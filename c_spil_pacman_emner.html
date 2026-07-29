@@ -650,6 +650,12 @@ const Game = {
     },
 
     input(k) {
+        if (k === 'Enter') {
+            if (!document.getElementById('win-screen').classList.contains('hidden')) this.nextLevel();
+            else if (!document.getElementById('loose-screen').classList.contains('hidden')) this.retryLevel();
+            else if (!document.getElementById('finish-screen').classList.contains('hidden')) this.showMenu();
+            return;
+        }
         if(!this.running) return;
         let d = {x:0, y:0};
         if(k==='ArrowUp') d.y = -1;
