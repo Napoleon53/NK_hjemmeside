@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kemi-Lab: Difficulty Edition</title>
+    <style>
+        :root { --bg: #0f0f1a; --panel: #1b1b2f; --accent: #00d2d3; --text: #e0e0e0; --gold: #ffd700; --danger: #ff4757; --success: #4ade80; }
+        body { margin: 0; padding: 0; background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; overflow: hidden; touch-action: none; display: flex; flex-direction: column; align-items: center; height: 100vh; }
+        
+        /* UI HEADER */
+        #ui-header { width: 100%; height: 55px; background: var(--panel); border-bottom: 2px solid var(--accent); display: flex; justify-content: space-between; align-items: center; padding: 0 15px; box-sizing: border-box; flex-shrink: 0; font-size: 0.9rem; z-index: 10; }
+        .stat { font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        #ghost-timer { color: var(--danger); font-weight: bold; display: none; animation: pulse 1s infinite; }
+        .menu-btn-small { background: #333; border: 1px solid #555; color: #fff; padding: 5px 10px; font-size: 0.8rem; border-radius: 5px; cursor: pointer; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        
+        /* OPGAVE BOKS */
+        #q-container { width: 100%; background: #161625; padding: 10px 0; text-align: center; border-bottom: 1px solid #333; flex-shrink: 0; z-index: 5; }
+        #q-box { display: inline-block; background: rgba(255,255,255,0.05); border: 1px solid var(--gold); padding: 5px 30px; border-radius: 50px; min-width: 200px; }
+        #q-label { font-size: 0.75rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+        #q-text { font-family: 'Courier New', monospace; font-size: 1.4rem; font-weight: bold; color: var(--gold); }
+
+        /* SPIL OMRÅDE */
+        #game-wrapper { flex: 1; width: 100%; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden; background: #050505; }
+        canvas { background: #121212; box-shadow: 0 0 30px rgba(0, 210, 211, 0.15); image-rendering: pixelated; max-width: 98%; max-height: 98%; border-radius: 4px; }
+
+        /* SKÆRME */
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 15, 26, 0.98); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; transition: opacity 0.2s; backdrop-filter: blur(5px); }
+        .hidden { opacity: 0; pointer-events: none; display: none; }
+        
+        h1 { font-size: 2.5rem; background: linear-gradient(45deg, var(--accent), #2980b9); -webkit-background-clip: text; color: transparent; margin: 0 0 20px 0; text-align: center; }
+        p { color: #ccc; max-width: 500px; text-align: center; line-height: 1.6; margin-bottom: 30px; padding: 0 20px; }
+        
+        /* KNAPPER */
+        .btn-group { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 300px; }
+        button.main-btn { padding: 15px 20px; font-size: 1.1rem; font-weight: bold; border-radius: 12px; border: none; background: var(--accent); color: #0b0c15; cursor: pointer; box-shadow: 0 5px 15px rgba(0, 210, 211, 0.3); transition: transform 0.1s, background 0.2s; }
+        button.main-btn:active { transform: scale(0.96); }
+        button.main-btn:hover { background: #22a6b3; }
+        
+        button.secondary { background: transparent; border: 2px solid #444; color: #aaa; margin-top: 10px; }
+        button.secondary:hover { border-color: #fff; color: #fff; }
+
+        /* Sværhedsgrad-valg */
+        #diff-hint { margin-bottom: 10px; }
+        #diff-group { display: flex; gap: 10px; width: 100%; max-width: 420px; margin-bottom: 25px; }
+        .diff-choice { flex: 1; padding: 14px 8px; font-size: 0.95rem; font-weight: bold; border-radius: 10px; border: 2px solid #444; background: #222235; color: #999; cursor: pointer; transition: transform 0.1s, background 0.2s, border-color 0.2s, color 0.2s; }
+        .diff-choice:hover { border-color: #888; color: #fff; }
+        .diff-choice:active { transform: scale(0.96); }
+        .diff-choice.active { border-color: var(--accent); background: var(--accent); color: #0b0c15; box-shadow: 0 5px 15px rgba(0, 210, 211, 0.3); }
+
+        /* Emne-grid (3 rækker) */
+        .topic-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 640px; transition: opacity 0.2s; }
+        .topic-grid button { padding: 12px 8px; font-size: 0.9rem; }
+        .topic-grid.locked { opacity: 0.35; pointer-events: none; filter: grayscale(70%); }
+        @media (max-width: 600px) { .topic-grid { gap: 6px; } .topic-grid button { padding: 8px 4px; font-size: 0.75rem; } .topic-grid button span { display: none; } }
+
+        /* TOUCH */
+        #dpad { display: none; position: absolute; bottom: 20px; right: 20px; width: 160px; height: 160px; z-index: 50; }
+        .d-btn { position: absolute; width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
+        .d-up { top: 0; left: 55px; } .d-down { bottom: 0; left: 55px; } .d-left { top: 55px; left: 0; } .d-right { top: 55px; right: 0; }
+        @media (hover: none) and (pointer: coarse) { #dpad { display: block; } }
+
+        #toast { position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: #fff; padding: 12px 25px; border-radius: 30px; font-weight: bold; opacity: 0; transition: opacity 0.3s; pointer-events: none; text-align: center; z-index: 60; border: 1px solid #333; }
+    </style>
+</head>
+<body>
+
+<div id="ui-header">
+    <button class="menu-btn-small" onclick="Game.showMenu()">☰ MENU</button>
+    <div id="ghost-timer">VÅGNER OM 2s</div>
+    <div class="stat"><span>LIV:</span> <span id="lives-display">❤️❤️❤️</span></div>
+    <div class="stat"><span>OPGAVE:</span> <span id="level-display">1/10</span></div>
+</div>
+
+<div id="q-container">
+    <div id="q-box">
+        <div id="q-label">VÆLG EMNE I MENU</div>
+        <div id="q-text">---</div>
+    </div>
+</div>
+
+<div id="game-wrapper">
+    <canvas id="gameCanvas"></canvas>
+    <div id="toast"></div>
+
+    <div id="menu-screen" class="overlay">
+        <h1>KEMI LAB</h1>
+        <p id="diff-hint">Vælg sværhedsgrad:</p>
+        <div id="diff-group">
+            <button class="diff-choice" data-diff="let" onclick="Game.selectDifficulty('let')">LET</button>
+            <button class="diff-choice" data-diff="mellem" onclick="Game.selectDifficulty('mellem')">MELLEM</button>
+            <button class="diff-choice" data-diff="svaer" onclick="Game.selectDifficulty('svaer')">SVÆR</button>
+        </div>
+        <p>Vælg et træningsforløb:</p>
+        <div id="menu-buttons" class="topic-grid locked"></div>
+    </div>
+
+    <div id="win-screen" class="overlay hidden">
+        <h1 style="color:var(--success)">KORREKT!</h1>
+        <div id="win-explanation" style="background:#222; padding:20px; border-radius:10px; color:#fff; max-width: 90%; margin-bottom: 20px; text-align: left;"></div>
+        <button class="main-btn" onclick="Game.nextLevel()">NÆSTE OPGAVE ➔</button>
+    </div>
+
+    <div id="finish-screen" class="overlay hidden">
+        <h1 style="color:var(--gold); font-size:3rem; text-shadow: 0 0 20px rgba(255,215,0,0.5);">TILLYKKE! 🏆</h1>
+        <p style="font-size:1.2rem;">Du har gennemført alle opgaverne i dette emne!</p>
+        <p style="color:#aaa; font-size:0.9rem;">Du er nu klar til næste udfordring.</p>
+        <button class="main-btn" onclick="Game.showMenu()">TILBAGE TIL MENU</button>
+    </div>
+
+    <div id="loose-screen" class="overlay hidden">
+        <h1 style="color:var(--danger)">FEJLET!</h1>
+        <p>Du mistede dine liv. Det rigtige svar var:</p>
+        <div id="loose-explanation" style="background:#222; padding:20px; border-radius:10px; color:#fff; max-width: 90%; margin-bottom: 20px; text-align: left;"></div>
+        <div class="btn-group">
+            <button class="main-btn" onclick="Game.retryLevel()">PRØV IGEN</button>
+            <button class="main-btn secondary" onclick="Game.showMenu()">TIL MENU</button>
+        </div>
+    </div>
+
+    <div id="dpad">
+        <div class="d-btn d-up" data-k="ArrowUp"></div>
+        <div class="d-btn d-down" data-k="ArrowDown"></div>
+        <div class="d-btn d-left" data-k="ArrowLeft"></div>
+        <div class="d-btn d-right" data-k="ArrowRight"></div>
+    </div>
+</div>
+
+<script>
+/* ==========================================================================
+   DATA & EMNER (Fast Progression)
+   ========================================================================== */
+const sub = (n) => n.toString().split('').map(c => '₀₁₂₃₄₅₆₇₈₉'[c]).join('');
+const sup = (n) => (n===1 ? '⁺' : (n===2 ? '²⁺' : '³⁺'));
+const supNeg = (n) => (n===1 ? '⁻' : (n===2 ? '²⁻' : '³⁻'));
+
+const EN = { H:2.20, C:2.55, N:3.04, O:3.44, F:3.98, Cl:3.16, Br:2.96, I:2.66, Na:0.93, Mg:1.31, Al:1.61, Si:1.90, P:2.19, S:2.58, K:0.82, Ca:1.00 };
+const NAVNE = ["", "Methan","Ethan","Propan","Butan","Pentan","Hexan","Heptan","Octan","Nonan","Decan"];
+const fmtOx = (v) => (v > 0 ? '+' : '') + v;
+const REDOX_CATS = ["Oxidation", "Reduktion", "Fældning", "Syre-base-reaktion"];
+
+// De første 20 grundstoffer + de mest almindelige metaller + brom og iod
+const GRUNDSTOFFER = [
+    {navn:'Hydrogen', symbol:'H'}, {navn:'Helium', symbol:'He'}, {navn:'Lithium', symbol:'Li'},
+    {navn:'Beryllium', symbol:'Be'}, {navn:'Bor', symbol:'B'}, {navn:'Kulstof', symbol:'C'},
+    {navn:'Kvælstof', symbol:'N'}, {navn:'Ilt', symbol:'O'}, {navn:'Fluor', symbol:'F'},
+    {navn:'Neon', symbol:'Ne'}, {navn:'Natrium', symbol:'Na'}, {navn:'Magnesium', symbol:'Mg'},
+    {navn:'Aluminium', symbol:'Al'}, {navn:'Silicium', symbol:'Si'}, {navn:'Fosfor', symbol:'P'},
+    {navn:'Svovl', symbol:'S'}, {navn:'Chlor', symbol:'Cl'}, {navn:'Argon', symbol:'Ar'},
+    {navn:'Kalium', symbol:'K'}, {navn:'Calcium', symbol:'Ca'}, {navn:'Jern', symbol:'Fe'},
+    {navn:'Kobber', symbol:'Cu'}, {navn:'Zink', symbol:'Zn'}, {navn:'Sølv', symbol:'Ag'},
+    {navn:'Guld', symbol:'Au'}, {navn:'Bly', symbol:'Pb'}, {navn:'Tin', symbol:'Sn'},
+    {navn:'Nikkel', symbol:'Ni'}, {navn:'Mangan', symbol:'Mn'}, {navn:'Krom', symbol:'Cr'},
+    {navn:'Brom', symbol:'Br'}, {navn:'Iod', symbol:'I'}
+];
+
+const EMNER = {
+    // GRUNDSTOFFER
+    'grundstoffer': {
+        title: "Grundstoffer",
+        desc: "Navn til kemisk symbol",
+        levels: GRUNDSTOFFER,
+        create: (data) => {
+            const correct = data.symbol;
+            const shuffle = (arr) => arr.map(v => [Math.random(), v]).sort((a,b) => a[0]-b[0]).map(v => v[1]);
+            const pool = GRUNDSTOFFER.map(e => e.symbol).filter(s => s !== correct);
+            // Prioriter symboler der starter på samme bogstav som en "lignende" (forvekslelig) forkert mulighed
+            const similar = shuffle(pool.filter(s => s[0] === correct[0]));
+            const rest = shuffle(pool.filter(s => s[0] !== correct[0]));
+            const wrongs = [...similar, ...rest].slice(0, 3);
+            return {
+                text: `Hvad er det kemiske symbol for ${data.navn.toLowerCase()}?`,
+                correct: correct,
+                wrongs: wrongs,
+                exp: `${data.navn} har det kemiske symbol ${correct}.`
+            };
+        }
+    },
+    // IONER
+    'ioner': {
+        title: "Salte (Ioner)",
+        desc: "Lær at afstemme saltformler.",
+        levels: [
+            { p:{n:'Natrium',f:'Na',c:1}, n:{n:'chlorid',f:'Cl',c:1} }, 
+            { p:{n:'Magnesium',f:'Mg',c:2}, n:{n:'oxid',f:'O',c:2} },   
+            { p:{n:'Kalium',f:'K',c:1}, n:{n:'sulfid',f:'S',c:2} },     
+            { p:{n:'Calcium',f:'Ca',c:2}, n:{n:'iodid',f:'I',c:1} },    
+            { p:{n:'Aluminium',f:'Al',c:3}, n:{n:'chlorid',f:'Cl',c:1} },
+            { p:{n:'Natrium',f:'Na',c:1}, n:{n:'sulfat',f:'SO₄',c:2,p:true} },
+            { p:{n:'Calcium',f:'Ca',c:2}, n:{n:'nitrat',f:'NO₃',c:1,p:true} }, 
+            { p:{n:'Ammonium',f:'NH₄',c:1,p:true}, n:{n:'chlorid',f:'Cl',c:1} }, 
+            { p:{n:'Aluminium',f:'Al',c:3}, n:{n:'oxid',f:'O',c:2} },   
+            { p:{n:'Jern(III)',f:'Fe',c:3}, n:{n:'sulfat',f:'SO₄',c:2,p:true} }
+        ],
+        create: (data) => {
+            const p = data.p; const n = data.n;
+            const lcm = (a, b) => (a * b) / (function gcd(x, y){return !y ? x : gcd(y, x % y)})(a, b);
+            const common = lcm(p.c, n.c);
+            const numP = common / p.c;
+            const numN = common / n.c;
+            const fmt = (ion, count) => (count===1) ? ion.f : (ion.p ? `(${ion.f})${sub(count)}` : `${ion.f}${sub(count)}`);
+            const correct = fmt(p, numP) + fmt(n, numN);
+            let wrongs = new Set();
+            const add = (v) => { if (v !== correct) wrongs.add(v); };
+            add(fmt(p, 1) + fmt(n, 1));
+            add(fmt(p, n.c) + fmt(n, p.c));
+            add(fmt(p, 1) + fmt(n, 2));
+            let safe = 0;
+            while(wrongs.size < 3 && safe++ < 50) add(fmt(p, Math.floor(Math.random()*3)+1) + fmt(n, Math.floor(Math.random()*3)+1));
+            return {
+                text: `${p.n}${n.n}`,
+                correct: correct,
+                wrongs: Array.from(wrongs).slice(0,3),
+                exp: `Ladninger: ${p.f}${sup(p.c)} og ${n.f}${supNeg(n.c)}.<br>Vi bruger ${numP} stk. positiv og ${numN} stk. negativ.`
+            };
+        }
+    },
+    // MÆNGDE
+    'maengde': {
+        title: "Mængdeberegning",
+        desc: "Molarmasse og m = n · M",
+        levels: [
+            { type: 'M', f:'O₂', val:32 }, { type: 'm', n:2, M:10 },
+            { type: 'M', f:'H₂O', val:18 }, { type: 'm', n:0.5, M:100 },
+            { type: 'M', f:'NaCl', val:58.5 }, { type: 'm', n:5, M:20 },
+            { type: 'M', f:'CH₄', val:16 }, { type: 'm', n:0.1, M:50 },
+            { type: 'M', f:'C₆H₁₂O₆', val:180 }, { type: 'm', n:3, M:18 }
+        ],
+        create: (data) => {
+            if(data.type === 'M') {
+                const correct = data.val + " g/mol";
+                let wrongs = new Set();
+                const add = (v) => { if (v !== correct) wrongs.add(v); };
+                add((data.val * 2) + " g/mol"); add((data.val + 10) + " g/mol"); add((data.val - 2) + " g/mol");
+                let safe = 1;
+                while(wrongs.size < 3) add((data.val + safe++ * 3) + " g/mol");
+                return { text: `Find molarmassen (M) for ${data.f}`, correct: correct, wrongs: Array.from(wrongs).slice(0,3), exp: `Vi lægger atommasserne sammen for ${data.f}.` };
+            } else {
+                const res = data.n * data.M;
+                const correct = res + " g";
+                let wrongs = new Set();
+                const add = (v) => { if (v !== correct) wrongs.add(v); };
+                add((res * 10) + " g"); add((data.n + data.M) + " g"); add((data.M / data.n) + " g");
+                let safe = 1;
+                while(wrongs.size < 3) add((res + safe++ * 5) + " g");
+                return { text: `Find massen (m) når n=${data.n} mol og M=${data.M} g/mol`, correct: correct, wrongs: Array.from(wrongs).slice(0,3), exp: `m = n · M<br>${data.n} · ${data.M} = ${correct}.` };
+            }
+        }
+    },
+    // OPLØSNING
+    'oplosning': {
+        title: "Opløsninger",
+        desc: "Koncentration c = n / V",
+        levels: [
+            {n:1, v:1}, {n:2, v:1}, {n:1, v:2}, {n:0.5, v:1},
+            {n:2, v:0.5}, {n:0.1, v:0.1}, {n:3, v:2}, {n:0.25, v:0.5},
+            {n:5, v:10}, {n:0.01, v:0.1}
+        ],
+        create: (data) => {
+            const res = data.n / data.v;
+            const correct = parseFloat(res.toFixed(2)) + " M";
+            let wrongs = new Set();
+            const add = (v) => { if (v !== correct) wrongs.add(v); };
+            add(parseFloat((data.n * data.v).toFixed(2)) + " M");
+            add(parseFloat((data.v / data.n).toFixed(2)) + " M");
+
+            let safe = 0;
+            while(wrongs.size < 3 && safe++ < 50) {
+                add(parseFloat((res + Math.random() * 3 + 0.1).toFixed(2)) + " M");
+            }
+
+            return {
+                text: `Beregn c når n=${data.n} mol og V=${data.v} L`,
+                correct: correct,
+                wrongs: Array.from(wrongs).slice(0,3),
+                exp: `c = n / V<br>${data.n} / ${data.v} = ${correct}.`
+            };
+        }
+    },
+    // SYRE/BASE
+    'syrebase': {
+        title: "Syre & Base",
+        desc: "Par og pH-værdi",
+        levels: [
+            {t:'par', q:'HCl', a:'Cl⁻', type:'base'}, {t:'par', q:'NH₃', a:'NH₄⁺', type:'syre'},
+            {t:'pH', c:0.1, val:1}, {t:'par', q:'H₂O', a:'OH⁻', type:'base'},
+            {t:'pH', c:0.01, val:2}, {t:'par', q:'CH₃COO⁻', a:'CH₃COOH', type:'syre'},
+            {t:'pH', c:0.001, val:3}, {t:'par', q:'OH⁻', a:'H₂O', type:'syre'},
+            {t:'par', q:'H₃O⁺', a:'H₂O', type:'base'}, {t:'pH', c:0.0001, val:4}
+        ],
+        create: (data) => {
+            if(data.t === 'par') {
+                const correct = data.a;
+                let wrongs = new Set();
+                const add = (v) => { if (v !== correct) wrongs.add(v); };
+                add(data.q); add(data.q + "H");
+                let safe = 0;
+                while(wrongs.size < 3 && safe++ < 50) add(data.q + "?".repeat(safe));
+                return { text: `Find den korresponderende ${data.type.toUpperCase()} til ${data.q}`, correct: correct, wrongs: Array.from(wrongs).slice(0,3), exp: data.type === 'syre' ? 'Basen optager H⁺.' : 'Syren afgiver H⁺.' };
+            } else {
+                const correct = data.val.toString();
+                let wrongs = new Set();
+                const add = (v) => { if (v !== correct && v !== "0") wrongs.add(v); };
+                add((data.val+1).toString()); add((data.val-1).toString()); add((14-data.val).toString());
+                let safe = 2;
+                while(wrongs.size < 3) add((data.val + safe++).toString());
+                return { text: `Find pH i stærk syre med c = ${data.c} M`, correct: correct, wrongs: Array.from(wrongs).slice(0,3), exp: `pH = -log(${data.c}) = ${correct}.` };
+            }
+        }
+    },
+    // BINDINGSTYPE
+    'binding': {
+        title: "Bindingstype",
+        desc: "Ion-, polær- og upolær binding",
+        levels: [
+            {a:'H', b:'H'}, {a:'H', b:'Cl'}, {a:'Na', b:'Cl'}, {a:'C', b:'H'}, {a:'O', b:'H'},
+            {a:'Mg', b:'O'}, {a:'C', b:'O'}, {a:'K', b:'Br'}, {a:'Cl', b:'Cl'}, {a:'N', b:'H'}
+        ],
+        create: (data) => {
+            const CATS = ["Ionbinding", "Polær kovalent binding", "Upolær kovalent binding", "Metalbinding"];
+            const enA = EN[data.a], enB = EN[data.b];
+            const diff = Math.abs(enA - enB);
+            let correct;
+            if (diff >= 1.7) correct = "Ionbinding";
+            else if (diff >= 0.4) correct = "Polær kovalent binding";
+            else correct = "Upolær kovalent binding";
+            return {
+                text: `Hvilken bindingstype er der mellem ${data.a} og ${data.b}?`,
+                correct: correct,
+                wrongs: CATS.filter(c => c !== correct),
+                exp: `Forskel i elektronegativitet: |${enA.toFixed(2)} − ${enB.toFixed(2)}| = ${diff.toFixed(2)}.<br>Under 0,4 → upolær kovalent. 0,4–1,7 → polær kovalent. Over 1,7 → ionbinding.`
+            };
+        }
+    },
+    // ORGANISK NAVNGIVNING
+    'organisk': {
+        title: "Organisk Navngivning",
+        desc: "Alkaners navn og formel (C₁–C₁₀)",
+        levels: [
+            {n:1, dir:'formel'}, {n:2, dir:'navn'}, {n:3, dir:'formel'}, {n:4, dir:'navn'},
+            {n:5, dir:'formel'}, {n:6, dir:'navn'}, {n:7, dir:'formel'}, {n:8, dir:'navn'},
+            {n:9, dir:'formel'}, {n:10, dir:'navn'}
+        ],
+        create: (data) => {
+            const n = data.n;
+            const navn = NAVNE[n];
+            const fmtF = (c, h) => `C${c===1 ? '' : sub(c)}H${sub(h)}`;
+            const formula = fmtF(n, 2*n+2);
+            if (data.dir === 'formel') {
+                const correct = formula;
+                let wrongs = new Set();
+                const add = (v) => { if (v !== correct) wrongs.add(v); };
+                add(fmtF(n, 2*n));
+                add(fmtF(n, 2*n+1));
+                add(fmtF(n+1, 2*n+2));
+                let safe = 1;
+                while(wrongs.size < 3) add(fmtF(n, 2*n+2+safe++));
+                return {
+                    text: `Hvad er den kemiske formel for ${navn.toLowerCase()}?`,
+                    correct: correct,
+                    wrongs: Array.from(wrongs).slice(0,3),
+                    exp: `${navn} har ${n} kulstofatom${n>1?'er':''}. Alkaner følger CₙH₂ₙ₊₂, så formlen er ${correct}.`
+                };
+            } else {
+                const correct = navn;
+                let wrongs = new Set();
+                const add = (v) => { if (v && v !== correct) wrongs.add(v); };
+                add(NAVNE[n-1]); add(NAVNE[n+1]); add(NAVNE[n-2]);
+                let safe = 1;
+                while(wrongs.size < 3) { add(NAVNE[(n+safe) % 10 + 1]); safe++; }
+                return {
+                    text: `Hvad hedder alkanet med formlen ${formula}?`,
+                    correct: correct,
+                    wrongs: Array.from(wrongs).slice(0,3),
+                    exp: `${formula} har ${n} kulstofatom${n>1?'er':''} og følger CₙH₂ₙ₊₂-mønstret for alkaner, så navnet er ${correct}.`
+                };
+            }
+        }
+    },
+    // REDOXREAKTIONER
+    'redox': {
+        title: "Redoxreaktioner",
+        desc: "Oxidationstal og oxidation/reduktion",
+        levels: [
+            {type:'tal', formel:'SO₄²⁻', atom:'S', val:6, exp:'Ilt (O) har oxidationstal −2. 4 · (−2) + x = −2 (ionens ladning) ⇒ x = +6.'},
+            {type:'redox', rxn:'Fe²⁺ → Fe³⁺ + e⁻', redoxCorrect:'Oxidation', exp:'Jern afgiver en elektron (e⁻ er produkt), og oxidationstallet stiger fra +2 til +3 → oxidation.'},
+            {type:'tal', formel:'NO₃⁻', atom:'N', val:5, exp:'Ilt (O) har oxidationstal −2. 3 · (−2) + x = −1 (ionens ladning) ⇒ x = +5.'},
+            {type:'redox', rxn:'Cl₂ + 2e⁻ → 2Cl⁻', redoxCorrect:'Reduktion', exp:'Chlor optager elektroner (e⁻ er reaktant), og oxidationstallet falder fra 0 til −1 → reduktion.'},
+            {type:'tal', formel:'MnO₄⁻', atom:'Mn', val:7, exp:'Ilt (O) har oxidationstal −2. 4 · (−2) + x = −1 (ionens ladning) ⇒ x = +7.'},
+            {type:'redox', rxn:'Zn → Zn²⁺ + 2e⁻', redoxCorrect:'Oxidation', exp:'Zink afgiver elektroner, og oxidationstallet stiger fra 0 til +2 → oxidation.'},
+            {type:'tal', formel:'Fe₂O₃', atom:'Fe', val:3, exp:'Ilt (O) har oxidationstal −2. 3 · (−2) + 2x = 0 (neutralt molekyle) ⇒ x = +3.'},
+            {type:'redox', rxn:'Cu²⁺ + 2e⁻ → Cu', redoxCorrect:'Reduktion', exp:'Kobber-ion optager elektroner, og oxidationstallet falder fra +2 til 0 → reduktion.'},
+            {type:'tal', formel:'H₂S', atom:'S', val:-2, exp:'Brint (H) har oxidationstal +1. 2 · (+1) + x = 0 (neutralt molekyle) ⇒ x = −2.'},
+            {type:'redox', rxn:'2I⁻ → I₂ + 2e⁻', redoxCorrect:'Oxidation', exp:'Iodid afgiver elektroner, og oxidationstallet stiger fra −1 til 0 → oxidation.'}
+        ],
+        create: (data) => {
+            if (data.type === 'tal') {
+                const correct = fmtOx(data.val);
+                let wrongs = new Set();
+                const add = (v) => { if (v !== correct) wrongs.add(v); };
+                add(fmtOx(data.val + 1));
+                add(fmtOx(data.val - 1));
+                add(fmtOx(-data.val));
+                let safe = 2;
+                while(wrongs.size < 3) add(fmtOx(data.val + safe++));
+                return {
+                    text: `Hvad er oxidationstallet for ${data.atom} i ${data.formel}?`,
+                    correct: correct,
+                    wrongs: Array.from(wrongs).slice(0,3),
+                    exp: data.exp
+                };
+            } else {
+                return {
+                    text: `Hvilken type reaktion viser dette: ${data.rxn}?`,
+                    correct: data.redoxCorrect,
+                    wrongs: REDOX_CATS.filter(c => c !== data.redoxCorrect),
+                    exp: data.exp
+                };
+            }
+        }
+    }
+};
+
+// MIX — blandet træning der trækker spørgsmål fra alle øvrige emner. Skal tilføjes
+// EFTER EMNER er defineret, da den samler spørgsmål fra de andre emner.
+EMNER.mix = {
+    title: "Mix",
+    desc: "Blandet træning – lidt af hvert emne",
+    levels: (() => {
+        const perTopic = 3;
+        const pool = [];
+        Object.keys(EMNER).forEach(k => {
+            const lvls = EMNER[k].levels;
+            const picks = new Set();
+            while (picks.size < Math.min(perTopic, lvls.length)) picks.add(Math.floor(Math.random() * lvls.length));
+            picks.forEach(i => pool.push({ topic: k, data: lvls[i] }));
+        });
+        for (let i = pool.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+        return pool;
+    })(),
+    create: (wrapped) => {
+        const q = EMNER[wrapped.topic].create(wrapped.data);
+        q.text = `[${EMNER[wrapped.topic].title}] ${q.text}`;
+        return q;
+    }
+};
+
+/* ==========================================================================
+   SPIL MOTOR
+   ========================================================================== */
+const TILE = 40; const ROWS = 15; const COLS = 19;
+const MAP = [
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,2,2,2,2,1,0,0,0,1,0,0,0,1,3,3,3,3,1],
+    [1,2,2,2,2,1,0,1,0,1,0,1,0,1,3,3,3,3,1],
+    [1,2,2,2,2,0,0,1,0,0,0,1,0,0,3,3,3,3,1],
+    [1,2,2,2,2,1,0,1,1,1,1,1,0,1,3,3,3,3,1],
+    [1,1,0,1,1,1,0,0,0,0,0,0,0,1,1,1,0,1,1],
+    [1,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,1],
+    [1,1,0,1,1,1,0,1,0,0,0,1,0,1,1,1,0,1,1],
+    [1,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,1],
+    [1,4,4,4,4,1,0,0,0,0,0,0,0,1,5,5,5,5,1],
+    [1,4,4,4,4,1,0,1,1,1,1,1,0,1,5,5,5,5,1],
+    [1,4,4,4,4,0,0,1,0,0,0,1,0,0,5,5,5,5,1],
+    [1,4,4,4,4,1,0,1,0,1,0,1,0,1,5,5,5,5,1],
+    [1,4,4,4,4,1,0,0,0,1,0,0,0,1,5,5,5,5,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+];
+
+const DIFFICULTIES = {
+    let:    { label: 'LET',    freezeTime: 5000, ghostSpeed: 40 },
+    mellem: { label: 'MELLEM', freezeTime: 3000, ghostSpeed: 25 },
+    svaer:  { label: 'SVÆR',   freezeTime: 1500, ghostSpeed: 15 }
+};
+
+const GHOST_SPAWNS = [{x:1,y:6}, {x:17,y:6}, {x:9,y:1}, {x:9,y:13}];
+const GHOST_COLORS = ['#ff4757', '#ff6b81', '#ff9f43', '#a29bfe'];
+const GHOST_SPAWN_INTERVAL = 5000; // SVÆR: nyt spøgelse hvert 5. sekund
+
+const Game = {
+    canvas: null, ctx: null,
+    running: false, frame: 0,
+    victoryMode: false,
+    confetti: [],
+    currentMode: null, currentIdx: 0,
+    lives: 3, startTime: 0,
+    selectedDifficulty: null,
+    freezeTime: null,
+    ghostSpeed: null,
+    lastGhostSpawn: 0,
+    player: { x:0,y:0, tx:9, ty:6, dir:{x:0,y:0}, invincible:false, shieldT:0 },
+    ghosts: [], powerups: [], answers: [], q: null,
+
+    init() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.canvas.width = COLS * TILE;
+        this.canvas.height = ROWS * TILE;
+
+        window.addEventListener('keydown', e => this.input(e.key));
+        document.querySelectorAll('.d-btn').forEach(b => {
+            b.addEventListener('touchstart', e => { e.preventDefault(); this.input(b.dataset.k); });
+        });
+        
+        const menu = document.getElementById('menu-buttons');
+        menu.innerHTML = '';
+        for(const k in EMNER) {
+            let btn = document.createElement('button');
+            btn.className = 'main-btn';
+            btn.innerHTML = `<strong>${EMNER[k].title}</strong><br><span style="font-size:0.8em; opacity:0.8">${EMNER[k].desc}</span>`;
+            btn.onclick = () => this.startGame(k);
+            menu.appendChild(btn);
+        }
+
+        this.resetPositions();
+        this.loop();
+    },
+
+    selectDifficulty(key) {
+        const d = DIFFICULTIES[key];
+        this.selectedDifficulty = key;
+        this.freezeTime = d.freezeTime;
+        this.ghostSpeed = d.ghostSpeed;
+        document.querySelectorAll('.diff-choice').forEach(b => b.classList.toggle('active', b.dataset.diff === key));
+        document.getElementById('menu-buttons').classList.remove('locked');
+        document.getElementById('diff-hint').innerText = `Sværhedsgrad: ${d.label} — vælg et træningsforløb:`;
+    },
+
+    showMenu() {
+        this.running = false;
+        this.victoryMode = false;
+        document.querySelectorAll('.overlay').forEach(e => e.classList.add('hidden'));
+        document.getElementById('menu-screen').classList.remove('hidden');
+        document.getElementById('q-text').innerText = "VÆLG EMNE";
+        document.getElementById('q-label').innerText = "PAUSE";
+
+        const grid = document.getElementById('menu-buttons');
+        if (this.selectedDifficulty) {
+            grid.classList.remove('locked');
+            document.getElementById('diff-hint').innerText = `Sværhedsgrad: ${DIFFICULTIES[this.selectedDifficulty].label} — vælg et træningsforløb:`;
+        } else {
+            grid.classList.add('locked');
+            document.getElementById('diff-hint').innerText = "Vælg sværhedsgrad:";
+        }
+    },
+
+    startGame(key) {
+        if (!this.selectedDifficulty) return;
+        this.currentMode = key;
+        this.currentIdx = 0;
+        this.lives = 3;
+        this.victoryMode = false;
+        this.setupLevel();
+    },
+
+    nextLevel() { 
+        this.currentIdx++;
+        // Check length
+        if (this.currentIdx >= EMNER[this.currentMode].levels.length) {
+            this.triggerVictory();
+        } else {
+            this.setupLevel(); 
+        }
+    },
+    
+    triggerVictory() {
+        this.hideOverlays();
+        document.getElementById('finish-screen').classList.remove('hidden');
+        this.victoryMode = true;
+        this.initConfetti();
+        document.getElementById('q-text').innerText = "SEJR!";
+        document.getElementById('q-label').innerText = "EMNE GENNEMFØRT";
+    },
+
+    retryLevel() { this.lives = 3; this.setupLevel(); },
+
+    setupLevel() {
+        document.querySelectorAll('.overlay').forEach(e => e.classList.add('hidden'));
+        this.startTime = Date.now();
+        this.resetPositions();
+        this.player.invincible = false;
+        
+        const modeObj = EMNER[this.currentMode];
+        const data = modeObj.levels[this.currentIdx];
+        
+        try {
+            this.q = modeObj.create(data);
+        } catch(e) {
+            this.q = { text: "Fejl", correct: "?", wrongs: ["?", "?", "?"], exp: "Fejl" };
+        }
+
+        document.getElementById('q-label').innerText = modeObj.title;
+        document.getElementById('q-text').innerText = this.q.text;
+        document.getElementById('level-display').innerText = `${this.currentIdx + 1}/${modeObj.levels.length}`;
+        document.getElementById('lives-display').innerText = "❤️".repeat(this.lives);
+
+        let opts = [this.q.correct, ...this.q.wrongs];
+        while(opts.length < 4) opts.push("???"); 
+        opts.sort(() => Math.random() - 0.5);
+
+        this.answers = [
+            { z: 2, t: opts[0], ok: opts[0]===this.q.correct, c: '#e056fd' },
+            { z: 3, t: opts[1], ok: opts[1]===this.q.correct, c: '#f0932b' },
+            { z: 4, t: opts[2], ok: opts[2]===this.q.correct, c: '#22a6b3' },
+            { z: 5, t: opts[3], ok: opts[3]===this.q.correct, c: '#badc58' }
+        ];
+
+        this.spawnPowerup();
+        this.running = true;
+    },
+
+    resetPositions() {
+        this.player.tx = 9; this.player.ty = 6;
+        this.player.x = 9*TILE; this.player.y = 6*TILE;
+        this.player.dir = {x:0, y:0};
+
+        this.ghosts = [];
+        let count = this.currentIdx < 4 ? 1 : 2;
+        for(let i=0; i<count; i++) {
+            this.ghosts.push(this.makeGhost(i));
+        }
+        this.lastGhostSpawn = 0;
+    },
+
+    makeGhost(spawnIdx) {
+        const s = GHOST_SPAWNS[spawnIdx % GHOST_SPAWNS.length];
+        return {
+            tx: s.x, ty: s.y,
+            x: s.x*TILE, y: s.y*TILE,
+            fromTx: -1, fromTy: -1,
+            c: GHOST_COLORS[spawnIdx % GHOST_COLORS.length]
+        };
+    },
+
+    spawnPowerup() {
+        this.powerups = [];
+        let valid = false, px, py, tries=0;
+        while(!valid && tries < 50) {
+            px = Math.floor(Math.random()*COLS);
+            py = Math.floor(Math.random()*ROWS);
+            if (MAP[py][px] === 0 && !(px===9 && py===6)) valid = true;
+            tries++;
+        }
+        if(valid) this.powerups.push({ tx: px, ty: py });
+    },
+
+    input(k) {
+        if(!this.running) return;
+        let d = {x:0, y:0};
+        if(k==='ArrowUp') d.y = -1;
+        else if(k==='ArrowDown') d.y = 1;
+        else if(k==='ArrowLeft') d.x = -1;
+        else if(k==='ArrowRight') d.x = 1;
+        else return;
+
+        let ntx = this.player.tx + d.x;
+        let nty = this.player.ty + d.y;
+        if(MAP[nty][ntx] !== 1) this.player.dir = d;
+    },
+
+    update() {
+        if(this.victoryMode) {
+            this.updateConfetti();
+            return;
+        }
+        if(!this.running) return;
+        this.frame++;
+
+        const elapsed = Date.now() - this.startTime;
+        const timerDiv = document.getElementById('ghost-timer');
+        
+        // Brug den valgte sværhedsgrad (this.freezeTime)
+        if (elapsed < this.freezeTime) {
+            timerDiv.style.display = 'block';
+            timerDiv.innerText = "VÅGNER OM " + Math.ceil((this.freezeTime - elapsed)/1000) + "s";
+        } else {
+            timerDiv.style.display = 'none';
+        }
+
+        if(this.player.dir.x !== 0 || this.player.dir.y !== 0) {
+            this.player.tx += this.player.dir.x;
+            this.player.ty += this.player.dir.y;
+            this.player.x = this.player.tx * TILE;
+            this.player.y = this.player.ty * TILE;
+
+            if(this.player.ty >= 0 && this.player.ty < ROWS && this.player.tx >= 0 && this.player.tx < COLS) {
+                let zone = MAP[this.player.ty][this.player.tx];
+                if(zone > 1) {
+                    let ans = this.answers.find(a => a.z === zone);
+                    if(ans) { 
+                        this.running = false; 
+                        this.player.dir={x:0,y:0};
+                        if(ans.ok) this.win(); else this.hit("Forkert rum!");
+                    }
+                }
+            }
+
+            let pIdx = this.powerups.findIndex(p => p.tx === this.player.tx && p.ty === this.player.ty);
+            if(pIdx !== -1) {
+                this.powerups.splice(pIdx, 1);
+                this.activateShield();
+            }
+            this.player.dir = {x:0, y:0};
+        }
+
+        if(this.player.invincible) {
+            this.player.shieldT--;
+            if(this.player.shieldT <= 0) this.player.invincible = false;
+        }
+
+        // I SVÆR sværhedsgrad dukker der et nyt spøgelse op hvert 5. sekund
+        if (this.selectedDifficulty === 'svaer' && this.ghosts.length < GHOST_SPAWNS.length && elapsed - this.lastGhostSpawn >= GHOST_SPAWN_INTERVAL) {
+            this.ghosts.push(this.makeGhost(this.ghosts.length));
+            this.lastGhostSpawn = elapsed;
+            this.showToast("👻 NYT SPØGELSE!", "#ff4757");
+        }
+
+        // Spøgelser vågner efter this.freezeTime
+        if (elapsed > this.freezeTime) {
+            let speed = this.ghostSpeed;
+            if (this.frame % speed === 0) {
+                this.ghosts.forEach(g => {
+                    let dirs = [{x:0,y:-1},{x:0,y:1},{x:-1,y:0},{x:1,y:0}];
+                    let valid = dirs.filter(d => MAP[g.ty+d.y][g.tx+d.x] !== 1);
+                    // AI-buff: undgå at vende om på sig selv (undtagen i blindgyder), så spøgelserne ikke virker "fastklemte"
+                    let options = valid.filter(d => !(g.tx+d.x === g.fromTx && g.ty+d.y === g.fromTy));
+                    if (options.length === 0) options = valid;
+                    if (options.length > 0) {
+                        let best = options[0];
+                        let min = 9999;
+                        options.forEach(d => {
+                            let dist = Math.abs((g.tx+d.x)-this.player.tx) + Math.abs((g.ty+d.y)-this.player.ty);
+                            if(dist < min) { min = dist; best = d; }
+                        });
+                        if(Math.random() < 0.25) best = options[Math.floor(Math.random()*options.length)];
+                        g.fromTx = g.tx; g.fromTy = g.ty;
+                        g.tx += best.x; g.ty += best.y;
+                        g.x = g.tx * TILE; g.y = g.ty * TILE;
+                    }
+                });
+            }
+
+            this.ghosts.forEach(g => {
+                if(g.tx === this.player.tx && g.ty === this.player.ty) {
+                    if(!this.player.invincible) this.hit("FANGET AF SPØGELSE!");
+                }
+            });
+        }
+    },
+
+    /* KONFETTI LOGIK */
+    initConfetti() {
+        this.confetti = [];
+        for(let i=0; i<100; i++) {
+            this.confetti.push({
+                x: Math.random() * this.canvas.width,
+                y: Math.random() * this.canvas.height - this.canvas.height,
+                vy: Math.random() * 3 + 2,
+                vx: Math.random() * 2 - 1,
+                c: `hsl(${Math.random()*360}, 100%, 50%)`,
+                s: Math.random() * 6 + 4
+            });
+        }
+    },
+    updateConfetti() {
+        this.confetti.forEach(p => {
+            p.y += p.vy;
+            p.x += Math.sin(p.y * 0.05); // Wiggle
+            if(p.y > this.canvas.height) p.y = -20;
+        });
+    },
+    drawConfetti() {
+        this.confetti.forEach(p => {
+            this.ctx.fillStyle = p.c;
+            this.ctx.fillRect(p.x, p.y, p.s, p.s);
+        });
+    },
+
+    activateShield() {
+        this.player.invincible = true;
+        this.player.shieldT = 300; 
+        this.showToast("🛡️ SKJOLD AKTIVERET!", "#ffd700");
+    },
+
+    hit(msg) {
+        this.lives--;
+        document.getElementById('lives-display').innerText = "❤️".repeat(this.lives);
+        this.showToast(msg, "#ff4757");
+        this.resetPositions();
+        
+        if(this.lives <= 0) {
+            this.running = false;
+            document.getElementById('loose-explanation').innerHTML = `<strong>${this.q.correct}</strong><br>${this.q.exp}`;
+            document.getElementById('loose-screen').classList.remove('hidden');
+        } else {
+            this.player.invincible = true;
+            this.player.shieldT = 120;
+            this.running = true;
+        }
+    },
+
+    win() {
+        document.getElementById('win-explanation').innerHTML = this.q.exp;
+        document.getElementById('win-screen').classList.remove('hidden');
+    },
+
+    showToast(t, c) {
+        let el = document.getElementById('toast');
+        el.innerText = t; el.style.borderColor = c; el.style.opacity = 1;
+        setTimeout(() => el.style.opacity = 0, 2000);
+    },
+
+    hideOverlays() { document.querySelectorAll('.overlay').forEach(e => e.classList.add('hidden')); },
+
+    loop() {
+        this.update();
+        
+        // DRAW BACKGROUND
+        this.ctx.fillStyle = '#0f0f1a';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        if (this.victoryMode) {
+            // Draw Victory State
+            this.ctx.font = "bold 40px Arial";
+            this.ctx.fillStyle = "#fff";
+            this.ctx.textAlign = "center";
+            this.ctx.fillText("SEJR!", this.canvas.width/2, this.canvas.height/2);
+            this.drawConfetti();
+        } else {
+            // Draw Game State
+            // Map
+            for(let y=0; y<ROWS; y++) {
+                for(let x=0; x<COLS; x++) {
+                    let c = MAP[y][x];
+                    let px = x*TILE, py = y*TILE;
+                    if(c===1) {
+                        this.ctx.fillStyle = '#1b1b2f'; this.ctx.fillRect(px,py,TILE,TILE);
+                        this.ctx.strokeStyle='#2c2c54'; this.ctx.strokeRect(px,py,TILE,TILE);
+                    } else if(c>1) {
+                        let ans = this.answers.find(a=>a.z===c);
+                        this.ctx.fillStyle = ans ? ans.c+'22' : '#000';
+                        this.ctx.fillRect(px,py,TILE,TILE);
+                    } else {
+                        this.ctx.fillStyle='#131324'; this.ctx.fillRect(px+15,py+15,10,10);
+                    }
+                }
+            }
+
+            // Answers
+            this.ctx.textAlign='center'; this.ctx.textBaseline='middle';
+            this.ctx.font='bold 20px Courier New';
+            this.answers.forEach(a => {
+                let cx=0, cy=0;
+                if(a.z===2) { cx=3*TILE; cy=3*TILE; }
+                if(a.z===3) { cx=15*TILE; cy=3*TILE; }
+                if(a.z===4) { cx=3*TILE; cy=11*TILE; }
+                if(a.z===5) { cx=15*TILE; cy=11*TILE; }
+                this.ctx.fillStyle='rgba(0,0,0,0.8)';
+                this.ctx.fillRect(cx-40, cy-15, 80, 30);
+                this.ctx.fillStyle=a.c;
+                this.ctx.fillText(a.t, cx, cy);
+            });
+
+            // Powerups
+            this.powerups.forEach(p => {
+                let x = p.tx*TILE + TILE/2;
+                let y = p.ty*TILE + TILE/2;
+                this.ctx.shadowBlur = 15; this.ctx.shadowColor = '#ffd700';
+                this.ctx.fillStyle = '#ffd700';
+                this.ctx.beginPath(); this.ctx.arc(x, y, 8, 0, Math.PI*2); this.ctx.fill();
+                this.ctx.shadowBlur = 0;
+                this.ctx.fillStyle = '#000'; this.ctx.font='12px Arial'; this.ctx.fillText("🛡️", x, y);
+            });
+
+            // Player
+            let px = this.player.x + TILE/2;
+            let py = this.player.y + TILE/2;
+            if(this.player.invincible) {
+                this.ctx.strokeStyle = `rgba(0, 210, 211, ${Math.random()*0.5 + 0.5})`;
+                this.ctx.lineWidth = 3;
+                this.ctx.beginPath(); this.ctx.arc(px, py, TILE/2, 0, Math.PI*2); this.ctx.stroke();
+            }
+            this.ctx.fillStyle = '#00d2d3';
+            this.ctx.beginPath(); this.ctx.arc(px, py, TILE/2-4, 0, Math.PI*2); this.ctx.fill();
+            this.ctx.fillStyle = '#000';
+            this.ctx.fillRect(px-6, py-4, 4, 4); this.ctx.fillRect(px+2, py-4, 4, 4);
+
+            // Ghosts
+            this.ghosts.forEach(g => {
+                let gx = g.x + TILE/2; let gy = g.y + TILE/2;
+                this.ctx.fillStyle = g.c;
+                this.ctx.beginPath(); this.ctx.arc(gx, gy-2, TILE/2-4, Math.PI, 0);
+                this.ctx.lineTo(gx+10, gy+10); this.ctx.lineTo(gx-10, gy+10);
+                this.ctx.fill();
+            });
+        }
+
+        requestAnimationFrame(() => this.loop());
+    }
+};
+
+window.onload = () => Game.init();
+</script>
+</body>
+</html>
