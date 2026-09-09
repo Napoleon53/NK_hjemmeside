@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fedt-Fabrikken: Byg et fedtstof</title>
+    <style>
+        :root {
+            --bg: #f6f3ee;
+            --panel: #ffffff;
+            --text: #2c3e50;
+            --muted: #7f8c8d;
+            --accent: #d35400;
+            --accent-soft: #fdf0e6;
+            --line: #e3ddd4;
+            --ok: #16a085;
+            --bad: #c0392b;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            touch-action: none;
+            -webkit-user-select: none; user-select: none;
+        }
+
+        /* ---------- HEADER ---------- */
+        header { background: var(--panel); box-shadow: 0 1px 0 var(--line); z-index: 20; flex: none; }
+        .top-bar { padding: 7px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        h1 { margin: 0; font-size: 1.05rem; letter-spacing: .2px; display: flex; align-items: baseline; gap: 8px; }
+        h1 small { font-weight: normal; font-size: .72rem; color: var(--muted); letter-spacing: 0; }
+        .header-actions { display: flex; gap: 6px; }
+        .ghost-btn { background: #f2efe9; color: #5d6d7e; border: 1px solid var(--line); padding: 6px 11px; border-radius: 20px;
+                     font-size: .74rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+        .ghost-btn:hover { background: #e8e3da; color: var(--text); }
+
+        /* ---------- ORDRE-BAR ---------- */
+        #order-bar { background: linear-gradient(180deg,#fffdf9,#fdf6ee); border-top: 1px solid var(--line);
+                     border-bottom: 2px solid #f0e2d2; padding: 7px 14px; display: flex; align-items: center; gap: 12px; }
+        .order-chip { background: var(--accent); color: #fff; font-size: .66rem; font-weight: 800; letter-spacing: .6px;
+                      padding: 4px 9px; border-radius: 6px; white-space: nowrap; }
+        .order-text { flex: 1; min-width: 0; line-height: 1.25; }
+        #order-title { font-size: .92rem; font-weight: 700; display: block; }
+        #order-desc { font-size: .74rem; color: #8d7a68; display: block; }
+        #order-pips { display: flex; gap: 4px; }
+        .pip { width: 26px; height: 26px; border-radius: 50%; background: #efe9e1; border: 2px solid #e0d7cb;
+               display: flex; align-items: center; justify-content: center; font-size: .8rem; filter: grayscale(1); opacity: .55; }
+        .pip.current { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); filter: none; opacity: 1; }
+        .pip.done { background: #d7f5ec; border-color: var(--ok); filter: none; opacity: 1; color: #0e7a68; font-weight: 800; }
+
+        /* ---------- BORD / CANVAS ---------- */
+        #stage { flex: 1; position: relative; overflow: hidden; min-height: 120px;
+                 background: radial-gradient(circle at 50% 42%, #ffffff 0%, #f4efe7 68%, #ece5da 100%); }
+        canvas { display: block; }
+
+        /* ---------- ANALYSE-BAR ---------- */
+        #result-bar { flex: none; display: none; background: var(--panel); border-top: 3px solid var(--accent);
+                      box-shadow: 0 -4px 14px rgba(0,0,0,.07); padding: 8px 14px; gap: 14px;
+                      align-items: center; flex-wrap: wrap; animation: riseIn .25s ease-out; }
+        @keyframes riseIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+        .res-id { display: flex; align-items: center; gap: 9px; min-width: 168px; }
+        .res-emoji { font-size: 1.7rem; }
+        .res-name { font-size: 1rem; font-weight: 800; line-height: 1.1; }
+        .res-facts { font-size: .72rem; color: var(--muted); }
+        .res-facts b { color: var(--text); }
+
+        .scale-wrap { flex: 1; min-width: 165px; max-width: 320px; }
+        .scale { position: relative; height: 14px; border-radius: 7px;
+                 background: linear-gradient(90deg,#8e44ad 0%, #e67e22 30%, #27ae60 55%, #2980b9 78%, #c0392b 100%); }
+        .scale-band { position: absolute; top: -2px; bottom: -2px; border: 2.5px solid #fff; border-radius: 7px;
+                      box-shadow: 0 0 0 1.5px #2c3e50; }
+        .scale-marker { position: absolute; top: -5px; width: 4px; height: 24px; background: #fff;
+                        box-shadow: 0 0 0 1.5px #2c3e50; border-radius: 2px; transform: translateX(-50%); transition: left .3s; }
+        .scale-labels { display: flex; justify-content: space-between; font-size: .62rem; color: var(--muted); margin-top: 3px; }
+        .scale-hint { font-size: .66rem; color: var(--muted); margin-bottom: 4px; }
+
+        .res-actions { display: flex; gap: 8px; margin-left: auto; }
+        button.primary { background: var(--accent); color: #fff; border: none; padding: 11px 18px; border-radius: 8px;
+                         font-size: .88rem; font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 #a04000; }
+        button.primary:hover { background: #e2620a; }
+        button.primary:active { transform: translateY(2px); box-shadow: 0 1px 0 #a04000; }
+        button.secondary { background: #fff; color: #5d6d7e; border: 1.5px solid var(--line); padding: 10px 14px;
+                           border-radius: 8px; font-size: .8rem; font-weight: 700; cursor: pointer; }
+        button.secondary:hover { background: #f4f1ec; }
+
+        /* ---------- PALETTE ---------- */
+        #palette-container { flex: none; background: #efeae2; border-top: 1px solid #ddd4c7; transition: background .15s; }
+        #palette-container.trash { background: #fbe4e0; }
+        #palette-container.trash .ph-title::after { content: " — slip her for at fjerne"; color: var(--bad); }
+        .palette-header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+                          padding: 5px 12px; background: #e5ded4; border-bottom: 1px solid #d8cfc2;
+                          font-size: .7rem; font-weight: 700; color: #6b5f52; letter-spacing: .3px; }
+        .steps { display: flex; gap: 5px; margin-left: auto; }
+        .step { background: #f6f2ec; border: 1px solid #d8cfc2; border-radius: 20px; padding: 2px 9px;
+                font-size: .68rem; color: #9b8f81; font-weight: 700; display: flex; align-items: center; gap: 4px; }
+        .step b { background: #cfc4b5; color: #fff; border-radius: 50%; width: 15px; height: 15px;
+                  display: inline-flex; align-items: center; justify-content: center; font-size: .6rem; }
+        .step.active { background: #fff3e6; border-color: var(--accent); color: var(--accent); }
+        .step.active b { background: var(--accent); }
+        .step.done { background: #ddf5ee; border-color: var(--ok); color: #0e7a68; }
+        .step.done b { background: var(--ok); }
+
+        #palette { display: flex; align-items: stretch; gap: 8px; padding: 9px 10px; overflow-x: auto; }
+        .card { flex: 1 1 0; min-width: 96px; max-width: 136px; background: #fff; border: 1px solid #e0d9cf;
+                border-top: 4px solid #bbb; border-radius: 10px; padding: 7px 5px 6px; cursor: grab;
+                display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+                box-shadow: 0 2px 4px rgba(0,0,0,.06); transition: transform .12s, box-shadow .12s, opacity .15s;
+                touch-action: none; }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 6px 14px rgba(0,0,0,.13); }
+        .card:active { cursor: grabbing; }
+        .card.dim { opacity: .42; }
+        .card.wiggle { animation: wiggle 1.6s ease-in-out infinite; }
+        @keyframes wiggle { 0%,100% { transform: none; } 45% { transform: translateY(-6px); } 62% { transform: translateY(-2px); } }
+        .card-sep { width: 1px; background: #d8cfc2; margin: 4px 3px; flex: none; }
+        .btn-pack { width: 62px; height: 32px; }
+        .card-label { font-size: .7rem; font-weight: 800; margin-top: 3px; text-align: center; line-height: 1.1; }
+        .card-sub { font-size: .58rem; color: var(--muted); text-align: center; line-height: 1.25; margin-top: 2px; }
+        .db-tag { display: inline-block; margin-top: 4px; font-size: .58rem; font-weight: 800; color: #fff;
+                  background: #95a5a6; border-radius: 10px; padding: 1px 7px; white-space: nowrap; }
+
+        /* ---------- GHOST (trække-billede uden for bordet) ---------- */
+        #drag-ghost { position: fixed; display: none; z-index: 300; pointer-events: none; opacity: .93;
+                      transform: translate(-50%,-50%) rotate(-3deg); background: #fff; border-radius: 10px;
+                      padding: 6px 4px; box-shadow: 0 10px 22px rgba(0,0,0,.3); width: 112px;
+                      flex-direction: column; align-items: center; }
+
+        /* ---------- MODAL ---------- */
+        #modal-overlay { position: fixed; inset: 0; background: rgba(20,15,10,.72); display: none;
+                         justify-content: center; align-items: center; z-index: 400; padding: 16px; }
+        .modal-box { background: #fff; padding: 24px 26px; border-radius: 14px; text-align: center; max-width: 440px;
+                     border-top: 6px solid var(--accent); box-shadow: 0 16px 40px rgba(0,0,0,.35); animation: riseIn .2s ease-out; }
+        .modal-badge { display: inline-block; padding: 4px 14px; border-radius: 20px; font-weight: 800; color: #fff;
+                       margin-bottom: 12px; text-transform: uppercase; font-size: .72rem; letter-spacing: .5px; }
+        .modal-title { font-size: 1.25rem; font-weight: 800; margin-bottom: 9px; line-height: 1.25; }
+        .modal-desc { margin-bottom: 18px; color: #5d6d7e; line-height: 1.45; font-size: .9rem; }
+        .bg-ok { background: var(--ok); } .bg-bad { background: var(--bad); } .bg-win { background: #8e44ad; }
+
+        /* ---------- INFO-PANEL ---------- */
+        #info-corner { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 600px; max-width: 94vw;
+                       max-height: 84vh; overflow-y: auto; background: #fff; border-radius: 12px; padding: 16px 20px;
+                       box-shadow: 0 14px 40px rgba(0,0,0,.4); border-top: 5px solid var(--accent); display: none;
+                       z-index: 350; font-size: .85rem; line-height: 1.4; color: #444; }
+        #info-corner h4 { margin: 0 0 6px 0; font-size: 1rem; color: var(--text); padding-right: 22px; }
+        #info-corner p { margin: 0 0 5px 0; }
+        #info-corner .info-close { position: absolute; top: 6px; right: 8px; cursor: pointer; font-weight: bold;
+                                   color: #999; font-size: 1.2rem; line-height: 1; padding: 4px 8px; }
+        #info-corner .info-close:hover { color: #333; }
+        #info-corner svg { width: 100%; height: auto; margin: 6px 0; }
+        #info-corner .ester-caption { font-size: .76rem; color: #888; margin-top: 6px; }
+
+        /* ---------- EFFEKTER ---------- */
+        .effect-text { position: absolute; pointer-events: none; font-weight: bold; color: #2980b9; font-size: 1.05rem;
+                       animation: floatUp 1.5s ease-out forwards; z-index: 5; }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-55px); } }
+        .toast-msg { position: absolute; left: 6%; width: 88%; top: 12px; text-align: center; pointer-events: none;
+                     font-weight: 700; color: #fff; font-size: .84rem; background: rgba(44,62,80,.93); padding: 9px 14px;
+                     border-radius: 10px; box-shadow: 0 6px 16px rgba(0,0,0,.25); z-index: 8;
+                     animation: toastLife 2.6s ease-out forwards; }
+        @keyframes toastLife { 0% { opacity: 0; transform: translateY(-12px); } 12%,80% { opacity: 1; transform: none; } 100% { opacity: 0; } }
+
+        @media (max-width: 640px) {
+            h1 small { display: none; }
+            .res-id { min-width: 132px; }
+            .scale-wrap { max-width: none; }
+            #order-desc { display: none; }
+            .steps { width: 100%; margin-left: 0; }
+        }
+        /* Alle 5 kort skal kunne være der på en telefon — derfor en kompakt udgave */
+        @media (max-width: 560px) {
+            #palette { gap: 5px; padding: 7px 6px; }
+            .card { min-width: 58px; padding: 5px 2px; }
+            .btn-pack { width: 48px; height: 26px; }
+            .card-label { font-size: .6rem; }
+            .card-sub { display: none; }
+            .db-tag { font-size: .53rem; padding: 1px 5px; }
+            .card-sep { margin: 4px 1px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="top-bar">
+        <h1>🏭 Fedt-Fabrikken <small>byg triglycerider af glycerol + 3 fedtsyrer</small></h1>
+        <div class="header-actions">
+            <button class="ghost-btn" onclick="openInfoPanel()">ℹ️ Esterbindingen</button>
+            <button class="ghost-btn" onclick="restartAll()">↺ Forfra</button>
+        </div>
+    </div>
+    <div id="order-bar">
+        <div class="order-chip" id="order-chip">ORDRE 1/5</div>
+        <div class="order-text">
+            <span id="order-title">…</span>
+            <span id="order-desc">…</span>
+        </div>
+        <div id="order-pips"></div>
+    </div>
+</header>
+
+<div id="stage">
+    <canvas id="simCanvas"></canvas>
+</div>
+
+<div id="result-bar">
+    <div class="res-id">
+        <div class="res-emoji" id="res-emoji">🧈</div>
+        <div>
+            <div class="res-name" id="res-name">—</div>
+            <div class="res-facts" id="res-facts">—</div>
+        </div>
+    </div>
+    <div class="scale-wrap">
+        <div class="scale-hint" id="scale-hint">—</div>
+        <div class="scale">
+            <div class="scale-band" id="scale-band"></div>
+            <div class="scale-marker" id="scale-marker"></div>
+        </div>
+        <div class="scale-labels"><span>0 dobbeltb. · hård</span><span>tyndtflydende · 9</span></div>
+    </div>
+    <div class="res-actions">
+        <button class="secondary" onclick="resetBench()">↺ Byg om</button>
+        <button class="primary" id="deliver-btn" onclick="deliver()">📦 Aflever ordre</button>
+    </div>
+</div>
+
+<div id="palette-container">
+    <div class="palette-header">
+        <span class="ph-title">⬆ TRÆK BYGGEDELENE OP PÅ BORDET</span>
+        <span class="steps">
+            <span class="step" id="step1"><b>1</b> Glycerol</span>
+            <span class="step" id="step2"><b>2</b> Fedtsyrer <span id="fa-count">0/3</span></span>
+            <span class="step" id="step3"><b>3</b> Aflever</span>
+        </span>
+    </div>
+    <div id="palette">
+        <div class="card" id="card-gly" data-kind="gly" style="border-top-color:#34495e" title="Glycerol: alkohol med 3 OH-grupper. Rygraden i alle triglycerider.">
+            <svg class="btn-pack" viewBox="0 0 70 36" xmlns="http://www.w3.org/2000/svg">
+                <line x1="22" y1="7" x2="22" y2="29" stroke="#34495e" stroke-width="3.5" stroke-linecap="round"/>
+                <circle cx="22" cy="7" r="3.4" fill="#34495e"/>
+                <circle cx="22" cy="18" r="3.4" fill="#34495e"/>
+                <circle cx="22" cy="29" r="3.4" fill="#34495e"/>
+                <line x1="22" y1="7" x2="35" y2="7" stroke="#95a5a6" stroke-width="2"/>
+                <line x1="22" y1="18" x2="35" y2="18" stroke="#95a5a6" stroke-width="2"/>
+                <line x1="22" y1="29" x2="35" y2="29" stroke="#95a5a6" stroke-width="2"/>
+                <text x="37" y="11" font-size="10" font-family="Arial" font-weight="bold" fill="#e74c3c">OH</text>
+                <text x="37" y="22" font-size="10" font-family="Arial" font-weight="bold" fill="#e74c3c">OH</text>
+                <text x="37" y="33" font-size="10" font-family="Arial" font-weight="bold" fill="#e74c3c">OH</text>
+            </svg>
+            <div class="card-label">Glycerol</div>
+            <div class="card-sub">Rygraden · 3 OH-grupper</div>
+        </div>
+
+        <div class="card-sep"></div>
+
+        <div class="card fa-card" data-kind="fa" data-type="saturated" style="border-top-color:#8e44ad" title="Stearinsyre: mættet, ingen dobbeltbindinger. Helt rette kæder, der kan pakke tæt sammen.">
+            <svg class="btn-pack" viewBox="0 0 70 36" xmlns="http://www.w3.org/2000/svg">
+                <line x1="3" y1="8" x2="67" y2="8" stroke="#8e44ad" stroke-width="3" stroke-linecap="round"/>
+                <line x1="3" y1="18" x2="67" y2="18" stroke="#8e44ad" stroke-width="3" stroke-linecap="round"/>
+                <line x1="3" y1="28" x2="67" y2="28" stroke="#8e44ad" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+            <div class="card-label">Stearinsyre</div>
+            <div class="card-sub">Mættet · helt ret kæde</div>
+            <div class="db-tag" style="background:#8e44ad">0 dobbeltb.</div>
+        </div>
+        <div class="card fa-card" data-kind="fa" data-type="mono" style="border-top-color:#27ae60" title="Oliesyre: mono-umættet, 1 dobbeltbinding. Ét knæk gør, at kæderne pakker løsere.">
+            <svg class="btn-pack" viewBox="0 0 70 36" xmlns="http://www.w3.org/2000/svg">
+                <polyline points="3,6 38,6 67,16" stroke="#27ae60" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <polyline points="3,18 38,18 67,28" stroke="#27ae60" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <polyline points="3,30 38,24 67,8" stroke="#27ae60" stroke-width="3" stroke-linecap="round" fill="none"/>
+            </svg>
+            <div class="card-label">Oliesyre</div>
+            <div class="card-sub">Mono-umættet · let knækket</div>
+            <div class="db-tag" style="background:#27ae60">1 dobbeltb.</div>
+        </div>
+        <div class="card fa-card" data-kind="fa" data-type="poly" style="border-top-color:#2980b9" title="Linolsyre: poly-umættet, 2 dobbeltbindinger. Flere knæk giver endnu løsere pakning.">
+            <svg class="btn-pack" viewBox="0 0 70 36" xmlns="http://www.w3.org/2000/svg">
+                <polyline points="3,6 24,10 45,4 67,20" stroke="#2980b9" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <polyline points="3,20 24,26 45,16 67,32" stroke="#2980b9" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <polyline points="3,32 24,18 45,30 67,6" stroke="#2980b9" stroke-width="3" stroke-linecap="round" fill="none"/>
+            </svg>
+            <div class="card-label">Linolsyre</div>
+            <div class="card-sub">Poly-umættet · knækket</div>
+            <div class="db-tag" style="background:#2980b9">2 dobbeltb.</div>
+        </div>
+        <div class="card fa-card" data-kind="fa" data-type="poly3" style="border-top-color:#c0392b" title="Linolensyre: poly-umættet, 3 dobbeltbindinger. Den mest knækkede kæde — pakker løsest af alle.">
+            <svg class="btn-pack" viewBox="0 0 70 36" xmlns="http://www.w3.org/2000/svg">
+                <polyline points="3,4 18,14 33,4 48,18 67,8" stroke="#c0392b" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <polyline points="3,18 18,30 33,16 48,32 67,20" stroke="#c0392b" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <polyline points="3,32 18,8 33,28 48,6 67,34" stroke="#c0392b" stroke-width="3" stroke-linecap="round" fill="none"/>
+            </svg>
+            <div class="card-label">Linolensyre</div>
+            <div class="card-sub">Poly-umættet · mest knækket</div>
+            <div class="db-tag" style="background:#c0392b">3 dobbeltb.</div>
+        </div>
+    </div>
+</div>
+
+<div id="drag-ghost"></div>
+
+<div id="info-corner">
+    <span class="info-close" onclick="closeInfoPanel()">✕</span>
+    <h4>🧪 Esterbindingen — et eksempel</h4>
+    <p>En syre (<b>-COOH</b>) + en alkohol (<b>-OH</b>) danner en <b>ester</b> + vand. Her er et konkret eksempel:</p>
+    <!-- Alle C-atomer er tegnet ind: carbonyl-C'et i syregruppen og i estergruppen står
+         som et rigtigt C, så det ikke er et usynligt knæk. Hele reaktionen står på én linje. -->
+    <svg viewBox="0 0 528 96" xmlns="http://www.w3.org/2000/svg" text-rendering="optimizeLegibility" shape-rendering="geometricPrecision">
+        <!-- Ethansyre: H₃C–C(=O)–OH -->
+        <text x="6" y="66" font-size="18" font-family="Arial" font-weight="bold">H₃C</text>
+        <line x1="46" y1="60" x2="60" y2="60" stroke="#333" stroke-width="2.5"/>
+        <text x="69" y="66" font-size="18" font-family="Arial" font-weight="bold" text-anchor="middle">C</text>
+        <line x1="66" y1="50" x2="66" y2="29" stroke="#333" stroke-width="2.5"/>
+        <line x1="72" y1="50" x2="72" y2="29" stroke="#333" stroke-width="2.5"/>
+        <text x="69" y="25" font-size="18" font-family="Arial" font-weight="bold" fill="#e74c3c" text-anchor="middle">O</text>
+        <line x1="78" y1="60" x2="92" y2="60" stroke="#333" stroke-width="2.5"/>
+        <text x="95" y="66" font-size="18" font-family="Arial" font-weight="bold">OH</text>
+        <text x="6" y="88" font-size="12" font-family="Arial" fill="#777">Ethansyre</text>
+
+        <text x="136" y="67" font-size="20" font-family="Arial" text-anchor="middle">+</text>
+
+        <!-- Methanol: H₃C–OH -->
+        <text x="150" y="66" font-size="18" font-family="Arial" font-weight="bold">H₃C</text>
+        <line x1="190" y1="60" x2="205" y2="60" stroke="#333" stroke-width="2.5"/>
+        <text x="208" y="66" font-size="18" font-family="Arial" font-weight="bold">OH</text>
+        <text x="150" y="88" font-size="12" font-family="Arial" fill="#777">Methanol</text>
+
+        <line x1="250" y1="60" x2="274" y2="60" stroke="#333" stroke-width="2.5"/>
+        <polygon points="274,54 286,60 274,66" fill="#333"/>
+
+        <!-- Methylethanoat: H₃C–C(=O)–O–CH₃ -->
+        <text x="296" y="66" font-size="18" font-family="Arial" font-weight="bold">H₃C</text>
+        <line x1="336" y1="60" x2="350" y2="60" stroke="#333" stroke-width="2.5"/>
+        <text x="359" y="66" font-size="18" font-family="Arial" font-weight="bold" text-anchor="middle">C</text>
+        <line x1="356" y1="50" x2="356" y2="29" stroke="#333" stroke-width="2.5"/>
+        <line x1="362" y1="50" x2="362" y2="29" stroke="#333" stroke-width="2.5"/>
+        <text x="359" y="25" font-size="18" font-family="Arial" font-weight="bold" fill="#e74c3c" text-anchor="middle">O</text>
+        <line x1="368" y1="60" x2="382" y2="60" stroke="#333" stroke-width="2.5"/>
+        <text x="391" y="66" font-size="18" font-family="Arial" font-weight="bold" fill="#e74c3c" text-anchor="middle">O</text>
+        <line x1="400" y1="60" x2="414" y2="60" stroke="#333" stroke-width="2.5"/>
+        <text x="417" y="66" font-size="18" font-family="Arial" font-weight="bold">CH₃</text>
+        <text x="296" y="88" font-size="12" font-family="Arial" fill="#777">Methylethanoat (en ester)</text>
+
+        <text x="466" y="67" font-size="20" font-family="Arial" text-anchor="middle">+</text>
+        <text x="478" y="66" font-size="18" font-family="Arial" font-weight="bold">H₂O</text>
+        <text x="478" y="88" font-size="12" font-family="Arial" fill="#777">vand</text>
+    </svg>
+    <p class="ester-caption">Læg mærke til <b>C-atomet</b> midt i: det er det samme carbonyl-C, der først sidder i syregruppen (<b>-COOH</b>) og bagefter i estergruppen (<b>-COO-</b>). O-atomet mellem C og CH₃ kommer fra alkoholen.</p>
+    <p class="ester-caption">I et fedtstof sker præcis det samme mellem glycerol og fedtsyrerne — bare 3 gange. Derfor hedder det et <b>tri</b>glycerid.</p>
+</div>
+
+<div id="modal-overlay">
+    <div class="modal-box">
+        <div id="res-badge" class="modal-badge">Resultat</div>
+        <div id="res-title" class="modal-title">Titel</div>
+        <div id="res-desc" class="modal-desc">Beskrivelse</div>
+        <button class="primary" id="modal-btn">Videre</button>
+    </div>
+</div>
+
+<script>
+/* ======================================================================
+   FEDT-FABRIKKEN
+   Én arbejdsflade: træk glycerol op på bordet, træk 3 fedtsyrer ind på
+   OH-grupperne (esterbinding + vand fraspaltes), og aflever produktet.
+   Den eneste knap eleven skruer på er det samlede antal dobbeltbindinger
+   (0-9) — og det er præcis det, der bestemmer produktets konsistens.
+   ====================================================================== */
+
+const canvas      = document.getElementById('simCanvas');
+const ctx         = canvas.getContext('2d');
+const stage       = document.getElementById('stage');
+const paletteBox  = document.getElementById('palette-container');
+const ghostEl     = document.getElementById('drag-ghost');
+const resultBar   = document.getElementById('result-bar');
+const modal       = document.getElementById('modal-overlay');
+const infoCorner  = document.getElementById('info-corner');
+const modalBtn    = document.getElementById('modal-btn');
+
+/* ---------- DATA ---------- */
+/* De enkelte fedtsyrers egne smeltepunkter er bevidst udeladt: de forvirrer mere end
+   de gavner, fordi de ikke er fedtstoffets smeltepunkt (stearinsyre smelter ved 69 °C,
+   men kakaosmør ved ca. 34 °C). Kun antallet af dobbeltbindinger er i spil her. */
+const FA_INFO = {
+    saturated: { name: 'Stearinsyre', db: 0, color: '#8e44ad' },
+    mono:      { name: 'Oliesyre',    db: 1, color: '#27ae60' },
+    poly:      { name: 'Linolsyre',   db: 2, color: '#2980b9' },
+    poly3:     { name: 'Linolensyre', db: 3, color: '#c0392b' }
+};
+
+/* Produktet bestemmes af det samlede antal dobbeltbindinger (0-9). */
+const PRODUCTS = [
+    { key:'kakao',     emoji:'🍫', name:'Kakaosmør',    range:[0,1], mp:34,  state:'fast ved 20 °C',
+      desc:'Meget mættet fedt. De rette kæder pakker tæt sammen, så det er hårdt og sprødt ved stuetemperatur — derfor knækker chokolade.' },
+    { key:'margarine', emoji:'🧈', name:'Margarine',    range:[2,3], mp:30,  state:'blød og smørbar',
+      desc:'En blanding af mættede og umættede fedtsyrer. Et par knæk i kæderne løsner pakningen lige nok til, at den er smørbar.' },
+    { key:'oliven',    emoji:'🫒', name:'Olivenolie',   range:[4,5], mp:-6,  state:'flydende ved 20 °C',
+      desc:'Mest mono-umættet. Ét knæk pr. kæde giver løsere pakning og lavere smeltepunkt — flydende, men stadig lidt tyktflydende.' },
+    { key:'solsikke',  emoji:'🌻', name:'Solsikkeolie', range:[6,7], mp:-17, state:'flydende ved 20 °C',
+      desc:'Poly-umættet. Mange knæk gør, at molekylerne næsten ikke kan pakke sig — en tynd, let olie, der også er flydende i køleskabet.' },
+    { key:'fisk',      emoji:'🐟', name:'Fiskeolie',    range:[8,9], mp:-20, state:'flydende ved 20 °C',
+      desc:'Meget poly-umættet med masser af omega-3. Kæderne er så knækkede, at olien er tyndtflydende selv på køl.' }
+];
+
+const ORDERS = [
+    { p:0, cust:'Chokoladefabrikken', text:'Vi skal bruge et fedtstof, der er HÅRDT ved stuetemperatur — ellers smelter chokoladen i hånden.' },
+    { p:1, cust:'Bageriet',           text:'Vi mangler et BLØDT, smørbart fedtstof — hverken hårdt som kakaosmør eller flydende som olie.' },
+    { p:2, cust:'Restauranten',       text:'Vi skal have en TYKTFLYDENDE madolie, hvor kæderne mest er mono-umættede.' },
+    { p:3, cust:'Salatbaren',         text:'Vi vil have en TYND, let olie til dressing — den skal stadig være flydende i køleskabet.' },
+    { p:4, cust:'Apoteket',           text:'Vi skal bruge en olie med SÅ MANGE dobbeltbindinger som muligt (omega-3-kosttilskud).' }
+];
+
+const ROOM_TEMP      = 20;
+const ESTER_BOND_LEN = 18;
+const SEGMENTS       = 12;
+const SNAP_R         = 95;
+
+/* ---------- TILSTAND ---------- */
+let width = 0, height = 0, dpr = 1;
+let glycerol   = null;
+let fattyAcids = [];
+let particles  = [];
+let dragging   = null;   // { kind, obj, ghostHTML, moved, sx, sy, fromPalette, wasAttached }
+let hoverSlot  = -1;
+let hoverBench = false;
+let orderIdx   = 0;
+let delivered  = [];
+let freePlay   = false;
+let pulse      = 0;
+
+/* ======================================================================
+   LAYOUT-HJÆLPERE
+   ====================================================================== */
+function benchX()  { return Math.max(92, Math.min(width * 0.24, 155)); }
+function benchY()  { return height * 0.48; }
+function slotGap() { return Math.max(34, Math.min(54, height * 0.17)); }
+function chainSegLen() {
+    const start = benchX() + 30 + ESTER_BOND_LEN + 12;
+    return Math.max(8.5, Math.min(17, (width - start - 16) / 12.4));
+}
+function distToSeg(p, a, b) {
+    const vx = b.x - a.x, vy = b.y - a.y, wx = p.x - a.x, wy = p.y - a.y;
+    const c1 = vx * wx + vy * wy; if (c1 <= 0) return Math.hypot(wx, wy);
+    const c2 = vx * vx + vy * vy; if (c2 <= c1) return Math.hypot(p.x - b.x, p.y - b.y);
+    const t = c1 / c2; return Math.hypot(p.x - (a.x + t * vx), p.y - (a.y + t * vy));
+}
+
+/* ======================================================================
+   KLASSER
+   ====================================================================== */
+class Glycerol {
+    constructor(x, y) {
+        this.x = x; this.y = y;
+        this.placed = false; this.visible = true; this.pop = 0;
+        this.slots = [{ dy:-1, y:0, filled:false, fa:null },
+                      { dy: 0, y:0, filled:false, fa:null },
+                      { dy: 1, y:0, filled:false, fa:null }];
+        this.sync();
+    }
+    sync() { const g = slotGap(); this.slots.forEach(s => { s.y = this.y + s.dy * g; }); }
+    anchorFor(i) { return { x: this.x + 30 + ESTER_BOND_LEN, y: this.slots[i].y }; }
+    draw() {
+        this.sync();
+        const g = slotGap();
+        const sc = 1 + this.pop * 0.22;
+
+        ctx.save();
+        ctx.translate(this.x, this.y); ctx.scale(sc, sc); ctx.translate(-this.x, -this.y);
+
+        ctx.beginPath(); ctx.moveTo(this.x, this.y - g); ctx.lineTo(this.x, this.y + g);
+        ctx.lineWidth = 9; ctx.strokeStyle = '#34495e'; ctx.lineCap = 'round'; ctx.stroke();
+        this.slots.forEach(sl => {
+            ctx.beginPath(); ctx.arc(this.x, sl.y, 10, 0, Math.PI * 2); ctx.fillStyle = '#34495e'; ctx.fill();
+        });
+        this.slots.forEach(sl => {
+            const ox = this.x + 30;
+            ctx.beginPath(); ctx.moveTo(this.x, sl.y); ctx.lineTo(ox, sl.y);
+            ctx.lineWidth = 4; ctx.strokeStyle = '#7f8c8d'; ctx.stroke();
+            ctx.beginPath(); ctx.arc(ox, sl.y, 9.5, 0, Math.PI * 2);
+            ctx.fillStyle = '#e74c3c'; ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 11px Arial';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('O', ox, sl.y + 1);
+            if (!sl.filled) {
+                ctx.fillStyle = '#e74c3c'; ctx.font = 'bold 12px Arial'; ctx.textAlign = 'left';
+                ctx.fillText('H', ox + 12, sl.y + 1);
+            }
+        });
+        ctx.fillStyle = '#34495e'; ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+        ctx.fillText('GLYCEROL', this.x, this.y - g - 22);
+        ctx.restore();
+
+        if (!this.placed) return;
+        // ledige pladser markeres, så det er tydeligt hvor fedtsyren skal hen
+        this.slots.forEach((sl, i) => {
+            if (sl.filled) return;
+            const a = this.anchorFor(i);
+            const hot = (hoverSlot === i);
+            ctx.save();
+            ctx.setLineDash([5, 4]);
+            ctx.lineWidth = hot ? 3 : 1.6;
+            ctx.strokeStyle = hot ? '#d35400' : 'rgba(150,140,130,.55)';
+            const r = hot ? 26 + Math.sin(pulse) * 3 : 20;
+            ctx.beginPath(); ctx.arc(a.x + 4, a.y, r, 0, Math.PI * 2); ctx.stroke();
+            ctx.restore();
+            if (hot) {
+                ctx.save();
+                ctx.fillStyle = '#d35400'; ctx.font = 'bold 11px Segoe UI, Arial';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText('slip her', a.x + 4, a.y + r + 12);
+                ctx.restore();
+            }
+        });
+    }
+}
+
+class FattyAcid {
+    constructor(type, x, y) {
+        this.type = type; this.x = x; this.y = y;
+        this.slotIdx = -1; this.visible = true; this.flash = 0;
+    }
+    get info() { return FA_INFO[this.type]; }
+    geometry() {
+        const segLen = chainSegLen();
+        const pts = [{ x: this.x, y: this.y }];
+        let cx = this.x + 13, cy = this.y;
+        pts.push({ x: cx, y: cy });
+        const dbl = [];
+        let angle = 0;
+        for (let i = 0; i < SEGMENTS; i++) {
+            const zig = (i % 2 === 0) ? -1 : 1;
+            let isDouble = false;
+            // Hvert knæk skifter kædens retning. Vinklerne skifter fortegn, så kæden
+            // folder sig sammen i stedet for at løbe skråt ud af billedet — og så man
+            // tydeligt kan tælle knækkene (= dobbeltbindingerne).
+            if (this.type === 'mono' && i === 5) { angle = Math.PI / 6; isDouble = true; }
+            if (this.type === 'poly') {
+                if (i === 4) { angle =  Math.PI / 5.5; isDouble = true; }
+                if (i === 8) { angle = -Math.PI / 8;   isDouble = true; }
+            }
+            if (this.type === 'poly3') {
+                if (i === 3) { angle =  Math.PI / 6;  isDouble = true; }
+                if (i === 6) { angle = -Math.PI / 7;  isDouble = true; }
+                if (i === 9) { angle =  Math.PI / 4;  isDouble = true; }
+            }
+            const nx = Math.cos(angle) * segLen + Math.cos(angle + Math.PI / 2) * (zig * segLen * 0.38);
+            const ny = Math.sin(angle) * segLen + Math.sin(angle + Math.PI / 2) * (zig * segLen * 0.38);
+            cx += nx; cy += ny;
+            pts.push({ x: cx, y: cy });
+            if (isDouble) dbl.push(pts.length - 1);
+        }
+        return { pts, dbl };
+    }
+    draw() {
+        if (!this.visible) return;
+        const { pts, dbl } = this.geometry();
+
+        ctx.save();
+        if (this.slotIdx === -1) {
+            // fri fedtsyre: HO-C(=O)- vises, så det er tydeligt hvad der reagerer
+            ctx.lineWidth = 2.5; ctx.strokeStyle = '#444'; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(this.x - 3, this.y - 3); ctx.lineTo(this.x - 7, this.y - 19); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(this.x + 3, this.y - 3); ctx.lineTo(this.x - 1, this.y - 19); ctx.stroke();
+            ctx.beginPath(); ctx.arc(this.x - 4, this.y - 24, 8, 0, Math.PI * 2);
+            ctx.fillStyle = '#e74c3c'; ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 10px Arial';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('O', this.x - 4, this.y - 23);
+            ctx.strokeStyle = '#444';
+            ctx.beginPath(); ctx.moveTo(this.x - 4, this.y); ctx.lineTo(this.x - 16, this.y); ctx.stroke();
+            ctx.fillStyle = '#e74c3c'; ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+            ctx.fillText('HO', this.x - 18, this.y);
+            ctx.fillStyle = '#2c3e50';
+            ctx.beginPath(); ctx.arc(this.x, this.y, 4, 0, Math.PI * 2); ctx.fill();
+        } else {
+            // esterbinding: glycerol-O — C(=O) — kæde
+            ctx.lineWidth = 2.5; ctx.strokeStyle = '#333'; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(this.x - (ESTER_BOND_LEN - 9), this.y); ctx.lineTo(this.x, this.y); ctx.stroke();
+            ctx.fillStyle = '#2c3e50';
+            ctx.beginPath(); ctx.arc(this.x, this.y, 3.5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(this.x - 3, this.y - 3); ctx.lineTo(this.x - 6, this.y - 20); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(this.x + 3, this.y - 3); ctx.lineTo(this.x,     this.y - 20); ctx.stroke();
+            ctx.beginPath(); ctx.arc(this.x - 3, this.y - 25, 7.5, 0, Math.PI * 2);
+            ctx.fillStyle = '#e74c3c'; ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 9px Arial';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('O', this.x - 3, this.y - 24);
+            if (this.flash > 0) {
+                ctx.strokeStyle = 'rgba(22,160,133,' + this.flash.toFixed(2) + ')';
+                ctx.lineWidth = 5;
+                ctx.beginPath(); ctx.arc(this.x - 8, this.y, 20 + (1 - this.flash) * 12, 0, Math.PI * 2); ctx.stroke();
+            }
+        }
+        ctx.restore();
+
+        ctx.save();
+        ctx.lineWidth = 3.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.strokeStyle = this.info.color;
+        ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+        ctx.stroke();
+        ctx.strokeStyle = '#e74c3c'; ctx.lineWidth = 2.2;
+        dbl.forEach(i => {
+            const a = pts[i - 1], b = pts[i];
+            const dx = b.x - a.x, dy = b.y - a.y, L = Math.hypot(dx, dy) || 1;
+            const ox = -dy / L * 4.5, oy = dx / L * 4.5;
+            ctx.beginPath(); ctx.moveTo(a.x + ox, a.y + oy); ctx.lineTo(b.x + ox, b.y + oy); ctx.stroke();
+        });
+        ctx.restore();
+    }
+    hit(p) {
+        if (Math.hypot(p.x - this.x, p.y - this.y) < 22) return true;
+        const { pts } = this.geometry();
+        for (let i = 1; i < pts.length; i++) if (distToSeg(p, pts[i - 1], pts[i]) < 13) return true;
+        return false;
+    }
+}
+
+/* ======================================================================
+   TRÆK & SLIP  (samme kode til mus og touch via pointer events)
+   ====================================================================== */
+function stagePos(e) { const r = stage.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+function insideRect(el, e) {
+    const r = el.getBoundingClientRect();
+    return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+}
+
+document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        if (card.dataset.kind === 'gly') {
+            if (glycerol) { toast('Der står allerede en glycerol på bordet 🙂'); return; }
+            glycerol = new Glycerol(-500, -500);
+            glycerol.visible = false;
+            dragging = { kind:'gly', obj: glycerol, ghostHTML: card.innerHTML,
+                         moved:false, sx:e.clientX, sy:e.clientY, fromPalette:true, wasAttached:false };
+        } else {
+            const fa = new FattyAcid(card.dataset.type, -500, -500);
+            fa.visible = false;
+            fattyAcids.push(fa);
+            dragging = { kind:'fa', obj: fa, ghostHTML: card.innerHTML,
+                         moved:false, sx:e.clientX, sy:e.clientY, fromPalette:true, wasAttached:false };
+        }
+    });
+});
+
+canvas.addEventListener('pointerdown', e => {
+    const p = stagePos(e);
+    for (let i = fattyAcids.length - 1; i >= 0; i--) {
+        const fa = fattyAcids[i];
+        if (fa.slotIdx === -1 && fa.hit(p)) { e.preventDefault(); startCanvasDrag(fa, e, false); return; }
+    }
+    for (let i = fattyAcids.length - 1; i >= 0; i--) {
+        const fa = fattyAcids[i];
+        if (fa.slotIdx !== -1 && fa.hit(p)) {
+            e.preventDefault();
+            const slot = glycerol.slots[fa.slotIdx];
+            slot.filled = false; slot.fa = null; fa.slotIdx = -1;
+            hideResult();
+            startCanvasDrag(fa, e, true);
+            return;
+        }
+    }
+});
+
+function startCanvasDrag(fa, e, wasAttached) {
+    dragging = { kind:'fa', obj: fa, ghostHTML:null, moved:false,
+                 sx:e.clientX, sy:e.clientY, fromPalette:false, wasAttached: wasAttached };
+    const p = stagePos(e); fa.x = p.x; fa.y = p.y; fa.visible = true;
+}
+
+window.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    e.preventDefault();
+    if (Math.hypot(e.clientX - dragging.sx, e.clientY - dragging.sy) > 6) dragging.moved = true;
+
+    hoverSlot = -1; hoverBench = false;
+
+    if (insideRect(stage, e)) {
+        hideGhost();
+        const p = stagePos(e);
+        dragging.obj.visible = true;
+        dragging.obj.x = p.x; dragging.obj.y = p.y;
+        if (dragging.kind === 'gly') {
+            hoverBench = true;
+        } else if (glycerol && glycerol.placed) {
+            let best = -1, bestD = SNAP_R;
+            glycerol.slots.forEach((s, i) => {
+                if (s.filled) return;
+                const a = glycerol.anchorFor(i);
+                const d = Math.hypot(dragging.obj.x - a.x, dragging.obj.y - a.y);
+                if (d < bestD) { bestD = d; best = i; }
+            });
+            hoverSlot = best;
+        }
+    } else {
+        // uden for bordet: vis kortet som "trække-billede", så man kan se hvad man har fat i
+        dragging.obj.visible = false;
+        if (dragging.fromPalette) {
+            if (ghostEl.style.display !== 'flex') showGhost(dragging.ghostHTML, e.clientX, e.clientY);
+            else moveGhost(e.clientX, e.clientY);
+        }
+    }
+    paletteBox.classList.toggle('trash', !dragging.fromPalette && insideRect(paletteBox, e));
+}, { passive: false });
+
+window.addEventListener('pointerup', e => {
+    if (!dragging) return;
+    const d = dragging; dragging = null;
+    hideGhost(); paletteBox.classList.remove('trash');
+    const on = insideRect(stage, e);
+
+    if (d.kind === 'gly') {
+        // klik uden træk på kortet virker også — ellers sker der "ingenting" for dem der bare tapper
+        if (on || (d.fromPalette && !d.moved)) placeGlycerol(); else glycerol = null;
+    } else {
+        const fa = d.obj;
+        if (d.fromPalette && !d.moved) {
+            if (glycerol && glycerol.placed) {
+                let free = -1;
+                glycerol.slots.forEach((s, i) => { if (free === -1 && !s.filled) free = i; });
+                if (free > -1) { fa.visible = true; attach(fa, free); }
+                else { removeFA(fa); toast('Glycerol er fuld — klik på en fedtsyre for at fjerne den igen.'); }
+            } else {
+                removeFA(fa);
+                toast('Sæt først glycerol på bordet — træk kortet op på bordet.');
+            }
+        } else if (!on) {
+            removeFA(fa);
+        } else if (d.wasAttached && !d.moved) {
+            removeFA(fa);                                   // kort klik på en påsat fedtsyre = fjern
+        } else if (!glycerol || !glycerol.placed) {
+            clampFree(fa);
+            if (d.fromPalette) toast('Sæt først glycerol på bordet — fedtsyrerne skal bindes til dens OH-grupper.');
+        } else if (hoverSlot > -1 && !glycerol.slots[hoverSlot].filled) {
+            attach(fa, hoverSlot);
+        } else {
+            clampFree(fa);
+        }
+    }
+    hoverSlot = -1; hoverBench = false;
+    updateUI();
+}, { passive: false });
+
+window.addEventListener('pointercancel', () => {
+    if (!dragging) return;
+    const d = dragging; dragging = null;
+    hideGhost(); paletteBox.classList.remove('trash');
+    if (d.kind === 'gly') glycerol = null; else removeFA(d.obj);
+    hoverSlot = -1; hoverBench = false; updateUI();
+});
+
+function placeGlycerol() {
+    glycerol.x = benchX(); glycerol.y = benchY();
+    glycerol.placed = true; glycerol.visible = true; glycerol.pop = 1;
+    glycerol.sync();
+}
+function removeFA(fa) {
+    if (fa.slotIdx > -1 && glycerol) { const s = glycerol.slots[fa.slotIdx]; s.filled = false; s.fa = null; }
+    fa.slotIdx = -1;
+    fattyAcids = fattyAcids.filter(f => f !== fa);
+    hideResult();
+}
+function clampFree(fa) {
+    fa.slotIdx = -1;
+    fa.x = Math.max(34, Math.min(width - 34, fa.x));
+    fa.y = Math.max(40, Math.min(height - 24, fa.y));
+}
+function attach(fa, i) {
+    const a = glycerol.anchorFor(i);
+    fa.x = a.x; fa.y = a.y; fa.slotIdx = i; fa.flash = 1;
+    glycerol.slots[i].filled = true; glycerol.slots[i].fa = fa;
+    spawnWater(a.x, a.y);
+}
+
+function showGhost(html, x, y) { ghostEl.innerHTML = html; ghostEl.style.display = 'flex'; moveGhost(x, y); }
+function moveGhost(x, y) { ghostEl.style.left = x + 'px'; ghostEl.style.top = y + 'px'; }
+function hideGhost() { ghostEl.style.display = 'none'; }
+
+/* ======================================================================
+   EFFEKTER
+   ====================================================================== */
+function spawnWater(x, y) {
+    const el = document.createElement('div');
+    el.className = 'effect-text'; el.innerText = '+ H₂O';
+    el.style.left = (x + 12) + 'px'; el.style.top = (y - 38) + 'px';
+    stage.appendChild(el); setTimeout(() => el.remove(), 1500);
+    for (let i = 0; i < 10; i++) {
+        particles.push({ x: x, y: y, vx: (Math.random() - 0.5) * 3, vy: -Math.random() * 2 - 1, life: 1 });
+    }
+}
+function toast(text) {
+    const el = document.createElement('div');
+    el.className = 'toast-msg'; el.innerText = text;
+    stage.appendChild(el); setTimeout(() => el.remove(), 2600);
+}
+
+/* ======================================================================
+   KEMI / VURDERING
+   ====================================================================== */
+function isComplete() { return !!(glycerol && glycerol.placed && glycerol.slots.every(s => s.filled)); }
+function totalDoubleBonds() {
+    if (!isComplete()) return -1;
+    return glycerol.slots.reduce((sum, s) => sum + FA_INFO[s.fa.type].db, 0);
+}
+function productFor(db) { return PRODUCTS.find(p => db >= p.range[0] && db <= p.range[1]); }
+
+/* ======================================================================
+   UI
+   ====================================================================== */
+function updateUI() {
+    const glyOn = !!(glycerol && glycerol.placed);
+    const faOn  = glyOn ? glycerol.slots.filter(s => s.filled).length : 0;
+    document.getElementById('fa-count').innerText = faOn + '/3';
+
+    document.getElementById('step1').className = 'step ' + (glyOn ? 'done' : 'active');
+    document.getElementById('step2').className = 'step ' + (!glyOn ? '' : (faOn === 3 ? 'done' : 'active'));
+    document.getElementById('step3').className = 'step ' + (faOn === 3 ? 'active' : '');
+
+    const glyCard = document.getElementById('card-gly');
+    glyCard.classList.toggle('dim', glyOn);
+    glyCard.classList.toggle('wiggle', !glyOn);
+    document.querySelectorAll('.fa-card').forEach(c => c.classList.toggle('dim', !glyOn));
+
+    if (isComplete()) showResult(); else hideResult();
+}
+
+function showResult() {
+    const db   = totalDoubleBonds();
+    const prod = productFor(db);
+    document.getElementById('res-emoji').innerText = prod.emoji;
+    document.getElementById('res-name').innerText  = prod.name;
+    document.getElementById('res-facts').innerHTML =
+        '<b>' + db + '</b> dobbeltbindinger i alt · smp. ca. <b>' + prod.mp + ' °C</b> · ' + prod.state;
+
+    document.getElementById('scale-marker').style.left = ((db + 0.5) * 10) + '%';
+
+    const band = document.getElementById('scale-band');
+    const hint = document.getElementById('scale-hint');
+    if (freePlay) {
+        band.style.display = 'none';
+        hint.innerText = 'Fri leg — alt kan afleveres. Mærket viser, hvor din vare lander.';
+    } else {
+        const target = PRODUCTS[ORDERS[orderIdx].p];
+        band.style.display = 'block';
+        band.style.left  = (target.range[0] * 10) + '%';
+        band.style.width = ((target.range[1] - target.range[0] + 1) * 10) + '%';
+        hint.innerHTML = 'Ordren kræver <b>' + target.range[0] + '–' + target.range[1] +
+                         '</b> dobbeltbindinger (hvid ramme) · din vare har <b>' + db + '</b>';
+    }
+    if (resultBar.style.display !== 'flex') { resultBar.style.display = 'flex'; resize(); }
+}
+function hideResult() {
+    if (resultBar.style.display === 'flex') { resultBar.style.display = 'none'; resize(); }
+}
+
+function renderOrder() {
+    const chip  = document.getElementById('order-chip');
+    const title = document.getElementById('order-title');
+    const desc  = document.getElementById('order-desc');
+    if (freePlay) {
+        chip.innerText = 'FRI LEG';
+        chip.style.background = '#8e44ad';
+        title.innerText = 'Byg lige hvad du vil';
+        desc.innerText  = 'Alle kombinationer kan afleveres — se hvad de bliver til.';
+    } else {
+        const o = ORDERS[orderIdx], p = PRODUCTS[o.p];
+        chip.innerText = 'ORDRE ' + (orderIdx + 1) + '/' + ORDERS.length;
+        chip.style.background = '#d35400';
+        title.innerText = o.cust + ' bestiller: ' + p.emoji + ' ' + p.name;
+        desc.innerText  = o.text;
+    }
+    const pips = document.getElementById('order-pips');
+    pips.innerHTML = '';
+    ORDERS.forEach((o, i) => {
+        const d = document.createElement('div');
+        const done = delivered.indexOf(i) > -1;
+        d.className = 'pip' + (done ? ' done' : ((!freePlay && i === orderIdx) ? ' current' : ''));
+        d.innerText = done ? '✓' : PRODUCTS[o.p].emoji;
+        d.title = PRODUCTS[o.p].name;
+        pips.appendChild(d);
+    });
+}
+
+/* ======================================================================
+   AFLEVERING
+   ====================================================================== */
+function deliver() {
+    if (!isComplete()) return;
+    const db   = totalDoubleBonds();
+    const prod = productFor(db);
+
+    if (freePlay) {
+        showModal('bg-win', 'Analyse', prod.emoji + ' ' + prod.name,
+            prod.desc + '  (' + db + ' dobbeltbindinger i alt, smeltepunkt ca. ' + prod.mp + ' °C.)',
+            'Byg en ny', 'reset');
+        return;
+    }
+
+    const target = PRODUCTS[ORDERS[orderIdx].p];
+    if (prod.key === target.key) {
+        if (delivered.indexOf(orderIdx) === -1) delivered.push(orderIdx);
+        renderOrder();
+        const last = (orderIdx + 1 >= ORDERS.length);
+        showModal('bg-ok', '✅ Ordren er leveret', prod.emoji + ' ' + prod.name,
+            prod.desc + '  Smeltepunktet er ca. ' + prod.mp + ' °C — altså ' +
+            (prod.mp > ROOM_TEMP ? 'over' : 'under') + ' stuetemperatur (' + ROOM_TEMP + ' °C).',
+            last ? 'Se resultatet' : 'Næste ordre →', last ? 'finish' : 'next');
+    } else {
+        let raad;
+        if (db > target.range[1]) {
+            raad = 'Din vare har for MANGE dobbeltbindinger (' + db + '): kæderne knækker for meget og pakker for løst, ' +
+                   'så smeltepunktet bliver for lavt. ' + target.name + ' skal ligge på ' +
+                   target.range[0] + '–' + target.range[1] + '. Byt en umættet fedtsyre ud med en mere mættet — ' +
+                   'fx Stearinsyre (0) eller Oliesyre (1).';
+        } else {
+            raad = 'Din vare har for FÅ dobbeltbindinger (' + db + '): kæderne er for rette og pakker for tæt, ' +
+                   'så smeltepunktet bliver for højt. ' + target.name + ' skal ligge på ' +
+                   target.range[0] + '–' + target.range[1] + '. Byt en mættet fedtsyre ud med en mere umættet — ' +
+                   'fx Linolsyre (2) eller Linolensyre (3).';
+        }
+        showModal('bg-bad', '❌ Varen blev afvist',
+            'Du lavede ' + prod.emoji + ' ' + prod.name + ' — de bestilte ' + target.emoji + ' ' + target.name,
+            raad, 'Ret varen', 'fix');
+    }
+}
+
+function showModal(cls, badge, title, desc, btn, action) {
+    const b = document.getElementById('res-badge');
+    b.className = 'modal-badge ' + cls; b.innerText = badge;
+    document.getElementById('res-title').innerText = title;
+    document.getElementById('res-desc').innerText  = desc;
+    modalBtn.innerText = btn;
+    modalBtn.dataset.action = action;
+    modal.style.display = 'flex';
+}
+
+function nextAction() {
+    const action = modalBtn.dataset.action;
+    modal.style.display = 'none';
+    if (action === 'fix') return;      // molekylet bliver stående, så én fedtsyre kan byttes ud
+    if (action === 'finish') { finishAll(); return; }
+    if (action === 'next') { orderIdx++; renderOrder(); resetBench(); return; }
+    if (action === 'freeplay') { freePlay = true; renderOrder(); resetBench(); return; }
+    resetBench();
+}
+
+function finishAll() {
+    showModal('bg-win', '🏆 Alle 5 ordrer leveret', 'Fabrikken kører!',
+        'Du har nu været hele skalaen igennem: jo flere dobbeltbindinger, jo mere knækkede kæder — ' +
+        'dårligere pakning, lavere smeltepunkt og mere flydende fedtstof. Byg videre som du vil.',
+        'Fri leg →', 'freeplay');
+}
+
+/* ======================================================================
+   NULSTIL
+   ====================================================================== */
+function resetBench() {
+    glycerol = null; fattyAcids = []; particles = [];
+    hoverSlot = -1; hoverBench = false; dragging = null;
+    hideGhost();
+    hideResult();
+    updateUI();
+}
+function restartAll() {
+    orderIdx = 0; delivered = []; freePlay = false;
+    modal.style.display = 'none';
+    modalBtn.onclick = nextAction;
+    renderOrder(); resetBench();
+}
+
+/* ======================================================================
+   INFO-PANEL
+   ====================================================================== */
+function openInfoPanel()  { infoCorner.style.display = 'block'; }
+function closeInfoPanel() { infoCorner.style.display = 'none'; }
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeInfoPanel();
+    if (e.key === 'Enter' && modal.style.display === 'flex') modalBtn.click();
+});
+
+/* ======================================================================
+   TEGNE-LOOP
+   ====================================================================== */
+function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y,     x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x,     y + h, r);
+    ctx.arcTo(x,     y + h, x,     y,     r);
+    ctx.arcTo(x,     y,     x + w, y,     r);
+    ctx.closePath();
+}
+
+function drawBench() {
+    if (glycerol && glycerol.placed) return;
+    const x = benchX(), y = benchY(), g = slotGap();
+    const w = 190, h = Math.min(g * 2 + 64, height - 16);
+    const hot = hoverBench;
+    ctx.save();
+    ctx.setLineDash([9, 6]);
+    ctx.lineWidth   = hot ? 3.5 : 2.2;
+    ctx.strokeStyle = hot ? '#d35400' : '#c3b7a6';
+    ctx.fillStyle   = hot ? 'rgba(211,84,0,.07)' : 'rgba(255,255,255,.55)';
+    roundRect(x - 54, y - h / 2, w, h, 14);
+    ctx.fill(); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = hot ? '#d35400' : '#9c8f7e';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = 'bold 15px Segoe UI, Arial';
+    ctx.fillText('Træk GLYCEROL', x - 54 + w / 2, y - 12);
+    ctx.fillText('herind', x - 54 + w / 2, y + 8);
+    ctx.font = '12px Segoe UI, Arial';
+    ctx.fillStyle = '#a89b8a';
+    ctx.fillText('▼ kortene nederst', x - 54 + w / 2, y + 32);
+    ctx.restore();
+}
+
+function loop() {
+    pulse += 0.12;
+    ctx.clearRect(0, 0, width, height);
+    drawBench();
+
+    if (glycerol && glycerol.visible) {
+        if (glycerol.pop > 0) glycerol.pop = Math.max(0, glycerol.pop - 0.08);
+        glycerol.draw();
+    }
+    fattyAcids.forEach(f => { if (f.slotIdx !== -1) { f.draw(); if (f.flash > 0) f.flash = Math.max(0, f.flash - 0.035); } });
+    fattyAcids.forEach(f => { if (f.slotIdx === -1) f.draw(); });
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx; p.y += p.vy; p.vy += 0.05; p.life -= 0.02;
+        ctx.globalAlpha = Math.max(0, p.life);
+        ctx.fillStyle = '#3498db';
+        ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 1;
+        if (p.life <= 0) particles.splice(i, 1);
+    }
+    requestAnimationFrame(loop);
+}
+
+/* ======================================================================
+   RESIZE / INIT
+   ====================================================================== */
+function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width  = stage.clientWidth;
+    height = stage.clientHeight;
+    canvas.width  = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    canvas.style.width  = width + 'px';
+    canvas.style.height = height + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    if (glycerol && glycerol.placed) {
+        glycerol.x = benchX(); glycerol.y = benchY(); glycerol.sync();
+        glycerol.slots.forEach((s, i) => {
+            if (s.filled && s.fa) { const a = glycerol.anchorFor(i); s.fa.x = a.x; s.fa.y = a.y; }
+        });
+    }
+    fattyAcids.forEach(f => {
+        if (f.slotIdx === -1 && f.visible && !(dragging && dragging.obj === f)) clampFree(f);
+    });
+}
+
+function init() {
+    window.addEventListener('resize', resize);
+    modalBtn.onclick = nextAction;
+    resize();
+    renderOrder();
+    updateUI();
+    loop();
+}
+init();
+</script>
+</body>
+</html>

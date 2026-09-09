@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Socialismen: Karl Marx og Klassekampen</title>
+<style>
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f7f6;
+        color: #2c3e50;
+        margin: 0;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .wrap {
+        width: 100%;
+        max-width: 920px;
+    }
+
+    h1 {
+        color: #6e1f18;
+        text-align: center;
+        margin: 5px 0 2px 0;
+        font-size: 26px;
+    }
+
+    p.subtitle {
+        text-align: center;
+        color: #6b5352;
+        margin: 0 0 18px 0;
+        font-size: 14px;
+        font-style: italic;
+    }
+
+    /* === NAV TABS === */
+    .nav-tabs {
+        display: flex;
+        gap: 6px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    .nav-tabs button {
+        padding: 9px 11px;
+        font-size: 12.5px;
+        font-weight: 600;
+        border: 2px solid #d1a19d;
+        background: #fff;
+        color: #6e1f18;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .nav-tabs button:hover { background: #f7e8e6; }
+
+    .nav-tabs button.active {
+        background: #922b21;
+        border-color: #922b21;
+        color: white;
+    }
+
+    .section {
+        display: none;
+        background: #fff;
+        border-radius: 12px;
+        padding: 25px 30px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        animation: fadeIn 0.3s ease;
+    }
+
+    .section.visible { display: block; }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+        color: #922b21;
+        border-bottom: 3px solid #f0dad8;
+        padding-bottom: 8px;
+        font-size: 20px;
+    }
+
+    h3 {
+        color: #6e1f18;
+        font-size: 16px;
+        margin-top: 22px;
+    }
+
+    .kilde-box {
+        background: #fbf5f4;
+        border-left: 4px solid #922b21;
+        padding: 12px 16px;
+        margin: 14px 0;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .kilde-box b { color: #6e1f18; }
+
+    .btn-primary {
+        display: block;
+        margin: 20px auto 5px auto;
+        padding: 12px 26px;
+        background: #922b21;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .btn-primary:hover { background: #6e1f18; }
+
+    /* === SCENARIO / GUESS CARDS (shared) === */
+    .scenario-card {
+        background: #fdfaf9;
+        border: 1px solid #ecdcda;
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin-bottom: 16px;
+    }
+
+    .scenario-text {
+        font-size: 15px;
+        margin-bottom: 12px;
+        line-height: 1.5;
+    }
+
+    .scenario-options {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .scenario-options button {
+        flex: 1;
+        min-width: 140px;
+        padding: 10px;
+        border: 2px solid #dcbab7;
+        background: white;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .scenario-options button:hover { background: #f7e8e6; }
+    .scenario-options button:disabled { cursor: default; }
+
+    .scenario-options button.correct { background: #2d6a4f !important; color: white !important; border-color: #1b4332 !important; }
+    .scenario-options button.wrong { background: #c0392b !important; color: white !important; border-color: #922 !important; }
+
+    .scenario-explanation {
+        display: none;
+        margin-top: 12px;
+        padding: 10px 14px;
+        background: #fbf5f4;
+        border-left: 4px solid #922b21;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    /* === PYRAMIDE (basis/overbygning) === */
+    .pyramid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        margin: 20px 0 10px 0;
+    }
+
+    .pyramid-layer {
+        text-align: center;
+        padding: 14px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        color: white;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        border: 2px solid transparent;
+    }
+
+    .pyramid-layer:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+    .pyramid-layer.open { border-color: #f1c40f; }
+
+    .layer-over { width: 70%; background: #b5495b; }
+    .layer-forhold { background: #922b21; }
+    .layer-kraefter { background: #6e1f18; }
+
+    .basis-group {
+        width: 100%;
+        border: 2px dashed #b58784;
+        border-radius: 10px;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+
+    .basis-label {
+        text-align: center;
+        font-weight: bold;
+        color: #6e1f18;
+        font-size: 12px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .basis-row {
+        display: flex;
+        gap: 8px;
+    }
+
+    .basis-row .pyramid-layer {
+        flex: 1;
+    }
+
+    @media (max-width: 640px) {
+        .basis-row { flex-direction: column; }
+    }
+
+    .layer-detail {
+        display: none;
+        background: #fbf5f4;
+        border-left: 4px solid #922b21;
+        padding: 12px 16px;
+        margin: 6px 0 16px 0;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    /* === UDBYTNINGS-SIMULATOR === */
+    .factory-slider-box {
+        background: #fafcfb;
+        border: 1px solid #dde8e2;
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-top: 15px;
+    }
+
+    .factory-slider-box label {
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 6px;
+        font-size: 14px;
+    }
+
+    .factory-slider-box input[type=range] {
+        width: 100%;
+        accent-color: #922b21;
+    }
+
+    .factory-visual {
+        display: grid;
+        grid-template-columns: 100px 1fr;
+        gap: 24px;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    .bar-stack {
+        width: 70px;
+        height: 200px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column-reverse;
+        border: 3px solid #34495e;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #eee;
+    }
+
+    .bar-material { background: #95a5a6; transition: height 0.3s ease; }
+    .bar-lon { background: #2d6a4f; transition: height 0.3s ease; }
+    .bar-profit { background: #922b21; transition: height 0.3s ease; }
+
+    .bar-legend {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        font-size: 11px;
+        color: #556;
+        margin-top: 6px;
+    }
+
+    .swatch {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        margin-right: 4px;
+        vertical-align: middle;
+    }
+
+    .swatch-material { background: #95a5a6; }
+    .swatch-lon { background: #2d6a4f; }
+    .swatch-profit { background: #922b21; }
+
+    .factory-readout {
+        font-size: 15px;
+        line-height: 2;
+    }
+
+    .factory-readout .face {
+        font-size: 34px;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+
+    .feedback-box {
+        margin-top: 18px;
+        padding: 14px 18px;
+        border-radius: 8px;
+        font-size: 15px;
+        line-height: 1.5;
+        transition: background 0.3s;
+    }
+
+    .fb-good { background: #e8f6ee; border-left: 5px solid #2d6a4f; }
+    .fb-warn { background: #fff8e1; border-left: 5px solid #f1c40f; }
+    .fb-bad { background: #fdecea; border-left: 5px solid #c0392b; }
+
+    @media (max-width: 640px) {
+        .factory-visual { grid-template-columns: 1fr; }
+    }
+
+    /* === TIDSLINJE === */
+    .timeline {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin: 25px 0 10px 0;
+        position: relative;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        top: 18px;
+        left: 20px;
+        right: 20px;
+        height: 3px;
+        background: #ecdcda;
+        z-index: 0;
+    }
+
+    .timeline-step {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 110px;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .timeline-dot {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #922b21;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 15px;
+        border: 3px solid white;
+        box-shadow: 0 0 0 2px #922b21;
+    }
+
+    .timeline-step.active .timeline-dot { background: #f1c40f; box-shadow: 0 0 0 2px #f1c40f; color: #6e1f18; }
+
+    .timeline-label {
+        font-size: 12px;
+        margin-top: 6px;
+        font-weight: 600;
+        color: #6e1f18;
+        line-height: 1.3;
+    }
+
+    #timeline-detail {
+        display: none;
+        margin-top: 10px;
+        background: #fbf5f4;
+        border-left: 4px solid #922b21;
+        padding: 14px 18px;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .timeline-detail-heading {
+        font-weight: bold;
+        font-size: 17px;
+        color: #6e1f18;
+        margin-bottom: 8px;
+    }
+
+    .compare-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-top: 14px;
+    }
+
+    .compare-card {
+        border-radius: 10px;
+        padding: 14px 16px;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .compare-card.reform { background: #e8f6ee; border: 1px solid #b6dcc7; }
+    .compare-card.revol { background: #fdecea; border: 1px solid #f0bdb6; }
+    .compare-card b { display: block; margin-bottom: 6px; }
+
+    @media (max-width: 640px) {
+        .compare-cards { grid-template-columns: 1fr; }
+        .timeline { flex-direction: column; align-items: flex-start; }
+        .timeline::before { display: none; }
+        .timeline-step { flex-direction: row; width: 100%; text-align: left; gap: 10px; }
+        .timeline-label { margin-top: 0; }
+    }
+
+    /* === HINT / REVEAL (delt mellem kilde-spørgsmål og quiz) === */
+    .hint-btn {
+        background: none;
+        border: 1px solid #b58784;
+        color: #6e1f18;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .hint-btn:hover { background: #f7e8e6; }
+
+    .hint-warning { font-size: 12px; color: #a67c00; margin-left: 6px; }
+
+    .hint-text {
+        display: none;
+        background: #fbf5f4;
+        padding: 10px;
+        border-left: 3px solid #922b21;
+        margin-bottom: 16px;
+        font-style: italic;
+        color: #5a4341;
+    }
+
+    .kilde-box .quote-revealed {
+        background: #f1c40f;
+        padding: 1px 3px;
+        border-radius: 3px;
+        transition: background 0.4s ease;
+    }
+
+    /* === MULTIPLE CHOICE MED FLERE RIGTIGE SVAR === */
+    .ms-options {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 10px 0;
+    }
+
+    .ms-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border: 2px solid #dcbab7;
+        border-radius: 6px;
+        background: #fff;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .ms-option input { width: 16px; height: 16px; flex-shrink: 0; }
+
+    .ms-option.ms-correct { background: #e8f6ee !important; border-color: #2d6a4f !important; }
+    .ms-option.ms-wrong { background: #fdecea !important; border-color: #c0392b !important; }
+    .ms-option.ms-missed { background: #fff8e1 !important; border-color: #f1c40f !important; }
+
+    #kilde-next-btn {
+        padding: 10px 22px;
+        background: #922b21;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        display: none;
+    }
+
+    #kilde-next-btn:hover { background: #6e1f18; }
+
+    #kilde-progress { font-weight: bold; }
+
+    /* === QUIZ === */
+    .quiz-box {
+        max-width: 720px;
+        margin: 0 auto;
+    }
+
+    .quiz-question {
+        font-size: 17px;
+        font-weight: 600;
+        margin-bottom: 14px;
+        line-height: 1.4;
+    }
+
+    .quiz-options button {
+        display: block;
+        width: 100%;
+        padding: 14px;
+        margin: 8px 0;
+        background: #f7ece9;
+        color: #2c3e50;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 15px;
+        text-align: left;
+        transition: background 0.2s, transform 0.1s;
+    }
+
+    .quiz-options button:hover { background: #f0dad8; transform: translateX(4px); }
+    .quiz-options button:disabled { cursor: default; transform: none; }
+
+    .quiz-options .correct { background: #2d6a4f !important; color: white !important; }
+    .quiz-options .wrong { background: #c0392b !important; color: white !important; }
+
+    .quiz-explanation {
+        margin-top: 16px;
+        padding: 16px;
+        background: #fbf5f4;
+        border-left: 5px solid #922b21;
+        display: none;
+        line-height: 1.5;
+        font-size: 14px;
+    }
+
+    .point-tag { display: block; margin-top: 8px; font-weight: bold; }
+    .point-full { color: #2d6a4f; }
+    .point-half { color: #a67c00; }
+    .point-zero { color: #c0392b; }
+
+    .quiz-footer {
+        margin-top: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #ecdcda;
+        padding-top: 16px;
+    }
+
+    #quiz-score { font-weight: bold; }
+
+    #quiz-next-btn {
+        padding: 10px 22px;
+        background: #922b21;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        display: none;
+    }
+
+    #quiz-next-btn:hover { background: #6e1f18; }
+</style>
+</head>
+<body>
+<div class="wrap">
+    <h1>Socialismen: Karl Marx og Klassekampen</h1>
+    <p class="subtitle">Baseret på "Vores Verdenshistorie 2", s. 116-126 — om Karl Marx, Friedrich Engels og Det kommunistiske manifest</p>
+
+    <div class="nav-tabs">
+        <button id="tab-btn-intro" class="active" onclick="showSection('intro')">① Intro</button>
+        <button id="tab-btn-model" onclick="showSection('model')">② Samfundsmodel</button>
+        <button id="tab-btn-fabrik" onclick="showSection('fabrik')">③ Overskuddet</button>
+        <button id="tab-btn-tid" onclick="showSection('tid')">④ Stadier</button>
+        <button id="tab-btn-kilde" onclick="showSection('kilde')">⑤ Kilde 37</button>
+        <button id="tab-btn-quiz" onclick="showSection('quiz')">⑥ Quiz</button>
+    </div>
+
+    <!-- ================= SECTION 1: INTRO ================= -->
+    <div id="section-intro" class="section visible">
+        <h2>Den industrielle revolutions bagside</h2>
+        <p>Den industrielle revolution skabte enorm rigdom — men også en fattig arbejderklasse, der boede tæt sammenpakket i byernes fattigkvarterer. Mange mente, at den liberale frihedstanke om, at "frihed for den enkelte gavner alle", slet ikke holdt stik for arbejderne i for eksempel London eller Manchester. En af de skarpeste kritikere af dette blev den tyske filosof <b>Karl Marx</b>.</p>
+
+        <div class="scenario-card">
+            <div class="scenario-text"><b>🤔 Gæt selv:</b> Hvem var Karl Marx?</div>
+            <div class="scenario-options">
+                <button data-correct="false" onclick="answerIntroGuess(0, this)">En engelsk fabriksejer, der ønskede lavere lønninger til arbejderne</button>
+                <button data-correct="true" onclick="answerIntroGuess(0, this)">En tysk filosof, der sammen med vennen Friedrich Engels skrev Det kommunistiske manifest i 1848</button>
+                <button data-correct="false" onclick="answerIntroGuess(0, this)">En fransk konge, der indførte markedsøkonomien</button>
+            </div>
+            <div class="scenario-explanation" id="intro-expl-0"></div>
+        </div>
+
+        <p>Marx mente, at det kapitalistiske samfund bestod af to klasser med <b>modsatrettede interesser</b>.</p>
+
+        <div class="scenario-card">
+            <div class="scenario-text"><b>🤔 Gæt selv:</b> Hvilke to klasser mente Marx, at det kapitalistiske samfund bestod af?</div>
+            <div class="scenario-options">
+                <button data-correct="false" onclick="answerIntroGuess(1, this)">Adelen og gejstligheden (kirken)</button>
+                <button data-correct="true" onclick="answerIntroGuess(1, this)">Kapitalisterne, der ejede fabrikkerne, og arbejderne (proletariatet), der solgte deres arbejdskraft</button>
+                <button data-correct="false" onclick="answerIntroGuess(1, this)">Kongen og parlamentet</button>
+            </div>
+            <div class="scenario-explanation" id="intro-expl-1"></div>
+        </div>
+
+        <div class="kilde-box">
+            <b>Fra teksten:</b> "Ifølge Marx og Engels bestod det kapitalistiske samfund primært af to klasser, der havde modsatrettede interesser: kapitalisterne, der ejede fabrikkerne og ønskede så stor profit som muligt, og arbejderne, der solgte deres arbejdskraft til kapitalisterne for derved at få løn."
+        </div>
+
+        <div class="scenario-card">
+            <div class="scenario-text"><b>🤔 Gæt selv:</b> Marx mente, at denne konflikt mellem klasserne var historiens vigtigste drivkraft. Hvad kaldte han denne konflikt?</div>
+            <div class="scenario-options">
+                <button data-correct="false" onclick="answerIntroGuess(2, this)">Den usynlige hånd</button>
+                <button data-correct="true" onclick="answerIntroGuess(2, this)">Klassekampen</button>
+                <button data-correct="false" onclick="answerIntroGuess(2, this)">Den sociale kontrakt</button>
+            </div>
+            <div class="scenario-explanation" id="intro-expl-2"></div>
+        </div>
+
+        <button class="btn-primary" onclick="showSection('model')">Se Marx' samfundsmodel →</button>
+    </div>
+
+    <!-- ================= SECTION 2: SAMFUNDSMODEL ================= -->
+    <div id="section-model" class="section">
+        <h2>Basis og overbygning</h2>
+        <p>Tænk på et samfund som et hus. <b>Basis</b> er fundamentet: hvem ejer noget, og hvordan tjener man penge? <b>Overbygningen</b> er resten af huset, bygget ovenpå fundamentet: love, moral, religion og kunst. Fundamentet bestemmer, hvordan resten af huset kommer til at se ud. Denne teori kaldte Marx <b>den historiske materialisme</b> — kort sagt: økonomien styrer resten af samfundet.</p>
+
+        <p style="font-size:14px; color:#6b5352;">Klik på boksene i modellen herunder for at se, hvad de indeholder.</p>
+
+        <div class="pyramid">
+            <div class="pyramid-layer layer-over" id="layer-over" onclick="toggleLayer('over')">🏛️ Overbygningen</div>
+            <div class="basis-group">
+                <div class="basis-label">Basis</div>
+                <div class="basis-row">
+                    <div class="pyramid-layer layer-forhold" id="layer-forhold" onclick="toggleLayer('forhold')">⚖️ Hvem ejer fabrikkerne?</div>
+                    <div class="pyramid-layer layer-kraefter" id="layer-kraefter" onclick="toggleLayer('kraefter')">⚙️ Hvad producerer man med?</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layer-detail" id="detail-over">
+            <b>🏛️ Overbygningen</b> = samfundets idéer: love, moral, religion, kunst. Den <b>formes af basis</b>. Eksempel: Ejer kapitalisterne fabrikkerne, vil lovene typisk beskytte netop deres ejendom.
+        </div>
+        <div class="layer-detail" id="detail-forhold">
+            <b>⚖️ Produktionsforhold</b> = hvem der ejer og bestemmer over fabrikkerne. I kapitalismen: kapitalisterne. Derfor er det også dem, der bestemmer, hvem der får arbejde — og hvad lønnen bliver.
+        </div>
+        <div class="layer-detail" id="detail-kraefter">
+            <b>⚙️ Produktivkræfter</b> = det, man producerer med: jord, råstoffer, værktøj, maskiner og arbejdskraft. Nye maskiner (nye produktivkræfter) tvinger før eller siden det gamle system til at ændre sig.
+        </div>
+
+        <div class="scenario-card" style="margin-top:24px;">
+            <div class="scenario-text"><b>🤔 Tjek din forståelse:</b> En gruppe kapitalister ejer alle landets aviser (det er <i>basis</i>). Hvad vil der ifølge Marx sandsynligvis ske med de holdninger, aviserne skriver (det er <i>overbygningen</i>)?</div>
+            <div class="scenario-options">
+                <button data-correct="true" onclick="answerModelCheck(this)">Aviserne vil ofte skrive positivt om kapitalisme og privat ejendom</button>
+                <button data-correct="false" onclick="answerModelCheck(this)">Aviserne vil altid være helt neutrale, uanset hvem der ejer dem</button>
+            </div>
+            <div class="scenario-explanation" id="model-check-expl"></div>
+        </div>
+
+        <button class="btn-primary" onclick="showSection('fabrik')">Se hvem der får overskuddet af arbejdet →</button>
+    </div>
+
+    <!-- ================= SECTION 3: FABRIK / UDBYTNING ================= -->
+    <div id="section-fabrik" class="section">
+        <h2>Hvem får overskuddet af arbejdet?</h2>
+        <p>Forestil dig en skofabrik. Kapitalisten ejer fabrikken og maskinerne (produktionsmidlerne). Arbejderen ejer intet af det — han har kun sin egen arbejdskraft at sælge. Materialer til et par sko koster altid <b>50 øre</b>. Resten af det, skoene sælges for, skal fordeles mellem arbejderens løn og kapitalistens profit.</p>
+        <p style="font-size:14px; color:#6b5352;">Prøv først at <b>sænke</b> prisen: læg mærke til, at det kun er arbejderens løn, der falder — kapitalistens profit ligger fast. Prøv derefter at <b>hæve</b> prisen igen: nu er det profitten, der stiger.</p>
+
+        <div class="factory-slider-box">
+            <label>🥾 Skoens salgspris <span id="pris-val">300</span> øre</label>
+            <input type="range" id="pris-slider" min="70" max="300" step="10" value="300" oninput="onPrisChange()">
+        </div>
+
+        <div class="factory-slider-box">
+            <label>🏭 Kapitalistens profit <span id="profit-val">100</span> øre</label>
+            <input type="range" id="profit-slider" min="0" max="230" step="5" value="100" oninput="updateFactory()">
+        </div>
+
+        <div class="factory-visual">
+            <div>
+                <div class="bar-stack">
+                    <div class="bar-material" id="bar-material"></div>
+                    <div class="bar-lon" id="bar-lon"></div>
+                    <div class="bar-profit" id="bar-profit"></div>
+                </div>
+                <div class="bar-legend">
+                    <span><span class="swatch swatch-material"></span>Materialer</span>
+                    <span><span class="swatch swatch-lon"></span>Løn</span>
+                    <span><span class="swatch swatch-profit"></span>Profit</span>
+                </div>
+            </div>
+            <div class="factory-readout">
+                <div>🔧 Materialer: <b>50 øre</b> <span style="font-size:12px; color:#6b5352;">(fast, uanset pris)</span></div>
+                <div><span class="face" id="worker-face">🙂</span>👷 Løn til arbejderen: <b id="lon-readout">155 øre</b></div>
+                <div>🏭 Kapitalistens profit (merværdi): <b id="profit-readout">100 øre</b></div>
+            </div>
+        </div>
+
+        <div class="feedback-box" id="factory-feedback"></div>
+
+        <button class="hint-btn" onclick="toggleFactoryHistory()" id="factory-hist-btn">📚 Se hvad teksten siger om arbejdernes virkelige vilkår</button>
+        <div class="kilde-box" id="factory-history-box" style="display:none;">
+            "Man skulle bare kigge sig omkring i fattigkvartererne i London eller Manchester for at se, at friheden ikke kom de fattige arbejdere til gode."<br>
+            <span style="font-size:12px; color:#6b5352;">— Vores Verdenshistorie 2, s. 117</span>
+        </div>
+
+        <button class="btn-primary" onclick="showSection('tid')">Se historiens stadier ifølge Marx →</button>
+    </div>
+
+    <!-- ================= SECTION 4: TIDSLINJE ================= -->
+    <div id="section-tid" class="section">
+        <h2>Fra feudalsamfund til det klasseløse samfund</h2>
+        <p style="font-size:14px; color:#6b5352;">Klik på trinene for at se, hvad der ifølge Marx skete i hver fase af historien.</p>
+
+        <div class="timeline" id="timeline"></div>
+        <div id="timeline-detail"></div>
+
+        <h3>Reform eller revolution?</h3>
+        <p style="font-size:14px; color:#6b5352;">Socialisterne blev senere uenige om vejen dertil, og bevægelsen splittedes i to:</p>
+        <div class="compare-cards">
+            <div class="compare-card reform">
+                <b>🗳️ Reformsocialisme</b>
+                Reformsocialisterne troede på gradvise forbedringer gennem fagforeninger og stemmeret – ikke revolution. I Rusland svarede dette til <b>mensjevikkerne</b>.
+            </div>
+            <div class="compare-card revol">
+                <b>✊ Revolutionær socialisme</b>
+                De revolutionære socialister mente, at kapitalismen skulle væltes ved en revolution, om nødvendigt med vold. I Rusland svarede dette til <b>bolsjevikkerne</b>, der tog magten i 1917.
+            </div>
+        </div>
+
+        <button class="btn-primary" onclick="showSection('kilde')">Læs uddrag af Det kommunistiske manifest →</button>
+    </div>
+
+    <!-- ================= SECTION 5: KILDE 37 ================= -->
+    <div id="section-kilde" class="section">
+        <h2>Kilde 37: Uddrag af Det kommunistiske manifest (1848)</h2>
+        <div class="kilde-box">
+            "<span id="quote-a">Alle hidtidige samfunds historie er en klassekampens historie.</span> Fri mand og slave, patricier og plebejer, baron og livegen, lavsmester og svend, kort sagt: undertrykkere og undertrykte har stået i stadig modsætning til hinanden [...] Det moderne borgerlige samfund [...] har ikke ophævet klassemodsætningerne [...] <span id="quote-b">hele samfundet spalter sig mere og mere i to store fjendtlige lejre, i to klasser, der står i direkte modsætning til hinanden: bourgeoisiet [borgerskabet] og proletariatet [arbejderklassen]</span>."
+            <br><br>
+            "Arbejderrevolutionens første skridt er at hæve arbejderklassen op til herskende klasse, at tilkæmpe sig demokratiet. Sit politiske herredømme vil arbejderklassen bruge til skridt for skridt at fravriste storborgerskabet al kapital, til at <span id="quote-c">centralisere alle produktionsmidler i statens hænder</span> [...] og til at øge mængden af produktivkræfter så hurtigt som muligt."
+        </div>
+
+        <div id="kilde-question-box"></div>
+
+        <div class="quiz-footer">
+            <span id="kilde-progress">Spørgsmål 1 af 5</span>
+            <button id="kilde-next-btn" onclick="nextKildeQuestion()">Næste spørgsmål →</button>
+        </div>
+
+        <button class="btn-primary" id="kilde-continue-btn" style="display:none;" onclick="showSection('quiz')">Gå til forståelsesquizzen →</button>
+    </div>
+
+    <!-- ================= SECTION 6: QUIZ ================= -->
+    <div id="section-quiz" class="section">
+        <h2>Forståelsesquiz</h2>
+        <div class="quiz-box">
+            <div id="quiz-question" class="quiz-question">Indlæser spørgsmål...</div>
+            <button id="quiz-hint-btn" class="hint-btn" onclick="toggleHint()">💡 Vis hint</button>
+            <span id="quiz-hint-warning" class="hint-warning" style="display:none;">(giver kun ½ point)</span>
+            <div id="quiz-hint-box" class="hint-text"></div>
+            <div id="quiz-options" class="quiz-options"></div>
+            <div id="quiz-explanation" class="quiz-explanation"></div>
+
+            <div class="quiz-footer">
+                <span id="quiz-score">Spørgsmål 1 af 8</span>
+                <button id="quiz-next-btn" onclick="nextQuizQuestion()">Næste spørgsmål →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+function showSection(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+    document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.remove('active'));
+    document.getElementById('section-' + name).classList.add('visible');
+    document.getElementById('tab-btn-' + name).classList.add('active');
+}
+
+/* ============================================================
+   INTRO GUESSES
+   ============================================================ */
+const introExplanations = [
+    "Karl Marx (1818-1883) var en tysk filosof. Sammen med vennen Friedrich Engels udgav han i 1848 Det kommunistiske manifest.",
+    "Marx mente, at det kapitalistiske samfund var delt i to klasser med modsatrettede interesser: kapitalisterne (der ejede fabrikkerne) og arbejderne/proletariatet (der solgte deres arbejdskraft for løn).",
+    "Marx kaldte denne vedvarende konflikt mellem samfundsklasserne for klassekampen — og mente, at den var den afgørende drivkraft i historien."
+];
+
+// Bland rækkefølgen af knapperne i en gruppe (fx "gæt selv"-kortene), så det
+// rigtige svar ikke altid ligger på samme plads. Selve svar-logikken bruger
+// data-correct-attributten, ikke positionen, så det er trygt at flytte rundt.
+function shuffleButtonsIn(selector) {
+    document.querySelectorAll(selector).forEach(container => {
+        const buttons = Array.from(container.children);
+        for (let i = buttons.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [buttons[i], buttons[j]] = [buttons[j], buttons[i]];
+        }
+        buttons.forEach(b => container.appendChild(b));
+    });
+}
+
+function answerIntroGuess(i, btn) {
+    const card = btn.closest('.scenario-card');
+    if (card.dataset.answered) return;
+    card.dataset.answered = '1';
+
+    const buttons = card.querySelectorAll('.scenario-options button');
+    buttons.forEach(b => b.disabled = true);
+
+    const isCorrect = btn.dataset.correct === 'true';
+    if (isCorrect) {
+        btn.classList.add('correct');
+    } else {
+        btn.classList.add('wrong');
+        card.querySelector('button[data-correct="true"]').classList.add('correct');
+    }
+
+    const explBox = document.getElementById('intro-expl-' + i);
+    explBox.innerHTML = (isCorrect ? '✅ ' : '❌ ') + introExplanations[i];
+    explBox.style.display = 'block';
+}
+
+/* ============================================================
+   PYRAMIDE + KLASSEKAMP-KORT
+   ============================================================ */
+function toggleLayer(name) {
+    const detail = document.getElementById('detail-' + name);
+    const layer = document.getElementById('layer-' + name);
+    const isOpen = detail.style.display === 'block';
+    detail.style.display = isOpen ? 'none' : 'block';
+    layer.classList.toggle('open', !isOpen);
+}
+
+function answerModelCheck(btn) {
+    const card = btn.closest('.scenario-card');
+    if (card.dataset.answered) return;
+    card.dataset.answered = '1';
+
+    const buttons = card.querySelectorAll('.scenario-options button');
+    buttons.forEach(b => b.disabled = true);
+
+    const isCorrect = btn.dataset.correct === 'true';
+    if (isCorrect) {
+        btn.classList.add('correct');
+    } else {
+        btn.classList.add('wrong');
+        card.querySelector('button[data-correct="true"]').classList.add('correct');
+    }
+
+    const explBox = document.getElementById('model-check-expl');
+    explBox.innerHTML = (isCorrect ? '✅ ' : '❌ ') + 'Ifølge Marx bliver overbygningen (fx det, aviserne skriver) formet af, hvem der ejer basis (fx aviserne selv). Ejere har en interesse i, at deres holdninger — herunder synet på kapitalisme og privat ejendom — bliver udbredt.';
+    explBox.style.display = 'block';
+}
+
+/* ============================================================
+   FABRIK / UDBYTNINGS-SIMULATOR
+   ============================================================ */
+const MATERIALE_PRIS = 50;
+const LON_MIN = 20;          // sultelønnen - den lavest mulige løn
+const LON_ANSTAENDIG = 100;  // løn skal op på mindst dette, før den regnes for anstændig
+const PRIS_MAX = 300;
+const PROFIT_MAX = PRIS_MAX - MATERIALE_PRIS - LON_MIN; // = 230
+let forrigePris = 300;
+
+function onPrisChange() {
+    const pris = parseInt(document.getElementById('pris-slider').value, 10);
+    document.getElementById('pris-val').innerText = pris;
+
+    const profitSlider = document.getElementById('profit-slider');
+    const delta = pris - forrigePris;
+    if (delta > 0) {
+        // Prisstigning: hele gevinsten går til kapitalistens profit
+        let profit = parseInt(profitSlider.value, 10) + delta;
+        if (profit > PROFIT_MAX) profit = PROFIT_MAX;
+        profitSlider.value = profit;
+    }
+    // Prisfald: profitskyderens værdi holdes fast — det er arbejderens løn, der tager smerten
+
+    forrigePris = pris;
+    updateFactory();
+}
+
+function updateFactory() {
+    const pris = parseInt(document.getElementById('pris-slider').value, 10);
+    const total = pris - MATERIALE_PRIS;
+    const profitSlider = document.getElementById('profit-slider');
+    let profit = parseInt(profitSlider.value, 10);
+
+    // Beskyt lønbunden: lønnen må aldrig gå under LON_MIN, uanset profitskyderens faste 0-230-skala
+    const maxTilladtProfit = Math.min(PROFIT_MAX, total - LON_MIN);
+    if (profit > maxTilladtProfit) profit = maxTilladtProfit;
+    if (profit < 0) profit = 0;
+    profitSlider.value = profit;
+
+    const lon = total - profit;
+
+    document.getElementById('profit-val').innerText = profit;
+    document.getElementById('lon-readout').innerText = lon + ' øre';
+    document.getElementById('profit-readout').innerText = profit + ' øre';
+
+    // Fast skala (0-300 øre, den højst mulige pris): en søjle rører sig kun, når dens egen værdi ændrer sig
+    document.getElementById('bar-material').style.height = ((MATERIALE_PRIS / PRIS_MAX) * 194) + 'px';
+    document.getElementById('bar-lon').style.height = ((lon / PRIS_MAX) * 194) + 'px';
+    document.getElementById('bar-profit').style.height = ((profit / PRIS_MAX) * 194) + 'px';
+
+    const face = document.getElementById('worker-face');
+    const feedback = document.getElementById('factory-feedback');
+
+    if (lon <= LON_MIN) {
+        face.innerText = '😢';
+        feedback.className = 'feedback-box fb-bad';
+        feedback.innerHTML = '😢 <b>Dette er den laveste løn, arbejderen overhovedet kan presses ned til: kun ' + LON_MIN + ' øre.</b> Kapitalistens profit er til gengæld meget stor. Konkurrencen mellem fabriksejere pressede ifølge Marx lønningerne helt i bund, fordi arbejderen ikke havde andet valg end at acceptere lønnen.';
+    } else if (lon < LON_ANSTAENDIG) {
+        face.innerText = '😐';
+        feedback.className = 'feedback-box fb-warn';
+        feedback.innerHTML = '😐 <b>Arbejderen får en lav løn, men der er råd til møbler, så længe han ikke bliver syg.</b> Kapitalisten beholder stadig en stor del af værdien som profit (merværdi).';
+    } else {
+        face.innerText = '🙂';
+        feedback.className = 'feedback-box fb-good';
+        feedback.innerHTML = '🙂 <b>Arbejderen får nu en anstændig løn</b> — men kapitalistens profit er lav. I et marked med hård konkurrence risikerer kapitalisten at blive udkonkurreret af andre fabriksejere, der betaler mindre i løn. Ifølge Marx var det netop denne konkurrence, der i praksis tvang lønningerne nedad igen.';
+    }
+}
+
+function toggleFactoryHistory() {
+    const box = document.getElementById('factory-history-box');
+    box.style.display = box.style.display === 'block' ? 'none' : 'block';
+}
+
+/* ============================================================
+   TIDSLINJE
+   ============================================================ */
+const timelineStages = [
+    {
+        icon: '🏰',
+        label: 'Feudalsamfundet',
+        text: 'I det førindustrielle landbrugssamfund ejede <b>godsejerne</b> jorden, og <b>bønderne</b> arbejdede for dem. Denne ulighed skabte utilfredshed, som med tiden banede vejen for opgøret med det gamle system.'
+    },
+    {
+        icon: '⚔️',
+        label: 'Den borgerlige revolution',
+        text: '<b>Hvorfor det skete:</b> En ny gruppe — borgerskabet — tjente penge på handel og produktion uden om godsejer-systemet. De havde penge, men ingen politisk magt, fordi konge og adel bestemte alt. Derfor gjorde borgerskabet oprør (fx den franske revolution i 1789) og indførte forfatninger, der begrænsede kongens magt og gav dem selv indflydelse.'
+    },
+    {
+        icon: '🏭',
+        label: 'Det kapitalistiske samfund',
+        text: '<b>Hvorfor det skete:</b> Da borgerskabet havde fået magten, kunne den industrielle revolution for alvor tage fart. Borgerskabet blev nu til <b>kapitalister</b>, der ejede fabrikkerne, mens en ny arbejderklasse — <b>proletariatet</b> — opstod og solgte sin arbejdskraft for løn. Dermed opstod en ny modsætning: mellem kapitalister og arbejdere.'
+    },
+    {
+        icon: '✊',
+        label: 'Klassekampen skærpes',
+        text: '<b>Hvorfor det skete:</b> Arbejderne boede tæt sammen i byernes fattigkvarterer og delte de samme dårlige vilkår: lange arbejdsdage, lave lønninger og usikre job. Ifølge Marx gjorde disse fælles vilkår, at arbejderne blev bevidste om, at de havde fælles interesser over for kapitalisterne — og klassekampen skærpedes, efterhånden som flere organiserede sig.'
+    },
+    {
+        icon: '🚩',
+        label: 'Den socialistiske revolution',
+        text: '<b>Hvorfor det skete:</b> Når klassekampen var skærpet nok, mente Marx, at arbejderne ville rejse sig og tage magten, om nødvendigt med vold. I overgangsperioden, "proletariatets diktatur", skulle staten aktivt fjerne kapitalisternes magt og overtage produktionsmidlerne, så samfundet gradvist blev forberedt på et liv uden klasser.'
+    },
+    {
+        icon: '🌍',
+        label: 'Det klasseløse samfund',
+        text: '<b>Hvorfor det skete:</b> Når kapitalisternes magt var helt afskaffet, mente Marx, at der ikke længere ville være brug for en statsmagt til at holde styr på klassekonflikter — for der ville jo ikke længere være nogen klasser. Målet var et samfund, hvor alle "yder efter evne og nyder efter behov".'
+    }
+];
+
+function buildTimeline() {
+    const container = document.getElementById('timeline');
+    container.innerHTML = '';
+    timelineStages.forEach((stage, i) => {
+        const step = document.createElement('div');
+        step.className = 'timeline-step';
+        step.id = 'timeline-step-' + i;
+        step.innerHTML = `<div class="timeline-dot">${stage.icon}</div><div class="timeline-label">${stage.label}</div>`;
+        step.onclick = () => showTimelineDetail(i);
+        container.appendChild(step);
+    });
+    showTimelineDetail(0);
+}
+
+function showTimelineDetail(i) {
+    document.querySelectorAll('.timeline-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('timeline-step-' + i).classList.add('active');
+    const detail = document.getElementById('timeline-detail');
+    detail.style.display = 'block';
+    detail.innerHTML = '<div class="timeline-detail-heading">' + timelineStages[i].icon + ' ' + timelineStages[i].label + '</div><div>' + timelineStages[i].text + '</div>';
+}
+
+/* ============================================================
+   KILDE 37 - SPØRGSMÅL (ét ad gangen)
+   ============================================================ */
+const kildeQuestions = [
+    {
+        type: 'single',
+        q: 'Hvem har skrevet kilden, og hvornår?',
+        options: [
+            { text: 'Den skotske økonom Adam Smith i 1776', correct: false },
+            { text: 'Karl Marx og Friedrich Engels, 1848', correct: true },
+            { text: 'Eduard Bernstein, 1899', correct: false }
+        ],
+        expl: 'Karl Marx og Friedrich Engels skrev Det kommunistiske manifest i 1848.'
+    },
+    {
+        type: 'single',
+        quoteId: 'quote-a',
+        q: 'Se citatet, der nu er markeret i kilden herover. Hvad menes der med det?',
+        options: [
+            { text: 'Klassekamp har ifølge Marx og Engels præget ALLE tidligere samfund, ikke kun det moderne', correct: true },
+            { text: 'Klassekamp er noget helt nyt, der først opstod med industrialiseringen', correct: false },
+            { text: 'Historien har altid handlet om konger og krige, ikke om klasser', correct: false }
+        ],
+        expl: 'Marx og Engels mener, at klassekamp ikke kun er et moderne fænomen — det har ifølge dem præget alle tidligere samfund, fra frie mænd og slaver til adel og livegne. Klassekampen er historiens grundlæggende drivkraft, uanset tidsperiode.'
+    },
+    {
+        type: 'single',
+        quoteId: 'quote-b',
+        q: 'Se citatet, der nu er markeret i kilden herover. Hvad menes der med det?',
+        options: [
+            { text: 'Samfundet deler sig i to modsatte klasser: bourgeoisiet og proletariatet', correct: true },
+            { text: 'Danmark og Tyskland er på vej i krig mod hinanden', correct: false },
+            { text: 'Alle samfundsklasser er blevet enige med hinanden', correct: false }
+        ],
+        expl: 'Marx og Engels mener, at samfundet i stigende grad kun består af to modsatrettede grupper — bourgeoisiet (kapitalisterne) og proletariatet (arbejderne) — og at konflikten mellem dem bliver renere og skarpere end nogensinde før.'
+    },
+    {
+        type: 'single',
+        quoteId: 'quote-c',
+        q: 'Se citatet, der nu er markeret i kilden herover. Hvad menes der med det?',
+        options: [
+            { text: 'Fabrikker og maskiner skal ikke længere ejes privat, men overtages af staten', correct: true },
+            { text: 'Hver enkelt arbejder skal eje sin egen lille fabrik', correct: false },
+            { text: 'Kongen skal fortsat eje alle produktionsmidlerne', correct: false }
+        ],
+        expl: 'Marx og Engels\' konkrete krav er, at produktionsmidlerne (fabrikker, jord, maskiner) ikke længere skal være privatejendom, men overtages af staten — som de forestillede sig styret af den nu magthavende arbejderklasse.'
+    },
+    {
+        type: 'multi',
+        q: 'Hvad er kilden god til at belyse? (Vælg de 2 rigtige svar)',
+        options: [
+            { text: 'Marx og Engels\' syn på klassekampen', correct: true },
+            { text: 'Arbejdernes vej til den politiske magt', correct: true },
+            { text: 'Adam Smiths markedsteori', correct: false },
+            { text: 'Statistik over fagforeningsmedlemmer', correct: false }
+        ],
+        expl: 'Kilden er et politisk manifest og viser derfor Marx og Engels\' eget syn på klassekampen og deres plan for arbejderklassen — men intet om Adam Smiths teorier eller konkret statistik.'
+    }
+];
+
+let kildeCurrent = 0;
+const kildeTotal = kildeQuestions.length;
+let kildeShuffledOptions = [];
+
+function loadKildeQuestion() {
+    const box = document.getElementById('kilde-question-box');
+    const qData = kildeQuestions[kildeCurrent];
+    document.getElementById('kilde-progress').innerText = `Spørgsmål ${kildeCurrent + 1} af ${kildeTotal}`;
+    document.getElementById('kilde-next-btn').style.display = 'none';
+
+    // Kun det citat, der hører til det aktuelle spørgsmål, skal være markeret
+    document.querySelectorAll('.kilde-box .quote-revealed').forEach(el => el.classList.remove('quote-revealed'));
+    revealKildeQuote(qData);
+
+    // Bland rækkefølgen af svarmulighederne, så det rigtige svar ikke altid står samme sted
+    kildeShuffledOptions = [...qData.options].sort(() => Math.random() - 0.5);
+
+    if (qData.type === 'single') {
+        box.innerHTML = `
+            <div class="scenario-card">
+                <div class="scenario-text">${kildeCurrent + 1}. ${qData.q}</div>
+                <div class="scenario-options" id="kilde-options"></div>
+                <div class="scenario-explanation" id="kilde-expl"></div>
+            </div>
+        `;
+        const optBox = document.getElementById('kilde-options');
+        kildeShuffledOptions.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.innerText = opt.text;
+            btn.dataset.correct = opt.correct;
+            btn.onclick = () => answerKildeSingle(i, btn);
+            optBox.appendChild(btn);
+        });
+    } else {
+        box.innerHTML = `
+            <div class="scenario-card">
+                <div class="scenario-text">${kildeCurrent + 1}. ${qData.q}</div>
+                <div class="ms-options" id="kilde-ms-options"></div>
+                <button class="btn-primary" style="margin:10px 0 0 0;" onclick="checkKildeMulti()">Tjek svar</button>
+                <div class="scenario-explanation" id="kilde-expl"></div>
+            </div>
+        `;
+        const optBox = document.getElementById('kilde-ms-options');
+        kildeShuffledOptions.forEach((opt, i) => {
+            const label = document.createElement('label');
+            label.className = 'ms-option';
+            label.innerHTML = `<input type="checkbox" value="${i}"> ${opt.text}`;
+            optBox.appendChild(label);
+        });
+    }
+}
+
+function revealKildeQuote(qData) {
+    if (!qData.quoteId) return;
+    const quoteEl = document.getElementById(qData.quoteId);
+    if (quoteEl) quoteEl.classList.add('quote-revealed');
+}
+
+function answerKildeSingle(index, btn) {
+    const optBox = document.getElementById('kilde-options');
+    if (optBox.dataset.answered) return;
+    optBox.dataset.answered = '1';
+
+    const allBtns = optBox.querySelectorAll('button');
+    allBtns.forEach(b => b.disabled = true);
+
+    const qData = kildeQuestions[kildeCurrent];
+    const isCorrect = kildeShuffledOptions[index].correct;
+    if (isCorrect) {
+        btn.classList.add('correct');
+    } else {
+        btn.classList.add('wrong');
+        const correctIndex = kildeShuffledOptions.findIndex(o => o.correct);
+        allBtns[correctIndex].classList.add('correct');
+    }
+
+    const explBox = document.getElementById('kilde-expl');
+    explBox.innerHTML = (isCorrect ? '✅ ' : '❌ ') + qData.expl;
+    explBox.style.display = 'block';
+
+    showKildeNext();
+}
+
+function checkKildeMulti() {
+    const options = document.querySelectorAll('#kilde-ms-options .ms-option');
+    if (options[0].dataset.checked) return;
+
+    const qData = kildeQuestions[kildeCurrent];
+    let allCorrect = true;
+    options.forEach((opt, i) => {
+        opt.dataset.checked = '1';
+        const input = opt.querySelector('input');
+        input.disabled = true;
+        const isChecked = input.checked;
+        const shouldBeChecked = kildeShuffledOptions[i].correct;
+
+        if (shouldBeChecked && isChecked) {
+            opt.classList.add('ms-correct');
+        } else if (shouldBeChecked && !isChecked) {
+            opt.classList.add('ms-missed');
+            allCorrect = false;
+        } else if (!shouldBeChecked && isChecked) {
+            opt.classList.add('ms-wrong');
+            allCorrect = false;
+        }
+    });
+
+    const explBox = document.getElementById('kilde-expl');
+    explBox.innerHTML = (allCorrect ? '✅ ' : '❌ ') + qData.expl;
+    explBox.style.display = 'block';
+
+    showKildeNext();
+}
+
+function showKildeNext() {
+    const nextBtn = document.getElementById('kilde-next-btn');
+    if (kildeCurrent === kildeTotal - 1) {
+        nextBtn.style.display = 'none';
+        document.getElementById('kilde-continue-btn').style.display = 'block';
+    } else {
+        nextBtn.style.display = 'inline-block';
+    }
+}
+
+function nextKildeQuestion() {
+    kildeCurrent++;
+    if (kildeCurrent < kildeTotal) {
+        loadKildeQuestion();
+    }
+}
+
+/* ============================================================
+   QUIZ ENGINE
+   ============================================================ */
+const quizQuestions = [
+    {
+        q: "Hvem skrev Det kommunistiske manifest i 1848, og med hvem?",
+        hint: "To gode venner, begge tyske tænkere.",
+        a: [
+            { text: "Karl Marx sammen med Friedrich Engels", correct: true },
+            { text: "Adam Smith sammen med David Ricardo", correct: false },
+            { text: "Edmund Burke, helt alene uden hjælp", correct: false }
+        ],
+        expl: "Karl Marx (1818-1883) skrev sammen med vennen Friedrich Engels Det kommunistiske manifest, der udkom i 1848."
+    },
+    {
+        q: "Hvilke to klasser mente Marx udgjorde det kapitalistiske samfund?",
+        hint: "Den ene ejer fabrikkerne, den anden sælger sin arbejdskraft for løn.",
+        a: [
+            { text: "Kapitalisterne og arbejderne (proletariatet)", correct: true },
+            { text: "Adelen og den katolske gejstlighed", correct: false },
+            { text: "Bønderne og de lokale håndværkere", correct: false }
+        ],
+        expl: "Ifølge Marx bestod det kapitalistiske samfund af kapitalisterne, der ejede fabrikkerne og ønskede størst mulig profit, og arbejderne (proletariatet), der solgte deres arbejdskraft for løn."
+    },
+    {
+        q: "Hvad kaldte Marx den vedvarende konflikt mellem samfundets klasser, som han mente drev historien fremad?",
+        hint: "Ordet indeholder 'kamp'.",
+        a: [
+            { text: "Den usynlige hånd", correct: false },
+            { text: "Klassekampen", correct: true },
+            { text: "Den sociale kontrakt", correct: false }
+        ],
+        expl: "Marx kaldte konflikten mellem samfundets klasser for klassekampen, som han mente var den historiske udviklings vigtigste drivkraft."
+    },
+    {
+        q: "Hvad kaldes teorien om, at et samfunds økonomiske grundlag i sidste ende bestemmer dets love, moral og kultur?",
+        hint: "Teorien handler om de materielle/økonomiske forhold — deraf navnet.",
+        a: [
+            { text: "Den historiske materialisme", correct: true },
+            { text: "Socialliberalismen", correct: false },
+            { text: "Reformsocialismen", correct: false }
+        ],
+        expl: "Den historiske materialisme (den materialistiske historieopfattelse) er teorien om, at samfundets basis (det økonomiske grundlag) bestemmer overbygningen (idéer, religion, moral, ret og kunst)."
+    },
+    {
+        q: "Hvad hører ifølge Marx til samfundets 'basis'?",
+        hint: "Tænk på fabrikker, maskiner, råstoffer og ejendomsret over produktionsmidlerne.",
+        a: [
+            { text: "Produktivkræfter og produktionsforhold", correct: true },
+            { text: "Religion, moral og kunst", correct: false },
+            { text: "Love og domstole alene", correct: false }
+        ],
+        expl: "Basis består af produktivkræfter (jord, råstoffer, redskaber, maskiner, arbejdskraft) og produktionsforhold (ejendomsret og rådighed over produktionsmidlerne)."
+    },
+    {
+        q: "Hvad mente Marx ville ske, når proletariatet blev bevidst om sine fælles klasseinteresser?",
+        hint: "Det handler om en skærpet konflikt, der ifølge Marx til sidst skulle føre til noget stort.",
+        a: [
+            { text: "Klassekampen ville skærpes og til sidst ende i en socialistisk revolution", correct: true },
+            { text: "Arbejderne ville stemme sig til magten inden for et rent liberalt system", correct: false },
+            { text: "Kapitalisterne ville frivilligt dele deres profit ligeligt", correct: false }
+        ],
+        expl: "Ifølge Marx ville arbejderne, når de blev klassebevidste, stå sammen i kampen om magten. Klassekampen ville skærpes og til sidst ende i en socialistisk revolution, om nødvendigt med voldelige midler."
+    },
+    {
+        q: "Hvad var målet med 'det klasseløse samfund', som Marx forestillede sig som kommunismens endemål?",
+        hint: "Tænk på slagordet om at 'yde' og 'nyde'.",
+        a: [
+            { text: "At alle 'yder efter evne og nyder efter behov', og der ikke længere er brug for en statsmagt", correct: true },
+            { text: "At staten for evigt ejer alt og fordeler goder lige, uanset indsats", correct: false },
+            { text: "At kapitalisterne bliver en ny adel, der overtager statens magt", correct: false }
+        ],
+        expl: "I det klasseløse samfund skulle alle 'yde efter evne og nyde efter behov', og der ville ifølge Marx ikke længere være behov for en statsmagt til at opretholde samfundsordenen. Det er noget andet end 'proletariatets diktatur', som kun var en midlertidig overgangsperiode."
+    },
+    {
+        q: "Hvad var forskellen mellem reformsocialisme og revolutionær socialisme, som til sidst splittede den socialistiske bevægelse i to?",
+        hint: "Tænk på Bernstein og fagforeninger over for bolsjevikkerne i Rusland 1917.",
+        a: [
+            { text: "Reformsocialister ville forbedre arbejdernes vilkår gradvist gennem demokrati og fagforeninger, mens revolutionære ville afskaffe kapitalismen med en revolution", correct: true },
+            { text: "Reformsocialister ønskede revolution med det samme, mens de revolutionære ville vente hundrede år", correct: false },
+            { text: "Der var i virkeligheden slet ingen reel forskel af betydning mellem de to politiske retninger", correct: false }
+        ],
+        expl: "Reformsocialister (fx Eduard Bernstein og de danske socialdemokrater) troede ikke, kapitalismen ville bryde sammen af sig selv, og ville i stedet forbedre vilkårene gradvist gennem fagforeninger og parlamentarisk arbejde. Revolutionære socialister (fx bolsjevikkerne i Rusland) fulgte Marx' idé om, at kapitalismen måtte væltes ved revolution."
+    }
+];
+
+let quizCurrent = 0;
+let quizScore = 0;
+let quizHintUsed = false;
+const quizTotal = quizQuestions.length;
+
+function loadQuizQuestion() {
+    const explBox = document.getElementById('quiz-explanation');
+    const nextBtn = document.getElementById('quiz-next-btn');
+    const hintBox = document.getElementById('quiz-hint-box');
+    const hintBtn = document.getElementById('quiz-hint-btn');
+    const hintWarning = document.getElementById('quiz-hint-warning');
+    const optBox = document.getElementById('quiz-options');
+
+    explBox.style.display = 'none';
+    nextBtn.style.display = 'none';
+    hintBox.style.display = 'none';
+    hintBtn.style.display = 'inline-block';
+    hintBtn.disabled = false;
+    hintWarning.style.display = 'none';
+    quizHintUsed = false;
+    optBox.innerHTML = '';
+
+    const qData = quizQuestions[quizCurrent];
+    document.getElementById('quiz-question').innerText = qData.q;
+    hintBox.innerText = '💡 ' + qData.hint;
+    document.getElementById('quiz-score').innerText = `Spørgsmål ${quizCurrent + 1} af ${quizTotal}`;
+
+    // Bland rækkefølgen af svarmulighederne, så det rigtige svar ikke altid står samme sted
+    const shuffled = [...qData.a].sort(() => Math.random() - 0.5);
+
+    shuffled.forEach((opt, index) => {
+        const btn = document.createElement('button');
+        btn.innerText = opt.text;
+        btn.onclick = () => checkQuizAnswer(index, btn, shuffled, qData);
+        optBox.appendChild(btn);
+    });
+}
+
+function toggleHint() {
+    const hintBox = document.getElementById('quiz-hint-box');
+    const hintWarning = document.getElementById('quiz-hint-warning');
+    if (hintBox.style.display === 'none' || hintBox.style.display === '') {
+        hintBox.style.display = 'block';
+        quizHintUsed = true;
+        hintWarning.style.display = 'inline';
+    } else {
+        hintBox.style.display = 'none';
+    }
+}
+
+function checkQuizAnswer(index, btn, shuffled, qData) {
+    const optBox = document.getElementById('quiz-options');
+    const allBtns = optBox.querySelectorAll('button');
+    allBtns.forEach(b => b.disabled = true);
+    document.getElementById('quiz-hint-btn').disabled = true;
+    document.getElementById('quiz-hint-box').style.display = 'none';
+
+    const explBox = document.getElementById('quiz-explanation');
+    const isCorrect = shuffled[index].correct;
+    let pointTag;
+
+    if (isCorrect) {
+        btn.classList.add('correct');
+        if (quizHintUsed) {
+            quizScore += 0.5;
+            pointTag = '<span class="point-tag point-half">☆ ½ point (du brugte hintet)</span>';
+        } else {
+            quizScore += 1;
+            pointTag = '<span class="point-tag point-full">★ 1 point</span>';
+        }
+        explBox.innerHTML = '✅ <b>Korrekt!</b><br>' + qData.expl + pointTag;
+    } else {
+        btn.classList.add('wrong');
+        const correctIndex = shuffled.findIndex(o => o.correct);
+        allBtns[correctIndex].classList.add('correct');
+        pointTag = '<span class="point-tag point-zero">0 point</span>';
+        explBox.innerHTML = '❌ <b>Forkert.</b><br>' + qData.expl + pointTag;
+    }
+
+    explBox.style.display = 'block';
+    document.getElementById('quiz-next-btn').style.display = 'block';
+    if (quizCurrent === quizTotal - 1) {
+        document.getElementById('quiz-next-btn').innerText = 'Se resultat';
+    }
+}
+
+function nextQuizQuestion() {
+    quizCurrent++;
+    if (quizCurrent < quizTotal) {
+        loadQuizQuestion();
+    } else {
+        showQuizResult();
+    }
+}
+
+function formatQuizScore(s) {
+    return (Math.round(s * 2) / 2).toString().replace('.', ',');
+}
+
+function showQuizResult() {
+    const box = document.querySelector('#section-quiz .quiz-box');
+    box.innerHTML = `
+        <h2 style="border:none;">Quiz gennemført!</h2>
+        <p style="text-align:center; font-size:1.3em; margin: 25px 0;">Du fik <b>${formatQuizScore(quizScore)}</b> ud af <b>${quizTotal}</b> point.</p>
+        <p style="text-align:center; color:#6b5352;">
+            ${quizScore >= 6.5 ? "Flot! Du har godt styr på Marx' klassekamp, samfundsmodel og de socialistiske retninger." :
+              quizScore >= 4 ? "Godt gået. Kig evt. samfundsmodellen og tidslinjen igennem en gang til." :
+              "Prøv igen — brug gerne pyramiden og fabrikssimulatoren i afsnit ② og ③ igen, og læs kilde 37 en ekstra gang."}
+        </p>
+        <button onclick="location.reload()" style="display:block; margin:30px auto; padding:14px 28px; background:#922b21; border:none; border-radius:6px; cursor:pointer; font-weight:bold; color:white; font-size:15px;">Prøv igen</button>
+    `;
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+shuffleButtonsIn('#section-intro .scenario-options');
+shuffleButtonsIn('#section-model .scenario-options');
+onPrisChange();
+buildTimeline();
+loadKildeQuestion();
+loadQuizQuestion();
+</script>
+</body>
+</html>

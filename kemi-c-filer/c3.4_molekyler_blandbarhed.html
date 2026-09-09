@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Molekylers blandbarhed</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --panel: #1e293b;
+            --text: #f1f5f9;
+            --water: #3b82f6;   
+            --alc: #d946ef;     
+            --oil: #fbbf24;     
+            --danger: #ef4444;
+            --font: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body { margin: 0; overflow: hidden; background: var(--bg); color: var(--text); font-family: var(--font); display: flex; height: 100vh; user-select: none; }
+        
+        #sidebar { 
+            width: 300px; 
+            background: var(--panel); 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            box-shadow: 4px 0 20px rgba(0,0,0,0.4); 
+            z-index: 10; 
+        }
+
+        h1 { font-size: 1.2rem; margin: 0; border-bottom: 2px solid var(--alc); padding-bottom: 8px; }
+        .control-group { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 6px; border: 1px solid #334155; }
+        
+        button { 
+            width: 100%; padding: 10px; margin-bottom: 8px; border: none; border-radius: 4px; 
+            color: white; cursor: pointer; font-weight: 600; font-size: 0.9rem; 
+            transition: all 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; 
+        }
+        button:hover { filter: brightness(1.15); }
+        button:active { transform: scale(0.97); }
+
+        .btn-water { background: var(--water); }
+        .btn-alc   { background: var(--alc); }
+        .btn-oil   { background: var(--oil); color: #0f172a; }
+        
+        .btn-shake { background: var(--danger); font-weight: bold; box-shadow: 0 4px 0 #991b1b; margin-top: 10px; }
+        .btn-shake:active { transform: translateY(4px); box-shadow: none; }
+        
+        .btn-reset { background: #475569; margin-top: 10px; }
+
+        input[type=range] { width: 100%; cursor: pointer; accent-color: var(--danger); margin: 10px 0; }
+        
+        .temp-display { 
+            font-family: monospace; font-size: 1.5rem; color: var(--danger); text-align: center; 
+            background: #000; padding: 8px; border-radius: 4px; margin-bottom: 5px; border: 1px solid #333;
+        }
+
+        #main { flex-grow: 1; position: relative; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle at center, #334155 0%, #0f172a 100%); }
+
+        #beaker {
+            position: relative;
+            width: min(92%, 560px); height: min(85vh, 760px);
+            border-bottom: 5px solid rgba(255,255,255,0.3);
+            border-left: 5px solid rgba(255,255,255,0.3);
+            border-right: 5px solid rgba(255,255,255,0.3);
+            border-radius: 0 0 40px 40px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.01), rgba(255,255,255,0.1));
+            box-shadow: 0 0 60px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        #condenser-zone {
+            position: absolute; top: 0; left: 0; width: 100%; height: 80px;
+            background: linear-gradient(to bottom, rgba(56, 189, 248, 0.2), transparent);
+            border-bottom: 1px dashed rgba(56, 189, 248, 0.4);
+            pointer-events: none;
+            display: flex; justify-content: center; padding-top: 10px;
+            color: #7dd3fc; font-size: 0.8rem; letter-spacing: 2px; font-weight: bold;
+        }
+
+        canvas { display: block; width: 100%; height: 100%; }
+
+        .legend { font-size: 0.75rem; color: #94a3b8; margin-top:5px; line-height: 1.4; }
+
+        #canvas-legend {
+            position: absolute; bottom: 12px; left: 12px; z-index: 5;
+            background: rgba(15,23,42,0.65); border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 8px; padding: 8px 12px; font-size: 0.78rem; color: #cbd5e1;
+            pointer-events: none;
+        }
+        #canvas-legend .legend-row { display: flex; align-items: center; gap: 7px; margin: 3px 0; }
+        #canvas-legend .dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+
+        .hidden { display: none !important; }
+
+        #quiz-panel {
+            width: 280px;
+            background: var(--panel);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.4);
+            z-index: 10;
+            overflow-y: auto;
+        }
+
+        #quiz-progress {
+            font-size: 0.7rem; color: var(--water); letter-spacing: 2px;
+            text-transform: uppercase; font-weight: 700;
+        }
+        #quiz-question { font-size: 0.95rem; margin: 0; line-height: 1.4; font-weight: 600; }
+
+        .quiz-option {
+            display: block; width: 100%; text-align: left; padding: 10px 12px; margin-bottom: 0;
+            background: rgba(255,255,255,0.05); border: 1px solid #334155; border-radius: 6px;
+            color: var(--text); cursor: pointer; font-size: 0.82rem; line-height: 1.3; transition: all 0.15s; font-weight: 400;
+        }
+        .quiz-option:hover:not(:disabled) { background: rgba(255,255,255,0.1); border-color: var(--water); }
+        .quiz-option.correct { background: rgba(34,197,94,0.25); border-color: #22c55e; }
+        .quiz-option.incorrect { background: rgba(239,68,68,0.2); border-color: var(--danger); }
+        .quiz-option:disabled { cursor: default; }
+        #quiz-options { display: flex; flex-direction: column; gap: 7px; }
+
+        #quiz-feedback { padding: 10px 12px; border-radius: 6px; font-size: 0.78rem; line-height: 1.45; }
+        #quiz-feedback.correct { background: rgba(34,197,94,0.12); border: 1px solid #22c55e; color: #bbf7d0; }
+        #quiz-feedback.incorrect { background: rgba(239,68,68,0.12); border: 1px solid var(--danger); color: #fecaca; }
+
+        #quiz-next-btn { background: var(--water); margin-top: 2px; }
+    </style>
+</head>
+<body>
+
+<div id="sidebar">
+    <h1>⚗️ Molekylers blandbarhed</h1>
+    
+    <div class="control-group">
+        <label>Tilsæt Stoffer</label>
+        <button class="btn-water" onclick="sim.spawn('water', 50)">+ Vand (H₂O)</button>
+        <button class="btn-alc" onclick="sim.spawn('alcohol', 50)">+ Ethanol (C₂H₅OH)</button>
+        <button class="btn-oil" onclick="sim.spawn('oil', 30)">+ Olie (Upolær)</button>
+    </div>
+
+    <div class="control-group">
+        <label>Energi & Temperatur</label>
+        <button class="btn-shake" onclick="sim.shake()">🌪️ RYST KOLBEN</button>
+
+        <div class="temp-display" id="temp-display">20°C</div>
+        <input type="range" id="temp-slider" min="20" max="120" value="20" step="1">
+        
+        <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#64748b;">
+            <span>20°C</span>
+            <span style="color:var(--alc)">78°C</span>
+            <span style="color:var(--water)">100°C</span>
+            <span>120°C</span>
+        </div>
+        <p class="legend">
+            Ethanol fordamper allerede ved 78°C — længe før vandet, der først koger ved 100°C. Jo varmere, jo hurtigere fordampning (se boblerne).
+        </p>
+    </div>
+
+    <div class="control-group">
+        <button class="btn-reset" onclick="sim.reset()">♻️ Tøm Kolbe</button>
+    </div>
+</div>
+
+<div id="main">
+    <div id="beaker">
+        <div id="condenser-zone">❄️ KONDENSATOR ZONE (< 50°C) ❄️</div>
+        <canvas id="simCanvas"></canvas>
+        <div id="canvas-legend">
+            <div class="legend-row"><span class="dot" style="background:var(--water)"></span> Vand — polær</div>
+            <div class="legend-row"><span class="dot" style="background:var(--alc)"></span> Ethanol — polær</div>
+            <div class="legend-row"><span class="dot" style="background:var(--oil)"></span> Olie — upolær</div>
+        </div>
+    </div>
+</div>
+
+<div id="quiz-panel">
+    <h1>🧠 Polaritets-Quiz</h1>
+    <div id="quiz-progress">Spørgsmål 1/5</div>
+    <div id="quiz-question">Spørgsmål...</div>
+    <div id="quiz-options"></div>
+    <div id="quiz-feedback" class="hidden"></div>
+    <button id="quiz-next-btn" class="hidden" onclick="quiz.next()">Næste →</button>
+</div>
+
+<script>
+/**
+ * KONFIGURATION
+ * Vand (1.0), Olie (0.92), Ethanol (0.79)
+ * Polaritets-flag styrer nu blandbarheden.
+ */
+const TYPES = {
+    water:   { symbol: 'H₂O', color: '#3b82f6', r: 6, mass: 18, bp: 100, density: 1.0, polar: true },
+    oil:     { symbol: 'Oil', color: '#fbbf24', r: 9, mass: 100, bp: 300, density: 0.92, polar: false },
+    alcohol: { symbol: 'C₂H₅OH', color: '#d946ef', r: 7, mass: 46, bp: 78, density: 0.79, polar: true }
+};
+const REFERENCE_MASS = TYPES.water.mass; // Grahams lov: diffusionshastighed ∝ 1/√masse, vand som reference
+
+class Simulation {
+    constructor() {
+        this.canvas = document.getElementById('simCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.resize();
+        
+        this.particles = [];
+        this.temp = 20;
+
+        this.initEvents();
+        this.loop();
+    }
+
+    resize() {
+        this.width = this.canvas.width = this.canvas.parentElement.clientWidth;
+        this.height = this.canvas.height = this.canvas.parentElement.clientHeight;
+    }
+
+    initEvents() {
+        window.addEventListener('resize', () => this.resize());
+        
+        document.getElementById('temp-slider').addEventListener('input', (e) => {
+            this.temp = parseInt(e.target.value);
+            document.getElementById('temp-display').innerText = this.temp + "°C";
+            this.particles.forEach(p => {
+                if(p.state === 'liquid') {
+                    p.vx += (Math.random()-0.5); 
+                    p.vy += (Math.random()-0.5);
+                }
+            });
+        });
+    }
+
+    spawn(type, count) {
+        if(this.particles.length > 800) return;
+        for (let i = 0; i < count; i++) {
+            this.particles.push({
+                type: type,
+                props: TYPES[type],
+                x: Math.random() * (this.width - 40) + 20,
+                y: Math.random() * (this.height * 0.5) + 200,
+                vx: (Math.random()-0.5),
+                vy: (Math.random()-0.5),
+                state: 'liquid'
+            });
+        }
+    }
+
+    shake() {
+        // De blandbare stoffer (vand + ethanol) skal fremstå HELT ligeligt fordelt efter en rystning —
+        // ikke bare have deres fart øget. Den lokale tiltræknings/frastødnings-fysik mellem naboer
+        // (se update()) virker kun på partikler der allerede rører hinanden, så den er for langsom til
+        // at bryde større klumper op i praksis. Derfor spreder vi dem eksplicit ud over hele kolben her;
+        // olie (upolær) rystes kun i fart og finder selv tilbage til sit eget lag via tæthedsfysikken.
+        const top = 90, bottom = this.height - 20, left = 20, right = this.width - 20;
+
+        this.particles.forEach(p => {
+            if (p.state === 'liquid' && p.props.polar) {
+                p.x = left + Math.random() * (right - left);
+                p.y = top + Math.random() * (bottom - top);
+            }
+            p.vx += (Math.random() - 0.5) * 40;
+            p.vy -= Math.random() * 30 + 10;
+        });
+    }
+
+    reset() { this.particles = []; }
+
+    update() {
+        const gravity = 0.4;
+        const thermalNoise = this.temp / 450;
+
+        for (let i = 0; i < this.particles.length; i++) {
+            let p = this.particles[i];
+
+            // --- 1. FASE LOGIK (gradvis fordampning/kondensering, ikke alt-eller-intet) ---
+            let overBp = this.temp - p.props.bp;
+            if (p.state === 'liquid') {
+                let evapChance = overBp >= 0
+                    ? 0.03 + Math.min(overBp, 20) * 0.01   // ved/over kogepunkt: hurtig, men gradvis kogning (bobler)
+                    : Math.max(0, 1 + overBp / 25) * 0.001; // under kogepunkt: svag overfladefordampning, tiltager nær kogepunktet
+                if (Math.random() < evapChance) {
+                    p.state = 'gas';
+                }
+            } else if (p.state === 'gas' && overBp < 0) {
+                // Temperaturen er skruet ned under kogepunktet igen, mens dampen stadig er på vej op.
+                // Den behøver ikke nå kondensatorzonen foroven — den kan "fortryde" og kondensere undervejs.
+                let condenseChance = Math.min(0.05, Math.abs(overBp) / 300);
+                if (Math.random() < condenseChance) {
+                    p.state = 'liquid';
+                }
+            }
+
+            // --- 2. KONDENSATOR ZONE ---
+            if (p.y < 80) {
+                p.state = 'liquid';
+                p.vy += 0.5;
+            }
+
+            // --- 3. BEVÆGELSE ---
+            // Grahams lov: lettere molekyler bevæger sig mere/hurtigere ved given temperatur end tunge
+            let diffusionFactor = Math.sqrt(REFERENCE_MASS / p.props.mass);
+
+            if (p.state === 'gas') {
+                p.vy -= 0.04;
+                p.vx += (Math.random()-0.5) * 0.15 * diffusionFactor;
+                p.vy += (Math.random()-0.5) * 0.15 * diffusionFactor;
+                p.vx *= 0.96;
+                p.vy *= 0.96;
+            } else {
+                p.vy += gravity;
+                p.vx += (Math.random()-0.5) * thermalNoise * diffusionFactor;
+                p.vy += (Math.random()-0.5) * thermalNoise * diffusionFactor;
+                p.vx *= 0.9;
+                p.vy *= 0.9;
+            }
+
+            // --- 4. VÆGGE ---
+            if (p.x < p.props.r) { p.x = p.props.r; p.vx *= -0.1; }
+            if (p.x > this.width - p.props.r) { p.x = this.width - p.props.r; p.vx *= -0.1; }
+            if (p.y > this.height - p.props.r) { p.y = this.height - p.props.r; p.vy *= -0.05; }
+            p.x += p.vx;
+            p.y += p.vy;
+
+            // --- 5. INTER-MOLEKYLÆR FYSIK ---
+            if (p.state === 'liquid') {
+                for (let j = i + 1; j < this.particles.length; j++) {
+                    let p2 = this.particles[j];
+                    if (p2.state !== 'liquid') continue;
+
+                    let dx = p2.x - p.x;
+                    let dy = p2.y - p.y;
+                    let distSq = dx*dx + dy*dy;
+                    let minDist = p.props.r + p2.props.r;
+
+                    if (distSq < minDist*minDist) {
+                        let dist = Math.sqrt(distSq);
+                        let force = (minDist - dist) * 0.15;
+                        let nx = dx / dist;
+                        let ny = dy / dist;
+                        
+                        // Basis kollision
+                        p.vx -= nx * force; p.vy -= ny * force;
+                        p2.vx += nx * force; p2.vy += ny * force;
+
+                        // TJEK FOR BLANDBARHED (POLARITET)
+                        // Blandbare stoffer = Sammme polaritet (Vand+Ethanol, Vand+Vand, Olie+Olie)
+                        // Ikke-blandbare = Forskelig polaritet (Olie+Vand, Olie+Ethanol)
+                        
+                        const isMiscible = p.props.polar === p2.props.polar;
+
+                        if (!isMiscible) {
+                            // A. IKKE BLANDBARE — det er altid Olie (upolær) mod Vand/Ethanol (polær).
+                            // Olie opløses ikke i den polære fase og skal derfor ALTID lægge sig
+                            // ovenpå — uanset om den polære nabo er rent vand, ren ethanol, eller
+                            // en blanding af dem. (En rå tal-sammenligning af densitet ville fejle her,
+                            // da ren ethanol reelt vejer mindre end olie, men ethanol optræder aldrig
+                            // som et rent, adskilt lag — den er jo opløst i vandet.)
+                            let diff = Math.abs(p.props.density - p2.props.density);
+                            const oilP = (p.type === 'oil') ? p : p2;
+                            const wetP = (oilP === p) ? p2 : p;
+
+                            let lift = 0.3 * (diff * 5);
+                            oilP.vy -= lift;
+                            wetP.vy += lift;
+
+                            // Frastødning
+                            let repulse = 0.02;
+                            p.vx -= nx * repulse; p.vy -= ny * repulse;
+                            p2.vx += nx * repulse; p2.vy += ny * repulse;
+                        }
+                        else {
+                            // B. BLANDBARE (Vand+Ethanol, Vand+Vand, Ethanol+Ethanol, Olie+Olie)
+                            // Her slukker vi for densitets-sorteringen!
+                            // Selvom ethanol er lettere, skal den ikke flyde ovenpå vand,
+                            // fordi blandingsentropien og hydrogenbindinger vinder.
+                            //
+                            // Vand og ethanol foretrækker aktivt HINANDEN (positiv = tiltrækning)
+                            // og støder samtidig deres EGEN type fra sig (negativ = frastødning).
+                            // Det bryder rene vand- og ethanol-klumper op og driver systemet mod
+                            // en reelt blandet, homogen tilstand — ikke bare tilfældig nabolag.
+                            // Olie har den modsatte præference: den klumper sig sammen med sig selv,
+                            // ligesom en oliedråbe der holder sammen i stedet for at sprede sig ud.
+                            let mixingStrength;
+                            if (p.type === 'oil' && p2.type === 'oil') {
+                                mixingStrength = 0.045;   // olie klumper sig sammen
+                            } else if (p.type !== p2.type) {
+                                mixingStrength = 0.045;   // vand↔ethanol: søger hinanden
+                            } else {
+                                mixingStrength = -0.02;   // vand-vand / ethanol-ethanol: støder fra hinanden
+                            }
+
+                            p.vx += nx * mixingStrength; p.vy += ny * mixingStrength;
+                            p2.vx -= nx * mixingStrength; p2.vy -= ny * mixingStrength;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    draw() {
+        this.ctx.clearRect(0, 0, this.width, this.height);
+
+        this.particles.forEach(p => {
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, p.props.r, 0, Math.PI*2);
+            this.ctx.fillStyle = p.props.color;
+            this.ctx.globalAlpha = p.state === 'gas' ? 0.7 : 1.0; 
+            this.ctx.fill();
+            this.ctx.globalAlpha = 1.0;
+            
+            this.ctx.fillStyle = "rgba(255,255,255,0.4)";
+            this.ctx.beginPath();
+            this.ctx.arc(p.x - 2, p.y - 2, 2, 0, Math.PI*2);
+            this.ctx.fill();
+        });
+    }
+
+    loop() {
+        this.update();
+        this.draw();
+        requestAnimationFrame(() => this.loop());
+    }
+}
+
+// ============================================================
+// QUIZ: Polaritet & Blandbarhed
+// Hver opgave kræver at eleven anvender polaritetsbegrebet
+// aktivt for at forudsige eller forklare et resultat.
+// ============================================================
+const QUIZ_QUESTIONS = [
+    {
+        q: "Hvad afgør, om to væsker er blandbare?",
+        options: [
+            "Farven på de to væsker",
+            "Polariteten — “lige blander lige”",
+            "Kogepunktet for stofferne",
+            "Massefylden i væskerne"
+        ],
+        correct: 1,
+        explain: "Polaritet afgør blandbarhed. Massefylde bestemmer kun hvem der lægger sig øverst, hvis stofferne IKKE er blandbare."
+    },
+    {
+        q: "Vand (polært) + olie (upolært) blandes. Hvad sker der?",
+        options: [
+            "Blandes homogent",
+            "To lag — olie øverst",
+            "Danner en ny forbindelse",
+            "Blandes kun ved høj varme"
+        ],
+        correct: 1,
+        explain: "Forskellig polaritet ⇒ to lag. Olie er mindre tæt end vand og lægger sig derfor øverst."
+    },
+    {
+        q: "Ethanols -OH-gruppe er polær. Hvorfor blandes ethanol med vand?",
+        options: [
+            "Hele ethanol-molekylet er upolært",
+            "Vands polære O–H-bindinger hydrogenbinder til ethanols -OH",
+            "Ethanol vejer lige så meget som vand",
+            "Ethanol forbliver altid i gasform"
+        ],
+        correct: 1,
+        explain: "Vands O–H-bindinger er også polære, så de kan hydrogenbinde med ethanols -OH-gruppe. Det gør dem blandbare."
+    },
+    {
+        q: "Olie+vand rystes til én mælket emulsion. Hvad sker der, når du stopper?",
+        options: [
+            "Forbliver blandet",
+            "Skiller sig ad igen",
+            "Olien opløses langsomt",
+            "Vandet fordamper"
+        ],
+        correct: 1,
+        explain: "Rystning ændrer ikke polariteten. Så snart det falder til ro, skiller det ad igen."
+    },
+    {
+        q: "Ethanol koger ved 78°C, vand ved 100°C. Hvorfor er det nyttigt?",
+        options: [
+            "Det er det ikke — de koger samtidig",
+            "Ethanol fordamper først og kan opsamles separat",
+            "Vand fordamper altid først",
+            "Kogepunkt er irrelevant for adskillelse"
+        ],
+        correct: 1,
+        explain: "Lavere kogepunkt ⇒ ethanol fordamper først. Det er princippet bag destillation."
+    }
+];
+
+class Quiz {
+    constructor() {
+        this.current = 0;
+        this.score = 0;
+        this.answered = false;
+        this.finished = false;
+        this.render();
+    }
+
+    restart() {
+        this.current = 0;
+        this.score = 0;
+        this.finished = false;
+        this.render();
+    }
+
+    render() {
+        this.answered = false;
+
+        // Bland svarmulighederne, saa det rigtige svar ikke altid staar samme sted
+        const original = QUIZ_QUESTIONS[this.current];
+        const order = original.options.map((_, i) => i);
+        for (let i = order.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [order[i], order[j]] = [order[j], order[i]];
+        }
+        const q = {
+            ...original,
+            options: order.map(i => original.options[i]),
+            correct: order.indexOf(original.correct)
+        };
+        this.currentQuestion = q;
+
+        document.getElementById('quiz-progress').innerText = `Spørgsmål ${this.current + 1}/${QUIZ_QUESTIONS.length}`;
+        document.getElementById('quiz-question').innerText = q.q;
+
+        const optionsDiv = document.getElementById('quiz-options');
+        optionsDiv.innerHTML = '';
+        q.options.forEach((opt, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-option';
+            btn.innerText = opt;
+            btn.onclick = () => this.select(idx);
+            optionsDiv.appendChild(btn);
+        });
+
+        const feedback = document.getElementById('quiz-feedback');
+        feedback.className = 'hidden';
+        feedback.innerText = '';
+
+        const nextBtn = document.getElementById('quiz-next-btn');
+        nextBtn.classList.add('hidden');
+        nextBtn.innerText = 'Næste →';
+    }
+
+    select(idx) {
+        if (this.answered) return;
+        this.answered = true;
+
+        const q = this.currentQuestion;
+        const buttons = document.querySelectorAll('#quiz-options .quiz-option');
+        buttons.forEach((btn, i) => {
+            btn.disabled = true;
+            if (i === q.correct) btn.classList.add('correct');
+            else if (i === idx) btn.classList.add('incorrect');
+        });
+
+        const feedback = document.getElementById('quiz-feedback');
+        feedback.classList.remove('hidden');
+        if (idx === q.correct) {
+            this.score++;
+            feedback.className = 'correct';
+            feedback.innerText = '✓ ' + q.explain;
+        } else {
+            feedback.className = 'incorrect';
+            feedback.innerText = '✗ ' + q.explain;
+        }
+
+        document.getElementById('quiz-next-btn').classList.remove('hidden');
+    }
+
+    next() {
+        if (this.finished) { this.restart(); return; }
+        if (!this.answered) return;
+
+        this.current++;
+        if (this.current >= QUIZ_QUESTIONS.length) {
+            this.showResult();
+        } else {
+            this.render();
+        }
+    }
+
+    showResult() {
+        this.finished = true;
+        document.getElementById('quiz-progress').innerText = 'Quiz afsluttet';
+        document.getElementById('quiz-question').innerText = `Du fik ${this.score}/${QUIZ_QUESTIONS.length} rigtige.`;
+        document.getElementById('quiz-options').innerHTML = '';
+        document.getElementById('quiz-feedback').className = 'hidden';
+
+        const nextBtn = document.getElementById('quiz-next-btn');
+        nextBtn.innerText = '🔄 Prøv igen';
+        nextBtn.classList.remove('hidden');
+    }
+}
+
+const sim = new Simulation();
+sim.spawn('water', 90);
+sim.spawn('alcohol', 90);
+
+const quiz = new Quiz();
+
+</script>
+</body>
+</html>

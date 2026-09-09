@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Redox-Lab V8: User Controlled Flow</title>
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --panel-bg: #1e1e24;
+            --text-main: #e0e0e0;
+            --accent: #4cc9f0;
+            --success: #4ade80;
+            --danger: #f72585;
+            --warning: #f48c06;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            user-select: none;
+        }
+
+        /* SIDEBAR */
+        #sidebar {
+            width: 280px; min-width: 280px;
+            background: var(--panel-bg);
+            border-right: 2px solid #333; /* Tykkere border for effekt */
+            display: flex; flex-direction: column;
+            padding: 15px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        /* Pulse Animation for "Next Metal" */
+        @keyframes attentionPulse {
+            0% { border-right-color: #333; box-shadow: 2px 0 10px rgba(0,0,0,0.5); }
+            50% { border-right-color: var(--accent); box-shadow: 0 0 25px var(--accent) inset; background-color: #252530; }
+            100% { border-right-color: #333; box-shadow: 2px 0 10px rgba(0,0,0,0.5); }
+        }
+        .pulse-attention {
+            animation: attentionPulse 2s infinite;
+            border-right: 2px solid var(--accent) !important;
+        }
+
+        /* MAIN AREA */
+        #main-view {
+            flex: 1; position: relative;
+            background: radial-gradient(circle at center, #2a2a35, #121212);
+            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        #canvas-container {
+            position: relative;
+            width: 100%; height: 100%;
+            max-width: 1600px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        
+        canvas { background: transparent; max-width: 100%; max-height: 100%; }
+
+        /* UI ELEMENTS */
+        h1 { font-size: 1.3rem; margin-top: 0; color: var(--accent); letter-spacing: 1px; }
+        h2 { font-size: 0.9rem; color: #aaa; margin-bottom: 8px; border-bottom: 1px solid #444; padding-bottom: 4px; }
+
+        select {
+            width: 100%; padding: 8px;
+            background: #2b2b36; border: 1px solid #444;
+            color: white; border-radius: 4px;
+            font-size: 0.9rem; margin-bottom: 10px; cursor: pointer;
+        }
+        
+        .btn {
+            background: var(--accent); color: #000;
+            border: none; padding: 10px;
+            border-radius: 4px; font-weight: bold;
+            cursor: pointer; width: 100%; margin-top: 5px;
+            transition: 0.2s; font-size: 0.9rem;
+        }
+        .btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .btn.secondary { background: #444; color: white; }
+        .btn-small { width: auto; padding: 5px 15px; font-size: 0.8rem; margin-left: 10px; }
+
+        /* SPÆNDINGSRÆKKE */
+        #reactivity-series {
+            background: rgba(0,0,0,0.2);
+            border-radius: 6px; padding: 8px; margin-top: auto;
+            border: 1px solid #333;
+        }
+        .series-item {
+            display: flex; justify-content: space-between;
+            padding: 3px 8px; border-radius: 3px;
+            font-size: 0.8rem; margin-bottom: 2px;
+        }
+        .active-metal { background: var(--accent); color: #000; font-weight: bold; }
+        .active-ion { background: var(--warning); color: #000; font-weight: bold; }
+        
+        /* OVERLAY STATUS & SKIP */
+        #wait-overlay {
+            position: absolute; top: 20px; 
+            background: rgba(0,0,0,0.85); color: #fff;
+            padding: 10px 20px; border-radius: 30px;
+            border: 1px solid var(--accent);
+            display: flex; align-items: center; gap: 10px;
+            opacity: 0; transition: opacity 0.3s; pointer-events: none;
+            z-index: 20;
+        }
+        #wait-overlay.visible { opacity: 1; pointer-events: auto; }
+        .loader { width:10px; height:10px; border:2px solid #fff; border-top-color:var(--accent); border-radius:50%; animation:spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* TASK BOX */
+        #task-box {
+            position: absolute; bottom: 20px; 
+            width: 90%; max-width: 850px;
+            background: rgba(20, 20, 25, 0.95);
+            padding: 15px; border-radius: 10px;
+            border: 1px solid var(--accent);
+            text-align: center;
+            box-shadow: 0 -5px 30px rgba(0,0,0,0.8);
+            opacity: 0; pointer-events: none;
+            transition: all 0.3s; z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+        #task-box.visible { opacity: 1; pointer-events: auto; }
+
+        .quiz-step { display: none; animation: fadeIn 0.3s; }
+        .quiz-step.active { display: block; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); }}
+
+        /* EQUATION STYLING */
+        .reaction-line {
+            display: flex; flex-wrap: wrap; 
+            align-items: center; justify-content: center;
+            gap: 8px; margin: 15px 0; font-size: 1.1rem;
+        }
+        .arrow-symbol { font-size: 1.5rem; color: var(--accent); margin: 0 5px; }
+        .chem-group { display: flex; align-items: center; gap: 2px; white-space: nowrap; }
+
+        .input-num { 
+            width: 30px; background: #333; color: #fff; border: 1px solid #555; 
+            text-align: center; padding: 4px; border-radius: 4px; font-weight: bold; 
+        }
+        .input-state { 
+            width: 50px; background: #333; color: var(--accent); border: 1px solid #555; 
+            padding: 4px; border-radius: 4px; font-weight: bold; cursor:pointer; 
+        }
+        
+        .feedback { min-height: 18px; font-weight: bold; margin-top: 10px; font-size: 0.9rem; }
+        
+        .quiz-options { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+        .quiz-btn { 
+            text-align: left; padding: 10px; background: rgba(255,255,255,0.05); 
+            border: 1px solid #444; color: #eee; border-radius: 5px; 
+            cursor: pointer; transition: 0.2s; font-size: 0.9rem; 
+        }
+        .quiz-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--accent); }
+
+    </style>
+</head>
+<body>
+
+<aside id="sidebar">
+    <h1>REDOX <span style="color:#fff">LAB</span></h1>
+    
+    <div class="control-group">
+        <h2>1. Vælg Metal (Stang)</h2>
+        <select id="metal-select">
+            <option value="Mg">Magnesium (Mg)</option>
+            <option value="Zn" selected>Zink (Zn)</option>
+            <option value="Fe">Jern (Fe)</option>
+            <option value="Cu">Kobber (Cu)</option>
+            <option value="Ag">Sølv (Ag)</option>
+        </select>
+    </div>
+
+    <div class="control-group">
+        <h2>2. Vælg Opløsning</h2>
+        <select id="solution-select">
+            <option value="Mg">Magnesiumsulfat (Mg²⁺)</option>
+            <option value="Zn">Zinksulfat (Zn²⁺)</option>
+            <option value="Fe">Jern(II)sulfat (Fe²⁺)</option>
+            <option value="Cu" selected>Kobbersulfat (Cu²⁺)</option>
+            <option value="Ag">Sølvnitrat (Ag⁺)</option>
+        </select>
+    </div>
+
+    <button id="reset-btn" class="btn secondary">Rengør / Genstart ↻</button>
+
+    <div id="reactivity-series">
+        <h2>Spændingsrækken</h2>
+        <div style="text-align:center; color:#666; font-size:0.7rem; margin-bottom:5px;">Mest reaktiv (Uædel / Afgiver e⁻)</div>
+        <div id="series-list"></div>
+        <div style="text-align:center; color:#666; font-size:0.7rem; margin-top:5px;">Mindst reaktiv (Ædel / Modtager e⁻)</div>
+    </div>
+</aside>
+
+<main id="main-view">
+    <div id="canvas-container">
+        <canvas id="sim-canvas"></canvas>
+        <div id="wait-overlay">
+            <div class="loader"></div>
+            <span>REAKTION I GANG...</span>
+            <button class="btn btn-small" onclick="skipAnim()">Gå direkte til opgave ⏭</button>
+        </div>
+    </div>
+
+    <div id="task-box">
+        <div id="quiz-step-1" class="quiz-step active">
+            <h3 style="margin:5px 0;">Hvad observerede du?</h3>
+            <div class="quiz-options" id="theory-options"></div>
+            <p id="theory-fb" class="feedback"></p>
+        </div>
+
+        <div id="quiz-step-2" class="quiz-step">
+            <h3 style="margin:5px 0;">Afstem Reaktionsskema</h3>
+            <div class="reaction-line" id="eq-container"></div>
+            <button class="btn" style="width: auto; padding: 8px 30px;" onclick="checkBalancing()">Kontroller Svar</button>
+            <p id="balance-fb" class="feedback"></p>
+        </div>
+
+        <div id="quiz-step-3" class="quiz-step">
+            <h3 style="color:var(--success)">Korrekt!</h3>
+            <p>Flot klaret! Opstillingen bliver stående, så du kan se resultatet.</p>
+            <p style="font-size: 0.9rem; color: #aaa;">Gå til menuen til venstre og vælg et nyt metal for at prøve igen.</p>
+        </div>
+    </div>
+</main>
+
+<script>
+/**
+ * REDOX LAB V8
+ * - Manual Flow Control: User decides when to reset.
+ * - Sidebar Pulse: Guiding user to next step visually.
+ */
+
+const METALS = {
+    'Mg': { name: 'Magnesium', color: '#ecf0f1', ionColor: 'rgba(236,240,241,0.2)', reactivity: 10, charge: 2 },
+    'Zn': { name: 'Zink',      color: '#95a5a6', ionColor: 'rgba(149,165,166,0.2)', reactivity: 8,  charge: 2 },
+    'Fe': { name: 'Jern',      color: '#795548', ionColor: 'rgba(100,255,100,0.15)', reactivity: 6,  charge: 2 },
+    'Cu': { name: 'Kobber',    color: '#d35400', ionColor: 'rgba(0,191,255,0.4)',   reactivity: 4,  charge: 2 },
+    'Ag': { name: 'Sølv',      color: '#bdc3c7', ionColor: 'rgba(255,255,255,0.1)', reactivity: 2,  charge: 1 }
+};
+const SERIES = ['Mg', 'Zn', 'Fe', 'Cu', 'Ag']; 
+const GAME_W = 1200, GAME_H = 800;
+
+const state = {
+    rod: 'Zn', solution: 'Cu',
+    rodPos: 0, rodTarget: 0, isLocked: false, 
+    reaction: { active: false, progress: 0, done: false },
+    micro: { active: false, timer: 0, maxTime: 1200, atoms: [], ions: [], electrons: [] },
+    canvas: null, ctx: null
+};
+
+window.onload = () => {
+    state.canvas = document.getElementById('sim-canvas');
+    state.ctx = state.canvas.getContext('2d');
+    state.canvas.width = GAME_W; state.canvas.height = GAME_H;
+    
+    setupUI(); setupInput(); updateSeriesUI(); resetSim(); loop();
+};
+
+function setupUI() {
+    // Changing metal/solution resets the simulation immediately
+    document.getElementById('metal-select').onchange = (e) => { 
+        state.rod = e.target.value; 
+        document.getElementById('sidebar').classList.remove('pulse-attention'); 
+        resetSim(); updateSeriesUI(); 
+    };
+    document.getElementById('solution-select').onchange = (e) => { 
+        state.solution = e.target.value; 
+        document.getElementById('sidebar').classList.remove('pulse-attention');
+        resetSim(); updateSeriesUI(); 
+    };
+    document.getElementById('reset-btn').onclick = resetSim;
+}
+
+function updateSeriesUI() {
+    const list = document.getElementById('series-list');
+    list.innerHTML = '';
+    SERIES.forEach(m => {
+        const div = document.createElement('div');
+        div.className = 'series-item';
+        div.innerHTML = `<span>${METALS[m].name}</span> <span>${m}</span>`;
+        if(m === state.rod) div.classList.add('active-metal');
+        if(m === state.solution) div.classList.add('active-ion');
+        list.appendChild(div);
+    });
+}
+
+function resetSim() {
+    state.reaction = { active: false, progress: 0, done: false };
+    state.rodTarget = 0; state.rodPos = 0;
+    state.isLocked = false; state.micro.active = false;
+    
+    toggleControls(false); 
+    document.getElementById('task-box').classList.remove('visible');
+    document.getElementById('wait-overlay').classList.remove('visible');
+    
+    document.getElementById('quiz-step-1').classList.add('active');
+    document.getElementById('quiz-step-2').classList.remove('active');
+    document.getElementById('quiz-step-3').classList.remove('active');
+    document.getElementById('theory-fb').innerText = '';
+    document.getElementById('balance-fb').innerText = '';
+}
+
+function toggleControls(disable) {
+    document.getElementById('metal-select').disabled = disable;
+    document.getElementById('solution-select').disabled = disable;
+}
+
+function setupInput() {
+    state.canvas.addEventListener('click', (e) => {
+        if (state.isLocked) return; 
+        const rect = state.canvas.getBoundingClientRect();
+        const scaleX = state.canvas.width / rect.width;
+        const clickX = (e.clientX - rect.left) * scaleX;
+        if (clickX > GAME_W/2 - 150 && clickX < GAME_W/2 + 150) {
+            state.rodTarget = state.rodTarget === 0 ? 1 : 0;
+        }
+    });
+}
+
+// --- SKIP FUNCTION ---
+function skipAnim() {
+    if(state.reaction.active) {
+        state.reaction.progress = 100;
+        state.micro.timer = state.micro.maxTime - 50; 
+    }
+}
+
+function update() {
+    state.rodPos += (state.rodTarget - state.rodPos) * 0.08;
+    const isDown = state.rodPos > 0.98;
+    
+    if (isDown && state.rodTarget === 1 && !state.reaction.active && !state.reaction.done) {
+        if (METALS[state.rod].reactivity > METALS[state.solution].reactivity) {
+            startReaction();
+        }
+    }
+
+    if (state.reaction.active) {
+        state.reaction.progress += 0.15;
+        if (state.reaction.progress >= 100) {
+            state.reaction.active = false;
+            state.reaction.done = true;
+            document.getElementById('wait-overlay').classList.remove('visible');
+            generateQuiz();
+            document.getElementById('task-box').classList.add('visible');
+        }
+    }
+}
+
+function startReaction() {
+    state.reaction.active = true;
+    state.isLocked = true; 
+    toggleControls(true);
+    state.micro.active = true;
+    initMicroParticles();
+    document.getElementById('wait-overlay').classList.add('visible');
+}
+
+function loop() {
+    update();
+    const ctx = state.ctx;
+    ctx.clearRect(0, 0, GAME_W, GAME_H);
+    drawMacroScene(ctx);
+    drawLabels(ctx);
+    if(state.micro.active) drawMicro(ctx);
+    
+    if (!state.isLocked && !state.reaction.done) {
+        ctx.fillStyle = "#fff"; ctx.font = "bold 20px Arial"; ctx.textAlign = "center";
+        const txt = state.rodTarget === 0 ? "KLIK PÅ STANGEN FOR AT SÆNKE DEN" : "KLIK IGEN FOR AT HÆVE";
+        ctx.fillText(txt, GAME_W/2, GAME_H - 80);
+    }
+    requestAnimationFrame(loop);
+}
+
+function drawMacroScene(ctx) {
+    const mx = GAME_W / 2;
+    const beakerY = 380, beakerW = 240, beakerH = 300;
+    
+    // Table
+    ctx.fillStyle = '#333'; ctx.fillRect(0, beakerY + beakerH, GAME_W, 20);
+    // Liquid
+    ctx.fillStyle = METALS[state.solution].ionColor;
+    ctx.fillRect(mx - beakerW/2, beakerY, beakerW, beakerH);
+    if (state.reaction.progress > 0) {
+        ctx.fillStyle = METALS[state.rod].ionColor;
+        ctx.globalAlpha = state.reaction.progress / 100;
+        ctx.fillRect(mx - beakerW/2, beakerY, beakerW, beakerH);
+        ctx.globalAlpha = 1;
+    }
+    // Glass
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 5;
+    ctx.strokeRect(mx - beakerW/2, beakerY, beakerW, beakerH);
+    // Rod
+    const rodY_Up = 40, rodY_Down = 340;
+    const currentRodY = rodY_Up + (rodY_Down - rodY_Up) * state.rodPos;
+    ctx.fillStyle = METALS[state.rod].color;
+    ctx.fillRect(mx - 25, currentRodY, 50, 260);
+    ctx.strokeStyle = '#111'; ctx.lineWidth=2;
+    ctx.strokeRect(mx - 25, currentRodY, 50, 260);
+    // Coating
+    if (state.reaction.progress > 0 && state.rodPos > 0.1) {
+        const submergedH = (currentRodY + 260) - beakerY;
+        if (submergedH > 0) {
+             ctx.fillStyle = METALS[state.solution].color;
+             ctx.globalAlpha = 0.95 * (state.reaction.progress/100);
+             ctx.fillRect(mx - 27, beakerY, 54, submergedH);
+             ctx.globalAlpha = 1;
+        }
+    }
+}
+
+function drawLabels(ctx) {
+    const mx = GAME_W/2;
+    ctx.font = "20px Arial"; ctx.textAlign = "left"; ctx.fillStyle = "rgba(255,255,255,0.8)";
+    ctx.fillText(`Opløsning: ${METALS[state.solution].name}ioner`, mx + 160, 520);
+    ctx.beginPath(); ctx.moveTo(mx + 150, 515); ctx.lineTo(mx + 100, 515); ctx.strokeStyle="#fff"; ctx.lineWidth=1; ctx.stroke();
+    if (state.rodPos > 0.8) {
+        ctx.fillText(`Metalstang: ${METALS[state.rod].name}`, mx + 160, 400);
+        ctx.beginPath(); ctx.moveTo(mx + 150, 395); ctx.lineTo(mx + 30, 395); ctx.stroke();
+    }
+}
+
+// --- MICRO SYSTEM ---
+function initMicroParticles() {
+    state.micro.atoms = []; state.micro.ions = []; state.micro.electrons = []; state.micro.timer = 0;
+    const cx = GAME_W - 220, cy = 220;
+    // Rod Atoms (Right)
+    for(let y=0; y<12; y++) { for(let x=0; x<5; x++) {
+        state.micro.atoms.push({ x: cx + 20 + x*26, y: cy - 140 + y*26, type: 'rod', metal: state.rod, active: true, vx:0, vy:0 });
+    }}
+    // Ions (Left)
+    for(let i=0; i<15; i++) spawnIon(cx, cy);
+}
+
+function spawnIon(cx, cy) {
+    const angle = Math.PI/2 + Math.random() * Math.PI; 
+    const dist = Math.random() * 120;
+    state.micro.ions.push({
+        x: cx + Math.cos(angle)*dist, y: cy + Math.sin(angle)*dist,
+        vx: (Math.random()-0.5)*1.5, vy: (Math.random()-0.5)*1.5,
+        metal: state.solution, type: 'ion', state: 'floating'
+    });
+}
+
+function drawMicro(ctx) {
+    const cx = GAME_W - 220, cy = 220, r = 170;
+    ctx.save();
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.clip();
+    ctx.fillStyle = '#1a1a2e'; ctx.fillRect(cx-r, cy-r, r*2, r*2);
+    
+    if (!state.reaction.done || state.micro.timer < state.micro.maxTime) state.micro.timer++;
+    
+    // Spawn Electron
+    if (state.micro.timer % 50 === 0 && !state.reaction.done) {
+        const rodAtom = state.micro.atoms.find(a => a.active && a.x < cx + 40);
+        const ion = state.micro.ions.find(i => i.state === 'floating' && i.x < cx);
+        if (rodAtom && ion) {
+            state.micro.electrons.push({ x: rodAtom.x, y: rodAtom.y, tx: ion.x, ty: ion.y, source: rodAtom, target: ion, t: 0 });
+        }
+    }
+
+    // Logic
+    state.micro.atoms.forEach(a => {
+        if (!a.active) {
+            a.x += a.vx; a.y += a.vy;
+            const dist = Math.sqrt((a.x-cx)**2 + (a.y-cy)**2);
+            if(dist > r-10) { 
+                const nx=(a.x-cx)/dist, ny=(a.y-cy)/dist; 
+                a.vx -= 2*(a.vx*nx+a.vy*ny)*nx; a.vy -= 2*(a.vx*nx+a.vy*ny)*ny; 
+                a.x -= nx*2; a.y -= ny*2; 
+            }
+            if(a.x > cx+10) a.vx = -Math.abs(a.vx);
+            ctx.fillStyle = METALS[a.metal].ionColor; ctx.strokeStyle = METALS[a.metal].color;
+        } else { ctx.fillStyle = METALS[a.metal].color; ctx.strokeStyle = '#000'; }
+        ctx.beginPath(); ctx.arc(a.x, a.y, 12, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = a.active?'#000':'#fff'; ctx.font="10px Arial"; ctx.textAlign="center";
+        ctx.fillText(a.metal + (a.active?'':getCharge(a.metal)), a.x, a.y+4);
+    });
+
+    for (let i = state.micro.electrons.length - 1; i >= 0; i--) {
+        let e = state.micro.electrons[i]; e.t += 0.03;
+        let curX = e.x + (e.tx - e.x)*e.t, curY = e.y + (e.ty - e.y)*e.t;
+        ctx.fillStyle = '#ff0'; ctx.beginPath(); ctx.arc(curX, curY, 4, 0, Math.PI*2); ctx.fill();
+        if (e.t >= 1) {
+            e.source.active = false; e.source.vx = -1-Math.random(); e.source.vy = (Math.random()-0.5)*2;
+            e.target.state = 'docking'; e.target.dockX = cx+5; e.target.dockY = e.target.y;
+            state.micro.electrons.splice(i, 1);
+        }
+    }
+
+    state.micro.ions.forEach(i => {
+        if (i.state === 'floating') {
+            i.x += i.vx; i.y += i.vy;
+            const dist = Math.sqrt((i.x-cx)**2 + (i.y-cy)**2);
+            if(dist > r-10) { 
+                const nx=(i.x-cx)/dist, ny=(i.y-cy)/dist; 
+                i.vx -= 2*(i.vx*nx+i.vy*ny)*nx; i.vy -= 2*(i.vx*nx+i.vy*ny)*ny; 
+                i.x -= nx*2; i.y -= ny*2; 
+            }
+            if(i.x > cx) i.vx = -Math.abs(i.vx);
+            ctx.fillStyle = METALS[i.metal].ionColor; ctx.strokeStyle = '#fff';
+        } else if (i.state === 'docking') {
+            i.x += (i.dockX - i.x) * 0.08; i.y += (i.dockY - i.y) * 0.08;
+            ctx.fillStyle = METALS[i.metal].color; ctx.strokeStyle = '#000';
+        }
+        ctx.beginPath(); ctx.arc(i.x, i.y, 11, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = i.state==='floating'?'#fff':'#000';
+        ctx.fillText(i.metal + (i.state==='floating'?getCharge(i.metal):''), i.x, i.y+4);
+    });
+
+    ctx.restore();
+    ctx.lineWidth = 6; ctx.strokeStyle = "#4cc9f0"; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.stroke();
+    ctx.font = "bold 16px Arial"; ctx.fillStyle = "#fff"; ctx.textAlign="center";
+    ctx.fillText("MIKRO-NIVEAU", cx, cy + r + 25);
+    ctx.font = "12px Arial"; ctx.fillStyle="#aaa";
+    ctx.fillText("⟵ Væske (Ioner)   |   Metalstang ⟶", cx, cy + r + 45);
+}
+
+function getCharge(m) { return METALS[m].charge === 2 ? '²⁺' : '⁺'; }
+
+// --- QUIZ ---
+function generateQuiz() {
+    const mRod = METALS[state.rod], mSol = METALS[state.solution];
+    const box = document.getElementById('theory-options'); box.innerHTML = '';
+    
+    const opts = [
+        {txt: `${mSol.name} (${state.solution}) står til højre for ${mRod.name} (${state.rod}) i spændingsrækken og er mere ædelt.`, correct: true},
+        {txt: `${mRod.name} (${state.rod}) står til højre for ${mSol.name} (${state.solution}) og er derfor mere ædelt.`, correct: false},
+        {txt: `Boblerne skyldes at vandet koger på grund af friktion mellem stangen og væsken.`, correct: false}
+    ].sort(() => Math.random() - 0.5);
+    
+    opts.forEach(o => {
+        const btn = document.createElement('button'); btn.className = 'quiz-btn'; btn.innerText = o.txt;
+        btn.onclick = () => checkTheory(o.correct, btn); box.appendChild(btn);
+    });
+
+    const drop = `<option value="-">-</option><option value="aq">aq</option><option value="s">s</option>`;
+    
+    document.getElementById('eq-container').innerHTML = `
+        <div class="chem-group">
+            <input class="input-num" id="c1" value="1"> ${state.rod} 
+            <select class="input-state" id="s1">${drop}</select>
+        </div>
+        <span class="arrow-symbol">+</span>
+        <div class="chem-group">
+            <input class="input-num" id="c2" value="1"> ${state.solution}${getCharge(state.solution)}
+            <select class="input-state" id="s2">${drop}</select>
+        </div>
+        <span class="arrow-symbol">⟶</span>
+        <div class="chem-group">
+            <input class="input-num" id="c3" value="1"> ${state.rod}${getCharge(state.rod)}
+            <select class="input-state" id="s3">${drop}</select>
+        </div>
+        <span class="arrow-symbol">+</span>
+        <div class="chem-group">
+            <input class="input-num" id="c4" value="1"> ${state.solution} 
+            <select class="input-state" id="s4">${drop}</select>
+        </div>
+    `;
+}
+
+function checkTheory(isCorrect, btn) {
+    const fb = document.getElementById('theory-fb');
+    if (isCorrect) {
+        fb.innerText = "Korrekt! Det mere ædle metal vinder elektronerne."; fb.style.color = "var(--success)"; btn.style.borderColor = "var(--success)";
+        setTimeout(() => { document.getElementById('quiz-step-1').classList.remove('active'); document.getElementById('quiz-step-2').classList.add('active'); }, 1200);
+    } else {
+        fb.innerText = "Nej. Husk: Højre = Ædel = Beholder elektroner."; fb.style.color = "var(--danger)"; btn.style.borderColor = "var(--danger)";
+    }
+}
+
+function checkBalancing() {
+    const s1 = document.getElementById('s1').value, s2 = document.getElementById('s2').value, s3 = document.getElementById('s3').value, s4 = document.getElementById('s4').value;
+    const c1 = +document.getElementById('c1').value, c2 = +document.getElementById('c2').value, c3 = +document.getElementById('c3').value, c4 = +document.getElementById('c4').value;
+    const qRod = METALS[state.rod].charge, qSol = METALS[state.solution].charge;
+    
+    let r1 = 1, r2 = 1;
+    if(qRod===2 && qSol===1) { r1=1; r2=2; } else if(qRod===1 && qSol===2) { r1=2; r2=1; }
+    
+    const fb = document.getElementById('balance-fb');
+    if(s1==='s' && s2==='aq' && s3==='aq' && s4==='s' && c1===r1 && c2===r2 && c3===r1 && c4===r2) {
+        document.getElementById('quiz-step-2').classList.remove('active');
+        document.getElementById('quiz-step-3').classList.add('active');
+        // Visual Guide: Sidebar pulse
+        document.getElementById('sidebar').classList.add('pulse-attention');
+    } else {
+        fb.innerText = (s1!=='s' || s2!=='aq') ? "Tjek tilstandsformerne (s)/(aq)." : "Tjek koefficienterne.";
+        fb.style.color = "var(--danger)";
+    }
+}
+</script>
+</body>
+</html>

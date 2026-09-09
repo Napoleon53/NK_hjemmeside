@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kemi-Træner: Mængdeberegning</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #2980b9;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --error: #c0392b;
+            --bg: #fdfbf7;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--primary);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 1300px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 { margin-top: 0; color: var(--primary); font-size: 1.8em; border-bottom: 2px solid #eee; padding-bottom: 15px; }
+        .desc { font-size: 1.15em; line-height: 1.6; color: #555; margin-bottom: 25px; }
+
+        /* --- TOOLBAR --- */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .task-menu { display: flex; gap: 6px; flex-wrap: wrap; }
+        .task-pill {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            background: #fff;
+            color: var(--primary);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .task-pill:hover { border-color: var(--accent); }
+        .task-pill.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+        .toolbar-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .tool-btn {
+            padding: 8px 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: #fff;
+            color: var(--primary);
+            font-size: 0.85em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .tool-btn:hover { border-color: var(--accent); }
+        .tool-btn.mode-active { background: var(--warning); border-color: var(--warning); color: white; }
+
+        /* --- TABLE --- */
+        .schema-container { overflow-x: auto; margin-bottom: 20px; padding: 5px; }
+        table { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 600px; }
+
+        th {
+            padding: 15px;
+            text-align: center;
+            font-family: 'Georgia', serif;
+            font-size: 1.5em;
+            border-bottom: 3px solid var(--primary);
+            background: #fafafa;
+            white-space: nowrap;
+        }
+
+        .reaction-sign {
+            font-family: sans-serif;
+            font-weight: bold;
+            color: #7f8c8d;
+            font-size: 1.5em;
+            width: 40px;
+            text-align: center;
+            vertical-align: middle;
+            border: none !important;
+            background: transparent !important;
+        }
+
+        .arrow-sign { color: var(--error); font-size: 2em; }
+
+        td { padding: 10px; text-align: center; border-bottom: 1px solid #eee; vertical-align: middle; position: relative; }
+        .row-label { font-weight: bold; text-align: left; color: var(--accent); width: 60px; border-right: 2px solid #eee; }
+
+        /* INPUTS */
+        input[type="text"] {
+            width: 80px;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(41, 128, 185, 0.2); }
+
+        input.correct {
+            border-color: var(--success) !important;
+            background-color: #e8f8f5 !important;
+            color: var(--success);
+            font-weight: bold;
+        }
+        input.wrong { border-color: var(--error); background-color: #fceceb; animation: shake 0.4s; }
+
+        /* FOG OF WAR */
+        .cell-locked { opacity: 0.3; pointer-events: none; filter: grayscale(100%); }
+        .cell-active { opacity: 1; pointer-events: auto; filter: grayscale(0%); }
+
+        .cell-irrelevant { background-color: #f3f3f3; color: #ccc; pointer-events: none; }
+        .cell-irrelevant::after { content: "—"; color: #bdc3c7; font-weight: bold; }
+        .cell-irrelevant input { display: none; }
+
+        /* --- MENTOR BOX --- */
+        .mentor-box {
+            background: #fff9c4;
+            border-left: 6px solid #fbc02d;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+        .mentor-avatar { font-size: 2.5em; }
+        .mentor-text { font-style: italic; color: #444; font-size: 1.1em; }
+
+        .choice-btn {
+            padding: 10px 20px;
+            margin-top: 10px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 6px;
+            background-color: var(--primary);
+            color: white;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .choice-btn:hover { background-color: var(--accent); transform: translateY(-2px); }
+        .choice-btn:active { transform: translateY(0); }
+
+        /* --- LOG --- */
+        .log-container { background: #f8f9fa; overflow-y: auto; max-height: 80vh; }
+        .log-entry {
+            background: white; padding: 12px; margin-bottom: 10px; border-radius: 6px;
+            border-left: 4px solid var(--success); font-family: 'Segoe UI', sans-serif; font-size: 0.95em;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); animation: slideIn 0.3s ease;
+            line-height: 1.4;
+        }
+
+        .nav-btn {
+            background: var(--success); color: white; border: none; padding: 15px 30px;
+            font-size: 1.2em; border-radius: 8px; cursor: pointer; margin-top: 20px;
+            display: none; align-self: center;
+            transition: background-color 0.2s;
+        }
+        .nav-btn:hover { background: #219150; transform: translateY(-2px); }
+
+        /* CONFETTI CANVAS */
+        #confettiCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            display: none;
+        }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+        @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<canvas id="confettiCanvas"></canvas>
+
+<div class="layout">
+    <div class="card">
+        <div class="toolbar">
+            <div class="task-menu" id="taskMenu"></div>
+            <div class="toolbar-actions">
+                <button class="tool-btn" onclick="loadTask(currentTaskIdx)" title="Generér nye tal til den aktuelle opgave">🎲 Nye tal</button>
+                <button class="tool-btn" id="practiceToggleBtn" onclick="togglePracticeMode()" title="Slå trinvis hjælp fra/til">🎓 Øvet-tilstand: FRA</button>
+            </div>
+        </div>
+
+        <h1 id="taskTitle">Opgave 1</h1>
+        <div class="desc" id="taskDesc">Beskrivelse...</div>
+
+        <div class="schema-container" id="schemaContainer"></div>
+
+        <div class="mentor-box" id="mentorBox">
+            <div class="mentor-avatar">👨‍🔬</div>
+            <div class="mentor-text" id="mentorText">Klar?</div>
+        </div>
+
+        <button class="nav-btn" id="nextBtn" onclick="nextLevel()">Næste Opgave ➔</button>
+    </div>
+
+    <div class="card log-container">
+        <h3 style="margin-top:0; color:var(--primary); border-bottom:2px solid #eee; padding-bottom:10px;">
+            📝 Mellemregninger
+        </h3>
+        <div id="calcLog">
+            <div style="color:#aaa; font-style:italic;">Dine udregninger dokumenteres her automatisk.</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* ----- TASK TEMPLATES ----- */
+    /* "given" beskriver hvilke kolonner der har en kendt startmasse, og hvilket
+       "pænt" mol-interval den skal trækkes tilfældigt fra hver gang opgaven indlæses. */
+    const taskTemplates = [
+        {
+            id: 1,
+            title: "Introduktion",
+            given: [{ colIdx: 0, nMin: 6, nMax: 14, step: 1 }],
+            descTemplate: (v) => `Vi afbrænder ${v[0].m} g rent kul (C). Hvor meget CO₂ dannes der? <br><em>(Vi fokuserer kun på det nødvendige: O₂ er i overskud, så den regner vi ikke på).</em>`,
+            structure: [
+                { type: 'chem', formula: 'C', data: { m: null, M: 12.01, n: null }, colIdx: 0 },
+                { type: 'sign', symbol: '+' },
+                { type: 'chem', formula: 'O₂', data: { m: null, M: 32.00, n: null }, colIdx: 1 },
+                { type: 'sign', symbol: '➔', isArrow: true },
+                { type: 'chem', formula: 'CO₂', data: { m: null, M: 44.01, n: null }, colIdx: 2 }
+            ],
+            coeffs: [1, 1, 1],
+            needsBalancing: false,
+            unlockOrder: ['0_M', '2_M', '0_n', '2_n', '2_m']
+        },
+        {
+            id: 2,
+            title: "Massebevarelse",
+            given: [{ colIdx: 0, nMin: 1, nMax: 4, step: 0.5 }],
+            descTemplate: (v) => `Ved fuldstændig forbrænding af ${v[0].m} g Methan (CH₄) skal vi vise, at intet går til spilde.<br>1. Afstem reaktionsskemaet. <br>2. Beregn <strong>alle</strong> felter i skemaet.`,
+            structure: [
+                { type: 'chem', formula: 'CH₄', data: { m: null, M: 16.04, n: null }, colIdx: 0 },
+                { type: 'sign', symbol: '+' },
+                { type: 'chem', formula: 'O₂', data: { m: null, M: 32.00, n: null }, colIdx: 1 },
+                { type: 'sign', symbol: '➔', isArrow: true },
+                { type: 'chem', formula: 'CO₂', data: { m: null, M: 44.01, n: null }, colIdx: 2 },
+                { type: 'sign', symbol: '+' },
+                { type: 'chem', formula: 'H₂O', data: { m: null, M: 18.02, n: null }, colIdx: 3 }
+            ],
+            coeffs: [1, 2, 1, 2],
+            needsBalancing: true,
+            showMassConservation: true,
+            unlockOrder: [
+                'balance',
+                '0_M', '1_M', '2_M', '3_M',
+                '0_n', '1_n', '2_n', '3_n',
+                '1_m', '2_m', '3_m'
+            ]
+        },
+        {
+            id: 3,
+            title: "Haber-Bosch",
+            given: [{ colIdx: 0, nMin: 0.5, nMax: 2, step: 0.5 }],
+            descTemplate: (v) => `Vi skal producere NH₃ ud fra ${v[0].m} g N₂. Hydrogen (H₂) har vi rigeligt af.<br>Afstem skemaet og beregn <strong>kun</strong> udbyttet af NH₃.`,
+            structure: [
+                { type: 'chem', formula: 'N₂', data: { m: null, M: 28.02, n: null }, colIdx: 0 },
+                { type: 'sign', symbol: '+' },
+                { type: 'chem', formula: 'H₂', data: { m: null, M: 2.016, n: null }, colIdx: 1 },
+                { type: 'sign', symbol: '➔', isArrow: true },
+                { type: 'chem', formula: 'NH₃', data: { m: null, M: 17.03, n: null }, colIdx: 2 }
+            ],
+            coeffs: [1, 3, 2],
+            needsBalancing: true,
+            unlockOrder: ['balance', '0_M', '2_M', '0_n', '2_n', '2_m']
+        },
+        {
+            id: 4,
+            title: "Begrænsende Mængde",
+            given: [
+                { colIdx: 0, nMin: 1.5, nMax: 2.5, step: 0.25 },
+                { colIdx: 1, nMin: 1.5, nMax: 2.5, step: 0.25 }
+            ],
+            descTemplate: (v) => `Vi blander ${v[0].m} g Magnesium med ${v[1].m} g Saltsyre (HCl).<br>1. Afstem skemaet. <br>2. Find stofmængden for begge og tjek hvem der slipper op først. <br>3. Beregn m(H₂).`,
+            structure: [
+                { type: 'chem', formula: 'Mg', data: { m: null, M: 24.31, n: null }, colIdx: 0 },
+                { type: 'sign', symbol: '+' },
+                { type: 'chem', formula: 'HCl', data: { m: null, M: 36.46, n: null }, colIdx: 1 },
+                { type: 'sign', symbol: '➔', isArrow: true },
+                { type: 'chem', formula: 'MgCl₂', data: { m: null, M: 95.21, n: null }, colIdx: 2 },
+                { type: 'sign', symbol: '+' },
+                { type: 'chem', formula: 'H₂', data: { m: null, M: 2.016, n: null }, colIdx: 3 }
+            ],
+            coeffs: [1, 2, 1, 1],
+            needsBalancing: true,
+            hasLimiting: true,
+            unlockOrder: ['balance', '0_M', '1_M', '3_M', '0_n', '1_n', 'limiting', '3_n', '3_m']
+        },
+        {
+            id: 5,
+            title: "Forbrænding af Propan",
+            given: [{ colIdx: 0, nMin: 1, nMax: 3, step: 0.5 }],
+            descTemplate: (v) => `Ved fuldstændig forbrænding af ${v[0].m} g flaskegas (Propan, C₃H₈) undersøger vi massebevarelsen igen – denne gang med en mere udfordrende afstemning.<br>1. Afstem reaktionsskemaet. <br>2. Beregn <strong>alle</strong> felter i skemaet.`,
+            structure: [
+                { type: 'chem', formula: 'C₃H₈', data: { m: null, M: 44.11, n: null }, colIdx: 0 },
+                { type: 'sign', symbol: '+' },
+                { type: 'chem', formula: 'O₂', data: { m: null, M: 32.00, n: null }, colIdx: 1 },
+                { type: 'sign', symbol: '➔', isArrow: true },
+                { type: 'chem', formula: 'CO₂', data: { m: null, M: 44.01, n: null }, colIdx: 2 },
+                { type: 'sign', symbol: '+' },
+                { type: 'chem', formula: 'H₂O', data: { m: null, M: 18.02, n: null }, colIdx: 3 }
+            ],
+            coeffs: [1, 5, 3, 4],
+            needsBalancing: true,
+            showMassConservation: true,
+            unlockOrder: [
+                'balance',
+                '0_M', '1_M', '2_M', '3_M',
+                '0_n', '1_n', '2_n', '3_n',
+                '1_m', '2_m', '3_m'
+            ]
+        }
+    ];
+
+    /* ----- STATE ----- */
+    let tasks = new Array(taskTemplates.length);
+    let currentTaskIdx = 0;
+    let completedSteps = new Set();
+    let balanced = false;
+    let practiceMode = false;
+
+    window.onload = () => loadTask(0);
+
+    /* ----- TASK GENERATION (tilfældige, "pæne" tal) ----- */
+    function randNiceN(spec) {
+        const stepsCount = Math.round((spec.nMax - spec.nMin) / spec.step);
+        const k = Math.floor(Math.random() * (stepsCount + 1));
+        return +(spec.nMin + k * spec.step).toFixed(4);
+    }
+
+    function instantiateTask(tpl) {
+        const structure = tpl.structure.map(item =>
+            item.type === 'chem' ? { ...item, data: { ...item.data } } : { ...item }
+        );
+
+        const givenVals = {};
+        tpl.given.forEach(spec => {
+            const n = randNiceN(spec);
+            const item = structure.find(s => s.colIdx === spec.colIdx);
+            item.data.m = +(n * item.data.M).toFixed(1);
+            givenVals[spec.colIdx] = n;
+        });
+
+        // Undgå at de to mængder i "begrænsende reagens"-opgaver ligger for tæt på hinanden
+        if (tpl.hasLimiting && tpl.given.length === 2) {
+            const [gA, gB] = tpl.given;
+            const a = structure.find(s => s.colIdx === gA.colIdx);
+            const b = structure.find(s => s.colIdx === gB.colIdx);
+            let attempts = 0;
+            while (attempts < 8) {
+                const extentA = (a.data.m / a.data.M) / tpl.coeffs[a.colIdx];
+                const extentB = (b.data.m / b.data.M) / tpl.coeffs[b.colIdx];
+                if (Math.abs(extentA - extentB) / Math.max(extentA, extentB) > 0.08) break;
+                const n = randNiceN(gB);
+                b.data.m = +(n * b.data.M).toFixed(1);
+                givenVals[gB.colIdx] = n;
+                attempts++;
+            }
+        }
+
+        const descVals = {};
+        Object.entries(givenVals).forEach(([colIdx, n]) => {
+            const item = structure.find(s => s.colIdx == colIdx);
+            descVals[colIdx] = { n, m: formatNum(item.data.m) };
+        });
+
+        return {
+            id: tpl.id,
+            title: tpl.title,
+            desc: tpl.descTemplate(descVals),
+            structure,
+            coeffs: tpl.coeffs,
+            needsBalancing: tpl.needsBalancing,
+            hasLimiting: !!tpl.hasLimiting,
+            showMassConservation: !!tpl.showMassConservation,
+            unlockOrder: tpl.unlockOrder,
+            given: tpl.given
+        };
+    }
+
+    function loadTask(idx) {
+        currentTaskIdx = idx;
+        tasks[idx] = instantiateTask(taskTemplates[idx]);
+        const task = tasks[idx];
+        completedSteps.clear();
+        balanced = !task.needsBalancing;
+
+        document.getElementById('taskTitle').innerText = `${task.id}. ${task.title}`;
+        document.getElementById('taskDesc').innerHTML = task.desc;
+        document.getElementById('calcLog').innerHTML = '<div style="color:#aaa; font-style:italic;">Dine udregninger dokumenteres her automatisk.</div>';
+
+        const btn = document.getElementById('nextBtn');
+        btn.style.display = 'none';
+        btn.innerText = 'Næste Opgave ➔';
+        btn.onclick = nextLevel;
+
+        renderTaskMenu();
+        renderTable(task);
+        updateScaffolding(task);
+    }
+
+    function renderTaskMenu() {
+        const nav = document.getElementById('taskMenu');
+        nav.innerHTML = taskTemplates.map((t, i) => {
+            const active = i === currentTaskIdx ? 'active' : '';
+            return `<button class="task-pill ${active}" onclick="loadTask(${i})" title="${t.title}">${t.id}</button>`;
+        }).join('');
+    }
+
+    function renderTable(task) {
+        const container = document.getElementById('schemaContainer');
+        let html = '<table><thead><tr><th></th>';
+
+        // HEADER
+        task.structure.forEach(item => {
+            if(item.type === 'sign') {
+                const className = item.isArrow ? 'reaction-sign arrow-sign' : 'reaction-sign';
+                html += `<th class="${className}">${item.symbol}</th>`;
+            } else {
+                html += `<th>`;
+                if(task.needsBalancing) {
+                    html += `<input type="text" id="coeff_${item.colIdx}"
+                             style="width:40px; margin-right:5px; font-weight:bold;"
+                             placeholder="?"
+                             onkeydown="handleKey(event, 'coeff', ${item.colIdx})"
+                             onkeyup="checkBalance(this.value, ${item.colIdx})">`;
+                } else {
+                    const c = task.coeffs[item.colIdx];
+                    if(c > 1) html += `<span style="color:#c0392b; font-size:1.1em;">${c}</span> · `;
+                }
+                html += `${item.formula}</th>`;
+            }
+        });
+        html += '</tr></thead><tbody>';
+
+        // ROWS
+        const rows = [
+            { id: 'm', label: 'm (g)' },
+            { id: 'M', label: 'M (g/mol)' },
+            { id: 'n', label: 'n (mol)' }
+        ];
+
+        rows.forEach(row => {
+            html += `<tr><td class="row-label">${row.label}</td>`;
+
+            task.structure.forEach(item => {
+                if(item.type === 'sign') {
+                    html += `<td></td>`;
+                    return;
+                }
+
+                const cellId = `${item.colIdx}_${row.id}`;
+                const val = item.data[row.id];
+                const isUserTask = task.unlockOrder.includes(cellId);
+                const isIrrelevant = !isUserTask && val === null;
+
+                let content = '';
+
+                if (isIrrelevant) {
+                    content = '';
+                } else if (val !== null && !isUserTask) {
+                    content = `<span style="font-weight:bold; color:#2c3e50;">${formatNum(val)}</span>`;
+                    completedSteps.add(cellId);
+                } else if (isUserTask) {
+                    content = `<input type="text" id="inp_${cellId}"
+                               onkeydown="handleKey(event, 'inp', '${cellId}')"
+                               onblur="validateCell('${cellId}')"
+                               placeholder="...">`;
+                }
+
+                const cellClass = isIrrelevant ? 'cell-irrelevant' : '';
+                html += `<td id="td_${cellId}" class="${cellClass}">${content}</td>`;
+            });
+            html += '</tr>';
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+    }
+
+    /* ----- NAVIGATION ----- */
+    function handleKey(e, type, id) {
+        if (e.key === 'Enter' || e.key === 'Tab') {
+            e.preventDefault();
+            e.target.blur();
+            setTimeout(() => {
+                const activeInput = document.querySelector('.cell-active input');
+                if(activeInput && !activeInput.disabled) activeInput.focus();
+            }, 150);
+        }
+    }
+
+    /* ----- ØVET-TILSTAND (mindre hjælp) ----- */
+    function togglePracticeMode() {
+        practiceMode = !practiceMode;
+        const btn = document.getElementById('practiceToggleBtn');
+        btn.innerText = practiceMode ? '🎓 Øvet-tilstand: TIL' : '🎓 Øvet-tilstand: FRA';
+        btn.classList.toggle('mode-active', practiceMode);
+        loadTask(currentTaskIdx);
+    }
+
+    /* ----- SCAFFOLDING ----- */
+    function updateScaffolding(task) {
+        if (practiceMode) {
+            updatePracticeMode(task);
+            return;
+        }
+
+        let activeStep = null;
+        if (task.needsBalancing && !balanced) {
+            activeStep = 'balance';
+        } else {
+            for (let step of task.unlockOrder) {
+                if(step === 'balance') continue;
+                if (!completedSteps.has(step)) {
+                    activeStep = step;
+                    break;
+                }
+            }
+        }
+
+        if (!activeStep) {
+            finishTask(task);
+            return;
+        }
+        applyFogOfWar(task, activeStep);
+        giveHint(task, activeStep);
+    }
+
+    function updatePracticeMode(task) {
+        if (task.hasLimiting && !completedSteps.has('limiting')) completedSteps.add('limiting');
+
+        const allDone = (!task.needsBalancing || balanced) &&
+            task.unlockOrder.every(step => step === 'balance' || step === 'limiting' || completedSteps.has(step));
+
+        if (allDone) {
+            finishTask(task);
+            return;
+        }
+        applyPracticeFogOfWar(task);
+        mentorSay("🎓 <strong>Øvet-tilstand:</strong> Alle felter er åbne. Løs opgaven i den rækkefølge, du selv vælger — ingen trinvis hjælp denne gang.", "neutral");
+    }
+
+    function applyPracticeFogOfWar(task) {
+        toggleInputs('coeff', task.needsBalancing && !balanced);
+
+        task.unlockOrder.forEach(step => {
+            if (step === 'balance' || step === 'limiting') return;
+            const el = document.getElementById(`td_${step}`);
+            const inp = document.getElementById(`inp_${step}`);
+            if (!el || !inp) return;
+
+            el.classList.remove('cell-locked');
+            if (completedSteps.has(step)) {
+                inp.disabled = true;
+            } else {
+                el.classList.add('cell-active');
+                inp.disabled = false;
+            }
+        });
+    }
+
+    function finishTask(task) {
+        let msg = "Opgaven er løst! Flot arbejde.";
+        if (task.showMassConservation) {
+            const total = sumMass(task, true);
+            msg += ` <br><strong>Læg mærke til:</strong> Summen af masserne er ens på begge sider (ca. ${formatNum(total)} g). Massen er bevaret!`;
+        }
+        mentorSay(msg, "success");
+
+        const btn = document.getElementById('nextBtn');
+        btn.style.display = 'block';
+
+        if (currentTaskIdx === tasks.length - 1) {
+            btn.innerText = 'Start forfra ↺';
+            btn.onclick = () => location.reload();
+            fireConfetti();
+        } else {
+            btn.innerText = 'Næste Opgave ➔';
+            btn.onclick = nextLevel;
+        }
+
+        lockAll();
+    }
+
+    function sumMass(task, reactantsSide) {
+        const arrowIdx = task.structure.findIndex(i => i.isArrow);
+        let total = 0;
+        task.structure.forEach((item, idx) => {
+            if (item.type !== 'chem') return;
+            const isReactant = idx < arrowIdx;
+            if (isReactant === reactantsSide) {
+                total += calculateTruth(task, item.colIdx, 'm');
+            }
+        });
+        return total;
+    }
+
+    function applyFogOfWar(task, activeStep) {
+        if(activeStep === 'balance') {
+            toggleInputs('coeff', true);
+            toggleInputs('inp', false);
+            return;
+        }
+
+        toggleInputs('coeff', false);
+
+        task.unlockOrder.forEach(step => {
+            if(step === 'balance' || step === 'limiting') return;
+            const el = document.getElementById(`td_${step}`);
+            const inp = document.getElementById(`inp_${step}`);
+            if(!el || !inp) return;
+
+            el.classList.remove('cell-active', 'cell-locked');
+            if (completedSteps.has(step)) {
+                el.classList.remove('cell-locked');
+                inp.disabled = true;
+            } else if (step === activeStep) {
+                el.classList.add('cell-active');
+                inp.disabled = false;
+            } else {
+                el.classList.add('cell-locked');
+                inp.disabled = true;
+            }
+        });
+
+        // Lås input-felter indtil valget er truffet for limiting
+        if(activeStep === 'limiting') {
+            toggleInputs('inp', false);
+        }
+    }
+
+    function giveHint(task, step) {
+        if(step === 'balance') {
+            mentorSay("Afstem reaktionsskemaet. Tæl atomerne.", "neutral");
+            return;
+        }
+
+        if(step === 'limiting') {
+            const btns = task.given.map(g => {
+                const f = task.structure.find(s => s.colIdx === g.colIdx).formula;
+                return `<button onclick="checkLimiting('${f}')" class="choice-btn">${f}</button>`;
+            }).join('');
+            mentorSay(`<strong>Vent lidt!</strong> Kig på reaktionsskemaet og de stofmængder, du netop har beregnet. <br>Hvem slipper op først og bestemmer udbyttet? <br><div id="dialogBox">${btns}</div>`, "warning");
+            return;
+        }
+
+        const [col, type] = step.split('_');
+        const species = getFormula(task, col);
+        const item = task.structure.find(i => i.colIdx == col);
+
+        if(type === 'M') mentorSay(`Indtast <strong>Molarmassen (M)</strong> for ${species}.`, "neutral");
+        else if (type === 'n') {
+            if (item.data.m !== null) mentorSay(`Beregn stofmængden for ${species} (n = m / M).`, "neutral");
+            else {
+                if (task.hasLimiting) {
+                    const info = computeLimitingInfo(task);
+                    mentorSay(`<strong>Rigtigt tænkt!</strong> ${info.limiting.formula} er begrænsende. Brug n(${info.limiting.formula}) og støkiometrien i skemaet til at finde n for ${species}.`, "success");
+                } else {
+                    mentorSay(`Brug koefficienterne til at finde n for ${species}.`, "neutral");
+                }
+            }
+        }
+        else if (type === 'm') mentorSay(`Beregn massen af ${species} (m = n · M).`, "neutral");
+    }
+
+    /* ----- BEGRÆNSENDE REAGENS (dynamisk) ----- */
+    function computeLimitingInfo(task) {
+        const [gA, gB] = task.given;
+        const a = task.structure.find(s => s.colIdx === gA.colIdx);
+        const b = task.structure.find(s => s.colIdx === gB.colIdx);
+        const extentA = (a.data.m / a.data.M) / task.coeffs[a.colIdx];
+        const extentB = (b.data.m / b.data.M) / task.coeffs[b.colIdx];
+        const limiting = extentA <= extentB ? a : b;
+        const other = limiting === a ? b : a;
+        return { limiting, other };
+    }
+
+    function checkLimiting(choiceFormula) {
+        const task = tasks[currentTaskIdx];
+        const dialogBox = document.getElementById('dialogBox');
+        if (dialogBox) dialogBox.remove();
+
+        const info = computeLimitingInfo(task);
+
+        if (choiceFormula === info.limiting.formula) {
+            completedSteps.add('limiting');
+
+            const nLim = info.limiting.data.m / info.limiting.data.M;
+            const nOther = info.other.data.m / info.other.data.M;
+            const neededOther = nLim * (task.coeffs[info.other.colIdx] / task.coeffs[info.limiting.colIdx]);
+
+            const msg = `Vi har ${formatNum(nLim)} mol ${info.limiting.formula} og ${formatNum(nOther)} mol ${info.other.formula}. Ifølge reaktionsskemaet kræver ${formatNum(nLim)} mol ${info.limiting.formula} hele ${formatNum(neededOther)} mol ${info.other.formula} — men vi har kun ${formatNum(nOther)} mol. Derfor er <strong>${info.limiting.formula}</strong> begrænsende.`;
+            addToLogCustom('Begrænsende mængde fundet', msg);
+
+            const limCell = document.getElementById(`td_${info.limiting.colIdx}_n`);
+            if (limCell && !document.getElementById('badgeLimiting')) {
+                const badge = document.createElement('div');
+                badge.id = 'badgeLimiting';
+                badge.innerHTML = '⬇ Begrænsende';
+                badge.style.color = 'var(--error)';
+                badge.style.fontSize = '0.8em';
+                badge.style.marginTop = '8px';
+                badge.style.fontWeight = 'bold';
+                badge.style.animation = 'slideIn 0.4s ease';
+                limCell.appendChild(badge);
+            }
+
+            updateScaffolding(task);
+        } else {
+            const btns = task.given.map(g => {
+                const f = task.structure.find(s => s.colIdx === g.colIdx).formula;
+                return `<button onclick="checkLimiting('${f}')" class="choice-btn">${f}</button>`;
+            }).join('');
+            mentorSay(`Det er ikke helt rigtigt. Sammenlign forholdet mellem stofmængderne med koefficienterne i det afstemte skema. <br><div id="dialogBox">${btns}</div>`, "error");
+        }
+    }
+
+    /* ----- VALIDATION ----- */
+    function checkBalance(val, colIdx) {
+        const task = tasks[currentTaskIdx];
+        const intVal = parseInt(val);
+        const el = document.getElementById(`coeff_${colIdx}`);
+
+        if(intVal === task.coeffs[colIdx]) {
+            el.classList.add('correct');
+            el.classList.remove('wrong');
+        } else if (!isNaN(intVal)) el.classList.remove('correct');
+
+        const inputs = task.structure
+            .filter(item => item.type === 'chem')
+            .map(item => document.getElementById(`coeff_${item.colIdx}`));
+
+        if(inputs.every((inp, i) => parseInt(inp.value) === task.coeffs[i])) {
+            balanced = true;
+            mentorSay("Skemaet er afstemt!", "success");
+            completedSteps.add('balance');
+            setTimeout(() => updateScaffolding(task), 800);
+        }
+    }
+
+    function validateCell(cellId) {
+        const task = tasks[currentTaskIdx];
+        const inp = document.getElementById(`inp_${cellId}`);
+        if(!inp || inp.value.trim() === '') return;
+
+        const val = parseFloat(inp.value.replace(',', '.'));
+        const [col, type] = cellId.split('_');
+
+        const correctVal = calculateTruth(task, col, type);
+
+        // 2% Tolerance
+        if (Math.abs(val - correctVal) < (correctVal * 0.02) || (correctVal === 0 && val === 0)) {
+            if(!inp.classList.contains('correct')) {
+                inp.classList.add('correct');
+                inp.classList.remove('wrong');
+                inp.disabled = true;
+                completedSteps.add(cellId);
+
+                addToLog(task, cellId, val);
+
+                mentorSay("Korrekt! Fortsætter...", "success");
+                updateScaffolding(task);
+                setTimeout(() => {
+                    const active = document.querySelector('.cell-active input');
+                    if(active) active.focus();
+                }, 100);
+            }
+        } else {
+            inp.classList.add('wrong');
+            mentorSay("Fejl i beregning. Prøv igen.", "error");
+        }
+    }
+
+    function calculateTruth(task, targetCol, type) {
+        const item = task.structure.find(i => i.colIdx == targetCol);
+        if (type === 'M') return item.data.M;
+        if (type === 'm') {
+            const n = calculateTruth(task, targetCol, 'n');
+            return n * item.data.M;
+        }
+        if (type === 'n') {
+            if (item.data.m !== null) return item.data.m / item.data.M;
+            let limitingYield = Infinity;
+            task.structure.forEach(source => {
+                if(source.type === 'chem' && source.colIdx != targetCol) {
+                    if (source.data.m !== null) {
+                        const n_source = source.data.m / source.data.M;
+                        const yieldCandidate = (task.coeffs[targetCol] / task.coeffs[source.colIdx]) * n_source;
+                        if (yieldCandidate < limitingYield) limitingYield = yieldCandidate;
+                    }
+                }
+            });
+            return limitingYield;
+        }
+        return 0;
+    }
+
+    /* ----- LOGGING ----- */
+    function addToLog(task, cellId, val) {
+        const [col, type] = cellId.split('_');
+        const colIdx = parseInt(col);
+        const item = task.structure.find(i => i.colIdx === colIdx);
+        const species = item.formula;
+        const log = document.getElementById('calcLog');
+        let header = "", body = "";
+
+        if(type === 'M') {
+            header = `Molarmasse`;
+            body = `M(${species}) = ${formatNum(val)} g/mol`;
+        }
+        else if (type === 'n') {
+            header = `Stofmængde (${species})`;
+            if (item.data.m !== null) {
+                const m = formatNum(item.data.m);
+                const M = formatNum(item.data.M);
+                body = `n = m / M = ${m} g / ${M} g/mol = <strong>${formatNum(val)} mol</strong>`;
+            }
+            else {
+                let sourceItem = null;
+                for(let s of task.structure) {
+                    if (s.type === 'chem' && s.data.m !== null && s.colIdx !== colIdx) {
+                         const n_source = s.data.m / s.data.M;
+                         const ratio = task.coeffs[colIdx] / task.coeffs[s.colIdx];
+                         if (Math.abs((n_source * ratio) - val) < Math.max(0.02, Math.abs(val) * 0.02)) {
+                             sourceItem = s;
+                             break;
+                         }
+                    }
+                }
+
+                if (sourceItem) {
+                    const n_source_val = sourceItem.data.m / sourceItem.data.M;
+                    const ratioString = `${task.coeffs[colIdx]}/${task.coeffs[sourceItem.colIdx]}`;
+
+                    body = `n(${species}) = n(${sourceItem.formula}) · ${ratioString} <br>` +
+                           `= ${formatNum(n_source_val)} mol · ${ratioString} = <strong>${formatNum(val)} mol</strong>`;
+                } else {
+                    body = `n = ${formatNum(val)} mol`;
+                }
+            }
+        }
+        else if (type === 'm') {
+            header = `Masse (${species})`;
+            const M = item.data.M;
+            const n = val / M;
+            body = `m = n · M = ${formatNum(n)} mol · ${formatNum(M)} g/mol = <strong>${formatNum(val)} g</strong>`;
+        }
+
+        const div = document.createElement('div');
+        div.className = 'log-entry';
+        div.innerHTML = `<span style="display:block;font-weight:bold;color:#2c3e50; margin-bottom:4px;">${header}</span>${body}`;
+        log.prepend(div);
+    }
+
+    function addToLogCustom(header, body) {
+        const log = document.getElementById('calcLog');
+        const div = document.createElement('div');
+        div.className = 'log-entry';
+        div.innerHTML = `<span style="display:block;font-weight:bold;color:#2c3e50; margin-bottom:4px;">${header}</span>${body}`;
+        log.prepend(div);
+    }
+
+    /* ----- CONFETTI EFFECT ----- */
+    function fireConfetti() {
+        const canvas = document.getElementById('confettiCanvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        canvas.style.display = 'block';
+        const ctx = canvas.getContext('2d');
+        const pieces = [];
+        const colors = ['#f39c12', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6'];
+
+        for(let i=0; i<150; i++) {
+            pieces.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                vx: Math.random() * 4 - 2,
+                vy: Math.random() * 5 + 2,
+                size: Math.random() * 8 + 5,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                tilt: Math.random() * 10,
+                tiltAngle: Math.random() * 0.1 - 0.05
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let active = false;
+            pieces.forEach(p => {
+                p.y += p.vy;
+                p.x += p.vx;
+                p.tilt += p.tiltAngle;
+                if(p.y < canvas.height) active = true;
+                ctx.beginPath();
+                ctx.lineWidth = p.size;
+                ctx.strokeStyle = p.color;
+                ctx.moveTo(p.x + p.tilt, p.y);
+                ctx.lineTo(p.x + p.tilt, p.y + p.size);
+                ctx.stroke();
+            });
+            if(active) requestAnimationFrame(draw);
+        }
+        draw();
+    }
+
+    /* ----- UTILS ----- */
+    function getFormula(task, colIdx) { return task.structure.find(i => i.colIdx == colIdx).formula; }
+
+    function toggleInputs(prefix, enable) {
+        document.querySelectorAll(`input[id^="${prefix}"]`).forEach(el => {
+            if(!el.classList.contains('correct')) el.disabled = !enable;
+        });
+    }
+
+    function mentorSay(msg, type) {
+        const box = document.getElementById('mentorBox');
+        document.getElementById('mentorText').innerHTML = msg;
+        box.style.borderLeftColor = type === 'success' ? 'var(--success)' : (type === 'error' ? 'var(--error)' : (type === 'warning' ? 'var(--warning)' : '#fbc02d'));
+    }
+
+    function formatNum(n) { return n.toLocaleString('da-DK', { maximumFractionDigits: 3 }); }
+    function lockAll() { document.querySelectorAll('input').forEach(i => i.disabled = true); }
+
+    function nextLevel() {
+        if(currentTaskIdx < tasks.length -1) loadTask(currentTaskIdx + 1);
+    }
+</script>
+</body>
+</html>

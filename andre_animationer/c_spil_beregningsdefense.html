@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ione-Kanonen: Fældningsreaktioner</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #f8fafc;
+            --accent: #38bdf8;
+            --success: #4ade80;
+            --error: #ef4444;
+            --panel: rgba(30, 41, 59, 0.9);
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            user-select: none;
+            touch-action: none;
+        }
+        #gameCanvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+        /* UI Layer */
+        #ui-layer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+            display: flex;
+            gap: 20px;
+            z-index: 5;
+        }
+        .stat-box {
+            background: var(--panel);
+            backdrop-filter: blur(8px);
+            padding: 12px 24px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            text-shadow: 1px 1px 2px black;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        /* Overlays / Screens */
+        .screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            transition: opacity 0.4s ease;
+        }
+        .hidden { 
+            opacity: 0; 
+            pointer-events: none; 
+        }
+        h1 { 
+            font-size: 3.5rem; 
+            margin: 0 0 20px 0; 
+            color: var(--accent);
+            text-align: center;
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+        }
+        h2 { 
+            font-size: 2rem; 
+            color: var(--success); 
+            margin-top: 0; 
+        }
+        p { 
+            max-width: 700px; 
+            text-align: center; 
+            font-size: 1.3rem; 
+            line-height: 1.6; 
+            color: #cbd5e1; 
+            margin-bottom: 30px;
+        }
+        .btn {
+            padding: 16px 48px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #0ea5e9, #2563eb);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(14, 165, 233, 0.3);
+            transition: all 0.2s ease;
+        }
+        .btn:hover { 
+            transform: scale(1.05); 
+            box-shadow: 0 15px 25px rgba(14, 165, 233, 0.5);
+        }
+        .btn:active { 
+            transform: scale(0.95); 
+        }
+        #round-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.2rem;
+            color: #94a3b8;
+            background: var(--panel);
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui-layer">
+        <div class="stat-box">SCORE: <span id="score">0</span></div>
+        <div class="stat-box">RUNDE: <span id="level">1</span></div>
+        <div class="stat-box" style="border-left-color: #f59e0b;">MULTIPLIKATOR: <span id="multiplier">1,0</span>x</div>
+    </div>
+    
+    <div id="round-indicator">MONSTRE: <span id="monsters-left">6</span> / 6</div>
+
+    <div id="start-screen" class="screen">
+        <h1>Ione-Kanonen</h1>
+        <p>Brug din kanon til at skyde reaktanter mod indkommende ion-monstre.<br>
+           Målet er at ramme de ioner, der danner et <strong>tungtopløseligt bundfald (s)</strong> med din ladning.</p>
+        <p><em>Runderne skifter efter 6 monstre. Tiden sænkes ved succesfulde reaktioner, så du kan nå at læse det kemiske reaktionsskema.</em></p>
+        <button class="btn" id="start-btn">START LABORATORIET</button>
+    </div>
+
+    <div id="game-over-screen" class="screen hidden">
+        <h1>LABORATORIET ER LUKKET</h1>
+        <h2>Din endelige score: <span id="final-score">0</span></h2>
+        <p>Husk opløselighedsreglerne til næste gang!</p>
+        <button class="btn" id="restart-btn">GENSTART SPIL</button>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+<script>
+/**
+ * IONE-KANONEN - Didaktisk Kemi-spil
+ * Udviklet uden eksterne afhængigheder.
+ */
+
+// --- KONFIGURATION OG DATA ---
+var CONFIG = {
+    baseMonsterSpeed: 25, // Meget langsomt, for at imødekomme "alt for hurtigt"
+    monstersPerRound: 6,
+    colors: {
+        bg: '#0f172a',
+        cannonBase: '#334155',
+        cannonBarrel: '#94a3b8',
+        positiveIon: '#f87171', // Rødlig
+        negativeIon: '#60a5fa', // Blålig
+        textHit: '#4ade80',
+        textMiss: '#facc15'
+    }
+};
+
+// Runde-data: Hver runde har en specifik reaktant i kanonen og specifikke mål.
+var ROUNDS = [
+    {
+        cannonIon: 'Cl⁻',
+        monsters: ['Ag⁺', 'Pb²⁺', 'Na⁺', 'K⁺', 'Ag⁺', 'Pb²⁺'],
+        reactions: {
+            'Ag⁺': 'Ag⁺(aq) + Cl⁻(aq) ⟶ AgCl(s)',
+            'Pb²⁺': 'Pb²⁺(aq) + 2Cl⁻(aq) ⟶ PbCl₂(s)'
+        }
+    },
+    {
+        cannonIon: 'SO₄²⁻',
+        monsters: ['Ba²⁺', 'Ca²⁺', 'Na⁺', 'Ba²⁺', 'K⁺', 'Ca²⁺'],
+        reactions: {
+            'Ba²⁺': 'Ba²⁺(aq) + SO₄²⁻(aq) ⟶ BaSO₄(s)',
+            'Ca²⁺': 'Ca²⁺(aq) + SO₄²⁻(aq) ⟶ CaSO₄(s)'
+        }
+    },
+    {
+        cannonIon: 'OH⁻',
+        monsters: ['Cu²⁺', 'Fe³⁺', 'Na⁺', 'Cu²⁺', 'Fe³⁺', 'K⁺'],
+        reactions: {
+            'Cu²⁺': 'Cu²⁺(aq) + 2OH⁻(aq) ⟶ Cu(OH)₂(s)',
+            'Fe³⁺': 'Fe³⁺(aq) + 3OH⁻(aq) ⟶ Fe(OH)₃(s)'
+        }
+    }
+];
+
+// --- KERNE-KLASSER ---
+
+class Particle {
+    constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 200;
+        this.vy = (Math.random() - 0.5) * 200;
+        this.life = 1.0;
+        this.decay = Math.random() * 0.5 + 0.5;
+        this.color = color;
+        this.size = Math.random() * 4 + 2;
+    }
+    update(dt) {
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
+        this.life -= this.decay * dt;
+    }
+    draw(ctx) {
+        ctx.globalAlpha = Math.max(0, this.life);
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+    }
+}
+
+class FloatingText {
+    constructor(x, y, text, color, scaleUp = false) {
+        this.x = x;
+        this.y = y;
+        this.text = text;
+        this.color = color;
+        this.life = 2.0; // Vises i to sekunder i spil-tid (som bremses ved slow-mo)
+        this.vy = -30;
+        this.scaleUp = scaleUp;
+        this.scale = 0.5;
+    }
+    update(dt) {
+        this.y += this.vy * dt;
+        this.life -= dt;
+        if (this.scaleUp && this.scale < 1.5) {
+            this.scale += 2.0 * dt;
+        }
+    }
+    draw(ctx) {
+        ctx.globalAlpha = Math.min(1, Math.max(0, this.life));
+        ctx.fillStyle = this.color;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        var currentScale = this.scaleUp ? this.scale : 1.0;
+        var fontSize = Math.floor(24 * currentScale);
+        
+        ctx.font = 'bold ' + fontSize + 'px Arial';
+        
+        // Tekst skygge for læsbarhed
+        ctx.shadowColor = 'black';
+        ctx.shadowBlur = 4;
+        ctx.fillText(this.text, this.x, this.y);
+        ctx.shadowBlur = 0;
+        
+        ctx.globalAlpha = 1.0;
+    }
+}
+
+class Projectile {
+    constructor(x, y, angle, type) {
+        this.x = x;
+        this.y = y;
+        this.speed = 500;
+        this.vx = Math.cos(angle) * this.speed;
+        this.vy = Math.sin(angle) * this.speed;
+        this.type = type;
+        this.radius = 12;
+        this.active = true;
+    }
+    update(dt) {
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
+        
+        // Deaktiver hvis udenfor skærmen
+        if (this.x < 0 || this.x > window.innerWidth || this.y < 0 || this.y > window.innerHeight) {
+            this.active = false;
+        }
+    }
+    draw(ctx) {
+        ctx.fillStyle = CONFIG.colors.negativeIon;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.type, this.x, this.y);
+    }
+}
+
+class Monster {
+    constructor(x, y, type, targetReactions) {
+        this.x = x;
+        this.y = y;
+        this.radius = 35;
+        this.type = type;
+        this.active = true;
+        
+        // Variation i hastighed, men generelt langsom
+        this.speed = CONFIG.baseMonsterSpeed + (Math.random() * 15);
+        
+        // Er dette monster et sandt mål for den nuværende runde?
+        this.isTarget = targetReactions.hasOwnProperty(type);
+        this.reactionFormula = this.isTarget ? targetReactions[type] : null;
+        
+        // Visuel bølge-effekt
+        this.timeOffset = Math.random() * Math.PI * 2;
+    }
+    update(dt, globalTime) {
+        this.y += this.speed * dt;
+        
+        // Bølge bevægelse horisontalt
+        this.x += Math.sin(globalTime * 2 + this.timeOffset) * 20 * dt;
+        
+        if (this.y > window.innerHeight + 50) {
+            this.active = false;
+        }
+    }
+    draw(ctx) {
+        // Glød
+        ctx.shadowColor = this.isTarget ? 'rgba(248, 113, 113, 0.6)' : 'rgba(156, 163, 175, 0.4)';
+        ctx.shadowBlur = 15;
+        
+        ctx.fillStyle = CONFIG.colors.positiveIon;
+        if (!this.isTarget && this.type.indexOf('⁺') !== -1) {
+            ctx.fillStyle = '#64748b'; // Grålig for "decoys" (vildledende monstre)
+        }
+        
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        
+        // Tekst
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 20px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.type, this.x, this.y);
+    }
+}
+
+class Cannon {
+    constructor(canvasWidth, canvasHeight) {
+        this.x = canvasWidth / 2;
+        this.y = canvasHeight - 60;
+        this.angle = -Math.PI / 2; // Peger opad
+        this.loadedIon = '';
+    }
+    update(mouseX, mouseY) {
+        var dx = mouseX - this.x;
+        var dy = mouseY - this.y;
+        this.angle = Math.atan2(dy, dx);
+        
+        // Begræns vinkel så den ikke kan pege nedad
+        if (this.angle > -0.2 && this.angle < Math.PI / 2) this.angle = -0.2;
+        if (this.angle > Math.PI / 2 || this.angle < -Math.PI + 0.2) this.angle = -Math.PI + 0.2;
+    }
+    draw(ctx) {
+        // Tegn løb
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        ctx.fillStyle = CONFIG.colors.cannonBarrel;
+        ctx.fillRect(0, -15, 70, 30);
+        
+        // Detaljer på løbet
+        ctx.fillStyle = '#cbd5e1';
+        ctx.fillRect(50, -18, 10, 36);
+        ctx.restore();
+        
+        // Tegn base (stor og tydelig for at opfylde brugerkravet)
+        ctx.fillStyle = CONFIG.colors.cannonBase;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 50, Math.PI, 0); // Halvcirkel
+        ctx.fill();
+        
+        // Tydelig visning af ladning
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y - 10, 35, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('LADNING:', this.x, this.y - 25);
+        
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 24px Arial';
+        ctx.fillText(this.loadedIon, this.x, this.y - 5);
+    }
+}
+
+// --- SPIL MOTOREN ---
+
+class GameEngine {
+    constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        
+        this.uiScore = document.getElementById('score');
+        this.uiLevel = document.getElementById('level');
+        this.uiMultiplier = document.getElementById('multiplier');
+        this.uiMonstersLeft = document.getElementById('monsters-left');
+        
+        this.state = 'START'; // START, PLAYING, GAME_OVER
+        this.lastTime = performance.now();
+        this.globalTime = 0;
+        
+        this.score = 0;
+        this.multiplier = 1.0;
+        
+        this.roundIndex = 0;
+        this.monstersSpawnedThisRound = 0;
+        this.monstersDefeatedThisRound = 0;
+        this.spawnTimer = 0;
+        
+        // Slow-motion kontrol
+        this.timeScale = 1.0;
+        this.slowMoTimer = 0;
+        
+        this.entities = {
+            monsters: [],
+            projectiles: [],
+            particles: [],
+            texts: []
+        };
+        
+        this.mouseX = this.canvas.width / 2;
+        this.mouseY = 0;
+        
+        this.bindEvents();
+        this.resize();
+        
+        // Start loop
+        requestAnimationFrame(this.loop.bind(this));
+    }
+    
+    bindEvents() {
+        window.addEventListener('resize', this.resize.bind(this));
+        
+        this.canvas.addEventListener('mousemove', function(e) {
+            this.mouseX = e.clientX;
+            this.mouseY = e.clientY;
+        }.bind(this));
+        
+        this.canvas.addEventListener('mousedown', function(e) {
+            if (this.state === 'PLAYING') {
+                this.shoot();
+            }
+        }.bind(this));
+        
+        // Touch support
+        this.canvas.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+            this.mouseX = e.touches[0].clientX;
+            this.mouseY = e.touches[0].clientY;
+        }.bind(this), {passive: false});
+        
+        this.canvas.addEventListener('touchstart', function(e) {
+            if (this.state === 'PLAYING') {
+                this.mouseX = e.touches[0].clientX;
+                this.mouseY = e.touches[0].clientY;
+                this.shoot();
+            }
+        }.bind(this), {passive: false});
+        
+        document.getElementById('start-btn').addEventListener('click', this.startGame.bind(this));
+        document.getElementById('restart-btn').addEventListener('click', this.startGame.bind(this));
+    }
+    
+    resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+        if (this.cannon) {
+            this.cannon.x = this.canvas.width / 2;
+            this.cannon.y = this.canvas.height - 60;
+        }
+    }
+    
+    startGame() {
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('game-over-screen').classList.add('hidden');
+        
+        this.score = 0;
+        this.multiplier = 1.0;
+        this.roundIndex = 0;
+        this.cannon = new Cannon(this.canvas.width, this.canvas.height);
+        
+        this.resetEntities();
+        this.setupRound();
+        
+        this.state = 'PLAYING';
+        this.lastTime = performance.now();
+    }
+    
+    resetEntities() {
+        this.entities.monsters = [];
+        this.entities.projectiles = [];
+        this.entities.particles = [];
+        this.entities.texts = [];
+    }
+    
+    setupRound() {
+        if (this.roundIndex >= ROUNDS.length) {
+            this.endGame();
+            return;
+        }
+        
+        var roundData = ROUNDS[this.roundIndex];
+        this.cannon.loadedIon = roundData.cannonIon;
+        this.monstersSpawnedThisRound = 0;
+        this.monstersDefeatedThisRound = 0; // Inkluderer også dem der forsvinder ned i bunden
+        this.spawnTimer = 2.0; // Start forsinkelse
+        
+        this.updateUI();
+        
+        this.addText(this.canvas.width / 2, this.canvas.height / 2, "RUNDE " + (this.roundIndex + 1), CONFIG.colors.accent, true);
+    }
+    
+    shoot() {
+        if (!this.cannon) return;
+        
+        // Opsætning af startposition for projektil ud fra kanonens løb
+        var barrelLength = 70;
+        var startX = this.cannon.x + Math.cos(this.cannon.angle) * barrelLength;
+        var startY = this.cannon.y + Math.sin(this.cannon.angle) * barrelLength;
+        
+        var proj = new Projectile(startX, startY, this.cannon.angle, this.cannon.loadedIon);
+        this.entities.projectiles.push(proj);
+    }
+    
+    triggerSlowMotion() {
+        this.timeScale = 0.2; // 20% hastighed
+        this.slowMoTimer = 0.8; // Virkelig tid det varer
+    }
+    
+    createExplosion(x, y, color, count) {
+        for (var i = 0; i < count; i++) {
+            this.entities.particles.push(new Particle(x, y, color));
+        }
+    }
+    
+    addText(x, y, text, color, scaleUp = false) {
+        this.entities.texts.push(new FloatingText(x, y, text, color, scaleUp));
+    }
+    
+    updateUI() {
+        this.uiScore.innerText = Math.floor(this.score);
+        this.uiLevel.innerText = this.roundIndex + 1;
+        
+        // Brug dansk kommasætning
+        var multString = this.multiplier.toFixed(1).replace('.', ',');
+        this.uiMultiplier.innerText = multString;
+        
+        var left = CONFIG.monstersPerRound - this.monstersDefeatedThisRound;
+        this.uiMonstersLeft.innerText = Math.max(0, left);
+    }
+    
+    endGame() {
+        this.state = 'GAME_OVER';
+        document.getElementById('final-score').innerText = Math.floor(this.score);
+        document.getElementById('game-over-screen').classList.remove('hidden');
+    }
+    
+    update(dt) {
+        this.globalTime += dt;
+        
+        // Håndter slow-motion logik baseret på virkelig tid (dt)
+        if (this.slowMoTimer > 0) {
+            this.slowMoTimer -= dt;
+            if (this.slowMoTimer <= 0) {
+                this.timeScale = 1.0; // Genopret normal hastighed
+            }
+        }
+        
+        // Juster delta time med timeScale for spil-logik
+        var gameDt = dt * this.timeScale;
+        
+        if (this.state === 'PLAYING') {
+            this.cannon.update(this.mouseX, this.mouseY);
+            
+            var currentRound = ROUNDS[this.roundIndex];
+            
+            // Spawning af monstre
+            if (this.monstersSpawnedThisRound < CONFIG.monstersPerRound) {
+                this.spawnTimer -= gameDt;
+                if (this.spawnTimer <= 0) {
+                    var monsterType = currentRound.monsters[this.monstersSpawnedThisRound];
+                    var spawnX = 50 + Math.random() * (this.canvas.width - 100);
+                    var monster = new Monster(spawnX, -50, monsterType, currentRound.reactions);
+                    
+                    this.entities.monsters.push(monster);
+                    this.monstersSpawnedThisRound++;
+                    this.spawnTimer = 3.0; // Tid mellem hvert monster
+                }
+            }
+            
+            // Tjek runde afslutning
+            if (this.monstersDefeatedThisRound >= CONFIG.monstersPerRound && this.entities.monsters.length === 0) {
+                this.roundIndex++;
+                this.setupRound();
+            }
+            
+            // Opdater Entiteter
+            for (var i = this.entities.projectiles.length - 1; i >= 0; i--) {
+                var p = this.entities.projectiles[i];
+                p.update(gameDt);
+                if (!p.active) this.entities.projectiles.splice(i, 1);
+            }
+            
+            for (var j = this.entities.monsters.length - 1; j >= 0; j--) {
+                var m = this.entities.monsters[j];
+                m.update(gameDt, this.globalTime);
+                
+                // Missede monsteret
+                if (!m.active) {
+                    this.entities.monsters.splice(j, 1);
+                    this.monstersDefeatedThisRound++;
+                    this.multiplier = 1.0; // Reset multiplikator
+                    this.updateUI();
+                    continue;
+                }
+                
+                // Kollisionstjek
+                for (var k = this.entities.projectiles.length - 1; k >= 0; k--) {
+                    var proj = this.entities.projectiles[k];
+                    var dx = m.x - proj.x;
+                    var dy = m.y - proj.y;
+                    var dist = Math.sqrt(dx*dx + dy*dy);
+                    
+                    if (dist < m.radius + proj.radius) {
+                        // Kollision fundet!
+                        proj.active = false;
+                        
+                        if (m.isTarget) {
+                            // Succes!
+                            m.active = false;
+                            this.createExplosion(m.x, m.y, CONFIG.colors.textHit, 30);
+                            
+                            // Kreativ Udvidelse: Viser kemisk reaktionsskema og sænker tiden
+                            this.addText(this.canvas.width / 2, this.canvas.height / 3, m.reactionFormula, CONFIG.colors.success, true);
+                            this.triggerSlowMotion();
+                            
+                            var points = 100 * this.multiplier;
+                            this.score += points;
+                            this.multiplier = Math.min(5.0, this.multiplier + 0.5); // Maks 5,0x
+                            this.addText(m.x, m.y - 20, "+" + Math.floor(points), "white");
+                            
+                        } else {
+                            // Fejlskud
+                            this.createExplosion(m.x, m.y, '#94a3b8', 10);
+                            this.addText(m.x, m.y - 20, "Ingen reaktion", CONFIG.colors.textMiss);
+                            this.multiplier = 1.0;
+                        }
+                        this.updateUI();
+                        break; // Et projektil kan kun ramme ét monster
+                    }
+                }
+            }
+            
+            for (var l = this.entities.particles.length - 1; l >= 0; l--) {
+                var part = this.entities.particles[l];
+                part.update(gameDt); // Partikler påvirkes også af slow-mo
+                if (part.life <= 0) this.entities.particles.splice(l, 1);
+            }
+            
+            for (var t = this.entities.texts.length - 1; t >= 0; t--) {
+                var text = this.entities.texts[t];
+                text.update(gameDt);
+                if (text.life <= 0) this.entities.texts.splice(t, 1);
+            }
+        }
+    }
+    
+    draw() {
+        // Baggrund
+        this.ctx.fillStyle = CONFIG.colors.bg;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Simpel stjernehimmel/boble baggrund
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+        for (var i = 0; i < 50; i++) {
+            var bx = (Math.sin(i * 123.45) * 0.5 + 0.5) * this.canvas.width;
+            var by = ((this.globalTime * 10 + i * 321.12) % this.canvas.height);
+            this.ctx.beginPath();
+            this.ctx.arc(bx, this.canvas.height - by, Math.sin(i)*2+3, 0, Math.PI*2);
+            this.ctx.fill();
+        }
+        
+        if (this.state === 'PLAYING') {
+            for (var j = 0; j < this.entities.monsters.length; j++) {
+                this.entities.monsters[j].draw(this.ctx);
+            }
+            for (var k = 0; k < this.entities.projectiles.length; k++) {
+                this.entities.projectiles[k].draw(this.ctx);
+            }
+            for (var l = 0; l < this.entities.particles.length; l++) {
+                this.entities.particles[l].draw(this.ctx);
+            }
+            
+            this.cannon.draw(this.ctx);
+            
+            for (var t = 0; t < this.entities.texts.length; t++) {
+                this.entities.texts[t].draw(this.ctx);
+            }
+            
+            // Hvis slow-mo er aktiv, tegn en visuel vignette
+            if (this.timeScale < 1.0) {
+                var gradient = this.ctx.createRadialGradient(
+                    this.canvas.width/2, this.canvas.height/2, this.canvas.height/4,
+                    this.canvas.width/2, this.canvas.height/2, this.canvas.height
+                );
+                gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+                gradient.addColorStop(1, 'rgba(14, 165, 233, 0.15)');
+                this.ctx.fillStyle = gradient;
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+        }
+    }
+    
+    loop(timestamp) {
+        var dt = (timestamp - this.lastTime) / 1000; // Konverter til sekunder
+        this.lastTime = timestamp;
+        
+        // Sikkerhed for at undgå gigantiske hop hvis fanen er inaktiv
+        if (dt > 0.1) dt = 0.1;
+        
+        this.update(dt);
+        this.draw();
+        
+        requestAnimationFrame(this.loop.bind(this));
+    }
+}
+
+// Initialiser spillet
+var spil = new GameEngine();
+
+</script>
+</body>
+</html>

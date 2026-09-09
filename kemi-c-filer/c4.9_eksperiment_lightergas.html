@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtuelt Lab: Lightergasforsøget</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #2980b9;
+            --highlight: #e74c3c;
+            --success: #27ae60;
+            --bg-color: #ecf0f1;
+            --panel-bg: #ffffff;
+            --info: #f39c12;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Layout */
+        #simulation-area {
+            flex: 2;
+            position: relative;
+            background: radial-gradient(circle at center, #fff, #dfe6e9);
+            cursor: default;
+            overflow: hidden;
+        }
+
+        #sidebar {
+            flex: 1;
+            min-width: 380px;
+            max-width: 480px;
+            background: var(--panel-bg);
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        h2 { color: var(--primary); margin-top: 0; font-size: 1.4rem; border-bottom: 2px solid var(--accent); padding-bottom: 10px;}
+        
+        .guide-box {
+            background: #e8f6f3;
+            border-left: 5px solid #1abc9c;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .guide-text { font-size: 0.95rem; line-height: 1.4; color: #333; }
+
+        /* Card System */
+        .card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+        
+        .card.active {
+            opacity: 1;
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(41, 128, 185, 0.15);
+            transform: scale(1.01);
+        }
+
+        .card.done {
+            opacity: 0.7;
+            border-color: var(--success);
+            background: #f0fff4;
+        }
+
+        label { display: block; font-size: 0.85rem; color: #7f8c8d; margin-bottom: 5px; font-weight: 600; }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            box-sizing: border-box;
+            transition: border 0.3s, background 0.3s;
+        }
+        input:focus { outline: none; border-color: var(--accent); background: #fff; }
+        input:disabled { background-color: #f1f2f6; cursor: not-allowed; color: #aaa; }
+        
+        @keyframes unlockPulse {
+            0% { transform: scale(1); border-color: #bdc3c7; }
+            50% { transform: scale(1.05); border-color: var(--success); }
+            100% { transform: scale(1); border-color: var(--accent); }
+        }
+        .input-unlocked { animation: unlockPulse 0.5s ease-out; }
+
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            margin-top: 8px;
+            font-weight: bold;
+        }
+        button:hover { background-color: #3498db; }
+        button:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+
+        /* Help Button & Box */
+        .input-row { display: flex; gap: 5px; align-items: center; }
+        .help-btn {
+            background: var(--info);
+            width: 35px; height: 35px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 1.2rem;
+            margin-top: 0; flex-shrink: 0;
+        }
+        .help-btn:hover { background: #e67e22; }
+        
+        .help-content {
+            background: #fdf2e9;
+            border: 1px solid #fae5d3;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            color: #d35400;
+            margin-bottom: 10px;
+            display: none; /* Hidden by default */
+        }
+
+        /* Canvas Overlay Elements */
+        #gas-btn {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 40px;
+            font-size: 1.5rem;
+            background: var(--highlight);
+            color: white;
+            border-radius: 50px;
+            border: 4px solid white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: none; 
+            z-index: 100;
+            cursor: pointer;
+        }
+        #gas-btn:active { transform: translate(-50%, -50%) scale(0.95); }
+
+        #reset-btn {
+            position: absolute; top: 10px; right: 10px;
+            width: auto; background: rgba(255,255,255,0.9);
+            color: #333; font-size: 0.8rem; padding: 5px 15px;
+            border: 1px solid #ccc;
+        }
+
+        .feedback { margin-top: 10px; padding: 10px; border-radius: 5px; font-weight: bold; display: none; }
+        .correct { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .wrong { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* Chart */
+        #chart-area { margin-top: 15px; }
+        #chart-plot {
+            position: relative;
+            height: 150px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            border-bottom: 2px solid #333;
+        }
+        #chart-labels { display: flex; justify-content: space-around; padding-top: 5px; }
+        .bar-group { display: flex; align-items: flex-end; cursor: pointer; width: 18%; height: 100%; }
+        .bar { width: 100%; background: #95a5a6; border-radius: 4px 4px 0 0; transition: height 1s; min-height: 5px; }
+        .bar-group:hover .bar { background: var(--accent); }
+        .bar-label { font-size: 0.7rem; width: 18%; text-align: center; font-weight: bold; cursor: pointer; }
+        .bar-label:hover { color: var(--accent); }
+        
+        /* Step 4 Sections */
+        .step4-section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #ccc; }
+        .step4-section:last-child { border-bottom: none; }
+        .locked-section { opacity: 0.4; pointer-events: none; }
+
+        /* Chart marker for own calculated value */
+        .user-value-line {
+            position: absolute;
+            left: 0; right: 0;
+            border-top: 2px dashed var(--highlight);
+            pointer-events: none;
+        }
+        .user-value-line span {
+            position: absolute;
+            right: 0;
+            bottom: 2px;
+            background: var(--highlight);
+            color: white;
+            font-size: 0.65rem;
+            padding: 1px 6px;
+            border-radius: 3px;
+            white-space: nowrap;
+        }
+
+        /* Responsive: small screens / heavy browser zoom */
+        @media (max-width: 850px) {
+            body { flex-direction: column; overflow-y: auto; height: auto; min-height: 100vh; }
+            #simulation-area { flex: none; height: 60vh; min-height: 320px; }
+            #sidebar { flex: none; width: auto; min-width: 0; max-width: none; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="simulation-area">
+    <canvas id="canvas"></canvas>
+    <button id="gas-btn">HOLD NEDE: Slip gas ud</button>
+    <button id="reset-btn" onclick="location.reload()">Genstart</button>
+</div>
+
+<div id="sidebar">
+    <h2>Lightergas Journal</h2>
+    
+    <div class="guide-box">
+        <span id="guide-text" class="guide-text">Velkommen. Træk lighteren over på vægten for at starte.</span>
+    </div>
+
+    <div id="card-1" class="card active">
+        <label>Trin 1: Masse før start</label>
+        <div class="input-group">
+            <label>Aflæs vægten m(før) i g:</label>
+            <input type="number" id="input-m1" placeholder="Vej lighteren først..." disabled step="0.01">
+        </div>
+        <button id="btn-submit-m1" disabled>Gem Måling</button>
+        <div id="feedback-m1" class="feedback"></div>
+    </div>
+
+    <div id="card-2" class="card">
+        <label>Trin 2: Opsamling</label>
+        <p style="font-size: 0.85rem; color:#555; margin:0 0 10px 0;">
+            Træk lighteren ned til den stiplede firkant i vandet.
+        </p>
+        <div class="input-group">
+            <label>Volumen V (mL):</label>
+            <input type="number" id="input-v" placeholder="Slip gassen ud først..." disabled step="1">
+        </div>
+        <button id="btn-submit-v" disabled>Gem Volumen</button>
+    </div>
+
+    <div id="card-3" class="card">
+        <label>Trin 3: Masse efter</label>
+        <p style="font-size: 0.85rem; color:#555;">Tør lighteren og vej den igen.</p>
+        <div class="input-group">
+            <label>Aflæs vægten m(efter) i g:</label>
+            <input type="number" id="input-m2" placeholder="Sæt lighter på vægten..." disabled step="0.01">
+        </div>
+        <button id="btn-submit-m2" disabled>Gem Måling</button>
+        <div id="feedback-m2" class="feedback"></div>
+    </div>
+
+    <div id="card-4" class="card">
+        <label>Trin 4: Databehandling</label>
+        
+        <div id="step4-part-a" class="step4-section">
+            <label style="color:var(--accent);">Del A: Mellemregninger</label>
+            
+            <div class="input-group">
+                <label>Gassens masse m(gas) i g:</label>
+                <input type="number" id="input-mgas" placeholder="m(før) - m(efter)" step="0.01">
+            </div>
+
+            <div class="input-group" style="margin-top:10px;">
+                <label>Stofmængde n (mol):</label>
+                <div class="input-row">
+                    <input type="number" id="input-n" placeholder="Beregn stofmængden" step="0.0001">
+                    <button class="help-btn" id="btn-n-help" title="Få hjælp til formlen">?</button>
+                </div>
+            </div>
+            
+            <div id="n-help-content" class="help-content">
+                <strong>Hjælp til stofmængde (n):</strong><br>
+                Du kan bruge idealgasligningen:<br>
+                <em>n = (p · V) / (R · T)</em><br><br>
+                Eller den simple metode (ved stuetemp.):<br>
+                <em>n = V / 24 L/mol</em><br>
+                (Husk at omregne volumen til Liter!)
+            </div>
+
+            <button id="btn-check-part-a">Tjek Del A</button>
+            <div id="feedback-part-a" class="feedback"></div>
+        </div>
+
+        <div id="step4-part-b" class="step4-section locked-section">
+            <label style="color:var(--accent);">Del B: Konklusion</label>
+            <div class="input-group">
+                <label>Molarmasse M (g/mol):</label>
+                <input type="number" id="input-M" placeholder="M = m(gas) / n" step="0.1" disabled>
+            </div>
+            <button id="btn-check-part-b" disabled>Tjek Molarmasse</button>
+            <div id="feedback-part-b" class="feedback"></div>
+        </div>
+
+    </div>
+
+    <div id="card-5" class="card">
+        <label>Trin 5: Identifikation</label>
+        <p style="font-size:0.9rem">Hvilken alkan er det?</p>
+        <div id="chart-area"></div>
+        <div id="final-feedback" class="feedback"></div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let width, height;
+
+// Simulation Logic State
+const STATE = {
+    INTRO: 0,
+    WEIGH_1: 1,
+    SETUP_WATER: 2,
+    COLLECTING: 3,
+    FINISH_COLLECT: 4,
+    WEIGH_2: 5,
+    CALC_A: 6,
+    CALC_B: 7,
+    DONE: 8
+};
+
+let currState = STATE.INTRO;
+
+// Objects
+let lighter = {
+    x: 50, y: 50, w: 40, h: 70,
+    mass: 16.50 + Math.random(), 
+    dragging: false,
+    snapped: false 
+};
+
+let gasData = {
+    vol: 0, 
+    maxVol: 240, 
+    bubbles: []
+};
+
+// Physics
+const MOLAR_VOL = 24.0; 
+const BUTANE_MOLAR_MASS = 58.12;
+const DENSITY_GAS = BUTANE_MOLAR_MASS / (MOLAR_VOL * 1000); 
+
+// Zones
+let zones = { scale: {}, water: {}, target: {} };
+
+const guideText = document.getElementById('guide-text');
+const gasBtn = document.getElementById('gas-btn');
+
+// --- RESIZE ---
+function resize() {
+    const container = document.getElementById('simulation-area');
+    width = container.clientWidth;
+    height = container.clientHeight;
+
+    canvas.width = width;
+    canvas.height = height;
+    
+    zones.scale = { x: width * 0.1, y: height * 0.6, w: 140, h: 100 };
+    zones.water = { x: width * 0.5, y: height * 0.35, w: width * 0.45, h: height * 0.55 };
+    
+    zones.target = { 
+        x: zones.water.x + (zones.water.w/2) - 30, 
+        y: zones.water.y + zones.water.h - 90, 
+        w: 60, h: 70 
+    };
+
+    if(lighter.x > width) lighter.x = width - 100;
+    if(lighter.y > height) lighter.y = height - 100;
+    
+    if(currState === STATE.INTRO && lighter.x === 50) {
+        lighter.x = width * 0.05;
+        lighter.y = height * 0.75;
+    }
+}
+window.addEventListener('resize', resize);
+resize();
+
+// --- DRAWING ---
+function draw() {
+    ctx.clearRect(0,0, width, height);
+    
+    ctx.fillStyle = '#7f8c8d';
+    ctx.fillRect(0, height * 0.8, width, height * 0.2);
+    
+    drawScale();
+    drawWaterSetup();
+    drawLighter();
+    drawBubbles();
+    
+    requestAnimationFrame(draw);
+}
+
+function drawScale() {
+    const {x, y} = zones.scale;
+    // Stand
+    ctx.fillStyle = '#95a5a6';
+    ctx.fillRect(x + 20, y + 40, 100, 20);
+    // Body
+    ctx.fillStyle = '#ecf0f1';
+    ctx.fillRect(x + 10, y + 60, 120, 50);
+    // Screen
+    ctx.fillStyle = '#34495e';
+    ctx.fillRect(x + 20, y + 75, 100, 25);
+    
+    const onScale = isLighterOnScale();
+    let displayTxt = "0.00";
+    
+    if (onScale) {
+        displayTxt = lighter.mass.toFixed(2);
+        ctx.fillStyle = '#2ecc71';
+        
+        // Zoom bubble (Raised higher)
+        drawZoom(x + 70, y - 120, displayTxt + " g", "VÆGT");
+        
+        handleScaleInputUnlock();
+    } else {
+        ctx.fillStyle = '#7f8c8d';
+    }
+    
+    ctx.font = '16px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(displayTxt, x + 70, y + 93);
+}
+
+function drawWaterSetup() {
+    const {x, y, w, h} = zones.water;
+    
+    ctx.strokeStyle = '#3498db';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(x, y, w, h);
+    
+    ctx.fillStyle = 'rgba(52, 152, 219, 0.2)';
+    ctx.fillRect(x, y + 20, w, h - 20);
+    
+    const cx = x + w/2;
+    const cy = y - 40;
+    const cw = 60;
+    const ch = h - 20;
+    
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillRect(cx - cw/2, cy, cw, ch);
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(cx - cw/2, cy, cw, ch);
+    
+    const waterLevel = cy + (gasData.vol / 250) * ch;
+    
+    ctx.fillStyle = 'rgba(52, 152, 219, 0.5)';
+    ctx.fillRect(cx - cw/2 + 2, waterLevel, cw - 4, (cy + ch) - waterLevel);
+    
+    ctx.fillStyle = '#333';
+    ctx.font = '10px Arial';
+    for(let i=0; i<=5; i++) {
+        let ty = cy + 40 + (i * (ch/6));
+        ctx.fillRect(cx-cw/2, ty, 10, 1);
+        ctx.fillText(Math.round(250 - (i*41.6)), cx - cw/2 - 25, ty + 3);
+    }
+    
+    if (currState === STATE.SETUP_WATER) {
+        const t = zones.target;
+        ctx.save();
+        ctx.setLineDash([5, 5]);
+        ctx.strokeStyle = '#e74c3c';
+        ctx.strokeRect(t.x, t.y, t.w, t.h);
+        ctx.fillStyle = '#e74c3c';
+        ctx.font = 'bold 12px Arial';
+        ctx.fillText("PLACER HER", t.x + 30, t.y + 85);
+        ctx.restore();
+    }
+    
+    if (currState >= STATE.COLLECTING && gasData.vol > 0) {
+        drawZoom(cx + 100, cy + 100, Math.floor(gasData.vol) + " mL", "VOLUMEN");
+    }
+}
+
+function drawZoom(x, y, txt, label) {
+    ctx.save();
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = 'rgba(0,0,0,0.2)';
+    
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(x, y, 45, 0, Math.PI*2);
+    ctx.fill();
+    
+    ctx.strokeStyle = '#34495e';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    
+    ctx.fillStyle = '#2c3e50';
+    ctx.font = 'bold 20px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(txt, x, y + 5);
+    
+    ctx.fillStyle = '#7f8c8d';
+    ctx.font = '10px Arial';
+    ctx.fillText(label, x, y + 25);
+    ctx.restore();
+}
+
+function drawLighter() {
+    ctx.save();
+    ctx.translate(lighter.x, lighter.y);
+    ctx.fillStyle = '#e74c3c';
+    ctx.fillRect(0, 0, lighter.w, lighter.h);
+    ctx.fillStyle = '#95a5a6'; 
+    ctx.fillRect(0, -15, lighter.w, 15);
+    ctx.fillStyle = '#333';
+    ctx.fillRect(5, -12, 10, 8);
+    ctx.restore();
+}
+
+function drawBubbles() {
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    gasData.bubbles.forEach((b, i) => {
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
+        ctx.fill();
+        b.y -= b.speed;
+        b.x += Math.sin(b.y*0.1) * 0.5;
+        if(b.y < zones.water.y) gasData.bubbles.splice(i, 1);
+    });
+}
+
+// --- LOGIC ---
+
+function handleScaleInputUnlock() {
+    if (currState === STATE.INTRO) {
+        const inp = document.getElementById('input-m1');
+        const btn = document.getElementById('btn-submit-m1');
+        if (inp.disabled) {
+            inp.disabled = false;
+            btn.disabled = false;
+            inp.classList.add('input-unlocked');
+            inp.placeholder = "Indtast værdien fra luppen";
+            guideText.innerText = "Lighteren er på vægten! Aflæs tallet i luppen og indtast det.";
+        }
+    }
+    
+    if (currState === STATE.WEIGH_2) {
+        const inp = document.getElementById('input-m2');
+        const btn = document.getElementById('btn-submit-m2');
+        if (inp.disabled) {
+            inp.disabled = false;
+            btn.disabled = false;
+            inp.classList.add('input-unlocked');
+            inp.placeholder = "Indtast ny værdi";
+            guideText.innerText = "Aflæs den nye masse i luppen.";
+        }
+    }
+}
+
+function isLighterOnScale() {
+    const s = zones.scale;
+    return (lighter.x < s.x + s.w && lighter.x + lighter.w > s.x &&
+            lighter.y < s.y + s.h && lighter.y + lighter.h > s.y);
+}
+
+function isLighterInTarget() {
+    const t = zones.target;
+    return (lighter.x < t.x + t.w && lighter.x + lighter.w > t.x &&
+            lighter.y < t.y + t.h && lighter.y + lighter.h > t.y);
+}
+
+function getEventPos(evt) {
+    const t = (evt.touches && evt.touches.length) ? evt.touches[0] : evt;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return {
+        x: (t.clientX - rect.left) * scaleX,
+        y: (t.clientY - rect.top) * scaleY
+    };
+}
+
+function handleDragStart(e) {
+    const m = getEventPos(e);
+    if (m.x > lighter.x && m.x < lighter.x + lighter.w &&
+        m.y > lighter.y - 15 && m.y < lighter.y + lighter.h) {
+
+        if (!lighter.snapped) {
+            e.preventDefault();
+            lighter.dragging = true;
+            lighter.dragOffsetX = m.x - lighter.x;
+            lighter.dragOffsetY = m.y - lighter.y;
+        }
+    }
+}
+
+function handleDragMove(e) {
+    if (lighter.dragging) {
+        e.preventDefault();
+        const m = getEventPos(e);
+        lighter.x = m.x - lighter.dragOffsetX;
+        lighter.y = m.y - lighter.dragOffsetY;
+    }
+}
+
+function handleDragEnd() {
+    if (lighter.dragging) {
+        lighter.dragging = false;
+        if (currState === STATE.SETUP_WATER && isLighterInTarget()) {
+            lighter.x = zones.target.x + 10;
+            lighter.y = zones.target.y;
+            lighter.snapped = true;
+
+            currState = STATE.COLLECTING;
+            gasBtn.style.display = 'block';
+            document.getElementById('card-2').classList.add('active');
+            guideText.innerHTML = "Godt! Hold nu <b>knappen nede</b> for at frigive gas.";
+        }
+    }
+}
+
+['mousedown', 'touchstart'].forEach(type => canvas.addEventListener(type, handleDragStart, { passive: false }));
+['mousemove', 'touchmove'].forEach(type => window.addEventListener(type, handleDragMove, { passive: false }));
+['mouseup', 'touchend'].forEach(type => window.addEventListener(type, handleDragEnd));
+
+// --- UI BUTTONS & LOGIC ---
+
+// Help Button Toggle
+document.getElementById('btn-n-help').addEventListener('click', () => {
+    const content = document.getElementById('n-help-content');
+    if (content.style.display === 'block') {
+        content.style.display = 'none';
+    } else {
+        content.style.display = 'block';
+    }
+});
+
+document.getElementById('btn-submit-m1').addEventListener('click', () => {
+    const val = parseFloat(document.getElementById('input-m1').value);
+    const fb = document.getElementById('feedback-m1');
+    fb.style.display = 'block';
+
+    if (Math.abs(val - lighter.mass) < 0.2) {
+        fb.className = "feedback correct";
+        fb.innerHTML = "Korrekt aflæst!";
+        document.getElementById('card-1').classList.remove('active');
+        document.getElementById('card-1').classList.add('done');
+        currState = STATE.SETUP_WATER;
+        document.getElementById('card-2').classList.add('active');
+        guideText.innerText = "Trin 1 færdig. Træk nu lighteren ned i vandet til målzonen.";
+    } else {
+        fb.className = "feedback wrong";
+        fb.innerHTML = "Værdien stemmer ikke med vægten. Prøv igen.";
+    }
+});
+
+let gasInterval;
+function startGasRelease(e) {
+    e.preventDefault();
+    gasInterval = setInterval(() => {
+        if (gasData.vol < 240) {
+            gasData.vol += 1;
+            lighter.mass -= DENSITY_GAS;
+            gasData.bubbles.push({
+                x: lighter.x + 20 + (Math.random()*10-5), y: lighter.y - 10,
+                r: 2+Math.random()*4, speed: 2+Math.random()
+            });
+            document.getElementById('input-v').value = Math.floor(gasData.vol);
+        }
+    }, 20);
+}
+
+function stopGasRelease() {
+    clearInterval(gasInterval);
+    if (gasData.vol > 100) {
+        gasBtn.style.display = 'none';
+        lighter.snapped = false;
+        currState = STATE.FINISH_COLLECT;
+
+        const vInput = document.getElementById('input-v');
+        const vBtn = document.getElementById('btn-submit-v');
+        vInput.disabled = false;
+        vBtn.disabled = false;
+
+        guideText.innerText = "Gas opsamlet. Gem volumen, og træk derefter lighteren tilbage på vægten.";
+    }
+}
+
+['mousedown', 'touchstart'].forEach(type => gasBtn.addEventListener(type, startGasRelease, { passive: false }));
+['mouseup', 'touchend'].forEach(type => gasBtn.addEventListener(type, stopGasRelease));
+
+document.getElementById('btn-submit-v').addEventListener('click', () => {
+    document.getElementById('card-2').classList.remove('active');
+    document.getElementById('card-2').classList.add('done');
+    document.getElementById('card-3').classList.add('active');
+    currState = STATE.WEIGH_2; 
+    guideText.innerText = "Nu skal vi finde massetabet. Placer lighteren på vægten igen.";
+});
+
+document.getElementById('btn-submit-m2').addEventListener('click', () => {
+    const val = parseFloat(document.getElementById('input-m2').value);
+    const fb = document.getElementById('feedback-m2');
+    fb.style.display = 'block';
+
+    if (Math.abs(val - lighter.mass) < 0.2) {
+        fb.className = "feedback correct";
+        fb.innerHTML = "Korrekt aflæst!";
+        document.getElementById('card-3').classList.remove('active');
+        document.getElementById('card-3').classList.add('done');
+        document.getElementById('card-4').classList.add('active');
+        currState = STATE.CALC_A;
+        guideText.innerText = "Nu skal du beregne Del A: Gassens masse og stofmængde.";
+    } else {
+        fb.className = "feedback wrong";
+        fb.innerHTML = "Værdien stemmer ikke. Prøv igen.";
+    }
+});
+
+// CALCULATION PART A CHECKER
+document.getElementById('btn-check-part-a').addEventListener('click', () => {
+    const userMGas = parseFloat(document.getElementById('input-mgas').value);
+    const userN = parseFloat(document.getElementById('input-n').value);
+    
+    // True values
+    const m1 = parseFloat(document.getElementById('input-m1').value);
+    const m2 = lighter.mass;
+    const trueMGas = m1 - m2;
+    const trueN = (gasData.vol / 1000) / 24.0;
+    
+    const fb = document.getElementById('feedback-part-a');
+    fb.style.display = 'block';
+    
+    let okMass = Math.abs(userMGas - trueMGas) < 0.1;
+    let okN = Math.abs(userN - trueN) < 0.001; // generous tolerance
+    
+    if (okMass && okN) {
+        fb.className = "feedback correct";
+        fb.innerHTML = "Korrekt! I Del B kan du nu beregne molarmassen.";
+        
+        // Unlock Part B
+        document.getElementById('step4-part-b').classList.remove('locked-section');
+        document.getElementById('input-M').disabled = false;
+        document.getElementById('btn-check-part-b').disabled = false;
+        
+        currState = STATE.CALC_B;
+        guideText.innerText = "Beregn nu Molarmassen M i Del B.";
+    } else {
+        fb.className = "feedback wrong";
+        let msg = "Fejl i beregningerne:<br>";
+        if (!okMass) msg += "- m(gas) ser forkert ud. (Husk m(før) - m(efter))<br>";
+        if (!okN) msg += "- n ser forkert ud. (Husk V/24000 hvis du bruger mL)";
+        fb.innerHTML = msg;
+    }
+});
+
+// CALCULATION PART B CHECKER
+document.getElementById('btn-check-part-b').addEventListener('click', () => {
+    const userM = parseFloat(document.getElementById('input-M').value);
+    
+    // Re-calculate true values to be safe
+    const m1 = parseFloat(document.getElementById('input-m1').value);
+    const m2 = lighter.mass; // current mass
+    const trueN = (gasData.vol / 1000) / 24.0;
+    const trueM = (m1 - m2) / trueN;
+    
+    const fb = document.getElementById('feedback-part-b');
+    fb.style.display = 'block';
+    
+    if (Math.abs(userM - trueM) < 5) {
+        fb.className = "feedback correct";
+        fb.innerHTML = "Korrekt! Du har bestemt molarmassen.";
+        
+        document.getElementById('card-4').classList.remove('active');
+        document.getElementById('card-4').classList.add('done');
+        document.getElementById('card-5').classList.add('active');
+        
+        setupChart(userM);
+        currState = STATE.DONE;
+        guideText.innerHTML = "Sidste trin: Identificer gassen.";
+    } else {
+        fb.className = "feedback wrong";
+        fb.innerHTML = `Ikke helt. Tjek formlen M = m(gas) / n.`;
+    }
+});
+
+function setupChart(userM) {
+    const area = document.getElementById('chart-area');
+    area.innerHTML = '<div id="chart-plot"></div><div id="chart-labels"></div>';
+    const plot = document.getElementById('chart-plot');
+    const labels = document.getElementById('chart-labels');
+
+    const gases = [
+        {name: "Metan", m: 16}, {name: "Ethan", m: 30}, {name: "Propan", m: 44},
+        {name: "Butan", m: 58}, {name: "Pentan", m: 72}
+    ];
+
+    const PLOT_HEIGHT = 150; // px, skal matche #chart-plot's CSS-højde
+    const MAX_M = 80;
+
+    // Eleven skal selv sammenligne sin egen beregnede M med graferne
+    let closest = gases[0];
+    gases.forEach(g => {
+        if (Math.abs(userM - g.m) < Math.abs(userM - closest.m)) closest = g;
+    });
+
+    function selectGas(g) {
+        const fb = document.getElementById('final-feedback');
+        fb.style.display = 'block';
+        const diffPct = Math.abs((userM - g.m) / g.m * 100).toFixed(1);
+        if (g.name === closest.name) {
+            fb.className = "feedback correct";
+            fb.innerHTML = `KORREKT! Din beregnede molarmasse (${userM.toFixed(1)} g/mol) ligger tættest på <b>${g.name}</b> (M &asymp; ${g.m} g/mol, afvigelse ${diffPct}%).`;
+        } else {
+            fb.className = "feedback wrong";
+            fb.innerHTML = `Ikke helt. Din beregnede værdi (${userM.toFixed(1)} g/mol) ligger tættere på <b>${closest.name}</b> end på ${g.name}. Se den stiplede linje i grafen.`;
+        }
+    }
+
+    gases.forEach(g => {
+        const h = (g.m / MAX_M) * PLOT_HEIGHT;
+
+        const barGroup = document.createElement('div');
+        barGroup.className = 'bar-group';
+        barGroup.innerHTML = `<div class="bar" style="height:${h}px"></div>`;
+        barGroup.onclick = () => selectGas(g);
+        plot.appendChild(barGroup);
+
+        const label = document.createElement('div');
+        label.className = 'bar-label';
+        label.textContent = g.name;
+        label.onclick = () => selectGas(g);
+        labels.appendChild(label);
+    });
+
+    // Visuel markør for elevens egen beregnede værdi
+    const markerH = Math.min(PLOT_HEIGHT, Math.max(0, (userM / MAX_M) * PLOT_HEIGHT));
+    const marker = document.createElement('div');
+    marker.className = 'user-value-line';
+    marker.style.bottom = markerH + 'px';
+    marker.innerHTML = `<span>Din værdi: ${userM.toFixed(1)} g/mol</span>`;
+    plot.appendChild(marker);
+}
+
+// Start loop
+draw();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kemi-Træner: Fra Ks til pKs</title>
+    <style>
+        :root {
+            --bg:       #0f1115;
+            --panel:    #1a1d24;
+            --main:     #f3f4f6;
+            --muted:    #9ca3af;
+            --blue:     #3b82f6;
+            --green:    #10b981;
+            --red:      #ef4444;
+            --radius:   12px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body {
+            background: var(--bg);
+            color: var(--main);
+            min-height: 100vh;
+        }
+
+        /* ── HEADER ── */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: #14161a;
+            padding: 11px 28px;
+            border-bottom: 2px solid #232730;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        header h1 { font-size: 1.15rem; color: var(--blue); letter-spacing: 1px; text-transform: uppercase; }
+
+        .stats { display: flex; gap: 14px; }
+        .stat-box {
+            background: rgba(255,255,255,0.05);
+            padding: 5px 13px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 0.88rem;
+        }
+        .stat-value { color: var(--green); font-size: 1rem; }
+
+        /* ── PAGE ── */
+        .page {
+            padding: 28px 16px 60px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .column {
+            width: 100%;
+            max-width: 660px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* ── CARDS ── */
+        .card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+
+        .step-card {
+            border-left: 3px solid var(--blue);
+            transition: opacity 0.4s, border-left-color 0.3s;
+        }
+
+        .step-card.locked {
+            opacity: 0.28;
+            pointer-events: none;
+        }
+
+        .step-card.done { border-left-color: var(--green); }
+
+        /* ── ACID INFO ── */
+        .acid-display { text-align: center; }
+        .acid-name { font-size: 1.7rem; font-weight: bold; color: white; margin-bottom: 6px; }
+        .acid-formula {
+            display: inline-block;
+            font-size: 1.1rem;
+            color: var(--blue);
+            background: rgba(59,130,246,0.1);
+            padding: 4px 16px;
+            border-radius: 20px;
+        }
+        .acid-subtitle {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        /* ── STEP HEADER ── */
+        .step-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 11px;
+            margin-bottom: 16px;
+        }
+
+        .step-num {
+            background: var(--blue);
+            color: white;
+            width: 27px;
+            height: 27px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+            transition: background 0.3s;
+        }
+
+        .step-card.done .step-num { background: var(--green); }
+
+        .step-title { font-size: 1rem; font-weight: bold; line-height: 1.3; }
+        .step-sub { font-size: 0.82rem; color: var(--muted); margin-top: 3px; }
+
+        /* ── REACTION (step 1) ── */
+        .reaction-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin: 14px 0;
+            font-size: 1.05rem;
+        }
+
+        .chem-box {
+            font-weight: bold;
+            padding: 5px 11px;
+            border-radius: 6px;
+        }
+
+        .chem-acid  { color: var(--blue);  background: rgba(59,130,246,0.12); }
+        .chem-water { color: #60a5fa;      background: rgba(96,165,250,0.1); }
+        .chem-h3o   { color: var(--green); background: rgba(16,185,129,0.1); }
+        .chem-op    { color: var(--muted); font-size: 1rem; }
+
+        /* ── KS FRACTION (step 2) ── */
+        .fraction-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin: 16px 0;
+        }
+
+        .ks-label { font-size: 1.15rem; font-weight: bold; white-space: nowrap; }
+
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .frac-top {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 0 8px 5px;
+            border-bottom: 2px solid rgba(255,255,255,0.55);
+        }
+
+        .frac-bot {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px 8px 0;
+        }
+
+        .frac-dot { color: var(--muted); font-size: 1.1rem; font-weight: bold; }
+
+        /* ── SELECTS ── */
+        .sel {
+            padding: 7px 9px;
+            background: rgba(0,0,0,0.45);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            font-size: 0.96rem;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .sel:focus { outline: none; border-color: var(--blue); }
+        .sel option { background: var(--panel); }
+
+        /* ── KS GIVEN (step 3) ── */
+        .ks-reveal {
+            background: rgba(139,92,246,0.1);
+            border: 1px solid rgba(139,92,246,0.25);
+            border-radius: 8px;
+            padding: 14px 16px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .ks-reveal-label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+        .ks-reveal-value { font-size: 1.25rem; font-weight: bold; color: white; }
+
+        /* ── FORMULA REMINDER ── */
+        .formula-box {
+            background: rgba(59,130,246,0.07);
+            border: 1px solid rgba(59,130,246,0.18);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 14px;
+        }
+
+        .formula-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+        .formula-main  { font-size: 1.1rem; font-weight: bold; color: var(--blue); text-align: center; margin-bottom: 8px; }
+
+        .btn-hint {
+            width: 100%;
+            text-align: left;
+            background: transparent;
+            border: 1px solid rgba(59,130,246,0.22);
+            color: var(--blue);
+            font-size: 0.85rem;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-hint:hover { background: rgba(59,130,246,0.1); }
+
+        .hint-box {
+            display: none;
+            margin-top: 8px;
+            padding: 8px 10px;
+            background: rgba(0,0,0,0.25);
+            border-radius: 6px;
+        }
+
+        .hint-step {
+            display: flex;
+            gap: 8px;
+            padding: 5px 0;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .hint-step:last-child { border-bottom: none; }
+        .hint-num { color: var(--blue); font-weight: bold; flex-shrink: 0; min-width: 18px; }
+
+        /* ── pKs INPUT ── */
+        .pks-input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 14px 0;
+        }
+
+        .pks-input-label { font-size: 1.05rem; font-weight: bold; color: var(--muted); white-space: nowrap; }
+
+        input[type="text"] {
+            width: 110px;
+            padding: 9px 12px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            font-size: 1.05rem;
+            text-align: center;
+            border-radius: 7px;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus { outline: none; border-color: var(--blue); }
+
+        /* ── STRENGTH (step 4) ── */
+        .pks-computed-box {
+            background: rgba(16,185,129,0.1);
+            border-left: 4px solid var(--green);
+            border-radius: 0 8px 8px 0;
+            padding: 10px 14px;
+            margin-bottom: 14px;
+            font-size: 1.05rem;
+        }
+
+        .strength-hints {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .strength-chip {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 3px 10px;
+            font-size: 0.78rem;
+            color: var(--muted);
+        }
+
+        /* ── FEEDBACK ── */
+        .step-feedback {
+            display: none;
+            margin-top: 10px;
+            padding: 9px 12px;
+            border-radius: 7px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            animation: fadeIn 0.3s;
+        }
+
+        .step-feedback.ok  { display: block; background: rgba(16,185,129,0.12);  border: 1px solid var(--green); color: #a7f3d0; }
+        .step-feedback.err { display: block; background: rgba(239,68,68,0.12); border: 1px solid var(--red);   color: #fecaca; }
+
+        /* ── BUTTONS ── */
+        .btn-check {
+            width: 100%;
+            margin-top: 12px;
+            padding: 11px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            transition: all 0.25s;
+            background: linear-gradient(135deg, rgba(59,130,246,0.75), rgba(37,99,235,0.75));
+            color: white;
+        }
+
+        .btn-check:hover { opacity: 0.85; transform: translateY(-1px); }
+
+        #btn-next {
+            display: none;
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.25s;
+            background: linear-gradient(135deg, var(--green) 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16,185,129,0.3);
+        }
+
+        #btn-next:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16,185,129,0.5); }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Fra K<sub>s</sub> til pK<sub>s</sub></h1>
+    <div class="stats">
+        <div class="stat-box">Streak: <span id="streak-counter" class="stat-value">0</span></div>
+        <div class="stat-box">Point: <span id="score-counter" class="stat-value">0</span></div>
+    </div>
+</header>
+
+<div class="page">
+<div class="column">
+
+    <!-- ── SYRE-INFO ── -->
+    <div class="card" id="acid-card">
+        <div class="acid-display">
+            <div id="acid-name" class="acid-name">Indlæser...</div>
+            <div id="acid-formula" class="acid-formula">...</div>
+            <div class="acid-subtitle">Gennemfør de fire trin nedenfor</div>
+        </div>
+    </div>
+
+    <!-- ── TRIN 1: Reaktionen ── -->
+    <div class="card step-card" id="step1-card">
+        <div class="step-header">
+            <div class="step-num">1</div>
+            <div>
+                <div class="step-title">Skriv reaktionen</div>
+                <div class="step-sub">Hvad dannes når syren afgiver H⁺ til vand?</div>
+            </div>
+        </div>
+
+        <div class="reaction-row">
+            <span class="chem-box chem-acid" id="step1-acid">HA</span>
+            <span class="chem-op">+</span>
+            <span class="chem-box chem-water">H₂O</span>
+            <span class="chem-op">⇌</span>
+            <select class="sel" id="step1-conj">
+                <option value="">-- Vælg produkt --</option>
+            </select>
+            <span class="chem-op">+</span>
+            <span class="chem-box chem-h3o">H₃O⁺</span>
+        </div>
+
+        <button class="btn-check" onclick="checkStep1()">Tjek reaktion</button>
+        <div class="step-feedback" id="step1-fb"></div>
+    </div>
+
+    <!-- ── TRIN 2: Ks-udtryk ── -->
+    <div class="card step-card locked" id="step2-card">
+        <div class="step-header">
+            <div class="step-num">2</div>
+            <div>
+                <div class="step-title">Opstil K<sub>s</sub>-udtrykket</div>
+                <div class="step-sub">Produkter i tæller &middot; reaktant i nævner &mdash; H₂O udelades som opløsningsmiddel</div>
+            </div>
+        </div>
+
+        <div class="fraction-wrap">
+            <span class="ks-label">K<sub>s</sub> =</span>
+            <div class="fraction">
+                <div class="frac-top">
+                    <select class="sel" id="step2-n1"><option value="">?</option></select>
+                    <span class="frac-dot">&middot;</span>
+                    <select class="sel" id="step2-n2"><option value="">?</option></select>
+                </div>
+                <div class="frac-bot">
+                    <select class="sel" id="step2-d"><option value="">?</option></select>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-check" onclick="checkStep2()">Tjek K<sub>s</sub>-udtryk</button>
+        <div class="step-feedback" id="step2-fb"></div>
+    </div>
+
+    <!-- ── TRIN 3: Beregn pKs (givet Ks) ── -->
+    <div class="card step-card locked" id="step3-card">
+        <div class="step-header">
+            <div class="step-num">3</div>
+            <div>
+                <div class="step-title">Beregn pK<sub>s</sub></div>
+                <div class="step-sub">Du får nu oplyst K<sub>s</sub>-værdien</div>
+            </div>
+        </div>
+
+        <div class="ks-reveal">
+            <div class="ks-reveal-label">Givet fra måling</div>
+            <div class="ks-reveal-value" id="ks-display">K<sub>s</sub> = &mdash;</div>
+        </div>
+
+        <div class="formula-box">
+            <div class="formula-label">Huskeformel</div>
+            <div class="formula-main">pK<sub>s</sub> = &minus;log<sub>10</sub>(K<sub>s</sub>)</div>
+            <button class="btn-hint" id="hint-btn" onclick="toggleHint()">▶ Vis fremgangsmåde trin for trin</button>
+            <div class="hint-box" id="hint-box"></div>
+        </div>
+
+        <div class="pks-input-row">
+            <span class="pks-input-label">pK<sub>s</sub> =</span>
+            <input type="text" id="input-pks" placeholder="fx 4,76" autocomplete="off">
+        </div>
+
+        <button class="btn-check" onclick="checkStep3()">Tjek pK<sub>s</sub>-beregning</button>
+        <div class="step-feedback" id="step3-fb"></div>
+    </div>
+
+    <!-- ── TRIN 4: Klassificer styrke ── -->
+    <div class="card step-card locked" id="step4-card">
+        <div class="step-header">
+            <div class="step-num">4</div>
+            <div>
+                <div class="step-title">Klassificer syrestyrken</div>
+                <div class="step-sub">Basér det på den pK<sub>s</sub>-værdi du beregnede</div>
+            </div>
+        </div>
+
+        <div class="pks-computed-box">
+            Du beregnede: <strong>pK<sub>s</sub> = <span id="pks-result-display"></span></strong>
+        </div>
+
+        <select class="sel" id="input-strength" style="width:100%">
+            <option value="none">-- Vælg styrke --</option>
+            <option value="stærk">Stærk syre &nbsp;(pKs &lt; 0)</option>
+            <option value="middelstærk">Middelstærk syre &nbsp;(0 &lt; pKs &lt; 4)</option>
+            <option value="svag">Svag syre &nbsp;(4 &lt; pKs &lt; 12)</option>
+            <option value="meget svag">Meget svag syre &nbsp;(pKs &gt; 12)</option>
+        </select>
+
+        <div class="strength-hints">
+            <span class="strength-chip">Stærk: fuldstændig dissociation</span>
+            <span class="strength-chip">Middelstærk: delvis dissociation</span>
+            <span class="strength-chip">Svag: minimal dissociation</span>
+        </div>
+
+        <button class="btn-check" id="btn-check4" onclick="checkStep4()">Tjek klassificering</button>
+        <div class="step-feedback" id="step4-fb"></div>
+    </div>
+
+    <!-- ── NÆSTE OPGAVE ── -->
+    <button id="btn-next" onclick="generateTask()">Næste opgave &nbsp;&#8594;</button>
+
+</div>
+</div>
+
+<script>
+    var acidDatabase = [
+        { name: "Saltsyre",     formulaHTML: "HCl",                         formulaUnicode: "HCl",     pKa: -7.0,  strength: "stærk",      conjHTML: "Cl⁻",                     conjUnicode: "Cl⁻" },
+        { name: "Salpetersyre", formulaHTML: "HNO<sub>3</sub>",             formulaUnicode: "HNO₃",    pKa: -1.4,  strength: "stærk",      conjHTML: "NO<sub>3</sub>⁻",         conjUnicode: "NO₃⁻" },
+        { name: "Phosphorsyre", formulaHTML: "H<sub>3</sub>PO<sub>4</sub>", formulaUnicode: "H₃PO₄",  pKa:  2.12, strength: "middelstærk", conjHTML: "H<sub>2</sub>PO<sub>4</sub>⁻", conjUnicode: "H₂PO₄⁻" },
+        { name: "Flussyre",     formulaHTML: "HF",                          formulaUnicode: "HF",      pKa:  3.17, strength: "middelstærk", conjHTML: "F⁻",                      conjUnicode: "F⁻" },
+        { name: "Eddikesyre",   formulaHTML: "CH<sub>3</sub>COOH",          formulaUnicode: "CH₃COOH", pKa:  4.76, strength: "svag",        conjHTML: "CH<sub>3</sub>COO⁻",      conjUnicode: "CH₃COO⁻" },
+        { name: "Kulsyre",      formulaHTML: "H<sub>2</sub>CO<sub>3</sub>", formulaUnicode: "H₂CO₃",  pKa:  6.37, strength: "svag",        conjHTML: "HCO<sub>3</sub>⁻",        conjUnicode: "HCO₃⁻" },
+        { name: "Ammoniumion",  formulaHTML: "NH<sub>4</sub><sup>+</sup>",  formulaUnicode: "NH₄⁺",   pKa:  9.25, strength: "svag",        conjHTML: "NH<sub>3</sub>",           conjUnicode: "NH₃" }
+    ];
+
+    var currentTask = null;
+    var score = 0, streak = 0;
+
+    function formatDanish(n) { return n.toString().replace(".", ","); }
+
+    function formatKs(ks) {
+        var exp  = Math.floor(Math.log10(Math.abs(ks)));
+        var base = ks / Math.pow(10, exp);
+        return formatDanish(base.toFixed(2)) + " &middot; 10<sup>" + exp + "</sup> M";
+    }
+
+    /* ────────────────────────────────
+       TRIN 1 — Reaktionen
+    ──────────────────────────────── */
+    function populateStep1() {
+        document.getElementById("step1-acid").innerHTML = currentTask.formulaHTML;
+
+        var all = acidDatabase.map(function(a) { return a.conjUnicode; })
+                              .sort(function() { return 0.5 - Math.random(); });
+
+        var sel = document.getElementById("step1-conj");
+        sel.innerHTML = '<option value="">-- Vælg produkt --</option>';
+        all.forEach(function(v) {
+            var o = document.createElement("option");
+            o.value = v; o.textContent = v;
+            sel.appendChild(o);
+        });
+        sel.disabled = false;
+    }
+
+    function checkStep1() {
+        var sel = document.getElementById("step1-conj");
+        var fb  = document.getElementById("step1-fb");
+
+        if (sel.value === currentTask.conjUnicode) {
+            fb.className = "step-feedback ok";
+            fb.innerHTML = "Korrekt! " + currentTask.formulaUnicode + " afgiver H⁺ til vand og danner " +
+                           currentTask.conjUnicode + " som konjugeret base.";
+            sel.disabled = true;
+            markDone("step1-card");
+            unlockCard("step2-card");
+            populateStep2();
+            scrollTo("step2-card");
+        } else {
+            fb.className = "step-feedback err";
+            fb.innerHTML = "Ikke korrekt. Hvad mister " + currentTask.formulaUnicode +
+                           " når det afgiver et H⁺?";
+        }
+    }
+
+    /* ────────────────────────────────
+       TRIN 2 — Ks-udtryk
+    ──────────────────────────────── */
+    function populateStep2() {
+        var opts = [currentTask.formulaUnicode, currentTask.conjUnicode, "H₂O", "H₃O⁺"];
+
+        ["step2-n1","step2-n2","step2-d"].forEach(function(id) {
+            var shuffled = opts.slice().sort(function() { return 0.5 - Math.random(); });
+            var sel = document.getElementById(id);
+            sel.innerHTML = '<option value="">?</option>';
+            shuffled.forEach(function(v) {
+                var o = document.createElement("option");
+                o.value = v; o.textContent = v;
+                sel.appendChild(o);
+            });
+            sel.disabled = false;
+        });
+    }
+
+    function checkStep2() {
+        var n1   = document.getElementById("step2-n1").value;
+        var n2   = document.getElementById("step2-n2").value;
+        var den  = document.getElementById("step2-d").value;
+        var fb   = document.getElementById("step2-fb");
+        var conj = currentTask.conjUnicode;
+        var acid = currentTask.formulaUnicode;
+
+        var numOk = (n1 === conj && n2 === "H₃O⁺") || (n1 === "H₃O⁺" && n2 === conj);
+        var denOk = den === acid;
+
+        if (numOk && denOk) {
+            fb.className = "step-feedback ok";
+            fb.innerHTML = "Korrekt! Tæller: [" + conj + "] &middot; [H₃O⁺] &mdash; de to produkter. " +
+                           "Nævner: [" + acid + "] &mdash; reaktanten. " +
+                           "H₂O udelades fordi det er rent opløsningsmiddel (konstant aktivitet &asymp; 1).";
+            ["step2-n1","step2-n2","step2-d"].forEach(function(id) {
+                document.getElementById(id).disabled = true;
+            });
+            markDone("step2-card");
+            unlockCard("step3-card");
+
+            // Reveal Ks value
+            document.getElementById("ks-display").innerHTML = "K<sub>s</sub> = " + formatKs(currentTask.trueKs);
+            scrollTo("step3-card");
+        } else {
+            var msgs = [];
+            if (!numOk) msgs.push("Tælleren skal have de to <em>produkter</em>: " + conj + " og H₃O⁺");
+            if (!denOk) msgs.push("Nævneren skal have <em>reaktanten</em>: " + acid + " (ikke H₂O)");
+            fb.className = "step-feedback err";
+            fb.innerHTML = msgs.join("<br>");
+        }
+    }
+
+    /* ────────────────────────────────
+       TRIN 3 — Beregn pKs
+    ──────────────────────────────── */
+    function toggleHint() {
+        var box = document.getElementById("hint-box");
+        var btn = document.getElementById("hint-btn");
+
+        if (box.style.display !== "block") {
+            var ksFormatted = formatKs(currentTask.trueKs);
+            var ksExp = currentTask.trueKs.toExponential(2).replace("e+","·10^").replace("e-","·10^-").replace("e","·10^");
+            box.innerHTML =
+                '<div class="hint-step"><span class="hint-num">①</span><span>Start med den givne K<sub>s</sub>-værdi: K<sub>s</sub> = ' + ksFormatted + '</span></div>' +
+                '<div class="hint-step"><span class="hint-num">②</span><span>Indsæt i formlen: pK<sub>s</sub> = &minus;log<sub>10</sub>(K<sub>s</sub>)</span></div>' +
+                '<div class="hint-step"><span class="hint-num">③</span><span>Tast på lommeregneren: &minus;log(' + ksExp + ')</span></div>' +
+                '<div class="hint-step"><span class="hint-num">④</span><span>Afrund resultatet til 2 decimaler og opskriv pK<sub>s</sub></span></div>';
+            box.style.display = "block";
+            btn.innerHTML = "▼ Skjul fremgangsmåde";
+        } else {
+            box.style.display = "none";
+            btn.innerHTML = "▶ Vis fremgangsmåde trin for trin";
+        }
+    }
+
+    function checkStep3() {
+        var raw     = document.getElementById("input-pks").value.replace(/\s+/g,"").replace(",",".");
+        var userPks = parseFloat(raw);
+        var fb      = document.getElementById("step3-fb");
+
+        if (isNaN(userPks)) {
+            fb.className = "step-feedback err";
+            fb.innerHTML = "Indtast en talværdi for pK<sub>s</sub>.";
+            return;
+        }
+
+        if (Math.abs(userPks - currentTask.pKa) <= 0.1) {
+            fb.className = "step-feedback ok";
+            fb.innerHTML = "Korrekt! pK<sub>s</sub> = " + formatDanish(currentTask.pKa) +
+                           ". Jo lavere pK<sub>s</sub>, desto stærkere er syren.";
+            document.getElementById("input-pks").disabled = true;
+            markDone("step3-card");
+
+            // Pass pKs value to step 4
+            document.getElementById("pks-result-display").innerHTML = formatDanish(currentTask.pKa);
+
+            unlockCard("step4-card");
+            scrollTo("step4-card");
+        } else {
+            fb.className = "step-feedback err";
+            fb.innerHTML = "Ikke korrekt. Husk: pK<sub>s</sub> = &minus;log<sub>10</sub>(K<sub>s</sub>). " +
+                           "Brug 'Vis fremgangsmåde' for hjælp.";
+        }
+    }
+
+    /* ────────────────────────────────
+       TRIN 4 — Klassificer styrke
+    ──────────────────────────────── */
+    function checkStep4() {
+        var sel = document.getElementById("input-strength");
+        var fb  = document.getElementById("step4-fb");
+
+        if (sel.value === "none") {
+            fb.className = "step-feedback err";
+            fb.innerHTML = "Vælg en syrestyrke fra menuen.";
+            return;
+        }
+
+        if (sel.value !== currentTask.strength) {
+            fb.className = "step-feedback err";
+            fb.innerHTML = "Ikke korrekt. pK<sub>s</sub> = " + formatDanish(currentTask.pKa) +
+                           " — sammenlign med grænserne i menuen.";
+            streak = 0;
+            updateStats();
+            return;
+        }
+
+        var explanations = {
+            "stærk":       "pK<sub>s</sub> = " + formatDanish(currentTask.pKa) + " &lt; 0 — syren er fuldstændig dissocieret i vand.",
+            "middelstærk": "0 &lt; pK<sub>s</sub> = " + formatDanish(currentTask.pKa) + " &lt; 4 — syren er delvist dissocieret.",
+            "svag":        "4 &lt; pK<sub>s</sub> = " + formatDanish(currentTask.pKa) + " &lt; 12 — syren er kun svagt dissocieret.",
+            "meget svag":  "pK<sub>s</sub> = " + formatDanish(currentTask.pKa) + " &gt; 12 — syren reagerer næsten ikke med vand."
+        };
+
+        fb.className = "step-feedback ok";
+        fb.innerHTML = "Korrekt! " + (explanations[currentTask.strength] || "");
+
+        sel.disabled = true;
+        document.getElementById("btn-check4").style.display = "none";
+        markDone("step4-card");
+
+        score += 100 + (streak * 20);
+        streak += 1;
+        updateStats();
+
+        document.getElementById("btn-next").style.display = "block";
+        scrollTo("btn-next");
+    }
+
+    /* ────────────────────────────────
+       HJÆLPEFUNKTIONER
+    ──────────────────────────────── */
+    function markDone(id) { document.getElementById(id).classList.add("done"); }
+    function unlockCard(id) { document.getElementById(id).classList.remove("locked"); }
+
+    function scrollTo(id) {
+        setTimeout(function() {
+            document.getElementById(id).scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 120);
+    }
+
+    function updateStats() {
+        document.getElementById("score-counter").textContent = score;
+        document.getElementById("streak-counter").textContent = streak;
+        document.getElementById("streak-counter").style.color = streak >= 3 ? "#fbbf24" : "var(--green)";
+    }
+
+    /* ────────────────────────────────
+       GENERER NY OPGAVE
+    ──────────────────────────────── */
+    function generateTask() {
+        // Reset step cards
+        ["step1-card","step2-card","step3-card","step4-card"].forEach(function(id) {
+            document.getElementById(id).classList.remove("done","locked");
+        });
+        document.getElementById("step2-card").classList.add("locked");
+        document.getElementById("step3-card").classList.add("locked");
+        document.getElementById("step4-card").classList.add("locked");
+
+        // Reset feedbacks
+        ["step1-fb","step2-fb","step3-fb","step4-fb"].forEach(function(id) {
+            var el = document.getElementById(id);
+            el.className = "step-feedback"; el.innerHTML = "";
+        });
+
+        // Reset inputs
+        document.getElementById("step1-conj").value    = "";
+        document.getElementById("step1-conj").disabled = false;
+        ["step2-n1","step2-n2","step2-d"].forEach(function(id) {
+            document.getElementById(id).value    = "";
+            document.getElementById(id).disabled = false;
+        });
+        document.getElementById("input-pks").value    = "";
+        document.getElementById("input-pks").disabled = false;
+        document.getElementById("input-strength").value    = "none";
+        document.getElementById("input-strength").disabled = false;
+
+        // Reset hint
+        document.getElementById("hint-box").style.display = "none";
+        document.getElementById("hint-btn").innerHTML = "▶ Vis fremgangsmåde trin for trin";
+
+        // Reset buttons
+        document.getElementById("btn-next").style.display   = "none";
+        document.getElementById("btn-check4").style.display = "block";
+
+        // Pick acid
+        var idx = Math.floor(Math.random() * acidDatabase.length);
+        currentTask = acidDatabase[idx];
+        currentTask.trueKs = Math.pow(10, -currentTask.pKa);
+
+        document.getElementById("acid-name").innerHTML    = currentTask.name;
+        document.getElementById("acid-formula").innerHTML = currentTask.formulaHTML;
+        document.getElementById("ks-display").innerHTML   = "K<sub>s</sub> = &mdash;";
+
+        populateStep1();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    window.onload = generateTask;
+</script>
+</body>
+</html>

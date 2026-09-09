@@ -1,0 +1,2027 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forståelse for absorptionsspektre</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-panel: #1e293b;
+            --bg-panel-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #2563eb;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-yellow: #f59e0b;
+            --border-color: #475569;
+            --canvas-bg: #000000;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header Styling */
+        header {
+            background-color: rgba(30, 41, 59, 0.9);
+            padding: 8px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        .stat-box {
+            background-color: var(--bg-dark);
+            padding: 5px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            flex-wrap: wrap;
+            flex: 1;
+            padding: 12px;
+            gap: 12px;
+        }
+
+        /* Canvas / Visualizer Area */
+        .visualizer-section {
+            flex: 2;
+            min-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .canvas-container {
+            background-color: var(--canvas-bg);
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.8), 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            height: clamp(280px, 46vh, 460px);
+            cursor: crosshair;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* The Magnifier / Hover Tooltip */
+        #hover-tooltip {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--accent-blue);
+            padding: 10px;
+            border-radius: 8px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.1s;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            z-index: 5;
+            color: var(--text-main);
+            min-width: 160px;
+        }
+
+        .tooltip-color-indicator {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            margin-top: 5px;
+        }
+
+        /* Info & Quiz Area */
+        .interaction-section {
+            flex: 1;
+            min-width: 340px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .panel {
+            background-color: var(--bg-panel);
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .panel-header {
+            font-size: 1.05rem;
+            color: var(--accent-blue);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 7px;
+            font-weight: bold;
+        }
+
+        .substance-title {
+            font-size: 1.3rem;
+            color: var(--accent-yellow);
+            margin-bottom: 3px;
+        }
+
+        .substance-formula {
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--text-muted);
+            font-size: 1rem;
+            background: rgba(0,0,0,0.3);
+            padding: 3px 7px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .substance-desc {
+            line-height: 1.45;
+            font-size: 0.88rem;
+        }
+
+        /* Quiz Buttons */
+        .quiz-question {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .bonus-badge {
+            display: inline-block;
+            background-color: var(--accent-yellow);
+            color: #1e1e24;
+            font-size: 0.72rem;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-right: 7px;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .quiz-options.color-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .color-swatch-btn {
+            position: relative;
+            height: 62px;
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            overflow: hidden;
+            cursor: pointer;
+            background: #000;
+            transition: transform 0.15s ease, border-color 0.15s ease;
+        }
+
+        .color-swatch-btn .swatch-fill {
+            position: absolute;
+            inset: 0;
+        }
+
+        .color-swatch-btn .swatch-label {
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            text-align: center;
+            font-size: 0.72rem;
+            font-weight: bold;
+            padding: 3px 2px;
+        }
+
+        .color-swatch-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            border-color: var(--accent-blue);
+        }
+
+        .color-swatch-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .color-swatch-btn.correct {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.35);
+        }
+
+        .color-swatch-btn.incorrect {
+            border-color: var(--accent-red);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.35);
+            opacity: 0.55;
+        }
+
+        .color-swatch-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .color-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+            vertical-align: middle;
+            box-shadow: 0 0 3px rgba(255,255,255,0.4);
+        }
+
+        .btn-option {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 9px 13px;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-option:hover:not(:disabled) {
+            background-color: var(--bg-panel-hover);
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        .btn-option:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-option.correct {
+            background-color: rgba(16, 185, 129, 0.2);
+            border-color: var(--accent-green);
+        }
+
+        .btn-option.incorrect {
+            background-color: rgba(239, 68, 68, 0.2);
+            border-color: var(--accent-red);
+        }
+
+        .btn-option:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Controls */
+        .controls-row {
+            display: flex;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            flex: 1;
+            text-align: center;
+            transition: background 0.2s, transform 0.1s;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), #2563eb);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #60a5fa, var(--accent-blue));
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-panel-hover);
+        }
+
+        .btn-primary:disabled {
+            background: var(--border-color);
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Feedback Area */
+        .feedback-area {
+            min-height: 50px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: rgba(0,0,0,0.2);
+            border-left: 4px solid transparent;
+            font-size: 0.88rem;
+            line-height: 1.4;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-area.show {
+            display: block;
+        }
+
+        .feedback-area.success {
+            border-color: var(--accent-green);
+        }
+
+        .feedback-area.error {
+            border-color: var(--accent-red);
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background-color: var(--bg-panel);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: var(--accent-red);
+        }
+
+        .modal-title {
+            color: var(--accent-blue);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .modal-body {
+            line-height: 1.7;
+            color: var(--text-main);
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .modal-body h3 {
+            margin-top: 15px;
+            margin-bottom: 5px;
+            color: var(--accent-yellow);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Particle System Container */
+        #particle-container {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        /* Responsive constraints */
+        @media (max-width: 1000px) {
+            .visualizer-section { min-width: 100%; }
+            .canvas-container { height: clamp(260px, 40vh, 360px); }
+        }
+
+        /* Tabs */
+        header {
+            flex-wrap: wrap;
+            row-gap: 8px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .tab-btn {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 7px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            background-color: var(--bg-panel-hover);
+        }
+
+        .tab-btn.active {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        /* Cuvette color-explanation tab */
+        .cc-substance-picker {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .cc-substance-picker select {
+            flex: 1;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-size: 0.9rem;
+        }
+
+        #cc-result-swatch {
+            transition: background-color 0.4s ease;
+        }
+
+        .cc-legend-row {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .cc-legend-dot {
+            display: inline-block;
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+
+        /* "Præsentér animationen"-knap: pulserer diskret, så man opdager den findes */
+        @keyframes presentBtnPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.55); }
+            50% { box-shadow: 0 0 0 7px rgba(245, 158, 11, 0); }
+        }
+
+        #presentBtn {
+            animation: presentBtnPulse 2.4s ease-out infinite;
+            border-color: var(--accent-yellow);
+            color: var(--accent-yellow);
+        }
+
+        /* Præsentér: guidet rundtur der forklarer animationen (samme mønster som bordgrupper.html / c8.2) */
+        @keyframes tourPulse {
+            0% { box-shadow: 0 0 0 4px rgba(245, 158, 11, .95), 0 0 0 4px rgba(245, 158, 11, .5), 0 0 0 9999px rgba(0, 0, 0, .7); }
+            70% { box-shadow: 0 0 0 4px rgba(245, 158, 11, .95), 0 0 0 16px rgba(245, 158, 11, 0), 0 0 0 9999px rgba(0, 0, 0, .7); }
+            100% { box-shadow: 0 0 0 4px rgba(245, 158, 11, .95), 0 0 0 16px rgba(245, 158, 11, 0), 0 0 0 9999px rgba(0, 0, 0, .7); }
+        }
+
+        .tour-highlight {
+            position: relative;
+            z-index: 10000;
+            border-radius: 8px;
+            animation: tourPulse 1.6s ease-out infinite;
+        }
+
+        .tour-tooltip {
+            position: fixed;
+            z-index: 10001;
+            max-width: 320px;
+            background: #f8fafc;
+            color: #1f2933;
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .5);
+        }
+
+        .tour-tooltip .tt-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            gap: 8px;
+        }
+
+        .tour-tooltip button {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .tour-tooltip .tt-skip {
+            background: transparent;
+            color: #64748b;
+            border-color: #cbd5e1;
+        }
+
+        .tour-tooltip .tt-next {
+            background: var(--accent-yellow);
+            color: #1f2933;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Forståelse for absorptionsspektre</h1>
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="tab-spectrum">1. Spektrum & Quiz</button>
+            <button class="tab-btn" data-tab="tab-cuvette">2. Hvorfor denne farve?</button>
+        </div>
+        <div class="header-stats">
+            <button class="btn-secondary" id="presentBtn" style="padding: 6px 12px; font-size: 0.9rem;" onclick="startPresentTour()">🎬 Præsentér animationen</button>
+            <button class="btn-secondary" style="padding: 6px 12px; font-size: 0.9rem;" onclick="app.openTheory()">📘 Teori</button>
+        </div>
+    </header>
+
+    <div class="main-container tab-content active" id="tab-spectrum">
+        <!-- Visualizer Area -->
+        <section class="visualizer-section">
+            <div class="panel" style="flex: 1; padding: 10px;">
+                <div class="canvas-container" id="canvas-wrapper">
+                    <canvas id="spectrum-canvas"></canvas>
+                    <div id="hover-tooltip">
+                        <div id="tt-wavelength" style="font-weight: bold; color: var(--accent-yellow);">Bølgelængde: - nm</div>
+                        <div id="tt-absorbance">Absorbans: -</div>
+                        <div id="tt-color">Farve: -</div>
+                        <div class="tooltip-color-indicator" id="tt-color-bar"></div>
+                    </div>
+                </div>
+                <div style="text-align: center; font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">
+                    * Hold musen over grafen for at aktivere forstørrelses- og analyseværktøjet. Målt i bølgelængder fra 400 nm til 700 nm.
+                </div>
+            </div>
+        </section>
+
+        <!-- Interaction Area -->
+        <section class="interaction-section">
+            <div class="panel">
+                <div class="panel-header">Laboratorie Prøve <span id="substance-counter">1/5</span></div>
+                
+                <div id="substance-info">
+                    <div class="substance-title" id="info-name">Klorofyl a</div>
+                    <div class="substance-formula" id="info-formula">C₅₅H₇₂MgN₄O₅</div>
+                    <p class="substance-desc" id="info-desc" style="margin-top: 10px;">
+                        Loading description...
+                    </p>
+                </div>
+            </div>
+
+            <div class="panel" style="flex: 1; justify-content: flex-start;">
+                <div class="panel-header">Test din forståelse</div>
+                
+                <div id="quiz-container">
+                    <div class="quiz-question" id="quiz-question">Spørgsmål loader...</div>
+                    <div class="quiz-options" id="quiz-options">
+                        <!-- Options injected via JS -->
+                    </div>
+                </div>
+
+                <div class="feedback-area" id="feedback-box">
+                    <strong id="feedback-title">Korrekt!</strong>
+                    <div id="feedback-text">Her er en forklaring.</div>
+                </div>
+
+                <div class="controls-row">
+                    <button class="btn-secondary" id="btn-restart" onclick="app.restartApp()">🔄 Genstart</button>
+                    <button class="btn-primary" id="btn-next" onclick="app.nextQuestion()" disabled>Næste ⟶</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="main-container tab-content" id="tab-cuvette">
+        <!-- Visualizer Area -->
+        <section class="visualizer-section">
+            <div class="panel" style="flex: 1; padding: 10px;">
+                <div class="cc-substance-picker">
+                    <label for="cc-substance-select">Vælg stof:</label>
+                    <select id="cc-substance-select"></select>
+                </div>
+                <div class="canvas-container" id="cc-canvas-wrapper">
+                    <canvas id="cc-canvas"></canvas>
+                </div>
+                <div class="cc-legend-row">
+                    <span><span class="cc-legend-dot" style="background:#fff;"></span>Hvidt lys ind (alle bølgelængder)</span>
+                    <span><span class="cc-legend-dot" style="background:#ef4444;"></span>Absorberet i kuvetten</span>
+                </div>
+                <div style="text-align: center; font-size: 0.78rem; color: var(--text-muted); margin-top: 6px;">
+                    * Her ser vi ikke på koncentration eller kuvettebredde (det er Lambert-Beers lov) - vi kigger kun på, hvilke bølgelængder der slipper igennem, og hvorfor det giver stoffet dets farve.
+                </div>
+            </div>
+        </section>
+
+        <!-- Interaction Area -->
+        <section class="interaction-section">
+            <div class="panel">
+                <div class="panel-header">Farven vi ser</div>
+                <div style="display:flex; align-items:center; gap:14px;">
+                    <div id="cc-result-swatch" style="width:60px;height:60px;border-radius:10px;border:2px solid var(--border-color); flex-shrink:0;"></div>
+                    <div>
+                        <div style="font-weight:bold; color:var(--accent-yellow); font-size:1.1rem;" id="cc-result-name">-</div>
+                        <div style="font-size:0.82rem; color:var(--text-muted);">Farven af det lys, der IKKE bliver absorberet</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel" style="flex: 1; justify-content: flex-start;">
+                <div class="panel-header">Hvorfor får stoffet denne farve?</div>
+                <div class="substance-title" id="cc-info-name" style="font-size: 1.1rem;">-</div>
+                <p class="substance-desc" id="cc-explain-text" style="margin-top: 6px;">
+                    Loading...
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <!-- Theory Modal -->
+    <div class="modal-overlay" id="theory-modal">
+        <div class="modal-content">
+            <div class="modal-close" onclick="app.closeTheory()">✖</div>
+            <h2 class="modal-title">Teorien bag Absorptionsspektre</h2>
+            <div class="modal-body">
+                <p>Når hvidt lys (som indeholder alle synlige farver) passerer gennem en kemisk opløsning, vil molekylerne absorbere bestemte bølgelængder (farver) af lyset. Den lysmængde, der ikke absorberes, transmitteres (slipper igennem) og rammer vores øjne.</p>
+                
+                <h3>Bølgelængder (λ) og Farver</h3>
+                <p>Det synlige spektrum strækker sig cirka fra <strong>400 nm til 700 nm</strong>:</p>
+                <ul style="margin-left: 20px; margin-bottom: 10px;">
+                    <li>400 - 450 nm: Violet</li>
+                    <li>450 - 495 nm: Blå</li>
+                    <li>495 - 570 nm: Grøn</li>
+                    <li>570 - 590 nm: Gul</li>
+                    <li>590 - 620 nm: Orange</li>
+                    <li>620 - 700 nm: Rød</li>
+                </ul>
+
+                <h3>Komplementærfarver</h3>
+                <p>Farven af en opløsning bestemmes af de bølgelængder, stoffet <em>ikke</em> absorberer. Hvis et stof absorberer blåt lys kraftigt, vil det ofte fremstå med komplementærfarven orange eller gul. Klorofyl absorberer blåt og rødt lys, hvilket gør, at det transmitterer grønt lys og dermed ser grønt ud for os.</p>
+
+                <h3>Beer-Lamberts Lov</h3>
+                <p>Absorbansen (A) er et mål for, hvor meget lys der absorberes ved en given bølgelængde. Ifølge Beer-Lamberts lov gælder det at absorbansen er ligefrem proportional med stoffets koncentration. I denne simulation kigger vi udelukkende på formen af absorptionskurven.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- End Modal -->
+    <div class="modal-overlay" id="end-modal">
+        <div class="modal-content" style="text-align: center;">
+            <h2 class="modal-title" style="font-size: 2rem;">Eksperiment Færdigt!</h2>
+            <div class="modal-body">
+                <p style="font-size: 1.2rem; margin-bottom: 20px;">Du har analyseret alle spektre.</p>
+                <div style="font-size: 3rem; margin-bottom: 20px;">🎉</div>
+                <p>Godt klaret! Vil du tage en tur mere i laboratoriet for at forbedre din viden?</p>
+                <button class="btn-primary" style="margin-top: 20px; font-size: 1.2rem;" onclick="app.restartApp(); app.closeEndModal();">Tag laboratoriekit på igen 🥼</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="particle-container"></div>
+
+<script>
+/* =======================================================
+   DATA: Absorptionsspektre og Quiz Spørgsmål
+   ======================================================= */
+
+// Standard sæt af farve-swatches til de interaktive "klik på farven" spørgsmål
+const COLOR_SWATCH_SET = [
+    { label: "Violet", nm: 420 },
+    { label: "Blå", nm: 470 },
+    { label: "Grøn", nm: 530 },
+    { label: "Gul", nm: 580 },
+    { label: "Orange", nm: 605 },
+    { label: "Rød", nm: 660 }
+];
+
+const spectraData = [
+    {
+        id: "klorofyl-a",
+        name: "Klorofyl a",
+        formula: "C₅₅H₇₂MgN₄O₅",
+        description: "Et grønt pigment, der findes i de fleste planter og alger. Det er fuldstændig essentielt for fotosyntesen, da det omdanner lysenergi til kemisk energi.",
+        peaks: [
+            { center: 430, width: 22, height: 1.4 },
+            { center: 660, width: 18, height: 1.1 }
+        ],
+        questions: [
+            {
+                q: "Hvilke farver lys absorberes primært af Klorofyl a, baseret på grafen?",
+                options: [
+                    "Grøn og gul",
+                    "Blå og rød",
+                    "Udelukkende grøn",
+                    "Violet og infrarød"
+                ],
+                correct: 1,
+                explanation: "Klorofyl a har store absorptionstoppe i det blå (~430 nm) og det røde (~660 nm) område."
+            },
+            {
+                type: "color",
+                q: "🎨 Gæt farvenuancen! Klik på den farve, klorofyl a faktisk har.",
+                options: COLOR_SWATCH_SET,
+                correct: 2,
+                explanation: "Rigtigt! Klorofyl a er grøn."
+            },
+            {
+                q: "Hvorfor fremstår klorofyl som grønt for vores blotte øje?",
+                options: [
+                    "Fordi det absorberer grønt lys",
+                    "Fordi magnesium-ionen udsender grønt lys",
+                    "Fordi det transmitterer og reflekterer det grønne lys",
+                    "Fordi planter er skabt sådan uden kemisk grund"
+                ],
+                correct: 2,
+                explanation: "Når blå og rød absorberes effektivt, kastes det resterende lys (overvejende grønt omkring 500-550 nm) tilbage til vores øjne."
+            }
+        ]
+    },
+    {
+        id: "betakaroten",
+        name: "Beta-karoten",
+        formula: "C₄₀H₅₆",
+        description: "Et stærkt farvet rødt-orange pigment, der findes i høj koncentration i gulerødder, søde kartofler og græskar.",
+        peaks: [
+            { center: 450, width: 30, height: 1.35 },
+            { center: 480, width: 25, height: 1.25 }
+        ],
+        questions: [
+            {
+                q: "Hvilket bølgelængdeområde har Beta-karoten sin maksimale absorbans i?",
+                options: [
+                    "400 - 500 nm (Blå/Cyan)",
+                    "500 - 600 nm (Grøn/Gul)",
+                    "600 - 700 nm (Orange/Rød)",
+                    "Det absorberer jævnt overalt"
+                ],
+                correct: 0,
+                explanation: "Grafen viser at absorbansen er højest mellem 400 nm og 500 nm, hvilket svarer til blåt lys."
+            },
+            {
+                type: "color",
+                q: "🎨 Gæt farvenuancen! Klik på den farve, beta-karoten faktisk har.",
+                options: COLOR_SWATCH_SET,
+                correct: 4,
+                explanation: "Rigtigt! Beta-karoten er orange."
+            }
+        ]
+    },
+    {
+        id: "kaliumpermanganat",
+        name: "Kaliumpermanganat",
+        formula: "KMnO₄",
+        description: "Et uorganisk salt, der opløst i vand danner en intens violet/lilla opløsning. Det er et stærkt oxidationsmiddel.",
+        peaks: [
+            { center: 530, width: 45, height: 1.6 },
+            { center: 550, width: 35, height: 1.4 } // Dobbelt top simulation
+        ],
+        questions: [
+            {
+                q: "Hvilken farve har det lys, som KMnO₄ absorberer mest effektivt?",
+                options: [
+                    "Rød",
+                    "Blå",
+                    "Grøn",
+                    "Violet"
+                ],
+                correct: 2,
+                explanation: "Maksimal absorbans ligger omkring 530 nm, hvilket er midt i det grønne område."
+            },
+            {
+                type: "color",
+                q: "🎨 Gæt farvenuancen! Klik på den farve, en KMnO₄-opløsning faktisk har.",
+                options: COLOR_SWATCH_SET,
+                correct: 0,
+                explanation: "Rigtigt! En KMnO₄-opløsning er violet/lilla."
+            },
+            {
+                q: "Når KMnO₄ absorberer grønt lys, fremstår væsken lilla/violet. Hvad kaldes dette fænomen?",
+                options: [
+                    "Diffraktion af lyset",
+                    "Komplementærfarve-effekten",
+                    "Kromatisk aberration i linsen",
+                    "Kemo-luminescens i væsken"
+                ],
+                correct: 1,
+                explanation: "Violet (en blanding af rød og blå transmission) er komplementærfarven til grøn. Når grøn fjernes fra hvidt lys, ser vi violet."
+            }
+        ]
+    },
+    {
+        id: "kobber-sulfat",
+        name: "Kobber(II)sulfat",
+        formula: "CuSO₄(aq)",
+        description: "En vandig opløsning af kobber(II)ioner. Opløsningen er kendt for sin meget karakteristiske, klare blå farve i laboratoriet.",
+        peaks: [
+            { center: 800, width: 120, height: 1.8 } // Top ligger i IR, men "halen" går ned gennem rød
+        ],
+        questions: [
+            {
+                q: "Grafen viser en stigende absorbans mod højre (højere bølgelængder). Hvilket område absorberes mest i det synlige spektrum?",
+                options: [
+                    "Det violette og blå område",
+                    "Det grønne område alene",
+                    "Det gule, orange og røde område",
+                    "Ingen dele af det synlige spektrum"
+                ],
+                correct: 2,
+                explanation: "Absorbansen stiger kraftigt fra 600 nm mod 700 nm, som udgør det røde og orange område af spektret."
+            },
+            {
+                type: "color",
+                q: "🎨 Gæt farvenuancen! Klik på den farve, en CuSO₄-opløsning faktisk har.",
+                options: COLOR_SWATCH_SET,
+                correct: 1,
+                explanation: "Rigtigt! En CuSO₄-opløsning er blå."
+            },
+            {
+                q: "Hvorfor er kobbersulfat-opløsningen blå?",
+                options: [
+                    "Kobber-ioner udsender selv blåt lys, når de bliver oxideret",
+                    "Fordi de længere bølgelængder (rød/orange) absorberes, mens blå slipper igennem",
+                    "Fordi vand i sig selv altid har en naturlig blå farvetone",
+                    "Fordi sulfat-ionen spreder og udsender kraftigt blåt lys"
+                ],
+                correct: 1,
+                explanation: "Absorptionen af rødt lys betyder, at det blå lys transmitteres uhindret gennem opløsningen."
+            }
+        ]
+    },
+    {
+        id: "cytochrom-c",
+        name: "Cytochrom c (reduceret)",
+        formula: "Cyt c (Fe²⁺)",
+        description: "Et lille protein, der fungerer i mitokondriernes elektrontransportkæde. Det har et karakteristisk spektrum afhængigt af jernets oxidationstrin.",
+        peaks: [
+            { center: 415, width: 15, height: 1.7 }, // Soret peak
+            { center: 520, width: 12, height: 0.4 }, // Beta peak
+            { center: 550, width: 8, height: 0.8 }   // Alpha peak
+        ],
+        questions: [
+            {
+                q: "Hvilken 'top' er den mest dominerende i dette spektrum?",
+                options: [
+                    "Toppen ved 415 nm",
+                    "Toppen ved 520 nm",
+                    "Toppen ved 550 nm",
+                    "De er alle lige store"
+                ],
+                correct: 0,
+                explanation: "Toppen i det violette/blå område (~415 nm) er langt højere og repræsenterer den kraftigste absorption."
+            },
+            {
+                type: "color",
+                q: "🎨 Gæt farvenuancen! Klik på den farve, reduceret cytochrom c faktisk har.",
+                options: COLOR_SWATCH_SET,
+                correct: 5,
+                explanation: "Rigtigt! Reduceret cytochrom c er rød/pink."
+            },
+            {
+                bonus: true,
+                q: "Hvad indikerer de meget skarpe og smalle toppe ved 520 nm og 550 nm?",
+                options: [
+                    "At stoffet befinder sig i gasform ved målingen",
+                    "At absorbansen spænder over mange forskellige energiniveauer",
+                    "Specifikke og veldefinerede elektronovergange i hæmgruppen",
+                    "Fejl i spektrofotometerets måling af absorbansen"
+                ],
+                correct: 2,
+                explanation: "Smalle toppe i et absorptionsspektrum peger på meget specifikke elektronovergange, typisk for komplekse molekyler som porfyrin-ringen i cytochrom c."
+            }
+        ]
+    }
+];
+
+/* =======================================================
+   HELPER FUNKTIONER (Matematik & Formatering)
+   ======================================================= */
+
+// Returnerer {r,g,b} baseret på bølgelængde i nm (synligt lys 400-700)
+function nmToRGB(wavelength) {
+    var R = 0, G = 0, B = 0;
+    if (wavelength >= 380 && wavelength < 440) {
+        R = -(wavelength - 440) / (440 - 380);
+        B = 1.0;
+    } else if (wavelength >= 440 && wavelength < 490) {
+        G = (wavelength - 440) / (490 - 440);
+        B = 1.0;
+    } else if (wavelength >= 490 && wavelength < 510) {
+        G = 1.0;
+        B = -(wavelength - 510) / (510 - 490);
+    } else if (wavelength >= 510 && wavelength < 580) {
+        R = (wavelength - 510) / (580 - 510);
+        G = 1.0;
+    } else if (wavelength >= 580 && wavelength < 645) {
+        R = 1.0;
+        G = -(wavelength - 645) / (645 - 580);
+    } else if (wavelength >= 645 && wavelength <= 780) {
+        R = 1.0;
+    }
+
+    // Intensitet falder i yderkantområderne for realistisk visning
+    var intensity = 1.0;
+    if (wavelength > 700) intensity = 0.3 + 0.7 * (780 - wavelength) / (780 - 700);
+    else if (wavelength < 420) intensity = 0.3 + 0.7 * (wavelength - 380) / (420 - 380);
+
+    return {
+        r: Math.round(R * intensity * 255),
+        g: Math.round(G * intensity * 255),
+        b: Math.round(B * intensity * 255)
+    };
+}
+
+// Returnerer RGB streng baseret på bølgelængde i nm (synligt lys 400-700)
+function nmToRGBString(wavelength) {
+    var c = nmToRGB(wavelength);
+    return "rgb(" + c.r + "," + c.g + "," + c.b + ")";
+}
+
+// Omdanner engelsk decimalpunktum til dansk komma
+function formatDanish(num, decimals) {
+    var str = num.toFixed(decimals);
+    return str.replace(".", ",");
+}
+
+// Gaussian funktion til at udregne absorbanskurven ud fra peaks
+function calculateAbsorbance(nm, peaks) {
+    var abs = 0;
+    for (var i = 0; i < peaks.length; i++) {
+        var peak = peaks[i];
+        // Gaussisk fordeling: A * e^(-(x-x0)^2 / (2*sigma^2))
+        abs += peak.height * Math.exp(-Math.pow(nm - peak.center, 2) / (2 * Math.pow(peak.width, 2)));
+    }
+    return abs;
+}
+
+// Repræsentativ bølgelængde for danske farveord, brugt til at farvelægge quiz-tekst
+const colorWordToNm = {
+    "rød": 660, "blå": 470, "grøn": 530, "gul": 580,
+    "orange": 605, "violet": 420, "lilla": 425, "cyan": 485
+};
+
+// Indsætter en lille farveprik foran genkendte farveord i quiz-teksten (kun statisk, hardkodet data)
+function highlightColorWords(text) {
+    return text.replace(/(rød|blå|grøn|gul|orange|violet|lilla|cyan)/gi, function(match) {
+        var nm = colorWordToNm[match.toLowerCase()];
+        var hex = nmToRGBString(nm);
+        return '<span class="color-dot" style="background:' + hex + '"></span>' + match;
+    });
+}
+
+// Bølgelængde til farvenavn (simpel dansk oversættelse)
+function getColorName(nm) {
+    if (nm < 450) return "Violet";
+    if (nm < 495) return "Blå";
+    if (nm < 570) return "Grøn";
+    if (nm < 590) return "Gul";
+    if (nm < 620) return "Orange";
+    if (nm <= 750) return "Rød";
+    return "Infrarød/Usynlig";
+}
+
+// Finder det stof-facit for "hvilken farve har det" quizspørgsmål, så vi bruger
+// samme (rigtige) farve i kuvette-fanen som i quizzen, i stedet for at regne den ud selv.
+function getApparentColor(substanceData) {
+    for (var i = 0; i < substanceData.questions.length; i++) {
+        var q = substanceData.questions[i];
+        if (q.type === 'color') {
+            var swatch = q.options[q.correct];
+            return { nm: swatch.nm, label: swatch.label };
+        }
+    }
+    return { nm: 550, label: "Ukendt" };
+}
+
+// Deler det synlige spektrum op i farve-bånd og finder ud af, hvilke bånd stoffet
+// primært absorberer, og hvilke der stort set slipper igennem.
+function classifySpectrumBands(peaks) {
+    var bands = [
+        { name: "violette", lo: 400, hi: 450 },
+        { name: "blå", lo: 450, hi: 495 },
+        { name: "grønne", lo: 495, hi: 570 },
+        { name: "gule", lo: 570, hi: 590 },
+        { name: "orange", lo: 590, hi: 620 },
+        { name: "røde", lo: 620, hi: 700 }
+    ];
+
+    var results = bands.map(function(b) {
+        var sum = 0, n = 0;
+        for (var nm = b.lo; nm <= b.hi; nm += 5) {
+            sum += calculateAbsorbance(nm, peaks);
+            n++;
+        }
+        return { name: b.name, avg: sum / n };
+    });
+
+    var maxAvg = Math.max.apply(null, results.map(function(r) { return r.avg; }));
+
+    var absorbed = results.filter(function(r) {
+        return maxAvg > 0.15 && r.avg > maxAvg * 0.5;
+    }).map(function(r) { return r.name; });
+
+    var transmitted = results.filter(function(r) {
+        return absorbed.indexOf(r.name) === -1;
+    }).map(function(r) { return r.name; });
+
+    return { absorbed: absorbed, transmitted: transmitted };
+}
+
+/* =======================================================
+   CANVAS GRAPH ENGINE
+   ======================================================= */
+class SpectrumGrapher {
+    constructor(canvasId, tooltipId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.tooltip = document.getElementById(tooltipId);
+        this.ttWavelength = document.getElementById('tt-wavelength');
+        this.ttAbsorbance = document.getElementById('tt-absorbance');
+        this.ttColor = document.getElementById('tt-color');
+        this.ttColorBar = document.getElementById('tt-color-bar');
+        
+        // Graf Opsætning
+        this.minX = 400; // nm
+        this.maxX = 700; // nm
+        this.maxY = 2.0; // Absorbans max
+        
+        this.currentPeaks = [];
+        this.hoverX = null;
+        this.hoverY = null;
+
+        // Resize håndtering
+        this.resize();
+        window.addEventListener('resize', this.resize.bind(this));
+
+        // Interaktion
+        this.canvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
+        this.canvas.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
+    }
+
+    resize() {
+        var wrapper = this.canvas.parentElement;
+        this.canvas.width = wrapper.clientWidth;
+        this.canvas.height = wrapper.clientHeight;
+        
+        // Margener internt i canvas
+        this.padding = { top: 40, right: 30, bottom: 60, left: 60 };
+        this.plotWidth = this.canvas.width - this.padding.left - this.padding.right;
+        this.plotHeight = this.canvas.height - this.padding.top - this.padding.bottom;
+        
+        this.draw();
+    }
+
+    setPeaks(peaks) {
+        this.currentPeaks = peaks;
+        this.draw();
+    }
+
+    handleMouseMove(e) {
+        var rect = this.canvas.getBoundingClientRect();
+        var mouseX = e.clientX - rect.left;
+        var mouseY = e.clientY - rect.top;
+
+        // Tjek om indenfor plot-området
+        if (mouseX >= this.padding.left && mouseX <= this.canvas.width - this.padding.right &&
+            mouseY >= this.padding.top && mouseY <= this.canvas.height - this.padding.bottom) {
+            
+            this.hoverX = mouseX;
+            // Beregn faktiske værdier
+            var nm = this.pixelToX(mouseX);
+            var abs = calculateAbsorbance(nm, this.currentPeaks);
+            this.hoverY = this.yToPixel(abs);
+
+            // Opdater Tooltip UI
+            this.ttWavelength.textContent = "Bølgelængde: " + Math.round(nm) + " nm";
+            this.ttAbsorbance.textContent = "Absorbans: " + formatDanish(abs, 2);
+            this.ttColor.textContent = "Farve: " + getColorName(nm);
+            
+            var colorStr = nmToRGBString(nm);
+            this.ttColorBar.style.backgroundColor = colorStr;
+            this.tooltip.style.borderLeft = "4px solid " + colorStr;
+
+            // Placer tooltip
+            var ttX = e.clientX + 15;
+            var ttY = e.clientY + 15;
+            this.tooltip.style.left = ttX + "px";
+            this.tooltip.style.top = ttY + "px";
+            this.tooltip.style.opacity = "1";
+
+            this.draw(); // Genoptegn med hover effekter
+        } else {
+            this.handleMouseLeave();
+        }
+    }
+
+    handleMouseLeave() {
+        this.hoverX = null;
+        this.hoverY = null;
+        this.tooltip.style.opacity = "0";
+        this.draw();
+    }
+
+    // Matematik konvertering
+    pixelToX(px) {
+        return this.minX + ((px - this.padding.left) / this.plotWidth) * (this.maxX - this.minX);
+    }
+    xToPixel(x) {
+        return this.padding.left + ((x - this.minX) / (this.maxX - this.minX)) * this.plotWidth;
+    }
+    yToPixel(y) {
+        return this.padding.top + this.plotHeight - ((y / this.maxY) * this.plotHeight);
+    }
+
+    draw() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.drawGridAndAxes();
+        this.drawVisibleSpectrumBand();
+        
+        if (this.currentPeaks.length > 0) {
+            this.drawSpectrumCurve();
+        }
+
+        if (this.hoverX !== null) {
+            this.drawHoverCrosshair();
+        }
+    }
+
+    drawGridAndAxes() {
+        this.ctx.strokeStyle = '#334155';
+        this.ctx.lineWidth = 1;
+        this.ctx.font = '12px Segoe UI';
+        this.ctx.fillStyle = '#94a3b8';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'top';
+
+        // Vertikale linjer (Bølgelængde)
+        var xSteps = 6;
+        for (var i = 0; i <= xSteps; i++) {
+            var nm = this.minX + i * ((this.maxX - this.minX) / xSteps);
+            var px = this.xToPixel(nm);
+            
+            this.ctx.beginPath();
+            this.ctx.moveTo(px, this.padding.top);
+            this.ctx.lineTo(px, this.canvas.height - this.padding.bottom + 5);
+            this.ctx.stroke();
+            
+            this.ctx.fillText(Math.round(nm), px, this.canvas.height - this.padding.bottom + 15);
+        }
+
+        // Horisontale linjer (Absorbans)
+        this.ctx.textAlign = 'right';
+        this.ctx.textBaseline = 'middle';
+        var ySteps = 4;
+        for (var j = 0; j <= ySteps; j++) {
+            var abs = j * (this.maxY / ySteps);
+            var py = this.yToPixel(abs);
+
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.padding.left - 5, py);
+            this.ctx.lineTo(this.canvas.width - this.padding.right, py);
+            this.ctx.stroke();
+
+            this.ctx.fillText(formatDanish(abs, 1), this.padding.left - 10, py);
+        }
+
+        // Akse titler
+        this.ctx.font = 'bold 14px Segoe UI';
+        this.ctx.fillStyle = '#f8fafc';
+        
+        // X-Akse
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText("Bølgelængde λ (nm)", this.padding.left + this.plotWidth / 2, this.canvas.height - 20);
+        
+        // Y-Akse
+        this.ctx.save();
+        this.ctx.translate(20, this.padding.top + this.plotHeight / 2);
+        this.ctx.rotate(-Math.PI / 2);
+        this.ctx.fillText("Absorbans (A)", 0, 0);
+        this.ctx.restore();
+    }
+
+    drawVisibleSpectrumBand() {
+        // En farvebjælke under X-aksen
+        var yPos = this.canvas.height - this.padding.bottom + 5;
+        var barHeight = 6;
+
+        for (var i = 0; i < this.plotWidth; i++) {
+            var nm = this.pixelToX(this.padding.left + i);
+            this.ctx.fillStyle = nmToRGBString(nm);
+            this.ctx.fillRect(this.padding.left + i, yPos, 1, barHeight);
+        }
+    }
+
+    drawSpectrumCurve() {
+        this.ctx.beginPath();
+        this.ctx.lineWidth = 4;
+        this.ctx.strokeStyle = '#38bdf8'; // Lyseblå
+        this.ctx.shadowColor = '#0284c7';
+        this.ctx.shadowBlur = 10;
+        this.ctx.lineJoin = 'round';
+
+        var startPx = this.padding.left;
+        var endPx = this.canvas.width - this.padding.right;
+
+        // Fyld under kurven med en gradient (repræsenterer absorberet lys mængde)
+        var gradient = this.ctx.createLinearGradient(0, this.padding.top, 0, this.canvas.height - this.padding.bottom);
+        gradient.addColorStop(0, "rgba(56, 189, 248, 0.4)");
+        gradient.addColorStop(1, "rgba(56, 189, 248, 0.0)");
+
+        this.ctx.moveTo(startPx, this.canvas.height - this.padding.bottom);
+
+        var points = [];
+        for (var px = startPx; px <= endPx; px++) {
+            var nm = this.pixelToX(px);
+            var abs = calculateAbsorbance(nm, this.currentPeaks);
+            
+            // Begræns indenfor grafen
+            if (abs > this.maxY) abs = this.maxY;
+            
+            var py = this.yToPixel(abs);
+            points.push({x: px, y: py});
+            this.ctx.lineTo(px, py);
+        }
+
+        // Færdiggør fyld
+        this.ctx.lineTo(endPx, this.canvas.height - this.padding.bottom);
+        this.ctx.fillStyle = gradient;
+        this.ctx.fill();
+
+        // Tegn selve stregen ovenpå
+        this.ctx.beginPath();
+        this.ctx.moveTo(points[0].x, points[0].y);
+        for(var k=1; k<points.length; k++) {
+            this.ctx.lineTo(points[k].x, points[k].y);
+        }
+        this.ctx.stroke();
+        
+        // Reset skygge
+        this.ctx.shadowBlur = 0;
+    }
+
+    drawHoverCrosshair() {
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+        this.ctx.lineWidth = 1;
+        this.ctx.setLineDash([5, 5]);
+
+        // Lodret streg
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.hoverX, this.padding.top);
+        this.ctx.lineTo(this.hoverX, this.canvas.height - this.padding.bottom);
+        this.ctx.stroke();
+
+        // Vandret streg
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.padding.left, this.hoverY);
+        this.ctx.lineTo(this.canvas.width - this.padding.right, this.hoverY);
+        this.ctx.stroke();
+
+        this.ctx.setLineDash([]);
+
+        // Markør cirkel på kurven
+        var nm = this.pixelToX(this.hoverX);
+        var colorStr = nmToRGBString(nm);
+        
+        this.ctx.beginPath();
+        this.ctx.arc(this.hoverX, this.hoverY, 6, 0, Math.PI * 2);
+        this.ctx.fillStyle = colorStr;
+        this.ctx.fill();
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeStyle = '#ffffff';
+        this.ctx.stroke();
+    }
+}
+
+/* =======================================================
+   PARTICLE ENGINE (Visual Effects)
+   ======================================================= */
+class ParticleSystem {
+    constructor(containerId) {
+        this.container = document.getElementById(containerId);
+    }
+
+    spawnSuccess(x, y) {
+        var colors = ['#10b981', '#3b82f6', '#f59e0b', '#ffffff'];
+        for (var i = 0; i < 30; i++) {
+            var particle = document.createElement('div');
+            var size = Math.random() * 8 + 4;
+            var color = colors[Math.floor(Math.random() * colors.length)];
+            
+            particle.style.position = 'absolute';
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.backgroundColor = color;
+            particle.style.borderRadius = '50%';
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            particle.style.opacity = '1';
+            
+            this.container.appendChild(particle);
+            
+            this.animateParticle(particle);
+        }
+    }
+
+    animateParticle(el) {
+        var angle = Math.random() * Math.PI * 2;
+        var velocity = Math.random() * 100 + 50;
+        var vx = Math.cos(angle) * velocity;
+        var vy = Math.sin(angle) * velocity - 50; // Tendens opad
+        var opacity = 1;
+        var posX = parseFloat(el.style.left);
+        var posY = parseFloat(el.style.top);
+        
+        var start = performance.now();
+        
+        function update(time) {
+            var dt = (time - start) / 1000;
+            if (dt > 1.5) {
+                el.remove();
+                return;
+            }
+            
+            // Fysik
+            posY += vy * dt;
+            posX += vx * dt;
+            vy += 200 * dt; // Tyngdekraft
+            
+            opacity = 1 - (dt / 1.5);
+            
+            el.style.transform = "translate(" + (posX - parseFloat(el.style.left)) + "px, " + (posY - parseFloat(el.style.top)) + "px)";
+            el.style.opacity = opacity;
+            
+            requestAnimationFrame(update);
+        }
+        requestAnimationFrame(update);
+    }
+}
+
+/* =======================================================
+   KUVETTE-FARVE SIMULATION (fane 2)
+   Viser hvidt lys (alle bølgelængder) ramme en kuvette.
+   De bølgelængder stoffet absorberer forsvinder undervejs;
+   resten passerer igennem og er det, vi ser som stoffets farve.
+   Ingen koncentration/kuvettebredde-styring her - det er Lambert-Beers lov (fane "Teori"/b9.3).
+   ======================================================= */
+class CuvetteColorSim {
+    constructor(canvasId, wrapperId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.wrapper = document.getElementById(wrapperId);
+
+        this.peaks = [];
+        this.apparentColor = { r: 255, g: 255, b: 255 };
+        this.photons = [];
+        this.running = false;
+        this.spawnAccumulator = 0;
+
+        this.resize();
+        window.addEventListener('resize', this.resize.bind(this));
+    }
+
+    resize() {
+        var w = this.wrapper.clientWidth;
+        var h = this.wrapper.clientHeight;
+        if (w <= 0 || h <= 0) return;
+        this.canvas.width = w;
+        this.canvas.height = h;
+
+        this.cuvetteX = w * 0.42;
+        this.cuvetteWidth = Math.max(50, w * 0.14);
+        this.cuvetteY = h * 0.18;
+        this.cuvetteHeight = h * 0.64;
+
+        this.draw();
+    }
+
+    setPeaks(peaks, apparentColorNm) {
+        this.peaks = peaks;
+        this.apparentColor = nmToRGB(apparentColorNm);
+        this.photons = [];
+    }
+
+    start() {
+        if (this.running) return;
+        this.running = true;
+        requestAnimationFrame(this.loop.bind(this));
+    }
+
+    stop() {
+        this.running = false;
+    }
+
+    loop() {
+        if (!this.running) return;
+        this.spawnAccumulator += 1;
+        if (this.spawnAccumulator >= 2) {
+            this.spawnAccumulator = 0;
+            this.spawnPhoton();
+        }
+        this.update();
+        this.draw();
+        requestAnimationFrame(this.loop.bind(this));
+    }
+
+    spawnPhoton() {
+        // Bølgelængde trukket jævnt fra hele det synlige spektrum -> "hvidt lys"
+        var nm = 400 + Math.random() * 300;
+        this.photons.push({
+            nm: nm,
+            x: 8,
+            y: this.cuvetteY + Math.random() * this.cuvetteHeight,
+            speed: 1.4 + Math.random() * 1.1,
+            active: true,
+            decided: false,
+            absorbAtX: undefined,
+            flashLife: 0
+        });
+    }
+
+    update() {
+        for (var i = this.photons.length - 1; i >= 0; i--) {
+            var p = this.photons[i];
+
+            if (!p.active) {
+                p.flashLife--;
+                if (p.flashLife <= 0) this.photons.splice(i, 1);
+                continue;
+            }
+
+            p.x += p.speed;
+
+            // Afgør ÉN gang pr. foton (idet den når kuvetten), om den absorberes,
+            // ud fra hvor meget stoffet absorberer netop dens bølgelængde.
+            if (!p.decided && p.x >= this.cuvetteX) {
+                p.decided = true;
+                var abs = calculateAbsorbance(nm_clamp(p.nm), this.peaks);
+                var T = Math.pow(10, -abs);
+                if (Math.random() > T) {
+                    p.absorbAtX = this.cuvetteX + Math.random() * this.cuvetteWidth;
+                }
+            }
+
+            if (p.absorbAtX !== undefined && p.x >= p.absorbAtX) {
+                p.active = false;
+                p.flashLife = 16;
+            }
+
+            if (p.x > this.canvas.width - 10) {
+                this.photons.splice(i, 1);
+            }
+        }
+    }
+
+    draw() {
+        var ctx = this.ctx;
+        var w = this.canvas.width, h = this.canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        // Lyskilde
+        ctx.fillStyle = "#333";
+        ctx.fillRect(0, h / 2 - 26, 12, 52);
+
+        // Kuvette
+        var rgb = this.apparentColor;
+        ctx.fillStyle = "rgba(" + rgb.r + "," + rgb.g + "," + rgb.b + ",0.35)";
+        ctx.fillRect(this.cuvetteX, this.cuvetteY, this.cuvetteWidth, this.cuvetteHeight);
+        ctx.strokeStyle = "rgba(255,255,255,0.6)";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(this.cuvetteX, this.cuvetteY, this.cuvetteWidth, this.cuvetteHeight);
+
+        // Detektor / "øje"
+        ctx.font = "22px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("👁", w - 22, h / 2 + 8);
+
+        // Label
+        ctx.font = "bold 12px Segoe UI";
+        ctx.fillStyle = "#f8fafc";
+        ctx.textAlign = "center";
+        ctx.fillText("Hvidt lys", (8 + this.cuvetteX) / 2, this.cuvetteY - 12);
+        ctx.fillText("Kuvette", this.cuvetteX + this.cuvetteWidth / 2, this.cuvetteY - 12);
+        ctx.fillText("Det vi ser", (this.cuvetteX + this.cuvetteWidth + (w - 10)) / 2, this.cuvetteY - 12);
+
+        // Fotoner
+        for (var i = 0; i < this.photons.length; i++) {
+            var p = this.photons[i];
+            var c = nmToRGB(nm_clamp(p.nm));
+            var colorStr = "rgb(" + c.r + "," + c.g + "," + c.b + ")";
+
+            if (p.active) {
+                ctx.beginPath();
+                ctx.fillStyle = colorStr;
+                ctx.shadowColor = colorStr;
+                ctx.shadowBlur = 6;
+                ctx.arc(p.x, p.y, 2.6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            } else {
+                // Absorptions-glimt
+                var ringR = 6 + (16 - p.flashLife) * 1.1;
+                var alpha = p.flashLife / 16;
+                ctx.beginPath();
+                ctx.strokeStyle = "rgba(239,68,68," + alpha + ")";
+                ctx.lineWidth = 2;
+                ctx.arc(p.absorbAtX, p.y, ringR, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+    }
+}
+
+// Klemmer en bølgelængde ind i det synlige interval, så visning altid giver mening
+function nm_clamp(nm) {
+    if (nm < 400) return 400;
+    if (nm > 700) return 700;
+    return nm;
+}
+
+/* =======================================================
+   HOVEDAPPLIKATION (Game Loop & Logik)
+   ======================================================= */
+class AppLogic {
+    constructor() {
+        this.grapher = new SpectrumGrapher('spectrum-canvas', 'hover-tooltip');
+        this.particles = new ParticleSystem('particle-container');
+        
+        // Dom Elementer
+        this.uiName = document.getElementById('info-name');
+        this.uiFormula = document.getElementById('info-formula');
+        this.uiDesc = document.getElementById('info-desc');
+        this.uiCounter = document.getElementById('substance-counter');
+        
+        this.uiQuestion = document.getElementById('quiz-question');
+        this.uiOptions = document.getElementById('quiz-options');
+        this.btnNext = document.getElementById('btn-next');
+        
+        this.feedbackBox = document.getElementById('feedback-box');
+        this.feedbackTitle = document.getElementById('feedback-title');
+        this.feedbackText = document.getElementById('feedback-text');
+
+        this.modalTheory = document.getElementById('theory-modal');
+        this.modalEnd = document.getElementById('end-modal');
+
+        // State
+        this.currentSubstanceIdx = 0;
+        this.currentQuestionIdx = 0;
+        this.questionAnswered = false;
+
+        this.init();
+    }
+
+    init() {
+        this.currentSubstanceIdx = 0;
+        this.loadSubstance();
+    }
+
+    restartApp() {
+        this.init();
+        this.closeEndModal();
+    }
+
+    loadSubstance() {
+        if (this.currentSubstanceIdx >= spectraData.length) {
+            this.showEndModal();
+            return;
+        }
+
+        var data = spectraData[this.currentSubstanceIdx];
+        this.currentQuestionIdx = 0;
+
+        // Opdater Graf
+        this.grapher.setPeaks(data.peaks);
+
+        // Opdater Info
+        this.uiName.textContent = data.name;
+        this.uiFormula.textContent = data.formula;
+        this.uiDesc.textContent = data.description;
+        this.uiCounter.textContent = (this.currentSubstanceIdx + 1) + " / " + spectraData.length;
+        
+        this.loadQuestion();
+    }
+
+    loadQuestion() {
+        var data = spectraData[this.currentSubstanceIdx];
+        var qData = data.questions[this.currentQuestionIdx];
+        
+        this.questionAnswered = false;
+        this.btnNext.disabled = true;
+        this.feedbackBox.className = "feedback-area"; // reset classes
+        
+        var bonusBadge = qData.bonus ? '<span class="bonus-badge">🌟 Bonus - svært</span>' : '';
+        this.uiQuestion.innerHTML = bonusBadge + "Spørgsmål " + (this.currentQuestionIdx + 1) + "/" + data.questions.length + ": " + qData.q;
+
+        this.uiOptions.innerHTML = '';
+
+        var isColorType = qData.type === 'color';
+        this.uiOptions.classList.toggle('color-options', isColorType);
+
+        // Bland rækkefølgen af svarmuligheder (Fisher-Yates), så det rigtige
+        // svar ikke altid står samme sted. this.currentOrder[i] gemmer, hvilket
+        // oprindeligt options-index der vises på plads i, så handleAnswer()
+        // stadig kan finde det rigtige svar via qData.correct.
+        var order = qData.options.map(function (_, i) { return i; });
+        for (var i = order.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = order[i]; order[i] = order[j]; order[j] = tmp;
+        }
+        this.currentOrder = order;
+
+        for (var i = 0; i < order.length; i++) {
+            var srcIndex = order[i];
+            var btn = document.createElement('button');
+
+            if (isColorType) {
+                var opt = qData.options[srcIndex];
+                btn.className = 'color-swatch-btn';
+                var fill = document.createElement('div');
+                fill.className = 'swatch-fill';
+                fill.style.backgroundColor = nmToRGBString(opt.nm);
+                var label = document.createElement('div');
+                label.className = 'swatch-label';
+                label.textContent = opt.label;
+                btn.appendChild(fill);
+                btn.appendChild(label);
+            } else {
+                btn.className = 'btn-option';
+                btn.innerHTML = highlightColorWords(qData.options[srcIndex]);
+            }
+
+            // Brug closure til at binde index (position i den viste rækkefølge)
+            (function(index, btnRef, self) {
+                btnRef.onclick = function(e) {
+                    self.handleAnswer(index, btnRef, e);
+                };
+            })(i, btn, this);
+
+            this.uiOptions.appendChild(btn);
+        }
+    }
+
+    handleAnswer(selectedIndex, btnNode, event) {
+        if (this.questionAnswered) return;
+        this.questionAnswered = true;
+        
+        var data = spectraData[this.currentSubstanceIdx];
+        var qData = data.questions[this.currentQuestionIdx];
+        // selectedIndex er positionen i den (blandede) visning; find den blandede
+        // position, som det oprindelige rigtige svar endte på.
+        var correctPosition = this.currentOrder.indexOf(qData.correct);
+        var isCorrect = (selectedIndex === correctPosition);
+
+        // Deaktiver alle knapper
+        var allBtns = this.uiOptions.children;
+        for (var i = 0; i < allBtns.length; i++) {
+            allBtns[i].disabled = true;
+            if (i === correctPosition) {
+                allBtns[i].classList.add('correct');
+            } else if (i === selectedIndex && !isCorrect) {
+                allBtns[i].classList.add('incorrect');
+            }
+        }
+        
+        // UI Feedback
+        if (isCorrect) {
+            this.feedbackBox.className = "feedback-area show success";
+            this.feedbackTitle.textContent = "Korrekt!";
+            this.feedbackTitle.style.color = "var(--accent-green)";
+
+            // Effekter!
+            this.particles.spawnSuccess(event.clientX, event.clientY);
+        } else {
+            this.feedbackBox.className = "feedback-area show error";
+            this.feedbackTitle.textContent = "Forkert!";
+            this.feedbackTitle.style.color = "var(--accent-red)";
+        }
+
+        this.feedbackText.textContent = qData.explanation;
+
+        this.btnNext.disabled = false;
+    }
+
+    nextQuestion() {
+        var data = spectraData[this.currentSubstanceIdx];
+        this.currentQuestionIdx++;
+        
+        if (this.currentQuestionIdx >= data.questions.length) {
+            // Næste stof
+            this.currentSubstanceIdx++;
+            this.loadSubstance();
+        } else {
+            // Næste spørgsmål i samme stof
+            this.loadQuestion();
+        }
+    }
+
+    openTheory() {
+        this.modalTheory.classList.add('active');
+    }
+
+    closeTheory() {
+        this.modalTheory.classList.remove('active');
+    }
+
+    showEndModal() {
+        this.modalEnd.classList.add('active');
+    }
+
+    closeEndModal() {
+        this.modalEnd.classList.remove('active');
+    }
+}
+
+/* =======================================================
+   KUVETTE-FANE: UI-BINDING (stofvælger, tekst, tab-styring)
+   ======================================================= */
+
+// Det rigtige spektrum (peaks) bruges uændret til grafen og quizzen i fane 1.
+// Men rå spektraldata giver meget forskellig "absorptions-styrke" i fotonsimulationen
+// afhængigt af, hvor brede/tætte toppene tilfældigvis er (fx er kaliumpermanganats to
+// toppe brede og tætte og giver derfor et tydeligt, men ikke overvældende, resultat).
+// Her bygger vi et separat sæt "animations-toppe" pr. stof, så alle stoffer får et
+// lige så tydeligt og læsbart resultat i animationen, uden at ændre de rigtige data.
+var CC_MIN_PEAK_WIDTH = 35;   // ingen top må være smallere end dette i animationen
+var CC_TARGET_PEAK_ABS = 2.5; // alle stoffers kraftigste absorption skaleres til samme niveau
+
+function buildAnimationPeaks(peaks, minWidth, targetPeakAbs) {
+    var widened = peaks.map(function(p) {
+        return { center: p.center, width: Math.max(p.width, minWidth), height: p.height };
+    });
+
+    var curMax = 0;
+    for (var nm = 400; nm <= 700; nm += 2) {
+        var a = calculateAbsorbance(nm, widened);
+        if (a > curMax) curMax = a;
+    }
+    var scale = curMax > 0 ? targetPeakAbs / curMax : 1;
+
+    return widened.map(function(p) {
+        return { center: p.center, width: p.width, height: p.height * scale };
+    });
+}
+
+var ccSim;
+var ccUi = {};
+
+function ccLoadSubstance(idx) {
+    var data = spectraData[idx];
+    var apparent = getApparentColor(data);
+    var animPeaks = buildAnimationPeaks(data.peaks, CC_MIN_PEAK_WIDTH, CC_TARGET_PEAK_ABS);
+
+    ccSim.setPeaks(animPeaks, apparent.nm);
+
+    ccUi.resultSwatch.style.backgroundColor = nmToRGBString(apparent.nm);
+    ccUi.resultName.textContent = apparent.label;
+    ccUi.infoName.textContent = data.name;
+
+    var bands = classifySpectrumBands(animPeaks);
+    var text;
+    if (bands.absorbed.length === 0) {
+        text = data.name + " absorberer ikke ret meget lys i det synlige område, så det meste af det hvide lys passerer igennem.";
+    } else {
+        text = data.name + " absorberer kraftigt det " + bands.absorbed.join(" og ") + " lys. "
+             + "Resten af lyset (" + bands.transmitted.join(", ") + ") passerer stort set uhindret igennem kuvetten og når vores øje - "
+             + "det er derfor, vi ser " + data.name.toLowerCase() + " som " + apparent.label.toLowerCase() + ".";
+    }
+    ccUi.explainText.textContent = text;
+}
+
+function ccInit() {
+    ccSim = new CuvetteColorSim('cc-canvas', 'cc-canvas-wrapper');
+
+    ccUi.select = document.getElementById('cc-substance-select');
+    ccUi.resultSwatch = document.getElementById('cc-result-swatch');
+    ccUi.resultName = document.getElementById('cc-result-name');
+    ccUi.infoName = document.getElementById('cc-info-name');
+    ccUi.explainText = document.getElementById('cc-explain-text');
+
+    ccUi.select.innerHTML = '';
+    spectraData.forEach(function(data, i) {
+        var opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = data.name;
+        ccUi.select.appendChild(opt);
+    });
+
+    ccUi.select.addEventListener('change', function() {
+        ccLoadSubstance(parseInt(ccUi.select.value, 10));
+    });
+
+    ccLoadSubstance(0);
+}
+
+// --- TAB NAVIGATION ---
+function ccInitTabs() {
+    var tabBtns = document.querySelectorAll('.tab-btn');
+    var tabContents = document.querySelectorAll('.tab-content');
+
+    tabBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            tabBtns.forEach(function(b) { b.classList.remove('active'); });
+            tabContents.forEach(function(c) { c.classList.remove('active'); });
+
+            btn.classList.add('active');
+            var targetId = btn.getAttribute('data-tab');
+            document.getElementById(targetId).classList.add('active');
+
+            if (targetId === 'tab-cuvette') {
+                ccSim.resize();
+                ccSim.start();
+            } else {
+                ccSim.stop();
+            }
+        });
+    });
+}
+
+/* =======================================================
+   PRÆSENTÉR: guidet rundtur - viser kun indholdet på den fane,
+   man allerede er på, og peger til sidst blot på, at den anden
+   fane findes (uden at skifte til den).
+   (spotlight + tooltip, samme mønster som bordgrupper.html / c8.2)
+   ======================================================= */
+var tab1TourSteps = [
+    { sel: '#canvas-wrapper', text: 'Her ser du absorptionsspektret for det aktuelle stof. Hold musen over grafen for at se bølgelængde, absorbans og farve i det punkt, musen peger på.' },
+    { sel: '#substance-info', text: 'Her ser du navnet, den kemiske formel og en kort beskrivelse af stoffet.' },
+    { sel: '#quiz-container', text: 'Test din forståelse: besvar spørgsmålene om stoffets spektrum og farve. Nogle spørgsmål er markeret som lidt sværere bonusspørgsmål.' },
+    { sel: '[data-tab="tab-cuvette"]', text: 'Vidste du, at der er en ekstra fane herovre? Den viser med en animation, hvorfor stoffet netop får denne farve, når hvidt lys sendes igennem det.' }
+];
+
+var tab2TourSteps = [
+    { sel: '#cc-substance-select', text: 'Her kan du vælge mellem de samme 5 stoffer, som du mødte i quizzen.' },
+    { sel: '#cc-canvas-wrapper', text: 'Hvidt lys (alle bølgelængder) sendes ind fra venstre og igennem kuvetten. De bølgelængder, stoffet absorberer, forsvinder undervejs (rød glimt) - resten passerer igennem til øjet.' },
+    { sel: '#cc-result-swatch', text: 'Det er præcis den farve, det ikke-absorberede lys blander sig til, som gør at vi ser stoffet have netop denne farve.' },
+    { sel: '[data-tab="tab-spectrum"]', text: 'Vidste du, at der også er en fane med det fulde absorptionsspektrum og en quiz, hvor du kan teste din forståelse?' }
+];
+
+var currentTourSteps = tab1TourSteps;
+
+function clearTourHighlight() {
+    document.querySelectorAll('.tour-highlight').forEach(function(el) { el.classList.remove('tour-highlight'); });
+    var tt = document.getElementById('tourTooltip');
+    if (tt) tt.remove();
+}
+
+function startPresentTour() {
+    var activeTab = document.querySelector('.tab-content.active');
+    currentTourSteps = (activeTab && activeTab.id === 'tab-cuvette') ? tab2TourSteps : tab1TourSteps;
+    showTourStep(0);
+}
+
+function showTourStep(i) {
+    clearTourHighlight();
+    if (i >= currentTourSteps.length) return;
+    var step = currentTourSteps[i];
+
+    var el = document.querySelector(step.sel);
+    if (!el || el.offsetParent === null) { showTourStep(i + 1); return; }
+
+    el.classList.add('tour-highlight');
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    var tooltip = document.createElement('div');
+    tooltip.id = 'tourTooltip';
+    tooltip.className = 'tour-tooltip';
+    tooltip.innerHTML = '<div>' + step.text + '</div>' +
+        '<div class="tt-actions">' +
+        '<button type="button" class="tt-skip">Luk</button>' +
+        '<button type="button" class="tt-next">' + (i === currentTourSteps.length - 1 ? 'Afslut' : 'Næste') + '</button>' +
+        '</div>';
+    document.body.appendChild(tooltip);
+
+    setTimeout(function() {
+        var rect = el.getBoundingClientRect();
+        var top = rect.bottom + 14;
+        if (top + tooltip.offsetHeight > window.innerHeight - 10) top = Math.max(10, rect.top - tooltip.offsetHeight - 14);
+        var left = Math.min(Math.max(10, rect.left), window.innerWidth - tooltip.offsetWidth - 10);
+        tooltip.style.top = top + 'px';
+        tooltip.style.left = left + 'px';
+    }, 300);
+
+    tooltip.querySelector('.tt-next').addEventListener('click', function() { showTourStep(i + 1); });
+    tooltip.querySelector('.tt-skip').addEventListener('click', clearTourHighlight);
+}
+
+// Initialiser Applikation når DOM er klar
+var app;
+document.addEventListener("DOMContentLoaded", function() {
+    app = new AppLogic();
+    ccInit();
+    ccInitTabs();
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fokusspørgsmål: Naturens nitrogenkredsløb</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-50 min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef } = React;
+
+        // Ladede kemiske formler skrevet med rigtig unicode, fx "NH4+" -> "NH₄⁺"
+        const SUB = { '0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉' };
+        const SUP = { '0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','+':'⁺','-':'⁻' };
+        const f = (formula) => formula.replace(/\d+/g, m => m.split('').map(d => SUB[d]).join(''));
+        const ionDisp = (formula, charge) => f(formula) + charge.split('').map(c => SUP[c] || c).join('');
+
+        // Gør det muligt at taste svar med rigtige unicode-tegn (fx "NH₃") ved at oversætte dem
+        // til almindelig ASCII, inden svaret sammenlignes med facit.
+        const UNI_TO_ASCII = {
+            '₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4', '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9',
+            '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9',
+            '⁺': '+', '⁻': '-', '−': '-', '–': '-', '—': '-'
+        };
+        const normalizeInput = (str) => str.split('').map(ch => UNI_TO_ASCII[ch] || ch).join('');
+
+        // Levenshtein-afstand, bruges til at tillade én enkelt tastefejl i ord-svar (fx "nitrifikaton").
+        const levenshtein = (a, b) => {
+            const m = a.length, n = b.length;
+            const d = Array.from({ length: m + 1 }, (_, i) => [i, ...Array(n).fill(0)]);
+            for (let j = 0; j <= n; j++) d[0][j] = j;
+            for (let i = 1; i <= m; i++) {
+                for (let j = 1; j <= n; j++) {
+                    d[i][j] = a[i - 1] === b[j - 1]
+                        ? d[i - 1][j - 1]
+                        : 1 + Math.min(d[i - 1][j], d[i][j - 1], d[i - 1][j - 1]);
+                }
+            }
+            return d[m][n];
+        };
+
+        // Et svar accepteres hvis det matcher en facit-tekst præcist, eller (for rene ord på mindst
+        // 5 bogstaver, dvs. ikke kemiske formler som "nh3") ligger inden for 1 tastefejl af den.
+        const isTextAccepted = (input, accepted) => accepted.some(acc => {
+            if (input === acc) return true;
+            if (/\d/.test(acc) || acc.length < 5) return false;
+            return levenshtein(input, acc) <= 1;
+        });
+
+        // --- SPØRGSMÅL: fokusspørgsmål til Basiskemi B, s. 294-299 (naturens nitrogenkredsløb) ---
+        const QUESTIONS = [
+            {
+                id: 2, page: 294, type: 'mc',
+                prompt: 'Hvad er humus?',
+                options: [
+                    'Alt organisk materiale i jorden, både levende og dødt',
+                    'De svært nedbrydelige rester af dødt organisk materiale',
+                    'De uorganiske bestanddele som sten, grus, sand og ler',
+                    'De levende organismer i jorden (bakterier, svampe, smådyr)'
+                ],
+                correct: 1,
+                hint: 'Tænk på hvad der er tilbage, når det meste af det døde plantemateriale er nedbrudt.',
+                explain: 'Dødt organisk stof nedbrydes hurtigt i starten, men en svært nedbrydelig rest bliver tilbage i jorden — det er humus.'
+            },
+            {
+                id: 3, page: 294, type: 'mc',
+                prompt: 'Hvad er muld?',
+                options: [
+                    'Det samme som humus',
+                    'Kun de uorganiske bestanddele i jorden',
+                    'Blandingen af humus og de uorganiske bestanddele',
+                    'Det samme som rodzonen'
+                ],
+                correct: 2,
+                hint: 'Muld er en blanding af to ting, der begge er nævnt lige inden.',
+                explain: 'Muld = humus + de uorganiske bestanddele (sten, grus, sand, silt, ler).'
+            },
+            {
+                id: 4, page: 295, type: 'text',
+                prompt: 'Når mikroorganismer nedbryder ("forbrænder") dødt organisk kvælstofholdigt materiale (fx protein), dannes der CO₂, H₂O og … hvilket kvælstofstof?',
+                accepted: ['ammoniak', 'nh3'],
+                correctDisplay: 'Ammoniak, NH₃',
+                hint: 'Det er det samme stof, der senere (ved jordens normale pH) mest findes som ammonium-ion.',
+                explain: 'organisk N-forbindelse + O₂ → CO₂ + H₂O + NH₃. Ammoniakken opløses derefter i jordvandet.'
+            },
+            {
+                id: 5, page: 295, type: 'mc',
+                prompt: 'Ved jordens normale pH (omkring 7) findes det kvælstof, der lige er dannet ved nedbrydningen, overvejende som:',
+                options: [
+                    ionDisp('NH3', '') + ' (ammoniak)',
+                    ionDisp('NH4', '+') + ' (ammonium)',
+                    ionDisp('NO2', '-') + ' (nitrit)',
+                    ionDisp('NO3', '-') + ' (nitrat)'
+                ],
+                correct: 1,
+                hint: 'NH₃(aq) + H₂O ⇌ NH₄⁺(aq) + OH⁻(aq) — hvilken side af den ligevægt vinder ved pH 7?',
+                explain: 'Ved pH omkring 7 er ligevægten NH₃ + H₂O ⇌ NH₄⁺ + OH⁻ vidtgående forskudt mod højre, så kvælstoffet stort set findes som ammonium, NH₄⁺.'
+            },
+            {
+                id: 6, page: 296, type: 'text',
+                prompt: 'Hvad hedder den samlede proces, hvor ammonium (via nitrit) omdannes til nitrat?',
+                accepted: ['nitrifikation'],
+                correctDisplay: 'Nitrifikation',
+                hint: 'Navnet ligner det stof, processen ender med at danne (nitrat).',
+                explain: 'Nitrifikation sker i to trin udført af to slags bakterier: nitritbakterier (NH₄⁺ → NO₂⁻) og nitratbakterier (NO₂⁻ → NO₃⁻).'
+            },
+            {
+                id: 7, page: 296, type: 'mc',
+                prompt: 'Hvilken rækkefølge af ioner er korrekt for nitrifikationen?',
+                options: [
+                    ionDisp('NH4', '+') + ' → ' + ionDisp('NO3', '-') + ' → ' + ionDisp('NO2', '-'),
+                    ionDisp('NH4', '+') + ' → ' + ionDisp('NO2', '-') + ' → ' + ionDisp('NO3', '-'),
+                    ionDisp('NO3', '-') + ' → ' + ionDisp('NO2', '-') + ' → ' + ionDisp('NH4', '+'),
+                    ionDisp('NO2', '-') + ' → ' + ionDisp('NH4', '+') + ' → ' + ionDisp('NO3', '-')
+                ],
+                correct: 1,
+                hint: 'Først omdanner nitritbakterier ammonium til nitrit, derefter tager nitratbakterier over.',
+                explain: 'Trin 1 (nitritbakterier): 2NH₄⁺ + 3O₂ → 2NO₂⁻ + 4H⁺ + 2H₂O. Trin 2 (nitratbakterier): 2NO₂⁻ + O₂ → 2NO₃⁻.'
+            },
+            {
+                id: 8, page: 297, type: 'mc',
+                prompt: 'Hvorfor kan ammonium (NH₄⁺) bindes til ler- og humuspartikler, mens nitrat (NO₃⁻) ikke kan?',
+                options: [
+                    'Fordi ler og humus er negativt ladet, og NH₄⁺ er positiv, mens NO₃⁻ er negativ',
+                    'Fordi NH₄⁺-ionen er fysisk større end NO₃⁻-ionen',
+                    'Fordi ler og humus kun kan binde metalioner som Na⁺ og Ca²⁺',
+                    'Fordi nitrat reagerer kemisk med lerpartiklerne og opløses'
+                ],
+                correct: 0,
+                hint: 'Se på figur 184 — hvad er det, ler-partiklernes overflade er ladet med?',
+                explain: 'Ler- og humuspartikler er negativt ladede på overfladen og fastholder derfor positive ioner (fx NH₄⁺, Ca²⁺, K⁺, H⁺). En negativ ion som NO₃⁻ bliver frastødt og forbliver opløst i jordvandet.'
+            },
+            {
+                id: 9, page: 297, type: 'text',
+                prompt: 'Hvad hedder processen, hvor fx en Na⁺ på en lerpartikel byttes med en NH₄⁺ fra jordvandet (Na⁺(ler) + NH₄⁺(aq) ⇌ Na⁺(aq) + NH₄⁺(ler))?',
+                accepted: ['ionbytning', 'ionbytningsproces', 'en ionbytning'],
+                correctDisplay: 'Ionbytning',
+                hint: 'Navnet beskriver helt bogstaveligt, hvad der sker: to slags ioner bytter plads.',
+                explain: 'Det er en ionbytningsproces. Både ler og humus (som har negativt ladede COO⁻-grupper) har denne egenskab.'
+            },
+            {
+                id: 10, page: 297, type: 'mc',
+                prompt: 'Hvorfor er ammonium bedre beskyttet mod udvaskning i vinterhalvåret end nitrat er?',
+                options: [
+                    'Fordi ammonium er bundet til ler og humus, mens nitrat er frit opløst i jordvandet',
+                    'Fordi ammonium fordamper i stedet for at blive udvasket',
+                    'Fordi nitrat altid bliver optaget fuldt af planterne om vinteren',
+                    'Fordi ammonium reagerer med regnvandet og forsvinder'
+                ],
+                correct: 0,
+                hint: 'Tænk tilbage på ionbytningsspørgsmålet lige før dette.',
+                explain: 'Fordi NH₄⁺ sidder bundet til ler og humus via ionbytning, er koncentrationen af frit NH₄⁺ i jordvandet lille, og det følger ikke bare med nedsivende vand. NO₃⁻ kan derimod ikke bindes, så det følger frit med vandet ned gennem jordlagene.'
+            },
+            {
+                id: 11, page: 298, type: 'mc',
+                prompt: 'Hvad kræver det, at bakterier kan gennemføre denitrifikation?',
+                options: [
+                    'Rigelig adgang til oxygen (aerobe forhold)',
+                    'Anaerobe forhold, dvs. at der ikke er oxygen til stede',
+                    'Meget lavt pH i jorden',
+                    'Direkte sollys på jordoverfladen'
+                ],
+                correct: 1,
+                hint: 'Det sker fx i sammenpresset eller vandfyldt jord, hvor luften ikke kan trænge ned.',
+                explain: 'Under anaerobe forhold (ingen oxygen) kan nogle bakterier bruge NO₃⁻ i stedet for O₂ til at oxidere organisk stof. Det kaldes denitrifikation.'
+            },
+            {
+                id: 12, page: 298, type: 'mc',
+                prompt: 'Hvad dannes primært, når bakterier udfører denitrifikation?',
+                options: [ionDisp('NH3', ''), ionDisp('NO3', '-'), 'N₂ (eller N₂O)', 'O₂'],
+                correct: 2,
+                hint: 'Gassen ender med at forsvinde ud i den atmosfæriske luft, som i forvejen er fyldt med den.',
+                explain: 'Organisk stof + NO₃⁻ + H⁺ → CO₂ + H₂O + N₂ (nogle gange dannes N₂O i stedet for N₂). Begge gasser ender i atmosfæren.'
+            },
+            {
+                id: 13, page: 298, type: 'text',
+                prompt: 'Hvad kaldes processen, hvor bakterier optager N₂ fra luften i jordens porer og omdanner det til kvælstofforbindelser?',
+                accepted: ['biologisk n-binding', 'biologisk kvælstofbinding', 'kvælstoffiksering', 'n-fiksering', 'biologisk nitrogenbinding', 'nitrogenbinding'],
+                correctDisplay: 'Biologisk N-binding (kvælstoffiksering)',
+                hint: 'Det er en "binding" af det frie N₂ fra luften — hvad kalder man den slags biologisk?',
+                explain: 'Visse N-bindende bakterier lever frit i jorden, mens andre ("knoldbakterier") lever i rodknolde på bælgplanters rødder og forsyner planten direkte med kvælstofforbindelser.'
+            },
+            {
+                id: 14, page: 298, type: 'mc',
+                prompt: 'Hvorfor behøver man normalt ikke gøde jorden med kvælstofgødning, når man dyrker bælgplanter som kløver, ærter og bønner?',
+                options: [
+                    'Bælgplanter har slet ikke brug for kvælstof',
+                    'Bælgplanter har rodknolde med bakterier, der fikserer N₂ fra luften og forsyner planten',
+                    'Bælgplanter optager al deres kvælstof direkte fra regnvand',
+                    'Bælgplanter omdanner selv CO₂ i luften til kvælstofforbindelser'
+                ],
+                correct: 1,
+                hint: 'Se figur 185 — hvad sidder der på rødderne af bølgeplanter/bælgplanter?',
+                explain: 'Knoldbakterierne i rodknoldene fikserer N₂ fra luften og forsyner planten med nitrogenforbindelser, så bælgplanten ikke er afhængig af NH₄⁺ eller NO₃⁻ fra jordvandet.'
+            },
+            {
+                id: 15, page: 299, type: 'mc',
+                prompt: 'Hvornår sker hovedparten af nitratudvaskningen fra rodzonen — og hvorfor ikke på det andet tidspunkt af året?',
+                options: [
+                    'Om sommeren, fordi det regner mest dengang',
+                    'Om vinteren, fordi der siver mest vand ned, og planterne ikke bruger nitraten',
+                    'Det er ens hele året rundt',
+                    'Kun ved skybrud'
+                ],
+                correct: 1,
+                hint: 'Om sommeren er fordampningen så stor, at der næsten ikke siver vand ned gennem jorden — og marken er samtidig dækket af planter.',
+                explain: 'Udvaskningen sker primært i vinterhalvåret. Om sommeren fordamper der så meget vand, at der ikke siver vand ned, og planterne optager desuden løbende den nitrat, der dannes.'
+            },
+            {
+                id: 16, page: 299, type: 'mc',
+                prompt: 'Hvordan kan man begrænse nitratudvaskningen fra en mark om efteråret?',
+                options: [
+                    'Ved at pløje jorden ekstra dybt',
+                    'Ved at holde marken grøn/tilsået, så planterne optager nitraten',
+                    'Ved at vande marken ekstra meget',
+                    'Ved at tilføre mere kvælstofgødning om efteråret'
+                ],
+                correct: 1,
+                hint: 'Løsningen bruger det, planter i forvejen gør ved nitrat, når de vokser på marken (jf. forrige spørgsmål).',
+                explain: 'Grønne/tilsåede marker om efteråret betyder, at planterne løbende optager den nitrat, der dannes, i stedet for at den bliver stående klar til at blive udvasket, når nedbøren for alvor sætter ind.'
+            }
+        ];
+
+        const App = () => {
+            const [taskIndex, setTaskIndex] = useState(0);
+            const [solved, setSolved] = useState({});
+            const [answerInput, setAnswerInput] = useState("");
+            const [wrongStreak, setWrongStreak] = useState(0);
+            const [feedback, setFeedback] = useState(null);
+            const [hintShown, setHintShown] = useState(false);
+            const [practicingSolved, setPracticingSolved] = useState(false);
+            const timeoutRef = useRef(null);
+
+            const q = QUESTIONS[taskIndex];
+            const isReviewing = !!solved[taskIndex] && !practicingSolved;
+            const solvedCount = Object.keys(solved).length;
+            const allDone = solvedCount === QUESTIONS.length;
+
+            const clearPendingTimeout = () => {
+                if (timeoutRef.current) { clearTimeout(timeoutRef.current); timeoutRef.current = null; }
+            };
+
+            const resetQuestion = () => {
+                clearPendingTimeout();
+                setAnswerInput("");
+                setWrongStreak(0);
+                setFeedback(null);
+                setHintShown(false);
+                setPracticingSolved(false);
+            };
+
+            const goTo = (index) => { setTaskIndex(index); resetQuestion(); };
+
+            const markSolvedAndAdvance = () => {
+                setSolved(prev => ({ ...prev, [taskIndex]: true }));
+                if (taskIndex < QUESTIONS.length - 1) {
+                    goTo(taskIndex + 1);
+                } else {
+                    clearPendingTimeout();
+                    setFeedback({ type: 'finish', msg: 'Flot! Du er igennem alle fokusspørgsmålene.' });
+                }
+            };
+
+            const registerWrong = (revealDisplay) => {
+                const streak = wrongStreak + 1;
+                setWrongStreak(streak);
+                if (streak >= 3) {
+                    setFeedback({ type: 'reveal', msg: 'Her er svaret:', reveal: revealDisplay, explain: q.explain, onContinue: markSolvedAndAdvance });
+                } else {
+                    setFeedback({ type: 'error', msg: streak === 2 ? 'Stadig ikke helt rigtigt. Prøv evt. hint-knappen.' : 'Ikke helt rigtigt endnu. Prøv igen.' });
+                }
+            };
+
+            const handleCheckMc = (optionIndex) => {
+                if (isReviewing) return;
+                if (optionIndex === q.correct) {
+                    setFeedback({ type: 'success', msg: 'Korrekt!', explain: q.explain });
+                    timeoutRef.current = setTimeout(markSolvedAndAdvance, 1400);
+                } else {
+                    registerWrong(q.options[q.correct]);
+                }
+            };
+
+            const handleCheckText = () => {
+                const input = normalizeInput(answerInput).trim().toLowerCase().replace(/\s+/g, ' ');
+                if (isTextAccepted(input, q.accepted)) {
+                    setFeedback({ type: 'success', msg: 'Korrekt!', explain: q.explain });
+                    timeoutRef.current = setTimeout(markSolvedAndAdvance, 1400);
+                } else {
+                    registerWrong(q.correctDisplay);
+                }
+            };
+
+            const handleKeyDown = (e) => { if (e.key === 'Enter') handleCheckText(); };
+
+            return (
+                <div className="max-w-2xl mx-auto py-10 px-4">
+                    <header className="mb-8 text-center">
+                        <h1 className="text-3xl font-black text-slate-800 mb-2">Fokusspørgsmål: Naturens nitrogenkredsløb</h1>
+                        <p className="text-sm text-slate-500">Basiskemi B, s. 294-299 — test om du har fået det væsentlige med</p>
+                    </header>
+
+                    <main className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 relative overflow-hidden">
+                        <div className="absolute top-0 left-0 h-1 bg-blue-500 transition-all duration-500" style={{ width: `${(solvedCount / QUESTIONS.length) * 100}%` }}></div>
+
+                        <div className="flex justify-between items-start mb-4 gap-3">
+                            <h2 className="text-sm uppercase tracking-wider text-gray-400 font-bold">
+                                Spørgsmål {taskIndex + 1} af {QUESTIONS.length}
+                            </h2>
+                            <span className="shrink-0 text-[11px] font-bold bg-slate-100 text-slate-500 px-2 py-1 rounded-full whitespace-nowrap">s. {q.page}</span>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-1 mb-6">
+                            <button onClick={() => goTo(Math.max(0, taskIndex - 1))} disabled={taskIndex === 0}
+                                className="w-5 h-5 rounded-full border border-slate-200 text-slate-400 text-[10px] font-bold disabled:opacity-30 hover:border-blue-400 transition-colors" aria-label="Forrige spørgsmål">‹</button>
+                            {QUESTIONS.map((t, i) => (
+                                <button key={t.id} onClick={() => goTo(i)}
+                                    className={`w-5 h-5 rounded-full text-[10px] font-bold border transition-colors ${
+                                        i === taskIndex ? 'bg-blue-600 text-white border-blue-600'
+                                        : solved[i] ? 'bg-green-100 text-green-700 border-green-300 hover:border-green-400'
+                                        : 'bg-white text-slate-400 border-slate-200 hover:border-blue-400'}`}>
+                                    {i + 1}
+                                </button>
+                            ))}
+                            <button onClick={() => goTo(Math.min(QUESTIONS.length - 1, taskIndex + 1))} disabled={taskIndex === QUESTIONS.length - 1}
+                                className="w-5 h-5 rounded-full border border-slate-200 text-slate-400 text-[10px] font-bold disabled:opacity-30 hover:border-blue-400 transition-colors" aria-label="Næste spørgsmål">›</button>
+                        </div>
+
+                        {isReviewing ? (
+                            <div>
+                                <p className="text-sm font-bold text-green-700 mb-3">✓ Besvaret — her er facit:</p>
+                                <p className="text-base font-medium text-slate-700 mb-4">{q.prompt}</p>
+                                <div className="w-full p-3 border-2 border-green-300 bg-green-50 rounded-xl font-bold text-green-800 mb-3">
+                                    {q.type === 'mc' ? q.options[q.correct] : q.correctDisplay}
+                                </div>
+                                <p className="text-sm text-slate-500 mb-4">{q.explain}</p>
+                                <button onClick={() => setPracticingSolved(true)} className="text-sm text-blue-600 font-bold hover:underline">Prøv spørgsmålet igen</button>
+                            </div>
+                        ) : (
+                            <div>
+                                <p className="text-base font-medium text-slate-700 mb-4">{q.prompt}</p>
+
+                                {q.type === 'mc' ? (
+                                    <div className="space-y-2">
+                                        {q.options.map((opt, i) => (
+                                            <button key={i} onClick={() => handleCheckMc(i)}
+                                                className="w-full text-left p-3 border-2 border-slate-200 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-colors font-medium text-slate-700">
+                                                {opt}
+                                            </button>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="flex gap-4 items-end">
+                                        <input type="text" value={answerInput} onChange={(e) => setAnswerInput(e.target.value)}
+                                            onKeyDown={handleKeyDown} placeholder="Dit svar..."
+                                            className="flex-1 p-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none" />
+                                        <button onClick={handleCheckText}
+                                            className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200">
+                                            Tjek
+                                        </button>
+                                    </div>
+                                )}
+
+                                <div className="mt-3">
+                                    {hintShown ? (
+                                        <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3">💡 {q.hint}</p>
+                                    ) : (
+                                        <button onClick={() => setHintShown(true)} className="text-xs text-slate-400 font-bold hover:text-amber-600 hover:underline">💡 Vis hint</button>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {feedback && (
+                            <div className={`mt-6 p-4 rounded-xl font-bold text-center ${
+                                feedback.type === 'success' ? 'bg-green-100 text-green-700' :
+                                feedback.type === 'finish' ? 'bg-blue-100 text-blue-700' :
+                                feedback.type === 'reveal' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-700'}`}>
+                                {feedback.msg}
+                                {feedback.type === 'success' && feedback.explain && (
+                                    <div className="mt-2 text-sm font-normal">{feedback.explain}</div>
+                                )}
+                                {feedback.type === 'reveal' && (
+                                    <>
+                                        <div className="text-lg mt-1">{feedback.reveal}</div>
+                                        <div className="mt-2 text-sm font-normal">{feedback.explain}</div>
+                                        <button onClick={feedback.onContinue} className="mt-3 bg-amber-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-amber-700">Fortsæt →</button>
+                                    </>
+                                )}
+                                {feedback.type === 'finish' && (
+                                    <div className="mt-2 text-sm font-normal">Du kan stadig klikke dig gennem tallene ovenfor for at repetere facit.</div>
+                                )}
+                            </div>
+                        )}
+                    </main>
+                </div>
+            );
+        };
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
+</body>
+</html>

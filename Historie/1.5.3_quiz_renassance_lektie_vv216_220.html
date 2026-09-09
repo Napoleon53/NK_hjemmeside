@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title>Forståelsesquiz: Renæssancen s. 216-220 i Vores Verdenshisorie 1</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #2c3e50; /* Mørk blågrå baggrund */
+            color: #ecf0f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .quiz-container {
+            background-color: #34495e;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 750px;
+        }
+        h1 {
+            text-align: center;
+            color: #e67e22; /* Brændt orange for renæssance-stemning */
+            margin-bottom: 10px;
+            margin-top: 0;
+        }
+        .subtitle {
+            text-align: center;
+            font-style: italic;
+            color: #bdc3c7;
+            margin-bottom: 30px;
+            font-size: 1em;
+        }
+        .question {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        
+        /* Hint Styling */
+        .hint-btn {
+            background: none;
+            border: 1px solid #95a5a6;
+            color: #95a5a6;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+        }
+        .hint-btn:hover { background-color: #95a5a6; color: #2c3e50; }
+        .hint-text {
+            display: none;
+            background-color: #2c3e50;
+            padding: 10px;
+            border-left: 3px solid #3498db;
+            margin-bottom: 20px;
+            font-style: italic;
+            color: #bdc3c7;
+        }
+
+        /* Knapper */
+        .options button {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            margin: 12px 0;
+            background-color: #ecf0f1;
+            color: #2c3e50;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            text-align: left;
+            transition: transform 0.1s, background-color 0.2s;
+        }
+        .options button:hover {
+            background-color: #bdc3c7;
+            transform: translateX(5px);
+        }
+        .options button:disabled {
+            cursor: default;
+            transform: none;
+        }
+        
+        /* Feedback farver */
+        .correct { background-color: #27ae60 !important; color: white !important; }
+        .wrong { background-color: #c0392b !important; color: white !important; }
+
+        .explanation {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #2c3e50;
+            border-left: 5px solid #e67e22;
+            display: none;
+            line-height: 1.6;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #7f8c8d;
+            padding-top: 20px;
+        }
+        #score-display { font-weight: bold; font-size: 1.1em; }
+        #next-btn {
+            padding: 12px 25px;
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            display: none;
+        }
+        #next-btn:hover { background-color: #d35400; }
+
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <h1>Renæssancen s. 216-220 i VV1 </h1>
+    <p class="subtitle">Forståelse af nybrud, økonomi og menneskesyn (1300-1600)</p>
+    
+    <div id="quiz-content">
+        <div id="question-box" class="question">Indlæser spørgsmål...</div>
+        
+        <button id="show-hint-btn" class="hint-btn" onclick="toggleHint()">💡 Vis Hint</button>
+        <div id="hint-box" class="hint-text"></div>
+
+        <div id="options-box" class="options"></div>
+        <div id="explanation-box" class="explanation"></div>
+    </div>
+
+    <div class="footer">
+        <span id="score-display">Spørgsmål 1 af 10</span>
+        <button id="next-btn" onclick="nextQuestion()">Næste spørgsmål &rarr;</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            q: "Hvad dækker begrebet 'sekularisering' over i beskrivelsen af renæssancens menneskesyn?",
+            hint: "Tænk på forholdet mellem det enkelte menneske og kirkens monopol på at forklare verden.",
+            a: [
+                { text: "En proces hvor kirken overtog magten over handelslivet i bystaterne.", correct: false },
+                { text: "En løsrivelse fra religionen, hvor individet selv fortolker verden.", correct: true },
+                { text: "En kunstnerisk teknik til at tegne perspektiv.", correct: false }
+            ],
+            expl: "Korrekt. Sekularisering beskriver processen, hvor religion bliver en mere privat sag, og mennesket løsrives fra udelukkende at se verden gennem 'Guds briller'."
+        },
+        {
+            q: "Hvilken historisk begivenhed fra omkring år 1100 nævnes som en direkte årsag til Norditaliens økonomiske vækst?",
+            hint: "Det involverede militære ekspeditioner mod Palæstina, som krævede transportskibe.",
+            a: [
+                { text: "Korstogene til Det Hellige Land.", correct: true },
+                { text: "Opdagelsen af søvejen til Indien.", correct: false },
+                { text: "Den religiøse reformation i Europa.", correct: false }
+            ],
+            expl: "Rigtigt. Købmænd fra Venedig, Genova og Pisa tjente enorme summer på at stå for transport og udrustning til korstogshærene."
+        },
+        {
+            q: "Hvordan adskilte de rige borgeres syn på succes sig i renæssancen fra den traditionelle middelalderlige tankegang?",
+            hint: "Fokusér på skiftet fra 'Guds vilje' til 'menneskets evner'.",
+            a: [
+                { text: "De mente, at al rigdom var en synd, der skulle gives til kirken.", correct: false },
+                { text: "De tilskrev deres succes egen indsats frem for udelukkende Guds nåde.", correct: true },
+                { text: "De troede, at succes kun kunne opnås gennem arv fra adelen.", correct: false }
+            ],
+            expl: "Præcis. Borgerne begyndte at se deres rigdom som et resultat af individuel fortjeneste og dygtighed, hvilket var et brud med tanken om, at alt skyldtes Guds vilje."
+        },
+        {
+            q: "Hvorfor er historikere uenige om brugen af begrebet 'renæssance'?",
+            hint: "Debatten handler om, hvorvidt vi skal tegne en skarp streg i tidslinjen eller se det som en glidende overgang.",
+            a: [
+                { text: "Der er uenighed om, hvorvidt det skal ses som en selvstændig tidsperiode eller en del af middelalderen.", correct: true },
+                { text: "Ingen mener, at perioden har haft nogen betydning for moderne tid.", correct: false },
+                { text: "Man kan ikke blive enige om, hvorvidt renæssancen startede i Italien eller Danmark.", correct: false }
+            ],
+            expl: "Korrekt. Nogle historikere ser renæssancen som et radikalt brud (en ny æra), mens andre ser det som en kulturel strømning, der foregik *indenfor* middelalderen."
+        },
+        {
+            q: "Hvad kendetegnede 'humanismen' i renæssancen i forhold til religion?",
+            hint: "Tænk på humanismen som en 'opdatering' af kristendommen ved hjælp af gammel viden, snarere end en sletning.",
+            a: [
+                { text: "Humanisterne var erklærede ateister, der forkastede kristendommen.", correct: false },
+                { text: "De forenede antikkens tanker med kristendommen og søgte ofte kirkelig reform.", correct: true },
+                { text: "De mente, at paven skulle have absolut magt over videnskaben.", correct: false }
+            ],
+            expl: "Netop. Humanisterne var sjældent ateister. De brugte antikkens lærdom til at nytolke kristendommen og reagerede mod kirkens monopol på sandheden."
+        },
+        {
+            q: "Hvilket socialt lag var renæssancens tanker primært forbeholdt i begyndelsen?",
+            hint: "Teksten bruger ordet 'laboratorium' om udbredelsen af de nye tanker.",
+            a: [
+                { text: "De fattige bønder på landet.", correct: false },
+                { text: "Håndværkerne og handlende i de store byer.", correct: false },
+                { text: "Den intellektuelle elite og overklassen.", correct: true }
+            ],
+            expl: "Rigtigt. Renæssancen var et 'laboratorium' for eliten (lærde, købmænd, bankfolk). For 90% af befolkningen (bønderne) fortsatte livet som før i mange hundrede år."
+        },
+        {
+            q: "Hvilken rolle spillede bankvæsnet for de norditalienske bystater?",
+            hint: "Kig på, hvad mændene foretager sig på billedet med den store bog og mønterne.",
+            a: [
+                { text: "Det gjorde det muligt for kirken at kontrollere al handel.", correct: false },
+                { text: "Det tillod handelsfolk at låne penge, veksle valuta og styre overførsler.", correct: true },
+                { text: "Det blev udelukkende brugt til at finansiere kunstnere.", correct: false }
+            ],
+            expl: "Korrekt. Bankvæsnet var motoren, der gjorde det muligt at håndtere de store pengestrømme og investeringer i nye handelsruter."
+        },
+        {
+            q: "Hvad var det primære mål for Marco Polos rejser ifølge teksten?",
+            hint: "Tænk på, hvad købmændene i Norditalien levede af.",
+            a: [
+                { text: "At finde nye handelsruter og varer.", correct: true },
+                { text: "At sprede kristendommen til Kina.", correct: false },
+                { text: "At bevise, at jorden var rund.", correct: false }
+            ],
+            expl: "Godt. Rejsen handlede om økonomi: ønsket om at finde nye ruter til Østens luksusvarer."
+        },
+        {
+            q: "Hvad betyder selve ordet 'renæssance'?",
+            hint: "Det handler om at bringe noget gammelt (antikken) til live igen.",
+            a: [
+                { text: "Oplysning.", correct: false },
+                { text: "Revolution.", correct: false },
+                { text: "Genfødsel.", correct: true }
+            ],
+            expl: "Præcis. Renæssance betyder 'Genfødsel' – specifikt genfødslen af antikkens græske og romerske idealer."
+        },
+        {
+            q: "Hvad menes der med, at det menneskelige individ blev 'løsrevet' fra sin stand?",
+            hint: "Forskellen ligger i, om man defineres af sin gruppe (familie/job) eller af sin egen person.",
+            a: [
+                { text: "Man gik fra et kollektivt menneskesyn til en interesse for det enkelte menneske.", correct: true },
+                { text: "Man mistede fuldstændig retten til nogensinde at blive gift.", correct: false },
+                { text: "Alle mennesker blev gjort lige og klasseløse.", correct: false }
+            ],
+            expl: "Korrekt. I middelalderen var man låst fast i en stand (kollektivet). I renæssancen opstod en interesse for individets unikke evner og skæbne."
+        }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+    const totalQ = questions.length;
+
+    const qBox = document.getElementById("question-box");
+    const hintBox = document.getElementById("hint-box");
+    const hintBtn = document.getElementById("show-hint-btn");
+    const optBox = document.getElementById("options-box");
+    const explBox = document.getElementById("explanation-box");
+    const nextBtn = document.getElementById("next-btn");
+    const scoreDisplay = document.getElementById("score-display");
+
+    function loadQuestion() {
+        // Reset state
+        explBox.style.display = "none";
+        nextBtn.style.display = "none";
+        hintBox.style.display = "none";
+        hintBtn.style.display = "inline-block"; // Vis hint knap igen
+        optBox.innerHTML = "";
+        
+        const qData = questions[currentQ];
+        qBox.innerText = qData.q;
+        hintBox.innerText = "💡 " + qData.hint; // Sæt hint tekst
+        
+        scoreDisplay.innerText = `Spørgsmål ${currentQ + 1} af ${totalQ}`;
+
+        // Bland rækkefølgen af svarmulighederne, så det rigtige svar ikke altid står samme sted
+        const shuffled = [...qData.a].sort(() => Math.random() - 0.5);
+
+        // Create buttons
+        shuffled.forEach((opt, index) => {
+            const btn = document.createElement("button");
+            btn.innerText = opt.text;
+            btn.onclick = () => checkAnswer(index, btn, shuffled, qData);
+            optBox.appendChild(btn);
+        });
+    }
+
+    function toggleHint() {
+        if (hintBox.style.display === "none") {
+            hintBox.style.display = "block";
+        } else {
+            hintBox.style.display = "none";
+        }
+    }
+
+    function checkAnswer(index, btn, shuffled, qData) {
+        // Disable all buttons and hide hint button
+        const allBtns = optBox.querySelectorAll("button");
+        allBtns.forEach(b => b.disabled = true);
+        hintBtn.style.display = "none";
+        hintBox.style.display = "none";
+
+        const isCorrect = shuffled[index].correct;
+
+        if (isCorrect) {
+            btn.classList.add("correct");
+            score++;
+            explBox.innerHTML = "✅ <b>Korrekt!</b><br>" + qData.expl;
+        } else {
+            btn.classList.add("wrong");
+            // Find and highlight correct answer
+            const correctIndex = shuffled.findIndex(o => o.correct);
+            allBtns[correctIndex].classList.add("correct");
+            explBox.innerHTML = "❌ <b>Forkert.</b><br>" + qData.expl;
+        }
+
+        explBox.style.display = "block";
+        nextBtn.style.display = "block";
+
+        if (currentQ === totalQ - 1) {
+            nextBtn.innerText = "Se resultat";
+        }
+    }
+
+    function nextQuestion() {
+        currentQ++;
+        if (currentQ < totalQ) {
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.querySelector(".quiz-container").innerHTML = `
+            <h1 style="color:#e67e22">Quiz Gennemført!</h1>
+            <p style="text-align:center; font-size:1.5em; margin: 30px 0;">Du fik <b>${score}</b> ud af <b>${totalQ}</b> rigtige.</p>
+            <p style="text-align:center; color:#bdc3c7;">
+                ${score > 8 ? "Fremragende! Du har helt styr på teksten." : 
+                  score > 5 ? "Godt gået. Læs teksten en gang til for at fange de sidste detaljer." : 
+                  "Prøv igen. Husk at bruge hints næste gang!"}
+            </p>
+            <button onclick="location.reload()" style="display:block; margin:40px auto; padding:15px 30px; background:#e67e22; border:none; border-radius:5px; cursor:pointer; font-weight:bold; color:white; font-size:1.1em;">Prøv igen</button>
+        `;
+    }
+
+    // Start
+    loadQuestion();
+
+</script>
+
+</body>
+</html>

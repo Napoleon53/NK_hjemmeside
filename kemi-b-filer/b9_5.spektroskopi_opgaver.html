@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spektroskopiopgaver</title>
+<style>
+    :root {
+        --bg-color: #f4f6f9;
+        --panel-bg: #ffffff;
+        --primary: #2c3e50;
+        --accent: #3498db;
+        --success: #27ae60;
+        --danger: #e74c3c;
+        --border: #dcdde1;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--primary);
+        line-height: 1.5;
+    }
+
+    header {
+        background-color: var(--primary);
+        color: white;
+        padding: 18px 25px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+
+    .sub-header {
+        font-size: 0.9rem;
+        opacity: 0.85;
+        margin-top: 4px;
+    }
+
+    .page {
+        max-width: 880px;
+        margin: 0 auto;
+        padding: 25px 20px 60px;
+    }
+
+    .intro-box {
+        background: #eaf4fc;
+        border: 1px solid var(--accent);
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin-bottom: 18px;
+        font-size: 0.92rem;
+    }
+
+    .intro-box h2 {
+        margin-top: 0;
+        font-size: 1.05rem;
+    }
+
+    .intro-box ol {
+        padding-left: 20px;
+        margin-bottom: 0;
+    }
+
+    .intro-box li { margin-bottom: 6px; }
+
+    .toolbar {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        background: var(--panel-bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px 16px;
+        margin-bottom: 22px;
+        font-size: 0.85rem;
+    }
+
+    .decimal-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .decimal-toggle input { cursor: pointer; }
+
+    .tab-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 0;
+    }
+
+    .tab-btn {
+        padding: 10px 16px;
+        border: 1px solid var(--border);
+        border-bottom: none;
+        background: #eef2f5;
+        border-radius: 6px 6px 0 0;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 0.88rem;
+        color: var(--primary);
+    }
+
+    .tab-btn:hover { background: #e2e8ec; }
+
+    .tab-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .tab-progress {
+        font-weight: normal;
+        font-size: 0.78rem;
+        margin-left: 4px;
+        opacity: 0.85;
+    }
+
+    .task-card {
+        background: var(--panel-bg);
+        border-left: 5px solid var(--accent);
+        border-radius: 0 8px 8px 8px;
+        padding: 22px 24px;
+        margin-bottom: 34px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .task-card h2 {
+        margin-top: 0;
+        margin-bottom: 2px;
+        font-size: 1.25rem;
+    }
+
+    .task-source {
+        font-size: 0.78rem;
+        color: #7f8c8d;
+        margin-bottom: 12px;
+        font-style: italic;
+    }
+
+    .task-intro {
+        font-size: 0.95rem;
+        margin-bottom: 16px;
+    }
+
+    .table-row-flex {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    table.data-table {
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    table.data-table th, table.data-table td {
+        border: 1px solid var(--border);
+        padding: 6px 14px;
+        text-align: center;
+    }
+
+    table.data-table th {
+        background-color: #f8f9fa;
+    }
+
+    .copy-block {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-start;
+        padding-top: 4px;
+    }
+
+    .copy-btn {
+        padding: 7px 14px;
+        background-color: #8e44ad;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    .copy-btn:hover { background-color: #7d3c98; }
+
+    .copy-feedback {
+        font-size: 0.78rem;
+        color: var(--success);
+        max-width: 220px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .copy-feedback.show { opacity: 1; }
+
+    .step-card {
+        position: relative;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 16px 18px;
+        margin-bottom: 16px;
+        background: #fbfcfd;
+    }
+
+    .step-card.step-hidden {
+        display: none;
+    }
+
+    .step-card.step-done {
+        border-color: var(--success);
+        background: #eafaf1;
+    }
+
+    .step-badge {
+        display: inline-block;
+        font-size: 0.72rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: white;
+        background: var(--primary);
+        padding: 2px 9px;
+        border-radius: 10px;
+        margin-bottom: 8px;
+    }
+
+    .step-prompt {
+        font-size: 0.94rem;
+        margin-bottom: 12px;
+    }
+
+    .step-controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .step-controls input[type="text"] {
+        width: 110px;
+        padding: 7px 8px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        font-size: 0.95rem;
+        text-align: center;
+    }
+
+    .eps-label {
+        font-weight: bold;
+        font-size: 1rem;
+    }
+
+    .step-controls select {
+        padding: 7px 8px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        font-size: 0.9rem;
+        background: white;
+    }
+
+    .check-btn {
+        padding: 7px 16px;
+        background-color: var(--accent);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    .check-btn:hover { background-color: #2980b9; }
+    .check-btn:disabled { background-color: #95a5a6; cursor: not-allowed; }
+
+    .choice-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .choice-list label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.92rem;
+        cursor: pointer;
+    }
+
+    .step-feedback {
+        font-size: 0.88rem;
+        font-weight: bold;
+        min-height: 1.2em;
+    }
+
+    .step-feedback.correct { color: var(--success); }
+    .step-feedback.wrong { color: var(--danger); }
+
+    .task-done-msg {
+        display: none;
+        background: #eafaf1;
+        border: 1px solid var(--success);
+        border-radius: 6px;
+        padding: 12px 16px;
+        font-size: 0.92rem;
+        font-weight: bold;
+        color: var(--success);
+    }
+
+    .task-footer {
+        margin-top: 10px;
+        text-align: right;
+    }
+
+    .reset-btn {
+        padding: 5px 12px;
+        background: transparent;
+        color: #7f8c8d;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.78rem;
+    }
+
+    .reset-btn:hover { background: #f0f0f0; }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Spektroskopiopgaver</h1>
+    <div class="sub-header">Kemi B — bestem forskriften ud fra en standardkurve, og brug den på en ukendt prøve</div>
+</header>
+
+<div class="page">
+
+    <div class="intro-box">
+        <h2>Sådan bruger du siden</h2>
+        <ol>
+            <li>Kopiér tabellens data over i Excel med knappen "Kopiér tabel", eller indtast dem selv (koncentration på x-aksen, absorbans på y-aksen), og lav et punktdiagram.</li>
+            <li>Indsæt en lineær tendenslinje (uden at tvinge den gennem 0), og få vist ligningen i diagrammet.</li>
+            <li>Hældningen på tendenslinjen er den molare absorptionskoefficient, ε, ved den anvendte bølgelængde. Indtast din værdi <em>og</em> den korrekte enhed nedenfor.</li>
+            <li>Når en delopgave er godkendt, dukker den næste op, indtil du har løst hele opgaven.</li>
+        </ol>
+    </div>
+
+    <div class="toolbar">
+        <label class="decimal-toggle">
+            <input type="checkbox" id="decimalToggle" onchange="toggleDecimals()">
+            Brug engelsk decimaltegn (punktum) i tabeller og ved kopiering til Excel
+        </label>
+    </div>
+
+    <div class="tab-bar" id="tabBar"></div>
+    <div id="tasksContainer"></div>
+
+</div>
+
+<script>
+    /* ==========================================================================
+       ENHEDS-KATALOGER
+       ========================================================================== */
+    const EPS_UNITS = {
+        mM: [
+            { key: "Mcm",   label: "M⁻¹·cm⁻¹",   factor: 1,       hasCm: true },
+            { key: "mMcm",  label: "mM⁻¹·cm⁻¹",  factor: 1000,    hasCm: true },
+            { key: "uMcm",  label: "µM⁻¹·cm⁻¹",  factor: 1000000, hasCm: true },
+            { key: "mM",    label: "mM⁻¹",        factor: 1000,    hasCm: false },
+            { key: "M",     label: "M⁻¹",         factor: 1,       hasCm: false }
+        ],
+        uM: [
+            { key: "uMcm",  label: "µM⁻¹·cm⁻¹",  factor: 1000000, hasCm: true },
+            { key: "Mcm",   label: "M⁻¹·cm⁻¹",   factor: 1,       hasCm: true },
+            { key: "mMcm",  label: "mM⁻¹·cm⁻¹",  factor: 1000,    hasCm: true },
+            { key: "uM",    label: "µM⁻¹",        factor: 1000000, hasCm: false },
+            { key: "M",     label: "M⁻¹",         factor: 1,       hasCm: false }
+        ]
+    };
+
+    const CONC_UNITS = [
+        { key: "mM", label: "mM", factor: 1e-3 },
+        { key: "uM", label: "µM", factor: 1e-6 },
+        { key: "M",  label: "M (mol/L)", factor: 1 }
+    ];
+
+    const MASS_CONC_UNITS = [
+        { key: "mgL",  label: "mg/L",  factor: 1 },
+        { key: "ugmL", label: "µg/mL", factor: 1 },
+        { key: "gL",   label: "g/L",   factor: 1000 }
+    ];
+
+    const MASS_UNITS = [
+        { key: "mg", label: "mg", factor: 1 },
+        { key: "g",  label: "g",  factor: 1000 },
+        { key: "ug", label: "µg", factor: 0.001 }
+    ];
+
+    /* ==========================================================================
+       OPGAVE-DATA
+       ========================================================================== */
+    const TASKS = [
+        {
+            id: 1,
+            short: "1. MnO₄⁻",
+            title: "Opgave 1 — Permanganat ved 528 nm",
+            source: "Eksamenslignende opgave, kemi B",
+            intro: "Til bestemmelse af indholdet af permanganat i en prøve fremstilles en række standardopløsninger af permanganat i basisk opløsning. Der optages absorptionsspektre for standardopløsningerne, og der måles ved bølgelængden 528 nm i en kuvette med kuvettebredde <strong>1,00 cm</strong>.",
+            tableHeaders: ["c(MnO₄⁻) / mM", "A (528 nm)"],
+            tableRows: [
+                ["0,075", "0,187"],
+                ["0,150", "0,363"],
+                ["0,225", "0,556"],
+                ["0,300", "0,729"],
+                ["0,375", "0,924"]
+            ],
+            steps: [
+                {
+                    badge: "Del 1",
+                    type: "epsilon",
+                    prompt: "Lav en standardkurve i Excel ud fra tabellens data. Indsæt en lineær tendenslinje, og få vist ligningen. Brug hældningen til at bestemme den molare absorptionskoefficient, ε, for permanganat ved 528 nm — angiv værdi <em>og</em> korrekt enhed.",
+                    unitSet: "mM",
+                    correctM: 2453,
+                    tolPct: 6,
+                    placeholderDa: "fx 2,45 · 10³",
+                    placeholderEn: "e.g. 2.45 · 10³",
+                    hint: "Hældningen fra tendenslinjen har enheden 'absorbans pr. mM', da x-aksen er i mM. Gang med 1000 for at omregne til M⁻¹·cm⁻¹ (husk cm⁻¹, da kuvettebredden b = 1,00 cm)."
+                },
+                {
+                    badge: "Del 2",
+                    type: "concentration",
+                    prompt: "En prøveopløsning af permanganat måles ved 528 nm og giver absorbansen <strong>A = 0,442</strong>. Brug den ε-værdi, du netop fandt, til at bestemme koncentrationen af permanganat i prøveopløsningen.",
+                    correctM: 0.180e-3,
+                    tolPct: 8,
+                    placeholderDa: "fx 0,18",
+                    placeholderEn: "e.g. 0.18",
+                    hint: "Lambert-Beers lov: A = ε · c · b, hvor b = 1,00 cm. Så c = A / ε."
+                }
+            ]
+        },
+        {
+            id: 2,
+            short: "2. Bouillon",
+            title: "Opgave 2 — Glutaminsyre i bouillonterning (340 nm)",
+            source: "Eksamenslignende opgave, kemi B",
+            intro: "En elev ønsker at bestemme indholdet af mononatriumglutamat (E621, natriumsaltet af glutaminsyre) i en bouillonterning ved UV-spektrofotometri. Bouillonterningen opløses i vand. Der udtages en delprøve på <strong>2,00 mL</strong>, som fortyndes til i alt <strong>200,0 mL</strong> i en målekolbe, hvorefter prøven tilsættes samme reagenser som standardopløsningerne. Der fremstilles desuden en række standardopløsninger med kendte koncentrationer af glutaminsyre. Absorbansen måles ved 340 nm i en kuvette med kuvettebredde <strong>1,00 cm</strong>.",
+            tableHeaders: ["c(glutaminsyre) / mM", "A (340 nm)"],
+            tableRows: [
+                ["0,030", "0,171"],
+                ["0,060", "0,352"],
+                ["0,090", "0,518"],
+                ["0,120", "0,701"],
+                ["0,150", "0,865"]
+            ],
+            steps: [
+                {
+                    badge: "Del 1",
+                    type: "epsilon",
+                    prompt: "Lav en standardkurve i Excel ud fra tabellens data, og bestem den molare absorptionskoefficient, ε, for glutaminsyre-forbindelsen ved 340 nm ud fra tendenslinjens hældning.",
+                    unitSet: "mM",
+                    correctM: 5790,
+                    tolPct: 6,
+                    placeholderDa: "fx 5,79 · 10³",
+                    placeholderEn: "e.g. 5.79 · 10³",
+                    hint: "Husk at omregne hældningen til enheden M⁻¹·cm⁻¹, hvis dine koncentrationer er angivet i mM (gang med 1000)."
+                },
+                {
+                    badge: "Del 2",
+                    type: "concentration",
+                    prompt: "Den fortyndede prøveopløsning (2,00 mL af den opløste bouillonterning fortyndet til 200,0 mL, herefter tilsat samme reagenser som standarderne) giver absorbansen <strong>A = 0,579</strong> ved 340 nm. Bestem glutaminsyrekoncentrationen i denne fortyndede prøveopløsning.",
+                    correctM: 9.995e-5,
+                    tolPct: 8,
+                    placeholderDa: "fx 0,10",
+                    placeholderEn: "e.g. 0.10",
+                    hint: "c = A / ε — brug samme fremgangsmåde som i del 1."
+                },
+                {
+                    badge: "Del 2 (fortsat)",
+                    type: "concentration",
+                    prompt: "Prøven blev lavet ved at fortynde 2,00 mL op til 200,0 mL. Bestem den formelle stofmængdekoncentration af glutaminsyre i den oprindelige (ufortyndede) bouillon-opløsning.",
+                    correctM: 0.00999,
+                    tolPct: 8,
+                    placeholderDa: "fx 10,0",
+                    placeholderEn: "e.g. 10.0",
+                    hint: "Fortyndingsfaktor = V(efter) / V(før) = 200,0 mL / 2,00 mL = 100. Gang koncentrationen i den fortyndede prøve med denne faktor."
+                }
+            ]
+        },
+        {
+            id: 3,
+            short: "3. Prilocain",
+            title: "Opgave 3 — Prilocain i blodprøve (235 nm)",
+            source: "Eksamenslignende opgave, kemi B",
+            intro: "Indholdet af lokalbedøvelsesmidlet prilocain i en blodprøve skal bestemmes ved spektrofotometri. Prilocain ekstraheres først fra blodprøven over i en prøveopløsning. Der fremstilles en række standardopløsninger af prilocain, og standardopløsningernes og prøveopløsningens absorbans måles ved bølgelængden 235 nm i en kuvette med kuvettebredde <strong>1,00 cm</strong>.",
+            tableHeaders: ["[Prilocain] / µM", "A (235 nm)"],
+            tableRows: [
+                ["25,0", "0,104"],
+                ["50,0", "0,213"],
+                ["100", "0,417"],
+                ["175", "0,741"],
+                ["250", "1,056"],
+                ["325", "1,267"],
+                ["400", "1,459"],
+                ["475", "1,588"]
+            ],
+            steps: [
+                {
+                    badge: "Del 1",
+                    type: "choice",
+                    prompt: "Se på tabellens målepunkter — beregn evt. forholdet A/c for hvert punkt, eller plot dem i Excel. I hvilket koncentrationsområde er absorbansen proportional med koncentrationen, dvs. hvor er Lambert-Beers lov opfyldt?",
+                    choices: [
+                        "25,0 µM – 475 µM (alle målepunkter)",
+                        "25,0 µM – 250 µM",
+                        "100 µM – 400 µM",
+                        "325 µM – 475 µM"
+                    ],
+                    correctIndex: 1,
+                    hint: "Forholdet A/c er næsten konstant for de laveste koncentrationer, men falder tydeligt ved de højeste — det er tegn på, at Lambert-Beers lov ikke længere er opfyldt (fx pga. for høj absorbans)."
+                },
+                {
+                    badge: "Del 1 (fortsat)",
+                    type: "epsilon",
+                    prompt: "Brug <em>kun</em> målepunkterne i det lineære område, du fandt ovenfor, til at lave en standardkurve og bestemme ε for prilocain ved 235 nm.",
+                    unitSet: "uM",
+                    correctM: 4231,
+                    tolPct: 8,
+                    placeholderDa: "fx 4,23 · 10³",
+                    placeholderEn: "e.g. 4.23 · 10³",
+                    hint: "Brug kun de første 5 målepunkter (op til 250 µM) til tendenslinjen — de resterende afviger fra linearitet."
+                },
+                {
+                    badge: "Del 2",
+                    type: "concentration",
+                    prompt: "Prøveopløsningen giver en absorbans på <strong>A = 0,633</strong> ved 235 nm. Bestem koncentrationen af prilocain i prøveopløsningen.",
+                    correctM: 1.4997e-4,
+                    tolPct: 10,
+                    placeholderDa: "fx 150",
+                    placeholderEn: "e.g. 150",
+                    hint: "Tjek først, at A = 0,633 faktisk ligger inden for det lineære område, du fandt i del 1 — så må du bruge Lambert-Beers lov direkte. Brug derefter c = A / ε."
+                }
+            ]
+        },
+        {
+            id: 4,
+            short: "4. Medicin",
+            title: "Opgave 4 — Paracetamol i en hovedpinepille (243 nm)",
+            source: "Fiktiv/freestyle opgave i eksamensstil",
+            intro: "En elev vil bestemme indholdet af paracetamol i en hovedpinepille ved UV-spektrofotometri. Pillen knuses, opløses og fortyndes til en kendt volumen. Der fremstilles en række standardopløsninger af paracetamol, og absorbansen måles ved bølgelængden 243 nm i en kuvette med kuvettebredde <strong>1,00 cm</strong>.",
+            tableHeaders: ["c(paracetamol) / mM", "A (243 nm)"],
+            tableRows: [
+                ["0,020", "0,199"],
+                ["0,040", "0,392"],
+                ["0,060", "0,593"],
+                ["0,080", "0,784"],
+                ["0,100", "0,989"]
+            ],
+            steps: [
+                {
+                    badge: "Del 1",
+                    type: "epsilon",
+                    prompt: "Lav en standardkurve i Excel ud fra tabellens data, og bestem den molare absorptionskoefficient, ε, for paracetamol ved 243 nm.",
+                    unitSet: "mM",
+                    correctM: 9860,
+                    tolPct: 6,
+                    placeholderDa: "fx 9,86 · 10³",
+                    placeholderEn: "e.g. 9.86 · 10³",
+                    hint: "Husk at omregne hældningen til enheden M⁻¹·cm⁻¹, hvis dine koncentrationer er angivet i mM (gang med 1000)."
+                },
+                {
+                    badge: "Del 2",
+                    type: "concentration",
+                    prompt: "Den fortyndede prøveopløsning fra hovedpinepillen giver absorbansen <strong>A = 0,739</strong> ved 243 nm. Bestem koncentrationen af paracetamol i prøveopløsningen.",
+                    correctM: 7.495e-5,
+                    tolPct: 8,
+                    placeholderDa: "fx 0,075",
+                    placeholderEn: "e.g. 0.075",
+                    hint: "c = A / ε."
+                },
+                {
+                    badge: "Del 2 (fortsat)",
+                    type: "concentration",
+                    prompt: "Angiv koncentrationen af paracetamol i prøveopløsningen i <strong>mg/L</strong>. Molar masse for paracetamol: M = 151,16 g/mol.",
+                    customUnits: MASS_CONC_UNITS,
+                    correctM: 11.33,
+                    tolPct: 8,
+                    placeholderDa: "fx 11,3",
+                    placeholderEn: "e.g. 11.3",
+                    hint: "Massekoncentration (g/L) = c(mol/L) · molar masse (g/mol). Husk at gange med 1000, hvis du vil have svaret i mg/L."
+                }
+            ]
+        },
+        {
+            id: 5,
+            short: "5. Jern",
+            title: "Opgave 5 — Jern(II) i en kosttilskudstablet (510 nm)",
+            source: "Fiktiv/freestyle opgave i eksamensstil",
+            intro: "En kosttilskudstablet med jern opløses, og alt jernet omdannes til Fe²⁺. Ved tilsætning af 1,10-phenanthrolin dannes det orangerøde kompleks [Fe(phen)₃]²⁺, som måles ved bølgelængden 510 nm i en kuvette med kuvettebredde <strong>1,00 cm</strong>.",
+            tableHeaders: ["c(Fe²⁺) / µM", "A (510 nm)"],
+            tableRows: [
+                ["10,0", "0,112"],
+                ["20,0", "0,219"],
+                ["30,0", "0,336"],
+                ["40,0", "0,441"],
+                ["50,0", "0,558"]
+            ],
+            steps: [
+                {
+                    badge: "Del 1",
+                    type: "epsilon",
+                    prompt: "Lav en standardkurve i Excel ud fra tabellens data, og bestem den molare absorptionskoefficient, ε, for [Fe(phen)₃]²⁺ ved 510 nm.",
+                    unitSet: "uM",
+                    correctM: 11140,
+                    tolPct: 6,
+                    placeholderDa: "fx 1,11 · 10⁴",
+                    placeholderEn: "e.g. 1.11 · 10⁴",
+                    hint: "Husk at omregne hældningen til enheden M⁻¹·cm⁻¹, hvis dine koncentrationer er angivet i µM (gang med 10⁶)."
+                },
+                {
+                    badge: "Del 2",
+                    type: "concentration",
+                    prompt: "Den opløste kosttilskudstablet giver, efter kompleksdannelse og fortynding, en absorbans på <strong>A = 0,306</strong> ved 510 nm. Bestem koncentrationen af Fe²⁺ i den målte prøveopløsning.",
+                    correctM: 2.747e-5,
+                    tolPct: 8,
+                    placeholderDa: "fx 27,5",
+                    placeholderEn: "e.g. 27.5",
+                    hint: "c = A / ε."
+                }
+            ]
+        },
+        {
+            id: 6,
+            short: "6. Messing",
+            title: "Opgave 6 — Kobberindhold i en messingskrue (620 nm)",
+            source: "Fiktiv/freestyle opgave i eksamensstil",
+            intro: "En messingskrue (en legering af kobber og zink) opløses i syre, hvorved kobberet omdannes til Cu²⁺. Ved tilsætning af overskud af ammoniak dannes det dybblå kompleks [Cu(NH₃)₄]²⁺. Opløsningen fortyndes til i alt <strong>250,0 mL</strong> i en målekolbe, og absorbansen måles direkte ved bølgelængden 620 nm i en kuvette med kuvettebredde <strong>1,00 cm</strong>.",
+            tableHeaders: ["c(Cu²⁺) / mM", "A (620 nm)"],
+            tableRows: [
+                ["0,20", "0,243"],
+                ["0,40", "0,489"],
+                ["0,60", "0,741"],
+                ["0,80", "0,978"],
+                ["1,00", "1,235"]
+            ],
+            steps: [
+                {
+                    badge: "Del 1",
+                    type: "epsilon",
+                    prompt: "Lav en standardkurve i Excel ud fra tabellens data, og bestem den molare absorptionskoefficient, ε, for [Cu(NH₃)₄]²⁺ ved 620 nm.",
+                    unitSet: "mM",
+                    correctM: 1237,
+                    tolPct: 6,
+                    placeholderDa: "fx 1,24 · 10³",
+                    placeholderEn: "e.g. 1.24 · 10³",
+                    hint: "Husk at omregne hældningen til enheden M⁻¹·cm⁻¹, hvis dine koncentrationer er angivet i mM (gang med 1000)."
+                },
+                {
+                    badge: "Del 2",
+                    type: "concentration",
+                    prompt: "Den fortyndede prøveopløsning (den opløste skrue, fortyndet til 250,0 mL) giver absorbansen <strong>A = 0,799</strong> ved 620 nm. Bestem koncentrationen af Cu²⁺ i prøveopløsningen.",
+                    correctM: 6.500e-4,
+                    tolPct: 8,
+                    placeholderDa: "fx 0,65",
+                    placeholderEn: "e.g. 0.65",
+                    hint: "c = A / ε."
+                },
+                {
+                    badge: "Del 2 (fortsat)",
+                    type: "concentration",
+                    prompt: "Bestem den samlede masse af kobber i messingskruen. Hele skruen blev opløst og fortyndet til 250,0 mL, som du fandt koncentrationen af ovenfor. Molar masse for kobber: M = 63,55 g/mol.",
+                    customUnits: MASS_UNITS,
+                    correctM: 10.33,
+                    tolPct: 8,
+                    placeholderDa: "fx 10,3",
+                    placeholderEn: "e.g. 10.3",
+                    hint: "Stofmængde n = c · V, hvor V = 250,0 mL = 0,2500 L. Masse = n · M. Husk at gange om til mg til sidst, hvis du vil svare i den enhed."
+                }
+            ]
+        }
+    ];
+
+    /* ==========================================================================
+       GLOBAL STATE
+       ========================================================================== */
+    let useEnglishDecimals = false;
+    let activeTaskId = TASKS[0].id;
+    const attemptState = {};
+    const taskState = {}; // taskState[id] = { solved: n }
+    TASKS.forEach(t => taskState[t.id] = { solved: 0 });
+
+    function parseNum(str) {
+        if (typeof str !== "string") return NaN;
+        return parseFloat(str.replace(",", ".").trim());
+    }
+
+    function fmt(str) {
+        if (!useEnglishDecimals) return str;
+        return String(str).replace(/,/g, ".");
+    }
+
+    function getStep(taskId, idx) {
+        const task = TASKS.find(t => t.id === taskId);
+        return task ? task.steps[idx] : null;
+    }
+
+    /* ==========================================================================
+       RENDERING: TABEL + KOPIÉR-KNAP
+       ========================================================================== */
+    function tableBlockHTML(task) {
+        let tableHtml = '<table class="data-table"><thead><tr>';
+        task.tableHeaders.forEach(h => tableHtml += "<th>" + fmt(h) + "</th>");
+        tableHtml += "</tr></thead><tbody>";
+        task.tableRows.forEach(row => {
+            tableHtml += "<tr>";
+            row.forEach(cell => tableHtml += "<td>" + fmt(cell) + "</td>");
+            tableHtml += "</tr>";
+        });
+        tableHtml += "</tbody></table>";
+
+        return (
+            '<div class="table-row-flex">' +
+            tableHtml +
+            '<div class="copy-block">' +
+            '<button type="button" class="copy-btn" onclick="copyTable(' + task.id + ')">📋 Kopiér tabel</button>' +
+            '<div class="copy-feedback" id="copyfb_' + task.id + '"></div>' +
+            "</div>" +
+            "</div>"
+        );
+    }
+
+    function refreshAllTables() {
+        TASKS.forEach(t => {
+            const wrap = document.getElementById("tablewrap_" + t.id);
+            if (wrap) wrap.innerHTML = tableBlockHTML(t);
+        });
+        refreshPlaceholders();
+    }
+
+    function refreshPlaceholders() {
+        TASKS.forEach(task => {
+            task.steps.forEach((step, idx) => {
+                if (step.type !== "epsilon" && step.type !== "concentration") return;
+                const el = document.getElementById("val_" + task.id + "_" + idx);
+                if (el) el.placeholder = useEnglishDecimals ? step.placeholderEn : step.placeholderDa;
+            });
+        });
+    }
+
+    function copyTable(taskId) {
+        const task = TASKS.find(t => t.id === taskId);
+        const rows = [task.tableHeaders.map(fmt)];
+        task.tableRows.forEach(r => rows.push(r.map(fmt)));
+        const tsv = rows.map(r => r.join("\t")).join("\n");
+
+        const ta = document.createElement("textarea");
+        ta.value = tsv;
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.select();
+        ta.setSelectionRange(0, tsv.length);
+
+        let ok = false;
+        try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+        document.body.removeChild(ta);
+
+        const feedback = document.getElementById("copyfb_" + taskId);
+        if (ok) {
+            feedback.textContent = "Kopieret! Klik i Excel, og tryk Ctrl+V.";
+        } else {
+            feedback.textContent = "Kunne ikke kopiere automatisk — markér og kopiér tabellen manuelt.";
+        }
+        feedback.classList.add("show");
+        clearTimeout(feedback._t);
+        feedback._t = setTimeout(() => feedback.classList.remove("show"), 4000);
+    }
+
+    function toggleDecimals() {
+        useEnglishDecimals = document.getElementById("decimalToggle").checked;
+        refreshAllTables();
+    }
+
+    /* ==========================================================================
+       RENDERING: DELOPGAVER
+       ========================================================================== */
+    function renderStep(task, step, idx) {
+        const prefix = task.id + "_" + idx;
+        let controlsHtml = "";
+
+        if (step.type === "epsilon" || step.type === "concentration") {
+            const units = step.type === "epsilon" ? EPS_UNITS[step.unitSet] : (step.customUnits || CONC_UNITS);
+            let optionsHtml = units.map(u => '<option value="' + u.key + '">' + u.label + "</option>").join("");
+            if (step.type === "epsilon") {
+                optionsHtml = '<option value="" disabled selected>Indsæt enhed</option>' + optionsHtml;
+            }
+            let placeholder = useEnglishDecimals ? step.placeholderEn : step.placeholderDa;
+            let labelHtml = step.type === "epsilon" ? '<span class="eps-label">ε =</span>' : "";
+            controlsHtml =
+                '<div class="step-controls">' +
+                labelHtml +
+                '<input type="text" id="val_' + prefix + '" placeholder="' + placeholder + '" inputmode="decimal">' +
+                '<select id="unit_' + prefix + '">' + optionsHtml + "</select>" +
+                '<button type="button" class="check-btn" onclick="checkStep(' + task.id + "," + idx + ')">Tjek svar</button>' +
+                "</div>";
+        } else if (step.type === "choice") {
+            let optionsHtml = step.choices.map((c, ci) =>
+                '<label><input type="radio" name="choice_' + prefix + '" value="' + ci + '"> ' + c + "</label>"
+            ).join("");
+            controlsHtml =
+                '<div class="choice-list">' + optionsHtml + "</div>" +
+                '<button type="button" class="check-btn" onclick="checkStep(' + task.id + "," + idx + ')">Tjek svar</button>';
+        }
+
+        return (
+            '<div class="step-card' + (idx > 0 ? " step-hidden" : "") + '" id="stepcard_' + prefix + '">' +
+            '<span class="step-badge">' + step.badge + "</span>" +
+            '<div class="step-prompt">' + step.prompt + "</div>" +
+            controlsHtml +
+            '<div class="step-feedback" id="fb_' + prefix + '"></div>' +
+            "</div>"
+        );
+    }
+
+    function renderTask(task) {
+        let stepsHtml = task.steps.map((s, i) => renderStep(task, s, i)).join("");
+        return (
+            '<div class="task-card" id="task_' + task.id + '" style="display:' + (task.id === activeTaskId ? "block" : "none") + '">' +
+            "<h2>" + task.title + "</h2>" +
+            '<div class="task-source">' + task.source + "</div>" +
+            '<div class="task-intro">' + task.intro + "</div>" +
+            '<div id="tablewrap_' + task.id + '">' + tableBlockHTML(task) + "</div>" +
+            '<div class="steps-wrap" id="steps_' + task.id + '">' + stepsHtml + "</div>" +
+            '<div class="task-done-msg" id="taskdone_' + task.id + '">🎉 Flot! Du har løst hele opgaven korrekt.</div>' +
+            '<div class="task-footer"><button type="button" class="reset-btn" onclick="resetTask(' + task.id + ')">Nulstil opgave</button></div>' +
+            "</div>"
+        );
+    }
+
+    function renderAll() {
+        const container = document.getElementById("tasksContainer");
+        container.innerHTML = TASKS.map(renderTask).join("");
+        renderTabs();
+    }
+
+    /* ==========================================================================
+       FANER
+       ========================================================================== */
+    function renderTabs() {
+        const bar = document.getElementById("tabBar");
+        bar.innerHTML = TASKS.map(t =>
+            '<button type="button" class="tab-btn" id="tabbtn_' + t.id + '" onclick="selectTask(' + t.id + ')">' +
+            t.short +
+            '<span class="tab-progress" id="tabprog_' + t.id + '"></span>' +
+            "</button>"
+        ).join("");
+        TASKS.forEach(t => updateTabProgress(t.id));
+        updateTabStates();
+    }
+
+    function updateTabStates() {
+        TASKS.forEach(t => {
+            const btn = document.getElementById("tabbtn_" + t.id);
+            const card = document.getElementById("task_" + t.id);
+            if (btn) btn.classList.toggle("active", t.id === activeTaskId);
+            if (card) card.style.display = t.id === activeTaskId ? "block" : "none";
+        });
+    }
+
+    function selectTask(taskId) {
+        activeTaskId = taskId;
+        updateTabStates();
+    }
+
+    function updateTabProgress(taskId) {
+        const task = TASKS.find(t => t.id === taskId);
+        const total = task.steps.length;
+        const solved = taskState[taskId].solved;
+        const el = document.getElementById("tabprog_" + taskId);
+        if (!el) return;
+        el.textContent = solved >= total ? " ✓" : " (" + solved + "/" + total + ")";
+    }
+
+    /* ==========================================================================
+       TJEK-LOGIK
+       ========================================================================== */
+    function checkStep(taskId, idx) {
+        const task = TASKS.find(t => t.id === taskId);
+        const step = task.steps[idx];
+        const prefix = taskId + "_" + idx;
+        const feedbackEl = document.getElementById("fb_" + prefix);
+
+        if (attemptState[prefix] === undefined) attemptState[prefix] = 0;
+
+        let isCorrect = false;
+        let msg = "";
+
+        if (step.type === "epsilon" || step.type === "concentration") {
+            const valEl = document.getElementById("val_" + prefix);
+            const unitEl = document.getElementById("unit_" + prefix);
+            const num = parseNum(valEl.value);
+
+            if (isNaN(num)) {
+                feedbackEl.className = "step-feedback wrong";
+                feedbackEl.textContent = "Indtast et tal (brug evt. komma eller punktum som decimaltegn).";
+                return;
+            }
+
+            if (unitEl.value === "") {
+                feedbackEl.className = "step-feedback wrong";
+                feedbackEl.textContent = "Vælg en enhed i dropdown-menuen.";
+                return;
+            }
+
+            const units = step.type === "epsilon" ? EPS_UNITS[step.unitSet] : (step.customUnits || CONC_UNITS);
+            const unitDef = units.find(u => u.key === unitEl.value);
+
+            if (step.type === "epsilon" && !unitDef.hasCm) {
+                msg = "✗ Tjek enheden — husk cm⁻¹. Kuvettebredden er angivet til 1,00 cm i opgaven, så den skal indgå i enheden for ε.";
+                isCorrect = false;
+            } else {
+                const normalized = num * unitDef.factor;
+                const target = step.correctM;
+                const tol = Math.abs(target) * (step.tolPct / 100);
+                if (Math.abs(normalized - target) <= tol) {
+                    isCorrect = true;
+                    msg = "✓ Rigtigt!";
+                } else {
+                    msg = "✗ Ikke helt rigtigt endnu. Tjek din beregning.";
+                }
+            }
+        } else if (step.type === "choice") {
+            const selected = document.querySelector('input[name="choice_' + prefix + '"]:checked');
+            if (!selected) {
+                feedbackEl.className = "step-feedback wrong";
+                feedbackEl.textContent = "Vælg en af mulighederne.";
+                return;
+            }
+            if (parseInt(selected.value, 10) === step.correctIndex) {
+                isCorrect = true;
+                msg = "✓ Rigtigt!";
+            } else {
+                msg = "✗ Forkert — prøv igen.";
+            }
+        }
+
+        if (isCorrect) {
+            feedbackEl.className = "step-feedback correct";
+            feedbackEl.textContent = msg;
+            lockStepControls(prefix);
+            document.getElementById("stepcard_" + prefix).classList.add("step-done");
+
+            taskState[taskId].solved = idx + 1;
+            updateTabProgress(taskId);
+            unlockNext(task, idx);
+        } else {
+            attemptState[prefix]++;
+            feedbackEl.className = "step-feedback wrong";
+            let extra = "";
+            if (attemptState[prefix] >= 3 && step.hint) {
+                extra = " 💡 " + step.hint;
+            }
+            feedbackEl.textContent = msg + extra;
+        }
+    }
+
+    function lockStepControls(prefix) {
+        const card = document.getElementById("stepcard_" + prefix);
+        card.querySelectorAll("input, select, button.check-btn").forEach(el => el.disabled = true);
+    }
+
+    function unlockNext(task, idx) {
+        const next = task.steps[idx + 1];
+        if (next) {
+            document.getElementById("stepcard_" + task.id + "_" + (idx + 1)).classList.remove("step-hidden");
+        } else {
+            document.getElementById("taskdone_" + task.id).style.display = "block";
+        }
+    }
+
+    function resetTask(taskId) {
+        const task = TASKS.find(t => t.id === taskId);
+        taskState[taskId].solved = 0;
+
+        task.steps.forEach((step, idx) => {
+            const prefix = taskId + "_" + idx;
+            attemptState[prefix] = 0;
+            const card = document.getElementById("stepcard_" + prefix);
+            card.classList.remove("step-done");
+            if (idx > 0) {
+                card.classList.add("step-hidden");
+            } else {
+                card.classList.remove("step-hidden");
+            }
+
+            const feedbackEl = document.getElementById("fb_" + prefix);
+            feedbackEl.className = "step-feedback";
+            feedbackEl.textContent = "";
+
+            if (step.type === "epsilon" || step.type === "concentration") {
+                const valEl = document.getElementById("val_" + prefix);
+                const unitEl = document.getElementById("unit_" + prefix);
+                valEl.value = "";
+                valEl.disabled = false;
+                unitEl.selectedIndex = 0;
+                unitEl.disabled = false;
+            } else if (step.type === "choice") {
+                document.querySelectorAll('input[name="choice_' + prefix + '"]').forEach(r => {
+                    r.checked = false;
+                    r.disabled = false;
+                });
+            }
+            card.querySelector("button.check-btn").disabled = false;
+        });
+
+        document.getElementById("taskdone_" + taskId).style.display = "none";
+        updateTabProgress(taskId);
+    }
+
+    renderAll();
+</script>
+</body>
+</html>

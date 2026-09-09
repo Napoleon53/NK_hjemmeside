@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kemi-Animation: R/S Isomeri (Ball & Stick V5)</title>
+    <style>
+        :root {
+            --bg-color: #1a1a2e;
+            --text-color: #e0e0e0;
+            --panel-bg: #252542;
+            --accent: #4a90e2;
+            --accent-hover: #357abd;
+            --danger: #e74c3c;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #canvas-container {
+            flex: 1; 
+            position: relative;
+            background: radial-gradient(circle at center, #2a2a4a 0%, #1a1a2e 100%);
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+        canvas:active {
+            cursor: grabbing;
+        }
+        
+        /* UI OVERLAY */
+        #status-panel {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(20, 20, 30, 0.75); 
+            backdrop-filter: blur(6px);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            pointer-events: none;
+            user-select: none;
+            max-width: 300px;
+        }
+        #molecule-name {
+            font-size: 1.1rem; 
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+        #config-state {
+            font-size: 1.4rem; 
+            font-weight: bold;
+            color: #f1c40f;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+        
+        .legend {
+            font-size: 0.85rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+        }
+        .legend-item i {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 6px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* CONTROLS */
+        #controls {
+            background-color: var(--panel-bg);
+            padding: 12px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+            border-top: 1px solid #3a3a5e;
+            z-index: 10;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.2);
+        }
+        .control-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+        button:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        button.secondary {
+            background-color: transparent;
+            border: 1px solid var(--accent);
+        }
+        button.secondary:hover {
+            background-color: rgba(74, 144, 226, 0.1);
+        }
+        button#resetBtn {
+            background-color: var(--danger);
+        }
+        button#resetBtn:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+
+<div id="canvas-container">
+    <canvas id="moleculeCanvas"></canvas>
+    <div id="status-panel">
+        <div id="molecule-name">Bromchlorfluormethan</div>
+        <div id="config-state">Konfiguration: Ukendt</div>
+        <div class="legend">
+            <div class="legend-item"><i style="background:#333;"></i>C</div>
+            <div class="legend-item"><i style="background:#a52a2a;"></i>Br (1)</div>
+            <div class="legend-item"><i style="background:#2ecc71;"></i>Cl (2)</div>
+            <div class="legend-item"><i style="background:#3498db;"></i>F (3)</div>
+            <div class="legend-item"><i style="background:#ecf0f1;"></i>H (4)</div>
+        </div>
+    </div>
+</div>
+
+<div id="controls">
+    <div class="control-group">
+        <label for="showPriorities" style="cursor:pointer; display:flex; align-items:center;">
+            <span style="margin-right:8px;">Vis Tal (CIP)</span>
+            <input type="checkbox" id="showPriorities" checked>
+        </label>
+    </div>
+    <button id="switchEnantiomerBtn" class="secondary">↔ Skift Enantiomer</button>
+    <button id="autoOrientBtn">👁️ Auto-Orienter (Vis R/S)</button>
+    <button id="resetBtn">↺</button>
+</div>
+
+<script>
+// --- KONSTANTER & GLOBALE VARIABLER ---
+const canvas = document.getElementById('moleculeCanvas');
+const ctx = canvas.getContext('2d');
+let width, height;
+
+// Atomdata
+const ATOM_DATA = {
+    'C': { color: '#333333', radius: 25, z: 6, name: 'Carbon' }, 
+    'H': { color: '#ecf0f1', radius: 14, z: 1, name: 'Hydrogen' },
+    'Br':{ color: '#a52a2a', radius: 26, z: 35, name: 'Brom' },
+    'Cl':{ color: '#2ecc71', radius: 24, z: 17, name: 'Chlor' },
+    'F': { color: '#3498db', radius: 20, z: 9, name: 'Fluor' }
+};
+
+// Tilstandsvariabler
+let gameState = {
+    isRConfiguration: true,
+    showPriorities: true,
+    isAutoOriented: false,
+    rotation: { x: 0.3, y: 0.3, z: 0 },
+    targetRotation: null,
+    animating: false
+};
+
+// 3D Motor Variabler
+let atoms = [];
+let bonds = [];
+const BOND_LENGTH = 170; 
+let focalLength = 900;
+let mouse = { x: 0, y: 0, down: false, lastX: 0, lastY: 0 };
+
+const PRIORITY_SYMBOLS = ['①', '②', '③', '④'];
+
+// --- KLASSER ---
+class Atom {
+    constructor(symbol, x, y, z, id) {
+        this.symbol = symbol;
+        this.pos = { x, y, z };
+        this.origPos = { x, y, z };
+        this.data = ATOM_DATA[symbol];
+        this.id = id;
+        this.priority = 0; 
+        this.screenPos = { x: 0, y: 0, scale: 0 };
+    }
+
+    project() {
+        let scale = focalLength / (focalLength + this.pos.z);
+        this.screenPos.x = width / 2 + this.pos.x * scale;
+        this.screenPos.y = height / 2 + this.pos.y * scale;
+        this.screenPos.scale = scale;
+    }
+
+    draw() {
+        let scale = this.screenPos.scale;
+        let r = this.data.radius * scale;
+        
+        // Simuler 3D kugle med radial gradient
+        let grad = ctx.createRadialGradient(
+            this.screenPos.x - r/3, this.screenPos.y - r/3, r/10,
+            this.screenPos.x, this.screenPos.y, r
+        );
+        grad.addColorStop(0, lighten(this.data.color, 40));
+        grad.addColorStop(1, this.data.color);
+
+        ctx.beginPath();
+        ctx.arc(this.screenPos.x, this.screenPos.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.strokeStyle = "rgba(0,0,0,0.4)";
+        ctx.lineWidth = 1 * scale;
+        ctx.stroke();
+
+        ctx.fillStyle = this.data.z === 1 || this.data.z === 6 ? '#000' : '#fff';
+        if (this.data.z === 6) ctx.fillStyle = '#fff';
+        ctx.font = `bold ${16 * scale}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.symbol, this.screenPos.x, this.screenPos.y);
+
+        if (gameState.showPriorities && this.priority > 0) {
+            ctx.font = `bold ${28 * scale}px 'Segoe UI Symbol', Arial`;
+            ctx.fillStyle = '#f1c40f'; 
+            ctx.shadowColor = "rgba(0,0,0,0.9)";
+            ctx.shadowBlur = 4;
+            ctx.fillText(PRIORITY_SYMBOLS[this.priority-1], this.screenPos.x + r*0.8, this.screenPos.y - r*0.8);
+            ctx.shadowBlur = 0;
+        }
+    }
+}
+
+// --- HJÆLPEFUNKTIONER ---
+function lighten(color, percent) {
+    var num = parseInt(color.replace("#",""),16),
+    amt = Math.round(2.55 * percent),
+    R = (num >> 16) + amt,
+    B = ((num >> 8) & 0x00ff) + amt,
+    G = (num & 0x0000ff) + amt;
+    return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (B<255?B<1?0:B:255)*0x100 + (G<255?G<1?0:G:255)).toString(16).slice(1);
+}
+
+function rotateX(pos, angle) {
+    let y = pos.y * Math.cos(angle) - pos.z * Math.sin(angle);
+    let z = pos.y * Math.sin(angle) + pos.z * Math.cos(angle);
+    return { x: pos.x, y: y, z: z };
+}
+function rotateY(pos, angle) {
+    let x = pos.x * Math.cos(angle) + pos.z * Math.sin(angle);
+    let z = -pos.x * Math.sin(angle) + pos.z * Math.cos(angle);
+    return { x: x, y: pos.y, z: z };
+}
+
+// --- MOLEKYLE KONSTRUKTION ---
+function createMolecule() {
+    atoms = [];
+    bonds = [];
+    // 0: Central Carbon
+    atoms.push(new Atom('C', 0, 0, 0, 0));
+
+    // Geometri for Tetraeder
+    const a = BOND_LENGTH * Math.sqrt(8/9); 
+    const b = BOND_LENGTH * Math.sqrt(1/9); 
+    
+    // 1: H (lavest prioritet)
+    atoms.push(new Atom('H', 0, 0, BOND_LENGTH, 1)); 
+    
+    // Positioner for de tre andre (foran)
+    let sub2Pos = { x: a, y: 0, z: -b };
+    let sub3Pos = { x: -a/2, y: a*Math.sqrt(3)/2, z: -b };
+    
+    // VIGTIGT: For at skifte R/S bytter vi to grupper
+    if (!gameState.isRConfiguration) {
+        [sub2Pos, sub3Pos] = [sub3Pos, sub2Pos];
+    }
+
+    atoms.push(new Atom('Br', sub2Pos.x, sub2Pos.y, sub2Pos.z, 2));
+    atoms.push(new Atom('Cl', sub3Pos.x, sub3Pos.y, sub3Pos.z, 3));
+    atoms.push(new Atom('F', -a/2, -a*Math.sqrt(3)/2, -b, 4));
+
+    for (let i = 1; i < atoms.length; i++) {
+        bonds.push({ from: 0, to: i });
+    }
+
+    assignPriorities();
+    updateStatusText();
+}
+
+function assignPriorities() {
+    let substituents = atoms.filter(a => a.id !== 0);
+    substituents.sort((a, b) => b.data.z - a.data.z);
+    substituents.forEach((atom, index) => {
+        atom.priority = index + 1;
+    });
+}
+
+function determineCurrentConfig() {
+    let hAtom = atoms.find(a => a.priority === 4);
+    let p1 = atoms.find(a => a.priority === 1);
+    let p2 = atoms.find(a => a.priority === 2);
+    let p3 = atoms.find(a => a.priority === 3);
+
+    if (hAtom.pos.z > 20 && gameState.isAutoOriented) {
+        let v1x = p2.screenPos.x - p1.screenPos.x;
+        let v1y = p2.screenPos.y - p1.screenPos.y;
+        let v2x = p3.screenPos.x - p2.screenPos.x;
+        let v2y = p3.screenPos.y - p2.screenPos.y;
+
+        let crossZ = v1x * v2y - v1y * v2x;
+        return crossZ > 0 ? 'R (Med Uret)' : 'S (Mod Uret)';
+    }
+    return "Orienter H bagud...";
+}
+
+// --- RENDERING ---
+function init() {
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    setupControls();
+    createMolecule();
+    requestAnimationFrame(animate);
+}
+
+function resizeCanvas() {
+    width = canvas.width = canvas.offsetWidth;
+    height = canvas.height = canvas.offsetHeight;
+    focalLength = Math.min(width, height) * 0.9;
+}
+
+function updatePhysics() {
+    if (gameState.animating && gameState.targetRotation) {
+        let dx = gameState.targetRotation.x - gameState.rotation.x;
+        let dy = gameState.targetRotation.y - gameState.rotation.y;
+        
+        gameState.rotation.x += dx * 0.1;
+        gameState.rotation.y += dy * 0.1;
+
+        if (Math.abs(dx) < 0.005 && Math.abs(dy) < 0.005) {
+            gameState.rotation.x = gameState.targetRotation.x;
+            gameState.rotation.y = gameState.targetRotation.y;
+            gameState.animating = false;
+            gameState.isAutoOriented = true;
+            updateStatusText();
+        }
+    }
+
+    atoms.forEach(atom => {
+        let pos = rotateY(atom.origPos, gameState.rotation.y);
+        pos = rotateX(pos, gameState.rotation.x);
+        atom.pos = pos;
+    });
+}
+
+// V5 NY FUNKTION: Tegner stregen, men stopper VED kanten af atomerne
+function drawSingleBond(bond) {
+    let a1 = atoms[bond.from];
+    let a2 = atoms[bond.to];
+    
+    let avgZ = (a1.pos.z + a2.pos.z) / 2;
+    let scale = focalLength / (focalLength + avgZ);
+    
+    // MEGET tyndere streger (v5 ændring)
+    let lineWidth = 6 * scale; 
+
+    // Beregn retningsvektor mellem de to atomer på skærmen
+    let dx = a2.screenPos.x - a1.screenPos.x;
+    let dy = a2.screenPos.y - a1.screenPos.y;
+    let dist = Math.sqrt(dx*dx + dy*dy);
+
+    if (dist < 1) return; // Undgå division med 0
+
+    // Normaliser vektor
+    let nx = dx / dist;
+    let ny = dy / dist;
+
+    // Hent radius for atomerne (skaleret)
+    let r1 = a1.data.radius * a1.screenPos.scale;
+    let r2 = a2.data.radius * a2.screenPos.scale;
+
+    // Start og slut punkter justeret så de starter ved atomets kant
+    // Vi trækker lidt fra radius (0.8) for at sikre de "rører" ved visuel overlap
+    let startX = a1.screenPos.x + nx * (r1 * 0.9);
+    let startY = a1.screenPos.y + ny * (r1 * 0.9);
+    let endX = a2.screenPos.x - nx * (r2 * 0.9);
+    let endY = a2.screenPos.y - ny * (r2 * 0.9);
+
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.lineTo(endX, endY);
+    
+    let shade = Math.floor(60 * scale); 
+    shade = Math.max(30, Math.min(100, shade)); 
+    
+    ctx.strokeStyle = `rgb(${shade},${shade},${shade})`; // Mørkegrå
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+}
+
+function drawRSArc() {
+    if (!gameState.isAutoOriented) return;
+
+    let p1 = atoms.find(a => a.priority === 1);
+    let p2 = atoms.find(a => a.priority === 2);
+    let p3 = atoms.find(a => a.priority === 3);
+    let center = atoms[0];
+
+    if (!p1 || !p2 || !p3) return;
+
+    ctx.save();
+    let configStr = determineCurrentConfig();
+    let isR = configStr.startsWith('R');
+    let color = isR ? '#2ecc71' : '#3498db';
+
+    // Pil stil
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 8;
+    ctx.setLineDash([20, 10]);
+
+    // Bue fra 1 -> 2 -> 3
+    ctx.beginPath();
+    ctx.moveTo(p1.screenPos.x, p1.screenPos.y);
+    let ctrlX = p2.screenPos.x + (p2.screenPos.x - center.screenPos.x)*0.6;
+    let ctrlY = p2.screenPos.y + (p2.screenPos.y - center.screenPos.y)*0.6;
+    ctx.quadraticCurveTo(ctrlX, ctrlY, p3.screenPos.x, p3.screenPos.y);
+    ctx.stroke();
+
+    // Pilspids ved 3
+    let angle = Math.atan2(p3.screenPos.y - ctrlY, p3.screenPos.x - ctrlX);
+    let headlen = 25;
+    ctx.beginPath();
+    ctx.setLineDash([]);
+    ctx.moveTo(p3.screenPos.x, p3.screenPos.y);
+    ctx.lineTo(p3.screenPos.x - headlen * Math.cos(angle - Math.PI / 6), p3.screenPos.y - headlen * Math.sin(angle - Math.PI / 6));
+    ctx.lineTo(p3.screenPos.x - headlen * Math.cos(angle + Math.PI / 6), p3.screenPos.y - headlen * Math.sin(angle + Math.PI / 6));
+    ctx.fill();
+    
+    // Tekst R/S
+    ctx.font = 'bold 100px Arial';
+    ctx.textAlign = 'center';
+    ctx.globalAlpha = 0.9;
+    ctx.shadowColor = "rgba(0,0,0,0.6)";
+    ctx.shadowBlur = 15;
+    ctx.fillText(isR ? 'R' : 'S', center.screenPos.x, center.screenPos.y + 15);
+    
+    ctx.restore();
+}
+
+function render() {
+    ctx.clearRect(0, 0, width, height);
+    
+    atoms.forEach(atom => atom.project());
+    
+    let renderList = [];
+
+    atoms.forEach(atom => {
+        renderList.push({
+            type: 'atom',
+            z: atom.pos.z, 
+            obj: atom
+        });
+    });
+
+    bonds.forEach(bond => {
+        let a1 = atoms[bond.from];
+        let a2 = atoms[bond.to];
+        let midZ = (a1.pos.z + a2.pos.z) / 2;
+        
+        renderList.push({
+            type: 'bond',
+            z: midZ, 
+            obj: bond
+        });
+    });
+
+    // Sorter: Længst væk først
+    renderList.sort((a, b) => b.z - a.z);
+
+    renderList.forEach(item => {
+        if (item.type === 'atom') {
+            item.obj.draw();
+        } else {
+            drawSingleBond(item.obj);
+        }
+    });
+
+    drawRSArc();
+}
+
+function animate() {
+    updatePhysics();
+    render();
+    requestAnimationFrame(animate);
+}
+
+// --- INTERAKTION ---
+function setupControls() {
+    const handleStart = (x, y) => {
+        mouse.down = true;
+        mouse.lastX = x;
+        mouse.lastY = y;
+        gameState.isAutoOriented = false;
+        updateStatusText();
+    };
+    
+    const handleMove = (x, y) => {
+        if (!mouse.down) return;
+        let deltaX = x - mouse.lastX;
+        let deltaY = y - mouse.lastY;
+        gameState.rotation.y += deltaX * 0.005;
+        gameState.rotation.x += deltaY * 0.005;
+        mouse.lastX = x;
+        mouse.lastY = y;
+    };
+
+    canvas.addEventListener('mousedown', e => handleStart(e.clientX, e.clientY));
+    window.addEventListener('mouseup', () => mouse.down = false);
+    window.addEventListener('mousemove', e => handleMove(e.clientX, e.clientY));
+
+    canvas.addEventListener('touchstart', e => {
+        handleStart(e.touches[0].clientX, e.touches[0].clientY);
+        e.preventDefault();
+    }, {passive: false});
+    window.addEventListener('touchend', () => mouse.down = false);
+    window.addEventListener('touchmove', e => {
+        handleMove(e.touches[0].clientX, e.touches[0].clientY);
+        e.preventDefault();
+    }, {passive: false});
+
+    document.getElementById('showPriorities').addEventListener('change', (e) => {
+        gameState.showPriorities = e.target.checked;
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        gameState.rotation = { x: 0.3, y: 0.3, z: 0 };
+        gameState.isAutoOriented = false;
+        gameState.animating = false;
+        updateStatusText();
+    });
+
+    document.getElementById('switchEnantiomerBtn').addEventListener('click', () => {
+        gameState.isRConfiguration = !gameState.isRConfiguration;
+        createMolecule(); 
+        gameState.isAutoOriented = false;
+        updateStatusText();
+        const btn = document.getElementById('switchEnantiomerBtn');
+        btn.textContent = gameState.isRConfiguration ? "↔ Skift til S" : "↔ Skift til R";
+    });
+
+    document.getElementById('autoOrientBtn').addEventListener('click', () => {
+        gameState.targetRotation = { x: 0, y: 0, z: 0 }; 
+        gameState.animating = true;
+    });
+}
+
+function updateStatusText() {
+    const configStateDiv = document.getElementById('config-state');
+    const molNameDiv = document.getElementById('molecule-name');
+    
+    let prefix = gameState.isRConfiguration ? '(R)-' : '(S)-';
+    molNameDiv.textContent = prefix + 'Bromchlorfluormethan';
+
+    if (gameState.isAutoOriented) {
+        configStateDiv.textContent = determineCurrentConfig();
+        configStateDiv.style.color = gameState.isRConfiguration ? '#2ecc71' : '#3498db';
+    } else {
+        configStateDiv.textContent = "Drej molekylet så H peger bagud";
+        configStateDiv.style.color = '#f1c40f';
+    }
+}
+
+init();
+</script>
+</body>
+</html>

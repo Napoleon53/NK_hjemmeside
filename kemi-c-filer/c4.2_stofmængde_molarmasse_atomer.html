@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kemi-Lab: Forståelse af stofmængde</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --panel: #1e293b;
+            --accent: #f59e0b;
+            --accent-hover: #fbbf24;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #22c55e;
+            --danger: #ef4444;
+        }
+
+        body { 
+            margin: 0; font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg); color: var(--text); 
+            height: 100vh; overflow: hidden; display: flex; flex-direction: column; 
+        }
+
+        nav {
+            height: 60px; background: rgba(30,41,59,0.95); border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; padding: 0 20px; gap: 10px; z-index: 20;
+        }
+        
+        .nav-btn {
+            background: transparent; border: none; color: #94a3b8; padding: 10px 20px;
+            font-size: 1rem; font-weight: 600; cursor: pointer; border-radius: 6px;
+            transition: 0.2s; display: flex; align-items: center; gap: 8px;
+        }
+        
+        .nav-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .nav-btn.active { background: rgba(245, 158, 11, 0.15); color: var(--accent); }
+
+        #content-area { flex: 1; position: relative; overflow: hidden; }
+        
+        .page { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            display: none; opacity: 0; transition: opacity 0.3s; 
+        }
+        
+        .page.active { display: flex; opacity: 1; }
+
+        #lab-page { flex-direction: row; }
+        
+        .sidebar {
+            width: 360px;
+            background: var(--panel); border-right: 1px solid var(--border);
+            padding: 20px; display: flex; flex-direction: column; gap: 20px; z-index: 10;
+            overflow-y: auto; box-sizing: border-box;
+        }
+        
+        .canvas-container {
+            flex: 1; position: relative; background: radial-gradient(circle at center, #1e293b, #020617);
+            overflow: hidden;
+        }
+        
+        canvas { width: 100%; height: 100%; display: block; }
+
+        .card { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
+        .control-header { color: var(--text-muted); font-size: 0.95rem; font-weight: bold; margin-bottom: 8px; }
+        
+        select, input {
+            width: 100%; background: #020617; border: 1px solid var(--border); color: #fff;
+            padding: 10px; border-radius: 6px; box-sizing: border-box; font-family: monospace; font-size: 1rem;
+        }
+        
+        input[type="range"] { cursor: pointer; padding: 0; margin-top: 5px; }
+
+        .data-row { 
+            display: flex; justify-content: space-between; margin-bottom: 8px; 
+            font-family: monospace; font-size: 1.1rem; align-items: center;
+            white-space: nowrap;
+        }
+        
+        .data-label { color: var(--text-muted); font-size: 0.9rem; font-family: sans-serif; }
+        .highlight { color: var(--accent); font-weight: bold; }
+
+        #quiz-page { justify-content: center; align-items: center; background-image: radial-gradient(#334155 1px, transparent 1px); background-size: 20px 20px; }
+        
+        .quiz-box {
+            background: var(--panel); padding: 40px; border-radius: 16px; border: 1px solid var(--border);
+            width: 100%; max-width: 600px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            position: relative; z-index: 5;
+        }
+        
+        .btn {
+            background: var(--accent); color: #000; border: none; padding: 12px 30px;
+            border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; margin-top: 10px;
+            transition: 0.2s; min-width: 160px;
+        }
+        
+        .btn:hover { background: var(--accent-hover); transform: translateY(-2px); }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
+        .btn-outline:hover { color: var(--text); border-color: var(--text); }
+        
+        .feedback-msg {
+            margin-top: 20px; font-weight: bold; min-height: 24px;
+            padding: 15px; border-radius: 6px; line-height: 1.5;
+        }
+
+        .btn-row { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+        .btn-row .btn { margin-top: 0; }
+
+        @media (max-width: 700px) {
+            #lab-page { flex-direction: column; }
+            .sidebar { width: 100%; max-height: 50vh; border-right: none; border-bottom: 1px solid var(--border); }
+            .canvas-container { min-height: 250px; }
+            .quiz-box { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <button class="nav-btn active" onclick="setPage('lab')">🔬 Mikroniveau</button>
+    <button class="nav-btn" onclick="setPage('quiz')">📝 Regneøvelser</button>
+    <div style="margin-left:auto; color:#64748b; font-size:0.9rem;">Forståelse af stofmængde</div>
+</nav>
+
+<div id="content-area">
+    
+    <div id="lab-page" class="page active">
+        <div class="sidebar">
+            <h2 style="margin-top:0; color:var(--accent);">Opstilling</h2>
+            
+            <div class="card">
+                <div class="control-header">1. Vælg fast stof</div>
+                <select id="elSelect" onchange="updateLab()">
+                    <option value="C" data-rho="2.2" data-r="6">Carbon (Grafit)</option>
+                    <option value="Fe" data-rho="7.8" data-r="9">Jern (Fe)</option>
+                    <option value="Cu" data-rho="8.9" data-r="9.5">Kobber (Cu)</option>
+                    <option value="Ag" data-rho="10.5" data-r="11">Sølv (Ag)</option>
+                    <option value="Au" data-rho="19.3" data-r="12">Guld (Au)</option>
+                </select>
+            </div>
+
+            <div class="card" style="border-color: var(--accent);">
+                <div class="control-header" style="color:var(--accent);">2. Juster stofmængde (n)</div>
+                <input type="range" id="molSlider" min="0.5" max="10.0" step="0.1" value="2.0" oninput="updateLab()">
+                
+                <div style="display:flex; justify-content:center; align-items:baseline; gap:5px; margin-top:5px;">
+                    <span id="molDisplay" style="font-size:1.8rem; font-weight:bold; color:var(--accent);">2,00</span>
+                    <span style="color:var(--text-muted);">mol</span>
+                </div>
+            </div>
+
+            <div class="card" style="background:rgba(255,255,255,0.03);">
+                <div class="control-header">Data & Beregninger</div>
+                
+                <div class="data-row">
+                    <span class="data-label">Molarmasse (M):</span>
+                    <span id="resM">0,00 g/mol</span>
+                </div>
+                
+                <div class="data-row" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:8px; margin-top:8px;">
+                    <span class="data-label">Masse (m = n · M):</span>
+                    <span id="resMass" class="highlight">0,00 g</span>
+                </div>
+
+                <div class="data-row">
+                    <span class="data-label">Antal (N):</span>
+                    <span id="resN" style="color:#fbbf24;">0 · 10²³</span>
+                </div>
+            </div>
+            
+            <div style="font-size:0.8rem; color:#64748b; line-height:1.4;">
+                <strong>💡 Vidste du?</strong> Nogle stoffers atomer sidder tættere pakket sammen end andres. Derfor fylder fx guld mindre end kulstof i glasset – selvom du har præcis lige så mange mol af begge dele! Prøv selv: skift mellem guld og kulstof ved samme stofmængde, og se forskellen.
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="labCanvas"></canvas>
+        </div>
+    </div>
+
+    <div id="quiz-page" class="page">
+        <canvas id="quizBgCanvas" style="position:absolute; top:0; left:0; pointer-events:none;"></canvas>
+        <div class="quiz-box">
+            <h2 style="color:var(--accent); margin-top:0;">Øvelse: Faste Stoffer</h2>
+
+            <div id="qText" style="font-size:1.2rem; line-height:1.6; min-height:100px; margin-bottom:20px; font-family: 'Segoe UI', sans-serif;">
+                Henter opgave...
+            </div>
+
+            <div style="background:rgba(0,0,0,0.3); padding:20px; border-radius:8px; margin-bottom:20px;">
+                <label style="display:block; margin-bottom:10px; color:#aaa;">Indtast dit svar:</label>
+                <div style="display:flex; justify-content:center; gap:10px; align-items:center;">
+                    <input type="text" inputmode="decimal" id="qInput" placeholder="0,00" style="width:140px; text-align:center; font-size:1.3rem;">
+                    <span id="qUnit" style="font-weight:bold; color:#aaa;">enhed</span>
+                </div>
+            </div>
+
+            <button id="actionBtn" class="btn" onclick="checkAnswer()">Tjek Svar</button>
+            <div class="btn-row">
+                <button id="hintBtn" class="btn btn-outline" onclick="toggleHint()">💡 Vis mellemregning</button>
+                <button class="btn btn-outline" onclick="newQuestion()">Ny Opgave</button>
+            </div>
+
+            <div id="feedback" class="feedback-msg"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function toDaSig(num) {
+    if (num === 0) return "0,00";
+    let p = Number(num).toPrecision(3);
+    
+    if (p.includes('e')) {
+        let parts = p.split('e');
+        let base = parts[0].replace('.', ',');
+        let exp = parseInt(parts[1], 10);
+        const supers = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻','+':''};
+        let expStr = exp.toString().split('').map(c => supers[c] || c).join('');
+        return base + " · 10" + expStr;
+    }
+    return p.replace('.', ',');
+}
+
+function toDaM(num) {
+    return Number(num).toFixed(2).replace('.', ',');
+}
+
+const labCanvas = document.getElementById('labCanvas');
+const lCtx = labCanvas.getContext('2d');
+const quizBgCanvas = document.getElementById('quizBgCanvas');
+const qCtx = quizBgCanvas.getContext('2d');
+
+let W, H;
+
+const SUBSTANCES = {
+    C:  { name: "Carbon",  M: 12.01,  rho: 2.2,  r: 6,  col: "#4b5563" }, 
+    Fe: { name: "Jern",    M: 55.85,  rho: 7.8,  r: 9,  col: "#94a3b8" }, 
+    Cu: { name: "Kobber",  M: 63.55,  rho: 8.9,  r: 9.5,col: "#ea580c" }, 
+    Ag: { name: "Sølv",    M: 107.87, rho: 10.5, r: 11, col: "#e2e8f0" }, 
+    Au: { name: "Guld",    M: 196.97, rho: 19.3, r: 12, col: "#fbbf24" }  
+};
+
+let state = {
+    substance: 'Au',
+    n: 2.0,      
+    mass: 0,     
+    volume: 0,   
+    N: 0,        
+    atomOffsets: [] 
+};
+
+function init() {
+    window.addEventListener('resize', resize);
+    resize();
+
+    document.getElementById('qInput').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('actionBtn').click();
+        }
+    });
+
+    for(let i=0; i<200; i++) {
+        state.atomOffsets.push({
+            phase: Math.random() * Math.PI * 2,
+            speed: 0.5 + Math.random() * 0.5
+        });
+    }
+
+    updateLab();
+    newQuestion();
+    loop();
+}
+
+function resize() {
+    const container = document.querySelector('.canvas-container');
+    if(container) {
+        W = labCanvas.width = container.clientWidth;
+        H = labCanvas.height = container.clientHeight;
+    }
+    quizBgCanvas.width = window.innerWidth;
+    quizBgCanvas.height = window.innerHeight;
+}
+
+function setPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id+'-page').classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    
+    if(id==='lab') document.querySelectorAll('.nav-btn')[0].classList.add('active');
+    else document.querySelectorAll('.nav-btn')[1].classList.add('active');
+    
+    resize();
+}
+
+function updateLab() {
+    const sel = document.getElementById('elSelect');
+    const slider = document.getElementById('molSlider');
+    
+    state.substance = sel.value;
+    state.n = parseFloat(slider.value);
+    
+    const data = SUBSTANCES[state.substance];
+    
+    state.mass = state.n * data.M;
+    state.N = state.n * 6.022;
+    state.volume = state.mass / data.rho; 
+
+    document.getElementById('molDisplay').innerText = toDaSig(state.n);
+    document.getElementById('resM').innerText = toDaM(data.M) + " g/mol";
+    document.getElementById('resMass').innerText = toDaSig(state.mass) + " g";
+    document.getElementById('resN').innerText = toDaSig(state.n * 6.022) + " · 10²³";
+}
+
+function drawLab() {
+    lCtx.clearRect(0, 0, W, H);
+    const data = SUBSTANCES[state.substance];
+    
+    const glassW = 200; 
+    const glassH = 300;
+    const glassX = W / 2 - glassW / 2; 
+    const glassBottom = H - 50;
+    const glassY = glassBottom - glassH;
+
+    // Fast 100 mL måleglas-skala, samme for alle stoffer. Tætte stoffer (fx guld)
+    // kan derfor godt havne lidt over 100 mL-stregen ved høj stofmængde.
+    const scaleMaxVol = 100;
+    const scaleHeight = glassH * 0.8;
+    const fillH = Math.min((state.volume / scaleMaxVol) * scaleHeight, glassH * 0.98);
+
+    if (fillH > 0) {
+        lCtx.fillStyle = data.col;
+        lCtx.fillRect(glassX, glassBottom - fillH, glassW, fillH);
+        
+        let grad = lCtx.createLinearGradient(glassX, 0, glassX + glassW, 0);
+        grad.addColorStop(0, "rgba(0,0,0,0.2)");
+        grad.addColorStop(0.2, "rgba(255,255,255,0.1)");
+        grad.addColorStop(0.5, "rgba(255,255,255,0)");
+        grad.addColorStop(1, "rgba(0,0,0,0.3)");
+        lCtx.fillStyle = grad;
+        lCtx.fillRect(glassX, glassBottom - fillH, glassW, fillH);
+    }
+
+    lCtx.strokeStyle = "rgba(255,255,255,0.4)";
+    lCtx.lineWidth = 4;
+    lCtx.beginPath();
+    lCtx.moveTo(glassX, glassY);
+    lCtx.lineTo(glassX, glassBottom);
+    lCtx.lineTo(glassX + glassW, glassBottom);
+    lCtx.lineTo(glassX + glassW, glassY);
+    lCtx.stroke();
+    
+    lCtx.fillStyle = "rgba(255,255,255,0.3)";
+    lCtx.font = "12px monospace";
+    for (const mark of [25, 50, 75, 100]) {
+        let y = glassBottom - (mark / scaleMaxVol) * scaleHeight;
+        lCtx.fillRect(glassX, y, 15, 2);
+        lCtx.fillText(mark + " mL", glassX-45, y+4);
+    }
+
+    const zoomR = 90;
+    const zoomX = W - 140;
+    const zoomY = 140;
+
+    if (fillH > 0) {
+        lCtx.strokeStyle = "rgba(255,255,255,0.6)"; 
+        lCtx.lineWidth = 2;
+        lCtx.setLineDash([5, 5]); 
+        
+        const targetX = glassX + glassW/2;
+        const targetY = glassBottom - fillH/2;
+
+        lCtx.beginPath();
+        lCtx.moveTo(zoomX, zoomY + zoomR);
+        lCtx.lineTo(targetX, targetY);
+        lCtx.stroke();
+        lCtx.setLineDash([]);
+        
+        lCtx.fillStyle = "#fff";
+        lCtx.beginPath(); lCtx.arc(targetX, targetY, 4, 0, Math.PI*2); lCtx.fill();
+    }
+
+    lCtx.save();
+    lCtx.beginPath();
+    lCtx.arc(zoomX, zoomY, zoomR, 0, Math.PI*2);
+    lCtx.fillStyle = "#111"; 
+    lCtx.fill();
+    lCtx.strokeStyle = "#fbbf24"; 
+    lCtx.lineWidth = 5;
+    lCtx.stroke();
+    lCtx.clip(); 
+
+    const atomR = data.r * 2.5; 
+    const gap = atomR * 2;
+    const rows = Math.ceil((zoomR*2) / (gap * 0.866)) + 2;
+    const cols = Math.ceil((zoomR*2) / gap) + 2;
+    const time = Date.now() / 200;
+
+    let idx = 0;
+    for(let r=0; r<rows; r++) {
+        for(let c=0; c<cols; c++) {
+            const xOff = (r % 2 === 0) ? 0 : gap/2;
+            let bx = (zoomX - zoomR) + c * gap + xOff - 20;
+            let by = (zoomY - zoomR) + r * gap * 0.866 - 20;
+            
+            let vib = state.atomOffsets[idx % state.atomOffsets.length];
+            let vx = Math.sin(time * vib.speed + vib.phase) * 1.5;
+            let vy = Math.cos(time * vib.speed + vib.phase) * 1.5;
+
+            lCtx.beginPath();
+            lCtx.arc(bx + vx, by + vy, atomR, 0, Math.PI*2);
+            lCtx.fillStyle = data.col;
+            lCtx.fill();
+            
+            lCtx.fillStyle = "rgba(255,255,255,0.2)";
+            lCtx.beginPath();
+            lCtx.arc(bx+vx - atomR*0.3, by+vy - atomR*0.3, atomR*0.4, 0, Math.PI*2);
+            lCtx.fill();
+
+            lCtx.strokeStyle = "rgba(0,0,0,0.3)";
+            lCtx.lineWidth = 1;
+            lCtx.stroke();
+            idx++;
+        }
+    }
+    lCtx.restore();
+
+    lCtx.fillStyle = "#fff";
+    lCtx.font = "bold 14px sans-serif";
+    lCtx.textAlign = "center";
+    lCtx.fillText("MIKRO-STRUKTUR", zoomX, zoomY - zoomR - 10);
+    lCtx.font = "12px sans-serif";
+    lCtx.fillStyle = "#aaa";
+    lCtx.fillText("(Krystalgitter)", zoomX, zoomY - zoomR + 5);
+}
+
+let currentQ = {};
+let particles = [];
+let lastQKey = null;
+
+function newQuestion() {
+    const isMass = Math.random() > 0.5;
+    const subs = Object.keys(SUBSTANCES);
+    const niceNumbers = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0];
+
+    // Undgå at trække præcis samme opgave (stof + tal) to gange i træk.
+    let key, n, qKey, attempts = 0;
+    do {
+        key = subs[Math.floor(Math.random() * subs.length)];
+        n = niceNumbers[Math.floor(Math.random() * niceNumbers.length)];
+        qKey = isMass + '|' + key + '|' + n;
+        attempts++;
+    } while (qKey === lastQKey && attempts < 20);
+    lastQKey = qKey;
+
+    const data = SUBSTANCES[key];
+
+    document.getElementById('feedback').innerHTML = "";
+    document.getElementById('feedback').className = "feedback-msg";
+    document.getElementById('feedback').style.backgroundColor = "transparent";
+    document.getElementById('qInput').value = "";
+    resetHint();
+
+    const actionBtn = document.getElementById('actionBtn');
+    actionBtn.innerText = "Tjek Svar";
+    actionBtn.onclick = checkAnswer;
+    actionBtn.style.background = "var(--accent)"; 
+    
+    if (isMass) {
+        const exactAns = n * data.M;
+        const ans = Number(exactAns.toPrecision(3)); 
+        
+        currentQ = {
+            ans: ans,
+            txt: `Du har ${toDaSig(n)} mol ${data.name}.<br>Stoffets molarmasse er ${toDaM(data.M)} g/mol.<br><br>Beregn massen af stoffet.`,
+            unit: "g",
+            scaffold: `m = n · M = ${toDaSig(n)} mol · ${toDaM(data.M)} g/mol`,
+            fullAnswer: `m = n · M = ${toDaSig(n)} mol · ${toDaM(data.M)} g/mol = ${toDaSig(ans)} g`
+        };
+    } else {
+        const exactM = n * data.M;
+        const m = Number(exactM.toPrecision(3));
+        
+        currentQ = {
+            ans: n,
+            txt: `Du har afvejet ${toDaSig(m)} g ${data.name}.<br>Stoffets molarmasse er ${toDaM(data.M)} g/mol.<br><br>Beregn stofmængden.`,
+            unit: "mol",
+            scaffold: `n = m / M = ${toDaSig(m)} g / (${toDaM(data.M)} g/mol)`,
+            fullAnswer: `n = m / M = ${toDaSig(m)} g / (${toDaM(data.M)} g/mol) = ${toDaSig(n)} mol`
+        };
+    }
+    
+    document.getElementById('qText').innerHTML = currentQ.txt;
+    document.getElementById('qUnit').innerText = currentQ.unit;
+    document.getElementById('qInput').focus();
+}
+
+function checkAnswer() {
+    resetHint();
+
+    let rawVal = document.getElementById('qInput').value;
+    rawVal = rawVal.replace(',', '.');
+    
+    const val = parseFloat(rawVal);
+    const fb = document.getElementById('feedback');
+    const actionBtn = document.getElementById('actionBtn');
+    
+    if (isNaN(val)) {
+        fb.innerHTML = "Indtast venligst et tal.";
+        fb.style.color = "#aaa";
+        fb.style.backgroundColor = "transparent";
+        return;
+    }
+
+    const diff = Math.abs(val - currentQ.ans);
+    const tol = currentQ.ans * 0.02; 
+
+    if (diff <= Math.max(0.1, tol)) {
+        fb.innerHTML = `<span style="color:#22c55e; font-size:1.1rem;">Korrekt! ✅</span><br><br><span style="font-weight:normal; color:#e2e8f0; font-family:monospace;">${currentQ.fullAnswer}</span>`;
+        fb.style.backgroundColor = "rgba(34, 197, 94, 0.15)";
+        spawnConfetti();
+
+        actionBtn.innerText = "Næste Opgave ➔";
+        actionBtn.style.background = "#22c55e";
+        actionBtn.onclick = newQuestion;
+
+    } else {
+        fb.innerHTML = `<span style="color:#ef4444;">Ikke helt.</span><br><span style="font-weight:normal; color:#e2e8f0; font-size:0.95rem;">Her er mellemregningen, du kan bruge:<br><br><span style="font-family:monospace;">${currentQ.scaffold} = ?</span></span>`;
+        fb.style.backgroundColor = "rgba(239, 68, 68, 0.15)";
+    }
+}
+
+let hintVisible = false;
+
+function toggleHint() {
+    const fb = document.getElementById('feedback');
+    const hintBtn = document.getElementById('hintBtn');
+    hintVisible = !hintVisible;
+
+    if (hintVisible) {
+        fb.innerHTML = `<span style="font-weight:normal; color:#e2e8f0; font-size:0.95rem;">Mellemregning:<br><br><span style="font-family:monospace;">${currentQ.scaffold} = ?</span></span>`;
+        fb.style.backgroundColor = "rgba(148, 163, 184, 0.15)";
+        hintBtn.innerText = "💡 Skjul mellemregning";
+    } else {
+        fb.innerHTML = "";
+        fb.style.backgroundColor = "transparent";
+        hintBtn.innerText = "💡 Vis mellemregning";
+    }
+}
+
+function resetHint() {
+    hintVisible = false;
+    document.getElementById('hintBtn').innerText = "💡 Vis mellemregning";
+}
+
+function spawnConfetti() {
+    for(let i=0; i<80; i++) {
+        particles.push({
+            x: quizBgCanvas.width / 2,
+            y: quizBgCanvas.height / 2,
+            vx: (Math.random()-0.5) * 15,
+            vy: (Math.random()-0.5) * 15 - 5,
+            col: `hsl(${Math.random()*360}, 100%, 50%)`,
+            life: 1.0
+        });
+    }
+}
+
+function updateQuizAnim() {
+    qCtx.clearRect(0, 0, quizBgCanvas.width, quizBgCanvas.height);
+    for(let i=particles.length-1; i>=0; i--) {
+        let p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.5; 
+        p.life -= 0.02;
+        
+        qCtx.globalAlpha = p.life;
+        qCtx.fillStyle = p.col;
+        qCtx.fillRect(p.x, p.y, 6, 6);
+        
+        if (p.life <= 0) particles.splice(i, 1);
+    }
+    qCtx.globalAlpha = 1.0;
+}
+
+function loop() {
+    drawLab(); 
+    updateQuizAnim(); 
+    requestAnimationFrame(loop);
+}
+
+init();
+</script>
+</body>
+</html>

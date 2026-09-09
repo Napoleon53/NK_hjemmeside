@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reduktion af Permanganat - Interaktiv Kemi</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --panel-bg: #ffffff;
+            --text-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #2ecc71;
+            --warning-color: #e67e22;
+            --error-color: #e74c3c;
+            --violet: rgba(138, 43, 226, 0.85);
+            --green: rgba(34, 139, 34, 0.85);
+            --brown: rgba(101, 67, 33, 0.95);
+            --colorless: rgba(230, 245, 255, 0.4);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Layout */
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .lab-section {
+            flex: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: radial-gradient(circle, #fff, #e0e6ed);
+            border-right: 2px solid #bdc3c7;
+        }
+
+        .task-section {
+            flex: 5;
+            background-color: var(--panel-bg);
+            padding: 30px;
+            overflow-y: auto;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Lab UI */
+        .shelf {
+            position: absolute;
+            top: 20px;
+            display: flex;
+            gap: 10px;
+            background: #dcdde1;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 85%;
+        }
+
+        .bottle {
+            padding: 8px 12px;
+            background: #fff;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            user-select: none;
+            font-size: 13px;
+        }
+
+        .bottle:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border-color: var(--accent-color);
+        }
+
+        .bottle:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .watch-glass-container {
+            position: relative;
+            margin-top: -20px;
+        }
+
+        #macroCanvas {
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            box-shadow: inset 0 -10px 20px rgba(0,0,0,0.1), 0 15px 25px rgba(0,0,0,0.15);
+            border: 2px solid rgba(255,255,255,0.8);
+        }
+
+        /* Micro View */
+        .micro-view-container {
+            margin-top: 30px;
+            background: #fff;
+            border: 3px solid #7f8c8d;
+            border-radius: 12px;
+            overflow: hidden;
+            width: 320px;
+            height: 160px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .micro-label {
+            text-align: center;
+            font-weight: bold;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #microCanvas {
+            width: 100%;
+            height: 100%;
+            background: #f8f9fa;
+        }
+
+        /* Task UI */
+        h1 {
+            font-size: 22px;
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        .step-container {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #ecf0f1;
+            border-left: 4px solid #bdc3c7;
+            border-radius: 4px;
+            transition: all 0.3s;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .step-container.active {
+            opacity: 1;
+            border-left-color: var(--warning-color);
+            background-color: #fcfbf7;
+            pointer-events: auto;
+        }
+
+        .step-container.completed {
+            opacity: 0.9;
+            border-left-color: var(--success-color);
+            background-color: #f9fdfa;
+        }
+
+        .equation-box {
+            font-family: 'Courier New', Courier, monospace;
+            background: #eef2f5;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            display: none;
+            border: 1px solid #dcdde1;
+        }
+
+        .show-eq {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .controls {
+            margin-top: auto;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding-top: 20px;
+        }
+
+        button.action-btn {
+            padding: 10px 20px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        button.action-btn:hover {
+            background: #2980b9;
+        }
+
+        button.reset-btn {
+            background: #e74c3c;
+        }
+
+        button.reset-btn:hover {
+            background: #c0392b;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .drop {
+            position: absolute;
+            width: 15px;
+            height: 20px;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            transform: translateX(-50%);
+            top: -30px;
+            left: 50%;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @keyframes fall {
+            0% { top: -30px; opacity: 1; height: 25px; }
+            80% { top: 120px; opacity: 1; height: 25px; }
+            100% { top: 130px; opacity: 0; height: 10px; width: 30px; }
+        }
+
+        /* --- BALANCING MODAL --- */
+        #balancingModal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(44, 62, 80, 0.9);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: #fff;
+            width: 800px;
+            max-width: 95%;
+            height: 85vh;
+            border-radius: 8px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            background: var(--accent-color);
+            color: #fff;
+            padding: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+            scroll-behavior: smooth;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            background: #f4f6f9;
+            border-top: 1px solid #dcdde1;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .bal-equation-display {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 22px;
+            text-align: center;
+            padding: 15px;
+            background: #fdfbf7;
+            border: 2px dashed #bdc3c7;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .bal-step {
+            display: none;
+            background: #fff;
+            border: 1px solid #e0e6ed;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+        }
+
+        /* Keeps older steps visible but styled as done */
+        .bal-step.past-step {
+            display: block;
+            opacity: 0.6;
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--success-color);
+            pointer-events: none;
+        }
+
+        .bal-step.active {
+            display: block;
+            border-left: 4px solid var(--warning-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            background-color: #ffffff;
+        }
+
+        .bal-step h3 {
+            margin-top: 0;
+            color: #34495e;
+            font-size: 17px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .input-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-item label {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-item input, .input-item select {
+            padding: 8px 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 15px;
+            width: 110px;
+            text-align: center;
+        }
+
+        .input-item input:focus, .input-item select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        /* Hint system */
+        .hint-btn {
+            background: none;
+            border: 1px solid #bdc3c7;
+            color: #7f8c8d;
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: normal;
+        }
+
+        .hint-btn:hover {
+            background: #eee;
+            color: #333;
+        }
+
+        .hint-text {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff9e6;
+            border-left: 3px solid #f1c40f;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #7f8c8d;
+            line-height: 1,4;
+        }
+
+        .hint-text.visible {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-msg {
+            margin-top: 15px;
+            font-weight: bold;
+            min-height: 20px;
+            font-size: 15px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="lab-section" id="labSection">
+            <div class="shelf">
+                <button class="bottle" id="btnKMnO4">0,02 M KMnO₄</button>
+                <button class="bottle" id="btnNaOH">2 M NaOH</button>
+                <button class="bottle" id="btnNa2SO3">Na₂SO₃ (aq)</button>
+                <button class="bottle" id="btnH2SO4">2 M H₂SO₄</button>
+            </div>
+
+            <div class="watch-glass-container">
+                <canvas id="macroCanvas" width="300" height="300"></canvas>
+                <div id="dropAnimation" class="drop"></div>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <div class="micro-label">Mikroskop-visning (Partikelniveau)</div>
+                <div class="micro-view-container">
+                    <canvas id="microCanvas" width="320" height="160"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-section">
+            <h1>Reduktion af Permanganat</h1>
+            <p>Følg vejledningen trinvis. Når en reaktion igangsættes, skal du afstemme reaktionsskemaet efter 5-7 trinsmetoden.</p>
+
+            <div class="step-container active" id="step1">
+                <h3>1. Forberedelse</h3>
+                <p>Tilsæt en dråbe 0,02 M KMnO₄ til urglasset og gør derefter opløsningen basisk med en dråbe 2 M NaOH.</p>
+                <p><em>Observation: Permanganat (MnO₄⁻) giver en intens violet opløsning.</em></p>
+            </div>
+
+            <div class="step-container" id="step2">
+                <h3>2. Oxidation i Basisk Miljø</h3>
+                <p>Tilsæt nu en dråbe natriumsulfit (Na₂SO₃).</p>
+                <p>Når stofferne mødes, åbnes afstemnings-værktøjet automatisk.</p>
+                <div class="equation-box" id="eq2">
+                    SO₃²⁻(aq) + 2 MnO₄⁻(aq) + 2 OH⁻(aq) ⟶ SO₄²⁻(aq) + 2 MnO₄²⁻(aq) + H₂O(l)<br><br>
+                    <small style="color:var(--green);">Farve: Mørkegrøn (Manganat-ioner)</small>
+                </div>
+            </div>
+
+            <div class="step-container" id="step3">
+                <h3>3. Ustabilt Manganat</h3>
+                <p>Manganat (MnO₄²⁻) er ustabilt. Tryk på knappen for at lade opløsningen stå og reagere videre med overskydende sulfit.</p>
+                <button class="action-btn" id="btnWait" style="display:none; margin-top: 10px;">Observer videre omdannelse</button>
+                <div class="equation-box" id="eq3">
+                    SO₃²⁻(aq) + MnO₄²⁻(aq) + H₂O(l) ⟶ SO₄²⁻(aq) + MnO₂(s) + 2 OH⁻(aq)<br><br>
+                    <small style="color:var(--brown);">Farve: Brun/sort fintfordelt bundfald (Brunsten)</small>
+                </div>
+            </div>
+
+            <div class="step-container" id="step4">
+                <h3>4. Reaktion i Surt Miljø</h3>
+                <p>Tilsæt nu 2 M H₂SO₄ for at ændre miljøet til surt. Dette ændrer reduktionsproduktet drastisk.</p>
+                <div class="equation-box" id="eq4">
+                    5 SO₃²⁻(aq) + 2 MnO₄⁻(aq) + 6 H⁺(aq) ⟶ 5 SO₄²⁻(aq) + 2 Mn²⁺(aq) + 3 H₂O(l)<br><br>
+                    <small style="color:#7f8c8d;">Farve: Helt farveløs opløsning (Mangan(II)ioner)</small>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="action-btn reset-btn" id="btnReset">Genstart Øvelse</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="balancingModal">
+        <div class="modal-content">
+            <div class="modal-header" id="balHeader">Afstem Reaktionsskema</div>
+            <div class="modal-body" id="modalBody">
+                <div class="bal-equation-display" id="balEquation">...</div>
+                
+                <div id="balStepsContainer">
+                    <div class="bal-step" id="balStep1">
+                        <h3>Trin 1: Tildel Oxidationstal <button class="hint-btn" onclick="toggleHint(1)">💡 Hint</button></h3>
+                        <p>Bestem oxidationstallet for de grundstoffer, der ændrer sig under reaktionen (S og Mn).</p>
+                        <div class="input-group" id="balInputs1"></div>
+                        <div class="hint-text" id="hint1">Husk: Oxygen (O) har næsten altid oxidationstallet -II. Hydrogen (H) har +I. Den samlede sum af oxidationstal skal være lig med ionens ladning. For MnO₄⁻ gælder: Mn + 4 × (-2) = -1.</div>
+                    </div>
+
+                    <div class="bal-step" id="balStep2">
+                        <h3>Trin 2: Find ændring (Δox) <button class="hint-btn" onclick="toggleHint(2)">💡 Hint</button></h3>
+                        <p>Hvor meget stiger svovl (oxidation), og hvor meget falder mangan (reduktion)?</p>
+                        <div class="input-group" id="balInputs2"></div>
+                        <div class="hint-text" id="hint2">Træk det gamle oxidationstal fra det nye. Angiv ændringen som et positivt tal for både opgang og nedgang.</div>
+                    </div>
+
+                    <div class="bal-step" id="balStep3">
+                        <h3>Trin 3: Sæt elektron-koefficienter <button class="hint-btn" onclick="toggleHint(3)">💡 Hint</button></h3>
+                        <p>Sørg for, at den samlede opgang i oxidationstal er lig med den samlede nedgang ved at indsætte koefficienter.</p>
+                        <div class="input-group" id="balInputs3"></div>
+                        <div class="hint-text" id="hint3">Find det mindste fælles multiplum for opgangen og nedgangen fra Trin 2. Hvis S stiger med 2, og Mn falder med 1, skal der bruges 2 Mn for hver 1 S.</div>
+                    </div>
+
+                    <div class="bal-step" id="balStep4">
+                        <h3>Trin 4: Optæl ladning <button class="hint-btn" onclick="toggleHint(4)">💡 Hint</button></h3>
+                        <p>Beregn den samlede ladning på venstre (V) side og højre (H) side før tilsætning af miljø-ioner.</p>
+                        <div class="input-group" id="balInputs4"></div>
+                        <div class="hint-text" id="hint4">Husk at gange ionens ladning med dens nye koefficient fra Trin 3! Hvis du f.eks. har 2 MnO₄⁻, bidrager de med 2 × (-1) = -2 til ladningen på venstre side.</div>
+                    </div>
+
+                    <div class="bal-step" id="balStep5">
+                        <h3>Trin 5: Ladningsafstemning <button class="hint-btn" onclick="toggleHint(5)">💡 Hint</button></h3>
+                        <p id="balEnvText">Miljø-ioner.</p>
+                        <div class="input-group" id="balInputs5"></div>
+                        <div class="hint-text" id="hint5">I et basisk miljø skal du bruge OH⁻-ioner til at udligne ladningsforskellen. Tilføj OH⁻ på den side, der er "for positiv" (mangler negativ ladning). I surt miljø bruges H⁺.</div>
+                    </div>
+
+                    <div class="bal-step" id="balStep6">
+                        <h3>Trin 6: Afstem med vand (H₂O) <button class="hint-btn" onclick="toggleHint(6)">💡 Hint</button></h3>
+                        <p>Hvor mange H₂O-molekyler skal der tilføjes, og på hvilken side, for at hydrogen og oxygen stemmer?</p>
+                        <div class="input-group" id="balInputs6"></div>
+                        <div class="hint-text" id="hint6">Tæl antallet af H-atomer på den side, hvor der er flest (typisk pga. H⁺ eller OH⁻). Tilføj halvt så mange H₂O-molekyler på den modsatte side for at balancere kemien helt.</div>
+                    </div>
+                </div>
+                
+                <div class="feedback-msg" id="balFeedback"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="action-btn" id="btnBalCheck">Tjek svar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA: BALANCING CONFIGURATIONS ---
+        const reactionsData = {
+            react2: {
+                title: "Afstemning: Sulfit oxideres til Sulfat (Basisk)",
+                baseEq: "SO₃²⁻ + MnO₄⁻ ⟶ SO₄²⁻ + MnO₄²⁻",
+                env: "basisk",
+                steps: [
+                    { inputs: [{id:'oxS1', lbl:'S i SO₃²⁻', ans:'4'}, {id:'oxMn1', lbl:'Mn i MnO₄⁻', ans:'7'}, {id:'oxS2', lbl:'S i SO₄²⁻', ans:'6'}, {id:'oxMn2', lbl:'Mn i MnO₄²⁻', ans:'6'}] },
+                    { inputs: [{id:'dS', lbl:'Opgang (S)', ans:'2'}, {id:'dMn', lbl:'Nedgang (Mn)', ans:'1'}] },
+                    { inputs: [{id:'cSO3', lbl:'Koefficient SO₃²⁻', ans:'1'}, {id:'cMnO4', lbl:'Koefficient MnO₄⁻', ans:'2'}] },
+                    { inputs: [{id:'chgL', lbl:'Ladning Venstre', ans:'-4'}, {id:'chgR', lbl:'Ladning Højre', ans:'-6'}] },
+                    { inputs: [{id:'ionType', lbl:'Ion', opts:['H⁺', 'OH⁻'], ans:'OH⁻'}, {id:'ionCount', lbl:'Antal ioner', ans:'2'}, {id:'ionSide', lbl:'Side', opts:['Venstre', 'Højre'], ans:'Venstre'}] },
+                    { inputs: [{id:'h2oCount', lbl:'Antal H₂O', ans:'1'}, {id:'h2oSide', lbl:'Side', opts:['Venstre', 'Højre'], ans:'Højre'}] }
+                ],
+                finalEq: "SO₃²⁻ + 2 MnO₄⁻ + 2 OH⁻ ⟶ SO₄²⁻ + 2 MnO₄²⁻ + H₂O"
+            },
+            react3: {
+                title: "Afstemning: Manganat reduceres til Brunsten (Basisk)",
+                baseEq: "SO₃²⁻ + MnO₄²⁻ ⟶ SO₄²⁻ + MnO₂",
+                env: "basisk",
+                steps: [
+                    { inputs: [{id:'oxS1', lbl:'S i SO₃²⁻', ans:'4'}, {id:'oxMn1', lbl:'Mn i MnO₄²⁻', ans:'6'}, {id:'oxS2', lbl:'S i SO₄²⁻', ans:'6'}, {id:'oxMn2', lbl:'Mn i MnO₂', ans:'4'}] },
+                    { inputs: [{id:'dS', lbl:'Opgang (S)', ans:'2'}, {id:'dMn', lbl:'Nedgang (Mn)', ans:'2'}] },
+                    { inputs: [{id:'cSO3', lbl:'Koefficient SO₃²⁻', ans:'1'}, {id:'cMnO42', lbl:'Koefficient MnO₄²⁻', ans:'1'}] },
+                    { inputs: [{id:'chgL', lbl:'Ladning Venstre', ans:'-4'}, {id:'chgR', lbl:'Ladning Højre', ans:'-2'}] },
+                    { inputs: [{id:'ionType', lbl:'Ion', opts:['H⁺', 'OH⁻'], ans:'OH⁻'}, {id:'ionCount', lbl:'Antal ioner', ans:'2'}, {id:'ionSide', lbl:'Side', opts:['Venstre', 'Højre'], ans:'Højre'}] },
+                    { inputs: [{id:'h2oCount', lbl:'Antal H₂O', ans:'1'}, {id:'h2oSide', lbl:'Side', opts:['Venstre', 'Højre'], ans:'Venstre'}] }
+                ],
+                finalEq: "SO₃²⁻ + MnO₄²⁻ + H₂O ⟶ SO₄²⁻ + MnO₂ + 2 OH⁻"
+            },
+            react4: {
+                title: "Afstemning: Permanganat i Surt Miljø",
+                baseEq: "SO₃²⁻ + MnO₄⁻ ⟶ SO₄²⁻ + Mn²⁺",
+                env: "surt",
+                steps: [
+                    { inputs: [{id:'oxS1', lbl:'S i SO₃²⁻', ans:'4'}, {id:'oxMn1', lbl:'Mn i MnO₄⁻', ans:'7'}, {id:'oxS2', lbl:'S i SO₄²⁻', ans:'6'}, {id:'oxMn2', lbl:'Mn i Mn²⁺', ans:'2'}] },
+                    { inputs: [{id:'dS', lbl:'Opgang (S)', ans:'2'}, {id:'dMn', lbl:'Nedgang (Mn)', ans:'5'}] },
+                    { inputs: [{id:'cSO3', lbl:'Koefficient SO₃²⁻', ans:'5'}, {id:'cMnO4', lbl:'Koefficient MnO₄⁻', ans:'2'}] },
+                    { inputs: [{id:'chgL', lbl:'Ladning Venstre', ans:'-12'}, {id:'chgR', lbl:'Ladning Højre', ans:'-6'}] },
+                    { inputs: [{id:'ionType', lbl:'Ion', opts:['H⁺', 'OH⁻'], ans:'H⁺'}, {id:'ionCount', lbl:'Antal ioner', ans:'6'}, {id:'ionSide', lbl:'Side', opts:['Venstre', 'Højre'], ans:'Venstre'}] },
+                    { inputs: [{id:'h2oCount', lbl:'Antal H₂O', ans:'3'}, {id:'h2oSide', lbl:'Side', opts:['Venstre', 'Højre'], ans:'Højre'}] }
+                ],
+                finalEq: "5 SO₃²⁻ + 2 MnO₄⁻ + 6 H⁺ ⟶ 5 SO₄²⁻ + 2 Mn²⁺ + 3 H₂O"
+            }
+        };
+
+        // --- STATE MANAGEMENT ---
+        const state = {
+            step: 1,
+            hasKMnO4: false,
+            hasNaOH: false,
+            currentColor: 'rgba(230, 245, 255, 0)',
+            targetColor: 'rgba(230, 245, 255, 0)',
+            isPrecipitating: false,
+            
+            // Balancing modal state
+            balActiveReactId: null,
+            balCurrentStep: 0
+        };
+
+        const colors = {
+            empty: 'rgba(230, 245, 255, 0)',
+            violet: 'rgba(138, 43, 226, 0.85)',
+            green: 'rgba(34, 139, 34, 0.85)',
+            brown: 'rgba(101, 67, 33, 0.95)',
+            colorless: 'rgba(230, 245, 255, 0.3)'
+        };
+
+        // --- MACRO CANVAS (Watch Glass) ---
+        const macroCanvas = document.getElementById('macroCanvas');
+        const macroCtx = macroCanvas.getContext('2d');
+        let colorAnimProgress = 1;
+        let currentRgba = [230, 245, 255, 0];
+        let targetRgba = [230, 245, 255, 0];
+
+        function parseRgba(rgbaStr) {
+            const match = rgbaStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+            return match ? [parseInt(match[1]), parseInt(match[2]), parseInt(match[3]), parseFloat(match[4] || 1)] : [0,0,0,0];
+        }
+
+        function setLiquidColor(newColorStr) {
+            targetRgba = parseRgba(newColorStr);
+            colorAnimProgress = 0;
+        }
+
+        function drawMacro() {
+            macroCtx.clearRect(0, 0, macroCanvas.width, macroCanvas.height);
+            
+            if (colorAnimProgress < 1) {
+                colorAnimProgress += 0.01;
+                if (colorAnimProgress > 1) colorAnimProgress = 1;
+                for (let i = 0; i < 4; i++) {
+                    currentRgba[i] = currentRgba[i] + (targetRgba[i] - currentRgba[i]) * colorAnimProgress;
+                }
+            }
+
+            const radius = 110;
+            macroCtx.beginPath();
+            macroCtx.arc(macroCanvas.width/2, macroCanvas.height/2, radius, 0, Math.PI * 2);
+            macroCtx.fillStyle = `rgba(${currentRgba[0]}, ${currentRgba[1]}, ${currentRgba[2]}, ${currentRgba[3]})`;
+            macroCtx.fill();
+
+            if (state.isPrecipitating) {
+                macroCtx.fillStyle = '#2c1e16';
+                for(let i=0; i<80; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const r = Math.sqrt(Math.random()) * (radius - 10);
+                    const x = macroCanvas.width/2 + Math.cos(angle) * r;
+                    const y = macroCanvas.height/2 + Math.sin(angle) * r;
+                    macroCtx.beginPath();
+                    macroCtx.arc(x, y, Math.random() * 2 + 1, 0, Math.PI * 2);
+                    macroCtx.fill();
+                }
+            }
+
+            macroCtx.beginPath();
+            macroCtx.arc(macroCanvas.width/2, macroCanvas.height/2, 140, 0, Math.PI * 2);
+            macroCtx.strokeStyle = 'rgba(255,255,255,0.6)';
+            macroCtx.lineWidth = 6;
+            macroCtx.stroke();
+
+            requestAnimationFrame(drawMacro);
+        }
+
+        // --- MICRO CANVAS (Calm Particle System) ---
+        const microCanvas = document.getElementById('microCanvas');
+        const microCtx = microCanvas.getContext('2d');
+        let particles = [];
+
+        class Particle {
+            constructor(type) {
+                this.x = 30 + Math.random() * (microCanvas.width - 60);
+                this.y = 30 + Math.random() * (microCanvas.height - 60);
+                this.vx = (Math.random() - 0.5) * 0,3;
+                this.vy = (Math.random() - 0.5) * 0,3;
+                this.setType(type);
+            }
+
+            setType(type) {
+                this.type = type;
+                this.radius = 13;
+                if (type === 'MnO4-') { this.color = '#8e44ad'; this.label = 'MnO₄⁻'; }
+                else if (type === 'SO32-') { this.color = '#3498db'; this.label = 'SO₃²⁻'; }
+                else if (type === 'MnO42-') { this.color = '#27ae60'; this.label = 'MnO₄²⁻'; }
+                else if (type === 'SO42-') { this.color = '#95a5a6'; this.label = 'SO₄²⁻'; }
+                else if (type === 'OH-') { this.color = '#1abc9c'; this.label = 'OH⁻'; this.radius = 10; }
+                else if (type === 'MnO2') { this.color = '#5c4033'; this.label = 'MnO₂'; this.vx = 0; this.vy = 0,15; this.radius = 14;} 
+                else if (type === 'Mn2+') { this.color = '#bdc3c7'; this.label = 'Mn²⁺'; this.radius = 11; }
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x < this.radius || this.x > microCanvas.width - this.radius) this.vx *= -1;
+                if (this.y < this.radius || this.y > microCanvas.height - this.radius) this.vy *= -1;
+
+                if (this.type === 'MnO2') {
+                    if (this.y > microCanvas.height - this.radius - 5) {
+                        this.y = microCanvas.height - this.radius - 5;
+                        this.vy = 0;
+                    }
+                }
+            }
+
+            draw(ctx) {
+                ctx.beginPath();
+                if (this.type === 'MnO2') {
+                    ctx.rect(this.x - this.radius, this.y - this.radius, this.radius*2, this.radius*2);
+                } else {
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                }
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.strokeStyle = '#2c3e50';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                ctx.fillStyle = '#fff';
+                if(this.type === 'MnO2' || this.type === 'Mn2+' || this.type === 'OH-') ctx.fillStyle = '#000';
+                ctx.font = 'bold 9px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(this.label, this.x, this.y);
+            }
+        }
+
+        function syncParticlesWithState() {
+            // Re-generate a calm view depending on what phase we are in
+            if (!state.hasKMnO4 && !state.hasNaOH) {
+                particles = [];
+            } else if (state.hasKMnO4 && !state.hasNaOH) {
+                particles = [new Particle('MnO4-'), new Particle('MnO4-')];
+            } else if (state.hasKMnO4 && state.hasNaOH && state.step === 2) {
+                particles = [new Particle('MnO4-'), new Particle('MnO4-'), new Particle('OH-'), new Particle('OH-')];
+            }
+        }
+
+        function drawMicro() {
+            microCtx.clearRect(0, 0, microCanvas.width, microCanvas.height);
+            microCtx.strokeStyle = 'rgba(0,0,0,0.02)';
+            microCtx.lineWidth = 1;
+            for(let i=0; i<microCanvas.width; i+=20) { microCtx.beginPath(); microCtx.moveTo(i,0); microCtx.lineTo(i,microCanvas.height); microCtx.stroke(); }
+            for(let i=0; i<microCanvas.height; i+=20) { microCtx.beginPath(); microCtx.moveTo(0,i); microCtx.lineTo(microCanvas.width,i); microCtx.stroke(); }
+
+            particles.forEach(p => {
+                p.update();
+                p.draw(microCtx);
+            });
+            requestAnimationFrame(drawMicro);
+        }
+
+        // --- BALANCING SYSTEM MODAL LOGIC ---
+        const modal = document.getElementById('balancingModal');
+        const modalBody = document.getElementById('modalBody');
+        const balHeader = document.getElementById('balHeader');
+        const balEquation = document.getElementById('balEquation');
+        const balFeedback = document.getElementById('balFeedback');
+        const btnBalCheck = document.getElementById('btnBalCheck');
+        let currentReactionData = null;
+
+        function openBalancing(reactionId) {
+            currentReactionData = reactionsData[reactionId];
+            state.balActiveReactId = reactionId;
+            state.balCurrentStep = 0;
+            
+            balHeader.innerText = currentReactionData.title;
+            balEquation.innerText = currentReactionData.baseEq;
+            document.getElementById('balEnvText').innerText = `Miljøet er angivet til at være ${currentReactionData.env}. Hvilken miljø-ion skal bruges, hvor mange, og på hvilken side af reaktionspilen?`;
+            
+            buildBalancingInputs();
+            
+            // Clean classes and show only the first step
+            document.querySelectorAll('.bal-step').forEach(el => {
+                el.classList.remove('active', 'past-step');
+                el.style.display = 'none';
+            });
+            document.querySelectorAll('.hint-text').forEach(h => h.classList.remove('visible'));
+            
+            document.getElementById('balStep1').classList.add('active');
+            document.getElementById('balStep1').style.display = 'block';
+            balFeedback.innerText = '';
+            
+            modal.style.display = 'flex';
+        }
+
+        function toggleHint(stepNum) {
+            const h = document.getElementById(`hint${stepNum}`);
+            h.classList.toggle('visible');
+        }
+
+        function buildBalancingInputs() {
+            currentReactionData.steps.forEach((stepData, stepIdx) => {
+                const container = document.getElementById(`balInputs${stepIdx+1}`);
+                container.innerHTML = '';
+                
+                stepData.inputs.forEach(inp => {
+                    const item = document.createElement('div');
+                    item.className = 'input-item';
+                    
+                    const lbl = document.createElement('label');
+                    lbl.innerText = inp.lbl;
+                    item.appendChild(lbl);
+
+                    if (inp.opts) {
+                        const sel = document.createElement('select');
+                        sel.id = inp.id;
+                        const defaultOpt = document.createElement('option');
+                        defaultOpt.value = ""; defaultOpt.innerText = "Vælg...";
+                        sel.appendChild(defaultOpt);
+                        inp.opts.forEach(opt => {
+                            const o = document.createElement('option');
+                            o.value = opt; o.innerText = opt;
+                            sel.appendChild(o);
+                        });
+                        item.appendChild(sel);
+                    } else {
+                        const txt = document.createElement('input');
+                        txt.type = 'text';
+                        txt.id = inp.id;
+                        txt.autocomplete = "off";
+                        item.appendChild(txt);
+                    }
+                    container.appendChild(item);
+                });
+            });
+        }
+
+        const checkHandler = () => {
+             if (btnBalCheck.innerText === "Luk og overfør til forsøg") {
+                 modal.style.display = 'none';
+                 btnBalCheck.innerText = "Tjek svar";
+                 triggerMacroReaction(state.balActiveReactId);
+                 return;
+             }
+
+             const stepData = currentReactionData.steps[state.balCurrentStep];
+             let allCorrect = true;
+             
+             stepData.inputs.forEach(inp => {
+                 const el = document.getElementById(inp.id);
+                 if (el.value.trim().toLowerCase() !== inp.ans.toLowerCase()) {
+                     allCorrect = false;
+                     el.style.borderColor = varColor('--error-color');
+                 } else {
+                     el.style.borderColor = varColor('--success-color');
+                 }
+             });
+
+             if (allCorrect) {
+                 balFeedback.innerText = "Korrekt svar! Går videre...";
+                 balFeedback.style.color = varColor('--success-color');
+                 
+                 setTimeout(() => {
+                     const currentStepEl = document.getElementById(`balStep${state.balCurrentStep+1}`);
+                     currentStepEl.classList.remove('active');
+                     currentStepEl.classList.add('past-step'); // Keeps it visible but locked
+                     
+                     state.balCurrentStep++;
+                     
+                     if (state.balCurrentStep < currentReactionData.steps.length) {
+                         // Update formula header layout at specific increments
+                         if (state.balCurrentStep === 3) {
+                              if(state.balActiveReactId === 'react2') balEquation.innerText = "SO₃²⁻ + 2 MnO₄⁻ ⟶ SO₄²⁻ + 2 MnO₄²⁻";
+                              if(state.balActiveReactId === 'react3') balEquation.innerText = "SO₃²⁻ + MnO₄²⁻ ⟶ SO₄²⁻ + MnO₂";
+                              if(state.balActiveReactId === 'react4') balEquation.innerText = "5 SO₃²⁻ + 2 MnO₄⁻ ⟶ 5 SO₄²⁻ + 2 Mn²⁺";
+                         }
+
+                         const nextStepEl = document.getElementById(`balStep${state.balCurrentStep+1}`);
+                         nextStepEl.style.display = 'block';
+                         nextStepEl.classList.add('active');
+                         balFeedback.innerText = "";
+                         
+                         // Scroll to view the new active step smoothly
+                         setTimeout(() => {
+                             modalBody.scrollTop = nextStepEl.offsetTop - 120;
+                         }, 50);
+                     } else {
+                         balEquation.innerText = currentReactionData.finalEq;
+                         balFeedback.innerText = "Super godt arbejdet! Hele reaktionsskemaet er nu korrekt afstemt.";
+                         balFeedback.style.color = varColor('--success-color');
+                         btnBalCheck.innerText = "Luk og overfør til forsøg";
+                     }
+                 }, 800);
+             } else {
+                 balFeedback.innerText = "Ukorrekt indtastning. Tjek dine værdier, fortegn eller tælling, og prøv igen.";
+                 balFeedback.style.color = varColor('--error-color');
+             }
+        };
+
+        document.getElementById('btnBalCheck').addEventListener('click', checkHandler);
+
+        function varColor(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        }
+
+        // --- CHEMICAL BENCH CODE ---
+        const btnKMnO4 = document.getElementById('btnKMnO4');
+        const btnNaOH = document.getElementById('btnNaOH');
+        const btnNa2SO3 = document.getElementById('btnNa2SO3');
+        const btnH2SO4 = document.getElementById('btnH2SO4');
+        const btnWait = document.getElementById('btnWait');
+        const btnReset = document.getElementById('btnReset');
+        const dropAnim = document.getElementById('dropAnimation');
+
+        function triggerDropAnimation(color) {
+            dropAnim.style.backgroundColor = color;
+            dropAnim.style.animation = 'none';
+            void dropAnim.offsetWidth; 
+            dropAnim.style.animation = 'fall 0.6s ease-in forwards';
+        }
+
+        function updateStepUI(activeStepId) {
+            document.querySelectorAll('.step-container').forEach(el => {
+                if(el.id === activeStepId) {
+                    el.classList.add('active');
+                    el.classList.remove('completed');
+                } else {
+                    el.classList.remove('active');
+                }
+            });
+        }
+
+        function markStepCompleted(stepId) {
+            document.getElementById(stepId).classList.add('completed');
+        }
+
+        // Tilsæt Permanganat
+        btnKMnO4.addEventListener('click', () => {
+            if (state.step === 1 && !state.hasKMnO4) {
+                triggerDropAnimation(colors.violet);
+                setTimeout(() => {
+                    setLiquidColor(colors.violet);
+                    state.hasKMnO4 = true;
+                    btnKMnO4.disabled = true;
+                    syncParticlesWithState();
+                    checkStep1();
+                }, 600);
+            }
+        });
+
+        // Tilsæt Base (NaOH)
+        btnNaOH.addEventListener('click', () => {
+            if (state.step === 1 && !state.hasNaOH) {
+                triggerDropAnimation('rgba(255,255,255,0.4)');
+                setTimeout(() => {
+                    state.hasNaOH = true;
+                    btnNaOH.disabled = true;
+                    syncParticlesWithState();
+                    checkStep1();
+                }, 600);
+            }
+        });
+
+        function checkStep1() {
+            if (state.hasKMnO4 && state.hasNaOH) {
+                markStepCompleted('step1');
+                state.step = 2;
+                updateStepUI('step2');
+            }
+        }
+
+        // Tilsæt Sulfit
+        btnNa2SO3.addEventListener('click', () => {
+            if (state.step === 2) {
+                triggerDropAnimation('rgba(255,255,255,0.4)');
+                btnNa2SO3.disabled = true;
+                setTimeout(() => {
+                    openBalancing('react2');
+                }, 600);
+            }
+        });
+
+        // Lad stå (Ustabilt manganat)
+        btnWait.addEventListener('click', () => {
+            if (state.step === 3) {
+                openBalancing('react3');
+            }
+        });
+
+        // Tilsæt Syre (H2SO4)
+        btnH2SO4.addEventListener('click', () => {
+            if (state.step === 4) {
+                triggerDropAnimation('rgba(255,255,255,0.4)');
+                btnH2SO4.disabled = true;
+                setTimeout(() => {
+                    openBalancing('react4');
+                }, 600);
+            }
+        });
+
+        // Kører når afstemning lukkes godkendt
+        function triggerMacroReaction(reactId) {
+            if (reactId === 'react2') {
+                setLiquidColor(colors.green);
+                particles = [new Particle('MnO42-'), new Particle('MnO42-'), new Particle('SO42-'), new Particle('OH-')];
+                document.getElementById('eq2').classList.add('show-eq');
+                markStepCompleted('step2');
+                state.step = 3;
+                updateStepUI('step3');
+                btnWait.style.display = 'inline-block';
+            } 
+            else if (reactId === 'react3') {
+                btnWait.style.display = 'none';
+                setLiquidColor(colors.brown);
+                state.isPrecipitating = true;
+                particles = [new Particle('MnO2'), new Particle('SO42-'), new Particle('OH-'), new Particle('OH-')];
+                document.getElementById('eq3').classList.add('show-eq');
+                markStepCompleted('step3');
+                state.step = 4;
+                updateStepUI('step4');
+            }
+            else if (reactId === 'react4') {
+                state.isPrecipitating = false;
+                setLiquidColor(colors.colorless);
+                particles = [new Particle('Mn2+'), new Particle('SO42-'), new Particle('SO42-')]; // OH- neutralized
+                document.getElementById('eq4').classList.add('show-eq');
+                markStepCompleted('step4');
+                state.step = 5;
+                document.querySelectorAll('.step-container').forEach(el => el.classList.add('completed'));
+            }
+        }
+
+        // RESET SYSTEM
+        btnReset.addEventListener('click', () => {
+            state.step = 1;
+            state.hasKMnO4 = false;
+            state.hasNaOH = false;
+            state.isPrecipitating = false;
+            
+            setLiquidColor(colors.empty);
+            particles = [];
+            
+            btnKMnO4.disabled = false;
+            btnNaOH.disabled = false;
+            btnNa2SO3.disabled = false;
+            btnH2SO4.disabled = false;
+            btnWait.style.display = 'none';
+            
+            document.querySelectorAll('.equation-box').forEach(eq => eq.classList.remove('show-eq'));
+            document.querySelectorAll('.step-container').forEach(el => {
+                el.classList.remove('completed', 'active');
+            });
+            updateStepUI('step1');
+        });
+
+        // Initialize loops
+        requestAnimationFrame(drawMacro);
+        requestAnimationFrame(drawMicro);
+
+    </script>
+</body>
+</html>

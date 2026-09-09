@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lambert-Beers Lov</title>
+    <style>
+        :root {
+            --bg-dark: #1e1e24;
+            --panel-bg: #2b2b36;
+            --text-light: #f5f6fa;
+            --accent-blue: #00a8ff;
+            --accent-green: #4cd137;
+            --accent-red: #e84118;
+            --accent-yellow: #fbc531;
+            --accent-purple: #9c88ff;
+            --border-color: #3f3f50;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: #15151a;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            color: var(--accent-blue);
+            letter-spacing: 1px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            background-color: var(--panel-bg);
+            color: var(--text-light);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            background-color: #3f3f50;
+        }
+
+        .tab-btn.active {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .tab-content {
+            display: none;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .tab-content.active {
+            display: flex;
+            gap: 20px;
+        }
+
+        /* SIMULATION TAB */
+        .sim-main-col {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-width: 0;
+        }
+
+        .canvas-container {
+            flex: 1;
+            min-height: 0;
+            background: radial-gradient(circle at center, #2a2a35 0%, #1a1a20 100%);
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        .wavelength-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.65);
+            border: 2px solid var(--accent-red);
+            color: #ff8a75;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            box-shadow: 0 0 12px rgba(232,65,24,0.4);
+            pointer-events: none;
+            max-width: 220px;
+        }
+
+        .formula-group {
+            flex-shrink: 0;
+        }
+
+        #epsInFormula {
+            color: var(--accent-purple);
+            font-weight: bold;
+        }
+
+        #simCanvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+        }
+
+        .controls-panel {
+            flex: 1;
+            background-color: var(--panel-bg);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-width: 300px;
+            overflow-y: auto;
+        }
+
+        .control-group {
+            background-color: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .control-group h3 {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: var(--accent-blue);
+        }
+
+        .slider-container {
+            margin-bottom: 15px;
+        }
+
+        .slider-container label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .readout {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #000;
+            color: var(--accent-green);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 1.2rem;
+            margin-top: 10px;
+            border: 1px solid #333;
+        }
+
+        .btn {
+            background-color: #333;
+            color: white;
+            border: 1px solid #555;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background-color: #444;
+            border-color: var(--text-light);
+        }
+
+        .btn.primary {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        .btn.primary:hover {
+            background-color: #0097e6;
+        }
+
+        .btn.restart {
+            background-color: transparent;
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+            margin-top: auto;
+        }
+
+        .btn.restart:hover {
+            background-color: rgba(232, 65, 24, 0.1);
+        }
+
+        /* EXERCISE TAB */
+        .exercise-layout {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .exercise-panel {
+            flex: 1;
+            background-color: var(--panel-bg);
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            overflow-y: auto;
+        }
+
+        .graph-panel {
+            flex: 1;
+            background-color: var(--panel-bg);
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #graphCanvas {
+            background-color: #fff;
+            border-radius: 4px;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 500px;
+            height: 350px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: rgba(0,168,255,0.2);
+            color: var(--accent-blue);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            background-color: #1e1e24;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .feedback.success {
+            background-color: rgba(76, 209, 55, 0.2);
+            color: var(--accent-green);
+            border: 1px solid var(--accent-green);
+            display: block;
+        }
+
+        .feedback.error {
+            background-color: rgba(232, 65, 24, 0.2);
+            color: var(--accent-red);
+            border: 1px solid var(--accent-red);
+            display: block;
+        }
+
+        .score-board {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--accent-yellow);
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        /* THEORY TAB */
+        .theory-content {
+            background-color: var(--panel-bg);
+            border-radius: 10px;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            max-width: 900px;
+            margin: 0 auto;
+            line-height: 1.6;
+            overflow-y: auto;
+            width: 100%;
+        }
+
+        .theory-content h2 {
+            color: var(--accent-blue);
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .theory-content p {
+            margin-bottom: 15px;
+        }
+
+        .theory-content .formula {
+            background-color: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid var(--accent-yellow);
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.2rem;
+            margin: 20px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Lambert-Beers Lov</h1>
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="simTab">1. Simulation</button>
+            <button class="tab-btn" data-tab="exTab">2. Beregningsopgaver</button>
+            <button class="tab-btn" data-tab="theoryTab">3. Teori</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- SIMULATION TAB -->
+        <div id="simTab" class="tab-content active">
+            <div class="sim-main-col">
+                <div class="canvas-container" id="canvasWrap">
+                    <canvas id="simCanvas"></canvas>
+                    <div class="wavelength-badge">λ = 630 nm<br><span style="font-weight:normal; font-size:0.7rem;">Kun denne bølgelængde betragtes</span></div>
+                </div>
+
+                <div class="control-group formula-group" style="border-left-color: var(--accent-yellow);">
+                    <h3 style="color: var(--accent-yellow);">Lambert-Beers Lov (live)</h3>
+                    <div class="readout" style="text-align:left; font-size:1.2rem; line-height:1.6;">
+                        <div>A = ε · l · c</div>
+                        <div style="margin-top:24px; font-size:0.9rem; font-weight:normal; color: var(--accent-purple);">ε(CuSO₄, 630 nm) = <span id="epsDefValue">0,80</span> (mg/L)<sup>-1</sup>·cm<sup>-1</sup></div>
+                        <div style="margin-top:14px;">A = <span id="epsInFormula">0,80</span><span style="color: var(--accent-purple); font-size:0.7rem;"> (konst.)</span> <span style="color:#888; font-size:0.8rem;">L/(mg·cm)</span> · <span id="lInFormula">1,0</span> <span style="color:#888; font-size:0.8rem;">cm</span> · <span id="cInFormula">0,50</span> <span style="color:#888; font-size:0.8rem;">mg/L</span></div>
+                        <div style="margin-top:8px;">A = <span id="aInFormula" style="color: var(--accent-green); font-weight:bold;">0,400</span> <span style="color:#888; font-size:0.8rem;">(enhedsløs)</span></div>
+                    </div>
+                    <div style="font-size:0.75rem; color:#aaa; margin-top:6px;">Den <span style="color: var(--accent-purple); font-weight:bold;">lilla værdi (ε)</span> er ekstinktionskoefficienten — en konstant for stoffet ved den valgte bølgelængde. Den ændrer sig ikke, når du trækker i skyderne; kun l og c er variable.</div>
+                    <div id="epsSourceNote" style="font-size:0.8rem; color: var(--accent-blue); margin-top:8px; display:none;"></div>
+                </div>
+            </div>
+
+            <div class="controls-panel">
+                <div class="control-group">
+                    <h3>Ændr koncentration og kuvettebredde</h3>
+                    <div class="slider-container">
+                        <label>
+                            <span>Koncentration (c):</span>
+                            <span id="cValDisp">0,50 mg/L</span>
+                        </label>
+                        <input type="range" id="cSlider" min="0" max="2" step="0.01" value="0.5">
+                    </div>
+                    <div class="slider-container">
+                        <label>
+                            <span>Kuvettebredde (l):</span>
+                            <span id="lValDisp">1,0 cm</span>
+                        </label>
+                        <input type="range" id="lSlider" min="0.5" max="3" step="0.1" value="1.0">
+                    </div>
+                    <div style="text-align:center; margin-top:5px;">
+                        <button class="btn" id="btnToggleSpeed" style="font-size:0.75rem; padding:6px 14px; width:auto; display:inline-block;">Langsom fotoner</button>
+                    </div>
+                </div>
+
+                <div>
+                    <button class="btn" id="btnToggleColorInfo" style="font-size:0.8rem; padding:8px;">Hvorfor skifter farven?</button>
+                    <div id="colorInfoBox" style="display:none; margin-top:10px; font-size:0.85rem; line-height:1.5; background: rgba(0,0,0,0.3); padding:12px; border-radius:6px;">
+                        <p>Væsken ser blå ud, fordi molekylerne i prøven <strong>absorberer det røde lys</strong>. Det blå lys bliver <em>ikke</em> absorberet og når igennem til detektoren — derfor ser vi prøven som blå.</p>
+                        <p style="margin-top:8px;">Jo <strong>højere koncentration</strong>, jo flere molekyler er der til at fange det røde lys undervejs, og jo mørkere/mere mættet bliver den blå farve, vi ser. Prøv at trække i koncentrationsslideren og se kuvetten skifte farve.</p>
+                        <div style="height:14px; border-radius:4px; margin-top:10px; background: linear-gradient(to right, #ebf5ff, #1428ff);"></div>
+                        <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#aaa; margin-top:4px;">
+                            <span>Lav koncentration</span><span>Høj koncentration</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <button class="btn" id="btnToggleUnitsInfo" style="font-size:0.8rem; padding:8px;">Om enhederne</button>
+                    <div id="unitsInfoBox" style="display:none; margin-top:10px; font-size:0.85rem; line-height:1.5; background: rgba(0,0,0,0.3); padding:12px; border-radius:6px;">
+                        <p>I Lambert-Beers lov A = ε · l · c har hver størrelse sin egen enhed. Ekstinktionskoefficienten ε angives i L/(mg·cm), hvilket er det samme som (mg/L)<sup>-1</sup>·cm<sup>-1</sup>. Vejlængden l måles i cm, og koncentrationen c i mg/L.</p>
+                        <p style="margin-top:8px;">Når de tre størrelser ganges sammen, ophæver enhederne cm og mg/L hinanden — derfor ender absorbansen A med at være <strong>enhedsløs</strong> (den har ingen måleenhed).</p>
+                    </div>
+                </div>
+
+                <button class="btn restart" id="btnResetSim">Nulstil Simulation</button>
+            </div>
+        </div>
+
+        <!-- EXERCISE TAB -->
+        <div id="exTab" class="tab-content">
+            <div class="score-board">Point: <span id="scoreDisplay">0</span></div>
+            
+            <div class="exercise-layout">
+                <div class="exercise-panel">
+                    <h2 style="color: var(--accent-blue); margin-bottom: 20px;">Beregning af ukendt prøve</h2>
+                    <p>En standardkurve er blevet fremstillet ved at måle absorbansen af kendte opløsninger. Data for standardkurven ses i tabellen til højre.</p>
+                    
+                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid var(--accent-green);">
+                        <strong>Opgave 1:</strong> Beregn ekstinktionskoefficienten (hældningen) ud fra standardkurvens data (antag l = 1 cm).
+                        <div class="input-group" style="margin-top: 15px;">
+                            <label>Indtast ekstinktionskoefficient (L/(mg·cm)):</label>
+                            <input type="text" id="inputEps" placeholder="Brug dansk komma, fx 0,45">
+                        </div>
+                        <button class="btn primary" id="btnCheckEps">Tjek Hældning</button>
+                        <div id="feedbackEps" class="feedback"></div>
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid var(--accent-yellow);">
+                        <strong>Opgave 2:</strong> En ukendt prøve har fået målt sin absorbans til <span id="unknownAbs" style="font-weight: bold; color: var(--accent-yellow);">0,000</span> (enhedsløs). Brug den ekstinktionskoefficient, du fandt i opgave 1.
+                        <div class="input-group" style="margin-top: 15px;">
+                            <label>Beregn koncentrationen af den ukendte prøve (mg/L):</label>
+                            <input type="text" id="inputConc" placeholder="Brug dansk komma, fx 1,25">
+                        </div>
+                        <button class="btn primary" id="btnCheckConc" disabled>Tjek Koncentration</button>
+                        <div id="feedbackConc" class="feedback"></div>
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid var(--accent-red);">
+                        <strong>Opgave 3:</strong> Du har <span id="unknownVol" style="font-weight: bold; color: var(--accent-red);">100</span> mL af den samme ukendte prøve som i opgave 2. Brug den koncentration, du lige har beregnet.
+                        <div class="input-group" style="margin-top: 15px;">
+                            <label>Beregn massen af opløst stof i prøven (mg):</label>
+                            <input type="text" id="inputMass" placeholder="Brug dansk komma, fx 12,50" disabled>
+                        </div>
+                        <button class="btn primary" id="btnCheckMass" disabled>Tjek Masse</button>
+                        <div id="feedbackMass" class="feedback"></div>
+                    </div>
+
+                    <button class="btn restart" id="btnNewExercise" style="margin-top: 20px;">Generer ny opgave</button>
+                </div>
+
+                <div class="graph-panel">
+                    <h3 style="color: var(--text-light);">Data til Standardkurve</h3>
+                    <table id="dataTable">
+                        <thead>
+                            <tr>
+                                <th>Koncentration (mg/L)</th>
+                                <th>Absorbans (A, enhedsløs)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableBody">
+                            <!-- Data genereres via JS -->
+                        </tbody>
+                    </table>
+                    <canvas id="graphCanvas"></canvas>
+                    <p style="margin-top: 15px; font-size: 0.9rem; color: #aaa;">Grafen optegner standardkurven lineært.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- THEORY TAB -->
+        <div id="theoryTab" class="tab-content">
+            <div class="theory-content">
+                <h2>Lambert-Beers Lov</h2>
+                <p>Lambert-Beers lov beskriver sammenhængen mellem absorbansen af lys gennem en opløsning og koncentrationen af det opløste stof. Loven er et centralt værktøj inden for spektrofotometri til at bestemme koncentrationen af en ukendt prøve.</p>
+                
+                <div class="formula">
+                    A = ε · l · c
+                </div>
+
+                <p>Hvor:</p>
+                <ul style="margin-left: 40px; margin-bottom: 20px;">
+                    <li><strong>A</strong> er absorbansen (enhedsløs). Dette er et udtryk for mængden af lys, der bliver absorberet.</li>
+                    <li><strong>ε (epsilon)</strong> er ekstinktionskoefficienten (eller absorptionskoefficienten). Det er en stofspecifik konstant, der afhænger af bølgelængden. Her angives den i <strong>L/(mg·cm)</strong>, fordi koncentrationen angives i mg/L.</li>
+                    <li><strong>l</strong> er lysets vejlængde gennem opløsningen (kuvettebredden), typisk målt i <strong>cm</strong>.</li>
+                    <li><strong>c</strong> er koncentrationen af det opløste stof, her i <strong>mg/L</strong>.</li>
+                </ul>
+
+                <h2>Transmittans og Absorbans</h2>
+                <p>Når en lysstråle med intensiteten I₀ sendes gennem en kuvette med opløsningen, vil en del af lyset blive absorberet, og den resterende del med intensiteten I vil slippe igennem (transmitteres).</p>
+                
+                <div class="formula">
+                    T = I / I₀
+                </div>
+
+                <p>Transmittansen (T) angives ofte i procent. Absorbansen er defineret logaritmisk ud fra transmittansen:</p>
+                
+                <div class="formula">
+                    A = -log₁₀(T)
+                </div>
+
+                <p>Hvis 100 % af lyset slipper igennem (T = 1), er absorbansen A = 0. Slipper kun 10 % igennem (T = 0,1), er absorbansen A = 1.</p>
+                
+                <h2>Standardkurve</h2>
+                <p>Ved at måle absorbansen for en række standardopløsninger med kendte koncentrationer, kan man optegne en standardkurve. Hvis Lambert-Beers lov gælder, vil kurven være en ret linje, der går gennem origo (0,0). Hældningen på denne linje svarer til (ε · l).</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- HJÆLPEFUNKTIONER ---
+        function formatDK(num, decimals = 2) {
+            return num.toFixed(decimals).replace('.', ',');
+        }
+
+        function parseDK(str) {
+            return parseFloat(str.replace(',', '.'));
+        }
+
+        // "Pæne" akseskalaer (0 -> et rundt max-tal, med et rundt trin mellem mærker)
+        function niceNumber(range, round) {
+            const exponent = Math.floor(Math.log10(range));
+            const fraction = range / Math.pow(10, exponent);
+            let niceFraction;
+            if (round) {
+                if (fraction < 1.5) niceFraction = 1;
+                else if (fraction < 3) niceFraction = 2;
+                else if (fraction < 7) niceFraction = 5;
+                else niceFraction = 10;
+            } else {
+                if (fraction <= 1) niceFraction = 1;
+                else if (fraction <= 2) niceFraction = 2;
+                else if (fraction <= 5) niceFraction = 5;
+                else niceFraction = 10;
+            }
+            return niceFraction * Math.pow(10, exponent);
+        }
+
+        function niceScale(maxVal, maxTicks = 5) {
+            const range = niceNumber(maxVal, false);
+            const step = niceNumber(range / (maxTicks - 1), true);
+            const max = Math.ceil(maxVal / step) * step;
+            return { max: max, step: step };
+        }
+
+        // --- TAB NAVIGATION ---
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                btn.classList.add('active');
+                document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
+
+                // Resize canvas hvis vi skifter til sim-fanen
+                if (btn.getAttribute('data-tab') === 'simTab') {
+                    resizeCanvas();
+                } else if (btn.getAttribute('data-tab') === 'exTab') {
+                    drawGraph();
+                }
+            });
+        });
+
+        // --- SIMULATION LOGIK (HTML5 CANVAS) ---
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const canvasWrap = document.getElementById('canvasWrap');
+
+        // State variabler
+        const DEFAULT_SIM_EPS = 0.8; // Fiktiv standard-epsilon for simulationens visuals
+        let simState = {
+            c: 0.5,      // Koncentration
+            l: 1.0,      // Vejlængde (relativ)
+            eps: DEFAULT_SIM_EPS,
+            linked: false, // Er eps låst til den aktuelle opgave?
+            I0: 100,     // Start intensitet
+            A: 0,
+            T: 1
+        };
+
+        // UI Elementer
+        const cSlider = document.getElementById('cSlider');
+        const lSlider = document.getElementById('lSlider');
+        const cValDisp = document.getElementById('cValDisp');
+        const lValDisp = document.getElementById('lValDisp');
+        const epsInFormula = document.getElementById('epsInFormula');
+        const epsDefValue = document.getElementById('epsDefValue');
+        const lInFormula = document.getElementById('lInFormula');
+        const cInFormula = document.getElementById('cInFormula');
+        const aInFormula = document.getElementById('aInFormula');
+        const epsSourceNote = document.getElementById('epsSourceNote');
+
+        function updateSimCalculations() {
+            simState.c = parseFloat(cSlider.value);
+            simState.l = parseFloat(lSlider.value);
+
+            // Lambert-Beer: A = eps * l * c
+            simState.A = simState.eps * simState.l * simState.c;
+
+            // Transmittans: T = 10^-A
+            simState.T = Math.pow(10, -simState.A);
+
+            // Opdater UI display (med dansk komma)
+            cValDisp.innerText = formatDK(simState.c) + " mg/L";
+            lValDisp.innerText = formatDK(simState.l, 1) + " cm";
+
+            // Opdater den live formel med indsatte tal
+            epsInFormula.innerText = formatDK(simState.eps, 2);
+            epsDefValue.innerText = formatDK(simState.eps, 2);
+            lInFormula.innerText = formatDK(simState.l, 1);
+            cInFormula.innerText = formatDK(simState.c, 2);
+            aInFormula.innerText = formatDK(simState.A, 3);
+
+            if (simState.linked) {
+                epsSourceNote.style.display = 'block';
+                epsSourceNote.innerHTML = 'ε er låst til den aktuelle opgaves stof (ε = ' + formatDK(simState.eps, 2) + ' L/(mg·cm)), indtil du genererer en ny opgave.';
+            } else {
+                epsSourceNote.style.display = 'none';
+            }
+        }
+
+        cSlider.addEventListener('input', updateSimCalculations);
+        lSlider.addEventListener('input', updateSimCalculations);
+        document.getElementById('btnResetSim').addEventListener('click', () => {
+            cSlider.value = 0.5;
+            lSlider.value = 1.0;
+            updateSimCalculations();
+            initParticles();
+        });
+
+        document.getElementById('btnToggleColorInfo').addEventListener('click', () => {
+            const box = document.getElementById('colorInfoBox');
+            box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        });
+
+        document.getElementById('btnToggleUnitsInfo').addEventListener('click', () => {
+            const box = document.getElementById('unitsInfoBox');
+            box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        });
+
+        let slowMode = false;
+        const btnToggleSpeed = document.getElementById('btnToggleSpeed');
+        btnToggleSpeed.addEventListener('click', () => {
+            slowMode = !slowMode;
+            btnToggleSpeed.textContent = slowMode ? 'Normal hastighed' : 'Langsom fotoner';
+            btnToggleSpeed.classList.toggle('primary', slowMode);
+        });
+
+        function resizeCanvas() {
+            const rect = canvasWrap.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        // --- PARTIKEL SYSTEM (FOTONER) ---
+        let photons = [];
+
+        function initParticles() {
+            photons = [];
+        }
+
+        function spawnPhoton() {
+            photons.push({
+                x: 0,
+                y: canvas.height * 0.4 + Math.random() * (canvas.height * 0.2),
+                speed: slowMode ? (1.2 + Math.random() * 0.6) : (4 + Math.random() * 2),
+                active: true,
+                passed: false,
+                decided: false
+            });
+        }
+
+        function drawSimulation() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // --- Tegn Lyskilde (Makro) ---
+            ctx.fillStyle = "#333";
+            ctx.fillRect(20, canvas.height/2 - 50, 40, 100);
+            ctx.fillStyle = "#e84118";
+            ctx.fillRect(60, canvas.height/2 - 30, 10, 60);
+
+            // --- Kuvette Dimensioner ---
+            const cuvetteBaseWidth = 80;
+            const cuvetteWidth = cuvetteBaseWidth * simState.l;
+            const cuvetteX = canvas.width/2 - cuvetteWidth/2;
+            const cuvetteY = canvas.height * 0.2;
+            const cuvetteHeight = canvas.height * 0.6;
+
+            // Lys før kuvette - konstant intensitet (fader ikke undervejs), og lidt dæmpet
+            // fra start så fotonerne er tydelige at se oven på lysbåndet
+            const beamBaseAlpha = 0.35;
+            ctx.fillStyle = `rgba(232, 65, 24, ${beamBaseAlpha})`;
+            ctx.fillRect(70, canvas.height/2 - 30, cuvetteX - 70, 60);
+
+            // Lys efter kuvette - konstant intensitet, dæmpet udelukkende ift. transmittansen
+            const alphaOut = beamBaseAlpha * simState.T;
+            ctx.fillStyle = `rgba(232, 65, 24, ${alphaOut})`;
+            ctx.fillRect(cuvetteX + cuvetteWidth, canvas.height/2 - 30, canvas.width - (cuvetteX + cuvetteWidth) - 50, 60);
+
+            // --- Marker I0 (før kuvette) og I (efter kuvette) på lysstrålen ---
+            ctx.textAlign = "center";
+            const i0X = (70 + cuvetteX) / 2;
+            ctx.fillStyle = "#fff";
+            ctx.font = "bold 14px sans-serif";
+            ctx.fillText("I₀", i0X, canvas.height/2 - 45);
+            ctx.fillStyle = "#ccc";
+            ctx.font = "11px sans-serif";
+            ctx.fillText("100 %", i0X, canvas.height/2 - 62);
+
+            const iX = cuvetteX + cuvetteWidth + (canvas.width - 50 - (cuvetteX + cuvetteWidth)) / 2;
+            ctx.fillStyle = "#fff";
+            ctx.font = "bold 14px sans-serif";
+            ctx.fillText("I", iX, canvas.height/2 - 45);
+            ctx.fillStyle = "#ccc";
+            ctx.font = "11px sans-serif";
+            ctx.fillText(formatDK(simState.T * 100, 1) + " %", iX, canvas.height/2 - 62);
+            ctx.textAlign = "start";
+
+            // --- Tegn Kuvette Væske ---
+            // Farven bliver mørkere/dybere baseret på koncentration
+            const maxC = parseFloat(cSlider.max);
+            const intensityRatio = simState.c / maxC;
+            // Væske er blålig, fordi den absorberer rødt lys - jo højere koncentration, jo mere mættet blå
+            const liqR = Math.max(15, 235 - (intensityRatio * 220));
+            const liqG = Math.max(40, 245 - (intensityRatio * 205));
+            const liqB = 255;
+            
+            ctx.fillStyle = `rgba(${liqR}, ${liqG}, ${liqB}, 0.7)`;
+            ctx.fillRect(cuvetteX, cuvetteY, cuvetteWidth, cuvetteHeight);
+            
+            // Kuvette Glas
+            ctx.strokeStyle = "rgba(255,255,255,0.6)";
+            ctx.lineWidth = 4;
+            ctx.strokeRect(cuvetteX, cuvetteY, cuvetteWidth, cuvetteHeight);
+
+            // Tegn detektor
+            ctx.fillStyle = "#555";
+            ctx.fillRect(canvas.width - 50, canvas.height/2 - 60, 30, 120);
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(canvas.width - 50, canvas.height/2 - 40, 5, 80);
+
+            // --- Målinger fra detektoren (inkorporeret i animationen) ---
+            ctx.textAlign = "right";
+            ctx.fillStyle = "#aaa";
+            ctx.font = "11px sans-serif";
+            ctx.fillText("Måling:", canvas.width - 15, canvas.height/2 + 76);
+            ctx.fillStyle = "#fff";
+            ctx.font = "bold 13px sans-serif";
+            ctx.fillText("T = " + formatDK(simState.T * 100, 1) + " %", canvas.width - 15, canvas.height/2 + 94);
+            ctx.fillStyle = "#fbc531";
+            ctx.fillText("A = " + formatDK(simState.A, 3), canvas.width - 15, canvas.height/2 + 112);
+            ctx.textAlign = "start";
+
+            // --- Opdater og Tegn Fotoner ---
+            if(Math.random() < (slowMode ? 0.08 : 0.3)) spawnPhoton(); // Styrer mængden af fotoner
+
+            ctx.fillStyle = "#ff3838"; // Foton farve (rødt lys)
+            for (let i = photons.length - 1; i >= 0; i--) {
+                let p = photons[i];
+                p.x += p.speed;
+
+                // Fotonens skæbne afgøres ÉN gang, idet den når kuvetten - med sandsynligheden
+                // for at overleve sat direkte til den faktiske transmittans T = 10^-A.
+                // Sådan matcher andelen af fotoner, der forsvinder, altid %-tallet i aflæsningen.
+                if (!p.decided && p.x >= cuvetteX) {
+                    p.decided = true;
+                    if (Math.random() > simState.T) {
+                        p.absorbAtX = cuvetteX + Math.random() * cuvetteWidth; // absorberes et tilfældigt sted i kuvetten
+                    }
+                }
+
+                if (p.absorbAtX !== undefined && p.x >= p.absorbAtX) {
+                    p.active = false; // Blev absorberet
+                }
+
+                if (p.x > cuvetteX + cuvetteWidth) {
+                    p.passed = true;
+                }
+
+                // Tegn foton, hvis den er aktiv
+                if (p.active) {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 2, 0, Math.PI*2);
+                    ctx.fill();
+                }
+
+                // Fjern fotoner der har ramt detektoren
+                if (p.x > canvas.width - 50 || !p.active) {
+                    photons.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(drawSimulation);
+        }
+
+
+        // --- OPGAVE LOGIK (EXERCISE TAB) ---
+        let currentExercise = {
+            eps: 0,
+            unknownConc: 0,
+            unknownAbs: 0,
+            unknownVolume: 0,
+            dataPoints: []
+        };
+        let userScore = 0;
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const dataTableBody = document.getElementById('dataTableBody');
+        const unknownAbsDisplay = document.getElementById('unknownAbs');
+        const unknownVolDisplay = document.getElementById('unknownVol');
+        const inputEps = document.getElementById('inputEps');
+        const inputConc = document.getElementById('inputConc');
+        const inputMass = document.getElementById('inputMass');
+        const btnCheckEps = document.getElementById('btnCheckEps');
+        const btnCheckConc = document.getElementById('btnCheckConc');
+        const btnCheckMass = document.getElementById('btnCheckMass');
+        const feedbackEps = document.getElementById('feedbackEps');
+        const feedbackConc = document.getElementById('feedbackConc');
+        const feedbackMass = document.getElementById('feedbackMass');
+        const btnNewExercise = document.getElementById('btnNewExercise');
+
+        const gCanvas = document.getElementById('graphCanvas');
+        const gCtx = gCanvas.getContext('2d');
+
+        function generateExercise() {
+            // Tilfældig epsilon mellem 0.1 og 1.5
+            currentExercise.eps = (0.1 + Math.random() * 1.4);
+            currentExercise.dataPoints = [];
+
+            dataTableBody.innerHTML = '';
+
+            // Generer standardkurve data (l = 1cm antages)
+            let concentrations = [0.2, 0.4, 0.6, 0.8, 1.0];
+            concentrations.forEach(c => {
+                // Lidt tilfældig støj for realisme (±2%)
+                let noise = 1 + (Math.random() - 0.5) * 0.04;
+                let abs = (currentExercise.eps * 1.0 * c) * noise;
+
+                currentExercise.dataPoints.push({c: c, a: abs});
+
+                // Tilføj til tabel
+                let tr = document.createElement('tr');
+                tr.innerHTML = `<td>${formatDK(c)}</td><td>${formatDK(abs, 3)}</td>`;
+                dataTableBody.appendChild(tr);
+            });
+
+            // Ukendt prøve
+            currentExercise.unknownConc = (0.3 + Math.random() * 0.6);
+            currentExercise.unknownAbs = currentExercise.eps * 1.0 * currentExercise.unknownConc;
+            unknownAbsDisplay.innerText = formatDK(currentExercise.unknownAbs, 3);
+
+            // Opgave 3: et tilfældigt volumen af den samme ukendte prøve
+            currentExercise.unknownVolume = Math.round(50 + Math.random() * 200);
+            unknownVolDisplay.innerText = currentExercise.unknownVolume;
+
+            // Kobling til simulationsfanen: nulstil til standard-stoffet, indtil opgave 1 er løst
+            simState.eps = DEFAULT_SIM_EPS;
+            simState.linked = false;
+            updateSimCalculations();
+
+            // Nulstil UI
+            inputEps.value = '';
+            inputConc.value = '';
+            inputMass.value = '';
+            inputEps.disabled = false;
+            btnCheckEps.disabled = false;
+            inputConc.disabled = true;
+            btnCheckConc.disabled = true;
+            inputMass.disabled = true;
+            btnCheckMass.disabled = true;
+
+            feedbackEps.className = 'feedback';
+            feedbackConc.className = 'feedback';
+            feedbackMass.className = 'feedback';
+            
+            drawGraph();
+        }
+
+        function drawGraph() {
+            if(!currentExercise.dataPoints.length) return;
+
+            // Fix canvas resolution for sharpness
+            const rect = gCanvas.getBoundingClientRect();
+            if(rect.width > 0) {
+                gCanvas.width = rect.width;
+                gCanvas.height = rect.height;
+            }
+
+            gCtx.clearRect(0, 0, gCanvas.width, gCanvas.height);
+
+            const padding = { top: 20, right: 20, bottom: 45, left: 55 };
+            const chartW = gCanvas.width - padding.left - padding.right;
+            const chartH = gCanvas.height - padding.top - padding.bottom;
+            const x0 = padding.left;
+            const y0 = gCanvas.height - padding.bottom;
+
+            // "Pæne" skalaer der altid starter i 0 (origo er fysisk meningsfuldt for Lambert-Beers lov)
+            const dataMaxC = Math.max(...currentExercise.dataPoints.map(d => d.c));
+            const dataMaxA = Math.max(...currentExercise.dataPoints.map(d => d.a));
+            const xScale = niceScale(dataMaxC * 1.15, 6);
+            const yScale = niceScale(dataMaxA * 1.15, 6);
+            const maxC = xScale.max;
+            const maxA = yScale.max;
+
+            const xPix = c => x0 + (c / maxC) * chartW;
+            const yPix = a => y0 - (a / maxA) * chartH;
+
+            // Gitterlinjer + talmærker på X-aksen (koncentration)
+            gCtx.textAlign = "center";
+            gCtx.font = "11px sans-serif";
+            for (let t = 0; t <= maxC + 1e-9; t += xScale.step) {
+                const x = xPix(t);
+                gCtx.strokeStyle = "rgba(0,0,0,0.08)";
+                gCtx.lineWidth = 1;
+                gCtx.beginPath();
+                gCtx.moveTo(x, padding.top);
+                gCtx.lineTo(x, y0);
+                gCtx.stroke();
+
+                gCtx.fillStyle = "#555";
+                gCtx.fillText(formatDK(t, 1), x, y0 + 16);
+            }
+
+            // Gitterlinjer + talmærker på Y-aksen (absorbans)
+            gCtx.textAlign = "right";
+            for (let t = 0; t <= maxA + 1e-9; t += yScale.step) {
+                const y = yPix(t);
+                gCtx.strokeStyle = "rgba(0,0,0,0.08)";
+                gCtx.lineWidth = 1;
+                gCtx.beginPath();
+                gCtx.moveTo(x0, y);
+                gCtx.lineTo(gCanvas.width - padding.right, y);
+                gCtx.stroke();
+
+                gCtx.fillStyle = "#555";
+                gCtx.fillText(formatDK(t, 2), x0 - 8, y + 4);
+            }
+
+            // Tegn akser (over gitteret)
+            gCtx.strokeStyle = "#222";
+            gCtx.lineWidth = 2;
+            gCtx.beginPath();
+            gCtx.moveTo(x0, padding.top);
+            gCtx.lineTo(x0, y0);
+            gCtx.lineTo(gCanvas.width - padding.right, y0);
+            gCtx.stroke();
+
+            // Akse-titler (med enheder)
+            gCtx.fillStyle = "#222";
+            gCtx.font = "bold 12px sans-serif";
+            gCtx.textAlign = "center";
+            gCtx.fillText("Koncentration, c (mg/L)", x0 + chartW / 2, gCanvas.height - 8);
+            gCtx.save();
+            gCtx.translate(14, padding.top + chartH / 2);
+            gCtx.rotate(-Math.PI / 2);
+            gCtx.fillText("Absorbans, A (enhedsløs)", 0, 0);
+            gCtx.restore();
+
+            // Tegn datapunkter
+            gCtx.fillStyle = "#00a8ff";
+            currentExercise.dataPoints.forEach(pt => {
+                gCtx.beginPath();
+                gCtx.arc(xPix(pt.c), yPix(pt.a), 4, 0, Math.PI * 2);
+                gCtx.fill();
+            });
+
+            // Hvis Opgave 1 er løst, tegn best-fit linjen (A = eps * l * c, med l = 1 cm)
+            if (inputEps.disabled) {
+                gCtx.strokeStyle = "rgba(232, 65, 24, 0.7)";
+                gCtx.lineWidth = 2;
+                gCtx.beginPath();
+                gCtx.moveTo(xPix(0), yPix(0));
+                const aAtMaxC = currentExercise.eps * 1.0 * maxC;
+                gCtx.lineTo(xPix(maxC), yPix(Math.min(aAtMaxC, maxA)));
+                gCtx.stroke();
+            }
+        }
+
+        btnCheckEps.addEventListener('click', () => {
+            let userEps = parseDK(inputEps.value);
+            if (isNaN(userEps)) {
+                feedbackEps.innerText = "Indtast venligst et gyldigt tal.";
+                feedbackEps.className = "feedback error";
+                return;
+            }
+
+            // Margin of error 10% tilladt (pga støj)
+            let error = Math.abs(userEps - currentExercise.eps) / currentExercise.eps;
+            if (error < 0.1) {
+                feedbackEps.innerText = "Korrekt! Hældningen (ε) er ca. " + formatDK(currentExercise.eps) + " L/(mg·cm). Du kan nu løse opgave 2. Tip: skift til fanen 'Simulation' - den viser nu samme stof, så du kan udforske det visuelt.";
+                feedbackEps.className = "feedback success";
+                userScore += 10;
+
+                inputEps.disabled = true;
+                btnCheckEps.disabled = true;
+                inputConc.disabled = false;
+                btnCheckConc.disabled = false;
+
+                // Kobl simulationsfanen til denne opgaves stof
+                simState.eps = currentExercise.eps;
+                simState.linked = true;
+                updateSimCalculations();
+
+                drawGraph(); // Genoptegn graf med trendline
+            } else {
+                feedbackEps.innerText = "Forkert. Prøv at beregne hældningen som gennemsnittet af A/c.";
+                feedbackEps.className = "feedback error";
+                userScore = Math.max(0, userScore - 5);
+            }
+            scoreDisplay.innerText = userScore;
+        });
+
+        btnCheckConc.addEventListener('click', () => {
+            let userC = parseDK(inputConc.value);
+            if (isNaN(userC)) {
+                feedbackConc.innerText = "Indtast venligst et gyldigt tal.";
+                feedbackConc.className = "feedback error";
+                return;
+            }
+
+            // Beregn faktiske ukendte C via den korrekte Epsilon
+            let exactC = currentExercise.unknownAbs / currentExercise.eps;
+            let error = Math.abs(userC - exactC) / exactC;
+
+            if (error < 0.05) {
+                feedbackConc.innerText = "Korrekt! Den ukendte koncentration er " + formatDK(exactC) + " mg/L. Du kan nu løse opgave 3.";
+                feedbackConc.className = "feedback success";
+                userScore += 15;
+
+                inputConc.disabled = true;
+                btnCheckConc.disabled = true;
+
+                inputMass.disabled = false;
+                btnCheckMass.disabled = false;
+            } else {
+                feedbackConc.innerText = "Forkert. Husk formlen c = A / (ε · l), hvor l = 1 cm.";
+                feedbackConc.className = "feedback error";
+                userScore = Math.max(0, userScore - 5);
+            }
+            scoreDisplay.innerText = userScore;
+        });
+
+        btnCheckMass.addEventListener('click', () => {
+            let userMass = parseDK(inputMass.value);
+            if (isNaN(userMass)) {
+                feedbackMass.innerText = "Indtast venligst et gyldigt tal.";
+                feedbackMass.className = "feedback error";
+                return;
+            }
+
+            // m (mg) = c (mg/L) * V (L), hvor V omregnes fra mL til L
+            let exactMass = currentExercise.unknownConc * (currentExercise.unknownVolume / 1000);
+            let error = Math.abs(userMass - exactMass) / exactMass;
+
+            if (error < 0.05) {
+                feedbackMass.innerText = "Korrekt! Massen af opløst stof i prøven er " + formatDK(exactMass, 2) + " mg.";
+                feedbackMass.className = "feedback success";
+                userScore += 15;
+
+                inputMass.disabled = true;
+                btnCheckMass.disabled = true;
+            } else {
+                feedbackMass.innerText = "Forkert. Husk formlen m = c · V, hvor V regnes om til liter (V/1000), da c er i mg/L.";
+                feedbackMass.className = "feedback error";
+                userScore = Math.max(0, userScore - 5);
+            }
+            scoreDisplay.innerText = userScore;
+        });
+
+        btnNewExercise.addEventListener('click', generateExercise);
+
+        // --- INIT ---
+        setTimeout(() => {
+            resizeCanvas();
+            updateSimCalculations();
+            initParticles();
+            requestAnimationFrame(drawSimulation);
+            generateExercise();
+        }, 100); // Lille forsinkelse for at lade DOM renderes ordentligt
+
+    </script>
+</body>
+</html>

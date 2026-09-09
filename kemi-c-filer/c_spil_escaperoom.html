@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EscapeRoom Kemi C</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg-dark: #15151a;
+        --bg-body: #1e1e24;
+        --panel-bg: #2b2b36;
+        --panel-bg-2: #242430;
+        --text-light: #f5f5f5;
+        --text-dim: #a9adb4;
+        --accent-blue: #3498db;
+        --accent-orange: #e67e22;
+        --accent-green: #2ecc71;
+        --accent-red: #e74c3c;
+        --accent-purple: #9b59b6;
+        --gold: #f1c40f;
+        --border-dim: #3a3a46;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background: radial-gradient(circle at 50% -10%, #23233a 0%, var(--bg-body) 55%);
+        color: var(--text-light);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+    }
+
+    #vignette {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 60;
+        mix-blend-mode: overlay;
+        background:
+            radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%),
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    }
+
+    .mystery-font { font-family: 'Special Elite', 'Courier New', monospace; }
+
+    @keyframes flicker {
+        0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+        20%, 22%, 24%, 55% { opacity: 0.35; }
+    }
+    .lock-icon.flicker { animation: flicker 6s infinite; }
+
+    .case-stamp {
+        display: inline-block;
+        border: 2px solid var(--accent-red);
+        color: var(--accent-red);
+        padding: 4px 14px;
+        border-radius: 4px;
+        transform: rotate(-3deg);
+        font-family: 'Special Elite', 'Courier New', monospace;
+        letter-spacing: 2px;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        margin-bottom: 14px;
+    }
+
+    .room-tag {
+        display: inline-block;
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        background: var(--panel-bg-2);
+        border: 1px solid var(--border-dim);
+        padding: 3px 10px;
+        border-radius: 20px;
+        margin-bottom: 12px;
+    }
+
+    .door-row {
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        margin: 22px 0;
+        flex-wrap: wrap;
+    }
+    .door-preview {
+        width: 66px;
+        height: 82px;
+        border-radius: 8px 8px 4px 4px;
+        background: var(--panel-bg-2);
+        border: 2px solid var(--border-dim);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        color: var(--text-dim);
+        font-size: 0.7rem;
+    }
+    .door-preview .door-icon { font-size: 1.5rem; }
+
+    header {
+        background-color: var(--bg-dark);
+        padding: 14px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid var(--border-dim);
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .brand-title {
+        margin: 0;
+        font-size: 1.3rem;
+        color: var(--accent-blue);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .brand-sub {
+        margin: 0;
+        font-size: 0.75rem;
+        color: var(--text-dim);
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+
+    #timer {
+        font-variant-numeric: tabular-nums;
+        font-weight: bold;
+        color: var(--gold);
+        font-size: 1rem;
+        background: var(--panel-bg);
+        border: 1px solid var(--border-dim);
+        border-radius: 8px;
+        padding: 6px 12px;
+    }
+
+    #resetBtn {
+        background: transparent;
+        border: 1px solid var(--border-dim);
+        color: var(--text-dim);
+        border-radius: 8px;
+        padding: 6px 10px;
+        font-size: 0.75rem;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    #resetBtn:hover { border-color: var(--accent-red); color: var(--accent-red); }
+
+    .progress-track {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0;
+        padding: 16px 10px 4px 10px;
+    }
+
+    .progress-line {
+        width: 20px;
+        height: 2px;
+        background: var(--border-dim);
+        transition: background 0.3s;
+    }
+    .progress-line.done { background: var(--accent-green); }
+
+    .progress-dot {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        font-weight: bold;
+        background: var(--panel-bg);
+        border: 2px solid var(--border-dim);
+        color: var(--text-dim);
+        transition: all 0.3s;
+    }
+
+    .progress-dot.clickable { cursor: pointer; }
+    .progress-dot.clickable:hover { transform: scale(1.1); }
+
+    .progress-dot.done,
+    .progress-dot.current {
+        transition: all 0.4s;
+    }
+
+    main {
+        max-width: 820px;
+        margin: 0 auto;
+        padding: 20px 20px 80px 20px;
+    }
+
+    .panel {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-dim);
+        border-radius: 14px;
+        padding: 26px 30px;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+        animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes shake {
+        10%, 90% { transform: translateX(-2px); }
+        20%, 80% { transform: translateX(4px); }
+        30%, 50%, 70% { transform: translateX(-8px); }
+        40%, 60% { transform: translateX(8px); }
+    }
+
+    .shake { animation: shake 0.5s; }
+
+    @keyframes rainbow-border {
+        0% { background-position: 0 0, 0% 0; }
+        100% { background-position: 0 0, 300% 0; }
+    }
+    @keyframes rainbow-text {
+        0% { background-position: 0% 0; }
+        100% { background-position: 300% 0; }
+    }
+    @keyframes win-pop {
+        0% { transform: scale(0.7) rotate(-4deg); opacity: 0; }
+        60% { transform: scale(1.04) rotate(2deg); opacity: 1; }
+        100% { transform: scale(1) rotate(0); }
+    }
+
+    .win-card {
+        border: 3px solid transparent;
+        background-image: linear-gradient(var(--panel-bg), var(--panel-bg)), linear-gradient(90deg, #f87171, #fbbf24, #4ade80, #38bdf8, #a78bfa, #f87171);
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+        background-size: 100% 100%, 300% 100%;
+        animation: rainbow-border 4s linear infinite, win-pop 0.5s ease;
+    }
+    .win-title {
+        background: linear-gradient(90deg, #f87171, #fbbf24, #4ade80, #38bdf8, #a78bfa, #f87171);
+        background-size: 300% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: rainbow-text 3s linear infinite;
+        font-size: 1.8rem;
+        font-weight: 800;
+        text-align: center;
+    }
+
+    h2.room-title {
+        margin-top: 0;
+        color: var(--accent-orange);
+        font-size: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .story {
+        background: var(--panel-bg-2);
+        border-left: 4px solid var(--accent-blue);
+        padding: 12px 16px;
+        border-radius: 6px;
+        font-style: italic;
+        color: #d8dbe3;
+        margin-bottom: 18px;
+    }
+
+    h3.task-title {
+        color: var(--accent-blue);
+        margin-bottom: 4px;
+        margin-top: 26px;
+        font-size: 1.05rem;
+    }
+
+    p, li { line-height: 1.55; color: var(--text-light); }
+    .dim { color: var(--text-dim); }
+
+    table.opgave-table {
+        border-collapse: collapse;
+        margin: 12px 0;
+        width: 100%;
+        font-size: 0.92rem;
+    }
+    table.opgave-table th, table.opgave-table td {
+        border: 1px solid var(--border-dim);
+        padding: 8px 10px;
+        text-align: center;
+    }
+    table.opgave-table th {
+        background: #33334a;
+        color: var(--gold);
+    }
+    table.opgave-table td { background: var(--panel-bg-2); }
+
+    .formula {
+        text-align: center;
+        font-size: 1.15rem;
+        margin: 14px 0;
+        color: var(--gold);
+        letter-spacing: 0.5px;
+    }
+
+    .code-box {
+        margin-top: 30px;
+        border-top: 1px dashed var(--border-dim);
+        padding-top: 20px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .code-box input {
+        flex: 1;
+        min-width: 160px;
+        background: #101017;
+        border: 2px solid var(--border-dim);
+        color: var(--text-light);
+        font-size: 1.3rem;
+        letter-spacing: 3px;
+        text-align: center;
+        border-radius: 8px;
+        padding: 10px 12px;
+    }
+    .code-box input:focus { outline: none; border-color: var(--accent-blue); }
+
+    .btn {
+        background: var(--accent-blue);
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: transform 0.1s, background 0.15s;
+    }
+    .btn:hover { background: #2c81ba; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-gold {
+        background: var(--gold);
+        color: #3a2c00;
+    }
+    .btn-gold:hover { background: #d4ac0d; }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--accent-blue);
+        color: var(--accent-blue);
+    }
+    .btn-outline:hover { background: rgba(52,152,219,0.15); }
+
+    .feedback {
+        margin-top: 12px;
+        font-weight: bold;
+        min-height: 24px;
+    }
+    .feedback.ok { color: var(--accent-green); }
+    .feedback.err { color: var(--accent-red); }
+
+    .hint-box {
+        margin-top: 14px;
+        background: #2f2a1a;
+        border: 1px solid #6b551a;
+        color: #f1d98b;
+        padding: 10px 14px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        display: none;
+    }
+    .hint-box.visible { display: block; }
+
+    .lock-icon { font-size: 1.3rem; }
+
+    .center { text-align: center; }
+
+    ul.tasklist { padding-left: 22px; }
+
+    .start-screen h1 {
+        font-size: 2.1rem;
+        color: var(--accent-blue);
+        text-align: center;
+        margin-bottom: 6px;
+    }
+    .start-screen .sub {
+        text-align: center;
+        color: var(--text-dim);
+        margin-bottom: 22px;
+    }
+
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(5,5,8,0.82);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        padding: 20px;
+    }
+    .modal-overlay.visible { display: flex; }
+    .modal-box {
+        background: var(--panel-bg);
+        border: 1px solid var(--border-dim);
+        border-radius: 14px;
+        max-width: 640px;
+        width: 100%;
+        max-height: 88vh;
+        overflow-y: auto;
+        padding: 26px 28px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        animation: fadeIn 0.3s ease;
+        position: relative;
+    }
+    .modal-close {
+        position: absolute;
+        top: 14px;
+        right: 16px;
+        background: transparent;
+        border: none;
+        color: var(--text-dim);
+        font-size: 1.3rem;
+        cursor: pointer;
+    }
+    .modal-close:hover { color: var(--accent-red); }
+
+    .evidence-tag {
+        display: inline-block;
+        background: #3a2f10;
+        border: 1px dashed var(--gold);
+        color: var(--gold);
+        padding: 3px 10px;
+        border-radius: 4px;
+        font-size: 0.72rem;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+    }
+
+    .lab-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 16px 0;
+        flex-wrap: wrap;
+        background: var(--panel-bg-2);
+        border: 1px solid var(--border-dim);
+        border-radius: 10px;
+        padding: 12px 14px;
+    }
+    .lab-controls select {
+        background: #101017;
+        border: 1px solid var(--border-dim);
+        color: var(--text-light);
+        padding: 8px 10px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        flex: 1;
+        min-width: 150px;
+    }
+    .lab-controls .plus-sign {
+        color: var(--text-dim);
+        font-weight: bold;
+    }
+    #labGridTable td.dim { color: var(--text-dim); font-style: italic; }
+    #labGridTable td:first-child, #labGridTable th:first-child { text-align: left; }
+    .spot-circle {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        border: 1px solid rgba(255,255,255,0.3);
+        background: #444;
+    }
+
+    .id-options {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 14px;
+    }
+    .id-btn {
+        flex: 1;
+        min-width: 100px;
+        background: var(--panel-bg-2);
+        border: 1px solid var(--border-dim);
+        color: var(--text-light);
+        padding: 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    .id-btn:hover { border-color: var(--accent-blue); }
+    .id-btn.correct { background: var(--accent-green); border-color: var(--accent-green); color: #063a1f; }
+
+    .gold-riddle {
+        background: var(--panel-bg-2);
+        border: 1px solid #6b551a;
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin: 14px 0;
+    }
+    .gold-riddle .code-box { border-top: none; padding-top: 8px; margin-top: 8px; }
+
+    .struct-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 14px;
+        margin-top: 14px;
+    }
+    .struct-card {
+        background: var(--panel-bg-2);
+        border: 1px solid var(--border-dim);
+        border-radius: 10px;
+        padding: 10px;
+        text-align: center;
+    }
+    .struct-name {
+        color: var(--gold);
+        font-weight: bold;
+        margin: 0 0 6px 0;
+        font-size: 0.95rem;
+    }
+
+    .task-hint-row { margin: 10px 0 4px 0; }
+    .btn-small { padding: 8px 14px; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+
+<div id="vignette"></div>
+
+<header>
+    <div class="brand">
+        <span class="lock-icon flicker">🔒</span>
+        <div>
+            <p class="brand-title mystery-font">EscapeRoom Kemi C</p>
+            <p class="brand-sub">Sag #47 · Fortroligt</p>
+        </div>
+    </div>
+    <div class="header-right">
+        <span id="timer">⏱ 00:00</span>
+        <button id="resetBtn" onclick="resetGame()">↺ Nulstil</button>
+    </div>
+</header>
+
+<div class="progress-track" id="progressTrack"></div>
+
+<main id="main"></main>
+
+<div class="modal-overlay" id="labModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeLabModal()">✕</button>
+        <span class="evidence-tag">BEVIS #1 · UIDENTIFICERET PRØVE</span>
+        <h2 class="room-title mystery-font" style="font-size:1.15rem;">🧪 Prøve X</h2>
+        <p>På laboratoriebordet står 4 kendte referenceprøver (Ag⁺, Pb²⁺, Cu²⁺, Ba²⁺), 3 reagenser (NaCl, KI, Na₂SO₄) og det ukendte reagensglas "Prøve X". <b>Der findes ingen facitliste.</b></p>
+        <p><b>Sådan gør I:</b> Vælg en prøve og et reagens i menuerne nedenfor, og tryk "Dryp" for at se resultatet. Test Prøve X mod alle tre reagenser, test også de fire kendte prøver, og sammenlign rækkerne i skemaet, når det bliver udfyldt.</p>
+        <p class="dim">Bemærk: to forskellige ioner kan sagtens give samme resultat med ét reagens – I skal derfor bruge <b>mere end én test</b> for at være helt sikre på svaret.</p>
+
+        <div style="overflow-x:auto;">
+            <table class="opgave-table" id="labGridTable" style="font-size:0.82rem;"></table>
+        </div>
+
+        <div class="lab-controls">
+            <select id="labCationSelect"></select>
+            <span class="plus-sign">+</span>
+            <select id="labReagentSelect"></select>
+            <button class="btn" onclick="dripReagent()">⚗️ Dryp</button>
+        </div>
+        <div class="feedback ok" id="labLastResult"></div>
+
+        <p style="margin-top:18px;"><b>Hvilken metalion indeholder Prøve X?</b></p>
+        <div class="id-options" id="labIdOptions"></div>
+        <div class="feedback" id="labFeedback"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="structModal">
+    <div class="modal-box" style="max-width:760px;">
+        <button class="modal-close" onclick="closeStructModal()">✕</button>
+        <span class="evidence-tag">STRUKTURFORMLER</span>
+        <h2 class="room-title mystery-font" style="font-size:1.15rem;">🧬 De fem molekyler</h2>
+        <p class="dim">Brug strukturerne og EN-tabellen til selv at afgøre, hvilke molekyler der er polære som helhed.</p>
+        <div class="struct-grid" id="structGrid"></div>
+    </div>
+</div>
+
+<script>
+    const ROOMS = [
+        {
+            key: 'start',
+            kind: 'start'
+        },
+        {
+            key: 'del1',
+            kind: 'room',
+            num: 1,
+            title: 'Rum 1 – Grundstofkoden',
+            story: 'Jeres kemilærer, Niller, er slet ikke dukket op til undervisningen i dag. Det eneste, han har efterladt sig i laboratoriet, er et reagensglas med en uidentificeret prøve og en ufuldstændig reaktionsligning på tavlen. Ved siden af ligger en seddel med hans håndskrift: "Kemien vil vise vej." Den næste dør er kodelåst.',
+            tasks: [
+                {
+                    title: 'Opgave 1.1 – Den ukendte prøve',
+                    html: `
+                        <p>Ved siden af tavlen står et reagensglas mærket "Prøve X" – en ukendt opløsning, Niller tydeligvis var i gang med at undersøge, inden han udeblev.</p>
+                        <div class="center" style="margin: 16px 0;">
+                            <button class="btn btn-outline" onclick="openLabModal()">🧪 Undersøg Prøve X</button>
+                        </div>
+                        <p>a) Brug laboratoriet til at teste prøven, og bestem, hvilken metalion den indeholder.<br>
+                        b) Find <b>atomnummeret</b> på metallet.</p>
+                    `,
+                    hint: 'I laboratoriet: ét enkelt reagens giver samme farve for flere ioner - I skal teste med mindst to forskellige reagenser for at indsnævre det til kun én mulighed.'
+                },
+                {
+                    title: 'Opgave 1.2 – Tavlenoten',
+                    html: `
+                        <p>På tavlen står følgende ufuldstændige reaktionsskema for forbrænding af aluminium:</p>
+                        <p class="formula">___ Al(s) + ___ O₂(g) &rarr; ___ Al₂O₃(s)</p>
+                        <p>Afstem skemaet, og find koefficienten, der skal stå foran O₂.</p>
+                    `,
+                    hint: 'Det afstemte aluminium-skema er 4Al + 3O₂ → 2Al₂O₃.'
+                }
+            ],
+            codeNote: 'Kodeordet er de to tal fra 1.1b og 1.2 sat sammen (uden mellemrum): <b>[atomnummer]</b> efterfulgt af <b>[koefficient foran O₂]</b>.',
+            code: '823'
+        },
+        {
+            key: 'del2',
+            kind: 'room',
+            num: 2,
+            title: 'Rum 2 – Molekylets gemmested',
+            story: 'Døren glider op. Bag den ligger et lille laboratorium fyldt med kolber og en tavle med fem molekyler tegnet op, samt en række flasker uden etiketter.',
+            tasks: [
+                {
+                    title: 'Opgave 2.1 – HCN på papiret',
+                    html: `
+                        <p>Tegn stregformlen for hydrogencyanid, <b>HCN</b>.</p>
+                        <p>Tæl det samlede antal bindinger (streger) i din strukturformel.</p>
+                    `,
+                    hint: 'Brint danner altid kun 1 binding. For at både kulstof og kvælstof kan opnå oktet (8 elektroner omkring sig), skal der være en tredobbeltbinding mellem dem: H–C≡N.'
+                },
+                {
+                    title: 'Opgave 2.2 – Polaritet',
+                    html: `
+                        <p>Se strukturformlerne for H₂O, NH₃, CH₄, CO₂ og CCl₄:</p>
+                        <div class="center" style="margin: 16px 0;">
+                            <button class="btn btn-outline" onclick="openStructModal()">🧬 Vis strukturformlerne</button>
+                        </div>
+                        <p>Hvor mange af de fem molekyler er polære som helhed?</p>
+                    `,
+                    hint: 'Elektronegativiteter: H=2,2 · C=2,5 · N=3,0 · O=3,4 · Cl=3,2. Et molekyle kan have polære bindinger og alligevel være upolært som helhed, hvis strukturen er symmetrisk (dipolmomenterne ophæver hinanden) - det gælder for CO₂ og CCl₄. Kun H₂O og NH₃ har en asymmetrisk (bøjet/pyramideformet) struktur.'
+                },
+                {
+                    title: 'Opgave 2.3 – Blandingsgåden',
+                    html: `
+                        <p>Niller har blandet 6 par stoffer og noteret resultaterne - men han har ikke skrevet, hvilke af stofferne der er polære, og hvilke der er upolære:</p>
+                        <table class="opgave-table">
+                            <tr><th>Blanding</th><th>Resultat</th></tr>
+                            <tr><td>Vand + urea</td><td>Kan blandes</td></tr>
+                            <tr><td>Urea + ethanol</td><td>Kan blandes</td></tr>
+                            <tr><td>Urea + toluen</td><td>Kan IKKE blandes</td></tr>
+                            <tr><td>Toluen + hexan</td><td>Kan blandes</td></tr>
+                            <tr><td>Toluen + sorbinsyre</td><td>Kan blandes</td></tr>
+                            <tr><td>Vand + sorbinsyre</td><td>Kan IKKE blandes</td></tr>
+                        </table>
+                        <p>Hvor mange af de <b>6 stoffer i forsøget</b> er upolære?</p>
+                    `,
+                    hint: 'Vand er polært (kendt fra pensum) - brug reglen "lige opløser lige" ud fra resultaterne ovenfor, ikke strukturformler. Følg kæderne: hvis stof A kan blandes med stof B, har de samme polaritet. Vand + urea + ethanol hænger sammen i én gruppe. Toluen + hexan + sorbinsyre hænger sammen i en anden gruppe (og kan ikke blandes med den første gruppe).'
+                }
+            ],
+            codeNote: 'Kodeordet er tre tal sat sammen: <b>[antal bindinger i HCN, opg. 2.1]</b> efterfulgt af <b>[antal polære molekyler, opg. 2.2]</b> efterfulgt af <b>[antal upolære stoffer i blandingsgåden, opg. 2.3]</b>.',
+            code: '423'
+        },
+        {
+            key: 'del3',
+            kind: 'room',
+            num: 3,
+            title: 'Rum 3 – Laboratoriets vægt',
+            story: 'I det næste rum står en digital vægt og et låst skab. Skabet åbnes med en talkode – men først skal I beregne den rigtige gasmængde.',
+            tasks: [
+                {
+                    title: 'Opgave 3.1',
+                    html: `
+                        <p>Niller har afvejet 2,4 g magnesium og ladet det reagere fuldstændigt med saltsyre:</p>
+                        <p class="formula">Mg(s) + 2HCl(aq) &rarr; MgCl₂(aq) + H₂(g)</p>
+                        <p>a) Beregn stofmængden af Mg.<br>
+                        b) Beregn stofmængden af H₂-gas, der dannes.</p>
+                        <p>c) Beregn volumen af H₂-gassen ved 25 °C og 1 bar vha. idealgasligningen:</p>
+                        <p class="formula">p·V = n·R·T</p>
+                        <p>hvor R er idealgaskonstanten på 0,08314 L·bar·K⁻¹·mol⁻¹. Angiv svaret i liter med 3 decimaler.</p>
+                    `,
+                    hint: 'n(Mg) = 2,4 / 24,0 = 0,1 mol. Da forholdet Mg:H₂ er 1:1, er n(H₂) også 0,1 mol. Husk 25 °C = 298,15 K og p = 1 bar i beregningen.'
+                }
+            ],
+            codeNote: 'Kodeordet er volumen fra 3.1c med kommaet fjernet (fx 2,479 L → "2479").',
+            code: '2479'
+        },
+        {
+            key: 'del4',
+            kind: 'room',
+            num: 4,
+            title: 'Rum 4 – Den hemmelige opløsning',
+            story: 'På hylden står en navnløs flaske med en syre. En seddel fra Niller beskriver en titrering, han lavede, dagen han udeblev.',
+            tasks: [
+                {
+                    title: 'Opgave 4.1 – Titrering',
+                    html: `
+                        <p>25,0 mL af den ukendte saltsyre-opløsning (HCl) titreres med 0,100 mol/L NaOH. Der medgår 12,5 mL NaOH til ækvivalenspunktet.</p>
+                        <p class="formula">HCl(aq) + NaOH(aq) &rarr; NaCl(aq) + H₂O(l)</p>
+                        <p>Beregn koncentrationen af saltsyren, c(HCl), i mol/L med 3 decimaler.</p>
+                    `,
+                    hint: 'n(NaOH) = 0,0125 L × 0,100 mol/L. Det giver n(HCl), og c = n/V (V = 0,0250 L).'
+                },
+                {
+                    title: 'Opgave 4.2 – pH',
+                    html: `
+                        <p>Saltsyre er en stærk syre: HCl(aq) + H₂O(l) &rarr; H₃O⁺(aq) + Cl⁻(aq). Brug koncentrationen fra opgave 4.1 til at beregne pH af opløsningen (2 decimaler).</p>
+                    `,
+                    hint: 'HCl er en STÆRK syre og opspaltes fuldstændigt, så [H₃O⁺] = c(HCl). Brug pH = -log[H₃O⁺] direkte - der skal IKKE bruges en Ka-formel her.'
+                }
+            ],
+            codeNote: 'Kodeordet er pH-værdien ganget med 100, afrundet til nærmeste hele tal (fx pH = 3,45 giver koden "345").',
+            code: '130'
+        },
+        {
+            key: 'del5',
+            kind: 'room',
+            num: 5,
+            title: 'Rum 5 – Den sidste reaktion',
+            story: 'I det sidste rum finder I Nillers forsøgsopstilling: en halvfærdig redox-titrering.',
+            tasks: [
+                {
+                    title: 'Opgave 5.1 – Redox-titrering',
+                    html: `
+                        <p>En jernprøve (indeholdende Fe²⁺) titreres med en 0,0200 mol/L KMnO₄-opløsning:</p>
+                        <p class="formula">MnO₄⁻(aq) + 5Fe²⁺(aq) + 8H⁺(aq) &rarr; Mn²⁺(aq) + 5Fe³⁺(aq) + 4H₂O(l)</p>
+                        <p>Til 20,0 mL af jernprøven medgår der 24,0 mL af KMnO₄-opløsningen til ækvivalenspunktet.</p>
+                        <p>a) Beregn stofmængden af MnO₄⁻, der er brugt.<br>
+                        b) Beregn stofmængden af Fe²⁺ i prøven (brug støkiometrien i reaktionsskemaet).<br>
+                        c) Beregn koncentrationen c(Fe²⁺) i mol/L.</p>
+                    `,
+                    hint: 'n(MnO₄⁻) = 0,0240 L × 0,0200 mol/L, og n(Fe²⁺) = 5 × n(MnO₄⁻) pga. støkiometrien 5:1.'
+                }
+            ],
+            codeNote: 'Kodeordet er koncentrationen c(Fe²⁺) fra opgave 5.1c omregnet til mmol/L (ganget med 1000), som et helt tal.',
+            code: '120'
+        },
+        {
+            key: 'golddoor',
+            kind: 'golddoor',
+            num: 6,
+            title: 'Rum 6 – Den Gyldne Dør',
+            story: 'Bag Rum 5 finder I noget, Niller aldrig nævnte i sin logbog: en sjette dør, støbt i massivt guld. Den har ingen taltastatur - kun tre indgraverede segl, der ser ud til at stamme fra helt andre steder i jeres kemi-samling.'
+        },
+        {
+            key: 'finale',
+            kind: 'finale'
+        }
+    ];
+
+    // Hver dør har sin egen nøglefarve - den sjette og sidste dør er guld.
+    const DOOR_COLORS = { 1: '#3498db', 2: '#2ecc71', 3: '#9b59b6', 4: '#e67e22', 5: '#e74c3c', 6: '#f1c40f' };
+    const DOOR_TEXT = { 1: '#ffffff', 2: '#063a1f', 3: '#ffffff', 4: '#ffffff', 5: '#ffffff', 6: '#3a2c00' };
+    const KEY_NAMES = { 1: 'den grønne nøgle', 2: 'den violette nøgle', 3: 'den orange nøgle', 4: 'den røde nøgle', 5: 'den gyldne nøgle' };
+
+    // Segl til den gyldne dør - svarene er hemmelige titler, man optjener ved at vinde de andre kemispil.
+    const GOLD_RIDDLES = {
+        million: { label: 'Segl 1 · Kemi-Millionær', question: 'Hvad er man, hvis man har vundet millionærspillet?', answer: 'superkemiker', hint: 'Spil Kemi-Millionær igennem til alle 15 spørgsmål er besvaret korrekt, og læs sejrsskærmen nøje.' },
+        hangman: { label: 'Segl 2 · Syregalgen', question: 'Hvad bliver du kaldt, hvis du undslipper syrebadet 5 gange i træk i Syregalgen?', answer: 'syreimmun', hint: 'Vind Syregalgen 5 gange i træk uden at tabe undervejs - der venter en hemmelig sejrsskærm.' },
+        pacman: { label: 'Segl 3 · Pacman Quiz', question: 'Hvad bliver du kåret til, hvis du gennemfører et forløb i Mix i Pacman Quiz på sværeste niveau?', answer: 'labyrintmester', hint: 'Vælg sværhedsgraden SVÆR og emnet "Mix" i Pacman Quiz, og gennemfør hele forløbet uden at give op.' },
+        organisk: { label: 'Segl 4 · Organisk Sortering', question: 'Hvad bliver du kåret til, hvis du når 14.000 point i Organisk Sortering?', answer: 'stofgruppemester', hint: 'Spil Organisk Sortering til du når 14.000 point - der venter en tillykke-besked.' }
+    };
+    const GOLD_RIDDLE_KEYS = Object.keys(GOLD_RIDDLES);
+
+    function normalizeWord(str) {
+        return (str || '').trim().toLowerCase();
+    }
+
+    function checkGoldRiddle(key) {
+        if (!state.gold) state.gold = {};
+        const input = document.getElementById('goldInput_' + key);
+        const feedback = document.getElementById('goldFeedback_' + key);
+        const given = normalizeWord(input.value);
+        if (given === GOLD_RIDDLES[key].answer) {
+            state.gold[key] = true;
+            saveState(state);
+        } else {
+            feedback.textContent = given.length === 0 ? 'Indtast et svar.' : '❌ Forkert - det er ikke det rette segl.';
+            feedback.className = 'feedback err';
+        }
+        renderGoldDoor();
+    }
+
+    function renderGoldDoor() {
+        if (!state.gold) state.gold = {};
+        GOLD_RIDDLE_KEYS.forEach(key => {
+            const input = document.getElementById('goldInput_' + key);
+            const feedback = document.getElementById('goldFeedback_' + key);
+            if (!input) return;
+            if (state.gold[key]) {
+                input.disabled = true;
+                input.value = GOLD_RIDDLES[key].answer;
+                if (feedback) { feedback.textContent = '✅ Segl brudt!'; feedback.className = 'feedback ok'; }
+            }
+        });
+        const allDone = GOLD_RIDDLE_KEYS.every(k => state.gold[k]);
+        const completeBox = document.getElementById('goldComplete');
+        if (completeBox) completeBox.style.display = allDone ? 'block' : 'none';
+    }
+
+    // Bindes kun én gang, når rummets HTML netop er sat (undgår at stable event listeners
+    // op, hver gang renderGoldDoor() genkører efter et forkert/rigtigt svar).
+    function bindGoldDoorInputs() {
+        GOLD_RIDDLE_KEYS.forEach(key => {
+            const input = document.getElementById('goldInput_' + key);
+            if (!input) return;
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') checkGoldRiddle(key);
+            });
+        });
+    }
+
+    function proceedFromGoldDoor() {
+        state.index += 1;
+        state.maxIndex = Math.max(state.maxIndex, state.index);
+        saveState(state);
+        render();
+    }
+
+    // --- Magisk bevis-kode (CPR-stil kontroltal) ---
+    // Payload = dags dato+klokkeslæt (DDMMHHmm, 8 cifre) - skifter hvert minut, så en kode
+    // ikke kan genbruges fra en tidligere klasse/dag. Kontrolcifrene er et ægte vægtet
+    // modulus-11-tjek, ligesom i et dansk CPR-nummer.
+    //
+    // Sådan tjekker du en kode, eleverne viser dig:
+    //  1) Læs de 8 midterste cifre som DD MM HH mm, og tjek at det nogenlunde passer med uret nu.
+    //  2) Gang de 8 cifre - i rækkefølge - med vægtene 4, 3, 2, 7, 6, 5, 4, 3 og læg det hele sammen.
+    //  3) Tag den sum mod 11 (rest ved division med 11). Resultatet (00-10) skal være identisk
+    //     med de sidste 2 cifre i koden. Er det ikke det, er koden ikke ægte.
+    const CPR_WEIGHTS = [4, 3, 2, 7, 6, 5, 4, 3];
+
+    function getMagicCode() {
+        const now = new Date();
+        const dd = String(now.getDate()).padStart(2, '0');
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mi = String(now.getMinutes()).padStart(2, '0');
+        const payload = dd + mm + hh + mi;
+        let sum = 0;
+        for (let i = 0; i < payload.length; i++) {
+            sum += Number(payload[i]) * CPR_WEIGHTS[i];
+        }
+        const check = String(sum % 11).padStart(2, '0');
+        return 'RUMLESKAFT-' + payload + '-' + check;
+    }
+
+    const STORAGE_KEY = 'escapeRoomKemiC_state';
+
+    function loadState() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) return null;
+            return JSON.parse(raw);
+        } catch (e) { return null; }
+    }
+
+    function saveState(state) {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+    }
+
+    let state = loadState() || { index: 0, startTime: null, elapsedLocked: null, lab: null, gold: null, maxIndex: 0 };
+    // Migrering af gemte spil fra før tilbage-navigation fandtes: behandl det rum, de allerede
+    // var nået til, som deres reelle fremskridt (maxIndex).
+    if (state.maxIndex === undefined || state.maxIndex === null) {
+        state.maxIndex = state.index || 0;
+    }
+
+    function resetGame() {
+        if (!confirm('Nulstil hele escape roomet og start forfra?')) return;
+        state = { index: 0, startTime: null, elapsedLocked: null, lab: null, gold: null, maxIndex: 0 };
+        saveState(state);
+        closeLabModal();
+        render();
+    }
+
+    // Navigér tilbage til et allerede løst (eller det aktuelle) rum via nøglerne i statuslinjen.
+    // Kan ikke bruges til at snyde sig forbi et rum, der ikke er nået endnu.
+    function navigateToRoom(num) {
+        if (num > state.maxIndex) return;
+        state.index = num;
+        saveState(state);
+        render();
+    }
+
+    // Vises øverst i et rum, når man gennemser et tidligere løst rum i stedet for sit
+    // nuværende (frontier) rum.
+    function reviewBannerHtml() {
+        if (state.index >= state.maxIndex) return '';
+        return `
+            <div style="background:var(--panel-bg-2); border:1px solid var(--accent-blue); border-radius:8px; padding:10px 14px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <span class="dim" style="font-size:0.85rem;">🔍 I gennemser et løst rum igen.</span>
+                <button class="btn btn-outline btn-small" onclick="navigateToRoom(${state.maxIndex})">Tilbage til jeres nuværende rum →</button>
+            </div>
+        `;
+    }
+
+    // --- Laboratorie-popup: identificér "Prøve X" (rum 1) ---
+    // Fri sandkasse: eleverne vælger selv en kendt referenceprøve + et reagens og dryppe dem
+    // sammen. Der er ingen facitliste forudgivet - skemaet udfyldes kun med de kombinationer,
+    // eleverne selv har testet.
+    const LAB_CATIONS = [
+        { key: 'ag', label: 'Ag⁺', full: 'Ag⁺ (kendt referenceprøve)' },
+        { key: 'pb', label: 'Pb²⁺', full: 'Pb²⁺ (kendt referenceprøve)' },
+        { key: 'cu', label: 'Cu²⁺', full: 'Cu²⁺ (kendt referenceprøve)' },
+        { key: 'ba', label: 'Ba²⁺', full: 'Ba²⁺ (kendt referenceprøve)' },
+        { key: 'x', label: 'Prøve X', full: 'Prøve X (ukendt)' }
+    ];
+    const LAB_REAGENTS = [
+        { key: 'cl', label: 'NaCl(aq)' },
+        { key: 'i', label: 'KI(aq)' },
+        { key: 'so4', label: 'Na₂SO₄(aq)' }
+    ];
+    // Prøve X indeholder Pb²⁺ - dens række er derfor identisk med Pb²⁺-rækken.
+    const LAB_RESULTS = {
+        ag: { cl: { text: 'Hvidt bundfald', color: '#e9e9ee' }, i: { text: 'Gult bundfald', color: '#f1c40f' }, so4: { text: 'Svagt bundfald (tungtopløseligt)', color: '#9a9aa5' } },
+        pb: { cl: { text: 'Hvidt bundfald', color: '#e9e9ee' }, i: { text: 'Gult bundfald', color: '#f1c40f' }, so4: { text: 'Hvidt bundfald', color: '#e9e9ee' } },
+        cu: { cl: { text: 'Ingen reaktion', color: null }, i: { text: 'Brunt bundfald', color: '#8b5a2b' }, so4: { text: 'Ingen reaktion', color: null } },
+        ba: { cl: { text: 'Ingen reaktion', color: null }, i: { text: 'Ingen reaktion', color: null }, so4: { text: 'Hvidt bundfald', color: '#e9e9ee' } },
+        x: { cl: { text: 'Hvidt bundfald', color: '#e9e9ee' }, i: { text: 'Gult bundfald', color: '#f1c40f' }, so4: { text: 'Hvidt bundfald', color: '#e9e9ee' } }
+    };
+    const LAB_ANSWER = 'pb';
+
+    function openLabModal() {
+        if (!state.lab) state.lab = { tested: {}, solved: false };
+        saveState(state);
+        document.getElementById('labModal').classList.add('visible');
+        renderLabModal();
+    }
+
+    function closeLabModal() {
+        const modal = document.getElementById('labModal');
+        if (modal) modal.classList.remove('visible');
+    }
+
+    // --- Strukturformel-popup (rum 2, opgave 2.2) ---
+    const MOLECULE_SVGS = {
+        'H₂O': `<svg viewBox="0 0 200 150" width="170" height="128">
+            <line x1="100" y1="55" x2="55" y2="105" stroke="#ccc" stroke-width="2"/>
+            <line x1="100" y1="55" x2="145" y2="105" stroke="#ccc" stroke-width="2"/>
+            <circle cx="88" cy="30" r="2" fill="#e74c3c"/><circle cx="94" cy="25" r="2" fill="#e74c3c"/>
+            <circle cx="112" cy="30" r="2" fill="#e74c3c"/><circle cx="106" cy="25" r="2" fill="#e74c3c"/>
+            <circle cx="100" cy="55" r="18" fill="#e74c3c"/>
+            <text x="100" y="61" text-anchor="middle" font-size="16" fill="#fff" font-weight="bold">O</text>
+            <circle cx="55" cy="112" r="13" fill="#f5f5f5"/><text x="55" y="117" text-anchor="middle" font-size="13" fill="#111" font-weight="bold">H</text>
+            <circle cx="145" cy="112" r="13" fill="#f5f5f5"/><text x="145" y="117" text-anchor="middle" font-size="13" fill="#111" font-weight="bold">H</text>
+        </svg>`,
+        'NH₃': `<svg viewBox="0 0 200 150" width="170" height="128">
+            <line x1="100" y1="45" x2="50" y2="105" stroke="#ccc" stroke-width="2"/>
+            <line x1="100" y1="45" x2="150" y2="105" stroke="#ccc" stroke-width="2"/>
+            <polygon points="100,45 92,112 108,112" fill="#ccc"/>
+            <circle cx="88" cy="20" r="2" fill="#3498db"/><circle cx="94" cy="15" r="2" fill="#3498db"/>
+            <circle cx="100" cy="45" r="18" fill="#3498db"/>
+            <text x="100" y="51" text-anchor="middle" font-size="16" fill="#fff" font-weight="bold">N</text>
+            <circle cx="50" cy="112" r="13" fill="#f5f5f5"/><text x="50" y="117" text-anchor="middle" font-size="13" fill="#111" font-weight="bold">H</text>
+            <circle cx="150" cy="112" r="13" fill="#f5f5f5"/><text x="150" y="117" text-anchor="middle" font-size="13" fill="#111" font-weight="bold">H</text>
+            <circle cx="100" cy="118" r="13" fill="#f5f5f5"/><text x="100" y="123" text-anchor="middle" font-size="13" fill="#111" font-weight="bold">H</text>
+        </svg>`,
+        'CH₄': `<svg viewBox="0 0 200 150" width="170" height="128">
+            <line x1="100" y1="75" x2="50" y2="35" stroke="#ccc" stroke-width="2"/>
+            <line x1="100" y1="75" x2="150" y2="35" stroke="#ccc" stroke-width="2"/>
+            <polygon points="100,75 45,120 60,128" fill="#ccc"/>
+            <line x1="100" y1="75" x2="150" y2="120" stroke="#ccc" stroke-width="2" stroke-dasharray="4,3"/>
+            <circle cx="100" cy="75" r="16" fill="#999"/><text x="100" y="80" text-anchor="middle" font-size="15" fill="#111" font-weight="bold">C</text>
+            <circle cx="50" cy="30" r="13" fill="#f5f5f5"/><text x="50" y="35" text-anchor="middle" font-size="13" fill="#111" font-weight="bold">H</text>
+            <circle cx="150" cy="30" r="13" fill="#f5f5f5"/><text x="150" y="35" text-anchor="middle" font-size="13" fill="#111" font-weight="bold">H</text>
+            <circle cx="50" cy="128" r="13" fill="#f5f5f5"/><text x="50" y="133" text-anchor="middle" font-size="13" fill="#111" font-weight="bold">H</text>
+            <circle cx="150" cy="126" r="13" fill="#f5f5f5"/><text x="150" y="131" text-anchor="middle" font-size="13" fill="#111" font-weight="bold">H</text>
+        </svg>`,
+        'CO₂': `<svg viewBox="0 0 200 150" width="170" height="128">
+            <line x1="55" y1="70" x2="95" y2="70" stroke="#ccc" stroke-width="2"/>
+            <line x1="55" y1="80" x2="95" y2="80" stroke="#ccc" stroke-width="2"/>
+            <line x1="105" y1="70" x2="145" y2="70" stroke="#ccc" stroke-width="2"/>
+            <line x1="105" y1="80" x2="145" y2="80" stroke="#ccc" stroke-width="2"/>
+            <circle cx="40" cy="75" r="17" fill="#e74c3c"/><text x="40" y="81" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">O</text>
+            <circle cx="100" cy="75" r="16" fill="#999"/><text x="100" y="80" text-anchor="middle" font-size="15" fill="#111" font-weight="bold">C</text>
+            <circle cx="160" cy="75" r="17" fill="#e74c3c"/><text x="160" y="81" text-anchor="middle" font-size="15" fill="#fff" font-weight="bold">O</text>
+        </svg>`,
+        'CCl₄': `<svg viewBox="0 0 200 150" width="170" height="128">
+            <line x1="100" y1="75" x2="50" y2="35" stroke="#ccc" stroke-width="2"/>
+            <line x1="100" y1="75" x2="150" y2="35" stroke="#ccc" stroke-width="2"/>
+            <polygon points="100,75 42,120 62,130" fill="#ccc"/>
+            <line x1="100" y1="75" x2="150" y2="120" stroke="#ccc" stroke-width="2" stroke-dasharray="4,3"/>
+            <circle cx="100" cy="75" r="16" fill="#999"/><text x="100" y="80" text-anchor="middle" font-size="15" fill="#111" font-weight="bold">C</text>
+            <circle cx="50" cy="28" r="16" fill="#2ecc71"/><text x="50" y="33" text-anchor="middle" font-size="12" fill="#053" font-weight="bold">Cl</text>
+            <circle cx="150" cy="28" r="16" fill="#2ecc71"/><text x="150" y="33" text-anchor="middle" font-size="12" fill="#053" font-weight="bold">Cl</text>
+            <circle cx="48" cy="130" r="16" fill="#2ecc71"/><text x="48" y="135" text-anchor="middle" font-size="12" fill="#053" font-weight="bold">Cl</text>
+            <circle cx="152" cy="128" r="16" fill="#2ecc71"/><text x="152" y="133" text-anchor="middle" font-size="12" fill="#053" font-weight="bold">Cl</text>
+        </svg>`
+    };
+
+    function openStructModal() {
+        const grid = document.getElementById('structGrid');
+        if (grid && grid.children.length === 0) {
+            grid.innerHTML = Object.keys(MOLECULE_SVGS).map(name => `
+                <div class="struct-card">
+                    <p class="struct-name">${name}</p>
+                    ${MOLECULE_SVGS[name]}
+                </div>
+            `).join('');
+        }
+        document.getElementById('structModal').classList.add('visible');
+    }
+
+    function closeStructModal() {
+        const modal = document.getElementById('structModal');
+        if (modal) modal.classList.remove('visible');
+    }
+
+    function dripReagent() {
+        if (!state.lab) state.lab = { tested: {}, solved: false };
+        const cationSelect = document.getElementById('labCationSelect');
+        const reagentSelect = document.getElementById('labReagentSelect');
+        const cationKey = cationSelect.value;
+        const reagentKey = reagentSelect.value;
+        const cellKey = cationKey + '_' + reagentKey;
+        state.lab.tested[cellKey] = true;
+        saveState(state);
+
+        const result = LAB_RESULTS[cationKey][reagentKey];
+        const cation = LAB_CATIONS.find(c => c.key === cationKey);
+        const reagent = LAB_REAGENTS.find(r => r.key === reagentKey);
+        const last = document.getElementById('labLastResult');
+        last.textContent = `⚗️ ${cation.full} + ${reagent.label} → ${result.text}`;
+
+        renderLabModal();
+    }
+
+    function submitIdentification(key) {
+        if (!state.lab) state.lab = { tested: {}, solved: false };
+        const feedback = document.getElementById('labFeedback');
+        if (key === LAB_ANSWER) {
+            state.lab.solved = true;
+            saveState(state);
+            feedback.textContent = '✅ Korrekt! Prøve X indeholder bly-ioner, Pb²⁺. Find nu atomnummeret på bly (Pb), og brug det til at afstemme fældningsreaktionen i opgave 1.1.';
+            feedback.className = 'feedback ok';
+        } else {
+            feedback.textContent = '❌ Ikke helt - dryp flere reagenser på de kendte referenceprøver, og sammenlign hele rækken med Prøve X-rækken i skemaet.';
+            feedback.className = 'feedback err';
+        }
+        renderLabModal();
+    }
+
+    function renderLabModal() {
+        if (!state.lab) return;
+
+        const cationSelect = document.getElementById('labCationSelect');
+        if (cationSelect && cationSelect.options.length === 0) {
+            cationSelect.innerHTML = LAB_CATIONS.map(c => `<option value="${c.key}">${c.full}</option>`).join('');
+        }
+        const reagentSelect = document.getElementById('labReagentSelect');
+        if (reagentSelect && reagentSelect.options.length === 0) {
+            reagentSelect.innerHTML = LAB_REAGENTS.map(r => `<option value="${r.key}">${r.label}</option>`).join('');
+        }
+
+        const table = document.getElementById('labGridTable');
+        if (table) {
+            let html = '<tr><th>Prøve</th>' + LAB_REAGENTS.map(r => `<th>${r.label}</th>`).join('') + '</tr>';
+            LAB_CATIONS.forEach(c => {
+                html += `<tr><td>${c.label}</td>`;
+                LAB_REAGENTS.forEach(r => {
+                    const key = c.key + '_' + r.key;
+                    if (state.lab.tested[key]) {
+                        const res = LAB_RESULTS[c.key][r.key];
+                        const dot = res.color ? `<span class="spot-circle" style="background:${res.color}; display:inline-block; vertical-align:middle; margin-right:6px;"></span>` : '';
+                        html += `<td>${dot}${res.text}</td>`;
+                    } else {
+                        html += `<td class="dim">?</td>`;
+                    }
+                });
+                html += '</tr>';
+            });
+            table.innerHTML = html;
+        }
+
+        const idOptions = document.getElementById('labIdOptions');
+        idOptions.innerHTML = LAB_CATIONS.filter(c => c.key !== 'x').map(c => {
+            let cls = 'id-btn';
+            if (state.lab.solved && c.key === LAB_ANSWER) cls += ' correct';
+            return `<button class="${cls}" onclick="submitIdentification('${c.key}')">${c.label}</button>`;
+        }).join('');
+    }
+
+    function startGame() {
+        state.index = 1;
+        state.maxIndex = Math.max(state.maxIndex, 1);
+        state.startTime = Date.now();
+        saveState(state);
+        render();
+    }
+
+    function normalizeCode(str) {
+        return (str || '').replace(/[^0-9]/g, '');
+    }
+
+    function submitCode(roomIndex) {
+        const input = document.getElementById('codeInput');
+        const feedback = document.getElementById('feedback');
+        const panel = document.getElementById('roomPanel');
+        const room = ROOMS[roomIndex];
+        const given = normalizeCode(input.value);
+
+        if (given === room.code) {
+            const keyName = KEY_NAMES[room.num];
+            feedback.textContent = keyName ? `✅ Rigtigt! I finder ${keyName} og låser den næste dør op...` : '✅ Rigtigt! Den sidste lås klikker op...';
+            feedback.className = 'feedback ok';
+            input.disabled = true;
+            setTimeout(() => {
+                state.index = roomIndex + 1;
+                state.maxIndex = Math.max(state.maxIndex, state.index);
+                saveState(state);
+                render();
+            }, 900);
+        } else {
+            feedback.textContent = given.length === 0 ? 'Indtast en kode.' : '❌ Forkert kode, prøv igen.';
+            feedback.className = 'feedback err';
+            panel.classList.remove('shake');
+            void panel.offsetWidth;
+            panel.classList.add('shake');
+        }
+    }
+
+    function toggleHint(key) {
+        const box = document.getElementById('hintBox_' + key);
+        if (box) box.classList.toggle('visible');
+    }
+
+    function renderProgress() {
+        const track = document.getElementById('progressTrack');
+        const maxIdx = state.maxIndex || 0;
+        // Den gyldne bonusdør holdes skjult i statuslinjen, indtil man når Rum 5 - den skal
+        // opdages som en overraskelse, ikke annonceres på forhånd.
+        const roomList = ROOMS.filter(r => r.num && (r.num <= 5 || maxIdx >= 5 || state.index >= 5));
+        let html = '';
+        roomList.forEach((r, i) => {
+            if (i > 0) {
+                const lineDone = maxIdx > roomList[i - 1].num;
+                const lineColor = lineDone ? DOOR_COLORS[roomList[i - 1].num] : '';
+                html += `<div class="progress-line${lineDone ? ' done' : ''}"${lineColor ? ` style="background:${lineColor};"` : ''}></div>`;
+            }
+            const color = DOOR_COLORS[r.num];
+            let cls = 'progress-dot';
+            let label = '🔒';
+            let style;
+            let clickable = false;
+            if (maxIdx > r.num) {
+                cls += ' done';
+                label = '🔑';
+                style = `background:${color}; border-color:${color}; color:${DOOR_TEXT[r.num]};`;
+                clickable = true;
+            } else if (maxIdx === r.num) {
+                cls += ' current';
+                label = r.num === 6 ? '⭐' : String(r.num);
+                style = `background:${color}; border-color:${color}; color:${DOOR_TEXT[r.num]}; box-shadow:0 0 0 4px ${color}55;`;
+                clickable = true;
+            } else {
+                style = `border-color:${color}66;`;
+            }
+            // Ekstra ring, hvis dette er det rum, man faktisk kigger på lige nu, men det IKKE
+            // er ens frontier (dvs. man er gået tilbage for at gense et løst rum).
+            if (state.index === r.num && maxIdx !== r.num) {
+                style += ' outline:2px solid #fff; outline-offset:2px;';
+            }
+            if (clickable) cls += ' clickable';
+            const onclick = clickable ? ` onclick="navigateToRoom(${r.num})"` : '';
+            const titleSuffix = maxIdx > r.num ? ' - løst, klik for at gense' : (maxIdx === r.num ? ' - jeres nuværende rum' : '');
+            html += `<div class="${cls}" style="${style}" title="Rum ${r.num}${titleSuffix}"${onclick}>${label}</div>`;
+        });
+        track.innerHTML = html;
+        track.style.display = state.index === 0 ? 'none' : 'flex';
+    }
+
+    function renderDoorPreview() {
+        const wrap = document.getElementById('doorRow');
+        if (!wrap) return;
+        // Kun de 5 kendte rum vises på forsiden - den gyldne dør er en hemmelighed.
+        const roomList = ROOMS.filter(r => r.num && r.num <= 5);
+        wrap.innerHTML = roomList.map(r => {
+            const color = DOOR_COLORS[r.num];
+            return `
+                <div class="door-preview" style="border-color:${color}77;">
+                    <span class="door-icon">${r.num === 6 ? '✨' : '🚪'}</span>
+                    <span>${r.num === 6 ? 'Bonus' : 'Rum ' + r.num}</span>
+                    <span style="color:${color};">🔒</span>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function formatTime(ms) {
+        const totalSec = Math.floor(ms / 1000);
+        const m = String(Math.floor(totalSec / 60)).padStart(2, '0');
+        const s = String(totalSec % 60).padStart(2, '0');
+        return m + ':' + s;
+    }
+
+    let timerInterval = null;
+    function updateTimer() {
+        const el = document.getElementById('timer');
+        if (el) {
+            if (!state.startTime) {
+                el.textContent = '⏱ 00:00';
+            } else {
+                const end = state.elapsedLocked !== null ? state.elapsedLocked : (Date.now() - state.startTime);
+                el.textContent = '⏱ ' + formatTime(end);
+            }
+        }
+        const magicEl = document.getElementById('magicCode');
+        if (magicEl) magicEl.textContent = getMagicCode();
+    }
+
+    function render() {
+        renderProgress();
+        const main = document.getElementById('main');
+        const room = ROOMS[state.index];
+
+        if (room.kind === 'start') {
+            main.innerHTML = `
+                <div class="panel start-screen">
+                    <span class="case-stamp">Fortroligt · Sag #47</span>
+                    <h1 class="mystery-font">🔒 EscapeRoom: Kemi C</h1>
+                    <p class="sub mystery-font">"Læreren Niller er forsvundet"</p>
+                    <p>Jeres kemilærer, Niller, er slet ikke dukket op til undervisningen. Bag fem låste døre gemmer sig svaret på, hvad der er sket med ham – men hver dør kræver et kodeord, som kun kan findes ved at bruge <b>hele pensum fra Kemi C</b>.</p>
+                    <div class="door-row" id="doorRow"></div>
+                    <p class="dim" style="text-align:center; font-size:0.85rem;">Bevismateriale fundet ved gerningsstedet:<br>🧪 et reagensglas med en uidentificeret prøve · 📐 en ufuldstændig reaktionsligning</p>
+                    <ul class="tasklist dim">
+                        <li>Kodeordene er altid tal – indtast dem i feltet i bunden af hvert rum.</li>
+                        <li>Sidder I fast, er der en 💡 hint-knap i hvert rum.</li>
+                        <li>Jeres tid tages fra I trykker "Start" til I når i mål.</li>
+                    </ul>
+                    <div class="center" style="margin-top:20px;">
+                        <button class="btn btn-gold" onclick="startGame()">🔓 Start efterforskningen</button>
+                    </div>
+                </div>
+            `;
+            renderDoorPreview();
+        } else if (room.kind === 'room') {
+            const tasksHtml = room.tasks.map((task, i) => {
+                const hintKey = state.index + '_t' + i;
+                const shortTitle = task.title.split('–')[0].trim();
+                return `
+                    <h3 class="task-title">${task.title}</h3>
+                    ${task.html}
+                    <div class="task-hint-row">
+                        <button class="btn btn-outline btn-small" onclick="toggleHint('${hintKey}')">💡 Hint til ${shortTitle}</button>
+                    </div>
+                    <div class="hint-box" id="hintBox_${hintKey}">${task.hint}</div>
+                `;
+            }).join('');
+
+            main.innerHTML = `
+                <div class="panel" id="roomPanel">
+                    ${reviewBannerHtml()}
+                    <span class="room-tag">Rum ${room.num} af 6</span>
+                    <h2 class="room-title mystery-font"><span class="lock-icon">🔓</span> ${room.title}</h2>
+                    <div class="story">${room.story}</div>
+                    ${room.intro || ''}
+                    ${tasksHtml}
+                    <h3 class="task-title">Kodeordet</h3>
+                    <p>${room.codeNote}</p>
+                    <div class="code-box">
+                        <input id="codeInput" type="text" inputmode="numeric" placeholder="Indtast kodeord..." autocomplete="off">
+                        <button class="btn" onclick="submitCode(${state.index})">🔓 Lås op</button>
+                    </div>
+                    <div class="feedback" id="feedback"></div>
+                </div>
+            `;
+            const input = document.getElementById('codeInput');
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') submitCode(state.index);
+            });
+            input.focus();
+        } else if (room.kind === 'golddoor') {
+            const riddleHtml = Object.keys(GOLD_RIDDLES).map(key => {
+                const r = GOLD_RIDDLES[key];
+                const hintKey = 'gold_' + key;
+                return `
+                    <div class="gold-riddle">
+                        <p class="dim" style="margin:0 0 4px 0; font-size:0.75rem; letter-spacing:1px; text-transform:uppercase;">${r.label}</p>
+                        <p style="margin-top:0;"><b>${r.question}</b></p>
+                        <div class="code-box">
+                            <input type="text" id="goldInput_${key}" placeholder="Dit svar..." autocomplete="off">
+                            <button class="btn" onclick="checkGoldRiddle('${key}')">Indløs segl</button>
+                        </div>
+                        <div class="feedback" id="goldFeedback_${key}"></div>
+                        <div class="task-hint-row">
+                            <button class="btn btn-outline btn-small" onclick="toggleHint('${hintKey}')">💡 Hint til dette segl</button>
+                        </div>
+                        <div class="hint-box" id="hintBox_${hintKey}">${r.hint}</div>
+                    </div>
+                `;
+            }).join('');
+
+            main.innerHTML = `
+                <div class="panel" id="roomPanel">
+                    ${reviewBannerHtml()}
+                    <span class="room-tag" style="border-color:var(--gold); color:var(--gold);">Rum 6 af 6 · Hemmeligt bonusrum</span>
+                    <h2 class="room-title mystery-font" style="color:var(--gold);"><span class="lock-icon">🔓</span> ${room.title}</h2>
+                    <div class="story">${room.story}</div>
+                    <p>Denne dør åbnes ikke med en beregning, men med fire segl fundet i fire af jeres andre kemispil. Har I allerede mestret dem, kender I måske svarene allerede. Der er ingen vej udenom - alle fire segl skal brydes for at afslutte sagen.</p>
+                    ${riddleHtml}
+                    <div id="goldComplete" class="center" style="display:none; margin-top:20px;">
+                        <p class="win-title" style="font-size:1.2rem;">✨ Alle fire segl er brudt!</p>
+                        <button class="btn btn-gold" onclick="proceedFromGoldDoor()">🔓 Åbn den gyldne dør</button>
+                    </div>
+                </div>
+            `;
+            bindGoldDoorInputs();
+            renderGoldDoor();
+        } else if (room.kind === 'finale') {
+            if (state.elapsedLocked === null && state.startTime) {
+                state.elapsedLocked = Date.now() - state.startTime;
+                saveState(state);
+            }
+            const tid = state.elapsedLocked !== null ? formatTime(state.elapsedLocked) : '??:??';
+            main.innerHTML = `
+                <div class="panel win-card center">
+                    <span class="case-stamp" style="border-color:var(--accent-green); color:var(--accent-green);">Sagen er opklaret</span><br>
+                    <p class="win-title">🏆 I fandt Niller!</p>
+                    <p style="margin-top:14px;">Bag det sidste rum finder I en seddel: Niller var slet ikke i fare - han var bare taget ud i felten for at hente en sjælden mineralprøve til jeres næste forsøg, og glemte at fortælle det til nogen. Hans logbog roser jer for at have brugt hele Kemi C-pensum til at finde vej: atomer og ioner, molekylers polaritet, mængdeberegning, koncentration og pH, samt organisk kemi og redox - og for at have knækket den gyldne dørs fire segl. Ægte superhold!</p>
+                    <p style="margin-top:14px;">⏱ Jeres samlede tid: <b>${tid}</b></p>
+                    <div style="margin-top:20px; padding:14px; background:var(--panel-bg-2); border:1px dashed var(--gold); border-radius:10px;">
+                        <p class="dim" style="margin:0 0 6px 0; font-size:0.75rem; text-transform:uppercase; letter-spacing:1px;">Bevis på gennemførsel</p>
+                        <p class="mystery-font" style="margin:0; font-size:1.3rem; color:var(--gold); letter-spacing:1px;" id="magicCode"></p>
+                        <p class="dim" style="margin:8px 0 0 0; font-size:0.75rem;">Koden skifter hvert minut - vis den til din lærer som bevis på, at I er færdige.</p>
+                    </div>
+                    <div style="margin-top:22px;">
+                        <button class="btn btn-outline" onclick="resetGame()">↺ Spil igen</button>
+                    </div>
+                </div>
+            `;
+            const magicEl = document.getElementById('magicCode');
+            if (magicEl) magicEl.textContent = getMagicCode();
+        }
+    }
+
+    if (!timerInterval) {
+        timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    render();
+    updateTimer();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtuel Kemi: Temperatur & Opløselighed</title>
+    <style>
+        :root {
+            --bg-color: #1a1a1d;
+            --panel-bg: #2d2d34;
+            --text-color: #e0e0e0;
+            --accent-color: #4ecca3;
+        }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg-color); color: var(--text-color); height: 100vh; display: flex; overflow: hidden; }
+
+        #app-container { display: flex; width: 100%; height: 100%; }
+        
+        #control-panel {
+            width: 320px; background: var(--panel-bg); padding: 20px;
+            display: flex; flex-direction: column; border-right: 2px solid #333;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.5); z-index: 10; overflow-y: auto;
+        }
+
+        #sim-view {
+            flex: 1; position: relative;
+            background: radial-gradient(circle at center, #2b3040 0%, #1a1a1d 100%);
+            overflow: hidden;
+        }
+
+        #info-panel {
+            width: 320px; background: #232328; border-left: 2px solid #333;
+            padding: 20px; font-size: 0.9rem; overflow-y: auto;
+        }
+
+        h2 { color: var(--accent-color); margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        h3 { font-size: 1rem; color: #aaa; margin-top: 20px; margin-bottom: 5px; border-bottom: 1px solid #444; }
+        
+        .control-group { margin-bottom: 20px; background: #222; padding: 10px; border-radius: 6px; border: 1px solid #444; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #ccc; }
+        input[type=range] { width: 100%; cursor: pointer; }
+        
+        .btn {
+            background: #393e46; color: white; border: none; padding: 12px; margin-bottom: 10px;
+            border-radius: 6px; cursor: pointer; width: 100%; font-weight: bold; transition: 0.2s;
+        }
+        .btn:hover { background: var(--accent-color); color: #000; }
+        .btn.active { background: var(--accent-color); color: #000; box-shadow: 0 0 10px var(--accent-color); }
+
+        .temp-row { display: flex; gap: 6px; }
+        .temp-btn { flex: 1; width: auto; margin-bottom: 0; padding: 12px 4px; font-size: 0.85rem; }
+
+        .chem-eq { 
+            font-family: 'Times New Roman', serif; font-size: 1.3rem; 
+            background: #111; padding: 10px; border-radius: 5px; text-align: center; margin: 10px 0; border: 1px solid #444;
+            color: #fff;
+        }
+
+        .legend-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.85rem; }
+        .dot { width: 14px; height: 14px; border-radius: 50%; margin-right: 10px; border: 1px solid #fff; display:grid; place-items:center; font-size:10px; color:#fff; font-weight:bold;}
+        
+        .water-demo { display: flex; flex-direction: column; align-items: center; margin: 15px 0 5px; }
+        .water-molecule { position: relative; width: 40px; height: 40px; margin-top: 18px; }
+        .oxy { width: 24px; height: 24px; background: #FF5252; border-radius: 50%; position: absolute; top: 8px; left: 8px; z-index: 2; text-align: center; line-height: 24px; font-weight: bold; font-size: 14px; color:#fff; border:1px solid #fff; }
+        .hyd { width: 14px; height: 14px; background: #EEE; border-radius: 50%; position: absolute; z-index: 1; color: #333; text-align: center; line-height: 14px; font-size: 10px; font-weight: bold; }
+        .h1 { top: 28px; left: 2px; } .h2 { top: 28px; right: 2px; }
+        .dipole-arrow { position: absolute; left: 50%; top: -18px; width: 2px; height: 20px; background: var(--accent-color); transform: translateX(-50%); }
+        .dipole-arrow::after { content: ''; position: absolute; top: -6px; left: 50%; transform: translateX(-50%); border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 7px solid var(--accent-color); }
+
+        .quiz-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+            display: none; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .quiz-card {
+            background: var(--panel-bg); border: 1px solid #444; border-radius: 10px;
+            padding: 28px; max-width: 460px; width: 90%; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+        }
+        .quiz-progress { font-size: 0.8rem; color: #888; margin-bottom: 8px; }
+        .quiz-question { font-size: 1.1rem; margin-bottom: 16px; color: #fff; }
+        .quiz-option {
+            background: #222; border: 1px solid #444; border-radius: 6px; padding: 10px 14px;
+            margin-bottom: 8px; cursor: pointer; transition: 0.15s;
+        }
+        .quiz-option:hover { border-color: var(--accent-color); }
+        .quiz-option.selected { border-color: var(--accent-color); background: #263c36; }
+        .quiz-option.correct { border-color: #4ecca3; background: #1f4a3d; }
+        .quiz-option.incorrect { border-color: #e05a5a; background: #4a2323; }
+        .quiz-explain { font-size: 0.85rem; color: #aaa; margin-top: 12px; min-height: 20px; line-height: 1.4; }
+        .quiz-actions { display: flex; justify-content: space-between; margin-top: 18px; gap: 10px; }
+        .quiz-actions .btn { width: auto; margin: 0; padding: 10px 18px; }
+        .quiz-actions .btn:disabled { opacity: 0.4; cursor: default; }
+        .quiz-actions .btn:disabled:hover { background: #393e46; color: white; }
+
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    
+    <div id="control-panel">
+        <h2>🔥 Kontrolpanel</h2>
+        
+        <div class="control-group">
+            <label>Temperatur</label>
+            <div class="temp-row">
+                <button class="btn temp-btn" data-temp="cold" onclick="sim.setTemp('cold')">❄️ Koldt</button>
+                <button class="btn temp-btn active" data-temp="lukewarm" onclick="sim.setTemp('lukewarm')">💧 Lunkent</button>
+                <button class="btn temp-btn" data-temp="warm" onclick="sim.setTemp('warm')">🔥 Varmt</button>
+            </div>
+            <p style="font-size:0.8rem; color:#888; margin-top:8px;">
+                Tip: Fire vandmolekyler går sammen om hver ion - temperaturen bestemmer kun tempoet.
+            </p>
+        </div>
+
+        <button class="btn" onclick="sim.reset()">Genstart Simulation</button>
+        <button class="btn" onclick="quiz.open()">🧠 Test din viden</button>
+
+        <div class="control-group">
+            <strong>Legende:</strong>
+            <div class="legend-item" style="margin-top:10px;"><div class="dot" style="background:#BA68C8;">+</div> Na⁺ (Natrium)</div>
+            <div class="legend-item"><div class="dot" style="background:#AED581;">-</div> Cl⁻ (Chlorid)</div>
+            <hr style="border-color:#444; opacity:0.3; margin: 8px 0;">
+            <div class="legend-item"><div class="dot" style="background:#FF5252;">&delta;-</div> Oxygen</div>
+            <div class="legend-item"><div class="dot" style="background:#EEE; color:#333;">&delta;+</div> Hydrogen</div>
+
+            <div class="water-demo">
+                <div class="water-molecule">
+                    <div class="dipole-arrow"></div>
+                    <div class="oxy">&delta;-</div>
+                    <div class="hyd h1">&delta;+</div>
+                    <div class="hyd h2">&delta;+</div>
+                </div>
+                <p style="font-size:0.75rem; color:#888; text-align:center; margin:4px 0 0;">
+                    Pilen viser vandets polaritet: &delta;--enden vender mod Na⁺, &delta;+-enderne mod Cl⁻.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div id="sim-view">
+        <canvas id="simCanvas"></canvas>
+    </div>
+
+    <div id="info-panel">
+        <h2>📚 Teori: Fra (s) til (aq)</h2>
+        
+        <h3>1. Det faste stof (s)</h3>
+        <p>I bunden ses iongitteret. Her sidder ionerne fastlåst i et ordnet mønster. De vibrerer kun ganske lidt.</p>
+        <div class="chem-eq">NaCl (s)</div>
+
+        <h3>2. Opløsningen</h3>
+        <p>Vandmolekylerne angriber overfladen. På grund af polaritet vender de sig helt bestemt:</p>
+        <ul>
+            <li>Det negative <span style="color:#FF5252">Oxygen</span> trækker i <span style="color:#BA68C8">Na⁺</span>.</li>
+            <li>Det positive <span style="color:#EEE">Hydrogen</span> trækker i <span style="color:#AED581">Cl⁻</span>.</li>
+        </ul>
+        <p><strong>Temperatur:</strong> Jo varmere vandet er, jo hurtigere bevæger molekylerne sig (højere kinetisk energi), og jo lettere har de ved at slå ionerne løs.</p>
+
+        <h3>3. Resultat: (aq)</h3>
+        <p>Når en ion er revet løs, omringes den af vandmolekyler (hydratisering). Den er nu opløst.</p>
+        <div class="chem-eq">Na⁺(aq) + Cl⁻(aq)</div>
+    </div>
+
+</div>
+
+<div id="quiz-overlay" class="quiz-overlay">
+    <div class="quiz-card">
+        <div id="quiz-content"></div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('simCanvas');
+const ctx = canvas.getContext('2d');
+
+const TEMPS = {
+    cold:     { factor: 0.5 },
+    lukewarm: { factor: 1 },
+    warm:     { factor: 1.8 }
+};
+
+const sim = {
+    width: 0, height: 0,
+    ions: [],
+    waters: [],
+    bgWater: [],
+    tempFactor: TEMPS.lukewarm.factor,
+
+    init() {
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+
+        this.reset();
+        this.loop();
+    },
+
+    cols: 7, rows: 6, waterCount: 8, requiredWaters: 4,
+
+    resize() {
+        const parent = document.getElementById('sim-view');
+        this.width = canvas.width = parent.clientWidth;
+        this.height = canvas.height = parent.clientHeight;
+
+        // Genberegn gitter og hjemmepladser i forhold til den nye størrelse,
+        // så intet ryger uden for skærmen når vinduet/zoomniveauet ændrer sig.
+        this.layoutLattice();
+        this.layoutWaterHomes();
+    },
+
+    // Genberegner gitterionernes "hvile-position" (ogX/ogY) ud fra deres faste
+    // række/kolonne-indeks og de aktuelle canvas-mål.
+    layoutLattice() {
+        const startX = this.width / 2 - (this.cols * 30) / 2;
+        const startY = this.height - 180;
+        this.latticeTop = startY - 40; // fri ioner skal holde sig ovenfor denne linje
+        this.ions.forEach(ion => {
+            ion.ogX = startX + ion.col * 30;
+            ion.ogY = startY + ion.row * 30;
+        });
+    },
+
+    // Genberegner vandmolekylernes hjemmeplads øverst i billedet. Idle-molekyler
+    // flyttes direkte til den nye plads; de andre finder selv hjem næste gang de returnerer.
+    layoutWaterHomes() {
+        const n = this.waterCount;
+        this.waters.forEach((w, i) => {
+            w.homeX = this.width * (0.08 + i * (0.84 / (n - 1)));
+            w.homeY = 50;
+            if (w.state === 'idle') { w.x = w.homeX; w.y = w.homeY; }
+        });
+    },
+
+    setTemp(key) {
+        this.tempFactor = TEMPS[key].factor;
+        document.querySelectorAll('.temp-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.temp === key);
+        });
+    },
+
+    reset() {
+        this.ions = [];
+        this.waters = [];
+
+        // 1. Byg saltgitteret (NaCl)
+        for (let r = 0; r < this.rows; r++) {
+            for (let c = 0; c < this.cols; c++) {
+                const isNa = (r + c) % 2 === 0;
+                this.ions.push({
+                    x: 0, y: 0, ogX: 0, ogY: 0,
+                    col: c, row: r,
+                    type: isNa ? 'Na' : 'Cl',
+                    state: 'solid',
+                    waterCount: 0,      // hvor mange vandmolekyler er reserveret/tilknyttet (0-4)
+                    carriers: [],       // de vandmolekyler der rent faktisk er dokket
+                    slotBaseAngle: Math.random() * Math.PI * 2, // akse de 4 vandmolekyler fordeler sig jævnt omkring
+                    beingPulled: false,
+                    dragX: 0, dragY: 0,
+                    vx: 0, vy: 0,
+                    radius: isNa ? 10 : 13,
+                    color: isNa ? '#BA68C8' : '#AED581'
+                });
+            }
+        }
+        this.layoutLattice();
+        this.ions.forEach(ion => { ion.x = ion.ogX; ion.y = ion.ogY; });
+
+        // 2. Otte vandmolekyler, der arbejder fire og fire om hver ion
+        for (let i = 0; i < this.waterCount; i++) {
+            this.waters.push({
+                x: 0, y: 0, homeX: 0, homeY: 0,
+                angle: 0,
+                state: 'idle', // idle -> seeking -> attached -> pulling -> returning -> idle
+                target: null,
+                slot: 0,
+                offsetX: 0, offsetY: 0
+            });
+        }
+        this.layoutWaterHomes();
+
+        // 3. Diskret baggrundsvand - giver indtryk af at ionerne svømmer i et hav af
+        //    vandmolekyler, selvom vi kun følger de 8 aktive. Rent dekorativt, ingen interaktion.
+        this.bgWater = [];
+        for (let i = 0; i < 35; i++) {
+            this.bgWater.push({
+                x: Math.random() * this.width,
+                y: Math.random() * this.height,
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3,
+                angle: Math.random() * Math.PI * 2,
+                spin: (Math.random() - 0.5) * 0.01,
+                scale: 0.3 + Math.random() * 0.25
+            });
+        }
+    },
+
+    // Finder den nærmeste ion, der mangler et vandmolekyle. Ioner der allerede har flest
+    // vandmolekyler siddende og ventende foretrækkes - så igangværende grupper bliver færdige
+    // hurtigst muligt, i stedet for at mange ioner står og venter halvfærdige på én gang.
+    pickNearestFreeIon(w) {
+        for (let need = this.requiredWaters - 1; need >= 0; need--) {
+            let best = null, bestDist = Infinity;
+            this.ions.forEach(ion => {
+                if (ion.state === 'solid' && ion.waterCount === need) {
+                    const d = Math.hypot(ion.x - w.x, ion.y - w.y);
+                    if (d < bestDist) { bestDist = d; best = ion; }
+                }
+            });
+            if (best) return best;
+        }
+        return null;
+    },
+
+    updateWater(w, speed) {
+        switch (w.state) {
+            case 'idle': {
+                const ion = this.pickNearestFreeIon(w);
+                if (ion) {
+                    w.slot = ion.waterCount;   // 0., 1., 2. eller 3. ankomne - hver sin plads rundt om ionen
+                    ion.waterCount++;
+                    w.target = ion;
+                    w.state = 'seeking';
+                } else {
+                    w.angle += 0.01; // ingenting tilbage at hente - blid svæven
+                }
+                break;
+            }
+            case 'seeking': {
+                const ion = w.target;
+
+                // De 4 vandmolekyler sigter mod hver sin plads jævnt fordelt rundt om ionen
+                // (90° fra hinanden), så de omringer den i stedet for at klumpe sig sammen.
+                const slotAngle = ion.slotBaseAngle + w.slot * (Math.PI / 2);
+                const dockDist = ion.radius + 14;
+                const slotX = ion.x + Math.cos(slotAngle) * dockDist;
+                const slotY = ion.y + Math.sin(slotAngle) * dockDist;
+
+                const dx = slotX - w.x, dy = slotY - w.y;
+                const dist = Math.hypot(dx, dy);
+
+                // Vend den rigtige pol ind mod ionen mens den svømmer derhen
+                const faceAngle = Math.atan2(ion.y - w.y, ion.x - w.x);
+                w.angle = (ion.type === 'Na') ? faceAngle + Math.PI/2 : faceAngle - Math.PI/2;
+
+                if (dist > 4) {
+                    w.x += (dx/dist) * speed;
+                    w.y += (dy/dist) * speed;
+                } else {
+                    // Dokket - hold den relative position til ionen fast
+                    w.offsetX = w.x - ion.x;
+                    w.offsetY = w.y - ion.y;
+                    w.state = 'attached';
+                    ion.carriers.push(w);
+
+                    if (ion.carriers.length === this.requiredWaters) {
+                        // Alle fire er nu på plads - riv ionen løs og bær den ud sammen
+                        ion.state = 'aqueous';
+                        ion.beingPulled = true;
+                        ion.dragX = 60 + Math.random() * (this.width - 120);
+                        ion.dragY = 60 + Math.random() * Math.max(40, this.latticeTop - 80);
+                        ion.carriers.forEach(cw => cw.state = 'pulling');
+                    }
+                }
+                break;
+            }
+            case 'attached': {
+                // Venter roligt fastholdt på ionen, indtil de andre også dokker
+                break;
+            }
+            case 'pulling': {
+                const ion = w.target;
+                w.x = ion.x + w.offsetX;
+                w.y = ion.y + w.offsetY;
+                if (!ion.beingPulled) {
+                    w.target = null;
+                    w.state = 'returning';
+                }
+                break;
+            }
+            case 'returning': {
+                const dx = w.homeX - w.x, dy = w.homeY - w.y;
+                const dist = Math.hypot(dx, dy);
+                if (dist > 4) {
+                    w.x += (dx/dist) * speed;
+                    w.y += (dy/dist) * speed;
+                    w.angle += 0.02;
+                } else {
+                    w.state = 'idle';
+                }
+                break;
+            }
+        }
+    },
+
+    loop() {
+        ctx.clearRect(0, 0, this.width, this.height);
+
+        const speed = 1.6 * this.tempFactor;       // hvor hurtigt vandmolekylerne svømmer
+        const vibration = 0.6 + this.tempFactor * 0.6;
+
+        // 0. Diskret baggrundsvand, tegnes bagerst
+        this.bgWater.forEach(bw => this.updateAndDrawBgWater(bw));
+
+        // 1. Faste ioner vibrerer; ioner der bæres ud bevæger sig mod deres mål;
+        //    frigivne ioner driver roligt af sted på egen hånd
+        this.ions.forEach(ion => {
+            if (ion.state === 'solid') {
+                ion.x = ion.ogX + (Math.random()-0.5) * vibration;
+                ion.y = ion.ogY + (Math.random()-0.5) * vibration;
+            } else if (ion.beingPulled) {
+                const dx = ion.dragX - ion.x, dy = ion.dragY - ion.y;
+                const dist = Math.hypot(dx, dy);
+                if (dist > 6) {
+                    ion.x += (dx/dist) * speed;
+                    ion.y += (dy/dist) * speed;
+                } else {
+                    ion.beingPulled = false;
+                    ion.carriers = [];
+                    ion.vx = (Math.random() - 0.5) * 1.4;
+                    ion.vy = (Math.random() - 0.5) * 1.4;
+                }
+            } else if (ion.state === 'aqueous') {
+                ion.x += ion.vx;
+                ion.y += ion.vy;
+                ion.vx *= 0.995; ion.vy *= 0.995;
+
+                // Opløste ioner holder sig ovenfor gitteret, så de aldrig glider ned i det igen
+                if (ion.x < 20 || ion.x > this.width-20) ion.vx *= -1;
+                if (ion.y < 20 || ion.y > this.latticeTop) ion.vy *= -1;
+            }
+        });
+
+        // 2. De 10 vandmolekylers søge/hente-cyklus
+        this.waters.forEach(w => this.updateWater(w, speed));
+
+        // 3. Tegn ioner
+        this.ions.forEach(ion => {
+            ctx.beginPath();
+            ctx.arc(ion.x, ion.y, ion.radius, 0, Math.PI * 2);
+            ctx.fillStyle = ion.color;
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(ion.type === 'Na' ? '+' : '-', ion.x, ion.y);
+        });
+
+        // 4. Tegn vandmolekyler ovenpå
+        this.waters.forEach(w => this.drawWater(w));
+
+        requestAnimationFrame(() => this.loop());
+    },
+
+    // Tegner ét vandmolekyle omkring (0,0) i det aktuelle (roterede) koordinatsystem.
+    drawWaterMolecule() {
+        const oxyR = 12, hydR = 7;
+        const hx = 13, hy = 17; // Hydrogen-offset (giver plads til en synlig binding)
+
+        // Bindinger (O-H)
+        ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(0, 0); ctx.lineTo(-hx, hy);
+        ctx.moveTo(0, 0); ctx.lineTo(hx, hy);
+        ctx.stroke();
+
+        // Hydrogener (delta+)
+        ctx.beginPath();
+        ctx.arc(-hx, hy, hydR, 0, Math.PI * 2);
+        ctx.arc(hx, hy, hydR, 0, Math.PI * 2);
+        ctx.fillStyle = '#EEE';
+        ctx.fill();
+        ctx.fillStyle = '#333';
+        ctx.font = 'bold 9px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('δ+', -hx, hy);
+        ctx.fillText('δ+', hx, hy);
+
+        // Oxygen (delta-)
+        ctx.beginPath();
+        ctx.arc(0, 0, oxyR, 0, Math.PI * 2);
+        ctx.fillStyle = '#FF5252';
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 10px Arial';
+        ctx.fillText('δ-', 0, 0);
+    },
+
+    drawWater(w) {
+        ctx.save();
+        ctx.translate(w.x, w.y);
+        ctx.rotate(w.angle);
+        this.drawWaterMolecule();
+        ctx.restore();
+    },
+
+    // Små, svage, ikke-interagerende vandmolekyler der driver stille rundt i baggrunden -
+    // antyder at der reelt svømmer langt flere end de 10 aktive rundt om ionerne.
+    updateAndDrawBgWater(bw) {
+        bw.x += bw.vx; bw.y += bw.vy; bw.angle += bw.spin;
+
+        if (bw.x < -20) bw.x = this.width + 20;
+        if (bw.x > this.width + 20) bw.x = -20;
+        if (bw.y < -20) bw.y = this.height + 20;
+        if (bw.y > this.height + 20) bw.y = -20;
+
+        ctx.save();
+        ctx.translate(bw.x, bw.y);
+        ctx.rotate(bw.angle);
+        ctx.scale(bw.scale, bw.scale);
+        ctx.globalAlpha = 0.14;
+        this.drawWaterMolecule();
+        ctx.restore();
+    }
+};
+
+sim.init();
+
+const quiz = {
+    questions: [
+        {
+            q: "Hvorfor opløses salt (NaCl) i vand?",
+            options: [
+                "Vandmolekylet er ladet i begge ender og trækker i ionerne",
+                "Vand kan opløse næsten alle stoffer",
+                "Na⁺ og Cl⁻ kan ikke lide hinanden",
+                "Salt smelter, når det bliver vådt"
+            ],
+            correct: 0,
+            explain: "Vandmolekylet er plus i den ene ende og minus i den anden. Det gør, at det kan trække i ionerne og hive dem løs fra saltkrystallen."
+        },
+        {
+            q: "Hvilken del af vandmolekylet er negativ (δ-)?",
+            options: ["Hydrogen-enden af vandmolekylet", "Oxygen-enden af vandmolekylet", "Hele molekylet er negativt", "Ingen af delene er negative"],
+            correct: 1,
+            explain: "Oxygen-enden af vandmolekylet er negativ (δ-). Hydrogen-enderne er positive (δ+)."
+        },
+        {
+            q: "Hvorfor bliver Na⁺ trukket mod vandets oxygen-ende?",
+            options: [
+                "Fordi de har samme farve",
+                "Fordi Na⁺ er positiv, og oxygen er negativ",
+                "Fordi Na⁺ er tungere end oxygen",
+                "Fordi de begge er en del af saltet"
+            ],
+            correct: 1,
+            explain: "Plus og minus tiltrækker hinanden. Na⁺ er positiv, og oxygen-enden af vandet er negativ (δ-) - derfor trækkes de mod hinanden."
+        },
+        {
+            q: "Hvad betyder (aq) efter en ion, fx Na⁺(aq)?",
+            options: [
+                "Ionen er opløst i vand",
+                "Ionen sidder fast i saltkrystallen",
+                "Ionen er blevet til en gas",
+                "Ionen har ingen ladning mere"
+            ],
+            correct: 0,
+            explain: "(aq) betyder, at ionen er opløst i vand og omgivet af vandmolekyler - den sidder ikke længere fast i krystallen."
+        },
+        {
+            q: "Hvad sker der, når vandet bliver varmere?",
+            options: [
+                "Vandmolekylerne bevæger sig hurtigere, og saltet opløses hurtigere",
+                "Vandmolekylerne stopper helt med at bevæge sig",
+                "Saltet holder fuldstændig op med at opløses",
+                "Vandet holder helt op med at trække i ionerne"
+            ],
+            correct: 0,
+            explain: "Jo varmere vandet er, jo hurtigere bevæger molekylerne sig. Så kan de hurtigere rive ionerne løs fra krystallen."
+        },
+        {
+            q: "Hvad betyder det, at et salt er 'letopløseligt'?",
+            options: [
+                "Der skal meget lidt salt til, før vandet er mættet",
+                "Der kan opløses en stor mængde af saltet i vandet",
+                "Saltet kan kun opløses i kogende vand",
+                "Saltet danner altid et bundfald"
+            ],
+            correct: 1,
+            explain: "Letopløselig betyder, at der kan opløses meget af stoffet i vandet, før det er mættet. Det modsatte kaldes tungtopløseligt - der kan kun opløses en lille smule, før resten lægger sig som bundfald."
+        }
+    ],
+    index: 0,
+    score: 0,
+    selected: null,
+    answered: false,
+
+    open() {
+        this.index = 0;
+        this.score = 0;
+        this.selected = null;
+        this.answered = false;
+        document.getElementById('quiz-overlay').style.display = 'flex';
+        this.shuffleCurrent();
+        this.render();
+    },
+
+    close() {
+        document.getElementById('quiz-overlay').style.display = 'none';
+    },
+
+    shuffleCurrent() {
+        const original = this.questions[this.index];
+        const order = original.options.map((_, i) => i);
+        for (let i = order.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [order[i], order[j]] = [order[j], order[i]];
+        }
+        this.current = {
+            ...original,
+            options: order.map(i => original.options[i]),
+            correct: order.indexOf(original.correct)
+        };
+    },
+
+    select(i) {
+        if (this.answered) return;
+        this.selected = i;
+        this.answered = true;
+        if (i === this.current.correct) this.score++;
+        this.render();
+    },
+
+    next() {
+        this.index++;
+        this.selected = null;
+        this.answered = false;
+        if (this.index >= this.questions.length) {
+            this.renderResult();
+        } else {
+            this.shuffleCurrent();
+            this.render();
+        }
+    },
+
+    render() {
+        const q = this.current;
+        const isLast = this.index + 1 === this.questions.length;
+
+        const optionsHtml = q.options.map((opt, i) => {
+            let cls = 'quiz-option';
+            if (this.answered) {
+                if (i === q.correct) cls += ' correct';
+                else if (i === this.selected) cls += ' incorrect';
+            } else if (i === this.selected) {
+                cls += ' selected';
+            }
+            return `<div class="${cls}" onclick="quiz.select(${i})">${opt}</div>`;
+        }).join('');
+
+        document.getElementById('quiz-content').innerHTML = `
+            <div class="quiz-progress">Spørgsmål ${this.index + 1} af ${this.questions.length}</div>
+            <div class="quiz-question">${q.q}</div>
+            ${optionsHtml}
+            <div class="quiz-explain">${this.answered ? q.explain : ''}</div>
+            <div class="quiz-actions">
+                <button class="btn" onclick="quiz.close()">Luk</button>
+                <button class="btn" onclick="quiz.next()" ${this.answered ? '' : 'disabled'}>${isLast ? 'Se resultat' : 'Næste spørgsmål'}</button>
+            </div>
+        `;
+    },
+
+    renderResult() {
+        const pct = Math.round(100 * this.score / this.questions.length);
+        const feedback = pct === 100
+            ? 'Flot - du har fuldstændig styr på det!'
+            : pct >= 50
+                ? 'Godt gået. Kig evt. teori-panelet igennem en ekstra gang for de sidste detaljer.'
+                : 'Prøv at læse teorien i panelet til højre, og gå så quizzen igennem igen.';
+
+        document.getElementById('quiz-content').innerHTML = `
+            <div class="quiz-question">Du fik ${this.score} ud af ${this.questions.length} rigtige (${pct}%)</div>
+            <div class="quiz-explain">${feedback}</div>
+            <div class="quiz-actions">
+                <button class="btn" onclick="quiz.close()">Luk</button>
+                <button class="btn" onclick="quiz.open()">Prøv igen</button>
+            </div>
+        `;
+    }
+};
+</script>
+</body>
+</html>

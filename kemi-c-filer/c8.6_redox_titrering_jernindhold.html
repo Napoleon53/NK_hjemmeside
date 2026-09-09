@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktiv Redox-Titreringsanalyse — Jernindhold i Ståluld</title>
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --bg-panel: #131c2e;
+            --bg-card: #1e293b;
+            --accent-purple: #b55fe6;
+            --accent-blue: #38bdf8;
+            --accent-green: #22c55e;
+            --accent-yellow: #eab308;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --success-color: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        header {
+            background-color: rgba(19, 28, 46, 0.9);
+            backdrop-filter: blur(8px);
+            padding: 15px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #38bdf8, #b55fe6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-reset {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+            padding: 8px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-reset:hover {
+            background: rgba(239, 68, 68, 0.3);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr; /* Justeret for at give mere plads til canvas */
+            gap: 25px;
+            padding: 25px;
+            flex: 1;
+            max-width: 1500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .theory-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        h2 {
+            font-size: 1.15rem;
+            color: #fff;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+
+        .formula-display {
+            background-color: rgba(11, 15, 25, 0.7);
+            border-left: 4px solid var(--accent-blue);
+            padding: 14px;
+            border-radius: 0 8px 8px 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.05rem;
+            color: #fff;
+            margin: 12px 0;
+            text-align: center;
+            letter-spacing: 0.5px;
+            transition: border-color 0.3s ease;
+        }
+
+        .formula-display.active-step {
+            border-color: var(--accent-purple);
+            background-color: rgba(181, 95, 230, 0.05);
+        }
+
+        .step-indicator-box {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .step-node {
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .step-node.active {
+            background: rgba(56, 189, 248, 0.06);
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        .step-node.completed {
+            background: rgba(34, 197, 94, 0.06);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .step-header {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .step-status {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .step-header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-header {
+            padding: 6px 0;
+            cursor: pointer;
+        }
+
+        .step-chevron {
+            font-size: 1.2rem;
+            line-height: 1;
+            color: var(--text-main);
+            min-width: 34px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 7px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border-color);
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+
+        .step-header:hover .step-chevron {
+            background: rgba(56, 189, 248, 0.15);
+            border-color: var(--accent-blue);
+        }
+
+        .step-node.locked {
+            opacity: 0.55;
+        }
+
+        .step-node.locked .step-header {
+            cursor: default;
+        }
+
+        .step-node.locked .step-header:hover .step-chevron {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: var(--border-color);
+        }
+
+        .locked-msg {
+            font-size: 0.85rem;
+            font-style: italic;
+            color: var(--text-muted);
+            margin-top: 8px;
+            margin-bottom: 0;
+        }
+
+        /* ANIMATION INTERFACE */
+        .visualizer-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+
+        .canvas-wrapper {
+            background: radial-gradient(circle at center, #16223f 0%, #0b1120 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        canvas {
+            display: block;
+            background: transparent;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .controls-card {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .info-banner {
+            background-color: rgba(56, 189, 248, 0.06);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .btn-action {
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            user-select: none;
+        }
+
+        .btn-acid {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            box-shadow: 0 4px 12px rgba(3, 105, 161, 0.3);
+        }
+
+        .btn-acid:hover:not(:disabled) {
+            background: linear-gradient(135deg, #0369a1, #075985);
+            transform: translateY(-1px);
+        }
+
+        .btn-titrate {
+            background: linear-gradient(135deg, #a855f7, #7e22ce);
+            box-shadow: 0 4px 12px rgba(126, 34, 206, 0.3);
+        }
+
+        .btn-titrate:hover:not(:disabled) {
+            background: linear-gradient(135deg, #7e22ce, #6b21a8);
+            transform: translateY(-1px);
+        }
+
+        .btn-action:disabled {
+            background: #334155;
+            color: #64748b;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* LIVE DATABOX */
+        .live-counter-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .counter-tab {
+            background: rgba(11, 15, 25, 0.5);
+            border: 1px solid var(--border-color);
+            padding: 10px 5px;
+            border-radius: 6px;
+        }
+
+        .counter-val {
+            font-family: monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        /* INTERAKTIV EFTERBEHANDLING */
+        .calc-box {
+            margin-top: 15px;
+            background: rgba(11, 15, 25, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .calc-row {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr 60px;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .calc-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .calc-input {
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 8px 10px;
+            color: #fff;
+            text-align: right;
+            font-size: 0.95rem;
+            width: 100%;
+        }
+
+        .calc-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .calc-unit {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            padding-left: 5px;
+        }
+
+        .btn-calc {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .btn-calc:hover {
+            background: #059669;
+        }
+
+        /* FRIVILLIG QUIZ (INGEN POPUP) */
+        .quiz-standalone-wrapper {
+            max-width: 1500px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 0 25px 25px;
+        }
+
+        /* GUIDET BEREGNINGS-POPUP */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 8, 15, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 26px;
+            width: 100%;
+            max-width: 460px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .modal-header span {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #fff;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: #fff;
+        }
+
+        .modal-progress {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .progress-dot {
+            flex: 1;
+            height: 5px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: background 0.2s;
+        }
+
+        .progress-dot.active {
+            background: var(--accent-blue);
+        }
+
+        .progress-dot.done {
+            background: var(--success-color);
+        }
+
+        #modal-question {
+            font-size: 1rem;
+            color: var(--text-main);
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .modal-given {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: rgba(11, 15, 25, 0.5);
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .modal-field {
+            margin-bottom: 14px;
+        }
+
+        .modal-field label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .modal-field select,
+        .modal-field input {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            color: #fff;
+            font-size: 0.95rem;
+        }
+
+        .modal-field select:focus,
+        .modal-field input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .modal-answer-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .modal-answer-row input {
+            flex: 1;
+        }
+
+        .modal-answer-row span {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            min-width: 30px;
+        }
+
+        .modal-feedback {
+            min-height: 0;
+            font-size: 0.88rem;
+            margin-bottom: 10px;
+            border-radius: 6px;
+        }
+
+        .modal-feedback.success {
+            color: #a7f3d0;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 8px 10px;
+        }
+
+        .modal-feedback.error {
+            color: #fca5a5;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 8px 10px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-footer .btn-calc {
+            width: auto;
+            margin-top: 0;
+        }
+
+        .completion-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .completion-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--success-color);
+            margin: 12px 0;
+        }
+
+        /* FORSTÅELSESSPØRGSMÅL (QUIZ-POPUP) */
+        .quiz-option-btn {
+            display: block;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 12px 14px;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 0.92rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 10px;
+        }
+
+        .quiz-option-btn:hover:not(:disabled) {
+            border-color: var(--accent-blue);
+            background: rgba(56, 189, 248, 0.08);
+        }
+
+        .quiz-option-btn.correct {
+            border-color: var(--success-color);
+            background: rgba(16, 185, 129, 0.15);
+            color: #a7f3d0;
+        }
+
+        .quiz-option-btn.wrong {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.12);
+            color: #fca5a5;
+        }
+
+        .quiz-option-btn:disabled {
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Jernindhold i Ståluld</h1>
+        <button class="btn-reset" onclick="resetSimulation()">Genstart Simulation</button>
+    </header>
+
+    <div class="dashboard">
+        
+        <!-- VENSTRE SIDE: SIMPEL TEORI MED INTEGREREDE TRIN -->
+        <div class="theory-panel">
+            <div class="card">
+                <h2>Teoretisk Grundlag & Reaktionsforløb</h2>
+                <p>Analysen udføres i to adskilte kemiske hovedtrin. Hold øje med, hvordan reaktionsskemaerne nedenfor lyser op synkront med animationen til højre.</p>
+                
+                <div class="step-indicator-box">
+
+                    <!-- TRIN 1 INFO -->
+                    <div id="info-step-1" class="step-node active">
+                        <div class="step-header" onclick="toggleStepCollapse(1)">
+                            <span style="color: var(--accent-blue);">Trin 1: Opløsning af jern med syre (H⁺)</span>
+                            <span class="step-header-right">
+                                <span id="status-1" class="step-status" style="color: var(--accent-blue);">I gang</span>
+                                <span id="chevron-1" class="step-chevron">▾</span>
+                            </span>
+                        </div>
+                        <div id="content-step-1">
+                            <p style="font-size: 0.88rem; margin-bottom: 8px;">Det faste jern i stålulden oxideres af syrens hydroner til opløselige jern(II)-ioner, mens der udvikles dihydrogen-gas (bobler):</p>
+                            <div id="formula-1" class="formula-display active-step">Fe(s) + 2 H⁺(aq) ⟶ Fe²⁺(aq) + H₂(g)</div>
+                        </div>
+                    </div>
+
+                    <!-- TRIN 2 INFO -->
+                    <div id="info-step-2" class="step-node locked">
+                        <div class="step-header" onclick="toggleStepCollapse(2)">
+                            <span style="color: var(--accent-purple);">Trin 2: Redox-titrering med MnO₄⁻</span>
+                            <span class="step-header-right">
+                                <span id="status-2" class="step-status">Låst</span>
+                                <span id="chevron-2" class="step-chevron">🔒</span>
+                            </span>
+                        </div>
+                        <div id="content-step-2" style="display:none;">
+                            <p style="font-size: 0.88rem; margin-bottom: 8px;">De dannede 5 jern(II)-ioner oxideres kvantitativt til jern(III) af én permanganat-ion. Forholdet er nøjagtigt 1:5 ifølge det afstemte skema:</p>
+                            <div id="formula-2" class="formula-display">8 H⁺(aq) + 5 Fe²⁺(aq) + MnO₄⁻(aq) ⟶ 5 Fe³⁺(aq) + Mn²⁺(aq) + 4 H₂O(l)</div>
+                        </div>
+                        <p id="locked-msg-2" class="locked-msg">🔒 Lås op ved at gennemføre Trin 1 (tilsæt syre og opløs alt jernet).</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- INTERAKTIV DATABEHANDLING (EFTERBEHANDLING) -->
+            <div id="efterbehandling-card" class="card" style="display:none;">
+                <h2>Efterbehandling</h2>
+                <p>Lad os sige, at du fik følgende måleresultater. Herfra kan du nu beregne jernindholdet i ståluld.</p>
+
+                <div id="calc-box" class="calc-box">
+                    <div class="calc-row">
+                        <span class="calc-label">Afvejet ståluld (m_ståluld):</span>
+                        <input type="text" id="calc-m-wool" class="calc-input" value="0,102">
+                        <span class="calc-unit">g</span>
+                    </div>
+                    <div class="calc-row">
+                        <span class="calc-label">KMnO₄-koncentration (c):</span>
+                        <input type="text" id="calc-c-mono" class="calc-input" value="0,0200" disabled>
+                        <span class="calc-unit">M</span>
+                    </div>
+                    <div class="calc-row">
+                        <span class="calc-label">Forbrugt KMnO₄-volumen (V):</span>
+                        <input type="text" id="calc-v-purple" class="calc-input" value="17,8">
+                        <span class="calc-unit">mL</span>
+                    </div>
+                    <button id="btn-start-calc" class="btn-calc" onclick="openCalcModal()">Start guidet beregning</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- HØJRE SIDE: STØRRE MIKROSKALA-INTERFACE OG ANIMATION -->
+        <div class="visualizer-container">
+            <div class="canvas-wrapper">
+                <!-- Forstørret canvas for bedre detaljer -->
+                <canvas id="chemCanvas" width="600" height="520"></canvas>
+            </div>
+
+            <div id="info-text-box" class="info-banner">Klar til start.</div>
+
+            <div class="controls-card">
+                <div class="live-counter-grid">
+                    <div class="counter-tab" style="border-color: #64748b;">
+                        <span style="font-size:0.75rem; color:var(--text-muted);">Fe(s)</span>
+                        <div id="count-fes" class="counter-val" style="color: #94a3b8;">10</div>
+                    </div>
+                    <div class="counter-tab" style="border-color: var(--accent-green);">
+                        <span style="font-size:0.75rem; color:var(--text-muted);">Fe²⁺</span>
+                        <div id="count-fe2" class="counter-val" style="color: var(--accent-green);">0</div>
+                    </div>
+                    <div class="counter-tab" style="border-color: var(--accent-yellow);">
+                        <span style="font-size:0.75rem; color:var(--text-muted);">Fe³⁺</span>
+                        <div id="count-fe3" class="counter-val" style="color: var(--accent-yellow);">0</div>
+                    </div>
+                    <div class="counter-tab" style="border-color: var(--accent-purple);">
+                        <span style="font-size:0.75rem; color:var(--text-muted);">MnO₄⁻</span>
+                        <div id="count-mno4" class="counter-val" style="color: var(--accent-purple);">0</div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button id="btn-add-acid" class="btn-action btn-acid" onclick="triggerAcidAction()">1. Tilsæt Syre (H⁺)</button>
+                    <button id="btn-add-titrant" class="btn-action btn-titrate" onclick="triggerTitrationAction()" disabled>2. Tilsæt KMnO₄</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- GUIDET BEREGNINGS-POPUP -->
+    <div id="calc-modal-overlay" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span id="modal-step-title">Trin 1 af 4</span>
+                <button class="modal-close" onclick="closeCalcModal()">&times;</button>
+            </div>
+            <div id="modal-progress" class="modal-progress">
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+            </div>
+
+            <div id="modal-step-content">
+                <div class="modal-body">
+                    <p id="modal-question"></p>
+                    <div id="modal-given" class="modal-given"></div>
+
+                    <div class="modal-field">
+                        <label>Vælg den rigtige formel:</label>
+                        <select id="modal-formula-select"></select>
+                    </div>
+
+                    <div class="modal-field">
+                        <label id="modal-input-label">Svar:</label>
+                        <div class="modal-answer-row">
+                            <input type="text" id="modal-answer-input" placeholder="Indtast din beregnede værdi">
+                            <span id="modal-unit"></span>
+                        </div>
+                    </div>
+
+                    <div id="modal-feedback" class="modal-feedback"></div>
+                </div>
+                <div class="modal-footer">
+                    <button id="modal-check-btn" class="btn-calc" onclick="checkCalcStep()">Tjek svar</button>
+                    <button id="modal-next-btn" class="btn-calc" style="display:none;" onclick="nextCalcStep()">Næste trin →</button>
+                </div>
+            </div>
+
+            <div id="modal-completion" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- FRIVILLIG QUIZ (INGEN POPUP — kan tages før eller efter øvelsen) -->
+    <div class="quiz-standalone-wrapper">
+        <div class="card">
+            <h2 id="quiz-title">📋 Frivillig quiz</h2>
+            <p>Quizzen er valgfri og låser ikke noget op i simulationen. Tag den, før du går i gang ovenfor, eller bagefter som en opsummering.</p>
+            <div id="quiz-progress" class="modal-progress"></div>
+
+            <div id="quiz-body">
+                <p id="quiz-question" style="font-size: 1rem; color: var(--text-main); line-height: 1.5; margin-bottom: 14px;"></p>
+                <div id="quiz-options"></div>
+                <div id="quiz-feedback" class="modal-feedback"></div>
+
+                <div class="modal-footer">
+                    <button id="quiz-next-btn" class="btn-calc" style="display:none;" onclick="quizNext()">Næste spørgsmål →</button>
+                </div>
+            </div>
+
+            <div id="quiz-complete" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // ANIMATIONS- & TILSTANDSREGLER
+        var canvas = document.getElementById('chemCanvas');
+        var ctx = canvas.getContext('2d');
+
+        var state = {
+            currentPhase: 1,
+            ironSolidCount: 10,
+            iron2Count: 0,
+            iron3Count: 0,
+            permanganateCount: 0,
+            mangan2Count: 0,
+            totalDrops: 0,
+            particles: [],
+            gasBubbles: [],
+            acidPouring: false,
+            dropPouring: false,
+            pourTimer: 0,
+            flaskColor: { r: 30, g: 41, b: 59, a: 0.15 },
+            infoText: "Klar til start. Tilsæt syre for at opløse ståluldens 10 jernatomer."
+        };
+
+        // Positioner for de 10 jernatomer, pakket i to rækker nederst i den udvidede kolbe
+        var solidIronPositions = [
+            { x: 190, y: 380, active: true },
+            { x: 245, y: 380, active: true },
+            { x: 300, y: 380, active: true },
+            { x: 355, y: 380, active: true },
+            { x: 410, y: 380, active: true },
+            { x: 150, y: 425, active: true },
+            { x: 225, y: 425, active: true },
+            { x: 300, y: 425, active: true },
+            { x: 375, y: 425, active: true },
+            { x: 450, y: 425, active: true }
+        ];
+
+        // Kolbens geometri (skal matche polygonerne i drawApparatus)
+        var FLASK_SHOULDER_Y = 225;
+        var FLASK_BASE_Y = 500;
+        var FLASK_NECK_HALFWIDTH = 25;
+        var FLASK_BASE_HALFWIDTH = 250;
+
+        // Kolbens indvendige bredde ved en given y-koordinat (bruges til at holde ioner væk fra glasset)
+        function flaskHalfWidthAt(y) {
+            var t = Math.max(0, y - FLASK_SHOULDER_Y) / (FLASK_BASE_Y - FLASK_SHOULDER_Y);
+            return FLASK_NECK_HALFWIDTH + t * (FLASK_BASE_HALFWIDTH - FLASK_NECK_HALFWIDTH);
+        }
+
+        var ionCollection = [];
+
+        function initSimulation() {
+            state.currentPhase = 1;
+            state.ironSolidCount = 10;
+            state.iron2Count = 0;
+            state.iron3Count = 0;
+            state.permanganateCount = 0;
+            state.mangan2Count = 0;
+            state.totalDrops = 0;
+            state.particles = [];
+            state.gasBubbles = [];
+            state.acidPouring = false;
+            state.dropPouring = false;
+            ionCollection = [];
+            
+            for(var i = 0; i < solidIronPositions.length; i++) {
+                solidIronPositions[i].active = true;
+            }
+
+            document.getElementById('btn-add-acid').disabled = false;
+            document.getElementById('btn-add-titrant').disabled = true;
+
+            document.getElementById('info-step-1').className = "step-node active";
+            document.getElementById('content-step-1').style.display = "block";
+            document.getElementById('chevron-1').textContent = "▾";
+            document.getElementById('formula-1').className = "formula-display active-step";
+            document.getElementById('status-1').innerText = "I gang";
+            document.getElementById('status-1').style.color = "var(--accent-blue)";
+
+            document.getElementById('info-step-2').className = "step-node locked";
+            document.getElementById('content-step-2').style.display = "none";
+            document.getElementById('locked-msg-2').style.display = "block";
+            document.getElementById('chevron-2').textContent = "🔒";
+            document.getElementById('formula-2').className = "formula-display";
+            document.getElementById('status-2').innerText = "Låst";
+            document.getElementById('status-2').style.color = "var(--text-muted)";
+
+            document.getElementById('efterbehandling-card').style.display = "none";
+
+            state.flaskColor = { r: 40, g: 50, b: 70, a: 0.15 };
+            setInfoText("Klar til start. Tilsæt syre for at opløse ståluldens 10 jernatomer.");
+            updateCountersUi();
+        }
+
+        function resetSimulation() {
+            initSimulation();
+        }
+
+        function updateCountersUi() {
+            document.getElementById('count-fes').innerText = state.ironSolidCount;
+            document.getElementById('count-fe2').innerText = state.iron2Count;
+            document.getElementById('count-fe3').innerText = state.iron3Count;
+            document.getElementById('count-mno4').innerText = state.permanganateCount;
+        }
+
+        function setInfoText(text) {
+            state.infoText = text;
+            document.getElementById('info-text-box').textContent = text;
+        }
+
+        function createBurst(x, y, color) {
+            for (var i = 0; i < 15; i++) {
+                state.particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 5,
+                    vy: (Math.random() - 0.5) * 5,
+                    radius: Math.random() * 3 + 1.5,
+                    color: color,
+                    life: 1.0,
+                    decay: Math.random() * 0.04 + 0.015,
+                    isGas: false
+                });
+            }
+        }
+
+        function triggerAcidAction() {
+            if (state.ironSolidCount > 0 && !state.acidPouring) {
+                state.acidPouring = true;
+                state.pourTimer = 0;
+                document.getElementById('btn-add-acid').disabled = true;
+            }
+        }
+
+        function triggerTitrationAction() {
+            if (!state.dropPouring && state.currentPhase >= 2) {
+                state.dropPouring = true;
+                state.pourTimer = 0;
+                document.getElementById('btn-add-titrant').disabled = true;
+            }
+        }
+
+        // HOVEDANIMATIONS LOOP
+        function updateAndRender() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Tegn udstyr (Burette og Kolbe)
+            drawApparatus();
+
+            // Opdater flydende syretilsætning via flaske (Trin 1)
+            if (state.acidPouring) {
+                state.pourTimer++;
+                
+                // Animer syreflasken (roterer ind)
+                var tilt = Math.min(state.pourTimer * 0.03, 0.9); // Op til ca. 50 graders hældning
+                
+                ctx.save();
+                ctx.translate(220, 135); // Startposition for flasken (skråt over kolben)
+                ctx.rotate(tilt);
+                
+                // Tegn syreflaske (Erlenmeyer form)
+                ctx.fillStyle = "rgba(180, 190, 205, 0.25)";
+                ctx.strokeStyle = "rgba(203, 213, 225, 0.8)";
+                ctx.lineWidth = 2;
+                
+                ctx.beginPath();
+                ctx.moveTo(-18, -50); // Hals venstre
+                ctx.lineTo(-18, -90);
+                ctx.lineTo(18, -90);  // Hals højre
+                ctx.lineTo(18, -50);
+                ctx.lineTo(45, 30);   // Krop højre
+                ctx.lineTo(-45, 30);  // Krop venstre
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                // Glas-refleksion på syreflasken
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(-35, 20);
+                ctx.quadraticCurveTo(-20, -20, -12, -45);
+                ctx.stroke();
+
+                // Syre inde i flasken
+                ctx.fillStyle = "rgba(56, 189, 248, 0.6)";
+                ctx.beginPath();
+                ctx.moveTo(-35, 5);
+                ctx.lineTo(35, 5);
+                ctx.lineTo(42, 28);
+                ctx.lineTo(-42, 28);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.restore();
+
+                // Når flasken er tilstrækkeligt tiltet, startes væskestrålen
+                if (tilt >= 0.7) {
+                    ctx.fillStyle = "rgba(56, 189, 248, 0.7)";
+                    ctx.fillRect(290, 155, 8, 105); // Stråle ned i kolben
+
+                    // Splash partikler på væskeoverfladen (y=260)
+                    if (Math.random() > 0.4) {
+                        state.particles.push({
+                            x: 294 + (Math.random() - 0.5) * 15,
+                            y: 260,
+                            vx: (Math.random() - 0.5) * 3,
+                            vy: -(Math.random() * 2 + 1.5),
+                            radius: Math.random() * 2 + 1,
+                            color: "rgba(56, 189, 248, 0.8)",
+                            life: 1.0,
+                            decay: 0.06,
+                            isGas: false
+                        });
+                    }
+
+                    // Opløs et jernatom med intervaller
+                    if (state.pourTimer % 25 === 0) {
+                        for (var i = 0; i < solidIronPositions.length; i++) {
+                            if (solidIronPositions[i].active) {
+                                solidIronPositions[i].active = false;
+                                state.ironSolidCount--;
+                                state.iron2Count++;
+                                
+                                ionCollection.push({
+                                    x: solidIronPositions[i].x,
+                                    y: solidIronPositions[i].y - 25,
+                                    vx: (Math.random() - 0.5) * 2.0,
+                                    vy: (Math.random() - 0.5) * 1.0 - 0.5,
+                                    type: "Fe2+"
+                                });
+
+                                // Generer "wobbling" gasbobler
+                                for (var b = 0; b < 6; b++) {
+                                    state.gasBubbles.push({
+                                        x: solidIronPositions[i].x + (Math.random() - 0.5) * 20,
+                                        y: solidIronPositions[i].y,
+                                        baseX: solidIronPositions[i].x,
+                                        vy: Math.random() * 1.5 + 1.5,
+                                        radius: Math.random() * 3 + 2,
+                                        offset: Math.random() * Math.PI * 2 // Til sinus-wobble
+                                    });
+                                }
+
+                                createBurst(solidIronPositions[i].x, solidIronPositions[i].y, "#22c55e");
+                                updateCountersUi();
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Når alle er opløst, fjern flasken og test forståelsen før trin 2 låses op
+                if (state.ironSolidCount === 0 && tilt >= 0.9) {
+                    // Vi lader flasken forsvinde (eller lader den rotere tilbage i en mere kompleks version)
+                    state.acidPouring = false;
+                    unlockStep2();
+                }
+            }
+
+            // Opdater drypning af violet titratorvæske (Trin 2)
+            if (state.dropPouring) {
+                state.pourTimer++;
+                
+                // Dråbe falder fra burettespidsen (y=95) til væskeoverfladen (y=260)
+                var dropY = 95 + (state.pourTimer * 6);
+                
+                ctx.fillStyle = "rgba(181, 95, 230, 0.9)";
+                ctx.beginPath();
+                ctx.arc(300, dropY, 6, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Lidt dråbe-hale
+                ctx.beginPath();
+                ctx.moveTo(297, dropY);
+                ctx.lineTo(303, dropY);
+                ctx.lineTo(300, dropY - 12);
+                ctx.fill();
+
+                if (dropY >= 260) {
+                    state.dropPouring = false;
+                    state.permanganateCount++;
+                    state.totalDrops++;
+                    updateCountersUi();
+
+                    // Skab ringe i vandet ved dråbenedslag
+                    createBurst(300, 260, "rgba(181, 95, 230, 0.6)");
+
+                    handleRedoxReactionKinetics();
+                }
+            }
+
+            // Tegn faste jernatomer
+            for (var i = 0; i < solidIronPositions.length; i++) {
+                if (solidIronPositions[i].active) {
+                    // Skygge
+                    ctx.fillStyle = "rgba(0,0,0,0.4)";
+                    ctx.beginPath();
+                    ctx.ellipse(solidIronPositions[i].x, solidIronPositions[i].y + 6, 11, 4, 0, 0, Math.PI*2);
+                    ctx.fill();
+
+                    // Atom
+                    ctx.fillStyle = "#64748b";
+                    ctx.strokeStyle = "#475569";
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(solidIronPositions[i].x, solidIronPositions[i].y, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                    
+                    // Lysrefleksion på atom
+                    ctx.fillStyle = "rgba(255,255,255,0.3)";
+                    ctx.beginPath();
+                    ctx.arc(solidIronPositions[i].x - 4, solidIronPositions[i].y - 4, 3, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = "#fff";
+                    ctx.font = "bold 11px sans-serif";
+                    ctx.fillText("Fe", solidIronPositions[i].x - 6, solidIronPositions[i].y + 4);
+                }
+            }
+
+            // Opdater og tegn opløste ioner
+            for (var i = 0; i < ionCollection.length; i++) {
+                var ion = ionCollection[i];
+                ion.x += ion.vx;
+                ion.y += ion.vy;
+
+                // Afgrænsning af væsken - følger glassets faktiske facon minus en sikkerhedsmargen,
+                // så ionerne altid holder sig et godt stykke fra glasvæggen
+                var safeHalfWidth = flaskHalfWidthAt(ion.y) - 25;
+                var leftBound = 300 - safeHalfWidth + 18;
+                var rightBound = 300 + safeHalfWidth - 18;
+
+                // Klem positionen fast inden for grænserne (i stedet for kun at vende farten),
+                // så en ion aldrig kan tegnes uden for kolben, uanset hastighed
+                if (ion.x < leftBound) { ion.x = leftBound; ion.vx = Math.abs(ion.vx); }
+                else if (ion.x > rightBound) { ion.x = rightBound; ion.vx = -Math.abs(ion.vx); }
+
+                if (ion.y < 270) { ion.y = 270; ion.vy = Math.abs(ion.vy); }
+                else if (ion.y > 485) { ion.y = 485; ion.vy = -Math.abs(ion.vy); }
+
+                if (ion.type === "Fe2+") {
+                    ctx.fillStyle = "#22c55e";
+                    ctx.beginPath();
+                    ctx.arc(ion.x, ion.y, 12, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = "#000";
+                    ctx.font = "bold 10px sans-serif";
+                    ctx.fillText("Fe²⁺", ion.x - 10, ion.y + 4);
+                } else if (ion.type === "Fe3+") {
+                    ctx.fillStyle = "#eab308";
+                    ctx.beginPath();
+                    ctx.arc(ion.x, ion.y, 12, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = "#000";
+                    ctx.font = "bold 10px sans-serif";
+                    ctx.fillText("Fe³⁺", ion.x - 10, ion.y + 4);
+                } else if (ion.type === "MnO4-") {
+                    ctx.fillStyle = "#b55fe6";
+                    ctx.beginPath();
+                    ctx.arc(ion.x, ion.y, 15, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = "#fff";
+                    ctx.font = "bold 9px sans-serif";
+                    ctx.fillText("MnO₄⁻", ion.x - 13, ion.y + 3);
+                }
+            }
+
+            // Opdater og tegn H2 gasbobler med fysik ("wobble")
+            for (var b = state.gasBubbles.length - 1; b >= 0; b--) {
+                var bubble = state.gasBubbles[b];
+                bubble.y -= bubble.vy;
+                bubble.offset += 0.1;
+                bubble.x += Math.sin(bubble.offset) * 0.8; // Wobble effekt
+                
+                ctx.strokeStyle = "rgba(148, 163, 184, 0.6)";
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Lille refleksion på boblen
+                ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+                ctx.beginPath();
+                ctx.arc(bubble.x - bubble.radius*0.3, bubble.y - bubble.radius*0.3, bubble.radius*0.3, 0, Math.PI*2);
+                ctx.fill();
+
+                if (bubble.y < 260) {
+                    state.gasBubbles.splice(b, 1);
+                }
+            }
+
+            // Partikelsystem
+            for (var p = state.particles.length - 1; p >= 0; p--) {
+                var part = state.particles[p];
+                part.x += part.vx;
+                part.y += part.vy;
+                part.life -= part.decay;
+
+                if (part.life <= 0) {
+                    state.particles.splice(p, 1);
+                } else {
+                    ctx.fillStyle = part.color;
+                    ctx.globalAlpha = part.life;
+                    ctx.beginPath();
+                    ctx.arc(part.x, part.y, part.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.globalAlpha = 1.0;
+                }
+            }
+
+            requestAnimationFrame(updateAndRender);
+        }
+
+        function handleRedoxReactionKinetics() {
+            if (state.iron2Count > 0) {
+                // Hver dråbe MnO4- omsætter præcis 5 Fe2+ (5:1-forholdet)
+                var toConvert = Math.min(5, state.iron2Count);
+                var converted = 0;
+                for (var i = 0; i < ionCollection.length && converted < toConvert; i++) {
+                    if (ionCollection[i].type === "Fe2+") {
+                        ionCollection[i].type = "Fe3+";
+                        createBurst(ionCollection[i].x, ionCollection[i].y, "#eab308");
+                        converted++;
+                    }
+                }
+                state.iron2Count -= toConvert;
+                state.iron3Count += toConvert;
+                state.permanganateCount = 0;
+
+                if (state.iron2Count === 0) {
+                    state.currentPhase = 3;
+                    state.flaskColor = { r: 245, g: 247, b: 250, a: 0.15 };
+                    setInfoText("Ækvivalenspunkt nået! Præcis 2 dråber MnO₄⁻ omsatte alle 10 Fe²⁺-ioner (5:1-forhold). Næste dråbe vil give farve.");
+                } else {
+                    setInfoText("5 Fe²⁺ omsat af denne dråbe (5:1-forhold). " + state.iron2Count + " Fe²⁺ tilbage — tilsæt endnu en dråbe MnO₄⁻.");
+                }
+                document.getElementById('btn-add-titrant').disabled = false;
+            }
+            else if (state.iron3Count === 10) {
+                state.currentPhase = 4;
+                ionCollection.push({
+                    x: 300,
+                    y: 290,
+                    vx: (Math.random() - 0.5) * 2.0,
+                    vy: (Math.random() - 0.5) * 1.5,
+                    type: "MnO4-"
+                });
+
+                state.flaskColor = { r: 181, g: 95, b: 230, a: 0.4 };
+                setInfoText("Ækvivalenspunktet er nået! Der er ikke mere Fe²⁺ til at reagere med den sidste dråbe, så opløsningen farves svagt, permanent lilla. Efterbehandlingen er nu låst op nedenfor.");
+                document.getElementById('btn-add-titrant').disabled = true;
+
+                finishStep2();
+            }
+            updateCountersUi();
+        }
+
+        function drawApparatus() {
+            // Burette rør (gjort mindre - kolbens indhold er det vigtigste)
+            var buretteGrad = ctx.createLinearGradient(293, 0, 307, 0);
+            buretteGrad.addColorStop(0, "rgba(200, 210, 220, 0.2)");
+            buretteGrad.addColorStop(0.2, "rgba(255, 255, 255, 0.5)");
+            buretteGrad.addColorStop(0.8, "rgba(200, 210, 220, 0.1)");
+            buretteGrad.addColorStop(1, "rgba(255, 255, 255, 0.3)");
+
+            ctx.fillStyle = buretteGrad;
+            ctx.fillRect(293, 10, 14, 55);
+
+            ctx.strokeStyle = "#94a3b8";
+            ctx.lineWidth = 3;
+            ctx.strokeRect(293, 10, 14, 55);
+
+            // Væske i buretten (aftager glidende over de 2 dråber der kræves for ækvivalens;
+            // en evt. 3. dråbe er ud over ækvivalenspunktet og ændrer ikke buretten yderligere)
+            if (state.currentPhase < 4) {
+                var dropsForBurette = Math.min(state.totalDrops, 2);
+                var fillRatio = Math.max(0, 1 - (dropsForBurette / 2));
+                var liquidHeight = 51 * fillRatio;
+                ctx.fillStyle = "rgba(181, 95, 230, 0.85)";
+                ctx.fillRect(295, 12 + (51 - liquidHeight), 10, liquidHeight);
+            }
+
+            // Burettespids
+            ctx.beginPath();
+            ctx.moveTo(300, 65);
+            ctx.lineTo(300, 95);
+            ctx.stroke();
+
+            // Staphane / Stopkok
+            ctx.fillStyle = state.dropPouring ? "#22c55e" : "#ef4444";
+            ctx.beginPath();
+            ctx.roundRect(288, 78, 24, 8, 3);
+            ctx.fill();
+
+            // KONISK KOLBE (yderligere forstørret, så der er rigelig plads til 10 jernatomer)
+            var fColor = state.flaskColor;
+
+            // Væskeindhold
+            ctx.fillStyle = "rgba(" + fColor.r + "," + fColor.g + "," + fColor.b + "," + fColor.a + ")";
+            ctx.beginPath();
+            ctx.moveTo(246, 260); // Væskeoverflade venstre
+            ctx.lineTo(354, 260); // Væskeoverflade højre
+            ctx.lineTo(545, 495); // Væske bund højre
+            ctx.lineTo(55, 495); // Væske bund venstre
+            ctx.closePath();
+            ctx.fill();
+
+            // Meniskus (væskeoverfladens bue)
+            ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+            ctx.beginPath();
+            ctx.ellipse(300, 260, 54, 4, 0, 0, Math.PI*2);
+            ctx.fill();
+
+            // Kolbens glas-baggrund (subtil tint)
+            var flaskGrad = ctx.createLinearGradient(50, 0, 550, 0);
+            flaskGrad.addColorStop(0, "rgba(255, 255, 255, 0.15)");
+            flaskGrad.addColorStop(0.5, "rgba(255, 255, 255, 0.02)");
+            flaskGrad.addColorStop(1, "rgba(255, 255, 255, 0.1)");
+
+            ctx.fillStyle = flaskGrad;
+            ctx.beginPath();
+            ctx.moveTo(275, 190);
+            ctx.lineTo(325, 190);
+            ctx.lineTo(328, 225);
+            ctx.lineTo(550, 500);
+            ctx.lineTo(50, 500);
+            ctx.lineTo(272, 225);
+            ctx.closePath();
+            ctx.fill();
+
+            // Kolbens glasomrids
+            ctx.strokeStyle = "rgba(203, 213, 225, 0.9)";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(275, 190); // Hals top-venstre
+            ctx.lineTo(275, 225);
+            ctx.lineTo(50, 500);
+            ctx.lineTo(550, 500);
+            ctx.lineTo(325, 225);
+            ctx.lineTo(325, 190); // Hals top-højre
+            ctx.stroke();
+
+            // Glas-refleksioner på kolben for et professionelt look
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+            ctx.lineWidth = 4;
+            ctx.lineCap = "round";
+            ctx.beginPath();
+            ctx.moveTo(282, 198);
+            ctx.lineTo(282, 218);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(253, 270);
+            ctx.quadraticCurveTo(158, 380, 77, 485);
+            ctx.stroke();
+        }
+
+        // TRIN-LÅSE OG SAMMENFOLDNING AF TEORIBOKSE
+        function toggleStepCollapse(n) {
+            var node = document.getElementById('info-step-' + n);
+            if (node.classList.contains('locked')) return;
+
+            var content = document.getElementById('content-step-' + n);
+            var chevron = document.getElementById('chevron-' + n);
+            var isHidden = content.style.display === 'none';
+            content.style.display = isHidden ? 'block' : 'none';
+            chevron.textContent = isHidden ? '▾' : '▸';
+        }
+
+        function unlockStep2() {
+            state.currentPhase = 2;
+
+            document.getElementById('info-step-1').className = "step-node completed";
+            document.getElementById('status-1').innerText = "Færdig";
+            document.getElementById('status-1').style.color = "var(--success-color)";
+            document.getElementById('content-step-1').style.display = "none";
+            document.getElementById('chevron-1').textContent = "▸";
+            document.getElementById('formula-1').className = "formula-display";
+
+            document.getElementById('info-step-2').className = "step-node active";
+            document.getElementById('locked-msg-2').style.display = "none";
+            document.getElementById('content-step-2').style.display = "block";
+            document.getElementById('chevron-2').textContent = "▾";
+            document.getElementById('formula-2').className = "formula-display active-step";
+            document.getElementById('status-2').innerText = "I gang";
+            document.getElementById('status-2').style.color = "var(--accent-purple)";
+
+            document.getElementById('btn-add-titrant').disabled = false;
+            setInfoText("Trin 2 er nu låst op. Tilsæt KMnO₄ dråbevis for at titrere Fe²⁺.");
+        }
+
+        function finishStep2() {
+            document.getElementById('info-step-2').className = "step-node completed";
+            document.getElementById('status-2').innerText = "Endepunkt nået";
+            document.getElementById('status-2').style.color = "var(--success-color)";
+            document.getElementById('content-step-2').style.display = "none";
+            document.getElementById('chevron-2').textContent = "▸";
+
+            unlockEfterbehandling();
+        }
+
+        function unlockEfterbehandling() {
+            document.getElementById('efterbehandling-card').style.display = "block";
+        }
+
+        // FRIVILLIG QUIZ (INGEN POPUP — kan tages før eller efter øvelsen)
+        var QUIZ_QUESTIONS = [
+            {
+                q: "Hvilken rolle spiller H⁺-ionerne fra syren, når de reagerer med det faste jern?",
+                options: [
+                    "De oxiderer jernet til Fe²⁺, og bliver selv reduceret til H₂-gas.",
+                    "De reducerer jernet til Fe²⁺, og bliver selv oxideret til H₂-gas.",
+                    "De virker blot som en katalysator og de forbruges ikke undervejs.",
+                    "De reagerer overhovedet ikke med jernet, men kun med luftens ilt."
+                ],
+                correct: 0,
+                hint: "Se på oxidationstallene: Fe går fra 0 til +2 (afgiver elektroner), mens H går fra +1 til 0 (optager elektroner)."
+            },
+            {
+                q: "Hvad er det synlige tegn på, at reaktionen i trin 1 er færdig?",
+                options: [
+                    "Opløsningen bliver nu kraftigt lilla i farven straks.",
+                    "Der dannes ikke flere bobler, og alt jernet er opløst.",
+                    "Der bliver i stedet straks tilsat mere KMnO₄ i kolben.",
+                    "Kolben begynder i stedet pludselig at koge voldsomt."
+                ],
+                correct: 1,
+                hint: "Gasboblerne (H₂) og de faste Fe-atomer er de eneste synlige tegn på, at reaktionen stadig kører."
+            },
+            {
+                q: "Hvorfor bliver opløsningen svagt, permanent lilla, når al Fe²⁺ er omdannet til Fe³⁺?",
+                options: [
+                    "Fordi der ikke mere er Fe²⁺ til at aftage MnO₄⁻'s lilla farve.",
+                    "Fordi det er Mn²⁺-ionerne, der dannes, som er kraftigt lilla.",
+                    "Fordi det er Fe³⁺-ionerne, der dannes, som er kraftigt lilla.",
+                    "Fordi al syren i den samlede kolben er fuldstændigt brugt op."
+                ],
+                correct: 0,
+                hint: "Så længe der er Fe²⁺ tilbage, bliver den lilla MnO₄⁻ omdannet til den næsten farveløse Mn²⁺ med det samme."
+            },
+            {
+                q: "Hvorfor reagerer præcis 5 Fe²⁺-ioner med hver eneste MnO₄⁻-ion i titreringen?",
+                options: [
+                    "Fordi Mn optager 5 elektroner, mens hvert Fe²⁺ kun afgiver 1 elektron.",
+                    "Fordi der tilfældigvis blev tilsat 5 gange så meget jern som MnO₄⁻.",
+                    "Fordi 5 er det mindste hele tal, der får ligningen til at gå pænt op.",
+                    "Fordi hver MnO₄⁻-ion indeholder præcis 5 oxygenatomer, der skal mættes."
+                ],
+                correct: 0,
+                hint: "Se på oxidationstallene: Mn går fra +7 til +2 (optager 5 elektroner), mens Fe²⁺ går fra +2 til +3 (afgiver 1 elektron). Antal afgivne og optagne elektroner skal være ens."
+            }
+        ];
+
+        var quizState = { questions: QUIZ_QUESTIONS, index: 0 };
+        var quizAttempts = 0;
+        var currentQuizQ = null;
+
+        // Blander en quiz-opgaves svarmuligheder (og flytter "correct"-indekset med), så det
+        // rigtige svar ikke altid står på samme plads. QUIZ_QUESTIONS selv ændres ikke.
+        function shuffleQuizOptions(original) {
+            var indices = original.options.map(function(_, i) { return i; });
+            for (var i = indices.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
+            }
+            return {
+                q: original.q,
+                options: indices.map(function(i) { return original.options[i]; }),
+                correct: indices.indexOf(original.correct),
+                hint: original.hint
+            };
+        }
+
+        function initQuiz() {
+            document.getElementById('quiz-body').style.display = 'block';
+            document.getElementById('quiz-complete').style.display = 'none';
+            quizState.index = 0;
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            var q = shuffleQuizOptions(quizState.questions[quizState.index]);
+            currentQuizQ = q;
+            quizAttempts = 0;
+
+            document.getElementById('quiz-title').textContent =
+                "Frivillig quiz — spørgsmål " + (quizState.index + 1) + " af " + quizState.questions.length;
+            document.getElementById('quiz-question').textContent = q.q;
+
+            var feedback = document.getElementById('quiz-feedback');
+            feedback.className = 'modal-feedback';
+            feedback.textContent = '';
+
+            document.getElementById('quiz-next-btn').style.display = 'none';
+            document.getElementById('quiz-next-btn').textContent =
+                (quizState.index === quizState.questions.length - 1) ? "Afslut quiz" : "Næste spørgsmål →";
+
+            var progressDiv = document.getElementById('quiz-progress');
+            progressDiv.innerHTML = '';
+            quizState.questions.forEach(function(_, idx) {
+                var dot = document.createElement('div');
+                dot.className = 'progress-dot' + (idx < quizState.index ? ' done' : (idx === quizState.index ? ' active' : ''));
+                progressDiv.appendChild(dot);
+            });
+
+            var optsDiv = document.getElementById('quiz-options');
+            optsDiv.innerHTML = '';
+            q.options.forEach(function(opt, idx) {
+                var btn = document.createElement('button');
+                btn.className = 'quiz-option-btn';
+                btn.textContent = opt;
+                btn.onclick = function() { selectQuizOption(idx, btn); };
+                optsDiv.appendChild(btn);
+            });
+        }
+
+        function selectQuizOption(idx, btnEl) {
+            var q = currentQuizQ;
+            var feedback = document.getElementById('quiz-feedback');
+            var allBtns = document.querySelectorAll('#quiz-options .quiz-option-btn');
+
+            if (idx === q.correct) {
+                allBtns.forEach(function(b) { b.disabled = true; });
+                btnEl.classList.add('correct');
+                feedback.className = 'modal-feedback success';
+                feedback.textContent = 'Korrekt!';
+                document.getElementById('quiz-next-btn').style.display = 'inline-block';
+            } else {
+                quizAttempts++;
+                btnEl.classList.add('wrong');
+                btnEl.disabled = true;
+                feedback.className = 'modal-feedback error';
+                feedback.textContent = (quizAttempts >= 2) ? ('Ikke helt. Hint: ' + q.hint) : 'Ikke helt rigtigt — prøv en anden mulighed.';
+            }
+        }
+
+        function quizNext() {
+            if (quizState.index === quizState.questions.length - 1) {
+                showQuizCompletion();
+            } else {
+                quizState.index++;
+                renderQuizQuestion();
+            }
+        }
+
+        function showQuizCompletion() {
+            document.getElementById('quiz-body').style.display = 'none';
+            document.querySelectorAll('#quiz-progress .progress-dot').forEach(function(dot) {
+                dot.classList.remove('active');
+                dot.classList.add('done');
+            });
+
+            var box = document.getElementById('quiz-complete');
+            box.style.display = 'block';
+            box.innerHTML =
+                '<p class="completion-title">Flot klaret!</p>' +
+                '<p>Du har nu gennemført alle ' + quizState.questions.length + ' spørgsmål i quizzen.</p>' +
+                '<div class="modal-footer"><button class="btn-calc" style="width:auto;" onclick="initQuiz()">Tag quizzen igen</button></div>';
+        }
+
+        // GUIDET MÆNGDEBEREGNING (POPUP)
+        function fmtNum(x, decimals) {
+            return x.toFixed(decimals).replace('.', ',');
+        }
+
+        var CALC_STEPS = [
+            {
+                title: "Trin 1 af 4 — Stofmængde af KMnO₄",
+                question: "Hvor mange mol KMnO₄ blev brugt til titreringen?",
+                given: function(d) { return "Givet:<br>c(KMnO₄) = " + fmtNum(d.c, 4) + " M<br>V(KMnO₄) = " + fmtNum(d.V_mL, 1) + " mL"; },
+                formulas: ["n = c · V", "n = m / M", "c = n / V", "n = c / V"],
+                correctFormulaIndex: 0,
+                inputLabel: "n(KMnO₄) =",
+                unit: "mol",
+                hint: "Husk at omregne volumen til liter (divider mL med 1000) før du ganger med koncentrationen.",
+                compute: function(d) { return d.c * (d.V_mL / 1000); }
+            },
+            {
+                title: "Trin 2 af 4 — Stofmængde af Fe²⁺",
+                question: "Brug støkiometrien fra det afstemte skema (5 Fe²⁺ : 1 MnO₄⁻) til at finde n(Fe²⁺).",
+                given: function(d) { return "Givet: n(MnO₄⁻) = " + fmtNum(d.results[0], 6) + " mol"; },
+                formulas: ["n(Fe²⁺) = n(MnO₄⁻) · 5", "n(Fe²⁺) = n(MnO₄⁻) / 5", "n(Fe²⁺) = n(MnO₄⁻) · 8", "n(Fe²⁺) = n(MnO₄⁻)"],
+                correctFormulaIndex: 0,
+                inputLabel: "n(Fe²⁺) =",
+                unit: "mol",
+                hint: "Se på det afstemte skema: der er 5 Fe²⁺ for hver 1 MnO₄⁻.",
+                compute: function(d) { return d.results[0] * 5; }
+            },
+            {
+                title: "Trin 3 af 4 — Masse af jern",
+                question: "Beregn massen af det jern der reagerede (M(Fe) = 55,85 g/mol).",
+                given: function(d) { return "Givet:<br>n(Fe²⁺) = " + fmtNum(d.results[1], 6) + " mol<br>M(Fe) = 55,85 g/mol"; },
+                formulas: ["m = n · M", "m = n / M", "m = M / n", "n = m · M"],
+                correctFormulaIndex: 0,
+                inputLabel: "m(Fe) =",
+                unit: "g",
+                hint: "Massen findes ved at gange stofmængden med den molare masse: m = n · M.",
+                compute: function(d) { return d.results[1] * 55.85; }
+            },
+            {
+                title: "Trin 4 af 4 — Masseprocent jern i ståluld",
+                question: "Hvor mange procent af stålulden bestod af rent jern?",
+                given: function(d) { return "Givet:<br>m(Fe) = " + fmtNum(d.results[2], 4) + " g<br>m(ståluld) = " + fmtNum(d.mWool, 3) + " g"; },
+                formulas: ["m% = (m(Fe) / m(ståluld)) · 100%", "m% = (m(ståluld) / m(Fe)) · 100%", "m% = m(Fe) · m(ståluld)", "m% = m(Fe) − m(ståluld)"],
+                correctFormulaIndex: 0,
+                inputLabel: "m% =",
+                unit: "%",
+                hint: "Masseprocent = (massen af det du leder efter / totalmassen) · 100%.",
+                compute: function(d) { return (d.results[2] / d.mWool) * 100; }
+            }
+        ];
+
+        var calcData = null;
+        var calcStepIndex = 0;
+        var calcAttempts = 0;
+
+        function openCalcModal() {
+            var mWoolStr = document.getElementById('calc-m-wool').value.replace(',', '.');
+            var vStr = document.getElementById('calc-v-purple').value.replace(',', '.');
+            var mWool = parseFloat(mWoolStr);
+            var vMl = parseFloat(vStr);
+
+            if (isNaN(mWool) || mWool <= 0 || isNaN(vMl) || vMl <= 0) {
+                alert("Indtast venligst gyldige talværdier for ståluld og forbrugt KMnO₄-volumen.");
+                return;
+            }
+
+            calcData = { c: 0.0200, V_mL: vMl, mWool: mWool, results: [] };
+            calcStepIndex = 0;
+
+            document.getElementById('modal-step-content').style.display = 'block';
+            document.getElementById('modal-completion').style.display = 'none';
+            document.getElementById('calc-modal-overlay').classList.add('open');
+            renderCalcStep();
+        }
+
+        function closeCalcModal() {
+            document.getElementById('calc-modal-overlay').classList.remove('open');
+        }
+
+        function renderCalcStep() {
+            var step = CALC_STEPS[calcStepIndex];
+            calcAttempts = 0;
+
+            document.getElementById('modal-step-title').textContent = step.title;
+            document.getElementById('modal-question').textContent = step.question;
+            document.getElementById('modal-given').innerHTML = step.given(calcData);
+            document.getElementById('modal-input-label').textContent = step.inputLabel;
+            document.getElementById('modal-unit').textContent = step.unit;
+            document.getElementById('modal-answer-input').value = '';
+
+            var feedback = document.getElementById('modal-feedback');
+            feedback.className = 'modal-feedback';
+            feedback.textContent = '';
+
+            document.getElementById('modal-check-btn').style.display = 'inline-block';
+            document.getElementById('modal-next-btn').style.display = 'none';
+            document.getElementById('modal-next-btn').textContent = (calcStepIndex === CALC_STEPS.length - 1) ? "Se samlet resultat" : "Næste trin →";
+
+            var select = document.getElementById('modal-formula-select');
+            select.innerHTML = '<option value="-1">Vælg en formel...</option>';
+            step.formulas.forEach(function(f, idx) {
+                var opt = document.createElement('option');
+                opt.value = idx;
+                opt.textContent = f;
+                select.appendChild(opt);
+            });
+
+            updateProgressDots();
+        }
+
+        function updateProgressDots() {
+            var dots = document.querySelectorAll('#modal-progress .progress-dot');
+            dots.forEach(function(dot, idx) {
+                dot.classList.remove('active', 'done');
+                if (idx < calcStepIndex) dot.classList.add('done');
+                else if (idx === calcStepIndex) dot.classList.add('active');
+            });
+        }
+
+        function checkCalcStep() {
+            var step = CALC_STEPS[calcStepIndex];
+            var formulaIdx = parseInt(document.getElementById('modal-formula-select').value, 10);
+            var answerVal = parseFloat(document.getElementById('modal-answer-input').value.replace(',', '.'));
+            var feedback = document.getElementById('modal-feedback');
+
+            if (isNaN(formulaIdx) || formulaIdx === -1) {
+                feedback.className = 'modal-feedback error';
+                feedback.textContent = 'Vælg først en formel.';
+                return;
+            }
+            if (isNaN(answerVal)) {
+                feedback.className = 'modal-feedback error';
+                feedback.textContent = 'Indtast en talværdi for dit svar.';
+                return;
+            }
+
+            var correctVal = step.compute(calcData);
+            var formulaCorrect = (formulaIdx === step.correctFormulaIndex);
+            var valueCorrect = Math.abs(answerVal - correctVal) / Math.abs(correctVal) < 0.03;
+
+            if (formulaCorrect && valueCorrect) {
+                feedback.className = 'modal-feedback success';
+                feedback.textContent = 'Korrekt! ' + step.inputLabel + ' ' + fmtNum(correctVal, Math.abs(correctVal) < 1 ? 6 : 2) + ' ' + step.unit;
+                calcData.results[calcStepIndex] = correctVal;
+                document.getElementById('modal-check-btn').style.display = 'none';
+                document.getElementById('modal-next-btn').style.display = 'inline-block';
+            } else {
+                calcAttempts++;
+                feedback.className = 'modal-feedback error';
+                var msg = !formulaCorrect
+                    ? 'Formlen er ikke helt rigtig — tænk over hvilke størrelser du kender.'
+                    : 'Formlen er rigtig, men tallet stemmer ikke — tjek din udregning igen.';
+                if (calcAttempts >= 2) {
+                    msg += ' Hint: ' + step.hint;
+                }
+                feedback.textContent = msg;
+            }
+        }
+
+        function nextCalcStep() {
+            if (calcStepIndex === CALC_STEPS.length - 1) {
+                showCalcCompletion();
+            } else {
+                calcStepIndex++;
+                renderCalcStep();
+            }
+        }
+
+        function showCalcCompletion() {
+            document.getElementById('modal-step-content').style.display = 'none';
+
+            document.querySelectorAll('#modal-progress .progress-dot').forEach(function(dot) {
+                dot.classList.remove('active');
+                dot.classList.add('done');
+            });
+
+            var completion = document.getElementById('modal-completion');
+            completion.style.display = 'block';
+            completion.innerHTML =
+                '<p class="completion-title">Flot klaret!</p>' +
+                '<p>Du har nu selv regnet dig frem til, hvor stor en andel af stålulden der var rent jern:</p>' +
+                '<p class="completion-value">' + fmtNum(calcData.results[3], 2) + ' %</p>' +
+                '<div class="modal-footer"><button class="btn-calc" onclick="closeCalcModal()">Luk</button></div>';
+        }
+
+        initSimulation();
+        updateAndRender();
+        initQuiz();
+
+    </script>
+</body>
+</html>

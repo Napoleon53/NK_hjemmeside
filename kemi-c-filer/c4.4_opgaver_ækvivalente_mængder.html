@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ækvivalente Mængder</title>
+    <style>
+        :root {
+            --bg: #1a1a2e;
+            --panel: #16213e;
+            --text: #eaeaea;
+            --accent: #0f3460;
+            --highlight: #e94560;
+            --success: #4ade80;
+            --error: #ef476f;
+            --warning: #fca311;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background: rgba(0, 0, 0, 0.5);
+            padding: clamp(6px, 1.2vh, 12px) clamp(15px, 4vw, 25px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            z-index: 10;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: clamp(1.1rem, 3vw, 1.5rem);
+            letter-spacing: 1px;
+            color: var(--highlight);
+        }
+
+        .score-board {
+            font-size: clamp(0.95rem, 2.5vw, 1.2rem);
+            font-weight: bold;
+            background: var(--glass);
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Værktøjspanel */
+        .workspace {
+            flex: 1;
+            padding: clamp(8px, 1.5vh, 20px) clamp(12px, 3vw, 30px);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .card {
+            background: var(--panel);
+            width: 100%;
+            max-width: 850px;
+            border-radius: 12px;
+            padding: clamp(10px, 2vh, 22px) clamp(15px, 4vw, 25px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+            margin-bottom: clamp(8px, 1.2vh, 15px);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 { margin-top: 0; margin-bottom: clamp(6px, 1vh, 10px); color: #fff; border-bottom: 2px solid var(--accent); padding-bottom: clamp(4px, 0.8vh, 8px); font-size: clamp(1.1rem, 2.5vw, 1.4rem); }
+        p { line-height: 1.45; margin: clamp(6px, 1vh, 10px) 0; font-size: clamp(0.9rem, 2vw, 1.05rem); }
+
+        /* Knapper */
+        .btn {
+            background: var(--highlight);
+            color: #fff;
+            border: none;
+            padding: clamp(8px, 1.2vh, 12px) clamp(16px, 3vw, 24px);
+            font-size: clamp(0.95rem, 2vw, 1.05rem);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+            margin-top: clamp(8px, 1.2vh, 15px);
+        }
+        .btn:hover { filter: brightness(1.2); transform: scale(1.02); }
+        .btn:disabled { background: #555; cursor: not-allowed; transform: none; }
+
+        .btn-secondary { background: var(--accent); }
+
+        /* Input felter */
+        input[type="text"] {
+            width: 80px;
+            padding: 10px;
+            font-size: 1.2rem;
+            text-align: center;
+            border: 2px solid var(--accent);
+            border-radius: 6px;
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            transition: border-color 0.3s;
+        }
+        
+        input.coeff-input {
+            width: 55px; 
+            padding: 8px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        input.mol-input {
+            width: 80px;
+            margin-right: 5px;
+        }
+
+        input[type="text"]:focus { outline: none; border-color: var(--highlight); }
+        input.correct { border-color: var(--success); background: rgba(74, 222, 128, 0.1); }
+        input.error { border-color: var(--error); background: rgba(239, 71, 111, 0.1); }
+
+        /* Reaktionsskema Layout */
+        .reaction-row {
+            display: flex;
+            align-items: flex-start; /* Sørger for at top-delen (skemaet) flugter over det hele */
+            justify-content: center;
+            gap: clamp(6px, 2vw, 15px);
+            margin: clamp(8px, 1.5vh, 20px) 0;
+            flex-wrap: wrap;
+            background: rgba(0,0,0,0.2);
+            padding: clamp(10px, 1.8vh, 20px) clamp(10px, 3vw, 20px);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .molecule-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: clamp(6px, 1.2vh, 14px); /* Plads mellem afstemning (top) og stofmængde (bund) */
+        }
+
+        .molecule-top {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            height: clamp(32px, 5vh, 42px);
+        }
+
+        .molecule-bottom {
+            display: flex;
+            align-items: center;
+            height: clamp(32px, 5vh, 42px);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .formula {
+            font-size: clamp(1.2rem, 3.5vw, 1.8rem);
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .math-symbol {
+            font-size: clamp(1.3rem, 3.5vw, 2rem);
+            font-weight: bold;
+            color: var(--highlight);
+            margin: 0 clamp(2px, 1vw, 10px);
+            height: clamp(32px, 5vh, 42px);
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Tydelig markering af den oplyste stofmængde */
+        .given-mol {
+            font-size: clamp(1rem, 3vw, 1.4rem);
+            font-weight: 900;
+            color: var(--success);
+            background: rgba(74, 222, 128, 0.1);
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 2px dashed var(--success);
+        }
+
+        .feedback {
+            margin-top: clamp(8px, 1.2vh, 15px);
+            font-weight: bold;
+            font-size: clamp(0.95rem, 2vw, 1.05rem);
+            min-height: 18px;
+            padding: clamp(6px, 1vh, 10px);
+            border-radius: 6px;
+        }
+
+        .instruction-box {
+            background: rgba(255,255,255,0.05);
+            border-left: 4px solid var(--accent);
+            padding: clamp(8px, 1.2vh, 12px) 15px;
+            margin: clamp(8px, 1.2vh, 15px) 0;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Hotdog specifikt og den implementerede pølsegrafik */
+        .hotdog-equation {
+            font-size: clamp(1.3rem, 4vw, 2rem);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: clamp(6px, 2vw, 15px);
+            margin: clamp(8px, 1.5vh, 20px) 0;
+            background: rgba(0,0,0,0.3);
+            padding: clamp(8px, 1.5vh, 20px) clamp(10px, 3vw, 20px);
+            border-radius: 10px;
+            flex-wrap: wrap;
+        }
+
+        .hotdog-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hotdog-coeff {
+            color: var(--warning);
+            font-weight: bold;
+            font-size: clamp(1.5rem, 4.5vw, 2.2rem);
+        }
+
+        .emoji {
+            font-size: clamp(1.7rem, 5vw, 2.5rem);
+            filter: drop-shadow(0px 4px 4px rgba(0,0,0,0.5));
+        }
+
+        /* METODE TIL PØLSEFIGUR (Fra udkastet) */
+        .sausage-graphic {
+            background: #ef4136; 
+            border-radius: 10px;
+            box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2); 
+            transform: rotate(-10deg);
+            display: inline-block;
+        }
+        .sausage-graphic.large {
+            width: clamp(40px, 9vw, 60px);
+            height: clamp(14px, 3vw, 20px);
+            margin: 0 5px;
+        }
+        .sausage-graphic.header {
+            width: clamp(34px, 7vw, 50px);
+            height: clamp(12px, 2.5vw, 18px);
+            margin: 0 5px;
+            transform: rotate(-5deg);
+        }
+
+        .quiz-option {
+            background: var(--accent);
+            padding: clamp(10px, 2.5vw, 15px);
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid transparent;
+            font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+        }
+        .quiz-option:hover { background: var(--highlight); }
+        .quiz-option.selected { border-color: #fff; background: var(--highlight); }
+
+        /* Canvas Micro-level */
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.15;
+            transition: opacity 1s;
+        }
+        #particle-canvas.active {
+            opacity: 0.6;
+        }
+
+        /* Ekstra tilpasning til smalle skærme (mobil/tablet) */
+        @media (max-width: 480px) {
+            .molecule-group { gap: 8px; }
+            .math-symbol { margin: 0 2px; }
+            input.coeff-input { width: 42px; font-size: 1.1rem; padding: 6px; }
+            input.mol-input { width: 65px; }
+            .btn { padding: 10px 18px; font-size: 1rem; }
+        }
+
+        /* Valgfri hjælpeboks i siden */
+        .side-help-toggle {
+            position: fixed;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 14px 10px;
+            border-radius: 8px 0 0 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            z-index: 30;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            box-shadow: -4px 0 10px rgba(0,0,0,0.3);
+        }
+        .side-help-toggle:hover { filter: brightness(1.2); }
+
+        .side-help-panel {
+            position: fixed;
+            right: 0;
+            top: 0;
+            height: 100%;
+            width: min(340px, 88vw);
+            background: var(--panel);
+            border-left: 1px solid var(--border);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            padding: 20px;
+            padding-top: 45px;
+            z-index: 31;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+        .side-help-panel.open { transform: translateX(0); }
+        .side-help-panel h3 { margin-top: 0; color: #fff; font-size: 1.15rem; }
+        .side-help-panel p, .side-help-panel li { font-size: 0.95rem; line-height: 1.5; }
+        .side-help-panel ol { padding-left: 20px; }
+        .side-help-panel li { margin-bottom: 12px; }
+        .side-help-close {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.3rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .side-help-close:hover { color: var(--highlight); }
+
+        /* Sikkerhedsnet til meget lave skærme/vinduer */
+        @media (max-height: 550px) {
+            .card { padding: 8px 15px; margin-bottom: 6px; }
+            .workspace { padding: 4px 12px; }
+            .reaction-row { margin: 6px 0; padding: 8px 10px; }
+            .molecule-group { gap: 4px; }
+            h2 { padding-bottom: 2px; margin-bottom: 4px; }
+            p { margin: 4px 0; }
+            .instruction-box { padding: 6px 12px; margin: 6px 0; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Ækvivalente Mængder</h1>
+        <div class="score-board">Point: <span id="score-display">0</span></div>
+    </header>
+
+    <div class="container">
+        <canvas id="particle-canvas"></canvas>
+
+        <div class="workspace" id="main-workspace">
+            </div>
+    </div>
+
+    <button class="side-help-toggle" id="side-help-toggle" type="button">💡 Hjælp</button>
+    <div class="side-help-panel" id="side-help-panel">
+        <button class="side-help-close" id="side-help-close" type="button" aria-label="Luk">✕</button>
+        <div id="side-help-body"></div>
+    </div>
+
+<script>
+    // --- STATE MANAGEMENT ---
+    var state = {
+        score: 0,
+        currentPhase: 'intro', // intro, hotdog, reaction
+        currentHotdogIndex: 0,
+        currentReactionIndex: 0,
+        reactionQueue: [],
+        particles: [],
+        animating: false
+    };
+
+    // --- DATA ---
+    var hotdogData = [
+        {
+            q: "1. Hvor mange pølser er ækvivalent til 14 skiver syltede agurker?",
+            options: ["7 pølser", "14 pølser", "28 pølser", "12 pølser"],
+            correct: 0,
+            feedback: "Korrekt. Forholdet mellem pølser og agurker er 1:2. Hver gang du bruger 2 agurker, skal du bruge 1 pølse. 14 agurker kræver derfor 7 pølser.",
+            hint: "Forholdet er 1 pølse : 2 agurker. Del antallet af agurker med 2."
+        },
+        {
+            q: "2. Hvis du har 5 brød og 5 pølser, hvor mange syltede agurker skal du bruge for at lave perfekte hotdogs uden at mangle noget?",
+            options: ["5 agurker", "10 agurker", "15 agurker", "2 agurker"],
+            correct: 1,
+            feedback: "Helt rigtigt. Du skal bruge dobbelt så mange agurker som brød/pølser. 5 * 2 = 10 agurker.",
+            hint: "Du skal bruge dobbelt så mange agurker som pølser/brød. Gang antallet af hotdogs med 2."
+        },
+        {
+            q: "3. Du har netop serveret 8 hotdogs. Hvor mange syltede agurker har du brugt i alt til disse?",
+            options: ["8 agurker", "12 agurker", "16 agurker", "4 agurker"],
+            correct: 2,
+            feedback: "Rigtigt. Opskriften siger 2 agurker pr. hotdog. Så til 8 hotdogs har du brugt 8 * 2 = 16 syltede agurker.",
+            hint: "Gang antallet af hotdogs med 2 agurker pr. hotdog."
+        },
+        {
+            q: "4. Hvor mange komplette hotdogs kan du lave, hvis du har 10 pølser, 10 brød og KUN 10 syltede agurker?",
+            options: ["5 hotdogs", "10 hotdogs", "20 hotdogs", "Ingen hotdogs"],
+            correct: 0,
+            feedback: "Rigtigt. Agurkerne er den begrænsende faktor. Selvom du har brød og pølser til 10 hotdogs, rækker de 10 agurker kun til 5 hotdogs (10 / 2 = 5).",
+            hint: "Se på hvilket stof der løber tør først, når du fordeler efter opskriftens forhold (1 pølse : 1 brød : 2 agurker)."
+        }
+    ];
+
+    // Hver reaktion har flere "varianter" (forskelligt kendt stof/stofmængde).
+    // Der trækkes tilfældigt én variant hver gang reaktionen vises, så opgaven
+    // ikke er den samme fra gang til gang.
+    var reactionData = [
+        {
+            id: 1,
+            title: "Reaktion 1: Dannelse af vand",
+            desc: "Trin 1: Afstem reaktionsskemaet ved at indtaste koefficienter i boksene foran molekylerne. (Brug 1, hvis der kun er et molekyle).",
+            reactants: [
+                { formula: "H₂", coeff: 2 },
+                { formula: "O₂", coeff: 1 }
+            ],
+            products: [
+                { formula: "H₂O", coeff: 2 }
+            ],
+            balanceHint: "Tæl atomer af brint (H) og ilt (O) på begge sider af pilen - antallet skal stemme overens.",
+            variants: [
+                { givenIndex: 0, givenIsReactant: true, givenMol: "3,0", answers: [ "1,5", "3,0" ] },
+                { givenIndex: 1, givenIsReactant: true, givenMol: "2,0", answers: [ "4,0", "4,0" ] }
+            ]
+        },
+        {
+            id: 2,
+            title: "Reaktion 2: Ammoniaksyntesen",
+            desc: "Trin 1: Dinitrogen reagerer med dihydrogen og danner ammoniak. Afstem skemaet.",
+            reactants: [
+                { formula: "N₂", coeff: 1 },
+                { formula: "H₂", coeff: 3 }
+            ],
+            products: [
+                { formula: "NH₃", coeff: 2 }
+            ],
+            balanceHint: "Tæl atomer af nitrogen (N) og brint (H) på begge sider af pilen - antallet skal stemme overens.",
+            variants: [
+                { givenIndex: 1, givenIsReactant: true, givenMol: "6,0", answers: [ "2,0", "4,0" ] },
+                { givenIndex: 0, givenIsReactant: true, givenMol: "2,0", answers: [ "6,0", "4,0" ] }
+            ]
+        },
+        {
+            id: 3,
+            title: "Reaktion 3: Forbrænding af methan",
+            desc: "Trin 1: Methan forbrændes fuldstændigt med dioxygen. Afstem skemaet.",
+            reactants: [
+                { formula: "CH₄", coeff: 1 },
+                { formula: "O₂", coeff: 2 }
+            ],
+            products: [
+                { formula: "CO₂", coeff: 1 },
+                { formula: "H₂O", coeff: 2 }
+            ],
+            balanceHint: "Tæl atomer af kulstof (C), brint (H) og ilt (O) på begge sider af pilen - antallet skal stemme overens.",
+            variants: [
+                { givenIndex: 0, givenIsReactant: true, givenMol: "0,25", answers: [ "0,50", "0,25", "0,50" ] },
+                { givenIndex: 1, givenIsReactant: true, givenMol: "1,0", answers: [ "0,50", "0,50", "1,00" ] }
+            ]
+        },
+        {
+            id: 4,
+            title: "Reaktion 4: Forbrænding af propan",
+            desc: "Trin 1: Propan forbrændes fuldstændigt med dioxygen. Der er flere stoffer at holde styr på end i de forrige reaktioner, men metoden er præcis den samme.",
+            reactants: [
+                { formula: "C₃H₈", coeff: 1 },
+                { formula: "O₂", coeff: 5 }
+            ],
+            products: [
+                { formula: "CO₂", coeff: 3 },
+                { formula: "H₂O", coeff: 4 }
+            ],
+            balanceHint: "Tæl atomer af kulstof (C), brint (H) og ilt (O) på begge sider af pilen - antallet skal stemme overens.",
+            variants: [
+                { givenIndex: 1, givenIsReactant: true, givenMol: "10,0", answers: [ "2,0", "6,0", "8,0" ] },
+                { givenIndex: 0, givenIsReactant: true, givenMol: "0,5", answers: [ "2,5", "1,5", "2,0" ] }
+            ]
+        }
+    ];
+
+    var molHintText = "Brug forholdet mellem koefficienterne: ukendt mol = kendt mol × (koefficient for det ukendte stof ÷ koefficient for det kendte stof).";
+
+    // --- DOM ELEMENTER ---
+    var workspace = document.getElementById('main-workspace');
+    var scoreDisplay = document.getElementById('score-display');
+    var canvas = document.getElementById('particle-canvas');
+    var ctx = canvas.getContext('2d');
+    var sideHelpToggle = document.getElementById('side-help-toggle');
+    var sideHelpPanel = document.getElementById('side-help-panel');
+    var sideHelpClose = document.getElementById('side-help-close');
+    var sideHelpBody = document.getElementById('side-help-body');
+
+    var helpContentBalance =
+        "<h3>Sådan afstemmer du skemaet</h3>" +
+        "<p>Tænk på reaktionspilen som et lighedstegn: der skal være lige mange atomer af hver slags på begge sider — ligesom der skal være lige mange pølser og brød, hvis alle skal have en hel hotdog.</p>" +
+        "<ol>" +
+        "<li>Vælg ét grundstof ad gangen (fx brint, H).</li>" +
+        "<li>Tæl hvor mange atomer af det grundstof der er i alt til venstre for pilen — og hvor mange til højre.</li>" +
+        "<li>Er tallene ikke ens? Så ret på <strong>koefficienten</strong> (tallet du selv skriver foran molekylet) — aldrig de små tal, der allerede står nede i selve formlen (fx det lille 2 i H₂O).</li>" +
+        "<li>Gentag for hvert grundstof, til det går op på begge sider.</li>" +
+        "</ol>" +
+        "<p>Tag ét grundstof ad gangen, så bliver det ikke til et stort regnestykke på én gang.</p>";
+
+    var helpContentMol =
+        "<h3>Sådan finder du de ukendte mængder</h3>" +
+        "<p>Husk hotdog-opskriften: <strong>1 pølse + 1 brød + 2 agurker</strong>. Hvis du en dag skal bruge 6 agurker i stedet for 2, ved du med det samme, at det er <strong>3 gange så meget</strong> — så skal du også bruge 3 pølser og 3 brød.</p>" +
+        "<p>Det er præcis den samme tanke, du skal bruge her:</p>" +
+        "<ol>" +
+        "<li>Find ud af hvor mange gange større (eller mindre) den kendte mængde er end dens koefficient.<br><em>Eksempel: Har du fået 6 mol af et stof med koefficienten 2? Så er det 3 gange koefficienten (6 ÷ 2 = 3).</em></li>" +
+        "<li>Gang alle de andre koefficienter i skemaet med det samme tal.<br><em>Har et andet stof koefficienten 1? Så skal du bruge 1 × 3 = 3 mol af det.</em></li>" +
+        "</ol>" +
+        "<p>Det er hele tricket — resten er bare at gange tallene sammen.</p>";
+
+    function setHelpContent(mode) {
+        sideHelpBody.innerHTML = (mode === 'mol') ? helpContentMol : helpContentBalance;
+    }
+    setHelpContent('balance');
+
+    sideHelpToggle.onclick = function() { sideHelpPanel.classList.add('open'); };
+    sideHelpClose.onclick = function() { sideHelpPanel.classList.remove('open'); };
+
+    // Global Enter-håndtering: hver render-funktion sætter enterAction til
+    // den knap, Enter skal udløse i den aktuelle visning.
+    var enterAction = null;
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && typeof enterAction === 'function') {
+            e.preventDefault();
+            enterAction();
+        }
+    });
+
+    // --- HJÆLPEFUNKTIONER ---
+    function updateScore(points) {
+        state.score += points;
+        scoreDisplay.innerText = state.score;
+        scoreDisplay.style.color = varToRgb('--success');
+        setTimeout(function() { scoreDisplay.style.color = ''; }, 500);
+    }
+
+    function varToRgb(varName) {
+        return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    }
+
+    function parseDanishFloat(str) {
+        var normalized = str.replace(',', '.').replace(/\s/g, '');
+        return parseFloat(normalized);
+    }
+
+    function clearWorkspace() {
+        workspace.innerHTML = '';
+        enterAction = null;
+    }
+
+    // --- VIEW CONTROLLERS ---
+
+    function renderIntro() {
+        clearWorkspace();
+        var card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = 
+            "<h2>Velkommen til Ækvivalente Mængder</h2>" +
+            "<p>I dette modul skal du tr\u00e6ne to af de vigtigste koncepter i kemi:</p>" +
+            "<ul>" +
+            "<li>At afstemme reaktionsskemaer.</li>" +
+            "<li>At beregne <strong>\u00e6kvivalente m\u00e6ngder</strong> (mol) med udgangspunkt i reaktionsskemaet.</li>" +
+            "</ul>" +
+            "<p>Kemiske reaktioner er fuldst\u00e6ndig ligesom madopskrifter. For at forst\u00e5 logikken, starter vi med noget alle forst\u00e5r: <strong>En Hotdog!</strong></p>";
+        
+        var btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.innerText = "G\u00e5 til hotdog-eksemplet";
+        enterAction = function() { btn.click(); };
+        btn.onclick = function() {
+            state.currentPhase = 'hotdog';
+            renderHotdogPhase();
+        };
+        card.appendChild(btn);
+        workspace.appendChild(card);
+    }
+
+    function renderHotdogPhase() {
+        clearWorkspace();
+        if (state.currentHotdogIndex >= hotdogData.length) {
+            state.currentPhase = 'reaction';
+            renderTransitionCard();
+            return;
+        }
+
+        var hData = hotdogData[state.currentHotdogIndex];
+        // Bland svarmulighederne, saa det rigtige svar ikke altid staar samme sted
+        var hOrder = [];
+        for (var oi = 0; oi < hData.options.length; oi++) { hOrder.push(oi); }
+        for (var oi = hOrder.length - 1; oi > 0; oi--) {
+            var oj = Math.floor(Math.random() * (oi + 1));
+            var oTmp = hOrder[oi]; hOrder[oi] = hOrder[oj]; hOrder[oj] = oTmp;
+        }
+        var hShuffledOptions = [];
+        for (var oi = 0; oi < hOrder.length; oi++) { hShuffledOptions.push(hData.options[hOrder[oi]]); }
+        hData = {
+            q: hData.q,
+            options: hShuffledOptions,
+            correct: hOrder.indexOf(hData.correct),
+            feedback: hData.feedback,
+            hint: hData.hint
+        };
+        var attempts = 0;
+        var card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = "<h2>Indledende eksempel: Hotdogs (" + (state.currentHotdogIndex + 1) + "/" + hotdogData.length + ")</h2>" +
+                         "<p>Her er det \"kemiske\" reaktionsskema for at lave 1 perfekt hotdog:</p>";
+
+        // Hotdog reaktionsskema
+        var equationDiv = document.createElement('div');
+        equationDiv.className = 'hotdog-equation';
+        equationDiv.innerHTML = 
+            "<div class='hotdog-item'><span class='hotdog-coeff'>1</span><div class='sausage-graphic large'></div></div>" + 
+            "<div class='math-symbol'>+</div>" +
+            "<div class='hotdog-item'><span class='hotdog-coeff'>1</span><span class='emoji'>\uD83E\uDD56</span></div>" + 
+            "<div class='math-symbol'>+</div>" +
+            "<div class='hotdog-item'><span class='hotdog-coeff'>2</span><span class='emoji'>\uD83E\uDD52</span></div>" + 
+            "<div class='math-symbol'>\u27F6</div>" +
+            "<div class='hotdog-item'><span class='hotdog-coeff'>1</span><span class='emoji'>\uD83C\uDF2D</span></div>";
+        card.appendChild(equationDiv);
+
+        var questionText = document.createElement('p');
+        questionText.innerHTML = "<strong>" + hData.q + "</strong>";
+        card.appendChild(questionText);
+
+        var optionsContainer = document.createElement('div');
+        var selectedIndex = -1;
+
+        for (var i = 0; i < hData.options.length; i++) {
+            var optBtn = document.createElement('div');
+            optBtn.className = 'quiz-option';
+            optBtn.innerText = hData.options[i];
+            
+            (function(index, element) {
+                element.onclick = function() {
+                    var children = optionsContainer.children;
+                    for(var j=0; j<children.length; j++) { children[j].classList.remove('selected'); }
+                    element.classList.add('selected');
+                    selectedIndex = index;
+                    checkBtn.disabled = false;
+                };
+            })(i, optBtn);
+
+            optionsContainer.appendChild(optBtn);
+        }
+        card.appendChild(optionsContainer);
+
+        var feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        card.appendChild(feedback);
+
+        var checkBtn = document.createElement('button');
+        checkBtn.className = 'btn';
+        checkBtn.innerText = "Tjek Svar";
+        checkBtn.disabled = true;
+        enterAction = function() { if (!checkBtn.disabled) checkBtn.click(); };
+        
+        checkBtn.onclick = function() {
+            if (selectedIndex === hData.correct) {
+                feedback.innerText = hData.feedback;
+                feedback.style.background = 'rgba(74, 222, 128, 0.2)';
+                feedback.style.color = 'var(--success)';
+                updateScore(100);
+                checkBtn.innerText = "N\u00e6ste Sp\u00f8rgsm\u00e5l";
+                checkBtn.onclick = function() {
+                    state.currentHotdogIndex++;
+                    renderHotdogPhase();
+                };
+            } else {
+                attempts++;
+                var msg = "Ikke helt. Pr\u00f8v igen! Kig p\u00e5 tallene i hotdog-reaktionsskemaet ovenfor.";
+                if (attempts >= 2 && hData.hint) {
+                    msg += " Hint: " + hData.hint;
+                }
+                feedback.innerText = msg;
+                feedback.style.background = 'rgba(239, 71, 111, 0.2)';
+                feedback.style.color = 'var(--error)';
+                state.score = Math.max(0, state.score - 20);
+                scoreDisplay.innerText = state.score;
+            }
+        };
+
+        card.appendChild(checkBtn);
+        workspace.appendChild(card);
+    }
+
+    function renderTransitionCard() {
+        clearWorkspace();
+        var card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = 
+            "<h2>Fra Hotdogs til Molekyler</h2>" +
+            "<p>Den logik du lige brugte til hotdogs er <strong>pr\u00e6cis den samme</strong>, vi bruger i kemi.</p>" +
+            "<ul>" +
+            "<li><strong>Afstemning:</strong> Vi finder ud af hvor mange molekyler af hver type, der skal til (ligesom antallet af p\u00f8lser og agurker).</li>" +
+            "<li><strong>\u00c6kvivalente m\u00e6ngder:</strong> Vi beregner mol (stofm\u00e6ngde) ud fra den faste opskrift, s\u00e5 vi ved pr\u00e6cis hvor meget stof vi skal afveje i laboratoriet.</li>" +
+            "</ul>" +
+            "<p><em>Husk at bruge dansk komma (f.eks. 2,5) n\u00e5r du beregner mol!</em></p>";
+        
+        var btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.innerText = "Start Kemi-delen \u27F6";
+        btn.onclick = function() { startReactionPhase(); };
+        enterAction = function() { btn.click(); };
+        card.appendChild(btn);
+        workspace.appendChild(card);
+    }
+
+    function startReactionPhase() {
+        // Reaktionerne gennemg\u00E5s i fast r\u00E6kkef\u00F8lge (nemmest til sv\u00E6rest).
+        // Kun det "kendte stof" inden for hver reaktion tr\u00E6kkes tilf\u00E6ldigt.
+        state.reactionQueue = reactionData.slice();
+        state.currentReactionIndex = 0;
+        renderReaction();
+    }
+
+    function renderReaction() {
+        clearWorkspace();
+        setHelpContent('balance');
+        if (state.currentReactionIndex >= state.reactionQueue.length) {
+            renderOutro();
+            return;
+        }
+
+        var rData = state.reactionQueue[state.currentReactionIndex];
+        var variant = rData.variants[Math.floor(Math.random() * rData.variants.length)];
+        var card = document.createElement('div');
+        card.className = 'card';
+        card.id = 'reaction-card';
+
+        var title = document.createElement('h2');
+        title.innerText = rData.title + " (Opgave " + (state.currentReactionIndex + 1) + "/" + state.reactionQueue.length + ")";
+        card.appendChild(title);
+        
+        var desc = document.createElement('p');
+        desc.innerText = rData.desc;
+        card.appendChild(desc);
+
+        // Container til eventuelle instrukser for Trin 2
+        var instructionContainer = document.createElement('div');
+        card.appendChild(instructionContainer);
+
+        // -- Byg det samlede reaktionsskema og mol-felter --
+        var reactionRow = document.createElement('div');
+        reactionRow.className = 'reaction-row';
+
+        var coeffInputs = [];
+        var molInputs = [];
+        var answerIndex = 0;
+        var balanceAttempts = 0;
+        var molAttempts = 0;
+        var totalMolecules = rData.reactants.length + rData.products.length;
+
+        for (var i = 0; i < totalMolecules; i++) {
+            var isReactant = i < rData.reactants.length;
+            var currentData = isReactant ? rData.reactants[i] : rData.products[i - rData.reactants.length];
+            
+            // Afgør om denne er den "kendte" stofmængde
+            var isKnown = false;
+            if (isReactant && variant.givenIsReactant && variant.givenIndex === i) isKnown = true;
+            if (!isReactant && !variant.givenIsReactant && variant.givenIndex === (i - rData.reactants.length)) isKnown = true;
+
+            var group = document.createElement('div');
+            group.className = 'molecule-group';
+            
+            // TOP-DEL (Afstemning)
+            var topPart = document.createElement('div');
+            topPart.className = 'molecule-top';
+            
+            var inpCoeff = document.createElement('input');
+            inpCoeff.type = 'text';
+            inpCoeff.className = 'coeff-input';
+            inpCoeff.maxLength = 2;
+            inpCoeff.dataset.expected = currentData.coeff;
+            coeffInputs.push(inpCoeff);
+            
+            var form = document.createElement('div');
+            form.className = 'formula';
+            form.innerText = currentData.formula;
+
+            topPart.appendChild(inpCoeff);
+            topPart.appendChild(form);
+            
+            // BUND-DEL (Stofmængder - skjult til at starte med)
+            var bottomPart = document.createElement('div');
+            bottomPart.className = 'molecule-bottom hidden';
+
+            if (isKnown) {
+                // Tydelig, grøn boks til den kendte værdi
+                var givenLabel = document.createElement('div');
+                givenLabel.className = 'given-mol';
+                givenLabel.innerText = variant.givenMol + " mol";
+                bottomPart.appendChild(givenLabel);
+            } else {
+                // Tomt input felt til at beregne (ingen forvirrende "n=?")
+                var inpMol = document.createElement('input');
+                inpMol.type = 'text';
+                inpMol.className = 'mol-input';
+                inpMol.placeholder = '';
+                inpMol.dataset.answer = variant.answers[answerIndex];
+                molInputs.push(inpMol);
+                answerIndex++;
+
+                var unit = document.createElement('span');
+                unit.innerText = 'mol';
+                unit.style.color = '#aaa';
+                unit.style.fontSize = '1.1rem';
+
+                bottomPart.appendChild(inpMol);
+                bottomPart.appendChild(unit);
+            }
+
+            group.appendChild(topPart);
+            group.appendChild(bottomPart);
+            reactionRow.appendChild(group);
+
+            // Tilføj symboler (+ og pil)
+            if (i < rData.reactants.length - 1) {
+                var plus = document.createElement('div');
+                plus.className = 'math-symbol';
+                plus.innerText = '+';
+                reactionRow.appendChild(plus);
+            } else if (i === rData.reactants.length - 1) {
+                var arrow = document.createElement('div');
+                arrow.className = 'math-symbol';
+                arrow.innerText = '\u27F6';
+                reactionRow.appendChild(arrow);
+            }
+        }
+
+        card.appendChild(reactionRow);
+
+        var feedback = document.createElement('div');
+        feedback.className = 'feedback';
+        card.appendChild(feedback);
+
+        var actionBtn = document.createElement('button');
+        actionBtn.className = 'btn';
+        actionBtn.innerText = "Tjek Afstemning";
+        
+        var checkMolBtn = document.createElement('button');
+        checkMolBtn.className = 'btn btn-secondary hidden';
+        checkMolBtn.innerText = "Tjek \u00c6kvivalente M\u00e6ngder";
+        
+        // Fase 1: Tjek afstemning
+        actionBtn.onclick = function() {
+            var allCorrect = true;
+            for (var k = 0; k < coeffInputs.length; k++) {
+                var val = parseInt(coeffInputs[k].value);
+                var exp = parseInt(coeffInputs[k].dataset.expected);
+                if (val === exp) {
+                    coeffInputs[k].classList.remove('error');
+                    coeffInputs[k].classList.add('correct');
+                    coeffInputs[k].disabled = true;
+                } else {
+                    coeffInputs[k].classList.add('error');
+                    allCorrect = false;
+                }
+            }
+
+            if (allCorrect) {
+                feedback.innerText = "Skemaet er afstemt korrekt.";
+                feedback.style.background = 'rgba(74, 222, 128, 0.2)';
+                feedback.style.color = 'var(--success)';
+                updateScore(150);
+                
+                // Gem afstemningsknap, vis mol-knap
+                actionBtn.style.display = 'none';
+                checkMolBtn.classList.remove('hidden');
+                setHelpContent('mol');
+                
+                // Tilføj instruks for Trin 2
+                instructionContainer.innerHTML = "<div class='instruction-box'><strong>Trin 2: Beregn ækvivalente mængder.</strong><br>Du har fået oplyst en stofmængde (det grønne felt). Brug forholdet fra dine afstemte koefficienter til at udfylde de tomme felter.</div>";
+                
+                // Vis mol-rækken under molekylerne
+                var bottomParts = card.querySelectorAll('.molecule-bottom');
+                bottomParts.forEach(function(el) { el.classList.remove('hidden'); });
+
+                // Start mikroniveau animation som belønning
+                startMicroSimulation(rData);
+            } else {
+                balanceAttempts++;
+                var balanceMsg = "Skemaet er ikke afstemt endnu. (Husk at skrive '1', hvis der ikke skal \u00e6ndres p\u00e5 molekylet).";
+                if (balanceAttempts >= 2) {
+                    balanceMsg += " Hint: " + rData.balanceHint;
+                }
+                feedback.innerText = balanceMsg;
+                feedback.style.background = 'rgba(239, 71, 111, 0.2)';
+                feedback.style.color = 'var(--error)';
+                state.score = Math.max(0, state.score - 10);
+                scoreDisplay.innerText = state.score;
+            }
+        };
+
+        // Fase 2: Tjek Mol
+        checkMolBtn.onclick = function() {
+            var allCorrect = true;
+            for (var m = 0; m < molInputs.length; m++) {
+                var userVal = parseDanishFloat(molInputs[m].value);
+                var expVal = parseDanishFloat(molInputs[m].dataset.answer);
+                
+                if (!isNaN(userVal) && Math.abs(userVal - expVal) < 0.05) {
+                    molInputs[m].classList.remove('error');
+                    molInputs[m].classList.add('correct');
+                    molInputs[m].disabled = true;
+                    // Formatér tilbage til pænt dansk komma
+                    molInputs[m].value = expVal.toString().replace('.', ',');
+                } else {
+                    molInputs[m].classList.add('error');
+                    allCorrect = false;
+                }
+            }
+
+            if (allCorrect) {
+                feedback.innerText = "Rigtigt. M\u00e6ngderne er nu \u00e6kvivalente.";
+                feedback.style.background = 'rgba(74, 222, 128, 0.2)';
+                feedback.style.color = 'var(--success)';
+                updateScore(200);
+                
+                checkMolBtn.innerText = "N\u00e6ste Opgave \u27F6";
+                checkMolBtn.className = 'btn';
+                checkMolBtn.onclick = function() {
+                    stopMicroSimulation();
+                    state.currentReactionIndex++;
+                    renderReaction();
+                };
+            } else {
+                molAttempts++;
+                var molMsg = "Der er fejl i beregningerne. Tjek dine decimaler og se p\u00e5 forholdet mellem koefficienterne igen.";
+                if (molAttempts >= 2) {
+                    molMsg += " Hint: " + molHintText;
+                }
+                feedback.innerText = molMsg;
+                feedback.style.background = 'rgba(239, 71, 111, 0.2)';
+                feedback.style.color = 'var(--error)';
+                state.score = Math.max(0, state.score - 15);
+                scoreDisplay.innerText = state.score;
+            }
+        };
+
+        enterAction = function() {
+            if (actionBtn.style.display !== 'none') {
+                actionBtn.click();
+            } else if (!checkMolBtn.classList.contains('hidden')) {
+                checkMolBtn.click();
+            }
+        };
+
+        card.appendChild(actionBtn);
+        card.appendChild(checkMolBtn);
+        workspace.appendChild(card);
+    }
+
+    function renderOutro() {
+        clearWorkspace();
+        var card = document.createElement('div');
+        card.className = 'card';
+        card.style.textAlign = 'center';
+        card.innerHTML = 
+            "<h2>Modulet er gennemf\u00f8rt</h2>" +
+            "<p>Du har tr\u00e6net afstemning af reaktionsskemaer og beregning af \u00e6kvivalente m\u00e6ngder.</p>" +
+            "<h1 style='font-size: 3rem; color: var(--success); margin: 20px 0;'>" + state.score + " point</h1>" +
+            "<p>Den samme fremgangsm\u00e5de fra hotdog-eksemplet g\u00e6lder for det proportionale forhold i kemiske reaktioner.</p>";
+        
+        var btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.innerText = "Genstart Tr\u00e6ning";
+        btn.onclick = function() {
+            state.score = 0;
+            state.currentPhase = 'intro';
+            state.currentHotdogIndex = 0;
+            state.currentReactionIndex = 0;
+            state.reactionQueue = [];
+            scoreDisplay.innerText = "0";
+            renderIntro();
+        };
+        enterAction = function() { btn.click(); };
+        card.appendChild(btn);
+        workspace.appendChild(card);
+    }
+
+    // --- KREATIV UDVIDELSE: Mikroskopisk Partikel Simulation ---
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function Particle(x, y, color, radius) {
+        this.x = x;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 2;
+        this.vy = (Math.random() - 0.5) * 2;
+        this.color = color;
+        this.radius = radius;
+        this.alpha = 1;
+    }
+
+    Particle.prototype.update = function() {
+        this.x += this.vx;
+        this.y += this.vy;
+        
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+    };
+
+    Particle.prototype.draw = function(context) {
+        context.globalAlpha = this.alpha;
+        context.beginPath();
+        context.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        context.fillStyle = this.color;
+        context.fill();
+        context.globalAlpha = 1.0;
+    };
+
+    function startMicroSimulation(rData) {
+        state.particles = [];
+        state.animating = true;
+        canvas.classList.add('active');
+
+        var numReactantsTotal = 0;
+        for(var i=0; i<rData.reactants.length; i++) { numReactantsTotal += rData.reactants[i].coeff; }
+        
+        var multiplier = 10; 
+        
+        for (var i = 0; i < numReactantsTotal * multiplier; i++) {
+            var color = (i % 2 === 0) ? '#4cc9f0' : '#ef476f'; 
+            var p = new Particle(
+                Math.random() * canvas.width,
+                Math.random() * canvas.height,
+                color,
+                Math.random() * 4 + 2
+            );
+            state.particles.push(p);
+        }
+
+        animateMicro();
+    }
+
+    function stopMicroSimulation() {
+        state.animating = false;
+        canvas.classList.remove('active');
+        setTimeout(function(){
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }, 1000);
+    }
+
+    function animateMicro() {
+        if (!state.animating) return;
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = 'rgba(26, 26, 46, 0.2)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        for (var i = 0; i < state.particles.length; i++) {
+            var p = state.particles[i];
+            p.update();
+            p.draw(ctx);
+            
+            for (var j = i + 1; j < state.particles.length; j++) {
+                var p2 = state.particles[j];
+                var dx = p.x - p2.x;
+                var dy = p.y - p2.y;
+                var dist = Math.sqrt(dx*dx + dy*dy);
+                
+                if (dist < 40) {
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.strokeStyle = 'rgba(255, 255, 255, ' + (1 - dist/40)*0.5 + ')';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            }
+        }
+
+        requestAnimationFrame(animateMicro);
+    }
+
+    // --- INITIALISERING ---
+    window.onload = function() {
+        renderIntro();
+    };
+
+</script>
+</body>
+</html>

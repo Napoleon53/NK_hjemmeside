@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Precision Lab 2.2: Danish Standard</title>
+    <style>
+        :root {
+            --bg-color: #0b0c15;
+            --panel-bg: #1f2029;
+            --glass-color: rgba(255, 255, 255, 0.15);
+            --liquid-color: #00d2ff;
+            --accent-green: #00ff88;
+            --accent-red: #ff4d4d;
+            --text-main: #ffffff;
+            --text-muted: #8b9bb4;
+            --border-color: #2d2f3d;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            user-select: none; /* Forhindrer markering af tekst ved uheld */
+        }
+
+        /* --- HEADER --- */
+        header {
+            height: 60px;
+            background: var(--panel-bg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+
+        .brand { font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; color: var(--liquid-color); }
+        .stats-area { display: flex; gap: 20px; font-size: 0.9rem; color: var(--text-muted); }
+        .stat-val { color: var(--text-main); font-weight: bold; margin-left: 5px; }
+
+        /* --- MAIN LAYOUT --- */
+        #workspace {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 60px);
+        }
+
+        /* VENSTRE: CANVAS */
+        #visual-container {
+            flex: 2; 
+            position: relative;
+            background: radial-gradient(circle at center, #1a1c26 0%, #0b0c15 100%);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        canvas { display: block; }
+
+        /* HØJRE: KONTROLPANEL */
+        #control-panel {
+            flex: 1; 
+            min-width: 350px;
+            background: var(--panel-bg);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+            overflow-y: auto;
+        }
+
+        .panel-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        h2 { margin: 0 0 10px 0; font-size: 1.1rem; color: var(--liquid-color); }
+        p { margin: 0 0 15px 0; line-height: 1.5; color: var(--text-muted); font-size: 0.95rem; }
+
+        /* INPUTS & BUTTONS */
+        .input-row { display: flex; gap: 10px; margin-top: 10px; }
+        
+        input[type="text"] {
+            background: #13141c;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 1.5rem; /* Større tekst */
+            width: 100%;
+            text-align: center;
+            font-family: monospace;
+            letter-spacing: 2px;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--liquid-color);
+        }
+
+        button {
+            background: var(--liquid-color);
+            color: #0b0c15;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+        button:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        button:active { transform: translateY(0); }
+        
+        /* Specifik styling til Næste knap for at undgå 'sløret' look */
+        #next-btn {
+            background: var(--accent-green);
+            color: #0b0c15;
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+        #next-btn:hover {
+            box-shadow: 0 6px 20px rgba(0, 255, 136, 0.5);
+            transform: scale(1.02);
+        }
+
+        button.hold-btn {
+            width: 100%;
+            background: #ff9f43;
+            user-select: none;
+        }
+        button.hold-btn:active { background: #ff7f00; }
+
+        /* FEEDBACK UI */
+        #feedback-area {
+            min-height: 60px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 6px;
+            margin-top: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid transparent;
+        }
+        .success { 
+            color: var(--accent-green); 
+            background: rgba(0, 255, 136, 0.1); 
+            border-color: rgba(0, 255, 136, 0.3) !important;
+            opacity: 1 !important;
+        }
+        .error { 
+            color: var(--accent-red); 
+            background: rgba(255, 77, 77, 0.1); 
+            border-color: rgba(255, 77, 77, 0.3) !important;
+            opacity: 1 !important;
+        }
+
+        /* ANALYSIS GRAPH */
+        #mini-canvas-container {
+            width: 100%;
+            height: 100px;
+            margin-top: 10px;
+            background: #13141c;
+            border-radius: 6px;
+            display: none;
+            border: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">Burette: Aflæsning</div>
+    <div class="stats-area">
+        <span>XP: <span id="xp-display" class="stat-val">0</span></span>
+        <span>Streak: <span id="streak-display" class="stat-val">0</span></span>
+    </div>
+</header>
+
+<div id="workspace">
+    <div id="visual-container">
+        <canvas id="mainCanvas"></canvas>
+    </div>
+
+    <div id="control-panel">
+        
+        <div class="panel-card">
+            <h2 id="task-title">Kalibrerer...</h2>
+            <p id="task-desc">Vent venligst.</p>
+        </div>
+
+        <div class="panel-card">
+            <h2 id="interaction-title">DIT SVAR</h2>
+            
+            <div id="input-mode-container">
+                <p style="font-size:0.8rem; color:#aaa;">Format: 0,00 mL (Husk 2 decimaler)</p>
+                <div class="input-row">
+                    <input type="text" id="user-input" placeholder="0,00" autocomplete="off">
+                </div>
+                <div class="input-row">
+                    <button id="submit-btn" style="width:100%">TJEK SVAR</button>
+                </div>
+            </div>
+
+            <div id="titration-mode-container" style="display:none;">
+                <p style="font-size:0.8rem;">Hold knappen nede for at tappe væske.</p>
+                <button id="titrate-btn" class="hold-btn">HOLD FOR AT TAPPE</button>
+                <div style="text-align:center; margin-top:15px; font-family:monospace; font-size:1.8rem; color:var(--liquid-color); font-weight:bold;">
+                    <span id="current-vol-display">0,00</span> mL
+                </div>
+                <button id="check-titration-btn" style="width:100%; margin-top:15px;">MÅL MÆNGDE</button>
+            </div>
+
+            <button id="next-btn" style="width:100%; margin-top:15px; display:none;">NÆSTE OPGAVE ➔</button>
+        </div>
+
+        <div id="feedback-area"></div>
+        
+        <div id="mini-canvas-container">
+            <canvas id="miniCanvas" width="290" height="100"></canvas>
+        </div>
+
+    </div>
+</div>
+
+<script>
+/**
+ * ------------------------------------------------------------------
+ * KONFIGURATION & STATE
+ * ------------------------------------------------------------------
+ */
+const CONFIG = {
+    colors: {
+        liquid: '#00d2ff',
+        glass: 'rgba(255,255,255,0.15)',
+        markings: '#ffffff',
+    },
+    physics: {
+        flowRate: 0.04 // Lidt langsommere for bedre kontrol
+    }
+};
+
+const State = {
+    xp: 0,
+    streak: 0,
+    currentLevel: 0, 
+    targetLevel: 0, 
+    mode: 'READING', 
+    isFlowing: false,
+    cw: 0, ch: 0
+};
+
+/**
+ * ------------------------------------------------------------------
+ * HJÆLPEFUNKTIONER (Dansk Formattering)
+ * ------------------------------------------------------------------
+ */
+const Utils = {
+    toDanish: (num) => {
+        return num.toFixed(2).replace('.', ',');
+    },
+    parseInput: (str) => {
+        return parseFloat(str.replace(',', '.'));
+    }
+};
+
+/**
+ * ------------------------------------------------------------------
+ * RENDERING ENGINE (CANVAS)
+ * ------------------------------------------------------------------
+ */
+const Renderer = {
+    canvas: document.getElementById('mainCanvas'),
+    ctx: document.getElementById('mainCanvas').getContext('2d'),
+    miniCanvas: document.getElementById('miniCanvas'),
+    miniCtx: document.getElementById('miniCanvas').getContext('2d'),
+
+    init() {
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        this.animate();
+    },
+
+    resize() {
+        const container = this.canvas.parentElement;
+        this.canvas.width = container.clientWidth;
+        this.canvas.height = container.clientHeight;
+        State.cw = this.canvas.width;
+        State.ch = this.canvas.height;
+        this.drawScene();
+    },
+
+    drawScene() {
+        const ctx = this.ctx;
+        const cw = State.cw;
+        const ch = State.ch;
+        const level = State.currentLevel;
+
+        ctx.clearRect(0, 0, cw, ch);
+
+        // Zoom: 3.5 mL fylder hele højden
+        const pixelsPerML = ch / 3.5; 
+        const getBuretteY = (vol) => (vol - level) * pixelsPerML + (ch / 2);
+
+        const tubeWidth = 220; // Endnu bredere for klarhed
+        const centerX = cw / 2;
+        const leftWallX = centerX - tubeWidth/2;
+        const rightWallX = centerX + tubeWidth/2;
+
+        // Clip region
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(leftWallX, 0, tubeWidth, ch);
+        ctx.clip();
+
+        // --- VÆSKE TEGNING ---
+        const readingY = getBuretteY(level);
+        const meniscusHeight = 25; 
+        const topEdgeY = readingY - meniscusHeight; 
+
+        // Væske form (Korrekt menisk: Bunden af buen rører tallet)
+        ctx.fillStyle = CONFIG.colors.liquid;
+        ctx.beginPath();
+        ctx.moveTo(leftWallX, topEdgeY);
+        ctx.bezierCurveTo(leftWallX, readingY, centerX - 20, readingY, centerX, readingY);
+        ctx.bezierCurveTo(centerX + 20, readingY, rightWallX, readingY, rightWallX, topEdgeY);
+        ctx.lineTo(rightWallX, ch);
+        ctx.lineTo(leftWallX, ch);
+        ctx.closePath();
+        ctx.fill();
+
+        // Gradient overlay
+        const grad = ctx.createLinearGradient(leftWallX, 0, rightWallX, 0);
+        grad.addColorStop(0, 'rgba(0,0,0,0.4)');
+        grad.addColorStop(0.3, 'rgba(0,0,0,0)');
+        grad.addColorStop(0.7, 'rgba(0,0,0,0)');
+        grad.addColorStop(1, 'rgba(0,0,0,0.4)');
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Menisk kant (Highlight)
+        ctx.strokeStyle = "rgba(255,255,255,0.5)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(leftWallX, topEdgeY);
+        ctx.bezierCurveTo(leftWallX, readingY, centerX - 20, readingY, centerX, readingY);
+        ctx.bezierCurveTo(centerX + 20, readingY, rightWallX, readingY, rightWallX, topEdgeY);
+        ctx.stroke();
+
+        ctx.restore(); 
+
+        // --- GLAS & SKALA ---
+        ctx.strokeStyle = CONFIG.colors.glass;
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(leftWallX, 0); ctx.lineTo(leftWallX, ch);
+        ctx.moveTo(rightWallX, 0); ctx.lineTo(rightWallX, ch);
+        ctx.stroke();
+
+        // Markeringer
+        ctx.fillStyle = CONFIG.colors.markings;
+        ctx.textAlign = "right";
+        ctx.font = "bold 24px monospace";
+        
+        const visibleMinVol = level - (ch/2)/pixelsPerML;
+        const visibleMaxVol = level + (ch/2)/pixelsPerML;
+        
+        const startTick = Math.floor(visibleMinVol * 10) / 10;
+        const endTick = Math.ceil(visibleMaxVol * 10) / 10;
+
+        for (let v = startTick; v <= endTick; v += 0.1) {
+            let vol = Math.round(v * 10) / 10;
+            let y = getBuretteY(vol);
+            
+            // Heltal (mL)
+            if (Math.abs(vol % 1) < 0.01) {
+                // Lang streg
+                ctx.fillRect(leftWallX, y - 1, 50, 3);
+                ctx.fillRect(rightWallX - 50, y - 1, 50, 3);
+                // Tal (kun hvert mL)
+                ctx.fillText(vol.toFixed(0), leftWallX - 15, y + 8);
+            } 
+            // Halv (0.5 mL)
+            else if (Math.abs(vol % 0.5) < 0.01) {
+                ctx.fillRect(leftWallX, y - 1, 35, 2);
+                ctx.fillRect(rightWallX - 35, y - 1, 35, 2);
+            } 
+            // Tiendedele (0.1 mL)
+            else {
+                ctx.fillRect(leftWallX, y, 20, 1);
+                ctx.fillRect(rightWallX - 20, y, 20, 1);
+            }
+        }
+        
+        // Glare highlight
+        ctx.fillStyle = "rgba(255,255,255,0.05)";
+        ctx.fillRect(leftWallX + 30, 0, 20, ch);
+        ctx.fillRect(rightWallX - 50, 0, 15, ch);
+    },
+
+    drawAnalysis(userVal, exactVal) {
+        const ctx = this.miniCtx;
+        const w = 290, h = 100;
+        ctx.clearRect(0, 0, w, h);
+        
+        ctx.fillStyle = "#13141c";
+        ctx.fillRect(0,0,w,h);
+        
+        ctx.strokeStyle = "#555";
+        ctx.beginPath(); ctx.moveTo(10, h/2); ctx.lineTo(w-10, h/2); ctx.stroke();
+        
+        let diff = userVal - exactVal;
+        let range = 0.2; 
+        
+        const mapX = (val) => {
+            let offset = val - exactVal;
+            return (w/2) + (offset / range) * (w/2); 
+        };
+
+        let xStart = mapX(exactVal - 0.05);
+        let xEnd = mapX(exactVal + 0.05);
+        ctx.fillStyle = "rgba(0, 255, 136, 0.2)";
+        ctx.fillRect(xStart, 0, xEnd-xStart, h);
+        
+        ctx.strokeStyle = "#00ff88";
+        ctx.beginPath(); ctx.moveTo(w/2, 0); ctx.lineTo(w/2, h); ctx.stroke();
+
+        let uX = mapX(userVal);
+        if(uX < 10) uX = 10; if(uX > w-10) uX = w-10;
+
+        ctx.fillStyle = "#fff";
+        ctx.beginPath(); ctx.arc(uX, h/2, 6, 0, Math.PI*2); ctx.fill();
+        
+        ctx.fillStyle = "#fff";
+        ctx.textAlign = "center";
+        ctx.font = "12px monospace";
+        ctx.fillText(`Afvigelse: ${(diff).toFixed(2).replace('.', ',')}`, w/2, h - 10);
+    },
+
+    animate() {
+        if (State.mode === 'TITRATION' && State.isFlowing) {
+            State.currentLevel += CONFIG.physics.flowRate; 
+            if (State.currentLevel >= 50) State.currentLevel = 50;
+            document.getElementById('current-vol-display').innerText = Utils.toDanish(State.currentLevel);
+        }
+        this.drawScene();
+        requestAnimationFrame(() => this.animate());
+    }
+};
+
+/**
+ * ------------------------------------------------------------------
+ * GAME LOGIC
+ * ------------------------------------------------------------------
+ */
+const Game = {
+    init() {
+        Renderer.init();
+        this.setupEvents();
+        this.startReadingTask();
+    },
+
+    setupEvents() {
+        document.getElementById('submit-btn').addEventListener('click', () => this.checkReading());
+        
+        // Enter key shortcut
+        document.getElementById('user-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.checkReading();
+        });
+
+        const titrateBtn = document.getElementById('titrate-btn');
+        const startFlow = (e) => { e.preventDefault(); State.isFlowing = true; };
+        const stopFlow = (e) => { e.preventDefault(); State.isFlowing = false; };
+
+        titrateBtn.addEventListener('mousedown', startFlow);
+        titrateBtn.addEventListener('mouseup', stopFlow);
+        titrateBtn.addEventListener('mouseleave', stopFlow);
+        titrateBtn.addEventListener('touchstart', startFlow);
+        titrateBtn.addEventListener('touchend', stopFlow);
+
+        document.getElementById('check-titration-btn').addEventListener('click', () => this.checkTitration());
+        document.getElementById('next-btn').addEventListener('click', () => this.nextTask());
+    },
+
+    startReadingTask() {
+        State.mode = 'READING';
+        this.resetUI();
+        // Generer tilfældigt tal
+        State.currentLevel = parseFloat((Math.random() * 30 + 10).toFixed(2));
+        
+        document.getElementById('task-title').innerText = "OPGAVE: AFLÆSNING";
+        document.getElementById('task-desc').innerText = "Aflæs buretten ved meniskens bund. Angiv svaret med 2 decimaler (fx 12,45).";
+        document.getElementById('interaction-title').innerText = "AFLÆS VÆRDI";
+        
+        document.getElementById('input-mode-container').style.display = 'block';
+        document.getElementById('titration-mode-container').style.display = 'none';
+        
+        Renderer.drawScene();
+    },
+
+    startTitrationTask() {
+        State.mode = 'TITRATION';
+        this.resetUI();
+        State.currentLevel = parseFloat((Math.random() * 2).toFixed(2));
+        document.getElementById('current-vol-display').innerText = Utils.toDanish(State.currentLevel);
+
+        let targetAdd = Math.random() * 15 + 5;
+        let target = State.currentLevel + targetAdd;
+        State.targetLevel = parseFloat(target.toFixed(2));
+
+        document.getElementById('task-title').innerText = "OPGAVE: AFMÅLING";
+        document.getElementById('task-desc').innerHTML = `Tilsæt væske indtil buretten viser præcis: <br><strong style="color:#00ff88; font-size:1.4rem">${Utils.toDanish(State.targetLevel)} mL</strong>`;
+        document.getElementById('interaction-title').innerText = "KONTROL";
+
+        document.getElementById('input-mode-container').style.display = 'none';
+        document.getElementById('titration-mode-container').style.display = 'block';
+        
+        Renderer.drawScene();
+    },
+
+    checkReading() {
+        const rawInput = document.getElementById('user-input').value.trim();
+        
+        // --- 1. VALIDERING AF FORMAT (Bug fix) ---
+        // Tillad både 12.50 og 12,50, men tjek formatet stringent.
+        const normalizedForCheck = rawInput.replace(',', '.');
+        
+        if (normalizedForCheck === "") return;
+
+        // Tjek om det er et tal
+        if (isNaN(normalizedForCheck)) {
+            this.showFeedback("Det er ikke et gyldigt tal.", false);
+            return;
+        }
+
+        // Tjek decimaler (Skal være præcis 2)
+        if (!normalizedForCheck.includes('.') || normalizedForCheck.split('.')[1].length !== 2) {
+            this.showFeedback("Fejl i format: Du SKAL angive 2 decimaler (fx " + normalizedForCheck.split('.')[0] + ",50).", false);
+            return;
+        }
+
+        // --- 2. VALIDERING AF VÆRDI ---
+        const userVal = parseFloat(normalizedForCheck);
+        const exact = State.currentLevel;
+        const diff = Math.abs(userVal - exact);
+        
+        if (diff <= 0.05) {
+            this.showFeedback(`Perfekt! Korrekt svar: ${Utils.toDanish(exact)}`, true);
+            this.endTurn(true, userVal, exact);
+        } else {
+            this.showFeedback("For upræcist. Prøv igen. Husk at læse bunden af buen.", false);
+            document.getElementById('user-input').value = "";
+            document.getElementById('user-input').focus();
+        }
+    },
+
+    checkTitration() {
+        const current = State.currentLevel;
+        const target = State.targetLevel;
+        const diff = Math.abs(current - target);
+
+        if (diff <= 0.1) {
+            this.showFeedback(`Godt klaret! Du landede på ${Utils.toDanish(current)} mL.`, true);
+            this.endTurn(true, current, target);
+        } else {
+            this.showFeedback(`Desværre. Du er på ${Utils.toDanish(current)} mL (Mål: ${Utils.toDanish(target)}).`, false);
+            this.endTurn(false, current, target);
+        }
+    },
+
+    showFeedback(msg, isSuccess) {
+        const el = document.getElementById('feedback-area');
+        el.innerText = msg;
+        el.className = isSuccess ? 'success' : 'error';
+        el.style.opacity = 1;
+    },
+
+    resetUI() {
+        document.getElementById('user-input').value = "";
+        document.getElementById('feedback-area').style.opacity = 0;
+        document.getElementById('submit-btn').style.display = 'inline-block';
+        document.getElementById('check-titration-btn').style.display = 'inline-block';
+        document.getElementById('next-btn').style.display = 'none';
+        document.getElementById('user-input').disabled = false;
+        document.getElementById('mini-canvas-container').style.display = 'none';
+        document.getElementById('titrate-btn').disabled = false;
+        
+        // Reset button colors
+        document.getElementById('check-titration-btn').disabled = false;
+    },
+
+    endTurn(success, val1, val2) {
+        if (success) {
+            State.xp += 100 + (State.streak * 20);
+            State.streak++;
+            document.getElementById('mini-canvas-container').style.display = 'block';
+            Renderer.drawAnalysis(val1, val2);
+        } else {
+            State.streak = 0;
+        }
+
+        document.getElementById('xp-display').innerText = State.xp;
+        document.getElementById('streak-display').innerText = State.streak;
+
+        document.getElementById('submit-btn').style.display = 'none';
+        document.getElementById('check-titration-btn').style.display = 'none';
+        document.getElementById('user-input').disabled = true;
+        document.getElementById('titrate-btn').disabled = true;
+        
+        // Vis Næste knap tydeligt
+        const nextBtn = document.getElementById('next-btn');
+        nextBtn.style.display = 'inline-block';
+        nextBtn.focus();
+    },
+
+    nextTask() {
+        if (Math.random() > 0.5) {
+            this.startTitrationTask();
+        } else {
+            this.startReadingTask();
+        }
+    }
+};
+
+window.onload = () => Game.init();
+</script>
+</body>
+</html>

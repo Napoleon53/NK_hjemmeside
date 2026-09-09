@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kemi B: Ekstraktion v10.0</title>
+    <style>
+        :root {
+            /* Farvepalet */
+            --bg-body: #121212;
+            --bg-panel: #1e1e1e;
+            --border-panel: #333;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            
+            /* Væsker */
+            --liquid-solvent: rgba(33, 150, 243, 0.85); /* Rensebenzin */
+            --liquid-mix: rgba(255, 235, 59, 0.4);      /* Blanding */
+            --liquid-pure: #FFEB3B;                      /* Rent fedt */
+            
+            /* UI */
+            --accent: #4caf50;
+            --accent-hover: #43a047;
+            --btn-replay: #ff9800;
+            --text-main: #f5f5f5;
+            --text-muted: #aaaaaa;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background: #000;
+            padding: 15px 0;
+            text-align: center;
+            border-bottom: 1px solid #333;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            z-index: 10;
+        }
+        h1 { margin: 0; font-weight: 600; font-size: 1.3rem; letter-spacing: 0.5px; }
+
+        /* --- LAYOUT --- */
+        #workspace {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 25px;
+            width: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
+            box-sizing: border-box;
+        }
+
+        .panel {
+            flex: 1;
+            background: var(--bg-panel);
+            border-radius: 16px;
+            border: 1px solid var(--border-panel);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .panel-head {
+            background: rgba(255,255,255,0.03);
+            padding: 15px 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-panel);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* --- MAKRO VISUALISERING --- */
+        #macro-stage {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 60px;
+            background: radial-gradient(circle at bottom, #2a2a2a 0%, #1e1e1e 70%);
+        }
+
+        /* Glasudstyr generelt */
+        .glass-eq {
+            border: 3px solid var(--glass-border);
+            background: var(--glass-bg);
+            position: relative;
+            backdrop-filter: blur(2px);
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.05);
+        }
+
+        /* Scene 1: Bægerglas */
+        .scene-beaker {
+            width: 150px; height: 200px;
+            border-top: none;
+            border-radius: 0 0 20px 20px;
+            position: absolute; bottom: 50px;
+            transition: opacity 0.5s;
+        }
+        .liquid {
+            position: absolute; bottom: 0; left:0; right:0;
+            height: 0%;
+            background: var(--liquid-solvent);
+            transition: height 2.5s ease-in-out, background 2s; /* Matchet med filtrering */
+            z-index: 1;
+        }
+        .solids-container {
+            position: absolute; bottom: 10px; width: 100%; height: 60px;
+            z-index: 2; pointer-events: none;
+        }
+        @keyframes dropIn { from { transform: translateY(-300px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .drop-anim { animation: dropIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* Scene 2: Filtrering */
+        .scene-filter {
+            position: absolute; bottom: 50px;
+            display: flex; flex-direction: column; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.5s;
+        }
+        .funnel {
+            width: 0; height: 0;
+            border-left: 65px solid transparent; border-right: 65px solid transparent;
+            border-top: 85px solid var(--glass-border);
+            position: relative; margin-bottom: -4px; z-index: 5;
+        }
+        .funnel:after { /* Filterpapir */
+            content: ''; position: absolute; top: -85px; left: -60px;
+            border-left: 60px solid transparent; border-right: 60px solid transparent;
+            border-top: 80px solid rgba(255,255,255,0.9); z-index: -1;
+        }
+        .funnel-stem { width: 12px; height: 50px; background: rgba(255,255,255,0.3); margin-bottom: 0; z-index: 4;}
+        
+        .receiver {
+            width: 130px; height: 110px;
+            border-top: none; border-radius: 0 0 20px 20px;
+            overflow: hidden; z-index: 1;
+        }
+        .residue { position: absolute; top: -75px; left: -25px; font-size: 24px; color: #555; opacity: 0; z-index: 6;}
+
+        /* Scene 3: Fordampning */
+        .scene-evap {
+            position: absolute; bottom: 50px;
+            display: flex; flex-direction: column; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.5s;
+        }
+        .hotplate {
+            width: 150px; height: 20px; background: #333; margin-top: 5px; border-radius: 6px;
+            position: absolute; bottom: -25px;
+            box-shadow: 0 0 0px #ff5722; opacity: 0.5; transition: box-shadow 1s, opacity 1s;
+        }
+        .fume { position: absolute; font-size: 24px; animation: rise 2.5s infinite; opacity: 0; color: #81D4FA; top:-50px; }
+        @keyframes rise { 0% { transform: translateY(20px) scale(0.8); opacity: 0; } 20% { opacity: 0.8; } 100% { transform: translateY(-150px) scale(1.2); opacity: 0; } }
+
+        /* --- MIKRO CANVAS --- */
+        #micro-stage {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+            position: relative;
+        }
+        canvas {
+            border: 4px solid #444;
+            border-radius: 50%;
+            background: radial-gradient(circle, #222 0%, #000 90%);
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+        
+        /* Legende */
+        .legend { 
+            position: absolute; bottom: 15px; right: 15px; 
+            background: rgba(10, 10, 10, 0.85); 
+            padding: 15px; border-radius: 12px; 
+            font-size: 14px; border: 1px solid #333;
+            backdrop-filter: blur(4px);
+        }
+        .legend-item { display: flex; align-items: center; margin-top: 8px; color: #ddd; }
+        .color-box { width: 14px; height: 14px; display: inline-block; margin-right: 10px; border-radius: 3px; }
+
+        /* --- CONTROLS --- */
+        #controls {
+            background: #1a1a1a;
+            padding: 20px 30px;
+            border-top: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            position: relative;
+        }
+        #text-box {
+            flex: 1;
+            font-size: 1.15rem;
+            line-height: 1.5;
+            color: #fff;
+            font-weight: 400;
+        }
+        
+        .btn-group { display: flex; gap: 10px; }
+
+        button {
+            padding: 14px 28px;
+            border: none;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            font-family: inherit;
+        }
+        button:active { transform: translateY(1px); box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        
+        #btn-next { background: var(--accent); }
+        #btn-next:hover { background: var(--accent-hover); }
+        
+        #btn-replay {
+            background: var(--bg-panel);
+            color: var(--btn-replay);
+            border: 1px solid var(--btn-replay);
+            display: none;
+        }
+        #btn-replay:hover { background: rgba(255, 152, 0, 0.1); }
+
+        .progress-container { position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: #222; }
+        .progress-bar { height: 100%; background: var(--accent); width: 0%; transition: width 0.4s ease; }
+
+        button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* --- SPØRGSMÅLS-MODAL --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+            display: none; align-items: center; justify-content: center; z-index: 100;
+            backdrop-filter: blur(3px);
+        }
+        .modal-box {
+            background: var(--bg-panel); border: 1px solid var(--border-panel);
+            border-radius: 16px; padding: 30px 35px; max-width: 540px; width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .modal-question { font-size: 1.15rem; font-weight: 600; margin-bottom: 20px; line-height: 1.4; }
+        .modal-options { display: flex; flex-direction: column; gap: 10px; }
+        .modal-option-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid #444; color: #fff;
+            padding: 14px 18px; border-radius: 10px; text-align: left; cursor: pointer;
+            font-size: 1rem; transition: all 0.15s; font-family: inherit;
+        }
+        .modal-option-btn:hover:not(:disabled) { background: rgba(255,255,255,0.1); border-color: #666; }
+        .modal-option-btn.correct { background: rgba(76,175,80,0.25); border-color: var(--accent); }
+        .modal-option-btn.wrong { background: rgba(244,67,54,0.2); border-color: #f44336; }
+        .modal-feedback { margin-top: 16px; font-size: 0.95rem; line-height: 1.5; color: #ddd; display: none; }
+        .modal-continue-btn {
+            margin-top: 20px; background: var(--accent); border: none; padding: 12px 24px;
+            border-radius: 8px; color: #fff; font-weight: 600; cursor: pointer; font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header><h1>Ekstraktion af Fedt: Separationsteknikker</h1></header>
+
+    <div id="workspace">
+        <div class="panel">
+            <div class="panel-head">
+                <span>MAKRO (Laboratoriet)</span>
+                <span style="opacity:0.5">👁️ Synligt</span>
+            </div>
+            <div id="macro-stage">
+                
+                <div class="glass-eq scene-beaker" id="scene1">
+                    <div class="liquid" id="liq1"></div>
+                    <div class="solids-container" id="solids1"></div>
+                </div>
+
+                <div class="scene-filter" id="scene2">
+                    <div class="funnel">
+                        <div class="residue" id="macro-residue">⬛</div>
+                    </div>
+                    <div class="funnel-stem"></div>
+                    <div class="glass-eq receiver">
+                        <div class="liquid" id="liq2" style="background: var(--liquid-mix);"></div>
+                    </div>
+                </div>
+
+                <div class="scene-evap" id="scene3">
+                    <div class="glass-eq receiver">
+                        <div class="liquid" id="liq3" style="background: var(--liquid-mix); height: 60%;"></div>
+                        <div id="fumes-container" style="position:absolute; width:100%; top:0;"></div>
+                    </div>
+                    <div class="hotplate" id="hotplate"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-head">
+                <span>MIKRO (Molekyler)</span>
+                <span style="opacity:0.5">🔬 Zoom x10.000</span>
+            </div>
+            <div id="micro-stage">
+                <canvas id="sim"></canvas>
+                <div class="legend">
+                    <div class="legend-item"><span class="color-box" style="background:#FFEB3B;"></span>Fedt</div>
+                    <div class="legend-item"><span class="color-box" style="background:#9E9E9E;"></span>Stivelse</div>
+                    <div class="legend-item" style="margin-top:12px;">
+                        <span class="color-box" style="background:#2196F3;"></span>
+                        <span style="font-weight:700; color:#fff; font-size:1.1em;">Rensebenzin</span>
+                    </div>
+                    <div class="legend-item" id="legend-water" style="display:none;">
+                        <span class="color-box" style="background:#0288D1;"></span>Vand (forkert valg)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="controls">
+        <div class="progress-container"><div class="progress-bar" id="bar"></div></div>
+        <div id="text-box">Velkommen. Klik 'Start' for at lægge chipsene i bægerglasset.</div>
+        <div class="btn-group">
+            <button id="btn-replay" onclick="replayStep()">Gentag Trin ↺</button>
+            <button id="btn-next" onclick="next()">Start</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="question-modal">
+        <div class="modal-box">
+            <div class="modal-question" id="modal-question-text"></div>
+            <div class="modal-options" id="modal-options"></div>
+            <div class="modal-feedback" id="modal-feedback"></div>
+            <button class="modal-continue-btn" id="modal-continue" style="display:none;"></button>
+        </div>
+    </div>
+
+<script>
+// --- CONFIG & STATE ---
+const cvs = document.getElementById('sim');
+const ctx = cvs.getContext('2d');
+const particles = [];
+let step = -1;
+let centerX, centerY, radius;
+let demoMode = null;    // 'water-fail' mens vi viser det forkerte opløsningsmiddel
+
+// Params
+const FAT = { color: '#FFEB3B' };
+const STARCH = { color: '#9E9E9E' };
+const SOLV = { color: '#2196F3' };
+
+// --- RESIZE ---
+function resize() {
+    const p = cvs.parentElement;
+    const s = Math.min(p.clientWidth, p.clientHeight) - 30;
+    cvs.style.width = s+'px'; cvs.style.height = s+'px';
+    cvs.width = s * window.devicePixelRatio; cvs.height = s * window.devicePixelRatio;
+    ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    centerX = s/2; centerY = s/2; radius = s/2;
+    if(step <= 1 && step >= 0) initStructure(step);
+}
+window.onresize = resize;
+
+// --- PARTICLE LOGIC ---
+class P {
+    constructor(type, x, y, fixed) {
+        this.type = type; this.x = x; this.y = y;
+        this.vx = 0; this.vy = 0;
+        this.fixed = fixed; this.active = true;
+    }
+    draw() {
+        if(!this.active) return;
+        ctx.beginPath();
+        if(this.type === 'fat') {
+            ctx.rect(this.x-6, this.y-6, 12, 12);
+            ctx.fillStyle = FAT.color; ctx.fill(); 
+            ctx.strokeStyle = '#cba000'; ctx.lineWidth = 1; ctx.stroke();
+        } else if(this.type === 'starch') {
+            ctx.rect(this.x-9, this.y-9, 18, 18);
+            ctx.fillStyle = STARCH.color; ctx.fill(); 
+            ctx.strokeStyle = '#555'; ctx.lineWidth = 1; ctx.stroke();
+        } else if(this.type === 'water') {
+            // Vand: bøjet molekyle (O i midten, 2x H)
+            ctx.arc(this.x, this.y, 6, 0, Math.PI*2);
+            ctx.fillStyle = '#0288D1'; ctx.fill();
+            ctx.beginPath(); ctx.arc(this.x-6, this.y+5, 3.5, 0, Math.PI*2);
+            ctx.fillStyle = '#B3E5FC'; ctx.fill();
+            ctx.beginPath(); ctx.arc(this.x+6, this.y+5, 3.5, 0, Math.PI*2);
+            ctx.fillStyle = '#B3E5FC'; ctx.fill();
+        } else {
+            ctx.moveTo(this.x, this.y-6); ctx.lineTo(this.x+6, this.y+6); ctx.lineTo(this.x-6, this.y+6);
+            ctx.fillStyle = SOLV.color; ctx.fill();
+        }
+    }
+    update() {
+        if(!this.active) return;
+
+        // DEMO: forkert valg (vand) - fedt klumper, vand blander sig ikke
+        if(demoMode === 'water-fail') {
+            if(this.type === 'water') {
+                this.x += (Math.random()-0.5)*5;
+                this.y += (Math.random()-0.5)*5;
+                particles.forEach(p2 => {
+                    if(p2.type === 'fat') {
+                        const d = Math.hypot(p2.x-this.x, p2.y-this.y);
+                        if(d < 20) { this.x -= (p2.x-this.x)*0.05; this.y -= (p2.y-this.y)*0.05; }
+                    }
+                });
+            }
+            if(this.type === 'fat') {
+                particles.forEach(p2 => {
+                    if(p2.type === 'fat' && p2 !== this) {
+                        const d = Math.hypot(p2.x-this.x, p2.y-this.y);
+                        if(d > 15) { this.x += (p2.x-this.x)*0.01; this.y += (p2.y-this.y)*0.01; }
+                    }
+                });
+            }
+            const d0 = Math.hypot(this.x-centerX, this.y-centerY);
+            if(d0 > radius-12 && !this.fixed) {
+                const a = Math.atan2(this.y-centerY, this.x-centerX);
+                this.x = centerX + Math.cos(a)*(radius-14); this.y = centerY + Math.sin(a)*(radius-14);
+            }
+            return;
+        }
+
+        // TRIN 2: EKSTRAKTION (Rystelse)
+        if(step === 2) {
+            if(this.type === 'solvent') {
+                // ØGET HASTIGHED (x 1.5 ift før)
+                this.x += (Math.random()-0.5)*6; 
+                this.y += (Math.random()-0.5)*6;
+                // Træk i fedt
+                particles.forEach(p2 => {
+                    if(p2.type === 'fat') {
+                        const d = Math.hypot(p2.x-this.x, p2.y-this.y);
+                        if(d < 45) { this.x += (p2.x-this.x)*0.08; this.y += (p2.y-this.y)*0.08; }
+                    }
+                });
+            }
+            if(this.type === 'fat') { 
+                particles.forEach(p2 => {
+                    if(p2.type === 'solvent') {
+                         const d = Math.hypot(p2.x-this.x, p2.y-this.y);
+                         if(d < 35) { this.x += (p2.x-this.x)*0.03; this.y += (p2.y-this.y)*0.03; }
+                    }
+                });
+            }
+            // Cirkulær begrænsning
+            const d = Math.hypot(this.x-centerX, this.y-centerY);
+            if(d > radius-12 && !this.fixed) {
+                const a = Math.atan2(this.y-centerY, this.x-centerX);
+                this.x = centerX + Math.cos(a)*(radius-14); this.y = centerY + Math.sin(a)*(radius-14);
+            }
+        }
+
+        // TRIN 3: FILTRERING (Meget langsomt fald)
+        if(step === 3) {
+            // SÆNKET HASTIGHED (Meget langsommere)
+            this.vy += 0.04; 
+            // Max hastighed cap
+            if(this.vy > 1.5) this.vy = 1.5;
+            
+            this.y += this.vy; 
+            this.x += (Math.random()-0.5); 
+            
+            // Barriere (Stivelse stopper)
+            if(this.y > centerY) {
+                if(this.type === 'starch') { 
+                    this.y = centerY - 5 - Math.random()*8; 
+                    this.vy = 0; 
+                } 
+            }
+            // Bund
+            if(this.y > centerY*2 - 25) { 
+                this.y = centerY*2 - 25; this.vy = 0; 
+            }
+        }
+
+        // TRIN 4: FORDAMPNING
+        if(step === 4) {
+             if(this.type === 'solvent') {
+                 this.vy -= 0.15; this.y += this.vy; this.x += (Math.random()-0.5)*2; 
+                 if(this.y < 0) this.active = false;
+             }
+             if(this.type === 'fat') {
+                 if(this.y < centerY*2 - 25) this.y += 1.5; 
+             }
+        }
+    }
+}
+
+// --- HELPERS ---
+function initStructure(s) {
+    particles.length = 0;
+    let fc=0, sc=0;
+    
+    // TRIN 1: HELE CHIPS - MEGET TÆT PAKKET
+    // Vi bruger en mindre 'gap' for at samle dem i en lille klump
+    if(s===0) {
+        const gap = 14; // Meget tæt
+        const startX = centerX - 28;
+        const startY = centerY - 28;
+        for(let r=0; r<3; r++) {
+            for(let c=0; c<4; c++) {
+                let x = startX + c*gap; 
+                let y = startY + r*gap;
+                if((r+c)%2===0 && fc<5) { particles.push(new P('fat', x, y, true)); fc++; }
+                else if(sc<6) { particles.push(new P('starch', x, y, true)); sc++; }
+            }
+        }
+    }
+    
+    // TRIN 2: KNUST - SPREDT MEGET UD
+    if(s===1) {
+        const gap = 40; // Normal spredning som base
+        const startX = centerX - 60;
+        const startY = centerY - 60;
+        
+        // Opret først
+        for(let r=0; r<3; r++) {
+            for(let c=0; c<4; c++) {
+                let x = startX + c*gap; let y = startY + r*gap;
+                if((r+c)%2===0 && fc<5) { particles.push(new P('fat', x, y, false)); fc++; }
+                else if(sc<6) { particles.push(new P('starch', x, y, true)); sc++; }
+            }
+        }
+        
+        // Spred dem voldsomt ud
+        particles.forEach(p => { 
+            // Eksploder ud fra midten
+            p.x += (Math.random()-0.5)*180; 
+            p.y += (Math.random()-0.5)*180; 
+            
+            // Hold inden for radius
+            const d = Math.hypot(p.x-centerX, p.y-centerY);
+            if(d > radius-20) {
+                 const a = Math.atan2(p.y-centerY, p.x-centerX);
+                 p.x = centerX + Math.cos(a)*(radius-30);
+                 p.y = centerY + Math.sin(a)*(radius-30);
+            }
+        });
+    }
+}
+
+function addSolvent() {
+    // ØGET MÆNGDE: 60 stks (var 30)
+    for(let i=0; i<60; i++) {
+        let a = Math.random()*6.28; let r = Math.random()*(radius-15);
+        particles.push(new P('solvent', centerX + Math.cos(a)*r, centerY + Math.sin(a)*r, false));
+    }
+}
+
+function addWater() {
+    for(let i=0; i<60; i++) {
+        let a = Math.random()*6.28; let r = Math.random()*(radius-15);
+        particles.push(new P('water', centerX + Math.cos(a)*r, centerY + Math.sin(a)*r, false));
+    }
+}
+
+function runWaterFailDemo() {
+    demoMode = 'water-fail';
+    document.getElementById('legend-water').style.display = 'flex';
+
+    const l1 = document.getElementById('liq1');
+    l1.style.transition = 'none'; l1.style.height = "0%"; l1.style.background = '#29B6F6';
+    setTimeout(() => {
+        l1.style.transition = 'height 2s ease-in-out';
+        l1.style.height = "70%";
+        // To faser: fedtet flyder ovenpå vandet i stedet for at opløses
+        l1.style.background = 'linear-gradient(to bottom, #FFEB3B 22%, #29B6F6 22%)';
+    }, 50);
+
+    if(particles.length < 10) initStructure(1);
+    for(let i=particles.length-1; i>=0; i--) {
+        if(particles[i].type === 'solvent' || particles[i].type === 'water') particles.splice(i,1);
+    }
+    addWater();
+}
+
+function resetToTop() {
+    particles.forEach(p => {
+        // Start højere oppe for at matche den langsomme animation
+        p.y = centerY - 150 - Math.random()*80; 
+        p.x = centerX + (Math.random()-0.5)*80; 
+        p.vy = 0;
+        p.active = true; 
+    });
+}
+
+function renderPotatoes(state) {
+    const container = document.getElementById('solids1');
+    container.innerHTML = '';
+    
+    if (state === 'whole') {
+        const p = document.createElement('div');
+        p.innerText = '🥔';
+        p.style.fontSize = '50px';
+        p.style.position = 'absolute';
+        p.style.left = '50px';
+        p.style.bottom = '10px';
+        p.className = 'drop-anim'; 
+        container.appendChild(p);
+    } else if (state === 'crushed') {
+        for(let i=0; i<5; i++) {
+            const p = document.createElement('div');
+            p.innerText = '🥔';
+            p.style.fontSize = '20px'; 
+            p.style.position = 'absolute';
+            const leftPos = 20 + Math.random() * 80;
+            const bottomPos = Math.random() * 20;
+            const rot = Math.random() * 360;
+            p.style.left = leftPos + 'px'; p.style.bottom = bottomPos + 'px';
+            p.style.transform = `rotate(${rot}deg)`;
+            container.appendChild(p);
+        }
+    }
+}
+
+// --- MAIN LOOP (FIXED) ---
+function loop() {
+    // 1. Gem den nuværende tegne-tilstand (med zoom/skalering)
+    ctx.save();
+    
+    // 2. Nulstil al skalering midlertidigt, så vi arbejder med RÅ pixels
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    
+    // 3. Slet HELE lærredet baseret på de faktiske fysiske pixels
+    ctx.clearRect(0, 0, cvs.width, cvs.height);
+    
+    // 4. Gendan skaleringen, så molekylerne tegnes i den rigtige størrelse
+    ctx.restore();
+    
+    // Tegn filterstreg (hvis vi er i trin 3)
+    if(step === 3) {
+        ctx.beginPath(); ctx.moveTo(0, centerY); ctx.lineTo(cvs.width, centerY); // Bemærk: cvs.width er fint her pga skalering
+        ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.setLineDash([5,5]); ctx.stroke(); ctx.setLineDash([]);
+    }
+
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(loop);
+}
+
+// --- SPØRGSMÅLS-MOTOR ---
+function askQuestion(config, onDone) {
+    const modal = document.getElementById('question-modal');
+    const qText = document.getElementById('modal-question-text');
+    const optContainer = document.getElementById('modal-options');
+    const feedbackEl = document.getElementById('modal-feedback');
+    const continueBtn = document.getElementById('modal-continue');
+
+    qText.textContent = config.question;
+    optContainer.innerHTML = '';
+    feedbackEl.style.display = 'none';
+    feedbackEl.textContent = '';
+    continueBtn.style.display = 'none';
+
+    const buttons = [];
+    // Bland rækkefølgen af svarmuligheder, så det rigtige svar ikke altid står på samme plads.
+    // Da hver mulighed selv bærer sin "correct"-boolean, holder et almindeligt array-shuffle
+    // parringen intakt uden at skulle regne noget indeks om.
+    const shuffledOptions = [...config.options];
+    for (let i = shuffledOptions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledOptions[i], shuffledOptions[j]] = [shuffledOptions[j], shuffledOptions[i]];
+    }
+    shuffledOptions.forEach(opt => {
+        const b = document.createElement('button');
+        b.className = 'modal-option-btn';
+        b.textContent = opt.label;
+        b.onclick = () => {
+            [...optContainer.children].forEach(c => c.disabled = true);
+            b.classList.add(opt.correct ? 'correct' : 'wrong');
+            if(!opt.correct && !config.allowRetry) {
+                const correctBtn = buttons.find(bb => bb.opt.correct);
+                if(correctBtn) correctBtn.el.classList.add('correct');
+            }
+            feedbackEl.textContent = opt.feedback || '';
+            feedbackEl.style.display = 'block';
+            if(opt.onSelect) opt.onSelect();
+
+            if(opt.correct || !config.allowRetry) {
+                continueBtn.textContent = 'Fortsæt →';
+                continueBtn.style.display = 'inline-block';
+                continueBtn.onclick = () => { hideModal(); if(onDone) onDone(); };
+            } else {
+                continueBtn.textContent = 'Prøv igen ↺';
+                continueBtn.style.display = 'inline-block';
+                continueBtn.onclick = () => { askQuestion(config, onDone); };
+            }
+        };
+        buttons.push({ el: b, opt });
+        optContainer.appendChild(b);
+    });
+
+    modal.style.display = 'flex';
+}
+
+function hideModal() {
+    document.getElementById('question-modal').style.display = 'none';
+}
+
+// --- AFSLUTTENDE QUIZ ---
+const quizQuestions = [
+    {
+        question: "Opsamlingsquiz (1/3): Hvorfor opløser rensebenzin fedtet, mens vand ikke gør?",
+        allowRetry: false,
+        options: [
+            { label: "Fordi rensebenzin og fedt begge er upolære – 'lige opløser lige'", correct: true, feedback: "✅ Præcis! Upolære stoffer blandes med upolære stoffer, fordi de tiltrækker hinanden med de samme (svage) kræfter." },
+            { label: "Fordi rensebenzin er varmere end vand og derfor smelter fedtet", correct: false, feedback: "Temperaturen er ikke afgørende her — det handler om molekylernes polaritet, ikke om varme." }
+        ]
+    },
+    {
+        question: "Opsamlingsquiz (2/3): Hvad var det, der blev tilbage i filterpapiret efter filtreringen?",
+        allowRetry: false,
+        options: [
+            { label: "Stivelse og andre uopløselige dele af kartoflen", correct: true, feedback: "✅ Rigtigt! Det faste materiale er for stort til at passere filterets porer." },
+            { label: "Det færdige, rensede fedtstof fra kartoflen", correct: false, feedback: "Nej — fedtet var opløst i rensebenzinen og løb igennem filteret sammen med den. Det var stivelsen, der blev tilbage." }
+        ]
+    },
+    {
+        question: "Opsamlingsquiz (3/3): Hvorfor forsvandt rensebenzinen under opvarmningen, men ikke fedtet?",
+        allowRetry: false,
+        options: [
+            { label: "Rensebenzin har et lavt kogepunkt og fordamper let", correct: true, feedback: "✅ Korrekt! Fedtets kogepunkt er langt højere, så det bliver liggende tilbage, mens rensebenzinen fordamper." },
+            { label: "Rensebenzin vejer mindre end fedt", correct: false, feedback: "Vægt/densitet er ikke årsagen — det er forskellen i kogepunkt, der afgør, hvad der fordamper." }
+        ]
+    }
+];
+
+function startQuiz(idx = 0) {
+    if(idx === 0) document.getElementById('btn-replay').style.display = 'none';
+    if(idx >= quizQuestions.length) {
+        document.getElementById('text-box').innerText = "🎉 Godt klaret! Du har gennemført forsøget og opsamlingsquizzen.";
+        document.getElementById('bar').style.width = "100%";
+        const btn = document.getElementById('btn-next');
+        btn.disabled = false;
+        btn.innerText = "Start Forfra";
+        btn.onclick = () => location.reload();
+        return;
+    }
+    askQuestion(quizQuestions[idx], () => startQuiz(idx+1));
+}
+
+// --- STEPS ---
+const steps = [
+    {
+        txt: "1. Hele Chips: Vi starter med kartoflen. I mikroskopet er fedt (Gul) og stivelse (Grå) tæt pakket sammen i cellerne.",
+        act: () => { 
+            document.getElementById('scene1').style.opacity=1; 
+            renderPotatoes('whole'); 
+            initStructure(0); // Tæt pakket
+        }
+    },
+    {
+        txt: "2. Knusning: Chipsene knuses til små stykker. Molekylerne spredes ud og er nu klar til at møde opløsningsmidlet.",
+        act: () => { 
+            renderPotatoes('crushed'); 
+            initStructure(1); // Spredt
+        }
+    },
+    {
+        txt: "3. Ekstraktion: Rensebenzin tilsættes. Se hvordan de mange blå molekyler suser rundt og omringer fedtet. 'Lige opløser lige'.",
+        preQuestion: (onDone) => askQuestion({
+            question: "Nu skal fedtet opløses ud af de knuste kartoffelstykker. Hvilket opløsningsmiddel tror du virker bedst?",
+            allowRetry: true,
+            options: [
+                {
+                    label: "💧 Vand",
+                    correct: false,
+                    feedback: "❌ Vand er et polært molekyle (δ+ og δ- er adskilt). Fedt er upolært. 'Lige opløser lige' — polære og upolære stoffer blander sig ikke. Se hvordan fedtet forbliver som en klump for sig i bægerglasset.",
+                    onSelect: () => runWaterFailDemo()
+                },
+                {
+                    label: "🧪 Rensebenzin",
+                    correct: true,
+                    feedback: "✅ Rigtigt! Rensebenzin er upolært, ligesom fedtet. 'Lige opløser lige' — derfor omslutter molekylerne fedtet og opløser det.",
+                    onSelect: () => {}
+                }
+            ]
+        }, onDone),
+        act: () => {
+            demoMode = null;
+            document.getElementById('legend-water').style.display = 'none';
+
+            const l1 = document.getElementById('liq1');
+            l1.style.transition = 'none'; l1.style.height = "0%"; l1.style.background = 'var(--liquid-solvent)';
+            setTimeout(() => { l1.style.transition = 'height 2s ease-in-out'; l1.style.height = "70%"; }, 50);
+
+            if(particles.length < 10) initStructure(1);
+            for(let i=particles.length-1; i>=0; i--) { if(particles[i].type === 'solvent' || particles[i].type === 'water') particles.splice(i,1); }
+            addSolvent(); // Mange flere molekyler
+        }
+    },
+    {
+        txt: "4. Filtrering: Blandingen hældes langsomt gennem tragten. Stivelsen fanges i filteret, mens fedtopløsningen drypper igennem.",
+        preQuestion: (onDone) => askQuestion({
+            question: "Vi hælder blandingen gennem et filter. Hvad tror du sker med stivelsen (de grå molekyler)?",
+            allowRetry: false,
+            options: [
+                { label: "Den passerer igennem filteret sammen med væsken", correct: false, feedback: "Faktisk ikke — stivelseskornene er faste og for store til at passere filterpapirets små porer, så de bliver siddende i filteret." },
+                { label: "Den fanges i filterpapiret, mens væsken passerer igennem", correct: true, feedback: "✅ Rigtigt! Stivelseskornene er for store til filterets porer. Kun den opløste fedt-i-rensebenzin-væske (filtratet) løber igennem." }
+            ]
+        }, onDone),
+        act: () => {
+            document.getElementById('scene1').style.opacity = 0;
+            document.getElementById('scene2').style.opacity = 1;
+            document.getElementById('scene2').style.pointerEvents = "auto";
+            
+            const l2 = document.getElementById('liq2');
+            l2.style.transition = 'none'; l2.style.height = "0%";
+            
+            // Langsommere makro-animation (2.5s)
+            setTimeout(() => {
+                l2.style.transition = 'height 2.5s ease-in-out';
+                l2.style.height = "50%"; 
+                document.getElementById('macro-residue').style.opacity = 1; 
+            }, 100);
+
+            resetToTop(); 
+        }
+    },
+    {
+        txt: "5. Fordampning: Varmen tændes. Væsken fordamper. Tilbage i bunden ligger det rene fedt.",
+        preQuestion: (onDone) => askQuestion({
+            question: "Vi varmer nu filtratet op på en varmeplade. Hvad tror du sker?",
+            allowRetry: false,
+            options: [
+                { label: "Rensebenzinen fordamper, og fedtet bliver tilbage", correct: true, feedback: "✅ Rigtigt! Rensebenzin har et lavt kogepunkt og fordamper let ved opvarmning. Fedtstoffet har et langt højere kogepunkt og bliver tilbage som en ren, gul væske." },
+                { label: "Fedtet fordamper, og rensebenzinen bliver tilbage", correct: false, feedback: "Faktisk omvendt — rensebenzin har et markant lavere kogepunkt end fedt, så det er rensebenzinen, der forsvinder som damp." }
+            ]
+        }, onDone),
+        act: () => {
+            document.getElementById('scene2').style.opacity = 0;
+            document.getElementById('scene3').style.opacity = 1;
+            
+            const hp = document.getElementById('hotplate');
+            hp.style.opacity = 1; 
+            hp.style.boxShadow = "0 0 20px #ff5722";
+
+            const l3 = document.getElementById('liq3');
+            l3.style.transition = 'none'; 
+            l3.style.height = "60%"; 
+            l3.style.background = "var(--liquid-mix)";
+            
+            setTimeout(() => {
+                l3.style.transition = 'height 2.5s ease-in-out, background 2.5s';
+                l3.style.height = "15%"; 
+                l3.style.background = "var(--liquid-pure)";
+            }, 100);
+
+            for(let i=particles.length-1; i>=0; i--) {
+                if(particles[i].type === 'starch') particles[i].active = false;
+                else particles[i].active = true; 
+            }
+            particles.forEach(p => {
+                if(p.type !== 'starch') {
+                    p.y = centerY*2 - 25 - Math.random()*30;
+                    p.x = centerX + (Math.random()-0.5)*80;
+                    p.vx = 0; p.vy = 0;
+                }
+            });
+
+            const interval = setInterval(() => {
+                if(step !== 4) { clearInterval(interval); return; }
+                let f = document.createElement('div'); f.className='fume'; f.innerText='💨';
+                f.style.left = (20+Math.random()*60)+'%';
+                document.getElementById('fumes-container').appendChild(f);
+                setTimeout(()=>f.remove(), 2400);
+            }, 300);
+        }
+    }
+];
+
+function next() {
+    step++;
+    if(step >= steps.length) { startQuiz(); return; }
+
+    if(step >= 0) document.getElementById('btn-replay').style.display = 'inline-block';
+
+    const btn = document.getElementById('btn-next');
+    btn.innerText = (step === steps.length - 1) ? "Afslut med quiz" : "Næste Trin";
+
+    const s = steps[step];
+    document.getElementById('bar').style.width = ((step+1)/steps.length)*100 + "%";
+
+    if(s.preQuestion) {
+        document.getElementById('text-box').innerText = "🤔 Forudsig, hvad der sker, før du fortsætter...";
+        btn.disabled = true;
+        document.getElementById('btn-replay').disabled = true;
+        s.preQuestion(() => {
+            btn.disabled = false;
+            document.getElementById('btn-replay').disabled = false;
+            document.getElementById('text-box').innerText = s.txt;
+            s.act();
+        });
+    } else {
+        document.getElementById('text-box').innerText = s.txt;
+        s.act();
+    }
+}
+
+function replayStep() {
+    if(step < 0 || step >= steps.length) return;
+    steps[step].act();
+}
+
+resize();
+loop();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titrering: Masseprocent i Eddike (V10)</title>
+    <style>
+        :root {
+            --panel-bg: #2c3e50;
+            --main-bg: #dcdde1;
+            --accent: #2980b9;
+            --success: #27ae60;
+            --text-light: #ecf0f1;
+            --text-dark: #2c3e50;
+            --warning: #f39c12;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            height: 100vh;
+            background: var(--main-bg);
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* --- LEFT SIDE: SIMULATION --- */
+        #sim-container {
+            flex-grow: 1;
+            position: relative;
+            background: radial-gradient(circle at center, #cfd8dc 0%, #abb6c2 100%);
+        }
+
+        canvas { display: block; width: 100%; height: 100%; }
+
+        #guide-overlay {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(44, 62, 80, 0.9); color: #fff;
+            padding: 10px 25px; border-radius: 50px;
+            font-size: 16px; font-weight: 500;
+            pointer-events: none; transition: opacity 0.5s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        /* --- RIGHT SIDE: CONTROLS --- */
+        #sidebar {
+            width: 420px;
+            background: var(--panel-bg);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.3);
+            z-index: 10;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .sidebar-header {
+            border-bottom: 1px solid #7f8c8d; padding-bottom: 15px; margin-bottom: 20px;
+        }
+        h1 { margin: 0 0 10px 0; font-size: 22px; color: #3498db; }
+        
+        .theory-btn {
+            background: transparent;
+            border: 2px solid #bdc3c7;
+            color: #ecf0f1;
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: 0.2s;
+            margin-bottom: 5px;
+        }
+        .theory-btn:hover { background: #34495e; border-color: #3498db; color: #3498db; }
+
+        h2 { font-size: 13px; color: #bdc3c7; margin-top: 25px; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; border-bottom: 1px solid #34495e; padding-bottom: 5px; }
+
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        
+        button.action {
+            background: var(--accent);
+            border: none; color: white; padding: 12px;
+            border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px;
+            transition: all 0.2s; width: 100%;
+        }
+        button.action:hover { background: #3498db; transform: translateY(-2px); }
+        button.action:disabled { background: #7f8c8d; cursor: not-allowed; opacity: 0.6; transform: none; }
+        
+        button.weigh-btn { background: #e67e22; }
+        .finish-btn { background: var(--success); width: 100%; margin-top: auto; padding: 15px; font-size: 16px; border:none; color:white; border-radius:6px; cursor:pointer; font-weight:bold; margin-bottom: 20px;}
+
+        /* Zoom Panels */
+        .zoom-container {
+            background: #fff;
+            border-radius: 8px;
+            height: 120px;
+            position: relative;
+            border: 4px solid #34495e;
+            overflow: hidden;
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box; 
+        }
+        .zoom-canvas-el { width: 100%; height: 100%; display: block; }
+
+        .zoom-label {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            text-align: center; color: #333; font-size: 11px; font-weight: bold;
+            background: rgba(255,255,255,0.9); padding: 2px 0;
+        }
+
+        .slider-container { margin: 15px 0; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 6px; }
+        input[type=range] { width: 100%; cursor: pointer; }
+        .slider-labels { display: flex; justify-content: space-between; font-size: 12px; color: #bdc3c7; margin-top: 8px; }
+
+        /* --- MODALS --- */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background: #fff; width: 750px; padding: 30px; border-radius: 10px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            color: var(--text-dark); position: relative; max-height: 90vh; overflow-y: auto;
+        }
+        .hidden { display: none !important; }
+
+        /* Theory Content */
+        .theory-section { margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        .theory-section:last-child { border-bottom: none; }
+        .theory-title { font-weight: bold; font-size: 1.1em; color: var(--accent); margin-bottom: 8px; display:block; }
+        .chem-eq { background: #f8f9fa; padding: 10px; border-radius: 4px; font-family: 'Courier New', monospace; font-weight: bold; text-align: center; margin: 10px 0; border: 1px solid #e0e0e0; }
+        
+        /* Calc Styles */
+        .calc-step {
+            border: 1px solid #eee; border-radius: 8px; padding: 20px; margin-bottom: 20px;
+            transition: all 0.4s ease; position: relative; background: #fff;
+        }
+        .calc-step.locked { opacity: 0.5; filter: grayscale(1); pointer-events: none; background: #f9f9f9; }
+        .calc-step.active { opacity: 1; filter: none; border-left: 5px solid var(--accent); box-shadow: 0 5px 15px rgba(0,0,0,0.05); transform: scale(1.01); }
+        .calc-step.completed { opacity: 1; border-left: 5px solid var(--success); background: #f0fdf4; }
+        .calc-step.completed input { background: transparent; border: none; font-weight: bold; color: var(--success); }
+        .calc-step.completed button.check-btn { display: none; }
+        .calc-step.completed .help-btn { display: none; }
+
+        .step-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .step-title { font-weight: bold; font-size: 1.1em; color: #2c3e50; }
+        
+        .input-row { display: flex; align-items: center; gap: 10px; margin-top: 15px; flex-wrap: wrap;}
+        input.calc-input {
+            padding: 8px 12px; width: 140px; 
+            border: 2px solid #bdc3c7; border-radius: 4px; 
+            font-size: 16px; font-weight: bold; color: #2c3e50; text-align: right;
+        }
+        button.check-btn { background: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        button.help-btn { background: #f1c40f; color: #fff; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; margin-left: auto; }
+        
+        .hint-box { background: #fff8e1; border-left: 4px solid #f1c40f; padding: 10px; margin-top: 10px; border-radius: 0 4px 4px 0; font-size: 0.9em; display: none; animation: fadeIn 0.3s; }
+        .feedback-msg { margin-top: 10px; font-weight: bold; font-size: 0.9em; min-height: 20px; }
+        .feedback-msg.error { color: #b9770e; }
+        .feedback-msg.success { color: #27ae60; }
+        .feedback-msg.notice { color: #2980b9; }
+        
+        .summary-box { text-align: center; margin-top: 30px; padding: 20px; background: #ecf0f1; border-radius: 8px; display: none; }
+        .theory-gradient { height: 30px; width: 100%; background: linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 50%, rgba(255,20,147,1) 100%); border: 1px solid #ccc; margin: 10px 0; border-radius:4px; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div id="sim-container">
+    <canvas id="simCanvas"></canvas>
+    <div id="guide-overlay">Klargøring: Afvej 2,00 g eddike-prøve.</div>
+</div>
+
+<div id="sidebar">
+    <div class="sidebar-header">
+        <h1>Analyse af Eddike</h1>
+        <button class="theory-btn" onclick="document.getElementById('modal-theory').classList.remove('hidden')">
+            📖 Teori & Metode
+        </button>
+    </div>
+    
+    <div style="font-size: 12px; margin-bottom: 5px; color: #bdc3c7;">
+        Burette Aflæsning (Zoom):
+    </div>
+    
+    <div id="sidebar-zoom-container" class="zoom-container">
+        <canvas id="zoomCanvas" class="zoom-canvas-el" width="400" height="120"></canvas>
+        <div class="zoom-label">Aflæs bunden af menisken</div>
+    </div>
+
+    <h2>1. Klargøring</h2>
+    <div class="btn-group">
+        <button id="btn-weigh" class="action weigh-btn" onclick="Lab.action('weigh')">Afvej 2,00 g Prøve</button>
+        <button id="btn-water" class="action" onclick="Lab.action('water')" disabled>Tilsæt Vand</button>
+    </div>
+
+    <h2>2. Titrering</h2>
+    <div class="btn-group">
+        <button id="btn-indicator" class="action" onclick="Lab.action('indicator')" disabled>Tilsæt Indikator</button>
+        <button id="btn-fill" class="action" onclick="Lab.action('fill')">Fyld Burette</button>
+    </div>
+
+    <h2 style="margin-top:20px;">3. Udførelse</h2>
+    <div class="slider-container">
+        <input type="range" id="valve-slider" min="0" max="100" value="0" disabled>
+        <div class="slider-labels">
+            <span>Lukket</span>
+            <span>Dryp</span>
+            <span>Hurtig</span>
+        </div>
+    </div>
+    
+    <button class="finish-btn" onclick="Lab.openCalculation()">Afslut & Beregn</button>
+
+    <div style="font-size:0.9em; color:#bdc3c7; margin-top:auto;">
+        Konstanter:<br>
+        c(NaOH) = 0,100 M<br>
+        M(syre) = 60,05 g/mol
+    </div>
+</div>
+
+<div id="modal-theory" class="modal hidden">
+    <div class="modal-content">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ccc; padding-bottom:10px; margin-bottom:20px;">
+            <h2 style="margin:0; color:#2c3e50; border:none;">Teori bag Øvelsen</h2>
+            <button onclick="document.getElementById('modal-theory').classList.add('hidden')" style="border:none; background:transparent; font-size:24px; cursor:pointer;">&times;</button>
+        </div>
+
+        <div class="theory-section">
+            <span class="theory-title">1. Formål & Reaktion</span>
+            <p>Formålet er at bestemme masseprocenten af eddikesyre i husholdningseddike. Vi bruger en <strong>syre-base titrering</strong>, hvor vi tilsætter en stærk base (NaOH) til vores syreholdige eddike.</p>
+            <p>Reaktionen sker i forholdet 1:1. Det betyder, at 1 mol base neutraliserer præcis 1 mol syre:</p>
+            <div class="chem-eq">CH₃COOH + NaOH → CH₃COO⁻ + Na⁺ + H₂O</div>
+        </div>
+
+        <div class="theory-section">
+            <span class="theory-title">2. Hvorfor tilsætter vi vand?</span>
+            <p>Du bliver bedt om at tilsætte vand til din eddikeprøve i starten. Mange tror fejlagtigt, at det ødelægger resultatet.</p>
+            <p><strong>Det gør det ikke!</strong> Vi skal finde <em>stofmængden (n)</em> af syren. Når vi tilsætter vand, ændrer vi volumen og koncentrationen i kolben, men <strong>antallet af syremolekyler (molet)</strong> er præcis det samme.</p>
+            <p>Vandet tilsættes blot for at give nok væske i kolben til, at vi tydeligt kan se farveomslaget.</p>
+        </div>
+
+        <div class="theory-section">
+            <span class="theory-title">3. Indikatoren (Phenolphthalein)</span>
+            <p>Vi bruger phenolphthalein til at se, hvornår al syren er spist af basen (ækvivalenspunktet). Omslaget sker omkring pH 8-10.</p>
+            
+            <div class="theory-gradient"></div>
+            <div style="display:flex; justify-content:space-between; font-size: 12px; font-weight: bold;">
+                <div style="text-align:left;">
+                    <span style="font-size:1.2em;">Farveløs</span><br>
+                    I syre (start)
+                </div>
+                <div style="text-align:right;">
+                    <span style="font-size:1.2em; color:deeppink;">Pink / Lilla</span><br>
+                    I base (slut)
+                </div>
+            </div>
+            <p style="margin-top:10px;"><strong>Opgave:</strong> Stop titreringen præcis ved den første, svage, varige lyserøde farve.</p>
+        </div>
+
+        <div style="text-align:center;">
+            <button class="action" style="width:150px;" onclick="document.getElementById('modal-theory').classList.add('hidden')">Luk & Start</button>
+        </div>
+    </div>
+</div>
+
+<div id="calc-modal" class="modal hidden">
+    <div class="modal-content">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom:20px;">
+            <h2 style="color:#2c3e50; margin:0; border:none;">Resultatbehandling</h2>
+            <button onclick="location.reload()" style="background:#95a5a6; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer;">Genstart</button>
+        </div>
+
+        <div id="step-1" class="calc-step active">
+            <div class="step-header">
+                <span class="step-title">1. Aflæs Volumen</span>
+                <span class="step-status">🧪</span>
+            </div>
+            <div class="step-content">
+                <p>Hvis du glemte at aflæse før, kan du se buretten her:</p>
+                <div class="zoom-container" style="border-color: #bdc3c7; margin-bottom: 15px;">
+                    <canvas id="calcZoomCanvas" class="zoom-canvas-el" width="400" height="120"></canvas>
+                    <div class="zoom-label">Live Aflæsning</div>
+                </div>
+
+                <p>Hvor meget NaOH har du brugt? (1 decimal)</p>
+                <div class="input-row">
+                    <label>V(NaOH) = </label>
+                    <input type="text" inputmode="decimal" id="in-vol" class="calc-input" placeholder="0,0"> mL
+                    <button class="help-btn" onclick="Calc.toggleHint(1)" title="Hjælp">?</button>
+                    <button class="check-btn" onclick="Calc.checkStep1()">Tjek</button>
+                </div>
+                <div id="hint-1" class="hint-box">
+                    <strong>Tip:</strong> Aflæs bunden af buen. Tallet viser hvor meget der er <em>tilbage</em>, så du skal trække det fra 25,00 mL (startvolumen) for at se forbruget.
+                </div>
+                <div id="fb-1" class="feedback-msg"></div>
+            </div>
+        </div>
+
+        <div id="step-2" class="calc-step locked">
+            <div class="step-header">
+                <span class="step-title">2. Stofmængde Base</span>
+                <span class="step-status">🔒</span>
+            </div>
+            <div class="step-content">
+                <p>Beregn stofmængden af tilsat NaOH.</p>
+                <div class="input-row">
+                    <label>n(NaOH) = </label>
+                    <input type="text" inputmode="decimal" id="in-nbase" class="calc-input" placeholder="0,000"> mol
+                    <button class="help-btn" onclick="Calc.toggleHint(2)" title="Hjælp">?</button>
+                    <button class="check-btn" onclick="Calc.checkStep2()">Tjek</button>
+                </div>
+                <div id="hint-2" class="hint-box">
+                    <strong>Formel:</strong> n = c · V<br>
+                    Husk at omregne volumen til Liter først! (Divider mL med 1000).<br>
+                    c(NaOH) = 0,100 M.
+                </div>
+                <div id="fb-2" class="feedback-msg"></div>
+            </div>
+        </div>
+
+        <div id="step-3" class="calc-step locked">
+            <div class="step-header">
+                <span class="step-title">3. Stofmængde Syre</span>
+                <span class="step-status">🔒</span>
+            </div>
+            <div class="step-content">
+                <p>Hvor meget eddikesyre var der i prøven?</p>
+                <div class="input-row">
+                    <label>n(syre) = </label>
+                    <input type="text" inputmode="decimal" id="in-nacid" class="calc-input" placeholder="0,000"> mol
+                    <button class="help-btn" onclick="Calc.toggleHint(3)" title="Hjælp">?</button>
+                    <button class="check-btn" onclick="Calc.checkStep3()">Tjek</button>
+                </div>
+                <div id="hint-3" class="hint-box">
+                    <strong>Tip:</strong> Reaktionen er 1:1. <br>Det betyder at: n(syre) = n(base).
+                </div>
+                <div id="fb-3" class="feedback-msg"></div>
+            </div>
+        </div>
+
+        <div id="step-4" class="calc-step locked">
+            <div class="step-header">
+                <span class="step-title">4. Masse af Syre</span>
+                <span class="step-status">🔒</span>
+            </div>
+            <div class="step-content">
+                <p>Beregn massen af den rene eddikesyre.</p>
+                <div class="input-row">
+                    <label>m(syre) = </label>
+                    <input type="text" inputmode="decimal" id="in-mass" class="calc-input" placeholder="0,000"> g
+                    <button class="help-btn" onclick="Calc.toggleHint(4)" title="Hjælp">?</button>
+                    <button class="check-btn" onclick="Calc.checkStep4()">Tjek</button>
+                </div>
+                <div id="hint-4" class="hint-box">
+                    <strong>Formel:</strong> m = n · M<br>
+                    Molarmassen M for eddikesyre er 60,05 g/mol.
+                </div>
+                <div id="fb-4" class="feedback-msg"></div>
+            </div>
+        </div>
+
+        <div id="step-5" class="calc-step locked">
+            <div class="step-header">
+                <span class="step-title">5. Masseprocent</span>
+                <span class="step-status">🔒</span>
+            </div>
+            <div class="step-content">
+                <p>Beregn eddikens masseprocent.</p>
+                <div class="input-row">
+                    <label>m% = </label>
+                    <input type="text" inputmode="decimal" id="in-pct" class="calc-input" placeholder="0,00"> %
+                    <button class="help-btn" onclick="Calc.toggleHint(5)" title="Hjælp">?</button>
+                    <button class="check-btn" onclick="Calc.checkStep5()">Tjek</button>
+                </div>
+                <div id="hint-5" class="hint-box">
+                    <strong>Formel:</strong> m% = (m(syre) / m(prøve)) · 100%<br>
+                    Du afvejede 2,00 g prøve i starten.
+                </div>
+                <div id="fb-5" class="feedback-msg"></div>
+            </div>
+        </div>
+
+        <div id="summary-area" class="summary-box">
+            <h3 style="color:var(--success);">Tillykke! Øvelsen er færdig.</h3>
+            <p>Du har bestemt masseprocenten.</p>
+            <p style="font-size:0.9em; color:#7f8c8d;">Husholdningseddike ligger typisk på 4-5%.</p>
+            <button class="action" style="width:auto; margin-top:10px;" onclick="location.reload()">Start Forfra</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+const CONST = {
+    M_NAOH: 0.100,
+    SAMPLE_MASS_G: 2.00,
+    MOLAR_MASS_ACID: 60.05,
+    TARGET_PCT: 0
+};
+
+class Lab {
+    static canvas;
+    static ctx;
+    static zCanvas;
+    static zCtx;
+    static calcZCanvas;
+    static calcZCtx;
+    
+    static width;
+    static height;
+    
+    // Simulation State
+    static buretteVol = 0; 
+    static valveOpen = 0;
+    
+    // Flask State
+    static volVinegar = 0; 
+    static volWater = 0;   
+    static volBase = 0;    
+    
+    static hasIndicator = false;
+    static colorIntensity = 0;
+    static drops = [];
+    static correctVolEq = 0;
+    static overshot = false;
+    static reachedEquivalence = false;
+
+    static init() {
+        this.canvas = document.getElementById('simCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        
+        // Setup Zoom Canvas 1 (Sidebar)
+        this.zCanvas = document.getElementById('zoomCanvas');
+        this.zCtx = this.zCanvas.getContext('2d');
+        
+        // Setup Zoom Canvas 2 (Calculation Modal)
+        this.calcZCanvas = document.getElementById('calcZoomCanvas');
+        this.calcZCtx = this.calcZCanvas.getContext('2d');
+        
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        
+        // Randomize problem: 4.0% - 5.5%
+        CONST.TARGET_PCT = 4.0 + Math.random() * 1.5;
+        
+        const m_acid = (CONST.TARGET_PCT / 100) * CONST.SAMPLE_MASS_G;
+        const n_acid = m_acid / CONST.MOLAR_MASS_ACID;
+        const v_base_L = n_acid / CONST.M_NAOH;
+        this.correctVolEq = v_base_L * 1000;
+
+        document.getElementById('valve-slider').addEventListener('input', (e) => {
+            this.valveOpen = parseInt(e.target.value) / 100;
+        });
+
+        this.loop();
+    }
+
+    static resize() {
+        this.width = this.canvas.width = document.getElementById('sim-container').clientWidth;
+        this.height = this.canvas.height = document.getElementById('sim-container').clientHeight;
+    }
+
+    static action(type) {
+        const guide = document.getElementById('guide-overlay');
+        
+        if (type === 'fill') {
+            let lvl = 0;
+            const i = setInterval(() => {
+                lvl++; this.buretteVol = lvl;
+                if(lvl >= 25) { clearInterval(i); this.buretteVol = 25.00; }
+            }, 10);
+            guide.innerText = "Burette fyldt. Juster hanen for at starte.";
+        }
+        else if (type === 'weigh') {
+            this.volVinegar = 10;
+            document.getElementById('btn-weigh').disabled = true;
+            document.getElementById('btn-water').disabled = false;
+            guide.innerText = "2,00 g afvejet. Tilsæt nu vand.";
+        }
+        else if (type === 'water') {
+            let w = 0;
+            const i = setInterval(() => {
+                w+=1; this.volWater = w;
+                if(w >= 20) clearInterval(i);
+            }, 15);
+            document.getElementById('btn-water').disabled = true;
+            document.getElementById('btn-indicator').disabled = false;
+            guide.innerText = "Vand tilsat. Tilsæt indikator.";
+        }
+        else if (type === 'indicator') {
+            this.hasIndicator = true;
+            document.getElementById('btn-indicator').disabled = true;
+            document.getElementById('valve-slider').disabled = false;
+            guide.innerText = "Klar. Fyld buretten (hvis den er tom) og titrer.";
+        }
+    }
+
+    static loop() {
+        this.update();
+        this.draw();
+        this.drawZoom(this.zCtx, this.zCanvas.width, this.zCanvas.height);
+        this.drawZoom(this.calcZCtx, this.calcZCanvas.width, this.calcZCanvas.height);
+        requestAnimationFrame(() => this.loop());
+    }
+
+    static update() {
+        if (this.valveOpen > 0 && this.buretteVol > 0) {
+            // Flowrate: Tilbage til en realistisk hastighed for måling
+            const flow = Math.min(this.valveOpen * 0.05, this.buretteVol);
+            this.buretteVol -= flow;
+            this.volBase += flow;
+            
+            // Visual Drop Logic: Justeret så det ikke er en "laserstråle"
+            // Lav sandsynlighed pr frame, medmindre hanen er helt åben
+            const dropChance = this.valveOpen * 0.3; // Max 30% chance pr frame
+            if(Math.random() < dropChance) {
+                this.drops.push({
+                    x: this.width/2, y: 320, vy: 2, 
+                    color: 'rgba(236, 240, 241, 0.9)', type: 'base'
+                });
+            }
+        }
+
+        for(let i=this.drops.length-1; i>=0; i--) {
+            let d = this.drops[i];
+            d.y += d.vy; d.vy += 0.5;
+            const liqH = (this.volVinegar + this.volWater + this.volBase) * 0.8; 
+            if(d.y > 600 - liqH) {
+                this.drops.splice(i, 1);
+            }
+        }
+
+        if (this.hasIndicator) {
+            const addedmL = this.volBase;
+            const diff = addedmL - this.correctVolEq;
+
+            if (diff < 0) {
+                this.colorIntensity = 0;
+            } else if (diff >= 0 && diff < 0.5) {
+                this.colorIntensity = diff * 1.5;
+            } else {
+                this.colorIntensity = 0.8;
+            }
+
+            if (diff >= 0 && !this.reachedEquivalence && !this.overshot) {
+                this.triggerEquivalenceReached();
+            }
+
+            if (this.buretteVol <= 0 && this.volBase > 0 && !this.overshot) {
+                this.triggerOvershoot();
+            }
+        } else {
+            this.colorIntensity = 0;
+        }
+    }
+
+    static triggerEquivalenceReached() {
+        this.reachedEquivalence = true;
+        const guide = document.getElementById('guide-overlay');
+        guide.style.background = 'rgba(39, 174, 96, 0.95)';
+        guide.innerText = 'Nu er ækvivalenspunktet nået - stop inden du overtitrerer!';
+    }
+
+    static triggerOvershoot() {
+        this.overshot = true;
+        this.valveOpen = 0;
+        const slider = document.getElementById('valve-slider');
+        slider.value = 0;
+        slider.disabled = true;
+
+        const guide = document.getElementById('guide-overlay');
+        guide.style.background = 'rgba(211, 84, 0, 0.95)';
+        guide.innerHTML = 'Buretten er nu tom, og du er langt forbi farveomslaget - forsøget er ikke præcist længere. ' +
+            '<button onclick="location.reload()" style="margin-left:8px;background:#fff;color:#d35400;border:none;padding:4px 12px;border-radius:20px;font-weight:bold;cursor:pointer;pointer-events:auto;">Prøv igen</button>';
+        guide.style.pointerEvents = 'auto';
+    }
+
+    static draw() {
+        const ctx = this.ctx;
+        const w = this.width;
+        const h = this.height;
+        const cx = w/2;
+
+        ctx.clearRect(0,0,w,h);
+
+        // --- MAGNETOMRØRER ---
+        const stirY = 620;
+        ctx.fillStyle = '#fefefe';
+        ctx.beginPath();
+        ctx.moveTo(cx - 90, stirY);
+        ctx.lineTo(cx + 90, stirY);
+        ctx.lineTo(cx + 100, stirY + 40);
+        ctx.lineTo(cx - 100, stirY + 40);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#bdc3c7';
+        ctx.beginPath();
+        ctx.moveTo(cx - 100, stirY + 40);
+        ctx.lineTo(cx + 100, stirY + 40);
+        ctx.lineTo(cx + 100, stirY + 50);
+        ctx.lineTo(cx - 100, stirY + 50);
+        ctx.fill();
+
+        // --- STATIV ---
+        ctx.fillStyle = '#7f8c8d';
+        ctx.fillRect(cx - 120, 50, 8, 600); 
+        ctx.fillStyle = '#34495e'; 
+        ctx.fillRect(cx - 112, 200, 70, 6); 
+
+        // --- BURETTE ---
+        const bW = 20; const bH = 350; const bY = 100;
+        const pct = this.buretteVol / 25;
+        const liqTop = bY + (bH * (1-pct));
+        
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'; 
+        ctx.fillRect(cx - bW/2 + 2, liqTop, bW - 4, bH * pct);
+        
+        ctx.strokeStyle = '#95a5a6'; ctx.lineWidth = 2;
+        ctx.strokeRect(cx - bW/2, bY, bW, bH);
+        
+        ctx.beginPath(); ctx.moveTo(cx, bY+bH); ctx.lineTo(cx, bY+bH+30); ctx.stroke();
+        ctx.fillStyle = '#e74c3c'; 
+        ctx.fillRect(cx-10, bY+bH+5, 20, 6);
+
+        // --- KONISK KOLBE ---
+        const fY = stirY; 
+        const totalVis = this.volVinegar + this.volWater + this.volBase;
+        const lh = Math.min(130, totalVis * 1.5); 
+        const liqSurfaceY = fY - lh;
+
+        // Path Definition Helper for re-use
+        const defineFlask = () => {
+            ctx.beginPath();
+            const neckW = 25; const baseW = 80; const flaskH = 140;
+            const topY = fY - flaskH;
+            ctx.moveTo(cx - neckW, topY);
+            ctx.lineTo(cx - neckW, topY + 40); 
+            ctx.quadraticCurveTo(cx - baseW - 10, fY - 10, cx - baseW, fY); 
+            ctx.lineTo(cx + baseW, fY); 
+            ctx.quadraticCurveTo(cx + baseW + 10, fY - 10, cx + neckW, topY + 40); 
+            ctx.lineTo(cx + neckW, topY); 
+            ctx.closePath();
+        }
+
+        // 1. Draw Liquid (Clipped)
+        ctx.save();
+        defineFlask();
+        ctx.clip();
+
+        if (totalVis > 0) {
+            let r = 245, g = 250, b = 255; 
+            let alpha = 0.3; 
+            if (this.colorIntensity > 0) {
+                r = 255; 
+                g = 255 - (235 * this.colorIntensity); 
+                b = 255 - (108 * this.colorIntensity); 
+                alpha = 0.3 + (0.4 * this.colorIntensity); 
+            }
+            ctx.fillStyle = `rgba(${r},${g},${b}, ${alpha})`;
+            ctx.fillRect(cx - 90, liqSurfaceY, 180, lh); // Fill rect big enough to cover
+            
+            // Surface
+            ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.lineWidth=1;
+            ctx.beginPath(); ctx.moveTo(cx-80, liqSurfaceY); ctx.lineTo(cx+80, liqSurfaceY); ctx.stroke();
+            
+            // Magnet
+            ctx.fillStyle = '#fff'; 
+            ctx.shadowBlur = 2; ctx.shadowColor = "rgba(0,0,0,0.2)";
+            ctx.fillRect(cx - 15, fY - 8, 30, 6);
+            ctx.shadowBlur = 0;
+        }
+        ctx.restore(); 
+
+        // 2. Draw Outline (ON TOP of liquid to ensure visibility)
+        defineFlask();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = 'rgba(255,255,255,0.3)'; // Inner glow/highlight
+        ctx.stroke();
+        
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = '#2c3e50'; // Dark outer edge - Always visible
+        ctx.stroke();
+
+        // Labels
+        ctx.fillStyle = "#2c3e50"; ctx.font = "12px Arial";
+        ctx.fillText("CH₃COOH (aq)", cx + 50, fY - 10);
+        if(this.hasIndicator) {
+            ctx.fillStyle = "#e67e22";
+            ctx.fillText("+ Indikator", cx + 50, fY + 5);
+        }
+        ctx.strokeStyle = "#2c3e50"; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(cx+45, fY-15); ctx.lineTo(cx+30, fY-15); ctx.stroke();
+
+        this.drops.forEach(d => {
+            ctx.beginPath(); ctx.arc(d.x, d.y, 3, 0, Math.PI*2);
+            ctx.fillStyle = d.color; ctx.fill();
+        });
+    }
+
+    static drawZoom(ctx, w, h) {
+        ctx.clearRect(0,0,w,h);
+        
+        ctx.fillStyle = '#fff'; ctx.fillRect(0,0,w,h);
+        
+        const reading = 25 - this.buretteVol;
+        const pxPerML = 40; 
+        const cy = h/2; 
+        
+        ctx.fillStyle = 'rgba(230, 240, 255, 1)';
+        ctx.fillRect(0, cy, w, h);
+        
+        ctx.fillStyle = '#fff'; 
+        ctx.beginPath();
+        ctx.moveTo(0, cy - 15);
+        ctx.quadraticCurveTo(w/2, cy + 15, w, cy - 15); 
+        ctx.lineTo(w, 0); ctx.lineTo(0, 0);
+        ctx.fill();
+        
+        ctx.strokeStyle = '#2980b9'; ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, cy - 15);
+        ctx.quadraticCurveTo(w/2, cy + 15, w, cy - 15);
+        ctx.stroke();
+
+        // Fremhæv aflæsningspunktet: bunden af menisken (kurvens laveste punkt er ved t=0.5, dvs. y=cy - ikke ved kontrolpunktet cy+15)
+        ctx.save();
+        ctx.strokeStyle = 'rgba(231, 76, 60, 0.9)';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 3]);
+        ctx.beginPath();
+        ctx.moveTo(w/2 - 45, cy);
+        ctx.lineTo(w/2 + 45, cy);
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.fillStyle = 'rgba(231, 76, 60, 0.9)';
+        ctx.beginPath();
+        ctx.moveTo(w/2, cy);
+        ctx.lineTo(w/2 - 5, cy - 8);
+        ctx.lineTo(w/2 + 5, cy - 8);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#000'; ctx.font = 'bold 14px Arial'; ctx.textAlign = 'right';
+        const start = Math.floor(reading - 1);
+        const end = Math.floor(reading + 2);
+        
+        for(let m = start; m <= end; m+=0.1) {
+            const diff = m - reading;
+            const y = cy + (diff * pxPerML);
+            
+            if(Math.abs(Math.round(m) - m) < 0.01) {
+                ctx.fillRect(w-40, y, 40, 2);
+                ctx.fillText(Math.round(m), w-45, y+5);
+            } else {
+                ctx.fillRect(w-20, y, 20, 1);
+            }
+        }
+    }
+
+    static openCalculation() {
+        document.getElementById('calc-modal').classList.remove('hidden');
+    }
+}
+
+class Calc {
+    static parseInput(id) {
+        let val = document.getElementById(id).value;
+        if (!val) return NaN;
+        val = val.replace(',', '.');
+        return parseFloat(val);
+    }
+    
+    static toggleHint(step) {
+        const h = document.getElementById('hint-'+step);
+        h.style.display = (h.style.display === 'block') ? 'none' : 'block';
+    }
+
+    // Tæller antal decimaler i det, brugeren har tastet (accepterer både , og .)
+    static countDecimals(raw) {
+        if (!raw) return 0;
+        const s = raw.trim().replace(',', '.');
+        const i = s.indexOf('.');
+        if (i === -1) return 0;
+        return s.length - i - 1;
+    }
+
+    // Laver et 1-decimal eksempel ud fra elevens eget svar, fx "24" -> "24,0"
+    static exampleWithOneDecimal(raw) {
+        const s = raw.trim().replace('.', ',');
+        let [intPart, dec] = s.split(',');
+        dec = dec || '';
+        while (dec.length < 1) dec += '0';
+        return intPart + ',' + dec.slice(0, 1);
+    }
+
+    static checkStep1() {
+        const raw = document.getElementById('in-vol').value;
+        const input = this.parseInput('in-vol');
+        const actual = 25 - Lab.buretteVol;
+
+        if (Math.abs(input - actual) < 0.15) {
+            this.success(1, "Godkendt. Du har aflæst korrekt.");
+            this.unlock(2);
+        } else if (!isNaN(input) && this.countDecimals(raw) < 1 && Math.abs(input - actual) < 1.0) {
+            const example = this.exampleWithOneDecimal(raw);
+            this.notice(1, `Du er tæt på! Husk at svare med 1 decimal, fx sådan: ${example} mL.`);
+        } else {
+            this.fail(1, "Ikke helt endnu - kig på LIVE-billedet og prøv igen.");
+        }
+    }
+
+    static checkStep2() {
+        const V = this.parseInput('in-vol');
+        const n = this.parseInput('in-nbase');
+        const correct = (V/1000) * CONST.M_NAOH;
+        
+        if (this.isClose(n, correct)) {
+            this.success(2, "Korrekt! Stofmængden er fundet.");
+            this.unlock(3);
+        } else {
+            this.fail(2, "Tæt på - husk at omregne mL til liter (divider med 1000).");
+        }
+    }
+
+    static checkStep3() {
+        const nBase = this.parseInput('in-nbase');
+        const nAcid = this.parseInput('in-nacid');
+        
+        if (this.isClose(nAcid, nBase)) {
+            this.success(3, "Rigtigt. Det er et 1:1 forhold.");
+            this.unlock(4);
+        } else {
+            this.fail(3, "Prøv igen - ved ækvivalenspunktet er n(syre) og n(base) ens.");
+        }
+    }
+
+    static checkStep4() {
+        const n = this.parseInput('in-nacid');
+        const m = this.parseInput('in-mass');
+        const correct = n * CONST.MOLAR_MASS_ACID;
+        
+        if (this.isClose(m, correct)) {
+            this.success(4, "Flot. Du har massen af syren.");
+            this.unlock(5);
+        } else {
+            this.fail(4, "Næsten - tjek at du bruger molarmassen 60,05 g/mol.");
+        }
+    }
+
+    static checkStep5() {
+        const m = this.parseInput('in-mass');
+        const pct = this.parseInput('in-pct');
+        const correct = (m / CONST.SAMPLE_MASS_G) * 100;
+        
+        if (this.isClose(pct, correct)) {
+            this.success(5, "Korrekt! Resultatet er i hus.");
+            this.finish();
+        } else {
+            this.fail(5, `Tæt på - husk at dividere med prøvens masse (${CONST.SAMPLE_MASS_G.toString().replace('.',',')} g).`);
+        }
+    }
+
+    static unlock(step) {
+        const el = document.getElementById('step-'+step);
+        el.classList.remove('locked');
+        el.classList.add('active');
+        setTimeout(() => {
+            el.scrollIntoView({behavior: "smooth", block: "center"});
+        }, 300);
+    }
+    
+    static finish() {
+        document.getElementById('summary-area').style.display = 'block';
+        setTimeout(() => {
+            document.getElementById('summary-area').scrollIntoView({behavior: "smooth"});
+        }, 100);
+    }
+
+    static isClose(a, b) { return Math.abs((a-b)/b) < 0.05; }
+    
+    static success(step, msg) { 
+        const el = document.getElementById('step-'+step);
+        el.classList.remove('active');
+        el.classList.add('completed');
+        el.querySelector('input').disabled = true;
+        const fb = document.getElementById('fb-'+step);
+        fb.innerText = msg; 
+        fb.className = "feedback-msg success"; 
+        document.getElementById('hint-'+step).style.display = 'none';
+    }
+    
+    static fail(step, msg) {
+        const fb = document.getElementById('fb-'+step);
+        fb.innerText = msg;
+        fb.className = "feedback-msg error";
+    }
+
+    static notice(step, msg) {
+        const fb = document.getElementById('fb-'+step);
+        fb.innerText = msg;
+        fb.className = "feedback-msg notice";
+    }
+}
+
+Lab.init();
+</script>
+</body>
+</html>

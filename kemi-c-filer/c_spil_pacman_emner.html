@@ -107,6 +107,7 @@
         <h1 style="color:var(--gold); font-size:3rem; text-shadow: 0 0 20px rgba(255,215,0,0.5);">TILLYKKE! 🏆</h1>
         <p style="font-size:1.2rem;">Du har gennemført alle opgaverne i dette emne!</p>
         <p style="color:#aaa; font-size:0.9rem;">Du er nu klar til næste udfordring.</p>
+        <p id="finish-secret" style="color:#aaa; font-size:0.85rem;"></p>
         <button class="main-btn" onclick="Game.showMenu()">TILBAGE TIL MENU</button>
     </div>
 
@@ -139,7 +140,7 @@ const supNeg = (n) => (n===1 ? '⁻' : (n===2 ? '²⁻' : '³⁻'));
 const EN = { H:2.20, C:2.55, N:3.04, O:3.44, F:3.98, Cl:3.16, Br:2.96, I:2.66, Na:0.93, Mg:1.31, Al:1.61, Si:1.90, P:2.19, S:2.58, K:0.82, Ca:1.00 };
 const NAVNE = ["", "Methan","Ethan","Propan","Butan","Pentan","Hexan","Heptan","Octan","Nonan","Decan"];
 const fmtOx = (v) => (v > 0 ? '+' : '') + v;
-const REDOX_CATS = ["Oxidation", "Reduktion", "Fældning", "Syre-base-reaktion"];
+const REDOX_CATS = ["Oxidation", "Reduktion", "Fældning", "Syre-base"];
 
 // De første 20 grundstoffer + de mest almindelige metaller + brom og iod
 const GRUNDSTOFFER = [
@@ -226,7 +227,7 @@ const EMNER = {
             { type: 'M', f:'H₂O', val:18 }, { type: 'm', n:0.5, M:100 },
             { type: 'M', f:'NaCl', val:58.5 }, { type: 'm', n:5, M:20 },
             { type: 'M', f:'CH₄', val:16 }, { type: 'm', n:0.1, M:50 },
-            { type: 'M', f:'C₆H₁₂O₆', val:180 }, { type: 'm', n:3, M:18 }
+            { type: 'M', f:'Fe', val:55.8 }, { type: 'm', n:3, M:18 }
         ],
         create: (data) => {
             if(data.type === 'M') {
@@ -319,18 +320,18 @@ const EMNER = {
             {a:'Mg', b:'O'}, {a:'C', b:'O'}, {a:'K', b:'Br'}, {a:'Cl', b:'Cl'}, {a:'N', b:'H'}
         ],
         create: (data) => {
-            const CATS = ["Ionbinding", "Polær kovalent binding", "Upolær kovalent binding", "Metalbinding"];
+            const CATS = ["Ionbinding", "Polær binding", "Upolær binding", "Metalbinding"];
             const enA = EN[data.a], enB = EN[data.b];
             const diff = Math.abs(enA - enB);
             let correct;
             if (diff >= 1.7) correct = "Ionbinding";
-            else if (diff >= 0.4) correct = "Polær kovalent binding";
-            else correct = "Upolær kovalent binding";
+            else if (diff >= 0.4) correct = "Polær binding";
+            else correct = "Upolær binding";
             return {
                 text: `Hvilken bindingstype er der mellem ${data.a} og ${data.b}?`,
                 correct: correct,
                 wrongs: CATS.filter(c => c !== correct),
-                exp: `Forskel i elektronegativitet: |${enA.toFixed(2)} − ${enB.toFixed(2)}| = ${diff.toFixed(2)}.<br>Under 0,4 → upolær kovalent. 0,4–1,7 → polær kovalent. Over 1,7 → ionbinding.`
+                exp: `Forskel i elektronegativitet: |${enA.toFixed(2)} − ${enB.toFixed(2)}| = ${diff.toFixed(2)}.<br>Under 0,4 → upolær. 0,4–1,7 → polær. Over 1,7 → ionbinding.`
             };
         }
     },
@@ -472,11 +473,22 @@ const MAP = [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 ];
 
+// ghostMoveMs = millisekunder mellem hvert spøgelsestræk (reelt forløbet tid, ikke antal
+// animations-frames - så hastigheden er den samme uanset skærmens opdateringsfrekvens).
 const DIFFICULTIES = {
-    let:    { label: 'LET',    freezeTime: 5000, ghostSpeed: 40 },
-    mellem: { label: 'MELLEM', freezeTime: 3000, ghostSpeed: 25 },
-    svaer:  { label: 'SVÆR',   freezeTime: 1500, ghostSpeed: 15 }
+    let:    { label: 'LET',    freezeTime: 5000, ghostMoveMs: 667 },
+    mellem: { label: 'MELLEM', freezeTime: 3000, ghostMoveMs: 417 },
+    svaer:  { label: 'SVÆR',   freezeTime: 2500, ghostMoveMs: 313 }
 };
+
+// Blander et emnes spørgsmålsrækkefølge (in place), så man ikke altid starter med samme spørgsmål.
+function shuffleLevels(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
 
 const GHOST_SPAWNS = [{x:1,y:6}, {x:17,y:6}, {x:9,y:1}, {x:9,y:13}];
 const GHOST_COLORS = ['#ff4757', '#ff6b81', '#ff9f43', '#a29bfe'];
@@ -491,8 +503,9 @@ const Game = {
     lives: 3, startTime: 0,
     selectedDifficulty: null,
     freezeTime: null,
-    ghostSpeed: null,
+    ghostMoveMs: null,
     lastGhostSpawn: 0,
+    lastGhostMoveTime: 0,
     player: { x:0,y:0, tx:9, ty:6, dir:{x:0,y:0}, invincible:false, shieldT:0 },
     ghosts: [], powerups: [], answers: [], q: null,
 
@@ -502,7 +515,15 @@ const Game = {
         this.canvas.width = COLS * TILE;
         this.canvas.height = ROWS * TILE;
 
-        window.addEventListener('keydown', e => this.input(e.key));
+        // Blur et evt. fokuseret element (fx "NÆSTE OPGAVE"-knappen efter et museklik) FØR vi
+        // håndterer tasten - ellers kan browseren selv "aktivere" den fokuserede knap ved Enter,
+        // så Game.nextLevel() bliver kaldt to gange og springer et spørgsmål over.
+        window.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && document.activeElement && document.activeElement.blur) {
+                document.activeElement.blur();
+            }
+            this.input(e.key);
+        });
         document.querySelectorAll('.d-btn').forEach(b => {
             b.addEventListener('touchstart', e => { e.preventDefault(); this.input(b.dataset.k); });
         });
@@ -525,7 +546,7 @@ const Game = {
         const d = DIFFICULTIES[key];
         this.selectedDifficulty = key;
         this.freezeTime = d.freezeTime;
-        this.ghostSpeed = d.ghostSpeed;
+        this.ghostMoveMs = d.ghostMoveMs;
         document.querySelectorAll('.diff-choice').forEach(b => b.classList.toggle('active', b.dataset.diff === key));
         document.getElementById('menu-buttons').classList.remove('locked');
         document.getElementById('diff-hint').innerText = `Sværhedsgrad: ${d.label} — vælg et træningsforløb:`;
@@ -552,6 +573,7 @@ const Game = {
     startGame(key) {
         if (!this.selectedDifficulty) return;
         this.currentMode = key;
+        shuffleLevels(EMNER[key].levels); // ny rækkefølge hver gang, så man ikke altid starter med samme spørgsmål
         this.currentIdx = 0;
         this.lives = 3;
         this.victoryMode = false;
@@ -575,9 +597,14 @@ const Game = {
         this.initConfetti();
         document.getElementById('q-text').innerText = "SEJR!";
         document.getElementById('q-label').innerText = "EMNE GENNEMFØRT";
+        const secretEl = document.getElementById('finish-secret');
+        if (secretEl) {
+            secretEl.innerText = (this.selectedDifficulty === 'svaer' && this.currentMode === 'mix') ? 'På sværeste niveau i Mix er du hermed kåret til Labyrintmester.' : '';
+        }
     },
 
-    retryLevel() { this.lives = 3; this.setupLevel(); },
+    // Mister man alle liv, starter emnet helt forfra fra spørgsmål 1 - ikke bare det spørgsmål man tabte på.
+    retryLevel() { this.lives = 3; this.currentIdx = 0; this.setupLevel(); },
 
     setupLevel() {
         document.querySelectorAll('.overlay').forEach(e => e.classList.add('hidden'));
@@ -614,17 +641,18 @@ const Game = {
         this.running = true;
     },
 
-    resetPositions() {
+    resetPositions(ghostCount) {
         this.player.tx = 9; this.player.ty = 6;
         this.player.x = 9*TILE; this.player.y = 6*TILE;
         this.player.dir = {x:0, y:0};
 
         this.ghosts = [];
-        let count = this.currentIdx < 4 ? 1 : 2;
+        let count = ghostCount !== undefined ? ghostCount : (this.currentIdx < 4 ? 1 : 2);
         for(let i=0; i<count; i++) {
             this.ghosts.push(this.makeGhost(i));
         }
         this.lastGhostSpawn = 0;
+        this.lastGhostMoveTime = 0;
     },
 
     makeGhost(spawnIdx) {
@@ -728,8 +756,8 @@ const Game = {
 
         // Spøgelser vågner efter this.freezeTime
         if (elapsed > this.freezeTime) {
-            let speed = this.ghostSpeed;
-            if (this.frame % speed === 0) {
+            if (elapsed - this.lastGhostMoveTime >= this.ghostMoveMs) {
+                this.lastGhostMoveTime = elapsed;
                 this.ghosts.forEach(g => {
                     let dirs = [{x:0,y:-1},{x:0,y:1},{x:-1,y:0},{x:1,y:0}];
                     let valid = dirs.filter(d => MAP[g.ty+d.y][g.tx+d.x] !== 1);
@@ -797,13 +825,16 @@ const Game = {
         this.lives--;
         document.getElementById('lives-display').innerText = "❤️".repeat(this.lives);
         this.showToast(msg, "#ff4757");
-        this.resetPositions();
-        
+        // Banen nulstilles helt ved et mistet liv: kun ét spøgelse, og fredningstiden starter forfra
+        // (this.startTime nulstilles), så man ikke bliver mødt af flere spøgelser med det samme.
+        this.resetPositions(1);
+
         if(this.lives <= 0) {
             this.running = false;
             document.getElementById('loose-explanation').innerHTML = `<strong>${this.q.correct}</strong><br>${this.q.exp}`;
             document.getElementById('loose-screen').classList.remove('hidden');
         } else {
+            this.startTime = Date.now();
             this.player.invincible = true;
             this.player.shieldT = 120;
             this.running = true;
@@ -858,8 +889,27 @@ const Game = {
             }
 
             // Answers
+            // Boksene skal have SAMME størrelse for hinanden (så et langt svar ikke stikker af),
+            // men størrelsen må gerne variere fra spørgsmål til spørgsmål alt efter tekstlængden.
+            // Mål derfor alle 4 svar for dette spørgsmål og find en fælles boksbredde/skriftstørrelse,
+            // der får selv det længste svar til at passe uden at overflyde boksen.
             this.ctx.textAlign='center'; this.ctx.textBaseline='middle';
-            this.ctx.font='bold 20px Courier New';
+            const ZONE_MAX_WIDTH = 150; // Svar-zonerne er 4 felter (160px) brede - hold os inden for det med margen
+            const BOX_PADDING = 16;
+            const BOX_HEIGHT = 30;
+            const FONT_SIZES = [20, 18, 16, 14, 12, 11];
+            let answerFont = FONT_SIZES[FONT_SIZES.length - 1];
+            let maxTextWidth = 0;
+            for (const size of FONT_SIZES) {
+                this.ctx.font = `bold ${size}px Courier New`;
+                const w = Math.max(...this.answers.map(a => this.ctx.measureText(a.t).width));
+                answerFont = size;
+                maxTextWidth = w;
+                if (w + BOX_PADDING <= ZONE_MAX_WIDTH) break;
+            }
+            this.ctx.font = `bold ${answerFont}px Courier New`;
+            const boxWidth = Math.max(80, Math.min(ZONE_MAX_WIDTH, maxTextWidth + BOX_PADDING));
+
             this.answers.forEach(a => {
                 let cx=0, cy=0;
                 if(a.z===2) { cx=3*TILE; cy=3*TILE; }
@@ -867,7 +917,7 @@ const Game = {
                 if(a.z===4) { cx=3*TILE; cy=11*TILE; }
                 if(a.z===5) { cx=15*TILE; cy=11*TILE; }
                 this.ctx.fillStyle='rgba(0,0,0,0.8)';
-                this.ctx.fillRect(cx-40, cy-15, 80, 30);
+                this.ctx.fillRect(cx-boxWidth/2, cy-BOX_HEIGHT/2, boxWidth, BOX_HEIGHT);
                 this.ctx.fillStyle=a.c;
                 this.ctx.fillText(a.t, cx, cy);
             });

@@ -1,0 +1,634 @@
+﻿<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Intro StofmængdeKoncentration & Quiz</title>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --panel: #ffffff;
+            --text: #1e293b;
+            --accent: #0284c7; 
+            --heat: #dc2626;
+            --success: #22c55e;
+            --error: #ef4444;
+            --neutral: #64748b;
+        }
+        body { 
+            margin: 0; padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background: var(--bg); color: var(--text); 
+            height: 100vh; width: 100vw;
+            overflow: hidden; 
+            display: flex;
+        }
+
+        /* --- LAYOUT --- */
+        #main-wrapper {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* LEFT: SIMULATION AREA */
+        #sim-container {
+            flex: 2; 
+            position: relative;
+            background: radial-gradient(circle at center, #f1f5f9 0%, #cbd5e1 100%);
+            overflow: hidden;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+
+        canvas { display: block; width: 100%; height: 100%; }
+
+        /* RIGHT: LEARNING PANEL */
+        #sidebar {
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
+            background: white;
+            border-left: 1px solid #cbd5e1;
+            padding: 20px;
+            display: flex; flex-direction: column; gap: 20px;
+            overflow-y: auto;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.05);
+            z-index: 50;
+        }
+
+        /* UI CONTROLS (Bund) */
+        .controls-bar {
+            position: absolute; 
+            bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: rgba(255,255,255,0.95); padding: 12px 20px; border-radius: 50px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            display: flex; gap: 10px; align-items: center;
+            white-space: nowrap; z-index: 20;
+        }
+        
+        button.ctrl-btn {
+            border: none; padding: 12px 18px; border-radius: 30px;
+            font-weight: bold; cursor: pointer; font-size: 0.9rem;
+            display: flex; align-items: center; gap: 6px;
+            color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+        }
+        button.ctrl-btn:active { transform: scale(0.95); }
+        .btn-water { background: #3b82f6; }
+        .btn-salt { background: #d97706; }
+        .btn-heat { background: var(--heat); }
+        .btn-reset { background: var(--neutral); }
+
+        /* DATA METERS (Top Venstre) */
+        .meters-panel {
+            position: absolute; top: 20px; left: 20px;
+            display: flex; gap: 10px; z-index: 10; flex-wrap: wrap;
+        }
+        .meter {
+            background: rgba(255,255,255,0.9); padding: 8px 12px;
+            border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-left: 4px solid #94a3b8; width: 90px;
+        }
+        .meter-label { font-size: 0.65rem; color: #64748b; font-weight: bold; text-transform: uppercase; }
+        .meter-value { font-family: monospace; font-size: 1.0rem; font-weight: bold; color: #0f172a; }
+
+        /* LEGEND (Top Højre - NY PLACERING) */
+        .legend-panel {
+            position: absolute; top: 20px; right: 20px;
+            background: rgba(255,255,255,0.9); padding: 10px 15px;
+            border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; gap: 5px; z-index: 10;
+            font-size: 0.85rem; color: #333; font-weight: 500;
+        }
+        .dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
+        .dot-cu { background:#0284c7; }
+        .dot-so4 { background:white; border: 2px solid #333; box-sizing: border-box; }
+
+        /* FORMULA BOX */
+        .card {
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px;
+        }
+        .card h3 { margin: 0 0 10px 0; font-size: 1rem; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+        
+        .formula-display {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            font-family: 'Times New Roman', serif; font-size: 1.4rem; margin: 15px 0;
+        }
+        .fraction { text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .numerator { border-bottom: 2px solid #333; padding-bottom: 2px; margin-bottom: 2px; width: 100%; }
+        .live-val { color: var(--accent); font-weight: bold; font-size: 1.2rem; white-space: nowrap; }
+        
+        /* QUIZ STYLES */
+        .quiz-container { display: flex; flex-direction: column; gap: 10px; min-height: 150px; justify-content: center; }
+        .quiz-question { font-weight: 600; margin-bottom: 10px; font-size: 0.95rem; }
+        .quiz-opt {
+            background: white; border: 1px solid #cbd5e1; padding: 10px; border-radius: 8px;
+            cursor: pointer; transition: all 0.2s; text-align: left; font-size: 0.9rem;
+        }
+        .quiz-opt:hover { background: #f1f5f9; border-color: var(--accent); }
+        .quiz-opt.correct { background: #dcfce7; border-color: var(--success); color: #166534; }
+        .quiz-opt.wrong { background: #fee2e2; border-color: var(--error); color: #991b1b; }
+        
+        .quiz-feedback { font-size: 0.85rem; padding: 8px; border-radius: 6px; display: none; margin-top: 5px; background: #f1f5f9; }
+        .quiz-nav { display: flex; justify-content: space-between; margin-top: 15px; visibility: hidden; } 
+        .nav-btn { background: var(--accent); color: white; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; font-weight: bold; }
+        .nav-btn:disabled { background: #cbd5e1; cursor: default; }
+
+        /* Responsive Layout */
+        @media (max-width: 900px) {
+            #main-wrapper { flex-direction: column; }
+            #sim-container { flex: 2; height: 60vh; }
+            #sidebar { flex: 1; height: 40vh; min-width: auto; max-width: none; border-left: none; border-top: 1px solid #cbd5e1; }
+            .meters-panel { top: 10px; left: 10px; gap: 5px; }
+            .legend-panel { top: 10px; right: 10px; padding: 8px; font-size: 0.75rem; }
+            .controls-bar { width: 90%; justify-content: center; gap: 5px; padding: 10px; }
+            button.ctrl-btn { padding: 10px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="main-wrapper">
+    <div id="sim-container">
+        <canvas id="mainCanvas"></canvas>
+        
+        <div class="meters-panel">
+            <div class="meter" style="border-color:var(--accent)">
+                <div class="meter-label">c (Konc.)</div>
+                <div class="meter-value"><span id="disp-c">0,00</span> M</div>
+            </div>
+            <div class="meter" style="border-color:#eab308">
+                <div class="meter-label">n (Stof)</div>
+                <div class="meter-value"><span id="disp-n">0,00</span> mol</div>
+            </div>
+            <div class="meter" style="border-color:#22c55e">
+                <div class="meter-label">V (Volumen)</div>
+                <div class="meter-value"><span id="disp-v">0,50</span> L</div>
+            </div>
+        </div>
+
+        <div class="legend-panel">
+            <div><span class="dot dot-cu"></span>Cu²⁺ (kobber(II)ion)</div>
+            <div><span class="dot dot-so4"></span>SO₄²⁻ (sulfat)</div>
+        </div>
+
+        <div id="sat-msg" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(220,38,38,0.9); color: white; padding: 10px 20px; border-radius: 20px; font-weight: bold; pointer-events: none; opacity: 0; transition: opacity 0.5s;">
+            Opløsningen er mættet!
+        </div>
+
+        <div class="controls-bar">
+            <button class="ctrl-btn btn-salt" onclick="sim.addSalt()">
+                <span>⚗️</span> + n(CuSO₄)
+            </button>
+            <button class="ctrl-btn btn-water" onmousedown="sim.setFlow('in', true)" onmouseup="sim.setFlow('in', false)" onmouseleave="sim.setFlow('in', false)" ontouchstart="sim.setFlow('in', true)" ontouchend="sim.setFlow('in', false)">
+                <span>💧</span> + V(vand)
+            </button>
+            <button class="ctrl-btn btn-heat" onmousedown="sim.setEvap(true)" onmouseup="sim.setEvap(false)" onmouseleave="sim.setEvap(false)" ontouchstart="sim.setEvap(true)" ontouchend="sim.setEvap(false)">
+                <span>♨️</span> - V(vand)
+            </button>
+            <button class="ctrl-btn btn-reset" onclick="sim.reset()" title="Start forfra">
+                <span>🔄</span> Genstart
+            </button>
+        </div>
+    </div>
+
+    <div id="sidebar">
+        <div class="card">
+            <h3>🧮 Matematikken</h3>
+            <div style="font-size: 0.85rem; color:#64748b;">Tallene opdateres live fra karret:</div>
+            
+            <div class="formula-display">
+                <div>c = </div>
+                <div class="fraction">
+                    <div class="numerator">n</div>
+                    <div>V</div>
+                </div>
+                <div> = </div>
+                <div class="fraction">
+                    <div class="numerator live-val" id="math-n">0,00 mol</div>
+                    <div class="live-val" id="math-v">0,50 L</div>
+                </div>
+                <div> = </div>
+                <div class="live-val" id="math-c">0,00 M</div>
+            </div>
+        </div>
+
+        <div class="card" style="flex:1;">
+            <h3>❓ Mini-Quiz</h3>
+            <div id="quiz-area" class="quiz-container">
+                </div>
+            
+            <div class="quiz-nav" id="quiz-nav-bar">
+                <span id="quiz-progress" style="font-size:0.8rem; color:#64748b; align-self:center;">Spørgsmål 1 af 4</span>
+                <button id="next-q-btn" class="nav-btn" onclick="quiz.next()" disabled>Næste ➔</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+/* --- HELPER: FORMAT NUMBER (Comma instead of dot) --- */
+function fmt(num) {
+    return num.toFixed(2).replace('.', ',');
+}
+
+/* --- 1. SIMULATION ENGINE --- */
+const canvas = document.getElementById('mainCanvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+
+const SOLUBILITY_LIMIT = 1.4; 
+const SCALE = { ionsPerMol: 20 }; 
+
+const state = {
+    v: 0.5,           
+    n_total: 0.0,     
+    n_aq: 0.0,        
+    n_s: 0.0,         
+    c: 0.0,           
+    flowIn: false,
+    evaporating: false
+};
+
+let ions = [];
+let crystals = [];
+let bubbles = [];
+let steam = [];
+
+const sim = {
+    init() {
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        this.loop = this.loop.bind(this);
+        requestAnimationFrame(this.loop);
+    },
+
+    resize() {
+        // Find container størrelse
+        const container = document.getElementById('sim-container');
+        W = canvas.width = container.clientWidth;
+        H = canvas.height = container.clientHeight;
+        
+        // Simpel tank placering
+        this.tankH = H * 0.6;
+        this.tankW = Math.min(W * 0.8, this.tankH * 1.3);
+        this.tankX = (W - this.tankW) / 2;
+        this.tankY = (H - this.tankH) / 2 - 20; 
+    },
+
+    reset() {
+        // Nulstil alt simulation data
+        state.v = 0.5;
+        state.n_total = 0.0;
+        state.n_aq = 0.0;
+        state.n_s = 0.0;
+        state.c = 0.0;
+        state.flowIn = false;
+        state.evaporating = false;
+        
+        ions = [];
+        crystals = [];
+        bubbles = [];
+        steam = [];
+        
+        document.getElementById('sat-msg').style.opacity = 0;
+        
+        // Bemærk: Quizzen nulstilles ikke, da man måske vil genstarte labbet uden at miste quiz-score
+    },
+
+    addSalt() {
+        state.n_total += 0.1; 
+        for(let i=0; i<5; i++) {
+            crystals.push({
+                x: this.tankX + this.tankW/2 + (Math.random()-0.5)*40,
+                y: this.tankY - 50,
+                vx: (Math.random()-0.5)*2,
+                vy: Math.random()*5 + 5,
+                rot: Math.random()*Math.PI
+            });
+        }
+    },
+
+    setFlow(type, active) { if(type === 'in') state.flowIn = active; },
+    setEvap(active) { state.evaporating = active; },
+
+    update() {
+        // Vand ind
+        if(state.flowIn && state.v < 1.0) {
+            state.v += 0.008;
+            if(Math.random() > 0.5) bubbles.push({ x: this.tankX + 40 + (Math.random()-0.5)*15, y: this.tankY - 20, vy: 8, life: 1.0 });
+        }
+        // Fordampning (-V)
+        if(state.evaporating && state.v > 0) {
+            state.v = Math.max(0, state.v - 0.004);
+            if(Math.random() > 0.3) {
+                const liqY = this.tankY + this.tankH - ((state.v / 1.0) * this.tankH);
+                steam.push({ x: this.tankX + Math.random() * this.tankW, y: liqY, vx: (Math.random()-0.5)*0.5, vy: -2 - Math.random()*2, alpha: 0.6, size: 10 + Math.random()*15 });
+            }
+        }
+
+        // Mætning Beregning
+        if(state.v <= 0.001) {
+            state.c = 0; state.n_aq = 0; state.n_s = state.n_total;
+        } else {
+            const maxMoles = state.v * SOLUBILITY_LIMIT;
+            if (state.n_total > maxMoles) {
+                state.n_aq = maxMoles;
+                state.n_s = state.n_total - maxMoles;
+                state.c = SOLUBILITY_LIMIT;
+                document.getElementById('sat-msg').style.opacity = 1;
+            } else {
+                state.n_aq = state.n_total;
+                state.n_s = 0;
+                state.c = state.n_aq / state.v;
+                document.getElementById('sat-msg').style.opacity = 0;
+            }
+        }
+        if(state.n_total < 0) state.n_total = 0;
+
+        // --- UPDATE UI & MATH (Using comma format) ---
+        document.getElementById('disp-c').innerText = fmt(state.c);
+        document.getElementById('disp-n').innerText = fmt(state.n_aq);
+        document.getElementById('disp-v').innerText = fmt(state.v);
+
+        // Update Math Sidebar WITH UNITS
+        document.getElementById('math-n').innerText = fmt(state.n_aq) + " mol";
+        document.getElementById('math-v').innerText = fmt(state.v) + " L";
+        document.getElementById('math-c').innerText = fmt(state.c) + " M";
+
+        // --- PARTICLES ---
+        const liquidH = (state.v / 1.0) * this.tankH;
+        const liquidY = this.tankY + this.tankH - liquidH;
+        const solidHeight = Math.min(this.tankH, state.n_s * 80); 
+
+        // Crystals
+        for(let i=crystals.length-1; i>=0; i--) {
+            let c = crystals[i]; c.y += c.vy; c.x += c.vx;
+            let hitY = (state.v > 0.01) ? liquidY : (this.tankY + this.tankH - solidHeight);
+            if(c.y >= hitY) crystals.splice(i, 1);
+        }
+        // Ions
+        const targetIonCount = Math.floor(state.n_aq * SCALE.ionsPerMol);
+        if(ions.length/2 < targetIonCount) this.spawnIonPair(liquidY, solidHeight);
+        if(ions.length/2 > targetIonCount) { ions.pop(); ions.pop(); }
+        ions.forEach(p => {
+            p.x += p.vx; p.y += p.vy;
+            if(p.x < this.tankX + 5 || p.x > this.tankX + this.tankW - 5) p.vx *= -1;
+            const floorY = this.tankY + this.tankH - solidHeight - 5;
+            if(p.y > floorY) { p.y = floorY; p.vy *= -1; }
+            if(p.y < liquidY + 5) { p.y = liquidY + 5; p.vy = Math.abs(p.vy); }
+            p.x = Math.max(this.tankX, Math.min(this.tankX+this.tankW, p.x));
+        });
+        // Steam
+        for(let i=steam.length-1; i>=0; i--) {
+            let s = steam[i]; s.y += s.vy; s.x += s.vx; s.alpha -= 0.01; s.size += 0.2;
+            if(s.alpha <= 0) steam.splice(i, 1);
+        }
+    },
+
+    spawnIonPair(minY, solidH) {
+        const effectiveH = this.tankH - ((minY - this.tankY) + solidH);
+        if(effectiveH < 10) return; 
+        const randX = this.tankX + 10 + Math.random() * (this.tankW - 20);
+        const randY = minY + 10 + Math.random() * (effectiveH - 20);
+        ions.push({ x: randX, y: randY, vx: (Math.random()-0.5)*2, vy: (Math.random()-0.5)*2, type: 'Cu' });
+        ions.push({ x: randX+8, y: randY+8, vx: (Math.random()-0.5)*1.5, vy: (Math.random()-0.5)*1.5, type: 'SO4' });
+    },
+
+    loop() {
+        this.update();
+        ctx.clearRect(0,0,W,H);
+        this.drawTankBack();
+        this.drawPrecipitateLattice();
+        this.drawLiquid();
+        this.drawIons();
+        this.drawCrystals();
+        this.drawSteam();
+        this.drawTankFront();
+        this.drawStreams();
+        requestAnimationFrame(this.loop);
+    },
+
+    drawTankBack() {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.fillRect(this.tankX, this.tankY, this.tankW, this.tankH);
+    },
+    drawPrecipitateLattice() {
+        if (state.n_s <= 0.01) return;
+        const pileHeight = Math.min(this.tankH - 10, state.n_s * 80);
+        const pSize = 12; 
+        const rows = Math.floor(pileHeight / pSize);
+        const cols = Math.floor((this.tankW - 10) / pSize);
+        const startY = this.tankY + this.tankH - (pSize/2);
+        const startX = this.tankX + 5 + (pSize/2);
+
+        for (let r = 0; r < rows; r++) {
+            const cy = startY - (r * pSize);
+            let rowWidth = cols; let offset = 0;
+            if (r === rows - 1) { rowWidth = Math.floor(cols * 0.6); offset = Math.floor((cols - rowWidth)/2); } 
+            else if (r === rows - 2) { rowWidth = Math.floor(cols * 0.8); offset = Math.floor((cols - rowWidth)/2); }
+            for (let c = 0; c < rowWidth; c++) {
+                const cx = startX + ((c + offset) * pSize);
+                const isCu = (r + c + offset) % 2 === 0;
+                ctx.beginPath(); ctx.arc(cx, cy, (pSize/2)-1, 0, Math.PI*2);
+                if (isCu) { ctx.fillStyle = '#0284c7'; ctx.fill(); } 
+                else { ctx.fillStyle = '#fff'; ctx.fill(); ctx.strokeStyle = '#333'; ctx.lineWidth = 1; ctx.stroke(); }
+            }
+        }
+    },
+    drawLiquid() {
+        if(state.v <= 0.001) return;
+        const h = (state.v / 1.0) * this.tankH;
+        const y = this.tankY + this.tankH - h;
+        const satRatio = Math.min(1, state.c / SOLUBILITY_LIMIT);
+        const light = 90 - (satRatio * 50); 
+        const alpha = 0.5 + (satRatio * 0.3);
+        ctx.fillStyle = `hsla(210, 85%, ${light}%, ${alpha})`;
+        ctx.fillRect(this.tankX, y, this.tankW, h);
+        ctx.beginPath(); ctx.moveTo(this.tankX, y); ctx.lineTo(this.tankX+this.tankW, y);
+        ctx.strokeStyle = `hsla(210, 85%, ${light-20}%, 1)`; ctx.lineWidth = 3; ctx.stroke();
+    },
+    drawIons() {
+        if(state.v <= 0.001) return;
+        ions.forEach(p => {
+            ctx.beginPath();
+            let r = (p.type === 'Cu' ? 6 : 7);
+            ctx.arc(p.x, p.y, r, 0, Math.PI*2);
+            if(p.type === 'Cu') {
+                ctx.fillStyle = '#0284c7'; ctx.fill();
+                ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fillRect(p.x-1, p.y-4, 2, 8); ctx.fillRect(p.x-4, p.y-1, 8, 2);
+            } else {
+                ctx.fillStyle = '#fff'; ctx.fill();
+                ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1.5; ctx.stroke();
+                ctx.fillStyle = '#1e293b'; ctx.fillRect(p.x-3, p.y-1, 6, 2);
+            }
+        });
+    },
+    drawCrystals() {
+        ctx.fillStyle = '#0284c7';
+        crystals.forEach(c => { ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.rot); ctx.fillRect(-5,-5,10,10); ctx.restore(); });
+    },
+    drawSteam() {
+        steam.forEach(s => { ctx.fillStyle = `rgba(255,255,255,${s.alpha})`; ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fill(); });
+    },
+    drawTankFront() {
+        ctx.lineWidth = 6; ctx.strokeStyle = '#334155'; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(this.tankX, this.tankY); ctx.lineTo(this.tankX, this.tankY+this.tankH);
+        ctx.lineTo(this.tankX+this.tankW, this.tankY+this.tankH); ctx.lineTo(this.tankX+this.tankW, this.tankY); ctx.stroke();
+        ctx.font = 'bold 12px sans-serif'; ctx.fillStyle = '#334155'; ctx.textAlign = 'right';
+        ctx.beginPath(); ctx.moveTo(this.tankX, this.tankY); ctx.lineTo(this.tankX-15, this.tankY); ctx.stroke();
+        ctx.fillText("1,0 L", this.tankX-20, this.tankY+5);
+        const y05 = this.tankY + this.tankH * 0.5;
+        ctx.beginPath(); ctx.moveTo(this.tankX, y05); ctx.lineTo(this.tankX-10, y05); ctx.stroke();
+        ctx.fillText("0,5 L", this.tankX-15, y05+5);
+    },
+    drawStreams() {
+        if(state.flowIn) {
+            const liqY = this.tankY + this.tankH - ((state.v / 1.0) * this.tankH);
+            ctx.fillStyle = 'rgba(180, 220, 255, 0.8)';
+            const spoutX = this.tankX + 40;
+            let targetY = (state.v > 0) ? liqY : (this.tankY + this.tankH);
+            ctx.fillRect(spoutX - 6, 0, 12, targetY);
+        }
+    }
+};
+
+/* --- 2. QUIZ MODULE --- */
+const quiz = {
+    started: false,
+    questions: [
+        {
+            q: "Hvad sker der med koncentrationen (c), hvis vi fordobler volumen (V) uden at ændre stofmængden?",
+            opts: ["Den bliver dobbelt så stor", "Den bliver halveret", "Den er uændret"],
+            ans: 1,
+            expl: "Korrekt! c = n/V. Når nævneren V bliver dobbelt så stor, bliver resultatet halvt så stort."
+        },
+        {
+            q: "Vi har V = 2,0 L og n = 0,5 mol. Hvad er koncentrationen?",
+            opts: ["0,25 M", "1,00 M", "2,50 M"],
+            ans: 0,
+            expl: "Rigtigt! 0,5 mol / 2,0 L = 0,25 M."
+        },
+        {
+            q: "Hvad sker der med koncentrationen, hvis vi halverer stofmængden (n), mens volumen er konstant?",
+            opts: ["Den fordobles", "Den halveres", "Ingen ændring"],
+            ans: 1,
+            expl: "Præcis! c afhænger direkte af n. Halv stofmængde = halv koncentration."
+        },
+        {
+            q: "Beregn koncentrationen: n = 0,20 mol og V = 0,20 L",
+            opts: ["0,10 M", "0,40 M", "1,00 M"],
+            ans: 2,
+            expl: "Korrekt! Et tal divideret med sig selv giver altid 1."
+        }
+    ],
+    idx: 0,
+
+    init() {
+        this.render();
+    },
+
+    start() {
+        this.started = true;
+        document.getElementById('quiz-nav-bar').style.visibility = 'visible';
+        this.render();
+    },
+
+    render() {
+        const qContainer = document.getElementById('quiz-area');
+        
+        // Show Start Button if not started
+        if(!this.started) {
+            qContainer.innerHTML = `
+                <div style="text-align:center;">
+                    <button class="nav-btn" style="font-size:1.1rem; padding:12px 25px;" onclick="quiz.start()">Start Quiz 🚀</button>
+                    <p style="font-size:0.85rem; color:#64748b; margin-top:10px;">Test din viden om c = n / V</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Bland svarmulighederne, saa det rigtige svar ikke altid staar samme sted
+        const original = this.questions[this.idx];
+        const order = original.opts.map((_, i) => i);
+        for (let i = order.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [order[i], order[j]] = [order[j], order[i]];
+        }
+        this.current = {
+            ...original,
+            opts: order.map(i => original.opts[i]),
+            ans: order.indexOf(original.ans)
+        };
+        const qData = this.current;
+
+        // Opdater tekst
+        document.getElementById('quiz-progress').innerText = `Spørgsmål ${this.idx + 1} af ${this.questions.length}`;
+        document.getElementById('next-q-btn').disabled = true;
+
+        let html = `<div class="quiz-question">${qData.q}</div>`;
+        qData.opts.forEach((opt, i) => {
+            html += `<div class="quiz-opt" onclick="quiz.check(${i}, this)">${opt}</div>`;
+        });
+        html += `<div id="q-feedback" class="quiz-feedback"></div>`;
+
+        qContainer.innerHTML = html;
+    },
+
+    check(selectedIdx, el) {
+        if(document.querySelector('.quiz-opt.correct') || document.querySelector('.quiz-opt.wrong')) return;
+
+        const qData = this.current;
+        const feedbackEl = document.getElementById('q-feedback');
+        
+        if(selectedIdx === qData.ans) {
+            el.classList.add('correct');
+            feedbackEl.style.display = 'block';
+            feedbackEl.style.color = '#166534';
+            feedbackEl.innerText = qData.expl;
+            document.getElementById('next-q-btn').disabled = false;
+        } else {
+            el.classList.add('wrong');
+            feedbackEl.style.display = 'block';
+            feedbackEl.style.color = '#991b1b';
+            feedbackEl.innerText = "Desværre ikke rigtigt. Prøv igen.";
+            
+            setTimeout(() => {
+                 el.classList.remove('wrong'); 
+                 feedbackEl.style.display = 'none';
+            }, 1500);
+        }
+    },
+
+    next() {
+        if(this.idx < this.questions.length - 1) {
+            this.idx++;
+            this.render();
+        } else {
+            document.getElementById('quiz-area').innerHTML = `
+                <div style="text-align:center; padding:20px;">
+                    <div style="font-size:3rem;">🏆</div>
+                    <h3>Godt klaret!</h3>
+                    <p>Du har gennemført quizzen.</p>
+                    <button class="nav-btn" onclick="quiz.reset()">Prøv igen</button>
+                </div>
+            `;
+            document.getElementById('quiz-nav-bar').style.visibility = 'hidden';
+        }
+    },
+
+    reset() {
+        this.idx = 0;
+        this.started = false;
+        document.getElementById('next-q-btn').style.display = 'block';
+        this.init();
+    }
+};
+
+/* --- START --- */
+sim.init();
+quiz.init();
+
+</script>
+</body>
+</html>

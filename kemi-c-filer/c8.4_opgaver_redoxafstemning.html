@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redox-Afstemning Pro</title>
+    <style>
+        /* --- CSS VARIABLER & GRUND-STYLING --- */
+        :root {
+            --bg-color: #1a1a24;
+            --panel-bg: #232332;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent-blue: #38bdf8;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --accent-gold: #fbbf24;
+            --input-bg: #0f172a;
+            --border-color: #334155;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* HTML5 Canvas overlay til effekter */
+        #fx-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* --- HOVEDCONTAINER --- */
+        #app-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 1100px;
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            color: var(--accent-blue);
+            letter-spacing: 1px;
+        }
+
+        /* --- TOP MENU (Opgavevalg, Score og Genstart) --- */
+        #top-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--border-color);
+            padding: 15px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            width: 90%;
+            max-width: 900px;
+        }
+
+        #score-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+            padding-right: 25px;
+            border-right: 1px solid var(--border-color);
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #top-controls label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        #task-btn-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .task-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--input-bg);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .task-btn:hover {
+            border-color: var(--accent-blue);
+            color: var(--text-main);
+        }
+
+        .task-btn.active {
+            background: var(--accent-blue);
+            color: #0f172a;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        .task-btn-divider {
+            width: 1px;
+            align-self: stretch;
+            background: var(--border-color);
+            margin: 0 4px;
+        }
+
+        .task-btn.bonus {
+            border-radius: 8px;
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            font-size: 0.85rem;
+        }
+
+        .task-btn.bonus:hover {
+            border-color: var(--accent-red);
+            color: #fff;
+        }
+
+        .task-btn.bonus.active {
+            background: var(--accent-red);
+            color: #fff;
+            border-color: var(--accent-red);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+        }
+
+        /* --- OPGAVE & TRIN INDIKATOR --- */
+        #progress-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        #progress-bar {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            background: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--text-muted);
+            transition: all 0.3s;
+        }
+
+        .step-indicator.active {
+            background: var(--accent-gold);
+            color: #1a1a24;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.5);
+            transform: scale(1.1);
+        }
+
+        .step-indicator.done {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+
+        #step-title {
+            color: var(--accent-blue);
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        /* --- REAKTIONSSKEMA (CENTRALT ELEMENT) --- */
+        #reaction-box {
+            background: var(--panel-bg);
+            padding: 40px 30px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 250px;
+            position: relative;
+        }
+
+        #instruction-text {
+            font-size: 1.15rem;
+            margin-bottom: 40px;
+            color: #fff;
+            text-align: center;
+            min-height: 2.5em;
+            max-width: 800px;
+        }
+
+        .equation-row {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            font-size: 2.2rem;
+            font-family: 'Georgia', serif;
+        }
+
+        .molecule-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .coef-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .coef-input {
+            width: 45px;
+            height: 45px;
+            font-size: 1.6rem;
+            text-align: center;
+            background: var(--input-bg);
+            color: var(--accent-blue);
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            margin-right: 5px;
+            font-family: monospace;
+            display: none;
+            outline: none;
+        }
+
+        .molecule-text {
+            display: flex;
+            align-items: flex-end;
+            position: relative;
+        }
+
+        .atom-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Oxidationstal input */
+        .ox-input {
+            width: 35px;
+            height: 30px;
+            font-size: 1rem;
+            text-align: center;
+            background: var(--input-bg);
+            color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            position: absolute;
+            top: -40px;
+            display: none;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .ox-input.correct-glow {
+            border-color: var(--accent-green) !important;
+            color: var(--accent-green) !important;
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .ox-input.error-border {
+            border-color: var(--accent-red) !important;
+        }
+
+        .ox-label {
+            position: absolute;
+            top: -35px;
+            font-size: 1.2rem;
+            color: var(--accent-green);
+            font-weight: bold;
+            display: none;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .symbol {
+            padding: 0;
+        }
+        
+        .charge {
+            align-self: flex-start;
+            font-size: 0.7em;
+            font-weight: bold;
+            margin-left: 2px;
+            margin-top: 5px;
+        }
+
+        .operator {
+            margin: 0 10px;
+            color: var(--text-muted);
+            padding-bottom: 5px;
+        }
+
+        /* --- KONTROLPANEL (BUND) --- */
+        #control-panel {
+            margin-top: 30px;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            min-height: 150px;
+            margin-bottom: 50px;
+        }
+
+        .dynamic-form {
+            display: none;
+            gap: 15px;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+            padding: 20px 30px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            max-width: 800px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 5px 15px;
+        }
+
+        .control-input {
+            padding: 8px 12px;
+            font-size: 1.1rem;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: white;
+            border-radius: 6px;
+            width: 70px;
+            text-align: center;
+            outline: none;
+        }
+
+        select.control-input {
+            width: auto;
+            text-align: left;
+        }
+
+        button.btn-primary {
+            padding: 10px 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            background: var(--accent-blue);
+            color: #0f172a;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 rgba(2, 132, 199, 1);
+            margin-left: 15px;
+        }
+
+        button.btn-primary:hover:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 rgba(2, 132, 199, 1);
+        }
+
+        button.btn-primary:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+        
+        button.btn-primary:disabled {
+            cursor: default;
+            box-shadow: none;
+            transform: translateY(4px);
+        }
+
+        button.btn-secondary {
+            background: var(--panel-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+            margin-left: 0;
+        }
+        
+        button.btn-secondary:hover {
+            box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+        }
+
+        /* --- TRIN 6 SPECIFIK INFO BOKS --- */
+        #step-6-info {
+            width: 100%;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        #step-6-info p {
+            margin: 5px 0;
+            font-size: 1.1rem;
+        }
+        
+        .highlight-charge {
+            font-weight: bold;
+            font-size: 1.3rem;
+            color: #fff;
+            padding: 2px 8px;
+            background: var(--panel-bg);
+            border-radius: 4px;
+            margin: 0 5px;
+        }
+
+        .highlight-env {
+            font-weight: bold;
+            color: var(--accent-green);
+        }
+
+        /* Animationer for fejl */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .error-shake {
+            animation: shake 0.4s;
+            border-color: var(--accent-red) !important;
+            color: var(--accent-red) !important;
+            background: rgba(239, 68, 68, 0.1) !important;
+        }
+        
+        /* Ekstra molekyler som tilføjes dynamisk (H+, H2O osv) */
+        .dynamic-molecule {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- FEJRINGS-OVERLAY (alle opgaver løst) --- */
+        #celebration-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 10, 20, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        #celebration-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        #celebration-content {
+            background: var(--panel-bg);
+            border: 2px solid var(--accent-gold);
+            border-radius: 16px;
+            padding: 40px 50px;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(251, 191, 36, 0.45);
+            max-width: 480px;
+        }
+
+        #celebration-unicorn {
+            font-size: 5rem;
+            line-height: 1;
+            animation: unicorn-bounce 1s ease-in-out infinite;
+        }
+
+        @keyframes unicorn-bounce {
+            0%, 100% { transform: translateY(0) rotate(-4deg); }
+            50% { transform: translateY(-18px) rotate(4deg); }
+        }
+
+        #celebration-content h2 {
+            color: var(--accent-gold);
+            margin: 15px 0 10px;
+            font-size: 1.8rem;
+        }
+
+        #celebration-content p {
+            color: var(--text-main);
+            margin: 0 0 25px 0;
+            font-size: 1.05rem;
+        }
+
+        /* Responsivt design for mindre skærme */
+        @media (max-width: 900px) {
+            #top-controls {
+                flex-direction: column;
+                gap: 15px;
+                padding: 20px;
+            }
+            #score-display { border-right: none; border-bottom: 1px solid var(--border-color); padding-right: 0; padding-bottom: 15px; width: 100%; text-align: center; }
+            .equation-row { font-size: 1.6rem; }
+            .coef-input { width: 35px; height: 35px; font-size: 1.2rem; }
+            .dynamic-form { flex-direction: column; }
+            button.btn-primary { margin-left: 0; width: 100%; margin-top: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="fx-canvas"></canvas>
+
+    <div id="celebration-overlay">
+        <div id="celebration-content">
+            <div id="celebration-unicorn">🦄</div>
+            <h2>Fantastisk klaret! ✨</h2>
+            <p>Du har afstemt alle opgaverne – inklusiv bonusopgaverne! Du er blevet en rigtig redox-mester.</p>
+            <button class="btn-primary" id="btn-celebration-close">Fortsæt</button>
+        </div>
+    </div>
+
+    <div id="app-container">
+        
+        <header>
+            <h1>Afstemning af redoxreaktioner</h1>
+            <p style="color: var(--text-muted); margin-top: 5px;">Trin-for-trin guide til mestring af elektronoverførsler</p>
+        </header>
+
+        <div id="top-controls">
+            <div id="score-display">
+                Score: <span id="points">0,00</span>
+            </div>
+            <div class="control-group">
+                <label>Vælg Opgave:</label>
+                <div id="task-btn-group">
+                    <!-- Autogenereres via JS -->
+                </div>
+            </div>
+            <button class="btn-primary btn-secondary" id="btn-restart">Genstart Opgave</button>
+        </div>
+
+        <div id="progress-container">
+            <div id="progress-bar">
+                <!-- Autogenereres via JS -->
+            </div>
+            <p id="bonus-badge" style="display:none; margin: 0 0 4px 0; font-size: 0.9rem; font-weight: bold; color: var(--accent-red); text-transform: uppercase; letter-spacing: 1px;"></p>
+            <h2 id="step-title">Indlæser...</h2>
+            <p id="env-badge" class="highlight-env" style="margin: 4px 0 0 0; font-size: 1rem;"></p>
+        </div>
+
+        <div id="reaction-box">
+            <div id="instruction-text">Indlæser instruktion...</div>
+            <div class="equation-row" id="equation-container">
+                <!-- Autogenereres via JS -->
+            </div>
+        </div>
+
+        <div id="control-panel">
+            <!-- TRIN 1: Oxidationstal -->
+            <div class="dynamic-form" id="form-step-1">
+                <span style="color: var(--text-muted); width: 100%; text-align: center; margin-bottom: 10px;">Skriv gerne med romertal, fx +VII eller -II (almindelige tal som +7 og -2 accepteres også).</span>
+                <button class="btn-primary" id="btn-check-1">Tjek Oxidationstal</button>
+            </div>
+
+            <!-- TRIN 2: Hvem oxideres/reduceres -->
+            <div class="dynamic-form" id="form-step-2">
+                <div class="form-group">
+                    <label>Stof der oxideres (stiger):</label>
+                    <select id="select-ox" class="control-input"></select>
+                </div>
+                <div class="form-group">
+                    <label>Stof der reduceres (falder):</label>
+                    <select id="select-red" class="control-input"></select>
+                </div>
+                <button class="btn-primary" id="btn-check-2">Tjek Redox-par</button>
+            </div>
+
+            <!-- TRIN 3: Stigning og Fald -->
+            <div class="dynamic-form" id="form-step-3">
+                <div class="form-group">
+                    <label id="label-inc">Stigning pr. atom:</label>
+                    <input type="number" id="input-inc" class="control-input" min="1" max="10">
+                </div>
+                <div class="form-group">
+                    <label id="label-dec">Fald pr. atom:</label>
+                    <input type="number" id="input-dec" class="control-input" min="1" max="10">
+                </div>
+                <button class="btn-primary" id="btn-check-3">Tjek Elektroner</button>
+            </div>
+
+            <!-- TRIN 4: Koefficienter -->
+            <div class="dynamic-form" id="form-step-4">
+                <span style="color: var(--text-muted); width: 100%; text-align: center; margin-bottom: 10px;">Indsæt de rigtige koefficienter i boksene foran molekylerne i skemaet.</span>
+                <div id="coef-hint" style="display:none; width: 100%; text-align: center; color: var(--accent-gold); font-size: 0.95rem; margin-bottom: 10px;"></div>
+                <button class="btn-primary" id="btn-check-4">Tjek Koefficienter</button>
+            </div>
+
+            <!-- TRIN 5: Ladning -->
+            <div class="dynamic-form" id="form-step-5">
+                <div class="form-group">
+                    <label>Samlet ladning Venstre:</label>
+                    <input type="number" id="input-charge-l" class="control-input">
+                </div>
+                <div class="form-group">
+                    <label>Samlet ladning Højre:</label>
+                    <input type="number" id="input-charge-r" class="control-input">
+                </div>
+                <button class="btn-primary" id="btn-check-5">Tjek Ladning</button>
+            </div>
+
+            <!-- TRIN 6: Afstemning af H og O -->
+            <div class="dynamic-form" id="form-step-6">
+                <div id="step-6-info">
+                    <p>Reaktionen foregår i <span id="env-display" class="highlight-env">surt miljø</span>.</p>
+                    <p>Ladning venstre: <span id="charge-l-display" class="highlight-charge"></span> | Ladning højre: <span id="charge-r-display" class="highlight-charge"></span></p>
+                </div>
+                <div class="form-group" id="h-balance-group">
+                    <!-- Udfyldes dynamisk -->
+                </div>
+                <div class="form-group" id="h2o-balance-group">
+                    <!-- Udfyldes dynamisk -->
+                </div>
+                <button class="btn-primary" id="btn-check-6">Tjek Afstemning</button>
+            </div>
+            
+            <!-- TRIN 7: Færdig -->
+            <div class="dynamic-form" id="form-step-7">
+                <h2 style="color: var(--accent-green); margin: 0; width: 100%; text-align: center;">Reaktion Færdigafstemt!</h2>
+                <button class="btn-primary" id="btn-next-reaction" style="margin-top: 15px;">Gå til Næste Opgave</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+/* ==========================================================================
+   KREATIV UDVIDELSE: PARTIKELSYSTEM (HTML5 CANVAS)
+   ========================================================================== */
+const canvas = document.getElementById('fx-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function createExplosion(x, y) {
+    const colors = ['#38bdf8', '#22c55e', '#fbbf24', '#ffffff'];
+    for (let i = 0; i < 50; i++) {
+        particles.push({
+            x: x,
+            y: y,
+            vx: (Math.random() - 0.5) * 15,
+            vy: (Math.random() - 0.5) * 15,
+            radius: Math.random() * 4 + 2,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            life: 1,
+            decay: Math.random() * 0.02 + 0.015
+        });
+    }
+}
+
+function createConfettiBurst() {
+    const colors = ['#38bdf8', '#22c55e', '#fbbf24', '#ef4444', '#a78bfa', '#f472b6', '#ffffff'];
+    for (let i = 0; i < 40; i++) {
+        particles.push({
+            type: 'confetti',
+            x: Math.random() * canvas.width,
+            y: -20 - Math.random() * 150,
+            vx: (Math.random() - 0.5) * 4,
+            vy: Math.random() * 2 + 2,
+            rotation: Math.random() * 360,
+            rotSpeed: (Math.random() - 0.5) * 12,
+            size: Math.random() * 8 + 6,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            life: 1,
+            decay: Math.random() * 0.004 + 0.004
+        });
+    }
+}
+
+function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = particles.length - 1; i >= 0; i--) {
+        let p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= p.decay;
+
+        if (p.life <= 0) {
+            particles.splice(i, 1);
+            continue;
+        }
+
+        ctx.globalAlpha = p.life;
+        if (p.type === 'confetti') {
+            p.vy += 0.05;
+            p.rotation += p.rotSpeed;
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation * Math.PI / 180);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+            ctx.restore();
+        } else {
+            p.vy += 0.2;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.fill();
+        }
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+/* ==========================================================================
+   DATASTRUKTUR: REDOX REAKTIONER
+   ========================================================================== */
+const db = [
+    {
+        id: 0,
+        env: "surt",
+        hType: "H⁺",
+        hSide: "left",    
+        h2oSide: "right", 
+        leftSide: [
+            { id: "r1", charge: -1, atoms: [ { sym: "Mn", ox: 7, isRedox: true }, { sym: "O", ox: -2, sub: 4 } ] },
+            { id: "r2", charge: 2, atoms: [ { sym: "Fe", ox: 2, isRedox: true } ] }
+        ],
+        rightSide: [
+            { id: "p1", charge: 2, atoms: [ { sym: "Mn", ox: 2, isRedox: true } ] },
+            { id: "p2", charge: 3, atoms: [ { sym: "Fe", ox: 3, isRedox: true } ] }
+        ],
+        answers: {
+            oxSym: "Fe", redSym: "Mn",
+            inc: 1, dec: 5,
+            coefs: { r1: 1, r2: 5, p1: 1, p2: 5 },
+            chargeL: 9, chargeR: 17,
+            hCount: 8, h2oCount: 4
+        }
+    },
+    {
+        id: 1,
+        env: "surt",
+        hType: "H⁺",
+        hSide: "left",
+        h2oSide: "right",
+        leftSide: [
+            { id: "r1", charge: -2, atoms: [ { sym: "Cr", ox: 6, isRedox: true, sub: 2 }, { sym: "O", ox: -2, sub: 7 } ] },
+            { id: "r2", charge: -1, atoms: [ { sym: "Cl", ox: -1, isRedox: true } ] }
+        ],
+        rightSide: [
+            { id: "p1", charge: 3, atoms: [ { sym: "Cr", ox: 3, isRedox: true } ] },
+            { id: "p2", charge: 0, atoms: [ { sym: "Cl", ox: 0, isRedox: true, sub: 2 } ] }
+        ],
+        answers: {
+            oxSym: "Cl", redSym: "Cr",
+            inc: 1, dec: 3, 
+            coefs: { r1: 1, r2: 6, p1: 2, p2: 3 },
+            chargeL: -8, chargeR: 6,
+            hCount: 14, h2oCount: 7
+        }
+    },
+    {
+        id: 2,
+        env: "surt",
+        hType: "H⁺",
+        hSide: "left",
+        h2oSide: "right",
+        leftSide: [
+            { id: "r1", charge: -1, atoms: [ { sym: "N", ox: 5, isRedox: true }, { sym: "O", ox: -2, sub: 3 } ] },
+            { id: "r2", charge: 0, atoms: [ { sym: "Cu", ox: 0, isRedox: true } ] }
+        ],
+        rightSide: [
+            { id: "p1", charge: 0, atoms: [ { sym: "N", ox: 4, isRedox: true }, { sym: "O", ox: -2, sub: 2 } ] },
+            { id: "p2", charge: 2, atoms: [ { sym: "Cu", ox: 2, isRedox: true } ] }
+        ],
+        answers: {
+            oxSym: "Cu", redSym: "N",
+            inc: 2, dec: 1,
+            coefs: { r1: 2, r2: 1, p1: 2, p2: 1 },
+            chargeL: -2, chargeR: 2,
+            hCount: 4, h2oCount: 2
+        }
+    },
+    {
+        id: 3,
+        env: "basisk",
+        hType: "OH⁻",
+        hSide: "right",
+        h2oSide: "left",
+        leftSide: [
+            { id: "r1", charge: -1, atoms: [ { sym: "Mn", ox: 7, isRedox: true }, { sym: "O", ox: -2, sub: 4 } ] },
+            { id: "r2", charge: -1, atoms: [ { sym: "I", ox: -1, isRedox: true } ] }
+        ],
+        rightSide: [
+            { id: "p1", charge: 0, atoms: [ { sym: "Mn", ox: 4, isRedox: true }, { sym: "O", ox: -2, sub: 2 } ] },
+            { id: "p2", charge: -1, atoms: [ { sym: "I", ox: 5, isRedox: true }, { sym: "O", ox: -2, sub: 3 } ] }
+        ],
+        answers: {
+            oxSym: "I", redSym: "Mn",
+            inc: 6, dec: 3,
+            coefs: { r1: 2, r2: 1, p1: 2, p2: 1 },
+            chargeL: -3, chargeR: -1,
+            hCount: 2, h2oCount: 1
+        }
+    },
+    {
+        id: 4,
+        env: "basisk",
+        hType: "OH⁻",
+        hSide: "right",
+        h2oSide: "left",
+        leftSide: [
+            { id: "r1", charge: -1, atoms: [ { sym: "Cl", ox: 1, isRedox: true }, { sym: "O", ox: -2 } ] },
+            { id: "r2", charge: -1, atoms: [ { sym: "I", ox: -1, isRedox: true } ] }
+        ],
+        rightSide: [
+            { id: "p1", charge: -1, atoms: [ { sym: "Cl", ox: -1, isRedox: true } ] },
+            { id: "p2", charge: 0, atoms: [ { sym: "I", ox: 0, isRedox: true, sub: 2 } ] }
+        ],
+        coefHint: "Husk at I₂ allerede indeholder 2 iod-atomer (indekstallet ₂) – der er derfor allerede 2 iod på højre side, selvom koefficienten foran I₂ kun skal være 1.",
+        answers: {
+            oxSym: "I", redSym: "Cl",
+            inc: 1, dec: 2,
+            coefs: { r1: 1, r2: 2, p1: 1, p2: 1 },
+            chargeL: -3, chargeR: -1,
+            hCount: 2, h2oCount: 1
+        }
+    },
+    {
+        id: 5,
+        bonus: true,
+        bonusLabel: "B1",
+        bonusTitle: "Bonus: Afladning af blyakkumulator (samme atom oxideres og reduceres!)",
+        env: "surt",
+        hType: "H⁺",
+        hSide: "left",
+        h2oSide: "right",
+        leftSide: [
+            { id: "r1", charge: 0, atoms: [ { sym: "Pb", ox: 0, isRedox: true } ] },
+            { id: "r2", charge: 0, atoms: [ { sym: "Pb", ox: 4, isRedox: true }, { sym: "O", ox: -2, sub: 2 } ] }
+        ],
+        rightSide: [
+            { id: "p1", charge: 2, atoms: [ { sym: "Pb", ox: 2, isRedox: true } ] },
+            { id: "p2", charge: 2, atoms: [ { sym: "Pb", ox: 2, isRedox: true } ] }
+        ],
+        coefHint: "Bly (Pb) optræder to steder på venstresiden: som rent metal og inden i PbO₂. Det er samme grundstof, men to forskellige stoffer – de skal have hver sin koefficient.",
+        mergeProducts: [["p1", "p2"]],
+        answers: {
+            oxId: "r1", redId: "r2",
+            incLabel: "Stigning pr. Pb-atom (i det rene Pb):",
+            decLabel: "Fald pr. Pb-atom (i PbO₂):",
+            inc: 2, dec: 2,
+            coefs: { r1: 1, r2: 1, p1: 1, p2: 1 },
+            chargeL: 0, chargeR: 4,
+            hCount: 4, h2oCount: 2
+        }
+    },
+    {
+        id: 6,
+        bonus: true,
+        bonusLabel: "B2",
+        bonusTitle: "Bonus: Komproportionering af jern (samme atom oxideres og reduceres!)",
+        env: "surt",
+        hType: "H⁺",
+        hSide: "left",
+        h2oSide: "right",
+        leftSide: [
+            { id: "r1", charge: 0, atoms: [ { sym: "Fe", ox: 0, isRedox: true } ] },
+            { id: "r2", charge: 3, atoms: [ { sym: "Fe", ox: 3, isRedox: true } ] }
+        ],
+        rightSide: [
+            { id: "p1", charge: 2, atoms: [ { sym: "Fe", ox: 2, isRedox: true } ] },
+            { id: "p2", charge: 2, atoms: [ { sym: "Fe", ox: 2, isRedox: true } ] }
+        ],
+        coefHint: "Jern (Fe) optræder to steder på venstresiden: som rent metal og som Fe³⁺-ion. Det er samme grundstof, men to forskellige stoffer – tæl elektronerne for hver af dem for sig.",
+        mergeProducts: [["p1", "p2"]],
+        answers: {
+            oxId: "r1", redId: "r2",
+            incLabel: "Stigning pr. Fe-atom (i det rene Fe):",
+            decLabel: "Fald pr. Fe-atom (i Fe³⁺):",
+            inc: 2, dec: 1,
+            coefs: { r1: 1, r2: 2, p1: 1, p2: 2 },
+            chargeL: 6, chargeR: 6,
+            hCount: 0, h2oCount: 0
+        }
+    }
+];
+
+/* ==========================================================================
+   HOVEDLOGIK FOR APPLIKATIONEN
+   ========================================================================== */
+const STEPS = [
+    { title: "Trin 1: Oxidationstal", instr: "Tildel korrekte oxidationstal til alle atomer. Skriv gerne med romertal (fx +VII eller -II)." },
+    { title: "Trin 2: Redox-Par", instr: "Identificer hvilket stof der oxideres (stiger i ox-tal) og hvilket der reduceres (falder)." },
+    { title: "Trin 3: Elektron-hop", instr: "Hvor meget stiger og falder oxidationstallet pr. atom for de involverede stoffer?" },
+    { title: "Trin 4: Koefficienter", instr: "Indsæt koefficienter foran molekylerne, så den samlede stigning og fald udlignes (husk evt. indeks-tal)." },
+    { title: "Trin 5: Ladning", instr: "Tæl den samlede ladning op på venstre og højre side ud fra de koefficienter du netop har indsat." },
+    { title: "Trin 6: H og O", instr: "Kig på ladningsforskellen. Afstem ladningen med reaktionsmiljøets ion, og afstem derefter oxygen med vand." },
+    { title: "Trin 7: Færdig", instr: "Flot arbejde! Du har demonstreret fuld kontrol over den systematiske redox-metode." }
+];
+
+class RedoxApp {
+    constructor() {
+        this.currentReaction = db[0];
+        this.currentStep = 1;
+        this.score = 0;
+        this.completedTasks = new Set();
+        this.hasCelebratedAll = false;
+
+        this.bindEvents();
+        this.initReaction(0);
+        this.updateScoreDisplay();
+    }
+
+    addScore(points) {
+        this.score += points;
+        if (this.score < 0) this.score = 0;
+        this.updateScoreDisplay();
+    }
+
+    updateScoreDisplay() {
+        let scoreStr = this.score.toFixed(2).replace('.', ',');
+        document.getElementById('points').innerText = scoreStr;
+    }
+
+    bindEvents() {
+        document.getElementById('btn-restart').addEventListener('click', () => {
+            this.initReaction(this.currentReaction.id);
+        });
+
+        document.getElementById('btn-check-1').addEventListener('click', (e) => this.checkStep1(e));
+        document.getElementById('btn-check-2').addEventListener('click', (e) => this.checkStep2(e));
+        document.getElementById('btn-check-3').addEventListener('click', (e) => this.checkStep3(e));
+        document.getElementById('btn-check-4').addEventListener('click', (e) => this.checkStep4(e));
+        document.getElementById('btn-check-5').addEventListener('click', (e) => this.checkStep5(e));
+        document.getElementById('btn-check-6').addEventListener('click', (e) => this.checkStep6(e));
+        document.getElementById('btn-next-reaction').addEventListener('click', () => {
+            let nextId = (this.currentReaction.id + 1) % db.length;
+            if (this.completedTasks.size === db.length && !this.hasCelebratedAll) {
+                this.hasCelebratedAll = true;
+                this.celebrateAllDone(() => this.initReaction(nextId));
+            } else {
+                this.initReaction(nextId);
+            }
+        });
+
+        document.getElementById('btn-celebration-close').addEventListener('click', () => {
+            if (this.celebrationCloseFn) this.celebrationCloseFn();
+        });
+    }
+
+    celebrateAllDone(onDone) {
+        const overlay = document.getElementById('celebration-overlay');
+        overlay.classList.add('show');
+
+        createConfettiBurst();
+        let burstCount = 1;
+        const burstInterval = setInterval(() => {
+            createConfettiBurst();
+            burstCount++;
+            if (burstCount >= 6) clearInterval(burstInterval);
+        }, 350);
+
+        let closed = false;
+        this.celebrationCloseFn = () => {
+            if (closed) return;
+            closed = true;
+            clearInterval(burstInterval);
+            overlay.classList.remove('show');
+            this.celebrationCloseFn = null;
+            if (onDone) onDone();
+        };
+
+        setTimeout(() => { if (this.celebrationCloseFn) this.celebrationCloseFn(); }, 6000);
+    }
+
+    buildTaskButtons() {
+        const container = document.getElementById('task-btn-group');
+        container.innerHTML = "";
+        let taskNo = 0;
+        let dividerAdded = false;
+        db.forEach((reaction) => {
+            if (reaction.bonus && !dividerAdded) {
+                let divider = document.createElement('div');
+                divider.className = "task-btn-divider";
+                container.appendChild(divider);
+                dividerAdded = true;
+            }
+
+            let btn = document.createElement('button');
+            btn.id = "task-btn-" + reaction.id;
+
+            if (reaction.bonus) {
+                btn.className = "task-btn bonus";
+                btn.innerText = reaction.bonusLabel || "★";
+                btn.title = reaction.bonusTitle || "Bonusopgave (svær)";
+            } else {
+                taskNo++;
+                btn.className = "task-btn";
+                btn.innerText = taskNo;
+                btn.title = "Opgave " + taskNo + " (" + reaction.env + " miljø)";
+            }
+
+            btn.addEventListener('click', () => this.initReaction(reaction.id));
+            container.appendChild(btn);
+        });
+    }
+
+    initReaction(index) {
+        this.currentReaction = db[index];
+        this.currentStep = 1;
+
+        if (!document.getElementById('task-btn-group').children.length) {
+            this.buildTaskButtons();
+        }
+        document.querySelectorAll('.task-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.id === "task-btn-" + this.currentReaction.id);
+        });
+
+        this.buildProgressBar();
+        this.buildReactionEquation();
+        this.populateSelects();
+
+        document.getElementById('env-badge').innerText = this.currentReaction.env === "surt"
+            ? "Reaktionen foregår i surt miljø."
+            : "Reaktionen foregår i basisk miljø.";
+
+        let bonusBadge = document.getElementById('bonus-badge');
+        if (this.currentReaction.bonus) {
+            bonusBadge.innerText = "⭐ Bonusopgave – svær sværhedsgrad: samme atom oxideres og reduceres!";
+            bonusBadge.style.display = "block";
+        } else {
+            bonusBadge.style.display = "none";
+        }
+
+        let hSideText = this.currentReaction.hSide === "left" ? "Venstre" : "Højre";
+        let h2oSideText = this.currentReaction.h2oSide === "left" ? "Venstre" : "Højre";
+
+        let hTypeLabel = this.currentReaction.env === "surt" ? "Antal H⁺ (" + hSideText + " side):" : "Antal OH⁻ (" + hSideText + " side):";
+        
+        document.getElementById('h-balance-group').innerHTML = 
+            "<label>" + hTypeLabel + "</label>" +
+            "<input type='number' id='input-h' class='control-input' min='0'>";
+
+        document.getElementById('h2o-balance-group').innerHTML = 
+            "<label>Antal H₂O (" + h2oSideText + " side):</label>" +
+            "<input type='number' id='input-h2o' class='control-input' min='0'>";
+
+        this.updateUI();
+    }
+
+    buildProgressBar() {
+        const container = document.getElementById('progress-bar');
+        container.innerHTML = "";
+        for (let i = 0; i < STEPS.length; i++) {
+            let div = document.createElement('div');
+            div.className = "step-indicator";
+            div.id = "step-ind-" + (i+1);
+            div.innerText = (i+1);
+            container.appendChild(div);
+        }
+    }
+
+    getUnicodeSubscript(num) {
+        const map = {2: '₂', 3: '₃', 4: '₄', 7: '₇'};
+        return map[num] || "";
+    }
+
+    getUnicodeCharge(charge) {
+        const map = {
+            1: '⁺', 2: '²⁺', 3: '³⁺',
+            '-1': '⁻', '-2': '²⁻', '-3': '³⁻'
+        };
+        return map[charge] || "";
+    }
+
+    buildReactionEquation() {
+        const container = document.getElementById('equation-container');
+        container.innerHTML = "";
+
+        let hLeftPlaceholder = document.createElement('div');
+        hLeftPlaceholder.id = "h-left-placeholder";
+        hLeftPlaceholder.style.display = "none";
+        
+        let h2oLeftPlaceholder = document.createElement('div');
+        h2oLeftPlaceholder.id = "h2o-left-placeholder";
+        h2oLeftPlaceholder.style.display = "none";
+        
+        container.appendChild(hLeftPlaceholder);
+        container.appendChild(h2oLeftPlaceholder);
+
+        this.currentReaction.leftSide.forEach((mol, idx) => {
+            container.appendChild(this.createMoleculeDOM(mol));
+            if (idx < this.currentReaction.leftSide.length - 1) {
+                let plus = document.createElement('div');
+                plus.className = "operator";
+                plus.innerText = "+";
+                container.appendChild(plus);
+            }
+        });
+        
+        let arrow = document.createElement('div');
+        arrow.className = "operator";
+        arrow.innerText = "⟶";
+        container.appendChild(arrow);
+
+        this.currentReaction.rightSide.forEach((mol, idx) => {
+            container.appendChild(this.createMoleculeDOM(mol));
+            if (idx < this.currentReaction.rightSide.length - 1) {
+                let plus = document.createElement('div');
+                plus.className = "operator";
+                plus.id = "op-after-" + mol.id;
+                plus.innerText = "+";
+                container.appendChild(plus);
+            }
+        });
+
+        let hRightPlaceholder = document.createElement('div');
+        hRightPlaceholder.id = "h-right-placeholder";
+        hRightPlaceholder.style.display = "none";
+
+        let h2oRightPlaceholder = document.createElement('div');
+        h2oRightPlaceholder.id = "h2o-right-placeholder";
+        h2oRightPlaceholder.style.display = "none";
+
+        container.appendChild(hRightPlaceholder);
+        container.appendChild(h2oRightPlaceholder);
+    }
+
+    createMoleculeDOM(mol) {
+        let wrapper = document.createElement('div');
+        wrapper.className = "molecule-group";
+        wrapper.id = "molgroup-" + mol.id;
+
+        let coefWrapper = document.createElement('div');
+        coefWrapper.className = "coef-wrapper";
+
+        let coefInput = document.createElement('input');
+        coefInput.type = "number";
+        coefInput.className = "coef-input";
+        coefInput.id = "coef-" + mol.id;
+        coefInput.min = "1";
+        
+        let molText = document.createElement('div');
+        molText.className = "molecule-text";
+
+        mol.atoms.forEach((atom, aIdx) => {
+            let atomGrp = document.createElement('div');
+            atomGrp.className = "atom-group";
+
+            // Kun atomer der indgår i redox-parret skal have oxidationstal
+            // tildelt af eleven (fx O i MnO4- er altid -II og ændres ikke).
+            if (atom.isRedox) {
+                let oxInput = document.createElement('input');
+                oxInput.type = "text";
+                oxInput.className = "ox-input";
+                oxInput.id = "ox-" + mol.id + "-" + aIdx;
+
+                let oxLabel = document.createElement('div');
+                oxLabel.className = "ox-label";
+                oxLabel.id = "oxlabel-" + mol.id + "-" + aIdx;
+
+                atomGrp.appendChild(oxInput);
+                atomGrp.appendChild(oxLabel);
+            }
+
+            let symSpan = document.createElement('span');
+            symSpan.className = "symbol";
+            symSpan.innerText = atom.sym + this.getUnicodeSubscript(atom.sub);
+
+            atomGrp.appendChild(symSpan);
+            molText.appendChild(atomGrp);
+        });
+
+        if (mol.charge !== 0) {
+            let chargeSpan = document.createElement('span');
+            chargeSpan.className = "charge";
+            chargeSpan.innerText = this.getUnicodeCharge(mol.charge);
+            molText.appendChild(chargeSpan);
+        }
+
+        coefWrapper.appendChild(coefInput);
+        coefWrapper.appendChild(molText);
+        wrapper.appendChild(coefWrapper);
+        return wrapper;
+    }
+
+    moleculeFormulaText(mol) {
+        let text = mol.atoms.map(a => a.sym + this.getUnicodeSubscript(a.sub)).join("");
+        if (mol.charge) text += this.getUnicodeCharge(mol.charge);
+        return text;
+    }
+
+    getOxRedMolIds() {
+        let ans = this.currentReaction.answers;
+        if (ans.oxId && ans.redId) return { oxId: ans.oxId, redId: ans.redId };
+        // Fald tilbage til at slå op på grundstof-symbol for reaktioner, der ikke
+        // eksplicit angiver oxId/redId (dvs. hvor de to stoffer har forskellige symboler).
+        const findBySym = (sym) => this.currentReaction.leftSide.find(m => m.atoms.some(a => a.isRedox && a.sym === sym));
+        return { oxId: findBySym(ans.oxSym).id, redId: findBySym(ans.redSym).id };
+    }
+
+    populateSelects() {
+        let oxSel = document.getElementById('select-ox');
+        let redSel = document.getElementById('select-red');
+        oxSel.innerHTML = "<option value=''>Vælg...</option>";
+        redSel.innerHTML = "<option value=''>Vælg...</option>";
+
+        // Molekyler (ikke bare grundstof-symboler), så to forskellige stoffer med
+        // samme centrale atom (fx Pb og PbO₂) kan skelnes fra hinanden i trin 2.
+        let redoxMols = this.currentReaction.leftSide.filter(m => m.atoms.some(a => a.isRedox));
+        let symCounts = {};
+        redoxMols.forEach(m => {
+            let sym = m.atoms.find(a => a.isRedox).sym;
+            symCounts[sym] = (symCounts[sym] || 0) + 1;
+        });
+
+        redoxMols.forEach(m => {
+            let sym = m.atoms.find(a => a.isRedox).sym;
+            let label = symCounts[sym] > 1 ? this.moleculeFormulaText(m) : sym;
+            oxSel.innerHTML += "<option value='" + m.id + "'>" + label + "</option>";
+            redSel.innerHTML += "<option value='" + m.id + "'>" + label + "</option>";
+        });
+    }
+
+    updateUI() {
+        document.getElementById('step-title').innerText = STEPS[this.currentStep - 1].title;
+        document.getElementById('instruction-text').innerText = STEPS[this.currentStep - 1].instr;
+
+        for (let i = 1; i <= STEPS.length; i++) {
+            let ind = document.getElementById('step-ind-' + i);
+            ind.className = "step-indicator";
+            if (i < this.currentStep) ind.classList.add('done');
+            if (i === this.currentStep) ind.classList.add('active');
+        }
+
+        // Fleksibel rækkefølge-styring af skemaerne: 
+        // Aktuel opgave rykkes øverst (order: -1), besvarede lægger sig nedenunder i rækkefølge.
+        for (let i = 1; i <= STEPS.length; i++) {
+            let form = document.getElementById('form-step-' + i);
+            if (form) {
+                if (i === this.currentStep) {
+                    form.style.display = 'flex';
+                    form.style.order = -1; 
+                } else if (i < this.currentStep) {
+                    if (i === 1) {
+                        form.style.display = 'none'; // Skjul oxidationstal input-boksen helt når løst
+                    } else {
+                        form.style.display = 'flex';
+                        form.style.order = i; 
+                    }
+                } else {
+                    form.style.display = 'none';
+                }
+
+                if (i < this.currentStep) {
+                    form.querySelectorAll('input, select').forEach(el => {
+                        if(!el.classList.contains('ox-input')) el.disabled = true;
+                    });
+                    
+                    let btn = form.querySelector('button');
+                    if(btn && btn.id !== 'btn-next-reaction') {
+                       btn.innerText = "✓ Korrekt";
+                       btn.disabled = true;
+                       btn.style.backgroundColor = "var(--accent-green)";
+                       btn.style.color = "#fff";
+                    }
+                }
+            }
+        }
+
+        if (this.currentStep === 1) {
+            document.querySelectorAll('.ox-input').forEach(el => el.style.display = "block");
+            this.clearInputs();
+        }
+        
+        if (this.currentStep === 3) {
+            let ans = this.currentReaction.answers;
+            document.getElementById('label-inc').innerText = ans.incLabel || ("Stigning pr. " + ans.oxSym + "-atom:");
+            document.getElementById('label-dec').innerText = ans.decLabel || ("Fald pr. " + ans.redSym + "-atom:");
+        }
+
+        if (this.currentStep === 4) {
+            document.querySelectorAll('.coef-input').forEach(el => el.style.display = "block");
+        }
+
+        if (this.currentStep === 6) {
+            let envText = this.currentReaction.env === "surt" ? "surt miljø (afstem med H⁺)" : "basisk miljø (afstem med OH⁻)";
+            document.getElementById('env-display').innerHTML = envText;
+            
+            let chargeL = this.currentReaction.answers.chargeL;
+            let chargeR = this.currentReaction.answers.chargeR;
+            document.getElementById('charge-l-display').innerText = (chargeL > 0 ? "+" : "") + chargeL;
+            document.getElementById('charge-r-display').innerText = (chargeR > 0 ? "+" : "") + chargeR;
+        }
+    }
+
+    clearInputs() {
+        document.querySelectorAll('input').forEach(el => {
+            el.value = "";
+            el.classList.remove('error-shake', 'correct-glow', 'error-border');
+            el.disabled = false;
+        });
+        document.querySelectorAll('select').forEach(el => {
+            el.value = "";
+            el.classList.remove('error-shake', 'correct-glow');
+            el.disabled = false;
+        });
+        
+        const originalTexts = {
+            'btn-check-1': 'Tjek Oxidationstal',
+            'btn-check-2': 'Tjek Redox-par',
+            'btn-check-3': 'Tjek Elektroner',
+            'btn-check-4': 'Tjek Koefficienter',
+            'btn-check-5': 'Tjek Ladning',
+            'btn-check-6': 'Tjek Afstemning'
+        };
+        document.querySelectorAll('.dynamic-form button').forEach(btn => {
+            if (btn.id !== 'btn-next-reaction') {
+                if(originalTexts[btn.id]) btn.innerText = originalTexts[btn.id];
+                btn.disabled = false;
+                btn.style.backgroundColor = "";
+                btn.style.color = "";
+            }
+        });
+        
+        document.querySelectorAll('.ox-label').forEach(el => el.style.display = "none");
+        document.querySelectorAll('[id$="-placeholder"]').forEach(el => el.style.display = 'none');
+
+        let coefHintEl = document.getElementById('coef-hint');
+        coefHintEl.style.display = "none";
+        coefHintEl.innerText = "";
+    }
+
+    triggerSuccess(buttonEvent) {
+        let btn = buttonEvent.target;
+        let rect = btn.getBoundingClientRect();
+        createExplosion(rect.left + rect.width / 2, rect.top + rect.height / 2);
+
+        // Fejl-markeringen (.error-shake) kan sidde på felter uden for det aktive
+        // dynamic-form (fx koefficient-felterne, som ligger i selve reaktionsskemaet),
+        // så den ryddes globalt her og ikke kun inden i det aktuelle trins form.
+        document.querySelectorAll('.error-shake').forEach(el => el.classList.remove('error-shake'));
+
+        this.addScore(100);
+        this.currentStep++;
+        this.updateUI();
+
+        if (this.currentStep === STEPS.length) {
+            this.mergeProductsDisplay();
+            this.completedTasks.add(this.currentReaction.id);
+        }
+    }
+
+    mergeProductsDisplay() {
+        let groups = this.currentReaction.mergeProducts;
+        if (!groups) return;
+
+        groups.forEach(group => {
+            let anchorId = group[0];
+            let total = group.reduce((sum, id) => sum + (this.currentReaction.answers.coefs[id] || 0), 0);
+
+            let anchorCoefEl = document.getElementById('coef-' + anchorId);
+            if (anchorCoefEl) {
+                anchorCoefEl.value = total;
+                anchorCoefEl.disabled = true;
+                anchorCoefEl.style.borderColor = "var(--accent-green)";
+                anchorCoefEl.style.color = "var(--accent-green)";
+            }
+
+            for (let i = 1; i < group.length; i++) {
+                let wrapper = document.getElementById('molgroup-' + group[i]);
+                if (wrapper) wrapper.style.display = "none";
+            }
+            for (let i = 0; i < group.length - 1; i++) {
+                let opEl = document.getElementById('op-after-' + group[i]);
+                if (opEl) opEl.style.display = "none";
+            }
+        });
+    }
+
+    triggerFail(elementIds) {
+        this.addScore(-10);
+        elementIds.forEach(id => {
+            let el = document.getElementById(id);
+            if (el) {
+                el.classList.remove('error-shake');
+                void el.offsetWidth;
+                el.classList.add('error-shake');
+            }
+        });
+    }
+
+    toRoman(num) {
+        if (num === 0) return "0";
+        let isNeg = num < 0;
+        let absNum = Math.abs(num);
+        let roman = "";
+        switch (absNum) {
+            case 1: roman = "I"; break;
+            case 2: roman = "II"; break;
+            case 3: roman = "III"; break;
+            case 4: roman = "IV"; break;
+            case 5: roman = "V"; break;
+            case 6: roman = "VI"; break;
+            case 7: roman = "VII"; break;
+            case 8: roman = "VIII"; break;
+            default: roman = absNum.toString();
+        }
+        return (isNeg ? "-" : "+") + roman;
+    }
+
+    parseOxInput(raw) {
+        let val = (raw || "").trim();
+        if (val === "") return NaN;
+
+        let sign = 1;
+        if (val[0] === '+') { val = val.slice(1); }
+        else if (val[0] === '-') { sign = -1; val = val.slice(1); }
+        val = val.trim().toUpperCase();
+
+        if (val === "0") return 0;
+
+        const romanMap = { I: 1, II: 2, III: 3, IV: 4, V: 5, VI: 6, VII: 7, VIII: 8 };
+        if (romanMap.hasOwnProperty(val)) {
+            return sign * romanMap[val];
+        }
+
+        let num = parseInt(val, 10);
+        return isNaN(num) ? NaN : sign * num;
+    }
+
+    checkStep1(e) {
+        let allCorrect = true;
+
+        const checkMolecule = (mol) => {
+            mol.atoms.forEach((atom, aIdx) => {
+                if (!atom.isRedox) return;
+                let id = "ox-" + mol.id + "-" + aIdx;
+                let el = document.getElementById(id);
+                if (el.disabled) return;
+
+                let val = this.parseOxInput(el.value);
+                if (isNaN(val) || val !== atom.ox) {
+                    allCorrect = false;
+                    el.classList.add('error-border');
+                    this.addScore(-5);
+                } else {
+                    el.classList.remove('error-border');
+                    el.classList.add('correct-glow');
+                    el.disabled = true; 
+                    this.addScore(15);
+                }
+            });
+        };
+
+        this.currentReaction.leftSide.forEach(checkMolecule);
+        this.currentReaction.rightSide.forEach(checkMolecule);
+
+        if (allCorrect) {
+            document.querySelectorAll('.ox-input').forEach(el => el.style.display = "none");
+            
+            const lockMolecule = (mol) => {
+                mol.atoms.forEach((atom, aIdx) => {
+                    if (!atom.isRedox) return;
+                    let label = document.getElementById("oxlabel-" + mol.id + "-" + aIdx);
+                    label.innerText = this.toRoman(atom.ox);
+                    label.style.display = "block";
+                });
+            };
+            this.currentReaction.leftSide.forEach(lockMolecule);
+            this.currentReaction.rightSide.forEach(lockMolecule);
+
+            this.triggerSuccess(e);
+        }
+    }
+
+    checkStep2(e) {
+        let ox = document.getElementById('select-ox').value;
+        let red = document.getElementById('select-red').value;
+        let { oxId, redId } = this.getOxRedMolIds();
+        let errors = [];
+
+        if (ox !== oxId) errors.push('select-ox');
+        if (red !== redId) errors.push('select-red');
+
+        if (errors.length === 0) {
+            this.triggerSuccess(e);
+        } else {
+            this.triggerFail(errors);
+        }
+    }
+
+    checkStep3(e) {
+        let inc = parseInt(document.getElementById('input-inc').value);
+        let dec = parseInt(document.getElementById('input-dec').value);
+        let errors = [];
+
+        if (inc !== this.currentReaction.answers.inc) errors.push('input-inc');
+        if (dec !== this.currentReaction.answers.dec) errors.push('input-dec');
+
+        if (errors.length === 0) {
+            this.triggerSuccess(e);
+        } else {
+            this.triggerFail(errors);
+        }
+    }
+
+    checkStep4(e) {
+        let allCorrect = true;
+        let errors = [];
+
+        const checkCoef = (sideData) => {
+            sideData.forEach(mol => {
+                let id = "coef-" + mol.id;
+                let el = document.getElementById(id);
+                let val = parseInt(el.value);
+                let target = this.currentReaction.answers.coefs[mol.id];
+                if (isNaN(val) || val !== target) {
+                    allCorrect = false;
+                    errors.push(id);
+                }
+            });
+        };
+
+        checkCoef(this.currentReaction.leftSide);
+        checkCoef(this.currentReaction.rightSide);
+
+        if (allCorrect) {
+            document.getElementById('coef-hint').style.display = "none";
+            document.querySelectorAll('.coef-input').forEach(el => {
+                el.style.borderColor = "var(--accent-green)";
+                el.style.color = "var(--accent-green)";
+            });
+            this.triggerSuccess(e);
+        } else {
+            if (this.currentReaction.coefHint) {
+                let hintEl = document.getElementById('coef-hint');
+                hintEl.innerText = "💡 " + this.currentReaction.coefHint;
+                hintEl.style.display = "block";
+            }
+            this.triggerFail(errors);
+        }
+    }
+
+    checkStep5(e) {
+        let cLeft = parseInt(document.getElementById('input-charge-l').value);
+        let cRight = parseInt(document.getElementById('input-charge-r').value);
+        let errors = [];
+
+        if (cLeft !== this.currentReaction.answers.chargeL) errors.push('input-charge-l');
+        if (cRight !== this.currentReaction.answers.chargeR) errors.push('input-charge-r');
+
+        if (errors.length === 0) {
+            this.triggerSuccess(e);
+        } else {
+            this.triggerFail(errors);
+        }
+    }
+
+    checkStep6(e) {
+        let hCount = parseInt(document.getElementById('input-h').value);
+        let h2oCount = parseInt(document.getElementById('input-h2o').value);
+        let errors = [];
+
+        if (hCount !== this.currentReaction.answers.hCount) errors.push('input-h');
+        if (h2oCount !== this.currentReaction.answers.h2oCount) errors.push('input-h2o');
+
+        if (errors.length === 0) {
+            // Nogle reaktioner (fx komproportionering) er allerede ladnings- og
+            // ilt-afstemt uden ekstra H⁺/OH⁻/H₂O — så vis kun boksen, hvis der reelt skal tilføjes noget.
+            if (hCount > 0) {
+                let hPh = this.currentReaction.hSide === "left" ? document.getElementById('h-left-placeholder') : document.getElementById('h-right-placeholder');
+
+                let hOpHtml = this.currentReaction.hSide === "right" ? "<div class='operator'>+</div>" : "";
+                let hOpEndHtml = this.currentReaction.hSide === "left" ? "<div class='operator'>+</div>" : "";
+
+                hPh.innerHTML = hOpHtml + "<div class='molecule-group dynamic-molecule'><div class='coef-wrapper'><span class='coef-input' style='display:inline-block; border-color:var(--accent-green); color:var(--accent-green); font-weight:bold;'>" + hCount + "</span><div class='molecule-text'><span class='symbol'>" + this.currentReaction.hType + "</span></div></div></div>" + hOpEndHtml;
+                hPh.style.display = "flex";
+            }
+
+            if (h2oCount > 0) {
+                let h2oPh = this.currentReaction.h2oSide === "left" ? document.getElementById('h2o-left-placeholder') : document.getElementById('h2o-right-placeholder');
+
+                let h2oOpHtml = this.currentReaction.h2oSide === "right" ? "<div class='operator'>+</div>" : "";
+                let h2oOpEndHtml = this.currentReaction.h2oSide === "left" ? "<div class='operator'>+</div>" : "";
+
+                h2oPh.innerHTML = h2oOpHtml + "<div class='molecule-group dynamic-molecule'><div class='coef-wrapper'><span class='coef-input' style='display:inline-block; border-color:var(--accent-green); color:var(--accent-green); font-weight:bold;'>" + h2oCount + "</span><div class='molecule-text'><span class='symbol'>H₂O</span></div></div></div>" + h2oOpEndHtml;
+                h2oPh.style.display = "flex";
+            }
+
+            this.triggerSuccess(e);
+        } else {
+            this.triggerFail(errors);
+        }
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    window.app = new RedoxApp();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SigFig Master: Kemi-Lab Pro</title>
+    <style>
+        :root {
+            --bg: #0a0a12;
+            --panel: #161b22;
+            --accent: #00d2ff;
+            --accent-glow: rgba(0, 210, 255, 0.4);
+            --success: #00ff88;
+            --error: #ff4b5c;
+            --info: #3b82f6; /* Ny farve til 'Videre' knap */
+            --text: #e6edf3;
+            --key-bg: #21262d;
+            --key-shadow: #010409;
+        }
+        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', system-ui, sans-serif; }
+        /* height:100dvh (med svh/vh som fallback) + overflow-y:auto i stedet for hidden:
+           på dårlige opløsninger/høj browser-zoom er der ikke altid plads nok til alt indhold -
+           i stedet for at klippe knapper væk (uden mulighed for at nå dem), kan siden så scrolle. */
+        body {
+            margin: 0; padding: 0; background: var(--bg); color: var(--text);
+            height: 100vh; height: 100svh; height: 100dvh;
+            overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column;
+        }
+
+        #app-header {
+            height: 65px; flex-shrink: 0; background: rgba(13, 17, 23, 0.95); border-bottom: 2px solid #30363d;
+            display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 10;
+        }
+        
+        .nav-btn {
+            background: #d73a49; color: white; border: none; padding: 10px 18px; 
+            border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.9rem;
+            box-shadow: 0 3px 0 #a02d37; transition: all 0.1s;
+        }
+        .nav-btn:active { transform: translateY(2px); box-shadow: none; }
+
+        .stats { display: flex; gap: 20px; font-size: 1.1rem; font-weight: bold; color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
+        
+        #game-area {
+            flex: 1 1 auto; min-height: 0; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: safe center;
+            background: radial-gradient(circle at center, #161b22 0%, #0a0a12 100%); overflow-y: auto; overflow-x: hidden;
+        }
+
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+
+        .card-container {
+            position: relative; z-index: 2; width: 92%; max-width: 650px; flex-shrink: 0;
+            background: rgba(22, 27, 34, 0.85); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+            padding: clamp(14px, 4vw, 30px); margin: 12px 0; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .progress-indicator { position: absolute; top: 15px; right: 25px; font-size: 0.85rem; color: #8b949e; font-weight: bold; }
+
+        .mode-title { color: var(--accent); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; }
+        .question-text { font-size: clamp(0.95rem, 3vw, 1.2rem); color: #c9d1d9; margin-bottom: 10px; line-height: 1.4; }
+
+        .main-number { font-size: clamp(1.9rem, 7vw, 3.2rem); font-weight: bold; margin: 15px 0; font-family: 'Consolas', monospace; letter-spacing: -1px; text-shadow: 0 0 15px rgba(255,255,255,0.1); }
+
+        /* Gangesymbolet ×'ets glyf sidder skævt (for højt) i Consolas ved store skriftstørrelser -
+           centreres eksplicit i stedet for at følge tekstens standard-baseline. */
+        .times-symbol { display: inline-block; vertical-align: middle; margin: 0 0.15em; letter-spacing: normal; }
+
+        .calc-box { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 15px; margin: 15px 0; font-size: clamp(1.3rem, 5vw, 2rem); font-family: 'Consolas', monospace; }
+        .factor { position: relative; padding: 5px 10px; background: rgba(255,255,255,0.03); border-radius: 8px; }
+        .sf-tag { 
+            position: absolute; top: -20px; left: 50%; transform: translateX(-50%); 
+            font-size: 0.7rem; color: var(--accent); opacity: 0.8; white-space: nowrap;
+        }
+        .operator { color: #8b949e; }
+
+        .input-row { display: flex; gap: 12px; margin: clamp(14px, 4vw, 25px) 0; align-items: stretch; }
+
+        .input-display {
+            background: #0d1117; border: 2px solid #30363d; border-radius: 12px;
+            padding: clamp(12px, 3vw, 20px); font-size: clamp(1.4rem, 5vw, 2rem); font-family: 'Consolas', monospace;
+            color: var(--accent); min-height: clamp(60px, 14vh, 80px); display: flex; align-items: center; justify-content: center;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.8); position: relative; flex: 1;
+            cursor: pointer; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .input-display:focus {
+            border-color: var(--accent);
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.8), 0 0 12px var(--accent-glow);
+        }
+        .cursor { width: 3px; height: 1.2em; background: var(--accent); animation: blink 1s infinite; margin-left: 4px; border-radius: 2px; visibility: hidden; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* Eksponent-boks: vises kun når det konkrete spørgsmåls facit rent faktisk kræver en potens - se JS (needsExponent) */
+        .exp-box { flex: 0 0 clamp(90px, 25vw, 150px); gap: 2px; color: var(--accent); padding-left: 10px; padding-right: 10px; white-space: nowrap; }
+        /* "10" og eksponenten skal stå i samme tekst-forløb (ikke som separate flex-elementer),
+           ellers ignorerer sup'ets vertical-align:super fordi flex-elementer ikke retter sig efter det. */
+        .exp-content { font-size: 0.85em; color: #8b949e; white-space: nowrap; }
+        .exp-content sup { font-size: 1.3em; vertical-align: super; color: var(--accent); }
+        .exp-placeholder { opacity: 0.35; }
+
+        .visualizer-box {
+            height: 8px; background: #30363d; border-radius: 4px; margin: 20px 0; position: relative; overflow: hidden;
+        }
+        .visualizer-fill {
+            height: 100%; background: linear-gradient(90deg, var(--accent), #58a6ff); width: 0%; transition: width 0.4s ease-out, background 0.3s;
+        }
+
+        #keypad {
+            background: #161b22; flex-shrink: 0; padding: clamp(8px, 2vh, 15px);
+            padding-bottom: max(env(safe-area-inset-bottom, 0px), clamp(10px, 2vh, 30px));
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(6px, 1.5vw, 12px);
+            border-top: 2px solid #30363d; z-index: 10;
+        }
+        .key {
+            background: var(--key-bg); color: white; border: none; border-radius: 10px;
+            font-size: clamp(1rem, 3.5vh, 1.4rem); padding: clamp(10px, 2.5vh, 18px) 0; font-weight: bold; cursor: pointer;
+            box-shadow: 0 5px 0 var(--key-shadow); transition: all 0.1s; position: relative;
+        }
+        .key:active { transform: translateY(4px); box-shadow: none; }
+        .key.action { background: #1f6feb; box-shadow: 0 5px 0 #113d85; }
+        .key.delete { background: #d73a49; box-shadow: 0 5px 0 #872029; }
+        .key.submit { grid-column: span 2; background: #238636; color: #ffffff; box-shadow: 0 5px 0 #155220; }
+        
+        /* Tilstand hvor knappen er "Videre" */
+        .key.submit.next-mode { background: var(--info); box-shadow: 0 5px 0 #2563eb; }
+
+        /* Screens */
+        /* overflow-y:auto + justify-content:safe center: skærmen centreres normalt, men hvis
+           indholdet (fx menuen med alle knapper) er højere end viewporten på et dårligt
+           opløsning/høj zoom, kan man scrolle i stedet for at knapper bliver utilgængelige. */
+        .screen { position: absolute; top:0; left:0; width:100%; height:100%; background:var(--bg); z-index:20; display:flex; flex-direction:column; align-items:center; justify-content:safe center; overflow-y:auto; text-align:center; padding: clamp(12px, 4vw, 20px); transition: opacity 0.3s; }
+        .hidden { opacity: 0; pointer-events: none; display: none; }
+        h1 { font-size: clamp(1.9rem, 7vw, 3.5rem); background: linear-gradient(to right, var(--accent), #a78bfa); -webkit-background-clip: text; color: transparent; margin-bottom: 10px; text-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+
+        /* 3 kolonner x 2 rækker (6 knapper) - så hele menuen altid er synlig uden scroll,
+           også ved høj browser-zoom hvor lodret plads er den knappe ressource. */
+        .menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(8px, 2vw, 15px); width: 100%; max-width: 560px; margin-top: clamp(15px, 4vh, 30px); }
+        .menu-btn {
+            background: linear-gradient(135deg, #21262d, #161b22); border: 1px solid #30363d; color: var(--accent);
+            padding: clamp(10px, 2.5vw, 20px) 8px; font-size: clamp(0.75rem, 2.4vw, 1.1rem); border-radius: 12px; cursor: pointer;
+            transition: 0.2s; letter-spacing: 0.5px; font-weight: bold; line-height: 1.3;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); position: relative; overflow: hidden;
+        }
+        /* Under ~480px bliver 3 kolonner for smalt til teksten - fald tilbage til 2 kolonner (3 rækker for 6 knapper) */
+        @media (max-width: 480px) {
+            .menu-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        .menu-btn:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0, 210, 255, 0.15); color: #fff; }
+        .menu-btn::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); transform: translateX(-100%); transition: 0.5s; }
+        .menu-btn:hover::after { transform: translateX(100%); }
+
+        .feedback-overlay {
+            position: absolute; top: 35%; left: 50%; transform: translate(-50%, -50%);
+            font-size: clamp(2rem, 9vw, 4rem); font-weight: 900; z-index: 100; opacity: 0; pointer-events: none;
+            text-shadow: 0 0 30px rgba(0,0,0,0.8); white-space: nowrap; transition: opacity 0.3s;
+            max-width: 94vw; text-align: center;
+        }
+        .feedback-overlay.show { opacity: 1; pointer-events: auto; }
+
+        /* Facit ved forkert svar - vises INDE i kortet (ikke som overlay), så intet dækker for spørgsmål/tastatur */
+        .wrong-panel {
+            background: rgba(255,75,92,0.08); border: 1px solid rgba(255,75,92,0.35); border-radius: 10px;
+            padding: 12px 16px; margin: 12px 0; text-align: left;
+        }
+        .wrong-panel.hidden { display: none; }
+        .wrong-label { color: var(--error); font-weight: bold; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .wrong-answer { color: var(--text); font-family: 'Consolas', monospace; font-size: 1.3rem; margin-left: 8px; }
+        .hint-text { font-size: 0.85rem; font-weight: 500; color: #8b949e; margin-top: 8px; line-height: 1.4; }
+
+        @keyframes pop { 0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); opacity: 0; } }
+    </style>
+</head>
+<body>
+
+<div id="app-header">
+    <button class="nav-btn" onclick="game.showMenu()">⌂ MENU</button>
+    <div class="stats">
+        <span id="score-display">Score: 0</span>
+    </div>
+</div>
+
+<div id="game-area">
+    <canvas id="bgCanvas"></canvas>
+    <div id="feedback-txt" class="feedback-overlay"></div>
+
+    <div class="card-container" id="quiz-card">
+        <div class="progress-indicator" id="progress-display"></div>
+        <div class="mode-title" id="mode-label">MODE</div>
+        <div class="question-text" id="q-text">Spørgsmål</div>
+        
+        <div id="q-content"></div>
+
+        <div class="wrong-panel hidden" id="wrong-panel">
+            <span class="wrong-label">✕ Forkert</span><span class="wrong-answer" id="wrong-answer-text"></span>
+            <div class="hint-text" id="wrong-hint-text"></div>
+        </div>
+
+        <div class="visualizer-box">
+            <div class="visualizer-fill" id="vis-bar"></div>
+        </div>
+
+        <div class="input-row">
+            <div class="input-display" id="mantissa-box" tabindex="0" onfocus="game.setActiveField('mantissa')">
+                <span id="user-input"></span><div class="cursor" id="mantissa-cursor"></div>
+            </div>
+            <div class="input-display exp-box" id="exp-box" tabindex="0" onfocus="game.setActiveField('exp')">
+                <span class="exp-content"><span class="times-symbol">×</span> 10<sup id="exp-input"></sup></span><div class="cursor" id="exp-cursor"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="keypad">
+    <button class="key" onclick="game.input('7')">7</button>
+    <button class="key" onclick="game.input('8')">8</button>
+    <button class="key" onclick="game.input('9')">9</button>
+    <button class="key delete" onclick="game.backspace()">⌫</button>
+    
+    <button class="key" onclick="game.input('4')">4</button>
+    <button class="key" onclick="game.input('5')">5</button>
+    <button class="key" onclick="game.input('6')">6</button>
+    <div></div>
+
+    <button class="key" onclick="game.input('1')">1</button>
+    <button class="key" onclick="game.input('2')">2</button>
+    <button class="key" onclick="game.input('3')">3</button>
+    <button class="key" onclick="game.input('-')">+/-</button>
+    
+    <button class="key" onclick="game.input('0')">0</button>
+    <button class="key" onclick="game.input(',')">,</button>
+    <button class="key submit" id="submit-btn" onclick="game.handleInteraction()">SVAR ↵</button>
+</div>
+
+<div id="start-screen" class="screen">
+    <h1>Afrunding og opskrivning</h1>
+    <p style="color:#8b949e; max-width:400px; margin-bottom:10px;">
+        Mestér de betydende cifre.<br>Brug skærmen eller tastaturet.
+    </p>
+    <div class="menu-grid">
+        <button class="menu-btn" onclick="game.start('COUNT')">1. Betydende cifre</button>
+        <button class="menu-btn" onclick="game.start('ROUND')">2. Afrunding</button>
+        <button class="menu-btn" onclick="game.start('CONVERT')">3. Videnskabelig notation</button>
+        <button class="menu-btn" onclick="game.start('MULTIPLY')">4. Regneregler</button>
+        <button class="menu-btn" onclick="game.start('UNITS')">5. Enheder (mL, L, µL)</button>
+        <button class="menu-btn" style="border-color:#a855f7; color:#a855f7" onclick="game.start('MIX')">6. Blandede opgaver</button>
+    </div>
+</div>
+
+<div id="end-screen" class="screen hidden">
+    <h1 style="font-size:clamp(1.5rem, 6vw, 2rem); margin-bottom:5px;">RESULTAT</h1>
+    <h2 id="final-score" style="font-size:clamp(2.4rem, 12vw, 4rem); margin:10px 0; color:var(--accent); font-family:'Consolas'">0 / 12</h2>
+    <p id="end-msg" style="color:#c9d1d9; font-size:clamp(1rem, 3.5vw, 1.2rem); margin-bottom:30px;">Godt arbejde!</p>
+    <button class="menu-btn" style="width:200px;" onclick="game.showMenu()">Hovedmenu</button>
+</div>
+
+<script>
+const Utils = {
+    // Returnerer antal betydende cifre
+    countSigFigs: (nStr) => {
+        if(nStr.includes('e') || nStr.includes('×')) {
+            let parts = nStr.toLowerCase().split(/[e×]/);
+            return Utils.countSigFigs(parts[0].trim());
+        }
+        let s = nStr.replace('-', '').trim();
+        if (!s.includes(',')) return s.length; 
+        
+        let started = false;
+        let count = 0;
+        for(let i=0; i<s.length; i++) {
+            if (s[i] === ',') continue;
+            if (!started && s[i] !== '0') started = true;
+            if (started) count++;
+        }
+        return count;
+    },
+
+    // Placerer et komma i en ren cifferstreng, 'pointPos' cifre inde fra venstre (kan være <=0 eller > digits.length)
+    // - alt sammen med streng-manipulation, så vi aldrig rammer floating-point-afrundingsfejl.
+    placeDecimal: (digits, pointPos) => {
+        if (pointPos <= 0) {
+            digits = '0'.repeat(1 - pointPos) + digits;
+            pointPos = 1;
+        }
+        if (pointPos >= digits.length) {
+            digits += '0'.repeat(pointPos - digits.length);
+        }
+        return pointPos < digits.length
+            ? digits.substring(0, pointPos) + ',' + digits.substring(pointPos)
+            : digits;
+    },
+
+    // Tilføjer punktum som tusindtalsseparator til visning (fx "234567" -> "234.567").
+    // Kun til VISNING - rører aldrig ved de rå tal der bruges til facit-tjek, da eleven
+    // hverken har et punktum-tast eller skal skrive separatoren selv.
+    // 4-cifrede tal (1000-9999) undtages bevidst - de skrives sædvanligvis uden separator
+    // (fx "4000", ikke "4.000"), mens 5+ cifre stadig får punktum (fx "1.000.000").
+    formatForDisplay: (numStr) => {
+        let [intPart, decPart] = numStr.split(',');
+        let neg = intPart.startsWith('-');
+        if (neg) intPart = intPart.substring(1);
+        if (intPart.length !== 4) {
+            intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+        return (neg ? '-' : '') + intPart + (decPart !== undefined ? ',' + decPart : '');
+    },
+
+    // Fjerner ubetydende afsluttende nuller efter kommaet (fx "0,250" -> "0,25"), så et
+    // enheds-omregnet facit ikke kræver et bestemt (og for eleven vilkårligt) antal decimaler.
+    // Rører aldrig heltal uden komma - der er nullerne del af selve størrelsesordenen.
+    stripTrailingZeros: (s) => {
+        if (!s.includes(',')) return s;
+        s = s.replace(/0+$/, '').replace(/,$/, '');
+        return s;
+    },
+
+    // Flytter kommaet i en tal-streng (fx "4,56") 'power' pladser, så vi undgår artefakter
+    // som "109.00000000000001" der ellers opstår ved floating-point-multiplikation.
+    shiftDecimalString: (baseVal, power) => {
+        let [intPart, decPart] = baseVal.split('.');
+        decPart = decPart || '';
+        return Utils.placeDecimal(intPart + decPart, intPart.length + power);
+    },
+
+    // Genererer korrekt afrundet streng. Bruger kun heltalsafrunding (Math.round) og
+    // cifferstrenge til at placere komma/eksponent - ALDRIG division med en potens af 10 -
+    // for at undgå at fx 100422 afrundet til 1 betydende ciffer bliver til "99999,99999999999"
+    // i stedet for "1 × 10^5" (floating-point-fejl i "shifted / magnitude").
+    generateFormattedAnswer: (num, targetFigs) => {
+        if (num === 0) return "0";
+        const neg = num < 0;
+        const absNum = Math.abs(num);
+
+        // Antal cifre foran kommaet. Math.log10 kan være upræcis lige på en potens af 10
+        // (fx log10(1) = 0.0000000000000002 hos nogle motorer), så vi eftertjekker mod selve tallet.
+        let d = Math.floor(Math.log10(absNum)) + 1;
+        if (Math.pow(10, d - 1) > absNum) d--;
+        if (Math.pow(10, d) <= absNum) d++;
+
+        const power = targetFigs - d;
+        const magnitude = Math.pow(10, power);
+        const shifted = Math.round(absNum * magnitude); // heltal - kun ÉT flydende-komma-trin, ingen division bagefter
+
+        const digits = shifted.toString();
+        // Korrigerer 'd' hvis afrundingen gav ét ekstra ciffer (fx 9,95 -> 10)
+        const actualD = d + (digits.length - targetFigs);
+
+        // Tvetydigt afsluttende 0 i et almindeligt heltal (fx "6820" til 4 cifre) - man kan ikke se om
+        // nullet er betydende eller bare en pladsholder. Kun videnskabelig notation fjerner tvivlen.
+        const wouldBeAmbiguous = actualD === digits.length && digits.endsWith('0');
+
+        let result;
+        if (actualD > digits.length || wouldBeAmbiguous) {
+            // Tallet ville enten kræve ubetydende nuller for at skrives fuldt ud, eller ville se
+            // tvetydigt ud som helt tal -> videnskabelig notation
+            const mantissa = targetFigs > 1 ? digits[0] + ',' + digits.substring(1, targetFigs) : digits[0];
+            result = `${mantissa} × 10^${actualD - 1}`;
+        } else {
+            result = Utils.placeDecimal(digits, actualD);
+        }
+        return neg ? '-' + result : result;
+    }
+};
+
+class GameEngine {
+    constructor() {
+        this.correctCount = 0;
+        this.questionsAnswered = 0;
+        this.maxQuestions = 10;
+        this.currentQ = null;
+        this.mantissaBuffer = "";
+        this.expBuffer = "";
+        this.activeField = 'mantissa'; // 'mantissa' eller 'exp' - hvilket felt tal-tasterne skriver i
+
+        // State management
+        this.hasHadOneSigFig = false;
+        this.waitingForNext = false; // Når brugeren har svaret forkert og skal trykke videre
+        this.locked = false; // Sandt fra svaret er afgivet til næste spørgsmål vises - blokerer dobbelt-indsendelse (fx Enter mashing)
+
+        this.bgCanvas = document.getElementById('bgCanvas');
+        this.ctx = this.bgCanvas.getContext('2d');
+        this.particles = [];
+        
+        window.addEventListener('resize', () => this.resizeCanvas());
+        this.setupKeyboardListeners();
+        this.resizeCanvas();
+        this.animate();
+    }
+
+    setupKeyboardListeners() {
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('start-screen').classList.contains('hidden') === false) return;
+            if (document.getElementById('end-screen').classList.contains('hidden') === false) return;
+
+            if (this.locked) return; // Svaret er lige afgivet korrekt - bloker input til næste spørgsmål vises
+
+            // I "venter på næste"-tilstand (efter forkert svar) må eleven gerne skrive for at rette sig selv
+            if (this.waitingForNext) {
+                if (e.key === 'Enter') this.handleInteraction();
+                else if (e.key >= '0' && e.key <= '9') this.input(e.key);
+                else if (e.key === ',' || e.key === '.') this.input(',');
+                else if (e.key === '-') this.input('-');
+                else if (e.key === 'Backspace') this.backspace();
+                return;
+            }
+
+            if (e.key >= '0' && e.key <= '9') this.input(e.key);
+            if (e.key === ',' || e.key === '.') this.input(',');
+            if (e.key === '-') this.input('-');
+            if (e.key === 'Backspace') this.backspace();
+            if (e.key === 'Enter') this.checkAnswer();
+        });
+    }
+    
+    resizeCanvas() {
+        this.bgCanvas.width = window.innerWidth;
+        this.bgCanvas.height = window.innerHeight;
+    }
+
+    showMenu() {
+        document.getElementById('start-screen').classList.remove('hidden');
+        document.getElementById('end-screen').classList.add('hidden');
+        document.getElementById('quiz-card').style.display = 'none';
+        document.getElementById('keypad').style.display = 'none';
+    }
+
+    start(mode) {
+        this.currentMode = mode;
+        this.correctCount = 0;
+        this.questionsAnswered = 0;
+        this.hasHadOneSigFig = false;
+        this.waitingForNext = false;
+        this.locked = false;
+
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('end-screen').classList.add('hidden');
+        document.getElementById('quiz-card').style.display = 'block';
+        document.getElementById('keypad').style.display = 'grid';
+        
+        this.updateUI();
+        this.resetSubmitButton();
+        this.nextQuestion();
+    }
+
+    // Denne metode håndterer klik på knappen (som både er SVAR og VIDERE)
+    handleInteraction() {
+        if (this.waitingForNext) {
+            this.retryCheck();
+        } else {
+            this.checkAnswer();
+        }
+    }
+
+    setActiveField(field) {
+        if (this.locked) return;
+        this.activeField = field;
+        this.updateInputDisplay();
+    }
+
+    nextQuestion() {
+        // Nulstil ventetilstand
+        this.waitingForNext = false;
+        this.locked = false;
+        this.resetSubmitButton();
+        document.getElementById('feedback-txt').classList.remove('show');
+        document.getElementById('feedback-txt').innerHTML = "";
+        document.getElementById('wrong-panel').classList.add('hidden');
+
+        if (this.questionsAnswered >= this.maxQuestions) {
+            this.gameOver();
+            return;
+        }
+
+        this.mantissaBuffer = "";
+        this.expBuffer = "";
+        this.activeField = 'mantissa';
+
+        const card = document.getElementById('quiz-card');
+        card.style.transform = "scale(0.95)";
+        setTimeout(() => card.style.transform = "scale(1)", 100);
+
+        document.getElementById('progress-display').innerText = `Opgave: ${this.questionsAnswered + 1} / ${this.maxQuestions}`;
+
+        let type = this.currentMode;
+        if(type === 'MIX') {
+            const types = ['COUNT', 'ROUND', 'CONVERT', 'MULTIPLY', 'UNITS'];
+            type = types[Math.floor(Math.random()*types.length)];
+        }
+
+        const contentDiv = document.getElementById('q-content');
+        contentDiv.innerHTML = ''; 
+
+        // ----------------------------------------------------
+        // MODE: OPTÆLLING
+        // ----------------------------------------------------
+        if (type === 'COUNT') {
+            let s = "";
+            let r = Math.random();
+            if (r < 0.3) {
+                let zeroCount = Math.floor(Math.random() * 3) + 1;
+                let sigFigs = Math.floor(Math.random() * 3) + 1;
+                let numPart = Math.floor(Math.random() * Math.pow(10, sigFigs));
+                if(numPart === 0) numPart = 1;
+                s = "0," + "0".repeat(zeroCount) + numPart.toString();
+            } else if (r < 0.6) {
+                let base = Math.floor(Math.random() * 98) + 1;
+                let zeros = Math.floor(Math.random() * 3) + 1;
+                s = base.toString() + "0".repeat(zeros);
+            } else {
+                s = (Math.random() * 500).toFixed(1 + Math.floor(Math.random()*3)).replace('.', ',');
+            }
+            this.currentQ = { type: 'COUNT', text: "Hvor mange betydende cifre?", val: s, ans: Utils.countSigFigs(s).toString() };
+            contentDiv.innerHTML = `<div class="main-number">${Utils.formatForDisplay(s)}</div>`;
+        }
+        
+        // ----------------------------------------------------
+        // MODE: AFRUNDING
+        // ----------------------------------------------------
+        else if (type === 'ROUND') {
+            let targetFigs = 3;
+            let sigRand = Math.random();
+            
+            if (sigRand < 0.15) {
+                if (!this.hasHadOneSigFig) {
+                    targetFigs = 1;
+                    this.hasHadOneSigFig = true;
+                } else {
+                    targetFigs = 2;
+                }
+            } else if (sigRand < 0.4) targetFigs = 2;
+            else if (sigRand < 0.8) targetFigs = 3;
+            else targetFigs = 4;
+
+            let base = "";
+            let correctString = "";
+            let attempts = 0;
+
+            // CONSTRAINT: Max 6 cifre i alt.
+            // Hvis heltal: max 999.999
+            // Hvis decimaltal: max ~5-6 tegn totalt (inklusiv komma og decimaler)
+            do {
+                if (Math.random() < 0.3) {
+                    // Heltal: Max 999999
+                    base = Math.floor(Math.random() * 900000 + 1).toString();
+                } else {
+                    // Decimaltal
+                    // Vi genererer et tal, men begrænser det for overskuelighed
+                    // Fx et tal mellem 0 og 500.
+                    // Hvis targetFigs er 4, skal vi bruge nok decimaler, men ikke for mange.
+                    // Vi capper længden af strengen for at undgå uoverskuelige tal
+
+                    let val = Math.random() * 500;
+                    // Sikr at vi har mindst 'targetFigs' cifre at arbejde med
+                    let decimaler = Math.max(2, targetFigs - 1);
+
+                    // Begræns så vi ikke får 123,456789
+                    // Hvis heltal-delen er stor (3 cifre), så få decimaler.
+                    if (val > 100) decimaler = Math.min(decimaler, 3);
+
+                    base = val.toFixed(decimaler).replace('.', ',');
+
+                    // Hård grænse for visual string length: klip hvis over 7 tegn (inkl komma)
+                    if (base.length > 7) {
+                        base = base.substring(0, 7);
+                    }
+                }
+
+                correctString = Utils.generateFormattedAnswer(parseFloat(base.replace(',', '.')), targetFigs);
+                attempts++;
+                // Undgå den urimeligt strikse "skriv 10" -> facit "1 × 10^1"-situation: her er den
+                // "korrekte" facit teknisk set videnskabelig notation, men et tal så lille som 10
+                // opleves helt naturligt at skrive uden. Prøv i stedet et andet tal.
+            } while (targetFigs === 1 && correctString === "1 × 10^1" && attempts < 20);
+
+            this.currentQ = { type: 'ROUND', text: `Afrund til ${targetFigs} betydende cifre:`, target: targetFigs, ans: correctString };
+            contentDiv.innerHTML = `<div class="main-number">${Utils.formatForDisplay(base)}</div>`;
+        }
+        
+        // ----------------------------------------------------
+        // MODE: NOTATION
+        // ----------------------------------------------------
+        else if (type === 'CONVERT') {
+            let isSmall = Math.random() < 0.4;
+            let power = isSmall ? -(Math.floor(Math.random()*3) + 2) : Math.floor(Math.random()*5) + 2;
+            let sigFigs = Math.floor(Math.random() * 4) + 1; // 1 til 4 betydende cifre
+            let decimals = sigFigs - 1;
+            // Klemt til lige under 10 (fx 9,99 ved 2 decimaler), så mantissen ikke kan runde op til "10,0..." (ugyldig videnskabelig notation)
+            let maxMantissa = 10 - Math.pow(10, -decimals);
+            let baseVal = Math.min(Math.random() * 9 + 1, maxMantissa).toFixed(decimals);
+            let baseComma = baseVal.replace('.', ',');
+            let plainNumStr = Utils.shiftDecimalString(baseVal, power);
+
+            if (Math.random() > 0.5) {
+                // Et almindeligt tal med nuller er i sig selv tvetydigt om antal betydende cifre -
+                // derfor skal opgaven altid sige det eksplicit.
+                this.currentQ = { type: 'CONVERT', text: `Skriv i videnskabelig notation med ${sigFigs} betydende cifre:`, ans: `${baseComma} × 10^${power}` };
+                contentDiv.innerHTML = `<div class="main-number">${Utils.formatForDisplay(plainNumStr)}</div>`;
+            } else {
+                this.currentQ = { type: 'CONVERT', text: "Skriv som almindeligt tal:", ans: plainNumStr };
+                contentDiv.innerHTML = `<div class="main-number">${baseComma} <span class="times-symbol">×</span> 10<sup>${power}</sup></div>`;
+            }
+        }
+        
+        // ----------------------------------------------------
+        // MODE: REGNEREGLER
+        // ----------------------------------------------------
+        else if (type === 'MULTIPLY') {
+            const pairs = [
+                {a: 2, b: 3}, {a: 2, b: 4}, {a: 3, b: 3}, {a: 5, b: 2}, 
+                {a: 1.5, b: 2}, {a: 2.5, b: 2}, {a: 4, b: 0.5}, {a: 1.2, b: 2}
+            ];
+            
+            let p = pairs[Math.floor(Math.random() * pairs.length)];
+            let valA = p.a; let valB = p.b;
+
+            const formatNum = (n) => {
+                let r = Math.random();
+                if(Number.isInteger(n)) {
+                     if(r < 0.3) return n.toString(); 
+                     if(r < 0.7) return n.toFixed(1); 
+                     return n.toFixed(2); 
+                } else {
+                     if(r < 0.5) return n.toString(); 
+                     return n.toFixed(2); 
+                }
+            };
+
+            let strA = formatNum(valA);
+            let strB = formatNum(valB);
+            
+            let product = valA * valB;
+            
+            let sigA = Utils.countSigFigs(strA.replace('.',','));
+            let sigB = Utils.countSigFigs(strB.replace('.',','));
+            let targetSig = Math.min(sigA, sigB);
+            
+            let ansStr = Utils.generateFormattedAnswer(product, targetSig);
+
+            this.currentQ = { 
+                type: 'ROUND', 
+                text: "Beregn og afrund korrekt (mindst præcise led bestemmer):",
+                target: targetSig,
+                ans: ansStr 
+            };
+
+            contentDiv.innerHTML = `
+                <div class="calc-box">
+                    <div class="factor">${strA.replace('.',',')} <span class="sf-tag">${sigA} cifre</span></div>
+                    <span class="operator">×</span>
+                    <div class="factor">${strB.replace('.',',')} <span class="sf-tag">${sigB} cifre</span></div>
+                    <span class="operator">=</span>
+                    <span style="color:#555">?</span>
+                </div>
+            `;
+        }
+
+        // ----------------------------------------------------
+        // MODE: ENHEDER (mL / L / µL)
+        // ----------------------------------------------------
+        else if (type === 'UNITS') {
+            // Enheds-eksponent ift. liter: 1 mL = 10^-3 L, 1 µL = 10^-6 L.
+            const UNIT_EXP = { 'mL': -3, 'L': 0, 'µL': -6 };
+            const units = ['mL', 'L', 'µL'];
+            let fromUnit = units[Math.floor(Math.random() * 3)];
+            let toUnit;
+            do { toUnit = units[Math.floor(Math.random() * 3)]; } while (toUnit === fromUnit);
+
+            // Størrelsesorden af grundtallet afhænger af enheden, så tallene ligner realistiske
+            // laboratoriemængder (fx "250 mL", "1,5 L", "500 µL") frem for vilkårlige tal.
+            const ranges = {
+                'mL': { intDigits: 3, decOptions: [0, 0, 1] },
+                'L':  { intDigits: 1, decOptions: [1, 2, 2] },
+                'µL': { intDigits: 4, decOptions: [0, 0, 0] }
+            };
+            const range = ranges[fromUnit];
+            const decPlaces = range.decOptions[Math.floor(Math.random() * range.decOptions.length)];
+            let intPart = Math.floor(Math.random() * (Math.pow(10, range.intDigits) - 1)) + 1;
+            let decPart = decPlaces > 0 ? Math.floor(Math.random() * Math.pow(10, decPlaces)) : 0;
+            let baseVal = (intPart + decPart / Math.pow(10, decPlaces)).toFixed(decPlaces);
+
+            const power = UNIT_EXP[fromUnit] - UNIT_EXP[toUnit];
+            const ansStr = Utils.stripTrailingZeros(Utils.shiftDecimalString(baseVal, power));
+            const baseComma = baseVal.replace('.', ',');
+
+            this.currentQ = { type: 'UNITS', text: `Omregn til ${toUnit}:`, ans: ansStr };
+            contentDiv.innerHTML = `<div class="main-number">${Utils.formatForDisplay(baseComma)} ${fromUnit}</div>`;
+        }
+
+        this.currentQ.mode = type;
+        document.getElementById('mode-label').innerText = this.getModeName(type);
+        document.getElementById('q-text').innerHTML = this.currentQ.text;
+
+        document.getElementById('vis-bar').style.width = '0%';
+        document.getElementById('vis-bar').style.background = 'var(--accent)';
+
+        this.updateInputDisplay();
+        document.getElementById('mantissa-box').focus();
+    }
+
+    getModeName(t) {
+        if(t==='COUNT') return 'OPTÆLLING';
+        if(t==='ROUND') return 'AFRUNDING';
+        if(t==='CONVERT') return 'NOTATION';
+        if(t==='MULTIPLY') return 'REGNEREGLER';
+        if(t==='UNITS') return 'ENHEDER';
+        return 'MODE';
+    }
+
+    // Tager hele spørgsmålet (ikke kun typen), så hintet om videnskabelig notation kun vises
+    // på de spørgsmål, hvor facit rent faktisk kræver det.
+    getRuleHint(q) {
+        const needsExponent = q.ans.includes('×');
+        const hints = {
+            COUNT: "Husk: Nuller først i tallet tæller ikke med. Nuller efter et komma (eller mellem cifre) tæller altid med.",
+            ROUND: "Husk: Antallet af betydende cifre skal passe præcist." + (needsExponent ? " Brug videnskabelig notation, da et almindeligt tal her ikke entydigt kan vise det rigtige antal cifre." : ""),
+            CONVERT: "Husk: Flyt kommaet til der kun står ét ciffer (1-9) foran det. Eksponenten viser hvor mange pladser kommaet er flyttet.",
+            MULTIPLY: "Husk: Ved multiplikation/division bestemmer den faktor med færrest betydende cifre, hvor mange cifre svaret må have.",
+            UNITS: "Husk: 1 L = 1000 mL = 1.000.000 µL, og 1 mL = 1000 µL. Flyt kommaet det tilsvarende antal pladser."
+        };
+        return hints[q.mode] || "";
+    }
+
+    // Skriver i det felt (mantisse eller eksponent) brugeren senest har klikket/tabbet til
+    input(char) {
+        if (this.locked) return;
+        const field = this.activeField === 'exp' ? 'expBuffer' : 'mantissaBuffer';
+
+        if (char === '-') {
+            this[field] = this[field].startsWith('-') ? this[field].substring(1) : '-' + this[field];
+        } else {
+            this[field] += char;
+        }
+        this.updateInputDisplay();
+    }
+
+    backspace() {
+        if (this.locked) return;
+        const field = this.activeField === 'exp' ? 'expBuffer' : 'mantissaBuffer';
+        this[field] = this[field].slice(0, -1);
+        this.updateInputDisplay();
+    }
+
+    // Kombinerer de to felter til én facit-streng (fx "4,56 × 10^3"), kun med eksponent hvis feltet er udfyldt
+    getCombinedInput() {
+        return this.expBuffer !== '' ? `${this.mantissaBuffer} × 10^${this.expBuffer}` : this.mantissaBuffer;
+    }
+
+    updateInputDisplay() {
+        // Eksponent-feltet vises kun når SVARET på det konkrete spørgsmål faktisk kræver det
+        const needsExponent = !!(this.currentQ && this.currentQ.ans.includes('×'));
+        document.getElementById('exp-box').style.display = needsExponent ? 'flex' : 'none';
+
+        document.getElementById('user-input').innerHTML = this.mantissaBuffer || '<span style="opacity:0.3; font-size:0.8em">Tal...</span>';
+        document.getElementById('exp-input').innerHTML = this.expBuffer || '<span class="exp-placeholder">n</span>';
+
+        const mantissaActive = this.activeField !== 'exp';
+        document.getElementById('mantissa-cursor').style.visibility = mantissaActive ? 'visible' : 'hidden';
+        document.getElementById('exp-cursor').style.visibility = (!mantissaActive && needsExponent) ? 'visible' : 'hidden';
+
+        let target = this.currentQ ? (this.currentQ.target || 0) : 0;
+        if(target > 0) {
+            let currentSig = Utils.countSigFigs(this.mantissaBuffer);
+            let pct = Math.min((currentSig / target) * 100, 100);
+            document.getElementById('vis-bar').style.width = pct + '%';
+
+            // Bevidst KUN rød ved for mange cifre - ingen grøn "korrekt"-farve, da rigtigt antal cifre
+            // ikke betyder at selve tallet er rigtigt endnu.
+            document.getElementById('vis-bar').style.background = currentSig > target ? '#f43f5e' : 'var(--accent)';
+        }
+    }
+
+    // Genbruges af både det første svarforsøg og et rettelsesforsøg efter et forkert svar
+    evaluateAnswer(buffer, q) {
+        let userClean = buffer.toLowerCase().replace(/\s/g, '');
+        let ansClean = q.ans.toLowerCase().replace(/\s/g, '');
+
+        if (userClean === ansClean) return true;
+
+        if (q.type === 'ROUND' || q.type === 'UNITS') {
+            // \s*×\s*10\^ fjerner mellemrummene omkring ×10^ helt, ellers stopper parseFloat ved mellemrummet
+            let userNumStr = buffer.replace(',', '.').replace(/\s*×\s*10\^/, 'e');
+            let ansNumStr = q.ans.replace(',', '.').replace(/\s*×\s*10\^/, 'e');
+            let val = parseFloat(userNumStr);
+            let correctVal = parseFloat(ansNumStr);
+
+            if (!isNaN(val) && Math.abs(val - correctVal) < 0.0000001) {
+                // ROUND kræver også det rigtige antal betydende cifre - UNITS handler kun om
+                // selve enheds-omregningen, så her er en talmæssigt korrekt værdi altid nok
+                // (fx både "0,25" og "0,250" for 250 mL -> L).
+                if (q.type === 'ROUND') {
+                    if (Utils.countSigFigs(buffer) === q.target) return true;
+                } else {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    checkAnswer() {
+        if(!this.currentQ || this.waitingForNext || this.locked) return;
+
+        if (this.evaluateAnswer(this.getCombinedInput(), this.currentQ)) {
+            this.locked = true; // Lås STRAKS, så gentagne Enter-tryk/klik ikke kan udløse handleSuccess() flere gange
+            this.handleSuccess();
+        } else {
+            this.handleFail(); // Låser IKKE - eleven må gerne selv prøve at rette svaret
+        }
+    }
+
+    // Kaldes når eleven har forsøgt at rette sit svar selv, efter et forkert forsøg
+    retryCheck() {
+        if (this.mantissaBuffer === '' && this.expBuffer === '') {
+            this.nextQuestion(); // Intet skrevet - bare spring videre, som VIDERE-knappen altid har gjort
+            return;
+        }
+        if (this.evaluateAnswer(this.getCombinedInput(), this.currentQ)) {
+            this.locked = true;
+            const feedback = document.getElementById('feedback-txt');
+            feedback.innerHTML = "RIGTIGT!";
+            feedback.style.color = "#00ff88";
+            feedback.style.animation = 'none';
+            feedback.offsetHeight;
+            feedback.style.animation = 'pop 1.5s forwards';
+            feedback.classList.add('show');
+            setTimeout(() => {
+                feedback.classList.remove('show');
+                this.nextQuestion();
+            }, 700);
+        } else {
+            // Stadig ikke korrekt - blid rysten som praj, men lad eleven blive ved med at prøve
+            document.getElementById('quiz-card').animate([
+                { transform: 'translateX(0)' }, { transform: 'translateX(-8px)' },
+                { transform: 'translateX(8px)' }, { transform: 'translateX(0)' }
+            ], { duration: 300 });
+        }
+    }
+
+    handleSuccess() {
+        this.correctCount++;
+        this.questionsAnswered++;
+        
+        const feedback = document.getElementById('feedback-txt');
+        feedback.innerHTML = "KORREKT";
+        feedback.style.color = "#00ff88";
+        feedback.style.animation = 'none';
+        feedback.offsetHeight; 
+        feedback.style.animation = 'pop 1.5s forwards';
+        feedback.classList.add('show');
+        
+        this.spawnParticles(window.innerWidth/2, window.innerHeight/2, '#00ff88');
+        this.updateUI();
+        
+        setTimeout(() => {
+            feedback.classList.remove('show');
+            this.nextQuestion();
+        }, 800);
+    }
+
+    handleFail() {
+        this.questionsAnswered++;
+        this.waitingForNext = true;
+
+        // Vis svaret INDE i kortet (ikke som overlay) så det ikke dækker for tastatur/input
+        let correctDisplay = this.currentQ.ans.includes('×')
+            ? this.currentQ.ans.replace(/\^(-?\d+)/, '<sup>$1</sup>').replace('×', '<span class="times-symbol">×</span>')
+            : Utils.formatForDisplay(this.currentQ.ans);
+        const hint = this.getRuleHint(this.currentQ);
+        document.getElementById('wrong-answer-text').innerHTML = correctDisplay;
+        document.getElementById('wrong-hint-text').innerHTML = hint;
+        document.getElementById('wrong-panel').classList.remove('hidden');
+
+        // Shake animation på kortet
+        const card = document.getElementById('quiz-card');
+        card.animate([
+            { transform: 'translateX(0)' }, { transform: 'translateX(-10px)' },
+            { transform: 'translateX(10px)' }, { transform: 'translateX(0)' }
+        ], { duration: 400 });
+
+        // Ryd input, så eleven kan skrive facit ind selv i stedet for bare at klikke videre
+        this.mantissaBuffer = "";
+        this.expBuffer = "";
+        this.activeField = 'mantissa';
+        this.updateInputDisplay();
+        document.getElementById('mantissa-box').focus();
+
+        // Ændr knap til "VIDERE" (springer videre hvis intet er skrevet, ellers tjekker den rettelsen - se retryCheck)
+        const btn = document.getElementById('submit-btn');
+        btn.innerText = "VIDERE ➔";
+        btn.classList.add('next-mode');
+
+        this.updateUI();
+        // INGEN timeout her - brugeren afgør selv naar der gaas videre
+    }
+
+    resetSubmitButton() {
+        const btn = document.getElementById('submit-btn');
+        btn.innerText = "SVAR ↵";
+        btn.classList.remove('next-mode');
+    }
+
+    updateUI() {
+        document.getElementById('score-display').innerText = `Rigtige: ${this.correctCount}`;
+    }
+
+    gameOver() {
+        document.getElementById('end-screen').classList.remove('hidden');
+        document.getElementById('quiz-card').style.display = 'none';
+        document.getElementById('keypad').style.display = 'none';
+        document.getElementById('final-score').innerText = `${this.correctCount} / ${this.maxQuestions}`;
+        
+        let msg = "Godt gået!";
+        if(this.correctCount === this.maxQuestions) msg = "Perfekt! Du er en mester.";
+        else if(this.correctCount < 5) msg = "Øvelse gør mester. Prøv igen!";
+        
+        document.getElementById('end-msg').innerText = msg;
+    }
+
+    spawnParticles(x, y, color) {
+        for(let i=0; i<30; i++) {
+            this.particles.push({
+                x: x, y: y,
+                vx: (Math.random()-0.5)*15, vy: (Math.random()-0.5)*15,
+                life: 1.0, color: color
+            });
+        }
+    }
+
+    animate() {
+        this.ctx.clearRect(0, 0, this.bgCanvas.width, this.bgCanvas.height);
+        this.ctx.strokeStyle = 'rgba(0, 210, 255, 0.05)';
+        this.ctx.lineWidth = 1;
+        let t = Date.now() / 2000;
+        let gridSize = 60;
+        let offY = (t * 30) % gridSize;
+        
+        for(let y=offY; y<this.bgCanvas.height; y+=gridSize) {
+            this.ctx.beginPath(); this.ctx.moveTo(0, y); this.ctx.lineTo(this.bgCanvas.width, y); this.ctx.stroke();
+        }
+
+        for(let i=this.particles.length-1; i>=0; i--) {
+            let p = this.particles[i];
+            p.x += p.vx; p.y += p.vy;
+            p.life -= 0.03;
+            this.ctx.globalAlpha = p.life;
+            this.ctx.fillStyle = p.color;
+            this.ctx.beginPath(); this.ctx.arc(p.x, p.y, 4, 0, Math.PI*2); this.ctx.fill();
+            if(p.life <= 0) this.particles.splice(i, 1);
+        }
+        this.ctx.globalAlpha = 1;
+        requestAnimationFrame(() => this.animate());
+    }
+}
+
+const game = new GameEngine();
+</script>
+</body>
+</html>

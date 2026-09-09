@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kemi-Lab: Substitution & Analyse</title>
+    <style>
+        :root {
+            --bg: #1a1a2e;
+            --panel: #16213e;
+            --text: #eaeaea;
+            --accent: #e94560;
+            --glass-border: rgba(255,255,255,0.3);
+        }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        header { background: rgba(0,0,0,0.4); padding: 15px; text-align: center; border-bottom: 1px solid #333; }
+        h1 { margin: 0; font-size: 1.2rem; letter-spacing: 1px; color: #fff; }
+        .container { display: flex; flex: 1; padding: 20px; gap: 20px; position: relative; }
+        .canvas-box {
+            flex: 2;
+            background: radial-gradient(circle at center, #252535, #111);
+            border-radius: 12px;
+            border: 2px solid #333;
+            position: relative;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+        canvas { width: 100%; height: 100%; display: block; }
+        .controls {
+            flex: 1;
+            background: var(--panel);
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            min-width: 320px;
+            min-height: 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+        .info-box {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+            min-height: 120px;
+            overflow-y: auto;
+        }
+        h2 { margin-top: 0; font-size: 1.1rem; color: var(--accent); }
+        p { font-size: 0.9rem; line-height: 1.5; color: #ccc; margin-bottom: 0; }
+        .chem-eq {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            padding: 8px;
+            border-radius: 4px;
+            color: #ffd700;
+            text-align: center;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            border: 1px solid #444;
+            display: none;
+        }
+        .btn-grid { display: grid; gap: 10px; margin-top: auto; }
+        button {
+            padding: 14px;
+            border: none;
+            border-radius: 6px;
+            background: #333;
+            color: #aaa;
+            font-weight: bold;
+            cursor: not-allowed;
+            transition: all 0.2s;
+            text-align: left;
+            position: relative;
+        }
+        button.active {
+            background: var(--accent);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(233, 69, 96, 0.3);
+        }
+        button.active:hover { transform: scale(1.02); }
+        button::after { content: '🔒'; position: absolute; right: 15px; opacity: 0.5; }
+        button.active::after { content: '➔'; opacity: 1; }
+        .reset-btn { background: transparent; border: 1px solid #555; text-align: center; color: #888; cursor: pointer; }
+        .reset-btn::after { content: ''; }
+        .reset-btn:hover { background: #333; color: #fff; }
+        .legend {
+            position: absolute;
+            top: 190px;
+            right: 20px;
+            width: 150px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 0.7rem;
+            background: rgba(0,0,0,0.3);
+            padding: 8px 10px;
+            border-radius: 8px;
+            pointer-events: none;
+        }
+        .tag { display: flex; align-items: center; gap: 5px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        
+        #macroView {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 160px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            pointer-events: none;
+        }
+        .test-tube {
+            width: 30px;
+            height: 120px;
+            border: 2px solid rgba(255,255,255,0.6);
+            border-top: none;
+            border-radius: 0 0 15px 15px;
+            position: relative;
+            overflow: hidden;
+            background: #fff; 
+            transition: background 1.5s ease;
+            box-shadow: 0 0 15px rgba(255,255,255,0.1);
+        }
+        .test-tube::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0.1), rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.1));
+            pointer-events: none;
+            z-index: 2;
+        }
+        .macro-label {
+            color: #aaa;
+            font-size: 10px;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        #reactionBar {
+            position: absolute;
+            bottom: 0; left: 0; height: 4px;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .quiz-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10,10,20,0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, background 0.3s ease;
+            z-index: 100;
+        }
+        .quiz-overlay.show { opacity: 1; pointer-events: all; }
+        .quiz-overlay.peeking { background: transparent; pointer-events: none; }
+        .quiz-overlay.peeking .quiz-box { display: none; }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .quiz-peek {
+            background: transparent;
+            border: 1px solid #555;
+            color: #aaa;
+            font-size: 0.7rem;
+            font-weight: normal;
+            padding: 6px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .quiz-peek::after { content: none; }
+        .quiz-peek:hover { border-color: var(--accent); color: #fff; }
+        .peek-pill {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            z-index: 101;
+        }
+        .quiz-box {
+            background: var(--panel);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 25px 30px;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            transform: translateY(10px);
+            transition: transform 0.3s ease;
+        }
+        .quiz-overlay.show .quiz-box { transform: translateY(0); }
+        .quiz-tag {
+            color: var(--accent);
+            font-size: 0.75rem;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .quiz-box h3 { margin: 0 0 18px 0; font-size: 1.05rem; line-height: 1.4; color: #fff; }
+        .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+        .quiz-opt {
+            text-align: left;
+            padding: 12px 14px;
+            background: #222;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: #ddd;
+            cursor: pointer;
+            font-weight: normal;
+        }
+        .quiz-opt::after { content: none; }
+        .quiz-opt:hover:not(:disabled) { border-color: var(--accent); background: #2a2a3d; }
+        .quiz-opt:disabled { cursor: default; opacity: 0.7; }
+        .quiz-opt.correct { background: #1f5c33; border-color: #2ecc71; color: #fff; opacity: 1; }
+        .quiz-opt.wrong { background: #5c1f1f; border-color: #e94560; color: #fff; opacity: 1; }
+        .quiz-feedback { margin-top: 12px; font-size: 0.9rem; font-weight: bold; min-height: 1.2em; }
+        .quiz-feedback.correct { color: #2ecc71; }
+        .quiz-feedback.wrong { color: #e94560; }
+        .quiz-continue {
+            margin-top: 16px; width: 100%; padding: 12px; border: none; border-radius: 8px;
+            background: var(--accent); color: #fff; font-weight: bold; cursor: pointer; text-align: center;
+        }
+        .quiz-continue::after { content: none; }
+        .quiz-continue:hover { transform: scale(1.02); }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Substitution & Analyse</h1>
+</header>
+
+<div class="container">
+    <div class="canvas-box" id="canvasContainer">
+        <canvas id="simCanvas"></canvas>
+        <div id="reactionBar"></div>
+        <div id="phStrip" style="position: absolute; top: -100px; left: 50%; width: 20px; height: 100px; background: yellow; transition: top 1s, background 2s; border: 1px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.5); z-index: 5;"></div>
+
+        <div id="macroView">
+            <div class="test-tube" id="macroTube"></div>
+            <div class="macro-label">Makro</div>
+        </div>
+        <div class="legend" id="legendBox"></div>
+    </div>
+
+    <div class="controls">
+        <div class="info-box">
+            <h2 id="stepTitle">Opstilling</h2>
+            <p id="stepDesc">Vi har et glas med vand (nederst) og hexan (øverst).<br>Der er tilsat 4 dibrom-molekyler (Br₂), som lige nu ligger i vandfasen.</p>
+            <div id="chemDisplay" class="chem-eq"></div>
+        </div>
+
+        <div class="btn-grid">
+            <button id="btn1" class="active" onclick="runStep(1)">1. Ryst (Fasefordeling)</button>
+            <button id="btn2" onclick="runStep(2)">2. Lys (Substitution)</button>
+            <button id="btn3" onclick="runStep(3)">3. Nyt Glas: Analyse</button>
+            <button id="btn4" onclick="runStep(4)">4. Mål pH (Indikator)</button>
+            <button id="btn5" onclick="runStep(5)">5. Tilsæt AgNO₃</button>
+            <button class="reset-btn" onclick="resetSim()">Genstart</button>
+        </div>
+    </div>
+</div>
+
+<div class="quiz-overlay" id="quizOverlay">
+    <div class="quiz-box">
+        <div class="quiz-header">
+            <div class="quiz-tag">Tjek din forståelse</div>
+            <button class="quiz-peek" onclick="togglePeek()">👁 Se forsøget</button>
+        </div>
+        <h3 id="quizQuestion"></h3>
+        <div class="quiz-options" id="quizOptions"></div>
+        <div class="quiz-feedback" id="quizFeedback"></div>
+        <button class="quiz-continue" id="quizContinueBtn" onclick="closeQuiz()" style="display:none;">Fortsæt ➔</button>
+    </div>
+</div>
+<div class="peek-pill" id="peekPill" onclick="togglePeek()" style="display:none;">🔍 Tilbage til spørgsmålet</div>
+
+<script>
+const canvas = document.getElementById('simCanvas');
+const ctx = canvas.getContext('2d');
+const macroTube = document.getElementById('macroTube');
+let W, H;
+
+const C = {
+    br: '#C46210', 
+    c: '#888888', 
+    h: '#ffffff', 
+    o: '#ff3333', 
+    ag: '#c0c0c0', 
+    hbr_gas: '#dcbfa6' 
+};
+
+let step = 0;
+let molecules = [];
+let particles = [];
+let animReq;
+
+const STEPS_INFO = [
+    { t: "Start", d: "Vi har 4 Br₂ i vandfasen og 8 Hexan-molekyler (C₆H₁₄) i topfasen. Br₂ er upolært, så det vil helst være sammen med hexan." },
+    { t: "Fasefordeling", d: "Efter omrystning vandrer de upolære Br₂ molekyler langsomt op i den upolære hexanfase.", eq: "" },
+    { t: "Substitutionsreaktion", d: "Lysenergi (hν) spalter bindingerne løbende over 5 sekunder. Br-atomer bytter plads med H-atomer på hexankæderne.", eq: "C₆H₁₄ + Br₂ → C₆H₁₃Br + HBr" },
+    { t: "Analyse: Nyt Glas", d: "Vandfasen er isoleret med 4 HBr. De reagerer løbende med vand (H₂O) og danner oxonium (H₃O⁺) og bromid (Br⁻).", eq: "HBr + H₂O → Br⁻ + H₃O⁺" },
+    { t: "pH Måling", d: "Indikatorpapiret bliver rødt! <br>En lav pH påviser en forhøjet koncentration af H₃O⁺.", eq: "pH ≈ 1-2" },
+    { t: "Fældningsreaktion", d: "Vi tilsætter sølvnitrat (Ag⁺). <br>Sølvionerne finder bromidionerne og danner et hvidt bundfald (AgBr), der lægger sig som et iongitter.", eq: "Ag⁺ + Br⁻ → AgBr (s)" }
+];
+
+const QUIZ = {
+    1: {
+        q: "Hvorfor vandrer Br₂-molekylerne op i hexanfasen efter omrystning?",
+        options: [
+            "Fordi Br₂ er polært, ligesom hexan, så de tiltrækker hinanden",
+            "Fordi upolære stoffer opløses bedst i upolære stoffer ('ens løser ens')",
+            "Fordi Br₂ er tungere end vand og derfor synker ned igennem vandlaget",
+            "Fordi hexan og Br₂ reagerer kemisk med hinanden i vandfasen"
+        ],
+        correct: 1
+    },
+    2: {
+        q: "Hvorfor kaldes reaktionen mellem hexan og Br₂ en SUBSTITUTIONSreaktion?",
+        options: [
+            "Fordi Br₂ lægger sig til hexan-molekylet uden at fjerne noget",
+            "Fordi et Br-atom erstatter (substituerer) et H-atom på hexankæden",
+            "Fordi molekylerne bytter plads mellem de to faser",
+            "Fordi reaktionen kun sker i totalt mørke uden lysenergi til stede"
+        ],
+        correct: 1
+    },
+    3: {
+        q: "Hvilken type reaktion er HBr + H₂O → Br⁻ + H₃O⁺?",
+        options: [
+            "En redoxreaktion",
+            "En fældningsreaktion",
+            "En syre-basereaktion",
+            "En substitutionsreaktion"
+        ],
+        correct: 2
+    },
+    4: {
+        q: "Indikatorpapiret bliver rødt og viser en lav pH. Hvad fortæller det om opløsningen?",
+        options: [
+            "Der er høj koncentration af OH⁻-ioner",
+            "Der er høj koncentration af H₃O⁺-ioner",
+            "Opløsningen indeholder ingen ioner",
+            "Opløsningen er neutral (pH 7)"
+        ],
+        correct: 1
+    },
+    5: {
+        q: "Hvorfor bruges AgNO₃ til at påvise bromidioner (Br⁻)?",
+        options: [
+            "Fordi Ag⁺ og Br⁻ danner et letopløseligt salt",
+            "Fordi Ag⁺ og Br⁻ danner et tungtopløseligt bundfald (AgBr)",
+            "Fordi AgNO₃ ændrer opløsningens pH",
+            "Fordi sølv reagerer direkte med vand"
+        ],
+        correct: 1
+    }
+};
+
+let pendingUnlockStep = null;
+let currentQuizData = null;
+
+// Blander en quiz-opgaves svarmuligheder (og flytter "correct"-indekset med), så det
+// rigtige svar ikke altid står på samme plads. Den oprindelige QUIZ-post ændres ikke.
+function shuffleQuizOptions(data) {
+    const indices = data.options.map((_, i) => i);
+    for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    return {
+        ...data,
+        options: indices.map(i => data.options[i]),
+        correct: indices.indexOf(data.correct)
+    };
+}
+
+function togglePeek() {
+    const overlay = document.getElementById('quizOverlay');
+    const pill = document.getElementById('peekPill');
+    const peeking = overlay.classList.toggle('peeking');
+    pill.style.display = peeking ? 'block' : 'none';
+}
+
+function showQuiz(n) {
+    const raw = QUIZ[n];
+    if (!raw) { unlockNext(n); return; }
+    const data = shuffleQuizOptions(raw);
+    currentQuizData = data;
+    pendingUnlockStep = n;
+    document.getElementById('quizOverlay').classList.remove('peeking');
+    document.getElementById('peekPill').style.display = 'none';
+    document.getElementById('quizQuestion').innerText = data.q;
+    const optsBox = document.getElementById('quizOptions');
+    optsBox.innerHTML = '';
+    const fb = document.getElementById('quizFeedback');
+    fb.innerHTML = ''; fb.className = 'quiz-feedback';
+    const contBtn = document.getElementById('quizContinueBtn');
+    contBtn.style.display = 'none';
+    contBtn.innerText = (n === 5) ? 'Afslut ✔' : 'Fortsæt ➔';
+    data.options.forEach((opt, idx) => {
+        const b = document.createElement('button');
+        b.className = 'quiz-opt';
+        b.innerText = opt;
+        b.onclick = () => checkAnswer(idx, b);
+        optsBox.appendChild(b);
+    });
+    document.getElementById('quizOverlay').classList.add('show');
+}
+
+function checkAnswer(idx, btnEl) {
+    const data = currentQuizData;
+    const opts = document.querySelectorAll('.quiz-opt');
+    opts.forEach(o => o.disabled = true);
+    const fb = document.getElementById('quizFeedback');
+    if (idx === data.correct) {
+        btnEl.classList.add('correct');
+        fb.innerHTML = (pendingUnlockStep === 5)
+            ? '✔ Rigtigt! 🎉 <b>Flot!</b> Du har gennemført hele forsøget.'
+            : '✔ Rigtigt!';
+        fb.className = 'quiz-feedback correct';
+        document.getElementById('quizContinueBtn').style.display = 'block';
+    } else {
+        btnEl.classList.add('wrong');
+        fb.innerHTML = 'Ikke helt — prøv igen.';
+        fb.className = 'quiz-feedback wrong';
+        setTimeout(() => {
+            opts.forEach(o => { o.disabled = false; o.classList.remove('wrong'); });
+            fb.innerHTML = '';
+        }, 1200);
+    }
+}
+
+function closeQuiz() {
+    document.getElementById('quizOverlay').classList.remove('show');
+    const finishedStep = pendingUnlockStep;
+    pendingUnlockStep = null;
+    if (finishedStep !== 5) {
+        unlockNext(finishedStep);
+    }
+}
+
+function unlockNext(n) {
+    const btn = document.getElementById('btn' + (n + 1));
+    if (btn) { btn.classList.add('active'); btn.disabled = false; }
+}
+
+class Particle {
+    constructor(x, y, color, type) {
+        this.x = x; this.y = y; this.color = color;
+        this.vx = (Math.random()-0.5)*4;
+        this.vy = (Math.random()-0.5)*4;
+        this.life = 1.0;
+        this.decay = Math.random()*0.03 + 0.01;
+        this.type = type; 
+    }
+    update() {
+        this.x += this.vx; this.y += this.vy;
+        this.life -= this.decay;
+        if(this.type === 'bubble') this.vy -= 0.1;
+    }
+    draw(ctx) {
+        ctx.globalAlpha = this.life;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.type === 'spark' ? 2 : 4, 0, Math.PI*2);
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+    }
+}
+
+class Molecule {
+    constructor(type, x, y) {
+        this.type = type; this.x = x; this.y = y;
+        this.vx = (Math.random()-0.5)*0.5; this.vy = (Math.random()-0.5)*0.5;
+        this.atoms = []; this.targetPos = null; 
+        this.vibration = 0; 
+        this.buildStructure();
+    }
+    buildStructure() {
+        this.atoms = [];
+        if (this.type === 'hexan') {
+            for(let i=0; i<6; i++) this.atoms.push({x: (i-2.5)*12, y: (i%2===0 ? -5 : 5), c: C.c, r: 6});
+        } else if (this.type === 'br2') {
+            this.atoms.push({x: -6, y: 0, c: C.br, r: 8}); this.atoms.push({x: 6, y: 0, c: C.br, r: 8});
+        } else if (this.type === 'hbr') {
+            this.atoms.push({x: -4, y: 0, c: C.br, r: 8}); this.atoms.push({x: 6, y: 0, c: C.h, r: 3});
+        } else if (this.type === 'bromhexan') {
+            for(let i=0; i<6; i++) {
+                this.atoms.push({x: (i-2.5)*12, y: (i%2===0 ? -5 : 5), c: C.c, r: 6});
+            }
+            this.atoms.push({x: -6, y: -20, c: C.br, r: 8}); 
+        } else if (this.type === 'h2o') {
+            this.atoms.push({x: 0, y: 0, c: C.o, r: 7}); this.atoms.push({x: -6, y: -5, c: C.h, r: 3}); this.atoms.push({x: 6, y: -5, c: C.h, r: 3});
+        } else if (this.type === 'h3o') {
+            this.atoms.push({x: 0, y: 0, c: C.o, r: 7}); this.atoms.push({x: -6, y: -5, c: C.h, r: 3}); this.atoms.push({x: 6, y: -5, c: C.h, r: 3}); this.atoms.push({x: 0, y: 8, c: C.h, r: 3});
+        } else if (this.type === 'br_ion') {
+            this.atoms.push({x: 0, y: 0, c: C.br, r: 8});
+        } else if (this.type === 'ag_ion') {
+            this.atoms.push({x: 0, y: 0, c: C.ag, r: 6});
+        } else if (this.type === 'agbr') {
+            this.atoms.push({x: -4, y: 0, c: C.ag, r: 6}); this.atoms.push({x: 4, y: 0, c: C.br, r: 8});
+        }
+    }
+    update() {
+        this.x += this.vx; this.y += this.vy;
+        
+        let vibX = (Math.random()-0.5) * this.vibration;
+        let vibY = (Math.random()-0.5) * this.vibration;
+
+        if(this.x < 50 || this.x > W-50) this.vx *= -1;
+        
+        if (this.targetPos) {
+             let dx = this.targetPos.x - this.x;
+             let dy = this.targetPos.y - this.y;
+             // AgBr falder nu EKSTREMT langsomt mod gitteret
+             this.vx = dx * 0.005; // Halveret hastighed
+             this.vy = dy * 0.005; // Halveret hastighed
+             if(Math.abs(dx) < 2 && Math.abs(dy) < 2) {
+                  this.x = this.targetPos.x; this.y = this.targetPos.y;
+                  this.vx = 0; this.vy = 0; this.targetPos = null;
+             }
+        } else {
+            if (step < 3) {
+                 if (this.type === 'hexan' || this.type === 'bromhexan') {
+                     if (this.y > H/2 - 20) { this.y = H/2 - 20; this.vy = -Math.abs(this.vy); }
+                     if (this.y < 20) this.vy = Math.abs(this.vy);
+                 }
+                 if (this.type === 'br2') {
+                     if (step === 0) {
+                         if (this.y < H/2 + 20) this.vy = Math.abs(this.vy);
+                         if (this.y > H-20) this.vy = -Math.abs(this.vy);
+                     } else {
+                         if (this.y > H/2) {
+                             this.vy -= 0.03; 
+                             if(this.vy < -1) this.vy = -1; 
+                         } else {
+                             if (this.y > H/2 - 20) { this.y = H/2 - 20; this.vy = -Math.abs(this.vy); }
+                             if (this.y < 20) this.vy = Math.abs(this.vy);
+                         }
+                     }
+                 }
+                 if (this.type === 'hbr') {
+                    if (this.y < H/2) {
+                        this.vy = 0.5; 
+                    } else {
+                        if (this.y > H-20) { this.y = H-20; this.vy = -Math.abs(this.vy); }
+                        if (this.y < H/2 + 10) { 
+                            this.y = H/2 + 10; 
+                            this.vy = Math.abs(this.vy); 
+                            if(Math.abs(this.vx) < 0.2) this.vx = (Math.random()-0.5);
+                        }
+                    }
+                 }
+            } else {
+                if (this.type !== 'agbr' || (this.type==='agbr' && this.vy !== 0)) {
+                    if (this.y > H-20 && this.type !== 'agbr') { this.y = H-20; this.vy *= -1; }
+                    if (this.y < H/3) { this.y = H/3; this.vy *= -1; }
+                }
+            }
+        }
+        this.drawX = this.x + vibX;
+        this.drawY = this.y + vibY;
+    }
+    draw() {
+        ctx.save();
+        ctx.translate(this.drawX, this.drawY);
+        ctx.beginPath();
+        if (this.type === 'hexan' || this.type === 'bromhexan') {
+            ctx.strokeStyle = '#666'; ctx.lineWidth = 4;
+            for(let i=0; i<5; i++) {
+                ctx.moveTo(this.atoms[i].x, this.atoms[i].y); ctx.lineTo(this.atoms[i+1].x, this.atoms[i+1].y);
+            }
+            if(this.type === 'bromhexan') {
+                 ctx.moveTo(this.atoms[2].x, this.atoms[2].y); ctx.lineTo(this.atoms[6].x, this.atoms[6].y);
+            }
+            ctx.stroke();
+        }
+        this.atoms.forEach(a => {
+            ctx.beginPath(); ctx.arc(a.x, a.y, a.r, 0, Math.PI*2);
+            ctx.fillStyle = a.c; ctx.fill();
+            ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.beginPath();
+            ctx.arc(a.x-a.r*0.3, a.y-a.r*0.3, a.r*0.3, 0, Math.PI*2); ctx.fill();
+        });
+        ctx.fillStyle = '#fff'; ctx.font = '10px Arial'; ctx.textAlign = 'center';
+        if(this.type === 'h3o') ctx.fillText("+", 10, -5);
+        if(this.type === 'br_ion') ctx.fillText("-", 6, -5);
+        if(this.type === 'ag_ion') ctx.fillText("+", 6, -5);
+        ctx.restore();
+    }
+}
+
+function init() {
+    const container = document.getElementById('canvasContainer');
+    W = container.clientWidth; H = container.clientHeight;
+    canvas.width = W; canvas.height = H;
+    resetSim(); loop();
+}
+
+function spawnParticles(x, y, count, color, type='spark') {
+    for(let i=0; i<count; i++) particles.push(new Particle(x, y, color, type));
+}
+
+function updateMacro(n) {
+    let bg = "";
+    if (n === 0) bg = "linear-gradient(to bottom, transparent 50%, rgba(196, 98, 16, 0.6) 50%)"; 
+    if (n === 1) bg = "linear-gradient(to bottom, rgba(196, 98, 16, 0.6) 50%, rgba(100,149,237,0.2) 50%)"; 
+    if (n === 2) bg = "linear-gradient(to bottom, rgba(200,200,200,0.2) 50%, rgba(100,149,237,0.2) 50%)"; 
+    if (n >= 3) bg = "rgba(200,200,255,0.2)"; 
+    if (n === 5) bg = "linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(200,200,200,0.9))"; 
+    macroTube.style.background = bg;
+}
+
+function resetSim() {
+    step = 0; molecules = []; particles = [];
+    const ph = document.getElementById('phStrip');
+    ph.style.top = "-100px"; ph.style.background = "yellow";
+    document.getElementById('reactionBar').style.width = "0%";
+    document.getElementById('quizOverlay').classList.remove('show');
+    document.getElementById('quizOverlay').classList.remove('peeking');
+    document.getElementById('peekPill').style.display = 'none';
+    pendingUnlockStep = null;
+
+    for(let i=0; i<8; i++) molecules.push(new Molecule('hexan', W/2 + (Math.random()-0.5)*120, H/4));
+    for(let i=0; i<4; i++) molecules.push(new Molecule('br2', W/2 + (Math.random()-0.5)*100, H*0.75));
+    updateUI(0);
+    unlockNext(0);
+}
+
+function runStep(n) {
+    if (n !== step + 1) return;
+    step = n; updateUI(n);
+
+    // TRIN 1: Fasefordeling
+    if (n === 1) {
+        setTimeout(() => { if (step === 1) showQuiz(1); }, 4000);
+    }
+
+    // TRIN 2: Substitution
+    if (n === 2) {
+        let duration = 5000;
+        let startTime = Date.now();
+        let bar = document.getElementById('reactionBar');
+        let reactionsLeft = 4; 
+
+        molecules.forEach(m => m.vibration = 2);
+
+        let inter = setInterval(() => {
+            let elapsed = Date.now() - startTime;
+            let progress = elapsed / duration;
+            bar.style.width = Math.min(progress * 100, 100) + "%";
+
+            ctx.fillStyle = `rgba(255,255,255,${Math.abs(Math.sin(elapsed/100))*0.15})`;
+            ctx.fillRect(0,0,W,H);
+
+            if (elapsed > (duration/4.5) * (5-reactionsLeft) && reactionsLeft > 0) {
+                let hex = molecules.find(m => m.type === 'hexan');
+                let br2 = molecules.find(m => m.type === 'br2');
+                if (hex && br2) {
+                    molecules.splice(molecules.indexOf(hex), 1);
+                    molecules.splice(molecules.indexOf(br2), 1);
+                    molecules.push(new Molecule('bromhexan', hex.x, hex.y));
+                    molecules.push(new Molecule('hbr', br2.x, br2.y)); 
+                    spawnParticles(hex.x, hex.y, 20, '#fff');
+                    reactionsLeft--;
+                }
+            }
+
+            if (elapsed > duration) {
+                clearInterval(inter);
+                molecules.forEach(m => m.vibration = 0);
+                bar.style.width = "0%";
+                if (step === 2) showQuiz(2);
+            }
+        }, 50);
+    }
+
+    // TRIN 3: Syre/Base
+    if (n === 3) {
+        molecules = [];
+        for(let i=0; i<4; i++) { molecules.push(new Molecule('hbr', W/3 + Math.random()*50, H/2)); molecules.push(new Molecule('h2o', W*2/3 + Math.random()*50, H/2)); }
+        
+        let duration = 5000;
+        let startTime = Date.now();
+        let reactionsLeft = 4;
+        let bar = document.getElementById('reactionBar');
+
+        let inter = setInterval(() => {
+            let elapsed = Date.now() - startTime;
+            bar.style.width = Math.min((elapsed/duration) * 100, 100) + "%";
+
+            if (elapsed > (duration/4.5) * (5-reactionsLeft) && reactionsLeft > 0) {
+                let hbr = molecules.find(m => m.type === 'hbr');
+                if (hbr) {
+                    let h2o = molecules.filter(m => m.type === 'h2o').sort((a,b) => {
+                        let distA = Math.hypot(a.x - hbr.x, a.y - hbr.y);
+                        let distB = Math.hypot(b.x - hbr.x, b.y - hbr.y);
+                        return distA - distB;
+                    })[0];
+
+                    if (h2o) {
+                        let mx = (hbr.x + h2o.x)/2; 
+                        let my = (hbr.y + h2o.y)/2;
+                        molecules.splice(molecules.indexOf(hbr), 1);
+                        molecules.splice(molecules.indexOf(h2o), 1);
+                        molecules.push(new Molecule('br_ion', mx-10, my));
+                        molecules.push(new Molecule('h3o', mx+10, my));
+                        spawnParticles(mx, my, 10, '#dcbfa6', 'bubble');
+                        reactionsLeft--;
+                    }
+                }
+            }
+            if (elapsed > duration) {
+                clearInterval(inter);
+                bar.style.width = "0%";
+                if (step === 3) showQuiz(3);
+            }
+        }, 50);
+    }
+
+    // TRIN 4: pH
+    if (n === 4) {
+        const ph = document.getElementById('phStrip');
+        ph.style.top = (H/2) + "px";
+        setTimeout(() => { ph.style.backgroundColor = "#ff3333"; spawnParticles(W/2, H/2, 20, '#ff3333', 'spark'); }, 1500);
+        setTimeout(() => { ph.style.top = "-100px"; }, 4000);
+        setTimeout(() => { if (step === 4) showQuiz(4); }, 4800);
+    }
+
+    // TRIN 5: Fældning
+    if (n === 5) {
+        let baseH = H - 12; // Justeret helt ned til bunden
+        let midW = W/2;
+        let slots = [
+            {x:midW-8, y:baseH}, {x:midW+8, y:baseH}, 
+            {x:midW-8, y:baseH-16}, {x:midW+8, y:baseH-16} 
+        ];
+
+        for(let i=0; i<4; i++) {
+            setTimeout(() => {
+                let ag = new Molecule('ag_ion', W/2 + (Math.random()-0.5)*80, 50);
+                ag.vy = 0.2; // Langsomt fald
+                molecules.push(ag);
+            }, i * 1500); 
+        }
+        
+        let reactionsLeft = 4;
+        let checkInt = setInterval(() => {
+            let ags = molecules.filter(m => m.type === 'ag_ion');
+            let brs = molecules.filter(m => m.type === 'br_ion');
+            
+            if (ags.length > 0 && brs.length > 0 && Math.random() > 0.7) {
+                let agIdx = molecules.indexOf(ags[0]); molecules.splice(agIdx, 1);
+                let brIdx = molecules.indexOf(brs[0]); molecules.splice(brIdx, 1);
+                
+                let solid = new Molecule('agbr', ags[0].x, ags[0].y);
+                solid.targetPos = slots[4-reactionsLeft]; 
+                molecules.push(solid);
+                spawnParticles(solid.x, solid.y, 10, '#fff', 'spark');
+                reactionsLeft--;
+            }
+            if (reactionsLeft === 0 && ags.length === 0) { clearInterval(checkInt); if (step === 5) showQuiz(5); }
+        }, 200);
+    }
+}
+
+function updateUI(n) {
+    document.getElementById('stepTitle').innerText = STEPS_INFO[n].t;
+    document.getElementById('stepDesc').innerHTML = STEPS_INFO[n].d;
+    const eq = document.getElementById('chemDisplay');
+    if(STEPS_INFO[n].eq) { eq.style.display = 'block'; eq.innerText = STEPS_INFO[n].eq; } else { eq.style.display = 'none'; }
+    for(let i=1; i<=5; i++) {
+        const btn = document.getElementById('btn'+i);
+        btn.classList.remove('active'); btn.disabled = true;
+    }
+    const l = document.getElementById('legendBox');
+    l.innerHTML = '';
+    const items = [];
+    if (n < 3) { items.push({c: C.br, t: 'Br (Brom)'}); items.push({c: C.c, t: 'C (Carbon)'}); } 
+    else { items.push({c: C.br, t: 'Br⁻ (Bromid)'}); items.push({c: C.o, t: 'O (Oxygen)'}); items.push({c: C.ag, t: 'Ag⁺ (sølvioner)'}); }
+    items.forEach(i => { l.innerHTML += `<div class="tag"><div class="dot" style="background:${i.c}"></div>${i.t}</div>`; });
+    updateMacro(n);
+}
+
+function loop() {
+    ctx.clearRect(0, 0, W, H);
+    if (step < 3) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)'; ctx.fillRect(0, 0, W, H/2);
+        ctx.fillStyle = 'rgba(100, 149, 237, 0.2)'; ctx.fillRect(0, H/2, W, H/2);
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(0, H/2); ctx.lineTo(W, H/2); ctx.stroke();
+    } else {
+        ctx.fillStyle = 'rgba(100, 149, 237, 0.2)'; ctx.fillRect(20, H/3, W-40, H*2/3);
+        ctx.strokeStyle = '#aaa'; ctx.lineWidth = 3; ctx.strokeRect(20, H/3, W-40, H*2/3);
+    }
+    molecules.forEach(m => { m.update(); m.draw(); });
+    for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        particles[i].draw(ctx);
+        if (particles[i].life <= 0) particles.splice(i, 1);
+    }
+    requestAnimationFrame(loop);
+}
+
+window.onload = init;
+window.onresize = init;
+</script>
+</body>
+</html>

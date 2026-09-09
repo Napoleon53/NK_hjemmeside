@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title>Ion-Tetris: Robust Logic</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --panel-bg: #111;
+            --accent: #00d2ff; /* Science Blue */
+            --highlight: #ff0055;
+            --text: #eee;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text);
+            font-family: 'Segoe UI', monospace;
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+        }
+        #game-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        canvas {
+            background-color: #080808;
+            border: 2px solid #333;
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.15);
+        }
+        #ui-panel {
+            width: 320px;
+            height: 700px;
+            background: var(--panel-bg);
+            margin-left: 20px;
+            padding: 20px;
+            border-left: 4px solid var(--accent);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+        }
+        .stat-box {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border-bottom: 2px solid #333;
+        }
+        h1 { color: var(--accent); margin: 0 0 15px 0; text-transform: uppercase; font-size: 24px; letter-spacing: 1px; text-align: center;}
+        .stat-label { font-size: 11px; color: #888; text-transform: uppercase; margin-bottom: 5px; }
+        .stat-value { font-size: 24px; font-weight: bold; font-family: monospace; color: #fff; }
+        
+        #log {
+            flex-grow: 1;
+            overflow-y: auto;
+            border-top: 1px solid #333;
+            padding-top: 10px;
+            font-size: 13px;
+            font-family: 'Courier New', monospace; 
+            background: rgba(0,0,0,0.2);
+        }
+        .log-entry { margin-bottom: 4px; padding: 6px; border-bottom: 1px solid rgba(255,255,255,0.05); animation: highlight 0.5s; }
+        .log-boom { color: var(--highlight); font-weight: bold; background: rgba(255, 0, 85, 0.1); }
+        .formula { color: var(--accent); font-weight: bold; letter-spacing: 1px; }
+
+        .legend-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:13px; }
+        .legend-swatch { display:inline-block; width:14px; height:14px; border-radius:2px; flex-shrink:0; }
+
+        @keyframes highlight { 0% { background: #fff; color:#000; } 100% { background: transparent; color: inherit; } }
+
+        #overlay {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.92);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 100;
+        }
+        .overlay-content {
+            background: #1a1a1a;
+            padding: 40px;
+            border: 1px solid #333;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+        button {
+            background: var(--accent); color: #000; border: none;
+            padding: 15px 50px; font-size: 22px; font-weight: bold;
+            cursor: pointer; margin-top: 30px; text-transform: uppercase;
+            transition: all 0.2s;
+        }
+        button:hover { background: #fff; transform: scale(1.05); }
+    </style>
+</head>
+<body>
+
+<div id="game-wrapper">
+    <canvas id="gameCanvas" width="420" height="700"></canvas>
+    
+    <div id="ui-panel">
+        <h1>Ion Fabrikken</h1>
+        
+        <div class="stat-box">
+            <div class="stat-label">Score</div>
+            <div class="stat-value" id="score">0</div>
+        </div>
+        
+        <div class="stat-box">
+            <div class="stat-label">Produktionshastighed</div>
+            <div class="stat-value" id="speed-display">100%</div>
+        </div>
+        
+        <div class="stat-box">
+            <div class="stat-label">Næste Leverance</div>
+            <canvas id="nextCanvas" width="80" height="80" style="background:transparent; margin: 0 auto; display:block;"></canvas>
+        </div>
+
+        <div class="stat-box">
+            <div class="stat-label">Ion-oversigt</div>
+            <div id="legend"></div>
+        </div>
+
+        <div class="stat-label">Reaktionslog</div>
+        <div id="log"></div>
+    </div>
+</div>
+
+<div id="overlay">
+    <div class="overlay-content">
+        <h1 style="font-size: 40px; margin-bottom: 20px; color:var(--accent);">IONISK TETRIS</h1>
+    <p style="margin-bottom: 20px;">
+        <strong>Din opgave:</strong> Dan neutrale salte ved at forbinde ioner.<br>
+        Brættet er fyldt med <span style="color:#777;">urenheder (grå blokke)</span>.
+    </p>
+
+    <p>
+        <span style="color:#3498db;">Positive (+)</span> skal røre <span style="color:#e74c3c;">negative ioner (-)</span>.<br>
+        Hvis den samlede ladning balancerer (lige mange + og − ladninger), sker reaktionen!
+    </p>
+
+    <p>
+        Bemærk at ionforbindelser skal bestå af kun 2 forskellige ioner.<br>
+        Hvis 2 Na⁺ rører hinanden, skal man bruge 2 Cl⁻ i kontakt, før der sker en reaktion.
+    </p>
+
+        <div style="background:#222; padding:15px; font-size:14px; color:#aaa; margin-bottom:20px; border-radius:4px;">
+            <strong>Tip:</strong> Lav store forbindelser med mange ioner (fx AlCl₃) for at sprænge urenhederne væk!
+        </div>
+        <button onclick="startGame()">Start Produktion</button>
+    </div>
+</div>
+
+<script>
+/** KONFIGURATION */
+const COLS = 12;
+const ROWS = 20;
+const BLOCK_SIZE = 35;
+const BASE_SPEED = 250; // Hurtig start
+const MAX_SPEED = 80;   // Max hastighed
+
+const CATIONS = [
+    { symbol: "Na⁺", charge: 1, color: "#2980b9" },
+    { symbol: "Mg²⁺", charge: 2, color: "#1abc9c" },
+    { symbol: "Al³⁺", charge: 3, color: "#9b59b6" }
+];
+const ANIONS = [
+    { symbol: "Cl⁻", charge: 1, color: "#e74c3c" },
+    { symbol: "O²⁻", charge: 2, color: "#f39c12" },
+    { symbol: "N³⁻", charge: 3, color: "#2ecc71" }
+];
+const TRASH = { symbol: "", charge: 0, color: "#444" };
+
+// Introduktionssekvens: Na+/Cl- (enkel 1:1 reaktion), derefter Al3+ med 3x Cl- (viser støkiometri)
+const INTRO_SEQUENCE = [
+    { type: 'ion', data: CATIONS[0] }, // Na+
+    { type: 'ion', data: ANIONS[0] },  // Cl-
+    { type: 'ion', data: CATIONS[2] }, // Al3+
+    { type: 'ion', data: ANIONS[0] },  // Cl-
+    { type: 'ion', data: ANIONS[0] },  // Cl-
+    { type: 'ion', data: ANIONS[0] }   // Cl-
+];
+
+/** STATE */
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+const nextCtx = document.getElementById('nextCanvas').getContext('2d');
+
+let grid = [];
+let activePiece = null;
+let nextPieceInfo = null;
+let score = 0;
+let speed = BASE_SPEED;
+let lastTime = 0;
+let dropCounter = 0;
+let isGameOver = false;
+let particles = [];
+let ionBag = [];
+let introQueue = [];
+
+/** INIT */
+function startGame() {
+    grid = Array(ROWS).fill().map(() => Array(COLS).fill(null));
+    score = 0;
+    speed = BASE_SPEED;
+    isGameOver = false;
+    particles = [];
+    ionBag = [];
+    introQueue = INTRO_SEQUENCE.map(item => ({...item}));
+
+    document.getElementById('overlay').style.display = 'none';
+    document.getElementById('log').innerHTML = '';
+    updateUI();
+    
+    fillBag();
+    nextPieceInfo = getNextFromBag();
+    spawnPiece();
+    requestAnimationFrame(loop);
+}
+
+/** BAG SYSTEM (30% Skrald) */
+function fillBag() {
+    let newItems = [];
+    // Balanceret pose
+    for(let i=0; i<3; i++) newItems.push({type: 'cat', data: CATIONS[Math.floor(Math.random()*CATIONS.length)]});
+    for(let i=0; i<3; i++) newItems.push({type: 'an', data: ANIONS[Math.floor(Math.random()*ANIONS.length)]});
+    // 3 Trash blokke
+    for(let i=0; i<3; i++) newItems.push({type: 'pure_trash'});
+
+    // Shuffle
+    for (let i = newItems.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newItems[i], newItems[j]] = [newItems[j], newItems[i]];
+    }
+    ionBag = newItems;
+}
+
+function getNextFromBag() {
+    if (introQueue.length > 0) return introQueue.shift();
+
+    if (ionBag.length === 0) fillBag();
+    let item = ionBag.pop();
+    
+    if (item.type === 'pure_trash') {
+        const r = Math.random();
+        let h = 1;
+        if (r > 0.5) h = 2; // Ofte 2-høje blokke
+        if (r > 0.85) h = 3;
+        return { type: 'pure_trash', height: h };
+    } else {
+        return { type: 'ion', data: item.data };
+    }
+}
+
+/** SPAWN */
+function spawnPiece() {
+    if (isGameOver) return;
+    const info = nextPieceInfo;
+    nextPieceInfo = getNextFromBag();
+    drawPreview();
+
+    let blocks = [];
+    const startX = Math.floor(COLS / 2) - 1;
+    const uniqueID = Math.random();
+
+    if (info.type === 'pure_trash') {
+        for(let i=0; i<info.height; i++) blocks.push({ type: 'trash', data: TRASH, offsetX: 0, offsetY: i, id: uniqueID });
+    } else {
+        for(let i=0; i<info.data.charge; i++) {
+            blocks.push({
+                type: 'ion', data: info.data, offsetX: 0, offsetY: i, id: uniqueID, isHead: i === 0
+            });
+        }
+    }
+
+    activePiece = { x: startX, y: -blocks.length, blocks: blocks };
+    
+    if (checkCollision(0, 0)) {
+        isGameOver = true;
+        drawGameOver();
+    }
+}
+
+/** LOOP */
+function loop(time) {
+    if (isGameOver) return;
+    const dt = time - lastTime;
+    lastTime = time;
+
+    dropCounter += dt;
+    if (dropCounter > speed) {
+        if (!move(0, 1)) lockPiece();
+        dropCounter = 0;
+    }
+
+    draw();
+    requestAnimationFrame(loop);
+}
+
+/** PHYSICS */
+function move(dx, dy) {
+    if (!activePiece) return false;
+    if (!checkCollision(dx, dy)) {
+        activePiece.x += dx;
+        activePiece.y += dy;
+        return true;
+    }
+    return false;
+}
+
+function checkCollision(dx, dy) {
+    if (!activePiece) return true;
+    for (let b of activePiece.blocks) {
+        let nx = activePiece.x + b.offsetX + dx;
+        let ny = activePiece.y + b.offsetY + dy;
+        if (nx < 0 || nx >= COLS) return true;
+        if (ny >= ROWS) return true;
+        if (ny >= 0 && grid[ny][nx]) return true;
+    }
+    return false;
+}
+
+document.addEventListener('keydown', e => {
+    if (isGameOver) return;
+    if (e.key === 'ArrowLeft') move(-1, 0);
+    if (e.key === 'ArrowRight') move(1, 0);
+    if (e.key === 'ArrowDown') { move(0, 1); score += 1; updateUI(); }
+});
+
+function lockPiece() {
+    if (!activePiece) return;
+    for (let b of activePiece.blocks) {
+        let ny = activePiece.y + b.offsetY;
+        let nx = activePiece.x + b.offsetX;
+        if (ny < 0) { isGameOver = true; drawGameOver(); return; }
+        grid[ny][nx] = { ...b };
+    }
+    activePiece = null;
+    resolveGridState();
+}
+
+/** * LOGIC CORE - ROBUST MATCHING 
+ * Denne funktion sikrer, at vi bliver ved med at tjekke, indtil alt er faldet på plads.
+ */
+function resolveGridState() {
+    let stable = false;
+    let iterations = 0;
+    
+    // Kør loop indtil intet flytter sig og ingen reaktioner sker
+    while (!stable && iterations < 15) {
+        stable = true;
+        iterations++;
+        
+        // 1. Tjek matches (hvis match fundet -> ustabilt, da noget forsvandt)
+        if (scanForMatches()) {
+            stable = false;
+            continue; // Start forfra, så vi fanger kædereaktioner
+        }
+        
+        // 2. Tjek tyngdekraft (hvis noget faldt -> ustabilt)
+        if (applyGravity()) {
+            stable = false;
+        }
+    }
+    
+    if (!isGameOver) spawnPiece();
+}
+
+function applyGravity() {
+    let moved = false;
+    for (let x = 0; x < COLS; x++) {
+        for (let y = ROWS - 2; y >= 0; y--) {
+            if (grid[y][x]) {
+                let dropY = y;
+                while (dropY + 1 < ROWS && grid[dropY + 1][x] === null) dropY++;
+                if (dropY !== y) {
+                    grid[dropY][x] = grid[y][x];
+                    grid[y][x] = null;
+                    moved = true;
+                }
+            }
+        }
+    }
+    return moved;
+}
+
+/** * SCANNER ALLE KLYNGER FOR KONTAKT 
+ */
+function scanForMatches() {
+    let visited = new Set();
+    
+    // Iterer gennem hele gitteret
+    for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS; x++) {
+            if (!grid[y][x]) continue;
+            if (grid[y][x].type === 'trash') continue;
+            if (visited.has(`${x},${y}`)) continue;
+
+            // Find Cluster A (fx en gruppe Natrium)
+            let clusterA = getCluster(x, y);
+            
+            // Marker som besøgt så vi ikke tjekker den igen i dette loop
+            clusterA.cells.forEach(c => visited.add(`${c.x},${c.y}`));
+            
+            // Nu tjekker vi om Cluster A rører en KOMPATIBEL Cluster B
+            let match = findTouchingMatch(clusterA);
+            
+            if (match) {
+                executeReaction(clusterA, match);
+                return true; // Returner true straks for at genstarte fysik-loopet
+            }
+        }
+    }
+    return false;
+}
+
+function getCluster(sx, sy) {
+    let targetSymbol = grid[sy][sx].data.symbol;
+    let stack = [{x:sx, y:sy}];
+    let cells = [];
+    let visitedLocal = new Set([`${sx},${sy}`]);
+
+    while(stack.length) {
+        let c = stack.pop();
+        cells.push({x:c.x, y:c.y, ...grid[c.y][c.x]});
+
+        [[0,1],[0,-1],[1,0],[-1,0]].forEach(d => {
+            let nx = c.x + d[0], ny = c.y + d[1];
+            if (nx>=0 && nx<COLS && ny>=0 && ny<ROWS) {
+                let nb = grid[ny][nx];
+                if (nb && nb.type === 'ion' && nb.data.symbol === targetSymbol && !visitedLocal.has(`${nx},${ny}`)) {
+                    visitedLocal.add(`${nx},${ny}`);
+                    stack.push({x:nx, y:ny});
+                }
+            }
+        });
+    }
+    return { cells, symbol: targetSymbol };
+}
+
+// Finder alle gitter-koordinater der grænser op til en klynge
+function getClusterNeighborCoords(cluster) {
+    let neighborCoords = new Set();
+    cluster.cells.forEach(c => {
+        [[0,1],[0,-1],[1,0],[-1,0]].forEach(d => {
+            let nx = c.x + d[0], ny = c.y + d[1];
+            if (nx>=0 && nx<COLS && ny>=0 && ny<ROWS) {
+                // Hvis koordinaten ikke er en del af klyngen selv
+                if (!cluster.cells.some(cell => cell.x === nx && cell.y === ny)) {
+                    neighborCoords.add(`${nx},${ny}`);
+                }
+            }
+        });
+    });
+    return neighborCoords;
+}
+
+// Tjekker alle naboer til Cluster A for at se om der er en gyldig reaktionspartner
+function findTouchingMatch(clusterA) {
+    let neighborCoords = getClusterNeighborCoords(clusterA);
+
+    // Tjek hver nabo
+    for (let key of neighborCoords) {
+        let [nx, ny] = key.split(',').map(Number);
+        let nb = grid[ny][nx];
+        
+        // Er naboen en Ion?
+        if (nb && nb.type === 'ion') {
+            // Er det en anden type ion? (Kation vs Anion)
+            // Hurtig måde: Hvis symbolerne er forskellige
+            if (nb.data.symbol !== clusterA.symbol) {
+                
+                // Hent hele Cluster B
+                let clusterB = getCluster(nx, ny);
+                
+                // Tjek kemisk kompatibilitet (En skal være kat, en an)
+                let isACat = CATIONS.some(c => c.symbol === clusterA.symbol);
+                let isBCat = CATIONS.some(c => c.symbol === clusterB.symbol);
+                
+                if (isACat !== isBCat) {
+                    // Tjek Støkiometri (Areal skal være ens)
+                    if (clusterA.cells.length === clusterB.cells.length) {
+                        return clusterB; // Vi fandt et match!
+                    }
+                }
+            }
+        }
+    }
+    return null;
+}
+
+// Finder alle par af modsat-ladede klynger der rører hinanden (uanset om ladningen balancerer).
+// Bruges kun til visning (badges/hint) - ændrer ikke gitteret. Matchende par (lige ladning) er
+// allerede fjernet af scanForMatches() før dette kaldes, så alt der returneres her er ubalanceret.
+function findAllTouchingClusterPairs() {
+    let visited = new Set();
+    let pairs = [];
+
+    for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS; x++) {
+            if (!grid[y][x] || grid[y][x].type === 'trash') continue;
+            if (visited.has(`${x},${y}`)) continue;
+
+            let clusterA = getCluster(x, y);
+            clusterA.cells.forEach(c => visited.add(`${c.x},${c.y}`));
+
+            let isACat = CATIONS.some(c => c.symbol === clusterA.symbol);
+            let seenPartnerSymbols = new Set();
+            let neighborCoords = getClusterNeighborCoords(clusterA);
+
+            for (let key of neighborCoords) {
+                let [nx, ny] = key.split(',').map(Number);
+                let nb = grid[ny][nx];
+                if (nb && nb.type === 'ion' && nb.data.symbol !== clusterA.symbol) {
+                    let isBCat = CATIONS.some(c => c.symbol === nb.data.symbol);
+                    if (isACat !== isBCat && !seenPartnerSymbols.has(nb.data.symbol)) {
+                        seenPartnerSymbols.add(nb.data.symbol);
+                        pairs.push({ a: clusterA, b: getCluster(nx, ny) });
+                    }
+                }
+            }
+        }
+    }
+    return pairs;
+}
+
+function gcd(a, b) {
+    return b === 0 ? a : gcd(b, a % b);
+}
+
+function executeReaction(cA, cB) {
+    let allCells = [...cA.cells, ...cB.cells];
+    let uniqueIDs = new Set(allCells.map(c => c.id));
+    let atomCount = uniqueIDs.size;
+    
+    let radius = 0;
+    let cssClass = "log-reaction";
+    if (atomCount >= 4) { radius = 1; cssClass = "log-boom"; }
+    if (atomCount >= 5) { radius = 2; cssClass = "log-boom"; }
+
+    let toDelete = new Set();
+    allCells.forEach(c => toDelete.add(`${c.x},${c.y}`));
+    
+    // Eksplosionslogik
+    if (radius > 0) {
+        allCells.forEach(c => {
+            for (let dy = -radius; dy <= radius; dy++) {
+                for (let dx = -radius; dx <= radius; dx++) {
+                    let nx = c.x + dx, ny = c.y + dy;
+                    if (nx>=0 && nx<COLS && ny>=0 && ny<ROWS) {
+                        if (grid[ny][nx]) {
+                            toDelete.add(`${nx},${ny}`);
+                            createParticles(nx, ny, "#fff", 6);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Slet celler
+    toDelete.forEach(key => {
+        let [x, y] = key.split(',').map(Number);
+        if (grid[y][x]) {
+            createParticles(x, y, grid[y][x].data.color, 4);
+            grid[y][x] = null;
+        }
+    });
+    
+    let points = (allCells.length * 50) + (radius * 1000);
+    score += points;
+    
+    // Accelerer
+    speed = Math.max(MAX_SPEED, speed - 8);
+    
+    updateUI();
+    logFullReaction(cA, cB, cssClass);
+}
+
+function logFullReaction(cA, cB, cls) {
+    let catClust = CATIONS.some(c => c.symbol === cA.symbol) ? cA : cB;
+    let anClust = (catClust === cA) ? cB : cA;
+
+    let countCat = new Set(catClust.cells.map(c => c.id)).size;
+    let countAn = new Set(anClust.cells.map(c => c.id)).size;
+
+    const clean = s => s.replace(/[⁺²³⁻]+/g, '');
+    const sub = n => n > 1 ? String.fromCharCode(8320 + n) : "";
+    
+    // Forkort til empirisk formel (fx Mg2Cl4 -> MgCl2) ved at dividere med største fælles divisor
+    let g = gcd(countCat, countAn);
+    let redCat = countCat / g;
+    let redAn = countAn / g;
+    let product = `${clean(catClust.symbol)}${sub(redCat)}${clean(anClust.symbol)}${sub(redAn)}`;
+
+    let txtCat = (countCat > 1 ? countCat : "") + catClust.symbol;
+    let txtAn = (countAn > 1 ? countAn : "") + anClust.symbol;
+    
+    const html = `<span class="formula">${txtCat} + ${txtAn} ⟶ ${product}</span>`;
+    
+    const log = document.getElementById('log');
+    const div = document.createElement('div');
+    div.className = `log-entry ${cls}`;
+    div.innerHTML = html;
+    log.prepend(div);
+}
+
+/** VISUALS */
+function createParticles(gx, gy, color, n) {
+    const cx = gx*BLOCK_SIZE + BLOCK_SIZE/2;
+    const cy = gy*BLOCK_SIZE + BLOCK_SIZE/2;
+    for(let i=0; i<n; i++) {
+        particles.push({
+            x: cx, y: cy,
+            vx: (Math.random()-0.5)*15, vy: (Math.random()-0.5)*15,
+            life: 1.0, color: color
+        });
+    }
+}
+
+function draw() {
+    ctx.fillStyle = "#080808";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    for(let y=0; y<ROWS; y++) {
+        for(let x=0; x<COLS; x++) {
+            if (grid[y][x]) drawBlock(ctx, x, y, grid[y][x]);
+        }
+    }
+    if (activePiece) {
+        activePiece.blocks.forEach(b => {
+            let dy = activePiece.y + b.offsetY;
+            if (dy >= 0) drawBlock(ctx, activePiece.x + b.offsetX, dy, b);
+        });
+    }
+    drawChargeBadges();
+    particles.forEach((p, i) => {
+        p.x += p.vx; p.y += p.vy; p.life -= 0.05;
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(p.x, p.y, 4, 4);
+        if (p.life<=0) particles.splice(i,1);
+    });
+    ctx.globalAlpha = 1;
+}
+
+function drawBlock(c, x, y, info) {
+    const s = BLOCK_SIZE;
+    const px = x*s; const py = y*s;
+    c.fillStyle = info.data.color;
+    
+    if (info.type === 'trash' || info.type === 'pure_trash') {
+        c.fillStyle = "#333";
+        c.fillRect(px+1, py+1, s-2, s-2);
+        c.fillStyle = "#555"; c.fillRect(px+5, py+5, s-10, s-10);
+        return;
+    }
+
+    c.fillRect(px+1, py+1, s-2, s-2);
+    if (info.type === 'ion' && !info.isHead) c.fillRect(px+4, py-2, s-8, 4); 
+    
+    if (info.isHead) {
+        c.fillStyle = "#fff";
+        c.font = "bold 15px Arial";
+        c.textAlign = "center";
+        c.textBaseline = "middle";
+        c.fillText(info.data.symbol, px+s/2, py+s/2);
+    }
+}
+
+// Viser "+X" / "-Y" ladningstal over klynger der rører en modsat ladet klynge (men endnu ikke matcher)
+function drawChargeBadges() {
+    let pairs = findAllTouchingClusterPairs();
+    let shown = new Set();
+
+    pairs.forEach(pair => {
+        [pair.a, pair.b].forEach(cluster => {
+            let key = cluster.cells.map(c => `${c.x},${c.y}`).sort().join('|');
+            if (shown.has(key)) return;
+            shown.add(key);
+
+            let top = cluster.cells.reduce((m, c) => (c.y < m.y || (c.y === m.y && c.x < m.x)) ? c : m, cluster.cells[0]);
+            let isCat = CATIONS.some(c => c.symbol === cluster.symbol);
+            let label = `${isCat ? '+' : '-'}${cluster.cells.length}`;
+
+            let px = top.x * BLOCK_SIZE + BLOCK_SIZE / 2;
+            let py = Math.max(12, top.y * BLOCK_SIZE - 6);
+
+            ctx.font = "bold 12px monospace";
+            ctx.textAlign = "center";
+            ctx.fillStyle = "rgba(0,0,0,0.65)";
+            ctx.fillRect(px - 17, py - 12, 34, 15);
+            ctx.fillStyle = isCat ? "#3498db" : "#e74c3c";
+            ctx.fillText(label, px, py);
+        });
+    });
+}
+
+function drawPreview() {
+    nextCtx.clearRect(0,0,80,80);
+    if (!nextPieceInfo) return;
+    const s = 18; const cx = 40 - s/2; let cy = 10;
+    
+    if (nextPieceInfo.type === 'pure_trash') {
+        for(let i=0; i<nextPieceInfo.height; i++) {
+            nextCtx.fillStyle = "#555"; nextCtx.fillRect(cx, cy + i*s, s, s);
+            nextCtx.strokeStyle = "#333"; nextCtx.strokeRect(cx, cy + i*s, s, s);
+        }
+    } else {
+        for(let i=0; i<nextPieceInfo.data.charge; i++) {
+            nextCtx.fillStyle = nextPieceInfo.data.color; nextCtx.fillRect(cx, cy + i*s, s, s);
+        }
+    }
+}
+
+function updateUI() {
+    document.getElementById('score').innerText = score;
+    let pct = Math.round((BASE_SPEED / speed) * 100);
+    document.getElementById('speed-display').innerText = pct + "%";
+}
+
+// Permanent oversigt over ioner, ladninger og farver - genereres ud fra CATIONS/ANIONS
+function buildLegend() {
+    const el = document.getElementById('legend');
+    el.innerHTML = '';
+    [...CATIONS, ...ANIONS].forEach(ion => {
+        const isCat = CATIONS.includes(ion);
+        const row = document.createElement('div');
+        row.className = 'legend-row';
+        row.innerHTML = `<span class="legend-swatch" style="background:${ion.color};"></span><span>${ion.symbol} &nbsp;(ladning ${isCat ? '+' : '-'}${ion.charge})</span>`;
+        el.appendChild(row);
+    });
+}
+buildLegend();
+
+function drawGameOver() {
+    ctx.fillStyle = "rgba(0,0,0,0.9)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = "#fff";
+    ctx.font = "40px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("PRODUKTION STOPPET", canvas.width/2, canvas.height/2);
+    ctx.font = "20px Arial";
+    ctx.fillText("Score: " + score, canvas.width/2, canvas.height/2 + 40);
+    document.getElementById('overlay').querySelector('.overlay-content').innerHTML = `
+        <h1 style="color:red">GAME OVER</h1>
+        <p>Score: ${score}</p>
+        <button onclick="startGame()">Prøv Igen</button>
+    `;
+    document.getElementById('overlay').style.display = 'flex';
+}
+</script>
+</body>
+</html>

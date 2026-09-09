@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Molarmasse Laboratoriet</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #2980b9;
+            --info: #8e44ad;
+            --success: #27ae60;
+            --warning: #f39c12; /* Ny farve til bonus */
+            --danger: #c0392b;
+            --bg: #f4f6f7;
+            --card: #ffffff;
+            --text: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .level-badge {
+            background: var(--accent);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        #xp-bar-container {
+            width: 200px;
+            height: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-left: 15px;
+        }
+
+        #xp-bar {
+            height: 100%;
+            background: var(--success);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: 1fr 480px; 
+            gap: 20px;
+            padding: 20px;
+            height: calc(100vh - 80px);
+        }
+
+        .canvas-container {
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #e1e4e8;
+            display: flex;
+            flex-direction: column;
+        }
+
+        canvas {
+            flex-grow: 1;
+            width: 100%;
+            cursor: crosshair;
+        }
+
+        .overlay-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.95);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            pointer-events: none;
+        }
+
+        .panel {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            border: 1px solid #e1e4e8;
+        }
+
+        h2 { 
+            margin-top: 0; 
+            font-size: 1.1rem; 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+            color: #7f8c8d;
+            border-bottom: 2px solid var(--bg); 
+            padding-bottom: 10px; 
+        }
+
+        .element-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 8px;
+        }
+
+        .element-btn {
+            aspect-ratio: 1;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.1s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .element-btn:hover { transform: translateY(-2px); border-color: var(--accent); background-color: #f8f9fa; }
+        .element-btn:active { transform: translateY(0); background-color: #e8e8e8; }
+        
+        .element-symbol { font-weight: bold; font-size: 1.2rem; }
+        .element-mass { font-size: 0.7rem; color: #7f8c8d; margin-top: 2px; }
+        .element-name { font-size: 0.6rem; margin-top: 2px; }
+
+        /* BEREGNINGS OMRÅDE */
+        .calc-area {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: auto;
+            border: 1px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        button.theory-btn {
+            background: white;
+            color: var(--info);
+            border: 1px solid var(--info);
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-bottom: 5px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        button.theory-btn:hover { background: #fdfaff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        .math-equation-container {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.05rem;
+            color: #333;
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            display: flex;
+            flex-direction: column; 
+            gap: 10px;
+        }
+
+        .equation-line {
+            display: flex;
+            flex-wrap: wrap; 
+            align-items: center;
+            line-height: 2.5rem;
+        }
+
+        input[type="text"] {
+            width: 90px;
+            padding: 6px;
+            border: 2px solid #bdc3c7;
+            border-radius: 4px;
+            font-size: 1rem;
+            text-align: center;
+            margin: 0 5px;
+            font-family: inherit;
+        }
+        
+        input[type="text"]:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        .hidden { display: none; }
+
+        .result-success {
+            color: var(--success);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-left: 5px;
+            animation: fadeIn 0.5s;
+            display: inline-block;
+        }
+        
+        /* Ny klasse til PERFEKT svar */
+        .result-perfect {
+            color: var(--warning);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-left: 5px;
+            animation: pulseText 0.5s;
+            display: inline-block;
+            text-shadow: 0px 0px 1px rgba(0,0,0,0.1);
+        }
+
+        button.action-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        button.action-btn:hover { background: #1f618d; }
+        button.action-btn:disabled { background: #bdc3c7; cursor: not-allowed; }
+
+        .molecule-target {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--accent);
+            display: block;
+        }
+        
+        .instruction-highlight {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            text-align: center;
+            margin-top: 10px;
+            border: 1px solid #ffeeba;
+            transition: all 0.3s ease;
+        }
+        
+        /* Bonus badge animation */
+        .bonus-badge {
+            position: absolute;
+            top: -20px;
+            right: 20px;
+            background: var(--warning);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            animation: floatUp 1s ease-out forwards;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        #reset-btn {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.5);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+        #reset-btn:hover { background: rgba(255,255,255,0.3); }
+
+        .mode-tab {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.4);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .mode-tab:hover { background: rgba(255,255,255,0.25); }
+        .mode-tab.active { background: var(--accent); border-color: var(--accent); }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .quiz-option-btn {
+            padding: 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.15s;
+            text-align: center;
+        }
+        .quiz-option-btn:hover:not(:disabled) { border-color: var(--accent); background: #f8f9fa; transform: translateY(-2px); }
+        .quiz-option-btn.correct { border-color: var(--success); background: #d4edda; color: #155724; }
+        .quiz-option-btn.wrong { border-color: var(--danger); background: #f8d7da; color: #721c24; }
+        .quiz-option-btn:disabled { cursor: default; }
+
+        .hint-box {
+            background: #f4f0fa;
+            color: #5b2c8d;
+            border: 1px solid #d9c8f0;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            text-align: left;
+        }
+
+        /* MODAL STYLES */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(3px);
+        }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 550px;
+            width: 90%;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+        .modal-header {
+            background: linear-gradient(135deg, var(--info), #9b59b6);
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .theory-title { margin: 0; font-size: 1.4rem; color:white; border:none; padding:0; text-transform:none; letter-spacing:0; }
+        .close-modal {
+            background: none; border: none;
+            color: white; font-size: 1.8rem;
+            cursor: pointer; opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+        .close-modal:hover { opacity: 1; }
+        
+        .modal-body {
+            padding: 25px;
+            color: #444;
+            line-height: 1.6;
+        }
+
+        .steps-list {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+        .steps-list li { margin-bottom: 8px; }
+
+        .theory-example {
+            background: #f4f6f7;
+            border-left: 5px solid var(--info);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 20px;
+            font-size: 0.95rem;
+        }
+        .example-header {
+            color: var(--info);
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .math-line {
+            font-family: 'Courier New', monospace;
+            display: block;
+            margin-top: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes pulseText { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        @keyframes floatUp { 0% { transform: translateY(0); opacity:1; } 100% { transform: translateY(-30px); opacity:0; } }
+
+    </style>
+</head>
+<body>
+
+<div id="theory-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="theory-title">Teori: Molarmasse</h2>
+            <button class="close-modal" id="close-modal-btn">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <div>
+                Molarmassen for et molekyle findes ved at lægge atommasserne for alle atomerne sammen.
+            </div>
+            
+            <p><strong>Sådan gør du:</strong></p>
+            <ul class="steps-list">
+                <li>Slå atommassen op for hvert grundstof (tallene i kasserne).</li>
+                <li>Gang med antallet af atomer.</li>
+                <li>Læg tallene sammen.</li>
+            </ul>
+
+            <div class="theory-example">
+                <span class="example-header">Eksempel: CO₂</span>
+                <div>
+                    C (12,01 g/mol) og 2 stk O (16,00 g/mol) får således følgende molarmasse:
+                </div>
+                <span class="math-line">M = 12,01 + (2 · 16,00)</span>
+                <span class="math-line">M = 44,01 g/mol</span>
+            </div>
+            
+            <button class="action-btn" id="understood-btn" style="margin-top:20px; background-color:var(--info);">Forstået</button>
+        </div>
+    </div>
+</div>
+
+<header>
+    <div style="display:flex; align-items:center;">
+        <div>
+            <h1 style="margin:0; font-size:1.3rem;">Molarmasse</h1>
+        </div>
+        <div style="margin-left: 40px; display:flex; align-items:center;">
+            <span id="level-badge" class="level-badge">Niveau 1: Lærling</span>
+            <div id="xp-bar-container">
+                <div id="xp-bar"></div>
+            </div>
+        </div>
+        <div style="margin-left: 30px; display:flex; align-items:center; gap:8px;">
+            <button id="tab-lab" class="mode-tab active">🧪 Byg molekylet</button>
+            <button id="tab-quiz" class="mode-tab">🎯 Gættekonkurrence</button>
+        </div>
+    </div>
+    <button id="reset-btn">Genstart Øvelse</button>
+</header>
+
+<main id="lab-page">
+    <div class="canvas-container">
+        <canvas id="simCanvas"></canvas>
+        <div class="overlay-info">
+            <span style="font-size: 0.8rem; text-transform: uppercase; color: #888; font-weight: bold;">Opgave</span>
+            <span id="target-molecule" class="molecule-target">H₂O</span>
+            <div style="margin-top:8px; font-size:0.95rem; color:#444;">
+                Indhold: <span id="current-formula" style="font-weight:bold; font-family:'Courier New'">Tom</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div>
+            <h2>1. Byg molekylet</h2>
+            <div id="element-list" class="element-grid">
+                </div>
+            <div id="instruction-box" class="instruction-highlight">
+                👇 <strong>Klik på kasserne herover</strong> for at samle atomerne til molekylet.
+            </div>
+        </div>
+
+        <div class="calc-area" style="position:relative;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                <h2 style="border:none; margin:0; padding:0;">2. Beregning</h2>
+            </div>
+            
+            <button id="open-theory-btn" class="theory-btn">
+                <span>📖</span> Sådan løser du opgaven
+            </button>
+
+            <div class="math-equation-container">
+                <div class="equation-line">
+                    <span style="margin-right:5px; font-weight:bold;">M = </span>
+                    <span id="equation-build">( ... ) g/mol</span>
+                </div>
+                
+                <div class="equation-line" id="input-line" style="border-top: 1px dashed #eee; padding-top:5px;">
+                     <span>= </span>
+                     <div id="input-wrapper" style="display:inline-block;">
+                        <input type="text" id="mass-input" placeholder="?" inputmode="decimal" autocomplete="off" disabled>
+                        <span id="success-display" class="result-success hidden"></span>
+                     </div>
+                     <span class="unit-label">&nbsp;g/mol</span>
+                </div>
+            </div>
+
+            <button id="check-btn" class="action-btn" disabled>Tjek Svar</button>
+            <button id="next-btn" class="action-btn" style="display:none; background-color: var(--success);">Næste Opgave ➔</button>
+            
+            <div id="error-msg" style="color:var(--danger); font-size:0.9rem; display:none; text-align:center;"></div>
+        </div>
+    </div>
+</main>
+
+<div id="quiz-page" style="display:none; height:calc(100vh - 80px); padding:20px; box-sizing:border-box; align-items:center; justify-content:center; overflow-y:auto;">
+    <div style="width:100%; max-width:560px; background:var(--card); border-radius:12px; box-shadow:0 4px 6px rgba(0,0,0,0.05); border:1px solid #e1e4e8; padding:30px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <div style="font-size:0.9rem; color:#7f8c8d;">🔥 Stribe: <strong id="quiz-streak" style="color:var(--text);">0</strong></div>
+            <div style="font-size:0.9rem; color:#7f8c8d;">🏆 Rekord: <strong id="quiz-best" style="color:var(--text);">0</strong></div>
+        </div>
+        <h2 style="border:none; padding:0; margin:0 0 15px 0; text-transform:none; letter-spacing:0; color:var(--primary); font-size:1.3rem; text-align:center;">Gættekonkurrence</h2>
+        <div id="quiz-stage-label" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; color:var(--accent); font-weight:bold; margin-bottom:8px; text-align:center;"></div>
+        <div id="quiz-question" style="font-size:1.1rem; line-height:1.6; min-height:70px; margin-bottom:15px; text-align:center;"></div>
+
+        <div id="quiz-options" class="quiz-options"></div>
+
+        <div id="quiz-numeric" style="display:none; justify-content:center; align-items:center; gap:10px; margin:15px 0;">
+            <input type="text" id="quiz-input" inputmode="decimal" placeholder="?" autocomplete="off">
+            <span style="font-weight:bold; color:#7f8c8d;" id="quiz-unit">g/mol</span>
+            <button id="quiz-check-btn" class="action-btn" style="width:auto; margin:0; padding:10px 20px;">Tjek</button>
+        </div>
+
+        <div id="quiz-feedback" style="margin-top:5px; text-align:center;"></div>
+        <button id="quiz-next-btn" class="action-btn" style="display:none; background-color:var(--success);">Næste spørgsmål ➔</button>
+    </div>
+</div>
+
+<script>
+/**
+ * DATA & KONFIGURATION
+ */
+const ELEMENTS = {
+    'H':  { name: 'Hydrogen', mass: 1.01,  color: '#ecf0f1', textCol:'#2c3e50', radius: 15 },
+    'C':  { name: 'Carbon',   mass: 12.01, color: '#2c3e50', textCol:'#fff',    radius: 20 },
+    'N':  { name: 'Nitrogen', mass: 14.01, color: '#3498db', textCol:'#fff',    radius: 19 },
+    'O':  { name: 'Oxygen',   mass: 16.00, color: '#e74c3c', textCol:'#fff',    radius: 18 },
+    'Na': { name: 'Natrium',  mass: 22.99, color: '#9b59b6', textCol:'#fff',    radius: 22 },
+    'Cl': { name: 'Chlor',    mass: 35.45, color: '#2ecc71', textCol:'#fff',    radius: 21 },
+    'S':  { name: 'Svovl',    mass: 32.07, color: '#f1c40f', textCol:'#2c3e50', radius: 20 }
+};
+
+const LEVELS = [
+    { target: 'H₂O', name: 'Vand', composition: {'H': 2, 'O': 1}, structure: [{type:'O',x:0,y:-10},{type:'H',x:-25,y:15},{type:'H',x:25,y:15}], bonds:[[0,1],[0,2]] },
+    
+    // CO2: Dobbeltbindinger (type 2)
+    { target: 'CO₂', name: 'Kuldioxid', composition: {'C': 1, 'O': 2}, structure: [{type:'C',x:0,y:0},{type:'O',x:-40,y:0},{type:'O',x:40,y:0}], bonds:[[0,1,2],[0,2,2]] },
+    
+    // SO2: Dobbeltbindinger (type 2)
+    { target: 'SO₂', name: 'Svovldioxid', composition: {'S': 1, 'O': 2}, structure: [{type:'S',x:0,y:-10},{type:'O',x:-35,y:20},{type:'O',x:35,y:20}], bonds:[[0,1,2],[0,2,2]] },
+    
+    { target: 'CH₄', name: 'Metan', composition: {'C': 1, 'H': 4}, structure: [{type:'C',x:0,y:0},{type:'H',x:0,y:-35},{type:'H',x:35,y:10},{type:'H',x:-30,y:20},{type:'H',x:10,y:35}], bonds:[[0,1],[0,2],[0,3],[0,4]] },
+    
+    // HEXAN (C6H14)
+    { 
+        target: 'C₆H₁₄', 
+        name: 'Hexan', 
+        composition: {'C': 6, 'H': 14},
+        structure: [
+            // Carbon backbone
+            {type:'C',x:-125,y:0}, {type:'C',x:-75,y:-30}, {type:'C',x:-25,y:0},
+            {type:'C',x:25,y:-30}, {type:'C',x:75,y:0}, {type:'C',x:125,y:-30},
+            // Hydrogens
+            {type:'H',x:-125,y:35}, {type:'H',x:-155,y:-10}, {type:'H',x:-125,y:-35},
+            {type:'H',x:-75,y:5}, {type:'H',x:-75,y:-65},
+            {type:'H',x:-25,y:35}, {type:'H',x:-25,y:-35},
+            {type:'H',x:25,y:5}, {type:'H',x:25,y:-65},
+            {type:'H',x:75,y:35}, {type:'H',x:75,y:-35},
+            {type:'H',x:125,y:5}, {type:'H',x:155,y:-20}, {type:'H',x:125,y:-65}
+        ],
+        bonds: [
+            [0,1], [1,2], [2,3], [3,4], [4,5],
+            [0,6], [0,7], [0,8], [1,9], [1,10], [2,11], [2,12],
+            [3,13], [3,14], [4,15], [4,16], [5,17], [5,18], [5,19]
+        ]
+    },
+    
+    // ETHANOL (C2H5OH)
+    { 
+        target: 'C₂H₅OH', 
+        name: 'Ethanol', 
+        composition: {'C': 2, 'H': 6, 'O': 1},
+        structure: [
+            {type:'C',x:-40,y:0}, {type:'C',x:20,y:0}, {type:'O',x:70,y:-30},
+            {type:'H',x:-40,y:-35}, {type:'H',x:-40,y:35}, {type:'H',x:-75,y:0},
+            {type:'H',x:20,y:-35}, {type:'H',x:20,y:35}, {type:'H',x:90,y:-55} 
+        ],
+        bonds: [[0,1], [1,2], [0,3], [0,4], [0,5], [1,6], [1,7], [2,8]]
+    }
+];
+
+// Pulje af molekyler til gættekonkurrencen (bruger kun grundstoffer fra ELEMENTS)
+const QUIZ_POOL = [
+    { formula: 'H₂O',    name: 'Vand',               composition: {'H':2,'O':1} },
+    { formula: 'CO₂',    name: 'Kuldioxid',          composition: {'C':1,'O':2} },
+    { formula: 'SO₂',    name: 'Svovldioxid',        composition: {'S':1,'O':2} },
+    { formula: 'CH₄',    name: 'Metan',              composition: {'C':1,'H':4} },
+    { formula: 'C₆H₁₄',  name: 'Hexan',              composition: {'C':6,'H':14} },
+    { formula: 'C₂H₆O',  name: 'Ethanol',            composition: {'C':2,'H':6,'O':1} },
+    { formula: 'NH₃',    name: 'Ammoniak',           composition: {'N':1,'H':3} },
+    { formula: 'HCl',    name: 'Hydrogenchlorid',    composition: {'H':1,'Cl':1} },
+    { formula: 'NaCl',   name: 'Natriumchlorid',     composition: {'Na':1,'Cl':1} },
+    { formula: 'N₂',     name: 'Kvælstofgas',        composition: {'N':2} },
+    { formula: 'O₂',     name: 'Oxygengas',          composition: {'O':2} },
+    { formula: 'Cl₂',    name: 'Chlorgas',           composition: {'Cl':2} },
+    { formula: 'H₂S',    name: 'Hydrogensulfid',     composition: {'H':2,'S':1} },
+    { formula: 'SO₃',    name: 'Svovltrioxid',       composition: {'S':1,'O':3} },
+    { formula: 'NaOH',   name: 'Natriumhydroxid',    composition: {'Na':1,'O':1,'H':1} },
+    { formula: 'H₂SO₄',  name: 'Svovlsyre',          composition: {'H':2,'S':1,'O':4} },
+    { formula: 'HNO₃',   name: 'Salpetersyre',       composition: {'H':1,'N':1,'O':3} },
+    { formula: 'CS₂',    name: 'Kulstofdisulfid',    composition: {'C':1,'S':2} },
+    { formula: 'CCl₄',   name: 'Tetrachlormethan',   composition: {'C':1,'Cl':4} },
+    { formula: 'NaHCO₃', name: 'Natron',             composition: {'Na':1,'H':1,'C':1,'O':3} }
+];
+
+function molarMassOf(composition) {
+    return Object.keys(composition).reduce((sum, k) => sum + composition[k] * ELEMENTS[k].mass, 0);
+}
+
+const quizState = {
+    streak: 0,
+    best: parseInt(localStorage.getItem('molarmasse_quiz_best') || '0', 10),
+    current: null,
+    wrongAttempts: 0
+};
+
+const state = {
+    currentLevelIdx: 0,
+    atomsInFlask: [],
+    isFormed: false,
+    xp: 0,
+    maxXp: 1500, // 6 opgaver * 250 max = 1500
+    lastActionTime: 0,
+    wrongAttempts: 0
+};
+
+// --- UTILITY ---
+function formatNum(num) {
+    return num.toLocaleString('da-DK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function parseInput(str) {
+    return parseFloat(str.replace(',', '.'));
+}
+
+// --- CANVAS ENGINE ---
+const canvas = document.getElementById('simCanvas');
+const ctx = canvas.getContext('2d');
+let animationId;
+
+function resizeCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    canvas.style.width = `${rect.width}px`;
+    canvas.style.height = `${rect.height}px`;
+}
+window.addEventListener('resize', resizeCanvas);
+
+class Atom {
+    constructor(symbol, x, y) {
+        this.symbol = symbol;
+        this.data = ELEMENTS[symbol];
+        this.x = x; this.y = y;
+        this.vx = (Math.random()-0.5)*1.5; this.vy = (Math.random()-0.5)*1.5;
+        this.radius = this.data.radius;
+        this.targetX = null; this.targetY = null;
+    }
+    update(w, h) {
+        if (state.isFormed && this.targetX !== null) {
+            this.x += (this.targetX - this.x)*0.10;
+            this.y += (this.targetY - this.y)*0.10;
+            return;
+        }
+        this.x += this.vx; this.y += this.vy;
+        if (this.x+this.radius > w || this.x-this.radius < 0) this.vx *= -1;
+        if (this.y+this.radius > h || this.y-this.radius < 0) this.vy *= -1;
+        this.x = Math.max(this.radius, Math.min(w-this.radius, this.x));
+        this.y = Math.max(this.radius, Math.min(h-this.radius, this.y));
+    }
+    draw() {
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+        ctx.fillStyle = this.data.color; ctx.fill();
+        ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineWidth = 1; ctx.stroke();
+        ctx.fillStyle = this.data.textCol; ctx.font = 'bold 13px Arial';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(this.symbol, this.x, this.y);
+    }
+}
+
+function drawBond(atom1, atom2, type) {
+    if (type === 2) {
+        const dx = atom2.x - atom1.x;
+        const dy = atom2.y - atom1.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist === 0) return;
+        const nx = -dy / dist;
+        const ny = dx / dist;
+        const offset = 4;
+
+        ctx.strokeStyle = '#7f8c8d';
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(atom1.x + nx * offset, atom1.y + ny * offset); ctx.lineTo(atom2.x + nx * offset, atom2.y + ny * offset); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(atom1.x - nx * offset, atom1.y - ny * offset); ctx.lineTo(atom2.x - nx * offset, atom2.y - ny * offset); ctx.stroke();
+    } else {
+        ctx.beginPath();
+        ctx.moveTo(atom1.x, atom1.y);
+        ctx.lineTo(atom2.x, atom2.y);
+        ctx.strokeStyle = '#95a5a6'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.stroke();
+    }
+}
+
+function loop() {
+    const rect = canvas.getBoundingClientRect();
+    ctx.clearRect(0, 0, rect.width, rect.height);
+    
+    if (state.isFormed) {
+        const level = LEVELS[state.currentLevelIdx];
+        if (level.bonds) {
+            level.bonds.forEach(b => {
+                const a1 = state.atomsInFlask[b[0]];
+                const a2 = state.atomsInFlask[b[1]];
+                const type = b[2] || 1;
+                if(a1 && a2) drawBond(a1, a2, type);
+            });
+        }
+    }
+    state.atomsInFlask.forEach(a => { a.update(rect.width, rect.height); a.draw(); });
+    animationId = requestAnimationFrame(loop);
+}
+
+// --- LOGIC ---
+function init() {
+    resizeCanvas();
+    renderElements();
+    loadLevel(0);
+    loop();
+
+    document.getElementById('check-btn').addEventListener('click', checkAnswer);
+    document.getElementById('next-btn').addEventListener('click', nextLevel);
+    document.getElementById('reset-btn').addEventListener('click', () => loadLevel(state.currentLevelIdx));
+    
+    document.getElementById('mass-input').addEventListener('keypress', (e) => {
+        if(e.key === 'Enter' && !document.getElementById('check-btn').disabled) checkAnswer();
+    });
+
+    const modal = document.getElementById('theory-modal');
+    document.getElementById('open-theory-btn').addEventListener('click', () => modal.style.display = 'flex');
+    document.getElementById('close-modal-btn').addEventListener('click', () => modal.style.display = 'none');
+    document.getElementById('understood-btn').addEventListener('click', () => modal.style.display = 'none');
+    modal.addEventListener('click', (e) => { if(e.target === modal) modal.style.display = 'none'; });
+
+    canvas.addEventListener('mousedown', (e) => {
+        if(state.isFormed) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        for(let i = state.atomsInFlask.length - 1; i >= 0; i--) {
+            const a = state.atomsInFlask[i];
+            const dx = x - a.x; const dy = y - a.y;
+            if (Math.sqrt(dx*dx + dy*dy) < a.radius+5) {
+                state.atomsInFlask.splice(i, 1);
+                updateUI();
+                break;
+            }
+        }
+    });
+}
+
+function renderElements() {
+    const con = document.getElementById('element-list');
+    con.innerHTML = '';
+    Object.keys(ELEMENTS).forEach(sym => {
+        const el = ELEMENTS[sym];
+        const btn = document.createElement('div');
+        btn.className = 'element-btn';
+        btn.innerHTML = `
+            <span class="element-symbol" style="color:${el.color==='#ecf0f1'?'#2c3e50':el.color}">${sym}</span>
+            <span class="element-mass">${formatNum(el.mass)}</span>
+            <span class="element-name">${el.name}</span>`;
+        btn.onclick = () => addAtom(sym);
+        con.appendChild(btn);
+    });
+}
+
+function addAtom(sym) {
+    if(state.isFormed) return;
+    const now = Date.now();
+    if(now - state.lastActionTime < 100) return; 
+    if(state.atomsInFlask.length >= 40) return; 
+    state.lastActionTime = now;
+    const rect = canvas.getBoundingClientRect();
+    const atom = new Atom(sym, rect.width/2 + (Math.random()-0.5)*60, rect.height/2 + (Math.random()-0.5)*60);
+    state.atomsInFlask.push(atom);
+    updateUI();
+    checkComposition();
+}
+
+function updateUI() {
+    const counts = {};
+    state.atomsInFlask.forEach(a => counts[a.symbol] = (counts[a.symbol]||0)+1);
+    const keys = Object.keys(counts).sort();
+    let formula = keys.length ? "" : "Tom";
+    keys.forEach(k => { formula += k; if(counts[k]>1) formula += toSubscript(counts[k]); });
+    document.getElementById('current-formula').textContent = formula;
+
+    let parts = [];
+    keys.forEach(k => {
+        const n = counts[k];
+        const m = formatNum(ELEMENTS[k].mass);
+        if (n > 1) parts.push(`${n} · ${m}`);
+        else parts.push(`${m}`);
+    });
+    const eqBuild = document.getElementById('equation-build');
+    if (parts.length === 0) eqBuild.textContent = "( ... ) g/mol";
+    else eqBuild.textContent = `(${parts.join(' + ')}) g/mol`;
+}
+
+function toSubscript(n) { return n.toString().split('').map(d => "₀₁₂₃₄₅₆₇₈₉"[d]).join(''); }
+
+function checkComposition() {
+    const target = LEVELS[state.currentLevelIdx];
+    const counts = {};
+    state.atomsInFlask.forEach(a => counts[a.symbol] = (counts[a.symbol]||0)+1);
+    const tKeys = Object.keys(target.composition);
+    const cKeys = Object.keys(counts);
+    if(tKeys.length !== cKeys.length) return;
+    let match = true;
+    tKeys.forEach(k => { if(target.composition[k] !== counts[k]) match = false; });
+    if(match) structureMolecule();
+}
+
+function structureMolecule() {
+    state.isFormed = true;
+    const level = LEVELS[state.currentLevelIdx];
+    document.getElementById('check-btn').disabled = false;
+    document.getElementById('mass-input').disabled = false;
+    document.getElementById('mass-input').focus();
+    
+    const instr = document.getElementById('instruction-box');
+    instr.innerHTML = "✅ <strong>Flot klaret!</strong> Molekylet er samlet.<br>Beregn nu molarmassen nedenfor 👇";
+    instr.style.backgroundColor = "#d4edda";
+    instr.style.color = "#155724";
+    instr.style.borderColor = "#c3e6cb";
+
+    const rect = canvas.getBoundingClientRect();
+    const cx = rect.width/2; const cy = rect.height/2;
+    let avail = [...state.atomsInFlask];
+    let struct = [];
+
+    level.structure.forEach(slot => {
+        const idx = avail.findIndex(a => a.symbol === slot.type);
+        if(idx !== -1) {
+            const atom = avail[idx];
+            atom.targetX = cx + slot.x; atom.targetY = cy + slot.y;
+            struct.push(atom);
+            avail.splice(idx, 1);
+        }
+    });
+
+    if(avail.length > 0) {
+        avail.forEach((atom, i) => {
+            const angle = (i / avail.length) * Math.PI * 2;
+            const dist = 100;
+            atom.targetX = cx + Math.cos(angle) * dist;
+            atom.targetY = cy + Math.sin(angle) * dist;
+            struct.push(atom);
+        });
+    }
+    state.atomsInFlask = struct;
+    const fe = document.getElementById('current-formula');
+    fe.style.color = 'var(--success)';
+    fe.textContent += " ✓";
+}
+
+// FEJLDIAGNOSE: gætter på den mest sandsynlige regnefejl og giver et målrettet hint
+function diagnoseMassError(userVal, composition, correct) {
+    const keys = Object.keys(composition);
+
+    // 1. Kommafejl (svar er ca. 10x for stort/lille)
+    if (Math.abs(userVal / 10 - correct) < Math.max(0.1, correct * 0.02)) {
+        return "Tjek om du har sat komma forkert – dit svar ser ud til at være ca. 10 gange for stort.";
+    }
+    if (Math.abs(userVal * 10 - correct) < Math.max(0.1, correct * 0.02)) {
+        return "Tjek om du har sat komma forkert – dit svar ser ud til at være ca. 10 gange for lille.";
+    }
+
+    // 2. Glemt decimaler (fx skrevet 44 i stedet for 44,01)
+    if (Math.abs(Math.round(correct) - userVal) < 0.02 && Math.abs(correct - userVal) >= 0.1) {
+        return "Har du husket decimalerne? Atommasserne har 2 decimaler, så svaret bør også have det.";
+    }
+
+    // 3. Helt glemt et grundstofs bidrag
+    for (const k of keys) {
+        if (keys.length > 1) {
+            const withoutK = correct - composition[k] * ELEMENTS[k].mass;
+            if (Math.abs(userVal - withoutK) < 0.1) {
+                return `Det ser ud som om bidraget fra ${ELEMENTS[k].name} (${k}) mangler i din udregning. Har du husket alle led i ligningen ovenfor?`;
+            }
+        }
+    }
+
+    // 4. Glemt at gange ét grundstofs masse med antallet af atomer
+    for (const k of keys) {
+        if (composition[k] > 1) {
+            const withOneInstead = correct - composition[k] * ELEMENTS[k].mass + ELEMENTS[k].mass;
+            if (Math.abs(userVal - withOneInstead) < 0.1) {
+                return `Har du husket at gange massen for ${k} med antallet af ${k}-atomer (${composition[k]} stk) – ikke kun tælle den én gang?`;
+            }
+        }
+    }
+
+    // 5. Generisk fallback
+    return "Tjek din udregning led for led – sammenlign hvert tal med ligningen ovenfor, og læg til sidst alle led sammen.";
+}
+
+function checkAnswer() {
+    const inp = document.getElementById('mass-input');
+    const val = parseInput(inp.value);
+    const errDiv = document.getElementById('error-msg');
+    const successSpan = document.getElementById('success-display');
+    const calcArea = document.querySelector('.calc-area');
+
+    if(isNaN(val)) {
+        errDiv.textContent = "Indtast venligst et tal.";
+        errDiv.style.display = 'block';
+        return;
+    }
+
+    const level = LEVELS[state.currentLevelIdx];
+    let correct = 0;
+    Object.keys(level.composition).forEach(s => correct += level.composition[s] * ELEMENTS[s].mass);
+
+    const diff = Math.abs(val - correct);
+
+    if(diff < 0.1) {
+        // Correct answer
+        state.wrongAttempts = 0;
+        errDiv.style.display = 'none';
+        document.getElementById('check-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'block';
+        
+        inp.classList.add('hidden');
+        successSpan.classList.remove('hidden');
+        
+        let bonusText = "";
+        
+        if (diff < 0.005) {
+            // PERFECT match (+250 XP)
+            addXP(250);
+            successSpan.textContent = formatNum(correct);
+            successSpan.className = "result-perfect";
+            bonusText = "PERFEKT! +250 XP";
+        } else {
+            // Standard match (+150 XP)
+            addXP(150);
+            successSpan.textContent = formatNum(correct);
+            successSpan.className = "result-success";
+            bonusText = "Korrekt! +150 XP";
+        }
+        
+        // Flyvende bonus badge
+        const badge = document.createElement('div');
+        badge.className = 'bonus-badge';
+        badge.textContent = bonusText;
+        calcArea.appendChild(badge);
+        setTimeout(() => badge.remove(), 2000);
+
+    } else {
+        state.wrongAttempts++;
+        if (state.wrongAttempts >= 2) {
+            const hint = diagnoseMassError(val, level.composition, correct);
+            errDiv.innerHTML = `Ikke helt korrekt. <br>Du skrev ${formatNum(val)}.<div class="hint-box">💡 ${hint}</div>`;
+        } else {
+            errDiv.innerHTML = `Ikke helt korrekt. <br>Du skrev ${formatNum(val)}. Prøv igen.`;
+        }
+        errDiv.style.display = 'block';
+    }
+}
+
+function addXP(n) {
+    state.xp += n;
+    const p = Math.min(100, (state.xp/state.maxXp)*100);
+    document.getElementById('xp-bar').style.width = `${p}%`;
+    let t = "Lærling";
+    if(state.xp >= 300) t = "Laborant";
+    if(state.xp >= 800) t = "Mester";
+    if(state.xp >= 1400) t = "Professor";
+    document.getElementById('level-badge').textContent = `Niveau: ${t}`;
+}
+
+function nextLevel() {
+    state.currentLevelIdx++;
+    if(state.currentLevelIdx >= LEVELS.length) {
+        alert("Fantastisk! Du har gennemført alle øvelser.");
+        state.currentLevelIdx=0; state.xp=0;
+    }
+    loadLevel(state.currentLevelIdx);
+}
+
+function loadLevel(idx) {
+    state.atomsInFlask = [];
+    state.isFormed = false;
+    state.wrongAttempts = 0;
+
+    const cb = document.getElementById('check-btn');
+    cb.disabled = true; cb.style.display = 'block';
+    document.getElementById('next-btn').style.display = 'none';
+    document.getElementById('error-msg').style.display = 'none';
+    
+    const inp = document.getElementById('mass-input');
+    inp.value = ''; 
+    inp.disabled = true;
+    inp.classList.remove('hidden');
+    
+    const successSpan = document.getElementById('success-display');
+    successSpan.classList.add('hidden');
+    successSpan.textContent = '';
+    
+    const instr = document.getElementById('instruction-box');
+    instr.innerHTML = "👇 <strong>Klik på kasserne herover</strong> for at samle atomerne til molekylet.";
+    instr.style.backgroundColor = "#fff3cd";
+    instr.style.color = "#856404";
+    instr.style.borderColor = "#ffeeba";
+    
+    document.getElementById('equation-build').textContent = "( ... ) g/mol";
+    document.getElementById('current-formula').textContent = 'Tom';
+    document.getElementById('current-formula').style.color = '#444';
+    
+    const lvl = LEVELS[idx];
+    document.getElementById('target-molecule').textContent = `${lvl.name} (${lvl.target})`;
+    
+    resizeCanvas();
+    updateUI();
+}
+
+// --- GÆTTEKONKURRENCE (omvendt opgavetype) ---
+
+function setMode(mode) {
+    const labPage = document.getElementById('lab-page');
+    const quizPage = document.getElementById('quiz-page');
+    const tabLab = document.getElementById('tab-lab');
+    const tabQuiz = document.getElementById('tab-quiz');
+
+    if (mode === 'lab') {
+        labPage.style.display = 'grid';
+        quizPage.style.display = 'none';
+        tabLab.classList.add('active');
+        tabQuiz.classList.remove('active');
+        resizeCanvas();
+    } else {
+        labPage.style.display = 'none';
+        quizPage.style.display = 'flex';
+        tabLab.classList.remove('active');
+        tabQuiz.classList.add('active');
+        if (!quizState.current) newQuizQuestion();
+    }
+}
+
+function updateQuizScoreUI() {
+    document.getElementById('quiz-streak').textContent = quizState.streak;
+    document.getElementById('quiz-best').textContent = quizState.best;
+}
+
+function registerQuizResult(isCorrect) {
+    if (isCorrect) {
+        quizState.streak++;
+        if (quizState.streak > quizState.best) {
+            quizState.best = quizState.streak;
+            localStorage.setItem('molarmasse_quiz_best', String(quizState.best));
+        }
+    } else {
+        quizState.streak = 0;
+    }
+    updateQuizScoreUI();
+}
+
+function newQuizQuestion() {
+    quizState.wrongAttempts = 0;
+    document.getElementById('quiz-next-btn').style.display = 'none';
+    document.getElementById('quiz-feedback').innerHTML = '';
+    setupQuantityQuestion();
+}
+
+// TRIN 2 (fælles for begge beregningstyper): match den netop beregnede molarmasse til det rigtige molekyle
+function setupMatchStage(mol, M) {
+    quizState.wrongAttempts = 0;
+    document.getElementById('quiz-feedback').innerHTML = '';
+    document.getElementById('quiz-stage-label').textContent = 'Trin 2 af 2 · Match molekylet';
+
+    const distractors = [];
+    const usedFormulas = new Set([mol.formula]);
+    let guard = 0;
+    while (distractors.length < 3 && guard < 300) {
+        guard++;
+        const candidate = QUIZ_POOL[Math.floor(Math.random() * QUIZ_POOL.length)];
+        if (usedFormulas.has(candidate.formula)) continue;
+        const cM = molarMassOf(candidate.composition);
+        if (Math.abs(cM - M) < 0.5) continue;
+        if (distractors.some(d => Math.abs(molarMassOf(d.composition) - cM) < 0.5)) continue;
+        usedFormulas.add(candidate.formula);
+        distractors.push(candidate);
+    }
+
+    const options = [...distractors, mol];
+    for (let i = options.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [options[i], options[j]] = [options[j], options[i]];
+    }
+
+    quizState.current = { type: 'match', correctMol: mol, correctM: M };
+
+    document.getElementById('quiz-question').innerHTML =
+        `Du beregnede lige <strong>M = ${formatNum(M)} g/mol</strong>.<br>Hvilket molekyle har denne molarmasse?`;
+
+    document.getElementById('quiz-numeric').style.display = 'none';
+    const inp = document.getElementById('quiz-input');
+    inp.disabled = false;
+    document.getElementById('quiz-check-btn').disabled = false;
+
+    const optCon = document.getElementById('quiz-options');
+    optCon.style.display = 'grid';
+    optCon.innerHTML = '';
+
+    options.forEach(optMol => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option-btn';
+        btn.innerHTML = `<strong>${optMol.formula}</strong><br><span style="font-size:0.8rem; color:#7f8c8d;">${optMol.name}</span>`;
+        btn.onclick = () => checkMatchAnswer(optMol, btn);
+        optCon.appendChild(btn);
+    });
+}
+
+function checkMatchAnswer(selectedMol, btnEl) {
+    const q = quizState.current;
+    const fb = document.getElementById('quiz-feedback');
+
+    if (selectedMol === q.correctMol) {
+        btnEl.classList.add('correct');
+        document.querySelectorAll('#quiz-options .quiz-option-btn').forEach(b => b.disabled = true);
+        registerQuizResult(true);
+        fb.innerHTML = `<span style="color:var(--success); font-weight:bold;">Korrekt! ✅</span><br>${q.correctMol.formula} (${q.correctMol.name}) har molarmassen ${formatNum(q.correctM)} g/mol.`;
+        document.getElementById('quiz-next-btn').style.display = 'block';
+    } else {
+        btnEl.classList.add('wrong');
+        btnEl.disabled = true;
+        quizState.wrongAttempts++;
+        registerQuizResult(false);
+
+        const selM = molarMassOf(selectedMol.composition);
+        let hint = 'Ikke helt korrekt. Prøv et af de andre forslag.';
+        if (quizState.wrongAttempts >= 2) {
+            hint = `${selectedMol.formula} har M = ${formatNum(selM)} g/mol – det er ${selM > q.correctM ? 'for højt' : 'for lavt'} i forhold til de ${formatNum(q.correctM)} g/mol, du beregnede.`;
+        }
+        fb.innerHTML = `<span style="color:var(--danger);">Forkert.</span><div class="hint-box">💡 ${hint}</div>`;
+    }
+}
+
+// TRIN 1: Mængdeberegning af formen M = m / n (stoffet holdes anonymt, ellers ville trin 2 være for let)
+function setupQuantityQuestion() {
+    const mol = QUIZ_POOL[Math.floor(Math.random() * QUIZ_POOL.length)];
+    const M = molarMassOf(mol.composition);
+    const niceN = [0.5, 1, 1.5, 2, 2.5, 3, 4, 5];
+    const n = niceN[Math.floor(Math.random() * niceN.length)];
+    const mass = Math.round(n * M * 100) / 100;
+    const correctM = mass / n;
+
+    quizState.current = { type: 'quantity', mol, n, mass, correctM };
+    document.getElementById('quiz-stage-label').textContent = 'Trin 1 af 2 · Beregn molarmassen (M = m/n)';
+
+    document.getElementById('quiz-question').innerHTML =
+        `Du har afvejet <strong>${formatNum(mass)} g</strong> af et ukendt stof.<br>
+         Prøven indeholder <strong>${formatNum(n)} mol</strong>.<br><br>
+         Beregn stoffets molarmasse <strong>M</strong> (i g/mol).`;
+
+    document.getElementById('quiz-options').style.display = 'none';
+    document.getElementById('quiz-options').innerHTML = '';
+    const numDiv = document.getElementById('quiz-numeric');
+    numDiv.style.display = 'flex';
+    document.getElementById('quiz-unit').textContent = 'g/mol';
+    const inp = document.getElementById('quiz-input');
+    inp.value = '';
+    inp.disabled = false;
+    document.getElementById('quiz-check-btn').disabled = false;
+    inp.focus();
+}
+
+// FEJLDIAGNOSE til M = m/n: tjekker for byttet tæller/nævner, gange i stedet for division, kommafejl
+function diagnoseQuantityError(val, q) {
+    const inverted = q.n / q.mass;
+    if (Math.abs(val - inverted) < Math.max(0.02, inverted * 0.02)) {
+        return "Det ligner, at du har byttet om på tæller og nævner. Husk: M = m / n (masse divideret med stofmængde), ikke omvendt.";
+    }
+
+    const multiplied = q.mass * q.n;
+    if (Math.abs(val - multiplied) < Math.max(0.5, multiplied * 0.02)) {
+        return "Det ser ud som om du har ganget i stedet for at dividere. Husk: M = m / n.";
+    }
+
+    if (Math.abs(val * 10 - q.correctM) < Math.max(0.1, q.correctM * 0.02)) {
+        return "Tjek om du har sat komma forkert – dit svar ser ud til at være ca. 10 gange for lille.";
+    }
+    if (Math.abs(val / 10 - q.correctM) < Math.max(0.1, q.correctM * 0.02)) {
+        return "Tjek om du har sat komma forkert – dit svar ser ud til at være ca. 10 gange for stort.";
+    }
+
+    return `Tjek din udregning: M = m / n = ${formatNum(q.mass)} g / ${formatNum(q.n)} mol.`;
+}
+
+function checkQuantityAnswer() {
+    const q = quizState.current;
+    const inp = document.getElementById('quiz-input');
+    const val = parseInput(inp.value);
+    const fb = document.getElementById('quiz-feedback');
+
+    if (isNaN(val)) {
+        fb.innerHTML = '<span style="color:var(--danger);">Indtast venligst et tal.</span>';
+        return;
+    }
+
+    const tol = Math.max(0.1, q.correctM * 0.02);
+    const diff = Math.abs(val - q.correctM);
+
+    if (diff <= tol) {
+        fb.innerHTML = `<span style="color:var(--success); font-weight:bold;">Korrekt! ✅</span><br>
+            <span style="font-family:'Courier New'; font-size:0.95rem;">M = m / n = ${formatNum(q.mass)} / ${formatNum(q.n)} = ${formatNum(q.correctM)} g/mol</span>`;
+        inp.disabled = true;
+        document.getElementById('quiz-check-btn').disabled = true;
+        setTimeout(() => setupMatchStage(q.mol, q.correctM), 1200);
+    } else {
+        quizState.wrongAttempts++;
+        registerQuizResult(false);
+
+        let hintHtml = '';
+        if (quizState.wrongAttempts >= 2) {
+            hintHtml = `<div class="hint-box">💡 ${diagnoseQuantityError(val, q)}</div>`;
+        }
+        fb.innerHTML = `<span style="color:var(--danger);">Ikke helt korrekt. Prøv igen.</span>${hintHtml}`;
+    }
+}
+
+function checkNumericAnswer() {
+    if (quizState.current) checkQuantityAnswer();
+}
+
+init();
+
+document.getElementById('tab-lab').addEventListener('click', () => setMode('lab'));
+document.getElementById('tab-quiz').addEventListener('click', () => setMode('quiz'));
+document.getElementById('quiz-check-btn').addEventListener('click', checkNumericAnswer);
+document.getElementById('quiz-next-btn').addEventListener('click', newQuizQuestion);
+document.getElementById('quiz-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') checkNumericAnswer(); });
+updateQuizScoreUI();
+</script>
+</body>
+</html>

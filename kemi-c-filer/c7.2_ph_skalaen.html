@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pH-skalaen: pH 4-10 Simulator</title>
+    <style>
+        /* CSS DESIGN SYSTEM */
+        :root {
+            --bg-dark: #111827;
+            --panel-bg: #1f2937;
+            --accent-cyan: #38bdf8;
+            --acid-red: #ef4444;    /* Tydelig rød syrefarve */
+            --base-blue: #3b82f6;   /* Tydelig blå basefarve */
+            --neutral-green: #10b981;
+            --text-main: #f9fafb;
+            --text-dim: #9ca3af;
+            --border-color: #374151;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        
+        body { background-color: var(--bg-dark); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
+
+        /* SIDEBAR NAVIGATION & DATA */
+        #sidebar { width: 380px; background-color: var(--panel-bg); border-right: 2px solid var(--border-color); display: flex; flex-direction: column; padding: 25px; z-index: 10; box-shadow: 10px 0 30px rgba(0,0,0,0.4); }
+
+        h1 { font-size: 24px; margin-bottom: 5px; color: var(--accent-cyan); }
+        .subtitle { font-size: 13px; color: var(--text-dim); margin-bottom: 25px; line-height: 1.4; }
+
+        .control-panel { background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--border-color); }
+        .slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .ph-label { font-weight: 600; font-size: 14px; text-transform: uppercase; color: var(--text-dim); }
+        .ph-val-display { font-size: 32px; font-weight: 800; color: var(--neutral-green); }
+
+        input[type=range] { width: 100%; height: 10px; border-radius: 5px; background: #374151; outline: none; -webkit-appearance: none; cursor: pointer; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%; background: var(--accent-cyan); border: 3px solid #fff; }
+
+        .data-grid { display: flex; flex-direction: column; gap: 12px; }
+        .data-card { background: rgba(17, 24, 39, 0.6); padding: 16px; border-radius: 10px; border-left: 4px solid var(--border-color); }
+        .data-card.acid { border-left-color: var(--acid-red); }
+        .data-card.base { border-left-color: var(--base-blue); }
+        .data-card.sum { border-left-color: #f59e0b; }
+
+        .card-label { font-size: 11px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; }
+        .card-value { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+
+        .preset-row { margin-top: auto; display: flex; gap: 10px; }
+        .btn-preset { flex: 1; background: var(--panel-bg); border: 1px solid var(--border-color); color: var(--text-main); padding: 12px 6px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.2s; }
+        .btn-preset:hover { border-color: var(--accent-cyan); background: rgba(56, 189, 248, 0.12); }
+
+        .btn-quiz { margin-top: 12px; background: var(--accent-cyan); color: #0c1120; border: none; padding: 15px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-quiz:hover { background: #7dd3fc; }
+
+        /* QUIZ MODAL */
+        #quiz-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100; align-items: center; justify-content: center; }
+        #quiz-overlay.open { display: flex; }
+        #quiz-card { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 14px; padding: 30px; width: 480px; max-width: 90vw; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        .quiz-progress { font-size: 12px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-bottom: 10px; }
+        .quiz-question { font-size: 18px; font-weight: 700; margin-bottom: 20px; line-height: 1.4; }
+        .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+        .quiz-opt { text-align: left; background: rgba(0,0,0,0.25); border: 1px solid var(--border-color); color: var(--text-main); padding: 12px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: 0.15s; }
+        .quiz-opt:hover:not(:disabled) { border-color: var(--accent-cyan); }
+        .quiz-opt:disabled { cursor: default; }
+        .quiz-opt.correct { background: rgba(16, 185, 129, 0.45); border-color: var(--neutral-green); border-width: 2px; color: #fff; font-weight: 700; }
+        .quiz-opt.wrong { background: rgba(239, 68, 68, 0.45); border-color: var(--acid-red); border-width: 2px; color: #fff; font-weight: 700; }
+        .quiz-feedback { margin-top: 16px; font-size: 13px; color: var(--text-dim); line-height: 1.5; min-height: 20px; }
+        .quiz-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 22px; }
+        .quiz-close { background: none; border: none; color: var(--text-dim); font-size: 13px; cursor: pointer; text-decoration: underline; }
+        .quiz-next { background: var(--accent-cyan); color: #0c1120; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; visibility: hidden; }
+        .quiz-score { font-size: 40px; font-weight: 800; color: var(--accent-cyan); text-align: center; margin: 10px 0 6px; }
+        .quiz-score-label { text-align: center; color: var(--text-dim); font-size: 13px; margin-bottom: 20px; }
+
+        /* MAIN VIEWPORT */
+        #viewport { flex-grow: 1; position: relative; overflow: hidden; background: radial-gradient(circle at center, #1f2937 0%, #111827 100%); }
+        canvas { display: block; width: 100%; height: 100%; }
+
+        /* OVERLAYS */
+        .overlay-box { position: absolute; background: rgba(31, 41, 55, 0.9); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; backdrop-filter: blur(8px); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        
+        #micro-panel { top: 25px; right: 25px; width: 300px; height: 320px; border-top: 3px solid var(--accent-cyan); }
+        #graph-panel { bottom: 25px; right: 25px; width: 450px; }
+
+        .panel-title { font-size: 12px; font-weight: 800; color: var(--accent-cyan); text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px; text-align: center; }
+
+        #graph-toggle { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; text-align: left; }
+        #graph-toggle:hover { color: #fff; }
+        #graph-arrow { font-size: 14px; }
+        #graph-canvas { display: none; }
+        #graph-panel.expanded #graph-canvas { display: block; }
+
+        .micro-legend { display: flex; justify-content: center; gap: 20px; font-size: 12px; margin-top: 15px; }
+        .legend-item { display: flex; align-items: center; gap: 6px; font-weight: bold;}
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+    </style>
+</head>
+<body>
+
+<div id="sidebar">
+    <h1>pH-skalaen</h1>
+    <p class="subtitle">Skala: pH 4 til 10. <br>Hvert trin ændrer mængden med en faktor 10.</p>
+
+    <div class="control-panel">
+        <div class="slider-header">
+            <span class="ph-label">Indstil pH:</span>
+            <span id="ph-display" class="ph-val-display">7,0</span>
+        </div>
+        <input type="range" id="ph-slider" min="4" max="10" step="0.1" value="7">
+        <div style="display: flex; justify-content: space-between; margin-top: 8px; color: var(--text-dim); font-size: 12px; font-weight: bold;">
+            <span>pH 4</span><span>pH 7</span><span>pH 10</span>
+        </div>
+    </div>
+
+    <div class="data-grid">
+        <div class="data-card acid">
+            <div class="card-label">[H&#x2083;O&#x207A;] Oxonium</div>
+            <div id="val-h3o" class="card-value" style="color: var(--acid-red);">1,0 &middot; 10&#x207B;&#x2077; M</div>
+        </div>
+        <div class="data-card base">
+            <div class="card-label">[OH&#x207B;] Hydroxid</div>
+            <div id="val-oh" class="card-value" style="color: var(--base-blue);">1,0 &middot; 10&#x207B;&#x2077; M</div>
+        </div>
+        <div class="data-card sum">
+            <div class="card-label">Samlet Ion-koncentration (Sum)</div>
+            <div id="val-sum" class="card-value" style="color: #fbd38d;">2,0 &middot; 10&#x207B;&#x2077; M</div>
+        </div>
+    </div>
+    
+    <div class="preset-row">
+        <button class="btn-preset" data-ph="4.5">Øl</button>
+        <button class="btn-preset" data-ph="7.4">Blod</button>
+        <button class="btn-preset" data-ph="9.5">Sæbevand</button>
+    </div>
+    <button class="btn-quiz" id="quiz-open-btn">Test dig selv (Quiz)</button>
+</div>
+
+<div id="quiz-overlay">
+    <div id="quiz-card">
+        <div id="quiz-body"></div>
+    </div>
+</div>
+
+<div id="viewport">
+    <canvas id="seesaw-canvas"></canvas>
+
+    <div class="overlay-box" id="micro-panel">
+        <div class="panel-title">Mikroplan (1 prik = 10&#x207B;&#x2077; M)</div>
+        <div style="background: #000; border-radius: 6px; overflow: hidden; height: 210px;">
+            <canvas id="micro-canvas"></canvas>
+        </div>
+        <div class="micro-legend">
+            <div class="legend-item"><div class="dot" style="background: var(--acid-red); box-shadow: 0 0 5px var(--acid-red);"></div>H&#x2083;O&#x207A;</div>
+            <div class="legend-item"><div class="dot" style="background: var(--base-blue); box-shadow: 0 0 5px var(--base-blue);"></div>OH&#x207B;</div>
+        </div>
+    </div>
+
+    <div class="overlay-box" id="graph-panel">
+        <div class="panel-title" id="graph-toggle">
+            <span>Logaritmisk Sum-Graf: [H&#x2083;O&#x207A;] + [OH&#x207B;]</span>
+            <span id="graph-arrow">&#x25B8;</span>
+        </div>
+        <canvas id="graph-canvas"></canvas>
+    </div>
+</div>
+
+<script>
+    // --- HJÆLPEFUNKTIONER ---
+    function tilSuperscript(n) {
+        var map = {'0':'\u2070','1':'\u00B9','2':'\u00B2','3':'\u00B3','4':'\u2074','5':'\u2075','6':'\u2076','7':'\u2077','8':'\u2078','9':'\u2079','-':'\u207B'};
+        var s = n.toString();
+        var r = "";
+        for(var i=0; i<s.length; i++) r += (map[s[i]] || s[i]);
+        return r;
+    }
+
+    function formaterVidenskabelig(val) {
+        if (val === 0) return "0 M";
+        var eksponent = Math.floor(Math.log10(val));
+        var koefficient = val / Math.pow(10, eksponent);
+        var kStr = koefficient.toFixed(1).replace(".", ",");
+        return kStr + " \u00B7 10" + tilSuperscript(eksponent) + " M";
+    }
+
+    // --- STATE OG SETUP ---
+    var App = {
+        ph: 7.0,
+        particles: [],
+        ctxS: document.getElementById('seesaw-canvas').getContext('2d'),
+        ctxM: document.getElementById('micro-canvas').getContext('2d'),
+        ctxG: document.getElementById('graph-canvas').getContext('2d'),
+        w: 0,
+        h: 0
+    };
+
+    var phSlider = document.getElementById('ph-slider');
+    var phDisplay = document.getElementById('ph-display');
+    var h3oDisp = document.getElementById('val-h3o');
+    var ohDisp = document.getElementById('val-oh');
+    var sumDisp = document.getElementById('val-sum');
+    var presetBtns = document.querySelectorAll('.btn-preset');
+
+    // --- LOGIK OG OPDATERING ---
+    function opdaterKoncentrationer() {
+        App.ph = parseFloat(phSlider.value);
+        var ph = App.ph;
+        
+        phDisplay.innerText = ph.toFixed(1).replace(".", ",");
+        
+        if(ph < 6.8) phDisplay.style.color = "var(--acid-red)";
+        else if(ph > 7.2) phDisplay.style.color = "var(--base-blue)";
+        else phDisplay.style.color = "var(--neutral-green)";
+
+        var cH3O = Math.pow(10, -ph);
+        var cOH = Math.pow(10, -(14 - ph));
+        var cSum = cH3O + cOH;
+
+        h3oDisp.innerText = formaterVidenskabelig(cH3O);
+        ohDisp.innerText = formaterVidenskabelig(cOH);
+        sumDisp.innerText = formaterVidenskabelig(cSum);
+
+        // Opdater partikler (1 partikel = 10^-7 M)
+        var nH3O = Math.round(cH3O / 1e-7);
+        var nOH = Math.round(cOH / 1e-7);
+
+        // Loft på præcis 1000 partikler for hver type
+        nH3O = Math.min(nH3O, 1000);
+        nOH = Math.min(nOH, 1000);
+
+        // Nulstil og generer kun de aktive ioner (Ingen H2O)
+        App.particles = [];
+        
+        // Generer Syre-partikler
+        for(var i=0; i<nH3O; i++) {
+            App.particles.push({
+                x: Math.random(),
+                y: Math.random(),
+                vx: (Math.random() - 0.5) * 0.005,
+                vy: (Math.random() - 0.5) * 0.005,
+                type: 'h3o'
+            });
+        }
+        
+        // Generer Base-partikler
+        for(var j=0; j<nOH; j++) {
+            App.particles.push({
+                x: Math.random(),
+                y: Math.random(),
+                vx: (Math.random() - 0.5) * 0.005,
+                vy: (Math.random() - 0.5) * 0.005,
+                type: 'oh'
+            });
+        }
+    }
+
+    // --- TEGNEFUNKTIONER ---
+
+    function tegnMikro() {
+        var ctx = App.ctxM;
+        var cw = ctx.canvas.width;
+        var ch = ctx.canvas.height;
+        ctx.clearRect(0, 0, cw, ch);
+
+        // Tegn kun ionerne, og gør dem meget små (1.5 px) så 1000 kan være der
+        for(var i=0; i<App.particles.length; i++) {
+            var p = App.particles[i];
+            
+            p.x += p.vx;
+            p.y += p.vy;
+
+            if(p.x < 0 || p.x > 1) p.vx *= -1;
+            if(p.y < 0 || p.y > 1) p.vy *= -1;
+
+            var x = p.x * cw;
+            var y = p.y * ch;
+
+            ctx.beginPath();
+            if(p.type === 'h3o') {
+                ctx.fillStyle = "#ef4444";
+                // Lidt glød
+                ctx.shadowBlur = 3;
+                ctx.shadowColor = "#ef4444";
+            } else {
+                ctx.fillStyle = "#3b82f6";
+                ctx.shadowBlur = 3;
+                ctx.shadowColor = "#3b82f6";
+            }
+            
+            ctx.arc(x, y, 1.5, 0, Math.PI*2);
+            ctx.fill();
+            ctx.shadowBlur = 0; 
+        }
+    }
+
+    function tegnVippe() {
+        var ctx = App.ctxS;
+        ctx.clearRect(0, 0, App.w, App.h);
+
+        var cx = App.w / 2 - 100;
+        var cy = App.h / 2 + 50;
+
+        var maxVinkel = 0.20; 
+        var vinkel = ((App.ph - 7) / 3) * maxVinkel;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+
+        // Fod
+        ctx.fillStyle = "#374151";
+        ctx.beginPath();
+        ctx.moveTo(-40, 100);
+        ctx.lineTo(40, 100);
+        ctx.lineTo(0, 0);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.rotate(vinkel);
+
+        // Planke
+        ctx.fillStyle = "#6b7280";
+        ctx.fillRect(-300, -8, 600, 16);
+
+        var bucketW = 110;
+        var bucketH = 170;
+
+        function tegnBeholder(x, phVærdi, erSyre, farve, label) {
+            ctx.save();
+            ctx.translate(x, -8);
+            
+            ctx.strokeStyle = "rgba(255,255,255,0.9)";
+            ctx.lineWidth = 3;
+            ctx.strokeRect(-bucketW/2, -bucketH, bucketW, bucketH);
+
+            var fyldProcent = 0;
+            
+            // Logik: Tøm glassene HELT (0%) når vi er på den forkerte side af skalaen
+            if (erSyre) {
+                if (phVærdi < 8) { // Ved pH 8 og over er oxonium glasset 100% tomt
+                    var aktuelConc = Math.pow(10, -phVærdi);
+                    var maxConc = Math.pow(10, -4);
+                    fyldProcent = aktuelConc / maxConc; 
+                }
+            } else {
+                if (phVærdi > 6) { // Ved pH 6 og under er hydroxid glasset 100% tomt
+                    var aktuelConc = Math.pow(10, -(14 - phVærdi));
+                    var maxConc = Math.pow(10, -4);
+                    fyldProcent = aktuelConc / maxConc;
+                }
+            }
+
+            // Hvis fyldProcent er > 0, sørg for en minimal streg. Ellers er det ægte 0 (tomt).
+            var vaeskeH = 0;
+            if (fyldProcent > 0) {
+                vaeskeH = Math.max(2, fyldProcent * (bucketH - 6));
+            }
+            
+            if (vaeskeH > 0) {
+                ctx.fillStyle = farve;
+                ctx.globalAlpha = 0.85;
+                ctx.fillRect(-bucketW/2 + 3, -3 - vaeskeH, bucketW - 6, vaeskeH);
+                ctx.globalAlpha = 1.0;
+            }
+
+            ctx.fillStyle = "#fff";
+            ctx.font = "bold 20px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(label, 0, 35);
+
+            ctx.restore();
+        }
+
+        tegnBeholder(-200, App.ph, true, "#ef4444", "H\u2083O\u207A");
+        tegnBeholder(200, App.ph, false, "#3b82f6", "OH\u207B");
+
+        ctx.restore();
+        
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 24px Arial";
+        ctx.textAlign = "center";
+        var status = "Neutral balance";
+        if(App.ph < 6.9) status = "Oxonium dominerer";
+        if(App.ph > 7.1) status = "Hydroxid dominerer";
+        ctx.fillText(status, cx, cy - 230);
+    }
+
+    function tegnGraf() {
+        var ctx = App.ctxG;
+        var cw = ctx.canvas.width;
+        var ch = ctx.canvas.height;
+        ctx.clearRect(0, 0, cw, ch);
+
+        var margin = 50;
+        var gW = cw - margin * 2;
+        var gH = ch - margin * 2;
+
+        ctx.strokeStyle = "var(--border-color)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(margin, margin);
+        ctx.lineTo(margin, margin + gH);
+        ctx.lineTo(margin + gW, margin + gH);
+        ctx.stroke();
+
+        ctx.fillStyle = "var(--text-dim)";
+        ctx.font = "11px Arial";
+        ctx.textAlign = "right";
+        
+        var yTicks = [-7, -6, -5, -4];
+        for(var i=0; i<yTicks.length; i++) {
+            var val = yTicks[i];
+            var py = margin + gH - ((val - (-7)) / ((-4) - (-7))) * gH;
+            ctx.fillText("10" + tilSuperscript(val), margin - 10, py + 4);
+            
+            ctx.strokeStyle = "rgba(255,255,255,0.05)";
+            ctx.beginPath();
+            ctx.moveTo(margin, py);
+            ctx.lineTo(margin + gW, py);
+            ctx.stroke();
+        }
+
+        ctx.textAlign = "center";
+        var xTicks = [4, 5, 6, 7, 8, 9, 10];
+        for(var j=0; j<xTicks.length; j++) {
+            var xVal = xTicks[j];
+            var px = margin + ((xVal - 4) / 6) * gW;
+            ctx.fillText(xVal.toString(), px, margin + gH + 20);
+            
+            if(xVal === 7) {
+                ctx.strokeStyle = "rgba(16, 185, 129, 0.4)";
+                ctx.beginPath();
+                ctx.moveTo(px, margin);
+                ctx.lineTo(px, margin + gH);
+                ctx.stroke();
+            }
+        }
+
+        ctx.strokeStyle = "#f59e0b";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        for(var phX = 4; phX <= 10; phX += 0.1) {
+            var sum = Math.pow(10, -phX) + Math.pow(10, -(14 - phX));
+            var logSum = Math.log10(sum);
+            
+            var plotX = margin + ((phX - 4) / 6) * gW;
+            var plotY = margin + gH - ((logSum - (-7)) / ((-4) - (-7))) * gH;
+            
+            plotY = Math.max(margin, Math.min(margin + gH, plotY));
+
+            if(phX === 4) ctx.moveTo(plotX, plotY);
+            else ctx.lineTo(plotX, plotY);
+        }
+        ctx.stroke();
+
+        var curSum = Math.pow(10, -App.ph) + Math.pow(10, -(14 - App.ph));
+        var curLog = Math.log10(curSum);
+        var curX = margin + ((App.ph - 4) / 6) * gW;
+        var curY = margin + gH - ((curLog - (-7)) / ((-4) - (-7))) * gH;
+        
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.arc(curX, curY, 6, 0, Math.PI*2);
+        ctx.fill();
+        ctx.strokeStyle = "#f59e0b";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
+
+    // --- SYSTEM LØKKE ---
+    function resize() {
+        App.w = window.innerWidth - 380;
+        App.h = window.innerHeight;
+        
+        App.ctxS.canvas.width = App.w;
+        App.ctxS.canvas.height = App.h;
+        
+        App.ctxM.canvas.width = 290;
+        App.ctxM.canvas.height = 210;
+        
+        App.ctxG.canvas.width = 450;
+        App.ctxG.canvas.height = 240;
+    }
+
+    function mainLoop() {
+        tegnVippe();
+        tegnMikro();
+        tegnGraf();
+        requestAnimationFrame(mainLoop);
+    }
+
+    // --- QUIZ ---
+    var quizSporgsmal = [
+        {
+            q: "Hvad er pH-værdien i en neutral vandig opløsning ved 25 °C?",
+            options: ["0", "7", "10", "14"],
+            correct: 1,
+            forklaring: "Ved 25 °C er [H₃O⁺] = [OH⁻] = 10⁻⁷ M netop ved pH 7 – derfor er opløsningen hverken sur eller basisk."
+        },
+        {
+            q: "En opløsning har pH 3. Hvilken ion findes der (langt) mest af?",
+            options: ["OH⁻ (Hydroxid)", "H₃O⁺ (Oxonium)", "Lige store mængder", "Ingen af dem"],
+            correct: 1,
+            forklaring: "Jo lavere pH, jo højere [H₃O⁺] – ved pH 3 er [H₃O⁺] = 10⁻³ M, langt over [OH⁻]."
+        },
+        {
+            q: "pH falder fra 6 til 5. Hvad sker der med [H₃O⁺]?",
+            options: ["Den bliver fordoblet i størrelse", "Den stiger med en faktor 10", "Den stiger med en faktor 100", "Den forbliver helt uændret"],
+            correct: 1,
+            forklaring: "pH er en logaritmisk skala, så ét trin ned svarer altid til en faktor 10 stigning i [H₃O⁺]."
+        },
+        {
+            q: "Hvad kaldes sammenhængen [H₃O⁺]·[OH⁻] = 10⁻¹⁴ M² ved 25 °C?",
+            options: ["pH-skalaen", "Syrestyrken", "Vands ionprodukt", "Molarmassen"],
+            correct: 2,
+            forklaring: "Denne konstante sammenhæng kaldes vands ionprodukt, og gælder for alle vandige opløsninger ved 25 °C."
+        },
+        {
+            q: "En opløsning har pH = 11. Hvordan vil du beskrive den?",
+            options: ["Stærkt sur", "Neutral", "Basisk", "Ionfri"],
+            correct: 2,
+            forklaring: "pH over 7 betyder [OH⁻] > [H₃O⁺], altså en basisk opløsning."
+        }
+    ];
+
+    var quizState = { index: 0, score: 0, answered: false };
+    var quizOverlay = document.getElementById('quiz-overlay');
+    var quizBody = document.getElementById('quiz-body');
+    var quizOpenBtn = document.getElementById('quiz-open-btn');
+
+    // Blander en quiz-opgaves svarmuligheder (og flytter "correct"-indekset med), så det
+    // rigtige svar ikke altid står på samme plads. quizSporgsmal selv ændres ikke.
+    function getShuffledQuiz(original) {
+        var indices = original.options.map(function(_, i) { return i; });
+        for (var i = indices.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = indices[i]; indices[i] = indices[j]; indices[j] = tmp;
+        }
+        return {
+            q: original.q,
+            options: indices.map(function(i) { return original.options[i]; }),
+            correct: indices.indexOf(original.correct),
+            forklaring: original.forklaring
+        };
+    }
+
+    function startQuiz() {
+        quizState = { index: 0, score: 0, answered: false };
+        quizOverlay.classList.add('open');
+        renderQuiz();
+    }
+
+    function closeQuiz() {
+        quizOverlay.classList.remove('open');
+    }
+
+    function renderQuiz() {
+        if (quizState.index >= quizSporgsmal.length) {
+            quizBody.innerHTML =
+                '<div class="quiz-score">' + quizState.score + ' / ' + quizSporgsmal.length + '</div>' +
+                '<div class="quiz-score-label">rigtige svar</div>' +
+                '<div class="quiz-footer">' +
+                    '<button class="quiz-close" id="quiz-close-btn">Luk</button>' +
+                    '<button class="quiz-next" style="visibility:visible" id="quiz-retry-btn">Prøv igen</button>' +
+                '</div>';
+            document.getElementById('quiz-close-btn').addEventListener('click', closeQuiz);
+            document.getElementById('quiz-retry-btn').addEventListener('click', startQuiz);
+            return;
+        }
+
+        var sp = getShuffledQuiz(quizSporgsmal[quizState.index]);
+        var optionsHtml = "";
+        for (var i = 0; i < sp.options.length; i++) {
+            optionsHtml += '<button class="quiz-opt" data-i="' + i + '">' + sp.options[i] + '</button>';
+        }
+
+        quizBody.innerHTML =
+            '<div class="quiz-progress">Spørgsmål ' + (quizState.index + 1) + ' af ' + quizSporgsmal.length + '</div>' +
+            '<div class="quiz-question">' + sp.q + '</div>' +
+            '<div class="quiz-options">' + optionsHtml + '</div>' +
+            '<div class="quiz-feedback" id="quiz-feedback"></div>' +
+            '<div class="quiz-footer">' +
+                '<button class="quiz-close" id="quiz-close-btn">Luk</button>' +
+                '<button class="quiz-next" id="quiz-next-btn">Næste →</button>' +
+            '</div>';
+
+        document.getElementById('quiz-close-btn').addEventListener('click', closeQuiz);
+
+        var optBtns = quizBody.querySelectorAll('.quiz-opt');
+        for (var j = 0; j < optBtns.length; j++) {
+            optBtns[j].addEventListener('click', function() {
+                if (quizState.answered) return;
+                quizState.answered = true;
+
+                var valgt = parseInt(this.getAttribute('data-i'), 10);
+                var rigtig = sp.correct;
+
+                for (var k = 0; k < optBtns.length; k++) {
+                    optBtns[k].disabled = true;
+                    if (k === rigtig) {
+                        optBtns[k].classList.add('correct');
+                        optBtns[k].innerHTML = "&#x2713; " + sp.options[k];
+                    }
+                }
+                if (valgt !== rigtig) {
+                    this.classList.add('wrong');
+                    this.innerHTML = "&#x2717; " + sp.options[valgt];
+                } else {
+                    quizState.score++;
+                }
+
+                document.getElementById('quiz-feedback').innerText = sp.forklaring;
+                document.getElementById('quiz-next-btn').style.visibility = 'visible';
+            });
+        }
+
+        document.getElementById('quiz-next-btn').addEventListener('click', function() {
+            quizState.index++;
+            quizState.answered = false;
+            renderQuiz();
+        });
+    }
+
+    quizOpenBtn.addEventListener('click', startQuiz);
+    quizOverlay.addEventListener('click', function(e) {
+        if (e.target === quizOverlay) closeQuiz();
+    });
+
+    // EVENTS
+    phSlider.addEventListener('input', opdaterKoncentrationer);
+    for (var pBtn = 0; pBtn < presetBtns.length; pBtn++) {
+        presetBtns[pBtn].addEventListener('click', function() {
+            phSlider.value = this.getAttribute('data-ph');
+            opdaterKoncentrationer();
+        });
+    }
+    window.addEventListener('resize', resize);
+
+    var graphPanel = document.getElementById('graph-panel');
+    var graphArrow = document.getElementById('graph-arrow');
+    document.getElementById('graph-toggle').addEventListener('click', function() {
+        graphPanel.classList.toggle('expanded');
+        graphArrow.innerHTML = graphPanel.classList.contains('expanded') ? "&#x25BE;" : "&#x25B8;";
+    });
+
+    // INIT
+    resize();
+    opdaterKoncentrationer();
+    mainLoop();
+</script>
+</body>
+</html>

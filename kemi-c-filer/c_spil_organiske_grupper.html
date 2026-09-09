@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kemi Master: Organiske Grupper</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --text-color: #ffffff;
+            --accent: #00d2d3;
+            --danger: #ff4757;
+        }
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            user-select: none;
+            touch-action: none;
+        }
+        #gameCanvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* UI Overlay */
+        #ui-layer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+            display: flex;
+            gap: 20px;
+            z-index: 5;
+        }
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 10px 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            text-shadow: 1px 1px 2px black;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .stat-box.flash {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        /* Screens */
+        .screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(18, 18, 18, 0.96);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            transition: opacity 0.3s;
+        }
+        .hidden { opacity: 0; pointer-events: none; }
+
+        h1 { font-size: 3rem; margin: 0 0 20px 0; background: linear-gradient(to right, #00d2d3, #5f27cd); -webkit-background-clip: text; color: transparent; text-align: center;}
+        h2 { font-size: 2rem; color: #ff9ff3; margin-top: 0; }
+        p { max-width: 600px; text-align: center; font-size: 1.2rem; line-height: 1.5; color: #c8d6e5; margin-bottom: 30px;}
+
+        button {
+            padding: 15px 50px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00d2d3, #54a0ff);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 210, 211, 0.3);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        button:hover { transform: scale(1.05); }
+        button:active { transform: scale(0.95); }
+
+        button.secondary-button {
+            padding: 10px 30px;
+            font-size: 1rem;
+            background: linear-gradient(45deg, #576574, #8395a7);
+            box-shadow: 0 6px 12px rgba(87, 101, 116, 0.3);
+            margin-top: 14px;
+        }
+
+        /* Level Up Toast */
+        #level-up-toast {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(0,0,0,0.9);
+            border: 2px solid #00d2d3;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            pointer-events: none;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 20;
+        }
+        #level-up-toast.show { transform: translate(-50%, -50%) scale(1); }
+
+        .new-unlock { color: #ffff00; font-weight: bold; font-size: 1.5em; display: block; margin-top: 10px; }
+
+        /* Speed indicator for Turbo levels */
+        #turbo-indicator {
+            position: absolute;
+            top: 80px; left: 20px;
+            color: var(--danger);
+            font-weight: bold;
+            font-size: 1.2rem;
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+        }
+        #turbo-indicator.show { opacity: 1; animation: pulse 1s infinite; }
+
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+        /* Placerer turboboost- og pause-knapperne lige under deres stat-boks */
+        .stat-box-wrapper {
+            position: relative;
+        }
+
+        .side-action-button {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 10px;
+            z-index: 6;
+            pointer-events: auto;
+            width: 100%;
+            padding: 8px 4px;
+            border-radius: 8px;
+            color: #121212;
+            font-weight: bold;
+            font-size: 0.85rem;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            white-space: nowrap;
+        }
+        /* Uden disse ville den generiske button:hover/:active (der sætter transform: scale(...))
+           overskrive translateX(-50%) og få knappen til at "springe" sidelæns ved klik/hover. */
+        .side-action-button:hover { transform: translateX(-50%) scale(1.05); }
+        .side-action-button:active { transform: translateX(-50%) scale(0.92); }
+        .side-action-button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        #turbo-button {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.45);
+        }
+        #pause-button {
+            background: linear-gradient(45deg, #54a0ff, #00d2d3);
+            box-shadow: 0 4px 10px rgba(84, 160, 255, 0.45);
+        }
+
+        /* Annullér-inhibitor-knap - kun synlig mens inhibitoren er aktiv */
+        #cancel-inhibitor-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 6;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: white;
+            cursor: pointer;
+            background: linear-gradient(45deg, #0abde3, #006ba6);
+            box-shadow: 0 4px 10px rgba(10, 189, 227, 0.45);
+            opacity: 0;
+            transform: scale(0.9);
+            pointer-events: none;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        #cancel-inhibitor-button.show {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+        #cancel-inhibitor-button:hover { transform: scale(1.05); }
+        #cancel-inhibitor-button:active { transform: scale(0.95); }
+
+        /* Pause-overlay - kan kun vises én gang pr. spil */
+        #pause-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(18, 18, 18, 0.92);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 18;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+        #pause-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Individuelle nedtællings-timere for hvert turbo-tryk */
+        #turbo-timers {
+            position: absolute;
+            top: 95px;
+            left: 20px;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            pointer-events: none;
+        }
+        .turbo-timer-chip {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: #121212;
+            font-weight: bold;
+            font-size: 0.9rem;
+            padding: 5px 14px;
+            border-radius: 20px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            width: fit-content;
+        }
+
+        /* Powerup Toast */
+        #powerup-toast {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-15px) scale(0.9);
+            background: rgba(0,0,0,0.85);
+            padding: 12px 30px;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+            text-align: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            z-index: 15;
+        }
+        #powerup-toast.show { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+        #powerup-toast-title { font-weight: bold; font-size: 1.3rem; }
+        #powerup-toast-subtitle { font-size: 0.95rem; color: #c8d6e5; }
+
+        /* Liv-mistet overlay */
+        #life-lost-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0);
+            pointer-events: none;
+            z-index: 12;
+            opacity: 0;
+            transition: opacity 0.15s, background-color 0.15s;
+        }
+        #life-lost-overlay.show {
+            opacity: 1;
+            background: rgba(0,0,0,0.3);
+        }
+        #life-lost-heart {
+            font-size: 8rem;
+            filter: drop-shadow(0 0 20px rgba(255,0,0,0.6));
+        }
+        #life-lost-overlay.show #life-lost-heart {
+            animation: heartPop 1s ease-in forwards;
+        }
+        #life-lost-text {
+            margin-top: 10px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            text-shadow: 1px 1px 4px black;
+            text-align: center;
+            max-width: 80%;
+        }
+        @keyframes heartPop {
+            0% { transform: scale(1.3); opacity: 1; }
+            25% { transform: scale(1.0); opacity: 1; }
+            100% { transform: scale(0.4); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui-layer">
+        <div class="stat-box">SCORE: <span id="score">0</span></div>
+        <div class="stat-box-wrapper">
+            <div class="stat-box">LIV: <span id="lives">❤️❤️❤️</span></div>
+            <button id="turbo-button" class="side-action-button" onclick="game.activateTurbo()">🚀 TURBOBOOST</button>
+        </div>
+        <div class="stat-box-wrapper">
+            <div class="stat-box" id="level-box">LEVEL: <span id="level">1</span></div>
+            <button id="pause-button" class="side-action-button" onclick="game.pauseGame()">⏸ PAUSE</button>
+        </div>
+    </div>
+    <div id="turbo-indicator">⚠️ HASTIGHED ØGET ⚠️</div>
+
+    <div id="turbo-timers"></div>
+    <button id="cancel-inhibitor-button" onclick="game.cancelInhibitor()">❄✖ Fjern inhibitor</button>
+
+    <div id="pause-overlay">
+        <h1 style="font-size: 2.5rem; margin: 0 0 20px;">⏸ PAUSE</h1>
+        <p style="margin-bottom: 20px;">Du starter med 1 pause pr. spil - saml "+1 x pause"-powerups for at få flere.</p>
+        <button onclick="game.resumeGame()">FORTSÆT</button>
+    </div>
+
+    <div id="powerup-toast">
+        <div id="powerup-toast-title">ENZYM AKTIVERET</div>
+        <div id="powerup-toast-subtitle">Skærmen er ryddet!</div>
+    </div>
+
+    <div id="life-lost-overlay">
+        <div id="life-lost-heart">💔</div>
+        <div id="life-lost-text"></div>
+    </div>
+
+    <div id="level-up-toast">
+        <h1 id="level-up-title" style="font-size: 2rem; margin:0;">NY KEMI LÅST OP!</h1>
+        <span id="unlock-text" class="new-unlock">STOFGRUPPE</span>
+    </div>
+
+    <div id="start-screen" class="screen">
+        <h1>Organiske Grupper</h1>
+        <p>Sorter molekylerne i de rigtige kategorier: alkaner, alkener, alkyner, cycloalkaner, arener, alkoholer og organiske syrer.</p>
+        <p>Kig på bindingerne: <strong>én linje</strong> = enkeltbinding, <strong>to parallelle linjer</strong> = dobbeltbinding (alken),
+           <strong>tre parallelle linjer</strong> = tripelbinding (alkyn). En lukket ring <em>uden</em> cirkel er et cycloalkan,
+           en ring <em>med</em> cirkel i midten er et aren (aromatisk).</p>
+        <p>Træk molekylerne hen over den rigtige spand, før de når bunden.<br>
+           Rammer et molekyle toppen af den <strong>forkerte</strong> spand, mister du et liv —
+           rammer det den <strong>rigtige</strong> spand, får du point (helt automatisk, hvis det allerede falder rigtigt!).</p>
+        <p>⚡ <strong>Gylden katalysator</strong> og ❄ <strong>blå inhibitor</strong> falder nu og da.
+           Tryk på dem (træk ikke i en spand!) — katalysatoren giver halvt point for alle molekyler på skærmen og rydder den,
+           inhibitoren sænker farten i 7 sekunder.</p>
+        <button onclick="game.start()">START SPIL</button>
+    </div>
+
+    <div id="game-over-screen" class="screen hidden">
+        <h1>SPILLET ER SLUT</h1>
+        <h2>Din Score: <span id="final-score">0</span></h2>
+        <button onclick="game.start()">PRØV IGEN</button>
+        <button class="secondary-button" onclick="game.showStartScreen()">TILBAGE TIL MENU</button>
+    </div>
+
+    <div id="win-screen" class="screen hidden">
+        <h1>TILLYKKE! 🎉</h1>
+        <h2>I har gennemført spillet!</h2>
+        <p>Score: <span id="win-score">0</span> point. Du er hermed officielt kåret til <b style="color:var(--accent);">Stofgruppemester</b>.</p>
+        <p>I må gerne fortsætte og jagte en endnu højere score.</p>
+        <button onclick="game.continueAfterWin()">SPIL VIDERE</button>
+        <button class="secondary-button" onclick="game.showStartScreen()">TILBAGE TIL MENU</button>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+<script>
+const CONFIG = {
+    baseSpeed: 70,
+    spawnRate: 2200,
+    colors: {
+        alkan: '#2ecc71',
+        alken: '#f1c40f',
+        alkyn: '#e74c3c',
+        cycloalkan: '#1abc9c',
+        aren: '#9b59b6',
+        alkohol: '#3498db',
+        syre: '#e67e22',
+        oxygen: '#ff7675'
+    }
+};
+
+// Tilføjer én binding til den aktuelt åbne canvas-sti (kaldes mellem ctx.beginPath() og ctx.stroke()).
+// order 1 = enkeltbinding, 2 = dobbeltbinding (to parallelle linjer), 3 = tripelbinding (tre parallelle linjer).
+function addBondSegment(ctx, p1, p2, order) {
+    const dx = p2[0] - p1[0], dy = p2[1] - p1[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const nx = -dy / len, ny = dx / len;
+    if (order <= 1) {
+        ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]);
+        return;
+    }
+    const gap = order === 2 ? 4 : 5;
+    if (order === 3) { ctx.moveTo(p1[0], p1[1]); ctx.lineTo(p2[0], p2[1]); }
+    ctx.moveTo(p1[0] + nx * gap, p1[1] + ny * gap); ctx.lineTo(p2[0] + nx * gap, p2[1] + ny * gap);
+    ctx.moveTo(p1[0] - nx * gap, p1[1] - ny * gap); ctx.lineTo(p2[0] - nx * gap, p2[1] - ny * gap);
+}
+
+// Manuel turboboost-knap: spilleren kan selv trykke sig til ekstra fart, op til 5 samtidige tryk
+const TURBO_CONFIG = {
+    duration: 15000,     // hvert tryk varer 15 sekunder
+    boostPerPress: 0.35, // +35% fart pr. aktivt tryk - lægges sammen (2 tryk = +70%, 3 tryk = +105%, ...)
+    maxStacks: 5
+};
+
+// Besked knyttet til det n'te samtidige tryk (index 0 = 1. tryk, osv.)
+const TURBO_MESSAGES = [
+    'Turboboost i 15 sekunder!',
+    'Ekstraboost!',
+    'Crazy!',
+    'Spænd sikkerhedsselen!',
+    'Du er ikke rask!'
+];
+
+// Sjældne "hjælpe-molekyler". Tappes (trækkes ikke i spand) for at aktiveres.
+const POWERUP_CONFIG = {
+    minInterval: 25000,   // min. tid mellem powerups (ms)
+    maxInterval: 45000,   // maks. tid mellem powerups
+    firstDelay: 20000,    // ventetid før den allerførste kan spawne
+    slowMoDuration: 7000, // hvor længe inhibitoren sænker farten
+    slowMoFactor: 0.3,    // 0.3 = 30% af normal fart (70% opbremsning)
+    fallSpeed: 55         // fast, moderat faldhastighed uanset level
+};
+
+const MOLECULE_DEFS = [
+    // ALKANER (kun enkeltbindinger)
+    { type: 'alkan', name: 'Propan', path: [[-30, 20], [0, -20], [30, 20]] },
+    { type: 'alkan', name: 'Butan', path: [[-45, 15], [-15, -15], [15, 15], [45, -15]] },
+    { type: 'alkan', name: 'Pentan', path: [[-40, -10], [-20, 20], [0, -10], [20, 20], [40, -10]] },
+
+    // ALKENER (én dobbeltbinding = to parallelle linjer; ~120° ved den dobbeltbundne sp2-kulstof)
+    { type: 'alken', name: 'Propen', path: [[-43, 0], [0, -25], [43, 0]], bonds: [2, 1] },
+    { type: 'alken', name: 'But-1-en', path: [[-45, 0], [-10, -20], [25, 0], [50, -20]], bonds: [2, 1, 1] },
+
+    // ALKYNER (én tripelbinding = tre parallelle linjer)
+    { type: 'alkyn', name: 'Propyn', path: [[-40, 10], [-5, 10], [30, -15]], bonds: [3, 1] },
+    { type: 'alkyn', name: 'But-1-yn', path: [[-50, 10], [-15, 10], [15, -15], [45, 10]], bonds: [3, 1, 1] },
+
+    // CYCLOALKANER (lukkede ringe, kun enkeltbindinger, ingen indre cirkel)
+    { type: 'cycloalkan', name: 'Cyclopropan', path: [[0, -30], [26, 15], [-26, 15]], ring: true },
+    { type: 'cycloalkan', name: 'Cyclobutan', path: [[-22, -22], [22, -22], [22, 22], [-22, 22]], ring: true },
+    { type: 'cycloalkan', name: 'Cyclohexan', path: [[30, 0], [15, -26], [-15, -26], [-30, 0], [-15, 26], [15, 26]], ring: true },
+
+    // ARENER (benzenring med indre cirkel = det aromatiske system)
+    { type: 'aren', name: 'Benzen', shape: 'benzen' },
+    { type: 'aren', name: 'Toluen', shape: 'benzen', groups: [{ t: 'CH₃', x: 0, y: -52 }] },
+
+    // ALKOHOLER (-OH)
+    { type: 'alkohol', name: 'Ethanol', path: [[-20, 10], [10, -10]], groups: [{ t: 'OH', x: 35, y: 15 }] },
+    { type: 'alkohol', name: 'Butan-2-ol', path: [[-30, 20], [0, -20], [30, 20]], groups: [{ t: 'OH', x: 0, y: -42 }] },
+
+    // ORGANISKE SYRER (-COOH). Carboxylkulstoffet er sp2 (trigonal plan), så R-, =O- og -OH-bindingerne
+    // er lagt ud med ca. 120° mellem sig omkring den carboxylkulstof (sidste punkt i path).
+    { type: 'syre', name: 'Ethansyre', path: [[-21, 8], [10, -10]], groups: [{ t: 'O', isCarbonyl: true, x: 10, y: -35 }, { t: 'OH', x: 40, y: 8 }] },
+    { type: 'syre', name: 'Propansyre', path: [[-36, -12], [-6, 8], [25, -10]], groups: [{ t: 'O', isCarbonyl: true, x: 25, y: -35 }, { t: 'OH', x: 55, y: 8 }] }
+];
+
+// 'seamless: true' betyder at spillet IKKE stopper, men bare øger level-tal og hastighed
+// Point pr. korrekt sortering er FAST 100 hele spillet igennem (skalerer ikke med level).
+// 'threshold' er derfor bare (antal rigtige krævet for at nå hertil) * 100 - se de påkrævede
+// antal rigtige pr. level i kommentaren ved hvert niveau, så progressionen er let at følge.
+const LEVELS = [
+    { threshold: 0, speedMod: 1.32, points: 100, types: ['alkan', 'alken'], seamless: false },                              // level 1: 10 rigtige for at klare
+    { threshold: 1000, speedMod: 1.32, points: 100, types: ['alkan', 'alken', 'alkyn'], unlock: 'ALKYNER', seamless: false },              // level 2: 15 rigtige (samme fart som level 1)
+    { threshold: 2500, speedMod: 1.44, points: 100, types: ['alken', 'alkyn', 'cycloalkan'], unlock: 'CYCLOALKANER', seamless: false },    // level 3: 20 rigtige
+    { threshold: 4500, speedMod: 1.3, points: 100, types: ['alkyn', 'cycloalkan', 'aren'], unlock: 'ARENER', seamless: false },            // level 4: 25 rigtige
+    { threshold: 7000, speedMod: 1.4, points: 100, types: ['cycloalkan', 'aren', 'alkohol', 'syre'], unlock: 'ALKOHOLER & SYRER', seamless: false }, // level 5: 30 rigtige
+
+    // TURBO Levels (Seamless) - roterer mellem maks. 5 typer ad gangen, så spandene ikke bliver for smalle.
+    // Fortsætter samme +5-mønster: 35, 40, 45, 50, 55 rigtige pr. niveau.
+    { threshold: 10000, speedMod: 1.55, points: 100, types: ['alken', 'alkyn', 'cycloalkan', 'aren', 'syre'], seamless: true },
+    { threshold: 13500, speedMod: 1.70, points: 100, types: ['alkan', 'alkyn', 'cycloalkan', 'alkohol', 'syre'], seamless: true },
+    { threshold: 17500, speedMod: 1.85, points: 100, types: ['alken', 'cycloalkan', 'aren', 'alkohol', 'syre'], seamless: true },
+    { threshold: 22000, speedMod: 2.00, points: 100, types: ['alkan', 'alken', 'alkyn', 'aren', 'syre'], seamless: true },
+    { threshold: 27000, speedMod: 2.15, points: 100, types: ['cycloalkan', 'aren', 'alkohol', 'syre', 'alken'], seamless: true },
+];
+
+// Ved denne score vises en tillykke-fejring, men spillet fortsætter uendeligt derefter.
+// 40 rigtige oveni de 100, der kræves for at klare level 1-5 (10+15+20+25+30=100) -> (100+40)*100
+const CONGRATS_SCORE = 14000;
+// Hvor mange point der skal til pr. 10%-stigning i spawn-hyppighed efter CONGRATS_SCORE (10 rigtige)
+const ENDLESS_FREQ_STEP = 1000;
+
+class Game {
+    constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.molecules = [];
+        this.buckets = [];
+        this.particles = [];
+        this.input = { x: 0, y: 0, active: false };
+        this.loop = this.loop.bind(this);
+
+        this.turboStacks = [];
+        this.pauseCharges = 1;
+
+        this.resize();
+        this.setupInput();
+        this.updatePauseButtonUI();
+        this.updateInhibitorButtonUI();
+        window.addEventListener('resize', () => this.resize());
+
+        this.lastTime = performance.now();
+        requestAnimationFrame(this.loop);
+    }
+
+    showStartScreen() {
+        document.getElementById('game-over-screen').classList.add('hidden');
+        document.getElementById('win-screen').classList.add('hidden');
+        document.getElementById('start-screen').classList.remove('hidden');
+    }
+
+    resize() {
+        // "this.W / this.H" er spillets låste, zoom-uafhængige spillelogik-koordinater.
+        // devicePixelRatio ændrer sig proportionalt med browser-zoom, så ved at sammenligne
+        // med den dPR vi startede med, kan vi regne zoom ud af ligningen og holde banen
+        // konstant uanset zoomniveau - uden at kræve at spilleren selv finder "rette" zoom.
+        const dpr = window.devicePixelRatio || 1;
+        if (!this.baselineDPR) this.baselineDPR = dpr;
+        const zoomRatio = dpr / this.baselineDPR;
+
+        const MIN_W = 340, MAX_W = 1400;
+        const MIN_H = 520, MAX_H = 900;
+        const effectiveW = window.innerWidth * zoomRatio;
+        const effectiveH = window.innerHeight * zoomRatio;
+        this.W = Math.min(MAX_W, Math.max(MIN_W, effectiveW));
+        this.H = Math.min(MAX_H, Math.max(MIN_H, effectiveH));
+
+        // Canvas-bufferen sættes til den fysiske pixel-tæthed for skarp tekst/grafik,
+        // mens al spillogik ovenfor forbliver låst til this.W / this.H.
+        this.canvas.width = Math.round(window.innerWidth * dpr);
+        this.canvas.height = Math.round(window.innerHeight * dpr);
+
+        if (this.buckets && this.buckets.length > 0) this.updateBuckets();
+    }
+
+    setupInput() {
+        const handler = (e) => {
+            if(e.type === 'touchmove') e.preventDefault();
+            // Ved touchend er e.touches tom (fingeren er løftet) - brug changedTouches der
+            const t = (e.changedTouches && e.changedTouches[0]) || (e.touches && e.touches[0]) || e;
+            // Konverter fra CSS/viewport-koordinater til spillets låste koordinatsystem
+            const rect = this.canvas.getBoundingClientRect();
+            const scaleX = this.W / rect.width;
+            const scaleY = this.H / rect.height;
+            this.input.x = (t.clientX - rect.left) * scaleX;
+            this.input.y = (t.clientY - rect.top) * scaleY;
+
+            if (e.type === 'mousedown' || e.type === 'touchstart') {
+                this.input.active = true;
+                this.checkDragStart();
+            } else if (e.type === 'mouseup' || e.type === 'touchend') {
+                this.input.active = false;
+                this.checkDragEnd();
+            }
+        };
+        ['mousedown', 'mousemove', 'mouseup', 'touchstart', 'touchmove', 'touchend'].forEach(evt =>
+            this.canvas.addEventListener(evt, handler, {passive: false})
+        );
+    }
+
+    start() {
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('game-over-screen').classList.add('hidden');
+        document.getElementById('win-screen').classList.add('hidden');
+
+        this.score = 0;
+        this.lives = 3;
+        this.levelIndex = 0;
+        this.molecules = [];
+        this.particles = [];
+        this.state = 'PLAYING';
+        this.draggedMol = null;
+        this.levelStartTime = performance.now();
+        this.updateUI();
+        this.setBucketsForLevel();
+        this.spawnTimer = CONFIG.spawnRate + 500;
+        this.lastTime = performance.now();
+
+        this.powerupTimer = 0;
+        this.nextPowerupTime = POWERUP_CONFIG.firstDelay;
+        this.slowMoActive = false;
+        this.slowMoEndTime = 0;
+        this.updateInhibitorButtonUI();
+
+        this.congratsShown = false;
+
+        this.turboStacks = [];
+        this.updateTurboUI();
+
+        this.pauseCharges = 1;
+        this.updatePauseButtonUI();
+        document.getElementById('pause-overlay').classList.remove('show');
+
+        this.pendingGameOver = false;
+        this.lifeLossEndTime = 0;
+        document.getElementById('life-lost-overlay').classList.remove('show');
+    }
+
+    setBucketsForLevel() {
+        const lvlCfg = LEVELS[this.levelIndex];
+        this.buckets = lvlCfg.types.map(type => ({
+            type: type,
+            label: type.toUpperCase(),
+            color: CONFIG.colors[type],
+            pulse: 0
+        }));
+        this.updateBuckets();
+    }
+
+    updateBuckets() {
+        if (!this.buckets.length) return;
+        const width = this.W / this.buckets.length;
+        this.buckets.forEach((b, i) => {
+            b.x = i * width;
+            b.width = width;
+            b.y = this.H - 120;
+            b.height = 120;
+        });
+    }
+
+    // Returnerer true hvis molecules-arrayet blev nulstillet (fejring eller nyt kemisk niveau) -
+    // kaldere der selv står midt i en iteration over this.molecules SKAL stoppe i så fald.
+    checkLevelUp() {
+        let boardCleared = false;
+
+        // Milepæl ved CONGRATS_SCORE: fejring, men spillet fortsætter (uendelig highscore-tilstand)
+        if (!this.congratsShown && this.score >= CONGRATS_SCORE) {
+            this.congratsShown = true;
+            this.showCongrats();
+            boardCleared = true;
+        }
+
+        // while (ikke if): et scoring-hop kan sagtens springe flere niveauers threshold over på
+        // én gang (fx enzym-katalysatoren, der rydder mange molekyler på skærmen samtidig) -
+        // uden while ville levelIndex/spandene hænge bagefter den faktiske score, og et molekyle
+        // af en type fra det "overspringte" niveau kunne nå at falde uden nogen spand kunne tage imod det.
+        let nextLevel = LEVELS[this.levelIndex + 1];
+        while (nextLevel && this.score >= nextLevel.threshold) {
+            this.levelIndex++;
+            this.levelStartTime = performance.now();
+            // Spandene SKAL opdateres ved hvert niveauskift, også seamless turbo-runder - de
+            // roterer jo også hvilke stofgrupper der er aktive. Ellers blev de gamle spande stående,
+            // selvom nye stofgrupper (uden spand) allerede begyndte at dumpe ned (den rapporterede fejl).
+            this.setBucketsForLevel();
+
+            // Hvis seamless (Turbo runde): Opdater kun UI og logik, ingen pause
+            if (nextLevel.seamless) {
+                const lvlBox = document.getElementById('level-box');
+                lvlBox.classList.add('flash');
+                setTimeout(() => lvlBox.classList.remove('flash'), 500);
+
+                // Vis kort "Speed Up" advarsel
+                const turbo = document.getElementById('turbo-indicator');
+                turbo.classList.add('show');
+                setTimeout(() => turbo.classList.remove('show'), 2000);
+            }
+            // Hvis det er et Nyt Kemisk Niveau: Pause og vis Toast
+            else {
+                const toast = document.getElementById('level-up-toast');
+                document.getElementById('level-up-title').innerText = 'NY KEMI LÅST OP!';
+                document.getElementById('unlock-text').innerText = nextLevel.unlock;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3500);
+                this.molecules.forEach(m => this.createExplosion(m.x, m.y, '#fff'));
+                this.molecules = [];
+                boardCleared = true;
+            }
+            nextLevel = LEVELS[this.levelIndex + 1];
+        }
+        return boardCleared;
+    }
+
+    // Fejring ved CONGRATS_SCORE - rydder skærmen, fyrer fyrværkeri af og pauser derefter
+    // spillet med en sejrsskærm, der viser bevis-koden. "Spil videre" genoptager uendelig-tilstanden.
+    showCongrats() {
+        this.molecules.forEach(m => this.createExplosion(m.x, m.y, '#fff'));
+        this.molecules = [];
+
+        // Fyrværkeri effekt
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => {
+                this.createExplosion(
+                    Math.random() * this.W,
+                    Math.random() * this.H,
+                    `hsl(${Math.random()*360}, 100%, 50%)`
+                );
+            }, i * 100);
+        }
+
+        setTimeout(() => this.showWinScreen(), 1200);
+    }
+
+    showWinScreen() {
+        // Vagt: hvis spilleren mistede sit sidste liv i de 1200ms mellem fyrværkeri og denne
+        // skærm, er state allerede LIFE_LOST/GAMEOVER - så skal sejrsskærmen ikke smide sig ovenpå.
+        if (this.state !== 'PLAYING') return;
+        this.state = 'WON';
+        this.winScreenStartTime = performance.now();
+        document.getElementById('win-score').innerText = Math.floor(this.score);
+        document.getElementById('win-screen').classList.remove('hidden');
+    }
+
+    continueAfterWin() {
+        if (this.state !== 'WON') return;
+        // Skub aktive timede effekter frem med pausens varighed, ligesom resumeGame().
+        const pausedDuration = performance.now() - this.winScreenStartTime;
+        this.slowMoEndTime += pausedDuration;
+        this.turboStacks.forEach(t => t.endTime += pausedDuration);
+
+        document.getElementById('win-screen').classList.add('hidden');
+        this.lastTime = performance.now();
+        this.state = 'PLAYING';
+    }
+
+    spawnMolecule() {
+        const currentLevelDef = LEVELS[this.levelIndex];
+        const activeTypes = currentLevelDef.types;
+        const possibleMolecules = MOLECULE_DEFS.filter(m => activeTypes.includes(m.type));
+        if (possibleMolecules.length === 0) return;
+
+        const template = possibleMolecules[Math.floor(Math.random() * possibleMolecules.length)];
+
+        const timeSinceLevelStart = (performance.now() - this.levelStartTime) / 1000;
+
+        // Mindre ramp-up på seamless levels for at holde presset - UNDTAGEN det første turbo-niveau
+        // (level 6), som i stedet skal ramme jævnt op i løbet af hele niveauet, så farten ikke
+        // pludselig føles høj lige når man forlader level 5.
+        const isFirstTurboLevel = this.levelIndex === 5;
+        const rampDuration = isFirstTurboLevel ? 25 : (currentLevelDef.seamless ? 2 : 10);
+        const rampUpFactor = Math.min(1, timeSinceLevelStart / rampDuration);
+
+        const speedMultiplier = currentLevelDef.speedMod;
+        const targetSpeed = CONFIG.baseSpeed * speedMultiplier;
+
+        const currentSpeed = targetSpeed * (0.6 + (0.4 * rampUpFactor));
+
+        // Vis kun hjælpelinjer på de "svære" levels, ikke turbo
+        const showHint = !currentLevelDef.seamless && timeSinceLevelStart < 6 && this.levelIndex > 0;
+
+        this.molecules.push({
+            ...template,
+            x: Math.random() * (this.W - 100) + 50,
+            y: -70,
+            vx: (Math.random() - 0.5) * 20,
+            vy: currentSpeed * (Math.random() * 0.4 + 0.8),
+            angle: (Math.random() - 0.5) * 0.5,
+            rotation: 0,
+            isDragging: false,
+            showHint: showHint
+        });
+    }
+
+    spawnPowerup() {
+        // Inhibitoren giver kun mening når der rent faktisk er noget at bremse for
+        const activeMolecules = this.molecules.filter(m => !m.isPowerup).length;
+        let kind;
+        if (activeMolecules >= 2 && Math.random() < 0.8) {
+            kind = 'inhibitor';
+        } else if (Math.random() < 0.2) {
+            kind = 'pause'; // sjælden - giver +1 x pause
+        } else {
+            kind = 'enzyme';
+        }
+        this.molecules.push({
+            isPowerup: true,
+            powerupType: kind,
+            x: Math.random() * (this.W - 100) + 50,
+            y: -70,
+            vx: 0,
+            vy: POWERUP_CONFIG.fallSpeed,
+            angle: (Math.random() - 0.5) * 0.3,
+            rotation: 0,
+            pulse: Math.random() * Math.PI * 2
+        });
+    }
+
+    activatePowerup(m) {
+        if (m.powerupType === 'enzyme') {
+            // Katalysatoren giver kun halvt point pr. molekyle ift. normal sortering
+            const perMoleculePoints = Math.round(this.getBasePoints() * 0.5);
+            let cleared = 0;
+            this.molecules.forEach(mol => {
+                if (!mol.isPowerup) {
+                    this.createExplosion(mol.x, mol.y, '#ffd700');
+                    cleared++;
+                }
+            });
+            this.score += perMoleculePoints * cleared;
+            this.molecules = this.molecules.filter(mol => mol.isPowerup);
+            this.showPowerupToast('⚡ ENZYM AKTIVERET', `Alle molekyler gav halvt point! (+${perMoleculePoints * cleared})`, '#ffd700');
+            this.checkLevelUp();
+            this.updateUI();
+        } else if (m.powerupType === 'pause') {
+            this.pauseCharges++;
+            this.updatePauseButtonUI();
+            this.createExplosion(m.x, m.y, '#54a0ff');
+            this.showPowerupToast('⏸ +1 x PAUSE!', `Du har nu ${this.pauseCharges} pause(r) til rådighed.`, '#54a0ff');
+        } else {
+            this.slowMoActive = true;
+            this.slowMoEndTime = performance.now() + POWERUP_CONFIG.slowMoDuration;
+            this.updateInhibitorButtonUI();
+            this.createExplosion(m.x, m.y, '#00d2d3');
+            const seconds = POWERUP_CONFIG.slowMoDuration / 1000;
+            this.showPowerupToast('❄ INHIBITOR AKTIVERET', `Farten er sænket i ${seconds} sekunder!`, '#00d2d3');
+        }
+    }
+
+    // --- Annullér-inhibitor-knap (kun synlig mens inhibitoren er aktiv) ---
+
+    updateInhibitorButtonUI() {
+        document.getElementById('cancel-inhibitor-button').classList.toggle('show', !!this.slowMoActive);
+    }
+
+    cancelInhibitor() {
+        if (!this.slowMoActive) return;
+        this.slowMoActive = false;
+        this.updateInhibitorButtonUI();
+        this.showPowerupToast('✅ INHIBITOR ANNULLERET', 'Farten er tilbage til normal.', '#00d2d3');
+    }
+
+    showPowerupToast(title, subtitle, color) {
+        const toast = document.getElementById('powerup-toast');
+        document.getElementById('powerup-toast-title').innerText = title;
+        document.getElementById('powerup-toast-subtitle').innerText = subtitle;
+        toast.style.borderLeftColor = color;
+        toast.classList.add('show');
+        clearTimeout(this._powerupToastTimer);
+        this._powerupToastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    // --- Manuel turboboost-knap ---
+
+    activateTurbo() {
+        if (this.state !== 'PLAYING') return;
+        if (this.turboStacks.length >= TURBO_CONFIG.maxStacks) return;
+
+        this.turboStacks.push({ endTime: performance.now() + TURBO_CONFIG.duration });
+        this.updateTurboUI();
+
+        const message = TURBO_MESSAGES[this.turboStacks.length - 1];
+        this.showPowerupToast(message, `${this.turboStacks.length}/${TURBO_CONFIG.maxStacks} boosts aktive`, '#ff6b6b');
+    }
+
+    getTurboSpeedMultiplier() {
+        return 1 + this.turboStacks.length * TURBO_CONFIG.boostPerPress;
+    }
+
+    // Fjerner udløbne tryk og opdaterer knap + venstre-hjørne-timere
+    updateTurboUI() {
+        const now = performance.now();
+        this.turboStacks = this.turboStacks.filter(t => t.endTime > now);
+
+        const timersEl = document.getElementById('turbo-timers');
+        timersEl.innerHTML = this.turboStacks
+            .map(t => `<div class="turbo-timer-chip">🚀 ${Math.max(0, Math.ceil((t.endTime - now) / 1000))}s</div>`)
+            .join('');
+
+        const btn = document.getElementById('turbo-button');
+        btn.disabled = this.turboStacks.length >= TURBO_CONFIG.maxStacks;
+    }
+
+    // --- Pauseknap (starter med 1 x pause pr. spil - flere kan optjenes via "+1 x pause"-powerup) ---
+
+    updatePauseButtonUI() {
+        const btn = document.getElementById('pause-button');
+        btn.innerText = `⏸ ${this.pauseCharges} x PAUSE`;
+        btn.disabled = this.pauseCharges <= 0;
+    }
+
+    pauseGame() {
+        if (this.pauseCharges <= 0 || this.state !== 'PLAYING') return;
+        this.pauseCharges--;
+        this.updatePauseButtonUI();
+        this.pauseStartTime = performance.now();
+        this.state = 'PAUSED';
+        document.getElementById('pause-overlay').classList.add('show');
+    }
+
+    resumeGame() {
+        if (this.state !== 'PAUSED') return;
+        // Skub aktive timede effekter (inhibitor, turboboost) frem med pausens varighed,
+        // så de ikke stille og roligt udløber mens spillet står stille.
+        const pausedDuration = performance.now() - this.pauseStartTime;
+        this.slowMoEndTime += pausedDuration;
+        this.turboStacks.forEach(t => t.endTime += pausedDuration);
+
+        this.lastTime = performance.now();
+        this.state = 'PLAYING';
+        document.getElementById('pause-overlay').classList.remove('show');
+    }
+
+    checkDragStart() {
+        if (this.state !== 'PLAYING') return;
+
+        // Powerups tegnes altid forrest (se loop()) - så de skal også altid vinde hit-testen,
+        // selv hvis de visuelt overlapper et almindeligt molekyle.
+        for (let i = this.molecules.length - 1; i >= 0; i--) {
+            const m = this.molecules[i];
+            if (!m.isPowerup) continue;
+            const dist = Math.hypot(this.input.x - m.x, this.input.y - m.y);
+            if (dist < 60) {
+                this.molecules.splice(i, 1);
+                this.activatePowerup(m);
+                return;
+            }
+        }
+
+        for (let i = this.molecules.length - 1; i >= 0; i--) {
+            const m = this.molecules[i];
+            if (m.isPowerup) continue;
+            const dist = Math.hypot(this.input.x - m.x, this.input.y - m.y);
+            if (dist < 60) {
+                this.draggedMol = m;
+                m.isDragging = true;
+                return;
+            }
+        }
+    }
+
+    checkDragEnd() {
+        if (!this.draggedMol) return;
+        // Slipper man molekylet uden at det har ramt en spandtop endnu, falder det
+        // bare videre fra slippestedet - selve afgørelsen sker i kollisionstjekket i loop().
+        this.draggedMol.isDragging = false;
+        this.draggedMol = null;
+    }
+
+    handleFail(m, info) {
+        if (this.state !== 'PLAYING') return; // undgå dobbelt-udløsning mens der allerede er pause
+        info = info || { reason: 'missed' };
+
+        this.lives--;
+        this.pendingGameOver = this.lives <= 0;
+
+        // Gør molekylet synligt og markér det til rødt blink i pausen
+        if (m.y > this.H - 80) m.y = this.H - 80;
+        m.isFailBlink = true;
+        m.failBlinkStart = performance.now();
+
+        const typeLabel = (m.type || '').toUpperCase();
+        const text = info.reason === 'wrong'
+            ? `${m.name} er en ${typeLabel} — ikke ${(info.attempted || '').toUpperCase()}!`
+            : `Du nåede ikke: ${m.name} er en ${typeLabel}!`;
+
+        const overlay = document.getElementById('life-lost-overlay');
+        document.getElementById('life-lost-text').innerText = text;
+        overlay.classList.remove('show');
+        void overlay.offsetWidth; // force reflow, så animationen kan genstartes
+        overlay.classList.add('show');
+
+        this.createExplosion(m.x, m.y, '#ff0000');
+
+        // Spillet sættes på pause i 3 sekunder, mens molekylet blinker og hjertet forsvinder
+        this.state = 'LIFE_LOST';
+        this.lifeLossEndTime = performance.now() + 3000;
+
+        this.updateUI();
+    }
+
+    createExplosion(x, y, color) {
+        for(let i=0; i<15; i++) {
+            this.particles.push({
+                x, y, color,
+                vx: (Math.random() - 0.5) * 15,
+                vy: (Math.random() - 0.5) * 15,
+                life: 1.0
+            });
+        }
+    }
+
+    getBasePoints() {
+        return LEVELS[this.levelIndex].points;
+    }
+
+    updateUI() {
+        document.getElementById('score').innerText = Math.floor(this.score);
+        document.getElementById('lives').innerText = '❤️'.repeat(Math.max(0, this.lives));
+        document.getElementById('level').innerText = this.levelIndex + 1;
+    }
+
+    drawMolecule(ctx, m) {
+        ctx.save();
+        ctx.translate(m.x, m.y);
+        ctx.rotate(m.rotation);
+
+        let blinkOn = false;
+        if (m.isFailBlink) {
+            const elapsed = performance.now() - m.failBlinkStart;
+            blinkOn = Math.floor(elapsed / 150) % 2 === 0;
+            if (blinkOn) {
+                ctx.save();
+                ctx.beginPath(); ctx.arc(0, 0, 48, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 71, 87, 0.35)';
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        if (m.isDragging) {
+            ctx.shadowColor = 'white'; ctx.shadowBlur = 15; ctx.scale(1.1, 1.1);
+        }
+
+        ctx.strokeStyle = blinkOn ? '#ff4757' : 'white';
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.fillStyle = blinkOn ? '#ff4757' : 'white';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+
+        // 1. Tegn Skelet
+        ctx.beginPath();
+        if (m.shape === 'benzen') {
+            for (let i = 0; i < 6; i++) {
+                const a = (i * 60 - 30) * Math.PI / 180; const r = 30;
+                const px = Math.cos(a) * r; const py = Math.sin(a) * r;
+                i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+            }
+            ctx.closePath(); ctx.stroke();
+            ctx.beginPath(); ctx.arc(0, 0, 15, 0, Math.PI*2); ctx.stroke();
+        } else if (m.path) {
+            const bonds = m.bonds || [];
+            for (let i = 1; i < m.path.length; i++) {
+                addBondSegment(ctx, m.path[i - 1], m.path[i], bonds[i - 1] || 1);
+            }
+            if (m.ring) {
+                addBondSegment(ctx, m.path[m.path.length - 1], m.path[0], bonds[m.path.length - 1] || 1);
+            }
+            ctx.stroke();
+        }
+
+        // 2. Tegn Grupper
+        if (m.groups) {
+            m.groups.forEach(g => {
+                ctx.save();
+                let color = 'white';
+                if(g.t.includes('O')) color = CONFIG.colors.oxygen;
+                ctx.fillStyle = color;
+
+                let nearestP = [0,0];
+                if (m.path) {
+                    let minD = 10000;
+                    m.path.forEach(p => {
+                        const d = Math.hypot(p[0] - g.x, p[1] - g.y);
+                        if(d < minD) { minD = d; nearestP = p; }
+                    });
+                } else if (m.shape === 'benzen') {
+                    let minD = 10000;
+                    for (let i = 0; i < 6; i++) {
+                        const a = (i * 60 - 30) * Math.PI / 180;
+                        const px = Math.cos(a) * 30; const py = Math.sin(a) * 30;
+                        const d = Math.hypot(px - g.x, py - g.y);
+                        if(d < minD) { minD = d; nearestP = [px, py]; }
+                    }
+                }
+
+                if (g.isCarbonyl && m.path) {
+                    ctx.strokeStyle = color; ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(nearestP[0]-2, nearestP[1]); ctx.lineTo(g.x-2, g.y+5);
+                    ctx.moveTo(nearestP[0]+2, nearestP[1]); ctx.lineTo(g.x+2, g.y+5);
+                    ctx.stroke();
+                } else if (!g.mid) {
+                    const dx = g.x - nearestP[0];
+                    const dy = g.y - nearestP[1];
+                    const dist = Math.hypot(dx, dy);
+                    const stopDist = Math.max(0, dist - 12);
+                    const angle = Math.atan2(dy, dx);
+
+                    const endX = nearestP[0] + Math.cos(angle) * stopDist;
+                    const endY = nearestP[1] + Math.sin(angle) * stopDist;
+
+                    ctx.strokeStyle = color; ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(nearestP[0], nearestP[1]);
+                    ctx.lineTo(endX, endY);
+                    ctx.stroke();
+                }
+
+                if (g.mid) {
+                    ctx.save(); ctx.fillStyle = '#121212';
+                    ctx.beginPath(); ctx.arc(g.x, g.y, 8, 0, Math.PI*2); ctx.fill(); ctx.restore();
+                }
+
+                ctx.fillText(g.t, g.x, g.y);
+                ctx.restore();
+            });
+        }
+        ctx.restore();
+
+        // Ghost Hint (Kun på ikke-turbo levels)
+        if (m.showHint && !m.isDragging) {
+            const targetBucket = this.buckets.find(b => b.type === m.type);
+            if (targetBucket) {
+                ctx.save();
+                ctx.globalAlpha = 0.3;
+                ctx.strokeStyle = targetBucket.color;
+                ctx.setLineDash([5, 10]);
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(m.x, m.y);
+                ctx.lineTo(targetBucket.x + targetBucket.width/2, this.H - 100);
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+    }
+
+    drawPowerup(ctx, m) {
+        ctx.save();
+        ctx.translate(m.x, m.y);
+        m.pulse += 0.08;
+        const pulseScale = 1 + Math.sin(m.pulse) * 0.08;
+        ctx.rotate(m.rotation);
+        ctx.scale(pulseScale, pulseScale);
+
+        const isEnzyme = m.powerupType === 'enzyme';
+        const isPause = m.powerupType === 'pause';
+        const color = isEnzyme ? '#ffd700' : isPause ? '#54a0ff' : '#00d2d3';
+
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 25;
+        ctx.fillStyle = color;
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 3;
+
+        ctx.beginPath();
+        if (isEnzyme) {
+            // Pac-man-agtig cirkel med et "hak" = enzymets aktive site
+            const mouthAngle = 0.35 * Math.PI;
+            ctx.moveTo(0, 0);
+            ctx.arc(0, 0, 32, mouthAngle, Math.PI * 2 - mouthAngle);
+            ctx.closePath();
+        } else if (isPause) {
+            // Rektangulær "boks" med "+1 x pause" skrevet på
+            ctx.rect(-35, -23, 70, 46);
+        } else {
+            // Sekskantet krystal = stabil, "blokerende" inhibitor
+            for (let i = 0; i < 6; i++) {
+                const a = (i * 60) * Math.PI / 180;
+                const px = Math.cos(a) * 30, py = Math.sin(a) * 30;
+                i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+            }
+            ctx.closePath();
+        }
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#121212';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        if (isPause) {
+            ctx.font = 'bold 13px Arial';
+            ctx.fillText('+1 x', 0, -8);
+            ctx.fillText('pause', 0, 8);
+        } else {
+            ctx.font = 'bold 22px Arial';
+            ctx.fillText(isEnzyme ? '⚡' : '❄', 0, 1);
+        }
+
+        ctx.restore();
+    }
+
+    loop(timestamp) {
+        if (!this.lastTime) this.lastTime = timestamp;
+        let dt = (timestamp - this.lastTime) / 1000;
+        this.lastTime = timestamp;
+        if (dt > 0.1) dt = 0.1;
+
+        // Afslut liv-mistet-pausen efter 1 sekund
+        if (this.state === 'LIFE_LOST' && performance.now() >= this.lifeLossEndTime) {
+            document.getElementById('life-lost-overlay').classList.remove('show');
+
+            this.molecules.forEach(mol => this.createExplosion(mol.x, mol.y, '#ffffff'));
+            this.molecules = [];
+
+            if (this.pendingGameOver) {
+                this.state = 'GAMEOVER';
+                const finalScore = Math.floor(this.score);
+                document.getElementById('final-score').innerText = finalScore;
+                document.getElementById('game-over-screen').classList.remove('hidden');
+            } else {
+                this.state = 'PLAYING';
+            }
+        }
+
+        if (this.state === 'PLAYING' || this.state === 'LIFE_LOST') {
+            // Skalér canvas' skarpe pixel-buffer til spillets låste koordinatsystem (this.W/this.H),
+            // så alt tegnes skarpt uanset zoom/pixel-tæthed, men spillogikken forbliver uændret.
+            this.ctx.setTransform(this.canvas.width / this.W, 0, 0, this.canvas.height / this.H, 0, 0);
+
+            this.ctx.fillStyle = '#121212';
+            this.ctx.fillRect(0, 0, this.W, this.H);
+
+            // Inhibitor-powerup: sænker farten på alt i en periode
+            if (this.slowMoActive && performance.now() >= this.slowMoEndTime) {
+                this.slowMoActive = false;
+                this.updateInhibitorButtonUI();
+            }
+            if (this.state === 'PLAYING') this.updateTurboUI();
+            const inhibitorFactor = (this.state === 'PLAYING' && this.slowMoActive) ? POWERUP_CONFIG.slowMoFactor : 1;
+            const turboFactor = this.state === 'PLAYING' ? this.getTurboSpeedMultiplier() : 1;
+            const speedFactor = inhibitorFactor * turboFactor;
+
+            if (this.state === 'PLAYING') {
+                const timeSinceLevelStart = (performance.now() - this.levelStartTime) / 1000;
+
+                // Kortere ramp-up på seamless levels - undtagen det første turbo-niveau (level 6),
+                // som rammer jævnt op ligesom faldhastigheden gør (se spawnMolecule()).
+                const isSeamless = LEVELS[this.levelIndex].seamless;
+                const isFirstTurboLevel = this.levelIndex === 5;
+                const rampDuration = isFirstTurboLevel ? 15 : (isSeamless ? 1 : 5);
+                const spawnRamp = Math.min(1, timeSinceLevelStart / rampDuration);
+
+                this.spawnTimer += dt * 1000 * speedFactor;
+
+                let currentRate = Math.max(600, CONFIG.spawnRate - (this.levelIndex * 220));
+                let adjustedRate = currentRate + (1000 * (1 - spawnRamp));
+
+                // Uendelig highscore-tilstand: hyppigheden stiger 10% for hver ENDLESS_FREQ_STEP point over CONGRATS_SCORE
+                if (this.score > CONGRATS_SCORE) {
+                    const freqSteps = Math.floor((this.score - CONGRATS_SCORE) / ENDLESS_FREQ_STEP);
+                    const freqMultiplier = 1 + freqSteps * 0.1;
+                    adjustedRate /= freqMultiplier;
+                }
+
+                if (this.spawnTimer > adjustedRate) {
+                    this.spawnMolecule();
+                    this.spawnTimer = 0;
+                }
+
+                // Sjælden powerup-spawn (kun én ad gangen på skærmen) - ingen powerups på niveau 1
+                if (this.levelIndex > 0) {
+                    this.powerupTimer += dt * 1000;
+                    const hasPowerupOnScreen = this.molecules.some(m => m.isPowerup);
+                    if (!hasPowerupOnScreen && this.powerupTimer > this.nextPowerupTime) {
+                        this.spawnPowerup();
+                        this.powerupTimer = 0;
+                        this.nextPowerupTime = POWERUP_CONFIG.minInterval +
+                            Math.random() * (POWERUP_CONFIG.maxInterval - POWERUP_CONFIG.minInterval);
+                    }
+                }
+            }
+
+            this.buckets.forEach(b => {
+                this.ctx.fillStyle = b.color;
+                let h = b.height + b.pulse;
+                if(b.pulse > 0) b.pulse *= 0.9;
+
+                this.ctx.globalAlpha = 0.8;
+                this.ctx.fillRect(b.x + 2, this.H - h, b.width - 4, h);
+                this.ctx.globalAlpha = 1;
+
+                this.ctx.fillStyle = '#fff';
+                this.ctx.font = 'bold 18px Arial';
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText(b.label, b.x + b.width/2, this.H - h + 30);
+            });
+
+            for (let i = this.molecules.length - 1; i >= 0; i--) {
+                const m = this.molecules[i];
+                if (this.state === 'PLAYING') {
+                    if (m.isDragging) {
+                        m.x += (this.input.x - m.x) * 0.3;
+                        m.y += (this.input.y - m.y) * 0.3;
+                    } else {
+                        m.y += m.vy * dt * speedFactor;
+                        m.rotation += m.angle * dt;
+                    }
+                }
+                if (this.state === 'PLAYING') {
+                    if (m.isPowerup) {
+                        if (m.y > this.H + 50) this.molecules.splice(i, 1);
+                    } else {
+                        // Kollision med spandtoppen: så snart molekylet (trukket eller frit faldende)
+                        // rammer toppen af den spand det befinder sig over, afgøres det med det samme.
+                        const bucket = this.buckets.find(b => m.x > b.x && m.x < b.x + b.width);
+                        if (bucket && m.y >= this.H - bucket.height) {
+                            if (m.isDragging) { m.isDragging = false; this.draggedMol = null; }
+                            if (bucket.type === m.type) {
+                                this.score += this.getBasePoints();
+                                this.createExplosion(m.x, m.y, '#00ff00');
+                                bucket.pulse = 20;
+                                this.molecules.splice(i, 1);
+                                this.updateUI();
+                                // checkLevelUp() kan nulstille this.molecules (nyt niveau/sejr) -
+                                // står vi stadig midt i denne for-løkke, skal vi stoppe med det samme.
+                                if (this.checkLevelUp()) break;
+                            } else if (!this.buckets.some(b => b.type === m.type)) {
+                                // Sikkerhedsnet: denne stofgruppe har slet ikke en spand på det
+                                // aktuelle niveau (fx pga. et niveauskift midt i luften) -
+                                // skal ikke koste et liv, molekylet forsvinder bare.
+                                this.createExplosion(m.x, m.y, '#ffffff');
+                                this.molecules.splice(i, 1);
+                            } else {
+                                this.handleFail(m, { reason: 'wrong', attempted: bucket.type });
+                                this.updateUI();
+                            }
+                        } else if (!bucket && m.y > this.H + 50) {
+                            // Sikkerhedsnet: molekylet er drevet uden for spandenes x-område
+                            this.handleFail(m, { reason: 'missed' });
+                            this.updateUI();
+                        }
+                    }
+                }
+            }
+
+            // Powerups tegnes altid ovenpå almindelige molekyler (i en separat sidste tegne-pas),
+            // så de aldrig er skjult bag et molekyle og altid er nemme at ramme.
+            this.molecules.forEach(m => { if (!m.isPowerup) this.drawMolecule(this.ctx, m); });
+            this.molecules.forEach(m => { if (m.isPowerup) this.drawPowerup(this.ctx, m); });
+
+            this.particles.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy; p.life -= 0.05;
+                this.ctx.globalAlpha = Math.max(0, p.life);
+                this.ctx.fillStyle = p.color;
+                this.ctx.beginPath(); this.ctx.arc(p.x, p.y, 4, 0, Math.PI*2); this.ctx.fill();
+                if(p.life <= 0) this.particles.splice(i, 1);
+            });
+            this.ctx.globalAlpha = 1;
+        }
+        requestAnimationFrame(this.loop);
+    }
+}
+
+const game = new Game();
+</script>
+</body>
+</html>

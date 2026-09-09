@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xperiment 55: Nitrit i vand</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --panel-bg: #ffffff;
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --border: #dcdde1;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-x: hidden;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.4rem;
+        }
+
+        .sub-header {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .lab-panel {
+            flex: 2.3;
+            position: relative;
+            background: linear-gradient(to bottom, #ecf0f1 60%, #bdc3c7 60%);
+            border-right: 2px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 600px;
+        }
+
+        #labCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 260px;
+        }
+
+        .controls button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .step-indicator {
+            font-size: 0.8rem;
+            color: #555;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .controls button:hover {
+            background-color: #2980b9;
+        }
+
+        .controls button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .analysis-panel {
+            flex: 1.7;
+            background-color: var(--panel-bg);
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            min-width: 450px;
+        }
+
+        .section-title {
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 5px;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        input[type="text"] {
+            width: 60px;
+            padding: 4px;
+            text-align: center;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+
+        .input-correct {
+            background-color: #e8f8f5;
+            border-color: var(--success) !important;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .input-wrong {
+            background-color: #fdedec;
+            border-color: var(--danger) !important;
+        }
+
+        #graphContainer {
+            width: 100%;
+            height: 250px;
+            background: #fdfdfd;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        #graphCanvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .feedback-box {
+            padding: 10px;
+            border-radius: 4px;
+            background: #eef2f5;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .micro-panel-wrapper {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 250px;
+        }
+
+        .micro-fold-btn {
+            display: block;
+            width: 100%;
+            padding: 6px 10px;
+            margin-bottom: 8px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+            pointer-events: auto;
+        }
+
+        .micro-panel-wrapper.folded .micro-view-overlay,
+        .micro-panel-wrapper.folded .micro-legend {
+            display: none;
+        }
+
+        .micro-view-overlay {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 3px solid var(--accent);
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            pointer-events: none;
+        }
+
+        #microCanvas {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .micro-label {
+            position: absolute;
+            bottom: 15px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+            pointer-events: none;
+        }
+
+        /* Tooltip */
+        #tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            pointer-events: none;
+            display: none;
+            z-index: 100;
+        }
+
+        /* Hjælp-modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+
+        .modal-overlay.visible {
+            display: flex;
+        }
+
+        .modal-box {
+            background: var(--panel-bg);
+            padding: 25px 30px;
+            border-radius: 8px;
+            max-width: 480px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .modal-box h3 {
+            margin-top: 0;
+        }
+
+        .modal-box ol {
+            padding-left: 20px;
+        }
+
+        .modal-box li {
+            margin-bottom: 8px;
+        }
+
+        .modal-close-btn {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .input-hint {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--danger);
+            margin-top: 3px;
+        }
+
+        /* Stamopløsning info */
+        .stock-info-box {
+            background: #eaf4fc;
+            border: 1px solid var(--accent);
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .stock-info-box strong {
+            display: block;
+            font-size: 0.95rem;
+            color: var(--primary);
+        }
+
+        /* Beregner: knap ved hvert inputfelt */
+        .calc-btn {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            line-height: 20px;
+            padding: 0;
+            margin-left: 4px;
+            border-radius: 50%;
+            border: 1px solid var(--accent);
+            background: white;
+            color: var(--accent);
+            font-size: 0.8rem;
+            cursor: pointer;
+            vertical-align: middle;
+        }
+
+        .calc-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .conc-cell {
+            white-space: nowrap;
+        }
+
+        /* Ægte brøkopskrivning */
+        .fraction-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-size: 1.05rem;
+            margin: 12px 0;
+        }
+
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            line-height: 1.3;
+        }
+
+        .fraction .frac-num {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            padding: 0 8px 6px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .fraction .frac-den {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 8px 0;
+        }
+
+        .calc-modal-box {
+            max-width: 460px;
+        }
+
+        .quiz-modal-box {
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .calc-inline-input {
+            width: 60px;
+            padding: 4px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .calc-known-field {
+            display: inline-block;
+            padding: 3px 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: #eef2f5;
+            color: #7f8c8d;
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+
+        .calc-btn-primary {
+            padding: 8px 16px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .calc-btn-transfer {
+            padding: 8px 16px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .calc-result-area {
+            /* Bevidst neutral (ikke grøn) — beregningen er ikke nødvendigvis rigtig,
+               den regner bare på de tal eleven selv har tastet ind. */
+            background: #f4f6f9;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .calc-result-value {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        /* Mikroplan legende */
+        .micro-legend {
+            width: 250px;
+            margin-top: 10px;
+            background: rgba(255,255,255,0.95);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-size: 0.75rem;
+            box-sizing: border-box;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .micro-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 3px;
+        }
+
+        .micro-legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            border: 2px solid;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+
+        .micro-legend-dot.filled {
+            border-color: transparent;
+        }
+
+        /* Quiz-knap i venstre hjørne */
+        .quiz-corner-btn {
+            padding: 8px 15px;
+            background: #8e44ad;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Quiz */
+        .quiz-question {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+        }
+
+        .quiz-q-text {
+            font-weight: bold;
+            margin: 0 0 8px;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .quiz-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .quiz-feedback {
+            margin-top: 8px;
+            font-size: 0.85rem;
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <h1>Nitrit i vand</h1>
+    </div>
+    <div>
+        <button onclick="openHelp()" style="padding: 8px 15px; background: var(--accent); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 10px;">❓ Sådan virker det</button>
+        <button class="quiz-corner-btn" onclick="openQuiz()" style="margin-right: 10px;">📝 Quiz</button>
+        <button onclick="resetLab()" style="padding: 8px 15px; background: var(--danger); color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Nulstil Lab</button>
+    </div>
+</header>
+
+<div class="modal-overlay" id="helpModal">
+    <div class="modal-box">
+        <h3>Sådan virker forsøget</h3>
+        <ol>
+            <li>Klik dig igennem de 4 procedure-trin til venstre, ét ad gangen (de låses op i rækkefølge).</li>
+            <li>Mikroplan-visningen til højre er altid aktiv og opdaterer sig selv, hver gang du tilsætter et nyt stof. Klik på "Skjul mikroplan", hvis den fylder for meget.</li>
+            <li>Når du er færdig med forsøget, dukker beregningsformlen op over tabellen. Udregn c(NO₂⁻) for kolbe 2-6 og skriv dem ind. Kolbe 1 er blindprøven og er udfyldt for dig.</li>
+            <li>Klik på den lille 🧮-knap ved et inputfelt, hvis du vil bruge beregneren: formlen og de kendte størrelser står for sig selv, du taster kun V(NaNO₂) ind, og den regner og overfører svaret for dig.</li>
+            <li>Til sidst skal du aflæse koncentrationen for de to ukendte vandprøver ud fra standardkurven i grafen.</li>
+            <li>Når du er færdig, kan du teste din forståelse af teorien via "📝 Quiz"-knappen øverst til højre.</li>
+        </ol>
+        <button class="modal-close-btn" onclick="closeHelp()">Luk</button>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="lab-panel" id="labPanel">
+        <canvas id="labCanvas"></canvas>
+        
+        <div class="controls">
+            <h3 style="margin-top:0; font-size: 1rem;">Procedure</h3>
+            <div class="stock-info-box">
+                Stamopløsning<br><strong>c(NaNO₂, før) = 5,00 · 10⁻⁵ M</strong>
+            </div>
+            <div class="step-indicator" id="stepIndicator">Trin 1 af 4</div>
+            <button id="btnStep1" onclick="executeStep1()">1. Tilsæt NaNO₂ og H₂O</button>
+            <button id="btnStep2" onclick="executeStep2()" disabled>2. Tilsæt Sulfanilamid (2 mL)</button>
+            <button id="btnStep3" onclick="executeStep3()" disabled>3. Tilsæt Koblingsreagens (2 mL)</button>
+            <button id="btnStep4" onclick="executeStep4()" disabled>4. Mål Absorbans</button>
+        </div>
+
+        <div class="micro-panel-wrapper" id="microPanelWrapper">
+            <button class="micro-fold-btn" id="microFoldBtn" onclick="toggleMicroFold()">▾ Skjul mikroplan</button>
+
+            <div class="micro-view-overlay" id="microView">
+                <canvas id="microCanvas"></canvas>
+                <div class="micro-label" id="microLabel">MIKROPLAN</div>
+            </div>
+
+            <div class="micro-legend" id="microLegend">
+                <div class="micro-legend-item" id="legendRow_NO2" style="display:none;"><span class="micro-legend-dot" style="border-color:#3498db;"></span> Nitrit (NO₂⁻)</div>
+                <div class="micro-legend-item" id="legendRow_SULF" style="display:none;"><span class="micro-legend-dot" style="border-color:#7f8c8d;"></span> Sulfanilamid</div>
+                <div class="micro-legend-item" id="legendRow_KOB" style="display:none;"><span class="micro-legend-dot" style="border-color:#2ecc71;"></span> Koblingsreagens</div>
+                <div class="micro-legend-item" id="legendRow_DIAZ" style="display:none;"><span class="micro-legend-dot" style="border-color:#9b59b6;"></span> Diazoniumsalt (mellemprodukt, farveløst)</div>
+                <div class="micro-legend-item" id="legendRow_AZO" style="display:none;"><span class="micro-legend-dot filled" style="background:#e74c3c; border-color:#e74c3c;"></span> Azofarvestof (rødt slutprodukt)</div>
+            </div>
+        </div>
+
+        <div id="tooltip"></div>
+    </div>
+
+    <div class="analysis-panel">
+        <h2 class="section-title">Efterbehandling</h2>
+        <div class="feedback-box" id="instructionText">
+            Følg proceduren i laboratoriet til venstre.
+        </div>
+
+        <div class="feedback-box" id="formulaBox" style="display: none;">
+            Når absorbansen er målt, skal du beregne c(NO₂⁻) for standardopløsningerne (kolbe 1-6) — brug 🧮-knappen ved hvert felt hvis du vil have hjælp. Formlen (fortyndingsformlen) er:
+            <div class="fraction-row">
+                c(NO₂⁻, efter) =
+                <div class="fraction">
+                    <div class="frac-num">V(NaNO₂) · c(NaNO₂, før)</div>
+                    <div class="frac-den">V<sub>total</sub></div>
+                </div>
+            </div>
+            <div style="font-size:0.8rem; color:#555;">
+                c(NaNO₂, før) er koncentrationen i stamopløsningen (før fortynding).<br>
+                c(NO₂⁻, efter) er koncentrationen i kolben, efter der er fyldt op med vand (efter fortynding) — det er den, du skal finde.
+            </div>
+        </div>
+
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>Nr.</th>
+                    <th>V(NaNO₂) mL</th>
+                    <th>V(H₂O) mL</th>
+                    <th>A (Absorbans)</th>
+                    <th>c(NO₂⁻) / 10⁻⁶ M</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Genereres via JS -->
+            </tbody>
+        </table>
+
+        <div id="graphContainer">
+            <canvas id="graphCanvas"></canvas>
+        </div>
+        
+        <div id="unknownSamplesContainer"></div>
+
+        <div class="feedback-box" id="unknownsCompleteMsg" style="display:none; background: #eaf4fc; border: 1px solid var(--accent);">
+            🎉 Flot! Du har aflæst begge prøver korrekt. Nu er du klar til at teste din forståelse.
+            <button class="calc-btn-primary" style="display:block; margin-top: 8px;" onclick="openQuiz()">📝 Tag quizzen</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="quizModal">
+    <div class="modal-box quiz-modal-box">
+        <h3>Afsluttende quiz</h3>
+        <div class="feedback-box">
+            Test din forståelse af teorien bag forsøget. Vælg et svar for hvert spørgsmål, og klik "Tjek svar" til sidst.
+        </div>
+        <div id="quizContainer"></div>
+        <button class="calc-btn-primary" onclick="checkQuiz()">Tjek svar</button>
+        <div id="quizScore" class="feedback-box" style="display:none; font-weight:bold; margin-top: 10px;"></div>
+        <div style="margin-top: 14px;">
+            <button class="modal-close-btn" onclick="closeQuiz()">Luk</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="calcModal">
+    <div class="modal-box calc-modal-box">
+        <h3>Beregn c(NO₂⁻) for kolbe <span id="calcFlaskId"></span></h3>
+
+        <div class="fraction-row">
+            c(NO₂⁻, efter) =
+            <div class="fraction">
+                <div class="frac-num">
+                    V(NaNO₂) <input type="text" id="calcVolNa" class="calc-inline-input" placeholder="fx 2,0"> mL
+                    ·
+                    c(NaNO₂, før) <span class="calc-known-field">5,00 · 10<sup>-5</sup> M</span>
+                </div>
+                <div class="frac-den">
+                    V<sub>total</sub> <span class="calc-known-field">50 mL</span>
+                </div>
+            </div>
+        </div>
+        <div style="font-size:0.8rem; color:#555; text-align:center; margin-bottom: 10px;">
+            c(NaNO₂, før) = koncentrationen i stamopløsningen<br>
+            c(NO₂⁻, efter) = koncentrationen i kolben (det du skal finde)
+        </div>
+
+        <div id="calcError" class="input-hint" style="display:none;"></div>
+        <button class="calc-btn-primary" onclick="computeCalc()">Beregn</button>
+
+        <div id="calcResultArea" class="calc-result-area" style="display:none;">
+            <div class="fraction-row" style="margin: 4px 0;">
+                <span>c(NO₂⁻, efter) =</span>
+                <span class="calc-result-value" id="calcResultValue"></span>
+            </div>
+            <button class="calc-btn-transfer" onclick="transferCalc()">Overfør til tabel</button>
+        </div>
+        <div style="margin-top: 14px;">
+            <button class="modal-close-btn" onclick="closeCalcModal()">Luk</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* ==========================================================================
+       SYSTEM & STATE
+       ========================================================================== */
+    const labCanvas = document.getElementById('labCanvas');
+    const ctx = labCanvas.getContext('2d');
+    const microCanvas = document.getElementById('microCanvas');
+    const mctx = microCanvas.getContext('2d');
+    const graphCanvas = document.getElementById('graphCanvas');
+    const gctx = graphCanvas.getContext('2d');
+    const tooltip = document.getElementById('tooltip');
+    
+    let w, h;
+    let animationId;
+    let microAnimationId;
+    
+    // Eksperimentelt data baseret på "Xperiment 55"
+    // Koncentration af NaNO2 opløsning er 5,00 * 10^-5 M.
+    // Total volumen før reagenser = 50 mL.
+    const STOCK_CONC = 5.00e-5; 
+    const VOL_TOTAL = 50.0;
+    const K_CONSTANT = 80000; // A = k * [NO2-] (Teoretisk konstant for simuleringen)
+    
+    const FLASK_DATA = [
+        { id: 1, volNa: 0.0, volH2O: 50.0, isUnknown: false },
+        { id: 2, volNa: 2.0, volH2O: 48.0, isUnknown: false },
+        { id: 3, volNa: 4.0, volH2O: 46.0, isUnknown: false },
+        { id: 4, volNa: 6.0, volH2O: 44.0, isUnknown: false },
+        { id: 5, volNa: 8.0, volH2O: 42.0, isUnknown: false },
+        { id: 6, volNa: 10.0, volH2O: 40.0, isUnknown: false },
+        { id: 7, volNa: 0, volH2O: 0, isUnknown: true, unknownConc: 3.5e-6, label: "Drikkevand" },
+        { id: 8, volNa: 0, volH2O: 0, isUnknown: true, unknownConc: 8.2e-6, label: "Spildevand" }
+    ];
+
+    const UNKNOWN_COLORS = ["#e74c3c", "#8e44ad"];
+
+    const QUIZ_DATA = [
+        {
+            q: "Hvorfor tilsættes sulfanilamid til prøven?",
+            options: [
+                "For at neutralisere basen i vandet, så pH bliver ens",
+                "For at reagere med nitrit og danne et diazoniumsalt",
+                "For at farve vandet blåt, så det kan ses med det blotte øje",
+                "For at fortynde prøven, inden den måles i spektrofotometeret"
+            ],
+            correct: 1,
+            explain: "Sulfanilamid reagerer med nitrit (NO₂⁻) i en diazoteringsreaktion og danner et diazoniumsalt."
+        },
+        {
+            q: "Hvad er formålet med koblingsreagenset?",
+            options: [
+                "At koble sig til diazoniumsaltet og danne det farvede azofarvestof",
+                "At fjerne overskydende nitrit fra prøven, inden målingen",
+                "At måle pH-værdien i den færdige prøveopløsning nøjagtigt",
+                "At stoppe hele reaktionen, så farven ikke udvikler sig mere"
+            ],
+            correct: 0,
+            explain: "Koblingsreagenset reagerer med diazoniumsaltet og danner det rødlige azofarvestof, som absorberer lys."
+        },
+        {
+            q: "Hvorfor laver man en standardkurve med flere kendte koncentrationer i stedet for kun én måling?",
+            options: [
+                "Det er hurtigere at lave én måling frem for flere gentagne målinger",
+                "Det giver en kalibreringskurve, man kan bruge til at aflæse ukendte prøver præcist",
+                "Det er lovpligtigt at gøre det sådan i alle danske laboratorier",
+                "Det sparer både tid og dyre kemikalier i forhold til mange målinger"
+            ],
+            correct: 1,
+            explain: "Standardkurven viser sammenhængen mellem koncentration og absorbans, så man kan aflæse koncentrationen af en ukendt prøve ud fra dens absorbans."
+        },
+        {
+            q: "Ifølge Lambert-Beers lov: hvad sker der med absorbansen, når koncentrationen af det farvede stof stiger?",
+            options: [
+                "Absorbansen falder, når koncentrationen stiger",
+                "Absorbansen stiger proportionalt med koncentrationen",
+                "Absorbansen forbliver konstant, uanset koncentrationen",
+                "Der sker intet målbart, uanset hvor meget der tilsættes"
+            ],
+            correct: 1,
+            explain: "Lambert-Beers lov siger, at absorbansen (ved en given bølgelængde og kuvettelængde) er proportional med koncentrationen — det er derfor standardkurven bliver en ret linje."
+        },
+        {
+            q: "Hvorfor er kolbe 1 (blindprøven uden NaNO₂) vigtig i forsøget?",
+            options: [
+                "Den bruges til at nulstille/kalibrere spektrofotometeret og vise baggrundsabsorbansen",
+                "Den er ikke vigtig for forsøget og kunne sagtens udelades helt",
+                "Den bruges til at fortynde de andre prøver, inden de måles",
+                "Den viser den højeste koncentration af nitrit i hele forsøget"
+            ],
+            correct: 0,
+            explain: "Blindprøven indeholder ikke NO₂⁻ og bør derfor give absorbans ≈ 0 — den bruges til at kontrollere baggrunden/nulpunktet på standardkurven."
+        },
+        {
+            q: "Hvorfor skal man vente ca. 10 minutter, efter koblingsreagenset er tilsat, før man måler?",
+            options: [
+                "For at give vandet tid til at køle af til stuetemperatur igen",
+                "For at give azo-koblingsreaktionen tid til at løbe færdig, så farven er fuldt udviklet",
+                "Det er ikke nødvendigt at vente, man kan måle med det samme",
+                "For at undgå at spektrofotometeret overophedes under målingen"
+            ],
+            correct: 1,
+            explain: "Reaktionen der danner azofarvestoffet tager tid — måler man for tidligt, er farven (og dermed absorbansen) ikke fuldt udviklet, og målingen bliver upræcis."
+        }
+    ];
+
+    let state = {
+        step: 0, // 0=init, 1=filled, 2=sulf_added, 3=kobling_added, 4=measured
+        flasks: [],
+        reactionProgress: 0,
+        hoveredFlask: null,
+        selectedFlask: null, // kolben vist i mikroplan — sat ved klik, uafhængig af musens position
+        microFolded: false
+    };
+
+    class Flask {
+        constructor(index, data) {
+            this.index = index;
+            this.data = data;
+            this.x = 0; // sættes i resize
+            this.y = 0;
+            this.width = 60;
+            this.height = 80;
+            this.hasLiquid = false;
+            this.hasSulf = false;
+            this.hasKobling = false;
+            this.reactionAmt = 0; // 0 til 1
+
+            // Mikroplan: hver kolbe har sit eget vedvarende partikelsæt
+            this.particles = [];
+            this.addedNO2 = false;
+            this.addedSulf = false;
+            this.addedKob = false;
+
+
+            // Teoretisk beregning
+            if (this.data.isUnknown) {
+                this.trueConc = this.data.unknownConc;
+            } else {
+                this.trueConc = (this.data.volNa * STOCK_CONC) / VOL_TOTAL;
+            }
+            this.trueAbsorbance = this.trueConc * K_CONSTANT;
+        }
+
+        draw(ctx) {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+
+            // Flask Body
+            ctx.beginPath();
+            ctx.moveTo(-15, -40); // Hals top venstre
+            ctx.lineTo(15, -40);  // Hals top højre
+            ctx.lineTo(15, -10);  // Hals bund højre
+            ctx.bezierCurveTo(35, 10, 40, 30, 40, 40); // Krop højre
+            ctx.lineTo(-40, 40); // Bund
+            ctx.bezierCurveTo(-40, 30, -35, 10, -15, -10); // Krop venstre
+            ctx.closePath();
+
+            // Skygge / Kant
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = "rgba(44, 62, 80, 0.8)";
+            ctx.stroke();
+            
+            // Væske
+            if (this.hasLiquid) {
+                ctx.save();
+                ctx.clip(); // Klip til kolbens form
+                
+                // Farveberegning baseret på reaktion
+                // Farveløs -> lyserød -> mørkerød afhængig af koncentration og tid
+                let baseR = 236, baseG = 240, baseB = 241, baseA = 0.5; // Klar/lys vand
+                let targetR = 200, targetG = 20, targetB = 50, targetA = 0.9;
+                
+                // Intensitet afhængig af koncentration (normaliseret mod max conc)
+                let maxConc = (10.0 * STOCK_CONC) / VOL_TOTAL;
+                let intensity = this.trueConc / maxConc; 
+                
+                let currentFactor = this.reactionAmt * intensity;
+                
+                let r = Math.round(baseR + (targetR - baseR) * currentFactor);
+                let g = Math.round(baseG + (targetG - baseG) * currentFactor);
+                let b = Math.round(baseB + (targetB - baseB) * currentFactor);
+                let a = baseA + (targetA - baseA) * currentFactor;
+                
+                ctx.fillStyle = "rgba(" + r + "," + g + "," + b + "," + a + ")";
+                
+                // Tegn væskeniveau
+                ctx.fillRect(-45, -5, 90, 50);
+                ctx.restore();
+            }
+
+            // Etiket
+            ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+            ctx.fillRect(-10, 10, 20, 15);
+            ctx.fillStyle = "#000";
+            ctx.font = "12px bold Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(this.data.id, 0, 22);
+
+            ctx.restore();
+        }
+        
+        isPointInside(px, py) {
+            return (px >= this.x - 40 && px <= this.x + 40 && py >= this.y - 40 && py <= this.y + 40);
+        }
+    }
+
+    /* ==========================================================================
+       INITIALISERING & RESIZE
+       ========================================================================== */
+    function init() {
+        window.addEventListener('resize', resizeCanvas);
+        labCanvas.addEventListener('mousemove', handleMouseMove);
+        microCanvas.width = 250;
+        microCanvas.height = 250;
+
+        buildTable();
+        buildQuiz();
+        resetLab();
+        resizeCanvas();
+        animate();
+    }
+
+    function openHelp() {
+        document.getElementById('helpModal').classList.add('visible');
+    }
+
+    function closeHelp() {
+        document.getElementById('helpModal').classList.remove('visible');
+    }
+
+    function openQuiz() {
+        document.getElementById('quizModal').classList.add('visible');
+    }
+
+    function closeQuiz() {
+        document.getElementById('quizModal').classList.remove('visible');
+    }
+
+    function toggleMicroFold() {
+        state.microFolded = !state.microFolded;
+        document.getElementById('microPanelWrapper').classList.toggle('folded', state.microFolded);
+        document.getElementById('microFoldBtn').textContent = state.microFolded ? '▸ Vis mikroplan' : '▾ Skjul mikroplan';
+    }
+
+    /* ==========================================================================
+       BEREGNER-POPUP (fortyndingsformel pr. inputfelt)
+       ========================================================================== */
+    let activeCalcIndex = null;
+    let activeCalcResult = null;
+
+    function openCalcModal(index) {
+        activeCalcIndex = index;
+        activeCalcResult = null;
+        document.getElementById('calcFlaskId').textContent = FLASK_DATA[index].id;
+        document.getElementById('calcVolNa').value = '';
+        document.getElementById('calcResultArea').style.display = 'none';
+        document.getElementById('calcError').style.display = 'none';
+        document.getElementById('calcModal').classList.add('visible');
+    }
+
+    function closeCalcModal() {
+        document.getElementById('calcModal').classList.remove('visible');
+        activeCalcIndex = null;
+        activeCalcResult = null;
+    }
+
+    function computeCalc() {
+        let vNaRaw = document.getElementById('calcVolNa').value.replace(',', '.');
+        let vNa = parseFloat(vNaRaw);
+
+        let errEl = document.getElementById('calcError');
+        let resultArea = document.getElementById('calcResultArea');
+
+        if (isNaN(vNa)) {
+            errEl.textContent = "Indtast V(NaNO₂) som et tal (brug komma som decimaltegn).";
+            errEl.style.display = 'block';
+            resultArea.style.display = 'none';
+            return;
+        }
+        errEl.style.display = 'none';
+
+        // c(NaNO₂, før) og V_total er kendte, faste størrelser (se felterne ovenfor)
+        let resultM = (vNa * STOCK_CONC) / VOL_TOTAL; // mol/L
+        let resultMicro = resultM * 1e6; // 10^-6 M, samme enhed som tabellen
+
+        document.getElementById('calcResultValue').textContent =
+            resultMicro.toFixed(2).replace('.', ',') + " · 10⁻⁶ M";
+
+        resultArea.style.display = 'block';
+        activeCalcResult = resultMicro;
+    }
+
+    function transferCalc() {
+        if (activeCalcIndex === null || activeCalcResult === null) return;
+        let inp = document.querySelector('#dataTable input[data-index="' + activeCalcIndex + '"]');
+        if (inp) {
+            inp.value = activeCalcResult.toFixed(2).replace('.', ',');
+            inp.dispatchEvent(new Event('input'));
+        }
+        closeCalcModal();
+    }
+
+    function updateStepIndicator() {
+        document.getElementById('stepIndicator').textContent = state.step >= 4 ? 'Alle trin udført' : 'Trin ' + (state.step + 1) + ' af 4';
+    }
+
+    function resizeCanvas() {
+        const panel = document.getElementById('labPanel');
+        w = panel.clientWidth;
+        h = panel.clientHeight;
+        labCanvas.width = w;
+        labCanvas.height = h;
+        
+        // Placer kolber på bordet
+        let startX = 80;
+        let spacing = (w - 160) / (state.flasks.length - 1);
+        for (let i = 0; i < state.flasks.length; i++) {
+            state.flasks[i].x = startX + i * spacing;
+            state.flasks[i].y = h * 0.75; 
+        }
+        
+        initGraphCanvas();
+        drawGraph();
+    }
+
+    function resetLab() {
+        state.step = 0;
+        state.reactionProgress = 0;
+        state.flasks = FLASK_DATA.map((data, i) => new Flask(i, data));
+        state.hoveredFlask = null;
+        // Mikroplan er låst til kolbe 3 (indeholder nitrit, i modsætning til blindprøven kolbe 1).
+        state.selectedFlask = state.flasks[2];
+        state.microFolded = false;
+        document.getElementById('microPanelWrapper').classList.remove('folded');
+        document.getElementById('microFoldBtn').textContent = '▾ Skjul mikroplan';
+
+        document.getElementById('btnStep1').disabled = false;
+        document.getElementById('btnStep2').disabled = true;
+        document.getElementById('btnStep3').disabled = true;
+        document.getElementById('btnStep4').disabled = true;
+
+        document.getElementById('formulaBox').style.display = 'none';
+        document.getElementById('instructionText').innerHTML = "Følg proceduren i laboratoriet til venstre.";
+
+        updateStepIndicator();
+        buildTable(); // Ryd tabellens input og absorbans
+        buildUnknownSamples(); // Ryd de ukendte prøvers input og absorbans
+        document.getElementById('unknownsCompleteMsg').style.display = 'none';
+        buildQuiz(); // Ryd quiz-svar
+        document.getElementById('quizScore').style.display = 'none';
+        resizeCanvas();
+    }
+
+    /* ==========================================================================
+       BRUGER INTERAKTIONER & TRIN
+       ========================================================================== */
+    function executeStep1() {
+        state.step = 1;
+        state.flasks.forEach(f => f.hasLiquid = true);
+        document.getElementById('btnStep1').disabled = true;
+        document.getElementById('btnStep2').disabled = false;
+        updateStepIndicator();
+        logFeedback("Vand og NaNO₂ tilsat. Hver kolbe indeholder nu 50 mL væske.");
+    }
+
+    function executeStep2() {
+        state.step = 2;
+        state.flasks.forEach(f => f.hasSulf = true);
+        document.getElementById('btnStep2').disabled = true;
+        document.getElementById('btnStep3').disabled = false;
+        updateStepIndicator();
+        logFeedback("2 mL sulfanilamid tilsat til alle kolber. Surhed og amin er nu til stede.");
+    }
+
+    function executeStep3() {
+        state.step = 3;
+        state.flasks.forEach(f => f.hasKobling = true);
+        document.getElementById('btnStep3').disabled = true;
+        updateStepIndicator();
+        logFeedback("2 mL koblingsreagens tilsat. Azofarvestof dannes gradvist. Venter 10 min (simuleret).");
+        
+        // Simuler 10 minutters ventetid på 5 sekunder
+        let startTime = Date.now();
+        let duration = 5000;
+        
+        function reactLoop() {
+            let elapsed = Date.now() - startTime;
+            let p = elapsed / duration;
+            if (p >= 1) {
+                p = 1;
+                document.getElementById('btnStep4').disabled = false;
+                logFeedback("Reaktion fuldført. Klar til at måle absorbansen.");
+            } else {
+                requestAnimationFrame(reactLoop);
+            }
+            state.reactionProgress = p;
+            state.flasks.forEach(f => f.reactionAmt = p);
+        }
+        reactLoop();
+    }
+
+    function executeStep4() {
+        state.step = 4;
+        document.getElementById('btnStep4').disabled = true;
+        updateStepIndicator();
+        logFeedback("Absorbans målt ved 540 nm. Udfyld beregningerne i tabellen nedenfor.");
+        document.getElementById('formulaBox').style.display = 'block';
+
+        // Udfyld absorbans i tabellen (Simulerer aflæsning)
+        state.flasks.forEach(f => {
+            let el = document.getElementById("abs_" + f.index);
+            if (el) el.innerText = f.trueAbsorbance.toFixed(3).replace('.', ',');
+
+            if (f.data.isUnknown) {
+                let absEl = document.getElementById('unknownAbs_' + f.index);
+                if (absEl) absEl.innerText = f.trueAbsorbance.toFixed(3).replace('.', ',');
+                let inputEl = document.getElementById('inputUnknown_' + f.index);
+                if (inputEl) inputEl.disabled = false;
+            }
+        });
+        
+        // Plot "0" punktet
+        drawGraph();
+    }
+
+    function logFeedback(msg) {
+        document.getElementById('instructionText').innerHTML = "<strong>Status:</strong> " + msg;
+    }
+
+    /* ==========================================================================
+       RENDERING: LABORATORIE BORD
+       ========================================================================== */
+    function animate() {
+        ctx.clearRect(0, 0, w, h);
+        drawBench();
+
+        state.flasks.forEach(f => f.draw(ctx));
+
+        renderMicroPanel();
+
+        animationId = requestAnimationFrame(animate);
+    }
+
+    function drawBench() {
+        ctx.fillStyle = "#95a5a6"; // Bordplade
+        ctx.fillRect(0, h * 0.75 + 40, w, h);
+        ctx.fillStyle = "#7f8c8d";
+        ctx.fillRect(0, h * 0.75 + 40, w, 10);
+    }
+
+    function handleMouseMove(e) {
+        let rect = labCanvas.getBoundingClientRect();
+        let mouseX = e.clientX - rect.left;
+        let mouseY = e.clientY - rect.top;
+        
+        let found = null;
+        for (let i = state.flasks.length - 1; i >= 0; i--) {
+            if (state.flasks[i].isPointInside(mouseX, mouseY)) {
+                found = state.flasks[i];
+                break;
+            }
+        }
+        
+        state.hoveredFlask = found;
+
+        if (found) {
+            tooltip.style.display = 'block';
+            tooltip.style.left = (e.clientX + 15) + 'px';
+            tooltip.style.top = (e.clientY + 15) + 'px';
+            tooltip.innerHTML = "Kolbe " + found.data.id + "<br>" +
+                (found.data.isUnknown ? found.data.label : found.data.volNa.toString().replace('.', ',') + " mL NaNO₂");
+        } else {
+            tooltip.style.display = 'none';
+        }
+    }
+
+    /* ==========================================================================
+       MIKROPLAN: PARTIKEL SYSTEM (permanent, én partikelmængde pr. kolbe)
+       ========================================================================== */
+    const PARTICLE_COLORS = { NO2: "#3498db", SULF: "#7f8c8d", KOB: "#2ecc71", DIAZ: "#9b59b6", AZO: "#e74c3c" };
+
+    function syncFlaskParticles(flask) {
+        let mw = microCanvas.width;
+        let mh = microCanvas.height;
+
+        // Base antal molekyler baseret på koncentration
+        let baseAmount = Math.ceil(flask.trueConc * 2000000);
+        if (baseAmount > 40) baseAmount = 40;
+
+        if (flask.hasLiquid && !flask.addedNO2) {
+            for (let i = 0; i < baseAmount; i++) {
+                flask.particles.push({
+                    x: Math.random() * mw, y: Math.random() * mh,
+                    vx: (Math.random() - 0.5) * 2, vy: (Math.random() - 0.5) * 2,
+                    type: 'NO2', radius: 4
+                });
+            }
+            flask.addedNO2 = true;
+        }
+
+        if (flask.hasSulf && !flask.addedSulf) {
+            for (let i = 0; i < baseAmount + 5; i++) {
+                flask.particles.push({
+                    x: Math.random() * mw, y: Math.random() * mh,
+                    vx: (Math.random() - 0.5) * 1.5, vy: (Math.random() - 0.5) * 1.5,
+                    type: 'SULF', radius: 5
+                });
+            }
+            flask.addedSulf = true;
+        }
+
+        if (flask.hasKobling && !flask.addedKob) {
+            for (let i = 0; i < baseAmount + 5; i++) {
+                flask.particles.push({
+                    x: Math.random() * mw, y: Math.random() * mh,
+                    vx: (Math.random() - 0.5) * 1.5, vy: (Math.random() - 0.5) * 1.5,
+                    type: 'KOB', radius: 6
+                });
+            }
+            flask.addedKob = true;
+        }
+    }
+
+    function renderMicroPanel() {
+        if (state.microFolded) return;
+
+        let mw = microCanvas.width;
+        let mh = microCanvas.height;
+        let flask = state.selectedFlask;
+        let label = document.getElementById('microLabel');
+
+        mctx.fillStyle = "rgba(236, 240, 241, 0.3)";
+        mctx.fillRect(0, 0, mw, mh);
+
+        if (!flask) {
+            label.textContent = "MIKROPLAN";
+            mctx.fillStyle = "#fff";
+            mctx.font = "13px sans-serif";
+            mctx.textAlign = "center";
+            mctx.fillText("Klik på", mw / 2, mh / 2 - 8);
+            mctx.fillText("en kolbe", mw / 2, mh / 2 + 10);
+            updateMicroLegend(null);
+            return;
+        }
+
+        label.textContent = "MIKROPLAN — Kolbe " + flask.data.id;
+        syncFlaskParticles(flask);
+
+        let parts = flask.particles;
+
+        // Fysik og kollisioner (simulerer reaktion)
+        for (let i = 0; i < parts.length; i++) {
+            let p1 = parts[i];
+            p1.x += p1.vx;
+            p1.y += p1.vy;
+
+            // Bounce
+            if (p1.x < 0 || p1.x > mw) p1.vx *= -1;
+            if (p1.y < 0 || p1.y > mh) p1.vy *= -1;
+
+            // Hvis reagenserne er tilsat, tjek reaktioner (simuleret reaktionskinetik via kollision)
+            if (state.step >= 2) {
+                for (let j = i + 1; j < parts.length; j++) {
+                    let p2 = parts[j];
+                    let dx = p1.x - p2.x;
+                    let dy = p1.y - p2.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < p1.radius + p2.radius + 2) {
+                        // NO2 + SULF -> DIAZONIUM
+                        if ((p1.type === 'NO2' && p2.type === 'SULF') || (p1.type === 'SULF' && p2.type === 'NO2')) {
+                            p1.type = 'DIAZ'; p1.radius = 7;
+                            p2.type = 'DEAD';
+                        }
+                        // DIAZONIUM + KOB -> AZO (Rød, det eneste farvede stof)
+                        if (state.step >= 3) {
+                            if ((p1.type === 'DIAZ' && p2.type === 'KOB') || (p1.type === 'KOB' && p2.type === 'DIAZ')) {
+                                p1.type = 'AZO'; p1.radius = 9;
+                                p2.type = 'DEAD';
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Ryd op i døde partikler
+        flask.particles = flask.particles.filter(p => p.type !== 'DEAD');
+        parts = flask.particles;
+
+        updateMicroLegend(flask);
+
+        // Tegn — kun azofarvestof er udfyldt (farvet), resten er farveløse og vises kun som en ring
+        for (let i = 0; i < parts.length; i++) {
+            let p = parts[i];
+            let color = PARTICLE_COLORS[p.type];
+            mctx.beginPath();
+            mctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            if (p.type === 'AZO') {
+                mctx.fillStyle = color;
+                mctx.fill();
+                mctx.strokeStyle = "rgba(0,0,0,0.2)";
+                mctx.lineWidth = 1;
+                mctx.stroke();
+            } else {
+                mctx.lineWidth = 2;
+                mctx.strokeStyle = color;
+                mctx.stroke();
+            }
+        }
+    }
+
+    // Legenden bygges op i takt med at stoffer rent faktisk er tilsat/dannet i den viste kolbe
+    function updateMicroLegend(flask) {
+        let show = { NO2: false, SULF: false, KOB: false, DIAZ: false, AZO: false };
+
+        if (flask) {
+            show.NO2 = flask.hasLiquid && flask.trueConc > 0;
+            show.SULF = flask.hasSulf;
+            show.KOB = flask.hasKobling;
+            show.DIAZ = flask.particles.some(p => p.type === 'DIAZ');
+            show.AZO = flask.particles.some(p => p.type === 'AZO');
+        }
+
+        for (let type in show) {
+            document.getElementById('legendRow_' + type).style.display = show[type] ? 'flex' : 'none';
+        }
+    }
+
+    /* ==========================================================================
+       TABEL & BEREGNINGER
+       ========================================================================== */
+    function buildTable() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        
+        FLASK_DATA.forEach((data, index) => {
+            let tr = document.createElement('tr');
+            
+            // Nr
+            let tdId = document.createElement('td');
+            tdId.innerText = data.id;
+            tr.appendChild(tdId);
+            
+            // V(NaNO2)
+            let tdVna = document.createElement('td');
+            tdVna.innerText = data.isUnknown ? "-" : data.volNa.toFixed(1).replace('.', ',');
+            tr.appendChild(tdVna);
+            
+            // V(H2O)
+            let tdVH2O = document.createElement('td');
+            tdVH2O.innerText = data.isUnknown ? "50 (" + data.label + ")" : data.volH2O.toFixed(1).replace('.', ',');
+            tr.appendChild(tdVH2O);
+
+            // Absorbans
+            let tdAbs = document.createElement('td');
+            tdAbs.id = "abs_" + index;
+            tdAbs.innerText = "-";
+            tr.appendChild(tdAbs);
+
+            // [NO2-] Beregning input
+            let tdConc = document.createElement('td');
+            tdConc.className = "conc-cell";
+            if (data.isUnknown) {
+                tdConc.innerText = "?";
+            } else if (data.volNa === 0) {
+                tdConc.innerText = "0,00"; // Kolbe 1 (blind) er nul
+            } else {
+                let inp = document.createElement('input');
+                inp.type = "text";
+                inp.dataset.index = index;
+                inp.dataset.wrongCount = 0;
+                inp.title = "V(NaNO₂) for kolbe " + data.id + " = " + data.volNa.toFixed(1).replace('.', ',') + " mL";
+                inp.oninput = validateInput;
+                tdConc.appendChild(inp);
+
+                let calcBtn = document.createElement('button');
+                calcBtn.type = "button";
+                calcBtn.className = "calc-btn";
+                calcBtn.textContent = "🧮";
+                calcBtn.title = "Åbn beregner";
+                calcBtn.onclick = (() => { let idx = index; return () => openCalcModal(idx); })();
+                tdConc.appendChild(calcBtn);
+
+                let hintSpan = document.createElement('span');
+                hintSpan.className = "input-hint";
+                hintSpan.id = "inputhint_" + index;
+                tdConc.appendChild(hintSpan);
+            }
+            tr.appendChild(tdConc);
+            
+            tbody.appendChild(tr);
+        });
+    }
+
+    function validateInput(e) {
+        let input = e.target;
+        let index = parseInt(input.dataset.index);
+        let flask = state.flasks[index];
+        let hintSpan = document.getElementById('inputhint_' + index);
+
+        // Forventet svar i mikromolær (10^-6)
+        let expectedConcMicro = flask.trueConc * 1e6;
+
+        // Parse brugerens input (håndter dansk komma)
+        let rawVal = input.value.replace(',', '.');
+        let userVal = parseFloat(rawVal);
+
+        input.classList.remove('input-correct', 'input-wrong');
+
+        if (!isNaN(userVal)) {
+            // Check if within 2% error margin
+            let diff = Math.abs(userVal - expectedConcMicro);
+            if (diff < 0.05) { // tillad lille afrundingsafvigelse
+                input.classList.add('input-correct');
+                input.dataset.wrongCount = 0;
+                if (hintSpan) hintSpan.textContent = "";
+                // Opdater grafen med den nye viden
+                drawGraph();
+            } else {
+                input.classList.add('input-wrong');
+                input.dataset.wrongCount = parseInt(input.dataset.wrongCount || 0) + 1;
+                if (hintSpan) {
+                    if (parseInt(input.dataset.wrongCount) >= 3) {
+                        hintSpan.textContent = "Brug V(NaNO₂) = " + flask.data.volNa.toFixed(1).replace('.', ',') + " mL i formlen ovenfor.";
+                    } else {
+                        hintSpan.textContent = "";
+                    }
+                }
+            }
+        } else if (hintSpan) {
+            hintSpan.textContent = "";
+        }
+    }
+    
+    function buildUnknownSamples() {
+        const container = document.getElementById('unknownSamplesContainer');
+        container.innerHTML = '';
+
+        FLASK_DATA.forEach((data, index) => {
+            if (!data.isUnknown) return;
+
+            let box = document.createElement('div');
+            box.className = "feedback-box";
+            box.style.background = "#e8f8f5";
+
+            let title = document.createElement('strong');
+            title.textContent = data.label + " (Kolbe " + data.id + "):";
+            box.appendChild(title);
+            box.appendChild(document.createElement('br'));
+
+            box.appendChild(document.createTextNode("Målt absorbans: "));
+            let absSpan = document.createElement('span');
+            absSpan.id = "unknownAbs_" + index;
+            absSpan.textContent = "-";
+            box.appendChild(absSpan);
+            box.appendChild(document.createElement('br'));
+
+            box.appendChild(document.createTextNode("Aflæs c(NO₂⁻) fra kurven og indtast resultatet (i 10⁻⁶ M): "));
+            let input = document.createElement('input');
+            input.type = "text";
+            input.id = "inputUnknown_" + index;
+            input.dataset.index = index;
+            input.disabled = true;
+            input.oninput = checkUnknown;
+            box.appendChild(input);
+
+            let feedbackSpan = document.createElement('span');
+            feedbackSpan.id = "unknownFeedback_" + index;
+            box.appendChild(feedbackSpan);
+
+            container.appendChild(box);
+        });
+    }
+
+    function checkUnknown(e) {
+        let input = e.target;
+        let index = parseInt(input.dataset.index);
+        let flask = state.flasks[index];
+
+        let rawVal = input.value.replace(',', '.');
+        let userVal = parseFloat(rawVal);
+
+        let expected = flask.trueConc * 1e6;
+
+        input.classList.remove('input-correct', 'input-wrong');
+        let feedback = document.getElementById('unknownFeedback_' + index);
+
+        if (!isNaN(userVal)) {
+            let diff = Math.abs(userVal - expected);
+            if (diff < 0.3) {
+                input.classList.add('input-correct');
+                feedback.innerHTML = " ✓ Korrekt aflæst!";
+                feedback.style.color = "var(--success)";
+            } else {
+                input.classList.add('input-wrong');
+                feedback.innerHTML = " ✗ Prøv igen (Husk x-aksen er i 10⁻⁶ M)";
+                feedback.style.color = "var(--danger)";
+            }
+        } else {
+            feedback.innerHTML = "";
+        }
+
+        checkAllUnknownsComplete();
+    }
+
+    function checkAllUnknownsComplete() {
+        let msgBox = document.getElementById('unknownsCompleteMsg');
+        let unknownInputs = document.querySelectorAll('#unknownSamplesContainer input[type="text"]');
+        let allCorrect = unknownInputs.length > 0 &&
+            Array.from(unknownInputs).every(inp => inp.classList.contains('input-correct'));
+
+        msgBox.style.display = allCorrect ? 'block' : 'none';
+    }
+
+    /* ==========================================================================
+       GRAFIK: STANDARDKURVE
+       ========================================================================== */
+    function initGraphCanvas() {
+        let container = document.getElementById('graphContainer');
+        graphCanvas.width = container.clientWidth;
+        graphCanvas.height = container.clientHeight;
+    }
+
+    function drawGraph() {
+        gctx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+        let gw = graphCanvas.width;
+        let gh = graphCanvas.height;
+        
+        let padX = 50;
+        let padY = 40;
+        let plotW = gw - padX - 20;
+        let plotH = gh - padY - 20;
+        
+        // Akser
+        gctx.beginPath();
+        gctx.moveTo(padX, 20);
+        gctx.lineTo(padX, 20 + plotH);
+        gctx.lineTo(padX + plotW, 20 + plotH);
+        gctx.strokeStyle = "#2c3e50";
+        gctx.lineWidth = 2;
+        gctx.stroke();
+        
+        // Labels
+        gctx.fillStyle = "#000";
+        gctx.font = "12px sans-serif";
+        gctx.textAlign = "center";
+        gctx.fillText("c(NO₂⁻) / 10⁻⁶ M", padX + plotW/2, gh - 10);
+        
+        gctx.save();
+        gctx.translate(15, 20 + plotH/2);
+        gctx.rotate(-Math.PI/2);
+        gctx.fillText("Absorbans", 0, 0);
+        gctx.restore();
+        
+        // Skala og grid
+        let maxConcPlot = 12.0; // max x = 12 * 10^-6
+        let maxAbsPlot = 1.0;   // max y = 1.0
+        
+        gctx.textAlign = "right";
+        gctx.textBaseline = "middle";
+        gctx.strokeStyle = "#ecf0f1";
+        gctx.lineWidth = 1;
+        
+        // Y-akse ticks
+        for(let a=0; a<=maxAbsPlot; a+=0.2) {
+            let y = 20 + plotH - (a / maxAbsPlot) * plotH;
+            gctx.fillText(a.toFixed(1).replace('.', ','), padX - 5, y);
+            gctx.beginPath(); gctx.moveTo(padX, y); gctx.lineTo(padX+plotW, y); gctx.stroke();
+        }
+        
+        // X-akse ticks
+        gctx.textAlign = "center";
+        gctx.textBaseline = "top";
+        for(let c=0; c<=maxConcPlot; c+=2) {
+            let x = padX + (c / maxConcPlot) * plotW;
+            gctx.fillText(c.toString(), x, 20 + plotH + 5);
+        }
+        
+        // Plot korrekte data point, hvis inputfeltet er korrekt!
+        let validPoints = [];
+        
+        // Kolbe 1 (0-punktet) sættes altid, hvis absorbansen er målt
+        if (state.step === 4) {
+            validPoints.push({c: 0, a: 0});
+        }
+        
+        // Tjek input felter
+        let inputs = document.querySelectorAll('#dataTable input[type="text"]');
+        inputs.forEach(inp => {
+            if (inp.classList.contains('input-correct')) {
+                let idx = parseInt(inp.dataset.index);
+                let flask = state.flasks[idx];
+                validPoints.push({
+                    c: flask.trueConc * 1e6,
+                    a: flask.trueAbsorbance
+                });
+            }
+        });
+        
+        // Tegn punkter
+        gctx.fillStyle = "#3498db";
+        validPoints.forEach(pt => {
+            let px = padX + (pt.c / maxConcPlot) * plotW;
+            let py = 20 + plotH - (pt.a / maxAbsPlot) * plotH;
+            
+            gctx.beginPath();
+            gctx.arc(px, py, 4, 0, Math.PI*2);
+            gctx.fill();
+        });
+        
+        // Tegn standardkurve linje (Best fit / teoretisk)
+        if (validPoints.length >= 2) {
+            gctx.beginPath();
+            gctx.strokeStyle = "rgba(41, 128, 185, 0.5)";
+            gctx.lineWidth = 2;
+            
+            // Tegn fra 0 til max
+            let x0 = padX;
+            let y0 = 20 + plotH;
+            let xMax = padX + (10 / maxConcPlot) * plotW;
+            let yMax = 20 + plotH - (state.flasks[5].trueAbsorbance / maxAbsPlot) * plotH;
+            
+            gctx.moveTo(x0, y0);
+            gctx.lineTo(xMax, yMax);
+            gctx.stroke();
+        }
+        
+        // Plot ukendte prøver med stiplet linje hver, hvis målt
+        if (state.step === 4) {
+            let unknownFlasks = state.flasks.filter(f => f.data.isUnknown);
+            unknownFlasks.forEach((f, i) => {
+                let color = UNKNOWN_COLORS[i % UNKNOWN_COLORS.length];
+                let uY = 20 + plotH - (f.trueAbsorbance / maxAbsPlot) * plotH;
+
+                gctx.beginPath();
+                gctx.strokeStyle = color;
+                gctx.setLineDash([5, 5]);
+                gctx.moveTo(padX, uY);
+                gctx.lineTo(padX + plotW, uY);
+                gctx.stroke();
+                gctx.setLineDash([]);
+
+                // Tekst label
+                gctx.fillStyle = color;
+                gctx.textAlign = "left";
+                gctx.textBaseline = "bottom";
+                gctx.fillText(f.data.label, padX + 5 + i * 90, uY - 2);
+            });
+        }
+    }
+
+    /* ==========================================================================
+       AFSLUTTENDE QUIZ
+       ========================================================================== */
+    function buildQuiz() {
+        const container = document.getElementById('quizContainer');
+        container.innerHTML = '';
+
+        QUIZ_DATA.forEach((item, qi) => {
+            let div = document.createElement('div');
+            div.className = "quiz-question";
+
+            let p = document.createElement('p');
+            p.className = "quiz-q-text";
+            p.textContent = (qi + 1) + ". " + item.q;
+            div.appendChild(p);
+
+            let optsDiv = document.createElement('div');
+            optsDiv.className = "quiz-options";
+            // Rækkefølgen blandes én gang, når quizzen bygges, så det rigtige svar
+            // ikke altid står samme sted. radio.value gemmer det oprindelige index,
+            // så checkQuiz() stadig kan sammenligne med item.correct.
+            let order = item.options.map((_, i) => i);
+            for (let i = order.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                [order[i], order[j]] = [order[j], order[i]];
+            }
+            order.forEach((origIdx) => {
+                let label = document.createElement('label');
+                label.className = "quiz-option";
+                let radio = document.createElement('input');
+                radio.type = "radio";
+                radio.name = "quiz_" + qi;
+                radio.value = origIdx;
+                label.appendChild(radio);
+                label.appendChild(document.createTextNode(item.options[origIdx]));
+                optsDiv.appendChild(label);
+            });
+            div.appendChild(optsDiv);
+
+            let fb = document.createElement('div');
+            fb.className = "quiz-feedback";
+            fb.id = "quizFeedback_" + qi;
+            div.appendChild(fb);
+
+            container.appendChild(div);
+        });
+    }
+
+    function checkQuiz() {
+        let correctCount = 0;
+        let answeredCount = 0;
+
+        QUIZ_DATA.forEach((item, qi) => {
+            let selected = document.querySelector('input[name="quiz_' + qi + '"]:checked');
+            let fb = document.getElementById('quizFeedback_' + qi);
+            if (!selected) {
+                fb.innerHTML = '<span style="color: var(--danger);">Ikke besvaret.</span>';
+                return;
+            }
+            answeredCount++;
+            let val = parseInt(selected.value);
+            if (val === item.correct) {
+                correctCount++;
+                fb.innerHTML = '<span style="color: var(--success);">✓ Rigtigt! ' + item.explain + '</span>';
+            } else {
+                fb.innerHTML = '<span style="color: var(--danger);">✗ Forkert. ' + item.explain + '</span>';
+            }
+        });
+
+        let scoreEl = document.getElementById('quizScore');
+        scoreEl.style.display = 'block';
+        scoreEl.textContent = "Resultat: " + correctCount + " ud af " + QUIZ_DATA.length + " rigtige (" + answeredCount + " besvaret).";
+    }
+
+    // Start
+    init();
+
+</script>
+</body>
+</html>

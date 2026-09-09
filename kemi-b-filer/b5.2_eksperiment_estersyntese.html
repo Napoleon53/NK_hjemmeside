@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estersyntese - Pædagogisk Version</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            user-select: none; /* Forhindrer markering af tekst ved hurtige klik */
+        }
+
+        h2 { color: #2c3e50; margin-bottom: 10px; }
+        
+        #container {
+            position: relative;
+            width: 650px;
+            height: 500px;
+            background: white;
+            border: 3px solid #34495e;
+            border-radius: 0 0 50px 50px;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        /* Faser */
+        .phase-organic {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 50%;
+            background-color: #fff9db; 
+            border-bottom: 2px dashed #bdc3c7;
+            transition: height 1s;
+            z-index: 0;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .phase-water {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 50%;
+            background-color: #dbf6ff;
+            opacity: 0;
+            transition: opacity 1s;
+            z-index: 0;
+        }
+
+        .label {
+            font-size: 14px;
+            color: #7f8c8d;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            pointer-events: none;
+        }
+
+        /* Molekyle styling */
+        .molecule {
+            position: absolute;
+            transition: all 1.2s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+            z-index: 10;
+            /* Transform-origin er vigtig når vi vender molekyler */
+            transform-origin: center center;
+        }
+
+        /* Atom styles */
+        circle.carbon { fill: #2d3436; stroke: #000; stroke-width: 1; }
+        circle.oxygen { fill: #e74c3c; stroke: #c0392b; stroke-width: 1; }
+        circle.hydrogen { fill: #ffffff; stroke: #333; stroke-width: 1.5; }
+        
+        text.charge { fill: #e74c3c; font-weight: bold; font-size: 18px; opacity: 0; font-family: sans-serif; }
+
+        /* Controls */
+        #controls { margin-top: 25px; text-align: center; }
+
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #1a5276;
+            min-width: 200px;
+        }
+
+        button:hover { background-color: #3498db; }
+        button:active { transform: translateY(4px); box-shadow: none; }
+        button:disabled { background-color: #95a5a6; cursor: not-allowed; box-shadow: none; transform: translateY(4px);}
+
+        #status-text {
+            margin-top: 15px;
+            font-size: 18px;
+            color: #2c3e50;
+            min-height: 1.5em;
+            font-weight: 500;
+        }
+        
+        .legend {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #555;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .dot { height: 10px; width: 10px; display: inline-block; border-radius: 50%; margin-right: 5px; border: 1px solid #333; }
+    </style>
+</head>
+<body>
+
+    <h2>Estersyntese: Propylbutanoat</h2>
+
+    <div id="container">
+        <div class="phase-organic" id="org-phase">
+            <span class="label">Organisk Fase<br><small style="font-size:0.8em; text-transform:none;">(delvist upolær)</small></span>
+        </div>
+        <div class="phase-water" id="water-phase">
+            <span class="label" style="position: absolute; bottom: 10px; right: 10px;">Vandfase (Polær)</span>
+        </div>
+        
+        <div id="molecule-layer"></div>
+    </div>
+
+    <div id="status-text">Klar: 2 Butansyre + 4 Propan-1-ol</div>
+
+    <div id="controls">
+        <button id="btn-next" onclick="nextStep()">Start Reaktion</button>
+    </div>
+
+    <div class="legend">
+        <span class="dot" style="background:#2d3436;"></span>Carbon
+        <span class="dot" style="background:#e74c3c;"></span>Oxygen
+        <span class="dot" style="background:#ffffff;"></span>Hydrogen (kun funktionelle grupper)
+    </div>
+
+    <script>
+        let step = 0;
+        const btn = document.getElementById('btn-next');
+        const status = document.getElementById('status-text');
+        const moleculeLayer = document.getElementById('molecule-layer');
+        const waterPhase = document.getElementById('water-phase');
+        const orgPhase = document.getElementById('org-phase');
+
+        // --- SVG SKABELONER ---
+
+        function createButanoicAcid(id, x, y) {
+            return `
+            <div id="${id}" class="molecule" style="left: ${x}px; top: ${y}px; width: 100px; height: 50px;">
+                <svg width="100" height="50">
+                    <line x1="10" y1="30" x2="30" y2="30" stroke="#333" stroke-width="2"/>
+                    <line x1="30" y1="30" x2="50" y2="30" stroke="#333" stroke-width="2"/>
+                    <line x1="50" y1="30" x2="70" y2="30" stroke="#333" stroke-width="2"/>
+                    <line x1="70" y1="30" x2="70" y2="10" stroke="#333" stroke-width="2"/>
+                    <line x1="70" y1="30" x2="85" y2="40" stroke="#333" stroke-width="2"/>
+                    <line x1="85" y1="40" x2="95" y2="40" stroke="#333" stroke-width="2"/>
+                    
+                    <circle cx="10" cy="30" r="7" class="carbon" />
+                    <circle cx="30" cy="30" r="7" class="carbon" />
+                    <circle cx="50" cy="30" r="7" class="carbon" />
+                    <circle cx="70" cy="30" r="7" class="carbon" />
+                    <circle cx="70" cy="10" r="6" class="oxygen" />
+                    <circle cx="85" cy="40" r="6" class="oxygen" />
+                    <circle id="${id}-h" cx="95" cy="40" r="5" class="hydrogen" />
+                    <text x="92" y="35" class="charge" id="${id}-charge">-</text>
+                </svg>
+            </div>`;
+        }
+
+        function createPropanol(id, x, y, flipped = false) {
+            // Flipped parameter bestemmer om molekylet skal spejlvendes
+            // Vi bruger transform: scaleX(-1) inline hvis den er flipped
+            const transformStyle = flipped ? "transform: scaleX(-1);" : "";
+            
+            return `
+            <div id="${id}" class="molecule" style="left: ${x}px; top: ${y}px; width: 90px; height: 40px; ${transformStyle}">
+                <svg width="90" height="40">
+                    <line x1="10" y1="20" x2="30" y2="20" stroke="#333" stroke-width="2"/>
+                    <line x1="30" y1="20" x2="50" y2="20" stroke="#333" stroke-width="2"/>
+                    <line x1="50" y1="20" x2="65" y2="20" stroke="#333" stroke-width="2"/>
+                    <line x1="65" y1="20" x2="80" y2="20" stroke="#333" stroke-width="2"/>
+                    
+                    <circle cx="10" cy="20" r="7" class="carbon" />
+                    <circle cx="30" cy="20" r="7" class="carbon" />
+                    <circle cx="50" cy="20" r="7" class="carbon" />
+                    <circle cx="65" cy="20" r="6" class="oxygen" />
+                    <circle cx="80" cy="20" r="5" class="hydrogen" />
+                </svg>
+            </div>`;
+        }
+
+        function createEster(id, x, y) {
+            return `
+            <div id="${id}" class="molecule" style="left: ${x}px; top: ${y}px; width: 160px; height: 50px; opacity: 0;">
+                <svg width="160" height="50">
+                    <line x1="10" y1="30" x2="30" y2="30" stroke="#333" stroke-width="2"/>
+                    <line x1="30" y1="30" x2="50" y2="30" stroke="#333" stroke-width="2"/>
+                    <line x1="50" y1="30" x2="70" y2="30" stroke="#333" stroke-width="2"/>
+                    <line x1="70" y1="30" x2="70" y2="10" stroke="#333" stroke-width="2"/>
+                    <line x1="70" y1="30" x2="85" y2="30" stroke="#333" stroke-width="2"/>
+                    <line x1="85" y1="30" x2="100" y2="30" stroke="#333" stroke-width="2"/>
+                    <line x1="100" y1="30" x2="120" y2="30" stroke="#333" stroke-width="2"/>
+                    <line x1="120" y1="30" x2="140" y2="30" stroke="#333" stroke-width="2"/>
+                    <circle cx="10" cy="30" r="7" class="carbon" />
+                    <circle cx="30" cy="30" r="7" class="carbon" />
+                    <circle cx="50" cy="30" r="7" class="carbon" />
+                    <circle cx="70" cy="30" r="7" class="carbon" />
+                    <circle cx="70" cy="10" r="6" class="oxygen" />
+                    <circle cx="85" cy="30" r="6" class="oxygen" />
+                    <circle cx="100" cy="30" r="7" class="carbon" />
+                    <circle cx="120" cy="30" r="7" class="carbon" />
+                    <circle cx="140" cy="30" r="7" class="carbon" />
+                </svg>
+            </div>`;
+        }
+
+        function createWater(id, x, y) {
+            return `
+            <div id="${id}" class="molecule" style="left: ${x}px; top: ${y}px; width: 40px; height: 30px; opacity: 0;">
+                <svg width="40" height="30">
+                    <line x1="20" y1="15" x2="8" y2="22" stroke="#333" stroke-width="2"/>
+                    <line x1="20" y1="15" x2="32" y2="22" stroke="#333" stroke-width="2"/>
+                    <circle cx="20" cy="15" r="6" class="oxygen" />
+                    <circle cx="8" cy="22" r="5" class="hydrogen" />
+                    <circle cx="32" cy="22" r="5" class="hydrogen" />
+                </svg>
+            </div>`;
+        }
+
+        // --- SIMULATION LOGIK ---
+
+        function init() {
+            moleculeLayer.innerHTML = ""; // Rens container
+
+            // 2 Syrer
+            moleculeLayer.innerHTML += createButanoicAcid('acid1', 40, 40);
+            moleculeLayer.innerHTML += createButanoicAcid('acid2', 40, 130);
+
+            // 4 Alkoholer
+            // VIGTIGT: 'alc1' er nu sat til true i "flipped" parameteren.
+            // Placeringen er justeret til x=160 for at komme tættere på syren.
+            moleculeLayer.innerHTML += createPropanol('alc1', 160, 50, true); 
+            
+            moleculeLayer.innerHTML += createPropanol('alc2', 200, 140, false);
+            moleculeLayer.innerHTML += createPropanol('alc3', 380, 50, false);
+            moleculeLayer.innerHTML += createPropanol('alc4', 380, 140, false);
+
+            // Produkter
+            moleculeLayer.innerHTML += createEster('ester1', 80, 50);
+            moleculeLayer.innerHTML += createWater('water1', 200, 80);
+        }
+
+        // Start første gang
+        init();
+
+        function nextStep() {
+            step++;
+            
+            if (step === 1) {
+                // REAKTION
+                btn.disabled = true;
+                status.textContent = "Kondensation: Syre og alkohol mødes. OH + H fraspaltes som vand.";
+                
+                const acid1 = document.getElementById('acid1');
+                const alc1 = document.getElementById('alc1');
+                
+                // Bevægelse ind mod midten
+                acid1.style.transform = "translate(20px, 0px) scale(0.9)";
+                acid1.style.opacity = "0";
+                
+                // Husk at bibeholde scaleX(-1) på den vendte alkohol når vi flytter den!
+                alc1.style.transform = "translate(-20px, 0px) scaleX(-1) scale(0.9)";
+                alc1.style.opacity = "0";
+
+                setTimeout(() => {
+                    document.getElementById('ester1').style.opacity = "1";
+                    document.getElementById('water1').style.opacity = "1";
+                    status.innerHTML = "Ester og vand er dannet. <br>Læg mærke til at esteren er 'låst' uden OH-grupper.";
+                    btn.textContent = "Tilsæt Vand (Vask 1)";
+                    btn.disabled = false;
+                }, 1000);
+
+            } else if (step === 2) {
+                // VANDVASK
+                status.textContent = "Vand tilsættes. De polære OH-grupper trækker propanol ned i vandet.";
+                waterPhase.style.opacity = "1";
+
+                const moveDown = "translateY(280px)";
+                
+                document.getElementById('alc2').style.transform = moveDown;
+                document.getElementById('alc3').style.transform = moveDown;
+                document.getElementById('alc4').style.transform = moveDown;
+                document.getElementById('water1').style.transform = "translate(0px, 280px)";
+
+                btn.textContent = "Tilsæt Base (OH-)";
+
+            } else if (step === 3) {
+                // BASE
+                status.textContent = "Basen angriber syren. H+ fjernes fra syregruppen.";
+                
+                const hAtom = document.getElementById('acid2-h');
+                hAtom.style.opacity = "0"; 
+                hAtom.style.transform = "translate(15px, -15px)";
+
+                const charge = document.getElementById('acid2-charge');
+                charge.style.opacity = "1";
+                document.getElementById('acid2').style.filter = "drop-shadow(0 0 4px #e74c3c)";
+
+                setTimeout(() => {
+                     btn.textContent = "Udvaskning af Butanoat";
+                }, 800);
+
+            } else if (step === 4) {
+                // FJERNELSE
+                status.textContent = "Butanoat-ionen er nu et polært salt og trækkes ned i vandet.";
+                
+                document.getElementById('acid2').style.transform = "translateY(240px)";
+
+                setTimeout(() => {
+                    status.innerHTML = "<strong>Resultat:</strong> Ren Ester (Propylbutanoat) isoleret i den organiske fase.";
+                    btn.textContent = "Start forfra";
+                    
+                    // Ændre knappen til at kalde reset funktionen i stedet for reload
+                    btn.onclick = resetSimulation;
+                    btn.disabled = false;
+                }, 1500);
+            }
+        }
+
+        function resetSimulation() {
+            // Nulstil tilstand
+            step = 0;
+            
+            // Nulstil tekst og knap
+            status.textContent = "Klar: 2 Butansyre + 4 Propan-1-ol";
+            btn.textContent = "Start Reaktion";
+            btn.onclick = nextStep;
+            
+            // Nulstil faser (CSS)
+            waterPhase.style.opacity = "0";
+            
+            // Nulstil molekyler ved at køre init igen
+            init();
+        }
+    </script>
+</body>
+</html>

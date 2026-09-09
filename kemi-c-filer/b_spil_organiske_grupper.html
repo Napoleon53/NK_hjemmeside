@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kemi Master: Flow Edition</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --text-color: #ffffff;
+            --accent: #00d2d3;
+            --danger: #ff4757;
+        }
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+            user-select: none;
+            touch-action: none;
+        }
+        #gameCanvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        /* UI Overlay */
+        #ui-layer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+            display: flex;
+            gap: 20px;
+            z-index: 5;
+        }
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            padding: 10px 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            text-shadow: 1px 1px 2px black;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        
+        .stat-box.flash {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        /* Screens */
+        .screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(18, 18, 18, 0.96);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            transition: opacity 0.3s;
+        }
+        .hidden { opacity: 0; pointer-events: none; }
+        
+        h1 { font-size: 3rem; margin: 0 0 20px 0; background: linear-gradient(to right, #00d2d3, #5f27cd); -webkit-background-clip: text; color: transparent; text-align: center;}
+        h2 { font-size: 2rem; color: #ff9ff3; margin-top: 0; }
+        p { max-width: 600px; text-align: center; font-size: 1.2rem; line-height: 1.5; color: #c8d6e5; margin-bottom: 30px;}
+        
+        button {
+            padding: 15px 50px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #00d2d3, #54a0ff);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 210, 211, 0.3);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        button:hover { transform: scale(1.05); }
+        button:active { transform: scale(0.95); }
+
+        button.secondary-button {
+            padding: 10px 30px;
+            font-size: 1rem;
+            background: linear-gradient(45deg, #576574, #8395a7);
+            box-shadow: 0 6px 12px rgba(87, 101, 116, 0.3);
+            margin-top: 14px;
+        }
+
+        /* Level Up Toast */
+        #level-up-toast {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: rgba(0,0,0,0.9);
+            border: 2px solid #00d2d3;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            pointer-events: none;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 20;
+        }
+        #level-up-toast.show { transform: translate(-50%, -50%) scale(1); }
+        
+        .new-unlock { color: #ffff00; font-weight: bold; font-size: 1.5em; display: block; margin-top: 10px; }
+        
+        /* Speed indicator for Turbo levels */
+        #turbo-indicator {
+            position: absolute;
+            top: 80px; left: 20px;
+            color: var(--danger);
+            font-weight: bold;
+            font-size: 1.2rem;
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+        }
+        #turbo-indicator.show { opacity: 1; animation: pulse 1s infinite; }
+
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+
+        /* Placerer turboboost- og pause-knapperne lige under deres stat-boks */
+        .stat-box-wrapper {
+            position: relative;
+        }
+
+        .side-action-button {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 10px;
+            z-index: 6;
+            pointer-events: auto;
+            width: 100%;
+            padding: 8px 4px;
+            border-radius: 8px;
+            color: #121212;
+            font-weight: bold;
+            font-size: 0.85rem;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            white-space: nowrap;
+        }
+        /* Uden disse ville den generiske button:hover/:active (der sætter transform: scale(...))
+           overskrive translateX(-50%) og få knappen til at "springe" sidelæns ved klik/hover. */
+        .side-action-button:hover { transform: translateX(-50%) scale(1.05); }
+        .side-action-button:active { transform: translateX(-50%) scale(0.92); }
+        .side-action-button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        #turbo-button {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.45);
+        }
+        #pause-button {
+            background: linear-gradient(45deg, #54a0ff, #00d2d3);
+            box-shadow: 0 4px 10px rgba(84, 160, 255, 0.45);
+        }
+
+        /* Annullér-inhibitor-knap - kun synlig mens inhibitoren er aktiv */
+        #cancel-inhibitor-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 6;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: white;
+            cursor: pointer;
+            background: linear-gradient(45deg, #0abde3, #006ba6);
+            box-shadow: 0 4px 10px rgba(10, 189, 227, 0.45);
+            opacity: 0;
+            transform: scale(0.9);
+            pointer-events: none;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        #cancel-inhibitor-button.show {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+        #cancel-inhibitor-button:hover { transform: scale(1.05); }
+        #cancel-inhibitor-button:active { transform: scale(0.95); }
+
+        /* Pause-overlay - kan kun vises én gang pr. spil */
+        #pause-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(18, 18, 18, 0.92);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 18;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+        #pause-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Individuelle nedtællings-timere for hvert turbo-tryk */
+        #turbo-timers {
+            position: absolute;
+            top: 95px;
+            left: 20px;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            pointer-events: none;
+        }
+        .turbo-timer-chip {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: #121212;
+            font-weight: bold;
+            font-size: 0.9rem;
+            padding: 5px 14px;
+            border-radius: 20px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            width: fit-content;
+        }
+
+        /* Powerup Toast */
+        #powerup-toast {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-15px) scale(0.9);
+            background: rgba(0,0,0,0.85);
+            padding: 12px 30px;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent);
+            text-align: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            z-index: 15;
+        }
+        #powerup-toast.show { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+        #powerup-toast-title { font-weight: bold; font-size: 1.3rem; }
+        #powerup-toast-subtitle { font-size: 0.95rem; color: #c8d6e5; }
+
+        /* Liv-mistet overlay */
+        #life-lost-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0);
+            pointer-events: none;
+            z-index: 12;
+            opacity: 0;
+            transition: opacity 0.15s, background-color 0.15s;
+        }
+        #life-lost-overlay.show {
+            opacity: 1;
+            background: rgba(0,0,0,0.3);
+        }
+        #life-lost-heart {
+            font-size: 8rem;
+            filter: drop-shadow(0 0 20px rgba(255,0,0,0.6));
+        }
+        #life-lost-overlay.show #life-lost-heart {
+            animation: heartPop 1s ease-in forwards;
+        }
+        #life-lost-text {
+            margin-top: 10px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ff6b6b;
+            text-shadow: 1px 1px 4px black;
+            text-align: center;
+            max-width: 80%;
+        }
+        @keyframes heartPop {
+            0% { transform: scale(1.3); opacity: 1; }
+            25% { transform: scale(1.0); opacity: 1; }
+            100% { transform: scale(0.4); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui-layer">
+        <div class="stat-box">SCORE: <span id="score">0</span></div>
+        <div class="stat-box-wrapper">
+            <div class="stat-box">LIV: <span id="lives">❤️❤️❤️</span></div>
+            <button id="turbo-button" class="side-action-button" onclick="game.activateTurbo()">🚀 TURBOBOOST</button>
+        </div>
+        <div class="stat-box-wrapper">
+            <div class="stat-box" id="level-box">LEVEL: <span id="level">1</span></div>
+            <button id="pause-button" class="side-action-button" onclick="game.pauseGame()">⏸ PAUSE</button>
+        </div>
+    </div>
+    <div id="turbo-indicator">⚠️ HASTIGHED ØGET ⚠️</div>
+
+    <div id="turbo-timers"></div>
+    <button id="cancel-inhibitor-button" onclick="game.cancelInhibitor()">❄✖ Fjern inhibitor</button>
+
+    <div id="pause-overlay">
+        <h1 style="font-size: 2.5rem; margin: 0 0 20px;">⏸ PAUSE</h1>
+        <p style="margin-bottom: 20px;">Du starter med 1 pause pr. spil - saml "+1 x pause"-powerups for at få flere.</p>
+        <button onclick="game.resumeGame()">FORTSÆT</button>
+    </div>
+
+    <div id="powerup-toast">
+        <div id="powerup-toast-title">ENZYM AKTIVERET</div>
+        <div id="powerup-toast-subtitle">Skærmen er ryddet!</div>
+    </div>
+
+    <div id="life-lost-overlay">
+        <div id="life-lost-heart">💔</div>
+        <div id="life-lost-text"></div>
+    </div>
+
+    <div id="level-up-toast">
+        <h1 id="level-up-title" style="font-size: 2rem; margin:0;">NY KEMI LÅST OP!</h1>
+        <span id="unlock-text" class="new-unlock">STOFGRUPPE</span>
+        <p id="congrats-secret" style="margin-top:10px; font-size:1rem; color:#c8d6e5;"></p>
+    </div>
+
+    <div id="start-screen" class="screen">
+        <h1>Organisk Sortering</h1>
+        <p>Sorter molekylerne i de rigtige kategorier.</p>
+        <p>Træk molekylerne hen over den rigtige spand, før de når bunden.<br>
+           Rammer et molekyle toppen af den <strong>forkerte</strong> spand, mister du et liv —
+           rammer det den <strong>rigtige</strong> spand, får du point (helt automatisk, hvis det allerede falder rigtigt!).</p>
+        <p>⚡ <strong>Gylden katalysator</strong> og ❄ <strong>blå inhibitor</strong> falder nu og da.
+           Tryk på dem (træk ikke i en spand!) — katalysatoren giver halvt point for alle molekyler på skærmen og rydder den,
+           inhibitoren sænker farten i 7 sekunder.</p>
+        <div style="margin-bottom: 20px;">
+            <label for="player-name" style="display:block; margin-bottom:6px; color:#c8d6e5;">Dit navn (til highscore-listen):</label>
+            <input type="text" id="player-name" maxlength="20" placeholder="Anonym"
+                   style="padding:10px 15px; border-radius:8px; border:none; font-size:1rem; width:220px; text-align:center;">
+        </div>
+        <button onclick="game.start()">START SPIL</button>
+        <button class="secondary-button" onclick="game.showHighscores()">🏆 SE HIGHSCORE</button>
+    </div>
+
+    <div id="game-over-screen" class="screen hidden">
+        <h1>SPILLET ER SLUT</h1>
+        <h2>Din Score: <span id="final-score">0</span></h2>
+        <div id="personal-best" style="margin: 5px 0 20px; font-size:1.1rem; color:#c8d6e5;"></div>
+        <div id="leaderboard-container" style="display:flex; gap:30px; flex-wrap:wrap; justify-content:center; margin: 0 0 20px; max-width: 600px;"></div>
+        <button onclick="game.start()">PRØV IGEN</button>
+        <button class="secondary-button" onclick="game.showStartScreen()">TILBAGE TIL MENU</button>
+    </div>
+
+    <div id="highscore-screen" class="screen hidden">
+        <h1>🏆 Highscore</h1>
+        <div id="highscore-personal" style="margin: 0 0 20px; font-size:1.1rem; color:#c8d6e5;"></div>
+        <div id="highscore-leaderboard" style="display:flex; gap:30px; flex-wrap:wrap; justify-content:center; margin: 0 0 20px; max-width: 600px;"></div>
+        <button class="secondary-button" onclick="game.showStartScreen()">TILBAGE</button>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+<script>
+const CONFIG = {
+    baseSpeed: 70, 
+    spawnRate: 2200,
+    colors: {
+        alkan: '#2ecc71',
+        alkohol: '#3498db',
+        syre: '#e67e22',
+        aromater: '#9b59b6',
+        amin: '#f1c40f',
+        ester: '#e84393',
+        keton: '#d63031',
+        aldehyd: '#ff7675',
+        oxygen: '#ff7675',
+        nitrogen: '#f1c40f'
+    }
+};
+
+// --- HIGHSCORE ---
+// Sæt denne til din Google Apps Script Web App-URL for at aktivere den DELTE highscore-liste
+// (uge + alletiders på tværs af alle elever). Se b_spil_organiske_grupper_HIGHSCORE_SETUP.txt
+// for den fulde Apps Script-kode og en trin-for-trin guide til opsætning.
+// Er den tom ('') vises kun det personlige rekord, som altid gemmes lokalt i browseren.
+const LEADERBOARD_URL = 'https://script.google.com/macros/s/AKfycbzylCaGhhbRI8ogtLSU1s9yJS-k9SboCXgJqMWz7kmgTgdXhjvrZTQJY679Bb2haLQJNQ/exec'; 
+
+const LS_KEYS = {
+    allTime: 'orgSortering_bestAllTime',
+    weeklyScore: 'orgSortering_bestWeekly',
+    weeklyKey: 'orgSortering_weekKey',
+    playerName: 'orgSortering_playerName'
+};
+
+// ISO-ugenummer (år-Wuge), bruges til at nulstille den personlige ugerekord automatisk
+function getWeekKey(date) {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+}
+
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+}
+
+// Manuel turboboost-knap: spilleren kan selv trykke sig til ekstra fart, op til 5 samtidige tryk
+const TURBO_CONFIG = {
+    duration: 15000,     // hvert tryk varer 15 sekunder
+    boostPerPress: 0.25, // +25% fart pr. aktivt tryk - lægges sammen (2 tryk = +50%, 3 tryk = +75%, ...)
+    maxStacks: 5
+};
+
+// Besked knyttet til det n'te samtidige tryk (index 0 = 1. tryk, osv.)
+const TURBO_MESSAGES = [
+    'Turboboost i 15 sekunder!',
+    'Ekstraboost!',
+    'Crazy!',
+    'Spænd sikkerhedsselen!',
+    'Du er ikke rask!'
+];
+
+// Sjældne "hjælpe-molekyler". Tappes (trækkes ikke i spand) for at aktiveres.
+const POWERUP_CONFIG = {
+    minInterval: 25000,   // min. tid mellem powerups (ms)
+    maxInterval: 45000,   // maks. tid mellem powerups
+    firstDelay: 20000,    // ventetid før den allerførste kan spawne
+    slowMoDuration: 7000, // hvor længe inhibitoren sænker farten
+    slowMoFactor: 0.3,    // 0.3 = 30% af normal fart (70% opbremsning)
+    fallSpeed: 55         // fast, moderat faldhastighed uanset level
+};
+
+// --- Procedural kulstof-skelet ---
+// Genererer en zigzag-kæde af n kulstoffer, så vi nemt kan lave flere kædelængder (varians)
+// pr. stofgruppe uden at røre selve tegne-/spilengine (den forstår stadig kun "path" + "groups").
+// Bruges kun til at BYGGE MOLECULE_DEFS herunder - alt andet i spillet er uændret.
+function chainPath(n) {
+    if (n <= 1) return [[0, 0]];
+    const amp = 18;
+    const totalWidth = Math.min(150, 28 * (n - 1)); // loftet holder selv 10-kulstofs-kæder på skærmen
+    const spacing = totalWidth / (n - 1);
+    const startX = -totalWidth / 2;
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+        pts.push([Math.round(startX + i * spacing), i % 2 === 0 ? amp : -amp]);
+    }
+    return pts;
+}
+
+function alkane(n, name) {
+    return { type: 'alkan', name, path: chainPath(n) };
+}
+function alcohol(n, name) {
+    const path = chainPath(n);
+    const last = path[path.length - 1];
+    return { type: 'alkohol', name, path, groups: [{ t: 'OH', x: last[0] + 25, y: last[1] + 25 }] };
+}
+function acid(n, name) {
+    // Carboxylkulstoffet er sp2 (trigonal plan): R-, =O- og -OH-bindingerne roteres derfor
+    // ±120° omkring den faktiske retning tilbage mod kæden, uanset hvordan zigzag'en falder.
+    const path = chainPath(n);
+    const last = path[path.length - 1];
+    const prev = path[path.length - 2] || [last[0] - 25, last[1]];
+    const dx = prev[0] - last[0], dy = prev[1] - last[1];
+    const len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len, uy = dy / len;
+    const bondLen = 25;
+    const rotate = (vx, vy, deg) => {
+        const r = deg * Math.PI / 180;
+        return [vx * Math.cos(r) - vy * Math.sin(r), vx * Math.sin(r) + vy * Math.cos(r)];
+    };
+    const [oDx, oDy] = rotate(ux, uy, 120);
+    const [ohDx, ohDy] = rotate(ux, uy, -120);
+    return { type: 'syre', name, path, groups: [
+        { t: 'O', isCarbonyl: true, x: Math.round(last[0] + oDx * bondLen), y: Math.round(last[1] + oDy * bondLen) },
+        { t: 'OH', x: Math.round(last[0] + ohDx * bondLen), y: Math.round(last[1] + ohDy * bondLen) }
+    ] };
+}
+function amine(n, name) {
+    const path = chainPath(n);
+    const last = path[path.length - 1];
+    return { type: 'amin', name, path, groups: [{ t: 'NH₂', x: last[0] + 25, y: last[1] + 25 }] };
+}
+function aldehyde(n, name) {
+    const path = chainPath(n);
+    const last = path[path.length - 1];
+    return { type: 'aldehyd', name, path, groups: [
+        { t: 'O', isCarbonyl: true, x: last[0], y: last[1] - 25 },
+        { t: 'H', x: last[0] + 25, y: last[1] + 25 }
+    ] };
+}
+function ketone(n, name) {
+    // Carbonylgruppen kan aldrig sidde på et endekulstof - placeres altid på kulstof nr. 2
+    const path = chainPath(n);
+    const c = path[1];
+    return { type: 'keton', name, path, groups: [{ t: 'O', isCarbonyl: true, x: c[0], y: c[1] - 25 }] };
+}
+function ester(acidC, alkylC, acidName, alkylName) {
+    // acidC/alkylC = antal kulstoffer i hhv. syre- og alkoholdelen (carbonylkulstoffet tælles med i acidC)
+    const path = chainPath(acidC + alkylC);
+    const carbonylPt = path[acidC - 1];
+    const bridgePt = path[acidC];
+    const midX = Math.round(carbonylPt[0] + (bridgePt[0] - carbonylPt[0]) * 0.6);
+    const midY = Math.round(carbonylPt[1] + (bridgePt[1] - carbonylPt[1]) * 0.6);
+    return { type: 'ester', name: `${alkylName}${acidName}`, path, groups: [
+        { t: 'O', isCarbonyl: true, x: carbonylPt[0], y: carbonylPt[1] - 25 },
+        { t: 'O', x: midX, y: midY, mid: true }
+    ] };
+}
+function aromatic(name, substituent) {
+    return substituent
+        ? { type: 'aromater', name, shape: 'benzen', groups: [{ t: substituent, x: 0, y: -52 }] }
+        : { type: 'aromater', name, shape: 'benzen' };
+}
+
+// Hver stofgruppe har nu flere kædelængder (op til 10 kulstoffer) for større varians i, hvad der falder ned.
+const MOLECULE_DEFS = [
+    // ALKANER
+    alkane(3, 'Propan'), alkane(4, 'Butan'), alkane(5, 'Pentan'), alkane(7, 'Heptan'), alkane(10, 'Decan'),
+
+    // ALKOHOLER (-OH)
+    alcohol(2, 'Ethanol'), alcohol(3, 'Propan-1-ol'),
+    { type: 'alkohol', name: 'Butan-2-ol', path: [[-30, 20], [0, -20], [30, 20]], groups: [{t:'OH', x:0, y:-42}] },
+    alcohol(6, 'Hexan-1-ol'), alcohol(10, 'Decan-1-ol'),
+
+    // CARBOXYLSYRER (-COOH)
+    acid(2, 'Ethansyre'), acid(3, 'Propansyre'), acid(4, 'Butansyre'), acid(7, 'Heptansyre'), acid(10, 'Decansyre'),
+
+    // AROMATER
+    aromatic('Benzen'), aromatic('Toluen', 'CH₃'), aromatic('Ethylbenzen', 'C₂H₅'),
+    aromatic('Propylbenzen', 'C₃H₇'), aromatic('Butylbenzen', 'C₄H₉'),
+
+    // AMINER (-NH₂)
+    amine(2, 'Ethylamin'), amine(3, 'Propylamin'), amine(4, 'Butylamin'), amine(6, 'Hexylamin'), amine(10, 'Decylamin'),
+
+    // KETONER
+    ketone(3, 'Propanon'), ketone(4, 'Butanon'), ketone(6, 'Hexan-2-on'), ketone(10, 'Decan-2-on'),
+
+    // ALDEHYDER
+    aldehyde(2, 'Ethanal'), aldehyde(3, 'Propanal'), aldehyde(5, 'Pentanal'), aldehyde(8, 'Octanal'), aldehyde(10, 'Decanal'),
+
+    // ESTERE
+    ester(2, 1, 'Ethanoat', 'Methyl'), ester(2, 2, 'Ethanoat', 'Ethyl'), ester(2, 3, 'Ethanoat', 'Propyl'),
+    ester(3, 4, 'Propanoat', 'Butyl'), ester(5, 5, 'Pentanoat', 'Pentyl')
+];
+
+// 'seamless: true' betyder at spillet IKKE stopper, men bare øger level-tal og hastighed
+// Point pr. korrekt sortering er FAST 100 hele spillet igennem (skalerer ikke med level).
+// 'threshold' er derfor bare (antal rigtige krævet for at nå hertil) * 100 - se de påkrævede
+// antal rigtige pr. level i kommentaren ved hvert niveau, så progressionen er let at følge.
+const LEVELS = [
+    { threshold: 0, speedMod: 1.1, points: 100, types: ['alkan', 'alkohol', 'syre'], seamless: false },                                          // level 1: 10 rigtige (samme fart som level 2)
+    { threshold: 1000, speedMod: 1.1, points: 100, types: ['alkan', 'alkohol', 'syre', 'aromater'], unlock: 'AROMATER', seamless: false },        // level 2: 15 rigtige
+    { threshold: 2500, speedMod: 1.2, points: 100, types: ['alkohol', 'syre', 'aromater', 'amin'], unlock: 'AMINER', seamless: false },           // level 3: 20 rigtige
+    { threshold: 4500, speedMod: 1.3, points: 100, types: ['syre', 'amin', 'keton', 'aldehyd'], unlock: 'CARBONYLER', seamless: false },          // level 4: 25 rigtige
+    { threshold: 7000, speedMod: 1.4, points: 100, types: ['keton', 'aldehyd', 'ester', 'amin', 'aromater'], unlock: 'ESTERE', seamless: false }, // level 5: 30 rigtige
+
+    // TURBO Levels (Seamless) - fortsætter samme +5-mønster: 35, 40, 45, 50, 55 rigtige pr. niveau.
+    { threshold: 10000, speedMod: 1.55, points: 100, types: ['keton', 'aldehyd', 'ester', 'amin', 'aromater'], seamless: true },
+    { threshold: 13500, speedMod: 1.70, points: 100, types: ['keton', 'aldehyd', 'ester', 'amin', 'aromater'], seamless: true },
+    { threshold: 17500, speedMod: 1.85, points: 100, types: ['keton', 'aldehyd', 'ester', 'amin', 'aromater'], seamless: true },
+    { threshold: 22000, speedMod: 2.00, points: 100, types: ['keton', 'aldehyd', 'ester', 'amin', 'aromater'], seamless: true },
+    { threshold: 27000, speedMod: 2.15, points: 100, types: ['keton', 'aldehyd', 'ester', 'amin', 'aromater'], seamless: true },
+];
+
+// Ved denne score vises en tillykke-fejring, men spillet fortsætter uendeligt derefter.
+// Enhver score - stor som lille - sendes til highscorelisten (se submitAndShowLeaderboard).
+// 40 rigtige oveni de 100, der kræves for at klare level 1-5 (10+15+20+25+30=100) -> (100+40)*100
+const CONGRATS_SCORE = 14000;
+// Hvor mange point der skal til pr. 10%-stigning i spawn-hyppighed efter CONGRATS_SCORE (10 rigtige)
+const ENDLESS_FREQ_STEP = 1000;
+
+class Game {
+    constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.molecules = [];
+        this.buckets = [];
+        this.particles = [];
+        this.input = { x: 0, y: 0, active: false };
+        this.loop = this.loop.bind(this);
+
+        this.turboStacks = [];
+        this.pauseCharges = 1;
+
+        this.resize();
+        this.setupInput();
+        this.setupNameInput();
+        this.loadPersonalBests();
+        this.updatePauseButtonUI();
+        this.updateInhibitorButtonUI();
+        window.addEventListener('resize', () => this.resize());
+
+        this.lastTime = performance.now();
+        requestAnimationFrame(this.loop);
+    }
+
+    // --- HIGHSCORE: personligt rekord (lokalt i browseren) ---
+
+    setupNameInput() {
+        const input = document.getElementById('player-name');
+        const stored = localStorage.getItem(LS_KEYS.playerName);
+        if (stored) input.value = stored;
+        input.addEventListener('input', () => {
+            localStorage.setItem(LS_KEYS.playerName, input.value.trim().substring(0, 20));
+        });
+    }
+
+    loadPersonalBests() {
+        this.bestAllTime = Number(localStorage.getItem(LS_KEYS.allTime)) || 0;
+
+        const storedWeekKey = localStorage.getItem(LS_KEYS.weeklyKey);
+        const currentWeekKey = getWeekKey(new Date());
+        if (storedWeekKey !== currentWeekKey) {
+            localStorage.setItem(LS_KEYS.weeklyKey, currentWeekKey);
+            localStorage.setItem(LS_KEYS.weeklyScore, '0');
+        }
+        this.bestWeekly = Number(localStorage.getItem(LS_KEYS.weeklyScore)) || 0;
+    }
+
+    updatePersonalBests(finalScore) {
+        let newAllTime = false, newWeekly = false;
+        if (finalScore > this.bestAllTime) {
+            this.bestAllTime = finalScore;
+            localStorage.setItem(LS_KEYS.allTime, String(finalScore));
+            newAllTime = true;
+        }
+        if (finalScore > this.bestWeekly) {
+            this.bestWeekly = finalScore;
+            localStorage.setItem(LS_KEYS.weeklyScore, String(finalScore));
+            newWeekly = true;
+        }
+        return { newAllTime, newWeekly };
+    }
+
+    renderPersonalBests(newAllTime, newWeekly) {
+        const el = document.getElementById('personal-best');
+        el.innerHTML = `
+            Din bedste denne uge: <strong>${this.bestWeekly}</strong> ${newWeekly ? '🏆 NYT REKORD!' : ''}<br>
+            Din bedste nogensinde: <strong>${this.bestAllTime}</strong> ${newAllTime ? '🏆 NYT REKORD!' : ''}
+        `;
+    }
+
+    // --- HIGHSCORE: delt liste (kun aktiv hvis LEADERBOARD_URL er sat, se toppen af filen) ---
+
+    async submitAndShowLeaderboard(finalScore) {
+        const container = document.getElementById('leaderboard-container');
+        container.innerHTML = '';
+        if (!LEADERBOARD_URL) return;
+
+        const name = (localStorage.getItem(LS_KEYS.playerName) || 'Anonym').trim().substring(0, 20) || 'Anonym';
+
+        // Enhver score indsendes nu - man kan komme på highscorelisten uanset hvor lav
+        // ens score er, så længe man er blandt top 10 den pågældende uge (eller alletiders).
+        if (finalScore > 0) {
+            // Content-Type udelades bevidst så requesten forbliver en "simple request" uden CORS-preflight,
+            // som Apps Script Web Apps ikke håndterer korrekt.
+            fetch(LEADERBOARD_URL, { method: 'POST', body: JSON.stringify({ name, score: finalScore }) }).catch(() => {});
+        }
+
+        try {
+            const res = await fetch(LEADERBOARD_URL);
+            const data = await res.json();
+            container.innerHTML =
+                this.renderLeaderboardHTML('🗓️ Top 10 (denne uge)', data.weekly) +
+                this.renderLeaderboardHTML('🏆 Top 10 (alletiders)', data.allTime);
+        } catch (e) {
+            container.innerHTML = '';
+        }
+    }
+
+    renderLeaderboardHTML(title, list) {
+        if (!list || !list.length) return '';
+        const rows = list.map((entry, i) =>
+            `<li>${i + 1}. ${escapeHtml(entry.name)} — ${Math.floor(entry.score)}</li>`
+        ).join('');
+        return `<div style="text-align:left;">
+            <h3 style="margin:0 0 8px; color:#00d2d3;">${title}</h3>
+            <ul style="margin:0; padding:0; list-style:none; color:#c8d6e5;">${rows}</ul>
+        </div>`;
+    }
+
+    // --- HIGHSCORE: fritstående visning, tilgængelig fra startmenuen og Game Over-skærmen ---
+
+    showStartScreen() {
+        document.getElementById('game-over-screen').classList.add('hidden');
+        document.getElementById('highscore-screen').classList.add('hidden');
+        document.getElementById('start-screen').classList.remove('hidden');
+    }
+
+    showHighscores() {
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('game-over-screen').classList.add('hidden');
+        document.getElementById('highscore-screen').classList.remove('hidden');
+        this.renderHighscoreScreen();
+    }
+
+    async renderHighscoreScreen() {
+        // Personlige rekorder kan altid ses her, uanset om de nåede CONGRATS_SCORE i sidste spil.
+        document.getElementById('highscore-personal').innerHTML = `
+            Din bedste denne uge: <strong>${this.bestWeekly}</strong><br>
+            Din bedste nogensinde: <strong>${this.bestAllTime}</strong>
+        `;
+
+        const container = document.getElementById('highscore-leaderboard');
+        if (!LEADERBOARD_URL) {
+            container.innerHTML = '';
+            return;
+        }
+
+        container.innerHTML = '<p style="color:#c8d6e5;">Henter highscoreliste…</p>';
+        try {
+            const res = await fetch(LEADERBOARD_URL);
+            const data = await res.json();
+            container.innerHTML =
+                this.renderLeaderboardHTML('🗓️ Top 10 (denne uge)', data.weekly) +
+                this.renderLeaderboardHTML('🏆 Top 10 (alletiders)', data.allTime);
+        } catch (e) {
+            container.innerHTML = '';
+        }
+    }
+
+    resize() {
+        // "this.W / this.H" er spillets låste, zoom-uafhængige spillelogik-koordinater.
+        // devicePixelRatio ændrer sig proportionalt med browser-zoom, så ved at sammenligne
+        // med den dPR vi startede med, kan vi regne zoom ud af ligningen og holde banen
+        // konstant uanset zoomniveau - uden at kræve at spilleren selv finder "rette" zoom.
+        const dpr = window.devicePixelRatio || 1;
+        if (!this.baselineDPR) this.baselineDPR = dpr;
+        const zoomRatio = dpr / this.baselineDPR;
+
+        const MIN_W = 340, MAX_W = 1400;
+        const MIN_H = 520, MAX_H = 900;
+        const effectiveW = window.innerWidth * zoomRatio;
+        const effectiveH = window.innerHeight * zoomRatio;
+        this.W = Math.min(MAX_W, Math.max(MIN_W, effectiveW));
+        this.H = Math.min(MAX_H, Math.max(MIN_H, effectiveH));
+
+        // Canvas-bufferen sættes til den fysiske pixel-tæthed for skarp tekst/grafik,
+        // mens al spillogik ovenfor forbliver låst til this.W / this.H.
+        this.canvas.width = Math.round(window.innerWidth * dpr);
+        this.canvas.height = Math.round(window.innerHeight * dpr);
+
+        if (this.buckets && this.buckets.length > 0) this.updateBuckets();
+    }
+
+    setupInput() {
+        const handler = (e) => {
+            if(e.type === 'touchmove') e.preventDefault();
+            // Ved touchend er e.touches tom (fingeren er løftet) - brug changedTouches der
+            const t = (e.changedTouches && e.changedTouches[0]) || (e.touches && e.touches[0]) || e;
+            // Konverter fra CSS/viewport-koordinater til spillets låste koordinatsystem
+            const rect = this.canvas.getBoundingClientRect();
+            const scaleX = this.W / rect.width;
+            const scaleY = this.H / rect.height;
+            this.input.x = (t.clientX - rect.left) * scaleX;
+            this.input.y = (t.clientY - rect.top) * scaleY;
+
+            if (e.type === 'mousedown' || e.type === 'touchstart') {
+                this.input.active = true;
+                this.checkDragStart();
+            } else if (e.type === 'mouseup' || e.type === 'touchend') {
+                this.input.active = false;
+                this.checkDragEnd();
+            }
+        };
+        ['mousedown', 'mousemove', 'mouseup', 'touchstart', 'touchmove', 'touchend'].forEach(evt => 
+            this.canvas.addEventListener(evt, handler, {passive: false})
+        );
+    }
+
+    start() {
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('game-over-screen').classList.add('hidden');
+        document.getElementById('highscore-screen').classList.add('hidden');
+
+        this.score = 0;
+        this.lives = 3;
+        this.levelIndex = 0;
+        this.molecules = [];
+        this.particles = [];
+        this.state = 'PLAYING';
+        this.draggedMol = null;
+        this.levelStartTime = performance.now();
+        this.updateUI();
+        this.setBucketsForLevel();
+        this.spawnTimer = CONFIG.spawnRate + 500;
+        this.lastTime = performance.now();
+
+        this.powerupTimer = 0;
+        this.nextPowerupTime = POWERUP_CONFIG.firstDelay;
+        this.slowMoActive = false;
+        this.slowMoEndTime = 0;
+        this.updateInhibitorButtonUI();
+
+        this.congratsShown = false;
+
+        this.turboStacks = [];
+        this.updateTurboUI();
+
+        this.pauseCharges = 1;
+        this.updatePauseButtonUI();
+        document.getElementById('pause-overlay').classList.remove('show');
+
+        this.pendingGameOver = false;
+        this.lifeLossEndTime = 0;
+        document.getElementById('life-lost-overlay').classList.remove('show');
+    }
+
+    setBucketsForLevel() {
+        const lvlCfg = LEVELS[this.levelIndex];
+        this.buckets = lvlCfg.types.map(type => ({
+            type: type,
+            label: type.toUpperCase(),
+            color: CONFIG.colors[type],
+            pulse: 0
+        }));
+        this.updateBuckets();
+    }
+
+    updateBuckets() {
+        if (!this.buckets.length) return;
+        const width = this.W / this.buckets.length;
+        this.buckets.forEach((b, i) => {
+            b.x = i * width;
+            b.width = width;
+            b.y = this.H - 120;
+            b.height = 120;
+        });
+    }
+
+    // Returnerer true hvis molecules-arrayet blev nulstillet (fejring eller nyt kemisk niveau) -
+    // kaldere der selv står midt i en iteration over this.molecules SKAL stoppe i så fald.
+    checkLevelUp() {
+        let boardCleared = false;
+
+        // Milepæl ved CONGRATS_SCORE: fejring, men spillet fortsætter (uendelig highscore-tilstand)
+        if (!this.congratsShown && this.score >= CONGRATS_SCORE) {
+            this.congratsShown = true;
+            this.showCongrats();
+            boardCleared = true;
+        }
+
+        // while (ikke if): et scoring-hop kan sagtens springe flere niveauers threshold over på
+        // én gang (fx enzym-katalysatoren, der rydder mange molekyler på skærmen samtidig) -
+        // uden while ville levelIndex/spandene hænge bagefter den faktiske score, og et molekyle
+        // af en type fra det "overspringte" niveau kunne nå at falde uden nogen spand kunne tage imod det.
+        let nextLevel = LEVELS[this.levelIndex + 1];
+        while (nextLevel && this.score >= nextLevel.threshold) {
+            this.levelIndex++;
+            this.levelStartTime = performance.now();
+            // Spandene SKAL opdateres ved hvert niveauskift, også seamless turbo-runder - de
+            // roterer jo også hvilke stofgrupper der er aktive. Ellers blev de gamle spande stående,
+            // selvom nye stofgrupper (uden spand) allerede begyndte at dumpe ned (den rapporterede fejl).
+            this.setBucketsForLevel();
+
+            // Hvis seamless (Turbo runde): Opdater kun UI og logik, ingen pause
+            if (nextLevel.seamless) {
+                const lvlBox = document.getElementById('level-box');
+                lvlBox.classList.add('flash');
+                setTimeout(() => lvlBox.classList.remove('flash'), 500);
+
+                // Vis kort "Speed Up" advarsel
+                const turbo = document.getElementById('turbo-indicator');
+                turbo.classList.add('show');
+                setTimeout(() => turbo.classList.remove('show'), 2000);
+            }
+            // Hvis det er et Nyt Kemisk Niveau: Pause og vis Toast
+            else {
+                const toast = document.getElementById('level-up-toast');
+                document.getElementById('level-up-title').innerText = 'NY KEMI LÅST OP!';
+                document.getElementById('unlock-text').innerText = nextLevel.unlock;
+                document.getElementById('congrats-secret').innerText = '';
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3500);
+                this.molecules.forEach(m => this.createExplosion(m.x, m.y, '#fff'));
+                this.molecules = [];
+                boardCleared = true;
+            }
+            nextLevel = LEVELS[this.levelIndex + 1];
+        }
+        return boardCleared;
+    }
+
+    // Fejring ved CONGRATS_SCORE - rydder skærmen og viser en tillykke-besked,
+    // men ændrer IKKE spiltilstanden: spillet fortsætter med det samme for highscore-jagt.
+    showCongrats() {
+        this.molecules.forEach(m => this.createExplosion(m.x, m.y, '#fff'));
+        this.molecules = [];
+
+        // Fyrværkeri effekt
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => {
+                this.createExplosion(
+                    Math.random() * this.W,
+                    Math.random() * this.H,
+                    `hsl(${Math.random()*360}, 100%, 50%)`
+                );
+            }, i * 100);
+        }
+
+        const toast = document.getElementById('level-up-toast');
+        document.getElementById('level-up-title').innerText = 'TILLYKKE! 🎉';
+        document.getElementById('unlock-text').innerText = `${CONGRATS_SCORE.toLocaleString('da-DK')} POINT! Spil videre for highscore!`;
+        document.getElementById('congrats-secret').innerText = 'Du er hermed officielt kåret til Stofgruppemester.';
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+
+    spawnMolecule() {
+        const currentLevelDef = LEVELS[this.levelIndex];
+        const activeTypes = currentLevelDef.types;
+        const possibleMolecules = MOLECULE_DEFS.filter(m => activeTypes.includes(m.type));
+        if (possibleMolecules.length === 0) return;
+        
+        const template = possibleMolecules[Math.floor(Math.random() * possibleMolecules.length)];
+        
+        const timeSinceLevelStart = (performance.now() - this.levelStartTime) / 1000;
+
+        // Mindre ramp-up på seamless levels for at holde presset - UNDTAGEN det første turbo-niveau
+        // (level 6), som i stedet skal ramme jævnt op i løbet af hele niveauet, så farten ikke
+        // pludselig føles høj lige når man forlader level 5.
+        const isFirstTurboLevel = this.levelIndex === 5;
+        const rampDuration = isFirstTurboLevel ? 25 : (currentLevelDef.seamless ? 2 : 10);
+        const rampUpFactor = Math.min(1, timeSinceLevelStart / rampDuration);
+        
+        const speedMultiplier = currentLevelDef.speedMod;
+        const targetSpeed = CONFIG.baseSpeed * speedMultiplier;
+        
+        const currentSpeed = targetSpeed * (0.6 + (0.4 * rampUpFactor));
+        
+        // Vis kun hjælpelinjer på de "svære" levels, ikke turbo
+        const showHint = !currentLevelDef.seamless && timeSinceLevelStart < 6 && this.levelIndex > 0; 
+
+        this.molecules.push({
+            ...template,
+            x: Math.random() * (this.W - 100) + 50,
+            y: -70,
+            vx: (Math.random() - 0.5) * 20,
+            vy: currentSpeed * (Math.random() * 0.4 + 0.8),
+            angle: (Math.random() - 0.5) * 0.5,
+            rotation: 0,
+            isDragging: false,
+            showHint: showHint
+        });
+    }
+
+    spawnPowerup() {
+        // Inhibitoren giver kun mening når der rent faktisk er noget at bremse for
+        const activeMolecules = this.molecules.filter(m => !m.isPowerup).length;
+        let kind;
+        if (activeMolecules >= 2 && Math.random() < 0.8) {
+            kind = 'inhibitor';
+        } else if (Math.random() < 0.2) {
+            kind = 'pause'; // sjælden - giver +1 x pause
+        } else {
+            kind = 'enzyme';
+        }
+        this.molecules.push({
+            isPowerup: true,
+            powerupType: kind,
+            x: Math.random() * (this.W - 100) + 50,
+            y: -70,
+            vx: 0,
+            vy: POWERUP_CONFIG.fallSpeed,
+            angle: (Math.random() - 0.5) * 0.3,
+            rotation: 0,
+            pulse: Math.random() * Math.PI * 2
+        });
+    }
+
+    activatePowerup(m) {
+        if (m.powerupType === 'enzyme') {
+            // Katalysatoren giver kun halvt point pr. molekyle ift. normal sortering
+            const perMoleculePoints = Math.round(this.getBasePoints() * 0.5);
+            let cleared = 0;
+            this.molecules.forEach(mol => {
+                if (!mol.isPowerup) {
+                    this.createExplosion(mol.x, mol.y, '#ffd700');
+                    cleared++;
+                }
+            });
+            this.score += perMoleculePoints * cleared;
+            this.molecules = this.molecules.filter(mol => mol.isPowerup);
+            this.showPowerupToast('⚡ ENZYM AKTIVERET', `Alle molekyler gav halvt point! (+${perMoleculePoints * cleared})`, '#ffd700');
+            this.checkLevelUp();
+            this.updateUI();
+        } else if (m.powerupType === 'pause') {
+            this.pauseCharges++;
+            this.updatePauseButtonUI();
+            this.createExplosion(m.x, m.y, '#54a0ff');
+            this.showPowerupToast('⏸ +1 x PAUSE!', `Du har nu ${this.pauseCharges} pause(r) til rådighed.`, '#54a0ff');
+        } else {
+            this.slowMoActive = true;
+            this.slowMoEndTime = performance.now() + POWERUP_CONFIG.slowMoDuration;
+            this.updateInhibitorButtonUI();
+            this.createExplosion(m.x, m.y, '#00d2d3');
+            const seconds = POWERUP_CONFIG.slowMoDuration / 1000;
+            this.showPowerupToast('❄ INHIBITOR AKTIVERET', `Farten er sænket i ${seconds} sekunder!`, '#00d2d3');
+        }
+    }
+
+    // --- Annullér-inhibitor-knap (kun synlig mens inhibitoren er aktiv) ---
+
+    updateInhibitorButtonUI() {
+        document.getElementById('cancel-inhibitor-button').classList.toggle('show', !!this.slowMoActive);
+    }
+
+    cancelInhibitor() {
+        if (!this.slowMoActive) return;
+        this.slowMoActive = false;
+        this.updateInhibitorButtonUI();
+        this.showPowerupToast('✅ INHIBITOR ANNULLERET', 'Farten er tilbage til normal.', '#00d2d3');
+    }
+
+    showPowerupToast(title, subtitle, color) {
+        const toast = document.getElementById('powerup-toast');
+        document.getElementById('powerup-toast-title').innerText = title;
+        document.getElementById('powerup-toast-subtitle').innerText = subtitle;
+        toast.style.borderLeftColor = color;
+        toast.classList.add('show');
+        clearTimeout(this._powerupToastTimer);
+        this._powerupToastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    // --- Manuel turboboost-knap ---
+
+    activateTurbo() {
+        if (this.state !== 'PLAYING') return;
+        if (this.turboStacks.length >= TURBO_CONFIG.maxStacks) return;
+
+        this.turboStacks.push({ endTime: performance.now() + TURBO_CONFIG.duration });
+        this.updateTurboUI();
+
+        const message = TURBO_MESSAGES[this.turboStacks.length - 1];
+        this.showPowerupToast(message, `${this.turboStacks.length}/${TURBO_CONFIG.maxStacks} boosts aktive`, '#ff6b6b');
+    }
+
+    getTurboSpeedMultiplier() {
+        return 1 + this.turboStacks.length * TURBO_CONFIG.boostPerPress;
+    }
+
+    // Fjerner udløbne tryk og opdaterer knap + venstre-hjørne-timere
+    updateTurboUI() {
+        const now = performance.now();
+        this.turboStacks = this.turboStacks.filter(t => t.endTime > now);
+
+        const timersEl = document.getElementById('turbo-timers');
+        timersEl.innerHTML = this.turboStacks
+            .map(t => `<div class="turbo-timer-chip">🚀 ${Math.max(0, Math.ceil((t.endTime - now) / 1000))}s</div>`)
+            .join('');
+
+        const btn = document.getElementById('turbo-button');
+        btn.disabled = this.turboStacks.length >= TURBO_CONFIG.maxStacks;
+    }
+
+    // --- Pauseknap (starter med 1 x pause pr. spil - flere kan optjenes via "+1 x pause"-powerup) ---
+
+    updatePauseButtonUI() {
+        const btn = document.getElementById('pause-button');
+        btn.innerText = `⏸ ${this.pauseCharges} x PAUSE`;
+        btn.disabled = this.pauseCharges <= 0;
+    }
+
+    pauseGame() {
+        if (this.pauseCharges <= 0 || this.state !== 'PLAYING') return;
+        this.pauseCharges--;
+        this.updatePauseButtonUI();
+        this.pauseStartTime = performance.now();
+        this.state = 'PAUSED';
+        document.getElementById('pause-overlay').classList.add('show');
+    }
+
+    resumeGame() {
+        if (this.state !== 'PAUSED') return;
+        // Skub aktive timede effekter (inhibitor, turboboost) frem med pausens varighed,
+        // så de ikke stille og roligt udløber mens spillet står stille.
+        const pausedDuration = performance.now() - this.pauseStartTime;
+        this.slowMoEndTime += pausedDuration;
+        this.turboStacks.forEach(t => t.endTime += pausedDuration);
+
+        this.lastTime = performance.now();
+        this.state = 'PLAYING';
+        document.getElementById('pause-overlay').classList.remove('show');
+    }
+
+    checkDragStart() {
+        if (this.state !== 'PLAYING') return;
+
+        // Powerups tegnes altid forrest (se loop()) - så de skal også altid vinde hit-testen,
+        // selv hvis de visuelt overlapper et almindeligt molekyle.
+        for (let i = this.molecules.length - 1; i >= 0; i--) {
+            const m = this.molecules[i];
+            if (!m.isPowerup) continue;
+            const dist = Math.hypot(this.input.x - m.x, this.input.y - m.y);
+            if (dist < 60) {
+                this.molecules.splice(i, 1);
+                this.activatePowerup(m);
+                return;
+            }
+        }
+
+        for (let i = this.molecules.length - 1; i >= 0; i--) {
+            const m = this.molecules[i];
+            if (m.isPowerup) continue;
+            const dist = Math.hypot(this.input.x - m.x, this.input.y - m.y);
+            if (dist < 60) {
+                this.draggedMol = m;
+                m.isDragging = true;
+                return;
+            }
+        }
+    }
+
+    checkDragEnd() {
+        if (!this.draggedMol) return;
+        // Slipper man molekylet uden at det har ramt en spandtop endnu, falder det
+        // bare videre fra slippestedet - selve afgørelsen sker i kollisionstjekket i loop().
+        this.draggedMol.isDragging = false;
+        this.draggedMol = null;
+    }
+
+    handleFail(m, info) {
+        if (this.state !== 'PLAYING') return; // undgå dobbelt-udløsning mens der allerede er pause
+        info = info || { reason: 'missed' };
+
+        this.lives--;
+        this.pendingGameOver = this.lives <= 0;
+
+        // Gør molekylet synligt og markér det til rødt blink i pausen
+        if (m.y > this.H - 80) m.y = this.H - 80;
+        m.isFailBlink = true;
+        m.failBlinkStart = performance.now();
+
+        const typeLabel = (m.type || '').toUpperCase();
+        const text = info.reason === 'wrong'
+            ? `${m.name} er en ${typeLabel} — ikke ${(info.attempted || '').toUpperCase()}!`
+            : `Du nåede ikke: ${m.name} er en ${typeLabel}!`;
+
+        const overlay = document.getElementById('life-lost-overlay');
+        document.getElementById('life-lost-text').innerText = text;
+        overlay.classList.remove('show');
+        void overlay.offsetWidth; // force reflow, så animationen kan genstartes
+        overlay.classList.add('show');
+
+        this.createExplosion(m.x, m.y, '#ff0000');
+
+        // Spillet sættes på pause i 3 sekunder, mens molekylet blinker og hjertet forsvinder
+        this.state = 'LIFE_LOST';
+        this.lifeLossEndTime = performance.now() + 3000;
+
+        this.updateUI();
+    }
+
+    createExplosion(x, y, color) {
+        for(let i=0; i<15; i++) {
+            this.particles.push({
+                x, y, color,
+                vx: (Math.random() - 0.5) * 15,
+                vy: (Math.random() - 0.5) * 15,
+                life: 1.0
+            });
+        }
+    }
+
+    getBasePoints() {
+        return LEVELS[this.levelIndex].points;
+    }
+
+    updateUI() {
+        document.getElementById('score').innerText = Math.floor(this.score);
+        document.getElementById('lives').innerText = '❤️'.repeat(Math.max(0, this.lives));
+        document.getElementById('level').innerText = this.levelIndex + 1;
+    }
+
+    drawMolecule(ctx, m) {
+        ctx.save();
+        ctx.translate(m.x, m.y);
+        ctx.rotate(m.rotation);
+
+        let blinkOn = false;
+        if (m.isFailBlink) {
+            const elapsed = performance.now() - m.failBlinkStart;
+            blinkOn = Math.floor(elapsed / 150) % 2 === 0;
+            if (blinkOn) {
+                ctx.save();
+                ctx.beginPath(); ctx.arc(0, 0, 48, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 71, 87, 0.35)';
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        if (m.isDragging) {
+            ctx.shadowColor = 'white'; ctx.shadowBlur = 15; ctx.scale(1.1, 1.1);
+        }
+
+        ctx.strokeStyle = blinkOn ? '#ff4757' : 'white';
+        ctx.lineWidth = 3;
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.fillStyle = blinkOn ? '#ff4757' : 'white';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+
+        // 1. Tegn Skelet
+        ctx.beginPath();
+        if (m.shape === 'benzen') {
+            for (let i = 0; i < 6; i++) {
+                const a = (i * 60 - 30) * Math.PI / 180; const r = 30;
+                const px = Math.cos(a) * r; const py = Math.sin(a) * r;
+                i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+            }
+            ctx.closePath(); ctx.stroke();
+            ctx.beginPath(); ctx.arc(0, 0, 15, 0, Math.PI*2); ctx.stroke();
+        } else if (m.path) {
+            ctx.moveTo(m.path[0][0], m.path[0][1]);
+            for(let i=1; i<m.path.length; i++) ctx.lineTo(m.path[i][0], m.path[i][1]);
+            ctx.stroke();
+        }
+
+        // 2. Tegn Grupper
+        if (m.groups) {
+            m.groups.forEach(g => {
+                ctx.save();
+                let color = 'white';
+                if(g.t.includes('O')) color = CONFIG.colors.oxygen;
+                else if (g.t.includes('N')) color = CONFIG.colors.nitrogen;
+                ctx.fillStyle = color;
+
+                let nearestP = [0,0]; 
+                if (m.path) {
+                    let minD = 10000;
+                    m.path.forEach(p => {
+                        const d = Math.hypot(p[0] - g.x, p[1] - g.y);
+                        if(d < minD) { minD = d; nearestP = p; }
+                    });
+                } else if (m.shape === 'benzen') {
+                    let minD = 10000;
+                    for (let i = 0; i < 6; i++) {
+                        const a = (i * 60 - 30) * Math.PI / 180; 
+                        const px = Math.cos(a) * 30; const py = Math.sin(a) * 30;
+                        const d = Math.hypot(px - g.x, py - g.y);
+                        if(d < minD) { minD = d; nearestP = [px, py]; }
+                    }
+                }
+
+                if (g.isCarbonyl && m.path) {
+                    // Beregnes ud fra den faktiske bindingsretning (ikke kun lodret), så dobbeltbindingen
+                    // tegnes korrekt parallelt, uanset hvilken vinkel carbonylgruppen sidder i.
+                    const bdx = g.x - nearestP[0], bdy = g.y - nearestP[1];
+                    const blen = Math.hypot(bdx, bdy) || 1;
+                    const ux = bdx / blen, uy = bdy / blen;
+                    const nx = -uy, ny = ux;
+                    const off = 2, shorten = 5;
+                    const endX = g.x - ux * shorten, endY = g.y - uy * shorten;
+                    ctx.strokeStyle = color; ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(nearestP[0] + nx*off, nearestP[1] + ny*off); ctx.lineTo(endX + nx*off, endY + ny*off);
+                    ctx.moveTo(nearestP[0] - nx*off, nearestP[1] - ny*off); ctx.lineTo(endX - nx*off, endY - ny*off);
+                    ctx.stroke();
+                } else if (!g.mid) {
+                    const dx = g.x - nearestP[0];
+                    const dy = g.y - nearestP[1];
+                    const dist = Math.hypot(dx, dy);
+                    const stopDist = Math.max(0, dist - 12);
+                    const angle = Math.atan2(dy, dx);
+                    
+                    const endX = nearestP[0] + Math.cos(angle) * stopDist;
+                    const endY = nearestP[1] + Math.sin(angle) * stopDist;
+
+                    ctx.strokeStyle = color; ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(nearestP[0], nearestP[1]);
+                    ctx.lineTo(endX, endY);
+                    ctx.stroke();
+                }
+
+                if (g.mid) {
+                    ctx.save(); ctx.fillStyle = '#121212'; 
+                    ctx.beginPath(); ctx.arc(g.x, g.y, 8, 0, Math.PI*2); ctx.fill(); ctx.restore();
+                }
+
+                ctx.fillText(g.t, g.x, g.y);
+                ctx.restore();
+            });
+        }
+        ctx.restore();
+
+        // Ghost Hint (Kun på ikke-turbo levels)
+        if (m.showHint && !m.isDragging) {
+            const targetBucket = this.buckets.find(b => b.type === m.type);
+            if (targetBucket) {
+                ctx.save();
+                ctx.globalAlpha = 0.3;
+                ctx.strokeStyle = targetBucket.color;
+                ctx.setLineDash([5, 10]);
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(m.x, m.y);
+                ctx.lineTo(targetBucket.x + targetBucket.width/2, this.H - 100);
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+    }
+
+    drawPowerup(ctx, m) {
+        ctx.save();
+        ctx.translate(m.x, m.y);
+        m.pulse += 0.08;
+        const pulseScale = 1 + Math.sin(m.pulse) * 0.08;
+        ctx.rotate(m.rotation);
+        ctx.scale(pulseScale, pulseScale);
+
+        const isEnzyme = m.powerupType === 'enzyme';
+        const isPause = m.powerupType === 'pause';
+        const color = isEnzyme ? '#ffd700' : isPause ? '#54a0ff' : '#00d2d3';
+
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 25;
+        ctx.fillStyle = color;
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 3;
+
+        ctx.beginPath();
+        if (isEnzyme) {
+            // Pac-man-agtig cirkel med et "hak" = enzymets aktive site
+            const mouthAngle = 0.35 * Math.PI;
+            ctx.moveTo(0, 0);
+            ctx.arc(0, 0, 32, mouthAngle, Math.PI * 2 - mouthAngle);
+            ctx.closePath();
+        } else if (isPause) {
+            // Rektangulær "boks" med "+1 x pause" skrevet på
+            ctx.rect(-35, -23, 70, 46);
+        } else {
+            // Sekskantet krystal = stabil, "blokerende" inhibitor
+            for (let i = 0; i < 6; i++) {
+                const a = (i * 60) * Math.PI / 180;
+                const px = Math.cos(a) * 30, py = Math.sin(a) * 30;
+                i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+            }
+            ctx.closePath();
+        }
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#121212';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        if (isPause) {
+            ctx.font = 'bold 13px Arial';
+            ctx.fillText('+1 x', 0, -8);
+            ctx.fillText('pause', 0, 8);
+        } else {
+            ctx.font = 'bold 22px Arial';
+            ctx.fillText(isEnzyme ? '⚡' : '❄', 0, 1);
+        }
+
+        ctx.restore();
+    }
+
+    loop(timestamp) {
+        if (!this.lastTime) this.lastTime = timestamp;
+        let dt = (timestamp - this.lastTime) / 1000;
+        this.lastTime = timestamp;
+        if (dt > 0.1) dt = 0.1; 
+
+        // Afslut liv-mistet-pausen efter 1 sekund
+        if (this.state === 'LIFE_LOST' && performance.now() >= this.lifeLossEndTime) {
+            document.getElementById('life-lost-overlay').classList.remove('show');
+
+            this.molecules.forEach(mol => this.createExplosion(mol.x, mol.y, '#ffffff'));
+            this.molecules = [];
+
+            if (this.pendingGameOver) {
+                this.state = 'GAMEOVER';
+                const finalScore = Math.floor(this.score);
+                document.getElementById('final-score').innerText = finalScore;
+                const { newAllTime, newWeekly } = this.updatePersonalBests(finalScore);
+                this.renderPersonalBests(newAllTime, newWeekly);
+                this.submitAndShowLeaderboard(finalScore);
+                document.getElementById('game-over-screen').classList.remove('hidden');
+            } else {
+                this.state = 'PLAYING';
+            }
+        }
+
+        if (this.state === 'PLAYING' || this.state === 'LIFE_LOST') {
+            // Skalér canvas' skarpe pixel-buffer til spillets låste koordinatsystem (this.W/this.H),
+            // så alt tegnes skarpt uanset zoom/pixel-tæthed, men spillogikken forbliver uændret.
+            this.ctx.setTransform(this.canvas.width / this.W, 0, 0, this.canvas.height / this.H, 0, 0);
+
+            this.ctx.fillStyle = '#121212';
+            this.ctx.fillRect(0, 0, this.W, this.H);
+
+            // Inhibitor-powerup: sænker farten på alt i en periode
+            if (this.slowMoActive && performance.now() >= this.slowMoEndTime) {
+                this.slowMoActive = false;
+                this.updateInhibitorButtonUI();
+            }
+            if (this.state === 'PLAYING') this.updateTurboUI();
+            const inhibitorFactor = (this.state === 'PLAYING' && this.slowMoActive) ? POWERUP_CONFIG.slowMoFactor : 1;
+            const turboFactor = this.state === 'PLAYING' ? this.getTurboSpeedMultiplier() : 1;
+            const speedFactor = inhibitorFactor * turboFactor;
+
+            if (this.state === 'PLAYING') {
+                const timeSinceLevelStart = (performance.now() - this.levelStartTime) / 1000;
+
+                // Kortere ramp-up på seamless levels - undtagen det første turbo-niveau (level 6),
+                // som rammer jævnt op ligesom faldhastigheden gør (se spawnMolecule()).
+                const isSeamless = LEVELS[this.levelIndex].seamless;
+                const isFirstTurboLevel = this.levelIndex === 5;
+                const rampDuration = isFirstTurboLevel ? 15 : (isSeamless ? 1 : 5);
+                const spawnRamp = Math.min(1, timeSinceLevelStart / rampDuration);
+
+                this.spawnTimer += dt * 1000 * speedFactor;
+
+                let currentRate = Math.max(600, CONFIG.spawnRate - (this.levelIndex * 220));
+                let adjustedRate = currentRate + (1000 * (1 - spawnRamp));
+
+                // Uendelig highscore-tilstand: hyppigheden stiger 10% for hver ENDLESS_FREQ_STEP point over CONGRATS_SCORE
+                if (this.score > CONGRATS_SCORE) {
+                    const freqSteps = Math.floor((this.score - CONGRATS_SCORE) / ENDLESS_FREQ_STEP);
+                    const freqMultiplier = 1 + freqSteps * 0.1;
+                    adjustedRate /= freqMultiplier;
+                }
+
+                if (this.spawnTimer > adjustedRate) {
+                    this.spawnMolecule();
+                    this.spawnTimer = 0;
+                }
+
+                // Sjælden powerup-spawn (kun én ad gangen på skærmen) - ingen powerups på niveau 1
+                if (this.levelIndex > 0) {
+                    this.powerupTimer += dt * 1000;
+                    const hasPowerupOnScreen = this.molecules.some(m => m.isPowerup);
+                    if (!hasPowerupOnScreen && this.powerupTimer > this.nextPowerupTime) {
+                        this.spawnPowerup();
+                        this.powerupTimer = 0;
+                        this.nextPowerupTime = POWERUP_CONFIG.minInterval +
+                            Math.random() * (POWERUP_CONFIG.maxInterval - POWERUP_CONFIG.minInterval);
+                    }
+                }
+            }
+
+            this.buckets.forEach(b => {
+                this.ctx.fillStyle = b.color;
+                let h = b.height + b.pulse;
+                if(b.pulse > 0) b.pulse *= 0.9;
+                
+                this.ctx.globalAlpha = 0.8;
+                this.ctx.fillRect(b.x + 2, this.H - h, b.width - 4, h);
+                this.ctx.globalAlpha = 1;
+
+                this.ctx.fillStyle = '#fff';
+                this.ctx.font = 'bold 18px Arial';
+                this.ctx.textAlign = 'center';
+                this.ctx.fillText(b.label, b.x + b.width/2, this.H - h + 30);
+            });
+
+            for (let i = this.molecules.length - 1; i >= 0; i--) {
+                const m = this.molecules[i];
+                if (this.state === 'PLAYING') {
+                    if (m.isDragging) {
+                        m.x += (this.input.x - m.x) * 0.3;
+                        m.y += (this.input.y - m.y) * 0.3;
+                    } else {
+                        m.y += m.vy * dt * speedFactor;
+                        m.rotation += m.angle * dt;
+                    }
+                }
+                if (this.state === 'PLAYING') {
+                    if (m.isPowerup) {
+                        if (m.y > this.H + 50) this.molecules.splice(i, 1);
+                    } else {
+                        // Kollision med spandtoppen: så snart molekylet (trukket eller frit faldende)
+                        // rammer toppen af den spand det befinder sig over, afgøres det med det samme.
+                        const bucket = this.buckets.find(b => m.x > b.x && m.x < b.x + b.width);
+                        if (bucket && m.y >= this.H - bucket.height) {
+                            if (m.isDragging) { m.isDragging = false; this.draggedMol = null; }
+                            if (bucket.type === m.type) {
+                                this.score += this.getBasePoints();
+                                this.createExplosion(m.x, m.y, '#00ff00');
+                                bucket.pulse = 20;
+                                this.molecules.splice(i, 1);
+                                this.updateUI();
+                                // checkLevelUp() kan nulstille this.molecules (nyt niveau/sejr) -
+                                // står vi stadig midt i denne for-løkke, skal vi stoppe med det samme.
+                                if (this.checkLevelUp()) break;
+                            } else if (!this.buckets.some(b => b.type === m.type)) {
+                                // Sikkerhedsnet: denne stofgruppe har slet ikke en spand på det
+                                // aktuelle niveau (fx pga. et niveauskift midt i luften) -
+                                // skal ikke koste et liv, molekylet forsvinder bare.
+                                this.createExplosion(m.x, m.y, '#ffffff');
+                                this.molecules.splice(i, 1);
+                            } else {
+                                this.handleFail(m, { reason: 'wrong', attempted: bucket.type });
+                                this.updateUI();
+                            }
+                        } else if (!bucket && m.y > this.H + 50) {
+                            // Sikkerhedsnet: molekylet er drevet uden for spandenes x-område
+                            this.handleFail(m, { reason: 'missed' });
+                            this.updateUI();
+                        }
+                    }
+                }
+            }
+
+            // Powerups tegnes altid ovenpå almindelige molekyler (i en separat sidste tegne-pas),
+            // så de aldrig er skjult bag et molekyle og altid er nemme at ramme.
+            this.molecules.forEach(m => { if (!m.isPowerup) this.drawMolecule(this.ctx, m); });
+            this.molecules.forEach(m => { if (m.isPowerup) this.drawPowerup(this.ctx, m); });
+
+            this.particles.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy; p.life -= 0.05;
+                this.ctx.globalAlpha = Math.max(0, p.life);
+                this.ctx.fillStyle = p.color;
+                this.ctx.beginPath(); this.ctx.arc(p.x, p.y, 4, 0, Math.PI*2); this.ctx.fill();
+                if(p.life <= 0) this.particles.splice(i, 1);
+            });
+            this.ctx.globalAlpha = 1;
+        }
+        requestAnimationFrame(this.loop);
+    }
+}
+
+const game = new Game();
+</script>
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>KemiLab: Rettet Visuelt</title>
+<style>
+    body { 
+        margin: 0; overflow: hidden; background: #eceff1; 
+        font-family: 'Segoe UI', sans-serif; touch-action: none; 
+    }
+
+    /* UI: Venstre Panel */
+    #ui-layer {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none; display: flex;
+    }
+
+    #checklist-panel {
+        width: 280px; background: rgba(255,255,255,0.95);
+        padding: 20px; border-right: 1px solid #b0bec5;
+        display: flex; flex-direction: column; gap: 10px;
+        pointer-events: auto; 
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        z-index: 10;
+    }
+    h2 { margin: 0 0 15px 0; font-size: 18px; color: #455a64; border-bottom: 2px solid #78909c; padding-bottom: 5px; }
+    
+    .task-item {
+        display: flex; align-items: flex-start; gap: 10px;
+        font-size: 14px; color: #37474f; padding: 5px 0;
+        line-height: 1.4;
+    }
+    .task-item.done { text-decoration: line-through; color: #b0bec5; }
+    .checkbox {
+        min-width: 16px; height: 16px; border: 2px solid #78909c; border-radius: 3px;
+        margin-top: 2px; display: flex; align-items: center; justify-content: center; background: white;
+    }
+    .task-item.done .checkbox { background: #78909c; border-color: #78909c; }
+    .task-item.done .checkbox::after { content: '✓'; color: white; font-size: 12px; font-weight: bold; }
+
+    /* Besked */
+    #msg-box {
+        position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+        background: #37474f; color: #eceff1; 
+        padding: 12px 24px; border-radius: 6px;
+        font-size: 15px; opacity: 0; transition: opacity 0.3s;
+        pointer-events: none; text-align: center;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    /* Ryste Knap */
+    #action-btn {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        background: #0277bd; color: white; border: none;
+        padding: 15px 30px; font-size: 16px; font-weight: bold; border-radius: 50px;
+        cursor: pointer; pointer-events: auto;
+        box-shadow: 0 4px 15px rgba(0,119,189,0.4);
+        display: none; animation: popIn 0.3s ease;
+    }
+    @keyframes popIn { from { transform: translate(-50%, -50%) scale(0.5); opacity:0; } to { transform: translate(-50%, -50%) scale(1); opacity:1;} }
+
+    canvas { display: block; width: 100vw; height: 100vh; cursor: default; }
+</style>
+</head>
+<body>
+
+<div id="ui-layer">
+    <div id="checklist-panel">
+        <h2>Fremgangsmåde</h2>
+        <div id="task-list"></div>
+    </div>
+    <button id="action-btn" onclick="Game.shakeFlask()">RYST KOLBE</button>
+    <div id="msg-box"></div>
+</div>
+
+<canvas id="simCanvas"></canvas>
+
+<script>
+const canvas = document.getElementById('simCanvas');
+const ctx = canvas.getContext('2d');
+
+// --- KEMI DATA ---
+const C = {
+    cu: '#b87333', br2: '#8d2c1d', mix: '#00695c', 
+    precip: '#fff9c4', complex: '#0047AB', glass: 'rgba(255,255,255,0.4)'
+};
+
+const TASKS = [
+    { id: 'vent', txt: "Start udsugning", check: () => Game.ventOn },
+    { id: 'fill', txt: "Tilsæt Cu og Br₂ til kolben", check: () => Game.flask.cu > 0 && Game.flask.br2 > 0 },
+    { id: 'react', txt: "Sæt prop på og ryst", check: () => Game.flask.reacted },
+    { id: 'pour', txt: "Fordel i Glas 1 og 2", check: () => Game.tubes[0].vol > 0 && Game.tubes[1].vol > 0 },
+    { id: 'agno3', txt: "Glas 1: Tilsæt AgNO₃ (Bundfald)", check: () => Game.tubes[0].precipitate },
+    { id: 'nh3', txt: "Glas 2: Tilsæt NH₃ (Blåfarvning)", check: () => Game.tubes[1].complex }
+];
+
+// --- MOTOR ---
+const Game = {
+    width: 0, height: 0, ventOn: false,
+    entities: [], dragTarget: null, dragOffset: {x:0, y:0},
+    flask: null, tubes: [],
+
+    init() {
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        
+        const cy = this.height - 100;
+        // RETTELSE: Vi sikrer at cx er mindst 580px fra venstre kant, så ting ikke gemmer sig bag panelet
+        const cx = Math.max(this.width / 2 + 50, 580); 
+
+        this.entities = [
+            new Item(cx, cy, 'flask', 'Kolbe'),
+            // RETTELSE: Mindre afstand mellem flaskerne (-140 og -210 i stedet for -150 og -240)
+            new Item(cx - 140, cy, 'bottle', 'Br₂'),
+            new Item(cx - 210, cy, 'bottle', 'Cu'),
+            
+            new Item(cx + 100, cy, 'tube', 'Glas 1'),
+            new Item(cx + 160, cy, 'tube', 'Glas 2'),
+            
+            new Item(cx + 250, cy, 'bottle', 'AgNO₃'),
+            new Item(cx + 320, cy, 'bottle', 'NH₃'),
+            
+            new Item(cx - 70, cy, 'stopper', 'Prop')
+        ];
+        
+        this.flask = this.find('Kolbe');
+        this.tubes = [this.find('Glas 1'), this.find('Glas 2')];
+        
+        // Input handlers
+        const h = { s: e=>this.start(e), m: e=>this.move(e), e: e=>this.end(e) };
+        ['mousedown','touchstart'].forEach(k => canvas.addEventListener(k, h.s, {passive:false}));
+        ['mousemove','touchmove'].forEach(k => window.addEventListener(k, h.m, {passive:false}));
+        ['mouseup','touchend'].forEach(k => window.addEventListener(k, h.e, {passive:false}));
+
+        this.renderChecklist();
+        this.loop();
+    },
+
+    resize() { this.width = canvas.width = window.innerWidth; this.height = canvas.height = window.innerHeight; },
+
+    loop() {
+        // Baggrund
+        ctx.fillStyle = "#eceff1"; ctx.fillRect(0,0,this.width,this.height);
+        // Bord
+        ctx.fillStyle = "#cfd8dc"; ctx.fillRect(0,this.height-40,this.width,40);
+        ctx.fillStyle = "#b0bec5"; ctx.fillRect(0,this.height-45,this.width,5); // Skygge kant
+
+        this.drawVent();
+
+        // Tegn ting (Drag item øverst)
+        this.entities.sort((a,b) => (a===this.dragTarget?1:0) - (b===this.dragTarget?1:0));
+        this.entities.forEach(e => { e.update(); e.draw(); });
+
+        // Ryste Knap
+        const btn = document.getElementById('action-btn');
+        const showBtn = this.flask.stopper && !this.flask.reacted && this.flask.cu>0 && this.flask.br2>0;
+        btn.style.display = showBtn ? 'block' : 'none';
+
+        this.updateChecklistUI();
+        requestAnimationFrame(() => this.loop());
+    },
+
+    drawVent() {
+        // RETTELSE: Flyttet Udsugning lidt mere til højre
+        const x = Math.max(this.width/2 + 60, 600), y = 80;
+        
+        // Panel boks
+        ctx.fillStyle = "#cfd8dc"; ctx.fillRect(x-60,y-35,120,70);
+        ctx.strokeStyle = "#90a4ae"; ctx.lineWidth=3; ctx.strokeRect(x-60,y-35,120,70);
+        
+        // Lys
+        ctx.shadowBlur = this.ventOn ? 15 : 0;
+        ctx.shadowColor = this.ventOn ? "#66bb6a" : "transparent";
+        ctx.fillStyle = this.ventOn?"#66bb6a":"#ef5350"; 
+        ctx.beginPath(); ctx.arc(x,y-5,12,0,Math.PI*2); ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Tekst
+        ctx.fillStyle = "#455a64"; ctx.font="bold 12px Arial"; ctx.textAlign="center"; 
+        ctx.fillText("UDSUGNING",x,y+20);
+    },
+
+    // --- INPUT ---
+    start(e) {
+        e.preventDefault(); const p = getPos(e);
+
+        // Udsugning knap hit test
+        const vx = Math.max(this.width/2 + 60, 600);
+        if (Math.hypot(p.x-vx, p.y-75) < 40) {
+            this.ventOn = !this.ventOn; return;
+        }
+
+        for(let i=this.entities.length-1; i>=0; i--) {
+            let ent = this.entities[i];
+            
+            // Kolbe prop removal
+            if (ent.type === 'flask' && ent.stopper) {
+                if (Math.abs(p.x - ent.x) < 30 && p.y < ent.y - 60) {
+                    this.toggleStopper(ent); return;
+                }
+            }
+
+            if(ent.hit(p.x, p.y)) {
+                if(ent.type === 'bottle' && p.y < ent.y - 70) {
+                    ent.capped = !ent.capped; return;
+                }
+                if(ent.type === 'bottle' && ent.capped) {
+                    this.notify("Åben låget først."); return;
+                }
+                
+                this.dragTarget = ent;
+                this.dragOffset = {x:p.x-ent.x, y:p.y-ent.y};
+                return;
+            }
+        }
+    },
+
+    move(e) {
+        if(!this.dragTarget) return;
+        e.preventDefault(); const p = getPos(e);
+        this.dragTarget.x = p.x - this.dragOffset.x;
+        this.dragTarget.y = p.y - this.dragOffset.y;
+    },
+
+    end(e) {
+        if(!this.dragTarget) return;
+        const t = this.dragTarget;
+
+        if (t.type === 'stopper' && dist(t, this.flask) < 80) {
+            this.flask.stopper = true; t.inUse = true; t.x = -1000; this.notify("Prop påsat.");
+        }
+        else if (t.type === 'bottle' && dist(t, this.flask) < 80) {
+            t.tilt();
+            if(t.name === 'Br₂') {
+                if(!this.ventOn) this.notify("Start udsugning før du bruger Br₂!");
+                else { this.flask.br2=10; this.notify("Br₂ tilsat"); }
+            }
+            if(t.name === 'Cu') { this.flask.cu=10; this.notify("Cu tilsat"); }
+        }
+        else {
+            this.tubes.forEach(tube => {
+                if(t.type === 'flask' && dist(t, tube) < 80) {
+                    if(t.stopper) this.notify("Fjern proppen først.");
+                    else if(!t.reacted) this.notify("Reaktion mangler.");
+                    else { t.tilt(); tube.vol=10; }
+                }
+                if(t.type === 'bottle' && dist(t, tube) < 80) {
+                    t.tilt();
+                    if(t.name === 'AgNO₃') tube.precipitate = true;
+                    if(t.name === 'NH₃') tube.complex = true;
+                }
+            });
+        }
+        this.dragTarget = null;
+    },
+
+    toggleStopper(flask) {
+        flask.stopper = false;
+        let prop = this.find('Prop');
+        prop.inUse = false;
+        prop.x = flask.x + 60; prop.y = flask.y; 
+        prop.vx = 5; prop.vy = -5;
+        this.notify("Prop fjernet.");
+    },
+
+    shakeFlask() {
+        let c=0; const i=setInterval(()=>{
+            this.flask.x = this.flask.homeX + (Math.random()-0.5)*20;
+            if(++c>20) { clearInterval(i); this.flask.x = this.flask.homeX; this.flask.reacted=true; }
+        }, 50);
+    },
+
+    notify(m) {
+        const b = document.getElementById('msg-box'); b.innerText=m; b.style.opacity=1;
+        clearTimeout(this.to); this.to=setTimeout(()=>b.style.opacity=0, 3000);
+    },
+    
+    renderChecklist() {
+        document.getElementById('task-list').innerHTML = TASKS.map(t => 
+            `<div class="task-item" id="t-${t.id}"><div class="checkbox"></div><span>${t.txt}</span></div>`
+        ).join('');
+    },
+    updateChecklistUI() { TASKS.forEach(t => { if(t.check()) document.getElementById(`t-${t.id}`).classList.add('done'); }); },
+    find(n) { return this.entities.find(e=>e.name===n); }
+};
+
+// --- ITEMS ---
+class Item {
+    constructor(x, y, type, name) {
+        this.x = x; this.y = y; this.homeX = x; this.homeY = y;
+        this.type = type; this.name = name;
+        this.w = 50; this.h = 100; this.rot = 0;
+        this.capped = (type==='bottle');
+        this.stopper = false; this.inUse = false;
+        this.cu=0; this.br2=0; this.vol=0; this.reacted=false; this.precipitate=false; this.complex=false;
+    }
+
+    hit(mx, my) {
+        if(this.inUse) return false;
+        if(this.type === 'stopper') return mx>this.x-25 && mx<this.x+25 && my>this.y-25 && my<this.y+25;
+        return mx > this.x-25 && mx < this.x+25 && my > this.y-90 && my < this.y+10;
+    }
+
+    update() {
+        if(Game.dragTarget !== this && !this.inUse) {
+            this.x += (this.homeX - this.x)*0.1;
+            this.y += (this.homeY - this.y)*0.1;
+            this.rot += (0 - this.rot)*0.1;
+        }
+    }
+
+    tilt() { this.rot = -1.5; setTimeout(()=>this.rot=0, 600); }
+
+    draw() {
+        if(this.inUse) return;
+        ctx.save(); ctx.translate(this.x, this.y); ctx.rotate(this.rot);
+
+        let fill = C.glass;
+        if(this.type==='flask' && this.reacted) fill=C.mix;
+        else if(this.type==='flask' && this.br2>0) fill=C.br2;
+        else if(this.type==='tube') {
+            if(this.complex) fill=C.complex;
+            else if(this.precipitate) fill=C.precip;
+            else if(this.vol>0) fill=C.mix;
+        }
+
+        ctx.lineWidth=2; ctx.strokeStyle="#546e7a";
+
+        if(this.type === 'bottle') {
+            // Flaske krop
+            ctx.fillStyle="rgba(255,255,255,0.6)"; ctx.fillRect(-20,-80,40,80); ctx.strokeRect(-20,-80,40,80);
+            
+            // Væske
+            if(this.name!=='Cu') { 
+                ctx.fillStyle=(this.name==='Br₂'?C.br2:C.glass); 
+                ctx.fillRect(-19,-30,38,29); 
+            } else { 
+                ctx.fillStyle=C.cu; ctx.beginPath(); ctx.arc(0,-10,8,0,Math.PI*2); ctx.fill(); 
+            }
+            
+            // Låg
+            if(this.capped) { 
+                ctx.fillStyle="#37474f"; ctx.fillRect(-22,-95,44,15); 
+                // Små riller i låget
+                ctx.fillStyle="#546e7a"; ctx.fillRect(-18,-95,2,15); ctx.fillRect(-10,-95,2,15); ctx.fillRect(0,-95,2,15); ctx.fillRect(10,-95,2,15);
+            }
+            
+            // Label
+            ctx.fillStyle="#fff"; ctx.fillRect(-18,-65,36,22);
+            ctx.fillStyle="#000"; ctx.font="bold 13px Arial"; ctx.textAlign="center"; ctx.fillText(this.name,0,-49);
+        }
+        else if(this.type === 'flask') {
+            ctx.beginPath();
+            ctx.moveTo(-18,-90); ctx.lineTo(-18,-50); ctx.lineTo(-45,0);
+            ctx.lineTo(45,0); ctx.lineTo(18,-50); ctx.lineTo(18,-90);
+            ctx.fillStyle="rgba(255,255,255,0.3)"; ctx.fill(); ctx.stroke();
+            if(this.cu>0 && !this.reacted) { ctx.fillStyle=C.cu; ctx.beginPath(); ctx.arc(0,-5,6,0,Math.PI*2); ctx.fill(); }
+            if(this.br2>0 || this.reacted) { 
+                ctx.fillStyle=fill; ctx.beginPath(); ctx.moveTo(-40,-2); ctx.lineTo(40,-2); ctx.lineTo(18,-50); ctx.lineTo(-18,-50); ctx.fill(); 
+            }
+            if(this.stopper) { ctx.fillStyle="#b71c1c"; ctx.fillRect(-17,-102,34,14); }
+        }
+        else if(this.type === 'tube') {
+            // RETTELSE: Pænere reagensglas med runding og væske-clipping
+            
+            // Glas Krop
+            ctx.beginPath();
+            ctx.moveTo(-10, -90); // Top venstre
+            ctx.lineTo(-10, -10); // Ned til bue start
+            ctx.arc(0, -10, 10, Math.PI, 0, true); // Bue (Uret rundt forneden)
+            ctx.lineTo(10, -90); // Op højre
+            ctx.strokeStyle = "#78909c"; ctx.stroke();
+            ctx.fillStyle = "rgba(255,255,255,0.3)"; ctx.fill();
+
+            // Kant i toppen (Krave)
+            ctx.fillStyle = "#cfd8dc";
+            ctx.fillRect(-12, -94, 24, 4);
+            ctx.strokeRect(-12, -94, 24, 4);
+
+            // Væske med Clipping (Så den følger rundingen perfekt)
+            if(this.vol > 0 || this.precipitate || this.complex) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.moveTo(-9, -90);
+                ctx.lineTo(-9, -10);
+                ctx.arc(0, -10, 9, Math.PI, 0, true);
+                ctx.lineTo(9, -90);
+                ctx.closePath();
+                ctx.clip(); // Klip alt udenfor glassets indre
+
+                ctx.fillStyle = fill;
+                ctx.fillRect(-10, -50, 20, 50); // Tegn væsken som firkant (bliver klippet)
+                ctx.restore();
+            }
+            
+            // Label under
+            ctx.fillStyle="#333"; ctx.font="11px Arial"; ctx.textAlign="center"; ctx.fillText(this.name,0,18);
+        }
+        else if(this.type === 'stopper') {
+            ctx.fillStyle="#b71c1c"; ctx.fillRect(-15,-15,30,30);
+            ctx.fillStyle="white"; ctx.font="9px Arial"; ctx.textAlign="center"; ctx.fillText("PROP",0,4);
+        }
+        ctx.restore();
+    }
+}
+
+function getPos(e) { const t=e.touches?e.touches[0]:e; return {x:t.clientX, y:t.clientY}; }
+function dist(a,b) { return Math.hypot(a.x-b.x, a.y-b.y); }
+
+Game.init();
+</script>
+</body>
+</html>

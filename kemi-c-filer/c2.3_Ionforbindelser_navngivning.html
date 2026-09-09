@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opskrivning af ionforbindelser</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        .periodic-table-grid {
+            display: grid;
+            grid-template-columns: repeat(8, minmax(0, 1fr));
+            gap: 2px;
+        }
+        .element-cell {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            border-radius: 4px;
+            cursor: default;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef } = React;
+
+        // --- HELPERS: korrekte kemiske formler med unicode ---
+        const SUB_DIGITS = { '0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄', '5': '₅', '6': '₆', '7': '₇', '8': '₈', '9': '₉' };
+        const SUP_DIGITS = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+
+        const toSub = (n) => String(n).split('').map(d => SUB_DIGITS[d] || d).join('');
+        const toSup = (n) => String(n).split('').map(d => SUP_DIGITS[d] || d).join('');
+
+        // Neutral formel, fx "Al2(SO4)3" -> "Al₂(SO₄)₃"
+        const formatFormula = (formula) => formula.replace(/\d+/g, (m) => toSub(m));
+
+        // En ion gemmes struktureret som { f, c, names, compound, variable, mainGroup }.
+        // f/c holdes adskilt (ikke som "SO42-") så et ciffer aldrig kan fejltolkes som enten
+        // formel-indeks eller ladning (fx NH4+ vs. SO42-).
+        // names: accepterede danske navne på ionen (kun relevant i "Opskriv navne"-opgaver), primær først.
+        // compound: sammensat ion (skal genkendes, ikke udledes af det periodiske system).
+        // variable: grundstof med variabel ladning (kræver ladningsbalance/romertal).
+        // mainGroup: false for metaller hvis ladning ikke kan aflæses af hovedgruppenummeret (fx Ag, Zn).
+        const ion = (f, c, extra = {}) => ({
+            f, c,
+            names: extra.names || [],
+            compound: !!extra.compound,
+            variable: !!extra.variable,
+            mainGroup: extra.mainGroup !== undefined ? extra.mainGroup : true
+        });
+
+        // Ren tekst-form brugt til at tjekke elevens svar, fx { f: "SO4", c: -2 } -> "so42-"
+        const ionPlain = ({ f, c }) => {
+            const mag = Math.abs(c);
+            return (f + (mag > 1 ? mag : '') + (c > 0 ? '+' : '-')).toLowerCase();
+        };
+
+        // Unicode-visning, fx { f: "SO4", c: -2 } -> "SO₄²⁻"
+        const ionDisplay = ({ f, c }) => {
+            const mag = Math.abs(c);
+            return formatFormula(f) + (mag > 1 ? toSup(mag) : '') + (c > 0 ? '⁺' : '⁻');
+        };
+
+        // Gør det muligt at taste svar med rigtige unicode-tegn (fx "Na⁺", "SO₄²⁻") ved at
+        // oversætte dem til den almindelige ASCII-form, inden svaret tjekkes.
+        const UNI_TO_ASCII = {
+            '₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4', '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9',
+            '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9',
+            '⁺': '+', '⁻': '-', '−': '-', '–': '-', '—': '-'
+        };
+        const normalizeChemInput = (str) => str.split('').map(ch => UNI_TO_ASCII[ch] || ch).join('');
+
+        // --- DATA ---
+        // "formula"-opgaver: udgangspunktet er navnet -> find ionerne -> opskriv formlen.
+        // "name"-opgaver: udgangspunktet er formlen -> find/navngiv den positive ion, så den negative -> opskriv det samlede navn.
+        const formlerTasks = [
+            { id: 1, mode: 'formula', ions: [ion("Na", 1, { names: ["natriumion"] }), ion("O", -2, { names: ["oxid"] })], formula: "Na2O", names: ["natriumoxid"] },
+            { id: 2, mode: 'formula', ions: [ion("Mg", 2, { names: ["magnesiumion"] }), ion("Cl", -1, { names: ["chlorid"] })], formula: "MgCl2", names: ["magnesiumchlorid"] },
+            { id: 3, mode: 'formula', ions: [ion("Al", 3, { names: ["aluminiumion"] }), ion("O", -2, { names: ["oxid"] })], formula: "Al2O3", names: ["aluminiumoxid"] },
+            { id: 4, mode: 'formula', ions: [ion("Ca", 2, { names: ["calciumion"] }), ion("Br", -1, { names: ["bromid"] })], formula: "CaBr2", names: ["calciumbromid"] },
+            { id: 5, mode: 'formula', ions: [ion("K", 1, { names: ["kaliumion"] }), ion("S", -2, { names: ["sulfid"] })], formula: "K2S", names: ["kaliumsulfid"] },
+            { id: 6, mode: 'formula', ions: [ion("Li", 1, { names: ["lithiumion"] }), ion("N", -3, { names: ["nitrid"] })], formula: "Li3N", names: ["lithiumnitrid"] },
+            { id: 7, mode: 'formula', ions: [ion("Ba", 2, { names: ["bariumion"] }), ion("F", -1, { names: ["fluorid"] })], formula: "BaF2", names: ["bariumfluorid"] },
+            { id: 8, mode: 'formula', ions: [ion("Sr", 2, { names: ["strontiumion"] }), ion("I", -1, { names: ["iodid"] })], formula: "SrI2", names: ["strontiumiodid"] },
+            { id: 9, mode: 'formula', ions: [ion("Be", 2, { names: ["berylliumion"] }), ion("O", -2, { names: ["oxid"] })], formula: "BeO", names: ["berylliumoxid"] },
+            { id: 10, mode: 'formula', ions: [ion("Cs", 1, { names: ["caesiumion"] }), ion("P", -3, { names: ["phosphid"] })], formula: "Cs3P", names: ["caesiumphosphid"] }
+        ];
+
+        const navneTasks = [
+            { id: 11, mode: 'name', ions: [ion("Fe", 2, { names: ["jern(II)ion", "jern(2+)ion"], variable: true }), ion("O", -2, { names: ["oxid"] })], formula: "FeO", names: ["jern(II)oxid", "jern(2+)oxid"] },
+            { id: 12, mode: 'name', ions: [ion("Fe", 3, { names: ["jern(III)ion", "jern(3+)ion"], variable: true }), ion("O", -2, { names: ["oxid"] })], formula: "Fe2O3", names: ["jern(III)oxid", "jern(3+)oxid"] },
+            { id: 13, mode: 'name', ions: [ion("Cu", 2, { names: ["kobber(II)ion", "kobber(2+)ion"], variable: true }), ion("Cl", -1, { names: ["chlorid"] })], formula: "CuCl2", names: ["kobber(II)chlorid", "kobber(2+)chlorid"] },
+            { id: 14, mode: 'name', ions: [ion("Cu", 1, { names: ["kobber(I)ion", "kobber(1+)ion"], variable: true }), ion("O", -2, { names: ["oxid"] })], formula: "Cu2O", names: ["kobber(I)oxid", "kobber(1+)oxid"] },
+            { id: 15, mode: 'name', ions: [ion("Pb", 4, { names: ["bly(IV)ion", "bly(4+)ion"], variable: true }), ion("O", -2, { names: ["oxid"] })], formula: "PbO2", names: ["bly(IV)oxid", "bly(4+)oxid"] },
+            { id: 16, mode: 'name', ions: [ion("Ni", 2, { names: ["nikkel(II)ion", "nikkel(2+)ion"], variable: true }), ion("Br", -1, { names: ["bromid"] })], formula: "NiBr2", names: ["nikkel(II)bromid", "nikkel(2+)bromid"] },
+            { id: 17, mode: 'name', ions: [ion("Sn", 2, { names: ["tin(II)ion", "tin(2+)ion"], variable: true }), ion("O", -2, { names: ["oxid"] })], formula: "SnO", names: ["tin(II)oxid", "tin(2+)oxid"] },
+            { id: 18, mode: 'name', ions: [ion("Ag", 1, { names: ["sølvion"], mainGroup: false }), ion("Cl", -1, { names: ["chlorid"] })], formula: "AgCl", names: ["sølvchlorid"] },
+            { id: 19, mode: 'name', ions: [ion("Zn", 2, { names: ["zinkion"], mainGroup: false }), ion("O", -2, { names: ["oxid"] })], formula: "ZnO", names: ["zinkoxid"] },
+            { id: 20, mode: 'name', ions: [ion("Hg", 2, { names: ["kviksølv(II)ion", "kviksølv(2+)ion"], variable: true }), ion("O", -2, { names: ["oxid"] })], formula: "HgO", names: ["kviksølv(II)oxid", "kviksølv(2+)oxid"] }
+        ];
+
+        const sammensatTasks = [
+            { id: 21, mode: 'formula', ions: [ion("Na", 1, { names: ["natriumion"] }), ion("OH", -1, { names: ["hydroxid"], compound: true })], formula: "NaOH", names: ["natriumhydroxid"] },
+            { id: 22, mode: 'name', ions: [ion("Mg", 2, { names: ["magnesiumion"] }), ion("NO3", -1, { names: ["nitrat"], compound: true })], formula: "Mg(NO3)2", names: ["magnesiumnitrat"] },
+            { id: 23, mode: 'formula', ions: [ion("Al", 3, { names: ["aluminiumion"] }), ion("SO4", -2, { names: ["sulfat"], compound: true })], formula: "Al2(SO4)3", names: ["aluminiumsulfat"] },
+            { id: 24, mode: 'name', ions: [ion("Ca", 2, { names: ["calciumion"] }), ion("PO4", -3, { names: ["phosphat"], compound: true })], formula: "Ca3(PO4)2", names: ["calciumphosphat"] },
+            { id: 25, mode: 'formula', ions: [ion("K", 1, { names: ["kaliumion"] }), ion("CO3", -2, { names: ["carbonat"], compound: true })], formula: "K2CO3", names: ["kaliumcarbonat"] },
+            { id: 26, mode: 'name', ions: [ion("NH4", 1, { names: ["ammoniumion"], compound: true }), ion("Cl", -1, { names: ["chlorid"] })], formula: "NH4Cl", names: ["ammoniumchlorid"] },
+            { id: 27, mode: 'formula', ions: [ion("Ba", 2, { names: ["bariumion"] }), ion("SO4", -2, { names: ["sulfat"], compound: true })], formula: "BaSO4", names: ["bariumsulfat"] },
+            { id: 28, mode: 'name', ions: [ion("Fe", 3, { names: ["jern(III)ion", "jern(3+)ion"], variable: true }), ion("OH", -1, { names: ["hydroxid"], compound: true })], formula: "Fe(OH)3", names: ["jern(III)hydroxid", "jern(3+)hydroxid"] },
+            { id: 29, mode: 'formula', ions: [ion("Li", 1, { names: ["lithiumion"] }), ion("PO4", -3, { names: ["phosphat"], compound: true })], formula: "Li3PO4", names: ["lithiumphosphat"] },
+            { id: 30, mode: 'name', ions: [ion("Na", 1, { names: ["natriumion"] }), ion("HCO3", -1, { names: ["hydrogencarbonat"], compound: true })], formula: "NaHCO3", names: ["natriumhydrogencarbonat"] }
+        ];
+
+        const TASK_POOLS = { formler: formlerTasks, navne: navneTasks, sammensat: sammensatTasks };
+        const TYPE_LABELS = { formler: 'Opskriv formler', navne: 'Opskriv navne', sammensat: 'Med sammensatte ioner' };
+        const TYPE_ORDER = ['formler', 'navne', 'sammensat'];
+
+        // Rækkefølgen af spørgsmål for en opgave, afhængig af opgavens mode.
+        // Normalt kommer den positive ion først. Men hvis den positive ion har variabel ladning
+        // (fx jern), kan den ikke bestemmes før man kender den negative ions ladning — så her
+        // spørges der først til den negative ion (fx oxygen), som kan slås op direkte.
+        const buildSteps = (task) => {
+            const firstIdx = (task.ions[0].variable && !task.ions[1].variable) ? 1 : 0;
+            const secondIdx = 1 - firstIdx;
+            return task.mode === 'formula'
+                ? [{ kind: 'ionFormula', ionIdx: firstIdx }, { kind: 'ionFormula', ionIdx: secondIdx }, { kind: 'finalFormula' }]
+                : [{ kind: 'ionFormula', ionIdx: firstIdx }, { kind: 'ionName', ionIdx: firstIdx }, { kind: 'ionFormula', ionIdx: secondIdx }, { kind: 'ionName', ionIdx: secondIdx }, { kind: 'finalName' }];
+        };
+
+        // Hjælpetekst til hvert spørgsmål: "base" vises altid, "extra" vises som ekstra hjælp
+        // efter 2. forkerte forsøg (inden facit gives ved 3. forsøg).
+        const getStepHints = (step, task) => {
+            if (step.kind === 'ionFormula' || step.kind === 'ionName') {
+                const target = task.ions[step.ionIdx];
+                const other = task.ions[step.ionIdx === 0 ? 1 : 0];
+
+                if (step.kind === 'ionFormula') {
+                    if (target.compound) {
+                        return {
+                            base: 'Dette er en sammensat ion, du skal kunne genkende ladningen på.',
+                            extra: 'Tip: Det er en af de faste, sammensatte ioner man skal lære udenad, fx OH⁻, NO₃⁻, SO₄²⁻, PO₄³⁻, CO₃²⁻, HCO₃⁻ eller NH₄⁺.'
+                        };
+                    }
+                    if (target.variable) {
+                        return {
+                            base: (
+                                <>
+                                    <strong>{formatFormula(target.f)}</strong> kan ikke slås op i det periodiske system, fordi grundstoffet ligger i en undergruppe (ikke en hovedgruppe) og derfor kan danne ioner med forskellig ladning.
+                                    Nu hvor du kender ladningen på {formatFormula(other.f)}-ionen (<strong>{ionDisplay(other)}</strong>), kan du bruge at <strong>{formatFormula(task.formula)}</strong> skal være elektrisk neutral til at bestemme {formatFormula(target.f)}-ionens ladning.
+                                </>
+                            ),
+                            extra: `Tip: Gang ladningen ${ionDisplay(other)} med antallet af den ion i formlen ${formatFormula(task.formula)}. Fordel den modsatte, samlede ladning ligeligt på ${formatFormula(target.f)}-ionerne.`
+                        };
+                    }
+                    if (!target.mainGroup) {
+                        return {
+                            base: `${formatFormula(target.f)} ligger også i en undergruppe, så ladningen kan ikke aflæses ud fra hovedgruppenummeret. Til forskel fra fx jern har ${formatFormula(target.f)} dog kun én mulig ladning, som du skal kende.`,
+                            extra: `Tip: Slå ${formatFormula(target.f)}'s ladning op, eller brug det, du har lært om dette grundstof.`
+                        };
+                    }
+                    return {
+                        base: `Brug det periodiske system til at finde ${formatFormula(target.f)}'s mest almindelige ladning.`,
+                        extra: `Tip: Se hvilken hovedgruppe (kolonne) ${formatFormula(target.f)} står i — gruppenummeret hænger sammen med ladningen (fx gruppe 1 → +1, gruppe 2 → +2, gruppe 6 → -2, gruppe 7 → -1).`
+                    };
+                }
+
+                // ionName
+                if (target.compound) {
+                    return {
+                        base: 'Denne ion har sit eget navn, du skal kunne genkende.',
+                        extra: 'Tip: Er ionen positiv, får den stadig endelsen "-ion" (fx ammoniumion). Er den negativ, får den ikke "-ion" — mange iltholdige ender på "-at" (sulfat, nitrat, phosphat, carbonat), mens hydroxid er en undtagelse.'
+                    };
+                }
+                if (target.variable) {
+                    return {
+                        base: 'Da grundstoffet kan optræde med flere ladninger, skal ladningen skrives som romertal (eller ladningstal) i parentes i navnet.',
+                        extra: 'Tip: Navnet bygges som grundstofnavn + (romertal) + "ion", fx jern(II)ion.'
+                    };
+                }
+                if (target.c > 0) {
+                    return {
+                        base: 'Navnet på en positiv ion er grundstofnavnet + "ion".',
+                        extra: 'Tip: Fx bliver natrium til natriumion, magnesium til magnesiumion.'
+                    };
+                }
+                return {
+                    base: 'Navnet på en negativ ion får IKKE endelsen "-ion". Simple ioner (ét grundstof) ender som regel på "-id".',
+                    extra: 'Tip: Fx oxid, chlorid, sulfid, fluorid, bromid, iodid, nitrid eller phosphid.'
+                };
+            }
+            if (step.kind === 'finalFormula') {
+                return {
+                    base: 'Angiv nu den samlede kemiske formel.',
+                    extra: 'Tip: Antallet af hver ion skal afbalancere ladningerne, så den samlede ladning bliver 0 — brug de mindste hele tal.'
+                };
+            }
+            return {
+                base: 'Angiv nu det samlede danske navn.',
+                extra: 'Tip: Navnet er kation-navnet uden endelsen "-ion" (fx natrium) efterfulgt af anion-navnet (fx chlorid).'
+            };
+        };
+
+        // Kun hovedgrupperne (1-8) er med — undergrupperne (overgangsmetallerne) er udeladt,
+        // fordi deres ladning netop ikke kan aflæses af hovedgruppenummeret (se opgavehjælpen).
+        // pos: [periode, hovedgruppenummer 1-8]
+        const periodicTableData = [
+            { pos: [1, 1], sym: "H", cat: "nonmetal" }, { pos: [1, 8], sym: "He", cat: "noble" },
+            { pos: [2, 1], sym: "Li", cat: "alkali" }, { pos: [2, 2], sym: "Be", cat: "alkaline" }, { pos: [2, 3], sym: "B", cat: "metalloid" }, { pos: [2, 4], sym: "C", cat: "nonmetal" }, { pos: [2, 5], sym: "N", cat: "nonmetal" }, { pos: [2, 6], sym: "O", cat: "nonmetal" }, { pos: [2, 7], sym: "F", cat: "halogen" }, { pos: [2, 8], sym: "Ne", cat: "noble" },
+            { pos: [3, 1], sym: "Na", cat: "alkali" }, { pos: [3, 2], sym: "Mg", cat: "alkaline" }, { pos: [3, 3], sym: "Al", cat: "metal" }, { pos: [3, 4], sym: "Si", cat: "metalloid" }, { pos: [3, 5], sym: "P", cat: "nonmetal" }, { pos: [3, 6], sym: "S", cat: "nonmetal" }, { pos: [3, 7], sym: "Cl", cat: "halogen" }, { pos: [3, 8], sym: "Ar", cat: "noble" },
+            { pos: [4, 1], sym: "K", cat: "alkali" }, { pos: [4, 2], sym: "Ca", cat: "alkaline" }, { pos: [4, 3], sym: "Ga", cat: "metal" }, { pos: [4, 4], sym: "Ge", cat: "metalloid" }, { pos: [4, 5], sym: "As", cat: "metalloid" }, { pos: [4, 6], sym: "Se", cat: "nonmetal" }, { pos: [4, 7], sym: "Br", cat: "halogen" }, { pos: [4, 8], sym: "Kr", cat: "noble" },
+            { pos: [5, 1], sym: "Rb", cat: "alkali" }, { pos: [5, 2], sym: "Sr", cat: "alkaline" }, { pos: [5, 3], sym: "In", cat: "metal" }, { pos: [5, 4], sym: "Sn", cat: "metal" }, { pos: [5, 5], sym: "Sb", cat: "metalloid" }, { pos: [5, 6], sym: "Te", cat: "metalloid" }, { pos: [5, 7], sym: "I", cat: "halogen" }, { pos: [5, 8], sym: "Xe", cat: "noble" },
+            { pos: [6, 1], sym: "Cs", cat: "alkali" }, { pos: [6, 2], sym: "Ba", cat: "alkaline" }, { pos: [6, 3], sym: "Tl", cat: "metal" }, { pos: [6, 4], sym: "Pb", cat: "metal" }, { pos: [6, 5], sym: "Bi", cat: "metal" }, { pos: [6, 6], sym: "Po", cat: "metalloid" }, { pos: [6, 7], sym: "At", cat: "halogen" }, { pos: [6, 8], sym: "Rn", cat: "noble" },
+        ];
+
+        // --- COMPONENTS ---
+
+        const PeriodicTable = ({ isOpen, onClose }) => {
+            if (!isOpen) return null;
+
+            const ROWS = 6;
+            const COLS = 8;
+            const getColor = (cat) => {
+                const colors = {
+                    alkali: "bg-red-200", alkaline: "bg-orange-200",
+                    metal: "bg-blue-100", metalloid: "bg-green-100", nonmetal: "bg-green-200",
+                    halogen: "bg-teal-200", noble: "bg-purple-200"
+                };
+                return colors[cat] || "bg-gray-100";
+            };
+
+            return (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white p-6 rounded-xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-xl font-bold">Hovedgrupperne (udsnit)</h2>
+                            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">✕</button>
+                        </div>
+                        <div className="periodic-table-grid mb-1">
+                            {Array.from({ length: COLS }).map((_, i) => (
+                                <div key={i} className="text-center text-xs font-bold text-gray-400">{i + 1}</div>
+                            ))}
+                        </div>
+                        <div className="periodic-table-grid">
+                            {Array.from({ length: ROWS * COLS }).map((_, i) => {
+                                const row = Math.floor(i / COLS) + 1;
+                                const col = (i % COLS) + 1;
+                                const element = periodicTableData.find(e => e.pos[0] === row && e.pos[1] === col);
+
+                                return (
+                                    <div key={i} className={`element-cell border border-gray-300 ${element ? getColor(element.cat) : 'opacity-0'}`}>
+                                        {element && (
+                                            <span className="font-bold">{element.sym}</span>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        <p className="mt-4 text-xs text-gray-500 italic">Bemærk: Kun hovedgrupperne (1-8) er vist. Undergrupperne (overgangsmetallerne, fx Fe, Cu, Ag, Zn) står ikke her, fordi deres ladning ikke kan aflæses af hovedgruppenummeret.</p>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [taskType, setTaskType] = useState('formler');
+            const [taskIndexByType, setTaskIndexByType] = useState({ formler: 0, navne: 0, sammensat: 0 });
+            const [solvedByType, setSolvedByType] = useState({ formler: {}, navne: {}, sammensat: {} });
+            const [subStep, setSubStep] = useState(0);
+            const [answerInput, setAnswerInput] = useState("");
+            const [confirmedAnswers, setConfirmedAnswers] = useState([]);
+            const [wrongStreak, setWrongStreak] = useState(0);
+            const [feedback, setFeedback] = useState(null);
+            const [isTableOpen, setIsTableOpen] = useState(false);
+            const [practicingSolved, setPracticingSolved] = useState(false);
+            const timeoutRef = useRef(null);
+
+            const currentTasks = TASK_POOLS[taskType];
+            const taskIndex = taskIndexByType[taskType];
+            const task = currentTasks[taskIndex];
+            const steps = buildSteps(task);
+            const currentStep = steps[subStep];
+            const isFinal = currentStep.kind === 'finalFormula' || currentStep.kind === 'finalName';
+            // Man lander i facit-visning, når man vender tilbage til en allerede løst opgave,
+            // medmindre man aktivt har valgt at øve den igen.
+            const isReviewing = !!solvedByType[taskType][taskIndex] && !practicingSolved;
+
+            const clearPendingTimeout = () => {
+                if (timeoutRef.current) {
+                    clearTimeout(timeoutRef.current);
+                    timeoutRef.current = null;
+                }
+            };
+
+            const resetTask = () => {
+                clearPendingTimeout();
+                setSubStep(0);
+                setAnswerInput("");
+                setConfirmedAnswers([]);
+                setWrongStreak(0);
+                setFeedback(null);
+                setPracticingSolved(false);
+            };
+
+            // Hopper frit til en given opgave inden for den aktuelle opgavetype.
+            const goToTask = (index) => {
+                setTaskIndexByType(prev => ({ ...prev, [taskType]: index }));
+                resetTask();
+            };
+
+            // Skifter opgavetype, men husker hvilken opgave man var nået til i den type.
+            const goToType = (t) => {
+                setTaskType(t);
+                resetTask();
+            };
+
+            const goToNextType = () => {
+                const idx = TYPE_ORDER.indexOf(taskType);
+                if (idx < TYPE_ORDER.length - 1) goToType(TYPE_ORDER[idx + 1]);
+            };
+
+            const advanceStep = (entry) => {
+                setConfirmedAnswers(prev => [...prev, entry]);
+                setSubStep(s => s + 1);
+                setAnswerInput("");
+                setFeedback(null);
+                setWrongStreak(0);
+            };
+
+            const advanceFromFinalStep = () => {
+                setSolvedByType(prev => ({ ...prev, [taskType]: { ...prev[taskType], [taskIndex]: true } }));
+                if (taskIndex < currentTasks.length - 1) {
+                    goToTask(taskIndex + 1);
+                } else {
+                    clearPendingTimeout();
+                    setFeedback({ type: 'finish', msg: `Tillykke! Du har gennemført "${TYPE_LABELS[taskType]}".` });
+                }
+            };
+
+            // Ved 1. fejl: kort fejlbesked. Ved 2. fejl: samme besked + et ekstra tip. Ved 3. fejl: facit.
+            const registerWrong = (buildReveal) => {
+                const streak = wrongStreak + 1;
+                setWrongStreak(streak);
+                if (streak >= 3) {
+                    setFeedback({ type: 'reveal', msg: 'Her er svaret:', ...buildReveal() });
+                } else if (streak === 2) {
+                    const { extra } = getStepHints(currentStep, task);
+                    setFeedback({ type: 'error', msg: 'Stadig ikke helt rigtigt.', extra });
+                } else {
+                    setFeedback({ type: 'error', msg: 'Ikke helt rigtigt endnu. Prøv igen.' });
+                }
+            };
+
+            const handleCheck = () => {
+                const kind = currentStep.kind;
+                const input = normalizeChemInput(answerInput).trim().toLowerCase().replace(/\s/g, '');
+
+                if (kind === 'ionFormula') {
+                    const target = task.ions[currentStep.ionIdx];
+                    const expected = ionPlain(target);
+                    const entry = { label: target.c > 0 ? 'Positiv ion' : 'Negativ ion', display: ionDisplay(target) };
+                    if (input === expected) {
+                        setFeedback({ type: 'success', msg: 'Korrekt!' });
+                        timeoutRef.current = setTimeout(() => advanceStep(entry), 800);
+                    } else {
+                        registerWrong(() => ({ reveal: ionDisplay(target), onContinue: () => advanceStep(entry) }));
+                    }
+                } else if (kind === 'ionName') {
+                    const target = task.ions[currentStep.ionIdx];
+                    const expectedNames = target.names.map(n => n.toLowerCase().replace(/\s/g, ''));
+                    const entry = { label: (target.c > 0 ? 'Positiv ion' : 'Negativ ion') + ' – navn', display: target.names[0] };
+                    if (expectedNames.includes(input)) {
+                        setFeedback({ type: 'success', msg: 'Korrekt!' });
+                        timeoutRef.current = setTimeout(() => advanceStep(entry), 800);
+                    } else {
+                        registerWrong(() => ({ reveal: target.names[0], onContinue: () => advanceStep(entry) }));
+                    }
+                } else if (kind === 'finalFormula') {
+                    if (input === task.formula.toLowerCase()) {
+                        setFeedback({ type: 'success', msg: 'Flot! Opgaven er løst.' });
+                        timeoutRef.current = setTimeout(advanceFromFinalStep, 1200);
+                    } else {
+                        registerWrong(() => ({ reveal: formatFormula(task.formula), onContinue: advanceFromFinalStep }));
+                    }
+                } else { // finalName
+                    const normalizedNames = task.names.map(n => n.toLowerCase().replace(/\s/g, ''));
+                    if (normalizedNames.includes(input)) {
+                        setFeedback({ type: 'success', msg: 'Flot! Opgaven er løst.' });
+                        timeoutRef.current = setTimeout(advanceFromFinalStep, 1200);
+                    } else {
+                        registerWrong(() => ({ reveal: task.names[0], onContinue: advanceFromFinalStep }));
+                    }
+                }
+            };
+
+            const handleKeyDown = (e) => {
+                if (e.key === 'Enter') handleCheck();
+            };
+
+            // --- Indhold til det aktuelle spørgsmål ---
+            let stepContent;
+            if (!isFinal) {
+                const target = task.ions[currentStep.ionIdx];
+                const isPositive = target.c > 0;
+                const isNameStep = currentStep.kind === 'ionName';
+                const { base: hintBase } = getStepHints(currentStep, task);
+
+                const questionText = isNameStep
+                    ? <>Hvad hedder ionen <strong>{ionDisplay(target)}</strong> på dansk?</>
+                    : <>Hvilken ion danner <strong>{formatFormula(target.f)}</strong>?</>;
+
+                const fieldLabel = (isPositive ? 'Positiv ion' : 'Negativ ion') + (isNameStep ? ' – navn' : '');
+                const placeholderHint = taskIndex === 0
+                    ? (isNameStep
+                        ? (isPositive ? "fx calciumion" : "fx chlorid")
+                        : (isPositive ? "fx Na+ eller Na⁺" : "fx O2- eller O²⁻"))
+                    : "";
+
+                stepContent = (
+                    <div>
+                        <p className="text-xs uppercase tracking-wider text-gray-400 font-bold mb-1">Trin {subStep + 1} af {steps.length}</p>
+                        <p className="text-base font-medium text-slate-700 mb-1">{questionText}</p>
+                        <p className="text-xs text-gray-400 mb-4">{hintBase}</p>
+                        <div className="flex gap-4 items-end">
+                            <div className="flex-1">
+                                <label className="block text-xs font-bold text-gray-400 mb-1">{fieldLabel}</label>
+                                <input
+                                    type="text"
+                                    value={answerInput}
+                                    onChange={(e) => setAnswerInput(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    placeholder={placeholderHint}
+                                    className="w-full p-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none font-mono"
+                                    autoFocus
+                                />
+                            </div>
+                            <button
+                                onClick={handleCheck}
+                                className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
+                            >
+                                Tjek
+                            </button>
+                        </div>
+                    </div>
+                );
+            } else {
+                const isNameFinal = currentStep.kind === 'finalName';
+                const { base: hintBase } = getStepHints(currentStep, task);
+                stepContent = (
+                    <div>
+                        <p className="text-xs uppercase tracking-wider text-gray-400 font-bold mb-1">Trin {subStep + 1} af {steps.length}</p>
+                        <p className="text-sm text-gray-500 mb-4 italic">{hintBase}</p>
+                        <div className="flex gap-4">
+                            <input
+                                type="text"
+                                value={answerInput}
+                                onChange={(e) => setAnswerInput(e.target.value)}
+                                onKeyDown={handleKeyDown}
+                                placeholder={taskIndex === 0 ? (isNameFinal ? "Navn..." : "fx Na2O eller Na₂O") : ""}
+                                className="flex-1 p-4 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none text-xl font-bold"
+                                autoFocus
+                            />
+                            <button
+                                onClick={handleCheck}
+                                className="bg-green-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-700 transition-all shadow-lg shadow-green-200"
+                            >
+                                Svar
+                            </button>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="max-w-2xl mx-auto py-10 px-4">
+                    <header className="mb-8 text-center">
+                        <h1 className="text-3xl font-black text-slate-800 mb-2">Opskrivning af ionforbindelser</h1>
+                        <div className="flex flex-wrap justify-center gap-2">
+                            {TYPE_ORDER.map(t => (
+                                <button
+                                    key={t}
+                                    onClick={() => goToType(t)}
+                                    className={`px-3 py-1 rounded-full text-xs sm:text-sm font-bold transition-colors ${taskType === t ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`}
+                                >
+                                    {TYPE_LABELS[t]}
+                                </button>
+                            ))}
+                        </div>
+                    </header>
+
+                    <main className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 relative overflow-hidden">
+                        {/* Progress */}
+                        <div className="absolute top-0 left-0 h-1 bg-blue-500 transition-all duration-500" style={{ width: `${((taskIndex + 1) / currentTasks.length) * 100}%` }}></div>
+
+                        <div className="flex justify-between items-start mb-4">
+                            <div>
+                                <h2 className="text-sm uppercase tracking-wider text-gray-400 font-bold">
+                                    Opgave {taskIndex + 1} af {currentTasks.length}
+                                    {taskIndex === 0 && (
+                                        <span className="ml-2 inline-block bg-blue-100 text-blue-700 text-[10px] normal-case tracking-normal font-bold px-2 py-0.5 rounded-full align-middle">Intro-opgave</span>
+                                    )}
+                                </h2>
+                                <p className="text-lg font-medium text-slate-700">
+                                    {task.mode === 'formula'
+                                        ? <>Denne forbindelse hedder <strong>{task.names[0]}</strong>. Bestem ionerne, og opskriv til sidst den samlede formel.</>
+                                        : <>Forbindelsen har formlen <strong>{formatFormula(task.formula)}</strong>. Bestem og navngiv ionerne, og skriv til sidst det samlede danske navn.</>}
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setIsTableOpen(true)}
+                                className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-700 transition-colors whitespace-nowrap"
+                            >
+                                Periodisk System
+                            </button>
+                        </div>
+
+                        {/* Opgavenavigation: hop frit mellem opgave 1, 2, 3 osv. Holdt lille og diskret,
+                            så det er selve opgaven herunder der er i fokus, ikke tal-rækken. */}
+                        <div className="flex flex-wrap items-center gap-1 mb-4">
+                            <button
+                                onClick={() => goToTask(Math.max(0, taskIndex - 1))}
+                                disabled={taskIndex === 0}
+                                className="w-5 h-5 rounded-full border border-slate-200 text-slate-400 text-[10px] font-bold disabled:opacity-30 hover:border-blue-400 transition-colors"
+                                aria-label="Forrige opgave"
+                            >
+                                ‹
+                            </button>
+                            {currentTasks.map((t, i) => (
+                                <button
+                                    key={t.id}
+                                    onClick={() => goToTask(i)}
+                                    className={`w-5 h-5 rounded-full text-[10px] font-bold border transition-colors ${
+                                        i === taskIndex
+                                            ? 'bg-blue-600 text-white border-blue-600'
+                                            : solvedByType[taskType][i]
+                                                ? 'bg-green-100 text-green-700 border-green-300 hover:border-green-400'
+                                                : 'bg-white text-slate-400 border-slate-200 hover:border-blue-400'
+                                    }`}
+                                >
+                                    {i + 1}
+                                </button>
+                            ))}
+                            <button
+                                onClick={() => goToTask(Math.min(currentTasks.length - 1, taskIndex + 1))}
+                                disabled={taskIndex === currentTasks.length - 1}
+                                className="w-5 h-5 rounded-full border border-slate-200 text-slate-400 text-[10px] font-bold disabled:opacity-30 hover:border-blue-400 transition-colors"
+                                aria-label="Næste opgave"
+                            >
+                                ›
+                            </button>
+                        </div>
+
+                        {isReviewing ? (
+                            /* Man er vendt tilbage til en allerede løst opgave: vis facit i stedet for at spørge igen */
+                            <div>
+                                <p className="text-sm font-bold text-green-700 mb-4">✓ Denne opgave er løst — her er facit:</p>
+                                <div className="space-y-4 mb-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-400 mb-1">Positiv ion{task.mode === 'name' ? ' (formel og navn)' : ''}</label>
+                                        <div className="w-full p-3 border-2 border-green-200 bg-green-50 rounded-xl font-mono text-green-700 flex items-center justify-between">
+                                            <span>{ionDisplay(task.ions[0])}{task.mode === 'name' ? ` — ${task.ions[0].names[0]}` : ''}</span>
+                                            <span>✓</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-400 mb-1">Negativ ion{task.mode === 'name' ? ' (formel og navn)' : ''}</label>
+                                        <div className="w-full p-3 border-2 border-green-200 bg-green-50 rounded-xl font-mono text-green-700 flex items-center justify-between">
+                                            <span>{ionDisplay(task.ions[1])}{task.mode === 'name' ? ` — ${task.ions[1].names[0]}` : ''}</span>
+                                            <span>✓</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-400 mb-1">{task.mode === 'formula' ? 'Samlet formel' : 'Samlet navn'}</label>
+                                        <div className="w-full p-3 border-2 border-green-300 bg-green-100 rounded-xl font-mono font-bold text-green-800 flex items-center justify-between">
+                                            <span>{task.mode === 'formula' ? formatFormula(task.formula) : task.names[0]}</span>
+                                            <span>✓</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button onClick={() => setPracticingSolved(true)} className="text-sm text-blue-600 font-bold hover:underline">Øv opgaven igen</button>
+                            </div>
+                        ) : (
+                            <>
+                                {/* Allerede besvarede felter i denne opgave bliver stående, så man kan se hvad man lige har indtastet */}
+                                {confirmedAnswers.length > 0 && (
+                                    <div className="space-y-4 mb-4">
+                                        {confirmedAnswers.map((a, i) => (
+                                            <div key={i}>
+                                                <label className="block text-xs font-bold text-gray-400 mb-1">{a.label}</label>
+                                                <div className="w-full p-3 border-2 border-green-200 bg-green-50 rounded-xl font-mono text-green-700 flex items-center justify-between">
+                                                    <span>{a.display}</span>
+                                                    <span>✓</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {stepContent}
+                            </>
+                        )}
+
+                        {/* Feedback */}
+                        {feedback && (
+                            <div className={`mt-6 p-4 rounded-xl font-bold text-center ${
+                                feedback.type === 'success' ? 'bg-green-100 text-green-700 animate-bounce' :
+                                feedback.type === 'finish' ? 'bg-blue-100 text-blue-700' :
+                                feedback.type === 'reveal' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-700'
+                            }`}>
+                                {feedback.msg}
+                                {feedback.extra && (
+                                    <div className="mt-2 text-sm font-normal">{feedback.extra}</div>
+                                )}
+                                {feedback.type === 'reveal' && (
+                                    <>
+                                        <div className="text-2xl mt-1 font-mono">{feedback.reveal}</div>
+                                        <button onClick={feedback.onContinue} className="mt-3 bg-amber-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-amber-700">Fortsæt →</button>
+                                    </>
+                                )}
+                                {feedback.type === 'finish' && TYPE_ORDER.indexOf(taskType) < TYPE_ORDER.length - 1 && (
+                                    <button onClick={goToNextType} className="block mx-auto mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">Næste opgavetype</button>
+                                )}
+                            </div>
+                        )}
+                    </main>
+
+                    <footer className="mt-8 text-center text-gray-400 text-sm">
+                        Husk: Ladningerne skal gå ud med hinanden, så forbindelsen bliver neutral.
+                    </footer>
+
+                    <PeriodicTable isOpen={isTableOpen} onClose={() => setIsTableOpen(false)} />
+                </div>
+            );
+        };
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
+</body>
+</html>

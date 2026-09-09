@@ -1,0 +1,2425 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ligevægtsloven - Opskrivning af Reaktionsbrøken</title>
+    <style>
+        /* =========================================
+           CSS VARIABLER & NULSTILLING
+           ========================================= */
+        :root {
+            --bg-color: #121215;
+            --panel-bg: #1e1e24;
+            --panel-border: #333340;
+            --text-color: #f0f0f0;
+            --accent-blue: #4cc9f0;
+            --accent-green: #4ade80;
+            --accent-red: #ef476f;
+            --accent-yellow: #ffd166;
+            --accent-purple: #b892ff;
+            --drop-zone-bg: #2a2a35;
+            --btn-bg: #2d2d3a;
+            --btn-hover: #3d3d4e;
+            --fraction-line: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* =========================================
+           CANVAS LAYERS
+           ========================================= */
+        #bgCanvas, #fxCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+        }
+        #fxCanvas {
+            z-index: 100;
+        }
+
+        /* =========================================
+           HEADER & LAYOUT
+           ========================================= */
+        header {
+            position: relative;
+            z-index: 10;
+            background: rgba(30, 30, 36, 0.9);
+            border-bottom: 2px solid var(--accent-blue);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            color: var(--accent-blue);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--panel-border);
+        }
+
+        /* Teori- og hjælpeknapper i toppen */
+        .header-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .top-btn {
+            background: rgba(76, 201, 240, 0.1);
+            border: 2px solid var(--accent-blue);
+            color: var(--accent-blue);
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+        }
+        .top-btn:hover {
+            background: var(--accent-blue);
+            color: #06232c;
+            transform: translateY(-2px);
+        }
+
+        .top-btn.help {
+            background: rgba(255, 209, 102, 0.1);
+            border-color: var(--accent-yellow);
+            color: var(--accent-yellow);
+        }
+        .top-btn.help:hover {
+            background: var(--accent-yellow);
+            color: #2a2110;
+        }
+
+        .top-btn.quiz {
+            background: rgba(184, 146, 255, 0.12);
+            border-color: var(--accent-purple);
+            color: var(--accent-purple);
+        }
+        .top-btn.quiz:hover {
+            background: var(--accent-purple);
+            color: #20142e;
+        }
+
+        /* Quizzen er løst – knappen bliver grøn */
+        .top-btn.quiz.solved {
+            background: rgba(74, 222, 128, 0.16);
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+            box-shadow: 0 0 12px rgba(74, 222, 128, 0.35);
+        }
+        .top-btn.quiz.solved:hover {
+            background: var(--accent-green);
+            color: #08210f;
+        }
+
+        /* =========================================
+           MODAL (TEORI & HJÆLP)
+           ========================================= */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 300;
+            background: rgba(6, 6, 10, 0.8);
+            backdrop-filter: blur(3px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .modal-overlay[hidden] { display: none; }
+
+        .modal {
+            background: var(--panel-bg);
+            border: 2px solid var(--panel-border);
+            border-radius: 14px;
+            width: 100%;
+            max-width: 740px;
+            max-height: 86vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+            animation: popIn 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 16px 22px;
+            border-bottom: 2px solid var(--panel-border);
+            flex-shrink: 0;
+        }
+        .modal-head h2 {
+            font-size: 1.1rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--accent-blue);
+        }
+
+        .modal-close {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--btn-bg);
+            border: 2px solid var(--panel-border);
+            color: #bbb;
+            font-size: 0.9rem;
+            font-family: inherit;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .modal-close:hover {
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .modal-body {
+            padding: 20px 24px 26px;
+            overflow-y: auto;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            color: #d7d7e0;
+        }
+        .modal-body, .modal-body * { user-select: text; }
+
+        .modal-body h3 {
+            color: var(--accent-yellow);
+            font-size: 1.02rem;
+            margin: 22px 0 8px;
+        }
+        .modal-body h3:first-child { margin-top: 0; }
+        .modal-body p { margin-bottom: 10px; }
+        .modal-body ul { margin: 0 0 12px 22px; }
+        .modal-body li { margin-bottom: 7px; }
+        .modal-body strong { color: #ffffff; }
+
+        .modal-body .eq-line {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--accent-yellow);
+            margin: 14px 0;
+        }
+
+        .modal-body kbd {
+            background: var(--btn-bg);
+            border: 1px solid #555;
+            border-radius: 5px;
+            padding: 1px 7px;
+            font-size: 0.85em;
+            font-family: inherit;
+        }
+
+        /* Farveprikker i forklaringen af oversigten */
+        .dot-legend {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            border: 2px solid var(--panel-border);
+            vertical-align: -2px;
+            margin-right: 4px;
+        }
+        .dot-legend.done { border-color: var(--accent-green); background: rgba(74, 222, 128, 0.2); }
+        .dot-legend.started { border-color: var(--accent-yellow); }
+        .dot-legend.current { border-color: var(--accent-blue); background: rgba(76, 201, 240, 0.25); }
+
+        /* =========================================
+           QUIZ
+           ========================================= */
+        .quiz-progress {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #8a8aa0;
+            margin-bottom: 8px;
+        }
+
+        .quiz-bar {
+            height: 6px;
+            background: var(--btn-bg);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 22px;
+        }
+        .quiz-bar span {
+            display: block;
+            height: 100%;
+            border-radius: 3px;
+            background: var(--accent-purple);
+            transition: width 0.35s ease;
+        }
+
+        .quiz-q {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #fff;
+            line-height: 1.45;
+            margin-bottom: 18px;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .quiz-opt {
+            text-align: left;
+            padding: 13px 16px;
+            border-radius: 10px;
+            background: var(--btn-bg);
+            border: 2px solid var(--panel-border);
+            color: var(--text-color);
+            font-size: 0.98rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s, transform 0.15s;
+        }
+        .quiz-opt:hover:not(:disabled) {
+            border-color: var(--accent-purple);
+            background: var(--btn-hover);
+            transform: translateX(4px);
+        }
+        .quiz-opt:disabled { cursor: default; opacity: 0.6; }
+        .quiz-opt.correct {
+            border-color: var(--accent-green);
+            background: rgba(74, 222, 128, 0.15);
+            color: #fff;
+            opacity: 1;
+        }
+        .quiz-opt.wrong {
+            border-color: var(--accent-red);
+            background: rgba(239, 71, 111, 0.15);
+            color: #fff;
+            opacity: 1;
+        }
+
+        .quiz-feedback { margin-top: 18px; }
+        .quiz-verdict { font-weight: bold; margin-bottom: 5px; }
+        .quiz-verdict.ok { color: var(--accent-green); }
+        .quiz-verdict.no { color: var(--accent-red); }
+        .quiz-why { color: #b9b9c8; font-size: 0.92rem; }
+
+        .quiz-btn {
+            margin-top: 18px;
+            padding: 11px 28px;
+            border: none;
+            border-radius: 30px;
+            background: linear-gradient(135deg, var(--accent-blue), #2b84a3);
+            color: #000;
+            font-size: 1rem;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+        .quiz-btn:hover { transform: scale(1.04); }
+        .quiz-btn.secondary {
+            background: transparent;
+            border: 2px solid var(--accent-yellow);
+            color: var(--accent-yellow);
+            margin-left: 10px;
+        }
+
+        .quiz-result { text-align: center; padding: 12px 0 4px; }
+        .quiz-score-big {
+            font-size: 3.2rem;
+            font-weight: bold;
+            color: var(--accent-yellow);
+            line-height: 1.1;
+        }
+        .quiz-result.perfect .quiz-score-big { color: var(--accent-green); }
+        .quiz-result p { margin: 12px 0 6px; }
+
+        #templates { display: none; }
+
+        #main-container {
+            position: relative;
+            z-index: 10;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 25px 20px;
+            width: 100%;
+            max-width: 1060px;
+            margin: 0 auto;
+        }
+
+        /* =========================================
+           OPGAVEOVERSIGT (NAVIGATION)
+           ========================================= */
+        #level-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            width: 100%;
+            margin-bottom: 22px;
+            padding-top: 6px;
+        }
+
+        #level-dots {
+            display: flex;
+            gap: 9px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .level-dot {
+            position: relative;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: var(--btn-bg);
+            border: 2px solid var(--panel-border);
+            color: #9a9aae;
+            font-size: 1rem;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.15s, background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+        }
+
+        .level-dot:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-blue);
+            color: #fff;
+        }
+
+        /* Løst opgave */
+        .level-dot.done {
+            background: rgba(74, 222, 128, 0.14);
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+        .level-dot.done::after {
+            content: "✓";
+            position: absolute;
+            top: -7px;
+            right: -7px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            color: #0d1a12;
+            font-size: 0.72rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Påbegyndt, men ikke løst */
+        .level-dot.started {
+            border-color: var(--accent-yellow);
+            color: var(--accent-yellow);
+        }
+
+        /* Den opgave man er på lige nu */
+        .level-dot.current {
+            background: rgba(76, 201, 240, 0.2);
+            border-color: var(--accent-blue);
+            color: #fff;
+            box-shadow: 0 0 14px rgba(76, 201, 240, 0.45);
+            transform: translateY(-2px);
+        }
+        .level-dot.current.done {
+            background: rgba(74, 222, 128, 0.22);
+            border-color: var(--accent-green);
+            box-shadow: 0 0 14px rgba(74, 222, 128, 0.5);
+            color: #fff;
+        }
+
+        .nav-arrow {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--btn-bg);
+            border: 2px solid var(--panel-border);
+            color: #9a9aae;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s, opacity 0.2s;
+            flex-shrink: 0;
+        }
+        .nav-arrow:hover:not(:disabled) {
+            border-color: var(--accent-blue);
+            color: #fff;
+        }
+        .nav-arrow:disabled {
+            opacity: 0.25;
+            cursor: default;
+        }
+
+        /* =========================================
+           REAKTIONSSKEMA (TOP)
+           ========================================= */
+        #reaction-container {
+            background: var(--panel-bg);
+            border: 2px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 18px 40px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            width: 100%;
+            transition: box-shadow 0.3s, border-color 0.3s;
+        }
+
+        #reaction-title {
+            font-size: 1rem;
+            color: #aaa;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #reaction-equation {
+            font-size: 2.1rem;
+            font-weight: bold;
+            color: var(--accent-yellow);
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(255, 209, 102, 0.2);
+        }
+
+        #reaction-desc {
+            font-size: 0.95rem;
+            color: #888;
+            margin-top: 12px;
+            font-style: italic;
+        }
+
+        /* =========================================
+           FRACTION BUILDER (MIDDLE)
+           ========================================= */
+        #fraction-workspace {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        .fraction-label {
+            font-size: 2.5rem;
+            font-style: italic;
+            font-family: 'Times New Roman', Times, serif;
+            color: var(--text-color);
+            flex-shrink: 0;
+        }
+
+        #fraction-container {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: center;
+            flex: 1;
+            max-width: 660px;
+        }
+
+        .drop-zone {
+            position: relative;
+            width: 100%;
+            min-height: 84px;
+            background: var(--drop-zone-bg);
+            border: 3px dashed var(--panel-border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 14px;
+            gap: 6px;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            flex-wrap: wrap;
+        }
+
+        .drop-zone::before {
+            content: attr(data-placeholder);
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            text-align: center;
+            color: #6a6a7d;
+            font-size: 1.05rem;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+
+        .drop-zone.has-items::before {
+            opacity: 0;
+        }
+
+        /* Zonen man skriver i, når man KLIKKER en brik */
+        .drop-zone.active {
+            border-color: var(--accent-blue);
+            background: rgba(76, 201, 240, 0.08);
+        }
+
+        /* Zonen man svæver hen over med musen under et træk */
+        .drop-zone.drag-over {
+            border-color: var(--accent-green);
+            border-style: solid;
+            background: rgba(74, 222, 128, 0.12);
+            box-shadow: 0 0 18px rgba(74, 222, 128, 0.25) inset;
+        }
+
+        .fraction-line {
+            width: 100%;
+            height: 4px;
+            background-color: var(--fraction-line);
+            margin: 14px 0;
+            border-radius: 2px;
+            box-shadow: 0 0 8px rgba(255,255,255,0.3);
+        }
+
+        /* Indsætnings-markør under træk */
+        .caret {
+            width: 5px;
+            min-height: 48px;
+            align-self: center;
+            border-radius: 3px;
+            background: var(--accent-green);
+            box-shadow: 0 0 12px var(--accent-green);
+            animation: caretPulse 0.7s ease-in-out infinite;
+        }
+
+        /* =========================================
+           BRIKKER (OPERATORER, KEMIKALIER, EKSPONENTER)
+           ========================================= */
+        .tok {
+            background: var(--btn-bg);
+            color: var(--text-color);
+            border: 2px solid #555;
+            padding: 11px 18px;
+            font-size: 1.35rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: grab;
+            touch-action: none;
+            transition: transform 0.12s, background 0.2s, border-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+
+        .tok:hover {
+            background: var(--btn-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 12px rgba(0,0,0,0.35);
+        }
+
+        /* Farvekodning pr. kategori */
+        .tok[data-cat="chem"] { border-color: #3f6f88; background: #22323d; }
+        .tok[data-cat="chem"]:hover { border-color: var(--accent-blue); }
+
+        .tok[data-cat="op"]   { border-color: #5b4b86; background: #2e2840; color: #e6dcff; }
+        .tok[data-cat="op"]:hover { border-color: var(--accent-purple); }
+
+        .tok[data-cat="exp"] { border-color: #7a6425; background: #3a3220; color: var(--accent-yellow); padding: 8px 16px; }
+        .tok[data-cat="exp"]:hover { border-color: var(--accent-yellow); }
+
+        /* Brikker der ligger i brøken */
+        .tok.in-zone {
+            padding: 8px 13px;
+            font-size: 1.25rem;
+            animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .tok.in-zone[data-cat="exp"] {
+            align-self: flex-start;
+            margin-left: -10px;
+            margin-top: 8px;
+            padding: 3px 8px;
+            font-size: 1.05rem;
+        }
+        .tok.in-zone[data-cat="op"] {
+            padding: 8px 9px;
+        }
+
+        .tok.dragging { opacity: 0.25; }
+
+        /* Selve brikken der følger musen */
+        .drag-ghost {
+            position: fixed;
+            z-index: 999;
+            pointer-events: none;
+            transform: scale(1.12) rotate(-2deg);
+            box-shadow: 0 14px 28px rgba(0,0,0,0.55);
+            opacity: 0.96;
+            cursor: grabbing;
+        }
+        .drag-ghost.over-trash {
+            border-color: var(--accent-red) !important;
+            box-shadow: 0 0 22px rgba(239, 71, 111, 0.6);
+        }
+
+        /* =========================================
+           VÆRKTØJSKASSE (OPDELT I KATEGORIER)
+           ========================================= */
+        #options-pool {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .pool-section {
+            background: var(--panel-bg);
+            border: 2px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 14px 16px 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        #sec-chem { flex: 3 1 380px; }
+        #sec-op   { flex: 1 1 190px; }
+        #sec-exp  { flex: 1 1 170px; }
+
+        .pool-section h2 {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #8a8aa0;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--panel-border);
+        }
+        #sec-chem h2 { color: #7fb4cd; }
+        #sec-op h2   { color: var(--accent-purple); }
+        #sec-exp h2  { color: var(--accent-yellow); }
+
+        .pool-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-content: flex-start;
+        }
+
+        .pool-hint {
+            margin-top: 10px;
+            font-size: 0.75rem;
+            color: #6a6a7d;
+            font-style: italic;
+        }
+
+        /* =========================================
+           CONTROLS (BOTTOM)
+           ========================================= */
+        #controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .action-btn {
+            padding: 14px 32px;
+            font-size: 1.15rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn-check {
+            background: linear-gradient(135deg, var(--accent-green), #2c9c5e);
+            color: #000;
+        }
+        .btn-check:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(74, 222, 128, 0.4);
+        }
+
+        .btn-clear {
+            background: transparent;
+            border: 2px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+        .btn-clear:hover {
+            background: rgba(239, 71, 111, 0.1);
+            transform: scale(1.05);
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, var(--accent-blue), #2b84a3);
+            color: #000;
+            display: none;
+        }
+        .btn-next.show {
+            display: block;
+            animation: popIn 0.4s ease;
+        }
+        .btn-next:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-restart {
+            background: transparent;
+            border: 2px solid var(--accent-yellow);
+            color: var(--accent-yellow);
+            display: none;
+        }
+        .btn-restart.show {
+            display: block;
+            animation: popIn 0.4s ease;
+        }
+        .btn-restart:hover {
+            background: rgba(255, 209, 102, 0.1);
+            transform: scale(1.05);
+        }
+
+        /* =========================================
+           FEEDBACK
+           ========================================= */
+        #feedback-msg {
+            font-size: 1.15rem;
+            font-weight: bold;
+            text-align: center;
+            min-height: 30px;
+            margin-bottom: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            max-width: 780px;
+        }
+
+        .feedback-success { color: var(--accent-green); }
+        .feedback-error { color: var(--accent-red); }
+
+        #explain-box {
+            display: none;
+            width: 100%;
+            max-width: 780px;
+            background: rgba(74, 222, 128, 0.08);
+            border: 1px solid rgba(74, 222, 128, 0.4);
+            border-radius: 10px;
+            padding: 18px 20px 16px;
+            margin-bottom: 18px;
+            font-size: 0.95rem;
+            color: #cfe9d8;
+            line-height: 1.5;
+            text-align: center;
+        }
+        #explain-box.show { display: block; animation: popIn 0.35s ease; }
+
+        /* Pænt opsat facit med rigtig brøkstreg */
+        .result-eq {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+            color: #ffffff;
+            max-width: 100%;
+            overflow-x: auto;
+        }
+
+        .result-k {
+            font-family: 'Times New Roman', Times, serif;
+            font-style: italic;
+            font-size: 2.1rem;
+            color: var(--accent-green);
+            line-height: 1;
+        }
+        .result-k sub {
+            font-size: 0.55em;
+            font-style: normal;
+        }
+
+        .result-frac {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .result-num, .result-den {
+            padding: 6px 16px;
+            font-size: 1.45rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .result-num sup, .result-den sup {
+            font-size: 0.6em;
+            font-weight: bold;
+        }
+
+        .result-line {
+            width: 100%;
+            height: 3px;
+            border-radius: 2px;
+            background: var(--accent-green);
+            box-shadow: 0 0 10px rgba(74, 222, 128, 0.55);
+        }
+
+        .result-note {
+            font-size: 0.95rem;
+            color: #cfe9d8;
+        }
+
+        /* Svævende hjælpetekst under træk */
+        #drag-hint {
+            position: fixed;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(20, 20, 26, 0.94);
+            border: 1px solid var(--panel-border);
+            color: #bbb;
+            padding: 9px 18px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            z-index: 500;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        #drag-hint.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 15px;
+            color: #555;
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+
+        /* =========================================
+           ANIMATIONER
+           ========================================= */
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            80% { transform: scale(1.08); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes poofOut {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0.3) rotate(20deg); opacity: 0; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        @keyframes caretPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.35; }
+        }
+
+        .shake-effect {
+            animation: shake 0.5s ease-in-out;
+            border-color: var(--accent-red) !important;
+        }
+
+        .success-glow {
+            box-shadow: 0 0 30px rgba(74, 222, 128, 0.5) !important;
+            border-color: var(--accent-green) !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header { padding: 12px 15px; }
+            header h1 { font-size: 1.1rem; }
+            .header-stats { font-size: 0.9rem; gap: 10px; }
+            .stat-box { padding: 6px 10px; }
+            #reaction-container { padding: 15px; }
+            #reaction-equation { font-size: 1.4rem; }
+            .fraction-label { font-size: 1.8rem; }
+            .drop-zone { min-height: 70px; }
+            .tok { padding: 9px 13px; font-size: 1.1rem; }
+            #sec-chem, #sec-op, #sec-exp { flex: 1 1 100%; }
+            .action-btn { padding: 12px 22px; font-size: 1rem; }
+            .result-k { font-size: 1.6rem; }
+            .result-num, .result-den { font-size: 1.1rem; padding: 5px 10px; }
+            .level-dot, .nav-arrow { width: 34px; height: 34px; font-size: 0.85rem; }
+            .top-btn { padding: 6px 12px; font-size: 0.85rem; }
+            .modal-overlay { padding: 12px; }
+            .modal { max-height: 90vh; }
+            .modal-body { padding: 16px 18px 22px; font-size: 0.9rem; }
+            .modal-head { padding: 13px 16px; }
+            .modal-head h2 { font-size: 0.95rem; }
+            #level-dots { gap: 6px; }
+            #level-nav { gap: 8px; margin-bottom: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Canvas-lag til visuelle effekter -->
+    <canvas id="bgCanvas"></canvas>
+    <canvas id="fxCanvas"></canvas>
+
+    <!-- Header -->
+    <header>
+        <h1>⚗️ Ligevægts-Bygger</h1>
+
+        <div class="header-btns">
+            <button class="top-btn" id="btn-teori">📖 Teori</button>
+            <button class="top-btn help" id="btn-hjaelp">❓ Hjælp</button>
+            <button class="top-btn quiz" id="btn-quiz">🧠 Quiz</button>
+        </div>
+
+        <div class="header-stats">
+            <div class="stat-box">Point: <span id="score-display">0</span></div>
+            <div class="stat-box">Opgave: <span id="level-display">1</span> / <span id="total-levels">10</span></div>
+            <div class="stat-box">Løst: <span id="solved-display">0</span></div>
+        </div>
+    </header>
+
+    <div id="main-container">
+        <!-- Opgaveoversigt: spring frit frem og tilbage -->
+        <nav id="level-nav" aria-label="Opgaveoversigt">
+            <button class="nav-arrow" id="btn-prev" title="Forrige opgave">◀</button>
+            <div id="level-dots"></div>
+            <button class="nav-arrow" id="btn-fwd" title="Næste opgave">▶</button>
+        </nav>
+
+        <!-- Reaktionsskema -->
+        <div id="reaction-container">
+            <div id="reaction-title">Opgave Titel</div>
+            <div id="reaction-equation">A + B ⇌ C + D</div>
+            <div id="reaction-desc">Beskrivelse af reaktionen.</div>
+        </div>
+
+        <div id="feedback-msg"></div>
+        <div id="explain-box"></div>
+
+        <!-- Brøk-bygger -->
+        <div id="fraction-workspace">
+            <div class="fraction-label">K =</div>
+            <div id="fraction-container">
+                <div id="numerator-zone" class="drop-zone active" data-placeholder="Træk brikker herop – tælleren (produkter)"></div>
+                <div class="fraction-line"></div>
+                <div id="denominator-zone" class="drop-zone" data-placeholder="Træk brikker herned – nævneren (reaktanter)"></div>
+            </div>
+        </div>
+
+        <!-- Værktøjskasse, opdelt i kategorier -->
+        <div id="options-pool">
+            <div class="pool-section" id="sec-chem">
+                <h2>🧪 Kemikalier (koncentrationer)</h2>
+                <div class="pool-items" id="items-chem"></div>
+                <div class="pool-hint">Pas på: ikke alle stoffer på listen hører med i brøken.</div>
+            </div>
+            <div class="pool-section" id="sec-op">
+                <h2>✖️ Operatorer</h2>
+                <div class="pool-items" id="items-op"></div>
+                <div class="pool-hint">Sæt en operator mellem to stoffer.</div>
+            </div>
+            <div class="pool-section" id="sec-exp">
+                <h2>🔢 Opløftede tal</h2>
+                <div class="pool-items" id="items-exp"></div>
+                <div class="pool-hint">Placeres lige efter et stof.</div>
+            </div>
+        </div>
+
+        <!-- Knapper -->
+        <div id="controls">
+            <button class="action-btn btn-clear" id="btn-clear">Ryd Brøk</button>
+            <button class="action-btn btn-check" id="btn-check">Tjek Opskrivning</button>
+            <button class="action-btn btn-next" id="btn-next">Næste Opgave ➔</button>
+            <button class="action-btn btn-restart" id="btn-restart">Start forfra</button>
+        </div>
+    </div>
+
+    <div id="drag-hint"></div>
+
+    <!-- =========================================
+         MODAL TIL TEORI OG HJÆLP
+         ========================================= -->
+    <div class="modal-overlay" id="modal-overlay" hidden>
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <div class="modal-head">
+                <h2 id="modal-title"></h2>
+                <button class="modal-close" id="modal-close" title="Luk (Esc)">✕</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Indholdet til de to bokse -->
+    <div id="templates">
+        <div id="tpl-teori">
+            <h3>Hvad siger ligevægtsloven?</h3>
+            <p>Når en kemisk reaktion er i ligevægt, går den lige hurtigt frem og tilbage, og
+            koncentrationerne ændrer sig ikke længere. For enhver ligevægt kan man opskrive en
+            <strong>reaktionsbrøk</strong>, som altid har den samme værdi ved en given temperatur.
+            Den værdi kaldes <strong>ligevægtskonstanten K</strong>.</p>
+
+            <p>For den generelle ligevægt</p>
+            <div class="eq-line">aA + bB ⇌ cC + dD</div>
+            <p>gælder:</p>
+            <div class="result-eq">
+                <span class="result-k">K =</span>
+                <span class="result-frac">
+                    <span class="result-num">[C]<sup>c</sup>·[D]<sup>d</sup></span>
+                    <span class="result-line"></span>
+                    <span class="result-den">[A]<sup>a</sup>·[B]<sup>b</sup></span>
+                </span>
+            </div>
+
+            <h3>Reglerne, du skal bruge</h3>
+            <ul>
+                <li><strong>Produkterne øverst:</strong> stofferne på højre side af pilen står i tælleren,
+                reaktanterne på venstre side i nævneren.</li>
+                <li><strong>Koefficienter bliver til eksponenter:</strong> 3H₂ giver [H₂]³. En koefficient
+                på 1 skrives ikke.</li>
+                <li><strong>Leddene ganges sammen</strong> med en gangeprik (·) — aldrig med plus.</li>
+                <li><strong>Kantede parenteser</strong> betyder koncentration målt i mol/L.</li>
+                <li><strong>Faste stoffer (s) og rene væsker (l) udelades.</strong> Deres "koncentration"
+                er konstant og gemmes derfor i K. Det samme gælder vand, når det er opløsningsmiddel.</li>
+                <li><strong>Men vand tæller med</strong>, hvis det optræder som gas — H₂O(g) — eller som
+                et almindeligt reaktionsdeltager uden for vandig opløsning.</li>
+                <li>Er nævneren tom, skriver man <strong>1</strong>.</li>
+            </ul>
+
+            <h3>K's værdi fortæller om ligevægten</h3>
+            <ul>
+                <li><strong>Stor K</strong> (K ≫ 1): ligevægten er forskudt mod højre – der er mest produkt.</li>
+                <li><strong>Lille K</strong> (K ≪ 1): ligevægten er forskudt mod venstre – der er mest reaktant.</li>
+                <li>K afhænger <strong>kun af temperaturen</strong>. Ændrer man koncentrationer eller tryk,
+                forskydes ligevægten, men K er den samme.</li>
+            </ul>
+
+            <h3>Har K en enhed?</h3>
+            <p>Det afhænger af, hvordan reaktionsbrøken ser ud. Enheden regnes ud af brøken på samme
+            måde som tallene: er der lige mange led over og under brøkstregen, går mol/L ud mod hinanden,
+            og K er uden enhed – det gælder fx H₂ + I₂ ⇌ 2HI. Er brøken skæv, får K en enhed, fx
+            (mol/L)² for K<sub>v</sub> = [H₃O⁺]·[OH⁻], hvor nævneren er 1.</p>
+
+            <h3>Konstanter med særlige navne</h3>
+            <ul>
+                <li><strong>K<sub>s</sub></strong> – syrestyrkekonstanten for en syres reaktion med vand.</li>
+                <li><strong>K<sub>b</sub></strong> – basestyrkekonstanten for en bases reaktion med vand.</li>
+                <li><strong>K<sub>v</sub></strong> – vands ionprodukt, [H₃O⁺]·[OH⁻] = 1,0·10⁻¹⁴ ved 25 °C.</li>
+                <li><strong>Opløselighedsproduktet</strong> for et tungtopløseligt salt, hvor det faste
+                stof udelades, så nævneren bliver 1.</li>
+            </ul>
+        </div>
+
+        <div id="tpl-hjaelp">
+            <h3>Hvad går øvelsen ud på?</h3>
+            <p>Du får et reaktionsskema øverst og skal bygge den tilhørende reaktionsbrøk ved at trække
+            brikker op i <strong>tælleren</strong> og ned i <strong>nævneren</strong>. Tryk til sidst på
+            <strong>Tjek Opskrivning</strong> for at få svar på, om den er rigtig.</p>
+
+            <h3>Sådan flytter du brikkerne</h3>
+            <ul>
+                <li><strong>Træk frit:</strong> hold på en brik og træk den derhen, hvor den skal ligge.
+                Den grønne streg viser præcis, hvor brikken lander – også midt mellem to andre brikker.</li>
+                <li><strong>Flyt en brik</strong> ved at trække den til en ny plads eller over i den anden
+                halvdel af brøken.</li>
+                <li><strong>Fjern en brik</strong> ved at trække den ud af brøken og slippe – eller bare
+                klikke på den.</li>
+                <li><strong>Genvej:</strong> klikker du på en brik i værktøjskassen, lander den bagerst i
+                den zone, der er markeret med blåt. Klik på tælleren eller nævneren for at skifte zone.</li>
+                <li>Du kan bruge den samme brik så mange gange, du vil. <kbd>Esc</kbd> fortryder et træk.</li>
+            </ul>
+
+            <h3>Værktøjskassen</h3>
+            <ul>
+                <li><strong>🧪 Kemikalier</strong> – koncentrationerne. Pas på: der er flere stoffer end
+                dem, der hører til i brøken.</li>
+                <li><strong>✖️ Operatorer</strong> – gangeprikken · sætter to led sammen. Tallet 1 bruges,
+                når nævneren skal være tom. Plus og minus hører aldrig hjemme i en reaktionsbrøk.</li>
+                <li><strong>🔢 Opløftede tal</strong> – placeres lige efter det stof, de hører til.</li>
+            </ul>
+            <p>Rækkefølgen af leddene betyder ingenting: [A]·[B] og [B]·[A] er lige gode.</p>
+
+            <h3>Opgaveoversigten</h3>
+            <p>Række af tal øverst. Klik på et tal for at hoppe direkte til opgaven – frem eller tilbage.
+            Dine brikker bliver liggende, så du kan vende tilbage til en opgave, du er gået i stå med.</p>
+            <ul>
+                <li><span class="dot-legend"></span> ikke påbegyndt</li>
+                <li><span class="dot-legend started"></span> påbegyndt, men ikke løst</li>
+                <li><span class="dot-legend done"></span> løst rigtigt</li>
+                <li><span class="dot-legend current"></span> den opgave, du er på nu</li>
+            </ul>
+
+            <h3>Point</h3>
+            <p>Hver løst opgave giver 100 point, altså 1000 i alt. Point gives kun første gang en opgave
+            løses, og du mister ikke noget ved at gætte forkert – prøv dig frem.</p>
+        </div>
+    </div>
+
+    <footer>
+        Udviklet til STX Kemi – kemiformler.dk
+    </footer>
+
+    <script>
+        /* ==========================================================================
+           DATA: KEMISKE LIGEVÆGTE (NIVEAUER)
+           ==========================================================================
+           Unicode: subscripts ₂ ₃ ₄ · superscripts ⁺ ⁻ ² ³ ⁴ · ligevægtspil ⇌ · gangeprik ·
+
+           num / den beskriver det korrekte facit som [stof, eksponent].
+           Tom liste = "1" (eller helt tom zone), fx ved opløselighedsligevægte.
+           chem-listen indeholder BÅDE de rigtige stoffer og distraktorer.
+           ========================================================================== */
+
+        // Operatorer og eksponenter er de samme i alle opgaver – kun nogle af dem er rigtige.
+        const OPERATORS = ["·", "+", "−", "1"];
+        const EXPONENTS = ["²", "³", "⁴"];
+
+        const EXP_VALUE = { "¹": 1, "²": 2, "³": 3, "⁴": 4 };
+
+        // Point pr. korrekt løst opgave
+        const POINTS_PER_LEVEL = 100;
+
+        const levelsData = [
+            {
+                title: "Syntese af hydrogeniodid",
+                desc: "Start blødt: en homogen ligevægt mellem to gasser.",
+                reaction: "H₂(g) + I₂(g) ⇌ 2HI(g)",
+                chem: ["[H₂]", "[I₂]", "[HI]", "[H]", "[I]", "[H₂O]"],
+                num: [["[HI]", 2]],
+                den: [["[H₂]", 1], ["[I₂]", 1]],
+                explain: "Produkterne står i tælleren og reaktanterne i nævneren. Koefficienten 2 foran HI bliver til eksponenten 2, mens koefficienten 1 ikke skrives."
+            },
+            {
+                title: "Haber-Bosch-processen",
+                desc: "Klassisk ammoniaksyntese. Læg mærke til koefficienten 3 foran H₂.",
+                reaction: "N₂(g) + 3H₂(g) ⇌ 2NH₃(g)",
+                chem: ["[N₂]", "[H₂]", "[NH₃]", "[NO]", "[O₂]", "[N]"],
+                num: [["[NH₃]", 2]],
+                den: [["[N₂]", 1], ["[H₂]", 3]],
+                explain: "Hver koefficient i reaktionsskemaet bliver til en eksponent i reaktionsbrøken: 3H₂ giver [H₂]³."
+            },
+            {
+                title: "Dissociation af dinitrogentetraoxid",
+                desc: "Den farveløse gas N₂O₄ spaltes til den brune gas NO₂.",
+                reaction: "N₂O₄(g) ⇌ 2NO₂(g)",
+                chem: ["[N₂O₄]", "[NO₂]", "[NO]", "[N₂O]", "[N₂]", "[O₂]"],
+                num: [["[NO₂]", 2]],
+                den: [["[N₂O₄]", 1]],
+                explain: "Der er kun ét stof på hver side, så brøken er kort – men koefficienten 2 skal med som eksponent."
+            },
+            {
+                title: "Kontaktprocessen (svovlsyrefremstilling)",
+                desc: "Hold godt øje med de støkiometriske koefficienter på begge sider af pilen.",
+                reaction: "2SO₂(g) + O₂(g) ⇌ 2SO₃(g)",
+                chem: ["[SO₂]", "[O₂]", "[SO₃]", "[S]", "[SO]", "[H₂SO₄]"],
+                num: [["[SO₃]", 2]],
+                den: [["[SO₂]", 2], ["[O₂]", 1]],
+                explain: "Både SO₂ og SO₃ har koefficienten 2 og opløftes derfor i anden potens. O₂ har koefficienten 1."
+            },
+            {
+                title: "Vandgasskiftreaktionen",
+                desc: "Alle fire stoffer er gasser – også vandet. Skal [H₂O] med denne gang?",
+                reaction: "CO(g) + H₂O(g) ⇌ CO₂(g) + H₂(g)",
+                chem: ["[CO]", "[H₂O]", "[CO₂]", "[H₂]", "[O₂]", "[CH₄]"],
+                num: [["[CO₂]", 1], ["[H₂]", 1]],
+                den: [["[CO]", 1], ["[H₂O]", 1]],
+                explain: "Her er vand en gas og dermed en helt almindelig reaktionsdeltager, så [H₂O] skal med. Ingen koefficienter over 1 betyder ingen eksponenter."
+            },
+            {
+                title: "Svag syre i vand (syrestyrkekonstanten)",
+                desc: "Eddikesyre reagerer med vand. VIGTIGT: Hvordan håndteres opløsningsmidlet H₂O(l)?",
+                reaction: "CH₃COOH(aq) + H₂O(l) ⇌ CH₃COO⁻(aq) + H₃O⁺(aq)",
+                chem: ["[CH₃COOH]", "[H₂O]", "[CH₃COO⁻]", "[H₃O⁺]", "[OH⁻]", "[CH₃COO]"],
+                num: [["[CH₃COO⁻]", 1], ["[H₃O⁺]", 1]],
+                den: [["[CH₃COOH]", 1]],
+                ksub: "s",
+                explain: "Vand er opløsningsmiddel og har praktisk talt konstant koncentration – derfor indgår [H₂O] ikke i syrestyrkekonstanten."
+            },
+            {
+                title: "Svag base i vand (basestyrkekonstanten)",
+                desc: "Ammoniak optager en proton fra vand. Den samme regel om opløsningsmidlet gælder.",
+                reaction: "NH₃(aq) + H₂O(l) ⇌ NH₄⁺(aq) + OH⁻(aq)",
+                chem: ["[NH₃]", "[H₂O]", "[NH₄⁺]", "[OH⁻]", "[H₃O⁺]", "[NH₂⁻]"],
+                num: [["[NH₄⁺]", 1], ["[OH⁻]", 1]],
+                den: [["[NH₃]", 1]],
+                ksub: "b",
+                explain: "Basen står i nævneren, og de to produkter ganges sammen i tælleren. [H₂O] udgår igen, fordi vand er opløsningsmiddel."
+            },
+            {
+                title: "Vands autoprotolyse",
+                desc: "Vand reagerer med sig selv. Læg mærke til både koefficienten 2 og tilstandsformen (l).",
+                reaction: "2H₂O(l) ⇌ H₃O⁺(aq) + OH⁻(aq)",
+                chem: ["[H₂O]", "[H₃O⁺]", "[OH⁻]", "[H⁺]", "[O₂]", "[H₂]"],
+                num: [["[H₃O⁺]", 1], ["[OH⁻]", 1]],
+                den: [],
+                ksub: "v",
+                explain: "Alt vandet er opløsningsmiddel (l) og udgår – også selvom koefficienten er 2. Nævneren bliver 1, og resultatet er vands ionprodukt, der er 1,0·10⁻¹⁴ ved 25 °C."
+            },
+            {
+                title: "Opløselighedsligevægt for kalk",
+                desc: "Kalk opløses i vand. Faste stoffer (s) indgår ikke i opskrivningen.",
+                reaction: "CaCO₃(s) ⇌ Ca²⁺(aq) + CO₃²⁻(aq)",
+                chem: ["[CaCO₃]", "[Ca²⁺]", "[CO₃²⁻]", "[Ca]", "[CO₂]", "[OH⁻]"],
+                num: [["[Ca²⁺]", 1], ["[CO₃²⁻]", 1]],
+                den: [],
+                explain: "Et fast stof har konstant 'koncentration', så [CaCO₃] udgår og nævneren bliver 1. Tilbage står opløselighedsproduktet."
+            },
+            {
+                title: "Kalkbrænding (heterogen ligevægt)",
+                desc: "To af de tre stoffer er faste. Sidste opgave – tænk hele vejen igennem.",
+                reaction: "CaCO₃(s) ⇌ CaO(s) + CO₂(g)",
+                chem: ["[CaCO₃]", "[CaO]", "[CO₂]", "[Ca²⁺]", "[O₂]", "[CO]"],
+                num: [["[CO₂]", 1]],
+                den: [],
+                explain: "Både CaCO₃(s) og CaO(s) er faste stoffer og udgår. Kun gassen bliver tilbage, så ligevægten afhænger alene af mængden af CO₂."
+            }
+        ];
+
+        /* ==========================================================================
+           PARSER & VALIDERING AF UDTRYK
+           ========================================================================== */
+
+        // Læser en række brikker og bygger listen af led (stof + eksponent).
+        function parseExpression(tokens) {
+            if (tokens.length === 0) return { ok: true, terms: [] };
+
+            // "1" må kun stå helt alene
+            if (tokens.some(t => t.value === "1")) {
+                if (tokens.length === 1) return { ok: true, terms: [] };
+                return { ok: false, msg: "Tallet 1 kan kun stå alene – ikke sammen med andre brikker." };
+            }
+
+            const terms = [];
+            let i = 0;
+            while (i < tokens.length) {
+                const t = tokens[i];
+                if (t.cat !== "chem") {
+                    return { ok: false, msg: "Der skal stå en koncentration (fx [H₂]) her – ikke \"" + t.value + "\"." };
+                }
+                let exp = 1;
+                i++;
+                if (i < tokens.length && tokens[i].cat === "exp") {
+                    exp = EXP_VALUE[tokens[i].value];
+                    i++;
+                    if (i < tokens.length && tokens[i].cat === "exp") {
+                        return { ok: false, msg: "Et stof kan kun have ét opløftet tal." };
+                    }
+                }
+                terms.push({ sp: t.value, exp: exp });
+
+                if (i < tokens.length) {
+                    if (tokens[i].cat === "op" && tokens[i].value === "·") {
+                        i++;
+                        if (i >= tokens.length) return { ok: false, msg: "Der mangler et stof efter gangeprikken (·)." };
+                    } else if (tokens[i].cat === "op") {
+                        return { ok: false, msg: "\"" + tokens[i].value + "\" hører ikke hjemme i en reaktionsbrøk – led ganges sammen med ·" };
+                    } else {
+                        return { ok: false, msg: "Der mangler en gangeprik (·) mellem stofferne." };
+                    }
+                }
+            }
+            return { ok: true, terms: terms };
+        }
+
+        function termsToMap(terms) {
+            const m = {};
+            terms.forEach(t => { m[t.sp] = (m[t.sp] || 0) + t.exp; });
+            return m;
+        }
+
+        function canonical(terms) {
+            const m = termsToMap(terms);
+            return Object.keys(m).sort().map(k => k + "^" + m[k]).join("*");
+        }
+
+        // Pæn opskrivning med rigtige hævede eksponenter.
+        function termsToHTML(terms) {
+            if (terms.length === 0) return "1";
+            return terms.map(t => t.sp + (t.exp > 1 ? "<sup>" + t.exp + "</sup>" : "")).join("·");
+        }
+
+        // Giver en målrettet fejlbesked ud fra forskellen mellem svar og facit.
+        function diffMessage(actual, expected, label) {
+            const A = termsToMap(actual);
+            const E = termsToMap(expected);
+            const cap = label.charAt(0).toUpperCase() + label.slice(1);
+
+            for (const sp in A) {
+                if (!(sp in E)) return cap + " indeholder " + sp + ", som ikke skal stå der.";
+            }
+            for (const sp in E) {
+                if (!(sp in A)) return "Der mangler et stof i " + label + ".";
+            }
+            for (const sp in E) {
+                if (A[sp] !== E[sp]) return "Eksponenten på " + sp + " i " + label + " passer ikke med koefficienten i reaktionsskemaet.";
+            }
+            return cap + " er ikke helt rigtig.";
+        }
+
+        /* ==========================================================================
+           FRI DRAG & DROP (pointer events – virker med mus, touch og pen)
+           ========================================================================== */
+        class DragController {
+            constructor(game) {
+                this.game = game;
+                this.zones = [game.elNumZone, game.elDenZone];
+                this.elHint = document.getElementById("drag-hint");
+
+                this.reset();
+                document.addEventListener("pointermove", e => this.onMove(e));
+                document.addEventListener("pointerup", e => this.onUp(e));
+                document.addEventListener("pointercancel", () => this.cancel());
+                document.addEventListener("keydown", e => { if (e.key === "Escape") this.cancel(); });
+            }
+
+            reset() {
+                this.active = false;
+                this.source = null;      // originalt element
+                this.fromZone = false;   // trækkes brikken fra brøken?
+                this.ghost = null;
+                this.caret = null;
+                this.targetZone = null;
+                this.startX = 0;
+                this.startY = 0;
+                this.offX = 0;
+                this.offY = 0;
+                this.moved = false;
+            }
+
+            // Kaldes fra pointerdown på en brik.
+            begin(e, sourceEl, fromZone) {
+                if (this.game.isLevelCompleted) return;
+                if (e.button !== undefined && e.button !== 0) return;
+
+                this.active = true;
+                this.source = sourceEl;
+                this.fromZone = fromZone;
+                this.startX = e.clientX;
+                this.startY = e.clientY;
+                this.moved = false;
+
+                const r = sourceEl.getBoundingClientRect();
+                this.offX = e.clientX - r.left;
+                this.offY = e.clientY - r.top;
+                this.srcRect = r;
+            }
+
+            startGhost() {
+                const g = this.source.cloneNode(true);
+                g.classList.add("drag-ghost");
+                g.classList.remove("dragging");
+                g.style.width = this.srcRect.width + "px";
+                g.style.height = this.srcRect.height + "px";
+                g.style.left = this.srcRect.left + "px";
+                g.style.top = this.srcRect.top + "px";
+                document.body.appendChild(g);
+                this.ghost = g;
+
+                if (this.fromZone) {
+                    this.source.classList.add("dragging");
+                    this.showHint("Slip uden for brøken for at fjerne brikken");
+                } else {
+                    this.showHint("Slip brikken i tælleren eller nævneren");
+                }
+
+                this.caret = document.createElement("div");
+                this.caret.className = "caret";
+            }
+
+            onMove(e) {
+                if (!this.active) return;
+
+                if (!this.moved) {
+                    const dist = Math.hypot(e.clientX - this.startX, e.clientY - this.startY);
+                    if (dist < 6) return;   // stadig et klik, ikke et træk
+                    this.moved = true;
+                    this.startGhost();
+                }
+
+                this.ghost.style.left = (e.clientX - this.offX) + "px";
+                this.ghost.style.top = (e.clientY - this.offY) + "px";
+
+                const zone = this.zoneAt(e.clientX, e.clientY);
+                if (zone !== this.targetZone) {
+                    this.zones.forEach(z => z.classList.remove("drag-over"));
+                    if (zone) zone.classList.add("drag-over");
+                    this.targetZone = zone;
+                }
+
+                this.ghost.classList.toggle("over-trash", this.fromZone && !zone);
+
+                if (zone) {
+                    this.placeCaret(zone, e.clientX, e.clientY);
+                } else if (this.caret.parentElement) {
+                    this.caret.remove();
+                }
+            }
+
+            onUp(e) {
+                if (!this.active) return;
+
+                // Uden bevægelse: behandl som et klik
+                if (!this.moved) {
+                    const src = this.source, fromZone = this.fromZone;
+                    this.reset();
+                    if (fromZone) this.game.removeToken(src);
+                    else this.game.addToActiveZone(src.dataset.value, src.dataset.cat);
+                    return;
+                }
+
+                const zone = this.targetZone;
+                const index = zone ? this.caretIndex(zone) : -1;
+
+                this.cleanup();
+
+                if (zone) {
+                    if (this.fromZone) this.source.remove();
+                    this.game.insertToken(zone, this.source.dataset.value, this.source.dataset.cat, index);
+                } else if (this.fromZone) {
+                    this.game.poofToken(this.source);
+                }
+                this.reset();
+            }
+
+            cancel() {
+                if (!this.active) return;
+                if (this.moved && this.fromZone) this.source.classList.remove("dragging");
+                this.cleanup();
+                this.reset();
+            }
+
+            cleanup() {
+                if (this.ghost) this.ghost.remove();
+                if (this.caret && this.caret.parentElement) this.caret.remove();
+                this.zones.forEach(z => z.classList.remove("drag-over"));
+                this.hideHint();
+            }
+
+            zoneAt(x, y) {
+                const pad = 14;
+                for (const z of this.zones) {
+                    const r = z.getBoundingClientRect();
+                    if (x >= r.left - pad && x <= r.right + pad && y >= r.top - pad && y <= r.bottom + pad) return z;
+                }
+                return null;
+            }
+
+            // Beregner indsætningspunkt uden at markøren selv forstyrrer målingen.
+            placeCaret(zone, x, y) {
+                if (this.caret.parentElement) this.caret.remove();
+                const toks = Array.from(zone.querySelectorAll(".tok")).filter(t => t !== this.source);
+                let idx = toks.length;
+                for (let i = 0; i < toks.length; i++) {
+                    const r = toks[i].getBoundingClientRect();
+                    if (y < r.bottom && x < r.left + r.width / 2) { idx = i; break; }
+                }
+                if (toks[idx]) zone.insertBefore(this.caret, toks[idx]);
+                else zone.appendChild(this.caret);
+            }
+
+            // Positionen som markøren står på – talt i færdige brikker.
+            caretIndex(zone) {
+                const kids = Array.from(zone.children).filter(c => c === this.caret || (c.classList.contains("tok") && c !== this.source));
+                return kids.indexOf(this.caret);
+            }
+
+            showHint(text) {
+                this.elHint.textContent = text;
+                this.elHint.classList.add("show");
+            }
+            hideHint() {
+                this.elHint.classList.remove("show");
+            }
+        }
+
+        /* ==========================================================================
+           SPILLOGIK
+           ========================================================================== */
+        class GameManager {
+            constructor() {
+                this.currentLevelIndex = 0;
+                this.score = 0;
+                this.activeZone = "numerator-zone";
+                this.isLevelCompleted = false;
+                this.inVictory = false;
+
+                // Fremdrift pr. opgave, så man kan springe frem og tilbage uden at miste sit arbejde
+                this.progress = levelsData.map(() => ({ num: [], den: [], done: false }));
+
+                this.elTitle = document.getElementById("reaction-title");
+                this.elEquation = document.getElementById("reaction-equation");
+                this.elDesc = document.getElementById("reaction-desc");
+                this.elNumZone = document.getElementById("numerator-zone");
+                this.elDenZone = document.getElementById("denominator-zone");
+                this.elItemsChem = document.getElementById("items-chem");
+                this.elItemsOp = document.getElementById("items-op");
+                this.elItemsExp = document.getElementById("items-exp");
+                this.elFeedback = document.getElementById("feedback-msg");
+                this.elExplain = document.getElementById("explain-box");
+                this.elScore = document.getElementById("score-display");
+                this.elLevel = document.getElementById("level-display");
+                this.elTotal = document.getElementById("total-levels");
+                this.elSolved = document.getElementById("solved-display");
+                this.elPool = document.getElementById("options-pool");
+                this.elFractionWs = document.getElementById("fraction-workspace");
+                this.elDots = document.getElementById("level-dots");
+                this.elReaction = document.getElementById("reaction-container");
+
+                this.btnCheck = document.getElementById("btn-check");
+                this.btnClear = document.getElementById("btn-clear");
+                this.btnNext = document.getElementById("btn-next");
+                this.btnRestart = document.getElementById("btn-restart");
+                this.btnPrev = document.getElementById("btn-prev");
+                this.btnFwd = document.getElementById("btn-fwd");
+
+                this.drag = new DragController(this);
+                this.init();
+            }
+
+            init() {
+                this.elTotal.textContent = levelsData.length;
+                this.setupEventListeners();
+                this.buildStaticPool();
+                this.buildLevelNav();
+                this.loadLevel(this.currentLevelIndex);
+            }
+
+            setupEventListeners() {
+                this.elNumZone.addEventListener("click", e => {
+                    if (e.target === this.elNumZone) this.setActiveZone("numerator-zone");
+                });
+                this.elDenZone.addEventListener("click", e => {
+                    if (e.target === this.elDenZone) this.setActiveZone("denominator-zone");
+                });
+
+                this.btnCheck.addEventListener("click", () => this.checkAnswer());
+                this.btnClear.addEventListener("click", () => this.clearFractions());
+                this.btnNext.addEventListener("click", () => this.advance());
+                this.btnRestart.addEventListener("click", () => this.restart());
+                this.btnPrev.addEventListener("click", () => this.goToLevel(this.currentLevelIndex - 1));
+                this.btnFwd.addEventListener("click", () => this.goToLevel(this.currentLevelIndex + 1));
+            }
+
+            /* ---------- Opgaveoversigt ---------- */
+
+            buildLevelNav() {
+                this.elDots.innerHTML = "";
+                this.dots = levelsData.map((lvl, i) => {
+                    const b = document.createElement("button");
+                    b.className = "level-dot";
+                    b.textContent = (i + 1);
+                    b.title = "Opgave " + (i + 1) + ": " + lvl.title;
+                    b.addEventListener("click", () => this.goToLevel(i));
+                    this.elDots.appendChild(b);
+                    return b;
+                });
+            }
+
+            updateNav() {
+                let solved = 0;
+                this.dots.forEach((b, i) => {
+                    const p = this.progress[i];
+                    if (p.done) solved++;
+                    b.classList.toggle("done", p.done);
+                    b.classList.toggle("started", !p.done && (p.num.length > 0 || p.den.length > 0));
+                    b.classList.toggle("current", !this.inVictory && i === this.currentLevelIndex);
+                });
+                this.elSolved.textContent = solved;
+                this.btnPrev.disabled = this.inVictory || this.currentLevelIndex === 0;
+                this.btnFwd.disabled = this.inVictory || this.currentLevelIndex === levelsData.length - 1;
+            }
+
+            // Gemmer brikkerne i den opgave man forlader
+            saveState() {
+                if (this.inVictory) return;
+                const p = this.progress[this.currentLevelIndex];
+                p.num = this.readZone(this.elNumZone);
+                p.den = this.readZone(this.elDenZone);
+            }
+
+            goToLevel(index) {
+                if (index < 0 || index >= levelsData.length) return;
+                this.saveState();
+                this.currentLevelIndex = index;
+                this.loadLevel(index);
+            }
+
+            /* ---------- Brikker ---------- */
+
+            makeToken(value, cat, inZone) {
+                const el = document.createElement("div");
+                el.className = "tok" + (inZone ? " in-zone" : "");
+                el.textContent = value;
+                el.dataset.value = value;
+                el.dataset.cat = cat;
+                el.addEventListener("pointerdown", e => {
+                    e.preventDefault();
+                    this.drag.begin(e, el, inZone);
+                });
+                return el;
+            }
+
+            // Operatorer og eksponenter er ens i alle opgaver – bygges kun én gang.
+            buildStaticPool() {
+                OPERATORS.forEach(v => this.elItemsOp.appendChild(this.makeToken(v, "op", false)));
+                EXPONENTS.forEach(v => this.elItemsExp.appendChild(this.makeToken(v, "exp", false)));
+            }
+
+            insertToken(zone, value, cat, index) {
+                if (this.isLevelCompleted) return;
+                const el = this.makeToken(value, cat, true);
+                const toks = zone.querySelectorAll(".tok");
+                if (index >= 0 && index < toks.length) zone.insertBefore(el, toks[index]);
+                else zone.appendChild(el);
+                this.refreshZones();
+            }
+
+            addToActiveZone(value, cat) {
+                const zone = document.getElementById(this.activeZone);
+                this.insertToken(zone, value, cat, -1);
+            }
+
+            removeToken(el) {
+                if (this.isLevelCompleted) return;
+                el.remove();
+                this.refreshZones();
+            }
+
+            poofToken(el) {
+                el.style.animation = "poofOut 0.22s ease forwards";
+                setTimeout(() => { el.remove(); this.refreshZones(); }, 220);
+            }
+
+            refreshZones() {
+                [this.elNumZone, this.elDenZone].forEach(z => {
+                    z.classList.toggle("has-items", z.querySelectorAll(".tok").length > 0);
+                });
+                // Hold oversigten opdateret, så "påbegyndt" markeres med det samme
+                this.saveState();
+                this.updateNav();
+            }
+
+            readZone(zone) {
+                return Array.from(zone.querySelectorAll(".tok"))
+                    .map(el => ({ value: el.dataset.value, cat: el.dataset.cat }));
+            }
+
+            /* ---------- Niveauer ---------- */
+
+            loadLevel(index) {
+                const level = levelsData[index];
+                const saved = this.progress[index];
+
+                this.inVictory = false;
+                this.isLevelCompleted = false;
+
+                // Vis arbejdsområdet igen (kan være skjult af resultatskærmen)
+                this.elFractionWs.style.display = "flex";
+                this.elPool.style.display = "flex";
+                this.btnRestart.classList.remove("show");
+                this.elReaction.classList.remove("success-glow");
+                this.elFeedback.style.opacity = "0";
+                this.elExplain.classList.remove("show");
+                this.btnNext.classList.remove("show");
+                this.btnCheck.style.display = "block";
+                this.btnClear.style.display = "block";
+
+                this.elTitle.textContent = level.title;
+                this.elEquation.textContent = level.reaction;
+                this.elDesc.textContent = level.desc;
+                this.elLevel.textContent = (index + 1);
+
+                // Kemikalier blandes, så rigtige og forkerte muligheder står tilfældigt
+                this.elItemsChem.innerHTML = "";
+                level.chem.slice().sort(() => Math.random() - 0.5)
+                    .forEach(v => this.elItemsChem.appendChild(this.makeToken(v, "chem", false)));
+
+                // Genskab de brikker man havde lagt sidst, man var på opgaven
+                this.elNumZone.innerHTML = "";
+                this.elDenZone.innerHTML = "";
+                saved.num.forEach(t => this.elNumZone.appendChild(this.makeToken(t.value, t.cat, true)));
+                saved.den.forEach(t => this.elDenZone.appendChild(this.makeToken(t.value, t.cat, true)));
+                this.refreshZones();
+
+                this.setActiveZone("numerator-zone");
+
+                // Allerede løst? Så vises facit igen, og opgaven er låst.
+                if (saved.done) {
+                    this.isLevelCompleted = true;
+                    this.showSolution(level);
+                    this.elFeedback.textContent = "✔ Denne opgave er løst";
+                    this.elFeedback.className = "feedback-success";
+                    this.elFeedback.style.opacity = "1";
+                    this.elReaction.classList.add("success-glow");
+                    this.btnCheck.style.display = "none";
+                    this.btnClear.style.display = "none";
+                    this.btnNext.classList.add("show");
+                }
+
+                this.btnNext.textContent = (index === levelsData.length - 1) ? "Se resultat ➔" : "Næste Opgave ➔";
+                this.updateNav();
+            }
+
+            // Skriver facit pænt op som en rigtig brøk
+            showSolution(level) {
+                const expNum = level.num.map(p => ({ sp: p[0], exp: p[1] }));
+                const expDen = level.den.map(p => ({ sp: p[0], exp: p[1] }));
+                const kLabel = "K" + (level.ksub ? "<sub>" + level.ksub + "</sub>" : "");
+
+                this.elExplain.innerHTML =
+                    '<div class="result-eq">' +
+                        '<span class="result-k">' + kLabel + ' =</span>' +
+                        '<span class="result-frac">' +
+                            '<span class="result-num">' + termsToHTML(expNum) + '</span>' +
+                            '<span class="result-line"></span>' +
+                            '<span class="result-den">' + termsToHTML(expDen) + '</span>' +
+                        '</span>' +
+                    '</div>' +
+                    '<p class="result-note">' + level.explain + '</p>';
+                this.elExplain.classList.add("show");
+            }
+
+            setActiveZone(zoneId) {
+                if (this.isLevelCompleted) return;
+                this.activeZone = zoneId;
+                this.elNumZone.classList.toggle("active", zoneId === "numerator-zone");
+                this.elDenZone.classList.toggle("active", zoneId === "denominator-zone");
+            }
+
+            clearFractions() {
+                if (this.isLevelCompleted) return;
+                this.elNumZone.innerHTML = "";
+                this.elDenZone.innerHTML = "";
+                this.refreshZones();
+                this.elFeedback.style.opacity = "0";
+            }
+
+            /* ---------- Kontrol af svar ---------- */
+
+            checkAnswer() {
+                if (this.isLevelCompleted) return;
+
+                const level = levelsData[this.currentLevelIndex];
+                const numTokens = this.readZone(this.elNumZone);
+                const denTokens = this.readZone(this.elDenZone);
+
+                const expNum = level.num.map(p => ({ sp: p[0], exp: p[1] }));
+                const expDen = level.den.map(p => ({ sp: p[0], exp: p[1] }));
+
+                if (numTokens.length === 0) {
+                    this.showError("Du mangler at udfylde tælleren!");
+                    return;
+                }
+                if (denTokens.length === 0 && expDen.length > 0) {
+                    this.showError("Du mangler at udfylde nævneren!");
+                    return;
+                }
+
+                const num = parseExpression(numTokens);
+                if (!num.ok) { this.showError("Tælleren: " + num.msg); return; }
+                const den = parseExpression(denTokens);
+                if (!den.ok) { this.showError("Nævneren: " + den.msg); return; }
+
+                const numOK = canonical(num.terms) === canonical(expNum);
+                const denOK = canonical(den.terms) === canonical(expDen);
+
+                if (numOK && denOK) {
+                    this.handleCorrectAnswer(level);
+                } else if (!numOK) {
+                    this.showError(diffMessage(num.terms, expNum, "tælleren"));
+                } else {
+                    this.showError(diffMessage(den.terms, expDen, "nævneren"));
+                }
+            }
+
+            handleCorrectAnswer(level) {
+                this.isLevelCompleted = true;
+
+                // Point gives kun første gang opgaven løses
+                const p = this.progress[this.currentLevelIndex];
+                if (!p.done) {
+                    p.done = true;
+                    this.score += POINTS_PER_LEVEL;
+                    this.elScore.textContent = this.score;
+                }
+                this.saveState();
+                this.updateNav();
+
+                this.elFeedback.textContent = "✔ Korrekt! +" + POINTS_PER_LEVEL + " point";
+                this.elFeedback.className = "feedback-success";
+                this.elFeedback.style.opacity = "1";
+
+                this.showSolution(level);
+                this.elReaction.classList.add("success-glow");
+
+                const r = document.getElementById("fraction-container").getBoundingClientRect();
+                particleSys.createExplosion(r.left + r.width / 2, r.top + r.height / 2);
+
+                this.btnCheck.style.display = "none";
+                this.btnClear.style.display = "none";
+                this.btnNext.classList.add("show");
+            }
+
+            showError(msg) {
+                this.elFeedback.textContent = "✖ " + msg;
+                this.elFeedback.className = "feedback-error";
+                this.elFeedback.style.opacity = "1";
+
+                const rc = document.getElementById("reaction-container");
+                rc.classList.add("shake-effect");
+                setTimeout(() => rc.classList.remove("shake-effect"), 500);
+            }
+
+            advance() {
+                if (this.currentLevelIndex < levelsData.length - 1) {
+                    this.goToLevel(this.currentLevelIndex + 1);
+                } else {
+                    this.saveState();
+                    this.showVictoryScreen();
+                }
+            }
+
+            restart() {
+                this.progress = levelsData.map(() => ({ num: [], den: [], done: false }));
+                this.score = 0;
+                this.elScore.textContent = "0";
+                this.inVictory = false;
+                this.currentLevelIndex = 0;
+                this.loadLevel(0);
+            }
+
+            showVictoryScreen() {
+                const solved = this.progress.filter(p => p.done).length;
+                const max = levelsData.length * POINTS_PER_LEVEL;
+
+                this.inVictory = true;
+                this.isLevelCompleted = true;
+
+                this.elTitle.textContent = solved === levelsData.length ? "Fantastisk!" : "Status";
+                this.elEquation.textContent = solved === levelsData.length
+                    ? "Alle ligevægte er løst! 🎉"
+                    : "Du har løst " + solved + " af " + levelsData.length + " opgaver";
+                this.elDesc.textContent = "Samlet score: " + this.score + " ud af " + max + " point. "
+                    + (solved === levelsData.length
+                        ? "Klik på et tal i oversigten for at se en opgave igen."
+                        : "Klik på et tal i oversigten for at gå tilbage til en uløst opgave.");
+
+                this.elFractionWs.style.display = "none";
+                this.elPool.style.display = "none";
+                this.elExplain.classList.remove("show");
+                this.elReaction.classList.remove("success-glow");
+                this.btnNext.classList.remove("show");
+                this.btnCheck.style.display = "none";
+                this.btnClear.style.display = "none";
+                this.btnRestart.classList.add("show");
+                this.elFeedback.style.opacity = "0";
+                this.updateNav();
+
+                if (solved < levelsData.length) return;
+
+                let fwCount = 0;
+                const fwInterval = setInterval(() => {
+                    particleSys.createExplosion(Math.random() * window.innerWidth, Math.random() * window.innerHeight * 0.5);
+                    if (++fwCount > 10) clearInterval(fwInterval);
+                }, 400);
+            }
+        }
+
+        /* ==========================================================================
+           TEORI- OG HJÆLPEBOKS
+           ========================================================================== */
+        class InfoModal {
+            constructor() {
+                this.overlay = document.getElementById("modal-overlay");
+                this.title = document.getElementById("modal-title");
+                this.body = document.getElementById("modal-body");
+
+                document.getElementById("modal-close").addEventListener("click", () => this.close());
+                document.getElementById("btn-teori").addEventListener("click",
+                    () => this.open("📖 Teori: Ligevægtsloven", "tpl-teori"));
+                document.getElementById("btn-hjaelp").addEventListener("click",
+                    () => this.open("❓ Sådan bruger du animationen", "tpl-hjaelp"));
+
+                // Luk ved klik på baggrunden eller med Esc
+                this.overlay.addEventListener("click", e => {
+                    if (e.target === this.overlay) this.close();
+                });
+                document.addEventListener("keydown", e => {
+                    if (e.key === "Escape" && !this.overlay.hidden) this.close();
+                });
+            }
+
+            open(title, templateId) {
+                this.title.textContent = title;
+                this.body.innerHTML = document.getElementById(templateId).innerHTML;
+                this.body.scrollTop = 0;
+                this.overlay.hidden = false;
+            }
+
+            // Bruges af quizzen, der selv bygger sit indhold
+            openBuilt(title, build) {
+                this.title.textContent = title;
+                this.body.innerHTML = "";
+                build(this.body);
+                this.body.scrollTop = 0;
+                this.overlay.hidden = false;
+            }
+
+            close() {
+                this.overlay.hidden = true;
+            }
+        }
+
+        /* ==========================================================================
+           QUIZ: 5 HURTIGE SPØRGSMÅL
+           ========================================================================== */
+        const quizData = [
+            {
+                q: "Hvad betyder [H₂] i en reaktionsbrøk?",
+                options: [
+                    "Koncentrationen af H₂, målt i mol/L",
+                    "Stofmængden af H₂, målt i mol",
+                    "Massen af H₂, målt i gram",
+                    "Antallet af H₂-molekyler"
+                ],
+                correct: 0,
+                why: "De kantede parenteser betyder altid koncentration – altså stofmængde pr. liter, mol/L."
+            },
+            {
+                q: "I ligevægten N₂(g) + 3H₂(g) ⇌ 2NH₃(g): hvordan indgår hydrogen i reaktionsbrøken?",
+                options: ["[H₂]³", "3·[H₂]", "[H₂]", "[3H₂]"],
+                correct: 0,
+                why: "Koefficienten 3 bliver til eksponenten 3, så leddet bliver [H₂]³."
+            },
+            {
+                q: "Hvordan indgår et fast stof – fx CaCO₃(s) – i reaktionsbrøken?",
+                options: [
+                    "Det indgår slet ikke, men udelades",
+                    "Det står i nævneren som [CaCO₃]",
+                    "Det står i tælleren som [CaCO₃]",
+                    "Det indgår med massen af det faste stof"
+                ],
+                correct: 0,
+                why: "Et fast stof har en konstant \"koncentration\", der gemmes i K, så stoffer med (s) udelades – præcis som rene væsker (l), fx vand som opløsningsmiddel. Er der ikke andet tilbage, skriver man 1."
+            },
+            {
+                q: "Hvad kan ændre selve værdien af ligevægtskonstanten K?",
+                options: [
+                    "En ændring af temperaturen",
+                    "At man tilsætter mere reaktant",
+                    "At man tilsætter en katalysator",
+                    "At man bruger en større beholder"
+                ],
+                correct: 0,
+                why: "K afhænger kun af temperaturen. De andre indgreb kan forskyde ligevægten, men K har stadig samme værdi."
+            },
+            {
+                q: "Hvilken enhed har ligevægtskonstanten K?",
+                options: [
+                    "Det afhænger af, hvordan reaktionsbrøken ser ud",
+                    "Altid mol/L, uanset hvordan reaktionen er skrevet",
+                    "K har aldrig nogen enhed, uanset reaktionen",
+                    "Altid (mol/L)², uanset hvilken reaktion det er"
+                ],
+                correct: 0,
+                why: "Enheden følger af selve brøken. I H₂ + I₂ ⇌ 2HI er der lige mange led over og under, så enhederne går ud mod hinanden, og K er uden enhed. I Kᵥ = [H₃O⁺]·[OH⁻] er der ingen led i nævneren, så enheden bliver (mol/L)². Du skal altså regne efter i den konkrete reaktionsbrøk."
+            }
+        ];
+
+        class Quiz {
+            constructor(modal, button) {
+                this.modal = modal;
+                this.button = button;
+                this.solved = false;
+                this.reset();
+                this.button.addEventListener("click", () => this.open());
+            }
+
+            reset() {
+                this.index = 0;
+                this.correctCount = 0;
+                this.answered = false;
+                this.finished = false;
+                // Svarmulighederne blandes, så det rigtige svar ikke altid står samme sted
+                this.orders = quizData.map(q =>
+                    q.options.map((_, i) => i).sort(() => Math.random() - 0.5));
+            }
+
+            open() {
+                if (this.finished) this.reset();
+                this.modal.openBuilt("🧠 Quiz: Ligevægtsloven", () => this.render());
+            }
+
+            render() {
+                const el = this.modal.body;
+                el.innerHTML = "";
+
+                if (this.index >= quizData.length) {
+                    this.renderResult(el);
+                    return;
+                }
+
+                const q = quizData[this.index];
+
+                const prog = document.createElement("div");
+                prog.className = "quiz-progress";
+                prog.innerHTML = "<span>Spørgsmål " + (this.index + 1) + " af " + quizData.length + "</span>" +
+                                 "<span>Rigtige: " + this.correctCount + "</span>";
+                el.appendChild(prog);
+
+                const bar = document.createElement("div");
+                bar.className = "quiz-bar";
+                bar.innerHTML = '<span style="width:' + (this.index / quizData.length * 100) + '%"></span>';
+                el.appendChild(bar);
+
+                const qt = document.createElement("p");
+                qt.className = "quiz-q";
+                qt.textContent = q.q;
+                el.appendChild(qt);
+
+                const list = document.createElement("div");
+                list.className = "quiz-options";
+                this.orders[this.index].forEach(optIdx => {
+                    const b = document.createElement("button");
+                    b.className = "quiz-opt";
+                    b.textContent = q.options[optIdx];
+                    b.dataset.correct = (optIdx === q.correct);
+                    b.addEventListener("click", () => this.answer(b));
+                    list.appendChild(b);
+                });
+                el.appendChild(list);
+            }
+
+            answer(clicked) {
+                if (this.answered) return;
+                this.answered = true;
+
+                const el = this.modal.body;
+                const q = quizData[this.index];
+                const isCorrect = clicked.dataset.correct === "true";
+                if (isCorrect) this.correctCount++;
+
+                el.querySelectorAll(".quiz-opt").forEach(b => {
+                    b.disabled = true;
+                    if (b.dataset.correct === "true") b.classList.add("correct");
+                });
+                if (!isCorrect) clicked.classList.add("wrong");
+
+                const fb = document.createElement("div");
+                fb.className = "quiz-feedback";
+                fb.innerHTML =
+                    '<div class="quiz-verdict ' + (isCorrect ? "ok" : "no") + '">' +
+                        (isCorrect ? "✔ Rigtigt!" : "✖ Ikke helt.") +
+                    '</div>' +
+                    '<div class="quiz-why">' + q.why + '</div>';
+
+                const next = document.createElement("button");
+                next.className = "quiz-btn";
+                next.textContent = (this.index === quizData.length - 1) ? "Se resultat ➔" : "Næste spørgsmål ➔";
+                next.addEventListener("click", () => {
+                    this.index++;
+                    this.answered = false;
+                    this.render();
+                });
+                fb.appendChild(next);
+
+                el.appendChild(fb);
+                fb.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            }
+
+            renderResult(el) {
+                this.finished = true;
+                const perfect = this.correctCount === quizData.length;
+                if (perfect) {
+                    this.solved = true;
+                    this.button.classList.add("solved");
+                    this.button.textContent = "🧠 Quiz ✓";
+                }
+
+                const box = document.createElement("div");
+                box.className = "quiz-result" + (perfect ? " perfect" : "");
+                box.innerHTML =
+                    '<div class="quiz-score-big">' + this.correctCount + " / " + quizData.length + '</div>' +
+                    '<p>' + (perfect
+                        ? "Flot! Du har styr på ligevægtsloven. 🎉"
+                        : (this.solved
+                            ? "Denne gang blev det ikke alle fem – men du har tidligere haft dem alle rigtige."
+                            : "Du mangler et par detaljer. Kig i teoriboksen og prøv igen – knappen bliver grøn, når du har alle fem rigtige.")) +
+                    '</p>';
+
+                const again = document.createElement("button");
+                again.className = "quiz-btn";
+                again.textContent = "Tag quizzen igen";
+                again.addEventListener("click", () => { this.reset(); this.render(); });
+                box.appendChild(again);
+
+                const close = document.createElement("button");
+                close.className = "quiz-btn secondary";
+                close.textContent = "Luk";
+                close.addEventListener("click", () => this.modal.close());
+                box.appendChild(close);
+
+                el.appendChild(box);
+            }
+        }
+
+        /* ==========================================================================
+           VISUALS: CANVAS PARTIKELSYSTEM
+           ========================================================================== */
+        class ParticleSystem {
+            constructor() {
+                this.bgCanvas = document.getElementById("bgCanvas");
+                this.fxCanvas = document.getElementById("fxCanvas");
+                this.bgCtx = this.bgCanvas.getContext("2d");
+                this.fxCtx = this.fxCanvas.getContext("2d");
+
+                this.particles = [];
+                this.bgMolecules = [];
+                this.exclusions = [];
+
+                this.resize();
+                window.addEventListener("resize", () => this.resize());
+
+                this.initBackground();
+                this.loop();
+            }
+
+            resize() {
+                this.bgCanvas.width = window.innerWidth;
+                this.bgCanvas.height = window.innerHeight;
+                this.fxCanvas.width = window.innerWidth;
+                this.fxCanvas.height = window.innerHeight;
+            }
+
+            /* Områder som baggrunden aldrig må komme ind bag.
+               Rects hentes hver frame, så de følger med ved scroll og ændret layout. */
+            updateExclusions() {
+                this.exclusions = [];
+                const margin = 12;
+                for (const id of ["fraction-workspace", "options-pool"]) {
+                    const el = document.getElementById(id);
+                    if (!el || el.offsetParent === null) continue;   // skjult, fx på resultatskærmen
+                    const r = el.getBoundingClientRect();
+                    if (r.width === 0 || r.height === 0) continue;
+                    if (r.bottom < 0 || r.top > this.bgCanvas.height) continue;
+                    this.exclusions.push({
+                        left: r.left - margin,
+                        right: r.right + margin,
+                        top: r.top - margin,
+                        bottom: r.bottom + margin
+                    });
+                }
+            }
+
+            // Skubber et molekyle ud af det forbudte område ad korteste vej
+            keepOut(m) {
+                const pad = m.radius * 1.5;
+                for (const z of this.exclusions) {
+                    const l = z.left - pad, r = z.right + pad;
+                    const t = z.top - pad, b = z.bottom + pad;
+                    if (m.x < l || m.x > r || m.y < t || m.y > b) continue;
+
+                    const dl = m.x - l, dr = r - m.x, dt = m.y - t, db = b - m.y;
+                    const min = Math.min(dl, dr, dt, db);
+                    const speed = 0.25;
+
+                    if (min === dl)      { m.x = l; m.vx = -Math.max(Math.abs(m.vx), speed); }
+                    else if (min === dr) { m.x = r; m.vx =  Math.max(Math.abs(m.vx), speed); }
+                    else if (min === dt) { m.y = t; m.vy = -Math.max(Math.abs(m.vy), speed); }
+                    else                 { m.y = b; m.vy =  Math.max(Math.abs(m.vy), speed); }
+                }
+            }
+
+            initBackground() {
+                // Færre molekyler, da de nu skal dele pladsen uden om arbejdsfelterne
+                const count = Math.floor(window.innerWidth / 70);
+                for (let i = 0; i < count; i++) {
+                    this.bgMolecules.push({
+                        x: Math.random() * this.bgCanvas.width,
+                        y: Math.random() * this.bgCanvas.height,
+                        radius: Math.random() * 20 + 10,
+                        vx: (Math.random() - 0.5) * 0.5,
+                        vy: (Math.random() - 0.5) * 0.5,
+                        angle: Math.random() * Math.PI * 2,
+                        vAngle: (Math.random() - 0.5) * 0.02,
+                        nodes: Math.floor(Math.random() * 3) + 2
+                    });
+                }
+            }
+
+            createExplosion(x, y) {
+                const colors = ["#4cc9f0", "#4ade80", "#ffd166", "#ffffff"];
+                for (let i = 0; i < 60; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 8 + 2;
+                    this.particles.push({
+                        x: x,
+                        y: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        radius: Math.random() * 4 + 2,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        life: 1.0,
+                        decay: Math.random() * 0.02 + 0.015
+                    });
+                }
+            }
+
+            drawBackground() {
+                this.bgCtx.clearRect(0, 0, this.bgCanvas.width, this.bgCanvas.height);
+                this.bgCtx.strokeStyle = "rgba(76, 201, 240, 0.15)";
+                this.bgCtx.fillStyle = "rgba(76, 201, 240, 0.05)";
+                this.bgCtx.lineWidth = 2;
+
+                this.updateExclusions();
+
+                for (let i = 0; i < this.bgMolecules.length; i++) {
+                    const m = this.bgMolecules[i];
+                    m.x += m.vx;
+                    m.y += m.vy;
+                    m.angle += m.vAngle;
+
+                    if (m.x > this.bgCanvas.width + 50) m.x = -50;
+                    if (m.x < -50) m.x = this.bgCanvas.width + 50;
+                    if (m.y > this.bgCanvas.height + 50) m.y = -50;
+                    if (m.y < -50) m.y = this.bgCanvas.height + 50;
+
+                    this.keepOut(m);
+
+                    this.bgCtx.save();
+                    this.bgCtx.translate(m.x, m.y);
+                    this.bgCtx.rotate(m.angle);
+
+                    this.bgCtx.beginPath();
+                    this.bgCtx.arc(0, 0, m.radius / 2, 0, Math.PI * 2);
+                    this.bgCtx.fill();
+                    this.bgCtx.stroke();
+
+                    for (let n = 0; n < m.nodes; n++) {
+                        const nodeAngle = (Math.PI * 2 / m.nodes) * n;
+                        const nx = Math.cos(nodeAngle) * m.radius;
+                        const ny = Math.sin(nodeAngle) * m.radius;
+
+                        this.bgCtx.beginPath();
+                        this.bgCtx.moveTo(0, 0);
+                        this.bgCtx.lineTo(nx, ny);
+                        this.bgCtx.stroke();
+
+                        this.bgCtx.beginPath();
+                        this.bgCtx.arc(nx, ny, m.radius / 3, 0, Math.PI * 2);
+                        this.bgCtx.fill();
+                        this.bgCtx.stroke();
+                    }
+                    this.bgCtx.restore();
+                }
+            }
+
+            drawExplosions() {
+                this.fxCtx.clearRect(0, 0, this.fxCanvas.width, this.fxCanvas.height);
+
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const p = this.particles[i];
+
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.15;   // tyngdekraft
+                    p.vx *= 0.98;   // friktion
+                    p.life -= p.decay;
+
+                    if (p.life <= 0) {
+                        this.particles.splice(i, 1);
+                        continue;
+                    }
+
+                    this.fxCtx.globalAlpha = p.life;
+                    this.fxCtx.fillStyle = p.color;
+                    this.fxCtx.beginPath();
+                    this.fxCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    this.fxCtx.fill();
+                }
+                this.fxCtx.globalAlpha = 1.0;
+            }
+
+            loop() {
+                this.drawBackground();
+                this.drawExplosions();
+                requestAnimationFrame(() => this.loop());
+            }
+        }
+
+        /* ==========================================================================
+           OPSTART
+           ========================================================================== */
+        let gameManager;
+        let particleSys;
+        let infoModal;
+        let quiz;
+
+        window.onload = () => {
+            particleSys = new ParticleSystem();
+            gameManager = new GameManager();
+            infoModal = new InfoModal();
+            quiz = new Quiz(infoModal, document.getElementById("btn-quiz"));
+        };
+
+    </script>
+</body>
+</html>

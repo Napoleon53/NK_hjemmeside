@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oxidation: Ethanol → Ethanal → Ethansyre</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-color: #38bdf8;
+            --electron-color: #fbbf24;
+            --muted: #94a3b8;
+            --btn-hover: #0284c7;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #canvas-container {
+            flex: 1;
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        #ui-panel {
+            width: 360px;
+            background-color: var(--panel-bg);
+            border-left: 2px solid #334155;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+            z-index: 10;
+            overflow-y: auto;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin-bottom: 5px;
+            color: var(--accent-color);
+        }
+
+        p.subtitle {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .control-group {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #334155;
+        }
+
+        .control-group h3 {
+            font-size: 15px;
+            margin-bottom: 12px;
+            color: #cbd5e1;
+        }
+
+        .step-row {
+            display: flex;
+            gap: 6px;
+        }
+
+        .step-btn {
+            flex: 1;
+            padding: 10px 4px;
+            background-color: #334155;
+            color: white;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12.5px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .step-btn:hover { background-color: #475569; }
+
+        .step-btn.active {
+            background-color: rgba(56, 189, 248, 0.2);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .step-formula {
+            display: block;
+            font-size: 14px;
+            margin-top: 2px;
+        }
+
+        .toggle-btn {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            background-color: #334155;
+            color: white;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toggle-btn:last-child { margin-bottom: 0; }
+
+        .toggle-btn:hover { background-color: #475569; }
+
+        .toggle-btn.active {
+            background-color: rgba(56, 189, 248, 0.2);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .toggle-btn.active::after {
+            content: "TIL";
+            font-size: 12px;
+            background: var(--accent-color);
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .toggle-btn::after {
+            content: "FRA";
+            font-size: 12px;
+            background: #64748b;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .legend {
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .legend .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--electron-color);
+            margin-right: 4px;
+        }
+
+        .reset-btn {
+            padding: 12px;
+            background-color: transparent;
+            border: 1px solid #64748b;
+            color: #cbd5e1;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: auto;
+        }
+
+        .reset-btn:hover {
+            background-color: #334155;
+            color: white;
+        }
+
+        .hud-text {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: rgba(255,255,255,0.75);
+            font-size: 15px;
+            pointer-events: none;
+            line-height: 1.5;
+        }
+
+        .hud-text strong { color: var(--accent-color); }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container">
+        <div class="hud-text" id="hud-text"></div>
+        <canvas id="simCanvas"></canvas>
+    </div>
+
+    <div id="ui-panel">
+        <h1>Oxidation af alkohol</h1>
+        <p class="subtitle">Følg oxidationstallet gennem tre trin: ethanol → ethanal → ethansyre.</p>
+
+        <div class="control-group">
+            <h3>Trin</h3>
+            <div class="step-row">
+                <button class="step-btn" data-step="ethanol">Trin 1<span class="step-formula">Ethanol</span></button>
+                <button class="step-btn" data-step="ethanal">Trin 2<span class="step-formula">Ethanal</span></button>
+                <button class="step-btn" data-step="ethansyre">Trin 3<span class="step-formula">Ethansyre</span></button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <h3>Visningsindstillinger</h3>
+            <button class="toggle-btn" id="btn-en">Vis elektronegativitet (EN)</button>
+            <button class="toggle-btn" id="btn-origin">Vis elektronernes ophav</button>
+            <button class="toggle-btn" id="btn-elektroner">Vis elektronforskydning</button>
+            <button class="toggle-btn" id="btn-ox">Vis oxidationstal</button>
+            <div class="legend"><span class="dot"></span>Gule prikker = det fælles elektronpar i bindingen. Med "ophav" farves hver elektron efter hvilket atom den oprindeligt kom fra.</div>
+        </div>
+
+        <button class="reset-btn" id="btn-reset">Nulstil visning</button>
+    </div>
+
+    <script>
+        var canvas = document.getElementById("simCanvas");
+        var ctx = canvas.getContext("2d");
+        var width, height;
+
+        var camera = { x: 0, y: 0, scale: 1.0 };
+
+        var state = {
+            step: "ethanol",
+            showEN: false,
+            showOrigin: false,
+            showElectrons: false,
+            showOx: false,
+            skewT: 0 // 0..1 tween toward "elektronforskydning" being visible
+        };
+
+        var EN = { C: 2.5, O: 3.5, H: 2.1 };
+        var ATOM_STYLE = {
+            C: { radius: 32, color: "#94a3b8", text: "#0f172a" },
+            O: { radius: 30, color: "#ef4444", text: "#ffffff" },
+            H: { radius: 19, color: "#f1f5f9", text: "#0f172a" }
+        };
+        // Farve for hver elektrons oprindelige atom, brugt af "Vis elektronernes
+        // ophav" - bevidst mørkere end C-atomets egen (lysere) baggrundsfarve,
+        // så de to gråtoner ikke flyder sammen.
+        var ORIGIN_COLOR = { C: "#475569", O: "#ef4444", H: "#ffffff" };
+
+        var BOND_LEN = 135;
+        var ELECTRON_COLOR = "#fbbf24";
+
+        // --- Molekyle-specifikationer ---
+        // "chain" er den faste kulstof-rygrad (samme lokale position i alle 3 trin,
+        // så det er tydeligt at det er "samme molekyle" der ændrer sig).
+        // "branches" er alt andet (H og O), placeret automatisk vinkelret på
+        // allerede placerede bindinger via layoutMolecule().
+        var MOLECULES = {
+            ethanol: {
+                label: "Ethanol",
+                formula: "CH₃CH₂OH",
+                reactingAtom: "C2",
+                chain: [{ id: "C1", type: "C" }, { id: "C2", type: "C" }],
+                branches: [
+                    { parent: "C1", kids: [{ id: "H1", type: "H" }, { id: "H2", type: "H" }, { id: "H3", type: "H" }] },
+                    { parent: "C2", kids: [{ id: "H4", type: "H" }, { id: "H5", type: "H" }, { id: "O1", type: "O" }] },
+                    { parent: "O1", kids: [{ id: "H6", type: "H" }] }
+                ]
+            },
+            ethanal: {
+                label: "Ethanal",
+                formula: "CH₃CHO",
+                reactingAtom: "C2",
+                chain: [{ id: "C1", type: "C" }, { id: "C2", type: "C" }],
+                branches: [
+                    { parent: "C1", kids: [{ id: "H1", type: "H" }, { id: "H2", type: "H" }, { id: "H3", type: "H" }] },
+                    { parent: "C2", kids: [{ id: "H4", type: "H" }, { id: "O1", type: "O", order: 2 }] }
+                ]
+            },
+            ethansyre: {
+                label: "Ethansyre",
+                formula: "CH₃COOH",
+                reactingAtom: "C2",
+                chain: [{ id: "C1", type: "C" }, { id: "C2", type: "C" }],
+                branches: [
+                    { parent: "C1", kids: [{ id: "H1", type: "H" }, { id: "H2", type: "H" }, { id: "H3", type: "H" }] },
+                    { parent: "C2", kids: [{ id: "O1", type: "O", order: 2 }, { id: "O2", type: "O" }] },
+                    { parent: "O2", kids: [{ id: "H6", type: "H" }] }
+                ]
+            }
+        };
+
+        var atoms = [];
+        var bonds = [];
+
+        // Placerer `count` nye atomer omkring `center`, fanet ud i den ledige
+        // vinkel modsat summen af de bindinger, der allerede peger væk fra centeret.
+        function placeFan(center, existingAngles, count, radius) {
+            var start;
+            if (existingAngles.length) {
+                var sx = 0, sy = 0;
+                existingAngles.forEach(function(a) { sx += Math.cos(a); sy += Math.sin(a); });
+                start = Math.atan2(sy, sx) + Math.PI;
+            } else {
+                start = -Math.PI / 2;
+            }
+            var spread = Math.min(2.3, 0.9 * count);
+            var out = [];
+            for (var i = 0; i < count; i++) {
+                var t = count === 1 ? 0 : (i / (count - 1) - 0.5);
+                var ang = start + t * spread;
+                out.push({ x: center.x + Math.cos(ang) * radius, y: center.y + Math.sin(ang) * radius, angle: ang });
+            }
+            return out;
+        }
+
+        function layoutMolecule(spec) {
+            var pos = {};
+            var placedAngles = {};
+
+            spec.chain.forEach(function(a, i) {
+                pos[a.id] = { x: i * BOND_LEN, y: (i % 2 === 0) ? 0 : -BOND_LEN * 0.52 };
+            });
+            for (var i = 0; i < spec.chain.length - 1; i++) {
+                var aId = spec.chain[i].id, bId = spec.chain[i + 1].id;
+                var ang = Math.atan2(pos[bId].y - pos[aId].y, pos[bId].x - pos[aId].x);
+                (placedAngles[aId] = placedAngles[aId] || []).push(ang);
+                (placedAngles[bId] = placedAngles[bId] || []).push(ang + Math.PI);
+            }
+
+            spec.branches.forEach(function(br) {
+                var center = pos[br.parent];
+                var existing = placedAngles[br.parent] || (placedAngles[br.parent] = []);
+                var fan = placeFan(center, existing, br.kids.length, BOND_LEN);
+                br.kids.forEach(function(kid, i) {
+                    pos[kid.id] = { x: fan[i].x, y: fan[i].y };
+                    (placedAngles[kid.id] = placedAngles[kid.id] || []).push(fan[i].angle + Math.PI);
+                    existing.push(fan[i].angle);
+                });
+            });
+
+            return pos;
+        }
+
+        function typesFromSpec(spec) {
+            var typeById = {};
+            spec.chain.forEach(function(a) { typeById[a.id] = a.type; });
+            spec.branches.forEach(function(br) {
+                br.kids.forEach(function(k) { typeById[k.id] = k.type; });
+            });
+            return typeById;
+        }
+
+        function bondsFromSpec(spec) {
+            var list = [];
+            for (var i = 0; i < spec.chain.length - 1; i++) {
+                list.push({ from: spec.chain[i].id, to: spec.chain[i + 1].id, order: 1 });
+            }
+            spec.branches.forEach(function(br) {
+                br.kids.forEach(function(k) {
+                    list.push({ from: br.parent, to: k.id, order: k.order || 1 });
+                });
+            });
+            return list;
+        }
+
+        // Oxidationstal udledes direkte af EN-forskellen på hver binding, ikke
+        // hårdkodet: for hver binding går den fælles elektronpar-kontribution
+        // (±bindingsorden) til den mest elektronegative af de to atomer.
+        // Ren funktion (rører ikke global state).
+        function oxidationNumbersFor(key) {
+            var spec = MOLECULES[key];
+            var typeById = typesFromSpec(spec);
+            var localBonds = bondsFromSpec(spec);
+            var ox = {};
+            Object.keys(typeById).forEach(function(id) { ox[id] = 0; });
+            localBonds.forEach(function(b) {
+                var enA = EN[typeById[b.from]], enB = EN[typeById[b.to]];
+                if (enA === enB) return;
+                var order = b.order || 1;
+                var toA = enA < enB ? order : -order;
+                ox[b.from] += toA;
+                ox[b.to] -= toA;
+            });
+            return ox;
+        }
+
+        function buildMolecule(key) {
+            var spec = MOLECULES[key];
+            var pos = layoutMolecule(spec);
+            var typeById = typesFromSpec(spec);
+            var ox = oxidationNumbersFor(key);
+
+            atoms = Object.keys(pos).map(function(id) {
+                var type = typeById[id];
+                var style = ATOM_STYLE[type];
+                return {
+                    id: id, type: type,
+                    x: pos[id].x, y: pos[id].y,
+                    radius: style.radius, color: style.color, textColor: style.text,
+                    en: EN[type], ox: ox[id]
+                };
+            });
+            bonds = bondsFromSpec(spec);
+        }
+
+        function findAtom(id) {
+            for (var i = 0; i < atoms.length; i++) if (atoms[i].id === id) return atoms[i];
+            return null;
+        }
+
+        var ROMAN = ["0", "I", "II", "III", "IV", "V", "VI"];
+        function formatOx(n) {
+            if (n === 0) return "0";
+            return (n > 0 ? "+" : "−") + ROMAN[Math.abs(n)];
+        }
+
+        // --- Canvas init & fit ---
+        function init() {
+            resizeCanvas();
+            window.addEventListener("resize", resizeCanvas);
+            setupEventListeners();
+            buildMolecule(state.step);
+            fitView();
+            updateHud();
+            requestAnimationFrame(renderLoop);
+        }
+
+        function resizeCanvas() {
+            var container = document.getElementById("canvas-container");
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            width = canvas.width;
+            height = canvas.height;
+            fitView();
+        }
+
+        function fitView() {
+            if (!atoms.length) return;
+            var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+            atoms.forEach(function(a) {
+                minX = Math.min(minX, a.x - a.radius - 40);
+                maxX = Math.max(maxX, a.x + a.radius + 40);
+                minY = Math.min(minY, a.y - a.radius - 40);
+                maxY = Math.max(maxY, a.y + a.radius + 40);
+            });
+            var bw = maxX - minX, bh = maxY - minY;
+            var scale = Math.min(width / bw, height / bh);
+            scale = Math.min(scale, 1.6);
+            camera.scale = scale;
+            camera.x = width / 2 - (minX + bw / 2) * scale;
+            camera.y = height / 2 - (minY + bh / 2) * scale;
+        }
+
+        // --- Render ---
+        function renderLoop() {
+            var target = state.showElectrons ? 1 : 0;
+            state.skewT += (target - state.skewT) * 0.12;
+
+            ctx.clearRect(0, 0, width, height);
+            ctx.save();
+            ctx.translate(camera.x, camera.y);
+            ctx.scale(camera.scale, camera.scale);
+
+            drawBonds();
+            atoms.forEach(drawAtom);
+
+            ctx.restore();
+            requestAnimationFrame(renderLoop);
+        }
+
+        function drawBonds() {
+            bonds.forEach(function(b) {
+                var A = findAtom(b.from), B = findAtom(b.to);
+                var order = b.order || 1;
+
+                ctx.strokeStyle = "#334155";
+                ctx.lineWidth = 7;
+                ctx.lineCap = "round";
+                ctx.beginPath();
+                ctx.moveTo(A.x, A.y);
+                ctx.lineTo(B.x, B.y);
+                ctx.stroke();
+
+                var cx = (A.x + B.x) / 2, cy = (A.y + B.y) / 2;
+                var bondLen = Math.hypot(B.x - A.x, B.y - A.y);
+                var ang = Math.atan2(B.y - A.y, B.x - A.x);
+                var dotSpreadX = order === 1 ? 0 : 7; // hvor langt dobbeltbindingens prikker rækker ud til siden
+
+                var skew = 0;
+                if (A.en !== B.en) {
+                    // Forskydningen skalerer med EN-forskellen, men har et gulv, så
+                    // selv en "upolær" C-H-binding (ΔEN kun 0,4) tydeligt trækker mod C.
+                    var gap = Math.abs(A.en - B.en);
+                    var towardB = A.en < B.en;
+                    var targetRadius = towardB ? B.radius : A.radius;
+                    // Prikkerne må aldrig nå ind i selve atom-cirklen de trækkes imod.
+                    var maxSafePull = Math.max(4, bondLen / 2 - targetRadius - dotSpreadX - 5);
+                    var pull = Math.min(9 + 13 * gap, maxSafePull) * state.skewT;
+                    skew = towardB ? pull : -pull; // lokal +x peger fra A mod B
+                }
+
+                // Hvert bindende elektronpar har én elektron fra hvert atom - ved
+                // "ophav" farves den øverste prik i hvert par efter A, den nederste efter B.
+                var colorA = state.showOrigin ? ORIGIN_COLOR[A.type] : ELECTRON_COLOR;
+                var colorB = state.showOrigin ? ORIGIN_COLOR[B.type] : ELECTRON_COLOR;
+
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate(ang);
+                ctx.translate(skew, 0);
+                var dot = function(x, y, color) {
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                };
+                if (order === 1) {
+                    dot(0, -6, colorA); dot(0, 6, colorB);
+                } else {
+                    dot(-dotSpreadX, -6, colorA); dot(-dotSpreadX, 6, colorB);
+                    dot(dotSpreadX, -6, colorA); dot(dotSpreadX, 6, colorB);
+                }
+                ctx.restore();
+            });
+        }
+
+        function drawAtom(a) {
+            var isReacting = a.id === MOLECULES[state.step].reactingAtom;
+
+            if (isReacting) {
+                ctx.beginPath();
+                ctx.arc(a.x, a.y, a.radius + 9, 0, Math.PI * 2);
+                ctx.strokeStyle = "rgba(56, 189, 248, 0.55)";
+                ctx.lineWidth = 3;
+                ctx.stroke();
+            }
+
+            ctx.beginPath();
+            ctx.arc(a.x, a.y, a.radius, 0, Math.PI * 2);
+            ctx.fillStyle = a.color;
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = "#0f172a";
+            ctx.stroke();
+
+            ctx.fillStyle = a.textColor;
+            ctx.font = "bold 20px 'Segoe UI'";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(a.type, a.x, a.y);
+
+            if (state.showEN) {
+                ctx.font = "bold 12px 'Segoe UI'";
+                ctx.fillStyle = "#e2e8f0";
+                ctx.strokeStyle = "#0f172a";
+                ctx.lineWidth = 3;
+                var enStr = a.en.toFixed(1).replace(".", ",");
+                var enX = a.x - a.radius * 0.8, enY = a.y - a.radius * 0.85;
+                ctx.strokeText(enStr, enX, enY);
+                ctx.fillText(enStr, enX, enY);
+            }
+
+            if (state.showOx) {
+                ctx.font = "bold 15px 'Segoe UI'";
+                ctx.fillStyle = "#38bdf8";
+                ctx.strokeStyle = "#0f172a";
+                ctx.lineWidth = 3;
+                var label = formatOx(a.ox);
+                var lx = a.x + a.radius * 0.75, ly = a.y - a.radius * 0.85;
+                ctx.strokeText(label, lx, ly);
+                ctx.fillText(label, lx, ly);
+            }
+        }
+
+        // --- UI ---
+        function updateHud() {
+            var m = MOLECULES[state.step];
+            document.getElementById("hud-text").innerHTML =
+                "<strong>" + m.label + "</strong> (" + m.formula + ")";
+        }
+
+        function setStep(key) {
+            state.step = key;
+            buildMolecule(key);
+            fitView();
+            updateHud();
+            document.querySelectorAll(".step-btn").forEach(function(btn) {
+                btn.classList.toggle("active", btn.dataset.step === key);
+            });
+        }
+
+        function setupEventListeners() {
+            document.querySelectorAll(".step-btn").forEach(function(btn) {
+                btn.addEventListener("click", function() { setStep(this.dataset.step); });
+            });
+            document.querySelector('.step-btn[data-step="ethanol"]').classList.add("active");
+
+            document.getElementById("btn-en").addEventListener("click", function() {
+                state.showEN = !state.showEN;
+                this.classList.toggle("active", state.showEN);
+            });
+
+            document.getElementById("btn-origin").addEventListener("click", function() {
+                state.showOrigin = !state.showOrigin;
+                this.classList.toggle("active", state.showOrigin);
+            });
+
+            document.getElementById("btn-elektroner").addEventListener("click", function() {
+                state.showElectrons = !state.showElectrons;
+                this.classList.toggle("active", state.showElectrons);
+            });
+
+            document.getElementById("btn-ox").addEventListener("click", function() {
+                state.showOx = !state.showOx;
+                this.classList.toggle("active", state.showOx);
+            });
+
+            document.getElementById("btn-reset").addEventListener("click", function() {
+                state.showEN = false;
+                state.showOrigin = false;
+                state.showElectrons = false;
+                state.showOx = false;
+                document.getElementById("btn-en").classList.remove("active");
+                document.getElementById("btn-origin").classList.remove("active");
+                document.getElementById("btn-elektroner").classList.remove("active");
+                document.getElementById("btn-ox").classList.remove("active");
+                setStep("ethanol");
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>

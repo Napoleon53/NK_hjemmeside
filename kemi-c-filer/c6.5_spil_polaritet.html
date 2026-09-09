@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kemi-Lab: Polaritet & Struktur</title>
+    <style>
+        :root {
+            --bg: #f4f7f6;
+            --text: #2c3e50;
+            --water: #3498db;
+            --oil: #e67e22;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --btn: #34495e;
+        }
+
+        body { margin: 0; overflow: hidden; background: var(--bg); font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: var(--text); user-select: none; }
+        #game-container { position: relative; width: 100vw; height: 100vh; display: flex; flex-direction: column; }
+        canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+        canvas:active { cursor: grabbing; }
+
+        /* UI Elements */
+        .ui-layer { position: absolute; pointer-events: none; width: 100%; height: 100%; top: 0; left: 0; padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; }
+        
+        .header-area { text-align: center; margin-top: 10px; pointer-events: auto; }
+        .molecule-name { font-size: 2.5rem; font-weight: 800; color: var(--text); margin: 0; background: rgba(255,255,255,0.9); padding: 10px 30px; border-radius: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+        .progress-indicator { font-size: 1rem; color: #7f8c8d; margin-top: 5px; font-weight: bold; background: rgba(255,255,255,0.8); display: inline-block; padding: 2px 10px; border-radius: 10px; }
+
+        /* Score & Lives */
+        .stats-bar { position: absolute; top: 20px; right: 20px; text-align: right; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .stat-item { font-size: 1.2rem; font-weight: bold; margin-bottom: 5px; }
+
+        /* Hint */
+        .hint-bar { position: absolute; top: 20px; left: 20px; text-align: left; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 260px; pointer-events: auto; }
+        #hintBtn { padding: 8px 20px; font-size: 0.9rem; margin-top: 0; }
+        #hintText { display: none; margin-top: 10px; font-size: 0.85rem; color: #555; line-height: 1.4; }
+
+        /* Bægerglas Labels */
+        .beaker-labels { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: space-around; pointer-events: none; }
+        .label-box { background: white; padding: 15px 30px; border-radius: 8px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-bottom: 5px solid #ccc; }
+        .label-water { border-color: var(--water); color: var(--water); }
+        .label-oil { border-color: var(--oil); color: var(--oil); }
+        .label-title { font-size: 1.5rem; font-weight: 900; display: block; }
+        .label-desc { font-size: 0.9rem; color: #7f8c8d; }
+
+        /* Screens (Start / Game Over) */
+        .overlay-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(244, 247, 246, 0.98); z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: auto; transition: opacity 0.3s; }
+        .hidden { opacity: 0; pointer-events: none; }
+        
+        h1 { font-size: 3rem; color: var(--btn); margin-bottom: 10px; }
+        button { background: var(--btn); color: white; border: none; padding: 15px 40px; font-size: 1.2rem; border-radius: 50px; cursor: pointer; transition: transform 0.1s, background 0.2s; box-shadow: 0 5px 15px rgba(0,0,0,0.1); font-weight: bold; margin-top: 20px; }
+        button:hover { transform: scale(1.05); background: #2c3e50; }
+
+        /* FEEDBACK SIDEBAR */
+        #feedback-panel {
+            position: absolute; right: 0; top: 0; height: 100%; width: 400px;
+            background: white;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.15);
+            transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 15; padding: 40px; box-sizing: border-box;
+            display: flex; flex-direction: column; justify-content: center; pointer-events: auto;
+        }
+        #feedback-panel.active { transform: translateX(0); }
+        .fb-header { font-size: 2rem; font-weight: bold; margin-bottom: 30px; border-bottom: 4px solid #eee; padding-bottom: 15px; }
+        .fb-content { font-size: 1.15rem; line-height: 1.7; color: #555; flex-grow: 1; }
+        .fb-correct { color: var(--success); border-color: var(--success); }
+        .fb-wrong { color: var(--danger); border-color: var(--danger); }
+        .highlight { background: #fff3cd; padding: 2px 6px; border-radius: 4px; font-weight: bold; color: #333; border-bottom: 2px solid #ffeeba; }
+
+        /* Regnestykke (rigtig brøkstreg) */
+        .calc-box { margin-top: 22px; padding: 16px 18px; background: #f8f9fa; border: 1px solid #ececec; border-radius: 10px; }
+        .calc-line { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .calc-word, .calc-eq-sign, .calc-result { font-size: 1.25rem; font-weight: 800; color: var(--text); }
+        .fraction { display: inline-flex; flex-direction: column; align-items: stretch; text-align: center; font-size: 1.25rem; font-weight: 800; line-height: 1.15; color: var(--text); }
+        .frac-num, .frac-den { display: flex; flex-direction: column; align-items: center; }
+        .frac-num small, .frac-den small { font-size: 0.5em; font-weight: 700; color: #7f8c8d; text-transform: none; letter-spacing: 0; margin-top: 2px; }
+        .frac-bar { height: 2px; background: currentColor; margin: 4px 0; }
+        .calc-note { margin-top: 16px; font-size: 1rem; color: #444; line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <canvas id="simCanvas"></canvas>
+    
+    <div class="ui-layer">
+        <div class="stats-bar">
+            <div class="stat-item" style="color:var(--success)">Point: <span id="scoreDisplay">0</span></div>
+            <div class="stat-item" style="color:var(--danger)">Liv: <span id="livesDisplay">❤❤❤</span></div>
+        </div>
+
+        <div class="hint-bar">
+            <button id="hintBtn">💡 Hint</button>
+            <div id="hintText"></div>
+        </div>
+
+        <div class="header-area">
+            <h2 id="molName" class="molecule-name">Velkommen</h2>
+            <br>
+            <div id="progressDisplay" class="progress-indicator">Molekyle 0 / 0</div>
+        </div>
+
+        <div class="beaker-labels">
+            <div class="label-box label-water">
+                <span class="label-title">VANDFASEN</span>
+                <span class="label-desc">Polære stoffer (Hydrofile)</span>
+            </div>
+            <div class="label-box label-oil">
+                <span class="label-title">OLIEFASEN</span>
+                <span class="label-desc">Upolære stoffer (Hydrofobe)</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="feedback-panel">
+        <div id="fb-title" class="fb-header">Resultat</div>
+        <div id="fb-text" class="fb-content"></div>
+        <button id="nextBtn" style="width:100%">NÆSTE MOLEKYLE &rarr;</button>
+    </div>
+
+    <div id="start-screen" class="overlay-screen">
+        <h1>Molekylers opløselighed</h1>
+        <p style="max-width: 600px; text-align: center; color: #555; font-size: 1.3rem; line-height: 1.6;">
+            Sorter molekylerne efter opløselighed.<br>
+            Du skal igennem hele bunken uden at løbe tør for liv.
+        </p>
+        <button id="startBtn">START ØVELSE</button>
+    </div>
+
+    <div id="game-over-screen" class="overlay-screen hidden">
+        <h1 id="endTitle" style="color: var(--danger);">Spillet er slut!</h1>
+        <p id="endSubtitle" style="font-size: 1.4rem; color: #555; margin-bottom: 20px;"></p>
+        <h2 style="font-size: 2.5rem;">Score: <span id="finalScore">0</span></h2>
+        <div id="wrongSummary" style="display:none; width: 90%; max-width: 600px; max-height: 30vh; overflow-y: auto; text-align: left; background: white; border-radius: 10px; padding: 15px 25px; margin-top: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); box-sizing: border-box;">
+            <h3 style="margin-top: 0;">Molekyler du fik forkert:</h3>
+            <ul id="wrongSummaryList" style="padding-left: 20px; line-height: 1.6; margin: 0;"></ul>
+        </div>
+        <button id="restartBtn">PRØV IGEN</button>
+    </div>
+</div>
+
+<script>
+/* =========================================
+   KEMISK DATABASE & STRUKTUR-LOGIK
+   ========================================= */
+
+const COLORS = {
+    c: '#34495e',   // C-atom
+    o: '#e74c3c',   // Oxygen
+    n: '#3498db',   // Nitrogen
+    bond: '#2c3e50' // Bindinger
+};
+
+const GROUPS = {
+    OH: { t: "OH", color: COLORS.o, polar: true, name: "Hydroxyl" },
+    NH2: { t: "NH₂", color: COLORS.n, polar: true, name: "Amin" },
+    COOH: { t: "COOH", color: COLORS.o, polar: true, name: "Syre" },
+    ETHER: { t: "O", color: COLORS.o, polar: true, name: "Ether" } 
+};
+
+// Database over stoffer
+const RAW_DB = [
+    // Standard
+    { name: "ethanol", c: 2, g: [GROUPS.OH] },
+    { name: "butan-1-ol", c: 4, g: [GROUPS.OH] },
+    { name: "pentan-1-ol", c: 5, g: [GROUPS.OH] },
+    { name: "octan", c: 8, g: [] },
+    { name: "glycerol", c: 3, g: [GROUPS.OH, GROUPS.OH, GROUPS.OH], customShape: 'glycerol_realistic' },
+    { name: "ethansyre", c: 2, g: [GROUPS.COOH], customShape: 'acetic_acid' },
+    { name: "benzen", c: 6, g: [], customShape: 'benzen' },
+    { name: "methansyre", c: 1, g: [GROUPS.COOH], customShape: 'methanoic_acid' },
+    { name: "propan-2-ol", c: 3, g: [GROUPS.OH], customShape: 'isopropanol' },
+    { name: "dipropylæter", c: 6, g: [GROUPS.ETHER], customShape: 'dipropylether' },
+
+    // Grænsetilfælde (Polære)
+    { name: "octan-1,2,3-triol", c: 8, g: [GROUPS.OH, GROUPS.OH, GROUPS.OH], customShape: 'octan_triol' }, // Polær
+    { name: "dodecan-1,6,12-triol", c: 12, g: [GROUPS.OH, GROUPS.OH, GROUPS.OH], customShape: 'dodecan_triol' }, // Polær (Lige på grænsen)
+    { name: "heptan-1,4,7-triol", c: 7, g: [GROUPS.OH, GROUPS.OH, GROUPS.OH], customShape: 'heptan_triol' }, // Polær
+
+    // Grænsetilfælde (Upolære/Olie)
+    { name: "nonan-4,6-diol", c: 9, g: [GROUPS.OH, GROUPS.OH], customShape: 'nonan_diol' }, // Upolær
+    { name: "decan-4,5-diol", c: 10, g: [GROUPS.OH, GROUPS.OH], customShape: 'decan_diol' }, // Upolær
+
+    // NYE Upolære "fælder"
+    { name: "dodecan-1,7-diol", c: 12, g: [GROUPS.OH, GROUPS.OH], customShape: 'dodecan_diol' }, // Upolær (Ratio 6)
+    { name: "tetradecan-5,10-diol", c: 14, g: [GROUPS.OH, GROUPS.OH], customShape: 'tetradecan_diol' } // Upolær (Ratio 7)
+];
+
+class Molecule {
+    constructor(data) {
+        this.name = data.name;
+        this.cCount = data.c;
+        this.groups = data.g || [];
+        this.customShape = data.customShape || null;
+        
+        const hBondGroups = this.groups.filter(g => g.t !== "O").length;
+        this.hBondGroups = hBondGroups;
+
+        if (hBondGroups === 0) {
+            this.isWaterSoluble = false;
+            this.reason = "nonpolar_only";
+            this.ratio = null;
+            this.isBorderline = false;
+        } else {
+            // Rule of 4 check
+            const ratio = this.cCount / hBondGroups;
+            this.ratio = ratio;
+            this.isBorderline = ratio === 4.0; // Lige på grænsen: accepteres i begge faser
+            this.isWaterSoluble = ratio <= 4.0;
+            this.reason = this.isBorderline ? "borderline" : (this.isWaterSoluble ? "polar_dominant" : "nonpolar_dominant");
+        }
+
+        this.structure = this.generateStructure();
+    }
+
+    generateStructure() {
+        let points = []; 
+        let visualGroups = []; 
+        
+        const makeChain = (len) => {
+            let pts = [];
+            let startX = -(len * 18);
+            for(let i=0; i<len; i++) {
+                pts.push([startX + (i*35), (i%2===0)?18:-18]);
+            }
+            return pts;
+        };
+
+        const addGroup = (idx, type, bond='single') => {
+            let p = points[idx];
+            let yDir = (p[1] > 0) ? 1 : -1; 
+            visualGroups.push({ t: type.t, x: p[0], y: p[1] + (yDir * 45), c: type.color, bond: bond, attachTo: idx });
+        };
+
+        switch(this.customShape) {
+            // NYE
+            case 'dodecan_diol':
+                points = makeChain(12);
+                addGroup(0, GROUPS.OH);
+                addGroup(6, GROUPS.OH);
+                break;
+            case 'tetradecan_diol':
+                points = makeChain(14);
+                addGroup(4, GROUPS.OH); // C5
+                addGroup(9, GROUPS.OH); // C10
+                break;
+
+            // Eksisterende
+            case 'octan_triol':
+                points = makeChain(8);
+                addGroup(0, GROUPS.OH); addGroup(1, GROUPS.OH); addGroup(2, GROUPS.OH);
+                break;
+            case 'nonan_diol':
+                points = makeChain(9);
+                addGroup(3, GROUPS.OH); addGroup(5, GROUPS.OH);
+                break;
+            case 'dodecan_triol':
+                points = makeChain(12);
+                addGroup(0, GROUPS.OH); addGroup(5, GROUPS.OH); addGroup(11, GROUPS.OH);
+                break;
+            case 'decan_diol':
+                points = makeChain(10);
+                addGroup(3, GROUPS.OH); addGroup(4, GROUPS.OH);
+                break;
+            case 'heptan_triol':
+                points = makeChain(7);
+                addGroup(0, GROUPS.OH); addGroup(3, GROUPS.OH); addGroup(6, GROUPS.OH);
+                break;
+            case 'glycerol_realistic':
+                points = [[-25, -15], [0, 15], [25, -15]]; 
+                visualGroups.push({ t: "OH", x: -55, y: -35, c: COLORS.o, bond: 'single', attachTo: 0 });
+                visualGroups.push({ t: "OH", x: 0, y: 55, c: COLORS.o, bond: 'single', attachTo: 1 });
+                visualGroups.push({ t: "OH", x: 55, y: -35, c: COLORS.o, bond: 'single', attachTo: 2 });
+                break;
+            case 'acetic_acid': 
+                points = [[-20, 0], [20, 0]]; 
+                visualGroups.push({ t: "O", x: 35, y: -35, c: COLORS.o, bond: 'double', attachTo: 1 });
+                visualGroups.push({ t: "OH", x: 45, y: 30, c: COLORS.o, bond: 'single', attachTo: 1 });
+                break;
+            case 'methanoic_acid':
+                points = [[0, 0]]; 
+                visualGroups.push({ t: "O", x: 20, y: -35, c: COLORS.o, bond: 'double', attachTo: 0 });
+                visualGroups.push({ t: "OH", x: 30, y: 30, c: COLORS.o, bond: 'single', attachTo: 0 });
+                break;
+            case 'isopropanol':
+                points = [[-30, 15], [0, -15], [30, 15]];
+                addGroup(1, GROUPS.OH);
+                break;
+             case 'dipropylether':
+                 let gen = this.generateGenericChain(6, []);
+                 points = gen.points;
+                 visualGroups.push({ t: "O", x: (points[2][0]+points[3][0])/2, y: points[2][1]-25, c: COLORS.o, bond: 'single', attachTo: 2 });
+                break;
+            case 'benzen':
+                 for (let i = 0; i < 6; i++) {
+                     let angle = i * Math.PI / 3;
+                     points.push([Math.cos(angle)*45, Math.sin(angle)*45]);
+                 }
+                 break;
+            default:
+                return this.generateGenericChain(this.cCount, this.groups);
+        }
+        return { points, visualGroups };
+    }
+
+    generateGenericChain(count, groups) {
+        let points = []; let visualGroups = [];
+        let startX = -(count * 18);
+        for (let i = 0; i < count; i++) {
+            let angle = (i % 2 === 0) ? -Math.PI/7 : Math.PI/7;
+            points.push([startX + (i * 35), (i % 2 === 0) ? 18 : -18]);
+        }
+        if (groups.length > 0) {
+            let lastIdx = points.length-1;
+            let lastP = points[lastIdx];
+            if(groups[0].t === "O") {
+                 let midIdx = Math.floor(points.length/2) - 1;
+                 visualGroups.push({ t: "O", x: points[midIdx][0]+17, y: points[midIdx][1]-25, c: groups[0].color, bond: 'single', attachTo: midIdx });
+            } else {
+                visualGroups.push({ t: groups[0].t, x: lastP[0] + 40, y: lastP[1], c: groups[0].color, bond: 'single', attachTo: lastIdx });
+            }
+        }
+        return { points, visualGroups };
+    }
+}
+
+/* =========================================
+   GAME ENGINE & RENDERING
+   ========================================= */
+
+const canvas = document.getElementById('simCanvas');
+const ctx = canvas.getContext('2d');
+let width, height;
+
+let gameState = 'MENU';
+let currentMol = null;
+let remainingMolecules = []; // Bunken
+let score = 0;
+let lives = 3;
+let completedCount = 0;
+let particles = [];
+let drag = { active: false, offX: 0, offY: 0 };
+let wrongList = [];
+let hintUsedThisRound = false;
+
+function resize() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+function loop() {
+    ctx.clearRect(0,0, width, height);
+    drawBackgroundZones();
+    if (gameState === 'PLAY' || gameState === 'FEEDBACK') {
+        if (currentMol) drawMolecule(currentMol);
+        drawParticles();
+    }
+    requestAnimationFrame(loop);
+}
+
+function drawBackgroundZones() {
+    // Vand (Venstre)
+    ctx.fillStyle = '#eaf6ff'; ctx.fillRect(0, height/2, width/2, height/2);
+    // Olie (Højre)
+    ctx.fillStyle = '#fff5e6'; ctx.fillRect(width/2, height/2, width/2, height/2);
+    
+    ctx.beginPath(); ctx.moveTo(width/2, height/2); ctx.lineTo(width/2, height);
+    ctx.strokeStyle = '#bdc3c7'; ctx.lineWidth = 2; ctx.setLineDash([15, 15]); ctx.stroke(); ctx.setLineDash([]);
+
+    if (currentMol && gameState === 'PLAY' && currentMol.y < height/2 - 50) {
+        ctx.fillStyle = '#95a5a6'; ctx.font = 'bold 24px sans-serif';
+        ctx.textAlign = 'center'; ctx.fillText("↓ Træk molekylet ned ↓", width/2, height/2 - 50);
+    }
+}
+
+function drawMolecule(m) {
+    ctx.save();
+    ctx.translate(m.x, m.y);
+    ctx.rotate(m.r);
+    const scale = m.dragging ? 1.15 : 1.0;
+    ctx.scale(scale, scale);
+
+    ctx.shadowBlur = 20; ctx.shadowColor = 'rgba(0,0,0,0.1)';
+    ctx.strokeStyle = COLORS.bond;
+    ctx.lineWidth = 6; 
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+
+    const pts = m.obj.structure.points;
+    
+    // Tegn Skelet
+    ctx.beginPath();
+    if (m.obj.customShape === 'benzen') {
+        ctx.moveTo(pts[0][0], pts[0][1]); pts.forEach(p => ctx.lineTo(p[0], p[1])); ctx.closePath(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(0,0, 28, 0, Math.PI*2); ctx.lineWidth=3; ctx.stroke();
+    } else if (pts.length > 0) {
+        ctx.moveTo(pts[0][0], pts[0][1]);
+        for(let i=1; i<pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+        ctx.stroke();
+    }
+
+    // Tegn C-atomer
+    ctx.fillStyle = COLORS.c; ctx.shadowBlur = 0;
+    pts.forEach(p => { ctx.beginPath(); ctx.arc(p[0], p[1], 7, 0, Math.PI*2); ctx.fill(); });
+
+    // Tegn Grupper
+    ctx.font = 'bold 22px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    
+    m.obj.structure.visualGroups.forEach(g => {
+        let attachPoint = pts[g.attachTo];
+        let dx = g.x - attachPoint[0]; let dy = g.y - attachPoint[1];
+        let len = Math.hypot(dx, dy);
+        let ux = dx/len; let uy = dy/len; 
+        let perpX = -uy * 5; let perpY = ux * 5; 
+
+        ctx.strokeStyle = COLORS.bond; ctx.lineWidth = 4;
+        
+        if (g.bond === 'double') {
+            ctx.beginPath(); ctx.moveTo(attachPoint[0]+perpX, attachPoint[1]+perpY); ctx.lineTo(g.x+perpX, g.y+perpY); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(attachPoint[0]-perpX, attachPoint[1]-perpY); ctx.lineTo(g.x-perpX, g.y-perpY); ctx.stroke();
+        } else {
+            ctx.beginPath(); ctx.moveTo(attachPoint[0], attachPoint[1]); ctx.lineTo(g.x, g.y); ctx.stroke();
+        }
+
+        ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(g.x, g.y, 20, 0, Math.PI*2); ctx.fill();
+        ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = g.c; ctx.fillText(g.t, g.x, g.y);
+    });
+    ctx.restore();
+}
+
+/* =========================================
+   INTERACTION & LOGIC
+   ========================================= */
+
+function startGame() {
+    remainingMolecules = [...RAW_DB]; // Klon databasen til en "bunke"
+    score = 0;
+    lives = 3;
+    completedCount = 0;
+    wrongList = [];
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('game-over-screen').classList.add('hidden');
+    document.getElementById('wrongSummary').style.display = 'none';
+    gameState = 'PLAY';
+    spawnMolecule();
+    updateUI();
+}
+
+function spawnMolecule() {
+    // Tjek om bunken er tom
+    if (remainingMolecules.length === 0) {
+        endGame(true); // Victory!
+        return;
+    }
+
+    // Vælg tilfældigt fra tilbageværende
+    const index = Math.floor(Math.random() * remainingMolecules.length);
+    const data = remainingMolecules[index];
+    
+    // Fjern fra bunken
+    remainingMolecules.splice(index, 1);
+    
+    completedCount++;
+
+    currentMol = {
+        obj: new Molecule(data),
+        x: width/2, y: height/3,
+        r: (Math.random()-0.5)*0.4, dragging: false
+    };
+
+    hintUsedThisRound = false;
+    const hintDiv = document.getElementById('hintText');
+    hintDiv.style.display = 'none';
+    hintDiv.innerText = '';
+
+    updateUI();
+}
+
+function updateUI() {
+    if(currentMol) document.getElementById('molName').innerText = currentMol.obj.name;
+    document.getElementById('scoreDisplay').innerText = score;
+    document.getElementById('livesDisplay').innerText = "❤".repeat(lives);
+    document.getElementById('progressDisplay').innerText = `Molekyle ${completedCount} / ${RAW_DB.length}`;
+}
+
+function endGame(victory) {
+    gameState = 'GAMEOVER';
+    const screen = document.getElementById('game-over-screen');
+    const title = document.getElementById('endTitle');
+    const sub = document.getElementById('endSubtitle');
+    
+    screen.classList.remove('hidden');
+    document.getElementById('feedback-panel').classList.remove('active');
+    
+    document.getElementById('finalScore').innerText = score;
+
+    if (victory) {
+        title.innerText = "Flot klaret!";
+        title.style.color = COLORS.success;
+        sub.innerText = "Du har sorteret alle molekylerne korrekt!";
+    } else {
+        title.innerText = "Spillet er slut!";
+        title.style.color = COLORS.danger;
+        sub.innerText = "Du løb tør for liv.";
+    }
+
+    const summaryBox = document.getElementById('wrongSummary');
+    const summaryList = document.getElementById('wrongSummaryList');
+    if (wrongList.length > 0) {
+        summaryList.innerHTML = wrongList.map(w => `<li><strong>${w.name}</strong> hører til i <em>${w.zone}</em>. ${w.short}</li>`).join('');
+        summaryBox.style.display = 'block';
+    } else {
+        summaryBox.style.display = 'none';
+    }
+}
+
+function zoneName(mol) {
+    return mol.isWaterSoluble ? "Vandfasen (polær)" : "Oliefasen (upolær)";
+}
+
+function shortReason(mol) {
+    if (mol.reason === "nonpolar_only") return "Ingen polære grupper.";
+    if (mol.reason === "polar_dominant") return "De polære grupper dominerer trods carbonkæden.";
+    if (mol.reason === "borderline") return "Grænsetilfælde – molekylet er delvist polært.";
+    return "Den upolære carbonkæde er for lang ift. antal polære grupper.";
+}
+
+function handleDrop(zone) {
+    gameState = 'FEEDBACK';
+    const isWaterZone = zone === -1;
+    const mol = currentMol.obj;
+    const isCorrect = mol.isBorderline
+        ? true // Grænsetilfælde: begge faser accepteres
+        : (isWaterZone && mol.isWaterSoluble) || (!isWaterZone && !mol.isWaterSoluble);
+
+    spawnParticles(currentMol.x, currentMol.y, isCorrect);
+
+    if(isCorrect) {
+        score += 100;
+    } else {
+        lives--;
+        wrongList.push({ name: mol.name, zone: zoneName(mol), short: shortReason(mol) });
+    }
+    updateUI();
+    showFeedback(isCorrect, mol, isWaterZone);
+}
+
+function buildCalcHTML(mol) {
+    const plural = mol.hBondGroups > 1;
+    const groupLabel = `polær${plural ? "e" : ""} gruppe${plural ? "r" : ""}`;
+    const resultText = mol.ratio.toFixed(1).replace('.', ',');
+    return `
+        <div class="calc-box">
+            <div class="calc-line">
+                <span class="calc-word">Forhold</span>
+                <span class="calc-eq-sign">=</span>
+                <span class="fraction">
+                    <span class="frac-num">${mol.cCount}<small>C-atomer</small></span>
+                    <span class="frac-bar"></span>
+                    <span class="frac-den">${mol.hBondGroups}<small>${groupLabel}</small></span>
+                </span>
+                <span class="calc-eq-sign">=</span>
+                <span class="calc-result">${resultText}</span>
+            </div>
+            <div class="calc-note">${polarityNote(mol)}</div>
+        </div>`;
+}
+
+function polarityNote(mol) {
+    if (mol.reason === "nonpolar_only") {
+        return "Molekylet har ingen polære grupper, så der er intet forhold at beregne — stoffet er udelukkende upolært.";
+    }
+    const rule = "Når forholdet er under 4, vejer de polære grupper tungest, og molekylet er <strong>polært</strong> (opløses i vand). Når forholdet er over 4, vejer den upolære kæde tungest, og molekylet er <strong>upolært</strong> (opløses i olie).";
+    if (mol.reason === "borderline") {
+        return `${rule} Her rammer forholdet præcis 4 — kæden og grupperne er lige stærke, så molekylet er delvist polært og accepteres i begge faser.`;
+    }
+    if (mol.reason === "polar_dominant") {
+        return `${rule} Her er forholdet under 4, så molekylet er polært.`;
+    }
+    return `${rule} Her er forholdet over 4, så molekylet er upolært.`;
+}
+
+function showFeedback(correct, mol, placedInWater) {
+    const panel = document.getElementById('feedback-panel');
+    panel.classList.add('active');
+    
+    const title = document.getElementById('fb-title');
+    title.innerText = correct ? "Korrekt!" : "Forkert!";
+    title.className = "fb-header " + (correct ? "fb-correct" : "fb-wrong");
+
+    let explanation = "";
+    const groupText = mol.groups.length > 1 ? "De polære grupper" : "Den polære gruppe";
+    const groupTextSuffix = mol.groups.length > 1 ? "de" : "den";
+
+    if (mol.reason === "nonpolar_only") {
+        explanation = `Dette stof består næsten kun af Carbon og Hydrogen. Det er <span class="highlight">hydrofobt</span> og opløses bedst i upolære opløsningsmidler.`;
+    }
+    else if (mol.reason === "borderline") {
+        explanation = `Dette molekyle ligger <span class="highlight">præcis på grænsen</span> mellem de to typer. Begge svar accepteres her, fordi stoffet er delvist polært.`;
+    }
+    else if (mol.reason === "polar_dominant") {
+        explanation = `Stoffet er <span class="highlight">hydrofilt</span> (vandelskende). <br><br>${groupText} er stærke nok til at trække carbonkæden på ${mol.cCount} C-atomer med ned i vandet.`;
+    }
+    else if (mol.reason === "nonpolar_dominant") {
+        explanation = `Selvom stoffet har ${mol.groups.length} polære grupper, er den <span class="highlight">upolære carbonkæde for lang</span> (${mol.cCount} C-atomer). <br><br>Den upolære del dominerer, så ${groupTextSuffix} kan ikke holde stoffet opløst i vand.`;
+    }
+
+    if (mol.reason !== "nonpolar_only") {
+        explanation += buildCalcHTML(mol);
+    } else {
+        explanation += `<div class="calc-note">${polarityNote(mol)}</div>`;
+    }
+
+    if (!correct && lives <= 0) {
+         explanation += "<br><br><strong>Spillet er slut.</strong>";
+         document.getElementById('nextBtn').innerText = "SE RESULTAT";
+    } else {
+         document.getElementById('nextBtn').innerText = "NÆSTE MOLEKYLE →";
+    }
+    document.getElementById('fb-text').innerHTML = explanation;
+}
+
+document.getElementById('nextBtn').onclick = () => {
+    document.getElementById('feedback-panel').classList.remove('active');
+    if (lives > 0) {
+        gameState = 'PLAY';
+        spawnMolecule();
+    } else {
+        endGame(false);
+    }
+};
+
+document.getElementById('hintBtn').onclick = () => {
+    if (!currentMol || hintUsedThisRound || gameState !== 'PLAY') return;
+    hintUsedThisRound = true;
+    score = Math.max(0, score - 30);
+    updateUI();
+
+    const mol = currentMol.obj;
+    const hintDiv = document.getElementById('hintText');
+    if (mol.reason === 'nonpolar_only') {
+        hintDiv.innerText = `Kig godt efter: er der nogen polære grupper (fx OH, NH₂, COOH) på molekylet?`;
+    } else {
+        const plural = mol.hBondGroups > 1;
+        hintDiv.innerText = `Tæl selv: molekylet har ${mol.cCount} C-atomer og ${mol.hBondGroups} polær${plural ? "e" : ""} gruppe${plural ? "r" : ""}. Husk reglen om 4.`;
+    }
+    hintDiv.style.display = 'inline-block';
+};
+
+canvas.addEventListener('mousedown', e => {
+    if(gameState !== 'PLAY' || !currentMol) return;
+    const r = canvas.getBoundingClientRect(); const mx = e.clientX-r.left; const my = e.clientY-r.top;
+    if(Math.hypot(mx-currentMol.x, my-currentMol.y) < 100) {
+        drag.active = true; drag.offX = mx-currentMol.x; drag.offY = my-currentMol.y; currentMol.dragging = true;
+    }
+});
+window.addEventListener('mousemove', e => {
+    if(!drag.active) return;
+    const r = canvas.getBoundingClientRect();
+    currentMol.x = e.clientX-r.left-drag.offX; currentMol.y = e.clientY-r.top-drag.offY;
+});
+window.addEventListener('mouseup', e => {
+    if(!drag.active) return;
+    drag.active = false; currentMol.dragging = false;
+    if(currentMol.y > height/2) handleDrop(currentMol.x < width/2 ? -1 : 1);
+    else { currentMol.x = width/2; currentMol.y = height/3; }
+});
+
+canvas.addEventListener('touchstart', e => {
+    if(gameState !== 'PLAY' || !currentMol) return;
+    const t = e.touches[0];
+    const r = canvas.getBoundingClientRect(); const mx = t.clientX-r.left; const my = t.clientY-r.top;
+    if(Math.hypot(mx-currentMol.x, my-currentMol.y) < 100) {
+        drag.active = true; drag.offX = mx-currentMol.x; drag.offY = my-currentMol.y; currentMol.dragging = true;
+        e.preventDefault();
+    }
+}, { passive: false });
+window.addEventListener('touchmove', e => {
+    if(!drag.active) return;
+    e.preventDefault();
+    const t = e.touches[0];
+    const r = canvas.getBoundingClientRect();
+    currentMol.x = t.clientX-r.left-drag.offX; currentMol.y = t.clientY-r.top-drag.offY;
+}, { passive: false });
+window.addEventListener('touchend', e => {
+    if(!drag.active) return;
+    drag.active = false; currentMol.dragging = false;
+    if(currentMol.y > height/2) handleDrop(currentMol.x < width/2 ? -1 : 1);
+    else { currentMol.x = width/2; currentMol.y = height/3; }
+});
+
+function spawnParticles(x, y, success) {
+    for(let i=0; i<25; i++) particles.push({
+        x: x, y: y, vx: (Math.random()-0.5)*12, vy: (Math.random()-0.5)*12,
+        life: 1.0, color: success ? COLORS.success : COLORS.danger
+    });
+}
+function drawParticles() {
+    for(let i=particles.length-1; i>=0; i--) {
+        let p = particles[i]; p.x+=p.vx; p.y+=p.vy; p.life-=0.04;
+        ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
+        ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fill();
+        if(p.life<=0) particles.splice(i,1);
+    } ctx.globalAlpha = 1.0;
+}
+
+document.getElementById('startBtn').onclick = startGame;
+document.getElementById('restartBtn').onclick = startGame; // Genbrug logikken
+
+// Initial tegn (uden spil)
+loop();
+</script>
+</body>
+</html>

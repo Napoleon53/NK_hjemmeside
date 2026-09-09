@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtuel Kemi: Fældningsreaktioner</title>
+    <style>
+        :root {
+            --bg-color: #1a1a1d;
+            --panel-bg: #2d2d34;
+            --text-color: #e0e0e0;
+            --accent-color: #4ecca3;
+            --highlight: #fca311;
+            --danger: #ff6b6b;
+        }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg-color); color: var(--text-color); height: 100vh; display: flex; overflow: hidden; }
+
+        /* LAYOUT */
+        #app-container { display: flex; width: 100%; height: 100%; }
+
+        #control-panel {
+            width: 320px; background: var(--panel-bg); padding: 20px;
+            display: flex; flex-direction: column; border-right: 2px solid #333;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.5); z-index: 10;
+            min-height: 0; overflow-y: auto;
+        }
+
+        #macro-view {
+            flex: 0 1 400px; position: relative; min-width: 0; min-height: 0;
+            background: radial-gradient(circle at center, #404045 0%, #1a1a1d 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            gap: 14px; padding: 24px 16px; box-sizing: border-box; overflow-y: auto;
+        }
+
+        #micro-panel {
+            flex: 1; min-width: 0; min-height: 0; background: #232328; border-left: 2px solid #333;
+            padding: 20px; display: flex; flex-direction: column; overflow-y: auto;
+        }
+
+        h2 { color: var(--accent-color); margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        h3 { font-size: 1rem; color: #aaa; margin-bottom: 5px; }
+
+        .btn-exp {
+            background: #393e46; color: white; border: none; padding: 12px; margin-bottom: 8px;
+            border-radius: 6px; cursor: pointer; text-align: left; font-weight: bold;
+            transition: all 0.2s; border-left: 4px solid transparent; width: 100%;
+        }
+        .btn-exp:hover { background: #4b525e; }
+        .btn-exp.active { background: #393e46; border-left: 4px solid var(--accent-color); color: var(--accent-color); }
+        .btn-exp.next-hint { border-left: 4px solid var(--highlight); animation: btnBlink 1.2s ease-in-out infinite; }
+        @keyframes btnBlink { 0%, 100% { box-shadow: 0 0 0 rgba(252,163,17,0); } 50% { box-shadow: 0 0 14px 3px rgba(252,163,17,0.7); } }
+
+        .action-btn {
+            background: var(--accent-color); color: #000; border: none; padding: 15px;
+            border-radius: 50px; font-weight: bold; font-size: 1.1rem; cursor: pointer;
+            margin-top: 20px; width: 100%; box-shadow: 0 4px 15px rgba(78, 204, 163, 0.4);
+            transition: transform 0.1s;
+        }
+        .action-btn:active { transform: scale(0.98); }
+        .action-btn:disabled { background: #555; color: #888; cursor: not-allowed; box-shadow: none; }
+
+        #analysis-box {
+            background: #333; padding: 15px; border-radius: 8px; margin-top: 20px;
+            border: 1px solid #555; display: none;
+            width: 100%; max-width: 400px; box-sizing: border-box;
+        }
+        select { width: 100%; padding: 8px; margin: 10px 0; background: #222; color: #fff; border: 1px solid #555; box-sizing: border-box; }
+        .eq-select { width: auto; padding: 6px 4px; margin: 0; }
+        #eq-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 0.95rem; margin: 10px 0; }
+
+        canvas { border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.5); max-width: 100%; height: auto; display: block; min-width: 0; }
+
+        #feedback {
+            margin-top: 15px; padding: 10px; border-radius: 5px; font-size: 0.9rem; line-height: 1.4;
+            display: none; animation: fadeIn 0.5s;
+            width: 100%; max-width: 400px; box-sizing: border-box;
+        }
+        .correct { background: rgba(74, 222, 128, 0.15); color: #4ade80; border: 1px solid #4ade80; }
+        .incorrect { background: rgba(239, 71, 111, 0.15); color: #ef476f; border: 1px solid #ef476f; }
+
+        #micro-canvas-container {
+            width: 100%; max-width: 480px; aspect-ratio: 1 / 1; height: auto;
+            background: #000; border-radius: 50%; margin: 10px auto 0;
+            border: 4px solid #555; overflow: hidden; position: relative;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+        }
+        #micro-label { text-align: center; color: #888; font-size: 0.85rem; margin-top: 8px; min-height: 2.4em; }
+        #micro-legend { text-align: center; color: var(--highlight); font-size: 0.8rem; margin-top: 4px; min-height: 1.1em; }
+        #microCanvas { touch-action: none; display: block; width: 100%; height: 100%; }
+
+        #drag-hint {
+            display: none; position: absolute; inset: 0; align-items: center; justify-content: center;
+            pointer-events: none; text-align: center; padding: 20px;
+        }
+        #drag-hint span {
+            background: rgba(252,163,17,0.18); border: 2px solid var(--highlight); color: var(--highlight);
+            padding: 10px 18px; border-radius: 12px; font-weight: bold; font-size: 1.05rem;
+            animation: dragPulse 1.2s ease-in-out infinite;
+        }
+        @keyframes dragPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.07); opacity: 0.85; } }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* RESPONSIVE: stack panels on narrow screens / heavy zoom so nothing gets clipped */
+        @media (max-width: 1300px) {
+            body { height: auto; min-height: 100vh; overflow-y: auto; overflow-x: hidden; }
+            #app-container { flex-direction: column; height: auto; }
+            #control-panel, #micro-panel { width: 100%; box-sizing: border-box; }
+            #control-panel { border-right: none; border-bottom: 2px solid #333; }
+            #micro-panel { border-left: none; border-top: 2px solid #333; }
+            #macro-view { flex: none; min-height: 320px; padding: 30px 16px; box-sizing: border-box; }
+            #micro-panel { flex: none; }
+            #macroCanvas { width: min(90vw, 420px); }
+        }
+
+        @media (max-width: 480px) {
+            #control-panel, #micro-panel, #macro-view { padding: 14px; }
+            h2 { font-size: 1.1rem; }
+            .action-btn { font-size: 1rem; padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+
+    <div id="control-panel">
+        <h2>🧪 Øvelsesvejledning</h2>
+        <p style="font-size:0.9rem; color:#aaa;">Vælg et forsøg fra listen.</p>
+
+        <h3>Vælg Reaktion:</h3>
+        <div id="exp-list"></div>
+
+        <div id="instruction-box" style="margin-top:auto; font-style:italic; color:#888; font-size:0.9rem;">
+            Trin 1: Vælg forsøg.<br>
+            Trin 2: Tilsæt kemikalier til plastik lommen.<br>
+            Trin 3: Træk ionerne sammen og analyser resultatet.
+        </div>
+    </div>
+
+    <div id="macro-view">
+        <div style="width:100%; max-width:400px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+            <button id="btn-drop1" class="action-btn" style="width:auto; font-size:0.9rem; padding:10px 20px; margin-top:0;" disabled>💧 Tilsæt Væske 1</button>
+            <button id="btn-drop2" class="action-btn" style="width:auto; font-size:0.9rem; padding:10px 20px; margin-top:0;" disabled>💧 Tilsæt Væske 2</button>
+        </div>
+
+        <canvas id="macroCanvas" width="500" height="500"></canvas>
+        <div style="color: rgba(255,255,255,0.3); font-weight: bold; text-align: center;">
+            PLASTIKLOMME (Makroskopisk)
+        </div>
+
+        <div id="analysis-box">
+            <h3 id="analysis-question">Opskriv fældningsreaktionen</h3>
+            <p style="font-size:0.85rem; margin-top:0;">Vælg de to ioner der danner bundfaldet, og de koefficienter der får ladningerne til at gå op.</p>
+            <div id="eq-row">
+                <select id="eq-coeff-cation" class="eq-select"></select>
+                <select id="eq-cation" class="eq-select"></select>
+                <span>(aq) +</span>
+                <select id="eq-coeff-anion" class="eq-select"></select>
+                <select id="eq-anion" class="eq-select"></select>
+                <span>(aq) ⟶ bundfald (s)</span>
+            </div>
+            <button class="action-btn" style="margin-top:10px; font-size:0.9rem; padding:10px;" onclick="sim.checkAnswer()">Tjek reaktion</button>
+        </div>
+
+        <div id="feedback"></div>
+    </div>
+
+    <div id="micro-panel">
+        <h2>🔍 Analyse & Teori</h2>
+
+        <div id="micro-section">
+            <h3>Mikroskopisk Niveau (Ion-Zoom)</h3>
+            <div id="micro-canvas-container">
+                <canvas id="microCanvas" width="300" height="300"></canvas>
+                <div id="drag-hint"><span>👆 Klik og træk ionerne sammen!</span></div>
+            </div>
+            <div id="micro-label">Venter på reaktion...</div>
+            <div id="micro-legend"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+/* ION DATA */
+const ionColors = {
+    "Ag⁺": "#E0E0E0", // Bright Silver/White
+    "NO₃⁻": "#FF8A65", // Salmon/Orange
+    "Na⁺": "#BA68C8", // Purple
+    "I⁻": "#7986CB", // Indigo/Blueish
+    "Ba²⁺": "#4DB6AC", // Teal/Green
+    "Cl⁻": "#AED581", // Light Green
+    "Cu²⁺": "#2196F3", // Bright Blue
+    "SO₄²⁻": "#FFD54F", // Amber/Yellow
+    "K⁺": "#F06292", // Pink
+    "CO₃²⁻": "#90A4AE", // Blue Grey
+    "PO₄³⁻": "#FF7043" // Deep Orange
+};
+
+const ionCharge = { "Ag⁺":1, "Na⁺":1, "K⁺":1, "Ba²⁺":2, "Cu²⁺":2, "NO₃⁻":1, "Cl⁻":1, "I⁻":1, "SO₄²⁻":2, "CO₃²⁻":2, "PO₄³⁻":3 };
+const ionSymbol = { "Ag⁺":"Ag", "Na⁺":"Na", "K⁺":"K", "Ba²⁺":"Ba", "Cu²⁺":"Cu", "NO₃⁻":"NO₃", "Cl⁻":"Cl", "I⁻":"I", "SO₄²⁻":"SO₄", "CO₃²⁻":"CO₃", "PO₄³⁻":"PO₄" };
+const polyatomicAnions = ["NO₃⁻", "SO₄²⁻", "CO₃²⁻", "PO₄³⁻"];
+
+/* Opløsninger brugt i de 4 forudindstillede forsøg */
+const solutions = {
+    AgNO3:  { name: "Sølv(I)nitrat",    formula: "AgNO₃", cation: "Ag⁺",  cationRatio: 1, anion: "NO₃⁻",  anionRatio: 1, color: "rgba(220,220,255,0.2)" },
+    NaI:    { name: "Natriumiodid",     formula: "NaI",   cation: "Na⁺",  cationRatio: 1, anion: "I⁻",    anionRatio: 1, color: "rgba(255,255,255,0.1)" },
+    Na3PO4: { name: "Natriumphosphat",  formula: "Na₃PO₄",cation: "Na⁺",  cationRatio: 3, anion: "PO₄³⁻", anionRatio: 1, color: "rgba(255,255,255,0.1)" },
+    BaCl2:  { name: "Bariumchlorid",    formula: "BaCl₂", cation: "Ba²⁺", cationRatio: 1, anion: "Cl⁻",   anionRatio: 2, color: "rgba(255,255,255,0.1)" },
+    K2CO3:  { name: "Kaliumcarbonat",   formula: "K₂CO₃", cation: "K⁺",   cationRatio: 2, anion: "CO₃²⁻", anionRatio: 1, color: "rgba(255,255,255,0.1)" },
+    CuSO4:  { name: "Kobber(II)sulfat", formula: "CuSO₄", cation: "Cu²⁺", cationRatio: 1, anion: "SO₄²⁻", anionRatio: 1, color: "rgba(0,150,255,0.3)" }
+};
+
+const experiments = {
+    A: { title: "A: Sølvnitrat + Natriumiodid",       sol1: "AgNO3", sol2: "NaI" },
+    B: { title: "B: Bariumchlorid + Kobber(II)sulfat", sol1: "BaCl2", sol2: "CuSO4" },
+    C: { title: "C: Bariumchlorid + Kaliumcarbonat",   sol1: "BaCl2", sol2: "K2CO3" },
+    D: { title: "D: Sølvnitrat + Natriumphosphat",     sol1: "AgNO3", sol2: "Na3PO4" }
+};
+
+/* OPLØSELIGHEDSREGLER (forenklet, svarer til standard gymnasie-tabel) */
+function isInsoluble(cation, anion) {
+    if (cation === "Na⁺" || cation === "K⁺") return false; // alkalisalte er altid letopløselige
+    if (anion === "NO₃⁻") return false;                     // alle nitrater er letopløselige
+    if (anion === "CO₃²⁻" || anion === "PO₄³⁻") return true; // tungtopløselige undtagen med alkalimetaller
+    if (anion === "Cl⁻") return cation === "Ag⁺";
+    if (anion === "SO₄²⁻") return cation === "Ba²⁺";
+    if (anion === "I⁻") return cation === "Ag⁺";
+    return false;
+}
+
+function precipitateColor(cation) {
+    if (cation === "Ag⁺") return "rgba(255, 255, 224, 0.95)"; // bleg gul
+    if (cation === "Ba²⁺") return "rgba(255, 255, 255, 0.95)"; // hvid
+    if (cation === "Cu²⁺") return "rgba(120, 190, 170, 0.95)"; // blågrøn
+    return "rgba(220, 220, 220, 0.9)";
+}
+
+function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+
+function toSubscript(n) {
+    const map = {0:'₀',1:'',2:'₂',3:'₃',4:'₄',5:'₅',6:'₆',7:'₇',8:'₈',9:'₉'};
+    return String(n).split('').map(d => map[d]).join('');
+}
+
+function compoundFormula(cation, anion) {
+    const cCharge = ionCharge[cation];
+    const aCharge = ionCharge[anion];
+    const g = gcd(cCharge, aCharge);
+    const cationSub = aCharge / g;
+    const anionSub = cCharge / g;
+    const cationPart = ionSymbol[cation] + toSubscript(cationSub);
+    const anionPart = (polyatomicAnions.includes(anion) && anionSub > 1)
+        ? '(' + ionSymbol[anion] + ')' + toSubscript(anionSub)
+        : ionSymbol[anion] + toSubscript(anionSub);
+    return cationPart + anionPart;
+}
+
+function computeReaction(key1, key2) {
+    const s1 = solutions[key1], s2 = solutions[key2];
+    const combos = [
+        { cation: s1.cation, anion: s2.anion },
+        { cation: s2.cation, anion: s1.anion }
+    ];
+    const precipitates = combos.filter(c => isInsoluble(c.cation, c.anion));
+    let precipCoeffCation = 1, precipCoeffAnion = 1;
+    if (precipitates.length) {
+        const p = precipitates[0];
+        const g = gcd(ionCharge[p.cation], ionCharge[p.anion]);
+        precipCoeffCation = ionCharge[p.anion] / g;
+        precipCoeffAnion = ionCharge[p.cation] / g;
+    }
+    return { s1, s2, combos, precipitates, precipCoeffCation, precipCoeffAnion };
+}
+
+/* Ionerne bevæger sig i et cirkulært synsfelt, der matcher den runde mikroskop-visning */
+const FIELD_CX = 150, FIELD_CY = 150, FIELD_R = 145;
+
+function randomPointInField(maxDist) {
+    const angle = Math.random() * Math.PI * 2;
+    const r = maxDist * Math.sqrt(Math.random());
+    return { x: FIELD_CX + r * Math.cos(angle), y: FIELD_CY + r * Math.sin(angle) };
+}
+
+/* LOGIC */
+const sim = {
+    sol1Key: null,
+    sol2Key: null,
+    reaction: null,
+    state: 0, // 0 = intet, 1 = væske 1 tilsat, 2 = væske 2 tilsat / reaktion afgjort
+    macroCtx: document.getElementById('macroCanvas').getContext('2d'),
+    microCtx: document.getElementById('microCanvas').getContext('2d'),
+    particles: [],
+    dragParticle: null,
+    clusters: [],
+    nextClusterId: 0,
+    bundfaldDone: false,
+
+    init() {
+        this.renderExpList();
+        const canvas = document.getElementById('microCanvas');
+        canvas.addEventListener('pointerdown', e => this.onPointerDown(e));
+        canvas.addEventListener('pointermove', e => this.onPointerMove(e));
+        window.addEventListener('pointerup', () => this.onPointerUp());
+        this.loop();
+
+        const firstKey = Object.keys(experiments)[0];
+        const firstBtn = document.querySelector('.btn-exp');
+        if (firstBtn) this.selectExp(firstKey, firstBtn);
+    },
+
+    renderExpList() {
+        const list = document.getElementById('exp-list');
+        for (let key in experiments) {
+            let btn = document.createElement('button');
+            btn.className = 'btn-exp';
+            btn.innerText = experiments[key].title;
+            btn.onclick = () => this.selectExp(key, btn);
+            list.appendChild(btn);
+        }
+    },
+
+    selectExp(key, btnElement) {
+        document.querySelectorAll('.btn-exp').forEach(b => b.classList.remove('active', 'next-hint'));
+        btnElement.classList.add('active');
+        document.getElementById('analysis-box').style.display = 'none';
+        document.getElementById('feedback').style.display = 'none';
+        document.getElementById('drag-hint').style.display = 'none';
+        document.getElementById('micro-legend').innerText = '';
+
+        const exp = experiments[key];
+        this.currentExpKey = key;
+        this.sol1Key = exp.sol1;
+        this.sol2Key = exp.sol2;
+        this.reaction = computeReaction(exp.sol1, exp.sol2);
+        this.state = 0;
+        this.particles = [];
+        this.dragParticle = null;
+        this.clusters = [];
+        this.nextClusterId = 0;
+        this.bundfaldDone = false;
+        document.getElementById('microCanvas').style.cursor = 'default';
+
+        const b1 = document.getElementById('btn-drop1');
+        const b2 = document.getElementById('btn-drop2');
+        b1.disabled = false;
+        b1.innerText = `💧 Tilsæt ${solutions[exp.sol1].formula}`;
+        b1.onclick = () => this.addDrop(1);
+
+        b2.disabled = true;
+        b2.innerText = `💧 Tilsæt ${solutions[exp.sol2].formula}`;
+        b2.onclick = () => this.addDrop(2);
+
+        document.getElementById('micro-label').innerText = "Væske er ikke tilsat endnu.";
+    },
+
+    addDrop(step) {
+        if (step === 1) {
+            this.state = 1;
+            document.getElementById('btn-drop1').disabled = true;
+            document.getElementById('btn-drop2').disabled = false;
+            document.getElementById('micro-label').innerText = "Opløste ioner bevæger sig frit.";
+            this.spawnIons(this.sol1Key);
+        } else {
+            this.state = 2;
+            document.getElementById('btn-drop2').disabled = true;
+            this.spawnIons(this.sol2Key);
+
+            const p = this.reaction.precipitates[0];
+            const spectators = this.reaction.combos.find(c => c !== p);
+            document.getElementById('micro-label').innerText =
+                `REAKTION! Klik og træk ${p.cation} og ${p.anion} sammen.`;
+            document.getElementById('micro-legend').innerText =
+                `Tilskuerioner (reagerer ikke): ${spectators.cation} og ${spectators.anion}`;
+            document.getElementById('microCanvas').style.cursor = 'grab';
+            document.getElementById('drag-hint').style.display = 'flex';
+
+            this.showAnalysis();
+        }
+    },
+
+    spawnIons(solutionKey) {
+        const sol = solutions[solutionKey];
+        const precip = this.reaction.precipitates[0];
+
+        const countFor = (label, ownRatio) => {
+            if (label === precip.cation || label === precip.anion) {
+                const reactionRatio = label === precip.cation
+                    ? this.reaction.precipCoeffCation
+                    : this.reaction.precipCoeffAnion;
+                return 2 * Math.max(ownRatio, reactionRatio);
+            }
+            return 2 * ownRatio;
+        };
+
+        const precipLabels = [precip.cation, precip.anion];
+        const ionsToSpawn = [
+            { label: sol.cation, count: countFor(sol.cation, sol.cationRatio) },
+            { label: sol.anion, count: countFor(sol.anion, sol.anionRatio) }
+        ];
+        ionsToSpawn.forEach(({ label, count }) => {
+            const type = precipLabels.includes(label) ? 'precip' : 'soluble';
+            for (let i = 0; i < count; i++) {
+                const radius = 15;
+                const { x, y } = randomPointInField(FIELD_R - radius);
+                this.particles.push({
+                    x, y,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: (Math.random() - 0.5) * 2,
+                    label, type, radius, locked: false, clusterId: null
+                });
+            }
+        });
+    },
+
+    toCanvasCoords(e) {
+        const canvas = document.getElementById('microCanvas');
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: (e.clientX - rect.left) * (canvas.width / rect.width),
+            y: (e.clientY - rect.top) * (canvas.height / rect.height)
+        };
+    },
+
+    onPointerDown(e) {
+        if (this.state !== 2) return;
+        const { x, y } = this.toCanvasCoords(e);
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+            const p = this.particles[i];
+            if (p.type === 'precip' && !p.locked && p.clusterId === null && Math.hypot(p.x - x, p.y - y) < p.radius) {
+                this.dragParticle = p;
+                p.vx = 0; p.vy = 0;
+                document.getElementById('microCanvas').style.cursor = 'grabbing';
+                document.getElementById('drag-hint').style.display = 'none';
+                break;
+            }
+        }
+    },
+
+    onPointerMove(e) {
+        if (!this.dragParticle) return;
+        const { x, y } = this.toCanvasCoords(e);
+        const p = this.dragParticle;
+        const maxDist = FIELD_R - p.radius;
+        const dx = x - FIELD_CX, dy = y - FIELD_CY;
+        const dist = Math.hypot(dx, dy);
+        if (dist > maxDist && dist > 0) {
+            p.x = FIELD_CX + (dx / dist) * maxDist;
+            p.y = FIELD_CY + (dy / dist) * maxDist;
+        } else {
+            p.x = x; p.y = y;
+        }
+    },
+
+    onPointerUp() {
+        if (!this.dragParticle) return;
+        const p = this.dragParticle;
+        const precip = this.reaction.precipitates[0];
+        const cationsNeeded = this.reaction.precipCoeffCation;
+        const anionsNeeded = this.reaction.precipCoeffAnion;
+
+        let target = null, bestDist = Infinity;
+        this.particles.forEach(other => {
+            if (other === p || other.type !== 'precip' || other.locked || other.label === p.label) return;
+            const d = Math.hypot(other.x - p.x, other.y - p.y);
+            if (d < p.radius * 2.4 && d < bestDist) { bestDist = d; target = other; }
+        });
+
+        if (target) {
+            let cluster = target.clusterId !== null
+                ? this.clusters.find(c => c.id === target.clusterId)
+                : null;
+
+            if (!cluster) {
+                cluster = { id: this.nextClusterId++, particles: [], cationCount: 0, anionCount: 0 };
+                this.clusters.push(cluster);
+                this.addToCluster(cluster, target, precip);
+            }
+
+            const stillNeeds = p.label === precip.cation
+                ? cluster.cationCount < cationsNeeded
+                : cluster.anionCount < anionsNeeded;
+
+            if (stillNeeds) {
+                this.addToCluster(cluster, p, precip);
+                this.arrangeCluster(cluster);
+
+                if (cluster.cationCount === cationsNeeded && cluster.anionCount === anionsNeeded) {
+                    cluster.particles.forEach(pt => { pt.locked = true; pt.vx = 0; pt.vy = 0; });
+                }
+                this.updateBondProgress();
+            }
+        }
+
+        this.dragParticle = null;
+        document.getElementById('microCanvas').style.cursor = 'grab';
+    },
+
+    addToCluster(cluster, particle, precip) {
+        particle.clusterId = cluster.id;
+        cluster.particles.push(particle);
+        if (particle.label === precip.cation) cluster.cationCount++;
+        else cluster.anionCount++;
+    },
+
+    arrangeCluster(cluster) {
+        const n = cluster.particles.length;
+        let cx = 0, cy = 0;
+        cluster.particles.forEach(pt => { cx += pt.x; cy += pt.y; });
+        cx /= n; cy /= n;
+        const spread = 10 + n * 3;
+        cluster.particles.forEach((pt, i) => {
+            const angle = (i / n) * Math.PI * 2;
+            pt.x = cx + Math.cos(angle) * spread;
+            pt.y = cy + Math.sin(angle) * spread;
+            pt.vx = 0; pt.vy = 0;
+        });
+    },
+
+    updateBondProgress() {
+        const precip = this.reaction.precipitates[0];
+        const cationsNeeded = this.reaction.precipCoeffCation;
+        const anionsNeeded = this.reaction.precipCoeffAnion;
+        const precipParticles = this.particles.filter(pt => pt.type === 'precip');
+        const completeClusters = this.clusters.filter(c => c.cationCount === cationsNeeded && c.anionCount === anionsNeeded).length;
+        const leftCation = precipParticles.filter(pt => pt.label === precip.cation && !pt.locked).length;
+        const leftAnion = precipParticles.filter(pt => pt.label === precip.anion && !pt.locked).length;
+        const unitLabel = (cationsNeeded > 1 ? cationsNeeded + ' ' : '') + precip.cation
+            + ' og ' + (anionsNeeded > 1 ? anionsNeeded + ' ' : '') + precip.anion;
+
+        if (leftCation === 0 && leftAnion === 0) {
+            this.showBundfaldDone();
+        } else if (leftCation === 0 || leftAnion === 0) {
+            const overskud = leftCation + leftAnion;
+            document.getElementById('micro-label').innerText =
+                `${completeClusters} portioner bundfald dannet. Resten (${overskud} ioner) er i overskud og har ingen partner.`;
+        } else if (cationsNeeded > 1 || anionsNeeded > 1) {
+            document.getElementById('micro-label').innerText =
+                `${completeClusters} portioner bundfald dannet. Saml ${unitLabel} sammen, før det falder til bunds.`;
+        } else {
+            document.getElementById('micro-label').innerText =
+                `${completeClusters} ionpar dannet. Bliv ved med at trække ${precip.cation} og ${precip.anion} sammen.`;
+        }
+    },
+
+    showBundfaldDone() {
+        this.bundfaldDone = true;
+        const precip = this.reaction.precipitates[0];
+        const spectators = this.reaction.combos.find(c => c !== precip);
+        document.getElementById('micro-label').innerHTML =
+            `<span style="color:#4ade80; font-weight:bold;">✅ Du er færdig med at samle bundfald! ` +
+            `${spectators.cation} og ${spectators.anion} er tilskuerioner og forbliver opløst.</span>`;
+        document.getElementById('drag-hint').style.display = 'none';
+    },
+
+    showAnalysis() {
+        const box = document.getElementById('analysis-box');
+        box.style.display = 'block';
+        document.getElementById('feedback').style.display = 'none';
+
+        this.correctCoeffCation = this.reaction.precipCoeffCation;
+        this.correctCoeffAnion = this.reaction.precipCoeffAnion;
+
+        const cations = [...new Set([solutions[this.sol1Key].cation, solutions[this.sol2Key].cation])];
+        const anions = [...new Set([solutions[this.sol1Key].anion, solutions[this.sol2Key].anion])];
+        const coeffOpts = [1, 2, 3].map(n => `<option value="${n}">${n}</option>`).join('');
+
+        document.getElementById('eq-cation').innerHTML = cations.map(c => `<option value="${c}">${c}</option>`).join('');
+        document.getElementById('eq-anion').innerHTML = anions.map(a => `<option value="${a}">${a}</option>`).join('');
+        document.getElementById('eq-coeff-cation').innerHTML = coeffOpts;
+        document.getElementById('eq-coeff-anion').innerHTML = coeffOpts;
+    },
+
+    checkAnswer() {
+        const fb = document.getElementById('feedback');
+        fb.style.display = 'block';
+
+        const p = this.reaction.precipitates[0];
+        const precipFormula = compoundFormula(p.cation, p.anion);
+        const chosenCation = document.getElementById('eq-cation').value;
+        const chosenAnion = document.getElementById('eq-anion').value;
+        const chosenCoeffCation = parseInt(document.getElementById('eq-coeff-cation').value, 10);
+        const chosenCoeffAnion = parseInt(document.getElementById('eq-coeff-anion').value, 10);
+
+        const coefText = (n, ion) => (n > 1 ? n + ' ' : '') + ion;
+        const correctEq = `${coefText(this.correctCoeffCation, p.cation)}(aq) + ${coefText(this.correctCoeffAnion, p.anion)}(aq) ⟶ ${precipFormula}(s)`;
+
+        const ionsCorrect = chosenCation === p.cation && chosenAnion === p.anion;
+        const coeffsCorrect = chosenCoeffCation === this.correctCoeffCation && chosenCoeffAnion === this.correctCoeffAnion;
+
+        if (ionsCorrect && coeffsCorrect) {
+            fb.className = 'correct';
+            fb.innerHTML = `<strong>Korrekt!</strong><br>
+            <em>Reaktionsskema:</em><br>
+            ${correctEq}<br>
+            Prøv gerne den blinkende reaktion i listen til venstre, når du er klar.`;
+            this.hintNextReaction();
+        } else if (!ionsCorrect) {
+            fb.className = 'incorrect';
+            fb.innerHTML = `<strong>Ikke helt.</strong><br>
+            Det er ${p.cation} og ${p.anion}, der reagerer og danner bundfaldet ${precipFormula}. De øvrige ioner er tilskuere og ændrer sig ikke.`;
+        } else {
+            fb.className = 'incorrect';
+            fb.innerHTML = `<strong>Ionerne er rigtige, men koefficienterne passer ikke.</strong><br>
+            Husk at den samlede positive og negative ladning skal gå op: ${correctEq}`;
+        }
+    },
+
+    hintNextReaction() {
+        const keys = Object.keys(experiments);
+        const idx = keys.indexOf(this.currentExpKey);
+        const nextKey = keys[(idx + 1) % keys.length];
+        const buttons = document.querySelectorAll('.btn-exp');
+        document.querySelectorAll('.btn-exp').forEach(b => b.classList.remove('next-hint'));
+        const nextBtn = buttons[keys.indexOf(nextKey)];
+        if (nextBtn) nextBtn.classList.add('next-hint');
+    },
+
+    loop() {
+        this.macroCtx.clearRect(0,0,500,500);
+        this.microCtx.clearRect(0,0,300,300);
+
+        // --- MACRO VIEW ---
+        const mc = this.macroCtx;
+        const cx = 250, cy = 250;
+
+        if (this.state >= 1) {
+            mc.beginPath();
+            // Irregular puddle shape
+            mc.moveTo(cx-60, cy-50);
+            mc.bezierCurveTo(cx-100, cy-50, cx-100, cy+100, cx-30, cy+120);
+            mc.bezierCurveTo(cx+50, cy+130, cx+120, cy+80, cx+100, cy);
+            mc.bezierCurveTo(cx+90, cy-60, cx, cy-70, cx-60, cy-50);
+
+            if (this.state === 1) {
+                mc.fillStyle = solutions[this.sol1Key].color;
+            } else if (this.state === 2) {
+                mc.fillStyle = precipitateColor(this.reaction.precipitates[0].cation);
+            }
+            mc.fill();
+            mc.strokeStyle = "rgba(255,255,255,0.4)";
+            mc.lineWidth = 3;
+            mc.stroke();
+        }
+
+        // --- MICRO VIEW ---
+        const uc = this.microCtx;
+        const isSpectatorView = this.state === 2;
+
+        this.particles.forEach((p) => {
+            if (p.locked) {
+                if (!p.settled) {
+                    p.vy = Math.min((p.vy || 0) + 0.25, 5);
+                    p.y += p.vy;
+                    const maxDist = FIELD_R - p.radius;
+                    const dxp = Math.max(-maxDist, Math.min(maxDist, p.x - FIELD_CX));
+                    const floor = FIELD_CY + Math.sqrt(Math.max(0, maxDist * maxDist - dxp * dxp));
+                    if (p.y >= floor) { p.x = FIELD_CX + dxp; p.y = floor; p.settled = true; p.vy = 0; }
+                }
+            } else if (p !== this.dragParticle) {
+                p.x += p.vx; p.y += p.vy;
+                const maxDist = FIELD_R - p.radius;
+                const dx = p.x - FIELD_CX, dy = p.y - FIELD_CY;
+                const dist = Math.hypot(dx, dy);
+                if (dist > maxDist) {
+                    const nx = dx / dist, ny = dy / dist;
+                    p.x = FIELD_CX + nx * maxDist;
+                    p.y = FIELD_CY + ny * maxDist;
+                    const dot = p.vx * nx + p.vy * ny;
+                    p.vx -= 2 * dot * nx;
+                    p.vy -= 2 * dot * ny;
+                }
+            }
+
+            // Draw Ion with DISTINCT Colors
+            uc.beginPath();
+            uc.arc(p.x, p.y, p.radius, 0, Math.PI*2);
+            uc.fillStyle = ionColors[p.label] || '#999';
+            if (isSpectatorView && p.type === 'soluble') {
+                uc.globalAlpha = 0.55;
+                uc.setLineDash([3, 2]);
+            }
+            uc.fill();
+            uc.strokeStyle = p.locked ? '#4ecca3' : '#fff';
+            uc.lineWidth = p.locked ? 2.5 : 1;
+            uc.stroke();
+            uc.setLineDash([]);
+            uc.globalAlpha = 1;
+
+            // Text
+            uc.fillStyle = '#000'; // Black text for better contrast on bright colors
+            uc.font = 'bold 12px Arial';
+            uc.textAlign = 'center';
+            uc.textBaseline = 'middle';
+            uc.fillText(p.label.replace(/\d/g, ''), p.x, p.y);
+        });
+
+        requestAnimationFrame(() => this.loop());
+    }
+};
+
+sim.init();
+
+</script>
+</body>
+</html>

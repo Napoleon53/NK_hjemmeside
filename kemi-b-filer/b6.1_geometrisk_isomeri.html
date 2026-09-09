@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E/Z Isomeri Master: Kemi B</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --final: #d35400;
+            --bg: #ecf0f1;
+            --card: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- Header & UI --- */
+        header {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            padding: 15px 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 { margin: 0; font-size: 1.8rem; }
+        .subtitle { font-size: 0.9rem; opacity: 0.8; }
+
+        .game-controls {
+            margin: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: transform 0.1s, box-shadow 0.2s;
+            text-transform: uppercase;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+        }
+
+        button:active { transform: translateY(2px); box-shadow: none; }
+
+        .btn-mode { background: var(--accent); color: white; }
+        .btn-restart { background: var(--success); color: white; margin-top: 20px; }
+        .btn-e { background: var(--warning); color: white; }
+        .btn-z { background: var(--success); color: white; }
+        .btn-none { background: #95a5a6; color: white; }
+
+        /* --- Scoreboard --- */
+        .scoreboard {
+            display: flex;
+            gap: 30px;
+            background: var(--card);
+            padding: 10px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .highlight-stat { color: var(--accent); }
+
+        /* --- Laboratorie (Canvas/SVG område) --- */
+        .lab-container {
+            position: relative;
+            width: 700px;
+            height: 400px;
+            background: var(--card);
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            user-select: none;
+            overflow: hidden; 
+        }
+
+        /* SVG Layer for Bonds */
+        #bonds-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        line {
+            stroke: var(--primary);
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+        
+        .double-bond-line {
+            stroke-width: 10; 
+        }
+
+        .bond-highlight {
+            stroke: var(--success); /* Default grøn nu */
+            stroke-width: 8;
+            opacity: 0;
+            transition: opacity 0.3s, stroke 0.3s; /* Transition på farveskift */
+        }
+
+        /* --- Atomer --- */
+        .atom {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            z-index: 2;
+            box-shadow: inset -5px -5px 10px rgba(0,0,0,0.2), 0 5px 15px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+            cursor: pointer;
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+        }
+
+        .atom.carbon-center {
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle at 30% 30%, #5d6d7e, #2c3e50);
+            color: white;
+            font-size: 1.5rem;
+            cursor: default;
+        }
+
+        .atom.substituent {
+            width: 80px;
+            height: 80px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            border: 3px solid transparent;
+            white-space: nowrap; 
+        }
+        
+        .atom.long-text {
+            font-size: 0.95rem; 
+        }
+        
+        .atom.substituent:hover { transform: scale(1.1); }
+        .atom small { font-size: 0.7rem; font-weight: normal; margin-top: -2px; opacity: 0.8; }
+        .atom .priority-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--success); /* Default grøn */
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s, background-color 0.3s;
+        }
+
+        /* Atom Colors */
+        .atom-H { background: radial-gradient(circle at 30% 30%, #ffffff, #bdc3c7); color: #2c3e50; }
+        .atom-C { background: radial-gradient(circle at 30% 30%, #7f8c8d, #2c3e50); color: white; } 
+        .atom-Et { background: radial-gradient(circle at 30% 30%, #95a5a6, #34495e); color: white; } 
+        .atom-F { background: radial-gradient(circle at 30% 30%, #a3e4d7, #16a085); color: #0b5345; }
+        .atom-Cl { background: radial-gradient(circle at 30% 30%, #a9dfbf, #27ae60); color: #0e6655; }
+        .atom-Br { background: radial-gradient(circle at 30% 30%, #f5b7b1, #c0392b); color: #641e16; }
+        .atom-I { background: radial-gradient(circle at 30% 30%, #d7bde2, #8e44ad); color: #4a235a; }
+
+        /* --- Overlay FX (Feedback) --- */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .feedback-overlay {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 20;
+            width: 100%;
+        }
+
+        .feedback-main {
+            font-size: 3.5rem;
+            font-weight: bold;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .feedback-sub {
+            font-size: 1.5rem;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #f1c40f;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        /* --- Game Over Screen --- */
+        #game-over-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(44, 62, 80, 0.95);
+            color: white;
+            z-index: 50;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border-radius: 20px;
+        }
+
+        .final-score-title { font-size: 2rem; margin-bottom: 10px; }
+        .final-score-value { font-size: 4rem; color: var(--warning); font-weight: bold; }
+        .final-rank { font-size: 2rem; color: var(--accent); margin-top: 20px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5);}
+        .final-subtext { margin-top: 5px; opacity: 0.8; font-style: italic; }
+
+        /* --- Footer Info --- */
+        .info-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .info-highlight { color: var(--final); font-weight: bold; font-size: 1.1em; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>E/Z-isomeri</h1>
+        <div class="subtitle">Kemi B • Organisk Kemi • Stereoisomeri</div>
+    </header>
+
+    <div class="scoreboard">
+        <div>Score: <span id="score">0</span></div>
+        <div>Runde: <span id="round-display" class="highlight-stat">Sandbox</span></div>
+        <div>Streak: <span id="streak">0</span>x 🔥</div>
+    </div>
+
+    <div class="lab-container" id="lab">
+        <svg id="bonds-svg">
+            <line x1="270" y1="185" x2="430" y2="185" class="double-bond-line" />
+            <line x1="270" y1="215" x2="430" y2="215" class="double-bond-line" />
+            
+            <line x1="270" y1="200" x2="150" y2="80" />
+            <line x1="270" y1="200" x2="150" y2="320" />
+            
+            <line x1="430" y1="200" x2="550" y2="80" />
+            <line x1="430" y1="200" x2="550" y2="320" />
+
+            <line id="high-tl" class="bond-highlight" x1="270" y1="200" x2="150" y2="80" />
+            <line id="high-bl" class="bond-highlight" x1="270" y1="200" x2="150" y2="320" />
+            <line id="high-tr" class="bond-highlight" x1="430" y1="200" x2="550" y2="80" />
+            <line id="high-br" class="bond-highlight" x1="430" y1="200" x2="550" y2="320" />
+        </svg>
+
+        <div class="atom carbon-center" style="left: 235px; top: 165px;">C</div>
+        <div class="atom carbon-center" style="left: 395px; top: 165px;">C</div>
+
+        <div class="atom substituent" id="pos-tl" style="left: 110px; top: 40px;" onclick="handleClick('tl')"></div>
+        <div class="atom substituent" id="pos-bl" style="left: 110px; top: 280px;" onclick="handleClick('bl')"></div>
+        <div class="atom substituent" id="pos-tr" style="left: 510px; top: 40px;" onclick="handleClick('tr')"></div>
+        <div class="atom substituent" id="pos-br" style="left: 510px; top: 280px;" onclick="handleClick('br')"></div>
+        
+        <div id="feedback-container" class="feedback-overlay">
+            <div id="feedback-main" class="feedback-main"></div>
+            <div id="feedback-sub" class="feedback-sub"></div>
+        </div>
+
+        <div id="game-over-screen">
+            <div class="final-score-title">Spillet er slut!</div>
+            <div class="final-score-value" id="final-score">0</div>
+            <div class="final-rank" id="final-rank">Rang: ...</div>
+            <div class="final-subtext" id="final-subtext"></div>
+            <button class="btn-restart" onclick="restartGame()">Spil Igen</button>
+        </div>
+    </div>
+
+    <div class="game-controls" id="controls-sandbox">
+        <button class="btn-mode" onclick="toggleMode()">Start Spil (15 Runder)</button>
+    </div>
+
+    <div class="game-controls" id="controls-game" style="display: none;">
+        <button class="btn-e" onclick="submitGuess('E')">Det er (E)</button>
+        <button class="btn-z" onclick="submitGuess('Z')">Det er (Z)</button>
+        <button class="btn-none" onclick="submitGuess('None')">Ingen Isomeri</button>
+    </div>
+
+    <div class="info-panel" id="message-box">
+        Klik på grupperne for at ændre atomerne. Det tungeste atom (højest Z) har højest prioritet.
+        <br><strong>(E) Entgegen:</strong> Højeste prioriteter er modsat.
+        <br><strong>(Z) Zusammen:</strong> Højeste prioriteter er sammen.
+    </div>
+
+    <canvas id="confetti-canvas"></canvas>
+
+<script>
+    const elements = [
+        { symbol: 'H', z: 1, name: 'Hydrogen', class: 'atom-H' },
+        { symbol: 'CH₃', z: 6, name: 'Methyl', class: 'atom-C' },
+        { symbol: 'CH₂CH₃', z: 7, name: 'Ethyl', class: 'atom-Et' }, // Ethyl
+        { symbol: 'F', z: 9, name: 'Fluor', class: 'atom-F' },
+        { symbol: 'Cl', z: 17, name: 'Chlor', class: 'atom-Cl' },
+        { symbol: 'Br', z: 35, name: 'Brom', class: 'atom-Br' },
+        { symbol: 'I', z: 53, name: 'Jod', class: 'atom-I' }
+    ];
+
+    let state = { tl: 0, bl: 0, tr: 0, br: 0 };
+    let gameMode = false;
+    let score = 0;
+    let streak = 0;
+    let round = 0;
+    const MAX_ROUNDS = 15;
+    let canInteract = true;
+    let roundStartTime = 0;
+
+    const positions = ['tl', 'bl', 'tr', 'br'];
+
+    function init() {
+        randomizeAll();
+        renderAtoms();
+        updateAnalysis(true);
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+    }
+    
+    function resizeCanvas() {
+        const canvas = document.getElementById('confetti-canvas');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    function randomizeAll() {
+        positions.forEach(pos => {
+            state[pos] = Math.floor(Math.random() * elements.length);
+        });
+    }
+
+    function handleClick(pos) {
+        if (gameMode || !canInteract) return;
+        state[pos] = (state[pos] + 1) % elements.length;
+        renderAtoms();
+        updateAnalysis(false);
+    }
+
+    function renderAtoms() {
+        positions.forEach(pos => {
+            const atomIdx = state[pos];
+            const data = elements[atomIdx];
+            const el = document.getElementById('pos-' + pos);
+            
+            if (data.symbol.length > 3) {
+                el.className = `atom substituent long-text ${data.class}`;
+            } else {
+                el.className = `atom substituent ${data.class}`;
+            }
+            
+            let displayZ = data.z;
+            if (data.name === 'Ethyl') displayZ = 6; 
+            if (data.name === 'Methyl') displayZ = 6;
+
+            el.innerHTML = `${data.symbol}<small>${displayZ}</small><div class="priority-badge" id="badge-${pos}">1</div>`;
+        });
+    }
+
+    function analyzeMolecule() {
+        const atomTL = elements[state.tl];
+        const atomBL = elements[state.bl];
+        const atomTR = elements[state.tr];
+        const atomBR = elements[state.br];
+
+        let leftWinner = null;
+        let rightWinner = null;
+
+        if (atomTL.z > atomBL.z) leftWinner = 'tl';
+        else if (atomBL.z > atomTL.z) leftWinner = 'bl';
+        else return { type: 'None', reason: 'Venstre side har ens grupper' };
+
+        if (atomTR.z > atomBR.z) rightWinner = 'tr';
+        else if (atomBR.z > atomTR.z) rightWinner = 'br';
+        else return { type: 'None', reason: 'Højre side har ens grupper' };
+
+        const leftIsTop = (leftWinner === 'tl');
+        const rightIsTop = (rightWinner === 'tr');
+
+        if (leftIsTop === rightIsTop) return { type: 'Z', winners: [leftWinner, rightWinner] };
+        else return { type: 'E', winners: [leftWinner, rightWinner] };
+    }
+
+    function updateAnalysis(silent) {
+        document.querySelectorAll('.bond-highlight').forEach(el => el.style.opacity = 0);
+        document.querySelectorAll('.priority-badge').forEach(el => el.style.opacity = 0);
+
+        const result = analyzeMolecule();
+        const msgBox = document.getElementById('message-box');
+
+        if (!silent) {
+            if (result.type === 'None') {
+                msgBox.innerHTML = `<strong>Ingen Isomeri:</strong> ${result.reason}.`;
+            } else {
+                result.winners.forEach(pos => {
+                    const line = document.getElementById('high-' + pos);
+                    const badge = document.getElementById('badge-' + pos);
+                    
+                    // I Sandbox/Update mode er vi altid "neutrale/positive"
+                    line.style.stroke = "var(--success)";
+                    badge.style.backgroundColor = "var(--success)";
+                    
+                    line.style.opacity = 1;
+                    badge.style.opacity = 1;
+                });
+                const color = result.type === 'Z' ? 'var(--success)' : 'var(--warning)';
+                msgBox.innerHTML = `<strong style="color:${color}; font-size:1.2em">(${result.type})-Isomer</strong><br>Prioriteterne er ${result.type === 'Z' ? 'på samme side' : 'modsat hinanden'}.`;
+            }
+        }
+    }
+
+    function toggleMode() {
+        gameMode = true;
+        score = 0; 
+        streak = 0;
+        round = 1;
+        
+        document.querySelector('.btn-mode').style.display = 'none'; 
+        document.getElementById('controls-sandbox').style.display = 'none';
+        document.getElementById('controls-game').style.display = 'flex';
+        document.getElementById('game-over-screen').style.display = 'none';
+        
+        updateScoreboard();
+        nextRound();
+    }
+    
+    function restartGame() {
+        toggleMode();
+    }
+
+    function nextRound() {
+        if (round > MAX_ROUNDS) {
+            endGame();
+            return;
+        }
+
+        canInteract = true;
+        randomizeAll();
+        renderAtoms();
+        updateScoreboard();
+        
+        document.querySelectorAll('.bond-highlight').forEach(el => el.style.opacity = 0);
+        document.querySelectorAll('.priority-badge').forEach(el => el.style.opacity = 0);
+        
+        const msgBox = document.getElementById('message-box');
+        
+        if (round === MAX_ROUNDS) {
+            msgBox.innerHTML = `<span class="info-highlight">FINALERUNDE! Afgørelsens time – gør det perfekt!</span>`;
+        } else {
+            msgBox.innerText = `Runde ${round} af ${MAX_ROUNDS}: Hvad er det?`;
+        }
+        
+        roundStartTime = Date.now();
+    }
+
+    function endGame() {
+        const screen = document.getElementById('game-over-screen');
+        const finalScoreEl = document.getElementById('final-score');
+        const finalRankEl = document.getElementById('final-rank');
+        const finalSubtextEl = document.getElementById('final-subtext');
+        
+        screen.style.display = 'flex';
+        finalScoreEl.innerText = score;
+        
+        let rank = "Kemi-novice";
+        let subtext = "Øvelse gør mester. Prøv igen!";
+
+        if (score >= 700) {
+            rank = "Laborant 🧪";
+            subtext = "Godt gået! Du har styr på det basale.";
+        }
+        if (score >= 1000) {
+            rank = "Kemiker 🔬";
+            subtext = "Flot arbejde! Du kender dine prioriteter.";
+        }
+        if (score >= 1150) {
+            rank = "Professor 🎓";
+            subtext = "Imponerende! En sand ekspert.";
+        }
+        if (score >= 1350) {
+            rank = "Nobelpris-kandidat 🏆";
+            subtext = "Helt utroligt! Perfektion og hastighed!";
+        }
+        
+        finalRankEl.innerText = rank;
+        finalSubtextEl.innerText = subtext;
+        
+        document.getElementById('controls-game').style.display = 'none';
+        document.getElementById('controls-sandbox').style.display = 'flex';
+        document.querySelector('.btn-mode').style.display = 'inline-block';
+        gameMode = false;
+        round = 0;
+        document.getElementById('round-display').innerText = "Slut";
+        document.getElementById('message-box').innerText = "Spillet er slut. Start forfra for at forbedre din score!";
+    }
+
+    function submitGuess(guess) {
+        if (!canInteract) return;
+        canInteract = false;
+
+        const timeTaken = (Date.now() - roundStartTime) / 1000; 
+        const result = analyzeMolecule();
+        const correct = (guess === result.type);
+        
+        const feedbackMain = document.getElementById('feedback-main');
+        const feedbackSub = document.getElementById('feedback-sub');
+        const feedbackCont = document.getElementById('feedback-container');
+
+        // VISUELT FEEDBACK LOGIK: Rigtig = Grøn, Forkert = Rød
+        if (result.type !== 'None') {
+            result.winners.forEach(pos => {
+                const line = document.getElementById('high-' + pos);
+                const badge = document.getElementById('badge-' + pos);
+                
+                if (correct) {
+                    line.style.stroke = "var(--success)"; // GRØN
+                    badge.style.backgroundColor = "var(--success)";
+                } else {
+                    line.style.stroke = "var(--danger)"; // RØD
+                    badge.style.backgroundColor = "var(--danger)";
+                }
+
+                line.style.opacity = 1;
+                badge.style.opacity = 1;
+            });
+        }
+
+        if (correct) {
+            let points = 50;
+            let bonus = 0;
+            let bonusText = "";
+
+            if (timeTaken < 2) { bonus = 50; bonusText = "Lynhurtig!"; }
+            else if (timeTaken < 3) { bonus = 30; bonusText = "Super hurtig!"; }
+            else if (timeTaken < 4) { bonus = 20; bonusText = "Flot tempo!"; }
+            else if (timeTaken < 10) { bonus = 10; bonusText = "Godt gået!"; }
+            
+            score += points + bonus;
+            streak++;
+
+            feedbackMain.innerText = `KORREKT!`;
+            feedbackMain.style.color = "var(--success)";
+            feedbackSub.innerText = `+${points + bonus} point ${bonus > 0 ? '(' + bonusText + ')' : ''}`;
+            fireConfetti();
+        } else {
+            streak = 0;
+            feedbackMain.innerText = "FORKERT!";
+            feedbackMain.style.color = "var(--danger)";
+            feedbackSub.innerText = "";
+            
+            document.getElementById('lab').animate([
+                { transform: 'translate(0, 0)' },
+                { transform: 'translate(-10px, 0)' },
+                { transform: 'translate(10px, 0)' },
+                { transform: 'translate(0, 0)' }
+            ], { duration: 300 });
+        }
+
+        feedbackCont.style.opacity = 1;
+        feedbackCont.animate([
+            { transform: 'translate(-50%, -50%) scale(0.5)', opacity: 0 },
+            { transform: 'translate(-50%, -50%) scale(1.1)', opacity: 1, offset: 0.2 },
+            { transform: 'translate(-50%, -50%) scale(1)', opacity: 1, offset: 0.8 },
+            { transform: 'translate(-50%, -50%) scale(0.8)', opacity: 0 }
+        ], { duration: 2000, fill: 'forwards' });
+
+        round++;
+        setTimeout(() => {
+            if (gameMode) nextRound();
+        }, 2200);
+    }
+
+    function updateScoreboard() {
+        document.getElementById('score').innerText = score;
+        document.getElementById('streak').innerText = streak;
+        
+        const roundDisp = document.getElementById('round-display');
+        if (gameMode) {
+            roundDisp.innerText = `${round} / ${MAX_ROUNDS}`;
+        } else {
+            roundDisp.innerText = "Sandbox";
+        }
+    }
+
+    function fireConfetti() {
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        const particles = [];
+        const colors = ['#e74c3c', '#3498db', '#f1c40f', '#2ecc71', '#9b59b6'];
+
+        for (let i = 0; i < 80; i++) {
+            particles.push({
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                vx: (Math.random() - 0.5) * 15,
+                vy: (Math.random() - 0.5) * 15 - 5,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                size: Math.random() * 8 + 4,
+                life: 80
+            });
+        }
+
+        function update() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let alive = false;
+            particles.forEach(p => {
+                if (p.life > 0) {
+                    alive = true;
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.5;
+                    p.life--;
+                    p.size *= 0.95;
+                    ctx.fillStyle = p.color;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+            if (alive) requestAnimationFrame(update);
+        }
+        update();
+    }
+
+    init();
+</script>
+</body>
+</html>

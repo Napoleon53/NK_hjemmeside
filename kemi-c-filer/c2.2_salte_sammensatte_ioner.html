@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ion-Byggeren: Korrekte Formler</title>
+    <style>
+        :root {
+            --bg: #121212;
+            --panel: #1e1e24;
+            --text: #e0e0e0;
+            --accent: #4cc9f0;
+            --pos-color: #4361ee;
+            --neg-color: #f72585;
+            --success: #4ade80;
+        }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; overflow: hidden; }
+
+        /* LAYOUT */
+        #app { display: flex; width: 100%; height: 100%; }
+        
+        /* LEFT: SELECTION PANEL - positive and negative ions are both always
+           visible, side by side in two columns, so the panel needs to be
+           wider than when it only held one list. */
+        #controls {
+            width: 420px; flex-shrink: 0; background: var(--panel); padding: 20px;
+            display: flex; flex-direction: column; z-index: 10; overflow-y: auto;
+            border-right: 2px solid #333; box-shadow: 4px 0 15px rgba(0,0,0,0.5);
+        }
+
+        /* CENTER: VISUAL WORKSPACE - fills the remaining space; if its content
+           is taller than the viewport, only it scrolls internally instead of
+           the whole page. */
+        #workspace {
+            flex: 1; min-width: 0; position: relative;
+            background: radial-gradient(circle at bottom, #2a2a35 0%, #121212 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            overflow-y: auto;
+        }
+
+        /* Positive/negative ion lists side by side within the one panel */
+        .ion-columns { display: flex; gap: 14px; }
+        .ion-column { flex: 1; min-width: 0; }
+
+        /* UI ELEMENTS */
+        h2 { color: var(--accent); margin-top: 0; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        .section-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-top: 20px; margin-bottom: 10px; }
+
+        .ion-btn {
+            background: #333; color: #fff; border: 1px solid #444; padding: 10px; margin-bottom: 8px;
+            border-radius: 6px; cursor: pointer; text-align: left; display: flex; flex-wrap: wrap;
+            justify-content: space-between; gap: 4px;
+            transition: all 0.2s; font-family: 'Times New Roman', serif; font-size: 1.1rem;
+        }
+        .ion-btn:hover { background: #444; transform: translateX(5px); }
+        .ion-btn.active { border-left: 5px solid var(--accent); background: #3a3a45; }
+        .ion-btn.pos { border-left: 5px solid var(--pos-color); }
+        .ion-btn.neg { border-left: 5px solid var(--neg-color); }
+
+        /* MODE TOGGLE */
+        .mode-toggle { display: flex; gap: 6px; margin-bottom: 15px; }
+        .mode-btn {
+            flex: 1; padding: 9px 6px; border-radius: 6px; border: 1px solid #444;
+            background: #2a2a30; color: #ccc; cursor: pointer; font-size: 0.85rem;
+            font-family: sans-serif; transition: all 0.2s;
+        }
+        .mode-btn:hover { background: #34343c; }
+        .mode-btn.active { background: var(--accent); color: #111; font-weight: bold; border-color: var(--accent); }
+
+        /* Plain, normally-sized button (not a flex row item like .mode-btn,
+           so it doesn't stretch to fill the sidebar). */
+        #hide-names-btn {
+            padding: 8px 14px; border-radius: 6px; border: 1px solid #444;
+            background: #2a2a30; color: #ccc; cursor: pointer; font-size: 0.85rem;
+            font-family: sans-serif; margin-bottom: 15px;
+        }
+        #hide-names-btn:hover { background: #34343c; }
+        #hide-names-btn.active { background: var(--accent); color: #111; font-weight: bold; border-color: var(--accent); }
+
+        /* Hide ion names when practicing naming */
+        #app.names-hidden .ion-name { display: none; }
+
+        /* CHALLENGE BANNER - pinned near the top of the workspace instead of
+           being stacked (and centered) together with the builder UI below.
+           That way it never fights the towers for vertical centering space
+           and can't get pushed/clipped off the top of the screen. */
+        #challenge-banner {
+            position: absolute; top: 18px; left: 50%; transform: translateX(-50%);
+            background: var(--panel); border: 2px solid var(--accent); border-radius: 12px;
+            padding: 10px 24px; text-align: center; font-family: sans-serif;
+            box-shadow: 0 0 20px rgba(76, 201, 240, 0.15); z-index: 5;
+            max-width: calc(100% - 40px);
+        }
+        #challenge-score { font-size: 0.95rem; color: #ccc; margin-bottom: 6px; }
+        #challenge-target { font-size: 1.3rem; }
+        #challenge-target-name { color: var(--accent); font-weight: bold; }
+
+        /* CHALLENGE ACTION BUTTONS */
+        #challenge-actions { display: none; margin-top: 18px; gap: 10px; justify-content: center; }
+        .action-btn {
+            padding: 10px 18px; border-radius: 8px; border: none; cursor: pointer;
+            font-family: sans-serif; font-weight: bold; font-size: 0.85rem; transition: transform 0.15s;
+        }
+        .action-btn:hover { transform: translateY(-2px); }
+        .action-btn.check { background: var(--success); color: #111; }
+        .action-btn.hint { background: #555; color: #fff; }
+        .action-btn.skip { background: #333; color: #ccc; border: 1px solid #555; }
+
+        #compound-name { font-family: sans-serif; font-size: 1.15rem; color: var(--accent); min-height: 1.4em; margin-top: 4px; font-weight: bold; }
+
+        /* Custom Superscript/Subscript styling for better chemistry look */
+        .chem-text sup {
+            font-size: 0.7em;
+            vertical-align: baseline;
+            position: relative;
+            top: -0.5em;
+            margin-left: 1px;
+        }
+        .chem-text sub {
+            font-size: 0.7em;
+            vertical-align: baseline;
+            position: relative;
+            bottom: -0.2em;
+        }
+
+        /* BUILDER INTERFACE */
+        #builder-ui {
+            display: flex; gap: 40px; align-items: flex-end; margin-bottom: 35px;
+        }
+        /* Leave room under the absolutely-positioned challenge banner */
+        #workspace.has-banner #builder-ui { margin-top: 55px; }
+
+        .stack-container {
+            display: flex; flex-direction: column; align-items: center;
+            width: 140px;
+        }
+
+        .stack-visual {
+            display: flex; flex-direction: column-reverse; /* Stack from bottom */
+            width: 90px; height: 260px; background: rgba(255,255,255,0.05);
+            border-bottom: 2px solid #555; border-radius: 4px 4px 0 0;
+            position: relative;
+        }
+
+        .block {
+            width: 100%; border: 1px solid rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Times New Roman', serif; font-size: 1.25rem;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            box-sizing: border-box; animation: dropIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        /* Override specific superscripts in blocks for alignment */
+        .block sup { top: -0.4em; font-size: 0.6em; }
+        .block sub { bottom: -0.1em; font-size: 0.6em; }
+
+        .block.pos { background: var(--pos-color); }
+        .block.neg { background: var(--neg-color); }
+        .block { cursor: pointer; }
+        .block:hover { filter: brightness(1.3); }
+
+        .counter-box {
+            background: #222; padding: 10px; border-radius: 8px; margin-top: 15px;
+            display: flex; gap: 10px; align-items: center;
+        }
+        .count-btn {
+            width: 30px; height: 30px; border-radius: 50%; border: none; font-weight: bold; cursor: pointer;
+            display: grid; place-items: center; background: #444; color: #fff; font-family: sans-serif;
+        }
+        .count-btn:hover { background: #666; }
+
+        /* RESULT DISPLAY */
+        #result-display {
+            background: #1a1a1d; padding: 20px 40px; border-radius: 12px; border: 2px solid #333;
+            text-align: center; min-width: 350px;
+        }
+        #formula-box {
+            font-size: 4rem; font-family: 'Times New Roman', serif; margin: 15px 0;
+            min-height: 80px; display: flex; justify-content: center; align-items: baseline;
+            color: #fff;
+        }
+        #formula-box sup { top: -0.6em; font-size: 0.5em; }
+        #formula-box sub { bottom: -0.1em; font-size: 0.5em; }
+        
+        /* Helper classes for formula display */
+        .coef { color: var(--highlight); margin-right: 15px; font-size: 0.8em; vertical-align: middle; }
+        
+        #status-msg { font-size: 1rem; color: #aaa; margin-top: 10px; font-family: sans-serif; }
+        
+        @keyframes dropIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); } 100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); } }
+        .success-pulse { animation: pulse 1.5s infinite; border-color: var(--success) !important; }
+
+        @keyframes shake {
+            10%, 90% { transform: translateX(-2px); }
+            20%, 80% { transform: translateX(4px); }
+            30%, 50%, 70% { transform: translateX(-8px); }
+            40%, 60% { transform: translateX(8px); }
+        }
+        .shake { animation: shake 0.5s; border-color: #ef4444 !important; }
+
+        @media (max-width: 900px) {
+            body { height: auto; overflow: auto; }
+            #app { flex-direction: column; height: auto; }
+            #controls { width: auto; max-height: 50vh; box-shadow: none; border-right: none; border-bottom: 2px solid #333; }
+            #builder-ui { gap: 15px; }
+            #formula-box { font-size: 2.5rem; }
+        }
+
+        /* PRESENTATION / GUIDED TOUR */
+        #guide-start-btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            width: 100%; padding: 10px 14px; border-radius: 6px; border: 1px solid var(--accent);
+            background: rgba(76, 201, 240, 0.12); color: var(--accent); cursor: pointer;
+            font-size: 0.9rem; font-weight: bold; font-family: sans-serif; margin-bottom: 8px;
+        }
+        #guide-start-btn:hover { background: rgba(76, 201, 240, 0.22); }
+        #guide-blurb {
+            font-size: 0.78rem; color: #888; line-height: 1.4; margin-bottom: 18px;
+        }
+
+        /* Spotlight cutout: a huge box-shadow around the (small) highlight box
+           dims everything else on the page in one element, no separate overlay needed. */
+        #guide-highlight {
+            position: fixed; border-radius: 10px; pointer-events: none;
+            box-shadow: 0 0 0 4px var(--accent), 0 0 0 9999px rgba(0,0,0,0.6);
+            transition: top 0.35s ease, left 0.35s ease, width 0.35s ease, height 0.35s ease;
+            z-index: 500; display: none;
+        }
+        #guide-highlight.active { display: block; }
+
+        #guide-tooltip {
+            position: fixed; width: 320px; max-width: calc(100vw - 20px);
+            background: var(--panel); border: 2px solid var(--accent); border-radius: 12px;
+            padding: 16px 18px; z-index: 501; font-family: sans-serif;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6); display: none;
+        }
+        #guide-tooltip.active { display: block; }
+        #guide-step-label { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+        #guide-title { font-weight: bold; font-size: 1.05rem; color: var(--accent); margin-bottom: 8px; }
+        #guide-text { font-size: 0.9rem; line-height: 1.5; color: var(--text); margin-bottom: 16px; }
+        .guide-nav { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+        .guide-nav-btn {
+            padding: 8px 12px; border-radius: 6px; border: 1px solid #444; background: #2a2a30;
+            color: #ccc; cursor: pointer; font-size: 0.82rem; font-family: sans-serif;
+        }
+        .guide-nav-btn:hover { background: #34343c; }
+        .guide-nav-btn.guide-primary { background: var(--accent); color: #111; font-weight: bold; border-color: var(--accent); }
+        .guide-nav-btn.guide-skip { background: transparent; border-color: transparent; color: #888; }
+
+    </style>
+</head>
+<body>
+
+<div id="app">
+
+    <div id="controls">
+        <h2>Lav neutrale forbindelser</h2>
+        <p style="font-size:0.85rem; color:#aaa;">Byg en neutral ionforbindelse.</p>
+
+        <button id="guide-start-btn" onclick="guide.start()">🎬 Start præsentation</button>
+        <div id="guide-blurb">💡 Du træner at kombinere en positiv og en negativ ion, så ladningerne går op i nul – reglen bag alle salte og deres kemiske navne.</div>
+
+        <div class="mode-toggle" id="mode-toggle-el">
+            <button id="mode-sandbox-btn" class="mode-btn active" onclick="app.setMode('sandbox')">🧪 Frit byggeri</button>
+            <button id="mode-challenge-btn" class="mode-btn" onclick="app.setMode('challenge')">🎯 Opgaver</button>
+        </div>
+        <button id="hide-names-btn" style="display:none;" onclick="app.toggleNames()">Skjul navne</button>
+
+        <div class="ion-columns">
+            <div class="ion-column">
+                <div class="section-title">Positive Ioner</div>
+                <div id="cations-list"></div>
+            </div>
+            <div class="ion-column">
+                <div class="section-title">Negative Ioner</div>
+                <div id="anions-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="workspace">
+
+        <div id="challenge-banner" style="display:none;">
+            <div id="challenge-score">✅ 0&nbsp;&nbsp;❌ 0&nbsp;&nbsp;🔥 Streak: 0</div>
+            <div id="challenge-target">🎯 Byg: <span id="challenge-target-name">–</span></div>
+        </div>
+
+        <div id="builder-ui">
+            <div class="stack-container">
+                <div style="color:var(--pos-color); font-weight:bold; margin-bottom:5px; font-family:sans-serif;">POSITIV</div>
+                <div class="stack-visual" id="pos-stack"></div>
+                <div class="counter-box">
+                    <button class="count-btn" onclick="app.adjustCount('pos', -1)">-</button>
+                    <span id="pos-count" style="font-size:1.2rem; width:30px; text-align:center; font-family:sans-serif;">1</span>
+                    <button class="count-btn" onclick="app.adjustCount('pos', 1)">+</button>
+                </div>
+            </div>
+
+            <div style="font-size: 2rem; color: #555; padding-bottom: 60px;">
+                <div id="balance-icon">⚖️</div>
+            </div>
+
+            <div class="stack-container">
+                <div style="color:var(--neg-color); font-weight:bold; margin-bottom:5px; font-family:sans-serif;">NEGATIV</div>
+                <div class="stack-visual" id="neg-stack"></div>
+                <div class="counter-box">
+                    <button class="count-btn" onclick="app.adjustCount('neg', -1)">-</button>
+                    <span id="neg-count" style="font-size:1.2rem; width:30px; text-align:center; font-family:sans-serif;">1</span>
+                    <button class="count-btn" onclick="app.adjustCount('neg', 1)">+</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="result-display">
+            <div style="text-transform:uppercase; font-size:0.8rem; color:#666; letter-spacing:1px; font-family:sans-serif;">Kemisk Formel</div>
+            <div id="formula-box" class="chem-text"></div>
+            <div id="compound-name"></div>
+            <div id="status-msg">Ladningerne skal udligne hinanden (+ = -)</div>
+            <div id="challenge-actions">
+                <button class="action-btn check" onclick="app.checkChallenge()">✔️ Tjek svar</button>
+                <button class="action-btn hint" onclick="app.revealHint()">💡 Vis facit</button>
+                <button class="action-btn skip" onclick="app.nextChallenge()">⏭️ Ny opgave</button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div id="guide-highlight"></div>
+<div id="guide-tooltip">
+    <div id="guide-step-label"></div>
+    <div id="guide-title"></div>
+    <div id="guide-text"></div>
+    <div class="guide-nav">
+        <button id="guide-prev-btn" class="guide-nav-btn" onclick="guide.prev()">← Tilbage</button>
+        <button class="guide-nav-btn guide-skip" onclick="guide.close()">Spring over</button>
+        <button id="guide-next-btn" class="guide-nav-btn guide-primary" onclick="guide.next()">Næste →</button>
+    </div>
+</div>
+
+<script>
+/* HELPER: Format Charge Correctly 
+    If charge is 1, return just "+" or "-". 
+    If charge > 1, return number + sign (e.g., "2+").
+*/
+function fmtCharge(val, type) {
+    const sign = type === 'pos' ? '+' : '−';
+    return val === 1 ? `<sup>${sign}</sup>` : `<sup>${val}${sign}</sup>`;
+}
+
+/* DATA DEFINITIONS */
+const cations = [
+    { name: "Natriumion", charge: 1, poly: false, htmlBase: "Na" },
+    { name: "Magnesiumion", charge: 2, poly: false, htmlBase: "Mg" },
+    { name: "Aluminiumion", charge: 3, poly: false, htmlBase: "Al" },
+    { name: "Ammoniumion", charge: 1, poly: true,  htmlBase: "NH<sub>4</sub>" },
+    { name: "Jern(II)ion", charge: 2, poly: false, htmlBase: "Fe" }, // NY
+    { name: "Jern(III)ion", charge: 3, poly: false, htmlBase: "Fe" }
+];
+
+const anions = [
+    { name: "Chlorid", charge: 1, poly: false, htmlBase: "Cl" },
+    { name: "Oxid", charge: 2, poly: false, htmlBase: "O" },
+    { name: "Nitrat", charge: 1, poly: true,  htmlBase: "NO<sub>3</sub>" },
+    { name: "Hydroxid", charge: 1, poly: true,  htmlBase: "OH" },
+    { name: "Sulfat", charge: 2, poly: true,  htmlBase: "SO<sub>4</sub>" },
+    { name: "Carbonat", charge: 2, poly: true,  htmlBase: "CO<sub>3</sub>" },
+    { name: "Phosphat", charge: 3, poly: true,  htmlBase: "PO<sub>4</sub>" }
+];
+
+const app = {
+    selectedPos: null,
+    selectedNeg: null,
+    countPos: 1,
+    countNeg: 1,
+    mode: 'sandbox',
+    score: { correct: 0, wrong: 0, streak: 0 },
+    target: null,
+    hintUsed: false,
+    lastTargetKey: null,
+    namesHidden: false,
+
+    init() {
+        this.renderButtons();
+        this.updateUI();
+    },
+
+    setMode(mode) {
+        this.mode = mode;
+        document.getElementById('mode-sandbox-btn').classList.toggle('active', mode === 'sandbox');
+        document.getElementById('mode-challenge-btn').classList.toggle('active', mode === 'challenge');
+        document.getElementById('challenge-banner').style.display = mode === 'challenge' ? 'block' : 'none';
+        document.getElementById('challenge-actions').style.display = mode === 'challenge' ? 'flex' : 'none';
+        document.getElementById('hide-names-btn').style.display = mode === 'challenge' ? 'block' : 'none';
+        document.getElementById('workspace').classList.toggle('has-banner', mode === 'challenge');
+
+        if (mode === 'challenge') {
+            this.nextChallenge();
+        } else {
+            // Leaving challenge mode: drop the "hide names" practice. Selection
+            // stays whatever it was (often empty) - the workspace starts empty
+            // by default and doesn't force a default pair back in.
+            if (this.namesHidden) this.toggleNames();
+            this.updateActive('pos', -1);
+            this.updateActive('neg', -1);
+            this.updateUI();
+        }
+    },
+
+    nextChallenge() {
+        let cIdx, aIdx, key;
+        do {
+            cIdx = Math.floor(Math.random() * cations.length);
+            aIdx = Math.floor(Math.random() * anions.length);
+            key = cIdx + '-' + aIdx;
+        } while (key === this.lastTargetKey);
+        this.lastTargetKey = key;
+
+        const cation = cations[cIdx];
+        const anion = anions[aIdx];
+        const g = this.gcd(cation.charge, anion.charge);
+        this.target = {
+            cation, anion,
+            posCount: anion.charge / g,
+            negCount: cation.charge / g,
+            name: this.compoundName(cation, anion)
+        };
+        this.hintUsed = false;
+        this.countPos = 1;
+        this.countNeg = 1;
+
+        // Don't pre-select an ion for the student - that would give the answer away.
+        this.selectedPos = null;
+        this.selectedNeg = null;
+        this.updateActive('pos', -1);
+        this.updateActive('neg', -1);
+
+        document.getElementById('challenge-target-name').innerText = this.target.name;
+        document.getElementById('result-display').classList.remove('shake');
+        this.updateUI();
+    },
+
+    toggleNames() {
+        this.namesHidden = !this.namesHidden;
+        document.getElementById('app').classList.toggle('names-hidden', this.namesHidden);
+        const btn = document.getElementById('hide-names-btn');
+        btn.classList.toggle('active', this.namesHidden);
+        btn.innerText = this.namesHidden ? 'Vis navne' : 'Skjul navne';
+    },
+
+    checkChallenge() {
+        if (!this.target) return;
+        if (!this.selectedPos || !this.selectedNeg) {
+            const msg = document.getElementById('status-msg');
+            msg.innerHTML = `<span style="color:#ef4444">Vælg både en positiv og en negativ ion først.</span>`;
+            return;
+        }
+        const posOk = this.selectedPos === this.target.cation && this.countPos === this.target.posCount;
+        const negOk = this.selectedNeg === this.target.anion && this.countNeg === this.target.negCount;
+        const resDiv = document.getElementById('result-display');
+        const msg = document.getElementById('status-msg');
+        resDiv.classList.remove('shake');
+
+        if (posOk && negOk) {
+            this.score.correct++;
+            if (!this.hintUsed) this.score.streak++;
+            resDiv.classList.add('success-pulse');
+            resDiv.style.borderColor = 'var(--success)';
+            msg.innerHTML = `<span style="color:var(--success)">Korrekt! ${this.target.name} er bygget rigtigt 🎉</span>`;
+            this.updateScoreDisplay();
+            setTimeout(() => this.nextChallenge(), 1800);
+        } else {
+            this.score.wrong++;
+            this.score.streak = 0;
+            void resDiv.offsetWidth;
+            resDiv.classList.add('shake');
+            let hint;
+            if (this.selectedPos !== this.target.cation || this.selectedNeg !== this.target.anion) {
+                hint = 'Ikke helt. Tjek om du har valgt de rigtige ioner.';
+            } else {
+                hint = 'Ionerne er rigtige, men prøv at finde det mindst mulige antal af hver.';
+            }
+            msg.innerHTML = `<span style="color:#ef4444">${hint}</span>`;
+            this.updateScoreDisplay();
+        }
+    },
+
+    revealHint() {
+        if (!this.target) return;
+        this.hintUsed = true;
+        this.score.streak = 0;
+        const msg = document.getElementById('status-msg');
+        msg.innerHTML = `Facit: <span class="chem-text">${this.formatPart(this.target.cation, this.target.posCount)}${this.formatPart(this.target.anion, this.target.negCount)}</span> — ${this.target.name}`;
+        this.updateScoreDisplay();
+    },
+
+    updateScoreDisplay() {
+        document.getElementById('challenge-score').innerHTML = `✅ ${this.score.correct}&nbsp;&nbsp;❌ ${this.score.wrong}&nbsp;&nbsp;🔥 Streak: ${this.score.streak}`;
+    },
+
+    compoundName(cation, anion) {
+        const cationPart = cation.name.replace(/ion$/, '');
+        const anionPart = anion.name;
+        return cationPart + anionPart.charAt(0).toLowerCase() + anionPart.slice(1);
+    },
+
+    renderButtons() {
+        const cList = document.getElementById('cations-list');
+        cations.forEach((ion, i) => {
+            const btn = document.createElement('div');
+            btn.className = `ion-btn pos chem-text`;
+            // Use flex to separate Name and Symbol
+            btn.innerHTML = `<span class="ion-name" style="font-family:sans-serif; font-size:0.9rem;">${ion.name}</span> <span>${ion.htmlBase}${fmtCharge(ion.charge, 'pos')}</span>`;
+            btn.onclick = () => {
+                this.selectedPos = ion;
+                this.countPos = 1;
+                this.updateActive('pos', i);
+                document.getElementById('result-display').classList.remove('shake');
+                this.updateUI();
+            };
+            cList.appendChild(btn);
+        });
+
+        const aList = document.getElementById('anions-list');
+        anions.forEach((ion, i) => {
+            const btn = document.createElement('div');
+            btn.className = `ion-btn neg chem-text`;
+            btn.innerHTML = `<span class="ion-name" style="font-family:sans-serif; font-size:0.9rem;">${ion.name}</span> <span>${ion.htmlBase}${fmtCharge(ion.charge, 'neg')}</span>`;
+            btn.onclick = () => {
+                this.selectedNeg = ion;
+                this.countNeg = 1;
+                this.updateActive('neg', i);
+                document.getElementById('result-display').classList.remove('shake');
+                this.updateUI();
+            };
+            aList.appendChild(btn);
+        });
+    },
+
+    updateActive(type, index) {
+        document.querySelectorAll(`#${type === 'pos' ? 'cations' : 'anions'}-list .ion-btn`).forEach((b, i) => {
+            if (i === index) b.classList.add('active');
+            else b.classList.remove('active');
+        });
+    },
+
+    adjustCount(type, delta) {
+        if (type === 'pos') {
+            this.countPos = Math.max(1, Math.min(6, this.countPos + delta));
+        } else {
+            this.countNeg = Math.max(1, Math.min(6, this.countNeg + delta));
+        }
+        document.getElementById('result-display').classList.remove('shake');
+        this.updateUI();
+    },
+
+    updateUI() {
+        // Update Counters
+        document.getElementById('pos-count').innerText = this.countPos;
+        document.getElementById('neg-count').innerText = this.countNeg;
+
+        // Render Stacks
+        this.renderStack('pos-stack', this.selectedPos, this.countPos, 'pos');
+        this.renderStack('neg-stack', this.selectedNeg, this.countNeg, 'neg');
+
+        // Calculations
+        const totalPlus = this.selectedPos ? this.selectedPos.charge * this.countPos : 0;
+        const totalMinus = this.selectedNeg ? this.selectedNeg.charge * this.countNeg : 0;
+
+        // Update Result Box
+        this.renderFormula(totalPlus, totalMinus);
+    },
+
+    renderStack(elementId, ion, count, type) {
+        const container = document.getElementById(elementId);
+        container.innerHTML = '';
+        if (!ion) return;
+
+        // Calculate block height relative to charge.
+        const baseHeight = 30;
+        
+        for (let i = 0; i < count; i++) {
+            const div = document.createElement('div');
+            div.className = `block ${type} chem-text`;
+            div.style.height = (ion.charge * baseHeight) + 'px';
+            div.title = 'Klik for at fjerne';
+
+            // Render block content with correct charge notation
+            div.innerHTML = `${ion.htmlBase}${fmtCharge(ion.charge, type)}`;
+            div.onclick = () => this.adjustCount(type, -1);
+            container.appendChild(div);
+        }
+    },
+
+    // Greatest Common Divisor helper
+    gcd(a, b) {
+        return b === 0 ? a : this.gcd(b, a % b);
+    },
+
+    renderFormula(plus, minus) {
+        const box = document.getElementById('formula-box');
+        const msg = document.getElementById('status-msg');
+        const resDiv = document.getElementById('result-display');
+        const icon = document.getElementById('balance-icon');
+        const nameDiv = document.getElementById('compound-name');
+        const inChallenge = this.mode === 'challenge';
+
+        if (!this.selectedPos || !this.selectedNeg) {
+            resDiv.classList.remove('success-pulse');
+            resDiv.style.borderColor = '#333';
+            icon.innerText = "⚖️";
+            nameDiv.innerHTML = '';
+            box.innerHTML = `<span style="opacity:0.3; font-size:3rem;">?</span>`;
+            msg.innerHTML = 'Vælg både en positiv og en negativ ion.';
+            return;
+        }
+
+        if (plus === minus) {
+            icon.innerText = "✅";
+
+            if (inChallenge) {
+                // Show the RAW (unreduced) formula the student actually built.
+                // Balance alone doesn't confirm the answer - they still need to
+                // press "Tjek svar" to verify it's the simplest ratio AND right ions.
+                resDiv.classList.remove('success-pulse');
+                resDiv.style.borderColor = '#333';
+                msg.innerHTML = `Ladningen er afbalanceret. Er det den simplest mulige formel? Tryk "Tjek svar".`;
+                nameDiv.innerHTML = '';
+                box.innerHTML = this.formatPart(this.selectedPos, this.countPos) + this.formatPart(this.selectedNeg, this.countNeg);
+                return;
+            }
+
+            // SANDBOX SUCCESS
+            resDiv.classList.add('success-pulse');
+            resDiv.style.borderColor = 'var(--success)';
+            msg.innerHTML = `<span style="color:var(--success)">Perfekt! Neutral forbindelse.</span>`;
+
+            // REDUCE FORMULA (GCD LOGIC)
+            // Example: Na2Cl2 (gcd=2) -> 2 NaCl
+            const divisor = this.gcd(this.countPos, this.countNeg);
+
+            const coef = divisor > 1 ? divisor : '';
+            const finalPCount = this.countPos / divisor;
+            const finalNCount = this.countNeg / divisor;
+
+            let html = "";
+
+            // Add Coefficient if needed
+            if (coef) html += `<span style="color:#fca311; margin-right:10px;">${coef}</span>`;
+
+            // Build Formula Parts
+            html += this.formatPart(this.selectedPos, finalPCount);
+            html += this.formatPart(this.selectedNeg, finalNCount);
+
+            box.innerHTML = html;
+            nameDiv.innerHTML = this.compoundName(this.selectedPos, this.selectedNeg);
+
+        } else {
+            // UNBALANCED
+            resDiv.classList.remove('success-pulse');
+            resDiv.style.borderColor = '#333';
+            icon.innerText = "⚖️";
+            nameDiv.innerHTML = '';
+
+            const diff = plus - minus;
+            if (inChallenge) {
+                msg.innerHTML = `Ladningerne er ikke afbalancerede endnu.`;
+                box.innerHTML = this.formatPart(this.selectedPos, this.countPos) + this.formatPart(this.selectedNeg, this.countNeg);
+                return;
+            }
+
+            if (diff > 0) msg.innerHTML = `For meget positiv ladning (+${diff}). <br>Tilføj flere negative ioner.`;
+            else msg.innerHTML = `For meget negativ ladning (${diff}). <br>Tilføj flere positive ioner.`;
+
+            box.innerHTML = `<span style="opacity:0.3; font-size:3rem;">?</span>`;
+        }
+    },
+
+    formatPart(ion, count) {
+        let html = ion.htmlBase;
+        
+        if (count > 1) {
+            // Check if Polyatomic
+            if (ion.poly) {
+                // Parentheses for polyatomic ions > 1
+                return `(${html})<sub>${count}</sub>`;
+            } else {
+                // Standard subscript
+                return `${html}<sub>${count}</sub>`;
+            }
+        }
+        return html;
+    }
+};
+
+/* GUIDED PRESENTATION
+   A short spotlight tour that walks a new student through the tool:
+   what to train and why, then how each part of the UI is used. */
+const guideSteps = [
+    {
+        target: null,
+        title: "Hvad træner du her?",
+        text: "Du øver dig i at bygge en <b>elektrisk neutral ionforbindelse</b> (et salt) ved at kombinere en positiv ion og en negativ ion, så ladningerne går op i nul. Det er præcis den regel, du skal bruge, når du senere skal opskrive og navngive salte i kemi."
+    },
+    {
+        target: 'cations-list',
+        title: "1. Vælg en positiv ion",
+        text: "Klik på en af de positive ioner her til venstre. Blå kant markerer, at ionen er positiv."
+    },
+    {
+        target: 'anions-list',
+        title: "2. Vælg en negativ ion",
+        text: "Klik på en af de negative ioner her til højre. Rød/lyserød kant markerer, at ionen er negativ."
+    },
+    {
+        target: 'builder-ui',
+        title: "3. Justér antallet af hver ion",
+        text: "Brug + og − under hver søjle til at ændre, hvor mange af hver ion du har. Du kan også klikke direkte på en byggeklods i søjlen for at fjerne den igen."
+    },
+    {
+        target: 'result-display',
+        title: "4. Se om ladningen går op",
+        text: "⚖️-ikonet og formlen viser, om den samlede positive og negative ladning er lige store. Når de balancerer, forkortes formlen automatisk til det simplest mulige forhold (fx Mg₂O₂ vises som MgO)."
+    },
+    {
+        target: 'mode-toggle-el',
+        title: "5. Test dig selv",
+        text: "Skift til 'Opgaver', når du er klar. Der får du stillet konkrete forbindelser, du selv skal bygge – du kan endda skjule navnene for at gøre det sværere."
+    },
+    {
+        target: null,
+        title: "Klar til at prøve?",
+        text: "Godt gået! Tryk 'Afslut' og gå i gang med at bygge din første forbindelse."
+    }
+];
+
+const guide = {
+    steps: guideSteps,
+    idx: 0,
+    active: false,
+
+    start() {
+        this.active = true;
+        this.idx = 0;
+        document.getElementById('guide-tooltip').classList.add('active');
+        this.show(0);
+    },
+
+    show(i) {
+        this.idx = i;
+        const step = this.steps[i];
+        const tooltip = document.getElementById('guide-tooltip');
+        const highlight = document.getElementById('guide-highlight');
+
+        document.getElementById('guide-step-label').innerText = `Trin ${i + 1} af ${this.steps.length}`;
+        document.getElementById('guide-title').innerText = step.title;
+        document.getElementById('guide-text').innerHTML = step.text;
+        document.getElementById('guide-prev-btn').style.visibility = i === 0 ? 'hidden' : 'visible';
+        document.getElementById('guide-next-btn').innerText = i === this.steps.length - 1 ? 'Afslut' : 'Næste →';
+
+        if (step.target) {
+            const el = document.getElementById(step.target);
+            el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            setTimeout(() => this.position(el, tooltip, highlight), 220);
+        } else {
+            highlight.classList.remove('active');
+            this.centerTooltip(tooltip);
+        }
+    },
+
+    position(el, tooltip, highlight) {
+        const r = el.getBoundingClientRect();
+        const pad = 8;
+        highlight.classList.add('active');
+        highlight.style.top = (r.top - pad) + 'px';
+        highlight.style.left = (r.left - pad) + 'px';
+        highlight.style.width = (r.width + pad * 2) + 'px';
+        highlight.style.height = (r.height + pad * 2) + 'px';
+
+        // Prefer placing the tooltip to the right of the highlight; fall back
+        // to below/above it, and always clamp inside the viewport.
+        tooltip.style.transform = '';
+        const tw = tooltip.offsetWidth || 320;
+        const th = tooltip.offsetHeight || 180;
+        let left = r.right + 20;
+        let top = r.top;
+        if (left + tw > window.innerWidth - 10) {
+            left = Math.max(10, r.left);
+            top = r.bottom + 16;
+            if (top + th > window.innerHeight - 10) {
+                top = Math.max(10, r.top - th - 16);
+            }
+        }
+        left = Math.min(Math.max(10, left), window.innerWidth - tw - 10);
+        top = Math.min(Math.max(10, top), window.innerHeight - th - 10);
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
+    },
+
+    centerTooltip(tooltip) {
+        tooltip.style.left = '50%';
+        tooltip.style.top = '50%';
+        tooltip.style.transform = 'translate(-50%, -50%)';
+    },
+
+    next() {
+        if (this.idx >= this.steps.length - 1) { this.close(); return; }
+        this.show(this.idx + 1);
+    },
+
+    prev() {
+        if (this.idx > 0) this.show(this.idx - 1);
+    },
+
+    close() {
+        this.active = false;
+        document.getElementById('guide-highlight').classList.remove('active');
+        document.getElementById('guide-tooltip').classList.remove('active');
+    }
+};
+
+document.addEventListener('keydown', (e) => {
+    if (!guide.active) return;
+    if (e.key === 'Escape') { guide.close(); return; }
+    if (e.key === 'Enter' || e.key === 'ArrowRight') { guide.next(); return; }
+    if (e.key === 'ArrowLeft') { guide.prev(); }
+});
+
+app.init();
+</script>
+</body>
+</html>

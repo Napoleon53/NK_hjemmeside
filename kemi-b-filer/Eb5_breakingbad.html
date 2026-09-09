@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syntese-Tycoon 2.1: Organisk Mester</title>
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --warning: #f1c40f;
+            --danger: #e74c3c;
+            --text: #34495e;
+            --panel: #ffffff;
+            --card-border: #dfe6e9;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- TOP BAR --- */
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .brand { font-size: 22px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+        .stats { display: flex; gap: 20px; font-weight: 600; font-size: 16px; align-items: center; }
+        .money { color: var(--warning); text-shadow: 0 1px 2px rgba(0,0,0,0.3); font-size: 20px; }
+        
+        .market-ticker {
+            background: rgba(0,0,0,0.3);
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% {border-color: rgba(255,255,255,0.1);} 50% {border-color: var(--success);} 100% {border-color: rgba(255,255,255,0.1);} }
+
+        /* --- MAIN GRID --- */
+        .layout {
+            display: grid;
+            grid-template-columns: 280px 1fr 300px;
+            gap: 15px;
+            padding: 15px;
+            flex: 1;
+            height: calc(100vh - 70px);
+        }
+
+        .panel {
+            background: var(--panel);
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .panel-head {
+            background: #ecf0f1;
+            padding: 12px 15px;
+            font-weight: 700;
+            color: var(--primary);
+            border-bottom: 1px solid #bdc3c7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* --- INVENTORY --- */
+        .inv-grid {
+            padding: 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
+            overflow-y: auto;
+        }
+        
+        .card {
+            background: white;
+            border: 2px solid var(--card-border);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.1s, border-color 0.2s;
+        }
+        .card:hover { transform: translateY(-2px); border-color: var(--accent); }
+        .card:active { transform: scale(0.95); }
+        .card-badge {
+            position: absolute; top: -5px; right: -5px;
+            background: var(--primary); color: white;
+            border-radius: 50%; width: 20px; height: 20px;
+            font-size: 10px; line-height: 20px;
+            font-weight: bold;
+        }
+        .card-icon { font-size: 24px; display: block; margin-bottom: 2px; }
+        .card-name { font-size: 11px; font-weight: 600; line-height: 1.2; display: block; height: 26px; overflow: hidden; }
+        .card-chem { font-size: 9px; color: #7f8c8d; font-family: monospace; }
+
+        /* --- REACTOR --- */
+        .reactor-view {
+            flex: 1;
+            position: relative;
+            background: radial-gradient(circle at center, #f5f6fa, #dcdde1);
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        /* Canvas layer for particles */
+        #particleCanvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5;
+        }
+
+        .flask {
+            position: relative; width: 200px; height: 280px; z-index: 2;
+        }
+        .flask-neck {
+            position: absolute; top: 0; left: 70px; width: 60px; height: 100px;
+            background: rgba(255,255,255,0.2);
+            border: 4px solid #7f8c8d; border-bottom: none;
+            z-index: 3;
+        }
+        .flask-body {
+            position: absolute; bottom: 0; left: 0; width: 200px; height: 200px;
+            background: rgba(255,255,255,0.2);
+            border: 4px solid #7f8c8d;
+            border-radius: 50% 50% 10px 10px;
+            overflow: hidden;
+            box-shadow: inset 10px 10px 30px rgba(255,255,255,0.5), 0 10px 20px rgba(0,0,0,0.1);
+            z-index: 2;
+        }
+        .liquid {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 40%;
+            background: var(--accent); opacity: 0.8; transition: height 0.5s, background-color 1s;
+        }
+        
+        .input-slots {
+            position: absolute; top: 20px; width: 100%; display: flex; justify-content: center; gap: 180px; z-index: 10;
+        }
+        .slot {
+            width: 80px; height: 80px; background: white; border: 2px dashed #bdc3c7; border-radius: 8px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 10px; color: #aaa; text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: all 0.2s;
+        }
+        .slot:hover { border-color: var(--accent); color: var(--accent); }
+        .slot.filled { border-style: solid; color: var(--text); border-color: var(--success); }
+
+        .controls {
+            padding: 15px; background: white; border-top: 1px solid #ddd;
+            display: grid; grid-template-columns: 1fr 1fr auto; gap: 20px; align-items: end;
+        }
+        
+        .ctrl-grp label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; color: #7f8c8d; }
+        .slider-cont { display: flex; align-items: center; gap: 10px; }
+        input[type=range] { flex: 1; accent-color: var(--danger); cursor: pointer; }
+        
+        .toggle-grp { display: flex; background: #ecf0f1; padding: 3px; border-radius: 6px; }
+        .toggle-btn { flex: 1; border: none; background: transparent; padding: 8px; font-size: 12px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .toggle-btn.active { background: white; color: var(--accent); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
+        .btn-action {
+            background: var(--success); color: white; border: none; padding: 12px 25px;
+            border-radius: 6px; font-size: 16px; font-weight: 800; cursor: pointer;
+            box-shadow: 0 4px 0 #219150; transition: transform 0.1s; height: 50px;
+        }
+        .btn-action:active { transform: translateY(4px); box-shadow: none; }
+        .btn-shop { background: var(--warning); box-shadow: 0 4px 0 #d35400; font-size: 14px; padding: 8px 15px; }
+        
+        /* --- LOG & QUESTS --- */
+        .log-box {
+            flex: 1; background: #2c3e50; color: #ecf0f1; font-family: 'Consolas', monospace; font-size: 11px;
+            padding: 10px; overflow-y: auto; border-top: 1px solid #34495e;
+        }
+        .log-entry { margin-bottom: 5px; padding-left: 10px; border-left: 2px solid transparent; }
+        .log-succ { border-left-color: var(--success); color: #2ecc71; }
+        .log-err { border-left-color: var(--danger); color: #e74c3c; }
+        .log-info { border-left-color: var(--accent); }
+
+        .quest-card {
+            background: #fff8e1; border-bottom: 2px solid #ffecb3; padding: 15px;
+        }
+        .quest-header { color: #f39c12; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .quest-title { font-weight: bold; margin: 5px 0; }
+        .quest-desc { font-size: 12px; color: #555; line-height: 1.4; }
+
+        /* --- MODAL (SHOP) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            display: flex; justify-content: center; align-items: center; z-index: 100;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        
+        .shop-win {
+            background: white; width: 800px; height: 85vh; border-radius: 12px;
+            display: flex; flex-direction: column; overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+        .shop-nav { background: var(--primary); padding: 0 20px; display: flex; gap: 5px; }
+        .shop-tab { padding: 15px 20px; color: #95a5a6; cursor: pointer; font-weight: bold; font-size: 14px; }
+        .shop-tab.active { color: white; border-bottom: 4px solid var(--warning); background: rgba(255,255,255,0.05); }
+        .shop-content { padding: 20px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        
+        .shop-item { border: 1px solid #eee; padding: 15px; border-radius: 8px; text-align: center; }
+        .shop-item:hover { border-color: var(--accent); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <span style="font-size:28px;">⚗️</span>
+        <div>
+            Organisk syntese
+        </div>
+    </div>
+    
+    <div class="market-ticker" id="marketTicker">
+        📈 BØRSEN: Indlæser markedsdata...
+    </div>
+
+    <div class="stats">
+        <div>💰 <span id="moneyDisp" class="money">300</span> kr.</div>
+        <button class="btn-action btn-shop" onclick="toggleShop()">Indkøb</button>
+    </div>
+</header>
+
+<div class="layout">
+    
+    <div class="panel">
+        <div class="panel-head">
+            Lager
+            <small onclick="sellAll()" style="cursor:pointer; color:var(--success); font-size:11px;">Sælg Alt Færdigt</small>
+        </div>
+        <div class="inv-grid" id="invGrid"></div>
+    </div>
+
+    <div class="panel">
+        <div class="panel-head">Syntese Reaktor</div>
+        
+        <div class="reactor-view">
+            <canvas id="particleCanvas"></canvas>
+            
+            <div class="input-slots">
+                <div class="slot" id="slotA" onclick="clearSlot('A')">
+                    <span style="font-size:20px">➕</span>
+                    <span style="margin-top:5px">Tilføj stof</span>
+                </div>
+                <div class="slot" id="slotB" onclick="clearSlot('B')">
+                    <span style="font-size:20px">➕</span>
+                    <span style="margin-top:5px">Tilføj stof</span>
+                </div>
+            </div>
+
+            <div class="flask">
+                <div class="flask-neck"></div>
+                <div class="flask-body">
+                    <div class="liquid" id="liquid" style="height: 20%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="ctrl-grp">
+                <label>Katalysator (H₂SO₄)</label>
+                <div class="toggle-grp">
+                    <button class="toggle-btn active" id="catNone" onclick="setCat('none')">Ingen</button>
+                    <button class="toggle-btn" id="catAcid" onclick="setCat('H+')">Tilsæt Syre (H⁺)</button>
+                </div>
+            </div>
+            <div class="ctrl-grp">
+                <label>Temperatur: <span id="tempVal" style="color:var(--danger)">20</span>°C</label>
+                <div class="slider-cont">
+                    <span style="font-size:12px">20°</span>
+                    <input type="range" min="20" max="150" value="20" id="tempSlider" oninput="updateTemp(this.value)">
+                    <span style="font-size:12px">150°</span>
+                </div>
+            </div>
+            <button class="btn-action" onclick="synthesize()">START</button>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="quest-card" id="questCard">
+            <div class="quest-header">Aktiv Mission</div>
+            <div class="quest-title" id="qTitle">Velkommen</div>
+            <div class="quest-desc" id="qDesc">Opstart.</div>
+            <div style="background:#ddd; height:4px; margin-top:10px; border-radius:2px;">
+                <div id="qBar" style="background:var(--warning); width:0%; height:100%; transition:width 0.5s;"></div>
+            </div>
+        </div>
+        <div class="panel-head" style="border-top:1px solid #bdc3c7">Logbog</div>
+        <div class="log-box" id="gameLog">
+            <div class="log-entry log-info">> System klar.</div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="shopModal">
+    <div class="shop-win">
+        <div class="shop-nav">
+            <div style="padding:15px; color:white; font-weight:bold;">KEMIKALIE GROSSISTEN</div>
+            <div style="flex:1"></div>
+            <div class="shop-tab active" onclick="filterShop('alcohol', this)">Alkoholer</div>
+            <div class="shop-tab" onclick="filterShop('acid', this)">Syrer</div>
+            <div class="shop-tab" onclick="filterShop('reagent', this)">Reagenser</div>
+            <div style="padding:15px; color:white; cursor:pointer;" onclick="toggleShop()">✕</div>
+        </div>
+        <div class="shop-content" id="shopGrid"></div>
+    </div>
+</div>
+
+<script>
+/**
+ * SYNTESE-TYCOON 2.1
+ * Logic rewritten for robustness and strict chemical rules.
+ */
+
+// --- DATA: CHEMICALS ---
+const chemicals = {
+    // Råvarer (Alkoholer)
+    'methanol': { name: 'Methanol', formula: 'CH₃OH', type: 'alcohol', price: 15, icon: '🧪', color: '#ecf0f1' },
+    'ethanol':  { name: 'Ethanol', formula: 'C₂H₅OH', type: 'alcohol', price: 25, icon: '🧪', color: '#bdc3c7' },
+    'propanol': { name: 'Propan-1-ol', formula: 'C₃H₇OH', type: 'alcohol', price: 40, icon: '🧪', color: '#95a5a6' },
+    'butanol':  { name: 'Butan-1-ol', formula: 'C₄H₉OH', type: 'alcohol', price: 60, icon: '🧪', color: '#7f8c8d' },
+    'pentanol': { name: 'Pentan-1-ol', formula: 'C₅H₁₁OH', type: 'alcohol', price: 80, icon: '🧪', color: '#34495e' },
+
+    // Råvarer (Carboxylsyrer)
+    'ethansyre': { name: 'Ethansyre', formula: 'CH₃COOH', type: 'acid', price: 30, icon: '🍋', color: '#f1c40f' },
+    'propansyre': { name: 'Propansyre', formula: 'C₂H₅COOH', type: 'acid', price: 50, icon: '🧀', color: '#f39c12' },
+    'butansyre': { name: 'Butansyre', formula: 'C₃H₇COOH', type: 'acid', price: 70, icon: '🤮', color: '#d35400' }, // Lugter grimt!
+    'salicyl':   { name: 'Salicylsyre', formula: 'C₇H₆O₃', type: 'acid', price: 150, icon: '💊', color: '#fff' },
+
+    // Reagenser
+    'kmn04': { name: 'KMnO₄ (Ox)', formula: 'Oxidationsmiddel', type: 'reagent', price: 45, icon: '🔥', color: '#8e44ad' },
+
+    // Produkter (Estere - Duftstoffer)
+    'methylethanoat': { name: 'Methyl-ethanoat', formula: 'Lim-lugt', type: 'ester', sell: 120, icon: '🧴', color: '#e67e22' },
+    'ethylethanoat':  { name: 'Ethyl-ethanoat', formula: 'Pære-duft', type: 'ester', sell: 180, icon: '🍐', color: '#2ecc71' },
+    'propylethanoat': { name: 'Propyl-ethanoat', formula: 'Pære-duft II', type: 'ester', sell: 250, icon: '🍐', color: '#27ae60' },
+    'pentylethanoat': { name: 'Pentyl-ethanoat', formula: 'Banan-duft', type: 'ester', sell: 400, icon: '🍌', color: '#f1c40f' },
+    'ethylbutanoat':  { name: 'Ethyl-butanoat', formula: 'Ananas-duft', type: 'ester', sell: 450, icon: '🍍', color: '#f39c12' },
+    'aspirin':        { name: 'Acetylsalicylsyre', formula: 'Aspirin', type: 'pharma', sell: 800, icon: '⚕️', color: '#fff' },
+    
+    // Produkter (Oxidation)
+    'methansyre': { name: 'Methansyre', formula: 'HCOOH', type: 'acid', sell: 40, icon: '🐜', color: '#e74c3c' },
+    'pentansyre': { name: 'Pentansyre', formula: 'C₄H₉COOH', type: 'acid', sell: 100, icon: '🐐', color: '#c0392b' },
+};
+
+// --- DATA: RECIPES ---
+// Format: inputs (array of IDs sorted), out (ID), minTemp, maxTemp, cat (catalyst required)
+const recipes = [
+    // Oxidationer (Primær alkohol + Ox -> Carboxylsyre)
+    { in: ['kmn04', 'methanol'], out: 'methansyre', minT: 50, maxT: 90, cat: 'any' },
+    { in: ['ethanol', 'kmn04'], out: 'ethansyre', minT: 60, maxT: 100, cat: 'any' },
+    { in: ['kmn04', 'propanol'], out: 'propansyre', minT: 60, maxT: 100, cat: 'any' },
+    { in: ['butanol', 'kmn04'], out: 'butansyre', minT: 65, maxT: 105, cat: 'any' },
+    { in: ['kmn04', 'pentanol'], out: 'pentansyre', minT: 70, maxT: 110, cat: 'any' },
+
+    // Estere (Alkohol + Syre + H+ -> Ester)
+    { in: ['ethansyre', 'methanol'], out: 'methylethanoat', minT: 50, maxT: 90, cat: 'H+' },
+    { in: ['ethanol', 'ethansyre'], out: 'ethylethanoat', minT: 55, maxT: 95, cat: 'H+' },
+    { in: ['ethansyre', 'propanol'], out: 'propylethanoat', minT: 60, maxT: 100, cat: 'H+' },
+    { in: ['ethansyre', 'pentanol'], out: 'pentylethanoat', minT: 65, maxT: 105, cat: 'H+' },
+    { in: ['butansyre', 'ethanol'], out: 'ethylbutanoat', minT: 65, maxT: 105, cat: 'H+' },
+    
+    // Pharma
+    { in: ['ethansyre', 'salicyl'], out: 'aspirin', minT: 75, maxT: 95, cat: 'H+' } // Kræver præcis temp
+];
+
+// --- QUESTS ---
+const quests = [
+    { title: "Lærlingen", desc: "Vi skal bruge syre. Køb Ethanol og Oxidationsmiddel (KMnO₄). Varm det op til 60-100°C for at danne Ethansyre.", check: () => inventory['ethansyre'] >= 1 },
+    { title: "Duft af Pære", desc: "Lav en ester! Ethansyre + Ethanol + H⁺ katalysator + Varme = Ethyl-ethanoat.", check: () => inventory['ethylethanoat'] >= 1 },
+    { title: "Banan-mageren", desc: "Markedet vil have bananer. Køb Pentanol. Reager det med Ethansyre (Husk H⁺).", check: () => inventory['pentylethanoat'] >= 1 },
+    { title: "Ananas-ekspert", desc: "Avanceret: Vi skal bruge Butansyre. Lav det ved oxidation af Butanol. Reager derefter syren med Ethanol.", check: () => inventory['ethylbutanoat'] >= 1 },
+    { title: "Farmaceuten", desc: "Lav hovedpinepiller (Aspirin). Salicylsyre + Ethansyre. Pas på temperaturen!", check: () => inventory['aspirin'] >= 1 }
+];
+
+// --- GAME STATE ---
+let money = 300;
+let inventory = {};
+let slots = { A: null, B: null };
+let settings = { temp: 20, cat: 'none' };
+let currentQuest = 0;
+let marketTrend = { id: 'pentylethanoat', mult: 1.5 }; // Dynamic market
+
+// --- INIT ---
+window.onload = () => {
+    updateInventory();
+    updateQuest();
+    startMarketSimulation();
+    animateParticles(); // Start canvas loop
+    log("Velkommen til laboratoriet.", 'info');
+};
+
+// --- CORE FUNCTIONS ---
+
+function updateInventory() {
+    const grid = document.getElementById('invGrid');
+    grid.innerHTML = '';
+    
+    // Sort logic: Raw materials first, then products
+    Object.keys(inventory).sort().forEach(key => {
+        if(inventory[key] > 0) {
+            const item = chemicals[key];
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.onclick = () => addToSlot(key);
+            div.innerHTML = `
+                <div class="card-badge">${inventory[key]}</div>
+                <div class="card-icon">${item.icon}</div>
+                <div class="card-name">${item.name}</div>
+                <div class="card-chem">${item.formula}</div>
+            `;
+            grid.appendChild(div);
+        }
+    });
+}
+
+function addToSlot(key) {
+    if(!slots.A) { slots.A = key; } 
+    else if (!slots.B) { slots.B = key; } 
+    else { log("Reaktoren er fuld. Tøm en slot først.", 'err'); return; }
+    
+    updateSlots();
+}
+
+function clearSlot(slot) {
+    slots[slot] = null;
+    updateSlots();
+}
+
+function updateSlots() {
+    ['A', 'B'].forEach(s => {
+        const el = document.getElementById('slot'+s);
+        const key = slots[s];
+        if(key) {
+            const item = chemicals[key];
+            el.innerHTML = `<span style="font-size:24px">${item.icon}</span><div>${item.name}</div>`;
+            el.className = 'slot filled';
+        } else {
+            el.innerHTML = `<span style="font-size:20px">➕</span><span style="margin-top:5px">Tilføj</span>`;
+            el.className = 'slot';
+        }
+    });
+}
+
+function setCat(val) {
+    settings.cat = val;
+    document.getElementById('catNone').className = val==='none' ? 'toggle-btn active' : 'toggle-btn';
+    document.getElementById('catAcid').className = val==='H+' ? 'toggle-btn active' : 'toggle-btn';
+}
+
+function updateTemp(val) {
+    settings.temp = parseInt(val);
+    const disp = document.getElementById('tempVal');
+    disp.innerText = val;
+    
+    // Visual feedback
+    const liq = document.getElementById('liquid');
+    if(val > 100) { disp.style.color = '#c0392b'; liq.style.background = '#e74c3c'; }
+    else if(val > 50) { disp.style.color = '#e67e22'; liq.style.background = '#f39c12'; }
+    else { disp.style.color = '#3498db'; liq.style.background = '#3498db'; }
+}
+
+// --- SYNTHESIS ENGINE ---
+
+function synthesize() {
+    if(!slots.A || !slots.B) { log("Mangler reaktanter.", 'err'); return; }
+    
+    // 1. Consume resources
+    if(inventory[slots.A] < 1 || inventory[slots.B] < 1) { log("Ikke nok på lager.", 'err'); return; }
+    inventory[slots.A]--;
+    inventory[slots.B]--;
+    updateInventory();
+
+    // 2. Visuals
+    const liq = document.getElementById('liquid');
+    liq.style.height = "80%";
+    emitParticles('bubbles');
+    
+    setTimeout(() => {
+        processReaction();
+        liq.style.height = "20%";
+    }, 1500);
+}
+
+function processReaction() {
+    // Sorter input for at matche opskriften uanset rækkefølge
+    const inputs = [slots.A, slots.B].sort();
+    
+    // FIND OPSKRIFT (RETTET: bruger spread [...] for ikke at sortere databasen)
+    const match = recipes.find(r => 
+        JSON.stringify([...r.in].sort()) === JSON.stringify(inputs)
+    );
+
+    let result = null;
+
+    if (match) {
+        // Tjek Temperatur
+        const tempOK = settings.temp >= match.minT && settings.temp <= match.maxT;
+        // Tjek Katalysator
+        const catOK = match.cat === 'any' || match.cat === settings.cat;
+        
+        // Safety Check (Too hot?)
+        if (settings.temp > match.maxT + 20) {
+            log("ADVARSEL: OVEROPHEDNING! Produktet brændte på.", 'err');
+            emitParticles('explosion');
+            clearSlot('A'); clearSlot('B');
+            updateSlots();
+            return;
+        }
+
+        if (tempOK && catOK) {
+            result = match.out;
+            emitParticles('success');
+        } else {
+            if(!tempOK) log(`Fejl: Temp ${settings.temp}°C er udenfor ${match.minT}-${match.maxT}°C`, 'err');
+            if(!catOK) log(`Fejl: Forkert katalysator (Mangler H⁺?).`, 'err');
+            emitParticles('smoke'); // Fail smoke
+        }
+    } else {
+        log("Ingen reaktion skete mellem disse stoffer.", 'err');
+        emitParticles('smoke');
+    }
+
+    if (result) {
+        inventory[result] = (inventory[result] || 0) + 1;
+        const prod = chemicals[result];
+        log(`Succes! Syntetiserede 1x ${prod.name}`, 'succ');
+        checkQuest();
+    }
+    
+    clearSlot('A'); clearSlot('B');
+    updateInventory();
+    updateSlots();
+}
+
+// --- QUEST SYSTEM ---
+function checkQuest() {
+    if(currentQuest >= quests.length) return;
+    const q = quests[currentQuest];
+    if(q.check()) {
+        log(`MISSION FULDFØRT: ${q.title}`, 'info');
+        money += 150; // Reward
+        updateMoney();
+        currentQuest++;
+        emitParticles('confetti'); // Big celebration
+        updateQuest();
+    }
+}
+
+function updateQuest() {
+    if(currentQuest >= quests.length) {
+        document.getElementById('questCard').style.display = 'none';
+        log("Tillykke! Du er nu Kemi-Mester.", 'succ');
+        return;
+    }
+    const q = quests[currentQuest];
+    document.getElementById('qTitle').innerText = q.title;
+    document.getElementById('qDesc').innerText = q.desc;
+    document.getElementById('qBar').style.width = ((currentQuest / quests.length) * 100) + "%";
+}
+
+// --- MARKET & ECONOMY (EXPANSION) ---
+
+function startMarketSimulation() {
+    setInterval(() => {
+        // Pick a random ester to trend
+        const esters = Object.keys(chemicals).filter(k => chemicals[k].type === 'ester');
+        const pick = esters[Math.floor(Math.random() * esters.length)];
+        marketTrend = { id: pick, mult: (1.2 + Math.random()).toFixed(1) };
+        
+        const tick = document.getElementById('marketTicker');
+        const chemName = chemicals[pick].name;
+        tick.innerHTML = `📈 BØRSEN: Høj efterspørgsel på <b>${chemName}</b> (+${Math.round((marketTrend.mult-1)*100)}% pris)`;
+        tick.style.borderColor = '#2ecc71';
+        setTimeout(() => tick.style.borderColor = 'rgba(255,255,255,0.1)', 1000);
+    }, 30000); // New trend every 30 sec
+}
+
+function sellAll() {
+    let earned = 0;
+    Object.keys(inventory).forEach(k => {
+        const item = chemicals[k];
+        if(inventory[k] > 0 && item.sell) {
+            let price = item.sell;
+            // Apply market trend
+            if (k === marketTrend.id) price = Math.round(price * marketTrend.mult);
+            
+            earned += price * inventory[k];
+            inventory[k] = 0;
+        }
+    });
+    
+    if(earned > 0) {
+        money += earned;
+        log(`Salg gennemført. Indtjening: ${earned} kr.`, 'succ');
+        updateMoney();
+        updateInventory();
+    } else {
+        log("Intet salgbart på lager.", 'info');
+    }
+}
+
+function updateMoney() { document.getElementById('moneyDisp').innerText = money; }
+
+// --- SHOP SYSTEM ---
+function toggleShop() {
+    const m = document.getElementById('shopModal');
+    m.classList.toggle('open');
+    if(m.classList.contains('open')) filterShop('alcohol', document.querySelector('.shop-tab'));
+}
+
+function filterShop(type, tabEl) {
+    document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
+    tabEl.classList.add('active');
+    
+    const grid = document.getElementById('shopGrid');
+    grid.innerHTML = '';
+    
+    Object.keys(chemicals).forEach(k => {
+        const item = chemicals[k];
+        if(item.type === type && item.price) {
+            const div = document.createElement('div');
+            div.className = 'shop-item';
+            div.innerHTML = `
+                <div style="font-size:30px">${item.icon}</div>
+                <div style="font-weight:bold">${item.name}</div>
+                <div style="color:#7f8c8d; font-size:12px; margin-bottom:5px;">${item.formula}</div>
+                <div style="color:var(--warning); font-weight:bold;">${item.price} kr.</div>
+                <button class="btn-action btn-shop" style="margin-top:10px; width:100%" onclick="buy('${k}')">Køb</button>
+            `;
+            grid.appendChild(div);
+        }
+    });
+}
+
+function buy(key) {
+    const item = chemicals[key];
+    if(money >= item.price) {
+        money -= item.price;
+        inventory[key] = (inventory[key] || 0) + 1;
+        updateMoney();
+        updateInventory();
+        log(`Købte 1x ${item.name}`, 'info');
+    } else {
+        alert("Ikke nok penge!");
+    }
+}
+
+function log(msg, type) {
+    const div = document.createElement('div');
+    div.className = `log-entry log-${type}`;
+    div.innerText = "> " + msg;
+    const box = document.getElementById('gameLog');
+    box.prepend(div);
+}
+
+// --- CANVAS PARTICLE SYSTEM (VISUAL FX) ---
+const canvas = document.getElementById('particleCanvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+}
+window.onresize = resizeCanvas;
+resizeCanvas();
+
+function emitParticles(type) {
+    const count = type === 'bubbles' ? 20 : 50;
+    const x = canvas.width / 2;
+    const y = canvas.height - 50; // Near flask bottom
+    
+    for(let i=0; i<count; i++) {
+        particles.push({
+            x: x + (Math.random() - 0.5) * 60,
+            y: y,
+            vx: (Math.random() - 0.5) * 2,
+            vy: -1 - Math.random() * 3,
+            life: 1.0,
+            type: type,
+            color: type === 'success' ? '#2ecc71' : 
+                   type === 'explosion' ? '#000' : 
+                   type === 'smoke' ? '#95a5a6' : '#fff'
+        });
+    }
+}
+
+function animateParticles() {
+    ctx.clearRect(0,0, canvas.width, canvas.height);
+    
+    for(let i=particles.length-1; i>=0; i--) {
+        let p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.02;
+        
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.color;
+        
+        if (p.type === 'bubbles') {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+            ctx.fill();
+        } else if (p.type === 'explosion') {
+            p.vx *= 1.05; // Expand
+            p.vy *= 1.05;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 8, 0, Math.PI*2);
+            ctx.fill();
+        } else if (p.type === 'confetti') {
+            p.vy += 0.1; // Gravity
+            ctx.fillStyle = `hsl(${Math.random()*360}, 100%, 50%)`;
+            ctx.fillRect(p.x, p.y, 4, 4);
+        } else {
+            // Smoke/Generic
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 5 * (2-p.life), 0, Math.PI*2); // Grow
+            ctx.fill();
+        }
+
+        if(p.life <= 0) particles.splice(i, 1);
+    }
+    
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(animateParticles);
+}
+
+</script>
+</body>
+</html>

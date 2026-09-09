@@ -1,0 +1,1195 @@
+﻿<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avanceret Titrering: NaCl i Havvand (Realistisk Kinetik)</title>
+    <style>
+        /* --- CSS VARIABLER & BASIS --- */
+        :root {
+            --bg-color: #f0f2f5;
+            --panel-bg: #ffffff;
+            --primary: #2c3e50;
+            --accent: #2980b9;
+            --success: #27ae60;
+            --error: #c0392b;
+            --warning: #f39c12;
+            --text-light: #7f8c8d;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-color);
+            color: var(--primary);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR (JOURNAL & BEREGNINGER) --- */
+        #sidebar {
+            width: clamp(300px, 30vw, 430px);
+            flex-shrink: 0;
+            background: var(--panel-bg);
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 3px 0 15px rgba(0,0,0,0.05);
+            z-index: 10;
+            overflow-y: auto;
+        }
+
+        .notebook-header { 
+            background: var(--primary); 
+            color: white; 
+            padding: 25px 20px; 
+            box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2);
+        }
+        
+        .notebook-content { 
+            padding: 20px; 
+            flex: 1; 
+        }
+        
+        .data-row { 
+            display: flex; 
+            justify-content: space-between; 
+            border-bottom: 1px dashed #ccc; 
+            padding: 10px 0; 
+            font-size: 0.95rem; 
+        }
+        
+        .input-group { 
+            margin-bottom: 15px; 
+            background: #f8f9fa; 
+            padding: 12px; 
+            border-radius: 6px; 
+            border-left: 4px solid #ccc; 
+            transition: all 0.3s ease;
+        }
+        
+        .input-group label { 
+            display: block; 
+            font-weight: 600; 
+            font-size: 0.9rem; 
+            margin-bottom: 5px; 
+        }
+        
+        .input-group small {
+            display: block;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+        }
+
+        .input-flex { display: flex; gap: 8px; }
+
+        .unit-suffix {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 12px;
+            background: #eef1f3;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+        
+        input[type="text"] { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+            font-family: monospace; 
+            font-size: 1rem;
+        }
+        
+        button { 
+            padding: 10px 15px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: 0.2s; 
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-check { background: var(--accent); color: white; }
+        .btn-check:hover { background: #1f618d; transform: translateY(-1px); }
+        .btn-check:active { transform: translateY(1px); }
+        
+        .feedback-msg { 
+            font-size: 0.85rem; 
+            margin-top: 8px; 
+            min-height: 1.2em; 
+            font-weight: 600;
+        }
+        .correct { color: var(--success); }
+        .incorrect { color: var(--error); }
+
+        /* --- HOVEDVISNING (LAB & GRAF) --- */
+        #main-view {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: radial-gradient(circle at center, #ffffff 0%, #eef2f3 100%);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        #top-area {
+            flex: 2;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            padding: 15px;
+        }
+
+        /* --- GRAF OMRÅDE (side-panel ved siden af animationen) --- */
+        #graph-area {
+            width: 240px;
+            flex-shrink: 0;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: width 0.2s ease;
+        }
+
+        #graph-area.collapsed { width: auto; }
+
+        .graph-toggle-header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 12px 16px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: var(--primary);
+            text-transform: none;
+            letter-spacing: normal;
+            white-space: nowrap;
+        }
+        .graph-toggle-header:hover { background: #f8f9fa; }
+        .graph-toggle-header .chevron {
+            font-size: 0.75rem;
+            color: var(--accent);
+            transition: transform 0.2s ease;
+        }
+
+        #graph-content {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0 14px 14px 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #graphCanvas {
+            width: 100%;
+            max-width: 210px;
+            height: 230px;
+        }
+
+        /* --- MAKRO LAB (BURETTE OG KOLBE) --- */
+        #lab-container {
+            position: relative;
+            width: 240px;
+            height: 400px;
+        }
+
+        #burette {
+            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 22px; height: 224px;
+            border: 2px solid rgba(127, 140, 141, 0.6); 
+            border-top: none;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 0 0 14px 14px; z-index: 5;
+            box-shadow: inset -3px 0 10px rgba(0,0,0,0.1);
+        }
+
+        #burette::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%;
+            height: var(--liquid-height, 95%);
+            background: rgba(173, 216, 230, 0.6);
+            transition: height 0.1s linear; 
+            border-radius: 0 0 12px 12px;
+        }
+
+        #burette-tip {
+            position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+            width: 5px; height: 10px; background: #7f8c8d;
+            border-radius: 0 0 3px 3px;
+        }
+
+        #flask {
+            position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 145px;
+            clip-path: polygon(35% 0%, 65% 0%, 100% 100%, 0% 100%);
+            background: linear-gradient(to right, rgba(255,255,255,0.4), rgba(255,255,255,0.8));
+            border: 2px solid rgba(150,150,150,0.5);
+            display: flex; align-items: flex-end; z-index: 4;
+            box-shadow: 0 20px 20px rgba(0,0,0,0.1);
+        }
+
+        #solution {
+            width: 100%; height: 55%;
+            background-color: rgba(255, 206, 40, 0.55);
+            transition: background-color 0.3s;
+        }
+
+        /* DRYP ANIMATION */
+        .drop {
+            position: absolute; width: 7px; height: 8px;
+            background: rgba(173, 216, 230, 0.8);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            left: 50%; transform: translateX(-50%); top: 232px;
+            z-index: 3; animation: fall 0.4s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards;
+        }
+        @keyframes fall {
+            0% { top: 232px; opacity: 1; transform: translateX(-50%) scale(1); }
+            90% { top: 328px; opacity: 1; transform: translateX(-50%) scale(0.9, 1.1); }
+            100% { top: 336px; opacity: 0; }
+        }
+
+        /* --- MIKROSKOP VISNING --- */
+        #microscope-container {
+            width: 210px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #microscope {
+            width: 190px; height: 190px;
+            background: #fff; border: 6px solid #2c3e50;
+            border-radius: 50%; overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1), 0 10px 25px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        #microscope canvas { width: 100%; height: 100%; }
+
+        .legend-box {
+            margin-top: 15px;
+            background: white;
+            padding: 12px; border-radius: 8px;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+        .legend-item { display: flex; align-items: center; margin-bottom: 6px; font-weight: 500;}
+        .dot { width: 12px; height: 12px; border-radius: 50%; margin-right: 10px; border: 1px solid rgba(0,0,0,0.1); display: inline-block;}
+        .dot-agcl { background:#fff; border: 2px solid #555; }
+
+        /* KONTROL PANEL (HANE) - FLYTTET OG TILPASSET */
+        #lab-controls {
+            margin: 0 auto 20px auto; /* Centrerer boksen og giver afstand ned til grafen */
+            background: white; padding: 12px 25px; border-radius: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.10);
+            display: flex; gap: 20px; align-items: center; z-index: 20;
+            border: 1px solid #eee;
+            width: fit-content;
+        }
+
+        input[type=range] { width: 150px; cursor: pointer; }
+
+        /* OVERLAYS */
+        .overlay-mask {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.4); z-index: 50;
+            backdrop-filter: blur(2px);
+        }
+
+        .saved-result {
+            background: #e8f6f3; border: 1px solid #a2d9ce;
+            color: #16a085; padding: 12px; border-radius: 6px;
+            text-align: center; margin-bottom: 20px; font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* --- MINI-KOLBE (bruges i sammendrag & popup) --- */
+        .flask-summary {
+            display: flex; align-items: center; gap: 14px; text-align: left;
+        }
+        .mini-flask {
+            flex-shrink: 0; width: 44px; height: 52px;
+            clip-path: polygon(35% 0%, 65% 0%, 100% 100%, 0% 100%);
+            background: linear-gradient(to bottom, rgba(192,57,43,0.9), rgba(192,57,43,0.6));
+            border: 1px solid rgba(150,150,150,0.5);
+        }
+
+        /* --- BEREGNINGS-POPUP --- */
+        .modal-backdrop {
+            display: none; position: fixed; inset: 0; z-index: 200;
+            background: rgba(20, 25, 30, 0.45); backdrop-filter: blur(3px);
+            align-items: center; justify-content: center;
+            overflow-y: auto; padding: 30px 15px;
+        }
+        .modal-backdrop.active { display: flex; }
+        .modal-card {
+            position: relative; background: var(--panel-bg);
+            width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto;
+            border-radius: 10px; padding: 25px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+        }
+        .modal-close {
+            position: absolute; top: 8px; right: 10px;
+            background: none; border: none; color: var(--text-light);
+            font-size: 1.6rem; line-height: 1; padding: 4px 8px;
+            text-transform: none; letter-spacing: 0;
+        }
+        .modal-close:hover { color: var(--primary); }
+
+        /* --- TOAST BESKEDER --- */
+        #toast {
+            position: fixed; top: 20px; left: 50%; z-index: 500;
+            transform: translateX(-50%) translateY(-15px);
+            max-width: min(90vw, 480px); text-align: center;
+            padding: 14px 22px; border-radius: 8px;
+            font-weight: 600; font-size: 0.95rem; color: white;
+            background: var(--primary);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        #toast.info { background: var(--accent); }
+        #toast.warn { background: var(--warning); color: #3a2a00; }
+        #toast.sarcasm { background: var(--error); }
+
+        /* CONFETTI CANVAS */
+        #confettiCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 9999;
+        }
+
+    </style>
+</head>
+<body>
+
+<aside id="sidebar">
+    <div class="notebook-header">
+        <h2 style="margin:0; font-size: 1.5rem;">Mohr-Titrering: NaCl i Havvand</h2>
+    </div>
+    
+    <div class="notebook-content">
+        <div style="margin-bottom: 25px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
+            <div class="data-row"><strong>Prøve:</strong> <span>Havvand</span></div>
+            <div class="data-row"><strong>Masse m(prøve):</strong> <span>1,00 g</span></div>
+            <div class="data-row"><strong>Titrater c(AgNO₃):</strong> <span>0,050 M</span></div>
+        </div>
+
+        <div id="phase-experiment">
+            <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 5px;">1. Udfør Titrering</h3>
+            <p style="font-size: 0.9rem; color: #555; line-height: 1.4;">
+                Tilsæt AgNO₃ dråbevist. Kromat-indikatoren (CrO₄²⁻) farver først opløsningen rødbrunt, når alle chlorid-ioner (Cl⁻) er fældet som hvidt AgCl.
+            </p>
+            <div class="input-group" style="border-left-color: var(--accent);">
+                <label>Aflæst volumen AgNO₃ (mL):</label>
+                <div id="burette-reading" style="font-family: monospace; font-size: 1.8rem; text-align: center; background: #fff; padding: 15px; border: 1px solid #ccc; border-radius: 5px; color: var(--accent); font-weight: bold;">0,00 mL</div>
+            </div>
+            <button class="btn-check" style="width:100%; background: var(--primary); font-size: 1rem; padding: 15px;" onclick="finishTitration()">Afslut Titrering & Lås Data</button>
+        </div>
+
+        <div id="phase-summary" style="display:none;">
+            <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 5px;">2. Databehandling</h3>
+            <div class="saved-result">
+                <div class="flask-summary">
+                    <div class="mini-flask"></div>
+                    <div>
+                        Aflæst ækvivalensvolumen V(AgNO₃):<br>
+                        <span id="final-vol-display-sidebar" style="font-size: 1.4rem;"></span>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-check" style="width:100%; background: var(--primary); font-size: 1rem; padding: 15px;" onclick="openCalcModal()">Åbn Beregninger</button>
+            <button style="width:100%; margin-top:10px; padding: 12px; background:#95a5a6; color:white; border:none; border-radius:4px; cursor:pointer;" onclick="location.reload()">Start Nyt Forsøg</button>
+        </div>
+    </div>
+</aside>
+
+<main id="main-view">
+    
+    <div id="top-area">
+        <div id="lab-container">
+            <div id="burette">
+                <div id="burette-tip"></div>
+            </div>
+            <div id="flask">
+                <div id="solution"></div>
+            </div>
+        </div>
+
+        <div id="microscope-container">
+            <div style="font-weight:bold; margin-bottom:8px; color:var(--primary); font-size: 1.1rem; letter-spacing: 1px; text-transform: uppercase;">Mikroskopisk Visning</div>
+            <div id="microscope">
+                <canvas id="simCanvas" width="190" height="190"></canvas>
+            </div>
+            <div class="legend-box">
+                <div class="legend-item"><div class="dot" style="background:#2ecc71;"></div>Cl⁻ (Chlorid)</div>
+                <div class="legend-item"><div class="dot" style="background:#bdc3c7;"></div>Ag⁺ (Sølv)</div>
+                <div class="legend-item"><div class="dot" style="background:#f1c40f;"></div>CrO₄²⁻ (Indikator)</div>
+                <div class="legend-item"><div class="dot dot-agcl"></div>AgCl(s) (Hvidt fældning)</div>
+                <div class="legend-item"><div class="dot" style="background:#c0392b;"></div>Ag₂CrO₄(s) (Rødt)</div>
+            </div>
+        </div>
+
+        <div id="graph-area" class="collapsed">
+            <button type="button" class="graph-toggle-header" onclick="toggleGraph()">
+                <span>📈 Titrerkurve</span>
+                <span class="chevron" id="graph-toggle-icon">▸</span>
+            </button>
+            <div id="graph-content" style="display:none;">
+                <div style="font-weight:bold; margin-bottom:8px; color:var(--primary); font-size: 0.95rem; text-align:center;">Titrerkurve: Ion-fordeling</div>
+                <canvas id="graphCanvas" width="210" height="230"></canvas>
+                <div class="legend-box" style="margin-top:10px;">
+                    <div class="legend-item"><div class="dot" style="background:#2ecc71;"></div>Fri Cl⁻</div>
+                    <div class="legend-item"><div class="dot" style="background:#34495e;"></div>Fældet AgCl</div>
+                    <div class="legend-item"><div class="dot" style="background:#c0392b;"></div>Fældet Ag₂CrO₄</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="lab-controls">
+        <span style="font-weight: bold; color: var(--primary);">Hanens hastighed:</span>
+        <input type="range" id="speed-slider" min="0" max="4" step="1" value="0" oninput="updateSpeed()">
+        <span id="speed-label" style="font-weight:bold; color:var(--accent); min-width:64px; display:inline-block;">Lukket</span>
+    </div>
+
+    <div id="lab-overlay" class="overlay-mask"></div>
+</main>
+
+<div id="calc-modal-backdrop" class="modal-backdrop">
+    <div class="modal-card">
+        <button class="modal-close" onclick="closeCalcModal()" aria-label="Luk">&times;</button>
+        <h3 style="border-bottom: 2px solid var(--primary); padding-bottom: 5px; margin-top:0;">2. Databehandling</h3>
+
+        <div class="saved-result">
+            <div class="flask-summary">
+                <div class="mini-flask"></div>
+                <div>
+                    Aflæst ækvivalensvolumen V(AgNO₃):<br>
+                    <span id="final-vol-display-modal" style="font-size: 1.4rem;"></span>
+                </div>
+            </div>
+        </div>
+
+        <div style="background:#f8f9fa; border:1px solid #eee; border-radius:6px; padding:4px 14px; margin-bottom:20px;">
+            <div class="data-row"><strong>Titrator c(AgNO₃):</strong> <span>0,050 M</span></div>
+            <div class="data-row" style="border-bottom:none;"><strong>Prøve m(prøve):</strong> <span>1,00 g</span></div>
+        </div>
+
+        <div class="input-group" id="step1">
+            <label>Trin 1: Omregn volumen til liter</label>
+            <small>Formel: V(L) = V(mL) / 1000</small>
+            <div class="input-flex">
+                <input type="text" inputmode="decimal" id="input-vol-l" placeholder="fx 0,01230" onkeydown="if(event.key==='Enter') checkStep1();">
+                <span class="unit-suffix">L</span>
+                <button class="btn-check" onclick="checkStep1()">Tjek</button>
+            </div>
+            <div class="feedback-msg" id="fb-step1"></div>
+        </div>
+
+        <div class="input-group" id="step2" style="opacity: 0.4; pointer-events: none;">
+            <label>Trin 2: Beregn stofmængden n(Ag⁺)</label>
+            <small>Formel: n = c · V</small>
+            <div class="input-flex">
+                <input type="text" inputmode="decimal" id="input-n-ag" placeholder="fx 0,00050" onkeydown="if(event.key==='Enter') checkStep2();">
+                <span class="unit-suffix">mol</span>
+                <button class="btn-check" onclick="checkStep2()">Tjek</button>
+            </div>
+            <div class="feedback-msg" id="fb-step2"></div>
+        </div>
+
+        <div class="input-group" id="step3" style="opacity: 0.4; pointer-events: none;">
+            <label>Trin 3: Bestem n(NaCl)</label>
+            <small>Reaktionsforholdet mellem Ag⁺ og Cl⁻ er 1 : 1</small>
+            <div class="input-flex">
+                <input type="text" inputmode="decimal" id="input-n-nacl" placeholder="mol" onkeydown="if(event.key==='Enter') checkStep3();">
+                <span class="unit-suffix">mol</span>
+                <button class="btn-check" onclick="checkStep3()">Tjek</button>
+            </div>
+            <div class="feedback-msg" id="fb-step3"></div>
+        </div>
+
+        <div class="input-group" id="step4" style="opacity: 0.4; pointer-events: none;">
+            <label>Trin 4: Beregn massen m(NaCl)</label>
+            <small>Formel: m = n · M &nbsp;&nbsp;(M(NaCl) = 58,44 g/mol)</small>
+            <div class="input-flex">
+                <input type="text" inputmode="decimal" id="input-m-nacl" placeholder="g" onkeydown="if(event.key==='Enter') checkStep4();">
+                <span class="unit-suffix">g</span>
+                <button class="btn-check" onclick="checkStep4()">Tjek</button>
+            </div>
+            <div class="feedback-msg" id="fb-step4"></div>
+        </div>
+
+        <div class="input-group" id="step5" style="opacity: 0.4; pointer-events: none;">
+            <label>Trin 5: Masseprocent Salt i Havvand</label>
+            <small>m% = ( m(salt) / m(havvand) ) · 100 %</small>
+            <div class="input-flex">
+                <input type="text" inputmode="decimal" id="input-pct" placeholder="fx 3,20" onkeydown="if(event.key==='Enter') checkStep5();">
+                <span class="unit-suffix">%</span>
+                <button class="btn-check" onclick="checkStep5()">Tjek</button>
+            </div>
+            <div class="feedback-msg" id="fb-step5"></div>
+        </div>
+
+        <button style="width:100%; margin-top:20px; padding: 12px; background:#95a5a6; color:white; border:none; border-radius:4px; cursor:pointer;" onclick="location.reload()">Start Nyt Forsøg</button>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<canvas id="confettiCanvas"></canvas>
+
+<script>
+    // --- KEMI & KONFIGURATION ---
+    const M_AgNO3 = 0.050; // mol/L
+    const MolarMass_NaCl = 58.44; // g/mol
+    const m_sample_g = 1.00; // Masse af havvandsprøve (g)
+    
+    // Generer et realistisk saltindhold mellem 1,5% og 4,0%
+    const trueMassPercent = (Math.random() * 2.5 + 1.5); 
+    const targetMass_NaCl = (trueMassPercent / 100) * m_sample_g;
+    const targetMoles = targetMass_NaCl / MolarMass_NaCl;
+    const targetVolume_L = targetMoles / M_AgNO3;
+    const targetVolume_mL = targetVolume_L * 1000;
+
+    // Globale tilstandsvariabler
+    let currentVol_mL = 0;
+    let isDripping = false;
+    let dripInterval = null;
+    let macroIsRed = false;           // Sand når opløsningen er tydeligt rødlig (ækvivalenspunkt bekræftet)
+    let equivalenceNotified = false;  // Har vi vist "ækvivalente mængder"-beskeden?
+    let overTitrationNotified = false; // Har vi vist den sarkastiske overtitrerings-besked?
+    let redoSuggested = false;        // Har vi foreslået at forsøget laves om?
+    let reactedCrO4Count = 0;         // Antal CrO4-ioner der er FÆRDIGREAGERET (dvs. har fået begge sine 2 Ag+)
+
+    // --- HJÆLPEFUNKTIONER (Dansk Formatering) ---
+    function toDa(num, decimals = 3) {
+        return num.toFixed(decimals).replace('.', ',');
+    }
+    function parseDa(str) {
+        str = str.replace(',', '.').replace(/[^0-9.-]/g, '');
+        return parseFloat(str);
+    }
+
+    // --- TOAST BESKEDER ---
+    let toastTimer = null;
+    function showToast(msg, type = 'info', duration = 4200) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = 'show ' + type;
+        clearTimeout(toastTimer);
+        // duration = null betyder "bliv stående", indtil en ny besked overskriver den
+        if (duration !== null) {
+            toastTimer = setTimeout(() => { el.classList.remove('show'); }, duration);
+        }
+    }
+
+    // --- FOLDBAR TITRERKURVE ---
+    function toggleGraph() {
+        const area = document.getElementById('graph-area');
+        const content = document.getElementById('graph-content');
+        const icon = document.getElementById('graph-toggle-icon');
+        const nowCollapsed = area.classList.toggle('collapsed');
+        content.style.display = nowCollapsed ? 'none' : 'flex';
+        icon.textContent = nowCollapsed ? '▸' : '▾';
+    }
+
+    // --- BEREGNINGS-POPUP ---
+    function openCalcModal() {
+        document.getElementById('calc-modal-backdrop').classList.add('active');
+    }
+    function closeCalcModal() {
+        document.getElementById('calc-modal-backdrop').classList.remove('active');
+    }
+
+    // --- MIKRO PARTIKEL SYSTEM (Forbedret Fysik & Kinetik) ---
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    const CL_COUNT = 25;  // Halveret ift. tidligere for lettere/mere stabil animation
+    const IND_COUNT = 4;  // Kromat indikator partikler (halveret tilsvarende)
+    const MAX_PAIR_MS = 1500; // Garanti: en Ag+ må aldrig svæve rundt ureageret længere end dette
+
+    // Mikroskopets synlige felt er RUNDT (CSS border-radius:50% på #microscope),
+    // men canvas'et bag det er kvadratisk. Uden dette ville partikler kunne vandre
+    // ind i de fire afskårne hjørner og virke som om de "flyver ud af animationen".
+    const CENTER = canvas.width / 2;
+    const MAX_R = CENTER - 6;
+
+    function clampToVisibleCircle(p) {
+        const dx = p.x - CENTER, dy = p.y - CENTER;
+        const limit = MAX_R - p.radius;
+        const dist = Math.hypot(dx, dy);
+        if (dist > limit && dist > 0) {
+            const nx = dx / dist, ny = dy / dist;
+            p.x = CENTER + nx * limit;
+            p.y = CENTER + ny * limit;
+            if (!p.formed) {
+                // Elastisk stød mod den runde kant
+                const vDotN = p.vx * nx + p.vy * ny;
+                p.vx -= 2 * vDotN * nx;
+                p.vy -= 2 * vDotN * ny;
+            }
+        }
+    }
+
+    class Particle {
+        constructor(type) {
+            this.type = type;
+            // Spawn direkte inden for den synlige cirkel (polært), så ingen partikel
+            // starter livet gemt bag den runde maskes hjørner.
+            const angle = Math.random() * Math.PI * 2;
+            const r = Math.random() * (MAX_R - 10);
+            this.x = CENTER + Math.cos(angle) * r;
+            this.y = CENTER + Math.sin(angle) * r;
+
+            // Roligere basishastighed, så hele mikro-animationen er lettere at følge
+            this.vx = (Math.random() - 0.5) * 1.0;
+            this.vy = (Math.random() - 0.5) * 1.0;
+            this.radius = type === 'CrO4' ? 6 : 4;
+            this.formed = false;
+            this.createdAt = Date.now();
+            this.claimedTarget = null; // Kun brugt af Ag+: den unikke Cl- den har reserveret
+        }
+
+        update() {
+            if (this.formed) {
+                // Bundfald synker roligt mod bunden (og dæmpes i siderne af friktion)
+                this.vx *= 0.85;
+                this.vy = Math.min(this.vy + 0.15, 4);
+                this.x += this.vx;
+                this.y += this.vy;
+            } else {
+                this.x += this.vx;
+                this.y += this.vy;
+            }
+            // Fælles sikkerhedsnet: uanset hvilken gren der flyttede partiklen, skal
+            // den altid ende inden for den runde maske.
+            clampToVisibleCircle(this);
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            
+            if (this.type === 'AgCl') {
+                ctx.fillStyle = '#ffffff';
+                ctx.strokeStyle = '#555555'; ctx.lineWidth = 1.5;
+                ctx.fill(); ctx.stroke(); ctx.lineWidth = 1;
+            } else {
+                switch(this.type) {
+                    case 'Ag': ctx.fillStyle = '#bdc3c7'; break; 
+                    case 'Cl': ctx.fillStyle = '#2ecc71'; break;
+                    case 'CrO4': ctx.fillStyle = '#f1c40f'; break;
+                    case 'Ag2CrO4': ctx.fillStyle = '#c0392b'; break;
+                }
+                ctx.fill();
+            }
+        }
+    }
+
+    function initParticles() {
+        particles = [];
+        for(let i=0; i<CL_COUNT; i++) particles.push(new Particle('Cl'));
+        for(let i=0; i<IND_COUNT; i++) particles.push(new Particle('CrO4'));
+    }
+
+    // Farven går fra mælket hvid/gul (før ækvivalenspunktet) over orange til rød,
+    // efterhånden som en større andel af CrO4-indikatoren er færdigreageret til Ag2CrO4.
+    function updateSolutionColor(reactedCrO4Count) {
+        const solutionEl = document.getElementById('solution');
+        if (reactedCrO4Count <= 0) {
+            let progress = Math.min(1, currentVol_mL / targetVolume_mL);
+            let alpha = 0.55 + (0.3 * progress); // Tydelig gul fra start af, bliver lidt mere uklar mod ækvivalenspunktet
+            solutionEl.style.backgroundColor = `rgba(255, 206, 40, ${alpha})`;
+        } else {
+            let t = Math.min(1, reactedCrO4Count / IND_COUNT);
+            const r = Math.round(243 + (192 - 243) * t);
+            const g = Math.round(156 + (57 - 156) * t);
+            const b = Math.round(18 + (43 - 18) * t);
+            solutionEl.style.backgroundColor = `rgba(${r}, ${g}, ${b}, 0.92)`;
+        }
+    }
+
+    // Udløser ét-gangs beskeder, koblet direkte til det faktiske antal FÆRDIGREAGEREDE
+    // CrO4-ioner (samme tal som styrer opløsningens farve i updateSolutionColor), så
+    // beskederne kommer i takt med det, eleven rent faktisk ser i mikroskopet.
+    function checkEquivalenceEvents(reactedCrO4Count) {
+        if (!equivalenceNotified && reactedCrO4Count >= 1) {
+            equivalenceNotified = true;
+            showToast('Nu har du ækvivalente mængder mellem Cl⁻ og Ag⁺!', 'info', null);
+        }
+        if (!macroIsRed && reactedCrO4Count >= IND_COUNT / 2) {
+            macroIsRed = true;
+        }
+        // Så snart alle 4 kromat-ioner er færdigreageret, er der IKKE mere Cl- eller CrO4
+        // tilbage at reagere med - al yderligere AgNO3 er nu rent overskud.
+        if (!overTitrationNotified && reactedCrO4Count >= IND_COUNT) {
+            overTitrationNotified = true;
+            showToast('Stop nu, medmindre du vil lave hindbærsmoothie.', 'sarcasm', 5500);
+        }
+        if (!redoSuggested && currentVol_mL >= targetVolume_mL * 1.6) {
+            redoSuggested = true;
+            showToast('Der er tilsat alt for meget AgNO₃ nu – du bør nok lave forsøget om.', 'warn', 6000);
+        }
+    }
+
+    function microLoop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Tegn Mikroskopets "Burette-spids" i toppen
+        ctx.fillStyle = 'rgba(173, 216, 230, 0.4)'; 
+        ctx.strokeStyle = '#7f8c8d'; 
+        ctx.lineWidth = 2;
+        ctx.beginPath(); 
+        ctx.rect((canvas.width/2) - 8, -5, 16, 25); 
+        ctx.fill(); ctx.stroke();
+
+        // Tæl frie Cl-ioner (til datagraf og logik)
+        let freeClCount = particles.filter(p => p.type === 'Cl' && !p.formed).length;
+        // OBS: hver AgCl-reaktion sætter 2 partikler (Ag+ og Cl-) til typen 'AgCl', og hver
+        // Ag2CrO4-reaktion sætter 3 partikler (2×Ag+ og 1×CrO4) til typen 'Ag2CrO4'. Vi deler
+        // derfor med hhv. 2 og 3, så graf-tallene svarer til antal REELT dannede formelenheder
+        // (og dermed ikke overskrider graf-aksens skala, som går til CL_COUNT).
+        let ag2CrO4Count = particles.filter(p => p.type === 'Ag2CrO4').length / 3;
+        let agClCount = particles.filter(p => p.type === 'AgCl').length / 2;
+
+        // Sikrer at mikroniveauet ikke "løber tør" for Cl- hurtigere end makrovolumen tilsiger.
+        // Beregnes én gang pr. billede, så både søgning og kollision bruger samme svar.
+        let progress = Math.min(1.0, currentVol_mL / targetVolume_mL);
+        let idealClUsed = CL_COUNT * progress;
+        let currentClUsed = CL_COUNT - freeClCount;
+        let clReactionAllowed = (currentClUsed < idealClUsed) || (currentVol_mL >= targetVolume_mL);
+
+        // Opdater graf data ift. volumen
+        updateGraphData(currentVol_mL, freeClCount, agClCount, ag2CrO4Count);
+
+        // Makro-farve og beskeder styres ud fra hvor stor en andel af indikatoren, der er reageret
+        updateSolutionColor(reactedCrO4Count);
+        checkEquivalenceEvents(reactedCrO4Count);
+
+        // Ét sæt bygget én gang pr. billede: hvilke Cl- er allerede reserveret af en Ag+.
+        // Erstatter den gamle nestede "er den reserveret af en anden" -søgning.
+        let claimedCl = new Set();
+        for (const p of particles) {
+            if (p.type === 'Ag' && !p.formed && p.claimedTarget && p.claimedTarget.type === 'Cl' && !p.claimedTarget.formed) {
+                claimedCl.add(p.claimedTarget);
+            }
+        }
+
+        const now = Date.now();
+
+        for (let i = 0; i < particles.length; i++) {
+            let p1 = particles[i];
+
+            // Ag+ søger sin nærmeste ledige Cl- (eller CrO4, hvis der ikke er Cl- tilbage) og
+            // bevæger sig med konstant fart direkte mod den. Efter MAX_PAIR_MS teleporterer den
+            // sig til målet og reagerer med det samme - ingen sølvion kan svæve rundt uendeligt.
+            if (p1.type === 'Ag' && !p1.formed && p1.dockedTo) {
+                // Denne Ag+ er allerede "brugt op" som den FØRSTE af de to Ag+, en CrO4 kræver
+                // (2 Ag+ + CrO4 -> Ag2CrO4). Den venter roligt klistret til sit CrO4, indtil en
+                // anden Ag+ ankommer og fuldender reaktionen (se reactAg).
+                p1.x = p1.dockedTo.x + 5;
+                p1.y = p1.dockedTo.y;
+                p1.vx = 0; p1.vy = 0;
+            } else if (p1.type === 'Ag' && !p1.formed) {
+                const age = now - p1.createdAt;
+                const forcePair = age >= MAX_PAIR_MS;
+
+                if (p1.claimedTarget && p1.claimedTarget.formed) p1.claimedTarget = null;
+                if (!p1.claimedTarget) {
+                    p1.claimedTarget = findAgTarget(p1, claimedCl, freeClCount, forcePair);
+                    if (p1.claimedTarget && p1.claimedTarget.type === 'Cl') claimedCl.add(p1.claimedTarget);
+                }
+
+                const target = p1.claimedTarget;
+
+                if (target && target.formed) {
+                    p1.claimedTarget = null; // Sneget forbi os i dette billede - prøv igen næste
+                } else if (target && forcePair) {
+                    reactAg(p1, target);
+                    freeClCount = particles.filter(p => p.type === 'Cl' && !p.formed).length;
+                } else if (target) {
+                    const seekingCl = target.type === 'Cl';
+                    const dx = target.x - p1.x, dy = target.y - p1.y;
+                    const dist = Math.hypot(dx, dy) || 0.001;
+                    const bondDist = p1.radius + target.radius + 4;
+
+                    if (dist < bondDist) {
+                        // Lille "flyve-ind" forsinkelse, så en nyankommet Ag+ ikke bonder på første billede
+                        const canReactYet = age >= 400;
+                        if (canReactYet && (seekingCl ? clReactionAllowed : true)) {
+                            reactAg(p1, target);
+                            freeClCount = particles.filter(p => p.type === 'Cl' && !p.formed).length;
+                        } else {
+                            // Vent roligt lige uden for reaktions-afstanden (ingen vibration)
+                            p1.vx *= 0.8; p1.vy *= 0.8;
+                        }
+                    } else {
+                        // Konstant, stabil fart direkte mod målet (ingen puls, ingen tilfældighed)
+                        const speed = dist < 25 ? 4 : (seekingCl ? 1.3 : 0.5);
+                        p1.vx = (dx / dist) * speed;
+                        p1.vy = (dy / dist) * speed;
+                    }
+                } else {
+                    // Intet ledigt mål lige nu (fx alle Cl- allerede reserveret): driv roligt videre
+                    p1.vx *= 0.98; p1.vy *= 0.98;
+                }
+            }
+
+            p1.update();
+            p1.draw();
+        }
+        drawGraph(); // Tegn graf ramme
+        requestAnimationFrame(microLoop);
+    }
+
+    // Finder nærmeste relevante mål for en Ag+: Cl- har altid førsteprioritet (så længe der er
+    // nogen tilbage), CrO4 er kun et mål når alle Cl- er brugt. Ved forcePair ignoreres andre
+    // Ag+'s reservationer, så et mål altid kan findes (garanterer parring inden MAX_PAIR_MS).
+    function findAgTarget(p1, claimedCl, freeClCount, forcePair) {
+        let best = null, minDist = Infinity;
+        const wantCl = freeClCount > 0;
+        for (const cand of particles) {
+            if (wantCl) {
+                if (cand.type !== 'Cl' || cand.formed) continue;
+                if (!forcePair && claimedCl.has(cand)) continue;
+            } else {
+                if (cand.type !== 'CrO4' || cand.formed) continue;
+            }
+            const d = Math.hypot(p1.x - cand.x, p1.y - cand.y);
+            if (d < minDist) { minDist = d; best = cand; }
+        }
+        return best;
+    }
+
+    // Cl- reagerer 1:1 med Ag+ (Ag+ + Cl- -> AgCl), men CrO4 kræver præcis 2 Ag+
+    // (2 Ag+ + CrO4²⁻ -> Ag2CrO4). Den første Ag+, der når frem, "docker" derfor blot
+    // ved siden af sit CrO4 og venter - selve udfældningen (og reactedCrO4Count++)
+    // sker først når en anden Ag+ ankommer og fuldender parret.
+    function reactAg(ag, target) {
+        if (target.type === 'Cl') {
+            ag.type = 'AgCl'; ag.formed = true; ag.vx = 0; ag.vy = 0; ag.claimedTarget = null;
+            target.type = 'AgCl'; target.formed = true; target.vx = 0; target.vy = 0;
+            ag.x = target.x; ag.y = target.y - 5; // Saml dem visuelt
+            return;
+        }
+
+        if (!target.dockedAg) {
+            target.dockedAg = ag;
+            ag.dockedTo = target;
+            ag.vx = 0; ag.vy = 0;
+            ag.claimedTarget = null;
+            return;
+        }
+
+        // Anden Ag+ ankommet: reaktionen er nu fuldendt
+        const firstAg = target.dockedAg;
+        firstAg.type = 'Ag2CrO4'; firstAg.formed = true; firstAg.vx = 0; firstAg.vy = 0; firstAg.dockedTo = null;
+        ag.type = 'Ag2CrO4'; ag.formed = true; ag.vx = 0; ag.vy = 0; ag.claimedTarget = null;
+        target.type = 'Ag2CrO4'; target.formed = true; target.vx = 0; target.vy = 0;
+        firstAg.x = target.x - 5; firstAg.y = target.y - 5; // Saml dem visuelt
+        ag.x = target.x + 5; ag.y = target.y - 5;
+        reactedCrO4Count++;
+    }
+
+    // --- MAKRO STYRING ---
+    // 5 hastighedstrin. Trin 0 = lukket hane (intet dryp - erstatter den tidligere
+    // separate "Åbn Hane"-knap). Trin 4 er dobbelt så hurtigt som den gamle tophastighed
+    // (som var 400ms/dråbe).
+    const DRIP_SPEEDS_MS = [null, 800, 600, 400, 200];
+
+    function updateSpeed() {
+        const level = parseInt(document.getElementById('speed-slider').value, 10);
+        const label = document.getElementById('speed-label');
+        clearInterval(dripInterval);
+
+        if (level === 0) {
+            isDripping = false;
+            label.innerText = "Lukket";
+        } else {
+            isDripping = true;
+            dripInterval = setInterval(addDrop, DRIP_SPEEDS_MS[level]);
+            label.innerText = "Trin " + level + " / 4";
+        }
+    }
+
+    function addDrop() {
+        currentVol_mL += 0.05; 
+        
+        // Tilføj Ag+ til mikroskopet (dumper ind fra toppen)
+        if(Math.random() > 0.2) {
+            let p = new Particle('Ag');
+            p.x = canvas.width / 2 + (Math.random()*10 - 5); 
+            p.y = 15; 
+            p.vx = (Math.random() - 0.5);
+            p.vy = 2 + Math.random(); // Falder roligt ind
+            particles.push(p);
+        }
+
+        updateLabVisuals();
+        createDrop(macroIsRed); // Farven på dråben afhænger af opløsningens tilstand
+    }
+
+    function updateLabVisuals() {
+        document.getElementById('burette-reading').innerText = toDa(currentVol_mL, 2) + " mL";
+        
+        // Sænk væskestanden i buretten, skaleret så den ikke løber tør, før der reelt er
+        // tilsat nok til (over-)titrering med de nye, større volumener.
+        let pct = 95 - (currentVol_mL * 4);
+        if(pct < 0) pct = 0;
+        document.documentElement.style.setProperty('--liquid-height', pct + "%");
+    }
+
+    function createDrop(isRed) {
+        const container = document.getElementById('lab-container');
+        const drop = document.createElement('div');
+        drop.className = 'drop';
+        // Hvis opløsningen er rød, farves den nye dråbe ikke rød, men opløsningen er.
+        container.appendChild(drop);
+        setTimeout(() => drop.remove(), 400); // Renses op efter animation
+    }
+
+    function finishTitration() {
+        let freeClRemaining = particles.filter(p => p.type === 'Cl' && !p.formed).length;
+        if (freeClRemaining > 0) {
+            showToast('Titreringen er ikke klar endnu – der er stadig chlorid tilbage. Fortsæt til alt chlorid er fældet som AgCl.', 'warn');
+            return;
+        }
+        isDripping = false; clearInterval(dripInterval);
+        document.getElementById('phase-experiment').style.display = 'none';
+        document.getElementById('phase-summary').style.display = 'block';
+        document.getElementById('lab-controls').style.display = 'none';
+        document.getElementById('lab-overlay').style.display = 'block';
+        const volText = toDa(currentVol_mL, 2) + " mL";
+        document.getElementById('final-vol-display-sidebar').innerText = volText;
+        document.getElementById('final-vol-display-modal').innerText = volText;
+        openCalcModal();
+    }
+
+    // --- GRAF FUNKTIONER ---
+    const gCanvas = document.getElementById('graphCanvas');
+    const gCtx = gCanvas.getContext('2d');
+    // Startpunkt ved x=0, så kurverne har et udgangspunkt, inden titreringen er gået i gang
+    let graphData = [{v: 0, cl: CL_COUNT, agcl: 0, ag2cro4: 0}];
+
+    function updateGraphData(vol, freeCl, agCl, ag2CrO4) {
+        // Gem data for at tegne kurven. Undgå for meget data ved kun at gemme for hver 0.1 mL ændring
+        if (graphData.length === 0 || vol - graphData[graphData.length-1].v >= 0.05) {
+            graphData.push({v: vol, cl: freeCl, agcl: agCl, ag2cro4: ag2CrO4});
+        }
+    }
+
+    function drawGraph() {
+        gCtx.clearRect(0, 0, gCanvas.width, gCanvas.height);
+        
+        // Konstanter for graf-layout
+        const padX = 40, padY = 20, w = gCanvas.width - padX * 2, h = gCanvas.height - padY * 2;
+        
+        // Akser
+        gCtx.strokeStyle = "#ccc"; gCtx.lineWidth = 1;
+        gCtx.beginPath();
+        gCtx.moveTo(padX, padY); gCtx.lineTo(padX, padY + h); // Y-akse
+        gCtx.lineTo(padX + w, padY + h); // X-akse
+        gCtx.stroke();
+
+        gCtx.fillStyle = "#777"; gCtx.font = "10px sans-serif";
+        gCtx.fillText("Antal Partikler", 5, 15);
+        gCtx.fillText("Tilsat Volumen (mL)", padX + w - 80, padY + h + 15);
+
+        if (graphData.length < 1) return;
+
+        let maxV = Math.max(2.5, currentVol_mL); // X-akse max
+        let maxY = CL_COUNT; // Y-akse max er altid start antal Cl
+
+        // Tegnefunktion til linjer (inkl. en synlig startprik ved x=0)
+        const drawLine = (key, color) => {
+            gCtx.strokeStyle = color;
+            gCtx.fillStyle = color;
+            gCtx.lineWidth = 2;
+
+            if (graphData.length > 1) {
+                gCtx.beginPath();
+                for(let i=0; i<graphData.length; i++) {
+                    let d = graphData[i];
+                    let px = padX + (d.v / maxV) * w;
+                    let py = padY + h - (d[key] / maxY) * h;
+                    if(i===0) gCtx.moveTo(px, py);
+                    else gCtx.lineTo(px, py);
+                }
+                gCtx.stroke();
+            }
+
+            let d0 = graphData[0];
+            let px0 = padX + (d0.v / maxV) * w;
+            let py0 = padY + h - (Math.min(d0[key], maxY) / maxY) * h;
+            gCtx.beginPath();
+            gCtx.arc(px0, py0, 3, 0, Math.PI * 2);
+            gCtx.fill();
+        };
+
+        drawLine('cl', '#2ecc71'); // Grøn linje for fri Cl-
+        drawLine('agcl', '#34495e'); // Mørkeblå linje for fældet AgCl (adskilt fra Ag+'s grå i mikroskop-legenden)
+        drawLine('ag2cro4', '#c0392b'); // Rød linje for Ag2CrO4
+    }
+
+    // --- BEREGNER LOGIK & PEDAGOGISK FEEDBACK ---
+    function unlockStep(id) { 
+        const el = document.getElementById(id); 
+        el.style.opacity = "1"; 
+        el.style.pointerEvents = "auto"; 
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    
+    function feedback(id, isCorrect, msg) { 
+        const el = document.getElementById(id); 
+        el.innerText = msg; 
+        el.className = "feedback-msg " + (isCorrect ? "correct" : "incorrect"); 
+    }
+
+    function checkStep1() {
+        let inputVal = parseDa(document.getElementById('input-vol-l').value);
+        if(isNaN(inputVal)) return;
+        let expected = currentVol_mL / 1000;
+
+        if(Math.abs(inputVal - expected) <= (expected * 0.05) || Math.abs(inputVal - expected) < 0.000001) {
+            feedback('fb-step1', true, `Korrekt! ${toDa(currentVol_mL, 2)} mL = ${toDa(expected, 5)} L.`);
+            unlockStep('step2');
+        } else {
+            feedback('fb-step1', false, `Fejl. Del med 1000: ${toDa(currentVol_mL, 2)} mL / 1000 mL/L`);
+        }
+    }
+
+    function checkStep2() {
+        let inputVal = parseDa(document.getElementById('input-n-ag').value);
+        if(isNaN(inputVal)) return;
+        let expected = M_AgNO3 * (currentVol_mL / 1000);
+
+        if(Math.abs(inputVal - expected) <= (expected * 0.05) || Math.abs(inputVal - expected) < 0.00001) {
+            feedback('fb-step2', true, "Korrekt! Du har brugt n = c · V rigtigt.");
+            unlockStep('step3');
+        } else {
+            feedback('fb-step2', false, `Fejl. Prøv: ${toDa(currentVol_mL / 1000, 5)} L · ${toDa(M_AgNO3, 3)} M`);
+        }
+    }
+
+    function checkStep3() {
+        let inputVal = parseDa(document.getElementById('input-n-nacl').value);
+        let n_Ag = parseDa(document.getElementById('input-n-ag').value);
+        if(Math.abs(inputVal - n_Ag) < 0.000001) {
+            feedback('fb-step3', true, "Korrekt! Reaktionsforholdet er nemlig 1:1.");
+            unlockStep('step4');
+        } else {
+            feedback('fb-step3', false, "Husk at én Ag⁺ reagerer med præcis én Cl⁻ (1:1).");
+        }
+    }
+
+    function checkStep4() {
+        let inputVal = parseDa(document.getElementById('input-m-nacl').value);
+        let n_NaCl = parseDa(document.getElementById('input-n-nacl').value);
+        let expected = n_NaCl * MolarMass_NaCl;
+        if(Math.abs(inputVal - expected) <= (expected * 0.05)) {
+            feedback('fb-step4', true, "Perfekt! Massen er beregnet korrekt (m = n · M).");
+            unlockStep('step5');
+        } else {
+            feedback('fb-step4', false, `Fejl. Du skal gange din stofmængde med molarmassen (${toDa(MolarMass_NaCl)} g/mol).`);
+        }
+    }
+
+    function checkStep5() {
+        let inputVal = parseDa(document.getElementById('input-pct').value);
+        let m_NaCl = parseDa(document.getElementById('input-m-nacl').value);
+        let expected = (m_NaCl / m_sample_g) * 100;
+
+        if(Math.abs(inputVal - expected) < 0.5) {
+            feedback('fb-step5', true, `Fremragende arbejde! Havvandsprøven indeholder ${toDa(expected, 2)}% salt.`);
+            triggerConfetti();
+            document.getElementById('lab-overlay').style.display = 'none';
+        } else {
+            feedback('fb-step5', false, `Næsten. Brug: (masse_salt / ${toDa(m_sample_g, 2)} g) · 100`);
+        }
+    }
+
+    // --- FYSIKBASERET CONFETTI FEJRING ---
+    function triggerConfetti() {
+        const cCanvas = document.getElementById('confettiCanvas');
+        const cCtx = cCanvas.getContext('2d');
+        cCanvas.width = window.innerWidth;
+        cCanvas.height = window.innerHeight;
+        
+        let confetti = [];
+        const colors = ['#2ecc71', '#3498db', '#f1c40f', '#e74c3c', '#9b59b6'];
+        
+        for(let i=0; i<150; i++) {
+            confetti.push({
+                x: cCanvas.width / 2,
+                y: cCanvas.height / 2 + 100,
+                vx: (Math.random() - 0.5) * 20,
+                vy: (Math.random() - 1) * 20 - 5,
+                size: Math.random() * 8 + 4,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                tilt: Math.floor(Math.random() * 10) - 10,
+                tiltAngle: 0,
+                tiltAngleInc: (Math.random() * 0.07) + 0.05
+            });
+        }
+
+        function renderConfetti() {
+            cCtx.clearRect(0, 0, cCanvas.width, cCanvas.height);
+            let active = false;
+            
+            for(let i=0; i<confetti.length; i++) {
+                let p = confetti[i];
+                p.tiltAngle += p.tiltAngleInc;
+                p.y += (Math.cos(p.tiltAngle) + 1 + p.size / 2) / 2;
+                p.x += Math.sin(p.tiltAngle) * 2;
+                p.vy += 0.2; // Gravity
+                p.x += p.vx;
+                p.y += p.vy;
+                
+                if (p.y <= cCanvas.height) active = true;
+
+                cCtx.beginPath();
+                cCtx.lineWidth = p.size;
+                cCtx.strokeStyle = p.color;
+                cCtx.moveTo(p.x + p.tilt + p.size, p.y);
+                cCtx.lineTo(p.x + p.tilt, p.y + p.tilt + p.size);
+                cCtx.stroke();
+            }
+            if(active) requestAnimationFrame(renderConfetti);
+        }
+        renderConfetti();
+    }
+
+    // --- OPSTART ---
+    initParticles();
+    microLoop();
+
+</script>
+</body>
+</html>

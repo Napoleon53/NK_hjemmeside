@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Gruppegenerator</title>
+<style>
+  :root{
+    --bg:#f4f6f8;
+    --panel:#ffffff;
+    --border:#d8dee4;
+    --ink:#1f2933;
+    --muted:#5c6a76;
+    --accent:#2563eb;
+    --accent-dark:#1d4ed8;
+    --pair-a:#e0f2fe;
+    --pair-a-border:#38bdf8;
+    --pair-b:#fef3c7;
+    --pair-b-border:#f59e0b;
+    --trio-bg:#dcfce7;
+    --trio-border:#22c55e;
+    --four-border:#7c3aed;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI", Calibri, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding:24px;
+  }
+  h1{font-size:1.5rem; margin:0 0 4px;}
+  .sub{color:var(--muted); margin:2px 0 10px; font-size:.85rem;}
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:18px 20px;
+    margin-bottom:20px;
+  }
+  label{display:block; font-weight:600; margin-bottom:6px;}
+  textarea{
+    width:100%;
+    min-height:220px;
+    font-family:inherit;
+    font-size:.95rem;
+    padding:10px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    resize:vertical;
+  }
+  .row{display:flex; gap:10px; align-items:center; margin-top:12px; flex-wrap:wrap;}
+  button{
+    font-family:inherit;
+    font-size:.95rem;
+    font-weight:600;
+    padding:10px 18px;
+    border-radius:8px;
+    border:1px solid transparent;
+    cursor:pointer;
+  }
+  .btn-primary{background:var(--accent); color:#fff;}
+  .btn-primary:hover{background:var(--accent-dark);}
+  .btn-secondary{background:#fff; color:var(--ink); border-color:var(--border);}
+  .btn-secondary:hover{background:#eef1f4;}
+  .btn-secondary:disabled, .btn-primary:disabled{opacity:.45; cursor:not-allowed;}
+  .count{color:var(--muted); font-size:.9rem;}
+  .error{color:#b91c1c; font-weight:600; margin-top:10px; display:none;}
+  .example-banner{
+    display:inline-block;
+    background:#fef3c7;
+    color:#92400e;
+    border:1px solid #f5d78e;
+    border-radius:6px;
+    padding:6px 12px;
+    font-weight:700;
+    font-size:.9rem;
+    margin-bottom:14px;
+  }
+  .summary{display:flex; gap:22px; flex-wrap:wrap; margin-bottom:14px; font-size:.95rem;}
+  .summary b{color:var(--accent-dark);}
+  .legend{display:flex; gap:16px; flex-wrap:wrap; font-size:.85rem; color:var(--muted); margin-bottom:18px;}
+  .legend span{display:inline-flex; align-items:center; gap:6px;}
+  .swatch{width:14px; height:14px; border-radius:3px; display:inline-block;}
+
+  .tabbar{display:flex; gap:6px; border-bottom:2px solid var(--border); margin-bottom:20px;}
+  .tabbtn{
+    background:none;
+    border:none;
+    padding:10px 16px;
+    font-weight:600;
+    font-size:.95rem;
+    color:var(--muted);
+    cursor:pointer;
+    border-bottom:3px solid transparent;
+    margin-bottom:-2px;
+  }
+  .tabbtn.active{color:var(--accent-dark); border-bottom-color:var(--accent);}
+  .tabpanel{display:none;}
+  .tabpanel.active{display:block;}
+  .tabsub{color:var(--muted); font-size:.85rem; margin:-6px 0 16px;}
+
+  .tables{display:flex; flex-direction:column; gap:22px;}
+  .tables.grid-mode{display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:16px;}
+  .table-block h2{font-size:1.05rem; margin:0 0 10px;}
+  .row-seats{display:flex; flex-wrap:wrap; gap:10px; align-items:flex-start;}
+
+  .unit{display:flex; padding:6px; border-radius:8px;}
+  .unit.pair{border:2px solid var(--pair-a-border); background:var(--pair-a); flex-direction:column;}
+  .unit.three{background:var(--trio-bg); border:2px solid var(--trio-border);}
+  .fourtag{font-size:.75rem; color:var(--four-border); font-weight:700; margin-bottom:2px;}
+  .seat{
+    background:#fff;
+    border:1px solid rgba(0,0,0,.12);
+    border-radius:5px;
+    padding:6px 9px;
+    font-size:.85rem;
+    min-width:90px;
+    text-align:center;
+  }
+  .row-grid{
+    display:grid;
+    grid-template-columns:repeat(10, minmax(0,1fr));
+    gap:6px;
+  }
+  .row-grid .seat{min-width:0; width:100%; box-sizing:border-box;}
+  .row-grid .seat.seat-pair{border-top:4px solid var(--pair-a-border);}
+  .row-grid .seat.seat-three{border-top:4px solid var(--trio-border); background:var(--trio-bg);}
+  .hexblock{
+    border-radius:16px;
+    border:2px solid var(--border);
+    padding:14px;
+    background:#fbfdff;
+  }
+  .hexblock h2{margin-top:0;}
+
+  #resultSection{display:none;}
+
+  .cond-chip{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:.9rem;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:6px 10px;
+  }
+  .cond-chip.avoid{border-left:4px solid #dc2626;}
+  .cond-chip.together{border-left:4px solid #16a34a;}
+  .cond-chip button{
+    margin-left:auto;
+    padding:4px 10px;
+    font-size:.8rem;
+    background:#fff;
+    border:1px solid var(--border);
+  }
+
+  .gender-wrap{
+    margin-top:10px;
+    max-height:240px;
+    max-width:420px;
+    overflow-y:auto;
+    border:1px solid var(--border);
+    border-radius:6px;
+    background:#fff;
+  }
+  .gender-header, .gender-row{
+    display:grid;
+    grid-template-columns:1fr 40px 40px 120px;
+    align-items:center;
+    gap:2px;
+    padding:4px 6px;
+  }
+  .gender-header{
+    position:sticky;
+    top:0;
+    background:#f1f5f9;
+    font-size:.75rem;
+    font-weight:700;
+    color:var(--muted);
+    border-bottom:1px solid var(--border);
+    text-align:center;
+    z-index:1;
+  }
+  .gender-header span:first-child{ text-align:left; }
+  .gender-row{ font-size:.85rem; border-bottom:1px solid #f1f5f9; }
+  .gender-row:last-child{ border-bottom:none; }
+  .gender-row span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .gender-row input[type=checkbox]{ justify-self:center; margin:0; }
+  .gender-header span.cat-col, .gender-row .cat-cell{
+    border-left:1px dashed var(--border);
+    padding-left:8px;
+    margin-left:4px;
+  }
+  .gender-row .cat-cell select{
+    width:100%;
+    font-size:.78rem;
+    padding:3px 4px;
+    border:1px solid var(--border);
+    border-radius:4px;
+    font-family:inherit;
+  }
+  .category-edit-row{ display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .category-edit-row .cat-num{ width:18px; color:var(--muted); font-weight:600; font-size:.85rem; }
+  .category-edit-row input[type=text]{ flex:1; padding:5px 8px; border:1px solid var(--border); border-radius:6px; font-family:inherit; }
+  .category-edit-row button{ padding:4px 10px; font-size:.8rem; }
+
+  @keyframes tourPulse{
+    0%{ box-shadow:0 0 0 4px rgba(251,191,36,.95), 0 0 0 4px rgba(251,191,36,.5), 0 0 0 9999px rgba(15,23,42,.55); }
+    70%{ box-shadow:0 0 0 4px rgba(251,191,36,.95), 0 0 0 16px rgba(251,191,36,0), 0 0 0 9999px rgba(15,23,42,.55); }
+    100%{ box-shadow:0 0 0 4px rgba(251,191,36,.95), 0 0 0 16px rgba(251,191,36,0), 0 0 0 9999px rgba(15,23,42,.55); }
+  }
+  .tour-highlight{
+    position:relative;
+    z-index:10000;
+    border-radius:8px;
+    animation:tourPulse 1.6s ease-out infinite;
+  }
+  .tour-tooltip{
+    position:fixed;
+    z-index:10001;
+    max-width:300px;
+    background:#111827;
+    color:#fff;
+    padding:14px 16px;
+    border-radius:10px;
+    font-size:.9rem;
+    line-height:1.4;
+    box-shadow:0 8px 24px rgba(0,0,0,.35);
+  }
+  .tour-tooltip .tt-actions{display:flex; justify-content:space-between; align-items:center; margin-top:12px; gap:8px;}
+  .tour-tooltip button{
+    padding:6px 12px;
+    font-size:.8rem;
+    border-radius:6px;
+    border:1px solid transparent;
+    cursor:pointer;
+  }
+  .tour-tooltip .tt-skip{background:transparent; color:#cbd5e1; border-color:#374151;}
+  .tour-tooltip .tt-next{background:#fbbf24; color:#111827; font-weight:600;}
+</style>
+</head>
+<body>
+
+<h1>Gruppegenerator</h1>
+<button class="btn-secondary" id="tourBtn" style="margin-bottom:16px;">Præsentér programmet</button>
+
+<div class="panel">
+  <label for="names">Elevnavne (ét navn pr. linje)</label>
+  <p class="sub">Indsæt elevnavne, og brug eventuelt "forkort navne" til at tilpasse navnet.</p>
+  <textarea id="names" placeholder="Anna&#10;Bertram&#10;Cecilie&#10;...">Elev 1
+Elev 2
+Elev 3
+Elev 4
+Elev 5
+Elev 6
+Elev 7
+Elev 8
+Elev 9
+Elev 10
+Elev 11
+Elev 12
+Elev 13
+Elev 14
+Elev 15
+Elev 16
+Elev 17
+Elev 18
+Elev 19
+Elev 20
+Elev 21
+Elev 22
+Elev 23
+Elev 24
+Elev 25
+Elev 26
+Elev 27
+Elev 28</textarea>
+  <div class="row">
+    <button class="btn-secondary" id="importBtn">Sæt betingelser</button>
+    <button class="btn-secondary" id="shortenNamesBtn" type="button">Forkort navne</button>
+  </div>
+
+  <div class="panel" id="advancedPanel" style="display:none; background:#f7f9fb; margin-top:14px;">
+    <label style="margin-bottom:2px;">Avancerede betingelser</label>
+    <p class="tabsub" style="margin:0 0 10px;">Vælg to elever fra den importerede klasse og en betingelse mellem dem.</p>
+    <div class="row">
+      <select id="condStudentA" style="padding:6px 8px; border:1px solid var(--border); border-radius:6px;"></select>
+      <select id="condType" style="padding:6px 8px; border:1px solid var(--border); border-radius:6px;">
+        <option value="avoid">må ikke være i samme gruppe som</option>
+        <option value="together">skal altid være sammen med</option>
+      </select>
+      <select id="condStudentB" style="padding:6px 8px; border:1px solid var(--border); border-radius:6px;"></select>
+      <button class="btn-secondary" id="addCondBtn">Tilføj betingelse</button>
+      <button class="btn-secondary" id="clearCondBtn">Ryd alle betingelser</button>
+    </div>
+    <div id="conditionsList" style="margin-top:10px; display:flex; flex-direction:column; gap:6px;"></div>
+
+    <label style="margin:18px 0 2px; display:block;">Gruppestørrelse</label>
+    <label style="margin:0; font-weight:400; display:flex; align-items:center; gap:6px;">
+      <input type="checkbox" id="avoidTriosCheckbox" style="margin:0;">
+      Undgå 3-mandsgrupper (tving i stedet grupper på mindst 4, fx to femmandsgrupper i stedet for en tremandsgruppe)
+    </label>
+
+    <label style="margin:18px 0 2px; display:block;">Køn og kategori</label>
+    <p class="tabsub" style="margin:0 0 10px;">Sæt køn på eleverne, og vælg om makkerparrene skal have blandet eller ens køn. Du kan desuden sætte en kategori (1-9) pr. elev og vælge om grupperne skal blandes eller holdes samlet på tværs af kategorier.</p>
+    <div class="row">
+      <label style="margin:0; font-weight:600; display:flex; align-items:center; gap:6px;">
+        Makkerpar skal være
+        <select id="genderPreference" style="padding:6px 8px; border:1px solid var(--border); border-radius:6px;">
+          <option value="none">Ingen præference</option>
+          <option value="mixed">Blandet køn</option>
+          <option value="same">Samme køn</option>
+        </select>
+      </label>
+    </div>
+    <div class="row">
+      <label style="margin:0; font-weight:600; display:flex; align-items:center; gap:6px;">
+        Grupper skal have
+        <select id="categoryPreference" style="padding:6px 8px; border:1px solid var(--border); border-radius:6px;">
+          <option value="none">Ingen præference</option>
+          <option value="mixed">Blandet kategori</option>
+          <option value="same">Samme kategori</option>
+        </select>
+      </label>
+      <button class="btn-secondary" id="editCategoriesBtn" type="button">Navngiv kategorier</button>
+    </div>
+    <div id="categoryEditPanel" style="display:none; margin-top:8px; padding:10px; border:1px solid var(--border); border-radius:6px; background:#fff; max-width:420px;"></div>
+    <div class="gender-wrap">
+      <div class="gender-header">
+        <span></span>
+        <span>Dreng</span>
+        <span>Pige</span>
+        <span class="cat-col">Kategori</span>
+      </div>
+      <div id="genderList"></div>
+    </div>
+
+    <label style="margin:18px 0 2px; display:block;">Roller</label>
+    <p class="tabsub" style="margin:0 0 10px;">Giv medlemmerne i hver gruppe faste roller (fx kaptajn, sekretær), vist tydeligt i Word/PDF-udgaven. Rolle 1 tildeles automatisk den første elev i hver gruppe, rolle 2 den næste, og så videre.</p>
+    <div class="row">
+      <label style="margin:0; font-weight:600; display:flex; align-items:center; gap:6px;">
+        <input type="checkbox" id="rolesEnabledCheckbox" style="margin:0;">
+        Brug roller i grupperne
+      </label>
+      <label style="margin:0; font-weight:600; display:flex; align-items:center; gap:6px;">
+        Antal aktive roller
+        <select id="roleCount" style="padding:6px 8px; border:1px solid var(--border); border-radius:6px;">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </label>
+    </div>
+    <div id="roleNamesPanel" style="display:none; margin-top:8px; padding:10px; border:1px solid var(--border); border-radius:6px; background:#fff; max-width:420px;"></div>
+  </div>
+
+  <div class="row" style="margin-top:16px;">
+    <label style="margin:0; font-weight:600; display:flex; align-items:center; gap:6px;">
+      Klassenavn (valgfrit)
+      <input type="text" id="className" placeholder="2y" style="font-weight:400; padding:6px 8px; border:1px solid var(--border); border-radius:6px; width:140px;">
+    </label>
+  </div>
+  <div class="row">
+    <label style="margin:0; font-weight:600; display:flex; align-items:center; gap:6px;">
+      Første uge grupperne gælder fra
+      <input type="number" id="startWeek" min="1" max="53" style="font-weight:400; padding:6px 8px; border:1px solid var(--border); border-radius:6px; width:60px;">
+      <span id="currentWeekHint" style="font-weight:400; color:var(--muted); font-size:.8rem;"></span>
+    </label>
+    <label style="margin:0; font-weight:600; display:flex; align-items:center; gap:6px;">
+      Hvor ofte skal grupperne skiftes (uger)
+      <input type="number" id="rotationWeeks" value="2" min="1" max="52" style="font-weight:400; padding:6px 8px; border:1px solid var(--border); border-radius:6px; width:60px;">
+    </label>
+    <label style="margin:0; font-weight:600; display:flex; align-items:center; gap:6px;">
+      Hvor mange nye bordgrupper skal laves
+      <input type="number" id="groupingCount" value="5" min="1" max="30" style="font-weight:400; padding:6px 8px; border:1px solid var(--border); border-radius:6px; width:60px;">
+    </label>
+  </div>
+  <div class="row">
+    <button class="btn-primary" id="generateBtn">Generér grupper</button>
+    <span class="count" id="countLabel"></span>
+  </div>
+  <div class="row">
+    <button class="btn-secondary" id="exportBtn" disabled title="Generér grupper, før du eksporterer">Eksportér til Word</button>
+    <button class="btn-secondary" id="exportPdfBtn" disabled title="Generér grupper, før du eksporterer">Eksportér til PDF</button>
+  </div>
+
+  <div class="error" id="errorLabel"></div>
+</div>
+
+<div id="resultSection">
+  <div class="example-banner">Eksempel, der viser bordgrupper til første uge - Download word-filen for at se alle uger</div>
+  <div class="summary" id="summaryLine"></div>
+  <div class="legend">
+    <span><span class="swatch" style="background:var(--pair-a-border)"></span>Par</span>
+    <span><span class="swatch" style="background:var(--trio-border)"></span>Trio</span>
+    <span>"Gruppe N" = de par der tilsammen udgør én gruppe (kan sidde ved forskellige borde uden for Firemandsborde-fanen)</span>
+  </div>
+
+  <div class="tabbar">
+    <button class="tabbtn active" data-tab="four">Firemandsborde</button>
+    <button class="tabbtn" data-tab="hex">Sekskantede borde</button>
+    <button class="tabbtn" data-tab="row">Rækkeopstilling</button>
+  </div>
+
+  <div class="tabpanel active" id="tab-four">
+    <p class="tabsub">Hvert bord er én gruppe (par bundtet sammen, evt. med en enkelt trio). Der er altid højst 7 grupper. Under avancerede betingelser kan du slå "Undgå 3-mandsgrupper" til, så alle grupper i stedet bliver på mindst 4 (fx to femmandsgrupper).</p>
+    <div class="tables" id="tables-four"></div>
+  </div>
+  <div class="tabpanel" id="tab-hex">
+    <p class="tabsub">5 sekskantede borde, op til 6 elever pr. bord. Makkerpar og trioer holdes altid samlet.</p>
+    <div class="tables grid-mode" id="tables-hex"></div>
+  </div>
+  <div class="tabpanel" id="tab-row">
+    <p class="tabsub">3 rækker à op til 10 elever, opstillet i et fast gitter så samme sædeplads står lige over hinanden i alle 3 rækker. Makkerpar og trioer holdes altid samlet.</p>
+    <div class="tables" id="tables-row"></div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var CATEGORY_COUNT = 9;
+  var ROLE_COUNT_MAX = 5;
+  var state = {
+    groups:null, layouts:null, roster:[], sortedRoster:[],
+    constraints:{ together:[], avoid:[] }, genders:{},
+    categories:{}, categoryNames:new Array(CATEGORY_COUNT).fill(''), categoryActive:new Array(CATEGORY_COUNT).fill(true),
+    roleNames:new Array(ROLE_COUNT_MAX).fill('')
+  };
+
+  function categoryLabel(n){
+    var custom = (state.categoryNames[n-1] || '').trim();
+    return custom ? custom : String(n);
+  }
+
+  function roleLabel(n){
+    var custom = (state.roleNames[n-1] || '').trim();
+    return custom ? custom : ('Rolle ' + n);
+  }
+
+  // Skiftende farver pr. makkerpar i rækkeopstillingen, så man nemt kan se hvem der er makker med hvem.
+  var PAIR_PALETTE = ['#38bdf8', '#f59e0b', '#7c3aed', '#ec4899', '#14b8a6', '#ef4444'];
+
+  // Sikkerhedsloft: meget lange (fx fulde) navne kan ødelægge de faste bordopstillinger,
+  // så de afkortes automatisk her - uanset om "Forkort navne"-knappen er brugt.
+  var MAX_NAME_LENGTH = 24;
+
+  function capName(s){
+    return s.length > MAX_NAME_LENGTH ? (s.slice(0, MAX_NAME_LENGTH - 1) + '…') : s;
+  }
+
+  function parseNames(text){
+    return text.split('\n').map(function(s){return s.trim();}).filter(function(s){return s.length>0;}).map(capName);
+  }
+
+  // Fælles validering af elevlisten - bruges før både visning, import og eksport.
+  function rosterError(names){
+    if(names.length < 4) return 'Indsæt mindst 4 elevnavne (ét navn pr. linje).';
+    if(names.length > MAX_STUDENTS) return 'Dette program nægter at presse flere end ' + MAX_STUDENTS + ' elever ind i vores klasser. Det er simpelthen ikke forsvarligt i forhold til iltniveauet.';
+    return null;
+  }
+
+  function shortenName(full){
+    var trimmed = full.trim();
+    var tabFields = trimmed.split('\t').map(function(s){ return s.trim(); });
+
+    var nameSource;
+    if(tabFields.length > 1){
+      // Ligner et indsat Lectio-linje med flere kolonner (id-numre, holdinfo osv.)
+      // - fjern felter der indeholder tal, skråstreg eller kolon, og behold resten som navnet.
+      var nameFields = tabFields.filter(function(f){ return f.length > 0 && !/[\d\/:]/.test(f); });
+      nameSource = nameFields.join(' ');
+    } else {
+      nameSource = trimmed;
+    }
+
+    // Lectios pladsholder-navn for en elev uden rigtigt navn endnu er "Elev <årgang>" - ordet
+    // "elev" skal derfor aldrig kunne blive stående som for- eller efternavn, men bare ignoreres.
+    var parts = nameSource.split(/\s+/).filter(function(p){ return p.length > 0 && p.toLowerCase() !== 'elev'; });
+    if(parts.length === 0) return trimmed;
+    if(parts.length === 1) return parts[0];
+
+    var first = parts[0];
+    var last = parts[parts.length - 1];
+    // Et rent tal skal ikke forkortes til første ciffer - de sammenhængende cifre tæller som ét tegn.
+    if(/^\d+$/.test(last)) return first + ' ' + last;
+    return first + ' ' + last.charAt(0).toUpperCase();
+  }
+
+  function shortenNames(){
+    var textarea = document.getElementById('names');
+    var lines = textarea.value.split('\n');
+    textarea.value = lines.map(function(line){
+      var trimmed = line.trim();
+      return trimmed ? shortenName(trimmed) : line;
+    }).join('\n');
+  }
+
+  // ---------- Importér klasse + avancerede betingelser (skal/må ikke være sammen) ----------
+  function importClass(){
+    var names = parseNames(document.getElementById('names').value);
+    var errorLabel = document.getElementById('errorLabel');
+    errorLabel.style.display = 'none';
+    var err = rosterError(names);
+    if(err){
+      errorLabel.textContent = err;
+      errorLabel.style.display = 'block';
+      return;
+    }
+    state.roster = names;
+    state.constraints = { together:[], avoid:[] };
+    state.genders = {};
+    state.categories = {};
+    var sorted = names.slice().sort(function(a,b){ return a.localeCompare(b,'da'); });
+    state.sortedRoster = sorted;
+    ['condStudentA','condStudentB'].forEach(function(id){
+      var sel = document.getElementById(id);
+      sel.innerHTML = '';
+      sorted.forEach(function(nm){
+        var opt = document.createElement('option');
+        opt.value = nm; opt.textContent = nm;
+        sel.appendChild(opt);
+      });
+    });
+    document.getElementById('condStudentB').selectedIndex = Math.min(1, sorted.length-1);
+    document.getElementById('advancedPanel').style.display = 'block';
+    renderConditions();
+    renderGenderList(sorted);
+  }
+
+  function renderGenderList(sortedNames){
+    var container = document.getElementById('genderList');
+    container.innerHTML = '';
+    sortedNames.forEach(function(nm){
+      var row = document.createElement('div');
+      row.className = 'gender-row';
+
+      var span = document.createElement('span');
+      span.textContent = nm;
+      span.title = nm;
+
+      var boyBox = document.createElement('input');
+      boyBox.type = 'checkbox';
+      var girlBox = document.createElement('input');
+      girlBox.type = 'checkbox';
+
+      var current = state.genders[nm] || '';
+      boyBox.checked = current === 'dreng';
+      girlBox.checked = current === 'pige';
+
+      boyBox.addEventListener('change', function(){
+        if(boyBox.checked){ girlBox.checked = false; state.genders[nm] = 'dreng'; }
+        else { state.genders[nm] = ''; }
+      });
+      girlBox.addEventListener('change', function(){
+        if(girlBox.checked){ boyBox.checked = false; state.genders[nm] = 'pige'; }
+        else { state.genders[nm] = ''; }
+      });
+
+      var catCell = document.createElement('div');
+      catCell.className = 'cat-cell';
+      var catSelect = document.createElement('select');
+      var noneOpt = document.createElement('option');
+      noneOpt.value = '';
+      noneOpt.textContent = '–';
+      catSelect.appendChild(noneOpt);
+      for(var c=1; c<=CATEGORY_COUNT; c++){
+        if(!state.categoryActive[c-1]) continue;
+        var opt = document.createElement('option');
+        opt.value = String(c);
+        opt.textContent = categoryLabel(c);
+        catSelect.appendChild(opt);
+      }
+      catSelect.value = state.categories[nm] || '';
+      catSelect.addEventListener('change', function(){ state.categories[nm] = catSelect.value; });
+      catCell.appendChild(catSelect);
+
+      row.appendChild(span);
+      row.appendChild(boyBox);
+      row.appendChild(girlBox);
+      row.appendChild(catCell);
+      container.appendChild(row);
+    });
+  }
+
+  function refreshGenderList(){
+    if(state.sortedRoster && state.sortedRoster.length) renderGenderList(state.sortedRoster);
+  }
+
+  function renderCategoryEditPanel(){
+    var panel = document.getElementById('categoryEditPanel');
+    panel.innerHTML = '';
+    for(var i=0; i<CATEGORY_COUNT; i++){
+      (function(i){
+        var row = document.createElement('div');
+        row.className = 'category-edit-row';
+
+        var num = document.createElement('span');
+        num.className = 'cat-num';
+        num.textContent = (i+1) + '.';
+
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Navn (valgfrit) - fx "' + (i+1) + '"';
+        input.value = state.categoryNames[i];
+        input.disabled = !state.categoryActive[i];
+        input.style.opacity = state.categoryActive[i] ? '1' : '.45';
+        input.addEventListener('input', function(){
+          state.categoryNames[i] = input.value;
+          refreshGenderList();
+        });
+
+        var toggleBtn = document.createElement('button');
+        toggleBtn.type = 'button';
+        toggleBtn.className = 'btn-secondary';
+        toggleBtn.textContent = state.categoryActive[i] ? 'Slet' : 'Gendan';
+        toggleBtn.addEventListener('click', function(){
+          state.categoryActive[i] = !state.categoryActive[i];
+          if(!state.categoryActive[i]){
+            Object.keys(state.categories).forEach(function(nm){
+              if(state.categories[nm] === String(i+1)) state.categories[nm] = '';
+            });
+          }
+          renderCategoryEditPanel();
+          refreshGenderList();
+        });
+
+        row.appendChild(num);
+        row.appendChild(input);
+        row.appendChild(toggleBtn);
+        panel.appendChild(row);
+      })(i);
+    }
+  }
+
+  function getGenderPreference(){
+    return document.getElementById('genderPreference').value;
+  }
+
+  function getCategoryPreference(){
+    return document.getElementById('categoryPreference').value;
+  }
+
+  function getRolesEnabled(){
+    return document.getElementById('rolesEnabledCheckbox').checked;
+  }
+
+  function getRoleCount(){
+    var v = parseInt(document.getElementById('roleCount').value, 10);
+    if(!v || v < 1) return 1;
+    return Math.min(v, ROLE_COUNT_MAX);
+  }
+
+  // Rollerne tildeles altid kontinuert fra 1 (ikke et frit udvalg som kategorier), da rolle N
+  // svarer til den N'te elev i hver gruppe - giver ingen mening at "slette" rolle 2 og beholde 3.
+  function getActiveRoleNames(){
+    if(!getRolesEnabled()) return [];
+    var count = getRoleCount();
+    var names = [];
+    for(var i=1; i<=count; i++) names.push(roleLabel(i));
+    return names;
+  }
+
+  function renderRoleNamesPanel(){
+    var panel = document.getElementById('roleNamesPanel');
+    panel.innerHTML = '';
+    var count = getRoleCount();
+    for(var i=0; i<ROLE_COUNT_MAX; i++){
+      (function(i){
+        var active = i < count;
+        var row = document.createElement('div');
+        row.className = 'category-edit-row';
+
+        var num = document.createElement('span');
+        num.className = 'cat-num';
+        num.textContent = (i+1) + '.';
+
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.maxLength = 15;
+        input.placeholder = 'Navn (valgfrit) - fx "' + (i === 0 ? 'Kaptajn' : 'Rolle ' + (i+1)) + '"';
+        input.value = state.roleNames[i];
+        input.disabled = !active;
+        input.style.opacity = active ? '1' : '.45';
+        input.addEventListener('input', function(){ state.roleNames[i] = input.value; });
+
+        row.appendChild(num);
+        row.appendChild(input);
+        panel.appendChild(row);
+      })(i);
+    }
+  }
+
+  function getAvoidTrios(){
+    return document.getElementById('avoidTriosCheckbox').checked;
+  }
+
+  // Blødt scoretillæg: straffer en makkerkombination der ikke matcher køns-præferencen
+  // (ingen straf hvis kønnet på en af de to ikke er sat, eller hvis der ingen præference er).
+  function genderMismatchScore(anchor, candidate, genders, preference){
+    if(preference === 'none') return 0;
+    var ga = genders[anchor], gb = genders[candidate];
+    if(!ga || !gb) return 0;
+    if(preference === 'mixed') return ga === gb ? 100 : 0;
+    if(preference === 'same') return ga !== gb ? 100 : 0;
+    return 0;
+  }
+
+  // Blødt scoretillæg: straffer en makkerkombination der ikke matcher kategori-præferencen
+  // (ingen straf hvis kategorien på en af de to ikke er sat, eller hvis der ingen præference er).
+  function categoryMismatchScore(anchor, candidate, categories, preference){
+    if(preference === 'none') return 0;
+    var ca = categories[anchor], cb = categories[candidate];
+    if(!ca || !cb) return 0;
+    if(preference === 'mixed') return ca === cb ? 100 : 0;
+    if(preference === 'same') return ca !== cb ? 100 : 0;
+    return 0;
+  }
+
+  // Samme idé som ovenfor, men på gruppe-niveau (bruges når par/trioer bundtes sammen til en
+  // 4-mandsgruppe): tæller hvor mange af enhedens medlemmer der bryder præferencen mod dem der
+  // allerede sidder i gruppen, så bundlePairs kan vælge den bedste kandidat i stedet for at filtrere hårdt.
+  function categoryGroupPenalty(unit, currentMembers, categories, preference){
+    if(preference === 'none' || !currentMembers.length) return 0;
+    var penalty = 0;
+    unit.forEach(function(nm){
+      var cn = categories[nm];
+      if(!cn) return;
+      currentMembers.forEach(function(cm){
+        var cc = categories[cm];
+        if(!cc) return;
+        if(preference === 'mixed' && cn === cc) penalty += 1;
+        if(preference === 'same' && cn !== cc) penalty += 1;
+      });
+    });
+    return penalty;
+  }
+
+  function conditionExists(list, a, b){
+    return list.some(function(p){ return (p[0]===a && p[1]===b) || (p[0]===b && p[1]===a); });
+  }
+
+  function addCondition(){
+    var a = document.getElementById('condStudentA').value;
+    var b = document.getElementById('condStudentB').value;
+    var type = document.getElementById('condType').value;
+    var errorLabel = document.getElementById('errorLabel');
+    errorLabel.style.display = 'none';
+
+    if(!a || !b || a === b){
+      errorLabel.textContent = 'Vælg to forskellige elever.';
+      errorLabel.style.display = 'block';
+      return;
+    }
+    var otherList = type === 'avoid' ? state.constraints.together : state.constraints.avoid;
+    if(conditionExists(otherList, a, b)){
+      errorLabel.textContent = 'Disse to elever har allerede den modsatte betingelse.';
+      errorLabel.style.display = 'block';
+      return;
+    }
+    var list = state.constraints[type];
+    if(conditionExists(list, a, b)) return;
+    list.push([a, b]);
+    renderConditions();
+  }
+
+  function removeCondition(type, index){
+    state.constraints[type].splice(index, 1);
+    renderConditions();
+  }
+
+  function renderConditions(){
+    var container = document.getElementById('conditionsList');
+    container.innerHTML = '';
+    state.constraints.avoid.forEach(function(p, i){
+      var chip = document.createElement('div');
+      chip.className = 'cond-chip avoid';
+      chip.innerHTML = '<span>' + p[0] + ' må <b>ikke</b> være i samme gruppe som ' + p[1] + '</span>';
+      var btn = document.createElement('button');
+      btn.textContent = 'Fjern';
+      btn.addEventListener('click', function(){ removeCondition('avoid', i); });
+      chip.appendChild(btn);
+      container.appendChild(chip);
+    });
+    state.constraints.together.forEach(function(p, i){
+      var chip = document.createElement('div');
+      chip.className = 'cond-chip together';
+      chip.innerHTML = '<span>' + p[0] + ' skal <b>altid</b> være sammen med ' + p[1] + '</span>';
+      var btn = document.createElement('button');
+      btn.textContent = 'Fjern';
+      btn.addEventListener('click', function(){ removeCondition('together', i); });
+      chip.appendChild(btn);
+      container.appendChild(chip);
+    });
+  }
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var tmp=a[i]; a[i]=a[j]; a[j]=tmp;
+    }
+    return a;
+  }
+
+  var MAX_GROUPS = 7;
+  var MAX_HEX_TABLES = 5;
+  var MAX_ROWS = 3;
+  var MAX_STUDENTS = 33;
+  var MAX_GROUP_SIZE = 5;
+
+  // Standard: ulige/lige klassestørrelse danner trioer efter mod4-mønsteret (0,3,2,1 trioer for
+  // n mod 4 = 0,1,2,3) som enlige 3-mandsgrupper - fx giver 27 elever 6 firemandsgrupper +
+  // 1 tremandsgruppe. Bruges når "Undgå 3-mandsgrupper" ikke er markeret, og kun hvis resultatet
+  // holder sig inden for MAX_GROUPS grupper.
+  function planGroupSizesDefault(n){
+    var y = [0, 3, 2, 1][n % 4];
+    var pairs = (n - 3*y) / 2;
+    var sizes = [];
+    for(var i=0; i<pairs/2; i++) sizes.push(4);
+    for(var j=0; j<y; j++) sizes.push(3);
+    return sizes;
+  }
+
+  // Feature "mindst 4 i alle grupper": bruges når "Undgå 3-mandsgrupper" er markeret, eller når
+  // standardreglen ville give flere end MAX_GROUPS grupper. En gruppe er altid 4 eller 5 elever
+  // (2 par / 1 par + 1 trio) - aldrig 6, to femmandsgrupper prioriteres i stedet. Der bruges så
+  // mange grupper som muligt op til loftet (fx tvinger 27 elever 3 femmandsgrupper + 3 firemandsgrupper).
+  function planGroupSizesNoTrio(n){
+    for(var g = Math.min(MAX_GROUPS, Math.floor(n/4)); g >= 1; g--){
+      if(g*4 <= n && n <= g*MAX_GROUP_SIZE){
+        var sizes = [];
+        for(var i=0; i<g; i++) sizes.push(4);
+        var remainder = n - g*4;
+        var idx = 0;
+        while(remainder > 0){
+          sizes[idx % g] += 1;
+          remainder--;
+          idx++;
+        }
+        return sizes;
+      }
+    }
+    return [n]; // sker ikke i praksis - UI'et sikrer 4 <= n <= MAX_STUDENTS
+  }
+
+  function planGroupSizes(n, avoidTrios){
+    if(!avoidTrios){
+      var def = planGroupSizesDefault(n);
+      if(def.length <= MAX_GROUPS) return def;
+    }
+    return planGroupSizesNoTrio(n);
+  }
+
+  function computeSizes(n, avoidTrios){
+    var groupSizes = planGroupSizes(n, avoidTrios);
+    var triples = 0, pairs = 0;
+    groupSizes.forEach(function(size){
+      if(size === 3){ triples += 1; }
+      else if(size === 5){ triples += 1; pairs += 1; }
+      else if(size === 6){ pairs += 3; }
+      else { pairs += 2; }
+    });
+    return { pairs:pairs, triples:triples, groupSizes:groupSizes };
+  }
+
+  // ---------- Betingelser: tving/undgå bestemte elever sammen ----------
+  function historyKey(a,b){ return a < b ? a+' '+b : b+' '+a; }
+
+  function resolveForcedPairs(nameList, togetherList){
+    var nameSet = {};
+    nameList.forEach(function(nm){ nameSet[nm] = true; });
+    var claimed = {};
+    var pairs = [];
+    (togetherList || []).forEach(function(p){
+      var a = p[0], b = p[1];
+      if(!nameSet[a] || !nameSet[b] || a === b) return;
+      if(claimed[a] || claimed[b]) return;
+      claimed[a] = true; claimed[b] = true;
+      pairs.push([a, b]);
+    });
+    return { pairs:pairs, claimed:claimed };
+  }
+
+  function avoidSetFromList(avoidList){
+    var set = {};
+    (avoidList || []).forEach(function(p){ set[historyKey(p[0], p[1])] = true; });
+    return set;
+  }
+
+  function conflicts(avoidSet, a, b){ return !!avoidSet[historyKey(a, b)]; }
+
+  // Danner trioer/par fra den ledige pulje (efter tvungne par er trukket fra), via en
+  // ombyttelig "pickPartner"-funktion så både den almindelige og historik-bevidste
+  // gruppering kan genbruge samme tvungne-par/undgå-logik.
+  // Vælger den elev der har været i færrest trioer indtil nu som "anker" for en ny trio (uafgjort
+  // brydes tilfældigt, da "pool" allerede er shufflet) - så det roterer hvem der ender i en
+  // 3-mandsgruppe på tværs af flere ugers grupperinger, i stedet for at det er tilfældigt (og
+  // dermed ofte de samme elever) hver gang. Bruges kun ved "X grupperinger til Word/PDF".
+  function pickTrioAnchor(pool, trioCounts){
+    if(!trioCounts) return pool.shift();
+    var best = 0;
+    for(var i=1; i<pool.length; i++){
+      if((trioCounts[pool[i]] || 0) < (trioCounts[pool[best]] || 0)) best = i;
+    }
+    var anchor = pool[best];
+    pool.splice(best, 1);
+    return anchor;
+  }
+
+  function buildBaseGroups(nameList, constraints, pickPartner, avoidTrios, trioCounts){
+    constraints = constraints || { together:[], avoid:[] };
+    var forced = resolveForcedPairs(nameList, constraints.together);
+    var remaining = shuffle(nameList.filter(function(nm){ return !forced.claimed[nm]; }));
+    var sizes = computeSizes(nameList.length, avoidTrios);
+    var pairsFromPool = Math.max(0, sizes.pairs - forced.pairs.length);
+
+    var pool = remaining.slice();
+    var triplesGroups = [];
+    for(var i=0; i<sizes.triples; i++){
+      var anchor = pickTrioAnchor(pool, trioCounts);
+      triplesGroups.push([anchor].concat(pickPartner(pool, anchor, 2)));
+    }
+    var randomPairs = [];
+    for(var j=0; j<pairsFromPool; j++){
+      var anchor2 = pool.shift();
+      randomPairs.push([anchor2].concat(pickPartner(pool, anchor2, 1)));
+    }
+
+    return {
+      n: nameList.length,
+      pairsGroups: shuffle(forced.pairs.concat(randomPairs)),
+      triplesGroups: triplesGroups,
+      groupSizes: sizes.groupSizes
+    };
+  }
+
+  // Fordeler de færdige par/trioer i grupper efter den planlagte størrelsesliste (planGroupSizes):
+  // en gruppe på 4 = 2 par, på 5 = 1 par + 1 trio, på 6 = 3 par.
+  // "avoidSet" bruges til at undgå at lægge par/trioer med en undgå-betingelse mellem sig i samme gruppe.
+  function bundlePairs(pairsGroups, triplesGroups, avoidSet, groupSizes, categoryInfo){
+    avoidSet = avoidSet || {};
+    groupSizes = groupSizes || [];
+    categoryInfo = categoryInfo || {};
+    var categories = categoryInfo.categories || {};
+    var categoryPreference = categoryInfo.preference || 'none';
+    var pairPool = shuffle(pairsGroups.slice());
+    var trioPool = shuffle(triplesGroups.slice());
+
+    function pickNext(pool, currentMembers){
+      var shuffled = shuffle(pool);
+      var safe = shuffled.filter(function(unit){
+        return !unit.some(function(nm){
+          return currentMembers.some(function(cm){ return conflicts(avoidSet, nm, cm); });
+        });
+      });
+      var candidates = (safe.length ? safe : shuffled).slice();
+      if(categoryPreference !== 'none'){
+        candidates.sort(function(a,b){
+          return categoryGroupPenalty(a, currentMembers, categories, categoryPreference) -
+                 categoryGroupPenalty(b, currentMembers, categories, categoryPreference);
+        });
+      }
+      var chosen = candidates[0];
+      pool.splice(pool.indexOf(chosen), 1);
+      return chosen;
+    }
+
+    var bundles = groupSizes.map(function(size){
+      var b = { pairs:[], trio:null };
+      var currentMembers = [];
+      if(size === 3 || size === 5){
+        b.trio = pickNext(trioPool, currentMembers);
+        currentMembers = currentMembers.concat(b.trio);
+      }
+      var pairsNeeded = size === 3 ? 0 : (size === 6 ? 3 : (size === 5 ? 1 : 2));
+      for(var k=0; k<pairsNeeded; k++){
+        var p = pickNext(pairPool, currentMembers);
+        b.pairs.push(p);
+        currentMembers = currentMembers.concat(p);
+      }
+      return b;
+    });
+
+    return shuffle(bundles).map(function(b, i){
+      b.label = 'Gruppe ' + (i+1);
+      b.members = b.pairs.reduce(function(acc,p){ return acc.concat(p); }, []).concat(b.trio || []);
+      return b;
+    });
+  }
+
+  function fourLabelMap(pairsGroups, bundles){
+    var map = {};
+    pairsGroups.forEach(function(p, idx){
+      var b = bundles.filter(function(bb){ return bb.pairs.indexOf(p) !== -1; })[0];
+      if(b) map[idx] = b.label;
+    });
+    return map;
+  }
+
+  // ---------- Grunddata: par, trioer, grupper (mindst 4 elever pr. gruppe) ----------
+  function buildGroups(nameList, constraints, genderInfo, avoidTrios){
+    var avoidSet = avoidSetFromList((constraints || {}).avoid);
+    var genders = (genderInfo || {}).genders || {};
+    var preference = (genderInfo || {}).preference || 'none';
+    var categories = (genderInfo || {}).categories || {};
+    var categoryPreference = (genderInfo || {}).categoryPreference || 'none';
+    var base = buildBaseGroups(nameList, constraints, function(pool, anchor, count){
+      var rest = shuffle(pool);
+      rest.sort(function(a,b){
+        var sa = (conflicts(avoidSet, anchor, a) ? 1000 : 0) + genderMismatchScore(anchor, a, genders, preference) + categoryMismatchScore(anchor, a, categories, categoryPreference);
+        var sb = (conflicts(avoidSet, anchor, b) ? 1000 : 0) + genderMismatchScore(anchor, b, genders, preference) + categoryMismatchScore(anchor, b, categories, categoryPreference);
+        return sa - sb;
+      });
+      var chosen = rest.slice(0, count);
+      chosen.forEach(function(nm){ pool.splice(pool.indexOf(nm), 1); });
+      return chosen;
+    }, avoidTrios);
+
+    var bundles = bundlePairs(base.pairsGroups, base.triplesGroups, avoidSet, base.groupSizes, { categories: categories, preference: categoryPreference });
+
+    return {
+      n: base.n,
+      pairsCount: base.pairsGroups.length,
+      triplesCount: base.triplesGroups.length,
+      pairsGroups: base.pairsGroups,
+      triplesGroups: base.triplesGroups,
+      bundles: bundles,
+      fourLabelByPairIdx: fourLabelMap(base.pairsGroups, bundles)
+    };
+  }
+
+  function pairUnit(p, groups, pairIdx){
+    return { type:'pair', size:2, data:p, fourLabel: groups.fourLabelByPairIdx[pairIdx] || null };
+  }
+
+  // ---------- Historik-bevidst gruppering (bruges kun til "X grupperinger til Word/PDF") ----------
+  function historyCount(history, a, b){ return history[historyKey(a,b)] || 0; }
+  function bumpHistoryGroup(history, members){
+    for(var i=0;i<members.length;i++){
+      for(var j=i+1;j<members.length;j++){
+        var k = historyKey(members[i], members[j]);
+        history[k] = (history[k] || 0) + 1;
+      }
+    }
+  }
+
+  // Tæller hvor mange gange hver elev har været i en 3-mandsgruppe på tværs af rundernes - bruges
+  // af pickTrioAnchor og trio-vægten nedenfor til at rotere hvem der bliver trio-medlem.
+  function bumpTrioCounts(trioCounts, triplesGroups){
+    (triplesGroups || []).forEach(function(t){
+      t.forEach(function(nm){ trioCounts[nm] = (trioCounts[nm] || 0) + 1; });
+    });
+  }
+
+  function buildGroupsHistoryAware(nameList, history, constraints, genderInfo, avoidTrios, trioCounts){
+    var avoidSet = avoidSetFromList((constraints || {}).avoid);
+    var genders = (genderInfo || {}).genders || {};
+    var preference = (genderInfo || {}).preference || 'none';
+    var categories = (genderInfo || {}).categories || {};
+    var categoryPreference = (genderInfo || {}).categoryPreference || 'none';
+    var base = buildBaseGroups(nameList, constraints, function(pool, anchor, count){
+      var rest = shuffle(pool);
+      rest.sort(function(a,b){
+        var ca = (conflicts(avoidSet, anchor, a) ? 1000 : 0) + genderMismatchScore(anchor, a, genders, preference) + categoryMismatchScore(anchor, a, categories, categoryPreference) + historyCount(history, anchor, a);
+        var cb = (conflicts(avoidSet, anchor, b) ? 1000 : 0) + genderMismatchScore(anchor, b, genders, preference) + categoryMismatchScore(anchor, b, categories, categoryPreference) + historyCount(history, anchor, b);
+        if(count === 2 && trioCounts){
+          ca += (trioCounts[a] || 0) * 30;
+          cb += (trioCounts[b] || 0) * 30;
+        }
+        return ca - cb;
+      });
+      var chosen = rest.slice(0, count);
+      chosen.forEach(function(nm){ pool.splice(pool.indexOf(nm), 1); });
+      return chosen;
+    }, avoidTrios, trioCounts);
+
+    base.pairsGroups.forEach(function(p){ bumpHistoryGroup(history, p); });
+    base.triplesGroups.forEach(function(t){ bumpHistoryGroup(history, t); });
+    if(trioCounts) bumpTrioCounts(trioCounts, base.triplesGroups);
+
+    var bundles = bundlePairs(base.pairsGroups, base.triplesGroups, avoidSet, base.groupSizes, { categories: categories, preference: categoryPreference });
+    bundles.forEach(function(b){ bumpHistoryGroup(history, b.members); });
+
+    return {
+      n: base.n,
+      pairsCount: base.pairsGroups.length,
+      triplesCount: base.triplesGroups.length,
+      pairsGroups: base.pairsGroups,
+      triplesGroups: base.triplesGroups,
+      bundles: bundles,
+      fourLabelByPairIdx: fourLabelMap(base.pairsGroups, bundles)
+    };
+  }
+
+  // ---------- Layout 1: Firemandsborde (én gruppe pr. bord, altid mindst 4 elever) ----------
+  function buildFourTableLayout(groups){
+    var tables = groups.bundles.map(function(b){
+      var units = [];
+      b.pairs.forEach(function(p){ units.push({ type:'pair', size:2, data:p, fourLabel:null }); });
+      if(b.trio) units.push({ type:'three', size:3, data:b.trio });
+      var size = b.pairs.length*2 + (b.trio ? 3 : 0);
+      return { units:units, size:size };
+    });
+    return shuffle(tables);
+  }
+
+  // ---------- Layout 2 & 3: balanceret pakning i faste borde/rækker ----------
+  function packBalanced(groups, numTables, capacity){
+    var tables = [];
+    for(var t=0;t<numTables;t++) tables.push({ units:[], size:0 });
+
+    function place(unit, size){
+      var fitting = tables.filter(function(tb){ return tb.size+size<=capacity; });
+      var pool = fitting.length ? fitting : tables;
+      var minSize = Math.min.apply(null, pool.map(function(tb){return tb.size;}));
+      var candidates = pool.filter(function(tb){ return tb.size===minSize; });
+      var chosen = candidates[Math.floor(Math.random()*candidates.length)];
+      chosen.units.push(unit);
+      chosen.size += size;
+      return chosen;
+    }
+
+    // trioer parres to og to til samme bord først, så en enkelt trio ikke låser et bord under kapacitet
+    var threeUnits = shuffle(groups.triplesGroups.map(function(t){ return { type:'three', size:3, data:t }; }));
+    var i=0;
+    for(; i+1<threeUnits.length; i+=2){
+      var fitting = tables.filter(function(tb){ return tb.size+6<=capacity; });
+      var pool = fitting.length ? fitting : tables;
+      var minSize = Math.min.apply(null, pool.map(function(tb){return tb.size;}));
+      var candidates = pool.filter(function(tb){ return tb.size===minSize; });
+      var chosen = candidates[Math.floor(Math.random()*candidates.length)];
+      chosen.units.push(threeUnits[i]); chosen.units.push(threeUnits[i+1]);
+      chosen.size += 6;
+    }
+    if(threeUnits.length % 2 === 1){
+      place(threeUnits[threeUnits.length-1], 3);
+    }
+
+    var pairUnits = shuffle(groups.pairsGroups.map(function(p, idx){ return pairUnit(p, groups, idx); }));
+    pairUnits.forEach(function(u){ place(u, 2); });
+
+    return tables;
+  }
+
+  // ---------- Rendering ----------
+  function renderSeat(name){
+    var d = document.createElement('div');
+    d.className = 'seat';
+    d.textContent = name;
+    return d;
+  }
+
+  function renderUnit(unit){
+    var wrap = document.createElement('div');
+    if(unit.type === 'three'){
+      wrap.className = 'unit three';
+      unit.data.forEach(function(nm){ wrap.appendChild(renderSeat(nm)); });
+    } else {
+      wrap.className = 'unit pair';
+      if(unit.fourLabel){
+        var tag = document.createElement('div');
+        tag.className = 'fourtag';
+        tag.textContent = unit.fourLabel;
+        wrap.appendChild(tag);
+      }
+      var seatsRow = document.createElement('div');
+      seatsRow.style.display = 'flex';
+      seatsRow.style.gap = '4px';
+      unit.data.forEach(function(nm){ seatsRow.appendChild(renderSeat(nm)); });
+      wrap.appendChild(seatsRow);
+    }
+    return wrap;
+  }
+
+  function renderTablesInto(containerId, tables, labelFn, hexStyle, showCount){
+    var container = document.getElementById(containerId);
+    container.innerHTML = '';
+    tables.forEach(function(table, ti){
+      var block = document.createElement('div');
+      block.className = hexStyle ? 'table-block hexblock' : 'table-block';
+      var h = document.createElement('h2');
+      h.textContent = labelFn(ti) + (showCount ? ' (' + table.size + ' elever)' : '');
+      block.appendChild(h);
+      var rowSeats = document.createElement('div');
+      rowSeats.className = 'row-seats';
+      table.units.forEach(function(unit){ rowSeats.appendChild(renderUnit(unit)); });
+      block.appendChild(rowSeats);
+      container.appendChild(block);
+    });
+  }
+
+  function rowLabel(ti){
+    var names = ['Bagrække', 'Midterrække', 'Forrække'];
+    return names[ti] || ('Ekstra række ' + (ti-2));
+  }
+
+  // Rækkeopstilling: alle elever ligger i et fast 10-kolonners gitter, så samme sædeplads
+  // står lige over hinanden i alle 3 rækker, uanset navnelængde.
+  function renderRowGrid(containerId, tables){
+    var container = document.getElementById(containerId);
+    container.innerHTML = '';
+    tables.forEach(function(table, ti){
+      var block = document.createElement('div');
+      block.className = 'table-block';
+      var h = document.createElement('h2');
+      h.textContent = rowLabel(ti) + ' (' + table.size + ' elever)';
+      block.appendChild(h);
+      var grid = document.createElement('div');
+      grid.className = 'row-grid';
+      var pairColorIdx = 0;
+      table.units.forEach(function(unit){
+        if(unit.type === 'three'){
+          unit.data.forEach(function(nm){
+            var seat = renderSeat(nm);
+            seat.classList.add('seat-three');
+            grid.appendChild(seat);
+          });
+        } else {
+          var color = PAIR_PALETTE[pairColorIdx % PAIR_PALETTE.length];
+          pairColorIdx++;
+          unit.data.forEach(function(nm){
+            var seat = renderSeat(nm);
+            seat.classList.add('seat-pair');
+            seat.style.borderTopColor = color;
+            grid.appendChild(seat);
+          });
+        }
+      });
+      block.appendChild(grid);
+      container.appendChild(block);
+    });
+  }
+
+  function renderAll(groups, layouts){
+    renderTablesInto('tables-four', layouts.four, function(ti){ return 'Bord ' + (ti+1); }, false, true);
+    renderTablesInto('tables-hex', layouts.hex, function(ti){ return 'Bord ' + (ti+1); }, true, false);
+    renderRowGrid('tables-row', layouts.row);
+
+    var summary = document.getElementById('summaryLine');
+    summary.innerHTML =
+      '<span><b>' + groups.n + '</b> elever</span>' +
+      '<span><b>' + groups.bundles.length + '</b> grupper</span>' +
+      (groups.triplesCount ? '<span>heraf 1 trio</span>' : '');
+
+    document.getElementById('resultSection').style.display = 'block';
+  }
+
+  function generate(){
+    var text = document.getElementById('names').value;
+    var names = parseNames(text);
+    var errorLabel = document.getElementById('errorLabel');
+    errorLabel.style.display = 'none';
+
+    var err = rosterError(names);
+    if(err){
+      errorLabel.textContent = err;
+      errorLabel.style.display = 'block';
+      document.getElementById('resultSection').style.display = 'none';
+      document.getElementById('exportBtn').disabled = true;
+      document.getElementById('exportBtn').title = 'Generér grupper, før du eksporterer';
+      document.getElementById('exportPdfBtn').disabled = true;
+      document.getElementById('exportPdfBtn').title = 'Generér grupper, før du eksporterer';
+      return;
+    }
+
+    var groups = buildGroups(names, state.constraints, { genders: state.genders, preference: getGenderPreference(), categories: state.categories, categoryPreference: getCategoryPreference() }, getAvoidTrios());
+    var layouts = {
+      four: buildFourTableLayout(groups),
+      hex: packBalanced(groups, MAX_HEX_TABLES, 6),
+      row: packBalanced(groups, MAX_ROWS, 10)
+    };
+    state.groups = groups;
+    state.layouts = layouts;
+
+    renderAll(groups, layouts);
+    document.getElementById('exportBtn').disabled = false;
+    document.getElementById('exportBtn').removeAttribute('title');
+    document.getElementById('exportPdfBtn').disabled = false;
+    document.getElementById('exportPdfBtn').removeAttribute('title');
+    document.getElementById('countLabel').textContent = names.length + ' elever indsat';
+  }
+
+  // ---------- Faner ----------
+  document.querySelectorAll('.tabbtn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.tabbtn').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.tabpanel').forEach(function(p){ p.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ---------- Word-eksport: 5 forskellige grupperinger i forlængelse af hinanden ----------
+  function unitToWordDiv(unit, plain){
+    if(unit.type === 'three'){
+      var tag3 = plain ? '' : '<span class="tag">Trio</span>';
+      return '<div class="grp three">' + tag3 + unit.data.join(', ') + '</div>';
+    }
+    var tag = plain ? '' : '<span class="tag">Par</span>';
+    return '<div class="grp">' + tag + unit.data.join(', ') + '</div>';
+  }
+
+  // Fylder sidste (ujævne) række op med tomme, usynlige celler op til "cols" celler i alt.
+  // Word's HTML->docx-konverter er upålidelig med tabelrækker der har færre celler end de
+  // foregående rækker - uden denne padding kan en ujævn sidste række (fx 1 kort ud af 6 kolonner)
+  // risikere slet ikke at blive vist i den eksporterede Word-fil, selvom browseren/PDF'en viser den fint.
+  function padRaggedRow(html, itemCount, cols, widthPct){
+    var remainder = itemCount % cols;
+    if(remainder === 0) return html;
+    var filler = '';
+    for(var f=0; f<cols-remainder; f++){ filler += '<td style="width:' + widthPct + '%; border:none;"></td>'; }
+    return html + filler;
+  }
+
+  function sectionHtml(title, tables, labelFn, maxCols, showCount, plain){
+    var cols = Math.max(1, Math.min(tables.length, maxCols));
+    var widthPct = (100/cols).toFixed(2);
+    var html = '<div class="section"><div class="sectitle">' + title + '</div>';
+    html += '<table class="layout"><tr>';
+    tables.forEach(function(table, ti){
+      var headerText = labelFn(ti) + (showCount ? ' (' + table.size + ')' : '');
+      html += '<td style="width:' + widthPct + '%;"><h2>' + headerText + '</h2>';
+      table.units.forEach(function(unit){ html += unitToWordDiv(unit, plain); });
+      html += '</td>';
+      if((ti+1) % cols === 0 && ti+1 < tables.length){ html += '</tr><tr>'; }
+    });
+    html = padRaggedRow(html, tables.length, cols, widthPct);
+    html += '</tr></table></div>';
+    return html;
+  }
+
+  // Lille tabel pr. gruppe: øverste række = gruppenummer, derunder makkerparrene side om side (1 navn pr. celle pr. par/trio-kolonne)
+  function bundleColumns(b){
+    var palette = ['pa', 'pb', 'pc'];
+    var cols = b.pairs.map(function(p, i){ return { names:p, colorClass: palette[i % palette.length] }; });
+    if(b.trio) cols.push({ names:b.trio, colorClass:'pt' });
+    return cols;
+  }
+
+  // Rolle N tildeles automatisk den N'te elev i gruppens medlemsliste (samme rækkefølge som
+  // b.members) - kun de først "activeRoleNames.length" elever i gruppen får en rolle.
+  function bundleRoleMap(b, activeRoleNames){
+    var map = {};
+    if(!activeRoleNames || !activeRoleNames.length) return map;
+    b.members.slice(0, activeRoleNames.length).forEach(function(nm, i){ map[nm] = activeRoleNames[i]; });
+    return map;
+  }
+
+  function groupCardTable(label, columns, roleMap){
+    var rows = Math.max.apply(null, columns.map(function(c){ return c.names.length; }));
+    var html = '<table class="gcard"><tr><th colspan="' + columns.length + '">' + label + '</th></tr>';
+    for(var r=0; r<rows; r++){
+      html += '<tr>';
+      columns.forEach(function(c){
+        var nm = c.names[r];
+        var cellHtml = '';
+        if(nm !== undefined){
+          var role = roleMap && roleMap[nm];
+          cellHtml = (role ? '<span class="role-tag">' + role + '</span><br>' : '') + nm;
+        }
+        html += '<td class="' + c.colorClass + '">' + cellHtml + '</td>';
+      });
+      html += '</tr>';
+    }
+    html += '</table>';
+    return html;
+  }
+
+  // Rækkeopstilling i Word: fast 10-kolonners tabel, så samme sædeplads står lige over hinanden i alle 3 rækker
+  function rowGridWordTable(tables){
+    var maxCols = 10;
+    var html = '<table class="rowgrid">';
+    tables.forEach(function(table, ti){
+      html += '<tr><th>' + rowLabel(ti) + '</th>';
+      var seats = [];
+      var pairColorIdx = 0;
+      table.units.forEach(function(unit){
+        if(unit.type === 'three'){
+          unit.data.forEach(function(nm){ seats.push({ name:nm, cls:'st', style:'' }); });
+        } else {
+          var color = PAIR_PALETTE[pairColorIdx % PAIR_PALETTE.length];
+          pairColorIdx++;
+          unit.data.forEach(function(nm){ seats.push({ name:nm, cls:'', style:'border-top:3px solid ' + color + ';' }); });
+        }
+      });
+      for(var c=0; c<maxCols; c++){
+        html += seats[c] ? ('<td class="' + seats[c].cls + '" style="' + seats[c].style + '">' + seats[c].name + '</td>') : '<td></td>';
+      }
+      html += '</tr>';
+    });
+    html += '</table>';
+    return html;
+  }
+
+  function cardsGridHtml(cards, maxCols){
+    var cols = Math.max(1, Math.min(cards.length, maxCols));
+    var widthPct = (100/cols).toFixed(2);
+    var html = '<table class="layout"><tr>';
+    cards.forEach(function(card, i){
+      html += '<td style="width:' + widthPct + '%;">' + card + '</td>';
+      if((i+1) % cols === 0 && i+1 < cards.length){ html += '</tr><tr>'; }
+    });
+    html = padRaggedRow(html, cards.length, cols, widthPct);
+    html += '</tr></table>';
+    return html;
+  }
+
+  function buildRound(names, history, constraints, genderInfo, avoidTrios, trioCounts){
+    var groups = buildGroupsHistoryAware(names, history, constraints, genderInfo, avoidTrios, trioCounts);
+    var layouts = {
+      hex: packBalanced(groups, MAX_HEX_TABLES, 6),
+      row: packBalanced(groups, MAX_ROWS, 10)
+    };
+    return { groups:groups, layouts:layouts };
+  }
+
+  // Fælles indhold for én gruppering - genbruges af både Word- og PDF-eksport.
+  function roundBodyHtml(g, l, weeks, className){
+    var title = (className ? ('Bordgrupper til ' + className + ' i ') : 'Bordgrupper i ') + formatWeekList(weeks) + '.';
+    var html = '<h1>' + title + '</h1>';
+    html += '<p class="dato">' + g.n + ' elever, ' + g.bundles.length + ' grupper' + (g.triplesCount ? ' (heraf 1 trio)' : '') + '</p>';
+
+    var activeRoleNames = getActiveRoleNames();
+    var cards = g.bundles.map(function(b){ return groupCardTable(b.label, bundleColumns(b), bundleRoleMap(b, activeRoleNames)); });
+    html += '<div class="section"><div class="sectitle">Grupper</div>' + cardsGridHtml(cards, 4) + '</div>';
+
+    html += sectionHtml('Sekskantede borde', l.hex, function(ti){ return 'Bord ' + (ti+1); }, 5, false, true);
+    html += '<div class="section"><div class="sectitle">Rækkeopstilling</div>' + rowGridWordTable(l.row) + '</div>';
+    return html;
+  }
+
+  function sharedExportStyles(){
+    return '@page{size:A4 landscape; margin:0.8cm;}' +
+      'body{font-family:Calibri, Arial, sans-serif; font-size:8pt; line-height:1.15;}' +
+      'h1{font-size:12pt; margin:0 0 2pt;}' +
+      '.dato{color:#555; margin:0 0 6pt; font-size:7.5pt;}' +
+      '.section{margin-bottom:5pt;}' +
+      '.sectitle{font-size:9pt; font-weight:bold; background:#dfe7f0; padding:2pt 5pt; margin-bottom:3pt;}' +
+      'table.layout{width:100%; border-collapse:collapse; margin-bottom:2pt;}' +
+      'table.layout td{vertical-align:top; padding:2pt 4pt; border:1px solid #ccc;}' +
+      'h2{font-size:7.5pt; margin:0 0 2pt; background:#eef1f4; padding:1pt 3pt;}' +
+      '.grp{margin-bottom:1.5pt; padding:1pt 3pt; border:1px solid #999; border-radius:2px; font-size:6.8pt; line-height:1.1;}' +
+      '.grp.three{background:#eafaf0;}' +
+      '.grp .tag{font-weight:bold; color:#666; margin-right:3pt;}' +
+      'table.gcard{border-collapse:collapse; width:100%;}' +
+      'table.gcard th{font-size:6.8pt; background:#dfe7f0; padding:1.5pt 3pt; border:1px solid #aaa;}' +
+      'table.gcard td{font-size:6.8pt; padding:1.5pt 4pt; border:1px solid #ccc; text-align:center;}' +
+      'table.gcard td.pa{color:#1d63c9; font-weight:bold; background:#eaf3fd;}' +
+      'table.gcard td.pb{color:#c9720f; font-weight:bold; background:#fdf1e3;}' +
+      'table.gcard td.pc{color:#7c3aed; font-weight:bold; background:#f1eafe;}' +
+      'table.gcard td.pt{color:#159957; font-weight:bold; background:#e8f9ef;}' +
+      '.role-tag{display:block; font-size:5.5pt; font-weight:bold; color:#fff; background:#b45309; border-radius:3px; padding:0.5pt 3pt; margin-bottom:1pt; line-height:1.3;}' +
+      'table.rowgrid{width:100%; border-collapse:collapse;}' +
+      'table.rowgrid th{width:8%; font-size:6.8pt; background:#dfe7f0; padding:2pt 3pt; border:1px solid #aaa; text-align:left;}' +
+      'table.rowgrid td{width:9.2%; font-size:6.5pt; padding:2pt 3pt; border:1px solid #ccc; text-align:center;}' +
+      'table.rowgrid td.st{border-top:3px solid #22c55e; background:#eafaf0;}' +
+      '.pagebreak{page-break-before:always;}';
+  }
+
+  // ---------- Klassenavn / antal grupperinger / filnavn ----------
+  function getGroupingCount(){
+    var v = parseInt(document.getElementById('groupingCount').value, 10);
+    if(!v || v < 1) return 5;
+    return Math.min(v, 30);
+  }
+
+  function getISOWeek(date){
+    var d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    var dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  }
+
+  function sanitizeFilenamePart(s){
+    return s.trim().replace(/[\\\/:*?"<>|]/g, '').replace(/\s+/g, ' ');
+  }
+
+  function getClassName(){
+    return sanitizeFilenamePart(document.getElementById('className').value || '');
+  }
+
+  // ---------- Ugeplan: hvornår hver ny bordgruppe gælder ----------
+  var NON_SCHOOL_WEEKS = [25, 26, 27, 28, 29, 30, 31, 32, 42, 52, 53, 7];
+
+  function nextSchoolWeek(w){
+    var next = w >= 53 ? 1 : w + 1;
+    while(NON_SCHOOL_WEEKS.indexOf(next) !== -1){
+      next = next >= 53 ? 1 : next + 1;
+    }
+    return next;
+  }
+
+  // Default: altid NÆSTE skoleuge efter i dag (springer sommerferie/andre skoleferie-uger over).
+  function defaultStartWeek(){
+    return nextSchoolWeek(getISOWeek(new Date()));
+  }
+
+  function formatWeekList(weeks){
+    if(weeks.length === 1) return 'uge ' + weeks[0];
+    if(weeks.length === 2) return 'uge ' + weeks[0] + ' og uge ' + weeks[1];
+    var head = weeks.slice(0, -1).map(function(w){ return 'uge ' + w; }).join(', ');
+    return head + ' og uge ' + weeks[weeks.length - 1];
+  }
+
+  function getStartWeek(){
+    var v = parseInt(document.getElementById('startWeek').value, 10);
+    if(!v || v < 1 || v > 53) return defaultStartWeek();
+    return v;
+  }
+
+  function getRotationWeeks(){
+    var v = parseInt(document.getElementById('rotationWeeks').value, 10);
+    if(!v || v < 1) return 2;
+    return v;
+  }
+
+  // Bygger ét array af ugelister - ét pr. bordgruppe - der hver dækker "interval" skoleuger
+  // i træk, startende fra "startWeek", med skoleferie-uger sprunget over.
+  function buildWeekPlan(startWeek, interval, count){
+    var plans = [];
+    var cursor = startWeek;
+    for(var i=0; i<count; i++){
+      var weeks = [];
+      var w = cursor;
+      for(var k=0; k<interval; k++){
+        weeks.push(w);
+        w = nextSchoolWeek(w);
+      }
+      plans.push(weeks);
+      cursor = w;
+    }
+    return plans;
+  }
+
+  function buildFilenameBase(){
+    var className = getClassName();
+    var startWeek = getStartWeek();
+    var plan = buildWeekPlan(startWeek, getRotationWeeks(), getGroupingCount());
+    var lastGroup = plan[plan.length - 1];
+    var lastWeek = lastGroup[lastGroup.length - 1];
+    var parts = [];
+    if(className) parts.push(className);
+    parts.push('Bordgrupper');
+    parts.push('uge');
+    parts.push('' + startWeek);
+    parts.push('til');
+    parts.push('' + lastWeek);
+    return parts.join('_');
+  }
+
+  function buildRounds(){
+    var names = parseNames(document.getElementById('names').value);
+    if(rosterError(names)) return null;
+    var count = getGroupingCount();
+    var weekPlan = buildWeekPlan(getStartWeek(), getRotationWeeks(), count);
+    var history = {};
+    var trioCounts = {};
+    var genderInfo = { genders: state.genders, preference: getGenderPreference(), categories: state.categories, categoryPreference: getCategoryPreference() };
+    var avoidTrios = getAvoidTrios();
+    var rounds = [];
+    for(var r=0; r<count; r++){
+      var round = buildRound(names, history, state.constraints, genderInfo, avoidTrios, trioCounts);
+      round.weeks = weekPlan[r];
+      rounds.push(round);
+    }
+    return rounds;
+  }
+
+  function showExportError(msg){
+    var errorLabel = document.getElementById('errorLabel');
+    errorLabel.textContent = msg;
+    errorLabel.style.display = 'block';
+  }
+
+  function exportWord(){
+    var rounds = buildRounds();
+    if(!rounds){ showExportError(rosterError(parseNames(document.getElementById('names').value)) || 'Indsæt mindst 4 elevnavne (ét navn pr. linje) før eksport.'); return; }
+
+    var html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">';
+    html += '<head><meta charset="utf-8"><title>Gruppeoversigt</title>';
+    html += '<style>' + sharedExportStyles() + '</style></head><body>';
+
+    var className = getClassName();
+    rounds.forEach(function(round, idx){
+      var g = round.groups, l = round.layouts;
+      // Word ignorerer ofte page-break-before på en almindelig <div> - dette br-tricket
+      // er den robuste metode MSO's egen HTML-eksport selv bruger til at tvinge sideskift.
+      html += idx>0 ? '<br clear=all style="mso-special-character:line-break;page-break-before:always">' : '';
+      html += '<div>' + roundBodyHtml(g, l, round.weeks, className) + '</div>';
+    });
+
+    html += '</body></html>';
+
+    var blob = new Blob(['﻿', html], { type: 'application/msword' });
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = buildFilenameBase() + '.doc';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function exportPDF(){
+    var rounds = buildRounds();
+    if(!rounds){ showExportError(rosterError(parseNames(document.getElementById('names').value)) || 'Indsæt mindst 4 elevnavne (ét navn pr. linje) før eksport.'); return; }
+
+    var win = window.open('', '_blank');
+    if(!win){ showExportError('Pop-up blev blokeret - tillad pop-ups for denne side for at eksportere PDF.'); return; }
+
+    var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + buildFilenameBase() + '</title>';
+    html += '<style>' + sharedExportStyles() + '</style></head><body>';
+    var className = getClassName();
+    rounds.forEach(function(round, idx){
+      var g = round.groups, l = round.layouts;
+      html += '<div' + (idx>0 ? ' class="pagebreak"' : '') + '>' + roundBodyHtml(g, l, round.weeks, className) + '</div>';
+    });
+    html += '</body></html>';
+
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    // Vent til layoutet er sat, før udskriftsdialogen (Gem som PDF) åbnes.
+    setTimeout(function(){ win.print(); }, 300);
+  }
+
+  document.getElementById('startWeek').value = defaultStartWeek();
+  document.getElementById('currentWeekHint').textContent = '(vi er i uge ' + getISOWeek(new Date()) + ' nu)';
+
+  // ---------- Præsentér programmet: kort guidet rundtur med gule ringe ----------
+  var tourSteps = [
+    { sel:'#names', text:'Indsæt elevernes navne her, ét pr. linje. Feltet er forudfyldt så du hurtigt kan se, hvordan det virker.' },
+    { sel:'#shortenNamesBtn', text:'Forkort navne til fornavn + efternavns-forbogstav. Virker også hvis du indsætter en elevliste direkte fra Lectio - den fjerner selv id-numre og holdinformation automatisk.' },
+    { sel:'#importBtn', text:'Importér klassen for at sætte avancerede betingelser - fx at to elever aldrig skal være i samme gruppe eller altid skal være sammen. Du kan også sætte køn på eleverne og vælge blandet eller ens køn i makkerparrene.' },
+    { sel:'#groupingCount', text:'Vælg hvor mange nye bordgrupper du vil have, fra hvilken uge de gælder, og hvor tit de skal skiftes. Skoleferie-uger springes automatisk over.' },
+    { sel:'#generateBtn', text:'Klik her for at danne makkerpar, bordgrupper og grupper til lokaler med rækker og 6-mandsborde. Resultatet vises nedenfor i tre faner: Firemandsborde, Sekskantede borde og Rækkeopstilling.' },
+    { sel:'#exportBtn', text:'Til sidst kan du eksportere alle bordgrupperne til Word eller PDF, klar til udskrift.' }
+  ];
+
+  function clearTourHighlight(){
+    document.querySelectorAll('.tour-highlight').forEach(function(el){ el.classList.remove('tour-highlight'); });
+    var tt = document.getElementById('tourTooltip');
+    if(tt) tt.remove();
+  }
+
+  function showTourStep(i){
+    clearTourHighlight();
+    if(i >= tourSteps.length) return;
+    var step = tourSteps[i];
+    var el = document.querySelector(step.sel);
+    if(!el || el.offsetParent === null){ showTourStep(i+1); return; }
+
+    el.classList.add('tour-highlight');
+    el.scrollIntoView({ behavior:'smooth', block:'center' });
+
+    var tooltip = document.createElement('div');
+    tooltip.id = 'tourTooltip';
+    tooltip.className = 'tour-tooltip';
+    tooltip.innerHTML = '<div>' + step.text + '</div>' +
+      '<div class="tt-actions">' +
+        '<button type="button" class="tt-skip">Luk</button>' +
+        '<button type="button" class="tt-next">' + (i === tourSteps.length-1 ? 'Afslut' : 'Næste') + '</button>' +
+      '</div>';
+    document.body.appendChild(tooltip);
+
+    setTimeout(function(){
+      var rect = el.getBoundingClientRect();
+      var top = rect.bottom + 14;
+      if(top + tooltip.offsetHeight > window.innerHeight - 10){ top = Math.max(10, rect.top - tooltip.offsetHeight - 14); }
+      var left = Math.min(Math.max(10, rect.left), window.innerWidth - tooltip.offsetWidth - 10);
+      tooltip.style.top = top + 'px';
+      tooltip.style.left = left + 'px';
+    }, 300);
+
+    tooltip.querySelector('.tt-next').addEventListener('click', function(){ showTourStep(i+1); });
+    tooltip.querySelector('.tt-skip').addEventListener('click', clearTourHighlight);
+  }
+
+  document.getElementById('tourBtn').addEventListener('click', function(){ showTourStep(0); });
+
+  document.getElementById('generateBtn').addEventListener('click', generate);
+  document.getElementById('exportBtn').addEventListener('click', exportWord);
+  document.getElementById('exportPdfBtn').addEventListener('click', exportPDF);
+  document.getElementById('importBtn').addEventListener('click', importClass);
+  document.getElementById('shortenNamesBtn').addEventListener('click', shortenNames);
+  document.getElementById('editCategoriesBtn').addEventListener('click', function(){
+    var panel = document.getElementById('categoryEditPanel');
+    var willShow = panel.style.display === 'none';
+    if(willShow) renderCategoryEditPanel();
+    panel.style.display = willShow ? 'block' : 'none';
+  });
+  document.getElementById('rolesEnabledCheckbox').addEventListener('change', function(){
+    var panel = document.getElementById('roleNamesPanel');
+    if(this.checked){ renderRoleNamesPanel(); panel.style.display = 'block'; }
+    else { panel.style.display = 'none'; }
+  });
+  document.getElementById('roleCount').addEventListener('change', renderRoleNamesPanel);
+  document.getElementById('addCondBtn').addEventListener('click', addCondition);
+  document.getElementById('clearCondBtn').addEventListener('click', function(){
+    state.constraints = { together:[], avoid:[] };
+    renderConditions();
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kemi-Simulator: Cu & Br2 (v7.0 Final Polished)</title>
+    <style>
+        :root { --bg: #1e1e24; --panel: #2b2b35; --accent: #4cc9f0; --text: #e0e0e0; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; display: flex; height: 100vh; }
+        #sidebar { width: 320px; background: var(--panel); padding: 20px; box-shadow: 2px 0 10px rgba(0,0,0,0.3); display: flex; flex-direction: column; z-index: 10; overflow-y: auto; }
+        #main-view { flex-grow: 1; position: relative; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle at center, #25252d 0%, #1a1a20 100%); }
+        h1 { font-size: 1.4rem; margin: 0 0 10px 0; color: var(--accent); }
+        h2 { font-size: 1rem; margin: 15px 0 5px 0; border-bottom: 1px solid #444; padding-bottom: 5px; }
+        .btn { background: var(--accent); color: #000; border: none; padding: 10px; width: 100%; margin-bottom: 8px; cursor: pointer; font-weight: bold; border-radius: 4px; transition: 0.2s; }
+        .btn:hover { filter: brightness(1.1); }
+        .btn:disabled { background: #555; cursor: not-allowed; color: #888; }
+        
+        #btn-shake-more { background: #ff9f1c; display: none; animation: pulse 1s infinite; } 
+        #btn-shake-more:active { transform: scale(0.98); }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 159, 28, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255, 159, 28, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 159, 28, 0); } }
+
+        .info-box { font-size: 0.85rem; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 4px; margin-top: auto; line-height: 1.4; border-left: 3px solid var(--accent); }
+        canvas { box-shadow: 0 0 30px rgba(0,0,0,0.5); border-radius: 8px; max-width: 100%; max-height: 85vh; height: auto; display: block; }
+        #overlays { width: 100%; margin-top: 15px; }
+        .monitor { background: rgba(0,0,0,0.7); padding: 10px; margin-bottom: 10px; border-radius: 4px; border: 1px solid #444; }
+        .bar-container { height: 10px; background: #333; margin-top: 5px; border-radius: 5px; overflow: hidden; }
+        .bar-fill { height: 100%; transition: width 0.3s; }
+
+        /* --- QUIZ MODAL --- */
+        #quiz-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; justify-content: center; align-items: center; z-index: 100; }
+        #quiz-card { background: var(--panel); border: 1px solid var(--accent); border-radius: 8px; padding: 25px; width: 90%; max-width: 480px; box-shadow: 0 0 40px rgba(0,0,0,0.6); }
+        #quiz-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent); margin-bottom: 6px; }
+        #quiz-question { font-size: 1.05rem; font-weight: bold; margin-bottom: 16px; line-height: 1.4; }
+        .quiz-option { display: block; width: 100%; text-align: left; background: #3a3a46; color: var(--text); border: 1px solid #555; padding: 12px; margin-bottom: 8px; border-radius: 4px; cursor: pointer; font-size: 0.9rem; transition: 0.15s; }
+        .quiz-option:hover:not(:disabled) { border-color: var(--accent); background: #45454f; }
+        .quiz-option:disabled { cursor: not-allowed; }
+        .quiz-option.correct { background: #2f7d4f; border-color: #4cd980; color: #fff; }
+        .quiz-option.wrong { background: #7d2f2f; border-color: #d94c4c; color: #fff; opacity: 0.7; }
+        #quiz-feedback { margin-top: 10px; font-size: 0.85rem; line-height: 1.4; min-height: 1.2em; }
+        #quiz-continue { display: none; margin-top: 14px; }
+    </style>
+</head>
+<body>
+
+<div id="sidebar">
+    <h1>Cu & Br<sub>2</sub> Reaktor</h1>
+    <div id="controls">
+        <h2>Fase 1: Syntese</h2>
+        <button id="btn-add-cu" class="btn">1. Tilsæt Kobber (Cu)</button>
+        <button id="btn-add-br" class="btn" disabled>2. Tilsæt Bromvand (Br<sub>2</sub> (aq))</button>
+        <button id="btn-shake" class="btn" disabled>3. Ryst Kolben</button>
+        <button id="btn-shake-more" class="btn">RYST EKSTRA! (Boost)</button>
+        
+        <h2>Fase 2: Identifikation</h2>
+        <button id="btn-split" class="btn" disabled>4. Fordel i 2 Glas</button>
+        <div style="display:flex; gap:5px;">
+            <button id="btn-test-nh3" class="btn" disabled style="font-size:0.8rem">Test A: NH<sub>3</sub></button>
+            <button id="btn-test-ag" class="btn" disabled style="font-size:0.8rem">Test B: AgNO<sub>3</sub></button>
+        </div>
+        <button id="btn-reset" class="btn" style="background:#ff6b6b; margin-top:15px;">Genstart Forsøg</button>
+    </div>
+
+    <div id="overlays">
+        <div class="monitor">
+            <div style="font-size:0.8rem; color:#ccc;">Koncentrationer</div>
+            <div style="margin-top:5px; font-size:0.8rem; color:#e6a23c;">[Br<sub>2</sub>] (Start: 100%)</div>
+            <div class="bar-container"><div id="bar-br2" class="bar-fill" style="width: 0%; background: #e6a23c;"></div></div>
+
+            <div style="margin-top:5px; font-size:0.8rem; color:#4cc9f0;">[Cu<sup>2+</sup>] (Produkt)</div>
+            <div class="bar-container"><div id="bar-cu" class="bar-fill" style="width: 0%; background: #4cc9f0;"></div></div>
+        </div>
+        <div class="monitor" id="equation-monitor" style="display:none;">
+            <div style="font-size:0.8rem; color:#ccc;">Reaktionsligning</div>
+            <div style="margin-top:5px; font-size:1rem; font-weight:bold; letter-spacing:0.3px;">
+                Cu + Br<sub>2</sub> → Cu<sup>2+</sup> + 2 Br<sup>-</sup>
+            </div>
+            <div id="equation-progress" style="margin-top:4px; font-size:0.75rem; color:#aaa;"></div>
+        </div>
+        <div class="monitor" id="equation-monitor-ag" style="display:none;">
+            <div style="font-size:0.8rem; color:#ccc;">Reaktionsligning (Glas 2)</div>
+            <div style="margin-top:5px; font-size:1rem; font-weight:bold; letter-spacing:0.3px;">
+                Ag<sup>+</sup> + Br<sup>-</sup> → AgBr (s)
+            </div>
+            <div id="equation-progress-ag" style="margin-top:4px; font-size:0.75rem; color:#aaa;"></div>
+        </div>
+    </div>
+
+    <div id="info-panel" class="info-box">
+        Velkommen. Vi skal undersøge reaktionen mellem et metal og et ikke-metal.
+    </div>
+
+    <div id="completion-banner" class="info-box" style="display:none; margin-top:10px; border-left-color:#4cd980; background: rgba(76,217,128,0.12);">
+        ✅ <b>Forsøget er gennemført!</b> Du har identificeret både Cu²⁺ (via det mørkeblå NH₃-kompleks) og Br⁻ (via det lysegule AgBr-bundfald).
+    </div>
+</div>
+
+<div id="main-view">
+    <canvas id="simCanvas" width="800" height="600"></canvas>
+</div>
+
+<div id="quiz-modal">
+    <div id="quiz-card">
+        <div id="quiz-label">Tænkepause</div>
+        <div id="quiz-question"></div>
+        <div id="quiz-options"></div>
+        <div id="quiz-feedback"></div>
+        <button id="quiz-continue" class="btn">Fortsæt →</button>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('simCanvas');
+const ctx = canvas.getContext('2d');
+
+// --- CONFIG & STATE ---
+const UI = {
+    btns: {
+        cu: document.getElementById('btn-add-cu'),
+        br: document.getElementById('btn-add-br'),
+        shake: document.getElementById('btn-shake'),
+        shakeMore: document.getElementById('btn-shake-more'),
+        split: document.getElementById('btn-split'),
+        nh3: document.getElementById('btn-test-nh3'),
+        ag: document.getElementById('btn-test-ag'),
+        reset: document.getElementById('btn-reset')
+    },
+    bars: { br2: document.getElementById('bar-br2'), cu: document.getElementById('bar-cu') },
+    info: document.getElementById('info-panel'),
+    eq: { box: document.getElementById('equation-monitor'), progress: document.getElementById('equation-progress') },
+    eqAg: { box: document.getElementById('equation-monitor-ag'), progress: document.getElementById('equation-progress-ag') },
+    completionBanner: document.getElementById('completion-banner'),
+    quiz: {
+        modal: document.getElementById('quiz-modal'),
+        question: document.getElementById('quiz-question'),
+        options: document.getElementById('quiz-options'),
+        feedback: document.getElementById('quiz-feedback'),
+        continueBtn: document.getElementById('quiz-continue')
+    }
+};
+
+// --- QUIZ ENGINE ---
+// Viser et multiple-choice spoergsmaal og blokerer (via disabled-knapper) indtil
+// eleven vaelger det rigtige svar. onCorrect koeres foerst naar der er svaret rigtigt.
+function askQuiz(question, options, correctIndex, explanation, onCorrect) {
+    UI.quiz.question.textContent = question;
+    UI.quiz.options.innerHTML = '';
+    UI.quiz.feedback.textContent = '';
+    UI.quiz.continueBtn.style.display = 'none';
+    UI.quiz.modal.style.display = 'flex';
+
+    let solved = false;
+
+    // Bland svarmulighederne, saa det rigtige svar ikke altid staar samme sted
+    const order = options.map((_, i) => i);
+    for (let i = order.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [order[i], order[j]] = [order[j], order[i]];
+    }
+    const shuffledOptions = order.map(i => options[i]);
+    const shuffledCorrectIndex = order.indexOf(correctIndex);
+
+    shuffledOptions.forEach((optText, i) => {
+        const b = document.createElement('button');
+        b.className = 'quiz-option';
+        b.textContent = optText;
+        b.onclick = () => {
+            if (solved) return;
+            if (i === shuffledCorrectIndex) {
+                solved = true;
+                b.classList.add('correct');
+                UI.quiz.feedback.innerHTML = `<span style="color:#4cd980;">Rigtigt!</span> ${explanation}`;
+                UI.quiz.continueBtn.style.display = 'block';
+                [...UI.quiz.options.children].forEach(c => c.disabled = true);
+            } else {
+                b.classList.add('wrong');
+                b.disabled = true;
+                UI.quiz.feedback.innerHTML = `<span style="color:#ff8080;">Ikke helt.</span> Prøv igen.`;
+            }
+        };
+        UI.quiz.options.appendChild(b);
+    });
+
+    UI.quiz.continueBtn.onclick = () => {
+        UI.quiz.modal.style.display = 'none';
+        onCorrect();
+    };
+}
+
+const STAGE = { EMPTY: 0, CU_ADDED: 1, BR_ADDED: 2, REACTING: 3, REACTED: 4, SPLIT: 5 };
+let currentState = STAGE.EMPTY;
+let temperature = 20.0;
+let particles = [];
+let shakeClicks = 0;
+let experimentDone = false;
+
+// Viewport constants
+const MACRO = { x: 50, y: 150, w: 200, h: 300 };
+const MICRO = { x: 300, y: 50, w: 450, h: 450 };
+
+// Chemistry Definitions - UPSCALED SIZES (faerre partikler i alt, men stoerre pr. stk. for bedre laesbarhed)
+const CHEM = {
+    Cu: { color: '#b87333', r: 18, label: 'Cu' },
+    Br2: { color: '#d97706', r: 15, label: 'Br₂' },
+    Cu_ion: { color: '#4cc9f0', r: 17, label: 'Cu²⁺' },
+    Br_ion: { color: '#ddd', r: 13, label: 'Br⁻' },
+    NH3: { color: '#e0f7fa', r: 15, label: 'NH₃' },
+    Ag: { color: '#c0c0c0', r: 15, label: 'Ag⁺' },
+    AgBr: { color: '#fffff0', r: 16, label: 'AgBr' }
+};
+const COMPLEX_COLOR = '#0b1a75'; // moerkebla farve som Cu2+ skifter til naar 4 NH3 er klistret fast
+
+// Startmaengder - Cu holdes i overskud ift. Br2 (8 > 6), saa al Br2 naar at reagere.
+// SPLIT_CU:SPLIT_BR er 1:2, som passer med Cu2+ + 2 Br- ioner fra oploest CuBr2.
+// NH3 er 8 i alt = 4 pr. Cu2+ (der er 2 stk i Glas 1), saa der er praecis nok til at begge kan komplekses.
+const COUNTS = { CU: 8, BR2: 6, SPLIT_CU: 2, SPLIT_BR: 4, NH3: 8, AG: 4 };
+const NH3_PER_COMPLEX = 4;
+
+// --- PARTICLE CLASS ---
+class Particle {
+    constructor(type, x, y, fixed = false, tube = 0) {
+        this.type = type;
+        this.x = x;
+        this.y = y;
+        this.vx = fixed ? 0 : (Math.random() - 0.5) * 2;
+        this.vy = fixed ? 0 : (Math.random() - 0.5) * 2;
+        this.fixed = fixed;
+        this.tube = tube; 
+    }
+
+    update() {
+        if (this.fixed) return;
+
+        // AgBr handled manually
+        if (this.type === CHEM.AgBr) return;
+
+        // Br- der allerede er brugt til at danne AgBr skal ikke laengere fysik-opdateres
+        // (ellers bliver den skubbet tilbage i vaeggen og "genopstaar" som et ledigt maal)
+        if (this.consumed) return;
+
+        // NH3 der allerede er klistret fast foelger sin Cu2+-vaert rundt
+        if (this.attachedTo) {
+            const host = this.attachedTo;
+            const d = host.type.r + this.type.r - 2;
+            this.x = host.x + Math.cos(this.attachAngle) * d;
+            this.y = host.y + Math.sin(this.attachAngle) * d;
+            return;
+        }
+
+        // Frie NH3-molekyler er "magnetiske" og traekkes langsomt mod naermeste ledige Cu2+-ion,
+        // saa man kan naa at se dem vandre hen og saette sig fast et ad gangen.
+        if (this.type === CHEM.NH3) {
+            const host = findNearestOpenCu(this);
+            if (host) {
+                const dx = host.x - this.x, dy = host.y - this.y;
+                const dist = Math.hypot(dx, dy) || 1;
+                this.vx += (dx / dist) * 0.05;
+                this.vy += (dy / dist) * 0.05;
+                const spd = Math.hypot(this.vx, this.vy);
+                if (spd > 1.6) { this.vx = this.vx / spd * 1.6; this.vy = this.vy / spd * 1.6; }
+            }
+        }
+
+        // Frie Ag+-ioner er ligeledes "magnetiske" og traekkes mod naermeste ledige Br--ion,
+        // saa de ikke skal drive tilfaeldigt rundt og lede efter hinanden.
+        if (this.type === CHEM.Ag) {
+            const target = findNearestFreeBr(this);
+            if (target) {
+                const dx = target.x - this.x, dy = target.y - this.y;
+                const dist = Math.hypot(dx, dy) || 1;
+                this.vx += (dx / dist) * 0.05;
+                this.vy += (dy / dist) * 0.05;
+                const spd = Math.hypot(this.vx, this.vy);
+                if (spd > 1.6) { this.vx = this.vx / spd * 1.6; this.vy = this.vy / spd * 1.6; }
+            }
+        }
+
+        // Physics Speed - kun Br2 (det ureagerede stof) bliver hurtigere af at ryste kolben.
+        // Produkter (Cu2+, Br- m.fl.) bevaeger sig i konstant tempo, saa billedet ikke bliver kaotisk.
+        const speedMult = (this.type === CHEM.Br2) ? 1 + (temperature - 20) / 40 : 1;
+        this.x += this.vx * speedMult;
+        this.y += this.vy * speedMult;
+
+        // Walls
+        let minX = MICRO.x, maxX = MICRO.x + MICRO.w;
+        if (currentState === STAGE.SPLIT) {
+            if (this.tube === 1) maxX = MICRO.x + MICRO.w/2 - 5;
+            else if (this.tube === 2) minX = MICRO.x + MICRO.w/2 + 5;
+        }
+
+        const r = this.type.r;
+        if (this.x < minX + r) { this.x = minX + r + 1; this.vx = Math.abs(this.vx); }
+        if (this.x > maxX - r) { this.x = maxX - r - 1; this.vx = -Math.abs(this.vx); }
+        if (this.y < MICRO.y + r) { this.y = MICRO.y + r + 1; this.vy = Math.abs(this.vy); }
+        if (this.y > MICRO.y + MICRO.h - r) { this.y = MICRO.y + MICRO.h - r - 1; this.vy = -Math.abs(this.vy); }
+    }
+
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.type.r, 0, Math.PI * 2);
+        
+        ctx.fillStyle = this.complexed ? COMPLEX_COLOR : this.type.color;
+        ctx.fill();
+
+        // Stroke Visuals
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(0,0,0,0.3)'; 
+
+        if (this.type === CHEM.NH3) {
+            ctx.strokeStyle = '#ff4d4d'; // Red Ring
+            ctx.lineWidth = 3; // Thicker due to larger size
+        }
+        else if (this.type === CHEM.Ag) {
+            ctx.strokeStyle = '#00ffff'; // Cyan Edge
+            ctx.lineWidth = 3;
+        }
+
+        ctx.stroke();
+
+        ctx.fillStyle = (this.type === CHEM.AgBr || this.complexed) ? '#fff' : '#000';
+        ctx.font = 'bold 13px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(this.type.label, this.x, this.y);
+    }
+}
+
+// Naermeste Cu2+ i samme glas, som stadig mangler NH3 for at blive komplekseret
+function findNearestOpenCu(nh3) {
+    let best = null, bestDist = Infinity;
+    for (const p of particles) {
+        if (p.type === CHEM.Cu_ion && p.tube === nh3.tube && !p.complexed) {
+            const d = Math.hypot(p.x - nh3.x, p.y - nh3.y);
+            if (d < bestDist) { bestDist = d; best = p; }
+        }
+    }
+    return best;
+}
+
+// Naermeste ledige (endnu ikke opbrugte) Br- i Glas 2, som en fri Ag+ kan reagere med
+function findNearestFreeBr(ag) {
+    let best = null, bestDist = Infinity;
+    for (const p of particles) {
+        if (p.type === CHEM.Br_ion && p.tube === 2 && !p.fixed && !p.consumed) {
+            const d = Math.hypot(p.x - ag.x, p.y - ag.y);
+            if (d < bestDist) { bestDist = d; best = p; }
+        }
+    }
+    return best;
+}
+
+// --- CONTROLLERS ---
+
+UI.btns.cu.onclick = () => {
+    currentState = STAGE.CU_ADDED;
+    UI.info.innerHTML = "<b>Teori:</b> Fast kobber (Cu) i bunden af glasset.";
+    UI.btns.cu.disabled = true;
+    // Faerre, stoerre Cu-atomer i to raekker - nem at overskue, stadig i overskud ift. Br2
+    for(let r=0; r<2; r++) { for(let c=0; c<COUNTS.CU/2; c++) { particles.push(new Particle(CHEM.Cu, MICRO.x + 130 + c*50, MICRO.y + MICRO.h - 60 - r*45, true)); } }
+
+    askQuiz(
+        "Hvad tror du der sker, når bromvand (Br₂ (aq)) tilsættes til det faste kobber?",
+        [
+            "Kobberet danner Cu²⁺-ioner, og Br₂ bliver til Br⁻-ioner",
+            "Der sker ingen reaktion – stofferne blandes bare",
+            "Kobberet omdannes til gasform med det samme",
+            "Bromvandet fordamper, og kobberet forbliver uændret"
+        ],
+        0,
+        "Cu afgiver elektroner til Br₂, så der dannes Cu²⁺- og Br⁻-ioner i opløsningen.",
+        () => { UI.btns.br.disabled = false; }
+    );
+};
+
+UI.btns.br.onclick = () => {
+    currentState = STAGE.BR_ADDED;
+    UI.info.innerHTML = "<b>Teori:</b> Bromvand (Br<sub>2</sub> (aq)) tilsat. Væsken er orange.";
+    UI.btns.br.disabled = true;
+    for(let i=0; i<COUNTS.BR2; i++) { particles.push(new Particle(CHEM.Br2, MICRO.x + Math.random()*MICRO.w, MICRO.y + Math.random()*(MICRO.h-150))); }
+    updateBars(100, 0);
+    UI.eq.box.style.display = "block";
+    UI.eq.progress.textContent = `0 af ${COUNTS.BR2} Cu omdannet`;
+
+    askQuiz(
+        "Hvilken af disse reaktionsskemaer er korrekt afstemt for reaktionen mellem Cu og Br₂?",
+        [
+            "2 Cu + Br₂ → 2 Cu²⁺ + Br⁻",
+            "Cu + Br₂ → Cu²⁺ + 2 Br⁻",
+            "Cu + 2 Br₂ → Cu²⁺ + 4 Br⁻",
+            "2 Cu + Br₂ → 2 Cu²⁺ + 2 Br⁻"
+        ],
+        1,
+        "Ladningerne skal gå op: 1 Cu afgiver 2 elektroner, og de deles på 2 Br-atomer, som hver bliver til Br⁻.",
+        () => { UI.btns.shake.disabled = false; }
+    );
+};
+
+UI.btns.shake.onclick = () => {
+    currentState = STAGE.REACTING;
+    temperature += 25; // Øjeblikkelig energitilførsel, så partiklerne straks bevæger sig hurtigere
+    UI.info.innerHTML = "<b>Reaktion:</b> Brug 'RYST EKSTRA' for at øge kinetisk energi!";
+    UI.btns.shake.disabled = true;
+    UI.btns.shakeMore.style.display = "block";
+};
+
+UI.btns.shakeMore.onclick = () => {
+    shakeClicks++;
+    temperature += 30; 
+    if (shakeClicks === 1) UI.info.innerHTML = "<b>Energi boost!</b> Kinetisk energi stiger.";
+    else if (shakeClicks === 2) UI.info.innerHTML = "<b>Højt blus!</b> Reaktionen accelererer.";
+    else if (shakeClicks >= 3) { UI.info.innerHTML = "<b>Super-ryst!</b> Reaktionen fuldføres øjeblikkeligt."; forceFinish(); }
+};
+
+UI.btns.split.onclick = () => {
+    currentState = STAGE.SPLIT;
+    temperature = 20.0; // RESET SPEED
+    UI.info.innerHTML = "<b>Opdeling:</b> Væsken er faldet til ro. Vælg test.";
+    UI.btns.split.disabled = true;
+    UI.btns.nh3.disabled = false;
+    UI.btns.ag.disabled = false;
+    particles = [];
+    spawnSet(1, COUNTS.SPLIT_CU, COUNTS.SPLIT_BR);
+    spawnSet(2, COUNTS.SPLIT_CU, COUNTS.SPLIT_BR);
+    UI.eq.box.style.display = "none";
+};
+
+function spawnSet(tubeID, nCu, nBr) {
+    let xBase = tubeID === 1 ? MICRO.x : MICRO.x + MICRO.w/2;
+    let wZone = MICRO.w/2;
+    for(let i=0; i<nCu; i++) particles.push(new Particle(CHEM.Cu_ion, xBase + 20 + Math.random()*(wZone-40), MICRO.y + 50 + Math.random()*200, false, tubeID));
+    for(let i=0; i<nBr; i++) particles.push(new Particle(CHEM.Br_ion, xBase + 20 + Math.random()*(wZone-40), MICRO.y + 50 + Math.random()*200, false, tubeID));
+}
+
+UI.btns.nh3.onclick = () => {
+    UI.btns.nh3.disabled = true;
+
+    askQuiz(
+        "Hvad forventer du sker, når NH₃ tilsættes til Glas 1 (som indeholder Cu²⁺-ioner)?",
+        [
+            "Der sker ingen synlig ændring",
+            "Væsken bliver mørkeblå pga. et NH₃-Cu²⁺-kompleks",
+            "Der dannes straks et hvidt bundfald",
+            "Væsken skifter farve til rød"
+        ],
+        1,
+        "NH₃-molekylerne binder sig til Cu²⁺-ionen (4 stk. pr. ion) og danner et mørkeblåt kompleks-ion.",
+        () => {
+            UI.info.innerHTML = "<b>Glas 1:</b> NH<sub>3</sub> tilsat. Molekylerne soeger mod Cu<sup>2+</sup>-ionerne. Naar 4 stykker har sat sig fast paa en ion, bliver den moerkeblaa.";
+            for(let i=0; i<COUNTS.NH3; i++) { particles.push(new Particle(CHEM.NH3, MICRO.x + Math.random()*(MICRO.w/2 - 20), MICRO.y + 50, false, 1)); }
+        }
+    );
+};
+
+UI.btns.ag.onclick = () => {
+    UI.btns.ag.disabled = true;
+
+    askQuiz(
+        "Hvad forventer du sker, når AgNO₃ tilsættes til Glas 2 (som indeholder Br⁻-ioner)?",
+        [
+            "Der dannes et lysegult bundfald af AgBr",
+            "Der sker slet ingen reaktion",
+            "Væsken skifter farve til blå",
+            "Der udvikles straks en gas"
+        ],
+        0,
+        "Ag⁺ og Br⁻ danner det tungtopløselige salt AgBr, som udfælder som et lysegult bundfald.",
+        () => {
+            UI.info.innerHTML = "<b>Glas 2:</b> Ag<sup>+</sup> tilsat. (Kig efter cyan kant).";
+            for(let i=0; i<COUNTS.AG; i++) { particles.push(new Particle(CHEM.Ag, MICRO.x + MICRO.w/2 + Math.random()*(MICRO.w/2 - 20), MICRO.y + 50, false, 2)); }
+            UI.eqAg.box.style.display = "block";
+            UI.eqAg.progress.textContent = `0 af ${COUNTS.AG} AgBr dannet`;
+        }
+    );
+};
+
+UI.btns.reset.onclick = () => location.reload();
+
+// --- LOOP ---
+
+function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Physics Move
+    particles.forEach(p => p.update());
+
+    // Logic
+    if (currentState === STAGE.REACTING) {
+        particles.forEach((p) => {
+            if (p.type === CHEM.Br2) {
+                let target = particles.find(t => t.type === CHEM.Cu && t.fixed);
+                if (target && Math.hypot(p.x - target.x, p.y - target.y) < 90 && Math.random() < 0.25) { // Increased distance check due to size
+                    target.type = CHEM.Cu_ion; target.fixed = false;
+                    const angle = Math.random() * Math.PI * 2; // Spred i alle retninger, ikke kun lodret
+                    const speed = 1.5 + Math.random() * 2;
+                    target.vx = Math.cos(angle) * speed;
+                    target.vy = Math.sin(angle) * speed;
+                    p.type = CHEM.Br_ion;
+                    particles.push(new Particle(CHEM.Br_ion, p.x + 10, p.y));
+                    temperature += 3.5;
+                }
+            }
+        });
+        if(temperature > 20) temperature -= 0.15;
+        const remainingBr2 = particles.filter(p => p.type === CHEM.Br2).length;
+        const formedCu = particles.filter(p => p.type === CHEM.Cu_ion).length;
+        updateBars(remainingBr2 * (100 / COUNTS.BR2), formedCu * (100 / COUNTS.BR2));
+        UI.eq.progress.textContent = `${formedCu} af ${COUNTS.BR2} Cu omdannet`;
+        if (remainingBr2 === 0) {
+            currentState = STAGE.REACTED;
+            UI.btns.shakeMore.style.display = "none";
+            UI.info.innerHTML = "Reaktion færdig. Observer farven og de ioniserede produkter.";
+
+            askQuiz(
+                "I reaktionen Cu + Br₂ → Cu²⁺ + 2 Br⁻ – hvorfor ændrer kobberet ladning, fra neutralt Cu til Cu²⁺?",
+                [
+                    "Fordi Cu optager 2 elektroner fra Br₂",
+                    "Fordi Cu afgiver 2 elektroner til Br₂",
+                    "Fordi Cu optager 2 Br-atomer og derved bliver positivt",
+                    "Ladningen ændrer sig ikke – Cu²⁺ er bare et andet navn for Cu"
+                ],
+                1,
+                "Et neutralt Cu-atom har lige mange protoner og elektroner. Når det afgiver 2 elektroner til Br₂, mangler det 2 negative ladninger og bliver til Cu²⁺.",
+                () => { UI.btns.split.disabled = false; }
+            );
+        }
+    }
+    
+    if (currentState === STAGE.SPLIT) {
+        particles.forEach(p => {
+            // NH3 klistrer sig fast paa naermeste ledige Cu2+ ved beroering.
+            // Efter 4 stk er klistret fast bliver ionen selv moerkeblaa (intet nyt symbol).
+            if(p.type === CHEM.NH3 && !p.attachedTo && p.tube === 1) {
+                const host = findNearestOpenCu(p);
+                if (host) {
+                    const touchDist = host.type.r + p.type.r + 2;
+                    if (Math.hypot(p.x - host.x, p.y - host.y) < touchDist) {
+                        host.attachedNH3 = host.attachedNH3 || [];
+                        p.attachedTo = host;
+                        p.attachAngle = host.attachedNH3.length * (Math.PI / 2); // 0/90/180/270 grader
+                        p.vx = 0; p.vy = 0;
+                        host.attachedNH3.push(p);
+                        if (host.attachedNH3.length >= NH3_PER_COMPLEX) host.complexed = true;
+                    }
+                }
+            }
+            // Precipitate (AgBr)
+            if(p.type === CHEM.Ag && !p.fixed && p.tube === 2) {
+                let target = findNearestFreeBr(p);
+                if(target && Math.hypot(p.x - target.x, p.y - target.y) < 60) { // Increased range
+                    p.type = CHEM.AgBr;
+                    p.fixed = false;
+                    target.consumed = true;
+                    target.x = -9999;
+                }
+            }
+        });
+
+        // FIXED PRECIPITATE GRAVITY
+        particles.forEach(p => {
+            if(p.type === CHEM.AgBr) {
+                if(p.y < MICRO.y + MICRO.h - 15) { // Adjusted for larger size
+                    p.y += 1.5;
+                } else {
+                    p.y = MICRO.y + MICRO.h - 15;
+                }
+            }
+        });
+
+        let agBrCount = 0;
+        if (UI.eqAg.box.style.display === "block") {
+            agBrCount = particles.filter(p => p.type === CHEM.AgBr).length;
+            UI.eqAg.progress.textContent = `${agBrCount} af ${COUNTS.AG} AgBr dannet`;
+        }
+
+        // Begge tests er kun fuldfoert, naar alle Cu2+ er komplekseret OG alt Br- er udfaeldet som AgBr
+        if (!experimentDone) {
+            const cplxCount = particles.filter(p => p.type === CHEM.Cu_ion && p.tube === 1 && p.complexed).length;
+            if (cplxCount === COUNTS.SPLIT_CU && agBrCount === COUNTS.AG) {
+                experimentDone = true;
+                UI.completionBanner.style.display = "block";
+                askQuiz(
+                    "Forsøget er slut! Hvilken affaldsbeholder skal indholdet af de to glas hældes i?",
+                    [
+                        "Almindeligt husholdningsaffald",
+                        "Beholderen til tungmetalholdigt kemikalieaffald",
+                        "Direkte ud i vasken/afløbet",
+                        "Beholderen til organisk affald"
+                    ],
+                    1,
+                    "Glassene indeholder tungmetal-ioner (Cu²⁺, Ag⁺) og bundfaldet AgBr, som skal afleveres som kemikalieaffald – aldrig i afløbet eller det almindelige affald.",
+                    () => {}
+                );
+            }
+        }
+    }
+
+    drawScene();
+    particles.forEach(p => { if(p.x > 0) p.draw(); });
+    requestAnimationFrame(loop);
+}
+
+function forceFinish() {
+    particles.forEach(p => {
+        if(p.type === CHEM.Br2) {
+            p.type = CHEM.Br_ion; particles.push(new Particle(CHEM.Br_ion, p.x+5, p.y));
+            let cu = particles.find(t => t.type === CHEM.Cu && t.fixed);
+            if(cu) {
+                cu.type = CHEM.Cu_ion; cu.fixed = false;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 1.5 + Math.random() * 2;
+                cu.vx = Math.cos(angle) * speed;
+                cu.vy = Math.sin(angle) * speed;
+            }
+        }
+    });
+}
+
+// --- DRAW HELPERS ---
+
+function drawScene() {
+    const liquidColor = getLiquidColor();
+    
+    if (currentState === STAGE.SPLIT) {
+        drawTestTube(MACRO.x, MACRO.y, "Glas 1", getTubeColor(1));
+        drawTestTube(MACRO.x + 110, MACRO.y, "Glas 2", getTubeColor(2));
+    } else {
+        ctx.fillStyle = liquidColor;
+        ctx.fillRect(MACRO.x + 10, MACRO.y + 50, MACRO.w - 20, MACRO.h - 60);
+        ctx.lineWidth = 4; ctx.strokeStyle = '#aaa';
+        ctx.strokeRect(MACRO.x, MACRO.y, MACRO.w, MACRO.h);
+        ctx.fillStyle = '#fff'; ctx.font = '16px Arial';
+        ctx.fillText("Makro", MACRO.x + 10, MACRO.y - 10);
+        
+        // --- DRAW COPPER POWDER (Macro fix) ---
+        if (currentState >= STAGE.CU_ADDED) {
+            ctx.fillStyle = '#b87333';
+            ctx.beginPath();
+            // A simple pile shape at the bottom
+            ctx.moveTo(MACRO.x + 50, MACRO.y + MACRO.h - 10);
+            ctx.quadraticCurveTo(MACRO.x + 100, MACRO.y + MACRO.h - 40, MACRO.x + 150, MACRO.y + MACRO.h - 10);
+            ctx.fill();
+            ctx.strokeStyle = '#8a5020';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+    }
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(MICRO.x, MICRO.y, MICRO.w, MICRO.h);
+    ctx.clip();
+    ctx.fillStyle = '#111';
+    ctx.fillRect(MICRO.x, MICRO.y, MICRO.w, MICRO.h);
+    
+    if(currentState === STAGE.SPLIT) {
+        ctx.strokeStyle = '#444'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(MICRO.x + MICRO.w/2, MICRO.y);
+        ctx.lineTo(MICRO.x + MICRO.w/2, MICRO.y + MICRO.h);
+        ctx.stroke();
+    }
+    ctx.restore();
+    
+    ctx.lineWidth = 2; ctx.strokeStyle = '#4cc9f0';
+    ctx.strokeRect(MICRO.x, MICRO.y, MICRO.w, MICRO.h);
+    ctx.fillStyle = '#fff';
+    ctx.fillText("Mikro-Partikler (Zoom: x 10⁸)", MICRO.x, MICRO.y - 10);
+}
+
+function drawTestTube(x, y, label, color) {
+    ctx.fillStyle = color;
+    ctx.fillRect(x + 10, y + 20, 80, 200);
+    ctx.strokeStyle = '#aaa'; ctx.lineWidth = 3;
+    ctx.strokeRect(x + 10, y, 80, 220);
+    ctx.fillStyle = '#fff'; ctx.font = '14px Arial';
+    ctx.fillText(label, x + 20, y + 240);
+}
+
+function getLiquidColor() {
+    if (currentState === STAGE.CU_ADDED) return 'rgba(255,255,255,0.1)';
+    // FIX: Explicit check for BR_ADDED to show orange immediately
+    if (currentState === STAGE.BR_ADDED) return 'rgba(217, 119, 6, 0.7)';
+    
+    if (currentState === STAGE.REACTING || currentState === STAGE.REACTED) {
+        const br2Count = particles.filter(p => p.type === CHEM.Br2).length;
+        const ratio = br2Count / COUNTS.BR2;
+        if (ratio > 0.6) return 'rgba(217, 119, 6, 0.8)';
+        if (ratio > 0.1) return 'rgba(85, 107, 47, 0.8)';
+        return 'rgba(76, 201, 240, 0.6)';
+    }
+    return 'rgba(255,255,255,0.1)';
+}
+
+function getTubeColor(tubeID) {
+    let base = 'rgba(76, 201, 240, 0.6)';
+    if (tubeID === 1) {
+        const cplx = particles.filter(p => p.type === CHEM.Cu_ion && p.tube === 1 && p.complexed).length;
+        if (cplx > 0) return `rgba(0, 0, 139, ${0.4 + (cplx / COUNTS.SPLIT_CU) * 0.4})`;
+    }
+    if (tubeID === 2) {
+        const solid = particles.filter(p => p.type === CHEM.AgBr && p.tube === 2).length;
+        if (solid > 0) return `rgba(255, 255, 240, ${0.6 + solid/10})`;
+    }
+    return base;
+}
+
+function updateBars(br, cu) {
+    UI.bars.br2.style.width = Math.min(br, 100) + "%";
+    UI.bars.cu.style.width = Math.min(cu, 100) + "%";
+}
+
+loop(); 
+</script>
+</body>
+</html>

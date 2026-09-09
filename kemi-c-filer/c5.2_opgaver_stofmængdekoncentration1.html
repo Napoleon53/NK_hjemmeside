@@ -1,0 +1,1039 @@
+﻿<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Opgaver til stofmængdekoncentration</title>
+    <style>
+        :root {
+            --bg-dark: #1e272e;
+            --panel-bg: #2d3436;
+            --text-main: #ecf0f1;
+            --accent-blue: #0984e3;
+            --accent-green: #00b894;
+            --accent-orange: #e17055;
+            --input-bg: #dfe6e9;
+            --input-text: #2d3436;
+        }
+
+        * { box-sizing: border-box; touch-action: manipulation; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        header {
+            height: 50px;
+            background: rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 15px;
+            border-bottom: 1px solid #444;
+            z-index: 10;
+            flex-shrink: 0;
+        }
+
+        h1 { margin: 0; font-size: 1.1rem; font-weight: 600; }
+
+        /* MAIN LAYOUT */
+        #main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: row;
+            overflow: hidden;
+        }
+
+        /* LEFT SIDE: VISUALS */
+        #canvas-area {
+            flex: 1;
+            position: relative;
+            background: radial-gradient(circle at center, #2c3e50 0%, #1e272e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        canvas { box-shadow: 0 0 30px rgba(0,0,0,0.5); border-radius: 4px; max-width: 100%; max-height: 100%; }
+
+        /* RIGHT SIDE: CONTROLS / TASKS */
+        #interaction-area {
+            width: 420px;
+            background: var(--panel-bg);
+            border-left: 1px solid #444;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.3);
+        }
+
+        /* CONTROLS (SIM MODE) */
+        .control-group { margin-bottom: 25px; }
+        
+        label { 
+            font-size: 0.9rem; 
+            color: #bdc3c7; 
+            margin-bottom: 8px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+        }
+        .label-text { display: flex; align-items: center; gap: 4px; }
+        .value-display { font-family: 'Consolas', monospace; color: var(--accent-blue); font-weight: bold; }
+        
+        input[type="range"] {
+            width: 100%; height: 6px; background: #444; border-radius: 3px; outline: none; -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 20px; height: 20px; background: var(--text-main); border-radius: 50%; cursor: pointer; box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        /* TASK MODE STYLING */
+        .task-card {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #444;
+        }
+        .task-header { font-weight: bold; margin-bottom: 10px; color: var(--accent-orange); border-bottom: 1px solid #555; padding-bottom: 5px; }
+        .task-desc { font-size: 0.95rem; line-height: 1.4; margin-bottom: 15px; color: #dfe6e9; }
+        
+        .step-container { margin-top: 15px; padding-top: 10px; border-top: 1px dashed #555; animation: fadeIn 0.5s; }
+        .step-label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: #81ecec; }
+        
+        /* FORMULA BLOCK STYLING */
+        .formula-block {
+            display: block;
+            text-align: center;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.15rem;
+            color: #fff;
+            font-style: italic;
+        }
+
+        .input-group { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+        .calc-input {
+            background: var(--input-bg); border: 2px solid transparent; color: var(--input-text);
+            padding: 8px; width: 100px; border-radius: 4px; font-size: 1rem; text-align: center; font-weight: bold;
+        }
+        .calc-input:focus { outline: none; border-color: var(--accent-blue); }
+        .calc-input.correct { border-color: var(--accent-green); background: #b8e994; color: #1e272e; }
+        .calc-input.wrong { border-color: var(--accent-orange); background: #fab1a0; }
+        
+        .unit-label { font-weight: bold; color: #aaa; white-space: nowrap; }
+
+        .step-hint {
+            font-size: 0.85rem;
+            color: #ffeaa7;
+            margin-top: 8px;
+            line-height: 1.4;
+            animation: fadeIn 0.3s;
+        }
+
+        .btn {
+            padding: 8px 16px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;
+            text-transform: uppercase; font-size: 0.8rem; transition: transform 0.1s;
+        }
+        .btn:active { transform: scale(0.96); }
+        .btn-primary { background: var(--accent-blue); color: white; width: 100%; margin-top: 10px; }
+        .btn-check { background: var(--accent-green); color: white; }
+        .btn-toggle { background: #636e72; color: white; width: 100%; margin-bottom: 15px; }
+        .btn-toggle.active { background: var(--accent-orange); }
+
+        /* TASKS CTA (entry point from sim panel, bunden af panelet) */
+        .tasks-cta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            background: rgba(225, 112, 85, 0.1);
+            border: 1px solid rgba(225, 112, 85, 0.35);
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-top: 20px;
+            cursor: pointer;
+            color: var(--text-main);
+            text-align: left;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .tasks-cta:hover { background: rgba(225, 112, 85, 0.2); border-color: var(--accent-orange); }
+        .tasks-cta:active { transform: scale(0.98); }
+        .tasks-cta .cta-icon { font-size: 1.3rem; line-height: 1; flex-shrink: 0; }
+        .tasks-cta .cta-title { font-size: 0.9rem; font-weight: 600; }
+        .tasks-cta .cta-sub { font-size: 0.78rem; opacity: 0.75; font-weight: normal; }
+        .tasks-cta .cta-arrow { margin-left: auto; font-size: 1.1rem; color: var(--accent-orange); }
+
+        .task-nav-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .task-num-btn {
+            padding: 8px 0;
+            background: #444;
+            color: #ccc;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .task-num-btn:hover { background: #555; }
+        .task-num-btn.active { background: var(--accent-blue); color: #fff; }
+
+        .back-to-sim {
+            background: none;
+            border: 1px solid #555;
+            color: #bdc3c7;
+            padding: 6px 14px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        .back-to-sim:hover { border-color: var(--accent-blue); color: var(--text-main); }
+
+        /* FEEDBACK OVERLAY */
+        #feedback-overlay {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.85); padding: 10px 25px; border-radius: 25px;
+            color: #fff; font-weight: bold; pointer-events: none; opacity: 0; transition: opacity 0.3s;
+            text-align: center; border: 1px solid #555; z-index: 100;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 800px) {
+            #main-container { flex-direction: column; }
+            #canvas-area { height: 45vh; flex: none; }
+            #interaction-area { width: 100%; flex: 1; border-left: none; border-top: 1px solid #444; }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Helper classes */
+        sub { font-size: 0.7em; vertical-align: sub; }
+        sup { font-size: 0.7em; vertical-align: super; }
+        i { font-style: italic; font-family: 'Times New Roman', serif; padding-right: 1px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Opgaver til stofmængdekoncentration</h1>
+    </header>
+
+    <div id="main-container">
+        <div id="canvas-area">
+            <canvas id="simCanvas"></canvas>
+            <div id="feedback-overlay">Feedback tekst</div>
+        </div>
+
+        <div id="interaction-area">
+            </div>
+    </div>
+
+<script>
+/**
+ * UTILS
+ */
+function fmt(num, decimals = 2) {
+    return parseFloat(num).toFixed(decimals).replace('.', ',');
+}
+
+function parseInput(str) {
+    if (!str) return NaN;
+    return parseFloat(str.replace(',', '.'));
+}
+
+/**
+ * DATA & PHYSICS ENGINE
+ */
+const IONS = {
+    'Na':   { symbol: 'Na⁺',   color: [253, 203, 110] },
+    'K':    { symbol: 'K⁺',    color: [225, 112, 85] },
+    'Ca':   { symbol: 'Ca²⁺',  color: [0, 184, 148] },
+    'Cu':   { symbol: 'Cu²⁺',  color: [9, 132, 227] },
+    'Cl':   { symbol: 'Cl⁻',   color: [129, 236, 236] },
+    'SO4':  { symbol: 'SO₄²⁻', color: [255, 234, 167] },
+    'CO3':  { symbol: 'CO₃²⁻', color: [223, 230, 233] },
+    'MnO4': { symbol: 'MnO₄⁻', color: [142, 68, 173] } // Eneste lilla ion (permanganat)
+};
+
+const SUBSTANCES = {
+    'CuSO4': { name: 'Kobber(II)sulfat', M: 159.61, color: [9, 132, 227], formulaHtml: 'CuSO<sub>4</sub>',
+        ions: [ { ...IONS['Cu'], count: 1 }, { ...IONS['SO4'], count: 1 } ] },
+    'NaCl':  { name: 'Natriumchlorid', M: 58.44, color: [178, 190, 195], formulaHtml: 'NaCl',
+        ions: [ { ...IONS['Na'], count: 1 }, { ...IONS['Cl'], count: 1 } ] },
+    'KMnO4': { name: 'Kaliumpermanganat', M: 158.03, color: [142, 68, 173], formulaHtml: 'KMnO<sub>4</sub>',
+        ions: [ { ...IONS['K'], count: 1 }, { ...IONS['MnO4'], count: 1 } ] },
+    'Na2CO3': { name: 'Natriumcarbonat', M: 105.99, color: [255, 255, 255], formulaHtml: 'Na<sub>2</sub>CO<sub>3</sub>',
+        ions: [ { ...IONS['Na'], count: 2 }, { ...IONS['CO3'], count: 1 } ] },
+    'CaCl2': { name: 'Calciumchlorid', M: 110.98, color: [223, 230, 233], formulaHtml: 'CaCl<sub>2</sub>',
+        ions: [ { ...IONS['Ca'], count: 1 }, { ...IONS['Cl'], count: 2 } ] },
+    'KCl':   { name: 'Kaliumchlorid', M: 74.55, color: [200, 200, 200], formulaHtml: 'KCl',
+        ions: [ { ...IONS['K'], count: 1 }, { ...IONS['Cl'], count: 1 } ] }
+};
+
+class PhysicsEngine {
+    constructor() {
+        this.substance = SUBSTANCES['CuSO4'];
+        this.n = 0.5; // mol
+        this.V = 1.0; // Liter
+        this.maxV = 3.0;
+        this.targetC = null;
+        this.hideVolume = false; // Skjul volumen-aflæsning (bruges i opgaver hvor V skal beregnes)
+    }
+
+    get c() { return this.V <= 0.001 ? 0 : this.n / this.V; }
+    get m() { return this.n * this.substance.M; }
+
+    setSubstance(key) { if(SUBSTANCES[key]) this.substance = SUBSTANCES[key]; }
+}
+
+/**
+ * VISUALIZATION SYSTEM (MICROSCOPE)
+ */
+class Particle {
+    constructor(radius) {
+        this.reset(radius);
+    }
+    
+    reset(radius) {
+        const angle = Math.random() * Math.PI * 2;
+        const r = Math.sqrt(Math.random()) * (radius - 5);
+        this.x = Math.cos(angle) * r;
+        this.y = Math.sin(angle) * r;
+        this.vx = (Math.random() - 0.5) * 2;
+        this.vy = (Math.random() - 0.5) * 2;
+        this.size = 2.5 + Math.random() * 2;
+    }
+
+    update(radius) {
+        this.x += this.vx; this.y += this.vy;
+        const dist = Math.sqrt(this.x*this.x + this.y*this.y);
+        const limit = radius - 5; 
+        if (dist > limit) {
+            const nx = this.x / dist; const ny = this.y / dist;
+            const dot = this.vx * nx + this.vy * ny;
+            this.vx = this.vx - 2 * dot * nx; this.vy = this.vy - 2 * dot * ny;
+            this.x = nx * limit; this.y = ny * limit;
+        }
+    }
+}
+
+class Renderer {
+    constructor(canvasId, physics) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.physics = physics;
+        this.particles = [];
+        this.microscopeRadius = 70; 
+        for(let i=0; i<400; i++) this.particles.push(new Particle(this.microscopeRadius));
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+    }
+
+    resize() {
+        const dpr = window.devicePixelRatio || 1;
+        this.width = this.canvas.parentElement.clientWidth;
+        this.height = this.canvas.parentElement.clientHeight;
+        this.canvas.width = this.width * dpr;
+        this.canvas.height = this.height * dpr;
+        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    draw() {
+        const W = this.width, H = this.height;
+        this.ctx.clearRect(0, 0, W, H);
+        
+        const cx = W / 2;
+        const by = H * 0.85;
+        const bw = Math.min(220, W * 0.4);
+        const bh = Math.min(350, H * 0.65);
+        
+        // Liquid
+        const fillRatio = Math.min(1, this.physics.V / this.physics.maxV);
+        const lh = fillRatio * bh;
+        const ly = by - lh;
+        
+        const col = this.physics.substance.color;
+        const alpha = Math.min(0.95, 0.1 + (this.physics.c * 0.4));
+        
+        this.ctx.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${alpha})`;
+        this.ctx.fillRect(cx - bw/2 + 5, ly, bw - 10, lh - 5);
+
+        // Beaker
+        this.ctx.strokeStyle = "rgba(255,255,255,0.8)";
+        this.ctx.lineWidth = 4;
+        this.ctx.beginPath();
+        this.ctx.moveTo(cx - bw/2, by - bh);
+        this.ctx.lineTo(cx - bw/2, by - 10);
+        this.ctx.quadraticCurveTo(cx - bw/2, by, cx - bw/2 + 20, by);
+        this.ctx.lineTo(cx + bw/2 - 20, by);
+        this.ctx.quadraticCurveTo(cx + bw/2, by, cx + bw/2, by - 10);
+        this.ctx.lineTo(cx + bw/2, by - bh);
+        this.ctx.stroke();
+
+        // Lines
+        this.ctx.fillStyle = "rgba(255,255,255,0.7)";
+        this.ctx.font = "12px Arial";
+        this.ctx.textAlign = "right";
+        for(let v = 0.5; v <= this.physics.maxV; v += 0.5) {
+            const y = by - (v / this.physics.maxV) * bh;
+            if (y > by - bh) {
+                this.ctx.fillRect(cx - bw/2, y, 15, 2);
+                if (!this.physics.hideVolume) {
+                    this.ctx.fillText(fmt(v,1) + " L", cx - bw/2 - 5, y + 4);
+                }
+            }
+        }
+        if (this.physics.hideVolume) {
+            this.ctx.fillRect(cx - bw/2, ly, 18, 3);
+            this.ctx.fillStyle = "#fdcb6e";
+            this.ctx.font = "bold 14px Arial";
+            this.ctx.fillText("?", cx - bw/2 - 5, ly + 5);
+        }
+
+        // Labels
+        this.ctx.fillStyle = "#fff";
+        this.ctx.textAlign = "center";
+        if (this.physics.V > 0.1) {
+            this.ctx.font = "bold 16px Segoe UI";
+            this.ctx.fillText(this.physics.hideVolume ? "? L" : `${fmt(this.physics.V, 2)} L`, cx, ly + lh/2);
+        }
+        
+        this.ctx.font = "bold 22px Segoe UI";
+        this.ctx.fillStyle = "rgba(255,255,255,0.9)";
+        this.ctx.fillText(this.physics.substance.name, cx, by + 40);
+        
+        this.ctx.font = "14px Segoe UI";
+        this.ctx.fillStyle = "#aaa";
+        this.ctx.fillText(`M = ${fmt(this.physics.substance.M, 2)} g/mol`, cx, by + 65);
+
+        // Microscope
+        if (this.physics.V > 0.05 && W > 550) {
+            const mr = Math.min(80, W * 0.15); 
+            const mx = cx + bw/2 + mr + 20;    
+            const my = by - bh/2;              
+            const liquidCenterY = ly + lh/2;   
+
+            this.drawMicroscope(mx, my, mr, this.physics.substance, cx, liquidCenterY);
+        }
+
+        // Target (Challenge)
+        if (this.physics.targetC) {
+            this.ctx.strokeStyle = "#fab1a0";
+            this.ctx.setLineDash([6, 4]);
+            this.ctx.lineWidth = 2;
+            this.ctx.strokeRect(cx - 110, 30, 220, 50);
+            this.ctx.fillStyle = "#fab1a0";
+            this.ctx.textAlign = "center";
+            this.ctx.font = "14px Arial";
+            this.ctx.fillText("MÅL KONCENTRATION:", cx, 46);
+            this.ctx.font = "bold 20px Consolas";
+            // Pæne tal i challenge mode
+            this.ctx.fillText(`${fmt(this.physics.targetC, 1)} M`, cx, 70);
+            
+            if (Math.abs(this.physics.c - this.physics.targetC) < 0.03) {
+                this.ctx.fillStyle = "#00b894";
+                this.ctx.fillText("✔ RAMT!", cx + 140, 60);
+            }
+            this.ctx.setLineDash([]);
+        }
+    }
+
+    drawMicroscope(x, y, r, substance, beakerX, liquidY) {
+        this.ctx.save();
+        this.ctx.beginPath(); this.ctx.moveTo(x - r, y); this.ctx.lineTo(beakerX + 20, liquidY);
+        this.ctx.strokeStyle = "rgba(255, 255, 255, 0.4)"; this.ctx.lineWidth = 2; this.ctx.setLineDash([4, 4]); this.ctx.stroke(); this.ctx.setLineDash([]);
+        this.ctx.beginPath(); this.ctx.arc(beakerX + 20, liquidY, 5, 0, Math.PI*2); this.ctx.stroke();
+
+        this.ctx.beginPath(); this.ctx.arc(x, y, r, 0, Math.PI*2);
+        this.ctx.fillStyle = "#222"; this.ctx.fill();
+        this.ctx.strokeStyle = "#dfe6e9"; this.ctx.lineWidth = 4; this.ctx.stroke();
+        this.ctx.clip();
+
+        // Ion-mønster: hvert felt i mønstret svarer til én ion, i det rigtige mængdeforhold
+        const ionPattern = [];
+        substance.ions.forEach(ion => { for (let k = 0; k < ion.count; k++) ionPattern.push(ion); });
+
+        const densityFactor = 80;
+        const count = Math.min(this.particles.length, Math.floor(this.physics.c * densityFactor));
+
+        for(let i = 0; i < count; i++) {
+            let p = this.particles[i]; p.update(r);
+            const ionColor = ionPattern[i % ionPattern.length].color;
+            this.ctx.beginPath(); this.ctx.arc(x + p.x, y + p.y, p.size, 0, Math.PI*2);
+            this.ctx.fillStyle = `rgb(${ionColor[0]},${ionColor[1]},${ionColor[2]})`; this.ctx.fill();
+            this.ctx.fillStyle = "rgba(255,255,255,0.5)";
+            this.ctx.beginPath(); this.ctx.arc(x + p.x - 1, y + p.y - 1, p.size/2, 0, Math.PI*2); this.ctx.fill();
+        }
+        this.ctx.restore();
+        this.ctx.fillStyle = "#aaa"; this.ctx.font = "11px Arial"; this.ctx.textAlign = "center";
+        this.ctx.fillText("Mikroskop (Partikeltæthed)", x, y + r + 15);
+
+        // Legende: hvilke ioner indgår i tegningen
+        let legendY = y + r + 36;
+        substance.ions.forEach(ion => {
+            this.ctx.beginPath();
+            this.ctx.arc(x - 28, legendY - 4, 6, 0, Math.PI*2);
+            this.ctx.fillStyle = `rgb(${ion.color[0]},${ion.color[1]},${ion.color[2]})`;
+            this.ctx.fill();
+            this.ctx.strokeStyle = "rgba(255,255,255,0.6)"; this.ctx.lineWidth = 1; this.ctx.stroke();
+
+            this.ctx.fillStyle = "#fff";
+            this.ctx.font = "bold 13px Segoe UI";
+            this.ctx.textAlign = "left";
+            this.ctx.fillText(ion.symbol, x - 16, legendY);
+            legendY += 20;
+        });
+    }
+}
+
+/**
+ * TASKS & APP CONTROL
+ */
+const TASKS = [
+    {
+        id: 1,
+        title: "Opgave 1: Find Koncentration",
+        desc: "Der afvejes <strong>{m} g {sub}</strong>. Stoffet opløses i en målekolbe og fyldes op til <strong>{V} L</strong>.",
+        setup: (p) => {
+            const subs = ['CaCl2', 'NaCl', 'Na2CO3'];
+            const sKey = subs[Math.floor(Math.random()*subs.length)];
+            const s = SUBSTANCES[sKey];
+            const V = [0.25, 0.5, 1.0][Math.floor(Math.random()*3)];
+            const targetC = (0.1 + Math.random()*0.5).toFixed(2);
+            const m = (targetC * V * s.M).toFixed(2);
+            p.setSubstance(sKey);
+            p.n = parseFloat(m) / s.M; p.V = V;
+            return { m: fmt(m), V: fmt(V), sub: s.formulaHtml, correctM: s.M };
+        },
+        steps: [
+            {
+                text: "a) Find molarmassen (<i>M</i>) for {sub}.",
+                label: "<i>M</i> =", unit: "g/mol",
+                check: (val, data) => Math.abs(val - data.correctM) < 1.0,
+                hint: "Læg molmasserne for hvert grundstof sammen (gange med antal atomer af hver slags). Slå atommasserne op i et periodesystem."
+            },
+            {
+                text: "b) Beregn stofmængden (<i>n</i>). Brug formlen:<div class='formula-block'><i>n</i> = <i>m</i> / <i>M</i></div>",
+                label: "<i>n</i> =", unit: "mol",
+                check: (val, data) => Math.abs(val - (parseInput(data.m) / data.correctM)) < 0.05,
+                hint: (data) => `n = m / M = ${data.m} / ${fmt(data.correctM)}`
+            },
+            {
+                text: "c) Beregn koncentrationen (<i>c</i>). Brug formlen:<div class='formula-block'><i>c</i> = <i>n</i> / <i>V</i></div>",
+                label: "<i>c</i> =", unit: "M",
+                check: (val, data) => Math.abs(val - ((parseInput(data.m)/data.correctM)/parseInput(data.V))) < 0.05,
+                hint: (data) => `c = n / V = (${data.m}/${fmt(data.correctM)}) / ${data.V}`
+            }
+        ]
+    },
+    {
+        id: 2,
+        title: "Opgave 2: Find Massen",
+        desc: "Du skal lave <strong>{V} L</strong> af en <strong>{c} M</strong> opløsning af <strong>{sub}</strong>. Hvor meget skal du afveje?",
+        setup: (p) => {
+            const s = SUBSTANCES['Na2CO3'];
+            const V = (1.5 + Math.random()).toFixed(1);
+            const c = (0.05 + Math.random()*0.2).toFixed(3);
+            p.setSubstance('Na2CO3');
+            p.V = parseFloat(V); p.n = parseFloat(c) * parseFloat(V);
+            return { V: fmt(V), c: fmt(c, 3), sub: s.formulaHtml, M: s.M, rawV: V, rawC: c };
+        },
+        steps: [
+            {
+                text: "a) Beregn stofmængden (<i>n</i>). Brug formlen:<div class='formula-block'><i>n</i> = <i>c</i> · <i>V</i></div>",
+                label: "<i>n</i> =", unit: "mol",
+                check: (val, data) => Math.abs(val - (data.rawC * data.rawV)) < 0.05,
+                hint: (data) => `n = c · V = ${fmt(data.rawC,3)} · ${fmt(data.rawV)}`
+            },
+            {
+                text: "b) Beregn massen (<i>m</i>). Brug formlen:<div class='formula-block'><i>m</i> = <i>n</i> · <i>M</i></div>",
+                label: "<i>m</i> =", unit: "g",
+                check: (val, data) => Math.abs(val - (data.rawC * data.rawV * data.M)) < 0.5,
+                hint: (data) => `m = n · M = (${fmt(data.rawC,3)}·${fmt(data.rawV)}) · ${fmt(data.M)}`
+            }
+        ]
+    },
+    {
+        id: 3,
+        title: "Opgave 3: Find Volumen",
+        desc: "Vi har opløst <strong>{n} mol {sub}</strong>. Opløsningen har koncentrationen <strong>{c} M</strong>. Hvad er volumen?",
+        setup: (p) => {
+            const s = SUBSTANCES['NaCl'];
+            const n = (0.4 + Math.random()*0.4).toFixed(2);
+            const c = (0.2 + Math.random()*0.3).toFixed(2);
+            p.setSubstance('NaCl');
+            p.n = parseFloat(n); p.V = parseFloat(n)/parseFloat(c);
+            p.hideVolume = true;
+            return { n: fmt(n), c: fmt(c), sub: s.formulaHtml, rawN: n, rawC: c };
+        },
+        steps: [
+            {
+                text: "Isoler <i>V</i> i formlen <i>c</i> = <i>n</i> / <i>V</i> og beregn volumen:<div class='formula-block'><i>V</i> = <i>n</i> / <i>c</i></div>",
+                label: "<i>V</i> =", unit: "L",
+                check: (val, data) => Math.abs(val - (data.rawN / data.rawC)) < 0.1,
+                hint: (data) => `V = n / c = ${fmt(data.rawN)} / ${fmt(data.rawC)}`
+            }
+        ]
+    },
+    {
+        id: 4,
+        title: "Opgave 4: Fortynding",
+        desc: "Du har <strong>200 mL</strong> af en <strong>0,150 M</strong> KCl-opløsning. Du fortynder den til <strong>500 mL</strong>.",
+        setup: (p) => {
+            p.setSubstance('KCl');
+            const V1 = 200, c1 = 0.150, V2 = 500;
+            p.V = V1 / 1000; p.n = (c1 * V1) / 1000;
+            return { V1, c1: fmt(c1,3), V2, sub: SUBSTANCES['KCl'].formulaHtml };
+        },
+        steps: [
+            {
+                text: "a) Beregn stofmængden (<i>n</i>) FØR fortynding. (Husk: mL til L)",
+                label: "<i>n</i><sub>før</sub> =", unit: "mol",
+                check: (val, data) => Math.abs(val - 0.03) < 0.005,
+                hint: "n = c · V = 0,150 mol/L · 0,200 L (husk at lave 200 mL om til 0,200 L)"
+            },
+            {
+                text: "b) Hvad er koncentrationen (<i>c</i>) EFTER fortynding? Brug formlen:<div class='formula-block'><i>c</i><sub>efter</sub> = <i>n</i><sub>før</sub> / <i>V</i><sub>efter</sub></div>",
+                label: "<i>c</i><sub>efter</sub> =", unit: "M",
+                check: (val, data) => Math.abs(val - 0.06) < 0.01,
+                hint: "c = n / V = 0,03 mol / 0,5 L (500 mL = 0,5 L)",
+                onCorrect: (p, data) => {
+                    let startV = p.V, endV = 0.5;
+                    let anim = setInterval(() => { startV += 0.01; p.V = startV; if(p.V >= endV) clearInterval(anim); }, 20);
+                }
+            }
+        ]
+    },
+    {
+        id: 5,
+        title: "Opgave 5: Beregn Stofmængde",
+        desc: "Vi har en opløsning af <strong>{sub}</strong> med volumen <strong>{V} L</strong> og koncentration <strong>{c} M</strong>. Hvor mange mol salt er der i glasset?",
+        setup: (p) => {
+            const s = SUBSTANCES['CuSO4'];
+            const V = (1.0 + Math.random()).toFixed(1);
+            const c = (0.2 + Math.random()*0.3).toFixed(2);
+            p.setSubstance('CuSO4');
+            p.V = parseFloat(V); 
+            p.n = parseFloat(c) * parseFloat(V);
+            return { V: fmt(V), c: fmt(c), sub: s.formulaHtml, rawV: V, rawC: c };
+        },
+        steps: [
+            {
+                text: "Beregn stofmængden (<i>n</i>). Brug formlen:<div class='formula-block'><i>n</i> = <i>c</i> · <i>V</i></div>",
+                label: "<i>n</i> =", unit: "mol",
+                check: (val, data) => Math.abs(val - (data.rawC * data.rawV)) < 0.05,
+                hint: (data) => `n = c · V = ${fmt(data.rawC)} · ${fmt(data.rawV)}`
+            }
+        ]
+    },
+    {
+        id: 6,
+        title: "Opgave 6: Lilla Laboratorium",
+        desc: "Du skal lave en kraftig lilla opløsning af Kaliumpermanganat ({sub}). Du afvejer <strong>{m} g</strong> og opløser det i <strong>500 mL</strong> vand.",
+        setup: (p) => {
+            const s = SUBSTANCES['KMnO4'];
+            const V = 0.5;
+            const m = (10 + Math.random()*10).toFixed(1); // ca 10-20g
+            p.setSubstance('KMnO4');
+            p.n = parseFloat(m) / s.M;
+            p.V = V;
+            return { m: fmt(m), sub: s.formulaHtml, correctM: s.M, rawM: m, rawV: V };
+        },
+        steps: [
+            {
+                text: "a) Find molarmassen (<i>M</i>) for KMnO₄.",
+                label: "<i>M</i> =", unit: "g/mol",
+                check: (val, data) => Math.abs(val - data.correctM) < 1.0,
+                hint: "M(KMnO₄) = M(K) + M(Mn) + 4 · M(O) = 39,10 + 54,94 + 4 · 16,00"
+            },
+            {
+                text: "b) Hvor stor er stofmængden? (<i>n</i> = <i>m</i> / <i>M</i>)",
+                label: "<i>n</i> =", unit: "mol",
+                check: (val, data) => Math.abs(val - (data.rawM / data.correctM)) < 0.05,
+                hint: (data) => `n = m / M = ${data.rawM} / ${fmt(data.correctM)}`
+            },
+            {
+                text: "c) Hvad bliver koncentrationen? (Husk: 500 mL = 0,5 L)",
+                label: "<i>c</i> =", unit: "M",
+                check: (val, data) => Math.abs(val - ((data.rawM/data.correctM)/data.rawV)) < 0.05,
+                hint: (data) => `c = n / V = (${data.rawM}/${fmt(data.correctM)}) / ${fmt(data.rawV)}`
+            }
+        ]
+    },
+    {
+        id: 7,
+        title: "Opgave 7: Fremstilling af Opløsning (Ekstra)",
+        desc: "Der afvejes <strong>27,75 g {sub}</strong>. Stoffet overføres til en <strong>500 mL</strong> målekolbe og opløses i vand.",
+        setup: (p) => {
+            const s = SUBSTANCES['CaCl2'];
+            const m = 27.75, V = 0.5;
+            p.setSubstance('CaCl2');
+            p.n = m / s.M; p.V = V;
+            return { m: fmt(m), V: fmt(V), sub: s.formulaHtml, correctM: s.M };
+        },
+        steps: [
+            {
+                text: "a) Find molarmassen (<i>M</i>) for {sub}.",
+                label: "<i>M</i> =", unit: "g/mol",
+                check: (val, data) => Math.abs(val - data.correctM) < 0.5,
+                hint: "M(CaCl₂) = M(Ca) + 2 · M(Cl) = 40,08 + 2 · 35,45"
+            },
+            {
+                text: "b) Beregn stofmængden (<i>n</i>). Brug formlen:<div class='formula-block'><i>n</i> = <i>m</i> / <i>M</i></div>",
+                label: "<i>n</i> =", unit: "mol",
+                check: (val, data) => Math.abs(val - (parseInput(data.m) / data.correctM)) < 0.01,
+                hint: (data) => `n = m / M = ${data.m} / ${fmt(data.correctM)}`
+            },
+            {
+                text: "c) Beregn koncentrationen (<i>c</i>). Brug formlen:<div class='formula-block'><i>c</i> = <i>n</i> / <i>V</i></div>",
+                label: "<i>c</i> =", unit: "M",
+                check: (val, data) => Math.abs(val - ((parseInput(data.m)/data.correctM)/parseInput(data.V))) < 0.01,
+                hint: (data) => `c = n / V = (${data.m}/${fmt(data.correctM)}) / ${data.V}`
+            }
+        ]
+    },
+    {
+        id: 8,
+        title: "Opgave 8: Beregning af Masse (Ekstra)",
+        desc: "Vi skal bruge <strong>2,0 L</strong> af en <strong>{sub}</strong>-opløsning med koncentrationen <strong>0,50 M</strong>.",
+        setup: (p) => {
+            const s = SUBSTANCES['Na2CO3'];
+            const V = 2.0, c = 0.50;
+            p.setSubstance('Na2CO3');
+            p.V = V; p.n = c * V;
+            return { V: fmt(V), c: fmt(c), sub: s.formulaHtml, M: s.M, rawV: V, rawC: c };
+        },
+        steps: [
+            {
+                text: "a) Find stofmængden (<i>n</i>). Brug formlen:<div class='formula-block'><i>n</i> = <i>c</i> · <i>V</i></div>",
+                label: "<i>n</i> =", unit: "mol",
+                check: (val, data) => Math.abs(val - (data.rawC * data.rawV)) < 0.05,
+                hint: (data) => `n = c · V = ${fmt(data.rawC)} · ${fmt(data.rawV)}`
+            },
+            {
+                text: "b) Hvor mange gram {sub} skal afvejes? Brug formlen:<div class='formula-block'><i>m</i> = <i>n</i> · <i>M</i></div>",
+                label: "<i>m</i> =", unit: "g",
+                check: (val, data) => Math.abs(val - (data.rawC * data.rawV * data.M)) < 1.0,
+                hint: (data) => `m = n · M = (${fmt(data.rawC)}·${fmt(data.rawV)}) · ${fmt(data.M)}`
+            }
+        ]
+    },
+    {
+        id: 9,
+        title: "Opgave 9: Volumenberegning (Ekstra)",
+        desc: "Du har <strong>2,0 mol {sub}</strong>. Du ønsker at lave en saltvandsopløsning med koncentrationen <strong>0,80 M</strong>.",
+        setup: (p) => {
+            const s = SUBSTANCES['NaCl'];
+            const n = 2.0, c = 0.80;
+            p.setSubstance('NaCl');
+            p.n = n; p.V = n / c;
+            p.hideVolume = true;
+            return { n: fmt(n), c: fmt(c), sub: s.formulaHtml, rawN: n, rawC: c };
+        },
+        steps: [
+            {
+                text: "Hvor meget vand skal du tilsætte? Isoler <i>V</i> i formlen <i>c</i> = <i>n</i> / <i>V</i>:<div class='formula-block'><i>V</i> = <i>n</i> / <i>c</i></div>",
+                label: "<i>V</i> =", unit: "L",
+                check: (val, data) => Math.abs(val - (data.rawN / data.rawC)) < 0.1,
+                hint: (data) => `V = n / c = ${fmt(data.rawN)} / ${fmt(data.rawC)}`
+            }
+        ]
+    },
+    {
+        id: 10,
+        title: "Opgave 10: Fortynding (Ekstra)",
+        desc: "Du har <strong>200 mL</strong> af en <strong>2,0 M</strong> {sub}-opløsning. Du fortynder den til <strong>1,0 L</strong>.",
+        setup: (p) => {
+            p.setSubstance('KCl');
+            const V1 = 200, c1 = 2.0, V2 = 1000;
+            p.V = V1 / 1000; p.n = (c1 * V1) / 1000;
+            return { V1, c1: fmt(c1,2), V2, sub: SUBSTANCES['KCl'].formulaHtml };
+        },
+        steps: [
+            {
+                text: "a) Beregn stofmængden (<i>n</i>) FØR fortynding. (Husk: mL til L)",
+                label: "<i>n</i><sub>før</sub> =", unit: "mol",
+                check: (val, data) => Math.abs(val - 0.40) < 0.01,
+                hint: "n = c · V = 2,0 mol/L · 0,200 L (husk at lave 200 mL om til 0,200 L)"
+            },
+            {
+                text: "b) Hvad er koncentrationen (<i>c</i>) EFTER fortynding? Brug formlen:<div class='formula-block'><i>c</i><sub>efter</sub> = <i>n</i><sub>før</sub> / <i>V</i><sub>efter</sub></div>",
+                label: "<i>c</i><sub>efter</sub> =", unit: "M",
+                check: (val, data) => Math.abs(val - 0.40) < 0.01,
+                hint: "c = n / V = 0,40 mol / 1,0 L",
+                onCorrect: (p, data) => {
+                    let startV = p.V, endV = 1.0;
+                    let anim = setInterval(() => { startV += 0.02; p.V = startV; if(p.V >= endV) clearInterval(anim); }, 20);
+                }
+            }
+        ]
+    }
+];
+
+class AppController {
+    constructor() {
+        this.physics = new PhysicsEngine();
+        this.renderer = new Renderer('simCanvas', this.physics);
+        this.ui = document.getElementById('interaction-area');
+        this.feedback = document.getElementById('feedback-overlay');
+        this.currentMode = 'sim'; this.currentTaskIdx = 0; this.currentTaskStep = 0; this.taskData = null;
+        
+        // Sim Mode setup med pæne targets
+        this.niceTargets = [0.2, 0.4, 0.5, 0.6, 0.8, 1.0, 1.2, 1.4, 1.5, 1.6, 1.8, 2.0];
+
+        this.setMode('sim');
+        this.loop();
+    }
+
+    setMode(mode) {
+        this.currentMode = mode;
+        this.renderUI();
+    }
+
+    renderUI() {
+        this.ui.innerHTML = '';
+        if (this.currentMode === 'sim') this.renderSimControls();
+        else this.renderTaskControls();
+    }
+
+    renderSimControls() {
+        this.physics.hideVolume = false;
+
+        const btn = document.createElement('button');
+        btn.className = `btn btn-toggle ${this.physics.targetC ? 'active' : ''}`;
+        btn.innerHTML = this.physics.targetC ? "Afslut Udfordring" : "🎯 Start: Ram Koncentrationen";
+        
+        btn.onclick = () => {
+            if(this.physics.targetC) { 
+                this.physics.targetC = null; 
+                this.physics.setSubstance('CuSO4'); 
+            } else { 
+                this.physics.targetC = this.niceTargets[Math.floor(Math.random() * this.niceTargets.length)];
+                this.physics.setSubstance('CuSO4'); 
+                this.physics.n = 0.5; this.physics.V = 1.0; 
+            }
+            this.renderUI();
+        };
+        this.ui.appendChild(btn);
+
+        // Sliders med step 0.1
+        this.createSlider('Stofmængde (<i>n</i>)', 'mol', 0.1, 2.5, 0.1, this.physics.n, (v) => this.physics.n = parseFloat(v));
+        this.createSlider('Volumen (<i>V</i>)', 'L', 0.1, 3.0, 0.1, this.physics.V, (v) => this.physics.V = parseFloat(v));
+
+        const info = document.createElement('div');
+        info.innerHTML = `
+            <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:6px; margin-top:20px; text-align:center;">
+                <div style="font-size:0.9rem; color:#aaa; margin-bottom:5px;">Aktuel Koncentration</div>
+                <div id="live-c-display" style="font-size:2rem; font-weight:bold; color:var(--accent-blue);">0,00 M</div>
+                <div style="font-size:0.8rem; margin-top:5px;">Formel: <i>c</i> = <i>n</i> / <i>V</i></div>
+            </div>
+        `;
+        this.ui.appendChild(info);
+
+        const cta = document.createElement('button');
+        cta.className = 'tasks-cta';
+        cta.innerHTML = `
+            <span class="cta-icon">📝</span>
+            <span>
+                <div class="cta-title">Prøv opgaverne</div>
+                <div class="cta-sub">${TASKS.length} regneopgaver om koncentration</div>
+            </span>
+            <span class="cta-arrow">→</span>
+        `;
+        cta.onclick = () => this.setMode('tasks');
+        this.ui.appendChild(cta);
+    }
+
+    createSlider(labelHtml, unit, min, max, step, val, cb) {
+        const div = document.createElement('div');
+        div.className = 'control-group';
+        const id = 'sld-' + Math.random().toString(36).substr(2,5);
+        div.innerHTML = `
+            <label>
+                <span class="label-text">${labelHtml}</span>
+                <span class="value-display"><span id="val-${id}">${fmt(val, 2)}</span> ${unit}</span>
+            </label>
+            <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}">
+        `;
+        this.ui.appendChild(div);
+        div.querySelector('input').oninput = (e) => {
+            document.getElementById(`val-${id}`).innerText = fmt(e.target.value, 2);
+            cb(e.target.value);
+        };
+    }
+
+    renderTaskControls() {
+        if (!this.taskData || this.taskData.id !== TASKS[this.currentTaskIdx].id) {
+            this.physics.hideVolume = false;
+            this.taskData = TASKS[this.currentTaskIdx].setup(this.physics);
+            this.currentTaskStep = 0;
+        }
+        const task = TASKS[this.currentTaskIdx];
+        const vars = this.taskData;
+
+        const backBtn = document.createElement('button');
+        backBtn.className = 'back-to-sim';
+        backBtn.innerHTML = '❮ Tilbage til simulering';
+        backBtn.onclick = () => this.setMode('sim');
+        this.ui.appendChild(backBtn);
+
+        const nav = document.createElement('div');
+        nav.className = 'task-nav-grid';
+        TASKS.forEach((t, idx) => {
+            const numBtn = document.createElement('button');
+            numBtn.className = 'task-num-btn' + (idx === this.currentTaskIdx ? ' active' : '');
+            numBtn.innerText = idx + 1;
+            numBtn.onclick = () => this.goToTask(idx);
+            nav.appendChild(numBtn);
+        });
+        this.ui.appendChild(nav);
+
+        const card = document.createElement('div');
+        card.className = 'task-card';
+        let desc = task.desc;
+        for (let key in vars) { desc = desc.replace(`{${key}}`, vars[key]); }
+        card.innerHTML = `<div class="task-header">${task.title}</div><div class="task-desc">${desc}</div><div id="steps-area"></div>`;
+        this.ui.appendChild(card);
+        this.renderSteps(task);
+    }
+
+    renderSteps(task) {
+        const area = document.getElementById('steps-area');
+        area.innerHTML = '';
+        for (let i = 0; i <= this.currentTaskStep && i < task.steps.length; i++) {
+            const step = task.steps[i];
+            const isCurrent = (i === this.currentTaskStep);
+            const div = document.createElement('div');
+            div.className = 'step-container';
+            if (!isCurrent) div.style.opacity = '0.6';
+            let stepText = step.text;
+            for (let key in this.taskData) { stepText = stepText.replace(`{${key}}`, this.taskData[key]); }
+            
+            div.innerHTML = `
+                <span class="step-label">${stepText}</span>
+                <div class="input-group">
+                    <span class="unit-label">${step.label}</span>
+                    <input type="text" inputmode="decimal" class="calc-input" id="inp-${i}" ${!isCurrent ? 'disabled' : ''}>
+                    <span class="unit-label">${step.unit}</span>
+                </div>
+                ${isCurrent ? `<div class="step-hint" id="hint-${i}"></div>` : ''}
+            `;
+            if (isCurrent) {
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-check'; btn.innerText = 'Tjek Svar';
+                btn.onclick = () => this.checkStep(i);
+                div.appendChild(btn);
+
+                const inputEl = div.querySelector('input');
+                inputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') this.checkStep(i); });
+            } else {
+                // Vis korrekt svar, låst
+                const inp = div.querySelector('input');
+                inp.classList.add('correct');
+                // Hent værdien fra inputtet hvis brugeren har skrevet det, ellers sæt flueben (men her vil vi gerne se tallet)
+                // Da vi re-renderer, skal vi vide hvad brugeren skrev. 
+                // Hack: Vi antager brugeren har løst det, så vi kan ikke genskabe præcis input uden state.
+                // Bedre løsning: Gem inputs i taskData?
+                // For nu: Sæt flueben hvis vi ikke har state, MEN ved checkStep lader vi være med at overskrive.
+                // Da re-render kører ved start af opgave, og step-logik kører i checkStep, behøver vi ikke "genskabe" inputtet her, 
+                // fordi vi kun tilføjer NÆSTE step. De forrige steps ligger allerede i DOM'en hvis vi ikke slettede dem.
+                // Men renderSteps sletter innerHTML.
+                // Fix: Vi må bare markere dem som "færdige" visuelt.
+                inp.value = "✔"; // Fallback hvis vi re-renderer alt
+                // Rigtig fix: Gem værdier.
+                if(this.taskData[`step_${i}_val`]) inp.value = this.taskData[`step_${i}_val`];
+            }
+            area.appendChild(div);
+        }
+        const activeInput = document.getElementById(`inp-${this.currentTaskStep}`);
+        if (activeInput) activeInput.focus();
+    }
+
+    checkStep(stepIdx) {
+        const input = document.getElementById(`inp-${stepIdx}`);
+        const valStr = input.value;
+        const val = parseInput(valStr);
+        const task = TASKS[this.currentTaskIdx];
+        const step = task.steps[stepIdx];
+
+        if (isNaN(val)) { this.showFeedback("Indtast et tal", "error"); return; }
+
+        if (step.check(val, this.taskData)) {
+            input.classList.add('correct');
+            input.classList.remove('wrong');
+            input.disabled = true; // Lås inputtet
+
+            // Gem værdien så den huskes ved re-render
+            this.taskData[`step_${stepIdx}_val`] = valStr;
+
+            // Fjern knappen
+            input.parentElement.parentElement.querySelector('button').remove();
+            const hintEl = document.getElementById(`hint-${stepIdx}`);
+            if (hintEl) hintEl.innerHTML = '';
+
+            this.showFeedback("Korrekt!", "success");
+            if (step.onCorrect) step.onCorrect(this.physics, this.taskData);
+
+            this.currentTaskStep++;
+            // Vent lidt og vis næste step
+            setTimeout(() => this.renderSteps(task), 600);
+        } else {
+            input.classList.add('wrong');
+            this.showFeedback("Prøv igen.", "error");
+            if (step.hint) {
+                const hintEl = document.getElementById(`hint-${stepIdx}`);
+                const hintText = typeof step.hint === 'function' ? step.hint(this.taskData) : step.hint;
+                hintEl.innerHTML = `💡 Hjælp: ${hintText}`;
+            }
+        }
+    }
+
+    goToTask(idx) {
+        if (idx !== this.currentTaskIdx) {
+            this.currentTaskIdx = idx;
+            this.taskData = null;
+            this.renderUI();
+        }
+    }
+
+    showFeedback(msg, type) {
+        this.feedback.innerText = msg;
+        this.feedback.style.color = type === 'success' ? '#55efc4' : '#ff7675';
+        this.feedback.style.opacity = 1;
+        setTimeout(() => this.feedback.style.opacity = 0, 2000);
+    }
+
+    loop() {
+        if (this.currentMode === 'sim') {
+            const el = document.getElementById('live-c-display');
+            if (el) el.innerText = fmt(this.physics.c, 2) + " M";
+        }
+        this.renderer.draw();
+        requestAnimationFrame(() => this.loop());
+    }
+}
+
+const app = new AppController();
+</script>
+</body>
+</html>

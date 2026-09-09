@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotdog Stress: Rema Rush</title>
+    <style>
+        :root {
+            --bg: #121212;
+            --panel: #1e1e24;
+            --rema-blue: #005aa4;
+            --rema-red: #ef4136;
+            --text: #ffffff;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --success: #22c55e;
+            --purple: #8b5cf6;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* TOP SECTION */
+        .top-deck {
+            background: #000;
+            border-bottom: 4px solid #333;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+            z-index: 10;
+        }
+
+        .recipe-bar {
+            width: 100%;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #ddd;
+            background: #222;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #444;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .highlight { color: var(--accent); font-size: 2.2rem; }
+
+        .sausage-graphic {
+            background: #ef4136; border-radius: 10px;
+            box-shadow: inset 0 -3px 0 rgba(0,0,0,0.2); transform: rotate(-10deg);
+            display: inline-block;
+        }
+        .sausage-graphic.large { width: 60px; height: 20px; }
+        .sausage-graphic.header { width: 50px; height: 18px; margin: 0 5px; transform: rotate(-5deg); }
+
+        .inventory-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            background: #1a1a1a;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .inv-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #333;
+            padding: 5px 25px;
+            border-radius: 30px;
+            border: 1px solid #555;
+        }
+        .inv-label { font-size: 1rem; color: #aaa; text-transform: uppercase; }
+        .inv-count { font-size: 1.8rem; font-weight: bold; color: #fff; font-family: monospace; }
+
+        /* GAME LAYOUT */
+        .game-stage { display: flex; flex: 1; height: 100%; }
+
+        /* LEFT: REMA 1000 */
+        .shop-zone {
+            flex: 1;
+            background: #e0e0e0;
+            padding: 15px;
+            border-right: 8px solid var(--rema-blue);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .rema-header {
+            background: var(--rema-blue); color: white; text-align: center;
+            font-weight: 900; font-style: italic; font-size: 2rem;
+            padding: 15px; border-radius: 4px; margin-bottom: 10px;
+            box-shadow: 0 6px 0 var(--rema-red); text-transform: uppercase;
+        }
+
+        .stats-display {
+            background: #fff; color: #000; padding: 10px; border-radius: 8px;
+            margin-bottom: 15px; display: flex; justify-content: space-between;
+            font-weight: bold; font-size: 1.2rem; border: 2px solid #ccc;
+        }
+
+        .shop-grid { display: grid; grid-template-rows: 1fr 1fr 1fr; gap: 10px; flex: 1; }
+        .shop-row { display: flex; gap: 5px; height: 100%; }
+
+        .shop-btn {
+            background: white; border: 3px solid #ccc; border-radius: 8px;
+            cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: 0.1s; box-shadow: 0 4px 0 #999; position: relative; flex: 2;
+        }
+        .shop-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #999; }
+        .shop-btn:hover { border-color: var(--rema-blue); background: #f8faff; }
+        
+        .bulk-btn {
+            flex: 1; border-radius: 8px; cursor: pointer; display: none; 
+            flex-direction: column; align-items: center; justify-content: center;
+            font-weight: 900; font-size: 1.1rem; color: #fff;
+        }
+        .bulk-btn.active { display: flex; animation: popIn 0.3s; }
+        .bulk-btn:active { transform: translateY(4px); }
+        
+        /* Gold Button (x3) */
+        .bulk-btn.x3 { background: #f59e0b; border: 3px solid #d97706; box-shadow: 0 4px 0 #b45309; }
+        
+        /* Purple Button (x10) */
+        .bulk-btn.x10 { background: var(--purple); border: 3px solid #6d28d9; box-shadow: 0 4px 0 #4c1d95; }
+
+        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
+
+        .price-badge {
+            position: absolute; top: 5px; right: 5px;
+            background: var(--accent); color: #000; font-weight: bold;
+            padding: 2px 8px; border-radius: 10px; font-size: 0.9rem;
+        }
+        .emoji-icon { font-size: 2.5rem; }
+
+        /* RIGHT: ORDER */
+        .order-zone {
+            flex: 1; background: #1a1a1a; padding: 30px;
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+        }
+
+        .timer-container {
+            width: 100%; height: 50px; background: #333; border-radius: 25px;
+            border: 4px solid #555; position: relative; overflow: hidden;
+        }
+        .timer-fill {
+            height: 100%; width: 100%;
+            background: linear-gradient(90deg, #22c55e, #f59e0b, #ef4444);
+            transition: width 0.1s linear;
+        }
+        .timer-text {
+            position: absolute; top:0; left:0; width:100%; text-align:center;
+            line-height: 42px; font-weight: bold; font-size: 1.5rem; text-shadow: 0 0 5px black;
+        }
+
+        .order-ticket {
+            background: #fff; color: #000; padding: 30px; width: 70%; text-align: center;
+            transform: rotate(-3deg); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-top: 10px solid #ccc; animation: float 2s infinite ease-in-out;
+        }
+        @keyframes float { 0%, 100% { transform: rotate(-3deg) translateY(0); } 50% { transform: rotate(-3deg) translateY(-10px); } }
+
+        .order-num { font-size: 6rem; font-weight: 900; color: #222; line-height: 1; }
+        .order-label { font-size: 1.5rem; text-transform: uppercase; color: #666; font-weight: bold; border-top: 2px dashed #000; margin-top: 10px; padding-top: 10px;}
+
+        .deliver-btn {
+            background: var(--success); color: #000; border: none; width: 100%; padding: 25px;
+            font-size: 2rem; font-weight: 900; text-transform: uppercase; cursor: pointer;
+            border-radius: 15px; box-shadow: 0 8px 0 #15803d; transition: 0.1s;
+        }
+        .deliver-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #15803d; }
+
+        /* MODALS */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 100;
+        }
+        .modal h2 { font-size: 4rem; margin: 0; color: var(--accent); text-transform: uppercase; text-align: center;}
+        .modal p { font-size: 1.5rem; color: #ddd; max-width: 600px; text-align: center; margin: 20px 0; line-height: 1.5; }
+        
+        .shame-text {
+            color: var(--danger); font-size: 3rem !important; font-weight: 900;
+            border: 4px solid var(--danger); padding: 20px; transform: rotate(-5deg);
+            margin-bottom: 30px; background: rgba(255,0,0,0.1);
+        }
+
+        .btn-start {
+            background: var(--accent); color: #000; padding: 20px 60px; font-size: 2rem; font-weight: bold;
+            border: none; border-radius: 60px; cursor: pointer; box-shadow: 0 0 30px var(--accent); margin-top: 20px;
+        }
+        
+        .modal.warning { background: rgba(100, 0, 0, 0.85); border: 10px solid #ef4444; }
+        .hidden { display: none; }
+
+        /* FX */
+        .float-text {
+            position: absolute; font-weight: bold; pointer-events: none; z-index: 50;
+            animation: floatUp 1s ease-out forwards; text-shadow: 0 0 5px #000;
+        }
+        @keyframes floatUp { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-80px); opacity: 0; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="top-deck">
+        <div class="recipe-bar">
+            <span class="highlight">1</span> 🥖 
+            <span>+</span> 
+            <span class="highlight">1</span> <div class="sausage-graphic header"></div> 
+            <span>+</span> 
+            <span class="highlight">2</span> 🥒 
+            &nbsp;➜&nbsp; 
+            <span class="highlight">1</span> HOTDOG
+        </div>
+        
+        <div class="inventory-bar">
+            <div class="inv-item"><span class="inv-label">🥖 Brød</span><span class="inv-count" id="invBread">0</span></div>
+            <div class="inv-item"><span class="inv-label">🥩 Pølser</span><span class="inv-count" id="invSausage">0</span></div>
+            <div class="inv-item"><span class="inv-label">🥒 Agurker</span><span class="inv-count" id="invPickle">0</span></div>
+        </div>
+    </div>
+
+    <div class="game-stage">
+        
+        <div class="shop-zone">
+            <div class="rema-header">REMA 1000</div>
+            <div class="stats-display">
+                <span>Pengepung:</span><span id="moneyDisplay" style="color:var(--rema-blue)">0 kr.</span>
+            </div>
+            <div class="shop-grid">
+                <div class="shop-row">
+                    <button class="shop-btn" onclick="buy('bread', 1, 2, event)">
+                        <div class="price-badge">2 kr</div><div class="emoji-icon">🥖</div><div style="font-weight:bold;">Pølsebrød</div>
+                    </button>
+                    <button class="bulk-btn x3" onclick="buy('bread', 3, 6, event)"><div>x3</div><div style="font-size:0.9rem">6 kr</div></button>
+                    <button class="bulk-btn x10" onclick="buy('bread', 10, 20, event)"><div>x10</div><div style="font-size:0.9rem">20 kr</div></button>
+                </div>
+                <div class="shop-row">
+                    <button class="shop-btn" onclick="buy('sausage', 1, 3, event)">
+                        <div class="price-badge">3 kr</div><div class="sausage-graphic large"></div><div style="font-weight:bold; margin-top:5px;">Rød Pølse</div>
+                    </button>
+                    <button class="bulk-btn x3" onclick="buy('sausage', 3, 9, event)"><div>x3</div><div style="font-size:0.9rem">9 kr</div></button>
+                    <button class="bulk-btn x10" onclick="buy('sausage', 10, 30, event)"><div>x10</div><div style="font-size:0.9rem">30 kr</div></button>
+                </div>
+                <div class="shop-row">
+                    <button class="shop-btn" onclick="buy('pickle', 1, 1, event)">
+                        <div class="price-badge">1 kr</div><div class="emoji-icon">🥒</div><div style="font-weight:bold;">Agurk</div>
+                    </button>
+                    <button class="bulk-btn x3" onclick="buy('pickle', 3, 3, event)"><div>x3</div><div style="font-size:0.9rem">3 kr</div></button>
+                    <button class="bulk-btn x10" onclick="buy('pickle', 10, 10, event)"><div>x10</div><div style="font-size:0.9rem">10 kr</div></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="order-zone">
+            <div class="timer-container">
+                <div class="timer-text" id="timerText">14.00 s</div>
+                <div class="timer-fill" id="timerBar"></div>
+            </div>
+            <div class="order-ticket" id="ticket">
+                <div style="font-weight:bold; color:#888;">ORDRE #<span id="levelNum">1</span></div>
+                <div class="order-num" id="targetNum">3</div>
+                <div class="order-label">Hotdogs</div>
+            </div>
+            <button class="deliver-btn" onclick="deliver()">LEVER NU!</button>
+        </div>
+    </div>
+
+    <div id="startModal" class="modal">
+        <h2 style="color:#fff;">🌭 Korrekt forhold</h2>
+        <p>Du har <strong>14 sekunder</strong>.<br>Tiden går ikke i stå! Du får <strong>+10 sekunder</strong> bonus når du leverer.<br>Køb <strong>præcis</strong> det du skal bruge!</p>
+        <button class="btn-start" onclick="startGame()">START VAGT</button>
+    </div>
+
+    <div id="gameOverModal" class="modal hidden">
+        <h2 id="failTitle" style="color:var(--danger)">KONKURS!</h2>
+        <p id="failReason" style="font-size:1.5rem;">Du løb tør for penge eller tid.</p>
+        <button class="btn-start" onclick="location.reload()">PRØV IGEN</button>
+    </div>
+
+    <div id="winModal" class="modal hidden" style="background: linear-gradient(135deg, #ffd700, #f59e0b);">
+        <h2 style="color:#000; font-size:3.5rem;">TILLYKKE!</h2>
+        <p style="color:#000; font-weight:bold;">Du har rundet 100 hotdogs.</p>
+        <p style="color:#000; font-style:italic;">Du har officielt spildt dit liv på dette spil.<br>Søg job hos Steff Houlberg.</p>
+        <button class="btn-start" style="background:#000; color:#fff;" onclick="location.reload()">SPIL IGEN?</button>
+    </div>
+
+    <div id="warningModal" class="modal warning hidden">
+        <h2 style="color:#fff">HOVSA!</h2>
+        <div id="shameMsg" class="shame-text hidden">IKKE-ÆKVIVALENTE MÆNGDER!</div>
+        <p id="warnReason" style="font-size:1.3rem;">Du lavede en fejl</p>
+        <p id="warnCost" style="color:yellow; font-weight:bold; font-size:1.5rem;">...</p>
+        <p style="font-size:1rem; color:#fff;">(Skynd dig! Tiden går stadig!)</p>
+        <button id="warnBtn" class="btn-start" style="background:#fff; color:var(--danger)" onclick="handleWarningClick()">VIDERE!</button>
+    </div>
+
+    <div id="levelModal" class="modal hidden" style="background:rgba(34, 197, 94, 0.8);">
+        <h2 style="color:#fff;">GODT GÅET!</h2>
+        <p style="font-size:3rem; font-weight:bold;">+10 SEKUNDER</p>
+    </div>
+
+<script>
+    // --- GAME CONSTANTS ---
+    const TIME_LIMIT = 14.0; 
+    const BONUS_TIME = 10.0;
+    const COST = { bread: 2, sausage: 3, pickle: 1 };
+    const REWARD = 15; // Højere løn!
+    
+    // --- STATE ---
+    let state = {
+        level: 1,
+        target: 3,
+        money: 0,
+        inv: { bread: 0, sausage: 0, pickle: 0 },
+        timeLeft: TIME_LIMIT,
+        maxTime: 20, 
+        running: false,
+        lastTime: 0,
+        locked: false,
+        warningAction: null // 'retry' or 'next'
+    };
+
+    function startGame() {
+        document.getElementById('startModal').classList.add('hidden');
+        setupLevel(1, 3); 
+        state.running = true;
+        state.lastTime = performance.now();
+        requestAnimationFrame(gameLoop);
+    }
+
+    function setupLevel(lvl, target) {
+        if (target > 100) {
+            document.getElementById('winModal').classList.remove('hidden');
+            state.running = false;
+            return;
+        }
+
+        state.level = lvl;
+        state.target = target;
+        state.inv = { bread: 0, sausage: 0, pickle: 0 };
+        
+        const costPerDog = COST.bread + COST.sausage + (COST.pickle * 2);
+        if (lvl === 1) state.money = (target * costPerDog) + 6;
+        else state.money += (target * costPerDog);
+
+        updateButtons();
+        updateUI();
+        document.getElementById('levelModal').classList.add('hidden');
+    }
+
+    function updateButtons() {
+        const x3Btns = document.querySelectorAll('.x3');
+        const x10Btns = document.querySelectorAll('.x10');
+        if (state.level >= 2) x3Btns.forEach(b => b.classList.add('active'));
+        else x3Btns.forEach(b => b.classList.remove('active'));
+        if (state.target > 30) x10Btns.forEach(b => b.classList.add('active'));
+        else x10Btns.forEach(b => b.classList.remove('active'));
+    }
+
+    function buy(item, count, price, event) {
+        if (!state.running || state.locked) return;
+
+        if (state.money >= price) {
+            state.money -= price;
+            state.inv[item] += count;
+            showFloatText(event.clientX, event.clientY, `-${price}`, 'red');
+            updateUI();
+        } else {
+            triggerGameOver("KONKURS!", "Du har ingen penge tilbage.");
+        }
+    }
+
+    function deliver() {
+        if (!state.running || state.locked) return;
+
+        const possibleBread = Math.floor(state.inv.bread / 1);
+        const possibleSausage = Math.floor(state.inv.sausage / 1);
+        const possiblePickle = Math.floor(state.inv.pickle / 2);
+        const produced = Math.min(possibleBread, possibleSausage, possiblePickle);
+
+        if (produced < state.target) {
+            // FOR LIDT -> STRAF & RETRY
+            const penalty = 15;
+            state.money -= penalty;
+            
+            let reason = "Du manglede varer!";
+            if (possibleBread < state.target) reason = "Mangel: BRØD";
+            else if (possibleSausage < state.target) reason = "Mangel: PØLSER";
+            else if (possiblePickle < state.target) reason = "Mangel: AGURKER";
+
+            triggerWarning("FOR LIDT MAD!", reason, penalty, false, 'retry');
+        
+        } else if (produced === state.target) {
+            // Check waste
+            const waste = (state.inv.bread - produced) + 
+                          (state.inv.sausage - produced) + 
+                          (state.inv.pickle - produced*2);
+            
+            // Få betaling for ordren uanset hvad
+            const bonus = state.target * (REWARD - 7); 
+            state.money += bonus;
+
+            if (waste === 0) {
+                // PERFEKT -> SUCCESS
+                success();
+            } else {
+                // SPILD -> WARNING MEN NEXT LEVEL
+                // Ingen bøde trukket fra, men varerne er tabt.
+                triggerWarning("SPILD!", "Du havde overskud. Det røg i skraldespanden.", 0, true, 'next');
+            }
+        } else {
+            // For mange (teknisk set spild)
+            triggerWarning("SPILD!", "Du lavede for mange!", 0, true, 'next');
+        }
+        updateUI();
+    }
+
+    function triggerWarning(title, reason, cost, isShame, action) {
+        if (state.money < 0) {
+            triggerGameOver("KONKURS!", "Bøden slog bunden ud af kassen.");
+            return;
+        }
+
+        state.locked = true; 
+        state.warningAction = action; // save action for button click
+
+        const wModal = document.getElementById('warningModal');
+        wModal.querySelector('h2').textContent = title;
+        document.getElementById('warnReason').textContent = reason;
+        
+        if (cost > 0) document.getElementById('warnCost').textContent = `Bøde: -${cost} kr`;
+        else document.getElementById('warnCost').textContent = "Varerne er tabt";
+        
+        const shame = document.getElementById('shameMsg');
+        if(isShame) shame.classList.remove('hidden');
+        else shame.classList.add('hidden');
+
+        // Knap tekst
+        const btn = document.getElementById('warnBtn');
+        if (action === 'next') btn.textContent = "NÆSTE LEVEL ->";
+        else btn.textContent = "PRØV IGEN";
+
+        wModal.classList.remove('hidden');
+    }
+
+    function handleWarningClick() {
+        document.getElementById('warningModal').classList.add('hidden');
+        state.locked = false;
+
+        if (state.warningAction === 'next') {
+            success(); // Go to next level
+        } else {
+            // RETRY current level
+            // Reset inventory
+            state.inv = { bread: 0, sausage: 0, pickle: 0 };
+            // Refund cost so they can try again (penalty paid already)
+            const costPerDog = COST.bread + COST.sausage + (COST.pickle * 2);
+            state.money += (state.target * costPerDog); 
+            updateUI();
+        }
+    }
+
+    function triggerGameOver(title, reason) {
+        state.running = false;
+        document.getElementById('warningModal').classList.add('hidden'); 
+        const modal = document.getElementById('gameOverModal');
+        modal.classList.remove('hidden');
+        document.getElementById('failTitle').textContent = title;
+        document.getElementById('failReason').textContent = reason;
+    }
+
+    function success() {
+        state.timeLeft += BONUS_TIME;
+        document.getElementById('levelModal').classList.remove('hidden');
+        state.locked = true;
+
+        setTimeout(() => {
+            let nextT = 0;
+            if (state.level === 1) nextT = 7; 
+            else nextT = Math.floor(Math.random()*8) + 2 + state.target; // +2 til +9
+            
+            setupLevel(state.level + 1, nextT);
+            state.locked = false;
+        }, 1000);
+    }
+
+    function gameLoop(timestamp) {
+        if (!state.running) return;
+
+        const dt = (timestamp - state.lastTime) / 1000;
+        state.lastTime = timestamp;
+
+        if (dt < 0.5) state.timeLeft -= dt;
+        
+        if (state.timeLeft <= 0) {
+            state.timeLeft = 0;
+            triggerGameOver("TIDEN GIK!", "Du var for langsom i Rema.");
+            return; 
+        }
+
+        const visualPct = Math.min((state.timeLeft / state.maxTime) * 100, 100);
+        const bar = document.getElementById('timerBar');
+        bar.style.width = visualPct + "%";
+        document.getElementById('timerText').textContent = state.timeLeft.toFixed(2) + " s";
+
+        if (state.timeLeft < 5) bar.style.background = "#ef4444";
+        else bar.style.background = "linear-gradient(90deg, #22c55e, #f59e0b)";
+
+        requestAnimationFrame(gameLoop);
+    }
+
+    function updateUI() {
+        document.getElementById('levelNum').textContent = state.level;
+        document.getElementById('targetNum').textContent = state.target;
+        document.getElementById('moneyDisplay').textContent = Math.floor(state.money) + " kr.";
+        document.getElementById('invBread').textContent = state.inv.bread;
+        document.getElementById('invSausage').textContent = state.inv.sausage;
+        document.getElementById('invPickle').textContent = state.inv.pickle;
+    }
+
+    function showFloatText(x, y, text, color) {
+        const el = document.createElement('div');
+        el.className = 'float-text';
+        el.textContent = text;
+        el.style.left = x + 'px';
+        el.style.top = y + 'px';
+        el.style.color = color;
+        el.style.fontSize = "2.5rem";
+        el.style.textShadow = "0 0 5px black";
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 800);
+    }
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kemi-Træner: Stofmængde, Masse og Molarmasse</title>
+    <style>
+        :root {
+            --bg-color: #1a1a2e;
+            --panel-bg: #16213e;
+            --card-bg: #0f3460;
+            --text-main: #eaeaea;
+            --text-muted: #a0a0a0;
+            --accent: #e94560;
+            --success: #4ade80;
+            --error: #ef476f;
+            --highlight: #4cc9f0;
+            --border-radius: 8px;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        header {
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 15px 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--card-bg);
+            flex-shrink: 0;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--highlight);
+        }
+
+        .progress-indicator {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--success);
+        }
+
+        /* Main layout */
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar (Trekant og info) */
+        .sidebar {
+            width: 320px;
+            flex-shrink: 0;
+            background-color: var(--panel-bg);
+            padding: 15px;
+            border-right: 2px solid var(--card-bg);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        .sidebar-box {
+            background-color: var(--card-bg);
+            padding: 12px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .sidebar-box h2 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+        }
+
+        /* SVG Triangle Container */
+        #triangle-container {
+            width: 100%;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Tabs and Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background: radial-gradient(circle at center, #252535, #111);
+            overflow-y: auto;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background-color: var(--panel-bg);
+            color: var(--text-muted);
+            border: 2px solid var(--card-bg);
+            padding: 10px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--highlight);
+            color: var(--text-main);
+        }
+
+        .tab-btn.active {
+            background-color: var(--highlight);
+            color: #000;
+            border-color: var(--highlight);
+            box-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
+        }
+
+        .tab-btn.completed {
+            border-color: var(--success);
+            color: var(--success);
+        }
+        
+        .tab-btn.completed.active {
+            background-color: var(--success);
+            color: #000;
+        }
+
+        /* Task Area */
+        .task-container {
+            background-color: var(--panel-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .task-description {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            padding: 15px;
+            background-color: rgba(255,255,255,0.05);
+            border-left: 4px solid var(--highlight);
+            border-radius: 4px;
+        }
+
+        /* Scaffolding Steps */
+        .step-container {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            opacity: 0.4;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            position: relative;
+        }
+
+        .step-container.active {
+            opacity: 1;
+            pointer-events: auto;
+            border: 1px solid var(--highlight);
+        }
+
+        .step-container.completed {
+            opacity: 1;
+            pointer-events: none;
+            border: 1px solid var(--success);
+            background-color: rgba(74, 222, 128, 0.1);
+        }
+
+        .step-number {
+            background-color: var(--highlight);
+            color: #000;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .step-container.completed .step-number {
+            background-color: var(--success);
+        }
+
+        .step-label {
+            flex: 1;
+            font-size: 1.1rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            width: 100px;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #555;
+            background-color: #222;
+            color: #fff;
+            font-size: 1.1rem;
+            text-align: right;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--highlight);
+        }
+
+        select {
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #555;
+            background-color: #222;
+            color: #fff;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .check-btn {
+            padding: 10px 15px;
+            background-color: var(--highlight);
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .check-btn:hover {
+            background-color: #3bb2d6;
+        }
+
+        .feedback-icon {
+            min-width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .step-message {
+            flex-basis: 100%;
+            padding-left: 45px;
+            font-size: 0.95rem;
+            min-height: 1.2em;
+        }
+
+        /* Controls */
+        .controls {
+            margin-top: auto;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            background-color: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            border-radius: var(--border-radius);
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background-color: var(--accent);
+            color: #fff;
+        }
+
+        /* Particle Canvas */
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* --- RESPONSIVT LAYOUT --- */
+        /* Smalle skærme / høj zoom: stak sidebar over indholdet i stedet for ved siden af */
+        @media (max-width: 860px) {
+            body { overflow: auto; }
+            .container { flex-direction: column; overflow: visible; }
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                flex-wrap: wrap;
+                border-right: none;
+                border-bottom: 2px solid var(--card-bg);
+                overflow-y: visible;
+            }
+            .sidebar-box { flex: 1 1 260px; }
+            #triangle-container { height: 200px; }
+        }
+
+        /* Lave/korte vinduer (fx browser-værktøjslinjer/bogmærkelinje der spiser højde,
+           eller høj zoom): gør boksene mere kompakte. Sat relativt højt (960px) så almindelige
+           1920×1080-skærme med synlig værktøjs-/bogmærkelinje også rammer denne regel. */
+        @media (max-height: 960px) {
+            header { padding: 10px 20px; }
+            .sidebar { padding: 12px; gap: 12px; }
+            .sidebar-box { padding: 10px; }
+            #triangle-container { height: 170px; }
+        }
+
+        @media (max-height: 700px) {
+            header { padding: 8px 20px; }
+            header h1 { font-size: 1.2rem; }
+            .sidebar { padding: 10px; gap: 10px; }
+            .sidebar-box { padding: 8px; }
+            #triangle-container { height: 140px; }
+            .task-container { padding: 18px; gap: 12px; }
+            .step-container { padding: 10px; }
+            .task-description { padding: 10px; font-size: 1.05rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Masse og stofmængde</h1>
+        <div class="progress-indicator" id="global-progress">Gennemført: 0 / 6</div>
+    </header>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-box">
+                <h2>Formel-Trekanten</h2>
+                <div id="triangle-container">
+                    </div>
+                <p style="font-size: 0.9rem; color: var(--text-muted); text-align: center; margin-top: 10px;" id="triangle-help-text">
+                    Læg mærke til trekanten. Den lyser op for at vise dig, hvordan du isolerer den ukendte!
+                </p>
+            </div>
+            
+            <div class="sidebar-box">
+                <h2>Opgave Info</h2>
+                <p style="margin-bottom: 5px;"><strong>Enheder at huske:</strong></p>
+                <ul style="margin-top: 5px; padding-left: 20px; font-size: 0.95rem; line-height: 1.5;">
+                    <li><strong>m (masse):</strong> g (gram)</li>
+                    <li><strong>M (molarmasse):</strong> g/mol</li>
+                    <li><strong>n (stofmængde):</strong> mol</li>
+                </ul>
+                <p style="font-size: 0.85rem; color: var(--highlight); margin-top: 15px;">
+                    Husk at bruge dansk komma (fx 18,0) og ikke punktum.
+                </p>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="tabs" id="tabs-container">
+                </div>
+
+            <div class="task-container" id="task-workspace">
+                <div class="task-description" id="task-desc">
+                    Vælg en opgave for at starte.
+                </div>
+                
+                <div id="steps-container">
+                    </div>
+
+                <div class="controls">
+                    <button class="action-btn" id="restart-btn" onclick="app.restartCurrentTask()">Genstart Opgave</button>
+                    <button class="action-btn" id="next-task-btn" style="display: none; border-color: var(--success); color: var(--success);" onclick="app.nextTask()">Næste Opgave ⟶</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <canvas id="particle-canvas"></canvas>
+
+    <script>
+        // --- DATA STRUCTURE FOR TASKS ---
+        // Vi bruger strenge til formler med unicodes (fx H\u2082O for H₂O) for at undgå sub-tags i JS variabler, 
+        // selvom vi nemt kan parse det. Vi bruger rigtige unicode tegn her.
+        
+        // --- HJÆLPEFUNKTIONER TIL TAL/FORMATERING ---
+        function pickRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // Runder til 2 decimaler og formaterer med dansk komma, med mindst 1 og højst 2 decimaler
+        function round2(num) {
+            return Math.round(num * 100) / 100;
+        }
+
+        function fmtDK(num) {
+            var rounded = round2(num);
+            var str = (Math.abs(rounded * 10 - Math.round(rounded * 10)) < 0.001)
+                ? rounded.toFixed(1)
+                : rounded.toFixed(2);
+            return str.replace('.', ',');
+        }
+
+        // --- OPGAVE-SKABELONER ---
+        // Hver skabelon genererer nye "pæne" tal ved hvert forsøg/genstart,
+        // så eleverne ikke bare kan udveksle facit med hinanden.
+        var STORAGE_KEY = "kemitraener_masse_stofmaengde_v1";
+
+        var taskTemplates = [
+            {
+                id: 1,
+                title: "Opg. 1 (Find n)",
+                targetVar: "n",
+                generate: function() {
+                    var M = 18.0;
+                    var n = pickRandom([1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0]);
+                    var m = round2(n * M);
+                    return {
+                        desc: "Du har afvejet " + fmtDK(m) + " g vand (H₂O) i et bægerglas. Molarmassen for vand er beregnet til 18,0 g/mol.<br><br>Find stofmængden (n) af vand.",
+                        steps: [
+                            { label: "Trin 1: Hvad er massen (m)? Indtast værdi og vælg enhed.", expectedVal: m, expectedUnit: "g", tolerance: 0.1 },
+                            { label: "Trin 2: Hvad er molarmassen (M)?", expectedVal: M, expectedUnit: "g/mol", tolerance: 0.1 },
+                            { label: "Trin 3: Beregn stofmængden (n) ved at dividere massen med molarmassen.", expectedVal: n, expectedUnit: "mol", tolerance: 0.05 }
+                        ]
+                    };
+                }
+            },
+            {
+                id: 2,
+                title: "Opg. 2 (Find n)",
+                targetVar: "n",
+                generate: function() {
+                    var M = 58.5; // Na (23,0) + Cl (35,5)
+                    var n = pickRandom([1, 2, 3, 4, 5]);
+                    var m = round2(n * M);
+                    return {
+                        desc: "Du har " + fmtDK(m) + " g natriumchlorid (NaCl, køkkensalt). <br>M(Na) = 23,0 g/mol og M(Cl) = 35,5 g/mol.<br><br>Beregn først molarmassen for NaCl, og find derefter stofmængden.",
+                        steps: [
+                            { label: "Trin 1: Hvad er massen (m) af saltet?", expectedVal: m, expectedUnit: "g", tolerance: 0.1 },
+                            { label: "Trin 2: Beregn og indtast molarmassen (M) for NaCl.", expectedVal: M, expectedUnit: "g/mol", tolerance: 0.1 },
+                            { label: "Trin 3: Beregn stofmængden (n).", expectedVal: n, expectedUnit: "mol", tolerance: 0.05 }
+                        ]
+                    };
+                }
+            },
+            {
+                id: 3,
+                title: "Opg. 3 (Find m)",
+                targetVar: "m",
+                generate: function() {
+                    var M = 100.1;
+                    var n = pickRandom([1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]);
+                    var m = round2(n * M);
+                    return {
+                        desc: "Et forsøg kræver, at du bruger præcis " + fmtDK(n) + " mol calciumcarbonat (CaCO₃). Molarmassen for kridt er 100,1 g/mol.<br><br>Hvor mange gram skal du afveje på vægten?",
+                        steps: [
+                            { label: "Trin 1: Hvad er stofmængden (n)?", expectedVal: n, expectedUnit: "mol", tolerance: 0.05 },
+                            { label: "Trin 2: Hvad er molarmassen (M)?", expectedVal: M, expectedUnit: "g/mol", tolerance: 0.1 },
+                            { label: "Trin 3: Beregn massen (m) ved at gange n med M.", expectedVal: m, expectedUnit: "g", tolerance: 0.5 }
+                        ]
+                    };
+                }
+            },
+            {
+                id: 4,
+                title: "Opg. 4 (Find m)",
+                targetVar: "m",
+                generate: function() {
+                    var M = 98.1; // 2×H (1,0) + S (32,1) + 4×O (16,0)
+                    var n = pickRandom([0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1.0]);
+                    var m = round2(n * M);
+                    return {
+                        desc: "Du skal fremstille en opløsning med " + fmtDK(n) + " mol svovlsyre (H₂SO₄). <br>M(H) = 1,0 g/mol, M(S) = 32,1 g/mol, M(O) = 16,0 g/mol.<br><br>Beregn massen, du skal bruge.",
+                        steps: [
+                            { label: "Trin 1: Hvad er den ønskede stofmængde (n)?", expectedVal: n, expectedUnit: "mol", tolerance: 0.01 },
+                            { label: "Trin 2: Beregn molarmassen (M) for H₂SO₄.", expectedVal: M, expectedUnit: "g/mol", tolerance: 0.2 },
+                            { label: "Trin 3: Beregn massen (m).", expectedVal: m, expectedUnit: "g", tolerance: 0.3 }
+                        ]
+                    };
+                }
+            },
+            {
+                id: 5,
+                title: "Opg. 5 (Find M)",
+                targetVar: "M",
+                generate: function() {
+                    var M = pickRandom([40.0, 44.0, 60.0, 74.5, 78.0]);
+                    var n = pickRandom([0.1, 0.2, 0.25, 0.5]);
+                    var m = round2(n * M);
+                    return {
+                        desc: "Du har fået udleveret en prøve af et ukendt hvidt pulver. Du får at vide, at stofmængden i glasset er " + fmtDK(n) + " mol, og du afvejer massen til at være " + fmtDK(m) + " g.<br><br>Beregn molarmassen (M) for at finde ud af, hvilket stof der er tale om.",
+                        steps: [
+                            { label: "Trin 1: Hvad er massen (m)?", expectedVal: m, expectedUnit: "g", tolerance: 0.1 },
+                            { label: "Trin 2: Hvad er stofmængden (n)?", expectedVal: n, expectedUnit: "mol", tolerance: 0.01 },
+                            { label: "Trin 3: Beregn molarmassen (M) ved at dividere massen med stofmængden.", expectedVal: M, expectedUnit: "g/mol", tolerance: 0.1 }
+                        ]
+                    };
+                }
+            },
+            {
+                id: 6,
+                title: "Opg. 6 (Mesteren)",
+                targetVar: "m",
+                generate: function() {
+                    var M = 180.0; // 6×C (12,0) + 12×H (1,0) + 6×O (16,0)
+                    var n = pickRandom([0.5, 1.0, 1.5, 2.0, 2.5, 3.0]);
+                    var m = round2(n * M);
+                    return {
+                        desc: "Til fremstilling af ethanol gennem gæring anvendes " + fmtDK(n) + " mol glukose (C₆H₁₂O₆). <br>M(C) = 12,0 g/mol, M(H) = 1,0 g/mol, M(O) = 16,0 g/mol.<br><br>Beregn hvor meget glukose der skal afvejes.",
+                        steps: [
+                            { label: "Trin 1: Hvad er stofmængden (n)?", expectedVal: n, expectedUnit: "mol", tolerance: 0.01 },
+                            { label: "Trin 2: Beregn molarmassen (M) for C₆H₁₂O₆.", expectedVal: M, expectedUnit: "g/mol", tolerance: 0.5 },
+                            { label: "Trin 3: Beregn den masse (m) du skal afveje.", expectedVal: m, expectedUnit: "g", tolerance: 1.0 }
+                        ]
+                    };
+                }
+            }
+        ];
+
+        var taskData = [];
+
+        // --- APPLICATION LOGIC ---
+        var app = {
+            currentTaskIndex: 0,
+            completedTasks: [false, false, false, false, false, false],
+            currentStepIndex: 0,
+
+            init: function() {
+                this.loadProgress();
+                this.buildTabs();
+                this.loadTask(this.currentTaskIndex, this.currentStepIndex);
+                this.setupCanvas();
+            },
+
+            generateTasks: function() {
+                var result = [];
+                for (var i = 0; i < taskTemplates.length; i++) {
+                    var tpl = taskTemplates[i];
+                    var generated = tpl.generate();
+                    result.push({
+                        id: tpl.id,
+                        title: tpl.title,
+                        targetVar: tpl.targetVar,
+                        desc: generated.desc,
+                        steps: generated.steps
+                    });
+                }
+                return result;
+            },
+
+            // Gemmer fremgang (inkl. de aktuelt udtrukne opgavetal) så et genindlæst
+            // faneblad ikke nulstiller elevens arbejde.
+            saveProgress: function() {
+                try {
+                    var state = {
+                        taskData: taskData,
+                        completedTasks: this.completedTasks,
+                        currentTaskIndex: this.currentTaskIndex,
+                        currentStepIndex: this.currentStepIndex
+                    };
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+                } catch (e) {
+                    // localStorage kan være utilgængeligt (fx privat browsing) - ikke kritisk
+                }
+            },
+
+            loadProgress: function() {
+                var saved = null;
+                try {
+                    var raw = localStorage.getItem(STORAGE_KEY);
+                    if (raw) saved = JSON.parse(raw);
+                } catch (e) {
+                    saved = null;
+                }
+
+                if (saved && saved.taskData && saved.taskData.length === taskTemplates.length) {
+                    taskData = saved.taskData;
+                    this.completedTasks = saved.completedTasks || [false, false, false, false, false, false];
+                    this.currentTaskIndex = (typeof saved.currentTaskIndex === "number") ? saved.currentTaskIndex : 0;
+                    this.currentStepIndex = (typeof saved.currentStepIndex === "number") ? saved.currentStepIndex : 0;
+                    // Delvis fremgang i en allerede gennemført opgave giver ikke mening at genskabe
+                    if (this.completedTasks[this.currentTaskIndex]) {
+                        this.currentStepIndex = 0;
+                    }
+                } else {
+                    taskData = this.generateTasks();
+                }
+            },
+
+            buildTabs: function() {
+                var tabsContainer = document.getElementById("tabs-container");
+                tabsContainer.innerHTML = "";
+                
+                for (var i = 0; i < taskData.length; i++) {
+                    var btn = document.createElement("button");
+                    btn.className = "tab-btn";
+                    if (i === this.currentTaskIndex) btn.classList.add("active");
+                    if (this.completedTasks[i]) btn.classList.add("completed");
+                    
+                    btn.innerText = taskData[i].title;
+                    btn.setAttribute("data-index", i);
+                    
+                    var self = this;
+                    btn.onclick = function(e) {
+                        var index = parseInt(e.target.getAttribute("data-index"));
+                        self.loadTask(index);
+                    };
+                    
+                    tabsContainer.appendChild(btn);
+                }
+                
+                var completedCount = 0;
+                for (var j = 0; j < this.completedTasks.length; j++) {
+                    if (this.completedTasks[j]) completedCount++;
+                }
+                document.getElementById("global-progress").innerText = "Gennemført: " + completedCount + " / 6";
+            },
+
+            loadTask: function(index, restoreStepIndex) {
+                this.currentTaskIndex = index;
+                this.currentStepIndex = (typeof restoreStepIndex === "number") ? restoreStepIndex : 0;
+                this.buildTabs(); // Opdater UI for aktiv tab
+
+                var task = taskData[index];
+                document.getElementById("task-desc").innerHTML = task.desc;
+                document.getElementById("next-task-btn").style.display = this.completedTasks[index] ? "inline-block" : "none";
+
+                this.renderSteps();
+                this.updateTriangle("none"); // Nulstil trekant
+                document.getElementById("triangle-help-text").innerText = "Læs opgaven. Hvad er det endelige mål at finde?";
+                this.saveProgress();
+            },
+
+            restartCurrentTask: function() {
+                // Genstart trækker nye "pæne" tal, så en gentaget opgave ikke bare kan besvares udenad
+                var tpl = taskTemplates[this.currentTaskIndex];
+                var generated = tpl.generate();
+                taskData[this.currentTaskIndex] = {
+                    id: tpl.id,
+                    title: tpl.title,
+                    targetVar: tpl.targetVar,
+                    desc: generated.desc,
+                    steps: generated.steps
+                };
+                this.completedTasks[this.currentTaskIndex] = false;
+                this.loadTask(this.currentTaskIndex, 0);
+            },
+
+            nextTask: function() {
+                if (this.currentTaskIndex < taskData.length - 1) {
+                    this.loadTask(this.currentTaskIndex + 1);
+                }
+            },
+
+            renderSteps: function() {
+                var container = document.getElementById("steps-container");
+                container.innerHTML = "";
+                var task = taskData[this.currentTaskIndex];
+                var self = this;
+
+                var handleEnterKey = function(e) {
+                    if (e.key === "Enter" || e.keyCode === 13) {
+                        e.preventDefault();
+                        var stepIdx = parseInt(e.target.getAttribute("data-step"));
+                        self.checkStep(stepIdx);
+                    }
+                };
+
+                for (var i = 0; i < task.steps.length; i++) {
+                    var stepData = task.steps[i];
+                    var stepDiv = document.createElement("div");
+                    stepDiv.className = "step-container";
+                    stepDiv.id = "step-" + i;
+
+                    if (i === this.currentStepIndex) {
+                        stepDiv.classList.add("active");
+                    } else if (i < this.currentStepIndex || this.completedTasks[this.currentTaskIndex]) {
+                        stepDiv.classList.add("completed");
+                    }
+
+                    var stepNum = document.createElement("div");
+                    stepNum.className = "step-number";
+                    stepNum.innerText = (i + 1).toString();
+
+                    var label = document.createElement("div");
+                    label.className = "step-label";
+                    label.innerText = stepData.label;
+
+                    var inputGroup = document.createElement("div");
+                    inputGroup.className = "input-group";
+
+                    var inputField = document.createElement("input");
+                    inputField.type = "text";
+                    inputField.placeholder = "0,0";
+                    inputField.id = "input-val-" + i;
+                    inputField.setAttribute("data-step", i);
+                    inputField.setAttribute("aria-label", stepData.label);
+
+                    // Tillad kun tal og komma
+                    inputField.onkeypress = function(e) {
+                        var charCode = (e.which) ? e.which : e.keyCode;
+                        if (charCode !== 44 && charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                            return false;
+                        }
+                        return true;
+                    };
+                    inputField.onkeydown = handleEnterKey;
+
+                    var selectUnit = document.createElement("select");
+                    selectUnit.id = "input-unit-" + i;
+                    selectUnit.setAttribute("data-step", i);
+                    selectUnit.setAttribute("aria-label", "Enhed for trin " + (i + 1));
+                    var optionEmpty = document.createElement("option"); optionEmpty.value = ""; optionEmpty.innerText = "?";
+                    var optionG = document.createElement("option"); optionG.value = "g"; optionG.innerText = "g";
+                    var optionMol = document.createElement("option"); optionMol.value = "mol"; optionMol.innerText = "mol";
+                    var optionGMol = document.createElement("option"); optionGMol.value = "g/mol"; optionGMol.innerText = "g/mol";
+
+                    selectUnit.appendChild(optionEmpty);
+                    selectUnit.appendChild(optionG);
+                    selectUnit.appendChild(optionMol);
+                    selectUnit.appendChild(optionGMol);
+                    selectUnit.onkeydown = handleEnterKey;
+
+                    var checkBtn = document.createElement("button");
+                    checkBtn.className = "check-btn";
+                    checkBtn.innerText = "Tjek";
+                    checkBtn.setAttribute("data-step", i);
+
+                    checkBtn.onclick = function(e) {
+                        var stepIdx = parseInt(e.target.getAttribute("data-step"));
+                        self.checkStep(stepIdx);
+                    };
+
+                    var feedbackIcon = document.createElement("div");
+                    feedbackIcon.className = "feedback-icon";
+                    feedbackIcon.id = "feedback-" + i;
+                    feedbackIcon.setAttribute("aria-live", "polite");
+
+                    inputGroup.appendChild(inputField);
+                    inputGroup.appendChild(selectUnit);
+                    inputGroup.appendChild(checkBtn);
+                    inputGroup.appendChild(feedbackIcon);
+
+                    var messageDiv = document.createElement("div");
+                    messageDiv.className = "step-message";
+                    messageDiv.id = "msg-" + i;
+                    messageDiv.setAttribute("aria-live", "polite");
+
+                    stepDiv.appendChild(stepNum);
+                    stepDiv.appendChild(label);
+                    stepDiv.appendChild(inputGroup);
+                    stepDiv.appendChild(messageDiv);
+
+                    // Pre-fill hvis opgaven er gennemført
+                    if (this.completedTasks[this.currentTaskIndex] || i < this.currentStepIndex) {
+                        inputField.value = stepData.expectedVal.toString().replace('.', ',');
+                        inputField.disabled = true;
+                        selectUnit.value = stepData.expectedUnit;
+                        selectUnit.disabled = true;
+                        checkBtn.style.display = "none";
+                        feedbackIcon.innerHTML = "<span aria-hidden='true' style='color:var(--success); font-size: 22px;'>✔</span><span>Korrekt</span>";
+                        feedbackIcon.style.color = "var(--success)";
+                    }
+
+                    container.appendChild(stepDiv);
+                }
+
+                // Opdater trekant ift aktuelt trin
+                if (this.currentStepIndex === task.steps.length - 1 && !this.completedTasks[this.currentTaskIndex]) {
+                    this.updateTriangle(task.targetVar);
+
+                    var helpMsg = "";
+                    if (task.targetVar === "n") helpMsg = "For at finde stofmængde (n), skal du dividere m med M (se stregen mellem m og M).";
+                    else if (task.targetVar === "m") helpMsg = "For at finde masse (m), skal du gange n og M (de står ved siden af hinanden).";
+                    else if (task.targetVar === "M") helpMsg = "For at finde molarmasse (M), skal du dividere m med n.";
+
+                    document.getElementById("triangle-help-text").innerText = helpMsg;
+                }
+            },
+
+            checkStep: function(stepIndex) {
+                var task = taskData[this.currentTaskIndex];
+                var stepData = task.steps[stepIndex];
+
+                var inputValStr = document.getElementById("input-val-" + stepIndex).value;
+                var inputUnit = document.getElementById("input-unit-" + stepIndex).value;
+                var feedbackDiv = document.getElementById("feedback-" + stepIndex);
+                var messageDiv = document.getElementById("msg-" + stepIndex);
+                var stepDiv = document.getElementById("step-" + stepIndex);
+
+                // Udskift dansk komma med punktum for konvertering
+                var parsedVal = parseFloat(inputValStr.replace(',', '.'));
+
+                var isValCorrect = !isNaN(parsedVal) && Math.abs(parsedVal - stepData.expectedVal) <= stepData.tolerance;
+                var isUnitCorrect = inputUnit === stepData.expectedUnit;
+
+                if (isValCorrect && isUnitCorrect) {
+                    feedbackDiv.innerHTML = "<span aria-hidden='true' style='color:var(--success); font-size: 22px;'>✔</span><span>Korrekt</span>";
+                    feedbackDiv.style.color = "var(--success)";
+                    messageDiv.textContent = "";
+                    this.advanceStep();
+                } else {
+                    feedbackDiv.innerHTML = "<span aria-hidden='true' style='color:var(--error); font-size: 22px;'>✘</span><span>Forkert</span>";
+                    feedbackDiv.style.color = "var(--error)";
+
+                    var hint;
+                    if (!isValCorrect && isUnitCorrect) {
+                        hint = "Tallet er forkert. Prøv at regne efter igen. (Husk dansk komma)";
+                    } else if (isValCorrect && !isUnitCorrect) {
+                        hint = "Tallet er korrekt, men enheden er forkert. Hvilken enhed hører til størrelsen?";
+                    } else {
+                        hint = "Både tal og enhed skal rettes.";
+                    }
+                    messageDiv.style.color = "var(--error)";
+                    messageDiv.textContent = hint;
+
+                    // Giv hint via kortvarig rød kant
+                    stepDiv.style.borderColor = "var(--error)";
+                    setTimeout(function() {
+                        stepDiv.style.borderColor = "var(--highlight)";
+                    }, 1000);
+                }
+            },
+
+            advanceStep: function() {
+                var task = taskData[this.currentTaskIndex];
+                this.currentStepIndex++;
+
+                if (this.currentStepIndex >= task.steps.length) {
+                    this.completeTask();
+                } else {
+                    this.renderSteps();
+                    this.saveProgress();
+                }
+            },
+
+            completeTask: function() {
+                this.completedTasks[this.currentTaskIndex] = true;
+                this.renderSteps();
+                this.buildTabs();
+                this.saveProgress();
+
+                document.getElementById("next-task-btn").style.display = "inline-block";
+                document.getElementById("triangle-help-text").innerText = "Fremragende arbejde! Du har mestret denne opgave.";
+
+                this.triggerConfetti();
+            },
+
+            // --- KREATIV UDVIDELSE 1: SVG FORMEL-TREKANT ---
+            updateTriangle: function(highlightTarget) {
+                var container = document.getElementById("triangle-container");
+                var w = 250;
+                var h = 220;
+                
+                var svgHTML = "<svg viewBox='0 0 " + w + " " + h + "' style='width:100%; height:100%; max-width:" + w + "px;'>";
+                
+                // Farver baseret på highlight
+                var col_m = (highlightTarget === "m") ? "var(--accent)" : "var(--text-main)";
+                var col_n = (highlightTarget === "n") ? "var(--accent)" : "var(--text-main)";
+                var col_M_val = (highlightTarget === "M") ? "var(--accent)" : "var(--text-main)";
+                
+                var fill_m = (highlightTarget === "m") ? "rgba(233, 69, 96, 0.2)" : "rgba(255,255,255,0.05)";
+                var fill_n = (highlightTarget === "n") ? "rgba(233, 69, 96, 0.2)" : "rgba(255,255,255,0.05)";
+                var fill_M_val = (highlightTarget === "M") ? "rgba(233, 69, 96, 0.2)" : "rgba(255,255,255,0.05)";
+
+                // Selve trekanten ydre
+                svgHTML += "<polygon points='125,10 10,210 240,210' fill='none' stroke='var(--highlight)' stroke-width='4' />";
+                
+                // Vandret skillelinje (brøkstreg)
+                var divLineColor = (highlightTarget === "n" || highlightTarget === "M") ? "var(--success)" : "var(--highlight)";
+                var divLineStroke = (highlightTarget === "n" || highlightTarget === "M") ? "6" : "3";
+                svgHTML += "<line x1='67' y1='110' x2='183' y2='110' stroke='" + divLineColor + "' stroke-width='" + divLineStroke + "' />";
+                
+                // Lodret skillelinje (gangetegn)
+                var mulLineColor = (highlightTarget === "m") ? "var(--success)" : "var(--highlight)";
+                var mulLineStroke = (highlightTarget === "m") ? "6" : "3";
+                svgHTML += "<line x1='125' y1='110' x2='125' y2='210' stroke='" + mulLineColor + "' stroke-width='" + mulLineStroke + "' />";
+
+                // Sektion for 'm' (øverst)
+                svgHTML += "<path d='M 125 12 L 68 108 L 182 108 Z' fill='" + fill_m + "' />";
+                svgHTML += "<text x='125' y='85' font-size='40' font-family='Arial' font-weight='bold' text-anchor='middle' fill='" + col_m + "'>m</text>";
+
+                // Sektion for 'n' (nederst til venstre)
+                svgHTML += "<path d='M 12 208 L 123 208 L 123 112 L 66 112 Z' fill='" + fill_n + "' />";
+                svgHTML += "<text x='75' y='180' font-size='40' font-family='Arial' font-weight='bold' text-anchor='middle' fill='" + col_n + "'>n</text>";
+
+                // Sektion for 'M' (nederst til højre)
+                svgHTML += "<path d='M 238 208 L 127 208 L 127 112 L 184 112 Z' fill='" + fill_M_val + "' />";
+                svgHTML += "<text x='175' y='180' font-size='40' font-family='Arial' font-weight='bold' text-anchor='middle' fill='" + col_M_val + "'>M</text>";
+
+                // Symboler for operatorer (vises ved highlight)
+                if (highlightTarget === "m") {
+                    svgHTML += "<circle cx='125' cy='160' r='15' fill='var(--bg-color)' stroke='var(--success)' stroke-width='2' />";
+                    svgHTML += "<text x='125' y='167' font-size='24' font-family='Arial' font-weight='bold' text-anchor='middle' fill='var(--success)'>&times;</text>";
+                } else if (highlightTarget === "n") {
+                    svgHTML += "<circle cx='125' cy='110' r='15' fill='var(--bg-color)' stroke='var(--success)' stroke-width='2' />";
+                    svgHTML += "<text x='125' y='118' font-size='24' font-family='Arial' font-weight='bold' text-anchor='middle' fill='var(--success)'>&divide;</text>";
+                } else if (highlightTarget === "M") {
+                    svgHTML += "<circle cx='125' cy='110' r='15' fill='var(--bg-color)' stroke='var(--success)' stroke-width='2' />";
+                    svgHTML += "<text x='125' y='118' font-size='24' font-family='Arial' font-weight='bold' text-anchor='middle' fill='var(--success)'>&divide;</text>";
+                }
+
+                svgHTML += "</svg>";
+                container.innerHTML = svgHTML;
+            },
+
+            // --- KREATIV UDVIDELSE 2: PARTIKELSYSTEM (KONFETTI) ---
+            canvas: null,
+            ctx: null,
+            particles: [],
+            animating: false,
+
+            setupCanvas: function() {
+                this.canvas = document.getElementById("particle-canvas");
+                this.ctx = this.canvas.getContext("2d");
+                
+                var self = this;
+                window.onresize = function() {
+                    self.canvas.width = window.innerWidth;
+                    self.canvas.height = window.innerHeight;
+                };
+                window.onresize(); // Initial kalibrering
+            },
+
+            triggerConfetti: function() {
+                var colors = ["#e94560", "#4cc9f0", "#4ade80", "#ffd166", "#ffffff"];
+                for (var i = 0; i < 150; i++) {
+                    this.particles.push({
+                        x: this.canvas.width / 2,
+                        y: this.canvas.height / 2,
+                        vx: (Math.random() - 0.5) * 20,
+                        vy: (Math.random() - 0.5) * 20 - 5,
+                        size: Math.random() * 8 + 4,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        life: 1.0,
+                        decay: Math.random() * 0.02 + 0.01
+                    });
+                }
+                
+                if (!this.animating) {
+                    this.animating = true;
+                    this.animateConfetti();
+                }
+            },
+
+            animateConfetti: function() {
+                var self = app; // Bruger app da self i requestAnimationFrame kontekst kan drille
+                self.ctx.clearRect(0, 0, self.canvas.width, self.canvas.height);
+                
+                var activeParticles = 0;
+                
+                for (var i = 0; i < self.particles.length; i++) {
+                    var p = self.particles[i];
+                    if (p.life > 0) {
+                        activeParticles++;
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += 0.5; // Tyngdekraft
+                        p.life -= p.decay;
+                        
+                        self.ctx.globalAlpha = Math.max(0, p.life);
+                        self.ctx.fillStyle = p.color;
+                        self.ctx.fillRect(p.x, p.y, p.size, p.size);
+                    }
+                }
+                
+                self.ctx.globalAlpha = 1.0;
+                
+                if (activeParticles > 0) {
+                    requestAnimationFrame(self.animateConfetti);
+                } else {
+                    self.animating = false;
+                    self.particles = [];
+                }
+            }
+        };
+
+        // Opstart af applikationen når siden er loadet
+        window.onload = function() {
+            app.init();
+        };
+
+    </script>
+</body>
+</html>

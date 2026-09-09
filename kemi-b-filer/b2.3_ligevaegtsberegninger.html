@@ -1,0 +1,2228 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beregninger med ligevægtskonstanter</title>
+<style>
+:root{
+    --bg:      #0f1115;
+    --panel:   #1a1d24;
+    --main:    #f3f4f6;
+    --muted:   #9ca3af;
+    --blue:    #3b82f6;
+    --green:   #10b981;
+    --red:     #ef4444;
+    --yellow:  #fbbf24;
+    --purple:  #a78bfa;
+    --radius:  12px;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; }
+[hidden]{ display:none !important; }
+
+body{ background:var(--bg); color:var(--main); min-height:100vh; }
+
+#bgCanvas{ position:fixed; inset:0; width:100vw; height:100vh; pointer-events:none; z-index:0; }
+
+/* ── HEADER ── */
+header{
+    position:sticky; top:0; z-index:100;
+    background:#14161a; padding:10px 20px;
+    border-bottom:2px solid #232730;
+    display:flex; justify-content:space-between; align-items:center;
+    gap:12px; flex-wrap:wrap;
+    box-shadow:0 4px 15px rgba(0,0,0,0.5);
+}
+header h1{ font-size:1.05rem; color:var(--blue); letter-spacing:1px; text-transform:uppercase; }
+
+.niveau-valg{ display:flex; gap:6px; flex-wrap:wrap; }
+.niv-btn{
+    background:transparent; border:1px solid rgba(255,255,255,0.15);
+    color:var(--muted); padding:5px 12px; border-radius:20px;
+    font-size:0.8rem; cursor:pointer; transition:all .2s;
+}
+.niv-btn:hover{ border-color:var(--blue); color:var(--main); }
+.niv-btn.aktiv{ background:rgba(59,130,246,0.18); border-color:var(--blue); color:#bfdbfe; font-weight:bold; }
+
+.stats{ display:flex; gap:10px; }
+.stat-box{
+    background:rgba(255,255,255,0.05); padding:5px 12px; border-radius:8px;
+    font-weight:bold; font-size:0.82rem; display:flex; align-items:center; gap:6px;
+}
+.stat-value{ color:var(--green); font-size:0.95rem; }
+
+.top-btn{
+    background:rgba(59,130,246,0.1); border:1px solid var(--blue); color:var(--blue);
+    padding:6px 14px; border-radius:20px; font-size:0.82rem; font-weight:bold;
+    cursor:pointer; transition:all .2s;
+}
+.top-btn:hover{ background:var(--blue); color:#06232c; }
+.top-btn.gul{ background:rgba(251,191,36,0.1); border-color:var(--yellow); color:var(--yellow); }
+.top-btn.gul:hover{ background:var(--yellow); color:#2a2110; }
+
+/* ── SIDE ── */
+.page{ position:relative; z-index:1; padding:24px 22px 70px; display:flex; justify-content:center; }
+.column{ width:100%; max-width:1020px; display:flex; flex-direction:column; gap:14px; }
+
+.card{
+    background:rgba(20,22,28,0.88);
+    border:1px solid rgba(255,255,255,0.07);
+    border-radius:var(--radius); padding:18px 20px;
+}
+
+.step-card{ border-left:3px solid var(--blue); transition:border-left-color .3s; animation:fadeIn .35s ease; }
+.step-card.skjult{ display:none; }
+.step-card.done{ border-left-color:var(--green); padding:12px 20px; }
+.step-card.done.aaben{ padding:18px 20px; }
+
+/* Sammenfoldning: et gennemført trin viser kun overskrift og svar. */
+.step-hoved-rad{ display:flex; align-items:flex-start; gap:10px; }
+.step-card.done .step-hoved-rad{ cursor:pointer; }
+.step-card.done .step-sub{ display:none; }
+.step-body{ margin-top:14px; }
+.step-card.done .step-body{ display:none; }
+.step-card.done.aaben .step-body{ display:block; }
+.step-hoved-tekst{ flex:1; min-width:0; }
+.step-resume{
+    display:none; margin-top:4px; font-size:0.9rem; color:#a7f3d0; line-height:1.6;
+}
+.step-card.done .step-resume{ display:block; }
+.step-card.done.aaben .step-resume{ display:none; }
+.fold-pil{ display:none; color:var(--muted); font-size:0.75rem; flex-shrink:0; margin-top:6px; }
+.step-card.done .fold-pil{ display:block; }
+.step-card.done .fold-pil::after{ content:"Vis ▸"; }
+.step-card.done.aaben .fold-pil::after{ content:"Skjul ▾"; }
+
+/* Markering af de enkelte svarfelter, når man trykker "Tjek svar". */
+input[type="text"].rigtig{  border-color:var(--green) !important; box-shadow:0 0 0 2px rgba(16,185,129,.45); }
+input[type="text"].forkert{ border-color:var(--red)   !important; box-shadow:0 0 0 2px rgba(239,68,68,.30); }
+select.sel.rigtig{  border-color:var(--green) !important; box-shadow:0 0 0 2px rgba(16,185,129,.45); }
+select.sel.forkert{ border-color:var(--red)   !important; box-shadow:0 0 0 2px rgba(239,68,68,.30); }
+
+/* ── OPGAVEOVERSIGT ── */
+#oversigt-kort{ padding:14px 18px; }
+.oversigt-top{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:11px; }
+.oversigt-titel{ font-size:0.82rem; text-transform:uppercase; letter-spacing:1px; color:var(--muted); font-weight:bold; }
+.oversigt-nav{ display:flex; gap:8px; }
+.nav-btn{
+    background:transparent; border:1px solid rgba(255,255,255,0.18); color:var(--muted);
+    padding:5px 13px; border-radius:16px; font-size:0.8rem; font-family:inherit;
+    cursor:pointer; transition:all .2s;
+}
+.nav-btn:hover:not(:disabled){ border-color:var(--blue); color:var(--blue); }
+.nav-btn:disabled{ opacity:.28; cursor:default; }
+.oversigt-liste{ display:flex; flex-wrap:wrap; gap:7px; }
+.opg-chip{
+    display:flex; align-items:center; gap:7px;
+    background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); color:var(--muted);
+    padding:6px 12px; border-radius:18px; font-size:0.82rem; font-family:inherit;
+    cursor:pointer; transition:all .18s; text-align:left;
+}
+.opg-chip:hover{ border-color:var(--blue); color:var(--main); }
+.opg-chip.aktiv{ background:rgba(59,130,246,0.18); border-color:var(--blue); color:#bfdbfe; font-weight:bold; }
+.opg-chip.loest{ border-color:rgba(16,185,129,0.45); }
+.chip-nr{
+    background:rgba(255,255,255,0.1); border-radius:50%; width:19px; height:19px;
+    display:flex; align-items:center; justify-content:center; font-size:0.71rem; flex-shrink:0;
+}
+.opg-chip.aktiv .chip-nr{ background:var(--blue); color:#fff; }
+.chip-ok{ color:var(--green); font-weight:bold; }
+.chip-niv{ font-size:0.65rem; padding:1px 6px; border-radius:10px; }
+
+/* ── OPLYSTE DATA I ET TRIN ── */
+.data-boks{
+    background:rgba(167,139,250,0.08); border:1px solid rgba(167,139,250,0.22);
+    border-radius:8px; padding:11px 13px; margin-bottom:14px;
+}
+.data-lab{ font-size:0.71rem; color:var(--muted); text-transform:uppercase; letter-spacing:.6px; margin-bottom:6px; }
+.data-krop{ font-size:0.97rem; line-height:1.75; }
+
+/* ── OPGAVEKORT ── */
+.opg-top{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+.opg-titel{ font-size:1.25rem; font-weight:bold; color:#fff; }
+.opg-mærkat{
+    font-size:0.72rem; text-transform:uppercase; letter-spacing:1px;
+    padding:3px 10px; border-radius:20px; white-space:nowrap;
+}
+.niv1{ background:rgba(16,185,129,0.15); color:#6ee7b7; border:1px solid rgba(16,185,129,0.35); }
+.niv2{ background:rgba(251,191,36,0.15); color:#fcd34d; border:1px solid rgba(251,191,36,0.35); }
+.niv3{ background:rgba(239,68,68,0.15);  color:#fca5a5; border:1px solid rgba(239,68,68,0.35); }
+
+.reaktion{
+    text-align:center; font-size:1.15rem; font-weight:bold; color:#fff;
+    background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.2);
+    border-radius:8px; padding:12px 10px; margin:12px 0;
+    overflow-x:auto; white-space:nowrap;
+}
+.pil{ color:var(--blue); margin:0 10px; display:inline-block; animation:pulsPil 2.4s ease-in-out infinite; }
+@keyframes pulsPil{ 0%,100%{ transform:scale(1); opacity:.85 } 50%{ transform:scale(1.18); opacity:1 } }
+
+.opg-tekst{ font-size:0.95rem; line-height:1.65; color:#e5e7eb; }
+.opg-tekst b{ color:#fff; }
+.opg-spm{
+    margin-top:12px; padding:11px 14px;
+    background:rgba(167,139,250,0.09); border-left:3px solid var(--purple);
+    border-radius:0 8px 8px 0; font-size:0.95rem; line-height:1.6;
+}
+
+/* ── TRINHOVED ── */
+.step-num{
+    background:var(--blue); color:#fff; width:26px; height:26px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:bold; font-size:0.82rem; flex-shrink:0; margin-top:2px; transition:background .3s;
+}
+.step-card.done .step-num{ background:var(--green); }
+.step-title{ font-size:0.99rem; font-weight:bold; line-height:1.3; }
+.step-sub{ font-size:0.8rem; color:var(--muted); margin-top:3px; line-height:1.45; }
+
+/* ── MULTIPLE CHOICE ── */
+.mc-liste{ display:flex; flex-direction:column; gap:8px; }
+.mc-opt{
+    display:flex; align-items:center; gap:11px;
+    background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1);
+    border-radius:8px; padding:10px 13px; cursor:pointer; transition:all .18s;
+}
+.mc-opt:hover{ border-color:var(--blue); background:rgba(59,130,246,0.07); }
+.mc-opt input{ accent-color:var(--blue); width:16px; height:16px; flex-shrink:0; cursor:pointer; }
+.mc-opt.facit{ border-color:var(--green); background:rgba(16,185,129,0.1); }
+/* Almindeligt tekstflow — ikke flex. Ellers bliver <b> og <sub> til selvstændige
+   flex-elementer, og sætningerne brækker i stykker. */
+.mc-krop{ display:block; flex:1; min-width:0; font-size:1rem; line-height:1.7; }
+
+/* ── BRØK ── */
+.fraction{ display:inline-flex; flex-direction:column; align-items:stretch; vertical-align:middle; }
+.frac-top{ padding:0 9px 4px; border-bottom:2px solid rgba(255,255,255,0.6); text-align:center; white-space:nowrap; }
+.frac-bot{ padding:4px 9px 0; text-align:center; white-space:nowrap; }
+.kc-mærke{ font-weight:bold; white-space:nowrap; }
+
+/* ── SKEMA ── */
+.skema-wrap{ overflow-x:auto; margin:6px 0 4px; }
+.skema{ width:100%; border-collapse:collapse; font-size:0.88rem; min-width:380px; }
+.skema th,.skema td{ border:1px solid rgba(255,255,255,0.12); padding:8px 9px; text-align:center; white-space:nowrap; }
+.skema th{ background:rgba(255,255,255,0.05); font-size:0.85rem; }
+.skema td.rowlab{ text-align:left; color:var(--muted); font-size:0.82rem; }
+.skema tr.skjult td{ color:transparent; }
+.skema tr.vist{ animation:fadeIn .45s ease; }
+.skema tr.vist td{ color:var(--green); font-weight:bold; }
+.skema tr.vist td.rowlab{ color:var(--muted); font-weight:normal; }
+
+/* ── INPUT ── */
+.in-liste{ display:flex; flex-direction:column; gap:10px; }
+.in-row{ display:flex; align-items:center; gap:9px; flex-wrap:wrap; font-size:1rem; }
+.in-lab{ font-weight:bold; min-width:92px; }
+input[type="text"]{
+    width:120px; padding:8px 10px; background:rgba(0,0,0,0.45);
+    border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:1rem;
+    text-align:center; border-radius:7px; transition:border-color .2s;
+}
+input[type="text"]:focus{ outline:none; border-color:var(--blue); }
+.enhed-fast{ color:var(--muted); font-weight:bold; }
+select.sel{
+    padding:8px 9px; background:rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.2);
+    color:#fff; font-size:0.95rem; border-radius:7px; cursor:pointer;
+}
+select.sel:focus{ outline:none; border-color:var(--blue); }
+select.sel option{ background:var(--panel); }
+.mini-note{ font-size:0.78rem; color:var(--muted); margin-top:4px; font-style:italic; }
+
+/* ── FORMELBOKS & HINT ── */
+.formel-boks{
+    background:rgba(59,130,246,0.06); border:1px solid rgba(59,130,246,0.18);
+    border-radius:8px; padding:10px 12px; margin-bottom:13px;
+}
+.formel-lab{ font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:.6px; margin-bottom:6px; }
+.formel-hoved{ font-size:1.02rem; text-align:center; color:#dbeafe; }
+.btn-hint{
+    width:100%; text-align:left; background:transparent;
+    border:1px solid rgba(59,130,246,0.22); color:var(--blue);
+    font-size:0.83rem; padding:6px 10px; border-radius:6px; cursor:pointer;
+    margin-top:11px; transition:background .2s;
+}
+.btn-hint:hover{ background:rgba(59,130,246,0.1); }
+.hint-box{ display:none; margin-top:8px; padding:9px 11px; background:rgba(0,0,0,0.3); border-radius:6px; }
+.hint-step{ display:flex; gap:9px; padding:5px 0; font-size:0.87rem; line-height:1.55; border-bottom:1px solid rgba(255,255,255,0.05); }
+.hint-step:last-child{ border-bottom:none; }
+.hint-num{ color:var(--blue); font-weight:bold; flex-shrink:0; min-width:16px; }
+
+/* ── KNAPPER & FEEDBACK ── */
+.btn-check{
+    width:100%; margin-top:12px; padding:10px; border:none; border-radius:8px;
+    font-size:0.93rem; font-weight:bold; cursor:pointer; letter-spacing:.4px;
+    background:linear-gradient(135deg,rgba(59,130,246,.8),rgba(37,99,235,.8)); color:#fff;
+    transition:all .22s;
+}
+.btn-check:hover{ opacity:.87; transform:translateY(-1px); }
+
+.step-feedback{ display:none; margin-top:10px; padding:9px 12px; border-radius:7px; font-size:0.87rem; line-height:1.55; animation:fadeIn .3s; }
+.step-feedback.ok{  display:block; background:rgba(16,185,129,.12); border:1px solid var(--green); color:#a7f3d0; }
+.step-feedback.err{ display:block; background:rgba(239,68,68,.12);  border:1px solid var(--red);   color:#fecaca; }
+.step-feedback.tip{ display:block; background:rgba(251,191,36,.12); border:1px solid var(--yellow);color:#fde68a; }
+
+#btn-next{
+    display:none; width:100%; padding:13px; border:none; border-radius:8px;
+    font-size:1.02rem; font-weight:bold; cursor:pointer; text-transform:uppercase; letter-spacing:1px;
+    background:linear-gradient(135deg,var(--green),#059669); color:#fff;
+    box-shadow:0 4px 15px rgba(16,185,129,.3); transition:all .25s;
+}
+#btn-next:hover{ transform:translateY(-2px); box-shadow:0 6px 20px rgba(16,185,129,.5); }
+
+/* ── RESULTATKORT ── */
+.res-titel{ font-size:1.05rem; font-weight:bold; color:var(--green); margin-bottom:12px; letter-spacing:.5px; text-transform:uppercase; }
+.viz-wrap{ position:relative; width:100%; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:8px; }
+#vizCanvas{ width:100%; height:290px; display:block; }
+.viz-knap{
+    background:transparent; border:1px solid rgba(255,255,255,0.18); color:var(--muted);
+    font-size:0.78rem; padding:4px 12px; border-radius:16px; cursor:pointer; margin-top:8px;
+}
+.viz-knap:hover{ border-color:var(--blue); color:var(--blue); }
+
+.facit-boks{ margin-top:16px; background:rgba(0,0,0,0.28); border-radius:8px; padding:14px 16px; }
+.facit-h{ font-size:0.78rem; text-transform:uppercase; letter-spacing:.8px; color:var(--blue); margin:14px 0 6px; }
+.facit-h:first-child{ margin-top:0; }
+.facit-linje{ font-size:0.93rem; line-height:1.75; padding:2px 0 2px 12px; border-left:2px solid rgba(255,255,255,0.08); }
+.facit-svar{
+    margin-top:14px; padding:11px 14px; background:rgba(16,185,129,.1);
+    border-left:4px solid var(--green); border-radius:0 8px 8px 0; font-size:1rem; line-height:1.7;
+}
+.kontrol-boks{
+    margin-top:12px; padding:10px 13px; background:rgba(167,139,250,.09);
+    border-left:3px solid var(--purple); border-radius:0 8px 8px 0; font-size:0.88rem; line-height:1.6;
+}
+
+/* ── MODAL ── */
+.modal-overlay{
+    position:fixed; inset:0; z-index:300; background:rgba(6,6,10,.82);
+    backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; padding:20px;
+}
+.modal{
+    background:var(--panel); border:1px solid rgba(255,255,255,0.12); border-radius:14px;
+    width:100%; max-width:880px; max-height:86vh; display:flex; flex-direction:column;
+    box-shadow:0 24px 60px rgba(0,0,0,.6); animation:popIn .28s cubic-bezier(.175,.885,.32,1.275);
+}
+.modal-head{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding:15px 20px; border-bottom:1px solid rgba(255,255,255,0.1); flex-shrink:0; }
+.modal-head h2{ font-size:1rem; letter-spacing:1.2px; text-transform:uppercase; color:var(--blue); }
+.modal-close{
+    width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.15); color:#bbb; font-size:0.85rem; cursor:pointer; flex-shrink:0;
+}
+.modal-close:hover{ border-color:var(--red); color:var(--red); }
+.modal-body{ padding:18px 22px 24px; overflow-y:auto; line-height:1.68; font-size:0.93rem; }
+.modal-body h3{ color:var(--yellow); font-size:0.95rem; margin:18px 0 6px; }
+.modal-body h3:first-child{ margin-top:0; }
+.modal-body ul{ margin:6px 0 6px 20px; }
+.modal-body li{ margin-bottom:5px; }
+.modal-body .regel{
+    background:rgba(59,130,246,.07); border-left:3px solid var(--blue);
+    border-radius:0 8px 8px 0; padding:9px 13px; margin:9px 0;
+}
+.modal-body .advarsel{
+    background:rgba(239,68,68,.08); border-left:3px solid var(--red);
+    border-radius:0 8px 8px 0; padding:9px 13px; margin:9px 0;
+}
+
+@keyframes fadeIn{ from{ opacity:0; transform:translateY(-4px) } to{ opacity:1; transform:translateY(0) } }
+@keyframes popIn{ from{ opacity:0; transform:scale(.94) } to{ opacity:1; transform:scale(1) } }
+
+@media (max-width:620px){
+    header h1{ font-size:0.92rem; }
+    .in-lab{ min-width:0; }
+    .card{ padding:15px 14px; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<header>
+    <h1>Beregninger med ligevægtskonstanter</h1>
+    <div class="niveau-valg" id="niveau-valg">
+        <button class="niv-btn" data-niv="0">Alle</button>
+        <button class="niv-btn aktiv" data-niv="1">Niveau 1</button>
+        <button class="niv-btn" data-niv="2">Niveau 2</button>
+        <button class="niv-btn" data-niv="3">Niveau 3</button>
+    </div>
+    <div class="stats">
+        <div class="stat-box">Løst: <span id="loest" class="stat-value">0</span></div>
+        <div class="stat-box">Stribe: <span id="stribe" class="stat-value">0</span></div>
+    </div>
+    <div style="display:flex; gap:8px;">
+        <button class="top-btn" onclick="visModal('teori')">Teori</button>
+        <button class="top-btn gul" onclick="visModal('hjaelp')">Hjælp</button>
+    </div>
+</header>
+
+<div class="page">
+<div class="column">
+    <div class="card" id="oversigt-kort"></div>
+    <div class="card" id="opgave-kort"></div>
+    <div id="trin-container"></div>
+    <div class="card" id="resultat-kort" hidden></div>
+    <button id="btn-next" onclick="naesteOpgave()">Næste opgave &nbsp;&#8594;</button>
+</div>
+</div>
+
+<div class="modal-overlay" id="modal" hidden onclick="if(event.target===this) lukModal()">
+    <div class="modal">
+        <div class="modal-head">
+            <h2 id="modal-titel"></h2>
+            <button class="modal-close" onclick="lukModal()">&#10005;</button>
+        </div>
+        <div class="modal-body" id="modal-krop"></div>
+    </div>
+</div>
+
+<script>
+/* =====================================================================
+   OPGAVEBANK
+   Alle talværdier er konstrueret, så regningen bliver overskuelig.
+   Fremgangsmåden er den samme som ved rigtige måledata.
+   ===================================================================== */
+
+var OPGAVER = [
+
+/* ---------- NIVEAU 1: uden ligning ---------- */
+{
+    id:"n1-1", niveau:1, type:"kcFraStofmaengder",
+    titel:"Nitrosylchlorid spaltes",
+    temp:"462 °C", V:2.00,
+    reaktanter:[{navn:"NOCl", html:"NOCl", koef:2, fase:"g"}],
+    produkter: [{navn:"NO", html:"NO", koef:2, fase:"g"},
+                {navn:"Cl2", html:"Cl<sub>2</sub>", koef:1, fase:"g"}],
+    n:{ NOCl:0.600, NO:0.0800, Cl2:0.0400 },
+    ceq:{ NOCl:0.300, NO:0.0400, Cl2:0.0200 },
+    Kc:3.5556e-4,
+    tekst:"Nitrosylchlorid, NOCl(g), lukkes inde i en beholder og opvarmes, indtil ligevægten har indstillet sig.",
+    spm:"Bestem ligevægtskonstanten K<sub>c</sub> — med enhed."
+},
+{
+    id:"n1-2", niveau:1, type:"kcFraStofmaengder",
+    titel:"Ammoniaksyntesen",
+    temp:"400 °C", V:5.00,
+    reaktanter:[{navn:"N2", html:"N<sub>2</sub>", koef:1, fase:"g"},
+                {navn:"H2", html:"H<sub>2</sub>", koef:3, fase:"g"}],
+    produkter: [{navn:"NH3", html:"NH<sub>3</sub>", koef:2, fase:"g"}],
+    n:{ N2:0.500, H2:1.50, NH3:0.250 },
+    ceq:{ N2:0.100, H2:0.300, NH3:0.0500 },
+    Kc:0.92593,
+    tekst:"Ammoniak dannes ud fra dinitrogen og dihydrogen i en lukket beholder, hvor ligevægten får lov at indstille sig.",
+    spm:"Bestem K<sub>c</sub> — med enhed."
+},
+{
+    id:"n1-3", niveau:1, type:"kcFraStofmaengder",
+    titel:"Vandgasligevægten",
+    temp:"700 K", V:10.0,
+    reaktanter:[{navn:"CO", html:"CO", koef:1, fase:"g"},
+                {navn:"H2O", html:"H<sub>2</sub>O", koef:1, fase:"g"}],
+    produkter: [{navn:"CO2", html:"CO<sub>2</sub>", koef:1, fase:"g"},
+                {navn:"H2", html:"H<sub>2</sub>", koef:1, fase:"g"}],
+    n:{ CO:0.300, H2O:0.300, CO2:0.700, H2:0.700 },
+    ceq:{ CO:0.0300, H2O:0.0300, CO2:0.0700, H2:0.0700 },
+    Kc:5.4444,
+    tekst:"Vandgasligevægten undersøges i en lukket beholder. Bemærk, at H<sub>2</sub>O her er på gasform og derfor <i>ikke</i> udelades af ligevægtsloven.",
+    spm:"Bestem K<sub>c</sub> — med enhed."
+},
+{
+    id:"n1-4", niveau:1, type:"isolerKoncentration",
+    titel:"Phosgen-ligevægten",
+    temp:"600 K",
+    reaktanter:[{navn:"CO", html:"CO", koef:1, fase:"g"},
+                {navn:"Cl2", html:"Cl<sub>2</sub>", koef:1, fase:"g"}],
+    produkter: [{navn:"COCl2", html:"COCl<sub>2</sub>", koef:1, fase:"g"}],
+    Kc:25.0, KcHTML:"25,0 M<sup>−1</sup>",
+    kendte:{ CO:0.120, COCl2:0.450 },
+    ukendt:"Cl2",
+    ceq:{ CO:0.120, Cl2:0.150, COCl2:0.450 },
+    svar:0.150, svarEnhed:"M",
+    tekst:"Phosgen, COCl<sub>2</sub>(g), dannes ud fra carbonmonooxid og dichlor i en lukket beholder. Ligevægten har indstillet sig, og to af de tre koncentrationer er målt.",
+    spm:"Bestem ligevægtskoncentrationen [Cl<sub>2</sub>].",
+    isoleretKorrekt:"[Cl<sub>2</sub>] = <div class=\"fraction\"><div class=\"frac-top\">[COCl<sub>2</sub>]</div><div class=\"frac-bot\">K<sub>c</sub> · [CO]</div></div>",
+    isoleretForkerte:[
+        "[Cl<sub>2</sub>] = <div class=\"fraction\"><div class=\"frac-top\">K<sub>c</sub> · [COCl<sub>2</sub>]</div><div class=\"frac-bot\">[CO]</div></div>",
+        "[Cl<sub>2</sub>] = <div class=\"fraction\"><div class=\"frac-top\">K<sub>c</sub> · [CO]</div><div class=\"frac-bot\">[COCl<sub>2</sub>]</div></div>",
+        "[Cl<sub>2</sub>] = <div class=\"fraction\"><div class=\"frac-top\">[CO]</div><div class=\"frac-bot\">K<sub>c</sub> · [COCl<sub>2</sub>]</div></div>"
+    ],
+    udregning:[
+        "K<sub>c</sub> = [COCl<sub>2</sub>] / ([CO] · [Cl<sub>2</sub>])",
+        "[Cl<sub>2</sub>] = [COCl<sub>2</sub>] / (K<sub>c</sub> · [CO])",
+        "[Cl<sub>2</sub>] = 0,450 M / (25,0 M<sup>−1</sup> · 0,120 M) = 0,450 M / 3,00 = 0,150 M",
+        "Enhedskontrol: M / (M<sup>−1</sup> · M) = M / 1 = M &nbsp;✓"
+    ]
+},
+{
+    id:"n1-5", niveau:1, type:"isolerKoncentration",
+    titel:"Svovltrioxid spaltes",
+    temp:"900 K",
+    reaktanter:[{navn:"SO3", html:"SO<sub>3</sub>", koef:2, fase:"g"}],
+    produkter: [{navn:"SO2", html:"SO<sub>2</sub>", koef:2, fase:"g"},
+                {navn:"O2", html:"O<sub>2</sub>", koef:1, fase:"g"}],
+    Kc:4.00e-3, KcHTML:"4,00·10<sup>−3</sup> M",
+    kendte:{ SO3:0.500, O2:0.100 },
+    ukendt:"SO2",
+    ceq:{ SO3:0.500, SO2:0.100, O2:0.100 },
+    svar:0.100, svarEnhed:"M",
+    tekst:"Svovltrioxid spaltes i en lukket beholder, indtil ligevægten har indstillet sig. To af de tre koncentrationer er målt.",
+    spm:"Bestem ligevægtskoncentrationen [SO<sub>2</sub>].",
+    isoleretKorrekt:"[SO<sub>2</sub>] = (K<sub>c</sub> · [SO<sub>3</sub>]<sup>2</sup> / [O<sub>2</sub>])<sup>1/2</sup>",
+    isoleretForkerte:[
+        "[SO<sub>2</sub>] = K<sub>c</sub> · [SO<sub>3</sub>]<sup>2</sup> / [O<sub>2</sub>]",
+        "[SO<sub>2</sub>] = ([O<sub>2</sub>] · [SO<sub>3</sub>]<sup>2</sup> / K<sub>c</sub>)<sup>1/2</sup>",
+        "[SO<sub>2</sub>] = (K<sub>c</sub> · [O<sub>2</sub>] / [SO<sub>3</sub>]<sup>2</sup>)<sup>1/2</sup>"
+    ],
+    udregning:[
+        "K<sub>c</sub> = ([SO<sub>2</sub>]<sup>2</sup> · [O<sub>2</sub>]) / [SO<sub>3</sub>]<sup>2</sup>",
+        "[SO<sub>2</sub>]<sup>2</sup> = K<sub>c</sub> · [SO<sub>3</sub>]<sup>2</sup> / [O<sub>2</sub>]",
+        "[SO<sub>2</sub>]<sup>2</sup> = 4,00·10<sup>−3</sup> M · (0,500 M)<sup>2</sup> / 0,100 M = 1,00·10<sup>−2</sup> M<sup>2</sup>",
+        "[SO<sub>2</sub>] = (1,00·10<sup>−2</sup> M<sup>2</sup>)<sup>1/2</sup> = 0,100 M",
+        "Enhedskontrol: (M · M<sup>2</sup> / M)<sup>1/2</sup> = (M<sup>2</sup>)<sup>1/2</sup> = M &nbsp;✓"
+    ]
+},
+
+/* ---------- NIVEAU 2: opstil ligning og isolér x ---------- */
+{
+    id:"n2-1", niveau:2, type:"ligningX", metode:"lineaer",
+    titel:"Isomerisering af butan",
+    temp:"25 °C",
+    reaktanter:[{navn:"nbutan", html:"<i>n</i>-butan", koef:1, fase:"g"}],
+    produkter: [{navn:"isobutan", html:"isobutan", koef:1, fase:"g"}],
+    Kc:2.50, KcHTML:"2,50 (ingen enhed)",
+    start:{ nbutan:0.600, isobutan:0 },
+    xArt:"nbutan", xArtHTML:"<i>n</i>-butan",
+    x:0.42857,
+    ceq:{ nbutan:0.17143, isobutan:0.42857 },
+    tekst:"<i>n</i>-butan kan omdannes til isobutan. En lukket beholder fyldes udelukkende med <i>n</i>-butan, og ligevægten får lov at indstille sig.",
+    spm:"Bestem ligevægtskoncentrationerne af begge stoffer.",
+    ligningKorrekt:"2,50 = <div class=\"fraction\"><div class=\"frac-top\">x</div><div class=\"frac-bot\">0,600 M − x</div></div>",
+    ligningForkerte:[
+        "2,50 = <div class=\"fraction\"><div class=\"frac-top\">0,600 M − x</div><div class=\"frac-bot\">x</div></div>",
+        "2,50 = <div class=\"fraction\"><div class=\"frac-top\">x</div><div class=\"frac-bot\">0,600 M</div></div>",
+        "2,50 = x · (0,600 M − x)"
+    ],
+    udregning:[
+        "2,50 = x / (0,600 M − x)",
+        "x = 2,50 · (0,600 M − x) = 1,50 M − 2,50·x",
+        "x + 2,50·x = 1,50 M &nbsp; &rArr; &nbsp; 3,50·x = 1,50 M",
+        "x = 1,50 M / 3,50 = 0,4286 M &asymp; <b>0,429 M</b>",
+        "Kontrol af x: 0 M &lt; 0,429 M &lt; 0,600 M &nbsp;✓ (x kan ikke være større end startkoncentrationen)"
+    ]
+},
+{
+    id:"n2-2", niveau:2, type:"ligningX", metode:"lineaer",
+    titel:"Cis-trans-isomerisering af 2-buten",
+    temp:"400 K",
+    reaktanter:[{navn:"cis", html:"<i>cis</i>-2-buten", koef:1, fase:"g"}],
+    produkter: [{navn:"trans", html:"<i>trans</i>-2-buten", koef:1, fase:"g"}],
+    Kc:4.00, KcHTML:"4,00 (ingen enhed)",
+    start:{ cis:0.500, trans:0 },
+    xArt:"cis", xArtHTML:"<i>cis</i>-2-buten",
+    x:0.400,
+    ceq:{ cis:0.100, trans:0.400 },
+    tekst:"<i>cis</i>-2-buten kan omdannes til <i>trans</i>-2-buten. En lukket beholder fyldes udelukkende med <i>cis</i>-2-buten.",
+    spm:"Bestem ligevægtskoncentrationerne af de to isomerer.",
+    ligningKorrekt:"4,00 = <div class=\"fraction\"><div class=\"frac-top\">x</div><div class=\"frac-bot\">0,500 M − x</div></div>",
+    ligningForkerte:[
+        "4,00 = <div class=\"fraction\"><div class=\"frac-top\">0,500 M − x</div><div class=\"frac-bot\">x</div></div>",
+        "4,00 = <div class=\"fraction\"><div class=\"frac-top\">x</div><div class=\"frac-bot\">0,500 M</div></div>",
+        "4,00 = <div class=\"fraction\"><div class=\"frac-top\">0,500 M + x</div><div class=\"frac-bot\">x</div></div>"
+    ],
+    udregning:[
+        "4,00 = x / (0,500 M − x)",
+        "x = 4,00 · (0,500 M − x) = 2,00 M − 4,00·x",
+        "5,00·x = 2,00 M",
+        "x = 2,00 M / 5,00 = <b>0,400 M</b>",
+        "Kontrol af x: 0 M &lt; 0,400 M &lt; 0,500 M &nbsp;✓"
+    ]
+},
+{
+    id:"n2-3", niveau:2, type:"ligningX", metode:"kvadratrod",
+    titel:"Vandgasligevægten fra rene udgangsstoffer",
+    temp:"700 K",
+    reaktanter:[{navn:"CO", html:"CO", koef:1, fase:"g"},
+                {navn:"H2O", html:"H<sub>2</sub>O", koef:1, fase:"g"}],
+    produkter: [{navn:"CO2", html:"CO<sub>2</sub>", koef:1, fase:"g"},
+                {navn:"H2", html:"H<sub>2</sub>", koef:1, fase:"g"}],
+    Kc:5.44, KcHTML:"5,44 (ingen enhed)",
+    start:{ CO:0.100, H2O:0.100, CO2:0, H2:0 },
+    xArt:"CO", xArtHTML:"CO",
+    x:0.06999,
+    ceq:{ CO:0.03001, H2O:0.03001, CO2:0.06999, H2:0.06999 },
+    tekst:"En lukket beholder fyldes med CO(g) og H<sub>2</sub>O(g) i lige store koncentrationer. Der er intet CO<sub>2</sub> og intet H<sub>2</sub> fra start.",
+    spm:"Bestem ligevægtskoncentrationerne af alle fire stoffer.",
+    ligningKorrekt:"5,44 = <div class=\"fraction\"><div class=\"frac-top\">x · x</div><div class=\"frac-bot\">(0,100 M − x) · (0,100 M − x)</div></div>",
+    ligningForkerte:[
+        "5,44 = <div class=\"fraction\"><div class=\"frac-top\">x · x</div><div class=\"frac-bot\">0,100 M − x</div></div>",
+        "5,44 = <div class=\"fraction\"><div class=\"frac-top\">(0,100 M − x) · (0,100 M − x)</div><div class=\"frac-bot\">x · x</div></div>",
+        "5,44 = <div class=\"fraction\"><div class=\"frac-top\">(2x)<sup>2</sup></div><div class=\"frac-bot\">(0,100 M − x)<sup>2</sup></div></div>"
+    ],
+    udregning:[
+        "5,44 = x<sup>2</sup> / (0,100 M − x)<sup>2</sup>",
+        "Begge sider er positive, så begge sider kan opløftes i 1/2: 5,44<sup>1/2</sup> = x / (0,100 M − x)",
+        "2,3324 = x / (0,100 M − x)",
+        "x = 2,3324 · (0,100 M − x) = 0,23324 M − 2,3324·x",
+        "3,3324·x = 0,23324 M",
+        "x = 0,23324 M / 3,3324 = 0,06999 M &asymp; <b>0,0700 M</b>",
+        "Kontrol af x: 0 M &lt; 0,0700 M &lt; 0,100 M &nbsp;✓"
+    ]
+},
+{
+    id:"n2-4", niveau:2, type:"ligningX", metode:"kvadratrod",
+    titel:"Dannelse af hydrogenbromid",
+    temp:"500 K",
+    reaktanter:[{navn:"H2", html:"H<sub>2</sub>", koef:1, fase:"g"},
+                {navn:"Br2", html:"Br<sub>2</sub>", koef:1, fase:"g"}],
+    produkter: [{navn:"HBr", html:"HBr", koef:2, fase:"g"}],
+    Kc:64.0, KcHTML:"64,0 (ingen enhed)",
+    start:{ H2:0.200, Br2:0.200, HBr:0 },
+    xArt:"H2", xArtHTML:"H<sub>2</sub>",
+    x:0.160,
+    ceq:{ H2:0.0400, Br2:0.0400, HBr:0.320 },
+    tekst:"En lukket beholder fyldes med H<sub>2</sub>(g) og Br<sub>2</sub>(g) i lige store koncentrationer. Der er intet HBr fra start.",
+    spm:"Bestem ligevægtskoncentrationerne af alle tre stoffer.",
+    ligningKorrekt:"64,0 = <div class=\"fraction\"><div class=\"frac-top\">(2x)<sup>2</sup></div><div class=\"frac-bot\">(0,200 M − x) · (0,200 M − x)</div></div>",
+    ligningForkerte:[
+        "64,0 = <div class=\"fraction\"><div class=\"frac-top\">x<sup>2</sup></div><div class=\"frac-bot\">(0,200 M − x)<sup>2</sup></div></div>",
+        "64,0 = <div class=\"fraction\"><div class=\"frac-top\">2x</div><div class=\"frac-bot\">(0,200 M − x)<sup>2</sup></div></div>",
+        "64,0 = <div class=\"fraction\"><div class=\"frac-top\">(0,200 M − x)<sup>2</sup></div><div class=\"frac-bot\">(2x)<sup>2</sup></div></div>"
+    ],
+    udregning:[
+        "64,0 = (2x)<sup>2</sup> / (0,200 M − x)<sup>2</sup>",
+        "Begge sider opløftes i 1/2: 64,0<sup>1/2</sup> = 2x / (0,200 M − x)",
+        "8,00 = 2x / (0,200 M − x)",
+        "8,00 · (0,200 M − x) = 2x &nbsp; &rArr; &nbsp; 1,60 M − 8,00·x = 2,00·x",
+        "10,00·x = 1,60 M",
+        "x = 1,60 M / 10,00 = <b>0,160 M</b>",
+        "Kontrol af x: 0 M &lt; 0,160 M &lt; 0,200 M &nbsp;✓"
+    ]
+},
+
+/* ---------- NIVEAU 3: andengradsligning ---------- */
+{
+    id:"n3-1", niveau:3, type:"ligningX", metode:"andengrad",
+    titel:"Sulfurylchlorid spaltes",
+    temp:"375 °C",
+    reaktanter:[{navn:"SO2Cl2", html:"SO<sub>2</sub>Cl<sub>2</sub>", koef:1, fase:"g"}],
+    produkter: [{navn:"SO2", html:"SO<sub>2</sub>", koef:1, fase:"g"},
+                {navn:"Cl2", html:"Cl<sub>2</sub>", koef:1, fase:"g"}],
+    Kc:0.0500, KcHTML:"0,0500 M",
+    start:{ SO2Cl2:0.200, SO2:0, Cl2:0 },
+    xArt:"SO2Cl2", xArtHTML:"SO<sub>2</sub>Cl<sub>2</sub>",
+    x:0.078078, x1:0.078078, x2:-0.128078,
+    ceq:{ SO2Cl2:0.121922, SO2:0.078078, Cl2:0.078078 },
+    tekst:"Sulfurylchlorid, SO<sub>2</sub>Cl<sub>2</sub>(g), spaltes. En lukket beholder fyldes udelukkende med SO<sub>2</sub>Cl<sub>2</sub>(g).",
+    spm:"Bestem ligevægtskoncentrationerne af de tre stoffer.",
+    ligningKorrekt:"0,0500 M = <div class=\"fraction\"><div class=\"frac-top\">x · x</div><div class=\"frac-bot\">0,200 M − x</div></div>",
+    ligningForkerte:[
+        "0,0500 M = <div class=\"fraction\"><div class=\"frac-top\">x · x</div><div class=\"frac-bot\">0,200 M</div></div>",
+        "0,0500 M = <div class=\"fraction\"><div class=\"frac-top\">0,200 M − x</div><div class=\"frac-bot\">x · x</div></div>",
+        "0,0500 M = <div class=\"fraction\"><div class=\"frac-top\">2x</div><div class=\"frac-bot\">0,200 M − x</div></div>"
+    ],
+    andengradKorrekt:"x<sup>2</sup> + 0,0500 M · x − 0,0100 M<sup>2</sup> = 0",
+    andengradForkerte:[
+        "x<sup>2</sup> − 0,0500 M · x − 0,0100 M<sup>2</sup> = 0",
+        "x<sup>2</sup> + 0,0500 M · x + 0,0100 M<sup>2</sup> = 0",
+        "x<sup>2</sup> + 0,0100 M · x − 0,0500 M<sup>2</sup> = 0"
+    ],
+    rodValgKorrekt:"x = 0,0781 M, fordi den anden løsning er negativ — og en koncentrationsændring kan ikke være negativ.",
+    rodValgForkerte:[
+        "x = −0,128 M, fordi det er den numerisk største løsning.",
+        "Begge løsninger kan bruges, da en andengradsligning altid har to gyldige svar.",
+        "x = 0,0781 M, fordi man altid vælger løsningen med minus foran d<sup>1/2</sup>."
+    ],
+    udregning:[
+        "0,0500 M = x<sup>2</sup> / (0,200 M − x)",
+        "x<sup>2</sup> = 0,0500 M · (0,200 M − x) = 0,0100 M<sup>2</sup> − 0,0500 M · x",
+        "x<sup>2</sup> + 0,0500 M · x − 0,0100 M<sup>2</sup> = 0 &nbsp; (alle led har enheden M<sup>2</sup>)",
+        "a = 1, &nbsp; b = 0,0500 M, &nbsp; c = −0,0100 M<sup>2</sup>",
+        "d = b<sup>2</sup> − 4ac = (0,0500 M)<sup>2</sup> + 4 · 0,0100 M<sup>2</sup> = 0,0425 M<sup>2</sup> &nbsp; &rArr; &nbsp; d<sup>1/2</sup> = 0,2062 M",
+        "x = (−0,0500 M ± 0,2062 M) / 2 &nbsp; &rArr; &nbsp; x<sub>1</sub> = 0,0781 M &nbsp;og&nbsp; x<sub>2</sub> = −0,128 M",
+        "x<sub>2</sub> forkastes: en koncentrationsændring kan ikke være negativ.",
+        "x = <b>0,0781 M</b> &nbsp; (og 0 M &lt; x &lt; 0,200 M ✓)"
+    ]
+},
+{
+    id:"n3-2", niveau:3, type:"ligningX", metode:"andengrad",
+    titel:"Phosgen spaltes ved høj temperatur",
+    temp:"800 K",
+    reaktanter:[{navn:"COCl2", html:"COCl<sub>2</sub>", koef:1, fase:"g"}],
+    produkter: [{navn:"CO", html:"CO", koef:1, fase:"g"},
+                {navn:"Cl2", html:"Cl<sub>2</sub>", koef:1, fase:"g"}],
+    Kc:0.0200, KcHTML:"0,0200 M",
+    start:{ COCl2:0.500, CO:0, Cl2:0 },
+    xArt:"COCl2", xArtHTML:"COCl<sub>2</sub>",
+    x:0.0904988, x1:0.0904988, x2:-0.1104988,
+    ceq:{ COCl2:0.4095012, CO:0.0904988, Cl2:0.0904988 },
+    tekst:"Phosgen, COCl<sub>2</sub>(g), spaltes ved høj temperatur. En lukket beholder fyldes udelukkende med COCl<sub>2</sub>(g).",
+    spm:"Bestem ligevægtskoncentrationerne af de tre stoffer.",
+    ligningKorrekt:"0,0200 M = <div class=\"fraction\"><div class=\"frac-top\">x · x</div><div class=\"frac-bot\">0,500 M − x</div></div>",
+    ligningForkerte:[
+        "0,0200 M = <div class=\"fraction\"><div class=\"frac-top\">x · x</div><div class=\"frac-bot\">0,500 M</div></div>",
+        "0,0200 M = <div class=\"fraction\"><div class=\"frac-top\">0,500 M − x</div><div class=\"frac-bot\">x · x</div></div>",
+        "0,0200 M = <div class=\"fraction\"><div class=\"frac-top\">x</div><div class=\"frac-bot\">0,500 M − x</div></div>"
+    ],
+    andengradKorrekt:"x<sup>2</sup> + 0,0200 M · x − 0,0100 M<sup>2</sup> = 0",
+    andengradForkerte:[
+        "x<sup>2</sup> − 0,0200 M · x + 0,0100 M<sup>2</sup> = 0",
+        "x<sup>2</sup> + 0,0200 M · x + 0,0100 M<sup>2</sup> = 0",
+        "x<sup>2</sup> + 0,0100 M · x − 0,0200 M<sup>2</sup> = 0"
+    ],
+    rodValgKorrekt:"x = 0,0905 M, fordi den anden løsning er negativ — og en koncentrationsændring kan ikke være negativ.",
+    rodValgForkerte:[
+        "x = −0,110 M, fordi reaktanten forbruges, og ændringen derfor skal være negativ.",
+        "Begge løsninger kan bruges, da de begge opfylder ligningen.",
+        "x = 0,0905 M, fordi man altid vælger den mindste af de to løsninger."
+    ],
+    udregning:[
+        "0,0200 M = x<sup>2</sup> / (0,500 M − x)",
+        "x<sup>2</sup> = 0,0200 M · (0,500 M − x) = 0,0100 M<sup>2</sup> − 0,0200 M · x",
+        "x<sup>2</sup> + 0,0200 M · x − 0,0100 M<sup>2</sup> = 0",
+        "d = (0,0200 M)<sup>2</sup> + 4 · 0,0100 M<sup>2</sup> = 0,0404 M<sup>2</sup> &nbsp; &rArr; &nbsp; d<sup>1/2</sup> = 0,2010 M",
+        "x = (−0,0200 M ± 0,2010 M) / 2 &nbsp; &rArr; &nbsp; x<sub>1</sub> = 0,0905 M &nbsp;og&nbsp; x<sub>2</sub> = −0,110 M",
+        "x<sub>2</sub> forkastes (negativ ændring er ikke mulig).",
+        "x = <b>0,0905 M</b> &nbsp; (og 0 M &lt; x &lt; 0,500 M ✓)"
+    ]
+},
+{
+    id:"n3-3", niveau:3, type:"ligningX", metode:"andengrad",
+    titel:"Vandgasligevægten med forskellige startkoncentrationer",
+    temp:"700 K",
+    reaktanter:[{navn:"CO", html:"CO", koef:1, fase:"g"},
+                {navn:"H2O", html:"H<sub>2</sub>O", koef:1, fase:"g"}],
+    produkter: [{navn:"CO2", html:"CO<sub>2</sub>", koef:1, fase:"g"},
+                {navn:"H2", html:"H<sub>2</sub>", koef:1, fase:"g"}],
+    Kc:5.44, KcHTML:"5,44 (ingen enhed)",
+    start:{ CO:0.200, H2O:0.100, CO2:0, H2:0 },
+    xArt:"CO", xArtHTML:"CO",
+    x:0.0874927, x1:0.2800749, x2:0.0874927,
+    ceq:{ CO:0.1125073, H2O:0.0125073, CO2:0.0874927, H2:0.0874927 },
+    tekst:"Vandgasligevægten undersøges igen — men nu er startkoncentrationerne af CO(g) og H<sub>2</sub>O(g) <i>forskellige</i>. Der er intet CO<sub>2</sub> og intet H<sub>2</sub> fra start.",
+    spm:"Bestem ligevægtskoncentrationerne af alle fire stoffer.",
+    ligningKorrekt:"5,44 = <div class=\"fraction\"><div class=\"frac-top\">x · x</div><div class=\"frac-bot\">(0,200 M − x) · (0,100 M − x)</div></div>",
+    ligningForkerte:[
+        "5,44 = <div class=\"fraction\"><div class=\"frac-top\">x · x</div><div class=\"frac-bot\">(0,200 M − x) + (0,100 M − x)</div></div>",
+        "5,44 = <div class=\"fraction\"><div class=\"frac-top\">(0,200 M − x) · (0,100 M − x)</div><div class=\"frac-bot\">x · x</div></div>",
+        "5,44 = <div class=\"fraction\"><div class=\"frac-top\">x · x</div><div class=\"frac-bot\">(0,300 M − x) · (0,300 M − x)</div></div>"
+    ],
+    andengradKorrekt:"4,44 · x<sup>2</sup> − 1,632 M · x + 0,1088 M<sup>2</sup> = 0",
+    andengradForkerte:[
+        "4,44 · x<sup>2</sup> + 1,632 M · x + 0,1088 M<sup>2</sup> = 0",
+        "6,44 · x<sup>2</sup> − 1,632 M · x + 0,1088 M<sup>2</sup> = 0",
+        "4,44 · x<sup>2</sup> − 1,632 M · x − 0,1088 M<sup>2</sup> = 0"
+    ],
+    rodValgKorrekt:"x = 0,0875 M, fordi x = 0,280 M ville give [H<sub>2</sub>O] = 0,100 M − 0,280 M = −0,180 M, altså en negativ koncentration.",
+    rodValgForkerte:[
+        "x = 0,280 M, fordi det er den største løsning, og reaktionen forløber så langt som muligt.",
+        "Begge løsninger kan bruges, da de begge er positive og derfor gyldige kemiske svar.",
+        "x = 0,0875 M, fordi man altid vælger den mindste af de to rødder i en andengradsligning."
+    ],
+    udregning:[
+        "5,44 = x<sup>2</sup> / ((0,200 M − x) · (0,100 M − x))",
+        "x<sup>2</sup> = 5,44 · (0,0200 M<sup>2</sup> − 0,300 M · x + x<sup>2</sup>)",
+        "x<sup>2</sup> = 0,1088 M<sup>2</sup> − 1,632 M · x + 5,44 · x<sup>2</sup>",
+        "4,44 · x<sup>2</sup> − 1,632 M · x + 0,1088 M<sup>2</sup> = 0",
+        "d = (1,632 M)<sup>2</sup> − 4 · 4,44 · 0,1088 M<sup>2</sup> = 2,663 M<sup>2</sup> − 1,932 M<sup>2</sup> = 0,7311 M<sup>2</sup> &nbsp; &rArr; &nbsp; d<sup>1/2</sup> = 0,8551 M",
+        "x = (1,632 M ± 0,8551 M) / (2 · 4,44) &nbsp; &rArr; &nbsp; x<sub>1</sub> = 0,280 M &nbsp;og&nbsp; x<sub>2</sub> = 0,0875 M",
+        "x<sub>1</sub> forkastes: [H<sub>2</sub>O] = 0,100 M − 0,280 M = −0,180 M, og en koncentration kan ikke være negativ.",
+        "x = <b>0,0875 M</b> &nbsp; (og 0 M &lt; x &lt; 0,100 M ✓)"
+    ]
+},
+{
+    id:"n3-4", niveau:3, type:"ligningX", metode:"andengrad",
+    titel:"Iod spaltes til iodatomer",
+    temp:"1200 K",
+    reaktanter:[{navn:"I2", html:"I<sub>2</sub>", koef:1, fase:"g"}],
+    produkter: [{navn:"I", html:"I", koef:2, fase:"g"}],
+    Kc:0.0100, KcHTML:"0,0100 M",
+    start:{ I2:0.400, I:0 },
+    xArt:"I2", xArtHTML:"I<sub>2</sub>",
+    x:0.0303975, x1:0.0303975, x2:-0.0328975,
+    ceq:{ I2:0.3696025, I:0.060795 },
+    tekst:"Iodmolekyler spaltes til frie iodatomer. En lukket beholder fyldes udelukkende med I<sub>2</sub>(g).",
+    spm:"Bestem ligevægtskoncentrationerne af I<sub>2</sub> og I.",
+    ligningKorrekt:"0,0100 M = <div class=\"fraction\"><div class=\"frac-top\">(2x)<sup>2</sup></div><div class=\"frac-bot\">0,400 M − x</div></div>",
+    ligningForkerte:[
+        "0,0100 M = <div class=\"fraction\"><div class=\"frac-top\">x<sup>2</sup></div><div class=\"frac-bot\">0,400 M − x</div></div>",
+        "0,0100 M = <div class=\"fraction\"><div class=\"frac-top\">(2x)<sup>2</sup></div><div class=\"frac-bot\">0,400 M − 2x</div></div>",
+        "0,0100 M = <div class=\"fraction\"><div class=\"frac-top\">0,400 M − x</div><div class=\"frac-bot\">(2x)<sup>2</sup></div></div>"
+    ],
+    andengradKorrekt:"4 · x<sup>2</sup> + 0,0100 M · x − 0,00400 M<sup>2</sup> = 0",
+    andengradForkerte:[
+        "x<sup>2</sup> + 0,0100 M · x − 0,00400 M<sup>2</sup> = 0",
+        "4 · x<sup>2</sup> − 0,0100 M · x − 0,00400 M<sup>2</sup> = 0",
+        "2 · x<sup>2</sup> + 0,0100 M · x − 0,00400 M<sup>2</sup> = 0"
+    ],
+    rodValgKorrekt:"x = 0,0304 M, fordi den anden løsning er negativ — og en koncentrationsændring kan ikke være negativ.",
+    rodValgForkerte:[
+        "x = −0,0329 M, fordi I<sub>2</sub> forbruges, og en ændring regnes altid med fortegn.",
+        "Begge løsninger kan bruges, fordi enhver andengradsligning altid har to gyldige rødder.",
+        "x = 0,0608 M, fordi der dannes 2 mol I for hvert mol I<sub>2</sub>, der spaltes."
+    ],
+    udregning:[
+        "0,0100 M = (2x)<sup>2</sup> / (0,400 M − x) = 4x<sup>2</sup> / (0,400 M − x)",
+        "4x<sup>2</sup> = 0,0100 M · (0,400 M − x) = 0,00400 M<sup>2</sup> − 0,0100 M · x",
+        "4 · x<sup>2</sup> + 0,0100 M · x − 0,00400 M<sup>2</sup> = 0",
+        "d = (0,0100 M)<sup>2</sup> + 4 · 4 · 0,00400 M<sup>2</sup> = 0,0641 M<sup>2</sup> &nbsp; &rArr; &nbsp; d<sup>1/2</sup> = 0,2532 M",
+        "x = (−0,0100 M ± 0,2532 M) / (2 · 4) &nbsp; &rArr; &nbsp; x<sub>1</sub> = 0,0304 M &nbsp;og&nbsp; x<sub>2</sub> = −0,0329 M",
+        "x<sub>2</sub> forkastes (negativ ændring er ikke mulig).",
+        "x = <b>0,0304 M</b>. Bemærk: [I] = 2x = 0,0608 M, mens x selv er ændringen af [I<sub>2</sub>]."
+    ]
+},
+
+];
+
+/* =====================================================================
+   TALFORMAT OG SVARKONTROL
+   ===================================================================== */
+
+/* Skriver et tal på dansk form med det ønskede antal betydende cifre. */
+function tal(v, cifre){
+    cifre = cifre || 3;
+    if (v === 0) return "0";
+    var a = Math.abs(v);
+    if (a >= 0.001 && a < 100000){
+        return v.toPrecision(cifre).replace(".", ",").replace("-", "−");
+    }
+    var eks = Math.floor(Math.log10(a));
+    var man = v / Math.pow(10, eks);
+    return man.toPrecision(cifre).replace(".", ",").replace("-", "−")
+           + "·10<sup>" + String(eks).replace("-", "−") + "</sup>";
+}
+
+/* Hævede cifre, fx 10⁻⁴, oversættes til almindelig eksponentskrivning: ^-4 */
+var HAEVEDE = { "⁰":"0", "¹":"1", "²":"2", "³":"3", "⁴":"4",
+                "⁵":"5", "⁶":"6", "⁷":"7", "⁸":"8", "⁹":"9",
+                "⁻":"-", "⁺":"+" };
+
+/* Læser elevens indtastning. Både almindelige decimaltal (0,000356) og videnskabelig
+   skrivemåde (3,56e-4, 3,56·10^-4, 3,56·10⁻⁴) godtages — de giver samme værdi. */
+function laesTal(s){
+    if (s === null || s === undefined) return NaN;
+    s = String(s).toLowerCase().replace(/\s+/g, "")
+                 .replace(/[−–—]/g, "-")   /* minus, en- og em-streg */
+                 .replace(/,/g, ".");
+    s = s.replace(/[⁰¹²³⁴-⁹⁺⁻]+/g, function(m){
+        var r = "^";
+        for (var i = 0; i < m.length; i++) r += HAEVEDE[m.charAt(i)];
+        return r;
+    });
+    s = s.replace(/[·*x×]10\^?/g, "e");   /* 3.56·10^-4  →  3.56e-4 */
+    s = s.replace(/^10\^/, "1e");         /* 10^-4       →  1e-4    */
+    s = s.replace(/\^/g, "e");            /* 3.56e^-4    →  3.56e-4 */
+    s = s.replace(/^e/, "1e");            /* ·10^-4      →  1e-4    */
+    return parseFloat(s);
+}
+
+/* Sammenligner elevens svar med facit inden for 2 % relativ afvigelse. */
+function taetPaa(elev, facit){
+    if (isNaN(elev)) return false;
+    if (facit === 0) return Math.abs(elev) < 1e-9;
+    return Math.abs(elev - facit) <= Math.abs(facit) * 0.02;
+}
+
+function bland(arr){
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--){
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+}
+
+/* =====================================================================
+   KEMISK OPSKRIVNING
+   ===================================================================== */
+
+function alleArter(op){ return op.reaktanter.concat(op.produkter); }
+
+function sideHTML(arter){
+    return arter.map(function(s){
+        return (s.koef > 1 ? s.koef + " " : "") + s.html + "(" + s.fase + ")";
+    }).join(" + ");
+}
+
+function reaktionHTML(op){
+    return sideHTML(op.reaktanter) + '<span class="pil">&#8652;</span>' + sideHTML(op.produkter);
+}
+
+function brok(taeller, naevner){
+    return '<div class="fraction"><div class="frac-top">' + taeller +
+           '</div><div class="frac-bot">' + naevner + '</div></div>';
+}
+
+/* Enheden for Kc: M opløftet i (sum af produktkoefficienter − sum af reaktantkoefficienter). */
+function kcEksponent(op){
+    var s = 0;
+    op.produkter.forEach(function(a){ s += a.koef; });
+    op.reaktanter.forEach(function(a){ s -= a.koef; });
+    return s;
+}
+
+function kcEnhedHTML(op){
+    var e = kcEksponent(op);
+    if (e === 0) return "ingen enhed";
+    if (e === 1) return "M";
+    return "M<sup>" + String(e).replace("-", "−") + "</sup>";
+}
+
+/* Bygger ligevægtslovens højreside i forskellige varianter (til multiple choice). */
+function kcUdtryk(op, variant){
+    function led(s, form){
+        var k = "[" + s.html + "]";
+        if (form === "faktor") return (s.koef > 1 ? s.koef + "·" : "") + k;
+        if (form === "ingen")  return k;
+        return s.koef > 1 ? k + "<sup>" + s.koef + "</sup>" : k;
+    }
+    function saml(arr, form, sammen){
+        return arr.map(function(s){ return led(s, form); }).join(sammen);
+    }
+    var P = op.produkter, R = op.reaktanter;
+    switch (variant){
+        case "korrekt": return brok(saml(P, "eks", " · "), saml(R, "eks", " · "));
+        case "omvendt": return brok(saml(R, "eks", " · "), saml(P, "eks", " · "));
+        case "faktor":  return brok(saml(P, "faktor", " · "), saml(R, "faktor", " · "));
+        case "ingen":   return brok(saml(P, "ingen", " · "), saml(R, "ingen", " · "));
+        case "sum":     return brok(saml(P, "eks", " + "), saml(R, "eks", " + "));
+        case "kunP":    return brok(led(P[0], "eks"), saml(R, "eks", " · "));
+        case "kunR":    return brok(saml(P, "eks", " · "), led(R[0], "eks"));
+    }
+    return "";
+}
+
+/* Ligevægtsloven skrevet på én linje — til hints, hvor en brøk fylder for meget. */
+function kcFlad(op){
+    function led(s){ return "[" + s.html + "]" + (s.koef > 1 ? "<sup>" + s.koef + "</sup>" : ""); }
+    var P = op.produkter.map(led).join(" · ");
+    var R = op.reaktanter.map(led).join(" · ");
+    return "(" + P + ") / (" + R + ")";
+}
+
+/* Finder tre forkerte udtryk, der alle er forskellige fra det rigtige. */
+function kcDistraktorer(op){
+    var korrekt = kcUdtryk(op, "korrekt");
+    var kandidater = ["omvendt", "faktor", "ingen", "sum", "kunP", "kunR"];
+    var ud = [];
+    for (var i = 0; i < kandidater.length && ud.length < 3; i++){
+        var h = kcUdtryk(op, kandidater[i]);
+        if (h !== korrekt && ud.indexOf(h) === -1) ud.push(h);
+    }
+    return ud;
+}
+
+/* =====================================================================
+   OPGAVEKORT
+   ===================================================================== */
+
+var aktuel = null;
+var opgaveListe = [];          /* Opgaverne på det valgte niveau, i fast rækkefølge */
+var aktuelIndex = 0;
+var loeste = {};               /* id -> true for de opgaver, der er gennemført */
+var valgtNiveau = 1;           /* Siden starter på niveau 1 */
+var antalLoest = 0, stribe = 0;
+
+function tegnOpgaveKort(op){
+    var h = '<div class="opg-top">' +
+              '<div class="opg-titel">' + op.titel + '</div>' +
+              '<div class="opg-mærkat niv' + op.niveau + '">Niveau ' + op.niveau + '</div>' +
+            '</div>';
+
+    h += '<div class="reaktion">' + reaktionHTML(op) + '</div>';
+    h += '<div class="mini-note" style="text-align:center; margin-bottom:10px;">' +
+         'Temperaturen er ' + op.temp + ' og holdes konstant.</div>';
+    h += '<div class="opg-tekst">' + op.tekst + '</div>';
+    h += '<div class="opg-spm"><b>Opgave:</b> ' + op.spm +
+         '<br><span style="color:var(--muted); font-size:0.86rem;">' +
+         'De oplyste tal dukker op i det trin, hvor du får brug for dem.</span></div>';
+    document.getElementById("opgave-kort").innerHTML = h;
+}
+
+/* =====================================================================
+   OPLYSTE DATA — vises først i det trin, hvor de skal bruges
+   ===================================================================== */
+
+function dataBoks(indhold){
+    return '<div class="data-boks"><div class="data-lab">Oplyst</div>' +
+           '<div class="data-krop">' + indhold + '</div></div>';
+}
+
+/* Volumen og de målte stofmængder (til trinnet, hvor c = n/V skal bruges). */
+function oplystStofmaengder(op){
+    var arter = alleArter(op);
+    var h = 'Beholderens volumen er <b>V = ' + tal(op.V) + ' L</b>. ' +
+            'Ved ligevægt måles følgende stofmængder:' +
+            '<div class="skema-wrap" style="margin-top:8px;"><table class="skema"><tr><th>Stof</th>';
+    arter.forEach(function(s){ h += '<th>' + s.html + '(' + s.fase + ')</th>'; });
+    h += '</tr><tr><td class="rowlab">Stofmængde ved ligevægt</td>';
+    arter.forEach(function(s){ h += '<td>' + tal(op.n[s.navn]) + ' mol</td>'; });
+    return h + '</tr></table></div>';
+}
+
+/* Ligevægtskonstanten alene. */
+function oplystKc(op){
+    return 'K<sub>c</sub> = <b>' + op.KcHTML + '</b> ved ' + op.temp + '.';
+}
+
+/* Ligevægtskonstanten og de målte koncentrationer. */
+function oplystKendte(op){
+    var arter = alleArter(op);
+    var linjer = Object.keys(op.kendte).map(function(k){
+        var a = arter.filter(function(s){ return s.navn === k; })[0];
+        return "[" + a.html + "] = <b>" + tal(op.kendte[k]) + " M</b>";
+    }).join(" &nbsp;&nbsp; ");
+    return oplystKc(op) + '<br>Ved ligevægt er målt: ' + linjer;
+}
+
+/* =====================================================================
+   TRIN-MOTOR
+   Hvert trin er et objekt: { titel, sub, html, tjek(), facit, resume, hint }
+   Kun det aktuelle trin vises. Gennemførte trin foldes sammen til overskrift + svar
+   og kan foldes ud igen ved klik på overskriften.
+   ===================================================================== */
+
+var trinListe = [];
+var fejlTaeller = [];
+
+/* Bygger et multiple-choice-felt og husker, hvilket svar der er det rigtige. */
+function mcFelt(trin, nr, korrektHTML, forkerteHTML){
+    var alle = bland([{h:korrektHTML, ok:true}].concat(
+        forkerteHTML.map(function(f){ return {h:f, ok:false}; })
+    ));
+    trin.mcKorrekt = -1;
+    var h = '<div class="mc-liste">';
+    alle.forEach(function(o, i){
+        if (o.ok) trin.mcKorrekt = i;
+        h += '<label class="mc-opt" id="mc-' + nr + '-' + i + '">' +
+                '<input type="radio" name="mc-' + nr + '" value="' + i + '">' +
+                '<span class="mc-krop">' + o.h + '</span>' +
+             '</label>';
+    });
+    return h + '</div>';
+}
+
+function mcValgt(nr){
+    var r = document.querySelector('input[name="mc-' + nr + '"]:checked');
+    return r ? parseInt(r.value, 10) : -1;
+}
+
+function hintHTML(punkter){
+    return punkter.map(function(p, i){
+        return '<div class="hint-step"><span class="hint-num">' + (i + 1) + '</span><span>' + p + '</span></div>';
+    }).join("");
+}
+
+function visHint(nr){
+    var boks = document.getElementById("hint-" + nr);
+    var knap = document.getElementById("hintknap-" + nr);
+    if (boks.style.display !== "block"){
+        boks.style.display = "block";
+        knap.innerHTML = "▼ Skjul fremgangsmåde";
+    } else {
+        boks.style.display = "none";
+        knap.innerHTML = "▶ Vis fremgangsmåde";
+    }
+}
+
+function tegnTrin(){
+    var c = document.getElementById("trin-container");
+    c.innerHTML = "";
+    fejlTaeller = [];
+
+    trinListe.forEach(function(t, i){
+        fejlTaeller.push(0);
+        var d = document.createElement("div");
+        /* Kun første trin vises. De øvrige folder sig ud, efterhånden som man kommer videre. */
+        d.className = "card step-card" + (i === 0 ? "" : " skjult");
+        d.id = "trin-" + i;
+
+        var krop = t.html;
+        if (t.hint && t.hint.length){
+            krop += '<button class="btn-hint" id="hintknap-' + i + '" onclick="visHint(' + i + ')">▶ Vis fremgangsmåde</button>' +
+                    '<div class="hint-box" id="hint-' + i + '">' + hintHTML(t.hint) + '</div>';
+        }
+        krop += '<button class="btn-check" id="tjekknap-' + i + '" onclick="tjekTrin(' + i + ')">Tjek svar</button>' +
+                '<div class="step-feedback" id="fb-' + i + '"></div>';
+
+        d.innerHTML =
+            '<div class="step-hoved-rad" onclick="skiftFold(' + i + ')">' +
+                '<div class="step-num">' + (i + 1) + '</div>' +
+                '<div class="step-hoved-tekst">' +
+                    '<div class="step-title">' + t.titel + '</div>' +
+                    '<div class="step-sub">' + t.sub + '</div>' +
+                    '<div class="step-resume" id="resume-' + i + '"></div>' +
+                '</div>' +
+                '<div class="fold-pil"></div>' +
+            '</div>' +
+            '<div class="step-body">' + krop + '</div>';
+
+        c.appendChild(d);
+    });
+}
+
+/* Folder et gennemført trin ud og sammen igen. */
+function skiftFold(i){
+    var kort = document.getElementById("trin-" + i);
+    if (!kort.classList.contains("done")) return;
+    kort.classList.toggle("aaben");
+}
+
+function tjekTrin(i){
+    var t  = trinListe[i];
+    var fb = document.getElementById("fb-" + i);
+    var r  = t.tjek();
+
+    if (r.ok){
+        fb.className = "step-feedback ok";
+        fb.innerHTML = r.besked;
+        document.getElementById("resume-" + i).innerHTML = "✓ &nbsp;" + (t.resume || t.facit || "");
+        document.getElementById("trin-" + i).classList.add("done");
+        document.getElementById("tjekknap-" + i).style.display = "none";
+        laasFelter(i);
+
+        if (i + 1 < trinListe.length){
+            document.getElementById("trin-" + (i + 1)).classList.remove("skjult");
+            rulTil("trin-" + (i + 1));
+        } else {
+            afslutOpgave();
+        }
+    } else {
+        fejlTaeller[i]++;
+        if (fejlTaeller[i] >= 3 && t.facit){
+            fb.className = "step-feedback tip";
+            fb.innerHTML = "<b>Facit for dette trin:</b><br>" + t.facit +
+                           "<br><br>Skriv/vælg det rigtige svar, og tryk på “Tjek svar” igen.";
+            if (t.mcKorrekt >= 0){
+                var lab = document.getElementById("mc-" + i + "-" + t.mcKorrekt);
+                if (lab) lab.classList.add("facit");
+            }
+        } else {
+            fb.className = "step-feedback err";
+            fb.innerHTML = r.besked;
+        }
+        stribe = 0;
+        opdaterStats();
+    }
+}
+
+/* Markerer et enkelt svarfelt grønt eller rødt, så delvist rigtige svar kan ses. */
+function maerkFelt(id, rigtigt){
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove("rigtig", "forkert");
+    el.classList.add(rigtigt ? "rigtig" : "forkert");
+}
+
+/* Låser alle input og select i et gennemført trin. */
+function laasFelter(i){
+    var kort = document.getElementById("trin-" + i);
+    Array.prototype.forEach.call(kort.querySelectorAll("input, select"), function(el){
+        el.disabled = true;
+    });
+}
+
+function rulTil(id){
+    setTimeout(function(){
+        var el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior:"smooth", block:"start" });
+    }, 130);
+}
+
+function opdaterStats(){
+    document.getElementById("loest").textContent  = antalLoest;
+    document.getElementById("stribe").textContent = stribe;
+    document.getElementById("stribe").style.color = stribe >= 3 ? "var(--yellow)" : "var(--green)";
+}
+
+/* =====================================================================
+   FÆLLES TRIN: OPSKRIV LIGEVÆGTSLOVEN
+   ===================================================================== */
+
+function trinLigevaegtslov(op, nr){
+    var t = {
+        titel: "Opskriv ligevægtsloven",
+        sub:   "Hvilket udtryk er det rigtige?",
+        facit: '<span class="kc-mærke">K<sub>c</sub> = </span>' + kcUdtryk(op, "korrekt"),
+        hint: [
+            "Den generelle opskrivning: for &nbsp;a A + b B &#8652; c C + d D&nbsp; gælder<br>K<sub>c</sub> = " +
+                brok("[C]<sup>c</sup> · [D]<sup>d</sup>", "[A]<sup>a</sup> · [B]<sup>b</sup>"),
+            "Tælleren indeholder <b>produkterne</b> (stofferne til højre for ligevægtspilen).",
+            "Nævneren indeholder <b>reaktanterne</b> (stofferne til venstre).",
+            "En koefficient foran et stof bliver til en <b>eksponent</b> — ikke til en faktor. " +
+            "Fx giver 2 NO(g) leddet [NO]<sup>2</sup>, ikke 2·[NO].",
+            "Rene faste stoffer (s) og rene væsker (l) skrives ikke med. Her er alle stoffer på gasform, " +
+            "så de tæller alle med."
+        ]
+    };
+    t.html = mcFelt(t, nr, '<span class="kc-mærke">K<sub>c</sub> = </span>' + kcUdtryk(op, "korrekt"),
+                           kcDistraktorer(op).map(function(d){
+                               return '<span class="kc-mærke">K<sub>c</sub> = </span>' + d;
+                           }));
+    t.tjek = function(){
+        var v = mcValgt(nr);
+        if (v < 0) return { ok:false, besked:"Vælg et af udtrykkene." };
+        if (v === t.mcKorrekt){
+            return { ok:true, besked:"Korrekt. Tælleren indeholder produkterne, nævneren reaktanterne, " +
+                     "og koefficienterne står som eksponenter." };
+        }
+        return { ok:false, besked:"Ikke korrekt. Kontrollér tre ting: (1) står produkterne i tælleren? " +
+                 "(2) står reaktanterne i nævneren? (3) er koefficienterne skrevet som eksponenter og ikke som faktorer?" };
+    };
+    return t;
+}
+
+/* =====================================================================
+   NIVEAU 1 — TYPE A: Kc ud fra stofmængder
+   ===================================================================== */
+
+/* Enheder til rullemenuerne. Nøglen bruges som værdi, så der ikke står HTML i attributterne. */
+var ENH = {
+    ingen: { vis:"ingen enhed", html:"ingen enhed" },
+    M:     { vis:"M",   html:"M" },
+    Mm1:   { vis:"M⁻¹", html:"M<sup>−1</sup>" },
+    M2:    { vis:"M²",  html:"M<sup>2</sup>" },
+    Mm2:   { vis:"M⁻²", html:"M<sup>−2</sup>" },
+    M3:    { vis:"M³",  html:"M<sup>3</sup>" },
+    Mm3:   { vis:"M⁻³", html:"M<sup>−3</sup>" },
+    mol:   { vis:"mol", html:"mol" }
+};
+var ENHEDER_KC = ["ingen", "M", "Mm1", "M2", "Mm2", "M3", "Mm3"];
+
+/* Nøglen for K_c's enhed, bestemt ud fra koefficienterne. */
+function kcEnhedNoegle(op){
+    var e = kcEksponent(op);
+    if (e === 0) return "ingen";
+    if (e === 1) return "M";
+    if (e === 2) return "M2";
+    if (e === 3) return "M3";
+    if (e === -1) return "Mm1";
+    if (e === -2) return "Mm2";
+    return "Mm3";
+}
+
+function enhedSelect(id, noegler){
+    var h = '<select class="sel" id="' + id + '"><option value="">– vælg enhed –</option>';
+    noegler.forEach(function(k){
+        h += '<option value="' + k + '">' + ENH[k].vis + '</option>';
+    });
+    return h + '</select>';
+}
+
+function trinKoncentrationer(op, nr){
+    var arter = alleArter(op);
+    var t = {
+        titel: "Beregn ligevægtskoncentrationerne",
+        sub:   "Stofmængderne står i opgaven ovenfor.",
+        hint: [
+            "Omregn stofmængde til koncentration med formlen &nbsp;c = " + brok("n", "V"),
+            "n er stofmængden i mol, og V er beholderens volumen — her V = " + tal(op.V) + " L.",
+            "Enheden bliver mol/L, som forkortes M.",
+            "Angiv svarene med 3 betydende cifre."
+        ]
+    };
+
+    var h = dataBoks(oplystStofmaengder(op)) + '<div class="in-liste">';
+    arter.forEach(function(s, k){
+        h += '<div class="in-row"><span class="in-lab">[' + s.html + '] =</span>' +
+             '<input type="text" id="in-' + nr + '-' + k + '" autocomplete="off">' +
+             '<span class="enhed-fast">M</span></div>';
+    });
+    h += '</div><div class="mini-note">Brug komma som decimaltegn. Angiv 3 betydende cifre.</div>';
+    t.html = h;
+
+    t.facit = arter.map(function(s){
+        return "[" + s.html + "] = " + tal(op.ceq[s.navn]) + " M";
+    }).join("<br>");
+    t.resume = arter.map(function(s){
+        return "[" + s.html + "] = " + tal(op.ceq[s.navn]) + " M";
+    }).join(", &nbsp;");
+
+    t.tjek = function(){
+        var fejl = [];
+        arter.forEach(function(s, k){
+            var v  = laesTal(document.getElementById("in-" + nr + "-" + k).value);
+            var ok = taetPaa(v, op.ceq[s.navn]);
+            maerkFelt("in-" + nr + "-" + k, ok);
+            if (!ok) fejl.push("[" + s.html + "]");
+        });
+        if (fejl.length === 0){
+            return { ok:true, besked:"Korrekt. " + t.resume + "." };
+        }
+        return { ok:false, besked:"De grønt markerede felter er rigtige. Der mangler stadig: " +
+                 fejl.join(", ") + "." };
+    };
+    return t;
+}
+
+function trinBeregnKc(op, nr){
+    var arter = alleArter(op);
+    var enhed = kcEnhedHTML(op);
+    var indsat = op.produkter.map(function(s){
+        return "(" + tal(op.ceq[s.navn]) + " M)" + (s.koef > 1 ? "<sup>" + s.koef + "</sup>" : "");
+    }).join(" · ");
+    var indsatN = op.reaktanter.map(function(s){
+        return "(" + tal(op.ceq[s.navn]) + " M)" + (s.koef > 1 ? "<sup>" + s.koef + "</sup>" : "");
+    }).join(" · ");
+
+    var t = {
+        titel: "Beregn K<sub>c</sub> — og angiv enheden",
+        sub:   "Både talværdi og enhed skal være rigtige.",
+        hint: [
+            "Indsæt de koncentrationer, du beregnede i forrige trin, i ligevægtsloven:<br>" +
+                "K<sub>c</sub> = " + brok(indsat, indsatN),
+            "Husk eksponenterne. Fx er (0,0400 M)<sup>2</sup> = 1,60·10<sup>−3</sup> M<sup>2</sup>.",
+            "Enheden findes ved at forkorte M'erne. Den bliver M opløftet i " +
+                "(summen af produkternes koefficienter − summen af reaktanternes koefficienter) = " +
+                String(kcEksponent(op)).replace("-", "−") + ".",
+            "Er dette tal 0, har K<sub>c</sub> <b>ingen enhed</b>. Så skriver man K<sub>c</sub> = tal (ingen enhed) — ikke bare et tal uden kommentar."
+        ]
+    };
+
+    t.html = '<div class="in-row"><span class="in-lab">K<sub>c</sub> =</span>' +
+             '<input type="text" id="in-' + nr + '-v" autocomplete="off">' +
+             enhedSelect("in-" + nr + "-e", ENHEDER_KC) + '</div>' +
+             '<div class="mini-note">Talværdien kan skrives som almindeligt decimaltal eller i videnskabelig ' +
+             'skrivemåde — begge dele godtages. Brug komma som decimaltegn, og angiv 3 betydende cifre.</div>';
+
+    t.facit = "K<sub>c</sub> = " + tal(op.Kc) + " " + (enhed === "ingen enhed" ? "(ingen enhed)" : enhed);
+
+    t.tjek = function(){
+        var v = laesTal(document.getElementById("in-" + nr + "-v").value);
+        var e = document.getElementById("in-" + nr + "-e").value;
+        if (isNaN(v)) return { ok:false, besked:"Indtast en talværdi for K<sub>c</sub>." };
+        if (e === "")  return { ok:false, besked:"Vælg også en enhed. Et svar uden enhed er ikke fuldstændigt — " +
+                                "og “ingen enhed” er et gyldigt valg, hvis M'erne går ud med hinanden." };
+        var talOk   = taetPaa(v, op.Kc);
+        var enhedOk = (e === kcEnhedNoegle(op));
+        maerkFelt("in-" + nr + "-v", talOk);
+        maerkFelt("in-" + nr + "-e", enhedOk);
+        if (talOk && enhedOk){
+            return { ok:true, besked:"Korrekt: K<sub>c</sub> = " + tal(op.Kc) + " " +
+                     (enhed === "ingen enhed" ? "(ingen enhed)" : enhed) + " ved " + op.temp + "." };
+        }
+        if (talOk && !enhedOk){
+            return { ok:false, besked:"Talværdien er rigtig, men enheden passer ikke. Tæl koefficienterne: " +
+                     "produkter minus reaktanter giver " + String(kcEksponent(op)).replace("-", "−") + ", " +
+                     "så enheden er M opløftet i dette tal." };
+        }
+        return { ok:false, besked:"Talværdien passer ikke. Kontrollér, at du har husket eksponenterne, " +
+                 "og at produkterne står i tælleren." };
+    };
+    return t;
+}
+
+/* =====================================================================
+   NIVEAU 1 — TYPE B: isolér en ukendt koncentration
+   ===================================================================== */
+
+function trinIsoler(op, nr){
+    var uk = alleArter(op).filter(function(s){ return s.navn === op.ukendt; })[0];
+    var t = {
+        titel: "Isolér den ukendte koncentration",
+        sub:   "Omskriv ligevægtsloven, så [" + uk.html + "] står alene på venstre side.",
+        hint: [
+            "Start med ligevægtsloven: K<sub>c</sub> = " + kcFlad(op),
+            "Gang op i nævneren på begge sider, så der ikke længere er en brøk.",
+            "Divider derefter med alt det, der står sammen med den ukendte.",
+            uk.koef > 1
+                ? "Bemærk, at [" + uk.html + "] er opløftet i " + uk.koef + ". Til sidst skal du derfor opløfte hele højresiden i 1/" + uk.koef + "."
+                : "Kontrollér til sidst, at enhederne på højresiden reducerer til M."
+        ]
+    };
+    t.html = mcFelt(t, nr, op.isoleretKorrekt, op.isoleretForkerte);
+    t.facit = op.isoleretKorrekt;
+    t.tjek = function(){
+        var v = mcValgt(nr);
+        if (v < 0) return { ok:false, besked:"Vælg et af udtrykkene." };
+        if (v === t.mcKorrekt) return { ok:true, besked:"Korrekt isoleret." };
+        return { ok:false, besked:"Ikke korrekt. Prøv at gange nævneren op på begge sider af ligevægtsloven " +
+                 "og derefter dividere med det, der står sammen med [" + uk.html + "]." };
+    };
+    return t;
+}
+
+function trinBeregnUkendt(op, nr){
+    var uk = alleArter(op).filter(function(s){ return s.navn === op.ukendt; })[0];
+    var t = {
+        titel: "Indsæt tallene og beregn",
+        sub:   "Indsæt med enheder, og kontrollér at enheden på resultatet bliver M.",
+        hint: [
+            "Brug det udtryk, du isolerede i forrige trin.",
+            "Indsæt de oplyste værdier <b>med enheder</b> — også K<sub>c</sub>, som her har enheden " +
+                (op.KcHTML.indexOf("ingen") > -1 ? "M<sup>0</sup> (ingen enhed)" : op.KcHTML.replace(/^[^ ]+ /, "")) + ".",
+            "Regn tælleren og nævneren hver for sig, før du dividerer.",
+            uk.koef > 1
+                ? "Til sidst opløftes hele udtrykket i 1/2. Bemærk, at enheden også skal opløftes i 1/2: (M<sup>2</sup>)<sup>1/2</sup> = M."
+                : "Forkort enhederne til sidst og kontrollér, at der står M tilbage."
+        ]
+    };
+    t.html = dataBoks(oplystKendte(op)) +
+             '<div class="in-row"><span class="in-lab">[' + uk.html + '] =</span>' +
+             '<input type="text" id="in-' + nr + '-v" autocomplete="off">' +
+             enhedSelect("in-" + nr + "-e", ["M", "M2", "mol", "ingen"]) + '</div>';
+    t.facit = "[" + uk.html + "] = " + tal(op.svar) + " M";
+    t.tjek = function(){
+        var v = laesTal(document.getElementById("in-" + nr + "-v").value);
+        var e = document.getElementById("in-" + nr + "-e").value;
+        if (isNaN(v)) return { ok:false, besked:"Indtast en talværdi." };
+        if (e === "")  return { ok:false, besked:"Vælg også enheden. En koncentration skal altid have en enhed." };
+        var talOk = taetPaa(v, op.svar);
+        maerkFelt("in-" + nr + "-v", talOk);
+        maerkFelt("in-" + nr + "-e", e === "M");
+        if (!talOk) return { ok:false, besked:"Talværdien passer ikke. Brug knappen “Vis fremgangsmåde”, " +
+                             "og kontrollér, at du har indsat i det isolerede udtryk." };
+        if (e !== "M") return { ok:false, besked:"Talværdien er rigtig, men enheden er forkert. " +
+                                "En stofmængdekoncentration måles i M (= mol/L)." };
+        return { ok:true, besked:"Korrekt: [" + uk.html + "] = " + tal(op.svar) + " M ved " + op.temp + "." };
+    };
+    return t;
+}
+
+/* =====================================================================
+   NIVEAU 2 OG 3 — x-METODEN
+   ===================================================================== */
+
+/* Ændringen for et stof, udtrykt ved x. Reaktanter forbruges, produkter dannes. */
+function dxFor(op, s){
+    var erReaktant = op.reaktanter.indexOf(s) !== -1;
+    return (erReaktant ? -1 : 1) * s.koef;
+}
+
+function dxTekst(d){
+    if (d === 0)  return "0";
+    var fortegn = d < 0 ? "−" : "+";
+    var t = Math.abs(d);
+    return fortegn + (t === 1 ? "x" : t + "x");
+}
+
+/* Udtrykket for ligevægtskoncentrationen, fx "0,200 M − x" eller "2x". */
+function ligevaegtsUdtryk(op, s){
+    var c0 = op.start[s.navn];
+    var d  = dxFor(op, s);
+    var xLed = (Math.abs(d) === 1 ? "x" : Math.abs(d) + "x");
+    if (c0 === 0) return d > 0 ? xLed : "−" + xLed;
+    return tal(c0) + " M " + (d < 0 ? "−" : "+") + " " + xLed;
+}
+
+/* Samme udtryk, men med x erstattet af den beregnede talværdi. */
+function ligevaegtsIndsat(op, s){
+    var c0 = op.start[s.navn];
+    var d  = dxFor(op, s);
+    var n  = Math.abs(d);
+    var xVaerdi = (n === 1 ? tal(op.x) + " M" : n + " · " + tal(op.x) + " M");
+    if (c0 === 0) return (d > 0 ? "" : "−") + xVaerdi;
+    return tal(c0) + " M " + (d < 0 ? "−" : "+") + " " + xVaerdi;
+}
+
+function trinDefinerX(op, nr){
+    var art = op.xArtHTML;
+    var korrekt = "x er den <b>stofmængdekoncentration af " + art + "</b>, der omsættes, " +
+                  "indtil ligevægten har indstillet sig. x måles i M.";
+    var forkerte = [
+        "x er selve <b>ligevægtskoncentrationen</b> af " + art + ", altså den færdige koncentration ved ligevægt. x måles i M.",
+        "x er den <b>stofmængde af " + art + "</b>, der omsættes, indtil ligevægten har indstillet sig. x måles i mol.",
+        "x er et tal uden enhed, der angiver, hvor stor en <b>brøkdel</b> af " + art + ", der omsættes."
+    ];
+    var t = {
+        titel: "Definér x",
+        sub:   "Hvilken formulering vil du skrive i din besvarelse?",
+        hint: [
+            "x må aldrig indføres, uden at det står klart, <b>hvilken størrelse</b> x er — og <b>hvilken enhed</b> x har.",
+            "Når man regner med et koncentrationsskema, er x altid en <b>ændring i koncentration</b>, ikke en færdig ligevægtskoncentration.",
+            "x knyttes til ét bestemt stof — her " + art + " — og de andre stoffers ændringer udtrykkes derefter ved hjælp af koefficienterne.",
+            "Fordi x er en koncentration, har x enheden M (mol/L). Skriv det altid.",
+            "En korrekt formulering i din besvarelse: “Vi sætter x = den stofmængdekoncentration af " + art + ", der omsættes, indtil ligevægten har indstillet sig.”"
+        ]
+    };
+    t.html = mcFelt(t, nr, korrekt, forkerte);
+    t.facit = korrekt;
+    t.tjek = function(){
+        var v = mcValgt(nr);
+        if (v < 0) return { ok:false, besked:"Vælg en definition." };
+        if (v === t.mcKorrekt){
+            return { ok:true, besked:"Korrekt. Skriv altid denne sætning ned i din besvarelse, " +
+                     "før du bruger x i et skema eller en ligning." };
+        }
+        return { ok:false, besked:"Ikke korrekt. x skal være en <b>ændring i koncentration</b> " +
+                 "med enheden M — ikke en stofmængde, ikke en færdig ligevægtskoncentration og ikke et tal uden enhed." };
+    };
+    return t;
+}
+
+function trinSkema(op, nr){
+    var arter = alleArter(op);
+    var t = {
+        titel: "Udfyld koncentrationsskemaet",
+        sub:   "Startkoncentrationerne er oplyst i skemaet. Udfyld ændringsrækken.",
+        hint: [
+            "Ændringerne følger koefficienterne i reaktionsskemaet: reaktanter forbruges, produkter dannes.",
+            "x er knyttet til " + op.xArtHTML + ", som har koefficienten 1. Ændringen for " + op.xArtHTML + " er derfor −x.",
+            "Et stof med koefficienten 2 ændres dobbelt så meget: ændringen bliver ±2x.",
+            "Ligevægtskoncentrationen er start + ændring. Den udfyldes automatisk, når ændringerne er rigtige."
+        ]
+    };
+
+    var h = '<div class="skema-wrap"><table class="skema"><tr><th></th>';
+    arter.forEach(function(s){ h += '<th>' + s.html + '(' + s.fase + ')</th>'; });
+    h += '</tr><tr><td class="rowlab">Startkoncentration</td>';
+    arter.forEach(function(s){ h += '<td>' + tal(op.start[s.navn]) + ' M</td>'; });
+    h += '</tr><tr><td class="rowlab">Ændring</td>';
+    arter.forEach(function(s, k){
+        h += '<td><select class="sel" id="dx-' + nr + '-' + k + '" style="font-size:0.9rem; padding:5px 6px;">' +
+             '<option value="">?</option><option value="0">0</option>' +
+             '<option value="−x">−x</option><option value="+x">+x</option>' +
+             '<option value="−2x">−2x</option><option value="+2x">+2x</option>' +
+             '<option value="−3x">−3x</option><option value="+3x">+3x</option></select></td>';
+    });
+    h += '</tr><tr class="skjult" id="lig-raekke-' + nr + '"><td class="rowlab">Ligevægtskoncentration</td>';
+    arter.forEach(function(s){ h += '<td>' + ligevaegtsUdtryk(op, s) + '</td>'; });
+    h += '</tr></table></div>';
+    t.html = h;
+
+    t.facit = arter.map(function(s){
+        return s.html + ": " + dxTekst(dxFor(op, s));
+    }).join(" &nbsp;&nbsp; ");
+
+    t.resume = arter.map(function(s){
+        return s.html + ": " + dxTekst(dxFor(op, s));
+    }).join(", &nbsp;");
+
+    t.tjek = function(){
+        var fejl = [];
+        arter.forEach(function(s, k){
+            var v  = document.getElementById("dx-" + nr + "-" + k).value;
+            var ok = (v === dxTekst(dxFor(op, s)));
+            maerkFelt("dx-" + nr + "-" + k, ok);
+            if (!ok) fejl.push(s.html);
+        });
+        if (fejl.length === 0){
+            var r = document.getElementById("lig-raekke-" + nr);
+            r.classList.remove("skjult");
+            r.classList.add("vist");
+            return { ok:true, besked:"Korrekt. Nederste række viser nu ligevægtskoncentrationerne udtrykt ved x " +
+                     "— de er summen af startkoncentration og ændring." };
+        }
+        return { ok:false, besked:"De grønt markerede er rigtige. Der er stadig fejl ved: " + fejl.join(", ") + "." };
+    };
+    return t;
+}
+
+function trinOpstilLigning(op, nr){
+    var t = {
+        titel: "Opstil ligningen",
+        sub:   "Hvilken ligning svarer til skemaet?",
+        hint: [
+            "Indsæt udtrykkene fra skemaets nederste række i ligevægtsloven, og sæt det hele lig K<sub>c</sub>.",
+            "Skriv ligevægtsloven op igen: K<sub>c</sub> = " + kcFlad(op),
+            "Erstat hver koncentration med udtrykket fra skemaets nederste række.",
+            "Behold enhederne: startkoncentrationerne skrives med M, og x har også enheden M.",
+            "Husk eksponenterne fra koefficienterne — de gælder for hele udtrykket, fx (2x)<sup>2</sup> og ikke 2x<sup>2</sup>."
+        ]
+    };
+    t.html = dataBoks(oplystKc(op)) + mcFelt(t, nr, op.ligningKorrekt, op.ligningForkerte);
+    t.facit = op.ligningKorrekt;
+    t.tjek = function(){
+        var v = mcValgt(nr);
+        if (v < 0) return { ok:false, besked:"Vælg en ligning." };
+        if (v === t.mcKorrekt){
+            return { ok:true, besked:"Korrekt. Nu er der kun én ubekendt, x, tilbage — og ligningen kan løses." };
+        }
+        return { ok:false, besked:"Ikke korrekt. Sammenlign led for led med skemaets nederste række, " +
+                 "og kontrollér, at koefficienterne står som eksponenter." };
+    };
+    return t;
+}
+
+function trinBeregnX(op, nr){
+    var hints = op.metode === "kvadratrod"
+        ? ["Tæller og nævner er begge kvadrater, og begge sider af ligningen er positive. Derfor kan man opløfte begge sider i 1/2.",
+           "Når begge sider er opløftet i 1/2, står der en ligning uden x<sup>2</sup> — den er lineær og kan løses direkte.",
+           "Gang nævneren op på begge sider.",
+           "Saml alle x-led på den ene side og alle talled på den anden, og divider til sidst.",
+           "Kontrollér: x skal være positiv og mindre end den mindste startkoncentration af en reaktant."]
+        : ["Gang nævneren op på begge sider, så brøken forsvinder.",
+           "Gang parentesen ud.",
+           "Saml alle x-led på den ene side og alle talled på den anden.",
+           "Divider med tallet foran x.",
+           "Kontrollér: x skal være positiv og mindre end den mindste startkoncentration af en reaktant."];
+
+    var t = {
+        titel: "Isolér x og beregn værdien",
+        sub:   "Angiv både talværdi og enhed.",
+        hint: hints
+    };
+    t.html = '<div class="formel-boks"><div class="formel-lab">Din ligning fra trin ' + nr + '</div>' +
+             '<div class="formel-hoved">' + op.ligningKorrekt + '</div></div>' +
+             '<div class="in-row"><span class="in-lab">x =</span>' +
+             '<input type="text" id="in-' + nr + '-v" autocomplete="off">' +
+             enhedSelect("in-" + nr + "-e", ["M", "mol", "ingen", "M2"]) + '</div>' +
+             '<div class="mini-note">Angiv 3 betydende cifre.</div>';
+    t.facit = "x = " + tal(op.x) + " M";
+    t.tjek = function(){
+        var v = laesTal(document.getElementById("in-" + nr + "-v").value);
+        var e = document.getElementById("in-" + nr + "-e").value;
+        if (isNaN(v)) return { ok:false, besked:"Indtast en talværdi for x." };
+        if (e === "")  return { ok:false, besked:"Vælg også enheden for x." };
+        var talOk = taetPaa(v, op.x);
+        maerkFelt("in-" + nr + "-v", talOk);
+        maerkFelt("in-" + nr + "-e", e === "M");
+        if (!talOk) return { ok:false, besked:"Talværdien passer ikke. Brug “Vis fremgangsmåde”. " +
+                             "Kontrollér også, at x er positiv og mindre end startkoncentrationen." };
+        if (e !== "M") return { ok:false, besked:"Talværdien er rigtig, men enheden er forkert. " +
+                                "x er en koncentrationsændring og måles derfor i M." };
+        return { ok:true, besked:"Korrekt: x = " + tal(op.x) + " M." };
+    };
+    return t;
+}
+
+function trinAndengrad(op, nr){
+    var t = {
+        titel: "Omskriv til en andengradsligning",
+        sub:   "Hvilken andengradsligning svarer ligningen til?",
+        hint: [
+            "Kvadratrodsmetoden kan ikke bruges her. Målet er formen &nbsp;a·x<sup>2</sup> + b·x + c = 0.",
+            "Gang nævneren op på begge sider af ligningen.",
+            "Gang parentesen(erne) ud.",
+            "Flyt alle led over på den ene side, så der står 0 på den anden.",
+            "Bemærk enhederne: leddet med x<sup>2</sup> har enheden M<sup>2</sup>, så b skal have enheden M og c enheden M<sup>2</sup>. " +
+            "Er det ikke tilfældet, er der en fejl i omskrivningen."
+        ]
+    };
+    t.html = '<div class="formel-boks"><div class="formel-lab">Din ligning fra trin ' + nr + '</div>' +
+             '<div class="formel-hoved">' + op.ligningKorrekt + '</div></div>' +
+             mcFelt(t, nr, op.andengradKorrekt, op.andengradForkerte);
+    t.facit = op.andengradKorrekt;
+    t.tjek = function(){
+        var v = mcValgt(nr);
+        if (v < 0) return { ok:false, besked:"Vælg en andengradsligning." };
+        if (v === t.mcKorrekt){
+            return { ok:true, besked:"Korrekt. Læg mærke til, at alle tre led har enheden M<sup>2</sup> — " +
+                     "det er en god kontrol af, at omskrivningen er rigtig." };
+        }
+        return { ok:false, besked:"Ikke korrekt. Gang nævneren op, gang parentesen ud, og saml leddene. " +
+                 "Kontrollér fortegnene, når du flytter led over på den anden side." };
+    };
+    return t;
+}
+
+function trinRoedder(op, nr){
+    var t = {
+        titel: "Løs andengradsligningen og vælg den brugbare løsning",
+        sub:   "Begge løsninger skal beregnes.",
+        hint: [
+            "Kun den ene løsning giver kemisk mening — og du skal kunne begrunde hvorfor.",
+            "Diskriminanten er d = b<sup>2</sup> − 4ac. Enheden bliver M<sup>2</sup>, så d<sup>1/2</sup> har enheden M.",
+            "Løsningsformlen er x = (−b ± d<sup>1/2</sup>) / (2a).",
+            "Begge løsninger skal beregnes og skrives ned — også den, du ender med at forkaste.",
+            "En løsning forkastes, hvis den giver en negativ koncentration eller en negativ koncentrationsændring. " +
+            "Skriv begrundelsen ned i din besvarelse."
+        ]
+    };
+    t.html = '<div class="in-liste">' +
+             '<div class="in-row"><span class="in-lab">x<sub>1</sub> =</span>' +
+             '<input type="text" id="in-' + nr + '-a" autocomplete="off">' +
+             '<span class="enhed-fast">M</span></div>' +
+             '<div class="in-row"><span class="in-lab">x<sub>2</sub> =</span>' +
+             '<input type="text" id="in-' + nr + '-b" autocomplete="off">' +
+             '<span class="enhed-fast">M</span></div></div>' +
+             '<div class="step-sub" style="margin:14px 0 8px;">Hvilken løsning kan bruges — og hvorfor?</div>' +
+             mcFelt(t, nr, op.rodValgKorrekt, op.rodValgForkerte);
+    t.facit = "x<sub>1</sub> = " + tal(op.x1) + " M &nbsp;og&nbsp; x<sub>2</sub> = " + tal(op.x2) + " M.<br>" + op.rodValgKorrekt;
+    t.resume = "x = " + tal(op.x) + " M &nbsp;(den anden løsning forkastet)";
+    t.tjek = function(){
+        var a = laesTal(document.getElementById("in-" + nr + "-a").value);
+        var b = laesTal(document.getElementById("in-" + nr + "-b").value);
+        /* Rækkefølgen er ligegyldig: hvert felt markeres, hvis det rammer én af de to løsninger. */
+        var aOk = taetPaa(a, op.x1) || taetPaa(a, op.x2);
+        var bOk = taetPaa(b, op.x1) || taetPaa(b, op.x2);
+        if (!isNaN(a)) maerkFelt("in-" + nr + "-a", aOk);
+        if (!isNaN(b)) maerkFelt("in-" + nr + "-b", bOk);
+        if (isNaN(a) || isNaN(b)) return { ok:false, besked:"Indtast begge løsninger — også den, der skal forkastes." };
+        var parOk = (taetPaa(a, op.x1) && taetPaa(b, op.x2)) || (taetPaa(a, op.x2) && taetPaa(b, op.x1));
+        if (!parOk) return { ok:false, besked:(aOk || bOk ? "Den grønt markerede løsning er rigtig. " : "") +
+                             "Kontrollér diskriminanten d = b<sup>2</sup> − 4ac " +
+                             "og løsningsformlen x = (−b ± d<sup>1/2</sup>)/(2a)." };
+        var v = mcValgt(nr);
+        if (v < 0) return { ok:false, besked:"Løsningerne er rigtige. Vælg nu, hvilken af dem der kan bruges, og hvorfor." };
+        if (v !== t.mcKorrekt) return { ok:false, besked:"Løsningerne er rigtige, men begrundelsen holder ikke. " +
+                                        "Sæt hver løsning ind i skemaets nederste række, og se, om nogen koncentration bliver negativ." };
+        return { ok:true, besked:"Korrekt. " + op.rodValgKorrekt };
+    };
+    return t;
+}
+
+function trinLigevaegtskoncentrationer(op, nr){
+    var arter = alleArter(op);
+    var t = {
+        titel: "Beregn ligevægtskoncentrationerne",
+        sub:   "Koncentrationsskemaet kan foldes ud igen i trin 3.",
+        hint: [
+            "Tag hvert udtryk fra nederste række i koncentrationsskemaet: " +
+                arter.map(function(s){ return "[" + s.html + "] = " + ligevaegtsUdtryk(op, s); }).join(", &nbsp;"),
+            "Indsæt x = " + tal(op.x) + " M.",
+            "Husk faktoren foran x, hvor koefficienten er større end 1.",
+            "Kontrollér til sidst ved at sætte alle koncentrationerne ind i ligevægtsloven — du skal få K<sub>c</sub> igen."
+        ]
+    };
+    var h = '<div class="in-liste">';
+    arter.forEach(function(s, k){
+        h += '<div class="in-row"><span class="in-lab">[' + s.html + '] =</span>' +
+             '<input type="text" id="in-' + nr + '-' + k + '" autocomplete="off">' +
+             '<span class="enhed-fast">M</span></div>';
+    });
+    t.html = h + '</div><div class="mini-note">Angiv 3 betydende cifre.</div>';
+    t.facit = arter.map(function(s){ return "[" + s.html + "] = " + tal(op.ceq[s.navn]) + " M"; }).join("<br>");
+    t.resume = arter.map(function(s){ return "[" + s.html + "] = " + tal(op.ceq[s.navn]) + " M"; }).join(", &nbsp;");
+    t.tjek = function(){
+        var fejl = [];
+        arter.forEach(function(s, k){
+            var v  = laesTal(document.getElementById("in-" + nr + "-" + k).value);
+            var ok = taetPaa(v, op.ceq[s.navn]);
+            maerkFelt("in-" + nr + "-" + k, ok);
+            if (!ok) fejl.push("[" + s.html + "]");
+        });
+        if (fejl.length === 0) return { ok:true, besked:"Korrekt — opgaven er løst." };
+        return { ok:false, besked:"De grønt markerede felter er rigtige. Der mangler stadig: " + fejl.join(", ") +
+                 ". Indsæt x = " + tal(op.x) + " M i udtrykkene fra skemaet, og husk eventuelle faktorer foran x." };
+    };
+    return t;
+}
+
+/* =====================================================================
+   OPBYGNING AF TRINRÆKKEN
+   ===================================================================== */
+
+function byggeTrin(op){
+    var t = [];
+    if (op.type === "kcFraStofmaengder"){
+        t.push(trinLigevaegtslov(op, 0));
+        t.push(trinKoncentrationer(op, 1));
+        t.push(trinBeregnKc(op, 2));
+    } else if (op.type === "isolerKoncentration"){
+        t.push(trinLigevaegtslov(op, 0));
+        t.push(trinIsoler(op, 1));
+        t.push(trinBeregnUkendt(op, 2));
+    } else if (op.type === "ligningX"){
+        t.push(trinLigevaegtslov(op, 0));
+        t.push(trinDefinerX(op, 1));
+        t.push(trinSkema(op, 2));
+        t.push(trinOpstilLigning(op, 3));
+        if (op.metode === "andengrad"){
+            t.push(trinAndengrad(op, 4));
+            t.push(trinRoedder(op, 5));
+            t.push(trinLigevaegtskoncentrationer(op, 6));
+        } else {
+            t.push(trinBeregnX(op, 4));
+            t.push(trinLigevaegtskoncentrationer(op, 5));
+        }
+    }
+    return t;
+}
+
+/* =====================================================================
+   RESULTATKORT: ANIMATION, FULD BESVARELSE OG KONTROL
+   ===================================================================== */
+
+/* Genberegner Kc ud fra ligevægtskoncentrationerne — kontrollen til sidst. */
+function kcAfKoncentrationer(op){
+    var t = 1, n = 1;
+    op.produkter.forEach(function(s){ t *= Math.pow(op.ceq[s.navn], s.koef); });
+    op.reaktanter.forEach(function(s){ n *= Math.pow(op.ceq[s.navn], s.koef); });
+    return t / n;
+}
+
+function facitHTML(op){
+    var arter = alleArter(op);
+    var enhed = kcEnhedHTML(op);
+    var h = '<div class="facit-boks">';
+
+    h += '<div class="facit-h">Reaktionsskema</div>' +
+         '<div class="facit-linje">' + sideHTML(op.reaktanter) + ' &#8652; ' + sideHTML(op.produkter) +
+         ' &nbsp;&nbsp; ved ' + op.temp + '</div>';
+
+    h += '<div class="facit-h">Ligevægtsloven opskrives</div>' +
+         '<div class="facit-linje" style="padding-top:6px; padding-bottom:6px;">' +
+         '<span class="kc-mærke">K<sub>c</sub> = </span>' + kcUdtryk(op, "korrekt") +
+         ' &nbsp;&nbsp; med enheden ' + (enhed === "ingen enhed" ? "M<sup>0</sup>, dvs. ingen enhed" : enhed) +
+         '</div>';
+
+    if (op.type === "kcFraStofmaengder"){
+        h += '<div class="facit-h">Koncentrationerne beregnes med c = n/V</div>';
+        arter.forEach(function(s){
+            h += '<div class="facit-linje">[' + s.html + '] = ' + tal(op.n[s.navn]) + ' mol / ' +
+                 tal(op.V) + ' L = ' + tal(op.ceq[s.navn]) + ' M</div>';
+        });
+        var iP = op.produkter.map(function(s){
+            return "(" + tal(op.ceq[s.navn]) + " M)" + (s.koef > 1 ? "<sup>" + s.koef + "</sup>" : "");
+        }).join(" · ");
+        var iR = op.reaktanter.map(function(s){
+            return "(" + tal(op.ceq[s.navn]) + " M)" + (s.koef > 1 ? "<sup>" + s.koef + "</sup>" : "");
+        }).join(" · ");
+        h += '<div class="facit-h">Indsættelse i ligevægtsloven</div>' +
+             '<div class="facit-linje" style="padding-top:6px; padding-bottom:6px;">K<sub>c</sub> = ' +
+             brok(iP, iR) + ' &nbsp;=&nbsp; ' + tal(op.Kc) + ' ' + (enhed === "ingen enhed" ? "" : enhed) + '</div>' +
+             '<div class="facit-svar"><b>Svar:</b> K<sub>c</sub> = ' + tal(op.Kc) + ' ' +
+             (enhed === "ingen enhed" ? "(ingen enhed)" : enhed) + ' ved ' + op.temp + '.</div>';
+    }
+
+    if (op.type === "isolerKoncentration"){
+        h += '<div class="facit-h">Isolering og indsættelse</div>';
+        op.udregning.forEach(function(l){ h += '<div class="facit-linje">' + l + '</div>'; });
+        var uk = arter.filter(function(s){ return s.navn === op.ukendt; })[0];
+        h += '<div class="facit-svar"><b>Svar:</b> [' + uk.html + '] = ' + tal(op.svar) +
+             ' M ved ' + op.temp + '.</div>';
+    }
+
+    if (op.type === "ligningX"){
+        h += '<div class="facit-h">x defineres</div>' +
+             '<div class="facit-linje">x = den stofmængdekoncentration af ' + op.xArtHTML +
+             ', der omsættes, indtil ligevægten har indstillet sig. x måles i M.</div>';
+
+        h += '<div class="facit-h">Koncentrationsskema</div><div class="skema-wrap"><table class="skema"><tr><th></th>';
+        arter.forEach(function(s){ h += '<th>' + s.html + '</th>'; });
+        h += '</tr><tr><td class="rowlab">Start</td>';
+        arter.forEach(function(s){ h += '<td>' + tal(op.start[s.navn]) + ' M</td>'; });
+        h += '</tr><tr><td class="rowlab">Ændring</td>';
+        arter.forEach(function(s){ h += '<td>' + dxTekst(dxFor(op, s)) + '</td>'; });
+        h += '</tr><tr><td class="rowlab">Ligevægt</td>';
+        arter.forEach(function(s){ h += '<td>' + ligevaegtsUdtryk(op, s) + '</td>'; });
+        h += '</tr></table></div>';
+
+        h += '<div class="facit-h">Ligningen opstilles og løses</div>';
+        op.udregning.forEach(function(l){ h += '<div class="facit-linje">' + l + '</div>'; });
+
+        h += '<div class="facit-h">Ligevægtskoncentrationerne beregnes</div>';
+        arter.forEach(function(s){
+            h += '<div class="facit-linje">[' + s.html + '] = ' + ligevaegtsUdtryk(op, s) + ' = ' +
+                 ligevaegtsIndsat(op, s) + ' = ' + tal(op.ceq[s.navn]) + ' M</div>';
+        });
+        h += '<div class="facit-svar"><b>Svar:</b> ' + arter.map(function(s){
+                 return "[" + s.html + "] = " + tal(op.ceq[s.navn]) + " M";
+             }).join(", &nbsp;") + ' ved ' + op.temp + '.</div>';
+    }
+
+    /* Kontrol: indsæt ligevægtskoncentrationerne i ligevægtsloven igen. */
+    var kontrol = kcAfKoncentrationer(op);
+    h += '<div class="kontrol-boks"><b>Kontrol.</b> Sættes ligevægtskoncentrationerne ind i ligevægtsloven, fås ' +
+         'K<sub>c</sub> = ' + tal(kontrol) + ' ' + (enhed === "ingen enhed" ? "(ingen enhed)" : enhed) +
+         (op.type === "kcFraStofmaengder"
+            ? ', hvilket er det beregnede svar. Sådan en kontrol er især nyttig, når man har regnet med x.'
+            : ', som stemmer med den oplyste værdi K<sub>c</sub> = ' + op.KcHTML + '. Lav altid denne kontrol til sidst.') +
+         '</div>';
+
+    return h + '</div>';
+}
+
+function afslutOpgave(){
+    loeste[aktuel.id] = true;
+    antalLoest = Object.keys(loeste).length;
+    stribe++;
+    opdaterStats();
+    tegnOversigt();
+
+    var op = aktuel;
+    var k = document.getElementById("resultat-kort");
+    k.innerHTML = '<div class="res-titel">Løst — se forløbet og den fulde besvarelse</div>' +
+                  '<div class="viz-wrap"><canvas id="vizCanvas"></canvas></div>' +
+                  '<button class="viz-knap" onclick="startViz()">↻ Afspil animationen igen</button>' +
+                  facitHTML(op);
+    k.hidden = false;
+    document.getElementById("btn-next").style.display = "block";
+    startViz();
+    rulTil("resultat-kort");
+}
+
+/* =====================================================================
+   ANIMATION AF KONCENTRATIONERNE
+   Niveau 2 og 3: koncentration som funktion af tiden, fra start til ligevægt.
+   Niveau 1: søjlediagram over ligevægtskoncentrationerne.
+   ===================================================================== */
+
+var FARVER = ["#4cc9f0", "#4ade80", "#fbbf24", "#a78bfa", "#ef476f", "#f472b6"];
+var viz = { arter:[], tilstand:"soejler", start:0, koerer:false };
+
+/* Fjerner HTML-mærker, så navnet kan tegnes på canvas. */
+function rentNavn(html){
+    return html.replace(/<sub>/g, "").replace(/<\/sub>/g, "")
+               .replace(/<sup>/g, "").replace(/<\/sup>/g, "")
+               .replace(/<[^>]+>/g, "");
+}
+
+function startViz(){
+    var op = aktuel;
+    if (!op) return;
+    viz.arter = alleArter(op).map(function(s, i){
+        return {
+            navn:  rentNavn(s.html),
+            farve: FARVER[i % FARVER.length],
+            c0:    op.start ? op.start[s.navn] : op.ceq[s.navn],
+            ceq:   op.ceq[s.navn]
+        };
+    });
+    viz.tilstand = op.start ? "kurver" : "soejler";
+    viz.start = performance.now();
+    if (!viz.koerer){ viz.koerer = true; requestAnimationFrame(vizLoop); }
+}
+
+function vizLoop(nu){
+    var c = document.getElementById("vizCanvas");
+    if (!c){ viz.koerer = false; return; }
+    var p = Math.min(1, (nu - viz.start) / 2600);
+    tegnViz(c, p);
+    if (p < 1){ requestAnimationFrame(vizLoop); } else { viz.koerer = false; }
+}
+
+function tegnViz(c, p){
+    var dpr = window.devicePixelRatio || 1;
+    var b = c.clientWidth, h = c.clientHeight;
+    if (c.width !== Math.round(b * dpr) || c.height !== Math.round(h * dpr)){
+        c.width  = Math.round(b * dpr);
+        c.height = Math.round(h * dpr);
+    }
+    var g = c.getContext("2d");
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, b, h);
+
+    var mV = 58, mH = 34, mT = 14, mB = 34;
+    var bx = b - mV - mH, by = h - mT - mB;
+    if (bx <= 10 || by <= 10) return;
+
+    var cmax = 0;
+    viz.arter.forEach(function(a){ cmax = Math.max(cmax, a.c0, a.ceq); });
+    cmax = cmax * 1.18 || 1;
+
+    /* Akser og gitter */
+    g.strokeStyle = "rgba(255,255,255,0.13)";
+    g.fillStyle   = "#9ca3af";
+    g.font        = "11px Segoe UI, sans-serif";
+    g.lineWidth   = 1;
+    for (var i = 0; i <= 4; i++){
+        var y = mT + by - (by * i / 4);
+        g.beginPath(); g.moveTo(mV, y); g.lineTo(mV + bx, y); g.stroke();
+        g.textAlign = "right"; g.textBaseline = "middle";
+        g.fillText((cmax * i / 4).toFixed(2).replace(".", ","), mV - 7, y);
+    }
+    g.strokeStyle = "rgba(255,255,255,0.3)";
+    g.beginPath(); g.moveTo(mV, mT); g.lineTo(mV, mT + by); g.lineTo(mV + bx, mT + by); g.stroke();
+
+    g.save();
+    g.translate(13, mT + by / 2); g.rotate(-Math.PI / 2);
+    g.textAlign = "center"; g.textBaseline = "middle";
+    g.fillStyle = "#9ca3af";
+    g.fillText("c / M", 0, 0);
+    g.restore();
+
+    if (viz.tilstand === "kurver"){
+        g.textAlign = "center"; g.textBaseline = "top";
+        g.fillText("tid", mV + bx / 2, mT + by + 9);
+
+        var T = 100, tau = 20;
+        viz.arter.forEach(function(a){
+            g.strokeStyle = a.farve;
+            g.lineWidth = 2.4;
+            g.beginPath();
+            var n = 140, sidsteX = mV, sidsteY = mT + by;
+            for (var k = 0; k <= n; k++){
+                var t = (T * p) * k / n;
+                var cv = a.ceq + (a.c0 - a.ceq) * Math.exp(-t / tau);
+                var X = mV + bx * (t / T);
+                var Y = mT + by - by * (cv / cmax);
+                if (k === 0) g.moveTo(X, Y); else g.lineTo(X, Y);
+                sidsteX = X; sidsteY = Y;
+            }
+            g.stroke();
+            g.fillStyle = a.farve;
+            g.beginPath(); g.arc(sidsteX, sidsteY, 3.5, 0, Math.PI * 2); g.fill();
+            if (p > 0.55){
+                g.globalAlpha = Math.min(1, (p - 0.55) / 0.3);
+                g.textAlign = "left"; g.textBaseline = "middle";
+                g.fillText(a.navn, Math.min(sidsteX + 7, mV + bx - 4), sidsteY);
+                g.globalAlpha = 1;
+            }
+        });
+
+        if (p >= 1){
+            g.fillStyle = "#9ca3af";
+            g.textAlign = "right"; g.textBaseline = "bottom";
+            g.fillText("ligevægt indstillet", mV + bx - 4, mT + 12);
+        }
+    } else {
+        var n2 = viz.arter.length;
+        var bredde = Math.min(62, (bx / n2) * 0.56);
+        viz.arter.forEach(function(a, i){
+            var cx = mV + bx * (i + 0.5) / n2;
+            var hoejde = by * (a.ceq / cmax) * p;
+            g.fillStyle = a.farve;
+            g.globalAlpha = 0.85;
+            g.fillRect(cx - bredde / 2, mT + by - hoejde, bredde, hoejde);
+            g.globalAlpha = 1;
+            g.fillStyle = "#f3f4f6";
+            g.textAlign = "center"; g.textBaseline = "bottom";
+            g.font = "bold 11px Segoe UI, sans-serif";
+            if (p > 0.6) g.fillText(a.ceq.toPrecision(3).replace(".", ",") + " M", cx, mT + by - hoejde - 5);
+            g.fillStyle = "#9ca3af";
+            g.font = "11px Segoe UI, sans-serif";
+            g.textBaseline = "top";
+            g.fillText(a.navn, cx, mT + by + 8);
+        });
+    }
+}
+
+window.addEventListener("resize", function(){
+    var c = document.getElementById("vizCanvas");
+    if (c && viz.arter.length) tegnViz(c, 1);
+});
+
+/* =====================================================================
+   BAGGRUNDSANIMATION
+   ===================================================================== */
+
+(function baggrund(){
+    var c = document.getElementById("bgCanvas");
+    var g = c.getContext("2d");
+    var partikler = [];
+
+    function nulstil(){
+        c.width  = window.innerWidth;
+        c.height = window.innerHeight;
+    }
+    nulstil();
+    window.addEventListener("resize", nulstil);
+
+    for (var i = 0; i < 34; i++){
+        partikler.push({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            r: 1 + Math.random() * 2.4,
+            vx: (Math.random() - 0.5) * 0.22,
+            vy: (Math.random() - 0.5) * 0.22,
+            f: FARVER[i % FARVER.length]
+        });
+    }
+
+    function tegn(){
+        g.clearRect(0, 0, c.width, c.height);
+        partikler.forEach(function(p){
+            p.x += p.vx; p.y += p.vy;
+            if (p.x < 0) p.x = c.width;  if (p.x > c.width)  p.x = 0;
+            if (p.y < 0) p.y = c.height; if (p.y > c.height) p.y = 0;
+            g.globalAlpha = 0.16;
+            g.fillStyle = p.f;
+            g.beginPath(); g.arc(p.x, p.y, p.r, 0, Math.PI * 2); g.fill();
+        });
+        g.globalAlpha = 1;
+        requestAnimationFrame(tegn);
+    }
+    tegn();
+})();
+
+/* =====================================================================
+   TEORI OG HJÆLP
+   ===================================================================== */
+
+var MODALER = {
+teori: {
+    titel: "Teori og god skik",
+    krop:
+    '<h3>1. Ligevægtsloven</h3>' +
+    '<p>For reaktionen &nbsp;a A + b B &#8652; c C + d D&nbsp; gælder ved ligevægt:</p>' +
+    '<div class="regel" style="text-align:center;">K<sub>c</sub> = ' +
+        brok("[C]<sup>c</sup> · [D]<sup>d</sup>", "[A]<sup>a</sup> · [B]<sup>b</sup>") + '</div>' +
+    '<ul>' +
+    '<li>Produkterne står i tælleren, reaktanterne i nævneren.</li>' +
+    '<li>Koefficienterne bliver til <b>eksponenter</b> — ikke til faktorer.</li>' +
+    '<li>Kun stoffer på gasform (g) og opløste stoffer (aq) skrives med. Rene faste stoffer (s) ' +
+        'og rene væsker (l) udelades, fordi deres koncentration er konstant.</li>' +
+    '<li>K<sub>c</sub> gælder kun ved den temperatur, den er målt ved. Skriv derfor altid temperaturen på.</li>' +
+    '</ul>' +
+
+    '<h3>2. Enheden for K<sub>c</sub></h3>' +
+    '<p>Enheden findes ved at forkorte M&#39;erne. Den bliver M opløftet i (summen af produkternes ' +
+    'koefficienter − summen af reaktanternes koefficienter).</p>' +
+    '<div class="regel">Eksempler:<br>' +
+    'N<sub>2</sub>O<sub>4</sub> &#8652; 2 NO<sub>2</sub>: 2 − 1 = 1 &nbsp;&rArr;&nbsp; enheden er M<br>' +
+    'N<sub>2</sub> + 3 H<sub>2</sub> &#8652; 2 NH<sub>3</sub>: 2 − 4 = −2 &nbsp;&rArr;&nbsp; enheden er M<sup>−2</sup><br>' +
+    'CO + H<sub>2</sub>O &#8652; CO<sub>2</sub> + H<sub>2</sub>: 2 − 2 = 0 &nbsp;&rArr;&nbsp; K<sub>c</sub> har ingen enhed</div>' +
+    '<div class="advarsel">Skriv <b>“ingen enhed”</b> i din besvarelse, når det er tilfældet. ' +
+    'At udelade enheden uden kommentar ser ud, som om man har glemt den.</div>' +
+
+    '<h3>3. Fra stofmængde til koncentration</h3>' +
+    '<div class="regel" style="text-align:center;">c = ' + brok("n", "V") +
+    ' &nbsp;&nbsp; [n] = mol, &nbsp; [V] = L, &nbsp; [c] = mol/L = M</div>' +
+
+    '<h3>4. Koncentrationsskemaet</h3>' +
+    '<p>Når startkoncentrationerne kendes, men ligevægtskoncentrationerne ikke gør, bruges et skema ' +
+    'med tre rækker: <b>startkoncentration</b>, <b>ændring</b> og <b>ligevægtskoncentration</b>. ' +
+    'Ændringerne udtrykkes ved den ubekendte x og følger koefficienterne i reaktionsskemaet.</p>' +
+
+    '<h3>5. Sådan indfører du x korrekt</h3>' +
+    '<div class="regel">' +
+    '<b>Skriv altid med ord, hvad x er</b>, fx:<br>' +
+    '“Vi sætter x = den stofmængdekoncentration af CO, der omsættes, indtil ligevægten har indstillet sig.”<br><br>' +
+    '<b>Skriv altid enheden på x.</b> Fordi x er en koncentration, har x enheden M.' +
+    '</div>' +
+    '<div class="advarsel"><b>Almindelige fejl:</b><ul>' +
+    '<li>At skrive “x” uden at forklare, hvad x står for.</li>' +
+    '<li>At forveksle x med en ligevægtskoncentration. x er en <i>ændring</i>.</li>' +
+    '<li>At glemme koefficienten: har et stof koefficienten 2, er ændringen ±2x.</li>' +
+    '<li>At regne uden enheder og dermed ikke opdage, at et led har fået en forkert enhed.</li>' +
+    '</ul></div>' +
+
+    '<h3>6. At løse ligningen</h3>' +
+    '<ul>' +
+    '<li><b>Lineær ligning:</b> Gang nævneren op, saml x-leddene, og divider.</li>' +
+    '<li><b>Kvadratrodsmetoden:</b> Er både tæller og nævner kvadrater, og er begge sider positive, ' +
+        'kan man opløfte begge sider i 1/2. Så bliver ligningen lineær.</li>' +
+    '<li><b>Andengradsligning:</b> Omskriv til a·x<sup>2</sup> + b·x + c = 0 og brug ' +
+        'x = (−b ± d<sup>1/2</sup>)/(2a) med d = b<sup>2</sup> − 4ac. ' +
+        'Bemærk, at leddene har enhederne M<sup>2</sup> (a·x<sup>2</sup> og c) og M (b·x&nbsp;&rarr;&nbsp;b har enheden M).</li>' +
+    '</ul>' +
+
+    '<h3>7. Kontrol af løsningen</h3>' +
+    '<ul>' +
+    '<li>Er x positiv? En koncentrationsændring kan ikke være negativ.</li>' +
+    '<li>Bliver nogen ligevægtskoncentration negativ? Så skal løsningen forkastes — ' +
+        'og du skal skrive begrundelsen ned.</li>' +
+    '<li>Sæt til sidst ligevægtskoncentrationerne ind i ligevægtsloven. Får du K<sub>c</sub> igen, ' +
+        'er regningen sandsynligvis rigtig.</li>' +
+    '<li>Svar med 3 betydende cifre og med enhed.</li>' +
+    '</ul>' +
+
+    '<div class="advarsel" style="margin-top:18px;">Talværdierne i opgaverne er konstrueret, så regningen ' +
+    'bliver overskuelig. Fremgangsmåden er den samme som ved rigtige måledata.</div>'
+},
+hjaelp: {
+    titel: "Sådan bruger du siden",
+    krop:
+    '<h3>Niveauer</h3>' +
+    '<ul>' +
+    '<li><b>Niveau 1</b> — kan løses uden at opstille en ligning. Du opskriver ligevægtsloven, ' +
+        'omregner stofmængder til koncentrationer og indsætter, eller du isolerer en enkelt ukendt koncentration.</li>' +
+    '<li><b>Niveau 2</b> — du skal opstille et koncentrationsskema, indføre x og løse en ligning, ' +
+        'der efter en enkelt omskrivning er lineær.</li>' +
+    '<li><b>Niveau 3</b> — samme fremgangsmåde, men ligningen skal omskrives til en andengradsligning, ' +
+        'og du skal begrunde, hvilken af de to løsninger der kan bruges.</li>' +
+    '</ul>' +
+    '<p>Siden starter på niveau 1. Vælg et andet niveau i toppen — “Alle” viser alle opgaver i rækkefølge.</p>' +
+
+    '<h3>Opgaveoversigt</h3>' +
+    '<ul>' +
+    '<li>Øverst står niveauets opgaver som nummererede knapper. Klik på en af dem for at springe direkte derhen.</li>' +
+    '<li>“‹ Forrige” og “Næste ›” spoler ét skridt ad gangen.</li>' +
+    '<li>En opgave, du har gennemført, får et ✓ og en grøn kant. Markeringen bliver liggende, ' +
+        'så du kan gå tilbage og se en opgave igen — men trinnene starter forfra, når du åbner den.</li>' +
+    '</ul>' +
+
+    '<h3>Arbejdsgang</h3>' +
+    '<ul>' +
+    '<li>Ét trin ad gangen. Næste trin dukker først op, når det foregående er rigtigt.</li>' +
+    '<li>De oplyste tal vises i den lilla “Oplyst”-boks i netop det trin, hvor du skal bruge dem. ' +
+        'I det første trin får du derfor kun reaktionsskemaet og temperaturen — det er alt, ' +
+        'du behøver for at opskrive ligevægtsloven.</li>' +
+    '<li>Et gennemført trin folder sig sammen og viser kun sit svar. ' +
+        'Klik på overskriften (“Vis ▸”) for at folde det ud igen — fx for at kigge på koncentrationsskemaet.</li>' +
+    '<li>“Vis fremgangsmåde” giver hjælp uden at afsløre svaret. Formler og metode ligger her, ' +
+        'så du selv kan prøve først.</li>' +
+    '<li>Efter tre forkerte forsøg på samme trin vises facit for det trin.</li>' +
+    '<li>Når opgaven er løst, vises et animeret koncentrationsforløb og en fuld besvarelse, ' +
+        'du kan sammenligne din egen med.</li>' +
+    '</ul>' +
+
+    '<h3>Indtastning</h3>' +
+    '<ul>' +
+    '<li>Brug komma som decimaltegn. Punktum accepteres også.</li>' +
+    '<li>Du bestemmer selv skrivemåden: et almindeligt decimaltal og videnskabelig skrivemåde ' +
+        'godtages på lige fod — også når facit efterfølgende vises som 10-potens. ' +
+        'Videnskabelig skrivemåde kan tastes som e-notation (2,5e-6), med gangetegn (2,5·10^-6) ' +
+        'eller med hævet skrift (2,5·10<sup>−6</sup>).</li>' +
+    '<li>Svar accepteres med op til 2 % afvigelse, så mellemregninger må gerne afrundes undervejs.</li>' +
+    '<li>Hvor der skal vælges enhed, tæller enheden med i vurderingen.</li>' +
+    '<li>Når et trin har flere felter, markeres hvert felt for sig, når du trykker “Tjek svar”: ' +
+        '<span style="color:#6ee7b7;">grøn ramme</span> = rigtigt, ' +
+        '<span style="color:#fca5a5;">rød ramme</span> = skal rettes. Du kan altså se, hvilke af dine ' +
+        'værdier der allerede er rigtige, selvom de ikke er det alle sammen.</li>' +
+    '</ul>'
+}
+};
+
+function visModal(navn){
+    document.getElementById("modal-titel").innerHTML = MODALER[navn].titel;
+    document.getElementById("modal-krop").innerHTML  = MODALER[navn].krop;
+    document.getElementById("modal").hidden = false;
+}
+function lukModal(){ document.getElementById("modal").hidden = true; }
+document.addEventListener("keydown", function(e){ if (e.key === "Escape") lukModal(); });
+
+/* =====================================================================
+   OPGAVEVALG OG OPSTART
+   ===================================================================== */
+
+function fyldListe(){
+    opgaveListe = OPGAVER.filter(function(o){ return valgtNiveau === 0 || o.niveau === valgtNiveau; });
+}
+
+/* Oversigten over niveauets opgaver — man kan springe frit frem og tilbage. */
+function tegnOversigt(){
+    var navn = valgtNiveau === 0 ? "Alle niveauer" : "Niveau " + valgtNiveau;
+    var h = '<div class="oversigt-top">' +
+                '<div class="oversigt-titel">' + navn + ' &middot; opgave ' +
+                    (aktuelIndex + 1) + ' af ' + opgaveListe.length + '</div>' +
+                '<div class="oversigt-nav">' +
+                    '<button class="nav-btn" onclick="spol(-1)"' +
+                        (aktuelIndex === 0 ? ' disabled' : '') + '>&#8249; Forrige</button>' +
+                    '<button class="nav-btn" onclick="spol(1)"' +
+                        (aktuelIndex === opgaveListe.length - 1 ? ' disabled' : '') + '>Næste &#8250;</button>' +
+                '</div>' +
+            '</div><div class="oversigt-liste">';
+
+    opgaveListe.forEach(function(o, i){
+        h += '<button class="opg-chip' + (i === aktuelIndex ? ' aktiv' : '') +
+                (loeste[o.id] ? ' loest' : '') + '" onclick="visOpgave(' + i + ')">' +
+                '<span class="chip-nr">' + (i + 1) + '</span>' +
+                (valgtNiveau === 0 ? '<span class="chip-niv niv' + o.niveau + '">N' + o.niveau + '</span>' : '') +
+                '<span>' + o.titel + '</span>' +
+                (loeste[o.id] ? '<span class="chip-ok">&#10003;</span>' : '') +
+             '</button>';
+    });
+    document.getElementById("oversigt-kort").innerHTML = h + '</div>';
+}
+
+/* Viser opgave nr. i på det valgte niveau og nulstiller alle trin. */
+function visOpgave(i){
+    if (i < 0 || i >= opgaveListe.length) return;
+    aktuelIndex = i;
+    aktuel = opgaveListe[i];
+
+    document.getElementById("resultat-kort").hidden = true;
+    document.getElementById("resultat-kort").innerHTML = "";
+    document.getElementById("btn-next").style.display = "none";
+
+    tegnOversigt();
+    tegnOpgaveKort(aktuel);
+    trinListe = byggeTrin(aktuel);
+    tegnTrin();
+    window.scrollTo({ top:0, behavior:"smooth" });
+}
+
+function spol(retning){ visOpgave(aktuelIndex + retning); }
+
+/* Knappen under en løst opgave: videre til den næste, og forfra efter den sidste. */
+function naesteOpgave(){
+    visOpgave((aktuelIndex + 1) % opgaveListe.length);
+}
+
+Array.prototype.forEach.call(document.querySelectorAll(".niv-btn"), function(b){
+    b.addEventListener("click", function(){
+        Array.prototype.forEach.call(document.querySelectorAll(".niv-btn"), function(x){
+            x.classList.remove("aktiv");
+        });
+        b.classList.add("aktiv");
+        valgtNiveau = parseInt(b.getAttribute("data-niv"), 10);
+        fyldListe();
+        visOpgave(0);
+    });
+});
+
+fyldListe();
+visOpgave(0);
+opdaterStats();
+</script>
+</body>
+</html>

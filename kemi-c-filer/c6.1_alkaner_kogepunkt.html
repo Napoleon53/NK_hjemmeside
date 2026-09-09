@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alkaners smelte/kogepunkt</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            color: #333;
+        }
+
+        h1 { margin: 0 0 10px 0; font-size: 22px; color: #2c3e50; }
+
+        .main-container {
+            display: flex;
+            gap: 25px;
+            background: white;
+            padding: 16px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            width: 420px;
+            height: 540px;
+            border: 3px solid #546E7A;
+            background: linear-gradient(to bottom, #e3f2fd 0%, #ffffff 70%, #cfd8dc 100%);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        canvas { display: block; width: 100%; height: 100%; }
+        
+        /* Eksplosions-effekt klasse */
+        .flash-anim {
+            animation: flash 0.5s ease-out;
+        }
+        @keyframes flash {
+            0% { background: #ffff00; }
+            50% { background: #ff9800; }
+            100% { background: linear-gradient(to bottom, #e3f2fd 0%, #ffffff 70%, #cfd8dc 100%); }
+        }
+
+        .zone-label {
+            position: absolute;
+            font-weight: 800;
+            color: #90a4ae;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            pointer-events: none;
+            left: 15px;
+        }
+        .top-label { top: 15px; }
+        .bot-label { bottom: 15px; color: #78909c; }
+
+        /* Farve-forklaring: grå=fast, orange=væske, blå=gas */
+        .color-legend {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            background: rgba(255,255,255,0.8);
+            padding: 6px 9px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            color: #455A64;
+            pointer-events: none;
+        }
+        .color-legend .row { display: flex; align-items: center; gap: 5px; }
+        .color-legend .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+
+        .canvas-col {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 420px;
+        }
+
+        .controls-panel {
+            width: 340px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .slider-card {
+            background: #fff3e0;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid #ffe0b2;
+            text-align: center;
+            margin-bottom: 2px;
+        }
+
+        .temp-display { font-size: 32px; font-weight: 900; color: #d32f2f; margin: 5px 0; font-family: monospace;}
+
+        input[type=range] { width: 100%; cursor: pointer; margin: 8px 0; }
+
+        .state-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+
+        .state-badge {
+            font-weight: 700;
+            font-size: 15px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.9);
+            border: 1px solid #ddd;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            border: 1px solid #cfd8dc;
+            background: #f8f9fa;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            color: #455A64;
+        }
+        .icon-btn:hover { background: #eceff1; }
+        .icon-btn.active { background: #cfd8dc; border-color: #37474F; color: #263238; }
+
+        .btn-styled {
+            width: 100%;
+            padding: 9px 12px;
+            margin-bottom: 4px;
+            border: 1px solid #cfd8dc;
+            background: #f8f9fa;
+            cursor: pointer;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+            color: #455A64;
+        }
+        
+        .btn-styled:hover { background: #eceff1; }
+        
+        .btn-styled.active {
+            background: #e3f2fd;
+            border-color: #2196F3;
+            color: #0d47a1;
+            font-weight: 700;
+            transform: translateY(-1px);
+        }
+
+        /* Mix knap */
+        .btn-mix {
+            border: 2px solid #673AB7;
+            background: #EDE7F6;
+            margin-top: 2px;
+            padding: 10px;
+        }
+        .btn-mix.active { background: #D1C4E9; border-color: #512DA8; color: #311B92; }
+
+        /* Isomer-mix knap */
+        .btn-mix-alt {
+            border: 2px solid #AD1457;
+            background: #FCE4EC;
+            margin-top: 2px;
+            padding: 10px;
+        }
+        .btn-mix-alt.active { background: #F8BBD0; border-color: #880E4F; color: #560027; }
+
+        /* Smp/Kp-markører under temperatur-slideren */
+        .marker-layer {
+            position: relative;
+            height: 30px;
+            margin-top: 2px;
+        }
+        .slider-marker {
+            position: absolute;
+            top: 0;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
+            color: #555;
+        }
+        .slider-marker .tick { width: 2px; height: 8px; background: currentColor; border-radius: 1px; }
+        .slider-marker .lbl { font-size: 9px; font-weight: 800; margin-top: 1px; white-space: nowrap; }
+        .slider-marker.stagger .tick { height: 19px; }
+
+        /* Forbrændings knap */
+        .btn-burn {
+            border: 2px solid #d32f2f;
+            background: #ffebee;
+            color: #b71c1c;
+            font-weight: bold;
+            margin-top: 10px;
+            padding: 12px;
+            text-align: center;
+            justify-content: center;
+        }
+        .btn-burn:hover { background: #ffcdd2; box-shadow: 0 0 10px rgba(211, 47, 47, 0.3); }
+        .btn-burn:active { transform: scale(0.98); }
+
+        .kp-badge { font-size: 11px; color: #555; background: #eceff1; padding: 2px 6px; border-radius: 4px; font-weight: 600; }
+
+        .section-separator {
+            border-top: 1px solid #e0e0e0;
+            margin: 6px 0 3px 0;
+            position: relative;
+            text-align: center;
+        }
+        .section-separator span {
+            position: relative;
+            top: -10px;
+            background: white;
+            padding: 0 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #90a4ae;
+            text-transform: uppercase;
+        }
+        
+        .info-box {
+            font-size: 13px; color: #546E7A; background: #eceff1; padding: 10px; border-radius: 8px; border-left: 4px solid #90a4ae;
+            line-height: 1.4; min-height: 40px;
+        }
+        
+        .flex-row { display: flex; gap: 8px; }
+        .flex-fill { flex: 1; }
+
+    </style>
+</head>
+<body>
+
+    <h1>Alkaners smelte/kogepunkt</h1>
+
+    <div class="main-container">
+        <div class="canvas-col">
+            <div class="canvas-wrapper" id="canvasWrap">
+                <canvas id="simCanvas" width="420" height="540"></canvas>
+                <div class="zone-label top-label">Gasfase</div>
+                <div class="zone-label bot-label">Væske / Fast Stof</div>
+                <div class="color-legend">
+                    <div class="row"><span class="dot" style="background:#90A4AE"></span>Fast stof</div>
+                    <div class="row"><span class="dot" style="background:#FFA726"></span>Væske</div>
+                    <div class="row"><span class="dot" style="background:#42A5F5"></span>Gas</div>
+                </div>
+            </div>
+            <div id="infoText" class="info-box">
+                Indlæser data...
+            </div>
+        </div>
+
+        <div class="controls-panel">
+            <div class="slider-card">
+                <label style="font-weight:600; color:#d84315;">Temperatur (°C)</label>
+                <input type="range" id="tempSlider" min="-200" max="150" value="20">
+                <div id="markerLayer" class="marker-layer"></div>
+                <div class="temp-display"><span id="tempValue">20</span> °C</div>
+                <div class="state-row">
+                    <div id="stateText" class="state-badge">Tilstand: ...</div>
+                    <button onclick="togglePause()" id="btn-pause" class="icon-btn" title="Pause animationen">
+                        <span id="pauseLabel">⏸</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="section-separator"><span>Alkaner (Størrelse)</span></div>
+            
+            <button onclick="changeAlkane('metan')" id="btn-metan" class="btn-styled active">
+                <span>Metan (C₁)</span>
+                <span class="kp-badge">Kp: -162°</span>
+            </button>
+            
+            <button onclick="changeAlkane('octan')" id="btn-octan" class="btn-styled">
+                <span>Octan (C₈)</span>
+                <span class="kp-badge">Kp: 126°</span>
+            </button>
+
+            <div class="section-separator"><span>Isomeri (Form)</span></div>
+            
+            <div class="flex-row">
+                <button onclick="changeAlkane('pentan')" id="btn-pentan" class="btn-styled flex-fill">
+                    <span>n-Pentan</span>
+                     <span class="kp-badge">Kp: 36°</span>
+                </button>
+                <button onclick="changeAlkane('neopentan')" id="btn-neopentan" class="btn-styled flex-fill" style="background:#fce4ec; border-color:#f8bbd0; color:#880e4f;">
+                    <span>2,2-Dimethylpropan</span>
+                    <span class="kp-badge" style="background:#f8bbd0; color:#880e4f;">Kp: 10°</span>
+                </button>
+            </div>
+
+            <button onclick="startMixIsomers()" id="btn-mix-isomers" class="btn-styled btn-mix-alt">
+                <span>🧪 Bland: n-Pentan &amp; Isomer</span>
+            </button>
+
+            <div class="section-separator"><span>Avanceret</span></div>
+            
+            <button onclick="startMix()" id="btn-mix" class="btn-styled btn-mix">
+                <span>🧪 Bland: Metan & Octan</span>
+            </button>
+
+            <button onclick="triggerCombustion()" id="btn-burn" class="btn-burn">
+                🔥 ANTÆND DAMP
+            </button>
+        </div>
+    </div>
+
+<script>
+window.onload = function() {
+
+    // --- Opsætning ---
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+
+    // Farve-tiers: alle stoffer farves efter TILSTAND (grå/orange/blå).
+    // To stoffer, der kan blandes sammen, får hver deres nuance af tilstandsfarven,
+    // så de stadig kan skelnes fra hinanden i blandingerne.
+    const TIER_LIGHT = { solid: "#B0BEC5", liquid: "#FFB74D", gas: "#64B5F6" }; // metan, n-pentan
+    const TIER_DARK  = { solid: "#546E7A", liquid: "#E65100", gas: "#1565C0" }; // octan, isomeren
+
+    // Data definitioner
+    const alkanes = {
+        metan:  { name: "Metan", carbons: 1, melt: -182, boil: -162, stateCol: TIER_LIGHT, isBranched: false, txt: "Metan (C₁) er lille. Den koger allerede ved -162°C." },
+        pentan: { name: "n-Pentan", carbons: 5, melt: -130, boil: 36, stateCol: TIER_LIGHT, isBranched: false, txt: "n-Pentan (C₅) er en lang kæde. Koger ved 36°C." },
+        // ** OPDATERET NAVN HER **
+        neopentan:{ name: "2,2-Dimethylpropan", carbons: 5, melt: -17, boil: 10, stateCol: TIER_DARK, isBranched: true,  txt: "2,2-Dimethylpropan (C₅) er kugleformet (Neopentan). Koger ved 10°C." },
+        octan:  { name: "Octan", carbons: 8, melt: -57, boil: 126, stateCol: TIER_DARK, isBranched: false, txt: "Octan (C₈) er en tung kæde. Koger ved 126°C." }
+    };
+
+    let currentTemp = 20;
+    let particles = [];
+    let isMixMode = false;
+    let isCombustionMode = false;
+    let isPaused = false;
+    let mixPair = null; // { low, high } - de to stoffer i en blanding, sorteret efter kogepunkt
+
+    // --- Partikel Klasser ---
+    
+    // 1. Alkan Partikel (De normale)
+    class AlkaneParticle {
+        constructor(alkaneType) {
+            this.type = alkaneType; 
+            this.reset(true);
+        }
+
+        reset(randomY = false) {
+            this.atomRadius = 5; 
+            let sizeFactor = this.type.isBranched ? 1.0 : 1.5;
+            this.physRadius = this.atomRadius + (this.type.carbons * sizeFactor);
+
+            this.x = Math.random() * (width - 40) + 20;
+            this.y = randomY ? Math.random() * height : height - 20;
+            this.vx = (Math.random() - 0.5) * 0.8; 
+            this.vy = 0;
+            this.angle = Math.random() * Math.PI * 2;
+            this.spin = 0;
+        }
+
+        update() {
+            const isSolid = currentTemp < this.type.melt;
+            const isGas = currentTemp > this.type.boil;
+            const isLiquid = !isSolid && !isGas;
+
+            if (isSolid) {
+                this.vy += 0.3; this.vx *= 0.8; this.spin *= 0.9; 
+                if (this.y > height - this.physRadius) {
+                    this.y = height - this.physRadius; this.vy = 0;
+                    this.x += (Math.random() - 0.5) * 0.5; this.y += (Math.random() - 0.5) * 0.5;
+                }
+            } else if (isLiquid) {
+                this.vy += 0.15; this.spin = (this.vx * 0.05);
+                if (this.y > height - this.physRadius) {
+                    this.y = height - this.physRadius; this.vy *= -0.2; this.vx *= 0.96;
+                    this.vx += (Math.random() - 0.5) * 0.2;
+                    if(Math.random() < 0.02) this.vy -= 0.5;
+                }
+            } else { // GAS - ALLEREDE KORRIGERET FOR RANDOM BEVÆGELSE
+                // Hvor meget varmere end kogepunktet stoffet er (0 = lige akkurat fordampet)
+                let overheat = Math.max(currentTemp - this.type.boil, 0);
+                // Kvadratrod-skalering: hastigheden vokser med temperaturen, men
+                // løber ikke løbsk selv ved stuetemperatur, hvor fx metan er
+                // meget over sit kogepunkt
+                let baseEnergy = 0.35 + Math.sqrt(overheat) * 0.045;
+                let energy = baseEnergy * 2.6; // Gas skal tydeligt bevæge sig hurtigere end væske/fast stof
+
+                // Tilfældig bevægelse (Brownske bevægelser) i stedet for kun opad
+                if (Math.random() < 0.2) {
+                    this.vx += (Math.random() - 0.5) * energy;
+                    this.vy += (Math.random() - 0.5) * energy;
+                }
+
+                // Dæmpning så hastigheden ikke løber løbsk
+                this.vx *= 0.96;
+                this.vy *= 0.96;
+                
+                this.spin = (Math.random() - 0.5) * 0.1;
+
+                if (this.y < 0) { this.y = 0; this.vy *= -1; }
+                if (this.y > height - this.physRadius) { this.y = height - this.physRadius; this.vy *= -1; }
+            } 
+
+            this.x += this.vx; this.y += this.vy; this.angle += this.spin;
+            if (this.x < 10) { this.x = 10; this.vx *= -1; }
+            if (this.x > width - 10) { this.x = width - 10; this.vx *= -1; }
+        }
+
+        draw(ctx) {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle);
+
+            // Farve følger tilstand (fast/væske/gas) - nuancen fortæller hvilket stof det er
+            const phase = currentTemp < this.type.melt ? 'solid' : (currentTemp > this.type.boil ? 'gas' : 'liquid');
+            let drawColor = this.type.stateCol[phase];
+
+            // ** KORRIGERET TEGNE-LOGIK HER **
+            // Hvis isBranched er sand, tegnes den kugleformet (uanset antallet af C-atomer)
+            if (this.type.isBranched) { 
+                this.drawAtom(ctx, 0, 0, drawColor);
+                const dist = this.atomRadius * 1.8;
+                this.drawAtom(ctx, dist, 0, drawColor); this.drawAtom(ctx, -dist, 0, drawColor);
+                this.drawAtom(ctx, 0, dist, drawColor); this.drawAtom(ctx, 0, -dist, drawColor);
+            } else {
+                const count = this.type.carbons;
+                const spacing = 8;
+                const totalLen = (count - 1) * spacing;
+                const startX = -totalLen / 2;
+                
+                ctx.strokeStyle = "rgba(0,0,0,0.3)";
+                if (count > 1) {
+                    ctx.beginPath(); ctx.moveTo(startX, 0); ctx.lineTo(startX + totalLen, 0);
+                    ctx.lineWidth = 4; ctx.stroke();
+                }
+                for (let i = 0; i < count; i++) this.drawAtom(ctx, startX + (i * spacing), 0, drawColor);
+            }
+            ctx.restore();
+        }
+
+        drawAtom(ctx, x, y, color) {
+            ctx.beginPath(); ctx.arc(x, y, this.atomRadius, 0, Math.PI * 2);
+            ctx.fillStyle = color; ctx.fill();
+            ctx.lineWidth = 1; ctx.strokeStyle = "rgba(0,0,0,0.2)"; ctx.stroke();
+        }
+    }
+
+    // 2. Produkt Partikel (CO2 og H2O til forbrænding)
+    class ProductParticle {
+        constructor(type) {
+            this.type = type; // 'co2' eller 'h2o'
+            this.x = Math.random() * width;
+            this.y = Math.random() * (height/2); // Start i luften
+            this.vx = (Math.random() - 0.5) * 8; // Meget hurtige! (Høj energi)
+            this.vy = (Math.random() - 0.5) * 8;
+            this.angle = Math.random();
+            this.spin = (Math.random() - 0.5) * 0.5;
+        }
+
+        update() {
+            this.x += this.vx; this.y += this.vy; this.angle += this.spin;
+            
+            // Bounce vildt rundt
+            if (this.x < 0 || this.x > width) this.vx *= -1;
+            if (this.y < 0 || this.y > height) this.vy *= -1;
+        }
+
+        draw(ctx) {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle);
+
+            if (this.type === 'co2') {
+                // CO2: Sort (C) i midten, to Røde (O) på siderne
+                // C
+                ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI*2); ctx.fillStyle = "#333"; ctx.fill();
+                // O'er
+                ctx.beginPath(); ctx.arc(-8, 0, 5, 0, Math.PI*2); ctx.fillStyle = "#f44336"; ctx.fill();
+                ctx.beginPath(); ctx.arc(8, 0, 5, 0, Math.PI*2); ctx.fillStyle = "#f44336"; ctx.fill();
+            } else {
+                // H2O: Rød (O) i midten, to Hvide (H) (Mickey Mouse)
+                // O
+                ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI*2); ctx.fillStyle = "#f44336"; ctx.fill();
+                // H'er (Mickey ører)
+                ctx.beginPath(); ctx.arc(-5, -6, 4, 0, Math.PI*2); ctx.fillStyle = "#fff"; ctx.fill(); ctx.stroke();
+                ctx.beginPath(); ctx.arc(5, -6, 4, 0, Math.PI*2); ctx.fillStyle = "#fff"; ctx.fill(); ctx.stroke();
+            }
+            ctx.restore();
+        }
+    }
+
+    // --- Logik og Events ---
+    
+    window.triggerCombustion = function() {
+        // Tjek om vi er i gas-tilstand
+        // Vi tager en prøve fra den første partikel
+        if (particles.length === 0 || isCombustionMode) return;
+        
+        // Find ud af om det koger
+        let sample = particles[0];
+        // Hvis mix-mode, tjek om metan koger (hvis den er der)
+        let boilPoint = sample.type.boil;
+        
+        // Sikkerhedsregel: Skal være varmere end kogepunktet for at antænde
+        if (currentTemp <= boilPoint) {
+            alert("⚠️ Du kan ikke antænde væsken! Varm op indtil det er damp (gas).");
+            return;
+        }
+
+        // START FORBRÆNDING
+        isCombustionMode = true;
+        
+        // Visuel effekt
+        document.getElementById('canvasWrap').classList.add('flash-anim');
+        setTimeout(() => document.getElementById('canvasWrap').classList.remove('flash-anim'), 500);
+
+        // Skift tekst
+        document.getElementById('infoText').innerHTML = "<b>BOOM! 💥</b> Kemisk reaktion! <br>Alkan + Ilt → CO₂ + Vand. <br>Reaktionen udvikler masser af varme!";
+        document.getElementById('infoText').style.background = "#fff3cd";
+        document.getElementById('infoText').style.borderColor = "#ffc107";
+
+        // Sæt temperatur til MAX (Exoterm reaktion)
+        currentTemp = 500; 
+        document.getElementById('tempValue').innerText = "MAX";
+        document.getElementById('stateText').innerText = "PLASMA / ILD 🔥";
+        document.getElementById('stateText').style.color = "red";
+
+        // Erstat partikler med Produkter (CO2 og H2O)
+        let count = particles.length;
+        particles = [];
+        for(let i=0; i<count; i++) {
+            // 50/50 chance for CO2 eller H2O for simpel visualisering
+            let type = Math.random() > 0.5 ? 'co2' : 'h2o';
+            particles.push(new ProductParticle(type));
+        }
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+        
+        // Væske linje (kun hvis ikke eksplosion)
+        if (!isCombustionMode) {
+            ctx.beginPath(); ctx.moveTo(0, height-100); ctx.lineTo(width, height-100); 
+            ctx.strokeStyle = "rgba(255,255,255,0.3)"; ctx.stroke();
+        }
+
+        particles.forEach(p => {
+            if (!isPaused) p.update();
+            p.draw(ctx);
+        });
+        requestAnimationFrame(animate);
+    }
+
+    // Tegner Smp/Kp-markører under temperatur-slideren for de(t) aktive stof(fer)
+    function setSliderMarkers(markers) {
+        const layer = document.getElementById('markerLayer');
+        layer.innerHTML = '';
+        const slider = document.getElementById('tempSlider');
+        const min = parseFloat(slider.min), max = parseFloat(slider.max);
+
+        const valid = markers
+            .filter(m => m.temp >= min && m.temp <= max)
+            .sort((a, b) => a.temp - b.temp);
+
+        let lastPct = -999;
+        valid.forEach(m => {
+            const pct = (m.temp - min) / (max - min) * 100;
+            const el = document.createElement('div');
+            el.className = 'slider-marker' + (pct - lastPct < 8 ? ' stagger' : '');
+            el.style.left = pct + '%';
+            el.style.color = m.color;
+            el.title = m.label + ' (' + m.temp + '°C)';
+            el.innerHTML = '<div class="tick"></div><div class="lbl">' + m.label + '</div>';
+            layer.appendChild(el);
+            lastPct = pct;
+        });
+    }
+
+    function setPauseButtonUI() {
+        const btn = document.getElementById('btn-pause');
+        document.getElementById('pauseLabel').textContent = isPaused ? '▶' : '⏸';
+        btn.title = isPaused ? 'Genoptag animationen' : 'Pause animationen';
+        btn.classList.toggle('active', isPaused);
+    }
+
+    window.togglePause = function() {
+        isPaused = !isPaused;
+        setPauseButtonUI();
+    };
+
+    window.changeAlkane = function(key) {
+        resetMode();
+        let selected = alkanes[key];
+
+        document.querySelectorAll('.btn-styled').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-' + key).classList.add('active');
+        document.getElementById('infoText').innerText = selected.txt;
+
+        particles = [];
+        const n = selected.carbons > 5 ? 60 : 100;
+        for(let i=0; i<n; i++) particles.push(new AlkaneParticle(selected));
+
+        setSliderMarkers([
+            { temp: selected.melt, label: 'Smp', color: '#1565C0' },
+            { temp: selected.boil, label: 'Kp', color: '#d32f2f' }
+        ]);
+        updateUI();
+    };
+
+    window.startMix = function() {
+        resetMode();
+        isMixMode = true;
+        mixPair = { low: alkanes.metan, high: alkanes.octan };
+        document.querySelectorAll('.btn-styled').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-mix').classList.add('active');
+        document.getElementById('infoText').innerText = "BLANDING: Metan & Octan. Varm op og se forskellen.";
+
+        currentTemp = -200;
+        document.getElementById('tempSlider').value = -200;
+
+        particles = [];
+        for(let i=0; i<50; i++) particles.push(new AlkaneParticle(alkanes.metan));
+        for(let i=0; i<40; i++) particles.push(new AlkaneParticle(alkanes.octan));
+
+        setSliderMarkers([
+            { temp: alkanes.metan.boil, label: 'Kp Metan', color: alkanes.metan.stateCol.gas },
+            { temp: alkanes.octan.boil, label: 'Kp Octan', color: alkanes.octan.stateCol.gas }
+        ]);
+        updateUI();
+    };
+
+    window.startMixIsomers = function() {
+        resetMode();
+        isMixMode = true;
+        mixPair = { low: alkanes.neopentan, high: alkanes.pentan };
+        document.querySelectorAll('.btn-styled').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-mix-isomers').classList.add('active');
+        document.getElementById('infoText').innerText = "BLANDING: n-Pentan & 2,2-Dimethylpropan. Samme antal C-atomer (C₅) - men se hvordan den kugleformede isomer koger ved en lavere temperatur end den lange kæde.";
+
+        currentTemp = 0;
+        document.getElementById('tempSlider').value = 0;
+
+        particles = [];
+        for(let i=0; i<50; i++) particles.push(new AlkaneParticle(alkanes.pentan));
+        for(let i=0; i<50; i++) particles.push(new AlkaneParticle(alkanes.neopentan));
+
+        setSliderMarkers([
+            { temp: alkanes.pentan.boil, label: 'Kp n-Pentan', color: alkanes.pentan.stateCol.gas },
+            { temp: alkanes.neopentan.boil, label: 'Kp Isomer', color: alkanes.neopentan.stateCol.gas }
+        ]);
+        updateUI();
+    };
+
+    function resetMode() {
+        isCombustionMode = false;
+        isMixMode = false;
+        mixPair = null;
+        isPaused = false;
+        setPauseButtonUI();
+        document.getElementById('infoText').style.background = "#eceff1"; // Reset farve
+        document.getElementById('infoText').style.borderColor = "#90a4ae";
+        // Reset knap styles hvis nødvendigt
+    }
+
+    function updateUI() {
+        if(isCombustionMode) return; // UI opdateres ikke under eksplosion
+
+        document.getElementById('tempValue').innerText = currentTemp;
+        let sText = document.getElementById('stateText');
+
+        if(isMixMode && mixPair) {
+            if (currentTemp < mixPair.low.melt) {
+                sText.innerText = "Begge er fast stof 🧊"; sText.style.color = "#37474F";
+            } else if (currentTemp < mixPair.low.boil) {
+                sText.innerText = "Begge er væske 💧"; sText.style.color = "#0277bd";
+            } else if (currentTemp < mixPair.high.boil) {
+                sText.innerText = mixPair.low.name + " fordamper! 🔥"; sText.style.color = "#673AB7";
+            } else {
+                sText.innerText = "Alt fordamper ☁️"; sText.style.color = "#d84315";
+            }
+        } else {
+            let type = particles[0].type;
+            if (currentTemp < type.melt) {
+                sText.innerText = "Fast Stof 🧊"; sText.style.color = "#37474F";
+            } else if (currentTemp >= type.melt && currentTemp < type.boil) {
+                sText.innerText = "Væske 💧"; sText.style.color = "#0277bd";
+            } else {
+                sText.innerText = "Gas (Damp) ☁️"; sText.style.color = "#d84315";
+            }
+        }
+    }
+
+    document.getElementById('tempSlider').oninput = function() {
+        if (isCombustionMode) {
+            // Hvis man rører slideren efter eksplosion, resetter vi til det valgte stof
+            let activeBtn = document.querySelector('.btn-styled.active');
+            if (activeBtn) activeBtn.click();
+        }
+        currentTemp = parseInt(this.value);
+        updateUI();
+    };
+
+    // Start
+    changeAlkane('metan');
+    animate();
+};
+</script>
+</body>
+</html>

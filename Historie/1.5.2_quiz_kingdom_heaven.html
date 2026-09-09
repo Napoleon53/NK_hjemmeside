@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title>Historisk Analyse: Kingdom of Heaven</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .quiz-container {
+            background-color: #34495e;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 700px;
+        }
+        h1 {
+            text-align: center;
+            color: #f1c40f;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            text-align: center;
+            font-style: italic;
+            color: #bdc3c7;
+            margin-bottom: 25px;
+            font-size: 0.9em;
+        }
+        .question {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .options button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: #ecf0f1;
+            color: #2c3e50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            text-align: left;
+            transition: all 0.2s;
+        }
+        .options button:hover {
+            background-color: #bdc3c7;
+        }
+        .options button:disabled {
+            cursor: default;
+        }
+        
+        /* Feedback farver */
+        .correct { background-color: #27ae60 !important; color: white !important; }
+        .wrong { background-color: #c0392b !important; color: white !important; }
+
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #2c3e50;
+            border-left: 5px solid #f1c40f;
+            display: none;
+            line-height: 1.5;
+        }
+        
+        .footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #score-display { font-weight: bold; }
+        #next-btn {
+            padding: 10px 20px;
+            background-color: #f1c40f;
+            color: #2c3e50;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            display: none;
+        }
+        #next-btn:hover { background-color: #f39c12; }
+
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <h1>Kingdom of Heaven</h1>
+    <p class="subtitle">Historiefaglig analyse af filmens tendens og historiebrug</p>
+    
+    <div id="quiz-content">
+        <div id="question-box" class="question">Indlæser spørgsmål...</div>
+        <div id="options-box" class="options"></div>
+        <div id="explanation-box" class="explanation"></div>
+    </div>
+
+    <div class="footer">
+        <span id="score-display">Spørgsmål 1 af 10</span>
+        <button id="next-btn" onclick="nextQuestion()">Næste spørgsmål &rarr;</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            q: "Filmen er produceret i 2005. Hvordan kan man se samtidens politiske konflikter spejlet i filmen?",
+            a: [
+                { text: "Filmen kommenterer indirekte på 'Krigen mod Terror' og Irak-krigen ved at advare mod religiøs fanatisme.", correct: true },
+                { text: "Filmen handler om den Kolde Krig og konflikten mellem øst og vest.", correct: false },
+                { text: "Filmen er en ren filmatisering af historiske kilder uden moderne budskaber.", correct: false }
+            ],
+            expl: "Korrekt. Filmen udkom kort efter 11. september og Irak-krigen. Ridley Scott bruger middelalderen som et spejl for at kritisere begreber som 'Hellige Krig' og fundamentalisme i sin egen tid."
+        },
+        {
+            q: "Hvilken historiefaglig betegnelse bruges om det, når filmen lader Balian tale for moderne værdier (tolerance, humanisme) i 1100-tallet?",
+            a: [
+                { text: "Kildekritik", correct: false },
+                { text: "Anakronisme", correct: true },
+                { text: "Overlevering", correct: false }
+            ],
+            expl: "Præcis. En anakronisme er noget, der er 'ude af sin tid'. Balians moderne syn på religionsfrihed ('The Kingdom of Conscience') hører ikke hjemme i en dybt religiøs middelalder, men er lagt ind for at tale til et moderne publikum."
+        },
+        {
+            q: "Filmen opstiller en skarp kontrast mellem 'Det gamle Europa' (Frankrig) og 'Det Hellige Land'. Hvad består denne kontrast i?",
+            a: [
+                { text: "Europa er præget af udbredt rigdom og velstand, mens Jerusalem fremstår som et fattigt og øde landområde.", correct: false },
+                { text: "Europa er et fastlåst feudalt standssamfund, mens Jerusalem præsenteres som et sted med social mobilitet.", correct: true },
+                { text: "Der er ingen forskel; begge steder er præget af mørke og pest.", correct: false }
+            ],
+            expl: "Rigtigt. Filmen viser Jerusalem som et 'mulighedernes land' (næsten som USA), hvor en smed kan blive ridder pga. sine evner, modsat det fastlåste Europa. Dette er et dramaturgisk greb."
+        },
+        {
+            q: "Hvordan fremstilles Tempelridderne (især Reynald og Guy) i forhold til filmens tendens?",
+            a: [
+                { text: "De er filmens helte, der forsvarer kristendommen.", correct: false },
+                { text: "De er neutrale aktører uden holdning til konflikten mellem kristne og muslimer.", correct: false },
+                { text: "De fungerer som repræsentanter for blind fanatisme og intolerance.", correct: true }
+            ],
+            expl: "Korrekt. Filmen har en tydelig tendens: Den kritiserer fanatisme. Tempelridderne bruges som 'skurke', der ønsker krig for krigens skyld ('God Wills It!'), hvilket stilles over for de rationelle pragmatikere."
+        },
+        {
+            q: "Hvilket motiv for at drage på korstog er mest fremtrædende hos hovedpersonen Balian?",
+            a: [
+                { text: "Religiøs frelse (Absolution) for personlige synder.", correct: true },
+                { text: "Økonomisk vinding og lysten til at eje land.", correct: false },
+                { text: "Et dybt personligt had til muslimer og ønsket om hævn.", correct: false }
+            ],
+            expl: "Godt. Selvom andre riddere søger rigdom, er Balian drevet af en søgen efter tilgivelse for sin kones selvmord og sit eget drab på en præst. Det viser middelalderens religiøse mentalitet, selvom filmen ellers er moderne."
+        },
+        {
+            q: "Saladin siger: 'Jerusalem is worth nothing... and everything'. Hvad menes der med dette paradoks?",
+            a: [
+                { text: "At byen rent økonomisk er stort set værdiløs, men militært set er den til gengæld enormt vigtig.", correct: false },
+                { text: "At byen som fysisk sted (sten) er ligegyldig, men som symbol på fred/sameksistens er den alt.", correct: true },
+                { text: "At han er dybt usikker og slet ikke selv ved, hvad han egentlig mener om byen.", correct: false }
+            ],
+            expl: "Netop. Dette er filmens kernebudskab: Menneskeliv og etik er vigtigere end hellige bygninger. Byen har kun værdi, hvis den huser fred."
+        },
+        {
+            q: "Filmen ændrer på Balians historiske baggrund (han gøres til smed). Hvorfor gør instruktøren sandsynligvis dette?",
+            a: [
+                { text: "For at skabe en identifikationsfigur, publikum kan forstå (fra 'bunden' til toppen).", correct: true },
+                { text: "Fordi man ikke vidste, hvem den rigtige Balian var.", correct: false },
+                { text: "Fordi smede generelt var meget ansete og respekterede håndværkere i middelalderen.", correct: false }
+            ],
+            expl: "Korrekt. Den virkelige Balian var en magtfuld adelsmand. Ved at gøre ham til en 'almindelig mand' (smed), bliver hans rejse en klassisk heltefortælling, som et moderne publikum kan spejle sig i."
+        },
+        {
+            q: "Hvordan bryder filmen med det traditionelle vestlige fjendebillede af muslimer (Orientalisme)?",
+            a: [
+                { text: "Den fremstiller muslimerne som barbariske og uciviliserede.", correct: false },
+                { text: "Den nuancerer billedet ved at vise Saladin som ærefuld, intelligent og barmhjertig.", correct: true },
+                { text: "Den ignorerer fuldstændig muslimerne i filmen.", correct: false }
+            ],
+            expl: "Præcis. I modsætning til ældre korstogsfilm, der ofte dæmoniserede 'de andre', viser Ridley Scott civilisation og barbari på begge sider. Saladin fremstilles som en ideal-fyrste."
+        },
+        {
+            q: "Filmen argumenterer for 'The Kingdom of Conscience'. Hvad indebærer denne moralfilosofi?",
+            a: [
+                { text: "At man udelukkende skal følge kirkens dogmer blindt.", correct: false },
+                { text: "At 'gode handlinger' og samvittighed står over religiøst tilhørsforhold.", correct: true },
+                { text: "At kun de allerstærkeste og mest hensynsløse bør overleve.", correct: false }
+            ],
+            expl: "Rigtigt. Filmen fremmer en sekulær humanisme: Det er ikke din religion, der frelser dig, men dine handlinger mod dine medmennesker ('Right Action')."
+        },
+        {
+            q: "Hvad er den faglige konklusion på filmens 'historiske korrekthed'?",
+            a: [
+                { text: "Den er 100% historisk korrekt i alle detaljer, uden nogen kunstnerisk frihed taget undervejs.", correct: false },
+                { text: "Den er ren fiktion og har intet som helst rod i den virkelige historiske begivenhed.", correct: false },
+                { text: "Den rammer den historiske ramme (begivenheder/personer), men fylder den med moderne værdier og dramatiserede relationer.", correct: true }
+            ],
+            expl: "Korrekt. Filmen er 'fiktion baseret på fakta'. Personerne fandtes, og slaget om Jerusalem skete, men karakterernes tanker, romancer og motiver er omskrevet for at passe til et moderne drama."
+        }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+    const totalQ = questions.length;
+
+    const qBox = document.getElementById("question-box");
+    const optBox = document.getElementById("options-box");
+    const explBox = document.getElementById("explanation-box");
+    const nextBtn = document.getElementById("next-btn");
+    const scoreDisplay = document.getElementById("score-display");
+
+    function loadQuestion() {
+        // Reset state
+        explBox.style.display = "none";
+        nextBtn.style.display = "none";
+        optBox.innerHTML = "";
+        
+        const qData = questions[currentQ];
+        qBox.innerText = qData.q;
+        scoreDisplay.innerText = `Spørgsmål ${currentQ + 1} af ${totalQ}`;
+
+        // Bland rækkefølgen af svarmulighederne, så det rigtige svar ikke altid står samme sted
+        const shuffled = [...qData.a].sort(() => Math.random() - 0.5);
+
+        // Create buttons
+        shuffled.forEach((opt, index) => {
+            const btn = document.createElement("button");
+            btn.innerText = opt.text;
+            btn.onclick = () => checkAnswer(index, btn, shuffled, qData);
+            optBox.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(index, btn, shuffled, qData) {
+        // Disable all buttons
+        const allBtns = optBox.querySelectorAll("button");
+        allBtns.forEach(b => b.disabled = true);
+
+        const isCorrect = shuffled[index].correct;
+
+        if (isCorrect) {
+            btn.classList.add("correct");
+            score++;
+            explBox.innerHTML = "✅ <b>Korrekt!</b><br>" + qData.expl;
+        } else {
+            btn.classList.add("wrong");
+            // Find and highlight correct answer
+            const correctIndex = shuffled.findIndex(o => o.correct);
+            allBtns[correctIndex].classList.add("correct");
+            explBox.innerHTML = "❌ <b>Forkert.</b><br>" + qData.expl;
+        }
+
+        explBox.style.display = "block";
+        nextBtn.style.display = "block";
+
+        if (currentQ === totalQ - 1) {
+            nextBtn.innerText = "Se resultat";
+        }
+    }
+
+    function nextQuestion() {
+        currentQ++;
+        if (currentQ < totalQ) {
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.querySelector(".quiz-container").innerHTML = `
+            <h1 style="color:#f1c40f">Analyse Færdig!</h1>
+            <p style="text-align:center; font-size:1.5em;">Du fik ${score} ud af ${totalQ} rigtige.</p>
+            <p style="text-align:center;">
+                ${score > 8 ? "Fantastisk! Du har fuldstændig styr på filmens historiebrug." : 
+                  score > 5 ? "Godt gået. Du har fat i de fleste faglige pointer." : 
+                  "Prøv igen. Læs noterne grundigt for at forstå forskellen på film og virkelighed."}
+            </p>
+            <button onclick="location.reload()" style="display:block; margin:20px auto; padding:15px; background:#f1c40f; border:none; border-radius:5px; cursor:pointer; font-weight:bold; color:#2c3e50;">Prøv igen</button>
+        `;
+    }
+
+    // Start
+    loadQuestion();
+
+</script>
+
+</body>
+</html>

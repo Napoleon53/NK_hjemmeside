@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title>Virtuelt Lab: Titrering (Easy Hitbox)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --panel-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #1a1a1a;
+            --accent: #2c3e50;
+            --highlight: #2980b9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex; flex-direction: column; overflow: hidden;
+            touch-action: none;
+        }
+
+        #ui-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 10;
+        }
+
+        header {
+            background: var(--accent); color: white; padding: 0 15px; height: 50px;
+            display: flex; justify-content: space-between; align-items: center;
+            pointer-events: auto; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Journal - Fixed Top Left */
+        .hud-panel {
+            pointer-events: auto;
+            background: var(--panel-bg);
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: absolute; top: 60px; left: 10px;
+            width: 250px;
+            border-left: 5px solid var(--highlight);
+        }
+
+        h3 { margin: 0 0 10px 0; font-size: 1rem; border-bottom: 2px solid #eee; padding-bottom: 5px; color: var(--accent); }
+        .data-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+        .data-val { font-family: 'Courier New', monospace; font-weight: bold; font-size: 1rem; color: #2c3e50; }
+
+        .slider-section { margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee; }
+        input[type=range] { width: 100%; margin: 10px 0; cursor: pointer; height: 25px; }
+        
+        button {
+            background: var(--highlight); color: white; border: none;
+            padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;
+        }
+
+        .toast-box {
+            position: absolute; top: 70px; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+            width: 90%; max-width: 400px;
+        }
+        .toast {
+            background: rgba(40, 40, 40, 0.95); color: white; padding: 12px 20px;
+            border-radius: 4px; text-align: center; opacity: 0;
+            transform: translateY(-10px); transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); font-size: 0.9rem;
+            border-left: 5px solid #aaa;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.sarcasm { border-left-color: #e67e22; background: #2c3e50; font-style: italic; }
+        .toast.success { border-left-color: #27ae60; }
+
+        canvas { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none; }
+        canvas:active { cursor: grabbing; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="font-weight:bold;">Titrering af eddikesyre</div>
+    <button onclick="window.location.reload()">Genstart</button>
+</header>
+
+<div id="ui-layer">
+    <div class="hud-panel" id="journal-panel">
+        <h3>Journal</h3>
+        <div class="data-row"><span>m(Eddike):</span> <span class="data-val" id="disp-mass">0,00 g</span></div>
+        <div class="data-row"><span>V(Start):</span> <span class="data-val" id="disp-start">--</span></div>
+        <div class="data-row"><span>V(Slut):</span> <span class="data-val" id="disp-end">--</span></div>
+        <div class="data-row" style="background:#eef; padding:2px;"><span>Forbrug:</span> <span class="data-val" id="disp-delta" style="color:#d35400;">0,00 mL</span></div>
+
+        <div class="slider-section">
+            <label style="font-weight:bold; display:block; font-size:0.8rem; color:var(--accent);">HANE (Flow)</label>
+            <input type="range" id="flow-slider" min="0" max="100" value="0">
+            <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#666;">
+                <span>Lukket</span><span>Åben</span>
+            </div>
+        </div>
+    </div>
+    <div class="toast-box" id="toaster"></div>
+</div>
+
+<canvas id="simCanvas"></canvas>
+
+<script>
+/**
+ * VIRTUAL LAB ENGINE v16 - Wider Hitbox & Juice Logic
+ */
+
+const COLORS = {
+    glassBorder: '#7f8c8d',
+    liquidAcid: 'rgba(190, 160, 120, 0.4)', 
+    liquidBase: 'rgba(230, 230, 255, 0.6)', 
+    liquidPink: 'rgba(255, 105, 180, 0.8)', 
+    stirrer: '#34495e'
+};
+
+const SARCASM = {
+    generic: ["Glasudstyr koster penge.", "Pas nu på udstyret.", "Er du vågen?"],
+    no_acid: ["Du titrerer ren luft.", "Måske skulle du starte med at tilsætte eddike?", "Vand + Base = Basevand. Imponerende."],
+    no_goggles: ["BRILLER! Jeg gider ikke køre på skadestuen.", "Er dine øjne lavet af glas? Nej. Tag briller på.", "Du rører ikke basen uden briller.", "Sikkerhed først."],
+    not_over_sink: ["Du hælder base ud over mine sko. BRUG VASKEN!", "Buretten skal fyldes over vasken.", "Sigter du efter gulvet?"],
+    burette_empty: ["Buretten er tom. Fyld den med NaOH først.", "Du åbner hanen, men intet sker. Mystisk."],
+    vinegar_in_burette: ["Nej! Eddike skal i kolben, ikke buretten!", "Hvorfor vil du fylde buretten med syre? Stop.", "Læs øvelsesvejledningen igen."],
+    waste_in_sink: ["Du hælder ubrugte kemikalier direkte i afløbet? Miljøsvin.", "Det der skal bruges, ikke hældes ud.", "Vasken er ikke til opbevaring."],
+    base_in_flask: ["Base skal dryppes fra buretten, ikke hældes direkte!", "Det var så den titrering. Start forfra.", "Præcision er ikke din stærke side, vel?"],
+    spill: ["Hovsa. Kemikalier på bordet.", "Sigt efter hullet i kolben næste gang."],
+    juice: ["Tillykke, du lavede saftevand.", "Det skulle være svagt lyserødt, ikke neon-pink.", "Du har overtitreret helt vildt.", "Det er ikke en konkurrence om mest farve."]
+};
+
+function toDK(num) { return num.toFixed(2).replace('.', ','); }
+
+// UI Manager
+class UI {
+    static toast(msg, type = 'normal') {
+        const box = document.getElementById('toaster');
+        if (box.lastChild && box.lastChild.innerHTML === msg) return;
+        const el = document.createElement('div');
+        el.className = `toast ${type}`; el.innerHTML = msg; 
+        box.appendChild(el); void el.offsetWidth; el.classList.add('show');
+        setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 4000); }, 4000);
+    }
+    static scold(cat) {
+        const list = SARCASM[cat] || SARCASM.generic;
+        this.toast(list[Math.floor(Math.random()*list.length)], 'sarcasm');
+    }
+    static updateJournal(mass, start, end, delta) {
+        if(mass !== null) document.getElementById('disp-mass').innerText = toDK(mass) + " g";
+        if(start !== null) document.getElementById('disp-start').innerText = start;
+        if(end !== null) document.getElementById('disp-end').innerText = end;
+        if(delta !== null) document.getElementById('disp-delta').innerText = toDK(delta) + " mL";
+    }
+}
+
+// Basic Entity
+class Entity {
+    constructor(x, y, w, h, name) {
+        this.x = x; this.y = y; this.w = w; this.h = h; this.name = name;
+        this.dragging = false; this.dragOff = {x:0, y:0}; this.baseX = x; this.baseY = y; 
+    }
+    get cx() { return this.x + this.w/2; } get cy() { return this.y + this.h/2; }
+    distTo(other) { return Math.hypot(this.cx - other.cx, this.cy - other.cy); }
+    draw(ctx) { ctx.fillStyle = "red"; ctx.fillRect(this.x, this.y, this.w, this.h); } 
+}
+
+class Bottle extends Entity {
+    constructor(x, y, label, color, type) { super(x, y, 50, 80, type); this.label = label; this.color = color; }
+    draw(ctx) {
+        ctx.save(); ctx.translate(this.x, this.y);
+        ctx.fillStyle = this.color; ctx.fillRect(5, 25, 40, 55); 
+        ctx.fillStyle = "#ecf0f1"; ctx.fillRect(15, 0, 20, 25); 
+        ctx.fillStyle = "white"; ctx.fillRect(5, 35, 40, 25); 
+        ctx.fillStyle = "black"; ctx.font = "bold 10px Arial"; ctx.textAlign = "center";
+        ctx.fillText(this.label, 25, 50); ctx.restore();
+    }
+}
+
+class Flask extends Entity {
+    constructor(x, y) { super(x, y, 70, 100, "flask"); this.reset(); }
+    reset() {
+        this.baseInFlask = 0; // mL
+        this.totalLiquid = 0; // mL (bruges til visuel opfyldning)
+        this.hasIndicator = false; 
+        this.hasMagnet = false; 
+        this.hasVinegar = false;
+        this.magnetRot = 0;
+    }
+    addLiquid(type, amount) {
+        this.totalLiquid += amount;
+        if (type === 'acid') { this.hasVinegar = true; } 
+        else if (type === 'base') { this.baseInFlask += amount; }
+    }
+    getColor() {
+        if (this.totalLiquid === 0) return null;
+        let c = this.hasVinegar ? COLORS.liquidAcid : 'rgba(200,200,255,0.2)';
+        
+        if (this.hasIndicator) {
+            if (this.baseInFlask >= 17.0) {
+                return COLORS.liquidPink;
+            }
+        }
+        return c;
+    }
+    draw(ctx) {
+        ctx.save(); ctx.translate(this.x, this.y);
+        let visualHeight = (this.totalLiquid / 50) * 75;
+        const fillHeight = Math.min(80, visualHeight); 
+        if (fillHeight > 0) {
+            ctx.fillStyle = this.getColor() || 'rgba(0,0,0,0)'; ctx.beginPath();
+            ctx.moveTo(5, 100); ctx.lineTo(65, 100);
+            const narrowing = (fillHeight/90)*15;
+            ctx.lineTo(65 - narrowing, 100 - fillHeight); ctx.lineTo(5 + narrowing, 100 - fillHeight);
+            ctx.fill();
+        }
+        if (this.hasMagnet) {
+            ctx.save(); ctx.translate(35, 95); ctx.rotate(this.magnetRot);
+            ctx.fillStyle = "white"; ctx.fillRect(-8, -3, 16, 6); ctx.strokeRect(-8, -3, 16, 6); ctx.restore();
+        }
+        ctx.strokeStyle = COLORS.glassBorder; ctx.lineWidth = 2; ctx.beginPath();
+        ctx.moveTo(25, 0); ctx.lineTo(45, 0); ctx.lineTo(45, 30);
+        ctx.lineTo(65, 90); ctx.quadraticCurveTo(70, 100, 35, 100);
+        ctx.quadraticCurveTo(0, 100, 5, 90); ctx.lineTo(25, 30); ctx.lineTo(25, 0);
+        ctx.stroke(); ctx.restore();
+    }
+}
+
+class Burette extends Entity {
+    constructor(x, y) { super(x, y, 50, 320, "burette"); this.currentVol = 0; this.flowRate = 0; this.dropY = 0; }
+    fill() { if (this.currentVol < 50) { this.currentVol = 50; return true; } return false; }
+    draw(ctx) {
+        ctx.save(); ctx.translate(this.x, this.y);
+        ctx.fillStyle = "#95a5a6"; ctx.fillRect(35, 20, 5, 300); ctx.fillRect(20, 140, 20, 5); 
+        ctx.strokeStyle = COLORS.glassBorder; ctx.lineWidth = 2; ctx.strokeRect(15, 20, 10, 240);
+        const fh = (this.currentVol / 50) * 240;
+        if (fh > 0) { ctx.fillStyle = COLORS.liquidBase; ctx.fillRect(16, 20 + (240-fh), 8, fh); }
+        ctx.fillStyle = "#2c3e50"; ctx.fillRect(13, 260, 14, 10);
+        ctx.beginPath(); ctx.moveTo(17, 270); ctx.lineTo(20, 290); ctx.lineTo(23, 270); ctx.stroke();
+        if (this.flowRate > 0 && this.currentVol > 0) {
+            ctx.fillStyle = COLORS.liquidBase; ctx.beginPath(); ctx.arc(20, 290 + this.dropY, 3, 0, Math.PI*2); ctx.fill();
+        }
+        ctx.restore();
+    }
+}
+
+class Equipment extends Entity {
+    constructor(x, y, w, h, type, label) { super(x, y, w, h, type); this.label = label; }
+    draw(ctx) {
+        ctx.save(); ctx.translate(this.x, this.y);
+        if (this.name === 'sink') {
+            ctx.fillStyle = "#bdc3c7"; ctx.fillRect(0,0,this.w,this.h);
+            ctx.fillStyle = "#7f8c8d"; ctx.fillRect(5,5,this.w-10,this.h-10);
+            ctx.fillStyle = "#333"; ctx.beginPath(); ctx.arc(this.w/2, this.h/2, 10, 0, Math.PI*2); ctx.fill();
+        } else if (this.name === 'stirrer') {
+            ctx.fillStyle = COLORS.stirrer; ctx.fillRect(0, 10, this.w, this.h-10);
+            ctx.fillStyle = "#ccc"; ctx.beginPath(); ctx.ellipse(this.w/2, 10, this.w/2-5, 10, 0, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = this.active ? "#2ecc71" : "#e74c3c"; ctx.beginPath(); ctx.arc(this.w-20, this.h-15, 6, 0, Math.PI*2); ctx.fill();
+        } else if (this.name === 'scale') {
+            ctx.fillStyle = "#95a5a6"; ctx.fillRect(0,20,this.w,30);
+            ctx.fillStyle = "#ecf0f1"; ctx.fillRect(10,15,this.w-20,5);
+            ctx.fillStyle = "#222"; ctx.fillRect(this.w/2-30, 25, 60, 15);
+            ctx.fillStyle = "#0f0"; ctx.font = "12px monospace"; ctx.textAlign="right";
+            ctx.fillText(toDK(this.reading||0)+" g", this.w/2+25, 37);
+        }
+        if (this.label) { ctx.fillStyle = "#2c3e50"; ctx.font = "bold 12px Arial"; ctx.textAlign="center"; ctx.fillText(this.label, this.w/2, this.h-5); }
+        ctx.restore();
+    }
+}
+
+class Goggles extends Entity {
+    constructor(x, y) { super(x, y, 60, 30, "goggles"); this.worn = false; }
+    draw(ctx) {
+        if(this.worn) return;
+        ctx.save(); ctx.translate(this.x, this.y);
+        ctx.fillStyle = "rgba(100, 180, 255, 0.3)";
+        ctx.strokeStyle = "#27ae60"; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(15, 15, 14, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(45, 15, 14, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(29, 15); ctx.lineTo(31, 15); ctx.stroke();
+        ctx.font="bold 9px Arial"; ctx.fillStyle="#27ae60"; ctx.textAlign="center";
+        ctx.fillText("SIKKERHED", 30, 40);
+        ctx.restore();
+    }
+}
+
+class Magnet extends Entity {
+    constructor(x, y) { super(x, y, 20, 10, "magnet"); this.inFlask = false; }
+    draw(ctx) {
+        if(this.inFlask) return;
+        ctx.save(); ctx.translate(this.x, this.y);
+        ctx.fillStyle = "white"; ctx.fillRect(0, 0, 20, 10); ctx.strokeRect(0,0,20,10);
+        ctx.restore();
+    }
+}
+
+class Engine {
+    constructor() {
+        this.canvas = document.getElementById('simCanvas'); this.ctx = this.canvas.getContext('2d');
+        this.entities = []; this.resize(); this.setupScene();
+        const handler = (e) => {
+            if(e.type === 'touchmove') e.preventDefault();
+            const r = this.canvas.getBoundingClientRect();
+            let cx = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
+            let cy = e.touches && e.touches.length > 0 ? e.touches[0].clientY : e.clientY;
+            const x = cx - r.left; const y = cy - r.top;
+            if (e.type.includes('down') || e.type.includes('start')) this.onDown(x, y);
+            else if (e.type.includes('move')) this.onMove(x, y);
+            else if (e.type.includes('up') || e.type.includes('end')) this.onUp();
+        };
+        ['mousedown','touchstart','mousemove','touchmove','mouseup','touchend'].forEach(evt => this.canvas.addEventListener(evt, handler, {passive: false}));
+        window.addEventListener('resize', () => this.resize());
+        document.getElementById('flow-slider').addEventListener('input', e => { this.burette.flowRate = parseFloat(e.target.value); });
+        this.warnedNoInd = false; this.warnedNoAcid = false; this.recordedMass = 0;
+        this.overTitrated = false;
+        this.loop();
+    }
+    resize() { this.canvas.width = window.innerWidth; this.canvas.height = window.innerHeight; if(this.entities.length > 0) this.setupScene(); }
+    
+    setupScene() {
+        const w = this.canvas.width; const h = this.canvas.height;
+        const cx = w / 2; const floorY = h - 100;
+        this.entities = [];
+        this.sink = new Equipment(cx - 180, floorY, 100, 60, "sink", "Vask");
+        this.stirrer = new Equipment(cx - 50, floorY, 100, 50, "stirrer", "Omrører");
+        this.scale = new Equipment(cx + 80, floorY, 100, 50, "scale", "Vægt");
+        const shelfY = 120;
+        this.entities.push(new Bottle(cx - 120, shelfY, "Eddike", "#e67e22", "bottle_acid"));
+        this.entities.push(new Bottle(cx, shelfY, "Base", "#bdc3c7", "bottle_base"));
+        this.entities.push(new Bottle(cx + 120, shelfY, "Indik.", "#9b59b6", "bottle_ind"));
+        this.flask = new Flask(cx + 80 + 15, floorY - 100); 
+        this.burette = new Burette(cx - 70, 160); 
+        this.magnet = new Magnet(cx + 200, floorY + 20);
+        this.goggles = new Goggles(w - 150, h - 80);
+
+        this.entities.push(this.sink, this.stirrer, this.scale, this.goggles); 
+        this.entities.push(this.flask, this.burette, this.magnet);
+    }
+
+    onDown(x, y) {
+        for (let i = this.entities.length-1; i >= 0; i--) {
+            let ent = this.entities[i];
+            if (x >= ent.x - 20 && x <= ent.x + ent.w + 20 && y >= ent.y - 20 && y <= ent.y + ent.h + 20) {
+                if (ent.name === 'goggles') { this.goggles.worn = true; UI.toast("Briller påtaget."); return; }
+                if (ent.name === 'stirrer' && ent.distTo({cx:x, cy:y}) < 60) { ent.active = !ent.active; UI.toast(ent.active ? "Omrører: ON" : "Omrører: OFF"); return; }
+                if (ent.name === 'magnet' && ent.inFlask) return;
+                if (['sink', 'scale', 'stirrer'].includes(ent.name)) return; 
+                this.dragTarget = ent; ent.dragging = true; ent.dragOff = { x: x - ent.x, y: y - ent.y };
+                this.entities.splice(i, 1); this.entities.push(ent); return;
+            }
+        }
+    }
+    onMove(x, y) { if (this.dragTarget) { this.dragTarget.x = x - this.dragTarget.dragOff.x; this.dragTarget.y = y - this.dragTarget.dragOff.y; } }
+    onUp() {
+        if (!this.dragTarget) return;
+        const t = this.dragTarget; t.dragging = false;
+        
+        // Flask Snap & Hitbox
+        if (t.name === 'flask') {
+            if (t.distTo(this.scale) < 100) { t.x = this.scale.x + (this.scale.w - t.w)/2; t.y = this.scale.y - t.h + 10; } 
+            // SNAP TO STIRRER (Burette position)
+            else if (t.distTo(this.stirrer) < 100) { t.x = this.stirrer.x + (this.stirrer.w - t.w)/2; t.y = this.stirrer.y - t.h + 10; } 
+            else if (t.distTo(this.sink) < 100) {
+                if (t.totalLiquid > 0) {
+                    t.reset(); if(t.hasMagnet) { t.hasMagnet = false; this.magnet.inFlask = false; this.magnet.x = this.sink.x + 80; this.magnet.y = this.sink.y - 30; }
+                    UI.toast("Kolben tømt.", "success"); this.warnedNoInd = false; this.warnedNoAcid = false; this.recordedMass = 0; this.overTitrated = false; UI.updateJournal(0, 0, null, 0);
+                }
+            }
+        }
+        if (t.name === 'burette') { if (t.cx >= this.sink.x + 150) { if (Math.abs(t.x - this.stirrer.x) < 150) { t.x = this.stirrer.x + (this.stirrer.w - t.w)/2; } } }
+        if (t.name.startsWith('bottle')) {
+            if (t.distTo(this.flask) < 150) this.pour(t, this.flask);
+            else if (t.name === 'bottle_base' && t.distTo(this.burette) < 150) {
+                if (!this.goggles.worn) { UI.scold('no_goggles'); } 
+                else {
+                    if (this.burette.distTo(this.sink) < 180) { if(this.burette.fill()) UI.toast("Burette fyldt med NaOH."); else UI.toast("Buretten er allerede fuld."); } 
+                    else UI.scold('not_over_sink');
+                }
+            } else if (t.distTo(this.sink) < 100) UI.scold('waste_in_sink'); 
+            else if (t.y > this.canvas.height - 150) UI.scold('spill');
+            t.x = t.baseX; t.y = t.baseY;
+        }
+        if (t.name === 'magnet' && t.distTo(this.flask) < 100) { t.inFlask = this.flask; this.flask.hasMagnet = true; UI.toast("Magnet i kolben."); }
+        this.dragTarget = null;
+    }
+
+    pour(bottle, flask) {
+        if (bottle.name === 'bottle_base') { if(!this.goggles.worn) { UI.scold('no_goggles'); return; } UI.scold('base_in_flask'); return; }
+        if (bottle.name === 'bottle_acid') {
+            if (bottle.distTo(this.burette) < 150) { UI.scold('vinegar_in_burette'); return; }
+            if (flask.hasVinegar) { UI.toast("Du har allerede tilsat eddike."); return; }
+            const amount = 2.0; flask.addLiquid('acid', amount); UI.toast(`Tilsat eddike.`);
+        } else if (bottle.name === 'bottle_ind') { flask.hasIndicator = true; UI.toast("Indikator tilsat."); }
+    }
+
+    loop() {
+        this.ctx.clearRect(0,0,this.canvas.width, this.canvas.height);
+        if (this.goggles.worn) { this.ctx.strokeStyle="rgba(39, 174, 96, 0.4)"; this.ctx.lineWidth=10; this.ctx.strokeRect(0,0,this.canvas.width,this.canvas.height); }
+
+        if (this.flask.distTo(this.scale) < 80) {
+            let total = 100 + (this.flask.hasMagnet?5:0) + this.flask.totalLiquid; this.scale.reading = total;
+            if(this.flask.hasVinegar) this.recordedMass = 2.00;
+            UI.updateJournal(this.recordedMass > 0 ? this.recordedMass : 0, null, null, null);
+        } else {
+            this.scale.reading = 0; if (this.recordedMass > 0) document.getElementById('disp-mass').innerText = toDK(this.recordedMass) + " g";
+        }
+
+        const onStirrer = this.flask.distTo(this.stirrer) < 80;
+        if (onStirrer && this.stirrer.active && this.flask.hasMagnet) { this.flask.magnetRot += 0.5; }
+
+        if (this.burette.flowRate > 0) {
+            if (this.burette.currentVol > 0) {
+                const flow = (this.burette.flowRate/100)*0.1;
+                this.burette.currentVol -= flow; this.burette.dropY = (this.burette.dropY + flow*100) % 20;
+                
+                // HITBOX: Wider acceptance (60px)
+                const bTipX = this.burette.x + 20;
+                if (Math.abs(bTipX - this.flask.cx) < 60 && this.flask.y > this.burette.y + 280) {
+                     this.flask.addLiquid('base', flow);
+                     if (!this.flask.hasVinegar && !this.warnedNoAcid) { UI.scold('no_acid'); this.warnedNoAcid = true; }
+                     if (this.flask.baseInFlask > 10 && !this.flask.hasIndicator && !this.warnedNoInd) { UI.scold('no_indicator'); this.warnedNoInd = true; }
+                     
+                     // JUICE SARCASM (Base > 22 mL)
+                     if (this.flask.baseInFlask > 22 && !this.overTitrated && this.flask.hasIndicator) {
+                         UI.scold('juice');
+                         this.overTitrated = true;
+                     }
+
+                } else { if (this.burette.distTo(this.sink) > 120 && Math.random() < 0.02) UI.scold('spill'); }
+            } else if(Math.random() < 0.01) UI.scold('burette_empty');
+        }
+
+        if(this.burette.currentVol < 50) { 
+            const used = 50 - this.burette.currentVol; 
+            UI.updateJournal(null, "0,00 mL", toDK(used) + " mL", used); 
+        } 
+        else UI.updateJournal(null, "--", "--", 0);
+
+        this.entities.forEach(e => { if(!['flask','burette','bottle_acid','bottle_base','bottle_ind','magnet'].includes(e.name)) e.draw(this.ctx); });
+        this.magnet.draw(this.ctx); 
+        this.entities.forEach(e => { if(['flask','burette','bottle_acid','bottle_base','bottle_ind'].includes(e.name)) e.draw(this.ctx); });
+        requestAnimationFrame(() => this.loop());
+    }
+}
+window.onload = () => { const sim = new Engine(); };
+</script>
+</body>
+</html>

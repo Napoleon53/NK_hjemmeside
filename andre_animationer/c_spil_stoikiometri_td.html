@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stoikiometri Tower Defense</title>
+<style>
+  :root{
+    --bg-deep:#070c14;
+    --bg-panel:#101826;
+    --bg-panel-2:#161f30;
+    --border:#26364d;
+    --text:#e7edf5;
+    --text-dim:#93a3b8;
+    --accent:#4fd1c5;
+    --accent-2:#f6ad55;
+    --good:#48bb78;
+    --bad:#f56565;
+    --warn:#fbbf24;
+    --gold:#ffd166;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    padding:0;
+    height:100%;
+    overflow:hidden;
+    background:radial-gradient(circle at 50% -10%, #142236 0%, var(--bg-deep) 55%);
+    color:var(--text);
+    font-family:"Segoe UI", Verdana, Arial, sans-serif;
+  }
+  #app{
+    max-width:1300px;
+    height:100vh;
+    margin:0 auto;
+    padding:10px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  h1{
+    text-align:center;
+    font-size:1.15rem;
+    margin:0;
+    letter-spacing:0.5px;
+    background:linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+
+  /* ---------- TOP BAR ---------- */
+  #topBar{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:8px 16px;
+  }
+  #roundInfo{flex:1; min-width:260px;}
+  #roundName{font-weight:700; color:var(--text-dim); font-size:0.75rem; text-transform:uppercase; letter-spacing:0.5px;}
+  #equationDisplay{
+    font-size:2rem;
+    font-weight:800;
+    margin:1px 0;
+    letter-spacing:1px;
+    color:var(--accent);
+    text-shadow:0 0 18px rgba(79,209,197,0.35);
+  }
+  #ratioNote{
+    font-size:0.78rem;
+    color:var(--text-dim);
+  }
+  #molarMassNote{
+    display:inline-block;
+    margin-top:4px;
+    padding:3px 10px;
+    background:#1c2740;
+    border:1px solid var(--border);
+    border-radius:20px;
+    font-size:0.8rem;
+    color:var(--accent-2);
+  }
+  #statsBox{
+    display:flex;
+    gap:14px;
+    align-items:center;
+    font-size:1.05rem;
+    font-weight:700;
+  }
+  #goldDisplay{color:var(--gold);}
+  #livesDisplay{letter-spacing:2px;}
+  #helpBtn{
+    width:34px; height:34px;
+    border-radius:50%;
+    border:1px solid var(--border);
+    background:var(--bg-panel-2);
+    color:var(--text);
+    font-weight:700;
+    cursor:pointer;
+    font-size:1rem;
+    flex-shrink:0;
+  }
+  #helpBtn:hover{border-color:var(--accent);}
+
+  #progressWrap{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:5px 12px;
+    font-size:0.78rem;
+    color:var(--text-dim);
+    flex-shrink:0;
+  }
+  #progressBarOuter{
+    height:7px;
+    background:#1c2740;
+    border-radius:6px;
+    overflow:hidden;
+    margin-top:3px;
+  }
+  #progressBarInner{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    transition:width 0.25s ease;
+  }
+
+  /* ---------- MAIN LAYOUT (no page scroll; shop lives in the sidebar) ---------- */
+  #gameLayout{
+    flex:1;
+    min-height:0;
+    display:flex;
+    gap:12px;
+  }
+  #mainColumn{
+    flex:1;
+    min-width:0;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  #sidebar{
+    width:190px;
+    flex-shrink:0;
+    min-height:0;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  /* ---------- GAME FIELD ---------- */
+  #gameField{
+    position:relative;
+    flex:1;
+    min-height:120px;
+    background:
+      repeating-linear-gradient(0deg, rgba(79,209,197,0.04) 0px, rgba(79,209,197,0.04) 1px, transparent 1px, transparent 40px),
+      repeating-linear-gradient(90deg, rgba(79,209,197,0.04) 0px, rgba(79,209,197,0.04) 1px, transparent 1px, transparent 40px),
+      linear-gradient(180deg, #0b1220 0%, #0a0f1a 100%);
+    border:1px solid var(--border);
+    border-radius:14px;
+    overflow:hidden;
+    cursor:crosshair;
+  }
+  #gameField.slow::after{
+    content:"";
+    position:absolute; inset:0;
+    background:rgba(79,209,197,0.08);
+    pointer-events:none;
+  }
+
+  .monster{
+    position:absolute;
+    width:84px; height:84px;
+    top:-96px;
+    border-radius:50%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    color:#0a0f1a;
+    line-height:1.2;
+    user-select:none;
+    box-shadow:0 0 0 3px rgba(255,255,255,0.1), 0 0 18px rgba(0,0,0,0.4);
+    transition:transform 0.12s ease;
+  }
+  .monster:hover{transform:scale(1.08);}
+  .monster .m-formula{font-size:1.05rem; font-weight:800;}
+  .monster .m-value{font-size:0.72rem; font-weight:700; opacity:0.85; margin-top:1px;}
+  .monster .m-scan{
+    font-size:0.6rem;
+    font-weight:700;
+    margin-top:1px;
+  }
+  .monster.hit{
+    transform:scale(1.5);
+    opacity:0;
+  }
+  .monster.miss{
+    animation:shake 0.3s ease;
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-6px);}
+    75%{transform:translateX(6px);}
+  }
+
+  /* Boss-monster: stort, stillestående, tydeligt anderledes */
+  .monster.boss-monster{
+    width:150px; height:150px;
+    box-shadow:0 0 0 4px rgba(239,68,68,0.55), 0 0 32px rgba(239,68,68,0.55);
+    animation:bossPulse 2.2s ease-in-out infinite;
+  }
+  @keyframes bossPulse{
+    0%,100%{box-shadow:0 0 0 4px rgba(239,68,68,0.55), 0 0 32px rgba(239,68,68,0.55);}
+    50%{box-shadow:0 0 0 6px rgba(239,68,68,0.8), 0 0 46px rgba(239,68,68,0.8);}
+  }
+  .monster.boss-monster .m-boss-label{font-size:0.85rem; font-weight:800; letter-spacing:0.5px;}
+  .monster.boss-monster .m-formula{font-size:1.5rem;}
+  .monster.boss-monster .m-value{font-size:0.95rem;}
+  .monster.boss-monster .m-boss-hp{font-size:0.85rem; letter-spacing:3px; margin-top:3px;}
+  .monster.boss-flash{
+    animation:bossFlash 0.35s ease;
+  }
+  @keyframes bossFlash{
+    0%{filter:brightness(1);}
+    40%{filter:brightness(1.8);}
+    100%{filter:brightness(1);}
+  }
+
+  .floatText{
+    position:absolute;
+    font-weight:800;
+    font-size:0.85rem;
+    white-space:nowrap;
+    pointer-events:none;
+    animation:floatUp 1.1s ease-out forwards;
+    transform:translate(-50%,0);
+  }
+  @keyframes floatUp{
+    0%{opacity:1; transform:translate(-50%,0);}
+    100%{opacity:0; transform:translate(-50%,-55px);}
+  }
+
+  /* Kanon-design inspireret af c_spil_beregningsdefense.html: en tydelig,
+     "rigtig" kanon (tykt løb + bred kuppel-sokkel) med et indbygget
+     rundt "ladnings-vindue" i stedet for et svævende badge. Løbet
+     roterer efter musen ligesom i forbilledet, og selve skydningen
+     sker ved klik i banen (håndteres i JS, se fireCannon()). */
+  #cannon{
+    position:absolute;
+    bottom:6px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    pointer-events:none;
+    z-index:2;
+  }
+  .cannon-barrel{
+    width:26px;
+    height:46px;
+    background:linear-gradient(180deg,#7dd3fc,#0e7490);
+    border-radius:7px 7px 2px 2px;
+    position:relative;
+    box-shadow:0 0 14px rgba(79,209,197,0.4);
+    transform-origin:50% 100%;
+    transform:rotate(0deg);
+  }
+  .cannon-barrel-tip{
+    position:absolute;
+    top:0;
+    left:50%;
+    transform:translateX(-50%);
+    width:18px;
+    height:9px;
+    background:#e0f7fa;
+    border-radius:4px 4px 0 0;
+  }
+  .cannon-dome{
+    position:relative;
+    width:150px;
+    height:62px;
+    margin-top:-4px;
+    background:linear-gradient(180deg,#334155,#1a2332);
+    border:2px solid #475569;
+    border-top:none;
+    border-radius:150px 150px 0 0;
+    box-shadow:0 6px 14px rgba(0,0,0,0.45);
+  }
+  .cannon-readout{
+    position:absolute;
+    top:-27px;
+    left:50%;
+    transform:translateX(-50%);
+    width:68px;
+    height:68px;
+    border-radius:50%;
+    background:rgba(8,13,22,0.92);
+    border:2px solid var(--accent);
+    box-shadow:inset 0 0 12px rgba(0,0,0,0.65), 0 0 16px rgba(79,209,197,0.4);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:1px;
+  }
+  .cannon-readout-label{
+    font-size:0.5rem;
+    font-weight:800;
+    letter-spacing:0.6px;
+    text-transform:uppercase;
+    color:var(--accent);
+    opacity:0.85;
+  }
+  #cannonReadout{
+    font-size:0.72rem;
+    font-weight:800;
+    color:#fff;
+    white-space:nowrap;
+    line-height:1.15;
+    text-align:center;
+  }
+  .projectile{
+    position:absolute;
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 10px rgba(79,209,197,0.8);
+    transform:translate(-50%,-50%);
+    pointer-events:none;
+    z-index:3;
+  }
+
+  /* Guldbonus: en ekstra indtægtsmulighed der falder gennem banen */
+  .gold-bonus{
+    position:absolute;
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:1.4rem;
+    background:radial-gradient(circle at 35% 30%, #fff6d8, var(--gold) 65%, #b8860b 100%);
+    box-shadow:0 0 0 3px rgba(255,209,102,0.35), 0 0 18px rgba(255,209,102,0.6);
+    animation:bonusSpin 1.6s ease-in-out infinite;
+    pointer-events:none;
+    user-select:none;
+  }
+  @keyframes bonusSpin{
+    0%,100%{transform:scale(1) rotate(-6deg);}
+    50%{transform:scale(1.1) rotate(6deg);}
+  }
+  .gold-bonus.collected{
+    transform:scale(1.6);
+    opacity:0;
+    transition:transform 0.25s ease, opacity 0.25s ease;
+  }
+
+  /* ---------- CONTROL PANEL ---------- */
+  #controlPanel{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:10px;
+    flex-shrink:0;
+  }
+  #loadedDisplay{
+    min-width:150px;
+    text-align:center;
+    font-size:1.3rem;
+    font-weight:800;
+    color:var(--accent);
+    background:var(--bg-panel-2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:8px 12px;
+  }
+  #loadedDisplay span{color:var(--accent-2); font-size:0.95rem; display:block; font-weight:800;}
+  .loadBtn{
+    min-width:52px;
+    padding:8px 8px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:var(--bg-panel-2);
+    color:var(--text);
+    font-weight:700;
+    cursor:pointer;
+    font-size:0.9rem;
+  }
+  .loadBtn:hover{border-color:var(--accent); color:var(--accent);}
+  .loadBtn.reset{color:var(--bad); border-color:#5b2b34;}
+
+  /* ---------- SHOP (sidebar) ---------- */
+  .shopCard{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:9px 11px;
+    flex-shrink:0;
+    transition:opacity 0.2s ease;
+  }
+  .shopCard h4{margin:0; font-size:0.85rem; display:flex; align-items:center; gap:6px;}
+  .shopMicro{margin:2px 0 6px; font-size:0.7rem; color:var(--text-dim);}
+  .shopBtn{
+    width:100%;
+    padding:7px;
+    border-radius:8px;
+    border:1px solid var(--accent);
+    background:transparent;
+    color:var(--accent);
+    font-weight:700;
+    font-size:0.82rem;
+    cursor:pointer;
+  }
+  .shopBtn:disabled{
+    border-color:var(--border);
+    color:var(--text-dim);
+    cursor:not-allowed;
+  }
+  .shopCard.locked{opacity:0.45;}
+
+  /* ---------- OVERLAYS ---------- */
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(4,7,12,0.86);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:50;
+    padding:20px;
+  }
+  .overlay.hidden{display:none;}
+  .overlayCard{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:28px 26px;
+    max-width:480px;
+    width:100%;
+    text-align:center;
+  }
+  .overlayCard h2{margin-top:0; color:var(--accent);}
+  .overlayCard p{color:var(--text-dim); line-height:1.55; font-size:0.9rem;}
+  .overlayCard .bigStat{font-size:1.6rem; font-weight:800; color:var(--gold); margin:10px 0;}
+  .introEquation{
+    font-size:2.4rem;
+    font-weight:800;
+    color:var(--accent);
+    letter-spacing:1px;
+    margin:14px 0 8px;
+    text-shadow:0 0 22px rgba(79,209,197,0.4);
+  }
+  .helpCard{max-width:520px; text-align:left;}
+  .helpCard ul{margin:8px 0; padding-left:20px; font-size:0.85rem; line-height:1.55; color:var(--text);}
+  .primaryBtn{
+    margin-top:12px;
+    padding:12px 22px;
+    border-radius:10px;
+    border:none;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    color:#0a0f1a;
+    font-weight:800;
+    font-size:1rem;
+    cursor:pointer;
+  }
+  .primaryBtn:hover{filter:brightness(1.08);}
+</style>
+</head>
+<body>
+<div id="app">
+  <h1>🧪 Stoikiometri Tower Defense</h1>
+
+  <div id="topBar">
+    <div id="roundInfo">
+      <div id="roundName">Runde 1</div>
+      <div id="equationDisplay">–</div>
+      <div id="ratioNote">–</div>
+      <div id="molarMassNote" style="display:none;"></div>
+    </div>
+    <div id="statsBox">
+      <div id="goldDisplay">💰 0</div>
+      <div id="livesDisplay">❤❤❤</div>
+      <button id="helpBtn" title="Regler">?</button>
+    </div>
+  </div>
+
+  <div id="progressWrap">
+    <span id="progressLabel">Nedskudt: 0 / 0</span>
+    <div id="progressBarOuter"><div id="progressBarInner"></div></div>
+  </div>
+
+  <div id="gameLayout">
+    <div id="mainColumn">
+      <div id="gameField">
+        <div id="cannon">
+          <div class="cannon-barrel" id="cannonBarrel"><div class="cannon-barrel-tip"></div></div>
+          <div class="cannon-dome" id="cannonDome">
+            <div class="cannon-readout">
+              <div class="cannon-readout-label">Ladning</div>
+              <div id="cannonReadout">0 mol</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="controlPanel">
+        <button class="loadBtn" data-delta="-5">−5</button>
+        <button class="loadBtn" data-delta="-1">−1</button>
+        <button class="loadBtn" data-delta="-0.5">−0,5</button>
+        <div id="loadedDisplay">0 mol<span id="cannonLabel">–</span></div>
+        <button class="loadBtn" data-delta="0.5">+0,5</button>
+        <button class="loadBtn" data-delta="1">+1</button>
+        <button class="loadBtn" data-delta="5">+5</button>
+        <button class="loadBtn reset" id="resetLoadBtn">Nulstil</button>
+      </div>
+    </div>
+
+    <div id="sidebar">
+      <div class="shopCard" id="cardKatalysator">
+        <h4>🐌 Katalysator</h4>
+        <div class="shopMicro">Sænker farten i 10s</div>
+        <button class="shopBtn" id="buyKatalysator">Køb (25 💰)</button>
+      </div>
+      <div class="shopCard" id="cardScanner">
+        <h4>🔍 Scanner</h4>
+        <div class="shopMicro">Viser mol i 8s</div>
+        <button class="shopBtn" id="buyScanner">Køb (20 💰)</button>
+      </div>
+      <div class="shopCard" id="cardOprydning">
+        <h4>🧹 Oprydning</h4>
+        <div class="shopMicro">Fjerner alle monstre</div>
+        <button class="shopBtn" id="buyOprydning">Køb (30 💰)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- START OVERLAY -->
+<div class="overlay" id="startOverlay">
+  <div class="overlayCard">
+    <h2>Stoikiometri Tower Defense</h2>
+    <p>Forsvar kanonen ved at reagere den rigtige mængde med de indkommende molekyler. Læs ligningen, beregn mængdeforholdet, og skyd med den korrekte mol-ladning.</p>
+    <p>Fem runder venter, og til sidst en rigtig boss!</p>
+    <button class="primaryBtn" id="startBtn">Start spillet</button>
+  </div>
+</div>
+
+<!-- ROUND INTRO OVERLAY: viser reaktionsskemaet, inden runden starter -->
+<div class="overlay hidden" id="roundIntroOverlay">
+  <div class="overlayCard">
+    <h2 id="introRoundName">Runde 1</h2>
+    <div class="introEquation" id="introEquation">–</div>
+    <p id="introRatioNote">–</p>
+    <div id="introMolarNote" style="display:none;"></div>
+    <button class="primaryBtn" id="roundIntroBtn">Start runde</button>
+  </div>
+</div>
+
+<!-- EMPTY-SHOT HINT: vises kun første gang man skyder uden at have ladet kanonen -->
+<div class="overlay hidden" id="emptyShotHintOverlay">
+  <div class="overlayCard">
+    <h2>Husk at lade kanonen!</h2>
+    <p>Du skød uden ladning. Indstil hvor mange mol du vil skyde med knapperne under spillefeltet, og klik derefter i banen for at skyde i den retning.</p>
+    <button class="primaryBtn" id="closeEmptyShotHintBtn">Forstået</button>
+  </div>
+</div>
+
+<!-- HELP OVERLAY -->
+<div class="overlay hidden" id="helpOverlay">
+  <div class="overlayCard helpCard">
+    <h2>Sådan spiller du</h2>
+    <ul>
+      <li>Reaktionsligningen vises øverst og ved starten af hver runde. Kanonen skyder <b>din</b> reaktant, monstrene bærer <b>den anden</b>.</li>
+      <li>Indstil ladningen i <b>mol</b> med knapperne under spillefeltet. Kanonen sigter efter musen – klik et sted på banen for at skyde i den retning.</li>
+      <li>For lidt → monsteret overlever, og du mister lidt guld for det forkerte skud. Præcis rigtigt → +guld. For meget → dræbt, men du mister guld på grund af spild.</li>
+      <li>Når et monster når bunden uskudt, mister du et liv. Tre tabte liv afslutter spillet.</li>
+      <li>Hvert skud koster guld – men et skud uden ladning (0 mol) er gratis. Hold øje med den blinkende 💰-guldbonus, der falder ned imellem – skyd den for ekstra guld.</li>
+      <li>Efter runde 5 venter en boss, der kræver flere korrekte skud i træk.</li>
+    </ul>
+    <button class="primaryBtn" id="closeHelpBtn">Luk</button>
+  </div>
+</div>
+
+<!-- ROUND CLEAR OVERLAY -->
+<div class="overlay hidden" id="roundClearOverlay">
+  <div class="overlayCard">
+    <h2 id="roundClearTitle">Runde klaret!</h2>
+    <p id="roundClearText">Godt arbejde.</p>
+    <div class="bigStat" id="roundClearGold">💰 0</div>
+    <button class="primaryBtn" id="nextRoundBtn">Fortsæt</button>
+  </div>
+</div>
+
+<!-- GAME OVER OVERLAY -->
+<div class="overlay hidden" id="gameOverOverlay">
+  <div class="overlayCard">
+    <h2 style="color:var(--bad);">Game Over</h2>
+    <p>For mange monstre nåede bunden. Prøv igen og styr mængdeberegningerne bedre denne gang!</p>
+    <div class="bigStat" id="gameOverGold">💰 0</div>
+    <button class="primaryBtn" id="restartBtn">Prøv igen</button>
+  </div>
+</div>
+
+<!-- VICTORY OVERLAY -->
+<div class="overlay hidden" id="victoryOverlay">
+  <div class="overlayCard">
+    <h2 style="color:var(--good);">Alle runder gennemført! 🎉</h2>
+    <p>Du har besejret bossen og mestret mængdeforhold, koefficienter og molarmasse-omregning.</p>
+    <div class="bigStat" id="victoryGold">💰 0</div>
+    <button class="primaryBtn" id="playAgainBtn">Spil igen</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* =========================================================
+     RUNDE-KONFIGURATION
+     Tilføj flere runder ved blot at udvide dette array.
+     coeffCannon / coeffMonster = koefficienterne foran hhv.
+     kanonens stof og monsterets stof i den balancerede ligning.
+     valueType 'mol' viser mol direkte på monsteret,
+     'gram' viser gram og kræver molarMass til omregning.
+     monstersToWin er samtidig det samlede antal monstre,
+     der overhovedet spawnes i runden (loftet på 4).
+     firstValue (valgfri) tvinger værdien på det allerførste
+     monster i runden – bruges til en let åbningsopgave.
+     isBoss (valgfri) gør runden til et boss-møde: ét stort,
+     stillestående monster der skal rammes korrekt monstersToWin
+     gange i træk (værdien "genoprulles" mellem hvert korrekte skud)
+     i stedet for monstersToWin separate faldende monstre.
+  ========================================================= */
+  const ROUNDS = [
+    {
+      name: "Runde 1 · Syre-base",
+      equation: "H⁺ + OH⁻ → H₂O",
+      ratioNote: "Forholdet er 1:1 – lad kanonen med lige så mange mol H⁺ som monsteret har mol OH⁻.",
+      cannonFormula: "H⁺",
+      monsterFormula: "OH⁻",
+      valueType: "mol",
+      molarMass: null,
+      coeffCannon: 1,
+      coeffMonster: 1,
+      values: [1, 1.5, 2, 2.5, 3, 3.5, 4],
+      monstersToWin: 2,
+      spawnIntervalMs: 5000,
+      fallSpeed: 10,
+      finalSpeedMultiplier: 1,
+      monsterColor: "#4fd1c5"
+    },
+    {
+      name: "Runde 2 · Ammoniaksyntese",
+      equation: "N₂ + 3 H₂ → 2 NH₃",
+      ratioNote: "Koefficienterne viser forholdet 3:1 – der skal 3 mol H₂ for hver 1 mol N₂. Gang monsterets tal med 3.",
+      cannonFormula: "H₂",
+      monsterFormula: "N₂",
+      valueType: "mol",
+      molarMass: null,
+      coeffCannon: 3,
+      coeffMonster: 1,
+      values: [1, 1.5, 2, 2.5, 3],
+      monstersToWin: 4,
+      spawnIntervalMs: 4500,
+      fallSpeed: 12,
+      finalSpeedMultiplier: 2,
+      monsterColor: "#f6ad55"
+    },
+    {
+      name: "Runde 3 · Forbrænding",
+      equation: "C + O₂ → CO₂",
+      ratioNote: "Molarmassen for C er 12 g/mol. Omregn gram til mol (del med 12), og skyd samme antal mol O₂ (forhold 1:1).",
+      cannonFormula: "O₂",
+      monsterFormula: "C",
+      valueType: "gram",
+      molarMass: 12,
+      coeffCannon: 1,
+      coeffMonster: 1,
+      firstValue: 12,
+      values: [12, 24, 36, 48],
+      monstersToWin: 4,
+      spawnIntervalMs: 4000,
+      fallSpeed: 14,
+      finalSpeedMultiplier: 2,
+      monsterColor: "#fc8181"
+    },
+    {
+      name: "Runde 4 · Magnesium-forbrænding",
+      equation: "2 Mg + O₂ → 2 MgO",
+      ratioNote: "Molarmassen for Mg er 24 g/mol. Omregn gram til mol, og del med 2 for at finde mol O₂ (forhold 1:2).",
+      cannonFormula: "O₂",
+      monsterFormula: "Mg",
+      valueType: "gram",
+      molarMass: 24,
+      coeffCannon: 1,
+      coeffMonster: 2,
+      firstValue: 24,
+      values: [24, 48, 72, 96],
+      monstersToWin: 4,
+      spawnIntervalMs: 3800,
+      fallSpeed: 16,
+      finalSpeedMultiplier: 2,
+      monsterColor: "#c084fc"
+    },
+    {
+      name: "Runde 5 · Propan-forbrænding",
+      equation: "C₃H₈ + 5 O₂ → 3 CO₂ + 4 H₂O",
+      ratioNote: "Molarmassen for C₃H₈ er 44 g/mol. Omregn gram til mol, og gang med 5 for at finde mol O₂ (forhold 5:1).",
+      cannonFormula: "O₂",
+      monsterFormula: "C₃H₈",
+      valueType: "gram",
+      molarMass: 44,
+      coeffCannon: 5,
+      coeffMonster: 1,
+      firstValue: 44,
+      values: [44, 88, 132, 176],
+      monstersToWin: 4,
+      spawnIntervalMs: 3600,
+      fallSpeed: 18,
+      finalSpeedMultiplier: 2,
+      monsterColor: "#facc15"
+    },
+    {
+      name: "🔥 BOSS · Thermit-Kolossen",
+      equation: "2 Al + Fe₂O₃ → Al₂O₃ + 2 Fe",
+      ratioNote: "Bossen kræver 3 korrekte skud i træk! Molarmassen for Fe₂O₃ er 160 g/mol. Omregn gram til mol, og gang med 2 for at finde mol Al (forhold 2:1). Værdien ændrer sig efter hvert ramt skud.",
+      cannonFormula: "Al",
+      monsterFormula: "Fe₂O₃",
+      valueType: "gram",
+      molarMass: 160,
+      coeffCannon: 2,
+      coeffMonster: 1,
+      values: [160, 240, 320, 400],
+      monstersToWin: 3,
+      spawnIntervalMs: 999999,
+      fallSpeed: 0,
+      finalSpeedMultiplier: 1,
+      isBoss: true,
+      monsterColor: "#ef4444"
+    }
+  ];
+
+  const REWARD_EXACT = 12;
+  const PENALTY_OVERSHOOT = 6;
+  const PENALTY_UNDERSHOOT = 3;
+  const FIRE_COST = 5;
+  const PROJECTILE_SPEED = 700; // px/sekund
+  const PROJECTILE_RADIUS = 7;
+  const CANNON_BARREL_LENGTH = 46; // skal matche .cannon-barrel's height i CSS
+  const MAX_CONCURRENT_MONSTERS = 2;
+  const FIELD_MONSTER_SIZE = 84;
+  const BOSS_MONSTER_SIZE = 150;
+  const KATALYSATOR_COST = 25;
+  const KATALYSATOR_DURATION = 10000;
+  const SCANNER_COST = 20;
+  const SCANNER_DURATION = 8000;
+  const OPRYDNING_COST = 30;
+
+  /* Guldbonus: dukker jævnligt op i banen som en ekstra indtægtskilde,
+     så guld føles knapt uden at hvert skud skal koste ekstra meget. */
+  const GOLD_BONUS_VALUE = 20;
+  const GOLD_BONUS_SIZE = 46;
+  const GOLD_BONUS_FALL_SPEED = 34; // px/sekund
+  const GOLD_BONUS_MIN_INTERVAL = 6000; // ms
+  const GOLD_BONUS_MAX_INTERVAL = 11000; // ms
+
+  /* Powerups låses op ét ad gangen, efterhånden som runderne skrider frem
+     (roundIndex er 0-baseret: 0 = Runde 1 (intro), 1 = Runde 2, 2 = Runde 3).
+     Katalysator er bevidst låst i introrunden. */
+  const SHOP_LOCKS = [
+    { cardId: "cardKatalysator", btnId: "buyKatalysator", unlockRound: 1, cost: KATALYSATOR_COST, activeFlag: "katalysatorActive" },
+    { cardId: "cardScanner", btnId: "buyScanner", unlockRound: 1, cost: SCANNER_COST, activeFlag: "scannerActive" },
+    { cardId: "cardOprydning", btnId: "buyOprydning", unlockRound: 2, cost: OPRYDNING_COST, activeFlag: null }
+  ];
+
+  /* ---------------- STATE ---------------- */
+  const state = {
+    roundIndex: 0,
+    gold: 50,
+    lives: 3,
+    kills: 0,
+    loaded: 0,
+    monsters: [],
+    projectiles: [],
+    goldBonuses: [],
+    goldBonusTimer: 0,
+    nextGoldBonusDelay: 0,
+    cannonAngle: -Math.PI / 2,
+    isPaused: true,
+    gameActive: false,
+    spawnTimer: 0,
+    spawnedCount: 0,
+    lastTs: null,
+    slowUntil: 0,
+    scannerUntil: 0,
+    katalysatorActive: false,
+    scannerActive: false,
+    emptyShotHintShown: false
+  };
+
+  /* ---------------- DOM REFS ---------------- */
+  const $ = (id) => document.getElementById(id);
+  const roundNameEl = $("roundName");
+  const equationDisplayEl = $("equationDisplay");
+  const ratioNoteEl = $("ratioNote");
+  const molarMassNoteEl = $("molarMassNote");
+  const goldDisplayEl = $("goldDisplay");
+  const livesDisplayEl = $("livesDisplay");
+  const progressLabelEl = $("progressLabel");
+  const progressBarInnerEl = $("progressBarInner");
+  const gameFieldEl = $("gameField");
+  const loadedDisplayEl = $("loadedDisplay");
+  const cannonLabelEl = $("cannonLabel");
+  const cannonReadoutEl = $("cannonReadout");
+  const cannonBarrelEl = $("cannonBarrel");
+  const cannonDomeEl = $("cannonDome");
+  const helpBtn = $("helpBtn");
+  const helpOverlay = $("helpOverlay");
+  const closeHelpBtn = $("closeHelpBtn");
+  const buyKatalysatorBtn = $("buyKatalysator");
+  const buyScannerBtn = $("buyScanner");
+  const buyOprydningBtn = $("buyOprydning");
+  const startOverlay = $("startOverlay");
+  const startBtn = $("startBtn");
+  const roundIntroOverlay = $("roundIntroOverlay");
+  const introRoundNameEl = $("introRoundName");
+  const introEquationEl = $("introEquation");
+  const introRatioNoteEl = $("introRatioNote");
+  const introMolarNoteEl = $("introMolarNote");
+  const roundIntroBtn = $("roundIntroBtn");
+  const emptyShotHintOverlay = $("emptyShotHintOverlay");
+  const closeEmptyShotHintBtn = $("closeEmptyShotHintBtn");
+  const roundClearOverlay = $("roundClearOverlay");
+  const roundClearTitle = $("roundClearTitle");
+  const roundClearText = $("roundClearText");
+  const roundClearGold = $("roundClearGold");
+  const nextRoundBtn = $("nextRoundBtn");
+  const gameOverOverlay = $("gameOverOverlay");
+  const gameOverGold = $("gameOverGold");
+  const restartBtn = $("restartBtn");
+  const victoryOverlay = $("victoryOverlay");
+  const victoryGold = $("victoryGold");
+  const playAgainBtn = $("playAgainBtn");
+
+  /* ---------------- HELPERS ---------------- */
+  function formatNumber(n){
+    const rounded = Math.round(n * 100) / 100;
+    return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1).replace(".", ",");
+  }
+
+  function currentRound(){
+    return ROUNDS[state.roundIndex];
+  }
+
+  function requiredMol(round, value){
+    const baseMol = round.valueType === "gram" ? value / round.molarMass : value;
+    return (round.coeffCannon / round.coeffMonster) * baseMol;
+  }
+
+  function clampLoaded(v){
+    return Math.max(0, Math.min(50, Math.round(v * 2) / 2));
+  }
+
+  /* ---------------- HUD ---------------- */
+  function updateHUD(){
+    goldDisplayEl.textContent = "💰 " + state.gold;
+    livesDisplayEl.textContent = "❤".repeat(state.lives) + "🖤".repeat(3 - state.lives);
+    const round = currentRound();
+    progressLabelEl.textContent = (round.isBoss ? "Boss ramt: " : "Nedskudt: ") + state.kills + " / " + round.monstersToWin;
+    progressBarInnerEl.style.width = Math.min(100, (state.kills / round.monstersToWin) * 100) + "%";
+    loadedDisplayEl.innerHTML = formatNumber(state.loaded) + " mol<span>" + round.cannonFormula + "</span>";
+    cannonLabelEl.textContent = round.cannonFormula;
+    cannonReadoutEl.textContent = formatNumber(state.loaded) + " mol " + round.cannonFormula;
+  }
+
+  function updateRoundHeader(){
+    const round = currentRound();
+    roundNameEl.textContent = round.name;
+    equationDisplayEl.textContent = round.equation;
+    ratioNoteEl.textContent = round.ratioNote;
+    if(round.valueType === "gram"){
+      molarMassNoteEl.style.display = "inline-block";
+      molarMassNoteEl.textContent = "Molarmasse " + round.monsterFormula + " = " + round.molarMass + " g/mol";
+    } else {
+      molarMassNoteEl.style.display = "none";
+    }
+  }
+
+  /* ---------------- ROUND INTRO (reaktionsskemaet vises inden runden går i gang) ---------------- */
+  function showRoundIntro(){
+    const round = currentRound();
+    introRoundNameEl.textContent = round.name;
+    introEquationEl.textContent = round.equation;
+    introRatioNoteEl.textContent = round.ratioNote;
+    if(round.valueType === "gram"){
+      introMolarNoteEl.style.display = "inline-block";
+      introMolarNoteEl.textContent = "Molarmasse " + round.monsterFormula + " = " + round.molarMass + " g/mol";
+    } else {
+      introMolarNoteEl.style.display = "none";
+    }
+    roundIntroOverlay.classList.remove("hidden");
+  }
+
+  function beginRound(){
+    roundIntroOverlay.classList.add("hidden");
+    state.spawnTimer = 0;
+    state.isPaused = false;
+    spawnMonster(); // det første monster skal ikke vente på spawn-intervallet
+  }
+
+  /* ---------------- FLOATING TEXT ---------------- */
+  function showFloatingText(xPx, yPx, text, color){
+    const el = document.createElement("div");
+    el.className = "floatText";
+    el.textContent = text;
+    el.style.left = xPx + "px";
+    el.style.top = yPx + "px";
+    el.style.color = color;
+    gameFieldEl.appendChild(el);
+    el.addEventListener("animationend", () => el.remove());
+  }
+
+  /* ---------------- MONSTERS ---------------- */
+  function renderMonsterInner(m){
+    const round = currentRound();
+    let html = "<div class=\"m-formula\">" + round.monsterFormula + "</div>";
+    html += "<div class=\"m-value\">" + formatNumber(m.value) + (round.valueType === "gram" ? " g" : " mol") + "</div>";
+    if(round.valueType === "gram" && state.scannerActive){
+      html += "<div class=\"m-scan\">≈ " + formatNumber(m.required) + " mol</div>";
+    }
+    if(m.isBoss){
+      const hitsLeft = round.monstersToWin - state.kills;
+      html = "<div class=\"m-boss-label\">👹 BOSS</div>" + html;
+      html += "<div class=\"m-boss-hp\">" + "●".repeat(Math.max(0, hitsLeft)) + "○".repeat(Math.max(0, round.monstersToWin - hitsLeft)) + "</div>";
+    }
+    return html;
+  }
+
+  function refreshMonsterLabels(){
+    state.monsters.forEach((m) => {
+      m.el.innerHTML = renderMonsterInner(m);
+    });
+  }
+
+  function spawnMonster(){
+    const round = currentRound();
+
+    // Spawn-rækkefølgen (0-baseret) styrer både evt. tvungen startværdi
+    // og farten: kun det sidste monster i runden falder hurtigere
+    // (finalSpeedMultiplier), resten holder rundens grundfart.
+    const spawnIndex = state.spawnedCount;
+    state.spawnedCount++;
+
+    const value = (spawnIndex === 0 && round.firstValue !== undefined)
+      ? round.firstValue
+      : round.values[Math.floor(Math.random() * round.values.length)];
+    const required = requiredMol(round, value);
+    const isFinalMonster = spawnIndex === round.monstersToWin - 1;
+    const speedMultiplier = isFinalMonster ? (round.finalSpeedMultiplier || 1) : 1;
+    const fallSpeed = round.isBoss ? 0 : round.fallSpeed * speedMultiplier;
+    const size = round.isBoss ? BOSS_MONSTER_SIZE : FIELD_MONSTER_SIZE;
+
+    const el = document.createElement("div");
+    el.className = round.isBoss ? "monster boss-monster" : "monster";
+    el.style.background = round.monsterColor;
+
+    // Bossen spawner én gang, centreret og stillestående; almindelige
+    // monstre spawner tilfældigt vandret, lige uden for feltet foroven.
+    const leftPct = round.isBoss ? 50 : (8 + Math.random() * 78);
+    const topPx = round.isBoss ? Math.max(20, gameFieldEl.clientHeight * 0.22) : -96;
+    el.style.left = "calc(" + leftPct + "% - " + (size / 2) + "px)";
+    el.style.top = topPx + "px";
+
+    const monster = { el, value, required, top: topPx, fallSpeed, radius: size / 2, isBoss: !!round.isBoss, valueType: round.valueType, dead: false };
+    monster.el.innerHTML = renderMonsterInner(monster);
+    // Monstrene har ikke længere deres eget klik-mål – kanonen skydes
+    // ved klik i banen og rammer via projektilets kollisionstjek (se fireCannon()).
+
+    gameFieldEl.appendChild(el);
+    state.monsters.push(monster);
+  }
+
+  function removeMonster(monster, cssClass){
+    monster.dead = true;
+    state.monsters = state.monsters.filter((m) => m !== monster);
+    if(cssClass) monster.el.classList.add(cssClass);
+    setTimeout(() => monster.el.remove(), 350);
+  }
+
+  /* ---------------- HIT RESOLUTION / STOICHIOMETRY CHECK ----------------
+     Kaldes når et projektil rammer et monster (se fireCannon() og
+     projektil-opdateringen i gameLoop). Selve affyrings-prisen (FIRE_COST)
+     er allerede trukket når projektilet blev skudt af sted. */
+  function resolveHit(monster){
+    if(state.isPaused || monster.dead) return;
+    const round = currentRound();
+    const eps = 0.001;
+    const loaded = state.loaded;
+    const req = monster.required;
+    const xPx = monster.el.offsetLeft + monster.radius;
+    const yPx = monster.el.offsetTop;
+
+    if(loaded < req - eps){
+      state.gold = Math.max(0, state.gold - PENALTY_UNDERSHOOT);
+      monster.el.classList.add("miss");
+      setTimeout(() => monster.el.classList.remove("miss"), 300);
+      showFloatingText(xPx, yPx, "For lidt reaktant! −" + PENALTY_UNDERSHOOT + " 💰", "#fbbf24");
+      updateHUD();
+      return;
+    }
+
+    if(Math.abs(loaded - req) <= eps){
+      state.gold += REWARD_EXACT;
+      showFloatingText(xPx, yPx, "Perfekt! +" + REWARD_EXACT + " 💰", "#48bb78");
+    } else {
+      state.gold = Math.max(0, state.gold - PENALTY_OVERSHOOT);
+      showFloatingText(xPx, yPx, "Spild af reaktant! −" + PENALTY_OVERSHOOT + " 💰", "#f56565");
+    }
+
+    // Bossen dør ikke ved første korrekte skud – den skal rammes
+    // monstersToWin gange i træk, og genopruller sin værdi imellem hver gang.
+    if(monster.isBoss){
+      state.kills++;
+      const hitsLeft = round.monstersToWin - state.kills;
+      if(hitsLeft > 0){
+        rerollBossMonster(monster, round);
+        showFloatingText(xPx, yPx - 34, hitsLeft + " skud tilbage!", "#f59e0b");
+      } else {
+        removeMonster(monster, "hit");
+        showFloatingText(xPx, yPx - 34, "Bossen er besejret!", "#48bb78");
+      }
+      updateHUD();
+      checkRoundClear();
+      return;
+    }
+
+    removeMonster(monster, "hit");
+    state.kills++;
+    updateHUD();
+    checkRoundClear();
+  }
+
+  function rerollBossMonster(monster, round){
+    const value = round.values[Math.floor(Math.random() * round.values.length)];
+    monster.value = value;
+    monster.required = requiredMol(round, value);
+    monster.el.innerHTML = renderMonsterInner(monster);
+    monster.el.classList.add("boss-flash");
+    setTimeout(() => monster.el.classList.remove("boss-flash"), 350);
+  }
+
+  function loseLife(monster){
+    removeMonster(monster);
+    // Et undsluppet monster blev aldrig nedkæmpet, så det skal stadig
+    // erstattes af et nyt – ellers kan runden aldrig gøres færdig.
+    state.spawnedCount = Math.max(0, state.spawnedCount - 1);
+    state.lives--;
+    showFloatingText(monster.el.offsetLeft + monster.radius, gameFieldEl.clientHeight - 60, "Undveg! −1 liv", "#f56565");
+    updateHUD();
+    if(state.lives <= 0){
+      endGame();
+    }
+  }
+
+  /* ---------------- ROUND FLOW ---------------- */
+  function checkRoundClear(){
+    const round = currentRound();
+    if(state.kills >= round.monstersToWin){
+      state.isPaused = true;
+      state.monsters.forEach((m) => removeMonster(m, "hit"));
+      const isLast = state.roundIndex === ROUNDS.length - 1;
+      if(isLast){
+        victoryGold.textContent = "💰 " + state.gold;
+        victoryOverlay.classList.remove("hidden");
+      } else {
+        roundClearTitle.textContent = round.name + " klaret!";
+        roundClearText.textContent = "Klar til " + ROUNDS[state.roundIndex + 1].name + "?";
+        roundClearGold.textContent = "💰 " + state.gold;
+        roundClearOverlay.classList.remove("hidden");
+      }
+    }
+  }
+
+  function clearProjectiles(){
+    state.projectiles.forEach((p) => p.el.remove());
+    state.projectiles = [];
+  }
+
+  function resetCannonAim(){
+    state.cannonAngle = -Math.PI / 2;
+    cannonBarrelEl.style.transform = "rotate(0deg)";
+  }
+
+  function initRound(index){
+    state.roundIndex = index;
+    state.kills = 0;
+    state.loaded = 0;
+    state.spawnTimer = 0;
+    state.spawnedCount = 0;
+    state.monsters.forEach((m) => m.el.remove());
+    state.monsters = [];
+    clearProjectiles();
+    clearGoldBonuses();
+    state.goldBonusTimer = 0;
+    state.nextGoldBonusDelay = pickNextGoldBonusDelay();
+    resetCannonAim();
+    updateRoundHeader();
+    updateHUD();
+    updateShopLocks();
+    state.isPaused = true;
+    showRoundIntro();
+  }
+
+  function endGame(){
+    state.isPaused = true;
+    state.gameActive = false;
+    state.monsters.forEach((m) => m.el.remove());
+    state.monsters = [];
+    clearProjectiles();
+    clearGoldBonuses();
+    gameOverGold.textContent = "💰 " + state.gold;
+    gameOverOverlay.classList.remove("hidden");
+  }
+
+  function startGame(){
+    state.gold = 50;
+    state.lives = 3;
+    state.katalysatorActive = false;
+    state.scannerActive = false;
+    state.slowUntil = 0;
+    state.scannerUntil = 0;
+    state.emptyShotHintShown = false;
+    state.gameActive = true;
+    startOverlay.classList.add("hidden");
+    initRound(0);
+  }
+
+  /* Powerups låses op ét ad gangen, i takt med state.roundIndex.
+     Et allerede-låst-op powerup forbliver tilgængeligt i senere runder,
+     medmindre det er midt i sin egen aktive nedtælling. */
+  function updateShopLocks(){
+    SHOP_LOCKS.forEach((item) => {
+      const card = $(item.cardId);
+      const btn = $(item.btnId);
+      const unlocked = state.roundIndex >= item.unlockRound;
+      card.classList.toggle("locked", !unlocked);
+      if(!unlocked){
+        btn.disabled = true;
+        btn.textContent = "🔒 Runde " + (item.unlockRound + 1);
+      } else if(!item.activeFlag || !state[item.activeFlag]){
+        btn.disabled = false;
+        btn.textContent = "Køb (" + item.cost + " 💰)";
+      }
+    });
+  }
+
+  /* ---------------- SHOP ---------------- */
+  function buyKatalysator(){
+    if(state.katalysatorActive || state.gold < KATALYSATOR_COST || state.isPaused) return;
+    state.gold -= KATALYSATOR_COST;
+    state.katalysatorActive = true;
+    state.slowUntil = performance.now() + KATALYSATOR_DURATION;
+    gameFieldEl.classList.add("slow");
+    updateHUD();
+
+    let remaining = Math.ceil(KATALYSATOR_DURATION / 1000);
+    buyKatalysatorBtn.disabled = true;
+    buyKatalysatorBtn.textContent = "Aktiv: " + remaining + "s";
+    const tick = setInterval(() => {
+      remaining--;
+      if(remaining <= 0){
+        clearInterval(tick);
+        state.katalysatorActive = false;
+        gameFieldEl.classList.remove("slow");
+        buyKatalysatorBtn.disabled = false;
+        buyKatalysatorBtn.textContent = "Køb (" + KATALYSATOR_COST + " 💰)";
+      } else {
+        buyKatalysatorBtn.textContent = "Aktiv: " + remaining + "s";
+      }
+    }, 1000);
+  }
+
+  function buyScanner(){
+    if(state.scannerActive || state.gold < SCANNER_COST || state.isPaused) return;
+    state.gold -= SCANNER_COST;
+    state.scannerActive = true;
+    state.scannerUntil = performance.now() + SCANNER_DURATION;
+    refreshMonsterLabels();
+    updateHUD();
+
+    let remaining = Math.ceil(SCANNER_DURATION / 1000);
+    buyScannerBtn.disabled = true;
+    buyScannerBtn.textContent = "Aktiv: " + remaining + "s";
+    const tick = setInterval(() => {
+      remaining--;
+      if(remaining <= 0){
+        clearInterval(tick);
+        state.scannerActive = false;
+        refreshMonsterLabels();
+        buyScannerBtn.disabled = false;
+        buyScannerBtn.textContent = "Køb (" + SCANNER_COST + " 💰)";
+      } else {
+        buyScannerBtn.textContent = "Aktiv: " + remaining + "s";
+      }
+    }, 1000);
+  }
+
+  function buyOprydning(){
+    if(state.isPaused || state.gold < OPRYDNING_COST || state.monsters.length === 0) return;
+    state.gold -= OPRYDNING_COST;
+    const cleared = state.monsters.length;
+    const cx = gameFieldEl.clientWidth / 2;
+    const cy = gameFieldEl.clientHeight / 2;
+    state.monsters.slice().forEach((m) => removeMonster(m, "hit"));
+    // De ryddede monstre skal stadig nedkæmpes rigtigt senere,
+    // så de tælles fra i spawnedCount og kommer igen som nye monstre.
+    state.spawnedCount = Math.max(0, state.spawnedCount - cleared);
+    showFloatingText(cx, cy, "Skærmen ryddet!", "#4fd1c5");
+    updateHUD();
+  }
+
+  /* ---------------- KANON: SIGTE OG SKYD ----------------
+     Kanonen sigter kontinuerligt efter musen/fingeren (som i
+     c_spil_beregningsdefense.html) og affyrer et projektil i den
+     retning, når man klikker/trykker i banen. Vinklen klemmes så
+     løbet aldrig kan pege nedad.
+     Omdrejningspunktet beregnes ud fra kuplen (.cannon-dome), som
+     ALDRIG roterer – hvis man i stedet læste løbets egen (roterede)
+     getBoundingClientRect(), ville omdrejningspunktet vandre for hvert
+     skud, fordi den rapporterede boks ændrer sig når elementet drejes. */
+  function getCannonPivot(){
+    const fieldRect = gameFieldEl.getBoundingClientRect();
+    const domeRect = cannonDomeEl.getBoundingClientRect();
+    return {
+      x: (domeRect.left + domeRect.right) / 2 - fieldRect.left,
+      y: domeRect.top - fieldRect.top
+    };
+  }
+
+  function updateAimFromEvent(clientX, clientY){
+    const fieldRect = gameFieldEl.getBoundingClientRect();
+    const pivot = getCannonPivot();
+    const px = clientX - fieldRect.left;
+    const py = clientY - fieldRect.top;
+
+    let angle = Math.atan2(py - pivot.y, px - pivot.x);
+    const minAngle = -Math.PI + 0.12;
+    const maxAngle = -0.12;
+    if(angle > maxAngle) angle = maxAngle;
+    if(angle < minAngle) angle = minAngle;
+
+    state.cannonAngle = angle;
+    cannonBarrelEl.style.transform = "rotate(" + (angle * 180 / Math.PI + 90) + "deg)";
+  }
+
+  function fireCannon(){
+    if(!state.gameActive || state.isPaused) return;
+    const isEmptyShot = state.loaded <= 0;
+
+    // Første gang man skyder uden ladning: vis en påmindelse i stedet
+    // for faktisk at affyre kanonen.
+    if(isEmptyShot && !state.emptyShotHintShown){
+      state.emptyShotHintShown = true;
+      emptyShotHintOverlay.classList.remove("hidden");
+      return;
+    }
+
+    const pivot = getCannonPivot();
+    if(!isEmptyShot){
+      if(state.gold < FIRE_COST){
+        showFloatingText(pivot.x, pivot.y - 10, "Ikke nok guld!", "#f56565");
+        return;
+      }
+      state.gold -= FIRE_COST;
+      updateHUD();
+    }
+
+    const angle = state.cannonAngle;
+    const muzzleX = pivot.x + Math.cos(angle) * CANNON_BARREL_LENGTH;
+    const muzzleY = pivot.y + Math.sin(angle) * CANNON_BARREL_LENGTH;
+    // Et skud uden ladning (0 mol) er gratis, så der skal ikke vises
+    // et "−10"-tab for det.
+    if(!isEmptyShot){
+      showFloatingText(muzzleX, muzzleY - 6, "−" + FIRE_COST + " 💰", "#fbbf24");
+    }
+
+    const el = document.createElement("div");
+    el.className = "projectile";
+    el.style.left = muzzleX + "px";
+    el.style.top = muzzleY + "px";
+    gameFieldEl.appendChild(el);
+
+    state.projectiles.push({
+      x: muzzleX,
+      y: muzzleY,
+      vx: Math.cos(angle) * PROJECTILE_SPEED,
+      vy: Math.sin(angle) * PROJECTILE_SPEED,
+      el
+    });
+  }
+
+  /* ---------------- GULDBONUS ----------------
+     Dukker jævnligt op i banen og falder langsomt ned. Rammes den med
+     et skud, giver den GOLD_BONUS_VALUE guld – ellers forsvinder den
+     bare uden straf, hvis den når bunden. */
+  function pickNextGoldBonusDelay(){
+    return GOLD_BONUS_MIN_INTERVAL + Math.random() * (GOLD_BONUS_MAX_INTERVAL - GOLD_BONUS_MIN_INTERVAL);
+  }
+
+  function spawnGoldBonus(){
+    const el = document.createElement("div");
+    el.className = "gold-bonus";
+    el.textContent = "💰";
+    const leftPct = 10 + Math.random() * 74;
+    el.style.left = "calc(" + leftPct + "% - " + (GOLD_BONUS_SIZE / 2) + "px)";
+    el.style.top = -(GOLD_BONUS_SIZE + 10) + "px";
+    gameFieldEl.appendChild(el);
+
+    state.goldBonuses.push({ el, top: -(GOLD_BONUS_SIZE + 10), radius: GOLD_BONUS_SIZE / 2, collected: false });
+  }
+
+  function collectGoldBonus(bonus){
+    bonus.collected = true;
+    state.goldBonuses = state.goldBonuses.filter((b) => b !== bonus);
+    state.gold += GOLD_BONUS_VALUE;
+    bonus.el.classList.add("collected");
+    setTimeout(() => bonus.el.remove(), 300);
+    showFloatingText(bonus.el.offsetLeft + bonus.radius, bonus.el.offsetTop + bonus.radius, "+" + GOLD_BONUS_VALUE + " 💰 Bonus!", "#ffd166");
+    updateHUD();
+  }
+
+  function clearGoldBonuses(){
+    state.goldBonuses.forEach((b) => b.el.remove());
+    state.goldBonuses = [];
+  }
+
+  /* ---------------- GAME LOOP ---------------- */
+  function gameLoop(ts){
+    if(state.lastTs === null) state.lastTs = ts;
+    const dt = ts - state.lastTs;
+    state.lastTs = ts;
+
+    if(state.gameActive && !state.isPaused){
+      const round = currentRound();
+      const slowFactor = performance.now() < state.slowUntil ? 0.4 : 1;
+
+      // Boss-monstre spawner kun én gang (i beginRound) og genopstår aldrig
+      // via den almindelige spawn-timer.
+      state.spawnTimer += dt;
+      if(!round.isBoss && state.spawnedCount < round.monstersToWin && state.spawnTimer >= round.spawnIntervalMs && state.monsters.length < MAX_CONCURRENT_MONSTERS){
+        spawnMonster();
+        state.spawnTimer = 0;
+      }
+
+      // Guldbonus dukker op med jævne (men tilfældige) mellemrum
+      state.goldBonusTimer += dt;
+      if(state.goldBonusTimer >= state.nextGoldBonusDelay && state.goldBonuses.length === 0){
+        spawnGoldBonus();
+        state.goldBonusTimer = 0;
+        state.nextGoldBonusDelay = pickNextGoldBonusDelay();
+      }
+
+      const fieldWidth = gameFieldEl.clientWidth;
+      const fieldHeight = gameFieldEl.clientHeight;
+      state.monsters.slice().forEach((m) => {
+        if(m.dead) return;
+        m.top += m.fallSpeed * slowFactor * (dt / 1000);
+        m.el.style.top = m.top + "px";
+        if(m.top > fieldHeight - 30){
+          loseLife(m);
+        }
+      });
+
+      // Guldbonus falder langsomt og forsvinder uden straf, hvis den ikke nås
+      state.goldBonuses.slice().forEach((b) => {
+        b.top += GOLD_BONUS_FALL_SPEED * slowFactor * (dt / 1000);
+        b.el.style.top = b.top + "px";
+        if(b.top > fieldHeight){
+          state.goldBonuses = state.goldBonuses.filter((x) => x !== b);
+          b.el.remove();
+        }
+      });
+
+      // Flyt projektiler og tjek kollision mod de aktive monstre
+      state.projectiles.slice().forEach((p) => {
+        p.x += p.vx * (dt / 1000);
+        p.y += p.vy * (dt / 1000);
+        p.el.style.left = p.x + "px";
+        p.el.style.top = p.y + "px";
+
+        let hitSomething = false;
+        if(p.x < -20 || p.x > fieldWidth + 20 || p.y < -20 || p.y > fieldHeight + 20){
+          hitSomething = true;
+        } else {
+          for(const b of state.goldBonuses){
+            if(b.collected) continue;
+            const bx = b.el.offsetLeft + b.radius;
+            const by = b.el.offsetTop + b.radius;
+            const bdx = p.x - bx;
+            const bdy = p.y - by;
+            if(Math.sqrt(bdx * bdx + bdy * bdy) < b.radius + PROJECTILE_RADIUS){
+              collectGoldBonus(b);
+              hitSomething = true;
+              break;
+            }
+          }
+          if(!hitSomething){
+            for(const m of state.monsters){
+              if(m.dead) continue;
+              const mx = m.el.offsetLeft + m.radius;
+              const my = m.el.offsetTop + m.radius;
+              const dx = p.x - mx;
+              const dy = p.y - my;
+              if(Math.sqrt(dx * dx + dy * dy) < m.radius + PROJECTILE_RADIUS){
+                resolveHit(m);
+                hitSomething = true;
+                break;
+              }
+            }
+          }
+        }
+
+        if(hitSomething){
+          p.el.remove();
+          state.projectiles = state.projectiles.filter((proj) => proj !== p);
+        }
+      });
+    }
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  /* ---------------- EVENTS ---------------- */
+  document.querySelectorAll(".loadBtn[data-delta]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.loaded = clampLoaded(state.loaded + parseFloat(btn.dataset.delta));
+      updateHUD();
+    });
+  });
+  $("resetLoadBtn").addEventListener("click", () => {
+    state.loaded = 0;
+    updateHUD();
+  });
+
+  // Kanonen sigter efter musen/fingeren og skyder ved klik/tryk i banen
+  gameFieldEl.addEventListener("mousemove", (e) => {
+    if(state.gameActive && !state.isPaused) updateAimFromEvent(e.clientX, e.clientY);
+  });
+  gameFieldEl.addEventListener("click", (e) => {
+    if(!state.gameActive || state.isPaused) return;
+    updateAimFromEvent(e.clientX, e.clientY);
+    fireCannon();
+  });
+  gameFieldEl.addEventListener("touchmove", (e) => {
+    if(state.gameActive && !state.isPaused && e.touches[0]){
+      e.preventDefault();
+      updateAimFromEvent(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive: false });
+  gameFieldEl.addEventListener("touchstart", (e) => {
+    if(state.gameActive && !state.isPaused && e.touches[0]){
+      e.preventDefault();
+      updateAimFromEvent(e.touches[0].clientX, e.touches[0].clientY);
+      fireCannon();
+    }
+  }, { passive: false });
+
+  helpBtn.addEventListener("click", () => helpOverlay.classList.remove("hidden"));
+  closeHelpBtn.addEventListener("click", () => helpOverlay.classList.add("hidden"));
+  closeEmptyShotHintBtn.addEventListener("click", () => emptyShotHintOverlay.classList.add("hidden"));
+  buyKatalysatorBtn.addEventListener("click", buyKatalysator);
+  buyScannerBtn.addEventListener("click", buyScanner);
+  buyOprydningBtn.addEventListener("click", buyOprydning);
+
+  startBtn.addEventListener("click", startGame);
+  roundIntroBtn.addEventListener("click", beginRound);
+  nextRoundBtn.addEventListener("click", () => {
+    roundClearOverlay.classList.add("hidden");
+    initRound(state.roundIndex + 1);
+  });
+  restartBtn.addEventListener("click", () => {
+    gameOverOverlay.classList.add("hidden");
+    startGame();
+  });
+  playAgainBtn.addEventListener("click", () => {
+    victoryOverlay.classList.add("hidden");
+    startGame();
+  });
+
+  updateRoundHeader();
+  updateHUD();
+  requestAnimationFrame(gameLoop);
+})();
+</script>
+</body>
+</html>

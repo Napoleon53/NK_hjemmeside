@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B-niveau kemi-animationer</title>
+    <style>
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+        .main-layout { display: flex; width: 100vw; height: 100vh; }
+
+        .sidebar {
+            width: 185px;
+            background-color: #000000;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            border-right: 1px solid #333;
+            overflow-x: hidden;
+            overflow-y: auto;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .sidebar.collapsed {
+            width: 60px;
+        }
+
+        .sidebar-header {
+            height: 60px;
+            background-color: #111;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            transition: all 0.3s;
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            justify-content: center;
+            padding: 0;
+        }
+
+        .header-text {
+            font-weight: bold;
+            color: #f1c40f;
+            letter-spacing: 1px;
+            font-size: 1.1em;
+            white-space: nowrap;
+        }
+
+        .sidebar.collapsed .header-text {
+            display: none;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: #f1c40f;
+            font-size: 26px;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-btn:hover {
+            color: white;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            border-left: 3px solid transparent;
+            color: #aaa;
+            padding: 12px 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid #222;
+            font-size: 14px;
+            white-space: nowrap;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            background-color: #222;
+            color: white;
+            border-left-color: #f1c40f;
+        }
+
+        .tab-btn.active {
+            background-color: #222;
+            color: #f1c40f;
+            font-weight: bold;
+            border-left: 3px solid #f1c40f;
+        }
+
+        /* Pill-formet kode-badge (bredere end en cirkel, så den kan rumme fx "B4") */
+        .btn-num {
+            flex-shrink: 0;
+            min-width: 36px;
+            height: 20px;
+            border-radius: 10px;
+            background-color: #2a2a2a;
+            color: #bbb;
+            font-size: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
+        .tab-btn.active .btn-num {
+            background-color: #f1c40f;
+            color: #000;
+        }
+
+        .btn-text {
+            transition: opacity 0.15s ease;
+        }
+
+        /* Kollaps: vis kun kode-badge, centrer det */
+        .sidebar.collapsed .tab-btn {
+            justify-content: center;
+            padding: 12px 0;
+        }
+
+        .sidebar.collapsed .btn-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        .content-area {
+            flex-grow: 1;
+            height: 100%;
+            background-color: #333;
+            position: relative;
+        }
+
+        iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        /* Startside: boks-oversigt over alle kapitler */
+        .startside {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            box-sizing: border-box;
+            padding: 30px 40px;
+            background-color: #292929;
+        }
+
+        .startside-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .startside-box {
+            background-color: #1e1e1e;
+            border: 1px solid #3a3a3a;
+            border-radius: 10px;
+            padding: 18px;
+            min-height: 140px;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .startside-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+            border-color: #f1c40f;
+        }
+
+        .startside-box-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .startside-box-title {
+            font-weight: bold;
+            font-size: 13px;
+            color: white;
+        }
+
+        .startside-box-desc {
+            font-size: 13px;
+            color: #aaa;
+            line-height: 1.4;
+        }
+
+        .header-text.clickable {
+            cursor: pointer;
+        }
+
+        .header-text.clickable:hover {
+            text-decoration: underline;
+        }
+
+        /* Feedback-knap nederst i sidebar */
+        .feedback-btn {
+            margin-top: auto;
+            border-top: 1px solid #333;
+            color: #8fd694;
+        }
+
+        .feedback-btn:hover {
+            background-color: #223322;
+            color: #b6ffc0;
+            border-left-color: #8fd694;
+        }
+
+        .feedback-btn .btn-num {
+            background-color: #234a29;
+            color: #8fd694;
+        }
+
+        /* Feedback-modal */
+        .feedback-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feedback-overlay.vis {
+            display: flex;
+        }
+
+        .feedback-modal {
+            background-color: #1e1e1e;
+            color: #eee;
+            width: 420px;
+            max-width: 92vw;
+            max-height: 88vh;
+            overflow-y: auto;
+            border-radius: 10px;
+            border: 1px solid #3a3a3a;
+            padding: 20px 22px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+        }
+
+        .feedback-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .feedback-modal-header span {
+            font-weight: bold;
+            color: #f1c40f;
+            font-size: 1.15em;
+        }
+
+        .feedback-close {
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 22px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .feedback-close:hover {
+            color: white;
+        }
+
+        .feedback-intro {
+            font-size: 13px;
+            color: #bbb;
+            line-height: 1.5;
+            margin: 0 0 16px 0;
+        }
+
+        .feedback-modal label {
+            display: block;
+            font-size: 12px;
+            color: #ccc;
+            margin: 12px 0 4px 0;
+        }
+
+        .feedback-modal select,
+        .feedback-modal input[type="text"],
+        .feedback-modal textarea {
+            width: 100%;
+            box-sizing: border-box;
+            background-color: #2a2a2a;
+            color: #eee;
+            border: 1px solid #444;
+            border-radius: 6px;
+            padding: 8px 10px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .feedback-modal textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .feedback-modal select:focus,
+        .feedback-modal input[type="text"]:focus,
+        .feedback-modal textarea:focus {
+            outline: none;
+            border-color: #f1c40f;
+        }
+
+        #feedbackOrdtal {
+            color: #888;
+            font-weight: normal;
+        }
+
+        #feedbackOrdtal.udenfor {
+            color: #e57373;
+        }
+
+        .feedback-status {
+            min-height: 18px;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        .feedback-status.fejl { color: #e57373; }
+        .feedback-status.ok { color: #8fd694; }
+
+        .feedback-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .feedback-actions button {
+            border: none;
+            border-radius: 6px;
+            padding: 9px 16px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .feedback-btn-cancel {
+            background-color: #333;
+            color: #ccc;
+        }
+
+        .feedback-btn-cancel:hover {
+            background-color: #444;
+        }
+
+        .feedback-btn-submit {
+            background-color: #f1c40f;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .feedback-btn-submit:hover {
+            background-color: #ffd633;
+        }
+
+        .feedback-btn-submit:disabled {
+            background-color: #6b6b6b;
+            color: #999;
+            cursor: default;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="main-layout">
+        <div class="sidebar" id="sidebarMenu">
+
+            <div class="sidebar-header">
+                <span class="header-text clickable" onclick="visStartside()" title="Tilbage til oversigt">Emner</span>
+                <button class="toggle-btn" onclick="toggleMenu()" title="Vis/Skjul menu">☰</button>
+            </div>
+
+            <button class="tab-btn" data-beskrivelse="Udforsk hvad der påvirker, hvor hurtigt en kemisk reaktion forløber - koncentration, temperatur, katalysator og inhibitor." onclick="visKategori(this, 'kemi-b-filer/samling_b1.html')" title="B1: Kinetik"><span class="btn-num">B1</span><span class="btn-text">Kinetik</span></button>
+            <button class="tab-btn" data-beskrivelse="Opskriv reaktionsbrøken, regn på ligevægtskonstanten K, og forskyd en rigtig ligevægt i et virtuelt laboratorium." onclick="visKategori(this, 'kemi-b-filer/samling_b2.html')" title="B2: Ligevægt"><span class="btn-num">B2</span><span class="btn-text">Ligevægt</span></button>
+            <button class="tab-btn" data-beskrivelse="Regn med syrekonstanten Ks og pKs, og træn at omregne mellem dem." onclick="visKategori(this, 'kemi-b-filer/samling_b3.html')" title="B3: Syre/Base"><span class="btn-num">B3</span><span class="btn-text">Syre/Base</span></button>
+            <button class="tab-btn" data-beskrivelse="Estersyntese, DNPH/Tollens, intermolekylære kræfter, isomeri og et par spil om organiske stofklasser og polymerer." onclick="visKategori(this, 'kemi-b-filer/samling_b4,5,6.html')" title="B4-6: Organisk B"><span class="btn-num">B4</span><span class="btn-text">Organisk B</span></button>
+            <button class="tab-btn" data-beskrivelse="Se hvordan glucose og fructose lukker ring og danner alfa- og beta-anomerer." onclick="visKategori(this, 'kemi-b-filer/samling_b7.html')" title="B7: Kulhydrater"><span class="btn-num">B7</span><span class="btn-text">Kulhydrater</span></button>
+            <button class="tab-btn" data-beskrivelse="Absorptionsspektre og Lambert-Beers lov, inkl. et rigtigt forsøg med azofarvestof i en Breezer." onclick="visKategori(this, 'kemi-b-filer/samling_b9.html')" title="B9: Spektroskopi"><span class="btn-num">B9</span><span class="btn-text">Spektroskopi</span></button>
+
+            <button class="tab-btn feedback-btn" data-beskrivelse="Alle animationerne bliver løbende forbedret, og al feedback du sender bliver læst og forsøgt implementeret." onclick="visFeedback()" title="Giv feedback (rettelser eller forslag)"><span class="btn-num">✎</span><span class="btn-text">Feedback</span></button>
+
+        </div>
+
+        <div class="content-area">
+            <div class="startside" id="startside">
+                <div class="startside-grid" id="startsideGrid"></div>
+            </div>
+            <iframe id="visningsVindue" style="display:none;" allow="clipboard-write"></iframe>
+        </div>
+    </div>
+
+    <div class="feedback-overlay" id="feedbackOverlay" onmousedown="feedbackOverlayKlik(event)">
+        <div class="feedback-modal">
+            <div class="feedback-modal-header">
+                <span>Giv feedback</span>
+                <button class="feedback-close" onclick="lukFeedback()" title="Luk">×</button>
+            </div>
+            <p class="feedback-intro">Har du fundet en fejl, eller har du et forslag til en forbedring? Feedbacken kan være rettelser eller forslag — begge dele er meget velkomne.</p>
+
+            <label for="feedbackKapitel">Kapitel</label>
+            <select id="feedbackKapitel" onchange="opdaterFeedbackAnimationer()"></select>
+
+            <label for="feedbackAnimation">Animation/opgave</label>
+            <select id="feedbackAnimation"></select>
+
+            <label for="feedbackNavn">Dit navn (valgfrit)</label>
+            <input type="text" id="feedbackNavn" maxlength="60" placeholder="Kan udelades">
+
+            <label for="feedbackTekst">Din feedback <span id="feedbackOrdtal">(0 tegn, mindst 20)</span></label>
+            <textarea id="feedbackTekst" maxlength="3000" oninput="opdaterOrdtal()" placeholder="Beskriv fejlen eller forslaget (mindst 20 tegn)..."></textarea>
+
+            <div class="feedback-status" id="feedbackStatus"></div>
+
+            <div class="feedback-actions">
+                <button class="feedback-btn-cancel" onclick="lukFeedback()">Annuller</button>
+                <button class="feedback-btn-submit" id="feedbackSubmitBtn" onclick="sendFeedback()">Send feedback</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function visKategori(knap, filsti) {
+            document.getElementById('startside').style.display = 'none';
+            var iframe = document.getElementById('visningsVindue');
+            iframe.style.display = 'block';
+            iframe.src = filsti;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            knap.classList.add('active');
+        }
+
+        function visStartside() {
+            document.getElementById('visningsVindue').style.display = 'none';
+            document.getElementById('startside').style.display = 'block';
+            document.getElementById('sidebarMenu').classList.remove('collapsed');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        }
+
+        function byggStartside() {
+            var grid = document.getElementById('startsideGrid');
+            document.querySelectorAll('.tab-btn').forEach(function(knap) {
+                var num = knap.querySelector('.btn-num').textContent;
+                var titel = knap.querySelector('.btn-text').textContent;
+                var beskrivelse = knap.getAttribute('data-beskrivelse') || '';
+                var boks = document.createElement('div');
+                boks.className = 'startside-box';
+                boks.innerHTML = '<div class="startside-box-head"><span class="btn-num">' + num + '</span><span class="startside-box-title">' + titel + '</span></div><div class="startside-box-desc">' + beskrivelse + '</div>';
+                boks.addEventListener('click', function() { knap.click(); });
+                grid.appendChild(boks);
+            });
+        }
+        byggStartside();
+
+        function toggleMenu() {
+            var menu = document.getElementById('sidebarMenu');
+            menu.classList.toggle('collapsed');
+        }
+
+        function checkScreenSize() {
+            var menu = document.getElementById('sidebarMenu');
+            var startside = document.getElementById('startside');
+            if (startside && startside.style.display !== 'none') {
+                menu.classList.remove('collapsed');
+                return;
+            }
+            if (window.innerWidth < 1100) {
+                menu.classList.add('collapsed');
+            } else {
+                menu.classList.remove('collapsed');
+            }
+        }
+
+        window.onload = checkScreenSize;
+        window.onresize = checkScreenSize;
+
+        function findSideFraEmne(emne) {
+            if (/^b1/i.test(emne)) return 'kemi-b-filer/samling_b1.html';
+            if (/^b2/i.test(emne)) return 'kemi-b-filer/samling_b2.html';
+            if (/^b3/i.test(emne)) return 'kemi-b-filer/samling_b3.html';
+            if (/^(b[456]|eb\d*|b\.spil)/i.test(emne)) return 'kemi-b-filer/samling_b4,5,6.html';
+            if (/^b7/i.test(emne)) return 'kemi-b-filer/samling_b7.html';
+            if (/^b9/i.test(emne)) return 'kemi-b-filer/samling_b9.html';
+            return null;
+        }
+
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const emneFil = urlParams.get('emne');
+            let emneSide = urlParams.get('side') || (emneFil ? findSideFraEmne(emneFil) : null);
+
+            if (emneSide) {
+                const knapper = document.querySelectorAll('.tab-btn');
+                knapper.forEach(knap => {
+                    if (knap.getAttribute('onclick').includes(emneSide)) {
+                        let filsti = emneSide;
+                        if (emneFil) {
+                            filsti += '?emne=' + encodeURIComponent(emneFil);
+                        }
+                        visKategori(knap, filsti);
+                    }
+                });
+                // Direkte link skal altid vise et sammenklappet sidepanel med det samme.
+                document.getElementById('sidebarMenu').classList.add('collapsed');
+            }
+        });
+
+        window.addEventListener('message', function(event) {
+            if (event.data === 'animationFocus') {
+                document.getElementById('sidebarMenu').classList.add('collapsed');
+            }
+        });
+
+        // ===== Feedback-funktion =====
+        // Samme Google Apps Script Web App som samling_alt.html (kemi C) bruger.
+        const FEEDBACK_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxgfp2af0Zf9QL15s8E6FtsYOCrKh8rRZcjRY_cMh6MCgaEZVfRr2a3CDts29EB6CRQug/exec';
+
+        // Snapshot af kapitler/animationer (hentet fra data-emne/data-beskrivelse i hver samling_bN.html).
+        // Skal opdateres med én linje, når en ny animation tilføjes til et kapitel.
+        const FEEDBACK_EMNER = [
+            { navn: 'B1: Kinetik', animationer: [
+                { nr: 1, navn: 'Reaktionshastighed' }, { nr: 2, navn: 'Energidiagram' }, { nr: 3, navn: 'Katalyse (H₂O₂)' }
+            ]},
+            { navn: 'B2: Ligevægt', animationer: [
+                { nr: 1, navn: 'Ligevægtsloven' }, { nr: 2, navn: 'Ligevægtsberegninger' }, { nr: 3, navn: 'Ligevægts-laboratoriet' }
+            ]},
+            { navn: 'B3: Syre/Base', animationer: [
+                { nr: 1, navn: 'Fra Ks til pKs' }
+            ]},
+            { navn: 'B4-6: Organisk B', animationer: [
+                { nr: 1, navn: 'Estersyntese' }, { nr: 2, navn: 'DNPH/Tollens' }, { nr: 3, navn: 'Intermolekylært' },
+                { nr: 4, navn: 'Spil: polymerisation' }, { nr: 5, navn: 'Sælg kemikalier' },
+                { nr: 6, navn: 'Geometrisk isomeri' }, { nr: 7, navn: 'Spejlbilledeisomeri' }
+            ]},
+            { navn: 'B7: Kulhydrater', animationer: [
+                { nr: 1, navn: 'Ringslutning' }
+            ]},
+            { navn: 'B9: Spektroskopi', animationer: [
+                { nr: 1, navn: 'Absorptionsspektre' }, { nr: 2, navn: 'Breezer-forsøg' }, { nr: 3, navn: 'Lambert-Beers Lov' }, { nr: 4, navn: 'Nitrit i vand' }
+            ]},
+            { navn: 'Generelt (ikke et bestemt kapitel)', animationer: [] }
+        ];
+
+        function byggFeedbackKapitler() {
+            var sel = document.getElementById('feedbackKapitel');
+            FEEDBACK_EMNER.forEach(function(kap, i) {
+                var opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = kap.navn;
+                sel.appendChild(opt);
+            });
+            opdaterFeedbackAnimationer();
+        }
+
+        function opdaterFeedbackAnimationer() {
+            var kapIndex = document.getElementById('feedbackKapitel').value;
+            var kap = FEEDBACK_EMNER[kapIndex];
+            var sel = document.getElementById('feedbackAnimation');
+            sel.innerHTML = '';
+
+            var generelOpt = document.createElement('option');
+            generelOpt.value = '';
+            generelOpt.textContent = kap.animationer.length ? 'Generelt om kapitlet' : 'Hele siden generelt';
+            sel.appendChild(generelOpt);
+
+            kap.animationer.forEach(function(anim) {
+                var opt = document.createElement('option');
+                var tekst = anim.nr + '. ' + anim.navn;
+                opt.value = tekst;
+                opt.textContent = tekst;
+                sel.appendChild(opt);
+            });
+        }
+
+        function opdaterOrdtal() {
+            var antal = document.getElementById('feedbackTekst').value.trim().length;
+            var span = document.getElementById('feedbackOrdtal');
+            span.textContent = '(' + antal + ' tegn, mindst 20)';
+            span.classList.toggle('udenfor', antal > 0 && antal < 20);
+        }
+
+        function visFeedback() {
+            document.getElementById('feedbackOverlay').classList.add('vis');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function lukFeedback() {
+            document.getElementById('feedbackOverlay').classList.remove('vis');
+            document.body.style.overflow = '';
+        }
+
+        function feedbackOverlayKlik(event) {
+            if (event.target.id === 'feedbackOverlay') lukFeedback();
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && document.getElementById('feedbackOverlay').classList.contains('vis')) {
+                lukFeedback();
+            }
+        });
+
+        function sendFeedback() {
+            var statusEl = document.getElementById('feedbackStatus');
+            var kapIndex = document.getElementById('feedbackKapitel').value;
+            var kapNavn = FEEDBACK_EMNER[kapIndex].navn;
+            var animNavn = document.getElementById('feedbackAnimation').value || '(generelt)';
+            var navn = document.getElementById('feedbackNavn').value.trim() || '(anonym)';
+            var tekst = document.getElementById('feedbackTekst').value.trim();
+            var antalTegn = tekst.length;
+
+            statusEl.className = 'feedback-status';
+
+            if (antalTegn < 20) {
+                statusEl.textContent = 'Feedbacken skal være mindst 20 tegn (den er lige nu ' + antalTegn + ' tegn).';
+                statusEl.classList.add('fejl');
+                return;
+            }
+
+            if (FEEDBACK_SCRIPT_URL.indexOf('INDSÆT_') === 0) {
+                statusEl.textContent = 'Feedback-modtageren er ikke sat op endnu (mangler Web App-URL i koden).';
+                statusEl.classList.add('fejl');
+                return;
+            }
+
+            var submitBtn = document.getElementById('feedbackSubmitBtn');
+            submitBtn.disabled = true;
+            statusEl.textContent = 'Sender...';
+
+            var data = new URLSearchParams();
+            data.append('kapitel', kapNavn);
+            data.append('animation', animNavn);
+            data.append('navn', navn);
+            data.append('feedback', tekst);
+
+            fetch(FEEDBACK_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: data
+            }).then(function() {
+                statusEl.textContent = 'Tak for din feedback!';
+                statusEl.classList.add('ok');
+                setTimeout(function() {
+                    document.getElementById('feedbackTekst').value = '';
+                    document.getElementById('feedbackNavn').value = '';
+                    opdaterOrdtal();
+                    submitBtn.disabled = false;
+                    lukFeedback();
+                    statusEl.textContent = '';
+                    statusEl.className = 'feedback-status';
+                }, 1500);
+            }).catch(function() {
+                statusEl.textContent = 'Der skete en fejl - tjek din internetforbindelse og prøv igen.';
+                statusEl.classList.add('fejl');
+                submitBtn.disabled = false;
+            });
+        }
+
+        byggFeedbackKapitler();
+
+    </script>
+
+</body>
+</html>

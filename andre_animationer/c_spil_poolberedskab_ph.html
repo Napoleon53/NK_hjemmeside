@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pool-Beredskabet: Operation pH</title>
+<style>
+  /* ======================================================================
+     DESIGN-TOKENS
+     Alle farver samlet i CSS-variabler, så temaet er let at justere.
+     ====================================================================== */
+  :root{
+    --bg-deep:#071c2b;
+    --bg-deep2:#0c2b40;
+    --panel:#0f2e42;
+    --panel-light:#14405c;
+    --border:#1f5678;
+    --text:#eaf6ff;
+    --text-dim:#9fc4da;
+    --accent:#3fd0ff;
+    --accent2:#7bffb0;
+    --danger:#ff6b6b;
+    --warn:#ffcb5c;
+    --safe:#5cffb0;
+    --acid:#e0453d;
+    --base:#8e5bff;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; height:100%; }
+  body{
+    font-family:'Segoe UI', system-ui, -apple-system, sans-serif;
+    background:
+      radial-gradient(ellipse at 20% -10%, #123a54 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 110%, #0c2f47 0%, transparent 55%),
+      linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-deep2) 100%);
+    color:var(--text);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:16px;
+  }
+
+  #app{
+    width:100%;
+    max-width:980px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+
+  /* ---------------------------- HEADER ---------------------------- */
+  header{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:linear-gradient(135deg, var(--panel), var(--panel-light));
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:12px 18px;
+  }
+  header h1{
+    margin:0;
+    font-size:1.25rem;
+    letter-spacing:.3px;
+  }
+  header h1 span{ color:var(--accent); }
+  .header-stats{
+    display:flex;
+    gap:18px;
+    font-size:.95rem;
+    flex-wrap:wrap;
+  }
+  .stat{ text-align:center; min-width:70px; }
+  .stat .label{ font-size:.68rem; text-transform:uppercase; letter-spacing:.6px; color:var(--text-dim); }
+  .stat .value{ font-size:1.15rem; font-weight:700; }
+  .stat .value.warn{ color:var(--warn); }
+  .stat .value.danger{ color:var(--danger); }
+
+  #timerBarWrap{
+    width:100%;
+    height:6px;
+    background:#04141f;
+    border-radius:4px;
+    overflow:hidden;
+    margin-top:2px;
+  }
+  #timerBar{
+    height:100%;
+    width:100%;
+    background:linear-gradient(90deg, var(--accent2), var(--accent));
+    transition:width .2s linear;
+  }
+
+  /* ------------------------- EVENT BANNER -------------------------- */
+  #eventBanner{
+    position:fixed;
+    top:14px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    z-index:50;
+    pointer-events:none;
+    width:min(92vw, 460px);
+    max-height:30vh;      /* alarmbeskeder må aldrig vokse ned over poolen */
+    overflow:hidden;
+  }
+  .toast{
+    background:rgba(15,46,66,.96);
+    border:1px solid var(--warn);
+    border-radius:10px;
+    padding:10px 14px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    box-shadow:0 6px 18px rgba(0,0,0,.4);
+    animation:toastIn .25s ease-out, toastOut .4s ease-in 6.6s forwards;
+  }
+  .toast .icon{ font-size:1.4rem; }
+  .toast .txt strong{ display:block; font-size:.92rem; }
+  .toast .txt span{ display:block; font-size:.78rem; color:var(--text-dim); }
+  .toast .txt em{ display:block; font-size:.72rem; color:var(--accent2); font-style:normal; margin-top:2px; }
+  .toast-death{ border-color:var(--danger); background:rgba(46,10,10,.96); }
+  @keyframes toastIn{ from{ opacity:0; transform:translateY(-14px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes toastOut{ to{ opacity:0; transform:translateY(-10px); } }
+
+  /* ---------------------------- MAIN ------------------------------- */
+  main{
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+  }
+  #poolColumn{
+    flex:1 1 0%;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+
+  #poolScene{
+    position:relative;
+    border-radius:16px;
+    overflow:hidden;
+    border:1px solid var(--border);
+    min-height:260px;
+    background:#04141f;
+  }
+  #waterTint{
+    position:absolute; inset:0;
+    background:rgb(56,142,196);
+    transition:background-color .8s ease;
+  }
+  #waterTint::before{
+    /* stiliseret bølgemønster i vandet */
+    content:"";
+    position:absolute; inset:0;
+    background:repeating-linear-gradient(115deg, rgba(255,255,255,.05) 0 14px, rgba(255,255,255,0) 14px 34px);
+    animation:waveDrift 9s linear infinite;
+  }
+  @keyframes waveDrift{ from{ background-position:0 0; } to{ background-position:400px 0; } }
+
+  #rippleLayer{ position:absolute; inset:0; z-index:2; }
+  .ripple{
+    position:absolute;
+    width:150px; height:150px;
+    margin-left:-75px; margin-top:-75px;
+    border-radius:50%;
+    pointer-events:none;
+    animation-name:rippleSpread;
+    animation-timing-function:ease-out;
+    animation-fill-mode:forwards;
+  }
+  @keyframes rippleSpread{
+    0%{ transform:scale(0); opacity:.65; }
+    100%{ transform:scale(1); opacity:0; }
+  }
+  .ripple.chem-hcl{ background:radial-gradient(circle, rgba(224,69,61,.9), rgba(224,69,61,0) 70%); }
+  .ripple.chem-naoh{ background:radial-gradient(circle, rgba(142,91,255,.9), rgba(142,91,255,0) 70%); }
+  .ripple.chem-phminus{ width:90px; height:90px; margin-left:-45px; margin-top:-45px; background:radial-gradient(circle, rgba(255,158,84,.8), rgba(255,158,84,0) 70%); }
+  .ripple.chem-phplus{ width:90px; height:90px; margin-left:-45px; margin-top:-45px; background:radial-gradient(circle, rgba(123,255,176,.8), rgba(123,255,176,0) 70%); }
+  .ripple.event-tisser{ width:70px; height:70px; margin-left:-35px; margin-top:-35px; background:radial-gradient(circle, rgba(230,214,90,.75), rgba(230,214,90,0) 70%); }
+  .ripple.event-syreregn{ width:220px; height:220px; margin-left:-110px; margin-top:-110px; background:radial-gradient(circle, rgba(224,69,61,.55), rgba(224,69,61,0) 70%); }
+  .ripple.event-klorchok{ width:200px; height:200px; margin-left:-100px; margin-top:-100px; background:radial-gradient(circle, rgba(142,91,255,.7), rgba(255,255,255,.2) 40%, rgba(142,91,255,0) 70%); }
+  .ripple.event-fugleklat{ width:60px; height:60px; margin-left:-30px; margin-top:-30px; background:radial-gradient(circle, rgba(140,110,70,.85), rgba(140,110,70,0) 70%); }
+
+  #guestLayer{
+    position:relative;
+    z-index:3;
+    min-height:260px;
+    display:flex;
+    flex-wrap:wrap;
+    align-content:center;
+    justify-content:center;
+    gap:14px;
+    padding:26px;
+  }
+  .guest{
+    position:relative;
+    font-size:2rem;
+    filter:drop-shadow(0 3px 4px rgba(0,0,0,.4));
+    transition:transform .6s ease, opacity .6s ease;
+  }
+  .guest .bubble{
+    position:absolute;
+    bottom:110%;
+    left:50%;
+    transform:translateX(-50%) scale(.85);
+    background:#fff;
+    color:#111;
+    font-size:.62rem;
+    font-weight:600;
+    padding:4px 7px;
+    border-radius:8px;
+    white-space:nowrap;
+    opacity:0;
+    transition:opacity .2s ease;
+    pointer-events:none;
+  }
+  .guest .bubble::after{
+    content:"";
+    position:absolute; top:100%; left:50%;
+    border:5px solid transparent;
+    border-top-color:#fff;
+    transform:translateX(-50%);
+  }
+  .guest.protest .bubble{ opacity:1; }
+  .guest.leaving-anim{ transform:translateY(-46px) scale(.4); opacity:0; }
+  .guest.distress{ animation:guestShake .4s ease-in-out; }
+  .guest.cry{ animation:guestShake .35s ease-in-out infinite; }
+  .guest.cry .bubble{ background:#ff3b3b; color:#fff; font-weight:800; opacity:1; }
+  @keyframes guestShake{
+    0%,100%{ transform:translateX(0) rotate(0); }
+    25%{ transform:translateX(-5px) rotate(-6deg); }
+    75%{ transform:translateX(5px) rotate(6deg); }
+  }
+  .guest.dying-anim{ animation:guestCollapse .5s ease-in forwards; }
+  @keyframes guestCollapse{
+    to{ transform:scale(.75) rotate(12deg); filter:grayscale(1) brightness(.55); }
+  }
+  .guest.dead{ filter:grayscale(1) brightness(.8); opacity:.9; transform:scale(.92); }
+
+  #poolScene.danger-flash-low{ box-shadow:inset 0 0 0 5px var(--danger), 0 0 26px rgba(255,60,60,.55); }
+  #poolScene.danger-flash-high{ box-shadow:inset 0 0 0 5px var(--base), 0 0 26px rgba(142,91,255,.55); }
+
+  #poolFooterInfo{
+    position:absolute;
+    left:10px; bottom:8px;
+    z-index:4;
+    background:rgba(4,20,31,.65);
+    border-radius:8px;
+    padding:4px 9px;
+    font-size:.78rem;
+    color:var(--text-dim);
+  }
+
+  /* ---------------------------- pH PANEL ---------------------------- */
+  #phPanel{
+    background:linear-gradient(135deg, var(--panel), var(--panel-light));
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:16px 18px 12px;
+  }
+  #phPanel h2{ margin:0 0 10px; font-size:.9rem; letter-spacing:.4px; color:var(--text-dim); font-weight:600; }
+  .ph-readouts{
+    display:flex;
+    gap:22px;
+    margin-bottom:10px;
+    flex-wrap:wrap;
+  }
+  .ph-readouts .box .label{ font-size:.7rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:.5px; }
+  .ph-readouts .box .num{ font-size:1.6rem; font-weight:800; }
+  #currentPHNum{ color:var(--accent2); }
+  #projectedPHNum{ color:var(--accent); opacity:.85; }
+
+  #scaleTrack{
+    position:relative;
+    height:34px;
+    border-radius:8px;
+    background:linear-gradient(90deg,
+      #c0392b 0%,
+      #e67e22 15%,
+      #f1c40f 30%,
+      #9ad14b 42%,
+      #4fd07a 50%,
+      #4fd07a 58%,
+      #35c2b0 66%,
+      #3a8bdb 80%,
+      #6a5fd8 92%,
+      #8e44ad 100%);
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.25);
+  }
+  #safeZoneBand{
+    position:absolute;
+    top:-4px; bottom:-4px;
+    border:2px dashed rgba(255,255,255,.65);
+    border-radius:6px;
+    pointer-events:none;
+  }
+  #deathZoneBand{
+    position:absolute;
+    top:-4px; bottom:-4px;
+    right:0;
+    background:repeating-linear-gradient(45deg, rgba(0,0,0,.4) 0 6px, rgba(255,40,40,.4) 6px 12px);
+    border-left:2px solid #fff;
+    border-radius:0 6px 6px 0;
+    pointer-events:none;
+  }
+  #deathZoneBand::before{
+    content:"☠️";
+    position:absolute;
+    top:-20px; right:2px;
+    font-size:.75rem;
+  }
+  #targetLine{
+    position:absolute;
+    top:-8px; bottom:-8px;
+    width:2px;
+    background:#fff;
+    pointer-events:none;
+  }
+  #targetLine::after{
+    content:"Mål 7.2";
+    position:absolute;
+    top:-18px; left:50%;
+    transform:translateX(-50%);
+    font-size:.62rem;
+    color:#fff;
+    white-space:nowrap;
+  }
+  .marker{
+    position:absolute;
+    top:50%;
+    width:0; height:0;
+    transform:translate(-50%,-50%);
+  }
+  #shadowMarker{
+    border-left:9px solid transparent;
+    border-right:9px solid transparent;
+    border-top:14px solid rgba(255,255,255,.55);
+    top:-2px;
+    transition:left .15s linear;
+  }
+  #currentMarker{
+    border-left:10px solid transparent;
+    border-right:10px solid transparent;
+    border-bottom:16px solid #fff;
+    top:38px;
+    filter:drop-shadow(0 0 4px rgba(0,0,0,.5));
+    transition:left .1s linear;
+  }
+  #scaleTicks{
+    display:flex;
+    justify-content:space-between;
+    font-size:.68rem;
+    color:var(--text-dim);
+    margin-top:22px;
+  }
+  #scaleLegend{
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:6px;
+    font-size:.7rem;
+    color:var(--text-dim);
+    margin-top:8px;
+    border-top:1px dashed var(--border);
+    padding-top:8px;
+  }
+
+  /* ------------------------- CHEMICAL BAR (sidebar) ------------------ */
+  #chemicalBar{
+    width:248px;
+    flex-shrink:0;
+    background:linear-gradient(135deg, var(--panel), var(--panel-light));
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:14px 14px;
+  }
+  #chemicalBar h2{ margin:0 0 4px; font-size:.9rem; color:var(--text-dim); font-weight:600; }
+  .hint-line{
+    font-size:.7rem;
+    color:var(--text-dim);
+    margin:0 0 10px;
+  }
+  #buttonsGrid{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .chem-btn{
+    position:relative;
+    overflow:hidden;
+    text-align:left;
+    background:#0c2537;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:10px 12px;
+    color:var(--text);
+    cursor:pointer;
+    font-family:inherit;
+    transition:transform .1s ease, border-color .15s ease;
+  }
+  .chem-btn:hover:not(:disabled){ border-color:var(--accent); transform:translateY(-1px); }
+  .chem-btn:active:not(:disabled){ transform:translateY(0); }
+  .chem-btn:disabled{ opacity:.55; cursor:not-allowed; }
+  .chem-btn .top{ display:flex; align-items:center; gap:8px; font-weight:700; font-size:.88rem; line-height:1.25; }
+  .chem-btn .top .kicker{ font-size:1.3rem; }
+  .chem-btn .formula{ font-size:.72rem; color:var(--accent2); font-weight:700; margin-top:5px; letter-spacing:.2px; }
+  .chem-btn .cooldown-fill{
+    position:absolute; left:0; bottom:0; top:0;
+    width:0%;
+    background:rgba(0,0,0,.55);
+    transition:width .05s linear;
+    z-index:0;
+  }
+  .chem-btn > *:not(.cooldown-fill){ position:relative; z-index:1; }
+  .chem-hcl-btn{ border-color:#8a3226; background:#2a1414; }
+  .chem-phminus-btn{ border-color:#8a4a26; background:#241a10; }
+  .chem-naoh-btn{ border-color:#4a3489; background:#181433; }
+  .chem-phplus-btn{ border-color:#3a4a8f; background:#12182e; }
+  .chem-card{ display:flex; flex-direction:column; }
+  .chem-group-heading{
+    font-size:.68rem;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    margin:10px 0 2px;
+  }
+  .chem-group-heading:first-child{ margin-top:0; }
+  .heading-syre{ color:#ff8f7a; }
+  .heading-base{ color:#b9a6ff; }
+  .why-toggle{
+    align-self:flex-start;
+    margin-top:6px;
+    background:none;
+    border:none;
+    color:var(--accent);
+    font-size:.72rem;
+    font-family:inherit;
+    cursor:pointer;
+    padding:2px 0;
+  }
+  .why-toggle:hover{ text-decoration:underline; }
+  .ion-info{
+    display:none;
+    font-size:.74rem;
+    color:var(--text-dim);
+    line-height:1.5;
+    background:#04141f;
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:8px 10px;
+    margin:4px 0 0;
+  }
+  .ion-info.open{ display:block; }
+  kbd{
+    background:#04141f;
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:0 5px;
+    font-size:.68rem;
+  }
+
+  /* ----------------------------- OVERLAY ----------------------------- */
+  #overlay{
+    position:fixed; inset:0;
+    background:rgba(3,14,22,.86);
+    backdrop-filter:blur(3px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    padding:16px;
+  }
+  .panel{
+    display:none;
+    max-width:560px;
+    width:100%;
+    background:linear-gradient(160deg, var(--panel), #0a2233);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:28px 26px;
+    box-shadow:0 20px 60px rgba(0,0,0,.55);
+  }
+  .panel.active{ display:block; animation:panelIn .25s ease-out; }
+  @keyframes panelIn{ from{ opacity:0; transform:translateY(10px) scale(.98); } to{ opacity:1; transform:translateY(0) scale(1); } }
+  .panel h2{ margin-top:0; font-size:1.4rem; }
+  .panel h2 span{ color:var(--accent); }
+  .panel p{ color:var(--text-dim); line-height:1.5; font-size:.94rem; }
+  .panel ul{ color:var(--text-dim); font-size:.88rem; line-height:1.6; padding-left:20px; }
+  .primary-btn{
+    background:linear-gradient(135deg, var(--accent), var(--accent2));
+    border:none;
+    color:#022;
+    font-weight:800;
+    font-size:1rem;
+    padding:11px 22px;
+    border-radius:10px;
+    cursor:pointer;
+    margin-top:14px;
+  }
+  .primary-btn:hover{ filter:brightness(1.07); }
+  .score-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin:16px 0;
+  }
+  .score-box{
+    background:#04141f;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:10px 12px;
+  }
+  .score-grid-full{ grid-template-columns:1fr; }
+  .score-box .label{ font-size:.7rem; color:var(--text-dim); text-transform:uppercase; }
+  .score-box .val{ font-size:1.3rem; font-weight:800; color:var(--accent2); }
+  .grade{ font-size:1.1rem; font-weight:700; color:var(--warn); margin-top:4px; }
+
+  @media (max-width:720px){
+    main{ flex-direction:column; }
+    #chemicalBar{ width:100%; }
+    #buttonsGrid{ flex-direction:row; flex-wrap:wrap; }
+    #buttonsGrid .chem-card{ flex:1 1 220px; }
+  }
+  @media (max-width:560px){
+    header{ flex-direction:column; align-items:flex-start; }
+    .ph-readouts{ gap:14px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <header>
+    <h1>Pool-Beredskabet: <span>Operation pH</span></h1>
+    <div class="header-stats">
+      <div class="stat">
+        <div class="label">Runde</div>
+        <div class="value" id="statRound">–</div>
+      </div>
+      <div class="stat">
+        <div class="label">Tid tilbage</div>
+        <div class="value" id="statTime">–</div>
+      </div>
+      <div class="stat">
+        <div class="label">Gæster</div>
+        <div class="value" id="statGuests">–</div>
+      </div>
+      <div class="stat">
+        <div class="label">Døde</div>
+        <div class="value" id="statDeaths">0/2</div>
+      </div>
+      <div class="stat">
+        <div class="label">Score</div>
+        <div class="value" id="statScore">0</div>
+      </div>
+    </div>
+  </header>
+  <div id="timerBarWrap"><div id="timerBar"></div></div>
+
+  <main>
+    <div id="poolColumn">
+      <section id="poolScene">
+        <div id="waterTint"></div>
+        <div id="rippleLayer"></div>
+        <div id="guestLayer"></div>
+        <div id="poolFooterInfo">Sikker zone: 6.5 – 8.0</div>
+      </section>
+
+      <section id="phPanel">
+        <h2>pH-MÅLING</h2>
+        <div class="ph-readouts">
+          <div class="box">
+            <div class="label">Nu</div>
+            <div class="num" id="currentPHNum">7.20</div>
+          </div>
+          <div class="box">
+            <div class="label">Skygge</div>
+            <div class="num" id="projectedPHNum">7.20</div>
+          </div>
+        </div>
+        <div id="scaleTrack">
+          <div id="safeZoneBand"></div>
+          <div id="deathZoneBand"></div>
+          <div id="targetLine"></div>
+          <div id="shadowMarker" class="marker"></div>
+          <div id="currentMarker" class="marker"></div>
+        </div>
+        <div id="scaleTicks">
+          <span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span>
+        </div>
+        <div id="scaleLegend">
+          <span>🔴 Surt</span>
+          <span>🟢 7.2</span>
+          <span>🟣 Basisk ☠️</span>
+        </div>
+      </section>
+    </div>
+
+    <section id="chemicalBar">
+      <h2>KEMIKALIER</h2>
+      <p class="hint-line">Virker med forsinkelse – følg skyggepilen.</p>
+      <div id="buttonsGrid"></div>
+    </section>
+  </main>
+
+</div>
+
+<div id="eventBanner"></div>
+
+<div id="overlay">
+
+  <div class="panel" data-screen="start">
+    <h2>Velkommen, <span>pool-ansvarlig</span> 👨‍🔬</h2>
+    <p><strong>Hvad er pH?</strong> pH er et tal for, hvor meget "surt stof" (H⁺-ioner) der er i vandet. Lavt tal (under 7) = surt vand, mange H⁺-ioner. Højt tal (over 7) = basisk vand, få H⁺-ioner. 7.2 er det bedste for hud og øjne – det er dit mål.</p>
+    <p>Går pH under <strong>6.5</strong> eller over <strong>8.0</strong>, begynder badegæsterne at forlade poolen i protest.</p>
+    <ul>
+      <li>Vandet syrner konstant lidt af sig selv – du <strong>kan ikke bare vente</strong>, der skal handles løbende.</li>
+      <li>Kemikalier virker med <strong>forsinkelse (2-3 sek.)</strong> – dosér i god tid, og undgå at overkorrigere.</li>
+      <li>De to "chok"-midler (syre/base) giver store, voldsomme udsving. Granulaterne er små og lettere at styre.</li>
+      <li>Kommer pH <strong>helt i top af skalaen</strong> (☠️-zonen), dør gæster i stedet for at gå – poolen lukker for altid ved 2 døde.</li>
+      <li>Gæster, der går eller dør, kommer <strong>ikke tilbage</strong> i næste runde – der er 6 runder i alt.</li>
+      <li>Tryk på "Hvorfor virker det?" under et kemikalie for den kemiske forklaring.</li>
+    </ul>
+    <button class="primary-btn" id="btnStart">Start spillet</button>
+  </div>
+
+  <div class="panel" data-screen="roundIntro">
+    <h2 id="introTitle">Runde</h2>
+    <p id="introText"></p>
+    <button class="primary-btn" id="btnBeginRound">Start runde</button>
+  </div>
+
+  <div class="panel" data-screen="roundSummary">
+    <h2>Runden er slut – <span id="summaryRoundTitle"></span></h2>
+    <div class="score-grid">
+      <div class="score-box"><div class="label">Gæster tilbage</div><div class="val" id="sumGuests">–</div></div>
+      <div class="score-box"><div class="label">pH-præcision</div><div class="val" id="sumPhScore">–</div></div>
+      <div class="score-box"><div class="label">Døde (straf)</div><div class="val" id="sumDeaths">–</div></div>
+      <div class="score-box"><div class="label">Rundens score</div><div class="val" id="sumRoundScore">–</div></div>
+    </div>
+    <div class="score-grid score-grid-full">
+      <div class="score-box"><div class="label">Samlet score</div><div class="val" id="sumTotalScore">–</div></div>
+    </div>
+    <button class="primary-btn" id="btnContinue">Fortsæt</button>
+  </div>
+
+  <div class="panel" data-screen="gameOver">
+    <h2 id="goTitle">☠️ Poolen lukket for altid!</h2>
+    <p id="goDesc">To badegæster døde af det ekstreme pH. Her er din indsats:</p>
+    <div class="score-grid">
+      <div class="score-box"><div class="label">Runder gennemført</div><div class="val" id="goRounds">–</div></div>
+      <div class="score-box"><div class="label">Samlet score</div><div class="val" id="goScore">–</div></div>
+    </div>
+    <button class="primary-btn" id="btnRetryGameOver">Prøv igen</button>
+  </div>
+
+  <div class="panel" data-screen="finished">
+    <h2>🏁 Alle 6 runder klaret!</h2>
+    <p>Sådan gik det med at holde styr på poolens kemi:</p>
+    <div class="score-grid">
+      <div class="score-box"><div class="label">Samlet score</div><div class="val" id="finalScore">–</div></div>
+      <div class="score-box"><div class="label">Ud af</div><div class="val">6000</div></div>
+    </div>
+    <div class="grade" id="finalGrade"></div>
+    <button class="primary-btn" id="btnRestartFinal">Spil igen</button>
+  </div>
+
+</div>
+
+<script>
+/* ==========================================================================
+   POOL-BEREDSKABET: OPERATION pH
+   -------------------------------------------------------------------------
+   Selvstændigt læringsspil i ét HTML-dokument.
+
+   OVERBLIK OVER FILENS OPBYGNING:
+   1) KONFIGURATION  – tal og indhold der er nemme at justere/udvide
+      (CHEMICALS, EVENT_DEFS, ROUNDS). Nye hændelser/kemikalier kan
+      tilføjes her uden at røre resten af spillogikken.
+   2) SPILTILSTAND    – ét centralt state-objekt.
+   3) SIMULATION      – "doser" (kemikalier + hændelser) der virker med
+      forsinkelse og glider ind over tid (blandingstid/træghed).
+   4) GÆSTER          – badegæster der forlader poolen, når pH er ude
+      af den sikre zone.
+   5) RUNDER & SCORE  – rundeforløb, pointberegning, overlays.
+   6) RENDERING       – opdaterer DOM hver frame.
+   7) OPSTART/EVENTS  – knapper og spil-loop.
+   ========================================================================== */
+
+/* -------------------------------------------------------------------------
+   1) KONFIGURATION
+   ------------------------------------------------------------------------- */
+
+const TARGET_PH   = 7.2;   // Idealt pH for poolen
+const SAFE_MIN    = 6.5;   // Under denne grænse begynder gæster at forlade
+const SAFE_MAX    = 8.0;   // Over denne grænse begynder gæster at forlade
+const SCALE_MIN   = 3;     // Venstre kant af pH-skalaen (visning)
+const SCALE_MAX   = 11;    // Højre kant af pH-skalaen (visning)
+const TOTAL_GUESTS = 10;   // Antal badegæster ved spilstart – de bygges kun op igen ved en helt ny runde 1
+const ROUND_DURATION_MS = 60000; // 60 sekunder pr. runde
+
+const DEATH_PH_HIGH = 9.6;        // Helt oppe i toppen af skalaen: gæster dør i stedet for at gå
+const DEATH_LIMIT = 2;            // Spillet er slut, når så mange gæster er døde
+const DEATH_TRIGGER_DELAY = 2600; // ms i dødszonen, før en gæst overhovedet begynder at dødsråbe
+const DEATH_CRY_DURATION = 2900;  // ms en gæst dødsråber, før det afgøres om de dør eller reddes
+const DEATH_COOLDOWN_AFTER = 4500;// ms ro efter et dødsforløb, før det næste overhovedet kan starte
+const DISCOMFORT_SEVERITY = 0.8;  // Hvor langt fra sikker zone, før tydeligt akut ubehag vises
+const BASELINE_DRIFT_PER_SEC = -0.045; // Vandet syrner konstant lidt af sig selv – man kan ikke bare vente
+
+const FATE_GUARD_MS = 1000;   // min. tid mellem to gæster, der forlader ELLER dør (uanset kombination)
+const MAX_SPEAKING_GUESTS = 2; // maks. antal gæster der viser en snakkeboble på samme tid
+
+// De 4 kemikalie-knapper spilleren har til rådighed.
+// delay      = ms før stoffet begynder at virke ("blandingstid") – varierer lidt for realisme
+// ramp       = ms det tager at nå fuld effekt, fra delay er udløbet
+// delta      = samlet pH-ændring når effekten er fuldt indfaset
+// cooldown   = ms før knappen kan bruges igen
+// group      = "syre" eller "base" – bruges til at gruppere knapperne visuelt
+// action     = den korte, handlingsorienterede knap-tekst (ingen forklarende brødtekst)
+// formula    = altid synlig kemisk ligning (unicode sub-/superscript)
+// ionInfo    = uddybende forklaring, vises kun når spilleren selv åbner "Hvorfor virker det?"
+const CHEMICALS = {
+  hcl: {
+    action:"Tilsæt en spand HCl", kicker:"🧪", group:"syre",
+    delta:-3.0, delay:2500, ramp:2200, cooldown:1000,
+    formula:"HCl → H⁺ + Cl⁻",
+    ionInfo:"Saltsyre spalter sig fuldstændigt i vand til en positiv ion (H⁺) og en negativ ion (Cl⁻). Det er de ekstra H⁺-ioner, der gør vandet mere surt og sænker pH.",
+    btnClass:"chem-hcl-btn", key:"1"
+  },
+  naoh: {
+    action:"Tilsæt en spand NaOH", kicker:"🧴", group:"base",
+    delta: 3.0, delay:2500, ramp:2200, cooldown:1000,
+    formula:"NaOH → Na⁺ + OH⁻",
+    ionInfo:"Natriumhydroxid spalter sig i en positiv ion (Na⁺) og en negativ ion (OH⁻). OH⁻-ionerne binder H⁺ fra vandet, så der bliver færre H⁺-ioner tilbage – derfor stiger pH.",
+    btnClass:"chem-naoh-btn", key:"2"
+  },
+  phminus: {
+    action:"Tilsæt en skefuld NaHSO₄", kicker:"🧂", group:"syre",
+    delta:-0.9, delay:2000, ramp:4600, cooldown:1000,
+    formula:"NaHSO₄ → Na⁺ + HSO₄⁻",
+    ionInfo:"Natriumhydrogensulfat er et svagt syrende salt. Den negative ion HSO₄⁻ afgiver gradvist H⁺ til vandet, så pH falder langsomt og til at styre – i modsætning til den rene saltsyre.",
+    btnClass:"chem-phminus-btn", key:"3"
+  },
+  phplus: {
+    action:"Tilsæt en skefuld Na₂CO₃", kicker:"🧂", group:"base",
+    delta: 0.9, delay:2000, ramp:4600, cooldown:1000,
+    formula:"Na₂CO₃ → 2 Na⁺ + CO₃²⁻",
+    ionInfo:"Natriumcarbonat (soda) frigiver den negative ion CO₃²⁻, som reagerer med vand og optager H⁺-ioner. Det sker langsommere end med den flydende base, så pH stiger blødt.",
+    btnClass:"chem-phplus-btn", key:"4"
+  }
+};
+
+// Hændelser der kan indtræffe i løbet af en runde. Se ROUNDS herunder for,
+// hvornår de bliver udløst. "ramp" bruges som den periode hvor effekten
+// glider ind (fx "gradvist over 10 sekunder" for syreregn).
+// "formula" er valgfri og vises som en ekstra kemi-linje i hændelses-boblen.
+const EVENT_DEFS = {
+  tisser: {
+    label:"Et barn tisser i vandet!", icon:"🚼",
+    delta:-1.05, delay:0, ramp:900,
+    desc:"Hurtigt fald.",
+    formula:"Urinstof (CH₄N₂O)"
+  },
+  syreregn: {
+    label:"Syreregn!", icon:"🌧️",
+    delta:-2.4, delay:0, ramp:10000,
+    desc:"Fald over 10 sek.",
+    formula:"H₂SO₄ + HNO₃ i regnen"
+  },
+  klorchok: {
+    label:"Klor-chok rengøring!", icon:"🧯",
+    delta: 2.6, delay:500, ramp:3400,
+    desc:"Kraftig stigning.",
+    formula:"NaOCl → Na⁺ + OCl⁻"
+  },
+  fugleklat: {
+    label:"Fugleklat-invasion!", icon:"🐦",
+    delta:-1.0, delay:0, ramp:600,
+    desc:"Lille, tilfældigt fald."
+  }
+};
+
+// De 6 runder. "schedule" er tidspunkter (sekunder inde i runden) hvor en
+// hændelse udløses automatisk. Nemt at tilføje/fjerne linjer her.
+// OBS: gæsterne bygges kun op igen ved runde 1 – hvem der er tilbage i runde 4-6
+// afhænger af, hvordan de foregående runder gik.
+const ROUNDS = [
+  {
+    title:"Runde 1: Morgenåbning",
+    intro:"Poolen åbner roligt. Brug tiden til at mærke, hvor lang tid kemikalierne er om at virke, før du skal reagere hurtigt senere.",
+    schedule:[
+      {t:15, event:"tisser"},
+      {t:38, event:"fugleklat"},
+      {t:50, event:"tisser"}
+    ]
+  },
+  {
+    title:"Runde 2: Børnehavebesøg",
+    intro:"En børnehaveklasse er på besøg! Mange små uheld i vandet kræver konstant småjustering med granulaterne – og et par overraskelser fra himlen.",
+    schedule:[
+      {t:4,  event:"tisser"},
+      {t:9,  event:"fugleklat"},
+      {t:12, event:"tisser"},
+      {t:20, event:"tisser"},
+      {t:27, event:"tisser"},
+      {t:34, event:"tisser"},
+      {t:41, event:"tisser"},
+      {t:44, event:"fugleklat"},
+      {t:48, event:"tisser"},
+      {t:55, event:"tisser"}
+    ]
+  },
+  {
+    title:"Runde 3: Tordenvejr og syreregn",
+    intro:"Himlen trækker sig sammen. Gentagne bølger af voldsom syreregn presser pH nedad – vær klar med de kraftige midler, men pas på ikke at overkorrigere!",
+    schedule:[
+      {t:5,  event:"fugleklat"},
+      {t:8,  event:"syreregn"},
+      {t:20, event:"tisser"},
+      {t:24, event:"fugleklat"},
+      {t:30, event:"klorchok"},
+      {t:34, event:"syreregn"},
+      {t:45, event:"tisser"},
+      {t:50, event:"klorchok"}
+    ]
+  },
+  {
+    title:"Runde 4: Eftermiddagsrush",
+    intro:"Eftermiddagens myldretid presser på. Flere slags uheld på én gang – hold tungen lige i munden.",
+    schedule:[
+      {t:5,  event:"tisser"},
+      {t:12, event:"fugleklat"},
+      {t:18, event:"tisser"},
+      {t:25, event:"klorchok"},
+      {t:32, event:"tisser"},
+      {t:38, event:"fugleklat"},
+      {t:45, event:"tisser"},
+      {t:52, event:"syreregn"}
+    ]
+  },
+  {
+    title:"Runde 5: Renseanlægget svigter",
+    intro:"Renseanlægget hakker i det. Gentagne bølger af kemisk uro rammer poolen uden meget varsel.",
+    schedule:[
+      {t:4,  event:"syreregn"},
+      {t:10, event:"klorchok"},
+      {t:18, event:"tisser"},
+      {t:24, event:"syreregn"},
+      {t:30, event:"fugleklat"},
+      {t:36, event:"klorchok"},
+      {t:44, event:"tisser"},
+      {t:50, event:"syreregn"},
+      {t:56, event:"fugleklat"}
+    ]
+  },
+  {
+    title:"Runde 6: Sæsonens sidste vagt",
+    intro:"Den sidste vagt inden lukketid. Alt kan ske, og intet venter på dig – vis, at du har styr på poolens kemi.",
+    schedule:[
+      {t:3,  event:"fugleklat"},
+      {t:6,  event:"syreregn"},
+      {t:14, event:"klorchok"},
+      {t:20, event:"tisser"},
+      {t:26, event:"syreregn"},
+      {t:32, event:"klorchok"},
+      {t:38, event:"tisser"},
+      {t:42, event:"fugleklat"},
+      {t:48, event:"syreregn"},
+      {t:54, event:"klorchok"}
+    ]
+  }
+];
+
+const GUEST_EMOJIS = ["🏊","🤽","🧑‍🦱","👧","🧔","👩‍🦰","🧒","👨","👱‍♀️","🧑","🏊‍♀️","🤾"];
+const PROTEST_MESSAGES = [
+  "Vandet føles forkert!","Mine øjne svier!","Jeg skal hjem!",
+  "Puha, det lugter skarpt!","Nej tak, jeg går!","Det her er ulækkert!"
+];
+// Vises på ALLE tilbageværende gæster (ikke kun den der går), når pH er langt uden for zonen.
+const DISTRESS_MESSAGES_LOW  = ["AV, det svier!!","Det brænder i øjnene!","For surt!!"];
+const DISTRESS_MESSAGES_HIGH = ["Det klør i huden!","Uhh, glat og forkert!","Det stinker af klor!"];
+// Vises i rækkefølge, mens en gæst er i dødszonen og endnu ikke er afgjort død eller reddet.
+const DEATH_CRY_MESSAGES = ["AAAH!! Det brænder!!","Jeg kan ikke få vejret!!","HJÆLP MIG!!"];
+
+/* -------------------------------------------------------------------------
+   2) SPILTILSTAND
+   ------------------------------------------------------------------------- */
+
+const state = {
+  screen:"start",          // start | roundIntro | playing | roundSummary | gameOver | finished
+  roundIndex:0,
+  roundGen:0,               // bruges til at annullere gamle setTimeout-kæder ved rundeskift
+  roundElapsed:0,           // ms
+  currentPH:TARGET_PH,
+  doses:[],                 // aktive kemikalie-/hændelsesdoser under indfasning
+  guests:[],                // {id, el, bubble, leaving, dying, dead}
+  devAccum:0,                // sum af |pH-7.2|*dt, bruges til pointberegning
+  outOfRangeAccum:0,        // ms akkumuleret uden for sikker zone (styrer hvor tit nogen går)
+  deathAccum:0,             // ms akkumuleret i dødszonen (styrer hvornår et dødsforløb starter)
+  deathInProgress:false,    // true mens én gæst er i gang med at "dødsråbe"
+  deathCooldownAccum:0,     // ms tilbage før et nyt dødsforløb overhovedet kan starte
+  distressAccum:0,          // ms akkumuleret ved akut ubehag (styrer synlige ubehags-blink)
+  deathCount:0,             // antal døde gæster i hele spillet (persisterer på tværs af runder) – 2 = game over
+  roundStartDeathCount:0,   // deathCount ved rundens start – bruges til kun at straffe DENNE rundes dødsfald i scoren
+  fateGuardAccum:0,         // ms tilbage før en NY gæst må forlade poolen eller dø (fælles spærre)
+  speakingGuests:new Set(), // id'er på gæster der lige nu viser en snakkeboble (maks MAX_SPEAKING_GUESTS)
+  cooldowns:{hcl:0, naoh:0, phminus:0, phplus:0},
+  eventQueue:[],
+  scoreHistory:[],          // [{phScore,guestScore,deathPenalty,deaths,total,guestsLeft}]
+  lastFrameTime:0
+};
+
+function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+function easeInOutQuad(t){ return t<0.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2; }
+function phToPercent(ph){
+  const c = clamp(ph, SCALE_MIN, SCALE_MAX);
+  return (c-SCALE_MIN)/(SCALE_MAX-SCALE_MIN)*100;
+}
+
+/* -------------------------------------------------------------------------
+   3) SIMULATION – doser med forsinkelse og indfasning
+   ------------------------------------------------------------------------- */
+
+function spawnDose(kind, key){
+  const def = kind==="chemical" ? CHEMICALS[key] : EVENT_DEFS[key];
+  let delta = def.delta;
+  let delay = def.delay;
+  if(kind==="event"){
+    // Lidt tilfældighed på hændelser, så runderne ikke føles 100% ens hver gang.
+    delta *= (0.85 + Math.random()*0.3);
+  } else {
+    // Vandets cirkulationstid varierer lidt fra dosering til dosering – det gør
+    // det sværere at time præcist, ligesom i en rigtig pool.
+    delay *= (0.8 + Math.random()*0.4);
+  }
+  const dose = {
+    kind, key,
+    totalDelta:delta,
+    delay,
+    rampDuration:Math.max(200, def.ramp),
+    startTime:performance.now(),
+    appliedSoFar:0
+  };
+  state.doses.push(dose);
+  spawnRipple(kind, key, def);
+  if(kind==="event") showEventBanner(def);
+  return dose;
+}
+
+function updateDoses(now, dt){
+  // Baggrundssyrning: vandet driver konstant en smule surt af sig selv (bruger-belastning,
+  // klorforbrug osv.), så det ikke er nok bare at vente og se tiden gå.
+  let ph = state.currentPH + BASELINE_DRIFT_PER_SEC*(dt/1000);
+  for(let i=state.doses.length-1; i>=0; i--){
+    const d = state.doses[i];
+    const elapsed = now - d.startTime;
+    const fraction = elapsed<=d.delay ? 0 : Math.min(1, (elapsed-d.delay)/d.rampDuration);
+    const eased = easeInOutQuad(fraction);
+    const targetApplied = d.totalDelta * eased;
+    ph += (targetApplied - d.appliedSoFar);
+    d.appliedSoFar = targetApplied;
+    if(fraction>=1) state.doses.splice(i,1);
+  }
+  state.currentPH = clamp(ph, 1.5, 12.5);
+}
+
+// Skygge-pH: hvor systemet er på vej hen, hvis spilleren ikke gør mere.
+function getProjectedPH(){
+  return state.doses.reduce((sum,d)=> sum + (d.totalDelta - d.appliedSoFar), state.currentPH);
+}
+
+function spawnRipple(kind, key, def){
+  const layer = document.getElementById("rippleLayer");
+  const el = document.createElement("div");
+  el.className = "ripple " + (kind==="chemical" ? "chem-"+key : "event-"+key);
+  const x = 20 + Math.random()*60;
+  const y = 20 + Math.random()*60;
+  el.style.left = x+"%";
+  el.style.top = y+"%";
+  const duration = def.delay + def.ramp + 400;
+  el.style.animationDuration = duration+"ms";
+  layer.appendChild(el);
+  setTimeout(()=> el.remove(), duration+100);
+}
+
+const MAX_VISIBLE_TOASTS = 3; // alarmbeskeder må aldrig vokse ned og dække poolen
+
+// Fælles indsætning for alle alarmbeskeder – fjerner den ældste med det samme,
+// hvis der allerede er for mange synlige, så bunken aldrig vokser ned over poolen.
+function appendToast(toast){
+  const banner = document.getElementById("eventBanner");
+  banner.appendChild(toast);
+  while(banner.children.length > MAX_VISIBLE_TOASTS){
+    banner.removeChild(banner.firstElementChild);
+  }
+}
+
+function showEventBanner(def){
+  const toast = document.createElement("div");
+  toast.className = "toast";
+  const formulaLine = def.formula ? `<em>${def.formula}</em>` : "";
+  toast.innerHTML = `<div class="icon">${def.icon}</div><div class="txt"><strong>${def.label}</strong><span>${def.desc}</span>${formulaLine}</div>`;
+  appendToast(toast);
+  setTimeout(()=> toast.remove(), 7100);
+}
+
+/* -------------------------------------------------------------------------
+   4) GÆSTER
+   ------------------------------------------------------------------------- */
+
+// Kaldes KUN ved en helt ny spilstart (runde 1) – nye badegæster kommer ikke
+// ind mellem runderne, så hvem der er tilbage, afhænger af hele spillets forløb.
+// Øger roundGen, som guest-livscyklus-funktionerne bruger til at ugyldiggøre
+// gamle setTimeout-kæder fra et evt. tidligere spil.
+function buildGuests(){
+  state.roundGen++;
+  state.deathCount = 0;
+  state.speakingGuests.clear();
+  const layer = document.getElementById("guestLayer");
+  layer.innerHTML = "";
+  state.guests = [];
+  for(let i=0;i<TOTAL_GUESTS;i++){
+    const id = state.roundGen+"-"+i;
+    const el = document.createElement("div");
+    el.className = "guest";
+    el.textContent = GUEST_EMOJIS[Math.floor(Math.random()*GUEST_EMOJIS.length)];
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    el.appendChild(bubble);
+    layer.appendChild(el);
+    state.guests.push({id, el, bubble, leaving:false, dying:false, dead:false});
+  }
+  renderGuestCount();
+}
+
+// Snakkeboble-styring: højst MAX_SPEAKING_GUESTS gæster må vise en boble ad gangen.
+// force:true (kun dødsråb) må skubbe en mindre vigtig boble væk for at få plads –
+// alt andet (almindelig protest, akut ubehag) springes simpelthen over, hvis der er fyldt op.
+function startSpeaking(g, force){
+  if(state.speakingGuests.has(g.id)) return true;
+  if(state.speakingGuests.size >= MAX_SPEAKING_GUESTS){
+    if(!force) return false;
+    const evictId = state.speakingGuests.values().next().value;
+    const evictGuest = state.guests.find(x=>x.id===evictId);
+    if(evictGuest) stopSpeaking(evictGuest);
+  }
+  state.speakingGuests.add(g.id);
+  g.el.classList.add("protest");
+  return true;
+}
+function stopSpeaking(g){
+  state.speakingGuests.delete(g.id);
+  g.bubble.textContent = "";
+  g.el.classList.remove("protest","distress","cry");
+}
+
+// Konsekvensmotor: jo længere pH er fra sikker zone, jo hyppigere sker der noget.
+// Under SAFE_MIN eller mellem SAFE_MAX og DEATH_PH_HIGH forlader gæster poolen.
+// Over DEATH_PH_HIGH starter i stedet et langsommere, tydeligt dødsforløb (se startGuestDying).
+// FATE_GUARD_MS sikrer, at ingen to gæster nogensinde forlader/dør med under 1 sek. mellemrum.
+function updateGuestConsequences(dt){
+  const ph = state.currentPH;
+  const severity = Math.max(0, SAFE_MIN-ph, ph-SAFE_MAX);
+  const alive = state.guests.filter(g=>!g.leaving && !g.dead && !g.dying);
+  const inDeathZone = ph > DEATH_PH_HIGH;
+
+  if(state.deathCooldownAccum>0){
+    state.deathCooldownAccum = Math.max(0, state.deathCooldownAccum-dt);
+  }
+  if(state.fateGuardAccum>0){
+    state.fateGuardAccum = Math.max(0, state.fateGuardAccum-dt);
+  }
+
+  if(inDeathZone){
+    // Almindeligt "gå sur"-ubehag falder til ro her – det er dødsforløbet, der tager over.
+    state.outOfRangeAccum = Math.max(0, state.outOfRangeAccum - dt);
+    if(!state.deathInProgress && state.deathCooldownAccum<=0 && state.fateGuardAccum<=0 && alive.length>0){
+      state.deathAccum += dt;
+      if(state.deathAccum >= DEATH_TRIGGER_DELAY){
+        state.deathAccum = 0;
+        startGuestDying();
+      }
+    }
+  } else {
+    state.deathAccum = 0;
+    if(severity>0 && alive.length>0 && state.fateGuardAccum<=0){
+      state.outOfRangeAccum += dt;
+      const interval = clamp(4600 - severity*3400, 1100, 4600);
+      if(state.outOfRangeAccum >= interval){
+        state.outOfRangeAccum = 0;
+        removeOneGuest();
+      }
+    } else if(severity<=0){
+      state.outOfRangeAccum = Math.max(0, state.outOfRangeAccum - dt*1.6);
+    }
+  }
+
+  // Tydeligt, akut ubehag når man er langt fra den behagelige zone.
+  if(severity > DISCOMFORT_SEVERITY && alive.length>0){
+    state.distressAccum += dt;
+    if(state.distressAccum >= 1700){
+      state.distressAccum = 0;
+      flashAmbientDistress(ph < SAFE_MIN, alive);
+    }
+  } else {
+    state.distressAccum = 0;
+  }
+}
+
+function removeOneGuest(){
+  const candidates = state.guests.filter(g=>!g.leaving && !g.dead && !g.dying);
+  if(candidates.length===0) return;
+  const g = candidates[Math.floor(Math.random()*candidates.length)];
+  state.fateGuardAccum = FATE_GUARD_MS;
+  g.leaving = true;
+  const myGen = state.roundGen;
+  const spoke = startSpeaking(g);
+  if(spoke) g.bubble.textContent = PROTEST_MESSAGES[Math.floor(Math.random()*PROTEST_MESSAGES.length)];
+  renderGuestCount();
+  setTimeout(()=>{
+    if(myGen!==state.roundGen) return;
+    if(spoke) stopSpeaking(g);
+    g.el.classList.add("leaving-anim");
+    setTimeout(()=>{
+      if(myGen!==state.roundGen) return;
+      g.el.remove();
+      state.guests = state.guests.filter(x=>x.id!==g.id);
+      renderGuestCount();
+      // Ingen tilbage til at passe på – poolen står tom, og spillet er slut.
+      const stillAlive = state.guests.filter(x=>!x.dead).length;
+      if(stillAlive===0 && state.screen==="playing"){
+        triggerGameOver("abandoned");
+      }
+    }, 650);
+  }, 1600);
+}
+
+// Ekstrem pH i toppen af skalaen: gæsten dødsråber i et par sekunder først (så spilleren kan
+// nå at redde dem ved at korrigere pH), og først derefter afgøres det, om de dør eller reddes.
+// To dødsfald kan aldrig ske lige efter hinanden pga. DEATH_COOLDOWN_AFTER + FATE_GUARD_MS.
+// Dødsråb har forrang og må skubbe en anden gæsts boble væk (se startSpeaking force:true).
+function startGuestDying(){
+  const candidates = state.guests.filter(g=>!g.leaving && !g.dead && !g.dying);
+  if(candidates.length===0) return;
+  const g = candidates[Math.floor(Math.random()*candidates.length)];
+  state.fateGuardAccum = FATE_GUARD_MS;
+  g.dying = true;
+  state.deathInProgress = true;
+  const myGen = state.roundGen;
+
+  let cryIndex = 0;
+  const cry = ()=>{
+    if(myGen!==state.roundGen) return;
+    startSpeaking(g, true);
+    g.bubble.textContent = DEATH_CRY_MESSAGES[cryIndex % DEATH_CRY_MESSAGES.length];
+    cryIndex++;
+    g.el.classList.add("cry");
+  };
+  cry();
+  const cryTimer = setInterval(cry, 1200);
+
+  setTimeout(()=>{
+    clearInterval(cryTimer);
+    if(myGen!==state.roundGen) return;
+    g.dying = false;
+    state.deathInProgress = false;
+    state.deathCooldownAccum = DEATH_COOLDOWN_AFTER;
+    stopSpeaking(g);
+
+    if(state.currentPH > DEATH_PH_HIGH){
+      finalizeGuestDeath(g, myGen);
+    } else {
+      startSpeaking(g, true);
+      g.bubble.textContent = "Puha, det gik lige akkurat!";
+      setTimeout(()=>{ if(myGen===state.roundGen) stopSpeaking(g); }, 2000);
+    }
+  }, DEATH_CRY_DURATION);
+}
+
+// Gæsten dør og bliver stående som en dødningehoved-markør (fjernes ikke fra poolen –
+// det skal minde spilleren om prisen for at overkorrigere).
+function finalizeGuestDeath(g, myGen){
+  g.dead = true;
+  state.deathCount++;
+  stopSpeaking(g);
+  g.el.classList.add("dying-anim");
+  setTimeout(()=>{
+    if(myGen!==state.roundGen) return;
+    g.el.textContent = "💀";
+    g.el.classList.remove("dying-anim");
+    g.el.classList.add("dead");
+  }, 500);
+  showDeathToast();
+  renderGuestCount();
+  if(state.deathCount>=DEATH_LIMIT && state.screen==="playing"){
+    triggerGameOver("death");
+    return;
+  }
+  // Var det den sidste gæst tilbage (ingen efterladte, ingen døde tilbage), er poolen også tom.
+  const stillAlive = state.guests.filter(x=>!x.dead).length;
+  if(stillAlive===0 && state.screen==="playing"){
+    triggerGameOver("abandoned");
+  }
+}
+
+function showDeathToast(){
+  const toast = document.createElement("div");
+  toast.className = "toast toast-death";
+  toast.innerHTML = `<div class="icon">☠️</div><div class="txt"><strong>En gæst døde af det basiske vand!</strong><span>${state.deathCount}/${DEATH_LIMIT} døde</span></div>`;
+  appendToast(toast);
+  setTimeout(()=> toast.remove(), 7100);
+}
+
+function flashAmbientDistress(isLowSide, alive){
+  const scene = document.getElementById("poolScene");
+  scene.classList.add(isLowSide ? "danger-flash-low" : "danger-flash-high");
+  setTimeout(()=> scene.classList.remove(isLowSide ? "danger-flash-low" : "danger-flash-high"), 650);
+  const msgs = isLowSide ? DISTRESS_MESSAGES_LOW : DISTRESS_MESSAGES_HIGH;
+  const shuffled = [...alive].sort(()=> Math.random()-0.5);
+  for(const g of shuffled){
+    if(state.speakingGuests.size >= MAX_SPEAKING_GUESTS) break;
+    if(Math.random() < 0.7){
+      const spoke = startSpeaking(g);
+      if(spoke){
+        g.bubble.textContent = msgs[Math.floor(Math.random()*msgs.length)];
+        g.el.classList.add("distress");
+        setTimeout(()=>{ stopSpeaking(g); }, 1500);
+      }
+    }
+  }
+}
+
+function renderGuestCount(){
+  const remaining = state.guests.filter(g=>!g.leaving && !g.dead).length;
+  document.getElementById("statGuests").textContent = remaining+"/"+TOTAL_GUESTS;
+  document.getElementById("statGuests").className = "value" + (remaining<=3 ? " danger" : remaining<=6 ? " warn" : "");
+  const deathsEl = document.getElementById("statDeaths");
+  if(deathsEl){
+    deathsEl.textContent = state.deathCount+"/"+DEATH_LIMIT;
+    deathsEl.className = "value" + (state.deathCount>0 ? " danger" : "");
+  }
+}
+
+/* -------------------------------------------------------------------------
+   5) RUNDER & SCORE
+   ------------------------------------------------------------------------- */
+
+function computeRoundScore(){
+  const elapsed = Math.max(1, state.roundElapsed);
+  const avgDeviation = state.devAccum / elapsed; // gennemsnitlig |pH-7.2|
+  const phScore = Math.round(clamp(400 - avgDeviation*520, 0, 400));
+  const guestsLeft = state.guests.filter(g=>!g.leaving && !g.dead).length;
+  const guestScore = Math.round(guestsLeft/TOTAL_GUESTS*600);
+  // Kun de dødsfald der skete I DENNE runde skal trække ned i rundens score –
+  // deathCount er en spil-lang tæller, så vi ser på ændringen siden rundens start.
+  const deathsThisRound = state.deathCount - state.roundStartDeathCount;
+  const deathPenalty = deathsThisRound*250;
+  const total = Math.max(0, phScore+guestScore-deathPenalty);
+  return { phScore, guestScore, deathPenalty, deaths:deathsThisRound, total, guestsLeft };
+}
+
+function totalScoreSoFar(){
+  return state.scoreHistory.reduce((s,r)=> s+r.total, 0);
+}
+
+function beginRound(){
+  const round = ROUNDS[state.roundIndex];
+  state.currentPH = TARGET_PH;
+  state.doses = [];
+  state.devAccum = 0;
+  state.roundElapsed = 0;
+  state.cooldowns = {hcl:0, naoh:0, phminus:0, phplus:0};
+  state.eventQueue = round.schedule.map(e=>({...e, fired:false}));
+  document.getElementById("rippleLayer").innerHTML = "";
+  document.getElementById("eventBanner").innerHTML = "";
+  // Gæsterne (og dødstallet) er en spil-lang tilstand, ikke en runde-tilstand –
+  // kun ved en helt ny spilstart (runde 1) bygges poolen op igen.
+  if(state.roundIndex === 0){
+    buildGuests(); // nulstiller bl.a. state.deathCount – derfor sker snapshottet herunder EFTER dette kald
+  }
+  state.roundStartDeathCount = state.deathCount;
+  renderGuestCount();
+  state.screen = "playing";
+  state.lastFrameTime = performance.now();
+  render();
+}
+
+function updateRoundSchedule(){
+  state.eventQueue.forEach(ev=>{
+    if(!ev.fired && state.roundElapsed >= ev.t*1000){
+      ev.fired = true;
+      spawnDose("event", ev.event);
+    }
+  });
+}
+
+function endRound(){
+  const result = computeRoundScore();
+  result.roundTitle = ROUNDS[state.roundIndex].title;
+  state.scoreHistory.push(result);
+  state.screen = "roundSummary";
+  render();
+}
+
+function triggerGameOver(reason){
+  const result = computeRoundScore();
+  result.roundTitle = ROUNDS[state.roundIndex].title + " (afbrudt)";
+  result.reason = reason; // "death" eller "abandoned" – styrer teksten på game over-skærmen
+  state.scoreHistory.push(result);
+  state.screen = "gameOver";
+  render();
+}
+
+function goToNextRoundOrFinish(){
+  if(state.roundIndex < ROUNDS.length-1){
+    state.roundIndex++;
+    state.screen = "roundIntro";
+  } else {
+    state.screen = "finished";
+  }
+  render();
+}
+
+function resetGame(){
+  state.roundIndex = 0;
+  state.scoreHistory = [];
+  state.screen = "start";
+  document.getElementById("guestLayer").innerHTML = "";
+  document.getElementById("rippleLayer").innerHTML = "";
+  document.getElementById("eventBanner").innerHTML = "";
+  render();
+}
+
+/* -------------------------------------------------------------------------
+   6) RENDERING
+   ------------------------------------------------------------------------- */
+
+function poolTint(ph){
+  // Interpolerer en vandfarve: gulligt ved surt, violet ved basisk, ellers blåt.
+  const base = [56,142,196];
+  if(ph < SAFE_MIN){
+    const t = clamp((SAFE_MIN-ph)/3, 0, 1);
+    return mixRGB(base, [168,168,50], t);
+  }
+  if(ph > SAFE_MAX){
+    const t = clamp((ph-SAFE_MAX)/3, 0, 1);
+    return mixRGB(base, [123,74,196], t);
+  }
+  return "rgb("+base.join(",")+")";
+}
+function mixRGB(a,b,t){
+  const r = Math.round(a[0]+(b[0]-a[0])*t);
+  const g = Math.round(a[1]+(b[1]-a[1])*t);
+  const bl = Math.round(a[2]+(b[2]-a[2])*t);
+  return "rgb("+r+","+g+","+bl+")";
+}
+
+function renderPHPanel(){
+  const cur = state.currentPH;
+  const proj = getProjectedPH();
+  document.getElementById("currentPHNum").textContent = cur.toFixed(2);
+  document.getElementById("projectedPHNum").textContent = proj.toFixed(2);
+  document.getElementById("currentMarker").style.left = phToPercent(cur)+"%";
+  document.getElementById("shadowMarker").style.left = phToPercent(proj)+"%";
+
+  const safeLeft = phToPercent(SAFE_MIN);
+  const safeRight = phToPercent(SAFE_MAX);
+  const band = document.getElementById("safeZoneBand");
+  band.style.left = safeLeft+"%";
+  band.style.width = (safeRight-safeLeft)+"%";
+  document.getElementById("targetLine").style.left = phToPercent(TARGET_PH)+"%";
+
+  const deathLeft = phToPercent(DEATH_PH_HIGH);
+  const deathZone = document.getElementById("deathZoneBand");
+  deathZone.style.left = deathLeft+"%";
+  deathZone.style.width = (100-deathLeft)+"%";
+
+  document.getElementById("waterTint").style.backgroundColor = poolTint(cur);
+
+  const outOfRange = cur < SAFE_MIN || cur > SAFE_MAX;
+  document.getElementById("currentPHNum").style.color = outOfRange ? "#ff8f7a" : "";
+}
+
+function renderHeader(){
+  document.getElementById("statRound").textContent = (state.roundIndex+1)+" / "+ROUNDS.length;
+  const secondsLeft = Math.max(0, Math.ceil((ROUND_DURATION_MS-state.roundElapsed)/1000));
+  document.getElementById("statTime").textContent = state.screen==="playing" ? secondsLeft+"s" : "–";
+  document.getElementById("statScore").textContent = totalScoreSoFar();
+  const pct = state.screen==="playing" ? clamp(100-(state.roundElapsed/ROUND_DURATION_MS*100),0,100) : 100;
+  document.getElementById("timerBar").style.width = pct+"%";
+}
+
+function renderButtons(){
+  Object.entries(CHEMICALS).forEach(([key, def])=>{
+    const btn = document.getElementById("btn-"+key);
+    if(!btn) return;
+    const cd = state.cooldowns[key];
+    const disabled = state.screen!=="playing" || cd>0;
+    btn.disabled = disabled;
+    const fill = btn.querySelector(".cooldown-fill");
+    fill.style.width = cd>0 ? (cd/def.cooldown*100)+"%" : "0%";
+  });
+}
+
+function renderOverlay(){
+  const overlay = document.getElementById("overlay");
+  overlay.style.display = state.screen==="playing" ? "none" : "flex";
+  document.querySelectorAll(".panel").forEach(p=>{
+    p.classList.toggle("active", p.dataset.screen===state.screen);
+  });
+
+  if(state.screen==="roundIntro"){
+    const round = ROUNDS[state.roundIndex];
+    document.getElementById("introTitle").textContent = round.title;
+    document.getElementById("introText").textContent = round.intro;
+  }
+
+  if(state.screen==="roundSummary"){
+    const r = state.scoreHistory[state.scoreHistory.length-1];
+    document.getElementById("summaryRoundTitle").textContent = r.roundTitle;
+    document.getElementById("sumGuests").textContent = r.guestsLeft+"/"+TOTAL_GUESTS;
+    document.getElementById("sumPhScore").textContent = r.phScore+"/400";
+    document.getElementById("sumDeaths").textContent = r.deaths+" (−"+r.deathPenalty+")";
+    document.getElementById("sumRoundScore").textContent = r.total+"/1000";
+    document.getElementById("sumTotalScore").textContent = totalScoreSoFar();
+    document.getElementById("btnContinue").textContent =
+      state.roundIndex < ROUNDS.length-1 ? "Fortsæt til næste runde" : "Se samlet resultat";
+  }
+
+  if(state.screen==="gameOver"){
+    const r = state.scoreHistory[state.scoreHistory.length-1];
+    if(r && r.reason==="abandoned"){
+      document.getElementById("goTitle").textContent = "🚪 Poolen står tom!";
+      document.getElementById("goDesc").textContent = "Alle badegæster har forladt poolen. Her er din indsats:";
+    } else {
+      document.getElementById("goTitle").textContent = "☠️ Poolen lukket for altid!";
+      document.getElementById("goDesc").textContent = "To badegæster døde af det ekstreme pH. Her er din indsats:";
+    }
+    document.getElementById("goRounds").textContent = state.roundIndex+1;
+    document.getElementById("goScore").textContent = totalScoreSoFar();
+  }
+
+  if(state.screen==="finished"){
+    const total = totalScoreSoFar();
+    document.getElementById("finalScore").textContent = total;
+    let grade;
+    if(total>=5000) grade = "🏆 Perfekt pool-mester!";
+    else if(total>=3600) grade = "👍 Solid indsats!";
+    else if(total>=2000) grade = "😅 Poolen overlevede – så nogenlunde.";
+    else grade = "🙈 Der er plads til forbedring…";
+    document.getElementById("finalGrade").textContent = grade;
+  }
+}
+
+function render(){
+  renderHeader();
+  renderPHPanel();
+  renderButtons();
+  renderOverlay();
+}
+
+/* -------------------------------------------------------------------------
+   7) OPSTART, KNAPPER OG SPIL-LOOP
+   ------------------------------------------------------------------------- */
+
+const GROUP_HEADINGS = {
+  syre: { label:"🔴 SYRE – sænker pH", cls:"heading-syre" },
+  base: { label:"🔵 BASE – hæver pH", cls:"heading-base" }
+};
+
+function buildChemicalButtons(){
+  const grid = document.getElementById("buttonsGrid");
+  grid.innerHTML = "";
+
+  ["syre","base"].forEach(group=>{
+    const heading = document.createElement("div");
+    heading.className = "chem-group-heading " + GROUP_HEADINGS[group].cls;
+    heading.textContent = GROUP_HEADINGS[group].label;
+    grid.appendChild(heading);
+
+    Object.entries(CHEMICALS).filter(([,def])=> def.group===group).forEach(([key, def])=>{
+      const wrap = document.createElement("div");
+      wrap.className = "chem-card";
+
+      const btn = document.createElement("button");
+      btn.className = "chem-btn " + def.btnClass;
+      btn.id = "btn-"+key;
+      btn.innerHTML = `
+        <div class="cooldown-fill"></div>
+        <div class="top"><span class="kicker">${def.kicker}</span>${def.action} <kbd>${def.key}</kbd></div>
+        <div class="formula">${def.formula}</div>
+      `;
+      btn.addEventListener("click", ()=> useChemical(key));
+
+      // "Hvorfor virker det?" er en valgfri, skjult uddybning – vises kun hvis
+      // eleven selv klikker på den (ingen automatiske hint-bokse).
+      const why = document.createElement("button");
+      why.type = "button";
+      why.className = "why-toggle";
+      why.textContent = "🔬 Hvorfor virker det?";
+      const info = document.createElement("p");
+      info.className = "ion-info";
+      info.textContent = def.ionInfo;
+      why.addEventListener("click", (e)=>{
+        e.stopPropagation();
+        const open = info.classList.toggle("open");
+        why.textContent = open ? "🔬 Skjul forklaring" : "🔬 Hvorfor virker det?";
+      });
+
+      wrap.appendChild(btn);
+      wrap.appendChild(why);
+      wrap.appendChild(info);
+      grid.appendChild(wrap);
+    });
+  });
+}
+
+function useChemical(key){
+  if(state.screen!=="playing") return;
+  if(state.cooldowns[key] > 0) return;
+  spawnDose("chemical", key);
+  state.cooldowns[key] = CHEMICALS[key].cooldown;
+}
+
+function updateCooldowns(dt){
+  Object.keys(state.cooldowns).forEach(k=>{
+    if(state.cooldowns[k]>0) state.cooldowns[k] = Math.max(0, state.cooldowns[k]-dt);
+  });
+}
+
+function tick(now){
+  const dt = state.lastFrameTime ? now-state.lastFrameTime : 16;
+  state.lastFrameTime = now;
+
+  if(state.screen==="playing"){
+    updateDoses(now, dt);
+    updateGuestConsequences(dt);
+    updateCooldowns(dt);
+    state.devAccum += Math.abs(state.currentPH-TARGET_PH)*dt;
+    state.roundElapsed += dt;
+    updateRoundSchedule();
+    if(state.roundElapsed >= ROUND_DURATION_MS){
+      endRound();
+    }
+  }
+  render();
+  requestAnimationFrame(tick);
+}
+
+document.getElementById("btnStart").addEventListener("click", beginRound);
+document.getElementById("btnBeginRound").addEventListener("click", beginRound);
+document.getElementById("btnContinue").addEventListener("click", goToNextRoundOrFinish);
+document.getElementById("btnRetryGameOver").addEventListener("click", resetGame);
+document.getElementById("btnRestartFinal").addEventListener("click", resetGame);
+
+document.addEventListener("keydown", (e)=>{
+  const map = {"1":"hcl","2":"naoh","3":"phminus","4":"phplus"};
+  if(map[e.key]) useChemical(map[e.key]);
+});
+
+buildChemicalButtons();
+render();
+requestAnimationFrame(tick);
+
+</script>
+</body>
+</html>

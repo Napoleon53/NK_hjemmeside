@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kemi-Lab: Prikformler & Lewis-Strukturer</title>
+    <style>
+        :root {
+            --bg: #111827;
+            --panel: #1f2937;
+            --text: #f3f4f6;
+            --accent: #60a5fa;
+            --success: #34d399;
+            --danger: #f87171;
+            --electron: #fbbf24;
+            --footer-h: 80px;
+        }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; overflow: hidden; display: flex; flex-direction: column; height: 100vh; user-select: none; }
+        
+        /* Layout Grid */
+        header { height: 60px; padding: 0 20px; background: var(--panel); border-bottom: 1px solid #374151; display: flex; justify-content: space-between; align-items: center; z-index: 10; flex-shrink: 0; }
+        
+        #game-area { flex: 1; position: relative; overflow: hidden; background: #0f172a; }
+        canvas { display: block; width: 100%; height: 100%; cursor: crosshair; }
+        
+        footer { height: var(--footer-h); background: var(--panel); border-top: 1px solid #374151; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0; z-index: 10; }
+
+        /* UI Elements */
+        .molecule-box { font-size: 1.5rem; font-weight: bold; color: var(--accent); background: rgba(96, 165, 250, 0.1); padding: 5px 15px; border-radius: 8px; }
+
+        .task-menu { display: flex; gap: 6px; }
+        .task-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #4b5563; background: #374151; color: #e5e7eb; font-size: 0.75rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: 0.15s; }
+        .task-btn:hover { border-color: var(--accent); }
+        .task-btn.active { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+        .task-btn.solved { background: #064e3b; border-color: var(--success); color: var(--success); }
+        .task-btn.solved.active { background: var(--success); color: #052e1c; }
+        
+        .btn-primary { background: var(--accent); color: var(--bg); border: none; padding: 10px 30px; border-radius: 6px; font-weight: bold; font-size: 1.1rem; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+        .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(1px); }
+
+        .btn-secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 10px 20px; border-radius: 6px; font-weight: bold; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+        .btn-secondary:hover { background: rgba(96, 165, 250, 0.1); }
+        .btn-secondary:active { transform: translateY(1px); }
+
+        .instructions { font-size: 0.9rem; color: #9ca3af; line-height: 1.4; }
+        .instructions strong { color: var(--text); }
+
+        /* Overlays */
+        .overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(31, 41, 55, 0.98); padding: 30px; border-radius: 12px; border: 1px solid #4b5563; text-align: center; max-width: 800px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 50; transition: opacity 0.3s; }
+        .hidden { opacity: 0; pointer-events: none; display: none !important; }
+
+        #setup-heading { font-size: 1.1rem; font-weight: normal; }
+
+        /* Setup Phase Styles */
+        .pt-display { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; margin: 20px 0; }
+        .pt-cell { width: 45px; height: 50px; border: 1px solid #4b5563; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #374151; opacity: 0.5; position: relative; }
+        .pt-cell.active { opacity: 1; background: #1f2937; border-color: #9ca3af; }
+        .pt-cell.highlight { border: 2px solid var(--accent); background: #3b82f6; color: white; transform: scale(1.1); z-index: 2; opacity: 1; box-shadow: 0 0 15px var(--accent); }
+        .atom-sym { font-weight: bold; font-size: 1.1rem; }
+        .atom-num { font-size: 0.65rem; position: absolute; top: 2px; left: 3px; }
+        .group-num { font-size: 0.7rem; color: #9ca3af; grid-column: span 1; text-align: center; margin-bottom: 5px; }
+
+        .v-btn { width: 40px; height: 40px; border-radius: 8px; border: 2px solid var(--accent); background: transparent; color: white; font-size: 1.1rem; cursor: pointer; margin: 5px; transition: 0.2s; }
+        .v-btn:hover { background: var(--accent); color: var(--bg); }
+
+        /* Feedback Toast */
+        #toast { position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--danger); color: white; padding: 10px 20px; border-radius: 30px; font-weight: bold; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+
+        /* Task menu label */
+        .task-menu-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+        .task-menu-label { font-size: 0.65rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Intro button */
+        .intro-btn { background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 6px 14px; font-size: 0.85rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .intro-btn:hover { background: rgba(96, 165, 250, 0.15); }
+
+        /* Guided tour */
+        #tourBackdrop { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.65); z-index: 2000; }
+        #tourTooltip { position: fixed; z-index: 2001; background: var(--panel); border: 1px solid #4b5563; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); padding: 16px 20px; width: 300px; font-size: 0.95rem; line-height: 1.4; color: var(--text); }
+        #tourTooltip .tour-step-count { font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; font-weight: 700; }
+        #tourTooltip .tour-text { margin-bottom: 14px; }
+        #tourTooltip .tour-nav { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        #tourTooltip .tour-nav button { border: none; border-radius: 5px; padding: 7px 14px; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
+        #tourTooltip .tour-btn-skip { background: transparent; color: #9ca3af; }
+        #tourTooltip .tour-btn-skip:hover { color: var(--danger); }
+        #tourTooltip .tour-btn-prev { background: #374151; color: var(--text); }
+        #tourTooltip .tour-btn-prev:hover { background: #4b5563; }
+        #tourTooltip .tour-btn-next { background: var(--accent); color: var(--bg); }
+        #tourTooltip .tour-btn-next:hover { filter: brightness(1.1); }
+
+        /* Line-formula (stregformel) preview panel */
+        #line-panel { position: absolute; top: 14px; left: 14px; width: 276px; background: rgba(31, 41, 55, 0.9); border: 1px solid #4b5563; border-radius: 8px; padding: 8px; z-index: 5; pointer-events: none; }
+        #line-panel-title { font-size: 0.7rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; margin-bottom: 4px; }
+        #line-canvas { display: block; width: 260px; height: 210px; cursor: default; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <span style="color:#9ca3af; font-size:0.9rem;">Øvelse <span id="lvl-num">1</span>/<span id="lvl-total">5</span></span>
+        <h1 style="margin:0; font-size:1.2rem;">Elektron-Prikformler</h1>
+    </div>
+    <div class="task-menu-wrap">
+        <span class="task-menu-label">Opgaver</span>
+        <div class="task-menu" id="task-menu"></div>
+    </div>
+    <div style="display:flex; align-items:center; gap:14px;">
+        <div class="molecule-box" id="target-mol">Loading...</div>
+        <button class="intro-btn" onclick="startTour()">❔ Introduktion</button>
+    </div>
+</header>
+
+<div id="game-area">
+    <canvas id="c"></canvas>
+
+    <div id="line-panel">
+        <div id="line-panel-title">Stregformel</div>
+        <canvas id="line-canvas" width="260" height="210"></canvas>
+    </div>
+
+    <div id="setup-overlay" class="overlay">
+        <div id="setup-mol-display" style="font-size:1.8rem; font-weight:bold; color:var(--accent); margin-bottom:6px;"></div>
+        <h2 id="setup-heading"></h2>
+        <p>Hvor mange elektroner er der i yderste skal?</p>
+        <div style="display:grid; grid-template-columns: repeat(8, 1fr); width: 100%; max-width: 420px; margin: 0 auto;">
+            <div class="group-num">I</div><div class="group-num">II</div><div class="group-num">III</div><div class="group-num">IV</div>
+            <div class="group-num">V</div><div class="group-num">VI</div><div class="group-num">VII</div><div class="group-num">VIII</div>
+        </div>
+        <div id="pt-grid" class="pt-display" style="max-width: 420px; margin: 5px auto 20px auto;"></div>
+        <div id="v-btns"></div>
+    </div>
+
+    <div id="win-overlay" class="overlay hidden">
+        <h2 style="color:var(--success)">Korrekt Prikformel!</h2>
+        <p id="win-msg">Alle atomer opfylder oktetreglen.</p>
+        <button class="btn-primary" onclick="nextLevel()">Næste Opgave</button>
+    </div>
+
+    <div id="toast">Fejl besked her</div>
+</div>
+
+<footer>
+    <div class="instructions">
+        <strong>Vejledning:</strong> Træk atomer sammen for at binde.<br>
+        Klik bindingen for at skifte enkelt → dobbelt → tripel → fjern. Træk atomer fra hinanden for at bryde bindingen.
+    </div>
+    <div id="btn-group" style="display:flex; gap:10px;">
+        <button id="reset-btn" class="btn-secondary hidden" onclick="resetCurrentLevel()">Nulstil</button>
+        <button id="check-btn" class="btn-primary hidden" onclick="checkAnswer()">Tjek Svar</button>
+    </div>
+</footer>
+
+<script>
+/** DATA **/
+const ELEMENTS = {
+    1: { s: 'H', n: 'Hydrogen', v: 1, g: 1 },
+    6: { s: 'C', n: 'Carbon', v: 4, g: 14 }, 
+    7: { s: 'N', n: 'Nitrogen', v: 5, g: 15 },
+    8: { s: 'O', n: 'Oxygen', v: 6, g: 16 },
+    17: { s: 'Cl', n: 'Chlor', v: 7, g: 17 },
+    35: { s: 'Br', n: 'Brom', v: 7, g: 17 }
+};
+
+const LEVELS = [
+    { f: 'H₂O', name: 'Vand', atoms: [1, 8, 1] },
+    { f: 'NH₃', name: 'Ammoniak', atoms: [1, 7, 1, 1] },
+    { f: 'Br₂', name: 'Dibrom', atoms: [35, 35] },
+    { f: 'CO₂', name: 'Kuldioxid', atoms: [8, 6, 8] },
+    { f: 'CH₄', name: 'Methan', atoms: [6, 1, 1, 1, 1] },
+    { f: 'HCN', name: 'Blåsyre', atoms: [1, 6, 7] },
+    { f: 'N₂', name: 'Kvælstof', atoms: [7, 7] },
+    { f: 'CH₂O', name: 'Formaldehyd', atoms: [8, 6, 1, 1] },
+    { f: 'C₂H₂', name: 'Ethyn', atoms: [1, 6, 6, 1] }
+];
+
+// Idealised 2D bond-angle layout per level, indexed to match LEVELS[].atoms.
+// type 'chain': atoms placed in a straight line, in array order (linear molecules).
+// type 'star': 'hub' is the central atom (at the origin); 'angles' gives the
+// direction (degrees) each other atom sits at, reproducing the real bond angle.
+const LEVEL_GEOM = [
+    { type: 'star', hub: 1, angles: { 0: 217.75, 2: 322.25 } },   // H2O ~104.5°
+    { type: 'star', hub: 1, angles: { 0: 270, 2: 30, 3: 150 } },  // NH3 (flattened, 120° apart)
+    { type: 'chain' },                                            // Br2
+    { type: 'chain' },                                            // CO2 (linear)
+    { type: 'star', hub: 0, angles: { 1: 45, 2: 135, 3: 225, 4: 315 } }, // CH4 (flattened cross)
+    { type: 'chain' },                                            // HCN (linear)
+    { type: 'chain' },                                            // N2
+    { type: 'star', hub: 1, angles: { 0: 270, 2: 30, 3: 150 } },  // CH2O ~120°
+    { type: 'chain' }                                             // C2H2 (linear)
+];
+
+const PT_MAP = [
+    1,0,0,0,0,0,0,2,
+    3,4,5,6,7,8,9,10,
+    11,12,13,14,15,16,17,18,
+    0,0,0,0,0,0,35,0
+];
+
+/** STATE **/
+const cvs = document.getElementById('c');
+const ctx = cvs.getContext('2d');
+let W, H;
+let state = {
+    lvl: 0,
+    phase: 'setup',
+    subPhase: 0,
+    uniqueAtoms: [],
+    atoms: [],
+    bonds: [],
+    particles: []
+};
+
+// Resize Logic (Important for layout)
+window.addEventListener('resize', resize);
+function resize() {
+    const container = document.getElementById('game-area');
+    W = container.clientWidth;
+    H = container.clientHeight;
+    cvs.width = W; 
+    cvs.height = H;
+}
+resize();
+
+/** PROGRESS PERSISTENCE **/
+const STORAGE_KEY = 'elektronprikformel_progress';
+const STORAGE_KEY_SOLVED = 'elektronprikformel_solved';
+function loadProgress() {
+    const v = parseInt(localStorage.getItem(STORAGE_KEY), 10);
+    return (isNaN(v) || v < 0 || v >= LEVELS.length) ? 0 : v;
+}
+function saveProgress(idx) {
+    localStorage.setItem(STORAGE_KEY, idx);
+}
+
+function loadSolved() {
+    try {
+        const arr = JSON.parse(localStorage.getItem(STORAGE_KEY_SOLVED));
+        if (Array.isArray(arr)) return LEVELS.map((_, i) => !!arr[i]);
+    } catch (e) {}
+    return LEVELS.map(() => false);
+}
+function saveSolved() {
+    localStorage.setItem(STORAGE_KEY_SOLVED, JSON.stringify(solved));
+}
+
+/** TASK MENU **/
+let solved = loadSolved();
+function buildTaskMenu() {
+    const menu = document.getElementById('task-menu');
+    menu.innerHTML = '';
+    LEVELS.forEach((lvl, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'task-btn';
+        btn.innerText = i + 1;
+        btn.title = `${lvl.f} (${lvl.name})`;
+        btn.onclick = () => initLevel(i);
+        menu.appendChild(btn);
+    });
+}
+function updateTaskMenu() {
+    const buttons = document.getElementById('task-menu').children;
+    for (let i = 0; i < buttons.length; i++) {
+        buttons[i].classList.toggle('solved', solved[i]);
+        buttons[i].classList.toggle('active', i === state.lvl);
+    }
+}
+
+/** GAME FLOW **/
+function initLevel(idx) {
+    if(idx >= LEVELS.length) idx = 0;
+    state.lvl = idx;
+    state.phase = 'setup';
+    state.uniqueAtoms = [...new Set(LEVELS[idx].atoms)].sort((a,b) => a-b);
+    state.subPhase = 0;
+    state.atoms = [];
+    state.bonds = [];
+    state.particles = [];
+    saveProgress(idx);
+
+    // UI Reset
+    document.getElementById('lvl-num').innerText = idx + 1;
+    document.getElementById('target-mol').innerText = LEVELS[idx].f;
+    document.getElementById('win-overlay').classList.add('hidden');
+    document.getElementById('check-btn').classList.add('hidden');
+    document.getElementById('reset-btn').classList.add('hidden');
+    document.getElementById('setup-overlay').classList.remove('hidden');
+    document.getElementById('line-panel').classList.add('hidden');
+
+    updateTaskMenu();
+    setupPhaseLogic();
+}
+
+function setupPhaseLogic() {
+    if (state.subPhase >= state.uniqueAtoms.length) {
+        document.getElementById('setup-overlay').classList.add('hidden');
+        document.getElementById('check-btn').classList.remove('hidden');
+        document.getElementById('reset-btn').classList.remove('hidden');
+        document.getElementById('line-panel').classList.remove('hidden');
+        spawnAtoms();
+        return;
+    }
+    
+    const z = state.uniqueAtoms[state.subPhase];
+    const el = ELEMENTS[z];
+    const atomLabel = `<span style="color:var(--accent)">${el.n} (${el.s})</span>`;
+    const level = LEVELS[state.lvl];
+    document.getElementById('setup-mol-display').innerHTML =
+        `${level.f} <span style="font-size:1rem; color:#9ca3af; font-weight:normal;">(${level.name})</span>`;
+    const heading = state.subPhase === 0
+        ? `Før vi kan lave elektronprikformlen for ${level.f} (${level.name}), skal vi først betragte ${atomLabel}`
+        : `Lad os nu se nærmere på ${atomLabel}`;
+    document.getElementById('setup-heading').innerHTML = heading;
+
+    // Draw PT
+    const ptGrid = document.getElementById('pt-grid');
+    ptGrid.innerHTML = '';
+    PT_MAP.forEach((pid) => {
+        const div = document.createElement('div');
+        div.className = 'pt-cell';
+        if(pid > 0 && ELEMENTS[pid]) {
+             div.innerHTML = `<span class="atom-num">${pid}</span><span class="atom-sym">${ELEMENTS[pid].s}</span>`;
+             div.classList.add('active');
+             if(pid === z) div.classList.add('highlight');
+        } else {
+            div.style.visibility = 'hidden';
+        }
+        ptGrid.appendChild(div);
+    });
+    
+    // Draw Buttons
+    const vBtns = document.getElementById('v-btns');
+    vBtns.innerHTML = '';
+    for(let i=1; i<=8; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'v-btn';
+        btn.innerText = i;
+        btn.onclick = () => {
+            if (i === ELEMENTS[z].v) {
+                state.subPhase++;
+                setupPhaseLogic();
+            } else {
+                btn.style.background = 'var(--danger)';
+                setTimeout(() => btn.style.background = '', 400);
+            }
+        };
+        vBtns.appendChild(btn);
+    }
+}
+
+function resetCurrentLevel() {
+    if(state.phase !== 'action') return;
+    state.atoms = [];
+    state.bonds = [];
+    state.particles = [];
+    spawnAtoms();
+}
+
+function spawnAtoms() {
+    resize(); // Ensure size is correct before placing
+    state.phase = 'action';
+    const list = LEVELS[state.lvl].atoms;
+    const cx = W/2, cy = H/2;
+    // Spread them out nicely but safe from edges
+    const r = Math.min(W, H) * 0.25; 
+    
+    list.forEach((z, i) => {
+        const ang = (i / list.length) * Math.PI * 2 - 1.57;
+        state.atoms.push({
+            id: i, z: z,
+            x: cx + Math.cos(ang) * r,
+            y: cy + Math.sin(ang) * r,
+            r: 35, drag: false
+        });
+    });
+}
+
+function checkAnswer() {
+    if(state.phase !== 'action') return;
+    
+    // 1. Check Connectivity
+    if (state.atoms.length > 1 && state.bonds.length < state.atoms.length - 1) {
+        showToast("Atomerne hænger ikke sammen!");
+        return;
+    }
+
+    // 2. Check Octet Rule for ALL
+    let errorAtom = null;
+    for (let a of state.atoms) {
+        const s = getAtomStatus(a);
+        if (!s.isStable) {
+            errorAtom = a;
+            break;
+        }
+    }
+
+    if (!errorAtom) {
+        // WIN!
+        state.phase = 'win';
+        document.getElementById('win-overlay').classList.remove('hidden');
+        document.getElementById('check-btn').classList.add('hidden');
+        document.getElementById('reset-btn').classList.add('hidden');
+        solved[state.lvl] = true;
+        saveSolved();
+        updateTaskMenu();
+        spawnConfetti();
+    } else {
+        // Fail
+        const name = ELEMENTS[errorAtom.z].n;
+        const status = getAtomStatus(errorAtom);
+        if(status.current < status.target) showToast(`Prøv igen: ${name} mangler elektroner.`);
+        else showToast(`Prøv igen: ${name} har for mange elektroner!`);
+    }
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.innerText = msg;
+    t.style.opacity = '1';
+    t.style.bottom = '100px';
+    setTimeout(() => { t.style.opacity = '0'; t.style.bottom = '90px'; }, 3000);
+}
+
+function nextLevel() {
+    initLevel(state.lvl + 1);
+}
+
+/** INTERACTION **/
+const SNAP_DIST = 105;
+const BREAK_DIST = 200;
+let dragAtom = null;
+let snapTarget = null;
+cvs.addEventListener('mousedown', e => {
+    if(state.phase !== 'action') return;
+    const r = cvs.getBoundingClientRect();
+    const mx = e.clientX - r.left, my = e.clientY - r.top;
+    
+    // Bonds toggle: single -> double -> triple -> removed
+    for(let i=0; i<state.bonds.length; i++) {
+        const b = state.bonds[i];
+        const cx = (b.s.x + b.t.x)/2, cy = (b.s.y + b.t.y)/2;
+        if(Math.hypot(mx-cx, my-cy) < 20) {
+            if(b.type >= 3) state.bonds.splice(i, 1);
+            else b.type++;
+            return;
+        }
+    }
+    // Atom Drag
+    for(let a of state.atoms) {
+        if(Math.hypot(mx-a.x, my-a.y) < a.r) {
+            dragAtom = a; a.drag = true; return;
+        }
+    }
+});
+
+window.addEventListener('mousemove', e => {
+    if(!dragAtom) return;
+    const r = cvs.getBoundingClientRect();
+    // Keep inside bounds (padding 40px)
+    let x = e.clientX - r.left;
+    let y = e.clientY - r.top;
+    x = Math.max(40, Math.min(W-40, x));
+    y = Math.max(40, Math.min(H-40, y));
+    dragAtom.x = x; dragAtom.y = y;
+
+    // Live preview: highlight nearest atom within bonding range
+    snapTarget = null;
+    let bestDist = SNAP_DIST;
+    for(let other of state.atoms) {
+        if(other === dragAtom) continue;
+        const d = Math.hypot(dragAtom.x - other.x, dragAtom.y - other.y);
+        if(d < bestDist) { bestDist = d; snapTarget = other; }
+    }
+});
+
+window.addEventListener('mouseup', () => {
+    if(dragAtom) {
+        dragAtom.drag = false;
+
+        // Break bonds that got dragged too far apart
+        state.bonds = state.bonds.filter(b => {
+            if(b.s !== dragAtom && b.t !== dragAtom) return true;
+            const other = (b.s === dragAtom) ? b.t : b.s;
+            return Math.hypot(dragAtom.x - other.x, dragAtom.y - other.y) <= BREAK_DIST;
+        });
+
+        // Snap Logic: bond only to the closest in-range atom (the one showing the glow)
+        if(snapTarget) {
+            const other = snapTarget;
+            const exist = state.bonds.find(b => (b.s===dragAtom && b.t===other) || (b.s===other && b.t===dragAtom));
+            if(!exist) {
+                state.bonds.push({ s: dragAtom, t: other, type: 1 });
+                // Spring separation
+                const dx = dragAtom.x - other.x, dy = dragAtom.y - other.y;
+                const len = Math.hypot(dx, dy) || 1;
+                dragAtom.x = other.x + (dx/len)*90;
+                dragAtom.y = other.y + (dy/len)*90;
+            }
+        }
+    }
+    dragAtom = null;
+    snapTarget = null;
+});
+
+/** DRAW & CALC **/
+function getAtomStatus(a) {
+    const base = ELEMENTS[a.z].v;
+    let bonds = 0, shared = 0;
+    state.bonds.forEach(b => {
+        if(b.s === a || b.t === a) { bonds += b.type; shared += b.type*2; }
+    });
+    const lone = Math.max(0, base - bonds);
+    const current = lone + shared;
+    const target = (a.z === 1) ? 2 : 8;
+    return { current, target, isStable: current === target && lone >= 0, lone };
+}
+
+const LINE_ATOM_R = 17; // radius kept clear of bond strokes around each atom label
+
+function drawLineFormula() {
+    const lc = document.getElementById('line-canvas');
+    const lx = lc.getContext('2d');
+    const w = lc.width, h = lc.height;
+    lx.clearRect(0, 0, w, h);
+
+    if (state.phase !== 'action' && state.phase !== 'win') return;
+
+    const level = LEVELS[state.lvl];
+    const geom = LEVEL_GEOM[state.lvl];
+    const BOND = 52;
+    const cx = w / 2, cy = h / 2 - 10;
+
+    // Base positions: correct bond-angle geometry for the target molecule.
+    const positions = [];
+    if (geom.type === 'chain') {
+        const n = level.atoms.length;
+        level.atoms.forEach((z, i) => {
+            positions[i] = { x: cx + (i - (n - 1) / 2) * BOND, y: cy };
+        });
+    } else {
+        positions[geom.hub] = { x: cx, y: cy };
+        Object.entries(geom.angles).forEach(([idxStr, deg]) => {
+            const rad = deg * Math.PI / 180;
+            positions[+idxStr] = { x: cx + Math.cos(rad) * BOND, y: cy + Math.sin(rad) * BOND };
+        });
+    }
+
+    // Atoms with no bonds yet just sit loosely spaced in a row, not at their "correct" slot.
+    const bondSum = {};
+    state.atoms.forEach(a => bondSum[a.id] = 0);
+    state.bonds.forEach(b => { bondSum[b.s.id] += b.type; bondSum[b.t.id] += b.type; });
+
+    const loose = state.atoms.filter(a => bondSum[a.id] === 0);
+    loose.forEach((a, k) => {
+        positions[a.id] = { x: cx + (k - (loose.length - 1) / 2) * 46, y: cy + 62 };
+    });
+
+    // Bonds: drawn exactly as the student made them, right or wrong — trimmed so the
+    // stroke stops at the edge of each atom's label instead of running through it.
+    lx.strokeStyle = '#9ca3af'; lx.lineWidth = 2;
+    state.bonds.forEach(b => {
+        const p1 = positions[b.s.id], p2 = positions[b.t.id];
+        const dx = p2.x - p1.x, dy = p2.y - p1.y;
+        const len = Math.hypot(dx, dy) || 1;
+        const ux = dx / len, uy = dy / len;
+        const a1 = { x: p1.x + ux * LINE_ATOM_R, y: p1.y + uy * LINE_ATOM_R };
+        const a2 = { x: p2.x - ux * LINE_ATOM_R, y: p2.y - uy * LINE_ATOM_R };
+        const ox = -uy * 3, oy = ux * 3;
+        const offsets = b.type === 1 ? [0] : b.type === 2 ? [-1, 1] : [-1.6, 0, 1.6];
+        offsets.forEach(m => {
+            lx.beginPath();
+            lx.moveTo(a1.x + ox * m, a1.y + oy * m);
+            lx.lineTo(a2.x + ox * m, a2.y + oy * m);
+            lx.stroke();
+        });
+    });
+
+    // Atom labels.
+    lx.font = 'bold 22px sans-serif'; lx.textAlign = 'center'; lx.textBaseline = 'middle';
+    lx.fillStyle = '#f3f4f6';
+    state.atoms.forEach(a => {
+        const p = positions[a.id];
+        lx.fillText(ELEMENTS[a.z].s, p.x, p.y);
+    });
+}
+
+function draw() {
+    ctx.fillStyle = '#111827';
+    ctx.fillRect(0,0,W,H);
+    drawLineFormula();
+
+    if(state.phase === 'action' || state.phase === 'win') {
+        // Bonds
+        ctx.strokeStyle = '#374151'; ctx.lineWidth = 4;
+        state.bonds.forEach(b => {
+            ctx.beginPath(); ctx.moveTo(b.s.x, b.s.y); ctx.lineTo(b.t.x, b.t.y); ctx.stroke();
+            // Electrons
+            const cx = (b.s.x + b.t.x)/2, cy = (b.s.y + b.t.y)/2;
+            const ang = Math.atan2(b.t.y - b.s.y, b.t.x - b.s.x);
+            ctx.save(); ctx.translate(cx, cy); ctx.rotate(ang); ctx.fillStyle = '#fbbf24';
+            const dot = (x,y) => { ctx.beginPath(); ctx.arc(x,y,4,0,6.28); ctx.fill(); };
+            if(b.type===1) { dot(0,-6); dot(0,6); }
+            if(b.type===2) { dot(-6,-6); dot(-6,6); dot(6,-6); dot(6,6); }
+            if(b.type===3) { dot(-12,-6); dot(-12,6); dot(0,-6); dot(0,6); dot(12,-6); dot(12,6); }
+            ctx.restore();
+        });
+
+        // Atoms
+        state.atoms.forEach(a => {
+            const st = getAtomStatus(a);
+
+            // Bonding-range glow (live feedback while dragging)
+            if(a === snapTarget) {
+                ctx.save();
+                ctx.beginPath(); ctx.arc(a.x, a.y, a.r + 10, 0, 6.28);
+                ctx.strokeStyle = '#60a5fa'; ctx.lineWidth = 4;
+                ctx.shadowColor = '#60a5fa'; ctx.shadowBlur = 18;
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Body
+            ctx.beginPath(); ctx.arc(a.x, a.y, a.r, 0, 6.28);
+            ctx.fillStyle = st.isStable ? '#064e3b' : '#1f2937';
+            ctx.fill();
+            ctx.strokeStyle = st.isStable ? '#34d399' : '#9ca3af'; ctx.lineWidth = 2; ctx.stroke();
+            // Label
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 20px sans-serif'; 
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(ELEMENTS[a.z].s, a.x, a.y);
+            // Counter
+            ctx.font = '12px monospace'; ctx.fillStyle = st.isStable ? '#34d399' : '#f87171';
+            ctx.fillText(`${st.current}/${st.target}e⁻`, a.x, a.y + 50);
+            
+            // Lone Pairs (Auto-distribute)
+            if(st.lone > 0) {
+                const angles = state.bonds.map(b => {
+                    if(b.s === a) return Math.atan2(b.t.y - a.y, b.t.x - a.x);
+                    if(b.t === a) return Math.atan2(b.s.y - a.y, b.s.x - a.x);
+                    return null;
+                }).filter(v => v!==null);
+                
+                let start = 0;
+                if(angles.length) {
+                    let sx=0, sy=0; angles.forEach(r => { sx+=Math.cos(r); sy+=Math.sin(r); });
+                    start = Math.atan2(sy, sx) + Math.PI;
+                }
+                
+                const pairs = Math.ceil(st.lone/2);
+                for(let i=0; i<pairs; i++) {
+                    const ang = start + (i - (pairs-1)/2);
+                    const lx = a.x + Math.cos(ang)*(a.r-6), ly = a.y + Math.sin(ang)*(a.r-6);
+                    ctx.fillStyle = '#fbbf24';
+                    let d = (i===pairs-1 && st.lone%2!==0) ? 1 : 2;
+                    if(d===2) {
+                        const p = ang+1.57;
+                        ctx.beginPath(); ctx.arc(lx+Math.cos(p)*4, ly+Math.sin(p)*4, 3, 0, 6.28); ctx.fill();
+                        ctx.beginPath(); ctx.arc(lx-Math.cos(p)*4, ly-Math.sin(p)*4, 3, 0, 6.28); ctx.fill();
+                    } else {
+                        ctx.beginPath(); ctx.arc(lx, ly, 3, 0, 6.28); ctx.fill();
+                    }
+                }
+            }
+        });
+
+        // Particles
+        state.particles.forEach((p,i) => {
+            p.x+=p.vx; p.y+=p.vy; p.vy+=0.2; p.life-=0.02;
+            ctx.globalAlpha=Math.max(0,p.life); ctx.fillStyle=p.c;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, 6.28); ctx.fill();
+            ctx.globalAlpha=1;
+            if(p.life<=0) state.particles.splice(i,1);
+        });
+    }
+    requestAnimationFrame(draw);
+}
+
+function spawnConfetti() {
+    for(let i=0; i<80; i++) state.particles.push({
+        x: W/2, y: H/2, vx: (Math.random()-0.5)*15, vy: (Math.random()-0.5)*15,
+        life: 1+Math.random(), c: `hsl(${Math.random()*360}, 70%, 60%)`, s: 3+Math.random()*3
+    });
+}
+
+/** GUIDED TOUR **/
+const TOUR_CANDIDATES = [
+    { sel: '#task-menu', text: 'Cirklerne foroven viser opgavenummeret (1-9). Klik på en cirkel for at hoppe direkte til den opgave. Grøn cirkel betyder, at du allerede har løst opgaven.' },
+    { sel: '#target-mol', text: 'Her kan du se forkortelsen for det molekyle, du er i gang med at bygge en prikformel for.' },
+    { sel: '#setup-overlay', text: 'Find atomet i det periodiske system, og klik på den firkant, der viser antallet af elektroner i dets yderste skal (valenselektroner).' },
+    { sel: 'footer', text: 'Træk atomerne sammen for at danne bindinger. Klik på en binding for at skifte mellem enkelt-, dobbelt- og tripelbinding. Tryk "Tjek Svar", når alle atomer opfylder oktetreglen.' }
+];
+let tourSteps = [];
+let tourIdx = 0;
+let tourBackdrop = null, tourTooltip = null;
+
+function startTour() {
+    tourSteps = TOUR_CANDIDATES.filter(s => {
+        const elm = document.querySelector(s.sel);
+        if (!elm) return false;
+        const r = elm.getBoundingClientRect();
+        return r.width > 0 && r.height > 0;
+    });
+    if (!tourSteps.length) return;
+    if (!tourBackdrop) {
+        tourBackdrop = document.createElement('div');
+        tourBackdrop.id = 'tourBackdrop';
+        document.body.appendChild(tourBackdrop);
+        tourTooltip = document.createElement('div');
+        tourTooltip.id = 'tourTooltip';
+        document.body.appendChild(tourTooltip);
+    }
+    showTourStep(0);
+}
+
+function showTourStep(i) {
+    tourIdx = i;
+    const step = tourSteps[i];
+    const target = document.querySelector(step.sel);
+    if (!target) { endTour(); return; }
+
+    const r = target.getBoundingClientRect();
+    const pad = 6;
+    const x1 = Math.max(r.left - pad, 0), y1 = Math.max(r.top - pad, 0);
+    const x2 = Math.min(r.right + pad, window.innerWidth), y2 = Math.min(r.bottom + pad, window.innerHeight);
+    const poly = `polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, ${x1}px ${y1}px, ${x2}px ${y1}px, ${x2}px ${y2}px, ${x1}px ${y2}px, ${x1}px ${y1}px, 0 0)`;
+    tourBackdrop.style.clipPath = poly;
+    tourBackdrop.style.webkitClipPath = poly;
+
+    const isLast = i === tourSteps.length - 1;
+    const prevBtnHtml = i > 0 ? `<button class="tour-btn-prev" onclick="showTourStep(${i - 1})">◀ Forrige</button>` : '';
+    const nextOnclick = isLast ? 'endTour()' : `showTourStep(${i + 1})`;
+    const nextLabel = isLast ? 'Afslut ✔' : 'Næste ▶';
+    tourTooltip.innerHTML = `
+        <div class="tour-step-count">Trin ${i + 1} af ${tourSteps.length}</div>
+        <div class="tour-text">${step.text}</div>
+        <div class="tour-nav">
+            <button class="tour-btn-skip" onclick="endTour()">Afslut</button>
+            <div style="display:flex;gap:8px;">
+                ${prevBtnHtml}
+                <button class="tour-btn-next" onclick="${nextOnclick}">${nextLabel}</button>
+            </div>
+        </div>
+    `;
+
+    const tRect = tourTooltip.getBoundingClientRect();
+    let top = y2 + 14;
+    if (top + tRect.height > window.innerHeight - 10) {
+        top = y1 - tRect.height - 14;
+        if (top < 10) top = 10;
+    }
+    let left = r.left + r.width / 2 - tRect.width / 2;
+    left = Math.max(10, Math.min(left, window.innerWidth - tRect.width - 10));
+    tourTooltip.style.top = top + 'px';
+    tourTooltip.style.left = left + 'px';
+}
+
+function endTour() {
+    if (tourBackdrop) { tourBackdrop.remove(); tourBackdrop = null; }
+    if (tourTooltip) { tourTooltip.remove(); tourTooltip = null; }
+}
+
+document.addEventListener('keydown', e => {
+    if (!tourBackdrop) return;
+    if (e.key === 'Escape') endTour();
+    else if (e.key === 'ArrowRight' || e.key === 'Enter') {
+        if (tourIdx < tourSteps.length - 1) showTourStep(tourIdx + 1); else endTour();
+    } else if (e.key === 'ArrowLeft') {
+        if (tourIdx > 0) showTourStep(tourIdx - 1);
+    }
+});
+
+document.getElementById('lvl-total').innerText = LEVELS.length;
+buildTaskMenu();
+initLevel(loadProgress());
+draw();
+</script>
+</body>
+</html>

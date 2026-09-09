@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forsøg: Afbrænding af Ståluld</title>
+    <style>
+        :root {
+            --bg: #121212;
+            --panel: #1e1e24;
+            --accent: #f59e0b;
+            --iron: #95a5a6;
+            --oxygen: #e74c3c;
+            --text: #e4e4e7;
+            --success: #22c55e;
+            --success-bg: rgba(34, 197, 94, 0.2);
+            --error: #ef4444;
+            --border: #3f3f46;
+            --input-bg: #27272a;
+            --header-height: 60px;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        header {
+            height: var(--header-height);
+            padding: 0 20px;
+            background: #000;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            flex-shrink: 0; 
+        }
+        h1 { margin: 0; font-size: 1.1rem; letter-spacing: 1px; color: #aaa; text-transform: uppercase; }
+        
+        .reaction-bar {
+            font-family: 'Times New Roman', serif;
+            font-style: italic;
+            font-size: 1.2rem;
+            color: #fff;
+            background: #222;
+            padding: 5px 15px;
+            border-radius: 4px;
+            border: 1px solid #444;
+        }
+
+        .main-stage {
+            height: calc(100vh - var(--header-height));
+            display: flex; 
+            padding: 15px; 
+            gap: 15px;
+            box-sizing: border-box;
+            overflow: hidden; 
+        }
+
+        .view-column { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            height: 100%; 
+            min-width: 0; 
+        }
+
+        .canvas-box {
+            background: #000; 
+            border-radius: 8px; 
+            border: 1px solid var(--border);
+            position: relative; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            min-height: 0; 
+        }
+
+        #macroBox { flex: 55; }
+        #microBox { flex: 45; }
+
+        canvas { 
+            display: block; 
+            width: 100%;
+            flex: 1;        
+            min-height: 0;  
+        }
+
+        .scale-area {
+            background: #111; 
+            padding: 8px 0; 
+            border-top: 1px solid #333;
+            text-align: center; 
+            font-family: 'Courier New', monospace;
+            font-size: 1.8rem; 
+            color: var(--success); 
+            z-index: 10;
+            flex-shrink: 0; 
+            height: auto;
+        }
+
+        .control-panel {
+            flex: 0 0 360px; 
+            background: var(--panel); 
+            padding: 15px;
+            border-radius: 8px; 
+            border: 1px solid var(--border);
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+            height: 100%; 
+            overflow-y: auto; 
+            box-sizing: border-box;
+        }
+
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table td { padding: 8px; border-bottom: 1px solid #444; font-size: 0.9rem; }
+        .data-table td:last-child { text-align: right; font-weight: bold; font-family: monospace; }
+
+        .btn {
+            padding: 12px; font-size: 1rem; font-weight: bold; border: none; border-radius: 6px;
+            cursor: pointer; background: var(--accent); color: #000; text-transform: uppercase;
+            box-shadow: 0 4px 0 #b45309; transition: 0.1s; width: 100%; flex-shrink: 0;
+        }
+        .btn:active { transform: translateY(4px); box-shadow: 0 0 0 #b45309; }
+        .btn:disabled { background: #444; color: #888; box-shadow: none; cursor: not-allowed; transform: none; }
+        
+        .btn-reset { background: #333; color: #fff; box-shadow: 0 4px 0 #111; margin-top: 20px; }
+        .btn-reset:hover { background: #444; }
+
+        .btn-boost {
+            background: var(--oxygen); color: #fff; box-shadow: 0 4px 0 #a52714;
+            animation: blinkRed 1s infinite;
+        }
+        .btn-boost:disabled { background: #444; color: #888; box-shadow: none; animation: none; cursor: not-allowed; }
+        @keyframes blinkRed { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+        .info-label {
+            position: absolute; top: 10px; left: 10px; 
+            background: rgba(0,0,0,0.7); padding: 4px 8px; border-radius: 4px; 
+            color: #aaa; font-size: 0.8rem; pointer-events: none; z-index: 5;
+        }
+
+        .conclusion-box {
+            padding: 15px; background: rgba(255,255,255,0.05); border-radius: 6px;
+            display: none; border-left: 4px solid var(--success); flex-shrink: 0;
+        }
+
+        .error-box {
+            padding: 15px; background: rgba(245, 158, 11, 0.08); border-radius: 6px;
+            display: none; border-left: 4px solid var(--accent); flex-shrink: 0;
+            font-size: 0.85rem; line-height: 1.5;
+        }
+        .error-box ul { margin: 8px 0 0 0; padding-left: 18px; }
+        .error-box li { margin-bottom: 4px; }
+        .error-box .efficiency-readout { color: var(--accent); font-weight: bold; }
+
+        .badge {
+            display: none; align-items: center; gap: 10px;
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: #1a1a1a; padding: 12px 15px; border-radius: 8px;
+            font-weight: bold; font-size: 0.9rem; flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+            animation: badgePop 0.4s ease-out;
+        }
+        .badge .badge-icon { font-size: 1.6rem; }
+        @keyframes badgePop {
+            0% { transform: scale(0.7); opacity: 0; }
+            60% { transform: scale(1.08); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .calc-box {
+            background: rgba(0,0,0,0.3); border: 1px solid #444; border-radius: 6px;
+            padding: 15px; margin-top: 10px; display: none;
+            flex-shrink: 0;
+        }
+        .calc-row { margin-bottom: 15px; border-bottom: 1px dashed #333; padding-bottom: 15px; }
+        .calc-row:last-child { border: none; margin: 0; padding: 0; }
+        .calc-label { display: block; font-size: 0.85rem; color: #aaa; margin-bottom: 5px; }
+        
+        input[type="text"] {
+            background: var(--input-bg); border: 1px solid #555; color: #fff;
+            padding: 6px; border-radius: 4px; width: 80px; text-align: center;
+            font-size: 0.9rem; transition: 0.2s;
+        }
+        input:focus { outline: none; border-color: var(--accent); }
+        input.valid { border-color: var(--success); background: var(--success-bg); }
+        input.invalid { border-color: var(--error); background: rgba(239, 68, 68, 0.1); }
+        
+        .step-container { display: none; } 
+        .step-container.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .mc-container { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; }
+        .mc-btn {
+            background: #222; border: 1px solid #444; color: #ccc; padding: 8px;
+            text-align: left; cursor: pointer; border-radius: 4px; font-size: 0.85rem;
+        }
+        .mc-btn:hover { background: #333; }
+        .mc-btn.correct { background: var(--success-bg); border-color: var(--success); color: #fff; }
+        .mc-btn.wrong { background: rgba(239, 68, 68, 0.2); border-color: var(--error); }
+
+        .mol-info { font-size: 0.8rem; color: #666; margin-top: 4px; font-style: italic; }
+
+        .legend {
+            position: absolute; bottom: 10px; left: 10px; display:flex; gap:15px; 
+            font-size:0.8rem; color:#ccc; background:rgba(0,0,0,0.8); padding:8px; border-radius:4px;
+            pointer-events: none;
+        }
+        .legend-item { display: flex; align-items: center; gap: 5px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .dot.grey { background: var(--iron); }
+        .dot.red { background: var(--oxygen); }
+        .dot.pair { 
+            width: 16px; height: 8px; background: transparent; 
+            display: flex; gap:0; 
+        }
+        .dot.pair::before, .dot.pair::after {
+            content:''; display:block; width:8px; height:8px; 
+            border-radius:50%; background:var(--oxygen);
+        }
+
+        #hypoOverlay {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: rgba(18, 18, 18, 0.98);
+            z-index: 100;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .hypo-card {
+            background: var(--panel); padding: 30px; border-radius: 12px;
+            border: 2px solid var(--accent); text-align: center; max-width: 500px;
+        }
+        .hypo-btn {
+            display: block; width: 100%; padding: 12px; margin: 8px 0;
+            background: #333; border: 1px solid #555; color: white;
+            font-size: 1rem; cursor: pointer; border-radius: 6px; transition: 0.2s;
+        }
+        .hypo-btn:hover { background: #444; border-color: var(--accent); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Afbrænding af Ståluld</h1>
+        <div class="reaction-bar">
+            2 Fe + O₂ &nbsp;➜&nbsp; 2 FeO
+        </div>
+    </header>
+
+    <div class="main-stage">
+        
+        <div id="hypoOverlay">
+            <div class="hypo-card">
+                <h2 style="color:var(--accent); margin-bottom:15px;">Hypotese</h2>
+                <p style="margin-bottom:20px; color:#ccc;">
+                    Vi afbrænder ståluld på en tændt vægt.<br>
+                    Hvad sker der med massen (vægten)?
+                </p>
+                <button class="hypo-btn" onclick="setHypothesis('lighter')">A) Den falder (bliver lettere)</button>
+                <button class="hypo-btn" onclick="setHypothesis('same')">B) Den er uændret</button>
+                <button class="hypo-btn" onclick="setHypothesis('heavier')">C) Den stiger (bliver tungere)</button>
+            </div>
+        </div>
+
+        <div class="view-column">
+            <div id="macroBox" class="canvas-box">
+                <div class="info-label">MAKRO: Opstilling</div>
+                <canvas id="macroCanvas"></canvas>
+                <div class="scale-area" id="scaleReadout">0,00 g</div>
+            </div>
+            
+            <div id="microBox" class="canvas-box">
+                <div class="info-label">MIKRO: Partikelmodel (1 mia. gange zoom)</div>
+                <canvas id="microCanvas"></canvas>
+                <div class="legend">
+                    <div class="legend-item"><span class="dot grey"></span>Fe</div>
+                    <div class="legend-item"><span class="dot red"></span>O</div>
+                    <div class="legend-item"><div class="dot pair"></div>O₂ (Luft)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <h3 style="margin:0; color:#fff; border-bottom:1px solid #444; padding-bottom:10px;">Måledata</h3>
+            
+            <table class="data-table">
+                <tr><td>Startvægt (m₀):</td><td id="tableStart">5,00 g</td></tr>
+                <tr><td>Nuværende:</td><td id="tableCurrent" style="color:var(--accent)">5,00 g</td></tr>
+                <tr><td>Slutvægt (m₁):</td><td id="tableEnd" style="color:#888;">-</td></tr>
+            </table>
+
+            <div style="margin-top:10px;">
+                <label style="color:#aaa; font-size:0.9rem;">Mængde Ståluld (g):</label>
+                <input type="range" id="massSlider" min="1" max="10" step="0.5" value="5" style="width:100%; accent-color:var(--accent);" oninput="updateStartMass(this.value)">
+            </div>
+
+            <button id="burnBtn" class="btn" onclick="startExperiment()">🔥 ANTÆND</button>
+
+            <button id="boostBtn" class="btn btn-boost" onclick="addOxygen()" style="display:none;">💨 TILSÆT EKSTRA ILT (O₂)</button>
+
+            <div id="conclusion" class="conclusion-box">
+                <strong id="resultTitle">OBSERVATION</strong>
+                <p id="resultText" style="margin:5px 0; font-size:0.9rem; line-height:1.4;">...</p>
+                <p style="margin:8px 0 0 0; font-size:0.85rem; color:#aaa; font-style:italic;">Lad os efterprøve det med tal herunder.</p>
+            </div>
+
+            <div id="badge" class="badge">
+                <span class="badge-icon">🏅</span>
+                <span>Præcisions-badge! Korrekt hypotese + rigtige beregninger i første forsøg.</span>
+            </div>
+
+            <div id="calcSection" class="calc-box">
+                <strong style="color:var(--accent); display:block; margin-bottom:10px;">EFTERBEHANDLING</strong>
+                <p style="font-size:0.85rem; color:#aaa; margin:-5px 0 10px 0;">Regn dig frem til, hvor meget jern der reagerede med ilten – og sammenlign bagefter med det, du selv så på vægten.</p>
+
+                <div id="step1" class="calc-row step-container active">
+                    <span class="calc-label">1. Beregn start-stofmængde n(Fe):</span>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <input type="text" id="inp_n_Fe" placeholder="0,000"> mol
+                        <button class="btn" style="width:auto; padding:5px 10px; font-size:0.8rem;" onclick="checkStep1()">Tjek</button>
+                    </div>
+                    <div class="mol-info">Formel: n = m / M <br> M(Fe) = 55,85 g/mol</div>
+                </div>
+
+                <div id="step2" class="calc-row step-container">
+                    <span class="calc-label">2. Beregn stofmængde produkt n(FeO):</span>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <input type="text" id="inp_n_Rust" placeholder="0,000"> mol
+                        <button class="btn" style="width:auto; padding:5px 10px; font-size:0.8rem;" onclick="checkStep2()">Tjek</button>
+                    </div>
+                    <div class="mol-info">Reaktionsskema: 2 Fe ➜ 2 FeO <br> Forholdet er 2:2 (altså 1:1, samme stofmængde)</div>
+                </div>
+
+                <div id="step3" class="calc-row step-container">
+                    <span class="calc-label">3. Beregn teoretisk slutvægt m(FeO):</span>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <input type="text" id="inp_m_Rust" placeholder="0,00"> g
+                        <button class="btn" style="width:auto; padding:5px 10px; font-size:0.8rem;" onclick="checkStep3()">Tjek</button>
+                    </div>
+                    <div class="mol-info">Formel: m = n · M <br> M(FeO) = 71,85 g/mol <br> (Brug din n-værdi fra trin 2)</div>
+                    <div id="massFeedback" style="color:var(--error); font-size:0.8rem; margin-top:5px; display:none;"></div>
+                </div>
+
+                <div id="step4" class="calc-row step-container" style="border-bottom:none;">
+                    <span class="calc-label" style="color:#fff; font-weight:bold;">4. Sammenligning:</span>
+                    <div style="font-size:0.85rem; margin-bottom:10px; padding:10px; background:rgba(255,255,255,0.05); border-radius:4px;">
+                        Teoretisk vægt (100%): <span id="theoDisplay" style="color:var(--accent); float:right;">-</span><br>
+                        Vægt aflæst på vægten: <span id="expDisplay" style="color:var(--success); float:right;">-</span>
+                    </div>
+                    <span class="calc-label">Hvorfor er den målte vægt lavere end den teoretiske?</span>
+                    <div class="mc-container">
+                        <div class="mc-btn" onclick="checkReflection(this, false)">A) Jernatomerne fordampede pga. varmen.</div>
+                        <div class="mc-btn" onclick="checkReflection(this, true)">B) Ikke alt jernet nåede at reagere (oxidere).</div>
+                        <div class="mc-btn" onclick="checkReflection(this, false)">C) Vægten kan ikke veje ilt-atomer.</div>
+                    </div>
+                    <p id="reflectionFeedback" style="font-size:0.85rem; font-weight:bold; margin-top:5px;"></p>
+                </div>
+            </div>
+
+            <div id="errorSourcesBox" class="error-box">
+                <strong style="color:var(--accent);">Fejlkilder &amp; usikkerhed</strong>
+                <p style="margin:8px 0 0 0;">Din beregning viste en teoretisk slutvægt på <strong id="errBoxTheo" style="color:#fff;">-</strong>, men vægten i forsøget viste kun <strong id="errBoxExp" style="color:var(--success);">-</strong>. Forskellen skyldes, at kun ca. <span id="efficiencyReadout" class="efficiency-readout">-</span> af jernet nåede at reagere med ilten. Typiske fejlkilder er:</p>
+                <ul>
+                    <li>Ufuldstændig forbrænding – ilt når ikke altid ind til jernet inderst i ståluldsklumpen</li>
+                    <li>Vejefejl – vægtens præcision og aflæsningsnøjagtighed</li>
+                    <li>Varmetab og luftfugtighed, som kan påvirke målingen undervejs</li>
+                </ul>
+            </div>
+
+            <button class="btn btn-reset" onclick="reset()">↺ GENTAG FORSØG</button>
+        </div>
+
+    </div>
+
+<script>
+    const macroCanvas = document.getElementById('macroCanvas');
+    const microCanvas = document.getElementById('microCanvas');
+    const ctxMacro = macroCanvas.getContext('2d');
+    const ctxMicro = microCanvas.getContext('2d');
+
+    const M_Fe = 55.85;
+    const M_Rust = 71.85; // Molar masse for FeO
+
+    // VIRKNINGSGRAD varierer per forsøg (75-88%), ligesom i det virkelige laboratorium
+    const EFFICIENCY_MIN = 0.75;
+    const EFFICIENCY_MAX = 0.88;
+
+    // Teoretisk ratio (1:1 for 2Fe -> 2FeO)
+    const THEO_GAIN_FACTOR = M_Rust / M_Fe;
+
+    let state = {
+        running: false,
+        finished: false,
+        userHypothesis: null,
+        startMass: 5.00,
+        currentMass: 5.00,
+        targetMass: 0,
+        theoMass: 0,
+        burnProgress: 0,
+        efficiency: 0.82,
+        boosting: false,
+        boostFramesLeft: 0,
+        particles: [],
+        ironAtoms: [],
+        woolPoints: [],
+        sparks: [],
+
+        // Calculation state
+        calcNFe: 0,
+        calcNRust: 0,
+
+        // Badge-tracking: korrekt besvarelse i FØRSTE forsøg
+        stepAttempts: { s1: 0, s2: 0, s3: 0 },
+        firstTry: { s1: null, s2: null, s3: null }
+    };
+
+    function init() {
+        resize();
+        window.addEventListener('resize', resize);
+        reset();
+        requestAnimationFrame(loop);
+    }
+
+    function resize() {
+        if(macroCanvas.parentElement) {
+            macroCanvas.width = macroCanvas.clientWidth;
+            macroCanvas.height = macroCanvas.clientHeight;
+        }
+        
+        if(microCanvas.parentElement) {
+            microCanvas.width = microCanvas.clientWidth;
+            microCanvas.height = microCanvas.clientHeight;
+        }
+        
+        generateWool();
+    }
+
+    function reset() {
+        state.running = false;
+        state.finished = false;
+        state.burnProgress = 0;
+        state.currentMass = state.startMass;
+
+        // Ny tilfældig virkningsgrad hvert forsøg (simulerer naturlig variation/fejlkilder)
+        state.efficiency = EFFICIENCY_MIN + Math.random() * (EFFICIENCY_MAX - EFFICIENCY_MIN);
+
+        state.theoMass = state.startMass * THEO_GAIN_FACTOR;
+        const totalGain = state.theoMass - state.startMass;
+        state.targetMass = state.startMass + (totalGain * state.efficiency);
+
+        state.sparks = [];
+
+        // Nulstil badge-tracking
+        state.stepAttempts = { s1: 0, s2: 0, s3: 0 };
+        state.firstTry = { s1: null, s2: null, s3: null };
+
+        // Nulstil ilt-boost
+        state.boosting = false;
+        state.boostFramesLeft = 0;
+
+        // UI Reset
+        document.getElementById('massSlider').disabled = false;
+        document.getElementById('burnBtn').disabled = false;
+        document.getElementById('burnBtn').style.background = "var(--accent)";
+        document.getElementById('burnBtn').textContent = "🔥 ANTÆND";
+
+        const boostBtn = document.getElementById('boostBtn');
+        boostBtn.style.display = "none";
+        boostBtn.disabled = false;
+        boostBtn.textContent = "💨 TILSÆT EKSTRA ILT (O₂)";
+
+        document.getElementById('conclusion').style.display = "none";
+        document.getElementById('calcSection').style.display = "none";
+        document.getElementById('errorSourcesBox').style.display = "none";
+        document.getElementById('badge').style.display = "none";
+
+        // Hide steps 2, 3, 4
+        document.getElementById('step2').classList.remove('active');
+        document.getElementById('step3').classList.remove('active');
+        document.getElementById('step4').classList.remove('active');
+        document.getElementById('massFeedback').style.display = "none";
+        
+        document.getElementById('tableEnd').textContent = "-";
+        document.getElementById('tableEnd').style.color = "#888";
+        
+        document.getElementById('reflectionFeedback').textContent = "";
+        const btns = document.querySelectorAll('.mc-btn');
+        btns.forEach(b => b.classList.remove('correct', 'wrong'));
+
+        // Reset Inputs
+        ['inp_n_Fe', 'inp_n_Rust', 'inp_m_Rust'].forEach(id => {
+            const el = document.getElementById(id);
+            el.value = "";
+            el.classList.remove('valid', 'invalid');
+        });
+
+        generateWool();
+        initParticles();
+        updateUI();
+    }
+
+    // --- MATH & VALIDATION ---
+    function parseInput(id) {
+        let val = document.getElementById(id).value;
+        val = val.replace(',', '.'); 
+        if(!val) return 0;
+        return parseFloat(val);
+    }
+
+    function setValidationUI(id, isValid) {
+        const el = document.getElementById(id);
+        if (isValid) {
+            el.classList.add('valid');
+            el.classList.remove('invalid');
+        } else {
+            el.classList.add('invalid');
+            el.classList.remove('valid');
+        }
+    }
+
+    // STEP 1: n(Fe)
+    function checkStep1() {
+        const userN = parseInput('inp_n_Fe');
+        const trueN = state.startMass / M_Fe;
+        state.calcNFe = trueN;
+
+        const valid = Math.abs(userN - trueN) < 0.005;
+        setValidationUI('inp_n_Fe', valid);
+
+        state.stepAttempts.s1++;
+        if (state.firstTry.s1 === null) state.firstTry.s1 = valid;
+
+        if(valid) {
+            document.getElementById('step2').classList.add('active');
+        }
+    }
+
+    // STEP 2: n(FeO)
+    function checkStep2() {
+        const userN = parseInput('inp_n_Rust');
+        const trueN = state.calcNFe * 1.0; // 1:1 ratio for FeO
+        state.calcNRust = trueN;
+
+        const valid = Math.abs(userN - trueN) < 0.005;
+        setValidationUI('inp_n_Rust', valid);
+
+        state.stepAttempts.s2++;
+        if (state.firstTry.s2 === null) state.firstTry.s2 = valid;
+
+        if(valid) {
+            document.getElementById('step3').classList.add('active');
+        }
+    }
+
+    // STEP 3: m(FeO)
+    function checkStep3() {
+        const userM = parseInput('inp_m_Rust');
+
+        const userPrevN = parseInput('inp_n_Rust');
+        const targetBasedOnUser = userPrevN * M_Rust;
+        const targetPrecise = state.calcNRust * M_Rust;
+
+        const closeToUser = Math.abs(userM - targetBasedOnUser) < 0.15;
+        const closeToPrecise = Math.abs(userM - targetPrecise) < 0.15;
+
+        const valid = closeToUser || closeToPrecise;
+
+        setValidationUI('inp_m_Rust', valid);
+
+        state.stepAttempts.s3++;
+        if (state.firstTry.s3 === null) state.firstTry.s3 = valid;
+
+        const fb = document.getElementById('massFeedback');
+        if (valid) {
+            fb.style.display = "none";
+            document.getElementById('step4').classList.add('active');
+
+            document.getElementById('theoDisplay').textContent = targetPrecise.toFixed(2) + " g";
+            document.getElementById('expDisplay').textContent = state.targetMass.toFixed(2) + " g";
+
+            // Fejlkilder & usikkerhed dukker først op, når eleven selv har regnet færdig
+            document.getElementById('errBoxTheo').textContent = targetPrecise.toFixed(2).replace('.', ',') + " g";
+            document.getElementById('errBoxExp').textContent = state.targetMass.toFixed(2).replace('.', ',') + " g";
+            document.getElementById('efficiencyReadout').textContent = Math.round(state.efficiency * 100) + "%";
+            document.getElementById('errorSourcesBox').style.display = "block";
+
+            checkBadgeEligibility();
+        } else {
+            fb.style.display = "block";
+            fb.textContent = "Ikke helt. Husk: m = n · M (brug n fra trin 2)";
+        }
+    }
+
+    // BADGE: korrekt hypotese + rigtige beregninger i første forsøg
+    function checkBadgeEligibility() {
+        const hypothesisCorrect = state.userHypothesis === 'heavier';
+        const calcFirstTry = state.firstTry.s1 === true && state.firstTry.s2 === true && state.firstTry.s3 === true;
+
+        if (hypothesisCorrect && calcFirstTry) {
+            document.getElementById('badge').style.display = "flex";
+        }
+    }
+
+    function checkReflection(btn, isCorrect) {
+        const btns = document.querySelectorAll('.mc-btn');
+        btns.forEach(b => b.classList.remove('correct', 'wrong'));
+        
+        const fb = document.getElementById('reflectionFeedback');
+
+        if (isCorrect) {
+            btn.classList.add('correct');
+            fb.textContent = "Korrekt! I virkeligheden når alt jernet inderst i bunken ikke at reagere.";
+            fb.style.color = "var(--success)";
+        } else {
+            btn.classList.add('wrong');
+            fb.textContent = "Forkert. Tænk over, om ilden kan nå helt ind i midten af stålulden?";
+            fb.style.color = "var(--error)";
+        }
+    }
+
+    // --- VISUALS & LOGIC ---
+    function generateWool() {
+        state.woolPoints = [];
+        const cx = macroCanvas.width / 2;
+        const cy = macroCanvas.height * 0.6; 
+        const density = Math.floor(state.startMass * 80); 
+        
+        for(let i=0; i<density; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const r = Math.sqrt(Math.random()) * 50; 
+            const x = cx + Math.cos(angle) * r * 1.2; 
+            const y = cy + Math.sin(angle) * (r * 0.8) - 10;
+            const len = 5 + Math.random() * 10;
+            const dir = Math.random() * Math.PI * 2;
+
+            state.woolPoints.push({
+                x1: x, y1: y,
+                x2: x + Math.cos(dir)*len,
+                y2: y + Math.sin(dir)*len,
+                thresh: Math.random()
+            });
+        }
+    }
+
+    function initParticles() {
+        state.ironAtoms = [];
+        const rows = 5; const cols = 8;
+        const startX = (microCanvas.width - (cols*30)) / 2 + 15;
+        const startY = microCanvas.height - 80;
+
+        for(let r=0; r<rows; r++) {
+            for(let c=0; c<cols; c++) {
+                state.ironAtoms.push({
+                    x: startX + c*30,
+                    y: startY + r*15 + (c%2)*5,
+                    oxidized: false
+                });
+            }
+        }
+        state.particles = [];
+        for(let i=0; i<15; i++) spawnOxygen();
+    }
+
+    function spawnOxygen() {
+        state.particles.push({
+            x: Math.random() * microCanvas.width,
+            y: -20 - Math.random() * 50,
+            vx: (Math.random()-0.5) * 1,
+            vy: 0.5 + Math.random() * 1.5,
+            active: true
+        });
+    }
+
+    // --- ILTFLASKE (primitiv) ---
+    function getTankGeometry() {
+        const w = 24;
+        const h = Math.max(45, Math.min(85, microCanvas.height * 0.35));
+        const x = 12;
+        const y = 18;
+        return {
+            x, y, w, h,
+            nozzleX: x + w + 30,
+            nozzleY: y + h * 0.35
+        };
+    }
+
+    function drawOxygenTank() {
+        const t = getTankGeometry();
+        const ctx = ctxMicro;
+
+        // Krop
+        ctx.fillStyle = "#2563eb";
+        ctx.fillRect(t.x, t.y, t.w, t.h);
+        ctx.strokeStyle = "#1e3a8a";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(t.x, t.y, t.w, t.h);
+
+        // Ventil ovenpå
+        ctx.fillStyle = "#555";
+        ctx.fillRect(t.x + t.w/2 - 4, t.y - 12, 8, 12);
+
+        // Label
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 10px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("O₂", t.x + t.w/2, t.y + t.h/2 + 4);
+        ctx.textAlign = "left";
+
+        // Slange fra ventil til dysespids
+        ctx.strokeStyle = "#333";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(t.x + t.w/2, t.y - 12);
+        ctx.quadraticCurveTo(t.nozzleX - 20, t.y - 4, t.nozzleX, t.nozzleY);
+        ctx.stroke();
+
+        // Dysespids
+        ctx.fillStyle = "#333";
+        ctx.beginPath();
+        ctx.arc(t.nozzleX, t.nozzleY, 4, 0, Math.PI*2);
+        ctx.fill();
+
+        // Gløden mens der tilføres ekstra ilt
+        if (state.boosting) {
+            ctx.fillStyle = "rgba(59, 130, 246, 0.5)";
+            ctx.beginPath();
+            ctx.arc(t.nozzleX, t.nozzleY, 7 + Math.sin(Date.now()/60)*2, 0, Math.PI*2);
+            ctx.fill();
+        }
+    }
+
+    function spawnBoostOxygen() {
+        const t = getTankGeometry();
+        const targetX = microCanvas.width * 0.5 + (Math.random()-0.5) * 60;
+        const targetY = microCanvas.height - 70 + (Math.random()-0.5) * 20;
+        const dx = targetX - t.nozzleX;
+        const dy = targetY - t.nozzleY;
+        const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+        const speed = 3.5 + Math.random() * 1.5;
+
+        state.particles.push({
+            x: t.nozzleX,
+            y: t.nozzleY,
+            vx: (dx / dist) * speed,
+            vy: (dy / dist) * speed,
+            active: true
+        });
+    }
+
+    function setHypothesis(choice) {
+        state.userHypothesis = choice;
+        document.getElementById('hypoOverlay').style.display = "none";
+    }
+
+    function updateStartMass(val) {
+        state.startMass = parseFloat(val);
+        reset();
+    }
+
+    function startExperiment() {
+        state.running = true;
+        state.targetMass = state.startMass + (state.theoMass - state.startMass) * state.efficiency;
+
+        document.getElementById('massSlider').disabled = true;
+        document.getElementById('burnBtn').disabled = true;
+        document.getElementById('burnBtn').style.background = "#444";
+        document.getElementById('burnBtn').textContent = "FORBRÆNDING...";
+
+        const boostBtn = document.getElementById('boostBtn');
+        boostBtn.style.display = "block";
+        boostBtn.disabled = false;
+    }
+
+    // Sprøjt ekstra O2 på: forbrændingen kører 10x hurtigere i en kort periode
+    function addOxygen() {
+        if (!state.running || state.finished || state.boosting) return;
+
+        state.boosting = true;
+        state.boostFramesLeft = 90; // ca. 1,5 sek ved 60 fps
+
+        const boostBtn = document.getElementById('boostBtn');
+        boostBtn.disabled = true;
+        boostBtn.textContent = "💨 TILFØRER EKSTRA O₂...";
+    }
+
+    function loop() {
+        if (state.running) {
+            if (state.burnProgress < 1.0) {
+                let rate = 0.0007;
+
+                if (state.boosting) {
+                    rate *= 10;
+                    state.boostFramesLeft--;
+                    if (state.boostFramesLeft <= 0) {
+                        state.boosting = false;
+                        const boostBtn = document.getElementById('boostBtn');
+                        boostBtn.disabled = false;
+                        boostBtn.textContent = "💨 TILSÆT EKSTRA ILT (O₂)";
+                    }
+                }
+
+                state.burnProgress = Math.min(1.0, state.burnProgress + rate);
+                state.currentMass = state.startMass + (state.targetMass - state.startMass) * state.burnProgress;
+
+                if(Math.random() < (state.boosting ? 0.5 : 0.15)) createSpark();
+                updateMicroPhysics();
+
+            } else {
+                state.running = false;
+                state.finished = true;
+                state.currentMass = state.targetMass;
+                document.getElementById('boostBtn').style.display = "none";
+                showConclusion();
+            }
+            updateUI();
+        }
+        draw();
+        requestAnimationFrame(loop);
+    }
+
+    function createSpark() {
+        const cx = macroCanvas.width / 2;
+        const cy = macroCanvas.height * 0.6;
+        state.sparks.push({
+            x: cx + (Math.random()-0.5)*60,
+            y: cy + (Math.random()-0.5)*40,
+            vx: (Math.random()-0.5)*2,
+            vy: -0.5 - Math.random(),
+            life: 50 + Math.random()*30
+        });
+    }
+
+    function updateMicroPhysics() {
+        if (state.boosting) {
+            if (Math.random() < 0.6) spawnBoostOxygen();
+        } else if (Math.random() < 0.05) {
+            spawnOxygen();
+        }
+
+        state.particles.forEach((p, i) => {
+            p.x += p.vx; p.y += p.vy;
+            if(p.y > microCanvas.height + 20 || p.y < -40 || p.x < -20 || p.x > microCanvas.width + 20) {
+                state.particles.splice(i,1);
+            }
+        });
+
+        const numAtoms = state.ironAtoms.length;
+        const maxOxidized = Math.floor(numAtoms * state.efficiency);
+        
+        const shouldBeOxidized = Math.floor(state.burnProgress * maxOxidized);
+        const currentlyOxidized = state.ironAtoms.filter(a => a.oxidized).length;
+
+        if (currentlyOxidized < shouldBeOxidized) {
+            const candidates = state.ironAtoms.filter(a => !a.oxidized);
+            if(candidates.length > 0) {
+                const pick = candidates[Math.floor(Math.random()*candidates.length)];
+                pick.oxidized = true;
+            }
+        }
+    }
+
+    function updateUI() {
+        const txt = state.currentMass.toFixed(2).replace('.', ',') + " g";
+        document.getElementById('scaleReadout').textContent = txt;
+        document.getElementById('tableCurrent').textContent = txt;
+        document.getElementById('tableStart').textContent = state.startMass.toFixed(2).replace('.', ',') + " g";
+        
+        if (state.finished) {
+            document.getElementById('tableEnd').textContent = state.targetMass.toFixed(2).replace('.', ',') + " g";
+            document.getElementById('tableEnd').style.color = "var(--success)";
+        }
+    }
+
+    function showConclusion() {
+        document.getElementById('conclusion').style.display = "block";
+        document.getElementById('calcSection').style.display = "block";
+        document.getElementById('step1').classList.add('active');
+
+        const title = document.getElementById('resultTitle');
+        const text = document.getElementById('resultText');
+
+        if (state.userHypothesis === 'heavier') {
+            title.textContent = "KORREKT!";
+            title.style.color = "var(--success)";
+            text.textContent = "Massen steg, fordi ilt-atomerne (O) bandt sig til jernet.";
+        } else if (state.userHypothesis === 'lighter') {
+            title.textContent = "IKKE HELT";
+            title.style.color = "var(--error)";
+            text.textContent = "Du gættede, at massen ville falde – måske fordi det ser ud som om noget 'brænder væk'. Men intet forsvinder ud i luften her. Tværtimod bliver der TILFØJET stof: ilt fra luften binder sig til jernet, og massen stiger.";
+        } else if (state.userHypothesis === 'same') {
+            title.textContent = "IKKE HELT";
+            title.style.color = "var(--error)";
+            text.textContent = "Du gættede uændret masse – det ville være rigtigt, hvis systemet var lukket. Men her er systemet åbent: ilt fra den omgivende luft bliver optaget i det faste stof (rust), så den samlede masse på vægten stiger.";
+        } else {
+            title.textContent = "RESULTAT";
+            title.style.color = "var(--accent)";
+            text.textContent = "Vægten steg! Ilt fra luften er bundet til jernet som rust.";
+        }
+    }
+
+    function draw() {
+        ctxMacro.clearRect(0,0, macroCanvas.width, macroCanvas.height);
+        ctxMicro.clearRect(0,0, microCanvas.width, microCanvas.height);
+        
+        // MACRO
+        const cx = macroCanvas.width / 2;
+        const plateY = (macroCanvas.height * 0.6) + 40; 
+        ctxMacro.fillStyle = "#333";
+        ctxMacro.fillRect(cx - 60, plateY, 120, 10);
+        ctxMacro.fillStyle = "#222";
+        ctxMacro.fillRect(cx - 10, plateY+10, 20, 40); 
+
+        ctxMacro.lineWidth = 1.5;
+        state.woolPoints.forEach(p => {
+            let color = "#95a5a6"; 
+            if (state.running) {
+                if (p.thresh < state.burnProgress) { color = "#4a3b32"; } 
+                else if (p.thresh < state.burnProgress + 0.15) { color = (Math.random() > 0.5) ? "#ffaa00" : "#ff5500"; }
+            } else if (state.finished) { color = "#4a3b32"; }
+            ctxMacro.strokeStyle = color;
+            ctxMacro.beginPath(); ctxMacro.moveTo(p.x1, p.y1); ctxMacro.lineTo(p.x2, p.y2); ctxMacro.stroke();
+        });
+
+        state.sparks.forEach((s, i) => {
+            s.x += s.vx; s.y += s.vy; s.life--;
+            ctxMacro.fillStyle = `rgba(255, 200, 50, ${s.life/50})`;
+            ctxMacro.beginPath(); ctxMacro.arc(s.x, s.y, 1.5, 0, Math.PI*2); ctxMacro.fill();
+            if(s.life<=0) state.sparks.splice(i,1);
+        });
+
+        // MICRO
+        drawOxygenTank();
+        if (state.running) {
+            state.particles.forEach(p => {
+                ctxMicro.fillStyle = "#e74c3c"; 
+                ctxMicro.beginPath(); ctxMicro.arc(p.x, p.y, 5, 0, Math.PI*2); ctxMicro.fill();
+                ctxMicro.beginPath(); ctxMicro.arc(p.x+8, p.y, 5, 0, Math.PI*2); ctxMicro.fill();
+            });
+        }
+        state.ironAtoms.forEach(a => {
+            ctxMicro.fillStyle = "#95a5a6";
+            ctxMicro.beginPath(); ctxMicro.arc(a.x, a.y, 10, 0, Math.PI*2); ctxMicro.fill();
+            ctxMicro.fillStyle = "rgba(0,0,0,0.5)"; ctxMicro.font="10px sans-serif"; 
+            ctxMicro.fillText("Fe", a.x-6, a.y+3);
+
+            if (a.oxidized) {
+                ctxMicro.fillStyle = "#e74c3c";
+                // KUN 1 Ilt-atom per Jernatom til FeO
+                ctxMicro.beginPath(); ctxMicro.arc(a.x+8, a.y-8, 6, 0, Math.PI*2); ctxMicro.fill();
+            }
+        });
+    }
+
+    init();
+
+</script>
+</body>
+</html>

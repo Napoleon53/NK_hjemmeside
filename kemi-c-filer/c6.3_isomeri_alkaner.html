@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title>Isomer-Detektiven: Fejlsikret Edition</title>
+    <style>
+        :root {
+            --bg: #f3f4f6;
+            --panel: #ffffff;
+            --primary: #2563eb;
+            --success: #16a34a;
+            --warning: #f59e0b;
+            --danger: #dc2626;
+            --text: #111827;
+        }
+
+        body {
+            margin: 0; 
+            height: 100vh; 
+            display: flex;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg); 
+            color: var(--text); 
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .panel {
+            background: var(--panel);
+            flex-shrink: 0; 
+            display: flex; 
+            flex-direction: column;
+            z-index: 20;
+        }
+
+        #sidebar {
+            width: 270px;
+            padding: 20px;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.05);
+            flex-shrink: 0;
+        }
+
+        h1 { margin: 0 0 5px 0; font-size: 1.6rem; color: #1f2937; }
+        .subtitle { color: #6b7280; font-size: 0.9rem; margin-bottom: 25px; }
+
+        .level-select { display: flex; gap: 8px; margin-bottom: 25px; }
+        .lvl-btn {
+            flex: 1; padding: 10px; border: none; background: #f3f4f6;
+            border-radius: 8px; cursor: pointer; font-weight: 700; color: #9ca3af;
+            transition: all 0.2s; position: relative;
+        }
+        .lvl-btn.active { 
+            background: var(--primary); color: white; 
+            transform: scale(1.05); box-shadow: 0 4px 6px rgba(37,99,235,0.2); 
+        }
+        .lvl-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .mission-card {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border: 1px solid #bfdbfe; padding: 20px; border-radius: 12px;
+            text-align: center; margin-bottom: 20px;
+        }
+        .formula { font-size: 2.5rem; font-weight: 800; color: #1e40af; letter-spacing: 2px; line-height: 1; margin: 10px 0; }
+        
+        .btn-check {
+            width: 100%; padding: 16px; background: var(--success); color: white;
+            border: none; border-radius: 10px; font-size: 1.1rem; font-weight: 800;
+            cursor: pointer; margin-bottom: 12px; transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(22, 163, 74, 0.2);
+            opacity: 0.6; 
+        }
+        .btn-check.ready { opacity: 1; }
+        .btn-check:active { transform: scale(0.98); }
+        
+        .btn-clear {
+            width: 100%; padding: 12px; background: white; color: var(--danger);
+            border: 2px solid var(--danger); border-radius: 10px; font-weight: 700; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-clear:hover { background: #fef2f2; }
+
+        #feedback-area {
+            margin-top: auto; padding: 15px; border-radius: 8px;
+            background: #fff; border: 1px dashed #cbd5e1;
+            text-align: center; font-weight: 600; color: #475569;
+            min-height: 60px; display: flex; align-items: center; justify-content: center;
+        }
+
+        #list-panel {
+            width: 290px;
+            flex-shrink: 0;
+            border-left: 1px solid #e5e7eb;
+            padding: 16px;
+            overflow-y: auto;
+        }
+        .found-header { font-size: 0.9rem; font-weight: 700; color: #6b7280; margin-bottom: 10px; text-transform: uppercase; }
+        .found-item {
+            padding: 12px; background: #f9fafb; border-radius: 8px; margin-bottom: 8px;
+            font-size: 0.9rem;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+        }
+        .found-item-locked {
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .found-item-header {
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .found-item.new {
+            background: #ecfdf5; color: #065f46; border-color: #a7f3d0; font-weight: 700;
+            animation: slideIn 0.3s ease-out;
+        }
+        .found-diagram {
+            margin-top: 8px; background: #ffffff; border: 1px solid #a7f3d0; border-radius: 6px;
+            padding: 6px; display: flex; align-items: center; justify-content: center; min-height: 58px;
+        }
+        .found-diagram svg { display: block; max-width: 100%; height: auto; }
+
+        .diagram-legend {
+            display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #6b7280;
+            margin-bottom: 14px;
+        }
+        .diagram-legend .dot-main, .diagram-legend .dot-branch {
+            display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+        }
+        .diagram-legend .dot-main { background: #334155; }
+        .diagram-legend .dot-branch { background: #2563eb; }
+        
+        @keyframes slideIn {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        #stage {
+            flex-grow: 1; position: relative; cursor: crosshair;
+            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+            background-size: 30px 30px;
+            min-width: 260px;
+        }
+        
+        #instructions {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: rgba(255,255,255,0.95); padding: 12px 24px; border-radius: 30px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); pointer-events: none; color: #374151;
+            font-weight: 600; font-size: 0.95rem; text-align: center;
+        }
+
+        #chain-legend {
+            position: absolute; top: 30px; left: 50%; transform: translateX(-50%) translateY(-10px);
+            background: rgba(255,255,255,0.95); padding: 8px 18px; border-radius: 20px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); pointer-events: none; color: #374151;
+            font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;
+            opacity: 0; transition: all 0.3s ease-out; z-index: 40;
+        }
+        #chain-legend.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        #chain-legend .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-left: 8px; }
+        #chain-legend .dot:first-child { margin-left: 0; }
+        
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
+            70% { box-shadow: 0 0 0 12px rgba(22, 163, 74, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+        }
+        
+        @keyframes pulse-blue {
+            0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7); transform: scale(1.05); }
+            70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); transform: scale(1.08); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); transform: scale(1.05); }
+        }
+
+        .pulse-btn { animation: pulse-green 1.5s infinite; }
+        .pulse-next-level { animation: pulse-blue 1.5s infinite; background: var(--primary) !important; color: white !important; }
+
+        #level-complete-overlay {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9);
+            background: rgba(255,255,255,0.95); border: 2px solid var(--primary);
+            padding: 30px 50px; border-radius: 20px; text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+            opacity: 0; pointer-events: none; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 50;
+        }
+        #level-complete-overlay.show { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: all; }
+        #level-complete-overlay h2 { margin: 0 0 10px 0; color: var(--primary); font-size: 2rem; }
+
+        #overlay-close-btn {
+            position: absolute; top: 8px; right: 10px; border: none; background: transparent;
+            color: #9ca3af; font-size: 1.1rem; cursor: pointer; line-height: 1; padding: 4px;
+        }
+        #overlay-close-btn:hover { color: #374151; }
+
+        #restart-btn {
+            position: fixed; top: 16px; right: 16px; z-index: 200;
+            display: flex; align-items: center; gap: 6px;
+            background: white; color: #374151; border: 1px solid #e5e7eb;
+            padding: 8px 14px; border-radius: 20px; font-weight: 700; font-size: 0.85rem;
+            cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+        }
+        #restart-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+        .toast {
+            position: absolute; top: 40px; left: 50%; transform: translateX(-50%);
+            padding: 10px 20px; border-radius: 20px; font-weight: 700; color: white;
+            opacity: 0; transition: opacity 0.2s; pointer-events: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        .toast.error { background: var(--danger); }
+        .toast.warning { background: var(--warning); color: #111; }
+
+        /* Ved høj zoom / smallere vindue: behold sidepanel + tegnefelt side om side,
+           men lad kun højre "fundne isomerer"-panel flytte ned under tegnefeltet,
+           så opgave og tegning altid er synlige samtidig. */
+        @media (max-width: 900px) {
+            body { flex-wrap: wrap; overflow-y: auto; }
+            #stage { min-height: 55vh; }
+            #list-panel {
+                width: 100%; flex-basis: 100%; order: 3;
+                max-height: 220px; height: auto;
+                border-left: none; border-top: 1px solid #e5e7eb;
+                box-sizing: border-box;
+            }
+        }
+
+        @media (max-width: 620px) {
+            body { flex-direction: column; overflow-x: hidden; }
+            #sidebar { width: 100%; padding: 15px; box-sizing: border-box; }
+            #stage { min-height: 55vh; border-bottom: 1px solid #ccc; }
+            #list-panel { max-height: none; padding: 15px; }
+            .mission-card { margin-bottom: 10px; }
+            .btn-check { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<button id="restart-btn" onclick="game.restartGame()" title="Start hele spillet forfra">↺ Genstart spil</button>
+
+<div id="sidebar" class="panel">
+    <div>
+        <h1>Isomeri af alkaner</h1>
+        <div class="subtitle">Tegn alle de forskellige isomerer, der findes med det antal C-atomer.</div>
+    </div>
+
+    <div class="level-select">
+        <button class="lvl-btn active" id="btn-c4" onclick="game.setLevel(4)">C4</button>
+        <button class="lvl-btn" id="btn-c5" onclick="game.setLevel(5)" disabled>C5</button>
+        <button class="lvl-btn" id="btn-c6" onclick="game.setLevel(6)" disabled>C6</button>
+        <button class="lvl-btn" id="btn-c7" onclick="game.setLevel(7)" disabled>C7</button>
+    </div>
+
+    <div class="mission-card">
+        <div style="font-size: 0.8rem; text-transform: uppercase; color: #60a5fa; font-weight:700;">Dagens Opgave</div>
+        <div class="formula" id="target-formula">C₄H₁₀</div>
+        <div id="current-count" style="color: #64748b; font-weight: 600;">1 / 4 Atomer</div>
+    </div>
+
+    <button id="main-check-btn" class="btn-check" onclick="game.checkSolution()">TJEK SVAR</button>
+    <button class="btn-clear" onclick="game.reset()">Ryd Alt</button>
+
+    <div id="feedback-area">Tegn et molekyle ved at trække i enderne.</div>
+</div>
+
+<div id="stage">
+    <canvas id="canvas"></canvas>
+    <div id="toast-msg" class="toast error">Fejlbesked</div>
+    
+    <div id="level-complete-overlay">
+        <button id="overlay-close-btn" onclick="game.closeOverlay()" title="Luk">✕</button>
+        <h2>Fremragende! 🌟</h2>
+        <p>Du har fundet alle isomerer for dette niveau.</p>
+        <p id="level-complete-hint" style="color: #64748b; font-size: 0.9rem;">Klik på det pulserende niveau i menuen for at fortsætte.</p>
+    </div>
+
+    <div id="instructions">
+        <span>🖱️ Klik & Træk for at bygge | Højreklik for at slette</span>
+    </div>
+
+    <div id="chain-legend">
+        <span class="dot" style="background:#16a34a"></span> Hovedkæde
+        <span class="dot" style="background:#2563eb"></span> Sidegruppe
+    </div>
+</div>
+
+<div id="list-panel" class="panel">
+    <div class="found-header">Fundne Isomerer (<span id="progress-txt">0/2</span>)</div>
+    <div class="diagram-legend"><span class="dot-main"></span> Hovedkæde &nbsp; <span class="dot-branch"></span> Sidegruppe</div>
+    <div id="found-list"></div>
+</div>
+
+<script>
+/**
+ * ISOMER DETEKTIVEN v7.0
+ * Rettelser: 
+ * 1. Forhindrer at bindinger krydser hinanden (Line Intersection Algorithm).
+ * 2. Forhindrer dannelse af ringe (overlap-tjek forbedret).
+ * 3. Tvinger udelukkende små bogstaver for korrekte kemiske navne i lister.
+ */
+
+const LEVELS = {
+    4: { target: 4, isomers: 2, formula: "C₄H₁₀" },
+    5: { target: 5, isomers: 3, formula: "C₅H₁₂" },
+    6: { target: 6, isomers: 5, formula: "C₆H₁₄" },
+    7: { target: 7, isomers: 9, formula: "C₇H₁₆" }
+};
+
+class IUPAC {
+    // Analyserer molekylet: finder hovedkæde + substituenter og bygger navnet.
+    // Returnerer også "path" (hovedkædens atomer i den valgte nummereringsretning)
+    // og "subs" (substituenter m. position+størrelse), så CanonicalDraw kan
+    // genbruge nøjagtig samme struktur til at tegne den udfoldede model.
+    static analyzeStructure(nodes, edges) {
+        let adj = {}; nodes.forEach(n => adj[n.id] = []);
+        edges.forEach(e => { adj[e.a].push(e.b); adj[e.b].push(e.a); });
+
+        let ends = nodes.filter(n => adj[n.id].length === 1);
+        if(nodes.length === 1) ends = [nodes[0]];
+        if(ends.length < 2) return { name: "ukendt struktur", path: nodes.map(n => n.id), subs: [] };
+
+        let maxPath = [];
+        const dfs = (c, v, p) => {
+            v.add(c); p.push(c);
+            let end = true;
+            for(let n of adj[c]) if(!v.has(n)) { end = false; dfs(n, new Set(v), [...p]); }
+            if(end && p.length > maxPath.length) maxPath = p;
+        };
+        ends.forEach(n => dfs(n.id, new Set(), []));
+
+        const roots = ["", "methan", "ethan", "propan", "butan", "pentan", "hexan", "heptan", "octan"];
+        let base = roots[maxPath.length] || "poly";
+
+        let variants = [];
+        [maxPath, [...maxPath].reverse()].forEach(path => {
+            let subs = []; let pSet = new Set(path);
+            path.forEach((id, i) => {
+                adj[id].forEach(n => {
+                    if(!pSet.has(n)) {
+                        let sz = IUPAC.size(n, id, adj);
+                        subs.push({p: i+1, size: sz, n: sz===1 ? "methyl" : (sz===2 ? "ethyl" : "propyl")});
+                    }
+                });
+            });
+            variants.push({ path, subs });
+        });
+
+        let chosenIdx = 0;
+        let s1 = variants[0].subs.map(x=>x.p).sort().join('');
+        let s2 = variants[1].subs.map(x=>x.p).sort().join('');
+        if(s1 > s2) chosenIdx = 1;
+        else if(s2 > s1) chosenIdx = 0;
+
+        let chosen = variants[chosenIdx].subs;
+        let chosenPath = variants[chosenIdx].path;
+
+        let name;
+        if(chosen.length === 0) {
+            name = base.toLowerCase();
+        } else {
+            let cnt = {};
+            chosen.forEach(s => { if(!cnt[s.n]) cnt[s.n]=[]; cnt[s.n].push(s.p); });
+
+            let pre = [];
+            Object.keys(cnt).sort().forEach(k => {
+                let nums = cnt[k].sort((a,b)=>a-b).join(",");
+                let mul = {1:"", 2:"di", 3:"tri", 4:"tetra", 5:"penta"}[cnt[k].length] || "";
+                pre.push(`${nums}-${mul}${k}`);
+            });
+
+            // Returnerer udelukkende med små bogstaver som bestilt
+            name = (pre.join("-") + base).toLowerCase();
+        }
+
+        return { name, path: chosenPath, subs: chosen };
+    }
+
+    static getName(nodes, edges) {
+        return IUPAC.analyzeStructure(nodes, edges).name;
+    }
+
+    static size(n, p, adj) {
+        let s=1; for(let k of adj[n]) if(k!==p) s+=IUPAC.size(k, n, adj); return s;
+    }
+}
+
+/**
+ * Bygger et "udfoldet" kanonisk diagram (ren zigzag hovedkæde + sidegrupper)
+ * ud fra samme kæde/substituent-data som IUPAC-navnet, så tegning og navn
+ * altid stemmer overens - uanset hvordan eleven selv har tegnet molekylet.
+ */
+class CanonicalDraw {
+    // Fast bindingslængde og faste vinkler (grader) - samme geometri som en
+    // rigtig håndtegnet zigzag-skeletformel, så alle bindinger bliver lige
+    // lange og grene altid starter præcis i det kulstofatom de hører til.
+    static BOND = 32;
+    static CHAIN_HALF_ANGLE = 30;   // hovedkædens zigzag-udsving om vandret
+    static BRANCH_TURN = 45;        // udsving for en sidegrens egen zigzag (ethyl/propyl)
+    static FAN_SPREAD = 44;         // vifte-vinkel mellem flere sidegrupper på samme C
+
+    static toRad(deg) { return deg * Math.PI / 180; }
+
+    static build(path, subs) {
+        const B = CanonicalDraw.BOND;
+        const toRad = CanonicalDraw.toRad;
+
+        // Hovedkæde: ensartet zigzag, hver binding har præcis samme længde
+        let atoms = [{ x: 0, y: 0, isChain: true }];
+        for (let i = 1; i < path.length; i++) {
+            let angle = (i % 2 === 1) ? -CanonicalDraw.CHAIN_HALF_ANGLE : CanonicalDraw.CHAIN_HALF_ANGLE;
+            let prev = atoms[i - 1];
+            atoms.push({
+                x: prev.x + Math.cos(toRad(angle)) * B,
+                y: prev.y + Math.sin(toRad(angle)) * B,
+                isChain: true
+            });
+        }
+        let bonds = [];
+        for (let i = 0; i < atoms.length - 1; i++) {
+            bonds.push({ x1: atoms[i].x, y1: atoms[i].y, x2: atoms[i + 1].x, y2: atoms[i + 1].y, branch: false });
+        }
+
+        // Grupper substituenter pr. position, så flere grene på samme C
+        // viftes symmetrisk ud i stedet for at overlappe hinanden.
+        let byPos = {};
+        subs.forEach(s => { (byPos[s.p] = byPos[s.p] || []).push(s); });
+
+        Object.keys(byPos).forEach(posKey => {
+            let idx = Number(posKey) - 1;
+            if (idx < 0 || idx >= path.length) return;
+            let base = atoms[idx];
+            let group = byPos[posKey];
+
+            // Peger ud i det "ledige" rum: op fra en top-knude, ned fra en bund-knude
+            let perpAngle = (idx % 2 === 1) ? -90 : 90;
+
+            group.forEach((s, j) => {
+                let branchAngle = perpAngle;
+                if (group.length > 1) {
+                    branchAngle = perpAngle - CanonicalDraw.FAN_SPREAD / 2
+                        + j * (CanonicalDraw.FAN_SPREAD / (group.length - 1));
+                }
+
+                let px = base.x, py = base.y;
+                for (let k = 0; k < s.size; k++) {
+                    let angle = branchAngle + (k === 0 ? 0 : (k % 2 === 1 ? CanonicalDraw.BRANCH_TURN : -CanonicalDraw.BRANCH_TURN));
+                    let nx = px + Math.cos(toRad(angle)) * B;
+                    let ny = py + Math.sin(toRad(angle)) * B;
+                    bonds.push({ x1: px, y1: py, x2: nx, y2: ny, branch: true });
+                    atoms.push({ x: nx, y: ny, isChain: false });
+                    px = nx; py = ny;
+                }
+            });
+        });
+
+        return { atoms, bonds };
+    }
+
+    static svg(path, subs) {
+        let { atoms, bonds } = CanonicalDraw.build(path, subs);
+        let xs = atoms.map(a => a.x), ys = atoms.map(a => a.y);
+        let pad = 16;
+        let minX = Math.min(...xs) - pad, maxX = Math.max(...xs) + pad;
+        let minY = Math.min(...ys) - pad, maxY = Math.max(...ys) + pad;
+        let w = maxX - minX, h = maxY - minY;
+
+        let lines = bonds.map(b =>
+            `<line x1="${b.x1}" y1="${b.y1}" x2="${b.x2}" y2="${b.y2}" stroke="${b.branch ? '#2563eb' : '#334155'}" stroke-width="3" stroke-linecap="round"/>`
+        ).join('');
+        let dots = atoms.map(a =>
+            `<circle cx="${a.x}" cy="${a.y}" r="3.2" fill="#334155"/>`
+        ).join('');
+
+        // Lokantnumre: placeret på modsatte side af en evt. sidegruppe,
+        // så eleven kan se hvorfor fx "3-methylpentan" hedder 3.
+        let labels = path.map((id, i) => {
+            let a = atoms[i];
+            let ly = a.y + (i % 2 === 1 ? 11 : -11);
+            return `<text x="${a.x}" y="${ly}" font-size="7.5" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#94a3b8">${i + 1}</text>`;
+        }).join('');
+
+        // Fast enheds-til-pixel-skala (1:1) i stedet for at presse alt ind i en
+        // fast højde - ellers krymper store, forgrenede molekyler (og deres tal)
+        // uforholdsmæssigt meget i forhold til fx simpel hexan.
+        return `<svg viewBox="${minX} ${minY} ${w} ${h}" width="${Math.round(w)}" height="${Math.round(h)}">${lines}${dots}${labels}</svg>`;
+    }
+}
+
+class Game {
+    constructor() {
+        this.canvas = document.getElementById('canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.nodes = [];
+        this.edges = [];
+        this.lvl = 4;
+        this.found = new Map(); // navn -> {name, path, subs} fra IUPAC.analyzeStructure
+        this.highlightChain = null; // Set af node-id'er der udgør hovedkæden, vist kortvarigt efter korrekt svar
+        
+        this.activeNode = null;
+        this.mouse = {x:0, y:0};
+        this.isDragging = false;
+        this.potentialPos = null;
+        this.isValidMove = true;
+        this.downX = 0;
+        this.downY = 0;
+        this.clickedNode = null;
+
+        window.addEventListener('resize', () => this.resize());
+        this.canvas.addEventListener('mousedown', e => this.onDown(e));
+        this.canvas.addEventListener('mousemove', e => this.onMove(e));
+        this.canvas.addEventListener('mouseup', e => this.onUp(e));
+        this.canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+        this.resize();
+        this.setLevel(4);
+        this.loop();
+    }
+
+    resize() {
+        let container = document.getElementById('stage');
+        this.canvas.width = container.clientWidth;
+        this.canvas.height = container.clientHeight;
+    }
+
+    setLevel(n) {
+        this.lvl = n;
+        this.found.clear();
+        document.getElementById('target-formula').innerText = LEVELS[n].formula;
+        document.getElementById('level-complete-overlay').classList.remove('show');
+        
+        [4,5,6,7].forEach(i => {
+            let btn = document.getElementById(`btn-c${i}`);
+            if(btn) {
+                btn.classList.toggle('active', i===n);
+                btn.classList.remove('pulse-next-level');
+            }
+        });
+        
+        this.updateStats();
+        this.reset();
+    }
+
+    reset() {
+        this.nodes = [];
+        this.edges = [];
+        this.activeNode = null;
+        this.highlightChain = null;
+        document.getElementById('chain-legend').classList.remove('show');
+        this.nodes.push({id: 1, x: this.canvas.width/2 - 40, y: this.canvas.height/2});
+        this.updateCount();
+        this.msg("Tegn molekylet ved at trække fra et C-atom.", "#475569");
+    }
+
+    getNeighbors(nodeId) {
+        let nIds = [];
+        this.edges.forEach(e => {
+            if(e.a === nodeId) nIds.push(e.b);
+            if(e.b === nodeId) nIds.push(e.a);
+        });
+        return this.nodes.filter(n => nIds.includes(n.id));
+    }
+
+    // Algoritme til at tjekke om to linjestykker krydser hinanden
+    segmentsIntersect(p1, p2, p3, p4) {
+        let det = (p2.x - p1.x) * (p4.y - p3.y) - (p3.x - p4.x) * (p1.y - p2.y);
+        if (det === 0) return false;
+        let lambda = ((p4.y - p3.y) * (p4.x - p1.x) + (p3.x - p4.x) * (p4.y - p1.y)) / det;
+        let gamma = ((p1.y - p2.y) * (p4.x - p1.x) + (p2.x - p1.x) * (p4.y - p1.y)) / det;
+        // Vi bruger 0.01 og 0.99 for at ignorere "skæringer" i selve endepunkterne
+        return (0.01 < lambda && lambda < 0.99) && (0.01 < gamma && gamma < 0.99);
+    }
+
+    // Tjekker om en binding fra fromNode til candidatePos (ved snapAngle) er gyldig.
+    // Udtrukket fra den oprindelige onMove, så både det kontinuerlige
+    // kæde-autobyg og "ghost"-forhåndsvisningen kan bruge nøjagtig samme regler.
+    evaluateMove(fromNode, candidatePos, snapAngle) {
+        let neighbors = this.getNeighbors(fromNode.id);
+
+        if (neighbors.length >= 4) {
+            return { ok: false, toast: { text: "C har allerede 4 bindinger!", type: "error" } };
+        }
+
+        let isTaken = false, isStraight = false, isRing = false, isCrossing = false;
+
+        // 1. Tjekker overlap og lige linjer i forhold til fromNode
+        for(let n of neighbors) {
+            let nAngle = Math.atan2(n.y - fromNode.y, n.x - fromNode.x);
+            let diff = Math.abs(snapAngle - nAngle);
+            while(diff > Math.PI) diff -= 2*Math.PI;
+            diff = Math.abs(diff);
+
+            if(diff < 0.3) isTaken = true;
+            if(diff > 2.8) isStraight = true;
+        }
+
+        // 2. Anti-Ring: Tjekker om den nye position lander for tæt på ethvert ANDET atom
+        for(let n of this.nodes) {
+            if (n.id !== fromNode.id) {
+                let dist = Math.hypot(n.x - candidatePos.x, n.y - candidatePos.y);
+                if (dist < 20) { isRing = true; break; }
+            }
+        }
+
+        // 3. Anti-Kryds: Tjekker om den potentielle linje skærer nogen eksisterende binding
+        for(let edge of this.edges) {
+            let a = this.nodes.find(n => n.id === edge.a);
+            let b = this.nodes.find(n => n.id === edge.b);
+            // Vi springer de kanter over, som udspringer fra fromNode
+            if (a.id === fromNode.id || b.id === fromNode.id) continue;
+
+            if (this.segmentsIntersect(fromNode, candidatePos, a, b)) { isCrossing = true; break; }
+        }
+
+        if (isTaken || isRing) return { ok: false, toast: null }; // Ingen besked, stregen bliver bare rød.
+        if (isCrossing) return { ok: false, toast: { text: "Bindinger må ikke krydse!", type: "error" } };
+        if (isStraight && neighbors.length === 1) return { ok: false, toast: { text: "Husk knæk på kæden!", type: "warning" } };
+        return { ok: true, toast: null };
+    }
+
+    angleDiff(a, b) {
+        let d = a - b;
+        while (d > Math.PI) d -= 2 * Math.PI;
+        while (d < -Math.PI) d += 2 * Math.PI;
+        return d;
+    }
+
+    // Finder næste gyldige skridt fra fromNode hen mod musen. Hvis den lige
+    // fortsættelse (30°-snappet mod musen) er ulovlig - typisk fordi den ville
+    // give en lige linje uden knæk - prøver den automatisk de to nærmeste
+    // knæk-vinkler (±30°) i stedet, så eleven bare kan trække musen videre
+    // uden selv at skulle styre vinklen for hvert knæk.
+    resolveNextStep(fromNode) {
+        const BOND_LENGTH = 50;
+        const UNIT = Math.PI / 6;
+
+        let rawAngle = Math.atan2(this.mouse.y - fromNode.y, this.mouse.x - fromNode.x);
+        let baseSnap = Math.round(rawAngle / UNIT) * UNIT;
+        let alt1 = baseSnap - UNIT, alt2 = baseSnap + UNIT;
+        let kinks = [alt1, alt2].sort((a, b) =>
+            Math.abs(this.angleDiff(rawAngle, a)) - Math.abs(this.angleDiff(rawAngle, b))
+        );
+
+        let results = [baseSnap, ...kinks].map(angle => {
+            let candidatePos = {
+                x: fromNode.x + Math.cos(angle) * BOND_LENGTH,
+                y: fromNode.y + Math.sin(angle) * BOND_LENGTH
+            };
+            return { angle, candidatePos, ...this.evaluateMove(fromNode, candidatePos, angle) };
+        });
+
+        return results.find(r => r.ok) || results[0];
+    }
+
+    onMove(e) {
+        let r = this.canvas.getBoundingClientRect();
+        this.mouse.x = e.clientX - r.left;
+        this.mouse.y = e.clientY - r.top;
+
+        if (this.isDragging && this.activeNode) {
+            const BOND_LENGTH = 50;
+
+            // Kædebygning i ét træk: så længe musen holdes nede og trækkes
+            // langt nok væk, committes atomet automatisk (med et selvvalgt
+            // knæk om nødvendigt) og kæden fortsætter - som i almindelige
+            // kemitegneprogrammer, uden at man behøver slippe museknappen
+            // eller selv styre vinklen mellem hvert C-atom.
+            while (this.nodes.length < LEVELS[this.lvl].target) {
+                let dist = Math.hypot(this.mouse.x - this.activeNode.x, this.mouse.y - this.activeNode.y);
+                if (dist < BOND_LENGTH) break;
+
+                let step = this.resolveNextStep(this.activeNode);
+                if (!step.ok) break;
+
+                let newNode = { id: Date.now() + Math.random(), x: step.candidatePos.x, y: step.candidatePos.y };
+                this.nodes.push(newNode);
+                this.edges.push({ a: this.activeNode.id, b: newNode.id });
+                this.activeNode = newNode;
+                this.updateCount();
+            }
+
+            // "Ghost"-forhåndsvisning af det næste (endnu ikke committede) skridt
+            let step = this.resolveNextStep(this.activeNode);
+            this.potentialPos = step.candidatePos;
+
+            if (this.nodes.length >= LEVELS[this.lvl].target) {
+                this.isValidMove = false;
+                this.showToast("Max antal atomer nået. Tryk på TJEK SVAR!", "warning");
+                return;
+            }
+
+            this.isValidMove = step.ok;
+            if (step.toast) this.showToast(step.toast.text, step.toast.type);
+            else this.hideToast();
+        }
+    }
+
+    draw() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Bindinger
+        this.ctx.lineCap = "round";
+        this.ctx.lineJoin = "round";
+        this.ctx.lineWidth = 8;
+
+        if (this.highlightChain) {
+            // Hovedkæde/sidegruppe farvelagt efter korrekt svar
+            this.edges.forEach(e => {
+                let a = this.nodes.find(n => n.id === e.a);
+                let b = this.nodes.find(n => n.id === e.b);
+                let isChainEdge = this.highlightChain.has(e.a) && this.highlightChain.has(e.b);
+                this.ctx.beginPath();
+                this.ctx.moveTo(a.x, a.y);
+                this.ctx.lineTo(b.x, b.y);
+                this.ctx.strokeStyle = isChainEdge ? "#16a34a" : "#2563eb";
+                this.ctx.stroke();
+            });
+        } else {
+            this.ctx.strokeStyle = "#334155";
+            this.ctx.beginPath();
+            this.edges.forEach(e => {
+                let a = this.nodes.find(n => n.id === e.a);
+                let b = this.nodes.find(n => n.id === e.b);
+                this.ctx.moveTo(a.x, a.y);
+                this.ctx.lineTo(b.x, b.y);
+            });
+            this.ctx.stroke();
+        }
+
+        // Atomer
+        this.nodes.forEach(n => {
+            let isEnd = this.getDegree(n.id) <= 1;
+            let dist = Math.hypot(n.x - this.mouse.x, n.y - this.mouse.y);
+
+            if(this.highlightChain || isEnd || dist < 30 || (this.activeNode && this.activeNode.id === n.id)) {
+                this.ctx.beginPath();
+                this.ctx.arc(n.x, n.y, 8, 0, Math.PI*2);
+                if (this.highlightChain) {
+                    this.ctx.fillStyle = this.highlightChain.has(n.id) ? "#16a34a" : "#2563eb";
+                } else {
+                    this.ctx.fillStyle = (dist < 30 || this.activeNode?.id === n.id) ? "#2563eb" : "#334155";
+                }
+                this.ctx.fill();
+
+                this.ctx.beginPath();
+                this.ctx.arc(n.x, n.y, 3, 0, Math.PI*2);
+                this.ctx.fillStyle = "white";
+                this.ctx.fill();
+            }
+        });
+
+        // "Ghost" streg under træk
+        if (this.isDragging && this.activeNode && this.potentialPos) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.activeNode.x, this.activeNode.y);
+            this.ctx.lineTo(this.potentialPos.x, this.potentialPos.y);
+            
+            this.ctx.strokeStyle = this.isValidMove ? "#60a5fa" : "#ef4444"; 
+            this.ctx.lineWidth = 6;
+            this.ctx.setLineDash([5, 8]);
+            this.ctx.stroke();
+            this.ctx.setLineDash([]);
+
+            this.ctx.beginPath();
+            this.ctx.arc(this.potentialPos.x, this.potentialPos.y, 6, 0, Math.PI*2);
+            this.ctx.fillStyle = this.isValidMove ? "#60a5fa" : "#ef4444"; 
+            this.ctx.fill();
+        }
+    }
+
+    loop() {
+        this.draw();
+        requestAnimationFrame(() => this.loop());
+    }
+
+    onDown(e) {
+        if(e.button === 2) { 
+            let n = this.getNodeAt(this.mouse.x, this.mouse.y);
+            if(n && this.getDegree(n.id) <= 1 && this.nodes.length > 1) this.deleteNode(n);
+            return;
+        }
+
+        this.downX = this.mouse.x;
+        this.downY = this.mouse.y;
+        let node = this.getNodeAt(this.mouse.x, this.mouse.y);
+        if (node) {
+            this.activeNode = node;
+            this.isDragging = true;
+            this.clickedNode = node;
+        } else {
+            this.clickedNode = null;
+        }
+    }
+
+    onUp(e) {
+        let movedDist = Math.hypot(this.mouse.x - this.downX, this.mouse.y - this.downY);
+        let addedViaDrag = false;
+
+        if (this.isDragging && this.activeNode && this.potentialPos && this.isValidMove) {
+            if (this.nodes.length < LEVELS[this.lvl].target) {
+                let newId = Date.now() + Math.random();
+                this.nodes.push({ id: newId, x: this.potentialPos.x, y: this.potentialPos.y });
+                this.edges.push({ a: this.activeNode.id, b: newId });
+                this.updateCount();
+                addedViaDrag = true;
+            } else {
+                this.showToast("Max antal atomer nået. Tryk på TJEK SVAR!", "warning");
+            }
+        }
+
+        if (!addedViaDrag && this.clickedNode && movedDist < 6) {
+            // Rent klik på et atom uden at trække - forlæng kæden med ét nyt C-atom
+            // i en tilfældig, men pænt vinklet retning fra det klikkede atom.
+            this.addRandomAtomFrom(this.clickedNode);
+        }
+
+        this.isDragging = false;
+        this.activeNode = null;
+        this.potentialPos = null;
+        this.hideToast();
+    }
+
+    // Vælger blandt alle gyldige 30°-retninger fra 'node' (samme regelsæt som
+    // evaluateMove bruger under træk: ingen ringe, ingen krydsende bindinger, intet
+    // lige gennemløb) og tilføjer ét nyt atom i en tilfældig af dem.
+    addRandomAtomFrom(node) {
+        if (this.nodes.length >= LEVELS[this.lvl].target) {
+            this.showToast("Max antal atomer nået. Tryk på TJEK SVAR!", "warning");
+            return;
+        }
+        const BOND_LENGTH = 50;
+        const UNIT = Math.PI / 6;
+        let candidates = [];
+        for (let i = 0; i < 12; i++) {
+            let angle = i * UNIT;
+            let candidatePos = { x: node.x + Math.cos(angle) * BOND_LENGTH, y: node.y + Math.sin(angle) * BOND_LENGTH };
+            if (this.evaluateMove(node, candidatePos, angle).ok) candidates.push(candidatePos);
+        }
+        if (candidates.length === 0) {
+            this.showToast("Der er ikke plads til flere atomer her!", "error");
+            setTimeout(() => this.hideToast(), 1200);
+            return;
+        }
+        let chosen = candidates[Math.floor(Math.random() * candidates.length)];
+        let newId = Date.now() + Math.random();
+        this.nodes.push({ id: newId, x: chosen.x, y: chosen.y });
+        this.edges.push({ a: node.id, b: newId });
+        this.updateCount();
+    }
+
+    getNodeAt(x, y) { return this.nodes.find(n => Math.hypot(n.x - x, n.y - y) < 25); }
+    getDegree(id) { return this.edges.filter(e => e.a === id || e.b === id).length; }
+    
+    deleteNode(node) {
+        this.nodes = this.nodes.filter(n => n.id !== node.id);
+        this.edges = this.edges.filter(e => e.a !== node.id && e.b !== node.id);
+        this.updateCount();
+    }
+
+    updateCount() {
+        let count = this.nodes.length;
+        let target = LEVELS[this.lvl].target;
+        let el = document.getElementById('current-count');
+        let checkBtn = document.getElementById('main-check-btn');
+
+        el.innerText = `${count} / ${target} Atomer`;
+        
+        if (count === target) {
+            el.style.color = "#16a34a";
+            checkBtn.classList.add('ready');
+            checkBtn.classList.add('pulse-btn');
+            this.msg("Molekylet er færdigbygget. <strong>Klik på TJEK SVAR!</strong>", "#16a34a");
+        } else {
+            el.style.color = "#64748b";
+            checkBtn.classList.remove('ready');
+            checkBtn.classList.remove('pulse-btn');
+        }
+    }
+
+    checkSolution() {
+        if (this.nodes.length !== LEVELS[this.lvl].target) {
+            this.msg(`Tegn videre. Du mangler at bruge alle ${LEVELS[this.lvl].target} atomer.`, "#dc2626");
+            return;
+        }
+
+        let struct = IUPAC.analyzeStructure(this.nodes, this.edges);
+        let name = struct.name;
+
+        if (this.found.has(name)) {
+            this.msg(`<strong>${name}</strong> har du allerede fundet. Prøv en anden struktur!`, "#d97706");
+        } else {
+            this.found.set(name, struct);
+            this.msg(`KORREKT! Det er: <strong>${name}</strong>`, "#16a34a");
+            this.updateStats();
+
+            this.highlightChain = new Set(struct.path);
+            document.getElementById('chain-legend').classList.add('show');
+
+            if (this.found.size === LEVELS[this.lvl].isomers) {
+                document.getElementById('level-complete-overlay').classList.add('show');
+                
+                if(this.lvl < 7) {
+                    let nextBtn = document.getElementById(`btn-c${this.lvl+1}`);
+                    nextBtn.disabled = false;
+                    nextBtn.classList.add('pulse-next-level'); 
+                    this.msg(`Niveau klaret! Vælg C${this.lvl+1} i menuen.`, "#2563eb");
+                } else {
+                    document.querySelector('#level-complete-overlay h2').innerText = "SPILLET ER GENNEMFØRT! 🏆";
+                    document.querySelector('#level-complete-overlay p').innerText = "Du er nu officielt Isomer-Mester.";
+                    document.getElementById('level-complete-hint').innerText = "Luk dette vindue og se dine molekyler, eller genstart spillet i øverste hjørne.";
+                    this.msg("Alt klaret! Imponerende arbejde.", "#2563eb");
+                }
+            } else {
+                 setTimeout(() => { if(this.found.size < LEVELS[this.lvl].isomers) this.reset(); }, 1500);
+            }
+        }
+        
+        document.getElementById('main-check-btn').classList.remove('pulse-btn');
+    }
+
+    closeOverlay() {
+        document.getElementById('level-complete-overlay').classList.remove('show');
+    }
+
+    // Nulstiller hele spillet (alle niveauer) - brugeren skal selv vælge det,
+    // fx efter at have gennemført alle fire niveauer og villet øve sig igen.
+    restartGame() {
+        if (!confirm("Genstart hele spillet forfra? Al fremgang på alle niveauer bliver nulstillet.")) return;
+
+        [5, 6, 7].forEach(i => document.getElementById(`btn-c${i}`).disabled = true);
+
+        document.querySelector('#level-complete-overlay h2').innerText = "Fremragende! 🌟";
+        document.querySelector('#level-complete-overlay p').innerText = "Du har fundet alle isomerer for dette niveau.";
+        document.getElementById('level-complete-hint').innerText = "Klik på det pulserende niveau i menuen for at fortsætte.";
+
+        this.setLevel(4);
+    }
+
+    updateStats() {
+        document.getElementById('progress-txt').innerText = `${this.found.size}/${LEVELS[this.lvl].isomers}`;
+        let html = "";
+        // Sorter efter hovedkædelængde (kort/mest forgrenet øverst), ikke
+        // alfabetisk - alfabetisk sortering rangerer reelt efter lokanttal
+        // først, hvilket blander fx "3-ethylpentan" ind mellem hexan-navnene.
+        let names = Array.from(this.found.keys()).sort((a, b) => {
+            let diff = this.found.get(a).path.length - this.found.get(b).path.length;
+            return diff !== 0 ? diff : a.localeCompare(b);
+        });
+        names.forEach(name => {
+            let struct = this.found.get(name);
+            html += `<div class="found-item new">
+                <div class="found-item-header">
+                    <span>${name}</span>
+                    <span class="check-icon">✓</span>
+                </div>
+                <div class="found-diagram">${CanonicalDraw.svg(struct.path, struct.subs)}</div>
+            </div>`;
+        });
+        for(let i=names.length; i<LEVELS[this.lvl].isomers; i++) {
+             html += `<div class="found-item found-item-locked"><span style="color:#9ca3af">Find isomer</span><span style="opacity:0.5">🔒</span></div>`;
+        }
+        document.getElementById('found-list').innerHTML = html;
+    }
+
+    msg(txt, col) {
+        let el = document.getElementById('feedback-area');
+        el.innerHTML = txt;
+        el.style.color = col;
+        el.style.borderColor = col;
+    }
+
+    showToast(text, type) {
+        let t = document.getElementById('toast-msg');
+        t.innerText = text;
+        t.className = `toast ${type}`;
+        t.style.opacity = 1;
+    }
+    hideToast() { document.getElementById('toast-msg').style.opacity = 0; }
+}
+
+const game = new Game();
+</script>
+</body>
+</html>

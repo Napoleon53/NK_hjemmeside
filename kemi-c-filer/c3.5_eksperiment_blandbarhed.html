@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kemi-Lab: Blandbarhed v8 (Easy Click)</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #2980b9;
+            --water: #3498db;
+            --oil: #7f8c8d;
+            --light: #ecf0f1;
+            --success: #27ae60;
+            --danger: #c0392b;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        
+        #game-container {
+            display: flex;
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR */
+        #sidebar {
+            width: 320px;
+            background: white;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            z-index: 5;
+            padding: 20px;
+            gap: 15px;
+            overflow-y: auto;
+        }
+        
+        .section-title {
+            font-size: 1.1rem; font-weight: bold; color: var(--primary);
+            border-bottom: 2px solid #eee; padding-bottom: 5px; margin-bottom: 10px;
+        }
+
+        .mol-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .mol-btn {
+            padding: 10px;
+            background: #f1f2f6;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .mol-btn:hover { background: #e1e2e6; }
+        .mol-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* BAR CHART */
+        .bar-container {
+            height: 25px;
+            background: #dfe6e9;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            border: 1px solid #b2bec3;
+            margin-top: 5px;
+        }
+        .bar-part {
+            height: 100%; display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem; color: white; font-weight: bold; transition: width 0.3s ease-out;
+            white-space: nowrap; overflow: hidden;
+        }
+        
+        #confirm-btn {
+            width: 100%; padding: 12px;
+            background-color: var(--success); color: white;
+            border: none; border-radius: 8px;
+            font-size: 1rem; font-weight: bold;
+            cursor: pointer; margin-top: 10px;
+        }
+        #confirm-btn:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+
+        #instruction {
+            background: #fff3cd; color: #856404; padding: 12px; border-radius: 8px; font-size: 0.9rem;
+            border-left: 5px solid #ffeeba; line-height: 1.4;
+        }
+
+        /* CANVAS */
+        #stage {
+            flex-grow: 1;
+            position: relative;
+            background-color: #f8f9fa;
+            cursor: default;
+        }
+        canvas { display: block; width: 100%; height: 100%; }
+
+        #overlay-msg {
+            position: absolute;
+            top: 40%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(44, 62, 80, 0.95);
+            color: white; padding: 15px 30px; border-radius: 50px;
+            font-size: 1.2rem; font-weight: bold;
+            pointer-events: none; opacity: 0; transition: opacity 0.3s;
+            z-index: 20; text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size: 1.5rem;">⚗️</span>
+        <h1 style="margin:0; font-size:1.4rem;">Blandbarhed: Eksperiment</h1>
+    </div>
+    <div style="font-weight:bold; background:rgba(255,255,255,0.2); padding:5px 15px; border-radius:15px;">
+        Score: <span id="score">0</span>
+    </div>
+</header>
+
+<div id="game-container">
+    <div id="sidebar">
+        <div>
+            <div class="section-title">1. Vælg Stof</div>
+            <div class="mol-grid" id="mol-list"></div>
+        </div>
+
+        <div>
+            <div class="section-title">2. Analyse</div>
+            <div id="instruction">
+                Klik på de <strong>polære grupper</strong> (OH, NH₂, COOH osv.) for at markere dem.
+            </div>
+            
+            <div style="margin-top:15px;">
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:5px; color:#555;">
+                    <span>Upolær (C-kæde)</span>
+                    <span>Polær (Vand-elskende)</span>
+                </div>
+                <div class="bar-container">
+                    <div id="bar-phob" class="bar-part" style="background: var(--oil); width:100%;">Upolær</div>
+                    <div id="bar-phil" class="bar-part" style="background: var(--water); width:0%;">Polær</div>
+                </div>
+            </div>
+
+            <button id="confirm-btn" onclick="game.checkAnalysis()">
+                ✅ Færdig med analyse
+            </button>
+        </div>
+
+        <div style="margin-top:auto; font-size:0.8rem; color:#95a5a6; text-align:center;">
+            Vand = Polært<br>Heptan = Upolært
+        </div>
+    </div>
+
+    <div id="stage">
+        <canvas id="canvas"></canvas>
+        <div id="overlay-msg">Besked</div>
+    </div>
+</div>
+
+<script>
+/* ------------------------------------------------------------------
+   DATAMODEL 
+   ------------------------------------------------------------------ */
+const MOLECULES = [
+    {
+        id: 'vand', name: 'Vand (H₂O)', type: 'water', cCount: 0,
+        groups: [{ ids:[0,1,2], type:'polar' }], 
+        atoms: [ {id:0, el:'O', x:0, y:-10}, {id:1, el:'H', x:-40, y:30}, {id:2, el:'H', x:40, y:30} ],
+        bonds: [{s:0, e:1}, {s:0, e:2}]
+    },
+    {
+        id: 'heptan', name: 'Heptan', type: 'oil', cCount: 7,
+        groups: [],
+        atoms: [
+            {id:0, el:'C', x:-150, y:0}, {id:1, el:'C', x:-100, y:-40},
+            {id:2, el:'C', x:-50, y:0}, {id:3, el:'C', x:0, y:-40},
+            {id:4, el:'C', x:50, y:0}, {id:5, el:'C', x:100, y:-40},
+            {id:6, el:'C', x:150, y:0}
+        ],
+        bonds: [{s:0, e:1}, {s:1, e:2}, {s:2, e:3}, {s:3, e:4}, {s:4, e:5}, {s:5, e:6}]
+    },
+    {
+        id: 'urea', name: 'Urea', type: 'water', cCount: 1,
+        groups: [ {ids:[0,1], type:'carbonyl'}, {ids:[2,4,5], type:'amino'}, {ids:[3,6,7], type:'amino'} ],
+        atoms: [
+            {id:0, el:'C', x:0, y:0}, {id:1, el:'O', x:0, y:-60},
+            {id:2, el:'N', x:-60, y:40}, {id:3, el:'N', x:60, y:40},
+            {id:4, el:'H', x:-90, y:20}, {id:5, el:'H', x:-50, y:80},
+            {id:6, el:'H', x:90, y:20},  {id:7, el:'H', x:50, y:80}
+        ],
+        bonds: [{s:0, e:1, d:true}, {s:0, e:2}, {s:0, e:3}, {s:2, e:4}, {s:2, e:5}, {s:3, e:6}, {s:3, e:7}]
+    },
+    {
+        id: 'hexan1ol', name: 'Hexan-1-ol', type: 'oil', cCount: 6,
+        groups: [ {ids:[6,7], type:'hydroxyl'} ],
+        atoms: [
+            {id:0, el:'C', x:-140, y:20}, {id:1, el:'C', x:-90, y:-20},
+            {id:2, el:'C', x:-40, y:20}, {id:3, el:'C', x:10, y:-20},
+            {id:4, el:'C', x:60, y:20}, {id:5, el:'C', x:110, y:-20},
+            {id:6, el:'O', x:160, y:20}, {id:7, el:'H', x:190, y:40}
+        ],
+        bonds: [{s:0, e:1}, {s:1, e:2}, {s:2, e:3}, {s:3, e:4}, {s:4, e:5}, {s:5, e:6}, {s:6, e:7}]
+    },
+    {
+        id: 'glucose', name: 'Glucose', type: 'water', cCount: 6,
+        groups: [
+             {ids:[0], type:'ether'}, {ids:[7,8], type:'hydroxyl'}, {ids:[9,10], type:'hydroxyl'},
+             {ids:[11,12], type:'hydroxyl'}, {ids:[13,14], type:'hydroxyl'}, {ids:[15,16], type:'hydroxyl'}
+        ],
+        atoms: [
+            {id:0, el:'O', x:40, y:-40}, 
+            {id:1, el:'C', x:80, y:0}, {id:2, el:'C', x:40, y:60}, {id:3, el:'C', x:-40, y:60}, {id:4, el:'C', x:-80, y:0},
+            {id:5, el:'C', x:-40, y:-40}, {id:6, el:'C', x:-80, y:-80},
+            {id:7, el:'O', x:-120, y:-80}, {id:8, el:'H', x:-140,y:-80},
+            {id:9, el:'O', x:-120, y:20},  {id:10,el:'H', x:-140,y:20},
+            {id:11,el:'O', x:-60, y:100},  {id:12,el:'H', x:-60, y:120},
+            {id:13,el:'O', x:60, y:100},   {id:14,el:'H', x:60, y:120},
+            {id:15,el:'O', x:120, y:0},    {id:16,el:'H', x:140,y:0}
+        ],
+        bonds: [
+            {s:0, e:1}, {s:1, e:2}, {s:2, e:3}, {s:3, e:4}, {s:4, e:5}, {s:5, e:0},
+            {s:5, e:6}, {s:6, e:7}, {s:7, e:8}, {s:4, e:9}, {s:9, e:10},
+            {s:3, e:11}, {s:11,e:12}, {s:2, e:13}, {s:13,e:14}, {s:1, e:15}, {s:15,e:16}
+        ]
+    },
+    {
+        id: 'glycerol', name: 'Glycerol', type: 'water', cCount: 3,
+        groups: [
+            {ids:[3,4], type:'hydroxyl'}, 
+            {ids:[5,6], type:'hydroxyl'}, 
+            {ids:[7,8], type:'hydroxyl'}
+        ],
+        atoms: [
+            {id:0, el:'C', x:-60, y:0}, {id:1, el:'C', x:0, y:0}, {id:2, el:'C', x:60, y:0}, 
+            {id:3, el:'O', x:-60, y:-50}, {id:4, el:'H', x:-90, y:-60}, 
+            {id:5, el:'O', x:0, y:50},    {id:6, el:'H', x:0, y:80},
+            {id:7, el:'O', x:60, y:-50},  {id:8, el:'H', x:90, y:-60}
+        ],
+        bonds: [
+            {s:0, e:1}, {s:1, e:2}, 
+            {s:0, e:3}, {s:3, e:4},
+            {s:1, e:5}, {s:5, e:6},
+            {s:2, e:7}, {s:7, e:8}
+        ]
+    },
+    {
+        id: 'sorbinsyre', name: 'Sorbinsyre', type: 'oil', cCount: 6,
+        groups: [ {ids:[5,6,7,8], type:'acid'} ],
+        atoms: [
+            {id:0, el:'C', x:-120, y:10}, {id:1, el:'C', x:-80, y:-20}, {id:2, el:'C', x:-40, y:10}, 
+            {id:3, el:'C', x:0, y:-20}, {id:4, el:'C', x:40, y:10}, {id:5, el:'C', x:80, y:-20}, 
+            {id:6, el:'O', x:80, y:-60}, {id:7, el:'O', x:120, y:0}, {id:8, el:'H', x:140, y:20}
+        ],
+        bonds: [
+            {s:0, e:1}, {s:1, e:2, d:true}, {s:2, e:3}, {s:3, e:4, d:true}, {s:4, e:5},
+            {s:5, e:6, d:true}, {s:5, e:7}, {s:7, e:8}
+        ]
+    },
+    {
+        id: 'citronsyre', name: 'Citronsyre', type: 'water', cCount: 6,
+        groups: [
+            {ids:[3,4], type:'hydroxyl'},       // Center OH
+            {ids:[5,6,7,8], type:'acid'},       // Center COOH
+            {ids:[9,10,11,12], type:'acid'},    // Venstre COOH
+            {ids:[13,14,15,16], type:'acid'}    // Højre COOH
+        ],
+        atoms: [
+            {id:0, el:'C', x:0, y:10},  
+            {id:1, el:'C', x:-60, y:10}, 
+            {id:2, el:'C', x:60, y:10},  
+            {id:3, el:'O', x:0, y:-40}, {id:4, el:'H', x:0, y:-70},
+            {id:5, el:'C', x:0, y:60},  
+            {id:6, el:'O', x:-30, y:90},
+            {id:7, el:'O', x:30, y:90}, 
+            {id:8, el:'H', x:50, y:100},
+            {id:9, el:'C', x:-110, y:10},
+            {id:10,el:'O', x:-140, y:-20}, 
+            {id:11,el:'O', x:-140, y:40},  
+            {id:12,el:'H', x:-160, y:60},
+            {id:13,el:'C', x:110, y:10},
+            {id:14,el:'O', x:140, y:-20}, 
+            {id:15,el:'O', x:140, y:40},  
+            {id:16,el:'H', x:160, y:60}
+        ],
+        bonds: [
+            {s:0, e:1}, {s:0, e:2},          
+            {s:0, e:3}, {s:3, e:4},          
+            {s:0, e:5},                      
+            {s:5, e:6, d:true}, {s:5, e:7}, {s:7, e:8}, 
+            {s:1, e:9}, 
+            {s:9, e:10, d:true}, {s:9, e:11}, {s:11, e:12}, 
+            {s:2, e:13}, 
+            {s:13, e:14, d:true}, {s:13, e:15}, {s:15, e:16} 
+        ]
+    }
+];
+
+/* ------------------------------------------------------------------
+   GAME LOGIC 
+   ------------------------------------------------------------------ */
+class Game {
+    constructor() {
+        this.canvas = document.getElementById('canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.width = 100;
+        this.height = 100;
+        
+        this.currentMol = null;
+        this.foundGroups = new Set();
+        this.state = 'analyzing'; 
+        
+        this.pos = {x:0, y:0}; 
+        this.drag = { active: false, offset: {x:0, y:0} };
+        this.score = 0;
+        this.scale = 1.2;
+        
+        this.setupUI();
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        
+        this.canvas.addEventListener('mousedown', e => this.handleStart(e));
+        this.canvas.addEventListener('mousemove', e => this.handleMove(e));
+        this.canvas.addEventListener('mouseup', e => this.handleEnd(e));
+        
+        this.loadMolecule(0);
+        this.loop();
+    }
+
+    setupUI() {
+        const list = document.getElementById('mol-list');
+        list.innerHTML = '';
+        MOLECULES.forEach((m, idx) => {
+            const btn = document.createElement('div');
+            btn.className = 'mol-btn';
+            btn.innerText = m.name;
+            btn.onclick = () => {
+                document.querySelectorAll('.mol-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                this.loadMolecule(idx);
+            };
+            list.appendChild(btn);
+        });
+        list.firstChild.classList.add('active');
+    }
+
+    resize() {
+        const parent = this.canvas.parentElement;
+        this.width = parent.clientWidth;
+        this.height = parent.clientHeight;
+        this.canvas.width = this.width;
+        this.canvas.height = this.height;
+        
+        if(this.currentMol) {
+            if(this.pos.x > this.width) this.pos.x = this.width/2;
+            if(this.pos.y > this.height) this.pos.y = this.height*0.3;
+        }
+    }
+
+    loadMolecule(idx) {
+        this.currentMol = MOLECULES[idx];
+        this.foundGroups.clear();
+        this.state = 'analyzing';
+        
+        const btn = document.getElementById('confirm-btn');
+        btn.disabled = false;
+        btn.innerText = (this.currentMol.groups.length === 0) 
+            ? "✅ Ingen polære grupper? (Bekræft)" 
+            : "✅ Færdig med analyse";
+        
+        const instr = document.getElementById('instruction');
+        instr.innerHTML = "Klik på de <strong>polære grupper</strong> (OH, NH₂, COOH osv.) for at markere dem.";
+        instr.style.background = "#fff3cd";
+
+        this.resetPos();
+        this.updateBar();
+    }
+
+    resetPos() {
+        this.pos = { x: this.width/2, y: this.height * 0.3 };
+        this.drag.active = false;
+    }
+
+    /* --- INPUT LOGIC (UPDATED FOR EASY CLICKING) --- */
+    
+    getMouse(e) {
+        const r = this.canvas.getBoundingClientRect();
+        return { x: e.clientX - r.left, y: e.clientY - r.top };
+    }
+
+    handleStart(e) {
+        const m = this.getMouse(e);
+        
+        if (this.state === 'analyzing') {
+            let hit = false;
+            
+            // NY LOGIK: Tjek om vi rammer indenfor gruppe-cirklen (meget nemmere)
+            this.currentMol.groups.forEach((group, gIdx) => {
+                if(this.foundGroups.has(gIdx)) return;
+                
+                // Beregn center af gruppen (samme logik som boblen)
+                let sx=0, sy=0, count=0;
+                group.ids.forEach(id => {
+                    const a = this.currentMol.atoms[id];
+                    if(a) { sx += a.x; sy += a.y; count++; }
+                });
+                
+                if (count > 0) {
+                    const cx = this.pos.x + (sx / count) * this.scale;
+                    const cy = this.pos.y + (sy / count) * this.scale;
+                    
+                    // Beregn radius
+                    let maxR = 0;
+                    group.ids.forEach(id => {
+                        const a = this.currentMol.atoms[id];
+                        const ax = this.pos.x + a.x * this.scale;
+                        const ay = this.pos.y + a.y * this.scale;
+                        const d = Math.hypot(cx - ax, cy - ay);
+                        maxR = Math.max(maxR, d);
+                    });
+                    
+                    // Hit detection radius = gruppens radius + buffer (40px)
+                    const hitRadius = maxR + (40 * this.scale); 
+                    
+                    if (Math.hypot(m.x - cx, m.y - cy) < hitRadius) {
+                        this.foundGroups.add(gIdx);
+                        hit = true;
+                    }
+                }
+            });
+
+            if (hit) {
+                this.updateBar();
+            } else {
+                // Kun vis fejlmeddelelse, hvis vi er langt fra en gruppe, men tæt på C/H
+                this.currentMol.atoms.forEach(atom => {
+                     if(atom.hidden) return;
+                     const ax = this.pos.x + atom.x * this.scale;
+                     const ay = this.pos.y + atom.y * this.scale;
+                     // Hvis vi er tæt på et atom (20px), men ikke ramte en gruppe ovenfor
+                     if (Math.hypot(m.x - ax, m.y - ay) < 20) {
+                         if (atom.el === 'C' || atom.el === 'H') {
+                             this.showToast("Upolær (C-H)", "#7f8c8d");
+                         }
+                     }
+                });
+            }
+        }
+
+        if (this.state === 'ready_to_drag') {
+            if (Math.hypot(m.x - this.pos.x, m.y - this.pos.y) < 120) {
+                this.drag.active = true;
+                this.drag.offset = { x: this.pos.x - m.x, y: this.pos.y - m.y };
+            }
+        }
+    }
+
+    handleMove(e) {
+        if (this.drag.active) {
+            const m = this.getMouse(e);
+            this.pos.x = m.x + this.drag.offset.x;
+            this.pos.y = m.y + this.drag.offset.y;
+        }
+    }
+
+    handleEnd(e) {
+        if (this.drag.active) {
+            this.drag.active = false;
+            this.checkDrop();
+        }
+    }
+
+    /* --- GAME LOGIC --- */
+
+    checkAnalysis() {
+        const total = this.currentMol.groups.length;
+        const found = this.foundGroups.size;
+
+        if (found === total) {
+            this.state = 'ready_to_drag';
+            document.getElementById('confirm-btn').disabled = true;
+            document.getElementById('confirm-btn').innerText = "Analyse Godkendt";
+            
+            const instr = document.getElementById('instruction');
+            instr.innerHTML = "<strong>Klar til test!</strong><br>Træk molekylet ned i bægerglasset (Vand eller Benzin).";
+            instr.style.background = "#d4edda";
+            
+            this.showToast("Korrekt! Du må nu trække stoffet.", "#27ae60");
+        } else {
+            this.showToast(`Du mangler at finde ${total - found} polære grupper!`, "#e67e22");
+        }
+    }
+
+    checkDrop() {
+        const surfaceY = this.height * 0.65;
+        
+        if (this.pos.y > surfaceY) {
+            const isWater = this.pos.x < this.width / 2;
+            const target = isLeft => isLeft ? 'water' : 'oil';
+            const hitType = target(isWater);
+
+            if (hitType === this.currentMol.type) {
+                this.score += 100;
+                document.getElementById('score').innerText = this.score;
+                this.showToast(`Korrekt! ${this.currentMol.name} opløses.`, "#27ae60");
+                this.state = 'complete';
+                setTimeout(() => {
+                    this.loadMolecule(MOLECULES.indexOf(this.currentMol));
+                }, 1500);
+            } else {
+                this.showToast("Blandes ikke! Prøv det andet glas.", "#c0392b");
+                this.pos.y = this.height * 0.35; 
+            }
+        } else {
+             this.pos.x = this.width / 2;
+             this.pos.y = this.height * 0.35;
+        }
+    }
+
+    updateBar() {
+        const cVal = this.currentMol.cCount;
+        const pFound = this.foundGroups.size;
+        const total = cVal + (pFound > 0 ? pFound : 0.1); 
+        const oilPct = (cVal / total) * 100;
+        
+        const barOil = document.getElementById('bar-phob');
+        const barWater = document.getElementById('bar-phil');
+
+        if(cVal === 0 && pFound > 0) {
+             barOil.style.width = "0%";
+             barWater.style.width = "100%";
+        } else {
+             barOil.style.width = oilPct + "%";
+             barWater.style.width = (100 - oilPct) + "%";
+        }
+        
+        barOil.innerText = cVal > 0 ? `${cVal} C-atomer` : "";
+        barWater.innerText = pFound > 0 ? `${pFound} Polær` : (this.state === 'analyzing' ? "?" : "Ingen");
+    }
+
+    showToast(msg, color) {
+        const el = document.getElementById('overlay-msg');
+        el.innerText = msg;
+        el.style.backgroundColor = color;
+        el.style.opacity = 1;
+        setTimeout(() => el.style.opacity = 0, 2000);
+    }
+    
+    /* --- DRAWING --- */
+
+    loop() {
+        this.draw();
+        requestAnimationFrame(() => this.loop());
+    }
+
+    draw() {
+        this.ctx.clearRect(0,0,this.width, this.height);
+        this.drawBeakers();
+        if (this.currentMol) this.drawMolecule();
+    }
+
+    drawBeakers() {
+        const h = this.height;
+        const w = this.width;
+        const liquidH = h * 0.35;
+        const topY = h - liquidH;
+        
+        // VAND (Venstre)
+        this.ctx.fillStyle = "rgba(52, 152, 219, 0.4)";
+        this.ctx.fillRect(0, topY, w/2, liquidH);
+        
+        this.ctx.fillStyle = "#155a8a";
+        this.ctx.font = "bold 24px Arial";
+        this.ctx.textAlign = "center";
+        this.ctx.fillText("VAND (Polær)", w/4, h - (liquidH/2));
+
+        // BENZIN (Højre)
+        this.ctx.fillStyle = "rgba(127, 140, 141, 0.4)"; 
+        this.ctx.fillRect(w/2, topY, w/2, liquidH);
+        
+        this.ctx.fillStyle = "#4a5a5b"; 
+        this.ctx.fillText("RENSEBENZIN (Upolær)", w*0.75, h - (liquidH/2));
+        
+        // Midterlinje
+        this.ctx.beginPath();
+        this.ctx.moveTo(w/2, h);
+        this.ctx.lineTo(w/2, topY);
+        this.ctx.strokeStyle = "#7f8c8d";
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
+        
+        // Overflade
+        this.ctx.beginPath();
+        this.ctx.moveTo(0, topY);
+        this.ctx.lineTo(w, topY);
+        this.ctx.strokeStyle = "#555";
+        this.ctx.lineWidth = 2;
+        this.ctx.setLineDash([8, 6]);
+        this.ctx.stroke();
+        this.ctx.setLineDash([]);
+    }
+
+    drawMolecule() {
+        const { atoms, bonds, groups } = this.currentMol;
+        const ox = this.pos.x;
+        const oy = this.pos.y;
+        const s = this.scale;
+
+        // Ready Glow
+        if (this.state === 'ready_to_drag') {
+             this.ctx.beginPath();
+             this.ctx.arc(ox, oy, 140, 0, Math.PI*2);
+             this.ctx.fillStyle = "rgba(46, 204, 113, 0.15)";
+             this.ctx.fill();
+        }
+
+        // Bubbles for found groups
+        groups.forEach((g, idx) => {
+            if (this.foundGroups.has(idx)) {
+                this.drawGroupBubble(g, ox, oy, s);
+            }
+        });
+
+        // Bonds
+        this.ctx.strokeStyle = "#2c3e50";
+        this.ctx.lineWidth = 4 * s;
+        this.ctx.lineCap = "round";
+        bonds.forEach(b => {
+            const a1 = atoms[b.s];
+            const a2 = atoms[b.e];
+            this.ctx.beginPath();
+            this.ctx.moveTo(ox + a1.x*s, oy + a1.y*s);
+            this.ctx.lineTo(ox + a2.x*s, oy + a2.y*s);
+            this.ctx.stroke();
+            if(b.d) {
+                this.ctx.strokeStyle = "white";
+                this.ctx.lineWidth = 1.5*s;
+                this.ctx.stroke();
+                this.ctx.strokeStyle = "#2c3e50";
+                this.ctx.lineWidth = 4*s;
+            }
+        });
+
+        // Atoms
+        atoms.forEach(a => {
+            if(a.hidden) return; 
+            const x = ox + a.x*s;
+            const y = oy + a.y*s;
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, 14*s, 0, Math.PI*2);
+            
+            if (a.el === 'C') this.ctx.fillStyle = "#95a5a6";
+            else if (a.el === 'O') this.ctx.fillStyle = "#e74c3c";
+            else if (a.el === 'N') this.ctx.fillStyle = "#3498db";
+            else this.ctx.fillStyle = "#ecf0f1";
+            
+            this.ctx.fill();
+            this.ctx.strokeStyle = "#34495e";
+            this.ctx.lineWidth = 1.5;
+            this.ctx.stroke();
+            
+            this.ctx.fillStyle = (a.el === 'H' || a.el === 'C') ? "#2c3e50" : "white";
+            this.ctx.font = `bold ${11*s}px Arial`;
+            this.ctx.textAlign = "center";
+            this.ctx.textBaseline = "middle";
+            this.ctx.fillText(a.el, x, y);
+        });
+    }
+
+    drawGroupBubble(group, ox, oy, s) {
+        let sx=0, sy=0, count=0;
+        group.ids.forEach(id => {
+            const a = this.currentMol.atoms[id];
+            if(a) { sx += a.x; sy += a.y; count++; }
+        });
+        const cx = ox + (sx / count) * s;
+        const cy = oy + (sy / count) * s;
+        
+        let maxR = 0;
+        group.ids.forEach(id => {
+             const a = this.currentMol.atoms[id];
+             if(a) {
+                const d = Math.hypot(cx - (ox+a.x*s), cy - (oy+a.y*s));
+                maxR = Math.max(maxR, d);
+             }
+        });
+        
+        this.ctx.beginPath();
+        this.ctx.arc(cx, cy, maxR + 20*s, 0, Math.PI*2);
+        this.ctx.fillStyle = "rgba(52, 152, 219, 0.4)";
+        this.ctx.fill();
+        this.ctx.strokeStyle = "#3498db";
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
+    }
+}
+
+// Start app
+const game = new Game();
+</script>
+</body>
+</html>

@@ -1,0 +1,1093 @@
+﻿<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spektroskopi: Analyse af Azofarvestof</title>
+    <style>
+        :root {
+            --bg-dark: #12121a;
+            --panel-bg: #1e1e2d;
+            --text-main: #e0e0e0;
+            --accent-blue: #00d2ff;
+            --accent-red: #ff3366;
+            --success-green: #00e676;
+            --warning-yellow: #ffeb3b;
+            --glass-border: rgba(255, 255, 255, 0.15);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            overflow-y: auto;
+            user-select: none;
+        }
+
+        header {
+            background: linear-gradient(90deg, #161625, #232336);
+            padding: 15px 25px;
+            border-bottom: 2px solid var(--accent-blue);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+            color: #ffffff;
+        }
+
+        .subtitle { font-size: 0.9rem; color: #aaaaaa; }
+
+        #workspace {
+            display: flex;
+            flex: 1;
+            padding: 15px;
+            gap: 15px;
+            overflow: visible;
+            position: relative;
+            min-height: 500px;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            min-height: 300px;
+        }
+
+        #lab-panel { flex: 2; display: flex; flex-direction: column; min-width: 320px; }
+        #info-panel { flex: 1; min-width: 400px; padding: 20px; }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            background: radial-gradient(circle at center, #2a2a3d 0%, #1a1a24 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid var(--glass-border);
+            min-height: 220px;
+        }
+
+        /* Ved kraftig browser-zoom (ind) skrumper den effektive CSS-viewport,
+           og de to paneler kan ikke længere stå side om side uden at klemme
+           hinanden. Stak dem i stedet lodret, og fjern min-bredden på
+           info-panelet så intet klippes væk eller bliver utilgængeligt. */
+        @media (max-width: 900px) {
+            #workspace { flex-direction: column; min-height: 0; }
+            #lab-panel, #info-panel { min-width: 0; }
+        }
+
+        canvas { display: block; }
+
+        #micro-panel {
+            height: 260px;
+            background: #0a0a10;
+            position: relative;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .micro-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        #spectrometer-display {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 15px 20px;
+            text-align: right;
+            box-shadow: 0 0 15px rgba(0,0,0,0.9);
+            z-index: 5;
+            min-width: 180px;
+        }
+
+        .lcd-text {
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--warning-yellow);
+            font-size: 1.6rem;
+            font-weight: bold;
+            text-shadow: 0 0 8px var(--warning-yellow);
+            margin: 0;
+            line-height: 1.2;
+            transition: color 0.3s;
+        }
+
+        .lcd-sub {
+            font-size: 1.2rem;
+            color: var(--accent-blue);
+            text-shadow: 0 0 5px var(--accent-blue);
+            margin-top: 5px;
+        }
+
+        #photon-counter {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 210, 255, 0.1);
+            border: 1px solid var(--accent-blue);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            color: #fff;
+            display: flex;
+            gap: 20px;
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .counter-val { font-weight: bold; color: var(--success-green); font-size: 1.1rem; }
+
+        .info-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow-y: auto;
+        }
+
+        .step-indicator {
+            font-weight: bold;
+            color: var(--accent-blue);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        h2 { margin: 0; font-size: 1.3rem; color: #ffffff; }
+        p { line-height: 1.5; font-size: 0.95rem; color: #cccccc; margin: 0; }
+
+        .equation-box {
+            background: rgba(0, 210, 255, 0.1);
+            border-left: 4px solid var(--accent-blue);
+            padding: 10px 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            color: #ffffff;
+            margin: 5px 0;
+        }
+
+        .task-form {
+            display: none;
+            background: rgba(255, 235, 59, 0.1);
+            border: 1px solid var(--warning-yellow);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .input-group { display: flex; gap: 10px; margin-top: 10px; align-items: center; }
+        input[type="text"], select {
+            background: #12121a; color: #fff; border: 1px solid #555;
+            padding: 8px; border-radius: 4px; font-size: 1rem;
+        }
+        input[type="text"] { width: 90px; }
+
+        .btn-grid {
+            display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px;
+        }
+
+        button {
+            background: #333344; color: #ffffff; border: 1px solid #555;
+            padding: 10px 15px; border-radius: 6px; font-size: 1rem;
+            cursor: pointer; transition: all 0.2s; font-weight: bold; text-align: center;
+        }
+
+        button:hover:not(:disabled) { background: #444455; border-color: var(--accent-blue); }
+        button.active-action {
+            background: var(--accent-blue); color: #000;
+            border-color: var(--accent-blue); box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
+        }
+        button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .hint-btn { background: transparent; border: 1px dashed #888; color: #aaa; font-size: 0.85rem; padding: 6px 10px; }
+        .hint-btn:hover { color: #fff; border-color: #fff; }
+        .hint-box { display: none; margin-top: 10px; padding: 10px; background: rgba(255, 255, 255, 0.05); border-left: 3px solid #888; font-size: 0.9rem; font-style: italic; }
+
+        #graph-container {
+            margin-top: auto; width: 100%; height: 260px;
+            background: #0f0f16; border-radius: 8px; border: 1px solid #333; position: relative;
+        }
+
+        .notification {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0, 230, 118, 0.9); color: #000; padding: 15px 30px;
+            border-radius: 50px; font-weight: bold; font-size: 1.2rem;
+            pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 100;
+        }
+        .notification.show { opacity: 1; }
+
+        #quiz-panel {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(18, 18, 26, 0.98); backdrop-filter: blur(10px);
+            z-index: 50; display: none; flex-direction: column; padding: 40px; overflow-y: auto;
+        }
+
+        .quiz-card {
+            background: var(--panel-bg); border: 1px solid var(--glass-border);
+            border-radius: 10px; padding: 25px; margin-bottom: 20px;
+            max-width: 700px; margin-left: auto; margin-right: auto; width: 100%;
+        }
+
+        .quiz-feedback { margin-top: 10px; font-weight: bold; min-height: 20px; }
+        
+        .quiz-header-banner {
+            background: rgba(0, 230, 118, 0.1); border: 1px solid var(--success-green);
+            color: var(--success-green); text-align: center; padding: 10px;
+            border-radius: 8px; font-weight: bold; font-size: 1.1rem;
+            max-width: 700px; margin: 0 auto 20px auto; width: 100%;
+        }
+
+        /* Præsentér: guidet rundtur der forklarer opstillingen (samme mønster som andre værktøjer i samlingen) */
+        @keyframes tourPulse {
+            0% { box-shadow: 0 0 0 4px rgba(0, 210, 255, .95), 0 0 0 4px rgba(0, 210, 255, .5), 0 0 0 9999px rgba(0, 0, 0, .75); }
+            70% { box-shadow: 0 0 0 4px rgba(0, 210, 255, .95), 0 0 0 16px rgba(0, 210, 255, 0), 0 0 0 9999px rgba(0, 0, 0, .75); }
+            100% { box-shadow: 0 0 0 4px rgba(0, 210, 255, .95), 0 0 0 16px rgba(0, 210, 255, 0), 0 0 0 9999px rgba(0, 0, 0, .75); }
+        }
+
+        .tour-highlight {
+            position: relative;
+            z-index: 10000;
+            border-radius: 8px;
+            animation: tourPulse 1.6s ease-out infinite;
+        }
+
+        /* .panel har normalt overflow:hidden (for de runde hjørner), hvilket
+           ville klippe spotlight-skyggen af, så nedtoningen af resten af siden
+           kun blev synlig inde i det panel, det fremhævede element sidder i.
+           Under en aktiv rundtur slås det midlertidigt fra. */
+        body.tour-active .panel,
+        body.tour-active .info-content { overflow: visible; }
+
+        .tour-tooltip {
+            position: fixed;
+            z-index: 10001;
+            max-width: 320px;
+            background: #f8fafc;
+            color: #1f2933;
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .5);
+        }
+
+        .tour-tooltip .tt-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            gap: 8px;
+        }
+
+        .tour-tooltip button {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .tour-tooltip .tt-skip {
+            background: transparent;
+            color: #64748b;
+            border-color: #cbd5e1;
+        }
+
+        .tour-tooltip .tt-next {
+            background: var(--accent-blue);
+            color: #12151c;
+            font-weight: 700;
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <h1>Spektroskopi: Azofarvestof i Breezer</h1>
+        <div class="subtitle">Kvantitativ analyse med Lambert-Beers lov</div>
+    </div>
+    <div>
+        <button onclick="startTour()" style="padding: 8px 15px; font-size: 0.85rem;">🎬 Præsentér</button>
+        <button id="resetBtn" onclick="resetSimulation()" style="padding: 8px 15px; font-size: 0.85rem;">⟲ Genstart Laboratorium</button>
+    </div>
+</header>
+
+<div id="workspace">
+    <div class="panel" id="lab-panel">
+        <div class="canvas-container" id="macro-container">
+            <canvas id="labCanvas"></canvas>
+            <div id="notify-msg" class="notification">Måling Gemt!</div>
+        </div>
+        <div id="micro-panel">
+            <div class="micro-label">Mikroplan: Foton-Transmission</div>
+            
+            <div id="spectrometer-display">
+                <div style="color: #777; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px;">Bølgelængde: 520 nm</div>
+                <div class="lcd-text" id="abs-readout">A = -,---</div>
+                <div class="lcd-text lcd-sub" id="trans-readout">T = --,- %</div>
+            </div>
+
+            <div id="photon-counter">
+                <div>Ind: <span class="counter-val" id="photons-in">0</span></div>
+                <div>Ud: <span class="counter-val" id="photons-out">0</span></div>
+            </div>
+
+            <canvas id="microCanvas"></canvas>
+        </div>
+    </div>
+
+    <div class="panel" id="info-panel">
+        <div class="info-content">
+            <div class="step-indicator" id="step-id">Trin 1: Blindprøve</div>
+            <h2 id="step-title">Nulstil spektrofotometeret</h2>
+            <p id="step-desc">Vi skal lave en blindmåling med rent vand (H₂O). Klik på kuvetten med rent vand (0,0 mM) for at nulstille, så maskinen kun måler farvestof.</p>
+            
+            <div class="equation-box" id="equation-box">
+                A = ε · l · c
+            </div>
+
+            <div id="epsilon-form" class="task-form">
+                <p style="color:#fff; font-weight:bold; margin-bottom:5px;">Aflæs grafen:</p>
+                <p style="font-size:0.9rem;">Hvad er hældningen (ekstinktionskoefficienten, ε)? Vælg også den korrekte enhed.</p>
+                <div class="input-group">
+                    <input type="text" id="eps-input" placeholder="Fx 0,50">
+                    <select id="eps-unit">
+                        <option value="none">-- Vælg --</option>
+                        <option value="wrong1">mM / cm</option>
+                        <option value="correct">mM⁻¹·cm⁻¹</option>
+                        <option value="wrong2">M⁻¹·cm</option>
+                    </select>
+                </div>
+                <button onclick="checkEpsilon()" style="margin-top: 10px; width: 100%;">Bekræft</button>
+                <div id="eps-feedback" style="margin-top: 10px; font-weight: bold; font-size: 0.9rem;"></div>
+            </div>
+
+            <div id="read-graph-form" class="task-form">
+                <p style="color:#fff; font-weight:bold; margin-bottom:5px;">Aflæs koncentrationen:</p>
+                <p style="font-size:0.9rem;">Kig på grafen nederst. Hvor skærer den gule stiplede linje x-aksen? Hvad er farvestofkoncentrationen i kuvetten?</p>
+                <div class="input-group">
+                    <input type="text" id="breezer-input" placeholder="Fx 0,40"> mM
+                </div>
+                <button onclick="checkBreezerRead()" style="margin-top: 10px; width: 100%;">Tjek Aflæsning</button>
+                <div id="breezer-feedback" style="margin-top: 10px; font-weight: bold; font-size: 0.9rem;"></div>
+            </div>
+
+            <div class="btn-grid">
+                <button id="btn-next" onclick="nextStep()" disabled>Næste Trin ⟶</button>
+            </div>
+        </div>
+
+        <div id="graph-container">
+            <canvas id="graphCanvas"></canvas>
+        </div>
+    </div>
+
+    <!-- Quiz Panel Overlay -->
+    <div id="quiz-panel">
+        <h1 style="text-align: center; color: var(--accent-blue); margin-bottom: 10px;">Dataopsamling Afsluttet</h1>
+        <p style="text-align: center; font-size: 1.1rem; margin-bottom: 20px;">Lad os bearbejde de indsamlede data for at finde den sande koncentration i sodavanden.</p>
+        
+        <div class="quiz-header-banner" id="quiz-banner">
+            Din fundne ekstinktionskoefficient: ε = 0,80 mM⁻¹·cm⁻¹
+        </div>
+
+        <div class="quiz-card">
+            <h3>Opgave 1: Beregning via Lambert-Beers lov</h3>
+            <p>I stedet for at aflæse grafen, kan vi beregne koncentrationen præcist. Din Breezer-prøve havde en absorbans på <strong>A = 0,520</strong> målt i en <strong>1,0 cm</strong> kuvette.</p>
+            <p>Beregn koncentrationen (c) i kuvetten ved hjælp af formlen.</p>
+            <div style="margin-top:15px; display: flex; align-items: center; gap: 10px;">
+                <input type="text" id="q1-ans" placeholder="0,00" style="padding: 8px; background: #12121a; color: #fff; border: 1px solid #555;"> mM 
+                <button onclick="checkQ1()">Tjek Svar</button>
+                <button class="hint-btn" onclick="document.getElementById('hint1').style.display='block'">Vis Hint</button>
+            </div>
+            <div id="hint1" class="hint-box">Isoler c i Lambert-Beers lov: c = A / (ε · l). Indsæt A = 0,520 og ε = 0,80.</div>
+            <div id="q1-feedback" class="quiz-feedback"></div>
+        </div>
+
+        <div class="quiz-card">
+            <h3>Opgave 2: Fortynding af Breezeren</h3>
+            <p>Den koncentration du lige har fundet (0,65 mM) er fra væsken i <em>kuvetten</em>. Men før forsøget blev Breezeren fortyndet for overhovedet at kunne måles: Der blev afmålt <strong>10,0 mL</strong> Breezer, som blev hældt i en målekolbe og fyldt op med demineraliseret vand til <strong>100,0 mL</strong>.</p>
+            <p>Hvad er den oprindelige koncentration af azofarvestof i selve sodavandsflasken?</p>
+            <div style="margin-top:15px; display: flex; align-items: center; gap: 10px;">
+                <input type="text" id="q2-ans" placeholder="0,00" style="padding: 8px; background: #12121a; color: #fff; border: 1px solid #555;"> mM
+                <button onclick="checkQ2()">Tjek Svar</button>
+                <button class="hint-btn" onclick="document.getElementById('hint2').style.display='block'">Vis Hint</button>
+            </div>
+            <div id="hint2" class="hint-box">Brug fortyndingsformlen: c(før) · V(før) = c(efter) · V(efter). <br>Du kender c(efter) = 0,65 mM, V(efter) = 100 mL og V(før) = 10 mL. Isoler c(før).</div>
+            <div id="q2-feedback" class="quiz-feedback"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* -------------------------------------------------------------------------- */
+    /* UTILITIES & GLOBALS                                                        */
+    /* -------------------------------------------------------------------------- */
+    
+    const formatDK = function(num, decimals) {
+        if (num === undefined || num === null || isNaN(num)) return "-";
+        return num.toFixed(decimals).replace(".", ",");
+    };
+
+    let step = 1;
+    let labW, labH, microW, microH, graphW, graphH;
+    let animationId;
+    
+    const EPSILON = 0.8; 
+    const CUVETTE_L = 1.0;
+    
+    // Breezer farve opdateret til at matche de andre røde opløsninger.
+    const solutions = [
+        { id: "blank", c: 0.0, color: "rgba(200, 220, 255, 0.1)", label: "0,0 mM", measured: false },
+        { id: "std1", c: 0.2, color: "rgba(255, 50, 80, 0.2)", label: "0,2 mM", measured: false },
+        { id: "std2", c: 0.4, color: "rgba(255, 50, 80, 0.4)", label: "0,4 mM", measured: false },
+        { id: "std3", c: 0.6, color: "rgba(255, 50, 80, 0.6)", label: "0,6 mM", measured: false },
+        { id: "std4", c: 0.8, color: "rgba(255, 50, 80, 0.8)", label: "0,8 mM", measured: false },
+        { id: "std5", c: 1.0, color: "rgba(255, 50, 80, 1.0)", label: "1,0 mM", measured: false },
+        { id: "breezer", c: 0.65, color: "rgba(255, 50, 80, 0.65)", label: "Breezer", measured: false, isUnknown: true }
+    ];
+
+    let activeSolution = null;
+    let graphData = [];
+    let isMeasuring = false;
+    let measureProgress = 0; 
+
+    const labCv = document.getElementById("labCanvas");
+    const labCtx = labCv.getContext("2d");
+    const micCv = document.getElementById("microCanvas");
+    const micCtx = micCv.getContext("2d");
+    const grfCv = document.getElementById("graphCanvas");
+    const grfCtx = grfCv.getContext("2d");
+
+    const readoutAbs = document.getElementById("abs-readout");
+    const readoutTrans = document.getElementById("trans-readout");
+    const counterUI = document.getElementById("photon-counter");
+    const valIn = document.getElementById("photons-in");
+    const valOut = document.getElementById("photons-out");
+    const btnNext = document.getElementById("btn-next");
+    const notifyMsg = document.getElementById("notify-msg");
+    const epsilonForm = document.getElementById("epsilon-form");
+    const readGraphForm = document.getElementById("read-graph-form");
+    const quizPanel = document.getElementById("quiz-panel");
+
+    /* -------------------------------------------------------------------------- */
+    /* STEP LOGIC                                                                 */
+    /* -------------------------------------------------------------------------- */
+    
+    // Trin 6 tilføjet for at forhindre undefined fejl når der skiftes til quizzen
+    const stepsData = {
+        1: { title: "Nulstil spektrofotometeret", desc: "For at maskinen kun måler på farvestoffet, skal vi lave en blindmåling med rent vand. Klik på kuvetten med 0,0 mM for at nulstille.", eq: "A = log(100 / %T)" },
+        2: { title: "Mål standardrækken", desc: "For at bestemme koncentrationen af azofarvestof, skal vi bygge en standardkurve. Klik på de 5 røde standardopløsninger. Hold øje med transmittansen i mikroplanet!", eq: "A = ε · l · c" },
+        3: { title: "Beregn Ekstinktionskoefficient", desc: "Standardkurven er færdig! Da vores kuvette er 1,0 cm, er grafens hældning lig med ekstinktionskoefficienten (ε).", eq: "ε = A / c" },
+        4: { title: "Mål Breezer-prøven", desc: "Nu er maskinen kalibreret. Klik på den fortyndede Breezer-prøve for at måle dens absorbans.", eq: "A = 0,80 · 1,0 · c" },
+        5: { title: "Aflæs koncentrationen", desc: "Maskinen har indsat Breezerens absorbans på grafen. Aflæs koncentrationen på x-aksen og indtast den herunder.", eq: "Aflæsning på x-aksen" },
+        6: { title: "Databehandling", desc: "Gennemfør beregningerne i popup vinduet for at afslutte.", eq: "c(før) · V(før) = c(efter) · V(efter)" }
+    };
+
+    function updateStepUI() {
+        if (step === 6) {
+            quizPanel.style.display = "flex";
+            return; // Undgå at skrive over den bagvedliggende tekst
+        }
+
+        document.getElementById("step-id").innerText = "Trin " + step;
+        document.getElementById("step-title").innerText = stepsData[step].title;
+        document.getElementById("step-desc").innerText = stepsData[step].desc;
+        document.getElementById("equation-box").innerText = stepsData[step].eq;
+        
+        btnNext.disabled = true;
+        btnNext.classList.remove("active-action");
+        btnNext.style.display = "block";
+
+        epsilonForm.style.display = (step === 3) ? "block" : "none";
+        readGraphForm.style.display = (step === 5) ? "block" : "none";
+
+        if(step === 3 || step === 5) btnNext.style.display = "none"; 
+
+        if (step === 5) {
+            btnNext.innerText = "Gå til Databehandling ⟶";
+        } else {
+            btnNext.innerText = "Næste Trin ⟶";
+        }
+    }
+
+    function checkStepCompletion() {
+        if (step === 1 && solutions[0].measured) enableNext();
+        else if (step === 2) {
+            let allStds = true;
+            for(let i=1; i<=5; i++) if(!solutions[i].measured) allStds = false;
+            if(allStds) enableNext();
+        }
+        else if (step === 4 && solutions[6].measured) {
+            setTimeout(() => { step = 5; updateStepUI(); }, 2000);
+        }
+    }
+
+    function enableNext() {
+        btnNext.style.display = "block";
+        btnNext.disabled = false;
+        btnNext.classList.add("active-action");
+    }
+
+    function nextStep() {
+        step++;
+        updateStepUI();
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* MATH & FORMS                                                               */
+    /* -------------------------------------------------------------------------- */
+    
+    function getA(c) { return EPSILON * CUVETTE_L * c; }
+    function getT(A) { return Math.pow(10, -A) * 100; }
+
+    function checkEpsilon() {
+        let val = parseFloat(document.getElementById("eps-input").value.replace(",", "."));
+        let unit = document.getElementById("eps-unit").value;
+        let fb = document.getElementById("eps-feedback");
+
+        if(isNaN(val)) { fb.innerText = "Indtast et tal."; fb.style.color = varColor("--warning-yellow"); return; }
+        if(Math.abs(val - EPSILON) > 0.05) { fb.innerText = "Hældningen er forkert. Husk: y / x."; fb.style.color = varColor("--accent-red"); return; }
+        if(unit !== "correct") { fb.innerText = "Tallet er rigtigt, men enheden er forkert."; fb.style.color = varColor("--warning-yellow"); return; }
+
+        fb.innerText = "Korrekt! ε = 0,80 mM⁻¹·cm⁻¹.";
+        fb.style.color = varColor("--success-green");
+        enableNext();
+    }
+
+    function checkBreezerRead() {
+        let val = parseFloat(document.getElementById("breezer-input").value.replace(",", "."));
+        let fb = document.getElementById("breezer-feedback");
+
+        if(isNaN(val)) { fb.innerText = "Indtast aflæsningen."; return; }
+        if(Math.abs(val - 0.65) < 0.03) {
+            fb.innerText = "Fremragende aflæst! Koncentrationen i kuvetten er 0,65 mM.";
+            fb.style.color = varColor("--success-green");
+            enableNext();
+        } else {
+            fb.innerText = "Ikke helt præcist. Kig på den stiplede linje ned mod x-aksen.";
+            fb.style.color = varColor("--accent-red");
+        }
+    }
+
+    function showNotification(text) {
+        notifyMsg.innerText = text; notifyMsg.classList.add("show");
+        setTimeout(() => notifyMsg.classList.remove("show"), 1500);
+    }
+
+    function resetSimulation() {
+        endTour();
+        quizPanel.style.display = "none";
+        document.querySelectorAll("input").forEach(i => i.value = "");
+        document.querySelectorAll(".quiz-feedback, #eps-feedback, #breezer-feedback").forEach(e => e.innerText = "");
+        document.querySelectorAll(".hint-box").forEach(e => e.style.display = "none");
+        document.getElementById("eps-unit").value = "none";
+        
+        step = 1;
+        activeSolution = null;
+        graphData = [];
+        isMeasuring = false;
+        measureProgress = 0;
+        
+        readoutAbs.innerText = "A = -,---"; readoutAbs.style.color = "var(--warning-yellow)";
+        readoutTrans.innerText = "T = --,- %";
+        counterUI.style.opacity = 0;
+        
+        for(let s of solutions) s.measured = false;
+        
+        updateStepUI(); initMicroSystem(); drawGraph();
+    }
+
+    function checkQ1() {
+        let val = parseFloat(document.getElementById("q1-ans").value.replace(",", "."));
+        let fb = document.getElementById("q1-feedback");
+        if(Math.abs(val - 0.65) < 0.02) {
+            fb.innerText = "Rigtigt! c = 0,520 / 0,80 = 0,65 mM."; fb.style.color = varColor("--success-green");
+        } else {
+            fb.innerText = "Forkert. Prøv at bruge formlen i hintet."; fb.style.color = varColor("--accent-red");
+        }
+    }
+
+    function checkQ2() {
+        let val = parseFloat(document.getElementById("q2-ans").value.replace(",", "."));
+        let fb = document.getElementById("q2-feedback");
+        if(Math.abs(val - 6.5) < 0.2) {
+            fb.innerText = "Helt korrekt! Sodavanden var oprindeligt 6,5 mM."; fb.style.color = varColor("--success-green");
+        } else {
+            fb.innerText = "Forkert. Husk at opløsningen blev fortyndet 10 gange (fra 10 mL til 100 mL)."; fb.style.color = varColor("--accent-red");
+        }
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* LAB CANVAS (MACRO VIEW)                                                    */
+    /* -------------------------------------------------------------------------- */
+    const cuvettesUI = [];
+
+    // Sætter canvas' interne bitmap i forhold til devicePixelRatio, så tegningen
+    // forbliver skarp uanset browser-zoom eller skærmens pixel-tæthed, mens al
+    // tegnekode fortsat kan regne i "logiske" CSS-pixler (w/h returneret herfra).
+    function sizeCanvasToParent(canvas, ctx, minW, minH) {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        const w = Math.max(Math.round(rect.width), minW);
+        const h = Math.max(Math.round(rect.height), minH);
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+        canvas.style.width = w + "px";
+        canvas.style.height = h + "px";
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        return { w: w, h: h };
+    }
+
+    function initLab() {
+        const size = sizeCanvasToParent(labCv, labCtx, 260, 200);
+        labW = size.w; labH = size.h;
+
+        cuvettesUI.length = 0;
+        let startX = 40;
+        let breezerX = labW - 100;
+        // Skalér afstanden mellem kuvetterne ned, hvis panelet er blevet
+        // klemt sammen (fx ved kraftig zoom-ind), så hverken kuvetterne eller
+        // deres tekst-labels overlapper hinanden eller Breezer-kuvetten.
+        let usableWidth = Math.max(breezerX - startX - 70, 6 * 30);
+        let spacing = Math.min(65, usableWidth / 5);
+
+        for(let i=0; i<solutions.length; i++) {
+            let cx = solutions[i].isUnknown ? breezerX : startX + i * spacing;
+            cuvettesUI.push({ idx: i, x: cx, y: labH - 120, w: 30, h: 80, sol: solutions[i] });
+        }
+    }
+
+    // Hvilke(n) kuvette(r) er det meningen man klikker på lige nu?
+    // Bruges til at tegne et blinkende "klik her"-praj, så det er tydeligt
+    // hvad man skal gøre, uden at man behøver læse teksten i højre panel.
+    function getActionableCuvetteIds() {
+        if (step === 1) return solutions[0].measured ? [] : ["blank"];
+        if (step === 2) return solutions.slice(1, 6).filter(s => !s.measured).map(s => s.id);
+        if (step === 4) return solutions[6].measured ? [] : ["breezer"];
+        return [];
+    }
+
+    function drawLab() {
+        labCtx.clearRect(0, 0, labW, labH);
+        let specX = labW / 2 - 120; let specY = labH / 2 - 80;
+        let actionable = getActionableCuvetteIds();
+
+        labCtx.fillStyle = "#222233"; labCtx.fillRect(specX, specY, 240, 160);
+        labCtx.fillStyle = "#1a1a25"; labCtx.fillRect(specX + 20, specY + 20, 100, 120);
+        labCtx.fillStyle = "#000";    labCtx.fillRect(specX + 45, specY + 40, 50, 90);
+
+        labCtx.fillStyle = "#aaa"; labCtx.font = "12px sans-serif";
+        labCtx.textAlign = "right"; labCtx.fillText("Lyskilde", specX - 10, specY + 80);
+        labCtx.textAlign = "left"; labCtx.fillText("Detektor", specX + 130, specY + 80);
+
+        // Den tomme kuvetteholder pulserer, så det er tydeligt hvor den
+        // valgte kuvette "sættes i" - matcher glødet om kuvetten nedenfor.
+        if (!activeSolution && actionable.length > 0) {
+            let slotPulse = 0.5 + 0.5 * Math.sin(Date.now() / 400);
+            labCtx.save();
+            labCtx.strokeStyle = varColor("--accent-blue");
+            labCtx.globalAlpha = 0.35 + slotPulse * 0.35;
+            labCtx.setLineDash([5, 4]);
+            labCtx.lineWidth = 2;
+            labCtx.strokeRect(specX + 43, specY + 38, 54, 94);
+            labCtx.restore();
+        }
+
+        if (isMeasuring && activeSolution) {
+            labCtx.fillStyle = "rgba(0, 255, 0, 0.6)"; 
+            labCtx.fillRect(specX - 40, specY + 75, 85, 10);
+            
+            let finalA = getA(activeSolution.c);
+            let currentA = finalA * measureProgress; 
+            let trans = Math.pow(10, -currentA);
+            labCtx.fillStyle = "rgba(0, 255, 0, " + (0.6 * trans) + ")";
+            labCtx.fillRect(specX + 95, specY + 75, 40, 10);
+        }
+
+        if (activeSolution) drawCuvette(specX + 55, specY + 45, 30, 80, activeSolution);
+
+        labCtx.fillStyle = "#151520"; labCtx.fillRect(0, labH - 40, labW, 40);
+        labCtx.strokeStyle = "#333"; labCtx.beginPath(); labCtx.moveTo(0, labH - 40); labCtx.lineTo(labW, labH - 40); labCtx.stroke();
+
+        for (let c of cuvettesUI) {
+            if (activeSolution !== c.sol) {
+                if (actionable.includes(c.sol.id)) {
+                    let pulse = 0.5 + 0.5 * Math.sin(Date.now() / 400);
+                    labCtx.save();
+                    labCtx.shadowColor = varColor("--accent-blue");
+                    labCtx.shadowBlur = 8 + pulse * 10;
+                    labCtx.strokeStyle = varColor("--accent-blue");
+                    labCtx.globalAlpha = 0.6 + pulse * 0.4;
+                    labCtx.lineWidth = 2;
+                    labCtx.strokeRect(c.x - 4, c.y - 4, c.w + 8, c.h + 8);
+                    labCtx.restore();
+
+                    // Kun én pil ad gangen, ellers bliver det for rodet når
+                    // flere kuvetter er aktuelle på samme tid (fx trin 2).
+                    if (actionable.length === 1) {
+                        let bob = Math.sin(Date.now() / 300) * 4;
+                        let ax = c.x + c.w / 2; let ay = c.y - 14 + bob;
+                        labCtx.fillStyle = varColor("--accent-blue");
+                        labCtx.beginPath();
+                        labCtx.moveTo(ax, ay + 8);
+                        labCtx.lineTo(ax - 6, ay - 4);
+                        labCtx.lineTo(ax + 6, ay - 4);
+                        labCtx.closePath();
+                        labCtx.fill();
+                    }
+                }
+
+                drawCuvette(c.x, c.y, c.w, c.h, c.sol);
+                labCtx.fillStyle = "#aaa"; labCtx.font = "11px sans-serif"; labCtx.textAlign = "center";
+                labCtx.fillText(c.sol.label, c.x + c.w/2, c.y + c.h + 20);
+                if (c.sol.measured) {
+                    labCtx.fillStyle = varColor("--success-green");
+                    labCtx.beginPath(); labCtx.arc(c.x + c.w/2, c.y - 15, 4, 0, Math.PI*2); labCtx.fill();
+                }
+            }
+        }
+    }
+
+    function drawCuvette(x, y, w, h, sol) {
+        labCtx.fillStyle = sol.color; labCtx.fillRect(x + 2, y + 20, w - 4, h - 22);
+        labCtx.strokeStyle = "rgba(255,255,255,0.4)"; labCtx.lineWidth = 2; labCtx.strokeRect(x, y, w, h);
+        labCtx.fillStyle = "rgba(255,255,255,0.1)"; labCtx.fillRect(x + 2, y + 2, 8, h - 4);
+    }
+
+    labCv.addEventListener('mousedown', function(e) {
+        if(isMeasuring) return;
+        const rect = labCv.getBoundingClientRect();
+        const mx = e.clientX - rect.left; const my = e.clientY - rect.top;
+
+        for(let c of cuvettesUI) {
+            if(mx >= c.x && mx <= c.x + c.w && my >= c.y && my <= c.y + c.h) {
+                handleCuvetteClick(c.sol); break;
+            }
+        }
+    });
+
+    // Håndmarkør over kuvetterne, så det er tydeligt de kan klikkes,
+    // uden at man behøver klikke forkert først for at finde ud af det.
+    labCv.addEventListener('mousemove', function(e) {
+        if(isMeasuring) { labCv.style.cursor = 'default'; return; }
+        const rect = labCv.getBoundingClientRect();
+        const mx = e.clientX - rect.left; const my = e.clientY - rect.top;
+        const hovering = cuvettesUI.some(c => mx >= c.x && mx <= c.x + c.w && my >= c.y && my <= c.y + c.h);
+        labCv.style.cursor = hovering ? 'pointer' : 'default';
+    });
+
+    function handleCuvetteClick(sol) {
+        if(step === 1 && sol.id !== "blank") { showNotification("Start med vand"); return; }
+        if(step === 2 && (sol.id === "blank" || sol.id === "breezer")) return;
+        if(step === 3) { showNotification("Beregn ε først"); return; }
+        if(step === 4 && sol.id !== "breezer" && !sol.measured) return; 
+
+        activeSolution = sol;
+        isMeasuring = true;
+        measureProgress = 0;
+        initMicroSystem();
+        counterUI.style.opacity = 1;
+        
+        let startT = Date.now();
+        let duration = 2000;
+        let finalA = getA(sol.c);
+        let finalT = getT(finalA);
+        
+        readoutAbs.innerText = "Måler..."; readoutAbs.style.color = "#fff";
+        readoutTrans.innerText = "T = 0,0 %";
+
+        function animateMeasure() {
+            let now = Date.now();
+            measureProgress = Math.min((now - startT) / duration, 1);
+            
+            let curT = 100 - ((100 - finalT) * measureProgress);
+            readoutTrans.innerText = "T = " + formatDK(curT, 1) + " %";
+            
+            let pIn = Math.floor(measureProgress * 8500);
+            let pOut = Math.floor(pIn * (curT/100));
+            valIn.innerText = pIn; valOut.innerText = pOut;
+
+            if(measureProgress < 1) {
+                requestAnimationFrame(animateMeasure);
+            } else {
+                readoutAbs.innerText = "A = " + formatDK(finalA, 3);
+                readoutAbs.style.color = varColor("--success-green");
+                readoutTrans.innerText = "T = " + formatDK(finalT, 1) + " %";
+                
+                sol.measured = true; isMeasuring = false;
+
+                let exists = graphData.find(p => p.id === sol.id);
+                if(!exists) graphData.push({ id: sol.id, c: sol.c, a: finalA, isUnknown: sol.isUnknown });
+
+                showNotification(sol.isUnknown ? "Prøve Analyseret" : "Standard Målt!");
+                drawGraph(); checkStepCompletion();
+            }
+        }
+        animateMeasure();
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* MICRO CANVAS (PARTICLES)                                                   */
+    /* -------------------------------------------------------------------------- */
+    let particles = []; let photons = [];
+    
+    function initMicro() {
+        const size = sizeCanvasToParent(micCv, micCtx, 260, 260);
+        microW = size.w; microH = size.h;
+    }
+
+    function initMicroSystem() {
+        particles = []; photons = [];
+        if(!activeSolution) return;
+        let startX = microW/2 - 100;
+        let numParticles = Math.floor(activeSolution.c * 150); 
+        for(let i=0; i<numParticles; i++) {
+            particles.push({
+                x: startX + Math.random() * 200, y: Math.random() * microH,
+                vx: (Math.random() - 0.5)*0.8, vy: (Math.random() - 0.5)*0.8, r: 4
+            });
+        }
+    }
+
+    function updateMicro() {
+        if(!activeSolution) return;
+        let startX = microW/2 - 100; let endX = microW/2 + 100;
+
+        for(let p of particles) {
+            p.x += p.vx; p.y += p.vy;
+            if(p.x < startX || p.x > endX) p.vx *= -1;
+            if(p.y < 0 || p.y > microH) p.vy *= -1;
+        }
+
+        if(isMeasuring || step >= 5) {
+            if(Math.random() < 0.4) photons.push({ x: 0, y: 30 + Math.random()*(microH-60), vx: 8, active: true });
+        }
+
+        for(let i=photons.length-1; i>=0; i--) {
+            let ph = photons[i]; if(!ph.active) continue;
+            ph.x += ph.vx;
+            
+            if(ph.x > startX && ph.x < endX) {
+                if(Math.random() < activeSolution.c * 0.025) {
+                    ph.active = false;
+                    for(let p of particles) {
+                        if(Math.abs(p.y - ph.y) < 20) { p.hitTimer = 10; break; }
+                    }
+                }
+            }
+            if(ph.x > microW) photons.splice(i, 1);
+        }
+    }
+
+    function drawMicro() {
+        micCtx.clearRect(0, 0, microW, microH);
+        if(!activeSolution) return;
+
+        let startX = microW/2 - 100; let viewW = 200;
+        micCtx.fillStyle = activeSolution.color; micCtx.fillRect(startX, 0, viewW, microH);
+        micCtx.fillStyle = "rgba(255,255,255,0.2)"; micCtx.fillRect(startX - 5, 0, 5, microH); micCtx.fillRect(startX + viewW, 0, 5, microH);
+
+        for(let p of particles) {
+            micCtx.beginPath(); micCtx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+            if(p.hitTimer > 0) {
+                micCtx.fillStyle = "#fff"; micCtx.shadowBlur = 10; micCtx.shadowColor = "#fff"; p.hitTimer--;
+            } else { micCtx.fillStyle = varColor("--accent-red"); micCtx.shadowBlur = 0; }
+            micCtx.fill();
+        }
+        micCtx.shadowBlur = 0;
+
+        micCtx.fillStyle = "#00ff00"; 
+        for(let ph of photons) {
+            if(ph.active) {
+                micCtx.beginPath(); micCtx.arc(ph.x, ph.y, 2, 0, Math.PI*2); micCtx.fill();
+                micCtx.strokeStyle = "rgba(0, 255, 0, 0.4)"; micCtx.beginPath(); micCtx.moveTo(ph.x - 15, ph.y); micCtx.lineTo(ph.x, ph.y); micCtx.stroke();
+            }
+        }
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* GRAPH CANVAS                                                               */
+    /* -------------------------------------------------------------------------- */
+    function initGraph() {
+        const size = sizeCanvasToParent(grfCv, grfCtx, 260, 180);
+        graphW = size.w; graphH = size.h;
+    }
+
+    function drawGraph() {
+        grfCtx.clearRect(0, 0, graphW, graphH);
+        let padL = 50, padR = 20, padT = 20, padB = 40;
+        let plotW = graphW - padL - padR; let plotH = graphH - padT - padB;
+
+        grfCtx.strokeStyle = "#888"; grfCtx.beginPath(); grfCtx.moveTo(padL, padT); grfCtx.lineTo(padL, padT + plotH); grfCtx.lineTo(padL + plotW, padT + plotH); grfCtx.stroke();
+        grfCtx.fillStyle = "#aaa"; grfCtx.font = "12px sans-serif"; grfCtx.textAlign = "center";
+        grfCtx.fillText("Koncentration c (mM)", padL + plotW/2, graphH - 10);
+        
+        grfCtx.save(); grfCtx.translate(15, padT + plotH/2); grfCtx.rotate(-Math.PI/2); grfCtx.fillText("Absorbans A", 0, 0); grfCtx.restore();
+
+        let maxC = 1.2; let maxA = 1.2; 
+        function getX(c) { return padL + (c / maxC) * plotW; }
+        function getY(a) { return padT + plotH - (a / maxA) * plotH; }
+
+        grfCtx.textAlign = "center";
+        for(let c = 0; c <= maxC; c += 0.2) {
+            let x = getX(c); grfCtx.strokeStyle = "#333";
+            grfCtx.beginPath(); grfCtx.moveTo(x, padT); grfCtx.lineTo(x, padT + plotH); grfCtx.stroke();
+            grfCtx.fillText(formatDK(c, 1), x, padT + plotH + 15);
+        }
+
+        grfCtx.textAlign = "right"; grfCtx.textBaseline = "middle";
+        for(let a = 0; a <= maxA; a += 0.2) {
+            let y = getY(a); grfCtx.strokeStyle = "#333";
+            grfCtx.beginPath(); grfCtx.moveTo(padL, y); grfCtx.lineTo(padL + plotW, y); grfCtx.stroke();
+            grfCtx.fillText(formatDK(a, 1), padL - 10, y);
+        }
+
+        // Tegn regressionslinjen og skriv ligningen for hældningen
+        if(step >= 3 || graphData.length > 2) {
+            grfCtx.strokeStyle = "rgba(0, 210, 255, 0.5)"; grfCtx.lineWidth = 2;
+            grfCtx.beginPath(); grfCtx.moveTo(getX(0), getY(0)); grfCtx.lineTo(getX(maxC), getY(EPSILON * maxC)); grfCtx.stroke();
+            
+            // Tilføjet: Linjens hældning skrevet på grafen
+            grfCtx.fillStyle = "rgba(0, 210, 255, 0.9)";
+            grfCtx.font = "bold 13px sans-serif";
+            grfCtx.textAlign = "right";
+            grfCtx.fillText("y = 0,80x", getX(maxC) - 10, getY(EPSILON * maxC) - 10);
+        }
+
+        for(let p of graphData) {
+            let px = getX(p.c); let py = getY(p.a);
+            if(p.isUnknown) {
+                grfCtx.strokeStyle = varColor("--warning-yellow"); grfCtx.setLineDash([5, 5]);
+                grfCtx.beginPath(); grfCtx.moveTo(padL, py); grfCtx.lineTo(px, py); grfCtx.lineTo(px, padT + plotH); grfCtx.stroke();
+                grfCtx.setLineDash([]);
+                grfCtx.fillStyle = varColor("--warning-yellow"); grfCtx.beginPath(); grfCtx.arc(px, py, 6, 0, Math.PI*2); grfCtx.fill();
+                grfCtx.fillStyle = "#fff"; grfCtx.textAlign = "left";
+                grfCtx.fillText("Breezer", px + 10, py - 10);
+            } else {
+                grfCtx.fillStyle = varColor("--accent-red"); grfCtx.beginPath(); grfCtx.arc(px, py, 4, 0, Math.PI*2); grfCtx.fill();
+            }
+        }
+    }
+
+    function varColor(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+    function loop() { updateMicro(); drawLab(); drawMicro(); animationId = requestAnimationFrame(loop); }
+    function handleResize() { initLab(); initMicro(); initGraph(); initMicroSystem(); drawGraph(); }
+
+    // Browser-zoom ændrer devicePixelRatio, men udløser ikke altid et 'resize'-
+    // event pålideligt i alle browsere. matchMedia på den aktuelle dppx fanger
+    // zoom-ændringer direkte og gen-arm'er sig selv til næste zoom-niveau.
+    function watchZoom() {
+        if (!window.matchMedia) return;
+        const mq = matchMedia("(resolution: " + window.devicePixelRatio + "dppx)");
+        mq.addEventListener('change', function onZoom() {
+            mq.removeEventListener('change', onZoom);
+            handleResize();
+            watchZoom();
+        });
+    }
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); updateStepUI(); loop(); watchZoom();
+
+    /* -------------------------------------------------------------------------- */
+    /* PRÆSENTÉR (GUIDET RUNDTUR)                                                 */
+    /* -------------------------------------------------------------------------- */
+    const tourSteps = [
+        { sel: "#step-title", text: "Her i højre panel guides du gennem forsøget trin for trin. Beskrivelsen og formlen skifter automatisk, når du går videre." },
+        { sel: "#equation-box", text: "Formlen viser, hvad det aktuelle trin handler om - fra selve Lambert-Beers lov til beregning af ekstinktionskoefficienten." },
+        { sel: "#macro-container", text: "Dette er spektrofotometeret. Klik på en kuvette for at sætte den ind og måle den." },
+        { sel: "#spectrometer-display", text: "Her aflæses målingen i realtid: absorbans (A) og transmittans (T - hvor stor en andel af lyset der slipper igennem)." },
+        { sel: "#micro-panel", text: "Mikroplanet viser, hvad der sker på molekyleniveau: grønne fotoner rammer de røde farvestofpartikler. Jo flere partikler, jo flere fotoner bliver opsuget." },
+        { sel: "#graph-container", text: "Alle dine målinger plottes automatisk her. Standardkurvens hældning er ekstinktionskoefficienten (ε), som senere bruges til at finde den ukendte koncentration." },
+        { sel: "#btn-next", text: "Når et trin er gennemført korrekt, bliver denne knap aktiv, så du kan gå videre til næste trin." },
+        { sel: "#resetBtn", text: "Du kan altid klikke her for at nulstille hele laboratoriet og starte forfra." }
+    ];
+
+    function clearTourHighlight() {
+        document.querySelectorAll('.tour-highlight').forEach(el => el.classList.remove('tour-highlight'));
+        const tt = document.getElementById('tourTooltip');
+        if (tt) tt.remove();
+    }
+
+    function endTour() {
+        clearTourHighlight();
+        document.body.classList.remove('tour-active');
+    }
+
+    function startTour() {
+        document.body.classList.add('tour-active');
+        showTourStep(0);
+    }
+
+    function showTourStep(i) {
+        clearTourHighlight();
+        if (i >= tourSteps.length) { endTour(); return; }
+        const step = tourSteps[i];
+        const el = document.querySelector(step.sel);
+        if (!el || el.offsetParent === null) { showTourStep(i + 1); return; }
+
+        el.classList.add('tour-highlight');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        const tooltip = document.createElement('div');
+        tooltip.id = 'tourTooltip';
+        tooltip.className = 'tour-tooltip';
+        tooltip.innerHTML = '<div>' + step.text + '</div>' +
+            '<div class="tt-actions">' +
+            '<button type="button" class="tt-skip">Luk</button>' +
+            '<button type="button" class="tt-next">' + (i === tourSteps.length - 1 ? 'Afslut' : 'Næste') + '</button>' +
+            '</div>';
+        document.body.appendChild(tooltip);
+
+        setTimeout(() => {
+            const rect = el.getBoundingClientRect();
+            let top = rect.bottom + 14;
+            if (top + tooltip.offsetHeight > window.innerHeight - 10) top = Math.max(10, rect.top - tooltip.offsetHeight - 14);
+            const left = Math.min(Math.max(10, rect.left), window.innerWidth - tooltip.offsetWidth - 10);
+            tooltip.style.top = top + 'px';
+            tooltip.style.left = left + 'px';
+        }, 300);
+
+        tooltip.querySelector('.tt-next').addEventListener('click', () => showTourStep(i + 1));
+        tooltip.querySelector('.tt-skip').addEventListener('click', () => endTour());
+    }
+
+</script>
+</body>
+</html>

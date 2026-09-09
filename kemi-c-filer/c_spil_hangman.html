@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syregalgen: Fagords-Gætteren</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: #1e293b;
+            --text-main: #f8fafc;
+            --accent-glow: #38bdf8;
+            --correct-color: #22c55e;
+            --wrong-color: #ef4444;
+            --warn-color: #f59e0b;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            display: flex;
+            height: 100vh;
+            user-select: none;
+        }
+
+        /* Layout Grid */
+        #app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Left Side: Canvas & Animations */
+        #visual-section {
+            flex: 1;
+            position: relative;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            border-right: 2px solid #334155;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* Right Side: UI & Interaction */
+        #interaction-section {
+            flex: 1;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            z-index: 2;
+            background: rgba(30, 41, 59, 0.95);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+
+        /* UI Elements */
+        .header-box {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 28px;
+            color: var(--accent-glow);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .score-text { color: var(--accent-glow); }
+        .streak-text { color: var(--warn-color); }
+
+        #hint-box {
+            background: rgba(56, 189, 248, 0.1);
+            border-left: 4px solid var(--accent-glow);
+            padding: 15px;
+            margin-bottom: 30px;
+            font-style: italic;
+            font-size: 16px;
+            line-height: 1.5;
+            min-height: 50px;
+        }
+
+        /* Word Display */
+        #word-display {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 40px;
+            min-height: 60px;
+        }
+
+        .letter-slot {
+            width: 40px;
+            height: 50px;
+            border-bottom: 4px solid var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            font-size: 32px;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding-bottom: 5px;
+            color: var(--text-main);
+            transition: all 0.3s;
+        }
+
+        .letter-slot.space {
+            border-bottom: none;
+            width: 20px;
+        }
+
+        /* Keyboard */
+        #keyboard {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .key-btn {
+            background: #334155;
+            color: white;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            padding: 12px 16px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.1s;
+            box-shadow: 0 4px 0 #0f172a;
+        }
+
+        .key-btn:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #0f172a;
+        }
+
+        .key-btn:hover:not(:disabled) {
+            background: #475569;
+            border-color: var(--accent-glow);
+        }
+
+        .key-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .key-btn.correct { background: var(--correct-color) !important; color: white; opacity: 1;}
+        .key-btn.wrong { background: var(--wrong-color) !important; color: white; opacity: 0.3;}
+
+        /* Overlay / Modal */
+        #overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 10;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal {
+            background: var(--panel-bg);
+            padding: 40px;
+            border-radius: 12px;
+            border: 2px solid #334155;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .modal h2 { margin-top: 0; font-size: 32px; }
+        .modal p { font-size: 18px; line-height: 1.6; margin-bottom: 25px; }
+        .fact-box {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--accent-glow);
+            text-align: left;
+            font-size: 15px;
+        }
+
+        .btn-restart {
+            background: var(--accent-glow);
+            color: #0f172a;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .btn-restart:hover {
+            background: #7dd3fc;
+            transform: scale(1.05);
+        }
+
+        /* Hemmelig victory-screen (5 gennemførte i træk) */
+        #secretOverlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 11;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            backdrop-filter: blur(6px);
+        }
+
+        .secret-modal {
+            background: var(--panel-bg);
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 520px;
+            box-shadow: 0 0 60px rgba(56, 189, 248, 0.6);
+            border: 3px solid transparent;
+            background-image: linear-gradient(var(--panel-bg), var(--panel-bg)), linear-gradient(90deg, #f87171, #fbbf24, #4ade80, #38bdf8, #a78bfa, #f87171);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            background-size: 100% 100%, 300% 100%;
+            animation: rainbow-border 4s linear infinite, secret-pop 0.4s ease;
+        }
+
+        @keyframes rainbow-border {
+            0% { background-position: 0 0, 0% 0; }
+            100% { background-position: 0 0, 300% 0; }
+        }
+
+        @keyframes secret-pop {
+            0% { transform: scale(0.7) rotate(-5deg); opacity: 0; }
+            60% { transform: scale(1.05) rotate(2deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0); }
+        }
+
+        .secret-emoji {
+            font-size: 40px;
+            margin-bottom: 10px;
+            animation: secret-bounce 1.2s ease-in-out infinite;
+        }
+
+        @keyframes secret-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .secret-modal h2 {
+            margin-top: 0;
+            font-size: 24px;
+            background: linear-gradient(90deg, #f87171, #fbbf24, #4ade80, #38bdf8, #a78bfa, #f87171);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: rainbow-text 3s linear infinite;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @keyframes rainbow-text {
+            0% { background-position: 0% 0; }
+            100% { background-position: 300% 0; }
+        }
+
+        .secret-modal p { font-size: 17px; line-height: 1.6; margin-bottom: 20px; font-style: italic; }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            #app-container { flex-direction: column; }
+            #visual-section { flex: 0.8; border-right: none; border-bottom: 2px solid #334155; }
+            #interaction-section { flex: 1.2; max-width: 100%; padding: 15px; }
+            .letter-slot { width: 25px; height: 35px; font-size: 22px; }
+            .key-btn { padding: 10px 12px; font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div id="visual-section">
+        <canvas id="gameCanvas"></canvas>
+    </div>
+
+    <div id="interaction-section">
+        <div class="header-box">
+            <h1>Syregalgen</h1>
+            <p>Gæt ordet, før han ender i syrebadet!</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="score-text" id="score-display">Point: 0,0</div>
+            <div class="streak-text" id="streak-display">Streak: x1,0</div>
+        </div>
+
+        <div id="hint-box">Kategori: Indlæser...</div>
+
+        <div id="word-display"></div>
+
+        <div id="keyboard"></div>
+    </div>
+</div>
+
+<div id="overlay">
+    <div class="modal">
+        <h2 id="modal-title">Status</h2>
+        <p id="modal-desc">Beskrivelse</p>
+        <div class="fact-box" id="modal-fact">Faglig forklaring her.</div>
+        <button class="btn-restart" onclick="Game.init()">Næste Ord ⟶</button>
+    </div>
+</div>
+
+<div id="secretOverlay">
+    <div class="secret-modal">
+        <div class="secret-emoji">🧪✨🏆✨🧪</div>
+        <h2>Hemmeligt niveau låst op</h2>
+        <p id="secret-desc">Beskrivelse</p>
+        <div class="fact-box" id="secret-fact">Ros her.</div>
+        <button class="btn-restart" onclick="Game.closeSecret()">Fortsæt, hvis du tør ⟶</button>
+    </div>
+</div>
+
+<script>
+    "use strict";
+
+    // --- DATA: Kemi C Begreber ---
+    const KEMI_ORD = [
+        {
+            word: "STOFMÆNGDE",
+            category: "Stofmængde og mol",
+            fact: "Stofmængde (n) beregnes oftest via formlen n = m / M. Et mol svarer til ca. 6,022 * 10²³ partikler."
+        },
+        {
+            word: "MOLARMASSE",
+            category: "Stofmængde og mol",
+            fact: "Findes ved at lægge atommasserne for atomerne i molekylet sammen. For H₂O er den ca. 18,015 g/mol."
+        },
+        {
+            word: "ATOMNUMMER",
+            category: "Atomets opbygning",
+            fact: "Atomnummeret angiver antallet af protoner i kernen og bestemmer, hvilket grundstof der er tale om."
+        },
+        {
+            word: "VALENSELEKTRON",
+            category: "Atomets opbygning",
+            fact: "Valenselektronerne sidder i atomets yderste skal og er dem, der indgår i kemiske bindinger."
+        },
+        {
+            word: "OKTETREGLEN",
+            category: "Atomets opbygning",
+            fact: "Atomer 'ønsker' 8 elektroner i den yderste skal (H og He nøjes med 2), hvilket driver dannelsen af bindinger."
+        },
+        {
+            word: "ISOTOP",
+            category: "Atomets opbygning",
+            fact: "Carbon-12 og Carbon-14 er isotoper. De har samme antal protoner (6), men henholdsvis 6 og 8 neutroner."
+        },
+        {
+            word: "FÆLDNINGSREAKTION",
+            category: "Reaktionstyper",
+            fact: "Et klassisk eksempel er dannelsen af sølvchlorid: Ag⁺(aq) + Cl⁻(aq) ⟶ AgCl(s)."
+        },
+        {
+            word: "IONGITTER",
+            category: "Kemisk binding",
+            fact: "I et iongitter er ionerne pakket i et regelmæssigt, tredimensionalt mønster, holdt sammen af elektrostatiske kræfter."
+        },
+        {
+            word: "OPLØSELIGHED",
+            category: "Ionforbindelser",
+            fact: "Opløselighed angiver, hvor meget af et stof der maksimalt kan opløses i en given mængde vand ved en given temperatur."
+        },
+        {
+            word: "IONBINDING",
+            category: "Kemisk binding",
+            fact: "Når ΔEN > 2,0 overføres elektroner oftest helt. Danner et iongitter (fx NaCl)."
+        },
+        {
+            word: "KOVALENT BINDING",
+            category: "Kemisk binding",
+            fact: "Kaldes også molekylbinding eller elektronparbinding. Kan illustreres med elektronprikformler."
+        },
+        {
+            word: "ELEKTRONPRIKFORMEL",
+            category: "Molekylers opbygning",
+            fact: "Elektronprikformlen viser alle valenselektroner omkring atomerne, inklusive bindende og ikke-bindende elektronpar."
+        },
+        {
+            word: "ELEKTRONEGATIVITET",
+            category: "Atomers egenskaber",
+            fact: "Forskellen i elektronegativitet (ΔEN) afgør, om en binding er upolær, polær kovalent eller en ionbinding. Fluor (F) har den højeste værdi (4,0)."
+        },
+        {
+            word: "DIPOL",
+            category: "Molekylers opbygning",
+            fact: "En dipol opstår, når ladningen i et molekyle er skævt fordelt på grund af forskel i elektronegativitet mellem atomerne."
+        },
+        {
+            word: "HYDROGENBINDING",
+            category: "Intermolekylære kræfter",
+            fact: "Opstår mellem et H-atom bundet til N, O eller F og et ledigt elektronpar på et naboatom - stærkere end andre intermolekylære kræfter."
+        },
+        {
+            word: "LONDONKRÆFTER",
+            category: "Intermolekylære kræfter",
+            fact: "Svage, midlertidige tiltrækninger mellem molekyler pga. tilfældige udsving i elektronfordelingen."
+        },
+        {
+            word: "IDEALGASLIGNING",
+            category: "Gasser og beregning",
+            fact: "Idealgasligningen pV = nRT beskriver sammenhængen mellem tryk, volumen, stofmængde og temperatur for en gas."
+        },
+        {
+            word: "AFSTEMNING",
+            category: "Reaktionsligninger",
+            fact: "At afstemme et reaktionsskema betyder at sikre, at der er lige mange atomer af hvert grundstof på begge sider af pilen."
+        },
+        {
+            word: "STOFMÆNGDEKONCENTRATION",
+            category: "Koncentration",
+            fact: "Stofmængdekoncentrationen c angiver stofmængden af opløst stof pr. liter opløsning og måles i mol/L."
+        },
+        {
+            word: "FORTYNDING",
+            category: "Koncentration",
+            fact: "Ved fortynding tilsættes mere opløsningsmiddel, så stofmængden er uændret, men koncentrationen falder."
+        },
+        {
+            word: "ALKANER",
+            category: "Organisk kemi",
+            fact: "De er mættede forbindelser. Den generelle formel er C_nH_(2n+2). Ex: Propan (C₃H₈)."
+        },
+        {
+            word: "ALKENER",
+            category: "Organisk kemi",
+            fact: "Alkener er umættede kulbrinter med mindst én dobbeltbinding mellem to C-atomer. Generel formel: C_nH_2n."
+        },
+        {
+            word: "ISOMERI",
+            category: "Organisk kemi",
+            fact: "Isomerer har samme molekylformel, men forskellig struktur, fx forskellig forgrening af kulstofkæden."
+        },
+        {
+            word: "CARBOXYLSYRE",
+            category: "Organisk kemi",
+            fact: "Carboxylsyrer indeholder gruppen -COOH og er svage syrer, fx eddikesyre (ethansyre)."
+        },
+        {
+            word: "FUNKTIONEL GRUPPE",
+            category: "Organisk kemi",
+            fact: "Den funktionelle gruppe er den del af molekylet, der bestemmer stoffets kemiske egenskaber, fx -OH i alkoholer."
+        },
+        {
+            word: "UMÆTTET",
+            category: "Organisk kemi",
+            fact: "Umættede kulbrinter indeholder mindst én dobbelt- eller tripelbinding og kan derfor reagere ved addition."
+        },
+        {
+            word: "ADDITIONSREAKTION",
+            category: "Reaktionstyper",
+            fact: "Ved en additionsreaktion lægges atomer til en dobbelt- eller tripelbinding, som derved bliver til en enkeltbinding."
+        },
+        {
+            word: "SUBSTITUTION",
+            category: "Reaktionstyper",
+            fact: "Ved substitution udskiftes et atom (ofte H) i et molekyle med et andet atom eller en anden gruppe."
+        },
+        {
+            word: "KATALYSATOR",
+            category: "Reaktionshastighed",
+            fact: "I biler omdanner katalysatorer skadelige gasser (fx CO) til mindre skadelige (fx CO₂). Enzymer er biologiske katalysatorer."
+        },
+        {
+            word: "EXOTERM",
+            category: "Energi i reaktioner",
+            fact: "Temperaturen i omgivelserne stiger. Eksempel: Forbrænding af methan (CH₄ + 2 O₂ ⟶ CO₂ + 2 H₂O + energi)."
+        },
+        {
+            word: "ENDOTERM",
+            category: "Energi i reaktioner",
+            fact: "Temperaturen i omgivelserne falder. Et klassisk eksperiment er opløsning af ammoniumnitrat i vand."
+        },
+        {
+            word: "TITRERING",
+            category: "Titrering",
+            fact: "Udføres ofte med en burette, der dråbevis tilsætter en standardopløsning til en kolbe indeholdende en indikator."
+        },
+        {
+            word: "ÆKVIVALENSPUNKT",
+            category: "Titrering",
+            fact: "Ved ækvivalenspunktet har man tilsat præcis den stofmængde titrator, der kræves for at reagere fuldstændigt med titranden."
+        },
+        {
+            word: "INDIKATOR",
+            category: "Syre-base kemi",
+            fact: "En indikator skifter farve afhængigt af pH og bruges til at vise, hvornår ækvivalenspunktet er nået i en titrering."
+        },
+        {
+            word: "PROTOLYSE",
+            category: "Syre-base kemi",
+            fact: "Protolyse er en reaktion, hvor der overføres en H⁺-ion (en proton) fra en syre til en base."
+        },
+        {
+            word: "NEUTRALISATION",
+            category: "Syre-base kemi",
+            fact: "Den resulterende opløsnings pH afhænger af syrens og basens styrke. Reaktionsskema: H₃O⁺ + OH⁻ ⟶ 2 H₂O."
+        },
+        {
+            word: "OXIDATION",
+            category: "Redox-reaktioner",
+            fact: "Ved oxidation afgiver et stof elektroner, og dets oxidationstal stiger."
+        },
+        {
+            word: "REDUKTION",
+            category: "Redox-reaktioner",
+            fact: "Ved reduktion optager et stof elektroner, og dets oxidationstal falder."
+        },
+        {
+            word: "OXIDATIONSTAL",
+            category: "Redox-reaktioner",
+            fact: "Oxidationstal er et 'regnskabstal' for elektronfordelingen i en forbindelse og bruges til at afgøre, om noget oxideres eller reduceres."
+        },
+        {
+            word: "SPÆNDINGSRÆKKEN",
+            category: "Redox-reaktioner",
+            fact: "Spændingsrækken rangerer grundstoffer efter, hvor let de afgiver elektroner - jo længere til venstre, jo mere uædelt metal."
+        },
+
+        // --- Ekstra fagord hentet fra Fagordsquiz for Kemi C ---
+        {
+            word: "PROTON",
+            category: "Atomets opbygning",
+            fact: "En proton er en kernepartikel med positiv ladning. Antallet af protoner i kernen er lig atomnummeret og bestemmer grundstoffet."
+        },
+        {
+            word: "NEUTRON",
+            category: "Atomets opbygning",
+            fact: "En neutron er en kernepartikel uden ladning. Sammen med protonerne udgør neutronerne næsten hele atomets masse."
+        },
+        {
+            word: "TILSTANDSFORM",
+            category: "Tilstandsformer",
+            fact: "Tilstandsformen angives med (s), (l), (g) eller (aq) og fortæller, om stoffet er fast, flydende, gasformigt eller opløst i vand."
+        },
+        {
+            word: "VÆSKE",
+            category: "Tilstandsformer",
+            fact: "Bogstavet (l) i et reaktionsskema står for 'liquid' og betyder, at stoffet er en væske, fx H₂O(l)."
+        },
+        {
+            word: "REAKTIONSSKEMA",
+            category: "Reaktionsligninger",
+            fact: "Et reaktionsskema viser en kemisk reaktion med formler for reaktanter og produkter forbundet af en reaktionspil (⟶)."
+        },
+        {
+            word: "KOEFFICIENT",
+            category: "Reaktionsligninger",
+            fact: "Koefficienterne er de store tal foran formlerne i et reaktionsskema, som bruges til at afstemme antallet af atomer på begge sider."
+        },
+        {
+            word: "HOVEDGRUPPE",
+            category: "Periodesystemet",
+            fact: "Hovedgrupperne er de lodrette søjler i det periodiske system. Grundstoffer i samme hovedgruppe har samme antal valenselektroner."
+        },
+        {
+            word: "LETOPLØSELIG",
+            category: "Ionforbindelser",
+            fact: "Et salt kaldes letopløseligt, hvis man kan opløse mere end ca. 2 g af det i 100 mL vand."
+        },
+        {
+            word: "TUNGTOPLØSELIG",
+            category: "Ionforbindelser",
+            fact: "Et salt kaldes tungtopløseligt, hvis mindre end ca. 2 g kan opløses i 100 mL vand - fx AgCl."
+        },
+        {
+            word: "SAMMENSAT ION",
+            category: "Ioner",
+            fact: "En sammensat ion består af flere atomer, der tilsammen har afgivet eller optaget elektroner, fx NO₃⁻ eller SO₄²⁻."
+        },
+        {
+            word: "KRYSTALVAND",
+            category: "Ionforbindelser",
+            fact: "Krystalvand er vandmolekyler, der sidder fast mellem ionerne i visse iongitre, fx CuSO₄·5H₂O."
+        },
+        {
+            word: "TILSKUERION",
+            category: "Fældningsreaktioner",
+            fact: "Tilskuerioner deltager ikke selv i fældningsreaktionen, men forbliver opløst i vandfasen og udelades ofte af nettoreaktionsskemaet."
+        },
+        {
+            word: "BUNDFALD",
+            category: "Fældningsreaktioner",
+            fact: "Bundfald er det tungtopløselige stof, der udfældes som et fast stof (s), når to opløsninger blandes."
+        },
+        {
+            word: "IONFORBINDELSE",
+            category: "Ioner",
+            fact: "En ionforbindelse dannes af positive og negative ioner, der tiltrækker hinanden elektrostatisk og danner et iongitter."
+        },
+        {
+            word: "TRIVIALNAVN",
+            category: "Kemisk navngivning",
+            fact: "Et trivialnavn er et hverdagsnavn for et stof, fx 'salmiak' eller 'eddikesyre', i modsætning til det systematiske navn."
+        },
+        {
+            word: "MIKROSKOPISK",
+            category: "Generel kemi",
+            fact: "Den mikroskopiske beskrivelse forholder sig til stoffernes opbygning på atom- og molekyleniveau - modsætningen er det makroskopiske niveau."
+        },
+        {
+            word: "MOLEKYLFORMEL",
+            category: "Molekylers opbygning",
+            fact: "Molekylformlen viser, hvilke atomer og hvor mange af hver slags der indgår i molekylet, fx C₂H₆O, men ikke den rumlige struktur."
+        },
+        {
+            word: "STRUKTURFORMEL",
+            category: "Molekylers opbygning",
+            fact: "Strukturformlen viser, hvordan atomerne i et molekyle er bundet sammen, og giver et overblik over den rumlige opbygning."
+        },
+        {
+            word: "LEDIGT ELEKTRONPAR",
+            category: "Molekylers opbygning",
+            fact: "Et ledigt elektronpar (lone pair) er et ikke-bindende elektronpar, der sidder på et atom, fx de to ledige par på oxygen i H₂O."
+        },
+        {
+            word: "TETRAEDER",
+            category: "Molekylers opbygning",
+            fact: "Molekyler som CH₄ har tetraederstruktur, hvor bindingsvinklerne mellem atomerne er ca. 109,5°."
+        },
+        {
+            word: "HYDROFIL",
+            category: "Molekylers opbygning",
+            fact: "Hydrofil betyder 'vandelskende' og bruges om polære stoffer, der let blandes med eller opløses i vand."
+        },
+        {
+            word: "POLÆR",
+            category: "Molekylers opbygning",
+            fact: "En polær binding eller molekyle har en skæv fordeling af elektroner pga. forskel i elektronegativitet mellem atomerne."
+        },
+        {
+            word: "DOBBELTBINDING",
+            category: "Kemisk binding",
+            fact: "I en dobbeltbinding deles to elektronpar mellem de samme to atomer, fx mellem C-atomerne i ethen (C₂H₄)."
+        },
+        {
+            word: "DET ABSOLUTTE NULPUNKT",
+            category: "Gasser og beregning",
+            fact: "Det absolutte nulpunkt er 0 K (-273,15 °C) og er den laveste temperatur, der teoretisk kan opnås."
+        },
+        {
+            word: "GASKONSTANT",
+            category: "Gasser og beregning",
+            fact: "Symbolet R i idealgasligningen pV = nRT kaldes gaskonstanten og har værdien 8,314 J/(mol·K)."
+        },
+        {
+            word: "DENSITET",
+            category: "Mængdeberegning",
+            fact: "Densitet (massefylde) angiver forholdet mellem masse og volumen og har i kemi typisk enheden g/mL."
+        },
+        {
+            word: "VOLUMEN",
+            category: "Mængdeberegning",
+            fact: "Volumen (rumfang) angiver, hvor meget plads et stof fylder, og måles i kemi ofte i liter eller milliliter."
+        },
+        {
+            word: "TUNGMETAL",
+            category: "Mængdeberegning",
+            fact: "Tungmetaller er metaller med en densitet på mere end ca. 7 g/mL, fx bly, kviksølv og jern."
+        },
+        {
+            word: "STØKIOMETRISK FORHOLD",
+            category: "Mængdeberegning",
+            fact: "Det støkiometriske forhold er forholdet mellem koefficienterne i et afstemt reaktionsskema og bruges til at beregne stofmængder."
+        },
+        {
+            word: "KONCENTRATION",
+            category: "Koncentration",
+            fact: "Koncentrationen angiver, hvor meget stof der er opløst pr. volumenenhed af opløsningen, fx i mol/L."
+        },
+        {
+            word: "MÅLEKOLBE",
+            category: "Koncentration",
+            fact: "En målekolbe bruges til nøjagtigt at fremstille en opløsning med en bestemt koncentration ved at fylde op til en streg."
+        },
+        {
+            word: "PIPETTE",
+            category: "Koncentration",
+            fact: "En pipette bruges til nøjagtigt at afmåle og overføre et bestemt volumen af en væske."
+        },
+        {
+            word: "MÆTTET",
+            category: "Koncentration",
+            fact: "En mættet opløsning kan ikke opløse mere af stoffet, selvom der tilsættes mere - overskuddet forbliver som bundfald."
+        },
+        {
+            word: "AKTUEL KONCENTRATION",
+            category: "Koncentration",
+            fact: "Den aktuelle koncentration tager højde for kemiske reaktioner, fx protolyse, og angiver, hvad opløsningen reelt indeholder."
+        },
+        {
+            word: "BURETTE",
+            category: "Titrering",
+            fact: "En burette er det glasudstyr, man dråbevis tilsætter en standardopløsning fra under en titrering."
+        },
+        {
+            word: "ORGANISK KEMI",
+            category: "Organisk kemi",
+            fact: "Organisk kemi er læren om carbonforbindelser, som næsten altid også indeholder hydrogen."
+        },
+        {
+            word: "ZIGZAGFORMEL",
+            category: "Organisk kemi",
+            fact: "En zigzagformel tegner kun de kovalente bindinger mellem C-atomerne som en zigzag-linje og udelader H-atomerne."
+        },
+        {
+            word: "ETHYL",
+            category: "Organisk kemi",
+            fact: "Ethyl (-CH₂CH₃) er navnet på en sidekæde med to carbonatomer, fx i ethanol (C₂H₅OH)."
+        },
+        {
+            word: "FYSISKE EGENSKABER",
+            category: "Organisk kemi",
+            fact: "De fysiske egenskaber omfatter bl.a. smeltepunkt, kogepunkt, densitet og opløselighed."
+        },
+        {
+            word: "ALKOHOLER",
+            category: "Organisk kemi",
+            fact: "Alkoholer er organiske forbindelser med en hydroxygruppe (-OH), fx ethanol og methanol."
+        },
+        {
+            word: "BASE",
+            category: "Syre-base kemi",
+            fact: "En base er et stof, der kan modtage en hydron (H⁺) fra en syre, fx OH⁻."
+        },
+        {
+            word: "OXONIUM",
+            category: "Syre-base kemi",
+            fact: "Oxonium (H₃O⁺) er den sammensatte ion, der dannes, når en syre afgiver en hydron til et vandmolekyle."
+        },
+        {
+            word: "KORRESPONDERENDE",
+            category: "Syre-base kemi",
+            fact: "Når en syre afgiver en hydron, dannes dens korresponderende base - fx er Cl⁻ den korresponderende base til HCl."
+        },
+        {
+            word: "SVAG SYRE",
+            category: "Syre-base kemi",
+            fact: "En svag syre protolyserer ikke fuldstændigt i vand, fx ethansyre (eddikesyre), i modsætning til en stærk syre som HCl."
+        },
+        {
+            word: "EDDIKESYRE",
+            category: "Syre-base kemi",
+            fact: "Eddikesyre er trivialnavnet for ethansyre (CH₃COOH), en svag syre der bl.a. findes i almindelig husholdningseddike."
+        },
+        {
+            word: "AUTOPROTOLYSE",
+            category: "Syre-base kemi",
+            fact: "Ved vands autoprotolyse reagerer to vandmolekyler med hinanden og danner H₃O⁺ og OH⁻."
+        },
+        {
+            word: "VANDS IONPRODUKT",
+            category: "Syre-base kemi",
+            fact: "Vands ionprodukt beskriver sammenhængen [H₃O⁺]·[OH⁻] = 1,0·10⁻¹⁴ ved 25 °C."
+        },
+        {
+            word: "KOLORIMETRISK",
+            category: "Titrering",
+            fact: "En kolorimetrisk titrering bruger en indikators farveskift til at vise, hvornår ækvivalenspunktet er nået."
+        },
+        {
+            word: "REDOXREAKTION",
+            category: "Redox-reaktioner",
+            fact: "En redoxreaktion er en reaktion, hvor der overføres elektroner fra et atom til et andet - én oxideres, mens en anden reduceres."
+        },
+        {
+            word: "ÆDELMETAL",
+            category: "Redox-reaktioner",
+            fact: "Ædelmetaller ligger yderst til højre i spændingsrækken og er meget stabile i deres metalliske form, fx guld og platin."
+        },
+        {
+            word: "OXYGEN",
+            category: "Grundstoffer",
+            fact: "Oxygen har elektronegativiteten 3,5 og har oftest oxidationstallet -II i sine forbindelser."
+        },
+        {
+            word: "KALIUMPERMANGANAT",
+            category: "Redox-reaktioner",
+            fact: "Kaliumpermanganat (KMnO₄) er en dybviolet forbindelse, der ofte bruges som oxidationsmiddel i redoxreaktioner."
+        },
+        {
+            word: "HYDROGENPEROXID",
+            category: "Redox-reaktioner",
+            fact: "Hydrogenperoxid (H₂O₂), også kaldet brintoverilte, bruges bl.a. som oxidationsmiddel og til blegning."
+        },
+        {
+            word: "BRINT",
+            category: "Redox-reaktioner",
+            fact: "Brint (H₂, dihydrogen) indgår i spændingsrækken og danner H⁺-ioner, når det oxideres."
+        }
+    ];
+
+    // --- HEMMELIG ROS (vises efter 5 gennemførte forsøg i træk) ---
+    const WEIRD_PRAISE = [
+        "Din stavehjerne er nu officielt klassificeret som farligt gods af Beredskabsstyrelsen.",
+        "Vi har målt din koncentration af talent til at ligge markant over den kritiske micelkoncentration.",
+        "Det Kongelige Videnskabernes Selskab overvejer at opkalde en hidtil ukendt isotop efter dig.",
+        "Din prøve er sendt til analyse - resultatet viser 100% ren, ufortyndet dygtighed.",
+        "Et enigt råd af syrebade verden over har erklæret dig 'kemisk umulig at true'.",
+        "Selv katalysatorerne beder om din autograf, når de skal sænke deres aktiveringsenergi.",
+        "Din elektronegativitet er så høj, at bogstaverne selv flytter sig hen mod dig."
+    ];
+
+    // --- GAME ENGINE & STATE ---
+    const Game = {
+        state: {
+            wordObj: null,
+            targetWord: "",
+            guessedLetters: [],
+            wrongCount: 0,
+            maxWrong: 6, // 6 skridt til døden
+            status: "playing", // playing, won, lost
+            score: 0,
+            streak: 1,
+            winStreak: 0, // gennemførte forsøg i træk, uden en eneste fiasko
+            remainingIndices: [] // "pose" af endnu ikke-viste ord i denne runde
+        },
+
+        elements: {
+            wordDisplay: document.getElementById('word-display'),
+            keyboard: document.getElementById('keyboard'),
+            hintBox: document.getElementById('hint-box'),
+            overlay: document.getElementById('overlay'),
+            modalTitle: document.getElementById('modal-title'),
+            modalDesc: document.getElementById('modal-desc'),
+            modalFact: document.getElementById('modal-fact'),
+            scoreDisplay: document.getElementById('score-display'),
+            streakDisplay: document.getElementById('streak-display'),
+            secretOverlay: document.getElementById('secretOverlay'),
+            secretDesc: document.getElementById('secret-desc'),
+            secretFact: document.getElementById('secret-fact')
+        },
+
+        init: function() {
+            this.elements.overlay.style.display = "none";
+            this.elements.secretOverlay.style.display = "none";
+            this.state.guessedLetters = [];
+            this.state.wrongCount = 0;
+            this.state.status = "playing";
+            
+            // Vælg et tilfældigt ord - uden at gentage et ord, før alle andre har været vist
+            if(this.state.remainingIndices.length === 0) {
+                this.refillWordPool();
+            }
+            const poolPos = Math.floor(Math.random() * this.state.remainingIndices.length);
+            const wordIndex = this.state.remainingIndices.splice(poolPos, 1)[0];
+            this.state.wordObj = KEMI_ORD[wordIndex];
+            this.state.targetWord = this.state.wordObj.word.toUpperCase();
+            
+            this.elements.hintBox.innerText = "Kategori: " + this.state.wordObj.category;
+            this.updateScoreUI();
+            this.buildWordDisplay();
+            this.buildKeyboard();
+            
+            // Reset Canvas animation
+            CanvasEngine.reset();
+        },
+
+        refillWordPool: function() {
+            this.state.remainingIndices = KEMI_ORD.map(function(_, i) { return i; });
+        },
+
+        buildWordDisplay: function() {
+            this.elements.wordDisplay.innerHTML = "";
+            for(let i = 0; i < this.state.targetWord.length; i++) {
+                const char = this.state.targetWord[i];
+                const slot = document.createElement('div');
+                
+                if(char === " " || char === "-") {
+                    slot.className = "letter-slot space";
+                    slot.innerText = char;
+                } else {
+                    slot.className = "letter-slot";
+                    slot.id = "slot-" + i;
+                    slot.innerText = "";
+                }
+                this.elements.wordDisplay.appendChild(slot);
+            }
+        },
+
+        buildKeyboard: function() {
+            this.elements.keyboard.innerHTML = "";
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ".split("");
+            
+            for(let i = 0; i < letters.length; i++) {
+                const btn = document.createElement('button');
+                btn.className = "key-btn";
+                btn.innerText = letters[i];
+                btn.id = "key-" + letters[i];
+                btn.onclick = function() { Game.handleGuess(letters[i]); };
+                this.elements.keyboard.appendChild(btn);
+            }
+        },
+
+        handleGuess: function(letter) {
+            if(this.state.status !== "playing") return;
+            if(this.state.guessedLetters.indexOf(letter) !== -1) return;
+
+            this.state.guessedLetters.push(letter);
+            const btn = document.getElementById("key-" + letter);
+            if(btn) btn.disabled = true;
+
+            if(this.state.targetWord.indexOf(letter) !== -1) {
+                // Rigtigt gæt
+                if(btn) btn.classList.add("correct");
+                this.revealLetter(letter);
+                this.checkWin();
+            } else {
+                // Forkert gæt
+                if(btn) btn.classList.add("wrong");
+                this.state.wrongCount++;
+                CanvasEngine.addDamage();
+                this.state.streak = 1; // Nulstil streak
+                this.updateScoreUI();
+                this.checkLoss();
+            }
+        },
+
+        revealLetter: function(letter) {
+            for(let i = 0; i < this.state.targetWord.length; i++) {
+                if(this.state.targetWord[i] === letter) {
+                    const slot = document.getElementById("slot-" + i);
+                    if(slot) slot.innerText = letter;
+                }
+            }
+        },
+
+        checkWin: function() {
+            let won = true;
+            for(let i = 0; i < this.state.targetWord.length; i++) {
+                const char = this.state.targetWord[i];
+                if(char !== " " && char !== "-") {
+                    if(this.state.guessedLetters.indexOf(char) === -1) {
+                        won = false;
+                        break;
+                    }
+                }
+            }
+
+            if(won) {
+                this.state.status = "won";
+                // Beregn point (basis + færre fejl = flere point) * streak
+                let pointsGained = (50 - (this.state.wrongCount * 5)) * this.state.streak;
+                this.state.score += pointsGained;
+                this.state.streak += 0.5; // Forøg streak
+                this.state.winStreak++;
+                this.updateScoreUI();
+
+                CanvasEngine.triggerWin();
+                setTimeout(function() {
+                    if(Game.state.winStreak > 0 && Game.state.winStreak % 5 === 0) {
+                        Game.showSecretVictory();
+                    } else {
+                        Game.showModal(true);
+                    }
+                }, 1500);
+            }
+        },
+
+        checkLoss: function() {
+            if(this.state.wrongCount >= this.state.maxWrong) {
+                this.state.status = "lost";
+                this.state.streak = 1;
+                this.state.winStreak = 0;
+                this.updateScoreUI();
+                
+                CanvasEngine.triggerLoss();
+                
+                // Afslør resten af ordet
+                for(let i = 0; i < this.state.targetWord.length; i++) {
+                    const char = this.state.targetWord[i];
+                    if(char !== " " && char !== "-") {
+                        const slot = document.getElementById("slot-" + i);
+                        if(slot && slot.innerText === "") {
+                            slot.innerText = char;
+                            slot.style.color = "var(--wrong-color)";
+                        }
+                    }
+                }
+                setTimeout(function() { Game.showModal(false); }, 2000);
+            }
+        },
+
+        showModal: function(isWin) {
+            if(isWin) {
+                this.elements.modalTitle.innerText = "Fremragende!";
+                this.elements.modalTitle.style.color = "var(--correct-color)";
+                this.elements.modalDesc.innerText = "Du afstemte reaktionen korrekt.";
+            } else {
+                this.elements.modalTitle.innerText = "Opløst!";
+                this.elements.modalTitle.style.color = "var(--wrong-color)";
+                this.elements.modalDesc.innerText = "Forsøget slog fejl. Ordet var: " + this.state.targetWord;
+            }
+            this.elements.modalFact.innerText = this.state.wordObj.fact;
+            this.elements.overlay.style.display = "flex";
+        },
+
+        showSecretVictory: function() {
+            const praise = WEIRD_PRAISE[Math.floor(Math.random() * WEIRD_PRAISE.length)];
+            this.elements.secretDesc.innerText = "Du har nu gennemført " + this.state.winStreak + " forsøg i træk uden at ende i syrebadet. Det er... statistisk set bekymrende imponerende. Du er officielt Syreimmun.";
+            this.elements.secretFact.innerText = praise;
+            this.elements.secretOverlay.style.display = "flex";
+        },
+
+        closeSecret: function() {
+            this.elements.secretOverlay.style.display = "none";
+            this.init();
+        },
+
+        updateScoreUI: function() {
+            // Dansk formatering af tal (udskift punktum med komma)
+            let scStr = this.state.score.toFixed(1).replace(".", ",");
+            let stStr = this.state.streak.toFixed(1).replace(".", ",");
+            
+            this.elements.scoreDisplay.innerText = "Point: " + scStr;
+            this.elements.streakDisplay.innerText = "Streak: x" + stStr;
+        },
+        
+        handlePhysicalKeyboard: function(e) {
+            if(this.state.status !== "playing") return;
+            const key = e.key.toUpperCase();
+            const valid = "ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ";
+            if(valid.indexOf(key) !== -1) {
+                this.handleGuess(key);
+            }
+        }
+    };
+
+    // Lyt til fysisk tastatur
+    window.addEventListener('keydown', function(e) { Game.handlePhysicalKeyboard(e); });
+
+
+    // --- CANVAS ENGINE (Visuelt pædagogisk greb) ---
+    const CanvasEngine = {
+        canvas: document.getElementById('gameCanvas'),
+        ctx: null,
+        width: 0,
+        height: 0,
+        particles: [],
+        animationId: null,
+
+        // Syrebadet (kar), som manden nærmer sig
+        beaker: { x: 0, y: 0, w: 120, h: 160 },
+        liquidColor: { r: 34, g: 197, b: 94 }, // Starter grøn
+
+        // Mandens fremdrift mod syrebadet, 0 (sikker) til 1 (ved kanten)
+        manProgress: 0,
+        targetManProgress: 0,
+        manFalling: false,
+        manFallT: 0,
+        splashSpawned: false,
+
+        init: function() {
+            this.ctx = this.canvas.getContext('2d');
+            this.resize();
+            window.addEventListener('resize', function() { CanvasEngine.resize(); });
+            this.loop();
+        },
+
+        resize: function() {
+            const parent = document.getElementById('visual-section');
+            this.canvas.width = parent.clientWidth;
+            this.canvas.height = parent.clientHeight;
+            this.width = this.canvas.width;
+            this.height = this.canvas.height;
+
+            // Centrer bægerglas
+            this.beaker.x = this.width / 2 - this.beaker.w / 2;
+            this.beaker.y = this.height - 250;
+        },
+
+        reset: function() {
+            this.particles = [];
+            this.manProgress = 0;
+            this.targetManProgress = 0;
+            this.manFalling = false;
+            this.manFallT = 0;
+            this.splashSpawned = false;
+            this.liquidColor = { r: 34, g: 197, b: 94 }; // Grøn
+        },
+
+        addDamage: function() {
+            this.targetManProgress = Game.state.wrongCount / Game.state.maxWrong;
+
+            // Flere og hurtigere bobler i takt med faren
+            for(let i = 0; i < 20; i++) {
+                this.particles.push(this.createBubble());
+            }
+        },
+
+        triggerWin: function() {
+            // Eksoterm konfetti (varme farver)
+            for(let i=0; i<150; i++) {
+                this.particles.push({
+                    x: this.width / 2,
+                    y: this.height / 2,
+                    vx: (Math.random() - 0.5) * 20,
+                    vy: (Math.random() - 0.5) * 20,
+                    life: 1.0,
+                    decay: Math.random() * 0.02 + 0.01,
+                    size: Math.random() * 6 + 2,
+                    color: (Math.random() > 0.5) ? "#38bdf8" : "#fcd34d",
+                    type: "confetti"
+                });
+            }
+        },
+
+        triggerLoss: function() {
+            this.manFalling = true;
+            this.manFallT = 0;
+            this.splashSpawned = false;
+        },
+
+        spawnSplash: function() {
+            // Giftigt syre-stænk og gas-eksplosion
+            for(let i=0; i<100; i++) {
+                this.particles.push({
+                    x: this.beaker.x + this.beaker.w/2,
+                    y: this.beaker.y + 20,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: (Math.random() - 1.0) * 15,
+                    life: 1.0,
+                    decay: Math.random() * 0.01 + 0.005,
+                    size: Math.random() * 20 + 10,
+                    color: "rgba(34, 197, 94, 0.6)",
+                    type: "smoke"
+                });
+            }
+        },
+
+        createBubble: function() {
+            return {
+                x: this.beaker.x + Math.random() * this.beaker.w,
+                y: this.beaker.y + 10 + Math.random() * (this.beaker.h - 20),
+                vx: (Math.random() - 0.5) * 2,
+                vy: -Math.random() * 3 - 1,
+                life: 1.0,
+                decay: 0.02,
+                size: Math.random() * 4 + 2,
+                color: "rgba(255, 255, 255, 0.6)",
+                type: "bubble"
+            };
+        },
+
+        lerpColor: function(c1, c2, t) {
+            return {
+                r: c1.r + (c2.r - c1.r) * t,
+                g: c1.g + (c2.g - c1.g) * t,
+                b: c1.b + (c2.b - c1.b) * t
+            };
+        },
+
+        loop: function() {
+            // Brug requestAnimationFrame i stedet for timeout
+            window.requestAnimationFrame(function() { CanvasEngine.loop(); });
+
+            let ctx = CanvasEngine.ctx;
+            ctx.clearRect(0, 0, CanvasEngine.width, CanvasEngine.height);
+
+            // Interpoler mandens position mod badet (smooth animation)
+            CanvasEngine.manProgress += (CanvasEngine.targetManProgress - CanvasEngine.manProgress) * 0.08;
+
+            // Farven skifter gradvist fra grøn over orange til rød med faren
+            const GREEN = { r: 34, g: 197, b: 94 };
+            const ORANGE = { r: 245, g: 158, b: 11 };
+            const RED = { r: 239, g: 68, b: 68 };
+            CanvasEngine.liquidColor = (CanvasEngine.manProgress < 0.5)
+                ? CanvasEngine.lerpColor(GREEN, ORANGE, CanvasEngine.manProgress / 0.5)
+                : CanvasEngine.lerpColor(ORANGE, RED, (CanvasEngine.manProgress - 0.5) / 0.5);
+
+            CanvasEngine.drawLabTheme(ctx);
+            CanvasEngine.drawSceneAndMan(ctx);
+            CanvasEngine.updateAndDrawParticles(ctx);
+        },
+
+        drawLabTheme: function(ctx) {
+            // Tegn et bord
+            ctx.fillStyle = "#1e293b";
+            ctx.fillRect(0, this.beaker.y + this.beaker.h, this.width, this.height);
+            ctx.strokeStyle = "#38bdf8";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, this.beaker.y + this.beaker.h);
+            ctx.lineTo(this.width, this.beaker.y + this.beaker.h);
+            ctx.stroke();
+        },
+
+        drawSceneAndMan: function(ctx) {
+            let bx = this.beaker.x;
+            let by = this.beaker.y;
+            let bw = this.beaker.w;
+            let bh = this.beaker.h;
+            let floorY = by + bh;
+
+            // --- Tegn syrebadet (altid fyldt - det er faren han nærmer sig) ---
+            let colStr = "rgba(" + Math.round(this.liquidColor.r) + "," + Math.round(this.liquidColor.g) + "," + Math.round(this.liquidColor.b) + ", 0.85)";
+            ctx.fillStyle = colStr;
+            ctx.beginPath();
+            ctx.moveTo(bx, by + 10);
+            ctx.lineTo(bx, by + bh - 10);
+            ctx.quadraticCurveTo(bx, by + bh, bx + 10, by + bh);
+            ctx.lineTo(bx + bw - 10, by + bh);
+            ctx.quadraticCurveTo(bx + bw, by + bh, bx + bw, by + bh - 10);
+            ctx.lineTo(bx + bw, by + 10);
+            ctx.fill();
+
+            // Boblende syre - hyppigere jo tættere faren er
+            if(Math.random() < 0.03 + this.manProgress * 0.12) {
+                this.particles.push(this.createBubble());
+            }
+
+            // Kar-omrids
+            ctx.strokeStyle = "rgba(255,255,255,0.7)";
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(bx - 10, by);
+            ctx.lineTo(bx, by);
+            ctx.lineTo(bx, by + bh - 10);
+            ctx.quadraticCurveTo(bx, by + bh, bx + 10, by + bh);
+            ctx.lineTo(bx + bw - 10, by + bh);
+            ctx.quadraticCurveTo(bx + bw, by + bh, bx + bw, by + bh - 10);
+            ctx.lineTo(bx + bw, by);
+            ctx.lineTo(bx + bw + 10, by);
+            ctx.stroke();
+
+            // --- Tegn manden, der langsomt presses nærmere badet ---
+            const manStartX = 50;
+            const manEndX = bx - 55;
+
+            if(this.manFalling) {
+                this.manFallT += 0.025;
+                if(this.manFallT <= 1) {
+                    this.drawFallingMan(ctx, manEndX, floorY, this.manFallT);
+                }
+                if(this.manFallT >= 0.45 && !this.splashSpawned) {
+                    this.splashSpawned = true;
+                    this.spawnSplash();
+                }
+            } else {
+                let mx = manStartX + (manEndX - manStartX) * this.manProgress;
+                this.drawMan(ctx, mx, floorY, this.manProgress);
+            }
+
+            // Blinkende fare-symbol når manden er tæt på kanten af badet
+            if(!this.manFalling && this.manProgress > 0.7) {
+                let alpha = (this.manProgress - 0.7) / 0.3 * Math.abs(Math.sin(Date.now() / 200));
+                ctx.fillStyle = "rgba(239, 68, 68, " + alpha + ")";
+                ctx.font = "bold 44px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText("☠", bx + bw/2, by - 20);
+            }
+        },
+
+        drawMan: function(ctx, x, groundY, fear) {
+            const bounce = Math.sin(Date.now() / 150) * 3;
+            const headR = 14;
+            const bodyH = 46;
+            const legH = 30;
+            const armLen = 24;
+            const leanBack = fear * 18; // læner sig væk fra badet, jo tættere han kommer
+
+            const hipY = groundY - legH;
+            const shoulderY = hipY - bodyH;
+            const headX = x - leanBack;
+            const headY = shoulderY - headR - 2 + bounce;
+            const legSwing = Math.sin(Date.now() / 150) * 8;
+            const armSwing = Math.sin(Date.now() / 120) * 6;
+
+            ctx.save();
+            ctx.strokeStyle = "#f8fafc";
+            ctx.fillStyle = "#f8fafc";
+            ctx.lineWidth = 5;
+            ctx.lineCap = "round";
+
+            // Ben
+            ctx.beginPath();
+            ctx.moveTo(x, hipY);
+            ctx.lineTo(x - 10 + legSwing, groundY);
+            ctx.moveTo(x, hipY);
+            ctx.lineTo(x + 10 - legSwing, groundY);
+            ctx.stroke();
+
+            // Krop (læner sig bagud jo tættere på badet)
+            ctx.beginPath();
+            ctx.moveTo(x, hipY);
+            ctx.lineTo(headX, shoulderY);
+            ctx.stroke();
+
+            // Arme - flakser mere i takt med frygten
+            ctx.beginPath();
+            ctx.moveTo(headX, shoulderY + 6);
+            ctx.lineTo(headX - armLen * 0.6 - fear * 10, shoulderY - 6 - fear * 14 + armSwing);
+            ctx.moveTo(headX, shoulderY + 6);
+            ctx.lineTo(headX + armLen * 0.6 + fear * 4, shoulderY + 10 + armSwing);
+            ctx.stroke();
+
+            // Hoved
+            ctx.beginPath();
+            ctx.arc(headX, headY, headR, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Ansigt - øjne
+            ctx.beginPath();
+            ctx.arc(headX - 5, headY - 2, 1.5, 0, Math.PI * 2);
+            ctx.arc(headX + 5, headY - 2, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Mund - går fra smil til bekymret grimasse
+            ctx.beginPath();
+            const mouthCurve = 4 - fear * 8;
+            ctx.moveTo(headX - 5, headY + 5);
+            ctx.quadraticCurveTo(headX, headY + 5 + mouthCurve, headX + 5, headY + 5);
+            ctx.stroke();
+
+            // Sveddråbe når frygten stiger
+            if(fear > 0.4) {
+                ctx.fillStyle = "rgba(56,189,248,0.8)";
+                ctx.beginPath();
+                ctx.ellipse(headX + headR + 2, headY - 4, 3, 5, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.restore();
+        },
+
+        drawFallingMan: function(ctx, x, groundY, t) {
+            const rot = t * Math.PI / 2.2;
+            const scale = 1 - t * 0.6;
+            const dropY = t * 40;
+            const alpha = 1 - Math.max(0, t - 0.6) / 0.4;
+
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, alpha);
+            ctx.translate(x, groundY);
+            ctx.rotate(rot);
+            ctx.translate(0, dropY);
+            ctx.scale(scale, scale);
+            ctx.translate(-x, -groundY);
+            this.drawMan(ctx, x, groundY, 1);
+            ctx.restore();
+        },
+
+        updateAndDrawParticles: function(ctx) {
+            for(let i = this.particles.length - 1; i >= 0; i--) {
+                let p = this.particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= p.decay;
+
+                if(p.type === "smoke") {
+                    p.size += 0.5; // Røg udvider sig
+                }
+
+                if(p.life <= 0) {
+                    this.particles.splice(i, 1);
+                    continue;
+                }
+
+                ctx.save();
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color;
+                
+                if(p.type === "confetti") {
+                    // Simpel rotation/firkant
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.life * 10);
+                    ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                } else if(p.type === "bubble" || p.type === "smoke") {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+        }
+    };
+
+    // Opstart
+    window.onload = function() {
+        CanvasEngine.init();
+        Game.init();
+    };
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energidiagram, aktiveret kompleks &amp; temperatur (Kemi B)</title>
+    <style>
+        :root {
+            --bg-dark: #121215;
+            --panel-bg: #1e1e24;
+            --text-main: #e0e0e0;
+            --text-muted: #9e9e9e;
+            --accent-blue: #3498db;
+            --accent-red: #e74c3c;
+            --accent-green: #2ecc71;
+            --accent-purple: #9b59b6;
+            --accent-orange: #f39c12;
+            --border: #333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Nødvendig, fordi display:flex ellers overtrumfer hidden-attributten */
+        [hidden] { display: none !important; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: #111;
+            padding: 12px 20px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex: 0 0 auto;
+        }
+
+        header h1 { font-size: 1.3rem; font-weight: 600; }
+
+        .eq-box {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 14px;
+            white-space: nowrap;
+        }
+
+        #app-container { display: flex; flex: 1; overflow: hidden; }
+
+        /* ---------- VENSTRE: DIAGRAM + QUIZ ---------- */
+        #stage {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        #visuals {
+            flex: 1 1 auto;
+            min-height: 200px;
+            position: relative;
+            background: radial-gradient(circle at center, #252530 0%, #121215 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            overflow: hidden;
+        }
+
+        canvas {
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            display: block;
+        }
+
+        #quiz-dock {
+            flex: 0 0 auto;
+            background: #17171c;
+            border-top: 1px solid var(--border);
+        }
+
+        #quiz-launch { padding: 12px 20px; display: flex; justify-content: center; }
+
+        .btn-quiz-open {
+            flex: 0 0 auto;
+            padding: 11px 26px;
+            background: rgba(46, 204, 113, 0.12);
+            border: 1px solid rgba(46, 204, 113, 0.45);
+            color: #7ee2a8;
+            border-radius: 8px;
+            font-size: 0.92rem;
+        }
+        .btn-quiz-open:hover { background: rgba(46, 204, 113, 0.25); color: #fff; }
+
+        #quiz-panel {
+            padding: 14px 22px 18px;
+            max-height: 44vh;
+            overflow-y: auto;
+            border-top: 3px solid var(--accent-green);
+        }
+
+        .quiz-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .quiz-head h3 {
+            font-size: 0.85rem;
+            color: var(--accent-green);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .quiz-head span { color: var(--text-muted); margin-left: 8px; letter-spacing: 0; }
+
+        .btn-quiz-close {
+            flex: 0 0 auto;
+            padding: 6px 12px;
+            background: transparent;
+            border: 1px solid #555;
+            color: var(--text-muted);
+            border-radius: 5px;
+            font-size: 0.78rem;
+            font-weight: normal;
+        }
+        .btn-quiz-close:hover { border-color: #888; color: #fff; }
+
+        #task-text { font-size: 1rem; line-height: 1.5; margin-bottom: 12px; }
+
+        #task-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        #task-options label {
+            display: flex;
+            gap: 9px;
+            align-items: flex-start;
+            font-size: 0.88rem;
+            line-height: 1.45;
+            background: rgba(255,255,255,0.045);
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        #task-options label:hover { border-color: rgba(46,204,113,0.45); }
+        #task-options input { margin-top: 3px; accent-color: var(--accent-green); }
+
+        #task-feedback { font-size: 0.9rem; line-height: 1.45; margin-bottom: 12px; min-height: 20px; }
+
+        .quiz-actions { display: flex; gap: 10px; max-width: 460px; }
+        .btn-check-task { background-color: var(--accent-green); color: #000; }
+        .btn-check-task:hover { background-color: #27ae60; }
+        .btn-skip { background: #3a3a42; color: #ccc; }
+        .btn-skip:hover { background: #4a4a55; }
+
+        /* ---------- HØJRE: KONTROLPANEL ---------- */
+        #controls {
+            flex: 1;
+            min-width: 340px;
+            max-width: 430px;
+            background-color: var(--panel-bg);
+            border-left: 1px solid var(--border);
+            padding: 18px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .control-group {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 14px;
+            border-radius: 8px;
+        }
+
+        .control-group h3 {
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .slider-container { margin-bottom: 14px; }
+        .slider-container:last-child { margin-bottom: 0; }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-size: 0.88rem;
+        }
+        .slider-header span:last-child {
+            font-variant-numeric: tabular-nums;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        input[type="range"] { width: 100%; accent-color: var(--accent-blue); cursor: pointer; }
+        input[type="range"]:disabled { opacity: 0.45; cursor: not-allowed; }
+        #slider-temp { accent-color: var(--accent-orange); }
+
+        .hint { font-size: 0.76rem; color: var(--text-muted); line-height: 1.4; margin-top: 6px; }
+
+        button {
+            flex: 1;
+            padding: 11px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-row { display: flex; gap: 8px; }
+        .btn-test { background-color: var(--accent-green); color: #000; text-transform: uppercase; }
+        .btn-test:hover { background-color: #27ae60; }
+        .btn-test:disabled { background-color: #555; color: #888; cursor: not-allowed; }
+        .btn-reset { background-color: #444; color: #fff; text-transform: uppercase; }
+        .btn-reset:hover { background-color: #555; }
+
+        .preset-row { display: flex; flex-wrap: wrap; gap: 6px; }
+        .btn-preset {
+            flex: 1 1 45%;
+            padding: 9px 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            background: rgba(52,152,219,0.12);
+            border: 1px solid rgba(52,152,219,0.35);
+            color: #9ed2f0;
+            border-radius: 6px;
+        }
+        .btn-preset:hover { background: rgba(52,152,219,0.25); color: #fff; }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(243, 156, 18, 0.1);
+            padding: 11px;
+            border-radius: 6px;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 12px;
+        }
+        .toggle-container:hover { background: rgba(243, 156, 18, 0.2); }
+        .toggle-label { font-weight: bold; color: var(--accent-orange); font-size: 0.9rem; }
+
+        details.theory {
+            background: rgba(155, 89, 182, 0.08);
+            border: 1px solid rgba(155, 89, 182, 0.3);
+            border-radius: 8px;
+            padding: 12px 14px;
+        }
+        details.theory summary {
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--accent-purple);
+            font-size: 0.92rem;
+            list-style: none;
+        }
+        details.theory summary::-webkit-details-marker { display: none; }
+        details.theory summary::before { content: "▸ "; }
+        details.theory[open] summary::before { content: "▾ "; }
+        details.theory ul { margin: 10px 0 0 18px; }
+        details.theory li { font-size: 0.84rem; line-height: 1.5; margin-bottom: 6px; color: #d5d5d5; }
+
+        #reaction-result {
+            position: absolute;
+            top: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.88);
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            border: 1px solid #555;
+            text-align: center;
+            max-width: 88%;
+        }
+        .success-text { color: var(--accent-green); }
+        .fail-text { color: var(--accent-red); }
+
+        @media (max-width: 900px) {
+            body { height: auto; overflow: auto; }
+            #app-container { flex-direction: column; }
+            #stage { overflow: visible; }
+            #visuals { height: 52vh; }
+            #controls { max-width: none; border-left: none; border-top: 1px solid var(--border); }
+            #quiz-panel { max-height: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>
+            <h1>Kemi B: Energidiagram &amp; aktiveret kompleks</h1>
+        </div>
+        <div class="eq-box">A₂ + B₂ ⟶ 2 AB</div>
+    </header>
+
+    <div id="app-container">
+
+        <!-- VENSTRE SIDE: diagram øverst, quiz nederst -->
+        <div id="stage">
+            <div id="visuals">
+                <canvas id="simCanvas"></canvas>
+                <div id="reaction-result"></div>
+            </div>
+
+            <div id="quiz-dock">
+                <div id="quiz-launch">
+                    <button class="btn-quiz-open" onclick="startQuiz()">▶ Start træningsquiz</button>
+                </div>
+
+                <div id="quiz-panel" hidden>
+                    <div class="quiz-head">
+                        <h3>Træningsquiz <span id="task-counter">1/7</span></h3>
+                        <button class="btn-quiz-close" onclick="closeQuiz()">Afslut quiz ✕</button>
+                    </div>
+                    <p id="task-text"></p>
+                    <div id="task-options"></div>
+                    <div id="task-feedback"></div>
+                    <div class="quiz-actions">
+                        <button class="btn-check-task" onclick="checkTask()">Tjek svar</button>
+                        <button class="btn-skip" onclick="nextTask()">Spring over ▸</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HØJRE SIDE: kontrolpanel -->
+        <div id="controls">
+
+            <div class="control-group">
+                <h3>Termodynamik</h3>
+
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <span>H(reaktanter)</span>
+                        <span id="val-hr">80,0 kJ/mol</span>
+                    </div>
+                    <input type="range" id="slider-hr" min="10" max="150" step="1" value="80">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <span>H(produkter)</span>
+                        <span id="val-hp">30,0 kJ/mol</span>
+                    </div>
+                    <input type="range" id="slider-hp" min="10" max="150" step="1" value="30">
+                </div>
+                <p class="hint">ΔH = H(produkter) − H(reaktanter). Fortegnet afgør, om reaktionen er exoterm eller endoterm.</p>
+            </div>
+
+            <div class="control-group">
+                <h3>Kinetik</h3>
+
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <span>Aktiveringsenergi Eₐ</span>
+                        <span id="val-ea">80,0 kJ/mol</span>
+                    </div>
+                    <input type="range" id="slider-ea" min="10" max="200" step="1" value="80">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <span>🌡 Temperatur T</span>
+                        <span id="val-temp">350 K (77 °C)</span>
+                    </div>
+                    <input type="range" id="slider-temp" min="200" max="1500" step="10" value="350">
+                    <p class="hint" style="margin-top:8px;">Reaktionshastighed <b id="val-rate" style="color:#f39c12;">×121</b> i forhold til 25 °C</p>
+                    <p class="hint">Molekylernes kinetiske energi vokser proportionalt med den <b>absolutte temperatur</b>.
+                    Den stiplede vandrette linje viser energien hos de energirige molekyler, der kan nå op til det aktiverede kompleks —
+                    kommer linjen over toppen, forløber reaktionen.</p>
+                </div>
+
+                <div class="toggle-container" onclick="toggleCatalyst()">
+                    <span class="toggle-label">⚙ Tilføj katalysator</span>
+                    <input type="checkbox" id="check-catalyst" style="pointer-events: none;">
+                </div>
+                <p class="hint">En katalysator giver en ny reaktionsvej med et lavere aktiveret kompleks — Eₐ falder, men ΔH er uændret.</p>
+            </div>
+
+            <div class="control-group">
+                <h3>Kør forsøg</h3>
+                <div class="btn-row" style="margin-bottom:10px;">
+                    <button class="btn-test" id="btn-start" onclick="startReaction()">▶ Test reaktion</button>
+                    <button class="btn-reset" onclick="resetState()">Nulstil</button>
+                </div>
+                <div class="preset-row">
+                    <button class="btn-preset" onclick="loadPreset('exo')">Kraftigt exoterm</button>
+                    <button class="btn-preset" onclick="loadPreset('endo')">Endoterm spaltning</button>
+                    <button class="btn-preset" onclick="loadPreset('slow')">Høj barriere</button>
+                    <button class="btn-preset" onclick="loadPreset('cat')">Katalyseret</button>
+                </div>
+            </div>
+
+            <details class="theory">
+                <summary>Hvad er det aktiverede kompleks?</summary>
+                <ul>
+                    <li>Det er strukturen i <b>toppen</b> af energikurven — hverken reaktant eller produkt, men noget midt imellem.</li>
+                    <li>De gamle bindinger er <b>delvist brudt</b>, og de nye er <b>delvist dannet</b> på samme tid.</li>
+                    <li>Det skrives i skarp parentes med dobbeltkryds: <b>[A₂B₂]<sup>‡</sup></b>.</li>
+                    <li>Det har reaktionsvejens højeste energi og kan <b>ikke isoleres</b> — levetiden er ca. 10⁻¹³ s.</li>
+                    <li>Energien, der skal til for at nå derop fra reaktanterne, er netop <b>aktiveringsenergien Eₐ</b>.</li>
+                    <li>Et aktiveret kompleks er <b>ikke</b> et mellemprodukt: et mellemprodukt ligger i en <i>dal</i> på kurven og kan i princippet påvises.</li>
+                    <li>Klik på den lilla markør i toppen af diagrammet for at se en skitse.</li>
+                </ul>
+            </details>
+
+        </div>
+    </div>
+
+    <script>
+    "use strict";
+
+    /* ========================================================
+       1) TILSTAND
+       ======================================================== */
+    const DEFAULTS = { hR: 80, hP: 30, eA: 80, T: 350, catalyst: false };
+
+    const state = {
+        hR: DEFAULTS.hR,      // Entalpi, reaktanter (kJ/mol)
+        hP: DEFAULTS.hP,      // Entalpi, produkter (kJ/mol)
+        eA: DEFAULTS.eA,      // Aktiveringsenergi, ukatalyseret (kJ/mol)
+        T:  DEFAULTS.T,       // Temperatur (K)
+        catalyst: false,
+
+        animating: false,
+        ball: { t: 0.15, dir: 1, reacted: false, active: false },
+        heat: [],             // Varmepartikler (afgivet/optaget energi)
+        sparks: [],           // Gnister ved mislykket sammenstød
+        hoverPeak: false,
+        pinComplex: false,    // Infokortet fastholdt ved klik (touch/projektor)
+        quizOpen: false,
+        taskIndex: 0,
+        mcChoice: -1
+    };
+
+    const CATALYST_FACTOR = 0.55;
+    const R = 8.314;          // J/(mol·K)
+    // Energien hos den energirige hale af Maxwell-Boltzmann-fordelingen:
+    // E = R·T·ln(10⁹), dvs. den energi som ca. 1 ud af 10⁹ molekyler mindst har.
+    const K_TAIL = R * Math.log(1e9) / 1000;   // ≈ 0,1723 kJ/(mol·K)
+    const T_REF = 298;        // Referencetemperatur (25 °C) for relativ hastighed
+
+    /* ========================================================
+       2) CANVAS-OPSÆTNING (logiske koordinater + DPR-skalering)
+       ======================================================== */
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    const LW = 980, LH = 520;
+    const PLOT = { left: 105, right: 930, top: 78, bottom: 470, tMin: 125, tMax: 905 };
+
+    const view = { eMin: 0, eMax: 400, step: 50 };   // y-akse, auto-skaleret
+
+    const UI = {
+        sl_hR:   document.getElementById('slider-hr'),
+        sl_hP:   document.getElementById('slider-hp'),
+        sl_eA:   document.getElementById('slider-ea'),
+        sl_T:    document.getElementById('slider-temp'),
+        val_hR:  document.getElementById('val-hr'),
+        val_hP:  document.getElementById('val-hp'),
+        val_eA:  document.getElementById('val-ea'),
+        val_T:   document.getElementById('val-temp'),
+        val_rate: document.getElementById('val-rate'),
+        chk_cat: document.getElementById('check-catalyst'),
+        btn_start: document.getElementById('btn-start'),
+        res_box: document.getElementById('reaction-result')
+    };
+
+    function resizeCanvas() {
+        const wrap = document.getElementById('visuals');
+        const availW = Math.max(300, wrap.clientWidth - 32);
+        const availH = Math.max(180, wrap.clientHeight - 32);
+        const s = Math.min(availW / LW, availH / LH);
+        const cssW = LW * s, cssH = LH * s;
+        const dpr = window.devicePixelRatio || 1;
+
+        canvas.style.width = cssW + 'px';
+        canvas.style.height = cssH + 'px';
+        canvas.width = Math.round(cssW * dpr);
+        canvas.height = Math.round(cssH * dpr);
+        ctx.setTransform(canvas.width / LW, 0, 0, canvas.height / LH, 0, 0);
+    }
+
+    /* ========================================================
+       3) KEMI-MATEMATIK
+       ======================================================== */
+    function getActiveEa()  { return state.catalyst ? state.eA * CATALYST_FACTOR : state.eA; }
+    function deltaH()       { return state.hP - state.hR; }
+    function peakEnergy(cat){ return state.hR + (cat ? state.eA * CATALYST_FACTOR : state.eA); }
+    function isExo()        { return deltaH() < 0; }
+
+    // Kinetisk energi hos de energirige molekyler — vokser proportionalt med T
+    function eKin()         { return K_TAIL * state.T; }
+    function totalEnergy()  { return state.hR + eKin(); }
+    function reactionPossible() { return eKin() >= getActiveEa(); }
+
+    // Relativ reaktionshastighed i forhold til 25 °C (Arrhenius)
+    function relRate() {
+        const Ea = getActiveEa() * 1000;                       // J/mol
+        return Math.exp(-Ea / R * (1 / state.T - 1 / T_REF));
+    }
+
+    // Energien (kJ/mol) på reaktionsvejen for et givet trin t ∈ [0;1]
+    function curveEnergy(t, cat) {
+        const peak = peakEnergy(cat);
+        if (t <= 0.15) return state.hR;
+        if (t >= 0.85) return state.hP;
+        if (t < 0.5) {
+            const n = (t - 0.15) / 0.35;
+            return state.hR + (peak - state.hR) * (n * n * (3 - 2 * n));
+        }
+        const n = (t - 0.5) / 0.35;
+        return peak + (state.hP - peak) * (n * n * (3 - 2 * n));
+    }
+
+    function computeView() {
+        const hi = Math.max(state.hR, state.hP, peakEnergy(false), peakEnergy(true), totalEnergy());
+        view.eMin = 0;
+        view.eMax = hi * 1.16 + 10;    // luft over det højeste niveau, så etiketterne har plads
+        const raw = (view.eMax - view.eMin) / 7;
+        view.step = [5, 10, 20, 25, 50, 100, 200, 250].find(c => raw <= c) || 500;
+    }
+
+    function energyToY(E) {
+        return PLOT.bottom - ((E - view.eMin) / (view.eMax - view.eMin)) * (PLOT.bottom - PLOT.top);
+    }
+    function tToX(t) { return PLOT.tMin + t * (PLOT.tMax - PLOT.tMin); }
+
+    /* ---- Talformatering (dansk) ---- */
+    function fmt(n)  { return n.toFixed(1).replace('.', ','); }
+    function fmtU(n) { return fmt(n) + ' kJ/mol'; }
+    function fmtSigned(n) {
+        const sign = n > 0.0001 ? '+' : (n < -0.0001 ? '−' : '');
+        return sign + fmt(Math.abs(n));
+    }
+    function fmtSignedU(n) { return fmtSigned(n) + ' kJ/mol'; }
+    function celsius(T) { return Math.round(T - 273.15); }
+    function fmtTemp(T) { return `${T} K  (${celsius(T)} °C)`; }
+
+    const SUP = { '0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻' };
+    function sup(n) { return String(n).split('').map(c => SUP[c] || c).join(''); }
+
+    function fmtRate(v) {
+        if (!isFinite(v) || v <= 0) return '–';
+        if (v >= 1000 || v < 0.01) {
+            const e = Math.floor(Math.log10(v));
+            return '×' + fmt(v / Math.pow(10, e)) + '·10' + sup(e);
+        }
+        return '×' + fmt(v);
+    }
+
+    const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+
+    /* ========================================================
+       4) UI-OPDATERING
+       ======================================================== */
+    function updateUI() {
+        // Termodynamisk krav: barrieren skal ligge over BEGGE niveauer.
+        const minEa = Math.max(10, deltaH() + 5);
+        if (state.eA < minEa) state.eA = minEa;
+        UI.sl_eA.min = minEa;
+        UI.sl_eA.value = state.eA;
+
+        UI.val_hR.innerText   = fmtU(state.hR);
+        UI.val_hP.innerText   = fmtU(state.hP);
+        UI.val_eA.innerText   = fmtU(state.eA);
+        UI.val_T.innerText    = fmtTemp(state.T);
+        UI.val_rate.innerText = fmtRate(relRate());
+        UI.chk_cat.checked    = state.catalyst;
+    }
+
+    function setControlsEnabled(on) {
+        [UI.sl_hR, UI.sl_hP, UI.sl_eA, UI.sl_T].forEach(s => s.disabled = !on);
+        UI.btn_start.disabled = !on;
+    }
+
+    function readSliders() {
+        if (state.animating) return;
+        state.hR = parseFloat(UI.sl_hR.value);
+        state.hP = parseFloat(UI.sl_hP.value);
+        state.eA = parseFloat(UI.sl_eA.value);
+        state.T  = parseFloat(UI.sl_T.value);
+        updateUI();
+    }
+
+    function toggleCatalyst() {
+        if (state.animating) return;
+        state.catalyst = !state.catalyst;
+        updateUI();
+    }
+
+    function applySettings(s) {
+        UI.sl_hR.value = s.hR;
+        UI.sl_hP.value = s.hP;
+        UI.sl_eA.min = 10;          // nulstil begrænsningen før ny værdi sættes
+        UI.sl_eA.value = s.eA;
+        UI.sl_T.value = s.T;
+        state.catalyst = !!s.catalyst;
+        state.ball = { t: 0.15, dir: 1, reacted: false, active: false };
+        state.heat = []; state.sparks = [];
+        hideResult();
+        readSliders();
+    }
+
+    function loadPreset(kind) {
+        if (state.animating) return;
+        const presets = {
+            exo:  { hR: 140, hP: 25,  eA: 55,  T: 410,  catalyst: false },
+            endo: { hR: 40,  hP: 115, eA: 110, T: 760,  catalyst: false },
+            slow: { hR: 90,  hP: 45,  eA: 170, T: 520,  catalyst: false },
+            cat:  { hR: 110, hP: 40,  eA: 150, T: 550,  catalyst: true  }
+        };
+        if (presets[kind]) applySettings(presets[kind]);
+    }
+
+    function resetState() {
+        if (state.animating) return;
+        applySettings(DEFAULTS);
+    }
+
+    /* ========================================================
+       5) TEGNE-HJÆLPERE
+       ======================================================== */
+    function roundRect(x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y,     x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x,     y + h, r);
+        ctx.arcTo(x,     y + h, x,     y,     r);
+        ctx.arcTo(x,     y,     x + w, y,     r);
+        ctx.closePath();
+    }
+
+    // Tekst med diskret baggrundsplade, så den altid er læsbar oven på kurven
+    function chip(text, x, y, align, color, font) {
+        ctx.font = font || "bold 14px 'Segoe UI', sans-serif";
+        const w = ctx.measureText(text).width;
+        const padX = 7, h = 21;
+        let bx = x - padX;
+        if (align === 'right')  bx = x - w - padX;
+        if (align === 'center') bx = x - w / 2 - padX;
+
+        ctx.fillStyle = 'rgba(10,10,14,0.78)';
+        roundRect(bx, y - h / 2, w + padX * 2, h, 5);
+        ctx.fill();
+
+        ctx.fillStyle = color;
+        ctx.textAlign = align;
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, x, y + 0.5);
+    }
+
+    function arrowLine(x1, y1, x2, y2, color, head) {
+        head = head || 8;
+        const ang = Math.atan2(y2 - y1, x2 - x1);
+        ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - head * Math.cos(ang - Math.PI / 6), y2 - head * Math.sin(ang - Math.PI / 6));
+        ctx.lineTo(x2 - head * Math.cos(ang + Math.PI / 6), y2 - head * Math.sin(ang + Math.PI / 6));
+        ctx.closePath(); ctx.fill();
+    }
+
+    function doubleArrow(x, y1, y2, color) {
+        arrowLine(x, y1, x, y2, color);
+        arrowLine(x, y2, x, y1, color);
+    }
+
+    /* ========================================================
+       6) ENERGIDIAGRAMMET
+       ======================================================== */
+    function drawDiagram() {
+        computeView();
+
+        // --- Gitter ---
+        ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let E = 0; E <= view.eMax; E += view.step) {
+            const y = energyToY(E);
+            if (y < PLOT.top) break;
+            ctx.moveTo(PLOT.left, y); ctx.lineTo(PLOT.right, y);
+        }
+        ctx.stroke();
+
+        // --- Akser med pilespidser ---
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(PLOT.left, PLOT.top - 14);
+        ctx.lineTo(PLOT.left, PLOT.bottom);
+        ctx.lineTo(PLOT.right + 14, PLOT.bottom);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(PLOT.left - 5, PLOT.top - 5); ctx.lineTo(PLOT.left, PLOT.top - 15); ctx.lineTo(PLOT.left + 5, PLOT.top - 5);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(PLOT.right + 5, PLOT.bottom - 5); ctx.lineTo(PLOT.right + 15, PLOT.bottom); ctx.lineTo(PLOT.right + 5, PLOT.bottom + 5);
+        ctx.stroke();
+
+        // --- Tickmarks ---
+        ctx.font = "12px 'Segoe UI', sans-serif";
+        ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+        for (let E = 0; E <= view.eMax; E += view.step) {
+            const y = energyToY(E);
+            if (y < PLOT.top) break;
+            ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.moveTo(PLOT.left - 6, y); ctx.lineTo(PLOT.left, y); ctx.stroke();
+            ctx.fillStyle = '#9e9e9e';
+            ctx.fillText(String(E), PLOT.left - 11, y);
+        }
+
+        // --- Aksetitler ---
+        ctx.save();
+        ctx.translate(26, (PLOT.top + PLOT.bottom) / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = "bold 14px 'Segoe UI', sans-serif";
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('Entalpi  H  (kJ/mol)', 0, 0);
+        ctx.restore();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = "bold 14px 'Segoe UI', sans-serif";
+        ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+        ctx.fillText('Reaktionsforløb  ⟶', (PLOT.tMin + PLOT.tMax) / 2, PLOT.bottom + 12);
+
+        const yR    = energyToY(state.hR);
+        const yP    = energyToY(state.hP);
+        const yTot  = energyToY(totalEnergy());
+        const yPeak = energyToY(peakEnergy(state.catalyst));
+        const xPeak = tToX(0.5);
+
+        // --- Kinetisk energi som skraveret felt mellem kurven og totalenergilinjen ---
+        drawKineticBand(yTot);
+
+        // --- Hjælpelinjer ---
+        ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(tToX(0.15), yR);   ctx.lineTo(PLOT.right, yR);
+        ctx.moveTo(tToX(0.5),  yP);   ctx.lineTo(PLOT.right, yP);
+        ctx.moveTo(PLOT.left,  yPeak); ctx.lineTo(xPeak, yPeak);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // --- Kurver ---
+        if (state.catalyst) drawCurve(false, 'rgba(231,76,60,0.35)', 3, [6, 6]);
+        drawCurve(state.catalyst, state.catalyst ? '#f39c12' : '#e74c3c', 4, []);
+
+        // --- Totalenergilinjen (temperaturens tærskel) ---
+        const ok = reactionPossible();
+        ctx.strokeStyle = ok ? 'rgba(46,204,113,0.95)' : 'rgba(231,76,60,0.95)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([9, 6]);
+        ctx.beginPath(); ctx.moveTo(PLOT.tMin, yTot); ctx.lineTo(PLOT.tMax, yTot); ctx.stroke();
+        ctx.setLineDash([]);
+        chip(`Samlet energi ved ${state.T} K = ${fmtU(totalEnergy())}`,
+             tToX(0.02), yTot - 15, 'left', ok ? '#7ee2a8' : '#f19a91',
+             "bold 13px 'Segoe UI', sans-serif");
+
+        // --- Aktiveringsenergi Eₐ ---
+        const xEa = tToX(0.5);
+        doubleArrow(xEa, yR, yPeak, '#3498db');
+        chip(`Eₐ = ${fmtU(getActiveEa())}`, xEa - 12, (yR + yPeak) / 2, 'right', '#8ecbf0');
+
+        // --- ΔH ---
+        const dH = deltaH();
+        const xDH = tToX(0.93);
+        const dhColor = Math.abs(dH) < 0.001 ? '#bbb' : (dH < 0 ? '#2ecc71' : '#e74c3c');
+        arrowLine(xDH, yR, xDH, yP, dhColor, 10);
+        ctx.strokeStyle = dhColor; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(xDH - 7, yR); ctx.lineTo(xDH + 7, yR); ctx.stroke();
+        chip(`ΔH = ${fmtSignedU(dH)}`, xDH - 12, (yR + yP) / 2, 'right', dhColor);
+
+        // --- Niveau-etiketter ---
+        chip('Reaktanter  A₂ + B₂', tToX(0.02), yR + 20, 'left', '#7fc8f5');
+        chip('Produkter  2 AB', tToX(0.98), yP - 20, 'right', '#7ee2a8');
+
+        // --- Toppunkt: det aktiverede kompleks ---
+        drawTransitionStateMarker(xPeak, yPeak);
+
+        // --- Partikeleffekter og bold ---
+        drawParticles();
+        if (state.ball.active) drawBall();
+
+        // --- Legende når katalysatoren er slået til ---
+        if (state.catalyst) {
+            chip('– – –  uden katalysator', tToX(0.99), PLOT.top + 12, 'right', 'rgba(231,76,60,0.9)',
+                 "12px 'Segoe UI', sans-serif");
+            chip('——  med katalysator', tToX(0.99), PLOT.top + 34, 'right', '#f39c12',
+                 "12px 'Segoe UI', sans-serif");
+        }
+    }
+
+    function drawCurve(cat, color, width, dash) {
+        ctx.strokeStyle = color; ctx.lineWidth = width;
+        ctx.setLineDash(dash); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+        ctx.beginPath();
+        const steps = 160;
+        for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            const x = tToX(t), y = energyToY(curveEnergy(t, cat));
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+
+    // Feltet mellem kurven og totalenergilinjen ER den kinetiske energi
+    function drawKineticBand(yTot) {
+        const Etot = totalEnergy();
+        const steps = 200;
+        const segs = [];
+        let seg = null;
+        for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            if (curveEnergy(t, state.catalyst) < Etot) {
+                if (!seg) { seg = []; segs.push(seg); }
+                seg.push(t);
+            } else seg = null;
+        }
+        ctx.fillStyle = 'rgba(52,152,219,0.16)';
+        segs.forEach(s => {
+            if (s.length < 2) return;
+            ctx.beginPath();
+            ctx.moveTo(tToX(s[0]), yTot);
+            s.forEach(t => ctx.lineTo(tToX(t), energyToY(curveEnergy(t, state.catalyst))));
+            ctx.lineTo(tToX(s[s.length - 1]), yTot);
+            ctx.closePath(); ctx.fill();
+        });
+    }
+
+    function drawTransitionStateMarker(x, y) {
+        const nearTop = state.ball.active && Math.abs(state.ball.t - 0.5) < 0.06;
+        const pulse = nearTop ? 4 + 3 * Math.sin(Date.now() / 120) : 0;
+
+        ctx.save();
+        ctx.shadowBlur = 14; ctx.shadowColor = '#9b59b6';
+        ctx.fillStyle = nearTop ? '#d59bea' : '#9b59b6';
+        ctx.beginPath(); ctx.arc(x, y, 7 + pulse * 0.4, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+
+        if (nearTop) {
+            ctx.strokeStyle = 'rgba(155,89,182,0.6)'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(x, y, 14 + pulse, 0, Math.PI * 2); ctx.stroke();
+        }
+
+        // Etiketterne lægges under toppunktet, hvis der ikke er plads over det
+        const above = (y - 47) > PLOT.top - 4;
+        chip('Aktiveret kompleks  [A₂B₂]‡', x, above ? y - 26 : y + 30, 'center', '#d59bea');
+        if (!state.ball.active) {
+            chip(state.pinComplex ? '(klik for at lukke)' : '(klik for forklaring)',
+                 x, above ? y - 47 : y + 51, 'center', 'rgba(255,255,255,0.45)',
+                 "11px 'Segoe UI', sans-serif");
+        }
+        if (state.hoverPeak || state.pinComplex) drawComplexCard(x, y);
+    }
+
+    function drawComplexCard(px, py) {
+        const lines = [
+            'Toppen af reaktionsvejen — hverken reaktant eller produkt.',
+            'Gamle bindinger er delvist brudt, nye delvist dannet.',
+            'Højeste energi; kan ikke isoleres (levetid ≈ 10⁻¹³ s).',
+            'Eₐ er netop energien op til dette punkt.',
+            'En katalysator giver et andet, lavere aktiveret kompleks.'
+        ];
+        const w = 530, h = 34 + lines.length * 20;
+        const x = clamp(px - w / 2, PLOT.left + 4, PLOT.right - w - 4);
+        let y = py + 24;
+        if (y + h > PLOT.bottom - 4) y = py - h - 34;
+
+        ctx.fillStyle = 'rgba(20,16,26,0.97)';
+        ctx.strokeStyle = 'rgba(155,89,182,0.8)';
+        ctx.lineWidth = 1.5;
+        roundRect(x, y, w, h, 8); ctx.fill(); ctx.stroke();
+
+        ctx.fillStyle = '#d59bea';
+        ctx.font = "bold 14px 'Segoe UI', sans-serif";
+        ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+        ctx.fillText('Aktiveret kompleks (overgangstilstand) ‡', x + 14, y + 10);
+
+        ctx.font = "12.5px 'Segoe UI', sans-serif";
+        ctx.fillStyle = '#dcdcdc';
+        lines.forEach((l, i) => ctx.fillText('•  ' + l, x + 14, y + 34 + i * 20));
+
+        drawComplexSketch(x + w - 68, y + h / 2 + 4);
+    }
+
+    // Lille, statisk skitse af [A₂B₂]‡ med delvise (stiplede) bindinger
+    function drawComplexSketch(cx, cy) {
+        const d = 21, r = 12;
+        const pts = [
+            { x: cx - d, y: cy - d, c: '#3498db', l: 'A' },
+            { x: cx + d, y: cy - d, c: '#3498db', l: 'A' },
+            { x: cx - d, y: cy + d, c: '#e74c3c', l: 'B' },
+            { x: cx + d, y: cy + d, c: '#e74c3c', l: 'B' }
+        ];
+
+        ctx.save();
+        ctx.setLineDash([3, 3]); ctx.lineWidth = 3; ctx.lineCap = 'round';
+        ctx.strokeStyle = 'rgba(213,155,234,0.85)';
+        [[0,1],[2,3],[0,2],[1,3]].forEach(([a, b]) => {
+            ctx.beginPath(); ctx.moveTo(pts[a].x, pts[a].y); ctx.lineTo(pts[b].x, pts[b].y); ctx.stroke();
+        });
+        ctx.restore();
+
+        pts.forEach(p => {
+            ctx.fillStyle = p.c;
+            ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.font = "bold 12px 'Segoe UI', sans-serif";
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(p.l, p.x, p.y + 1);
+        });
+
+        // Skarp parentes med ‡
+        const bx = d + 24, by = d + 20;
+        ctx.strokeStyle = '#d59bea'; ctx.lineWidth = 2; ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(cx - bx + 8, cy - by); ctx.lineTo(cx - bx, cy - by);
+        ctx.lineTo(cx - bx, cy + by);     ctx.lineTo(cx - bx + 8, cy + by);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx + bx - 8, cy - by); ctx.lineTo(cx + bx, cy - by);
+        ctx.lineTo(cx + bx, cy + by);     ctx.lineTo(cx + bx - 8, cy + by);
+        ctx.stroke();
+        ctx.fillStyle = '#d59bea';
+        ctx.font = "bold 16px 'Segoe UI', sans-serif";
+        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillText('‡', cx + bx + 3, cy - by + 7);
+    }
+
+    function drawBall() {
+        const E = curveEnergy(state.ball.t, state.catalyst);
+        const x = tToX(state.ball.t);
+        const y = energyToY(E);
+        const yTot = energyToY(totalEnergy());
+
+        if (state.animating) {
+            const eKinNow = Math.max(0, totalEnergy() - E);
+            ctx.strokeStyle = 'rgba(52,152,219,0.9)';
+            ctx.lineWidth = 2; ctx.setLineDash([3, 3]);
+            ctx.beginPath(); ctx.moveTo(x, y - 11); ctx.lineTo(x, yTot); ctx.stroke();
+            ctx.setLineDash([]);
+            if (Math.abs(y - yTot) > 34) {
+                chip(`E_kin = ${fmtU(eKinNow)}`, x + 12, (y + yTot) / 2, 'left', '#8ecbf0',
+                     "bold 12px 'Segoe UI', sans-serif");
+            }
+        }
+
+        ctx.save();
+        ctx.shadowBlur = 16; ctx.shadowColor = '#3498db';
+        ctx.fillStyle = '#3498db';
+        ctx.beginPath(); ctx.arc(x, y - 11, 11, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+        ctx.fillStyle = 'rgba(255,255,255,0.55)';
+        ctx.beginPath(); ctx.arc(x - 3.5, y - 15, 3.5, 0, Math.PI * 2); ctx.fill();
+    }
+
+    /* ========================================================
+       7) TOP-BADGES
+       ======================================================== */
+    function drawBadges() {
+        const dH = deltaH();
+        const exo = dH < -0.0001, endo = dH > 0.0001;
+        const col = exo ? '#2ecc71' : (endo ? '#e74c3c' : '#bbbbbb');
+        const bg  = exo ? 'rgba(46,204,113,0.13)' : (endo ? 'rgba(231,76,60,0.13)' : 'rgba(255,255,255,0.07)');
+
+        // Venstre: ΔH med enhed + type
+        const x = 105, y = 10, w = 470, h = 50;
+        ctx.fillStyle = bg; ctx.strokeStyle = col; ctx.lineWidth = 1.5;
+        roundRect(x, y, w, h, 9); ctx.fill(); ctx.stroke();
+
+        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = col;
+        ctx.font = "bold 21px 'Segoe UI', sans-serif";
+        const label = exo ? 'EXOTERM' : (endo ? 'ENDOTERM' : 'TERMONEUTRAL');
+        ctx.fillText(label, x + 16, y + h / 2);
+        const lw = ctx.measureText(label).width;
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = "bold 19px 'Segoe UI', sans-serif";
+        ctx.fillText(`ΔH = ${fmtSignedU(dH)}`, x + 30 + lw, y + h / 2 - 9);
+
+        ctx.fillStyle = '#a9a9a9';
+        ctx.font = "12.5px 'Segoe UI', sans-serif";
+        ctx.fillText(exo  ? 'Energi frigives til omgivelserne'
+                   : endo ? 'Energi optages fra omgivelserne'
+                          : 'Hverken varme afgives eller optages', x + 30 + lw, y + h / 2 + 12);
+
+        // Højre: kan barrieren passeres ved denne temperatur?
+        const ok = reactionPossible();
+        const x2 = 600, w2 = 330;
+        ctx.fillStyle = ok ? 'rgba(46,204,113,0.13)' : 'rgba(231,76,60,0.13)';
+        ctx.strokeStyle = ok ? '#2ecc71' : '#e74c3c';
+        roundRect(x2, y, w2, h, 9); ctx.fill(); ctx.stroke();
+
+        ctx.fillStyle = ok ? '#2ecc71' : '#e74c3c';
+        ctx.font = "bold 15px 'Segoe UI', sans-serif";
+        ctx.fillText(ok ? '✔  E_kin ≥ Eₐ — barrieren kan passeres'
+                        : '✖  E_kin < Eₐ — barrieren kan ikke passeres', x2 + 14, y + h / 2 - 9);
+        ctx.fillStyle = '#a9a9a9';
+        ctx.font = "12.5px 'Segoe UI', sans-serif";
+        ctx.fillText(`T = ${state.T} K   ·   E_kin = ${fmtU(eKin())}`, x2 + 14, y + h / 2 + 12);
+    }
+
+    /* ========================================================
+       8) VARME- OG GNISTPARTIKLER
+       ======================================================== */
+    // Exoterm: energien stråler væk fra systemet. Endoterm: energien trækkes ind.
+    function spawnHeat(x, y, exo) {
+        for (let i = 0; i < 2; i++) {
+            const ang = Math.random() * Math.PI * 2;
+            const sp = 1.1 + Math.random() * 1.7;
+            state.heat.push(exo
+                ? { x, y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp,
+                    r: 2 + Math.random() * 3, life: 1, decay: 0.016, color: '#f39c12' }
+                : { x: x + Math.cos(ang) * 70, y: y + Math.sin(ang) * 70,
+                    vx: -Math.cos(ang) * sp, vy: -Math.sin(ang) * sp,
+                    r: 2 + Math.random() * 3, life: 1, decay: 0.016, color: '#5dade2' });
+        }
+    }
+
+    function spawnSparks(x, y, n, color) {
+        for (let i = 0; i < n; i++) {
+            const ang = Math.random() * Math.PI * 2;
+            const sp = 2 + Math.random() * 4.5;
+            state.sparks.push({
+                x, y, vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp,
+                r: 1 + Math.random() * 2.5, life: 1,
+                decay: 0.02 + Math.random() * 0.03, color
+            });
+        }
+    }
+
+    function drawParticles() {
+        if (!state.heat.length && !state.sparks.length) return;
+
+        // Klip til diagramfeltet, så partiklerne ikke flyder ud over akserne
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(PLOT.left + 1, PLOT.top - 16, PLOT.right - PLOT.left, PLOT.bottom - PLOT.top + 15);
+        ctx.clip();
+        [state.heat, state.sparks].forEach(list => list.forEach(p => {
+            ctx.globalAlpha = Math.max(0, p.life);
+            ctx.fillStyle = p.color;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+        }));
+        ctx.restore();
+        ctx.globalAlpha = 1;
+
+        if (state.heat.length > 5) {
+            const exo = isExo();
+            chip(exo ? '🔥  Varme afgives til omgivelserne' : '❄  Varme optages fra omgivelserne',
+                 tToX(0.02), PLOT.bottom - 18, 'left', exo ? '#f39c12' : '#5dade2',
+                 "bold 13px 'Segoe UI', sans-serif");
+        }
+    }
+
+    function updateParticles() {
+        state.heat.forEach(p => { p.x += p.vx; p.y += p.vy; p.vx *= 0.985; p.vy *= 0.985; p.life -= p.decay; });
+        state.sparks.forEach(p => { p.x += p.vx; p.y += p.vy; p.vx *= 0.94; p.vy *= 0.94; p.life -= p.decay; });
+        state.heat   = state.heat.filter(p => p.life > 0);
+        state.sparks = state.sparks.filter(p => p.life > 0);
+    }
+
+    /* ========================================================
+       9) ANIMATION
+       ======================================================== */
+    function startReaction() {
+        if (state.animating) return;
+        state.animating = true;
+        state.ball = { t: 0.15, dir: 1, reacted: false, active: true };
+        state.heat = []; state.sparks = [];
+        setControlsEnabled(false);
+        hideResult();
+    }
+
+    function stepPhysics() {
+        if (!state.animating) return;
+
+        const Epot = curveEnergy(state.ball.t, state.catalyst);
+        const Ekin = totalEnergy() - Epot;
+        const bx = tToX(state.ball.t);
+        const by = energyToY(Epot) - 11;
+
+        // Vendepunkt: molekylerne har ikke energi nok til at nå det aktiverede kompleks
+        if (Ekin <= 0 && state.ball.dir === 1) {
+            state.ball.dir = -1;
+            spawnSparks(bx, by, 26, '#e74c3c');
+            showResult(false,
+                `Ikke nok energi ved ${state.T} K: E_kin = ${fmtU(eKin())} &lt; Eₐ = ${fmtU(getActiveEa())}.<br>` +
+                `Molekylerne preller af — hæv temperaturen eller tilføj en katalysator.`);
+        }
+
+        // Hastighed ∝ √(kinetisk energi)
+        const v = Math.sqrt(Math.max(0.6, Ekin)) * 0.0013;
+        state.ball.t += v * state.ball.dir;
+
+        // Endoterm: energi optages på vej op. Exoterm: energi afgives på vej ned.
+        if (isExo()) {
+            if (state.ball.reacted && state.ball.t > 0.52 && state.ball.t < 0.9) spawnHeat(bx, by, true);
+        } else if (deltaH() > 0) {
+            if (state.ball.dir === 1 && state.ball.t > 0.2 && state.ball.t < 0.5) spawnHeat(bx, by, false);
+        }
+
+        if (!state.ball.reacted && state.ball.dir === 1 && state.ball.t >= 0.5) {
+            state.ball.reacted = true;
+            spawnSparks(bx, by, 30, '#9b59b6');
+        }
+
+        if (state.ball.t >= 0.85) {
+            state.ball.t = 0.85;
+            finishRun();
+            const dH = deltaH();
+            showResult(true, `Reaktionen forløb!  ΔH = ${fmtSignedU(dH)} — ` +
+                (isExo() ? `<b>exoterm</b>, der frigives ${fmtU(Math.abs(dH))}.`
+                         : (dH > 0 ? `<b>endoterm</b>, der optages ${fmtU(dH)}.` : `<b>termoneutral</b>.`)));
+        } else if (state.ball.t <= 0.15 && state.ball.dir === -1) {
+            state.ball.t = 0.15;
+            finishRun();
+        }
+    }
+
+    function finishRun() {
+        state.animating = false;
+        setControlsEnabled(true);
+    }
+
+    function showResult(success, html) {
+        UI.res_box.innerHTML = `<span class="${success ? 'success-text' : 'fail-text'}">${html}</span>`;
+        UI.res_box.style.opacity = 1;
+        clearTimeout(showResult._t);
+        showResult._t = setTimeout(hideResult, 5200);
+    }
+    function hideResult() { UI.res_box.style.opacity = 0; }
+
+    function draw() {
+        ctx.clearRect(0, 0, LW, LH);
+        drawBadges();
+        drawDiagram();
+    }
+
+    function tick() {
+        stepPhysics();
+        updateParticles();
+        draw();
+        requestAnimationFrame(tick);
+    }
+
+    /* ========================================================
+       10) QUIZ
+       ======================================================== */
+    const tasks = [
+        {
+            type: 'sim',
+            text: 'Opgave 1: Indstil skyderne, så reaktionen bliver exoterm (ΔH < 0). Aflæs ΔH med enhed i badgen øverst til venstre.',
+            check: () => deltaH() < 0,
+            ok: () => `Rigtigt — ΔH = ${fmtSignedU(deltaH())}. Produkterne ligger lavere end reaktanterne, så energi frigives.`
+        },
+        {
+            type: 'mc',
+            text: 'Opgave 2: Hvad kendetegner det aktiverede kompleks?',
+            options: [
+                'Et stabilt mellemprodukt, der kan isoleres og opbevares i et lukket rør ligesom et almindeligt stof.',
+                'Strukturen i toppen af energikurven, hvor gamle bindinger er delvist brudt og nye delvist dannet.',
+                'Det samme kemiske stof som slutprodukterne, bare ved en lidt højere temperatur end normalt.',
+                'En struktur med lavere energi end både reaktanterne og de færdige produkter.'
+            ],
+            answer: 1,
+            ok: () => 'Præcis — det er toppunktet på reaktionsvejen. Det kan ikke isoleres (levetid ca. 10⁻¹³ s), og energien op til det er netop Eₐ.'
+        },
+        {
+            type: 'sim',
+            text: 'Opgave 3: Lav en endoterm reaktion (ΔH > 0) med en aktiveringsenergi Eₐ over 100 kJ/mol. Læg mærke til, at Eₐ altid må være større end ΔH.',
+            check: () => deltaH() > 0 && getActiveEa() > 100,
+            ok: () => `Godt — ΔH = ${fmtSignedU(deltaH())} (endoterm) og Eₐ = ${fmtU(getActiveEa())}.`
+        },
+        {
+            type: 'sim',
+            text: 'Opgave 4: Indstil reaktionsentalpien til præcis ΔH = +40,0 kJ/mol.',
+            check: () => Math.abs(deltaH() - 40) < 0.5,
+            ok: () => 'Korrekt: ΔH = +40,0 kJ/mol — reaktionen optager 40,0 kJ pr. mol omsætning.'
+        },
+        {
+            type: 'mc',
+            text: 'Opgave 5: Hvad sker der, når du skruer op for temperaturen?',
+            options: [
+                'Aktiveringsenergien Eₐ bliver mindre, fordi molekylerne bevæger sig hurtigere ved højere temperatur.',
+                'ΔH bliver mere negativ, fordi reaktionen frigiver mere energi ved den højere temperatur.',
+                'Flere molekyler får energi nok til at komme op til det aktiverede kompleks — Eₐ og ΔH er uændrede.',
+                'Det aktiverede kompleks forsvinder helt, så reaktionen kan forløbe helt uden energibarriere.'
+            ],
+            answer: 2,
+            ok: () => 'Rigtigt — temperaturen ændrer hverken barrierens højde eller ΔH. Den flytter kun den vandrette energilinje op, så flere molekyler kan komme over.'
+        },
+        {
+            type: 'sim',
+            text: 'Opgave 6: Find den laveste temperatur, hvor reaktionen lige akkurat kan forløbe. Skru langsomt op, indtil badgen øverst til højre skifter fra rød til grøn — og stop der.',
+            check: () => {
+                const over = eKin() - getActiveEa();
+                return over >= 0 && (over < 6 || state.T <= 210);
+            },
+            ok: () => (eKin() - getActiveEa() < 6)
+                ? `Fint ramt: ved ${state.T} K er E_kin = ${fmtU(eKin())} — lige netop over Eₐ = ${fmtU(getActiveEa())}. Tryk "Test reaktion" og se kuglen snige sig over toppen.`
+                : `Godt set: Eₐ er kun ${fmtU(getActiveEa())}, så reaktionen kan forløbe helt ned til den laveste temperatur på skyderen.`
+        },
+        {
+            type: 'sim',
+            text: 'Opgave 7: Slå katalysatoren til, og indstil temperaturen, så reaktionen KUN kan forløbe med katalysator (E_kin skal ligge mellem den katalyserede og den ukatalyserede Eₐ).',
+            check: () => state.catalyst && eKin() >= getActiveEa() && eKin() < state.eA,
+            ok: () => `Flot — ved ${state.T} K er E_kin = ${fmtU(eKin())}: nok til den katalyserede vej (Eₐ = ${fmtU(getActiveEa())}), men ikke til den ukatalyserede (Eₐ = ${fmtU(state.eA)}).`
+        }
+    ];
+
+    function startQuiz() {
+        state.quizOpen = true;
+        state.taskIndex = 0;
+        if (state.animating) finishRun();   // afbryd en igangværende animation, så nulstillingen slår igennem
+        resetState();                       // diagrammet stilles tilbage til udgangspunktet
+        document.getElementById('quiz-launch').hidden = true;
+        document.getElementById('quiz-panel').hidden = false;
+        loadTask();
+        document.getElementById('task-feedback').innerHTML =
+            "<span style='color:var(--text-muted)'>Diagrammet er nulstillet til udgangspunktet.</span>";
+        resizeCanvas();
+    }
+
+    function closeQuiz() {
+        state.quizOpen = false;
+        document.getElementById('quiz-panel').hidden = true;
+        document.getElementById('quiz-launch').hidden = false;
+        resizeCanvas();
+    }
+
+    function loadTask() {
+        const t = tasks[state.taskIndex];
+        state.mcChoice = -1;
+        document.getElementById('task-counter').innerText = `${state.taskIndex + 1}/${tasks.length}`;
+        document.getElementById('task-text').innerText = t.text;
+        document.getElementById('task-feedback').innerHTML = '';
+
+        const box = document.getElementById('task-options');
+        box.innerHTML = '';
+        if (t.type === 'mc') {
+            const order = t.options.map((_, i) => i);
+            for (let i = order.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [order[i], order[j]] = [order[j], order[i]];
+            }
+            order.forEach(origIndex => {
+                const lab = document.createElement('label');
+                const inp = document.createElement('input');
+                inp.type = 'radio'; inp.name = 'mc'; inp.value = origIndex;
+                inp.addEventListener('change', () => state.mcChoice = origIndex);
+                lab.appendChild(inp);
+                lab.appendChild(document.createTextNode(t.options[origIndex]));
+                box.appendChild(lab);
+            });
+        }
+    }
+
+    function nextTask() {
+        if (state.taskIndex < tasks.length - 1) {
+            state.taskIndex++;
+            loadTask();
+        } else {
+            document.getElementById('task-feedback').innerHTML =
+                "<span style='color:var(--accent-purple)'>Det var den sidste opgave.</span>";
+        }
+    }
+
+    function checkTask() {
+        const t = tasks[state.taskIndex];
+        const fb = document.getElementById('task-feedback');
+        let correct;
+
+        if (t.type === 'mc') {
+            if (state.mcChoice < 0) {
+                fb.innerHTML = "<span style='color:var(--accent-orange)'>Vælg et svar først.</span>";
+                return;
+            }
+            correct = state.mcChoice === t.answer;
+        } else {
+            correct = t.check();
+        }
+
+        if (correct) {
+            fb.innerHTML = `<span style='color:var(--accent-green)'>✔ ${t.ok()}</span>`;
+            if (state.taskIndex < tasks.length - 1) {
+                setTimeout(() => { state.taskIndex++; loadTask(); }, 2800);
+            } else {
+                setTimeout(() => {
+                    fb.innerHTML = "<span style='color:var(--accent-purple)'>🎉 Du har gennemført alle træningsopgaverne!</span>";
+                }, 2800);
+            }
+        } else {
+            fb.innerHTML = "<span style='color:var(--accent-red)'>✖ Ikke helt endnu — juster og prøv igen.</span>";
+        }
+    }
+
+    /* ========================================================
+       11) EVENTS & OPSTART
+       ======================================================== */
+    function bindEvents() {
+        [UI.sl_hR, UI.sl_hP, UI.sl_eA, UI.sl_T].forEach(s => s.addEventListener('input', readSliders));
+        window.addEventListener('resize', resizeCanvas);
+
+        const nearPeak = e => {
+            const r = canvas.getBoundingClientRect();
+            const x = (e.clientX - r.left) / r.width * LW;
+            const y = (e.clientY - r.top) / r.height * LH;
+            return Math.hypot(x - tToX(0.5), y - energyToY(peakEnergy(state.catalyst))) < 34;
+        };
+
+        canvas.addEventListener('mousemove', e => {
+            state.hoverPeak = nearPeak(e);
+            canvas.style.cursor = state.hoverPeak ? 'help' : 'default';
+        });
+        canvas.addEventListener('mouseleave', () => state.hoverPeak = false);
+        canvas.addEventListener('pointerdown', e => {
+            state.pinComplex = nearPeak(e) ? !state.pinComplex : false;
+        });
+
+        // Mellemrum starter forsøget — men ikke når fokus ligger på en knap/skyder
+        document.addEventListener('keydown', e => {
+            const tag = (e.target.tagName || '').toLowerCase();
+            if (tag === 'button' || tag === 'input' || tag === 'summary') return;
+            if (e.code === 'Space' && !state.animating) { e.preventDefault(); startReaction(); }
+        });
+    }
+
+    window.addEventListener('load', () => {
+        resizeCanvas();
+        bindEvents();
+        readSliders();
+        requestAnimationFrame(tick);
+    });
+    </script>
+</body>
+</html>

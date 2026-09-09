@@ -1,0 +1,741 @@
+﻿<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kemi-Træner: Mængdeberegning</title>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --primary: #0ea5e9;
+            --primary-hover: #0284c7;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #22c55e;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --focus-ring: rgba(14, 165, 233, 0.2);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 12px;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* CONTAINER */
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        /* HEADER & TABS */
+        header {
+            background: #f1f5f9;
+            border-bottom: 1px solid var(--border);
+            padding: 16px 20px 0 20px;
+        }
+
+        h1 {
+            margin: 0 0 14px 0;
+            font-size: 1.25rem;
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: 1px solid transparent;
+            border-bottom: none;
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-radius: 8px 8px 0 0;
+            transition: all 0.2s;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            background: #e2e8f0;
+            color: var(--text-main);
+        }
+
+        .tab-btn.active {
+            background: var(--card-bg);
+            color: var(--primary);
+            border-color: var(--border);
+            border-bottom-color: var(--card-bg);
+            margin-bottom: -1px;
+            z-index: 10;
+        }
+
+        /* OPGAVE INDHOLD */
+        .exercise-content {
+            padding: 24px 28px;
+            min-height: 0;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 18px;
+            margin-bottom: 8px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 5px;
+        }
+
+        .reaction-scheme {
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            font-size: 1.05rem;
+            margin-bottom: 14px;
+            border: 2px dashed var(--border);
+            color: #334155;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        /* Input inside reaction scheme (coeff) */
+        .coeff-input {
+            width: 40px;
+            padding: 4px;
+            text-align: center;
+            font-family: inherit;
+            font-size: 1.1rem;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            margin: 0 2px;
+            background: white;
+        }
+        .coeff-input:focus { outline: none; border-color: var(--primary); }
+        .coeff-input.wrong { border-color: var(--error); background: #fef2f2; }
+        .coeff-input.correct { border-color: var(--success); background: #f0fdf4; }
+
+        .question-text {
+            font-size: 1rem;
+            margin-bottom: 18px;
+            color: #334155;
+        }
+
+        /* INPUTS */
+        .input-group {
+            margin-bottom: 10px;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .chem-label {
+            min-width: 150px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        input[type="text"].answer-input {
+            padding: 8px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 100px;
+            text-align: center;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        input[type="text"].answer-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--focus-ring);
+        }
+
+        input.correct { border-color: var(--success); background-color: #f0fdf4; color: #15803d; }
+        input.wrong { border-color: var(--error); background-color: #fef2f2; animation: shake 0.4s ease-in-out; }
+
+        .hint-text {
+            display: none;
+            font-size: 0.85rem;
+            color: var(--error);
+            margin-top: 5px;
+            margin-left: 165px; /* Align under input */
+            font-style: italic;
+        }
+
+        /* KNAPPER */
+        .action-bar {
+            margin-top: 22px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            padding-top: 16px;
+        }
+
+        .btn-check {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 26px;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.3);
+        }
+
+        .btn-check:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* FEEDBACK AREA */
+        .feedback-box {
+            margin-top: 16px;
+            padding: 16px;
+            border-radius: 8px;
+            background: #f8fafc;
+            border-left: 5px solid transparent;
+            display: none;
+            font-size: 0.95rem;
+            scroll-margin: 20px;
+        }
+        
+        .feedback-box.visible { display: block; animation: slideDown 0.3s ease; }
+        .feedback-box.success { border-color: var(--success); background: #f0fdf4; }
+        .feedback-box.error { border-color: var(--error); background: #fef2f2; }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* FEATURE: RATIO VISUALIZER (BARS) */
+        .ratio-bar-container {
+            flex: 1;
+            height: 12px;
+            background: #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+            display: none;
+            max-width: 200px;
+            margin-left: 10px;
+        }
+        
+        .ratio-bar-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .unit { color: var(--text-muted); font-weight: 500; font-size: 0.9rem; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @media (max-width: 600px) {
+            .input-row { flex-direction: column; align-items: flex-start; gap: 8px; margin-bottom: 25px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; }
+            .chem-label { min-width: auto; font-size: 1rem; }
+            .ratio-bar-container { width: 100%; max-width: none; margin-top: 8px; margin-left: 0; }
+            .action-bar { justify-content: center; }
+            .btn-check { width: 100%; }
+            .hint-text { margin-left: 0; }
+        }
+
+        /* Kompakt layout på lav skærmopløsning, så alt (inkl. feedback) kan ses uden scroll */
+        @media (max-height: 750px) {
+            body { padding: 6px; }
+            header { padding: 12px 18px 0 18px; }
+            h1 { margin-bottom: 8px; font-size: 1.1rem; }
+            .tab-btn { padding: 7px 14px; font-size: 0.85rem; }
+            .exercise-content { padding: 16px 22px; }
+            .question-text { margin-bottom: 12px; }
+            .section-title { margin-top: 12px; margin-bottom: 6px; }
+            .reaction-scheme { padding: 8px; margin-bottom: 10px; }
+            .action-bar { margin-top: 14px; padding-top: 12px; }
+            .feedback-box { margin-top: 12px; padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Aktuel koncentration</h1>
+        <div class="tabs" id="tab-container">
+            </div>
+    </header>
+
+    <div class="exercise-content" id="exercise-area">
+        </div>
+</div>
+
+<script>
+    /* DATA STRUKTUR
+       'inputs' kan nu indeholde 'customRender' eller være knyttet til sections.
+       Vi bruger en simpel liste, men renderer dem smart.
+    */
+    const tasks = [
+        {
+            id: 1,
+            title: "Opgave 1: Kaliumiodid",
+            chem: "KI(s) ⟶ K⁺(aq) + I⁻(aq)",
+            desc: "Der laves en kaliumiodid (KI) opløsning med den formelle koncentration <strong>0,65 M</strong>.<br>Hvad er de aktuelle koncentrationer af ionerne?",
+            inputs: [
+                { label: "[K⁺]", unit: "M", ans: 0.65, ratio: 1, hint: "Forholdet er 1:1" },
+                { label: "[I⁻]", unit: "M", ans: 0.65, ratio: 1, hint: "Forholdet er 1:1" }
+            ],
+            explanation: "Støkiometrien er 1:1. <br>[K⁺] = 0,65 M og [I⁻] = 0,65 M."
+        },
+        {
+            id: 2,
+            title: "Opgave 2: Calciumchlorid",
+            chem: "CaCl₂(s) ⟶ Ca²⁺(aq) + 2 Cl⁻(aq)",
+            desc: "Der laves en calciumchlorid opløsning med den formelle koncentration <strong>0,24 M</strong>.<br>Husk at tage højde for koefficienterne i reaktionsskemaet.",
+            inputs: [
+                { label: "[Ca²⁺]", unit: "M", ans: 0.24, ratio: 1, hint: "Ca²⁺ har koefficienten 1." },
+                { label: "[Cl⁻]", unit: "M", ans: 0.48, ratio: 2, hint: "Husk at gange med 2 (se skemaet)." }
+            ],
+            explanation: "Forholdet er 1:2. <br>[Ca²⁺] = 0,24 M.<br>[Cl⁻] = 2 · 0,24 M = 0,48 M."
+        },
+        {
+            id: 3,
+            title: "Opgave 3: Bariumchlorid",
+            chem: "BaCl₂(s) ⟶ Ba²⁺(aq) + 2 Cl⁻(aq)",
+            desc: "Den formelle koncentration måles til <strong>0,18 M</strong>.<br>Bestem de aktuelle ion-koncentrationer.",
+            inputs: [
+                { label: "[Ba²⁺]", unit: "M", ans: 0.18, ratio: 1, hint: "1:1 forhold for barium." },
+                { label: "[Cl⁻]", unit: "M", ans: 0.36, ratio: 2, hint: "Der er 2 klorider for hver barium." }
+            ],
+            explanation: "[Ba²⁺] = 0,18 M.<br>[Cl⁻] = 2 · 0,18 = 0,36 M."
+        },
+        {
+            id: 4,
+            title: "Opgave 4: Aluminiumsulfat",
+            chem: "Al₂(SO₄)₃(s) ⟶ 2 Al³⁺(aq) + 3 SO₄²⁻(aq)",
+            desc: "Formel koncentration: <strong>0,120 M</strong>.<br>Vær opmærksom på, at begge ioner har koefficienter større end 1.",
+            inputs: [
+                { label: "[Al³⁺]", unit: "M", ans: 0.240, ratio: 2, hint: "Der er 2 aluminium-ioner i formlen." },
+                { label: "[SO₄²⁻]", unit: "M", ans: 0.360, ratio: 3, hint: "Der er 3 sulfat-grupper i formlen." }
+            ],
+            explanation: "[Al³⁺] = 2 · 0,120 = 0,240 M.<br>[SO₄²⁻] = 3 · 0,120 = 0,360 M."
+        },
+        
+        // --- SCAFFOLDED OPGAVE 5 ---
+        {
+            id: 5,
+            title: "Opgave 5: Blanding (Trin-for-trin)",
+            // Vi bruger en custom HTML struktur til denne opgave
+            customHTML: true,
+            desc: "Vi blander to opløsninger:<br>A) <strong>0,25 M CaCl₂</strong><br>B) <strong>0,15 M AlCl₃</strong><br>Vi vil finde den totale chlorid-koncentration.",
+            inputs: [
+                // STEP 1: Afstemning
+                { id: "c1", type: "coeff", ans: 2, hint: "Hvor mange Cl er der i CaCl₂?" },
+                { id: "c2", type: "coeff", ans: 3, hint: "Hvor mange Cl er der i AlCl₃?" },
+                
+                // STEP 2: Beregninger
+                { label: "Bidrag fra CaCl₂", unit: "M Cl⁻", ans: 0.50, ratio: 5, hint: "Gang koncentrationen (0,25) med antallet af Cl." },
+                { label: "Bidrag fra AlCl₃", unit: "M Cl⁻", ans: 0.45, ratio: 4.5, hint: "Gang koncentrationen (0,15) med antallet af Cl." },
+                
+                // STEP 3: Total
+                { label: "[Cl⁻] total", unit: "M", ans: 0.95, ratio: 9.5, hint: "Læg de to bidrag sammen." }
+            ],
+            explanation: "<strong>1. Bidrag fra CaCl₂:</strong> 2 · 0,25 M = 0,50 M<br><strong>2. Bidrag fra AlCl₃:</strong> 3 · 0,15 M = 0,45 M<br><strong>3. Total:</strong> 0,50 + 0,45 = 0,95 M"
+        },
+
+        // --- SCAFFOLDED OPGAVE 6 ---
+        {
+            id: 6,
+            title: "Opgave 6: Fra masse til c",
+            // Custom HTML struktur med afstemning først
+            customHTML: true,
+            desc: "<strong>4,14 g</strong> bly(II)nitrat, Pb(NO₃)₂, opløses i vand til et volumen på <strong>250 mL</strong> (0,250 L).<br>Molarmassen er <strong>331,2 g/mol</strong>.",
+            inputs: [
+                // STEP 1: Afstemning
+                { id: "c6", type: "coeff", ans: 2, hint: "Der er 2 nitratgrupper i formlen." },
+
+                // STEP 2: Mellemregninger
+                { label: "Stofmængde <i>n</i> af Pb(NO₃)₂", unit: "mol", ans: 0.0125, ratio: 0, hint: "n = m / M" },
+                { label: "Formel konc. <i>c</i> af Pb(NO₃)₂", unit: "M", ans: 0.050, ratio: 1, hint: "c = n / V (husk V i Liter)" },
+                
+                // STEP 3: Ioner
+                { label: "[Pb²⁺]", unit: "M", ans: 0.050, ratio: 1, hint: "Koefficienten er 1." },
+                { label: "[NO₃⁻]", unit: "M", ans: 0.100, ratio: 2, hint: "Husk koefficienten fra reaktionsskemaet." }
+            ],
+            explanation: "<strong>Stofmængde:</strong> $n = \\frac{4,14 \\text{ g}}{331,2 \\text{ g/mol}} = 0,0125 \\text{ mol}$<br><strong>Koncentration:</strong> $c = \\frac{0,0125 \\text{ mol}}{0,250 \\text{ L}} = 0,050 \\text{ M}$<br><strong>Nitrat:</strong> $[NO_3^-] = 2 \\cdot 0,050 \\text{ M} = 0,100 \\text{ M}$"
+        },
+
+        // --- SCAFFOLDED OPGAVE 7: FORTYNDING ---
+        {
+            id: 7,
+            title: "Opgave 7: Fortynding",
+            customHTML: true,
+            desc: "Der udtages <strong>25,0 mL</strong> af en <strong>0,60 M</strong> calciumchlorid-opløsning (CaCl₂), som fortyndes med vand til et samlet volumen på <strong>150 mL</strong>.<br>Brug fortyndingsformlen <strong>c₁ · V₁ = c₂ · V₂</strong> til at finde den nye formelle koncentration, og bestem derefter ionkoncentrationerne i den fortyndede opløsning.",
+            inputs: [
+                // STEP 1: Fortynding
+                { label: "Formel konc. <i>c</i> (efter fortynding)", unit: "M", ans: 0.100, ratio: 1, hint: "c₂ = (c₁ · V₁) / V₂ = (0,60 M · 25,0 mL) / 150 mL" },
+
+                // STEP 2: Ioner
+                { label: "[Ca²⁺]", unit: "M", ans: 0.100, ratio: 1, hint: "Ca²⁺ har koefficienten 1, samme som formel konc." },
+                { label: "[Cl⁻]", unit: "M", ans: 0.200, ratio: 2, hint: "Cl⁻ har koefficienten 2, så gang c med 2." }
+            ],
+            explanation: "<strong>Fortynding:</strong> c₂ = (0,60 M · 25,0 mL) / 150 mL = 0,100 M<br><strong>[Ca²⁺]:</strong> 0,100 M (koefficient 1)<br><strong>[Cl⁻]:</strong> 2 · 0,100 M = 0,200 M"
+        },
+
+        // --- SCAFFOLDED OPGAVE 8: BLANDING MED FORSKELLIGE VOLUMENER ---
+        {
+            id: 8,
+            title: "Opgave 8: Blanding (forskellige volumener)",
+            customHTML: true,
+            desc: "Man blander <strong>100 mL</strong> af en <strong>0,30 M CaCl₂</strong>-opløsning med <strong>200 mL</strong> af en <strong>0,15 M NaCl</strong>-opløsning.<br>Denne gang har opløsningerne <em>forskelligt volumen</em>, så du skal regne med stofmængder (mol), før du kan finde den samlede koncentration.",
+            inputs: [
+                // STEP 1: Stofmængde af Cl- fra hver opløsning
+                { label: "n(Cl⁻) fra CaCl₂", unit: "mol", ans: 0.0600, ratio: 0.06, hint: "n = c · V · antal Cl⁻ = 0,30 M · 0,100 L · 2" },
+                { label: "n(Cl⁻) fra NaCl", unit: "mol", ans: 0.0300, ratio: 0.03, hint: "n = c · V · antal Cl⁻ = 0,15 M · 0,200 L · 1" },
+
+                // STEP 2: Total stofmængde og volumen
+                { label: "n(Cl⁻) total", unit: "mol", ans: 0.0900, ratio: 0.09, hint: "Læg de to stofmængder sammen: 0,0600 + 0,0300 mol" },
+                { label: "V total", unit: "L", ans: 0.300, ratio: 0, hint: "Læg volumerne sammen: 100 mL + 200 mL = 300 mL = 0,300 L" },
+
+                // STEP 3: Samlet koncentration
+                { label: "[Cl⁻] total", unit: "M", ans: 0.300, ratio: 0, hint: "c = n / V (brug de totale værdier fra trin 2)" }
+            ],
+            explanation: "<strong>1. Cl⁻ fra CaCl₂:</strong> 0,30 M · 0,100 L · 2 = 0,0600 mol<br><strong>2. Cl⁻ fra NaCl:</strong> 0,15 M · 0,200 L · 1 = 0,0300 mol<br><strong>3. Total stofmængde:</strong> 0,0600 + 0,0300 = 0,0900 mol<br><strong>4. Total volumen:</strong> 0,100 L + 0,200 L = 0,300 L<br><strong>5. Samlet koncentration:</strong> c = 0,0900 mol / 0,300 L = 0,300 M"
+        },
+
+        // --- OPGAVE 9: BAGLÆNS ---
+        {
+            id: 9,
+            title: "Opgave 9: Baglæns (fra ion til formel)",
+            chem: "Na₃PO₄(s) ⟶ 3 Na⁺(aq) + PO₄³⁻(aq)",
+            desc: "En opløsning af trinatriumphosphat (Na₃PO₄) analyseres, og man måler <strong>[PO₄³⁻] = 0,15 M</strong>.<br>Tænk denne gang baglæns: brug reaktionsskemaet til at finde den formelle koncentration og den manglende ionkoncentration.",
+            inputs: [
+                { label: "Formel konc. <i>c</i>", unit: "M", ans: 0.15, ratio: 1, hint: "PO₄³⁻ har koefficienten 1, så c er lig [PO₄³⁻]." },
+                { label: "[Na⁺]", unit: "M", ans: 0.45, ratio: 3, hint: "Na⁺ har koefficienten 3, så gang c med 3." }
+            ],
+            explanation: "Da PO₄³⁻ har koefficienten 1, er den formelle koncentration lig [PO₄³⁻]: c = 0,15 M.<br>[Na⁺] = 3 · 0,15 M = 0,45 M."
+        }
+    ];
+
+    let currentTaskIndex = 0;
+
+    function init() {
+        renderTabs();
+        loadTask(0);
+        document.getElementById('exercise-area').addEventListener('keydown', handleEnterKey);
+    }
+
+    // Enter-tast: hop til næste (ikke-låste) felt, eller tjek svar hvis det er det sidste felt
+    function handleEnterKey(e) {
+        if (e.key !== 'Enter') return;
+        const target = e.target;
+        if (!target.matches('input.answer-input, input.coeff-input')) return;
+
+        e.preventDefault();
+
+        const fields = Array.from(
+            document.querySelectorAll('#exercise-area input.answer-input, #exercise-area input.coeff-input')
+        );
+        const idx = fields.indexOf(target);
+
+        let next = null;
+        for (let i = idx + 1; i < fields.length; i++) {
+            if (!fields[i].disabled) { next = fields[i]; break; }
+        }
+
+        if (next) {
+            next.focus();
+            next.select();
+        } else {
+            checkAnswer();
+        }
+    }
+
+    function renderTabs() {
+        const container = document.getElementById('tab-container');
+        container.innerHTML = '';
+        tasks.forEach((task, index) => {
+            const btn = document.createElement('button');
+            btn.className = `tab-btn ${index === currentTaskIndex ? 'active' : ''}`;
+            btn.innerText = `Opgave ${task.id}`; 
+            btn.onclick = () => loadTask(index);
+            container.appendChild(btn);
+        });
+    }
+
+    function loadTask(index) {
+        currentTaskIndex = index;
+        renderTabs(); 
+
+        const task = tasks[index];
+        const area = document.getElementById('exercise-area');
+        
+        let contentHTML = `<h2 style="margin-top:0; color:var(--primary);">${task.title}</h2>`;
+        contentHTML += `<div class="question-text">${task.desc}</div>`;
+
+        // CUSTOM RENDERING FOR OPGAVE 5 & 6 (STILLADSERING)
+        if (task.id === 5) {
+            contentHTML += `
+                <div class="section-title">Trin 1: Afstem reaktionsskemaer</div>
+                <div class="reaction-scheme">
+                    CaCl₂(s) ⟶ Ca²⁺(aq) + <input type="text" class="coeff-input" id="inp-0" placeholder="?"> Cl⁻(aq)
+                </div>
+                <div class="reaction-scheme">
+                    AlCl₃(s) ⟶ Al³⁺(aq) + <input type="text" class="coeff-input" id="inp-1" placeholder="?"> Cl⁻(aq)
+                </div>
+
+                <div class="section-title">Trin 2: Beregn chlorid-bidrag</div>
+                <div id="inputs-part1"></div> <div class="section-title">Trin 3: Samlet koncentration</div>
+                <div id="inputs-part2"></div>
+            `;
+        } 
+        else if (task.id === 6) {
+            contentHTML += `
+                <div class="section-title">Trin 1: Afstem reaktionsskema</div>
+                <div class="reaction-scheme">
+                    Pb(NO₃)₂(s) ⟶ Pb²⁺(aq) + <input type="text" class="coeff-input" id="inp-0" placeholder="?"> NO₃⁻(aq)
+                </div>
+
+                <div class="section-title">Trin 2: Beregn mængder</div>
+                <div id="inputs-part1"></div>
+            `;
+        }
+        else if (task.id === 7) {
+            contentHTML += `
+                <div class="section-title">Trin 1: Fortynding</div>
+                <div id="inputs-dilute"></div>
+
+                <div class="section-title">Trin 2: Ionkoncentrationer</div>
+                <div class="reaction-scheme">CaCl₂(aq) ⟶ Ca²⁺(aq) + 2 Cl⁻(aq)</div>
+                <div id="inputs-ions"></div>
+            `;
+        }
+        else if (task.id === 8) {
+            contentHTML += `
+                <div class="section-title">Trin 1: Stofmængde af Cl⁻ fra hver opløsning</div>
+                <div id="inputs-part1"></div>
+
+                <div class="section-title">Trin 2: Total stofmængde og volumen</div>
+                <div id="inputs-part2"></div>
+
+                <div class="section-title">Trin 3: Samlet koncentration</div>
+                <div id="inputs-part3"></div>
+            `;
+        }
+        else {
+            // STANDARD RENDERING (Opg 1-4)
+            contentHTML += `<div class="reaction-scheme">${task.chem}</div>`;
+            contentHTML += `<div id="inputs-standard"></div>`;
+        }
+
+        contentHTML += `<div class="feedback-box" id="feedback"></div>`;
+        contentHTML += `<div class="action-bar"><button class="btn-check" onclick="checkAnswer()">Tjek Svar</button></div>`;
+
+        area.innerHTML = contentHTML;
+
+        // INJECT INPUT FIELDS (For non-coefficient inputs)
+        // Vi skal holde styr på indekset i tasks.inputs arrayet.
+        // For Opg 5: index 0,1 er coeffs. 2,3 er part1. 4 er part2.
+        // For Opg 6: index 0 er coeff. 1,2 er part1 (n, c). 3,4 er part1 (ioner).
+        
+        if (task.id === 5) {
+            renderInputRow(task.inputs[2], 2, 'inputs-part1');
+            renderInputRow(task.inputs[3], 3, 'inputs-part1');
+            renderInputRow(task.inputs[4], 4, 'inputs-part2');
+        } else if (task.id === 6) {
+            renderInputRow(task.inputs[1], 1, 'inputs-part1'); // n
+            renderInputRow(task.inputs[2], 2, 'inputs-part1'); // c
+            
+            // Tilføj en lille sub-header for ioner dynamisk
+            const div = document.createElement('div');
+            div.className = 'section-title'; div.innerText = "Trin 3: Aktuelle koncentrationer";
+            document.getElementById('inputs-part1').appendChild(div);
+            
+            renderInputRow(task.inputs[3], 3, 'inputs-part1'); // Pb
+            renderInputRow(task.inputs[4], 4, 'inputs-part1'); // NO3
+        } else if (task.id === 7) {
+            renderInputRow(task.inputs[0], 0, 'inputs-dilute'); // c efter fortynding
+            renderInputRow(task.inputs[1], 1, 'inputs-ions');   // Ca2+
+            renderInputRow(task.inputs[2], 2, 'inputs-ions');   // Cl-
+        } else if (task.id === 8) {
+            renderInputRow(task.inputs[0], 0, 'inputs-part1'); // n Cl fra CaCl2
+            renderInputRow(task.inputs[1], 1, 'inputs-part1'); // n Cl fra NaCl
+            renderInputRow(task.inputs[2], 2, 'inputs-part2'); // n total
+            renderInputRow(task.inputs[3], 3, 'inputs-part2'); // V total
+            renderInputRow(task.inputs[4], 4, 'inputs-part3'); // c total
+        } else {
+            task.inputs.forEach((inp, i) => {
+                renderInputRow(inp, i, 'inputs-standard');
+            });
+        }
+
+        // Setup focus behavior
+        setTimeout(() => {
+             const firstInput = document.getElementById('inp-0'); // Coeff input usually
+             const firstStandard = document.getElementById('input-0');
+             if(firstInput) firstInput.focus();
+             else if(firstStandard) firstStandard.focus();
+        }, 50);
+    }
+
+    function renderInputRow(inp, index, containerId) {
+        const container = document.getElementById(containerId);
+        const div = document.createElement('div');
+        div.className = 'input-group';
+        
+        let ratioBarHTML = '';
+        if(inp.ratio > 0) {
+            ratioBarHTML = `
+                <div class="ratio-bar-container" title="Visuel mængde">
+                    <div class="ratio-bar-fill" id="bar-${index}" style="width:0%"></div>
+                </div>`;
+        }
+
+        // Bemærk: Vi bruger id="input-INDEX" for standard inputs, og id="inp-INDEX" for coeff inputs i HTML strengen
+        div.innerHTML = `
+            <div class="input-row">
+                <div class="chem-label">${inp.label}</div>
+                <input type="text" class="answer-input" id="input-${index}" placeholder="?" autocomplete="off">
+                <span class="unit">${inp.unit}</span>
+                ${ratioBarHTML}
+            </div>
+            <div class="hint-text" id="hint-${index}">${inp.hint}</div>
+        `;
+        container.appendChild(div);
+    }
+
+    function checkAnswer() {
+        const task = tasks[currentTaskIndex];
+        const fb = document.getElementById('feedback');
+        let allCorrect = true;
+        let firstWrongInput = null;
+
+        // Skjul alle hints først
+        document.querySelectorAll('.hint-text').forEach(el => el.style.display = 'none');
+
+        task.inputs.forEach((inp, i) => {
+            let field;
+            
+            if (inp.type === 'coeff') {
+                field = document.getElementById(`inp-${i}`); // Coeff inputs har id inp-X
+            } else {
+                field = document.getElementById(`input-${i}`); // Standard inputs har id input-X
+            }
+
+            if (!field) return; // Should not happen
+
+            // Rens input 
+            let valStr = field.value.replace(',', '.').trim();
+            let val = parseFloat(valStr);
+
+            // Validering
+            let isCorrect = false;
+            if (!isNaN(val)) {
+                // Større tolerance for flydende tal beregninger, mindre for heltal (koefficienter)
+                const tolerance = inp.type === 'coeff' ? 0.1 : 0.005;
+                if (Math.abs(val - inp.ans) <= tolerance) {
+                    isCorrect = true;
+                }
+            }
+
+            if (isCorrect) {
+                field.classList.remove('wrong');
+                field.classList.add('correct');
+                field.disabled = true; 
+
+                // Visualisering (hvis bar findes)
+                const barFill = document.getElementById(`bar-${i}`);
+                if (barFill && inp.ratio > 0) {
+                    field.parentElement.querySelector('.ratio-bar-container').style.display = 'block';
+                    const maxRatio = Math.max(...task.inputs.map(t => t.ratio || 0));
+                    const widthPct = (inp.ratio / maxRatio) * 100;
+                    setTimeout(() => { barFill.style.width = `${widthPct}%`; }, 100);
+                }
+
+            } else {
+                field.classList.add('wrong');
+                field.classList.remove('correct');
+                allCorrect = false;
+                
+                // Vis hint
+                const hintEl = document.getElementById(`hint-${i}`);
+                if(hintEl) {
+                    hintEl.style.display = 'block';
+                } else if (inp.type === 'coeff') {
+                    // Hvis det er coeff felt, lav en midlertidig tooltip eller bare rød ramme
+                    // (I dette design er hints kun kodet til standard rækker, så vi tilføjer ikke tekst for coeffs, bare rød farve)
+                }
+
+                if(!firstWrongInput) firstWrongInput = field;
+            }
+        });
+
+        if (allCorrect) {
+            // Formater forklaringen for LaTeX-lignende matematik ($ tegn fjernes i tekst men beholdes i logikken hvis nødvendigt)
+            // Vi bruger en simpel replace for at gøre det pænt
+            let explanation = task.explanation.replace(/\$/g, ''); 
+            
+            fb.innerHTML = `
+                <strong style="color:var(--success)">Korrekt!</strong><br>
+                <div style="margin-top:10px; color:#475569; border-top:1px solid #e2e8f0; padding-top:10px;">
+                    ${explanation}
+                </div>
+            `;
+            fb.className = "feedback-box visible success";
+            fb.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            fb.innerHTML = `
+                <strong style="color:var(--error)">Der er fejl</strong><br>
+                Kig efter de røde felter og læs de hints, der er dukket op under dem.
+            `;
+            fb.className = "feedback-box visible error";
+            if (firstWrongInput) {
+                firstWrongInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstWrongInput.focus();
+            }
+        }
+    }
+
+    // Start app
+    init();
+
+</script>
+
+</body>
+</html>

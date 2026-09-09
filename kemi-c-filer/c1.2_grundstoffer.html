@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grundstoffer og Elektronstruktur</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        .periodic-table-grid {
+            display: grid;
+            grid-template-columns: repeat(18, minmax(38px, 1fr));
+            gap: 2px;
+        }
+        .element-cell {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            cursor: default;
+        }
+        .element-cell .z-label {
+            font-size: 0.5rem;
+            line-height: 1;
+            color: #64748b;
+        }
+        .element-cell .sym-label {
+            font-size: 0.8rem;
+            line-height: 1.15;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useRef, useMemo } = React;
+
+        // --- HELPERS: korrekte kemiske formler og isotopnotation med unicode ---
+        const SUB_DIGITS = { '0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄', '5': '₅', '6': '₆', '7': '₇', '8': '₈', '9': '₉' };
+        const SUP_DIGITS = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+
+        const toSub = (n) => String(n).split('').map(d => SUB_DIGITS[d] || d).join('');
+        const toSup = (n) => String(n).split('').map(d => SUP_DIGITS[d] || d).join('');
+
+        // Neutral formel, fx "Al2(SO4)3" -> "Al₂(SO₄)₃"
+        const formatFormula = (formula) => formula.replace(/\d+/g, (m) => toSub(m));
+
+        // En brugers svar for elektronstruktur kan skrives med kommaer, mellemrum eller
+        // bindestreger som adskillere (fx "2,8,1" eller "2 8 1") — vi sammenligner kun tallene.
+        const normalizeStructure = (str) => (str.match(/\d+/g) || []).join(',');
+
+        // Fordeler elektroner i skaller efter den model, der undervises i på Kemi C:
+        // 1. skal max 2, 2. skal max 8, 3. skal normalt max 8. Men for grundstoffer efter
+        // nr. 20 (Ca) er overgangsmetallernes 3d-elektroner "usynligt" fyldt ind i 3. skal,
+        // så den kan rumme op til 18 — resten lægges i 4. skal (fx Br: 2,8,18,7).
+        const shellFill = (electrons) => {
+            const shells = [];
+            let remaining = electrons;
+            let put = Math.min(remaining, 2);
+            shells.push(put); remaining -= put;
+            if (remaining <= 0) return shells;
+            put = Math.min(remaining, 8);
+            shells.push(put); remaining -= put;
+            if (remaining <= 0) return shells;
+            const cap3 = electrons > 20 ? 18 : 8;
+            put = Math.min(remaining, cap3);
+            shells.push(put); remaining -= put;
+            if (remaining <= 0) return shells;
+            shells.push(remaining);
+            return shells;
+        };
+
+        // --- DATA: grundstoffer periode 1-4 (Z 1-36), til opslag af atomnummer og navn ---
+        const ELEMENTS = [
+            { z: 1, sym: "H", period: 1, group: 1, cat: "nonmetal", name: "Hydrogen", alt: ["Brint"] },
+            { z: 2, sym: "He", period: 1, group: 18, cat: "noble", name: "Helium" },
+            { z: 3, sym: "Li", period: 2, group: 1, cat: "alkali", name: "Lithium" },
+            { z: 4, sym: "Be", period: 2, group: 2, cat: "alkaline", name: "Beryllium" },
+            { z: 5, sym: "B", period: 2, group: 13, cat: "metalloid", name: "Bor" },
+            { z: 6, sym: "C", period: 2, group: 14, cat: "nonmetal", name: "Carbon", alt: ["Kulstof"] },
+            { z: 7, sym: "N", period: 2, group: 15, cat: "nonmetal", name: "Nitrogen", alt: ["Kvælstof"] },
+            { z: 8, sym: "O", period: 2, group: 16, cat: "nonmetal", name: "Oxygen", alt: ["Ilt"] },
+            { z: 9, sym: "F", period: 2, group: 17, cat: "halogen", name: "Fluor" },
+            { z: 10, sym: "Ne", period: 2, group: 18, cat: "noble", name: "Neon" },
+            { z: 11, sym: "Na", period: 3, group: 1, cat: "alkali", name: "Natrium" },
+            { z: 12, sym: "Mg", period: 3, group: 2, cat: "alkaline", name: "Magnesium" },
+            { z: 13, sym: "Al", period: 3, group: 13, cat: "metal", name: "Aluminium" },
+            { z: 14, sym: "Si", period: 3, group: 14, cat: "metalloid", name: "Silicium" },
+            { z: 15, sym: "P", period: 3, group: 15, cat: "nonmetal", name: "Phosphor", alt: ["Fosfor"] },
+            { z: 16, sym: "S", period: 3, group: 16, cat: "nonmetal", name: "Svovl" },
+            { z: 17, sym: "Cl", period: 3, group: 17, cat: "halogen", name: "Chlor", alt: ["Klor"] },
+            { z: 18, sym: "Ar", period: 3, group: 18, cat: "noble", name: "Argon" },
+            { z: 19, sym: "K", period: 4, group: 1, cat: "alkali", name: "Kalium" },
+            { z: 20, sym: "Ca", period: 4, group: 2, cat: "alkaline", name: "Calcium" },
+            { z: 21, sym: "Sc", period: 4, group: 3, cat: "transition", name: "Scandium" },
+            { z: 22, sym: "Ti", period: 4, group: 4, cat: "transition", name: "Titan" },
+            { z: 23, sym: "V", period: 4, group: 5, cat: "transition", name: "Vanadium" },
+            { z: 24, sym: "Cr", period: 4, group: 6, cat: "transition", name: "Chrom" },
+            { z: 25, sym: "Mn", period: 4, group: 7, cat: "transition", name: "Mangan" },
+            { z: 26, sym: "Fe", period: 4, group: 8, cat: "transition", name: "Jern" },
+            { z: 27, sym: "Co", period: 4, group: 9, cat: "transition", name: "Cobalt" },
+            { z: 28, sym: "Ni", period: 4, group: 10, cat: "transition", name: "Nikkel" },
+            { z: 29, sym: "Cu", period: 4, group: 11, cat: "transition", name: "Kobber" },
+            { z: 30, sym: "Zn", period: 4, group: 12, cat: "transition", name: "Zink" },
+            { z: 31, sym: "Ga", period: 4, group: 13, cat: "metal", name: "Gallium" },
+            { z: 32, sym: "Ge", period: 4, group: 14, cat: "metalloid", name: "Germanium" },
+            { z: 33, sym: "As", period: 4, group: 15, cat: "metalloid", name: "Arsen" },
+            { z: 34, sym: "Se", period: 4, group: 16, cat: "nonmetal", name: "Selen" },
+            { z: 35, sym: "Br", period: 4, group: 17, cat: "halogen", name: "Brom" },
+            { z: 36, sym: "Kr", period: 4, group: 18, cat: "noble", name: "Krypton" },
+        ];
+        const ELEMENTS_BY_SYM = ELEMENTS.reduce((acc, e) => { acc[e.sym] = e; return acc; }, {});
+
+        // --- DATA: opgaver hentet og udbygget fra "1.1 Atomet og Elektronstruktur" ---
+        // De 6 første (H, He udeladt af originalen) svarer til de isotoper, der stod i
+        // regnearket (²³Na, ³²S, ¹⁴C, ¹⁸O, ⁷⁹Br, ²¹Ne) — resten er tilføjet for mere øvelse,
+        // i stigende rækkefølge efter atomnummer.
+        const isotopeTasks = [
+            { id: 1, sym: "H", mass: 1 },
+            { id: 2, sym: "He", mass: 4 },
+            { id: 3, sym: "C", mass: 14 },
+            { id: 4, sym: "O", mass: 18 },
+            { id: 5, sym: "Ne", mass: 21 },
+            { id: 6, sym: "Na", mass: 23 },
+            { id: 7, sym: "Mg", mass: 24 },
+            { id: 8, sym: "Al", mass: 27 },
+            { id: 9, sym: "P", mass: 31 },
+            { id: 10, sym: "S", mass: 32 },
+            { id: 11, sym: "Cl", mass: 35 },
+            { id: 12, sym: "K", mass: 39 },
+            { id: 13, sym: "Ca", mass: 40 },
+            { id: 14, sym: "Br", mass: 79 },
+        ];
+
+        // De 6 formler er dem fra regnearkets opgave 1b. Der spørges nu til alle
+        // grundstoffer i hver formel (ikke kun oxygen), plus det samlede antal atomer.
+        const formulaTasks = [
+            { id: 1, formula: "H2O", charge: 0 },
+            { id: 2, formula: "H2SO4", charge: 0 },
+            { id: 3, formula: "Al2(SO4)3", charge: 0 },
+            { id: 4, formula: "NH4NO3", charge: 0 },
+            { id: 5, formula: "HNO3", charge: 0 },
+            { id: 6, formula: "NO2", charge: -1 },
+        ];
+
+        // Hurtig-quiz i at genkende centrale grundstoffer — skifter mellem symbol->navn og
+        // navn->symbol, så begge retninger øves. Kun de mest gængse grundstoffer er med.
+        const navneTasks = [
+            { id: 1, sym: "H", direction: "symToName" },
+            { id: 2, sym: "O", direction: "nameToSym" },
+            { id: 3, sym: "C", direction: "symToName" },
+            { id: 4, sym: "Na", direction: "nameToSym" },
+            { id: 5, sym: "He", direction: "symToName" },
+            { id: 6, sym: "Cl", direction: "nameToSym" },
+            { id: 7, sym: "N", direction: "symToName" },
+            { id: 8, sym: "Mg", direction: "nameToSym" },
+            { id: 9, sym: "F", direction: "symToName" },
+            { id: 10, sym: "Al", direction: "nameToSym" },
+            { id: 11, sym: "Ne", direction: "symToName" },
+            { id: 12, sym: "S", direction: "nameToSym" },
+            { id: 13, sym: "Li", direction: "symToName" },
+            { id: 14, sym: "K", direction: "nameToSym" },
+            { id: 15, sym: "Si", direction: "symToName" },
+            { id: 16, sym: "Ca", direction: "nameToSym" },
+            { id: 17, sym: "P", direction: "symToName" },
+            { id: 18, sym: "Fe", direction: "nameToSym" },
+            { id: 19, sym: "Ar", direction: "symToName" },
+            { id: 20, sym: "Cu", direction: "nameToSym" },
+            { id: 21, sym: "Br", direction: "symToName" },
+            { id: 22, sym: "Zn", direction: "nameToSym" },
+        ];
+
+        // Rene forståelsesspørgsmål uden beregning — om ladning, placering og betydning af
+        // de grundlæggende partikler. Multiple choice, så det er selve forståelsen der
+        // testes, og ikke hvordan svaret staves eller formuleres.
+        const begreberTasks = [
+            { id: 1, question: 'Hvilken ladning har en proton?', options: ['Positiv', 'Negativ', 'Neutral'], correct: 0,
+                hintBase: "Tænk på navnet: en 'proton' er den ladningsbærende partikel, der giver atomkernen dens ladning.",
+                hintExtra: 'Tip: Protoner og elektroner har modsat ladning af hinanden — protonen er den positive af de to.' },
+            { id: 2, question: 'Hvilken ladning har en neutron?', options: ['Positiv', 'Negativ', 'Neutral'], correct: 2,
+                hintBase: "Navnet 'neutron' er et godt fingerpeg.",
+                hintExtra: "Tip: 'Neutral' og 'neutron' kommer af samme ord — neutroner har ingen ladning." },
+            { id: 3, question: 'Hvilken ladning har en elektron?', options: ['Positiv', 'Negativ', 'Neutral'], correct: 1,
+                hintBase: 'Elektroner er dem, der kan vandre fra atom til atom og danne ioner.',
+                hintExtra: 'Tip: Elektroner har modsat ladning af protoner — de er negative.' },
+            { id: 4, question: 'Hvor i atomet sidder protonerne?', options: ['Uden for kernen, i elektronskaller', 'Der er ingen bestemt placering', 'I atomkernen, midt i atomet'], correct: 2,
+                hintBase: 'Tænk på atomets opbygning: en tæt central del, og et stort tomrum udenom.',
+                hintExtra: 'Tip: Protoner (og neutroner) udgør atomkernen, som elektronerne bevæger sig omkring.' },
+            { id: 5, question: 'Hvor i atomet sidder elektronerne?', options: ['I atomkernen, midt i atomet', 'Der er ingen bestemt placering', 'Uden for kernen, i elektronskaller'], correct: 2,
+                hintBase: 'Elektronerne er dem, der bestemmer atomets størrelse og kemiske egenskaber.',
+                hintExtra: 'Tip: Elektronerne bevæger sig uden for kernen, i det man kalder elektronskaller.' },
+            { id: 6, question: 'Hvad bestemmer et atoms atomnummer?', options: ['Antallet af protoner', 'Antallet af neutroner', 'Antallet af elektroner'], correct: 0,
+                hintBase: 'Atomnummeret er det tal, der definerer, hvilket grundstof et atom er — uanset om atomet er blevet til en ion.',
+                hintExtra: 'Tip: Et neutralt atom har ganske vist også lige så mange elektroner som protoner, men det er protonantallet, der er selve definitionen på atomnummeret.' },
+            { id: 7, question: 'Hvad kaldes summen af protoner og neutroner i atomkernen?', options: ['Atomnummeret', 'Massetallet', 'Ladningstallet'], correct: 1,
+                hintBase: 'Dette tal står som regel foran grundstofsymbolet, fx det lille tal i ²³Na.',
+                hintExtra: 'Tip: Elektroner vejer stort set ingenting, så massen af atomet sidder i kernen — i protonerne og neutronerne. Deres sum kaldes massetallet.' },
+            { id: 8, question: 'Hvilken af de tre partikler har den mindste masse?', options: ['Protonen', 'Neutronen', 'Elektronen'], correct: 2,
+                hintBase: 'Tænk på hvilken partikel der bevæger sig hurtigt rundt uden for kernen og nemt kan rives løs.',
+                hintExtra: 'Tip: En elektron vejer under 1/1000 af en proton eller neutron — den regnes for at have en ubetydelig masse.' },
+            { id: 9, question: 'Hvad kaldes to atomer af samme grundstof med forskelligt antal neutroner?', options: ['Isotoper', 'Ioner', 'Isomerer'], correct: 0,
+                hintBase: "Ordet begynder med 'iso-', som betyder 'ens' — det er stadig samme grundstof.",
+                hintExtra: 'Tip: Isotoper har samme antal protoner (samme grundstof), men forskelligt antal neutroner og dermed forskelligt massetal.' },
+            { id: 10, question: 'Hvad sker der, når et neutralt atom mister en elektron?', options: ['Det bliver en negativ ion', 'Det forbliver neutralt', 'Det bliver en positiv ion'], correct: 2,
+                hintBase: 'Når en negativ partikel forsvinder fra et neutralt atom, ændres den samlede ladning.',
+                hintExtra: 'Tip: Færre elektroner end protoner giver en overskydende positiv ladning — altså en positiv ion.' },
+            { id: 11, question: 'Hvad sker der, når et neutralt atom optager en ekstra elektron?', options: ['Det bliver en positiv ion', 'Det bliver en negativ ion', 'Det forbliver neutralt'], correct: 1,
+                hintBase: 'Når en ekstra negativ partikel kommer til, ændres den samlede ladning.',
+                hintExtra: 'Tip: Flere elektroner end protoner giver en overskydende negativ ladning — altså en negativ ion.' },
+            { id: 12, question: 'Hvor mange elektroner kan der maksimalt være i 1. elektronskal?', options: ['8', '18', '2'], correct: 2,
+                hintBase: 'Den inderste skal er den mindste og kan derfor kun rumme få elektroner.',
+                hintExtra: 'Tip: 1. skal (nærmest kernen) kan maksimalt indeholde 2 elektroner.' },
+            { id: 13, question: 'Hvor mange elektroner kan der maksimalt være i 2. elektronskal?', options: ['2', '8', '18'], correct: 1,
+                hintBase: 'Tænk på grundstoffer som neon, der har elektronstrukturen 2,8.',
+                hintExtra: 'Tip: 2. skal kan maksimalt indeholde 8 elektroner.' },
+            { id: 14, question: 'Hvad kaldes elektronerne i atomets yderste skal?', options: ['Kerneelektroner', 'Valenselektroner', 'Frie elektroner'], correct: 1,
+                hintBase: 'Det er disse elektroner, der er med til at bestemme, hvordan atomet reagerer kemisk.',
+                hintExtra: 'Tip: De kaldes valenselektroner — det er dem, der indgår i kemiske bindinger.' },
+            { id: 15, question: 'Hvorfor er et atom normalt elektrisk neutralt?', options: ['Fordi det har lige mange protoner og elektroner', 'Fordi det ikke har nogen ladede partikler', 'Fordi neutronerne udligner al ladning'], correct: 0,
+                hintBase: 'Tænk på hvilke to slags ladede partikler et atom indeholder.',
+                hintExtra: 'Tip: Antallet af positive protoner og negative elektroner er ens i et neutralt atom, så ladningerne går lige op.' },
+            { id: 16, question: 'Hvad er den mindste enhed af et grundstof, der stadig har grundstoffets kemiske egenskaber?', options: ['Et molekyle', 'Et atom', 'En ion'], correct: 1,
+                hintBase: 'Det er ikke en sammensætning af flere andre enheder — det er selve byggestenen.',
+                hintExtra: 'Tip: Et atom er den mindste enhed af et grundstof, der stadig har grundstoffets kemiske egenskaber.' },
+        ];
+
+        // Optæller atomer i en kemisk formel, fx "Al2(SO4)3" -> {Al:2, S:3, O:12}.
+        // Ladningstegn indgår ikke i formel-strengene (opbevares separat), så parseren
+        // behøver kun forholde sig til bogstaver, tal og parenteser.
+        const parseFormula = (formula) => {
+            const counts = {};
+            const stack = [counts];
+            let i = 0;
+            while (i < formula.length) {
+                const ch = formula[i];
+                if (ch === '(') {
+                    stack.push({});
+                    i++;
+                } else if (ch === ')') {
+                    const group = stack.pop();
+                    i++;
+                    let numStr = '';
+                    while (i < formula.length && /[0-9]/.test(formula[i])) { numStr += formula[i]; i++; }
+                    const mult = numStr ? parseInt(numStr, 10) : 1;
+                    const target = stack[stack.length - 1];
+                    Object.keys(group).forEach((el) => {
+                        target[el] = (target[el] || 0) + group[el] * mult;
+                    });
+                } else if (/[A-Z]/.test(ch)) {
+                    let sym = ch;
+                    i++;
+                    while (i < formula.length && /[a-z]/.test(formula[i])) { sym += formula[i]; i++; }
+                    let numStr = '';
+                    while (i < formula.length && /[0-9]/.test(formula[i])) { numStr += formula[i]; i++; }
+                    const cnt = numStr ? parseInt(numStr, 10) : 1;
+                    const target = stack[stack.length - 1];
+                    target[sym] = (target[sym] || 0) + cnt;
+                } else {
+                    i++;
+                }
+            }
+            return counts;
+        };
+
+        const displayFormula = (task) => {
+            const base = formatFormula(task.formula);
+            if (!task.charge) return base;
+            const mag = Math.abs(task.charge);
+            return base + (mag > 1 ? toSup(mag) : '') + (task.charge > 0 ? '⁺' : '⁻');
+        };
+
+        const getIsotopeCtx = (task) => {
+            const el = ELEMENTS_BY_SYM[task.sym];
+            const protons = el.z;
+            const neutrons = task.mass - protons;
+            const electrons = protons;
+            const structure = shellFill(electrons);
+            return { el, protons, neutrons, electrons, structure };
+        };
+
+        const getFormulaCtx = (task) => {
+            const counts = parseFormula(task.formula);
+            const order = Object.keys(counts);
+            const total = order.reduce((sum, k) => sum + counts[k], 0);
+            return { counts, order, total };
+        };
+
+        // Bygger den fulde liste af spørgsmålstrin for en opgave. Hvert trin bærer selv
+        // sit spørgsmål, sin hjælpetekst og facit, så både selve opgaveflowet og
+        // facit-visningen for allerede løste opgaver kan læse fra samme sted.
+        const buildTaskSteps = (taskType, task, begreberOptionOrder) => {
+            if (taskType === 'isotoper') {
+                const { el, protons, neutrons, electrons, structure } = getIsotopeCtx(task);
+                const mass = task.mass;
+                return [
+                    {
+                        label: 'Antal protoner',
+                        question: 'Hvor mange protoner har atomet?',
+                        hintBase: <>Antallet af protoner er det samme som <strong>atomnummeret</strong> for grundstoffet {task.sym}.</>,
+                        hintExtra: `Tip: Find ${task.sym} i det periodiske system — atomnummeret (det lille tal i feltet) er antallet af protoner.`,
+                        accepted: [String(protons)],
+                        display: String(protons),
+                    },
+                    {
+                        label: 'Antal neutroner',
+                        question: 'Hvor mange neutroner har atomet?',
+                        hintBase: <>Massetallet (tallet foran symbolet — her <strong>{mass}</strong>) er summen af antal protoner og antal neutroner.</>,
+                        hintExtra: `Tip: Antal neutroner = massetal − antal protoner, altså ${mass} minus det protontal, du fandt herover.`,
+                        accepted: [String(neutrons)],
+                        display: String(neutrons),
+                    },
+                    {
+                        label: 'Antal elektroner',
+                        question: 'Hvor mange elektroner har det neutrale atom?',
+                        hintBase: 'For et neutralt atom (ikke en ion) er antallet af elektroner det samme som antallet af protoner.',
+                        hintExtra: 'Tip: Se det protontal, du fandt i trinnet ovenfor — det er også antallet af elektroner, fordi atomet er elektrisk neutralt.',
+                        accepted: [String(electrons)],
+                        display: String(electrons),
+                    },
+                    {
+                        label: 'Grundstofnavn',
+                        question: <>Hvad hedder grundstoffet med symbolet <strong>{task.sym}</strong> på dansk?</>,
+                        hintBase: `Brug grundstofsymbolet ${task.sym} til at finde grundstoffets navn.`,
+                        hintExtra: `Tip: Åbn det periodiske system, og peg med musen på feltet med symbolet ${task.sym} — det fulde danske navn dukker op.`,
+                        accepted: [el.name, ...(el.alt || [])],
+                        display: el.name,
+                    },
+                    {
+                        label: 'Elektronstruktur',
+                        question: 'Angiv atomets elektronstruktur (elektronfordelingen i skaller, adskilt af kommaer).',
+                        hintBase: <>Fordel atomets <strong>{electrons}</strong> elektroner i skaller. Start med skal 1 nærmest kernen, og fyld skallerne én ad gangen.</>,
+                        hintExtra: electrons > 20
+                            ? 'Tip: Grundstoffer efter nr. 20 (Ca) har "usynlige" overgangsmetaller, som gør at 3. skal kan rumme op til 18 elektroner. Fyld: 1. skal max 2, 2. skal max 8, 3. skal max 18 — og læg resten i 4. skal.'
+                            : 'Tip: Fyld skallerne i rækkefølge: 1. skal max 2 elektroner, 2. skal max 8, og 3. skal max 8 (så længe der samlet er 20 elektroner eller færre).',
+                        accepted: [structure.join(',')],
+                        isStructure: true,
+                        display: structure.join(','),
+                        diagram: { protons, structure },
+                    },
+                ];
+            }
+
+            if (taskType === 'navne') {
+                const el = ELEMENTS_BY_SYM[task.sym];
+                if (task.direction === 'symToName') {
+                    return [{
+                        label: 'Grundstofnavn',
+                        question: <>Hvad hedder grundstoffet med symbolet <strong>{task.sym}</strong>?</>,
+                        hintBase: 'Slå symbolet op i det periodiske system.',
+                        hintExtra: `Tip: Åbn det periodiske system, og peg med musen på feltet med symbolet ${task.sym} — det fulde danske navn dukker op.`,
+                        accepted: [el.name, ...(el.alt || [])],
+                        display: el.name,
+                    }];
+                }
+                return [{
+                    label: 'Kemisk symbol',
+                    question: <>Hvad er det kemiske symbol for grundstoffet <strong>{el.name.toLowerCase()}</strong>?</>,
+                    hintBase: 'Brug det periodiske system til at finde symbolet.',
+                    hintExtra: `Tip: ${el.name} står i det periodiske system med sit symbol fremhævet i feltet.`,
+                    accepted: [el.sym],
+                    display: el.sym,
+                }];
+            }
+
+            if (taskType === 'begreber') {
+                // Svarmulighedernes rækkefølge, som vist på knapperne, kan være blandet
+                // (se begreberOptionOrder i App) — det rigtige svar findes stadig ud fra
+                // teksten (task.options[task.correct]), aldrig ud fra positionen.
+                const displayOptions = begreberOptionOrder
+                    ? begreberOptionOrder.map((i) => task.options[i])
+                    : task.options;
+                return [{
+                    label: 'Svar',
+                    question: task.question,
+                    hintBase: task.hintBase,
+                    hintExtra: task.hintExtra,
+                    accepted: [task.options[task.correct]],
+                    display: task.options[task.correct],
+                    options: displayOptions,
+                }];
+            }
+
+            const { counts, order, total } = getFormulaCtx(task);
+            const elementSteps = order.map((elSym) => ({
+                label: `Antal ${elSym}-atomer`,
+                question: <>Hvor mange <strong>{elSym}</strong>-atomer er der i formlen, <strong>{displayFormula(task)}</strong>?</>,
+                hintBase: <>Tæl hvor mange gange grundstoffet <strong>{elSym}</strong> optræder i formlen — læg evt. flere forekomster sammen.</>,
+                hintExtra: 'Tip: Et tal lige efter et symbol gælder kun det symbol. Et tal efter en (parentes) skal ganges på alle atomer inde i parentesen.',
+                accepted: [String(counts[elSym])],
+                display: String(counts[elSym]),
+            }));
+            const totalStep = {
+                label: 'Samlet antal atomer',
+                question: 'Hvad er det samlede antal atomer i hele formlen?',
+                hintBase: 'Læg antallet af alle grundstoffernes atomer i formlen sammen.',
+                hintExtra: 'Tip: Brug de antal, du allerede har fundet for hvert grundstof ovenfor, og læg dem sammen.',
+                accepted: [String(total)],
+                display: String(total),
+            };
+            return [...elementSteps, totalStep];
+        };
+
+        const TASK_POOLS = { isotoper: isotopeTasks, formler: formulaTasks, navne: navneTasks, begreber: begreberTasks };
+        const TYPE_LABELS = { isotoper: 'Atomets opbygning', formler: 'Tæl atomer i formler', navne: 'Grundstofnavne', begreber: 'Fagbegreber' };
+        const TYPE_ORDER = ['isotoper', 'formler', 'navne', 'begreber'];
+
+        // Forklarer for hver opgavetype, hvad man træner, og hvorfor det er relevant for
+        // resten af Kemi C — vises i "Hvad trænes her?"-popup'en, så eleven kan se formålet,
+        // ikke kun løse opgaverne mekanisk.
+        const LEARNING_GOALS = {
+            isotoper: {
+                title: 'Atomets opbygning',
+                goals: [
+                    'Finde antal protoner, neutroner og elektroner ud fra et grundstofs isotopnotation (massetal og atomnummer).',
+                    'Koble atomnummer til grundstoffets navn og placering i det periodiske system.',
+                    'Fordele elektroner i skaller efter skalmodellen (2, 8, 8/18 …).',
+                ],
+why: 'Fundamentet for al kemi. Binding, ioner og molekylers geometri bygger direkte på den elektronstruktur, du træner her.',
+            },
+            formler: {
+                title: 'Tæl atomer i formler',
+                goals: [
+                    'Aflæse hvor mange atomer af hvert grundstof en kemisk formel indeholder — også når tal står efter en (parentes).',
+                    'Lægge sammen til det samlede antal atomer i et molekyle eller en ion.',
+                ],
+why: 'Forudsætning for alt regnearbejde senere — molarmasse, mol og afstemning af reaktioner kræver, at atomtallene er rigtige. En tællefejl her giver forkerte beregninger hele vejen igennem.',
+            },
+            navne: {
+                title: 'Grundstofnavne',
+                goals: [
+                    'Genkende de mest almindelige grundstoffers danske navne ud fra deres kemiske symbol.',
+                    'Gå den anden vej: finde det rigtige symbol ud fra grundstoffets navn.',
+                ],
+why: 'Kemiens ordforråd. Det forventes, at du kan de mest almindelige grundstofsymboler udenad — uden dem bliver formler og undervisning svære at følge.',
+            },
+            begreber: {
+                title: 'Fagbegreber',
+                goals: [
+                    'Kende ladningen og placeringen af protoner, neutroner og elektroner.',
+                    'Forstå centrale begreber som atomnummer, massetal, isotoper, ioner og valenselektroner.',
+                ],
+why: 'Fagets grundbegreber. Ord som "valenselektron" og "massetal" bruges som en selvfølge resten af faget — de skal give mening uden forklaring.',
+            },
+        };
+
+        // Fast tip-boks under opgavebeskrivelsen. Vises kun når den er relevant for netop
+        // denne opgave — ikke som en konstant, gentaget besked på hver eneste opgave.
+        const getPersistentTip = (taskType, taskIndex) => {
+            if (taskType === 'isotoper') {
+                if (taskIndex !== 0) return null;
+                return <>Tip: Massetallet er tallet foran grundstofsymbolet (fx <strong className="font-mono">²³Na</strong> har massetal 23) — det er <strong>ikke</strong> det samme som atomnummeret.</>;
+            }
+            if (taskType === 'formler') {
+                if (taskIndex === 0) {
+                    return <>Tip: Et tal lige efter et grundstofsymbol (fx H₂) gælder kun det atom.</>;
+                }
+                if (taskIndex === 2) {
+                    return <>Tip: Et tal efter en (parentes) ganges ud på alle atomer inde i parentesen — fx betyder (SO₄)₃, at der er 3 × S og 3 × 4 O.</>;
+                }
+                if (taskIndex === 5) {
+                    return <>Tip: Det lille ⁻ (eller ⁺) er ladningen og skal ikke tælles med som et atom. Et minus betyder, at ionen har én ekstra elektron i forhold til et neutralt molekyle med samme atomer.</>;
+                }
+                return null;
+            }
+            return null;
+        };
+
+        const CAT_COLORS = {
+            alkali: "bg-red-200", alkaline: "bg-orange-200", transition: "bg-yellow-100",
+            metal: "bg-blue-100", metalloid: "bg-green-100", nonmetal: "bg-green-200",
+            halogen: "bg-teal-200", noble: "bg-purple-200"
+        };
+        const CAT_LABELS = {
+            alkali: "Alkalimetaller", alkaline: "Jordalkalimetaller", transition: "Overgangsmetaller",
+            metal: "Øvrige metaller", metalloid: "Halvmetaller", nonmetal: "Ikke-metaller",
+            halogen: "Halogener", noble: "Ædelgasser"
+        };
+        const CAT_ORDER = ["alkali", "alkaline", "transition", "metal", "metalloid", "nonmetal", "halogen", "noble"];
+
+        // --- COMPONENTS ---
+
+        // Simpelt Bohr-diagram: kerne med protontal, og skaller med prikker for elektroner.
+        const AtomDiagram = ({ protons, structure }) => {
+            const cx = 100, cy = 100, baseR = 26, shellGap = 22;
+            return (
+                <svg viewBox="0 0 200 200" className="w-40 h-40 mx-auto">
+                    {structure.map((_, i) => (
+                        <circle key={i} cx={cx} cy={cy} r={baseR + i * shellGap} fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="3,3" />
+                    ))}
+                    <circle cx={cx} cy={cy} r="16" fill="#1e293b" />
+                    <text x={cx} y={cy + 4} textAnchor="middle" fill="white" fontSize="11" fontWeight="bold">{protons}+</text>
+                    {structure.map((count, i) => {
+                        const r = baseR + i * shellGap;
+                        return Array.from({ length: count }).map((_, k) => {
+                            const angle = (2 * Math.PI * k) / count - Math.PI / 2;
+                            const ex = cx + r * Math.cos(angle);
+                            const ey = cy + r * Math.sin(angle);
+                            return <circle key={`${i}-${k}`} cx={ex} cy={ey} r="4.5" fill="#2563eb" />;
+                        });
+                    })}
+                </svg>
+            );
+        };
+
+        const PeriodicTable = ({ isOpen, onClose }) => {
+            if (!isOpen) return null;
+
+            const PERIODS = 4;
+            const GROUPS = 18;
+
+            return (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white p-6 rounded-xl shadow-2xl max-w-4xl w-full max-h-[85vh] overflow-y-auto">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-xl font-bold">Periodisk system — grundstof 1 til 36</h2>
+                            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">✕</button>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <div className="periodic-table-grid" style={{ minWidth: '720px' }}>
+                                {Array.from({ length: PERIODS * GROUPS }).map((_, i) => {
+                                    const period = Math.floor(i / GROUPS) + 1;
+                                    const group = (i % GROUPS) + 1;
+                                    const element = ELEMENTS.find(e => e.period === period && e.group === group);
+
+                                    return (
+                                        <div
+                                            key={i}
+                                            title={element ? `${element.name} (Z=${element.z})` : undefined}
+                                            className={`element-cell border border-gray-300 ${element ? CAT_COLORS[element.cat] : 'opacity-0'}`}
+                                        >
+                                            {element && (
+                                                <>
+                                                    <span className="z-label">{element.z}</span>
+                                                    <span className="sym-label">{element.sym}</span>
+                                                </>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-4 justify-center">
+                            {CAT_ORDER.map(cat => (
+                                <span key={cat} className="flex items-center gap-1 text-xs text-gray-500">
+                                    <span className={`inline-block w-3 h-3 rounded-sm border border-gray-300 ${CAT_COLORS[cat]}`}></span>
+                                    {CAT_LABELS[cat]}
+                                </span>
+                            ))}
+                        </div>
+                        <p className="mt-4 text-xs text-gray-500 italic text-center">Tip: Hold musen over et grundstof for at se dets fulde danske navn. Det lille tal øverst er atomnummeret (Z) — som er lig antallet af protoner.</p>
+                    </div>
+                </div>
+            );
+        };
+
+        const LearningGoalsModal = ({ isOpen, onClose, taskType }) => {
+            if (!isOpen) return null;
+            const info = LEARNING_GOALS[taskType];
+
+            return (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white p-6 rounded-xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto">
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-xl font-bold">Hvad trænes her? — {info.title}</h2>
+                            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">✕</button>
+                        </div>
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Du træner:</p>
+                        <ul className="list-disc list-inside space-y-1 text-sm text-slate-700 mb-5">
+                            {info.goals.map((g, i) => <li key={i}>{g}</li>)}
+                        </ul>
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Hvorfor er det vigtigt?</p>
+                        <p className="text-sm text-slate-700 leading-relaxed">{info.why}</p>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [taskType, setTaskType] = useState('isotoper');
+            const [taskIndexByType, setTaskIndexByType] = useState({ isotoper: 0, formler: 0, navne: 0, begreber: 0 });
+            const [solvedByType, setSolvedByType] = useState({ isotoper: {}, formler: {}, navne: {}, begreber: {} });
+            const [subStep, setSubStep] = useState(0);
+            const [answerInput, setAnswerInput] = useState("");
+            const [confirmedAnswers, setConfirmedAnswers] = useState([]);
+            const [wrongStreak, setWrongStreak] = useState(0);
+            const [feedback, setFeedback] = useState(null);
+            const [isTableOpen, setIsTableOpen] = useState(false);
+            const [isGoalsOpen, setIsGoalsOpen] = useState(false);
+            const [practicingSolved, setPracticingSolved] = useState(false);
+            const timeoutRef = useRef(null);
+
+            const currentTasks = TASK_POOLS[taskType];
+            const taskIndex = taskIndexByType[taskType];
+            const task = currentTasks[taskIndex];
+            // Blander rækkefølgen af svarmuligheder for 'begreber'-opgaver, så det rigtige
+            // svar ikke altid står samme sted. Beregnes kun på ny, når man skifter opgave
+            // (via useMemo), ikke ved hvert re-render — ellers ville knapperne "hoppe rundt",
+            // fx når man svarer forkert og får feedback.
+            const begreberOptionOrder = useMemo(() => {
+                if (taskType !== 'begreber') return null;
+                const order = task.options.map((_, i) => i);
+                for (let i = order.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [order[i], order[j]] = [order[j], order[i]];
+                }
+                return order;
+            }, [taskType, task.id]);
+            const steps = buildTaskSteps(taskType, task, begreberOptionOrder);
+            const isFinalStep = subStep === steps.length - 1;
+            const currentStep = steps[subStep];
+            // Man lander i facit-visning, når man vender tilbage til en allerede løst opgave,
+            // medmindre man aktivt har valgt at øve den igen.
+            const isReviewing = !!solvedByType[taskType][taskIndex] && !practicingSolved;
+            const persistentTip = getPersistentTip(taskType, taskIndex);
+
+            const clearPendingTimeout = () => {
+                if (timeoutRef.current) {
+                    clearTimeout(timeoutRef.current);
+                    timeoutRef.current = null;
+                }
+            };
+
+            const resetTask = () => {
+                clearPendingTimeout();
+                setSubStep(0);
+                setAnswerInput("");
+                setConfirmedAnswers([]);
+                setWrongStreak(0);
+                setFeedback(null);
+                setPracticingSolved(false);
+            };
+
+            // Hopper frit til en given opgave inden for den aktuelle opgavetype.
+            const goToTask = (index) => {
+                setTaskIndexByType(prev => ({ ...prev, [taskType]: index }));
+                resetTask();
+            };
+
+            // Skifter opgavetype, men husker hvilken opgave man var nået til i den type.
+            const goToType = (t) => {
+                setTaskType(t);
+                resetTask();
+            };
+
+            const goToNextType = () => {
+                const idx = TYPE_ORDER.indexOf(taskType);
+                if (idx < TYPE_ORDER.length - 1) goToType(TYPE_ORDER[idx + 1]);
+            };
+
+            const advanceStep = (entry) => {
+                setConfirmedAnswers(prev => [...prev, entry]);
+                setSubStep(s => s + 1);
+                setAnswerInput("");
+                setFeedback(null);
+                setWrongStreak(0);
+            };
+
+            const advanceFromFinalStep = () => {
+                const updatedSolved = { ...solvedByType[taskType], [taskIndex]: true };
+                setSolvedByType(prev => ({ ...prev, [taskType]: updatedSolved }));
+                // Spring ikke direkte til "Tillykke", selvom man løste den sidste opgave i rækken —
+                // man kan være hoppet direkte til opgave 6 og sprunget 3, 4 og 5 over. Find i stedet
+                // den første uløste opgave, og hop videre dertil; kun når ALLE er løst, er man færdig.
+                const nextUnsolvedIndex = currentTasks.findIndex((_, i) => !updatedSolved[i]);
+                if (nextUnsolvedIndex !== -1) {
+                    goToTask(nextUnsolvedIndex);
+                } else {
+                    clearPendingTimeout();
+                    setFeedback({ type: 'finish', msg: `Tillykke! Du har gennemført "${TYPE_LABELS[taskType]}".` });
+                }
+            };
+
+            // Ved 1. fejl: kort fejlbesked. Ved 2. fejl: samme besked + et ekstra tip. Ved 3. fejl: facit.
+            const registerWrong = (buildReveal) => {
+                const streak = wrongStreak + 1;
+                setWrongStreak(streak);
+                if (streak >= 3) {
+                    setFeedback({ type: 'reveal', msg: 'Her er svaret:', ...buildReveal() });
+                } else if (streak === 2) {
+                    setFeedback({ type: 'error', msg: 'Stadig ikke helt rigtigt.', extra: currentStep.hintExtra });
+                } else {
+                    setFeedback({ type: 'error', msg: 'Ikke helt rigtigt endnu. Prøv igen.' });
+                }
+            };
+
+            const norm = (s) => s.toLowerCase().replace(/\s+/g, '');
+
+            const handleCheck = (overrideValue) => {
+                const raw = (overrideValue !== undefined ? overrideValue : answerInput).trim();
+                if (raw === '') return;
+                const userVal = currentStep.isStructure ? normalizeStructure(raw) : norm(raw);
+                const acceptedVals = currentStep.accepted.map(a => currentStep.isStructure ? normalizeStructure(a) : norm(a));
+                const entry = { label: currentStep.label, display: currentStep.display };
+
+                if (acceptedVals.includes(userVal)) {
+                    setFeedback({ type: 'success', msg: isFinalStep ? 'Flot! Opgaven er løst.' : 'Korrekt!' });
+                    if (isFinalStep) {
+                        timeoutRef.current = setTimeout(advanceFromFinalStep, 1200);
+                    } else {
+                        timeoutRef.current = setTimeout(() => advanceStep(entry), 800);
+                    }
+                } else {
+                    registerWrong(() => ({
+                        reveal: currentStep.display,
+                        diagram: currentStep.diagram,
+                        onContinue: isFinalStep ? advanceFromFinalStep : () => advanceStep(entry)
+                    }));
+                }
+            };
+
+            const handleKeyDown = (e) => {
+                if (e.key === 'Enter') handleCheck();
+            };
+
+            return (
+                <div className="max-w-2xl mx-auto py-10 px-4">
+                    <header className="mb-8 text-center">
+                        <h1 className="text-3xl font-black text-slate-800 mb-2">Grundstoffer og Elektronstruktur</h1>
+                        <div className="flex flex-wrap justify-center gap-2">
+                            {TYPE_ORDER.map(t => (
+                                <button
+                                    key={t}
+                                    onClick={() => goToType(t)}
+                                    className={`px-3 py-1 rounded-full text-xs sm:text-sm font-bold transition-colors ${taskType === t ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`}
+                                >
+                                    {TYPE_LABELS[t]}
+                                </button>
+                            ))}
+                        </div>
+                    </header>
+
+                    <main className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 relative overflow-hidden">
+                        {/* Progress */}
+                        <div className="absolute top-0 left-0 h-1 bg-blue-500 transition-all duration-500" style={{ width: `${((taskIndex + 1) / currentTasks.length) * 100}%` }}></div>
+
+                        <div className="flex justify-between items-start mb-4 gap-3 flex-wrap">
+                            <div>
+                                <h2 className="text-sm uppercase tracking-wider text-gray-400 font-bold">
+                                    Opgave {taskIndex + 1} af {currentTasks.length}
+                                    {taskIndex === 0 && (
+                                        <span className="ml-2 inline-block bg-blue-100 text-blue-700 text-[10px] normal-case tracking-normal font-bold px-2 py-0.5 rounded-full align-middle">Intro-opgave</span>
+                                    )}
+                                </h2>
+                                <p className="text-lg font-medium text-slate-700">
+                                    {taskType === 'isotoper'
+                                        ? <>Isotopen er <strong className="font-mono">{toSup(task.mass)}{task.sym}</strong>. Bestem antal protoner, neutroner og elektroner, grundstoffets navn — og til sidst dets elektronstruktur.</>
+                                        : taskType === 'formler'
+                                            ? <>Formlen er <strong className="font-mono">{displayFormula(task)}</strong>. Tæl antallet af hvert grundstof i formlen, og find til sidst det samlede antal atomer.</>
+                                            : taskType === 'navne'
+                                                ? <>Genkend grundstoffet — nogle gange fra symbol til navn, andre gange fra navn til symbol.</>
+                                                : <>Test din forståelse af atomets grundlæggende partikler — ingen beregning, kun det rigtige svar.</>}
+                                </p>
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setIsGoalsOpen(true)}
+                                    className="bg-white text-slate-600 border-2 border-slate-200 px-4 py-2 rounded-lg text-sm font-bold hover:border-blue-400 hover:text-blue-700 transition-colors whitespace-nowrap"
+                                >
+                                    Hvad trænes her?
+                                </button>
+                                <button
+                                    onClick={() => setIsTableOpen(true)}
+                                    className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-700 transition-colors whitespace-nowrap"
+                                >
+                                    Periodisk System
+                                </button>
+                            </div>
+                        </div>
+
+                        {persistentTip && (
+                            <p className="text-xs text-blue-700 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2 mb-6 inline-block">
+                                {persistentTip}
+                            </p>
+                        )}
+
+                        {/* Opgavenavigation: hop frit mellem opgave 1, 2, 3 osv. Holdt lille og diskret,
+                            så det er selve opgaven herunder der er i fokus, ikke tal-rækken. */}
+                        <div className="flex flex-wrap items-center gap-1 mb-4">
+                            <button
+                                onClick={() => goToTask(Math.max(0, taskIndex - 1))}
+                                disabled={taskIndex === 0}
+                                className="w-5 h-5 rounded-full border border-slate-200 text-slate-400 text-[10px] font-bold disabled:opacity-30 hover:border-blue-400 transition-colors"
+                                aria-label="Forrige opgave"
+                            >
+                                ‹
+                            </button>
+                            {currentTasks.map((t, i) => (
+                                <button
+                                    key={t.id}
+                                    onClick={() => goToTask(i)}
+                                    className={`w-5 h-5 rounded-full text-[10px] font-bold border transition-colors ${
+                                        i === taskIndex
+                                            ? 'bg-blue-600 text-white border-blue-600'
+                                            : solvedByType[taskType][i]
+                                                ? 'bg-green-100 text-green-700 border-green-300 hover:border-green-400'
+                                                : 'bg-white text-slate-400 border-slate-200 hover:border-blue-400'
+                                    }`}
+                                >
+                                    {i + 1}
+                                </button>
+                            ))}
+                            <button
+                                onClick={() => goToTask(Math.min(currentTasks.length - 1, taskIndex + 1))}
+                                disabled={taskIndex === currentTasks.length - 1}
+                                className="w-5 h-5 rounded-full border border-slate-200 text-slate-400 text-[10px] font-bold disabled:opacity-30 hover:border-blue-400 transition-colors"
+                                aria-label="Næste opgave"
+                            >
+                                ›
+                            </button>
+                        </div>
+
+                        {isReviewing ? (
+                            /* Man er vendt tilbage til en allerede løst opgave: vis facit i stedet for at spørge igen */
+                            <div>
+                                <p className="text-sm font-bold text-green-700 mb-4">✓ Denne opgave er løst — her er facit:</p>
+                                <div className="space-y-4 mb-4">
+                                    {steps.map((s, i) => (
+                                        <div key={i}>
+                                            <label className="block text-xs font-bold text-gray-400 mb-1">{s.label}</label>
+                                            <div className="w-full p-3 border-2 border-green-200 bg-green-50 rounded-xl font-mono text-green-700 flex items-center justify-between">
+                                                <span>{s.display}</span>
+                                                <span>✓</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                {taskType === 'isotoper' && (
+                                    <div className="border-t border-slate-100 pt-4 mb-2">
+                                        <p className="text-xs font-bold text-gray-400 mb-2 text-center uppercase tracking-wider">Elektronskal-diagram</p>
+                                        <AtomDiagram protons={steps[steps.length - 1].diagram.protons} structure={steps[steps.length - 1].diagram.structure} />
+                                    </div>
+                                )}
+                                <button onClick={() => setPracticingSolved(true)} className="text-sm text-blue-600 font-bold hover:underline">Øv opgaven igen</button>
+                            </div>
+                        ) : (
+                            <>
+                                {/* Allerede besvarede felter i denne opgave bliver stående, så man kan se hvad man lige har indtastet */}
+                                {confirmedAnswers.length > 0 && (
+                                    <div className="space-y-4 mb-4">
+                                        {confirmedAnswers.map((a, i) => (
+                                            <div key={i}>
+                                                <label className="block text-xs font-bold text-gray-400 mb-1">{a.label}</label>
+                                                <div className="w-full p-3 border-2 border-green-200 bg-green-50 rounded-xl font-mono text-green-700 flex items-center justify-between">
+                                                    <span>{a.display}</span>
+                                                    <span>✓</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                <div>
+                                    <p className="text-base font-medium text-slate-700 mb-1">{currentStep.question}</p>
+                                    <p className="text-xs text-gray-400 mb-4">{currentStep.hintBase}</p>
+
+                                    {currentStep.options ? (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            {currentStep.options.map((opt, i) => (
+                                                <button
+                                                    key={i}
+                                                    onClick={() => handleCheck(opt)}
+                                                    className="p-4 border-2 border-slate-200 rounded-xl text-left font-medium hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                                                >
+                                                    {opt}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    ) : isFinalStep ? (
+                                        <div className="flex gap-4">
+                                            <input
+                                                type="text"
+                                                value={answerInput}
+                                                onChange={(e) => setAnswerInput(e.target.value)}
+                                                onKeyDown={handleKeyDown}
+                                                className="flex-1 p-4 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none text-xl font-bold"
+                                                autoFocus
+                                            />
+                                            <button
+                                                onClick={() => handleCheck()}
+                                                className="bg-green-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-green-700 transition-all shadow-lg shadow-green-200"
+                                            >
+                                                Svar
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex gap-4 items-end">
+                                            <div className="flex-1">
+                                                <label className="block text-xs font-bold text-gray-400 mb-1">{currentStep.label}</label>
+                                                <input
+                                                    type="text"
+                                                    value={answerInput}
+                                                    onChange={(e) => setAnswerInput(e.target.value)}
+                                                    onKeyDown={handleKeyDown}
+                                                    className="w-full p-3 border-2 border-slate-200 rounded-xl focus:border-blue-500 outline-none font-mono"
+                                                    autoFocus
+                                                />
+                                            </div>
+                                            <button
+                                                onClick={() => handleCheck()}
+                                                className="bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
+                                            >
+                                                Tjek
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+                            </>
+                        )}
+
+                        {/* Feedback */}
+                        {feedback && (
+                            <div className={`mt-6 p-4 rounded-xl font-bold text-center ${
+                                feedback.type === 'success' ? 'bg-green-100 text-green-700 animate-bounce' :
+                                feedback.type === 'finish' ? 'bg-blue-100 text-blue-700' :
+                                feedback.type === 'reveal' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-700'
+                            }`}>
+                                {feedback.msg}
+                                {feedback.extra && (
+                                    <div className="mt-2 text-sm font-normal">{feedback.extra}</div>
+                                )}
+                                {feedback.type === 'reveal' && (
+                                    <>
+                                        <div className="text-2xl mt-1 font-mono">{feedback.reveal}</div>
+                                        {feedback.diagram && (
+                                            <div className="mt-3">
+                                                <AtomDiagram protons={feedback.diagram.protons} structure={feedback.diagram.structure} />
+                                            </div>
+                                        )}
+                                        <button onClick={feedback.onContinue} className="mt-3 bg-amber-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-amber-700">Fortsæt →</button>
+                                    </>
+                                )}
+                                {feedback.type === 'finish' && TYPE_ORDER.indexOf(taskType) < TYPE_ORDER.length - 1 && (
+                                    <button onClick={goToNextType} className="block mx-auto mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">Næste opgavetype</button>
+                                )}
+                            </div>
+                        )}
+                    </main>
+
+                    <footer className="mt-8 text-center text-gray-400 text-sm">
+                        Husk: Massetal = antal protoner + antal neutroner. Atomnummeret i det periodiske system er altid lig antallet af protoner.
+                    </footer>
+
+                    <PeriodicTable isOpen={isTableOpen} onClose={() => setIsTableOpen(false)} />
+                    <LearningGoalsModal isOpen={isGoalsOpen} onClose={() => setIsGoalsOpen(false)} taskType={taskType} />
+                </div>
+            );
+        };
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tildeling af oxidationstal</title>
+    <style>
+        :root {
+            --bg-main: #12151c;
+            --bg-panel: #1b202c;
+            --bg-card: #252c3d;
+            --accent: #00d2d3;
+            --accent-hover: #00b8b9;
+            --text-main: #ffffff;
+            --text-muted: #a0aec0;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --warning: #f39c12;
+            --border: #343d52;
+            --cat-mangan: #c084fc;
+            --cat-nitrogen: #60a5fa;
+            --cat-carbon: #94a3b8;
+            --cat-svovl: #fbbf24;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        header {
+            background-color: var(--bg-panel);
+            border-bottom: 2px solid var(--border);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .header-title h1 {
+            font-size: 1.3rem;
+            color: var(--accent);
+            letter-spacing: 0.5px;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .tab-nav {
+            display: flex;
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 14px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            position: relative;
+            padding: 14px 20px;
+            gap: 20px;
+            max-width: 1500px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .view-section {
+            display: none;
+            width: 100%;
+            gap: 20px;
+        }
+
+        .view-section.active {
+            display: flex;
+        }
+
+        .col-left {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-width: 320px;
+        }
+
+        .col-right {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-width: 280px;
+        }
+
+        .card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-title {
+            color: var(--accent);
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .formula-display {
+            font-size: 2.6rem;
+            font-weight: bold;
+            text-align: center;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 20px 16px 16px;
+            letter-spacing: 2px;
+            color: #ffffff;
+            margin-bottom: 12px;
+        }
+
+        .formula-display-lg {
+            font-size: 4.5rem;
+            padding: 16px 16px 10px;
+        }
+
+        .equation-caption {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin: -4px 0 10px;
+        }
+
+        .formula-atoms {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .formula-atom {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .formula-atom-label {
+            font-size: 0.36em;
+            min-height: 1.3em;
+            line-height: 1.3em;
+            color: var(--warning);
+            font-weight: bold;
+            letter-spacing: 0;
+        }
+
+        /* Regnestykke: live-opdaterende ligning */
+        .equation-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 18px;
+            font-family: 'Consolas', 'Cascadia Code', 'Segoe UI', monospace;
+            font-size: 1.15rem;
+            text-align: center;
+            margin-bottom: 10px;
+            letter-spacing: 0.3px;
+        }
+
+        .eq-symbol { color: var(--text-muted); }
+        .eq-pending { color: var(--warning); font-style: italic; }
+        .eq-confirmed { color: var(--success); font-weight: bold; }
+
+        .step-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .step-box {
+            background: var(--bg-card);
+            border-left: 4px solid var(--border);
+            padding: 10px 16px;
+            border-radius: 6px;
+            transition: all 0.3s;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .step-box.active {
+            opacity: 1;
+            border-left-color: var(--accent);
+            background: rgba(0, 210, 211, 0.08);
+            pointer-events: auto;
+        }
+
+        .step-box.completed {
+            opacity: 0.8;
+            border-left-color: var(--success);
+            pointer-events: auto;
+        }
+
+        .step-title {
+            font-weight: bold;
+            font-size: 1.08rem;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .step-hint-btn {
+            background: none;
+            border: none;
+            color: var(--warning);
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 0;
+            margin-bottom: 6px;
+            text-align: left;
+        }
+
+        .step-hint-btn:hover {
+            text-decoration: underline;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            background: #12151c;
+            border: 1px solid var(--border);
+            color: #ffffff;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 1.25rem;
+            width: 150px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 8px rgba(0, 210, 211, 0.3);
+        }
+
+        .btn {
+            background: var(--accent);
+            color: #000000;
+            border: none;
+            padding: 11px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1.02rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: #323b50;
+            color: #ffffff;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        .feedback {
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback.success {
+            display: block;
+            background: rgba(46, 204, 113, 0.15);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .feedback.error {
+            display: block;
+            background: rgba(231, 76, 60, 0.15);
+            border: 1px solid var(--error);
+            color: var(--error);
+        }
+
+        .feedback.reveal {
+            display: block;
+            background: rgba(243, 156, 18, 0.15);
+            border: 1px solid var(--warning);
+            color: var(--warning);
+        }
+
+        .feedback-next-btn {
+            display: block;
+            margin: 10px auto 0;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .filter-pill {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .filter-pill:hover {
+            color: var(--text-main);
+        }
+
+        .filter-pill.active {
+            background: var(--accent);
+            color: #000000;
+            border-color: var(--accent);
+        }
+
+        .practice-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            max-height: 480px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .practice-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .practice-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .practice-card.selected {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent);
+        }
+
+        .practice-card.solved {
+            border-color: var(--success);
+            background: rgba(46, 204, 113, 0.05);
+        }
+
+        .cat-dot {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .practice-formula {
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        .hint-box {
+            background: rgba(243, 156, 18, 0.1);
+            border-left: 4px solid var(--warning);
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #fdd835;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 480px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.4rem;
+            cursor: pointer;
+            float: right;
+        }
+
+        .modal-card h2 {
+            color: var(--accent);
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+        }
+
+        .modal-card ol, .modal-card ul {
+            padding-left: 20px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .modal-card ol + p, .modal-card ul + p {
+            margin-top: 16px;
+        }
+
+        .modal-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            margin: 16px 0 8px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 900px) {
+            main {
+                flex-direction: column;
+            }
+        }
+
+        /* Præsentér: guidet rundtur der forklarer logikken i siden (samme mønster som bordgrupper.html) */
+        @keyframes tourPulse {
+            0% { box-shadow: 0 0 0 4px rgba(251, 191, 36, .95), 0 0 0 4px rgba(251, 191, 36, .5), 0 0 0 9999px rgba(0, 0, 0, .7); }
+            70% { box-shadow: 0 0 0 4px rgba(251, 191, 36, .95), 0 0 0 16px rgba(251, 191, 36, 0), 0 0 0 9999px rgba(0, 0, 0, .7); }
+            100% { box-shadow: 0 0 0 4px rgba(251, 191, 36, .95), 0 0 0 16px rgba(251, 191, 36, 0), 0 0 0 9999px rgba(0, 0, 0, .7); }
+        }
+
+        .tour-highlight {
+            position: relative;
+            z-index: 10000;
+            border-radius: 8px;
+            animation: tourPulse 1.6s ease-out infinite;
+        }
+
+        .tour-tooltip {
+            position: fixed;
+            z-index: 10001;
+            max-width: 320px;
+            background: #f8fafc;
+            color: #1f2933;
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .5);
+        }
+
+        .tour-tooltip .tt-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            gap: 8px;
+        }
+
+        .tour-tooltip button {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .tour-tooltip .tt-skip {
+            background: transparent;
+            color: #64748b;
+            border-color: #cbd5e1;
+        }
+
+        .tour-tooltip .tt-next {
+            background: var(--accent);
+            color: #12151c;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">
+            <h1>⚗️ Tildeling af oxidationstal</h1>
+        </div>
+        <div class="header-stats">
+            <div class="stat-badge">
+                <span>Score:</span>
+                <span class="stat-value" id="scoreValue">0</span>
+            </div>
+            <div class="stat-badge">
+                <span>Streak:</span>
+                <span class="stat-value" id="streakValue">0 🔥</span>
+            </div>
+            <div class="stat-badge">
+                <span>Løst i alt:</span>
+                <span class="stat-value" id="progressValue">0 / 25</span>
+            </div>
+            <button class="btn btn-secondary" id="rulesBtn" onclick="app.openRules()">📋 Regel-oversigt</button>
+            <button class="btn btn-secondary" onclick="app.resetAll()">🔄 Genstart alt</button>
+        </div>
+    </header>
+
+    <nav class="tab-nav">
+        <button class="tab-btn active" id="navGuided" onclick="app.switchTab('guided')">1. Guidet Introduktion</button>
+        <button class="tab-btn" id="navPractice" onclick="app.switchTab('practice')">2. Trænings-Laboratoriet</button>
+    </nav>
+
+    <main>
+        <!-- FANE 1: GUIDET INTRODUKTION -->
+        <section id="tab-guided" class="view-section active">
+            <div class="col-left">
+                <div class="card">
+                    <div class="card-title">
+                        <span id="guidedTaskTitle">Opgave 1 af 6</span>
+                        <div id="guidedNavRow">
+                            <button class="btn btn-secondary btn-small" id="presentBtn" onclick="app.startTour()">🎬 Præsentér</button>
+                            <button class="btn btn-secondary btn-small" onclick="app.prevGuided()">⟵ Forrige</button>
+                            <button class="btn btn-secondary btn-small" onclick="app.nextGuided()">Næste ⟶</button>
+                        </div>
+                    </div>
+
+                    <div class="formula-display formula-display-lg" id="guidedFormulaBox"><span class="formula-atoms" id="guidedFormula"></span></div>
+
+                    <div class="equation-box" id="guidedEquation"></div>
+                    <p class="equation-caption">Regnestykket opdateres, mens du taster - og romertallet dukker op over atomet, når du svarer rigtigt.</p>
+
+                    <div class="step-container" id="guidedStepsContainer"></div>
+
+                    <div id="guidedFeedback" class="feedback" style="margin-top: 14px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FANE 2: TRÆNINGS-LABORATORIET -->
+        <section id="tab-practice" class="view-section">
+            <div class="col-left">
+                <div class="card">
+                    <div class="card-title">
+                        <span>Vælg et molekyle eller en ion</span>
+                    </div>
+                    <div class="filter-row" id="filterRow"></div>
+                    <div class="practice-grid" id="practiceGrid"></div>
+                </div>
+            </div>
+
+            <div class="col-right">
+                <div class="card">
+                    <div class="card-title">
+                        <span>Analyse-station</span>
+                        <span id="practiceProgress" style="font-size: 0.85rem; color: var(--accent);">0 / 25 løst</span>
+                    </div>
+
+                    <div class="formula-display"><span class="formula-atoms" id="practiceFormulaDisplay">Vælg en opgave</span></div>
+
+                    <p id="practiceQuestion" style="font-size: 1.05rem; margin-bottom: 16px;">
+                        Klik på en formel til venstre for at bestemme oxidationstallet.
+                    </p>
+
+                    <div class="equation-box" id="practiceAnswerBox" style="display: none;"></div>
+
+                    <div class="input-row" id="practiceInputRow" style="display: none; margin-bottom: 16px;">
+                        <input type="text" id="practiceInput" placeholder="OT (fx +4 / IV)">
+                        <button class="btn" onclick="app.checkPractice()">Tjek svar</button>
+                        <button class="btn btn-secondary" onclick="app.toggleHint('practiceHint')">💡 Hint</button>
+                    </div>
+
+                    <div id="practiceFeedback" class="feedback"></div>
+
+                    <div id="practiceHint" class="hint-box">
+                        <strong>Hjælp til opstilling:</strong>
+                        <div id="hintText" style="margin-top: 4px;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal-overlay" id="rulesModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="app.closeRules()">✕</button>
+            <h2>De 3 grundregler for oxidationstal</h2>
+            <ol>
+                <li><strong>Hydrogen (H)</strong> har (næsten) altid oxidationstal <strong>+I (+1)</strong>.</li>
+                <li><strong>Oxygen (O)</strong> har (næsten) altid oxidationstal <strong>-II (-2)</strong>.</li>
+                <li><strong>Summen</strong> af alle oxidationstal i et stof er lig stoffets samlede ladning: <strong>0</strong> for et neutralt molekyle, eller <strong>ionens ladning</strong> for en sammensat ion.</li>
+            </ol>
+            <p class="modal-section-title">To praktiske følger af regel 3</p>
+            <ul>
+                <li>Et enkelt atom, der selv er en ion (fx Mn²⁺), har oxidationstal = ionens ladning.</li>
+                <li>Et grundstof i ren, utilbundet form (fx S₈, O₂, Cl₂) har altid oxidationstal 0.</li>
+            </ul>
+            <p class="modal-section-title">Fremgangsmåde for en ukendt formel</p>
+            <ol>
+                <li>Find formlens samlede ladning (0 hvis neutral).</li>
+                <li>Sæt OT(O) = -2 og OT(H) = +1, hvor de indgår.</li>
+                <li>Isolér det ukendte oxidationstal - og del med antallet af atomer, hvis der er flere end ét.</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        /* ============================================================
+         * OXIDATIONSTAL: FORTOLKNING OG VISNING
+         * ============================================================ */
+        const ROMAN_MAP = { 0: '0', 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V', 6: 'VI', 7: 'VII', 8: 'VIII', 9: 'IX', 10: 'X' };
+        const ROMAN_VALUES = { I: 1, II: 2, III: 3, IV: 4, V: 5, VI: 6, VII: 7, VIII: 8, IX: 9, X: 10 };
+        const UNI_TO_ASCII = {
+            '₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4', '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9',
+            '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9',
+            '⁺': '+', '⁻': '-', '−': '-', '–': '-', '—': '-'
+        };
+        const normalizeChemInput = (str) => str.split('').map(ch => UNI_TO_ASCII[ch] || ch).join('');
+
+        const otArabic = (n) => (n === 0 ? '0' : (n > 0 ? `+${n}` : `${n}`));
+        const otRoman = (n) => (n === 0 ? '0' : (n > 0 ? `+${ROMAN_MAP[n]}` : `-${ROMAN_MAP[-n]}`));
+        const otBoth = (n) => `${otArabic(n)} (${otRoman(n)})`;
+
+        function parseOT(raw) {
+            if (raw == null) return null;
+            let s = normalizeChemInput(raw).trim().toUpperCase().replace(/\s+/g, '');
+            if (s === '') return null;
+            if (s === '0' || s === '+0' || s === '-0') return 0;
+            let sign = 1;
+            if (s.startsWith('+')) s = s.slice(1);
+            else if (s.startsWith('-')) { sign = -1; s = s.slice(1); }
+            else if (s.endsWith('+')) s = s.slice(0, -1);
+            else if (s.endsWith('-')) { sign = -1; s = s.slice(0, -1); }
+            if (s === '') return null;
+            if (/^\d+$/.test(s)) return sign * parseInt(s, 10);
+            if (ROMAN_VALUES[s] !== undefined) return sign * ROMAN_VALUES[s];
+            return null;
+        }
+
+        // Splitter en formel som "H₂SO₄" eller "Cr₂O₇²⁻" i atom-grupper (symbol + subscript)
+        // plus en evt. ladnings-suffiks (superscript-tegn til sidst), så hvert element kan
+        // få sit eget romertal vist lige over sig i formel-visningen.
+        const SUPERSCRIPT_CHARS = '⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻';
+        function parseFormulaAtoms(formula) {
+            let end = formula.length;
+            while (end > 0 && SUPERSCRIPT_CHARS.includes(formula[end - 1])) end--;
+            const mainPart = formula.slice(0, end);
+            const chargeSuffix = formula.slice(end);
+
+            const atoms = [];
+            const re = /([A-Z][a-z]?)([₀-₉]*)/g;
+            let m;
+            while ((m = re.exec(mainPart)) !== null) {
+                if (m[0] === '') { re.lastIndex++; continue; }
+                atoms.push({ symbol: m[1], subscript: m[2] || '' });
+            }
+            return { atoms, chargeSuffix };
+        }
+
+        const finalOT = (c) => (c.charge - c.H * 1 + c.O * 2) / c.unknownCount;
+
+        const buildEquationHint = (c) => {
+            const known = c.O * -2 + c.H * 1;
+            const knownStr = known === 0 ? '0' : (known > 0 ? `+${known}` : `${known}`);
+            const lhs = c.unknownCount > 1 ? `${c.unknownCount}×OT(${c.unknownEl})` : `OT(${c.unknownEl})`;
+            return `Ligning: ${lhs} + (${knownStr}) = ${c.charge}. Isolér ${lhs}` + (c.unknownCount > 1 ? `, og husk at dele med ${c.unknownCount} til sidst.` : '.');
+        };
+
+        const directHint = (c) => {
+            const parts = [];
+            if (c.O > 0) parts.push(`O bidrager med ${c.O} × (-2) = ${otArabic(c.O * -2)}`);
+            if (c.H > 0) parts.push(`H bidrager med ${c.H} × (+1) = ${otArabic(c.H * 1)}`);
+            parts.push(`Formlens samlede ladning er ${otArabic(c.charge)}`);
+            if (c.unknownCount > 1) parts.push(`Der er ${c.unknownCount} ${c.unknownEl}-atomer, så du skal dele den resterende ladning med ${c.unknownCount}`);
+            return parts.join('. ') + '.';
+        };
+
+        function buildGuidedSteps(c) {
+            const steps = [];
+            steps.push({
+                kind: 'charge', fieldLabel: 'Samlet ladning',
+                question: `Hvad er den samlede ladning for ${c.formula}?`,
+                hint: 'Kig efter et ladningstegn (fx ²⁻) efter formlen. Står der intet ladningstegn, er stoffet neutralt, og ladningen er 0.',
+                expected: c.charge, displayAnswer: otArabic(c.charge)
+            });
+            if (c.O > 0) {
+                steps.push({
+                    kind: 'O', atomLabel: 'O',
+                    fieldLabel: 'OT(O)', question: `Hvad er oxidationstallet for O i ${c.formula}?`,
+                    hint: 'Oxygen har (næsten) altid oxidationstal -II (-2).',
+                    expected: -2, displayAnswer: otBoth(-2)
+                });
+            }
+            if (c.H > 0) {
+                steps.push({
+                    kind: 'H', atomLabel: 'H',
+                    fieldLabel: 'OT(H)', question: `Hvad er oxidationstallet for H i ${c.formula}?`,
+                    hint: 'Hydrogen har (næsten) altid oxidationstal +I (+1).',
+                    expected: 1, displayAnswer: otBoth(1)
+                });
+            }
+            const fOT = finalOT(c);
+            steps.push({
+                kind: 'final', atomLabel: c.unknownEl,
+                fieldLabel: `OT(${c.unknownEl})`,
+                question: `Brug regnestykket til at finde oxidationstallet for ${c.unknownEl} i ${c.formula}.`,
+                hint: buildEquationHint(c),
+                expected: fOT, displayAnswer: otBoth(fOT)
+            });
+            return steps;
+        }
+
+        /* ============================================================
+         * DATA: hentet fra "8.1 Oxidationstal" i SelvrettendeKemiC.xlsx
+         * (Chromat/Dichromat tilføjet som ekstra, sværere eksempler)
+         * ============================================================ */
+        const REGLER_COMPOUNDS = [
+            { name: 'Carbondioxid', formula: 'CO₂', unknownEl: 'C', unknownCount: 1, O: 2, H: 0, charge: 0 },
+            { name: 'Ammonium-ionen', formula: 'NH₄⁺', unknownEl: 'N', unknownCount: 1, O: 0, H: 4, charge: 1 },
+            { name: 'Chlorat-ionen', formula: 'ClO₃⁻', unknownEl: 'Cl', unknownCount: 1, O: 3, H: 0, charge: -1 },
+            { name: 'Svovlsyre', formula: 'H₂SO₄', unknownEl: 'S', unknownCount: 1, O: 4, H: 2, charge: 0 },
+            { name: 'Chromat-ionen', formula: 'CrO₄²⁻', unknownEl: 'Cr', unknownCount: 1, O: 4, H: 0, charge: -2 },
+            { name: 'Dichromat-ionen', formula: 'Cr₂O₇²⁻', unknownEl: 'Cr', unknownCount: 2, O: 7, H: 0, charge: -2 }
+        ];
+
+        const MANGAN = [
+            { name: 'Mangan(IV)oxid', formula: 'MnO₂', unknownEl: 'Mn', unknownCount: 1, O: 2, H: 0, charge: 0 },
+            { name: 'Mangan(II)ion', formula: 'Mn²⁺', unknownEl: 'Mn', unknownCount: 1, O: 0, H: 0, charge: 2 },
+            { name: 'Manganat-ion', formula: 'MnO₄²⁻', unknownEl: 'Mn', unknownCount: 1, O: 4, H: 0, charge: -2 },
+            { name: 'Mangan(VII)oxid', formula: 'Mn₂O₇', unknownEl: 'Mn', unknownCount: 2, O: 7, H: 0, charge: 0 },
+            { name: 'Permanganat-ion', formula: 'MnO₄⁻', unknownEl: 'Mn', unknownCount: 1, O: 4, H: 0, charge: -1 }
+        ];
+        const NITROGEN = [
+            { name: 'Nitrogenmonoxid', formula: 'NO', unknownEl: 'N', unknownCount: 1, O: 1, H: 0, charge: 0 },
+            { name: 'Nitrogendioxid', formula: 'NO₂', unknownEl: 'N', unknownCount: 1, O: 2, H: 0, charge: 0 },
+            { name: 'Dinitrogenpentoxid', formula: 'N₂O₅', unknownEl: 'N', unknownCount: 2, O: 5, H: 0, charge: 0 },
+            { name: 'Dinitrogenoxid (lattergas)', formula: 'N₂O', unknownEl: 'N', unknownCount: 2, O: 1, H: 0, charge: 0 },
+            { name: 'Nitrit-ion', formula: 'NO₂⁻', unknownEl: 'N', unknownCount: 1, O: 2, H: 0, charge: -1 },
+            { name: 'Ammoniak', formula: 'NH₃', unknownEl: 'N', unknownCount: 1, O: 0, H: 3, charge: 0 },
+            { name: 'Nitrat-ion', formula: 'NO₃⁻', unknownEl: 'N', unknownCount: 1, O: 3, H: 0, charge: -1 },
+            { name: 'Salpetersyre', formula: 'HNO₃', unknownEl: 'N', unknownCount: 1, O: 3, H: 1, charge: 0 }
+        ];
+        const CARBON = [
+            { name: 'Carbonmonoxid', formula: 'CO', unknownEl: 'C', unknownCount: 1, O: 1, H: 0, charge: 0 },
+            { name: 'Carbondioxid', formula: 'CO₂', unknownEl: 'C', unknownCount: 1, O: 2, H: 0, charge: 0 },
+            { name: 'Oxalat-ion', formula: 'C₂O₄²⁻', unknownEl: 'C', unknownCount: 2, O: 4, H: 0, charge: -2 },
+            { name: 'Carbonat-ion', formula: 'CO₃²⁻', unknownEl: 'C', unknownCount: 1, O: 3, H: 0, charge: -2 },
+            { name: 'Hydrogencarbonat-ion', formula: 'HCO₃⁻', unknownEl: 'C', unknownCount: 1, O: 3, H: 1, charge: -1 }
+        ];
+        const SVOVL = [
+            { name: 'Svovltrioxid', formula: 'SO₃', unknownEl: 'S', unknownCount: 1, O: 3, H: 0, charge: 0 },
+            { name: 'Hydrogensulfit-ion', formula: 'HSO₃⁻', unknownEl: 'S', unknownCount: 1, O: 3, H: 1, charge: -1 },
+            { name: 'Sulfat-ion', formula: 'SO₄²⁻', unknownEl: 'S', unknownCount: 1, O: 4, H: 0, charge: -2 },
+            { name: 'Peroxodisulfat-ion', formula: 'S₂O₈²⁻', unknownEl: 'S', unknownCount: 2, O: 8, H: 0, charge: -2 },
+            { name: 'Svovldioxid', formula: 'SO₂', unknownEl: 'S', unknownCount: 1, O: 2, H: 0, charge: 0 },
+            { name: 'Thiosulfat-ion', formula: 'S₂O₃²⁻', unknownEl: 'S', unknownCount: 2, O: 3, H: 0, charge: -2 },
+            { name: 'Svovl (grundstofform)', formula: 'S₈', unknownEl: 'S', unknownCount: 8, O: 0, H: 0, charge: 0 }
+        ];
+
+        const CATEGORIES = [
+            { id: 'mangan', label: 'Mangan', color: 'var(--cat-mangan)', compounds: MANGAN },
+            { id: 'nitrogen', label: 'Nitrogen', color: 'var(--cat-nitrogen)', compounds: NITROGEN },
+            { id: 'carbon', label: 'Carbon', color: 'var(--cat-carbon)', compounds: CARBON },
+            { id: 'svovl', label: 'Svovl', color: 'var(--cat-svovl)', compounds: SVOVL }
+        ];
+        const ALL_PRACTICE = [];
+        CATEGORIES.forEach(cat => cat.compounds.forEach((c, i) => {
+            ALL_PRACTICE.push({ ...c, category: cat.id, catColor: cat.color, uid: `${cat.id}-${i}` });
+        }));
+
+        const AFTER_NOTES = {
+            'Mn²⁺': 'Bemærk: for en simpel, étatomig ion er oxidationstallet altid det samme som ionens ladning.',
+            'Mn₂O₇': 'Bemærk: der er 2 Mn-atomer i formlen, så den resterende ladning deles med 2.',
+            'S₈': 'Bemærk: et grundstof i ren, utilbundet form har altid oxidationstal 0 - uanset hvor mange atomer der sidder sammen (samme regel gælder fx O₂ og Cl₂).'
+        };
+
+        /* ============================================================
+         * APPLIKATIONENS HOVEDLOGIK
+         * ============================================================ */
+        class ChemistryApp {
+            constructor() {
+                this.guidedIndex = 0;
+                this.guidedWrongStreak = 0;
+                this.guidedConfirmed = {};
+                this.guidedPendingRaw = '';
+                this.score = 0;
+                this.streak = 0;
+                this.solvedPractice = new Set();
+                this.currentPractice = null;
+                this.practiceWrongStreak = 0;
+                this.categoryFilter = 'all';
+
+                this.init();
+            }
+
+            init() {
+                this.renderFilterRow();
+                this.loadGuidedTask(this.guidedIndex);
+                this.renderPracticeGrid();
+                this.updateStats();
+            }
+
+            switchTab(tabId) {
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+                if (tabId === 'guided') {
+                    document.getElementById('navGuided').classList.add('active');
+                    document.getElementById('tab-guided').classList.add('active');
+                } else {
+                    document.getElementById('navPractice').classList.add('active');
+                    document.getElementById('tab-practice').classList.add('active');
+                }
+            }
+
+            openRules() { document.getElementById('rulesModal').classList.add('open'); }
+            closeRules() { document.getElementById('rulesModal').classList.remove('open'); }
+
+            updateStats() {
+                document.getElementById('scoreValue').innerText = this.score;
+                document.getElementById('streakValue').innerText = `${this.streak} 🔥`;
+                document.getElementById('progressValue').innerText = `${this.solvedPractice.size} / ${ALL_PRACTICE.length}`;
+                document.getElementById('practiceProgress').innerText = `${this.solvedPractice.size} / ${ALL_PRACTICE.length} løst`;
+            }
+
+            resetAll() {
+                this.score = 0;
+                this.streak = 0;
+                this.solvedPractice.clear();
+                this.guidedIndex = 0;
+                this.currentPractice = null;
+                this.loadGuidedTask(0);
+                this.renderPracticeGrid();
+                document.getElementById('practiceFormulaDisplay').innerText = 'Vælg en opgave';
+                document.getElementById('practiceQuestion').innerText = 'Klik på en formel til venstre for at bestemme oxidationstallet.';
+                document.getElementById('practiceInputRow').style.display = 'none';
+                document.getElementById('practiceAnswerBox').style.display = 'none';
+                document.getElementById('practiceFeedback').className = 'feedback';
+                document.getElementById('practiceFeedback').style.display = '';
+                document.getElementById('practiceHint').style.display = 'none';
+                this.updateStats();
+                this.switchTab('guided');
+            }
+
+            registerCorrect(points) {
+                this.score += points;
+                this.streak += 1;
+                this.updateStats();
+            }
+
+            registerWrong() {
+                this.streak = 0;
+                this.updateStats();
+            }
+
+            /* --------------------------------------------------------
+             * FORMEL MED ROMERTAL OVER ATOMERNE + LIVE-REGNESTYKKE
+             * -------------------------------------------------------- */
+            buildFormulaAtomsHtml(c, confirmed) {
+                const { atoms, chargeSuffix } = parseFormulaAtoms(c.formula);
+                let html = '';
+                atoms.forEach((a, idx) => {
+                    let kind = null;
+                    if (a.symbol === 'O') kind = 'O';
+                    else if (a.symbol === 'H') kind = 'H';
+                    else if (a.symbol === c.unknownEl) kind = 'final';
+                    const val = kind && confirmed[kind] !== undefined ? confirmed[kind] : null;
+                    const label = val !== null ? otRoman(val) : '';
+                    // Ladningen skrives som almindelig tekst direkte efter sidste atom (som i "NH₄⁺") -
+                    // ladningstegnene er allerede rigtige Unicode-superskrift-tegn, ligesom subscript-tallene,
+                    // så de sidder korrekt uden ekstra styling. Ekstra font-size/vertical-align ødelagde det.
+                    const isLast = idx === atoms.length - 1;
+                    const chargeText = (isLast && chargeSuffix) ? chargeSuffix : '';
+                    html += `<span class="formula-atom"><span class="formula-atom-label">${label}</span><span>${a.symbol}${a.subscript}${chargeText}</span></span>`;
+                });
+                return html;
+            }
+
+            renderGuidedFormula() {
+                const c = REGLER_COMPOUNDS[this.guidedIndex];
+                document.getElementById('guidedFormula').innerHTML = this.buildFormulaAtomsHtml(c, this.guidedConfirmed);
+            }
+
+            renderPracticeFormula(c, solved) {
+                const confirmed = solved ? { final: finalOT(c) } : {};
+                document.getElementById('practiceFormulaDisplay').innerHTML = this.buildFormulaAtomsHtml(c, confirmed);
+            }
+
+            renderEquation() {
+                const c = REGLER_COMPOUNDS[this.guidedIndex];
+                const activeStep = this.guidedSteps[this.guidedStepIdx];
+
+                const term = (kind, coeff, symbol) => {
+                    const prefix = coeff > 1 ? `${coeff}·` : '';
+                    if (this.guidedConfirmed[kind] !== undefined) {
+                        return `<span class="eq-confirmed">${prefix}(${otArabic(this.guidedConfirmed[kind])})</span>`;
+                    }
+                    if (activeStep && activeStep.kind === kind && this.guidedPendingRaw) {
+                        const parsed = parseOT(this.guidedPendingRaw);
+                        const shown = parsed !== null ? otArabic(parsed) : this.guidedPendingRaw;
+                        return `<span class="eq-pending">${prefix}(${shown})</span>`;
+                    }
+                    return `<span class="eq-symbol">${prefix}${symbol}</span>`;
+                };
+
+                let lhs = term('final', c.unknownCount, `OT(${c.unknownEl})`);
+                if (c.O > 0) lhs += ' + ' + term('O', c.O, 'OT(O)');
+                if (c.H > 0) lhs += ' + ' + term('H', c.H, 'OT(H)');
+                const rhs = term('charge', 1, 'Ladning');
+
+                document.getElementById('guidedEquation').innerHTML = `${lhs} &nbsp;=&nbsp; ${rhs}`;
+            }
+
+            /* --------------------------------------------------------
+             * PRÆSENTÉR: guidet rundtur der forklarer logikken i siden
+             * (spotlight + tooltip, samme mønster som bordgrupper.html)
+             * -------------------------------------------------------- */
+            get tourSteps() {
+                return [
+                    { sel: '#guidedFormulaBox', text: 'Her ser du forbindelsens formel. Så snart du finder et atoms oxidationstal, dukker romertallet op lige over det pågældende atom.' },
+                    { sel: '#guidedEquation', text: 'Regnestykket viser reglen "Summen af oxidationstal = ladning". Det opdateres automatisk, mens du taster, så du hele tiden kan følge udregningen.' },
+                    { sel: '#guidedStepsContainer', text: 'Du svarer trin for trin: først formlens samlede ladning, så oxygen (altid -II) og evt. hydrogen (altid +I), og til sidst det ukendte grundstof. Sidder du fast, kan du klikke "Vis hint" under hvert trin.' },
+                    { sel: '#rulesBtn', text: 'Har du brug for at genopfriske de 3 grundregler for oxidationstal? Klik her - de er altid tilgængelige.' },
+                    { sel: '#guidedNavRow', text: 'Skift mellem de 6 opgaver med Forrige/Næste, eller løs opgaven færdig - så får du automatisk en "Næste opgave"-knap.' },
+                    { sel: '#navPractice', text: 'Når du er igennem de guidede opgaver, kan du øve dig på 25 molekyler og ioner i Trænings-Laboratoriet - her svarer du direkte på oxidationstallet, uden trin.' }
+                ];
+            }
+
+            clearTourHighlight() {
+                document.querySelectorAll('.tour-highlight').forEach(el => el.classList.remove('tour-highlight'));
+                const tt = document.getElementById('tourTooltip');
+                if (tt) tt.remove();
+            }
+
+            startTour() {
+                this.showTourStep(0);
+            }
+
+            showTourStep(i) {
+                this.clearTourHighlight();
+                const steps = this.tourSteps;
+                if (i >= steps.length) return;
+                const step = steps[i];
+                const el = document.querySelector(step.sel);
+                if (!el || el.offsetParent === null) { this.showTourStep(i + 1); return; }
+
+                el.classList.add('tour-highlight');
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                const tooltip = document.createElement('div');
+                tooltip.id = 'tourTooltip';
+                tooltip.className = 'tour-tooltip';
+                tooltip.innerHTML = `<div>${step.text}</div>` +
+                    `<div class="tt-actions">` +
+                    `<button type="button" class="tt-skip">Luk</button>` +
+                    `<button type="button" class="tt-next">${i === steps.length - 1 ? 'Afslut' : 'Næste'}</button>` +
+                    `</div>`;
+                document.body.appendChild(tooltip);
+
+                setTimeout(() => {
+                    const rect = el.getBoundingClientRect();
+                    let top = rect.bottom + 14;
+                    if (top + tooltip.offsetHeight > window.innerHeight - 10) top = Math.max(10, rect.top - tooltip.offsetHeight - 14);
+                    const left = Math.min(Math.max(10, rect.left), window.innerWidth - tooltip.offsetWidth - 10);
+                    tooltip.style.top = top + 'px';
+                    tooltip.style.left = left + 'px';
+                }, 300);
+
+                tooltip.querySelector('.tt-next').addEventListener('click', () => this.showTourStep(i + 1));
+                tooltip.querySelector('.tt-skip').addEventListener('click', () => this.clearTourHighlight());
+            }
+
+            /* --------------------------------------------------------
+             * GUIDET INTRODUKTION
+             * -------------------------------------------------------- */
+            loadGuidedTask(index) {
+                const c = REGLER_COMPOUNDS[index];
+                const steps = buildGuidedSteps(c);
+                this.guidedSteps = steps;
+                this.guidedStepIdx = 0;
+                this.guidedWrongStreak = 0;
+                this.guidedConfirmed = {};
+                this.guidedPendingRaw = '';
+
+                document.getElementById('guidedTaskTitle').innerText = `Opgave ${index + 1} af ${REGLER_COMPOUNDS.length}: ${c.name}`;
+                const feedbackEl = document.getElementById('guidedFeedback');
+                feedbackEl.className = 'feedback';
+                feedbackEl.style.display = '';
+                // Flyt beskeden ud af trin-containeren, før den ryddes - ellers bliver
+                // beskedens DOM-element selv slettet af innerHTML='' nedenfor.
+                document.body.appendChild(feedbackEl);
+
+                const container = document.getElementById('guidedStepsContainer');
+                container.innerHTML = '';
+                steps.forEach((step, i) => {
+                    const box = document.createElement('div');
+                    box.className = 'step-box' + (i === 0 ? ' active' : '');
+                    box.id = `gStep${i}`;
+                    box.innerHTML = `
+                        <div class="step-title"><span>Trin ${i + 1}: ${step.question}</span><span class="g-status"></span></div>
+                        <button class="step-hint-btn">💡 Vis hint</button>
+                        <p class="step-hint-text" style="display:none; font-size:0.85rem; color:var(--text-muted); margin-bottom:8px;">${step.hint}</p>
+                        <div class="input-row">
+                            <input type="text" class="g-input" placeholder="${i === 0 ? 'fx 0, -2 eller VI' : ''}">
+                            <button class="btn g-check">Tjek</button>
+                        </div>
+                    `;
+                    container.appendChild(box);
+
+                    const hintBtn = box.querySelector('.step-hint-btn');
+                    const hintText = box.querySelector('.step-hint-text');
+                    hintBtn.addEventListener('click', () => {
+                        const showing = hintText.style.display !== 'none';
+                        hintText.style.display = showing ? 'none' : 'block';
+                    });
+
+                    const input = box.querySelector('.g-input');
+                    const checkBtn = box.querySelector('.g-check');
+                    const doCheck = () => this.checkGuidedStep(i);
+                    checkBtn.addEventListener('click', doCheck);
+                    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') doCheck(); });
+                    input.addEventListener('input', () => {
+                        if (i === this.guidedStepIdx) {
+                            this.guidedPendingRaw = input.value;
+                            this.renderEquation();
+                        }
+                    });
+                });
+
+                this.moveFeedbackTo(0);
+                this.renderGuidedFormula();
+                this.renderEquation();
+            }
+
+            // Flytter den delte feedback-boks ind i det pågældende trins boks, lige under dets
+            // input-felt, så beskeden altid står i sammenhæng med det trin, den handler om.
+            moveFeedbackTo(stepIdx) {
+                const box = document.getElementById(`gStep${stepIdx}`);
+                const feedbackEl = document.getElementById('guidedFeedback');
+                if (box && feedbackEl) box.appendChild(feedbackEl);
+            }
+
+            nextGuided() {
+                this.guidedIndex = (this.guidedIndex + 1) % REGLER_COMPOUNDS.length;
+                this.loadGuidedTask(this.guidedIndex);
+            }
+
+            prevGuided() {
+                this.guidedIndex = (this.guidedIndex - 1 + REGLER_COMPOUNDS.length) % REGLER_COMPOUNDS.length;
+                this.loadGuidedTask(this.guidedIndex);
+            }
+
+            checkGuidedStep(stepIdx) {
+                if (stepIdx !== this.guidedStepIdx) return;
+                this.moveFeedbackTo(stepIdx);
+                const step = this.guidedSteps[stepIdx];
+                const box = document.getElementById(`gStep${stepIdx}`);
+                const input = box.querySelector('.g-input');
+                const parsed = parseOT(input.value);
+
+                if (parsed !== null && parsed === step.expected) {
+                    box.classList.remove('active');
+                    box.classList.add('completed');
+                    box.querySelector('.g-status').innerText = `✓ ${step.displayAnswer}`;
+                    this.guidedWrongStreak = 0;
+                    this.guidedConfirmed[step.kind] = parsed;
+                    this.guidedPendingRaw = '';
+                    this.renderGuidedFormula();
+
+                    const isFinalStep = stepIdx === this.guidedSteps.length - 1;
+                    if (!isFinalStep) {
+                        this.guidedStepIdx = stepIdx + 1;
+                        document.getElementById(`gStep${this.guidedStepIdx}`).classList.add('active');
+                        this.showFeedback('guidedFeedback', 'Korrekt! Gå videre til næste trin.', 'success');
+                        this.registerCorrect(5);
+                    } else {
+                        const isLastTask = this.guidedIndex === REGLER_COMPOUNDS.length - 1;
+                        const msg = `Flot! Regnestykket går op. OT(${step.atomLabel}) = ${step.displayAnswer}.` + (isLastTask ? ' 🎉 Du har gennemført alle opgaverne!' : '');
+                        this.showFeedback('guidedFeedback', msg, 'success', isLastTask ? null : { label: 'Næste opgave →', onClick: () => this.nextGuided() });
+                        this.registerCorrect(15);
+                    }
+                    this.renderEquation();
+                } else {
+                    this.guidedWrongStreak += 1;
+                    this.registerWrong();
+                    if (this.guidedWrongStreak >= 3) {
+                        this.showFeedback('guidedFeedback', `Her er svaret: ${step.displayAnswer}. Klik Tjek igen for at fortsætte.`, 'reveal');
+                        input.value = normalizeChemInputSafe(step.displayAnswer);
+                        this.guidedPendingRaw = input.value;
+                        this.renderEquation();
+                    } else if (this.guidedWrongStreak === 2) {
+                        this.showFeedback('guidedFeedback', 'Stadig ikke helt rigtigt. Prøv evt. hint-knappen.', 'error');
+                    } else {
+                        this.showFeedback('guidedFeedback', 'Ikke helt rigtigt endnu. Prøv igen.', 'error');
+                    }
+                }
+            }
+
+            /* --------------------------------------------------------
+             * TRÆNINGS-LABORATORIET
+             * -------------------------------------------------------- */
+            renderFilterRow() {
+                const row = document.getElementById('filterRow');
+                row.innerHTML = '';
+                const makePill = (id, label) => {
+                    const pill = document.createElement('button');
+                    pill.className = 'filter-pill' + (this.categoryFilter === id ? ' active' : '');
+                    pill.innerText = label;
+                    pill.addEventListener('click', () => {
+                        this.categoryFilter = id;
+                        this.renderFilterRow();
+                        this.renderPracticeGrid();
+                    });
+                    row.appendChild(pill);
+                };
+                makePill('all', 'Alle');
+                CATEGORIES.forEach(cat => makePill(cat.id, cat.label));
+            }
+
+            renderPracticeGrid() {
+                const grid = document.getElementById('practiceGrid');
+                grid.innerHTML = '';
+                const list = this.categoryFilter === 'all' ? ALL_PRACTICE : ALL_PRACTICE.filter(c => c.category === this.categoryFilter);
+                list.forEach(c => {
+                    const card = document.createElement('div');
+                    const isSolved = this.solvedPractice.has(c.uid);
+                    const isSelected = this.currentPractice && this.currentPractice.uid === c.uid;
+                    card.className = 'practice-card' + (isSolved ? ' solved' : '') + (isSelected ? ' selected' : '');
+                    card.innerHTML = `
+                        <span class="cat-dot" style="background:${c.catColor}"></span>
+                        <div class="practice-formula">${c.formula}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); text-align:center;">${c.name}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Find OT(${c.unknownEl})</div>
+                    `;
+                    card.addEventListener('click', () => this.selectPracticeTask(c));
+                    grid.appendChild(card);
+                });
+            }
+
+            selectPracticeTask(c) {
+                this.currentPractice = c;
+                this.practiceWrongStreak = 0;
+                this.renderPracticeFormula(c, false);
+                document.getElementById('practiceQuestion').innerHTML = `<strong>${c.name}</strong> — hvad er oxidationstallet for ${c.unknownEl} i ${c.formula}?`;
+                document.getElementById('practiceInputRow').style.display = 'flex';
+                const input = document.getElementById('practiceInput');
+                input.value = '';
+                input.focus();
+                document.getElementById('practiceAnswerBox').style.display = 'none';
+                document.getElementById('practiceFeedback').className = 'feedback';
+                document.getElementById('practiceFeedback').style.display = '';
+                document.getElementById('practiceHint').style.display = 'none';
+                document.getElementById('hintText').innerText = directHint(c);
+                this.renderPracticeGrid();
+            }
+
+            checkPractice() {
+                if (!this.currentPractice) return;
+                const c = this.currentPractice;
+                const parsed = parseOT(document.getElementById('practiceInput').value);
+                const expected = finalOT(c);
+
+                const answerBox = document.getElementById('practiceAnswerBox');
+                const showAnswerBox = () => {
+                    answerBox.innerHTML = `OT(${c.unknownEl}) = <span class="eq-confirmed">${otArabic(expected)}</span>`;
+                    answerBox.style.display = 'block';
+                    this.renderPracticeFormula(c, true);
+                };
+
+                if (parsed !== null && parsed === expected) {
+                    const note = AFTER_NOTES[c.formula];
+                    let msg = `Fremragende! I ${c.name} (${c.formula}) har ${c.unknownEl} oxidationstallet ${otBoth(expected)}.`;
+                    if (note) msg += ' ' + note;
+                    this.showFeedback('practiceFeedback', msg, 'success');
+                    showAnswerBox();
+                    this.practiceWrongStreak = 0;
+                    if (!this.solvedPractice.has(c.uid)) {
+                        this.solvedPractice.add(c.uid);
+                        this.registerCorrect(10);
+                        this.renderPracticeGrid();
+                    }
+                } else {
+                    this.practiceWrongStreak += 1;
+                    this.registerWrong();
+                    if (this.practiceWrongStreak >= 3) {
+                        this.showFeedback('practiceFeedback', `Her er svaret: ${otBoth(expected)}.`, 'reveal');
+                        showAnswerBox();
+                        if (!this.solvedPractice.has(c.uid)) {
+                            this.solvedPractice.add(c.uid);
+                            this.updateStats();
+                            this.renderPracticeGrid();
+                        }
+                    } else if (this.practiceWrongStreak === 2) {
+                        this.showFeedback('practiceFeedback', 'Stadig ikke helt rigtigt. Prøv evt. hint-knappen.', 'error');
+                    } else {
+                        this.showFeedback('practiceFeedback', 'Det er desværre ikke rigtigt. Prøv igen.', 'error');
+                    }
+                }
+            }
+
+            toggleHint(elId) {
+                const hintBox = document.getElementById(elId);
+                hintBox.style.display = hintBox.style.display === 'none' || !hintBox.style.display ? 'block' : 'none';
+            }
+
+            showFeedback(elementId, message, type, button) {
+                const el = document.getElementById(elementId);
+                el.innerText = message;
+                el.className = `feedback ${type}`;
+                el.style.display = '';
+                if (button) {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn btn-small feedback-next-btn';
+                    btn.innerText = button.label;
+                    btn.addEventListener('click', button.onClick);
+                    el.appendChild(btn);
+                }
+            }
+        }
+
+        function normalizeChemInputSafe(displayAnswer) {
+            const m = displayAnswer.match(/^[+-]?\d+/);
+            return m ? m[0] : '';
+        }
+
+        let app;
+        window.addEventListener('DOMContentLoaded', () => {
+            app = new ChemistryApp();
+        });
+    </script>
+</body>
+</html>

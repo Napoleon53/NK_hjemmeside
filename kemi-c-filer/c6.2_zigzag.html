@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title>Zigzagformler</title>
+    <style>
+        :root {
+            --bg: #f3f4f6;
+            --panel: #ffffff;
+            --primary: #2563eb;
+            --success: #16a34a;
+            --warning: #f59e0b;
+            --danger: #dc2626;
+            --text: #111827;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            user-select: none;
+        }
+
+        #mode-tabs {
+            flex-shrink: 0;
+            display: flex;
+            gap: 10px;
+            padding: 12px 20px;
+            background: #1f2937;
+            z-index: 30;
+        }
+        .mode-tab {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 10px;
+            background: #374151;
+            color: #d1d5db;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mode-tab:hover { background: #4b5563; }
+        .mode-tab.active { background: var(--primary); color: white; }
+
+        .view { display: none; flex: 1; min-height: 0; }
+        .view.active { display: flex; }
+
+        .panel { background: var(--panel); flex-shrink: 0; display: flex; flex-direction: column; z-index: 20; }
+
+        .sidebar-col {
+            width: 340px;
+            flex-shrink: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.05);
+            overflow-y: auto;
+        }
+
+        h1 { margin: 0 0 5px 0; font-size: 1.5rem; color: #1f2937; }
+        .subtitle { color: #6b7280; font-size: 0.9rem; margin-bottom: 18px; }
+
+        .progress-line { font-size: 0.8rem; color: #6b7280; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; }
+        .progress-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin-bottom: 20px; }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
+
+        .mission-card {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border: 1px solid #bfdbfe; padding: 20px; border-radius: 12px;
+            text-align: center; margin-bottom: 20px;
+        }
+        .card-label { font-size: 0.8rem; text-transform: uppercase; color: #60a5fa; font-weight: 700; }
+        .formula { font-size: 1.6rem; font-weight: 800; color: #1e40af; letter-spacing: 0.3px; line-height: 1.2; margin: 10px 0; white-space: nowrap; }
+
+        #draw-target-wrap {
+            background: white; border-radius: 10px; padding: 10px; margin: 10px 0;
+            display: flex; align-items: center; justify-content: center; min-height: 90px;
+            box-shadow: inset 0 0 0 1px #e5e7eb;
+        }
+        #draw-target-wrap svg { max-width: 100%; height: auto; max-height: 230px; }
+
+        .btn-check {
+            width: 100%; padding: 16px; background: var(--success); color: white;
+            border: none; border-radius: 10px; font-size: 1.1rem; font-weight: 800;
+            cursor: pointer; margin-bottom: 12px; transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(22, 163, 74, 0.2);
+            opacity: 0.6;
+        }
+        .btn-check.ready { opacity: 1; }
+        .btn-check:active { transform: scale(0.98); }
+        .btn-check:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .btn-clear {
+            width: 100%; padding: 12px; background: white; color: var(--danger);
+            border: 2px solid var(--danger); border-radius: 10px; font-weight: 700; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-clear:hover { background: #fef2f2; }
+
+        .feedback-area {
+            margin-top: 14px; padding: 15px; border-radius: 8px;
+            background: #fff; border: 1px dashed #cbd5e1;
+            text-align: center; font-weight: 600; color: #475569;
+            line-height: 1.5; min-height: 20px;
+        }
+
+        .name-input-row { display: flex; gap: 8px; margin-bottom: 12px; }
+        .text-input {
+            flex: 1; padding: 12px 14px; border: 2px solid #cbd5e1; border-radius: 8px;
+            font-size: 1rem; font-family: inherit;
+        }
+        .text-input:focus { outline: none; border-color: var(--primary); }
+        .text-input:disabled { background: #f3f4f6; color: #9ca3af; }
+
+        .list-panel-col {
+            width: 290px;
+            flex-shrink: 0;
+            border-left: 1px solid #e5e7eb;
+            padding: 16px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .found-header { font-size: 0.9rem; font-weight: 700; color: #6b7280; margin-bottom: 10px; text-transform: uppercase; }
+        .found-item {
+            padding: 12px; background: #f9fafb; border-radius: 8px; margin-bottom: 8px;
+            font-size: 0.9rem; border: 1px solid transparent; transition: all 0.3s;
+        }
+        .found-item-locked { display: flex; justify-content: space-between; align-items: center; }
+        .found-item-header { display: flex; justify-content: space-between; align-items: center; }
+        .found-item.new {
+            background: #ecfdf5; color: #065f46; border-color: #a7f3d0; font-weight: 700;
+            animation: slideIn 0.3s ease-out;
+        }
+        .found-diagram {
+            margin-top: 8px; background: #ffffff; border: 1px solid #a7f3d0; border-radius: 6px;
+            padding: 6px; display: flex; align-items: center; justify-content: center; min-height: 58px;
+        }
+        .found-diagram svg { display: block; max-width: 100%; height: auto; }
+
+        .diagram-legend {
+            display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #6b7280;
+            margin-bottom: 14px;
+        }
+        .diagram-legend .dot-main, .diagram-legend .dot-branch { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+        .diagram-legend .dot-main { background: #334155; }
+        .diagram-legend .dot-branch { background: #2563eb; }
+
+        @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        .stage { flex-grow: 1; position: relative; min-width: 260px; background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px); background-size: 30px 30px; }
+        .stage.build-cursor { cursor: crosshair; }
+        .stage.pick-cursor { cursor: pointer; }
+
+        .instructions {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: rgba(255,255,255,0.95); padding: 12px 24px; border-radius: 30px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); pointer-events: none; color: #374151;
+            font-weight: 600; font-size: 0.95rem; text-align: center; max-width: 90%;
+        }
+
+        .chain-legend {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%) translateY(-10px);
+            background: rgba(255,255,255,0.95); padding: 8px 18px; border-radius: 20px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); pointer-events: none; color: #374151;
+            font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;
+            opacity: 0; transition: all 0.3s ease-out; z-index: 40;
+        }
+        .chain-legend.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .chain-legend .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-left: 8px; }
+        .chain-legend .dot:first-child { margin-left: 0; }
+
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7); }
+            70% { box-shadow: 0 0 0 12px rgba(22, 163, 74, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+        }
+        .pulse-btn { animation: pulse-green 1.5s infinite; }
+
+        #restart-btn {
+            position: fixed; top: 12px; right: 16px; z-index: 200;
+            display: flex; align-items: center; gap: 6px;
+            background: white; color: #374151; border: 1px solid #e5e7eb;
+            padding: 8px 14px; border-radius: 20px; font-weight: 700; font-size: 0.85rem;
+            cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+        }
+        #restart-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+        .toast {
+            position: absolute; top: 40px; left: 50%; transform: translateX(-50%);
+            padding: 10px 20px; border-radius: 20px; font-weight: 700; color: white;
+            opacity: 0; transition: opacity 0.2s; pointer-events: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        .toast.error { background: var(--danger); }
+        .toast.warning { background: var(--warning); color: #111; }
+
+        .overlay-backdrop {
+            position: fixed; inset: 0; background: rgba(15,23,42,0.55);
+            display: none; align-items: center; justify-content: center; z-index: 500;
+        }
+        .overlay-backdrop.show { display: flex; }
+        .overlay-card {
+            background: white; border-radius: 18px; padding: 36px 50px; text-align: center;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); max-width: 420px; position: relative;
+        }
+        .overlay-card h2 { margin: 0 0 10px 0; color: var(--primary); font-size: 1.7rem; }
+        .overlay-close-btn {
+            position: absolute; top: 8px; right: 12px; border: none; background: transparent;
+            color: #9ca3af; font-size: 1.2rem; cursor: pointer; line-height: 1; padding: 4px;
+        }
+        .overlay-close-btn:hover { color: #374151; }
+
+        /* Ved høj zoom / smallere vindue: behold sidepanel + tegnefelt side om side,
+           men lad kun højre "fundne"-panel flytte ned under tegnefeltet,
+           så opgave og tegning altid er synlige samtidig. */
+        @media (max-width: 900px) {
+            .view.active { flex-wrap: wrap; overflow-y: auto; }
+            .stage { min-height: 55vh; }
+            .list-panel-col {
+                width: 100%; flex-basis: 100%; order: 3;
+                max-height: 220px; height: auto;
+                border-left: none; border-top: 1px solid #e5e7eb;
+            }
+        }
+
+        @media (max-width: 660px) {
+            body { overflow-y: auto; }
+            .view.active { flex-direction: column; }
+            .sidebar-col { width: 100%; }
+            .stage { min-height: 55vh; border-bottom: 1px solid #ccc; }
+            .list-panel-col { max-height: none; }
+            .mission-card { margin-bottom: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<button id="restart-btn" onclick="restartAll()" title="Generér 10 nye molekyler i begge øvelser">↺ Genstart</button>
+
+<div id="mode-tabs">
+    <button class="mode-tab active" id="tab-draw" onclick="switchMode('draw')">🔨 Tegn zigzag</button>
+    <button class="mode-tab" id="tab-atoms" onclick="switchMode('atoms')">⚛️ Sæt atomer på</button>
+</div>
+
+<!-- ===================== FANE 1: TEGN ZIGZAG UD FRA FULD STRUKTURFORMEL ===================== -->
+<div id="view-draw" class="view active">
+    <div class="panel sidebar-col">
+        <h1>Tegn zigzagformlen</h1>
+        <div class="subtitle">Molekylet er vist med alle C- og H-atomer. Tegn den tilsvarende zigzagform (stregformel).</div>
+
+        <div class="progress-line">Molekyle <span id="draw-progress-num">1</span> / 10</div>
+        <div class="progress-bar"><div class="progress-fill" id="draw-progress-fill"></div></div>
+
+        <div class="mission-card">
+            <div class="card-label">Tegn zigzagformen for dette molekyle</div>
+            <div id="draw-target-wrap"></div>
+            <div id="draw-target-formula" style="color:#60a5fa; font-weight:700;">-</div>
+            <div id="draw-current-count" style="color:#64748b; font-weight:600; margin-top:8px;">0 / 0 Atomer</div>
+        </div>
+
+        <button id="draw-check-btn" class="btn-check" onclick="drawGame.checkSolution()">TJEK SVAR</button>
+        <button class="btn-clear" onclick="drawGame.reset()">Ryd Alt</button>
+
+        <div id="draw-feedback-area" class="feedback-area">Tegn molekylet ved at trække fra C-atomet.</div>
+    </div>
+
+    <div id="draw-stage" class="stage build-cursor">
+        <canvas id="draw-canvas"></canvas>
+        <div id="draw-toast" class="toast error">Fejlbesked</div>
+        <div class="instructions"><span>🖱️ Klik &amp; Træk for at bygge | Klik på en binding for dobbeltbinding | Højreklik for at slette</span></div>
+        <div id="draw-chain-legend" class="chain-legend">
+            <span class="dot" style="background:#16a34a"></span> Hovedkæde
+            <span class="dot" style="background:#2563eb"></span> Sidegruppe
+        </div>
+    </div>
+
+    <div class="panel list-panel-col">
+        <div class="found-header">Løste molekyler (<span id="draw-progress-txt">0/10</span>)</div>
+        <div class="diagram-legend"><span class="dot-main"></span> Hovedkæde &nbsp; <span class="dot-branch"></span> Sidegruppe</div>
+        <div id="draw-found-list"></div>
+    </div>
+</div>
+
+<!-- ===================== FANE 2: SÆT C- OG H-ATOMER PÅ EN GIVEN ZIGZAGFORMEL ===================== -->
+<div id="view-atoms" class="view">
+    <div class="panel sidebar-col">
+        <h1>Sæt atomer på zigzagformlen</h1>
+        <div class="subtitle">Find alle C-atomer i figuren, tilføj de rigtige H-atomer, og skriv til sidst molekylformlen.</div>
+
+        <div class="progress-line">Molekyle <span id="atoms-progress-num">1</span> / 10</div>
+        <div class="progress-bar"><div class="progress-fill" id="atoms-progress-fill"></div></div>
+
+        <div class="mission-card">
+            <div class="card-label">Trin <span id="atoms-phase-num">1</span> af 3</div>
+            <div class="formula" id="atoms-phase-title" style="font-size:1.3rem;">Sæt C-atomer</div>
+            <div id="atoms-phase-desc" style="color:#475569; font-weight:600; font-size:0.9rem;">Klik på hvert "knæk" og hver ende af figuren for at markere et C-atom.</div>
+            <div id="atoms-progress-count" style="color:#64748b; font-weight:600; margin-top:8px;">0 / 0 C-atomer</div>
+        </div>
+
+        <button id="atoms-check-h-btn" class="btn-check" style="display:none;" onclick="atomsGame.checkHydrogens()">TJEK H-ATOMER</button>
+
+        <div id="atoms-formula-row" style="display:none;">
+            <div class="card-label" style="margin-bottom:6px;">Molekylformel</div>
+            <div class="name-input-row">
+                <input type="text" id="atoms-formula-input" class="text-input" placeholder="fx C5H12" autocomplete="off" spellcheck="false">
+            </div>
+            <button id="atoms-formula-btn" class="btn-check ready" onclick="atomsGame.checkFormula()">TJEK FORMEL</button>
+        </div>
+
+        <button class="btn-clear" onclick="atomsGame.reset()">Ryd Alt</button>
+
+        <div id="atoms-feedback-area" class="feedback-area">Klik på hver "knæk" og hver ende af figuren for at markere et C-atom.</div>
+    </div>
+
+    <div id="atoms-stage" class="stage pick-cursor">
+        <canvas id="atoms-canvas"></canvas>
+        <div class="instructions" id="atoms-instructions">🖱️ Klik på hver "knæk"/endepunkt for at sætte et C-atom</div>
+    </div>
+
+    <div class="panel list-panel-col">
+        <div class="found-header">Løste molekyler (<span id="atoms-progress-txt">0/10</span>)</div>
+        <div class="diagram-legend"><span class="dot-main"></span> Hovedkæde &nbsp; <span class="dot-branch"></span> Sidegruppe</div>
+        <div id="atoms-found-list"></div>
+    </div>
+</div>
+
+<div class="overlay-backdrop" id="complete-overlay">
+    <div class="overlay-card">
+        <button class="overlay-close-btn" onclick="closeOverlay()" title="Luk">✕</button>
+        <h2 id="complete-title">Fremragende! 🌟</h2>
+        <p>Du har klaret alle 10 molekyler i denne øvelse.</p>
+        <p style="color:#64748b; font-size:0.9rem;">Skift evt. til den anden fane, eller tryk Genstart for nye molekyler.</p>
+    </div>
+</div>
+
+<script>
+/**
+ * ZIGZAGFORMLER v1.0
+ * Genbruger tegne-/navngivningsmotoren fra c6.4_byg_alkaner.html (som selv genbruger
+ * c6.3_isomeri_alkaner.html's IUPAC/AlkeneIUPAC/CanonicalDraw) - se dét filens egen
+ * kommentar for baggrunden. Denne fil tilføjer to NYE renderere oven på den samme
+ * (path, subs, dbInfo)-datastruktur som CanonicalDraw allerede bruger:
+ *   - FullStructureDraw: tegner den FULDE strukturformel (alle C og H eksplicit,
+ *     lagt ud på et 90°-gitter) - bruges som opgave-visning i fane 1.
+ *   - ZigzagGeometry: samme zigzag-geometri som CanonicalDraw, men med eksplicit
+ *     indeks-baserede kanter (til brug i fane 2's interaktive C/H-mærkning).
+ *
+ * IUPAC/AlkeneIUPAC.analyzeStructure() er stadig den eneste autoritet for hvad et
+ * molekyle hedder - både generatoren og tjek-funktionen i fane 1 bruger den samme
+ * funktion, så det tegnede og det, eleven skal ramme, aldrig kan komme i modstrid.
+ */
+
+class IUPAC {
+    static analyzeStructure(nodes, edges) {
+        let adj = {}; nodes.forEach(n => adj[n.id] = []);
+        edges.forEach(e => { adj[e.a].push(e.b); adj[e.b].push(e.a); });
+
+        let ends = nodes.filter(n => adj[n.id].length === 1);
+        if(nodes.length === 1) ends = [nodes[0]];
+        if(ends.length < 2) return { name: "ukendt struktur", path: nodes.map(n => n.id), subs: [] };
+
+        let maxPath = [];
+        const dfs = (c, v, p) => {
+            v.add(c); p.push(c);
+            let end = true;
+            for(let n of adj[c]) if(!v.has(n)) { end = false; dfs(n, new Set(v), [...p]); }
+            if(end && p.length > maxPath.length) maxPath = p;
+        };
+        ends.forEach(n => dfs(n.id, new Set(), []));
+
+        const roots = ["", "methan", "ethan", "propan", "butan", "pentan", "hexan", "heptan", "octan", "nonan", "decan"];
+        let base = roots[maxPath.length] || "poly";
+
+        let variants = [];
+        [maxPath, [...maxPath].reverse()].forEach(path => {
+            let subs = []; let pSet = new Set(path);
+            path.forEach((id, i) => {
+                adj[id].forEach(n => {
+                    if(!pSet.has(n)) {
+                        let sz = IUPAC.size(n, id, adj);
+                        subs.push({p: i+1, size: sz, n: sz===1 ? "methyl" : (sz===2 ? "ethyl" : "propyl")});
+                    }
+                });
+            });
+            variants.push({ path, subs });
+        });
+
+        let chosenIdx = 0;
+        let s1 = variants[0].subs.map(x=>x.p).sort().join('');
+        let s2 = variants[1].subs.map(x=>x.p).sort().join('');
+        if(s1 > s2) chosenIdx = 1;
+        else if(s2 > s1) chosenIdx = 0;
+
+        let chosen = variants[chosenIdx].subs;
+        let chosenPath = variants[chosenIdx].path;
+
+        let name;
+        if(chosen.length === 0) {
+            name = base.toLowerCase();
+        } else {
+            let cnt = {};
+            chosen.forEach(s => { if(!cnt[s.n]) cnt[s.n]=[]; cnt[s.n].push(s.p); });
+
+            let pre = [];
+            Object.keys(cnt).sort().forEach(k => {
+                let nums = cnt[k].sort((a,b)=>a-b).join(",");
+                let mul = {1:"", 2:"di", 3:"tri", 4:"tetra", 5:"penta"}[cnt[k].length] || "";
+                pre.push(`${nums}-${mul}${k}`);
+            });
+
+            name = (pre.join("-") + base).toLowerCase();
+        }
+
+        return { name, path: chosenPath, subs: chosen };
+    }
+
+    static getName(nodes, edges) {
+        return IUPAC.analyzeStructure(nodes, edges).name;
+    }
+
+    static size(n, p, adj) {
+        let s=1; for(let k of adj[n]) if(k!==p) s+=IUPAC.size(k, n, adj); return s;
+    }
+}
+
+const ALKENE_STEMS = ["", "meth", "eth", "prop", "but", "pent", "hex", "hept", "oct", "non", "dec"];
+
+class AlkeneIUPAC {
+    static analyzeStructure(nodes, edges) {
+        let doubleEdges = edges.filter(e => e.order === 2);
+        if (doubleEdges.length !== 1) {
+            return { error: doubleEdges.length === 0 ? "no-double-bond" : "too-many-double-bonds" };
+        }
+        let { a, b } = doubleEdges[0];
+
+        let adj = {}; nodes.forEach(n => adj[n.id] = []);
+        edges.forEach(e => { adj[e.a].push(e.b); adj[e.b].push(e.a); });
+
+        function farthestPath(start, banned) {
+            let best = [start];
+            function dfs(cur, prevId, path) {
+                if (path.length > best.length) best = path.slice();
+                for (let n of adj[cur]) {
+                    if (n === prevId || n === banned) continue;
+                    dfs(n, cur, path.concat([n]));
+                }
+            }
+            dfs(start, null, [start]);
+            return best;
+        }
+
+        let pathFromA = farthestPath(a, b);
+        let pathFromB = farthestPath(b, a);
+        let fullPath = pathFromA.slice().reverse().concat(pathFromB);
+
+        function subsFor(path) {
+            let subs = []; let pSet = new Set(path);
+            path.forEach((id, i) => {
+                adj[id].forEach(n => {
+                    if (!pSet.has(n)) {
+                        let sz = AlkeneIUPAC.size(n, id, adj);
+                        subs.push({ p: i + 1, size: sz, n: sz === 1 ? "methyl" : (sz === 2 ? "ethyl" : "propyl") });
+                    }
+                });
+            });
+            return subs;
+        }
+
+        let variants = [fullPath, fullPath.slice().reverse()].map(path => {
+            let idxA = path.indexOf(a), idxB = path.indexOf(b);
+            return { path, dbLocant: Math.min(idxA, idxB) + 1, subs: subsFor(path) };
+        });
+
+        let chosen = variants[0];
+        if (variants[1].dbLocant < variants[0].dbLocant) {
+            chosen = variants[1];
+        } else if (variants[1].dbLocant === variants[0].dbLocant) {
+            let s0 = variants[0].subs.map(x => x.p).sort().join('');
+            let s1 = variants[1].subs.map(x => x.p).sort().join('');
+            chosen = (s1 < s0) ? variants[1] : variants[0];
+        }
+
+        let L = chosen.path.length;
+        let stem = ALKENE_STEMS[L] || "?";
+        let enPart = L <= 3 ? `${stem}en` : `${stem}-${chosen.dbLocant}-en`;
+
+        let name;
+        if (chosen.subs.length === 0) {
+            name = enPart.toLowerCase();
+        } else {
+            let cnt = {};
+            chosen.subs.forEach(s => { if (!cnt[s.n]) cnt[s.n] = []; cnt[s.n].push(s.p); });
+            let pre = [];
+            Object.keys(cnt).sort().forEach(k => {
+                let nums = cnt[k].sort((x, y) => x - y).join(",");
+                let mul = { 1: "", 2: "di", 3: "tri", 4: "tetra" }[cnt[k].length] || "";
+                pre.push(`${nums}-${mul}${k}`);
+            });
+            name = (pre.join("-") + enPart).toLowerCase();
+        }
+
+        return { name, path: chosen.path, subs: chosen.subs, dbLocant: chosen.dbLocant, a, b };
+    }
+
+    static size(n, p, adj) {
+        let s = 1; for (let k of adj[n]) if (k !== p) s += AlkeneIUPAC.size(k, n, adj); return s;
+    }
+}
+
+class CanonicalDraw {
+    static BOND = 32;
+    static CHAIN_HALF_ANGLE = 30;
+    static BRANCH_TURN = 45;
+    static FAN_SPREAD = 44;
+
+    static toRad(deg) { return deg * Math.PI / 180; }
+
+    static build(path, subs, dbInfo) {
+        const B = CanonicalDraw.BOND;
+        const toRad = CanonicalDraw.toRad;
+
+        let atoms = [{ x: 0, y: 0, isChain: true }];
+        for (let i = 1; i < path.length; i++) {
+            let angle = (i % 2 === 1) ? -CanonicalDraw.CHAIN_HALF_ANGLE : CanonicalDraw.CHAIN_HALF_ANGLE;
+            let prev = atoms[i - 1];
+            atoms.push({
+                x: prev.x + Math.cos(toRad(angle)) * B,
+                y: prev.y + Math.sin(toRad(angle)) * B,
+                isChain: true
+            });
+        }
+
+        let bonds = [];
+        for (let i = 0; i < atoms.length - 1; i++) {
+            let isDouble = !!(dbInfo && i === dbInfo.locant - 1);
+            bonds.push({ x1: atoms[i].x, y1: atoms[i].y, x2: atoms[i + 1].x, y2: atoms[i + 1].y, branch: false, double: isDouble });
+        }
+
+        let byPos = {};
+        subs.forEach(s => { (byPos[s.p] = byPos[s.p] || []).push(s); });
+
+        Object.keys(byPos).forEach(posKey => {
+            let idx = Number(posKey) - 1;
+            if (idx < 0 || idx >= path.length) return;
+            let base = atoms[idx];
+            let group = byPos[posKey];
+            let perpAngle = (idx % 2 === 1) ? -90 : 90;
+
+            group.forEach((s, j) => {
+                let branchAngle = perpAngle;
+                if (group.length > 1) {
+                    branchAngle = perpAngle - CanonicalDraw.FAN_SPREAD / 2
+                        + j * (CanonicalDraw.FAN_SPREAD / (group.length - 1));
+                }
+
+                let px = base.x, py = base.y;
+                for (let k = 0; k < s.size; k++) {
+                    let angle = branchAngle + (k === 0 ? 0 : (k % 2 === 1 ? CanonicalDraw.BRANCH_TURN : -CanonicalDraw.BRANCH_TURN));
+                    let nx = px + Math.cos(toRad(angle)) * B;
+                    let ny = py + Math.sin(toRad(angle)) * B;
+                    bonds.push({ x1: px, y1: py, x2: nx, y2: ny, branch: true });
+                    atoms.push({ x: nx, y: ny, isChain: false });
+                    px = nx; py = ny;
+                }
+            });
+        });
+
+        return { atoms, bonds };
+    }
+
+    static svg(path, subs, dbInfo) {
+        let { atoms, bonds } = CanonicalDraw.build(path, subs, dbInfo);
+        let xs = atoms.map(a => a.x), ys = atoms.map(a => a.y);
+        let pad = 16;
+        let minX = Math.min(...xs) - pad, maxX = Math.max(...xs) + pad;
+        let minY = Math.min(...ys) - pad, maxY = Math.max(...ys) + pad;
+        let w = maxX - minX, h = maxY - minY;
+
+        let lines = bonds.map(b => {
+            if (b.double) {
+                let dx = b.x2 - b.x1, dy = b.y2 - b.y1;
+                let len = Math.hypot(dx, dy) || 1;
+                let px = -dy / len * 4, py = dx / len * 4;
+                return `<line x1="${b.x1 + px}" y1="${b.y1 + py}" x2="${b.x2 + px}" y2="${b.y2 + py}" stroke="#334155" stroke-width="2.4" stroke-linecap="round"/>`
+                     + `<line x1="${b.x1 - px}" y1="${b.y1 - py}" x2="${b.x2 - px}" y2="${b.y2 - py}" stroke="#334155" stroke-width="2.4" stroke-linecap="round"/>`;
+            }
+            return `<line x1="${b.x1}" y1="${b.y1}" x2="${b.x2}" y2="${b.y2}" stroke="${b.branch ? '#2563eb' : '#334155'}" stroke-width="3" stroke-linecap="round"/>`;
+        }).join('');
+        let dots = atoms.map(a =>
+            `<circle cx="${a.x}" cy="${a.y}" r="3.2" fill="#334155"/>`
+        ).join('');
+
+        return `<svg viewBox="${minX} ${minY} ${w} ${h}" width="${Math.round(w)}" height="${Math.round(h)}">${lines}${dots}</svg>`;
+    }
+}
+
+/* ===================== FULD STRUKTURFORMEL (90°-gitter) - opgave-visning i fane 1 =====================
+ * Bygger sin egen indeks-baserede atom/kant-graf ud fra (path, subs, dbInfo) - hovedkæden
+ * lægges vandret, sidegrupper lodret (op/ned), og hvert kulstofs resterende valens (4 minus
+ * summen af dets bindingsordener) udfyldes med eksplicitte H-atomer i de gitter-retninger
+ * (U/D/L/R), der ikke allerede er brugt af en C-C-binding. Se memory-notatet for hvorfor
+ * denne enkle "retning er brugt eller fri"-model altid giver præcis det rigtige antal
+ * H-pladser, også ved dobbeltbindinger (som "bruger" kun én retning, men to valens-enheder).
+ */
+class FullStructureDraw {
+    static UNIT = 44;
+    static HLEN = 27;
+
+    static build(path, subs, dbInfo) {
+        const U = FullStructureDraw.UNIT;
+        let atoms = [];
+        let edges = [];
+        let dirUsed = [];
+
+        for (let i = 0; i < path.length; i++) {
+            atoms.push({ x: i * U, y: 0 });
+            dirUsed.push(new Set());
+        }
+        for (let i = 0; i < path.length - 1; i++) {
+            let order = (dbInfo && i === dbInfo.locant - 1) ? 2 : 1;
+            edges.push({ a: i, b: i + 1, order });
+            dirUsed[i].add('R');
+            dirUsed[i + 1].add('L');
+        }
+
+        let byPos = {};
+        subs.forEach(s => { (byPos[s.p] = byPos[s.p] || []).push(s); });
+
+        Object.keys(byPos).forEach(posKey => {
+            let mainIdx = Number(posKey) - 1;
+            if (mainIdx < 0 || mainIdx >= path.length) return;
+            let group = byPos[posKey];
+            group.forEach((s, gi) => {
+                // Første gren på en position går op; en evt. anden gren på SAMME
+                // position går ned, så de to lodrette "stave" ikke lægger sig oveni hinanden.
+                let dirName = (gi === 0) ? 'U' : 'D';
+                let oppositeName = (dirName === 'U') ? 'D' : 'U';
+                let dirSign = (dirName === 'U') ? -1 : 1;
+                let prevIdx = mainIdx;
+                for (let k = 0; k < s.size; k++) {
+                    let newIdx = atoms.length;
+                    let ny = atoms[prevIdx].y + dirSign * U;
+                    atoms.push({ x: atoms[mainIdx].x, y: ny });
+                    dirUsed.push(new Set());
+                    edges.push({ a: prevIdx, b: newIdx, order: 1 });
+                    dirUsed[prevIdx].add(dirName);
+                    dirUsed[newIdx].add(oppositeName);
+                    prevIdx = newIdx;
+                }
+            });
+        });
+
+        function bondSum(idx) {
+            return edges.filter(e => e.a === idx || e.b === idx).reduce((s, e) => s + e.order, 0);
+        }
+
+        const DIR_VEC = { U: [0, -1], D: [0, 1], L: [-1, 0], R: [1, 0] };
+        const PRIORITY = ['U', 'D', 'L', 'R'];
+        const H = FullStructureDraw.HLEN;
+        let hAtoms = [];
+        let hBonds = [];
+
+        for (let idx = 0; idx < atoms.length; idx++) {
+            let remaining = 4 - bondSum(idx);
+            if (remaining <= 0) continue;
+            let free = PRIORITY.filter(d => !dirUsed[idx].has(d));
+            let chosen = free.slice(0, remaining);
+            chosen.forEach(d => {
+                let [dx, dy] = DIR_VEC[d];
+                let hx = atoms[idx].x + dx * H, hy = atoms[idx].y + dy * H;
+                hAtoms.push({ x: hx, y: hy });
+                hBonds.push({ x1: atoms[idx].x, y1: atoms[idx].y, x2: hx, y2: hy });
+            });
+        }
+
+        return { atoms, edges, hAtoms, hBonds };
+    }
+
+    static svg(path, subs, dbInfo) {
+        let { atoms, edges, hAtoms, hBonds } = FullStructureDraw.build(path, subs, dbInfo);
+        let allX = atoms.concat(hAtoms).map(a => a.x);
+        let allY = atoms.concat(hAtoms).map(a => a.y);
+        let pad = 18;
+        let minX = Math.min(...allX) - pad, maxX = Math.max(...allX) + pad;
+        let minY = Math.min(...allY) - pad, maxY = Math.max(...allY) + pad;
+        let w = maxX - minX, h = maxY - minY;
+
+        let lines = edges.map(e => {
+            let a = atoms[e.a], b = atoms[e.b];
+            if (e.order === 2) {
+                let dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1;
+                let px = -dy / len * 4, py = dx / len * 4;
+                return `<line x1="${a.x + px}" y1="${a.y + py}" x2="${b.x + px}" y2="${b.y + py}" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/>`
+                     + `<line x1="${a.x - px}" y1="${a.y - py}" x2="${b.x - px}" y2="${b.y - py}" stroke="#334155" stroke-width="2.2" stroke-linecap="round"/>`;
+            }
+            return `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#334155" stroke-width="2.6" stroke-linecap="round"/>`;
+        }).join('');
+
+        let hLines = hBonds.map(b =>
+            `<line x1="${b.x1}" y1="${b.y1}" x2="${b.x2}" y2="${b.y2}" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/>`
+        ).join('');
+
+        let cLabels = atoms.map(a =>
+            `<circle cx="${a.x}" cy="${a.y}" r="11" fill="white" stroke="#334155" stroke-width="1.6"/>`
+            + `<text x="${a.x}" y="${a.y + 0.5}" font-size="12" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#1f2937">C</text>`
+        ).join('');
+
+        let hLabels = hAtoms.map(a =>
+            `<circle cx="${a.x}" cy="${a.y}" r="9" fill="white" stroke="#94a3b8" stroke-width="1.3"/>`
+            + `<text x="${a.x}" y="${a.y + 0.5}" font-size="10" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#475569">H</text>`
+        ).join('');
+
+        return `<svg viewBox="${minX} ${minY} ${w} ${h}" width="${Math.round(w)}" height="${Math.round(h)}">${hLines}${lines}${hLabels}${cLabels}</svg>`;
+    }
+}
+
+/* ===================== ZIGZAG-GEOMETRI MED INDEKS-KANTER - interaktiv brug i fane 2 =====================
+ * Samme 30°-alternerende zigzag-geometri som CanonicalDraw.build, men opbygget som sin egen
+ * funktion der også returnerer kanter som {a: atomIndeks, b: atomIndeks, order}, så fane 2 kan
+ * regne bondSum/frie retninger pr. atom direkte på atoms[]-indekser (uden at skulle matche
+ * grafens egne node-id'er op mod CanonicalDraws interne rækkefølge).
+ */
+class ZigzagGeometry {
+    static CHAIN_HALF_ANGLE = 30;
+    static BRANCH_TURN = 45;
+    static FAN_SPREAD = 44;
+
+    static build(path, subs, dbInfo, bondLen) {
+        const B = bondLen || 56;
+        const toRad = d => d * Math.PI / 180;
+        let atoms = [{ x: 0, y: 0 }];
+        for (let i = 1; i < path.length; i++) {
+            let angle = (i % 2 === 1) ? -ZigzagGeometry.CHAIN_HALF_ANGLE : ZigzagGeometry.CHAIN_HALF_ANGLE;
+            let prev = atoms[i - 1];
+            atoms.push({ x: prev.x + Math.cos(toRad(angle)) * B, y: prev.y + Math.sin(toRad(angle)) * B });
+        }
+        let edges = [];
+        for (let i = 0; i < atoms.length - 1; i++) {
+            let order = (dbInfo && i === dbInfo.locant - 1) ? 2 : 1;
+            edges.push({ a: i, b: i + 1, order });
+        }
+
+        let byPos = {};
+        subs.forEach(s => { (byPos[s.p] = byPos[s.p] || []).push(s); });
+
+        Object.keys(byPos).forEach(posKey => {
+            let idx = Number(posKey) - 1;
+            if (idx < 0 || idx >= path.length) return;
+            let base = atoms[idx];
+            let group = byPos[posKey];
+            let perpAngle = (idx % 2 === 1) ? -90 : 90;
+
+            group.forEach((s, j) => {
+                let branchAngle = perpAngle;
+                if (group.length > 1) {
+                    branchAngle = perpAngle - ZigzagGeometry.FAN_SPREAD / 2
+                        + j * (ZigzagGeometry.FAN_SPREAD / (group.length - 1));
+                }
+                let px = base.x, py = base.y;
+                let prevIdx = idx;
+                for (let k = 0; k < s.size; k++) {
+                    let angle = branchAngle + (k === 0 ? 0 : (k % 2 === 1 ? ZigzagGeometry.BRANCH_TURN : -ZigzagGeometry.BRANCH_TURN));
+                    let nx = px + Math.cos(toRad(angle)) * B;
+                    let ny = py + Math.sin(toRad(angle)) * B;
+                    let newIdx = atoms.length;
+                    atoms.push({ x: nx, y: ny });
+                    edges.push({ a: prevIdx, b: newIdx, order: 1 });
+                    prevIdx = newIdx;
+                    px = nx; py = ny;
+                }
+            });
+        });
+
+        return { atoms, edges };
+    }
+}
+
+function subscriptNum(n) {
+    const map = { '0':'₀','1':'₁','2':'₂','3':'₃','4':'₄','5':'₅','6':'₆','7':'₇','8':'₈','9':'₉' };
+    return String(n).split('').map(c => map[c] || c).join('');
+}
+
+/* ===================== GENERATOR (fælles for begge faner) =====================
+ * Samme grundmodel som c6.4_byg_alkaner.html: en tier beskriver kædelængde-interval,
+ * antal sidegrupper og deres størrelser; alkan-grene placeres med tryPlaceBranches
+ * (undgår at skabe en LÆNGERE alternativ hovedkæde end den tilsigtede), alken-grene
+ * med tryPlaceBranchesExcluding (udelukker selve dobbeltbindings-kulstofferne, så
+ * de altid kun har H som "modpart" - den klassiske, simple cis/trans-forudsætning,
+ * som ikke er relevant her, da denne fil ikke stiller krav om cis/trans).
+ */
+function pickInt(a, b) { return a + Math.floor(Math.random() * (b - a + 1)); }
+
+function tryPlaceBranches(L, branchCount, sizes) {
+    attemptLoop:
+    for (let attempt = 0; attempt < 300; attempt++) {
+        if (L <= 2) return null;
+        let placed = [];
+        let posCount = {};
+        for (let i = 0; i < branchCount; i++) {
+            let p = pickInt(2, L - 1);
+            let s = sizes[Math.floor(Math.random() * sizes.length)];
+
+            if ((posCount[p] || 0) >= 2) continue attemptLoop;
+            if (s + Math.max(p, L - p + 1) > L) continue attemptLoop;
+
+            for (let other of placed) {
+                let p1 = Math.min(p, other.p), p2 = Math.max(p, other.p);
+                let s1 = (p === p1) ? s : other.s;
+                let s2 = (p === p1) ? other.s : s;
+                if (s1 + s2 + (p2 - p1 + 1) > L) continue attemptLoop;
+            }
+
+            placed.push({ p, s });
+            posCount[p] = (posCount[p] || 0) + 1;
+        }
+        return placed;
+    }
+    return null;
+}
+
+function tryPlaceBranchesExcluding(L, branchCount, sizes, excluded) {
+    if (branchCount === 0) return [];
+    attemptLoop:
+    for (let attempt = 0; attempt < 300; attempt++) {
+        if (L <= 2) return null;
+        let placed = [];
+        let posCount = {};
+        for (let i = 0; i < branchCount; i++) {
+            let p = pickInt(2, L - 1);
+            if (excluded.has(p)) continue attemptLoop;
+            let s = sizes[Math.floor(Math.random() * sizes.length)];
+
+            if ((posCount[p] || 0) >= 2) continue attemptLoop;
+            if (s + Math.max(p, L - p + 1) > L) continue attemptLoop;
+
+            for (let other of placed) {
+                let p1 = Math.min(p, other.p), p2 = Math.max(p, other.p);
+                let s1 = (p === p1) ? s : other.s;
+                let s2 = (p === p1) ? other.s : s;
+                if (s1 + s2 + (p2 - p1 + 1) > L) continue attemptLoop;
+            }
+
+            placed.push({ p, s });
+            posCount[p] = (posCount[p] || 0) + 1;
+        }
+        return placed;
+    }
+    return null;
+}
+
+function buildGraphFromSpec(L, positions) {
+    let nodes = [], edges = [];
+    let id = 1;
+    let chainIds = [];
+    for (let i = 0; i < L; i++) { nodes.push({ id }); chainIds.push(id); id++; }
+    for (let i = 0; i < L - 1; i++) edges.push({ a: chainIds[i], b: chainIds[i + 1], order: 1 });
+
+    positions.forEach(({ p, s }) => {
+        let prev = chainIds[p - 1];
+        for (let k = 0; k < s; k++) {
+            let nid = id++;
+            nodes.push({ id: nid });
+            edges.push({ a: prev, b: nid, order: 1 });
+            prev = nid;
+        }
+    });
+    return { nodes, edges };
+}
+
+function graphTotalH(nodes, edges) {
+    return nodes.reduce((sum, node) => {
+        let bs = edges.filter(e => e.a === node.id || e.b === node.id).reduce((s, e) => s + (e.order || 1), 0);
+        return sum + (4 - bs);
+    }, 0);
+}
+
+function generateMolecule(tier) {
+    for (let attempt = 0; attempt < 60; attempt++) {
+        let L = pickInt(tier.L[0], tier.L[1]);
+        if (tier.type === 'alkane') {
+            let maxPossible = Math.max(0, (L - 2) * 2);
+            let branchCount = Math.min(pickInt(tier.branches[0], tier.branches[1]), maxPossible);
+            let positions = branchCount === 0 ? [] : tryPlaceBranches(L, branchCount, tier.sizes);
+            if (positions === null) continue;
+
+            let { nodes, edges } = buildGraphFromSpec(L, positions);
+            let struct = IUPAC.analyzeStructure(nodes, edges);
+            if (branchCount > 0 && (!struct.subs || struct.subs.length === 0)) continue;
+
+            let totalH = graphTotalH(nodes, edges);
+            return {
+                isAlkene: false, name: struct.name, path: struct.path, subs: struct.subs,
+                atomCount: nodes.length, totalH,
+                formula: `C${subscriptNum(nodes.length)}H${subscriptNum(totalH)}`
+            };
+        } else {
+            if (L < 2) continue;
+            let p = pickInt(1, L - 1);
+            let branchCount = pickInt(tier.branches[0], tier.branches[1]);
+            let excluded = new Set([p, p + 1]);
+            let positions = branchCount === 0 ? [] : tryPlaceBranchesExcluding(L, branchCount, tier.sizes, excluded);
+            if (positions === null) continue;
+
+            let { nodes, edges } = buildGraphFromSpec(L, positions);
+            edges.forEach(e => { e.order = 1; });
+            edges[p - 1].order = 2;
+
+            let result = AlkeneIUPAC.analyzeStructure(nodes, edges);
+            if (result.error) continue;
+            if (branchCount > 0 && (!result.subs || result.subs.length === 0)) continue;
+
+            let totalH = graphTotalH(nodes, edges);
+            return {
+                isAlkene: true, name: result.name, path: result.path, subs: result.subs,
+                dbLocant: result.dbLocant, atomCount: nodes.length, totalH,
+                formula: `C${subscriptNum(nodes.length)}H${subscriptNum(totalH)}`
+            };
+        }
+    }
+    return null;
+}
+
+function generateSetFromTiers(tiers) {
+    let list = [];
+    let used = new Set();
+    for (let i = 0; i < tiers.length; i++) {
+        let mol = null;
+        for (let tries = 0; tries < 25; tries++) {
+            let cand = generateMolecule(tiers[i]);
+            if (!cand) continue;
+            if (!used.has(cand.name)) { mol = cand; break; }
+            if (!mol) mol = cand;
+        }
+        if (!mol) mol = generateMolecule(tiers[i]) || generateMolecule(tiers[0]);
+        used.add(mol.name);
+        list.push(mol);
+    }
+    return list;
+}
+
+// Fane 1: op til 10 C-atomer, blanding af alkaner/alkener og forgrenet/uforgrenet,
+// stigende sværhedsgrad.
+const ZIGZAG_TIERS = [
+    { type: 'alkane', L: [2, 3], branches: [0, 0], sizes: [1] },
+    { type: 'alkane', L: [3, 4], branches: [0, 0], sizes: [1] },
+    { type: 'alkane', L: [4, 5], branches: [1, 1], sizes: [1] },
+    { type: 'alkene', L: [3, 4], branches: [0, 0], sizes: [1] },
+    { type: 'alkane', L: [5, 6], branches: [1, 1], sizes: [1, 2] },
+    { type: 'alkene', L: [4, 5], branches: [0, 1], sizes: [1] },
+    { type: 'alkane', L: [6, 7], branches: [1, 2], sizes: [1, 2, 3] },
+    { type: 'alkene', L: [5, 6], branches: [1, 1], sizes: [1, 2] },
+    { type: 'alkane', L: [7, 9], branches: [2, 2], sizes: [1, 2, 3] },
+    { type: 'alkene', L: [7, 9], branches: [1, 2], sizes: [1, 2, 3] }
+];
+
+// Fane 2: op til 7 C-atomer (som opgaven kræver) - samme blanding af typer, men
+// mindre molekyler, da eleven her selv skal tælle/tegne hvert enkelt atom.
+// Sværhedstiers er skrevet så VÆRSTE tilfælde (længste kæde + flest/største grene)
+// aldrig kan overstige 7 C-atomer i alt, som opgaven kræver - fx L:[4,5] med op til
+// 2 grene af størrelse op til 2 giver højst 5+2=7, aldrig mere.
+const ATOMS_TIERS = [
+    { type: 'alkane', L: [2, 3], branches: [0, 0], sizes: [1] },
+    { type: 'alkane', L: [4, 4], branches: [0, 0], sizes: [1] },
+    { type: 'alkane', L: [3, 4], branches: [1, 1], sizes: [1] },
+    { type: 'alkane', L: [5, 5], branches: [0, 0], sizes: [1] },
+    { type: 'alkane', L: [4, 5], branches: [1, 1], sizes: [1, 2] },
+    { type: 'alkene', L: [2, 3], branches: [0, 0], sizes: [1] },
+    { type: 'alkene', L: [4, 4], branches: [0, 0], sizes: [1] },
+    { type: 'alkane', L: [4, 5], branches: [1, 2], sizes: [1] },
+    { type: 'alkene', L: [5, 6], branches: [0, 1], sizes: [1] },
+    { type: 'alkene', L: [4, 5], branches: [1, 1], sizes: [1, 2] }
+];
+
+function dbInfoFor(mol) { return mol.isAlkene ? { locant: mol.dbLocant } : null; }
+
+/* ===================== FANE 1: TEGN ZIGZAG - genbruger AlkeneGame-mekanikken fra c6.4_byg_alkaner.html ===================== */
+
+class ZigzagGame {
+    constructor(list) {
+        this.list = list;
+        this.idx = 0;
+        this.completed = [];
+        this.solved = false;
+
+        this.canvas = document.getElementById('draw-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.nodes = [];
+        this.edges = [];
+        this.highlightChain = null;
+
+        this.activeNode = null;
+        this.mouse = { x: 0, y: 0 };
+        this.isDragging = false;
+        this.potentialPos = null;
+        this.isValidMove = true;
+        this.downX = 0;
+        this.downY = 0;
+        this.clickedNode = null;
+
+        window.addEventListener('resize', () => this.resize());
+        this.canvas.addEventListener('mousedown', e => this.onDown(e));
+        this.canvas.addEventListener('mousemove', e => this.onMove(e));
+        this.canvas.addEventListener('mouseup', e => this.onUp(e));
+        this.canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+        this.resize();
+        this.loadCurrent();
+        this.loop();
+    }
+
+    get target() { return this.list[this.idx]; }
+
+    resize() {
+        let container = document.getElementById('draw-stage');
+        this.canvas.width = container.clientWidth;
+        this.canvas.height = container.clientHeight;
+    }
+
+    loadCurrent() {
+        let dbInfo = dbInfoFor(this.target);
+        document.getElementById('draw-target-wrap').innerHTML = FullStructureDraw.svg(this.target.path, this.target.subs, dbInfo);
+        document.getElementById('draw-target-formula').innerText = this.target.formula;
+        this.updateProgressUI();
+        this.reset();
+    }
+
+    reset() {
+        this.nodes = [];
+        this.edges = [];
+        this.activeNode = null;
+        this.highlightChain = null;
+        this.solved = false;
+        document.getElementById('draw-chain-legend').classList.remove('show');
+        this.nodes.push({ id: 1, x: this.canvas.width / 2 - 40, y: this.canvas.height / 2 });
+        this.updateCount();
+        this.msg("Tegn molekylet ved at trække fra C-atomet.", "#475569");
+    }
+
+    getNeighbors(nodeId) {
+        let nIds = [];
+        this.edges.forEach(e => {
+            if (e.a === nodeId) nIds.push(e.b);
+            if (e.b === nodeId) nIds.push(e.a);
+        });
+        return this.nodes.filter(n => nIds.includes(n.id));
+    }
+
+    bondSum(nodeId) {
+        return this.edges
+            .filter(e => e.a === nodeId || e.b === nodeId)
+            .reduce((sum, e) => sum + (e.order || 1), 0);
+    }
+
+    segmentsIntersect(p1, p2, p3, p4) {
+        let det = (p2.x - p1.x) * (p4.y - p3.y) - (p3.x - p4.x) * (p1.y - p2.y);
+        if (det === 0) return false;
+        let lambda = ((p4.y - p3.y) * (p4.x - p1.x) + (p3.x - p4.x) * (p4.y - p1.y)) / det;
+        let gamma = ((p1.y - p2.y) * (p4.x - p1.x) + (p2.x - p1.x) * (p4.y - p1.y)) / det;
+        return (0.01 < lambda && lambda < 0.99) && (0.01 < gamma && gamma < 0.99);
+    }
+
+    evaluateMove(fromNode, candidatePos, snapAngle) {
+        let neighbors = this.getNeighbors(fromNode.id);
+
+        if (this.bondSum(fromNode.id) >= 4) {
+            return { ok: false, toast: { text: "C har allerede 4 bindinger!", type: "error" } };
+        }
+
+        let isTaken = false, isStraight = false, isRing = false, isCrossing = false;
+
+        for (let n of neighbors) {
+            let nAngle = Math.atan2(n.y - fromNode.y, n.x - fromNode.x);
+            let diff = Math.abs(snapAngle - nAngle);
+            while (diff > Math.PI) diff -= 2 * Math.PI;
+            diff = Math.abs(diff);
+
+            if (diff < 0.3) isTaken = true;
+            if (diff > 2.8) isStraight = true;
+        }
+
+        for (let n of this.nodes) {
+            if (n.id !== fromNode.id) {
+                let dist = Math.hypot(n.x - candidatePos.x, n.y - candidatePos.y);
+                if (dist < 20) { isRing = true; break; }
+            }
+        }
+
+        for (let edge of this.edges) {
+            let a = this.nodes.find(n => n.id === edge.a);
+            let b = this.nodes.find(n => n.id === edge.b);
+            if (a.id === fromNode.id || b.id === fromNode.id) continue;
+            if (this.segmentsIntersect(fromNode, candidatePos, a, b)) { isCrossing = true; break; }
+        }
+
+        if (isTaken || isRing) return { ok: false, toast: null };
+        if (isCrossing) return { ok: false, toast: { text: "Bindinger må ikke krydse!", type: "error" } };
+        if (isStraight && neighbors.length === 1) return { ok: false, toast: { text: "Husk knæk på kæden!", type: "warning" } };
+        return { ok: true, toast: null };
+    }
+
+    angleDiff(a, b) {
+        let d = a - b;
+        while (d > Math.PI) d -= 2 * Math.PI;
+        while (d < -Math.PI) d += 2 * Math.PI;
+        return d;
+    }
+
+    resolveNextStep(fromNode) {
+        const BOND_LENGTH = 50;
+        const UNIT = Math.PI / 6;
+
+        let rawAngle = Math.atan2(this.mouse.y - fromNode.y, this.mouse.x - fromNode.x);
+        let baseSnap = Math.round(rawAngle / UNIT) * UNIT;
+        let alt1 = baseSnap - UNIT, alt2 = baseSnap + UNIT;
+        let kinks = [alt1, alt2].sort((a, b) =>
+            Math.abs(this.angleDiff(rawAngle, a)) - Math.abs(this.angleDiff(rawAngle, b))
+        );
+
+        let results = [baseSnap, ...kinks].map(angle => {
+            let candidatePos = {
+                x: fromNode.x + Math.cos(angle) * BOND_LENGTH,
+                y: fromNode.y + Math.sin(angle) * BOND_LENGTH
+            };
+            return { angle, candidatePos, ...this.evaluateMove(fromNode, candidatePos, angle) };
+        });
+
+        return results.find(r => r.ok) || results[0];
+    }
+
+    onMove(e) {
+        let r = this.canvas.getBoundingClientRect();
+        this.mouse.x = e.clientX - r.left;
+        this.mouse.y = e.clientY - r.top;
+
+        if (this.isDragging && this.activeNode) {
+            const BOND_LENGTH = 50;
+
+            while (this.nodes.length < this.target.atomCount) {
+                let dist = Math.hypot(this.mouse.x - this.activeNode.x, this.mouse.y - this.activeNode.y);
+                if (dist < BOND_LENGTH) break;
+
+                let step = this.resolveNextStep(this.activeNode);
+                if (!step.ok) break;
+
+                let newNode = { id: Date.now() + Math.random(), x: step.candidatePos.x, y: step.candidatePos.y };
+                this.nodes.push(newNode);
+                this.edges.push({ a: this.activeNode.id, b: newNode.id, order: 1 });
+                this.activeNode = newNode;
+                this.updateCount();
+            }
+
+            let step = this.resolveNextStep(this.activeNode);
+            this.potentialPos = step.candidatePos;
+
+            if (this.nodes.length >= this.target.atomCount) {
+                this.isValidMove = false;
+                this.showToast("Max antal atomer nået. Tryk på TJEK SVAR!", "warning");
+                return;
+            }
+
+            this.isValidMove = step.ok;
+            if (step.toast) this.showToast(step.toast.text, step.toast.type);
+            else this.hideToast();
+        }
+    }
+
+    draw() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.lineCap = "round";
+        this.ctx.lineJoin = "round";
+
+        this.edges.forEach(e => {
+            let a = this.nodes.find(n => n.id === e.a);
+            let b = this.nodes.find(n => n.id === e.b);
+            let color;
+            if (this.highlightChain) {
+                color = (this.highlightChain.has(e.a) && this.highlightChain.has(e.b)) ? "#16a34a" : "#2563eb";
+            } else {
+                color = "#334155";
+            }
+            this.ctx.strokeStyle = color;
+
+            if (e.order === 2) {
+                let dx = b.x - a.x, dy = b.y - a.y;
+                let len = Math.hypot(dx, dy) || 1;
+                let px = -dy / len * 5, py = dx / len * 5;
+                this.ctx.lineWidth = 4.5;
+                this.ctx.beginPath();
+                this.ctx.moveTo(a.x + px, a.y + py); this.ctx.lineTo(b.x + px, b.y + py);
+                this.ctx.moveTo(a.x - px, a.y - py); this.ctx.lineTo(b.x - px, b.y - py);
+                this.ctx.stroke();
+            } else {
+                this.ctx.lineWidth = 8;
+                this.ctx.beginPath();
+                this.ctx.moveTo(a.x, a.y); this.ctx.lineTo(b.x, b.y);
+                this.ctx.stroke();
+            }
+        });
+
+        this.nodes.forEach(n => {
+            let isEnd = this.getDegree(n.id) <= 1;
+            let dist = Math.hypot(n.x - this.mouse.x, n.y - this.mouse.y);
+
+            if (this.highlightChain || isEnd || dist < 30 || (this.activeNode && this.activeNode.id === n.id)) {
+                this.ctx.beginPath();
+                this.ctx.arc(n.x, n.y, 8, 0, Math.PI * 2);
+                if (this.highlightChain) {
+                    this.ctx.fillStyle = this.highlightChain.has(n.id) ? "#16a34a" : "#2563eb";
+                } else {
+                    this.ctx.fillStyle = (dist < 30 || this.activeNode?.id === n.id) ? "#2563eb" : "#334155";
+                }
+                this.ctx.fill();
+
+                this.ctx.beginPath();
+                this.ctx.arc(n.x, n.y, 3, 0, Math.PI * 2);
+                this.ctx.fillStyle = "white";
+                this.ctx.fill();
+            }
+        });
+
+        if (this.isDragging && this.activeNode && this.potentialPos) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.activeNode.x, this.activeNode.y);
+            this.ctx.lineTo(this.potentialPos.x, this.potentialPos.y);
+
+            this.ctx.strokeStyle = this.isValidMove ? "#60a5fa" : "#ef4444";
+            this.ctx.lineWidth = 6;
+            this.ctx.setLineDash([5, 8]);
+            this.ctx.stroke();
+            this.ctx.setLineDash([]);
+
+            this.ctx.beginPath();
+            this.ctx.arc(this.potentialPos.x, this.potentialPos.y, 6, 0, Math.PI * 2);
+            this.ctx.fillStyle = this.isValidMove ? "#60a5fa" : "#ef4444";
+            this.ctx.fill();
+        }
+    }
+
+    loop() {
+        this.draw();
+        requestAnimationFrame(() => this.loop());
+    }
+
+    onDown(e) {
+        if (e.button === 2) {
+            let n = this.getNodeAt(this.mouse.x, this.mouse.y);
+            if (n && this.getDegree(n.id) <= 1 && this.nodes.length > 1) this.deleteNode(n);
+            return;
+        }
+
+        this.downX = this.mouse.x;
+        this.downY = this.mouse.y;
+        let node = this.getNodeAtForDrag(this.mouse.x, this.mouse.y);
+        if (node) {
+            this.activeNode = node;
+            this.isDragging = true;
+            this.clickedNode = node;
+        } else {
+            this.clickedNode = null;
+        }
+    }
+
+    onUp(e) {
+        let movedDist = Math.hypot(this.mouse.x - this.downX, this.mouse.y - this.downY);
+        let addedViaDrag = false;
+
+        if (this.isDragging && this.activeNode && this.potentialPos && this.isValidMove) {
+            if (this.nodes.length < this.target.atomCount) {
+                let newId = Date.now() + Math.random();
+                this.nodes.push({ id: newId, x: this.potentialPos.x, y: this.potentialPos.y });
+                this.edges.push({ a: this.activeNode.id, b: newId, order: 1 });
+                this.updateCount();
+                addedViaDrag = true;
+            } else {
+                this.showToast("Max antal atomer nået. Tryk på TJEK SVAR!", "warning");
+            }
+        }
+
+        if (!addedViaDrag && movedDist < 6) {
+            if (this.clickedNode) {
+                this.addRandomAtomFrom(this.clickedNode);
+            } else {
+                let edge = this.getEdgeAt(this.mouse.x, this.mouse.y);
+                if (edge) this.toggleBond(edge);
+            }
+        }
+
+        this.isDragging = false;
+        this.activeNode = null;
+        this.potentialPos = null;
+        this.hideToast();
+    }
+
+    addRandomAtomFrom(node) {
+        if (this.nodes.length >= this.target.atomCount) {
+            this.showToast("Max antal atomer nået. Tryk på TJEK SVAR!", "warning");
+            return;
+        }
+        const BOND_LENGTH = 50;
+        const UNIT = Math.PI / 6;
+        let candidates = [];
+        for (let i = 0; i < 12; i++) {
+            let angle = i * UNIT;
+            let candidatePos = { x: node.x + Math.cos(angle) * BOND_LENGTH, y: node.y + Math.sin(angle) * BOND_LENGTH };
+            if (this.evaluateMove(node, candidatePos, angle).ok) candidates.push(candidatePos);
+        }
+        if (candidates.length === 0) {
+            this.showToast("Der er ikke plads til flere atomer her!", "error");
+            setTimeout(() => this.hideToast(), 1200);
+            return;
+        }
+        let chosen = candidates[Math.floor(Math.random() * candidates.length)];
+        let newId = Date.now() + Math.random();
+        this.nodes.push({ id: newId, x: chosen.x, y: chosen.y });
+        this.edges.push({ a: node.id, b: newId, order: 1 });
+        this.updateCount();
+    }
+
+    getEdgeAt(x, y) {
+        const THRESH = 10;
+        let best = null, bestDist = THRESH;
+        this.edges.forEach(e => {
+            let a = this.nodes.find(n => n.id === e.a);
+            let b = this.nodes.find(n => n.id === e.b);
+            let d = ZigzagGame.pointToSegmentDist(x, y, a.x, a.y, b.x, b.y);
+            if (d < bestDist) { bestDist = d; best = e; }
+        });
+        return best;
+    }
+
+    static pointToSegmentDist(px, py, ax, ay, bx, by) {
+        let dx = bx - ax, dy = by - ay;
+        let lenSq = dx * dx + dy * dy;
+        let t = lenSq === 0 ? 0 : ((px - ax) * dx + (py - ay) * dy) / lenSq;
+        t = Math.max(0, Math.min(1, t));
+        let cx = ax + t * dx, cy = ay + t * dy;
+        return Math.hypot(px - cx, py - cy);
+    }
+
+    toggleBond(edge) {
+        if (edge.order === 2) {
+            edge.order = 1;
+            return;
+        }
+        let hasOtherDouble = (id) => this.edges.some(e => e !== edge && e.order === 2 && (e.a === id || e.b === id));
+        if (hasOtherDouble(edge.a) || hasOtherDouble(edge.b)) {
+            this.showToast("Et kulstofatom kan kun indgå i én dobbeltbinding!", "error");
+            setTimeout(() => this.hideToast(), 1500);
+            return;
+        }
+        if (this.bondSum(edge.a) + 1 > 4 || this.bondSum(edge.b) + 1 > 4) {
+            this.showToast("Kulstofatomet har ikke plads til en dobbeltbinding her!", "error");
+            setTimeout(() => this.hideToast(), 1500);
+            return;
+        }
+        edge.order = 2;
+    }
+
+    getNodeAt(x, y) { return this.nodes.find(n => Math.hypot(n.x - x, n.y - y) < 25); }
+    getNodeAtForDrag(x, y) { return this.nodes.find(n => Math.hypot(n.x - x, n.y - y) < 15); }
+    getDegree(id) { return this.edges.filter(e => e.a === id || e.b === id).length; }
+
+    deleteNode(node) {
+        this.nodes = this.nodes.filter(n => n.id !== node.id);
+        this.edges = this.edges.filter(e => e.a !== node.id && e.b !== node.id);
+        this.updateCount();
+    }
+
+    updateCount() {
+        let count = this.nodes.length;
+        let tgt = this.target.atomCount;
+        let el = document.getElementById('draw-current-count');
+        let checkBtn = document.getElementById('draw-check-btn');
+
+        el.innerText = `${count} / ${tgt} Atomer`;
+
+        if (count === tgt) {
+            el.style.color = "#16a34a";
+            checkBtn.classList.add('ready');
+            checkBtn.classList.add('pulse-btn');
+        } else {
+            el.style.color = "#64748b";
+            checkBtn.classList.remove('ready');
+            checkBtn.classList.remove('pulse-btn');
+        }
+    }
+
+    checkSolution() {
+        if (this.solved) return;
+
+        if (this.nodes.length !== this.target.atomCount) {
+            this.msg(`Tegn videre. Du mangler at bruge alle ${this.target.atomCount} atomer.`, "#dc2626");
+            return;
+        }
+
+        let doubles = this.edges.filter(e => e.order === 2);
+
+        if (this.target.isAlkene) {
+            if (doubles.length === 0) {
+                this.msg("Molekylet er en alken - det skal indeholde én dobbeltbinding. Klik på en binding for at gøre den til en dobbeltbinding.", "#dc2626");
+                return;
+            }
+            if (doubles.length > 1) {
+                this.msg("Der må kun være én dobbeltbinding i molekylet. Klik på den overskydende for at gøre den enkelt igen.", "#dc2626");
+                return;
+            }
+            let result = AlkeneIUPAC.analyzeStructure(this.nodes, this.edges);
+            if (result.error) { this.msg("Strukturen er ikke gyldig endnu.", "#dc2626"); return; }
+
+            if (result.name === this.target.name) {
+                this.markSolved(result.path, `KORREKT! Det er: <strong>${result.name}</strong>`);
+            } else {
+                this.msg(`Det er faktisk et gyldigt molekyle - det hedder <strong>${result.name}</strong>.<br>Men vi leder efter <strong>${this.target.name}</strong>.`, "#d97706");
+            }
+        } else {
+            if (doubles.length > 0) {
+                this.msg("Dette molekyle er en alkan - der skal ikke være nogen dobbeltbinding. Klik på dobbeltbindingen for at gøre den enkelt igen.", "#dc2626");
+                return;
+            }
+            let struct = IUPAC.analyzeStructure(this.nodes, this.edges);
+
+            if (struct.name === this.target.name) {
+                this.markSolved(struct.path, `KORREKT! Det er: <strong>${struct.name}</strong>`);
+            } else {
+                this.msg(`Det er faktisk et gyldigt molekyle - det hedder <strong>${struct.name}</strong>.<br>Men vi leder efter <strong>${this.target.name}</strong>.`, "#d97706");
+            }
+        }
+    }
+
+    markSolved(path, message) {
+        this.solved = true;
+        this.highlightChain = new Set(path);
+        document.getElementById('draw-chain-legend').classList.add('show');
+        this.msg(message, "#16a34a");
+        document.getElementById('draw-check-btn').classList.remove('pulse-btn');
+
+        this.completed.push(this.target);
+        this.updateProgressUI();
+
+        if (this.idx === this.list.length - 1) {
+            showCompletion('draw');
+        } else {
+            setTimeout(() => { this.idx++; this.loadCurrent(); }, 1600);
+        }
+    }
+
+    updateProgressUI() {
+        document.getElementById('draw-progress-num').innerText = this.idx + 1;
+        document.getElementById('draw-progress-fill').style.width = `${(this.completed.length / this.list.length) * 100}%`;
+        document.getElementById('draw-progress-txt').innerText = `${this.completed.length}/${this.list.length}`;
+
+        let html = "";
+        this.completed.forEach(mol => {
+            html += `<div class="found-item new">
+                <div class="found-item-header"><span>${mol.name}</span><span>✓</span></div>
+                <div class="found-diagram">${CanonicalDraw.svg(mol.path, mol.subs, dbInfoFor(mol))}</div>
+            </div>`;
+        });
+        for (let i = this.completed.length; i < this.list.length; i++) {
+            html += `<div class="found-item found-item-locked"><span style="color:#9ca3af">Molekyle #${i + 1}</span><span style="opacity:0.5">🔒</span></div>`;
+        }
+        document.getElementById('draw-found-list').innerHTML = html;
+    }
+
+    msg(txt, col) {
+        let el = document.getElementById('draw-feedback-area');
+        el.innerHTML = txt;
+        el.style.color = col;
+        el.style.borderColor = col;
+    }
+
+    showToast(text, type) {
+        let t = document.getElementById('draw-toast');
+        t.innerText = text;
+        t.className = `toast ${type}`;
+        t.style.opacity = 1;
+    }
+    hideToast() { document.getElementById('draw-toast').style.opacity = 0; }
+}
+
+/* ===================== FORMEL-TJEKKER - fane 2, trin 3 ===================== */
+
+function checkFormulaString(raw, expectedC, expectedH) {
+    const subMap = { '₀':'0','₁':'1','₂':'2','₃':'3','₄':'4','₅':'5','₆':'6','₇':'7','₈':'8','₉':'9' };
+    let s = String(raw).trim().toLowerCase().split('').map(c => subMap[c] || c).join('').replace(/\s+/g, '');
+    let m = s.match(/^c(\d+)h(\d+)$/);
+    if (!s) return { correct: false, hint: "Skriv molekylformlen i feltet, fx \"C5H12\"." };
+    if (!m) return { correct: false, hint: "Skriv formlen på formen \"C-antal H-antal\", fx \"C5H12\"." };
+    let c = Number(m[1]), h = Number(m[2]);
+    if (c === expectedC && h === expectedH) return { correct: true };
+    if (c !== expectedC) return { correct: false, hint: "Tæl kulstofatomerne (C) i tegningen igen." };
+    return { correct: false, hint: "Antallet af C-atomer er rigtigt, men tjek antallet af H-atomer igen - husk at hvert C i alt skal have 4 bindinger." };
+}
+
+/* ===================== FANE 2: SÆT C/H-ATOMER PÅ EN GIVEN ZIGZAGFORMEL ===================== */
+
+class AtomsGame {
+    constructor(list) {
+        this.list = list;
+        this.idx = 0;
+        this.completed = [];
+
+        this.canvas = document.getElementById('atoms-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.hoverIdx = null;
+        this.scale = 1;
+        this.screenAtoms = [];
+
+        window.addEventListener('resize', () => this.resize());
+        this.canvas.addEventListener('mousedown', e => {
+            let r = this.canvas.getBoundingClientRect();
+            this.onCanvasClick(e.clientX - r.left, e.clientY - r.top, e.button === 2);
+        });
+        this.canvas.addEventListener('mousemove', e => {
+            let r = this.canvas.getBoundingClientRect();
+            this.hoverIdx = this.hitTestAtom(e.clientX - r.left, e.clientY - r.top);
+        });
+        this.canvas.addEventListener('mouseleave', () => { this.hoverIdx = null; });
+        this.canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+        this.resize();
+        this.loadCurrent();
+        this.loop();
+    }
+
+    get target() { return this.list[this.idx]; }
+
+    resize() {
+        let container = document.getElementById('atoms-stage');
+        this.canvas.width = container.clientWidth;
+        this.canvas.height = container.clientHeight;
+        if (this.geom && this.canvas.width > 0 && this.canvas.height > 0) this.fitToStage();
+    }
+
+    loadCurrent() {
+        let dbInfo = dbInfoFor(this.target);
+        this.geom = ZigzagGeometry.build(this.target.path, this.target.subs, dbInfo, 58);
+        this.computeHGaps();
+        this.expectedH = this.geom.atoms.map((a, idx) => {
+            let bs = this.geom.edges.filter(e => e.a === idx || e.b === idx).reduce((s, e) => s + e.order, 0);
+            return 4 - bs;
+        });
+        this.fitToStage();
+        this.updateProgressUI();
+        this.reset();
+    }
+
+    fitToStage() {
+        let xs = this.geom.atoms.map(a => a.x), ys = this.geom.atoms.map(a => a.y);
+        let minX = Math.min(...xs), maxX = Math.max(...xs);
+        let minY = Math.min(...ys), maxY = Math.max(...ys);
+        let rawW = Math.max(1, maxX - minX), rawH = Math.max(1, maxY - minY);
+        let pad = 100;
+        let availW = Math.max(50, this.canvas.width - pad * 2);
+        let availH = Math.max(50, this.canvas.height - pad * 2);
+        let scale = Math.min(availW / rawW, availH / rawH);
+        scale = Math.max(0.5, Math.min(scale, 2.4));
+        let cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+        this.scale = scale;
+        this.screenAtoms = this.geom.atoms.map(a => ({
+            x: this.canvas.width / 2 + (a.x - cx) * scale,
+            y: this.canvas.height / 2 + (a.y - cy) * scale
+        }));
+    }
+
+    computeHGaps() {
+        this.hGaps = this.geom.atoms.map((atom, idx) => {
+            let angles = this.geom.edges.filter(e => e.a === idx || e.b === idx).map(e => {
+                let otherIdx = e.a === idx ? e.b : e.a;
+                let o = this.geom.atoms[otherIdx];
+                return Math.atan2(o.y - atom.y, o.x - atom.x);
+            });
+            if (angles.length === 0) return { center: 0, size: 2 * Math.PI };
+            let sorted = angles.slice().sort((a, b) => a - b);
+            let k = sorted.length;
+            let best = null;
+            for (let i = 0; i < k; i++) {
+                let a1 = sorted[i];
+                let a2 = sorted[(i + 1) % k];
+                let diff = a2 - a1;
+                while (diff <= 1e-9) diff += 2 * Math.PI;
+                if (!best || diff > best.size) best = { start: a1, size: diff };
+            }
+            return { center: best.start + best.size / 2, size: best.size };
+        });
+    }
+
+    reset() {
+        this.phase = 'C';
+        this.solved = false;
+        this.placedC = new Set();
+        this.hCount = new Array(this.geom.atoms.length).fill(0);
+
+        document.getElementById('atoms-phase-num').innerText = '1';
+        document.getElementById('atoms-phase-title').innerText = 'Sæt C-atomer';
+        document.getElementById('atoms-phase-desc').innerText = 'Klik på hvert "knæk" og hver ende af figuren for at markere et C-atom.';
+        document.getElementById('atoms-progress-count').innerText = `0 / ${this.geom.atoms.length} C-atomer`;
+        document.getElementById('atoms-check-h-btn').style.display = 'none';
+        document.getElementById('atoms-formula-row').style.display = 'none';
+        document.getElementById('atoms-formula-input').disabled = false;
+        document.getElementById('atoms-formula-input').value = '';
+        document.getElementById('atoms-instructions').innerText = '🖱️ Klik på hver "knæk"/endepunkt for at sætte et C-atom';
+        this.msg('Klik på hver "knæk" og hver ende af figuren for at markere et C-atom.', "#475569");
+    }
+
+    hitTestAtom(x, y) {
+        let best = null, bestDist = 24;
+        this.screenAtoms.forEach((p, i) => {
+            let d = Math.hypot(p.x - x, p.y - y);
+            if (d < bestDist) { bestDist = d; best = i; }
+        });
+        return best;
+    }
+
+    totalHExpected() { return this.expectedH.reduce((a, b) => a + b, 0); }
+
+    onCanvasClick(x, y, isRight) {
+        if (this.solved) return;
+        let idx = this.hitTestAtom(x, y);
+        if (idx === null) return;
+
+        if (this.phase === 'C') {
+            if (isRight) return;
+            if (this.placedC.has(idx)) this.placedC.delete(idx);
+            else this.placedC.add(idx);
+            document.getElementById('atoms-progress-count').innerText = `${this.placedC.size} / ${this.geom.atoms.length} C-atomer`;
+            if (this.placedC.size === this.geom.atoms.length) this.enterHPhase();
+        } else if (this.phase === 'H') {
+            if (isRight) this.hCount[idx] = Math.max(0, this.hCount[idx] - 1);
+            else this.hCount[idx] = Math.min(4, this.hCount[idx] + 1);
+            let total = this.hCount.reduce((a, b) => a + b, 0);
+            document.getElementById('atoms-progress-count').innerText = `${total} / ${this.totalHExpected()} H-atomer tilføjet`;
+        }
+    }
+
+    enterHPhase() {
+        this.phase = 'H';
+        document.getElementById('atoms-phase-num').innerText = '2';
+        document.getElementById('atoms-phase-title').innerText = 'Sæt H-atomer';
+        document.getElementById('atoms-phase-desc').innerText = 'Klik på et C-atom for at tilføje en H. Højreklik for at fjerne en H igen.';
+        document.getElementById('atoms-progress-count').innerText = `0 / ${this.totalHExpected()} H-atomer tilføjet`;
+        document.getElementById('atoms-check-h-btn').style.display = 'block';
+        document.getElementById('atoms-instructions').innerText = '🖱️ Klik på et C for at tilføje H | Højreklik for at fjerne';
+        this.msg('Godt! Nu skal du tilføje hydrogenatomer, så hvert C-atom i alt har 4 bindinger.', "#475569");
+    }
+
+    checkHydrogens() {
+        let wrongCount = 0;
+        for (let i = 0; i < this.geom.atoms.length; i++) {
+            if (this.hCount[i] !== this.expectedH[i]) wrongCount++;
+        }
+        if (wrongCount === 0) {
+            this.enterFormulaPhase();
+        } else {
+            this.msg(`${wrongCount} kulstofatom(er) har det forkerte antal H-atomer. Husk: hvert C skal i alt have 4 bindinger (tæl de C-C-bindinger, der allerede er tegnet).`, "#dc2626");
+        }
+    }
+
+    enterFormulaPhase() {
+        this.phase = 'formula';
+        document.getElementById('atoms-phase-num').innerText = '3';
+        document.getElementById('atoms-phase-title').innerText = 'Skriv molekylformlen';
+        document.getElementById('atoms-phase-desc').innerText = 'Tæl C- og H-atomerne i din tegning, og skriv den fulde molekylformel.';
+        document.getElementById('atoms-progress-count').innerText = '';
+        document.getElementById('atoms-check-h-btn').style.display = 'none';
+        document.getElementById('atoms-formula-row').style.display = 'block';
+        document.getElementById('atoms-instructions').innerText = 'Skriv molekylformlen i feltet til venstre, fx "C5H12".';
+        this.msg('Alle H-atomer er korrekte! Skriv nu molekylformlen.', "#16a34a");
+
+        let input = document.getElementById('atoms-formula-input');
+        input.value = '';
+        input.disabled = false;
+        if (document.getElementById('view-atoms').classList.contains('active')) input.focus();
+    }
+
+    checkFormula() {
+        let expectedC = this.geom.atoms.length;
+        let expectedH = this.totalHExpected();
+        let raw = document.getElementById('atoms-formula-input').value;
+        let result = checkFormulaString(raw, expectedC, expectedH);
+
+        if (result.correct) {
+            this.solved = true;
+            this.msg(`KORREKT! Molekylformlen er <strong>C${subscriptNum(expectedC)}H${subscriptNum(expectedH)}</strong> (${this.target.name}).`, "#16a34a");
+            document.getElementById('atoms-formula-input').disabled = true;
+
+            this.completed.push(this.target);
+            this.updateProgressUI();
+
+            if (this.idx === this.list.length - 1) {
+                showCompletion('atoms');
+            } else {
+                setTimeout(() => { this.idx++; this.loadCurrent(); }, 1600);
+            }
+        } else {
+            this.msg(result.hint, "#d97706");
+        }
+    }
+
+    getHPositions(idx, n) {
+        let gap = this.hGaps[idx];
+        const R = 26;
+        let spread = Math.min(gap.size * 0.55, 75 * Math.PI / 180);
+        let positions = [];
+        for (let k = 0; k < n; k++) {
+            let t = n === 1 ? 0 : (k / (n - 1) - 0.5);
+            let ang = gap.center + t * spread;
+            positions.push({ x: this.screenAtoms[idx].x + Math.cos(ang) * R, y: this.screenAtoms[idx].y + Math.sin(ang) * R });
+        }
+        return positions;
+    }
+
+    draw() {
+        let ctx = this.ctx;
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
+        this.geom.edges.forEach(e => {
+            let a = this.screenAtoms[e.a], b = this.screenAtoms[e.b];
+            ctx.strokeStyle = "#334155";
+            if (e.order === 2) {
+                let dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1;
+                let px = -dy / len * 4, py = dx / len * 4;
+                ctx.lineWidth = 3.2;
+                ctx.beginPath(); ctx.moveTo(a.x + px, a.y + py); ctx.lineTo(b.x + px, b.y + py); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(a.x - px, a.y - py); ctx.lineTo(b.x - px, b.y - py); ctx.stroke();
+            } else {
+                ctx.lineWidth = 5.5;
+                ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+            }
+        });
+
+        if (this.phase !== 'C') {
+            for (let i = 0; i < this.screenAtoms.length; i++) {
+                let n = this.hCount[i];
+                if (!n) continue;
+                let positions = this.getHPositions(i, n);
+                positions.forEach(p => {
+                    ctx.strokeStyle = "#94a3b8";
+                    ctx.lineWidth = 2.5;
+                    ctx.beginPath(); ctx.moveTo(this.screenAtoms[i].x, this.screenAtoms[i].y); ctx.lineTo(p.x, p.y); ctx.stroke();
+                    ctx.beginPath(); ctx.arc(p.x, p.y, 11, 0, Math.PI * 2);
+                    ctx.fillStyle = "#60a5fa"; ctx.fill();
+                    ctx.fillStyle = "white"; ctx.font = "bold 12px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                    ctx.fillText("H", p.x, p.y + 0.5);
+                });
+            }
+        }
+
+        for (let i = 0; i < this.screenAtoms.length; i++) {
+            let p = this.screenAtoms[i];
+            let placed = this.placedC.has(i);
+            let isHover = this.hoverIdx === i;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, placed ? 13 : 9, 0, Math.PI * 2);
+            ctx.fillStyle = placed ? "#334155" : (isHover ? "#93c5fd" : "#e2e8f0");
+            ctx.fill();
+            if (!placed) {
+                ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 2; ctx.stroke();
+            }
+            if (placed) {
+                ctx.fillStyle = "white"; ctx.font = "bold 13px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                ctx.fillText("C", p.x, p.y + 0.5);
+            }
+        }
+    }
+
+    loop() {
+        this.draw();
+        requestAnimationFrame(() => this.loop());
+    }
+
+    updateProgressUI() {
+        document.getElementById('atoms-progress-num').innerText = this.idx + 1;
+        document.getElementById('atoms-progress-fill').style.width = `${(this.completed.length / this.list.length) * 100}%`;
+        document.getElementById('atoms-progress-txt').innerText = `${this.completed.length}/${this.list.length}`;
+
+        let html = "";
+        this.completed.forEach(mol => {
+            html += `<div class="found-item new">
+                <div class="found-item-header"><span>${mol.name}</span><span>✓</span></div>
+                <div class="found-diagram">${CanonicalDraw.svg(mol.path, mol.subs, dbInfoFor(mol))}</div>
+                <div style="margin-top:6px; font-weight:800; color:#1e40af;">${mol.formula}</div>
+            </div>`;
+        });
+        for (let i = this.completed.length; i < this.list.length; i++) {
+            html += `<div class="found-item found-item-locked"><span style="color:#9ca3af">Molekyle #${i + 1}</span><span style="opacity:0.5">🔒</span></div>`;
+        }
+        document.getElementById('atoms-found-list').innerHTML = html;
+    }
+
+    msg(txt, col) {
+        let el = document.getElementById('atoms-feedback-area');
+        el.innerHTML = txt;
+        el.style.color = col;
+        el.style.borderColor = col;
+    }
+}
+
+/* ===================== Fælles styring ===================== */
+
+function switchMode(mode) {
+    document.getElementById('tab-draw').classList.toggle('active', mode === 'draw');
+    document.getElementById('tab-atoms').classList.toggle('active', mode === 'atoms');
+    document.getElementById('view-draw').classList.toggle('active', mode === 'draw');
+    document.getElementById('view-atoms').classList.toggle('active', mode === 'atoms');
+
+    if (mode === 'draw') drawGame.resize();
+    if (mode === 'atoms') atomsGame.resize();
+}
+
+function showCompletion(which) {
+    let titles = {
+        draw: "Alle 10 zigzagformer tegnet! 🌟",
+        atoms: "Alle 10 molekyler afsluttet! 🏆"
+    };
+    document.getElementById('complete-title').innerText = titles[which] || "Fremragende! 🌟";
+    document.getElementById('complete-overlay').classList.add('show');
+}
+function closeOverlay() {
+    document.getElementById('complete-overlay').classList.remove('show');
+}
+
+function restartAll() {
+    if (!confirm("Genstart begge øvelser? Der genereres nye tilfældige molekyler, og al fremgang nulstilles.")) return;
+    zigzagList = generateSetFromTiers(ZIGZAG_TIERS);
+    atomsList = generateSetFromTiers(ATOMS_TIERS);
+    drawGame = new ZigzagGame(zigzagList);
+    atomsGame = new AtomsGame(atomsList);
+    switchMode('draw');
+    closeOverlay();
+}
+
+let zigzagList = generateSetFromTiers(ZIGZAG_TIERS);
+let atomsList = generateSetFromTiers(ATOMS_TIERS);
+let drawGame = new ZigzagGame(zigzagList);
+let atomsGame = new AtomsGame(atomsList);
+</script>
+</body>
+</html>

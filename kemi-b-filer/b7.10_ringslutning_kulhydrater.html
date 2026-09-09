@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animationer: Monosakkarider (Final Layout)</title>
+    <style>
+        :root {
+            --bg: #1e1e1e;
+            --panel: #2d2d30;
+            --text: #e0e0e0;
+            --glucose-accent: #3498db; /* Blå */
+            --fructose-accent: #e056fd; /* Lilla */
+            --success: #2ecc71;
+            --highlight: #f1c40f;
+            --bond: #7f8c8d;
+        }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; user-select: none; }
+        
+        /* 1. MAIN HEADER (TITLE ONLY) */
+        header {
+            background: #111; border-bottom: 1px solid #333; 
+            height: 50px; display: flex; align-items: center; justify-content: center;
+        }
+        .nav-title { font-weight: bold; color: #fff; font-size: 1.2rem; letter-spacing: 1px; }
+
+        /* 2. TAB NAVIGATION BAR (BELOW HEADER) */
+        .nav-bar {
+            background: #252526; height: 50px; display: flex; justify-content: center; align-items: center;
+            border-bottom: 1px solid #444; gap: 40px;
+        }
+        .tab-btn {
+            background: transparent; border: none; color: #888; padding: 0 20px; height: 100%;
+            cursor: pointer; font-size: 1rem; font-weight: bold; border-bottom: 3px solid transparent;
+            transition: all 0.2s; display: flex; align-items: center; gap: 8px;
+        }
+        .tab-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        
+        /* Active States */
+        .tab-btn.active.g-tab { color: var(--glucose-accent); border-bottom-color: var(--glucose-accent); }
+        .tab-btn.active.f-tab { color: var(--fructose-accent); border-bottom-color: var(--fructose-accent); }
+        
+        /* Indicators */
+        .tab-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+        /* APP CONTAINERS (Adjusted height for 2 bars) */
+        .app-container { display: none; flex: 1; width: 100%; height: calc(100vh - 100px); }
+        .app-container.active { display: flex; }
+
+        /* SHARED STYLES */
+        .sidebar { 
+            width: 320px; background: var(--panel); border-right: 1px solid #333; 
+            padding: 20px; display: flex; flex-direction: column; z-index: 10;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.3); overflow-y: auto;
+        }
+        
+        h1 { margin: 0 0 10px 0; color: #fff; font-size: 1.3rem; }
+        .subtitle { color: #888; font-size: 0.9rem; margin-bottom: 20px; border-bottom: 1px solid #444; padding-bottom: 10px; }
+        
+        .step-box {
+            background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-bottom: 15px;
+            border-left: 4px solid #555; transition: 0.3s;
+        }
+        /* Glucose specific colors */
+        #glucose-app .step-box.active { border-left-color: var(--glucose-accent); background: rgba(52, 152, 219, 0.1); }
+        #glucose-app button.primary { background: var(--glucose-accent); }
+        #glucose-app .anomer-btn.selected { background: var(--glucose-accent); border-color: var(--glucose-accent); box-shadow: 0 0 15px rgba(52, 152, 219, 0.4); }
+
+        /* Fructose specific colors */
+        #fructose-app .step-box.active { border-left-color: var(--fructose-accent); background: rgba(224, 86, 253, 0.1); }
+        #fructose-app button.primary { background: var(--fructose-accent); }
+        #fructose-app .anomer-btn.selected { background: var(--fructose-accent); border-color: var(--fructose-accent); box-shadow: 0 0 15px rgba(224, 86, 253, 0.4); }
+
+        .step-box.done { border-left-color: var(--success); opacity: 0.6; }
+        
+        .step-title { font-weight: bold; margin-bottom: 5px; color: #fff; }
+        .step-desc { font-size: 0.85rem; color: #aaa; }
+
+        button {
+            margin-top: 10px; width: 100%; padding: 10px; border: none; border-radius: 4px;
+            background: #444; color: #ccc; font-weight: bold; cursor: not-allowed;
+            transition: 0.2s;
+        }
+        button.primary { color: #fff; cursor: pointer; }
+        button.primary:hover { filter: brightness(1.1); }
+
+        .canvas-wrapper { flex: 1; position: relative; background: radial-gradient(circle at center, #2b2b2b 0%, #1a1a1a 100%); }
+        canvas { display: block; width: 100%; height: 100%; }
+
+        .anomer-ui {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            display: none; gap: 15px;
+        }
+        .anomer-btn {
+            background: #333; border: 2px solid #555; color: #fff; padding: 10px 25px;
+            border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.2s;
+        }
+        .anomer-btn:hover { background: #444; border-color: #fff; }
+        
+        .reset-btn { position: absolute; top: 20px; right: 20px; background: transparent; border: 1px solid #555; color: #888; padding: 5px 10px; cursor: pointer; width: auto; margin:0; }
+        .reset-btn:hover { border-color: #fff; color: #fff; }
+        
+        .key-molecule { font-weight: bold; }
+        .g-col { color: var(--glucose-accent); }
+        .f-col { color: var(--fructose-accent); }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav-title">Animationer: Monosakkarider</div>
+</header>
+
+<nav class="nav-bar">
+    <button class="tab-btn g-tab active" onclick="app.switchTab('glucose')">
+        <div class="tab-dot" style="background:var(--glucose-accent)"></div>
+        D-Glucose
+    </button>
+    <button class="tab-btn f-tab" onclick="app.switchTab('fructose')">
+        <div class="tab-dot" style="background:var(--fructose-accent)"></div>
+        D-Fructose
+    </button>
+</nav>
+
+<div id="glucose-app" class="app-container active">
+    <div class="sidebar">
+        <h1>Glucose <span class="subtitle g-col">Aldohexose</span></h1>
+        
+        <div id="g_step1" class="step-box active">
+            <div class="step-title">1. Nummerering & Aldehyd</div>
+            <div class="step-desc" id="g_desc1">Klik på C-atomerne (1-6).<br>Bemærk <span class="g-col">C1=O</span> (Aldehyd) i toppen.</div>
+        </div>
+
+        <div id="g_step2" class="step-box">
+            <div class="step-title">2. Rotation</div>
+            <div class="step-desc">Molekylet bøjer sig. C5-OH nærmer sig C1. Dobbeltbindingen er stadig intakt.</div>
+            <button id="g_btn-rotate" disabled onclick="glucoseSim.rotate()">Roter Molekyle ↻</button>
+        </div>
+
+        <div id="g_step3" class="step-box">
+            <div class="step-title">3. Ringslutning</div>
+            <div class="step-desc">O5 angriber C1. <span class="g-col">C=O</span> brydes og bliver til <span class="g-col">C-OH</span> (Hemiacetal).</div>
+            <button id="g_btn-close" disabled onclick="glucoseSim.closeRing()">Luk Ringen ⬡</button>
+        </div>
+    </div>
+
+    <div class="canvas-wrapper">
+        <button class="reset-btn" onclick="glucoseSim.reset()">Genstart ↺</button>
+        <canvas id="g_canvas"></canvas>
+        <div id="g_anomer-ui" class="anomer-ui">
+            <button class="anomer-btn selected" onclick="glucoseSim.setAnomer('alpha')">α-Glucose (OH ned)</button>
+            <button class="anomer-btn" onclick="glucoseSim.setAnomer('beta')">β-Glucose (OH op)</button>
+        </div>
+    </div>
+</div>
+
+<div id="fructose-app" class="app-container">
+    <div class="sidebar">
+        <h1>Fructose <span class="subtitle f-col">Ketohexose</span></h1>
+
+        <div id="f_step1" class="step-box active">
+            <div class="step-title">1. Nummerering & Keton</div>
+            <div class="step-desc" id="f_desc1">Klik på C-atomerne (1-6).<br>Bemærk <span class="f-col">C2=O</span> (Keton) sidder nede i kæden.</div>
+        </div>
+
+        <div id="f_step2" class="step-box">
+            <div class="step-title">2. Rotation</div>
+            <div class="step-desc">Molekylet folder sig sammen. C5-OH nærmer sig C2.<br>Bemærk hvordan H-atomerne fordeler sig.</div>
+            <button id="f_btn-rotate" disabled onclick="fructoseSim.rotate()">Roter Molekyle ↻</button>
+        </div>
+
+        <div id="f_step3" class="step-box">
+            <div class="step-title">3. Hemiketal Dannelse</div>
+            <div class="step-desc">O5 angriber C2. <span class="f-col">C=O</span> brydes. Vi får en 5-leddet ring (Furanose).</div>
+            <button id="f_btn-close" disabled onclick="fructoseSim.closeRing()">Luk Ringen ⬡</button>
+        </div>
+    </div>
+
+    <div class="canvas-wrapper">
+        <button class="reset-btn" onclick="fructoseSim.reset()">Genstart ↺</button>
+        <canvas id="f_canvas"></canvas>
+        <div id="f_anomer-ui" class="anomer-ui">
+            <button class="anomer-btn" onclick="fructoseSim.setAnomer('alpha')">α-Fructose</button>
+            <button class="anomer-btn selected" onclick="fructoseSim.setAnomer('beta')">β-Fructose</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// FARVER OG GLOBALE KLASSER
+const COLS = { C: '#95a5a6', O: '#e74c3c', H: '#ecf0f1', Num: '#f1c40f', Bond: '#7f8c8d' };
+
+class Atom {
+    constructor(id, type, x, y) {
+        this.id = id; this.type = type;
+        this.x = x; this.y = y; this.tx = x; this.ty = y;
+        this.label = null;
+        this.r = type==='H'?8:(type==='C'?16:14);
+        this.highlight = false;
+        // Tags
+        this.isRingOxygen = false;   
+        this.isMobileProton = false; 
+        this.isCarbonylOxygen = false;
+    }
+    update() {
+        this.x += (this.tx - this.x) * 0.05;
+        this.y += (this.ty - this.y) * 0.05;
+    }
+    draw(ctx) {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+        if(this.highlight) { ctx.shadowBlur=20; ctx.shadowColor=COLS.Num; }
+        ctx.fillStyle = COLS[this.type]; ctx.fill();
+        ctx.shadowBlur=0;
+        
+        if(this.type !== 'C') {
+            ctx.fillStyle='#333'; ctx.font='bold 10px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
+            ctx.fillText(this.type, this.x, this.y+1);
+        }
+        if(this.label) {
+            ctx.fillStyle=COLS.Num; ctx.font='bold 14px Arial'; 
+            ctx.fillText(this.label, this.x+14, this.y-14);
+        }
+    }
+}
+
+// --------------------------------------------------------------------------------
+// GLUCOSE SIMULATION (ALDEHYDE, C1 ATTACK)
+// --------------------------------------------------------------------------------
+const glucoseSim = {
+    canvas: null, ctx: null, active: true,
+    W: 0, H: 0,
+    atoms: [], bonds: [], step: 1, nextC: 0, anomer: 'alpha',
+
+    init() {
+        this.canvas = document.getElementById('g_canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.resize();
+        this.canvas.addEventListener('mousedown', e => this.click(e));
+        this.buildFischer();
+        this.loop();
+    },
+    resize() {
+        this.W = this.canvas.parentElement.clientWidth;
+        this.H = this.canvas.parentElement.clientHeight;
+        this.canvas.width = this.W; this.canvas.height = this.H;
+        if(this.step===1) this.buildFischer(); 
+        else if(this.step===2) this.rotate();
+        else if(this.step>=3) this.closeRing();
+    },
+    
+    // BUILDERS
+    addAtom(t, x, y) { let id=this.atoms.length; this.atoms.push(new Atom(id, t, x, y)); return id; },
+    addBond(i1, i2, type=1) { this.bonds.push({a:i1, b:i2, type:type}); },
+    addSub(cid, cx, y, side) {
+        let ox = side==='right'?cx+40:cx-40;
+        let hx = side==='right'?cx-40:cx+40;
+        let o = this.addAtom('O', ox, y); this.addBond(cid, o);
+        let ho = this.addAtom('H', side==='right'?ox+20:ox-20, y); this.addBond(o, ho);
+        let h = this.addAtom('H', hx, y); this.addBond(cid, h);
+    },
+
+    buildFischer() {
+        this.atoms=[]; this.bonds=[];
+        const cx = this.W/2; const startY = this.H*0.1; const gap = 55;
+        const cIds = [];
+        for(let i=0; i<6; i++) {
+            cIds.push(this.addAtom('C', cx, startY+i*gap));
+            if(i>0) this.addBond(cIds[i-1], cIds[i]);
+        }
+        // C1 Aldehyd (C=O)
+        let o1 = this.addAtom('O', cx+60, startY); 
+        this.addBond(cIds[0], o1, 2); // Dobbelt
+        let h1 = this.addAtom('H', cx-40, startY); this.addBond(cIds[0], h1);
+
+        // C2-C4
+        this.addSub(cIds[1], cx, startY+gap, 'right');
+        this.addSub(cIds[2], cx, startY+gap*2, 'left');
+        this.addSub(cIds[3], cx, startY+gap*3, 'right');
+
+        // C5
+        let c5y = startY+gap*4;
+        let o5 = this.addAtom('O', cx+40, c5y); this.atoms[o5].isRingOxygen = true;
+        this.addBond(cIds[4], o5);
+        let hProton = this.addAtom('H', cx+65, c5y); this.atoms[hProton].isMobileProton = true;
+        this.addBond(o5, hProton);
+        let h5 = this.addAtom('H', cx-40, c5y); this.addBond(cIds[4], h5);
+
+        // C6
+        let c6y = startY+gap*5;
+        let o6 = this.addAtom('O', cx, c6y+40); this.addBond(cIds[5], o6);
+        let h6 = this.addAtom('H', cx, c6y+60); this.addBond(o6, h6);
+        let h6a = this.addAtom('H', cx-30, c6y+10); this.addBond(cIds[5], h6a);
+        let h6b = this.addAtom('H', cx+30, c6y+10); this.addBond(cIds[5], h6b);
+    },
+
+    // ACTIONS
+    click(e) {
+        if(this.step !== 1 || !this.active) return;
+        const r = this.canvas.getBoundingClientRect();
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        let target = this.atoms[this.nextC];
+        if(target && Math.hypot(x-target.x, y-target.y) < 25) {
+            target.label = (this.nextC+1).toString();
+            target.highlight = true; setTimeout(()=>target.highlight=false, 300);
+            this.nextC++;
+            if(this.nextC === 6) this.nextStep(1);
+        }
+    },
+    nextStep(from) {
+        document.getElementById(`g_step${from}`).classList.remove('active');
+        document.getElementById(`g_step${from}`).classList.add('done');
+        if(from===1) {
+            this.step=2; 
+            document.getElementById('g_step2').classList.add('active');
+            let btn = document.getElementById('g_btn-rotate');
+            btn.disabled = false; btn.classList.add('primary');
+        }
+        if(from===2) {
+            this.step=3;
+            document.getElementById('g_step2').classList.remove('active'); document.getElementById('g_step2').classList.add('done');
+            document.getElementById('g_step3').classList.add('active');
+            let btn = document.getElementById('g_btn-close');
+            btn.disabled = false; btn.classList.add('primary');
+        }
+    },
+
+    // ANIMATIONS
+    rotate() {
+        const cx = this.W/2; const cy = this.H/2 + 20; const R = 90;
+        const p1 = {x: cx + R, y: cy - 30};
+        const p2 = {x: cx + R*0.7, y: cy + R*0.6};
+        const p3 = {x: cx, y: cy + R};
+        const p4 = {x: cx - R*0.7, y: cy + R*0.6};
+        const p5 = {x: cx - R, y: cy - 30};
+
+        this.setTarget(0, p1.x, p1.y); this.setTarget(1, p2.x, p2.y); this.setTarget(2, p3.x, p3.y);
+        this.setTarget(3, p4.x, p4.y); this.setTarget(4, p5.x, p5.y);
+
+        let c6x = p5.x - 20, c6y = p5.y - 70;
+        this.setTarget(5, c6x, c6y);
+        this.updateNeighbors(5, c6x, c6y, [{t:'O', dx:20, dy:-10}, {t:'H', dx:-20, dy:10}, {t:'H', dx:20, dy:20}]);
+        let o6 = this.getNeighbors(5).find(a=>a.type==='O');
+        if(o6) this.updateNeighbors(o6.id, c6x+20, c6y-10, [{t:'H', dx:15, dy:-5}]);
+
+        let ringO = this.atoms.find(a=>a.isRingOxygen);
+        let ringOx = cx, ringOy = cy - R + 20;
+        this.setTarget(ringO.id, ringOx, ringOy);
+        let proton = this.atoms.find(a=>a.isMobileProton);
+        this.setTarget(proton.id, ringOx+20, ringOy);
+
+        // Aldehyd (Distinct C=O)
+        let o1 = this.getNeighbors(0).find(a => a.type==='O');
+        this.setTarget(o1.id, p1.x + 60, p1.y - 15);
+        let h1 = this.getNeighbors(0).find(a => a.type==='H');
+        this.setTarget(h1.id, p1.x + 40, p1.y + 35);
+
+        this.orientSub(1, p2.x, p2.y, 'down', 30);
+        this.orientSub(2, p3.x, p3.y, 'up', 0);
+        this.orientSub(3, p4.x, p4.y, 'down', -30);
+        
+        let h4 = this.getNeighbors(3).find(a=>a.type==='H');
+        if(h4) this.setTarget(h4.id, p4.x + 10, p4.y - 25);
+        let h5 = this.getNeighbors(4).find(a=>a.type==='H');
+        if(h5) this.setTarget(h5.id, p5.x - 35, p5.y + 10);
+
+        this.nextStep(2);
+    },
+    closeRing() {
+        const cx = this.W/2; const cy = this.H/2 + 20; const R = 80;
+        const p1 = {x: cx + R, y: cy};
+        const p2 = {x: cx + R/2, y: cy + R*0.8};
+        const p3 = {x: cx - R/2, y: cy + R*0.8};
+        const p4 = {x: cx - R, y: cy};
+        const p5 = {x: cx - R/2, y: cy - R*0.8};
+        const pO = {x: cx + R/2, y: cy - R*0.8};
+
+        this.setTarget(0, p1.x, p1.y); this.setTarget(1, p2.x, p2.y); this.setTarget(2, p3.x, p3.y);
+        this.setTarget(3, p4.x, p4.y); this.setTarget(4, p5.x, p5.y);
+        let ringO = this.atoms.find(a=>a.isRingOxygen);
+        this.setTarget(ringO.id, pO.x, pO.y);
+
+        let c6x = p5.x - 20, c6y = p5.y - 60;
+        this.setTarget(5, c6x, c6y);
+        this.updateNeighbors(5, c6x, c6y, [{t:'O', dx:20, dy:-10}, {t:'H', dx:-20, dy:10}, {t:'H', dx:20, dy:20}]);
+        let o6 = this.getNeighbors(5).find(a=>a.type==='O');
+        if(o6) this.updateNeighbors(o6.id, c6x+20, c6y-10, [{t:'H', dx:15, dy:-5}]);
+
+        this.orientSubHaworth(1, p2.x, p2.y, 'down');
+        this.orientSubHaworth(2, p3.x, p3.y, 'up');
+        this.orientSubHaworth(3, p4.x, p4.y, 'down');
+        let h5 = this.getNeighbors(4).find(a=>a.type==='H');
+        this.setTarget(h5.id, p5.x, p5.y + 40);
+        
+        // Break double bond C1=O
+        let o1 = this.getNeighbors(0).find(a => a.type==='O');
+        if(o1) { let bond = this.bonds.find(b => (b.a===0 && b.b===o1.id) || (b.b===0 && b.a===o1.id)); if(bond) bond.type = 1; }
+
+        this.setAnomer('alpha');
+        document.getElementById('g_step3').classList.remove('active'); document.getElementById('g_step3').classList.add('done');
+        document.getElementById('g_anomer-ui').style.display = 'flex';
+        this.step = 4;
+    },
+    setAnomer(type) {
+        if(this.step < 3) return;
+        this.anomer = type;
+        document.querySelectorAll('#glucose-app .anomer-btn').forEach(b => {
+            b.classList.remove('selected');
+            if(b.innerText.toLowerCase().includes(type)) b.classList.add('selected');
+        });
+        let c1 = this.atoms[0];
+        let n = this.getNeighbors(0);
+        let o1 = n.find(a => a.type==='O');
+        let h1 = n.find(a => a.type==='H');
+        let proton = this.atoms.find(a => a.isMobileProton);
+        const dist = 50;
+        const isAlpha = type==='alpha';
+        if(o1) {
+            this.setTarget(o1.id, c1.tx, c1.ty + (isAlpha ? dist : -dist));
+            if(proton) this.setTarget(proton.id, o1.tx + 15, o1.ty - 5);
+        }
+        if(h1) { this.setTarget(h1.id, c1.tx, c1.ty + (isAlpha ? -dist : dist)); }
+    },
+    // UTILS
+    setTarget(id, x, y) { if(this.atoms[id]) { this.atoms[id].tx = x; this.atoms[id].ty = y; } },
+    getNeighbors(id) {
+        let res = [];
+        this.bonds.forEach(b=>{
+            if(b.a===id) res.push(this.atoms[b.b]);
+            if(b.b===id) res.push(this.atoms[b.a]);
+        });
+        return res;
+    },
+    updateNeighbors(parentId, px, py, offsets) {
+        let n = this.getNeighbors(parentId); let used = [];
+        offsets.forEach(off => {
+            let match = n.find(a => a.type === off.t && !used.includes(a.id) && a.id > 5 && !a.isRingOxygen); 
+            if(match) { this.setTarget(match.id, px + off.dx, py + off.dy); used.push(match.id); }
+        });
+    },
+    orientSub(cid, cx, cy, ohDir, xOffset) {
+        let n = this.getNeighbors(cid);
+        let heavy = n.find(a => a.type==='O' && !a.isRingOxygen); 
+        let light = n.find(a => a.type==='H');
+        let dy = 40;
+        if(heavy) {
+            let ty = cy + (ohDir==='down' ? dy : -dy);
+            this.setTarget(heavy.id, cx + xOffset, ty);
+            let hOnO = this.getNeighbors(heavy.id).find(a=>a.type==='H' && a.id!==cid);
+            if(hOnO) this.setTarget(hOnO.id, cx + xOffset + 15, ty - 5);
+        }
+        if(light) { this.setTarget(light.id, cx + xOffset, cy + (ohDir==='down' ? -dy : dy)); }
+    },
+    orientSubHaworth(cid, cx, cy, ohDir) { this.orientSub(cid, cx, cy, ohDir, 0); },
+    reset() {
+        this.step=1; this.nextC=0; this.atoms=[]; this.bonds=[];
+        this.buildFischer();
+        document.querySelectorAll('#glucose-app .step-box').forEach(el=>{ el.classList.remove('active', 'done'); });
+        document.getElementById('g_step1').classList.add('active');
+        document.getElementById('g_btn-rotate').disabled = true; document.getElementById('g_btn-rotate').classList.remove('primary');
+        document.getElementById('g_btn-close').disabled = true; document.getElementById('g_btn-close').classList.remove('primary');
+        document.getElementById('g_anomer-ui').style.display = 'none';
+    },
+    loop() {
+        if(!this.active) { requestAnimationFrame(()=>this.loop()); return; }
+        this.ctx.fillStyle='#1e1e1e'; this.ctx.fillRect(0,0,this.W,this.H);
+        this.ctx.lineCap='round';
+        this.bonds.forEach(b=>{
+            let a1=this.atoms[b.a], a2=this.atoms[b.b];
+            let isProtonBond = (a1.isMobileProton && a2.isRingOxygen) || (a2.isMobileProton && a1.isRingOxygen);
+            if(this.step >= 3 && isProtonBond) return;
+            if(b.type === 2) {
+                this.ctx.lineWidth = 2; this.ctx.strokeStyle = COLS.Bond;
+                let dx = a2.x - a1.x, dy = a2.y - a1.y; let len = Math.hypot(dx, dy);
+                if(len > 0) {
+                    let nx = -dy/len * 4; let ny = dx/len * 4;
+                    this.ctx.beginPath(); this.ctx.moveTo(a1.x+nx, a1.y+ny); this.ctx.lineTo(a2.x+nx, a2.y+ny);
+                    this.ctx.moveTo(a1.x-nx, a1.y-ny); this.ctx.lineTo(a2.x-nx, a2.y-ny); this.ctx.stroke();
+                }
+            } else {
+                this.ctx.lineWidth = 3; this.ctx.strokeStyle = COLS.Bond;
+                this.ctx.beginPath(); this.ctx.moveTo(a1.x,a1.y); this.ctx.lineTo(a2.x,a2.y); this.ctx.stroke();
+            }
+        });
+        if(this.step >= 4) {
+            let c1 = this.atoms[0]; let o5 = this.atoms.find(a=>a.isRingOxygen);
+            this.ctx.lineWidth = 3; this.ctx.strokeStyle = COLS.O;
+            this.ctx.beginPath(); this.ctx.moveTo(c1.x, c1.y); this.ctx.lineTo(o5.x, o5.y); this.ctx.stroke();
+            let proton = this.atoms.find(a=>a.isMobileProton); let o1 = this.getNeighbors(0).find(a=>a.type==='O');
+            if(o1 && proton) { this.ctx.beginPath(); this.ctx.moveTo(o1.x, o1.y); this.ctx.lineTo(proton.x, proton.y); this.ctx.stroke(); }
+        }
+        this.atoms.forEach(a=>{ a.update(); a.draw(this.ctx); });
+        requestAnimationFrame(()=>this.loop());
+    }
+};
+
+// --------------------------------------------------------------------------------
+// FRUCTOSE SIMULATION (KETONE, C2 ATTACK)
+// --------------------------------------------------------------------------------
+const fructoseSim = {
+    canvas: null, ctx: null, active: false,
+    W: 0, H: 0,
+    atoms: [], bonds: [], step: 1, nextC: 0, anomer: 'beta',
+
+    init() {
+        this.canvas = document.getElementById('f_canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.resize();
+        this.canvas.addEventListener('mousedown', e => this.click(e));
+        this.buildFischer();
+        this.loop();
+    },
+    resize() {
+        this.W = this.canvas.parentElement.clientWidth;
+        this.H = this.canvas.parentElement.clientHeight;
+        this.canvas.width = this.W; this.canvas.height = this.H;
+        if(this.step===1) this.buildFischer(); 
+        else if(this.step===2) this.rotate();
+        else if(this.step>=3) this.closeRing();
+    },
+    
+    // BUILDERS (Same logic, separate arrays)
+    addAtom(t, x, y) { let id=this.atoms.length; this.atoms.push(new Atom(id, t, x, y)); return id; },
+    addBond(i1, i2, type=1) { this.bonds.push({a:i1, b:i2, type:type}); },
+    addSub(cid, cx, y, side) {
+        if (side === 'none') {
+            let o = this.addAtom('O', cx+40, y); this.addBond(cid, o);
+            let h_on_o = this.addAtom('H', cx+60, y); this.addBond(o, h_on_o);
+            let h1 = this.addAtom('H', cx-30, y-10); this.addBond(cid, h1);
+            let h2 = this.addAtom('H', cx-30, y+10); this.addBond(cid, h2);
+        } else {
+            let ox = side==='right'?cx+40:cx-40;
+            let hx = side==='right'?cx-40:cx+40;
+            let o = this.addAtom('O', ox, y); this.addBond(cid, o);
+            let ho = this.addAtom('H', side==='right'?ox+20:ox-20, y); this.addBond(o, ho);
+            let h = this.addAtom('H', hx, y); this.addBond(cid, h);
+        }
+    },
+
+    buildFischer() {
+        this.atoms=[]; this.bonds=[];
+        const cx = this.W/2; const startY = this.H*0.15; const gap = 55;
+        const cIds = [];
+        for(let i=0; i<6; i++) {
+            cIds.push(this.addAtom('C', cx, startY+i*gap));
+            if(i>0) this.addBond(cIds[i-1], cIds[i]);
+        }
+        // C1 CH2OH
+        this.addSub(cIds[0], cx, startY, 'none');
+        // C2 Keton
+        let o2 = this.addAtom('O', cx+60, startY+gap); 
+        this.atoms[o2].isCarbonylOxygen = true; this.addBond(cIds[1], o2, 2);
+        // C3-C4
+        this.addSub(cIds[2], cx, startY+gap*2, 'left');
+        this.addSub(cIds[3], cx, startY+gap*3, 'right');
+        // C5
+        let c5y = startY+gap*4;
+        let o5 = this.addAtom('O', cx+40, c5y); this.atoms[o5].isRingOxygen = true;
+        this.addBond(cIds[4], o5);
+        let hProton = this.addAtom('H', cx+65, c5y); this.atoms[hProton].isMobileProton = true;
+        this.addBond(o5, hProton);
+        let h5 = this.addAtom('H', cx-40, c5y); this.addBond(cIds[4], h5);
+        // C6
+        this.addSub(cIds[5], cx, startY+gap*5, 'none');
+    },
+
+    click(e) {
+        if(this.step !== 1 || !this.active) return;
+        const r = this.canvas.getBoundingClientRect();
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        let target = this.atoms[this.nextC];
+        if(target && Math.hypot(x-target.x, y-target.y) < 25) {
+            target.label = (this.nextC+1).toString();
+            target.highlight = true; setTimeout(()=>target.highlight=false, 300);
+            this.nextC++;
+            if(this.nextC === 6) this.nextStep(1);
+        }
+    },
+    nextStep(from) {
+        document.getElementById(`f_step${from}`).classList.remove('active');
+        document.getElementById(`f_step${from}`).classList.add('done');
+        if(from===1) {
+            this.step=2; 
+            document.getElementById('f_step2').classList.add('active');
+            let btn = document.getElementById('f_btn-rotate');
+            btn.disabled = false; btn.classList.add('primary');
+        }
+        if(from===2) {
+            this.step=3;
+            document.getElementById('f_step2').classList.remove('active'); document.getElementById('f_step2').classList.add('done');
+            document.getElementById('f_step3').classList.add('active');
+            let btn = document.getElementById('f_btn-close');
+            btn.disabled = false; btn.classList.add('primary');
+        }
+    },
+
+    rotate() {
+        const cx = this.W/2; const cy = this.H/2 + 20; const R = 80;
+        const p2 = {x: cx + R, y: cy};
+        const p3 = {x: cx + R*0.5, y: cy + R*0.8};
+        const p4 = {x: cx - R*0.5, y: cy + R*0.8};
+        const p5 = {x: cx - R, y: cy};
+
+        this.setTarget(1, p2.x, p2.y); this.setTarget(2, p3.x, p3.y);
+        this.setTarget(3, p4.x, p4.y); this.setTarget(4, p5.x, p5.y);
+
+        let p1 = {x: p2.x + 40, y: p2.y - 60};
+        this.setTarget(0, p1.x, p1.y);
+        this.placeNeighbors(0, p1.x, p1.y, [{t:'H', dx:-20, dy:10}, {t:'H', dx:20, dy:10}, {t:'O', dx:0, dy:-30}]);
+        let oOnC1 = this.getNeighbors(0).find(a=>a.type==='O');
+        if(oOnC1) this.placeNeighbors(oOnC1.id, oOnC1.tx, oOnC1.ty, [{t:'H', dx:15, dy:-5}]);
+
+        let oKeto = this.atoms.find(a => a.isCarbonylOxygen);
+        this.setTarget(oKeto.id, p2.x + 60, p2.y + 10);
+
+        let p6 = {x: p5.x - 20, y: p5.y - 70};
+        this.setTarget(5, p6.x, p6.y);
+        this.placeNeighbors(5, p6.x, p6.y, [{t:'H', dx:-20, dy:10}, {t:'H', dx:20, dy:10}, {t:'O', dx:20, dy:-20}]);
+        let oOnC6 = this.getNeighbors(5).find(a=>a.type==='O');
+        if(oOnC6) this.placeNeighbors(oOnC6.id, oOnC6.tx, oOnC6.ty, [{t:'H', dx:15, dy:-5}]);
+
+        let ringO = this.atoms.find(a => a.isRingOxygen);
+        let pRingO = {x: cx, y: cy - R + 20};
+        this.setTarget(ringO.id, pRingO.x, pRingO.y);
+        let proton = this.atoms.find(a => a.isMobileProton);
+        this.setTarget(proton.id, pRingO.x + 20, pRingO.y);
+
+        this.orientSub(2, p3.x, p3.y, 'up');
+        this.orientSub(3, p4.x, p4.y, 'down');
+        let h5 = this.getNeighbors(4).find(a => a.type==='H');
+        this.setTarget(h5.id, p5.x, p5.y + 40);
+
+        this.nextStep(2);
+    },
+    closeRing() {
+        const cx = this.W/2; const cy = this.H/2 + 20; const R = 70;
+        const pRingO = {x: cx, y: cy - R*0.6}; 
+        const p2 = {x: cx + R, y: cy};         
+        const p3 = {x: cx + R*0.6, y: cy + R}; 
+        const p4 = {x: cx - R*0.6, y: cy + R}; 
+        const p5 = {x: cx - R, y: cy};         
+
+        this.setTarget(1, p2.x, p2.y); this.setTarget(2, p3.x, p3.y);
+        this.setTarget(3, p4.x, p4.y); this.setTarget(4, p5.x, p5.y);
+        let ringO = this.atoms.find(a => a.isRingOxygen);
+        this.setTarget(ringO.id, pRingO.x, pRingO.y);
+
+        let p6 = {x: p5.x - 20, y: p5.y - 70};
+        this.setTarget(5, p6.x, p6.y); 
+        this.placeNeighbors(5, p6.x, p6.y, [{t:'H',dx:-20,dy:10}, {t:'H',dx:20,dy:10}, {t:'O',dx:20,dy:-20}]);
+        let oOnC6 = this.getNeighbors(5).find(a=>a.type==='O');
+        if(oOnC6) this.placeNeighbors(oOnC6.id, oOnC6.tx, oOnC6.ty, [{t:'H', dx:15, dy:-5}]);
+
+        this.orientSub(2, p3.x, p3.y, 'up');
+        this.orientSub(3, p4.x, p4.y, 'down');
+        let h5 = this.getNeighbors(4).find(a => a.type==='H');
+        this.setTarget(h5.id, p5.x, p5.y + 45);
+
+        let oKeto = this.atoms.find(a => a.isCarbonylOxygen);
+        let bond = this.bonds.find(b => (b.a===1 && b.b===oKeto.id) || (b.b===1 && b.a===oKeto.id));
+        if(bond) bond.type = 1;
+
+        this.setAnomer('beta');
+        document.getElementById('f_step3').classList.remove('active'); document.getElementById('f_step3').classList.add('done');
+        document.getElementById('f_anomer-ui').style.display = 'flex';
+        this.step = 4;
+    },
+    setAnomer(type) {
+        if(this.step < 3) return;
+        this.anomer = type;
+        document.querySelectorAll('#fructose-app .anomer-btn').forEach(b => {
+            b.classList.remove('selected');
+            if(b.innerText.toLowerCase().includes(type)) b.classList.add('selected');
+        });
+
+        let c2 = this.atoms[1]; let c1 = this.atoms[0]; 
+        let newOH = this.atoms.find(a => a.isCarbonylOxygen); 
+        let proton = this.atoms.find(a => a.isMobileProton); 
+        const dist = 50; const isBeta = type === 'beta';
+
+        if (isBeta) { // OH OP, C1 NED
+            this.setTarget(newOH.id, c2.tx, c2.ty - dist);
+            if(proton) this.setTarget(proton.id, c2.tx + 15, c2.ty - dist - 5);
+            let p1 = {x: c2.tx, y: c2.ty + dist + 20};
+            this.setTarget(c1.id, p1.x, p1.y);
+            this.placeNeighbors(0, p1.x, p1.y, [{t:'H',dx:-20,dy:10}, {t:'H',dx:20,dy:10}, {t:'O',dx:0,dy:30}]);
+            let oOnC1 = this.getNeighbors(0).find(a=>a.type==='O');
+            if(oOnC1) this.placeNeighbors(oOnC1.id, oOnC1.tx, oOnC1.ty, [{t:'H', dx:15, dy:5}]);
+        } else { // OH NED, C1 OP
+            this.setTarget(newOH.id, c2.tx, c2.ty + dist);
+            if(proton) this.setTarget(proton.id, c2.tx + 15, c2.ty + dist + 5);
+            let p1 = {x: c2.tx, y: c2.ty - dist - 20};
+            this.setTarget(c1.id, p1.x, p1.y);
+            this.placeNeighbors(0, p1.x, p1.y, [{t:'H',dx:-20,dy:10}, {t:'H',dx:20,dy:10}, {t:'O',dx:0,dy:-30}]);
+            let oOnC1 = this.getNeighbors(0).find(a=>a.type==='O');
+            if(oOnC1) this.placeNeighbors(oOnC1.id, oOnC1.tx, oOnC1.ty, [{t:'H', dx:15, dy:-5}]);
+        }
+    },
+    // UTILS
+    setTarget(id, x, y) { if(this.atoms[id]) { this.atoms[id].tx = x; this.atoms[id].ty = y; } },
+    placeNeighbors(rootId, rx, ry, offsets) {
+        let n = this.getNeighbors(rootId); let used = [];
+        offsets.forEach(off => {
+            let match = n.find(a => a.type === off.t && !used.includes(a.id) && !a.isCarbonylOxygen && !a.isRingOxygen);
+            if(match) { this.setTarget(match.id, rx + off.dx, ry + off.dy); used.push(match.id); }
+        });
+    },
+    orientSub(cid, cx, cy, dir) {
+        let n = this.getNeighbors(cid);
+        let heavy = n.find(a => a.type === 'O' && !a.isRingOxygen); let light = n.find(a => a.type === 'H');
+        let dy = 45;
+        if(heavy) {
+            let ty = cy + (dir==='down'?dy:-dy); this.setTarget(heavy.id, cx, ty);
+            let hOnO = this.getNeighbors(heavy.id).find(a=>a.type==='H' && a.id!==cid);
+            if(hOnO) this.setTarget(hOnO.id, cx+15, ty-5);
+        }
+        if(light) { this.setTarget(light.id, cx, cy + (dir==='down'?-dy:dy)); }
+    },
+    getNeighbors(id) {
+        let res = [];
+        this.bonds.forEach(b=>{ if(b.a===id) res.push(this.atoms[b.b]); if(b.b===id) res.push(this.atoms[b.a]); });
+        return res;
+    },
+    reset() {
+        this.step=1; this.nextC=0; this.atoms=[]; this.bonds=[];
+        this.buildFischer();
+        document.querySelectorAll('#fructose-app .step-box').forEach(el=>{ el.classList.remove('active', 'done'); });
+        document.getElementById('f_step1').classList.add('active');
+        document.getElementById('f_btn-rotate').disabled = true; document.getElementById('f_btn-rotate').classList.remove('primary');
+        document.getElementById('f_btn-close').disabled = true; document.getElementById('f_btn-close').classList.remove('primary');
+        document.getElementById('f_anomer-ui').style.display = 'none';
+    },
+    loop() {
+        if(!this.active) { requestAnimationFrame(()=>this.loop()); return; }
+        this.ctx.fillStyle='#1e1e1e'; this.ctx.fillRect(0,0,this.W,this.H);
+        this.ctx.lineCap='round';
+        this.bonds.forEach(b=>{
+            let a1=this.atoms[b.a], a2=this.atoms[b.b];
+            let isProtonBond = (a1.isMobileProton && a2.isRingOxygen) || (a2.isMobileProton && a1.isRingOxygen);
+            if(this.step >= 3 && isProtonBond) return;
+            if(b.type === 2) { 
+                this.ctx.lineWidth = 2; this.ctx.strokeStyle = COLS.Bond;
+                let dx = a2.x - a1.x, dy = a2.y - a1.y; let len = Math.hypot(dx, dy);
+                if(len > 0) {
+                    let nx = -dy/len * 4; let ny = dx/len * 4;
+                    this.ctx.beginPath(); this.ctx.moveTo(a1.x+nx, a1.y+ny); this.ctx.lineTo(a2.x+nx, a2.y+ny);
+                    this.ctx.moveTo(a1.x-nx, a1.y-ny); this.ctx.lineTo(a2.x-nx, a2.y-ny); this.ctx.stroke();
+                }
+            } else {
+                this.ctx.lineWidth = 3; this.ctx.strokeStyle = COLS.Bond;
+                this.ctx.beginPath(); this.ctx.moveTo(a1.x,a1.y); this.ctx.lineTo(a2.x,a2.y); this.ctx.stroke();
+            }
+        });
+        if(this.step >= 4) {
+            let c2 = this.atoms[1]; let o5 = this.atoms.find(a=>a.isRingOxygen);
+            this.ctx.lineWidth = 3; this.ctx.strokeStyle = COLS.O;
+            this.ctx.beginPath(); this.ctx.moveTo(c2.x, c2.y); this.ctx.lineTo(o5.x, o5.y); this.ctx.stroke();
+            let proton = this.atoms.find(a=>a.isMobileProton); let newOH = this.atoms.find(a=>a.isCarbonylOxygen);
+            if(proton && newOH) { this.ctx.beginPath(); this.ctx.moveTo(newOH.x, newOH.y); this.ctx.lineTo(proton.x, proton.y); this.ctx.stroke(); }
+        }
+        this.atoms.forEach(a=>{ a.update(); a.draw(this.ctx); });
+        requestAnimationFrame(()=>this.loop());
+    }
+};
+
+// --------------------------------------------------------------------------------
+// APP CONTROLLER
+// --------------------------------------------------------------------------------
+const app = {
+    current: 'glucose',
+    switchTab(tab) {
+        this.current = tab;
+        document.querySelectorAll('.app-container').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+        if(tab === 'glucose') {
+            document.getElementById('glucose-app').classList.add('active');
+            document.querySelector('.g-tab').classList.add('active');
+            glucoseSim.active = true; fructoseSim.active = false;
+            glucoseSim.resize();
+        } else {
+            document.getElementById('fructose-app').classList.add('active');
+            document.querySelector('.f-tab').classList.add('active');
+            fructoseSim.active = true; glucoseSim.active = false;
+            fructoseSim.resize();
+        }
+    }
+};
+
+window.onload = () => { glucoseSim.init(); fructoseSim.init(); };
+window.onresize = () => { glucoseSim.resize(); fructoseSim.resize(); };
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syregalgen: Historiske Fagord</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: #1e293b;
+            --text-main: #f8fafc;
+            --accent-glow: #38bdf8;
+            --correct-color: #22c55e;
+            --wrong-color: #ef4444;
+            --warn-color: #f59e0b;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            display: flex;
+            height: 100vh;
+            user-select: none;
+        }
+
+        /* Layout Grid */
+        #app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Left Side: Canvas & Animations */
+        #visual-section {
+            flex: 1;
+            position: relative;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            border-right: 2px solid #334155;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* Right Side: UI & Interaction */
+        #interaction-section {
+            flex: 1;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            z-index: 2;
+            background: rgba(30, 41, 59, 0.95);
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+
+        /* UI Elements */
+        .header-box {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 28px;
+            color: var(--accent-glow);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .score-text { color: var(--accent-glow); }
+        .streak-text { color: var(--warn-color); }
+
+        #hint-box {
+            background: rgba(56, 189, 248, 0.1);
+            border-left: 4px solid var(--accent-glow);
+            padding: 15px;
+            margin-bottom: 30px;
+            font-style: italic;
+            font-size: 16px;
+            line-height: 1.5;
+            min-height: 50px;
+        }
+
+        /* Word Display */
+        #word-display {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 40px;
+            min-height: 60px;
+        }
+
+        .letter-slot {
+            width: 40px;
+            height: 50px;
+            border-bottom: 4px solid var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            font-size: 32px;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding-bottom: 5px;
+            color: var(--text-main);
+            transition: all 0.3s;
+        }
+
+        .letter-slot.space {
+            border-bottom: none;
+            width: 20px;
+        }
+
+        /* Keyboard */
+        #keyboard {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .key-btn {
+            background: #334155;
+            color: white;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            padding: 12px 16px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.1s;
+            box-shadow: 0 4px 0 #0f172a;
+        }
+
+        .key-btn:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #0f172a;
+        }
+
+        .key-btn:hover:not(:disabled) {
+            background: #475569;
+            border-color: var(--accent-glow);
+        }
+
+        .key-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .key-btn.correct { background: var(--correct-color) !important; color: white; opacity: 1;}
+        .key-btn.wrong { background: var(--wrong-color) !important; color: white; opacity: 0.3;}
+
+        /* Overlay / Modal */
+        #overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 10;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal {
+            background: var(--panel-bg);
+            padding: 40px;
+            border-radius: 12px;
+            border: 2px solid #334155;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .modal h2 { margin-top: 0; font-size: 32px; }
+        .modal p { font-size: 18px; line-height: 1.6; margin-bottom: 25px; }
+        .fact-box {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--accent-glow);
+            text-align: left;
+            font-size: 15px;
+        }
+
+        .btn-restart {
+            background: var(--accent-glow);
+            color: #0f172a;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .btn-restart:hover {
+            background: #7dd3fc;
+            transform: scale(1.05);
+        }
+
+        /* Hemmelig victory-screen (5 gennemførte i træk) */
+        #secretOverlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 11;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            backdrop-filter: blur(6px);
+        }
+
+        .secret-modal {
+            background: var(--panel-bg);
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 520px;
+            box-shadow: 0 0 60px rgba(56, 189, 248, 0.6);
+            border: 3px solid transparent;
+            background-image: linear-gradient(var(--panel-bg), var(--panel-bg)), linear-gradient(90deg, #f87171, #fbbf24, #4ade80, #38bdf8, #a78bfa, #f87171);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            background-size: 100% 100%, 300% 100%;
+            animation: rainbow-border 4s linear infinite, secret-pop 0.4s ease;
+        }
+
+        @keyframes rainbow-border {
+            0% { background-position: 0 0, 0% 0; }
+            100% { background-position: 0 0, 300% 0; }
+        }
+
+        @keyframes secret-pop {
+            0% { transform: scale(0.7) rotate(-5deg); opacity: 0; }
+            60% { transform: scale(1.05) rotate(2deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0); }
+        }
+
+        .secret-emoji {
+            font-size: 40px;
+            margin-bottom: 10px;
+            animation: secret-bounce 1.2s ease-in-out infinite;
+        }
+
+        @keyframes secret-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .secret-modal h2 {
+            margin-top: 0;
+            font-size: 24px;
+            background: linear-gradient(90deg, #f87171, #fbbf24, #4ade80, #38bdf8, #a78bfa, #f87171);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: rainbow-text 3s linear infinite;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @keyframes rainbow-text {
+            0% { background-position: 0% 0; }
+            100% { background-position: 300% 0; }
+        }
+
+        .secret-modal p { font-size: 17px; line-height: 1.6; margin-bottom: 20px; font-style: italic; }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            #app-container { flex-direction: column; }
+            #visual-section { flex: 0.8; border-right: none; border-bottom: 2px solid #334155; }
+            #interaction-section { flex: 1.2; max-width: 100%; padding: 15px; }
+            .letter-slot { width: 25px; height: 35px; font-size: 22px; }
+            .key-btn { padding: 10px 12px; font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div id="visual-section">
+        <canvas id="gameCanvas"></canvas>
+    </div>
+
+    <div id="interaction-section">
+        <div class="header-box">
+            <h1>Syregalgen</h1>
+            <p>Gæt ordet, før han ender i syrebadet!</p>
+        </div>
+
+        <div class="stats-bar">
+            <div class="score-text" id="score-display">Point: 0,0</div>
+            <div class="streak-text" id="streak-display">Streak: x1,0</div>
+        </div>
+
+        <div id="hint-box">Kategori: Indlæser...</div>
+
+        <div id="word-display"></div>
+
+        <div id="keyboard"></div>
+    </div>
+</div>
+
+<div id="overlay">
+    <div class="modal">
+        <h2 id="modal-title">Status</h2>
+        <p id="modal-desc">Beskrivelse</p>
+        <div class="fact-box" id="modal-fact">Faglig forklaring her.</div>
+        <button class="btn-restart" onclick="Game.init()">Næste Ord ⟶</button>
+    </div>
+</div>
+
+<div id="secretOverlay">
+    <div class="secret-modal">
+        <div class="secret-emoji">📜✨🏆✨📜</div>
+        <h2>Hemmeligt niveau låst op</h2>
+        <p id="secret-desc">Beskrivelse</p>
+        <div class="fact-box" id="secret-fact">Ros her.</div>
+        <button class="btn-restart" onclick="Game.closeSecret()">Fortsæt, hvis du tør ⟶</button>
+    </div>
+</div>
+
+<script>
+    "use strict";
+
+    // --- DATA: Historiske fagord om industrialisering, ideologier og velfærdssamfund ---
+    const HISTORIE_ORD = [
+        {
+            word: "INDUSTRIALISERING",
+            category: "Industrialisering",
+            fact: "Startede i England omkring 1750'erne og bredte sig i løbet af 1800-tallet til det øvrige Europa, USA og Japan."
+        },
+        {
+            word: "DAMPMASKINE",
+            category: "Industrialisering",
+            fact: "James Watts effektive dampmaskine fra 1769 gjorde fabrikker uafhængige af vandkraft, så de kunne placeres frit."
+        },
+        {
+            word: "SPINNING JENNY",
+            category: "Industrialisering",
+            fact: "En hånddrevet spindemaskine fra 1764, der kunne spinde garn svarende til omkring 16 personers arbejde."
+        },
+        {
+            word: "TEKSTILINDUSTRI",
+            category: "Industrialisering",
+            fact: "En af de første industrier til at blive mekaniseret i England, blandt andet takket være maskiner som Spinning Jenny."
+        },
+        {
+            word: "JERNBANE",
+            category: "Industrialisering",
+            fact: "Den første strækning åbnede i 1829 mellem Liverpool og Manchester og fik godstransporttiden til at falde fra ca. 36 til ca. 2 timer."
+        },
+        {
+            word: "MANUFAKTUR",
+            category: "Industrialisering",
+            fact: "Mange håndværkere samlet ét sted med en vis arbejdsdeling - et mellemtrin mellem traditionelt håndværk og den moderne fabrik."
+        },
+        {
+            word: "ARBEJDSDELING",
+            category: "Industrialisering",
+            fact: "Ved at opdele produktionen i mange små, simple opgaver kunne ufaglærte arbejdere hurtigt læres op."
+        },
+        {
+            word: "INDHEGNING",
+            category: "Landbrug og industrialisering",
+            fact: "Kaldes også 'enclosure': fælles græsningsarealer i England blev samlet og indhegnet til større, mere effektive marker."
+        },
+        {
+            word: "GODSEJERE",
+            category: "Landbrug og industrialisering",
+            fact: "Ejede omkring halvdelen af jorden i England i begyndelsen af 1700-tallet og investerede ofte i minedrift, infrastruktur og handel."
+        },
+        {
+            word: "STÆNDERSAMFUND",
+            category: "Før industrialiseringen",
+            fact: "Befolkningen var inddelt i stænder (klasser), hvor kirken og adelen havde privilegier, som resten af befolkningen ikke havde."
+        },
+        {
+            word: "BØRNEARBEJDE",
+            category: "Industrialiseringens bagside",
+            fact: "Danmarks første lov om børnearbejde kom i 1873 og satte blandt andet aldersgrænser for, hvornår børn måtte arbejde på fabrikker."
+        },
+        {
+            word: "FATTIGKVARTER",
+            category: "Industrialiseringens bagside",
+            fact: "Arbejderklassen boede ofte tæt sammenpakket i byernes fattigkvarterer under dårlige sundhedsmæssige forhold."
+        },
+        {
+            word: "IDEOLOGI",
+            category: "Ideologier generelt",
+            fact: "En sammenhængende samling af idéer og forslag til, hvordan et samfund bør indrettes politisk og økonomisk."
+        },
+        {
+            word: "VENSTREFLØJEN",
+            category: "Ideologier generelt",
+            fact: "Udtrykket stammer fra den franske revolution, hvor de revolutionære i Nationalforsamlingen satte sig til venstre for kongens støtter."
+        },
+        {
+            word: "HØJREFLØJEN",
+            category: "Ideologier generelt",
+            fact: "Udtrykket stammer fra den franske revolution, hvor kongens støtter i Nationalforsamlingen satte sig til højre for de revolutionære."
+        },
+        {
+            word: "LIBERALISME",
+            category: "Liberalisme",
+            fact: "Bygger blandt andet på Adam Smiths idé om, at et frit marked uden statslig indblanding gavner hele samfundet."
+        },
+        {
+            word: "MARKEDSØKONOMI",
+            category: "Liberalisme",
+            fact: "Et økonomisk system, hvor det er markedet selv - via udbud, efterspørgsel og fri konkurrence - der bestemmer priser og produktion."
+        },
+        {
+            word: "DEN USYNLIGE HÅND",
+            category: "Liberalisme",
+            fact: "Adam Smiths billede på, hvordan enkeltpersoners egoistiske handlinger i et frit marked alligevel ender med at gavne hele samfundet."
+        },
+        {
+            word: "MERKANTILISME",
+            category: "Liberalisme",
+            fact: "Den tankegang Adam Smith kritiserede: at staten skulle beskytte den hjemlige produktion med importtold."
+        },
+        {
+            word: "NÆRINGSFRIHED",
+            category: "Liberalisme",
+            fact: "Retten til frit at drive erhverv og konkurrere på markedet - noget mange konservative håndværkere og lav frygtede."
+        },
+        {
+            word: "SOCIALLIBERALISME",
+            category: "Liberalisme",
+            fact: "John Stuart Mill mente, modsat den klassiske liberalisme, at staten burde gribe aktivt ind for at begrænse nød og fattigdom."
+        },
+        {
+            word: "KAPITALISME",
+            category: "Socialisme (Marx)",
+            fact: "Ifølge Marx bestod det kapitalistiske samfund af to modsatrettede klasser: kapitalisterne og arbejderne."
+        },
+        {
+            word: "KLASSEKAMP",
+            category: "Socialisme (Marx)",
+            fact: "Marx mente, at historien drives fremad af en vedvarende konflikt mellem samfundets klasser, fx mellem kapitalister og arbejdere."
+        },
+        {
+            word: "PROLETARIAT",
+            category: "Socialisme (Marx)",
+            fact: "Marx' betegnelse for arbejderklassen, der solgte sin arbejdskraft til kapitalisterne for at få løn."
+        },
+        {
+            word: "BOURGEOISIET",
+            category: "Socialisme (Marx)",
+            fact: "Marx' betegnelse for borgerskabet, der ejede produktionsmidlerne (fabrikkerne) i det kapitalistiske samfund."
+        },
+        {
+            word: "PRODUKTIONSMIDLER",
+            category: "Socialisme (Marx)",
+            fact: "Fabrikker, maskiner og jord - midlerne man producerer varer med, og som Marx mente burde overtages af staten."
+        },
+        {
+            word: "DEN HISTORISKE MATERIALISME",
+            category: "Socialisme (Marx)",
+            fact: "Marx' teori om, at et samfunds økonomiske grundlag (basis) i sidste ende bestemmer dets love, moral og kultur (overbygningen)."
+        },
+        {
+            word: "DET KOMMUNISTISKE MANIFEST",
+            category: "Socialisme (Marx)",
+            fact: "Udgivet af Karl Marx og Friedrich Engels i 1848. Indeholder blandt andet opfordringen: 'Arbejdere i alle lande, foren jer.'"
+        },
+        {
+            word: "DET KLASSELØSE SAMFUND",
+            category: "Socialisme (Marx)",
+            fact: "Marx' endemål: et samfund uden privat ejendomsret til produktionsmidlerne, hvor der ikke længere er brug for en statsmagt."
+        },
+        {
+            word: "REFORMSOCIALISME",
+            category: "Reformsocialisme",
+            fact: "Udviklet af Eduard Bernstein, der mente, man skulle forbedre arbejdernes vilkår gradvist gennem demokrati frem for revolution."
+        },
+        {
+            word: "FAGFORENING",
+            category: "Reformsocialisme",
+            fact: "Efter 1870 organiserede arbejdere sig i stigende grad i fagforeninger for at kæmpe for bedre løn og arbejdstid."
+        },
+        {
+            word: "BOLSJEVIKKER",
+            category: "Socialisme i Rusland",
+            fact: "Russisk for 'flertallet' - denne fløj af den russiske socialistiske bevægelse ønskede revolution og tog magten i 1917."
+        },
+        {
+            word: "MENSJEVIKKER",
+            category: "Socialisme i Rusland",
+            fact: "Russisk for 'mindretallet' - denne fløj af den russiske socialistiske bevægelse foretrak den reformsocialistiske vej."
+        },
+        {
+            word: "KONSERVATISME",
+            category: "Konservatisme",
+            fact: "Udviklet blandt andet af englænderen Edmund Burke som et modsvar til liberalismen og socialismen i 1800-tallet."
+        },
+        {
+            word: "SOCIALT HIERARKI",
+            category: "Konservatisme",
+            fact: "Konservatismen opfattede mennesket som en del af et naturligt socialt hierarki, hvor man havde sin bestemte plads i samfundet."
+        },
+        {
+            word: "TRADITION",
+            category: "Konservatisme",
+            fact: "Ifølge Edmund Burke var et samfund produkt af sin historie, og forandringer burde kun ske i små skridt og med respekt for det, der virkede."
+        },
+        {
+            word: "VELFÆRDSSTAT",
+            category: "Velfærdssamfundet",
+            fact: "En stat der - finansieret gennem skatter - sikrer borgerne uddannelse, sundhed og social tryghed, ofte efter et universelt princip."
+        }
+    ];
+
+    // --- HEMMELIG ROS (vises efter 5 gennemførte forsøg i træk) ---
+    const WEIRD_PRAISE = [
+        "Historikere er begyndt at diskutere, om du selv bør regnes som en historisk kilde af høj troværdighed.",
+        "Den usynlige hånd har angiveligt givet dig en anerkendende highfive - uden at nogen kunne se den.",
+        "Dit navn overvejes indsat i næste udgave af historiebogen - som fodnote til begrebet 'geni'.",
+        "Selv Karl Marx ville nok indrømme, at din indsats ikke kan forklares med den historiske materialisme alene.",
+        "Der er nedsat en kommission til at undersøge, hvordan du kan vide så meget om 1800-tallet uden selv at have været der.",
+        "Edmund Burke ville kalde din præstation en smuk, langsom tradition - selvom du lige har sat ny rekord på under et minut.",
+        "Dit pensum er blevet foreslået som næste kapitel i ideologiernes historie."
+    ];
+
+    // --- GAME ENGINE & STATE ---
+    const Game = {
+        state: {
+            wordObj: null,
+            targetWord: "",
+            guessedLetters: [],
+            wrongCount: 0,
+            maxWrong: 6, // 6 skridt til døden
+            status: "playing", // playing, won, lost
+            score: 0,
+            streak: 1,
+            winStreak: 0 // gennemførte forsøg i træk, uden en eneste fiasko
+        },
+
+        elements: {
+            wordDisplay: document.getElementById('word-display'),
+            keyboard: document.getElementById('keyboard'),
+            hintBox: document.getElementById('hint-box'),
+            overlay: document.getElementById('overlay'),
+            modalTitle: document.getElementById('modal-title'),
+            modalDesc: document.getElementById('modal-desc'),
+            modalFact: document.getElementById('modal-fact'),
+            scoreDisplay: document.getElementById('score-display'),
+            streakDisplay: document.getElementById('streak-display'),
+            secretOverlay: document.getElementById('secretOverlay'),
+            secretDesc: document.getElementById('secret-desc'),
+            secretFact: document.getElementById('secret-fact')
+        },
+
+        init: function() {
+            this.elements.overlay.style.display = "none";
+            this.elements.secretOverlay.style.display = "none";
+            this.state.guessedLetters = [];
+            this.state.wrongCount = 0;
+            this.state.status = "playing";
+
+            // Vælg et tilfældigt ord
+            const randIndex = Math.floor(Math.random() * HISTORIE_ORD.length);
+            this.state.wordObj = HISTORIE_ORD[randIndex];
+            this.state.targetWord = this.state.wordObj.word.toUpperCase();
+
+            this.elements.hintBox.innerText = "Kategori: " + this.state.wordObj.category;
+            this.updateScoreUI();
+            this.buildWordDisplay();
+            this.buildKeyboard();
+
+            // Reset Canvas animation
+            CanvasEngine.reset();
+        },
+
+        buildWordDisplay: function() {
+            this.elements.wordDisplay.innerHTML = "";
+            for(let i = 0; i < this.state.targetWord.length; i++) {
+                const char = this.state.targetWord[i];
+                const slot = document.createElement('div');
+
+                if(char === " " || char === "-") {
+                    slot.className = "letter-slot space";
+                    slot.innerText = char;
+                } else {
+                    slot.className = "letter-slot";
+                    slot.id = "slot-" + i;
+                    slot.innerText = "";
+                }
+                this.elements.wordDisplay.appendChild(slot);
+            }
+        },
+
+        buildKeyboard: function() {
+            this.elements.keyboard.innerHTML = "";
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ".split("");
+
+            for(let i = 0; i < letters.length; i++) {
+                const btn = document.createElement('button');
+                btn.className = "key-btn";
+                btn.innerText = letters[i];
+                btn.id = "key-" + letters[i];
+                btn.onclick = function() { Game.handleGuess(letters[i]); };
+                this.elements.keyboard.appendChild(btn);
+            }
+        },
+
+        handleGuess: function(letter) {
+            if(this.state.status !== "playing") return;
+            if(this.state.guessedLetters.indexOf(letter) !== -1) return;
+
+            this.state.guessedLetters.push(letter);
+            const btn = document.getElementById("key-" + letter);
+            if(btn) btn.disabled = true;
+
+            if(this.state.targetWord.indexOf(letter) !== -1) {
+                // Rigtigt gæt
+                if(btn) btn.classList.add("correct");
+                this.revealLetter(letter);
+                this.checkWin();
+            } else {
+                // Forkert gæt
+                if(btn) btn.classList.add("wrong");
+                this.state.wrongCount++;
+                CanvasEngine.addDamage();
+                this.state.streak = 1; // Nulstil streak
+                this.updateScoreUI();
+                this.checkLoss();
+            }
+        },
+
+        revealLetter: function(letter) {
+            for(let i = 0; i < this.state.targetWord.length; i++) {
+                if(this.state.targetWord[i] === letter) {
+                    const slot = document.getElementById("slot-" + i);
+                    if(slot) slot.innerText = letter;
+                }
+            }
+        },
+
+        checkWin: function() {
+            let won = true;
+            for(let i = 0; i < this.state.targetWord.length; i++) {
+                const char = this.state.targetWord[i];
+                if(char !== " " && char !== "-") {
+                    if(this.state.guessedLetters.indexOf(char) === -1) {
+                        won = false;
+                        break;
+                    }
+                }
+            }
+
+            if(won) {
+                this.state.status = "won";
+                // Beregn point (basis + færre fejl = flere point) * streak
+                let pointsGained = (50 - (this.state.wrongCount * 5)) * this.state.streak;
+                this.state.score += pointsGained;
+                this.state.streak += 0.5; // Forøg streak
+                this.state.winStreak++;
+                this.updateScoreUI();
+
+                CanvasEngine.triggerWin();
+                setTimeout(function() {
+                    if(Game.state.winStreak > 0 && Game.state.winStreak % 5 === 0) {
+                        Game.showSecretVictory();
+                    } else {
+                        Game.showModal(true);
+                    }
+                }, 1500);
+            }
+        },
+
+        checkLoss: function() {
+            if(this.state.wrongCount >= this.state.maxWrong) {
+                this.state.status = "lost";
+                this.state.streak = 1;
+                this.state.winStreak = 0;
+                this.updateScoreUI();
+
+                CanvasEngine.triggerLoss();
+
+                // Afslør resten af ordet
+                for(let i = 0; i < this.state.targetWord.length; i++) {
+                    const char = this.state.targetWord[i];
+                    if(char !== " " && char !== "-") {
+                        const slot = document.getElementById("slot-" + i);
+                        if(slot && slot.innerText === "") {
+                            slot.innerText = char;
+                            slot.style.color = "var(--wrong-color)";
+                        }
+                    }
+                }
+                setTimeout(function() { Game.showModal(false); }, 2000);
+            }
+        },
+
+        showModal: function(isWin) {
+            if(isWin) {
+                this.elements.modalTitle.innerText = "Fremragende!";
+                this.elements.modalTitle.style.color = "var(--correct-color)";
+                this.elements.modalDesc.innerText = "Du gættede fagordet korrekt.";
+            } else {
+                this.elements.modalTitle.innerText = "Opløst!";
+                this.elements.modalTitle.style.color = "var(--wrong-color)";
+                this.elements.modalDesc.innerText = "Forsøget slog fejl. Ordet var: " + this.state.targetWord;
+            }
+            this.elements.modalFact.innerText = this.state.wordObj.fact;
+            this.elements.overlay.style.display = "flex";
+        },
+
+        showSecretVictory: function() {
+            const praise = WEIRD_PRAISE[Math.floor(Math.random() * WEIRD_PRAISE.length)];
+            this.elements.secretDesc.innerText = "Du har nu gennemført " + this.state.winStreak + " forsøg i træk uden at ende i syrebadet. Det er... statistisk set bekymrende imponerende.";
+            this.elements.secretFact.innerText = praise;
+            this.elements.secretOverlay.style.display = "flex";
+        },
+
+        closeSecret: function() {
+            this.elements.secretOverlay.style.display = "none";
+            this.init();
+        },
+
+        updateScoreUI: function() {
+            // Dansk formatering af tal (udskift punktum med komma)
+            let scStr = this.state.score.toFixed(1).replace(".", ",");
+            let stStr = this.state.streak.toFixed(1).replace(".", ",");
+
+            this.elements.scoreDisplay.innerText = "Point: " + scStr;
+            this.elements.streakDisplay.innerText = "Streak: x" + stStr;
+        },
+
+        handlePhysicalKeyboard: function(e) {
+            if(this.state.status !== "playing") return;
+            const key = e.key.toUpperCase();
+            const valid = "ABCDEFGHIJKLMNOPQRSTUVWXYZÆØÅ";
+            if(valid.indexOf(key) !== -1) {
+                this.handleGuess(key);
+            }
+        }
+    };
+
+    // Lyt til fysisk tastatur
+    window.addEventListener('keydown', function(e) { Game.handlePhysicalKeyboard(e); });
+
+
+    // --- CANVAS ENGINE (Visuelt pædagogisk greb) ---
+    const CanvasEngine = {
+        canvas: document.getElementById('gameCanvas'),
+        ctx: null,
+        width: 0,
+        height: 0,
+        particles: [],
+        animationId: null,
+
+        // Syrebadet (kar), som manden nærmer sig
+        beaker: { x: 0, y: 0, w: 120, h: 160 },
+        liquidColor: { r: 34, g: 197, b: 94 }, // Starter grøn
+
+        // Mandens fremdrift mod syrebadet, 0 (sikker) til 1 (ved kanten)
+        manProgress: 0,
+        targetManProgress: 0,
+        manFalling: false,
+        manFallT: 0,
+        splashSpawned: false,
+
+        init: function() {
+            this.ctx = this.canvas.getContext('2d');
+            this.resize();
+            window.addEventListener('resize', function() { CanvasEngine.resize(); });
+            this.loop();
+        },
+
+        resize: function() {
+            const parent = document.getElementById('visual-section');
+            this.canvas.width = parent.clientWidth;
+            this.canvas.height = parent.clientHeight;
+            this.width = this.canvas.width;
+            this.height = this.canvas.height;
+
+            // Centrer bægerglas
+            this.beaker.x = this.width / 2 - this.beaker.w / 2;
+            this.beaker.y = this.height - 250;
+        },
+
+        reset: function() {
+            this.particles = [];
+            this.manProgress = 0;
+            this.targetManProgress = 0;
+            this.manFalling = false;
+            this.manFallT = 0;
+            this.splashSpawned = false;
+            this.liquidColor = { r: 34, g: 197, b: 94 }; // Grøn
+        },
+
+        addDamage: function() {
+            this.targetManProgress = Game.state.wrongCount / Game.state.maxWrong;
+
+            // Flere og hurtigere bobler i takt med faren
+            for(let i = 0; i < 20; i++) {
+                this.particles.push(this.createBubble());
+            }
+        },
+
+        triggerWin: function() {
+            // Konfetti i lyse farver
+            for(let i=0; i<150; i++) {
+                this.particles.push({
+                    x: this.width / 2,
+                    y: this.height / 2,
+                    vx: (Math.random() - 0.5) * 20,
+                    vy: (Math.random() - 0.5) * 20,
+                    life: 1.0,
+                    decay: Math.random() * 0.02 + 0.01,
+                    size: Math.random() * 6 + 2,
+                    color: (Math.random() > 0.5) ? "#38bdf8" : "#fcd34d",
+                    type: "confetti"
+                });
+            }
+        },
+
+        triggerLoss: function() {
+            this.manFalling = true;
+            this.manFallT = 0;
+            this.splashSpawned = false;
+        },
+
+        spawnSplash: function() {
+            // Giftigt syre-stænk og gas-eksplosion
+            for(let i=0; i<100; i++) {
+                this.particles.push({
+                    x: this.beaker.x + this.beaker.w/2,
+                    y: this.beaker.y + 20,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: (Math.random() - 1.0) * 15,
+                    life: 1.0,
+                    decay: Math.random() * 0.01 + 0.005,
+                    size: Math.random() * 20 + 10,
+                    color: "rgba(34, 197, 94, 0.6)",
+                    type: "smoke"
+                });
+            }
+        },
+
+        createBubble: function() {
+            return {
+                x: this.beaker.x + Math.random() * this.beaker.w,
+                y: this.beaker.y + 10 + Math.random() * (this.beaker.h - 20),
+                vx: (Math.random() - 0.5) * 2,
+                vy: -Math.random() * 3 - 1,
+                life: 1.0,
+                decay: 0.02,
+                size: Math.random() * 4 + 2,
+                color: "rgba(255, 255, 255, 0.6)",
+                type: "bubble"
+            };
+        },
+
+        lerpColor: function(c1, c2, t) {
+            return {
+                r: c1.r + (c2.r - c1.r) * t,
+                g: c1.g + (c2.g - c1.g) * t,
+                b: c1.b + (c2.b - c1.b) * t
+            };
+        },
+
+        loop: function() {
+            // Brug requestAnimationFrame i stedet for timeout
+            window.requestAnimationFrame(function() { CanvasEngine.loop(); });
+
+            let ctx = CanvasEngine.ctx;
+            ctx.clearRect(0, 0, CanvasEngine.width, CanvasEngine.height);
+
+            // Interpoler mandens position mod badet (smooth animation)
+            CanvasEngine.manProgress += (CanvasEngine.targetManProgress - CanvasEngine.manProgress) * 0.08;
+
+            // Farven skifter gradvist fra grøn over orange til rød med faren
+            const GREEN = { r: 34, g: 197, b: 94 };
+            const ORANGE = { r: 245, g: 158, b: 11 };
+            const RED = { r: 239, g: 68, b: 68 };
+            CanvasEngine.liquidColor = (CanvasEngine.manProgress < 0.5)
+                ? CanvasEngine.lerpColor(GREEN, ORANGE, CanvasEngine.manProgress / 0.5)
+                : CanvasEngine.lerpColor(ORANGE, RED, (CanvasEngine.manProgress - 0.5) / 0.5);
+
+            CanvasEngine.drawLabTheme(ctx);
+            CanvasEngine.drawSceneAndMan(ctx);
+            CanvasEngine.updateAndDrawParticles(ctx);
+        },
+
+        drawLabTheme: function(ctx) {
+            // Tegn et bord
+            ctx.fillStyle = "#1e293b";
+            ctx.fillRect(0, this.beaker.y + this.beaker.h, this.width, this.height);
+            ctx.strokeStyle = "#38bdf8";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, this.beaker.y + this.beaker.h);
+            ctx.lineTo(this.width, this.beaker.y + this.beaker.h);
+            ctx.stroke();
+        },
+
+        drawSceneAndMan: function(ctx) {
+            let bx = this.beaker.x;
+            let by = this.beaker.y;
+            let bw = this.beaker.w;
+            let bh = this.beaker.h;
+            let floorY = by + bh;
+
+            // --- Tegn syrebadet (altid fyldt - det er faren han nærmer sig) ---
+            let colStr = "rgba(" + Math.round(this.liquidColor.r) + "," + Math.round(this.liquidColor.g) + "," + Math.round(this.liquidColor.b) + ", 0.85)";
+            ctx.fillStyle = colStr;
+            ctx.beginPath();
+            ctx.moveTo(bx, by + 10);
+            ctx.lineTo(bx, by + bh - 10);
+            ctx.quadraticCurveTo(bx, by + bh, bx + 10, by + bh);
+            ctx.lineTo(bx + bw - 10, by + bh);
+            ctx.quadraticCurveTo(bx + bw, by + bh, bx + bw, by + bh - 10);
+            ctx.lineTo(bx + bw, by + 10);
+            ctx.fill();
+
+            // Boblende syre - hyppigere jo tættere faren er
+            if(Math.random() < 0.03 + this.manProgress * 0.12) {
+                this.particles.push(this.createBubble());
+            }
+
+            // Kar-omrids
+            ctx.strokeStyle = "rgba(255,255,255,0.7)";
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(bx - 10, by);
+            ctx.lineTo(bx, by);
+            ctx.lineTo(bx, by + bh - 10);
+            ctx.quadraticCurveTo(bx, by + bh, bx + 10, by + bh);
+            ctx.lineTo(bx + bw - 10, by + bh);
+            ctx.quadraticCurveTo(bx + bw, by + bh, bx + bw, by + bh - 10);
+            ctx.lineTo(bx + bw, by);
+            ctx.lineTo(bx + bw + 10, by);
+            ctx.stroke();
+
+            // --- Tegn manden, der langsomt presses nærmere badet ---
+            const manStartX = 50;
+            const manEndX = bx - 55;
+
+            if(this.manFalling) {
+                this.manFallT += 0.025;
+                if(this.manFallT <= 1) {
+                    this.drawFallingMan(ctx, manEndX, floorY, this.manFallT);
+                }
+                if(this.manFallT >= 0.45 && !this.splashSpawned) {
+                    this.splashSpawned = true;
+                    this.spawnSplash();
+                }
+            } else {
+                let mx = manStartX + (manEndX - manStartX) * this.manProgress;
+                this.drawMan(ctx, mx, floorY, this.manProgress);
+            }
+
+            // Blinkende fare-symbol når manden er tæt på kanten af badet
+            if(!this.manFalling && this.manProgress > 0.7) {
+                let alpha = (this.manProgress - 0.7) / 0.3 * Math.abs(Math.sin(Date.now() / 200));
+                ctx.fillStyle = "rgba(239, 68, 68, " + alpha + ")";
+                ctx.font = "bold 44px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText("☠", bx + bw/2, by - 20);
+            }
+        },
+
+        drawMan: function(ctx, x, groundY, fear) {
+            const bounce = Math.sin(Date.now() / 150) * 3;
+            const headR = 14;
+            const bodyH = 46;
+            const legH = 30;
+            const armLen = 24;
+            const leanBack = fear * 18; // læner sig væk fra badet, jo tættere han kommer
+
+            const hipY = groundY - legH;
+            const shoulderY = hipY - bodyH;
+            const headX = x - leanBack;
+            const headY = shoulderY - headR - 2 + bounce;
+            const legSwing = Math.sin(Date.now() / 150) * 8;
+            const armSwing = Math.sin(Date.now() / 120) * 6;
+
+            ctx.save();
+            ctx.strokeStyle = "#f8fafc";
+            ctx.fillStyle = "#f8fafc";
+            ctx.lineWidth = 5;
+            ctx.lineCap = "round";
+
+            // Ben
+            ctx.beginPath();
+            ctx.moveTo(x, hipY);
+            ctx.lineTo(x - 10 + legSwing, groundY);
+            ctx.moveTo(x, hipY);
+            ctx.lineTo(x + 10 - legSwing, groundY);
+            ctx.stroke();
+
+            // Krop (læner sig bagud jo tættere på badet)
+            ctx.beginPath();
+            ctx.moveTo(x, hipY);
+            ctx.lineTo(headX, shoulderY);
+            ctx.stroke();
+
+            // Arme - flakser mere i takt med frygten
+            ctx.beginPath();
+            ctx.moveTo(headX, shoulderY + 6);
+            ctx.lineTo(headX - armLen * 0.6 - fear * 10, shoulderY - 6 - fear * 14 + armSwing);
+            ctx.moveTo(headX, shoulderY + 6);
+            ctx.lineTo(headX + armLen * 0.6 + fear * 4, shoulderY + 10 + armSwing);
+            ctx.stroke();
+
+            // Hoved
+            ctx.beginPath();
+            ctx.arc(headX, headY, headR, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Ansigt - øjne
+            ctx.beginPath();
+            ctx.arc(headX - 5, headY - 2, 1.5, 0, Math.PI * 2);
+            ctx.arc(headX + 5, headY - 2, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Mund - går fra smil til bekymret grimasse
+            ctx.beginPath();
+            const mouthCurve = 4 - fear * 8;
+            ctx.moveTo(headX - 5, headY + 5);
+            ctx.quadraticCurveTo(headX, headY + 5 + mouthCurve, headX + 5, headY + 5);
+            ctx.stroke();
+
+            // Sveddråbe når frygten stiger
+            if(fear > 0.4) {
+                ctx.fillStyle = "rgba(56,189,248,0.8)";
+                ctx.beginPath();
+                ctx.ellipse(headX + headR + 2, headY - 4, 3, 5, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            ctx.restore();
+        },
+
+        drawFallingMan: function(ctx, x, groundY, t) {
+            const rot = t * Math.PI / 2.2;
+            const scale = 1 - t * 0.6;
+            const dropY = t * 40;
+            const alpha = 1 - Math.max(0, t - 0.6) / 0.4;
+
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, alpha);
+            ctx.translate(x, groundY);
+            ctx.rotate(rot);
+            ctx.translate(0, dropY);
+            ctx.scale(scale, scale);
+            ctx.translate(-x, -groundY);
+            this.drawMan(ctx, x, groundY, 1);
+            ctx.restore();
+        },
+
+        updateAndDrawParticles: function(ctx) {
+            for(let i = this.particles.length - 1; i >= 0; i--) {
+                let p = this.particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= p.decay;
+
+                if(p.type === "smoke") {
+                    p.size += 0.5; // Røg udvider sig
+                }
+
+                if(p.life <= 0) {
+                    this.particles.splice(i, 1);
+                    continue;
+                }
+
+                ctx.save();
+                ctx.globalAlpha = p.life;
+                ctx.fillStyle = p.color;
+
+                if(p.type === "confetti") {
+                    // Simpel rotation/firkant
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.life * 10);
+                    ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+                } else if(p.type === "bubble" || p.type === "smoke") {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+        }
+    };
+
+    // Opstart
+    window.onload = function() {
+        CanvasEngine.init();
+        Game.init();
+    };
+
+</script>
+</body>
+</html>

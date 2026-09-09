@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fældnings-Trainer: De 4 Trin</title>
+    <style>
+        :root {
+            --bg: #121212;
+            --panel: #1e1e24;
+            --text: #e0e0e0;
+            --accent: #4cc9f0;
+            --success: #4ade80;
+            --error: #ef476f;
+            --warning: #ffd166;
+        }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; overflow: hidden; }
+
+        /* LAYOUT - sidebar er en vandret bjælke i toppen, så arbejdsområdet får hele bredden til reaktionsskemaet */
+        #app { display: flex; flex-direction: column; width: 100%; height: 100%; }
+
+        /* SIDEBAR (top bar) */
+        #sidebar {
+            flex-shrink: 0; background: var(--panel); border-bottom: 2px solid #333;
+            padding: 10px 20px; display: flex; flex-direction: row; align-items: center;
+            gap: 18px; overflow-x: auto;
+        }
+        #sidebar h2 { margin: 0; white-space: nowrap; font-size: 1.05rem; }
+
+        /* WORKSPACE */
+        #workspace {
+            flex: 1; position: relative; min-width: 0; min-height: 0;
+            background: radial-gradient(circle at center, #2a2a35 0%, #121212 100%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px; overflow-y: auto;
+        }
+
+        /* STEPS VISUALIZER - vandret række af trin */
+        .step-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: row; gap: 8px; flex: 1; overflow-x: auto; }
+        .step-item {
+            padding: 6px 12px; background: #25252b; border-radius: 8px; flex-shrink: 0;
+            border-bottom: 3px solid #444; opacity: 0.5; transition: 0.3s; white-space: nowrap;
+        }
+        .step-item.active { opacity: 1; border-bottom-color: var(--accent); background: #2f2f38; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .step-item.done { opacity: 0.7; border-bottom-color: var(--success); text-decoration: line-through; }
+        .step-title { font-weight: bold; display: block; font-size: 0.8rem; }
+
+        #score-box { flex-shrink: 0; white-space: nowrap; }
+
+        /* LÅS SKALERING: knap der fastlåser layoutet til en fast 1920x1080-reference (15" FullHD)
+           og skalerer den til at fylde vinduet. Fjerner sarte medie-query/zoom-spring, da layoutet
+           altid regner ud fra samme faste bredde uanset browser-zoom eller vinduesstørrelse. */
+        #lock-btn {
+            background: #333; color: #ccc; border: 1px solid #555; border-radius: 6px;
+            padding: 6px 10px; font-size: 0.75rem; cursor: pointer; flex-shrink: 0; white-space: nowrap;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        #lock-btn:hover { border-color: var(--accent); color: var(--accent); }
+        #lock-btn.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: bold; }
+        #app { transform-origin: top left; }
+
+        /* CHEM DISPLAY AREA */
+        #display-container {
+            margin-bottom: 30px; width: 95%; max-width: 1150px;
+        }
+
+        /* REACTION EQUATION ROW - fluid: skalerer med både bredde og højde, wrapper som sidste udvej */
+        .reaction-row {
+            display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+            column-gap: clamp(4px, 1.2vw, 10px); row-gap: 12px;
+            font-family: 'Segoe UI', sans-serif; font-size: clamp(0.9rem, min(3.2vw, 5.5vh), 2rem);
+            background: rgba(255,255,255,0.05); padding: clamp(10px, 2.5vw, 22px); border-radius: 12px;
+            border: 1px solid #444; min-height: 80px; padding-bottom: 55px;
+        }
+
+        /* REACTANT CONTAINER (Holds formula + ions below). Ions er placeret absolut, så de
+           ikke lægger ekstra højde til gruppen - dermed havner alle formler (reaktanter,
+           plus-tegn, pil, produkter) i samme højde når skemaet står på én linje. */
+        .reactant-group {
+            display: flex; flex-direction: column; align-items: center; position: relative;
+        }
+        .chem-formula { font-weight: bold; padding: 5px 10px; border-radius: 4px; transition: 0.3s; }
+
+        /* IONS ROW (Below reactants) */
+        .ions-container {
+            position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 10px; margin-top: 10px; min-height: 40px; width: max-content;
+            justify-content: center; transition: all 0.5s;
+        }
+        .ion-badge {
+            background: #333; border: 1px solid var(--accent); color: var(--accent);
+            padding: 4px 8px; border-radius: 4px; font-size: 1.1rem;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        /* Smaller font for steps 2-4 */
+        .ions-container.shrink .ion-badge {
+            font-size: 0.8rem; padding: 2px 5px; opacity: 0.7; border-color: #555; color: #aaa;
+        }
+
+        .missing { border-bottom: 2px dashed var(--accent); color: var(--accent); min-width: 50px; display: inline-block; text-align: center; }
+        .plus-sign { color: #666; font-weight: bold; margin: 0 10px; font-size: 0.7em; }
+        .arrow { color: #888; margin: 0 15px; font-size: 0.7em; }
+
+        /* INTERACTION BUTTONS */
+        .option-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-top: 20px; width: 100%; max-width: 800px; }
+        .chem-btn {
+            background: #333; color: white; border: 1px solid #555; padding: 15px;
+            border-radius: 8px; font-size: 1.3rem; cursor: pointer; font-family: 'Segoe UI', sans-serif;
+            transition: all 0.2s; position: relative; overflow: hidden;
+        }
+        .chem-btn:hover { background: #444; transform: translateY(-2px); border-color: var(--accent); }
+        .chem-btn.selected { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: 0 0 10px var(--accent); }
+        .chem-btn.wrong { animation: shake 0.4s; border-color: var(--error); color: var(--error); background: rgba(239, 71, 111, 0.2); }
+
+        /* ACTIONS */
+        .action-area { margin-top: 20px; text-align: center; min-height: 50px; }
+        .check-btn {
+            background: var(--warning); color: #000; border: none; padding: 12px 30px;
+            border-radius: 50px; font-weight: bold; font-size: 1.1rem; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 209, 102, 0.3); transition: transform 0.1s;
+        }
+        .check-btn:active { transform: scale(0.95); }
+
+        /* STEP 3 TOGGLES */
+        .state-toggle { 
+            cursor: pointer; color: var(--warning); font-weight: bold; padding: 2px 6px; 
+            border: 1px solid var(--warning); border-radius: 4px; margin-left: 5px; font-size: 0.6em; vertical-align: middle;
+        }
+        .state-toggle:hover { background: var(--warning); color: #000; }
+
+        /* STEP 4 INPUTS */
+        .coef-input {
+            width: 1.4em; background: #222; border: 1px solid var(--accent); color: #fff;
+            text-align: center; font-size: 0.7em; border-radius: 4px; margin-right: 5px;
+        }
+
+        /* FEEDBACK & NEXT */
+        #feedback-msg { 
+            margin-top: 20px; font-size: 1.1rem; height: 30px; font-weight: bold;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        #next-btn {
+            margin-top: 20px; background: var(--success); color: #000; border: none;
+            padding: 12px 30px; font-size: 1.1rem; border-radius: 50px; font-weight: bold;
+            cursor: pointer; display: none; box-shadow: 0 0 15px rgba(74, 222, 128, 0.4);
+        }
+        #next-btn:hover { transform: scale(1.05); }
+
+        @keyframes popIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        
+        .confetti { position: absolute; width: 10px; height: 10px; background: var(--accent); animation: fall 2s linear forwards; }
+        @keyframes fall { to { transform: translateY(100vh) rotate(720deg); } }
+
+        /* RESPONSIVT DESIGN: smallere vinduer - strammere topbjælke */
+        @media (max-width: 1100px) {
+            .step-item { padding: 6px 10px; }
+        }
+        @media (max-width: 700px) {
+            body { height: auto; min-height: 100vh; overflow: auto; }
+            #app { height: auto; min-height: 100vh; }
+            #sidebar h2 { font-size: 0.9rem; }
+            .step-title { font-size: 0.72rem; }
+            .step-item { padding: 5px 8px; }
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="app">
+    
+    <div id="sidebar">
+        <h2 style="color:var(--accent);">⚗️ Fældningsreaktioner</h2>
+
+        <ul class="step-list">
+            <li class="step-item" id="step-1-ui">
+                <span class="step-title">Trin 1: Vælg ioner</span>
+            </li>
+            <li class="step-item" id="step-2-ui">
+                <span class="step-title">Trin 2: Nye Par</span>
+            </li>
+            <li class="step-item" id="step-3-ui">
+                <span class="step-title">Trin 3: Tilstandsformer</span>
+            </li>
+            <li class="step-item" id="step-4-ui">
+                <span class="step-title">Trin 4: Afstemning</span>
+            </li>
+        </ul>
+
+        <div id="score-box" style="font-weight:bold; color:var(--success);">
+            Opgave: <span id="current-q">1</span> / 3
+        </div>
+
+        <button id="lock-btn" onclick="toggleScaleLock()" title="Fastlåser layoutet til en 15&quot; FullHD-skærm, så det ikke ændrer sig ved zoom">🔓 Lås skala</button>
+    </div>
+
+    <div id="workspace">
+        <div id="instruction" style="font-size:1.2rem; color:#fff; margin-bottom:20px; font-weight:bold;">Instruktion her</div>
+        
+        <div id="display-container">
+            <div class="reaction-row" id="reaction-row">
+            </div>
+        </div>
+
+        <div id="interaction-zone">
+        </div>
+
+        <div class="action-area" id="action-area">
+        </div>
+
+        <div id="feedback-msg"></div>
+        <button id="next-btn" onclick="game.nextStep()">Næste Trin ➔</button>
+    </div>
+
+</div>
+
+<script>
+/* UTILS: Unicode Converters */
+const toSub = (str) => str.replace(/0/g,'₀').replace(/1/g,'₁').replace(/2/g,'₂').replace(/3/g,'₃').replace(/4/g,'₄').replace(/5/g,'₅').replace(/6/g,'₆').replace(/7/g,'₇').replace(/8/g,'₈').replace(/9/g,'₉');
+const toSup = (str) => str.replace(/0/g,'⁰').replace(/1/g,'¹').replace(/2/g,'²').replace(/3/g,'³').replace(/4/g,'⁴').replace(/5/g,'⁵').replace(/6/g,'⁶').replace(/7/g,'⁷').replace(/8/g,'⁸').replace(/9/g,'⁹').replace(/\+/g,'⁺').replace(/-/g,'⁻');
+
+function chem(str) {
+    str = str.replace(/\^\{([^}]+)\}/g, (_, m) => toSup(m));
+    str = str.replace(/\^([0-9\+\-]+)/g, (_, m) => toSup(m));
+    str = str.replace(/_(\d+)/g, (_, m) => toSub(m));
+    return str;
+}
+
+/* DATA */
+const problems = [
+    {
+        id: 1,
+        r1: { form: "BaCl_2", ions: ["Ba^{2+}", "Cl^-"] }, 
+        r2: { form: "K_2CO_3", ions: ["K^+", "CO_3^{2-}"] },
+        ionsDecoy: ["Ba^+", "Cl_2^-", "K^{2+}", "CO_3^-"],
+        prodCorrect: ["BaCO_3", "KCl"],
+        prodDecoy: ["Ba(CO_3)_2", "K_2Cl", "BaK", "ClCO_3"],
+        states: ["s", "aq"], 
+        coeffs: [1, 1, 1, 2]
+    },
+    {
+        id: 2,
+        r1: { form: "AgNO_3", ions: ["Ag^+", "NO_3^-"] }, 
+        r2: { form: "Na_3PO_4", ions: ["Na^+", "PO_4^{3-}"] },
+        ionsDecoy: ["Ag^{2+}", "N^{3-}", "Na_3^+", "PO_4^-"],
+        prodCorrect: ["Ag_3PO_4", "NaNO_3"],
+        prodDecoy: ["AgPO_4", "Na(NO_3)_3", "Ag(PO_4)_3", "Na_3NO_3"],
+        states: ["s", "aq"], 
+        coeffs: [3, 1, 1, 3]
+    },
+    {
+        id: 3,
+        r1: { form: "NH_4Cl", ions: ["NH_4^+", "Cl^-"] }, 
+        r2: { form: "Pb(NO_3)_2", ions: ["Pb^{2+}", "NO_3^-"] },
+        ionsDecoy: ["NH_4^-", "Cl^+", "Pb^+", "NO_3^{2-}"],
+        prodCorrect: ["PbCl_2", "NH_4NO_3"],
+        prodDecoy: ["PbCl", "NH_4(NO_3)_2", "Pb_2Cl", "NH_4Cl_2"],
+        states: ["s", "aq"], 
+        coeffs: [2, 1, 1, 2]
+    }
+];
+
+/* GAME LOGIC */
+const game = {
+    currentProbIndex: 0,
+    currentStep: 1,
+    selectedIons: [], 
+    selectedProd: [],
+    
+    init() {
+        this.loadProblem(0);
+    },
+
+    loadProblem(index) {
+        this.currentProbIndex = index;
+        this.currentStep = 1;
+        document.getElementById('current-q').innerText = index + 1;
+        
+        // --- FEJLRETTELSE START ---
+        // Nulstil 'Næste' knappen, så den peger på nextStep i stedet for loadProblem
+        const nextBtn = document.getElementById('next-btn');
+        nextBtn.onclick = () => game.nextStep();
+        nextBtn.innerText = "Næste Trin ➔";
+        // --- FEJLRETTELSE SLUT ---
+
+        // Reset Feedback
+        document.getElementById('feedback-msg').style.opacity = 0;
+        document.getElementById('feedback-msg').innerText = "";
+        
+        this.renderReactionBase();
+        this.setupStep1();
+        this.updateSidebar();
+    },
+
+    renderReactionBase() {
+        const p = problems[this.currentProbIndex];
+        const row = document.getElementById('reaction-row');
+        
+        row.innerHTML = `
+            <div class="reactant-group" id="r1-group">
+                <div class="chem-formula" id="r1-form">${chem(p.r1.form)}(aq)</div>
+                <div class="ions-container" id="r1-ions"></div>
+            </div>
+            <div class="plus-sign">+</div>
+            <div class="reactant-group" id="r2-group">
+                <div class="chem-formula" id="r2-form">${chem(p.r2.form)}(aq)</div>
+                <div class="ions-container" id="r2-ions"></div>
+            </div>
+            <div class="arrow">⟶</div>
+            <div id="products-area" style="display:flex; gap:10px; align-items:center;">
+                <span class="missing">?</span>
+            </div>
+        `;
+    },
+
+    updateSidebar() {
+        for(let i=1; i<=4; i++) {
+            const el = document.getElementById(`step-${i}-ui`);
+            el.className = 'step-item';
+            if(i < this.currentStep) el.classList.add('done');
+            if(i === this.currentStep) el.classList.add('active');
+        }
+    },
+
+    /* --- STEP 1 --- */
+    setupStep1() {
+        const p = problems[this.currentProbIndex];
+        document.getElementById('instruction').innerText = "Trin 1: Klik på de 4 ioner, som stofferne består af.";
+        document.getElementById('products-area').innerHTML = '<span class="missing">?</span>';
+        
+        this.selectedIons = [];
+        
+        const allCorrect = [...p.r1.ions, ...p.r2.ions];
+        const allOptions = [...allCorrect, ...p.ionsDecoy].sort(() => Math.random() - 0.5);
+        
+        let html = '<div class="option-grid">';
+        allOptions.forEach(ion => {
+            html += `<button class="chem-btn" id="btn-${ion}" onclick="game.toggleIon(this, '${ion}')">${chem(ion)}</button>`;
+        });
+        html += '</div>';
+        
+        document.getElementById('interaction-zone').innerHTML = html;
+        
+        // IMPORTANT FIX: Ensure action area is visible
+        const actionArea = document.getElementById('action-area');
+        actionArea.style.display = 'block';
+        actionArea.innerHTML = `<button class="check-btn" onclick="game.validateStep1()">Tjek Svar</button>`;
+        
+        this.toggleNext(false);
+    },
+
+    toggleIon(btn, val) {
+        if (this.selectedIons.includes(val)) {
+            this.selectedIons = this.selectedIons.filter(i => i !== val);
+            btn.classList.remove('selected');
+        } else {
+            if (this.selectedIons.length < 4) {
+                this.selectedIons.push(val);
+                btn.classList.add('selected');
+            }
+        }
+    },
+
+    validateStep1() {
+        const p = problems[this.currentProbIndex];
+        const fb = document.getElementById('feedback-msg');
+        const correctSet = [...p.r1.ions, ...p.r2.ions];
+        
+        if (this.selectedIons.length !== 4) {
+            fb.innerText = "Du skal vælge præcis 4 ioner.";
+            fb.style.color = "var(--warning)";
+            fb.style.opacity = 1;
+            return;
+        }
+
+        const isCorrect = this.selectedIons.every(i => correctSet.includes(i));
+
+        if (isCorrect) {
+            fb.innerText = "Korrekt! Ionerne er fordelt under stofferne.";
+            fb.style.color = "var(--success)";
+            fb.style.opacity = 1;
+            this.distributeIonsToDisplay();
+            document.getElementById('action-area').style.display = 'none'; 
+            document.getElementById('interaction-zone').innerHTML = '';
+            this.toggleNext(true);
+        } else {
+            fb.innerText = "Der er fejl i dine valg. Prøv igen.";
+            fb.style.color = "var(--error)";
+            fb.style.opacity = 1;
+            this.selectedIons.forEach(ion => {
+                if(!correctSet.includes(ion)) {
+                    const btn = document.getElementById(`btn-${ion}`);
+                    if(btn) btn.classList.add('wrong');
+                }
+            });
+            setTimeout(() => {
+                document.querySelectorAll('.chem-btn').forEach(b => b.classList.remove('wrong'));
+            }, 500);
+        }
+    },
+
+    distributeIonsToDisplay() {
+        const p = problems[this.currentProbIndex];
+        p.r1.ions.forEach(ion => this.addIonToDisplay('r1-ions', ion));
+        p.r2.ions.forEach(ion => this.addIonToDisplay('r2-ions', ion));
+    },
+
+    addIonToDisplay(containerId, ionStr) {
+        const el = document.getElementById(containerId);
+        const badge = document.createElement('div');
+        badge.className = 'ion-badge';
+        badge.innerText = chem(ionStr);
+        el.appendChild(badge);
+    },
+
+    /* --- STEP 2 --- */
+    setupStep2() {
+        const p = problems[this.currentProbIndex];
+        document.getElementById('instruction').innerText = "Trin 2: Dan nye neutrale salte ved at bytte ion-partnere.";
+        
+        document.getElementById('r1-ions').classList.add('shrink');
+        document.getElementById('r2-ions').classList.add('shrink');
+        
+        document.getElementById('products-area').innerHTML = `<span class="missing" id="p1-slot">Produkt 1</span> <span class="plus-sign">+</span> <span class="missing" id="p2-slot">Produkt 2</span>`;
+        
+        const options = [...p.prodCorrect, ...p.prodDecoy].sort(() => Math.random() - 0.5);
+        let html = '<div class="option-grid">';
+        options.forEach(form => {
+            html += `<button class="chem-btn" onclick="game.checkProd(this, '${form}')">${chem(form)}</button>`;
+        });
+        html += '</div>';
+        document.getElementById('interaction-zone').innerHTML = html;
+        document.getElementById('action-area').style.display = 'none'; 
+        
+        this.selectedProd = [];
+        this.toggleNext(false);
+    },
+
+    checkProd(btn, val) {
+        const p = problems[this.currentProbIndex];
+        const fb = document.getElementById('feedback-msg');
+
+        if (p.prodCorrect.includes(val)) {
+            if (!this.selectedProd.includes(val)) {
+                this.selectedProd.push(val);
+                btn.classList.add('selected');
+                
+                const slotId = this.selectedProd.length === 1 ? 'p1-slot' : 'p2-slot';
+                const slot = document.getElementById(slotId);
+                slot.className = 'chem-formula';
+                slot.innerText = chem(val);
+                slot.style.border = "2px solid var(--success)";
+
+                if (this.selectedProd.length === 2) {
+                    fb.innerText = "Korrekt! Ionerne er byttet og ladningerne passer.";
+                    fb.style.color = "var(--success)";
+                    fb.style.opacity = 1;
+                    this.toggleNext(true);
+                }
+            }
+        } else {
+            btn.classList.add('wrong');
+            setTimeout(() => btn.classList.remove('wrong'), 500);
+            fb.innerText = "Husk: Positiv skal med negativ, og ladningen skal være 0.";
+            fb.style.color = "var(--error)";
+            fb.style.opacity = 1;
+        }
+    },
+
+    /* --- STEP 3 --- */
+    setupStep3() {
+        const p = problems[this.currentProbIndex];
+        document.getElementById('instruction').innerText = "Trin 3: Hvem er bundfald (s)? Klik på (aq) for at skifte.";
+        
+        const p1 = chem(p.prodCorrect[0]);
+        const p2 = chem(p.prodCorrect[1]);
+        
+        document.getElementById('products-area').innerHTML = `
+            <div>${p1}<span id="state-0" class="state-toggle" onclick="game.toggleState(0)">(aq)</span></div>
+            <div class="plus-sign">+</div>
+            <div>${p2}<span id="state-1" class="state-toggle" onclick="game.toggleState(1)">(aq)</span></div>
+        `;
+        
+        document.getElementById('interaction-zone').innerHTML = `
+            <div style="color:#aaa; font-style:italic; margin-bottom:15px;">
+                Huskeregler: Nitrater, Natrium, Kalium, Ammonium er altid letopløselige.
+            </div>
+        `;
+        
+        // Ensure action area is visible for this step
+        const actionArea = document.getElementById('action-area');
+        actionArea.style.display = 'block';
+        actionArea.innerHTML = `<button class="chem-btn" style="width:auto;" onclick="game.checkStates()">Tjek Svar</button>`;
+        
+        this.currentStates = ["aq", "aq"];
+        this.toggleNext(false);
+    },
+
+    toggleState(idx) {
+        const el = document.getElementById(`state-${idx}`);
+        if(el.innerText === "(aq)") {
+            el.innerText = "(s)";
+            this.currentStates[idx] = "s";
+        } else {
+            el.innerText = "(aq)";
+            this.currentStates[idx] = "aq";
+        }
+    },
+
+    checkStates() {
+        const p = problems[this.currentProbIndex];
+        const fb = document.getElementById('feedback-msg');
+        
+        let correct = (this.currentStates[0] === p.states[0] && this.currentStates[1] === p.states[1]);
+        
+        if (correct) {
+            fb.innerText = "Korrekt! Du har fundet bundfaldet.";
+            fb.style.color = "var(--success)";
+            fb.style.opacity = 1;
+            this.toggleNext(true);
+            document.getElementById('action-area').style.display = 'none';
+        } else {
+            fb.innerText = "Ikke helt. Tjek din tabel igen. Hvem er tungtopløselig?";
+            fb.style.color = "var(--error)";
+            fb.style.opacity = 1;
+        }
+    },
+
+    /* --- STEP 4 --- */
+    setupStep4() {
+        const p = problems[this.currentProbIndex];
+        document.getElementById('instruction').innerText = "Trin 4: Afstem reaktionsskemaet.";
+        
+        document.getElementById('r1-ions').style.display = 'none';
+        document.getElementById('r2-ions').style.display = 'none';
+        
+        const r1 = chem(p.r1.form);
+        const r2 = chem(p.r2.form);
+        const p1 = chem(p.prodCorrect[0]);
+        const p2 = chem(p.prodCorrect[1]);
+        const s1 = p.states[0];
+        const s2 = p.states[1];
+        
+        const input = (id) => `<input type="number" id="coef-${id}" class="coef-input" min="1" max="6" value="1">`;
+        
+        const row = document.getElementById('reaction-row');
+        row.innerHTML = `
+            ${input(0)} ${r1}(aq) <span class="plus-sign">+</span> ${input(1)} ${r2}(aq)
+            <span class="arrow">⟶</span>
+            ${input(2)} ${p1}(${s1}) <span class="plus-sign">+</span> ${input(3)} ${p2}(${s2})
+        `;
+        
+        document.getElementById('interaction-zone').innerHTML = '';
+        
+        // SHOW ACTION AREA AGAIN
+        const actionArea = document.getElementById('action-area');
+        actionArea.style.display = 'block';
+        actionArea.innerHTML = `<button class="chem-btn" style="width:auto;" onclick="game.checkBalance()">Tjek Afstemning</button>`;
+        
+        this.toggleNext(false);
+    },
+
+    checkBalance() {
+        const p = problems[this.currentProbIndex];
+        const fb = document.getElementById('feedback-msg');
+        
+        let userVal = [];
+        for(let i=0; i<4; i++) userVal.push(parseInt(document.getElementById(`coef-${i}`).value));
+        
+        const isMatch = userVal.every((v, i) => v === p.coeffs[i]);
+        
+        if (isMatch) {
+            fb.innerText = "FANTASTISK! Opgaven er løst.";
+            fb.style.color = "var(--success)";
+            fb.style.opacity = 1;
+            this.celebrate();
+            
+            const btn = document.getElementById('next-btn');
+            btn.innerText = this.currentProbIndex < problems.length - 1 ? "Næste Opgave ➔" : "Alt Færdigt!";
+            btn.onclick = () => {
+                if(this.currentProbIndex < problems.length - 1) this.loadProblem(this.currentProbIndex + 1);
+                else alert("Tillykke! Du er nu ekspert i fældningsreaktioner.");
+            };
+            this.toggleNext(true);
+            document.getElementById('action-area').style.display = 'none';
+        } else {
+            fb.innerText = "Ikke afstemt. Tæl atomerne på hver side.";
+            fb.style.color = "var(--error)";
+            fb.style.opacity = 1;
+        }
+    },
+
+    /* UTILS */
+    nextStep() {
+        this.currentStep++;
+        document.getElementById('feedback-msg').style.opacity = 0;
+        document.getElementById('feedback-msg').innerText = "";
+        this.updateSidebar();
+        
+        if(this.currentStep === 2) this.setupStep2();
+        else if(this.currentStep === 3) this.setupStep3();
+        else if(this.currentStep === 4) this.setupStep4();
+    },
+
+    toggleNext(show) {
+        const btn = document.getElementById('next-btn');
+        btn.style.display = show ? 'block' : 'none';
+        if(!show) btn.innerText = "Næste Trin ➔";
+    },
+
+    celebrate() {
+        for(let i=0; i<30; i++) {
+            let d = document.createElement('div');
+            d.className = 'confetti';
+            d.style.left = Math.random()*100 + '%';
+            d.style.animationDuration = (Math.random()*2+1) + 's';
+            d.style.background = `hsl(${Math.random()*360}, 70%, 50%)`;
+            document.body.appendChild(d);
+            setTimeout(() => d.remove(), 3000);
+        }
+    }
+};
+
+game.init();
+
+/* SKALERINGSLÅS: fastholder layoutet ved en fast 1920x1080-reference (15" FullHD) og skalerer
+   den ned/op til at fylde vinduet. Dermed regner layoutet altid ud fra samme bredde, uanset
+   browser-zoom eller vinduesstørrelse, så f.eks. reaktionsskemaet ikke pludselig knækker
+   eller trin-linjen forsvinder når man zoomer. */
+function applyScaleLock() {
+    const app = document.getElementById('app');
+    app.style.width = '1920px';
+    app.style.height = '1080px';
+    app.style.transform = `scale(${Math.min(window.innerWidth / 1920, window.innerHeight / 1080)})`;
+}
+
+function removeScaleLock() {
+    const app = document.getElementById('app');
+    app.style.width = '';
+    app.style.height = '';
+    app.style.transform = '';
+}
+
+function toggleScaleLock() {
+    const locked = document.body.classList.toggle('scale-locked');
+    const btn = document.getElementById('lock-btn');
+    if (locked) {
+        applyScaleLock();
+        btn.textContent = '🔒 Skala låst (FullHD)';
+        btn.classList.add('active');
+        window.addEventListener('resize', applyScaleLock);
+    } else {
+        removeScaleLock();
+        btn.textContent = '🔓 Lås skala';
+        btn.classList.remove('active');
+        window.removeEventListener('resize', applyScaleLock);
+    }
+}
+
+</script>
+</body>
+</html>

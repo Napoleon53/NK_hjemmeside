@@ -1,0 +1,1914 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faseseparatoren - Kemi Animation</title>
+    <style>
+        :root {
+            --bg-dark: #1e1e24;
+            --panel-bg: #2b2b36;
+            --text-light: #f5f5f5;
+            --accent-blue: #3498db;
+            --accent-orange: #e67e22;
+            --accent-green: #2ecc71;
+            --accent-red: #e74c3c;
+            --gold: #f1c40f;
+            --select-color: #00e5c9;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #15151a;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #333;
+            z-index: 10;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1,5rem;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 30px;
+            font-size: 1,2rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-value {
+            font-weight: bold;
+            font-size: 1,4rem;
+        }
+
+        #money-display { color: var(--gold); }
+        #purity-display { color: var(--accent-green); transition: color 0.3s; }
+        
+        .purity-container {
+            width: 150px;
+            height: 20px;
+            background: #333;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #purity-bar {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, var(--accent-red), var(--accent-green));
+            transition: width 0.3s ease;
+        }
+
+        main {
+            display: flex;
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Værktøjslinje / Shop */
+        aside {
+            width: 320px;
+            background-color: var(--panel-bg);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            border-right: 2px solid #333;
+            z-index: 10;
+            overflow-y: auto;
+        }
+
+        .shop-header {
+            font-size: 1,3rem;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 1px solid #555;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .powerup-btn {
+            background: #3a3a48;
+            border: 2px solid #555;
+            color: white;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .powerup-btn:hover:not(:disabled) {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+        }
+
+        .powerup-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .powerup-title {
+            font-weight: bold;
+            font-size: 1,1rem;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .powerup-price {
+            color: var(--gold);
+        }
+
+        .powerup-desc {
+            font-size: 0,85rem;
+            color: #aaa;
+            text-align: left;
+        }
+
+        .cooldown-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: var(--accent-blue);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        /* Info paneler */
+        .info-panel {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0,9rem;
+            border-left: 4px solid var(--accent-orange);
+        }
+
+        /* Canvas Container */
+        #game-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #2a2a35 0%, #121212 100%);
+        }
+
+        canvas {
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+            cursor: default;
+            touch-action: none;
+        }
+
+        /* Overlays */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .modal-box {
+            background: var(--panel-bg);
+            padding: 40px;
+            border-radius: 12px;
+            border: 2px solid #555;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+        }
+
+        .modal-box h2 {
+            color: var(--accent-blue);
+            font-size: 2rem;
+            margin-top: 0;
+        }
+
+        .btn-large {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1,2rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .btn-large:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.6);
+        }
+
+        /* Kemi Lektion Styling (Source 1) */
+        .kemi-lektion {
+            background: #111;
+            border: 1px solid #444;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 8px;
+            font-size: 0,9rem;
+            text-align: left;
+            color: #ddd;
+        }
+
+        .kemi-lektion table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .kemi-lektion th, .kemi-lektion td {
+            border: 1px solid #555;
+            padding: 8px;
+        }
+        .kemi-lektion th { background: #222; color: var(--accent-blue); }
+
+        /* Effects */
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        #frost-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            box-shadow: inset 0 0 100px 20px rgba(173, 216, 230, 0.0);
+            pointer-events: none;
+            transition: box-shadow 1s;
+            z-index: 5;
+        }
+
+        .frozen {
+            box-shadow: inset 0 0 120px 40px rgba(173, 216, 230, 0.5) !important;
+        }
+
+        #combo-display {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent-orange);
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 20;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .combo-active {
+            opacity: 1 !important;
+            transform: scale(1) !important;
+        }
+
+        /* Header-værktøjer */
+        .icon-btn {
+            background: #2b2b36;
+            border: 2px solid #555;
+            color: var(--text-light);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .icon-btn:hover:not(:disabled) {
+            border-color: var(--accent-blue);
+        }
+        .icon-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .icon-btn.active {
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+        }
+
+        /* Øve-tilstand checkbox på startskærm */
+        .practice-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #ccc;
+            margin: 15px 0;
+            cursor: pointer;
+        }
+        .practice-toggle input { transform: scale(1.3); cursor: pointer; }
+
+        #practice-badge {
+            background: var(--accent-orange);
+            color: #111;
+            font-weight: bold;
+            font-size: 0.85rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+        }
+
+        /* Forklarings-toast ved forkert sortering */
+        #explain-toast {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            max-width: 85%;
+            background: rgba(20, 10, 10, 0.95);
+            border: 2px solid var(--accent-red);
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 30;
+        }
+        #explain-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Kemi-lektion hjælpe-modal (on-demand) */
+        #screen-lesson .modal-box {
+            text-align: left;
+        }
+
+        /* Badges (bølge-resultater) */
+        .badge-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        .badge-card {
+            background: #111;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 8px 14px;
+            min-width: 90px;
+        }
+        .badge-card .badge-wave { font-size: 0.8rem; color: #888; }
+        .badge-card .badge-label { font-size: 1.2rem; font-weight: bold; }
+
+        /* Fejlgennemgang */
+        .mistake-list {
+            text-align: left;
+            max-height: 220px;
+            overflow-y: auto;
+            background: #111;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 12px 15px;
+            margin-top: 15px;
+            font-size: 0.85rem;
+        }
+        .mistake-list ul { margin: 8px 0 0 0; padding-left: 18px; }
+        .mistake-list li { margin-bottom: 8px; color: #ddd; }
+
+        .wave-prev-stats {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin: 10px 0;
+            font-size: 0.95rem;
+        }
+
+        /* Bølge-forklaring med overskrift og punkter */
+        .wave-desc {
+            text-align: left;
+        }
+        .wave-desc h3 {
+            color: var(--accent-orange);
+            font-size: 1.05rem;
+            margin: 10px 0 6px 0;
+        }
+        .wave-desc ul {
+            margin: 0 0 10px 0;
+            padding-left: 22px;
+        }
+        .wave-desc li {
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+        .wave-desc p {
+            margin: 6px 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Faseseparatoren</h1>
+        <div class="stats-bar">
+            <div class="stat-item">
+                Bølge: <span class="stat-value" id="wave-display">1</span>
+            </div>
+            <div class="stat-item">
+                Forskningsmidler: <span class="stat-value" id="money-display">0 DKK</span>
+            </div>
+            <div class="stat-item">
+                Renhed:
+                <div class="purity-container">
+                    <div id="purity-bar"></div>
+                </div>
+                <span class="stat-value" id="purity-text">100,0%</span>
+            </div>
+            <div class="stat-item" id="practice-badge-wrap" style="display:none;">
+                <span id="practice-badge">Øve-tilstand</span>
+            </div>
+            <div class="stat-item">
+                <button class="icon-btn" id="btn-pause-think" onclick="togglePauseThink()" title="Frys tiden og træk i ro og mag">⏸ Pause &amp; tænk (3)</button>
+                <button class="icon-btn" onclick="toggleLessonModal(true)" title="Se teorien bag spillet">📖 Teori</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <aside>
+            <div class="shop-header">🛒 Laboratorie Shop</div>
+            
+            <!-- Shop knapper genereres her af JS -->
+            <button class="powerup-btn" id="btn-waste" onclick="buyWastePickup()">
+                <div class="powerup-title"><span>🗑️ Afhent affald</span> <span class="powerup-price">40 DKK</span></div>
+                <div class="powerup-desc">Tømmer begge beholdere.</div>
+            </button>
+
+            <button class="powerup-btn" id="btn-ice" onclick="buyPowerup('ice')">
+                <div class="powerup-title"><span>Kølebad (Is)</span> <span class="powerup-price">100 DKK</span></div>
+                <div class="powerup-desc">Halverer faldfart i 10 sek.</div>
+                <div class="cooldown-overlay" id="cd-ice"></div>
+            </button>
+
+            <button class="powerup-btn" id="btn-spectro" onclick="buyPowerup('spectro')">
+                <div class="powerup-title"><span>Spektroskop</span> <span class="powerup-price">75 DKK</span></div>
+                <div class="powerup-desc">Markerer O/N rødt i 15 sek.</div>
+                <div class="cooldown-overlay" id="cd-spectro"></div>
+            </button>
+
+        </aside>
+
+        <div id="game-container">
+            <canvas id="gameCanvas" width="900" height="700"></canvas>
+            <div id="frost-overlay"></div>
+            <div id="combo-display">COMBO x2!</div>
+            <div id="explain-toast"></div>
+
+            <!-- Start Screen -->
+            <div id="screen-start" class="overlay">
+                <div class="modal-box">
+                    <h2>Velkommen til Faseseparatoren</h2>
+                    <p>Sorter molekylerne, inden de rammer en affaldsspand!</p>
+                    <p><strong>Musen:</strong> træk molekylet i en spand (kan fortrydes før landing)<br>
+                    <strong>Piletaster:</strong> op/ned = vælg molekyle, venstre/højre = vælg fase<br>
+                    <strong>Enter:</strong> land det valgte molekyle med det samme (kun over en spand)</p>
+                    <p style="color: #aaa; font-size: 0.9rem;">Rigtigt = penge. Forkert = renhed og penge tabt.</p>
+
+                    <label class="practice-toggle">
+                        <input type="checkbox" id="practice-toggle">
+                        Øve-tilstand: molekylerne venter på dig, intet tidspres
+                    </label>
+
+                    <button class="btn-large" onclick="startGame()">Start Forskning</button>
+                </div>
+            </div>
+
+            <!-- Wave Intro Screen -->
+            <div id="screen-wave" class="overlay hidden">
+                <div class="modal-box">
+                    <h2 id="wave-title">Bølge 1</h2>
+                    <div id="wave-desc" class="wave-desc"></div>
+                    <div id="wave-prev-stats" class="wave-prev-stats hidden"></div>
+                    <button class="btn-large" onclick="resumeWave()">Fortsæt</button>
+                </div>
+            </div>
+
+            <!-- Teori-modal (kun på forlangende) -->
+            <div id="screen-lesson" class="overlay hidden">
+                <div class="modal-box">
+                    <h2>Teori</h2>
+                    <ul style="text-align:left;">
+                        <li>O eller N med H på → polært → Vandig fase</li>
+                        <li>Ren kulbrinte (kun C og H) → upolært → Organisk fase</li>
+                        <li>Lang kulbrintehale (4-5+ C pr. polær gruppe) vinder → Organisk fase</li>
+                    </ul>
+                    <button class="btn-large" onclick="toggleLessonModal(false)">Tilbage til spillet</button>
+                </div>
+            </div>
+
+            <!-- Game Over Screen -->
+            <div id="screen-gameover" class="overlay hidden">
+                <div class="modal-box" style="border-color: var(--accent-red);">
+                    <h2 style="color: var(--accent-red);">Eksperiment Fejlet!</h2>
+                    <p>Dit produkt blev for forurenet (Renhed < 0%).</p>
+                    <p><strong>Indtjente midler: </strong><span id="final-score" style="color: var(--gold); font-weight: bold; font-size: 1,5rem;"></span> DKK</p>
+                    <div id="gameover-badges"></div>
+                    <div id="gameover-mistakes" class="mistake-list"></div>
+                    <button class="btn-large" onclick="resetGame()">Prøv Igen</button>
+                </div>
+            </div>
+
+            <!-- Victory Screen -->
+            <div id="screen-victory" class="overlay hidden">
+                <div class="modal-box" style="border-color: var(--gold);">
+                    <h2 style="color: var(--gold);">Eksperiment Fuldendt!</h2>
+                    <p>Du har mestret faseseparation og molekylær genkendelse.</p>
+                    <p><strong>Totale midler: </strong><span id="victory-score" style="color: var(--gold); font-weight: bold; font-size: 1,5rem;"></span> DKK</p>
+                    <div id="victory-badges"></div>
+                    <div id="victory-mistakes" class="mistake-list"></div>
+                    <button class="btn-large" onclick="resetGame()">Start Forfra</button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // --- SPIL DATA & KONFIGURATION ---
+        // "tier" styrer hvornår et molekyle låses op (se WAVES' poolTier), ikke hvilket niveau det spawner i
+        const MOLECULES_DB = [
+            // Tier 1 (intro) — tre klart forskellige molekyler
+            { name: "Vand", formula: "H₂O", tier: 1, defaultPhase: "polar", points: 10, isBoss: false, skeleton: { type: "water" } },
+            { name: "Ethanol", formula: "CH₃CH₂OH", tier: 1, defaultPhase: "polar", points: 10, isBoss: false, skeleton: { type: "chain", carbons: 2, end: "OH" } },
+            { name: "Hexan", formula: "C₆H₁₄", tier: 1, defaultPhase: "organic", points: 10, isBoss: false, skeleton: { type: "chain", carbons: 6 } },
+
+            // Tier 2
+            { name: "Methanol", formula: "CH₃OH", tier: 2, defaultPhase: "polar", points: 20, isBoss: false, skeleton: { type: "chain", carbons: 1, end: "OH" } },
+            { name: "Propanol", formula: "CH₃CH₂CH₂OH", tier: 2, defaultPhase: "polar", points: 20, isBoss: false, skeleton: { type: "chain", carbons: 3, end: "OH" } },
+            { name: "Butanol", formula: "CH₃(CH₂)₃OH", tier: 2, defaultPhase: "organic", points: 20, isBoss: false, skeleton: { type: "chain", carbons: 4, end: "OH" } },
+            { name: "Pentanol", formula: "CH₃(CH₂)₄OH", tier: 2, defaultPhase: "organic", points: 20, isBoss: false, skeleton: { type: "chain", carbons: 5, end: "OH" } },
+            { name: "Propan", formula: "C₃H₈", tier: 2, defaultPhase: "organic", points: 20, isBoss: false, skeleton: { type: "chain", carbons: 3 } },
+            { name: "Butan", formula: "C₄H₁₀", tier: 2, defaultPhase: "organic", points: 20, isBoss: false, skeleton: { type: "chain", carbons: 4 } },
+            { name: "Pentan", formula: "C₅H₁₂", tier: 2, defaultPhase: "organic", points: 20, isBoss: false, skeleton: { type: "chain", carbons: 5 } },
+            { name: "Heptan", formula: "C₇H₁₆", tier: 2, defaultPhase: "organic", points: 20, isBoss: false, skeleton: { type: "chain", carbons: 7 } },
+            { name: "Benzen", formula: "C₆H₆", tier: 2, defaultPhase: "organic", points: 20, isBoss: false, skeleton: { type: "ring" } },
+            { name: "1-Octanol", formula: "CH₃(CH₂)₇OH", tier: 2, defaultPhase: "organic", points: 20, isBoss: false, skeleton: { type: "chain", carbons: 8, end: "OH" } },
+            { name: "1-Hexanol", formula: "CH₃(CH₂)₅OH", tier: 2, defaultPhase: "organic", points: 20, isBoss: false, skeleton: { type: "chain", carbons: 6, end: "OH" } },
+            { name: "Glycerol", formula: "C₃H₈O₃", tier: 2, defaultPhase: "polar", points: 20, isBoss: false, skeleton: { type: "triol" } },
+            { name: "Ethansyre", formula: "CH₃COOH", tier: 2, defaultPhase: "polar", points: 20, isBoss: false, skeleton: { type: "chain", carbons: 1, end: "COOH" } },
+            { name: "Propansyre", formula: "CH₃CH₂COOH", tier: 2, defaultPhase: "polar", points: 20, isBoss: false, skeleton: { type: "chain", carbons: 2, end: "COOH" } },
+            { name: "Ethylamin", formula: "CH₃CH₂NH₂", tier: 2, defaultPhase: "polar", points: 20, isBoss: false, skeleton: { type: "chain", carbons: 2, end: "NH2" } },
+            { name: "Propylamin", formula: "CH₃CH₂CH₂NH₂", tier: 2, defaultPhase: "polar", points: 20, isBoss: false, skeleton: { type: "chain", carbons: 3, end: "NH2" } },
+
+            // Tier 3 (sværere strukturer)
+            { name: "Nonan", formula: "C₉H₂₀", tier: 3, defaultPhase: "organic", points: 40, isBoss: false, skeleton: { type: "chain", carbons: 9 } },
+            { name: "Hexansyre", formula: "CH₃(CH₂)₄COOH", tier: 3, defaultPhase: "organic", points: 40, isBoss: false, skeleton: { type: "chain", carbons: 5, end: "COOH" } },
+            { name: "Decansyre", formula: "CH₃(CH₂)₈COOH", tier: 3, defaultPhase: "organic", points: 50, isBoss: false, skeleton: { type: "chain", carbons: 9, end: "COOH" } },
+            { name: "Toluen", formula: "C₆H₅CH₃", tier: 3, defaultPhase: "organic", points: 40, isBoss: false, skeleton: { type: "ring", sub: "CH3" } },
+            { name: "Phenol", formula: "C₆H₅OH", tier: 3, defaultPhase: "polar", points: 40, isBoss: false, skeleton: { type: "ring", sub: "OH" } },
+            { name: "Ibuprofen", formula: "C₁₃H₁₈O₂", tier: 3, defaultPhase: "organic", points: 100, isBoss: true, skeleton: { type: "ibuprofen" } },
+            { name: "Hexylamin", formula: "C₆H₁₃NH₂", tier: 3, defaultPhase: "organic", points: 100, isBoss: true, skeleton: { type: "chain", carbons: 6, end: "NH2" } },
+            { name: "Benzoesyre", formula: "C₆H₅COOH", tier: 3, defaultPhase: "organic", points: 50, isBoss: true, skeleton: { type: "ring", sub: "COOH" } },
+            { name: "Natriumchlorid", formula: "Na⁺ Cl⁻", tier: 3, defaultPhase: "polar", points: 30, isBoss: false, skeleton: { type: "ion" } }
+        ];
+
+        const WAVES = [
+            {
+                id: 1, title: "Bølge 1: Intro", poolTier: 1, molCount: 3, spawnInterval: 3400,
+                desc: `<h3>Reglen</h3>
+                    <ul>
+                        <li><strong>Polært</strong> (O/N-H) → <strong>Vandig fase</strong> (venstre)</li>
+                        <li><strong>Ren kulbrinte</strong> (kun C, H) → <strong>Organisk fase</strong> (højre)</li>
+                    </ul>`
+            },
+            {
+                id: 2, title: "Bølge 2: Opvarmning", poolTier: 1, molCount: 3, spawnInterval: 3000,
+                desc: `<h3>Øv dig</h3><ul><li>Samme regel som lige før — bare lidt hurtigere.</li></ul>`
+            },
+            {
+                id: 3, title: "Bølge 3: Kædelængde", poolTier: 2, molCount: 4, spawnInterval: 2800,
+                desc: `<h3>OH-fælden</h3>
+                    <ul>
+                        <li>4-5+ upolære C-atomer pr. polær gruppe → kæden vinder → <strong>Organisk fase</strong></li>
+                        <li>Sidste molekyle falder dobbelt så hurtigt</li>
+                    </ul>`
+            },
+            {
+                id: 4, title: "Bølge 4: Kædelængde II", poolTier: 2, molCount: 4, spawnInterval: 2600,
+                desc: `<h3>Stadig OH-fælden</h3><ul><li>Flere kædelængder i spil — tæl C-atomerne!</li></ul>`
+            },
+            {
+                id: 5, title: "Bølge 5: Tempo", poolTier: 2, molCount: 5, spawnInterval: 2500,
+                desc: `<h3>Tempo op</h3><ul><li>Samme regler, højere fart.</li></ul>`
+            },
+            {
+                id: 6, title: "Bølge 6: Svære Molekyler", poolTier: 3, molCount: 4, spawnInterval: 2500,
+                desc: `<h3>Guld-molekyler</h3>
+                    <ul>
+                        <li>Samme regel — bare mere komplekse strukturer. Kig efter kæde vs. gruppe.</li>
+                        <li>Guld = flere point. Sidste molekyle falder dobbelt så hurtigt.</li>
+                    </ul>`
+            },
+            {
+                id: 7, title: "Bølge 7: Guld-jagt", poolTier: 3, molCount: 5, spawnInterval: 2300,
+                desc: `<h3>Guld-jagt</h3><ul><li>Flere guld-molekyler på én gang.</li></ul>`
+            },
+            {
+                id: 8, title: "Bølge 8: Finalen", poolTier: 3, molCount: 6, spawnInterval: 2200,
+                desc: `<h3>Finalen</h3><ul><li>Alt du har lært — i højt tempo.</li></ul>`
+            }
+        ];
+
+        // --- GLOBAL TILSTAND ---
+        let state = {
+            isRunning: false,
+            money: 0,
+            purity: 100,
+            wave: 1,
+            molsSpawned: 0,
+            combo: 0,
+
+            // Powerups (aktive timere)
+            activeBuffs: {
+                ice: 0,
+                spectro: 0
+            },
+
+            // Entiteter
+            activeMolecules: [],
+            particles: [],
+            floatingTexts: [],
+            selectedMol: null, // molekyle valgt via piletaster/mus-greb
+            waveQueue: [], // forudtrukket, blandet rækkefølge af molekyler for den aktuelle bølge
+
+            // Væskeniveau i de to opsamlingsbeholdere (0-100%)
+            leftFill: 0,
+            rightFill: 0,
+
+            // Pause & tænk
+            paused: false,
+            pauseUsesLeft: 3,
+
+            // Øve-tilstand: intet tidspres, ét molekyle ad gangen
+            practiceMode: false,
+
+            // Statistik & pædagogik
+            waveStats: { correct: 0, wrong: 0 },
+            waveBadges: [],
+            mistakes: [],
+
+            lastTime: 0,
+            spawnTimer: 0,
+            spawnInterval: 3400
+        };
+
+        // Trækkeflow (mus/touch)
+        let dragState = { active: false, mol: null, offsetX: 0, offsetY: 0 };
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Rørsystemets geometri (bruges både til tegning og fysik)
+        const LIQUID_ZONE_HEIGHT = 140;
+        const SPLIT_Y = 300;
+        const MAIN_PIPE_WIDTH = 250;
+        const BRANCH_PIPE_WIDTH = 190;
+
+        // Referencer til UI
+        const uiMoney = document.getElementById('money-display');
+        const uiPurityBar = document.getElementById('purity-bar');
+        const uiPurityText = document.getElementById('purity-text');
+        const uiWave = document.getElementById('wave-display');
+        const frostOverlay = document.getElementById('frost-overlay');
+        const comboDisplay = document.getElementById('combo-display');
+
+        // --- LOGIK FOR KEMI (FASER) ---
+        function getCorrectPhase(mol) {
+            return mol.defaultPhase;
+        }
+
+        // Kort, skarp begrundelse for hvorfor et molekyle hører til den korrekte fase
+        function explainPhase(data) {
+            const correctPhase = data.defaultPhase;
+            const phaseText = correctPhase === 'polar' ? 'Vandig fase' : 'Organisk fase';
+            const reason = correctPhase === 'polar'
+                ? 'polær gruppe dominerer'
+                : 'lang upolær kæde dominerer';
+            return `${data.name}: ${reason} → ${phaseText}.`;
+        }
+
+        // --- STRUKTURFORMLER (ZIGZAG) ---
+        // Erstatter kondenserede formler ("CH₃(CH₂)₇OH") med rigtige skeletformler.
+        // Vand og salt har ingen kulstofkæde og kan derfor ikke tegnes som zigzag —
+        // de får et lille eksplicit atom-/ion-ikon i stedet, hvilket er kemisk korrekt.
+
+        function computeMoleculeBoxSize(skeleton) {
+            switch (skeleton.type) {
+                case 'water': return { width: 90, height: 58 };
+                case 'ion': return { width: 110, height: 58 };
+                case 'ring': return { width: skeleton.sub ? 165 : 115, height: 96 };
+                case 'triol': return { width: 135, height: 90 };
+                case 'ibuprofen': return { width: 215, height: 105 };
+                case 'chain':
+                default: {
+                    const extra = skeleton.end === 'COOH' ? 1 : 0;
+                    const verts = skeleton.carbons + extra;
+                    const stubW = skeleton.end ? 26 : 0;
+                    const w = Math.min(210, Math.max(95, 30 + verts * 15 + stubW));
+                    return { width: w, height: 72 };
+                }
+            }
+        }
+
+        function chainVertices(n, bondLen) {
+            const ang = 30 * Math.PI / 180;
+            const pts = [{ x: 0, y: 0 }];
+            for (let i = 1; i < n; i++) {
+                const up = (i % 2 === 1);
+                const prev = pts[i - 1];
+                pts.push({
+                    x: prev.x + Math.cos(ang) * bondLen,
+                    y: prev.y + (up ? -1 : 1) * Math.sin(ang) * bondLen
+                });
+            }
+            return pts;
+        }
+
+        function drawBond(ctx, x1, y1, x2, y2, color, double) {
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            if (!double) {
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+                return;
+            }
+            const dx = x2 - x1, dy = y2 - y1;
+            const len = Math.hypot(dx, dy) || 1;
+            const px = -dy / len * 2.6, py = dx / len * 2.6;
+            ctx.beginPath();
+            ctx.moveTo(x1 + px, y1 + py);
+            ctx.lineTo(x2 + px, y2 + py);
+            ctx.moveTo(x1 - px, y1 - py);
+            ctx.lineTo(x2 - px, y2 - py);
+            ctx.stroke();
+        }
+
+        function drawAtomLabel(ctx, x, y, text, color) {
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const w = ctx.measureText(text).width;
+            ctx.fillStyle = 'rgba(15,15,20,0.85)';
+            ctx.beginPath();
+            ctx.roundRect(x - w / 2 - 3, y - 8, w + 6, 16, 5);
+            ctx.fill();
+            ctx.fillStyle = color;
+            ctx.fillText(text, x, y);
+        }
+
+        function drawChainSkeleton(ctx, skeleton, originX, originY, boxW, boxH, bondColor, heteroColor) {
+            const carbons = skeleton.carbons;
+            const end = skeleton.end;
+            const backboneCount = carbons + (end === 'COOH' ? 1 : 0);
+
+            const marginX = 20;
+            const bondsAcross = Math.max(1, backboneCount - 1) + (end ? 0.8 : 0);
+            let bondLen = (boxW - marginX * 2) / (bondsAcross * 0.866);
+            bondLen = Math.max(10, Math.min(bondLen, 22));
+
+            const pts = chainVertices(backboneCount, bondLen);
+            const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+            const offX = originX + boxW / 2 - (Math.min(...xs) + Math.max(...xs)) / 2;
+            const offY = originY + boxH / 2 - (Math.min(...ys) + Math.max(...ys)) / 2;
+            const abs = pts.map(p => ({ x: p.x + offX, y: p.y + offY }));
+
+            for (let i = 0; i < abs.length - 1; i++) {
+                drawBond(ctx, abs[i].x, abs[i].y, abs[i + 1].x, abs[i + 1].y, bondColor, false);
+            }
+
+            const last = abs[abs.length - 1];
+            const nextUp = (backboneCount % 2 === 1);
+            const ang = 30 * Math.PI / 180;
+
+            if (end === 'OH' || end === 'NH2') {
+                const stubX = last.x + Math.cos(ang) * bondLen * 0.85;
+                const stubY = last.y + (nextUp ? -1 : 1) * Math.sin(ang) * bondLen * 0.85;
+                drawBond(ctx, last.x, last.y, stubX, stubY, bondColor, false);
+                drawAtomLabel(ctx, stubX, stubY, end === 'OH' ? 'OH' : 'NH₂', heteroColor);
+            } else if (end === 'COOH') {
+                // Syrens carbon (sidste vertex) forgrener til =O og -OH
+                const ohX = last.x + Math.cos(ang) * bondLen * 0.85;
+                const ohY = last.y + (nextUp ? -1 : 1) * Math.sin(ang) * bondLen * 0.85;
+                const oAng = 82 * Math.PI / 180;
+                const oX = last.x + Math.cos(oAng) * bondLen * 0.3;
+                const oY = last.y + (nextUp ? 1 : -1) * Math.sin(oAng) * bondLen * 0.9;
+                drawBond(ctx, last.x, last.y, oX, oY, bondColor, true);
+                drawAtomLabel(ctx, oX, oY, 'O', heteroColor);
+                drawBond(ctx, last.x, last.y, ohX, ohY, bondColor, false);
+                drawAtomLabel(ctx, ohX, ohY, 'OH', heteroColor);
+            }
+        }
+
+        function drawRingSkeleton(ctx, skeleton, originX, originY, boxW, boxH, bondColor, heteroColor) {
+            const cx = originX + boxW / 2;
+            const cy = originY + boxH / 2 - (skeleton.sub ? 10 : 0);
+            const r = Math.min(boxW, boxH * 0.75) * 0.32;
+            const pts = [];
+            for (let i = 0; i < 6; i++) {
+                const a = Math.PI / 2 + i * (Math.PI / 3);
+                pts.push({ x: cx + Math.cos(a) * r, y: cy - Math.sin(a) * r });
+            }
+            ctx.strokeStyle = bondColor;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+            ctx.closePath();
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(cx, cy, r * 0.6, 0, Math.PI * 2);
+            ctx.stroke();
+
+            if (skeleton.sub === 'COOH') {
+                const top = pts[0];
+                const stemX = top.x, stemY = top.y - r * 0.55;
+                drawBond(ctx, top.x, top.y, stemX, stemY, bondColor, false);
+                const oX = stemX - r * 0.45, oY = stemY - r * 0.35;
+                const ohX = stemX + r * 0.45, ohY = stemY - r * 0.35;
+                drawBond(ctx, stemX, stemY, oX, oY, bondColor, true);
+                drawAtomLabel(ctx, oX, oY, 'O', heteroColor);
+                drawBond(ctx, stemX, stemY, ohX, ohY, bondColor, false);
+                drawAtomLabel(ctx, ohX, ohY, 'OH', heteroColor);
+            } else if (skeleton.sub === 'OH') {
+                const top = pts[0];
+                const stubX = top.x, stubY = top.y - r * 0.55;
+                drawBond(ctx, top.x, top.y, stubX, stubY, bondColor, false);
+                drawAtomLabel(ctx, stubX, stubY, 'OH', heteroColor);
+            } else if (skeleton.sub === 'CH3') {
+                // Løs linje-ende uden label er standardkonventionen for en metylgruppe
+                const top = pts[0];
+                const stubX = top.x, stubY = top.y - r * 0.55;
+                drawBond(ctx, top.x, top.y, stubX, stubY, bondColor, false);
+            }
+        }
+
+        function drawTriolSkeleton(ctx, originX, originY, boxW, boxH, bondColor, heteroColor) {
+            const bondLen = 18;
+            const pts = chainVertices(3, bondLen);
+            const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+            const offX = originX + boxW / 2 - (Math.min(...xs) + Math.max(...xs)) / 2;
+            const offY = originY + boxH / 2 - (Math.min(...ys) + Math.max(...ys)) / 2 + 10;
+            const abs = pts.map(p => ({ x: p.x + offX, y: p.y + offY }));
+
+            for (let i = 0; i < abs.length - 1; i++) {
+                drawBond(ctx, abs[i].x, abs[i].y, abs[i + 1].x, abs[i + 1].y, bondColor, false);
+            }
+            abs.forEach(p => {
+                const ohY = p.y - 24;
+                drawBond(ctx, p.x, p.y, p.x, ohY, bondColor, false);
+                drawAtomLabel(ctx, p.x, ohY, 'OH', heteroColor);
+            });
+        }
+
+        function drawIbuprofenSkeleton(ctx, originX, originY, boxW, boxH, bondColor, heteroColor) {
+            const cx = originX + boxW * 0.42, cy = originY + boxH / 2;
+            const r = Math.min(boxW, boxH) * 0.24;
+            const pts = [];
+            for (let i = 0; i < 6; i++) {
+                const a = Math.PI / 2 + i * (Math.PI / 3);
+                pts.push({ x: cx + Math.cos(a) * r, y: cy - Math.sin(a) * r });
+            }
+            ctx.strokeStyle = bondColor;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+            ctx.closePath();
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(cx, cy, r * 0.6, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Forgrenet upolær hale (isobutyl) til venstre
+            const left = pts[3];
+            const b1 = { x: left.x - r * 0.9, y: left.y - r * 0.15 };
+            const b2a = { x: b1.x - r * 0.55, y: b1.y - r * 0.5 };
+            const b2b = { x: b1.x - r * 0.55, y: b1.y + r * 0.5 };
+            drawBond(ctx, left.x, left.y, b1.x, b1.y, bondColor, false);
+            drawBond(ctx, b1.x, b1.y, b2a.x, b2a.y, bondColor, false);
+            drawBond(ctx, b1.x, b1.y, b2b.x, b2b.y, bondColor, false);
+
+            // Syregren til højre: -CH(CH₃)-COOH
+            const right = pts[0];
+            const c1 = { x: right.x + r * 0.9, y: right.y - r * 0.25 };
+            const methyl = { x: c1.x + r * 0.1, y: c1.y - r * 0.75 };
+            const c2 = { x: c1.x + r * 0.85, y: c1.y + r * 0.35 };
+            drawBond(ctx, right.x, right.y, c1.x, c1.y, bondColor, false);
+            drawBond(ctx, c1.x, c1.y, methyl.x, methyl.y, bondColor, false);
+            drawBond(ctx, c1.x, c1.y, c2.x, c2.y, bondColor, false);
+            const oPos = { x: c2.x + r * 0.1, y: c2.y - r * 0.75 };
+            const ohPos = { x: c2.x + r * 0.85, y: c2.y + r * 0.15 };
+            drawBond(ctx, c2.x, c2.y, oPos.x, oPos.y, bondColor, true);
+            drawAtomLabel(ctx, oPos.x, oPos.y, 'O', heteroColor);
+            drawBond(ctx, c2.x, c2.y, ohPos.x, ohPos.y, bondColor, false);
+            drawAtomLabel(ctx, ohPos.x, ohPos.y, 'OH', heteroColor);
+        }
+
+        function drawWaterIcon(ctx, originX, originY, boxW, boxH, labelColor, heteroColor) {
+            const cx = originX + boxW / 2, cy = originY + boxH / 2;
+            const bond = 15;
+            const ang = 52 * Math.PI / 180;
+            const h1 = { x: cx - Math.sin(ang) * bond, y: cy + bond * 0.55 };
+            const h2 = { x: cx + Math.sin(ang) * bond, y: cy + bond * 0.55 };
+            const o = { x: cx, y: cy - bond * 0.5 };
+            drawBond(ctx, o.x, o.y, h1.x, h1.y, labelColor, false);
+            drawBond(ctx, o.x, o.y, h2.x, h2.y, labelColor, false);
+            drawAtomLabel(ctx, o.x, o.y, 'O', heteroColor);
+            drawAtomLabel(ctx, h1.x, h1.y, 'H', labelColor);
+            drawAtomLabel(ctx, h2.x, h2.y, 'H', labelColor);
+        }
+
+        function drawIonIcon(ctx, originX, originY, boxW, boxH, labelColor) {
+            const cy = originY + boxH / 2;
+            drawAtomLabel(ctx, originX + boxW * 0.32, cy, 'Na⁺', labelColor);
+            drawAtomLabel(ctx, originX + boxW * 0.68, cy, 'Cl⁻', labelColor);
+        }
+
+        function drawMoleculeSkeleton(ctx, data, originX, originY, boxW, boxH, spectroActive) {
+            const bondColor = 'rgba(255,255,255,0.85)';
+            const labelColor = '#f5f5f5';
+            const heteroColor = spectroActive ? varColor('--accent-red') : labelColor;
+            const skeleton = data.skeleton;
+
+            switch (skeleton.type) {
+                case 'water': drawWaterIcon(ctx, originX, originY, boxW, boxH, labelColor, heteroColor); break;
+                case 'ion': drawIonIcon(ctx, originX, originY, boxW, boxH, labelColor); break;
+                case 'ring': drawRingSkeleton(ctx, skeleton, originX, originY, boxW, boxH, bondColor, heteroColor); break;
+                case 'triol': drawTriolSkeleton(ctx, originX, originY, boxW, boxH, bondColor, heteroColor); break;
+                case 'ibuprofen': drawIbuprofenSkeleton(ctx, originX, originY, boxW, boxH, bondColor, heteroColor); break;
+                case 'chain':
+                default: drawChainSkeleton(ctx, skeleton, originX, originY, boxW, boxH, bondColor, heteroColor); break;
+            }
+        }
+
+        // --- KLASSER ---
+        class Molecule {
+            constructor(data, speedMultiplier) {
+                this.data = data;
+                const size = computeMoleculeBoxSize(data.skeleton);
+                this.width = size.width;
+                this.height = size.height;
+                this.x = canvas.width / 2 - this.width / 2;
+                this.y = -this.height;
+                
+                // Base hastighed justeres af kølebad[cite: 1] — dæmpet tempo så der er tid til at trække
+                this.baseSpeed = (22 + Math.random() * 10) * speedMultiplier;
+
+                this.sorted = false;
+                this.dragging = false;
+                this.targetX = this.x;
+                this.isDead = false;
+            }
+
+            update(dt) {
+                // Mens spilleren trækker molekylet følger det musen direkte (se pointermove)
+                if (this.dragging) return;
+
+                // Hastighed justeres hvis is er aktiv
+                let currentSpeed = this.baseSpeed;
+                if (state.activeBuffs.ice > 0) currentSpeed *= 0.3; // Slowmotion[cite: 1]
+
+                // Øve-tilstand: molekylet venter lige over forgreningen til det bliver sorteret
+                const waitY = SPLIT_Y - this.height - 10;
+                if (state.practiceMode && !this.sorted && this.y >= waitY) {
+                    this.y = waitY;
+                } else {
+                    this.y += currentSpeed * (dt / 1000);
+                }
+
+                // Horisontal bevægelse hvis sorteret (glider ned i det valgte rør)
+                if (this.sorted) {
+                    this.x += (this.targetX - this.x) * 5 * (dt / 1000);
+                }
+
+                // Hit detection med bund/væske
+                const liquidLevel = canvas.height - LIQUID_ZONE_HEIGHT;
+                if (this.y + this.height > liquidLevel && !this.isDead) {
+                    this.checkSorting();
+                }
+            }
+
+            sort(direction) {
+                // Ingen "sorted"-spærring: man må gerne fortryde og flytte molekylet
+                // over i det andet rør, så længe det ikke allerede er landet
+                if (this.isDead) return;
+                this.sorted = true;
+
+                if (direction === 'left') {
+                    this.targetX = canvas.width / 4 - this.width / 2; // Vandig
+                } else if (direction === 'right') {
+                    this.targetX = (canvas.width / 4) * 3 - this.width / 2; // Organisk
+                }
+            }
+
+            // Enter: "fyr direkte ned" — lander molekylet med det samme, men kun hvis
+            // det allerede er sorteret til et rør (dvs. ligger over en affaldsspand)
+            dropNow() {
+                if (this.isDead || !this.sorted) return;
+                this.x = this.targetX;
+                this.y = canvas.height - LIQUID_ZONE_HEIGHT;
+                this.checkSorting();
+            }
+
+            checkSorting() {
+                this.isDead = true;
+                
+                // Bestem hvilken side den reelt er landet i
+                let landedPhase = "center";
+                if (this.x + this.width/2 < canvas.width/2) landedPhase = "polar";
+                else if (this.x + this.width/2 > canvas.width/2) landedPhase = "organic";
+
+                const correctPhase = getCorrectPhase(this.data);
+
+                if (landedPhase === correctPhase) {
+                    // KORREKT
+                    handleCorrectSort(this, landedPhase);
+                } else {
+                    // FORKERT
+                    handleWrongSort(this, landedPhase);
+                }
+            }
+
+            draw(ctx) {
+                ctx.save();
+
+                const isSelected = (this === state.selectedMol);
+
+                if (this.dragging) {
+                    ctx.shadowColor = "rgba(255,255,255,0.8)";
+                    ctx.shadowBlur = 20;
+                } else if (this.data.isBoss) {
+                    // Boss-glød bevares som separat signal, selv når kassen er markeret som valgt
+                    ctx.shadowColor = varColor('--gold');
+                    ctx.shadowBlur = 15;
+                }
+
+                ctx.fillStyle = this.data.isBoss ? "rgba(241, 196, 15, 0.1)"
+                    : (this.dragging ? "rgba(52, 152, 219, 0.25)" : "rgba(255, 255, 255, 0.1)");
+
+                // Kant-farve: markerer tydeligt hvilket molekyle der er valgt til piletaster
+                if (this.dragging) {
+                    ctx.strokeStyle = varColor('--accent-blue');
+                } else if (isSelected) {
+                    ctx.strokeStyle = varColor('--select-color');
+                } else if (this.data.isBoss) {
+                    ctx.strokeStyle = varColor('--gold');
+                } else {
+                    ctx.strokeStyle = "#fff";
+                }
+
+                // Tegn kasse (let løftet/skaleret mens den trækkes eller er valgt)
+                const scale = this.dragging ? 1.08 : (isSelected ? 1.04 : 1);
+                const w = this.width * scale, h = this.height * scale;
+                const dx = this.x - (w - this.width) / 2, dy = this.y - (h - this.height) / 2;
+                ctx.lineWidth = (this.dragging || isSelected) ? 3 : 2;
+                ctx.beginPath();
+                ctx.roundRect(dx, dy, w, h, 10);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.shadowBlur = 0;
+
+                // Strukturformel (zigzag) i det meste af boksen; navn nederst
+                const nameAreaH = 16;
+                drawMoleculeSkeleton(ctx, this.data, this.x, this.y, this.width, this.height - nameAreaH, state.activeBuffs.spectro > 0);
+
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillStyle = "#aaa";
+                ctx.font = "11px Arial";
+                ctx.fillText(this.data.name, this.x + this.width / 2, this.y + this.height - nameAreaH / 2);
+
+                ctx.restore();
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 100 + 50;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed - 100; // Skyder opad
+                this.life = 1.0;
+                this.decay = Math.random() * 0.02 + 0.01;
+                this.size = Math.random() * 4 + 2;
+            }
+
+            update(dt) {
+                this.x += this.vx * (dt / 1000);
+                this.vy += 300 * (dt / 1000); // Tyngdekraft
+                this.y += this.vy * (dt / 1000);
+                this.life -= this.decay;
+            }
+
+            draw(ctx) {
+                ctx.globalAlpha = Math.max(0, this.life);
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        // Kort ✓/✗-markering direkte på molekylet, så feedbacken sidder præcis der handlingen skete
+        class FloatingText {
+            constructor(x, y, text, color) {
+                this.x = x;
+                this.y = y;
+                this.text = text;
+                this.color = color;
+                this.life = 1.1;
+                this.vy = -45;
+            }
+
+            update(dt) {
+                this.y += this.vy * (dt / 1000);
+                this.life -= dt / 1000;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, Math.min(1, this.life * 1.3));
+                ctx.fillStyle = this.color;
+                ctx.font = "bold 24px Arial";
+                ctx.textAlign = "center";
+                ctx.fillText(this.text, this.x, this.y);
+                ctx.restore();
+            }
+        }
+
+        // --- SPIL MEKANIKKER ---
+
+        function handleCorrectSort(mol, landedPhase) {
+            let pts = mol.data.points;
+
+            // Combo system[cite: 1]
+            state.combo++;
+            if (state.combo >= 5) {
+                pts *= 2;
+                comboDisplay.classList.add('combo-active');
+                setTimeout(() => comboDisplay.classList.remove('combo-active'), 1000);
+            }
+
+            addMoney(pts);
+            addFill(landedPhase, 30);
+            state.waveStats.correct++;
+            spawnExplosion(mol.x + mol.width/2, mol.y + mol.height, varColor('--accent-green'));
+            state.floatingTexts.push(new FloatingText(mol.x + mol.width/2, mol.y, "✓ +" + pts, varColor('--accent-green')));
+
+            // Tjek om bølgen er færdig
+            checkWaveProgress();
+        }
+
+        function handleWrongSort(mol, landedPhase) {
+            state.combo = 0;
+            comboDisplay.classList.remove('combo-active');
+
+            // Straf: mister renhed OG penge
+            let damage = mol.data.isBoss ? 20 : 10;
+            let penalty = Math.round(mol.data.points / 2);
+            updatePurity(-damage);
+            addMoney(-penalty);
+            addFill(landedPhase, 15);
+            state.waveStats.wrong++;
+            state.mistakes.push({
+                name: mol.data.name,
+                formula: mol.data.formula,
+                why: explainPhase(mol.data)
+            });
+
+            spawnExplosion(mol.x + mol.width/2, mol.y + mol.height, varColor('--accent-red'));
+            state.floatingTexts.push(new FloatingText(mol.x + mol.width/2, mol.y, "✗ -" + penalty, varColor('--accent-red')));
+            showExplainToast(explainPhase(mol.data));
+            shakeScreen();
+
+            checkWaveProgress();
+        }
+
+        // --- FORKLARINGS-TOAST ---
+        let explainToastTimer = null;
+        function showExplainToast(text) {
+            const el = document.getElementById('explain-toast');
+            el.textContent = text;
+            el.classList.add('show');
+            clearTimeout(explainToastTimer);
+            explainToastTimer = setTimeout(() => el.classList.remove('show'), 4500);
+        }
+
+        function addFill(phase, amount) {
+            const key = phase === 'polar' ? 'leftFill' : (phase === 'organic' ? 'rightFill' : null);
+            if (!key) return;
+
+            if (state[key] >= 100) {
+                // Beholderen løber over — straf i stedet for at fylde mere på
+                updatePurity(-15);
+                showExplainToast('⚠️ Beholderen løb over! Afhent affaldet i tide.');
+                shakeScreen();
+                return;
+            }
+            state[key] = Math.min(100, state[key] + amount);
+        }
+
+        function spawnExplosion(x, y, color) {
+            for(let i=0; i<20; i++) {
+                state.particles.push(new Particle(x, y, color));
+            }
+        }
+
+        function addMoney(amount) {
+            state.money = Math.max(0, state.money + amount);
+            uiMoney.innerText = String(state.money).replace('.', ',') + " DKK";
+            checkShopAvailability();
+        }
+
+        function updatePurity(amount) {
+            state.purity += amount;
+            if (state.purity > 100) state.purity = 100;
+            if (state.purity < 0) state.purity = 0;
+
+            uiPurityBar.style.width = state.purity + "%";
+            uiPurityText.innerText = String(state.purity.toFixed(1)).replace('.', ',') + "%";
+
+            // Farveskift
+            if (state.purity < 30) uiPurityText.style.color = varColor('--accent-red');
+            else if (state.purity < 70) uiPurityText.style.color = varColor('--accent-orange');
+            else uiPurityText.style.color = varColor('--accent-green');
+
+            if (state.purity <= 0) {
+                triggerGameOver();
+            }
+        }
+
+        function shakeScreen() {
+            document.body.classList.remove('shake');
+            void document.body.offsetWidth; // Trigger reflow
+            document.body.classList.add('shake');
+        }
+
+        // --- SHOP & POWERUPS ---
+
+        function checkShopAvailability() {
+            document.getElementById('btn-waste').disabled = (state.money < 40);
+            document.getElementById('btn-ice').disabled = (state.money < 100 || state.activeBuffs.ice > 0);
+            document.getElementById('btn-spectro').disabled = (state.money < 75 || state.activeBuffs.spectro > 0);
+        }
+
+        window.buyPowerup = function(type) {
+            if (!state.isRunning) return;
+
+            let cost = 0;
+            if (type === 'ice') cost = 100;
+            if (type === 'spectro') cost = 75;
+
+            if (state.money >= cost && state.activeBuffs[type] <= 0) {
+                addMoney(-cost);
+
+                // Aktiver buff varighed i ms
+                let duration = (type === 'ice') ? 10000 : 15000;
+                state.activeBuffs[type] = duration;
+
+                if (type === 'ice') {
+                    frostOverlay.classList.add('frozen');
+                }
+
+                animateCooldown(type, duration);
+            }
+        };
+
+        // --- KEMIKALIEAFFALD: tømmer begge beholdere mod betaling ---
+        window.buyWastePickup = function() {
+            if (!state.isRunning) return;
+            const cost = 40;
+            if (state.money < cost) return;
+            addMoney(-cost);
+            state.leftFill = 0;
+            state.rightFill = 0;
+        };
+
+        // --- PAUSE & TÆNK: fryser tiden midlertidigt så man kan trække i ro ---
+        window.togglePauseThink = function() {
+            if (!state.isRunning) return;
+
+            if (state.paused) {
+                state.paused = false;
+            } else {
+                if (state.pauseUsesLeft <= 0) return;
+                state.pauseUsesLeft--;
+                state.paused = true;
+            }
+            updatePauseButton();
+        };
+
+        function updatePauseButton() {
+            const btn = document.getElementById('btn-pause-think');
+            if (state.paused) {
+                btn.textContent = '▶ Fortsæt';
+                btn.classList.add('active');
+                btn.disabled = false;
+            } else {
+                btn.textContent = '⏸ Pause & tænk (' + state.pauseUsesLeft + ')';
+                btn.classList.remove('active');
+                btn.disabled = state.pauseUsesLeft <= 0;
+            }
+        }
+
+        // --- KEMI-LEKTION HJÆLPE-MODAL (kun på forlangende) ---
+        let pausedBeforeLesson = false;
+        window.toggleLessonModal = function(show) {
+            const el = document.getElementById('screen-lesson');
+            if (show) {
+                pausedBeforeLesson = state.paused;
+                state.paused = true;
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+                state.paused = pausedBeforeLesson;
+                updatePauseButton();
+            }
+        };
+
+        function animateCooldown(type, duration) {
+            const bar = document.getElementById('cd-' + type);
+            bar.style.transition = 'none';
+            bar.style.width = '100%';
+            
+            setTimeout(() => {
+                bar.style.transition = 'width ' + (duration/1000) + 's linear';
+                bar.style.width = '0%';
+            }, 50);
+        }
+
+        // --- STYRING AF BØLGER ---
+
+        // Badge (Guld/Sølv/Bronze) ud fra hvor stor en andel af bølgen der blev sorteret korrekt
+        function computeBadge(stats) {
+            const total = stats.correct + stats.wrong;
+            if (total === 0) return null;
+            const acc = stats.correct / total;
+            if (acc >= 0.9) return { label: '🥇 Guld', accPct: Math.round(acc * 100) };
+            if (acc >= 0.7) return { label: '🥈 Sølv', accPct: Math.round(acc * 100) };
+            if (acc >= 0.5) return { label: '🥉 Bronze', accPct: Math.round(acc * 100) };
+            return { label: 'Øv dig videre', accPct: Math.round(acc * 100) };
+        }
+
+        function renderBadgeSummary(containerId) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            if (state.waveBadges.length === 0) { el.innerHTML = ''; return; }
+            el.innerHTML = '<div class="badge-row">' + state.waveBadges.map(b =>
+                `<div class="badge-card"><div class="badge-wave">Bølge ${b.wave}</div><div class="badge-label">${b.badge ? b.badge.label : '-'}</div><div class="badge-wave">${b.badge ? b.badge.accPct + '%' : ''}</div></div>`
+            ).join('') + '</div>';
+        }
+
+        function renderMistakeList(containerId) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            if (state.mistakes.length === 0) {
+                el.innerHTML = '<strong style="color: var(--accent-green);">Ingen fejl — flot klaret!</strong>';
+                return;
+            }
+            el.innerHTML = '<strong>Gennemgå dine fejl:</strong><ul>' +
+                state.mistakes.map(m => `<li><strong>${m.name}</strong> (${m.formula}): ${m.why}</li>`).join('') +
+                '</ul>';
+        }
+
+        function checkWaveProgress() {
+            const wData = WAVES[state.wave - 1];
+            if (state.molsSpawned >= wData.molCount && state.activeMolecules.filter(m => !m.isDead).length === 0) {
+                // Bølge slut — gem badge for den netop overståede bølge
+                state.waveBadges.push({
+                    wave: state.wave,
+                    badge: computeBadge(state.waveStats),
+                    stats: { ...state.waveStats }
+                });
+
+                if (state.wave >= WAVES.length) {
+                    triggerVictory();
+                } else {
+                    state.wave++;
+                    showWaveIntro();
+                }
+            }
+        }
+
+        function showWaveIntro() {
+            state.isRunning = false;
+            const wData = WAVES[state.wave - 1];
+            uiWave.innerText = state.wave;
+            document.getElementById('wave-title').innerText = wData.title;
+            document.getElementById('wave-desc').innerHTML = wData.desc;
+
+            const prevStatsEl = document.getElementById('wave-prev-stats');
+            const last = state.waveBadges[state.waveBadges.length - 1];
+            if (last) {
+                const total = last.stats.correct + last.stats.wrong;
+                prevStatsEl.innerHTML = `<strong>Bølge ${last.wave} resultat:</strong> ${last.stats.correct}/${total} korrekte — ${last.badge ? last.badge.label : ''}`;
+                prevStatsEl.classList.remove('hidden');
+            } else {
+                prevStatsEl.classList.add('hidden');
+            }
+
+            document.getElementById('screen-wave').classList.remove('hidden');
+        }
+
+        window.resumeWave = function() {
+            document.getElementById('screen-wave').classList.add('hidden');
+            state.molsSpawned = 0;
+            state.waveStats = { correct: 0, wrong: 0 };
+            state.selectedMol = null;
+            state.lastTime = performance.now();
+
+            // Juster spawn rate baseret på bølge, og træk en blandet molekyle-kø
+            const wData = WAVES[state.wave - 1];
+            state.spawnInterval = wData.spawnInterval;
+            state.waveQueue = buildWaveQueue(wData.poolTier, wData.molCount);
+
+            state.isRunning = true;
+            requestAnimationFrame(gameLoop);
+        };
+
+        // --- SPIL LØKKE & TEGNING ---
+
+        // Trækker en blandet kø af molekyler til en bølge — undgår unødige gentagelser
+        // så længe puljen er stor nok (fx "3 forskellige molekyler" i intro-bølgen)
+        function buildWaveQueue(poolTier, count) {
+            const pool = MOLECULES_DB.filter(m => m.tier <= poolTier);
+            const queue = [];
+            while (queue.length < count) {
+                const shuffled = [...pool].sort(() => Math.random() - 0.5);
+                queue.push(...shuffled);
+            }
+            return queue.slice(0, count);
+        }
+
+        function spawnMolecule() {
+            const wData = WAVES[state.wave - 1];
+            if (state.molsSpawned < wData.molCount) {
+                // Øve-tilstand: send først næste molekyle når det forrige er sorteret
+                if (state.practiceMode && state.activeMolecules.some(m => !m.sorted && !m.isDead)) {
+                    return;
+                }
+
+                const molData = state.waveQueue[state.molsSpawned];
+
+                // Kun det sidste monster i en ikke-intro bølge falder dobbelt så hurtigt
+                const isLastInWave = (state.molsSpawned === wData.molCount - 1);
+                const speedMultiplier = (state.wave > 1 && isLastInWave) ? 2.0 : 1.0;
+
+                state.activeMolecules.push(new Molecule(molData, speedMultiplier));
+                state.molsSpawned++;
+            }
+        }
+
+        // Glas-agtig rørvæg: gradient med et par lyse "reflektions"-striber
+        function pipeWallGradient(x0, x1) {
+            const g = ctx.createLinearGradient(x0, 0, x1, 0);
+            g.addColorStop(0.00, "rgba(255,255,255,0.04)");
+            g.addColorStop(0.12, "rgba(255,255,255,0.30)");
+            g.addColorStop(0.30, "rgba(255,255,255,0.06)");
+            g.addColorStop(0.55, "rgba(255,255,255,0.10)");
+            g.addColorStop(0.80, "rgba(255,255,255,0.28)");
+            g.addColorStop(1.00, "rgba(255,255,255,0.04)");
+            return g;
+        }
+
+        function drawPipeSection(x0, y0, x1, y1) {
+            // Simpelt lodret rørstykke med rundede "glas" kanter
+            ctx.fillStyle = pipeWallGradient(x0, x1);
+            ctx.beginPath();
+            ctx.roundRect(x0, y0, x1 - x0, y1 - y0, 14);
+            ctx.fill();
+            ctx.strokeStyle = "rgba(255,255,255,0.15)";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        // Tydeligt markeret affaldsspand (trapezform) med tyk farvet kant og label
+        function drawWasteBin(centerX, topY, bottomY, topWidth, fillPercent, liquidColor, rimColor, label) {
+            const botWidth = topWidth * 0.78;
+            const x0 = centerX - topWidth / 2, x1 = centerX + topWidth / 2;
+            const bx0 = centerX - botWidth / 2, bx1 = centerX + botWidth / 2;
+
+            ctx.beginPath();
+            ctx.moveTo(x0, topY);
+            ctx.lineTo(x1, topY);
+            ctx.lineTo(bx1, bottomY);
+            ctx.lineTo(bx0, bottomY);
+            ctx.closePath();
+            ctx.fillStyle = "rgba(255,255,255,0.06)";
+            ctx.fill();
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = rimColor;
+            ctx.stroke();
+
+            // Tyk kant øverst — gør spanden tydelig at sigte efter
+            ctx.fillStyle = rimColor;
+            ctx.fillRect(x0 - 5, topY - 8, (x1 - x0) + 10, 8);
+
+            // Affald/væske i bunden, klippet til spandens facon
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(x0 + 3, topY);
+            ctx.lineTo(x1 - 3, topY);
+            ctx.lineTo(bx1 - 3, bottomY - 3);
+            ctx.lineTo(bx0 + 3, bottomY - 3);
+            ctx.closePath();
+            ctx.clip();
+
+            const maxLiquidH = (bottomY - topY) - 6;
+            const liquidH = Math.max(6, (fillPercent / 100) * maxLiquidH);
+            const liquidTop = bottomY - liquidH;
+            ctx.fillStyle = liquidColor;
+            ctx.fillRect(x0, liquidTop, topWidth, bottomY - liquidTop);
+
+            const t = performance.now() / 500;
+            ctx.strokeStyle = "rgba(255,255,255,0.35)";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let px = x0; px <= x1; px += 6) {
+                const wy = liquidTop + Math.sin(px / 18 + t) * 2;
+                if (px === x0) ctx.moveTo(px, wy); else ctx.lineTo(px, wy);
+            }
+            ctx.stroke();
+            ctx.restore();
+
+            // Tydelig label over spanden
+            ctx.fillStyle = rimColor;
+            ctx.font = "bold 16px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText(label, centerX, topY - 20);
+
+            ctx.fillStyle = "rgba(255,255,255,0.6)";
+            ctx.font = "12px Arial";
+            ctx.fillText(Math.round(fillPercent) + "%", centerX, bottomY + 16);
+        }
+
+        function drawBackground(ctx) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const liquidLevel = canvas.height - LIQUID_ZONE_HEIGHT;
+            const binW = BRANCH_PIPE_WIDTH + 50;
+            const leftCenterX = canvas.width / 4;
+            const rightCenterX = (canvas.width / 4) * 3;
+
+            // Kort rørstub i toppen — resten er åbent rum, molekylerne falder frit ned mod spandene
+            const mainX0 = canvas.width / 2 - MAIN_PIPE_WIDTH / 2;
+            const mainX1 = canvas.width / 2 + MAIN_PIPE_WIDTH / 2;
+            drawPipeSection(mainX0, -10, mainX1, 120);
+
+            // To tydeligt markerede affaldsspande nederst
+            drawWasteBin(leftCenterX, liquidLevel, canvas.height - 10, binW, state.leftFill,
+                "rgba(52, 152, 219, 0.65)", varColor('--accent-blue'), "VANDIG AFFALD");
+            drawWasteBin(rightCenterX, liquidLevel, canvas.height - 10, binW, state.rightFill,
+                "rgba(230, 126, 34, 0.65)", varColor('--accent-orange'), "ORGANISK AFFALD");
+        }
+
+        function gameLoop(timestamp) {
+            if (!state.isRunning) return;
+
+            let dt = timestamp - state.lastTime;
+            state.lastTime = timestamp;
+
+            // "Pause & tænk" fryser tiden helt (spawn, fald og buff-timere holder stille),
+            // men mus/touch-drag virker stadig da det ikke afhænger af dt
+            if (state.paused) dt = 0;
+
+            // Opdater Powerup timers
+            for (let key in state.activeBuffs) {
+                if (state.activeBuffs[key] > 0) {
+                    state.activeBuffs[key] -= dt;
+                    if (state.activeBuffs[key] <= 0) {
+                        state.activeBuffs[key] = 0;
+                        if (key === 'ice') frostOverlay.classList.remove('frozen');
+                        checkShopAvailability();
+                    }
+                }
+            }
+
+            // Spawn logik
+            state.spawnTimer += dt;
+            if (state.spawnTimer >= state.spawnInterval) {
+                state.spawnTimer = 0;
+                spawnMolecule();
+            }
+
+            // Update entities
+            for (let i = state.activeMolecules.length - 1; i >= 0; i--) {
+                state.activeMolecules[i].update(dt);
+                if (state.activeMolecules[i].isDead) {
+                    state.activeMolecules.splice(i, 1);
+                }
+            }
+
+            for (let i = state.particles.length - 1; i >= 0; i--) {
+                state.particles[i].update(dt);
+                if (state.particles[i].life <= 0) {
+                    state.particles.splice(i, 1);
+                }
+            }
+
+            for (let i = state.floatingTexts.length - 1; i >= 0; i--) {
+                state.floatingTexts[i].update(dt);
+                if (state.floatingTexts[i].life <= 0) {
+                    state.floatingTexts.splice(i, 1);
+                }
+            }
+
+            // Hold valgt molekyle opdateret, så markeringen matcher hvad piletaster reelt rammer
+            getSelectedMolecule();
+
+            // Drawing
+            drawBackground(ctx);
+
+            state.activeMolecules.forEach(mol => mol.draw(ctx));
+            state.particles.forEach(p => p.draw(ctx));
+            state.floatingTexts.forEach(f => f.draw(ctx));
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // --- INPUT HANDLING: piletaster med eksplicit valg af molekyle ---
+
+        // Alle ikke-landede molekyler, sorteret efter y (øverst først)
+        function getEligibleMolecules() {
+            return state.activeMolecules.filter(m => !m.isDead).sort((a, b) => a.y - b.y);
+        }
+
+        // Det valgte molekyle — falder tilbage til det nederste (mest presserende), hvis intet er valgt
+        function getSelectedMolecule() {
+            const eligible = getEligibleMolecules();
+            if (eligible.length === 0) {
+                state.selectedMol = null;
+                return null;
+            }
+            if (state.selectedMol && eligible.includes(state.selectedMol)) {
+                return state.selectedMol;
+            }
+            const def = eligible[eligible.length - 1];
+            state.selectedMol = def;
+            return def;
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (!state.isRunning) return;
+
+            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                const eligible = getEligibleMolecules();
+                if (eligible.length === 0) return;
+                const current = getSelectedMolecule();
+                const idx = eligible.indexOf(current);
+                if (e.key === 'ArrowUp' && idx > 0) {
+                    state.selectedMol = eligible[idx - 1]; // molekylet ovenover
+                } else if (e.key === 'ArrowDown' && idx < eligible.length - 1) {
+                    state.selectedMol = eligible[idx + 1]; // molekylet nedenunder
+                }
+                e.preventDefault();
+                return;
+            }
+
+            const target = getSelectedMolecule();
+            if (!target) return;
+
+            if (e.key === 'ArrowLeft') {
+                target.sort('left');
+            } else if (e.key === 'ArrowRight') {
+                target.sort('right');
+            } else if (e.key === 'Enter') {
+                target.dropNow();
+                e.preventDefault();
+            }
+        });
+
+        // --- MUSE/TOUCH DRAG: træk et molekyle fra ét rør over i det andet ---
+        function getCanvasCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            return {
+                x: (e.clientX - rect.left) * scaleX,
+                y: (e.clientY - rect.top) * scaleY
+            };
+        }
+
+        function moleculeAt(pos) {
+            for (let i = state.activeMolecules.length - 1; i >= 0; i--) {
+                const mol = state.activeMolecules[i];
+                // Kun landede (isDead) molekyler er udelukket — sorterede kan gribes igen (fortryd)
+                if (mol.isDead) continue;
+                if (pos.x >= mol.x && pos.x <= mol.x + mol.width &&
+                    pos.y >= mol.y && pos.y <= mol.y + mol.height) {
+                    return mol;
+                }
+            }
+            return null;
+        }
+
+        canvas.addEventListener('pointerdown', (e) => {
+            if (!state.isRunning) return;
+            const pos = getCanvasCoords(e);
+            const mol = moleculeAt(pos);
+            if (!mol) return;
+
+            dragState.active = true;
+            dragState.mol = mol;
+            dragState.offsetX = pos.x - mol.x;
+            dragState.offsetY = pos.y - mol.y;
+            mol.dragging = true;
+            state.selectedMol = mol; // hold mus og piletaster i sync
+            canvas.style.cursor = 'grabbing';
+            try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* touch/synthetic edge case, safe to ignore */ }
+        });
+
+        canvas.addEventListener('pointermove', (e) => {
+            const pos = getCanvasCoords(e);
+
+            if (dragState.active && dragState.mol) {
+                const mol = dragState.mol;
+                mol.x = pos.x - dragState.offsetX;
+                mol.y = pos.y - dragState.offsetY;
+                mol.x = Math.max(0, Math.min(canvas.width - mol.width, mol.x));
+                mol.y = Math.max(0, Math.min(canvas.height - mol.height, mol.y));
+                return;
+            }
+
+            // Vis "grab"-cursor når musen svæver over et trækbart molekyle
+            canvas.style.cursor = moleculeAt(pos) ? 'grab' : 'default';
+        });
+
+        function endDrag(e) {
+            if (!dragState.active || !dragState.mol) return;
+            const mol = dragState.mol;
+            mol.dragging = false;
+            dragState.active = false;
+            dragState.mol = null;
+            canvas.style.cursor = 'default';
+
+            // Sorteringsretning afgøres af hvor molekylet blev sluppet (venstre/højre halvdel)
+            const centerX = mol.x + mol.width / 2;
+            mol.sort(centerX < canvas.width / 2 ? 'left' : 'right');
+        }
+
+        canvas.addEventListener('pointerup', endDrag);
+        canvas.addEventListener('pointercancel', endDrag);
+
+        // Hjælpefunktion til farver
+        function varColor(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        }
+
+        // --- START / RESET / GAMEOVER ---
+
+        window.startGame = function() {
+            document.getElementById('screen-start').classList.add('hidden');
+            state.practiceMode = document.getElementById('practice-toggle').checked;
+            document.getElementById('practice-badge-wrap').style.display = state.practiceMode ? 'flex' : 'none';
+            resetGameLogic();
+            showWaveIntro();
+        };
+
+        window.resetGame = function() {
+            document.getElementById('screen-gameover').classList.add('hidden');
+            document.getElementById('screen-victory').classList.add('hidden');
+            resetGameLogic();
+            showWaveIntro();
+        };
+
+        function resetGameLogic() {
+            state.money = 0;
+            state.purity = 100;
+            state.wave = 1;
+            state.combo = 0;
+            state.activeMolecules = [];
+            state.particles = [];
+            state.floatingTexts = [];
+            state.selectedMol = null;
+            state.molsSpawned = 0;
+            state.leftFill = 0;
+            state.rightFill = 0;
+            state.paused = false;
+            state.pauseUsesLeft = 3;
+            state.waveStats = { correct: 0, wrong: 0 };
+            state.waveBadges = [];
+            state.mistakes = [];
+
+            for (let key in state.activeBuffs) {
+                state.activeBuffs[key] = 0;
+            }
+            frostOverlay.classList.remove('frozen');
+
+            addMoney(0);
+            updatePurity(0);
+            checkShopAvailability();
+            updatePauseButton();
+        }
+
+        function triggerGameOver() {
+            state.isRunning = false;
+            document.getElementById('final-score').innerText = String(state.money).replace('.', ',');
+            renderBadgeSummary('gameover-badges');
+            renderMistakeList('gameover-mistakes');
+            document.getElementById('screen-gameover').classList.remove('hidden');
+        }
+
+        function triggerVictory() {
+            state.isRunning = false;
+            document.getElementById('victory-score').innerText = String(state.money).replace('.', ',');
+            renderBadgeSummary('victory-badges');
+            renderMistakeList('victory-mistakes');
+            document.getElementById('screen-victory').classList.remove('hidden');
+        }
+
+        // Responsive canvas
+        function resizeCanvas() {
+            const container = document.getElementById('game-container');
+            const targetRatio = 900 / 700;
+            const containerRatio = container.clientWidth / container.clientHeight;
+            
+            let finalWidth, finalHeight;
+            if (containerRatio > targetRatio) {
+                finalHeight = container.clientHeight;
+                finalWidth = finalHeight * targetRatio;
+            } else {
+                finalWidth = container.clientWidth;
+                finalHeight = finalWidth / targetRatio;
+            }
+            
+            canvas.style.width = finalWidth + 'px';
+            canvas.style.height = finalHeight + 'px';
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+    </script>
+</body>
+</html>

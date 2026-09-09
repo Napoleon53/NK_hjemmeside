@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pH-beregninger</title>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --success: #16a34a;
+            --error: #dc2626;
+            --hint: #d97706;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            font-weight: bold;
+            border: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .level-select {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .lvl-btn {
+            padding: 10px 14px;
+            border: 2px solid var(--border);
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.92rem;
+            white-space: nowrap;
+            transition: all 0.3s;
+            color: var(--secondary);
+        }
+
+        .lvl-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Guld-knap styling til gennemførte niveauer */
+        .lvl-btn.gold {
+            background: linear-gradient(135deg, #f59e0b, #fbbf24);
+            color: white;
+            border-color: #d97706;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+        }
+        .lvl-btn.gold.active {
+            box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.4);
+        }
+
+        .lore-text {
+            font-style: italic;
+            color: var(--secondary);
+            border-left: 4px solid var(--primary);
+            padding-left: 15px;
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .task-box {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .formula-box {
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-family: monospace;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            min-height: 25px;
+        }
+
+        .input-group {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .l4-step-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-bottom: 15px;
+            transition: opacity 0.3s;
+        }
+
+        .l4-step-box p {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .input-tiny { width: 45px; }
+        .input-small { width: 90px; }
+        .input-med { width: 120px; }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        input:disabled {
+            background: #e2e8f0;
+            cursor: not-allowed;
+            color: #94a3b8;
+            border-color: #cbd5e1;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .main-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .check-btn { background: var(--primary); color: white; }
+        .help-btn { background: var(--hint); color: white; }
+        .answer-btn { background: var(--secondary); color: white; }
+        .next-btn { background: var(--success); color: white; }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .feedback.show { display: block; }
+        .feedback.ok { background: #dcfce7; color: var(--success); border: 1px solid #bbf7d0; }
+        .feedback.err { background: #fee2e2; color: var(--error); border: 1px solid #fecaca; }
+
+        .calc-visual {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fffbeb;
+            border: 2px dashed #fcd34d;
+            border-radius: 8px;
+            font-family: monospace;
+            color: #92400e;
+            font-size: 1.05rem;
+            display: none;
+            white-space: pre-wrap;
+        }
+
+        .log-section {
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .log-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .log-item {
+            background: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .log-calc { 
+            font-family: monospace; 
+            color: var(--primary); 
+            background: #f1f5f9;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .empty-msg {
+            text-align: center;
+            padding: 40px;
+            color: var(--secondary);
+            font-style: italic;
+        }
+
+        .calc-note {
+            text-align: center;
+            color: var(--secondary);
+            font-size: 0.9rem;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .task-nav {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .task-nav-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: white;
+            color: var(--secondary);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .task-nav-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .task-nav-btn.active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.25);
+        }
+
+        .task-nav-btn.solved {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .task-nav-btn.solved.active {
+            box-shadow: 0 0 0 3px rgba(22,163,74,0.35);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>pH-beregninger</h1>
+    </header>
+
+    <div class="stats-bar">
+        <span>Point: <span id="points">0</span></span>
+        <span>Streak: <span id="streak">0</span></span>
+        <span>Løst: <span id="solvedCount">0</span>/18</span>
+    </div>
+
+    <div class="level-select">
+        <button class="lvl-btn active" id="btnL1" onclick="app.setLevel(1)">Niveau 1: Find pH</button>
+        <button class="lvl-btn" id="btnL2" onclick="app.setLevel(2)">Niveau 2: Find [H₃O⁺]</button>
+        <button class="lvl-btn" id="btnL3" onclick="app.setLevel(3)">Niveau 3: Find [OH⁻]</button>
+        <button class="lvl-btn" id="btnL4" onclick="app.setLevel(4)">Niveau 4: Stærke syrer</button>
+        <button class="lvl-btn" id="btnL5" onclick="app.setLevel(5)">Niveau 5: Stærke baser</button>
+    </div>
+
+    <div class="task-nav" id="taskNav"></div>
+
+    <div class="card" id="mainCard">
+        <div id="lore" class="lore-text"></div>
+        <div id="formula" class="formula-box"></div>
+        <div id="task" class="task-box"></div>
+        <div class="calc-note">Denne opgave kræver en lommeregner.</div>
+
+        <div class="input-group" id="regular-inputs">
+            <div id="row-h3o" class="input-row" style="display:none;">
+                <span id="label-h3o">[H₃O⁺] = </span>
+                <input type="text" id="in_coeff" class="input-small" placeholder="fx 1,2">
+                <span>· 10^</span>
+                <input type="text" id="in_exp" class="input-small" placeholder="fx -3">
+                <span> M</span>
+            </div>
+
+            <div id="row-ph" class="input-row">
+                <span id="label-ph">pH = </span>
+                <input type="text" id="in_ph" class="input-med" placeholder="fx 2,50">
+            </div>
+        </div>
+
+        <div class="input-group" id="l4-container" style="display:none;">
+            <div id="l4-step1" class="l4-step-box">
+                <p>1. Afstem opløsningen i vand:</p>
+                <div class="input-row">
+                    <input type="text" id="l4_c1" class="input-tiny" placeholder="1"> <span id="l4_base_name">NaOH</span> ⟶
+                    <input type="text" id="l4_c2" class="input-tiny" placeholder="1"> <span id="l4_cat_name">Na⁺</span> +
+                    <input type="text" id="l4_c3" class="input-tiny" placeholder="1"> <span>OH⁻</span>
+                </div>
+            </div>
+            <div id="l4-step2" class="l4-step-box" style="display:none;">
+                <p>2. Beregn hydroxidkoncentrationen [OH⁻]:</p>
+                <div class="input-row">
+                    <span>[OH⁻] = </span>
+                    <input type="text" id="l4_oh_c" class="input-small"> <span>· 10^</span> <input type="text" id="l4_oh_e" class="input-small"> <span>M</span>
+                </div>
+            </div>
+            <div id="l4-step3" class="l4-step-box" style="display:none;">
+                <p>3. Beregn [H₃O⁺] via vands ionprodukt (Kv = 1,0·10⁻¹⁴ M²):</p>
+                <div class="input-row">
+                    <span>[H₃O⁺] = </span>
+                    <input type="text" id="l4_h3o_c" class="input-small"> <span>· 10^</span> <input type="text" id="l4_h3o_e" class="input-small"> <span>M</span>
+                </div>
+            </div>
+            <div id="l4-step4" class="l4-step-box" style="display:none;">
+                <p>4. Beregn pH-værdien:</p>
+                <div class="input-row">
+                    <span>pH = </span>
+                    <input type="text" id="l4_ph" class="input-med">
+                </div>
+            </div>
+        </div>
+
+        <div class="input-group" id="l3oh-container" style="display:none;">
+            <div id="l3oh-step1" class="l4-step-box">
+                <p>1. Beregn [H₃O⁺] ud fra pH:</p>
+                <div class="input-row">
+                    <span>[H₃O⁺] = </span>
+                    <input type="text" id="l3_h3o_c" class="input-small"> <span>· 10^</span> <input type="text" id="l3_h3o_e" class="input-small"> <span>M</span>
+                </div>
+            </div>
+            <div id="l3oh-step2" class="l4-step-box">
+                <p>2. Beregn [OH⁻] via vands ionprodukt (Kv = 1,0·10⁻¹⁴ M²):</p>
+                <div class="input-row">
+                    <span>[OH⁻] = </span>
+                    <input type="text" id="l3_oh_c" class="input-small"> <span>· 10^</span> <input type="text" id="l3_oh_e" class="input-small"> <span>M</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-row">
+            <button class="main-btn check-btn" id="btnCheck" onclick="app.check()">Tjek Svar</button>
+            <button class="main-btn help-btn" id="btnHelp" onclick="app.showHelp()">Hjælp</button>
+            <button class="main-btn answer-btn" id="btnShowAns" style="display:none" onclick="app.revealAnswer()">Vis Facit</button>
+            <button class="main-btn next-btn" id="btnNext" style="display:none" onclick="app.nextTask()">Næste Opgave ⟶</button>
+        </div>
+
+        <div id="feedback" class="feedback"></div>
+        <div id="calcVisual" class="calc-visual"></div>
+    </div>
+
+    <div class="log-section" id="logSection" style="display:none;">
+        <h3>Historik</h3>
+        <ul id="logList" class="log-list"></ul>
+    </div>
+</div>
+
+<script>
+    // --- DATABASE ---
+    const tasks = {
+        lvl1: [
+            { id: "1a", name: "Mavesyre", lore: "Mavesyre består primært af saltsyre og er ekstremt sur for at dræbe bakterier.", c: 1.2, e: -2, text: "En prøve mavesyre har [H₃O⁺] = 1,2 · 10⁻² M. Beregn pH." },
+            { id: "1b", name: "Citronsaft", lore: "Citronsyre i frugter giver den karakteristiske sure smag og lave pH.", c: 4.5, e: -3, text: "Friskpresset citronsaft har [H₃O⁺] = 4,5 · 10⁻³ M. Beregn pH." },
+            { id: "1c", name: "Sort kaffe", lore: "Kaffe er let surt, hvilket påvirker både smagsoplevelsen og fordøjelsen.", c: 1.0, e: -5, text: "En kop sort kaffe har [H₃O⁺] = 1,0 · 10⁻⁵ M. Beregn pH." },
+            { id: "1d", name: "Regnvand", lore: "Naturligt regnvand er en smule surt pga. atmosfærens indhold af CO₂.", c: 2.5, e: -6, text: "Uforurenet regnvand har [H₃O⁺] = 2,5 · 10⁻⁶ M. Beregn pH." },
+            { id: "1e", name: "Sodavand", lore: "Mange læskedrikke tilsættes phosphorsyre, som sænker pH markant.", c: 3.1, e: -3, text: "En sodavand har [H₃O⁺] = 3,1 · 10⁻³ M. Beregn pH." }
+        ],
+        lvl2: [
+            { id: "2a", name: "Eddike", lore: "Eddike indeholder eddikesyre. Selvom det er en svag syre, måler vi her pH direkte.", ph: 2.5, text: "I en husholdningseddike måles pH til 2,5. Beregn oxoniumkoncentrationen." },
+            { id: "2b", name: "Æblesaft", lore: "Æbler indeholder æblesyre, som bidrager til saftens surhedsgrad.", ph: 3.4, text: "En ufiltreret æblesaft har en pH på 3,4. Beregn [H₃O⁺]." },
+            { id: "2c", name: "Rent vand", lore: "Ved 25 °C er rent vand neutralt, da autoprotolysen er i ligevægt.", ph: 7.0, text: "For helt rent vand er pH præcis 7,0. Hvad er [H₃O⁺]?" },
+            { id: "2d", name: "Sæbevand", lore: "Mange rengøringsmidler er basiske for bedre at kunne opløse fedt.", ph: 9.2, text: "En mild sæbeopløsning har pH = 9,2. Beregn oxoniumkoncentrationen." },
+            { id: "2e", name: "Havvand", lore: "Havet er naturligt let basisk, hvilket er vigtigt for korallernes kalkdannelse.", ph: 8.1, text: "Overfladevand i oceanerne har typisk en pH på 8,1. Beregn [H₃O⁺]." }
+        ],
+        lvl3: [
+            { id: "oh1", name: "Batterisyre", lore: "Blysyrebatterier i biler indeholder koncentreret svovlsyre, som gør elektrolytten stærkt sur.", c: 1.0, e: -1, text: "En prøve batterisyre har [H₃O⁺] = 1,0 · 10⁻¹ M. Beregn [OH⁻] ved brug af vands ionprodukt." },
+            { id: "oh2", name: "Ammoniakrens", lore: "Ammoniakholdige rengøringsmidler er stærkt basiske og bruges til at opløse fedt og snavs.", c: 4.0, e: -12, text: "Et ammoniakbaseret rengøringsmiddel har [H₃O⁺] = 4,0 · 10⁻¹² M. Beregn [OH⁻]." },
+            { id: "oh3", name: "Rødvin", lore: "Vin indeholder flere syrer, bl.a. vinsyre, som giver en forholdsvis lav pH.", ph: 3.6, text: "En rødvin har en pH på 3,6. Beregn først [H₃O⁺] og dernæst [OH⁻]." },
+            { id: "oh4", name: "Klorblegemiddel", lore: "Klorblegemiddel er stærkt basisk, hvilket stabiliserer det aktive hypoklorit-ion.", ph: 12.4, text: "Et klorblegemiddel har en pH på 12,4. Beregn først [H₃O⁺] og dernæst [OH⁻]." }
+        ],
+        lvl4: [
+            { id: "3a", name: "Saltsyre (HCl)", lore: "Saltsyre er en stærk syre, der reagerer fuldstændigt med vand.", c: 5.0, e: -2, rxn: "HCl + H₂O ⟶ Cl⁻ + H₃O⁺", text: "En opløsning af saltsyre har den formelle koncentration 5,0 · 10⁻² M." },
+            { id: "3b", name: "Salpetersyre (HNO₃)", lore: "Salpetersyre bruges bl.a. i produktionen af gødning og reagerer ligeledes fuldstændigt med vand.", c: 1.5, e: -2, rxn: "HNO₃ + H₂O ⟶ NO₃⁻ + H₃O⁺", text: "I laboratoriet har du en salpetersyre-opløsning med koncentrationen 1,5 · 10⁻² M." }
+        ],
+        lvl5: [
+            { id: "4a", name: "Natriumhydroxid", lore: "NaOH (kaustisk soda) er en stærk base, der dissocierer fuldstændigt.", c: 2.0, e: -2, base: "NaOH(s)", cat: "Na⁺(aq)", bal: [1, 1, 1], text: "Du har en opløsning af NaOH med formel koncentration på 2,0 · 10⁻² M." },
+            { id: "4b", name: "Calciumhydroxid", lore: "Ca(OH)₂ kaldes læsket kalk. Bemærk at hver formelenhed indeholder to hydroxid-ioner.", c: 1.5, e: -2, base: "Ca(OH)₂(s)", cat: "Ca²⁺(aq)", bal: [1, 1, 2], text: "En opløsning af Ca(OH)₂ har den formelle koncentration 1,5 · 10⁻² M." }
+        ]
+    };
+
+    // --- LOGIK ---
+    const app = {
+        level: 1,
+        points: 0,
+        streak: 0,
+        currentTask: null,
+        solvedIds: new Set(),
+        ohStep1Done: false,
+        strongAcidStep1Done: false,
+        l4step: 1,
+        logs: { 1: [], 2: [], 3: [], 4: [], 5: [] },
+
+        init() {
+            this.setLevel(1);
+        },
+
+        activateLevelTab(lvl) {
+            this.level = lvl;
+            document.querySelectorAll('.lvl-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btnL' + lvl).classList.add('active');
+        },
+
+        setLevel(lvl) {
+            this.activateLevelTab(lvl);
+            this.nextTask();
+        },
+
+        checkGoldStatus() {
+            [1, 2, 3, 4, 5].forEach(lvl => {
+                let pool = tasks["lvl" + lvl];
+                let allSolved = pool.every(t => this.solvedIds.has(t.id));
+                if(allSolved && pool.length > 0) {
+                    document.getElementById('btnL' + lvl).classList.add('gold');
+                }
+            });
+        },
+
+        nextTask() {
+            const pool = tasks['lvl' + this.level];
+            const available = pool.filter(t => !this.solvedIds.has(t.id));
+
+            if(available.length === 0) {
+                this.resetUI();
+                this.currentTask = null;
+                document.getElementById('task').innerHTML = "<b>Tillykke!</b> Alle opgaver i dette niveau er løst.";
+                document.getElementById('lore').innerText = "Du har mestret niveauet! Vælg et andet niveau i toppen for at fortsætte.";
+                document.getElementById('formula').innerText = "";
+                document.getElementById('regular-inputs').style.display = "none";
+                document.getElementById('l4-container').style.display = "none";
+                document.getElementById('l3oh-container').style.display = "none";
+                document.getElementById('btnCheck').style.display = "none";
+                document.getElementById('btnHelp').style.display = "none";
+                this.renderTaskNav();
+                this.renderLog();
+                return;
+            }
+
+            const task = available[Math.floor(Math.random() * available.length)];
+            this.loadTask(task);
+        },
+
+        goToTask(lvl, idx) {
+            this.activateLevelTab(lvl);
+            const task = tasks['lvl' + lvl][idx];
+            this.loadTask(task, this.solvedIds.has(task.id));
+        },
+
+        loadTask(task, reviewMode) {
+            this.resetUI();
+            this.currentTask = task;
+
+            document.getElementById('lore').innerText = task.lore;
+            document.getElementById('task').innerText = task.text;
+            document.getElementById('btnCheck').disabled = false;
+
+            const regInputs = document.getElementById('regular-inputs');
+            const l4Inputs = document.getElementById('l4-container');
+            const l3ohInputs = document.getElementById('l3oh-container');
+            const rowH3O = document.getElementById('row-h3o');
+            const rowPH = document.getElementById('row-ph');
+            const formula = document.getElementById('formula');
+
+            if(this.level === 1) {
+                formula.innerText = "pH = -log([H₃O⁺])";
+                regInputs.style.display = "flex";
+                l4Inputs.style.display = "none";
+                l3ohInputs.style.display = "none";
+                rowH3O.style.display = "none";
+                rowPH.style.display = "flex";
+                document.getElementById('label-ph').innerText = "pH = ";
+            } else if(this.level === 2) {
+                formula.innerText = "[H₃O⁺] = 10^(-pH) M";
+                regInputs.style.display = "flex";
+                l4Inputs.style.display = "none";
+                l3ohInputs.style.display = "none";
+                rowH3O.style.display = "flex";
+                rowPH.style.display = "none";
+                document.getElementById('label-h3o').innerText = "[H₃O⁺] = ";
+            } else if(this.level === 3) {
+                this.ohStep1Done = !task.ph;
+                formula.innerText = "Vands ionprodukt:  Kv = [H₃O⁺] · [OH⁻] = 1,0 · 10⁻¹⁴ M²";
+                regInputs.style.display = "none";
+                l4Inputs.style.display = "none";
+                l3ohInputs.style.display = "flex";
+                const ohStep1 = document.getElementById('l3oh-step1');
+                const ohStep2 = document.getElementById('l3oh-step2');
+                if(task.ph) {
+                    ohStep1.style.display = "block";
+                    ohStep1.style.opacity = "1";
+                    ohStep2.style.display = "none";
+                } else {
+                    ohStep1.style.display = "none";
+                    ohStep2.style.display = "block";
+                    ohStep2.style.opacity = "1";
+                }
+            } else if(this.level === 4) {
+                this.strongAcidStep1Done = false;
+                formula.innerText = "Stærk Syre:  " + task.rxn;
+                regInputs.style.display = "flex";
+                l4Inputs.style.display = "none";
+                l3ohInputs.style.display = "none";
+                rowH3O.style.display = "flex";
+                rowPH.style.display = "flex";
+                document.getElementById('label-h3o').innerText = "1. Find [H₃O⁺] = ";
+                document.getElementById('label-ph').innerText = "2. Beregn pH = ";
+                document.getElementById('in_ph').disabled = true;
+                rowPH.style.opacity = "0.5";
+            } else if(this.level === 5) {
+                this.l4step = 1;
+                formula.innerText = "Stærk Base: Opløses og dissocierer fuldstændigt i vand.";
+                regInputs.style.display = "none";
+                l4Inputs.style.display = "flex";
+                l3ohInputs.style.display = "none";
+                document.getElementById('l4_base_name').innerText = task.base;
+                document.getElementById('l4_cat_name').innerText = task.cat;
+            }
+
+            this.renderTaskNav();
+            this.renderLog();
+
+            if(reviewMode) this.showReview(task);
+        },
+
+        showReview(task) {
+            document.querySelectorAll('#regular-inputs input, #l4-container input, #l3oh-container input').forEach(i => i.disabled = true);
+            const ans = this.getAnswerString(task);
+            this.showFeedback("Denne opgave er allerede løst.\n" + ans, true, true);
+            document.getElementById('btnNext').innerText = "Næste tilfældige opgave ⟶";
+        },
+
+        renderTaskNav() {
+            const nav = document.getElementById('taskNav');
+            const pool = tasks['lvl' + this.level];
+            nav.innerHTML = "";
+            pool.forEach((t, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "task-nav-btn" + (this.solvedIds.has(t.id) ? " solved" : "");
+                if(this.currentTask && this.currentTask.id === t.id) btn.classList.add("active");
+                btn.type = "button";
+                btn.innerText = (idx + 1);
+                btn.title = t.name;
+                btn.onclick = () => this.goToTask(this.level, idx);
+                nav.appendChild(btn);
+            });
+        },
+
+        renderLog() {
+            const section = document.getElementById('logSection');
+            const list = document.getElementById('logList');
+            const entries = this.logs[this.level] || [];
+            list.innerHTML = "";
+            if(entries.length === 0) {
+                section.style.display = "none";
+                return;
+            }
+            section.style.display = "block";
+            entries.forEach(e => {
+                const li = document.createElement('li');
+                li.className = "log-item";
+                li.innerHTML = `<span><b>${e.name}</b></span><span class='log-calc'>${e.calc}</span>`;
+                list.appendChild(li);
+            });
+        },
+
+        check() {
+            this.hideHelp();
+            let isCorrect = false;
+
+            if(this.level === 1) {
+                const userVal = this.parseDK('in_ph');
+                const h3oVal = this.currentTask.c * Math.pow(10, this.currentTask.e);
+                const targetVal = -Math.log10(h3oVal);
+                if(Math.abs(userVal - targetVal) < 0.05) isCorrect = true;
+            } 
+            else if(this.level === 2) {
+                const userVal = this.parseSci('in_coeff', 'in_exp');
+                const targetVal = Math.pow(10, -this.currentTask.ph);
+                if(this.isClose(userVal, targetVal)) isCorrect = true;
+            }
+            else if(this.level === 3) {
+                if(this.currentTask.ph) {
+                    const targetH3O = Math.pow(10, -this.currentTask.ph);
+
+                    if(!this.ohStep1Done) {
+                        const userH3O = this.parseSci('l3_h3o_c', 'l3_h3o_e');
+                        if(this.isClose(userH3O, targetH3O)) {
+                            this.ohStep1Done = true;
+                            this.showFeedback("Korrekt [H₃O⁺]! Beregn nu [OH⁻] i trin 2.", true, false);
+                            this.revealL3OhStep2();
+                            return;
+                        } else {
+                            return this.handleFailure("Forkert [H₃O⁺]. Brug [H₃O⁺] = 10^(-pH).");
+                        }
+                    } else {
+                        const targetOH = 1e-14 / targetH3O;
+                        const userOH = this.parseSci('l3_oh_c', 'l3_oh_e');
+                        if(this.isClose(userOH, targetOH, 0.05)) isCorrect = true;
+                        else return this.handleFailure("Forkert [OH⁻]. Brug Kv = [H₃O⁺] · [OH⁻] = 1,0 · 10⁻¹⁴ M².");
+                    }
+                } else {
+                    const targetH3O = this.currentTask.c * Math.pow(10, this.currentTask.e);
+                    const targetOH = 1e-14 / targetH3O;
+                    const userOH = this.parseSci('l3_oh_c', 'l3_oh_e');
+                    if(this.isClose(userOH, targetOH, 0.05)) isCorrect = true;
+                    else return this.handleFailure("Forkert [OH⁻]. Brug Kv = [H₃O⁺] · [OH⁻] = 1,0 · 10⁻¹⁴ M².");
+                }
+            }
+            else if(this.level === 4) {
+                const targetH3o = this.currentTask.c * Math.pow(10, this.currentTask.e);
+
+                if(!this.strongAcidStep1Done) {
+                    const userH3o = this.parseSci('in_coeff', 'in_exp');
+                    if(this.isClose(userH3o, targetH3o, 0.01)) {
+                        this.strongAcidStep1Done = true;
+                        this.showFeedback("Korrekt! Da syren er stærk (1:1), er oxoniumkoncentrationen den samme som syrens. Beregn nu pH.", true, false);
+                        document.getElementById('in_ph').disabled = false;
+                        document.getElementById('row-ph').style.opacity = "1";
+                        document.getElementById('in_coeff').disabled = true;
+                        document.getElementById('in_exp').disabled = true;
+                        return;
+                    }
+                } else {
+                    const userPH = this.parseDK('in_ph');
+                    const targetPH = -Math.log10(targetH3o);
+                    if(Math.abs(userPH - targetPH) < 0.05) isCorrect = true;
+                }
+            }
+            else if(this.level === 5) {
+                if(this.l4step === 1) {
+                    let c1 = parseInt(document.getElementById('l4_c1').value);
+                    let c2 = parseInt(document.getElementById('l4_c2').value);
+                    let c3 = parseInt(document.getElementById('l4_c3').value);
+                    
+                    if(c1 === this.currentTask.bal[0] && c2 === this.currentTask.bal[1] && c3 === this.currentTask.bal[2]) {
+                        this.l4step = 2;
+                        this.showFeedback("Rigtigt afstemt! Gå videre til trin 2.", true, false);
+                        this.revealL4Step(2);
+                        return;
+                    } else {
+                        return this.handleFailure("Forkert afstemt. Tæl atomer og ladninger på hver side.");
+                    }
+                }
+                else if(this.l4step === 2) {
+                    let userOH = this.parseSci('l4_oh_c', 'l4_oh_e');
+                    let targetOH = (this.currentTask.c * Math.pow(10, this.currentTask.e)) * this.currentTask.bal[2];
+                    
+                    if(this.isClose(userOH, targetOH)) {
+                        this.l4step = 3;
+                        this.showFeedback("Korrekt [OH⁻]! Gå videre til trin 3.", true, false);
+                        this.revealL4Step(3);
+                        return;
+                    } else {
+                        return this.handleFailure("Forkert [OH⁻]. Husk at gange formelkoncentrationen med koefficienten for OH⁻.");
+                    }
+                }
+                else if(this.l4step === 3) {
+                    let userH3O = this.parseSci('l4_h3o_c', 'l4_h3o_e');
+                    let targetOH = (this.currentTask.c * Math.pow(10, this.currentTask.e)) * this.currentTask.bal[2];
+                    let targetH3O = 1e-14 / targetOH;
+                    
+                    if(this.isClose(userH3O, targetH3O, 0.05)) {
+                        this.l4step = 4;
+                        this.showFeedback("Korrekt [H₃O⁺]! Beregn til sidst pH i trin 4.", true, false);
+                        this.revealL4Step(4);
+                        return;
+                    } else {
+                        return this.handleFailure("Forkert [H₃O⁺]. Brug Kv = [H₃O⁺] · [OH⁻] = 1,0 · 10⁻¹⁴ M².");
+                    }
+                }
+                else if(this.l4step === 4) {
+                    let userPH = this.parseDK('l4_ph');
+                    let targetOH = (this.currentTask.c * Math.pow(10, this.currentTask.e)) * this.currentTask.bal[2];
+                    let targetH3O = 1e-14 / targetOH;
+                    let targetPH = -Math.log10(targetH3O);
+                    
+                    if(Math.abs(userPH - targetPH) < 0.05) {
+                        isCorrect = true;
+                    } else {
+                        return this.handleFailure("Forkert pH-værdi. Tast -log([H₃O⁺]).");
+                    }
+                }
+            }
+
+            if(isCorrect) this.handleSuccess();
+            else this.handleFailure();
+        },
+
+        handleSuccess() {
+            this.points += (10 * this.level);
+            this.streak++;
+            this.solvedIds.add(this.currentTask.id);
+            this.updateStats();
+            this.checkGoldStatus();
+            this.renderTaskNav();
+
+            this.showFeedback("Rigtigt! Flot regnet.", true, true);
+            this.addLogEntry(this.currentTask);
+        },
+
+        handleFailure(customMsg) {
+            this.streak = 0;
+            this.updateStats();
+            let msg = customMsg || "Ikke helt rigtigt. Prøv igen eller brug Hjælp-knappen.";
+            this.showFeedback(msg, false, false);
+            document.getElementById('btnShowAns').style.display = "block";
+        },
+
+        showFeedback(msg, isSuccess, isDone) {
+            const fb = document.getElementById('feedback');
+            fb.innerText = msg;
+            fb.className = "feedback show " + (isSuccess ? "ok" : "err");
+            
+            if(isDone) {
+                document.getElementById('btnCheck').style.display = "none";
+                document.getElementById('btnNext').style.display = "block";
+                document.getElementById('btnShowAns').style.display = "none";
+                document.getElementById('btnHelp').style.display = "none";
+                
+                // Disable last inputs for stærke baser (niveau 5)
+                if(this.level === 5) document.getElementById('l4_ph').disabled = true;
+            }
+        },
+
+        revealL4Step(step) {
+            document.getElementById('l4-step' + step).style.display = "block";
+            document.getElementById('l4-step' + step).style.opacity = "1";
+            document.getElementById('l4-step' + (step-1)).style.opacity = "0.6";
+
+            // Disable previous inputs
+            const prevInputs = document.getElementById('l4-step' + (step-1)).querySelectorAll('input');
+            prevInputs.forEach(inp => inp.disabled = true);
+        },
+
+        revealL3OhStep2() {
+            document.getElementById('l3oh-step2').style.display = "block";
+            document.getElementById('l3oh-step2').style.opacity = "1";
+            document.getElementById('l3oh-step1').style.opacity = "0.6";
+
+            const prevInputs = document.getElementById('l3oh-step1').querySelectorAll('input');
+            prevInputs.forEach(inp => inp.disabled = true);
+        },
+
+        showHelp() {
+            const cv = document.getElementById('calcVisual');
+            cv.style.display = "block";
+
+            let tip = "";
+            if(this.level === 1) {
+                tip = `Lommeregner-tip:\nTast: [ - ] [ log ] ( ${this.formatDK(this.currentTask.c)} · 10^${this.currentTask.e} )`;
+            } else if(this.level === 2) {
+                tip = `Lommeregner-tip:\nTast: [ 10 ] [ ^ ] ( -${this.formatDK(this.currentTask.ph)} )`;
+            } else if(this.level === 3) {
+                if(this.currentTask.ph && !this.ohStep1Done) tip = `Lommeregner-tip:\nTast: [ 10 ] [ ^ ] ( -${this.formatDK(this.currentTask.ph)} )`;
+                else tip = "Tip:\nBrug formlen: [OH⁻] = ( 1,0 · 10⁻¹⁴ ) / [H₃O⁺]";
+            } else if(this.level === 4) {
+                if(!this.strongAcidStep1Done) tip = "Pædagogisk tip:\nSe på reaktionsskemaet. For hvert molekyle stærk syre, dannes der præcis én H₃O⁺.";
+                else tip = `Lommeregner-tip:\nTast: [ - ] [ log ] ( ${this.formatDK(this.currentTask.c)} · 10^${this.currentTask.e} )`;
+            } else if(this.level === 5) {
+                if(this.l4step === 1) tip = "Tip: Tæl hvor mange OH der er inde i formlen. Skriv '1' i de felter, der kun har én.";
+                else if(this.l4step === 2) tip = `Tip:\n[OH⁻] = ${this.formatDK(this.currentTask.c)} · 10^${this.currentTask.e} ganget med koefficienten for OH⁻ fra trin 1.`;
+                else if(this.l4step === 3) tip = "Tip:\nBrug formlen: [H₃O⁺] = ( 1,0 · 10⁻¹⁴ ) / [OH⁻]";
+                else if(this.l4step === 4) tip = "Lommeregner-tip:\nBrug svaret fra trin 3: pH = -log([H₃O⁺])";
+            }
+            cv.innerText = tip;
+        },
+
+        hideHelp() {
+            document.getElementById('calcVisual').style.display = "none";
+        },
+
+        revealAnswer() {
+            this.hideHelp();
+            const ansStr = this.getAnswerString(this.currentTask);
+
+            this.showFeedback(ansStr + "\n(Opgaven er markeret som gennemgået)", true, true);
+            this.solvedIds.add(this.currentTask.id);
+            this.updateStats();
+            this.checkGoldStatus();
+            this.renderTaskNav();
+            this.addLogEntry(this.currentTask);
+        },
+
+        getAnswerString(task) {
+            if(this.level === 1) {
+                const val = -Math.log10(task.c * Math.pow(10, task.e));
+                return "Facit: pH = " + val.toFixed(2).replace('.', ',');
+            } else if(this.level === 2) {
+                const val = Math.pow(10, -task.ph);
+                return "Facit: [H₃O⁺] = " + this.formatSci(val);
+            } else if(this.level === 3) {
+                if(task.ph) {
+                    const tH3O = Math.pow(10, -task.ph);
+                    const tOH = 1e-14 / tH3O;
+                    return `Facit: [H₃O⁺] = ${this.formatSci(tH3O)} og [OH⁻] = ${this.formatSci(tOH)}`;
+                } else {
+                    const tH3O = task.c * Math.pow(10, task.e);
+                    const tOH = 1e-14 / tH3O;
+                    return `Facit: [OH⁻] = ${this.formatSci(tOH)}`;
+                }
+            } else if(this.level === 4) {
+                const val = -Math.log10(task.c * Math.pow(10, task.e));
+                return `Facit: [H₃O⁺] = ${this.formatDK(task.c)} · 10${this.toSuper(task.e)} M og pH = ${val.toFixed(2).replace('.', ',')}`;
+            } else if(this.level === 5) {
+                const tOH = (task.c * Math.pow(10, task.e)) * task.bal[2];
+                const tH3O = 1e-14 / tOH;
+                const tPH = -Math.log10(tH3O);
+                return `Facit:\nAfstemt med ${task.bal[2]} OH⁻\n[OH⁻] = ${this.formatSci(tOH)}\n[H₃O⁺] = ${this.formatSci(tH3O)}\npH = ${tPH.toFixed(2).replace('.', ',')}`;
+            }
+            return "";
+        },
+
+        getCalcString(task) {
+            if(this.level === 1) {
+                const h3o = task.c * Math.pow(10, task.e);
+                const ph = -Math.log10(h3o);
+                return `pH = -log(${this.formatDK(task.c)}·10${this.toSuper(task.e)}) = ${ph.toFixed(2).replace('.', ',')}`;
+            } else if(this.level === 2) {
+                const h3o = Math.pow(10, -task.ph);
+                return `[H₃O⁺] = 10^(-${this.formatDK(task.ph)}) = ${this.formatSci(h3o)}`;
+            } else if(this.level === 3) {
+                if(task.ph) {
+                    const tH3O = Math.pow(10, -task.ph);
+                    const tOH = 1e-14 / tH3O;
+                    return `[H₃O⁺] = 10^(-${this.formatDK(task.ph)}) = ${this.formatSci(tH3O)} ⟶ [OH⁻] = 1,0·10⁻¹⁴/[H₃O⁺] = ${this.formatSci(tOH)}`;
+                } else {
+                    const tH3O = task.c * Math.pow(10, task.e);
+                    const tOH = 1e-14 / tH3O;
+                    return `[OH⁻] = 1,0·10⁻¹⁴ / (${this.formatDK(task.c)}·10${this.toSuper(task.e)}) = ${this.formatSci(tOH)}`;
+                }
+            } else if(this.level === 4) {
+                const h3o = task.c * Math.pow(10, task.e);
+                const ph = -Math.log10(h3o);
+                return `C = [H₃O⁺] ⟶ pH = -log(${this.formatDK(task.c)}·10${this.toSuper(task.e)}) = ${ph.toFixed(2).replace('.', ',')}`;
+            } else if(this.level === 5) {
+                const tOH = (task.c * Math.pow(10, task.e)) * task.bal[2];
+                const tH3O = 1e-14 / tOH;
+                const tPH = -Math.log10(tH3O);
+                return `⟶ ${task.bal[2]} OH⁻ ⟶ [OH⁻]=${this.formatSci(tOH)} ⟶ [H₃O⁺]=${this.formatSci(tH3O)} ⟶ pH=${tPH.toFixed(2).replace('.', ',')}`;
+            }
+            return "";
+        },
+
+        addLogEntry(task) {
+            this.logs[this.level].unshift({ name: task.name, calc: this.getCalcString(task) });
+            this.renderLog();
+        },
+
+        /* Utils */
+        parseDK(id) { return parseFloat(document.getElementById(id).value.replace(',', '.')) || 0; },
+        parseSci(idC, idE) { 
+            let c = parseFloat(document.getElementById(idC).value.replace(',', '.')) || 0;
+            let e = parseInt(document.getElementById(idE).value) || 0;
+            return c * Math.pow(10, e);
+        },
+        isClose(user, target, tol=0.05) { return Math.abs(user - target) / target < tol; },
+        formatDK(num) { return num.toString().replace('.', ','); },
+        formatSci(val) {
+            if(val === 0) return "0";
+            const exp = Math.floor(Math.log10(val));
+            const coeff = val / Math.pow(10, exp);
+            return coeff.toFixed(2).replace('.', ',') + " · 10" + this.toSuper(exp);
+        },
+        toSuper(n) {
+            const map = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻'};
+            return n.toString().split('').map(c => map[c] || c).join('');
+        },
+        updateStats() {
+            document.getElementById('points').innerText = this.points;
+            document.getElementById('streak').innerText = this.streak;
+            document.getElementById('solvedCount').innerText = this.solvedIds.size;
+        },
+
+        resetUI() {
+            document.querySelectorAll('input').forEach(i => { i.value = ""; i.disabled = false; });
+            document.getElementById('feedback').className = "feedback";
+            document.getElementById('calcVisual').style.display = "none";
+            document.getElementById('btnCheck').style.display = "block";
+            document.getElementById('btnHelp').style.display = "block";
+            document.getElementById('btnNext').style.display = "none";
+            document.getElementById('btnNext').innerText = "Næste Opgave ⟶";
+            document.getElementById('btnShowAns').style.display = "none";
+            
+            // L3 specifik
+            const rph = document.getElementById('row-ph');
+            if(rph) rph.style.opacity = "1";
+            
+            // L4 specifik
+            [1,2,3,4].forEach(i => {
+                let el = document.getElementById('l4-step'+i);
+                if(el) {
+                    el.style.display = (i === 1) ? "block" : "none";
+                    el.style.opacity = "1";
+                }
+            });
+
+            // Niveau 3 (OH-) specifik
+            [1,2].forEach(i => {
+                let el = document.getElementById('l3oh-step'+i);
+                if(el) {
+                    el.style.display = (i === 1) ? "block" : "none";
+                    el.style.opacity = "1";
+                }
+            });
+        }
+    };
+
+    window.onload = () => app.init();
+</script>
+
+</body>
+</html>

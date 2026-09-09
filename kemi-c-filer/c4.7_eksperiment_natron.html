@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtuelt Lab: Natronforsøget</title>
+    <style>
+        :root {
+            --bg: #121212;
+            --panel: #1e1e24;
+            --accent: #f59e0b;
+            --text: #e4e4e7;
+            --success: #22c55e;
+            --success-bg: rgba(34, 197, 94, 0.3); /* Kraftigere grøn baggrund */
+            --error: #ef4444;
+            --error-bg: rgba(239, 68, 68, 0.25);
+            --border: #3f3f46;
+            --input-bg: #27272a;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        /* HEADER */
+        header {
+            padding: 10px 20px;
+            background: #09090b;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h1 { margin: 0; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; color: #a1a1aa; }
+        .step-indicator { font-size: 0.9rem; font-weight: bold; color: var(--accent); }
+
+        /* MAIN LAYOUT */
+        .main-stage {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            padding: 15px;
+            gap: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* PRE-LAB OVERLAY */
+        #preLabOverlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--bg);
+            z-index: 100;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto;
+        }
+        .quiz-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 850px;
+            width: 100%;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .quiz-card h3 { 
+            color: var(--accent); margin-top: 0; 
+            border-bottom: 1px solid #333; padding-bottom: 10px; 
+        }
+        
+        .quiz-section {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 6px;
+            border-left: 2px solid #333;
+            transition: 0.3s;
+        }
+        .quiz-section.locked { opacity: 0.5; pointer-events: none; }
+        .quiz-section.unlocked { opacity: 1; pointer-events: auto; border-left-color: var(--accent); background: rgba(255,255,255,0.05); }
+        
+        .reaction-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+            background: #000;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .info-text { font-size: 0.85rem; color: #888; margin-bottom: 8px; font-style: italic; }
+
+        /* FORKLARENDE HINTS */
+        .hint {
+            display: none;
+            margin-top: 8px;
+            padding: 8px 10px;
+            background: rgba(245, 158, 11, 0.12);
+            border-left: 3px solid var(--accent);
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #fbbf24;
+        }
+        .hint.show { display: block; }
+
+        input[readonly] {
+            background: #19191c;
+            color: #aaa;
+            cursor: not-allowed;
+            border-color: #333;
+        }
+
+        input[type="text"], input[type="number"] {
+            background: var(--input-bg);
+            border: 1px solid #555;
+            color: #fff;
+            padding: 6px;
+            border-radius: 4px;
+            width: 80px;
+            text-align: center;
+            font-size: 1rem;
+            transition: 0.2s ease-in-out;
+        }
+        input:focus { outline: none; border-color: var(--accent); }
+        
+        /* FORBEDRET VALIDERINGS-STYLING */
+        input.valid { 
+            border: 2px solid var(--success); /* Tykkere kant */
+            background-color: var(--success-bg); 
+            color: #fff; 
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.4); /* Tydelig glød */
+        }
+        input.invalid { 
+            border: 2px solid var(--error); 
+            background-color: var(--error-bg); 
+        }
+
+        input.coeff { 
+            width: 45px; 
+            font-weight: bold;
+            font-size: 1.1rem;
+            border-color: #666;
+        }
+
+        /* LAB INTERFACE */
+        #labInterface { display: none; flex: 1; min-height: 0; width: 100%; gap: 20px; }
+        #labInterface.active { display: flex; }
+
+        .lab-left { flex: 2; min-height: 0; display: flex; flex-direction: column; gap: 15px; }
+        .lab-right { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 15px; }
+
+        .canvas-container {
+            flex: 2;
+            min-height: 0;
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            position: relative;
+        }
+        canvas { width: 100%; height: 100%; display: block; }
+        .graph-container {
+            flex: 1;
+            min-height: 120px;
+            width: 50%;
+            align-self: center;
+            background: #18181b;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            position: relative;
+        }
+
+        /* CONTROLS */
+        .panel {
+            background: var(--panel);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .digital-display {
+            background: #000;
+            color: var(--success);
+            font-family: 'Courier New', monospace;
+            font-size: 2.2rem;
+            text-align: right;
+            padding: 10px;
+            border: 2px solid #333;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+        .btn {
+            background: #333; color: white; border: none; padding: 8px 16px;
+            border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s; font-size: 0.9rem;
+        }
+        .btn:hover { background: #444; }
+        .btn.primary { background: var(--accent); color: #000; }
+        .btn.check { background: #27272a; border: 1px solid #555; }
+        .btn.check:hover { background: #3f3f46; border-color: #888; }
+        
+        .btn.heat { background: #e11d48; width: 100%; margin-top: 10px; padding: 12px; font-size: 1rem;}
+        .btn.heat.active { background: #555; }
+        .btn-reset { background: #3f3f46; font-size: 0.8rem; padding: 5px 10px; margin-right: 10px;}
+
+        /* MODAL */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 200; justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: var(--panel); padding: 30px; border-radius: 12px;
+            max-width: 500px; width: 90%; border: 1px solid var(--accent); text-align: center;
+        }
+        .result-table { width: 100%; margin: 20px 0; border-collapse: collapse; }
+        .result-table td { padding: 8px; border-bottom: 1px solid #444; }
+
+        /* JOURNAL */
+        #journalOverlay { align-items: flex-start; overflow-y: auto; padding: 30px 15px; }
+        #journalOverlay .modal-content { max-width: 700px; text-align: left; }
+        .journal-section { margin-bottom: 15px; }
+        .journal-section h4 { color: var(--accent); margin-bottom: 6px; border-bottom: 1px solid #333; padding-bottom: 4px; }
+        .journal-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .journal-table td { padding: 4px 6px; border-bottom: 1px solid #333; }
+        .journal-actions { display: flex; gap: 10px; margin-top: 20px; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #journalOverlay, #journalOverlay * { visibility: visible; }
+            #journalOverlay { position: absolute; top: 0; left: 0; width: 100%; background: #fff !important; }
+            #journalOverlay, #journalOverlay .modal-content { color: #000 !important; background: #fff !important; border: none; box-shadow: none; }
+            #journalOverlay h2, #journalOverlay h4 { color: #000 !important; }
+            #journalOverlay .journal-actions { display: none; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div style="display:flex; align-items:center;">
+            <h1>Journaløvelse: Natron</h1>
+        </div>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <button class="btn btn-reset" onclick="hardReset()">↻ Start Forfra</button>
+            <div id="stepIndicator" class="step-indicator">Fase 1: Pre-lab</div>
+        </div>
+    </header>
+
+    <div class="main-stage">
+        
+        <div id="preLabOverlay">
+            <h2 style="color:var(--accent)">Pre-lab: Beregninger</h2>
+            <p>Udfyld felterne og tryk "Tjek". Felterne lyser grønt, når de er korrekte.</p>
+            
+            <div class="quiz-card">
+                <h3>1. Molarmasse & Stofmængde</h3>
+                
+                <div class="quiz-section unlocked">
+                    <div class="info-text">Beregn molarmassen for natron (NaHCO₃).<br>Atomvægte: Na=22,99; H=1,01; C=12,01; O=16,00.</div>
+                    <div class="input-row">
+                        <label>M(NaHCO₃):</label>
+                        <input type="text" id="inp_M_Start" placeholder="0,00"> g/mol
+                        <button class="btn check" onclick="validateStep1()">Tjek</button>
+                    </div>
+                    <div class="hint" id="hint_inp_M_Start">💡 Læg atomvægtene sammen for ét Na, ét H, ét C og tre O: 22,99 + 1,01 + 12,01 + 3×16,00.</div>
+                </div>
+
+                <div class="quiz-section locked" id="sec_StartMass">
+                    <div class="input-row" style="margin-bottom:10px;">
+                        <label>Vi afvejer:</label>
+                        <input type="text" id="inp_m_Start" value="5,00" readonly style="width:60px;"> g NaHCO₃
+                    </div>
+                    <div class="input-row">
+                        <label>Beregn stofmængde (n = m/M):</label>
+                        <input type="text" id="inp_n_Start" placeholder="0,000"> mol
+                        <button class="btn check" onclick="validateStep2()">Tjek</button>
+                    </div>
+                    <div class="hint" id="hint_inp_n_Start">💡 Brug formlen n = m / M. Del din afvejede masse (ovenfor) med molarmassen M(NaHCO₃) = 84,01 g/mol.</div>
+                </div>
+            </div>
+
+            <div class="quiz-card" id="card_HypA" style="opacity:0.5; pointer-events:none;">
+                <h3>Hypotese A: (Hvis Na₂O dannes)</h3>
+                
+                <div class="quiz-section unlocked">
+                    <div class="info-text">Trin 1: Afstem HELE reaktionsskemaet.</div>
+                    <div class="reaction-row">
+                        <input type="number" class="coeff" id="cA_1"> NaHCO₃ 
+                        <span>→</span> 
+                        <input type="number" class="coeff" id="cA_2"> Na₂O + 
+                        <input type="number" class="coeff" id="cA_3"> CO₂ + 
+                        <input type="number" class="coeff" id="cA_4"> H₂O
+                    </div>
+                    <button class="btn check" onclick="validateHypA_Balance()">Tjek Afstemning</button>
+                    <div class="hint" id="hint_cA_Balance">💡 Tæl atomerne på begge sider af pilen: der skal være lige mange Na-, C-, H- og O-atomer før og efter reaktionen.</div>
+                </div>
+
+                <div class="quiz-section locked" id="sec_HypA_Mol">
+                    <div class="info-text">Trin 2: Bestem stofmængden af Na₂O.<br>Brug antalsforholdet fra reaktionsskemaet.</div>
+                    <div class="input-row">
+                        <label>n(Na₂O):</label>
+                        <input type="text" id="inp_n_A" placeholder="0,000"> mol
+                        <button class="btn check" onclick="validateHypA_Mol()">Tjek Stofmængde</button>
+                    </div>
+                    <div class="hint" id="hint_inp_n_A">💡 Det afstemte skema viser at 2 mol NaHCO₃ giver 1 mol Na₂O. Tag n(NaHCO₃) fra Trin 1 og halvér den.</div>
+                </div>
+
+                <div class="quiz-section locked" id="sec_HypA_Mass">
+                    <div class="info-text">Trin 3: Beregn massen af det faste stof (Na₂O).<br>(M(Na₂O) = 61,98 g/mol)</div>
+                    <div class="input-row">
+                        <label>Masse (m = n &middot; M):</label>
+                        <input type="text" id="inp_m_A" placeholder="0,00"> g
+                        <button class="btn check" onclick="validateHypA_Mass()">Tjek Masse</button>
+                    </div>
+                    <div class="hint" id="hint_inp_m_A">💡 Brug m = n · M. Sæt n(Na₂O), som du lige har fundet, ind sammen med M(Na₂O) = 61,98 g/mol.</div>
+                </div>
+            </div>
+
+            <div class="quiz-card" id="card_HypB" style="opacity:0.5; pointer-events:none;">
+                <h3>Hypotese B: (Hvis Na₂CO₃ dannes)</h3>
+                
+                <div class="quiz-section unlocked">
+                    <div class="info-text">Trin 1: Afstem HELE reaktionsskemaet.</div>
+                    <div class="reaction-row">
+                        <input type="number" class="coeff" id="cB_1"> NaHCO₃ 
+                        <span>→</span> 
+                        <input type="number" class="coeff" id="cB_2"> Na₂CO₃ + 
+                        <input type="number" class="coeff" id="cB_3"> CO₂ + 
+                        <input type="number" class="coeff" id="cB_4"> H₂O
+                    </div>
+                    <button class="btn check" onclick="validateHypB_Balance()">Tjek Afstemning</button>
+                    <div class="hint" id="hint_cB_Balance">💡 Tæl atomerne igen: 2 mol NaHCO₃ skal give 1 mol Na₂CO₃ + 1 mol CO₂ + 1 mol H₂O.</div>
+                </div>
+
+                <div class="quiz-section locked" id="sec_HypB_Mol">
+                    <div class="info-text">Trin 2: Bestem stofmængden af Na₂CO₃.<br>Brug antalsforholdet fra reaktionsskemaet.</div>
+                    <div class="input-row">
+                        <label>n(Na₂CO₃):</label>
+                        <input type="text" id="inp_n_B" placeholder="0,000"> mol
+                        <button class="btn check" onclick="validateHypB_Mol()">Tjek Stofmængde</button>
+                    </div>
+                    <div class="hint" id="hint_inp_n_B">💡 Samme forhold som før: 2 mol NaHCO₃ giver 1 mol Na₂CO₃. Halvér n(NaHCO₃) fra Trin 1.</div>
+                </div>
+
+                <div class="quiz-section locked" id="sec_HypB_Mass">
+                    <div class="info-text">Trin 3: Beregn massen af det faste stof (Na₂CO₃).<br>(M(Na₂CO₃) = 105,99 g/mol)</div>
+                    <div class="input-row">
+                        <label>Masse (m = n &middot; M):</label>
+                        <input type="text" id="inp_m_B" placeholder="0,00"> g
+                        <button class="btn check" onclick="validateHypB_Mass()">Tjek Masse</button>
+                    </div>
+                    <div class="hint" id="hint_inp_m_B">💡 Brug m = n · M med M(Na₂CO₃) = 105,99 g/mol.</div>
+                </div>
+            </div>
+
+            <div id="finalActionArea" style="display:none; gap:10px; margin-bottom:50px;">
+                <div id="cheatBadge" style="display:none; background:rgba(239,68,68,0.1); border:2px dashed var(--error); padding:12px; border-radius:4px; margin-bottom:10px; text-align:center;">
+                    <div style="font-weight:bold; color:var(--error); letter-spacing:1px;">📜 SNYDEBEVIS</div>
+                    <div style="font-size:0.85rem; color:#ddd; margin-top:4px;">Hermed bevidnes at "Snyd"-knappen blev brugt. Beregningerne er ikke lavet selv, og der er ikke opnået faglig indsigt fra denne øvelse.</div>
+                </div>
+                <div id="noErrorBadge" style="display:none; background:rgba(245,158,11,0.15); border:1px solid var(--accent); padding:10px; border-radius:4px; margin-bottom:10px; text-align:center; font-weight:bold; color:var(--accent);">
+                    🏆 Flot! Du gennemførte alle beregninger uden en eneste fejlindtastning.
+                </div>
+                <div style="background:rgba(34, 197, 94, 0.2); padding:10px; border-radius:4px; margin-bottom:10px; text-align:center;">
+                    Alle beregninger er godkendt! Du er klar til laboratoriet.
+                </div>
+                <button class="btn primary" style="width:100%; padding:15px;" onclick="startLab()">Gå til Laboratoriet</button>
+            </div>
+            
+            <button class="btn" onclick="fillCheat()" style="margin-top:20px; background:#333; font-size:0.8rem; opacity:0.5;">Snyd (Udfyld alt)</button>
+        </div>
+
+        <div id="labInterface">
+            <div class="lab-left">
+                <div class="canvas-container">
+                    <div style="position:absolute; top:10px; left:10px; color:#aaa; font-size:0.8rem;">
+                        <div>• Makro: Digel</div>
+                        <div>• Mikro: Partikler</div>
+                    </div>
+                    <canvas id="simCanvas"></canvas>
+                </div>
+                <div class="graph-container">
+                    <canvas id="graphCanvas"></canvas>
+                </div>
+            </div>
+
+            <div class="lab-right">
+                <div class="panel">
+                    <label style="color:#888; font-size:0.8rem;">Indholdets Masse (g)</label>
+                    <div class="digital-display" id="massDisplay">0,00 g</div>
+                    
+                    <div style="margin-top:20px; font-size:0.9rem; color:#ccc;">
+                        <div>Startmasse: <span id="labStartMass" style="color:#fff; font-weight:bold;"></span></div>
+                        <div style="margin-top:5px;">Temp: <span id="labTemp">20°C</span></div>
+                    </div>
+
+                    <button id="heatBtn" class="btn heat" onclick="toggleHeat()">Tænd Bunsenbrænder</button>
+                    
+                    <hr style="border:0; border-top:1px solid #444; margin:20px 0;">
+                    
+                    <p style="font-size:0.85rem; color:#aaa;">Opvarm indtil massen er konstant på grafen (vandret linje). Sluk derefter og stop forsøget.</p>
+                    <button id="finishBtn" class="btn primary" style="width:100%;" onclick="finishExperiment()">Stop & Analyser</button>
+                </div>
+                
+                <div class="panel">
+                    <strong>Dine Pre-lab Tal:</strong>
+                    <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:0.9rem;">
+                        <span>Teori A (Na₂O):</span>
+                        <span id="labTheoA" style="color:var(--accent); font-weight:bold;">-</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-top:5px; font-size:0.9rem;">
+                        <span>Teori B (Na₂CO₃):</span>
+                        <span id="labTheoB" style="color:var(--accent); font-weight:bold;">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <h2 style="color:var(--accent)">Forsøgsresultat</h2>
+            
+            <table class="result-table">
+                <tr><td>Startmasse</td><td id="resStart"></td></tr>
+                <tr><td>Slutmasse (Målt)</td><td id="resEnd" style="font-weight:bold; color:var(--success); font-size:1.2rem;"></td></tr>
+                <tr><td>Teori A (Na₂O)</td><td id="resTheoA"></td></tr>
+                <tr><td>Teori B (Na₂CO₃)</td><td id="resTheoB" style="border: 2px solid var(--accent)"></td></tr>
+            </table>
+
+            <p>Hvilken hypotese passer bedst med din målte slutmasse?</p>
+            
+            <div style="display:flex; gap:10px; justify-content:center; margin-bottom:15px;">
+                <button class="btn" onclick="conclude('A')">Na₂O</button>
+                <button class="btn" onclick="conclude('B')">Na₂CO₃</button>
+            </div>
+            
+            <div id="conclusionFeedback" style="font-weight:bold; min-height:40px; padding:10px; border-radius:4px;"></div>
+
+            <button class="btn primary" id="journalBtn" style="margin-top:10px; display:none; width:100%;" onclick="showJournal()">📄 Vis min journal</button>
+            <button class="btn" style="margin-top:10px; background:#444;" onclick="hardReset()">Start Helt Forfra</button>
+        </div>
+    </div>
+
+    <div id="journalOverlay" class="modal">
+        <div class="modal-content" id="journalContent"></div>
+    </div>
+
+<script>
+    // --- GLOBALE KONSTANTER ---
+    const M_NaHCO3 = 84.01;
+    const M_Na2O = 61.98;
+    const M_Na2CO3 = 105.99;
+    
+    // --- SIM STATE ---
+    let sim = {
+        active: false,
+        startMass: 5.00,
+        currentMass: 5.00,
+        targetMass: 0, 
+        heating: false,
+        temp: 20, 
+        particles: [],
+        graphData: [],
+        theoA: 0,
+        theoB: 0,
+        timeStep: 0,
+        convertedCount: 0,
+        totalReactants: 40,
+        conclusionChoice: null,
+        conclusionCorrect: null,
+        hasHeatedOnce: false,
+        lastSampleTime: 0
+    };
+
+    // --- HINT / FEJL-SPORING ---
+    let attemptCounts = {};
+    let anyError = false;
+    let usedCheat = false;
+
+    function trackAttempt(hintId, allValid) {
+        if (allValid) {
+            attemptCounts[hintId] = 0;
+            const h = document.getElementById(hintId);
+            if (h) h.classList.remove('show');
+            return;
+        }
+        anyError = true;
+        attemptCounts[hintId] = (attemptCounts[hintId] || 0) + 1;
+        if (attemptCounts[hintId] >= 2) {
+            const h = document.getElementById(hintId);
+            if (h) h.classList.add('show');
+        }
+    }
+
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    const graphCanvas = document.getElementById('graphCanvas');
+    const ctxGraph = graphCanvas.getContext('2d');
+
+    // --- HELPER FUNKTIONER ---
+    function parseInput(id) {
+        let val = document.getElementById(id).value;
+        val = val.replace(',', '.'); 
+        return parseFloat(val);
+    }
+
+    function formatNum(num, decimals) {
+        return num.toFixed(decimals).replace('.', ',');
+    }
+
+    function setValid(id, isValid) {
+        const el = document.getElementById(id);
+        if (isValid) {
+            el.classList.add('valid');
+            el.classList.remove('invalid');
+        } else {
+            el.classList.add('invalid');
+            el.classList.remove('valid');
+        }
+        return isValid;
+    }
+
+    function unlockSection(id) {
+        const el = document.getElementById(id);
+        el.classList.remove('locked');
+        el.classList.add('unlocked');
+    }
+
+    function unlockCard(id) {
+        const el = document.getElementById(id);
+        el.style.opacity = "1";
+        el.style.pointerEvents = "auto";
+    }
+
+    // --- PRE-LAB VALIDERINGS LOGIK ---
+
+    function validateStep1() {
+        const userM = parseInput('inp_M_Start');
+        const valid = Math.abs(userM - M_NaHCO3) < 0.2;
+        trackAttempt('hint_inp_M_Start', valid);
+        if (setValid('inp_M_Start', valid)) {
+            unlockSection('sec_StartMass');
+        }
+    }
+
+    function validateStep2() {
+        const m = parseInput('inp_m_Start');
+        const userN = parseInput('inp_n_Start');
+        const trueN = m / M_NaHCO3;
+
+        const valid = Math.abs(userN - trueN) < 0.002;
+        trackAttempt('hint_inp_n_Start', valid);
+        if (setValid('inp_n_Start', valid)) {
+            unlockCard('card_HypA');
+            unlockCard('card_HypB');
+        }
+    }
+
+    // HYPOTESE A VALIDERINGS KÆDE
+    function validateHypA_Balance() {
+        const c1 = parseInt(document.getElementById('cA_1').value);
+        const c2 = parseInt(document.getElementById('cA_2').value);
+        const c3 = parseInt(document.getElementById('cA_3').value);
+        const c4 = parseInt(document.getElementById('cA_4').value);
+
+        // Hypotese A: 2 NaHCO3 -> 1 Na2O + 2 CO2 + 1 H2O
+        const v1 = setValid('cA_1', c1 === 2);
+        const v2 = setValid('cA_2', c2 === 1);
+        const v3 = setValid('cA_3', c3 === 2);
+        const v4 = setValid('cA_4', c4 === 1);
+
+        const allValid = v1 && v2 && v3 && v4;
+        trackAttempt('hint_cA_Balance', allValid);
+        if (allValid) {
+            unlockSection('sec_HypA_Mol');
+        }
+    }
+
+    function validateHypA_Mol() {
+        const userN = parseInput('inp_n_A');
+        const mStart = parseInput('inp_m_Start');
+        const nStart = mStart / M_NaHCO3;
+        const nTarget = nStart / 2; // Ratio 2:1
+
+        const valid = Math.abs(userN - nTarget) < 0.002;
+        trackAttempt('hint_inp_n_A', valid);
+        if (setValid('inp_n_A', valid)) {
+            unlockSection('sec_HypA_Mass');
+        }
+    }
+
+    function validateHypA_Mass() {
+        const userM = parseInput('inp_m_A');
+        const mStart = parseInput('inp_m_Start');
+        const nStart = mStart / M_NaHCO3;
+        const mTarget = (nStart / 2) * M_Na2O;
+
+        const valid = Math.abs(userM - mTarget) < 0.2;
+        trackAttempt('hint_inp_m_A', valid);
+        if (setValid('inp_m_A', valid)) {
+            checkIfAllDone();
+        }
+    }
+
+    // HYPOTESE B VALIDERINGS KÆDE
+    function validateHypB_Balance() {
+        const c1 = parseInt(document.getElementById('cB_1').value);
+        const c2 = parseInt(document.getElementById('cB_2').value);
+        const c3 = parseInt(document.getElementById('cB_3').value);
+        const c4 = parseInt(document.getElementById('cB_4').value);
+
+        // Hypotese B: 2 NaHCO3 -> 1 Na2CO3 + 1 CO2 + 1 H2O
+        const v1 = setValid('cB_1', c1 === 2);
+        const v2 = setValid('cB_2', c2 === 1);
+        const v3 = setValid('cB_3', c3 === 1);
+        const v4 = setValid('cB_4', c4 === 1);
+
+        const allValid = v1 && v2 && v3 && v4;
+        trackAttempt('hint_cB_Balance', allValid);
+        if (allValid) {
+            unlockSection('sec_HypB_Mol');
+        }
+    }
+
+    function validateHypB_Mol() {
+        const userN = parseInput('inp_n_B');
+        const mStart = parseInput('inp_m_Start');
+        const nStart = mStart / M_NaHCO3;
+        const nTarget = nStart / 2; // Ratio 2:1
+
+        const valid = Math.abs(userN - nTarget) < 0.002;
+        trackAttempt('hint_inp_n_B', valid);
+        if (setValid('inp_n_B', valid)) {
+            unlockSection('sec_HypB_Mass');
+        }
+    }
+
+    function validateHypB_Mass() {
+        const userM = parseInput('inp_m_B');
+        const mStart = parseInput('inp_m_Start');
+        const nStart = mStart / M_NaHCO3;
+        const mTarget = (nStart / 2) * M_Na2CO3;
+
+        const valid = Math.abs(userM - mTarget) < 0.2;
+        trackAttempt('hint_inp_m_B', valid);
+        if (setValid('inp_m_B', valid)) {
+            checkIfAllDone();
+        }
+    }
+
+    function checkIfAllDone() {
+        const a = document.getElementById('inp_m_A').classList.contains('valid');
+        const b = document.getElementById('inp_m_B').classList.contains('valid');
+        if (a && b) {
+            document.getElementById('finalActionArea').style.display = "flex";
+            document.getElementById('finalActionArea').style.flexDirection = "column";
+            if (usedCheat) {
+                document.getElementById('cheatBadge').style.display = 'block';
+            } else if (!anyError) {
+                document.getElementById('noErrorBadge').style.display = 'block';
+            }
+        }
+    }
+
+    function fillCheat() {
+        usedCheat = true;
+        document.getElementById('inp_M_Start').value = formatNum(M_NaHCO3, 2);
+        validateStep1();
+        
+        const m = parseInput('inp_m_Start');
+        const n = m / M_NaHCO3;
+        document.getElementById('inp_n_Start').value = formatNum(n, 3);
+        validateStep2();
+
+        // A
+        document.getElementById('cA_1').value = 2;
+        document.getElementById('cA_2').value = 1;
+        document.getElementById('cA_3').value = 2;
+        document.getElementById('cA_4').value = 1;
+        validateHypA_Balance();
+        document.getElementById('inp_n_A').value = formatNum(n/2, 3);
+        validateHypA_Mol();
+        document.getElementById('inp_m_A').value = formatNum((n/2)*M_Na2O, 2);
+        validateHypA_Mass();
+
+        // B
+        document.getElementById('cB_1').value = 2;
+        document.getElementById('cB_2').value = 1;
+        document.getElementById('cB_3').value = 1;
+        document.getElementById('cB_4').value = 1;
+        validateHypB_Balance();
+        document.getElementById('inp_n_B').value = formatNum(n/2, 3);
+        validateHypB_Mol();
+        document.getElementById('inp_m_B').value = formatNum((n/2)*M_Na2CO3, 2);
+        validateHypB_Mass();
+    }
+
+    function startLab() {
+        sim.startMass = parseInput('inp_m_Start');
+        sim.currentMass = sim.startMass;
+        sim.theoA = parseInput('inp_m_A');
+        sim.theoB = parseInput('inp_m_B');
+        
+        const trueB = sim.startMass * (M_Na2CO3 / (2*M_NaHCO3));
+        const noise = 1 + ((Math.random() - 0.5) * 0.03); // +/- 1.5% støj
+        sim.targetMass = trueB * noise;
+
+        sim.active = true;
+
+        document.getElementById('preLabOverlay').style.display = 'none';
+        document.getElementById('labInterface').classList.add('active');
+        document.getElementById('stepIndicator').textContent = "Fase 2: Eksperiment";
+
+        document.getElementById('labStartMass').textContent = formatNum(sim.startMass, 2) + " g";
+        document.getElementById('massDisplay').textContent = formatNum(sim.currentMass, 2) + " g";
+        document.getElementById('labTheoA').textContent = formatNum(sim.theoA, 2) + " g";
+        document.getElementById('labTheoB').textContent = formatNum(sim.theoB, 2) + " g";
+
+        initSim();
+    }
+
+    function hardReset() {
+        location.reload();
+    }
+
+    // --- SIMULATION LOGIK ---
+
+    function initSim() {
+        resize();
+        if (window.ResizeObserver) {
+            const ro = new ResizeObserver(resize);
+            ro.observe(canvas.parentElement);
+            ro.observe(graphCanvas.parentElement);
+        } else {
+            window.addEventListener('resize', resize);
+        }
+
+        sim.particles = [];
+        const cols = 8; const rows = 5;
+        sim.totalReactants = cols * rows;
+        sim.convertedCount = 0;
+
+        for(let r=0; r<rows; r++) {
+            for(let c=0; c<cols; c++) {
+                sim.particles.push({
+                    x: 0, y: 0, gx: c, gy: r, state: 'NaHCO3', wiggle: 0
+                });
+            }
+        }
+        updateDisplay();
+        requestAnimationFrame(loop);
+    }
+
+    function resize() {
+        if (canvas.parentElement) {
+            const cw = canvas.parentElement.clientWidth;
+            const ch = canvas.parentElement.clientHeight;
+            if (cw > 0 && ch > 0) {
+                canvas.width = cw;
+                canvas.height = ch;
+            }
+        }
+        if (graphCanvas.parentElement) {
+            const gw = graphCanvas.parentElement.clientWidth;
+            const gh = graphCanvas.parentElement.clientHeight;
+            if (gw > 0 && gh > 0) {
+                graphCanvas.width = gw;
+                graphCanvas.height = gh;
+            }
+        }
+    }
+
+    function toggleHeat() {
+        sim.heating = !sim.heating;
+        const btn = document.getElementById('heatBtn');
+        if (sim.heating) {
+            sim.hasHeatedOnce = true;
+            btn.textContent = "Sluk Bunsenbrænder";
+            btn.classList.add('active');
+        } else {
+            btn.textContent = "Tænd Bunsenbrænder";
+            btn.classList.remove('active');
+        }
+    }
+
+    function loop() {
+        if (!sim.active) return;
+        sim.timeStep++;
+
+        if (sim.heating) { if (sim.temp < 400) sim.temp += 1.5; } 
+        else { if (sim.temp > 20) sim.temp -= 0.8; }
+        document.getElementById('labTemp').textContent = Math.round(sim.temp) + "°C";
+
+        // Reaction Logic
+        if (sim.temp > 100) {
+            const target = sim.targetMass; 
+            const diff = sim.currentMass - target;
+            
+            if (diff > 0.005) {
+                const rate = 0.002 * ((sim.temp - 80) / 300); 
+                let newMass = sim.currentMass - rate;
+                
+                if (newMass < target) sim.currentMass = target;
+                else sim.currentMass = newMass;
+
+                // Sync Visuals
+                const totalLossNeeded = sim.startMass - target;
+                const currentLoss = sim.startMass - sim.currentMass;
+                const percentDone = currentLoss / totalLossNeeded;
+                
+                const shouldBeConverted = Math.floor(percentDone * sim.totalReactants);
+                
+                while (sim.convertedCount < shouldBeConverted) {
+                    const cands = sim.particles.filter(p => p.state === 'NaHCO3');
+                    if (cands.length > 0) {
+                        const p = cands[Math.floor(Math.random()*cands.length)];
+                        p.state = 'Na2CO3';
+                        sim.convertedCount++;
+                        sim.particles.push({ type: 'gas', x: p.x, y: p.y, vx: (Math.random()-.5)*2, vy: -1-Math.random(), life: 60 });
+                    } else {
+                        break;
+                    }
+                }
+
+            } else {
+                sim.currentMass = target;
+            }
+        }
+
+        if (sim.hasHeatedOnce && (performance.now() - sim.lastSampleTime >= 1000)) {
+            sim.graphData.push(sim.currentMass);
+            sim.lastSampleTime = performance.now();
+        }
+
+        updateDisplay();
+        drawScene();
+        drawGraph();
+        requestAnimationFrame(loop);
+    }
+
+    function updateDisplay() {
+        document.getElementById('massDisplay').textContent = formatNum(sim.currentMass, 2) + " g";
+    }
+
+    function finishExperiment() {
+        document.getElementById('resultModal').style.display = 'flex';
+        sim.heating = false;
+        
+        document.getElementById('resStart').textContent = formatNum(sim.startMass, 2) + " g";
+        document.getElementById('resEnd').textContent = formatNum(sim.currentMass, 2) + " g";
+        document.getElementById('resTheoA').textContent = formatNum(sim.theoA, 2) + " g";
+        document.getElementById('resTheoB').textContent = formatNum(sim.theoB, 2) + " g";
+    }
+
+    function conclude(choice) {
+        const fb = document.getElementById('conclusionFeedback');
+
+        const diffA = Math.abs(sim.currentMass - sim.theoA);
+        const diffB = Math.abs(sim.currentMass - sim.theoB);
+        const closest = (diffB < diffA) ? 'B' : 'A';
+
+        sim.conclusionChoice = choice;
+        sim.conclusionCorrect = (choice === closest);
+        document.getElementById('journalBtn').style.display = 'block';
+
+        if (choice === 'B') {
+            if (closest === 'B') {
+                fb.textContent = "✅ Korrekt! Målingen passer med Hypotese B (Na₂CO₃), selvom der er en lille måleafvigelse.";
+                fb.style.background = "rgba(34, 197, 94, 0.2)";
+                fb.style.color = "#22c55e";
+            } else {
+                fb.textContent = "🤔 Hmm, resultatet er lidt tvetydigt, men B er det rigtige svar teoretisk.";
+            }
+        } else {
+            fb.textContent = "❌ Forkert. Din slutmasse ligger meget tættere på Hypotese B.";
+            fb.style.background = "rgba(239, 68, 68, 0.2)";
+            fb.style.color = "#ef4444";
+        }
+    }
+
+    // --- DRAWING ---
+    function drawScene() {
+        ctx.fillStyle = "#000"; ctx.fillRect(0,0,canvas.width, canvas.height);
+        const cx = canvas.width * 0.25; 
+        const cy = canvas.height * 0.75; 
+
+        ctx.fillStyle = "#444"; ctx.fillRect(cx-15, cy, 30, 60); 
+        if (sim.heating) {
+            const f = Math.random()*5;
+            ctx.fillStyle = "orange"; ctx.beginPath(); ctx.moveTo(cx-10,cy); ctx.lineTo(cx,cy-80-f); ctx.lineTo(cx+10,cy); ctx.fill();
+        }
+        ctx.strokeStyle="#888"; ctx.lineWidth=3;
+        ctx.beginPath(); ctx.moveTo(cx-30,cy+60); ctx.lineTo(cx,cy-30); ctx.lineTo(cx+30,cy+60); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx-35,cy-30); ctx.lineTo(cx+35,cy-30); ctx.stroke();
+
+        const dy = cy - 50; 
+        ctx.fillStyle = "#ddd"; ctx.beginPath(); ctx.moveTo(cx-20,dy); ctx.lineTo(cx-30,dy-30); ctx.lineTo(cx+30,dy-30); ctx.lineTo(cx+20,dy); ctx.fill();
+
+        const progress = sim.convertedCount / sim.totalReactants;
+        const cVal = Math.floor(255 - progress*100);
+        ctx.fillStyle = `rgb(${cVal},${cVal},${cVal})`;
+        ctx.beginPath(); ctx.moveTo(cx-18,dy-2); ctx.lineTo(cx-26,dy-25); ctx.lineTo(cx+26,dy-25); ctx.lineTo(cx+18,dy-2); ctx.fill();
+
+        const mx = canvas.width * 0.55; const my = 20; const mw = canvas.width * 0.4; const mh = canvas.height - 40;
+        ctx.strokeStyle = "#444"; ctx.strokeRect(mx, my, mw, mh);
+        ctx.fillStyle = "#222"; ctx.fillRect(mx, my, mw, mh);
+        ctx.fillStyle = "#666"; ctx.fillText("Mikro-View", mx+5, my+15);
+
+        const startX = mx + 40; const startY = my + mh - 40; const sp = 25;
+        sim.particles.forEach(p => {
+            if (p.type === 'gas') {
+                p.x+=p.vx; p.y+=p.vy; p.life--;
+                if(p.life>0) { ctx.fillStyle="rgba(100,200,255,0.5)"; ctx.beginPath(); ctx.arc(p.x,p.y,3,0,Math.PI*2); ctx.fill(); }
+            } else {
+                const shake = (sim.temp>50)?(Math.random()-.5)*(sim.temp/50):0;
+                p.x = startX + p.gx * sp; p.y = startY - p.gy * sp;
+                if (p.state==='NaHCO3') { ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(p.x+shake,p.y+shake,7,0,Math.PI*2); ctx.fill(); }
+                else { ctx.fillStyle="#888"; ctx.beginPath(); ctx.arc(p.x+shake,p.y+shake,6,0,Math.PI*2); ctx.fill(); }
+            }
+        });
+    }
+
+    function drawGraph() {
+        ctxGraph.clearRect(0,0, graphCanvas.width, graphCanvas.height);
+        if (sim.graphData.length < 2) return;
+        const w = graphCanvas.width; const h = graphCanvas.height; const pad = 40;
+
+        // SCALE (0 til StartMass)
+        const minY = 0; 
+        const maxY = Math.ceil(sim.startMass);
+        const maxX = Math.max(sim.graphData.length, 60); // 1 datapunkt/sek, så 60 = ét minuts visningsvindue
+
+        // LABELS & GRID
+        ctxGraph.fillStyle = "#888"; ctxGraph.font = "10px sans-serif";
+        ctxGraph.textAlign = "right"; ctxGraph.textBaseline = "middle";
+        
+        // Y-axis grid
+        for(let i=0; i<=maxY; i++) {
+            const y = (h-pad) - ((i-minY)/(maxY-minY))*(h-pad*2);
+            ctxGraph.fillText(i + " g", pad-5, y);
+            ctxGraph.strokeStyle = "#333";
+            ctxGraph.beginPath(); ctxGraph.moveTo(pad,y); ctxGraph.lineTo(w,y); ctxGraph.stroke();
+        }
+
+        // Axis Titles
+        ctxGraph.save();
+        ctxGraph.translate(15, h/2); ctxGraph.rotate(-Math.PI/2);
+        ctxGraph.textAlign = "center";
+        ctxGraph.fillText("Masse (g)", 0, 0);
+        ctxGraph.restore();
+        
+        ctxGraph.fillText("Tid", w/2, h-5);
+
+        // DATA LINE
+        ctxGraph.strokeStyle = "#f59e0b"; ctxGraph.lineWidth = 2; ctxGraph.beginPath();
+        sim.graphData.forEach((m,i)=>{
+            const x = pad + (i/maxX)*(w-pad);
+            const y = (h-pad) - ((m-minY)/(maxY-minY))*(h-pad*2);
+            if(i===0) ctxGraph.moveTo(x,y); else ctxGraph.lineTo(x,y);
+        });
+        ctxGraph.stroke();
+    }
+
+    // --- JOURNAL ---
+    function generateJournalHTML() {
+        const dateStr = new Date().toLocaleDateString('da-DK');
+
+        const M_Start = document.getElementById('inp_M_Start').value;
+        const m_Start = document.getElementById('inp_m_Start').value;
+        const n_Start = document.getElementById('inp_n_Start').value;
+
+        const cA = [1,2,3,4].map(i => document.getElementById('cA_'+i).value);
+        const n_A = document.getElementById('inp_n_A').value;
+        const m_A = document.getElementById('inp_m_A').value;
+
+        const cB = [1,2,3,4].map(i => document.getElementById('cB_'+i).value);
+        const n_B = document.getElementById('inp_n_B').value;
+        const m_B = document.getElementById('inp_m_B').value;
+
+        const badge = usedCheat
+            ? '<div style="border:2px dashed #ef4444; border-radius:4px; padding:10px;"><p style="color:#ef4444; font-weight:bold; margin:0 0 4px 0;">📜 SNYDEBEVIS</p><p style="color:#ef4444; margin:0; font-size:0.85rem;">"Snyd"-knappen blev brugt til at udfylde beregningerne. Resultaterne afspejler ikke elevens egen indsats.</p></div>'
+            : (!anyError
+                ? '<p style="color:#b45309; font-weight:bold;">🏆 Alle beregninger blev gennemført uden en eneste fejlindtastning.</p>'
+                : '');
+
+        const conclusionText = sim.conclusionChoice
+            ? `Eleven konkluderede at det dannede stof er ${sim.conclusionChoice === 'A' ? 'Na₂O' : 'Na₂CO₃'} (${sim.conclusionCorrect ? 'i overensstemmelse med målingen' : 'ikke i overensstemmelse med målingen'}).`
+            : 'Konklusion ikke afgivet endnu.';
+
+        return `
+            <h2 style="color:var(--accent); margin-top:0;">Journal: Natronforsøget</h2>
+            <p style="color:#888; font-size:0.85rem;">Genereret: ${dateStr}</p>
+
+            <div class="journal-section">
+                <h4>1. Molarmasse &amp; stofmængde</h4>
+                <table class="journal-table">
+                    <tr><td>M(NaHCO₃)</td><td>${M_Start} g/mol</td></tr>
+                    <tr><td>Afvejet masse</td><td>${m_Start} g</td></tr>
+                    <tr><td>n(NaHCO₃)</td><td>${n_Start} mol</td></tr>
+                </table>
+            </div>
+
+            <div class="journal-section">
+                <h4>2. Hypotese A: Na₂O</h4>
+                <p>Afstemt skema: ${cA[0]} NaHCO₃ &rarr; ${cA[1]} Na₂O + ${cA[2]} CO₂ + ${cA[3]} H₂O</p>
+                <table class="journal-table">
+                    <tr><td>n(Na₂O)</td><td>${n_A} mol</td></tr>
+                    <tr><td>Beregnet masse (teori A)</td><td>${m_A} g</td></tr>
+                </table>
+            </div>
+
+            <div class="journal-section">
+                <h4>3. Hypotese B: Na₂CO₃</h4>
+                <p>Afstemt skema: ${cB[0]} NaHCO₃ &rarr; ${cB[1]} Na₂CO₃ + ${cB[2]} CO₂ + ${cB[3]} H₂O</p>
+                <table class="journal-table">
+                    <tr><td>n(Na₂CO₃)</td><td>${n_B} mol</td></tr>
+                    <tr><td>Beregnet masse (teori B)</td><td>${m_B} g</td></tr>
+                </table>
+            </div>
+
+            <div class="journal-section">
+                <h4>4. Eksperimentelle resultater</h4>
+                <table class="journal-table">
+                    <tr><td>Startmasse</td><td>${formatNum(sim.startMass,2)} g</td></tr>
+                    <tr><td>Slutmasse (målt)</td><td>${formatNum(sim.currentMass,2)} g</td></tr>
+                    <tr><td>Teori A (Na₂O)</td><td>${formatNum(sim.theoA,2)} g</td></tr>
+                    <tr><td>Teori B (Na₂CO₃)</td><td>${formatNum(sim.theoB,2)} g</td></tr>
+                </table>
+            </div>
+
+            <div class="journal-section">
+                <h4>5. Konklusion</h4>
+                <p>${conclusionText}</p>
+                ${badge}
+            </div>
+        `;
+    }
+
+    function showJournal() {
+        document.getElementById('journalContent').innerHTML = generateJournalHTML() +
+            '<div class="journal-actions">' +
+            '<button class="btn primary" onclick="window.print()">🖨️ Udskriv / Gem som PDF</button>' +
+            '<button class="btn" style="background:#444;" onclick="closeJournal()">Luk</button>' +
+            '</div>';
+        document.getElementById('journalOverlay').style.display = 'flex';
+    }
+
+    function closeJournal() {
+        document.getElementById('journalOverlay').style.display = 'none';
+    }
+
+    // --- INDIVIDUALISERET STARTMASSE ---
+    function initRandomStartMass() {
+        const mass = 4.50 + Math.random() * 1.00; // 4,50 - 5,50 g
+        document.getElementById('inp_m_Start').value = formatNum(mass, 2);
+    }
+    initRandomStartMass();
+</script>
+</body>
+</html>

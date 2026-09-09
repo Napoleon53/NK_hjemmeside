@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kemisk Ligevægt: Fe³⁺ og SCN⁻</title>
+    <style>
+        :root {
+            --bg-color: #1e1e24;
+            --panel-bg: #2b2b36;
+            --text-color: #f5f5f5;
+            --accent: #e2596b;
+            --fe-color: rgba(255, 235, 153, 0.9); /* Svagt gul */
+            --scn-color: rgba(255, 255, 255, 0); /* Uden fyld */
+            --scn-border: #ffffff;
+            --fescn-color: rgba(220, 70, 70, 0.95); /* Dæmpet rød */
+            --glass-color: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Layout */
+        #app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        #sidebar {
+            width: 320px;
+            background-color: var(--panel-bg);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 2px solid #444;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+            z-index: 10;
+            overflow-y: auto;
+        }
+
+        #calc-sidebar {
+            width: 300px;
+            background-color: var(--panel-bg);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-left: 2px solid #444;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.5);
+            z-index: 10;
+            overflow-y: auto;
+        }
+
+        #main-area {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #f2f4f7 0%, #dde2e9 100%);
+        }
+
+        #reaction-scheme {
+            font-size: 1.7rem;
+            font-weight: bold;
+            color: #23272f;
+            text-align: center;
+            margin-bottom: 18px;
+            letter-spacing: 0.02em;
+        }
+
+        /* Mørkere varianter af ionfarverne, så de er læsbare på lys baggrund */
+        #reaction-scheme .rx-fe {
+            color: #a87c1a;
+        }
+
+        #reaction-scheme .rx-fescn {
+            color: #c0392b;
+        }
+
+        #rx-arrow {
+            display: inline-block;
+            margin: 0 6px;
+            transition: color 0.3s;
+        }
+
+        /* Typografi & UI Elementer */
+        h1, h2, h3 {
+            margin-top: 0;
+            color: var(--text-color);
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            color: var(--accent);
+            text-align: center;
+            border-bottom: 1px solid #444;
+            padding-bottom: 10px;
+        }
+
+        .info-panel {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            border-left: 4px solid var(--accent);
+        }
+
+        .legend {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .legend-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .legend-fe {
+            background-color: var(--fe-color);
+        }
+
+        .legend-scn {
+            background-color: var(--scn-color);
+            border: 2px solid var(--scn-border);
+        }
+
+        .legend-fescn {
+            background-color: var(--fescn-color);
+            box-shadow: 0 0 8px var(--fescn-color);
+        }
+
+        /* Knapper */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background-color: #444;
+            border-color: var(--accent);
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+        }
+
+        .btn-fe { border-left: 4px solid var(--fe-color); }
+        .btn-scn { border-left: 4px solid var(--scn-border); }
+        .btn-fescn { border-left: 4px solid var(--fescn-color); }
+
+        /* Ekstra Features (Kreativ Udvidelse) */
+        .feature-panel {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: auto;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+
+        .toggle-container.stacked {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .toggle-container label {
+            font-size: 0.9rem;
+        }
+
+        input[type="range"] {
+            accent-color: var(--accent);
+            width: 100%;
+        }
+
+        /* Ligevægtsbrøk og Data */
+        #data-panel {
+            background: rgba(30, 30, 36, 0.9);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #444;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .k-line {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--text-color);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        .math-eq {
+            font-size: 1rem;
+            font-weight: bold;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .fraction {
+            display: inline-block;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .numerator {
+            border-bottom: 2px solid var(--text-color);
+            padding: 2px 6px;
+        }
+
+        .denominator {
+            padding: 2px 6px;
+        }
+
+        .math-eq .result {
+            color: var(--text-color);
+        }
+
+        .y-equals-k {
+            display: none;
+            margin-top: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #4ade80;
+        }
+
+        .compare-box {
+            font-size: 1rem;
+            color: #aaa;
+            margin-top: 10px;
+        }
+
+        .unit-note {
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 12px;
+            line-height: 1.4;
+        }
+
+        /* Canvas */
+        #sim-canvas {
+            border-radius: 10px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+            background-color: #ffffff;
+        }
+
+        /* Datavisualisering - Graf */
+        #graph-canvas {
+            width: 100%;
+            height: 120px;
+            background-color: #222;
+            border-radius: 4px;
+            margin-top: 10px;
+            border: 1px solid #444;
+        }
+
+        .btn-small {
+            width: 100%;
+            margin-top: 8px;
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-small:hover {
+            background-color: #444;
+            border-color: var(--accent);
+        }
+
+        /* Knap i midterfeltet - lys baggrund, så den skal have lys styling */
+        #btn-force-equilibrium {
+            margin-top: 16px;
+            background-color: #ffffff;
+            color: #23272f;
+            border: 1px solid #b6bec9;
+            border-left: 4px solid #15803d;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+        }
+
+        #btn-force-equilibrium:hover {
+            background-color: #f2f6f2;
+            border-color: #15803d;
+        }
+
+        #btn-force-equilibrium:active {
+            transform: translateY(2px);
+        }
+
+        /* Forstørret graf, der lægger sig hen over midtersektionen.
+           Venstre panel er stadig frit, så man kan lave indgreb undervejs */
+        #graph-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(24, 26, 32, 0.97);
+            padding: 18px;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 20;
+        }
+
+        #graph-overlay.open {
+            display: flex;
+        }
+
+        #graph-overlay-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            font-weight: bold;
+        }
+
+        #graph-overlay-header .graph-legend {
+            display: flex;
+            gap: 10px;
+            font-size: 0.85rem;
+        }
+
+        /* Klikbare ioner: slå den enkelte kurve til og fra på den forstørrede graf */
+        .series-toggle {
+            cursor: pointer;
+            user-select: none;
+            padding: 3px 8px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            transition: all 0.15s;
+        }
+
+        .series-toggle:hover {
+            border-color: #999;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .series-toggle.off {
+            opacity: 0.4;
+            text-decoration: line-through;
+            border-color: #3a3a3a;
+        }
+
+        #graph-canvas-max {
+            flex: 1;
+            width: 100%;
+            background-color: #1b1d22;
+            border: 1px solid #444;
+            border-radius: 6px;
+        }
+
+        /* Hjælp (åbnes med hjælpeknappen - vises ikke af sig selv) */
+        #help-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        #help-modal.open {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--panel-bg);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 620px;
+            max-height: 85vh;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.3);
+        }
+
+        .close-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            float: right;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="help-modal">
+    <div class="modal-content">
+        <h2>Sådan bruger du Ligevægts-Laboratoriet</h2>
+        <p><strong>Reaktionen:</strong> Fe³⁺(aq) + SCN⁻(aq) ⇌ FeSCN²⁺(aq). Komplekset FeSCN²⁺ er rødt og farver opløsningen - jo højere koncentration, jo kraftigere rød.</p>
+        <p><strong>Y og K:</strong> Reaktionsbrøken Y beregnes løbende ud fra koncentrationerne i bægerglasset. Ligevægtskonstanten K afhænger kun af temperaturen. Når Y er så tæt på K, som antallet af ioner tillader, står systemet i ligevægt, og sammensætningen ændrer sig ikke.</p>
+        <p><strong>Tilsæt ioner:</strong> Knapperne til venstre tilsætter Fe³⁺, SCN⁻ eller FeSCN²⁺. Ionerne falder ned i glasset, og ligevægten forskyder sig, indtil Y igen er tættest muligt på K.</p>
+        <p><strong>Kemiske indgreb:</strong> Ag⁺ opsøger SCN⁻ og danner et hvidt AgSCN-bundfald, der synker til bunds - dermed fjernes SCN⁻ fra ligevægten. C-vitamin reducerer Fe³⁺ til Fe²⁺ (meget svagt grøn), som ikke længere deltager. "Fordobl volumen" fortynder: samme antal ioner, men halv koncentration - og fortynding forskyder ligevægten mod flere, mindre partikler.</p>
+        <p><strong>Temperatur:</strong> Reaktionen er eksoterm, så en højere temperatur giver en lavere K - altså mindre kompleks og en lysere farve, ligesom i det virkelige forsøg.</p>
+        <p><strong>Dynamisk ligevægt:</strong> Slå til for at se, at reaktionen stadig forløber begge veje, når systemet er i ligevægt. Er den slået fra, står ligevægten helt stille.</p>
+        <p><strong>Påtving ligevægt:</strong> Springer direkte til ligevægtspunktet, hvis du ikke vil vente på, at reaktionen selv finder derhen.</p>
+        <p><strong>Instant ligevægt:</strong> Slås den til, indstiller ligevægten sig selv umiddelbart efter hvert indgreb - også når du ændrer temperaturen. Ag⁺ og C-vitamin teleporterer hen til deres målion og reagerer inden for et sekund. Selve indgrebet kan stadig ses på grafen, før næste punkt er i ligevægt. Knappen "Påtving ligevægt" skjules, når den er slået til.</p>
+        <p><strong>Instant + dynamisk ligevægt samtidig:</strong> Så forløber mikroreaktionerne stadig i begge retninger, men hver gang de trækker systemet væk fra ligevægten, modsvares de med det samme - koncentrationerne står altså stille i ligevægtspunktet, mens de enkelte ioner hele tiden reagerer.</p>
+        <p><strong>Grafen:</strong> Viser koncentrationen (c) på y-aksen og tiden på x-aksen. Kurverne er forskudt en anelse i forhold til hinanden, så man kan se dem alle, når koncentrationerne er ens. Grafen kan forstørres og viser da et længere tidsforløb.</p>
+        <button class="close-btn" id="close-help-btn">Luk</button>
+    </div>
+</div>
+
+<div id="app-container">
+    <div id="sidebar">
+        <h1>Ligevægts-Laboratoriet</h1>
+
+        <button class="btn-small" id="btn-help" style="margin-bottom: 16px;">? Hjælp og forklaring</button>
+
+        <div class="info-panel">
+            Tilsæt ioner for at se, hvordan systemet forskydes, indtil reaktionsbrøken (Y) igen er lig med ligevægtskonstanten (K).
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-icon legend-fe"></div>
+                <span>Fe³⁺ (Jern(III)ion)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon legend-scn"></div>
+                <span>SCN⁻ (Thiocyanat)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon legend-fescn"></div>
+                <span>FeSCN²⁺ (Jernthiocyanat)</span>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-fe" id="btn-add-fe">+ Tilsæt 3 Fe³⁺</button>
+            <button class="btn btn-scn" id="btn-add-scn">+ Tilsæt 3 SCN⁻</button>
+            <button class="btn btn-fescn" id="btn-add-fescn">+ Tilsæt 1 FeSCN²⁺</button>
+            <button class="btn" id="btn-reset" style="margin-top: 10px;">Genstart Eksperiment</button>
+        </div>
+
+        <!-- Kemiske indgreb -->
+        <div class="feature-panel">
+            <h3>Kemiske Indgreb</h3>
+            <div style="font-size: 0.8rem; color: #aaa; margin-bottom: 12px;">
+                Fjern en af ionerne via en sidereaktion, og se hvordan ligevægten forskydes.
+            </div>
+            <div class="btn-group" style="margin-bottom: 0;">
+                <button class="btn" id="btn-add-ag" style="border-left: 4px solid #cfd8dc;">+ Tilsæt 3 Ag⁺ (fælder SCN⁻)</button>
+                <button class="btn" id="btn-add-vitc" style="border-left: 4px solid #e0c93a;">+ Tilsæt 3 C-vitamin (red. Fe³⁺)</button>
+                <button class="btn" id="btn-double-volume" style="border-left: 4px solid #6ea8d8;">Fordobl volumen (fortynd)</button>
+            </div>
+            <div style="font-size: 0.75rem; color: #888; margin-top: 10px;">
+                Volumen: <span id="ui-volume">1×</span> - fortynding forskyder ligevægten mod flere, mindre partikler.
+            </div>
+        </div>
+    </div>
+
+    <div id="main-area">
+        <div id="reaction-scheme">
+            <span class="rx-fe">Fe³⁺</span>(aq) + SCN⁻(aq)
+            <span id="rx-arrow">⇌</span>
+            <span class="rx-fescn">FeSCN²⁺</span>(aq)
+        </div>
+        <!-- Hovedsimulation Canvas -->
+        <canvas id="sim-canvas" width="704" height="528"></canvas>
+
+        <button id="btn-force-equilibrium">⚡ Påtving ligevægt (spring ventetiden over)</button>
+
+        <!-- Forstørret graf hen over midtersektionen -->
+        <div id="graph-overlay">
+            <div id="graph-overlay-header">
+                <span>Koncentrations-udvikling over tid
+                    <span style="font-weight: normal; color: #999; font-size: 0.8rem;">(klik på ionerne for at vise/skjule dem)</span>
+                </span>
+                <div class="graph-legend">
+                    <span class="series-toggle" data-series="fe" style="color: var(--fe-color)">Fe³⁺</span>
+                    <span class="series-toggle" data-series="scn" style="color: var(--scn-border)">SCN⁻</span>
+                    <span class="series-toggle" data-series="fescn" style="color: var(--fescn-color)">FeSCN²⁺</span>
+                </div>
+                <button class="btn-small" id="btn-close-graph" style="width: auto; margin-top: 0;">Luk graf</button>
+            </div>
+            <canvas id="graph-canvas-max"></canvas>
+        </div>
+    </div>
+
+    <div id="calc-sidebar">
+        <div id="data-panel">
+            <div style="font-size: 0.9rem; color: #ccc; margin-bottom: 10px;">Reaktionsbrøk (Y)</div>
+
+            <div class="k-line">K = <span id="ui-k-value">100</span> M</div>
+
+            <div class="math-eq">
+                Y =
+                <div class="fraction">
+                    <div class="numerator"><span id="ui-count-fescn">6</span> mM</div>
+                    <div class="denominator"><span id="ui-count-fe">8</span> mM &middot; <span id="ui-count-scn">6</span> mM</div>
+                </div>
+                = <span id="ui-y-value" class="result">100</span> M
+            </div>
+            <div class="y-equals-k" id="ui-y-equals-k">Y = K</div>
+            <div class="compare-box">
+                Status: <span id="ui-status" style="color: #4ade80; font-weight: bold;">I ligevægt</span>
+            </div>
+            <div class="unit-note">*Antallet af partikler svarer til koncentrationen i mM (millimolar), en realistisk skala for dette forsøg, og bruges i selve mellemregningen. Den samlede værdi for Y (og K) opgives altid i M, som er den gængse enhed for ligevægtskonstanter. Vi runder til 1 betydende ciffer i denne opgave.</div>
+        </div>
+
+        <!-- Kreativ Udvidelse -->
+        <div class="feature-panel">
+            <h3>Avancerede Værktøjer</h3>
+            <div class="toggle-container" title="Springer ventetiden over - ligevægten indstiller sig med det samme.">
+                <label for="instant-toggle">Instant ligevægt</label>
+                <input type="checkbox" id="instant-toggle">
+            </div>
+            <div class="toggle-container" title="Viser, at reaktionen kører begge veje - også i ligevægt.">
+                <label for="dynamic-toggle">Vis dynamisk ligevægt</label>
+                <input type="checkbox" id="dynamic-toggle">
+            </div>
+            <div class="toggle-container stacked" title="Højere temperatur giver lavere K - reaktionen er eksoterm.">
+                <label for="temp-slider">Temperatur: <span id="temp-value">20</span> °C</label>
+                <input type="range" id="temp-slider" min="0" max="100" step="5" value="20">
+                <div style="font-size: 0.7rem; color: #888;">Reaktionen er eksoterm: højere temperatur giver en lavere K (mindre kompleks dannes).</div>
+            </div>
+            <div style="font-size: 0.8rem; color: #aaa; margin-top: 15px;">
+                Koncentrations-udvikling over tid:
+            </div>
+            <canvas id="graph-canvas"></canvas>
+            <div style="display:flex; justify-content: space-between; font-size: 0.7rem; color: #888; margin-top: 5px;">
+                <span style="color: var(--fe-color)">Fe³⁺</span>
+                <span style="color: var(--scn-border)">SCN⁻</span>
+                <span style="color: var(--fescn-color)">FeSCN²⁺</span>
+            </div>
+            <button class="btn-small" id="btn-maximize-graph">⛶ Forstør grafen</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    /*
+     * KEMISK SIMULATION LIGEVÆGT
+     * Ingen brug af dollar-tegn (jQuery/template literals overholdt med ren string concat)
+     * Dansk decimalkomma implementeret
+     */
+
+    // Hjælpefunktion til dansk decimalkomma, afrundet til N betydende cifre
+    // (opgaven arbejder generelt med 1 betydende ciffer)
+    function formatSig(number, sig = 1) {
+        if (number === 0) {
+            return (0).toFixed(1).replace(".", ",");
+        }
+        let mag = Math.ceil(Math.log10(Math.abs(number)));
+        let factor = Math.pow(10, sig - mag);
+        let rounded = Math.round(number * factor) / factor;
+        let decimals = Math.max(sig - mag, 0);
+        return rounded.toFixed(decimals).replace(".", ",");
+    }
+
+    // Konverterer en mM-baseret brøkværdi til den tilsvarende værdi i M
+    // (1 M = 1000 mM), som er den enhed Y og K altid opgives i til sidst
+    const MM_PER_M = 1000;
+
+    // Ligevægtspunktet er den tilstand (heltals-antal partikler), systemet faktisk kan
+    // nå, der ligger tættest på K - altså et lokalt minimum for |Y - K blandt de
+    // tilstande, én reaktion (frem eller tilbage) kan nå. Der findes altid sådan en
+    // tilstand, selvom Y og K's afrundede tal ikke bliver præcis ens, når der kun er få
+    // partikler. Denne funktion bruges BÅDE til status/pil og til at afgøre, om
+    // reaktionen må køre, så de to aldrig kan være uenige.
+    function isAtEquilibrium(counts, currentK) {
+        function diffFor(fe, scn, fescn) {
+            let feC = fe / volumeMultiplier;
+            let scnC = scn / volumeMultiplier;
+            let fescnC = fescn / volumeMultiplier;
+            let denom = feC * scnC;
+            // Uden frie Fe³⁺ eller SCN⁻ er Y udefineret - aldrig et ligevægtspunkt,
+            // medmindre der slet ikke er noget, der kan reagere (så er alt Infinity)
+            if (denom === 0) return Infinity;
+            return Math.abs(fescnC / denom - currentK);
+        }
+
+        let currentDiff = diffFor(counts.fe, counts.scn, counts.fescn);
+
+        // Ét skridt frem (Fe³⁺ + SCN⁻ -> FeSCN²⁺)
+        let forwardDiff = (counts.fe >= 1 && counts.scn >= 1)
+            ? diffFor(counts.fe - 1, counts.scn - 1, counts.fescn + 1)
+            : Infinity;
+
+        // Ét skridt tilbage (FeSCN²⁺ -> Fe³⁺ + SCN⁻)
+        let backwardDiff = (counts.fescn >= 1)
+            ? diffFor(counts.fe + 1, counts.scn + 1, counts.fescn - 1)
+            : Infinity;
+
+        return currentDiff <= forwardDiff && currentDiff <= backwardDiff;
+    }
+
+    // Ved større volumen tegnes ionerne lidt mindre - der er jo mere væske om dem.
+    // Skalaen bruges både til radius (og dermed kollisioner) og til skriftstørrelsen.
+    function getIonScale() {
+        return Math.pow(volumeMultiplier, -0.35);
+    }
+
+    // Viser en koncentration (kan blive brøktal, når volumen er fordoblet) med dansk komma
+    function formatConc(value) {
+        if (Number.isInteger(value)) return String(value);
+        return value.toFixed(1).replace(".", ",");
+    }
+
+    // Hjælp åbnes og lukkes med knapperne (ingen pop-up ved start)
+    const helpModal = document.getElementById("help-modal");
+
+    document.getElementById("btn-help").addEventListener("click", function() {
+        helpModal.classList.add("open");
+    });
+
+    document.getElementById("close-help-btn").addEventListener("click", function() {
+        helpModal.classList.remove("open");
+    });
+
+    helpModal.addEventListener("click", function(event) {
+        // Klik uden for selve boksen lukker også hjælpen
+        if (event.target === helpModal) helpModal.classList.remove("open");
+    });
+
+    // Canvas og Kontekst
+    const canvas = document.getElementById("sim-canvas");
+    const ctx = canvas.getContext("2d");
+
+    const graphCanvas = document.getElementById("graph-canvas");
+    const graphCtx = graphCanvas.getContext("2d");
+
+    // Forstørret graf hen over midtersektionen
+    const graphOverlay = document.getElementById("graph-overlay");
+    const maxGraphCanvas = document.getElementById("graph-canvas-max");
+    const maxGraphCtx = maxGraphCanvas.getContext("2d");
+    let isGraphMaximized = false;
+
+    // Hvilke kurver der vises på den forstørrede graf (klik på ionerne i toppen)
+    let graphSeriesVisible = { fe: true, scn: true, fescn: true };
+
+    document.querySelectorAll("#graph-overlay-header .series-toggle").forEach(function(el) {
+        el.addEventListener("click", function() {
+            let key = el.dataset.series;
+            graphSeriesVisible[key] = !graphSeriesVisible[key];
+            el.classList.toggle("off", !graphSeriesVisible[key]);
+            drawGraph();
+        });
+    });
+
+    // Fysiske konstanter og simuleringstilstand
+    const WIDTH = canvas.width;
+    const HEIGHT = canvas.height;
+    const PARTICLE_RADIUS = 15; // Grundstørrelse - skaleres ned, når volumen øges
+
+    // Konstanter for kemi
+    // Hver partikel repræsenterer her 1 mM ved standardvolumen (1 L). Startforholdet
+    // 8 Fe, 6 SCN, 6 FeSCN giver K_REF = 6/(8·6) = 0,125 mM^-1 ved 20 °C, dvs. ca.
+    // 125 M^-1 - midt i det typiske litteraturinterval (ca. 100-150 M^-1). De flere
+    // partikler gør samtidig trinene mellem mulige tilstande finere, så ligevægten
+    // kan ramme K mere præcist.
+    const K_REF = 6 / (8 * 6);
+    const T_REF_C = 20; // referencetemperatur for K_REF
+    const DELTA_H = -14000; // J/mol - kompleksdannelsen er eksoterm (typisk værdi for FeSCN²⁺)
+    const R_GAS = 8.314; // J/(mol·K)
+    const BASE_SPEED = 2.5;
+    // Animationen kører altid i slow-motion, så der er tid til at følge kollisionerne
+    const SLOW_MOTION_FACTOR = 0.3;
+    // "Instant ligevægt": hvor lang tid der går, før systemet falder på plads, så
+    // man stadig kan nå at se selve indgrebet på grafen
+    const INSTANT_DELAY_MS = 1000;
+
+    // Temperaturens primære rolle er at ændre selve K (Van 't Hoffs ligning),
+    // ligesom man i det virkelige forsøg ser farven blegne ved opvarmning
+    function getCurrentK() {
+        let tempC = parseFloat(document.getElementById("temp-slider").value);
+        let T = tempC + 273.15;
+        let T_ref = T_REF_C + 273.15;
+        return K_REF * Math.exp((-DELTA_H / R_GAS) * (1 / T - 1 / T_ref));
+    }
+
+    // Temperaturen giver kun en minimal, sjov effekt på partiklernes fart -
+    // den er ikke den primære mekanisme (det er ændringen af K)
+    function getSpeedFactor() {
+        let temp = parseFloat(document.getElementById("temp-slider").value);
+        return 1 + (temp - T_REF_C) * 0.003;
+    }
+
+    document.getElementById("temp-slider").addEventListener("input", function() {
+        document.getElementById("temp-value").innerText = this.value;
+        // Mens man trækker i skyderen, holdes den automatiske korrektion tilbage,
+        // så temperaturændringen kan ses som et indgreb på grafen
+        holdInstantEquilibrium();
+    });
+
+    // Når skyderen slippes, indstiller ligevægten sig selv (som ved andre indgreb)
+    document.getElementById("temp-slider").addEventListener("change", function() {
+        scheduleInstantEquilibrium();
+    });
+
+    // Typer af partikler
+    const TYPE_FE = 1;
+    const TYPE_SCN = 2;
+    const TYPE_FESCN = 3;
+    const TYPE_AG = 4;     // Ag⁺ - søger mod SCN⁻
+    const TYPE_AGSCN = 5;  // AgSCN - hvidt bundfald, synker og fjernes
+    const TYPE_VITC = 6;   // C-vitamin - søger mod Fe³⁺
+    const TYPE_FE2 = 7;    // Fe²⁺ - reduceret, deltager ikke længere i ligevægten
+
+    // Klasser
+    class Particle {
+        constructor(type, x, y, opts) {
+            this.id = Math.random().toString(36).substr(2, 9);
+            this.type = type;
+            this.baseR = (type === TYPE_FESCN || type === TYPE_AGSCN) ? PARTICLE_RADIUS * 1.3 : PARTICLE_RADIUS;
+            this.settled = false; // AgSCN-bundfald, der er faldet til ro på bunden
+
+            // Nye ioner tilsat via knapperne falder sjovt ned i bægerglasset ovenfra
+            this.entering = !!(opts && opts.fromAbove);
+
+            if (this.entering) {
+                this.x = x;
+                this.y = -this.r - Math.random() * 100;
+                this.vx = (Math.random() - 0.5) * 2;
+                this.vy = 6 + Math.random() * 2;
+            } else {
+                // Random position hvis ikke angivet, holdes inden for bægerglasset
+                this.x = x || Math.random() * (WIDTH - 2 * this.r - 40) + this.r + 20;
+                this.y = y || Math.random() * (HEIGHT - 2 * this.r - 40) + this.r + 20;
+
+                // Random hastighed
+                let angle = Math.random() * Math.PI * 2;
+                this.vx = Math.cos(angle) * BASE_SPEED;
+                this.vy = Math.sin(angle) * BASE_SPEED;
+            }
+
+            // Levetid for komplekser (hvor længe de har eksisteret, bruges til dissociation)
+            this.age = 0;
+        }
+
+        // Den viste (og fysiske) radius skrumper, når volumen øges
+        get r() {
+            return this.baseR * getIonScale();
+        }
+
+        update(speedFactor) {
+            let speedMultiplier = SLOW_MOTION_FACTOR * speedFactor;
+
+            // Bægerglas (Kollision med vægge)
+            // Simulerer et bægerglas med lidt margin
+            const marginX = 20;
+            const marginY = 20;
+
+            if (this.type === TYPE_AGSCN) {
+                // Bundfaldet synker roligt lige ned og bliver liggende på bunden
+                if (!this.settled) {
+                    this.y += this.vy * speedMultiplier;
+                    this.age += speedMultiplier;
+                    if (this.y + this.r >= HEIGHT - marginY) {
+                        this.y = HEIGHT - marginY - this.r;
+                        this.vy = 0;
+                        this.settled = true;
+                    }
+                }
+                return;
+            }
+
+            this.x += this.vx * speedMultiplier;
+            this.y += this.vy * speedMultiplier;
+            this.age += speedMultiplier;
+
+            if (this.entering) {
+                // Ingen væg-kollision, mens den falder ned ovenfra
+                if (this.x - this.r < marginX) this.x = marginX + this.r;
+                else if (this.x + this.r > WIDTH - marginX) this.x = WIDTH - marginX - this.r;
+
+                if (this.y - this.r >= marginY) {
+                    // Landet i væsken - skift til normal svirrende bevægelse
+                    this.entering = false;
+                    let angle = Math.random() * Math.PI * 2;
+                    this.vx = Math.cos(angle) * BASE_SPEED;
+                    this.vy = Math.sin(angle) * BASE_SPEED;
+                }
+                return;
+            }
+
+            if (this.x - this.r < marginX) {
+                this.x = marginX + this.r;
+                this.vx *= -1;
+            } else if (this.x + this.r > WIDTH - marginX) {
+                this.x = WIDTH - marginX - this.r;
+                this.vx *= -1;
+            }
+
+            if (this.y - this.r < marginY) {
+                this.y = marginY + this.r;
+                this.vy *= -1;
+            } else if (this.y + this.r > HEIGHT - marginY) {
+                this.y = HEIGHT - marginY - this.r;
+                this.vy *= -1;
+            }
+        }
+
+        draw(ctx) {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+
+            // Skriftstørrelsen følger ionernes størrelse (mindre ved større volumen)
+            let ionScale = getIonScale();
+            let labelFont = "bold " + Math.max(6, Math.round(11 * ionScale)) + "px Arial";
+            let smallLabelFont = "bold " + Math.max(6, Math.round(10 * ionScale)) + "px Arial";
+
+            // Tegn partikel baseret på type
+            if (this.type === TYPE_FE) {
+                ctx.beginPath();
+                ctx.arc(0, 0, this.r, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(255, 235, 153, 0.9)";
+                ctx.fill();
+                ctx.strokeStyle = "#b89e47";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = "#333";
+                ctx.font = labelFont;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText("Fe³⁺", 0, 0);
+            }
+            else if (this.type === TYPE_SCN) {
+                // Farveløs ion: kun omrids, så den ses tydeligt på den lyse baggrund
+                ctx.beginPath();
+                ctx.arc(0, 0, this.r, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(255,255,255,0.75)";
+                ctx.fill();
+                ctx.strokeStyle = "#4a5561";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = "#333";
+                ctx.font = labelFont;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText("SCN⁻", 0, 0);
+            }
+            else if (this.type === TYPE_FESCN) {
+                // Pulserende glød effekt
+                let glow = 5 + Math.sin(this.age * 0.1) * 3;
+                ctx.shadowBlur = glow;
+                ctx.shadowColor = "rgba(220, 70, 70, 0.7)";
+
+                ctx.beginPath();
+                ctx.arc(0, 0, this.r, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(220, 70, 70, 0.95)";
+                ctx.fill();
+
+                ctx.shadowBlur = 0; // reset for text
+                ctx.fillStyle = "#fff";
+                ctx.font = labelFont;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText("FeSCN²⁺", 0, 0);
+            }
+            else if (this.type === TYPE_AG) {
+                ctx.beginPath();
+                ctx.arc(0, 0, this.r, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(196, 202, 212, 0.95)";
+                ctx.fill();
+                ctx.strokeStyle = "#77818f";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = "#222";
+                ctx.font = labelFont;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText("Ag⁺", 0, 0);
+            }
+            else if (this.type === TYPE_AGSCN) {
+                // Hvidt bundfald med en tyk hvid ring - med et fint mørkt omrids,
+                // så den hvide ring også ses på den lyse baggrund
+                ctx.beginPath();
+                ctx.arc(0, 0, this.r, 0, Math.PI * 2);
+                ctx.fillStyle = "#9aa2ac";
+                ctx.fill();
+                ctx.lineWidth = 6;
+                ctx.strokeStyle = "#ffffff";
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(0, 0, this.r + 3, 0, Math.PI * 2);
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = "rgba(90, 100, 112, 0.8)";
+                ctx.stroke();
+            }
+            else if (this.type === TYPE_VITC) {
+                ctx.beginPath();
+                ctx.arc(0, 0, this.r, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(255, 244, 150, 0.9)";
+                ctx.fill();
+                ctx.strokeStyle = "#e0c93a";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = "#333";
+                ctx.font = smallLabelFont;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText("Vit-C", 0, 0);
+            }
+            else if (this.type === TYPE_FE2) {
+                // Fe²⁺ - ekstremt svagt grøn og inaktiv
+                ctx.beginPath();
+                ctx.arc(0, 0, this.r, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(214, 246, 214, 0.85)";
+                ctx.fill();
+                ctx.strokeStyle = "rgba(108, 168, 108, 0.9)";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = "#3f6b3f";
+                ctx.font = labelFont;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText("Fe²⁺", 0, 0);
+            }
+
+            ctx.restore();
+        }
+    }
+
+    // Partikelsystem og Historik
+    let particles = [];
+    let history = []; // Til grafen
+    // Vi gemmer et langt forløb, men viser kun en del af det i den lille graf.
+    // Den forstørrede graf viser hele historikken, altså et større tidsudsnit.
+    let maxHistory = 600;
+    const SMALL_GRAPH_WINDOW = 150;
+    const MAX_GRAPH_WINDOW = 600;
+
+    // Volumen (1× = udgangspunktet). Fordobling fortynder opløsningen: samme antal
+    // partikler (stofmængde), men halveret koncentration - se getConcentrations()
+    let volumeMultiplier = 1;
+
+    // Initialiser systemet
+    function initSystem() {
+        particles = [];
+        history = [];
+        volumeMultiplier = 1;
+        document.getElementById("ui-volume").innerText = "1×";
+        // 8 Fe³⁺
+        for (let i = 0; i < 8; i++) {
+            particles.push(new Particle(TYPE_FE));
+        }
+        // 6 SCN⁻
+        for (let i = 0; i < 6; i++) {
+            particles.push(new Particle(TYPE_SCN));
+        }
+        // 6 FeSCN²⁺
+        for (let i = 0; i < 6; i++) {
+            particles.push(new Particle(TYPE_FESCN));
+        }
+    }
+
+    // Kemisk logik
+    // Sandssynlighed for reaktion under kollision afhænger af afstanden til ligevægt
+    function resolveCollisionsAndReactions() {
+        let counts = getCounts();
+        let conc = getConcentrations();
+        let currentY = conc.fescn / ((conc.fe * conc.scn) || 1); // Undgå division med 0
+        let currentK = getCurrentK(); // Afhænger af temperaturen (Van 't Hoff)
+        let dynamicMode = isDynamicMode();
+
+        let pForward, pBackward;
+
+        if (isAtEquilibrium(counts, currentK)) {
+            // Systemet står ved ligevægtspunktet (det nåelige tilstand tættest på K)
+            if (dynamicMode) {
+                // Reaktionen forløber tydeligt i begge retninger på mikroplan,
+                // selvom Y og K samlet set er konstante (dynamisk ligevægt)
+                pForward = 0.12;
+                pBackward = 0.018;
+            } else {
+                // Ved ligevægtspunktet kan der ikke ske reaktioner, så antallet af
+                // Fe³⁺, SCN⁻ og FeSCN²⁺ forbliver helt stabilt
+                pForward = 0;
+                pBackward = 0;
+            }
+        } else if (currentY < currentK) {
+            // For lidt kompleks i forhold til K -> fremadrettet reaktion fremmes
+            pForward = 0.3;
+            pBackward = 0.0005;
+        } else {
+            // For meget kompleks i forhold til K -> tilbagereaktion fremmes
+            pForward = 0.01;
+            pBackward = 0.015;
+        }
+
+        // Tjek for dissociation (FeSCN -> Fe + SCN)
+        for (let i = particles.length - 1; i >= 0; i--) {
+            let p = particles[i];
+            if (p.type === TYPE_FESCN) {
+                // Minimum levetid før den kan splitte (for visuel stabilitet)
+                if (p.age > 60 && Math.random() < pBackward) {
+                    // Split!
+                    particles.splice(i, 1);
+
+                    let p1 = new Particle(TYPE_FE, p.x - 10, p.y);
+                    let p2 = new Particle(TYPE_SCN, p.x + 10, p.y);
+
+                    // Skub dem væk fra hinanden
+                    p1.vx = -Math.abs(p.vx || 1) * 1.5;
+                    p2.vx = Math.abs(p.vx || 1) * 1.5;
+
+                    particles.push(p1);
+                    particles.push(p2);
+                }
+            }
+        }
+
+        // Tjek for kollisioner og sammensmeltning (Fe + SCN -> FeSCN)
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                let p1 = particles[i];
+                let p2 = particles[j];
+
+                // Bundfald (AgSCN) skal synke uforstyrret og deltager ikke i kollisioner
+                if (p1.type === TYPE_AGSCN || p2.type === TYPE_AGSCN) continue;
+
+                let dx = p1.x - p2.x;
+                let dy = p1.y - p2.y;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                let minDist = p1.r + p2.r;
+
+                if (dist < minDist) {
+                    // Fysisk kollision response (simpel elastisk)
+                    let overlap = minDist - dist;
+                    let nx = dx / dist;
+                    let ny = dy / dist;
+
+                    p1.x += nx * overlap * 0.5;
+                    p1.y += ny * overlap * 0.5;
+                    p2.x -= nx * overlap * 0.5;
+                    p2.y -= ny * overlap * 0.5;
+
+                    // Byt hastigheder (forenklet)
+                    let tempVx = p1.vx;
+                    let tempVy = p1.vy;
+                    p1.vx = p2.vx;
+                    p1.vy = p2.vy;
+                    p2.vx = tempVx;
+                    p2.vy = tempVy;
+
+                    // Kemisk reaktion?
+                    if ((p1.type === TYPE_FE && p2.type === TYPE_SCN) ||
+                        (p1.type === TYPE_SCN && p2.type === TYPE_FE)) {
+
+                        if (Math.random() < pForward) {
+                            // Merge!
+                            let newX = (p1.x + p2.x) / 2;
+                            let newY = (p1.y + p2.y) / 2;
+
+                            // Fjern de to gamle
+                            particles.splice(j, 1); // slet største index først
+                            particles.splice(i, 1);
+
+                            // Tilføj ny FeSCN
+                            let newParticle = new Particle(TYPE_FESCN, newX, newY);
+                            particles.push(newParticle);
+
+                            // Sørg for løkken ikke fejler pga fjernede elementer
+                            i--;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // "Magnetisk" tiltrækning: styrer forsigtigt en søgende partikeltype (fx Ag⁺)
+    // hen mod den nærmeste partikel af måltypen (fx SCN⁻)
+    function applySeeking(seekerType, targetType, strength, maxSpeedFactor = 2.2) {
+        let targets = [];
+        for (let p of particles) {
+            if (p.type === targetType && !p.entering) targets.push(p);
+        }
+        if (targets.length === 0) return;
+
+        for (let p of particles) {
+            if (p.type !== seekerType || p.entering) continue;
+
+            let nearest = null;
+            let nearestDistSq = Infinity;
+            for (let t of targets) {
+                let dx = t.x - p.x;
+                let dy = t.y - p.y;
+                let distSq = dx * dx + dy * dy;
+                if (distSq < nearestDistSq) {
+                    nearestDistSq = distSq;
+                    nearest = t;
+                }
+            }
+
+            let dx = nearest.x - p.x;
+            let dy = nearest.y - p.y;
+            let d = Math.sqrt(dx * dx + dy * dy) || 1;
+            p.vx += (dx / d) * strength;
+            p.vy += (dy / d) * strength;
+
+            let speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+            let maxSpeed = BASE_SPEED * maxSpeedFactor;
+            if (speed > maxSpeed) {
+                p.vx = (p.vx / speed) * maxSpeed;
+                p.vy = (p.vy / speed) * maxSpeed;
+            }
+        }
+    }
+
+    // Kemiske indgreb: sidereaktioner der fjerner en ion fra ligevægten
+    function resolveInterventions() {
+        // Ag⁺ + SCN⁻ -> AgSCN (hvidt bundfald) - fjerner SCN⁻ fra opløsningen
+        for (let i = particles.length - 1; i >= 0; i--) {
+            let ag = particles[i];
+            if (ag.type !== TYPE_AG || ag.entering) continue;
+
+            for (let j = particles.length - 1; j >= 0; j--) {
+                let scn = particles[j];
+                if (scn.type !== TYPE_SCN || scn.entering) continue;
+
+                let dx = ag.x - scn.x;
+                let dy = ag.y - scn.y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+
+                // Lidt ekstra rækkevidde, så Ag⁺ "snapper" til SCN⁻ og reagerer hurtigt
+                if (dist < (ag.r + scn.r) * 1.25) {
+                    particles.splice(j, 1);
+                    ag.type = TYPE_AGSCN;
+                    ag.baseR = PARTICLE_RADIUS * 1.3;
+                    ag.vx = 0;
+                    ag.vy = 1.5;
+                    break;
+                }
+            }
+        }
+
+        // C-vitamin + Fe³⁺ -> Fe²⁺ (reduceret, deltager ikke længere i ligevægten)
+        for (let i = particles.length - 1; i >= 0; i--) {
+            let vitc = particles[i];
+            if (vitc.type !== TYPE_VITC || vitc.entering) continue;
+
+            for (let j = particles.length - 1; j >= 0; j--) {
+                let fe = particles[j];
+                if (fe.type !== TYPE_FE || fe.entering) continue;
+
+                let dx = vitc.x - fe.x;
+                let dy = vitc.y - fe.y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+
+                // Samme ekstra rækkevidde som Ag⁺, så reaktionen sker lige så hurtigt
+                if (dist < (vitc.r + fe.r) * 1.25) {
+                    fe.type = TYPE_FE2;
+                    particles.splice(i, 1);
+                    break;
+                }
+            }
+        }
+    }
+
+    function getCounts() {
+        let fe = 0, scn = 0, fescn = 0;
+        for (let p of particles) {
+            if (p.type === TYPE_FE) fe++;
+            else if (p.type === TYPE_SCN) scn++;
+            else if (p.type === TYPE_FESCN) fescn++;
+        }
+        return { fe, scn, fescn };
+    }
+
+    // Koncentrationer (mM) ud fra de faktiske antal partikler og den aktuelle volumen.
+    // Fordobles volumen, halveres koncentrationerne - selvom antallet af partikler
+    // (stofmængden) er uændret. Det er det, der reelt afgør Y og K, og det driver
+    // både reaktionen og beregningen, så de altid er enige.
+    function getConcentrations() {
+        let counts = getCounts();
+        return {
+            fe: counts.fe / volumeMultiplier,
+            scn: counts.scn / volumeMultiplier,
+            fescn: counts.fescn / volumeMultiplier
+        };
+    }
+
+    function updateUI() {
+        let counts = getCounts();
+        let conc = getConcentrations();
+
+        document.getElementById("ui-count-fe").innerText = formatConc(conc.fe);
+        document.getElementById("ui-count-scn").innerText = formatConc(conc.scn);
+        document.getElementById("ui-count-fescn").innerText = formatConc(conc.fescn);
+
+        let denominator = conc.fe * conc.scn;
+        let y = denominator === 0 ? 0 : conc.fescn / denominator;
+        let currentK = getCurrentK(); // Afhænger af temperaturen (Van 't Hoff)
+
+        // Mellemregningen bruger mM, men den samlede værdi opgives altid i M
+        let yFormatted = formatSig(y * MM_PER_M);
+        let kFormatted = formatSig(currentK * MM_PER_M);
+
+        document.getElementById("ui-y-value").innerText = yFormatted;
+        document.getElementById("ui-k-value").innerText = kFormatted;
+
+        // "Y = K"-teksten vises kun, når de afrundede tal rent faktisk er identiske
+        // (et lidt strengere krav end selve ligevægtspunktet, se isAtEquilibrium)
+        document.getElementById("ui-y-equals-k").style.display =
+            (yFormatted === kFormatted) ? "block" : "none";
+
+        // Ligevægtspunktet findes altid - det er den nåelige tilstand tættest på K
+        let atEquilibrium = isAtEquilibrium(counts, currentK);
+        syncForceButtonVisibility(atEquilibrium);
+
+        let statusEl = document.getElementById("ui-status");
+        let arrowEl = document.getElementById("rx-arrow");
+
+        // Status står i det mørke sidepanel (lyse farver), mens pilen står over
+        // animationen på lys baggrund og derfor bruger mørkere varianter
+        if (atEquilibrium) {
+            statusEl.innerText = "I ligevægt";
+            statusEl.style.color = "#4ade80"; // Grøn
+            arrowEl.textContent = "⇌";
+            arrowEl.style.color = "#15803d";
+        } else if (y < currentK) {
+            // For lidt kompleks - pilen viser den korrigerende retning (mod venstre)
+            statusEl.innerText = "Forskudt mod HØJRE";
+            statusEl.style.color = "#fbbf24"; // Gul
+            arrowEl.textContent = "↽";
+            arrowEl.style.color = "#b45309";
+        } else {
+            // For meget kompleks - pilen viser den korrigerende retning (mod højre)
+            statusEl.innerText = "Forskudt mod VENSTRE";
+            statusEl.style.color = "#fbbf24";
+            arrowEl.textContent = "⇀";
+            arrowEl.style.color = "#b45309";
+        }
+    }
+
+    function pushHistory() {
+        let conc = getConcentrations();
+        if (history.length > maxHistory) {
+            history.shift();
+        }
+        history.push(conc);
+    }
+
+    // Tegner væskens farve som lag, der lægges oven på hinanden (i stedet for at blande
+    // farverne til et gennemsnit). Det sikrer, at den røde FeSCN²⁺-farve altid dominerer
+    // over den gule Fe³⁺-farve, især ved høje koncentrationer - ligesom i det virkelige
+    // forsøg. Derfor gør mere Fe³⁺ (som forskyder ligevægten mod mere kompleks) altid
+    // opløsningen mere rød, når en ny ligevægt er nået.
+    // Kvadratisk optrapning i stedet for lineær: farven er svag/afdæmpet ved lave
+    // koncentrationer, men tager til markant hurtigere, jo højere koncentrationen bliver
+    function concentrationAlpha(conc, refConc, cap) {
+        let ratio = conc / refConc;
+        return cap * Math.min(ratio * ratio, 1);
+    }
+
+    function drawSolutionLayers() {
+        let conc = getConcentrations();
+        let fe2Count = 0;
+        for (let p of particles) {
+            if (p.type === TYPE_FE2) fe2Count++;
+        }
+        let fe2Conc = fe2Count / volumeMultiplier;
+
+        const area = [15, 20, WIDTH - 30, HEIGHT - 35];
+
+        // Farvebidrag fra de farvede ioner. Den røde er sat lidt kraftigere op
+        // (både i styrke og i selve farvetonen), så den dominerer tydeligere
+        let feAlpha = concentrationAlpha(conc.fe, 13, 0.18);      // Fe³⁺ - gul-orange
+        let fe2Alpha = concentrationAlpha(fe2Conc, 8, 0.1);       // Fe²⁺ - meget svag grøn
+        let redAlpha = concentrationAlpha(conc.fescn, 11, 0.72);  // FeSCN²⁺ - orange-rød
+
+        // Rent vand (og SCN⁻, som er farveløs) er svagt lyseblåt. Det blå toner ud,
+        // efterhånden som der kommer farvede ioner i opløsningen, så blå + orange
+        // ikke ender med at blande sig til en grålig farve
+        let waterAlpha = 0.12 * Math.max(0, 1 - (feAlpha + fe2Alpha + redAlpha) / 0.2);
+        ctx.fillStyle = "rgba(100, 150, 255, " + waterAlpha + ")";
+        ctx.fillRect(...area);
+
+        // Fe³⁺ - svagt gul-orange, meget afdæmpet ved lave koncentrationer
+        if (feAlpha > 0) {
+            ctx.fillStyle = "rgba(255, 190, 90, " + feAlpha + ")";
+            ctx.fillRect(...area);
+        }
+
+        // Fe²⁺ - ekstremt svag grøn
+        if (fe2Alpha > 0) {
+            ctx.fillStyle = "rgba(150, 255, 150, " + fe2Alpha + ")";
+            ctx.fillRect(...area);
+        }
+
+        // FeSCN²⁺ - varm orange-rød ovenpå de andre lag. Svag ved udgangspunktets
+        // lave koncentration, men dominerer tydeligt, når koncentrationen stiger
+        if (redAlpha > 0) {
+            ctx.fillStyle = "rgba(216, 62, 38, " + redAlpha + ")";
+            ctx.fillRect(...area);
+        }
+    }
+
+    function drawBeaker() {
+        // Lys baggrund, så opløsningens farver ses tydeligt (som et bægerglas i lys)
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+        ctx.strokeStyle = "rgba(70, 82, 96, 0.35)";
+        ctx.lineWidth = 10;
+        ctx.beginPath();
+        // Venstre kant
+        ctx.moveTo(10, 0);
+        ctx.lineTo(10, HEIGHT - 10);
+        // Bund
+        ctx.lineTo(WIDTH - 10, HEIGHT - 10);
+        // Højre kant
+        ctx.lineTo(WIDTH - 10, 0);
+        ctx.stroke();
+
+        // Væskeniveau - farven afspejler den faktiske sammensætning i opløsningen
+        drawSolutionLayers();
+
+        // Volumenmarkering på kolben: 1 L fra start, 2 L efter en fordobling osv.
+        ctx.strokeStyle = "rgba(70, 82, 96, 0.5)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(20, 46);
+        ctx.lineTo(46, 46);
+        ctx.stroke();
+
+        ctx.fillStyle = "rgba(45, 55, 68, 0.85)";
+        ctx.font = "bold 15px Arial";
+        ctx.textAlign = "left";
+        ctx.textBaseline = "middle";
+        ctx.fillText(volumeMultiplier + " L", 52, 46);
+    }
+
+    // Tegner grafen på et vilkårligt canvas (både den lille i sidepanelet og den
+    // forstørrede). windowSize angiver, hvor langt et tidsforløb der vises - den
+    // forstørrede graf viser altså et større udsnit, ikke bare en forstørrelse.
+    // Kurverne forskydes en anelse lodret i forhold til hinanden, så man stadig kan
+    // se dem alle som "dobbeltstreger", når koncentrationerne er ens.
+    function drawGraphTo(targetCanvas, targetCtx, windowSize, visible) {
+        let show = visible || { fe: true, scn: true, fescn: true };
+        let W = targetCanvas.width;
+        let H = targetCanvas.height;
+        targetCtx.clearRect(0, 0, W, H);
+
+        let fontSize = H > 260 ? 13 : 10;
+        let padLeft = fontSize * 3.4;
+        let padRight = fontSize * 0.8;
+        let padTop = fontSize * 1.8;
+        let padBottom = fontSize * 1.9;
+        let plotW = Math.max(10, W - padLeft - padRight);
+        let plotH = Math.max(10, H - padTop - padBottom);
+
+        // Kun det seneste stykke historik vises
+        let data = history.slice(Math.max(0, history.length - windowSize));
+
+        // Skalaen tager kun højde for de kurver, der faktisk vises
+        let maxVal = 0;
+        for (let c of data) {
+            if (show.fe) maxVal = Math.max(maxVal, c.fe);
+            if (show.scn) maxVal = Math.max(maxVal, c.scn);
+            if (show.fescn) maxVal = Math.max(maxVal, c.fescn);
+        }
+        maxVal = Math.max(maxVal, 10); // Minimum scale
+
+        targetCtx.font = fontSize + "px Arial";
+
+        // Vandrette hjælpelinjer og værdier på y-aksen
+        targetCtx.textAlign = "right";
+        targetCtx.textBaseline = "middle";
+        for (let t = 0; t <= 2; t++) {
+            let value = (maxVal * t) / 2;
+            let y = padTop + plotH - (value / maxVal) * plotH;
+
+            if (t > 0) {
+                targetCtx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+                targetCtx.lineWidth = 1;
+                targetCtx.beginPath();
+                targetCtx.moveTo(padLeft, y);
+                targetCtx.lineTo(padLeft + plotW, y);
+                targetCtx.stroke();
+            }
+
+            targetCtx.fillStyle = "rgba(200, 200, 200, 0.8)";
+            targetCtx.fillText(formatConc(Math.round(value * 10) / 10), padLeft - 5, y);
+        }
+
+        // Selve akserne
+        targetCtx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+        targetCtx.lineWidth = 1;
+        targetCtx.beginPath();
+        targetCtx.moveTo(padLeft, padTop);
+        targetCtx.lineTo(padLeft, padTop + plotH);
+        targetCtx.lineTo(padLeft + plotW, padTop + plotH);
+        targetCtx.stroke();
+
+        // Aksetekster: koncentration op ad y-aksen, tid hen ad x-aksen
+        targetCtx.fillStyle = "rgba(230, 230, 230, 0.95)";
+        targetCtx.textAlign = "left";
+        targetCtx.textBaseline = "top";
+        targetCtx.fillText("c (mM)", 2, 2);
+        targetCtx.textAlign = "right";
+        targetCtx.textBaseline = "bottom";
+        targetCtx.fillText("tid →", W - 2, H - 1);
+
+        if (data.length === 0) return;
+
+        let stepX = plotW / windowSize;
+        // Fast stregtykkelse - kurverne bliver ikke tykkere, når grafen forstørres
+        let lineWidth = 2;
+        let shift = 2.2; // Adskillelse, når kurverne ligger oven i hinanden
+
+        const drawLine = (key, color, offset) => {
+            targetCtx.beginPath();
+            targetCtx.strokeStyle = color;
+            targetCtx.lineWidth = lineWidth;
+            for (let i = 0; i < data.length; i++) {
+                let x = padLeft + i * stepX;
+                let y = padTop + plotH - (data[i][key] / maxVal) * plotH + offset;
+                if (i === 0) targetCtx.moveTo(x, y);
+                else targetCtx.lineTo(x, y);
+            }
+            targetCtx.stroke();
+        };
+
+        if (show.fe) drawLine('fe', "rgba(255, 235, 153, 0.95)", -shift);
+        if (show.scn) drawLine('scn', "rgba(200, 200, 200, 0.95)", 0);
+        if (show.fescn) drawLine('fescn', "rgba(220, 70, 70, 0.95)", shift);
+    }
+
+    function drawGraph() {
+        // Den lille graf viser altid alle tre kurver; til- og fravalg gælder den
+        // forstørrede graf, hvor knapperne til det også sidder
+        drawGraphTo(graphCanvas, graphCtx, SMALL_GRAPH_WINDOW);
+        if (isGraphMaximized) {
+            drawGraphTo(maxGraphCanvas, maxGraphCtx, MAX_GRAPH_WINDOW, graphSeriesVisible);
+        }
+    }
+
+    let frameCount = 0;
+    function animate() {
+        let speedFactor = getSpeedFactor();
+
+        drawBeaker();
+
+        resolveCollisionsAndReactions();
+        // Både Ag⁺ og C-vitamin er kraftigt "magnetiske" og hurtige
+        applySeeking(TYPE_AG, TYPE_SCN, 0.35, 3.4);
+        applySeeking(TYPE_VITC, TYPE_FE, 0.35, 3.4);
+        resolveInterventions();
+
+        // Instant ligevægt: mikroreaktionerne (fx fra "dynamisk ligevægt") må gerne
+        // trække systemet væk fra ligevægten, men modsvares med det samme, så
+        // koncentrationerne straks er tilbage i ligevægtspunktet. Lige efter et
+        // indgreb holdes korrektionen tilbage, så indgrebet kan ses på grafen.
+        if (isInstantMode() && Date.now() >= instantHoldUntil &&
+            !isAtEquilibrium(getCounts(), getCurrentK())) {
+            forceEquilibrium();
+        }
+
+        for (let p of particles) {
+            p.update(speedFactor);
+            p.draw(ctx);
+        }
+
+        // UI opdateres jævnligt for at føles responsiv...
+        frameCount++;
+        if (frameCount % 10 === 0) {
+            updateUI();
+        }
+        // ...men grafen opdateres sjældnere og over et længere historik-vindue,
+        // så den ruller langsommere og ikke stresser brugeren
+        if (frameCount % 25 === 0) {
+            pushHistory();
+            drawGraph();
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    // Springer direkte til ligevægtspunktet i stedet for at vente på, at
+    // reaktionen selv finder derhen (til de utålmodige)
+    function forceEquilibrium() {
+        let currentK = getCurrentK();
+        let counts = getCounts();
+
+        // Fe og SCN er bevaret - de sidder enten frit eller bundet i komplekset
+        let feTotal = counts.fe + counts.fescn;
+        let scnTotal = counts.scn + counts.fescn;
+        let maxComplex = Math.min(feTotal, scnTotal);
+
+        // Find det antal komplekser, der bringer Y tættest på K
+        let bestComplex = counts.fescn;
+        let bestDiff = Infinity;
+        for (let k = 0; k <= maxComplex; k++) {
+            let feC = (feTotal - k) / volumeMultiplier;
+            let scnC = (scnTotal - k) / volumeMultiplier;
+            let denom = feC * scnC;
+            if (denom === 0) continue; // Y er udefineret her - aldrig et ligevægtspunkt
+            let diff = Math.abs((k / volumeMultiplier) / denom - currentK);
+            if (diff < bestDiff) {
+                bestDiff = diff;
+                bestComplex = k;
+            }
+        }
+
+        // Dan komplekser, indtil vi står i ligevægtspunktet
+        while (getCounts().fescn < bestComplex) {
+            let feIndex = particles.findIndex(p => p.type === TYPE_FE && !p.entering);
+            let scnIndex = particles.findIndex(p => p.type === TYPE_SCN && !p.entering);
+            if (feIndex === -1 || scnIndex === -1) break;
+
+            let newX = (particles[feIndex].x + particles[scnIndex].x) / 2;
+            let newY = (particles[feIndex].y + particles[scnIndex].y) / 2;
+            particles.splice(Math.max(feIndex, scnIndex), 1); // største index først
+            particles.splice(Math.min(feIndex, scnIndex), 1);
+            particles.push(new Particle(TYPE_FESCN, newX, newY));
+        }
+
+        // ...eller spalt komplekser, hvis der er for mange
+        while (getCounts().fescn > bestComplex) {
+            let index = particles.findIndex(p => p.type === TYPE_FESCN && !p.entering);
+            if (index === -1) break;
+
+            let complex = particles[index];
+            particles.splice(index, 1);
+            particles.push(new Particle(TYPE_FE, complex.x - 12, complex.y));
+            particles.push(new Particle(TYPE_SCN, complex.x + 12, complex.y));
+        }
+
+        updateUI();
+    }
+
+    // Canvas-opløsningen skal svare til den viste størrelse, ellers bliver akse-
+    // tekster strukket og uskarpe
+    function syncCanvasResolution(canvasEl) {
+        if (canvasEl.clientWidth > 0 && canvasEl.clientHeight > 0) {
+            canvasEl.width = canvasEl.clientWidth;
+            canvasEl.height = canvasEl.clientHeight;
+        }
+    }
+
+    function syncGraphSizes() {
+        syncCanvasResolution(graphCanvas);
+        drawGraphTo(graphCanvas, graphCtx, SMALL_GRAPH_WINDOW);
+
+        if (isGraphMaximized) {
+            syncCanvasResolution(maxGraphCanvas);
+            drawGraphTo(maxGraphCanvas, maxGraphCtx, MAX_GRAPH_WINDOW);
+        }
+    }
+
+    function setGraphMaximized(maximized) {
+        isGraphMaximized = maximized;
+        graphOverlay.classList.toggle("open", maximized);
+        syncGraphSizes();
+    }
+
+    window.addEventListener("resize", syncGraphSizes);
+
+    // Tilføjer en ion, som falder sjovt ned i bægerglasset ovenfra
+    function addParticleFromAbove(type) {
+        let r = ((type === TYPE_FESCN) ? PARTICLE_RADIUS * 1.3 : PARTICLE_RADIUS) * getIonScale();
+        let x = r + 20 + Math.random() * (WIDTH - 2 * r - 40);
+        particles.push(new Particle(type, x, null, { fromAbove: true }));
+    }
+
+    function isInstantMode() {
+        return document.getElementById("instant-toggle").checked;
+    }
+
+    function isDynamicMode() {
+        return document.getElementById("dynamic-toggle").checked;
+    }
+
+    // Mens et indgreb er "i luften", holder vi den automatiske korrektion tilbage,
+    // så selve indgrebet når at blive vist på grafen
+    let instantHoldUntil = 0;
+
+    function holdInstantEquilibrium() {
+        instantHoldUntil = Date.now() + INSTANT_DELAY_MS;
+    }
+
+    // Tilsætning af en ion: falder normalt ned ovenfra, men teleporterer direkte
+    // ned i væsken, når "instant ligevægt" er slået til
+    function addIon(type) {
+        if (isInstantMode()) {
+            particles.push(new Particle(type));
+        } else {
+            addParticleFromAbove(type);
+        }
+    }
+
+    // Ydre indgreb (Ag⁺ og C-vitamin) tilsættes i pakker. I instant-tilstand
+    // teleporterer de hen til hver sin målion, så reaktionen er overstået
+    // inden for et sekund - ellers falder de ned ovenfra som de øvrige ioner
+    function addReagentBatch(type, targetType, count) {
+        if (!isInstantMode()) {
+            for (let i = 0; i < count; i++) addParticleFromAbove(type);
+            return;
+        }
+
+        let targets = particles.filter(p => p.type === targetType && !p.entering);
+        let offset = (PARTICLE_RADIUS * 2.2) * getIonScale();
+
+        for (let i = 0; i < count; i++) {
+            let target = targets[i]; // hver sin målion, så de ikke lander oven i hinanden
+            if (target) {
+                particles.push(new Particle(type, target.x + offset, target.y));
+            } else {
+                particles.push(new Particle(type));
+            }
+        }
+    }
+
+    // Efter et indgreb i instant-tilstand: vis først selve indgrebet på grafen, og
+    // lad derefter systemet falde på plads i ligevægtspunktet
+    function scheduleInstantEquilibrium() {
+        if (!isInstantMode()) return;
+
+        holdInstantEquilibrium();
+        pushHistory();
+        drawGraph();
+
+        setTimeout(function() {
+            instantHoldUntil = 0; // Den løbende korrektion må køre igen
+            if (!isInstantMode()) return;
+            forceEquilibrium();
+            pushHistory();
+            drawGraph();
+        }, INSTANT_DELAY_MS);
+    }
+
+    // Knappen under animationen vises kun, når den giver mening: altså når man
+    // faktisk står og venter på en ligevægt. Den er skjult, hvis ligevægten
+    // indstiller sig selv (instant), hvis dynamisk ligevægt er slået til, eller
+    // hvis systemet allerede står i ligevægtspunktet
+    function syncForceButtonVisibility(atEquilibrium) {
+        let hide = isInstantMode() || isDynamicMode() || atEquilibrium;
+        document.getElementById("btn-force-equilibrium").style.display = hide ? "none" : "";
+    }
+
+    // Event Listeners for knapper
+    document.getElementById("btn-add-fe").addEventListener("click", () => {
+        for (let i = 0; i < 3; i++) addIon(TYPE_FE);
+        scheduleInstantEquilibrium();
+    });
+
+    document.getElementById("btn-add-scn").addEventListener("click", () => {
+        for (let i = 0; i < 3; i++) addIon(TYPE_SCN);
+        scheduleInstantEquilibrium();
+    });
+
+    document.getElementById("btn-add-fescn").addEventListener("click", () => {
+        addIon(TYPE_FESCN);
+        scheduleInstantEquilibrium();
+    });
+
+    document.getElementById("btn-add-ag").addEventListener("click", () => {
+        addReagentBatch(TYPE_AG, TYPE_SCN, 3);
+        scheduleInstantEquilibrium();
+    });
+
+    document.getElementById("btn-add-vitc").addEventListener("click", () => {
+        addReagentBatch(TYPE_VITC, TYPE_FE, 3);
+        scheduleInstantEquilibrium();
+    });
+
+    // Begge toggles kan ændre, om knappen "Påtving ligevægt" giver mening
+    document.getElementById("instant-toggle").addEventListener("change", () => {
+        updateUI();
+    });
+
+    document.getElementById("dynamic-toggle").addEventListener("change", () => {
+        updateUI();
+    });
+
+    // Fordobler volumen (fortynder opløsningen) - loftet på 8× er blot for at holde
+    // tallene læsbare; antallet af partikler ændres ikke, kun koncentrationen
+    document.getElementById("btn-double-volume").addEventListener("click", () => {
+        volumeMultiplier = Math.min(volumeMultiplier * 2, 8);
+        document.getElementById("ui-volume").innerText = volumeMultiplier + "×";
+        scheduleInstantEquilibrium();
+    });
+
+    document.getElementById("btn-force-equilibrium").addEventListener("click", () => {
+        forceEquilibrium();
+    });
+
+    document.getElementById("btn-maximize-graph").addEventListener("click", () => {
+        setGraphMaximized(true);
+    });
+
+    document.getElementById("btn-close-graph").addEventListener("click", () => {
+        setGraphMaximized(false);
+    });
+
+    document.getElementById("btn-reset").addEventListener("click", () => {
+        initSystem();
+    });
+
+    // Start
+    initSystem();
+    syncGraphSizes();
+    updateUI(); // Sætter også knappens synlighed korrekt fra start
+    animate();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formel og Aktuel Koncentration – Interaktive Animationer</title>
+    <style>
+        :root {
+            --bg: #1e272e;
+            --panel: #2d3436;
+            --text: #ecf0f1;
+            --accent: #0984e3;
+            --success: #00b894;
+        }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* --- NAVIGATION --- */
+        nav {
+            background: rgba(0,0,0,0.3); padding: 10px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 20px; border-bottom: 1px solid #444;
+        }
+        .nav-btn {
+            background: transparent; border: 1px solid #555; color: #aaa; padding: 8px 20px; border-radius: 20px; cursor: pointer; transition: 0.3s; font-weight: bold;
+        }
+        .nav-btn:hover { border-color: var(--accent); color: #fff; }
+        .nav-btn.active { background: var(--accent); border-color: var(--accent); color: white; box-shadow: 0 0 15px rgba(9, 132, 227, 0.4); }
+
+        /* --- APP CONTAINER --- */
+        #app-container { flex: 1; position: relative; overflow: hidden; }
+        
+        /* Fælles styling for alle 3 views */
+        .view-section {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: none; /* Skjult som standard */
+            flex-direction: row;
+        }
+        .view-section.active { display: flex; animation: fadein 0.5s; }
+
+        .canvas-area { flex: 1; min-width: 0; min-height: 0; position: relative; background: radial-gradient(circle, #34495e 0%, #1e272e 100%); display: flex; justify-content: center; align-items: center; }
+        .controls-area { width: 440px; flex-shrink: 0; background: var(--panel); border-left: 1px solid #444; padding: 16px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+
+        canvas { border-radius: 4px; box-shadow: 0 0 30px rgba(0,0,0,0.5); max-width: 100%; max-height: 100%; }
+        h2 { margin: 0 0 6px 0; color: var(--accent); font-size: 1.1rem; border-bottom: 1px solid #555; padding-bottom: 5px; }
+        p { font-size: 0.85rem; color: #bdc3c7; line-height: 1.35; margin: 0 0 6px 0; }
+
+        .btn { width: 100%; padding: 9px; background: var(--accent); border: none; color: white; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 8px; }
+        .btn:hover { opacity: 0.9; }
+        .btn-row { display: flex; gap: 8px; margin-top: 8px; }
+        .btn-row .btn { margin-top: 0; }
+
+        .coeff-btn { flex: 1; padding: 8px 0; background: #2d3436; border: 1px solid #555; color: #ccc; font-weight: bold; border-radius: 4px; cursor: pointer; transition: 0.2s; }
+        .coeff-btn:hover { border-color: var(--accent); color: #fff; }
+        .coeff-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+        /* --- Kontroller klistret på selve animationen (i stedet for højre panel) --- */
+        .canvas-overlay-left, .canvas-overlay-right {
+            position: absolute; top: 10px; z-index: 2;
+            display: flex; flex-direction: column; gap: 6px;
+            pointer-events: none; /* lad klik/træk på canvas gå igennem uden om selve boksene */
+        }
+        .canvas-overlay-left { left: 10px; align-items: flex-start; }
+        .canvas-overlay-right { right: 10px; align-items: flex-end; }
+
+        .overlay-label {
+            font-size: 0.65rem; color: #999; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .overlay-chips {
+            pointer-events: auto;
+            display: flex; flex-wrap: wrap; gap: 4px; max-width: 220px;
+            background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px; padding: 6px;
+        }
+        .canvas-overlay-right .overlay-chips { justify-content: flex-end; }
+
+        .chip-btn {
+            background: transparent; border: 1px solid #666; color: #ccc;
+            padding: 3px 9px; border-radius: 12px; font-size: 0.72rem; font-weight: bold;
+            cursor: pointer; transition: 0.2s; white-space: nowrap;
+        }
+        .chip-btn:hover { border-color: var(--accent); color: #fff; }
+        .chip-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+        .chip-btn.sub-chip { padding: 7px 15px; font-size: 0.85rem; border-radius: 16px; }
+        .chip-btn.next-hint { border-color: #fdcb6e; animation: chipBlink 1.2s ease-in-out infinite; }
+        @keyframes chipBlink { 0%, 100% { box-shadow: 0 0 0 rgba(253,203,110,0); } 50% { box-shadow: 0 0 12px 3px rgba(253,203,110,0.8); } }
+
+        @keyframes fadein { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Panelet i højre side bliver med, i stedet for at blive klippet væk,
+           når vinduet/zoomniveauet gør bredden for lille til side-om-side layout */
+        @media (max-width: 820px) {
+            .view-section.active { flex-direction: column; }
+            .canvas-area { flex: 1 1 55%; }
+            .controls-area {
+                width: 100%; flex: 0 0 auto; max-height: 45%;
+                border-left: none; border-top: 1px solid #444;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <button class="nav-btn active" onclick="switchTab(1)">1. Opløsning af salt</button>
+    <button class="nav-btn" onclick="switchTab(2)">2. Søjlediagram over ionkoncentration</button>
+</nav>
+
+<div id="app-container">
+
+    <div id="view-1" class="view-section active">
+        <div class="canvas-area">
+            <canvas id="canvas1"></canvas>
+            <div class="canvas-overlay-left" id="overlay-sub-1"></div>
+            <div class="canvas-overlay-right" id="overlay-vol-1"></div>
+        </div>
+        <div class="controls-area" id="controls1">
+            <h2>Opløsning af salt</h2>
+            <p>Træk stoffet ned i vandet og se hvad der sker med forholdet mellem ionerne.</p>
+            <div id="ui-1"></div>
+        </div>
+    </div>
+
+    <div id="view-2" class="view-section">
+        <div class="canvas-area">
+            <canvas id="canvas2"></canvas>
+        </div>
+        <div class="controls-area" id="controls2">
+            <h2>Søjlediagram over ionkoncentration</h2>
+            <p>Vælg koefficienten for hver ion. Søjlen viser resultatet med det samme.</p>
+            <div id="ui-2"></div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- GLOBAL STATE MANAGER ---
+    let activeApp = null;
+
+    // Formaterer tal med dansk komma som decimaltegn
+    function fmt(num, decimals) {
+        return num.toFixed(decimals).replace('.', ',');
+    }
+
+    function switchTab(id) {
+        // Opdater UI knapper
+        document.querySelectorAll('.nav-btn').forEach((b, i) => {
+            b.classList.toggle('active', i + 1 === id);
+        });
+
+        // Skift View
+        document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+        document.getElementById(`view-${id}`).classList.add('active');
+
+        // Stop forrige animation loop hvis nødvendigt
+        if(activeApp && activeApp.stop) activeApp.stop();
+
+        // Start den nye app
+        if(id === 1) activeApp = new SolutionApp();
+        if(id === 2) activeApp = new BarGameApp();
+    }
+
+// --- KODEBLOK 1: OPLØSNING AF SALT (drag-and-drop, med opgaver der kører i ét flow) ---
+class SolutionApp {
+    constructor() {
+        this.canvas = document.getElementById('canvas1');
+        this.ctx = this.canvas.getContext('2d');
+        this.ui = document.getElementById('ui-1');
+        this.subOverlay = document.getElementById('overlay-sub-1');
+        this.volOverlay = document.getElementById('overlay-vol-1');
+
+        // Hvor stor en del af bægerglasset der ser fyldt ud ved hver volumen-indstilling
+        this.fillFractionByVolume = { 0.5: 0.45, 1.0: 0.20, 2.0: 0.08 };
+
+        // Data om stoffer
+        this.substances = {
+            'NaCl':    { name: 'NaCl',      cat: { label: 'Na⁺',  col: '#9b59b6', factor: 1, r: 9 },  an: { label: 'Cl⁻',   col: '#3498db', factor: 1, r: 9 } },
+            'Na2SO4':  { name: 'Na₂SO₄',    cat: { label: 'Na⁺',  col: '#9b59b6', factor: 2, r: 7 },  an: { label: 'SO₄²⁻', col: '#f1c40f', factor: 1, r: 11 } },
+            'FeCl3':   { name: 'FeCl₃',     cat: { label: 'Fe³⁺', col: '#e67e22', factor: 1, r: 9 },  an: { label: 'Cl⁻',   col: '#3498db', factor: 3, r: 7 } },
+            'K3PO4':   { name: 'K₃PO₄',     cat: { label: 'K⁺',   col: '#1abc9c', factor: 3, r: 7 },  an: { label: 'PO₄³⁻', col: '#e84393', factor: 1, r: 11 } },
+            'Al2SO43': { name: 'Al₂(SO₄)₃', cat: { label: 'Al³⁺', col: '#c0392b', factor: 2, r: 8 },  an: { label: 'SO₄²⁻', col: '#f1c40f', factor: 3, r: 10 } }
+        };
+
+        // Par af salte, der deler en ion — bruges til "bland to salte"-opgaver
+        this.mixedPairs = [
+            { subs: ['NaCl', 'Na2SO4'],    ionKey: 'cat' }, // deler Na⁺
+            { subs: ['NaCl', 'FeCl3'],     ionKey: 'an' },  // deler Cl⁻
+            { subs: ['Na2SO4', 'Al2SO43'], ionKey: 'an' }   // deler SO₄²⁻
+        ];
+
+        // Bonusspørgsmål om ræsonnementet bag ion-forholdet (vises efter en korrekt løst opgave)
+        this.bonusQuestions = {
+            'NaCl': {
+                q: 'Hvorfor er [Na⁺] og [Cl⁻] lige store, når NaCl opløses?',
+                options: [
+                    'Fordi hver formelenhed NaCl indeholder præcis én Na⁺ og én Cl⁻',
+                    'Fordi Na⁺ og Cl⁻ altid har samme koncentration i alle salte',
+                    'Fordi NaCl ikke danner ioner, når det opløses'
+                ],
+                correct: 0
+            },
+            'Na2SO4': {
+                q: 'Hvorfor er [Na⁺] dobbelt så høj som c(Na₂SO₄)?',
+                options: [
+                    'Fordi Na⁺ vejer mindre end SO₄²⁻',
+                    'Fordi hver formelenhed Na₂SO₄ indeholder to Na⁺-ioner',
+                    'Fordi natrium altid optræder i par i vand'
+                ],
+                correct: 1
+            },
+            'FeCl3': {
+                q: 'Hvorfor er [Cl⁻] tre gange så høj som c(FeCl₃)?',
+                options: [
+                    'Fordi Fe³⁺ er en meget stor ion',
+                    'Fordi klor altid danner tre gange så mange ioner som metaller',
+                    'Fordi hver formelenhed FeCl₃ indeholder tre Cl⁻-ioner, som balancerer Fe³⁺s ladning på 3+'
+                ],
+                correct: 2
+            },
+            'K3PO4': {
+                q: 'Hvorfor er [K⁺] tre gange så høj som c(K₃PO₄)?',
+                options: [
+                    'Fordi kalium altid optræder i tripletter i opløsning',
+                    'Fordi hver formelenhed K₃PO₄ indeholder tre K⁺-ioner, som balancerer PO₄³⁻s ladning på 3−',
+                    'Fordi K⁺ er en lettere ion end PO₄³⁻'
+                ],
+                correct: 1
+            },
+            'Al2SO43': {
+                q: 'Hvorfor er forholdet mellem [Al³⁺] og [SO₄²⁻] netop 2:3, når Al₂(SO₄)₃ opløses?',
+                options: [
+                    'Fordi ladningerne skal balancere: 2 × (3+) = 3 × (2−) = 6',
+                    'Fordi sulfat-ionen indeholder tre oxygenatomer',
+                    'Fordi aluminium altid danner færre ioner end svovl'
+                ],
+                correct: 0
+            }
+        };
+
+        // Hjælper med at pege den blinkende "skift kemikalie"-hint på rette knap
+        this.substanceHintShown = false;
+        this.taskPrimarySub = null;
+        this.advanceTimer = null;
+
+        // Setup
+        this.currentSub = 'NaCl';
+        this.volume = 1.0;
+        this.particles = [];
+        this.unitsBySub = {};
+        Object.keys(this.substances).forEach(k => this.unitsBySub[k] = 0);
+        this.unitValue = 0.10;
+
+        // Beaker dims
+        this.beaker = { x: 0, y: 0, w: 220, h: 300 };
+        this.waterLevelY = 0;
+
+        // Drag State
+        this.sourcePos = { x: 0, y: 0 };
+        this.dragItem = null;
+        this.isDragging = false;
+        this.fallingItem = null;
+
+        // Opgave
+        this.taskActive = false;
+        this.taskMode = 'single'; // 'single' eller 'mixed'
+        this.targetIonLabel = '';
+        this.targetConc = 0;
+        this.taskHint = '';
+
+        this.bindEvents();
+        this.resize();
+        this.init();
+        
+        this.running = true;
+        this.loop();
+    }
+
+    resize() {
+        const oldBeakerX = this.beaker.x;
+        const oldBeakerY = this.beaker.y;
+
+        this.canvas.width = this.canvas.parentElement.clientWidth;
+        this.canvas.height = this.canvas.parentElement.clientHeight;
+
+        // Centrer bægerglas
+        this.beaker.x = this.canvas.width / 2 - this.beaker.w / 2;
+        this.beaker.y = this.canvas.height / 2 - this.beaker.h / 2 + 60;
+        this.updateWaterLevel();
+
+        // Hylde / Kilde position
+        this.sourcePos = { x: this.canvas.width / 2, y: 80 };
+
+        // Flyt eksisterende ioner/faldende enhed med, så de ikke "springer" når
+        // bægerglasset rykker sig pga. browser-zoom eller vinduesændring
+        const dx = this.beaker.x - oldBeakerX;
+        const dy = this.beaker.y - oldBeakerY;
+        if (dx || dy) {
+            this.particles.forEach(p => { p.x += dx; p.y += dy; });
+            if (this.fallingItem) {
+                this.fallingItem.x += dx;
+                this.fallingItem.y += dy;
+            }
+        }
+
+        // Kildeitemet ligger altid stille over hylden, når det ikke trækkes
+        if (this.dragItem && !this.isDragging) {
+            this.dragItem.x = this.sourcePos.x;
+            this.dragItem.y = this.sourcePos.y;
+        }
+    }
+
+    updateWaterLevel() {
+        const fraction = this.fillFractionByVolume[this.volume] ?? 0.20;
+        this.waterLevelY = this.beaker.y + this.beaker.h * fraction;
+    }
+
+    init() {
+        this.ui.innerHTML = `
+            <div id="equation-line" style="background:rgba(0,0,0,0.2); padding:8px; border-radius:4px; margin-bottom:8px; text-align:center; font-size:1rem; font-weight:bold;"></div>
+
+            <div style="background:#000; border:2px solid #555; border-radius:6px; padding:10px; margin-bottom:8px; box-shadow:0 0 10px rgba(0,0,0,0.5) inset;">
+                <div style="color:#00ff00; font-family:'Courier New', monospace; font-size:0.75rem; letter-spacing:1px; margin-bottom:4px;">FORMEL KONCENTRATION (pr. stof)</div>
+                <div id="lcd-c" style="color:#00ff00; font-family:'Courier New', monospace; font-size:1rem; font-weight:bold;"></div>
+            </div>
+
+            <div style="background:#1e272e; border-left:4px solid #0984e3; padding:8px 10px; margin-bottom:8px;">
+                <div style="font-size:0.7rem; color:#aaa; text-transform:uppercase;">Aktuel ion-koncentration</div>
+                <div id="readout-ions" style="font-family:'Segoe UI', sans-serif; margin-top:4px; font-size:0.95rem; font-weight:500;">–</div>
+            </div>
+
+            <div class="btn-row">
+                <button id="btn-new-task" class="btn" style="background:#e67e22" onclick="activeApp.newTask()">Ny opgave</button>
+                <button class="btn" style="background:#636e72" onclick="activeApp.reset()">Tøm og nulstil</button>
+            </div>
+
+            <div id="scan-feedback" style="margin-top:8px; font-weight:bold; text-align:center; min-height:40px;"></div>
+        `;
+
+        // Stof- og volumen-vælger sidder som en legend oven på selve animationen
+        this.subOverlay.innerHTML = `
+            <div class="overlay-label">Stof</div>
+            <div class="overlay-chips">
+                ${Object.keys(this.substances).map(key =>
+                    `<button class="chip-btn sub-chip" onclick="activeApp.setSub('${key}')">${this.substances[key].name}</button>`
+                ).join('')}
+            </div>`;
+        this.volOverlay.innerHTML = `
+            <div class="overlay-label">Volumen</div>
+            <div class="overlay-chips">
+                <button class="chip-btn vol-chip" onclick="activeApp.setVolume(0.5)">0,5 L</button>
+                <button class="chip-btn vol-chip" onclick="activeApp.setVolume(1.0)">1,0 L</button>
+                <button class="chip-btn vol-chip" onclick="activeApp.setVolume(2.0)">2,0 L</button>
+            </div>`;
+
+        this.setSub('NaCl');
+        this.setVolume(1.0);
+        this.newTask();
+    }
+
+    renderEquation() {
+        const s = this.substances[this.currentSub];
+        document.getElementById('equation-line').innerHTML =
+            `<span style="color:#fff">${s.name}</span> ⟶ ` +
+            `<span style="color:${s.cat.col}">${s.cat.factor > 1 ? s.cat.factor : ''}${s.cat.label}</span> + ` +
+            `<span style="color:${s.an.col}">${s.an.factor > 1 ? s.an.factor : ''}${s.an.label}</span>`;
+    }
+
+    setSub(key) {
+        this.currentSub = key;
+        const keys = Object.keys(this.substances);
+        this.subOverlay.querySelectorAll('.sub-chip').forEach((b, i) => {
+            b.classList.toggle('active', keys[i] === key);
+            b.classList.remove('next-hint');
+        });
+        this.renderEquation();
+
+        // Skifter kun hvilket stof der trækkes ned næste gang — tømmer IKKE glasset,
+        // så flere salte kan blandes i samme bægerglas
+        this.spawnDragItem();
+    }
+
+    setVolume(v) {
+        this.volume = v;
+        const vols = [0.5, 1.0, 2.0];
+        this.volOverlay.querySelectorAll('.vol-chip').forEach((b, i) => {
+            b.classList.toggle('active', vols[i] === v);
+        });
+        this.updateWaterLevel();
+
+        // Volumen kan nu skiftes uden at afbryde opgaven eller tømme glasset,
+        // så man kan fordoble/halvere koncentrationen af det, der allerede er opløst.
+        // Hvis vandspejlet er rykket ned under nogle af ionerne, teleporteres de
+        // bare ned i det nye (mindre) vandlag, så det stadig ser rigtigt ud.
+        const margin = 20;
+        this.particles.forEach(p => {
+            if (p.y < this.waterLevelY + margin) {
+                p.x = this.beaker.x + margin + Math.random() * (this.beaker.w - margin * 2);
+                p.y = this.waterLevelY + margin + Math.random() * 20;
+            }
+        });
+
+        this.updateReadout();
+        this.checkTask();
+    }
+
+    // "Ny opgave"-knappen skal kun være synlig, når der ikke er en opgave i gang —
+    // ellers virker det som en genvej til at "snyde sig forbi" den nuværende opgave
+    updateNewTaskButton() {
+        const btn = document.getElementById('btn-new-task');
+        if (btn) btn.style.display = this.taskActive ? 'none' : '';
+    }
+
+    // Blinker på den kemikalie-knap, opgaven kræver, hvis det ikke er den aktuelt valgte —
+    // men kun allerførste gang dette sker, så det ikke bliver ved med at forstyrre
+    maybeHintSubstanceSwitch(requiredSubs) {
+        this.subOverlay.querySelectorAll('.sub-chip').forEach(b => b.classList.remove('next-hint'));
+        if (this.substanceHintShown || requiredSubs.includes(this.currentSub)) return;
+        this.substanceHintShown = true;
+        const keys = Object.keys(this.substances);
+        const btn = this.subOverlay.querySelectorAll('.sub-chip')[keys.indexOf(requiredSubs[0])];
+        if (btn) btn.classList.add('next-hint');
+    }
+
+    newTask() {
+        this.reset();
+        this.taskActive = true;
+        this.updateNewTaskButton();
+
+        const mixed = Math.random() < 0.5;
+        let requiredSubs;
+        if (mixed) {
+            const pair = this.mixedPairs[Math.floor(Math.random() * this.mixedPairs.length)];
+            const [keyA, keyB] = pair.subs;
+            const sA = this.substances[keyA], sB = this.substances[keyB];
+            const ionA = sA[pair.ionKey], ionB = sB[pair.ionKey];
+            const unitsA = Math.floor(Math.random() * 3) + 1;
+            const unitsB = Math.floor(Math.random() * 3) + 1;
+
+            this.taskMode = 'mixed';
+            this.targetIonLabel = ionA.label;
+            this.targetConc = (unitsA * ionA.factor + unitsB * ionB.factor) * this.unitValue / this.volume;
+            this.taskHint = `${sA.name} og ${sB.name}`;
+            this.taskPrimarySub = null; // bonusspørgsmål for blandede opgaver springes over
+            requiredSubs = [keyA, keyB];
+        } else {
+            const keys = Object.keys(this.substances);
+            const key = keys[Math.floor(Math.random() * keys.length)];
+            const s = this.substances[key];
+            const ionKey = Math.random() < 0.5 ? 'cat' : 'an';
+            const ion = s[ionKey];
+            const units = Math.floor(Math.random() * 4) + 2;
+
+            this.taskMode = 'single';
+            this.targetIonLabel = ion.label;
+            this.targetConc = units * this.unitValue * ion.factor / this.volume;
+            this.taskHint = s.name;
+            this.taskPrimarySub = key;
+            requiredSubs = [key];
+        }
+
+        this.renderTaskFeedback(null);
+        this.maybeHintSubstanceSwitch(requiredSubs);
+    }
+
+    renderTaskFeedback(status) {
+        const fb = document.getElementById('scan-feedback');
+        let html = `<div style="color:#e67e22; font-size:0.8rem;">OPGAVE${this.taskMode === 'mixed' ? ' (bland ' + this.taskHint + ')' : ''}:</div>` +
+            `Lav en opløsning hvor<br><span style="font-size:1.2rem; color:#fff">[${this.targetIonLabel}] = ${fmt(this.targetConc, 2)} M</span>`;
+        if (status === 'correct') {
+            html += `<br><span style="color:#00b894">Flot! Målet er nået.</span>`;
+        } else if (status === 'over') {
+            html += `<br><span style="color:#ff7675">For meget. Tøm karret eller forøg volumet.</span>`;
+        }
+        fb.innerHTML = html;
+    }
+
+    showBonus(subKey) {
+        const bonus = this.bonusQuestions[subKey];
+        if (!bonus) return;
+        this.activeBonusSub = subKey;
+        const optsHtml = bonus.options.map((opt, i) =>
+            `<button class="btn" style="background:#34495e; font-size:0.8rem; margin-top:6px;" onclick="activeApp.answerBonus(${i})">${opt}</button>`
+        ).join('');
+        document.getElementById('scan-feedback').innerHTML += `
+        <div style="margin-top:12px; padding-top:10px; border-top:1px dashed #555; text-align:left;">
+            <div style="color:#f1c40f; font-size:0.85rem; margin-bottom:4px;">Bonus: ${bonus.q}</div>
+            ${optsHtml}
+            <div id="bonus-result-1" style="margin-top:6px; font-size:0.8rem;"></div>
+        </div>`;
+    }
+
+    answerBonus(i) {
+        const bonus = this.bonusQuestions[this.activeBonusSub];
+        const el = document.getElementById('bonus-result-1');
+        if (!el || !bonus) return;
+        if (i === bonus.correct) {
+            el.innerHTML = "<span style='color:#00b894'>✓ Rigtigt!</span>";
+        } else {
+            el.innerHTML = `<span style='color:#ff7675'>✗ Ikke helt — ${bonus.options[bonus.correct]}</span>`;
+        }
+    }
+
+    spawnDragItem() {
+        this.dragItem = { x: this.sourcePos.x, y: this.sourcePos.y, isHeld: false };
+    }
+
+    reset() {
+        if (this.advanceTimer) { clearTimeout(this.advanceTimer); this.advanceTimer = null; }
+        this.particles = [];
+        Object.keys(this.substances).forEach(k => this.unitsBySub[k] = 0);
+        this.updateReadout();
+        this.spawnDragItem();
+        this.fallingItem = null;
+        if(!this.taskActive) document.getElementById('scan-feedback').innerText = "";
+    }
+
+    // --- INPUT ---
+    bindEvents() {
+        this.onDown = this.handleDown.bind(this);
+        this.onMove = this.handleMove.bind(this);
+        this.onUp   = this.handleUp.bind(this);
+
+        this.canvas.addEventListener('mousedown', this.onDown);
+        this.canvas.addEventListener('mousemove', this.onMove);
+        window.addEventListener('mouseup', this.onUp);
+        
+        this.canvas.addEventListener('touchstart', (e) => { e.preventDefault(); this.handleDown(e.touches[0]); }, {passive: false});
+        this.canvas.addEventListener('touchmove', (e) => { e.preventDefault(); this.handleMove(e.touches[0]); }, {passive: false});
+        window.addEventListener('touchend', this.onUp);
+    }
+
+    getPos(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    }
+
+    handleDown(e) {
+        if(this.fallingItem) return; 
+        const p = this.getPos(e);
+        const dx = p.x - this.dragItem.x;
+        const dy = p.y - this.dragItem.y;
+        if (dx*dx + dy*dy < 40*40) {
+            this.isDragging = true;
+            this.dragItem.isHeld = true;
+        }
+    }
+
+    handleMove(e) {
+        if (!this.isDragging) return;
+        const p = this.getPos(e);
+        this.dragItem.x = p.x;
+        this.dragItem.y = p.y;
+    }
+
+    handleUp(e) {
+        if (!this.isDragging) return;
+        this.isDragging = false;
+        this.dragItem.isHeld = false;
+
+        // Tjek om vi er over bægerglasset
+        const inBeakerX = this.dragItem.x > this.beaker.x && this.dragItem.x < this.beaker.x + this.beaker.w;
+        
+        if (this.dragItem.y > 100 && inBeakerX) {
+            this.dropItem();
+        } else {
+            // Snap tilbage
+            this.dragItem.x = this.sourcePos.x;
+            this.dragItem.y = this.sourcePos.y;
+        }
+    }
+
+    dropItem() {
+        this.fallingItem = {
+            x: this.dragItem.x,
+            y: this.dragItem.y,
+            vy: 2,
+            rot: 0,
+            vRot: (Math.random()-0.5)*0.2,
+            sub: this.currentSub
+        };
+        this.spawnDragItem();
+        this.dragItem.y = -200; // Skjul den næste lidt
+    }
+
+    dissolveItem(x, y, subKey) {
+        const s = this.substances[subKey];
+        for (let i = 0; i < s.cat.factor; i++) {
+            this.particles.push({
+                x: x + (Math.random()-0.5)*20, y: y + (Math.random()-0.5)*20,
+                vx: (Math.random()-0.5)*4, vy: (Math.random()-0.2)*4,
+                r: s.cat.r, col: s.cat.col, label: s.cat.label
+            });
+        }
+        for (let i = 0; i < s.an.factor; i++) {
+            this.particles.push({
+                x: x + (Math.random()-0.5)*20, y: y + (Math.random()-0.5)*20,
+                vx: (Math.random()-0.5)*4, vy: (Math.random()-0.2)*4,
+                r: s.an.r, col: s.an.col, label: s.an.label
+            });
+        }
+
+        this.unitsBySub[subKey] = (this.unitsBySub[subKey] || 0) + 1;
+        this.updateReadout();
+        this.checkTask();
+
+        // Reset drag item
+        this.dragItem.x = this.sourcePos.x;
+        this.dragItem.y = this.sourcePos.y;
+    }
+
+    // Lægger bidrag fra alle tilsatte salte sammen pr. ion-label,
+    // så man kan se den samlede koncentration af en ion fra flere kilder
+    computeIonTotals() {
+        const totals = {};
+        Object.keys(this.substances).forEach(key => {
+            const units = this.unitsBySub[key] || 0;
+            if (units === 0) return;
+            const s = this.substances[key];
+            const c = (units * this.unitValue) / this.volume;
+            [s.cat, s.an].forEach(ion => {
+                if (!totals[ion.label]) totals[ion.label] = { val: 0, col: ion.col };
+                totals[ion.label].val += c * ion.factor;
+            });
+        });
+        return totals;
+    }
+
+    updateReadout() {
+        const subsWithUnits = Object.keys(this.substances).filter(k => this.unitsBySub[k] > 0);
+
+        document.getElementById('lcd-c').innerHTML = subsWithUnits.length
+            ? subsWithUnits.map(k => {
+                const s = this.substances[k];
+                const c = (this.unitsBySub[k] * this.unitValue) / this.volume;
+                return `<div style="display:flex; justify-content:space-between;"><span>${s.name}</span><span>${fmt(c, 2)} M</span></div>`;
+            }).join('')
+            : `<div style="color:#555;">Ingen stoffer tilsat endnu</div>`;
+
+        const totals = this.computeIonTotals();
+        const ionLabels = Object.keys(totals);
+        document.getElementById('readout-ions').innerHTML = ionLabels.length
+            ? ionLabels.map(label => `<span style="color:${totals[label].col}">${label}</span> : ${fmt(totals[label].val, 2)} M`).join('<br>')
+            : '<span style="color:#555;">–</span>';
+    }
+
+    checkTask() {
+        if(!this.taskActive) return;
+        const totals = this.computeIonTotals();
+        const currentVal = (totals[this.targetIonLabel] && totals[this.targetIonLabel].val) || 0;
+
+        if (Math.abs(currentVal - this.targetConc) < 0.005) {
+            this.renderTaskFeedback('correct');
+            if (this.taskPrimarySub) this.showBonus(this.taskPrimarySub);
+            this.taskActive = false;
+            this.updateNewTaskButton();
+            // Led automatisk videre til en ny opgave, så øvelsen kører i ét flow
+            this.advanceTimer = setTimeout(() => { if (this.running) this.newTask(); }, 3500);
+        } else if (currentVal > this.targetConc + 0.005) {
+            this.renderTaskFeedback('over');
+        } else {
+            this.renderTaskFeedback(null);
+        }
+    }
+
+    // --- DRAWING LOOP ---
+    loop() {
+        if(!this.running) return;
+        
+        const W = this.canvas.width;
+        const H = this.canvas.height;
+        this.ctx.clearRect(0, 0, W, H);
+
+        // 1. Kilde (Hylde)
+        this.ctx.fillStyle = "rgba(255,255,255,0.05)";
+        this.ctx.fillRect(this.sourcePos.x - 50, this.sourcePos.y - 40, 100, 80);
+        this.ctx.strokeStyle = "rgba(255,255,255,0.2)";
+        this.ctx.strokeRect(this.sourcePos.x - 50, this.sourcePos.y - 40, 100, 80);
+        this.ctx.fillStyle = "#aaa";
+        this.ctx.font = "10px Arial";
+        this.ctx.textAlign = "center";
+        this.ctx.fillText("Tag stof her", this.sourcePos.x, this.sourcePos.y + 50);
+
+        // 2. Bægerglas
+        this.drawBeaker();
+
+        // 3. Falling Item
+        if(this.fallingItem) {
+            this.fallingItem.vy += 0.5;
+            this.fallingItem.y += this.fallingItem.vy;
+            this.fallingItem.rot += this.fallingItem.vRot;
+            
+            this.drawCrystal(this.fallingItem.x, this.fallingItem.y, this.fallingItem.sub, this.fallingItem.rot);
+
+            if(this.fallingItem.y > this.waterLevelY + 20) {
+                this.dissolveItem(this.fallingItem.x, this.fallingItem.y, this.fallingItem.sub);
+                this.fallingItem = null;
+            }
+        }
+
+        // 4. Drag Item
+        if(this.dragItem) {
+            // Hvis man dragger, tegn "spøgelse" på hylden
+            if(this.isDragging) {
+                this.ctx.globalAlpha = 0.3;
+                this.drawCrystal(this.sourcePos.x, this.sourcePos.y, this.currentSub, 0);
+                this.ctx.globalAlpha = 1.0;
+            }
+            // Tegn selve itemet
+            this.drawCrystal(this.dragItem.x, this.dragItem.y, this.currentSub, 0);
+            
+            // Hjælpetekst
+            const nothingAddedYet = Object.values(this.unitsBySub).every(n => n === 0);
+            if(!this.fallingItem && nothingAddedYet && !this.isDragging) {
+                this.ctx.fillStyle = "#ffd700"; this.ctx.font = "bold 16px Arial";
+                this.ctx.fillText("↓ Træk ned", this.sourcePos.x, this.sourcePos.y - 50);
+            }
+        }
+
+        requestAnimationFrame(() => this.loop());
+    }
+
+    drawBeaker() {
+        const b = this.beaker;
+        this.ctx.save();
+        
+        // --- Væske (Indhold) med Clip ---
+        this.ctx.beginPath();
+        this.ctx.moveTo(b.x, b.y);
+        this.ctx.lineTo(b.x, b.y + b.h - 30);
+        this.ctx.quadraticCurveTo(b.x, b.y + b.h, b.x + 30, b.y + b.h);
+        this.ctx.lineTo(b.x + b.w - 30, b.y + b.h);
+        this.ctx.quadraticCurveTo(b.x + b.w, b.y + b.h, b.x + b.w, b.y + b.h - 30);
+        this.ctx.lineTo(b.x + b.w, b.y);
+        this.ctx.closePath();
+        this.ctx.clip();
+
+        // Vand Farve
+        const grad = this.ctx.createLinearGradient(0, this.waterLevelY, 0, b.y + b.h);
+        grad.addColorStop(0, "rgba(52, 152, 219, 0.4)");
+        grad.addColorStop(1, "rgba(41, 128, 185, 0.8)");
+        this.ctx.fillStyle = grad;
+        this.ctx.fillRect(b.x, this.waterLevelY, b.w, b.h);
+
+        // Vandoverflade
+        this.ctx.beginPath();
+        this.ctx.ellipse(b.x + b.w/2, this.waterLevelY, b.w/2, 10, 0, 0, Math.PI*2);
+        this.ctx.fillStyle = "rgba(255,255,255,0.1)";
+        this.ctx.fill();
+        this.ctx.strokeStyle = "rgba(255,255,255,0.3)";
+        this.ctx.stroke();
+
+        // --- Ioner ---
+        for(let p of this.particles) {
+            p.x += p.vx; p.y += p.vy;
+            // Kollision med vægge
+            if(p.x < b.x + 15 || p.x > b.x + b.w - 15) p.vx *= -1;
+            if(p.y < this.waterLevelY + 5 || p.y > b.y + b.h - 15) p.vy *= -1;
+            
+            // Pushback
+            if(p.x < b.x) p.x = b.x + 20; if(p.x > b.x + b.w) p.x = b.x + b.w - 20;
+            if(p.y > b.y + b.h) p.y = b.y + b.h - 20;
+
+            this.drawParticle(p.x, p.y, p.r, p.col, p.label);
+        }
+
+        this.ctx.restore(); // End Clip
+
+        // --- Glas Ramme ---
+        this.ctx.beginPath();
+        this.ctx.moveTo(b.x, b.y);
+        this.ctx.lineTo(b.x, b.y + b.h - 30);
+        this.ctx.quadraticCurveTo(b.x, b.y + b.h, b.x + 30, b.y + b.h);
+        this.ctx.lineTo(b.x + b.w - 30, b.y + b.h);
+        this.ctx.quadraticCurveTo(b.x + b.w, b.y + b.h, b.x + b.w, b.y + b.h - 30);
+        this.ctx.lineTo(b.x + b.w, b.y);
+        
+        // Glas top (åbning)
+        this.ctx.moveTo(b.x, b.y);
+        this.ctx.ellipse(b.x + b.w/2, b.y, b.w/2, 12, 0, 0, Math.PI*2);
+
+        this.ctx.strokeStyle = "rgba(255,255,255,0.5)";
+        this.ctx.lineWidth = 4;
+        this.ctx.stroke();
+
+        // Highlights
+        this.ctx.beginPath();
+        this.ctx.moveTo(b.x + 15, b.y + 40);
+        this.ctx.lineTo(b.x + 15, b.y + b.h - 40);
+        this.ctx.strokeStyle = "rgba(255,255,255,0.1)";
+        this.ctx.lineWidth = 3;
+        this.ctx.stroke();
+
+        // Måle streger
+        this.ctx.fillStyle = "rgba(255,255,255,0.6)";
+        this.ctx.font = "12px Arial";
+        this.ctx.textAlign = "right";
+        this.ctx.fillText(fmt(this.volume, 1) + " L", b.x - 10, this.waterLevelY + 5);
+        this.ctx.fillRect(b.x, this.waterLevelY, 15, 2);
+    }
+
+    drawCrystal(x, y, subKey, rot) {
+        const s = this.substances[subKey];
+        this.ctx.save();
+        this.ctx.translate(x, y);
+        this.ctx.rotate(rot);
+
+        // Generisk gitter-layout: fordel kation(er) og anion(er) i en lille ring,
+        // så det virker for et vilkårligt ion-forhold uden en hardkodet sag pr. salt
+        const items = [
+            ...Array(s.cat.factor).fill(s.cat),
+            ...Array(s.an.factor).fill(s.an)
+        ];
+        const n = items.length;
+        const dist = n > 1 ? 13 : 0;
+        items.forEach((ion, i) => {
+            const angle = (i / n) * Math.PI * 2;
+            this.drawBoundIon(Math.cos(angle) * dist, Math.sin(angle) * dist, ion.col, ion.r);
+        });
+
+        // Label under
+        this.ctx.rotate(-rot); // Roter tekst tilbage så den er læsbar
+        this.ctx.fillStyle = "#fff";
+        this.ctx.font = "bold 11px Arial";
+        this.ctx.textAlign = "center";
+        this.ctx.shadowColor="black"; this.ctx.shadowBlur=4;
+        this.ctx.fillText(fmt(this.unitValue, 2) + " M", 0, 30);
+        this.ctx.shadowBlur=0;
+
+        this.ctx.restore();
+    }
+
+    drawBoundIon(x, y, col, r=8) {
+        this.ctx.beginPath(); this.ctx.arc(x, y, r, 0, Math.PI*2);
+        this.ctx.fillStyle = col; this.ctx.fill();
+        this.ctx.strokeStyle="rgba(0,0,0,0.5)"; this.ctx.stroke();
+    }
+
+    drawParticle(x, y, r, col, label) {
+        this.ctx.beginPath(); this.ctx.arc(x, y, r, 0, Math.PI*2);
+        this.ctx.fillStyle = col; this.ctx.fill();
+        this.ctx.strokeStyle = "rgba(0,0,0,0.5)"; this.ctx.lineWidth = 1; this.ctx.stroke();
+        this.ctx.fillStyle = "#fff"; this.ctx.font = "9px Arial"; this.ctx.textAlign = "center"; 
+        this.ctx.fillText(label, x, y + r + 10);
+    }
+
+    stop() {
+        this.running = false;
+        if (this.advanceTimer) clearTimeout(this.advanceTimer);
+        this.canvas.removeEventListener('mousedown', this.onDown);
+        this.canvas.removeEventListener('mousemove', this.onMove);
+        window.removeEventListener('mouseup', this.onUp);
+    }
+}
+
+// --- KODEBLOK 2: SØJLEDIAGRAM (Automatisk søjle-visning) ---
+class BarGameApp {
+    constructor() {
+        this.canvas = document.getElementById('canvas2');
+        this.ctx = this.canvas.getContext('2d');
+        this.ui = document.getElementById('ui-2');
+
+        // Data
+        this.substances = {
+            'MgCl2': {
+                name: 'MgCl₂',
+                parts: [
+                    { label: 'MgCl₂', col: '#fff', isReactant: true },
+                    { label: 'Mg²⁺',  col: '#2ecc71', factor: 1 },
+                    { label: '2Cl⁻',  col: '#3498db', factor: 2 }
+                ]
+            },
+            'Na2SO4': {
+                name: 'Na₂SO₄',
+                parts: [
+                    { label: 'Na₂SO₄', col: '#fff', isReactant: true },
+                    { label: '2Na⁺',   col: '#9b59b6', factor: 2 },
+                    { label: 'SO₄²⁻',  col: '#f1c40f', factor: 1 }
+                ]
+            },
+            'Al2SO43': {
+                name: 'Al₂(SO₄)₃',
+                parts: [
+                    { label: 'Al₂(SO₄)₃', col: '#fff', isReactant: true },
+                    { label: '2Al³⁺',     col: '#e67e22', factor: 2 },
+                    { label: '3SO₄²⁻',    col: '#f1c40f', factor: 3 }
+                ]
+            }
+        };
+
+        // Bonusspørgsmål om ræsonnementet bag koefficienten (vises efter et rigtigt svar)
+        this.bonusQuestions = {
+            'MgCl2': {
+                q: 'Hvorfor står der et 2-tal foran Cl⁻, når MgCl₂ opløses?',
+                options: [
+                    'Fordi der er to Cl⁻-ioner bundet til hver Mg²⁺-ion, så ladningerne går op (2+ og 2 × 1−)',
+                    'Fordi Cl⁻-ioner altid optræder to og to i opløsning',
+                    'Fordi koncentrationen af Mg²⁺ altid er dobbelt så høj som Cl⁻'
+                ],
+                correct: 0
+            },
+            'Na2SO4': {
+                q: 'Hvorfor står der et 2-tal foran Na⁺, når Na₂SO₄ opløses?',
+                options: [
+                    'Fordi Na⁺ vejer dobbelt så meget som SO₄²⁻',
+                    'Fordi der skal to Na⁺-ioner til at udligne SO₄²⁻-ionens dobbelt-negative ladning',
+                    'Fordi metal-ioner altid er dobbelt så talrige som ikke-metal-ioner i et salt'
+                ],
+                correct: 1
+            },
+            'Al2SO43': {
+                q: 'Hvorfor er forholdet mellem Al³⁺ og SO₄²⁻ netop 2:3?',
+                options: [
+                    'Fordi sulfat-ionen indeholder 3 oxygenatomer',
+                    'Fordi aluminium altid danner tre gange så mange ioner som svovl',
+                    'Fordi ladningerne skal balancere: 2 × (3+) = 3 × (2−) = 6'
+                ],
+                correct: 2
+            }
+        };
+
+        // 5 faste opgaver, man kan skifte mellem (ikke tilfældige — samme opgaver hver gang)
+        this.opgaver = [
+            { sub: 'MgCl2',   c: 0.3 },
+            { sub: 'Na2SO4',  c: 0.6 },
+            { sub: 'Al2SO43', c: 0.4 },
+            { sub: 'MgCl2',   c: 0.7 },
+            { sub: 'Na2SO4',  c: 0.2 }
+        ];
+        this.opgaveIndex = 0;
+        this.solved = this.opgaver.map(() => false);
+
+        // State
+        this.currentSubKey = this.opgaver[0].sub;
+        this.cValue = this.opgaver[0].c;
+
+        // Brugerens valgte koefficienter (null = endnu ikke valgt)
+        this.userCoeffs = [null, null];
+        // Søjlernes aktuelt tegnede højde — glider blødt hen mod målværdien
+        this.displayedHeights = [0, 0];
+
+        this.checked = false;
+        this.isCorrect = false;
+
+        // Layout Config
+        this.graph = { x: 50, y: 60, w: 340, h: 220, maxY: 3.0 };
+
+        this.resize();
+        this.init();
+
+        this.running = true;
+        this.loop();
+    }
+
+    resize() {
+        this.canvas.width = this.canvas.parentElement.clientWidth;
+        this.canvas.height = this.canvas.parentElement.clientHeight;
+
+        // Centrer grafen
+        this.graph.x = (this.canvas.width - this.graph.w) / 2;
+        this.graph.y = Math.max(30, (this.canvas.height - this.graph.h) / 2);
+    }
+
+    init() {
+        this.ui.innerHTML = `
+            <div style="margin-bottom:8px;">
+                <div style="font-size:0.8rem; color:#aaa; margin-bottom:4px;">Opgave <span id="opgave-num">1</span> af ${this.opgaver.length}</div>
+                <div id="opgave-tabs" style="display:flex; gap:6px;"></div>
+            </div>
+
+            <div style="background:rgba(0,0,0,0.2); padding:10px; border-radius:4px; margin-bottom:8px; text-align:center;">
+                <div id="bar-equation-line" style="font-size:1.05rem; font-weight:bold;"></div>
+                <div id="conc-line" style="font-size:0.85rem; color:#f1c40f; margin-top:4px;"></div>
+            </div>
+
+            <div id="ion-controls"></div>
+
+            <button class="btn" style="background:#00b894; margin-top:0;" onclick="activeApp.checkAnswer()">Tjek koefficienter</button>
+            <button class="btn" style="background:#636e72; margin-top:6px;" onclick="activeApp.resetGame()">Nulstil</button>
+
+            <div id="bar-fb" style="margin-top:10px; font-weight:bold; text-align:center; min-height:24px; white-space: pre-wrap;"></div>
+        `;
+        this.renderEquation();
+        this.renderIonControls();
+        this.renderOpgaveTabs();
+    }
+
+    goToOpgave(idx) {
+        this.opgaveIndex = idx;
+        const o = this.opgaver[idx];
+        this.currentSubKey = o.sub;
+        this.cValue = o.c;
+
+        this.userCoeffs = [null, null];
+        this.checked = false;
+        this.isCorrect = false;
+        document.getElementById('bar-fb').innerHTML = "";
+
+        this.renderEquation();
+        this.renderIonControls();
+        this.renderOpgaveTabs();
+    }
+
+    renderOpgaveTabs() {
+        const tabsHtml = this.opgaver.map((_, i) => {
+            const active = i === this.opgaveIndex;
+            const mark = this.solved[i] ? ' ✓' : '';
+            return `<button class="coeff-btn${active ? ' active' : ''}" style="flex:none; width:40px;" onclick="activeApp.goToOpgave(${i})">${i + 1}${mark}</button>`;
+        }).join('');
+        document.getElementById('opgave-tabs').innerHTML = tabsHtml;
+        document.getElementById('opgave-num').innerText = this.opgaveIndex + 1;
+    }
+
+    setCoeff(idx, n) {
+        this.userCoeffs[idx] = n;
+        this.checked = false;
+        this.isCorrect = false;
+        document.getElementById('bar-fb').innerText = "";
+        this.renderIonControls();
+    }
+
+    resetGame() {
+        this.userCoeffs = [null, null];
+        this.checked = false;
+        this.isCorrect = false;
+        document.getElementById('bar-fb').innerText = "";
+        this.renderIonControls();
+    }
+
+    renderEquation() {
+        const s = this.substances[this.currentSubKey];
+        document.getElementById('bar-equation-line').innerHTML =
+            `<span style="color:${s.parts[0].col}">${s.parts[0].label}</span> ⟶ ` +
+            `<span style="color:${s.parts[1].col}">${s.parts[1].label}</span> + ` +
+            `<span style="color:${s.parts[2].col}">${s.parts[2].label}</span>`;
+        document.getElementById('conc-line').innerText = `c(${s.name}) = ${fmt(this.cValue, 1)} M`;
+    }
+
+    renderIonControls() {
+        const s = this.substances[this.currentSubKey];
+        let html = '';
+        [1, 2].forEach((partIdx, i) => {
+            const part = s.parts[partIdx];
+            const coeff = this.userCoeffs[i];
+            const ionLabel = part.label.replace(/^[0-9]+/, '');
+            const resultText = coeff
+                ? `${coeff} × ${fmt(this.cValue, 1)} M = ${fmt(coeff * this.cValue, 1)} M`
+                : 'Vælg koefficient';
+
+            html += `
+            <div style="background:#222; padding:8px; border-radius:4px; margin-bottom:6px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                    <span style="color:${part.col}; font-weight:bold;">${ionLabel}</span>
+                    <span style="font-size:0.8rem; color:#ccc;">${resultText}</span>
+                </div>
+                <div style="display:flex; gap:6px;">
+                    ${[1, 2, 3].map(n => `<button class="coeff-btn${coeff === n ? ' active' : ''}" onclick="activeApp.setCoeff(${i}, ${n})">× ${n}</button>`).join('')}
+                </div>
+            </div>`;
+        });
+        document.getElementById('ion-controls').innerHTML = html;
+    }
+
+    checkAnswer() {
+        const s = this.substances[this.currentSubKey];
+        const correctCoeffs = [s.parts[1].factor, s.parts[2].factor];
+        const fb = document.getElementById('bar-fb');
+
+        if (this.userCoeffs[0] === null || this.userCoeffs[1] === null) {
+            fb.innerHTML = "<span style='color:#fdcb6e'>Vælg en koefficient for begge ioner først.</span>";
+            return;
+        }
+
+        this.checked = true;
+        const ok = [0, 1].map(i => this.userCoeffs[i] === correctCoeffs[i]);
+        this.isCorrect = ok[0] && ok[1];
+
+        const lines = [0, 1].map(i => {
+            const ionLabel = s.parts[i + 1].label.replace(/^[0-9]+/, '');
+            const yourVal = fmt(this.userCoeffs[i] * this.cValue, 2);
+            if (ok[i]) {
+                return `<span style="color:#00b894">✓ ${ionLabel}: ${this.userCoeffs[i]} × ${fmt(this.cValue, 1)} M = ${yourVal} M</span>`;
+            }
+            const correctVal = fmt(correctCoeffs[i] * this.cValue, 2);
+            return `<span style="color:#ff7675">✗ ${ionLabel}: du valgte × ${this.userCoeffs[i]} (${yourVal} M) — rigtigt er × ${correctCoeffs[i]} (${correctVal} M)</span>`;
+        });
+
+        let html = lines.join('<br>');
+
+        // Bonusspørgsmål om ræsonnementet, når begge koefficienter er rigtige
+        if (this.isCorrect) {
+            this.solved[this.opgaveIndex] = true;
+            this.renderOpgaveTabs();
+
+            const bonus = this.bonusQuestions[this.currentSubKey];
+            const optsHtml = bonus.options.map((opt, i) =>
+                `<button class="btn" style="background:#34495e; font-size:0.8rem; margin-top:6px;" onclick="activeApp.answerBonus(${i})">${opt}</button>`
+            ).join('');
+            html += `
+            <div style="margin-top:12px; padding-top:10px; border-top:1px dashed #555;">
+                <div style="color:#f1c40f; font-size:0.85rem; margin-bottom:4px;">Bonus: ${bonus.q}</div>
+                ${optsHtml}
+                <div id="bonus-result-2" style="margin-top:6px; font-size:0.8rem;"></div>
+            </div>`;
+        }
+
+        fb.innerHTML = html;
+    }
+
+    answerBonus(i) {
+        const bonus = this.bonusQuestions[this.currentSubKey];
+        const el = document.getElementById('bonus-result-2');
+        if (!el) return;
+        if (i === bonus.correct) {
+            el.innerHTML = "<span style='color:#00b894'>✓ Rigtigt!</span>";
+        } else {
+            el.innerHTML = `<span style='color:#ff7675'>✗ Ikke helt — ${bonus.options[bonus.correct]}</span>`;
+        }
+    }
+
+    // --- DRAW LOOP ---
+    loop() {
+        if(!this.running) return;
+        const W = this.canvas.width; const H = this.canvas.height;
+        this.ctx.clearRect(0, 0, W, H);
+
+        this.drawGrid();
+        this.drawBars();
+
+        requestAnimationFrame(() => this.loop());
+    }
+
+    drawGrid() {
+        const g = this.graph;
+        this.ctx.fillStyle = "#222";
+        this.ctx.fillRect(g.x, g.y, g.w, g.h);
+        this.ctx.lineWidth = 1;
+        this.ctx.font = "11px Arial";
+        this.ctx.textAlign = "right";
+
+        for(let v = 0; v <= g.maxY; v += 0.5) {
+            const y = g.y + g.h - (v / g.maxY) * g.h;
+            this.ctx.strokeStyle = v === 0 ? "#fff" : "#444";
+            this.ctx.beginPath(); this.ctx.moveTo(g.x, y); this.ctx.lineTo(g.x + g.w, y); this.ctx.stroke();
+            this.ctx.fillStyle = "#aaa";
+            this.ctx.fillText(fmt(v, 1), g.x - 8, y + 4);
+        }
+
+        // Aksetekst
+        this.ctx.save();
+        this.ctx.translate(g.x - 30, g.y + g.h/2);
+        this.ctx.rotate(-Math.PI/2);
+        this.ctx.textAlign = "center";
+        this.ctx.fillStyle = "#aaa";
+        this.ctx.fillText("Koncentration (M)", 0, 0);
+        this.ctx.restore();
+    }
+
+    drawBars() {
+        const s = this.substances[this.currentSubKey];
+        const g = this.graph;
+        const cw = 70;
+        const gap = 30;
+        const startX = g.x + 20;
+
+        // Master Bar (statisk reference, ikke interaktiv)
+        this.drawSingleBar(startX, this.cValue, s.parts[0].col, `c(${s.name})`);
+
+        // Søjlerne glider blødt mod målværdien, så man tydeligt ser konsekvensen
+        // af det koefficient-valg, man lige har truffet
+        const targets = [0, 1].map(i => this.userCoeffs[i] !== null ? this.userCoeffs[i] * this.cValue : 0);
+        this.displayedHeights = this.displayedHeights.map((h, i) => {
+            const d = targets[i] - h;
+            return Math.abs(d) < 0.005 ? targets[i] : h + d * 0.18;
+        });
+
+        const x1 = g.x + 100 + gap;
+        this.drawSingleBar(x1, this.displayedHeights[0], s.parts[1].col, `[${s.parts[1].label.replace(/^[0-9]+/, '')}]`);
+
+        const x2 = x1 + cw + gap;
+        this.drawSingleBar(x2, this.displayedHeights[1], s.parts[2].col, `[${s.parts[2].label.replace(/^[0-9]+/, '')}]`);
+
+        // Pil fra Master
+        this.drawArrow(startX + cw + 5, g.y + g.h/2, x1 - 5, g.y + g.h/2);
+
+        // Facit som stiplet omrids, hvis svaret er tjekket og forkert
+        if(this.checked && !this.isCorrect) {
+            const correctCoeffs = [s.parts[1].factor, s.parts[2].factor];
+            if(this.userCoeffs[0] !== correctCoeffs[0]) this.drawGhost(x1, this.cValue * correctCoeffs[0]);
+            if(this.userCoeffs[1] !== correctCoeffs[1]) this.drawGhost(x2, this.cValue * correctCoeffs[1]);
+        }
+    }
+
+    drawSingleBar(x, val, col, label) {
+        const g = this.graph;
+        const h = (val / g.maxY) * g.h;
+        const y = g.y + g.h - h;
+        const w = 70;
+
+        // Bane, så man kan se hvor søjlen kan vokse til, selv når den er tom
+        this.ctx.strokeStyle = "rgba(255,255,255,0.15)";
+        this.ctx.lineWidth = 1;
+        this.ctx.strokeRect(x, g.y, w, g.h);
+
+        if(h > 0.5) {
+            this.ctx.fillStyle = col;
+            this.ctx.fillRect(x, y, w, h);
+            this.ctx.strokeStyle = "rgba(255,255,255,0.5)";
+            this.ctx.strokeRect(x, y, w, h);
+        }
+
+        // Værdi
+        if(val > 0.05) {
+            this.ctx.fillStyle = "#fff";
+            this.ctx.font = "12px monospace";
+            this.ctx.textAlign = "center";
+            this.ctx.fillText(fmt(val, 1), x + w/2, y - 5);
+        }
+
+        // Label (koefficient-tallet er allerede udeladt af den kaldende kode, da det vælges i panelet)
+        this.ctx.fillStyle = col;
+        this.ctx.font = "bold 14px Arial";
+        this.ctx.textAlign = "center";
+        this.ctx.fillText(label, x + w/2, g.y + g.h + 20);
+    }
+
+    drawGhost(x, val) {
+        const g = this.graph;
+        const h = (val / g.maxY) * g.h;
+        const y = g.y + g.h - h;
+        this.ctx.strokeStyle = "#fff";
+        this.ctx.lineWidth = 2;
+        this.ctx.setLineDash([5, 5]);
+        this.ctx.strokeRect(x - 2, y, 74, h);
+        this.ctx.setLineDash([]);
+    }
+
+    drawArrow(x1, y1, x2, y2) {
+        this.ctx.strokeStyle = "#555";
+        this.ctx.lineWidth = 2;
+        this.ctx.beginPath(); this.ctx.moveTo(x1, y1); this.ctx.lineTo(x2, y2); this.ctx.stroke();
+        this.ctx.beginPath(); this.ctx.moveTo(x2, y2); this.ctx.lineTo(x2 - 5, y2 - 5); this.ctx.lineTo(x2 - 5, y2 + 5); this.ctx.fill();
+    }
+
+    stop() {
+        this.running = false;
+    }
+}
+
+    // Håndter resize
+    window.addEventListener('resize', () => {
+        if(activeApp) activeApp.resize();
+    });
+
+    // Pinch-zoom på touch-enheder (tablets, interaktive tavler) udløser ikke altid
+    // det almindelige 'resize'-event, men rammer 'visualViewport' i stedet
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+            if(activeApp) activeApp.resize();
+        });
+    }
+
+    // FIX: Vent på at browseren er helt færdig med at tegne layoutet
+    window.addEventListener('load', () => {
+        // En lille forsinkelse på 50ms sikrer, at CSS er trådt i kraft
+        setTimeout(() => {
+            switchTab(1);
+        }, 50);
+    });
+
+</script>
+</body>
+</html>

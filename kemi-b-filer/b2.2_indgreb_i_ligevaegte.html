@@ -1,0 +1,2525 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Indgreb i ligevægte</title>
+<style>
+    :root {
+        --bg: #1e1e24;
+        --panel: #2b2b36;
+        --panel2: #343442;
+        --text: #f5f5f5;
+        --muted: #a3a3b2;
+        --accent: #e2596b;
+        --ok: #4ade80;
+        --fejl: #f87171;
+        --line: #44444f;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    #app { display: flex; height: 100vh; }
+
+    /* ---------- Venstre navigation ---------- */
+    #nav {
+        width: 236px;
+        flex-shrink: 0;
+        background: var(--panel);
+        border-right: 2px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        padding: 18px 16px;
+    }
+
+    #nav h1 {
+        font-size: 1.15rem;
+        margin: 0 0 4px 0;
+        color: var(--accent);
+    }
+
+    .nav-under {
+        font-size: 0.78rem;
+        color: var(--muted);
+        margin-bottom: 16px;
+        line-height: 1.4;
+    }
+
+    .nav-titel {
+        font-size: 0.7rem;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin: 6px 0 8px 0;
+    }
+
+    .sys-knap {
+        width: 100%;
+        text-align: left;
+        background: var(--panel2);
+        border: 1px solid transparent;
+        border-left: 4px solid #555;
+        color: #dcdce6;
+        padding: 10px 12px;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        line-height: 1.35;
+        transition: all 0.15s;
+    }
+
+    .sys-knap:hover { background: #3d3d4c; color: #fff; }
+    .sys-knap.aktiv { background: #3d3d4c; border-color: var(--accent); color: #fff; }
+    .sys-knap .sys-navn { font-weight: bold; display: block; }
+    .sys-knap .sys-kort { font-size: 0.74rem; color: var(--muted); }
+    .sys-knap .sys-status { float: right; font-size: 0.8rem; }
+
+    .lille-knap {
+        width: 100%;
+        background: #333340;
+        color: #ddd;
+        border: 1px solid #4a4a58;
+        padding: 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        margin-top: 8px;
+    }
+    .lille-knap:hover { background: #40404f; border-color: var(--accent); }
+
+    /* ---------- Midterste scene ---------- */
+    #scene {
+        flex: 1;
+        min-width: 0;
+        background: radial-gradient(circle at 50% 25%, #f6f8fa 0%, #dde2e9 100%);
+        color: #23272f;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow-y: auto;
+        padding: 16px 20px 24px 20px;
+        position: relative;
+    }
+
+    #ligning {
+        font-size: 1.3rem;
+        font-weight: bold;
+        text-align: center;
+        line-height: 1.6;
+        color: #23272f;
+        padding: 0 104px;
+    }
+
+    #ligning .lille-ligning { font-size: 0.92rem; font-weight: normal; color: #55606d; }
+
+    #entalpi {
+        font-size: 0.85rem;
+        color: #5a6673;
+        margin-top: 4px;
+        text-align: center;
+    }
+
+    #lab-holder { position: relative; width: 100%; max-width: 700px; flex: 1 1 auto; min-height: 260px; }
+    #lab-omraade.med-graf #lab-holder { flex: 0 0 250px; min-height: 250px; max-height: 250px; }
+    canvas#lab { width: 100%; height: 100%; display: block; }
+
+    #farvebar-holder { width: 100%; max-width: 430px; margin-top: 2px; }
+
+    #farvebar {
+        height: 14px;
+        border-radius: 7px;
+        border: 1px solid rgba(0,0,0,0.25);
+        position: relative;
+    }
+
+    #farvebar-maerke {
+        position: absolute;
+        top: -5px;
+        width: 4px;
+        height: 24px;
+        background: #23272f;
+        border-radius: 2px;
+        transform: translateX(-2px);
+    }
+
+    /* Referencens plads på skalaen — hul markør, så den ikke forveksles */
+    #farvebar-ref {
+        position: absolute;
+        top: -5px;
+        width: 4px;
+        height: 24px;
+        background: #ffffff;
+        border: 1px solid #6a7580;
+        border-radius: 2px;
+        transform: translateX(-3px);
+        box-sizing: border-box;
+    }
+
+    .farvebar-tekst {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: #55606d;
+        margin-top: 3px;
+    }
+
+    #observation {
+        max-width: 560px;
+        margin-top: 12px;
+        background: rgba(255,255,255,0.85);
+        border-left: 4px solid #3f8ecc;
+        border-radius: 6px;
+        padding: 10px 14px;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        color: #23272f;
+    }
+    #observation.skjult { display: none; }
+    #observation strong { color: #1f5f8f; }
+
+    #graf-knap {
+        position: sticky;
+        top: 0;
+        align-self: flex-end;
+        margin-bottom: -30px;
+        z-index: 5;
+        background: rgba(255,255,255,0.92);
+        border: 1px solid #b9c3cd;
+        color: #33404d;
+        border-radius: 6px;
+        padding: 6px 11px;
+        font-size: 0.8rem;
+        cursor: pointer;
+    }
+    #graf-knap:hover { border-color: #3f8ecc; color: #1f5f8f; }
+    #graf-knap.skjult { display: none; }
+
+    #graf-panel {
+        width: 100%;
+        max-width: 620px;
+        background: rgba(255,255,255,0.92);
+        border: 1px solid #c6cfd8;
+        border-radius: 8px;
+        padding: 10px 14px 12px 14px;
+        margin-top: 12px;
+        flex-shrink: 0;
+    }
+    #graf-panel.skjult { display: none; }
+    #graf-panel h3 { margin: 0 0 6px 0; font-size: 0.9rem; color: #23272f; }
+    canvas#graf { width: 100%; height: 180px; display: block; }
+    #graf-legende { display: flex; flex-wrap: wrap; gap: 14px; font-size: 0.78rem; margin-top: 6px; color: #33404d; }
+    #graf-legende .prik { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; }
+    #graf-note { font-size: 0.72rem; color: #66707c; margin-top: 6px; line-height: 1.4; }
+
+    /* ---------- Startside ---------- */
+    #startside { max-width: 820px; margin: auto; padding: 10px 0 20px 0; }
+    #startside h2 { font-size: 1.5rem; margin: 0 0 8px 0; color: #23272f; }
+    #startside p.ingress { font-size: 0.95rem; line-height: 1.6; color: #44505d; margin: 0 0 20px 0; }
+    #start-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(232px, 1fr)); gap: 14px; }
+    .start-kort {
+        background: #fff;
+        border: 1px solid #d3dae2;
+        border-radius: 10px;
+        padding: 14px 16px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .start-kort:hover { transform: translateY(-3px); box-shadow: 0 8px 18px rgba(0,0,0,0.14); border-color: #3f8ecc; }
+    .start-kort .kort-farver { display: flex; gap: 6px; margin-bottom: 8px; }
+    .start-kort .kort-plet { width: 26px; height: 14px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.2); }
+    .start-kort h4 { margin: 0 0 4px 0; font-size: 0.98rem; color: #23272f; }
+    .start-kort p { margin: 0; font-size: 0.82rem; line-height: 1.45; color: #55606d; }
+    .start-kort .kort-tags { margin-top: 8px; font-size: 0.72rem; color: #6a7683; }
+
+    /* ---------- Højre quizpanel ---------- */
+    #quiz {
+        width: 380px;
+        flex-shrink: 0;
+        background: var(--panel);
+        border-left: 2px solid var(--line);
+        padding: 18px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #quiz.tom { align-items: center; justify-content: center; text-align: center; color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+
+    #quiz-hoved { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    #trin-tekst { font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    #score-tekst { font-size: 0.78rem; color: var(--muted); }
+
+    #prikker { display: flex; gap: 6px; margin-bottom: 16px; }
+    .prik-trin { flex: 1; height: 5px; border-radius: 3px; background: #45455a; }
+    .prik-trin.gjort { background: var(--ok); }
+    .prik-trin.gjort.fejl { background: #b45a5a; }
+    .prik-trin.nu { background: var(--accent); }
+
+    #indgreb-navn { font-size: 1.05rem; font-weight: bold; margin-bottom: 6px; color: #fff; }
+    #indgreb-tekst { font-size: 0.88rem; line-height: 1.55; color: #ccccd8; margin-bottom: 16px; }
+
+    .spm { font-size: 1.04rem; font-weight: bold; line-height: 1.45; margin: 4px 0 11px 0; color: #fff; }
+    .spm .spm-nr { display: block; font-size: 0.68rem; font-weight: normal; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+
+    .svar {
+        width: 100%;
+        text-align: left;
+        background: var(--panel2);
+        border: 1px solid #4c4c5c;
+        color: #e2e2ec;
+        padding: 10px 12px;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        font-size: 0.86rem;
+        line-height: 1.4;
+        transition: all 0.15s;
+    }
+    .svar:hover:not(:disabled) { background: #414152; border-color: var(--accent); }
+    .svar:disabled { cursor: default; opacity: 0.7; }
+    .svar.rigtig { background: #24503a; border-color: var(--ok); color: #d6ffe6; opacity: 1; }
+    .svar.forkert { background: #4d2a2a; border-color: var(--fejl); color: #ffdede; opacity: 1; }
+    .svar .tast { color: var(--muted); font-size: 0.75rem; margin-right: 7px; }
+
+    .hint-knap, .mere-knap {
+        background: none;
+        border: 1px dashed #5a5a6e;
+        color: #b9b9c9;
+        padding: 7px 10px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        margin-bottom: 10px;
+    }
+    .hint-knap:hover, .mere-knap:hover { border-color: var(--accent); color: #fff; }
+    .hint-knap.skjult, .mere-knap.skjult { display: none; }
+
+    .hint-boks, .forklar-boks {
+        background: rgba(0,0,0,0.22);
+        border-left: 3px solid #6f7f9c;
+        border-radius: 5px;
+        padding: 10px 12px;
+        font-size: 0.83rem;
+        line-height: 1.55;
+        color: #cfcfdc;
+        margin-bottom: 12px;
+    }
+    .forklar-boks { border-left-color: #7a9c6f; }
+    .hint-boks.skjult, .forklar-boks.skjult { display: none; }
+
+    .feedback {
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        margin-bottom: 12px;
+    }
+    .feedback.rigtig { background: rgba(74,222,128,0.12); border-left: 3px solid var(--ok); }
+    .feedback.forkert { background: rgba(248,113,113,0.12); border-left: 3px solid var(--fejl); }
+    .feedback b { display: block; margin-bottom: 3px; }
+    .feedback.skjult { display: none; }
+
+    .stor-knap {
+        width: 100%;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        padding: 12px;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 4px;
+    }
+    .stor-knap:hover { filter: brightness(1.12); }
+    .stor-knap.sekundaer { background: #45455a; }
+    .stor-knap.skjult { display: none; }
+    .stor-knap:disabled { opacity: 0.5; cursor: default; }
+
+    .tast-tip { font-size: 0.72rem; color: var(--muted); text-align: center; margin-top: 8px; }
+
+    #resultat { text-align: center; }
+    #resultat .stor-tal { font-size: 2.4rem; font-weight: bold; color: var(--accent); }
+    #resultat p { font-size: 0.88rem; line-height: 1.6; color: #ccccd8; }
+
+    /* ---------- Hjælp ---------- */
+    #hjaelp {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.7);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        padding: 20px;
+    }
+    #hjaelp.vis { display: flex; }
+    #hjaelp .indhold {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        max-width: 660px;
+        max-height: 86vh;
+        overflow-y: auto;
+        padding: 24px 28px;
+    }
+    #hjaelp h2 { margin-top: 0; color: var(--accent); font-size: 1.2rem; }
+    #hjaelp p { font-size: 0.87rem; line-height: 1.6; color: #d2d2de; }
+    #hjaelp strong { color: #fff; }
+
+    .rx-pil { display: inline-block; margin: 0 5px; transition: color 0.3s, transform 0.3s; }
+    .rx-pil.hoejre { color: #2f8f4f; transform: scale(1.3); }
+    .rx-pil.venstre { color: #c0392b; transform: scale(1.3); }
+</style>
+</head>
+<body>
+
+<div id="hjaelp">
+    <div class="indhold">
+        <h2>Indgreb i ligevægte</h2>
+        <p><strong>Idéen:</strong> Du får et rigtigt forsøg at se på — en farve, et bundfald, nogle bobler. For hvert indgreb skal du <em>først</em> gætte, hvad der sker, og <em>derefter</em> udføre indgrebet og se, om du fik ret.</p>
+        <p><strong>Tænk i to (eller tre) skridt:</strong> Først spørges der om, <em>hvad indgrebet gør ved stofferne</em> — hvilken koncentration stiger eller falder, eller tilføres der varme? Først bagefter spørges der om, <em>hvilken vej ligevægten forskydes</em> som svar på det. Nogle indgreb har et tredje spørgsmål om, hvad du så rent faktisk ser i glasset — og der er det ikke altid det samme som forskydningens retning.</p>
+        <p><strong>Le Châteliers princip:</strong> Påvirker man et system i ligevægt, forskyder ligevægten sig den vej, der modvirker påvirkningen. Tilsætter du et stof, forbruges noget af det igen. Fjerner du et stof, dannes noget af det igen.</p>
+        <p><strong>De fire slags indgreb:</strong> ændring af en <em>koncentration</em> (tilsætte, fjerne, fælde ud, fortynde), ændring af <em>temperaturen</em> (varme tæller som reaktant eller produkt), ændring af <em>tryk/rumfang</em> ved gasser, og <em>katalysator</em> (som aldrig flytter ligevægten — kun farten).</p>
+        <p><strong>To glas ved siden af hinanden:</strong> Til venstre står et <em>referenceglas</em>, som ikke bliver rørt. Hvert indgreb starter forfra fra den samme udgangsblanding, så referencen altid viser præcis, hvordan glasset så ud, lige inden du greb ind. Til højre står dit eget glas, som indgrebet udføres på. Det er forskellen mellem de to, du skal kigge efter — præcis som når man har et urørt reagensglas stående ved siden af på laboratoriebordet.</p>
+        <p><strong>Makroplan:</strong> Animationen viser det, du kan se med øjnene i laboratoriet. Farvebjælken under glassene viser, hvor ligevægten står: den fyldte markør er dit glas, den hule er referencen.</p>
+        <p><strong>Grafen er valgfri:</strong> Klik på "📈 Vis graf" øverst til højre, hvis du vil se koncentrationerne som funktion af tiden. Der kan du se, at et indgreb giver et lodret spring, og at systemet derefter finder en ny ligevægt.</p>
+        <p><strong>Hints og forklaringer er valgfrie:</strong> Prøv selv først. Hintet er en ledetråd uden svaret. Den uddybende forklaring kommer først, når du har svaret.</p>
+        <p><strong>Tastatur:</strong> 1, 2, 3, 4 vælger svar. Enter går videre / udfører indgrebet.</p>
+        <p style="color:#8f8f9e; font-size:0.8rem;">Ligevægtene er inspireret af demonstrationsforsøgene fra Harper College (kobolt, ammonium, chromat, nitrogendioxid og kobbersulfat).</p>
+        <button class="stor-knap" id="luk-hjaelp">Luk</button>
+    </div>
+</div>
+
+<div id="app">
+    <nav id="nav">
+        <h1>Indgreb i ligevægte</h1>
+        <div class="nav-under">Le Châteliers princip i praksis — se, hvad der sker i glasset.</div>
+        <div class="nav-titel">Vælg ligevægt</div>
+        <div id="sys-liste"></div>
+        <button class="lille-knap" id="btn-hjaelp">? Hjælp og forklaring</button>
+        <button class="lille-knap" id="btn-forfra">↺ Start denne ligevægt forfra</button>
+    </nav>
+
+    <main id="scene">
+        <div id="startside">
+            <h2>Hvad sker der, når man forstyrrer en ligevægt?</h2>
+            <p class="ingress">
+                Her er seks rigtige demonstrationsforsøg. I hvert forsøg står et kemisk system i ligevægt — og du skal
+                udsætte det for et indgreb ad gangen. Inden hvert indgreb bliver du spurgt, hvad du tror der sker.
+                Bagefter udfører du indgrebet og ser det ske ved siden af et urørt referenceglas. Hvert indgreb
+                starter forfra fra den samme blanding. Vælg en ligevægt for at komme i gang.
+            </p>
+            <div id="start-grid"></div>
+        </div>
+
+        <div id="lab-omraade" style="display:none; width:100%; flex:1 1 auto; flex-direction:column; align-items:center;">
+            <button id="graf-knap" class="skjult">📈 Vis graf</button>
+            <div id="ligning"></div>
+            <div id="entalpi"></div>
+            <div id="lab-holder"><canvas id="lab"></canvas></div>
+            <div id="farvebar-holder">
+                <div id="farvebar"><div id="farvebar-ref"></div><div id="farvebar-maerke"></div></div>
+                <div class="farvebar-tekst"><span id="farvebar-venstre"></span><span id="farvebar-hoejre"></span></div>
+            </div>
+            <div id="observation" class="skjult"></div>
+            <div id="graf-panel" class="skjult">
+                <h3>Koncentrationerne over tid</h3>
+                <canvas id="graf"></canvas>
+                <div id="graf-legende"></div>
+                <div id="graf-note">
+                    Hver kurve er skaleret for sig, så alle ændringer kan ses. Pointen er <em>retningen</em>: et indgreb
+                    giver et lodret spring, hvorefter systemet indstiller sig i en ny ligevægt.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <aside id="quiz" class="tom">
+        <div id="quiz-tom-tekst">Vælg en ligevægt i menuen til venstre for at begynde.</div>
+        <div id="quiz-indhold" style="display:none;"></div>
+    </aside>
+</div>
+
+<script>
+/* =========================================================================
+   INDGREB I LIGEVÆGTE - makroskopisk simulation med quiz
+   Ingen template literals, dansk decimalkomma.
+   ========================================================================= */
+
+/* ---------- Hjælpefunktioner ---------- */
+function dk(tal, decimaler) {
+    if (decimaler === undefined) { decimaler = 1; }
+    return tal.toFixed(decimaler).replace(".", ",");
+}
+function beg(a, lav, hoej) { return Math.max(lav, Math.min(hoej, a)); }
+function lerp(a, b, t) { return a + (b - a) * t; }
+function blandFarve(f1, f2, t) {
+    return {
+        r: Math.round(lerp(f1.r, f2.r, t)),
+        g: Math.round(lerp(f1.g, f2.g, t)),
+        b: Math.round(lerp(f1.b, f2.b, t))
+    };
+}
+function rgba(f, a) {
+    return "rgba(" + f.r + "," + f.g + "," + f.b + "," + a + ")";
+}
+function rgbTekst(f) { return "rgb(" + f.r + "," + f.g + "," + f.b + ")"; }
+
+var ROSA = { r: 232, g: 112, b: 155 };
+var BLAA = { r: 45, g: 95, b: 210 };
+var GUL = { r: 240, g: 200, b: 40 };
+var ORANGE = { r: 232, g: 108, b: 32 };
+var BRUN = { r: 148, g: 68, b: 26 };
+var PINK = { r: 226, g: 62, b: 140 };
+var BTB_BLAA = { r: 32, g: 110, b: 198 };
+var BTB_GROEN = { r: 60, g: 170, b: 90 };
+var BTB_GUL = { r: 228, g: 205, b: 45 };
+
+/* =========================================================================
+   DATA: de fem ligevægtssystemer
+   ========================================================================= */
+var CUBLAA = { r: 30, g: 99, b: 200 };
+var PULVER = { r: 223, g: 228, b: 234 };
+var BLODROED = { r: 179, g: 35, b: 31 };
+
+/* Faste svarsæt til retningsspørgsmålet. Alle tre er lige lange, og
+   rækkefølgen blandes alligevel, hver gang spørgsmålet vises. */
+var RET_H = ["Mod højre, hen mod produkterne", "Mod venstre, mod reaktanterne", "Ingen forskydning — intet sker"];
+var RET_V = ["Mod venstre, mod reaktanterne", "Mod højre, hen mod produkterne", "Ingen forskydning — intet sker"];
+var RET_I = ["Ingen forskydning — intet sker", "Mod højre, hen mod produkterne", "Mod venstre, mod reaktanterne"];
+
+var SYSTEMER = [
+
+/* ------------------------------------------------------------------ 1 */
+{
+    id: "kobolt",
+    navn: "Kobolt-komplekset",
+    kort: "lyserød ⇌ blå",
+    tags: "koncentration · temperatur · fortynding · fældning",
+    beholder: "reagensglas",
+    pletter: ["#e8709b", "#2d5fd2"],
+    ligning: '<span style="color:#c94a7a">Co(H₂O)₆²⁺</span>(aq) + 4 Cl⁻(aq) <span class="rx-pil">⇌</span> <span style="color:#2453b8">CoCl₄²⁻</span>(aq) + 6 H₂O(l)',
+    entalpi: "Reaktionen mod højre optager varme (endoterm, ΔH &gt; 0).",
+    beskrivelse: "Det lyserøde Co(H₂O)₆²⁺ og det blå CoCl₄²⁻ står i ligevægt. Farven afslører med det samme, hvor ligevægten er.",
+    barVenstre: "lyserød = Co(H₂O)₆²⁺",
+    barHoejre: "blå = CoCl₄²⁻",
+    arter: [
+        { id: "rosa", navn: "Co(H₂O)₆²⁺", enhed: "mM", farve: "#d4548a", ref: 11 },
+        { id: "klorid", navn: "Cl⁻", enhed: "mM", farve: "#7e8b99", ref: 46 },
+        { id: "blaa", navn: "CoCl₄²⁻", enhed: "mM", farve: "#2d5fd2", ref: 11 }
+    ],
+    start: { konc: { rosa: 5.0, klorid: 20.0, blaa: 5.0 }, temp: 20, volumen: 1, bundfald: 0, bobler: 0 },
+    bundfaldFarve: "#eef0f2",
+    intro: "Begge reagensglas indeholder den samme violette blanding ved stuetemperatur: lige meget af det lyserøde og det blå kompleks.",
+    farve: function (t) {
+        var sum = t.konc.rosa + t.konc.blaa;
+        var f = sum > 0 ? t.konc.blaa / sum : 0.5;
+        return { farve: blandFarve(ROSA, BLAA, f), alfa: 0.35 + 0.55 * beg(sum / 10, 0.25, 1), pos: f };
+    },
+    indgreb: [
+        {
+            navn: "Tilsæt koncentreret saltsyre, HCl(aq)",
+            tekst: "Du drypper koncentreret saltsyre, HCl(aq), ned i reagensglasset.",
+            spm0: "Hvad gør saltsyren ved stofferne i ligevægten?",
+            svar0: ["Koncentrationen af Cl⁻ stiger", "Koncentrationen af Cl⁻ falder", "Ingen af stofferne ændrer sig"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten?",
+            svar1: RET_H,
+            rigtig1: 0,
+            hint: "Cl⁻ står på venstre side af pilen. Hvad gør systemet, når der pludselig kommer for meget af et stof på den ene side?",
+            spm2: "Hvad ser du i glasset?",
+            svar2: ["Blandingen bliver tydeligt blå", "Blandingen bliver mere lyserød", "Blandingen ændrer sig slet ikke"],
+            rigtig2: 0,
+            observation: "Blandingen skifter fra violet til <strong>klar blå</strong>. Ligevægten er forskudt mod højre.",
+            forklaring: "Koncentrationen af Cl⁻ stiger kraftigt. Systemet modvirker forstyrrelsen ved at forbruge Cl⁻, og det kan kun ske ved at danne mere CoCl₄²⁻. Reaktionsbrøken Y bliver mindre end K lige efter tilsætningen, og reaktionen løber mod højre, indtil Y = K igen.",
+            spring: { klorid: 44.0 },
+            slut: { rosa: 1.5, klorid: 30.5, blaa: 8.5 }
+        },
+        {
+            navn: "Sæt glasset i et varmt vandbad (60 °C)",
+            tekst: "Du sætter det ene reagensglas ned i et bægerglas med 60 °C varmt vand. Referenceglasset bliver stående ved stuetemperatur.",
+            spmKinds: [1, 2],
+            spm0: "Hvilken vej forskydes ligevægten, når temperaturen sættes op?",
+            svar0: RET_H,
+            rigtig0: 0,
+            hint: "Reaktionen mod højre er endoterm. Skriv varme ind i reaktionsskemaet som en reaktant: varme + Co(H₂O)₆²⁺ + 4 Cl⁻ ⇌ CoCl₄²⁻ + 6 H₂O.",
+            spm1: "Hvad ser du i det varme glas sammenlignet med referencen?",
+            svar1: ["Blandingen bliver tydeligt blå", "Blandingen bliver mere lyserød", "Blandingen ændrer sig slet ikke"],
+            rigtig1: 0,
+            observation: "Det varme glas bliver <strong>klart blåt</strong>, mens referenceglasset stadig er violet. Varmen presser ligevægten mod højre.",
+            forklaring: "Når reaktionen mod højre er endoterm, kan man opfatte varme som en reaktant. Tilfører man varme, forbruger systemet den ved at løbe mod højre. Bemærk forskellen fra alle de andre indgreb: her ændres selve ligevægtskonstanten K. Temperatur er det eneste indgreb, der flytter K.",
+            temp: 60,
+            slut: { rosa: 2.0, klorid: 8.0, blaa: 8.0 }
+        },
+        {
+            navn: "Stil glasset i et isbad (2 °C)",
+            tekst: "Du stiller det ene reagensglas ned i isvand. Referenceglasset bliver stående ved stuetemperatur.",
+            spmKinds: [1, 2],
+            spm0: "Hvilken vej forskydes ligevægten, når du køler ned?",
+            svar0: RET_V,
+            rigtig0: 0,
+            hint: "Du fjerner varme fra systemet. Hvordan modvirker systemet det, når varme opfører sig som en reaktant?",
+            spm1: "Hvad ser du i det kolde glas sammenlignet med referencen?",
+            svar1: ["Blandingen bliver mere lyserød", "Blandingen bliver tydeligt blå", "Blandingen ændrer sig slet ikke"],
+            rigtig1: 0,
+            observation: "Det kolde glas bliver <strong>tydeligt lyserødt</strong>. Reaktionen kan gå begge veje — ligevægten er reversibel.",
+            forklaring: "Når varme fjernes, modvirker systemet det ved at løbe den vej, der udvikler varme — altså mod venstre (den exoterme retning). K bliver mindre ved lav temperatur, så der dannes mindre CoCl₄²⁻. Sammenlign med det varme bad: samme ligevægt, modsat vej.",
+            temp: 2,
+            slut: { rosa: 8.5, klorid: 34.0, blaa: 1.5 }
+        },
+        {
+            navn: "Tilsæt vand (fordobl rumfanget)",
+            tekst: "Du hælder lige så meget vand i, som der allerede er i glasset. Alle koncentrationer halveres på ét slag.",
+            spm0: "Hvad sker der med koncentrationerne i selve det øjeblik, vandet hældes i?",
+            svar0: ["Alle koncentrationer halveres", "Kun Cl⁻ bliver fortyndet her", "Kun CoCl₄²⁻ bliver fortyndet"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten ved fortynding?",
+            svar1: RET_V,
+            rigtig1: 0,
+            hint: "Koncentrationen af Cl⁻ indgår i 4. potens i reaktionsbrøken. Hvad sker der med (½)⁴ i forhold til ½?",
+            spm2: "Hvad ser du i glasset?",
+            svar2: ["Lysere og mere lyserød farve", "Lysere, men stadig klart blå", "Mørkere og mere blå end før"],
+            rigtig2: 0,
+            observation: "Opløsningen bliver både <strong>lysere</strong> (alt er fortyndet) og tydeligt mere <strong>lyserød</strong>.",
+            forklaring: "Y = [CoCl₄²⁻] / ([Co(H₂O)₆²⁺] · [Cl⁻]⁴). Når alt halveres, bliver tælleren halveret, men nævneren bliver 2⁵ = 32 gange mindre. Y bliver altså 16 gange større end K, og reaktionen må løbe mod venstre. Tommelfingerregel: fortynding forskyder ligevægten mod den side, der har flest opløste partikler — her venstre side med 1 + 4 = 5 ioner.",
+            volumen: 2,
+            spring: { rosa: 2.5, klorid: 10.0, blaa: 2.5 },
+            slut: { rosa: 4.5, klorid: 18.0, blaa: 0.5 }
+        },
+        {
+            navn: "Tilsæt sølvnitrat, AgNO₃",
+            tekst: "Du drypper sølvnitrat i. Ag⁺ + Cl⁻ → AgCl(s) er en tungtopløselig forbindelse, som falder ud af opløsningen.",
+            spm0: "Hvad gør sølvionerne ved stofferne i ligevægten?",
+            svar0: ["Cl⁻ fjernes fra opløsningen", "Co²⁺ fjernes fra opløsningen", "Cl⁻ tilføres til opløsningen"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten?",
+            svar1: RET_V,
+            rigtig1: 0,
+            hint: "AgCl er ikke selv med i ligevægten, men sølvionerne stjæler Cl⁻ fra opløsningen. Hvad gør systemet, når en reaktant forsvinder?",
+            spm2: "Hvad ser du i glasset?",
+            svar2: ["Hvidt bundfald, lyserød væske", "Hvidt bundfald, klar blå væske", "Blåt bundfald, lyserød væske"],
+            rigtig2: 0,
+            observation: "Et <strong>hvidt bundfald af AgCl</strong> synker til bunds, og opløsningen bliver <strong>rent lyserød</strong>.",
+            forklaring: "En fældningsreaktion er en meget effektiv måde at fjerne en ion fra en ligevægt på: ionen forlader simpelthen opløsningen som fast stof. Når [Cl⁻] falder, bliver Y større end K, og reaktionen løber mod venstre for at danne Cl⁻ igen — men sølvet bliver ved med at fælde det, så ligevægten trækkes langt mod venstre.",
+            spring: { klorid: 5.0 },
+            slut: { rosa: 9.4, klorid: 7.0, blaa: 0.6 },
+            bundfald: 1
+        }
+    ]
+},
+
+/* ------------------------------------------------------------------ 2 */
+{
+    id: "chromat",
+    navn: "Chromat og dichromat",
+    kort: "gul ⇌ orange",
+    tags: "syre/base · fældning",
+    beholder: "reagensglas",
+    pletter: ["#f0c828", "#e86c20"],
+    ligning: '2 <span style="color:#b8951a">CrO₄²⁻</span>(aq) + 2 H₃O⁺(aq) <span class="rx-pil">⇌</span> <span style="color:#c25a18">Cr₂O₇²⁻</span>(aq) + 3 H₂O(l)',
+    entalpi: "Her flytter vi ligevægten udelukkende med syre og base — altså med koncentrationen af H₃O⁺.",
+    beskrivelse: "Gult chromat og orange dichromat står i ligevægt. Ligevægten styres af, hvor sur opløsningen er.",
+    barVenstre: "gul = CrO₄²⁻",
+    barHoejre: "orange = Cr₂O₇²⁻",
+    arter: [
+        { id: "gul", navn: "CrO₄²⁻", enhed: "mM", farve: "#c9a30f", ref: 10 },
+        { id: "orange", navn: "Cr₂O₇²⁻", enhed: "mM", farve: "#e86c20", ref: 6 },
+        { id: "oxonium", navn: "H₃O⁺", enhed: "mM", farve: "#7e8b99", ref: 6.5 }
+    ],
+    start: { konc: { gul: 6.0, orange: 3.0, oxonium: 0.5 }, temp: 20, volumen: 1, bundfald: 0, bobler: 0 },
+    bundfaldFarve: "#e8d23a",
+    intro: "Begge reagensglas indeholder den samme gulorange blanding af gule chromationer og orange dichromationer.",
+    farve: function (t) {
+        var crOrange = 2 * t.konc.orange;
+        var sum = t.konc.gul + crOrange;
+        var f = sum > 0 ? crOrange / sum : 0.5;
+        return { farve: blandFarve(GUL, ORANGE, f), alfa: 0.3 + 0.6 * beg(sum / 12, 0.2, 1), pos: f };
+    },
+    indgreb: [
+        {
+            navn: "Tilsæt saltsyre, HCl(aq)",
+            tekst: "Du tilsætter et par dråber saltsyre, så opløsningen bliver sur.",
+            spm0: "Hvad gør saltsyren ved stofferne i ligevægten?",
+            svar0: ["Koncentrationen af H₃O⁺ stiger", "Koncentrationen af H₃O⁺ falder", "Ingen af stofferne ændrer sig"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten?",
+            svar1: RET_H,
+            rigtig1: 0,
+            hint: "H₃O⁺ står på venstre side. Du øger koncentrationen af en reaktant.",
+            spm2: "Hvad ser du i glasset?",
+            svar2: ["Farven bliver mere orange", "Farven bliver mere gullig", "Farven ændrer sig slet ikke"],
+            rigtig2: 0,
+            observation: "Farven skifter fra gulorange til <strong>kraftig orange</strong>.",
+            forklaring: "Mere H₃O⁺ betyder mere af en reaktant. Systemet modvirker det ved at forbruge H₃O⁺, altså ved at løbe mod højre og danne dichromat. Læg mærke til, at H₃O⁺ indgår i 2. potens — derfor er ligevægten meget følsom over for pH.",
+            spring: { oxonium: 5.0 },
+            slut: { gul: 2.0, orange: 5.0, oxonium: 1.0 }
+        },
+        {
+            navn: "Tilsæt natriumhydroxid, NaOH",
+            tekst: "Du tilsætter natriumhydroxid. OH⁻ reagerer med H₃O⁺ og danner vand.",
+            spm0: "Hvad gør natriumhydroxiden ved stofferne i ligevægten?",
+            svar0: ["Koncentrationen af H₃O⁺ falder", "Koncentrationen af H₃O⁺ stiger", "Ingen af stofferne ændrer sig"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten?",
+            svar1: RET_V,
+            rigtig1: 0,
+            hint: "OH⁻ optræder ikke i skemaet, men den fjerner en af reaktanterne. Hvad gør systemet så?",
+            spm2: "Hvilken farve ender opløsningen med?",
+            svar2: ["Farven bliver tydeligt gul", "Farven bliver mere orange", "Farven ændrer sig slet ikke"],
+            rigtig2: 0,
+            observation: "Farven skifter til <strong>klar gul</strong> — chromat dominerer nu.",
+            forklaring: "Base fjerner H₃O⁺, og systemet modvirker det ved at løbe mod venstre og danne H₃O⁺ igen. Den H₃O⁺, der dannes, bliver straks neutraliseret af den overskydende base, så ligevægten trækkes langt mod venstre. Syre gør blandingen orange, base gør den gul — og man kan skifte frem og tilbage så mange gange, man vil.",
+            spring: { oxonium: 0.05 },
+            slut: { gul: 9.0, orange: 1.5, oxonium: 0.02 }
+        },
+        {
+            navn: "Tilsæt bariumchlorid, BaCl₂",
+            tekst: "Du tilsætter bariumchlorid. Ba²⁺ + CrO₄²⁻ → BaCrO₄(s) er tungtopløseligt og fælder ud som et gult bundfald. Dichromat fældes derimod ikke.",
+            spm0: "Hvad gør bariumionerne ved stofferne i ligevægten?",
+            svar0: ["CrO₄²⁻ fjernes fra opløsningen", "Cr₂O₇²⁻ fjernes fra opløsningen", "CrO₄²⁻ tilføres til opløsningen"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten, når CrO₄²⁻ fjernes?",
+            svar1: RET_V,
+            rigtig1: 0,
+            hint: "Når man fjerner et stof fra den ene side, forsøger systemet at erstatte det. Hvilken side står CrO₄²⁻ på?",
+            spm2: "Hvad ser du i glasset?",
+            svar2: ["Gult bundfald, lysere opløsning", "Orange bundfald, mørkere væske", "Hvidt bundfald, orange opløsning"],
+            rigtig2: 0,
+            observation: "Et <strong>gult bundfald af BaCrO₄</strong> lægger sig i bunden, og opløsningen bliver <strong>lysere</strong>, fordi chrom forsvinder ud af den.",
+            forklaring: "Fældningen fjerner CrO₄²⁻ fra opløsningen. Systemet modvirker det ved at løbe mod venstre og omdanne dichromat til chromat — som så også fældes. Til sidst er næsten alt chrom endt i bundfaldet, og opløsningen er blevet lys. Det er præcis samme princip som med AgCl i kobolt-forsøget.",
+            spring: { gul: 2.0 },
+            slut: { gul: 1.6, orange: 0.2, oxonium: 0.6 },
+            bundfald: 1
+        },
+        {
+            navn: "Syre på et bundfald af BaCrO₄",
+            tekst: "Dette glas er på forhånd gjort basisk og tilsat bariumchlorid, så blandingen er gul med et gult bundfald af BaCrO₄ i bunden. Nu hælder du rigeligt saltsyre, HCl(aq), i.",
+            fra: { konc: { gul: 9.0, orange: 1.5, oxonium: 0.02 }, bundfald: 1 },
+            spm0: "Hvad gør saltsyren ved stofferne i ligevægten?",
+            svar0: ["Koncentrationen af H₃O⁺ stiger", "Koncentrationen af H₃O⁺ falder", "Ingen af stofferne ændrer sig"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten?",
+            svar1: RET_H,
+            rigtig1: 0,
+            hint: "H₃O⁺ er reaktant i ligevægten. Og hvad sker der med bundfaldet, når CrO₄²⁻ bliver brugt op i opløsningen?",
+            spm2: "Hvad ser du i glasset?",
+            svar2: ["Bundfaldet opløses, og farven bliver orange", "Bundfaldet bliver liggende, og farven er gul", "Bundfaldet bliver orange, og væsken er klar"],
+            rigtig2: 0,
+            observation: "Bundfaldet <strong>opløses</strong>, og opløsningen bliver <strong>orange</strong>.",
+            forklaring: "Syren forbruger CrO₄²⁻ ved at danne dichromat. Så er opløsningen ikke længere mættet med hensyn til BaCrO₄, og bundfaldet går i opløsning for at erstatte det forbrugte chromat. Her er to ligevægte koblet sammen: fældningsligevægten og chromat/dichromat-ligevægten. Et indgreb i den ene flytter også den anden.",
+            spring: { oxonium: 6.0 },
+            slut: { gul: 1.0, orange: 5.5, oxonium: 2.5 },
+            bundfald: 0
+        }
+    ]
+},
+
+/* ------------------------------------------------------------------ 3 */
+{
+    id: "nitrogendioxid",
+    navn: "Nitrogendioxid i en sprøjte",
+    kort: "brun ⇌ farveløs",
+    tags: "temperatur · tryk og rumfang · katalysator",
+    beholder: "sproejte",
+    pletter: ["#94441a", "#e8ecef"],
+    ligning: '2 <span style="color:#94441a">NO₂</span>(g) <span class="rx-pil">⇌</span> <span style="color:#5a6673">N₂O₄</span>(g)',
+    entalpi: "Reaktionen mod højre udvikler varme (exoterm, ΔH &lt; 0). NO₂ er brun, N₂O₄ er farveløs.",
+    beskrivelse: "En lukket gassprøjte med en blanding af brun NO₂ og farveløs N₂O₄. Her kan vi både ændre temperaturen og rumfanget.",
+    barVenstre: "brun = meget NO₂",
+    barHoejre: "lys = meget N₂O₄",
+    arter: [
+        { id: "no2", navn: "NO₂", enhed: "mM", farve: "#94441a", ref: 9 },
+        { id: "n2o4", navn: "N₂O₄", enhed: "mM", farve: "#5a6673", ref: 8 }
+    ],
+    start: { konc: { no2: 4.0, n2o4: 3.0 }, temp: 20, volumen: 1, bundfald: 0, bobler: 0 },
+    bundfaldFarve: "#ffffff",
+    intro: "Begge sprøjter er lukket i spidsen og indeholder den samme middelbrune gasblanding ved stuetemperatur.",
+    farve: function (t) {
+        var a = beg(t.konc.no2 / 9, 0.02, 0.92);
+        return { farve: BRUN, alfa: a, pos: 1 - beg(t.konc.no2 / 9, 0, 1) };
+    },
+    indgreb: [
+        {
+            navn: "Sæt sprøjten i varmt vand (70 °C)",
+            tekst: "Du holder den ene gassprøjte ned i et varmt vandbad. Rumfanget holdes fast.",
+            spmKinds: [1, 2],
+            spm0: "Hvilken vej forskydes ligevægten, når temperaturen sættes op?",
+            svar0: RET_V,
+            rigtig0: 0,
+            hint: "Reaktionen mod højre er exoterm — varme er altså et produkt: 2 NO₂ ⇌ N₂O₄ + varme.",
+            spm1: "Hvad ser du i den varme sprøjte?",
+            svar1: ["Gassen bliver mørkere brun", "Gassen bliver næsten klar", "Gassen ændrer ikke farve"],
+            rigtig1: 0,
+            observation: "Gassen bliver tydeligt <strong>mørkere brun</strong> end i referencen. Ligevægten er forskudt mod NO₂.",
+            forklaring: "Skriv varmen ind som produkt: 2 NO₂ ⇌ N₂O₄ + varme. Tilfører du varme, modvirker systemet det ved at forbruge varme — altså ved at løbe mod venstre, den endoterme retning. K bliver mindre ved høj temperatur. Det er kun temperaturen, der ændrer K.",
+            temp: 70,
+            slut: { no2: 6.4, n2o4: 1.8 }
+        },
+        {
+            navn: "Sæt sprøjten i isvand (2 °C)",
+            tekst: "Du holder den ene sprøjte ned i et isbad. Rumfanget holdes fast.",
+            spmKinds: [1, 2],
+            spm0: "Hvilken vej forskydes ligevægten, når du køler ned?",
+            svar0: RET_H,
+            rigtig0: 0,
+            hint: "Nu fjerner du varme fra et system, hvor varme er et produkt.",
+            spm1: "Hvad ser du i den kolde sprøjte?",
+            svar1: ["Gassen bliver næsten farveløs", "Gassen bliver meget mørkere", "Gassen ændrer sig slet ikke"],
+            rigtig1: 0,
+            observation: "Gassen bliver <strong>næsten farveløs</strong> — næsten alt er nu N₂O₄.",
+            forklaring: "Fjerner du varme, modvirker systemet det ved at udvikle varme, altså ved at løbe mod højre. Ved lav temperatur er K stor, og N₂O₄ dominerer. Det er dette forsøg, der bruges til at vise, at temperatur ikke bare ændrer hastigheden, men selve ligevægtens position.",
+            temp: 2,
+            slut: { no2: 1.2, n2o4: 4.4 }
+        },
+        {
+            navn: "Tryk stemplet halvvejs ind",
+            tekst: "Du trykker stemplet ind, så rumfanget halveres. Temperaturen holdes konstant.",
+            spm0: "Hvad sker der med koncentrationerne i selve det øjeblik, du trykker stemplet ind?",
+            svar0: ["Begge koncentrationer fordobles", "Begge koncentrationer halveres", "Koncentrationerne er uændrede"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten, når rumfanget halveres?",
+            svar1: RET_H,
+            rigtig1: 0,
+            hint: "Tæl gasmolekylerne på hver side: 2 til venstre, 1 til højre. Hvilken side giver det laveste tryk?",
+            spm2: "Hvad ser du, mens du trykker og lige bagefter?",
+            svar2: ["Først mørkere, så lysere igen", "Kun mørkere hele vejen igennem", "Kun lysere hele vejen igennem"],
+            rigtig2: 0,
+            observation: "Farven bliver <strong>først tydeligt mørkere</strong> (samme gas på det halve rum) og derefter <strong>lysere igen</strong>, efterhånden som NO₂ omdannes til N₂O₄. Slutfarven er stadig mørkere end i referencen.",
+            forklaring: "Det er det klassiske to-trins-forsøg. Trin 1: halverer du rumfanget, fordobles alle koncentrationer med det samme, og farven bliver mørkere. Trin 2: nu er Y mindre end K, og systemet modvirker trykstigningen ved at løbe mod den side, der har færrest gasmolekyler — mod N₂O₄. Farven lysner igen, men den når ikke tilbage til referencen. På grafen ses trin 1 som et lodret spring og trin 2 som den bløde kurve bagefter.",
+            volumen: 0.5,
+            spring: { no2: 8.0, n2o4: 6.0 },
+            slut: { no2: 5.6, n2o4: 7.2 }
+        },
+        {
+            navn: "Træk stemplet ud til fire gange rumfanget",
+            tekst: "Denne sprøjte er på forhånd trykket sammen til det halve rumfang. Nu trækker du stemplet ud, så rumfanget bliver fire gange så stort (fra ½ til 2).",
+            fra: { konc: { no2: 5.6, n2o4: 7.2 }, volumen: 0.5 },
+            spm0: "Hvad sker der med koncentrationerne i selve det øjeblik, du trækker stemplet ud?",
+            svar0: ["Koncentrationerne bliver mindre", "Koncentrationerne bliver større", "Koncentrationerne er uændrede"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten nu?",
+            svar1: RET_V,
+            rigtig1: 0,
+            hint: "Nu falder trykket. Hvordan modvirker systemet et fald i tryk?",
+            spm2: "Hvad ser du, mens du trækker og lige bagefter?",
+            svar2: ["Først meget lysere, så lidt mørkere", "Kun lysere, og sådan bliver den ved", "Kun mørkere, og sådan bliver den ved"],
+            rigtig2: 0,
+            observation: "Gassen bliver <strong>først meget lys</strong> og derefter <strong>lidt mørkere igen</strong>, mens N₂O₄ spaltes til NO₂.",
+            forklaring: "Igen to trin: fortyndingen gør farven lysere med det samme, og derefter modvirker systemet trykfaldet ved at danne flere gasmolekyler — altså mod venstre. Det er samme princip som fortynding i en opløsning: lavere tryk (eller lavere koncentration) favoriserer den side med flest partikler.",
+            volumen: 2,
+            spring: { no2: 1.4, n2o4: 1.8 },
+            slut: { no2: 2.4, n2o4: 1.3 }
+        },
+        {
+            navn: "Tilsæt en katalysator",
+            tekst: "Du putter en lille smule fast katalysator ind i sprøjten. Temperatur og rumfang er uændrede.",
+            spm0: "Hvad gør katalysatoren ved stofferne i ligevægten?",
+            svar0: ["Ingen af stofferne ændrer sig", "Koncentrationen af N₂O₄ stiger", "Koncentrationen af NO₂ stiger"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten?",
+            svar1: RET_I,
+            rigtig1: 0,
+            hint: "En katalysator sænker aktiveringsenergien for reaktionen — men for hvilken retning?",
+            spm2: "Hvad ser du?",
+            svar2: ["Farven ændrer sig slet ikke", "Farven bliver noget lysere", "Farven bliver noget mørkere"],
+            rigtig2: 0,
+            observation: "<strong>Ingenting sker</strong> med farven. De to sprøjter ser fuldstændig ens ud.",
+            forklaring: "En katalysator sænker aktiveringsenergien lige meget for den fremadgående og den tilbagegående reaktion. Begge hastigheder stiger med samme faktor, så ligevægten indstiller sig hurtigere — men den ender samme sted. K er uændret. Var systemet ikke i ligevægt, ville du se, at det nåede frem hurtigere; men positionen bliver den samme.",
+            slut: { no2: 4.0, n2o4: 3.0 }
+        }
+    ]
+},
+
+/* ------------------------------------------------------------------ 4 */
+{
+    id: "ammoniak",
+    navn: "Ammoniak med phenolphthalein",
+    kort: "farveløs ⇌ pink",
+    tags: "fælles ion · syre · base",
+    beholder: "baegerglas",
+    pletter: ["#f2f2f2", "#e23e8c"],
+    ligning: '<span style="color:#2c8f80">NH₃</span>(aq) + H₂O(l) <span class="rx-pil">⇌</span> NH₄⁺(aq) + <span style="color:#c2306f">OH⁻</span>(aq)',
+    entalpi: "Phenolphthalein er tilsat: jo mere OH⁻, jo kraftigere pink.",
+    beskrivelse: "Ammoniakvand med phenolphthalein. Farvens styrke er et direkte mål for koncentrationen af OH⁻.",
+    barVenstre: "farveløs = lidt OH⁻",
+    barHoejre: "kraftig pink = meget OH⁻",
+    arter: [
+        { id: "nh3", navn: "NH₃", enhed: "mM", farve: "#2c8f80", ref: 23 },
+        { id: "nh4", navn: "NH₄⁺", enhed: "mM", farve: "#8a7fc4", ref: 7 },
+        { id: "oh", navn: "OH⁻", enhed: "mM", farve: "#e23e8c", ref: 2.2 }
+    ],
+    start: { konc: { nh3: 10.0, nh4: 0.4, oh: 0.4 }, temp: 20, volumen: 1, bundfald: 0, bobler: 0 },
+    bundfaldFarve: "#ffffff",
+    intro: "Begge bægerglas indeholder det samme fortyndede ammoniakvand med phenolphthalein. Den svage pink farve viser, at opløsningen er basisk.",
+    farve: function (t) {
+        var a = beg(t.konc.oh / 0.8, 0.02, 0.92) * 0.85;
+        return { farve: PINK, alfa: a, pos: beg(t.konc.oh / 0.8, 0, 1) };
+    },
+    indgreb: [
+        {
+            navn: "Tilsæt ammoniumchlorid, NH₄Cl",
+            tekst: "Du drysser fast ammoniumchlorid i og rører rundt. Saltet opløses fuldstændigt til NH₄⁺ og Cl⁻.",
+            spm0: "Hvad gør salmiakken ved stofferne i ligevægten?",
+            svar0: ["Koncentrationen af NH₄⁺ stiger", "Koncentrationen af OH⁻ falder", "Ingen af stofferne ændrer sig"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten?",
+            svar1: RET_V,
+            rigtig1: 0,
+            hint: "NH₄⁺ er allerede med i ligevægten som produkt. Det kaldes en fælles ion.",
+            spm2: "Hvad ser du i glasset?",
+            svar2: ["Den pink farve forsvinder næsten", "Den pink farve bliver kraftigere", "Farven skifter fra pink til blå"],
+            rigtig2: 0,
+            observation: "Den pink farve <strong>forsvinder næsten helt</strong> — opløsningen er blevet meget mindre basisk end referencen.",
+            forklaring: "Dette er den klassiske fælles ion-effekt. NH₄⁺ er et produkt i ligevægten, og når koncentrationen af et produkt sættes op, modvirker systemet det ved at løbe mod venstre. Så forbruges OH⁻, og phenolphthalein affarves. Det er præcis sådan, en pufferopløsning virker: NH₃/NH₄⁺ sammen holder pH stabil.",
+            spring: { nh4: 6.0 },
+            slut: { nh3: 10.3, nh4: 5.7, oh: 0.08 }
+        },
+        {
+            navn: "Tilsæt natriumhydroxid, NaOH",
+            tekst: "Du tilsætter et par dråber fortyndet natriumhydroxid. Det er en stærk base, som leverer OH⁻ direkte.",
+            spm0: "Hvad gør natriumhydroxiden ved stofferne i ligevægten?",
+            svar0: ["Koncentrationen af OH⁻ stiger", "Koncentrationen af OH⁻ falder", "Koncentrationen af NH₄⁺ stiger"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten?",
+            svar1: RET_V,
+            rigtig1: 0,
+            hint: "OH⁻ står på højre side af pilen. Tænk kun på ligevægten — ikke på farven endnu.",
+            spm2: "Og hvad ser du så i bægerglasset?",
+            svar2: ["Den pink farve bliver kraftigere", "Den pink farve bliver lidt svagere", "Farven forsvinder helt fra glasset"],
+            rigtig2: 0,
+            observation: "Farven bliver <strong>kraftigere pink</strong> — selvom ligevægten er forskudt mod <strong>venstre</strong>.",
+            forklaring: "Dette er et af de indgreb, som flest laver fejl i. Ligevægten forskydes mod venstre, fordi du tilsætter et produkt (OH⁻). Men det betyder ikke, at [OH⁻] falder til under udgangspunktet! Systemet forbruger kun en <em>del</em> af den tilsatte OH⁻ — det modvirker forstyrrelsen, men fjerner den ikke. Så [OH⁻] ender højere end i referencen, og farven bliver kraftigere. Huskeregel: forskydningen modvirker, den ophæver ikke.",
+            spring: { oh: 2.0 },
+            slut: { nh3: 10.35, nh4: 0.05, oh: 1.65 }
+        },
+        {
+            navn: "Tilsæt saltsyre, HCl(aq)",
+            tekst: "Du tilsætter fortyndet saltsyre. H₃O⁺ + OH⁻ → 2 H₂O fjerner hydroxidionerne fra opløsningen.",
+            spm0: "Hvad gør saltsyren ved stofferne i ligevægten?",
+            svar0: ["Koncentrationen af OH⁻ falder", "Koncentrationen af OH⁻ stiger", "Koncentrationen af NH₃ falder"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten?",
+            svar1: RET_H,
+            rigtig1: 0,
+            hint: "Syren fjerner et produkt. Hvad gør systemet, når et produkt forsvinder?",
+            spm2: "Hvad ser du i glasset?",
+            svar2: ["Den pink farve bliver svagere", "Den pink farve bliver stærkere", "Den pink farve er helt uændret"],
+            rigtig2: 0,
+            observation: "Farven <strong>falmer</strong> — selvom ligevægten forskydes mod <strong>højre</strong>.",
+            forklaring: "Spejlbilledet af det forrige indgreb. Syren fjerner OH⁻, så systemet modvirker det ved at løbe mod højre og danne mere OH⁻. Men det erstatter kun en del af det, der blev fjernet, så [OH⁻] ender lavere end i referencen — og farven falmer. Pointen er, at 'forskydning mod højre' og 'mere af produktet' ikke er det samme, når det er selve produktet, du har fjernet.",
+            spring: { oh: 0.05 },
+            slut: { nh3: 9.9, nh4: 0.5, oh: 0.12 }
+        },
+        {
+            navn: "Tilsæt mere ammoniakvand",
+            tekst: "Du hælder mere koncentreret ammoniakvand i bægerglasset.",
+            spm0: "Hvad gør ammoniakken ved stofferne i ligevægten?",
+            svar0: ["Koncentrationen af NH₃ stiger", "Koncentrationen af NH₄⁺ stiger", "Koncentrationen af OH⁻ falder"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten?",
+            svar1: RET_H,
+            rigtig1: 0,
+            hint: "NH₃ er reaktant. Her peger både forskydningen og observationen samme vej.",
+            spm2: "Hvad ser du i glasset?",
+            svar2: ["Den pink farve bliver kraftigere", "Den pink farve bliver meget svag", "Den pink farve er helt uændret"],
+            rigtig2: 0,
+            observation: "Farven bliver <strong>kraftigere pink</strong>. Mere NH₃ giver mere OH⁻.",
+            forklaring: "Her er der ingen fælder: du tilsætter en reaktant, ligevægten forskydes mod højre, og der dannes mere OH⁻. Sammenlign med de to foregående indgreb — det er værd at lægge mærke til, at farven kan gå op og ned, uanset hvilken vej ligevægten forskydes. Det afgørende er, hvad der sker med det stof, farven måler.",
+            spring: { nh3: 22.0 },
+            slut: { nh3: 21.4, nh4: 1.0, oh: 1.0 }
+        }
+    ]
+},
+
+/* ------------------------------------------------------------------ 5 */
+{
+    id: "kulsyre",
+    navn: "Kulsyre og bromthymolblåt",
+    kort: "blå ⇌ gul",
+    tags: "temperatur · gasafgang · fælles ion",
+    beholder: "baegerglas",
+    pletter: ["#206ec6", "#e4cd2d"],
+    ligning: '<span class="lille-ligning">CO₂(g) ⇌ CO₂(aq)</span><br><span style="color:#4a6070">CO₂</span>(aq) + 2 H₂O(l) <span class="rx-pil">⇌</span> <span style="color:#c05028">H₃O⁺</span>(aq) + HCO₃⁻(aq)',
+    entalpi: "Bromthymolblåt er tilsat: gul i sur opløsning, grøn omkring pH 7, blå i basisk.",
+    beskrivelse: "Vand med bromthymolblåt, som der er pustet CO₂ ned i. To ligevægte hænger sammen: opløsningen af CO₂ og dannelsen af kulsyre.",
+    barVenstre: "blå = lidt CO₂",
+    barHoejre: "gul = meget CO₂",
+    arter: [
+        { id: "co2", navn: "CO₂(aq)", enhed: "mM", farve: "#4a6070", ref: 20 },
+        { id: "oxonium", navn: "H₃O⁺", enhed: "µM", farve: "#c05028", ref: 10 },
+        { id: "hydrogencarbonat", navn: "HCO₃⁻", enhed: "mM", farve: "#4f9fd0", ref: 7 }
+    ],
+    start: { konc: { co2: 8.0, oxonium: 0.9, hydrogencarbonat: 0.9 }, temp: 20, volumen: 1, bundfald: 0, bobler: 0.05 },
+    bundfaldFarve: "#ffffff",
+    intro: "I begge bægerglas er der pustet CO₂ ned i vandet gennem et sugerør. Indikatoren er slået om mod gulgrøn, fordi opløsningen er blevet sur.",
+    farve: function (t) {
+        var ox = Math.max(t.konc.oxonium, 0.01);
+        var f = beg((Math.log(ox) - Math.log(0.08)) / (Math.log(2.5) - Math.log(0.08)), 0, 1);
+        var farve = f < 0.5 ? blandFarve(BTB_BLAA, BTB_GROEN, f / 0.5) : blandFarve(BTB_GROEN, BTB_GUL, (f - 0.5) / 0.5);
+        return { farve: farve, alfa: 0.72, pos: f };
+    },
+    indgreb: [
+        {
+            navn: "Varm vandet op til kogepunktet",
+            tekst: "Du sætter det ene bægerglas på en varmeplade og varmer det op. Gasser er mindre opløselige i varmt vand.",
+            spm0: "Hvad gør opvarmningen ved stofferne i den nederste ligevægt?",
+            svar0: ["Koncentrationen af CO₂ falder", "Koncentrationen af CO₂ stiger", "Koncentrationen af H₃O⁺ stiger"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes den nederste ligevægt?",
+            svar1: RET_V,
+            rigtig1: 0,
+            hint: "Se på den øverste ligevægt først: hvor bliver CO₂ af, når vandet bliver varmt? Og hvad betyder det for reaktanten i den nederste ligevægt?",
+            spm2: "Hvad ser du i glasset?",
+            svar2: ["Bobler, og farven går mod blå", "Bobler, og farven går mod gul", "Farven bliver blot lidt mørkere"],
+            rigtig2: 0,
+            observation: "Der stiger <strong>bobler af CO₂</strong> op, og farven skifter fra gulgrøn mod <strong>blå</strong>.",
+            forklaring: "Varmen driver CO₂ ud af opløsningen — den øverste ligevægt forskydes mod gasfasen. Dermed falder [CO₂(aq)], som er reaktant i den nederste ligevægt, og den forskydes mod venstre. Der dannes mindre H₃O⁺, pH stiger, og bromthymolblåt slår om mod blåt. Det er samme grund til, at en varm sodavand er fladere end en kold.",
+            temp: 95,
+            bobler: 1,
+            slut: { co2: 1.5, oxonium: 0.12, hydrogencarbonat: 0.3 }
+        },
+        {
+            navn: "Pust mere CO₂ ned i vandet",
+            tekst: "Du puster CO₂ ned i det ene bægerglas gennem et sugerør.",
+            spm0: "Hvad gør den tilførte CO₂ ved stofferne i ligevægten?",
+            svar0: ["Koncentrationen af CO₂ stiger", "Koncentrationen af CO₂ falder", "Koncentrationen af HCO₃⁻ falder"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten?",
+            svar1: RET_H,
+            rigtig1: 0,
+            hint: "Du tilsætter en reaktant til den nederste ligevægt.",
+            spm2: "Hvad ser du i glasset?",
+            svar2: ["Farven går fra grøn mod gul", "Farven går fra grøn mod blå", "Farven ændrer sig slet ikke"],
+            rigtig2: 0,
+            observation: "Farven skifter mod <strong>klar gul</strong>. Opløsningen er blevet mere sur end referencen.",
+            forklaring: "Mere CO₂(aq) er mere reaktant, og systemet modvirker det ved at løbe mod højre og danne H₃O⁺ og HCO₃⁻. Ligesom i kobolt-forsøget kan man skifte frem og tilbage — ligevægten er reversibel og indstiller sig hver gang på ny.",
+            bobler: 0.2,
+            spring: { co2: 16.0 },
+            slut: { co2: 14.5, oxonium: 1.8, hydrogencarbonat: 1.8 }
+        },
+        {
+            navn: "Tilsæt natron, NaHCO₃",
+            tekst: "Du rører en teskefuld natron ud i vandet. Natron leverer HCO₃⁻ direkte til opløsningen.",
+            spm0: "Hvad gør natronen ved stofferne i ligevægten?",
+            svar0: ["Koncentrationen af HCO₃⁻ stiger", "Koncentrationen af HCO₃⁻ falder", "Koncentrationen af H₃O⁺ stiger"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten?",
+            svar1: RET_V,
+            rigtig1: 0,
+            hint: "HCO₃⁻ står allerede på højre side af pilen. Hvad hedder den effekt?",
+            spm2: "Hvad ser du i glasset?",
+            svar2: ["Farven går fra gul mod grøn", "Farven går fra grøn mod gul", "Farven ændrer sig slet ikke"],
+            rigtig2: 0,
+            observation: "Farven skifter fra gulgrøn mod <strong>blågrøn</strong> — opløsningen er blevet mindre sur.",
+            forklaring: "Fælles ion-effekten igen, denne gang med HCO₃⁻. Systemet modvirker den øgede produktkoncentration ved at løbe mod venstre, og dermed falder [H₃O⁺]. Sammen udgør CO₂/HCO₃⁻ blodets vigtigste puffersystem — det er præcis den samme ligevægt, der holder pH i blodet omkring 7,4.",
+            spring: { hydrogencarbonat: 6.0 },
+            slut: { co2: 8.8, oxonium: 0.25, hydrogencarbonat: 5.6 }
+        },
+        {
+            navn: "Hæld saltsyre, HCl(aq), i",
+            tekst: "Du hælder saltsyre ned i glasset — som når man kommer eddike på natron.",
+            spm0: "Hvad gør saltsyren ved stofferne i ligevægten?",
+            svar0: ["Koncentrationen af H₃O⁺ stiger", "Koncentrationen af H₃O⁺ falder", "Koncentrationen af HCO₃⁻ stiger"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten, når [H₃O⁺] sættes kraftigt op?",
+            svar1: RET_V,
+            rigtig1: 0,
+            hint: "H₃O⁺ er et produkt. Og hvad sker der med den CO₂, der dannes, når opløsningen bliver overmættet?",
+            spm2: "Hvad ser du i glasset?",
+            svar2: ["Det bruser, og farven bliver gul", "Det bruser, og farven bliver blå", "Der dannes et hvidt bundfald her"],
+            rigtig2: 0,
+            observation: "Det <strong>bruser kraftigt</strong>, mens CO₂ undslipper, og farven bliver <strong>gul</strong>.",
+            forklaring: "Syren presser den nederste ligevægt mod venstre, så HCO₃⁻ omdannes til CO₂(aq). Opløsningen bliver overmættet med CO₂, og den øverste ligevægt forskydes mod gasfasen — derfor bruser det. Gassen forlader systemet, så reaktionen kan køre helt til bunds. Det er den samme kobling af to ligevægte som i chromat-forsøget, bare med en gas i stedet for et bundfald.",
+            spring: { oxonium: 9.0 },
+            bobler: 0.85,
+            slut: { co2: 14.0, oxonium: 6.0, hydrogencarbonat: 0.3 }
+        }
+    ]
+},
+
+/* ------------------------------------------------------------------ 6 */
+{
+    id: "krystalvand",
+    navn: "Krystalvand i kobbersulfat",
+    kort: "blå ⇌ hvid",
+    tags: "heterogen ligevægt · temperatur · gasafgang",
+    beholder: "fastStof",
+    pletter: ["#1e63c8", "#eef1f4"],
+    ligning: '<span style="color:#1a56b0">CuSO₄·5H₂O</span>(s) <span class="rx-pil">⇌</span> <span style="color:#6a7580">CuSO₄</span>(s) + 5 H₂O(g)',
+    entalpi: "Reaktionen mod højre optager varme (endoterm, ΔH &gt; 0). Kun vanddampen indgår i reaktionsbrøken — faste stoffer gør ikke.",
+    beskrivelse: "Blåt kobbersulfat med krystalvand står i ligevægt med hvidt, vandfrit kobbersulfat og vanddamp. En heterogen ligevægt mellem faste stoffer og en gas.",
+    barVenstre: "blå = CuSO₄·5H₂O",
+    barHoejre: "hvid = CuSO₄",
+    arter: [
+        { id: "damp", navn: "H₂O(g)", enhed: "kPa", farve: "#4f9fd0", ref: 13 },
+        { id: "blaat", navn: "CuSO₄·5H₂O", enhed: "g", farve: "#1e63c8", ref: 8 },
+        { id: "hvidt", navn: "CuSO₄", enhed: "g", farve: "#98a2ad", ref: 5 }
+    ],
+    grafAkse: "mængde / tryk",
+    start: { konc: { damp: 2.0, blaat: 4.5, hvidt: 0.5 }, temp: 20, volumen: 1, bundfald: 0, bobler: 0 },
+    bundfaldFarve: "#eef1f4",
+    intro: "Begge reagensglas indeholder det samme blå pulver med en lille smule hvidt vandfrit salt imellem. Over pulveret står vanddampen i ligevægt med krystalvandet.",
+    farve: function (t) {
+        var sum = t.konc.blaat + t.konc.hvidt;
+        var f = sum > 0 ? t.konc.hvidt / sum : 0.5;
+        return { farve: blandFarve(CUBLAA, PULVER, f), alfa: 1, pos: f };
+    },
+    indgreb: [
+        {
+            navn: "Varm glasset over en gasbrænder",
+            tekst: "Du holder det ene reagensglas over en gasbrænder. Referenceglasset står stadig ved stuetemperatur.",
+            spmKinds: [1, 2],
+            spm0: "Hvilken vej forskydes ligevægten, når temperaturen sættes op?",
+            svar0: RET_H,
+            rigtig0: 0,
+            hint: "Reaktionen mod højre er endoterm. Skriv varme ind som reaktant: varme + CuSO₄·5H₂O ⇌ CuSO₄ + 5 H₂O.",
+            spm1: "Hvad ser du i glasset?",
+            svar1: ["Pulveret bliver hvidt, og der stiger damp op", "Pulveret bliver blåere, og der stiger damp op", "Pulveret ser helt ud som i referenceglasset"],
+            rigtig1: 0,
+            observation: "Pulveret skifter fra blåt til <strong>næsten hvidt</strong>, og der stiger <strong>vanddamp</strong> op i glasset.",
+            forklaring: "Varme er reaktant i den endoterme retning, så tilført varme presser ligevægten mod højre: krystalvandet drives ud som vanddamp, og tilbage bliver hvidt, vandfrit CuSO₄. Det er præcis det forsøg, man bruger til at påvise krystalvand — og det er også derfor, hvidt CuSO₄ kan bruges til at teste, om en væske indeholder vand.",
+            temp: 130,
+            bobler: 1,
+            slut: { damp: 11.0, blaat: 0.4, hvidt: 4.6 }
+        },
+        {
+            navn: "Luk glasset og lad det køle af",
+            tekst: "Dette glas er lige blevet varmet op, så pulveret er hvidt, og der står vanddamp over det. Nu sætter du en prop i og lader glasset køle af.",
+            fra: { konc: { damp: 11.0, blaat: 0.4, hvidt: 4.6 }, temp: 130, bobler: 0.6 },
+            spmKinds: [1, 2],
+            spm0: "Hvilken vej forskydes ligevægten, når du køler ned?",
+            svar0: RET_V,
+            rigtig0: 0,
+            hint: "Proppen sørger for, at vanddampen bliver i glasset. Hvad gør systemet, når varme fjernes fra den endoterme retning?",
+            spm1: "Hvad ser du i glasset?",
+            svar1: ["Pulveret bliver klart blåt igen", "Pulveret bliver endnu hvidere", "Pulveret ændrer sig slet ikke"],
+            rigtig1: 0,
+            observation: "Pulveret bliver <strong>blåt igen</strong>, mens vanddampen forsvinder ind i krystallerne.",
+            forklaring: "Fordi proppen holder vanddampen inde i glasset, kan reaktionen gå den anden vej. Ved lav temperatur er K lille, og systemet modvirker varmetabet ved at løbe mod venstre — den exoterme retning — hvor vanddampen bindes som krystalvand igen. Havde du ladet dampen slippe ud, ville pulveret være blevet hvidt for altid.",
+            temp: 22,
+            bobler: 0,
+            slut: { damp: 2.2, blaat: 4.3, hvidt: 0.7 }
+        },
+        {
+            navn: "Tag proppen af glasset",
+            tekst: "Du fjerner proppen, så vanddampen kan slippe ud i lokalet. Temperaturen er uændret.",
+            spm0: "Hvad gør det ved stofferne i ligevægten?",
+            svar0: ["Trykket af vanddamp falder", "Trykket af vanddamp stiger", "Mængden af hvidt salt falder"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten?",
+            svar1: RET_H,
+            rigtig1: 0,
+            hint: "Vanddampen er det eneste produkt, der står i reaktionsbrøken. Hvad gør systemet, når et produkt forsvinder ud af glasset?",
+            spm2: "Hvad ser du i glasset?",
+            svar2: ["Pulveret bliver langsomt lysere", "Pulveret bliver langsomt blåere", "Pulveret ændrer sig slet ikke"],
+            rigtig2: 0,
+            observation: "Pulveret bliver <strong>langsomt lysere</strong>, efterhånden som krystalvandet forsvinder ud i lokalet.",
+            forklaring: "Y = (p(H₂O))⁵ — de faste stoffer indgår ikke. Slipper dampen ud, bliver Y mindre end K, og systemet danner ny vanddamp ved at afgive krystalvand. Men dampen slipper hele tiden ud, så ligevægten indstiller sig aldrig: reaktionen kører videre, indtil alt det blå er blevet hvidt. Det er samme trick som med en gas, der bobler væk, eller et bundfald, der falder ud.",
+            spring: { damp: 0.2 },
+            slut: { damp: 0.5, blaat: 2.5, hvidt: 2.5 }
+        },
+        {
+            navn: "Dryp vand på det hvide pulver",
+            tekst: "Dette glas indeholder hvidt, vandfrit kobbersulfat. Du drypper nogle få dråber vand ned på pulveret.",
+            fra: { konc: { damp: 0.5, blaat: 0.3, hvidt: 4.7 } },
+            spm0: "Hvad gør vandet ved stofferne i ligevægten?",
+            svar0: ["Trykket af vanddamp stiger", "Trykket af vanddamp falder", "Mængden af hvidt salt stiger"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten?",
+            svar1: RET_V,
+            rigtig1: 0,
+            hint: "Vandet fordamper og bliver til H₂O(g). Er det en reaktant eller et produkt i skemaet?",
+            spm2: "Hvad ser du og mærker du?",
+            svar2: ["Pulveret bliver blåt, og glasset bliver varmt", "Pulveret bliver hvidt, og glasset bliver koldt", "Pulveret bliver blåt, og glasset bliver koldt"],
+            rigtig2: 0,
+            observation: "Pulveret bliver med det samme <strong>klart blåt</strong>, og reagensglasset bliver mærkbart <strong>varmt</strong>.",
+            forklaring: "Vandet øger trykket af H₂O(g), som er produkt, og systemet modvirker det ved at løbe mod venstre og binde vandet som krystalvand. Fordi reaktionen mod venstre er exoterm, udvikles der varme — glasset bliver varmt. Det er den samme reaktion, der får hvidt CuSO₄ til at slå blåt ud, når man bruger det til at påvise vand i en væske.",
+            spring: { damp: 12.0 },
+            slut: { damp: 9.0, blaat: 4.2, hvidt: 0.8 }
+        },
+        {
+            navn: "Kom mere blåt salt i glasset",
+            tekst: "Du hælder dobbelt så meget blåt CuSO₄·5H₂O ned i det lukkede glas. Temperaturen er uændret.",
+            spm0: "Hvad gør det ved reaktionsbrøken for ligevægten?",
+            svar0: ["Ingenting — faste stoffer indgår ikke", "Reaktionsbrøken bliver dobbelt så stor", "Reaktionsbrøken bliver halvt så stor"],
+            rigtig0: 0,
+            spm1: "Hvilken vej forskydes ligevægten?",
+            svar1: RET_I,
+            rigtig1: 0,
+            hint: "Skriv reaktionsbrøken op. Hvilke af de tre stoffer i skemaet står der egentlig noget om i den?",
+            spm2: "Hvad sker der med trykket af vanddamp i glasset?",
+            svar2: ["Det er nøjagtig det samme som før", "Det bliver dobbelt så stort som før", "Det bliver halvt så stort som før"],
+            rigtig2: 0,
+            observation: "Der er nu <strong>dobbelt så meget pulver</strong> i glasset, men <strong>trykket af vanddamp er uændret</strong>.",
+            forklaring: "Dette er hele pointen med en heterogen ligevægt. Et fast stof har altid den samme koncentration i sig selv, uanset hvor meget af det man har, og derfor står faste stoffer slet ikke i reaktionsbrøken: Y = (p(H₂O))⁵. Man kan hælde nok så meget salt i — dampens tryk over pulveret bliver det samme, så længe temperaturen er den samme. Sammenlign med katalysatoren i NO₂-forsøget: også dér sker der ingen forskydning, men af en helt anden grund.",
+            volumen: 2,
+            spring: { blaat: 9.0, hvidt: 1.0 },
+            slut: { damp: 2.0, blaat: 9.0, hvidt: 1.0 }
+        }
+    ]
+}
+
+];
+</script>
+<script>
+/* =========================================================================
+   TILSTAND OG MOTOR
+   ========================================================================= */
+var sys = null;
+var trinNr = 0;
+var fase = "ingen";
+var tilstand = null;
+var refTilstand = null;
+var fraTilstand = null;
+var maalTilstand = null;
+var animerer = false;
+var animT0 = 0;
+var ANIM_TID = 2600;
+var resultater = [];
+var historik = [];
+var markoerer = [];
+var partikler = [];
+var boblerNu = [];
+var boblerRef = [];
+var grafVises = false;
+var frameTaeller = 0;
+
+var elScene = document.getElementById("scene");
+var elStart = document.getElementById("startside");
+var elLab = document.getElementById("lab-omraade");
+var elLigning = document.getElementById("ligning");
+var elEntalpi = document.getElementById("entalpi");
+var elObs = document.getElementById("observation");
+var elQuiz = document.getElementById("quiz");
+var elQuizTom = document.getElementById("quiz-tom-tekst");
+var elQuizInd = document.getElementById("quiz-indhold");
+var elSysListe = document.getElementById("sys-liste");
+var elGrafKnap = document.getElementById("graf-knap");
+var elGrafPanel = document.getElementById("graf-panel");
+var elGrafLeg = document.getElementById("graf-legende");
+var elBar = document.getElementById("farvebar");
+var elBarMaerke = document.getElementById("farvebar-maerke");
+var elBarRef = document.getElementById("farvebar-ref");
+var elBarV = document.getElementById("farvebar-venstre");
+var elBarH = document.getElementById("farvebar-hoejre");
+
+var labCanvas = document.getElementById("lab");
+var labCtx = labCanvas.getContext("2d");
+var grafCanvas = document.getElementById("graf");
+var grafCtx = grafCanvas.getContext("2d");
+
+function kopiTilstand(t) {
+    var ny = { konc: {}, temp: t.temp, volumen: t.volumen, bundfald: t.bundfald, bobler: t.bobler };
+    for (var k in t.konc) { if (t.konc.hasOwnProperty(k)) { ny.konc[k] = t.konc[k]; } }
+    return ny;
+}
+
+/* ---------- Navigation og startside ---------- */
+function byggMenu() {
+    var i;
+    for (i = 0; i < SYSTEMER.length; i++) {
+        (function (s) {
+            var knap = document.createElement("button");
+            knap.className = "sys-knap";
+            knap.id = "navknap-" + s.id;
+            knap.style.borderLeftColor = s.pletter[1];
+            knap.innerHTML = '<span class="sys-navn">' + s.navn + '</span><span class="sys-kort">' + s.kort + " · " + s.indgreb.length + " indgreb</span>";
+            knap.addEventListener("click", function () { vaelgSystem(s); });
+            elSysListe.appendChild(knap);
+
+            var kort = document.createElement("div");
+            kort.className = "start-kort";
+            kort.innerHTML =
+                '<div class="kort-farver"><div class="kort-plet" style="background:' + s.pletter[0] + '"></div>' +
+                '<div class="kort-plet" style="background:' + s.pletter[1] + '"></div></div>' +
+                "<h4>" + s.navn + "</h4><p>" + s.beskrivelse + "</p>" +
+                '<div class="kort-tags">' + s.indgreb.length + " indgreb · " + s.tags + "</div>";
+            kort.addEventListener("click", function () { vaelgSystem(s); });
+            document.getElementById("start-grid").appendChild(kort);
+        })(SYSTEMER[i]);
+    }
+}
+
+function vaelgSystem(s) {
+    sys = s;
+    trinNr = 0;
+    resultater = [];
+    historik = [];
+    markoerer = [];
+    partikler = [];
+    boblerNu = [];
+    boblerRef = [];
+    tilstand = kopiTilstand(s.start);
+    refTilstand = kopiTilstand(s.start);
+    maalTilstand = null;
+    animerer = false;
+
+    var knapper = document.querySelectorAll(".sys-knap");
+    var i;
+    for (i = 0; i < knapper.length; i++) { knapper[i].classList.remove("aktiv"); }
+    var aktiv = document.getElementById("navknap-" + s.id);
+    if (aktiv) { aktiv.classList.add("aktiv"); }
+
+    elStart.style.display = "none";
+    elLab.style.display = "flex";
+    elGrafKnap.classList.remove("skjult");
+    elLigning.innerHTML = s.ligning;
+    elEntalpi.innerHTML = s.entalpi;
+    elBar.style.background = "linear-gradient(90deg," + s.pletter[0] + "," + s.pletter[1] + ")";
+    elBarV.textContent = s.barVenstre;
+    elBarH.textContent = s.barHoejre;
+    elQuiz.classList.remove("tom");
+    elQuizTom.style.display = "none";
+    elQuizInd.style.display = "block";
+
+    byggGrafLegende();
+    visObservation(s.intro, false);
+    startTrin();
+    tegnAlt();
+}
+
+function visObservation(html, erSvar) {
+    elObs.classList.remove("skjult");
+    elObs.innerHTML = html;
+    elObs.style.borderLeftColor = erSvar ? "#2f8f4f" : "#3f8ecc";
+}
+
+/* ---------- Quizpanelet ---------- */
+function antalSpm(ind) { return ind.spm2 ? 3 : 2; }
+
+/* Lille overskrift over hvert spørgsmål, så trinnene i tankegangen står klart */
+var SPM_MAERKE = ["indgrebet", "ligevægten", "observationen"];
+
+/* De fleste indgreb stiller spørgsmålene i rækkefølgen indgrebet -> ligevægten
+   -> observationen. Nogle indgreb (fx rene temperaturskift) springer det første
+   spørgsmål over, fordi det ville være for trivielt ("varmt bad tilfører varme") -
+   de sætter spmKinds, så mærket alligevel passer til spørgsmålets indhold. */
+function spmMaerke(ind, nr) {
+    var kind = ind.spmKinds ? ind.spmKinds[nr] : nr;
+    return SPM_MAERKE[kind];
+}
+
+function samletAntalSpm() {
+    var i, sum = 0;
+    for (i = 0; i < sys.indgreb.length; i++) { sum += antalSpm(sys.indgreb[i]); }
+    return sum;
+}
+
+function opdaterHoved() {
+    var hoved = document.getElementById("quiz-hoved");
+    if (!hoved) { return; }
+    var i, rigtige = 0;
+    for (i = 0; i < resultater.length; i++) { rigtige += resultater[i].rigtige; }
+
+    hoved.innerHTML =
+        '<span id="trin-tekst">Indgreb ' + Math.min(trinNr + 1, sys.indgreb.length) + " af " + sys.indgreb.length + "</span>" +
+        '<span id="score-tekst">' + rigtige + " / " + samletAntalSpm() + " rigtige</span>";
+
+    var prikker = document.getElementById("prikker");
+    prikker.innerHTML = "";
+    for (i = 0; i < sys.indgreb.length; i++) {
+        var p = document.createElement("div");
+        p.className = "prik-trin";
+        var faerdigt = i < trinNr || (i === trinNr && fase === "faerdig");
+        if (faerdigt && resultater[i]) {
+            p.className += resultater[i].rigtige === resultater[i].mulige ? " gjort" : " gjort fejl";
+        } else if (i === trinNr) {
+            p.className += " nu";
+        }
+        prikker.appendChild(p);
+    }
+}
+
+function rulNed() {
+    elQuiz.scrollTop = elQuiz.scrollHeight;
+}
+
+/* Hvert indgreb har sin egen udgangstilstand. Som udgangspunkt er det
+   systemets startblanding; nogle indgreb overskriver den med "fra", fordi
+   de bygger på et glas, der på forhånd er behandlet. */
+function startTilstandFor(ind) {
+    var t = kopiTilstand(sys.start);
+    var k;
+    if (ind.fra) {
+        if (ind.fra.konc) {
+            for (k in ind.fra.konc) {
+                if (ind.fra.konc.hasOwnProperty(k)) { t.konc[k] = ind.fra.konc[k]; }
+            }
+        }
+        if (ind.fra.temp !== undefined) { t.temp = ind.fra.temp; }
+        if (ind.fra.volumen !== undefined) { t.volumen = ind.fra.volumen; }
+        if (ind.fra.bundfald !== undefined) { t.bundfald = ind.fra.bundfald; }
+        if (ind.fra.bobler !== undefined) { t.bobler = ind.fra.bobler; }
+    }
+    return t;
+}
+
+function startTrin() {
+    var ind = sys.indgreb[trinNr];
+    fase = "spm0";
+
+    /* Hvert indgreb starter forfra, så man kan se, hvad netop dette indgreb
+       gør — og referenceglasset viser den samme udgangstilstand. */
+    tilstand = startTilstandFor(ind);
+    refTilstand = kopiTilstand(tilstand);
+    maalTilstand = null;
+    animerer = false;
+    partikler = [];
+    boblerNu = [];
+    boblerRef = [];
+    historik = [];
+    markoerer = [];
+    optagFlad(14, null);
+
+    resultater[trinNr] = { rigtige: 0, mulige: antalSpm(ind) };
+
+    elQuizInd.innerHTML =
+        '<div id="quiz-hoved"></div><div id="prikker"></div>' +
+        '<div id="indgreb-navn"></div><div id="indgreb-tekst"></div><div id="quiz-krop"></div>';
+    document.getElementById("indgreb-navn").textContent = ind.navn;
+    document.getElementById("indgreb-tekst").innerHTML = ind.tekst;
+    opdaterHoved();
+
+    var krop = document.getElementById("quiz-krop");
+
+    if (ind.hint) {
+        var hintKnap = document.createElement("button");
+        hintKnap.className = "hint-knap";
+        hintKnap.textContent = "💡 Vis hint";
+        var hintBoks = document.createElement("div");
+        hintBoks.className = "hint-boks skjult";
+        hintBoks.innerHTML = "<strong>Hint:</strong> " + ind.hint;
+        hintKnap.addEventListener("click", function () {
+            hintBoks.classList.toggle("skjult");
+            hintKnap.textContent = hintBoks.classList.contains("skjult") ? "💡 Vis hint" : "💡 Skjul hint";
+        });
+        krop.appendChild(hintKnap);
+        krop.appendChild(hintBoks);
+    }
+
+    stilSpm(krop, ind.spm0, ind.svar0, ind.rigtig0, 0);
+}
+
+var aktiveSvarKnapper = [];
+
+function stilSpm(holder, tekst, svar, rigtig, nr) {
+    aktiveSvarKnapper = [];
+    var blok = document.createElement("div");
+    blok.className = "spm-blok";
+    var h = document.createElement("div");
+    h.className = "spm";
+    h.innerHTML = '<span class="spm-nr"></span>';
+    h.querySelector(".spm-nr").textContent =
+        "Spørgsmål " + (nr + 1) + " af " + antalSpm(sys.indgreb[trinNr]) + " · " + spmMaerke(sys.indgreb[trinNr], nr);
+    h.appendChild(document.createTextNode(tekst));
+    blok.appendChild(h);
+
+    /* Svarene blandes, så det rigtige svar ikke altid står samme sted */
+    var i, j, t;
+    var raekke = [];
+    for (i = 0; i < svar.length; i++) { raekke.push(i); }
+    for (i = raekke.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        t = raekke[i]; raekke[i] = raekke[j]; raekke[j] = t;
+    }
+    var nyRigtig = raekke.indexOf(rigtig);
+
+    for (i = 0; i < raekke.length; i++) {
+        (function (plads, oprindelig) {
+            var k = document.createElement("button");
+            k.className = "svar";
+            k.innerHTML = '<span class="tast">' + (plads + 1) + "</span>";
+            k.appendChild(document.createTextNode(svar[oprindelig]));
+            k.addEventListener("click", function () { vaelgSvar(plads, nyRigtig, nr); });
+            blok.appendChild(k);
+            aktiveSvarKnapper.push(k);
+        })(i, raekke[i]);
+    }
+    holder.appendChild(blok);
+    rulNed();
+}
+
+function vaelgSvar(valgt, rigtig, nr) {
+    var i;
+    for (i = 0; i < aktiveSvarKnapper.length; i++) {
+        aktiveSvarKnapper[i].disabled = true;
+        if (i === rigtig) { aktiveSvarKnapper[i].classList.add("rigtig"); }
+        if (i === valgt && valgt !== rigtig) { aktiveSvarKnapper[i].classList.add("forkert"); }
+    }
+    var korrekt = valgt === rigtig;
+    if (korrekt) { resultater[trinNr].rigtige += 1; }
+
+    var ind = sys.indgreb[trinNr];
+    var flereSpm = (nr === 0) || (nr === 1 && ind.spm2);
+
+    var krop = document.getElementById("quiz-krop");
+    var fb = document.createElement("div");
+    fb.className = "feedback " + (korrekt ? "rigtig" : "forkert");
+    if (korrekt) {
+        fb.innerHTML = flereSpm
+            ? "<b>Rigtigt.</b> Brug det, når du svarer på næste spørgsmål."
+            : "<b>Rigtigt.</b> Udfør indgrebet og se det ske i glasset.";
+    } else {
+        fb.innerHTML = flereSpm
+            ? "<b>Ikke helt.</b> Det rigtige svar er markeret med grønt — hold fast i det i næste spørgsmål."
+            : "<b>Ikke helt.</b> Det rigtige svar er markeret med grønt. Udfør indgrebet, og læs den uddybende forklaring bagefter.";
+    }
+    krop.appendChild(fb);
+
+    opdaterHoved();
+
+    if (nr === 0) {
+        fase = "spm1";
+        stilSpm(krop, ind.spm1, ind.svar1, ind.rigtig1, 1);
+    } else if (nr === 1 && ind.spm2) {
+        fase = "spm2";
+        stilSpm(krop, ind.spm2, ind.svar2, ind.rigtig2, 2);
+    } else {
+        fase = "klar";
+        visUdfoerKnap(krop);
+    }
+    rulNed();
+}
+
+function visUdfoerKnap(krop) {
+    var k = document.createElement("button");
+    k.className = "stor-knap";
+    k.id = "btn-udfoer";
+    k.textContent = "▶ Udfør indgrebet";
+    k.addEventListener("click", udfoerIndgreb);
+    krop.appendChild(k);
+    var tip = document.createElement("div");
+    tip.className = "tast-tip";
+    tip.textContent = "Tryk Enter";
+    krop.appendChild(tip);
+    rulNed();
+}
+
+/* Springer resten af en igangværende indstilling over, så både grafen og
+   referenceglasset altid tager udgangspunkt i en færdig ligevægt. */
+function afsluttAnimation() {
+    if (!animerer) { return; }
+    var k;
+    for (k in maalTilstand.konc) {
+        if (maalTilstand.konc.hasOwnProperty(k)) { tilstand.konc[k] = maalTilstand.konc[k]; }
+    }
+    tilstand.temp = maalTilstand.temp;
+    tilstand.bundfald = maalTilstand.bundfald;
+    tilstand.bobler = maalTilstand.bobler;
+    animerer = false;
+    optagFlad(4, null);
+}
+
+function udfoerIndgreb() {
+    if (fase !== "klar") { return; }
+    afsluttAnimation();
+    var ind = sys.indgreb[trinNr];
+    fase = "udfoert";
+
+    var knap = document.getElementById("btn-udfoer");
+    if (knap) { knap.parentNode.removeChild(knap); }
+    var tips = document.querySelectorAll(".tast-tip");
+    if (tips.length) { tips[tips.length - 1].parentNode.removeChild(tips[tips.length - 1]); }
+
+    /* 1) lidt flad tid før indgrebet, så springet ses tydeligt på grafen */
+    optagFlad(10, null);
+
+    /* 2) selve springet: øjeblikkelige ændringer */
+    if (ind.volumen !== undefined) { tilstand.volumen = ind.volumen; }
+    if (ind.spring) {
+        for (var k in ind.spring) {
+            if (ind.spring.hasOwnProperty(k)) { tilstand.konc[k] = ind.spring[k]; }
+        }
+    }
+    markoerer.push({ i: historik.length, nr: trinNr + 1 });
+    optagFlad(2, null);
+
+    /* 3) relaksation mod den nye ligevægt */
+    fraTilstand = kopiTilstand(tilstand);
+    maalTilstand = kopiTilstand(tilstand);
+    for (var m in ind.slut) {
+        if (ind.slut.hasOwnProperty(m)) { maalTilstand.konc[m] = ind.slut[m]; }
+    }
+    if (ind.temp !== undefined) { maalTilstand.temp = ind.temp; }
+    if (ind.bundfald !== undefined) { maalTilstand.bundfald = ind.bundfald; }
+    if (ind.bobler !== undefined) { maalTilstand.bobler = ind.bobler; }
+    animT0 = performance.now();
+    animerer = true;
+
+    visObservation(ind.observation, true);
+    pilBlink(ind);
+    visEfterIndgreb();
+}
+
+function pilBlink(ind) {
+    var pil = elLigning.querySelector(".rx-pil");
+    if (!pil) { return; }
+    var retning = "hoejre";
+    if (ind.rigtig1 !== undefined && ind.svar1) {
+        var t = ind.svar1[ind.rigtig1].toLowerCase();
+        if (t.indexOf("venstre") !== -1) { retning = "venstre"; }
+        if (t.indexOf("ingenting") === 0 || t.indexOf("ingen forskydning") !== -1) { retning = ""; }
+    }
+    pil.className = "rx-pil " + retning;
+    setTimeout(function () { pil.className = "rx-pil"; }, 2800);
+}
+
+function visEfterIndgreb() {
+    var krop = document.getElementById("quiz-krop");
+    var ind = sys.indgreb[trinNr];
+
+    var mereKnap = document.createElement("button");
+    mereKnap.className = "mere-knap";
+    mereKnap.textContent = "📖 Uddybende forklaring";
+    var boks = document.createElement("div");
+    boks.className = "forklar-boks skjult";
+    boks.innerHTML = ind.forklaring;
+    mereKnap.addEventListener("click", function () {
+        boks.classList.toggle("skjult");
+        mereKnap.textContent = boks.classList.contains("skjult") ? "📖 Uddybende forklaring" : "📖 Skjul forklaring";
+        rulNed();
+    });
+    krop.appendChild(mereKnap);
+    krop.appendChild(boks);
+
+    var naeste = document.createElement("button");
+    naeste.className = "stor-knap";
+    naeste.id = "btn-naeste";
+    naeste.textContent = trinNr < sys.indgreb.length - 1 ? "Næste indgreb →" : "Se resultat →";
+    naeste.addEventListener("click", naesteTrin);
+    krop.appendChild(naeste);
+
+    var tip = document.createElement("div");
+    tip.className = "tast-tip";
+    tip.textContent = "Tryk Enter";
+    krop.appendChild(tip);
+    rulNed();
+}
+
+function naesteTrin() {
+    if (fase !== "udfoert") { return; }
+    afsluttAnimation();
+    if (trinNr < sys.indgreb.length - 1) {
+        trinNr += 1;
+        startTrin();
+        elQuiz.scrollTop = 0;
+    } else {
+        visResultat();
+    }
+}
+
+function visResultat() {
+    fase = "faerdig";
+    var i, rigtige = 0, mulige = 0;
+    for (i = 0; i < resultater.length; i++) {
+        rigtige += resultater[i].rigtige;
+        mulige += resultater[i].mulige;
+    }
+    var kommentar;
+    if (rigtige === mulige) { kommentar = "Helt rent bord — du har styr på Le Châteliers princip i denne ligevægt."; }
+    else if (rigtige >= mulige * 0.7) { kommentar = "Godt gået. Kig på de indgreb, hvor det gik galt, og læs den uddybende forklaring igen."; }
+    else { kommentar = "Prøv ligevægten igen — brug hintene undervejs, og læs forklaringerne efter hvert indgreb."; }
+
+    var naesteSys = null;
+    for (i = 0; i < SYSTEMER.length; i++) {
+        if (SYSTEMER[i].id === sys.id && i + 1 < SYSTEMER.length) { naesteSys = SYSTEMER[i + 1]; }
+    }
+
+    elQuizInd.innerHTML =
+        '<div id="quiz-hoved"></div><div id="prikker"></div>' +
+        '<div id="resultat"><div class="stor-tal">' + rigtige + " / " + mulige + "</div>" +
+        "<p>" + kommentar + "</p></div><div id='quiz-krop'></div>";
+    opdaterHoved();
+
+    var krop = document.getElementById("quiz-krop");
+    var igen = document.createElement("button");
+    igen.className = "stor-knap sekundaer";
+    igen.textContent = "↺ Prøv denne ligevægt igen";
+    igen.addEventListener("click", function () { vaelgSystem(sys); });
+    krop.appendChild(igen);
+
+    if (naesteSys) {
+        var n = document.createElement("button");
+        n.className = "stor-knap";
+        n.style.marginTop = "8px";
+        n.textContent = "Næste ligevægt: " + naesteSys.navn + " →";
+        n.addEventListener("click", function () { vaelgSystem(naesteSys); });
+        krop.appendChild(n);
+    } else {
+        var slut = document.createElement("div");
+        slut.style.cssText = "margin-top:14px; font-size:0.85rem; color:#a3a3b2; line-height:1.6;";
+        slut.innerHTML = "Du har været igennem alle seks ligevægte. Læg mærke til, at det er de samme få indgreb, der går igen: koncentration, temperatur, tryk/rumfang, fortynding — og indgreb, der slet ikke flytter ligevægten.";
+        krop.appendChild(slut);
+    }
+}
+
+/* ---------- Optagelse til grafen ---------- */
+function optagFlad(n, markoer) {
+    var i;
+    for (i = 0; i < n; i++) { optagPunkt(); }
+}
+
+function optagPunkt() {
+    var punkt = {};
+    for (var k in tilstand.konc) {
+        if (tilstand.konc.hasOwnProperty(k)) { punkt[k] = tilstand.konc[k]; }
+    }
+    historik.push(punkt);
+    if (historik.length > 2600) {
+        historik.shift();
+        var i;
+        for (i = 0; i < markoerer.length; i++) { markoerer[i].i -= 1; }
+    }
+}
+
+/* =========================================================================
+   TEGNING
+   ========================================================================= */
+function tilpasCanvas(c) {
+    var r = c.getBoundingClientRect();
+    var d = window.devicePixelRatio || 1;
+    var b = Math.max(10, Math.round(r.width));
+    var h = Math.max(10, Math.round(r.height));
+    if (c.width !== Math.round(b * d) || c.height !== Math.round(h * d)) {
+        c.width = Math.round(b * d);
+        c.height = Math.round(h * d);
+    }
+    c.getContext("2d").setTransform(d, 0, 0, d, 0, 0);
+    return { b: b, h: h };
+}
+
+function tegnAlt() {
+    if (!sys) { return; }
+    tegnLab();
+    opdaterBar();
+    if (grafVises) { tegnGraf(); }
+}
+
+function opdaterBar() {
+    elBarMaerke.style.left = (beg(sys.farve(tilstand).pos, 0, 1) * 100) + "%";
+    elBarRef.style.left = (beg(sys.farve(refTilstand).pos, 0, 1) * 100) + "%";
+}
+
+/* Beholderen placeres lodret centreret i sin egen halvdel af tegnefeltet,
+   så referenceglasset og elevens eget glas står side om side. */
+function beholderGeometri(B, H, cx, t) {
+    var g = { cx: cx };
+    if (sys.beholder === "reagensglas") {
+        g.indreH = beg(H - 110, 130, 300);
+        g.hw = 36;
+        g.badBredde = 68;
+        g.bund = (H + g.indreH) / 2 - 22;
+        g.top = g.bund - g.indreH;
+        g.fyld = beg(g.indreH * 0.55 * t.volumen, 38, g.indreH - 42);
+    } else if (sys.beholder === "baegerglas") {
+        g.indreH = beg(H - 120, 120, 240);
+        g.hw = 68;
+        g.badBredde = 74;
+        g.bund = (H + g.indreH) / 2 - 26;
+        g.top = g.bund - g.indreH;
+        g.fyld = beg(g.indreH * 0.58 * t.volumen, 36, g.indreH - 26);
+    } else if (sys.beholder === "fastStof") {
+        /* reagensglas med pulver — der skal være plads til gasbrænderen under */
+        g.indreH = beg(H - 150, 110, 260);
+        g.hw = 36;
+        g.badBredde = 68;
+        g.bund = (H + g.indreH) / 2 - 46;
+        g.top = g.bund - g.indreH;
+        g.fyld = beg(g.indreH * 0.28 * t.volumen, 24, g.indreH - 54);
+        g.tekstY = 78;
+    } else {
+        /* gassprøjten skal have plads til stempelstangen over cylinderen */
+        g.indreH = beg(H - 150, 120, 280);
+        g.hw = 44;
+        g.badBredde = 76;
+        g.bund = (H + g.indreH) / 2 - 20;
+        g.top = g.bund - g.indreH;
+        g.fyld = beg(g.indreH * 0.36 * t.volumen, 24, g.indreH - 30);
+    }
+    return g;
+}
+
+function tegnLab() {
+    var d = tilpasCanvas(labCanvas);
+    var ctx = labCtx, B = d.b, H = d.h;
+    ctx.clearRect(0, 0, B, H);
+
+    /* Skillelinje mellem de to glas */
+    ctx.save();
+    ctx.strokeStyle = "rgba(120,132,145,0.28)";
+    ctx.setLineDash([5, 6]);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(B / 2, 18);
+    ctx.lineTo(B / 2, H - 14);
+    ctx.stroke();
+    ctx.restore();
+
+    tegnGlas(ctx, B, H, B * 0.26, refTilstand, boblerRef, null, "Reference", "før indgrebet");
+    tegnGlas(ctx, B, H, B * 0.74, tilstand, boblerNu, partikler, "Dit glas", "efter indgrebet");
+}
+
+function tegnGlas(ctx, B, H, cx, t, bobler, faldende, titel, undertitel) {
+    var g = beholderGeometri(B, H, cx, t);
+    var fr = sys.farve(t);
+
+    if (sys.beholder === "reagensglas") {
+        tegnBad(ctx, g, t, g.badBredde, Math.min(g.indreH * 0.72, 190));
+        tegnReagensglas(ctx, g, fr, t, bobler, faldende);
+    } else if (sys.beholder === "baegerglas") {
+        tegnVarmeplade(ctx, g, t);
+        tegnBaegerglas(ctx, g, fr, t, bobler, faldende);
+    } else if (sys.beholder === "fastStof") {
+        tegnFlamme(ctx, g, t);
+        tegnPulverglas(ctx, g, fr, t);
+    } else {
+        tegnBad(ctx, g, t, g.badBredde, Math.min(g.indreH * 0.68, 195));
+        tegnSproejte(ctx, g, fr, t);
+    }
+    tegnLilleTermometer(ctx, g, t);
+    tegnBilledtekst(ctx, g, t, titel, undertitel);
+}
+
+/* Navn og tilstand under hvert glas */
+function tegnBilledtekst(ctx, g, t, titel, undertitel) {
+    var linje2 = undertitel + " · " + Math.round(t.temp) + " °C";
+    if (sys.beholder === "sproejte") { linje2 += " · V = " + dk(t.volumen, 1) + "×"; }
+    if (sys.beholder === "fastStof") { linje2 += " · pulver " + dk(t.volumen, 1) + "×"; }
+    var y = g.tekstY || 52;
+    ctx.save();
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#2b3540";
+    ctx.font = "bold 13px Segoe UI, sans-serif";
+    ctx.fillText(titel, g.cx, g.bund + y);
+    ctx.fillStyle = "#6a7580";
+    ctx.font = "11px Segoe UI, sans-serif";
+    ctx.fillText(linje2, g.cx, g.bund + y + 16);
+    ctx.restore();
+}
+
+/* --- gasbrænder under reagensglasset med fast stof --- */
+function tegnFlamme(ctx, g, t) {
+    var cx = g.cx, y = g.bund + 8;
+    ctx.save();
+    ctx.fillStyle = "#5d646d";
+    ctx.fillRect(cx - 6, y + 30, 12, 20);
+    ctx.fillRect(cx - 19, y + 48, 38, 8);
+    if (t.temp > 35) {
+        var f = 1 + 0.09 * Math.sin(performance.now() / 110);
+        ctx.beginPath();
+        ctx.moveTo(cx - 14, y + 32);
+        ctx.quadraticCurveTo(cx - 12, y + 4, cx, y - 12 * f);
+        ctx.quadraticCurveTo(cx + 12, y + 4, cx + 14, y + 32);
+        ctx.closePath();
+        ctx.fillStyle = "rgba(96,152,228,0.7)";
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(cx - 6, y + 32);
+        ctx.quadraticCurveTo(cx - 5, y + 14, cx, y + 4 * f);
+        ctx.quadraticCurveTo(cx + 5, y + 14, cx + 6, y + 32);
+        ctx.closePath();
+        ctx.fillStyle = "rgba(158,206,255,0.92)";
+        ctx.fill();
+    }
+    ctx.restore();
+}
+
+/* --- reagensglas med fast stof og vanddamp --- */
+function tegnPulverglas(ctx, g, fr, t) {
+    var cx = g.cx, r = g.hw, top = g.top, bund = g.bund;
+    var pTop = bund - g.fyld;
+    var i;
+
+    var sti = function () {
+        ctx.beginPath();
+        ctx.moveTo(cx - r, top);
+        ctx.lineTo(cx - r, bund - r);
+        ctx.arc(cx, bund - r, r, Math.PI, 0, true);
+        ctx.lineTo(cx + r, top);
+    };
+
+    ctx.save();
+    sti();
+    ctx.closePath();
+    ctx.fillStyle = "rgba(255,255,255,0.62)";
+    ctx.fill();
+    ctx.restore();
+
+    /* vanddamp over pulveret */
+    if (t.bobler > 0.05) {
+        ctx.save();
+        sti();
+        ctx.closePath();
+        ctx.clip();
+        var tid = performance.now() / 700;
+        ctx.strokeStyle = "rgba(150,182,210," + (0.25 + 0.45 * beg(t.bobler, 0, 1)) + ")";
+        ctx.lineWidth = 4;
+        ctx.lineCap = "round";
+        for (i = 0; i < 3; i++) {
+            var bx = cx - r + (i + 0.5) * (2 * r / 3);
+            ctx.beginPath();
+            ctx.moveTo(bx, pTop - 6);
+            ctx.quadraticCurveTo(bx + 8 * Math.sin(tid + i), pTop - 34, bx - 6 * Math.sin(tid + i), pTop - 62);
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    /* selve pulveret */
+    ctx.save();
+    sti();
+    ctx.closePath();
+    ctx.clip();
+    ctx.fillStyle = rgbTekst(fr.farve);
+    ctx.fillRect(cx - r, pTop, 2 * r, bund - pTop + 8);
+    for (i = 0; i < 9; i++) {
+        var kx = cx - r + (i + 0.5) * (2 * r / 9);
+        ctx.beginPath();
+        ctx.arc(kx, pTop + (i % 2 === 0 ? 0 : 3), 4.5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    ctx.fillStyle = "rgba(0,0,0,0.13)";
+    ctx.fillRect(cx - r, bund - 12, 2 * r, 18);
+    /* kant langs pulverets overflade, så hvidt pulver også kan ses */
+    ctx.strokeStyle = "rgba(74,86,99,0.55)";
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    for (i = 0; i <= 9; i++) {
+        var sx = cx - r + i * (2 * r / 9);
+        if (i === 0) { ctx.moveTo(sx, pTop + 2); } else { ctx.lineTo(sx, pTop + (i % 2 === 0 ? 2 : 5)); }
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    tegnGlaskant(ctx, sti, 3);
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(cx, top, r, 8, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = "rgba(60,72,84,0.75)";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    ctx.fillStyle = "rgba(255,255,255,0.5)";
+    ctx.fill();
+    ctx.restore();
+
+    ctx.save();
+    ctx.strokeStyle = "rgba(255,255,255,0.75)";
+    ctx.lineWidth = 6;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(cx - r + 12, top + 22);
+    ctx.lineTo(cx - r + 12, bund - 40);
+    ctx.stroke();
+    ctx.restore();
+}
+
+/* --- vandbad / isbad bag beholderen --- */
+function tegnBad(ctx, g, t, halvBredde, hoejde) {
+    var varm = t.temp > 35;
+    var kold = t.temp < 10;
+    if (!varm && !kold) { return; }
+    var x = g.cx - halvBredde - 18;
+    var w = 2 * (halvBredde + 18);
+    var y = g.bund + 14 - hoejde;
+    var h = hoejde;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x, y + h - 12);
+    ctx.quadraticCurveTo(x, y + h, x + 12, y + h);
+    ctx.lineTo(x + w - 12, y + h);
+    ctx.quadraticCurveTo(x + w, y + h, x + w, y + h - 12);
+    ctx.lineTo(x + w, y);
+    ctx.closePath();
+    var g = ctx.createLinearGradient(0, y, 0, y + h);
+    if (varm) {
+        g.addColorStop(0, "rgba(236,150,90,0.32)");
+        g.addColorStop(1, "rgba(214,88,48,0.42)");
+    } else {
+        g.addColorStop(0, "rgba(150,205,240,0.42)");
+        g.addColorStop(1, "rgba(96,168,222,0.5)");
+    }
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.strokeStyle = "rgba(90,105,120,0.45)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    if (kold) {
+        var terninger = [[0.16, 0.14], [0.72, 0.1], [0.42, 0.3], [0.86, 0.34], [0.06, 0.42]];
+        ctx.fillStyle = "rgba(255,255,255,0.75)";
+        ctx.strokeStyle = "rgba(120,170,205,0.8)";
+        ctx.lineWidth = 1.4;
+        var i;
+        for (i = 0; i < terninger.length; i++) {
+            var tx = x + terninger[i][0] * w;
+            var ty = y + 10 + terninger[i][1] * h;
+            ctx.beginPath();
+            ctx.rect(tx, ty, 20, 15);
+            ctx.fill();
+            ctx.stroke();
+        }
+    } else {
+        /* damp */
+        var t = performance.now() / 900;
+        ctx.strokeStyle = "rgba(158,172,186,0.55)";
+        ctx.lineWidth = 3;
+        var j;
+        for (j = 0; j < 3; j++) {
+            var bx = x + w * (0.24 + 0.26 * j);
+            ctx.beginPath();
+            ctx.moveTo(bx, y - 4);
+            ctx.quadraticCurveTo(bx + 9 * Math.sin(t + j), y - 22, bx - 6 * Math.sin(t + j), y - 40);
+            ctx.stroke();
+        }
+    }
+    ctx.restore();
+}
+
+function tegnVarmeplade(ctx, g, t) {
+    var varm = t.temp > 35;
+    var x = g.cx - 92, w = 184, y = g.bund + 8, h = 26;
+    ctx.save();
+    ctx.fillStyle = "#5d646d";
+    ctx.beginPath();
+    ctx.rect(x, y, w, h);
+    ctx.fill();
+    ctx.fillStyle = varm ? "#e2593c" : "#8b929a";
+    ctx.beginPath();
+    ctx.rect(x + 14, y - 6, w - 28, 8);
+    ctx.fill();
+    if (varm) {
+        ctx.shadowColor = "rgba(226,89,60,0.8)";
+        ctx.shadowBlur = 22;
+        ctx.beginPath();
+        ctx.rect(x + 14, y - 6, w - 28, 8);
+        ctx.fill();
+    }
+    ctx.restore();
+}
+
+/* --- fælles væskeindhold --- */
+function tegnVaeske(ctx, klipSti, venstre, hoejre, top, bund, fr, t, bobler, faldende) {
+    ctx.save();
+    klipSti();
+    ctx.clip();
+
+    var g = ctx.createLinearGradient(0, top, 0, bund);
+    g.addColorStop(0, rgba(fr.farve, Math.min(1, fr.alfa * 0.82)));
+    g.addColorStop(1, rgba(fr.farve, Math.min(1, fr.alfa * 1.05)));
+    ctx.fillStyle = g;
+    ctx.fillRect(venstre, top, hoejre - venstre, bund - top + 6);
+
+    /* overflade */
+    ctx.fillStyle = "rgba(255,255,255,0.35)";
+    ctx.beginPath();
+    ctx.ellipse((venstre + hoejre) / 2, top, (hoejre - venstre) / 2, 7, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    /* bundfald */
+    if (t.bundfald > 0.01) {
+        var mh = 8 + 30 * beg(t.bundfald, 0, 1);
+        ctx.beginPath();
+        ctx.moveTo(venstre, bund + 4);
+        ctx.quadraticCurveTo((venstre + hoejre) / 2, bund - mh * 2.1, hoejre, bund + 4);
+        ctx.closePath();
+        var bg = ctx.createLinearGradient(0, bund - mh, 0, bund + 4);
+        bg.addColorStop(0, sys.bundfaldFarve);
+        bg.addColorStop(1, "rgba(120,128,138,0.9)");
+        ctx.fillStyle = bg;
+        ctx.fill();
+        ctx.strokeStyle = "rgba(45,55,66,0.55)";
+        ctx.lineWidth = 1.6;
+        ctx.stroke();
+    }
+
+    /* faldende partikler (kun i elevens eget glas) */
+    var vaeskeHoejde = bund - top;
+    var i;
+    ctx.fillStyle = sys.bundfaldFarve;
+    if (faldende) {
+        for (i = 0; i < faldende.length; i++) {
+            var p = faldende[i];
+            if (p.y > vaeskeHoejde - 8) { continue; }
+            ctx.beginPath();
+            ctx.arc(venstre + p.rx * (hoejre - venstre), top + p.y, p.r, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    /* bobler */
+    ctx.strokeStyle = "rgba(255,255,255,0.85)";
+    ctx.fillStyle = "rgba(255,255,255,0.45)";
+    ctx.lineWidth = 1.2;
+    for (i = 0; i < bobler.length; i++) {
+        var b = bobler[i];
+        if (b.y > vaeskeHoejde - 6) { continue; }
+        ctx.beginPath();
+        ctx.arc(venstre + b.rx * (hoejre - venstre), bund - b.y, b.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+    }
+    ctx.restore();
+}
+
+function tegnGlaskant(ctx, sti, bredde) {
+    ctx.save();
+    sti();
+    ctx.strokeStyle = "rgba(60,72,84,0.75)";
+    ctx.lineWidth = bredde;
+    ctx.stroke();
+    ctx.restore();
+}
+
+function tegnReagensglas(ctx, g, fr, t, bobler, faldende) {
+    var cx = g.cx, r = g.hw;
+    var top = g.top, bund = g.bund;
+    var vTop = bund - g.fyld;
+
+    var sti = function () {
+        ctx.beginPath();
+        ctx.moveTo(cx - r, top);
+        ctx.lineTo(cx - r, bund - r);
+        ctx.arc(cx, bund - r, r, Math.PI, 0, true);
+        ctx.lineTo(cx + r, top);
+    };
+
+    /* glasset bagfra */
+    ctx.save();
+    sti();
+    ctx.closePath();
+    ctx.fillStyle = "rgba(255,255,255,0.55)";
+    ctx.fill();
+    ctx.restore();
+
+    tegnVaeske(ctx, function () { sti(); ctx.closePath(); }, cx - r, cx + r, vTop, bund - 2, fr, t, bobler, faldende);
+
+    tegnGlaskant(ctx, sti, 3);
+
+    /* kant foroven */
+    ctx.save();
+    ctx.beginPath();
+    ctx.ellipse(cx, top, r, 8, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = "rgba(60,72,84,0.75)";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    ctx.fillStyle = "rgba(255,255,255,0.5)";
+    ctx.fill();
+    ctx.restore();
+
+    /* glans */
+    ctx.save();
+    ctx.strokeStyle = "rgba(255,255,255,0.75)";
+    ctx.lineWidth = 6;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(cx - r + 13, top + 22);
+    ctx.lineTo(cx - r + 13, bund - 40);
+    ctx.stroke();
+    ctx.restore();
+
+    /* holder */
+    ctx.save();
+    ctx.fillStyle = "rgba(120,132,145,0.55)";
+    ctx.fillRect(cx - r - 16, top + 30, 2 * r + 32, 12);
+    ctx.restore();
+}
+
+function tegnBaegerglas(ctx, g, fr, t, bobler, faldende) {
+    var cx = g.cx, hw = g.hw;
+    var top = g.top, bund = g.bund;
+    var vTop = bund - g.fyld;
+
+    var sti = function () {
+        ctx.beginPath();
+        ctx.moveTo(cx - hw, top);
+        ctx.lineTo(cx - hw + 4, bund - 14);
+        ctx.quadraticCurveTo(cx - hw + 4, bund, cx - hw + 18, bund);
+        ctx.lineTo(cx + hw - 18, bund);
+        ctx.quadraticCurveTo(cx + hw - 4, bund, cx + hw - 4, bund - 14);
+        ctx.lineTo(cx + hw, top);
+    };
+
+    ctx.save();
+    sti();
+    ctx.closePath();
+    ctx.fillStyle = "rgba(255,255,255,0.55)";
+    ctx.fill();
+    ctx.restore();
+
+    tegnVaeske(ctx, function () { sti(); ctx.closePath(); }, cx - hw + 4, cx + hw - 4, vTop, bund - 3, fr, t, bobler, faldende);
+    tegnGlaskant(ctx, sti, 3);
+
+    /* hældetud */
+    ctx.save();
+    ctx.strokeStyle = "rgba(60,72,84,0.75)";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(cx + hw, top);
+    ctx.lineTo(cx + hw + 14, top - 8);
+    ctx.stroke();
+    ctx.restore();
+
+    /* målestreger */
+    ctx.save();
+    ctx.strokeStyle = "rgba(70,84,96,0.4)";
+    ctx.lineWidth = 2;
+    var i;
+    for (i = 1; i <= 3; i++) {
+        var y = bund - (bund - top) * (i / 4.2);
+        ctx.beginPath();
+        ctx.moveTo(cx + hw - 30, y);
+        ctx.lineTo(cx + hw - 8, y);
+        ctx.stroke();
+    }
+    ctx.restore();
+
+    ctx.save();
+    ctx.strokeStyle = "rgba(255,255,255,0.7)";
+    ctx.lineWidth = 6;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(cx - hw + 18, top + 24);
+    ctx.lineTo(cx - hw + 16, bund - 34);
+    ctx.stroke();
+    ctx.restore();
+}
+
+function tegnSproejte(ctx, g, fr, t) {
+    var cx = g.cx, hw = g.hw;
+    var top = g.top, bund = g.bund;
+    var gasH = g.fyld;
+    var stempelY = bund - gasH;
+
+    /* cylinder */
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(cx - hw, top, 2 * hw, bund - top);
+    ctx.fillStyle = "rgba(255,255,255,0.6)";
+    ctx.fill();
+    ctx.restore();
+
+    /* gas */
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(cx - hw + 4, stempelY, 2 * hw - 8, bund - stempelY);
+    ctx.clip();
+    ctx.fillStyle = rgba(fr.farve, fr.alfa);
+    ctx.fillRect(cx - hw, stempelY, 2 * hw, bund - stempelY);
+    ctx.restore();
+
+    /* dyse og prop */
+    ctx.save();
+    ctx.fillStyle = "rgba(120,132,145,0.85)";
+    ctx.beginPath();
+    ctx.moveTo(cx - 16, bund);
+    ctx.lineTo(cx + 16, bund);
+    ctx.lineTo(cx + 8, bund + 20);
+    ctx.lineTo(cx - 8, bund + 20);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = "#c0563f";
+    ctx.beginPath();
+    ctx.rect(cx - 11, bund + 18, 22, 12);
+    ctx.fill();
+    ctx.restore();
+
+    /* stempel: skive i cylinderen, stang og greb stikker op over kanten */
+    var rodTop = top - 34;
+    ctx.save();
+    ctx.fillStyle = "#79838d";
+    ctx.fillRect(cx - hw + 3, stempelY - 13, 2 * hw - 6, 14);
+    ctx.fillRect(cx - 9, rodTop, 18, stempelY - 13 - rodTop);
+    ctx.fillRect(cx - 34, rodTop - 10, 68, 10);
+    ctx.restore();
+
+    /* cylinderkant */
+    ctx.save();
+    ctx.strokeStyle = "rgba(60,72,84,0.75)";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(cx - hw, top, 2 * hw, bund - top);
+    ctx.restore();
+
+    /* glans */
+    ctx.save();
+    ctx.strokeStyle = "rgba(255,255,255,0.7)";
+    ctx.lineWidth = 5;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(cx - hw + 13, top + 16);
+    ctx.lineTo(cx - hw + 13, bund - 12);
+    ctx.stroke();
+    ctx.restore();
+
+}
+
+/* Lille termometer, der står nede i badet ved siden af beholderen */
+function tegnLilleTermometer(ctx, g, tilst) {
+    var x = g.cx + g.hw + 24, bund = g.bund + 2;
+    var hoej = beg(g.indreH * 0.5, 74, 130);
+    var t = beg(tilst.temp, 0, 100);
+    ctx.save();
+    ctx.strokeStyle = "rgba(70,84,96,0.7)";
+    ctx.lineWidth = 1.6;
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.moveTo(x - 4, bund - hoej);
+    ctx.lineTo(x + 4, bund - hoej);
+    ctx.lineTo(x + 4, bund - 10);
+    ctx.lineTo(x - 4, bund - 10);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(x, bund - 3, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = t < 12 ? "#3f8ecc" : "#d0413a";
+    ctx.beginPath();
+    ctx.arc(x, bund - 3, 5.5, 0, Math.PI * 2);
+    ctx.fill();
+    var h = (hoej - 18) * (t / 100);
+    ctx.fillRect(x - 2, bund - 10 - h, 4, h + 5);
+    ctx.restore();
+}
+
+/* =========================================================================
+   GRAF (valgfri)
+   ========================================================================= */
+function byggGrafLegende() {
+    elGrafLeg.innerHTML = "";
+    var i;
+    for (i = 0; i < sys.arter.length; i++) {
+        var a = sys.arter[i];
+        var s = document.createElement("span");
+        s.innerHTML = '<span class="prik" style="background:' + a.farve + '"></span>' +
+            a.navn + " = <b id=\"leg-" + a.id + "\">–</b> " + a.enhed;
+        elGrafLeg.appendChild(s);
+    }
+}
+
+function opdaterGrafLegende() {
+    var i;
+    for (i = 0; i < sys.arter.length; i++) {
+        var a = sys.arter[i];
+        var el = document.getElementById("leg-" + a.id);
+        var v = tilstand.konc[a.id];
+        if (el) { el.textContent = dk(v, v < 1 ? 2 : 1); }
+    }
+}
+
+function tegnGraf() {
+    var d = tilpasCanvas(grafCanvas);
+    var ctx = grafCtx, B = d.b, H = d.h;
+    ctx.clearRect(0, 0, B, H);
+    var vp = 16, hp = 12, tp = 30, bp = 22;
+    var w = B - vp - hp, h = H - tp - bp;
+
+    ctx.fillStyle = "#fbfcfd";
+    ctx.fillRect(vp, tp, w, h);
+
+    /* gitter */
+    ctx.strokeStyle = "#e3e8ed";
+    ctx.lineWidth = 1;
+    var i;
+    for (i = 0; i <= 4; i++) {
+        var y = tp + h * (i / 4);
+        ctx.beginPath();
+        ctx.moveTo(vp, y);
+        ctx.lineTo(vp + w, y);
+        ctx.stroke();
+    }
+    ctx.strokeStyle = "#9aa6b2";
+    ctx.beginPath();
+    ctx.moveTo(vp, tp);
+    ctx.lineTo(vp, tp + h);
+    ctx.lineTo(vp + w, tp + h);
+    ctx.stroke();
+
+    ctx.fillStyle = "#66707c";
+    ctx.font = "11px Segoe UI, sans-serif";
+    ctx.textAlign = "left";
+    ctx.fillText("↑ " + (sys.grafAkse || "koncentration"), vp, 12);
+    ctx.textAlign = "right";
+    ctx.fillText("tid →", vp + w, tp + h + 16);
+
+    var n = historik.length;
+    if (n < 2) { return; }
+    var xSkala = w / Math.max(n - 1, 1);
+
+    /* markører for indgreb */
+    for (i = 0; i < markoerer.length; i++) {
+        var mx = vp + markoerer[i].i * xSkala;
+        if (mx < vp || mx > vp + w) { continue; }
+        ctx.save();
+        ctx.strokeStyle = "#b6bfc9";
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(mx, tp);
+        ctx.lineTo(mx, tp + h);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = "#6b7580";
+        ctx.beginPath();
+        ctx.arc(mx, tp + 8, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 10px Segoe UI, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(String(markoerer[i].nr), mx, tp + 11.5);
+        ctx.restore();
+    }
+
+    /* kurver */
+    var j;
+    for (i = 0; i < sys.arter.length; i++) {
+        var a = sys.arter[i];
+        ctx.beginPath();
+        for (j = 0; j < n; j++) {
+            var v = beg(historik[j][a.id] / a.ref, 0, 1);
+            var px = vp + j * xSkala;
+            var py = tp + h - v * (h - 8) - 4;
+            if (j === 0) { ctx.moveTo(px, py); } else { ctx.lineTo(px, py); }
+        }
+        ctx.strokeStyle = a.farve;
+        ctx.lineWidth = 2.2;
+        ctx.lineJoin = "round";
+        ctx.stroke();
+    }
+}
+
+/* =========================================================================
+   ANIMATIONSLØKKE
+   ========================================================================= */
+function opdaterBobler(liste, rate) {
+    var i;
+    if (rate > 0.02 && Math.random() < rate * 0.75) {
+        liste.push({ rx: 0.15 + Math.random() * 0.7, y: 0, v: 0.7 + Math.random() * 1.6, r: 1.8 + Math.random() * 3 });
+    }
+    for (i = liste.length - 1; i >= 0; i--) {
+        liste[i].y += liste[i].v;
+        if (liste[i].y > 150) { liste.splice(i, 1); }
+    }
+}
+
+function opdaterPartikler() {
+    var i;
+    var voksende = maalTilstand && maalTilstand.bundfald > tilstand.bundfald + 0.005;
+    if (voksende && Math.random() < 0.4) {
+        partikler.push({ rx: 0.15 + Math.random() * 0.7, y: 0, v: 0.9 + Math.random() * 1.4, r: 1.6 + Math.random() * 2.2 });
+    }
+    for (i = partikler.length - 1; i >= 0; i--) {
+        partikler[i].y += partikler[i].v;
+        if (partikler[i].y > 170) { partikler.splice(i, 1); }
+    }
+
+    opdaterBobler(boblerNu, tilstand.bobler);
+    opdaterBobler(boblerRef, refTilstand.bobler);
+}
+
+function loop() {
+    requestAnimationFrame(loop);
+    if (!sys) { return; }
+    frameTaeller += 1;
+
+    if (animerer) {
+        var t = beg((performance.now() - animT0) / ANIM_TID, 0, 1);
+        var e = (1 - Math.exp(-4.2 * t)) / (1 - Math.exp(-4.2));
+        var k;
+        for (k in maalTilstand.konc) {
+            if (maalTilstand.konc.hasOwnProperty(k)) {
+                tilstand.konc[k] = lerp(fraTilstand.konc[k], maalTilstand.konc[k], e);
+            }
+        }
+        tilstand.temp = lerp(fraTilstand.temp, maalTilstand.temp, e);
+        tilstand.bundfald = lerp(fraTilstand.bundfald, maalTilstand.bundfald, e);
+        tilstand.bobler = lerp(fraTilstand.bobler, maalTilstand.bobler, e);
+        optagPunkt();
+        if (t >= 1) {
+            animerer = false;
+            optagFlad(6, null);
+        }
+    }
+
+    opdaterPartikler();
+    tegnLab();
+    opdaterBar();
+    if (grafVises) {
+        tegnGraf();
+        opdaterGrafLegende();
+    }
+}
+
+/* =========================================================================
+   HÆNDELSER
+   ========================================================================= */
+elGrafKnap.addEventListener("click", function () {
+    grafVises = !grafVises;
+    elGrafPanel.classList.toggle("skjult", !grafVises);
+    elLab.classList.toggle("med-graf", grafVises);
+    elGrafKnap.textContent = grafVises ? "📈 Skjul graf" : "📈 Vis graf";
+    if (grafVises) {
+        opdaterGrafLegende();
+        tegnGraf();
+        setTimeout(function () { elGrafPanel.scrollIntoView({ behavior: "smooth", block: "nearest" }); }, 60);
+    }
+});
+
+document.getElementById("btn-hjaelp").addEventListener("click", function () {
+    document.getElementById("hjaelp").classList.add("vis");
+});
+document.getElementById("luk-hjaelp").addEventListener("click", function () {
+    document.getElementById("hjaelp").classList.remove("vis");
+});
+document.getElementById("hjaelp").addEventListener("click", function (e) {
+    if (e.target.id === "hjaelp") { this.classList.remove("vis"); }
+});
+document.getElementById("btn-forfra").addEventListener("click", function () {
+    if (sys) { vaelgSystem(sys); }
+});
+
+document.addEventListener("keydown", function (e) {
+    if (document.getElementById("hjaelp").classList.contains("vis")) {
+        if (e.key === "Enter" || e.key === "Escape") {
+            document.getElementById("hjaelp").classList.remove("vis");
+            e.preventDefault();
+        }
+        return;
+    }
+    if (!sys) { return; }
+    if (e.key === "Enter") {
+        if (fase === "klar") { udfoerIndgreb(); e.preventDefault(); }
+        else if (fase === "udfoert") { naesteTrin(); e.preventDefault(); }
+    } else if (e.key >= "1" && e.key <= "4") {
+        if ((fase === "spm0" || fase === "spm1" || fase === "spm2") && aktiveSvarKnapper.length) {
+            var i = parseInt(e.key, 10) - 1;
+            if (i < aktiveSvarKnapper.length && !aktiveSvarKnapper[i].disabled) {
+                aktiveSvarKnapper[i].click();
+                e.preventDefault();
+            }
+        }
+    }
+});
+
+window.addEventListener("resize", function () { tegnAlt(); });
+
+byggMenu();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

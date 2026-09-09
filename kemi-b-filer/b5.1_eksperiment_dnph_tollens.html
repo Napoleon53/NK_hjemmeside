@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtuel Kemi: DNPH & Tollens (Opdateret)</title>
+    <style>
+        :root {
+            --bg-color: #1a1a1d;
+            --text-color: #e0e0e0;
+            --accent-color: #4ecca3;
+            --danger-color: #ff6b6b;
+            --panel-bg: #2d2d34;
+            --border-radius: 8px;
+        }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg-color); color: var(--text-color); overflow: hidden; display: flex; height: 100vh; }
+        #app-container { display: flex; width: 100%; height: 100%; }
+        
+        #lab-area { flex: 2; position: relative; display: flex; flex-direction: column; border-right: 2px solid #333; }
+        #canvas-layer-wrapper { position: relative; width: 100%; height: 65%; background: radial-gradient(circle at center, #353540 0%, #1a1a1d 100%); }
+        #simCanvas { display: block; width: 100%; height: 100%; }
+        
+        #controls { height: 35%; background: var(--panel-bg); padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; overflow-y: auto; border-top: 2px solid #333; }
+        
+        #journal-area { flex: 1; background: #232328; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; border-left: 1px solid #444; }
+        
+        h1, h2, h3 { margin-top: 0; color: var(--accent-color); font-size: 1.1em; }
+        .btn { background: #393e46; color: white; border: none; padding: 12px 15px; margin: 5px; border-radius: 4px; cursor: pointer; transition: 0.2s; font-weight: bold; font-size: 0.9em; }
+        .btn:hover:not(:disabled) { background: var(--accent-color); color: #000; }
+        .btn.active { background: var(--accent-color); color: #000; box-shadow: 0 0 10px var(--accent-color); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+        .btn-danger { background: #8b0000; }
+        .btn-danger:hover:not(:disabled) { background: var(--danger-color); box-shadow: 0 0 15px var(--danger-color); }
+        .btn-danger.pulse { animation: pulse-red 1.5s infinite; }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 107, 107, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0); }
+        }
+
+        .substance-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+        .reagent-box { border: 1px solid #555; padding: 10px; border-radius: var(--border-radius); }
+        .status-bar { padding: 10px; background: #000; border-bottom: 1px solid #444; display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.85em; }
+        th, td { border: 1px solid #444; padding: 6px; text-align: left; }
+        th { background: #333; }
+        select { background: #444; color: white; border: none; padding: 4px; width: 100%; border-radius: 2px; }
+        
+        /* Reaction Info Box - Positioned above the glass */
+        #reaction-info {
+            position: absolute;
+            top: 5%; left: 50%; transform: translateX(-50%);
+            width: 60%;
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid var(--accent-color);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
+            z-index: 10;
+        }
+        #reaction-info.visible { opacity: 1; }
+        .chem-eq { font-family: 'Times New Roman', serif; font-size: 1.3em; margin: 10px 0; line-height: 1.4; color: #fff; }
+        .chem-desc { font-size: 0.9em; color: #aaa; }
+
+        #toast {
+            position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
+            background: #333; color: #fff; padding: 10px 20px; border-radius: 20px;
+            opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div id="lab-area">
+        <div class="status-bar">
+            <span>🧪 Kemi-Lab: DNPH & Tollens</span>
+            <span id="state-indicator">Status: Klar</span>
+        </div>
+        
+        <div id="canvas-layer-wrapper">
+            <canvas id="simCanvas"></canvas>
+            
+            <div id="reaction-info">
+                <div class="chem-desc" id="rxn-title">REAKTION</div>
+                <div class="chem-eq" id="rxn-eq"></div>
+            </div>
+        </div>
+
+        <div id="controls">
+            <div class="reagent-box">
+                <h3>1. Vælg Carbonylforbindelse</h3>
+                <div class="substance-grid" id="substance-list">
+                    </div>
+            </div>
+            <div class="reagent-box">
+                <h3>2. Udfør Test & Rengør</h3>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn" id="btn-dnph" onclick="lab.selectReagent('DNPH')">Tilsæt DNPH</button>
+                    <button class="btn" id="btn-tollens" onclick="lab.selectReagent('Tollens')">Tilsæt Tollens</button>
+                    <button class="btn" id="btn-heat" onclick="lab.heatUp()">🔥 Opvarm</button>
+                </div>
+                <hr style="border: 0; border-top: 1px solid #444; margin: 15px 0;">
+                <button class="btn btn-danger" id="btn-clean" onclick="lab.cleanUp()" style="width: 100%">🚿 RENGØR GLAS (Nulstil)</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="journal-area">
+        <h2>Laboratorie Journal</h2>
+        <div id="journal-content"></div>
+        <button class="btn" style="margin-top: 20px; width: 100%;" onclick="journal.checkAnswers()">Tjek Journal</button>
+        <div id="journal-feedback" style="margin-top: 15px;"></div>
+    </div>
+</div>
+
+<div id="toast">Besked</div>
+
+<script>
+// Data updated: Removed almond/vanilla, added specific full reaction schemes
+const substances = [
+    { 
+        id: 'ethanal', name: 'Ethanal', type: 'Aldehyd', 
+        formula: 'CH₃CHO', dnph: true, tollens: true,
+        rxnDNPH: 'CH₃CHO + H₂N-NH-Ar(NO₂)₂ →<br>CH₃CH=N-NH-Ar(NO₂)₂ + H₂O',
+        rxnTollens: 'CH₃CHO + 2Ag⁺ + 3OH⁻ →<br>CH₃COO⁻ + 2Ag(s) + 2H₂O'
+    },
+    { 
+        id: 'propanon', name: 'Propanon', type: 'Keton', 
+        formula: 'CH₃COCH₃', dnph: true, tollens: false,
+        rxnDNPH: '(CH₃)₂CO + H₂N-NH-Ar(NO₂)₂ →<br>(CH₃)₂C=N-NH-Ar(NO₂)₂ + H₂O',
+        rxnTollens: 'Ingen reaktion (Ketoner oxideres ikke let)'
+    },
+    { 
+        id: 'benzaldehyd', name: 'Benzaldehyd', type: 'Aldehyd', 
+        formula: 'C₆H₅CHO', dnph: true, tollens: true,
+        rxnDNPH: 'C₆H₅CHO + H₂N-NH-Ar(NO₂)₂ →<br>C₆H₅CH=N-NH-Ar(NO₂)₂ + H₂O',
+        rxnTollens: 'C₆H₅CHO + 2Ag⁺ + 3OH⁻ →<br>C₆H₅COO⁻ + 2Ag(s) + 2H₂O'
+    },
+    { 
+        id: 'ethansyre', name: 'Ethansyre', type: 'Syre', 
+        formula: 'CH₃COOH', dnph: false, tollens: false,
+        rxnDNPH: 'Ingen reaktion (Carboxylsyre)',
+        rxnTollens: 'Ingen reaktion'
+    },
+    { 
+        id: 'vanillin', name: 'Vanillin', type: 'Aldehyd', 
+        formula: 'C₈H₈O₃', dnph: true, tollens: true,
+        rxnDNPH: 'R-CHO + DNPH → R-CH=N-NH-Ar + H₂O',
+        rxnTollens: 'R-CHO + 2Ag⁺ + 3OH⁻ → R-COO⁻ + 2Ag(s) + 2H₂O'
+    },
+    { 
+        id: 'sprit', name: 'Sprit', type: 'Alkohol', 
+        formula: 'C₂H₅OH', dnph: false, tollens: false,
+        rxnDNPH: 'Ingen reaktion (Alkohol)',
+        rxnTollens: 'Ingen reaktion'
+    }
+];
+
+class LabSimulation {
+    constructor() {
+        this.canvas = document.getElementById('simCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.state = {
+            currentSubstance: null,
+            addedReagent: null,
+            isHeated: false,
+            tubeColor: 'rgba(200, 230, 255, 0.1)',
+            silverMirror: 0,
+            dirty: false
+        };
+        this.particles = [];
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+        this.loop();
+    }
+
+    resize() {
+        this.width = this.canvas.width = document.getElementById('canvas-layer-wrapper').clientWidth;
+        this.height = this.canvas.height = document.getElementById('canvas-layer-wrapper').clientHeight;
+    }
+
+    selectSubstance(id) {
+        if (this.state.dirty) {
+            this.showToast("⚠️ Glasset er beskidt! RENGØR FØRST.");
+            this.triggerCleanAttention();
+            return;
+        }
+        this.state.currentSubstance = substances.find(s => s.id === id);
+        this.state.tubeColor = 'rgba(230, 240, 255, 0.3)'; // Clear liquid
+        this.showToast(`Valgt: ${this.state.currentSubstance.name}`);
+        this.updateUI();
+    }
+
+    selectReagent(type) {
+        if (!this.state.currentSubstance) {
+            this.showToast("⚠️ Vælg først en carbonylforbindelse.");
+            return;
+        }
+        if (this.state.addedReagent) {
+            this.showToast("⚠️ Reagens allerede tilsat.");
+            return;
+        }
+
+        this.state.addedReagent = type;
+        this.state.dirty = true; // Mark as dirty immediately upon mixing
+        
+        if (type === 'DNPH') {
+            this.performDNPH();
+        } else if (type === 'Tollens') {
+            this.showToast("Tollens tilsat. Klar væske. Kræver varme!");
+            this.state.tubeColor = 'rgba(220, 220, 230, 0.2)';
+            this.updateReactionDisplay(false); // Show pending or partial info? No, wait for heat/result.
+        }
+        this.updateUI();
+    }
+
+    performDNPH() {
+        const sub = this.state.currentSubstance;
+        if (sub.dnph) {
+            this.showToast("Positiv: Gult/Orange bundfald!");
+            this.state.tubeColor = 'rgba(255, 165, 0, 0.8)';
+            this.spawnParticles('orange');
+            this.updateReactionDisplay(true, sub.rxnDNPH);
+        } else {
+            this.showToast("Negativ: Ingen reaktion.");
+            this.state.tubeColor = 'rgba(255, 255, 0, 0.1)';
+            this.updateReactionDisplay(true, sub.rxnDNPH);
+        }
+    }
+
+    heatUp() {
+        if (!this.state.currentSubstance || !this.state.addedReagent) {
+            this.showToast("Intet at opvarme.");
+            return;
+        }
+        if (this.state.isHeated) return;
+        this.state.isHeated = true;
+        this.spawnParticles('bubble');
+
+        if (this.state.addedReagent === 'Tollens') {
+            const sub = this.state.currentSubstance;
+            if (sub.tollens) {
+                setTimeout(() => {
+                    this.state.silverMirror = 1;
+                    this.showToast("Positiv: Sølvspejl dannet!");
+                    this.updateReactionDisplay(true, sub.rxnTollens);
+                }, 1500);
+            } else {
+                this.showToast("Negativ: Ingen sølvspejl.");
+                this.updateReactionDisplay(true, sub.rxnTollens);
+            }
+        } else if (this.state.addedReagent === 'DNPH') {
+             this.showToast("Opvarmning øger reaktionshastigheden.");
+        }
+        this.updateUI();
+    }
+
+    cleanUp() {
+        this.state = {
+            currentSubstance: null,
+            addedReagent: null,
+            isHeated: false,
+            tubeColor: 'rgba(200, 230, 255, 0.1)',
+            silverMirror: 0,
+            dirty: false
+        };
+        this.particles = [];
+        this.updateReactionDisplay(false);
+        this.showToast("Glasset er rengjort. Klar til ny test.");
+        
+        // Remove active class from all substance buttons
+        document.querySelectorAll('#substance-list .btn').forEach(b => b.classList.remove('active'));
+        this.updateUI();
+    }
+
+    triggerCleanAttention() {
+        const btn = document.getElementById('btn-clean');
+        btn.classList.add('pulse');
+        setTimeout(() => btn.classList.remove('pulse'), 1500);
+    }
+
+    updateReactionDisplay(visible, html = '') {
+        const el = document.getElementById('reaction-info');
+        const eq = document.getElementById('rxn-eq');
+        if (visible) {
+            eq.innerHTML = html;
+            el.classList.add('visible');
+        } else {
+            el.classList.remove('visible');
+        }
+    }
+
+    spawnParticles(type) {
+        for(let i=0; i<60; i++) {
+            this.particles.push({
+                x: this.width/2 - 25 + Math.random()*50,
+                y: this.height/2 + 20 + Math.random()*80,
+                vx: (Math.random()-0.5)*1.5,
+                vy: (Math.random()-0.5)*1.5,
+                type: type,
+                life: 1.0
+            });
+        }
+    }
+
+    updateUI() {
+        // Disable substance buttons if dirty
+        const subBtns = document.querySelectorAll('#substance-list .btn');
+        subBtns.forEach(b => b.disabled = this.state.dirty);
+
+        // Update status text
+        const status = document.getElementById('state-indicator');
+        if (this.state.dirty) {
+            status.innerHTML = "<span style='color:var(--danger-color)'>⚠ SKAL RENGØRES</span>";
+        } else if (this.state.currentSubstance) {
+            status.innerHTML = "Substans valgt";
+        } else {
+            status.innerHTML = "Klar";
+        }
+    }
+
+    loop() {
+        this.ctx.clearRect(0,0,this.width, this.height);
+        const cx = this.width / 2;
+        const cy = this.height / 2 + 50; // Moved slightly down to make room for reaction box
+
+        // Liquid
+        this.ctx.fillStyle = this.state.tubeColor;
+        this.ctx.beginPath();
+        this.ctx.roundRect(cx - 35, cy - 60, 70, 160, 30);
+        this.ctx.fill();
+
+        // Silver Mirror
+        if (this.state.silverMirror > 0) {
+            let grad = this.ctx.createLinearGradient(cx-35, cy-60, cx+35, cy+100);
+            grad.addColorStop(0, `rgba(160, 160, 160, ${this.state.silverMirror})`);
+            grad.addColorStop(0.3, `rgba(255, 255, 255, ${this.state.silverMirror})`);
+            grad.addColorStop(0.6, `rgba(120, 120, 120, ${this.state.silverMirror})`);
+            grad.addColorStop(1, `rgba(80, 80, 80, ${this.state.silverMirror})`);
+            this.ctx.fillStyle = grad;
+            this.ctx.beginPath();
+            this.ctx.roundRect(cx - 35, cy - 60, 70, 160, 30);
+            this.ctx.fill();
+        }
+
+        // Particles
+        this.particles.forEach((p, i) => {
+            p.x += p.vx; p.y += p.vy; p.life -= 0.015;
+            this.ctx.globalAlpha = p.life;
+            if (p.type === 'orange') {
+                this.ctx.fillStyle = '#ff9f43';
+                this.ctx.beginPath(); this.ctx.arc(p.x, p.y, 4, 0, Math.PI*2); this.ctx.fill();
+            } else { // Bubble
+                this.ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+                this.ctx.beginPath(); this.ctx.arc(p.x, p.y, 2, 0, Math.PI*2); this.ctx.stroke();
+                p.y -= 1.5;
+            }
+            this.ctx.globalAlpha = 1;
+            if(p.life <= 0) this.particles.splice(i, 1);
+        });
+
+        // Glass Outline
+        this.ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+        this.ctx.lineWidth = 5;
+        this.ctx.beginPath();
+        this.ctx.roundRect(cx - 35, cy - 120, 70, 220, 30);
+        this.ctx.stroke();
+        
+        // Rim
+        this.ctx.lineWidth = 3;
+        this.ctx.beginPath();
+        this.ctx.ellipse(cx, cy - 120, 35, 10, 0, 0, Math.PI*2);
+        this.ctx.stroke();
+
+        requestAnimationFrame(() => this.loop());
+    }
+
+    showToast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg;
+        t.style.opacity = 1;
+        setTimeout(() => t.style.opacity = 0, 2500);
+    }
+}
+
+class JournalSystem {
+    constructor() {
+        this.renderTable();
+    }
+    renderTable() {
+        let html = `<table><thead><tr><th>Stof</th><th>DNPH</th><th>Tollens</th><th>Type?</th></tr></thead><tbody>`;
+        substances.forEach(sub => {
+            html += `<tr><td>${sub.name}</td>
+                <td><select id="dnph-${sub.id}"><option value="">?</option><option value="pos">Positiv</option><option value="neg">Negativ</option></select></td>
+                <td><select id="tollens-${sub.id}"><option value="">?</option><option value="pos">Positiv</option><option value="neg">Negativ</option></select></td>
+                <td><select id="conc-${sub.id}"><option value="">?</option><option value="aldehyd">Aldehyd</option><option value="keton">Keton</option><option value="ingen">Andet</option></select></td>
+            </tr>`;
+        });
+        html += `</tbody></table>`;
+        document.getElementById('journal-content').innerHTML = html;
+    }
+    checkAnswers() {
+        let correct = 0, total = substances.length * 3;
+        substances.forEach(sub => {
+            const d = document.getElementById(`dnph-${sub.id}`).value;
+            const t = document.getElementById(`tollens-${sub.id}`).value;
+            const c = document.getElementById(`conc-${sub.id}`).value;
+            const dOk = (sub.dnph && d === 'pos') || (!sub.dnph && d === 'neg');
+            const tOk = (sub.tollens && t === 'pos') || (!sub.tollens && t === 'neg');
+            let cExp = 'ingen';
+            if(sub.type === 'Aldehyd') cExp = 'aldehyd';
+            if(sub.type === 'Keton') cExp = 'keton';
+            const cOk = (c === cExp);
+            if(dOk) correct++; if(tOk) correct++; if(cOk) correct++;
+            
+            document.getElementById(`dnph-${sub.id}`).closest('tr').style.backgroundColor = 
+                (dOk && tOk && cOk) ? 'rgba(78, 204, 163, 0.15)' : 'rgba(255, 107, 107, 0.15)';
+        });
+        document.getElementById('journal-feedback').innerHTML = `Score: <b>${Math.round((correct/total)*100)}%</b>`;
+    }
+}
+
+const lab = new LabSimulation();
+const journal = new JournalSystem();
+const list = document.getElementById('substance-list');
+
+substances.forEach(s => {
+    let btn = document.createElement('button');
+    btn.className = 'btn';
+    btn.innerText = s.name;
+    btn.onclick = (e) => {
+        document.querySelectorAll('#substance-list .btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        lab.selectSubstance(s.id);
+    };
+    list.appendChild(btn);
+});
+</script>
+</body>
+</html>

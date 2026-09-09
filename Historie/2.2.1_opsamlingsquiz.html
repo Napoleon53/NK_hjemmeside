@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title>Forståelsesquiz: Revolutionernes Kraft (VV2 s. 64-105)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1c2530;
+            color: #ecf0f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .quiz-container {
+            background-color: #2a3648;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 750px;
+            border-top: 6px solid #b02a2a;
+        }
+        h1 {
+            text-align: center;
+            color: #e0555a;
+            margin-bottom: 10px;
+            margin-top: 0;
+        }
+        .subtitle {
+            text-align: center;
+            font-style: italic;
+            color: #a9b4c0;
+            margin-bottom: 30px;
+            font-size: 1em;
+        }
+        .question {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        /* Hint Styling */
+        .hint-btn {
+            background: none;
+            border: 1px solid #7f8c9a;
+            color: #a9b4c0;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+        }
+        .hint-btn:hover { background-color: #7f8c9a; color: #1c2530; }
+        .hint-text {
+            display: none;
+            background-color: #1c2530;
+            padding: 10px;
+            border-left: 3px solid #3498db;
+            margin-bottom: 20px;
+            font-style: italic;
+            color: #a9b4c0;
+        }
+        .hint-warning {
+            font-size: 0.85em;
+            color: #e0b84a;
+            margin-left: 8px;
+        }
+
+        /* Knapper */
+        .options button {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            margin: 12px 0;
+            background-color: #ecf0f1;
+            color: #1c2530;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            text-align: left;
+            transition: transform 0.1s, background-color 0.2s;
+        }
+        .options button:hover {
+            background-color: #c9d2da;
+            transform: translateX(5px);
+        }
+        .options button:disabled {
+            cursor: default;
+            transform: none;
+        }
+
+        /* Feedback farver */
+        .correct { background-color: #27ae60 !important; color: white !important; }
+        .wrong { background-color: #b02a2a !important; color: white !important; }
+
+        .explanation {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #1c2530;
+            border-left: 5px solid #e0555a;
+            display: none;
+            line-height: 1.6;
+        }
+        .point-tag {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .point-full { color: #2ecc71; }
+        .point-half { color: #e0b84a; }
+        .point-zero { color: #e0555a; }
+
+        .footer {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #46536a;
+            padding-top: 20px;
+        }
+        #score-display { font-weight: bold; font-size: 1.1em; }
+        #next-btn {
+            padding: 12px 25px;
+            background-color: #b02a2a;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            display: none;
+        }
+        #next-btn:hover { background-color: #8e2222; }
+
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <h1>Revolutionernes Kraft</h1>
+    <p class="subtitle">Sammenfattende quiz om enevælde, oplysningstid, den amerikanske og den franske revolution (VV2 s. 64-105)</p>
+
+    <div id="quiz-content">
+        <div id="question-box" class="question">Indlæser spørgsmål...</div>
+
+        <button id="show-hint-btn" class="hint-btn" onclick="toggleHint()">💡 Vis Hint</button>
+        <span id="hint-warning" class="hint-warning" style="display:none;">(giver kun ½ point for spørgsmålet)</span>
+        <div id="hint-box" class="hint-text"></div>
+
+        <div id="options-box" class="options"></div>
+        <div id="explanation-box" class="explanation"></div>
+    </div>
+
+    <div class="footer">
+        <span id="score-display">Spørgsmål 1 af 15</span>
+        <button id="next-btn" onclick="nextQuestion()">Næste spørgsmål &rarr;</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            q: "Hvad betyder det, at den franske konge i 1600-1700-tallet regerede som 'enevældig'?",
+            hint: "Tænk på selve ordet: 'ene' vælde – kongen alene...",
+            a: [
+                { text: "Han skulle dele magten ligeligt med adelen og en folkevalgt forsamling.", correct: false },
+                { text: "Al lovgivende, udøvende og dømmende magt lå samlet hos kongen selv.", correct: true },
+                { text: "Han var kun en religiøs leder, mens paven i Rom havde den verdslige magt.", correct: false }
+            ],
+            expl: "Enevælden betød, at kongen havde al magt i staten samlet hos sig selv, uden at skulle stå til regnskab for et parlament eller en forsamling."
+        },
+        {
+            q: "Hvem var den franske konge, der byggede det pragtfulde Versailles-slot og blev kaldt 'Solkongen'?",
+            hint: "Han overtog tronen som kun 5-årig og regerede i mere end 70 år – helt frem til 1715.",
+            a: [
+                { text: "Ludvig 13.", correct: false },
+                { text: "Ludvig 14.", correct: true },
+                { text: "Ludvig 16.", correct: false }
+            ],
+            expl: "Ludvig 14. (1638-1715) blev kaldt Solkongen og opførte det enorme Versailles-slot som symbol på sin magt og pragt."
+        },
+        {
+            q: "Ifølge biskop Bossuet, hofprædikant for Ludvig 14., hvor stammede kongens magt fra?",
+            hint: "Bossuet skrev om, at kongen regerede 'af Guds nåde'.",
+            a: [
+                { text: "Fra folket, som frit havde valgt kongen til at repræsentere sig.", correct: false },
+                { text: "Fra Gud, som havde indsat kongen som sin repræsentant på jorden.", correct: true },
+                { text: "Fra hæren, som støttede kongen militært mod adelen.", correct: false }
+            ],
+            expl: "Bossuet mente, enevælden var indstiftet af Gud – kongens trone var 'Selve Guds trone', og han var derfor hellig i sit embede."
+        },
+        {
+            q: "Hvad skete der med de franske protestanter (huguenotterne), efter Ludvig 14. ophævede deres religionsfrihed i 1685?",
+            hint: "Mange måtte forlade landet i hast – bl.a. til Holland, England og nogle få tusind til Fredericia i Danmark.",
+            a: [
+                { text: "De fik udvidet religionsfrihed og flere rettigheder.", correct: false },
+                { text: "De blev tvunget til at flygte ud af Frankrig eller konvertere til katolicismen.", correct: true },
+                { text: "De overtog efterhånden hele den politiske og militære magt i Frankrig.", correct: false }
+            ],
+            expl: "Ludvig 14. ophævede Nantes-ediktet i 1685, og huguenotterne måtte flygte eller konvertere – mange rejste til Holland, England og Amerika."
+        },
+        {
+            q: "Hvorfor slog enevælden aldrig for alvor igennem i England, sådan som den gjorde i Frankrig?",
+            hint: "En engelsk konge blev halshugget i 1649, og senere måtte kongemagten acceptere parlamentets kontrol.",
+            a: [
+                { text: "Fordi englænderne ikke havde nogen konge i denne periode.", correct: false },
+                { text: "Fordi kongemagten blev mødt med oprør og til sidst måtte underlægge sig det folkevalgte parlament.", correct: true },
+                { text: "Fordi England i denne periode blev militært erobret og besat af Frankrig.", correct: false }
+            ],
+            expl: "I England blev en konge halshugget i 1649, og efter endnu et forsøg på enevælde i 1680'erne måtte de engelske konger acceptere, at parlamentet kontrollerede magten."
+        },
+        {
+            q: "Hvilken revolution begyndte i England i midten af 1700-tallet og ændrede produktionen fra håndarbejde til fabrikker?",
+            hint: "Det handler om maskiner og fabrikker – ikke om oprør mod en konge.",
+            a: [
+                { text: "Den franske revolution.", correct: false },
+                { text: "Den amerikanske revolution.", correct: false },
+                { text: "Den industrielle revolution.", correct: true }
+            ],
+            expl: "Den industrielle revolution mekaniserede produktionen, og byer som London voksede eksplosivt, da folk flyttede til fabriksarbejde."
+        },
+        {
+            q: "Hvorfor blev de amerikanske kolonister vrede på englænderne efter syvårskrigen (1763)?",
+            hint: "Tænk på sloganet 'ingen beskatning uden repræsentation'.",
+            a: [
+                { text: "England ville simpelthen ikke længere handle frit med kolonierne.", correct: false },
+                { text: "England pålagde kolonierne nye skatter og afgifter, selvom de ikke var repræsenteret i parlamentet.", correct: true },
+                { text: "England ville gøre kolonierne fuldstændigt selvstændige alt for hurtigt.", correct: false }
+            ],
+            expl: "Kolonisterne mente, at skat og politisk indflydelse hørte sammen – og da de ikke havde repræsentanter i det engelske parlament, nægtede mange at acceptere de nye skatter."
+        },
+        {
+            q: "Hvad var 'Boston Tea Party' i 1773?",
+            hint: "Begivenheden var en protest rettet mod te-skatten og den engelske handelspolitik.",
+            a: [
+                { text: "En fredsfest, hvor englændere og kolonister drak te sammen.", correct: false },
+                { text: "En protest, hvor kolonister forklædt som indianere kastede te fra et engelsk skib i havnen.", correct: true },
+                { text: "Det møde, hvor kolonierne underskrev uafhængighedserklæringen.", correct: false }
+            ],
+            expl: "Kolonister forklædt som indianere stormede et engelsk teskib og kastede te-kasserne i havnen i Boston som protest mod den engelske handelspolitik."
+        },
+        {
+            q: "Hvilken engelsk filosofs tanker om menneskets naturlige frihed inspirerede den amerikanske uafhængighedserklæring fra 1776 stærkt?",
+            hint: "Han mente, mennesket var frit af natur, og at en regering skulle bygge på en samfundspagt med folket.",
+            a: [
+                { text: "John Locke.", correct: true },
+                { text: "Voltaire.", correct: false },
+                { text: "Montesquieu.", correct: false }
+            ],
+            expl: "John Lockes tanker om menneskets naturlige frihed og folkets ret til at afsætte en regering, der ikke respekterer denne frihed, ligger til grund for uafhængighedserklæringen."
+        },
+        {
+            q: "Hvad bad Abigail Adams sin mand John Adams om i sit berømte brev fra 1776?",
+            hint: "Hun skrev bl.a. 'remember the ladies'.",
+            a: [
+                { text: "At han skulle stoppe krigen mod England med det samme.", correct: false },
+                { text: "At han skulle huske kvinderne og give dem flere rettigheder i de nye love.", correct: true },
+                { text: "At han skulle forlade arbejdet med uafhængighedserklæringen.", correct: false }
+            ],
+            expl: "Abigail Adams opfordrede sin mand til at huske kvindernes rettigheder i den nye lovgivning – men uafhængighedserklæringen kom alligevel kun til at gælde hvide mænd."
+        },
+        {
+            q: "Hvilken fransk filosof stod bag ideen om magtens tredeling (lovgivende, udøvende og dømmende magt), som USA's forfatning byggede på?",
+            hint: "Han skrev bogen 'Om Lovenes Ånd' i 1748.",
+            a: [
+                { text: "Montesquieu.", correct: true },
+                { text: "Rousseau.", correct: false },
+                { text: "Voltaire.", correct: false }
+            ],
+            expl: "Montesquieu argumenterede for, at magten burde deles mellem tre uafhængige myndigheder, for at ingen enkelt person eller gruppe kunne blive tyrannisk."
+        },
+        {
+            q: "Hvordan var det franske samfund inddelt i stænder før revolutionen i 1789?",
+            hint: "Førstestand var kirkens folk, andenstand var adelen...",
+            a: [
+                { text: "I to stænder: adelen og resten af folket.", correct: false },
+                { text: "I tre stænder: gejstlighed, adel og resten af befolkningen (ca. 98%).", correct: true },
+                { text: "Der var ingen klasseinddeling i Frankrig på det tidspunkt.", correct: false }
+            ],
+            expl: "Frankrig var et stændersamfund: gejstligheden (1. stand) og adelen (2. stand) havde privilegier som skattefrihed, mens resten af befolkningen (3. stand, ca. 98%) betalte skatten."
+        },
+        {
+            q: "Hvad skete der den 14. juli 1789 i Paris – en begivenhed, der i dag er Frankrigs nationaldag?",
+            hint: "Borgerne fik adgang til våben ved at storme en bestemt fæstning.",
+            a: [
+                { text: "Den franske konge blev fanget og henrettet af det oprørske folk denne dag.", correct: false },
+                { text: "Borgerne stormede Bastille-fæstningen, symbolet på enevældens undertrykkelse.", correct: true },
+                { text: "Menneskerettighedserklæringen blev underskrevet af kongen.", correct: false }
+            ],
+            expl: "Stormen på Bastillen den 14. juli 1789 gav borgerne adgang til våben og markerede et afgørende vendepunkt i revolutionen."
+        },
+        {
+            q: "Hvem var Marie-Olympe de Gouges, og hvad er hun især kendt for?",
+            hint: "Hun kritiserede, at Menneskerettighedserklæringen fra 1789 kun gjaldt mænd.",
+            a: [
+                { text: "En fransk dronning, der forsøgte at stoppe revolutionen.", correct: false },
+                { text: "En kvinde, der i 1791 skrev sin egen erklæring om kvinders og borgerinders rettigheder.", correct: true },
+                { text: "En soldat, der personligt ledte an i stormen på Bastillen-fæstningen.", correct: false }
+            ],
+            expl: "Olympe de Gouges skrev 'Erklæring om kvindens og borgerindens rettigheder' i 1791 som modsvar til den mandsdominerede menneskerettighedserklæring – hun blev senere henrettet i guillotinen i 1793."
+        },
+        {
+            q: "Hvad havde den danske forfatter Ludvig Holberg og englænderen Mary Wollstonecraft til fælles i deres syn på kvinder?",
+            hint: "Begge gik imod tidens (og fx Rousseaus) syn på kvinder som mænds underlegne.",
+            a: [
+                { text: "De mente begge, at kvinder og mænd grundlæggende var lige og burde have uddannelse.", correct: true },
+                { text: "De mente begge, at kvinder udelukkende skulle opdrages til at behage mænd.", correct: false },
+                { text: "De var begge modstandere af, at kvinder skulle have nogen rettigheder overhovedet.", correct: false }
+            ],
+            expl: "Både Holberg ('Forsvars Skrift for Qvinde-Kiønnet', 1722) og Wollstonecraft ('Et forsvar for kvinders rettigheder', 1792) argumenterede for, at kvinder var lige så fornuftige som mænd og fortjente uddannelse."
+        }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+    let hintUsed = false;
+    const totalQ = questions.length;
+
+    const qBox = document.getElementById("question-box");
+    const hintBox = document.getElementById("hint-box");
+    const hintBtn = document.getElementById("show-hint-btn");
+    const hintWarning = document.getElementById("hint-warning");
+    const optBox = document.getElementById("options-box");
+    const explBox = document.getElementById("explanation-box");
+    const nextBtn = document.getElementById("next-btn");
+    const scoreDisplay = document.getElementById("score-display");
+
+    function loadQuestion() {
+        // Reset state
+        explBox.style.display = "none";
+        nextBtn.style.display = "none";
+        hintBox.style.display = "none";
+        hintBtn.style.display = "inline-block";
+        hintBtn.disabled = false;
+        hintWarning.style.display = "none";
+        hintUsed = false;
+        optBox.innerHTML = "";
+
+        const qData = questions[currentQ];
+        qBox.innerText = qData.q;
+        hintBox.innerText = "💡 " + qData.hint;
+
+        scoreDisplay.innerText = `Spørgsmål ${currentQ + 1} af ${totalQ}`;
+
+        // Bland rækkefølgen af svarmulighederne, så det rigtige svar ikke altid står samme sted
+        const shuffled = [...qData.a].sort(() => Math.random() - 0.5);
+
+        shuffled.forEach((opt, index) => {
+            const btn = document.createElement("button");
+            btn.innerText = opt.text;
+            btn.onclick = () => checkAnswer(index, btn, shuffled, qData);
+            optBox.appendChild(btn);
+        });
+    }
+
+    function toggleHint() {
+        if (hintBox.style.display === "none") {
+            hintBox.style.display = "block";
+            hintUsed = true;
+            hintWarning.style.display = "inline";
+        } else {
+            hintBox.style.display = "none";
+        }
+    }
+
+    function checkAnswer(index, btn, shuffled, qData) {
+        const allBtns = optBox.querySelectorAll("button");
+        allBtns.forEach(b => b.disabled = true);
+        hintBtn.disabled = true;
+        hintBox.style.display = "none";
+
+        const isCorrect = shuffled[index].correct;
+        let pointTag = "";
+
+        if (isCorrect) {
+            btn.classList.add("correct");
+            if (hintUsed) {
+                score += 0.5;
+                pointTag = '<span class="point-tag point-half">☆ ½ point (du brugte hintet)</span>';
+            } else {
+                score += 1;
+                pointTag = '<span class="point-tag point-full">★ 1 point</span>';
+            }
+            explBox.innerHTML = "✅ <b>Korrekt!</b><br>" + qData.expl + pointTag;
+        } else {
+            btn.classList.add("wrong");
+            const correctIndex = shuffled.findIndex(o => o.correct);
+            allBtns[correctIndex].classList.add("correct");
+            pointTag = '<span class="point-tag point-zero">0 point</span>';
+            explBox.innerHTML = "❌ <b>Forkert.</b><br>" + qData.expl + pointTag;
+        }
+
+        explBox.style.display = "block";
+        nextBtn.style.display = "block";
+
+        if (currentQ === totalQ - 1) {
+            nextBtn.innerText = "Se resultat";
+        }
+    }
+
+    function nextQuestion() {
+        currentQ++;
+        if (currentQ < totalQ) {
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function formatScore(s) {
+        return (Math.round(s * 2) / 2).toString().replace(".", ",");
+    }
+
+    function showResult() {
+        document.querySelector(".quiz-container").innerHTML = `
+            <h1 style="color:#e0555a">Quiz Gennemført!</h1>
+            <p style="text-align:center; font-size:1.5em; margin: 30px 0;">Du fik <b>${formatScore(score)}</b> ud af <b>${totalQ}</b> point.</p>
+            <p style="text-align:center; color:#a9b4c0;">
+                ${score >= 12 ? "Fremragende! Du har helt styr på revolutionernes tid." :
+                  score >= 8 ? "Godt gået. Læs teksten en gang til for at fange de sidste detaljer." :
+                  "Prøv igen. Husk at bruge hints, hvis du er i tvivl – de koster kun et halvt point!"}
+            </p>
+            <button onclick="location.reload()" style="display:block; margin:40px auto; padding:15px 30px; background:#b02a2a; border:none; border-radius:5px; cursor:pointer; font-weight:bold; color:white; font-size:1.1em;">Prøv igen</button>
+        `;
+    }
+
+    // Start
+    loadQuestion();
+
+</script>
+
+</body>
+</html>

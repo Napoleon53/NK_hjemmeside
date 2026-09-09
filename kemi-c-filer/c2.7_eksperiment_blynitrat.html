@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kemi-Animation: Opløselighed af PbI₂ (V10 - Final)</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-color: #1e293b;
+            --text-color: #e2e8f0;
+            --accent-color: #fbbf24;
+            --accent-hover: #f59e0b;
+            --danger: #ef4444;
+            --success: #10b981;
+            --border: #334155;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+       
+        #app-container { display: flex; width: 100%; height: 100%; }
+
+        /* Sidebar */
+        #sidebar {
+            width: 260px;
+            background-color: var(--panel-color);
+            border-right: 1px solid var(--border);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 20;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.3);
+        }
+
+        /* Main Area */
+        #visual-area {
+            flex-grow: 1;
+            display: flex;
+        }
+
+        /* Left: Experiment */
+        #experiment-stage {
+            flex: 5; /* 50% width */
+            position: relative;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            border-right: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        /* Legend Box */
+        #particle-legend {
+            position: absolute;
+            top: 20px;  
+            left: 20px; 
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            pointer-events: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            z-index: 15;
+            min-width: 140px;
+        }
+        .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+        .legend-item:last-child { margin-bottom: 0; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        
+        .spectator-note {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border);
+            font-size: 0.7rem;
+            color: #94a3b8;
+            font-style: italic;
+            line-height: 1.2;
+        }
+
+        /* Right: Analysis */
+        #analysis-stage {
+            flex: 5; /* 50% width */
+            background-color: #0b1120;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 15px;
+        }
+
+        h1 { font-size: 1.1rem; margin: 0; color: #fff; border-bottom: 2px solid var(--accent-color); padding-bottom: 5px; }
+        .control-group { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 6px; border: 1px solid var(--border); }
+       
+        label { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px; color: #cbd5e1; }
+        input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--accent-color); margin-bottom: 5px; }
+        .value-display { color: var(--accent-color); font-weight: bold; font-family: monospace; }
+       
+        .btn-reset {
+            background-color: transparent;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            width: fit-content;
+            align-self: flex-start;
+            transition: all 0.2s;
+            margin-top: auto;
+        }
+        .btn-reset:hover { background-color: var(--danger); color: white; }
+
+        /* Data Grid */
+        #data-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+        .data-box { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 4px; }
+        .data-label { color: #64748b; display: block; font-size: 0.7rem; }
+        .data-value { color: #e2e8f0; font-size: 1rem; font-weight: bold; }
+
+        /* Graph */
+        #graph-container {
+            flex-grow: 1;
+            background: #172033;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            position: relative;
+            min-height: 250px;
+        }
+        canvas#graph-canvas { width: 100%; height: 100%; display: block; cursor: crosshair; }
+
+        /* Microscope */
+        #microscope-view {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 250px; 
+            height: 250px; 
+            border-radius: 50%;
+            border: 4px solid #475569;
+            background: #fff;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+        #microscope-label {
+            position: absolute; 
+            top: 280px; 
+            right: 85px; 
+            font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; pointer-events: none; font-weight: bold;
+        }
+       
+        #feedback-msg { position: absolute; top: 10px; left: 60px; color: #94a3b8; font-size: 0.8rem; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+   
+    <div id="sidebar">
+        <h1>Opløselighed: PbI₂</h1>
+       
+        <div class="control-group">
+            <label>Masse Pb(NO₃)₂ <span id="val-pb" class="value-display">0.00 g</span></label>
+            <input type="range" id="input-pb" min="0" max="0.50" step="0.01" value="0.00">
+           
+            <label>Masse KI <span id="val-ki" class="value-display">0.00 g</span></label>
+            <input type="range" id="input-ki" min="0" max="0.50" step="0.01" value="0.00">
+        </div>
+
+        <div class="control-group">
+            <label>Temperatur <span id="val-temp" class="value-display">20.0 °C</span></label>
+            <input type="range" id="input-temp" min="0" max="100" step="0.5" value="20">
+            <p style="font-size: 0.75rem; color:#64748b; margin-top:5px;">Juster slideren for at varme/køle.</p>
+        </div>
+
+        <button class="btn-reset" onclick="location.reload()">↺ Nulstil</button>
+    </div>
+
+    <div id="visual-area">
+       
+        <div id="experiment-stage">
+            <canvas id="world-canvas"></canvas>
+           
+            <div id="microscope-view">
+                <canvas id="micro-canvas" width="250" height="250"></canvas>
+            </div>
+            <div id="microscope-label">Ion-Zoom (×10⁶)</div>
+
+            <div id="particle-legend">
+                <div class="legend-item"><span class="dot" style="background:#64748b;"></span> Bly(II)-ion (Pb²⁺)</div>
+                <div class="legend-item"><span class="dot" style="background:#a855f7;"></span> Iodid-ion (I⁻)</div>
+                <div class="legend-item"><span class="dot" style="background:#fbbf24; border-radius:0; transform:rotate(45deg); width:8px; height:8px;"></span> Bly(II)iodid (s)</div>
+                <div class="spectator-note">*Tilskuerioner (K⁺, NO₃⁻)<br>er ikke vist.</div>
+            </div>
+        </div>
+
+        <div id="analysis-stage">
+            <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                <h2 style="margin:0; font-size:1rem; color:#fff;">Data & Analyse</h2>
+                <span id="guess-feedback" style="font-size:0.8rem; color:var(--accent-color);"></span>
+            </div>
+
+            <div id="data-panel">
+                <div class="data-box">
+                    <span class="data-label">Stofmængde n(Pb²⁺)</span>
+                    <span class="data-value" id="disp-n-pb">0.00 mmol</span>
+                </div>
+                <div class="data-box">
+                    <span class="data-label">Stofmængde n(I⁻)</span>
+                    <span class="data-value" id="disp-n-i">0.00 mmol</span>
+                </div>
+                <div class="data-box">
+                    <span class="data-label">Reaktionsbrøk (Y)</span>
+                    <span class="data-value" id="disp-q" style="color:var(--accent-color)">0</span>
+                </div>
+                <div class="data-box">
+                    <span class="data-label">Opløselighedsprodukt (Kₒ)</span>
+                    <span class="data-value" id="disp-k">0</span>
+                </div>
+            </div>
+           
+            <div id="graph-container">
+                <div id="feedback-msg">Klik på grafen for at gætte mætningspunktet</div>
+                <canvas id="graph-canvas"></canvas>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+/** KEMI KONSTANTER */
+const CONSTANTS = {
+    M_PB: 331.20,
+    M_KI: 166.00,
+    V: 0.200
+};
+
+function getKsp(tempC) {
+    const K20 = 1.79e-8; 
+    return K20 * Math.pow(1.06, (tempC - 20));
+}
+
+class Simulation {
+    constructor() {
+        this.massPb = 0.0;
+        this.massKI = 0.0;
+        this.temp = 20.0;
+        this.nPb = 0;
+        this.nI = 0;
+        this.Q = 0;
+        this.Ksp = 0;
+        this.percentSolid = 0; 
+        this.saturationTemp = null;
+        this.userGuessTemp = null;
+        this.displayTemp = 20.0;
+        
+        // --- NYT: Tidsstempel for aktivitet ---
+        this.lastActivityTime = Date.now();
+    }
+
+    // Metode til at registrere brugeraktivitet
+    triggerActivity() {
+        this.lastActivityTime = Date.now();
+    }
+
+    update() {
+        this.nPb = this.massPb / CONSTANTS.M_PB;
+        this.nI = this.massKI / CONSTANTS.M_KI;
+        const cPb = this.nPb / CONSTANTS.V;
+        const cI = this.nI / CONSTANTS.V;
+        this.Q = cPb * Math.pow(cI, 2);
+        this.Ksp = getKsp(this.displayTemp);
+
+        if (this.Q > this.Ksp && this.Q > 0) {
+            const ratio = this.Ksp / this.Q;
+            this.percentSolid = (1 - Math.pow(ratio, 0.4)); 
+            if (this.percentSolid < 0) this.percentSolid = 0;
+        } else {
+            this.percentSolid = 0;
+        }
+        this.findSaturationTemp();
+    }
+
+    findSaturationTemp() {
+        if (this.Q === 0) { this.saturationTemp = -100; return; }
+        for(let t=0; t<=100; t+=0.5) {
+            if (getKsp(t) >= this.Q) {
+                this.saturationTemp = t;
+                return;
+            }
+        }
+        this.saturationTemp = 100;
+    }
+}
+
+const sim = new Simulation();
+
+// --- PARTIKEL SYSTEM (Proportionalitet + Lynlås logik) ---
+class ParticleSystem {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.width = canvas.width;
+        this.height = canvas.height;
+        
+        this.poolPb = [];
+        for(let i=0; i<100; i++) this.poolPb.push(this.createParticle('Pb'));
+        
+        this.poolI = [];
+        for(let i=0; i<200; i++) this.poolI.push(this.createParticle('I'));
+    }
+
+    createParticle(type) {
+        return {
+            x: Math.random() * this.width,
+            y: Math.random() * this.height, 
+            vx: (Math.random()-0.5)*1.5,
+            vy: (Math.random()-0.5)*1.5,
+            type: type
+        };
+    }
+
+    draw() {
+        this.ctx.clearRect(0,0, this.width, this.height);
+        this.ctx.fillStyle = '#f8fafc'; 
+        this.ctx.fillRect(0,0, this.width, this.height);
+
+        const targetPb = Math.round(sim.massPb / 0.01) * 2;
+        const targetI = Math.round(sim.massKI / 0.01) * 4;
+
+        let activeParticles = [];
+        let pIndex = 0;
+        let iIndex = 0;
+
+        while (pIndex < targetPb || iIndex < targetI) {
+            if (pIndex < targetPb) activeParticles.push(this.poolPb[pIndex++]);
+            if (iIndex < targetI) activeParticles.push(this.poolI[iIndex++]);
+            if (iIndex < targetI) activeParticles.push(this.poolI[iIndex++]);
+        }
+
+        const solidCount = Math.floor(activeParticles.length * sim.percentSolid);
+
+        activeParticles.forEach((p, index) => {
+            const isCrystal = index < solidCount;
+            let speed = (sim.displayTemp + 20) / 50;
+
+            if (isCrystal) {
+                p.x += Math.sin(p.y * 0.2) * 0.3; 
+                p.y += 0.8 + Math.random() * 0.5;
+                if (p.y > this.height) { p.y = -10; p.x = Math.random() * this.width; }
+               
+                this.ctx.fillStyle = '#fbbf24';
+                this.ctx.beginPath();
+                const r = 4;
+                for (let i=0; i<6; i++) {
+                    this.ctx.lineTo(p.x + r * Math.cos(i*Math.PI/3), p.y + r * Math.sin(i*Math.PI/3));
+                }
+                this.ctx.fill();
+            } else {
+                p.x += p.vx * speed;
+                p.y += p.vy * speed;
+                if (p.x<0 || p.x>this.width) p.vx *= -1;
+                if (p.y<0 || p.y>this.height) p.vy *= -1;
+
+                this.ctx.beginPath();
+                this.ctx.arc(p.x, p.y, p.type==='Pb'?3:2, 0, Math.PI*2);
+                this.ctx.fillStyle = p.type==='Pb' ? '#64748b' : '#a855f7';
+                this.ctx.fill();
+            }
+        });
+    }
+}
+
+// --- SETUP ---
+const worldCanvas = document.getElementById('world-canvas');
+const worldCtx = worldCanvas.getContext('2d');
+const graphCanvas = document.getElementById('graph-canvas');
+const graphCtx = graphCanvas.getContext('2d');
+const microSys = new ParticleSystem(document.getElementById('micro-canvas'));
+
+function resize() {
+    worldCanvas.width = document.getElementById('experiment-stage').offsetWidth;
+    worldCanvas.height = document.getElementById('experiment-stage').offsetHeight;
+    graphCanvas.width = document.getElementById('graph-container').offsetWidth;
+    graphCanvas.height = document.getElementById('graph-container').offsetHeight;
+}
+window.addEventListener('resize', resize);
+setTimeout(resize, 100);
+
+// LOOP
+function loop() {
+    const diff = sim.temp - sim.displayTemp;
+    // Hvis temperaturen stadig ændrer sig (animation), så betragter vi det som aktivitet
+    if (Math.abs(diff) > 0.1) {
+        sim.displayTemp += diff * 0.1;
+        sim.triggerActivity(); 
+    } else {
+        sim.displayTemp = sim.temp;
+    }
+
+    sim.update();
+    updateDOM();
+    drawWorld();
+    microSys.draw();
+    drawGraph();
+
+    requestAnimationFrame(loop);
+}
+
+function updateDOM() {
+    document.getElementById('val-pb').textContent = sim.massPb.toFixed(2) + ' g';
+    document.getElementById('val-ki').textContent = sim.massKI.toFixed(2) + ' g';
+    document.getElementById('val-temp').textContent = sim.displayTemp.toFixed(1) + ' °C';
+    document.getElementById('input-temp').value = sim.temp;
+
+    document.getElementById('disp-n-pb').textContent = (sim.nPb * 1000).toFixed(2) + ' mmol';
+    document.getElementById('disp-n-i').textContent = (sim.nI * 1000).toFixed(2) + ' mmol';
+    document.getElementById('disp-q').textContent = sim.Q.toExponential(2);
+    document.getElementById('disp-k').textContent = sim.Ksp.toExponential(2);
+}
+
+function drawWorld() {
+    const w = worldCanvas.width;
+    const h = worldCanvas.height;
+    worldCtx.clearRect(0,0,w,h);
+
+    const cx = w / 2;
+    const cy = h - 60; 
+
+    const scale = 1.6;
+    const plateW = 100 * scale;
+    const plateH = 15 * scale;
+    const beakerW = 80 * scale; 
+    const beakerH = 120 * scale;
+
+    // Hotplate
+    worldCtx.fillStyle = '#334155';
+    worldCtx.fillRect(cx - plateW/2, cy, plateW, plateH);
+    if (sim.displayTemp > 25) {
+        worldCtx.fillStyle = `rgba(239, 68, 68, ${(sim.displayTemp-20)/100})`;
+        worldCtx.fillRect(cx - plateW/2, cy, plateW, plateH);
+    }
+
+    // Beaker
+    worldCtx.strokeStyle = 'rgba(255,255,255,0.5)';
+    worldCtx.lineWidth = 4;
+    worldCtx.beginPath();
+    worldCtx.moveTo(cx - beakerW, cy - beakerH);
+    worldCtx.lineTo(cx - beakerW, cy);
+    worldCtx.lineTo(cx + beakerW, cy);
+    worldCtx.lineTo(cx + beakerW, cy - beakerH);
+    worldCtx.stroke();
+
+    // Liquid
+    const liquidTop = cy - (beakerH - 10);
+    const alpha = Math.min(0.95, sim.percentSolid * 2.5);
+    worldCtx.fillStyle = `rgba(251, 191, 36, ${alpha})`; 
+    worldCtx.fillRect(cx - beakerW + 2, liquidTop, (beakerW*2) - 4, beakerH - 10);
+    worldCtx.fillStyle = `rgba(200, 230, 255, 0.1)`; 
+    worldCtx.fillRect(cx - beakerW + 2, liquidTop, (beakerW*2) - 4, beakerH - 10);
+
+    // Volumen Markør
+    worldCtx.save();
+    worldCtx.fillStyle = 'rgba(255,255,255,0.6)';
+    worldCtx.strokeStyle = 'rgba(255,255,255,0.6)';
+    worldCtx.font = 'bold 12px sans-serif';
+    worldCtx.textAlign = 'right';
+    
+    worldCtx.beginPath();
+    worldCtx.moveTo(cx + beakerW - 12, liquidTop);
+    worldCtx.lineTo(cx + beakerW, liquidTop);
+    worldCtx.stroke();
+    
+    worldCtx.fillText("200 mL", cx + beakerW - 16, liquidTop + 4);
+    worldCtx.restore();
+
+    // --- ÆNDRING: Falling crystals (Macro view) ---
+    // Tjekker om der har været aktivitet de sidste 3 sekunder (3000 ms)
+    const isActive = (Date.now() - sim.lastActivityTime) < 3000;
+
+    if (sim.percentSolid > 0 && isActive) {
+        worldCtx.fillStyle = '#fbbf24';
+        const count = Math.floor(sim.percentSolid * 150); 
+        for(let i=0; i<count; i++) {
+            const t = Date.now()/1000;
+            const px = (Math.sin(i*99 + t)*(beakerW-10)) + cx;
+            const py = ((i*17 + t*40)%(beakerH-15)) + (cy - (beakerH - 15));
+            worldCtx.fillRect(px, py, 3, 3); 
+        }
+    }
+}
+
+function drawGraph() {
+    const w = graphCanvas.width;
+    const h = graphCanvas.height;
+    graphCtx.clearRect(0,0,w,h);
+   
+    const padL = 55; 
+    const padB = 40;
+   
+    // Grid
+    graphCtx.strokeStyle = '#334155';
+    graphCtx.lineWidth = 1;
+    graphCtx.beginPath();
+    graphCtx.moveTo(padL, 20); graphCtx.lineTo(padL, h-padB); graphCtx.lineTo(w-20, h-padB);
+    graphCtx.stroke();
+
+    // Axis Labels
+    graphCtx.fillStyle = '#cbd5e1';
+    graphCtx.font = "bold 13px system-ui";
+    graphCtx.textAlign = "center";
+    graphCtx.fillText("0°C", padL, h-10);
+    graphCtx.fillText("100°C", w-20, h-10);
+
+    graphCtx.save();
+    graphCtx.translate(20, h/2);
+    graphCtx.rotate(-Math.PI/2);
+    graphCtx.fillStyle = "#fff";
+    graphCtx.font = "bold 14px system-ui"; 
+    graphCtx.fillText("[Pb²⁺] · [I⁻]²", 0, 0); 
+    graphCtx.restore();
+
+    // Plot Curves
+    const minLog = -9;
+    const maxLog = -5;
+
+    // Ksp curve
+    graphCtx.strokeStyle = '#10b981';
+    graphCtx.lineWidth = 3; 
+    graphCtx.beginPath();
+    for(let t=0; t<=100; t+=2) {
+        const k = getKsp(t);
+        const yNorm = (Math.log10(k) - minLog) / (maxLog - minLog);
+        const x = padL + (t/100)*(w-padL-20);
+        const y = (h-padB) - (yNorm * (h-padB-20));
+        if(t===0) graphCtx.moveTo(x,y); else graphCtx.lineTo(x,y);
+    }
+    graphCtx.stroke();
+
+    // Q dot
+    if (sim.Q > 0) {
+        const qLog = Math.log10(sim.Q);
+        const yNorm = (qLog - minLog) / (maxLog - minLog);
+        const x = padL + (sim.displayTemp/100)*(w-padL-20);
+        const y = (h-padB) - (yNorm * (h-padB-20));
+       
+        const cy = Math.max(20, Math.min(h-padB, y));
+       
+        graphCtx.fillStyle = sim.Q > sim.Ksp ? '#fbbf24' : '#fff';
+        graphCtx.beginPath(); 
+        graphCtx.arc(x, cy, 7, 0, Math.PI*2); 
+        graphCtx.fill();
+       
+        if (sim.Q > sim.Ksp) {
+             graphCtx.fillStyle = '#fbbf24';
+             graphCtx.textAlign = 'left';
+             graphCtx.font = "bold 12px monospace";
+             graphCtx.fillText("Bundfald!", x+10, cy);
+        }
+    }
+
+    // User Guess
+    if (sim.userGuessTemp !== null) {
+        const x = padL + (sim.userGuessTemp/100)*(w-padL-20);
+        graphCtx.strokeStyle = 'rgba(255,255,255,0.4)';
+        graphCtx.setLineDash([4,4]);
+        graphCtx.beginPath(); graphCtx.moveTo(x, 20); graphCtx.lineTo(x, h-padB); graphCtx.stroke();
+        graphCtx.setLineDash([]);
+       
+        const feedback = document.getElementById('guess-feedback');
+        if (sim.Q > sim.Ksp && sim.saturationTemp) {
+             const err = Math.abs(sim.userGuessTemp - sim.saturationTemp);
+             if (err < 3) feedback.innerHTML = `🎯 <b>Korrekt!</b> (Mætning: ${sim.saturationTemp.toFixed(1)}°C)`;
+             else feedback.innerText = `Gæt: ${sim.userGuessTemp.toFixed(1)}°C. Faktisk: ${sim.saturationTemp.toFixed(1)}°C`;
+        }
+    }
+}
+
+// Events
+// Opdaterer timestamp ved interaktion
+document.getElementById('input-pb').oninput = (e) => { sim.massPb = parseFloat(e.target.value); sim.triggerActivity(); };
+document.getElementById('input-ki').oninput = (e) => { sim.massKI = parseFloat(e.target.value); sim.triggerActivity(); };
+document.getElementById('input-temp').oninput = (e) => { sim.temp = parseFloat(e.target.value); sim.triggerActivity(); };
+
+graphCanvas.onmousedown = (e) => {
+    const rect = graphCanvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const w = graphCanvas.width;
+    const padL = 55; 
+    if (x > padL) {
+        let t = ((x-padL)/(w-padL-20))*100;
+        sim.userGuessTemp = Math.max(0, Math.min(100, t));
+    }
+};
+
+loop();
+</script>
+</body>
+</html>

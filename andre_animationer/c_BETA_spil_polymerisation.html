@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title>Polyethen Polymerisation Simulator</title>
+    <style>
+        body {
+            margin: 0;
+            background: #111;
+            color: #eee;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #game-container {
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 255, 200, 0.1);
+            border: 2px solid #333;
+        }
+        canvas {
+            background: radial-gradient(circle at center, #1a2a3a 0%, #000000 100%);
+            display: block;
+        }
+        #ui-layer {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+        }
+        .stat-box {
+            background: rgba(0, 0, 0, 0.7);
+            border-left: 4px solid #00ffcc;
+            padding: 10px 20px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        h1 { margin: 0; font-size: 1.2rem; color: #00ffcc; text-transform: uppercase; letter-spacing: 2px; }
+        p { margin: 5px 0 0; font-size: 0.9rem; color: #ccc; }
+        .value { font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.1rem; color: #fff; }
+        
+        #overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            text-align: center;
+        }
+        #overlay h2 { font-size: 3rem; margin: 0 0 20px; color: #00ffcc; text-shadow: 0 0 20px #00ffcc; }
+        #overlay p { font-size: 1.2rem; max-width: 600px; line-height: 1.6; margin-bottom: 30px; }
+        button {
+            background: #00ffcc;
+            color: #000;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover { transform: scale(1.05); box-shadow: 0 0 30px #00ffcc; }
+        .legend { display: flex; gap: 20px; margin-top: 20px; font-size: 0.9rem; }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .key-hint { position: absolute; bottom: 20px; width: 100%; text-align: center; opacity: 0.5; font-size: 0.8rem;}
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <canvas id="chemCanvas"></canvas>
+    
+    <div id="ui-layer">
+        <div class="stat-box">
+            <h1>Polyethen Kæde</h1>
+            <p>Molar Masse: <span id="molar-mass" class="value">0</span> g/mol</p>
+            <p>Monomerer ($n$): <span id="unit-count" class="value">0</span></p>
+        </div>
+        <div class="stat-box">
+            <h1>Reaktionsdata</h1>
+            <p>Hastighed (Temp): <span id="temp-display" class="value">298</span> K</p>
+        </div>
+    </div>
+
+    <div id="overlay">
+        <h2 id="title-text">POLYMERISERING</h2>
+        <p id="desc-text">Styr <strong>Initiator-radikalet</strong>. Fang <strong>Ethen</strong> molekyler for at bryde dobbeltbindingen og forlænge kæden.<br><br>Undgå andre frie initiatorer – det fører til TERMINERING!</p>
+        <div class="legend">
+            <div class="legend-item"><div class="dot" style="background:#00ffcc"></div>Ethen (Monomer)</div>
+            <div class="legend-item"><div class="dot" style="background:#ff3366"></div>Frie Initiatorer (Fare)</div>
+        </div>
+        <br>
+        <button id="start-btn">START REAKTION</button>
+    </div>
+    <div class="key-hint">Brug PILETASTERNE til at styre radikalet</div>
+</div>
+
+<script>
+/**
+ * POLYMERISATION SIMULATOR ENGINE
+ * Concepts: Grid-based movement (Snake logic), Collision detection, Particle Systems.
+ */
+
+const canvas = document.getElementById('chemCanvas');
+const ctx = canvas.getContext('2d');
+const uiMass = document.getElementById('molar-mass');
+const uiCount = document.getElementById('unit-count');
+const uiTemp = document.getElementById('temp-display');
+const overlay = document.getElementById('overlay');
+const startBtn = document.getElementById('start-btn');
+const titleText = document.getElementById('title-text');
+const descText = document.getElementById('desc-text');
+
+// Configuration
+const GRID_SIZE = 25;
+const COLS = 32;
+const ROWS = 24;
+const MOLAR_MASS_ETHENE = 28.05; // g/mol
+const MOLAR_MASS_INITIATOR = 15.00; // arbitrary R-group
+const BASE_SPEED = 150; // ms per frame
+
+canvas.width = COLS * GRID_SIZE;
+canvas.height = ROWS * GRID_SIZE;
+
+// Game State
+let gameLoopId;
+let lastTime = 0;
+let accumulator = 0;
+let stepInterval = BASE_SPEED;
+let isGameOver = false;
+let isPlaying = false;
+let score = 0; // number of ethene units
+
+// Entities
+let snake = []; // The polymer chain
+let direction = { x: 1, y: 0 };
+let nextDirection = { x: 1, y: 0 };
+let ethenes = [];
+let enemies = []; // Free initiators
+let particles = []; // Visual effects
+
+class Particle {
+    constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.vx = (Math.random() - 0.5) * 4;
+        this.vy = (Math.random() - 0.5) * 4;
+        this.life = 1.0;
+        this.decay = Math.random() * 0.05 + 0.02;
+    }
+    update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.life -= this.decay;
+    }
+    draw(ctx) {
+        ctx.globalAlpha = this.life;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1.0;
+    }
+}
+
+function spawnEthene() {
+    let valid = false;
+    let pos;
+    while (!valid) {
+        pos = {
+            x: Math.floor(Math.random() * COLS),
+            y: Math.floor(Math.random() * ROWS)
+        };
+        // Check collision with snake
+        valid = !snake.some(s => s.x === pos.x && s.y === pos.y);
+        // Check collision with enemies
+        if(valid) valid = !enemies.some(e => e.x === pos.x && e.y === pos.y);
+        // Check collision with existing ethenes
+        if(valid) valid = !ethenes.some(e => e.x === pos.x && e.y === pos.y);
+    }
+    ethenes.push(pos);
+}
+
+function spawnEnemy() {
+    let valid = false;
+    let pos;
+    while (!valid) {
+        pos = {
+            x: Math.floor(Math.random() * COLS),
+            y: Math.floor(Math.random() * ROWS)
+        };
+        // Avoid spawning too close to head
+        const head = snake[0] || {x: COLS/2, y: ROWS/2};
+        const dist = Math.abs(pos.x - head.x) + Math.abs(pos.y - head.y);
+        
+        valid = !snake.some(s => s.x === pos.x && s.y === pos.y) 
+                && !ethenes.some(e => e.x === pos.x && e.y === pos.y)
+                && dist > 5;
+    }
+    // Enemies have a velocity vector for smooth floating between grid steps
+    enemies.push({
+        x: pos.x, 
+        y: pos.y, 
+        moveTimer: 0, 
+        interval: 300 + Math.random() * 200 // Different speeds
+    });
+}
+
+function initGame() {
+    snake = [
+        { x: 10, y: 12 }, // Head (Radical)
+        { x: 9, y: 12 },  // Initiator tail
+        { x: 8, y: 12 }
+    ];
+    direction = { x: 1, y: 0 };
+    nextDirection = { x: 1, y: 0 };
+    score = 0;
+    stepInterval = BASE_SPEED;
+    isGameOver = false;
+    isPlaying = true;
+    
+    ethenes = [];
+    enemies = [];
+    particles = [];
+    
+    // Spawn initial items
+    for(let i=0; i<5; i++) spawnEthene();
+    for(let i=0; i<3; i++) spawnEnemy(); // Start with 3 terminator initiators
+
+    updateUI();
+    overlay.style.display = 'none';
+    lastTime = performance.now();
+    requestAnimationFrame(gameLoop);
+}
+
+function createExplosion(x, y, color) {
+    const screenX = x * GRID_SIZE + GRID_SIZE/2;
+    const screenY = y * GRID_SIZE + GRID_SIZE/2;
+    for(let i=0; i<10; i++) {
+        particles.push(new Particle(screenX, screenY, color));
+    }
+}
+
+function update(dt) {
+    if (!isPlaying) return;
+
+    // Update Particles
+    particles = particles.filter(p => p.life > 0);
+    particles.forEach(p => p.update());
+
+    // Enemy AI (Random Walk)
+    enemies.forEach(enemy => {
+        enemy.moveTimer += dt;
+        if (enemy.moveTimer > enemy.interval) {
+            enemy.moveTimer = 0;
+            const moves = [{x:0, y:1}, {x:0, y:-1}, {x:1, y:0}, {x:-1, y:0}];
+            const move = moves[Math.floor(Math.random() * moves.length)];
+            const newX = enemy.x + move.x;
+            const newY = enemy.y + move.y;
+            
+            // Simple bound check
+            if (newX >= 0 && newX < COLS && newY >= 0 && newY < ROWS) {
+                enemy.x = newX;
+                enemy.y = newY;
+            }
+        }
+    });
+
+    // Snake Movement Logic
+    accumulator += dt;
+    if (accumulator > stepInterval) {
+        accumulator -= stepInterval;
+        direction = nextDirection;
+
+        const head = snake[0];
+        const newHead = { x: head.x + direction.x, y: head.y + direction.y };
+
+        // 1. Wall Collision (Wrap around or Die? Let's Wrap for flow, but game logic says terminate)
+        // Hard mode: Die on wall. Educational mode: Wrap. Let's wrap but maybe penalize? 
+        // Let's do simple Wrap for better UX.
+        if (newHead.x < 0) newHead.x = COLS - 1;
+        if (newHead.x >= COLS) newHead.x = 0;
+        if (newHead.y < 0) newHead.y = ROWS - 1;
+        if (newHead.y >= ROWS) newHead.y = 0;
+
+        // 2. Self Collision
+        if (snake.some(s => s.x === newHead.x && s.y === newHead.y)) {
+            gameOver("Kæden kollapsede (Self-entanglement)");
+            return;
+        }
+
+        // 3. Enemy Collision (Termination)
+        if (enemies.some(e => e.x === newHead.x && e.y === newHead.y)) {
+            gameOver("TERMINERING: Kæden ramte en fri initiator!");
+            createExplosion(newHead.x, newHead.y, '#ff3366');
+            return;
+        }
+
+        // 4. Ethene Collision (Propagation)
+        const etheneIndex = ethenes.findIndex(e => e.x === newHead.x && e.y === newHead.y);
+        
+        snake.unshift(newHead); // Move head forward
+
+        if (etheneIndex !== -1) {
+            // Ate Ethene
+            ethenes.splice(etheneIndex, 1);
+            score++;
+            createExplosion(newHead.x, newHead.y, '#00ffcc'); // Bond breaking effect
+            spawnEthene();
+            
+            // Difficulty curve: Speed up + Add enemies occasionally
+            stepInterval = Math.max(50, BASE_SPEED - (score * 2));
+            
+            if (score % 5 === 0) {
+                spawnEthene(); // More food appears as chaos increases
+            }
+            if (score % 8 === 0) {
+                spawnEnemy(); // More terminators
+                uiTemp.style.color = "#ff3366"; // Visual warning
+                setTimeout(() => uiTemp.style.color = "#fff", 500);
+            }
+
+        } else {
+            // Didn't eat, remove tail
+            snake.pop();
+        }
+
+        // Also check if head hit enemy AFTER move (edge case where enemy moved into head)
+        // Handled by update loop speed vs grid speed diff, but safe enough.
+
+        updateUI();
+    }
+}
+
+function draw() {
+    // Clear
+    ctx.fillStyle = '#111';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw Grid (Subtle)
+    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let x = 0; x <= canvas.width; x += GRID_SIZE) { ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); }
+    for (let y = 0; y <= canvas.height; y += GRID_SIZE) { ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); }
+    ctx.stroke();
+
+    // Draw Ethenes
+    ethenes.forEach(e => {
+        const cx = e.x * GRID_SIZE + GRID_SIZE/2;
+        const cy = e.y * GRID_SIZE + GRID_SIZE/2;
+        
+        // Chemical structure visualization: C=C
+        ctx.fillStyle = '#00ffcc';
+        ctx.beginPath(); ctx.arc(cx - 5, cy, 4, 0, Math.PI*2); ctx.fill(); // C
+        ctx.beginPath(); ctx.arc(cx + 5, cy, 4, 0, Math.PI*2); ctx.fill(); // C
+        
+        // Double bond lines
+        ctx.strokeStyle = '#00ffcc';
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(cx-5, cy-2); ctx.lineTo(cx+5, cy-2); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx-5, cy+2); ctx.lineTo(cx+5, cy+2); ctx.stroke();
+    });
+
+    // Draw Enemies (Initiators)
+    enemies.forEach(e => {
+        const cx = e.x * GRID_SIZE + GRID_SIZE/2;
+        const cy = e.y * GRID_SIZE + GRID_SIZE/2;
+        
+        ctx.fillStyle = '#ff3366';
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#ff3366';
+        ctx.beginPath();
+        // Jagged shape for danger
+        ctx.moveTo(cx, cy - 8);
+        ctx.lineTo(cx + 7, cy + 5);
+        ctx.lineTo(cx - 7, cy + 5);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        
+        // "R." text
+        ctx.fillStyle = '#fff';
+        ctx.font = '10px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('R•', cx, cy+14);
+    });
+
+    // Draw Snake (Polymer Chain)
+    snake.forEach((seg, index) => {
+        const cx = seg.x * GRID_SIZE + GRID_SIZE/2;
+        const cy = seg.y * GRID_SIZE + GRID_SIZE/2;
+        
+        const isHead = index === 0;
+
+        if (isHead) {
+            // Active Radical Site
+            ctx.fillStyle = '#fff';
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = '#00ffcc';
+            ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI*2); ctx.fill();
+            ctx.shadowBlur = 0;
+            
+            // The electron dot
+            ctx.fillStyle = '#ff0000';
+            ctx.beginPath(); ctx.arc(cx + 4, cy - 4, 2, 0, Math.PI*2); ctx.fill();
+        } else {
+            // Backbone CH2
+            ctx.fillStyle = '#00aa88';
+            ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI*2); ctx.fill();
+            
+            // Bonds connecting segments
+            if (index > 0) {
+                const prev = snake[index - 1];
+                const px = prev.x * GRID_SIZE + GRID_SIZE/2;
+                const py = prev.y * GRID_SIZE + GRID_SIZE/2;
+                ctx.strokeStyle = '#008866';
+                ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(px, py); ctx.stroke();
+            }
+        }
+    });
+
+    // Draw Particles
+    particles.forEach(p => p.draw(ctx));
+}
+
+function updateUI() {
+    const totalMass = (score * MOLAR_MASS_ETHENE) + MOLAR_MASS_INITIATOR;
+    uiMass.innerText = totalMass.toFixed(2);
+    uiCount.innerText = score;
+    
+    // Simulate temperature rise with reaction speed
+    const temp = 298 + (score * 5);
+    uiTemp.innerText = temp;
+}
+
+function gameOver(reason) {
+    isPlaying = false;
+    titleText.innerText = "REAKTION STOPPET";
+    descText.innerHTML = `${reason}<br><br>Du dannede en polyethen-kæde med <strong>${score}</strong> enheder.<br>Molar masse: <strong>${((score * MOLAR_MASS_ETHENE) + MOLAR_MASS_INITIATOR).toFixed(2)} g/mol</strong>`;
+    startBtn.innerText = "NY SYNTESE";
+    overlay.style.display = 'flex';
+}
+
+function gameLoop(timestamp) {
+    if (!lastTime) lastTime = timestamp;
+    const dt = timestamp - lastTime;
+    lastTime = timestamp;
+
+    if (isPlaying) {
+        update(dt);
+        draw();
+        gameLoopId = requestAnimationFrame(gameLoop);
+    }
+}
+
+// Input Handling
+window.addEventListener('keydown', e => {
+    if (!isPlaying) return;
+    switch(e.key) {
+        case 'ArrowUp': if(direction.y === 0) nextDirection = {x: 0, y: -1}; break;
+        case 'ArrowDown': if(direction.y === 0) nextDirection = {x: 0, y: 1}; break;
+        case 'ArrowLeft': if(direction.x === 0) nextDirection = {x: -1, y: 0}; break;
+        case 'ArrowRight': if(direction.x === 0) nextDirection = {x: 1, y: 0}; break;
+    }
+});
+
+startBtn.addEventListener('click', initGame);
+
+// Initial Draw
+draw();
+
+</script>
+</body>
+</html>

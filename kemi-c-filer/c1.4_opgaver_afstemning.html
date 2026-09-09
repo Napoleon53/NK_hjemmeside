@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Afstemning af reaktionsskemaer</title>
+<style>
+:root{--primary:#2c3e50;--accent:#3498db;--success:#27ae60;--warning:#f39c12;--danger:#e74c3c;--bg:#f8f9fa;--panel:#ffffff;--border:#dee2e6;}
+body{font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background-color:var(--bg);color:var(--primary);display:flex;flex-direction:column;align-items:center;margin:0;padding:10px;min-height:100vh;}
+h1{margin:0 0 6px 0;font-size:1.3rem;text-transform:uppercase;letter-spacing:1px;color:#7f8c8d;}
+
+.game-wrapper{width:100%;max-width:950px;background:var(--panel);border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.08);overflow:hidden;display:flex;flex-direction:column; border: 1px solid #bdc3c7;}
+
+/* --- TABS --- */
+.level-tabs{display:flex;background:#ecf0f1;padding:0;border-bottom:1px solid var(--border); overflow-x: auto;}
+.tab-btn{flex:1;padding:8px 15px;border:none;background:transparent;color:#95a5a6;cursor:pointer;font-weight:700;transition:0.2s;border-bottom:4px solid transparent; min-width: 120px; white-space: nowrap; font-size: 0.95rem;}
+.tab-btn:hover{background:rgba(0,0,0,0.02);}
+.tab-btn.active{color:var(--primary);border-bottom-color:var(--accent);background:#fff;}
+.tab-stars{font-size:0.75rem;letter-spacing:2px;margin-top:2px;}
+.tab-stars .star-on{color:#f1c40f;}
+.tab-stars .star-off{color:#dce0e2;}
+
+/* --- CONTROLS (TOP) --- */
+.controls-section{padding:12px 20px;background:var(--panel);display:flex;flex-direction:column;align-items:center; z-index: 5;}
+.reaction-grid {
+    display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px; width: 100%; margin-bottom: 10px;
+}
+.arrow { font-size: 2.5rem; color: #95a5a6; margin: 0 10px; font-weight: 300; }
+
+.molecule-ctrl{
+    display:flex; flex-direction:column; align-items:center;
+    background:#fff; border:1px solid #e0e0e0; border-radius:10px; padding:8px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.04); min-width: 100px;
+}
+.mol-title{font-weight:700;margin-bottom:5px;font-size:1.1rem;}
+.stepper{display:flex;align-items:center;gap:10px;}
+.step-btn{width:32px;height:32px;border-radius:50%;border:none;color:white;font-size:1.3rem;cursor:pointer;display:flex;justify-content:center;align-items:center;transition:0.1s;}
+.step-btn:active{transform:scale(0.95);}
+.btn-minus{background:var(--danger);}
+.btn-plus{background:var(--success);}
+.coeff-display{font-size:1.5rem;font-weight:700;width:30px;text-align:center;}
+
+.action-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;}
+.check-btn{background:var(--primary);color:#fff;border:none;padding:10px 40px;font-size:1rem;font-weight:bold;border-radius:6px;cursor:pointer;transition:background 0.2s; text-transform:uppercase; letter-spacing: 1px;}
+.check-btn:hover{background:#34495e;}
+.reset-btn{background:transparent;color:#7f8c8d;border:1px solid #bdc3c7;padding:10px 24px;font-size:0.9rem;font-weight:bold;border-radius:6px;cursor:pointer;transition:0.2s; text-transform:uppercase; letter-spacing: 1px;}
+.reset-btn:hover{background:#ecf0f1;color:var(--primary);}
+.intro-btn{background:#fff;color:var(--accent);border:2px solid var(--accent);padding:9px 22px;font-size:0.9rem;font-weight:bold;border-radius:6px;cursor:pointer;transition:0.2s;text-transform:uppercase;letter-spacing:1px;}
+.intro-btn:hover{background:var(--accent);color:#fff;}
+
+/* --- GUIDED TOUR --- */
+#tourBackdrop{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.55);z-index:2000;}
+#tourTooltip{position:fixed;z-index:2001;background:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.35);padding:16px 20px;width:300px;font-size:0.95rem;line-height:1.4;color:var(--primary);}
+#tourTooltip .tour-step-count{font-size:0.75rem;color:#95a5a6;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:700;}
+#tourTooltip .tour-text{margin-bottom:14px;}
+#tourTooltip .tour-nav{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+#tourTooltip .tour-nav button{border:none;border-radius:5px;padding:7px 14px;font-weight:700;cursor:pointer;font-size:0.85rem;}
+#tourTooltip .tour-btn-skip{background:transparent;color:#95a5a6;}
+#tourTooltip .tour-btn-skip:hover{color:var(--danger);}
+#tourTooltip .tour-btn-prev{background:#ecf0f1;color:var(--primary);}
+#tourTooltip .tour-btn-prev:hover{background:#dfe4e6;}
+#tourTooltip .tour-btn-next{background:var(--accent);color:#fff;}
+#tourTooltip .tour-btn-next:hover{background:#2980b9;}
+
+.msg-box {
+    margin-top: 6px; padding: 6px 20px; border-radius: 6px; font-weight: 600; text-align: center;
+    opacity: 0; transition: opacity 0.3s; min-height: 20px; font-size: 0.95rem; width: 100%;
+}
+.msg-error { background: #fcebeb; color: #c0392b; border: 1px solid #fadbd8; animation: shake 0.4s ease-in-out; }
+.msg-warn { background: #fef9e7; color: #f39c12; border: 1px solid #fdebd0; }
+@keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); } }
+
+/* --- CANVAS AREA (MIDDLE) --- */
+.canvas-container{position:relative;width:100%;min-height:100px;background:linear-gradient(to bottom,#fdfbfb,#eff3f5);border-top:1px solid var(--border);border-bottom:1px solid var(--border); overflow: hidden;}
+canvas{display:block;width:100%;height:100%;}
+
+.overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.95);display:flex;flex-direction:column;justify-content:center;align-items:center;opacity:0;pointer-events:none;transition:opacity 0.3s ease;z-index:10;overflow:hidden;}
+.overlay.visible{opacity:1;pointer-events:all;}
+.win-title{font-size:2.5rem;color:var(--success);font-weight:800;margin-bottom:10px;}
+.overlay.visible .win-title{animation:winPop 0.5s ease-out;}
+.win-smiley{font-size:5.5rem;line-height:1;margin-bottom:4px;}
+.overlay.visible .win-smiley{animation:winPop 0.5s ease-out;}
+@keyframes winPop{0%{transform:scale(0.3) rotate(-8deg);opacity:0;}60%{transform:scale(1.15) rotate(3deg);opacity:1;}100%{transform:scale(1) rotate(0);opacity:1;}}
+.next-btn{margin-top:20px;padding:12px 35px;font-size:1.1rem;background:var(--success);color:white;border:none;border-radius:6px;cursor:pointer;font-weight:bold;}
+
+/* --- LEVEL CONTEXT BLURB --- */
+.level-context{width:100%;padding:6px 20px;background:#eaf2f8;color:#2c3e50;font-size:0.9rem;text-align:center;border-bottom:1px solid var(--border);box-sizing:border-box;}
+
+/* --- DATA TABLE (BOTTOM) --- */
+.data-panel{background:#f9f9f9;}
+.table-header {
+    display: grid; grid-template-columns: 1fr 1fr;
+    border-bottom: 2px solid #bdc3c7; background: #ecf0f1;
+    font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: #7f8c8d; padding: 7px 0;
+}
+.th-cell { text-align: center; }
+.atom-row { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #eee; }
+.cell-left { display: flex; justify-content: space-between; align-items: center; padding: 6px 30px; border-right: 1px solid #bdc3c7; }
+.cell-right { display: flex; justify-content: center; align-items: center; gap:10px; padding: 6px 30px; }
+.atom-name { font-weight: 600; color: #2c3e50; font-size: 1rem; }
+.count-val { font-weight: bold; font-size: 1.2rem; width: 40px; text-align: center; }
+.status-icon { font-weight: 800; font-size: 1.1rem; }
+.match-bg { background-color: #e8f5e9; color: #27ae60; }
+.mismatch-bg { background-color: #fdf2f2; color: #e74c3c; }
+</style>
+</head>
+<body>
+
+<h1>Afstemning af reaktionsskemaer</h1>
+
+<div class="game-wrapper">
+    <div class="level-tabs" id="levelTabs"></div>
+    <div class="level-context" id="levelContext"></div>
+
+    <div class="controls-section">
+        <div class="reaction-grid" id="reactionControls"></div>
+        <div class="action-row">
+            <button class="check-btn" onclick="app.checkAnswer()">TJEK SVAR</button>
+            <button class="reset-btn" onclick="app.resetLevel()">Nulstil</button>
+            <button class="intro-btn" onclick="app.startTour()">🔍 Opgave-introduktion</button>
+        </div>
+        <div id="msgBox" class="msg-box"></div>
+    </div>
+
+    <div class="canvas-container">
+        <canvas id="simCanvas"></canvas>
+        <div class="overlay" id="winOverlay">
+            <div class="win-smiley" id="winSmiley"></div>
+            <div class="win-title">AFSTEMT!</div>
+            <p style="font-size: 1.2rem;">Rigtigt! Massen er bevaret.</p>
+            <button class="next-btn" onclick="app.nextLevel()">Næste Opgave</button>
+        </div>
+    </div>
+
+    <div class="data-panel">
+        <div class="table-header">
+            <div class="th-cell" style="text-align:right; padding-right:40px;">Venstre Side</div>
+            <div class="th-cell" style="text-align:left; padding-left:40px;">Højre Side</div>
+        </div>
+        <div id="scoreBoard"></div>
+    </div>
+</div>
+
+<script>
+/* ATOM CONFIG */
+const STYLE = {
+    H: {c:'#ecf0f1', r:14, b:'#bdc3c7', txt:'#333'},
+    O: {c:'#e74c3c', r:22, b:'#c0392b', txt:'#fff'},
+    C: {c:'#34495e', r:22, b:'#2c3e50', txt:'#fff'},
+    N: {c:'#3498db', r:22, b:'#2980b9', txt:'#fff'},
+    Fe: {c:'#7f8c8d', r:24, b:'#2c3e50', txt:'#fff'}, // Jern
+    Mg: {c:'#9b59b6', r:22, b:'#8e44ad', txt:'#fff'} // Magnesium
+};
+const NAMES = { H:'Hydrogen', O:'Oxygen', C:'Carbon', N:'Nitrogen', Fe:'Jern', Mg:'Magnesium' };
+const SMILEYS = ['😄','😃','😁','🤩','😎','🥳','🤗','🙌','🌟','🎉','👏','💪','🔥','🚀','✨','🏆','😺','👍'];
+const MOL_SCALE = 0.65; // skalerer atomer/molekyler og mellemrum ned, så tegneområdet fylder mindre
+
+/* LEVELS DATA (sorteret efter stigende sværhedsgrad) */
+const LEVELS = [
+    {
+        id: 'magnesium',
+        title: '1. Magnesium',
+        type: 'micro',
+        difficulty: 1,
+        blurb: 'Magnesium brænder med et blændende hvidt lys og bruges bl.a. i fyrværkeri og bengalsk ild.',
+        // 2Mg + O2 -> 2MgO
+        reactants: [
+            { name: 'Mg', comp: {Mg:1}, atoms:[{e:'Mg',x:0,y:0}] },
+            { name: 'O₂', comp: {O:2}, atoms:[{e:'O',x:-22,y:0},{e:'O',x:22,y:0}] }
+        ],
+        products: [
+            { name: 'MgO', comp: {Mg:1, O:1}, atoms:[{e:'Mg',x:-16,y:0},{e:'O',x:16,y:0}] }
+        ]
+    },
+    {
+        id: 'water',
+        title: '2. Vand',
+        type: 'micro',
+        difficulty: 1,
+        blurb: 'Denne reaktion driver bl.a. brintceller og rumraketmotorer: hydrogen reagerer med ilt og danner vand.',
+        // 2H2 + O2 -> 2H2O
+        reactants: [
+            { name: 'H₂', comp: {H:2}, atoms:[{e:'H',x:-15,y:0},{e:'H',x:15,y:0}] },
+            { name: 'O₂', comp: {O:2}, atoms:[{e:'O',x:-22,y:0},{e:'O',x:22,y:0}] }
+        ],
+        products: [
+            { name: 'H₂O', comp: {H:2, O:1}, atoms:[{e:'O',x:0,y:-10},{e:'H',x:-20,y:15},{e:'H',x:20,y:15}] }
+        ]
+    },
+    {
+        id: 'peroxide',
+        title: '3. Peroxid',
+        type: 'micro',
+        difficulty: 2,
+        blurb: 'Hydrogenperoxid bruges bl.a. til at desinficere sår og blege hår - det henfalder langsomt til vand og ilt.',
+        // 2H2O2 -> 2H2O + O2
+        reactants: [
+            { name: 'H₂O₂', comp: {H:2, O:2}, atoms:[{e:'O',x:-15,y:0},{e:'O',x:15,y:0},{e:'H',x:-35,y:-18},{e:'H',x:35,y:-18}] }
+        ],
+        products: [
+            { name: 'H₂O', comp: {H:2, O:1}, atoms:[{e:'O',x:0,y:-10},{e:'H',x:-20,y:15},{e:'H',x:20,y:15}] },
+            { name: 'O₂', comp: {O:2}, atoms:[{e:'O',x:-22,y:0},{e:'O',x:22,y:0}] }
+        ]
+    },
+    {
+        id: 'ammonia',
+        title: '4. Ammoniak',
+        type: 'micro',
+        difficulty: 2,
+        blurb: 'Ammoniak fremstilles industrielt ved Haber-Bosch-processen og bruges som base for kunstgødning.',
+        // N2 + 3H2 -> 2NH3
+        reactants: [
+            { name: 'N₂', comp: {N:2}, atoms:[{e:'N',x:-22,y:0},{e:'N',x:22,y:0}] },
+            { name: 'H₂', comp: {H:2}, atoms:[{e:'H',x:-15,y:0},{e:'H',x:15,y:0}] }
+        ],
+        products: [
+            { name: 'NH₃', comp: {N:1, H:3}, atoms:[{e:'N',x:0,y:-5},{e:'H',x:-22,y:18},{e:'H',x:22,y:18},{e:'H',x:0,y:-30}] }
+        ]
+    },
+    {
+        id: 'methane',
+        title: '5. Methan',
+        type: 'micro',
+        difficulty: 2,
+        blurb: 'Fuldstændig forbrænding af metan (naturgas) frigiver energi og danner kuldioxid og vand.',
+        // CH4 + 2O2 -> CO2 + 2H2O
+        reactants: [
+            {
+                name: 'CH₄',
+                comp: {C:1, H:4},
+                atoms:[
+                    {e:'C',x:0,y:0}, // Center C
+                    {e:'H',x:0,y:-35}, {e:'H',x:0,y:35}, // Top/Bot H
+                    {e:'H',x:-35,y:0}, {e:'H',x:35,y:0}  // Left/Right H
+                ]
+            },
+            { name: 'O₂', comp: {O:2}, atoms:[{e:'O',x:-22,y:0},{e:'O',x:22,y:0}] }
+        ],
+        products: [
+            { name: 'CO₂', comp: {C:1, O:2}, atoms:[{e:'C',x:0,y:0},{e:'O',x:-44,y:0},{e:'O',x:44,y:0}] },
+            { name: 'H₂O', comp: {H:2, O:1}, atoms:[{e:'O',x:0,y:-10},{e:'H',x:-20,y:15},{e:'H',x:20,y:15}] }
+        ]
+    },
+    {
+        id: 'iron_steam',
+        title: '6. Jern & Damp',
+        type: 'micro',
+        difficulty: 3,
+        blurb: 'Når jern reagerer med vanddamp dannes magnetit (Fe₃O₄) og hydrogen – en reaktion man bl.a. ser ved korrosion i dampkedler.',
+        // 3Fe + 4H2O -> Fe3O4 + 4H2
+        reactants: [
+            { name: 'Fe', comp: {Fe:1}, atoms:[{e:'Fe',x:0,y:0}] },
+            { name: 'H₂O', comp: {H:2, O:1}, atoms:[{e:'O',x:0,y:-10},{e:'H',x:-20,y:15},{e:'H',x:20,y:15}] }
+        ],
+        products: [
+            {
+                name: 'Fe₃O₄',
+                comp: {Fe:3, O:4},
+                // A stylized crystal lattice cluster
+                atoms:[
+                    {e:'Fe',x:-30,y:10}, {e:'Fe',x:30,y:10}, {e:'Fe',x:0,y:-25}, // 3 Iron
+                    {e:'O',x:0,y:15}, {e:'O',x:-30,y:-25}, {e:'O',x:30,y:-25}, {e:'O',x:0,y:-55} // 4 Oxygen
+                ]
+            },
+            { name: 'H₂', comp: {H:2}, atoms:[{e:'H',x:-15,y:0},{e:'H',x:15,y:0}] }
+        ]
+    },
+    {
+        id: 'propane',
+        title: '7. Propan',
+        type: 'micro',
+        difficulty: 3,
+        blurb: 'Propan er brændstoffet i campinggas-flasker. Fuldstændig forbrænding danner kuldioxid og vand.',
+        // C3H8 + 5O2 -> 3CO2 + 4H2O
+        reactants: [
+            {
+                name: 'C₃H₈',
+                comp: {C:3, H:8},
+                atoms:[
+                    {e:'C',x:-40,y:0}, {e:'C',x:0,y:0}, {e:'C',x:40,y:0}, // 3 Carbon-kæde
+                    {e:'H',x:-40,y:-32}, {e:'H',x:-58,y:20}, {e:'H',x:-22,y:20}, // H på C1
+                    {e:'H',x:0,y:-32}, {e:'H',x:0,y:32}, // H på C2
+                    {e:'H',x:40,y:-32}, {e:'H',x:58,y:20}, {e:'H',x:22,y:20} // H på C3
+                ]
+            },
+            { name: 'O₂', comp: {O:2}, atoms:[{e:'O',x:-22,y:0},{e:'O',x:22,y:0}] }
+        ],
+        products: [
+            { name: 'CO₂', comp: {C:1, O:2}, atoms:[{e:'C',x:0,y:0},{e:'O',x:-44,y:0},{e:'O',x:44,y:0}] },
+            { name: 'H₂O', comp: {H:2, O:1}, atoms:[{e:'O',x:0,y:-10},{e:'H',x:-20,y:15},{e:'H',x:20,y:15}] }
+        ]
+    }
+];
+
+/* GUIDED TOUR STEPS */
+const TOUR_STEPS = [
+    { sel: '#levelTabs', text: 'Foroven vælger du mellem opgaverne. Stjernerne viser sværhedsgraden, og et ✅ betyder, at du allerede har løst opgaven.' },
+    { sel: '#reactionControls', text: 'Her ser du reaktionen. Brug + og − til at ændre koefficienterne (antal molekyler foran hvert stof), så antallet af atomer stemmer overens på begge sider af pilen.' },
+    { sel: '.canvas-container', text: 'Tegningen viser molekylerne ud fra dine koefficienter. Tæl selv atomerne, hvis du er i tvivl om, hvorvidt det stemmer.' },
+    { sel: '.data-panel', text: 'Tabellen holder regnskab: den tæller automatisk antallet af hver atomtype på venstre og højre side. Grøn med ✓ betyder, at det stemmer - rød med ✗ betyder, at det ikke gør endnu.' },
+    { sel: '.check-btn', text: 'Når du tror, ligningen er afstemt, trykker du her. Husk, at koefficienterne skal være det mindst mulige hele tal-forhold (fx 1:2, ikke 2:4).' },
+    { sel: '.reset-btn', text: 'Fortrudt undervejs? Klik her for at nulstille alle koefficienter til udgangspunktet.' }
+];
+
+class App {
+    constructor(){
+        this.canvas=document.getElementById('simCanvas');
+        this.ctx=this.canvas.getContext('2d');
+        this.level=0;
+        this.coeffs={r:[],p:[]};
+        this.solved=new Set();
+        this.hoverElement=null;
+        this.lastSmiley=-1;
+        this.initLevel(0);
+
+        window.addEventListener('resize', ()=>this.updateLayout());
+        this.loop();
+    }
+
+    updateLayout(){
+        const container=this.canvas.parentElement;
+        const w=container.offsetWidth;
+        const l=LEVELS[this.level];
+        const half=((w/2)-60)/MOL_SCALE;
+        const {maxY:maxYR}=this.computePositions(l.reactants,this.coeffs.r,60/MOL_SCALE,half);
+        const {maxY:maxYP}=this.computePositions(l.products,this.coeffs.p,((w/2)+60)/MOL_SCALE,half);
+        const contentHeight = Math.max(maxYR,maxYP)*MOL_SCALE + 80*MOL_SCALE;
+        const overlayVisible = document.getElementById('winOverlay').classList.contains('visible');
+        const floor = overlayVisible ? 210 : 100;
+        const needed=Math.max(floor, contentHeight);
+        container.style.height=needed+'px';
+        this.w=w;
+        this.h=needed;
+        this.dpr=window.devicePixelRatio||1;
+        this.canvas.width=Math.round(this.w*this.dpr);
+        this.canvas.height=Math.round(this.h*this.dpr);
+    }
+
+    initLevel(idx){
+        this.level=idx;
+        const l=LEVELS[idx];
+        this.coeffs.r=new Array(l.reactants.length).fill(1);
+        this.coeffs.p=new Array(l.products.length).fill(1);
+        this.hoverElement=null;
+        document.getElementById('winOverlay').classList.remove('visible');
+        document.getElementById('levelContext').innerText=l.blurb||'';
+        this.showMessage('', '');
+        this.renderTabs();
+        this.renderControls();
+        this.updateBoard();
+        this.updateLayout();
+    }
+
+    nextLevel(){ this.initLevel((this.level+1)%LEVELS.length); }
+
+    startTour(){
+        if(!this.tourBackdrop){
+            this.tourBackdrop = document.createElement('div');
+            this.tourBackdrop.id = 'tourBackdrop';
+            document.body.appendChild(this.tourBackdrop);
+            this.tourTooltip = document.createElement('div');
+            this.tourTooltip.id = 'tourTooltip';
+            document.body.appendChild(this.tourTooltip);
+            this._tourReflow = ()=>this.showTourStep(this.tourIdx);
+            window.addEventListener('resize', this._tourReflow);
+            window.addEventListener('scroll', this._tourReflow, true);
+        }
+        this.showTourStep(0);
+    }
+
+    showTourStep(i){
+        this.tourIdx = i;
+        const step = TOUR_STEPS[i];
+        const target = document.querySelector(step.sel);
+        if(!target){ this.endTour(); return; }
+        target.scrollIntoView({block:'center', behavior:'auto'});
+
+        const r = target.getBoundingClientRect();
+        const pad = 6;
+        const x1 = Math.max(r.left-pad,0), y1 = Math.max(r.top-pad,0);
+        const x2 = Math.min(r.right+pad, window.innerWidth), y2 = Math.min(r.bottom+pad, window.innerHeight);
+        const poly = `polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, ${x1}px ${y1}px, ${x2}px ${y1}px, ${x2}px ${y2}px, ${x1}px ${y2}px, ${x1}px ${y1}px, 0 0)`;
+        this.tourBackdrop.style.clipPath = poly;
+        this.tourBackdrop.style.webkitClipPath = poly;
+
+        const isLast = i === TOUR_STEPS.length-1;
+        const prevBtnHtml = i>0 ? ('<button class="tour-btn-prev" onclick="app.showTourStep('+(i-1)+')">◀ Forrige</button>') : '';
+        const nextOnclick = isLast ? 'app.endTour()' : ('app.showTourStep('+(i+1)+')');
+        const nextLabel = isLast ? 'Afslut ✔' : 'Næste ▶';
+        this.tourTooltip.innerHTML = `
+            <div class="tour-step-count">Trin ${i+1} af ${TOUR_STEPS.length}</div>
+            <div class="tour-text">${step.text}</div>
+            <div class="tour-nav">
+                <button class="tour-btn-skip" onclick="app.endTour()">Afslut</button>
+                <div style="display:flex;gap:8px;">
+                    ${prevBtnHtml}
+                    <button class="tour-btn-next" onclick="${nextOnclick}">${nextLabel}</button>
+                </div>
+            </div>
+        `;
+
+        const tRect = this.tourTooltip.getBoundingClientRect();
+        let top = y2 + 14;
+        if(top + tRect.height > window.innerHeight - 10){
+            top = y1 - tRect.height - 14;
+            if(top < 10) top = 10;
+        }
+        let left = r.left + r.width/2 - tRect.width/2;
+        left = Math.max(10, Math.min(left, window.innerWidth - tRect.width - 10));
+        this.tourTooltip.style.top = top+'px';
+        this.tourTooltip.style.left = left+'px';
+    }
+
+    endTour(){
+        if(this.tourBackdrop){ this.tourBackdrop.remove(); this.tourBackdrop=null; }
+        if(this.tourTooltip){ this.tourTooltip.remove(); this.tourTooltip=null; }
+        if(this._tourReflow){
+            window.removeEventListener('resize', this._tourReflow);
+            window.removeEventListener('scroll', this._tourReflow, true);
+            this._tourReflow=null;
+        }
+    }
+
+    resetLevel(){
+        if(document.getElementById('winOverlay').classList.contains('visible'))return;
+        const l=LEVELS[this.level];
+        this.coeffs.r=new Array(l.reactants.length).fill(1);
+        this.coeffs.p=new Array(l.products.length).fill(1);
+        this.showMessage('','');
+        this.renderControls();
+        this.updateBoard();
+        this.updateLayout();
+    }
+
+    modCoeff(side,i,d){
+        if(document.getElementById('winOverlay').classList.contains('visible'))return;
+        const arr=side==='r'?this.coeffs.r:this.coeffs.p;
+        let v=arr[i]+d;
+        if(v<1)v=1; if(v>12)v=12;
+        arr[i]=v;
+        this.showMessage('','');
+        this.renderControls();
+        this.updateBoard();
+        this.updateLayout();
+    }
+    
+    getCounts(){
+        const l=LEVELS[this.level], left={}, right={};
+        const sum=(mols,c,store)=>mols.forEach((m,i)=>{for(let k in m.comp)store[k]=(store[k]||0)+m.comp[k]*c[i]});
+        sum(l.reactants,this.coeffs.r,left); sum(l.products,this.coeffs.p,right);
+        return {left,right};
+    }
+
+    showMessage(text, type) {
+        const box = document.getElementById('msgBox');
+        box.className = 'msg-box';
+        box.innerText = text;
+        if(text) {
+            box.style.opacity = 1;
+            if(type === 'error') box.classList.add('msg-error');
+            if(type === 'warn') box.classList.add('msg-warn');
+        } else {
+            box.style.opacity = 0;
+        }
+    }
+
+    checkAnswer(){
+        const {left,right}=this.getCounts();
+        const keys=new Set([...Object.keys(left),...Object.keys(right)]);
+        let bal=true;
+        keys.forEach(k=>{if((left[k]||0)!==(right[k]||0))bal=false;});
+
+        if(!bal) {
+            this.showMessage("Det stemmer ikke helt. Tjek atom-regnskabet i bunden.", "error");
+            return;
+        }
+        
+        // GCD Check
+        const all=[...this.coeffs.r,...this.coeffs.p];
+        const gcd=(a,b)=>!b?a:gcd(b,a%b);
+        const div=all.reduce((a,b)=>gcd(a,b));
+        
+        if(div>1) {
+            this.showMessage(`Rigtigt forhold, men kan forkortes! Kemikere bruger altid de mindste hele tal – divider alle koefficienter med ${div}.`, "warn");
+        } else {
+            document.getElementById('winSmiley').textContent = this.pickSmiley();
+            document.getElementById('winOverlay').classList.add('visible');
+            this.solved.add(this.level);
+            this.renderTabs();
+            this.updateLayout();
+        }
+    }
+
+    pickSmiley(){
+        let idx;
+        do { idx = Math.floor(Math.random()*SMILEYS.length); } while(idx===this.lastSmiley && SMILEYS.length>1);
+        this.lastSmiley = idx;
+        return SMILEYS[idx];
+    }
+
+    updateBoard(){
+        const {left,right}=this.getCounts();
+        const keys=new Set([...Object.keys(left),...Object.keys(right)]);
+        const board=document.getElementById('scoreBoard');
+        board.innerHTML='';
+        
+        keys.forEach(k=>{
+            const l=left[k]||0; const r=right[k]||0;
+            const match = l===r;
+            const row=document.createElement('div');
+            row.className = `atom-row ${match?'match-bg':'mismatch-bg'}`;
+            row.innerHTML = `
+                <div class="cell-left">
+                    <span class="atom-name">${NAMES[k]||k}</span>
+                    <span class="count-val">${l}</span>
+                </div>
+                <div class="cell-right">
+                    <span class="count-val">${r}</span>
+                    <span class="status-icon">${match?'✓':'✗'}</span>
+                </div>
+            `;
+            row.addEventListener('mouseenter', ()=>{ this.hoverElement=k; });
+            row.addEventListener('mouseleave', ()=>{ this.hoverElement=null; });
+            board.appendChild(row);
+        });
+    }
+
+    renderControls(){
+        const div=document.getElementById('reactionControls');
+        div.innerHTML='';
+        const l=LEVELS[this.level];
+        
+        l.reactants.forEach((m,i)=>div.appendChild(this.mkBtn(m,'r',i,this.coeffs.r[i])));
+        
+        const arrow = document.createElement('div'); arrow.className='arrow';
+        arrow.innerHTML = '⟶';
+        div.appendChild(arrow);
+        
+        l.products.forEach((m,i)=>div.appendChild(this.mkBtn(m,'p',i,this.coeffs.p[i])));
+    }
+
+    mkBtn(m,s,i,v){
+        const d=document.createElement('div'); d.className='molecule-ctrl';
+        d.innerHTML=`<div class="mol-title">${m.name}</div>
+        <div class="stepper">
+        <button class="step-btn btn-minus" onclick="app.modCoeff('${s}',${i},-1)">−</button>
+        <div class="coeff-display">${v}</div>
+        <button class="step-btn btn-plus" onclick="app.modCoeff('${s}',${i},1)">+</button>
+        </div>`;
+        return d;
+    }
+
+    renderTabs(){
+        const t=document.getElementById('levelTabs'); t.innerHTML='';
+        LEVELS.forEach((l,i)=>{
+            const b=document.createElement('button'); b.className=`tab-btn ${i===this.level?'active':''}`;
+            const doneMark = this.solved.has(i) ? ' ✅' : '';
+            let stars = '';
+            for(let s=0; s<3; s++){
+                stars += `<span class="${s < l.difficulty ? 'star-on' : 'star-off'}">★</span>`;
+            }
+            b.innerHTML = `<div>${l.title}${doneMark}</div><div class="tab-stars">${stars}</div>`;
+            b.onclick=()=>this.initLevel(i); t.appendChild(b);
+        });
+    }
+
+    drawMol(x,y,def){
+        def.atoms.forEach(a=>{
+            const s=STYLE[a.e]||STYLE.H;
+            if(this.hoverElement===a.e){
+                const pulse = 4 + Math.sin(performance.now()/200)*2;
+                this.ctx.beginPath();
+                this.ctx.arc(x+a.x, y+a.y, s.r+pulse, 0, Math.PI*2);
+                this.ctx.strokeStyle='rgba(52,152,219,0.9)';
+                this.ctx.lineWidth=3;
+                this.ctx.stroke();
+            }
+            this.ctx.beginPath();
+            this.ctx.arc(x+a.x, y+a.y, s.r, 0, Math.PI*2);
+            this.ctx.fillStyle=s.c; this.ctx.fill();
+            this.ctx.strokeStyle='rgba(0,0,0,0.2)'; this.ctx.lineWidth=1; this.ctx.stroke();
+            this.ctx.fillStyle=s.txt;
+            this.ctx.font='bold 16px Arial';
+            this.ctx.textAlign='center';
+            this.ctx.textBaseline='middle';
+            this.ctx.fillText(a.e, x+a.x, y+a.y);
+        });
+    }
+
+    /* Beregner positioner for en gruppe molekyler (bruges både til at tegne og til at måle nødvendig canvas-højde) */
+    computePositions(mols, coeffs, startX, widthAvailable) {
+        let currentX = startX;
+        let currentY = 80;
+        const spacingX = 140;
+        const spacingY = 140;
+        const positions = [];
+
+        mols.forEach((m, i) => {
+            const count = coeffs[i];
+            // Fe3O4 er større, giv mere plads
+            const isBig = (m.comp.Fe >= 3);
+            const effectiveSpacingX = isBig ? 180 : spacingX;
+            const effectiveSpacingY = isBig ? 160 : spacingY;
+
+            for(let c=0; c<count; c++) {
+                positions.push({x:currentX, y:currentY, m});
+                currentX += effectiveSpacingX;
+                if (currentX > startX + widthAvailable - 60) {
+                    currentX = startX;
+                    currentY += effectiveSpacingY;
+                }
+            }
+        });
+
+        const maxY = positions.length ? Math.max(...positions.map(p=>p.y)) : 80;
+        return {positions, maxY};
+    }
+
+    drawGroup(mols, coeffs, startX, widthAvailable) {
+        const {positions} = this.computePositions(mols, coeffs, startX, widthAvailable);
+        positions.forEach(p=>this.drawMol(p.x, p.y, p.m));
+    }
+
+    loop(){
+        this.ctx.setTransform(this.dpr,0,0,this.dpr,0,0);
+        this.ctx.clearRect(0,0,this.w,this.h);
+
+        // Dashed Center Line
+        this.ctx.beginPath(); this.ctx.moveTo(this.w/2,0); this.ctx.lineTo(this.w/2,this.h);
+        this.ctx.strokeStyle='#bdc3c7'; this.ctx.lineWidth=2; this.ctx.setLineDash([8,8]); this.ctx.stroke(); this.ctx.setLineDash([]);
+
+        const l=LEVELS[this.level];
+        const half=((this.w/2)-60)/MOL_SCALE;
+        this.ctx.save();
+        this.ctx.scale(MOL_SCALE, MOL_SCALE);
+        this.drawGroup(l.reactants, this.coeffs.r, 60/MOL_SCALE, half);
+        this.drawGroup(l.products, this.coeffs.p, ((this.w/2)+60)/MOL_SCALE, half);
+        this.ctx.restore();
+
+        requestAnimationFrame(()=>this.loop());
+    }
+}
+const app = new App();
+</script>
+</body>
+</html>

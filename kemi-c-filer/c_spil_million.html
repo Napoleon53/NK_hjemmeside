@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kemi-Millionær</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        @keyframes rainbow-border {
+            0% { background-position: 0 0, 0% 0; }
+            100% { background-position: 0 0, 300% 0; }
+        }
+        @keyframes rainbow-text {
+            0% { background-position: 0% 0; }
+            100% { background-position: 300% 0; }
+        }
+        @keyframes win-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        @keyframes win-pop {
+            0% { transform: scale(0.7) rotate(-5deg); opacity: 0; }
+            60% { transform: scale(1.05) rotate(2deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0); }
+        }
+        .win-card {
+            border: 3px solid transparent;
+            background-image: linear-gradient(#172554, #172554), linear-gradient(90deg, #f87171, #fbbf24, #4ade80, #38bdf8, #a78bfa, #f87171);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            background-size: 100% 100%, 300% 100%;
+            animation: rainbow-border 4s linear infinite, win-pop 0.4s ease;
+        }
+        .win-title {
+            background: linear-gradient(90deg, #f87171, #fbbf24, #4ade80, #38bdf8, #a78bfa, #f87171);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: rainbow-text 3s linear infinite;
+        }
+        .win-emoji {
+            display: inline-block;
+            animation: win-bounce 1.2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 min-h-screen">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- SPØRGSMÅLSBANK ---
+        // Hentet fra "Fagordsquiz for Kemi C" (sidste fane i SelvrettendeKemiC.xlsx).
+        // Hver post: kap = kapitelnummer (bruges til at styre sværhedsgrad/tier),
+        // q = spørgsmål (da/en), opts = 4 svarmuligheder pr. sprog, correct = index på det rigtige svar.
+        // opts.da og opts.en holdes i samme rækkefølge, så withShuffledOptions kan blande dem samstemt.
+        const QUESTION_BANK = [
+            // --- Kapitel 1: Atomer og grundstoffer ---
+            { id: 'c1_1', kap: 1, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Kernepartikel med positiv ladning"?', en: 'Which term fits this description: "Nuclear particle with positive charge"?' }, opts: { da: ['Proton', 'Neutron', 'Elektron', 'Isotop'], en: ['Proton', 'Neutron', 'Electron', 'Isotope'] }, correct: 0 },
+            { id: 'c1_2', kap: 1, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Samme antal protoner, men forskelligt antal neutroner"?', en: 'Which term fits this description: "Same number of protons, but different number of neutrons"?' }, opts: { da: ['Isotop', 'Ion', 'Molekyle', 'Isomer'], en: ['Isotope', 'Ion', 'Molecule', 'Isomer'] }, correct: 0 },
+            { id: 'c1_3', kap: 1, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Måden man opskriver en kemisk reaktion på med kemiske symboler og reaktionspil"?', en: 'Which term fits this description: "The way a chemical reaction is written using chemical symbols and a reaction arrow"?' }, opts: { da: ['Reaktionsskema', 'Strukturformel', 'Molekylformel', 'Koefficient'], en: ['Reaction scheme', 'Structural formula', 'Molecular formula', 'Coefficient'] }, correct: 0 },
+            { id: 'c1_4', kap: 1, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Den form et kemisk stof har: enten (aq), (s), (g) eller (l)"?', en: 'Which term fits this description: "The physical state a chemical substance has: either (aq), (s), (g) or (l)"?' }, opts: { da: ['Tilstandsform', 'Oxidationstal', 'Molarmasse', 'Isotop'], en: ['State of matter', 'Oxidation number', 'Molar mass', 'Isotope'] }, correct: 0 },
+            { id: 'c1_5', kap: 1, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Kernepartikel med neutral ladning"?', en: 'Which term fits this description: "Nuclear particle with neutral charge"?' }, opts: { da: ['Neutron', 'Proton', 'Elektron', 'Atomnummer'], en: ['Neutron', 'Proton', 'Electron', 'Atomic number'] }, correct: 0 },
+            { id: 'c1_6', kap: 1, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Antallet af protoner i et atom (symbol Z)"?', en: 'Which term fits this description: "The number of protons in an atom (symbol Z)"?' }, opts: { da: ['Atomnummer', 'Massetal', 'Molarmasse', 'Oxidationstal'], en: ['Atomic number', 'Mass number', 'Molar mass', 'Oxidation number'] }, correct: 0 },
+            { id: 'c1_7', kap: 1, q: { da: 'Hvilket fagord passer til denne beskrivelse: "De lodrette søjler i det periodiske system"?', en: 'Which term fits this description: "The vertical columns in the periodic table"?' }, opts: { da: ['Gruppe', 'Periode', 'Blok', 'Serie'], en: ['Group', 'Period', 'Block', 'Series'] }, correct: 0 },
+            { id: 'c1_8', kap: 1, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Hvad betyder tilstandsformen (l)?"?', en: 'Which term fits this description: "What does the state (l) mean?"?' }, opts: { da: ['Væske', 'Gas', 'Fast stof', 'Opløst i vand'], en: ['Liquid', 'Gas', 'Solid', 'Dissolved in water'] }, correct: 0 },
+            { id: 'c1_9', kap: 1, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Reglen om at grundstoffer fra hovedgrupperne stræber efter 8 elektroner i yderste skal"?', en: 'Which term fits this description: "The rule that main-group elements strive for 8 electrons in their outer shell"?' }, opts: { da: ['Ædelgasreglen', 'Elektronegativitetsreglen', 'Ladningsreglen', 'Bindingsreglen'], en: ['Octet rule', 'Electronegativity rule', 'Charge rule', 'Bonding rule'] }, correct: 0 },
+            { id: 'c1_10', kap: 1, q: { da: 'Hvilket fagord passer til denne beskrivelse: "De store tal foran stofferne, der bruges til at afstemme et reaktionsskema"?', en: 'Which term fits this description: "The large numbers placed in front of substances, used to balance a reaction scheme"?' }, opts: { da: ['Koefficient', 'Indeks', 'Oxidationstal', 'Molforhold'], en: ['Coefficient', 'Subscript', 'Oxidation number', 'Mole ratio'] }, correct: 0 },
+
+            // --- Kapitel 2: Ioner og ionforbindelser ---
+            { id: 'c2_1', kap: 2, q: { da: 'Hvilket fagord passer til denne beskrivelse: "At man kan opløse over 2 g af et salt i 100 mL vand"?', en: 'Which term fits this description: "That you can dissolve more than 2 g of a salt in 100 mL water"?' }, opts: { da: ['Letopløselig', 'Tungtopløselig', 'Krystalvand', 'Bundfald'], en: ['Soluble', 'Sparingly soluble', 'Water of crystallization', 'Precipitate'] }, correct: 0 },
+            { id: 'c2_2', kap: 2, q: { da: 'Hvilket fagord passer til denne beskrivelse: "At man kan opløse under 2 g af et salt i 100 mL vand"?', en: 'Which term fits this description: "That you can dissolve less than 2 g of a salt in 100 mL water"?' }, opts: { da: ['Tungtopløselig', 'Letopløselig', 'Fældningsreaktion', 'Bundfald'], en: ['Sparingly soluble', 'Soluble', 'Precipitation reaction', 'Precipitate'] }, correct: 0 },
+            { id: 'c2_3', kap: 2, q: { da: 'Hvilket fagord passer til denne beskrivelse: "En ion der består af flere atomer, som tilsammen har optaget eller afgivet elektroner, fx NO₃⁻"?', en: 'Which term fits this description: "An ion made up of several atoms that together have gained or lost electrons, e.g. NO₃⁻"?' }, opts: { da: ['Sammensat ion', 'Tilskuerion', 'Ionforbindelse', 'Krystalvand'], en: ['Polyatomic ion', 'Spectator ion', 'Ionic compound', 'Water of crystallization'] }, correct: 0 },
+            { id: 'c2_4', kap: 2, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Vandmolekyler der sidder mellem ionerne i et iongitter"?', en: 'Which term fits this description: "Water molecules located between the ions in an ionic lattice"?' }, opts: { da: ['Krystalvand', 'Bundfald', 'Mikroskopisk', 'Trivialnavn'], en: ['Water of crystallization', 'Precipitate', 'Microscopic', 'Trivial name'] }, correct: 0 },
+            { id: 'c2_5', kap: 2, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Reaktionstypen hvor der dannes et tungtopløseligt salt, når man blander to opløsninger af letopløselige salte"?', en: 'Which term fits this description: "The reaction type where a sparingly soluble salt forms when mixing two solutions of soluble salts"?' }, opts: { da: ['Fældningsreaktion', 'Ionforbindelse', 'Sammensat ion', 'Krystalvand'], en: ['Precipitation reaction', 'Ionic compound', 'Polyatomic ion', 'Water of crystallization'] }, correct: 0 },
+            { id: 'c2_6', kap: 2, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Ladede partikler der IKKE indgår i en fældningsreaktion, men forbliver opløst i vandet"?', en: 'Which term fits this description: "Charged particles that do NOT take part in a precipitation reaction, but remain dissolved in the water"?' }, opts: { da: ['Tilskuerion', 'Sammensat ion', 'Letopløselig', 'Trivialnavn'], en: ['Spectator ion', 'Polyatomic ion', 'Soluble', 'Trivial name'] }, correct: 0 },
+            { id: 'c2_7', kap: 2, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Det uklare slør i en opløsning, når et tungtopløseligt stof lige er udfældet"?', en: 'Which term fits this description: "The cloudy haze in a solution just as a sparingly soluble substance has precipitated"?' }, opts: { da: ['Bundfald', 'Krystalvand', 'Tungtopløselig', 'Mikroskopisk'], en: ['Precipitate', 'Water of crystallization', 'Sparingly soluble', 'Microscopic'] }, correct: 0 },
+            { id: 'c2_8', kap: 2, q: { da: 'Hvilket fagord passer til denne beskrivelse: "En forbindelse mellem negative og positive ioner"?', en: 'Which term fits this description: "A compound between negative and positive ions"?' }, opts: { da: ['Ionforbindelse', 'Sammensat ion', 'Fældningsreaktion', 'Tilskuerion'], en: ['Ionic compound', 'Polyatomic ion', 'Precipitation reaction', 'Spectator ion'] }, correct: 0 },
+            { id: 'c2_9', kap: 2, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Et usystematisk ’kælenavn’ for et stof, som bruges i dagligdagen - fx salmiak"?', en: 'Which term fits this description: "An unsystematic ‘pet name’ for a substance, used in everyday language - e.g. sal ammoniac"?' }, opts: { da: ['Trivialnavn', 'Mikroskopisk', 'Ionforbindelse', 'Bundfald'], en: ['Trivial name', 'Microscopic', 'Ionic compound', 'Precipitate'] }, correct: 0 },
+            { id: 'c2_10', kap: 2, q: { da: 'Hvilket fagord passer til denne beskrivelse: "En beskrivelse, der forholder sig til det molekylære niveau"?', en: 'Which term fits this description: "A description that relates to the molecular level"?' }, opts: { da: ['Mikroskopisk', 'Trivialnavn', 'Krystalvand', 'Tilskuerion'], en: ['Microscopic', 'Trivial name', 'Water of crystallization', 'Spectator ion'] }, correct: 0 },
+
+            // --- Kapitel 3: Molekyler og bindinger ---
+            { id: 'c3_1', kap: 3, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Bindingstypen mellem to ikke-metaller, der danner et fælles elektronpar"?', en: 'Which term fits this description: "The bond type between two non-metals that forms a shared electron pair"?' }, opts: { da: ['Kovalent binding', 'Ionbinding', 'Hydrogenbinding', 'Metalbinding'], en: ['Covalent bond', 'Ionic bond', 'Hydrogen bond', 'Metallic bond'] }, correct: 0 },
+            { id: 'c3_2', kap: 3, q: { da: 'Hvilket fagord passer til denne beskrivelse: "En kemisk formel der viser hvilke atomer og hvor mange af dem, der indgår i molekylet - men ikke den rumlige opbygning"?', en: 'Which term fits this description: "A chemical formula showing which atoms and how many of them are in the molecule - but not the spatial structure"?' }, opts: { da: ['Molekylformel', 'Strukturformel', 'Prikformel', 'Tilstandsform'], en: ['Molecular formula', 'Structural formula', 'Lewis structure', 'State of matter'] }, correct: 0 },
+            { id: 'c3_3', kap: 3, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Et ikke-bindende elektronpar, der sidder på et atom uden at indgå i en binding"?', en: 'Which term fits this description: "A non-bonding electron pair sitting on an atom without taking part in a bond"?' }, opts: { da: ['Ledigt elektronpar', 'Dobbeltbinding', 'Kovalent binding', 'Prikformel'], en: ['Lone pair', 'Double bond', 'Covalent bond', 'Lewis structure'] }, correct: 0 },
+            { id: 'c3_4', kap: 3, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Et udtryk for et atoms evne til at tiltrække elektroner i en binding"?', en: "Which term fits this description: \"An expression of an atom's ability to attract electrons in a bond\"?" }, opts: { da: ['Elektronegativitet', 'Polaritet', 'Oxidationstal', 'Molarmasse'], en: ['Electronegativity', 'Polarity', 'Oxidation number', 'Molar mass'] }, correct: 0 },
+            { id: 'c3_5', kap: 3, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Den rumlige struktur man fx ser i CH₄, hvor bindingsvinklerne er 109,5°"?', en: 'Which term fits this description: "The spatial structure seen e.g. in CH₄, where the bond angles are 109.5°"?' }, opts: { da: ['Tetraeder', 'Trigonal', 'Lineær', 'Vinklet'], en: ['Tetrahedral', 'Trigonal', 'Linear', 'Bent'] }, correct: 0 },
+            { id: 'c3_6', kap: 3, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Betyder ’vandelskende’ og er et andet ord for en polær forbindelse"?', en: 'Which term fits this description: "Means ‘water-loving’ and is another word for a polar compound"?' }, opts: { da: ['Hydrofil', 'Hydrofob', 'Kovalent', 'Ionisk'], en: ['Hydrophilic', 'Hydrophobic', 'Covalent', 'Ionic'] }, correct: 0 },
+            { id: 'c3_7', kap: 3, q: { da: 'Hvilket fagord passer til denne beskrivelse: "En kemisk formel der viser hele molekylets rumlige opbygning"?', en: "Which term fits this description: \"A chemical formula showing the whole molecule's spatial structure\"?" }, opts: { da: ['Strukturformel', 'Molekylformel', 'Prikformel', 'Tetraeder'], en: ['Structural formula', 'Molecular formula', 'Lewis structure', 'Tetrahedral'] }, correct: 0 },
+            { id: 'c3_8', kap: 3, q: { da: 'Hvilket fagord passer til denne beskrivelse: "En binding, hvor to atomer deler 2 elektronpar i samme binding"?', en: 'Which term fits this description: "A bond where two atoms share 2 electron pairs in the same bond"?' }, opts: { da: ['Dobbeltbinding', 'Enkeltbinding', 'Kovalent binding', 'Ionbinding'], en: ['Double bond', 'Single bond', 'Covalent bond', 'Ionic bond'] }, correct: 0 },
+            { id: 'c3_9', kap: 3, q: { da: 'Hvilket fagord passer til denne beskrivelse: "En kemisk formel der viser alle elektronerne i yderste skal - ofte tegnet med prikker"?', en: 'Which term fits this description: "A chemical formula showing all the electrons in the outer shell - often drawn with dots"?' }, opts: { da: ['Prikformel', 'Strukturformel', 'Molekylformel', 'Ledigt elektronpar'], en: ['Lewis structure', 'Structural formula', 'Molecular formula', 'Lone pair'] }, correct: 0 },
+            { id: 'c3_10', kap: 3, q: { da: 'Hvilket fagord passer til denne beskrivelse: "En skæv fordeling af elektroner i en binding, som skyldes forskel i elektronegativitet"?', en: 'Which term fits this description: "An uneven distribution of electrons in a bond, caused by a difference in electronegativity"?' }, opts: { da: ['Polær', 'Upolær', 'Hydrofob', 'Neutral'], en: ['Polar', 'Non-polar', 'Hydrophobic', 'Neutral'] }, correct: 0 },
+
+            // --- Kapitel 4: Mængdeberegning ---
+            { id: 'c4_1', kap: 4, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Størrelsen der angiver hvor meget noget fylder - i kemi typisk angivet i liter"?', en: 'Which term fits this description: "The quantity indicating how much space something takes up - typically given in liters in chemistry"?' }, opts: { da: ['Volumen', 'Densitet', 'Stofmængde', 'Molarmasse'], en: ['Volume', 'Density', 'Amount of substance', 'Molar mass'] }, correct: 0 },
+            { id: 'c4_2', kap: 4, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Størrelsen der angiver forholdet mellem masse og volumen - angivet i g/mL"?', en: 'Which term fits this description: "The quantity indicating the ratio between mass and volume - given in g/mL"?' }, opts: { da: ['Densitet', 'Volumen', 'Molarmasse', 'Stofmængde'], en: ['Density', 'Volume', 'Molar mass', 'Amount of substance'] }, correct: 0 },
+            { id: 'c4_3', kap: 4, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Metaller med en densitet på over 7 g/mL"?', en: 'Which term fits this description: "Metals with a density over 7 g/mL"?' }, opts: { da: ['Tungmetal', 'Ædelmetal', 'Overgangsmetal', 'Alkalimetal'], en: ['Heavy metal', 'Noble metal', 'Transition metal', 'Alkali metal'] }, correct: 0 },
+            { id: 'c4_4', kap: 4, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Forholdet mellem to koefficienter i et reaktionsskema"?', en: 'Which term fits this description: "The ratio between two coefficients in a reaction scheme"?' }, opts: { da: ['Antalsforhold', 'Stofmængde', 'Molarmasse', 'Ækvivalent'], en: ['Ratio of amounts', 'Amount of substance', 'Molar mass', 'Equivalent'] }, correct: 0 },
+            { id: 'c4_5', kap: 4, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Størrelsen der angiver antallet af ’stofenheder’ - angivet i enheden mol"?', en: 'Which term fits this description: "The quantity indicating the number of ‘substance units’ - given in the unit mol"?' }, opts: { da: ['Stofmængde', 'Molarmasse', 'Volumen', 'Densitet'], en: ['Amount of substance', 'Molar mass', 'Volume', 'Density'] }, correct: 0 },
+            { id: 'c4_6', kap: 4, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Når forholdet mellem stofmængderne svarer til forholdet mellem koefficienterne i reaktionsskemaet"?', en: 'Which term fits this description: "When the ratio between the amounts of substance matches the ratio between the coefficients in the reaction scheme"?' }, opts: { da: ['Ækvivalent', 'Antalsforhold', 'Stofmængde', 'Molarmasse'], en: ['Equivalent', 'Ratio of amounts', 'Amount of substance', 'Molar mass'] }, correct: 0 },
+            { id: 'c4_7', kap: 4, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Størrelsen der angiver massen af 1 mol af et stof - enheden er g/mol"?', en: 'Which term fits this description: "The quantity indicating the mass of 1 mol of a substance - the unit is g/mol"?' }, opts: { da: ['Molarmasse', 'Densitet', 'Stofmængde', 'Antalsforhold'], en: ['Molar mass', 'Density', 'Amount of substance', 'Ratio of amounts'] }, correct: 0 },
+            { id: 'c4_8', kap: 4, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Sammenhængen mellem tryk, volumen, stofmængde og temperatur"?', en: 'Which term fits this description: "The relationship between pressure, volume, amount of substance and temperature"?' }, opts: { da: ['Idealgasloven', 'Gaskonstanten', 'Boyles lov', 'Avogadros lov'], en: ['Ideal gas law', 'Gas constant', "Boyle's law", "Avogadro's law"] }, correct: 0 },
+            { id: 'c4_9', kap: 4, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Temperaturen hvor kelvintemperaturen er 0 K (svarende til -273,15 °C) - den laveste temperatur der findes"?', en: 'Which term fits this description: "The temperature where the Kelvin temperature is 0 K (equal to -273.15 °C) - the lowest temperature that exists"?' }, opts: { da: ['Absolutte nulpunkt', 'Frysepunktet', 'Kogepunktet', 'Stuetemperatur'], en: ['Absolute zero', 'Freezing point', 'Boiling point', 'Room temperature'] }, correct: 0 },
+            { id: 'c4_10', kap: 4, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Symbolet R, som indgår i idealgasloven"?', en: 'Which term fits this description: "The symbol R, which appears in the ideal gas law"?' }, opts: { da: ['Gaskonstanten', 'Avogadros konstant', 'Molarmassen', 'Antalsforholdet'], en: ['Gas constant', "Avogadro's constant", 'Molar mass', 'Ratio of amounts'] }, correct: 0 },
+
+            // --- Kapitel 5: Koncentration og titrering ---
+            { id: 'c5_1', kap: 5, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Størrelsen der angiver stofmængde pr. volumenenhed af en opløsning"?', en: 'Which term fits this description: "The quantity indicating amount of substance per unit volume of a solution"?' }, opts: { da: ['Stofmængdekoncentration', 'Densitet', 'Molarmasse', 'Opløselighed'], en: ['Molar concentration', 'Density', 'Molar mass', 'Solubility'] }, correct: 0 },
+            { id: 'c5_2', kap: 5, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Glasudstyret man bruger til at fremstille og fortynde opløsninger med stor nøjagtighed"?', en: 'Which term fits this description: "The glassware used to prepare and dilute solutions with high accuracy"?' }, opts: { da: ['Målekolbe', 'Pipette', 'Burette', 'Bægerglas'], en: ['Volumetric flask', 'Pipette', 'Burette', 'Beaker'] }, correct: 0 },
+            { id: 'c5_3', kap: 5, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Glasudstyret man bruger til at afmåle og overføre en bestemt mængde opløsning"?', en: 'Which term fits this description: "The glassware used to measure and transfer a specific amount of solution"?' }, opts: { da: ['Pipette', 'Målekolbe', 'Burette', 'Bægerglas'], en: ['Pipette', 'Volumetric flask', 'Burette', 'Beaker'] }, correct: 0 },
+            { id: 'c5_4', kap: 5, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Når man tilsætter vand til en opløsning, så koncentrationen bliver lavere"?', en: 'Which term fits this description: "When water is added to a solution so the concentration becomes lower"?' }, opts: { da: ['Fortynding', 'Titrering', 'Mætning', 'Koncentrering'], en: ['Dilution', 'Titration', 'Saturation', 'Concentrating'] }, correct: 0 },
+            { id: 'c5_5', kap: 5, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Når der ikke kan opløses mere stof i en opløsning, selvom man tilsætter mere af stoffet"?', en: 'Which term fits this description: "When no more substance can dissolve in a solution, even if more of the substance is added"?' }, opts: { da: ['Mættet', 'Umættet', 'Fortyndet', 'Koncentreret'], en: ['Saturated', 'Unsaturated', 'Diluted', 'Concentrated'] }, correct: 0 },
+            { id: 'c5_6', kap: 5, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Den type koncentration der tager højde for kemiske reaktioner og fortæller, hvad opløsningen faktisk indeholder"?', en: 'Which term fits this description: "The type of concentration that accounts for chemical reactions and tells what the solution actually contains"?' }, opts: { da: ['Aktuel koncentration', 'Stofmængdekoncentration', 'Densitet', 'Ækvivalenspunkt'], en: ['Actual concentration', 'Molar concentration', 'Density', 'Equivalence point'] }, correct: 0 },
+            { id: 'c5_7', kap: 5, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Analysemetoden hvor man bestemmer en ukendt koncentration ved at tildryppe en opløsning med kendt koncentration"?', en: 'Which term fits this description: "The analysis method where an unknown concentration is determined by adding drops of a solution with known concentration"?' }, opts: { da: ['Titrering', 'Fortynding', 'Filtrering', 'Destillation'], en: ['Titration', 'Dilution', 'Filtration', 'Distillation'] }, correct: 0 },
+            { id: 'c5_8', kap: 5, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Glasudstyret man typisk bruger til selve tildrypningen under en titrering"?', en: 'Which term fits this description: "The glassware typically used for the actual dropwise addition during a titration"?' }, opts: { da: ['Burette', 'Pipette', 'Målekolbe', 'Bægerglas'], en: ['Burette', 'Pipette', 'Volumetric flask', 'Beaker'] }, correct: 0 },
+            { id: 'c5_9', kap: 5, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Et kemisk stof der fx skifter farve for at vise, hvornår der er tilsat ækvivalente mængder"?', en: 'Which term fits this description: "A chemical substance that e.g. changes color to show when equivalent amounts have been added"?' }, opts: { da: ['Indikator', 'Titrant', 'Katalysator', 'Reagens'], en: ['Indicator', 'Titrant', 'Catalyst', 'Reagent'] }, correct: 0 },
+            { id: 'c5_10', kap: 5, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Det punkt i en titrering, hvor man netop har tilsat ækvivalente mængder"?', en: 'Which term fits this description: "The point in a titration where exactly equivalent amounts have just been added"?' }, opts: { da: ['Ækvivalenspunkt', 'Omslagspunkt', 'Startpunkt', 'Slutpunkt'], en: ['Equivalence point', 'Endpoint', 'Starting point', 'Final point'] }, correct: 0 },
+
+            // --- Kapitel 7: Syre-basereaktioner ---
+            { id: 'c7_1', kap: 7, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Et stof der kan modtage en hydron (H⁺)"?', en: 'Which term fits this description: "A substance that can accept a hydron (H⁺)"?' }, opts: { da: ['Base', 'Syre', 'Salt', 'Indikator'], en: ['Base', 'Acid', 'Salt', 'Indicator'] }, correct: 0 },
+            { id: 'c7_2', kap: 7, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Navnet på den sammensatte ion H₃O⁺, som dannes når en syre reagerer med vand"?', en: 'Which term fits this description: "The name of the polyatomic ion H₃O⁺, formed when an acid reacts with water"?' }, opts: { da: ['Oxonium', 'Hydroxid', 'Ammonium', 'Sulfat'], en: ['Oxonium', 'Hydroxide', 'Ammonium', 'Sulfate'] }, correct: 0 },
+            { id: 'c7_3', kap: 7, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Betegnelsen for en syre og dens basemodpart, når de hænger sammen som et par"?', en: 'Which term fits this description: "The term for an acid and its base counterpart, when they are linked as a pair"?' }, opts: { da: ['Korresponderende par', 'Amfolyt', 'Neutralisation', 'Buffer'], en: ['Conjugate pair', 'Ampholyte', 'Neutralization', 'Buffer'] }, correct: 0 },
+            { id: 'c7_4', kap: 7, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Betegnelsen for syrer der ikke reagerer fuldstændigt med vand - fx ethansyre"?', en: 'Which term fits this description: "The term for acids that do not react completely with water - e.g. acetic acid"?' }, opts: { da: ['Svag syre', 'Stærk syre', 'Sur opløsning', 'Basisk opløsning'], en: ['Weak acid', 'Strong acid', 'Acidic solution', 'Basic solution'] }, correct: 0 },
+            { id: 'c7_5', kap: 7, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Trivialnavnet for ethansyre, CH₃COOH"?', en: 'Which term fits this description: "The trivial name for ethanoic acid, CH₃COOH"?' }, opts: { da: ['Eddikesyre', 'Citronsyre', 'Mælkesyre', 'Myresyre'], en: ['Acetic acid', 'Citric acid', 'Lactic acid', 'Formic acid'] }, correct: 0 },
+            { id: 'c7_6', kap: 7, q: { da: 'Hvilket fagord passer til denne beskrivelse: "En opløsning hvor [H₃O⁺] er større end [OH⁻]"?', en: 'Which term fits this description: "A solution where [H₃O⁺] is greater than [OH⁻]"?' }, opts: { da: ['Sur', 'Basisk', 'Neutral', 'Amfoter'], en: ['Acidic', 'Basic', 'Neutral', 'Amphoteric'] }, correct: 0 },
+            { id: 'c7_7', kap: 7, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Navnet for vands syre-basereaktion med sig selv"?', en: "Which term fits this description: \"The name for water's acid-base reaction with itself\"?" }, opts: { da: ['Vands autohydronolyse', 'Vands ionprodukt', 'Neutralisation', 'Hydrolyse'], en: ["Water's autoprotolysis", "Water's ion product", 'Neutralization', 'Hydrolysis'] }, correct: 0 },
+            { id: 'c7_8', kap: 7, q: { da: 'Hvilket fagord passer til denne beskrivelse: "En logaritmisk beskrivelse af [H₃O⁺], nemlig -log[H₃O⁺]"?', en: 'Which term fits this description: "A logarithmic description of [H₃O⁺], namely -log[H₃O⁺]"?' }, opts: { da: ['pH', 'pKs', 'pOH', 'Ks'], en: ['pH', 'pKa', 'pOH', 'Ka'] }, correct: 0 },
+            { id: 'c7_9', kap: 7, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Navnet på sammenhængen [H₃O⁺]∙[OH⁻] = 1,0∙10⁻¹⁴"?', en: "Which term fits this description: \"The name for the relationship [H₃O⁺]·[OH⁻] = 1.0·10⁻¹⁴\"?" }, opts: { da: ['Vands ionprodukt', 'Vands autohydronolyse', 'Syrekonstanten', 'pH-værdien'], en: ["Water's ion product", "Water's autoprotolysis", 'Acid constant', 'pH value'] }, correct: 0 },
+            { id: 'c7_10', kap: 7, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Et fint ord for en titrering, hvor det er selve farveskiftet der viser ækvivalenspunktet"?', en: 'Which term fits this description: "A fancy word for a titration where the color change itself shows the equivalence point"?' }, opts: { da: ['Kolorimetrisk', 'Gravimetrisk', 'Volumetrisk', 'Potentiometrisk'], en: ['Colorimetric', 'Gravimetric', 'Volumetric', 'Potentiometric'] }, correct: 0 },
+
+            // --- Kapitel 8: Redoxreaktioner ---
+            { id: 'c8_1', kap: 8, q: { da: 'Hvilket fagord passer til denne beskrivelse: "En delvis eller fuldstændig afgivelse af elektroner"?', en: 'Which term fits this description: "A partial or complete loss of electrons"?' }, opts: { da: ['Oxidation', 'Reduktion', 'Neutralisation', 'Fældning'], en: ['Oxidation', 'Reduction', 'Neutralization', 'Precipitation'] }, correct: 0 },
+            { id: 'c8_2', kap: 8, q: { da: 'Hvilket fagord passer til denne beskrivelse: "En delvis eller fuldstændig optagelse af elektroner"?', en: 'Which term fits this description: "A partial or complete gain of electrons"?' }, opts: { da: ['Reduktion', 'Oxidation', 'Ionisering', 'Protolyse'], en: ['Reduction', 'Oxidation', 'Ionization', 'Protolysis'] }, correct: 0 },
+            { id: 'c8_3', kap: 8, q: { da: 'Hvilket fagord passer til denne beskrivelse: "En delvis eller fuldstændig overførsel af elektroner fra ét atom til et andet"?', en: 'Which term fits this description: "A partial or complete transfer of electrons from one atom to another"?' }, opts: { da: ['Redoxreaktion', 'Syre-basereaktion', 'Fældningsreaktion', 'Substitutionsreaktion'], en: ['Redox reaction', 'Acid-base reaction', 'Precipitation reaction', 'Substitution reaction'] }, correct: 0 },
+            { id: 'c8_4', kap: 8, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Et mål for hvor mange elektroner et atom har afgivet eller optaget, helt eller delvist"?', en: 'Which term fits this description: "A measure of how many electrons an atom has lost or gained, fully or partially"?' }, opts: { da: ['Oxidationstal', 'Atomnummer', 'Ladningstal', 'Koefficient'], en: ['Oxidation number', 'Atomic number', 'Charge number', 'Coefficient'] }, correct: 0 },
+            { id: 'c8_5', kap: 8, q: { da: 'Hvilket fagord passer til denne beskrivelse: "En rækkefølge af grundstoffer, ordnet efter deres villighed til at afgive elektroner"?', en: 'Which term fits this description: "A ranking of elements ordered by their willingness to lose electrons"?' }, opts: { da: ['Spændingsrækken', 'Det periodiske system', 'Ædelgasreglen', 'Elektronegativitetsskalaen'], en: ['Activity series', 'The periodic table', 'Octet rule', 'Electronegativity scale'] }, correct: 0 },
+            { id: 'c8_6', kap: 8, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Metaller yderst til højre i spændingsrækken, som derfor er stabile i deres metalliske form"?', en: 'Which term fits this description: "Metals furthest to the right in the activity series, and therefore stable in their metallic form"?' }, opts: { da: ['Ædelmetal', 'Tungmetal', 'Letmetal', 'Uædelt metal'], en: ['Noble metal', 'Heavy metal', 'Light metal', 'Base metal'] }, correct: 0 },
+            { id: 'c8_7', kap: 8, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Grundstoffet med elektronegativitet 3,5, som ofte har oxidationstallet -II"?', en: 'Which term fits this description: "The element with electronegativity 3.5, which often has the oxidation number -II"?' }, opts: { da: ['Oxygen', 'Nitrogen', 'Chlor', 'Sulfur'], en: ['Oxygen', 'Nitrogen', 'Chlorine', 'Sulfur'] }, correct: 0 },
+            { id: 'c8_8', kap: 8, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Det systematiske navn for den violette forbindelse KMnO₄, der ofte bruges som oxidationsmiddel"?', en: 'Which term fits this description: "The systematic name for the purple compound KMnO₄, often used as an oxidizing agent"?' }, opts: { da: ['Kaliumpermanganat', 'Kaliumdichromat', 'Natriumhypochlorit', 'Kobbersulfat'], en: ['Potassium permanganate', 'Potassium dichromate', 'Sodium hypochlorite', 'Copper sulfate'] }, correct: 0 },
+            { id: 'c8_9', kap: 8, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Navnet for forbindelsen H₂O₂, der ofte bruges i redoxreaktioner"?', en: 'Which term fits this description: "The name for the compound H₂O₂, often used in redox reactions"?' }, opts: { da: ['Hydrogenperoxid', 'Hydrogenchlorid', 'Dihydrogenoxid', 'Kuldioxid'], en: ['Hydrogen peroxide', 'Hydrogen chloride', 'Dihydrogen monoxide', 'Carbon dioxide'] }, correct: 0 },
+            { id: 'c8_10', kap: 8, q: { da: 'Hvilket fagord passer til denne beskrivelse: "Navnet for gassen H₂, som indgår i spændingsrækken"?', en: 'Which term fits this description: "The name for the gas H₂, which appears in the activity series"?' }, opts: { da: ['Brint', 'Oxygen', 'Nitrogen', 'Helium'], en: ['Hydrogen', 'Oxygen', 'Nitrogen', 'Helium'] }, correct: 0 },
+        ];
+
+        const CHAPTER_NAMES = {
+            da: {
+                1: 'Atomer & grundstoffer',
+                2: 'Ioner & ionforbindelser',
+                3: 'Molekyler & bindinger',
+                4: 'Mængdeberegning',
+                5: 'Koncentration & titrering',
+                7: 'Syre-base',
+                8: 'Redox',
+            },
+            en: {
+                1: 'Atoms & elements',
+                2: 'Ions & ionic compounds',
+                3: 'Molecules & bonds',
+                4: 'Mole calculations',
+                5: 'Concentration & titration',
+                7: 'Acid-base',
+                8: 'Redox',
+            },
+        };
+
+        const UI_TEXT = {
+            da: {
+                docTitle: 'Kemi-Millionær',
+                headerTitle: '🏆 Hvem vil være Kemi-millionær?',
+                headerSubtitle: 'Kemi C – opsamlingsquiz på tværs af kapitlerne',
+                startIntro: 'Test din viden fra hele Kemi C. Sværhedsgraden stiger, jo længere du kommer!',
+                startButton: 'Start quiz',
+                lifelineRemoveOne: '➖ Fjern en',
+                lifelineFifty: '✂️ 50/50',
+                lifelineSwap: '🔄 Byt spørgsmål',
+                questionOf: (n) => `Spørgsmål ${n} af 15`,
+                chapterLabel: (kap, name) => `Kapitel ${kap} · ${name}`,
+                playingFor: (amt) => `Spiller om: ${amt}`,
+                lockAnswer: 'Lås svar 🔒',
+                stopAndTake: (amt) => `💰 Stop og tag ${amt}`,
+                confirmWalkAway: (amt) => `Er det din endelige beslutning? Du stopper spillet og går videre med ${amt}`,
+                yesStop: 'Ja, stop spillet',
+                noContinue: 'Nej, fortsæt',
+                correctMsg: 'Rigtigt! ✅',
+                wrongMsg: (ans) => `Forkert ✗ — det rigtige svar var: ${ans}`,
+                seeWinnings: 'Se din gevinst 🏆',
+                nextQuestion: 'Næste spørgsmål →',
+                seeResult: 'Se dit resultat →',
+                gameOverTitle: 'Spillet er slut',
+                wentHomeWith: 'Du gik hjem med',
+                playAgain: '🔁 Spil igen',
+                walkedTitle: 'Du stoppede i tide!',
+                walkedWith: 'Du gik videre med',
+                wonTitle: '🏆 TILLYKKE! Du er Kemi-millionær!',
+                wonText: 'Du har svaret rigtigt på alle 15 spørgsmål og vundet',
+                switchTo: 'Switch to English',
+            },
+            en: {
+                docTitle: 'Chemistry Millionaire',
+                headerTitle: '🏆 Who Wants to Be a Chemistry Millionaire?',
+                headerSubtitle: 'Chemistry C – review quiz across the chapters',
+                startIntro: 'Test your knowledge from all of Chemistry C. The difficulty increases the further you get!',
+                startButton: 'Start quiz',
+                lifelineRemoveOne: '➖ Remove one',
+                lifelineFifty: '✂️ 50/50',
+                lifelineSwap: '🔄 Swap question',
+                questionOf: (n) => `Question ${n} of 15`,
+                chapterLabel: (kap, name) => `Chapter ${kap} · ${name}`,
+                playingFor: (amt) => `Playing for: ${amt}`,
+                lockAnswer: 'Lock answer 🔒',
+                stopAndTake: (amt) => `💰 Stop and take ${amt}`,
+                confirmWalkAway: (amt) => `Is this your final decision? You will stop the game and walk away with ${amt}`,
+                yesStop: 'Yes, stop the game',
+                noContinue: 'No, continue',
+                correctMsg: 'Correct! ✅',
+                wrongMsg: (ans) => `Wrong ✗ — the correct answer was: ${ans}`,
+                seeWinnings: 'See your winnings 🏆',
+                nextQuestion: 'Next question →',
+                seeResult: 'See your result →',
+                gameOverTitle: 'Game over',
+                wentHomeWith: 'You went home with',
+                playAgain: '🔁 Play again',
+                walkedTitle: 'You stopped in time!',
+                walkedWith: 'You walked away with',
+                wonTitle: '🏆 CONGRATULATIONS! You are a Chemistry Millionaire!',
+                wonText: 'You have answered all 15 questions correctly and won',
+                switchTo: 'Skift til dansk',
+            },
+        };
+
+        // Små indlejrede SVG-flag til sprogknappen, så den ikke er afhængig af at
+        // browseren/OS'et har flag-emojis installeret (Windows viser typisk kun "GB"/"DK" som tekst).
+        const FLAG_SVG = {
+            en: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 20'>
+                <rect width='30' height='20' fill='#012169'/>
+                <g stroke='#fff' stroke-width='4'><line x1='0' y1='0' x2='30' y2='20'/><line x1='30' y1='0' x2='0' y2='20'/></g>
+                <g stroke='#C8102E' stroke-width='2'><line x1='0' y1='0' x2='30' y2='20'/><line x1='30' y1='0' x2='0' y2='20'/></g>
+                <g stroke='#fff' stroke-width='6'><line x1='15' y1='0' x2='15' y2='20'/><line x1='0' y1='10' x2='30' y2='10'/></g>
+                <g stroke='#C8102E' stroke-width='3'><line x1='15' y1='0' x2='15' y2='20'/><line x1='0' y1='10' x2='30' y2='10'/></g>
+            </svg>`,
+            da: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 20'>
+                <rect width='30' height='20' fill='#C8102E'/>
+                <rect x='9' y='0' width='4' height='20' fill='#fff'/>
+                <rect x='0' y='8' width='30' height='4' fill='#fff'/>
+            </svg>`,
+        };
+
+        function flagBackground(code) {
+            return `url("data:image/svg+xml,${encodeURIComponent(FLAG_SVG[code])}")`;
+        }
+
+        // Underlig, overdreven ros til dem, der rent faktisk klarer alle 15 spørgsmål.
+        // Indeksene i da/en matcher hinanden, så rosen forbliver den samme, hvis man skifter sprog.
+        const WEIRD_PRAISE = {
+            da: [
+                'Din hjerne er hermed forsikret af Tryg som værdifuldt laboratorieudstyr.',
+                'Nationalbanken overvejer at trykke en seddel med dit ansigt på - valøren hedder "1 Kemi-millionær".',
+                'Vi har målt din reaktionshastighed til at være hurtigere end en velkatalyseret eksplosion.',
+                'Dit navn er blevet foreslået som SI-enhed for "ekstrem kemisk snilde".',
+                'Selv det periodiske system har rykket rundt på et par grundstoffer for at gøre plads til dig.',
+            ],
+            en: [
+                'Your brain is hereby insured by a national bank as valuable laboratory equipment.',
+                'The mint is considering printing a banknote with your face on it - the denomination is called "1 Chemistry Millionaire".',
+                'We measured your reaction rate to be faster than a well-catalyzed explosion.',
+                'Your name has been proposed as the SI unit for "extreme chemical genius".',
+                'Even the periodic table rearranged a couple of elements just to make room for you.',
+            ],
+        };
+
+        const AMOUNTS = [100, 200, 300, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 125000, 250000, 500000, 1000000];
+        const SAFE_1 = 4;  // index for spørgsmål 5
+        const SAFE_2 = 9;  // index for spørgsmål 10
+
+        function formatKr(n) {
+            return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' kr.';
+        }
+
+        function tierForIndex(i) {
+            if (i < 5) return [1, 2, 3];
+            if (i < 10) return [4, 5, 7];
+            return [5, 7, 8];
+        }
+
+        function lossAmount(wrongIndex) {
+            if (wrongIndex > SAFE_2) return AMOUNTS[SAFE_2];
+            if (wrongIndex > SAFE_1) return AMOUNTS[SAFE_1];
+            return 0;
+        }
+
+        function shuffle(arr) {
+            const a = arr.slice();
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        // Blander svarmulighederne for ét spørgsmål (i begge sprog samstemt), så det rigtige
+        // svar ikke altid er A.
+        function withShuffledOptions(question) {
+            const order = shuffle([0, 1, 2, 3]);
+            return {
+                ...question,
+                opts: {
+                    da: order.map(i => question.opts.da[i]),
+                    en: order.map(i => question.opts.en[i]),
+                },
+                correct: order.indexOf(question.correct),
+            };
+        }
+
+        function pickGameQuestions() {
+            const used = new Set();
+            const pickN = (chapters, n) => {
+                const pool = shuffle(QUESTION_BANK.filter(q => chapters.includes(q.kap) && !used.has(q.id)));
+                const picked = pool.slice(0, n);
+                picked.forEach(q => used.add(q.id));
+                return picked.map(withShuffledOptions);
+            };
+            return [...pickN([1, 2, 3], 5), ...pickN([4, 5, 7], 5), ...pickN([5, 7, 8], 5)];
+        }
+
+        function drawReplacement(chapters, usedIds) {
+            const pool = QUESTION_BANK.filter(q => chapters.includes(q.kap) && !usedIds.has(q.id));
+            if (pool.length === 0) return null;
+            return withShuffledOptions(pool[Math.floor(Math.random() * pool.length)]);
+        }
+
+        function App() {
+            const [lang, setLang] = useState('da'); // da | en
+            const [gameState, setGameState] = useState('start'); // start | playing | lost | walked | won
+            const [questions, setQuestions] = useState([]);
+            const [usedIds, setUsedIds] = useState(new Set());
+            const [currentIndex, setCurrentIndex] = useState(0);
+            const [selected, setSelected] = useState(null);
+            const [locked, setLocked] = useState(false);
+            const [eliminated, setEliminated] = useState(() => new Set());
+            const [usedRemoveOne, setUsedRemoveOne] = useState(false);
+            const [usedFifty, setUsedFifty] = useState(false);
+            const [usedSwap, setUsedSwap] = useState(false);
+            const [finalAmount, setFinalAmount] = useState(0);
+            const [confirmingWalkAway, setConfirmingWalkAway] = useState(false);
+            const [winPraiseIndex, setWinPraiseIndex] = useState(0);
+
+            const t = UI_TEXT[lang];
+            const chapterNames = CHAPTER_NAMES[lang];
+
+            useEffect(() => {
+                document.title = t.docTitle;
+                document.documentElement.lang = lang;
+            }, [lang]);
+
+            const startGame = () => {
+                const qs = pickGameQuestions();
+                setQuestions(qs);
+                setUsedIds(new Set(qs.map(q => q.id)));
+                setCurrentIndex(0);
+                setSelected(null);
+                setLocked(false);
+                setEliminated(new Set());
+                setUsedRemoveOne(false);
+                setUsedFifty(false);
+                setUsedSwap(false);
+                setFinalAmount(0);
+                setConfirmingWalkAway(false);
+                setGameState('playing');
+            };
+
+            const currentQuestion = questions[currentIndex];
+
+            const handleLock = () => {
+                if (selected === null || locked) return;
+                setLocked(true);
+            };
+
+            const handleNext = () => {
+                if (currentIndex >= 14) {
+                    setWinPraiseIndex(Math.floor(Math.random() * WEIRD_PRAISE.da.length));
+                    setGameState('won');
+                    return;
+                }
+                setCurrentIndex(i => i + 1);
+                setSelected(null);
+                setLocked(false);
+                setEliminated(new Set());
+            };
+
+            const handleGameOver = () => {
+                setFinalAmount(lossAmount(currentIndex));
+                setGameState('lost');
+            };
+
+            const requestWalkAway = () => {
+                if (currentIndex === 0 || locked) return;
+                setConfirmingWalkAway(true);
+            };
+
+            const cancelWalkAway = () => setConfirmingWalkAway(false);
+
+            const confirmWalkAway = () => {
+                setFinalAmount(AMOUNTS[currentIndex - 1]);
+                setConfirmingWalkAway(false);
+                setGameState('walked');
+            };
+
+            // "Fjern en": fjerner ét ekstra forkert svar. Spærres hvis kun ét forkert svar er
+            // tilbage (fx fordi 50/50 allerede er brugt) - ellers ville facit blive afsløret.
+            const handleRemoveOne = () => {
+                if (usedRemoveOne || locked || !currentQuestion) return;
+                const wrongIdxs = [0, 1, 2, 3].filter(i => i !== currentQuestion.correct && !eliminated.has(i));
+                if (wrongIdxs.length < 2) return;
+                const pick = wrongIdxs[Math.floor(Math.random() * wrongIdxs.length)];
+                setEliminated(prev => new Set(prev).add(pick));
+                setUsedRemoveOne(true);
+                setSelected(sel => (sel === pick ? null : sel));
+            };
+
+            // 50/50: fjerner altid ned til præcis ét tilbageværende forkert svar (dvs. 2 svar i alt),
+            // uanset om "Fjern en" allerede har fjernet ét af de tre forkerte svar.
+            const handleFiftyFifty = () => {
+                if (usedFifty || locked || !currentQuestion) return;
+                const wrongIdxs = [0, 1, 2, 3].filter(i => i !== currentQuestion.correct && !eliminated.has(i));
+                if (wrongIdxs.length < 2) return;
+                const toRemove = shuffle(wrongIdxs).slice(0, wrongIdxs.length - 1);
+                setEliminated(prev => {
+                    const next = new Set(prev);
+                    toRemove.forEach(i => next.add(i));
+                    return next;
+                });
+                setUsedFifty(true);
+                setSelected(sel => (sel !== null && toRemove.includes(sel) ? null : sel));
+            };
+
+            const handleSwap = () => {
+                if (usedSwap || locked || !currentQuestion) return;
+                const chapters = tierForIndex(currentIndex);
+                const replacement = drawReplacement(chapters, usedIds);
+                if (!replacement) return;
+                setUsedIds(prev => new Set(prev).add(replacement.id));
+                setQuestions(prev => prev.map((q, i) => (i === currentIndex ? replacement : q)));
+                setUsedSwap(true);
+                setEliminated(new Set());
+                setSelected(null);
+            };
+
+            const lifelineClass = (used) =>
+                'px-4 py-2 rounded-full border text-sm font-semibold transition ' +
+                (used
+                    ? 'border-slate-700 text-slate-600 cursor-not-allowed opacity-50'
+                    : 'border-amber-400 text-amber-300 hover:bg-amber-400 hover:text-blue-950 cursor-pointer');
+
+            // Antal forkerte svar der stadig er synlige for det aktuelle spørgsmål. Bruges til at gråt
+            // "Fjern en"/"50/50" ud, så snart et klik ville fjerne det sidste forkerte svar og dermed
+            // afsløre facit - ikke kun når lifelinen selv er brugt.
+            const wrongRemaining = currentQuestion
+                ? [0, 1, 2, 3].filter(i => i !== currentQuestion.correct && !eliminated.has(i)).length
+                : 3;
+            const removeOneDisabled = usedRemoveOne || locked || wrongRemaining < 2;
+            const fiftyDisabled = usedFifty || locked || wrongRemaining < 2;
+
+            const optionClass = (i) => {
+                const base = 'w-full text-left px-4 py-3 rounded-xl border-2 transition flex items-start gap-3 ';
+                if (eliminated.has(i)) {
+                    return base + 'border-slate-700 bg-slate-900/60 text-slate-600 line-through opacity-40 cursor-not-allowed';
+                }
+                if (locked) {
+                    if (i === currentQuestion.correct) return base + 'border-green-400 bg-green-700/70 text-white';
+                    if (i === selected) return base + 'border-red-400 bg-red-800/70 text-white';
+                    return base + 'border-blue-900 bg-blue-950/40 text-slate-400';
+                }
+                if (i === selected) return base + 'border-amber-400 bg-blue-800/80 ring-2 ring-amber-400 text-white cursor-pointer';
+                return base + 'border-blue-400/40 bg-blue-900/40 text-slate-100 hover:bg-blue-800/60 hover:border-blue-300 cursor-pointer';
+            };
+
+            return (
+                <div className="min-h-screen bg-gradient-to-b from-slate-950 via-blue-950 to-slate-950 text-white font-sans px-4 py-6 md:px-8 md:py-8 relative">
+                    <button
+                        onClick={() => setLang(l => (l === 'da' ? 'en' : 'da'))}
+                        title={t.switchTo}
+                        aria-label={t.switchTo}
+                        style={{
+                            backgroundImage: flagBackground(lang === 'da' ? 'en' : 'da'),
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            textShadow: '0 0 2px #fff, 0 0 3px #fff, 0 0 4px #fff',
+                        }}
+                        className="fixed top-3 right-3 z-50 text-xs font-extrabold tracking-wide text-black w-10 h-7 flex items-center justify-center rounded-md border border-white/40 opacity-70 hover:opacity-100 transition cursor-pointer shadow"
+                    >
+                        {lang === 'da' ? 'EN' : 'DA'}
+                    </button>
+
+                    <div className="text-center mb-6">
+                        <h1 className="text-2xl md:text-4xl font-extrabold text-amber-400 drop-shadow">{t.headerTitle}</h1>
+                        <p className="text-slate-300 text-sm mt-1">{t.headerSubtitle}</p>
+                    </div>
+
+                    {gameState === 'start' && (
+                        <div className="max-w-xl mx-auto bg-blue-950/60 border border-amber-400/40 rounded-2xl p-6 shadow-xl space-y-4">
+                            <p className="text-slate-200">{t.startIntro}</p>
+                            {lang === 'da' ? (
+                                <ul className="list-disc list-inside text-sm text-slate-200 space-y-2">
+                                    <li>Der er <strong>15 spørgsmål</strong> i alt. De første er nemmest, de sidste er sværest.</li>
+                                    <li>Ved spørgsmål <strong>5</strong> og <strong>10</strong> når du et <strong>sikkert beløb</strong>, som du beholder, selvom du senere svarer forkert.</li>
+                                    <li>➖ <strong>Fjern en</strong>: fjerner ét forkert svar fra spørgsmålet. Kan bruges én gang i alt.</li>
+                                    <li>✂️ <strong>50/50</strong>: fjerner to forkerte svar, så kun facit og ét forkert svar er tilbage. Kan bruges én gang i alt.</li>
+                                    <li>🔄 <strong>Byt spørgsmål</strong>: bytter spørgsmålet ud med et nyt af samme sværhedsgrad. Kan bruges én gang i alt.</li>
+                                    <li>Du kan altid vælge at stoppe og gå videre med dine point, inden du svarer på næste spørgsmål - du skal bekræfte det, så det ikke sker ved en fejl.</li>
+                                </ul>
+                            ) : (
+                                <ul className="list-disc list-inside text-sm text-slate-200 space-y-2">
+                                    <li>There are <strong>15 questions</strong> in total. The first ones are the easiest, the last ones are the hardest.</li>
+                                    <li>At questions <strong>5</strong> and <strong>10</strong> you reach a <strong>safe amount</strong>, which you keep even if you later answer wrong.</li>
+                                    <li>➖ <strong>Remove one</strong>: removes one wrong answer from the question. Can be used once in total.</li>
+                                    <li>✂️ <strong>50/50</strong>: removes two wrong answers, so only the correct answer and one wrong answer remain. Can be used once in total.</li>
+                                    <li>🔄 <strong>Swap question</strong>: swaps the question for a new one of the same difficulty. Can be used once in total.</li>
+                                    <li>You can always choose to stop and keep your points before answering the next question - you must confirm it, so it doesn't happen by mistake.</li>
+                                </ul>
+                            )}
+                            <button onClick={startGame} className="w-full bg-amber-400 hover:bg-amber-300 text-blue-950 font-bold py-3 rounded-xl text-lg transition cursor-pointer">
+                                {t.startButton}
+                            </button>
+                        </div>
+                    )}
+
+                    {gameState === 'playing' && currentQuestion && (
+                        <div className="flex flex-col md:flex-row gap-6 max-w-5xl mx-auto">
+                            <div className="flex-1 order-2 md:order-1">
+                                <div className="flex flex-wrap gap-3 mb-4 justify-center">
+                                    <button onClick={handleRemoveOne} disabled={removeOneDisabled} className={lifelineClass(removeOneDisabled)}>{t.lifelineRemoveOne}</button>
+                                    <button onClick={handleFiftyFifty} disabled={fiftyDisabled} className={lifelineClass(fiftyDisabled)}>{t.lifelineFifty}</button>
+                                    <button onClick={handleSwap} disabled={usedSwap || locked} className={lifelineClass(usedSwap)}>{t.lifelineSwap}</button>
+                                </div>
+
+                                <div className="bg-blue-950/70 border-2 border-amber-400/60 rounded-2xl p-5 mb-4 shadow-lg">
+                                    <div className="flex items-center justify-between text-xs text-slate-300 mb-3">
+                                        <span>{t.questionOf(currentIndex + 1)}</span>
+                                        <span className="italic">{t.chapterLabel(currentQuestion.kap, chapterNames[currentQuestion.kap])}</span>
+                                    </div>
+                                    <p className="text-lg md:text-xl font-semibold text-center py-2">{currentQuestion.q[lang]}</p>
+                                    <p className="text-center text-amber-300 font-bold mt-2">{t.playingFor(formatKr(AMOUNTS[currentIndex]))}</p>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5">
+                                    {currentQuestion.opts[lang].map((opt, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => !locked && !confirmingWalkAway && !eliminated.has(i) && setSelected(i)}
+                                            disabled={locked || confirmingWalkAway || eliminated.has(i)}
+                                            className={optionClass(i)}
+                                        >
+                                            <span className="font-bold">{'ABCD'[i]}:</span>
+                                            <span>{opt}</span>
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {!locked && !confirmingWalkAway && (
+                                    <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                                        <button
+                                            onClick={handleLock}
+                                            disabled={selected === null}
+                                            className={
+                                                'px-6 py-3 rounded-xl font-bold text-lg transition ' +
+                                                (selected === null
+                                                    ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
+                                                    : 'bg-amber-400 hover:bg-amber-300 text-blue-950 cursor-pointer')
+                                            }
+                                        >
+                                            {t.lockAnswer}
+                                        </button>
+                                        {currentIndex > 0 && (
+                                            <button onClick={requestWalkAway} className="px-6 py-3 rounded-xl font-semibold border-2 border-slate-400 text-slate-200 hover:bg-slate-800 transition cursor-pointer">
+                                                {t.stopAndTake(formatKr(AMOUNTS[currentIndex - 1]))}
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
+
+                                {!locked && confirmingWalkAway && (
+                                    <div className="max-w-md mx-auto text-center bg-slate-900/80 border-2 border-amber-400 rounded-xl p-4 space-y-3">
+                                        <p className="font-semibold text-slate-100">
+                                            {t.confirmWalkAway(formatKr(AMOUNTS[currentIndex - 1]))}
+                                        </p>
+                                        <div className="flex gap-3 justify-center">
+                                            <button onClick={confirmWalkAway} className="px-5 py-2 rounded-xl font-bold bg-amber-400 hover:bg-amber-300 text-blue-950 transition cursor-pointer">
+                                                {t.yesStop}
+                                            </button>
+                                            <button onClick={cancelWalkAway} className="px-5 py-2 rounded-xl font-semibold border-2 border-slate-400 text-slate-200 hover:bg-slate-800 transition cursor-pointer">
+                                                {t.noContinue}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {locked && (
+                                    <div className="text-center space-y-3">
+                                        <p className={selected === currentQuestion.correct ? 'text-green-400 font-bold text-lg' : 'text-red-400 font-bold text-lg'}>
+                                            {selected === currentQuestion.correct
+                                                ? t.correctMsg
+                                                : t.wrongMsg(currentQuestion.opts[lang][currentQuestion.correct])}
+                                        </p>
+                                        <button
+                                            onClick={selected === currentQuestion.correct ? handleNext : handleGameOver}
+                                            className="px-6 py-3 rounded-xl font-bold text-lg bg-amber-400 hover:bg-amber-300 text-blue-950 transition cursor-pointer"
+                                        >
+                                            {selected === currentQuestion.correct
+                                                ? (currentIndex === 14 ? t.seeWinnings : t.nextQuestion)
+                                                : t.seeResult}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="w-full md:w-56 order-1 md:order-2">
+                                <div className="bg-blue-950/60 border border-amber-400/30 rounded-xl p-3 space-y-1 md:max-h-[75vh] md:overflow-y-auto">
+                                    {AMOUNTS.map((amt, i) => i).reverse().map((i) => {
+                                        const isSafe = i === SAFE_1 || i === SAFE_2;
+                                        const isCurrent = i === currentIndex;
+                                        const rowClass =
+                                            'flex justify-between px-2 py-1 rounded text-xs md:text-sm ' +
+                                            (isCurrent ? 'bg-amber-400 text-blue-950 font-bold' : isSafe ? 'text-amber-300 font-semibold' : 'text-slate-300');
+                                        return (
+                                            <div key={i} className={rowClass}>
+                                                <span>{isSafe ? '🔒 ' : ''}{i + 1}.</span>
+                                                <span>{formatKr(AMOUNTS[i])}</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {gameState === 'lost' && (
+                        <div className="max-w-lg mx-auto bg-blue-950/60 border border-red-400/40 rounded-2xl p-6 shadow-xl text-center space-y-4">
+                            <h2 className="text-2xl font-bold text-red-400">{t.gameOverTitle}</h2>
+                            <p className="text-slate-200">{t.wentHomeWith}</p>
+                            <p className="text-3xl font-extrabold text-amber-400">{formatKr(finalAmount)}</p>
+                            <button onClick={startGame} className="w-full bg-amber-400 hover:bg-amber-300 text-blue-950 font-bold py-3 rounded-xl text-lg transition cursor-pointer">
+                                {t.playAgain}
+                            </button>
+                        </div>
+                    )}
+
+                    {gameState === 'walked' && (
+                        <div className="max-w-lg mx-auto bg-blue-950/60 border border-amber-400/40 rounded-2xl p-6 shadow-xl text-center space-y-4">
+                            <h2 className="text-2xl font-bold text-amber-400">{t.walkedTitle}</h2>
+                            <p className="text-slate-200">{t.walkedWith}</p>
+                            <p className="text-3xl font-extrabold text-amber-400">{formatKr(finalAmount)}</p>
+                            <button onClick={startGame} className="w-full bg-amber-400 hover:bg-amber-300 text-blue-950 font-bold py-3 rounded-xl text-lg transition cursor-pointer">
+                                {t.playAgain}
+                            </button>
+                        </div>
+                    )}
+
+                    {gameState === 'won' && (
+                        <div className="win-card max-w-lg mx-auto rounded-2xl p-6 shadow-xl text-center space-y-4">
+                            <div className="win-emoji text-4xl">🧪🏆✨</div>
+                            <h2 className="win-title text-3xl font-extrabold uppercase tracking-wide">{t.wonTitle}</h2>
+                            <p className="text-slate-200">{t.wonText}</p>
+                            <p className="text-3xl font-extrabold text-amber-400">{formatKr(1000000)}</p>
+                            <p className="text-sm text-slate-300">{lang === 'da' ? 'Du er hermed officielt kåret til' : 'You are hereby officially crowned'} <b className="text-amber-300">Superkemiker</b>.</p>
+                            <div className="bg-slate-950/70 border-l-4 border-amber-400 rounded-lg p-4 text-left text-sm italic text-slate-200">
+                                {WEIRD_PRAISE[lang][winPraiseIndex]}
+                            </div>
+                            <button onClick={startGame} className="w-full bg-amber-400 hover:bg-amber-300 text-blue-950 font-bold py-3 rounded-xl text-lg transition cursor-pointer">
+                                {t.playAgain}
+                            </button>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>

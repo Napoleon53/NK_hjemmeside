@@ -1,0 +1,155 @@
+OPSÆTNING AF DELT HIGHSCORE-LISTE (Google Sheets + Apps Script)
+=================================================================
+
+OBS - RETTELSE (adgang til highscorelisten lempet):
+ALLE scorer indsendes nu (ikke kun scorer over 70.000 point) - man kan
+altså komme på top 10-listen uanset hvor lavt man scorer, så længe man
+er blandt de 10 bedste den pågældende uge (eller alletiders). Toplisten
+er stadig top 10, som den var i den oprindelige opsætning nedenfor - der
+er ingen ændring i selve Apps Script-koden, så ingen redeploy er nødvendig.
+
+Dette gør det muligt for alle elever, uanset enhed/browser, at se en fælles
+"Top 10 denne uge" og "Top 10 alletiders" i b_spil_organiske_grupper.html.
+
+Det personlige rekord (gemt lokalt i hver elevs browser) virker allerede
+UDEN denne opsætning. Dette er kun for den DELTE liste.
+
+
+TRIN 1 - Opret regnearket
+--------------------------
+1. Gå til sheets.google.com og opret et nyt, tomt regneark.
+2. Kald det fx "Kemi Highscore".
+3. Lad selve arket være tomt - scriptet nedenfor opretter selv en
+   overskriftsrække første gang nogen sender en score.
+
+
+TRIN 2 - Tilføj Apps Script-koden
+-----------------------------------
+1. I regnearket: klik på "Extensions" / "Udvidelser" > "Apps Script".
+2. Slet den tomme kode der står i "Code.gs" i forvejen.
+3. Indsæt HELE koden herunder:
+
+--------------------------------------------------------------------
+function doPost(e) {
+  const sheet = getScoreSheet_();
+  const data = JSON.parse(e.postData.contents);
+
+  const name = sanitizeForSheet_(String(data.name || 'Anonym').substring(0, 30));
+  const score = Math.max(0, Math.min(1000000, Math.floor(Number(data.score)) || 0));
+
+  sheet.appendRow([new Date(), name, score]);
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ ok: true }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// Forhindrer "formel-injektion": uden dette ville et navn der starter med
+// fx "=" blive fortolket som en Sheets-formel, næste gang arket åbnes.
+function sanitizeForSheet_(str) {
+  return /^[=+\-@|\t\r]/.test(str) ? "'" + str : str;
+}
+
+function doGet(e) {
+  const sheet = getScoreSheet_();
+  const lastRow = sheet.getLastRow();
+  const rows = lastRow > 1 ? sheet.getRange(2, 1, lastRow - 1, 3).getValues() : [];
+
+  const entries = rows.map(r => ({ date: r[0], name: r[1], score: r[2] }));
+
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  const allTime = [...entries]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 10);
+
+  const weekly = entries
+    .filter(e => new Date(e.date) >= weekAgo)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 10);
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ allTime, weekly }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function getScoreSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName('Scores');
+  if (!sheet) {
+    sheet = ss.insertSheet('Scores');
+  }
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(['Tidspunkt', 'Navn', 'Score']);
+  }
+  return sheet;
+}
+--------------------------------------------------------------------
+
+4. Klik det blå "Save"-diskette-ikon (eller Ctrl+S).
+
+
+TRIN 3 - Deploy som Web App
+------------------------------
+1. Klik "Deploy" (øverst til højre) > "New deployment".
+2. Klik på tandhjulet ved siden af "Select type" og vælg "Web app".
+3. Under "Execute as": vælg "Me" (din egen konto).
+4. Under "Who has access": vælg "Anyone" (VIGTIGT - ellers kan eleverne
+   ikke bruge den, da de ikke skal logge ind for at spille).
+5. Klik "Deploy".
+6. Google beder dig godkende adgang første gang - klik igennem
+   godkendelsen (du vil se en advarsel om "usikker app", det er normalt
+   for dine egne scripts - klik "Advanced"/"Avanceret" > "Go to (ditnavn)
+   (unsafe)").
+7. Kopiér den URL der vises ("Web app URL"). Den ligner:
+   https://script.google.com/macros/s/AKfycb................/exec
+
+
+TRIN 4 - Sæt URL'en ind i spillet
+------------------------------------
+1. Åbn b_spil_organiske_grupper.html i en teksteditor.
+2. Find linjen (nær toppen af <script>-blokken):
+       const LEADERBOARD_URL = '';
+3. Sæt din URL ind mellem anførselstegnene, fx:
+       const LEADERBOARD_URL = 'https://script.google.com/macros/s/AKfycb.../exec';
+4. Gem filen og upload den til jeres side.
+
+Nu vises "Top 10 denne uge" og "Top 10 alletiders" på Game Over-skærmen,
+og alle indsendte scorer gemmes i "Scores"-arket i dit regneark.
+
+
+OPDATERING AF SCRIPTET SENERE
+--------------------------------
+Hvis du ændrer koden i Apps Script efter første deploy, skal du lave en
+NY deployment for at ændringerne slår igennem:
+"Deploy" > "Manage deployments" > blyant-ikonet > "Version: New version"
+> "Deploy". URL'en forbliver den samme.
+
+
+OM SIKKERHED
+--------------
+Ingen løsning der er tilgængelig fra internettet er 100% risikofri, men
+her er præcis hvad risikoen består i for denne opsætning - der er ingen
+"bagdør"-mulighed i den forstand at nogen kan overtage din konto eller
+dine andre filer:
+
+- Scriptet får KUN adgang til det ene regneark det er bundet til - ikke
+  resten af dit Google Drive, Gmail osv. Det skyldes at koden kun kalder
+  SpreadsheetApp på "det aktive regneark". Tjek selv godkendelsesskærmen
+  når du deployer (trin 3.6) - den bør nævne netop dette ene ark.
+
+- Formel-injektion (fx et "navn" der starter med "=") er nu forhindret
+  i koden ovenfor (sanitizeForSheet_). Uden det kunne et ondsindet navn
+  blive fortolket som en Sheets-formel, når du selv åbnede arket.
+
+- Der er INGEN rate-limiting: en teknisk snedig elev kan sende falske
+  scorer direkte til URL'en uden om selve spillet, eller spamme den med
+  mange requests. Værste konsekvens er en rodet highscore-liste, eller
+  at I rammer Googles daglige kvote for gratis Apps Script-konti (så
+  holder listen midlertidigt op med at virke, indtil kvoten nulstilles
+  - ikke et sikkerhedsbrud, bare en driftsforstyrrelse).
+
+- Hold scriptet til KUN at røre dette ene regneark. Hvis du på et
+  tidspunkt udvider koden til at bruge Gmail, andre Drive-filer osv.,
+  vil den offentlige URL kunne bruges til at udløse DEN adgang også -
+  så tilføj kun funktionalitet du er tryg ved er offentligt tilgængelig.

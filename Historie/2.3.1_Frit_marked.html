@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Det Frie Marked: Udbud og Efterspørgsel</title>
+<style>
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f4f7f6;
+        color: #2c3e50;
+        margin: 0;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .wrap {
+        width: 100%;
+        max-width: 920px;
+    }
+
+    h1 {
+        color: #1b4332;
+        text-align: center;
+        margin: 5px 0 2px 0;
+        font-size: 26px;
+    }
+
+    p.subtitle {
+        text-align: center;
+        color: #557;
+        margin: 0 0 18px 0;
+        font-size: 14px;
+        font-style: italic;
+    }
+
+    /* === NAV TABS === */
+    .nav-tabs {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    .nav-tabs button {
+        padding: 10px 16px;
+        font-size: 14px;
+        font-weight: 600;
+        border: 2px solid #74a892;
+        background: #fff;
+        color: #1b4332;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .nav-tabs button:hover { background: #e6f2ec; }
+
+    .nav-tabs button.active {
+        background: #2d6a4f;
+        border-color: #2d6a4f;
+        color: white;
+    }
+
+    .section {
+        display: none;
+        background: #fff;
+        border-radius: 12px;
+        padding: 25px 30px;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        animation: fadeIn 0.3s ease;
+    }
+
+    .section.visible { display: block; }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+        color: #2d6a4f;
+        border-bottom: 3px solid #d8ede2;
+        padding-bottom: 8px;
+        font-size: 20px;
+    }
+
+    .kilde-box {
+        background: #f6faf8;
+        border-left: 4px solid #2d6a4f;
+        padding: 12px 16px;
+        margin: 14px 0;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .kilde-box b { color: #1b4332; }
+
+    .btn-primary {
+        display: block;
+        margin: 20px auto 5px auto;
+        padding: 12px 26px;
+        background: #2d6a4f;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .btn-primary:hover { background: #1b4332; }
+
+    /* === SIMULATOR === */
+    .sim-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-top: 15px;
+    }
+
+    .slider-box {
+        background: #fafcfb;
+        border: 1px solid #dde8e2;
+        border-radius: 10px;
+        padding: 14px 16px;
+    }
+
+    .slider-box label {
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 6px;
+        font-size: 14px;
+    }
+
+    .slider-box input[type=range] {
+        width: 100%;
+        accent-color: #2d6a4f;
+    }
+
+    .icon-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        min-height: 46px;
+        margin-top: 10px;
+        align-items: flex-end;
+    }
+
+    .icon-row span { font-size: 22px; }
+
+    .market-visual {
+        margin-top: 22px;
+        display: grid;
+        grid-template-columns: 1fr 130px;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .gauge-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .gauge {
+        position: relative;
+        width: 46px;
+        height: 220px;
+        background: linear-gradient(to top, #2d6a4f 0%, #f1c40f 50%, #c0392b 100%);
+        border-radius: 23px;
+        border: 3px solid #34495e;
+    }
+
+    .gauge-marker {
+        position: absolute;
+        left: -14px;
+        width: 74px;
+        height: 4px;
+        background: #2c3e50;
+        top: 50%;
+        transition: top 0.5s ease;
+    }
+
+    .gauge-marker::after {
+        content: '◀';
+        position: absolute;
+        right: -18px;
+        top: -10px;
+        color: #2c3e50;
+        font-size: 16px;
+    }
+
+    .gauge-labels {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 220px;
+        font-size: 11px;
+        color: #557;
+        text-align: right;
+        margin-right: 4px;
+    }
+
+    .price-readout {
+        text-align: center;
+        margin-top: 10px;
+        font-weight: bold;
+        font-size: 15px;
+    }
+
+    .feedback-box {
+        margin-top: 18px;
+        padding: 14px 18px;
+        border-radius: 8px;
+        font-size: 15px;
+        line-height: 1.5;
+        transition: background 0.3s;
+    }
+
+    .fb-balance { background: #fff8e1; border-left: 5px solid #f1c40f; }
+    .fb-oversupply { background: #e8f6ee; border-left: 5px solid #2d6a4f; }
+    .fb-shortage { background: #fdecea; border-left: 5px solid #c0392b; }
+
+    /* === SCENARIER === */
+    .scenario-card {
+        background: #fafcfb;
+        border: 1px solid #dde8e2;
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin-bottom: 16px;
+    }
+
+    .scenario-text {
+        font-size: 15px;
+        margin-bottom: 12px;
+        line-height: 1.5;
+    }
+
+    .scenario-options {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .scenario-options button {
+        flex: 1;
+        min-width: 140px;
+        padding: 10px;
+        border: 2px solid #b6d4c5;
+        background: white;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .scenario-options button:hover { background: #e6f2ec; }
+    .scenario-options button:disabled { cursor: default; }
+
+    .scenario-options button.correct { background: #2d6a4f !important; color: white !important; border-color: #1b4332 !important; }
+    .scenario-options button.wrong { background: #c0392b !important; color: white !important; border-color: #922; }
+
+    .scenario-explanation {
+        display: none;
+        margin-top: 12px;
+        padding: 10px 14px;
+        background: #f6faf8;
+        border-left: 4px solid #2d6a4f;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    /* === QUIZ === */
+    .quiz-box {
+        max-width: 720px;
+        margin: 0 auto;
+    }
+
+    .quiz-question {
+        font-size: 17px;
+        font-weight: 600;
+        margin-bottom: 14px;
+        line-height: 1.4;
+    }
+
+    .hint-btn {
+        background: none;
+        border: 1px solid #9ab;
+        color: #567;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .hint-btn:hover { background: #eef4f1; }
+
+    .hint-warning { font-size: 12px; color: #a67c00; margin-left: 6px; }
+
+    .hint-text {
+        display: none;
+        background: #f6faf8;
+        padding: 10px;
+        border-left: 3px solid #2d6a4f;
+        margin-bottom: 16px;
+        font-style: italic;
+        color: #456;
+    }
+
+    .quiz-options button {
+        display: block;
+        width: 100%;
+        padding: 14px;
+        margin: 8px 0;
+        background: #eef4f1;
+        color: #2c3e50;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 15px;
+        text-align: left;
+        transition: background 0.2s, transform 0.1s;
+    }
+
+    .quiz-options button:hover { background: #d8ede2; transform: translateX(4px); }
+    .quiz-options button:disabled { cursor: default; transform: none; }
+
+    .quiz-options .correct { background: #2d6a4f !important; color: white !important; }
+    .quiz-options .wrong { background: #c0392b !important; color: white !important; }
+
+    .quiz-explanation {
+        margin-top: 16px;
+        padding: 16px;
+        background: #f6faf8;
+        border-left: 5px solid #2d6a4f;
+        display: none;
+        line-height: 1.5;
+        font-size: 14px;
+    }
+
+    .point-tag { display: block; margin-top: 8px; font-weight: bold; }
+    .point-full { color: #2d6a4f; }
+    .point-half { color: #a67c00; }
+    .point-zero { color: #c0392b; }
+
+    .quiz-footer {
+        margin-top: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid #dde8e2;
+        padding-top: 16px;
+    }
+
+    #quiz-score { font-weight: bold; }
+
+    #quiz-next-btn {
+        padding: 10px 22px;
+        background: #2d6a4f;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        display: none;
+    }
+
+    #quiz-next-btn:hover { background: #1b4332; }
+
+    @media (max-width: 640px) {
+        .sim-grid { grid-template-columns: 1fr; }
+        .market-visual { grid-template-columns: 1fr; }
+        .gauge-wrap { flex-direction: row; align-items: center; justify-content: center; }
+        .gauge { width: 30px; height: 140px; }
+        .gauge-labels { height: 140px; }
+    }
+</style>
+</head>
+<body>
+<div class="wrap">
+    <h1>Det Frie Marked: Udbud og Efterspørgsel</h1>
+    <p class="subtitle">Baseret på "Vores Verdenshistorie 2", s. 110-115 — om Adam Smith og den økonomiske liberalisme</p>
+
+    <div class="nav-tabs">
+        <button id="tab-btn-intro" class="active" onclick="showSection('intro')">① Introduktion</button>
+        <button id="tab-btn-sim" onclick="showSection('sim')">② Markedssimulator</button>
+        <button id="tab-btn-scenarier" onclick="showSection('scenarier')">③ Prøv dig selv</button>
+        <button id="tab-btn-quiz" onclick="showSection('quiz')">④ Forståelsesquiz</button>
+    </div>
+
+    <!-- ================= SECTION 1: INTRO ================= -->
+    <div id="section-intro" class="section visible">
+        <h2>Hvorfor stiger og falder priser?</h2>
+        <p style="font-size:14px; color:#556;">Prøv at gætte dig frem herunder, før du læser forklaringerne. Du ved sikkert mere, end du tror!</p>
+
+        <div class="scenario-card">
+            <div class="scenario-text"><b>🤔 Gæt selv:</b> Hvem var Adam Smith?</div>
+            <div class="scenario-options">
+                <button data-correct="false" onclick="answerIntroGuess(0, this)">En engelsk konge, der indførte frihandel</button>
+                <button data-correct="true" onclick="answerIntroGuess(0, this)">En skotsk professor, der i 1776 skrev en berømt bog om økonomi</button>
+                <button data-correct="false" onclick="answerIntroGuess(0, this)">En fransk opfinder af dampmaskinen</button>
+            </div>
+            <div class="scenario-explanation" id="intro-expl-0"></div>
+        </div>
+
+        <p>Bogen hed <i>Nationernes velstand</i> (1776). Heri gik Smith til angreb på datidens dominerende tænkning, <b>merkantilismen</b>, hvor staten beskyttede den hjemlige produktion med importtold.</p>
+
+        <div class="scenario-card">
+            <div class="scenario-text"><b>🤔 Gæt selv:</b> Hvad tror du, der menes med, at Smith gik ind for en <b>"markedsøkonomi"</b>?</div>
+            <div class="scenario-options">
+                <button data-correct="false" onclick="answerIntroGuess(1, this)">At staten skal fastsætte alle priser retfærdigt</button>
+                <button data-correct="true" onclick="answerIntroGuess(1, this)">At markedet regulerer sig selv gennem fri konkurrence, udbud og efterspørgsel — uden statslig indblanding</button>
+                <button data-correct="false" onclick="answerIntroGuess(1, this)">At kun kongen må eje fabrikker og butikker</button>
+            </div>
+            <div class="scenario-explanation" id="intro-expl-1"></div>
+        </div>
+
+        <div class="kilde-box">
+            <b>Kilde 35 (uddrag), Adam Smith om markedsøkonomi:</b><br>
+            "Hvis udbuddet af en vare blev for stort i forhold til efterspørgslen, ville varens pris falde og tvinge producenten til at skære produktionen ned. Hvis efterspørgslen derimod var større end udbuddet af varer, ville prisen stige og give producenten motivation til at øge produktionen."
+        </div>
+
+        <div class="scenario-card">
+            <div class="scenario-text"><b>🤔 Gæt selv:</b> Ud fra citatet ovenfor — hvad sker der med prisen, hvis der pludselig kommer <b>flere varer</b> på markedet, end folk vil købe?</div>
+            <div class="scenario-options">
+                <button data-correct="false" onclick="answerIntroGuess(2, this)">Prisen stiger</button>
+                <button data-correct="true" onclick="answerIntroGuess(2, this)">Prisen falder</button>
+                <button data-correct="false" onclick="answerIntroGuess(2, this)">Prisen er uændret</button>
+            </div>
+            <div class="scenario-explanation" id="intro-expl-2"></div>
+        </div>
+
+        <p>Når udbud og efterspørgsel er i balance, sælges varen til det, Smith kaldte <b>"den naturlige pris"</b>. Denne selvregulering kaldte han en <b>"usynlig hånd"</b> — uden at staten behøvede at blande sig.</p>
+
+        <button class="btn-primary" onclick="showSection('sim')">Prøv det selv i markedssimulatoren →</button>
+    </div>
+
+    <!-- ================= SECTION 2: SIMULATOR ================= -->
+    <div id="section-sim" class="section">
+        <h2>Markedssimulator</h2>
+        <p style="font-size:14px; color:#556;">Træk i skyderne og se, hvordan udbud og efterspørgsel af sko på markedet påvirker prisen.</p>
+
+        <div class="sim-grid">
+            <div class="slider-box">
+                <label>📦 Udbud (varer på markedet) <span id="udbud-val">5</span></label>
+                <input type="range" id="udbud-slider" min="1" max="10" value="5" oninput="updateMarket()">
+                <div class="icon-row" id="udbud-icons"></div>
+            </div>
+            <div class="slider-box">
+                <label>🙋 Efterspørgsel (købere der vil have skoene) <span id="efter-val">5</span></label>
+                <input type="range" id="efter-slider" min="1" max="10" value="5" oninput="updateMarket()">
+                <div class="icon-row" id="efter-icons"></div>
+            </div>
+        </div>
+
+        <div class="market-visual">
+            <div>
+                <div class="price-readout">Markedspris: <span id="price-readout">100 kr</span></div>
+                <div class="feedback-box" id="feedback-box"></div>
+            </div>
+            <div class="gauge-wrap">
+                <div style="display:flex; gap:6px;">
+                    <div class="gauge-labels">
+                        <span>Høj pris</span>
+                        <span>Naturlig pris</span>
+                        <span>Lav pris</span>
+                    </div>
+                    <div class="gauge">
+                        <div class="gauge-marker" id="gauge-marker"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-primary" onclick="showSection('scenarier')">Prøv selv med historiske eksempler →</button>
+    </div>
+
+    <!-- ================= SECTION 3: SCENARIER ================= -->
+    <div id="section-scenarier" class="section">
+        <h2>Prøv dig selv: Gæt prisen</h2>
+        <p style="font-size:14px; color:#556;">Læs hvert eksempel, og gæt hvad der sker med prisen, før du ser forklaringen.</p>
+        <div id="scenario-list"></div>
+    </div>
+
+    <!-- ================= SECTION 4: QUIZ ================= -->
+    <div id="section-quiz" class="section">
+        <h2>Forståelsesquiz</h2>
+        <div class="quiz-box">
+            <div id="quiz-question" class="quiz-question">Indlæser spørgsmål...</div>
+            <button id="quiz-hint-btn" class="hint-btn" onclick="toggleHint()">💡 Vis hint</button>
+            <span id="quiz-hint-warning" class="hint-warning" style="display:none;">(giver kun ½ point)</span>
+            <div id="quiz-hint-box" class="hint-text"></div>
+            <div id="quiz-options" class="quiz-options"></div>
+            <div id="quiz-explanation" class="quiz-explanation"></div>
+
+            <div class="quiz-footer">
+                <span id="quiz-score">Spørgsmål 1 af 8</span>
+                <button id="quiz-next-btn" onclick="nextQuizQuestion()">Næste spørgsmål →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+function showSection(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+    document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.remove('active'));
+    document.getElementById('section-' + name).classList.add('visible');
+    document.getElementById('tab-btn-' + name).classList.add('active');
+}
+
+/* ============================================================
+   INTRO GUESSES
+   ============================================================ */
+const introExplanations = [
+    "Adam Smith (1723-1790) var en skotsk professor. I 1776 udgav han bogen 'Nationernes velstand', som regnes som den klassiske økonomiske liberalismes 'bibel'.",
+    "Markedsøkonomi betyder, at det er markedet selv — gennem fri konkurrence, udbud og efterspørgsel — der bestemmer priser og produktion, i stedet for staten.",
+    "Når udbuddet bliver større end efterspørgslen, er der flere varer, end folk vil købe. Derfor falder prisen, indtil producenterne skærer ned på produktionen."
+];
+
+// Bland rækkefølgen af knapperne i en gruppe (fx "gæt selv"-kortene), så det
+// rigtige svar ikke altid ligger på samme plads. Selve svar-logikken bruger
+// data-correct-attributten, ikke positionen, så det er trygt at flytte rundt.
+function shuffleButtonsIn(selector) {
+    document.querySelectorAll(selector).forEach(container => {
+        const buttons = Array.from(container.children);
+        for (let i = buttons.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [buttons[i], buttons[j]] = [buttons[j], buttons[i]];
+        }
+        buttons.forEach(b => container.appendChild(b));
+    });
+}
+
+function answerIntroGuess(i, btn) {
+    const card = btn.closest('.scenario-card');
+    if (card.dataset.answered) return;
+    card.dataset.answered = '1';
+
+    const buttons = card.querySelectorAll('.scenario-options button');
+    buttons.forEach(b => b.disabled = true);
+
+    const isCorrect = btn.dataset.correct === 'true';
+    if (isCorrect) {
+        btn.classList.add('correct');
+    } else {
+        btn.classList.add('wrong');
+        card.querySelector('button[data-correct="true"]').classList.add('correct');
+    }
+
+    const explBox = document.getElementById('intro-expl-' + i);
+    explBox.innerHTML = (isCorrect ? '✅ ' : '❌ ') + introExplanations[i];
+    explBox.style.display = 'block';
+}
+
+/* ============================================================
+   MARKET SIMULATOR
+   ============================================================ */
+const BASE_PRICE = 100;
+
+function updateMarket() {
+    const udbud = parseInt(document.getElementById('udbud-slider').value, 10);
+    const efter = parseInt(document.getElementById('efter-slider').value, 10);
+
+    document.getElementById('udbud-val').innerText = udbud;
+    document.getElementById('efter-val').innerText = efter;
+
+    // Ikon-rækker (viser mængden visuelt)
+    document.getElementById('udbud-icons').innerHTML = '📦'.repeat(udbud);
+    document.getElementById('efter-icons').innerHTML = '🙋'.repeat(efter);
+
+    const diff = efter - udbud; // -9..+9
+    const price = Math.round(BASE_PRICE + diff * 12);
+    document.getElementById('price-readout').innerText = price + ' kr';
+
+    // Gauge-markør: top 5% (høj pris) til 95% (lav pris)
+    const topPercent = 50 - (diff / 9) * 45;
+    document.getElementById('gauge-marker').style.top = topPercent + '%';
+
+    const feedbackBox = document.getElementById('feedback-box');
+    if (diff === 0) {
+        feedbackBox.className = 'feedback-box fb-balance';
+        feedbackBox.innerHTML = '⚖️ <b>Udbud og efterspørgsel er i balance.</b> Varen sælges til det, Adam Smith kaldte "den naturlige pris" — der er hverken overskud eller mangel på markedet.';
+    } else if (diff < 0) {
+        feedbackBox.className = 'feedback-box fb-oversupply';
+        feedbackBox.innerHTML = '📉 <b>Udbuddet er større end efterspørgslen.</b> Der er flere varer, end folk vil købe — derfor <b>falder prisen</b>, indtil producenterne skærer ned på produktionen.';
+    } else {
+        feedbackBox.className = 'feedback-box fb-shortage';
+        feedbackBox.innerHTML = '📈 <b>Efterspørgslen er større end udbuddet.</b> Der er flere købere, end der er varer til — derfor <b>stiger prisen</b>, hvilket motiverer producenterne til at øge produktionen.';
+    }
+}
+
+/* ============================================================
+   SCENARIO EXERCISES
+   ============================================================ */
+const scenarios = [
+    {
+        text: "Den nye dampmaskine gør det billigere og hurtigere at spinde bomuld til garn. Fabrikkerne kan nu producere langt mere garn end tidligere, men lige så mange vil stadig købe garn som før.",
+        answer: "falder",
+        expl: "Udbuddet af garn stiger kraftigt, mens efterspørgslen er uændret. Ifølge Adam Smith betyder et større udbud i forhold til efterspørgslen, at prisen falder."
+    },
+    {
+        text: "En dårlig høst betyder, at der i år kommer langt færre kartofler på markedet end normalt. Folk vil stadig gerne købe lige så mange kartofler som før.",
+        answer: "stiger",
+        expl: "Udbuddet falder, mens efterspørgslen er uændret — der er nu færre varer end købere ønsker. Det giver ifølge Smith en stigende pris."
+    },
+    {
+        text: "Regeringen fjerner importtolden på udenlandsk korn, så meget mere korn end tidligere strømmer ind på markedet. Dette er netop den slags frihandel, Adam Smith gik ind for som modsætning til merkantilismens beskyttelsestold.",
+        answer: "falder",
+        expl: "Uden importtold stiger udbuddet af korn markant. Med et større udbud i forhold til efterspørgslen falder prisen — til gavn for forbrugerne, som Smith argumenterede for."
+    },
+    {
+        text: "En ny opfindelse bliver pludselig meget populær, og næsten alle i byen vil have den med det samme. Producenterne kan i første omgang ikke nå at lave flere.",
+        answer: "stiger",
+        expl: "Efterspørgslen stiger kraftigt, mens udbuddet (i første omgang) er uændret. Det giver en høj pris — hvilket samtidig motiverer producenterne til at øge produktionen, sådan som Smith beskrev det."
+    },
+    {
+        text: "En ny konkurrerende fabrik åbner i byen og begynder at sælge præcis det samme tøj som de eksisterende fabrikker. Der er stadig lige så mange kunder som før.",
+        answer: "falder",
+        expl: "Udbuddet af tøj stiger, fordi der nu er en fabrik mere, der producerer den samme vare. Med uændret efterspørgsel betyder det større udbud, at prisen falder."
+    }
+];
+
+let scenarioAnswered = [];
+
+function buildScenarios() {
+    const list = document.getElementById('scenario-list');
+    list.innerHTML = '';
+    scenarios.forEach((sc, i) => {
+        const card = document.createElement('div');
+        card.className = 'scenario-card';
+        card.innerHTML = `
+            <div class="scenario-text"><b>Eksempel ${i + 1}:</b> ${sc.text}</div>
+            <div class="scenario-options">
+                <button onclick="answerScenario(${i}, 'stiger', this)">Prisen stiger</button>
+                <button onclick="answerScenario(${i}, 'falder', this)">Prisen falder</button>
+                <button onclick="answerScenario(${i}, 'uændret', this)">Prisen er uændret</button>
+            </div>
+            <div class="scenario-explanation" id="scenario-expl-${i}"></div>
+        `;
+        list.appendChild(card);
+    });
+}
+
+function answerScenario(i, chosen, btn) {
+    if (scenarioAnswered[i]) return;
+    scenarioAnswered[i] = true;
+
+    const card = btn.closest('.scenario-card');
+    const buttons = card.querySelectorAll('.scenario-options button');
+    buttons.forEach(b => b.disabled = true);
+
+    const sc = scenarios[i];
+    const isCorrect = chosen === sc.answer;
+
+    if (isCorrect) {
+        btn.classList.add('correct');
+    } else {
+        btn.classList.add('wrong');
+        buttons.forEach(b => {
+            if (b.innerText.toLowerCase().includes(sc.answer)) b.classList.add('correct');
+        });
+    }
+
+    const explBox = document.getElementById('scenario-expl-' + i);
+    explBox.innerHTML = (isCorrect ? '✅ ' : '❌ ') + sc.expl;
+    explBox.style.display = 'block';
+}
+
+/* ============================================================
+   QUIZ ENGINE
+   ============================================================ */
+const quizQuestions = [
+    {
+        q: "Hvem skrev bogen 'Nationernes velstand' i 1776?",
+        hint: "Han var skotsk professor og regnes som far til den klassiske økonomiske liberalisme.",
+        a: [
+            { text: "Adam Smith", correct: true },
+            { text: "Karl Marx", correct: false },
+            { text: "John Locke", correct: false }
+        ],
+        expl: "Adam Smith (1723-1790) skrev 'Nationernes velstand' i 1776, som regnes som den klassiske liberalismes 'bibel'."
+    },
+    {
+        q: "Hvad kritiserede Adam Smith især ved merkantilismen?",
+        hint: "Det handlede om, hvordan staten beskyttede den hjemlige produktion.",
+        a: [
+            { text: "At staten beskyttede indenlandsk produktion med importtold og begrænsede den frie konkurrence", correct: true },
+            { text: "At der overhovedet slet ingen handel fandt sted mellem landene", correct: false },
+            { text: "At kongen slet ikke selv havde nogen indflydelse på priserne", correct: false }
+        ],
+        expl: "Smith mente, at merkantilismens importtold og beskyttelse af hjemlig produktion begrænsede den enkelte borgers frihed og hæmmede den frie konkurrence."
+    },
+    {
+        q: "Hvad sker der ifølge Adam Smith med prisen, hvis udbuddet af en vare bliver større end efterspørgslen?",
+        hint: "Tænk på simulatoren: mange varer, men få der vil købe dem.",
+        a: [
+            { text: "Prisen stiger", correct: false },
+            { text: "Prisen falder", correct: true },
+            { text: "Prisen er altid uændret", correct: false }
+        ],
+        expl: "Når der er flere varer på markedet, end folk ønsker at købe, presses prisen ned, indtil producenterne skærer produktionen ned."
+    },
+    {
+        q: "Hvad sker der med prisen, hvis efterspørgslen bliver større end udbuddet?",
+        hint: "Tænk på simulatoren: mange købere, men få varer.",
+        a: [
+            { text: "Prisen falder", correct: false },
+            { text: "Prisen er altid uændret", correct: false },
+            { text: "Prisen stiger", correct: true }
+        ],
+        expl: "Når der er flere købere, end der er varer til, stiger prisen — hvilket samtidig motiverer producenterne til at øge produktionen."
+    },
+    {
+        q: "Hvad kaldte Adam Smith den pris, der opstår, når udbud og efterspørgsel er i balance?",
+        hint: "Det modsatte af en 'kunstig' eller statsbestemt pris.",
+        a: [
+            { text: "Markedsprisen", correct: false },
+            { text: "Den naturlige pris", correct: true },
+            { text: "Ligevægtstolden", correct: false }
+        ],
+        expl: "Smith kaldte balancepunktet mellem udbud og efterspørgsel for 'den naturlige pris' — modsat den faktiske markedspris, der kan svinge over eller under den."
+    },
+    {
+        q: "Hvad kaldte Smith princippet om, at egoistiske handlinger i et frit marked alligevel skaber gavn for hele samfundet?",
+        hint: "Det er et billede på noget, man ikke kan se, men som styrer markedet alligevel.",
+        a: [
+            { text: "Den usynlige hånd", correct: true },
+            { text: "Verdensånden", correct: false },
+            { text: "Den frie vilje", correct: false }
+        ],
+        expl: "Smith mente, at individets egoistiske handlinger i et selvregulerende marked ville medføre harmoni og orden — som en 'usynlig hånd', der fordelte samfundets goder retfærdigt."
+    },
+    {
+        q: "Hvad kaldes det økonomiske system, hvor det er markedet — og ikke staten — der bestemmer priser og produktion?",
+        hint: "Ordet indeholder både 'marked' og 'økonomi'.",
+        a: [
+            { text: "Planøkonomi", correct: false },
+            { text: "Markedsøkonomi", correct: true },
+            { text: "Merkantilisme", correct: false }
+        ],
+        expl: "Fordi det er markedet selv (udbud og efterspørgsel), der bestemmer produktion og pris, kaldes det liberale økonomiske system for markedsøkonomi."
+    },
+    {
+        q: "Ifølge Adam Smith, hvilke opgaver skulle staten (herskeren) stadig tage sig af i et frit marked?",
+        hint: "Kilde 36 nævner tre konkrete opgaver — bl.a. noget med forsvar og domstole.",
+        a: [
+            { text: "At fastsætte og kontrollere priserne på samtlige varer i landet", correct: false },
+            { text: "At forsvare landet, sikre retfærdig retspleje og bygge det, ingen enkeltperson selv ville bygge", correct: true },
+            { text: "At personligt eje og drive samtlige fabrikker i hele landet", correct: false }
+        ],
+        expl: "Smith mente, staten kun skulle: 1) forsvare samfundet mod ydre angreb, 2) sikre en retfærdig retspleje, og 3) stå for offentlige arbejder, som ingen enkeltperson eller mindre gruppe ville have interesse i at bygge selv."
+    }
+];
+
+let quizCurrent = 0;
+let quizScore = 0;
+let quizHintUsed = false;
+const quizTotal = quizQuestions.length;
+
+function loadQuizQuestion() {
+    const explBox = document.getElementById('quiz-explanation');
+    const nextBtn = document.getElementById('quiz-next-btn');
+    const hintBox = document.getElementById('quiz-hint-box');
+    const hintBtn = document.getElementById('quiz-hint-btn');
+    const hintWarning = document.getElementById('quiz-hint-warning');
+    const optBox = document.getElementById('quiz-options');
+
+    explBox.style.display = 'none';
+    nextBtn.style.display = 'none';
+    hintBox.style.display = 'none';
+    hintBtn.style.display = 'inline-block';
+    hintBtn.disabled = false;
+    hintWarning.style.display = 'none';
+    quizHintUsed = false;
+    optBox.innerHTML = '';
+
+    const qData = quizQuestions[quizCurrent];
+    document.getElementById('quiz-question').innerText = qData.q;
+    hintBox.innerText = '💡 ' + qData.hint;
+    document.getElementById('quiz-score').innerText = `Spørgsmål ${quizCurrent + 1} af ${quizTotal}`;
+
+    // Bland rækkefølgen af svarmulighederne, så det rigtige svar ikke altid står samme sted
+    const shuffled = [...qData.a].sort(() => Math.random() - 0.5);
+
+    shuffled.forEach((opt, index) => {
+        const btn = document.createElement('button');
+        btn.innerText = opt.text;
+        btn.onclick = () => checkQuizAnswer(index, btn, shuffled, qData);
+        optBox.appendChild(btn);
+    });
+}
+
+function toggleHint() {
+    const hintBox = document.getElementById('quiz-hint-box');
+    const hintWarning = document.getElementById('quiz-hint-warning');
+    if (hintBox.style.display === 'none' || hintBox.style.display === '') {
+        hintBox.style.display = 'block';
+        quizHintUsed = true;
+        hintWarning.style.display = 'inline';
+    } else {
+        hintBox.style.display = 'none';
+    }
+}
+
+function checkQuizAnswer(index, btn, shuffled, qData) {
+    const optBox = document.getElementById('quiz-options');
+    const allBtns = optBox.querySelectorAll('button');
+    allBtns.forEach(b => b.disabled = true);
+    document.getElementById('quiz-hint-btn').disabled = true;
+    document.getElementById('quiz-hint-box').style.display = 'none';
+
+    const explBox = document.getElementById('quiz-explanation');
+    const isCorrect = shuffled[index].correct;
+    let pointTag;
+
+    if (isCorrect) {
+        btn.classList.add('correct');
+        if (quizHintUsed) {
+            quizScore += 0.5;
+            pointTag = '<span class="point-tag point-half">☆ ½ point (du brugte hintet)</span>';
+        } else {
+            quizScore += 1;
+            pointTag = '<span class="point-tag point-full">★ 1 point</span>';
+        }
+        explBox.innerHTML = '✅ <b>Korrekt!</b><br>' + qData.expl + pointTag;
+    } else {
+        btn.classList.add('wrong');
+        const correctIndex = shuffled.findIndex(o => o.correct);
+        allBtns[correctIndex].classList.add('correct');
+        pointTag = '<span class="point-tag point-zero">0 point</span>';
+        explBox.innerHTML = '❌ <b>Forkert.</b><br>' + qData.expl + pointTag;
+    }
+
+    explBox.style.display = 'block';
+    document.getElementById('quiz-next-btn').style.display = 'block';
+    if (quizCurrent === quizTotal - 1) {
+        document.getElementById('quiz-next-btn').innerText = 'Se resultat';
+    }
+}
+
+function nextQuizQuestion() {
+    quizCurrent++;
+    if (quizCurrent < quizTotal) {
+        loadQuizQuestion();
+    } else {
+        showQuizResult();
+    }
+}
+
+function formatQuizScore(s) {
+    return (Math.round(s * 2) / 2).toString().replace('.', ',');
+}
+
+function showQuizResult() {
+    const box = document.querySelector('#section-quiz .quiz-box');
+    box.innerHTML = `
+        <h2 style="border:none;">Quiz gennemført!</h2>
+        <p style="text-align:center; font-size:1.3em; margin: 25px 0;">Du fik <b>${formatQuizScore(quizScore)}</b> ud af <b>${quizTotal}</b> point.</p>
+        <p style="text-align:center; color:#556;">
+            ${quizScore >= 6.5 ? "Flot! Du har godt styr på udbud, efterspørgsel og Adam Smiths tanker." :
+              quizScore >= 4 ? "Godt gået. Kig evt. simulatoren og teksten om Adam Smith igennem en gang til." :
+              "Prøv igen — brug gerne simulatoren i afsnit ② igen, og læs kildeteksten om Adam Smith en ekstra gang."}
+        </p>
+        <button onclick="location.reload()" style="display:block; margin:30px auto; padding:14px 28px; background:#2d6a4f; border:none; border-radius:6px; cursor:pointer; font-weight:bold; color:white; font-size:15px;">Prøv igen</button>
+    `;
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+shuffleButtonsIn('#section-intro .scenario-options');
+updateMarket();
+buildScenarios();
+loadQuizQuestion();
+</script>
+</body>
+</html>

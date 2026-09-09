@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syre-Base Træner: Find Produkterne</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --bg: #f0f4f8;
+            --card: #ffffff;
+            --text: #34495e;
+            --glow: rgba(39, 174, 96, 0.4);
+            --pair1: #3498db;
+            --pair2: #9b59b6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--card);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        header { text-align: center; margin-bottom: 40px; }
+        h1 { color: var(--primary); font-size: 2rem; margin-bottom: 10px; }
+        
+        /* Progress bar */
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Opgave-navigator */
+        .task-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin: 0 0 25px;
+        }
+
+        .task-nav-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 2px solid #d0d7de;
+            background: #fff;
+            color: var(--text);
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .task-nav-btn:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+        .task-nav-btn.current {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .task-nav-btn.completed {
+            border-color: var(--success);
+            background: var(--success);
+            color: white;
+        }
+
+        .step-info {
+            text-align: center;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            min-height: 1.5em;
+        }
+
+        /* Equation Visuals */
+        .equation-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 1.8rem;
+            margin: 40px 0;
+        }
+
+        .molecule {
+            padding: 20px 25px;
+            border: 3px solid #eee;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 110px;
+        }
+
+        .molecule.active-selection:hover {
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+
+        .molecule.correct {
+            border-color: var(--success);
+            background-color: rgba(39, 174, 96, 0.05);
+            box-shadow: 0 0 20px var(--glow);
+            transform: scale(1.05);
+        }
+
+        .molecule.wrong {
+            border-color: var(--error);
+            animation: shake 0.4s ease;
+        }
+
+        .molecule.placeholder {
+            border: 3px dashed #ddd;
+            color: #ccc;
+            cursor: default;
+        }
+
+        .molecule.fade-in {
+            animation: fadeIn 0.5s forwards;
+            border-color: var(--success);
+            background-color: rgba(39, 174, 96, 0.05);
+        }
+
+        .symbol { font-weight: bold; color: var(--primary); }
+
+        .molecule.pair-a { outline: 3px solid var(--pair1); outline-offset: 3px; }
+        .molecule.pair-b { outline: 3px solid var(--pair2); outline-offset: 3px; }
+
+        /* Flyvende hydron-animation */
+        .hydron-fly {
+            position: fixed;
+            transform: translate(-50%, -50%);
+            background: var(--accent);
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+            padding: 5px 9px;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.5);
+            z-index: 1000;
+            pointer-events: none;
+            transition: left 0.8s cubic-bezier(0.4,0,0.2,1), top 0.8s cubic-bezier(0.4,0,0.2,1), opacity 0.7s ease 0.15s;
+            opacity: 1;
+        }
+
+        .replay-btn {
+            display: inline-block;
+            margin-left: 10px;
+            padding: 4px 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--accent);
+            background: white;
+            border: 2px solid var(--accent);
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .replay-btn:hover { background: var(--accent); color: white; }
+
+        /* Korrespondancepar-forklaring */
+        .pair-caption {
+            max-width: 620px;
+            margin: 0 auto 10px;
+            font-size: 0.95rem;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: opacity 0.4s ease;
+        }
+        .pair-caption.show { opacity: 1; max-height: 200px; }
+        .pair-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+        }
+        .pair-a-line { background: rgba(52, 152, 219, 0.08); }
+        .pair-b-line { background: rgba(155, 89, 182, 0.08); }
+        .pair-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+        .pair-a-dot { background: var(--pair1); }
+        .pair-b-dot { background: var(--pair2); }
+
+        /* Forklaring ved forkert svar */
+        .feedback-msg {
+            text-align: center;
+            font-size: 0.95rem;
+            color: var(--error);
+            min-height: 1.4em;
+            margin: 10px 0 0;
+            opacity: 0;
+            transition: opacity 0.3s;
+            padding: 0 10px;
+        }
+        .feedback-msg.show { opacity: 1; }
+
+        /* Sluttabel med alle korrespondancepar */
+        .summary-table-wrap { overflow-x: auto; margin: 25px 0; }
+        .summary-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        .summary-table th, .summary-table td { padding: 10px 12px; text-align: center; border-bottom: 1px solid #eee; white-space: nowrap; }
+        .summary-table th { color: var(--primary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.03em; }
+        .summary-table td.pair-a-cell { color: var(--pair1); font-weight: bold; }
+        .summary-table td.pair-b-cell { color: var(--pair2); font-weight: bold; }
+
+        /* Interaction Elements */
+        .options-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+            justify-content: center;
+            background: #f9f9f9;
+            padding: 25px;
+            border-radius: 15px;
+            min-height: 120px;
+        }
+
+        .option-btn {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 12px 14px;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: 0.2s;
+            overflow-wrap: break-word;
+            text-align: center;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .option-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        .praise-msg {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--success);
+            height: 1.5em;
+            margin: 20px 0;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .praise-msg.show { opacity: 1; }
+
+        .btn-next {
+            display: block;
+            margin: 30px auto 0;
+            padding: 15px 40px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-next:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-next:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+        /* Summary Screen */
+        #summary {
+            display: none;
+            text-align: center;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .equation-area { font-size: 1.2rem; }
+            .molecule { padding: 10px 15px; min-width: 80px; }
+            .options-box { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+            .option-btn { font-size: 1rem; padding: 10px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Syre-base-reaktioner</h1>
+            <div class="task-nav" id="task-nav"></div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress"></div>
+            </div>
+            <div id="task-counter" style="font-weight: bold;">Opgave 1 af 8</div>
+        </header>
+
+        <div id="game-view">
+            <div class="step-info" id="step-info">Trin 1: Hvem er syren?</div>
+            
+            <div class="equation-area">
+                <div class="molecule active-selection" id="r1" onclick="checkAcid(0)"></div>
+                <div class="symbol">+</div>
+                <div class="molecule active-selection" id="r2" onclick="checkAcid(1)"></div>
+                <div class="symbol" id="arrow-symbol">⟶</div>
+                <div class="molecule placeholder" id="p1">?</div>
+                <div class="symbol">+</div>
+                <div class="molecule placeholder" id="p2">?</div>
+            </div>
+
+            <div class="praise-msg" id="praise-msg"></div>
+            <div class="pair-caption" id="pair-caption"></div>
+            <div class="feedback-msg" id="feedback-msg"></div>
+
+            <div class="options-box" id="options-box" style="display: none;">
+                </div>
+
+            <button class="btn-next" id="next-btn" onclick="goToNextStep()" disabled>Næste Trin ⟶</button>
+        </div>
+
+        <div id="summary">
+            <h2 style="font-size: 2.5rem; color: var(--success);">Fantastisk!</h2>
+            <p style="font-size: 1.2rem; margin: 20px 0;">Du har mestret hydronvandringen og gennemført alle 8 reaktioner korrekt. Her er alle korrespondanceparrene samlet:</p>
+            <div class="summary-table-wrap">
+                <table class="summary-table" id="summary-table"></table>
+            </div>
+            <button class="btn-next" onclick="location.reload()">Prøv igen</button>
+        </div>
+    </div>
+
+    <script>
+        // Data for 8 opgaver med UDVIDEDE svarmuligheder (distractors)
+        // Brug af Unicodes for kemiske tegn: ₂ ₃ ₄ ⁺ ⁻ ⟶
+        const tasks = [
+            {
+                reactants: [{ formula: "HCl", isAcid: true }, { formula: "H\u2082O", isAcid: false }],
+                products: ["Cl\u207B", "H\u2083O\u207A"],
+                distractors: [
+                    { f: "Cl\u207A", why: "Ladningen er forkert \u2013 n\u00E5r HCl afgiver en positiv hydron, bliver resten negativt ladet: Cl\u207B, ikke Cl\u207A." },
+                    { f: "OH\u207B", why: "OH\u207B dannes, n\u00E5r H\u2082O afgiver en hydron \u2013 men her er H\u2082O den, der modtager en hydron, og bliver til H\u2083O\u207A." },
+                    { f: "H\u2082", why: "Der dannes ikke H\u2082 \u2013 kun \u00E9n hydron (H\u207A) flyttes fra HCl til H\u2082O, ikke et helt hydrogenmolekyle." },
+                    { f: "HClO", why: "Det kr\u00E6ver en oxidationsreaktion at danne HClO \u2013 i en syre-base-reaktion flyttes der kun en hydron, ikke et oxygenatom." },
+                    { f: "Cl\u2082", why: "Cl\u2082 dannes ikke \u2013 kloratomet i HCl bliver til den enkelte ion Cl\u207B, n\u00E5r hydronen forlader molekylet." },
+                    { f: "H\u2082O\u2082", why: "Hydrogenperoxid har intet med denne reaktion at g\u00F8re \u2013 der sker ingen oxidation her." },
+                    { f: "O\u2082", why: "Der frig\u00F8res ikke oxygen i en syre-base-reaktion \u2013 kun en hydron flyttes." },
+                    { f: "H\u207A", why: "Den l\u00F8se hydron bliver ikke tilbage alene \u2013 den bindes til H\u2082O og danner H\u2083O\u207A." },
+                    { f: "ClO\u207B", why: "ClO\u207B ville kr\u00E6ve, at kloratomet bandt sig til endnu et oxygenatom \u2013 det sker ikke her." }
+                ]
+            },
+            {
+                reactants: [{ formula: "CH\u2083COOH", isAcid: true }, { formula: "H\u2082O", isAcid: false }],
+                products: ["CH\u2083COO\u207B", "H\u2083O\u207A"],
+                distractors: [
+                    { f: "CH\u2084", why: "Der dannes ikke metan \u2013 kulstofskelettet i eddikesyre bevares, kun hydronen p\u00E5 -COOH-gruppen flyttes." },
+                    { f: "OH\u207B", why: "OH\u207B dannes, n\u00E5r H\u2082O afgiver en hydron \u2013 men her modtager H\u2082O en hydron og bliver til H\u2083O\u207A." },
+                    { f: "CO\u2082", why: "Der sker ingen nedbrydning af molekylet til CO\u2082 i en syre-base-reaktion \u2013 kun en hydron flyttes." },
+                    { f: "CH\u2083COOH\u2082\u207A", why: "Eddikesyre er syren og afgiver en hydron \u2013 den optager ikke selv en ekstra hydron." },
+                    { f: "CH\u2083\u207A", why: "Der dannes ikke en l\u00F8srevet CH\u2083\u207A-ion \u2013 kun hydronen p\u00E5 carboxylsyregruppen (-COOH) flyttes." },
+                    { f: "CH\u2083O\u207B", why: "Denne ion passer ikke til eddikesyrens struktur \u2013 hydronen forlader -COOH-gruppen og danner CH\u2083COO\u207B, ikke CH\u2083O\u207B." },
+                    { f: "C\u2082H\u2086", why: "Der dannes ikke ethan \u2013 ingen kulstof-kulstofbindinger \u00E6ndres i denne reaktion." },
+                    { f: "H\u2082", why: "Kun \u00E9n hydron (H\u207A) overf\u00F8res til H\u2082O \u2013 der dannes ikke et frit hydrogenmolekyle." }
+                ]
+            },
+            {
+                reactants: [{ formula: "NH\u2083", isAcid: false }, { formula: "H\u2082O", isAcid: true }],
+                products: ["NH\u2084\u207A", "OH\u207B"],
+                distractors: [
+                    { f: "NH\u2082\u207B", why: "NH\u2082\u207B ville dannes, hvis NH\u2083 afgav en hydron \u2013 men her modtager NH\u2083 en hydron og bliver til NH\u2084\u207A." },
+                    { f: "H\u2083O\u207A", why: "H\u2083O\u207A dannes, n\u00E5r H\u2082O modtager en hydron \u2013 men her afgiver H\u2082O hydronen og bliver til OH\u207B." },
+                    { f: "N\u2082", why: "Der dannes ikke N\u2082 \u2013 nitrogenatomet forbliver bundet i ammoniumionen NH\u2084\u207A." },
+                    { f: "H\u2082", why: "Der frig\u00F8res ikke et hydrogenmolekyle \u2013 kun \u00E9n hydron flyttes fra H\u2082O til NH\u2083." },
+                    { f: "NH\u2084\u207B", why: "Ladningen er forkert \u2013 n\u00E5r NH\u2083 modtager en positiv hydron, bliver ionen positivt ladet: NH\u2084\u207A, ikke NH\u2084\u207B." },
+                    { f: "NO\u2083\u207B", why: "Nitrat (NO\u2083\u207B) h\u00F8rer til salpetersyre, ikke til denne reaktion mellem ammoniak og vand." },
+                    { f: "NO\u2082\u207B", why: "Nitrit (NO\u2082\u207B) er ikke et produkt her \u2013 der sker ingen omdannelse af nitrogen til en oxid-ion." },
+                    { f: "O\u2082", why: "Der frig\u00F8res ikke oxygen \u2013 kun en hydron flyttes mellem molekylerne." }
+                ]
+            },
+            {
+                reactants: [{ formula: "HNO\u2083", isAcid: true }, { formula: "H\u2082O", isAcid: false }],
+                products: ["NO\u2083\u207B", "H\u2083O\u207A"],
+                distractors: [
+                    { f: "NO\u2082", why: "NO\u2082 er en gasart dannet ved nedbrydning af salpetersyre \u2013 i denne syre-base-reaktion sker der kun en hydronoverf\u00F8rsel." },
+                    { f: "NO\u2083\u207A", why: "Ladningen er forkert \u2013 n\u00E5r HNO\u2083 afgiver en positiv hydron, bliver resten negativt ladet: NO\u2083\u207B, ikke NO\u2083\u207A." },
+                    { f: "OH\u207B", why: "OH\u207B dannes, n\u00E5r H\u2082O afgiver en hydron \u2013 men her er H\u2082O den, der modtager hydronen, og bliver til H\u2083O\u207A." },
+                    { f: "HNO\u2082", why: "Salpetersyrling (HNO\u2082) er et andet molekyle \u2013 der sker ikke en oxygen-udveksling i denne reaktion." },
+                    { f: "N\u2082", why: "Der dannes ikke frit nitrogen \u2013 nitrogenatomet forbliver bundet i nitrationen NO\u2083\u207B." },
+                    { f: "O\u2082", why: "Der frig\u00F8res ikke oxygen i denne reaktion \u2013 kun en hydron flyttes." },
+                    { f: "H\u2082", why: "Der dannes ikke et frit hydrogenmolekyle \u2013 hydronen bindes til H\u2082O og danner H\u2083O\u207A." },
+                    { f: "NO", why: "NO dannes ikke her \u2013 det kr\u00E6ver en redoxreaktion, ikke en simpel hydronoverf\u00F8rsel." },
+                    { f: "NO\u2082\u207B", why: "Nitrit (NO\u2082\u207B) har \u00E9t oxygenatom for lidt i forhold til nitrat \u2013 det er ikke produktet af denne reaktion." }
+                ]
+            },
+            {
+                reactants: [{ formula: "HF", isAcid: true }, { formula: "H\u2082O", isAcid: false }],
+                products: ["F\u207B", "H\u2083O\u207A"],
+                distractors: [
+                    { f: "F\u2082", why: "Der dannes ikke F\u2082 \u2013 fluoratomet bliver til den enkelte ion F\u207B, n\u00E5r hydronen forlader molekylet." },
+                    { f: "OH\u207B", why: "OH\u207B dannes, n\u00E5r H\u2082O afgiver en hydron \u2013 men her modtager H\u2082O en hydron og bliver til H\u2083O\u207A." },
+                    { f: "HF\u2082\u207B", why: "HF\u2082\u207B kan dannes ved h\u00F8je HF-koncentrationer, men er ikke det almindelige produkt i denne simple syre-base-reaktion." },
+                    { f: "F\u207A", why: "Ladningen er forkert \u2013 n\u00E5r HF afgiver en positiv hydron, bliver resten negativt ladet: F\u207B, ikke F\u207A." },
+                    { f: "H\u2082", why: "Der dannes ikke et frit hydrogenmolekyle \u2013 kun \u00E9n hydron flyttes fra HF til H\u2082O." },
+                    { f: "O\u2082", why: "Der frig\u00F8res ikke oxygen \u2013 kun en hydron overf\u00F8res mellem molekylerne." },
+                    { f: "FO\u207B", why: "FO\u207B ville kr\u00E6ve en omlejring af oxygen- og fluoratomer \u2013 det sker ikke i en simpel hydronoverf\u00F8rsel." },
+                    { f: "H\u2082F\u207A", why: "Det er H\u2082O, der modtager hydronen og bliver til H\u2083O\u207A \u2013 ikke HF, der optager endnu en hydron." }
+                ]
+            },
+            {
+                reactants: [{ formula: "H\u2082CO\u2083", isAcid: true }, { formula: "H\u2082O", isAcid: false }],
+                products: ["HCO\u2083\u207B", "H\u2083O\u207A"],
+                distractors: [
+                    { f: "CO\u2083\u00B2\u207B", why: "CO\u2083\u00B2\u207B dannes f\u00F8rst, hvis HCO\u2083\u207B ogs\u00E5 afgiver sin hydron \u2013 i dette trin afgiver H\u2082CO\u2083 kun \u00E9n hydron og bliver til HCO\u2083\u207B." },
+                    { f: "CO\u2082", why: "Kulsyre kan nedbrydes til CO\u2082 og vand, men det er ikke, hvad der sker i denne syre-base-reaktion, hvor kun en hydron flyttes." },
+                    { f: "H\u2082", why: "Der dannes ikke et frit hydrogenmolekyle \u2013 kun \u00E9n hydron overf\u00F8res til H\u2082O." },
+                    { f: "OH\u207B", why: "OH\u207B dannes, n\u00E5r H\u2082O afgiver en hydron \u2013 men her modtager H\u2082O en hydron og bliver til H\u2083O\u207A." },
+                    { f: "O\u2082", why: "Der frig\u00F8res ikke oxygen i denne reaktion." },
+                    { f: "CO", why: "Kulilte (CO) dannes ikke ved en simpel hydronoverf\u00F8rsel." },
+                    { f: "H\u2082CO\u2083\u207A", why: "H\u2082CO\u2083 er syren og afgiver en hydron \u2013 den optager ikke selv en ekstra hydron." },
+                    { f: "CH\u2084", why: "Der dannes ikke metan \u2013 kulstofatomet forbliver bundet i carbonat-strukturen." }
+                ]
+            },
+            {
+                reactants: [{ formula: "HBr", isAcid: true }, { formula: "H\u2082O", isAcid: false }],
+                products: ["Br\u207B", "H\u2083O\u207A"],
+                distractors: [
+                    { f: "Br\u2082", why: "Br\u2082 dannes ikke \u2013 bromatomet bliver til den enkelte ion Br\u207B, n\u00E5r hydronen forlader molekylet." },
+                    { f: "OH\u207B", why: "OH\u207B dannes, n\u00E5r H\u2082O afgiver en hydron \u2013 men her modtager H\u2082O en hydron og bliver til H\u2083O\u207A." },
+                    { f: "HBrO", why: "HBrO ville kr\u00E6ve tilf\u00F8jelse af et oxygenatom \u2013 det sker ikke i en simpel hydronoverf\u00F8rsel." },
+                    { f: "Br\u207A", why: "Ladningen er forkert \u2013 n\u00E5r HBr afgiver en positiv hydron, bliver resten negativt ladet: Br\u207B, ikke Br\u207A." },
+                    { f: "H\u2082", why: "Der dannes ikke et frit hydrogenmolekyle \u2013 kun \u00E9n hydron flyttes." },
+                    { f: "O\u2082", why: "Der frig\u00F8res ikke oxygen i denne reaktion." },
+                    { f: "BrO\u2083\u207B", why: "Bromat (BrO\u2083\u207B) kr\u00E6ver tre ekstra oxygenatomer \u2013 det dannes ikke ved en simpel hydronoverf\u00F8rsel." },
+                    { f: "H\u2082Br\u207A", why: "Det er H\u2082O, der modtager hydronen og bliver til H\u2083O\u207A \u2013 ikke HBr, der optager endnu en hydron." }
+                ]
+            },
+            {
+                reactants: [{ formula: "H\u2083PO\u2084", isAcid: true }, { formula: "H\u2082O", isAcid: false }],
+                products: ["H\u2082PO\u2084\u207B", "H\u2083O\u207A"],
+                distractors: [
+                    { f: "PO\u2084\u00B3\u207B", why: "PO\u2084\u00B3\u207B dannes f\u00F8rst, n\u00E5r alle tre hydroner er afgivet \u2013 i dette f\u00F8rste trin afgiver H\u2083PO\u2084 kun \u00E9n hydron og bliver til H\u2082PO\u2084\u207B." },
+                    { f: "HPO\u2084\u00B2\u207B", why: "HPO\u2084\u00B2\u207B dannes i trin to, n\u00E5r H\u2082PO\u2084\u207B afgiver endnu en hydron \u2013 ikke i dette f\u00F8rste trin." },
+                    { f: "OH\u207B", why: "OH\u207B dannes, n\u00E5r H\u2082O afgiver en hydron \u2013 men her modtager H\u2082O en hydron og bliver til H\u2083O\u207A." },
+                    { f: "P\u2084", why: "Der dannes ikke frit fosfor \u2013 fosforatomet forbliver bundet i fosfation." },
+                    { f: "O\u2082", why: "Der frig\u00F8res ikke oxygen i denne reaktion." },
+                    { f: "H\u2082", why: "Der dannes ikke et frit hydrogenmolekyle \u2013 kun \u00E9n hydron overf\u00F8res til H\u2082O." },
+                    { f: "H\u2083PO\u2083", why: "Fosforsyrling (H\u2083PO\u2083) er et andet molekyle med \u00E9t oxygenatom mindre \u2013 det dannes ikke her." },
+                    { f: "PO\u2083\u00B3\u207B", why: "PO\u2083\u00B3\u207B passer ikke til fosforsyrens struktur i denne reaktion." }
+                ]
+            }
+        ];
+
+        let currentIdx = 0;
+        let step = 1; // 0: gennemgår løst opgave, 1: Syre, 2: Produkter
+        let reactantOrder = [0, 1]; // Hvilken reactants-indeks der vises i hhv. r1 og r2 (blandes pr. opgave)
+        let selectedProd = [];
+        let completed = new Array(tasks.length).fill(false);
+        let feedbackTimer;
+        const praiseWords = ["Super flot!", "Helt rigtigt!", "Præcis!", "Du har styr på det!", "Flot set!", "Rigtig godt!", "Perfekt!"];
+
+        function showPraise() {
+            const msg = document.getElementById('praise-msg');
+            msg.innerText = praiseWords[Math.floor(Math.random() * praiseWords.length)];
+            msg.classList.add('show');
+            setTimeout(() => msg.classList.remove('show'), 2000);
+        }
+
+        function renderTaskNav() {
+            const nav = document.getElementById('task-nav');
+            nav.innerHTML = "";
+            tasks.forEach((_, i) => {
+                const btn = document.createElement('button');
+                btn.className = "task-nav-btn"
+                    + (completed[i] ? " completed" : "")
+                    + (i === currentIdx ? " current" : "");
+                btn.innerText = i + 1;
+                btn.title = completed[i] ? `Opgave ${i + 1} (løst)` : `Gå til opgave ${i + 1}`;
+                btn.onclick = () => jumpToTask(i);
+                nav.appendChild(btn);
+            });
+        }
+
+        function updateProgress() {
+            const doneCount = completed.filter(Boolean).length;
+            document.getElementById('progress').style.width = `${(doneCount / tasks.length) * 100}%`;
+        }
+
+        function jumpToTask(idx) {
+            currentIdx = idx;
+            document.getElementById('summary').style.display = "none";
+            document.getElementById('game-view').style.display = "block";
+            if (completed[idx]) {
+                showCompletedState(idx);
+            } else {
+                initTask();
+            }
+            renderTaskNav();
+        }
+
+        function initTask() {
+            const task = tasks[currentIdx];
+            document.getElementById('task-counter').innerText = `Opgave ${currentIdx + 1} af ${tasks.length}`;
+
+            // Bland hvilken side (venstre/højre) syren vises i, så den ikke altid står i samme slot
+            reactantOrder = Math.random() < 0.5 ? [0, 1] : [1, 0];
+
+            const r1 = document.getElementById('r1');
+            const r2 = document.getElementById('r2');
+            r1.innerText = task.reactants[reactantOrder[0]].formula;
+            r1.className = "molecule active-selection";
+            r2.innerText = task.reactants[reactantOrder[1]].formula;
+            r2.className = "molecule active-selection";
+
+            document.getElementById('p1').innerText = "?";
+            document.getElementById('p1').className = "molecule placeholder";
+            document.getElementById('p2').innerText = "?";
+            document.getElementById('p2').className = "molecule placeholder";
+
+            document.getElementById('options-box').style.display = "none";
+            document.getElementById('next-btn').disabled = true;
+            document.getElementById('next-btn').innerText = "Næste Trin ⟶";
+            document.getElementById('step-info').innerHTML = "Trin 1: Klik på syren (hydrondonoren)";
+
+            const fb = document.getElementById('feedback-msg');
+            fb.innerText = "";
+            fb.classList.remove('show');
+            const cap = document.getElementById('pair-caption');
+            cap.innerHTML = "";
+            cap.classList.remove('show');
+
+            step = 1;
+            selectedProd = [];
+        }
+
+        function showCompletedState(idx) {
+            const task = tasks[idx];
+            document.getElementById('task-counter').innerText = `Opgave ${idx + 1} af ${tasks.length} (løst)`;
+
+            const acidIdx = task.reactants[0].isAcid ? 0 : 1;
+            const r1 = document.getElementById('r1');
+            const r2 = document.getElementById('r2');
+            r1.innerText = task.reactants[0].formula;
+            r1.className = "molecule" + (acidIdx === 0 ? " correct" : "");
+            r2.innerText = task.reactants[1].formula;
+            r2.className = "molecule" + (acidIdx === 1 ? " correct" : "");
+
+            document.getElementById('p1').innerText = task.products[0];
+            document.getElementById('p1').className = "molecule fade-in";
+            document.getElementById('p2').innerText = task.products[1];
+            document.getElementById('p2').className = "molecule fade-in";
+
+            document.getElementById('options-box').style.display = "none";
+            document.getElementById('feedback-msg').classList.remove('show');
+
+            document.getElementById('step-info').innerHTML =
+                '✓ Denne opgave er allerede løst <button class="replay-btn" id="replay-btn">▶ Afspil hydron-vandring</button>';
+            document.getElementById('replay-btn').onclick = () => {
+                const acidEl = task.reactants[0].isAcid ? r1 : r2;
+                const baseEl = task.reactants[0].isAcid ? r2 : r1;
+                animateHydron(acidEl, baseEl);
+            };
+
+            applyPairColors(task);
+            renderPairCaption(task);
+
+            document.getElementById('next-btn').disabled = false;
+            document.getElementById('next-btn').innerText = (idx === tasks.length - 1) ? "Afslut Træning" : "Gå til næste opgave ⟶";
+            step = 0;
+            selectedProd = [];
+        }
+
+        function applyPairColors(task) {
+            const r1 = document.getElementById('r1');
+            const r2 = document.getElementById('r2');
+            const p1 = document.getElementById('p1');
+            const p2 = document.getElementById('p2');
+            const slotFor = (formula) => (p1.innerText === formula) ? p1 : p2;
+
+            r1.classList.add('pair-a');
+            slotFor(task.products[0]).classList.add('pair-a');
+            r2.classList.add('pair-b');
+            slotFor(task.products[1]).classList.add('pair-b');
+        }
+
+        function renderPairCaption(task) {
+            const acidIdx = task.reactants[0].isAcid ? 0 : 1;
+            const baseIdx = acidIdx === 0 ? 1 : 0;
+            const acidFormula = task.reactants[acidIdx].formula;
+            const baseFormula = task.reactants[baseIdx].formula;
+            const acidConjBase = task.products[acidIdx];
+            const baseConjAcid = task.products[baseIdx];
+
+            const cap = document.getElementById('pair-caption');
+            cap.innerHTML = `
+                <div class="pair-line pair-a-line"><span class="pair-dot pair-a-dot"></span> <b>${acidFormula}</b> afgiver en hydron og bliver til korresponderende base <b>${acidConjBase}</b></div>
+                <div class="pair-line pair-b-line"><span class="pair-dot pair-b-dot"></span> <b>${baseFormula}</b> modtager en hydron og bliver til korresponderende syre <b>${baseConjAcid}</b></div>
+            `;
+            cap.classList.add('show');
+        }
+
+        function animateHydron(acidEl, baseEl) {
+            const startRect = acidEl.getBoundingClientRect();
+            const endRect = baseEl.getBoundingClientRect();
+            const hydron = document.createElement('div');
+            hydron.className = 'hydron-fly';
+            hydron.innerText = 'H⁺';
+            hydron.style.left = `${startRect.left + startRect.width / 2}px`;
+            hydron.style.top = `${startRect.top + startRect.height / 2}px`;
+            document.body.appendChild(hydron);
+
+            requestAnimationFrame(() => {
+                hydron.style.left = `${endRect.left + endRect.width / 2}px`;
+                hydron.style.top = `${endRect.top + endRect.height / 2}px`;
+                hydron.style.opacity = '0';
+            });
+            setTimeout(() => hydron.remove(), 900);
+        }
+
+        function checkAcid(idx) {
+            if (step !== 1) return;
+            const task = tasks[currentIdx];
+            const correct = task.reactants[reactantOrder[idx]].isAcid;
+
+            if (correct) {
+                const el = idx === 0 ? document.getElementById('r1') : document.getElementById('r2');
+                el.classList.add('correct');
+                document.getElementById('r1').classList.remove('active-selection');
+                document.getElementById('r2').classList.remove('active-selection');
+                showPraise();
+                document.getElementById('next-btn').disabled = false;
+            } else {
+                const el = idx === 0 ? document.getElementById('r1') : document.getElementById('r2');
+                el.classList.add('wrong');
+                setTimeout(() => el.classList.remove('wrong'), 500);
+            }
+        }
+
+        function setupProductSelection() {
+            step = 2;
+            document.getElementById('step-info').innerText = "Trin 2: Vælg de to korrekte produkter";
+            document.getElementById('options-box').style.display = "flex";
+            document.getElementById('next-btn').disabled = true;
+
+            const task = tasks[currentIdx];
+            // Saml alle produkter og distractors (med forklaring) og bland dem tilfældigt
+            const allOptions = [
+                ...task.products.map(p => ({ formula: p, correct: true })),
+                ...task.distractors.map(d => ({ formula: d.f, correct: false, why: d.why }))
+            ];
+            allOptions.sort(() => Math.random() - 0.5);
+
+            const box = document.getElementById('options-box');
+            box.innerHTML = "";
+            allOptions.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn";
+                btn.innerText = opt.formula;
+                btn.onclick = () => selectProduct(opt, btn);
+                box.appendChild(btn);
+            });
+        }
+
+        function selectProduct(opt, btn) {
+            const task = tasks[currentIdx];
+            const formula = opt.formula;
+            const fb = document.getElementById('feedback-msg');
+
+            // Hvis det valgte er korrekt og ikke allerede valgt
+            if (opt.correct && !selectedProd.includes(formula)) {
+                selectedProd.push(formula);
+                btn.disabled = true;
+                btn.style.borderColor = "var(--success)";
+                btn.style.backgroundColor = "var(--success)";
+                btn.style.color = "white";
+                fb.classList.remove('show');
+
+                // Indsæt i reaktionsskemaet
+                const target = selectedProd.length === 1 ? 'p1' : 'p2';
+                const pEl = document.getElementById(target);
+                pEl.innerText = formula;
+                pEl.classList.remove('placeholder');
+                pEl.classList.add('fade-in');
+
+                if (selectedProd.length === 2) {
+                    completed[currentIdx] = true;
+                    renderTaskNav();
+                    updateProgress();
+                    showPraise();
+                    applyPairColors(task);
+                    renderPairCaption(task);
+
+                    const acidEl = task.reactants[0].isAcid ? document.getElementById('r1') : document.getElementById('r2');
+                    const baseEl = task.reactants[0].isAcid ? document.getElementById('r2') : document.getElementById('r1');
+                    animateHydron(acidEl, baseEl);
+
+                    document.getElementById('next-btn').disabled = false;
+                    document.getElementById('next-btn').innerText = (currentIdx === tasks.length - 1) ? "Afslut Træning" : "Næste Opgave ⟶";
+                }
+            }
+            // Hvis eleven klikker på et forkert produkt
+            else if (!opt.correct) {
+                btn.style.borderColor = "var(--error)";
+                btn.style.backgroundColor = "rgba(231, 76, 60, 0.1)";
+                setTimeout(() => {
+                    btn.style.borderColor = "var(--primary)";
+                    btn.style.backgroundColor = "white";
+                }, 500);
+
+                fb.innerText = opt.why || "Det er ikke korrekt – prøv igen.";
+                fb.classList.add('show');
+                clearTimeout(feedbackTimer);
+                feedbackTimer = setTimeout(() => fb.classList.remove('show'), 4500);
+            }
+        }
+
+        function goToNextStep() {
+            if (step === 1) {
+                setupProductSelection();
+            } else {
+                // Vi er færdige med step 2 (eller gennemgår en løst opgave), gå til næste opgave
+                currentIdx++;
+                if (currentIdx < tasks.length) {
+                    jumpToTask(currentIdx);
+                } else {
+                    finishGame();
+                }
+            }
+        }
+
+        function renderSummaryTable() {
+            let html = "<tr><th>Syre</th><th>→ Korresp. base</th><th>Base</th><th>→ Korresp. syre</th></tr>";
+            tasks.forEach(task => {
+                const acidIdx = task.reactants[0].isAcid ? 0 : 1;
+                const baseIdx = acidIdx === 0 ? 1 : 0;
+                html += `<tr>
+                    <td class="pair-a-cell">${task.reactants[acidIdx].formula}</td>
+                    <td class="pair-a-cell">${task.products[acidIdx]}</td>
+                    <td class="pair-b-cell">${task.reactants[baseIdx].formula}</td>
+                    <td class="pair-b-cell">${task.products[baseIdx]}</td>
+                </tr>`;
+            });
+            document.getElementById('summary-table').innerHTML = html;
+        }
+
+        function finishGame() {
+            document.getElementById('game-view').style.display = "none";
+            document.getElementById('progress').style.width = "100%";
+            renderSummaryTable();
+            document.getElementById('summary').style.display = "block";
+        }
+
+        // Start applikationen når siden er loadet
+        window.onload = () => jumpToTask(0);
+    </script>
+</body>
+</html>

@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Idealgasligningen - simulation</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --panel: #1e293b;
+            --text: #f1f5f9;
+            --accent: #38bdf8;
+            --heat: #ef4444;
+            --cool: #3b82f6;
+            --border: rgba(255, 255, 255, 0.15);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        header {
+            background: rgba(15, 23, 42, 0.95);
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        h1 { margin: 0; font-size: 1.2rem; letter-spacing: 1px; color: var(--accent); }
+        .formula-display { font-family: 'Times New Roman', serif; font-style: italic; font-size: 1.3rem; color: #fbbf24; font-weight: bold; }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* LEFT COLUMN: simulation og graf side om side */
+        .left-column {
+            flex: 2;
+            display: flex;
+            flex-direction: row;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 80%);
+            border-right: 1px solid var(--border);
+            position: relative;
+        }
+
+        .sim-wrapper {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 20px;
+            min-width: 220px;
+        }
+
+        .graph-wrapper {
+            flex: 0 0 300px;
+            min-width: 200px;
+            background: rgba(0,0,0,0.2);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            overflow: hidden;
+            transition: flex-basis 0.25s ease;
+        }
+        .graph-wrapper.collapsed {
+            flex: 0 0 40px;
+            min-width: 0;
+            padding: 8px 6px;
+        }
+        .graph-wrapper.collapsed #graphTitle,
+        .graph-wrapper.collapsed #graphInnerWrapper {
+            display: none;
+        }
+        .graph-wrapper.collapsed .graph-header-bar {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        canvas { display: block; width: 100%; height: 100%; }
+
+        .graph-toggle-btn {
+            flex: none;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 6px;
+            padding: 3px 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .graph-toggle-btn:hover { background: rgba(255,255,255,0.18); }
+
+        .explain-box {
+            background: rgba(56, 189, 248, 0.08);
+            border-left: 4px solid var(--accent);
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: #e2e8f0;
+            flex-shrink: 0;
+        }
+        .explain-box b { color: var(--accent); }
+
+        .quiz-btn {
+            flex: none;
+            background: #7c3aed;
+            border: none;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        .quiz-btn:hover { background: #8b5cf6; }
+
+        #quizOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 14, 25, 0.97);
+            z-index: 200;
+            overflow-y: auto;
+            padding: 30px 15px 60px;
+        }
+        .quiz-inner { max-width: 720px; margin: 0 auto; }
+        .quiz-inner h2 { color: var(--accent); margin-bottom: 4px; }
+        .quiz-inner > p { color: #94a3b8; margin-top: 0; margin-bottom: 20px; }
+        .quiz-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+        }
+        .quiz-q { font-weight: bold; margin-bottom: 10px; color: #f1f5f9; }
+        .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+        .quiz-opt {
+            text-align: left;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 9px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .quiz-opt:hover { background: rgba(255,255,255,0.1); }
+        .quiz-opt.correct { background: rgba(34, 197, 94, 0.25); border-color: #22c55e; }
+        .quiz-opt.wrong { background: rgba(239, 68, 68, 0.25); border-color: #ef4444; }
+        .quiz-opt:disabled { cursor: default; }
+        .quiz-fb { margin-top: 10px; font-size: 0.85rem; font-weight: bold; min-height: 18px; }
+        .quiz-fb.ok { color: #4ade80; }
+        .quiz-fb.bad { color: #f87171; }
+        .quiz-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        #quizScore { font-weight: bold; color: var(--accent); }
+
+        /* RIGHT COLUMN */
+        .controls-panel {
+            flex: 1;
+            min-width: 320px;
+            max-width: 400px;
+            background: var(--panel);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .data-card {
+            background: rgba(255,255,255,0.05);
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        .data-val { font-size: 1.3rem; font-weight: bold; font-family: monospace; }
+        .data-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; }
+
+        .control-group {
+            background: rgba(255,255,255,0.03);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .control-header {
+            display: flex; justify-content: space-between; margin-bottom: 8px;
+            font-weight: bold; color: var(--accent); font-size: 0.9rem;
+        }
+
+        input[type=range] { width: 100%; -webkit-appearance: none; background: transparent; margin: 10px 0; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: #fff; cursor: pointer; margin-top: -6px; box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; cursor: pointer; background: #475569; border-radius: 2px;
+        }
+        #rangeTemp::-webkit-slider-runnable-track { background: linear-gradient(90deg, var(--cool), var(--heat)); }
+        #rangePressure::-webkit-slider-runnable-track { background: linear-gradient(90deg, #94a3b8, #fbbf24); }
+        
+        .slider-labels { display:flex; justify-content:space-between; font-size:0.75rem; color:#aaa; }
+
+        .btn-row { display: flex; gap: 10px; margin-top: 5px; }
+        button {
+            flex: 1; padding: 8px; border: none; border-radius: 6px; cursor: pointer;
+            font-weight: bold; color: white; background: #334155; font-size: 0.85rem;
+        }
+        button:hover { background: #475569; }
+
+        .graph-header-bar {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+            margin-bottom: 5px;
+            font-size: 0.78rem;
+            color: #ccc;
+            flex-shrink: 0;
+        }
+
+        .overlay-label { position: absolute; color: rgba(255,255,255,0.5); font-size: 0.8rem; pointer-events: none; }
+
+        .sim-overlay-controls {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 5;
+        }
+        .overlay-title { font-size: 0.78rem; color: #cbd5e1; white-space: nowrap; }
+        .overlay-row { display: flex; align-items: center; gap: 10px; }
+        .overlay-value { font-family: monospace; font-weight: bold; color: #fbbf24; font-size: 0.95rem; min-width: 62px; text-align: center; }
+        .overlay-btn {
+            flex: none;
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.08);
+            color: var(--text);
+            font-size: 1.1rem;
+            line-height: 1;
+            padding: 0;
+            cursor: pointer;
+        }
+        .overlay-btn:hover:not(:disabled) { background: rgba(255,255,255,0.2); }
+        .overlay-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        .overlay-lock-btn {
+            flex: none;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 0.78rem;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .overlay-lock-btn:hover { background: rgba(255,255,255,0.15); }
+        .overlay-lock-btn.locked { background: rgba(56, 189, 248, 0.25); border-color: var(--accent); color: var(--accent); }
+
+        @media (max-width: 480px) {
+            .sim-overlay-controls { left: 6px; top: 6px; padding: 8px; }
+            .overlay-title { display: none; }
+        }
+
+        @media (max-width: 850px) {
+            .main-container { flex-direction: column; overflow-y: auto; }
+            .left-column { flex: none; height: 60vh; flex-direction: column; border-right: none; border-bottom: 1px solid var(--border); }
+            .sim-wrapper { min-width: 0; }
+            .graph-wrapper { flex: 0 0 180px; min-width: 0; border-left: none; border-top: 1px solid var(--border); }
+            .graph-wrapper.collapsed { flex: 0 0 40px; }
+            .graph-header-bar { flex-direction: row; justify-content: space-between; align-items: center; }
+            .graph-wrapper.collapsed .graph-header-bar { flex-direction: row; }
+            .controls-panel { width: auto; max-width: none; flex: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <h1>Idealgasligningen - simulation</h1>
+    </div>
+    <div class="formula-display">p · V = n · R · T</div>
+    <button class="quiz-btn" onclick="openQuiz()">🧠 Test din forståelse</button>
+</header>
+
+<div class="main-container">
+    <div class="left-column">
+        <div class="sim-wrapper" id="simContainerBox">
+            <canvas id="simCanvas"></canvas>
+            <div class="overlay-label" style="bottom: 10px;">Bunsenbrænder</div>
+
+            <div class="sim-overlay-controls">
+                <div class="overlay-title">⚖️ Ydre tryk (lodder på stemplet)</div>
+                <div class="overlay-row">
+                    <button class="overlay-btn" id="pressureMinusBtn" onclick="adjustPressure(-0.5)">−</button>
+                    <span class="overlay-value">+<span id="addedPLabel">0.0</span> atm</span>
+                    <button class="overlay-btn" id="pressurePlusBtn" onclick="adjustPressure(0.5)">+</button>
+                </div>
+                <button class="overlay-lock-btn" id="lockPistonBtn" onclick="togglePistonLock()">🔓 Frit stempel (p konstant)</button>
+            </div>
+        </div>
+        <div class="graph-wrapper" id="graphContainerBox">
+            <div class="graph-header-bar">
+                <span id="graphTitle">📉 pV-Diagram (Isobar proces)</span>
+                <button class="graph-toggle-btn" id="graphToggleBtn" onclick="toggleGraph()">◀ Skjul</button>
+            </div>
+            <div style="flex:1; position:relative;" id="graphInnerWrapper">
+                <canvas id="graphCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls-panel">
+        <div class="data-grid">
+            <div class="data-card" style="border-color: #ef4444;">
+                <div class="data-label">Temperatur (T)</div>
+                <div class="data-val" style="color: #ef4444;"><span id="valT">0</span> K</div>
+            </div>
+            <div class="data-card" style="border-color: #38bdf8;">
+                <div class="data-label">Tryk (p)</div>
+                <div class="data-val" style="color: #38bdf8;"><span id="valP">0</span> atm</div>
+            </div>
+            <div class="data-card" style="border-color: #22d3ee;">
+                <div class="data-label">Stofmængde (n)</div>
+                <div class="data-val" style="color: #22d3ee;"><span id="valN">0</span> mol</div>
+            </div>
+            <div class="data-card" style="border-color: #a3e635;">
+                <div class="data-label">Volumen (V)</div>
+                <div class="data-val" style="color: #a3e635;"><span id="valV">0</span> L</div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <div class="control-header">🔥 Temperatur</div>
+            <input type="range" id="rangeTemp" min="50" max="600" value="298">
+            <div class="slider-labels">
+                <span>Nedkøling (50K)</span><span>Stue (298K)</span><span>Opvarmning (600K)</span>
+            </div>
+        </div>
+
+        <input type="range" id="rangePressure" min="0.0" max="2.0" step="0.1" value="0.0" style="display:none">
+
+        <div class="control-group">
+            <div class="control-header">🧪 Stofmængde (n)</div>
+            <input type="range" id="rangeMoles" min="0.1" max="2.5" step="0.1" value="1.0">
+            <div class="btn-row">
+                <button onclick="updateMoles(-0.5)">-0.5 mol</button>
+                <button onclick="updateMoles(0.5)">+0.5 mol</button>
+            </div>
+        </div>
+
+        <div class="explain-box" id="explainBox">
+            👉 Prøv at trække i <b>temperatur-skyderen</b> og hold øje med boksen med molekyler ovenfor. Hvad sker der med stemplet?
+        </div>
+    </div>
+</div>
+
+<div id="quizOverlay">
+    <div class="quiz-inner">
+        <h2>🧠 Test din forståelse</h2>
+        <p>Brug det, du har set i simulationen, til at svare på spørgsmålene. Du kan lukke quizzen og prøve igen i simulationen, hvis du bliver i tvivl.</p>
+
+        <div class="quiz-card" data-qid="1">
+            <div class="quiz-q">1. Stemplet er LÅST (konstant volumen). Du varmer gassen op. Hvad sker der med trykket?</div>
+            <div class="quiz-options">
+                <button class="quiz-opt" data-correct="false">Trykket falder</button>
+                <button class="quiz-opt" data-correct="true">Trykket stiger</button>
+                <button class="quiz-opt" data-correct="false">Trykket er uændret</button>
+                <button class="quiz-opt" data-correct="false">Volumen stiger i stedet</button>
+            </div>
+            <div class="quiz-fb"></div>
+        </div>
+
+        <div class="quiz-card" data-qid="2">
+            <div class="quiz-q">2. Stemplet er FRIT (konstant tryk, ikke låst). Du varmer gassen op. Hvad sker der med volumen?</div>
+            <div class="quiz-options">
+                <button class="quiz-opt" data-correct="true">Volumen stiger</button>
+                <button class="quiz-opt" data-correct="false">Volumen falder</button>
+                <button class="quiz-opt" data-correct="false">Volumen er uændret</button>
+                <button class="quiz-opt" data-correct="false">Stofmængden stiger</button>
+            </div>
+            <div class="quiz-fb"></div>
+        </div>
+
+        <div class="quiz-card" data-qid="3">
+            <div class="quiz-q">3. Hvorfor stiger trykket, når du varmer gassen op ved konstant volumen?</div>
+            <div class="quiz-options">
+                <button class="quiz-opt" data-correct="false">Molekylerne bliver fysisk større af varmen</button>
+                <button class="quiz-opt" data-correct="false">Der dannes pludselig flere nye molekyler</button>
+                <button class="quiz-opt" data-correct="true">Molekylerne bevæger sig hurtigere og rammer væggene oftere og hårdere</button>
+                <button class="quiz-opt" data-correct="false">Molekylerne begynder at klumpe sig sammen</button>
+            </div>
+            <div class="quiz-fb"></div>
+        </div>
+
+        <div class="quiz-card" data-qid="4">
+            <div class="quiz-q">4. Du fordobler stofmængden (n), mens temperatur og tryk holdes konstant. Hvad sker der med volumen?</div>
+            <div class="quiz-options">
+                <button class="quiz-opt" data-correct="true">Volumen fordobles</button>
+                <button class="quiz-opt" data-correct="false">Volumen halveres</button>
+                <button class="quiz-opt" data-correct="false">Volumen er uændret</button>
+                <button class="quiz-opt" data-correct="false">Temperaturen stiger i stedet</button>
+            </div>
+            <div class="quiz-fb"></div>
+        </div>
+
+        <div class="quiz-card" data-qid="5">
+            <div class="quiz-q">5. På pV-diagrammet ser du en kurve, der bøjer nedad, når temperaturen er konstant (en isoterm). Hvad viser den kurve?</div>
+            <div class="quiz-options">
+                <button class="quiz-opt" data-correct="false">At tryk og volumen stiger sammen</button>
+                <button class="quiz-opt" data-correct="true">At tryk og volumen er omvendt proportionale</button>
+                <button class="quiz-opt" data-correct="false">At trykket altid er konstant</button>
+                <button class="quiz-opt" data-correct="false">At volumen altid er konstant</button>
+            </div>
+            <div class="quiz-fb"></div>
+        </div>
+
+        <div class="quiz-footer">
+            <span id="quizScore">Rigtige svar: 0 / 5</span>
+            <div style="display:flex; gap:10px;">
+                <button class="graph-toggle-btn" onclick="resetQuiz()">Nulstil quiz</button>
+                <button class="quiz-btn" onclick="closeQuiz()">Luk quiz</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('simCanvas');
+const ctx = canvas.getContext('2d');
+const graphCanvas = document.getElementById('graphCanvas');
+const gCtx = graphCanvas.getContext('2d');
+
+const ui = {
+    t: document.getElementById('valT'),
+    p: document.getElementById('valP'),
+    n: document.getElementById('valN'),
+    v: document.getElementById('valV'),
+    sliderT: document.getElementById('rangeTemp'),
+    sliderP: document.getElementById('rangePressure'),
+    sliderN: document.getElementById('rangeMoles'),
+    lockBtn: document.getElementById('lockPistonBtn'),
+    graphTitle: document.getElementById('graphTitle'),
+    addedPLabel: document.getElementById('addedPLabel'),
+    explainBox: document.getElementById('explainBox')
+};
+
+const P_ATM = 1.0;
+const MAX_DISPLAY_P = 8.0;
+// Loddernes maks (giver p_total maks 3 atm i frit stempel). Sat lavere end T×n's samlede
+// maks-multiplikator (~5x), så "maks alt samtidig" ikke tilfældigt ophæver sig selv og
+// giver et volumen tæt på udgangspunktet — hver skyder skal give en tydelig, aflæselig effekt.
+const MAX_ADDED_PRESSURE = 2.0;
+
+// Skaleret gaskonstant: kalibreret så n=1 mol, T=298 K, p=1 atm giver V=17,5 L
+// (tæt på det virkelige molare volumen ved stuetemperatur, ca. 24,5 L med den ægte R).
+// Bruges i stedet for den ægte R=0,0821, fordi det rigtige spænd (0,1-120+ L) ville
+// gøre midten af skydernes område usynligt lille i animationen.
+const GAS_CONST = 17.5 / 298;
+// Den størst mulige volumen, skyderne kan producere (n=2,5 mol, T=600 K, p=1 atm).
+// Både beholderen og pV-diagrammets akse skaleres efter dette tal, så loftet er en
+// fysisk grænse (skydernes yderpunkter) og ikke et tilfældigt pixel-loft, der
+// afhænger af vinduesstørrelsen.
+const THEORETICAL_MAX_V = 2.5 * GAS_CONST * 600 / 1.0;
+const MIN_PISTON_PX = 12;
+
+const state = {
+    T: 298,
+    P_added: 0.0,
+    P_total: 1.0,
+    n: 1.0,
+    V: 17.5,
+    isLocked: false,
+    pistonH: 0,
+    targetPistonH: 0,
+    containerBottomY: 0,
+    containerWidth: 220,
+    maxPistonVisualHeight: 300,
+    pixelsPerLiter: 12,
+    particles: [],
+    impacts: [],
+    pvHistory: [],
+    graphCollapsed: false
+};
+
+let lastTouched = null;
+
+const SCALE = {
+    molToParticles: 60,
+    baseSpeed: 0.8
+};
+
+class Impact {
+    constructor(x, y) {
+        this.x = x; this.y = y; this.life = 1.0; this.size = Math.random() * 5 + 2;
+    }
+    update() { this.life -= 0.1; }
+    draw() {
+        ctx.globalAlpha = this.life * 0.5; ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
+        ctx.globalAlpha = 1.0;
+    }
+}
+
+class Particle {
+    constructor() {
+        this.r = 3.5;
+        this.resetPosition();
+        this.vx = (Math.random() - 0.5);
+        this.vy = (Math.random() - 0.5);
+        this.color = `rgba(56, 189, 248, ${0.5 + Math.random()*0.5})`;
+        this.speed = 0;
+        this.normalizeVelocity();
+    }
+    resetPosition() {
+        const margin = 20;
+        if(state.containerWidth === 0) state.containerWidth = 220;
+        if(state.containerBottomY === 0) state.containerBottomY = 300;
+        this.x = canvas.width/2 - state.containerWidth/2 + margin + Math.random()*(state.containerWidth-margin*2);
+        // Ved meget lav pistonH (næsten sammenpresset gas) skal marginen skrumpe med,
+        // ellers bliver (pistonH - margin*2) negativt og partiklerne spawner forkert.
+        const vMargin = Math.min(margin, Math.max(1, state.pistonH / 2 - this.r));
+        this.y = state.containerBottomY - vMargin - Math.random()*Math.max(0, state.pistonH - vMargin*2);
+    }
+    normalizeVelocity() {
+        const targetSpeed = SCALE.baseSpeed * Math.sqrt(state.T / 298);
+        const randomFactor = 0.4 + Math.random()*1.2;
+        const mag = Math.hypot(this.vx, this.vy) || 1;
+        this.vx = (this.vx / mag) * targetSpeed * randomFactor;
+        this.vy = (this.vy / mag) * targetSpeed * randomFactor;
+        this.speed = Math.hypot(this.vx, this.vy);
+    }
+    update() {
+        this.x += this.vx; this.y += this.vy;
+        const cw = state.containerWidth;
+        const floorY = state.containerBottomY;
+        const pistonY = floorY - state.pistonH;
+        const leftWall = (canvas.width - cw) / 2;
+        const rightWall = leftWall + cw;
+
+        let hit = false;
+        if (this.x < leftWall + this.r) { this.x = leftWall + this.r; this.vx *= -1; hit=true; }
+        else if (this.x > rightWall - this.r) { this.x = rightWall - this.r; this.vx *= -1; hit=true; }
+        
+        if (this.y > floorY - this.r) { this.y = floorY - this.r; this.vy *= -1; hit=true; }
+        
+        if (this.y < pistonY + this.r) {
+            this.y = pistonY + this.r; this.vy *= -1; hit = true;
+            if(!state.isLocked && state.P_total < 1.5) state.pistonH += 0.5;
+        }
+
+        if (hit) state.impacts.push(new Impact(this.x, this.y));
+    }
+    draw() {
+        ctx.fillStyle = this.color; ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2); ctx.fill();
+    }
+}
+
+function init() {
+    window.addEventListener('resize', resizeAll);
+    resizeAll();
+    
+    ui.sliderT.addEventListener('input', (e) => {
+        const newT = parseFloat(e.target.value);
+        lastTouched = { type: 'T', dir: newT > state.T ? 'op' : (newT < state.T ? 'ned' : lastTouched && lastTouched.type === 'T' ? lastTouched.dir : 'op') };
+        state.T = newT;
+        updateParticlesSpeed();
+        calculatePhysics();
+    });
+    ui.sliderP.addEventListener('input', (e) => {
+        const newP = parseFloat(e.target.value);
+        lastTouched = { type: 'P', dir: newP > state.P_added ? 'op' : 'ned' };
+        state.P_added = newP;
+        ui.addedPLabel.innerText = state.P_added.toFixed(1);
+        calculatePhysics();
+    });
+    ui.sliderN.addEventListener('input', (e) => {
+        const newN = parseFloat(e.target.value);
+        lastTouched = { type: 'n', dir: newN > state.n ? 'op' : 'ned' };
+        state.n = newN;
+        adjustParticleCount();
+        calculatePhysics();
+    });
+
+    calculatePhysics();
+    state.pistonH = state.targetPistonH;
+    adjustParticleCount();
+    shuffleQuizOptions();
+
+    requestAnimationFrame(loop);
+}
+
+function resizeAll() {
+    const simBox = document.getElementById('simContainerBox');
+    canvas.width = simBox.clientWidth;
+    canvas.height = simBox.clientHeight;
+    state.containerBottomY = canvas.height - 60;
+    state.containerWidth = Math.min(280, canvas.width - 40);
+
+    state.maxPistonVisualHeight = Math.max(MIN_PISTON_PX, canvas.height - 120);
+    state.pixelsPerLiter = state.maxPistonVisualHeight / THEORETICAL_MAX_V;
+
+    const graphBox = document.getElementById('graphInnerWrapper');
+    graphCanvas.width = graphBox.clientWidth;
+    graphCanvas.height = graphBox.clientHeight;
+    
+    calculatePhysics();
+}
+
+function updateParticlesSpeed() { state.particles.forEach(p => p.normalizeVelocity()); }
+
+function adjustParticleCount() {
+    const targetCount = Math.floor(state.n * SCALE.molToParticles);
+    const currentCount = state.particles.length;
+    if (currentCount < targetCount) {
+        for (let i = 0; i < targetCount - currentCount; i++) state.particles.push(new Particle());
+    } else if (currentCount > targetCount) {
+        state.particles.splice(0, currentCount - targetCount);
+    }
+}
+
+function updateMoles(delta) {
+    let newVal = parseFloat(ui.sliderN.value) + delta;
+    ui.sliderN.value = Math.max(0.1, Math.min(2.5, newVal));
+    ui.sliderN.dispatchEvent(new Event('input'));
+}
+
+function adjustPressure(delta) {
+    if (state.isLocked) return;
+    let newVal = parseFloat(ui.sliderP.value) + delta;
+    ui.sliderP.value = Math.max(0, Math.min(MAX_ADDED_PRESSURE, newVal));
+    ui.sliderP.dispatchEvent(new Event('input'));
+}
+
+function togglePistonLock() {
+    state.isLocked = !state.isLocked;
+    ui.lockBtn.classList.toggle('locked', state.isLocked);
+    ui.lockBtn.innerText = state.isLocked ? '🔒 Låst stempel (V konstant)' : '🔓 Frit stempel (p konstant)';
+    ui.sliderP.disabled = state.isLocked;
+    document.getElementById('pressureMinusBtn').disabled = state.isLocked;
+    document.getElementById('pressurePlusBtn').disabled = state.isLocked;
+    ui.graphTitle.innerText = state.isLocked ? "📉 pV-Diagram (Isochor proces)" : "📉 pV-Diagram (Isobar proces)";
+    state.pvHistory = [];
+    lastTouched = { type: 'lock' };
+    calculatePhysics();
+}
+
+function calculatePhysics() {
+    state.P_total = P_ATM + state.P_added;
+
+    if (!state.isLocked) {
+        const V_liters = (state.n * GAS_CONST * state.T) / state.P_total;
+        state.V = V_liters.toFixed(1);
+        state.targetPistonH = Math.min(state.maxPistonVisualHeight, Math.max(MIN_PISTON_PX, V_liters * state.pixelsPerLiter));
+    } else {
+        state.targetPistonH = state.pistonH;
+        const V_liters = state.pistonH / state.pixelsPerLiter;
+        state.V = V_liters.toFixed(1);
+        let P_internal_req = (state.n * GAS_CONST * state.T) / V_liters;
+        state.P_total = Math.min(MAX_DISPLAY_P, Math.max(P_ATM, P_internal_req));
+
+        let needed_P_added = Math.max(0, state.P_total - P_ATM);
+        ui.sliderP.value = Math.min(MAX_ADDED_PRESSURE, needed_P_added);
+        ui.addedPLabel.innerText = parseFloat(ui.sliderP.value).toFixed(1);
+        state.P_added = parseFloat(ui.sliderP.value);
+    }
+
+    if(ui.t) ui.t.innerText = state.T;
+    if(ui.n) ui.n.innerText = state.n.toFixed(1);
+    if(ui.v) ui.v.innerText = state.V;
+    if(ui.p) ui.p.innerText = state.P_total.toFixed(2);
+
+    state.pvHistory.push({p: state.P_total, v: parseFloat(state.V)});
+    if(state.pvHistory.length > 90) state.pvHistory.shift();
+
+    updateExplanation();
+}
+
+function updateExplanation() {
+    if (!ui.explainBox) return;
+    let txt;
+    if (!lastTouched) {
+        txt = "👉 Prøv at trække i <b>temperatur-skyderen</b> og hold øje med boksen med molekyler ovenfor. Hvad sker der med stemplet?";
+    } else if (lastTouched.type === 'lock') {
+        txt = state.isLocked
+            ? "🔒 Stemplet er nu <b>låst</b>: volumen kan ikke ændre sig. Hvis du varmer op eller køler ned herfra, er det <b>trykket</b>, der ændrer sig i stedet."
+            : "🔓 Stemplet er nu <b>frit</b>: det ydre tryk (atmosfære + lodder) er konstant. Hvis du varmer op eller køler ned herfra, er det <b>volumen</b>, der ændrer sig.";
+    } else if (lastTouched.type === 'T') {
+        const varmer = lastTouched.dir === 'op';
+        if (state.isLocked) {
+            txt = varmer
+                ? "🔥 Du varmer gassen op ved <b>konstant volumen</b>. Molekylerne bevæger sig hurtigere og rammer beholderens vægge oftere og hårdere. Da stemplet er låst, kan gassen ikke udvide sig — så <b>trykket stiger</b> i stedet."
+                : "❄️ Du køler gassen ned ved <b>konstant volumen</b>. Molekylerne bevæger sig langsommere og rammer væggene sjældnere og svagere, så <b>trykket falder</b>.";
+        } else {
+            txt = varmer
+                ? "🔥 Du varmer gassen op ved <b>konstant tryk</b>. Molekylerne bevæger sig hurtigere og skubber hårdere på stemplet, som derfor presses opad, indtil trykket igen matcher det ydre tryk — så <b>volumen stiger</b>."
+                : "❄️ Du køler gassen ned ved <b>konstant tryk</b>. Molekylerne bevæger sig langsommere og skubber svagere på stemplet, som derfor synker ned — så <b>volumen falder</b>.";
+        }
+    } else if (lastTouched.type === 'P') {
+        const flere = lastTouched.dir === 'op';
+        txt = flere
+            ? "⚖️ Du lægger flere lodder på stemplet, så det ydre tryk stiger. Gassen bliver presset sammen, indtil dens indre tryk igen matcher det ydre — så <b>volumen falder</b>."
+            : "⚖️ Du fjerner lodder fra stemplet, så det ydre tryk falder. Gassen kan udvide sig, indtil trykkene igen er lige store — så <b>volumen stiger</b>.";
+    } else if (lastTouched.type === 'n') {
+        const flere = lastTouched.dir === 'op';
+        if (state.isLocked) {
+            txt = flere
+                ? "🧪 Du tilføjer flere gasmolekyler ved <b>konstant volumen</b>. Der er nu flere partikler til at ramme de samme vægge, så <b>trykket stiger</b>."
+                : "🧪 Du fjerner gasmolekyler ved <b>konstant volumen</b>. Der er nu færre partikler til at ramme væggene, så <b>trykket falder</b>.";
+        } else {
+            txt = flere
+                ? "🧪 Du tilføjer flere gasmolekyler ved <b>konstant tryk</b>. De ekstra partikler skubber stemplet opad, indtil trykket igen passer — så <b>volumen stiger</b>."
+                : "🧪 Du fjerner gasmolekyler ved <b>konstant tryk</b>. Der er nu færre partikler til at holde stemplet oppe, så det synker — <b>volumen falder</b>.";
+        }
+    }
+    if (txt) ui.explainBox.innerHTML = txt;
+}
+
+function loop() {
+    const dh = state.targetPistonH - state.pistonH;
+    state.pistonH += dh * 0.15;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const cx = canvas.width / 2;
+    const bottomY = state.containerBottomY;
+    const topY = bottomY - state.pistonH;
+    const w = state.containerWidth;
+    const leftX = cx - w/2;
+
+    ctx.fillStyle = 'rgba(30, 41, 59, 0.6)';
+    ctx.fillRect(leftX, topY, w, state.pistonH);
+    
+    state.particles.forEach(p => { p.update(); p.draw(); });
+
+    for (let i = state.impacts.length - 1; i >= 0; i--) {
+        let imp = state.impacts[i]; imp.update(); imp.draw();
+        if (imp.life <= 0) state.impacts.splice(i, 1);
+    }
+
+    ctx.strokeStyle = 'rgba(255,255,255,0.4)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(leftX, topY - 100); ctx.lineTo(leftX, bottomY); ctx.lineTo(leftX+w, bottomY); ctx.lineTo(leftX+w, topY - 100); ctx.stroke();
+    
+    const pistonHeight = 20;
+    ctx.fillStyle = '#94a3b8'; ctx.fillRect(leftX + 1, topY - pistonHeight, w - 2, pistonHeight);
+    
+    ctx.fillStyle = '#475569'; 
+    ctx.fillRect(cx - 6, topY - pistonHeight - 60, 12, 60); 
+    ctx.fillRect(cx - 45, topY - pistonHeight - 65, 90, 8);
+
+    ctx.fillStyle = '#94a3b8'; ctx.font = "12px Arial"; ctx.textAlign = "right";
+    ctx.fillText("p_atm (1 atm) ➔", leftX - 10, topY - pistonHeight - 5);
+
+    if (!state.isLocked && state.P_added > 0.05) {
+        const numWeights = Math.floor(state.P_added * 2.5); 
+        ctx.fillStyle = '#fbbf24'; ctx.strokeStyle = '#92400e'; ctx.lineWidth=1;
+        for(let i=0; i<numWeights; i++) {
+            const wy = topY - pistonHeight - 73 - (i*10);
+            ctx.fillRect(cx - 20, wy, 40, 8);
+            ctx.strokeRect(cx - 20, wy, 40, 8);
+        }
+    } else if (state.isLocked) {
+        ctx.font = "24px Arial"; ctx.fillStyle = "#fff"; ctx.textAlign = "center";
+        ctx.fillText("🔒", cx, topY - pistonHeight - 90);
+    }
+
+    if (state.T > 310) {
+        ctx.globalAlpha = (state.T - 300)/400; ctx.fillStyle = 'orange';
+        ctx.beginPath(); ctx.moveTo(cx-15, bottomY+5); ctx.lineTo(cx+15, bottomY+5); ctx.lineTo(cx, bottomY-25-Math.random()*15); ctx.fill(); ctx.globalAlpha = 1;
+    } else if (state.T < 280) {
+        ctx.fillStyle = '#a5f3fc'; ctx.font = "20px Arial"; ctx.textAlign = "center"; ctx.fillText("❄️", cx, bottomY+25);
+    }
+
+    drawGraph();
+    requestAnimationFrame(loop);
+}
+
+function drawGraph() {
+    if (state.graphCollapsed) return;
+    gCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+    const w = graphCanvas.width, h = graphCanvas.height, p = 34;
+
+    // maxV_g rundes op til et pænt tal, men matcher altid THEORETICAL_MAX_V (skydernes yderpunkter) —
+    // så grafens akse aldrig er ude af trit med, hvad animationen rent faktisk kan vise.
+    const maxV_g = Math.ceil(THEORETICAL_MAX_V / 10) * 10, maxP_g = MAX_DISPLAY_P;
+    const clampV = v => Math.min(maxV_g, Math.max(0, v));
+    const clampP = press => Math.min(maxP_g, Math.max(0, press));
+    const mapX = v => p + (clampV(v)/maxV_g)*(w-p-12);
+    const mapY = press => (h-p) - (clampP(press)/maxP_g)*(h-p-12);
+
+    // Aksekryds
+    gCtx.strokeStyle = '#475569'; gCtx.lineWidth = 1; gCtx.beginPath();
+    gCtx.moveTo(p, 10); gCtx.lineTo(p, h-p); gCtx.lineTo(w-5, h-p); gCtx.stroke();
+
+    // Gitterlinjer + akse-tal (gør grafen til at aflæse for eleven)
+    gCtx.font = "10px Arial"; gCtx.fillStyle = '#64748b';
+    gCtx.textAlign = 'center';
+    for (let v = 0; v <= maxV_g; v += 15) {
+        const x = mapX(v);
+        gCtx.strokeStyle = 'rgba(255,255,255,0.06)';
+        gCtx.beginPath(); gCtx.moveTo(x, 10); gCtx.lineTo(x, h-p); gCtx.stroke();
+        gCtx.fillText(v, x, h-p+13);
+    }
+    gCtx.textAlign = 'right';
+    for (let press = 0; press <= maxP_g; press += 2) {
+        const y = mapY(press);
+        gCtx.strokeStyle = 'rgba(255,255,255,0.06)';
+        gCtx.beginPath(); gCtx.moveTo(p, y); gCtx.lineTo(w-5, y); gCtx.stroke();
+        gCtx.fillText(press, p-6, y+3);
+    }
+
+    // Kun én isoterm (ved stuetemperatur) som let reference, i stedet for tre der roder billedet til
+    gCtx.strokeStyle = 'rgba(148,163,184,0.25)'; gCtx.setLineDash([4,3]); gCtx.lineWidth = 1;
+    gCtx.beginPath();
+    for (let v = 2; v <= maxV_g; v += 1) gCtx.lineTo(mapX(v), mapY((1*298*0.082)/v));
+    gCtx.stroke();
+    gCtx.setLineDash([]);
+
+    // Kurven vises kun for de sidste bevægelser og falmer med alderen, så den ikke bliver et langt, forvirrende spor
+    if (state.pvHistory.length > 1) {
+        const hist = state.pvHistory;
+        gCtx.lineWidth = 2.5;
+        for (let i = 1; i < hist.length; i++) {
+            const age = i / hist.length;
+            gCtx.strokeStyle = `rgba(56, 189, 248, ${0.15 + age * 0.65})`;
+            gCtx.beginPath();
+            gCtx.moveTo(mapX(hist[i-1].v), mapY(hist[i-1].p));
+            gCtx.lineTo(mapX(hist[i].v), mapY(hist[i].p));
+            gCtx.stroke();
+        }
+    }
+
+    // Nuværende tilstand markeret tydeligt
+    const curX = mapX(parseFloat(state.V)), curY = mapY(state.P_total);
+    gCtx.fillStyle = '#fff'; gCtx.strokeStyle = '#38bdf8'; gCtx.lineWidth = 2;
+    gCtx.beginPath(); gCtx.arc(curX, curY, 5, 0, Math.PI*2); gCtx.fill(); gCtx.stroke();
+
+    gCtx.fillStyle = '#94a3b8'; gCtx.font = "bold 13px Arial"; gCtx.textAlign = "center";
+    gCtx.fillText("Volumen (V, L)", w/2+p/2, h-5);
+    gCtx.save(); gCtx.translate(11, h/2); gCtx.rotate(-Math.PI/2); gCtx.fillText("Tryk (p, atm)", 0, 0); gCtx.restore();
+
+    gCtx.textAlign = 'left'; gCtx.font = '10px Arial'; gCtx.fillStyle = 'rgba(148,163,184,0.7)';
+    gCtx.fillText('- - - stiplet linje = 298 K (stuetemperatur)', p+2, 20);
+}
+
+function toggleGraph() {
+    state.graphCollapsed = !state.graphCollapsed;
+    document.getElementById('graphContainerBox').classList.toggle('collapsed', state.graphCollapsed);
+    document.getElementById('graphToggleBtn').innerText = state.graphCollapsed ? '▶' : '◀ Skjul';
+}
+
+document.getElementById('graphContainerBox').addEventListener('transitionend', (e) => {
+    if (e.propertyName === 'flex-basis') resizeAll();
+});
+
+/* ---------------- QUIZ ---------------- */
+let quizScore = 0;
+
+function openQuiz() {
+    document.getElementById('quizOverlay').style.display = 'block';
+}
+function closeQuiz() {
+    document.getElementById('quizOverlay').style.display = 'none';
+}
+
+function shuffleQuizOptions() {
+    document.querySelectorAll('.quiz-options').forEach(container => {
+        const opts = Array.from(container.children);
+        for (let i = opts.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [opts[i], opts[j]] = [opts[j], opts[i]];
+        }
+        opts.forEach(o => container.appendChild(o));
+    });
+}
+
+function resetQuiz() {
+    quizScore = 0;
+    document.querySelectorAll('.quiz-card').forEach(card => {
+        card.querySelectorAll('.quiz-opt').forEach(btn => {
+            btn.disabled = false;
+            btn.classList.remove('correct', 'wrong');
+        });
+        card.querySelector('.quiz-fb').innerText = '';
+        card.querySelector('.quiz-fb').className = 'quiz-fb';
+    });
+    shuffleQuizOptions();
+    updateQuizScore();
+}
+
+function updateQuizScore() {
+    document.getElementById('quizScore').innerText = `Rigtige svar: ${quizScore} / 5`;
+}
+
+document.querySelectorAll('.quiz-card').forEach(card => {
+    card.querySelectorAll('.quiz-opt').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const options = card.querySelectorAll('.quiz-opt');
+            const fb = card.querySelector('.quiz-fb');
+            const isCorrect = btn.getAttribute('data-correct') === 'true';
+
+            options.forEach(o => o.disabled = true);
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                fb.innerText = '✔ Korrekt!';
+                fb.className = 'quiz-fb ok';
+                quizScore++;
+            } else {
+                btn.classList.add('wrong');
+                options.forEach(o => { if (o.getAttribute('data-correct') === 'true') o.classList.add('correct'); });
+                fb.innerText = '✘ Ikke helt. Prøv at gense simulationen for dette spørgsmål.';
+                fb.className = 'quiz-fb bad';
+            }
+            updateQuizScore();
+        });
+    });
+});
+
+window.onload = init;
+</script>
+</body>
+</html>

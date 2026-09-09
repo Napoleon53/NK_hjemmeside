@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oxidationstal og elektronegativitet</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-color: #38bdf8;
+            --electron-color: #fbbf24;
+            --muted: #94a3b8;
+            --btn-hover: #0284c7;
+            --good: #4ade80;
+            --bad: #f87171;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #canvas-container {
+            flex: 1;
+            position: relative;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        #ui-panel {
+            width: 380px;
+            background-color: var(--panel-bg);
+            border-left: 2px solid #334155;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+            z-index: 10;
+            overflow-y: auto;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin-bottom: 5px;
+            color: var(--accent-color);
+        }
+
+        p.subtitle {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .task-note {
+            display: none;
+            background: rgba(56, 189, 248, 0.08);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            line-height: 1.4;
+            color: #cbd5e1;
+        }
+
+        .task-note.visible { display: block; }
+
+        .control-group {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            border: 1px solid #334155;
+        }
+
+        .control-group h3 {
+            font-size: 15px;
+            margin-bottom: 12px;
+            color: #cbd5e1;
+        }
+
+        .guess-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .guess-row:last-child { margin-bottom: 0; }
+
+        .guess-label {
+            font-size: 14px;
+            color: #e2e8f0;
+        }
+
+        .stepper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stepper button {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            border: 1px solid #475569;
+            background: #334155;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .stepper button:hover:not(:disabled) { background: #475569; }
+
+        .stepper button:disabled {
+            opacity: 0.35;
+            cursor: default;
+        }
+
+        .stepper-value {
+            min-width: 42px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .check-btn {
+            width: 100%;
+            margin-top: 14px;
+            padding: 11px;
+            background-color: var(--accent-color);
+            color: #0f172a;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .check-btn:hover:not(:disabled) { background-color: #7dd3fc; }
+
+        .check-btn:disabled {
+            background-color: #334155;
+            color: var(--muted);
+            cursor: default;
+        }
+
+        .info-box {
+            display: none;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-left: 4px solid var(--accent-color);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            font-size: 13.5px;
+            line-height: 1.5;
+        }
+
+        .info-box.visible { display: block; }
+
+        .info-box.correct { border-left-color: var(--good); }
+        .info-box.wrong { border-left-color: var(--bad); }
+
+        .info-box strong { font-size: 14.5px; }
+
+        .info-box .answer-line {
+            margin: 8px 0;
+            font-weight: bold;
+            color: #e2e8f0;
+        }
+
+        .info-box p { color: #cbd5e1; margin-top: 4px; }
+
+        .next-btn {
+            width: 100%;
+            margin-top: 12px;
+            padding: 10px;
+            background-color: var(--good);
+            color: #0f172a;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13.5px;
+            font-weight: bold;
+        }
+
+        .next-btn:hover { background-color: #86efac; }
+
+        .retry-btn {
+            width: 100%;
+            margin-top: 8px;
+            padding: 8px;
+            background: transparent;
+            border: 1px solid #64748b;
+            color: #cbd5e1;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12.5px;
+        }
+
+        .retry-btn:hover { background-color: #334155; color: white; }
+
+        .done-msg {
+            margin-top: 10px;
+            font-weight: bold;
+            color: var(--good);
+        }
+
+        .toggle-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #334155;
+            color: white;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toggle-btn:hover { background-color: #475569; }
+
+        .toggle-btn.active {
+            background-color: rgba(56, 189, 248, 0.2);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .toggle-btn.active::after {
+            content: "TIL";
+            font-size: 12px;
+            background: var(--accent-color);
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .toggle-btn::after {
+            content: "FRA";
+            font-size: 12px;
+            background: #64748b;
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .hud-controls-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        /* display:contents lader dot-knapperne indgå direkte i
+           .hud-controls-row's flex-wrap, så de løber vandret videre fra
+           "Vis EN"-knappen i stedet for at stå i deres egen blok nedenunder. */
+        .task-menu-row {
+            display: contents;
+        }
+
+        .task-dot {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 1px solid #334155;
+            background: #1e293b;
+            color: #94a3b8;
+            font-size: 10.5px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-dot:hover { border-color: #64748b; }
+
+        .task-dot.current {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .task-dot.done-correct {
+            background: rgba(74, 222, 128, 0.18);
+            border-color: var(--good);
+            color: var(--good);
+        }
+
+        .task-dot.done-wrong {
+            background: rgba(248, 113, 113, 0.18);
+            border-color: var(--bad);
+            color: var(--bad);
+        }
+
+        .reset-btn {
+            padding: 12px;
+            background-color: transparent;
+            border: 1px solid #64748b;
+            color: #cbd5e1;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: auto;
+        }
+
+        .reset-btn:hover {
+            background-color: #334155;
+            color: white;
+        }
+
+        .hud-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 5;
+            max-width: 340px;
+            background: rgba(15, 23, 42, 0.72);
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 14px 16px;
+            pointer-events: none;
+        }
+
+        .hud-overlay > * { pointer-events: auto; }
+
+        .hud-text {
+            color: rgba(255,255,255,0.75);
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .hud-text strong { color: var(--accent-color); }
+        .hud-text span.formula { color: #cbd5e1; }
+
+        .hud-toggle-btn {
+            width: auto;
+            padding: 6px 10px;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="canvas-container">
+        <div class="hud-overlay" id="hud-overlay">
+            <div class="hud-text" id="hud-text"></div>
+            <div class="hud-controls-row">
+                <button class="toggle-btn hud-toggle-btn" id="btn-en" title="Vis elektronegativitet for hvert atom">Vis EN</button>
+                <div class="task-menu-row" id="task-menu" title="Opgaver"></div>
+            </div>
+        </div>
+        <canvas id="simCanvas"></canvas>
+    </div>
+
+    <div id="ui-panel">
+        <h1>Oxidationstal og elektronegativitet</h1>
+        <p class="subtitle">Gæt oxidationstallet ud fra elektronegativiteten - så tjekker vi sammen, og du ser elektronerne rykke sig.</p>
+
+        <div class="task-note" id="task-note"></div>
+
+        <div class="control-group">
+            <h3>Gæt oxidationstal</h3>
+            <div id="guess-area"></div>
+            <button class="check-btn" id="btn-check">Tjek svar</button>
+        </div>
+
+        <div class="info-box" id="info-box"></div>
+
+        <button class="reset-btn" id="btn-reset">Nulstil alle opgaver</button>
+    </div>
+
+    <script>
+        var canvas = document.getElementById("simCanvas");
+        var ctx = canvas.getContext("2d");
+        var width, height;
+
+        var camera = { x: 0, y: 0, scale: 1.0 };
+
+        var state = {
+            taskIndex: 0,
+            showEN: false,
+            showElectrons: false,   // afslører positions-forskydningen (efter tjek)
+            showOrigin: false,      // afslører farven på elektronernes moderatom (efter tjek)
+            showOx: false,          // afslører oxidationstal-badges (efter tjek)
+            checked: false,
+            wasCorrect: false,
+            guess: {},
+            skewT: 0
+        };
+
+        var taskState = [];
+
+        var EN = { C: 2.5, O: 3.5, H: 2.1, Cl: 3.0, S: 2.5, F: 4.0, N: 3.0 };
+        var ATOM_STYLE = {
+            C:  { radius: 32, color: "#94a3b8", text: "#0f172a" },
+            O:  { radius: 30, color: "#ef4444", text: "#ffffff" },
+            H:  { radius: 19, color: "#f1f5f9", text: "#0f172a" },
+            Cl: { radius: 32, color: "#4ade80", text: "#052e12" },
+            S:  { radius: 34, color: "#fde047", text: "#422006" },
+            F:  { radius: 24, color: "#bef264", text: "#1a2e05" },
+            N:  { radius: 30, color: "#3b82f6", text: "#ffffff" }
+        };
+
+        // Farve for hver elektrons oprindelige (moder-)atom - vises efter tjek,
+        // uanset hvor langt elektronparret er skubbet mod det andet atom. C er
+        // bevidst mørkere end atomets egen (lysere) baggrundsfarve, så prikken
+        // ikke flyder sammen med selve atom-cirklen.
+        var ORIGIN_COLOR = {
+            C: "#475569", O: "#ef4444", H: "#ffffff",
+            Cl: "#4ade80", S: "#fde047", F: "#bef264",
+            N: "#1d4ed8"
+        };
+
+        var BOND_LEN = 135;
+        var ELECTRON_COLOR = "#fbbf24";
+
+        // Farver til den ekstra/manglende elektron, der forklarer en ions ladning
+        // (findes ikke i neutrale molekyler, kun i opgaverne med spec.ion).
+        var ION_EXTRA_COLOR = "#c084fc";
+        var ION_MISSING_COLOR = "#cbd5e1";
+
+        // --- Molekyle-specifikationer ---
+        // Samme "chain" + "branches"-struktur som b5.3_oxidation_alkohol_til_syre.html:
+        // chain er den faste rygrad, branches er alt andet, placeret automatisk
+        // vinkelret på allerede placerede bindinger via layoutMolecule().
+        var MOLECULES = {
+            h2o: {
+                label: "Vand", formula: "H₂O",
+                guessTypes: ["H", "O"],
+                chain: [{ id: "O1", type: "O" }],
+                branches: [
+                    { parent: "O1", kids: [{ id: "H1", type: "H" }, { id: "H2", type: "H" }] }
+                ],
+                explain: function(ox) {
+                    return "Ilt er mere elektronegativt end brint, så de fælles elektroner trækkes mod ilt. Ilt får derfor oxidationstallet " + formatOx(ox.O) + ", og brint får " + formatOx(ox.H) + " - den almindelige regel, som resten af opgaverne bygger videre på.";
+                }
+            },
+            hcl: {
+                label: "Hydrogenchlorid", formula: "HCl",
+                guessTypes: ["Cl"],
+                chain: [{ id: "H1", type: "H" }, { id: "Cl1", type: "Cl" }],
+                branches: [],
+                explain: function(ox) {
+                    return "Klor er mere elektronegativt end brint, så de fælles elektroner trækkes mod klor. Klor får oxidationstallet " + formatOx(ox.Cl) + ", mens brint som altid får +I.";
+                }
+            },
+            h2s: {
+                label: "Hydrogensulfid", formula: "H₂S",
+                guessTypes: ["S"],
+                chain: [{ id: "S1", type: "S" }],
+                branches: [
+                    { parent: "S1", kids: [{ id: "H1", type: "H" }, { id: "H2", type: "H" }] }
+                ],
+                explain: function(ox) {
+                    return "Svovl er mere elektronegativt end brint - ligesom ilt er det i vand. Elektronerne trækkes mod svovl, som får oxidationstallet " + formatOx(ox.S) + ".";
+                }
+            },
+            so2: {
+                label: "Svovldioxid", formula: "SO₂",
+                guessTypes: ["S"],
+                chain: [{ id: "S1", type: "S" }],
+                branches: [
+                    { parent: "S1", kids: [{ id: "O1", type: "O", order: 2 }, { id: "O2", type: "O", order: 2 }] }
+                ],
+                explain: function(ox) {
+                    return "Ilt trækker elektronerne til sig i begge bindinger, så hvert oxygen får −II. For at hele molekylet er neutralt (samlet ladning 0), skal svovl derfor have oxidationstallet " + formatOx(ox.S) + ".";
+                }
+            },
+            ch3oh: {
+                label: "Methanol", formula: "CH₃OH",
+                guessTypes: ["C"],
+                // O1 sidder i "chain" (ikke som en gren på C1) præcis som i
+                // ethanol i b5.3 - så C-O-bindingen får en almindelig
+                // rygrads-retning, og de tre H'er fanes automatisk ud på den
+                // modsatte side af den bindingsvinkel, i stedet for at blive
+                // klemt sammen med O1 i én snæver vifte på 4 grene.
+                chain: [{ id: "C1", type: "C" }, { id: "O1", type: "O" }],
+                branches: [
+                    { parent: "C1", kids: [{ id: "H1", type: "H" }, { id: "H2", type: "H" }, { id: "H3", type: "H" }] },
+                    { parent: "O1", kids: [{ id: "H4", type: "H" }] }
+                ],
+                explain: function(ox) {
+                    return "Kulstof er lidt mere elektronegativt end brint, så de tre C–H-bindinger trækker svagt elektroner til kulstof. Men C–O-bindingen trækker elektroner væk fra kulstof, mod ilt. Samlet får kulstof oxidationstallet " + formatOx(ox.C) + ".";
+                }
+            },
+            ethen: {
+                label: "Ethen", formula: "C₂H₄",
+                guessTypes: ["C"],
+                chain: [{ id: "C1", type: "C" }, { id: "C2", type: "C" }], chainOrder: 2,
+                branches: [
+                    { parent: "C1", kids: [{ id: "H1", type: "H" }, { id: "H2", type: "H" }] },
+                    { parent: "C2", kids: [{ id: "H3", type: "H" }, { id: "H4", type: "H" }] }
+                ],
+                explain: function(ox) {
+                    return "Hver kulstofatom sidder på to C–H-bindinger, som begge trækker elektroner til kulstof. C=C-bindingen mellem de to kulstofatomer bidrager 0, fordi ingen af dem er mere elektronegativ end den anden. Derfor får hvert kulstofatom oxidationstallet " + formatOx(ox.C) + ".";
+                }
+            },
+            h2: {
+                label: "Hydrogen (grundstof)", formula: "H₂",
+                guessTypes: ["H"],
+                chain: [{ id: "H1", type: "H" }, { id: "H2", type: "H" }],
+                branches: [],
+                explain: function(ox) {
+                    return "Brint er bundet til brint - samme grundstof på begge sider af bindingen. Ingen af atomerne er mere elektronegative end det andet, så elektronerne trækkes ikke mod nogen af dem. Derfor er oxidationstallet 0, selvom brint ellers næsten altid har +I. Rene grundstoffer har altid oxidationstal 0 - det er en undtagelse fra reglen.";
+                }
+            },
+            o2: {
+                label: "Oxygen (grundstof)", formula: "O₂",
+                guessTypes: ["O"],
+                chain: [{ id: "O1", type: "O" }, { id: "O2", type: "O" }], chainOrder: 2,
+                branches: [],
+                explain: function(ox) {
+                    return "Ilt har normalt −II, men i det rene grundstof O₂ er der intet andet grundstof at trække elektronerne fra. Derfor er oxidationstallet 0 - samme undtagelse som for H₂.";
+                }
+            },
+            h2o2: {
+                label: "Hydrogenperoxid", formula: "H₂O₂",
+                guessTypes: ["O"],
+                chain: [{ id: "O1", type: "O" }, { id: "O2", type: "O" }],
+                branches: [
+                    { parent: "O1", kids: [{ id: "H1", type: "H" }] },
+                    { parent: "O2", kids: [{ id: "H2", type: "H" }] }
+                ],
+                explain: function(ox) {
+                    return "Her er der en O–O-binding midt i molekylet, som ikke bidrager noget, fordi begge atomer er ilt. Hvert oxygen har kun én O–H-binding at trække elektroner fra, i stedet for to som i vand. Derfor bliver oxidationstallet kun " + formatOx(ox.O) + " i stedet for det sædvanlige −II - en klassisk undtagelse.";
+                }
+            },
+            of2: {
+                label: "Oxygendifluorid", formula: "OF₂",
+                guessTypes: ["O"],
+                chain: [{ id: "O1", type: "O" }],
+                branches: [
+                    { parent: "O1", kids: [{ id: "F1", type: "F" }, { id: "F2", type: "F" }] }
+                ],
+                explain: function(ox) {
+                    return "Fluor er det mest elektronegative grundstof af alle - mere elektronegativt end ilt! Her er det fluor, der trækker de fælles elektroner til sig, og ilt der taber dem. Derfor får ilt oxidationstallet " + formatOx(ox.O) + " - positivt, selvom ilt næsten altid er negativt. Det er den vigtigste undtagelse fra iltreglen.";
+                }
+            },
+            oh: {
+                label: "Hydroxidion", formula: "OH⁻", charge: -1,
+                guessTypes: ["O", "H"],
+                chain: [{ id: "O1", type: "O" }],
+                branches: [
+                    { parent: "O1", kids: [{ id: "H1", type: "H" }] }
+                ],
+                // Ionen har ét elektronpar mere, end ilt selv bidrager med i
+                // bindingerne. I vand ville det par sidde i en ekstra O–H-binding;
+                // her bliver det i stedet et ikke-bindende par (fremhævet lilla),
+                // som trækker iltens oxidationstal endnu et hak ned.
+                ion: { atomId: "O1", effect: "extra" },
+                explain: function(ox) {
+                    return "Ilt er mest elektronegativt, så O–H-bindingen trækker elektroner mod ilt - ligesom i vand. Men ilt har her tre ikke-bindende elektronpar i stedet for de to, den har i vand - det midterste (lilla) er \"det ekstra par\", som gør hele ionen negativt ladet. Det trækker iltens oxidationstal helt ned til " + formatOx(ox.O) + ", mens brint som altid får " + formatOx(ox.H) + ". Læg mærke til at " + formatOx(ox.O) + " + " + formatOx(ox.H) + " giver ionens samlede ladning, −1, i stedet for 0 som i et neutralt molekyle.";
+                }
+            },
+            nh4: {
+                label: "Ammoniumion", formula: "NH₄⁺", charge: 1,
+                guessTypes: ["N", "H"],
+                chain: [{ id: "N1", type: "N" }],
+                branches: [
+                    { parent: "N1", kids: [
+                        { id: "H1", type: "H" },
+                        { id: "H2", type: "H" },
+                        { id: "H3", type: "H", style: "dash" },
+                        { id: "H4", type: "H", style: "wedge" }
+                    ] }
+                ],
+                // Tegnet som en tetraeder: to bindinger i planet (op til venstre/
+                // højre), én stiplet binding der peger væk fra beskueren, og én
+                // kile-binding der peger frem mod beskueren.
+                customLayout: {
+                    H1: { x: -95.5, y: -95.5 },
+                    H2: { x: 95.5, y: -95.5 },
+                    H3: { x: -95.5, y: 95.5 },
+                    H4: { x: 95.5, y: 95.5 }
+                },
+                // Ionen mangler én elektron i forhold til bindingerne alene - den
+                // tomme, stiplede ring ved kvælstof - hvilket gør ionen positiv og
+                // trækker kvælstofs oxidationstal ét hak op.
+                ion: { atomId: "N1", effect: "missing" },
+                explain: function(ox) {
+                    return "Kvælstof er mere elektronegativt end brint, så alle fire N–H-bindinger trækker elektroner til kvælstof. Men ionen mangler en elektron (den tomme, stiplede ring), hvilket gør den positivt ladet. Den manglende elektron trækker kvælstofs oxidationstal ét hak op, til " + formatOx(ox.N) + ", mens hvert brint som altid får " + formatOx(ox.H) + ". Summen, " + formatOx(ox.N) + " + 4 × " + formatOx(ox.H) + ", giver ionens samlede ladning, +1.";
+                }
+            }
+        };
+
+        var TASK_ORDER = ["h2o", "hcl", "h2s", "so2", "ch3oh", "ethen", "h2", "o2", "h2o2", "of2", "oh", "nh4"];
+
+        var atoms = [];
+        var bonds = [];
+
+        // Placerer `count` nye atomer omkring `center`, fanet ud i den ledige
+        // vinkel modsat summen af de bindinger, der allerede peger væk fra centeret.
+        function placeFan(center, existingAngles, count, radius) {
+            var start;
+            if (existingAngles.length) {
+                var sx = 0, sy = 0;
+                existingAngles.forEach(function(a) { sx += Math.cos(a); sy += Math.sin(a); });
+                start = Math.atan2(sy, sx) + Math.PI;
+            } else {
+                start = -Math.PI / 2;
+            }
+            var spread = Math.min(2.3, 0.9 * count);
+            var out = [];
+            for (var i = 0; i < count; i++) {
+                var t = count === 1 ? 0 : (i / (count - 1) - 0.5);
+                var ang = start + t * spread;
+                out.push({ x: center.x + Math.cos(ang) * radius, y: center.y + Math.sin(ang) * radius, angle: ang });
+            }
+            return out;
+        }
+
+        function layoutMolecule(spec) {
+            var pos = {};
+            var placedAngles = {};
+
+            spec.chain.forEach(function(a, i) {
+                pos[a.id] = { x: i * BOND_LEN, y: (i % 2 === 0) ? 0 : -BOND_LEN * 0.52 };
+            });
+            for (var i = 0; i < spec.chain.length - 1; i++) {
+                var aId = spec.chain[i].id, bId = spec.chain[i + 1].id;
+                var ang = Math.atan2(pos[bId].y - pos[aId].y, pos[bId].x - pos[aId].x);
+                (placedAngles[aId] = placedAngles[aId] || []).push(ang);
+                (placedAngles[bId] = placedAngles[bId] || []).push(ang + Math.PI);
+            }
+
+            spec.branches.forEach(function(br) {
+                var center = pos[br.parent];
+                var existing = placedAngles[br.parent] || (placedAngles[br.parent] = []);
+
+                // spec.customLayout giver enkelte atomer en fast {x,y}-offset fra
+                // deres parent i stedet for placeFan's automatiske vifte - bruges
+                // til NH4+'s tetraeder-kryds, hvor et symmetrisk fan-layout ville
+                // klemme alle fire H'er sammen i en smal kile foroven.
+                var fanKids = [];
+                br.kids.forEach(function(kid) {
+                    var cp = spec.customLayout && spec.customLayout[kid.id];
+                    if (cp) {
+                        pos[kid.id] = { x: center.x + cp.x, y: center.y + cp.y };
+                        var ang = Math.atan2(cp.y, cp.x);
+                        (placedAngles[kid.id] = placedAngles[kid.id] || []).push(ang + Math.PI);
+                        existing.push(ang);
+                    } else {
+                        fanKids.push(kid);
+                    }
+                });
+                if (fanKids.length) {
+                    var fan = placeFan(center, existing, fanKids.length, BOND_LEN);
+                    fanKids.forEach(function(kid, i) {
+                        pos[kid.id] = { x: fan[i].x, y: fan[i].y };
+                        (placedAngles[kid.id] = placedAngles[kid.id] || []).push(fan[i].angle + Math.PI);
+                        existing.push(fan[i].angle);
+                    });
+                }
+            });
+
+            return pos;
+        }
+
+        function typesFromSpec(spec) {
+            var typeById = {};
+            spec.chain.forEach(function(a) { typeById[a.id] = a.type; });
+            spec.branches.forEach(function(br) {
+                br.kids.forEach(function(k) { typeById[k.id] = k.type; });
+            });
+            return typeById;
+        }
+
+        function bondsFromSpec(spec) {
+            var list = [];
+            var chainOrder = spec.chainOrder || 1;
+            for (var i = 0; i < spec.chain.length - 1; i++) {
+                list.push({ from: spec.chain[i].id, to: spec.chain[i + 1].id, order: chainOrder });
+            }
+            spec.branches.forEach(function(br) {
+                br.kids.forEach(function(k) {
+                    list.push({ from: br.parent, to: k.id, order: k.order || 1, style: k.style || "plain" });
+                });
+            });
+            return list;
+        }
+
+        // Oxidationstal udledes direkte af EN-forskellen på hver binding, ikke
+        // hårdkodet: for hver binding går den fælles elektronpar-kontribution
+        // (±bindingsorden) til den mest elektronegative af de to atomer.
+        function oxidationNumbersFor(key) {
+            var spec = MOLECULES[key];
+            var typeById = typesFromSpec(spec);
+            var localBonds = bondsFromSpec(spec);
+            var ox = {};
+            Object.keys(typeById).forEach(function(id) { ox[id] = 0; });
+            localBonds.forEach(function(b) {
+                var enA = EN[typeById[b.from]], enB = EN[typeById[b.to]];
+                if (enA === enB) return;
+                var order = b.order || 1;
+                var toA = enA < enB ? order : -order;
+                ox[b.from] += toA;
+                ox[b.to] -= toA;
+            });
+            // Ioner: en ekstra elektron trækker ét hak ned (mere negativ), en
+            // manglende elektron skubber ét hak op (mere positiv) - se spec.ion.
+            if (spec.ion) {
+                ox[spec.ion.atomId] += spec.ion.effect === "extra" ? -1 : 1;
+            }
+            return ox;
+        }
+
+        // Slår oxidationstal-per-atom-id op til oxidationstal-per-grundstof
+        // (alle atomer af samme type har samme OT i disse molekyler).
+        function oxByType(key) {
+            var spec = MOLECULES[key];
+            var typeById = typesFromSpec(spec);
+            var ox = oxidationNumbersFor(key);
+            var byType = {};
+            Object.keys(typeById).forEach(function(id) { byType[typeById[id]] = ox[id]; });
+            return byType;
+        }
+
+        function buildMolecule(key) {
+            var spec = MOLECULES[key];
+            var pos = layoutMolecule(spec);
+            var typeById = typesFromSpec(spec);
+            var ox = oxidationNumbersFor(key);
+
+            atoms = Object.keys(pos).map(function(id) {
+                var type = typeById[id];
+                var style = ATOM_STYLE[type];
+                return {
+                    id: id, type: type,
+                    x: pos[id].x, y: pos[id].y,
+                    radius: style.radius, color: style.color, textColor: style.text,
+                    en: EN[type], ox: ox[id]
+                };
+            });
+            bonds = bondsFromSpec(spec);
+        }
+
+        function findAtom(id) {
+            for (var i = 0; i < atoms.length; i++) if (atoms[i].id === id) return atoms[i];
+            return null;
+        }
+
+        var ROMAN = ["0", "I", "II", "III", "IV", "V", "VI"];
+        function formatOx(n) {
+            if (!n) return "0";
+            return (n > 0 ? "+" : "−") + ROMAN[Math.abs(n)];
+        }
+
+        // --- Canvas init & fit ---
+        function init() {
+            resizeCanvas();
+            window.addEventListener("resize", resizeCanvas);
+            setupEventListeners();
+            buildTaskMenu();
+            goToTask(0);
+            requestAnimationFrame(renderLoop);
+        }
+
+        function resizeCanvas() {
+            var container = document.getElementById("canvas-container");
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            width = canvas.width;
+            height = canvas.height;
+            fitView();
+        }
+
+        function fitView() {
+            if (!atoms.length) return;
+            var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+            var spec = MOLECULES[TASK_ORDER[state.taskIndex]];
+            var pad = spec && spec.ion ? 60 : 40; // ion-markøren rager længere ud end atomradius alene
+            atoms.forEach(function(a) {
+                minX = Math.min(minX, a.x - a.radius - pad);
+                maxX = Math.max(maxX, a.x + a.radius + pad);
+                minY = Math.min(minY, a.y - a.radius - pad);
+                maxY = Math.max(maxY, a.y + a.radius + pad);
+            });
+            var bw = maxX - minX, bh = maxY - minY;
+            var scale = Math.min(width / bw, height / bh);
+            scale = Math.min(scale, 1.6);
+            camera.scale = scale;
+            camera.x = width / 2 - (minX + bw / 2) * scale;
+            camera.y = height / 2 - (minY + bh / 2) * scale;
+        }
+
+        // --- Render ---
+        function renderLoop() {
+            var target = state.showElectrons ? 1 : 0;
+            state.skewT += (target - state.skewT) * 0.12;
+
+            ctx.clearRect(0, 0, width, height);
+            ctx.save();
+            ctx.translate(camera.x, camera.y);
+            ctx.scale(camera.scale, camera.scale);
+
+            drawBonds();
+            atoms.forEach(drawAtom);
+            drawIonMarker();
+
+            ctx.restore();
+            requestAnimationFrame(renderLoop);
+        }
+
+        // Finder den ledige retning væk fra et atoms bindinger (samme idé som
+        // placeFan's "start"-vinkel), så ion-markøren placeres et sted uden
+        // overlap med atomets egne bindingsstreger.
+        function freeAngleFrom(atomId) {
+            var A = findAtom(atomId);
+            var angles = [];
+            bonds.forEach(function(b) {
+                var otherId = b.from === atomId ? b.to : (b.to === atomId ? b.from : null);
+                if (!otherId) return;
+                var B = findAtom(otherId);
+                angles.push(Math.atan2(B.y - A.y, B.x - A.x));
+            });
+            if (!angles.length) return -Math.PI / 2;
+            var sx = 0, sy = 0;
+            angles.forEach(function(a) { sx += Math.cos(a); sy += Math.sin(a); });
+            // Ved perfekt symmetriske bindinger (fx NH4+'s tetraeder-kryds)
+            // ophæver vektorerne hinanden - fald tilbage til "op" i stedet for
+            // en udefineret retning.
+            if (Math.hypot(sx, sy) < 0.05) return -Math.PI / 2;
+            return Math.atan2(sy, sx) + Math.PI;
+        }
+
+        // Vinklen på et atoms eneste binding (bruges til at placere
+        // ikke-bindende elektronpar symmetrisk omkring bindingen, fx O1 i OH⁻).
+        function primaryBondAngle(atomId) {
+            var A = findAtom(atomId);
+            var b = null;
+            for (var i = 0; i < bonds.length; i++) {
+                if (bonds[i].from === atomId || bonds[i].to === atomId) { b = bonds[i]; break; }
+            }
+            if (!b) return -Math.PI / 2;
+            var otherId = b.from === atomId ? b.to : b.from;
+            var B = findAtom(otherId);
+            return Math.atan2(B.y - A.y, B.x - A.x);
+        }
+
+        // Tegner det, der forklarer hvorfor en ion har en ladning ud over de
+        // almindelige binding-elektroner: enten tre ikke-bindende elektronpar
+        // omkring atomet ("extra", fx O i OH⁻) eller en tom, stiplet ring, der
+        // markerer den manglende elektron ("missing", fx N i NH4+).
+        function drawIonMarker() {
+            var spec = MOLECULES[TASK_ORDER[state.taskIndex]];
+            if (!spec.ion) return;
+            if (spec.ion.effect === "extra") {
+                drawLonePairs(spec);
+            } else {
+                drawMissingElectronRing(spec);
+            }
+        }
+
+        // O1 i OH⁻ har kun én binding, så de tre ikke-bindende par kan lægges
+        // symmetrisk i en sekskant omkring den binding: binding(0°), et
+        // OT/EN-badge-hul på hver side (±60°), og de tre par i den resterende
+        // halvcirkel modsat bindingen (+120°, +180°, +240°). Det midterste par
+        // (lige modsat bindingen) er det, der gør ionen ladet, og fremhæves.
+        function drawLonePairs(spec) {
+            var A = findAtom(spec.ion.atomId);
+            if (!A) return;
+            var bondAngle = primaryBondAngle(spec.ion.atomId);
+            var slots = [bondAngle + Math.PI * 2 / 3, bondAngle + Math.PI, bondAngle + Math.PI * 4 / 3];
+            var dist = A.radius + 15;
+            var highlightIdx = 1;
+
+            slots.forEach(function(angle, idx) {
+                var cx = A.x + Math.cos(angle) * dist;
+                var cy = A.y + Math.sin(angle) * dist;
+                var perp = angle + Math.PI / 2;
+                var isExtra = idx === highlightIdx;
+                var color = isExtra ? ION_EXTRA_COLOR : ORIGIN_COLOR[A.type];
+
+                if (isExtra) {
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 11, 0, Math.PI * 2);
+                    ctx.fillStyle = "rgba(192, 132, 252, 0.18)";
+                    ctx.fill();
+                }
+
+                [-4, 4].forEach(function(o) {
+                    var dx = cx + Math.cos(perp) * o, dy = cy + Math.sin(perp) * o;
+                    ctx.beginPath();
+                    ctx.arc(dx, dy, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = color;
+                    ctx.fill();
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = "#0f172a";
+                    ctx.stroke();
+                });
+
+                if (isExtra) {
+                    ctx.font = "bold 10px 'Segoe UI'";
+                    ctx.textAlign = "center";
+                    ctx.fillStyle = ION_EXTRA_COLOR;
+                    ctx.strokeStyle = "#0f172a";
+                    ctx.lineWidth = 3;
+                    var ly = cy + (Math.sin(angle) >= 0 ? 20 : -16);
+                    ctx.strokeText("ekstra par", cx, ly);
+                    ctx.fillText("ekstra par", cx, ly);
+                }
+            });
+        }
+
+        function drawMissingElectronRing(spec) {
+            var A = findAtom(spec.ion.atomId);
+            if (!A) return;
+            var angle = freeAngleFrom(spec.ion.atomId);
+            var dist = A.radius + 20;
+            var mx = A.x + Math.cos(angle) * dist;
+            var my = A.y + Math.sin(angle) * dist;
+
+            ctx.beginPath();
+            ctx.arc(mx, my, 4.5, 0, Math.PI * 2);
+            ctx.setLineDash([2, 2]);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = ION_MISSING_COLOR;
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.font = "bold 10px 'Segoe UI'";
+            ctx.textAlign = "center";
+            ctx.fillStyle = ION_MISSING_COLOR;
+            ctx.strokeStyle = "#0f172a";
+            ctx.lineWidth = 3;
+            var ly = my + (Math.sin(angle) >= 0 ? 18 : -14);
+            ctx.strokeText("mgl. e⁻", mx, ly);
+            ctx.fillText("mgl. e⁻", mx, ly);
+        }
+
+        // Kile (fyldt trekant, smal ved A og bred ved B) for en binding, der
+        // peger frem mod betragteren - bruges til NH4+'s tetraeder-tegning.
+        function drawWedgeBond(A, B) {
+            var ang = Math.atan2(B.y - A.y, B.x - A.x);
+            var perp = ang + Math.PI / 2;
+            var nearW = 1.5, farW = 9;
+            ctx.beginPath();
+            ctx.moveTo(A.x + Math.cos(perp) * nearW, A.y + Math.sin(perp) * nearW);
+            ctx.lineTo(B.x + Math.cos(perp) * farW, B.y + Math.sin(perp) * farW);
+            ctx.lineTo(B.x - Math.cos(perp) * farW, B.y - Math.sin(perp) * farW);
+            ctx.lineTo(A.x - Math.cos(perp) * nearW, A.y - Math.sin(perp) * nearW);
+            ctx.closePath();
+            ctx.fillStyle = "#334155";
+            ctx.fill();
+        }
+
+        // Stiplet kile (tværstreger, der udvider sig fra A mod B) for en
+        // binding, der peger væk fra betragteren.
+        function drawDashBond(A, B) {
+            var perp = Math.atan2(B.y - A.y, B.x - A.x) + Math.PI / 2;
+            var steps = 6;
+            ctx.strokeStyle = "#334155";
+            ctx.lineWidth = 3;
+            ctx.lineCap = "round";
+            for (var i = 1; i <= steps; i++) {
+                var t = i / (steps + 1);
+                var w = 1.5 + t * 7.5;
+                var cx = A.x + (B.x - A.x) * t, cy = A.y + (B.y - A.y) * t;
+                ctx.beginPath();
+                ctx.moveTo(cx + Math.cos(perp) * w, cy + Math.sin(perp) * w);
+                ctx.lineTo(cx - Math.cos(perp) * w, cy - Math.sin(perp) * w);
+                ctx.stroke();
+            }
+        }
+
+        function drawBonds() {
+            bonds.forEach(function(b) {
+                var A = findAtom(b.from), B = findAtom(b.to);
+                var order = b.order || 1;
+
+                if (b.style === "wedge") {
+                    drawWedgeBond(A, B);
+                } else if (b.style === "dash") {
+                    drawDashBond(A, B);
+                } else {
+                    ctx.strokeStyle = "#334155";
+                    ctx.lineWidth = 7;
+                    ctx.lineCap = "round";
+                    ctx.beginPath();
+                    ctx.moveTo(A.x, A.y);
+                    ctx.lineTo(B.x, B.y);
+                    ctx.stroke();
+                }
+
+                var cx = (A.x + B.x) / 2, cy = (A.y + B.y) / 2;
+                var bondLen = Math.hypot(B.x - A.x, B.y - A.y);
+                var ang = Math.atan2(B.y - A.y, B.x - A.x);
+                var dotSpreadX = order === 1 ? 0 : 7; // hvor langt dobbeltbindingens prikker rækker ud til siden
+
+                var skew = 0;
+                if (A.en !== B.en) {
+                    // Forskydningen skalerer med EN-forskellen, men har et gulv, så
+                    // selv en lille forskel tydeligt trækker mod det rigtige atom.
+                    var gap = Math.abs(A.en - B.en);
+                    var towardB = A.en < B.en;
+                    var targetRadius = towardB ? B.radius : A.radius;
+                    var maxSafePull = Math.max(4, bondLen / 2 - targetRadius - dotSpreadX - 5);
+                    var pull = Math.min(9 + 13 * gap, maxSafePull) * state.skewT;
+                    skew = towardB ? pull : -pull; // lokal +x peger fra A mod B
+                }
+
+                // Efter "tjek": hver elektron farves efter sit eget moderatom (den
+                // atom den blev bidraget af) - farven følger IKKE med, selvom parret
+                // visuelt trækkes hen mod det andet atom. Position (skew) og farve er
+                // altså to uafhængige effekter, der bare afsløres på samme tid.
+                var colorA = ELECTRON_COLOR, colorB = ELECTRON_COLOR;
+                if (state.showOrigin) {
+                    colorA = ORIGIN_COLOR[A.type];
+                    colorB = ORIGIN_COLOR[B.type];
+                }
+
+                ctx.save();
+                ctx.translate(cx, cy);
+                ctx.rotate(ang);
+                ctx.translate(skew, 0);
+                var dot = function(x, y, color) {
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                };
+                if (order === 1) {
+                    dot(0, -6, colorA); dot(0, 6, colorB);
+                } else {
+                    dot(-dotSpreadX, -6, colorA); dot(-dotSpreadX, 6, colorB);
+                    dot(dotSpreadX, -6, colorA); dot(dotSpreadX, 6, colorB);
+                }
+                ctx.restore();
+            });
+        }
+
+        function drawAtom(a) {
+            var spec = MOLECULES[TASK_ORDER[state.taskIndex]];
+            var isGuessed = spec.guessTypes.indexOf(a.type) !== -1;
+
+            if (isGuessed) {
+                ctx.beginPath();
+                ctx.arc(a.x, a.y, a.radius + 9, 0, Math.PI * 2);
+                ctx.strokeStyle = "rgba(56, 189, 248, 0.55)";
+                ctx.lineWidth = 3;
+                ctx.stroke();
+            }
+
+            ctx.beginPath();
+            ctx.arc(a.x, a.y, a.radius, 0, Math.PI * 2);
+            ctx.fillStyle = a.color;
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = "#0f172a";
+            ctx.stroke();
+
+            ctx.fillStyle = a.textColor;
+            ctx.font = "bold 20px 'Segoe UI'";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(a.type, a.x, a.y);
+
+            if (state.showEN || state.showOx) {
+                // EN- og OT-badges placeres dynamisk i den ledige vinkel væk fra
+                // atomets egne bindinger (samme idé som ion-markørens
+                // freeAngleFrom), i stedet for et fast NV/NØ-hjørne - ellers kan
+                // et badge havne oven på en binding og skjule elektronparret, når
+                // det efter "tjek" trækkes tæt på atomet.
+                var hasIonHere = spec.ion && spec.ion.atomId === a.id;
+                var enAngle, oxAngle, labelDist = a.radius * 1.25;
+                if (hasIonHere && spec.ion.effect === "extra") {
+                    // Deler samme sekskant som drawLonePairs(): binding(0°), de
+                    // tre elektronpar (+120/+180/+240°), og badges i de to
+                    // ledige huller imellem (±60°).
+                    var bondAngle = primaryBondAngle(a.id);
+                    enAngle = bondAngle - Math.PI / 3;
+                    oxAngle = bondAngle + Math.PI / 3;
+                } else if (hasIonHere) {
+                    // "missing"-ionen (N i NH4+): fire symmetriske bindinger
+                    // optager alle fire kardinalretninger på nær markørens egen -
+                    // brug de to andre ledige kardinalretninger direkte (90° til
+                    // hver side af markøren) i stedet for en smal vifte, som ville
+                    // ende for tæt på en af de diagonale bindinger.
+                    var ringAngle = freeAngleFrom(a.id);
+                    enAngle = ringAngle - Math.PI / 2;
+                    oxAngle = ringAngle + Math.PI / 2;
+                } else {
+                    var baseAngle = freeAngleFrom(a.id);
+                    var showBoth = state.showEN && state.showOx;
+                    enAngle = showBoth ? baseAngle - 0.55 : baseAngle;
+                    oxAngle = showBoth ? baseAngle + 0.55 : baseAngle;
+                }
+
+                if (state.showEN) {
+                    ctx.font = "bold 12px 'Segoe UI'";
+                    ctx.fillStyle = "#e2e8f0";
+                    ctx.strokeStyle = "#0f172a";
+                    ctx.lineWidth = 3;
+                    var enStr = a.en.toFixed(1).replace(".", ",");
+                    var enX = a.x + Math.cos(enAngle) * labelDist, enY = a.y + Math.sin(enAngle) * labelDist;
+                    ctx.strokeText(enStr, enX, enY);
+                    ctx.fillText(enStr, enX, enY);
+                }
+
+                if (state.showOx) {
+                    ctx.font = "bold 15px 'Segoe UI'";
+                    ctx.fillStyle = "#38bdf8";
+                    ctx.strokeStyle = "#0f172a";
+                    ctx.lineWidth = 3;
+                    var label = formatOx(a.ox);
+                    var lx = a.x + Math.cos(oxAngle) * labelDist, ly = a.y + Math.sin(oxAngle) * labelDist;
+                    ctx.strokeText(label, lx, ly);
+                    ctx.fillText(label, lx, ly);
+                }
+            }
+        }
+
+        // --- UI: opgaveflow ---
+        function updateHud() {
+            var key = TASK_ORDER[state.taskIndex];
+            var m = MOLECULES[key];
+            var html = "Opgave " + (state.taskIndex + 1) + " af " + TASK_ORDER.length + "<br><strong>" + m.label + "</strong> <span class=\"formula\">(" + m.formula + ")</span>";
+            if (m.charge) {
+                html += "<br><span class=\"formula\">Ion - samlet ladning: " + (m.charge > 0 ? "+" : "−") + Math.abs(m.charge) + "</span>";
+            }
+            document.getElementById("hud-text").innerHTML = html;
+        }
+
+        // Kun opgave 7-10 (H2, O2, H2O2, OF2 - de fire undtagelser fra H/O-
+        // reglerne) og opgave 11-12 (ionerne) får en kontekstuel note - resten
+        // af opgaverne følger de almindelige regler og skal ikke forstyrres af
+        // en fast, altid-synlig disclaimer.
+        function updateTaskNote() {
+            var box = document.getElementById("task-note");
+            var i = state.taskIndex; // 0-indekseret
+            var text = "";
+            if (i >= 6 && i <= 9) {
+                text = "⚠️ Denne opgave bryder en af de \"normale\" regler for H eller O - tjek dit svar, og se hvorfor i forklaringen.";
+            } else if (i >= 10 && i <= 11) {
+                text = "⚠️ Denne opgave er en ion - vær opmærksom på det ekstra eller manglende elektron(par), som giver ionen sin ladning.";
+            }
+            box.textContent = text;
+            box.classList.toggle("visible", !!text);
+        }
+
+        function renderGuessArea() {
+            var key = TASK_ORDER[state.taskIndex];
+            var spec = MOLECULES[key];
+            spec.guessTypes.forEach(function(t) {
+                if (state.guess[t] === undefined) state.guess[t] = 0;
+            });
+
+            var wrap = document.getElementById("guess-area");
+            wrap.innerHTML = "";
+            spec.guessTypes.forEach(function(t) {
+                var row = document.createElement("div");
+                row.className = "guess-row";
+                row.innerHTML =
+                    "<span class=\"guess-label\">Gæt OT(" + t + ")</span>" +
+                    "<div class=\"stepper\">" +
+                    "<button class=\"step-minus\" data-type=\"" + t + "\" " + (state.checked ? "disabled" : "") + ">−</button>" +
+                    "<span class=\"stepper-value\" id=\"val-" + t + "\">" + formatOx(state.guess[t]) + "</span>" +
+                    "<button class=\"step-plus\" data-type=\"" + t + "\" " + (state.checked ? "disabled" : "") + ">+</button>" +
+                    "</div>";
+                wrap.appendChild(row);
+            });
+            wrap.querySelectorAll(".step-minus").forEach(function(btn) {
+                btn.addEventListener("click", function() { adjustGuess(this.dataset.type, -1); });
+            });
+            wrap.querySelectorAll(".step-plus").forEach(function(btn) {
+                btn.addEventListener("click", function() { adjustGuess(this.dataset.type, 1); });
+            });
+
+            document.getElementById("btn-check").disabled = state.checked;
+        }
+
+        function adjustGuess(type, delta) {
+            if (state.checked) return;
+            var v = (state.guess[type] || 0) + delta;
+            v = Math.max(-4, Math.min(4, v));
+            state.guess[type] = v;
+            document.getElementById("val-" + type).textContent = formatOx(v);
+        }
+
+        function renderInfoBox(key, byType, correct) {
+            var spec = MOLECULES[key];
+            var box = document.getElementById("info-box");
+            box.classList.remove("correct", "wrong");
+            box.classList.add(correct ? "correct" : "wrong");
+            box.classList.add("visible");
+
+            var headline = correct ? "✅ Rigtigt gættet!" : "❌ Ikke helt rigtigt.";
+            var answerLine = spec.guessTypes.map(function(t) {
+                return "OT(" + t + ") = " + formatOx(byType[t]);
+            }).join(", ");
+            var isLast = state.taskIndex === TASK_ORDER.length - 1;
+
+            var html = "<strong>" + headline + "</strong>";
+            html += "<div class=\"answer-line\">Facit: " + answerLine + "</div>";
+            html += "<p>" + spec.explain(byType) + "</p>";
+            if (isLast) {
+                html += "<div class=\"done-msg\">🎉 Du har været igennem alle molekylerne!</div>";
+            } else {
+                html += "<button class=\"next-btn\" id=\"btn-next\">Næste molekyle →</button>";
+            }
+            html += "<button class=\"retry-btn\" id=\"btn-retry\">🔄 Prøv denne opgave igen</button>";
+            box.innerHTML = html;
+
+            if (!isLast) {
+                document.getElementById("btn-next").addEventListener("click", function() { goToTask(state.taskIndex + 1); });
+            }
+            document.getElementById("btn-retry").addEventListener("click", function() {
+                taskState[state.taskIndex] = null;
+                goToTask(state.taskIndex);
+            });
+        }
+
+        function hideInfoBox() {
+            var box = document.getElementById("info-box");
+            box.classList.remove("visible", "correct", "wrong");
+            box.innerHTML = "";
+        }
+
+        function checkAnswer() {
+            if (state.checked) return;
+            var key = TASK_ORDER[state.taskIndex];
+            var spec = MOLECULES[key];
+            var byType = oxByType(key);
+            var allCorrect = spec.guessTypes.every(function(t) { return state.guess[t] === byType[t]; });
+
+            state.checked = true;
+            state.wasCorrect = allCorrect;
+            state.showElectrons = true;
+            state.showOrigin = true;
+            state.showOx = true;
+
+            taskState[state.taskIndex] = {
+                guess: Object.assign({}, state.guess),
+                checked: true,
+                correct: allCorrect
+            };
+
+            renderGuessArea();
+            renderInfoBox(key, byType, allCorrect);
+            updateTaskMenu();
+        }
+
+        function buildTaskMenu() {
+            var wrap = document.getElementById("task-menu");
+            wrap.innerHTML = "";
+            TASK_ORDER.forEach(function(key, i) {
+                var b = document.createElement("button");
+                b.className = "task-dot";
+                b.textContent = (i + 1);
+                b.title = MOLECULES[key].formula;
+                b.addEventListener("click", function() { goToTask(i); });
+                wrap.appendChild(b);
+            });
+        }
+
+        function updateTaskMenu() {
+            var dots = document.querySelectorAll(".task-dot");
+            dots.forEach(function(d, i) {
+                d.classList.toggle("current", i === state.taskIndex);
+                var res = taskState[i];
+                d.classList.toggle("done-correct", !!(res && res.checked && res.correct));
+                d.classList.toggle("done-wrong", !!(res && res.checked && !res.correct));
+            });
+        }
+
+        function goToTask(i) {
+            if (i < 0 || i >= TASK_ORDER.length) return;
+            state.taskIndex = i;
+            var key = TASK_ORDER[i];
+            var saved = taskState[i];
+
+            state.checked = !!(saved && saved.checked);
+            state.wasCorrect = saved ? saved.correct : false;
+            state.guess = saved ? Object.assign({}, saved.guess) : {};
+            state.showElectrons = state.checked;
+            state.showOrigin = state.checked;
+            state.showOx = state.checked;
+
+            buildMolecule(key);
+            fitView();
+            updateHud();
+            updateTaskNote();
+            renderGuessArea();
+
+            if (state.checked) {
+                var byType = oxByType(key);
+                renderInfoBox(key, byType, state.wasCorrect);
+            } else {
+                hideInfoBox();
+            }
+            updateTaskMenu();
+        }
+
+        function setupEventListeners() {
+            document.getElementById("btn-check").addEventListener("click", checkAnswer);
+
+            document.getElementById("btn-en").addEventListener("click", function() {
+                state.showEN = !state.showEN;
+                this.classList.toggle("active", state.showEN);
+            });
+
+            document.getElementById("btn-reset").addEventListener("click", function() {
+                taskState = [];
+                state.showEN = false;
+                document.getElementById("btn-en").classList.remove("active");
+                goToTask(0);
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>

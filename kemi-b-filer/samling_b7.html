@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animations Samling</title>
+    <style>
+        /* Nulstil alt så vi bruger hele skærmen */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* Hoved-containeren */
+        .main-layout {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Sidebaren styling */
+        .sidebar {
+            width: 210px; /* Standard bredde */
+            background-color: #2c3e50;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            border-right: 1px solid #1a252f;
+            overflow-x: hidden;
+            overflow-y: auto;
+            transition: width 0.3s ease; /* Glidende animation */
+            position: relative;
+        }
+
+        /* Når menuen er klappet sammen */
+        .sidebar.collapsed {
+            width: 60px; /* Smal stribe til knappen */
+        }
+
+        /* Headeren styling */
+        .sidebar-header {
+            height: 60px;
+            padding: 0 15px;
+            background-color: #1a252f;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        /* Centrer knappen når menuen er lukket */
+        .sidebar.collapsed .sidebar-header {
+            justify-content: center;
+            padding: 0;
+        }
+
+        /* Titlen i headeren */
+        .header-text {
+            font-weight: bold;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+
+        /* Skjul teksten når menuen er lukket */
+        .sidebar.collapsed .header-text {
+            display: none;
+        }
+
+        /* Toggle knappen (☰) */
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 26px;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-btn:hover {
+            color: #3498db;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .link-btn {
+            font-size: 16px;
+        }
+
+        .sidebar.collapsed .link-btn {
+            display: none;
+        }
+
+        /* Knapperne */
+        .tab-btn {
+            background: transparent;
+            border: none;
+            border-left: 3px solid transparent;
+            color: #bdc3c7;
+            padding: 12px 16px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid #34495e;
+            font-size: 14px;
+            white-space: nowrap;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tab-btn:hover {
+            background-color: #34495e;
+            color: white;
+            border-left-color: #3498db;
+        }
+
+        .tab-btn.active {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+            border-left: 3px solid #2980b9;
+        }
+
+        /* Tal-badge */
+        .btn-num {
+            flex-shrink: 0;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background-color: #34495e;
+            color: #ecf0f1;
+            font-size: 11px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tab-btn.active .btn-num {
+            background-color: #2980b9;
+            color: white;
+        }
+
+        .btn-text {
+            transition: opacity 0.15s ease;
+        }
+
+        /* Kollaps: vis kun tal-badge, centrer det */
+        .sidebar.collapsed .tab-btn {
+            justify-content: center;
+            padding: 12px 0;
+        }
+
+        .sidebar.collapsed .btn-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        /* Content area */
+        .content-area {
+            flex-grow: 1;
+            height: 100%;
+            background-color: white;
+            position: relative;
+        }
+
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* Startside: boks-oversigt over kapitlets animationer */
+        .startside {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            box-sizing: border-box;
+            padding: 30px 40px;
+            background-color: #eef1f4;
+        }
+
+        .startside-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .startside-box {
+            background-color: white;
+            border: 1px solid #dfe6ec;
+            border-radius: 10px;
+            padding: 16px;
+            min-height: 150px;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .startside-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+            border-color: #3498db;
+        }
+
+        .startside-box-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .startside-box-title {
+            font-weight: bold;
+            font-size: 13px;
+            color: #2c3e50;
+        }
+
+        .startside-box-desc {
+            font-size: 13px;
+            color: #5a6c7a;
+            line-height: 1.4;
+        }
+
+        .header-text.clickable {
+            cursor: pointer;
+        }
+
+        .header-text.clickable:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="main-layout">
+        <div class="sidebar" id="sidebarMenu">
+            <div class="sidebar-header">
+                <span class="header-text clickable" onclick="visStartside()" title="Tilbage til oversigt">Kulhydrater</span>
+                <div class="header-actions">
+                    <button class="toggle-btn link-btn" onclick="kopierLink(this)" title="Kopiér link til denne animation">🔗</button>
+                    <button class="toggle-btn" onclick="toggleMenu()" title="Vis/Skjul menu">☰</button>
+                </div>
+            </div>
+
+            <button class="tab-btn" data-emne="b7.10" data-beskrivelse="Se hvordan glucose og fructose lukker ring og danner alfa- og beta-anomerer." onclick="visAnimation(this, 'b7.10_ringslutning_kulhydrater.html')" title="Ringslutning: Monosakkarider"><span class="btn-num">1</span><span class="btn-text">Ringslutning</span></button>
+
+        </div>
+
+        <div class="content-area">
+            <div class="startside" id="startside">
+                <div class="startside-grid" id="startsideGrid"></div>
+            </div>
+            <iframe id="visningsVindue" style="display:none;"></iframe>
+        </div>
+    </div>
+
+    <script>
+        function visAnimation(knap, filsti) {
+            var iframe = document.getElementById('visningsVindue');
+            document.getElementById('startside').style.display = 'none';
+            iframe.style.display = 'block';
+            iframe.src = filsti;
+
+            var alleKnapper = document.querySelectorAll('.tab-btn');
+            alleKnapper.forEach(btn => btn.classList.remove('active'));
+            knap.classList.add('active');
+        }
+
+        function visStartside() {
+            document.getElementById('visningsVindue').style.display = 'none';
+            document.getElementById('startside').style.display = 'block';
+            document.getElementById('sidebarMenu').classList.remove('collapsed');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        }
+
+        function byggStartside() {
+            var grid = document.getElementById('startsideGrid');
+            document.querySelectorAll('.tab-btn').forEach(function(knap) {
+                var num = knap.querySelector('.btn-num').textContent;
+                var titel = knap.querySelector('.btn-text').textContent;
+                var beskrivelse = knap.getAttribute('data-beskrivelse') || '';
+                var boks = document.createElement('div');
+                boks.className = 'startside-box';
+                boks.innerHTML = '<div class="startside-box-head"><span class="btn-num">' + num + '</span><span class="startside-box-title">' + titel + '</span></div><div class="startside-box-desc">' + beskrivelse + '</div>';
+                boks.addEventListener('click', function() { knap.click(); });
+                grid.appendChild(boks);
+            });
+        }
+        byggStartside();
+
+        function toggleMenu() {
+            var menu = document.getElementById('sidebarMenu');
+            menu.classList.toggle('collapsed');
+        }
+
+        function kopierLink(btn) {
+            var forrigeTekst = btn.textContent;
+            var aktivKnap = document.querySelector('.tab-btn.active');
+            var url = new URL('../samling_alt_b.html', window.location.href);
+            if (aktivKnap) {
+                url.search = '?emne=' + encodeURIComponent(aktivKnap.getAttribute('data-emne'));
+            } else {
+                var egetFilnavn = window.location.pathname.split('/').pop();
+                url.search = '?side=' + encodeURIComponent(egetFilnavn);
+            }
+            function visManuelt() {
+                window.prompt('Kopiér linket manuelt (Ctrl+C):', url.href);
+            }
+            try {
+                navigator.clipboard.writeText(url.href).then(function() {
+                    btn.textContent = '✓';
+                    setTimeout(function() { btn.textContent = forrigeTekst; }, 1200);
+                }).catch(visManuelt);
+            } catch (e) {
+                visManuelt();
+            }
+        }
+
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const emneFil = urlParams.get('emne');
+
+            if (emneFil) {
+                const knapper = document.querySelectorAll('.tab-btn');
+                const aliasKnap = Array.from(knapper).find(knap => knap.getAttribute('data-emne') === emneFil);
+                if (aliasKnap) {
+                    aliasKnap.click();
+                } else {
+                    knapper.forEach(knap => {
+                        if (knap.getAttribute('onclick').includes(emneFil)) {
+                            visAnimation(knap, emneFil);
+                        }
+                    });
+                }
+                // Direkte link til en bestemt animation skal altid vise et sammenklappet
+                // sidepanel med det samme, i stedet for at vente på at brugeren interagerer
+                // med animationen (blur-baseret kollaps kan være upålideligt).
+                document.getElementById('sidebarMenu').classList.add('collapsed');
+                if (window.parent !== window) {
+                    window.parent.postMessage('animationFocus', '*');
+                }
+            }
+        });
+
+        window.addEventListener('blur', function() {
+            if (document.activeElement === document.getElementById('visningsVindue')) {
+                document.getElementById('sidebarMenu').classList.add('collapsed');
+                if (window.parent !== window) {
+                    window.parent.postMessage('animationFocus', '*');
+                }
+            }
+        });
+
+    </script>
+
+</body>
+</html>

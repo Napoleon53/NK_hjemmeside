@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rumlig Kemi: Stor Skala & Skarpe Bindinger</title>
+    <style>
+        :root {
+            --bg-color: #151525;
+            --panel-color: #1e2235;
+            --accent-color: #2a3b55;
+            --text-color: #ff6b6b;
+            --highlight: #fcd581;
+            --light-text: #e0e0e0;
+        }
+        body { margin: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: var(--bg-color); color: var(--light-text); overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
+        
+        header {
+            background: var(--panel-color); padding: 5px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 3px solid var(--text-color);
+            z-index: 20;
+        }
+        h1 { margin: 0; font-size: 1.5rem; letter-spacing: 1px; color: white; text-transform: uppercase; }
+        
+        #main-container { display: flex; flex: 1; position: relative; min-height: 0; }
+
+        #canvas-wrapper { flex: 1; position: relative; cursor: grab; background: radial-gradient(circle at center, #2a2f45 0%, #151525 100%); overflow: hidden; min-height: 0; }
+        #canvas-wrapper:active { cursor: grabbing; }
+        canvas { display: block; width: 100%; height: 100%; }
+
+        /* min-height:0 lets this flex item shrink below its content's natural size, so overflow-y:auto
+           actually scrolls internally instead of forcing the whole layout (and the canvas) taller than the viewport */
+        #sidebar { width: 320px; background: var(--panel-color); padding: 11px; box-shadow: -5px 0 15px rgba(0,0,0,0.4); overflow-y: auto; display: flex; flex-direction: column; gap: 7px; z-index: 10; border-left: 1px solid #333; min-height: 0; }
+
+        .card { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; border-left: 3px solid var(--text-color); }
+        .card h3 { margin-top: 0; margin-bottom: 6px; font-size: 0.87rem; text-transform: uppercase; color: #888; letter-spacing: 1px; }
+
+        select { width: 100%; padding: 9px; background: #111; color: white; border: 1px solid #444; border-radius: 4px; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+        select:hover { border-color: var(--text-color); }
+        select:focus { outline: none; border-color: var(--text-color); box-shadow: 0 0 5px rgba(255, 107, 107, 0.5); }
+        select:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Buttons */
+        .btn { width: 100%; padding: 9px; background: var(--text-color); color: #1a1a1a; border: none; border-radius: 4px; font-size: 0.95rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn:hover { filter: brightness(1.1); }
+        .btn-secondary { background: #333; color: var(--light-text); }
+        .btn-secondary:hover { background: #444; }
+
+        /* Quiz */
+        #quiz-score { font-size: 0.85rem; color: #888; margin-bottom: 5px; }
+        .quiz-options { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
+        .quiz-option-btn { padding: 6px 4px; background: #222; color: var(--light-text); border: 1px solid #444; border-radius: 4px; font-size: 0.8rem; cursor: pointer; transition: 0.15s; text-align: center; }
+        .quiz-option-btn:hover:not(:disabled) { border-color: var(--text-color); background: #2a2a2a; }
+        .quiz-option-btn:disabled { cursor: default; }
+        .quiz-option-btn.correct { background: rgba(111, 220, 111, 0.25); border-color: #6fdc6f; color: #6fdc6f; opacity: 1; font-weight: bold; }
+        .quiz-option-btn.incorrect { background: rgba(255, 107, 107, 0.25); border-color: var(--text-color); color: var(--text-color); opacity: 1; font-weight: bold; }
+        #quiz-feedback { min-height: 1.3em; font-size: 0.85rem; }
+        #quiz-buttons-row { display: flex; gap: 6px; margin-top: 6px; }
+        #quiz-buttons-row .btn { width: auto; flex: 1; }
+
+        /* EN Table */
+        #en-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        #en-table th { text-align: left; color: #888; padding-bottom: 3px; border-bottom: 1px solid #444; }
+        #en-table td { padding: 3px 0; border-bottom: 1px solid #333; }
+        .atom-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; }
+
+        /* Toggles */
+        .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 0.88rem; }
+        .toggle-row:last-child { margin-bottom: 0; }
+        .switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .3s; border-radius: 34px; border: 1px solid #555; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 2px; bottom: 2px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--text-color); border-color: var(--text-color); }
+        input:checked + .slider:before { transform: translateX(16px); }
+        /* Explicit override for switches forced off by JS (quiz mode) - independent of :checked so it can't lag behind. */
+        .switch.forced-off .slider { background-color: #333 !important; border-color: #555 !important; }
+        .switch.forced-off .slider:before { transform: translateX(0) !important; }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.88rem; margin-top: 4px; }
+        .info-item span:first-child { color: #888; display: block; font-size: 0.75rem; }
+        .info-item span:last-child { color: #fff; font-weight: bold; }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>RUMLIG KEMI: <span id="molecule-name" style="color:var(--text-color)">Molekyle</span></h1>
+</header>
+
+<div id="main-container">
+    <div id="canvas-wrapper">
+        <canvas id="moleculeCanvas"></canvas>
+    </div>
+
+    <aside id="sidebar">
+        <div class="card" id="quiz-card">
+            <h3>Quiz: Gæt Geometrien</h3>
+            <div id="quiz-intro">
+                <p style="font-size:0.85rem; color:#ccc; margin:0 0 8px;">Se molekylet, og gæt dets rumlige geometri, før du afslører facit.</p>
+                <button class="btn" id="quiz-start-btn" onclick="startQuiz()">Start Quiz</button>
+            </div>
+            <div id="quiz-active" style="display:none;">
+                <div id="quiz-score">Score: 0/0</div>
+                <div id="quiz-options" class="quiz-options"></div>
+                <div id="quiz-feedback"></div>
+                <div id="quiz-buttons-row">
+                    <button class="btn" id="quiz-next-btn" onclick="nextQuizQuestion()" style="display:none;">Næste molekyle &rarr;</button>
+                    <button class="btn btn-secondary" id="quiz-stop-btn" onclick="stopQuiz()">Afslut Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Kontrolpanel</h3>
+            <select id="molecule-select" onchange="loadMolecule(this.value)">
+                </select>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <span>Geometri</span>
+                    <span id="info-shape">-</span>
+                </div>
+                <div class="info-item">
+                    <span>Polaritet</span>
+                    <span id="info-polarity-text">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Visualisering</h3>
+            <div class="toggle-row">
+                <span style="color:#FFFFAA;">Vis Vinkler</span>
+                <label class="switch"><input type="checkbox" id="toggle-angles" checked><span class="slider"></span></label>
+            </div>
+            
+            <div class="toggle-row">
+                <span>Vis Lone Pairs</span>
+                <label class="switch"><input type="checkbox" id="toggle-lp" checked><span class="slider"></span></label>
+            </div>
+            <div class="toggle-row">
+                <span>Vis Bindings-træk (EN)</span>
+                <label class="switch"><input type="checkbox" id="toggle-bond-dipole"><span class="slider"></span></label>
+            </div>
+            <div class="toggle-row">
+                <span>Vis <span style="color:#0f0">Netto Dipol</span></span>
+                <label class="switch"><input type="checkbox" id="toggle-net-dipole"><span class="slider"></span></label>
+            </div>
+            <div class="toggle-row">
+                <span>Auto-rotation</span>
+                <label class="switch"><input type="checkbox" id="toggle-autorotate"><span class="slider"></span></label>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Atomer & Elektronegativitet</h3>
+            <table id="en-table">
+                <thead>
+                    <tr><th>Atom</th><th>EN</th></tr>
+                </thead>
+                <tbody id="en-tbody"></tbody>
+            </table>
+        </div>
+    </aside>
+</div>
+
+<script>
+/**
+ * 3D MOLECULE ENGINE V4
+ * Updates: Improved Multi-bond rendering, Extended Molecule List, Better Angle Arc positioning
+ */
+
+const canvas = document.getElementById('moleculeCanvas');
+const ctx = canvas.getContext('2d');
+let width, height;
+
+// State
+let currentMolecule = null;
+let rotation = { x: 0.1, y: 0.2 };
+let isDragging = false;
+let lastMouse = { x: 0, y: 0 };
+
+// Data: EN Values
+const EN_VALUES = {
+    'H': 2.1, 'B': 2.0, 'C': 2.5, 'N': 3.0, 'O': 3.5, 'F': 4.0, 
+    'P': 2.1, 'S': 2.5, 'Cl': 3.0
+};
+
+// Data: Molecules
+const MOLECULES = {
+    'H2O': {
+        name: 'H₂O (Vand)', shape: 'Vinklet', angleVal: '104,5°', polar: true,
+        atoms: [
+            { el: 'O', x: 0, y: 0, z: 0, r: 24, color: '#FF2222' },
+            { el: 'H', x: 75, y: 60, z: 0, r: 15, color: '#EEE' },
+            { el: 'H', x: -75, y: 60, z: 0, r: 15, color: '#EEE' }
+        ],
+        bonds: [[0,1,1], [0,2,1]], 
+        lonePairs: [{x:30,y:-40,z:40,size:22}, {x:-30,y:-40,z:-40,size:22}], 
+        dipoleVec: {x:0,y:-80,z:0},
+        angleIndices: [1,0,2] // H-O-H
+    },
+    'CO2': {
+        name: 'CO₂ (Carbondioxid)', shape: 'Lineær', angleVal: '180°', polar: false,
+        atoms: [
+            { el: 'C', x: 0, y: 0, z: 0, r: 24, color: '#444' },
+            { el: 'O', x: -110, y: 0, z: 0, r: 22, color: '#FF2222' },
+            { el: 'O', x: 110, y: 0, z: 0, r: 22, color: '#FF2222' }
+        ],
+        bonds: [[0,1,2], [0,2,2]], lonePairs: [], dipoleVec: {x:0,y:0,z:0},
+        angleIndices: [1,0,2] // O-C-O
+    },
+    'HCN': {
+        name: 'HCN (Blåsyre)', shape: 'Lineær', angleVal: '180°', polar: true,
+        atoms: [
+            { el: 'C', x: 0, y: 0, z: 0, r: 24, color: '#444' },
+            { el: 'H', x: -110, y: 0, z: 0, r: 15, color: '#EEE' },
+            { el: 'N', x: 110, y: 0, z: 0, r: 22, color: '#2222FF' }
+        ],
+        bonds: [[0,1,1], [0,2,3]], // Triple bond C-N
+        lonePairs: [{x:150, y:0, z:0, size:20}], 
+        dipoleVec: {x:80,y:0,z:0},
+        angleIndices: [1,0,2]
+    },
+    'C2H2': {
+        name: 'C₂H₂ (Ethyn)', shape: 'Lineær', angleVal: '180°', polar: false,
+        atoms: [
+            { el: 'C', x: -40, y: 0, z: 0, r: 24, color: '#333' },
+            { el: 'C', x: 40, y: 0, z: 0, r: 24, color: '#333' },
+            { el: 'H', x: -130, y: 0, z: 0, r: 15, color: '#EEE' },
+            { el: 'H', x: 130, y: 0, z: 0, r: 15, color: '#EEE' }
+        ],
+        bonds: [[0,1,3], [0,2,1], [1,3,1]], // C-C Triple
+        lonePairs: [], dipoleVec: {x:0,y:0,z:0},
+        angleIndices: [2,0,1] // H-C-C
+    },
+    'C2H4': {
+        name: 'C₂H₄ (Ethen)', shape: 'Trigonal Plan', angleVal: '120°', polar: false,
+        atoms: [
+            { el: 'C', x: -50, y: 0, z: 0, r: 24, color: '#333' },
+            { el: 'C', x: 50, y: 0, z: 0, r: 24, color: '#333' },
+            { el: 'H', x: -100, y: -86, z: 0, r: 15, color: '#EEE' },
+            { el: 'H', x: -100, y: 86, z: 0, r: 15, color: '#EEE' },
+            { el: 'H', x: 100, y: -86, z: 0, r: 15, color: '#EEE' },
+            { el: 'H', x: 100, y: 86, z: 0, r: 15, color: '#EEE' }
+        ],
+        bonds: [[0,1,2], [0,2,1], [0,3,1], [1,4,1], [1,5,1]], // C=C Double
+        lonePairs: [], dipoleVec: {x:0,y:0,z:0},
+        angleIndices: [2,0,3] // H-C-H
+    },
+    'CH4': {
+        name: 'CH₄ (Methan)', shape: 'Tetraeder', angleVal: '109,5°', polar: false,
+        atoms: [
+            { el: 'C', x: 0, y: 0, z: 0, r: 24, color: '#444' },
+            { el: 'H', x: 0, y: -100, z: 0, r: 15, color: '#EEE' },
+            { el: 'H', x: 94, y: 33, z: 0, r: 15, color: '#EEE' },
+            { el: 'H', x: -47, y: 33, z: -81, r: 15, color: '#EEE' },
+            { el: 'H', x: -47, y: 33, z: 81, r: 15, color: '#EEE' }
+        ],
+        bonds: [[0,1,1], [0,2,1], [0,3,1], [0,4,1]], lonePairs: [], dipoleVec: {x:0,y:0,z:0},
+        angleIndices: [1,0,2]
+    },
+    'NH3': {
+        name: 'NH₃ (Ammoniak)', shape: 'Trigonal Pyramide', angleVal: '107°', polar: true,
+        atoms: [
+            { el: 'N', x: 0, y: 10, z: 0, r: 24, color: '#2222FF' },
+            { el: 'H', x: 0, y: 65, z: 95, r: 15, color: '#EEE' },
+            { el: 'H', x: 82, y: 65, z: -47, r: 15, color: '#EEE' },
+            { el: 'H', x: -82, y: 65, z: -47, r: 15, color: '#EEE' }
+        ],
+        bonds: [[0,1,1], [0,2,1], [0,3,1]], 
+        lonePairs: [{x:0,y:-55,z:0,size:28}], 
+        dipoleVec: {x:0,y:-90,z:0},
+        angleIndices: [1,0,2]
+    },
+    'BF3': {
+        name: 'BF₃ (Bortrifluorid)', shape: 'Trigonal Plan', angleVal: '120°', polar: false,
+        atoms: [
+            { el: 'B', x: 0, y: 0, z: 0, r: 24, color: '#FFB5B5' },
+            { el: 'F', x: 0, y: -110, z: 0, r: 18, color: '#90E0EF' },
+            { el: 'F', x: 95, y: 55, z: 0, r: 18, color: '#90E0EF' },
+            { el: 'F', x: -95, y: 55, z: 0, r: 18, color: '#90E0EF' }
+        ],
+        bonds: [[0,1,1], [0,2,1], [0,3,1]], lonePairs: [], dipoleVec: {x:0,y:0,z:0},
+        angleIndices: [1,0,2]
+    },
+    'CH2O': {
+        name: 'CH₂O (Formaldehyd)', shape: 'Trigonal Plan', angleVal: '120°', polar: true,
+        atoms: [
+            { el: 'C', x: 0, y: 10, z: 0, r: 24, color: '#444' },
+            { el: 'O', x: 0, y: -100, z: 0, r: 22, color: '#FF2222' },
+            { el: 'H', x: 86, y: 70, z: 0, r: 15, color: '#EEE' },
+            { el: 'H', x: -86, y: 70, z: 0, r: 15, color: '#EEE' }
+        ],
+        bonds: [[0,1,2], [0,2,1], [0,3,1]], 
+        lonePairs: [{x:40,y:-120,z:0,size:18}, {x:-40,y:-120,z:0,size:18}], 
+        dipoleVec: {x:0,y:-90,z:0},
+        angleIndices: [2,0,3]
+    },
+    'PCl5': {
+        name: 'PCl₅ (Phosphorpentachlorid)', shape: 'Trigonal Bipyramide', angleVal: '90°/120°', polar: false,
+        atoms: [
+            { el: 'P', x: 0, y: 0, z: 0, r: 26, color: '#FF8000' },
+            { el: 'Cl', x: 0, y: -110, z: 0, r: 18, color: '#00FF00' },
+            { el: 'Cl', x: 0, y: 110, z: 0, r: 18, color: '#00FF00' },
+            { el: 'Cl', x: 110, y: 0, z: 0, r: 18, color: '#00FF00' },
+            { el: 'Cl', x: -55, y: 0, z: 95, r: 18, color: '#00FF00' },
+            { el: 'Cl', x: -55, y: 0, z: -95, r: 18, color: '#00FF00' }
+        ],
+        bonds: [[0,1,1], [0,2,1], [0,3,1], [0,4,1], [0,5,1]], lonePairs: [], dipoleVec: {x:0,y:0,z:0},
+        angleIndices: [1,0,3] // 90 degree angle
+    },
+    'SF6': {
+        name: 'SF₆ (Svovlhexafluorid)', shape: 'Oktaeder', angleVal: '90°', polar: false,
+        atoms: [
+            { el: 'S', x: 0, y: 0, z: 0, r: 26, color: '#CCCC00' },
+            { el: 'F', x: 100, y: 0, z: 0, r: 16, color: '#90E0EF' },
+            { el: 'F', x: -100, y: 0, z: 0, r: 16, color: '#90E0EF' },
+            { el: 'F', x: 0, y: 100, z: 0, r: 16, color: '#90E0EF' },
+            { el: 'F', x: 0, y: -100, z: 0, r: 16, color: '#90E0EF' },
+            { el: 'F', x: 0, y: 0, z: 100, r: 16, color: '#90E0EF' },
+            { el: 'F', x: 0, y: 0, z: -100, r: 16, color: '#90E0EF' }
+        ],
+        bonds: [[0,1,1], [0,2,1], [0,3,1], [0,4,1], [0,5,1], [0,6,1]], lonePairs: [], dipoleVec: {x:0,y:0,z:0},
+        angleIndices: [1,0,3]
+    }
+};
+
+// Data: simplified multiple-choice options for the quiz (label = shown on button, value = matches MOLECULES[key].shape)
+const QUIZ_SHAPES = [
+    { label: 'Lineær', value: 'Lineær' },
+    { label: 'Vinklet', value: 'Vinklet' },
+    { label: 'Plan', value: 'Trigonal Plan' },
+    { label: 'Pyramide', value: 'Trigonal Pyramide' },
+    { label: 'Tetraeder', value: 'Tetraeder' }
+];
+const QUIZ_SHAPE_LABEL = Object.fromEntries(QUIZ_SHAPES.map(s => [s.value, s.label]));
+// Only quiz molecules whose shape has a matching answer button above (excludes PCl5/SF6 - bipyramide/oktaeder)
+const QUIZ_POOL_KEYS = Object.keys(MOLECULES).filter(key => QUIZ_SHAPE_LABEL[MOLECULES[key].shape]);
+
+// Quiz State
+let quiz = { active: false, answered: false, queue: [], currentKey: null, score: 0, total: 0 };
+
+function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function startQuiz() {
+    quiz.active = true;
+    quiz.score = 0;
+    quiz.total = 0;
+    quiz.queue = [];
+
+    document.getElementById('quiz-intro').style.display = 'none';
+    document.getElementById('quiz-active').style.display = 'block';
+    // Hidden (not just disabled): a disabled-but-visible dropdown would still show the
+    // pre-quiz molecule name, which mismatches whatever the quiz just loaded and looks broken.
+    document.getElementById('molecule-select').style.display = 'none';
+
+    // These toggles would give the answer away directly, so lock them off during the quiz
+    const angleToggle = document.getElementById('toggle-angles');
+    angleToggle.checked = false;
+    angleToggle.disabled = true;
+    angleToggle.closest('.switch').classList.add('forced-off');
+    const dipoleToggle = document.getElementById('toggle-net-dipole');
+    dipoleToggle.checked = false;
+    dipoleToggle.disabled = true;
+    dipoleToggle.closest('.switch').classList.add('forced-off');
+
+    nextQuizQuestion();
+}
+
+function stopQuiz() {
+    quiz.active = false;
+    document.getElementById('quiz-intro').style.display = 'block';
+    document.getElementById('quiz-active').style.display = 'none';
+
+    const select = document.getElementById('molecule-select');
+    select.style.display = '';
+    if (quiz.currentKey) select.value = quiz.currentKey; // stay on the molecule just shown, don't jump back
+
+    const angleToggle = document.getElementById('toggle-angles');
+    angleToggle.disabled = false;
+    angleToggle.closest('.switch').classList.remove('forced-off');
+    const dipoleToggle = document.getElementById('toggle-net-dipole');
+    dipoleToggle.disabled = false;
+    dipoleToggle.closest('.switch').classList.remove('forced-off');
+
+    loadMolecule(select.value);
+}
+
+function nextQuizQuestion() {
+    if (quiz.queue.length === 0) {
+        quiz.queue = shuffle(QUIZ_POOL_KEYS);
+        const last = quiz.queue.length - 1;
+        if (quiz.queue.length > 1 && quiz.queue[last] === quiz.currentKey) {
+            [quiz.queue[last], quiz.queue[0]] = [quiz.queue[0], quiz.queue[last]];
+        }
+    }
+    quiz.answered = false;
+    quiz.currentKey = quiz.queue.pop();
+
+    loadMolecule(quiz.currentKey);
+    hideAnswerInfo();
+    buildQuizOptions();
+
+    document.getElementById('quiz-feedback').innerText = '';
+    document.getElementById('quiz-next-btn').style.display = 'none';
+    updateQuizScore();
+}
+
+function hideAnswerInfo() {
+    document.getElementById('molecule-name').innerText = 'Gæt molekylet!';
+    document.getElementById('info-shape').innerText = '?';
+    const polEl = document.getElementById('info-polarity-text');
+    polEl.innerText = '?';
+    polEl.style.color = '#888';
+}
+
+function buildQuizOptions() {
+    const container = document.getElementById('quiz-options');
+    container.innerHTML = '';
+    QUIZ_SHAPES.forEach(s => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option-btn';
+        btn.innerText = s.label;
+        btn.dataset.shape = s.value;
+        btn.onclick = () => submitQuizAnswer(s.value, btn);
+        container.appendChild(btn);
+    });
+}
+
+function submitQuizAnswer(chosenShape, btnEl) {
+    if (quiz.answered) return;
+    quiz.answered = true;
+
+    const correctShape = MOLECULES[quiz.currentKey].shape;
+    const isCorrect = chosenShape === correctShape;
+    quiz.total++;
+    if (isCorrect) quiz.score++;
+
+    document.querySelectorAll('#quiz-options .quiz-option-btn').forEach(b => {
+        b.disabled = true;
+        if (b.dataset.shape === correctShape) b.classList.add('correct');
+        else if (b === btnEl) b.classList.add('incorrect');
+    });
+
+    const feedback = document.getElementById('quiz-feedback');
+    const moleculeName = MOLECULES[quiz.currentKey].name;
+    feedback.style.color = isCorrect ? '#6fdc6f' : 'var(--text-color)';
+    feedback.innerText = (isCorrect ? 'Rigtigt! ' : 'Forkert. ') + moleculeName + ' er ' + QUIZ_SHAPE_LABEL[correctShape] + '.';
+
+    updateUI(quiz.currentKey); // reveal real name/geometry/polarity
+    document.getElementById('quiz-next-btn').style.display = 'inline-block';
+    updateQuizScore();
+}
+
+function updateQuizScore() {
+    document.getElementById('quiz-score').innerText = 'Score: ' + quiz.score + '/' + quiz.total;
+}
+
+function init() {
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    
+    const select = document.getElementById('molecule-select');
+    Object.keys(MOLECULES).forEach(key => {
+        const opt = document.createElement('option');
+        opt.value = key;
+        opt.innerText = MOLECULES[key].name;
+        select.appendChild(opt);
+    });
+
+    loadMolecule('H2O');
+    
+    const w = document.getElementById('canvas-wrapper');
+    w.addEventListener('mousedown', startDrag);
+    w.addEventListener('mousemove', drag);
+    w.addEventListener('mouseup', endDrag);
+    w.addEventListener('mouseleave', endDrag);
+    w.addEventListener('touchstart', e => startDrag(e.touches[0]));
+    w.addEventListener('touchmove', e => drag(e.touches[0]));
+    w.addEventListener('touchend', endDrag);
+
+    animate();
+}
+
+function resizeCanvas() {
+    width = canvas.width = document.getElementById('canvas-wrapper').clientWidth;
+    height = canvas.height = document.getElementById('canvas-wrapper').clientHeight;
+}
+
+function loadMolecule(key) {
+    currentMolecule = JSON.parse(JSON.stringify(MOLECULES[key]));
+    updateUI(key);
+}
+
+// Recomputed every frame so the molecule always fits the canvas, regardless of window size or browser zoom.
+function computeFitScale() {
+    if (!currentMolecule) return 2.2;
+
+    let maxExtent = 40; // floor so a lone small atom doesn't blow the scale up absurdly
+    currentMolecule.atoms.forEach(a => {
+        const dist = Math.sqrt(a.x*a.x + a.y*a.y + a.z*a.z) + a.r;
+        if (dist > maxExtent) maxExtent = dist;
+    });
+    currentMolecule.lonePairs.forEach(lp => {
+        const dist = Math.sqrt(lp.x*lp.x + lp.y*lp.y + lp.z*lp.z) + lp.size;
+        if (dist > maxExtent) maxExtent = dist;
+    });
+
+    const availableRadius = Math.min(width, height) / 2 * 0.78; // leaves room for angle labels/dipole arrows
+    const scale = availableRadius / maxExtent;
+    return Math.max(0.5, Math.min(scale, 4));
+}
+
+function updateUI(key) {
+    const m = MOLECULES[key];
+    document.getElementById('molecule-name').innerText = m.name;
+    document.getElementById('info-shape').innerText = m.shape;
+    
+    const polText = m.polar ? "Ja (Polært)" : "Nej (Upolært)";
+    const polEl = document.getElementById('info-polarity-text');
+    polEl.innerText = polText;
+    polEl.style.color = m.polar ? "#0f0" : "#888";
+
+    const tbody = document.getElementById('en-tbody');
+    tbody.innerHTML = '';
+    const uniqueElements = [...new Set(m.atoms.map(a => a.el))];
+    uniqueElements.sort((a,b) => EN_VALUES[b] - EN_VALUES[a]); 
+
+    uniqueElements.forEach(el => {
+        const val = EN_VALUES[el];
+        const color = m.atoms.find(a => a.el === el).color;
+        const row = `<tr>
+            <td><span class="atom-dot" style="background:${color}"></span>${el}</td>
+            <td style="font-weight:bold">${val.toFixed(1)}</td>
+        </tr>`;
+        tbody.innerHTML += row;
+    });
+}
+
+function rotatePoint(x, y, z, rotX, rotY) {
+    let cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+    let x1 = x * cosY - z * sinY;
+    let z1 = z * cosY + x * sinY;
+    let cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+    let y2 = y * cosX - z1 * sinX;
+    let z2 = z1 * cosX + y * sinX;
+    return { x: x1, y: y2, z: z2 };
+}
+
+function animate() {
+    ctx.clearRect(0, 0, width, height);
+    if (!currentMolecule) return requestAnimationFrame(animate);
+
+    if(document.getElementById('toggle-autorotate').checked && !isDragging) {
+        rotation.y += 0.003;
+    }
+
+    const cx = width / 2;
+    const cy = height / 2;
+    const scale = computeFitScale();
+    let renderList = [];
+
+    // 1. Transform Atoms
+    currentMolecule.atoms.forEach((atom, idx) => {
+        let p = rotatePoint(atom.x*scale, atom.y*scale, atom.z*scale, rotation.x, rotation.y);
+        renderList.push({
+            type: 'atom', x: cx+p.x, y: cy+p.y, z: p.z,
+            r: atom.r * scale, atomData: atom, idx: idx
+        });
+    });
+
+    // 2. Transform Bonds & Bond Dipoles
+    const showBondDipoles = document.getElementById('toggle-bond-dipole').checked;
+
+    currentMolecule.bonds.forEach(bond => {
+        let a1 = currentMolecule.atoms[bond[0]];
+        let a2 = currentMolecule.atoms[bond[1]];
+        let p1 = rotatePoint(a1.x*scale, a1.y*scale, a1.z*scale, rotation.x, rotation.y);
+        let p2 = rotatePoint(a2.x*scale, a2.y*scale, a2.z*scale, rotation.x, rotation.y);
+        
+        renderList.push({
+            type: 'bond',
+            x1: cx+p1.x, y1: cy+p1.y, x2: cx+p2.x, y2: cy+p2.y,
+            z: (p1.z + p2.z) / 2,
+            order: bond[2]
+        });
+
+        // Bond Dipole
+        if (showBondDipoles) {
+            let en1 = EN_VALUES[a1.el];
+            let en2 = EN_VALUES[a2.el];
+            let diff = Math.abs(en1 - en2);
+            if (diff > 0.1) {
+                let start = (en1 < en2) ? {x:cx+p1.x, y:cy+p1.y} : {x:cx+p2.x, y:cy+p2.y};
+                let end = (en1 < en2) ? {x:cx+p2.x, y:cy+p2.y} : {x:cx+p1.x, y:cy+p1.y};
+                let dx = end.x - start.x;
+                let dy = end.y - start.y;
+                renderList.push({
+                    type: 'bondDipole',
+                    x1: start.x + dx*0.35, y1: start.y + dy*0.35,
+                    x2: start.x + dx*0.65, y2: start.y + dy*0.65,
+                    z: (p1.z + p2.z) / 2 + 5 
+                });
+            }
+        }
+    });
+
+    // 3. Lone Pairs
+    if(document.getElementById('toggle-lp').checked) {
+        currentMolecule.lonePairs.forEach(lp => {
+            let p = rotatePoint(lp.x*scale, lp.y*scale, lp.z*scale, rotation.x, rotation.y);
+            renderList.push({ type: 'lp', x: cx+p.x, y: cy+p.y, z: p.z, size: lp.size * scale });
+        });
+    }
+
+    // 4. ANGLE VISUALIZATION (Updated Radius)
+    if(document.getElementById('toggle-angles').checked && currentMolecule.angleIndices) {
+        const idxes = currentMolecule.angleIndices;
+        if(idxes.length === 3) {
+            const a1 = renderList.find(r => r.type === 'atom' && r.idx === idxes[0]);
+            const center = renderList.find(r => r.type === 'atom' && r.idx === idxes[1]);
+            const a2 = renderList.find(r => r.type === 'atom' && r.idx === idxes[2]);
+
+            if(a1 && center && a2) {
+                renderList.push({
+                    type: 'angleMark',
+                    c: {x: center.x, y: center.y},
+                    p1: {x: a1.x, y: a1.y},
+                    p2: {x: a2.x, y: a2.y},
+                    z: center.z - 10,
+                    text: currentMolecule.angleVal,
+                    molScale: scale
+                });
+            }
+        }
+    }
+
+    // Sort by Z
+    renderList.sort((a, b) => a.z - b.z);
+
+    // Render
+    renderList.forEach(item => {
+        if(item.type === 'angleMark') drawAngleMark(item);
+        else if(item.type === 'bond') drawBond(item);
+        else if(item.type === 'bondDipole') drawBondDipole(item);
+        else if(item.type === 'atom') drawAtom(item, showBondDipoles);
+        else if(item.type === 'lp') drawLonePair(item);
+    });
+
+    // Net Dipole
+    if(document.getElementById('toggle-net-dipole').checked && currentMolecule.polar) {
+        let d = currentMolecule.dipoleVec;
+        let p = rotatePoint(d.x*scale, d.y*scale, d.z*scale, rotation.x, rotation.y);
+        drawBigArrow(cx, cy, cx+p.x, cy+p.y);
+    }
+    
+    requestAnimationFrame(animate);
+}
+
+function drawAngleMark(item) {
+    let v1 = { x: item.p1.x - item.c.x, y: item.p1.y - item.c.y };
+    let v2 = { x: item.p2.x - item.c.x, y: item.p2.y - item.c.y };
+    
+    // Scales with the molecule's fit-scale (was a fixed 95, tuned for the old fixed 2.2x scale)
+    const radius = 43 * (item.molScale || 2.2);
+    const len1 = Math.sqrt(v1.x*v1.x + v1.y*v1.y);
+    const len2 = Math.sqrt(v2.x*v2.x + v2.y*v2.y);
+    
+    v1.x = (v1.x / len1) * radius; v1.y = (v1.y / len1) * radius;
+    v2.x = (v2.x / len2) * radius; v2.y = (v2.y / len2) * radius;
+    
+    ctx.beginPath();
+    ctx.moveTo(item.c.x, item.c.y);
+    let midX = (v1.x + v2.x) * 0.5;
+    let midY = (v1.y + v2.y) * 0.5;
+    
+    ctx.lineTo(item.c.x + v1.x, item.c.y + v1.y);
+    ctx.quadraticCurveTo(item.c.x + midX*1.3, item.c.y + midY*1.3, item.c.x + v2.x, item.c.y + v2.y);
+    ctx.lineTo(item.c.x, item.c.y);
+    
+    ctx.fillStyle = "rgba(255, 255, 170, 0.15)";
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255, 255, 170, 0.5)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.fillStyle = "#FFFFDD";
+    ctx.font = "bold 14px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    
+    // UPDATED: Text pushed further out
+    let textPosX = item.c.x + midX * 1.6;
+    let textPosY = item.c.y + midY * 1.6;
+    
+    ctx.globalAlpha = 0.8;
+    ctx.fillStyle = "#222"; 
+    let textMetrics = ctx.measureText(item.text);
+    ctx.fillRect(textPosX - textMetrics.width/2 - 4, textPosY - 10, textMetrics.width + 8, 20);
+    ctx.globalAlpha = 1.0;
+    
+    ctx.fillStyle = "#FFFFDD";
+    ctx.fillText(item.text, textPosX, textPosY);
+}
+
+function drawAtom(item, showCharges) {
+    let scale = (item.z + 1000) / 1000;
+    if(scale < 0.1) scale = 0.1;
+    let r = item.r * scale;
+
+    ctx.beginPath();
+    let grad = ctx.createRadialGradient(item.x - r/3, item.y - r/3, r/4, item.x, item.y, r);
+    grad.addColorStop(0, '#fff');
+    grad.addColorStop(0.3, item.atomData.color);
+    grad.addColorStop(1, '#111');
+    ctx.fillStyle = grad;
+    ctx.arc(item.x, item.y, r, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = "white";
+    ctx.font = "bold " + Math.round(18 * scale) + "px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.shadowColor="black"; ctx.shadowBlur=4;
+    ctx.fillText(item.atomData.el, item.x, item.y);
+    ctx.shadowBlur=0;
+
+    if(showCharges) {
+        let atomEN = EN_VALUES[item.atomData.el];
+        let netDiff = 0;
+        currentMolecule.bonds.forEach(b => {
+            let otherIdx = (b[0] === item.idx) ? b[1] : (b[1] === item.idx) ? b[0] : -1;
+            if (otherIdx !== -1) {
+                let otherEl = currentMolecule.atoms[otherIdx].el;
+                netDiff += (atomEN - EN_VALUES[otherEl]);
+            }
+        });
+        if (Math.abs(netDiff) > 0.1) {
+            let symbol = netDiff > 0 ? "δ-" : "δ+";
+            ctx.fillStyle = netDiff > 0 ? "#ff9999" : "#99ff99"; 
+            ctx.font = "italic bold " + Math.round(16 * scale) + "px serif";
+            ctx.fillText(symbol, item.x + r*0.7, item.y - r*0.7);
+        }
+    }
+}
+
+function drawBond(item) {
+    let scale = (item.z + 1000) / 1000;
+    
+    // UPDATED: More sophisticated bond rendering for clarity
+    let bondWidth = (item.order > 1) ? 6 * scale : 10 * scale; // Thinner lines for multi-bonds
+    ctx.lineWidth = bondWidth;
+    ctx.strokeStyle = "#555";
+    ctx.lineCap = "round";
+
+    let dx = item.x2 - item.x1;
+    let dy = item.y2 - item.y1;
+    let len = Math.sqrt(dx*dx + dy*dy);
+    let nx = -dy / len; 
+    let ny = dx / len;
+    
+    // UPDATED: Wider offset for multi-bonds to prevent merging
+    let offset = (item.order === 3) ? 9 * scale : 7 * scale; 
+
+    if (item.order === 1) {
+        ctx.beginPath(); ctx.moveTo(item.x1, item.y1); ctx.lineTo(item.x2, item.y2); ctx.stroke();
+    } else if (item.order === 2) {
+        ctx.beginPath(); ctx.moveTo(item.x1 + nx*offset, item.y1 + ny*offset); ctx.lineTo(item.x2 + nx*offset, item.y2 + ny*offset); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(item.x1 - nx*offset, item.y1 - ny*offset); ctx.lineTo(item.x2 - nx*offset, item.y2 - ny*offset); ctx.stroke();
+    } else if (item.order === 3) {
+        ctx.beginPath(); ctx.moveTo(item.x1, item.y1); ctx.lineTo(item.x2, item.y2); ctx.stroke(); // Center
+        ctx.beginPath(); ctx.moveTo(item.x1 + nx*offset, item.y1 + ny*offset); ctx.lineTo(item.x2 + nx*offset, item.y2 + ny*offset); ctx.stroke(); // Top
+        ctx.beginPath(); ctx.moveTo(item.x1 - nx*offset, item.y1 - ny*offset); ctx.lineTo(item.x2 - nx*offset, item.y2 - ny*offset); ctx.stroke(); // Bottom
+    }
+}
+
+function drawBondDipole(item) {
+    const headlen = 10;
+    const angle = Math.atan2(item.y2 - item.y1, item.x2 - item.x1);
+    ctx.beginPath();
+    ctx.strokeStyle = "#fcd581"; 
+    ctx.fillStyle = "#fcd581";
+    ctx.lineWidth = 3;
+    ctx.moveTo(item.x1, item.y1); ctx.lineTo(item.x2, item.y2); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(item.x2, item.y2);
+    ctx.lineTo(item.x2 - headlen * Math.cos(angle - Math.PI / 6), item.y2 - headlen * Math.sin(angle - Math.PI / 6));
+    ctx.lineTo(item.x2 - headlen * Math.cos(angle + Math.PI / 6), item.y2 - headlen * Math.sin(angle + Math.PI / 6));
+    ctx.fill();
+    let crossSize = 5;
+    ctx.beginPath();
+    ctx.lineWidth = 2;
+    ctx.moveTo(item.x1 + crossSize * Math.cos(angle + Math.PI/2), item.y1 + crossSize * Math.sin(angle + Math.PI/2));
+    ctx.lineTo(item.x1 - crossSize * Math.cos(angle + Math.PI/2), item.y1 - crossSize * Math.sin(angle + Math.PI/2));
+    ctx.stroke();
+}
+
+function drawBigArrow(x1, y1, x2, y2) {
+    const headlen = 20;
+    const angle = Math.atan2(y2 - y1, x2 - x1);
+    ctx.beginPath();
+    ctx.strokeStyle = "#00FF00";
+    ctx.lineWidth = 6;
+    ctx.shadowBlur = 10; ctx.shadowColor = "#000";
+    ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    ctx.beginPath();
+    ctx.fillStyle = "#00FF00";
+    ctx.moveTo(x2, y2);
+    ctx.lineTo(x2 - headlen * Math.cos(angle - Math.PI / 6), y2 - headlen * Math.sin(angle - Math.PI / 6));
+    ctx.lineTo(x2 - headlen * Math.cos(angle + Math.PI / 6), y2 - headlen * Math.sin(angle + Math.PI / 6));
+    ctx.fill();
+    ctx.shadowBlur = 0;
+}
+
+function drawLonePair(item) {
+    let scale = (item.z + 1000) / 1000;
+    let size = item.size * scale;
+    ctx.beginPath();
+    ctx.fillStyle = "rgba(255, 255, 0, 0.25)";
+    ctx.strokeStyle = "rgba(255, 255, 0, 0.6)";
+    ctx.ellipse(item.x, item.y, size, size * 1.4, 0, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "rgba(255,255,255,0.7)";
+    ctx.font = Math.round(14*scale)+"px Arial";
+    ctx.fillText("..", item.x, item.y);
+}
+
+function startDrag(e) { isDragging = true; lastMouse = { x: e.clientX, y: e.clientY }; }
+function drag(e) {
+    if (!isDragging) return;
+    let dx = e.clientX - lastMouse.x;
+    let dy = e.clientY - lastMouse.y;
+    rotation.y += dx * 0.005;
+    rotation.x += dy * 0.005;
+    lastMouse = { x: e.clientX, y: e.clientY };
+}
+function endDrag() { isDragging = false; }
+
+init();
+</script>
+</body>
+</html>

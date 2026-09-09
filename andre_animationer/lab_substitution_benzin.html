@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kemi-Lab: Substitution (v19 - Safety Zones)</title>
+    <style>
+        :root {
+            --bg-dark: #2c3e50;
+            --hood-color: #ecf0f1;
+            --bench-color: #bdc3c7;
+            --danger: #c0392b;
+            --warning: #f39c12;
+            --success: #27ae60;
+            --info: #2980b9;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg-dark);
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            user-select: none;
+        }
+
+        #lab-container {
+            position: relative;
+            width: 1200px;
+            height: 700px;
+            background: #fff;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        canvas { display: block; }
+
+        #ui-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+        }
+
+        .hud-btn {
+            pointer-events: auto;
+            position: absolute;
+            top: 20px; right: 20px;
+            padding: 12px 25px;
+            background: #95a5a6;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 0 #7f8c8d;
+        }
+        .hud-btn:active { transform: translateY(4px); box-shadow: none; }
+        .hud-btn.active { background: var(--success); box-shadow: 0 4px 0 #1e8449; }
+
+        #strike-counter {
+            position: absolute;
+            top: 25px; right: 220px;
+            font-size: 20px; font-weight: bold;
+            color: var(--warning);
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        #notification-area {
+            position: absolute;
+            top: 100px; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; gap: 10px; align-items: center;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .toast {
+            background: rgba(44, 62, 80, 0.95); color: white; padding: 12px 24px;
+            border-radius: 4px; font-size: 15px; animation: slideDown 0.3s ease-out;
+            max-width: 500px; text-align: center; border-left: 6px solid #3498db;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .toast.warning { border-color: var(--warning); }
+        .toast.danger { border-color: var(--danger); }
+        .toast.success { border-color: var(--success); }
+        .toast.info { border-color: var(--info); }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .modal {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 999; pointer-events: auto;
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background: #fff; color: #2c3e50; padding: 40px; border-radius: 8px;
+            text-align: center; max-width: 650px; border-top: 8px solid #3498db;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        
+        button.action {
+            background: #3498db; color: white; border: none; padding: 15px 40px;
+            font-size: 18px; border-radius: 4px; cursor: pointer; margin-top: 20px;
+            transition: background 0.2s;
+        }
+        button.action:hover { background: #2980b9; }
+        button.action.danger { background: var(--danger); }
+        button.action.success { background: var(--success); }
+        .hidden { display: none !important; }
+
+        .zone-label {
+            position: absolute; top: 20px; 
+            font-size: 2rem; font-weight: bold; color: rgba(0,0,0,0.05);
+            pointer-events: none;
+        }
+        
+        #cursor-hint {
+            position: absolute; pointer-events: none; 
+            background: rgba(41, 128, 185, 0.9); color: white; 
+            padding: 5px 10px; border-radius: 4px; font-size: 12px;
+            display: none; z-index: 200;
+        }
+    </style>
+</head>
+<body>
+
+<div id="lab-container">
+    <canvas id="simCanvas" width="1200" height="700"></canvas>
+
+    <div id="ui-layer">
+        <div class="zone-label" style="left: 100px;">LABORATORIEBORD</div>
+        <div class="zone-label" style="left: 750px;">STINKSKAB</div>
+        <div id="strike-counter">FEJL: 0/3</div>
+        <div id="notification-area"></div>
+        <div id="cursor-hint"></div>
+        <button id="vent-btn" class="hud-btn">UDSUGNING: OFF</button>
+    </div>
+
+    <div id="modal-start" class="modal">
+        <div class="modal-content">
+            <h2>Organisk Substitution</h2>
+            <p>Velkommen til eksamen.</p>
+            <ul>
+                <li><strong>Opgave:</strong> Syntetiser, separer og påvis HBr.</li>
+                <li><strong>Regel 1:</strong> Du har <strong>3 liv</strong>.</li>
+                <li><strong>Regel 2:</strong> Åbner du for hexan uden sug? <strong>Game Over</strong>.</li>
+                <li><strong>Regel 3:</strong> Går du rundt med åben hexan? <strong>Advarsel (-1 liv)</strong>.</li>
+            </ul>
+            <button class="action" onclick="Lab.start()">Start Øvelse</button>
+        </div>
+    </div>
+
+    <div id="modal-fail" class="modal hidden">
+        <div class="modal-content" style="border-color: var(--danger)">
+            <h2 style="color: var(--danger)">DUMPET!</h2>
+            <p id="fail-msg" style="font-size: 1.2em; margin: 20px 0;">...</p>
+            <button class="action danger" onclick="Lab.reset()">Prøv Igen</button>
+        </div>
+    </div>
+
+    <div id="modal-success" class="modal hidden">
+        <div class="modal-content" style="border-color: var(--success)">
+            <h2 style="color: var(--success)">Reaktion Påvist!</h2>
+            <p>Det hvide bundfald (AgBr) beviser dannelsen af bromid-ioner.</p>
+            <p><strong>Afslutning:</strong> Tøm kemikalierne i affaldsspandene og vask glassene.</p>
+            <button class="action" onclick="document.getElementById('modal-success').classList.add('hidden')">Jeg rydder op nu</button>
+        </div>
+    </div>
+
+    <div id="modal-clean" class="modal hidden">
+        <div class="modal-content" style="border-color: #9b59b6">
+            <h2 style="color: #9b59b6">BESTÅET!</h2>
+            <p>Perfekt udført forsøg, korrekt sikkerhed og ryddeligt laboratorium.</p>
+            <button class="action success" onclick="Lab.reset()">Start Forfra</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const CONST = {
+    HOOD_X: 650, 
+    EXHAUST_X: 350, 
+    SAFE_RADIUS: 250, 
+    COLORS: {
+        BR2: 'rgba(210, 105, 30, 0.9)',    
+        HEX: 'rgba(129, 236, 236, 0.6)', 
+        HEX_BR: 'rgba(210, 100, 30, 0.8)', 
+        WATER: 'rgba(41, 128, 185, 0.3)',  
+        PPT: '#ffffff', 
+        PPT_BG: 'rgba(255, 255, 250, 1.0)', 
+        PARTICLE_GAS: '#2ecc71',           
+        WASTE_ORG: '#c0392b',
+        WASTE_INORG: '#2980b9',
+        SINK: '#3498db',
+        TARGET_HL: 'rgba(39, 174, 96, 0.5)'
+    }
+};
+
+class Lab {
+    static canvas;
+    static ctx;
+    static running = false;
+    static ventOn = false;
+    static lampOn = false;
+    static reactionVerified = false;
+    static warnings = 0;
+    static unsafeZoneWarningGiven = false; // State to track continuous movement warning
+    
+    static objects = [];
+    static particles = [];
+    static pptParticles = [];
+    static dragObj = null;
+    static dragOffset = {x:0, y:0};
+    static targetHighlight = null;
+
+    static tube = null;
+    static cyl = null;
+    static funnel = null;
+    static sink = null;
+    static stopper = null;
+
+    static init() {
+        this.canvas = document.getElementById('simCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        
+        this.canvas.addEventListener('mousedown', e => this.onDown(e));
+        window.addEventListener('mousemove', e => this.onMove(e));
+        window.addEventListener('mouseup', e => this.onUp(e));
+        
+        document.getElementById('vent-btn').addEventListener('click', (e) => {
+            this.ventOn = !this.ventOn;
+            e.target.innerText = this.ventOn ? "UDSUGNING: ON" : "UDSUGNING: OFF";
+            e.target.classList.toggle('active');
+            if(this.ventOn) this.particles = [];
+        });
+
+        this.reset();
+        this.loop();
+    }
+
+    static start() {
+        document.getElementById('modal-start').classList.add('hidden');
+        this.running = true;
+    }
+
+    static reset() {
+        this.running = false;
+        this.ventOn = false;
+        this.lampOn = false;
+        this.reactionVerified = false;
+        this.warnings = 0;
+        this.unsafeZoneWarningGiven = false;
+        this.objects = [];
+        this.particles = [];
+        this.pptParticles = [];
+        
+        document.getElementById('vent-btn').innerText = "UDSUGNING: OFF";
+        document.getElementById('vent-btn').classList.remove('active');
+        document.getElementById('strike-counter').innerText = "FEJL: 0/3";
+        document.getElementById('strike-counter').style.color = CONST.COLORS.WARNING;
+        document.getElementById('modal-fail').classList.add('hidden');
+        document.getElementById('modal-success').classList.add('hidden');
+        document.getElementById('modal-clean').classList.add('hidden');
+        document.getElementById('notification-area').innerHTML = '';
+
+        this.createLab();
+    }
+
+    static createLab() {
+        this.objects.push({ id: 'exhaust', type: 'exhaust', x: CONST.EXHAUST_X, y: 50, w: 100, h: 400, fixed: true });
+        this.objects.push({ id: 'lamp', type: 'lamp', x: 50, y: 300, w: 80, h: 120, fixed: true });
+        this.sink = { id: 'sink', type: 'sink', x: 50, y: 550, w: 120, h: 100, label: 'OPVASK', fixed: true };
+        this.objects.push(this.sink);
+
+        this.funnel = { id: 'funnel', type: 'funnel', x: 440, y: 150, w: 70, h: 180, volAq: 0, volOrg: 0, contentAq: null, contentOrg: null, fixed: true, processing: false, lastAction: 0 };
+        this.objects.push(this.funnel);
+
+        this.objects.push({ id: 'w_org', type: 'bin', x: 800, y: 550, w: 90, h: 110, label: 'Organisk', sub: 'affald', color: CONST.COLORS.WASTE_ORG, fixed: true });
+        this.objects.push({ id: 'w_inorg', type: 'bin', x: 920, y: 550, w: 90, h: 110, label: 'Uorganisk', sub: 'surt affald', color: CONST.COLORS.WASTE_INORG, fixed: true });
+
+        this.tube = { id: 'tube', type: 'tube', x: 250, y: 400, w: 40, h: 150, volAq: 0, volOrg: 0, hasBr: false, reacted: false, stoppered: false, extracted: false, label: 'Glas', homeX: 250, homeY: 400 };
+        this.objects.push(this.tube);
+        this.cyl = { id: 'cyl', type: 'cyl', x: 320, y: 420, w: 35, h: 130, vol: 0, capacity: 25, content: null, label: '25mL', homeX: 320, homeY: 420 };
+        this.objects.push(this.cyl);
+
+        const hx = CONST.HOOD_X + 50; const hy = 200;
+        this.objects.push({ id: 'br2', type: 'bottle', x: hx, y: hy, w: 50, h: 90, color: CONST.COLORS.BR2, label: 'Br₂ (aq)', chemical: 'br2', homeX: hx, homeY: hy });
+        this.objects.push({ id: 'hex', type: 'bottle', x: hx + 80, y: hy, w: 50, h: 90, color: '#fff', label: 'Hexan', chemical: 'hex', homeX: hx + 80, homeY: hy });
+        this.objects.push({ id: 'ag', type: 'bottle', x: 80, y: 150, w: 40, h: 70, color: '#2c3e50', label: 'AgNO₃', chemical: 'ag', homeX: 80, homeY: 150 });
+
+        this.stopper = { id: 'stopper', type: 'stopper', x: hx + 180, y: 400, w: 30, h: 20, label: 'Prop', homeX: hx + 180, homeY: 400, onTube: false, fixed: false };
+        this.objects.push(this.stopper);
+    }
+
+    static toast(msg, type='warning') {
+        if(type === 'warning') {
+            this.warnings++;
+            const counter = document.getElementById('strike-counter');
+            counter.innerText = `FEJL: ${this.warnings}/3`;
+            if(this.warnings >= 3) {
+                counter.style.color = CONST.COLORS.WASTE_ORG; 
+                this.fail("For mange fejl! Du er ude.");
+                return;
+            }
+        }
+
+        const note = document.createElement('div');
+        note.className = `toast ${type}`;
+        note.innerHTML = msg;
+        document.getElementById('notification-area').appendChild(note);
+        setTimeout(() => note.remove(), 5000);
+    }
+
+    static fail(msg) {
+        if(!this.running) return;
+        this.running = false;
+        for(let i=0; i<100; i++) {
+            this.particles.push({ x: this.dragObj ? this.dragObj.x : 600, y: this.dragObj ? this.dragObj.y : 350, vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10, life: 1.0 });
+        }
+        setTimeout(() => {
+            document.getElementById('fail-msg').innerText = msg;
+            document.getElementById('modal-fail').classList.remove('hidden');
+        }, 500);
+    }
+
+    static onDown(e) {
+        if(!this.running) return;
+        const {mx, my} = this.getMousePos(e);
+
+        const l = this.objects.find(o => o.id === 'lamp');
+        if(mx > l.x && mx < l.x+l.w && my > l.y && my < l.y+l.h) { this.lampOn = !this.lampOn; return; }
+
+        const f = this.funnel;
+        if(mx > f.x && mx < f.x+f.w && my > f.y && my < f.y+f.h) { this.handleFunnelClick(); return; }
+
+        for(let i=this.objects.length-1; i>=0; i--) {
+            const o = this.objects[i];
+            
+            let removingStopper = false;
+            if(o.type === 'stopper' && o.onTube) {
+                if((mx > o.x && mx < o.x + o.w && my > o.y && my < o.y + o.h) || (this.checkOverlap({x:mx-5,y:my-5,w:10,h:10}, o, 15))) removingStopper = true;
+            } else if(o.type === 'tube' && o.stoppered) {
+                if(mx > o.x-20 && mx < o.x+o.w+20 && my > o.y-50 && my < o.y+o.h/2) removingStopper = true;
+            }
+
+            if(removingStopper) { this.removeStopper(); return; }
+
+            if(!o.fixed && o.type !== 'stopper' || (o.type === 'stopper' && !o.onTube)) {
+                if(mx > o.x && mx < o.x+o.w && my > o.y && my < o.y+o.h) {
+                    this.dragObj = o;
+                    this.dragOffset = {x: mx - o.x, y: my - o.y};
+                    this.objects.splice(i, 1); this.objects.push(o); 
+                    return;
+                }
+            }
+        }
+    }
+
+    static onMove(e) {
+        const hint = document.getElementById('cursor-hint');
+        hint.style.display = 'none';
+        this.targetHighlight = null;
+
+        if(this.dragObj) {
+            const {mx, my} = this.getMousePos(e);
+            
+            let newX = mx - this.dragOffset.x;
+            let newY = my - this.dragOffset.y;
+            newX = Math.max(0, Math.min(1200 - this.dragObj.w, newX));
+            newY = Math.max(0, Math.min(700 - this.dragObj.h, newY));
+
+            this.dragObj.x = newX;
+            this.dragObj.y = newY;
+
+            // --- MOVEMENT SAFETY CHECK (WARNING ONLY) ---
+            const hasOpenOrg = (this.dragObj.id === 'tube' && !this.dragObj.stoppered && this.dragObj.volOrg > 0);
+            const isSafe = this.checkZoneSafe(this.dragObj);
+            
+            if(hasOpenOrg && !isSafe) {
+                if(!this.unsafeZoneWarningGiven) {
+                    this.toast("Advarsel: Du flytter åben organisk kemi ud af sikkerhedszonen!", "warning");
+                    this.unsafeZoneWarningGiven = true; // Flag to prevent spamming warnings during same drag
+                }
+            } else {
+                this.unsafeZoneWarningGiven = false; // Reset if they go back in safe zone
+            }
+
+            if(this.dragObj.id === 'tube' && this.dragObj.stoppered) {
+                this.stopper.x = this.dragObj.x + 5;
+                this.stopper.y = this.dragObj.y - 15;
+                if(Math.abs(e.movementX) + Math.abs(e.movementY) > 10) this.dragObj.extracted = true;
+            }
+            
+            const target = this.findTarget(this.dragObj);
+            if(target) {
+                this.targetHighlight = target;
+                if(this.dragObj.id === 'ag' && target.id === 'tube') {
+                    hint.style.display = 'block'; hint.style.left = (e.clientX+15)+'px'; hint.style.top = e.clientY+'px';
+                    hint.innerText = "Slip for at tilsætte";
+                }
+            }
+        }
+    }
+
+    static onUp(e) {
+        if(!this.dragObj) return;
+        const obj = this.dragObj;
+        this.dragObj = null;
+        this.targetHighlight = null;
+        this.unsafeZoneWarningGiven = false; // Reset drag warning flag
+
+        if(obj.id === 'tube') {
+            const f = this.funnel;
+            const snapX = f.x + (f.w - obj.w)/2; const snapY = f.y + f.h + 10;
+            if((obj.x < f.x + f.w && obj.x + obj.w > f.x && obj.y < f.y + f.h && obj.y + obj.h > f.y) || 
+               (Math.abs(obj.x - snapX) < 60 && Math.abs(obj.y - snapY) < 60)) { 
+                obj.x = snapX; obj.y = snapY; 
+                if(obj.id === 'tube' && obj.stoppered) { this.stopper.x = obj.x + 5; this.stopper.y = obj.y - 15; }
+            }
+        }
+
+        const target = this.findTarget(obj);
+
+        if(target) {
+            if(obj.type === 'bottle' && target.id === 'cyl') this.fillCylinder(obj, target);
+            else if(obj.id === 'cyl' && target.id === 'tube') this.pourCylinderToTube(obj, target);
+            else if(obj.type === 'stopper' && target.id === 'tube') this.stopperTube(obj, target);
+            else if(obj.id === 'ag' && target.id === 'tube') this.addSilver(target);
+            else if(target.id === 'sink' && (obj.id === 'tube' || obj.id === 'cyl')) this.washEquipment(obj);
+        }
+
+        if(obj.id === 'tube' || obj.id === 'cyl') {
+            const binOrg = this.objects.find(o => o.id === 'w_org');
+            const binInorg = this.objects.find(o => o.id === 'w_inorg');
+            if(this.checkOverlap(obj, binOrg)) this.dispose(obj, binOrg);
+            else if(this.checkOverlap(obj, binInorg)) this.dispose(obj, binInorg);
+        }
+
+        if(obj.type === 'bottle') { obj.x = obj.homeX; obj.y = obj.homeY; }
+    }
+
+    static addSilver(container) {
+        if(container.vol <= 0 && container.volAq <= 0) {
+            this.toast("Glasset er tomt.", "warning"); return;
+        }
+        
+        const hasHBr = container.hasHBr || (container.volAq > 0 && container.contentAq === 'hbr');
+
+        if(hasHBr) {
+            container.hasPpt = true; 
+            for(let i=0; i<40; i++) {
+                this.pptParticles.push({
+                    x: container.x + 10 + Math.random()*(container.w-20),
+                    y: container.y + container.h - Math.random()*(Math.max(container.vol, container.volAq)*2 + 10),
+                    r: 3 + Math.random()*3, life: 1.0
+                });
+            }
+            if(!this.reactionVerified) {
+                this.reactionVerified = true;
+                setTimeout(() => { document.getElementById('modal-success').classList.remove('hidden'); }, 1000);
+            }
+        } else {
+            let msg = "Ingen reaktion.";
+            if(container.contentAq === 'br2' || container.volAq > 0) msg += " (Indhold: Bromvand - Du har ikke belyst/rystet nok).";
+            else if(container.contentOrg || container.volOrg > 0) msg += " (Fejl: Du tester den organiske fase).";
+            this.toast(msg, "warning");
+        }
+    }
+
+    static washEquipment(obj) {
+        if(obj.vol > 0.1 || obj.volAq > 0.1 || obj.volOrg > 0.1) {
+            this.toast("Glasset skal tømmes i affaldsspanden først!", "warning");
+        } else {
+            this.emptyContainer(obj); 
+            obj.x = obj.homeX; obj.y = obj.homeY; 
+            if(obj.id === 'tube' && obj.stoppered) { this.stopper.x = obj.x + 5; this.stopper.y = obj.y - 15; }
+            this.toast("Glasset er vasket og sat på plads.", "info");
+            this.checkVictory();
+        }
+    }
+
+    static handleFunnelClick() {
+        const f = this.funnel;
+        const now = Date.now();
+        if(now - f.lastAction < 1500) return; 
+        f.lastAction = now;
+
+        if(f.volAq === 0 && f.volOrg === 0) {
+            const t = this.tube;
+            const dist = Math.hypot((t.x+t.w/2) - (f.x+f.w/2), (t.y+t.h/2) - (f.y+f.h/2));
+            if(dist > 200) { this.toast("Placer reagensglasset tættere på tragten.", "warning"); return; }
+            if(t.stoppered) { this.toast("Tag proppen af glasset.", "warning"); return; }
+            if(t.volAq === 0 && t.volOrg === 0) { this.toast("Glasset er tomt.", "warning"); return; }
+            if(!this.ventOn && t.volOrg > 0) { this.fail("Ingen udsugning ved påfyldning!"); return; }
+
+            f.volAq = t.volAq; f.volOrg = t.volOrg;
+            if(t.reacted) { f.contentAq = 'hbr'; f.contentOrg = 'clear'; } 
+            else if(t.extracted) { f.contentAq = 'water'; f.contentOrg = 'br2'; } 
+            else { f.contentAq = 'br2'; f.contentOrg = 'clear'; }
+            t.volAq = 0; t.volOrg = 0; t.hasBr = false; t.hasHBr = false; t.extracted = false;
+            return;
+        }
+
+        if(f.processing) return; 
+
+        let container = null;
+        const funnelTipX = f.x + f.w/2; const funnelTipY = f.y + f.h;
+        if(this.tube.x < funnelTipX + 20 && this.tube.x + this.tube.w > funnelTipX - 20 && this.tube.y > funnelTipY && this.tube.y < funnelTipY + 100) {
+            container = this.tube;
+        }
+
+        if(!container) { this.toast("Sæt reagensglasset under tragten! (Se markering)", "warning"); return; }
+
+        f.processing = true;
+        setTimeout(() => {
+            if(f.volAq > 0) {
+                container.volAq = f.volAq;
+                container.contentAq = f.contentAq;
+                f.volAq = 0;
+            } else if(f.volOrg > 0) {
+                container.volOrg = f.volOrg;
+                container.contentOrg = f.contentOrg;
+                f.volOrg = 0;
+            }
+            f.processing = false;
+        }, 400); 
+    }
+
+    // --- UTILS ---
+    static fillCylinder(bottle, cyl) {
+        if(!this.ventOn) { this.toast("Husk udsugningen!", "warning"); return; }
+        if(cyl.vol < 25) {
+            if(cyl.content && cyl.content !== bottle.chemical) cyl.vol = 0;
+            cyl.vol += 5; cyl.content = bottle.chemical;
+            if(cyl.vol >= 25) this.toast("Måleglasset er fyldt.", "warning");
+        }
+    }
+
+    static pourCylinderToTube(cyl, tube) {
+        if(cyl.vol === 0) return;
+        if(tube.stoppered) { this.toast("Tag proppen af først.", "warning"); return; }
+        // CHECK ZONE WHEN POURING
+        if(!this.checkZoneSafe(tube)) { this.fail("Du hælder kemikalier uden for sikkerhedszonen!"); return; }
+
+        if(cyl.content === 'hex') {
+            if(tube.volAq === 0) { this.toast("FAGLIG FEJL: Vandfase (Br₂) først!", "warning"); return; }
+            tube.volOrg += cyl.vol;
+        } else if(cyl.content === 'br2') {
+            if(tube.volOrg > 0) { this.toast("Vandfasen skal i bunden.", "warning"); return; }
+            tube.volAq += cyl.vol; tube.hasBr = true;
+        }
+        cyl.vol = 0; cyl.content = null;
+    }
+
+    static stopperTube(stopper, tube) {
+        if(tube.stoppered) return;
+        stopper.onTube = true; stopper.fixed = true; tube.stoppered = true;
+        stopper.x = tube.x + 5; stopper.y = tube.y - 15;
+    }
+
+    static removeStopper() {
+        const tube = this.tube;
+        const stopper = this.stopper;
+
+        if(!tube.stoppered) return;
+
+        // UNLOCK THE STOPPER
+        tube.stoppered = false;
+        stopper.onTube = false;
+        stopper.fixed = false;
+        stopper.x = tube.x + tube.w + 10;
+        stopper.y = tube.y;
+        this.dragObj = stopper;
+
+        // CRITICAL SAFETY CHECK - IMMEDIATE FAIL
+        if(!this.checkZoneSafe(tube) && tube.volOrg > 0) { 
+            this.fail("DU ÅBNEDE FOR HEXAN UDEN FOR SUG! ORGANISKE DAMPE ER FARLIGE."); 
+        }
+    }
+
+    static dispose(container, bin) {
+        if(container.vol <= 0.1 && container.volAq <= 0.1 && container.volOrg <= 0.1) return;
+        let isOrganic = false; let isInorganic = false;
+        
+        if(container.id === 'tube') {
+            if(container.volOrg > 0) isOrganic = true;
+            if(container.volAq > 0) isInorganic = true;
+        } else { 
+            if(container.content === 'hex') isOrganic = true; else isInorganic = true;
+        }
+
+        if(bin.id === 'w_org') {
+            if(isInorganic && !isOrganic) this.toast("Miljøfejl: Vandfase i organisk affald!", "warning");
+            else { this.emptyContainer(container); this.toast("Korrekt bortskaffelse.", "success"); }
+        } else if(bin.id === 'w_inorg') {
+            if(isOrganic) this.toast("Miljøfejl: Hexan i uorganisk affald!", "warning");
+            else { this.emptyContainer(container); this.toast("Korrekt bortskaffelse.", "success"); }
+        }
+    }
+
+    static emptyContainer(c) {
+        c.vol = 0; c.volAq = 0; c.volOrg = 0;
+        c.hasBr = false; c.hasHBr = false; c.hasPpt = false; c.reacted = false;
+        c.contentAq = null; c.contentOrg = null; c.content = null;
+    }
+
+    static checkVictory() {
+        if(this.reactionVerified) {
+            const dirty = [this.tube, this.cyl, this.funnel].some(o => o.vol > 0.1 || o.volAq > 0.1 || o.volOrg > 0.1);
+            if(!dirty) { setTimeout(() => { document.getElementById('modal-clean').classList.remove('hidden'); }, 800); }
+        }
+    }
+
+    static checkZoneSafe(obj) {
+        const cx = obj.x + obj.w/2;
+        if(cx > CONST.HOOD_X) return true;
+        const dist = Math.abs(cx - (this.exhaust.x + 50)); 
+        return (dist < CONST.SAFE_RADIUS && this.ventOn);
+    }
+
+    static findTarget(obj) {
+        if(obj.id === 'ag') return this.objects.find(t => t.id === 'tube' && this.checkOverlap(obj, t, 60)); 
+        if(obj.id === 'stopper') {
+            const t = this.objects.find(o => o.id === 'tube');
+            if(this.checkOverlap(obj, t, 100)) return t; 
+        }
+        return this.objects.find(t => t !== obj && !t.onTube && !t.fixed && this.checkOverlap(obj, t)) || this.objects.find(t => t.fixed && this.checkOverlap(obj, t));
+    }
+
+    static checkOverlap(a, b, extraBuffer=0) {
+        const acx = a.x + a.w/2; const acy = a.y + a.h/2;
+        const bcx = b.x + b.w/2; const bcy = b.y + b.h/2;
+        return (Math.abs(acx - bcx) < (50 + extraBuffer) && Math.abs(acy - bcy) < (60 + extraBuffer));
+    }
+    
+    static getMousePos(e) {
+        const r = this.canvas.getBoundingClientRect();
+        return { mx: e.clientX - r.left, my: e.clientY - r.top };
+    }
+
+    static loop() { this.update(); this.draw(); requestAnimationFrame(() => this.loop()); }
+
+    static update() {
+        if(!this.running) return;
+        const t = this.tube;
+        if(this.lampOn && t.hasBr && t.volOrg > 0 && t.extracted) {
+            const l = this.objects.find(o => o.id === 'lamp');
+            const dist = Math.hypot((t.x+t.w/2) - (l.x+40), (t.y+t.h/2) - (l.y+60));
+            if(dist < 150) {
+                t.progress = (t.progress || 0) + 0.5;
+                if(t.progress >= 100) {
+                    t.reacted = true; t.hasHBr = true; 
+                    if(t.progress === 100) this.toast("Reaktion fuldført!", "success");
+                    t.progress = 101; 
+                }
+            }
+        }
+    }
+
+    static draw() {
+        const ctx = this.ctx;
+        ctx.clearRect(0, 0, 1200, 700);
+
+        ctx.fillStyle = '#ecf0f1'; ctx.fillRect(CONST.HOOD_X, 0, 1200-CONST.HOOD_X, 700);
+        ctx.fillStyle = '#bdc3c7'; ctx.fillRect(CONST.HOOD_X, 450, 1200-CONST.HOOD_X, 250); 
+        ctx.fillStyle = '#dcdde1'; ctx.fillRect(0, 0, CONST.HOOD_X, 700);
+        ctx.fillStyle = '#95a5a6'; ctx.fillRect(0, 450, CONST.HOOD_X, 250); 
+        ctx.fillStyle = 'rgba(0,0,0,0.1)'; ctx.fillRect(CONST.HOOD_X-2, 0, 4, 700);
+
+        this.objects.forEach(o => {
+            if(this.targetHighlight === o) {
+                ctx.strokeStyle = CONST.COLORS.TARGET_HL; ctx.lineWidth = 5; 
+                ctx.strokeRect(o.x-5, o.y-5, o.w+10, o.h+10);
+            }
+            this.drawObject(o);
+        });
+
+        if(this.particles.length > 0) {
+            this.particles.forEach((p, i) => {
+                p.x += p.vx; p.y += p.vy; p.life -= 0.02;
+                ctx.fillStyle = `rgba(46, 204, 113, ${p.life})`;
+                ctx.beginPath(); ctx.arc(p.x, p.y, 8, 0, Math.PI*2); ctx.fill();
+                if(p.life <= 0) this.particles.splice(i, 1);
+            });
+        }
+        
+        if(this.pptParticles.length > 0) {
+             this.pptParticles.forEach((p, i) => {
+                p.y += 0.2; p.life -= 0.005; 
+                ctx.fillStyle = `rgba(255, 255, 255, ${p.life})`;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+                if(p.life <= 0) this.pptParticles.splice(i, 1);
+            });
+        }
+    }
+
+    static drawObject(o) {
+        const ctx = this.ctx;
+        const x = o.x, y = o.y, w = o.w, h = o.h;
+
+        if(o.type === 'exhaust') {
+            ctx.strokeStyle = '#34495e'; ctx.lineWidth = 15; ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(x+50, 0); ctx.lineTo(x+50, y); ctx.stroke();
+            ctx.fillStyle = '#7f8c8d'; ctx.beginPath(); ctx.moveTo(x-20, y+50); ctx.lineTo(x+120, y+50); ctx.lineTo(x+50, y); ctx.fill();
+            if(this.ventOn) {
+                ctx.fillStyle = 'rgba(52, 152, 219, 0.05)';
+                ctx.beginPath(); ctx.moveTo(x+50, y+40); ctx.lineTo(x+50+CONST.SAFE_RADIUS, 700); ctx.lineTo(x+50-CONST.SAFE_RADIUS, 700); ctx.fill();
+                ctx.fillStyle = 'rgba(52, 152, 219, 0.1)';
+                ctx.beginPath(); ctx.moveTo(x-20, y+50); ctx.lineTo(x+120, y+50); ctx.lineTo(x+150, y+350); ctx.lineTo(x-50, y+350); ctx.fill();
+            }
+        }
+        else if(o.type === 'lamp') {
+            ctx.fillStyle = '#34495e'; ctx.fillRect(x+20, y+h-10, 40, 10); 
+            ctx.strokeStyle = '#2c3e50'; ctx.lineWidth = 6;
+            ctx.beginPath(); ctx.moveTo(x+40, y+h-10); ctx.lineTo(x+40, y+40); ctx.stroke();
+            ctx.fillStyle = this.lampOn ? '#f1c40f' : '#95a5a6';
+            ctx.beginPath(); ctx.arc(x+40, y+30, 25, 0, Math.PI*2); ctx.fill();
+            if(this.lampOn) {
+                ctx.shadowBlur = 40; ctx.shadowColor = "#f1c40f";
+                ctx.fillStyle = "rgba(255, 255, 0, 0.3)";
+                ctx.beginPath(); ctx.arc(x+40, y+30, 30, 0, Math.PI*2); ctx.fill(); ctx.shadowBlur = 0;
+            }
+        }
+        else if(o.type === 'funnel') {
+            ctx.fillStyle = '#34495e'; ctx.fillRect(x+w+5, y-100, 5, 300); ctx.fillRect(x+w+5, y+50, -20, 5); 
+            ctx.save(); ctx.strokeStyle = 'rgba(44, 62, 80, 0.3)'; ctx.setLineDash([5, 5]); ctx.lineWidth = 2;
+            ctx.strokeRect(x, y+185, w, 80); ctx.font = "bold 10px Arial"; ctx.fillStyle = 'rgba(44, 62, 80, 0.4)'; ctx.textAlign = 'center';
+            ctx.fillText("SÆT GLAS", x+w/2, y+215); ctx.fillText("HER", x+w/2, y+228); ctx.restore();
+
+            ctx.strokeStyle = '#bdc3c7'; ctx.fillStyle = 'rgba(236, 240, 241, 0.2)'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(x+20, y); ctx.quadraticCurveTo(x-10, y+50, x+30, y+100); ctx.lineTo(x+35, y+160); ctx.lineTo(x+45, y+160); ctx.lineTo(x+50, y+100); ctx.quadraticCurveTo(x+90, y+50, x+60, y); ctx.closePath(); ctx.fill(); ctx.stroke();
+            
+            let yBase = y + 100;
+            if(o.volAq > 0) {
+                const hAq = 40;
+                ctx.fillStyle = o.contentAq === 'br2' ? CONST.COLORS.BR2 : CONST.COLORS.WATER;
+                ctx.beginPath(); ctx.moveTo(x+30, y+100); ctx.lineTo(x+50, y+100); ctx.quadraticCurveTo(x+90, y+50, x+60, y+100-hAq); ctx.lineTo(x+20, y+100-hAq); ctx.quadraticCurveTo(x-10, y+50, x+30, y+100); ctx.fill();
+                yBase -= hAq;
+            }
+            if(o.volOrg > 0) {
+                const hOrg = 40;
+                ctx.fillStyle = o.contentOrg === 'br2' ? CONST.COLORS.HEX_BR : CONST.COLORS.HEX;
+                ctx.fillRect(x+10, yBase-hOrg, 60, hOrg); 
+            }
+            const inCooldown = (Date.now() - o.lastAction < 1500);
+            ctx.fillStyle = inCooldown ? '#95a5a6' : '#c0392b'; 
+            if(o.processing) { ctx.save(); ctx.translate(x+40, y+130); ctx.rotate(Math.PI/2); ctx.fillRect(-10, -3, 20, 6); ctx.restore(); }
+            else { ctx.fillRect(x+30, y+127, 20, 6); }
+        }
+        else if(o.type === 'tube') {
+            ctx.strokeStyle = '#bdc3c7'; ctx.fillStyle = 'rgba(255, 255, 255, 0.3)'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.rect(x, y, w, h); ctx.stroke(); ctx.fill();
+            let yLev = y + h;
+            if(o.volAq > 0) {
+                const hAq = (o.volAq / 20) * (h/2);
+                ctx.fillStyle = o.hasBr && !o.extracted ? CONST.COLORS.BR2 : CONST.COLORS.WATER;
+                ctx.fillRect(x+1, yLev-hAq, w-2, hAq); yLev -= hAq;
+            }
+            if(o.volOrg > 0) {
+                const hOrg = (o.volOrg / 20) * (h/2);
+                if(o.reacted) ctx.fillStyle = CONST.COLORS.HEX;
+                else if(o.extracted) ctx.fillStyle = CONST.COLORS.HEX_BR;
+                else ctx.fillStyle = CONST.COLORS.HEX;
+                if(o.progress > 0 && o.progress < 100) ctx.fillStyle = `rgba(210, 100, 30, ${0.8 - (o.progress/100)*0.8})`; 
+                ctx.fillRect(x+1, yLev-hOrg, w-2, hOrg);
+            }
+            if(o.hasPpt) {
+                ctx.fillStyle = CONST.COLORS.PPT_BG;
+                ctx.fillRect(x+2, yLev-10, w-4, 10);
+            }
+            if(o.stoppered) { ctx.fillStyle = '#8e44ad'; ctx.fillRect(x+5, y-10, w-10, 15); }
+        }
+        else if(o.type === 'cyl') {
+            ctx.strokeStyle = '#bdc3c7'; ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.strokeRect(x,y,w,h); ctx.fillRect(x,y,w,h);
+            ctx.fillStyle = '#7f8c8d'; for(let i=10; i<h; i+=10) ctx.fillRect(x, y+i, 5, 1);
+            if(o.vol > 0) {
+                ctx.fillStyle = (o.content === 'br2') ? CONST.COLORS.BR2 : CONST.COLORS.HEX;
+                const hFill = (o.vol / 25) * h; ctx.fillRect(x+1, y+h-hFill, w-2, hFill);
+            }
+        }
+        else if(o.type === 'sink') {
+            ctx.fillStyle = CONST.COLORS.SINK; ctx.fillRect(x,y,w,h);
+            ctx.fillStyle = '#fff'; ctx.font = "bold 16px Arial"; ctx.textAlign = 'center'; ctx.fillText("VASK", x+w/2, y+55);
+            ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 3; ctx.strokeRect(x+10, y+10, w-20, h-20);
+        }
+        else if(o.type === 'bottle') {
+            ctx.fillStyle = o.color; ctx.fillRect(x, y+20, w, h-20); ctx.fillStyle = '#bdc3c7'; ctx.fillRect(x+10, y, w-20, 20); 
+            ctx.fillStyle = '#fff'; ctx.fillRect(x+2, y+40, w-4, 30); ctx.fillStyle = '#000'; ctx.font = "bold 12px Arial"; ctx.textAlign = 'center';
+            ctx.fillText(o.label, x+w/2, y+60); ctx.textAlign = 'left';
+        }
+        else if(o.type === 'bin') {
+            ctx.fillStyle = o.color; ctx.fillRect(x,y,w,h); ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.fillRect(x+5, y+10, w-10, 5); 
+            ctx.fillStyle = '#fff'; ctx.font = "bold 11px Arial"; ctx.textAlign = 'center'; ctx.fillText(o.label, x+w/2, y+50); 
+            if(o.sub) { ctx.font = "9px Arial"; ctx.fillText(o.sub, x+w/2, y+65); } ctx.textAlign = 'left';
+        }
+        else if(o.type === 'stopper') { ctx.fillStyle = '#8e44ad'; ctx.fillRect(x,y,w,h); ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.fillRect(x,y,w,3); }
+    }
+}
+Lab.init();
+</script>
+</body>
+</html>

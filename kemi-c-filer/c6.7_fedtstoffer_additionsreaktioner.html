@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kemi-Lab: Bromvandsprøven (Manuel Styring)</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #d35400; 
+            --bg: #f0f2f5;
+            --panel: #ffffff;
+            --bromine-color: #a04000;
+        }
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--primary);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        header {
+            padding: 10px;
+            background: var(--panel);
+            border-bottom: 1px solid #ddd;
+            z-index: 10;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-content { text-align: center; flex: 1; }
+        h1 { margin: 0; font-size: 1.4rem; }
+        .subtitle { font-size: 0.85rem; color: #7f8c8d; }
+        
+        .reset-all-btn {
+            margin-right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            background: #eee;
+            border: 1px solid #ccc;
+            transition: 0.2s;
+        }
+        .reset-all-btn:hover { background: #e74c3c; color: white; border-color: #c0392b; }
+
+        .score-badge {
+            font-weight: 700; color: var(--accent); background: #fff5e6;
+            border: 1px solid #ffd8a8; border-radius: 20px; padding: 6px 14px;
+            font-size: 0.9rem; white-space: nowrap;
+        }
+
+        /* MAIN LAYOUT */
+        #workspace {
+            display: flex;
+            flex: 1;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* LEFT SIDE: CONTROLS & RACK */
+        #sidebar {
+            width: 280px;
+            background: #fff;
+            border-right: 1px solid #ddd;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            z-index: 5;
+        }
+
+        .section-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 10px; text-transform: uppercase; color: #7f8c8d; }
+
+        /* Sample Buttons */
+        .sample-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .sample-btn {
+            padding: 12px;
+            border: 1px solid #ddd;
+            background: #f8f9fa;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sample-btn:hover { background: #eef2f5; }
+        .sample-btn.active { border-color: var(--accent); background: #fff5e6; font-weight: bold; }
+        .sample-btn.done { border-color: #27ae60; background: #eafaf1; }
+        .sample-btn.suggested { animation: pulse-suggest 1.4s infinite; }
+        @keyframes pulse-suggest {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(211, 84, 0, 0.5); }
+            50% { box-shadow: 0 0 0 8px rgba(211, 84, 0, 0); }
+        }
+        .status-icon { font-size: 1.2rem; }
+        .next-hint { display: block; font-size: 0.75rem; font-weight: normal; color: var(--accent); margin-top: 4px; }
+
+        /* Action Button */
+        #action-area { text-align: center; margin-top: auto; }
+        #actionBtn {
+            width: 100%;
+            background: var(--accent); color: white; border: none;
+            padding: 15px; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer;
+            box-shadow: 0 4px 0 #ba4a00;
+            transition: transform 0.1s;
+        }
+        #actionBtn:active { transform: translateY(2px); box-shadow: 0 2px 0 #ba4a00; }
+        #actionBtn:disabled { background: #95a5a6; box-shadow: none; cursor: not-allowed; transform: none; }
+        
+        /* Secondary state for button (Retry) */
+        #actionBtn.retry-mode { background: #34495e; box-shadow: 0 4px 0 #2c3e50; }
+
+        /* Quiz-unlock button (appears once all samples are tested; student decides when to start) */
+        .quiz-unlock-btn {
+            width: 100%; margin-bottom: 10px; padding: 14px; border-radius: 8px; border: none;
+            background: #8e44ad; color: white; font-weight: 700; font-size: 0.95rem; cursor: pointer;
+            animation: pulse-quiz 1.6s infinite;
+        }
+        .quiz-unlock-btn:hover { background: #7d3c98; }
+        @keyframes pulse-quiz {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(142, 68, 173, 0.5); }
+            50% { box-shadow: 0 0 0 8px rgba(142, 68, 173, 0); }
+        }
+
+        /* RESULT RACK */
+        #rack-container {
+            background: #eee;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .rack {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 80px;
+            padding-bottom: 5px;
+            border-bottom: 4px solid #aaa;
+        }
+        .tube-slot {
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+        }
+        .test-tube {
+            width: 18px;
+            height: 60px;
+            border: 2px solid rgba(0,0,0,0.3);
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            background: rgba(255,255,255,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+        .tube-liquid {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
+            background-color: transparent;
+            transition: background-color 1s;
+        }
+        .tube-label { font-size: 0.6rem; color: #666; font-weight: bold; }
+
+        /* RIGHT SIDE: CANVAS */
+        #canvas-wrapper {
+            flex: 1;
+            position: relative;
+            background: radial-gradient(circle at center, #fdfdfd, #f0f0f0);
+            display: flex; justify-content: center; align-items: center;
+        }
+        #flask {
+            width: 90%; height: 90%;
+            position: relative;
+            border: 4px solid rgba(0,0,0,0.1);
+            border-radius: 15px;
+            background: white;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        canvas { display: block; width: 100%; height: 100%; }
+        
+        #liquid-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(160, 60, 0, 0); 
+            pointer-events: none;
+            mix-blend-mode: multiply;
+        }
+
+        #status-overlay {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(255,255,255,0.9);
+            padding: 8px 16px; border-radius: 20px;
+            font-weight: bold; font-size: 0.9rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            pointer-events: none;
+            z-index: 20;
+            border: 1px solid #ddd;
+        }
+
+        /* LEGEND (Signaturforklaring) */
+        .legend {
+            position: absolute; bottom: 15px; right: 15px;
+            background: rgba(255,255,255,0.95); padding: 12px;
+            border-radius: 8px; border: 1px solid #ddd;
+            font-size: 0.75rem; pointer-events: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            z-index: 20;
+        }
+        .legend-title { font-weight: bold; margin-bottom: 8px; font-size: 0.8rem; color: #333; text-transform: uppercase; }
+        .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .line { width: 20px; height: 3px; background: #34495e; display: inline-block; }
+        .dbl { border-top: 2px solid #34495e; border-bottom: 2px solid #34495e; height: 5px; background: transparent; }
+
+
+        /* Success Modal */
+        #completion-modal {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none; justify-content: center; align-items: center; z-index: 100;
+        }
+        .modal-content {
+            background: white; padding: 30px; border-radius: 12px; text-align: center; max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .modal-content h2 { color: #27ae60; margin-top: 0; }
+        .btn-modal {
+            background: #2c3e50; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; margin-top: 10px;
+            font-weight: bold;
+        }
+        .btn-modal:hover { background: #34495e; }
+        .btn-close {
+            background: #95a5a6;
+        }
+
+        /* PREDICTION & QUIZ OVERLAYS (in-flask popups) */
+        .overlay-panel {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.55);
+            display: none; justify-content: center; align-items: center;
+            z-index: 50;
+        }
+        .overlay-card {
+            background: white; padding: 25px 30px; border-radius: 12px; text-align: center;
+            max-width: 420px; width: 90%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .overlay-card h3 { margin-top: 0; color: var(--primary); }
+
+        .predict-options { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .predict-btn {
+            padding: 12px; border-radius: 8px; border: 2px solid #ddd; background: #f8f9fa;
+            cursor: pointer; font-weight: 600; transition: 0.15s;
+        }
+        .predict-btn:hover { border-color: var(--accent); background: #fff5e6; }
+        .predict-sub { font-weight: 400; font-size: 0.75rem; color: #888; }
+
+        .predict-feedback { display: block; margin-top: 6px; font-size: 0.8rem; font-weight: 600; }
+        .predict-feedback.correct { color: #27ae60; }
+        .predict-feedback.wrong { color: #c0392b; }
+
+        .quiz-header { font-weight: 700; font-size: 1.1rem; margin-bottom: 4px; }
+        .quiz-progress { font-size: 0.75rem; color: #888; margin-bottom: 10px; }
+        .quiz-options { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+        .quiz-option-btn {
+            padding: 10px; border-radius: 8px; border: 2px solid #ddd; background: #f8f9fa;
+            cursor: pointer; text-align: left; font-size: 0.9rem;
+        }
+        .quiz-option-btn:hover:not(:disabled) { border-color: var(--accent); background: #fff5e6; }
+        .quiz-option-btn.correct { border-color: #27ae60; background: #eafaf1; font-weight: bold; }
+        .quiz-option-btn.wrong { border-color: #c0392b; background: #fdecea; }
+        .quiz-option-btn:disabled { cursor: default; }
+        .quiz-feedback {
+            margin-top: 12px; font-size: 0.85rem; text-align: left; padding: 10px;
+            border-radius: 8px; background: #f4f4f4;
+        }
+        .quiz-feedback.correct { background: #eafaf1; color: #1e7e45; }
+        .quiz-feedback.wrong { background: #fdecea; color: #a33025; }
+
+        /* BOND TOOLTIP (click-to-explain double bonds) */
+        .bond-tooltip {
+            position: absolute; max-width: 240px;
+            background: #2c3e50; color: white; padding: 10px 12px; border-radius: 8px;
+            font-size: 0.78rem; line-height: 1.4; z-index: 60; display: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .tooltip-close {
+            position: absolute; top: 2px; right: 6px; background: none; border: none; color: #bbb;
+            cursor: pointer; font-size: 0.8rem;
+        }
+        .legend-tip { margin-top: 8px; font-size: 0.65rem; color: #888; font-style: italic; }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <div id="score-display" class="score-badge" title="Point for korrekte forudsigelser og quizsvar">⭐ <span id="scoreValue">0</span></div>
+    <div class="header-content">
+        <h1>Bromvandsprøven</h1>
+        <div class="subtitle">Laboratorie-journal</div>
+    </div>
+    <div class="reset-all-btn" onclick="fullReset()" title="Start helt forfra">🔄</div>
+</header>
+
+<div id="workspace">
+    
+    <div id="sidebar">
+        <div>
+            <div class="section-title">1. Vælg Prøve</div>
+            <div class="sample-grid" id="sampleButtons">
+                </div>
+        </div>
+
+        <div id="rack-container">
+            <div class="section-title">Resultater (Gemt)</div>
+            <div class="rack" id="rackTubes">
+                </div>
+        </div>
+
+        <div id="action-area">
+            <button id="startQuizBtn" class="quiz-unlock-btn" style="display:none;">🧠 Start Miniquiz</button>
+            <button id="actionBtn" disabled>Start Forsøg</button>
+        </div>
+    </div>
+
+    <div id="canvas-wrapper">
+        <div id="flask">
+            <div id="liquid-overlay"></div>
+            <canvas id="simCanvas"></canvas>
+            
+            <div id="status-overlay">Vælg en prøve til venstre for at starte</div>
+
+            <div class="legend">
+                <div class="legend-title">Forklaring</div>
+                <div class="legend-item"><span class="dot" style="background: #2ecc71;"></span> Carbon (C)</div>
+                <div class="legend-item"><span class="dot" style="background: #e74c3c;"></span> Oxygen (O)</div>
+                <div class="legend-item"><span class="line"></span> Enkeltbinding</div>
+                <div class="legend-item"><span class="line dbl"></span> Dobbeltbinding</div>
+                <div class="legend-item"><span class="dot" style="background: #d35400;"></span> Brom (Br)</div>
+                <div class="legend-tip">💡 Klik på en dobbeltbinding i kæden for at få den forklaret</div>
+            </div>
+
+            <div id="bond-tooltip" class="bond-tooltip">
+                <button class="tooltip-close" onclick="hideBondTooltip()">✕</button>
+                <div id="bond-tooltip-text"></div>
+            </div>
+
+            <div id="prediction-panel" class="overlay-panel">
+                <div class="overlay-card">
+                    <h3>Forudsigelse 🔮</h3>
+                    <p>Hvad tror du der sker med bromvandets farve, når du tilsætter det til <strong id="predict-sample-name"></strong>?</p>
+                    <div class="predict-options">
+                        <button class="predict-btn" data-cat="none">Ingenting<br><span class="predict-sub">(fortsat brun)</span></button>
+                        <button class="predict-btn" data-cat="partial">Delvis reaktion<br><span class="predict-sub">(lysere brun)</span></button>
+                        <button class="predict-btn" data-cat="full">Fuldstændig reaktion<br><span class="predict-sub">(affarvning)</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quiz-panel" class="overlay-panel">
+                <div class="overlay-card">
+                    <div class="quiz-header">🧠 Miniquiz</div>
+                    <div id="quiz-progress" class="quiz-progress"></div>
+                    <p id="quiz-question"></p>
+                    <div class="quiz-options" id="quiz-options"></div>
+                    <div id="quiz-feedback" class="quiz-feedback" style="display:none;"></div>
+                    <button id="quiz-continue-btn" class="btn-modal" style="display:none;">Fortsæt →</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<div id="completion-modal">
+    <div class="modal-content">
+        <h2>Forsøgsrækken er færdig!</h2>
+        <p>Du har nu testet alle 4 fedtstoffer.</p>
+        <p><strong>Konklusion:</strong> Jo flere dobbeltbindinger (umættet), jo mere klart bliver vandet, fordi brom "spises" af fedtstoffet.</p>
+        <div style="display:flex; gap:10px; justify-content:center;">
+            <button class="btn-modal btn-close" onclick="closeModal()">Luk og se resultater</button>
+            <button class="btn-modal" onclick="fullReset()">Start helt forfra</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    const overlay = document.getElementById('liquid-overlay');
+    const statusText = document.getElementById('status-overlay');
+    const actionBtn = document.getElementById('actionBtn');
+    const sampleContainer = document.getElementById('sampleButtons');
+    const rackContainer = document.getElementById('rackTubes');
+    const modal = document.getElementById('completion-modal');
+
+    // --- DATA & CONFIG ---
+    
+    const LIQUID_BASE_COLOR = "160, 60, 0"; 
+    let width, height;
+    
+    // Sample Configuration
+    const SAMPLES = [
+        { id: 0, name: "Smør", sub: "Mættet", level: 0, done: false, savedColor: null, short: "Smør" },
+        { id: 1, name: "Olivenolie", sub: "Mono-umættet", level: 1, done: false, savedColor: null, short: "Oliven" },
+        { id: 2, name: "Solsikkeolie", sub: "Delvis polyumættet", level: 2, done: false, savedColor: null, short: "Sol" },
+        { id: 3, name: "Fiskeolie", sub: "Polyumættet", level: 3, done: false, savedColor: null, short: "Fisk" }
+    ];
+
+    let currentSample = null;
+    let isReactionRunning = false;
+    let triglycerides = [];
+    let bromines = [];
+    let totalBromineAdded = 0;
+
+    // Prediction & quiz state
+    let currentPrediction = null;
+    let predictionPanelOpen = false;
+    let quizPanelOpen = false;
+    let score = 0;
+
+    const QUIZ_BANK = [
+        {
+            question: "C=C-dobbeltbindinger reagerer hurtigt med brom i en additionsreaktion. Hvad sker der helt konkret med bindingen?",
+            options: [
+                "Dobbeltbindingen åbnes, og der bindes et Br-atom til hvert af de to kulstofatomer",
+                "Et af kulstofatomerne erstattes af et bromatom, mens resten af kæden er uændret",
+                "Bindingen forsvinder helt, og kæden knækker over i to mindre stykker",
+                "Der sker ingen ændring af bindingen, da brom slet ikke kan reagere med den"
+            ],
+            correctIndex: 0,
+            explanation: "Ved additionsreaktionen 'åbnes' dobbeltbindingen, og de to bromatomer lægger sig et på hver side — bindingen bliver til en enkeltbinding med et Br-atom på hvert kulstofatom."
+        },
+        {
+            question: "Hvad kaldes den type reaktion, hvor Br₂ lægger sig til en dobbeltbinding?",
+            options: ["Substitution", "Addition", "Fældningsreaktion", "Forbrænding"],
+            correctIndex: 1,
+            explanation: "Det er en additionsreaktion: dobbeltbindingen 'åbnes', og de to bromatomer bliver bundet til hvert sit kulstofatom."
+        },
+        {
+            question: "Et fedtstof med mange dobbeltbindinger kaldes...?",
+            options: ["Mættet", "Polyumættet", "Ureageret", "Estificeret"],
+            correctIndex: 1,
+            explanation: "Jo flere dobbeltbindinger, jo mere umættet er fedtstoffet — 'poly' betyder 'mange'."
+        },
+        {
+            question: "Hvorfor bliver bromvandet mere farveløst, jo flere dobbeltbindinger fedtstoffet har?",
+            options: [
+                "Fordi der er flere steder, hvor Br₂ kan reagere og forsvinde fra opløsningen",
+                "Fordi umættede fedtstoffer altid er helt gennemsigtige af natur",
+                "Fordi mættede fedtstoffer absorberer farven i stedet for at reagere",
+                "Der er ingen sammenhæng mellem antallet af dobbeltbindinger og bromvandets farve"
+            ],
+            correctIndex: 0,
+            explanation: "Hver dobbeltbinding kan 'opsluge' et Br₂-molekyle. Flere dobbeltbindinger giver mere reageret brom og dermed mindre farve tilbage i opløsningen."
+        },
+        {
+            question: "Hvad består et fedtstof (en triglycerid) af?",
+            options: [
+                "Tre glukosemolekyler bundet sammen",
+                "Glycerol + tre fedtsyrer bundet med ester-bindinger",
+                "Tre glycerolmolekyler bundet sammen",
+                "En kæde af aminosyrer (protein)"
+            ],
+            correctIndex: 1,
+            explanation: "Et fedtstof er en ester mellem glycerol (3 OH-grupper) og tre fedtsyrer — hver ester-binding indeholder en enkeltbundet oxygen og en dobbeltbundet (carbonyl) oxygen."
+        },
+        {
+            question: "Hvilken type binding gør en fedtsyrekæde 'umættet'?",
+            options: [
+                "Enkeltbinding mellem C og O",
+                "Dobbeltbinding mellem to C-atomer",
+                "Enkeltbinding mellem C og H",
+                "Ester-bindingen til glycerol"
+            ],
+            correctIndex: 1,
+            explanation: "Umættethed handler specifikt om C=C-dobbeltbindinger i fedtsyrekæden — jo flere, jo mere umættet."
+        }
+    ];
+    let quizQueue = [];
+    let quizQuestionNum = 0;
+    let quizTotal = 0;
+
+    // Blander en enkelt quiz-opgaves svarmuligheder (og flytter correctIndex med),
+    // så det rigtige svar ikke altid står på samme plads i listen.
+    function getShuffledQuestion(original) {
+        const indices = original.options.map((_, i) => i);
+        for (let i = indices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indices[i], indices[j]] = [indices[j], indices[i]];
+        }
+        return {
+            ...original,
+            options: indices.map(i => original.options[i]),
+            correctIndex: indices.indexOf(original.correctIndex)
+        };
+    }
+
+    // --- SETUP UI ---
+
+    function initUI() {
+        // Generate Buttons
+        sampleContainer.innerHTML = "";
+        SAMPLES.forEach((s, idx) => {
+            let btn = document.createElement('div');
+            btn.className = `sample-btn ${s.done ? 'done' : ''}`;
+            btn.innerHTML = `
+                <div>
+                    <div style="font-weight:bold">${s.name}</div>
+                    <div style="font-size:0.7rem; color:#666">${s.sub}</div>
+                </div>
+                <div class="status-icon">${s.done ? '✓' : '○'}</div>
+            `;
+            btn.onclick = () => selectSample(idx);
+            btn.id = `btn-${idx}`;
+            sampleContainer.appendChild(btn);
+        });
+
+        // Generate Rack Tubes
+        rackContainer.innerHTML = "";
+        SAMPLES.forEach((s, idx) => {
+            let slot = document.createElement('div');
+            slot.className = 'tube-slot';
+            slot.innerHTML = `
+                <div class="test-tube">
+                    <div class="tube-liquid" id="tube-liq-${idx}"></div>
+                </div>
+                <div class="tube-label">${s.short}</div>
+            `;
+            rackContainer.appendChild(slot);
+        });
+    }
+
+    function selectSample(index) {
+        if (isReactionRunning || predictionPanelOpen || quizPanelOpen) return; // Locked during animation/panels
+
+        currentSample = SAMPLES[index];
+        currentPrediction = null;
+        hideBondTooltip();
+
+        // Update UI Highlights
+        document.querySelectorAll('.sample-btn').forEach(b => b.classList.remove('active', 'suggested'));
+        document.getElementById(`btn-${index}`).classList.add('active');
+
+        // Reset Simulation for this sample
+        resetSim(currentSample.level);
+        
+        if (currentSample.done) {
+            statusText.innerText = `Resultat for ${currentSample.name}`;
+            actionBtn.disabled = false;
+            actionBtn.innerText = "Gentag Forsøg";
+            actionBtn.className = "retry-mode";
+            // Restore visual state
+            overlay.style.backgroundColor = currentSample.savedColor; 
+        } else {
+            statusText.innerText = `Klar til at teste: ${currentSample.name}`;
+            actionBtn.disabled = false;
+            actionBtn.innerText = `Tilsæt Br₂`;
+            actionBtn.className = "";
+            overlay.style.backgroundColor = `rgba(${LIQUID_BASE_COLOR}, 0)`;
+        }
+    }
+
+    function updateRack() {
+        SAMPLES.forEach((s, idx) => {
+            let liq = document.getElementById(`tube-liq-${idx}`);
+            if (s.done && s.savedColor) {
+                liq.style.backgroundColor = s.savedColor;
+            } else {
+                liq.style.backgroundColor = 'transparent';
+            }
+            
+            // Update button checkmark
+            let btn = document.getElementById(`btn-${idx}`);
+            if(s.done) {
+                btn.classList.add('done');
+                btn.querySelector('.status-icon').innerText = '✓';
+            }
+        });
+    }
+
+    function proceedAfterExperiment() {
+        if (SAMPLES.every(s => s.done)) {
+            // Lås miniquizzen op som en knap i stedet for at afbryde eleven med det samme
+            document.getElementById('startQuizBtn').style.display = 'block';
+        } else {
+            suggestNextSample();
+        }
+    }
+
+    function closeModal() {
+        modal.style.display = 'none';
+    }
+
+    function fullReset() {
+        location.reload(); // Simple reload to clear everything
+    }
+
+    // --- SIMULATION CLASSES ---
+    
+    class Chain {
+        constructor(startX, startY, level) {
+            this.segments = [];
+            this.generate(startX, startY, level);
+        }
+        generate(startX, startY, level) {
+            let cx = startX; let cy = startY;
+            let doubleBondCount = 0;
+            // Level 0=0, 1=1, 2=2, 3=3 max double bonds per chain roughly
+            let maxDB = level === 0 ? 0 : (level === 1 ? 1 : (level === 2 ? 2 : 3));
+            let prob = level * 20; // Probability percentage
+
+            this.segments.push({x1: cx, y1: cy - 15, x2: cx, y2: cy, type: 'link', reacted: false}); 
+
+            for(let i=0; i<12; i++) {
+                let isDouble = false;
+                if (i > 1 && i < 10 && doubleBondCount < maxDB) {
+                     let prev = this.segments[this.segments.length-1];
+                     if (!prev.isDouble && Math.random() * 100 < prob) {
+                         isDouble = true;
+                         doubleBondCount++;
+                     }
+                }
+                let offset = (i % 2 === 0 ? 1 : -1) * 8; 
+                if (isDouble) offset *= 1.4;
+                let nx = cx + offset; let ny = cy + 22;
+                this.segments.push({
+                    x1: cx, y1: cy, x2: nx, y2: ny,
+                    midX: (cx+nx)/2, midY: (cy+ny)/2,
+                    isDouble: isDouble, reacted: false
+                });
+                cx = nx; cy = ny;
+            }
+        }
+        draw() {
+            ctx.lineCap = "round";
+            this.segments.forEach(s => {
+                if(s.type === 'link') return; 
+                ctx.fillStyle = "#2ecc71"; ctx.beginPath(); ctx.arc(s.x1, s.y1, 3.5, 0, Math.PI*2); ctx.fill();
+                ctx.strokeStyle = "#34495e"; ctx.lineWidth = 3;
+                if (s.isDouble && !s.reacted) {
+                    let dx = s.x2 - s.x1; let dy = s.y2 - s.y1; let len = Math.hypot(dx, dy);
+                    let ox = (dy/len)*3; let oy = (-dx/len)*3;
+                    ctx.beginPath(); ctx.moveTo(s.x1+ox, s.y1+oy); ctx.lineTo(s.x2+ox, s.y2+oy); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(s.x1-ox, s.y1-oy); ctx.lineTo(s.x2-ox, s.y2-oy); ctx.stroke();
+                } else {
+                    ctx.beginPath(); ctx.moveTo(s.x1, s.y1); ctx.lineTo(s.x2, s.y2); ctx.stroke();
+                }
+                if (s.reacted) {
+                    // CORRECT STRUCTURE: 1 Br on each C
+                    this.drawReactedBromine(s);
+                }
+            });
+            let last = this.segments[this.segments.length-1];
+            ctx.fillStyle = "#2ecc71"; ctx.beginPath(); ctx.arc(last.x2, last.y2, 3.5, 0, Math.PI*2); ctx.fill();
+        }
+
+        drawReactedBromine(seg) {
+            let dx = seg.x2 - seg.x1; let dy = seg.y2 - seg.y1;
+            let len = Math.hypot(dx, dy);
+            let nx = -dy / len; let ny = dx / len;
+            let brDist = 14; 
+
+            // Br on C1
+            let bx1 = seg.x1 + nx * brDist; let by1 = seg.y1 + ny * brDist;
+            ctx.strokeStyle = "#d35400"; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(seg.x1, seg.y1); ctx.lineTo(bx1, by1); ctx.stroke();
+            ctx.fillStyle = "#d35400"; ctx.strokeStyle = "white"; ctx.lineWidth=1;
+            ctx.beginPath(); ctx.arc(bx1, by1, 5, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+
+            // Br on C2
+            let bx2 = seg.x2 + nx * brDist; let by2 = seg.y2 + ny * brDist;
+            ctx.strokeStyle = "#d35400"; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(seg.x2, seg.y2); ctx.lineTo(bx2, by2); ctx.stroke();
+            ctx.fillStyle = "#d35400"; ctx.strokeStyle = "white"; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.arc(bx2, by2, 5, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+        }
+    }
+
+    class Triglyceride {
+        constructor(x, y, level) {
+            this.x = x; this.y = y; this.chains = [];
+            // Ester-binding: Glycerol-C -> ester-O -> carbonyl-C(=O) -> kulstofkæde
+            this.esterY = y + 12;
+            this.carbonylY = y + 24;
+            this.chainStartY = y + 36;
+            this.chains.push(new Chain(x - 35, this.chainStartY, level));
+            this.chains.push(new Chain(x, this.chainStartY, level));
+            this.chains.push(new Chain(x + 35, this.chainStartY, level));
+        }
+        draw() {
+            // Glycerol-rygrad: 3 kulstofatomer forbundet med C-C bindinger (samme teknik som fedtsyrekæderne)
+            ctx.lineCap = "round";
+            ctx.strokeStyle = "#34495e"; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(this.x - 35, this.y); ctx.lineTo(this.x, this.y); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(this.x, this.y); ctx.lineTo(this.x + 35, this.y); ctx.stroke();
+
+            [ -35, 0, 35 ].forEach(offset => {
+                const gx = this.x + offset;
+                const esterOy = this.esterY;
+                const carbonylCy = this.carbonylY;
+                const chainY = this.chainStartY;
+                const carbonylOx = gx + 15;
+                const carbonylOy = carbonylCy - 8;
+
+                // Glycerol-kulstof (grøn prik, samme stil som kædernes kulstoffer)
+                ctx.fillStyle = "#2ecc71";
+                ctx.beginPath(); ctx.arc(gx, this.y, 3.5, 0, Math.PI*2); ctx.fill();
+
+                ctx.strokeStyle = "#7f8c8d"; ctx.lineWidth = 2;
+                // Glycerol-C -> ester-O (enkeltbinding)
+                ctx.beginPath(); ctx.moveTo(gx, this.y); ctx.lineTo(gx, esterOy); ctx.stroke();
+                // ester-O -> carbonyl-C (enkeltbinding)
+                ctx.beginPath(); ctx.moveTo(gx, esterOy); ctx.lineTo(gx, carbonylCy); ctx.stroke();
+                // carbonyl-C -> første kulstof i kæden (enkeltbinding)
+                ctx.beginPath(); ctx.moveTo(gx, carbonylCy); ctx.lineTo(gx, chainY); ctx.stroke();
+
+                // carbonyl-C = carbonyl-O (dobbeltbinding, to parallelle linjer vinkelret på bindingen)
+                const dbDx = carbonylOx - gx, dbDy = carbonylOy - carbonylCy;
+                const dbLen = Math.hypot(dbDx, dbDy);
+                const dbOx = (dbDy / dbLen) * 2.5, dbOy = (-dbDx / dbLen) * 2.5;
+                ctx.beginPath(); ctx.moveTo(gx + dbOx, carbonylCy + dbOy); ctx.lineTo(carbonylOx + dbOx, carbonylOy + dbOy); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(gx - dbOx, carbonylCy - dbOy); ctx.lineTo(carbonylOx - dbOx, carbonylOy - dbOy); ctx.stroke();
+
+                // Atomer: ester-O og carbonyl-O (rød), carbonyl-C (grøn)
+                ctx.fillStyle = "#e74c3c";
+                ctx.beginPath(); ctx.arc(gx, esterOy, 6, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.arc(carbonylOx, carbonylOy, 6, 0, Math.PI*2); ctx.fill();
+
+                ctx.fillStyle = "#2ecc71";
+                ctx.beginPath(); ctx.arc(gx, carbonylCy, 3.5, 0, Math.PI*2); ctx.fill();
+            });
+
+            this.chains.forEach(c => c.draw());
+        }
+    }
+
+    class Bromine {
+        constructor(target) {
+            this.r = 6;
+            this.x = Math.random() * (width - 40) + 20;
+            this.y = Math.random() * (height - 40) + 20;
+            this.active = true;
+            this.target = target || null;
+
+            if (this.target) {
+                // Tildelt en bestemt dobbeltbinding - bevæger sig målrettet ("magnetisk") derhen,
+                // ligesom en rigtig additionsreaktion sker hurtigt og pålideligt.
+                this.speed = Math.random() * 2 + 5;
+            } else {
+                // Ingen ledig dobbeltbinding tilbage - overskydende brom flyder frit rundt
+                let angle = Math.random() * Math.PI * 2;
+                let freeSpeed = Math.random() * 2.5 + 2.5;
+                this.vx = Math.cos(angle) * freeSpeed; this.vy = Math.sin(angle) * freeSpeed;
+            }
+        }
+        update() {
+            if (!this.active) return;
+
+            if (this.target) {
+                let dx = this.target.midX - this.x;
+                let dy = this.target.midY - this.y;
+                let dist = Math.hypot(dx, dy);
+                if (dist < 6) {
+                    this.active = false;
+                    this.target.reacted = true;
+                    return;
+                }
+                this.x += (dx / dist) * this.speed;
+                this.y += (dy / dist) * this.speed;
+                return;
+            }
+
+            this.x += this.vx; this.y += this.vy;
+            if(this.x < 5 || this.x > width - 5) this.vx *= -1;
+            if(this.y < 5 || this.y > height - 5) this.vy *= -1;
+        }
+        draw() {
+            if(!this.active) return;
+            ctx.translate(this.x, this.y);
+            ctx.fillStyle = "#d35400"; ctx.strokeStyle = "#fff"; ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.arc(-6, 0, 6, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.arc(6, 0, 6, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+            ctx.resetTransform();
+        }
+    }
+
+    // --- MAIN LOGIC ---
+
+    function resetSim(level) {
+        triglycerides = [];
+        bromines = [];
+        totalBromineAdded = 0;
+        
+        // Create 2 Molecules
+        let startY = 60; 
+        triglycerides.push(new Triglyceride(width * 0.3, startY, level));
+        triglycerides.push(new Triglyceride(width * 0.7, startY, level));
+    }
+
+    actionBtn.addEventListener('click', () => {
+        // Check if we are in "Retry" mode
+        if (actionBtn.innerText === "Gentag Forsøg") {
+            // Just reset the current simulation state
+            overlay.style.backgroundColor = `rgba(${LIQUID_BASE_COLOR}, 0)`;
+            resetSim(currentSample.level);
+            statusText.innerText = `Klar til at teste: ${currentSample.name}`;
+            actionBtn.innerText = `Tilsæt Br₂`;
+            actionBtn.className = "";
+            currentPrediction = null;
+            return;
+        }
+
+        if(!currentSample || isReactionRunning) return;
+
+        showPredictionPanel();
+    });
+
+    function showPredictionPanel() {
+        document.getElementById('predict-sample-name').innerText = currentSample.name;
+        predictionPanelOpen = true;
+        document.getElementById('prediction-panel').style.display = 'flex';
+    }
+
+    function choosePrediction(cat) {
+        currentPrediction = cat;
+        predictionPanelOpen = false;
+        document.getElementById('prediction-panel').style.display = 'none';
+        beginReaction();
+    }
+
+    function beginReaction() {
+        isReactionRunning = true;
+        actionBtn.disabled = true;
+        statusText.innerText = "Reaktion i gang...";
+
+        // Start dark
+        overlay.style.backgroundColor = `rgba(${LIQUID_BASE_COLOR}, 0.85)`;
+
+        // Find alle ledige dobbeltbindinger og bland rækkefølgen, så vi ved præcis hvor mange
+        // bromdråber der kan finde en reaktionspartner - resultatet afhænger ikke længere af tilfældig
+        // vandring, kun af hvor mange dobbeltbindinger prøven faktisk har (jf. dens umættethedsgrad).
+        let availableTargets = [];
+        triglycerides.forEach(mol => {
+            mol.chains.forEach(chain => {
+                chain.segments.forEach(seg => {
+                    if (seg.isDouble && !seg.reacted) availableTargets.push(seg);
+                });
+            });
+        });
+        for (let i = availableTargets.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [availableTargets[i], availableTargets[j]] = [availableTargets[j], availableTargets[i]];
+        }
+
+        let count = 0;
+        // Kalibreret så selv den mest umættede prøve (maks. 3 dobbeltbindinger x 6 kæder = 18) reelt kan nå at afvarve al bromen
+        let maxParticles = 16;
+        totalBromineAdded = maxParticles;
+
+        let interval = setInterval(() => {
+            let target = availableTargets.length > 0 ? availableTargets.pop() : null;
+            bromines.push(new Bromine(target));
+            count++;
+            if(count >= maxParticles) {
+                clearInterval(interval);
+                // Monitor for completion
+                checkReactionEnd();
+            }
+        }, 30);
+    }
+
+    function checkReactionEnd() {
+        // Mættede prøver har ingen dobbeltbindinger, så der sker aldrig noget - lad dem ikke vente unødigt.
+        // Ellers rigeligt tid til at den "magnetiske" brom kan nå frem til sin tildelte dobbeltbinding.
+        const settleTime = (currentSample.level === 0) ? 1200 : 4000;
+        setTimeout(() => {
+            finishExperiment();
+        }, settleTime);
+    }
+
+    function finishExperiment() {
+        isReactionRunning = false;
+        let active = bromines.filter(b => b.active).length;
+        let ratio = active / totalBromineAdded;
+        let finalOpacity = ratio * 0.85;
+        let finalColor = `rgba(${LIQUID_BASE_COLOR}, ${finalOpacity})`;
+
+        // Update Status - tærskler i stedet for præcis lighed, så tilfældig variation i antal dobbeltbindinger
+        // ikke forhindrer en meget umættet prøve i at tælle som "fuldstændig affarvet"
+        let actualCategory;
+        if(ratio <= 0.2) { actualCategory = 'full'; statusText.innerText = "Færdig: Fuldstændig affarvet!"; }
+        else if (ratio >= 0.85) { actualCategory = 'none'; statusText.innerText = "Færdig: Ingen reaktion (Mættet)"; }
+        else { actualCategory = 'partial'; statusText.innerText = "Færdig: Delvis affarvning"; }
+
+        // Compare with the student's prediction
+        if (currentPrediction) {
+            if (currentPrediction === actualCategory) {
+                score++;
+                updateScoreDisplay();
+                statusText.innerHTML += `<span class="next-hint">🎯 Din forudsigelse var rigtig! +1 ⭐</span>`;
+            } else {
+                statusText.innerHTML += `<span class="next-hint">🤔 Forkert gæt — se på antallet af dobbeltbindinger næste gang</span>`;
+            }
+            currentPrediction = null;
+        }
+
+        // Save Data
+        currentSample.done = true;
+        currentSample.savedColor = finalColor;
+
+        // Update UI
+        updateRack();
+
+        // Update Button to "Retry"
+        actionBtn.disabled = false;
+        actionBtn.innerText = "Gentag Forsøg";
+        actionBtn.className = "retry-mode";
+
+        // Guide the student onward — next sample, or the final miniquiz if all are done
+        proceedAfterExperiment();
+    }
+
+    function suggestNextSample() {
+        document.querySelectorAll('.sample-btn').forEach(b => b.classList.remove('suggested'));
+
+        const currentIndex = SAMPLES.indexOf(currentSample);
+        const remaining = SAMPLES.filter(s => !s.done);
+        if (remaining.length === 0) return; // Alle prøver er testet - modal håndterer dette
+
+        // Foretræk næste prøve i rækkefølgen, ellers første ledige
+        let next = SAMPLES.slice(currentIndex + 1).find(s => !s.done) || remaining[0];
+        const nextIndex = SAMPLES.indexOf(next);
+
+        statusText.innerHTML = `${statusText.innerText}<span class="next-hint">→ Prøv nu: ${next.name}</span>`;
+        document.getElementById(`btn-${nextIndex}`).classList.add('suggested');
+    }
+
+    function updateScoreDisplay() {
+        document.getElementById('scoreValue').innerText = score;
+    }
+
+    // --- MINI-QUIZ (samlet quiz når alle forsøg er gennemført) ---
+
+    function startMiniQuiz() {
+        quizQueue = QUIZ_BANK.map((_, i) => i);
+        // Bland rækkefølgen
+        for (let i = quizQueue.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [quizQueue[i], quizQueue[j]] = [quizQueue[j], quizQueue[i]];
+        }
+        quizTotal = quizQueue.length;
+        quizQuestionNum = 0;
+        showNextQuizQuestion();
+    }
+
+    function showNextQuizQuestion() {
+        if (quizQueue.length === 0) {
+            quizPanelOpen = false;
+            document.getElementById('quiz-panel').style.display = 'none';
+            modal.style.display = 'flex';
+            return;
+        }
+
+        quizQuestionNum++;
+        const q = getShuffledQuestion(QUIZ_BANK[quizQueue.shift()]);
+
+        document.getElementById('quiz-progress').innerText = `Spørgsmål ${quizQuestionNum} af ${quizTotal}`;
+        document.getElementById('quiz-question').innerText = q.question;
+
+        const optsContainer = document.getElementById('quiz-options');
+        optsContainer.innerHTML = "";
+        q.options.forEach((opt, i) => {
+            let b = document.createElement('button');
+            b.className = 'quiz-option-btn';
+            b.innerText = opt;
+            b.onclick = () => answerQuiz(i, q, optsContainer);
+            optsContainer.appendChild(b);
+        });
+
+        const feedback = document.getElementById('quiz-feedback');
+        feedback.style.display = 'none';
+        feedback.className = 'quiz-feedback';
+        document.getElementById('quiz-continue-btn').style.display = 'none';
+
+        quizPanelOpen = true;
+        document.getElementById('quiz-panel').style.display = 'flex';
+    }
+
+    function answerQuiz(selectedIndex, q, optsContainer) {
+        Array.from(optsContainer.children).forEach((b, i) => {
+            b.disabled = true;
+            if (i === q.correctIndex) b.classList.add('correct');
+            else if (i === selectedIndex) b.classList.add('wrong');
+        });
+
+        const feedback = document.getElementById('quiz-feedback');
+        if (selectedIndex === q.correctIndex) {
+            score++;
+            updateScoreDisplay();
+            feedback.innerHTML = `✅ Rigtigt! +1 ⭐<br>${q.explanation}`;
+            feedback.className = 'quiz-feedback correct';
+        } else {
+            feedback.innerHTML = `❌ Ikke helt — ${q.explanation}`;
+            feedback.className = 'quiz-feedback wrong';
+        }
+        feedback.style.display = 'block';
+        document.getElementById('quiz-continue-btn').style.display = 'inline-block';
+    }
+
+    // --- BOND TOOLTIP (click-to-explain double bonds) ---
+
+    function handleCanvasClick(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        let closestSeg = null;
+        let closestDist = 22; // px hit-test threshold
+        triglycerides.forEach(mol => {
+            mol.chains.forEach(chain => {
+                chain.segments.forEach(seg => {
+                    if (!seg.isDouble) return;
+                    const d = Math.hypot(clickX - seg.midX, clickY - seg.midY);
+                    if (d < closestDist) { closestDist = d; closestSeg = seg; }
+                });
+            });
+        });
+
+        if (closestSeg) {
+            showBondTooltip(closestSeg, clickX, clickY);
+        } else {
+            hideBondTooltip();
+        }
+    }
+
+    function showBondTooltip(seg, x, y) {
+        const textEl = document.getElementById('bond-tooltip-text');
+        if (seg.reacted) {
+            textEl.innerHTML = `<strong>Denne binding har reageret ✅</strong><br>Dobbeltbindingen er "åbnet", og de to bromatomer har lagt sig på hver sin side. Den er nu en enkeltbinding med et Br-atom på hvert kulstof.`;
+        } else {
+            textEl.innerHTML = `<strong>Reaktiv dobbeltbinding ⚡</strong><br>C=C-dobbeltbindinger er reaktive og reagerer hurtigt med Br₂ i en additionsreaktion, lige her.`;
+        }
+
+        const tooltip = document.getElementById('bond-tooltip');
+        tooltip.style.display = 'block';
+
+        const flaskEl = document.getElementById('flask');
+        const maxX = Math.max(10, flaskEl.clientWidth - 260);
+        const maxY = Math.max(10, flaskEl.clientHeight - 120);
+        tooltip.style.left = Math.min(Math.max(x + 15, 10), maxX) + 'px';
+        tooltip.style.top = Math.min(Math.max(y - 20, 10), maxY) + 'px';
+    }
+
+    function hideBondTooltip() {
+        document.getElementById('bond-tooltip').style.display = 'none';
+    }
+
+    // --- ANIMATION LOOP ---
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        triglycerides.forEach(t => t.draw());
+        bromines.forEach(b => { b.update(); b.draw(); });
+
+        // Update liquid visual instantly based on current active count
+        if (isReactionRunning && totalBromineAdded > 0) {
+            let active = bromines.filter(b => b.active).length;
+            let targetOpacity = (active / totalBromineAdded) * 0.85;
+            overlay.style.backgroundColor = `rgba(${LIQUID_BASE_COLOR}, ${targetOpacity})`;
+        }
+
+        requestAnimationFrame(animate);
+    }
+
+    // --- RESIZE & START ---
+    
+    function resize() {
+        let el = document.getElementById('flask');
+        let newWidth = el.clientWidth;
+        let newHeight = el.clientHeight;
+        // Undgå at nulstille forsøget ved "falske" resize-events, hvor størrelsen reelt er uændret
+        if (newWidth === width && newHeight === height) return;
+        width = newWidth;
+        height = newHeight;
+        canvas.width = width;
+        canvas.height = height;
+        // Regenerér kun molekylerne hvis der ikke er en reaktion i gang - ellers mister vi
+        // de brommolekyler og dobbeltbindinger, der allerede reagerer
+        if (currentSample && !isReactionRunning) resetSim(currentSample.level);
+    }
+
+    window.addEventListener('resize', resize);
+
+    // Prediction panel buttons
+    document.querySelectorAll('.predict-btn').forEach(btn => {
+        btn.addEventListener('click', () => choosePrediction(btn.dataset.cat));
+    });
+
+    // Quiz continue button
+    document.getElementById('quiz-continue-btn').addEventListener('click', showNextQuizQuestion);
+
+    // Quiz-unlock button (student starts the miniquiz when ready, not automatically)
+    document.getElementById('startQuizBtn').addEventListener('click', () => {
+        if (isReactionRunning || predictionPanelOpen) return;
+        document.getElementById('startQuizBtn').style.display = 'none';
+        startMiniQuiz();
+    });
+
+    // Click-to-explain double bonds
+    canvas.addEventListener('click', handleCanvasClick);
+
+    // Start
+    initUI();
+    resize();
+    animate();
+
+    // Select first sample by default
+    selectSample(0);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historie-animationer</title>
+    <style>
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', sans-serif; }
+        .main-layout { display: flex; width: 100vw; height: 100vh; }
+
+        .sidebar {
+            width: 185px;
+            background-color: #000000;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            border-right: 1px solid #333;
+            overflow-x: hidden;
+            overflow-y: auto;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .sidebar.collapsed {
+            width: 60px;
+        }
+
+        .sidebar-header {
+            height: 60px;
+            background-color: #111;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            transition: all 0.3s;
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            justify-content: center;
+            padding: 0;
+        }
+
+        .header-text {
+            font-weight: bold;
+            color: #f1c40f;
+            letter-spacing: 1px;
+            font-size: 1.1em;
+            white-space: nowrap;
+        }
+
+        .sidebar.collapsed .header-text {
+            display: none;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: #f1c40f;
+            font-size: 26px;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-btn:hover {
+            color: white;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            border-left: 3px solid transparent;
+            color: #aaa;
+            padding: 12px 12px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid #222;
+            font-size: 14px;
+            white-space: nowrap;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            background-color: #222;
+            color: white;
+            border-left-color: #f1c40f;
+        }
+
+        .tab-btn.active {
+            background-color: #222;
+            color: #f1c40f;
+            font-weight: bold;
+            border-left: 3px solid #f1c40f;
+        }
+
+        /* Pill-formet kode-badge (bredere end en cirkel, så den kan rumme fx "2.1") */
+        .btn-num {
+            flex-shrink: 0;
+            min-width: 36px;
+            height: 20px;
+            border-radius: 10px;
+            background-color: #2a2a2a;
+            color: #bbb;
+            font-size: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
+        .tab-btn.active .btn-num {
+            background-color: #f1c40f;
+            color: #000;
+        }
+
+        .btn-text {
+            transition: opacity 0.15s ease;
+        }
+
+        /* Kollaps: vis kun kode-badge, centrer det */
+        .sidebar.collapsed .tab-btn {
+            justify-content: center;
+            padding: 12px 0;
+        }
+
+        .sidebar.collapsed .btn-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        .content-area {
+            flex-grow: 1;
+            height: 100%;
+            background-color: #333;
+            position: relative;
+        }
+
+        iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        /* Startside: boks-oversigt over alle kapitler */
+        .startside {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            box-sizing: border-box;
+            padding: 30px 40px;
+            background-color: #292929;
+        }
+
+        .startside-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .startside-box {
+            background-color: #1e1e1e;
+            border: 1px solid #3a3a3a;
+            border-radius: 10px;
+            padding: 18px;
+            min-height: 140px;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .startside-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+            border-color: #f1c40f;
+        }
+
+        .startside-box-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .startside-box-title {
+            font-weight: bold;
+            font-size: 13px;
+            color: white;
+        }
+
+        .startside-box-desc {
+            font-size: 13px;
+            color: #aaa;
+            line-height: 1.4;
+        }
+
+        .header-text.clickable {
+            cursor: pointer;
+        }
+
+        .header-text.clickable:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="main-layout">
+        <div class="sidebar" id="sidebarMenu">
+
+            <div class="sidebar-header">
+                <span class="header-text clickable" onclick="visStartside()" title="Tilbage til oversigt">Emner</span>
+                <button class="toggle-btn" onclick="toggleMenu()" title="Vis/Skjul menu">☰</button>
+            </div>
+
+            <button class="tab-btn" data-beskrivelse="Kildeanalyse af feudalkontrakten, quiz om Kingdom of Heaven-filmen, og forståelsesquiz om renæssancen." onclick="visKategori(this, 'Historie/samling_1.5_middelalder.html')" title="1.5: Middelalder"><span class="btn-num">1.5</span><span class="btn-text">Middelalder</span></button>
+            <button class="tab-btn" data-beskrivelse="Byg en interaktiv tidslinje over opdagelsesrejserne fra Marco Polo til erobringen af Malaca." onclick="visKategori(this, 'Historie/samling_2.1_opdagelsesrejsende.html')" title="2.1: Kolonisering"><span class="btn-num">2.1</span><span class="btn-text">Kolonisering</span></button>
+            <button class="tab-btn" data-beskrivelse="Sammenfattende quiz om enevælde, oplysningstid, den amerikanske og den franske revolution." onclick="visKategori(this, 'Historie/samling_2.2_revolutioner.html')" title="2.2: Revolutioner"><span class="btn-num">2.2</span><span class="btn-text">Revolutioner</span></button>
+            <button class="tab-btn" data-beskrivelse="Markedssimulator, historiske scenarier og forståelsesquiz om udbud, efterspørgsel og Adam Smiths økonomiske liberalisme." onclick="visKategori(this, 'Historie/samling_2.3_ideologier.html')" title="2.3: Ideologier"><span class="btn-num">2.3</span><span class="btn-text">Ideologier</span></button>
+
+        </div>
+
+        <div class="content-area">
+            <div class="startside" id="startside">
+                <div class="startside-grid" id="startsideGrid"></div>
+            </div>
+            <iframe id="visningsVindue" style="display:none;" allow="clipboard-write"></iframe>
+        </div>
+    </div>
+
+    <script>
+        function visKategori(knap, filsti) {
+            document.getElementById('startside').style.display = 'none';
+            var iframe = document.getElementById('visningsVindue');
+            iframe.style.display = 'block';
+            iframe.src = filsti;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            knap.classList.add('active');
+        }
+
+        function visStartside() {
+            document.getElementById('visningsVindue').style.display = 'none';
+            document.getElementById('startside').style.display = 'block';
+            document.getElementById('sidebarMenu').classList.remove('collapsed');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        }
+
+        function byggStartside() {
+            var grid = document.getElementById('startsideGrid');
+            document.querySelectorAll('.tab-btn').forEach(function(knap) {
+                var num = knap.querySelector('.btn-num').textContent;
+                var titel = knap.querySelector('.btn-text').textContent;
+                var beskrivelse = knap.getAttribute('data-beskrivelse') || '';
+                var boks = document.createElement('div');
+                boks.className = 'startside-box';
+                boks.innerHTML = '<div class="startside-box-head"><span class="btn-num">' + num + '</span><span class="startside-box-title">' + titel + '</span></div><div class="startside-box-desc">' + beskrivelse + '</div>';
+                boks.addEventListener('click', function() { knap.click(); });
+                grid.appendChild(boks);
+            });
+        }
+        byggStartside();
+
+        function toggleMenu() {
+            var menu = document.getElementById('sidebarMenu');
+            menu.classList.toggle('collapsed');
+        }
+
+        function checkScreenSize() {
+            var menu = document.getElementById('sidebarMenu');
+            var startside = document.getElementById('startside');
+            if (startside && startside.style.display !== 'none') {
+                menu.classList.remove('collapsed');
+                return;
+            }
+            if (window.innerWidth < 1100) {
+                menu.classList.add('collapsed');
+            } else {
+                menu.classList.remove('collapsed');
+            }
+        }
+
+        window.onload = checkScreenSize;
+        window.onresize = checkScreenSize;
+
+        // Kapitel-alias -> samlingsfil. Aliaset er kapitlets nummer (fx "2.1"),
+        // mens en dybere emne-alias fra en indholdsfil (fx "2.1.1") matches via prefix.
+        const KAPITEL_FILER = {
+            '1.5': 'Historie/samling_1.5_middelalder.html',
+            '2.1': 'Historie/samling_2.1_opdagelsesrejsende.html',
+            '2.2': 'Historie/samling_2.2_revolutioner.html',
+            '2.3': 'Historie/samling_2.3_ideologier.html'
+        };
+
+        function findSideFraEmne(emne) {
+            const match = emne.match(/^(\d+\.\d+)/);
+            if (match && KAPITEL_FILER[match[1]]) return KAPITEL_FILER[match[1]];
+            return null;
+        }
+
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const emneFil = urlParams.get('emne');
+            let emneSide = urlParams.get('side') || (emneFil ? findSideFraEmne(emneFil) : null);
+
+            if (emneSide) {
+                const knapper = document.querySelectorAll('.tab-btn');
+                knapper.forEach(knap => {
+                    if (knap.getAttribute('onclick').includes(emneSide)) {
+                        let filsti = emneSide;
+                        if (emneFil) {
+                            filsti += '?emne=' + encodeURIComponent(emneFil);
+                        }
+                        visKategori(knap, filsti);
+                    }
+                });
+                // Direkte link skal altid vise et sammenklappet sidepanel med det samme.
+                document.getElementById('sidebarMenu').classList.add('collapsed');
+            }
+        });
+
+        window.addEventListener('message', function(event) {
+            if (event.data === 'animationFocus') {
+                document.getElementById('sidebarMenu').classList.add('collapsed');
+            }
+        });
+
+    </script>
+
+</body>
+</html>

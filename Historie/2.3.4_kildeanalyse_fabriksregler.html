@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kilde 23: Fabriksregler</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f2ef;
+            color: #2c2c2c;
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 20px 20px 60px;
+        }
+        h1 { color: #4a2c1a; text-align: center; margin-bottom: 4px; }
+        .subtitle { text-align: center; color: #6b5f52; font-style: italic; margin-bottom: 25px; }
+
+        .intro-box {
+            background: #fff;
+            border: 1px solid #e0d8cc;
+            border-radius: 8px;
+            padding: 18px 22px;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            box-shadow: 1px 1px 6px rgba(0,0,0,0.06);
+        }
+
+        .start-wrap { text-align: center; margin-bottom: 40px; }
+        .start-btn {
+            background-color: #8b4513;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-size: 1.15em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .start-btn:hover { background-color: #6f3610; transform: translateY(-2px); }
+
+        .progress-bar-wrap {
+            position: sticky;
+            top: 0;
+            background: #f4f2ef;
+            padding: 10px 0;
+            z-index: 10;
+            text-align: center;
+            font-size: 0.9em;
+            color: #6b5f52;
+            border-bottom: 1px solid #e0d8cc;
+            margin-bottom: 20px;
+        }
+        #progress-fill-text { font-weight: bold; color: #4a2c1a; }
+
+        .step-card {
+            background: #fff;
+            border: 1px solid #e0d8cc;
+            border-radius: 10px;
+            padding: 22px 26px;
+            margin-bottom: 22px;
+            box-shadow: 1px 1px 8px rgba(0,0,0,0.07);
+        }
+
+        .rule-quote {
+            font-family: 'Georgia', 'Cambria', serif;
+            background: #fff8dc;
+            border-left: 4px solid #8b4513;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            font-style: normal;
+            font-size: 1.35em;
+            line-height: 1.5;
+            color: #5c4527;
+        }
+        .rule-quote .source-title {
+            display: block;
+            font-family: 'Segoe UI', sans-serif;
+            font-style: normal;
+            font-weight: bold;
+            font-size: 0.55em;
+            color: #8b4513;
+            margin-bottom: 8px;
+        }
+
+        .task-block { margin-bottom: 10px; }
+        .task-block.locked { opacity: 0.35; pointer-events: none; }
+        .task-label {
+            font-weight: bold;
+            color: #4a2c1a;
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        .options button {
+            display: block;
+            width: 100%;
+            padding: 12px 14px;
+            margin: 8px 0;
+            background-color: #eee7db;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1em;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .options button:hover:not(:disabled) { background-color: #ded2bf; transform: translateX(4px); }
+        .options button:disabled { cursor: default; transform: none; }
+
+        .correct { background-color: #d4edda !important; border-left: 5px solid #2ecc71; }
+        .wrong { background-color: #f8d7da !important; border-left: 5px solid #c0392b; opacity: 0.6; }
+
+        .explanation {
+            margin-top: 12px;
+            padding: 12px 14px;
+            background-color: #eef6fb;
+            border-left: 4px solid #2196F3;
+            display: none;
+            line-height: 1.55;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .try-again-note {
+            font-size: 0.85em;
+            color: #b0392a;
+            margin: -4px 0 8px;
+            display: none;
+        }
+
+        .next-rule-btn {
+            display: none;
+            margin-top: 18px;
+            background-color: #c0642c;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        .next-rule-btn:hover { background-color: #9d5122; }
+
+        .nav-row { min-height: 32px; margin-bottom: 6px; }
+        .back-btn {
+            background: none;
+            border: 1px solid #8b6b3f;
+            color: #8b6b3f;
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            display: none;
+        }
+        .back-btn:hover { background-color: #8b6b3f; color: white; }
+
+        .review-tag {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: bold;
+            color: #6b5f52;
+            background: #eee7db;
+            padding: 3px 9px;
+            border-radius: 10px;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        .divider { border: none; border-top: 1px dashed #d8cdbb; margin: 20px 0; }
+
+        .finish-box {
+            background: #fff;
+            border: 1px solid #e0d8cc;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 1px 1px 8px rgba(0,0,0,0.07);
+            display: none;
+        }
+        .finish-box h2 { color: #4a2c1a; margin-top: 0; }
+
+        .final-note {
+            background: #fff;
+            border: 1px solid #e0d8cc;
+            border-radius: 8px;
+            padding: 18px 22px;
+            margin-top: 30px;
+            line-height: 1.6;
+            text-align: center;
+            color: #6b5f52;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🏭 Kildeanalyse: Fabriksreglerne</h1>
+    <p class="subtitle">Kilde 23: Fabriksregler fra Whittaker &amp; Sons, Waterfoot Mills, 1851 (VV2 s. 79)</p>
+
+    <div class="intro-box" id="intro-box">
+        Industrialiseringen skabte en helt ny socialgruppe: <b>fabriksarbejderne</b>. De arbejdede ofte 12-14 timer om dagen under farlige forhold og efter meget strenge regler, der sikrede, at maskinerne blev udnyttet optimalt. Overholdt man ikke reglerne, blev man trukket i løn. Herunder arbejder du dig igennem 5 udvalgte uddrag fra det faktiske regelsæt på en engelsk tekstilfabrik i 1851 — ét ad gangen. For hvert uddrag skal du først gætte, hvad det fortæller om 1800-tallet, og derefter gætte, hvordan forholdene er i dag.
+    </div>
+
+    <div class="start-wrap" id="start-wrap">
+        <button class="start-btn" onclick="startAnalysis()">Start kildeanalysen →</button>
+    </div>
+
+    <div id="stepper" style="display:none;">
+        <div class="progress-bar-wrap">
+            Vi kigger nu på uddrag <span id="rule-progress">1</span> af <span id="rule-total"></span>
+        </div>
+
+        <div class="step-card">
+            <div class="nav-row">
+                <button class="back-btn" id="back-btn" onclick="goBack()">← Forrige uddrag</button>
+            </div>
+
+            <div class="rule-quote" id="step-quote"></div>
+
+            <div class="task-block" id="then-block">
+                <div class="task-label">📋 Hvad fortæller dette uddrag om forholdene på fabrikkerne omkring 1800-tallet?</div>
+                <div class="options" id="then-options"></div>
+                <div class="try-again-note" id="then-retry-note">Ikke helt — prøv en af de andre muligheder.</div>
+                <div class="explanation" id="then-expl"></div>
+            </div>
+
+            <div class="task-block locked" id="today-block">
+                <hr class="divider">
+                <div class="task-label">🔄 Gæt: Hvordan er forholdene omkring dette i dag?</div>
+                <div class="options" id="today-options"></div>
+                <div class="try-again-note" id="today-retry-note">Ikke helt — prøv en af de andre muligheder.</div>
+                <div class="explanation" id="today-expl"></div>
+            </div>
+
+            <button class="next-rule-btn" id="continue-btn">Videre →</button>
+        </div>
+    </div>
+
+    <div class="finish-box" id="finish-box">
+        <h2>🎉 Kildeanalysen er gennemført!</h2>
+        <p>Du er nu kommet igennem alle 5 uddrag og har gættet på både 1800-tallets forhold og nutidens forhold for hver af dem.</p>
+        <p id="finish-attempts" style="color:#6b5f52;"></p>
+        <div style="display:flex; gap:12px; justify-content:center; margin-top:20px;">
+            <button class="back-btn" style="display:inline-block;" onclick="reviewFromFinish()">← Gennemse uddragene igen</button>
+            <button class="start-btn" onclick="location.reload()">Prøv igen</button>
+        </div>
+    </div>
+
+    <div class="final-note">
+        Husk kildekritik: denne kilde viser kun fabriksejerens perspektiv. Vi hører ikke arbejdernes egen stemme eller reaktion på reglerne.
+    </div>
+
+<script>
+    const ruleTasks = [
+        {
+            quote: "2. Enhver der kommer for sent, skal betale bøde som følger: for 5 minutter 2 d., 10 minutter 4 d., og 15 minutter 6 d. osv.",
+            then: {
+                options: [
+                    "Fabriksarbejdet krævede streng, fælles tidsdisciplin styret af maskinerne.",
+                    "Fabriksejeren straffede kun forsinkelse hos de nyansatte arbejdere.",
+                    "Bøderne skulle finansiere fabrikkens forsikring mod arbejdsulykker."
+                ],
+                correct: 0,
+                expl: "Den detaljerede skala (2d/4d/6d for hhv. 5/10/15 minutter) viser en meget stram tidsdisciplin. Fabrikkens produktion krævede, at alle mødte præcis, fordi det var maskinerne — ikke det enkelte menneske — der satte tempoet."
+            },
+            today: {
+                options: [
+                    "En arbejdsgiver kan kun trække løn for forsinkelse efter forudgående varsel.",
+                    "En arbejdsgiver må frit trække i lønnen for enhver forsinkelse i dag.",
+                    "Forsinkelse på arbejde kan i dag aldrig få nogen økonomisk konsekvens."
+                ],
+                correct: 0,
+                expl: "I dag reguleres forhold som forsinkelse typisk gennem ansættelseskontrakter og overenskomster. En arbejdsgiver kan sjældent trække løn for forsinkelse uden først at have givet en advarsel — det er hverken helt frit eller helt konsekvensløst."
+            }
+        },
+        {
+            quote: "9. Enhver person, der forlader sit arbejde og findes i samtale med andre arbejdere, skal i hvert tilfælde betale en bøde på 2 d.",
+            then: {
+                options: [
+                    "Fabriksejeren ønskede at forhindre arbejderne i at organisere sig.",
+                    "Fabriksejeren mente, at støjen fra samtaler ødelagde maskinerne.",
+                    "Loven krævede fuldstændig stilhed på alle offentlige arbejdspladser."
+                ],
+                correct: 0,
+                expl: "Et forbud mod samtale tjente formentlig to formål: at holde produktiviteten oppe, og at forhindre arbejderne i at koordinere sig mod ejeren — fx om utilfredshed med netop disse regler."
+            },
+            today: {
+                options: [
+                    "Danske lønmodtagere har grundlovssikret ret til at organisere sig.",
+                    "Danske arbejdsgivere kan stadig lovligt forbyde samtaler i arbejdstiden.",
+                    "Fagforeninger blev forbudt i Danmark kort efter industrialiseringen."
+                ],
+                correct: 0,
+                expl: "I Danmark er retten til at organisere sig og forhandle kollektivt (foreningsfrihed) en grundlæggende rettighed og en central del af den danske model. Et generelt samtaleforbud ville i dag være helt uacceptabelt."
+            }
+        },
+        {
+            quote: "12. Enhver person ansat hos os skal give fire ugers opsigelsesvarsel, men L. Whittaker &amp; Sons kan og vil afskedige uden varsel.",
+            then: {
+                options: [
+                    "Magtforholdet var ulige — kun arbejderen var bundet af et varsel.",
+                    "Reglen skulle sikre, at ingen arbejdere blev opsagt for hurtigt.",
+                    "Firmaet ønskede at beholde sine mest erfarne arbejdere længst muligt."
+                ],
+                correct: 0,
+                expl: "Reglen bandt arbejderen til fabrikken i månedsvis, mens ejeren selv ikke var bundet af noget varsel overhovedet — et tydeligt billede på den ulige magtbalance mellem ejer og arbejder."
+            },
+            today: {
+                options: [
+                    "I dag skal som udgangspunkt begge parter overholde et opsigelsesvarsel.",
+                    "I dag kan danske arbejdsgivere stadig afskedige helt uden varsel.",
+                    "I dag har kun arbejdsgiveren pligt til at give et opsigelsesvarsel."
+                ],
+                correct: 0,
+                expl: "Moderne dansk arbejdsret kræver som udgangspunkt saglig begrundelse og et opsigelsesvarsel også fra arbejdsgiverens side (fx efter anciennitet i Funktionærloven) — varslet gælder i dag begge veje, ikke kun for arbejderen."
+            }
+        },
+        {
+            quote: "14. Hvis nogen person med vilje eller af skødesløshed ødelægger maskiner eller børster, laver for meget affaldstvist osv., skal han yde erstatning til den fulde værdi.",
+            then: {
+                options: [
+                    "Maskinernes værdi blev beskyttet langt bedre end arbejdernes sikkerhed.",
+                    "Reglen viser, at fabrikken forsikrede samtlige maskiner mod skader.",
+                    "Reglen beskyttede først og fremmest arbejderne mod farlige maskiner."
+                ],
+                correct: 0,
+                expl: "Kilden viser en klar prioritering: maskinernes værdi var beskyttet af strenge erstatningsregler, mens der intet nævnes om sikkerhed for arbejderne selv — på trods af at fabriksulykker var en del af hverdagen."
+            },
+            today: {
+                options: [
+                    "Arbejdsgivere skal i dag ved lov forsikre ansatte mod arbejdsskader.",
+                    "Ansatte skal stadig i dag selv erstatte skader på arbejdsgiverens udstyr.",
+                    "Arbejdsmiljøregler beskytter i dag kun maskiner, aldrig de ansatte selv."
+                ],
+                correct: 0,
+                expl: "I dag skal arbejdsgivere i Danmark tegne lovpligtig arbejdsskadeforsikring, og Arbejdstilsynet fører kontrol med sikkerheden. Fokus er flyttet fra udelukkende at beskytte ejerens udstyr til også at beskytte den ansattes helbred."
+            }
+        },
+        {
+            quote: "16. Ejerne anbefaler, at deres arbejdere vasker sig hver morgen, men de skal vaske sig to gange om ugen, mandag morgen og torsdag morgen; og enhver, der findes ikke at være vasket, skal betale 3 d. i bøde i hvert tilfælde.",
+            then: {
+                options: [
+                    "Fabrikkens kontrol rakte helt ind i arbejdernes personlige hygiejne.",
+                    "Reglen skulle forhindre sygdomsspredning blandt fabrikkens mange kunder.",
+                    "Arbejderne selv havde bedt om faste vaskedage af hensyn til sundheden."
+                ],
+                correct: 0,
+                expl: "At fabriksejeren kunne bøde arbejdere for manglende personlig vask, viser hvor langt ind i arbejdernes private forhold fabrikkens kontrol rakte — det handlede ikke kun om selve arbejdsindsatsen."
+            },
+            today: {
+                options: [
+                    "En arbejdsgiver må normalt i dag ikke bøde ansattes personlige hygiejne.",
+                    "Danske arbejdsgivere fastsætter stadig i dag lovpligtige vaskedage.",
+                    "Persondataloven forbyder i dag arbejdsgivere at nævne personlig hygiejne."
+                ],
+                correct: 0,
+                expl: "I dag sætter regler om ligebehandling og privatlivets fred klare grænser for, hvor meget en arbejdsgiver må regulere medarbejderes private forhold — men det er ikke et specifikt databeskyttelses-forbud mod at nævne emnet."
+            }
+        }
+    ];
+
+    let currentView = 0;
+    let wrongAttempts = 0;
+    const totalRules = ruleTasks.length;
+    const completed = new Array(totalRules).fill(false);
+
+    document.getElementById("rule-total").innerText = totalRules;
+
+    function startAnalysis() {
+        document.getElementById("intro-box").style.display = "none";
+        document.getElementById("start-wrap").style.display = "none";
+        document.getElementById("stepper").style.display = "block";
+        renderView(0, "live");
+    }
+
+    function goBack() {
+        if (currentView > 0) {
+            renderView(currentView - 1, "review");
+        }
+    }
+
+    function reviewForward() {
+        if (currentView < totalRules - 1) {
+            const next = currentView + 1;
+            renderView(next, completed[next] ? "review" : "live");
+        }
+    }
+
+    function reviewFromFinish() {
+        document.getElementById("finish-box").style.display = "none";
+        document.getElementById("stepper").style.display = "block";
+        renderView(totalRules - 1, "review");
+    }
+
+    function renderView(index, mode) {
+        currentView = index;
+        const task = ruleTasks[index];
+
+        document.getElementById("rule-progress").innerText = index + 1;
+        document.getElementById("back-btn").style.display = index > 0 ? "inline-block" : "none";
+
+        const tag = (mode === "review") ? '<span class="review-tag">Gennemsyn</span>' : "";
+        document.getElementById("step-quote").innerHTML =
+            '<span class="source-title">KILDE 23 — uddrag ' + (index + 1) + ' af ' + totalRules + tag + '</span>' + task.quote;
+
+        const continueBtn = document.getElementById("continue-btn");
+        continueBtn.style.display = "none";
+
+        if (mode === "review") {
+            renderStaticBlock("then-options", "then-expl", "then-retry-note", task.then, "then-block");
+            renderStaticBlock("today-options", "today-expl", "today-retry-note", task.today, "today-block");
+            if (index < totalRules - 1) {
+                continueBtn.innerText = "Videre →";
+                continueBtn.onclick = reviewForward;
+                continueBtn.style.display = "inline-block";
+            }
+        } else {
+            renderLive(task);
+        }
+    }
+
+    function renderStaticBlock(optId, explId, retryId, data, blockId) {
+        document.getElementById(blockId).classList.remove("locked");
+        document.getElementById(retryId).style.display = "none";
+
+        const box = document.getElementById(optId);
+        box.innerHTML = "";
+        data.options.forEach((text, i) => {
+            const btn = document.createElement("button");
+            btn.innerText = text;
+            btn.disabled = true;
+            if (i === data.correct) btn.classList.add("correct");
+            box.appendChild(btn);
+        });
+
+        const explBox = document.getElementById(explId);
+        explBox.innerHTML = "✅ <b>Rigtigt!</b><br>" + data.expl;
+        explBox.style.display = "block";
+    }
+
+    function renderLive(task) {
+        const thenBlock = document.getElementById("then-block");
+        const todayBlock = document.getElementById("today-block");
+        thenBlock.classList.remove("locked");
+        todayBlock.classList.add("locked");
+
+        document.getElementById("then-expl").style.display = "none";
+        document.getElementById("then-expl").innerHTML = "";
+        document.getElementById("then-retry-note").style.display = "none";
+        document.getElementById("today-options").innerHTML = "";
+        document.getElementById("today-expl").style.display = "none";
+        document.getElementById("today-expl").innerHTML = "";
+        document.getElementById("today-retry-note").style.display = "none";
+
+        buildRetryOptions("then-options", task.then, "then-expl", "then-retry-note", function() {
+            const continueBtn = document.getElementById("continue-btn");
+            continueBtn.innerText = "Videre til næste spørgsmål →";
+            continueBtn.onclick = function() {
+                continueBtn.style.display = "none";
+                todayBlock.classList.remove("locked");
+                buildRetryOptions("today-options", task.today, "today-expl", "today-retry-note", function() {
+                    const isLast = currentView === totalRules - 1;
+                    continueBtn.innerText = isLast ? "Se resultat" : "Næste uddrag →";
+                    continueBtn.onclick = function() {
+                        completed[currentView] = true;
+                        if (isLast) {
+                            showFinish();
+                        } else {
+                            renderView(currentView + 1, "live");
+                        }
+                    };
+                    continueBtn.style.display = "inline-block";
+                });
+            };
+            continueBtn.style.display = "inline-block";
+        });
+    }
+
+    function buildRetryOptions(containerId, data, explId, retryNoteId, onSuccess) {
+        const box = document.getElementById(containerId);
+        box.innerHTML = "";
+        const explBox = document.getElementById(explId);
+        const retryNote = document.getElementById(retryNoteId);
+
+        data.options.forEach((text, i) => {
+            const btn = document.createElement("button");
+            btn.innerText = text;
+            btn.onclick = function() {
+                if (i === data.correct) {
+                    box.querySelectorAll("button").forEach(b => b.disabled = true);
+                    btn.classList.add("correct");
+                    retryNote.style.display = "none";
+                    explBox.innerHTML = "✅ <b>Rigtigt!</b><br>" + data.expl;
+                    explBox.style.display = "block";
+                    onSuccess();
+                } else {
+                    btn.classList.add("wrong");
+                    btn.disabled = true;
+                    wrongAttempts++;
+                    retryNote.style.display = "block";
+                }
+            };
+            box.appendChild(btn);
+        });
+    }
+
+    function showFinish() {
+        document.getElementById("stepper").style.display = "none";
+        document.getElementById("finish-box").style.display = "block";
+        document.getElementById("finish-attempts").innerText = wrongAttempts === 0
+            ? "Du ramte rigtigt i første forsøg hver gang — flot!"
+            : "Du brugte i alt " + wrongAttempts + " ekstra forsøg undervejs.";
+    }
+</script>
+
+</body>
+</html>

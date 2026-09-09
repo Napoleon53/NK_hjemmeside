@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title>Forståelsesquiz: Den industrielle revolution i England (VV2 s. 73-79)</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1a17;
+            color: #ecebe8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .quiz-container {
+            background-color: #2b241f;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 750px;
+            border-top: 6px solid #c0642c;
+        }
+        h1 {
+            text-align: center;
+            color: #d97a3f;
+            margin-bottom: 10px;
+            margin-top: 0;
+        }
+        .subtitle {
+            text-align: center;
+            font-style: italic;
+            color: #b8ada2;
+            margin-bottom: 30px;
+            font-size: 1em;
+        }
+        .question {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        /* Spørgsmålsoversigt */
+        .quiz-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #46403a;
+        }
+        .nav-dot {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 2px solid #46403a;
+            background-color: #1e1a17;
+            color: #b8ada2;
+            font-size: 0.85em;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s, border-color 0.2s;
+        }
+        .nav-dot:hover:not(.locked):not(.nav-current) { transform: translateY(-2px); border-color: #d97a3f; }
+        .nav-dot.locked { opacity: 0.3; cursor: default; }
+        .nav-dot.nav-pending { border-color: #8a7c6d; }
+        .nav-dot.nav-correct { background-color: #1f4d33; border-color: #27ae60; color: #d4edda; }
+        .nav-dot.nav-wrong { background-color: #4d221f; border-color: #b0392a; color: #f8d7da; }
+        .nav-dot.nav-current { border-width: 3px; box-shadow: 0 0 0 2px rgba(217,122,63,0.35); }
+
+        .review-note {
+            font-size: 0.85em;
+            color: #e0b84a;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        /* Hint Styling */
+        .hint-btn {
+            background: none;
+            border: 1px solid #8a7c6d;
+            color: #b8ada2;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+        }
+        .hint-btn:hover { background-color: #8a7c6d; color: #1e1a17; }
+        .hint-text {
+            display: none;
+            background-color: #1e1a17;
+            padding: 10px;
+            border-left: 3px solid #3498db;
+            margin-bottom: 20px;
+            font-style: italic;
+            color: #b8ada2;
+        }
+        .hint-warning {
+            font-size: 0.85em;
+            color: #e0b84a;
+            margin-left: 8px;
+        }
+
+        /* Knapper */
+        .options button {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            margin: 12px 0;
+            background-color: #ecf0f1;
+            color: #1e1a17;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            text-align: left;
+            transition: transform 0.1s, background-color 0.2s;
+        }
+        .options button:hover {
+            background-color: #d8cfc4;
+            transform: translateX(5px);
+        }
+        .options button:disabled {
+            cursor: default;
+            transform: none;
+        }
+
+        /* Feedback farver */
+        .correct { background-color: #27ae60 !important; color: white !important; }
+        .wrong { background-color: #b0392a !important; color: white !important; }
+
+        .explanation {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #1e1a17;
+            border-left: 5px solid #d97a3f;
+            display: none;
+            line-height: 1.6;
+        }
+        .point-tag {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .point-full { color: #2ecc71; }
+        .point-half { color: #e0b84a; }
+        .point-zero { color: #e0555a; }
+
+        .footer {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #46403a;
+            padding-top: 20px;
+        }
+        #score-display { font-weight: bold; font-size: 1.1em; }
+        #next-btn {
+            padding: 12px 25px;
+            background-color: #c0642c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            display: none;
+        }
+        #next-btn:hover { background-color: #9d5122; }
+
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <h1>Den Industrielle Revolution i England</h1>
+    <p class="subtitle">Forståelsesquiz om politik, landbrug, industri og transport (VV2 s. 73-79)</p>
+
+    <div class="quiz-nav" id="quiz-nav"></div>
+
+    <div id="quiz-content">
+        <div id="question-box" class="question">Indlæser spørgsmål...</div>
+
+        <div class="review-note" id="review-note">🔍 Du gennemser et tidligere besvaret spørgsmål — dit svar tæller stadig som det oprindelige.</div>
+
+        <button id="show-hint-btn" class="hint-btn" onclick="toggleHint()">💡 Vis Hint</button>
+        <span id="hint-warning" class="hint-warning" style="display:none;">(giver kun ½ point for spørgsmålet)</span>
+        <div id="hint-box" class="hint-text"></div>
+
+        <div id="options-box" class="options"></div>
+        <div id="explanation-box" class="explanation"></div>
+    </div>
+
+    <div class="footer">
+        <span id="score-display">Spørgsmål 1 af 12</span>
+        <button id="next-btn">Næste spørgsmål &rarr;</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            q: "Hvordan var magten fordelt mellem den engelske konge og parlamentet i 1700-tallet?",
+            hint: "Tænk på, hvem der bestemte over skatter og hæren.",
+            a: [
+                { text: "Kongen kunne frit opkræve skatter og styre hæren alene.", correct: false },
+                { text: "Kongen var bundet af parlamentets love om skat og hær.", correct: true },
+                { text: "Parlamentet var kun rådgivende og havde ingen reel magt.", correct: false }
+            ],
+            expl: "Skatteopkrævningen og magten over hæren og flåden lå hos parlamentet, ikke hos kongen. Kongen var bundet af de love, parlamentet vedtog."
+        },
+        {
+            q: "Hvordan var det engelske landbrug organiseret i begyndelsen af 1700-tallet?",
+            hint: "Omkring halvdelen af jorden var ejet af...",
+            a: [
+                { text: "Al jord var statsejet og fordelt ligeligt til alle bønder.", correct: false },
+                { text: "Godsejere ejede cirka halvdelen af jorden, resten var selvejerbønders.", correct: true },
+                { text: "Der fandtes hverken godsejere eller fæstebønder, kun gårdejere.", correct: false }
+            ],
+            expl: "Godsejernes jord blev dyrket af fæstebønder, husmænd og jordløse landarbejdere. Den øvrige jord var ejet af selvejerbønder, altså bønder der ejede deres egen jord."
+        },
+        {
+            q: "Hvad betød 'enclosure' (indhegning) for det engelske landbrug?",
+            hint: "Fælles græsningsarealer blev til noget andet...",
+            a: [
+                { text: "Fælles græsningsarealer blev samlet og indhegnet til større marker.", correct: true },
+                { text: "Al jord blev givet tilbage til kronen og fordelt på ny.", correct: false },
+                { text: "Landbrugsjorden blev opdelt i endnu flere små jordlodder.", correct: false }
+            ],
+            expl: "Man opgav de store frie fællesarealer, hvor får og kvæg havde græsset, og indhegnede dem i stedet til marker — på engelsk 'enclosure'."
+        },
+        {
+            q: "Hvad kendetegnede en 'manufaktur' sammenlignet med traditionelt håndværk?",
+            hint: "Mange håndværkere blev samlet ét sted.",
+            a: [
+                { text: "Mange håndværkere samlet ét sted med en vis arbejdsdeling.", correct: true },
+                { text: "Produktionen foregik udelukkende ved hjælp af dampkraft.", correct: false },
+                { text: "Kun én håndværker lavede hele produktet alene.", correct: false }
+            ],
+            expl: "Manufaktur afløste forlagsvirksomhederne og blev forstadiet til den industriproduktion, der slog igennem i England i sidste halvdel af 1700-tallet."
+        },
+        {
+            q: "Hvad var særligt ved den industrielle produktionsform i forhold til traditionelt håndværk?",
+            hint: "Tænk på, hvilke krav der blev stillet til arbejderens kvalifikationer.",
+            a: [
+                { text: "Den krævede lang håndværksmæssig oplæring af alle arbejdere.", correct: false },
+                { text: "Arbejdsdeling gjorde, at ufaglærte hurtigt kunne læres op.", correct: true },
+                { text: "Den producerede udelukkende luksusvarer til overklassen.", correct: false }
+            ],
+            expl: "Fordi produktionen foregik ved arbejdsdeling, blev der stillet færre krav til den enkelte arbejders kvalifikationer."
+        },
+        {
+            q: "Hvad var 'Spinning Jenny' fra 1764?",
+            hint: "Den kunne gøre 16 spinderes arbejde.",
+            a: [
+                { text: "En hånddrevet maskine, der kunne spinde som 16 personer.", correct: true },
+                { text: "Et dampdrevet skib, der fragtede bomuld til England.", correct: false },
+                { text: "Den første jernbanestrækning, bygget i England i 1764.", correct: false }
+            ],
+            expl: "Spinning Jenny var en af flere opfindelser, der skulle klare den stigende efterspørgsel på garn, som de simple spindehjul ikke længere kunne følge med til."
+        },
+        {
+            q: "De tidlige spindemaskiner blev drevet af vandkraft. Hvorfor blev James Watts dampmaskine (1769) alligevel afgørende for industriens videre udvikling?",
+            hint: "Tænk på, hvad der begrænsede vandkraften som energikilde.",
+            a: [
+                { text: "Fabrikker kunne nu placeres frit, uafhængigt af vandløb og årstid.", correct: true },
+                { text: "Dampmaskinen var den første maskine, der overhovedet krævede brændsel.", correct: false },
+                { text: "Vandkraft blev forbudt af det engelske parlament kort efter 1769.", correct: false }
+            ],
+            expl: "Vandkraft bandt fabrikkerne til floder og varierede med årstiden. Dampmaskinen gjorde produktionen uafhængig af naturens energikilder, og fabrikssystemet kunne derfor brede sig overalt."
+        },
+        {
+            q: "Hvad gjorde det muligt at øge den engelske jernproduktion kraftigt i slutningen af 1700-tallet?",
+            hint: "England var ved at løbe tør for skov til at varme højovnene.",
+            a: [
+                { text: "Man importerede al jernet færdigt fra Frankrig i stedet.", correct: false },
+                { text: "Man brugte koks af stenkul i stedet for træ.", correct: true },
+                { text: "Man opgav jernproduktion til fordel for tekstilindustrien.", correct: false }
+            ],
+            expl: "Koks af stenkul gav højere varme og bedre jernkvalitet — produktionen steg fra ca. 50.000 tons (1750) til 2,25 millioner tons (1850)."
+        },
+        {
+            q: "Hvad var særligt ved den første jernbanestrækning fra 1829 mellem Liverpool og Manchester?",
+            hint: "Sammenlign transporttiden med den gamle slæbebåd på kanalerne.",
+            a: [
+                { text: "Godstransporten faldt fra cirka 36 timer til cirka 2 timer.", correct: true },
+                { text: "Den blev kun brugt til persontransport, aldrig til gods.", correct: false },
+                { text: "Den forbandt den engelske hovedstad direkte med Paris.", correct: false }
+            ],
+            expl: "Jernbanen gjorde det muligt at transportere varer langt hurtigere og billigere end den tidligere godstransport ad kanalerne."
+        },
+        {
+            q: "Hvilken naturgiven fordel havde England, som fremmede den tidlige industrialisering?",
+            hint: "Tænk på landets kyststrækninger og hvad der lå i undergrunden.",
+            a: [
+                { text: "Rigelige forsyninger af kul og jern samt billig søtransport.", correct: true },
+                { text: "Store bjergkæder, der beskyttede landet mod invasion.", correct: false },
+                { text: "Et varmt klima, der gav flere høstsæsoner om året.", correct: false }
+            ],
+            expl: "England havde rigelige kul- og jernforsyninger, og de lange kyststrækninger gav gode muligheder for billig søtransport."
+        },
+        {
+            q: "Hvorfor spillede de engelske godsejere en større rolle for industrialiseringen, end den franske adel gjorde i Frankrig?",
+            hint: "Hvad brugte den franske adel typisk deres penge på?",
+            a: [
+                { text: "Engelske godsejere investerede i minedrift, infrastruktur og handel.", correct: true },
+                { text: "Engelske godsejere havde slet ingen penge at investere.", correct: false },
+                { text: "Fransk adel investerede faktisk mere i industri end englænderne.", correct: false }
+            ],
+            expl: "Teknologisk stod Frankrig og England lige, men der var ikke den samme kapital til stede i Frankrig, fordi adelen ikke havde tradition for at investere ud over deres godser."
+        },
+        {
+            q: "Hvordan var levevilkårene for mange fabriksarbejdere i industribyer som Manchester?",
+            hint: "En undersøgelse fra 1830 om levealder.",
+            a: [
+                { text: "Tætpakkede, mørke boliger uden toilet — levealder på blot 17 år.", correct: true },
+                { text: "Rummelige lejligheder med god hygiejne og stigende levealder.", correct: false },
+                { text: "De fleste boede stadig på landet og pendlede ind hver dag.", correct: false }
+            ],
+            expl: "Kulstøv fra opvarmning lagde sig som en tæt tåge over kvarteret og førte til høj dødelighed — især blandt børn."
+        }
+    ];
+
+    let current = 0;
+    let maxReached = 0;
+    let score = 0;
+    let hintUsed = false;
+    const totalQ = questions.length;
+    const answersState = new Array(totalQ).fill(null);
+    // Rækkefølgen af svarmuligheder blandes én gang pr. spørgsmål og genbruges,
+    // så et spørgsmål viser den SAMME rækkefølge, hvis man vender tilbage via nav-prikkerne.
+    const questionOrders = questions.map(q => q.a.map((_, idx) => idx).sort(() => Math.random() - 0.5));
+
+    const qBox = document.getElementById("question-box");
+    const hintBox = document.getElementById("hint-box");
+    const hintBtn = document.getElementById("show-hint-btn");
+    const hintWarning = document.getElementById("hint-warning");
+    const optBox = document.getElementById("options-box");
+    const explBox = document.getElementById("explanation-box");
+    const nextBtn = document.getElementById("next-btn");
+    const scoreDisplay = document.getElementById("score-display");
+    const reviewNote = document.getElementById("review-note");
+    const navBox = document.getElementById("quiz-nav");
+
+    function buildNav() {
+        navBox.innerHTML = "";
+        questions.forEach((q, i) => {
+            const dot = document.createElement("button");
+            dot.className = "nav-dot";
+            dot.innerText = i + 1;
+            if (i > maxReached) {
+                dot.classList.add("locked");
+                dot.disabled = true;
+            } else {
+                if (answersState[i]) {
+                    dot.classList.add(answersState[i].isCorrect ? "nav-correct" : "nav-wrong");
+                } else {
+                    dot.classList.add("nav-pending");
+                }
+                if (i === current) dot.classList.add("nav-current");
+                dot.onclick = () => goToQuestion(i);
+            }
+            navBox.appendChild(dot);
+        });
+    }
+
+    function goToQuestion(i) {
+        current = i;
+        if (answersState[i]) {
+            renderReview(i);
+        } else {
+            renderLive(i);
+        }
+        buildNav();
+    }
+
+    function renderLive(i) {
+        explBox.style.display = "none";
+        nextBtn.style.display = "none";
+        nextBtn.onclick = null;
+        hintBox.style.display = "none";
+        hintBtn.style.display = "inline-block";
+        hintBtn.disabled = false;
+        hintWarning.style.display = "none";
+        reviewNote.style.display = "none";
+        hintUsed = false;
+        optBox.innerHTML = "";
+
+        const qData = questions[i];
+        qBox.innerText = qData.q;
+        hintBox.innerText = "💡 " + qData.hint;
+        scoreDisplay.innerText = `Spørgsmål ${i + 1} af ${totalQ}`;
+
+        questionOrders[i].forEach(optIndex => {
+            const opt = qData.a[optIndex];
+            const btn = document.createElement("button");
+            btn.innerText = opt.text;
+            btn.onclick = () => checkAnswer(optIndex, btn, qData, i);
+            optBox.appendChild(btn);
+        });
+    }
+
+    function renderReview(i) {
+        const qData = questions[i];
+        const state = answersState[i];
+
+        hintBox.style.display = "none";
+        hintBtn.style.display = "none";
+        hintWarning.style.display = "none";
+        reviewNote.style.display = "block";
+        optBox.innerHTML = "";
+
+        qBox.innerText = qData.q;
+        scoreDisplay.innerText = `Spørgsmål ${i + 1} af ${totalQ}`;
+
+        questionOrders[i].forEach(optIndex => {
+            const opt = qData.a[optIndex];
+            const btn = document.createElement("button");
+            btn.innerText = opt.text;
+            btn.disabled = true;
+            if (opt.correct) btn.classList.add("correct");
+            else if (optIndex === state.selectedIndex) btn.classList.add("wrong");
+            optBox.appendChild(btn);
+        });
+
+        explBox.innerHTML = (state.isCorrect ? "✅ <b>Korrekt!</b><br>" : "❌ <b>Forkert.</b><br>") + qData.expl + state.pointTag;
+        explBox.style.display = "block";
+
+        nextBtn.innerText = "→ Tilbage til nuværende spørgsmål";
+        nextBtn.onclick = () => goToQuestion(maxReached);
+        nextBtn.style.display = "inline-block";
+    }
+
+    function toggleHint() {
+        if (hintBox.style.display === "none") {
+            hintBox.style.display = "block";
+            hintUsed = true;
+            hintWarning.style.display = "inline";
+        } else {
+            hintBox.style.display = "none";
+        }
+    }
+
+    function checkAnswer(index, btn, qData, i) {
+        const allBtns = optBox.querySelectorAll("button");
+        allBtns.forEach(b => b.disabled = true);
+        hintBtn.disabled = true;
+        hintBox.style.display = "none";
+
+        const isCorrect = qData.a[index].correct;
+        let pointTag = "";
+
+        if (isCorrect) {
+            btn.classList.add("correct");
+            if (hintUsed) {
+                score += 0.5;
+                pointTag = '<span class="point-tag point-half">☆ ½ point (du brugte hintet)</span>';
+            } else {
+                score += 1;
+                pointTag = '<span class="point-tag point-full">★ 1 point</span>';
+            }
+            explBox.innerHTML = "✅ <b>Korrekt!</b><br>" + qData.expl + pointTag;
+        } else {
+            btn.classList.add("wrong");
+            const correctIndex = qData.a.findIndex(o => o.correct);
+            const correctPos = questionOrders[i].indexOf(correctIndex);
+            allBtns[correctPos].classList.add("correct");
+            pointTag = '<span class="point-tag point-zero">0 point</span>';
+            explBox.innerHTML = "❌ <b>Forkert.</b><br>" + qData.expl + pointTag;
+        }
+
+        answersState[i] = { selectedIndex: index, isCorrect: isCorrect, pointTag: pointTag };
+
+        explBox.style.display = "block";
+        nextBtn.style.display = "block";
+        nextBtn.onclick = nextQuestion;
+        nextBtn.innerText = (i === totalQ - 1) ? "Se resultat" : "Næste spørgsmål →";
+
+        buildNav();
+    }
+
+    function nextQuestion() {
+        current++;
+        if (current > maxReached) maxReached = current;
+        if (current < totalQ) {
+            renderLive(current);
+            buildNav();
+        } else {
+            showResult();
+        }
+    }
+
+    function formatScore(s) {
+        return (Math.round(s * 2) / 2).toString().replace(".", ",");
+    }
+
+    function showResult() {
+        document.querySelector(".quiz-container").innerHTML = `
+            <h1 style="color:#d97a3f">Quiz Gennemført!</h1>
+            <p style="text-align:center; font-size:1.5em; margin: 30px 0;">Du fik <b>${formatScore(score)}</b> ud af <b>${totalQ}</b> point.</p>
+            <p style="text-align:center; color:#b8ada2;">
+                ${score >= 10 ? "Fremragende! Du har helt styr på Englands industrialisering." :
+                  score >= 7 ? "Godt gået. Læs teksten en gang til for at fange de sidste detaljer." :
+                  "Prøv igen. Husk at bruge hints, hvis du er i tvivl — de koster kun et halvt point!"}
+            </p>
+            <button onclick="location.reload()" style="display:block; margin:40px auto; padding:15px 30px; background:#c0642c; border:none; border-radius:5px; cursor:pointer; font-weight:bold; color:white; font-size:1.1em;">Prøv igen</button>
+        `;
+    }
+
+    // Start
+    renderLive(0);
+    buildNav();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Reaktionshastighed - animation</title>
+<style>
+    :root {
+        --bg: #0f172a;
+        --panel: #1e293b;
+        --panel2: #24324a;
+        --text: #f1f5f9;
+        --muted: #94a3b8;
+        --accent: #38bdf8;
+        --product: #fbbf24;
+        --reactant: #38bdf8;
+        --good: #4ade80;
+        --bad: #f87171;
+        --border: rgba(255, 255, 255, 0.15);
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--bg);
+        color: var(--text);
+        overflow-x: hidden;
+        user-select: none;
+    }
+    header {
+        background: rgba(15, 23, 42, 0.95);
+        padding: 10px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
+    h1 { margin: 0; font-size: 1.15rem; letter-spacing: 0.5px; color: var(--accent); }
+    h1 small { display: block; font-size: 0.7rem; color: var(--muted); font-weight: normal; letter-spacing: 0; }
+    .header-btns { display: flex; gap: 8px; }
+    .header-btns button {
+        border: none; color: #fff; padding: 8px 16px; border-radius: 6px;
+        font-weight: bold; font-size: 0.85rem; cursor: pointer;
+    }
+    .teori-btn { background: #0891b2; }
+    .teori-btn:hover { background: #06b6d4; }
+    .quiz-btn { background: #7c3aed; }
+    .quiz-btn:hover { background: #8b5cf6; }
+    .guide-btn { background: #059669; }
+    .guide-btn:hover { background: #10b981; }
+
+    /* ---------- GUIDED TOUR (spotlight) ---------- */
+    #guide-highlight {
+        position: fixed; border-radius: 10px; pointer-events: none;
+        box-shadow: 0 0 0 4px var(--accent), 0 0 0 9999px rgba(0,0,0,0.65);
+        transition: top 0.35s ease, left 0.35s ease, width 0.35s ease, height 0.35s ease;
+        z-index: 500; display: none;
+    }
+    #guide-highlight.active { display: block; }
+    #guide-tooltip {
+        position: fixed; width: 320px; max-width: calc(100vw - 20px);
+        background: var(--panel); border: 2px solid var(--accent); border-radius: 12px;
+        padding: 16px 18px; z-index: 501; font-family: 'Segoe UI', sans-serif;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.6); display: none;
+    }
+    #guide-tooltip.active { display: block; }
+    #guide-step-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    #guide-title { font-weight: bold; font-size: 1.05rem; color: var(--accent); margin-bottom: 8px; }
+    #guide-text { font-size: 0.88rem; line-height: 1.5; color: var(--text); margin-bottom: 16px; }
+    .guide-nav { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+    .guide-nav-btn {
+        padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.06);
+        color: var(--text); cursor: pointer; font-size: 0.8rem;
+    }
+    .guide-nav-btn:hover { background: rgba(255,255,255,0.16); }
+    .guide-nav-btn.guide-primary { background: var(--accent); color: #04202e; font-weight: bold; border-color: var(--accent); }
+    .guide-nav-btn.guide-skip { background: transparent; border-color: transparent; color: var(--muted); }
+
+    /* ---------- TOP TABS ---------- */
+    .top-tabs { display: flex; gap: 8px; padding: 10px 20px; background: var(--panel); border-bottom: 1px solid var(--border); }
+    .top-tabs button {
+        padding: 9px 18px; border-radius: 8px; border: 1px solid var(--border);
+        background: rgba(255,255,255,0.05); color: var(--text); font-weight: bold; font-size: 0.85rem; cursor: pointer;
+    }
+    .top-tabs button:hover { background: rgba(255,255,255,0.12); }
+    .top-tabs button.active { background: var(--accent); color: #04202e; border-color: var(--accent); }
+
+    /* ---------- MAIN AREA (TAB 1) ---------- */
+    .main-container {
+        display: flex;
+        gap: 0;
+        min-height: 640px;
+    }
+
+    .beaker-column {
+        flex: 0 0 220px;
+        background: radial-gradient(circle at center, #1e293b 0%, #0f172a 80%);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 16px 12px;
+        gap: 10px;
+    }
+    .beaker-title { font-size: 0.75rem; color: var(--muted); text-align: center; }
+    #beakerCanvas { width: 120px; height: 170px; display: block; }
+    .beaker-readouts { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+    .b-card {
+        background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 8px;
+        padding: 6px 8px; text-align: center;
+    }
+    .b-label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; }
+    .b-val { font-family: monospace; font-weight: bold; font-size: 0.95rem; }
+
+    .big-play-btn {
+        width: 100%; padding: 16px 8px; font-size: 1.05rem; font-weight: bold; border-radius: 10px;
+        border: none; cursor: pointer; background: linear-gradient(135deg, #4ade80, #16a34a); color: #052e12;
+        box-shadow: 0 4px 14px rgba(74, 222, 128, 0.35); margin-top: 4px;
+    }
+    .big-play-btn:hover { filter: brightness(1.08); }
+    .big-play-btn.active { background: linear-gradient(135deg, #fbbf24, #d97706); color: #3a2400; box-shadow: 0 4px 14px rgba(251, 191, 36, 0.35); }
+    .reset-btn {
+        width: 100%; padding: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.05);
+        color: var(--text); border-radius: 6px; font-size: 0.75rem; cursor: pointer;
+    }
+    .reset-btn:hover { background: rgba(255,255,255,0.15); }
+
+    .tool-select-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; margin-top: 8px; align-self: flex-start; }
+    .tool-select-btn {
+        width: 100%; text-align: left; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border);
+        background: rgba(255,255,255,0.05); color: var(--text); font-size: 0.76rem; font-weight: bold; cursor: pointer;
+        display: flex; align-items: center; gap: 6px;
+    }
+    .tool-select-btn:hover { background: rgba(255,255,255,0.12); }
+    .tool-select-btn.active { background: var(--accent); color: #04202e; border-color: var(--accent); }
+
+    .graph-column {
+        flex: 1 1 auto;
+        min-width: 340px;
+        display: flex;
+        flex-direction: column;
+        padding: 12px 14px;
+        gap: 8px;
+    }
+    .dataset-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .dataset-row .lbl { font-size: 0.72rem; color: var(--muted); }
+    .dataset-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .dataset-btns button {
+        background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--text);
+        padding: 6px 12px; border-radius: 6px; font-size: 0.78rem; font-weight: bold; cursor: pointer;
+    }
+    .dataset-btns button:hover { background: rgba(255,255,255,0.16); }
+    #btnShowBr2.active { background: var(--product); color: #2a1a00; border-color: var(--product); }
+    #btnShowBrO3.active { background: var(--reactant); color: #04202e; border-color: var(--reactant); }
+
+    .instruction-box {
+        background: rgba(56, 189, 248, 0.08); border-left: 4px solid var(--accent); border-radius: 6px;
+        padding: 8px 12px; font-size: 0.8rem; color: #e2e8f0; line-height: 1.4; flex-shrink: 0;
+    }
+    .instruction-box b { color: var(--accent); }
+
+    .graph-canvas-wrap { flex: 1 1 auto; position: relative; min-height: 320px; }
+    #graphCanvas { width: 100%; height: 100%; cursor: default; display: block; }
+
+    .calc-column {
+        flex: 0 0 260px;
+        max-width: 260px;
+        background: var(--panel);
+        border-left: 1px solid var(--border);
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        overflow-y: auto;
+    }
+    .fbox {
+        background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px;
+        padding: 10px 12px;
+    }
+    .fbox-title { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; font-weight: bold; }
+    .calc-panel { display: flex; flex-direction: column; gap: 6px; }
+    .calc-row { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.85rem; }
+    .calc-row .k { color: var(--muted); }
+    .calc-row .v { font-family: monospace; font-weight: bold; }
+    .calc-result {
+        margin-top: 4px; padding: 8px 10px; border-radius: 8px; background: rgba(251, 191, 36, 0.12);
+        border: 1px solid rgba(251, 191, 36, 0.4); text-align: center; font-family: monospace; font-weight: bold;
+        font-size: 1rem; color: var(--product);
+    }
+    .calc-result.sub { background: rgba(56, 189, 248, 0.12); border-color: rgba(56,189,248,0.4); color: var(--reactant); font-size: 0.9rem; margin-top: 6px; }
+    #tangentBtn {
+        width: 100%; margin-top: 8px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--text);
+        padding: 8px 12px; border-radius: 6px; font-size: 0.78rem; font-weight: bold; cursor: pointer;
+    }
+    #tangentBtn:hover { background: rgba(255,255,255,0.16); }
+    #tangentBtn.active { background: var(--good); color: #052e12; border-color: var(--good); }
+
+    /* ---------- FACTORS TAB ---------- */
+    .factors-section { padding: 18px 20px 40px; }
+    .factors-section h2 { color: var(--accent); font-size: 1.05rem; margin: 0 0 4px; }
+    .factors-section > p.sub { color: var(--muted); font-size: 0.82rem; margin: 0 0 16px; }
+    .factors-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; }
+    .factor-card {
+        background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px;
+    }
+    .factor-card h3 { margin: 0 0 4px; font-size: 0.95rem; color: var(--text); }
+    .factor-card .fig-note { font-size: 0.75rem; color: var(--muted); margin: 0 0 10px; }
+    .demo-canvas-wrap { position: relative; background: rgba(0,0,0,0.3); border-radius: 8px; overflow: hidden; }
+    #concCanvas, #areaCanvas { width: 100%; height: 190px; display: block; }
+    .demo-controls { display: flex; gap: 14px; margin-top: 10px; flex-wrap: wrap; }
+    .demo-slider-group { flex: 1 1 140px; }
+    .demo-slider-group label { font-size: 0.72rem; color: var(--muted); display: block; margin-bottom: 4px; }
+    .demo-slider-group .btn-row3 { display: flex; gap: 4px; }
+    .demo-slider-group .btn-row3 button {
+        flex: 1; padding: 5px 2px; border: 1px solid var(--border); background: rgba(255,255,255,0.05);
+        color: var(--text); font-size: 0.7rem; border-radius: 5px; cursor: pointer;
+    }
+    .demo-slider-group .btn-row3 button.active { background: var(--accent); color: #04202e; border-color: var(--accent); font-weight: bold; }
+    .counter-box { margin-top: 8px; font-size: 0.78rem; color: #cbd5e1; text-align: center; }
+    .counter-box b { color: var(--good); font-family: monospace; font-size: 1rem; }
+
+    .small-cards-col { display: flex; flex-direction: column; gap: 16px; }
+    .info-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+    .info-card .ic-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .info-card .ic-icon { font-size: 1.3rem; }
+    .info-card h3 { margin: 0; font-size: 0.95rem; }
+    .info-card p { margin: 0; font-size: 0.8rem; color: #cbd5e1; line-height: 1.45; }
+    .info-card .later { display: block; margin-top: 6px; font-size: 0.72rem; color: var(--muted); font-style: italic; }
+
+    /* ---------- OVERLAYS (Teori + Quiz) ---------- */
+    #teoriOverlay, #quizOverlay {
+        display: none; position: fixed; inset: 0; background: rgba(10, 14, 25, 0.97); z-index: 200;
+        overflow-y: auto; padding: 30px 15px 60px;
+    }
+    .teori-inner {
+        max-width: 640px; margin: 20px auto; background: var(--panel); border: 1px solid var(--border);
+        border-radius: 12px; padding: 26px 28px; position: relative;
+    }
+    .teori-inner .close-x {
+        position: absolute; top: 14px; right: 14px; background: rgba(255,255,255,0.08); border: none;
+        color: var(--text); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 1rem;
+    }
+    .teori-inner .close-x:hover { background: rgba(255,255,255,0.2); }
+    .teori-inner h2 { color: var(--accent); margin: 0 0 14px; }
+    .reaction-eq {
+        background: rgba(0,0,0,0.25); border-radius: 8px; padding: 10px; font-size: 0.9rem;
+        text-align: center; line-height: 1.6; border: 1px solid var(--border); margin-bottom: 16px;
+    }
+    .big-formula {
+        font-family: 'Times New Roman', serif; font-style: italic; font-size: 1.5rem; color: var(--product);
+        text-align: center; margin: 18px 0; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; font-size: 0.72em; line-height: 1.15; margin: 0 2px; }
+    .frac .num { border-bottom: 2px solid currentColor; padding: 0 6px 3px; }
+    .frac .den { padding: 3px 6px 0; }
+    .teori-inner p { font-size: 0.9rem; color: #cbd5e1; line-height: 1.55; }
+    .teori-inner p b { color: var(--text); }
+    .rate-law-box { margin-top: 10px; }
+    .rate-law-box .formula { font-family: 'Times New Roman', serif; font-style: italic; font-size: 1.05rem; }
+
+    .quiz-inner { max-width: 720px; margin: 0 auto; }
+    .quiz-inner h2 { color: var(--accent); margin-bottom: 4px; }
+    .quiz-inner > p { color: #94a3b8; margin-top: 0; margin-bottom: 20px; }
+    .quiz-card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+    .quiz-q { font-weight: bold; margin-bottom: 10px; color: #f1f5f9; line-height: 1.45; }
+    .quiz-q.quiz-q-sub { font-weight: normal; color: #cbd5e1; margin-top: -4px; font-size: 0.92rem; }
+    .quiz-formula {
+        display: block; margin: 4px 0 12px; padding: 10px 14px; background: rgba(0,0,0,0.25);
+        border: 1px solid var(--border); border-radius: 8px; font-family: 'Times New Roman', serif;
+        font-style: italic; font-size: 1.05rem; text-align: center; color: var(--product);
+    }
+    .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+    .quiz-opt {
+        text-align: left; background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--text);
+        padding: 9px 12px; border-radius: 6px; cursor: pointer; font-size: 0.9rem;
+        min-height: 40px; display: flex; align-items: center;
+    }
+    .quiz-opt.quiz-opt-math { font-family: 'Times New Roman', serif; font-style: italic; font-size: 0.98rem; }
+    .quiz-opt:hover { background: rgba(255,255,255,0.1); }
+    .quiz-opt.correct { background: rgba(34, 197, 94, 0.25); border-color: #22c55e; }
+    .quiz-opt.wrong { background: rgba(239, 68, 68, 0.25); border-color: #ef4444; }
+    .quiz-opt:disabled { cursor: default; }
+    .quiz-fb { margin-top: 10px; font-size: 0.85rem; font-weight: bold; min-height: 18px; }
+    .quiz-fb.ok { color: #4ade80; }
+    .quiz-fb.bad { color: #f87171; }
+    .quiz-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+    #quizScore { font-weight: bold; color: var(--accent); }
+    .quiz-close-row { display: flex; gap: 10px; }
+    .plain-btn {
+        background: rgba(255,255,255,0.08); border: 1px solid var(--border); color: var(--text);
+        padding: 8px 14px; border-radius: 6px; font-size: 0.85rem; cursor: pointer;
+    }
+    .plain-btn:hover { background: rgba(255,255,255,0.18); }
+    .quiz-close-btn {
+        background: rgba(248, 113, 113, 0.12); border: 1px solid rgba(248, 113, 113, 0.45); color: #fecaca;
+        padding: 9px 18px; border-radius: 999px; font-size: 0.85rem; font-weight: bold; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 6px; transition: background 0.15s, border-color 0.15s;
+    }
+    .quiz-close-btn:hover { background: rgba(248, 113, 113, 0.22); border-color: rgba(248, 113, 113, 0.75); }
+
+    @media (max-width: 980px) {
+        .main-container { flex-direction: column; min-height: 0; }
+        .beaker-column { flex-direction: row; border-right: none; border-bottom: 1px solid var(--border); flex-wrap: wrap; justify-content: center; }
+        .beaker-readouts { width: auto; flex-direction: row; }
+        .big-play-btn, .reset-btn, .tool-select-label, .tool-select-btn { width: 160px; }
+        .graph-column { min-height: 420px; }
+        .calc-column { flex: none; max-width: none; border-left: none; border-top: 1px solid var(--border); }
+        .factors-grid { grid-template-columns: 1fr; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>1. Kemiske reaktioners hastigheder<small>Basiskemi B, s. 7-13</small></h1>
+    <div class="header-btns">
+        <button class="guide-btn" onclick="startGuide()">&#10067; Hj&aelig;lp til at forst&aring; animationen</button>
+        <button class="teori-btn" onclick="openTeori()">&#128218; Teori</button>
+        <button class="quiz-btn" onclick="openQuiz()">&#129504; Test dig selv</button>
+    </div>
+</header>
+
+<div class="top-tabs">
+    <button class="active" data-tab="graph" onclick="switchTab('graph')">&#128202; Graf &amp; hastighed</button>
+    <button data-tab="factors" onclick="switchTab('factors')">&#129513; Hvad p&aring;virker reaktionshastigheden?</button>
+</div>
+
+<div class="main-container" id="tabGraph">
+
+    <div class="beaker-column">
+        <div class="beaker-title">Reaktionsblandingen<br>bliver mere gul, efterh&aring;nden<br>som Br&#8322; dannes</div>
+        <canvas id="beakerCanvas" width="130" height="190"></canvas>
+        <div class="beaker-readouts">
+            <div class="b-card"><div class="b-label">Tid</div><div class="b-val" id="bTime">0 s</div></div>
+            <div class="b-card"><div class="b-label">[Br&#8322;]</div><div class="b-val" id="bBr2" style="color:var(--product)">0</div></div>
+            <div class="b-card"><div class="b-label">[BrO&#8323;&#8315;]</div><div class="b-val" id="bBrO3" style="color:var(--reactant)">1,00&middot;10&#8315;&#179;</div></div>
+        </div>
+
+        <button class="big-play-btn" id="playBtn" onclick="togglePlay()">&#9654; Afspil</button>
+        <button class="reset-btn" onclick="resetExplore()">&#8634; Nulstil til 0 s</button>
+
+        <div class="tool-select-label">V&aelig;rkt&oslash;j</div>
+        <button class="tool-select-btn" id="avgModeBtn" onclick="toggleAverageMode()">&#128207; Gennemsnitshastighed</button>
+    </div>
+
+    <div class="graph-column">
+        <div class="dataset-row" id="datasetRow">
+            <span class="lbl">Vis p&aring; grafen:</span>
+            <div class="dataset-btns">
+                <button id="btnShowBr2" class="active" onclick="toggleDataset('br2')">[Br&#8322;] (produkt)</button>
+                <button id="btnShowBrO3" class="active" onclick="toggleDataset('bro3')">[BrO&#8323;&#8315;] (reaktant)</button>
+            </div>
+        </div>
+        <div class="instruction-box" id="instructionBox"></div>
+        <div class="graph-canvas-wrap" id="graphCanvasWrap">
+            <canvas id="graphCanvas"></canvas>
+        </div>
+    </div>
+
+    <div class="calc-column">
+        <div class="fbox calc-panel" id="calcPanel">
+            <div class="fbox-title" id="calcTitle">Reaktionshastighed</div>
+            <div id="calcRows"></div>
+            <div class="calc-result" id="calcResultMain">-</div>
+            <div class="calc-result sub" id="calcResultSub" style="display:none;">-</div>
+            <button id="tangentBtn" onclick="toggleTangent()">&#128204; Vis tangent p&aring; graf</button>
+        </div>
+    </div>
+
+</div>
+
+<div class="factors-section" id="tabFactors" style="display:none;">
+    <h2>Hvad p&aring;virker reaktionshastigheden?</h2>
+    <p class="sub">Reaktionshastigheden afh&aelig;nger bl.a. af reaktanternes koncentrationer, overfladeareal (ved heterogene reaktioner), temperatur, katalysator og inhibitor. Pr&oslash;v de to interaktive modeller herunder.</p>
+
+    <div class="factors-grid">
+        <div class="factor-card">
+            <h3>&#129513; Koncentration &amp; temperatur</h3>
+            <p class="fig-note">Jo st&oslash;rre koncentration og jo h&oslash;jere temperatur, desto flere (og hårdere) sammenst&oslash;d pr. tid - og desto st&oslash;rre reaktionshastighed.</p>
+            <div class="demo-canvas-wrap"><canvas id="concCanvas" width="260" height="190"></canvas></div>
+            <div class="demo-controls">
+                <div class="demo-slider-group">
+                    <label>Koncentration</label>
+                    <div class="btn-row3">
+                        <button data-conc="0" onclick="setConcLevel(0)">Lav</button>
+                        <button data-conc="1" class="active" onclick="setConcLevel(1)">Middel</button>
+                        <button data-conc="2" onclick="setConcLevel(2)">H&oslash;j</button>
+                    </div>
+                </div>
+                <div class="demo-slider-group">
+                    <label>Temperatur</label>
+                    <div class="btn-row3">
+                        <button data-temp="0" onclick="setTempLevel(0)">Lav</button>
+                        <button data-temp="1" class="active" onclick="setTempLevel(1)">Middel</button>
+                        <button data-temp="2" onclick="setTempLevel(2)">H&oslash;j</button>
+                    </div>
+                </div>
+            </div>
+            <div class="counter-box">Sammenst&oslash;d/sekund mellem <span style="color:#38bdf8">bl&aring;</span> og <span style="color:#fb923c">orange</span> partikel: <b id="concCounter">0</b></div>
+        </div>
+
+        <div class="small-cards-col">
+            <div class="info-card">
+                <div class="ic-head"><span class="ic-icon">&#9889;</span><h3>Katalysator</h3></div>
+                <p>Et stof, der &oslash;ger reaktionshastigheden uden selv at blive forbrugt af reaktionen.</p>
+                <span class="later">Uddybes i et senere afsnit.</span>
+            </div>
+            <div class="info-card">
+                <div class="ic-head"><span class="ic-icon">&#128683;</span><h3>Inhibitor</h3></div>
+                <p>Et stof, der neds&aelig;tter reaktionshastigheden - modsat en katalysator.</p>
+                <span class="later">Uddybes i et senere afsnit.</span>
+            </div>
+        </div>
+
+        <div class="factor-card" style="grid-column: 1 / -1;">
+            <h3>&#129517; Overfladeareal (heterogene reaktioner)</h3>
+            <p class="fig-note">Mg(s) + 2H<sup>+</sup>(aq) &rarr; Mg&sup2;&#8314;(aq) + H&#8322;(g). Reaktionen sker p&aring; gr&aelig;nsefladen mellem metal og syre - jo st&oslash;rre overfladeareal, desto flere sammenst&oslash;d pr. tid. Samme masse magnesium som <b>kugle</b> eller <b>pulver</b>:</p>
+            <div class="demo-controls" style="margin-top:0; margin-bottom:10px;">
+                <div class="demo-slider-group" style="flex: 0 0 220px;">
+                    <div class="btn-row3">
+                        <button data-shape="ball" class="active" onclick="setShape('ball')">Mg-kugle</button>
+                        <button data-shape="powder" onclick="setShape('powder')">Mg-pulver</button>
+                    </div>
+                </div>
+            </div>
+            <div class="demo-canvas-wrap"><canvas id="areaCanvas" width="500" height="190"></canvas></div>
+            <div class="counter-box">Sammenst&oslash;d med metaloverflade/sekund: <b id="areaCounter">0</b></div>
+        </div>
+    </div>
+</div>
+
+<div id="teoriOverlay">
+    <div class="teori-inner">
+        <button class="close-x" onclick="closeTeori()">&#10005;</button>
+        <h2>&#128218; Teori</h2>
+        <div class="reaction-eq">
+            5Br<sup>&#8315;</sup>(aq) + BrO<sub>3</sub><sup>&#8315;</sup>(aq) + 6H<sup>+</sup>(aq) &rarr; 3Br<sub>2</sub>(aq) + 3H<sub>2</sub>O(l)
+        </div>
+        <p>Reaktionshastigheden defineres som tilv&aelig;ksten i et <b>produkts</b> koncentration pr. tid:</p>
+        <div class="big-formula">v(Br&#8322;) = <span class="frac"><span class="num">&Delta;[Br&#8322;]</span><span class="den">&Delta;t</span></span></div>
+        <p>For en <b>reaktant</b>, fx BrO&#8323;&#8315;, aftager koncentrationen i stedet, s&aring; man regner med et fortegnsskift: v(BrO&#8323;&#8315;) = &minus;&Delta;[BrO&#8323;&#8315;]/&Delta;t. Da koefficienten foran Br&#8322; (3) er tre gange s&aring; stor som koefficienten foran BrO&#8323;&#8315; (1) i reaktionsskemaet, g&aelig;lder sammenh&aelig;ngen <b>v(Br&#8322;) = 3&middot;v(BrO&#8323;&#8315;)</b>.</p>
+        <div class="fbox rate-law-box">
+            <div class="fbox-title">Hastighedsudtryk (fundet eksperimentelt)</div>
+            <div class="formula">v(BrO&#8323;&#8315;) = k&middot;[Br&#8315;]&middot;[BrO&#8323;&#8315;]&middot;[H<sup>+</sup>]&sup2;</div>
+        </div>
+        <p>Enheden for reaktionshastighed er normalt <b>M/s</b> (mol/L pr. sekund) - for langsomme reaktioner ses ogs&aring; M/min eller M/h.</p>
+    </div>
+</div>
+
+<div id="quizOverlay">
+    <div class="quiz-inner">
+        <h2>&#129504; Test dig selv</h2>
+        <p>Sp&oslash;rgsm&aring;l om reaktionshastighed - brug grafen og modellerne, hvis du bliver i tvivl.</p>
+
+        <div class="quiz-card" data-qid="1">
+            <div class="quiz-q">1. Hvordan defineres reaktionshastigheden ud fra et produkt, fx Br&#8322;?</div>
+            <div class="quiz-options">
+                <button class="quiz-opt quiz-opt-math" data-correct="false">v(Br&#8322;) = &Delta;t / &Delta;[Br&#8322;]</button>
+                <button class="quiz-opt quiz-opt-math" data-correct="true">v(Br&#8322;) = &Delta;[Br&#8322;] / &Delta;t</button>
+                <button class="quiz-opt quiz-opt-math" data-correct="false">v(Br&#8322;) = [Br&#8322;] &middot; t</button>
+                <button class="quiz-opt quiz-opt-math" data-correct="false">v(Br&#8322;) = [Br&#8322;] / t&#8320;</button>
+            </div>
+            <div class="quiz-fb"></div>
+        </div>
+
+        <div class="quiz-card" data-qid="2">
+            <div class="quiz-q">2. P&aring; grafen for [Br&#8322;] bliver kurven fladere og fladere, efterh&aring;nden som tiden g&aring;r. Hvad betyder det?</div>
+            <div class="quiz-options">
+                <button class="quiz-opt" data-correct="true">Reaktionen bliver langsommere og langsommere</button>
+                <button class="quiz-opt" data-correct="false">Reaktionen bliver hurtigere og hurtigere hele tiden</button>
+                <button class="quiz-opt" data-correct="false">Reaktionshastigheden er konstant hele forl&oslash;bet</button>
+                <button class="quiz-opt" data-correct="false">Der dannes slet ikke mere Br&#8322; efter dette punkt</button>
+            </div>
+            <div class="quiz-fb"></div>
+        </div>
+
+        <div class="quiz-card" data-qid="3">
+            <div class="quiz-q">3. I bogens eksempel (t = 80 s til 120 s) er den &oslash;jeblikkelige hastighed for Br&#8322; denne:</div>
+            <div class="quiz-formula">v(Br&#8322;) = &Delta;[Br&#8322;] / &Delta;t &asymp; 3,0&middot;10&#8315;&#8308; M/s</div>
+            <div class="quiz-q quiz-q-sub">Da v(Br&#8322;) = 3&middot;v(BrO&#8323;&#8315;), hvad er s&aring; v(BrO&#8323;&#8315;)?</div>
+            <div class="quiz-options">
+                <button class="quiz-opt quiz-opt-math" data-correct="true">&asymp; 1,0&middot;10&#8315;&#8308; M/s</button>
+                <button class="quiz-opt quiz-opt-math" data-correct="false">&asymp; 3,0&middot;10&#8315;&#8308; M/s</button>
+                <button class="quiz-opt quiz-opt-math" data-correct="false">&asymp; 9,0&middot;10&#8315;&#8308; M/s</button>
+                <button class="quiz-opt quiz-opt-math" data-correct="false">&asymp; 1,0&middot;10&#8315;&#8309; M/s</button>
+            </div>
+            <div class="quiz-fb"></div>
+        </div>
+
+        <div class="quiz-card" data-qid="4">
+            <div class="quiz-q">4. Hvorfor reagerer magnesiumpulver hurtigere med saltsyre end en tilsvarende klump magnesium af samme masse?</div>
+            <div class="quiz-options">
+                <button class="quiz-opt" data-correct="false">Pulveret er varmere end klumpen, selvom massen er ens</button>
+                <button class="quiz-opt" data-correct="true">Pulveret har et st&oslash;rre overfladeareal, s&aring; H<sup>+</sup> rammer det oftere pr. tid</button>
+                <button class="quiz-opt" data-correct="false">Pulveret indeholder faktisk flere magnesium-atomer end klumpen</button>
+                <button class="quiz-opt" data-correct="false">Pulveret reagerer med en helt anden syre end klumpen g&oslash;r</button>
+            </div>
+            <div class="quiz-fb"></div>
+        </div>
+
+        <div class="quiz-card" data-qid="5">
+            <div class="quiz-q">5. Hvilken enhed bruges normalt for reaktionshastighed?</div>
+            <div class="quiz-options">
+                <button class="quiz-opt quiz-opt-math" data-correct="true">M/s</button>
+                <button class="quiz-opt quiz-opt-math" data-correct="false">s/M</button>
+                <button class="quiz-opt quiz-opt-math" data-correct="false">mol</button>
+                <button class="quiz-opt quiz-opt-math" data-correct="false">M &middot; s</button>
+            </div>
+            <div class="quiz-fb"></div>
+        </div>
+
+        <div class="quiz-card" data-qid="6">
+            <div class="quiz-q">6. For en reaktion viser m&aring;linger, at hastigheden halveres, hver gang [N&#8322;O&#8325;] halveres. Hvilket hastighedsudtryk passer bedst?</div>
+            <div class="quiz-options">
+                <button class="quiz-opt quiz-opt-math" data-correct="true">v = k &middot; [N&#8322;O&#8325;]</button>
+                <button class="quiz-opt quiz-opt-math" data-correct="false">v = k &middot; [N&#8322;O&#8325;]&sup2;</button>
+                <button class="quiz-opt quiz-opt-math" data-correct="false">v = k / [N&#8322;O&#8325;]</button>
+                <button class="quiz-opt quiz-opt-math" data-correct="false">v = k, uafh&aelig;ngig af [N&#8322;O&#8325;]</button>
+            </div>
+            <div class="quiz-fb"></div>
+        </div>
+
+        <div class="quiz-footer">
+            <span id="quizScore">Rigtige svar: 0 / 6</span>
+            <div class="quiz-close-row">
+                <button class="plain-btn" onclick="resetQuiz()">&#8634; Nulstil quiz</button>
+                <button class="quiz-close-btn" onclick="closeQuiz()">&#10005; Luk quiz</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ================= MODEL ================= */
+const K = 0.0116;            // hastighedskonstant (fittet til bogens datapunkter t=80s/t=120s)
+const BR2_MAX = 3.00e-3;      // M, [Br2] når reaktionen er slut
+const BRO3_0 = 1.00e-3;       // M, [BrO3-] ved start
+const T_MAX = 500;            // s, graf-akse
+const Y_MAX = 3.5e-3;         // M, fast y-akse (fælles for begge kurver)
+const Y_STEP = 0.5e-3;
+
+function fBr2(t) { return BR2_MAX * (1 - Math.exp(-K * t)); }
+function fBrO3(t) { return BRO3_0 * Math.exp(-K * t); }
+function fprimeBr2(t) { return BR2_MAX * K * Math.exp(-K * t); }   // = v(Br₂), altid positiv
+function fprimeBrO3(t) { return -BRO3_0 * K * Math.exp(-K * t); }  // = d[BrO3-]/dt, altid negativ; v(BrO3-) = -dette
+
+function fmtDK(numStr) { return numStr.replace('.', ','); }
+function toSup(n) {
+    const map = {'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+    return String(n).split('').map(ch => map[ch] || ch).join('');
+}
+function formatSci(value, decimals) {
+    decimals = decimals === undefined ? 2 : decimals;
+    if (value === 0) return '0';
+    const sign = value < 0 ? '-' : '';
+    value = Math.abs(value);
+    const exp = Math.floor(Math.log10(value));
+    const mantissa = value / Math.pow(10, exp);
+    return sign + fmtDK(mantissa.toFixed(decimals)) + '·10' + toSup(exp);
+}
+function formatMM(value) { return fmtDK((value * 1000).toFixed(2)) + '·10' + toSup(-3); }
+
+/* ================= STATE ================= */
+const state = {
+    mode: 'explore',     // explore | average
+    showBr2: true,
+    showBrO3: true,
+    showTangent: false,
+    tExplore: 0,
+    playing: false,
+    lastFrameTime: null,
+    t1: 80, t2: 120,
+    dragging: null
+};
+
+const graphCanvas = document.getElementById('graphCanvas');
+const gctx = graphCanvas.getContext('2d');
+const beakerCanvas = document.getElementById('beakerCanvas');
+const bctx = beakerCanvas.getContext('2d');
+
+let graphMap = { x0: 50, x1: 10, y0: 10, y1: 30 };
+
+function resizeGraph() {
+    const wrap = graphCanvas.parentElement;
+    if (!wrap || wrap.clientWidth === 0) return;
+    graphCanvas.width = wrap.clientWidth;
+    graphCanvas.height = wrap.clientHeight;
+    drawGraph();
+}
+
+function mapT(t) {
+    const usableW = graphCanvas.width - graphMap.x0 - graphMap.x1;
+    return graphMap.x0 + (t / T_MAX) * usableW;
+}
+function mapC(c) {
+    const usableH = graphCanvas.height - graphMap.y0 - graphMap.y1;
+    const cc = Math.min(Y_MAX, Math.max(0, c));
+    return (graphCanvas.height - graphMap.y1) - (cc / Y_MAX) * usableH;
+}
+function invMapT(px) {
+    const usableW = graphCanvas.width - graphMap.x0 - graphMap.x1;
+    let t = ((px - graphMap.x0) / usableW) * T_MAX;
+    return Math.min(T_MAX, Math.max(0, t));
+}
+
+function activeTime() {
+    return state.mode === 'explore' ? state.tExplore : state.t2;
+}
+
+/* ================= GRAPH DRAWING ================= */
+function drawGraph() {
+    const w = graphCanvas.width, h = graphCanvas.height;
+    gctx.clearRect(0, 0, w, h);
+    if (w < 10 || h < 10) return;
+
+    // axes
+    gctx.strokeStyle = '#475569';
+    gctx.lineWidth = 1;
+    gctx.beginPath();
+    gctx.moveTo(graphMap.x0, graphMap.y0 - 5);
+    gctx.lineTo(graphMap.x0, h - graphMap.y1);
+    gctx.lineTo(w - graphMap.x1 + 5, h - graphMap.y1);
+    gctx.stroke();
+
+    // gridlines + ticks
+    gctx.font = '11px Arial';
+    gctx.fillStyle = '#64748b';
+    gctx.textAlign = 'center';
+    for (let t = 0; t <= T_MAX; t += 100) {
+        const x = mapT(t);
+        gctx.strokeStyle = 'rgba(255,255,255,0.06)';
+        gctx.beginPath(); gctx.moveTo(x, graphMap.y0 - 5); gctx.lineTo(x, h - graphMap.y1); gctx.stroke();
+        gctx.fillText(t, x, h - graphMap.y1 + 15);
+    }
+    gctx.textAlign = 'right';
+    for (let c = 0; c <= Y_MAX + 1e-9; c += Y_STEP) {
+        const y = mapC(c);
+        gctx.strokeStyle = 'rgba(255,255,255,0.06)';
+        gctx.beginPath(); gctx.moveTo(graphMap.x0, y); gctx.lineTo(w - graphMap.x1 + 5, y); gctx.stroke();
+        gctx.fillText(fmtDK((c * 1000).toFixed(1)), graphMap.x0 - 6, y + 3);
+    }
+
+    // axis labels
+    gctx.fillStyle = '#94a3b8'; gctx.font = 'bold 12px Arial'; gctx.textAlign = 'center';
+    gctx.fillText('t / s', (graphMap.x0 + w - graphMap.x1) / 2, h - 4);
+    gctx.save();
+    gctx.translate(14, (graphMap.y0 + h - graphMap.y1) / 2);
+    gctx.rotate(-Math.PI / 2);
+    gctx.fillText('Koncentration / 10⁻³ M', 0, 0);
+    gctx.restore();
+
+    const showBr2Curve = state.mode === 'explore' ? state.showBr2 : true;
+    const showBrO3Curve = state.mode === 'explore' ? state.showBrO3 : false;
+
+    if (showBr2Curve) drawCurve(fBr2, '#fbbf24');
+    if (showBrO3Curve) drawCurve(fBrO3, '#38bdf8');
+
+    // legend
+    let lx = w - graphMap.x1 - 4;
+    gctx.textAlign = 'right'; gctx.font = 'bold 11px Arial';
+    let ly = graphMap.y0 + 10;
+    if (showBr2Curve) { gctx.fillStyle = '#fbbf24'; gctx.fillText('■ [Br₂] (produkt)', lx, ly); ly += 15; }
+    if (showBrO3Curve) { gctx.fillStyle = '#38bdf8'; gctx.fillText('■ [BrO₃⁻] (reaktant)', lx, ly); ly += 15; }
+
+    // mode overlays
+    if (state.mode === 'explore') {
+        drawExploreOverlay();
+        if (state.showTangent) drawTangents();
+    } else {
+        drawAverageOverlay();
+    }
+}
+
+function drawCurve(fn, color) {
+    gctx.strokeStyle = color;
+    gctx.lineWidth = 2.5;
+    gctx.beginPath();
+    for (let t = 0; t <= T_MAX; t += 4) {
+        const x = mapT(t), y = mapC(fn(t));
+        if (t === 0) gctx.moveTo(x, y); else gctx.lineTo(x, y);
+    }
+    gctx.stroke();
+}
+
+function drawHandle(t, c, color, label) {
+    const x = mapT(t), y = mapC(c);
+    gctx.beginPath(); gctx.arc(x, y, 7, 0, Math.PI * 2);
+    gctx.fillStyle = '#0f172a'; gctx.fill();
+    gctx.lineWidth = 3; gctx.strokeStyle = color; gctx.stroke();
+    if (label) {
+        gctx.fillStyle = '#f1f5f9'; gctx.font = 'bold 11px Arial'; gctx.textAlign = 'left';
+        gctx.fillText(label, x + 10, y - 8);
+    }
+}
+
+function drawExploreOverlay() {
+    const t = state.tExplore;
+    const x = mapT(t);
+    gctx.setLineDash([4, 3]);
+    gctx.strokeStyle = 'rgba(255,255,255,0.3)';
+    gctx.lineWidth = 1;
+    gctx.beginPath(); gctx.moveTo(x, graphMap.y0 - 5); gctx.lineTo(x, graphCanvas.height - graphMap.y1); gctx.stroke();
+    gctx.setLineDash([]);
+
+    let labelDone = false;
+    if (state.showBr2) { drawHandle(t, fBr2(t), '#fbbf24', labelDone ? null : 't = ' + Math.round(t) + ' s'); labelDone = true; }
+    if (state.showBrO3) { drawHandle(t, fBrO3(t), '#38bdf8', labelDone ? null : 't = ' + Math.round(t) + ' s'); labelDone = true; }
+}
+
+function drawAverageOverlay() {
+    const c1 = fBr2(state.t1), c2 = fBr2(state.t2);
+    const x1 = mapT(state.t1), y1 = mapC(c1);
+    const x2 = mapT(state.t2), y2 = mapC(c2);
+
+    gctx.setLineDash([4, 3]);
+    gctx.strokeStyle = 'rgba(255,255,255,0.35)'; gctx.lineWidth = 1;
+    gctx.beginPath(); gctx.moveTo(x1, y1); gctx.lineTo(x2, y1); gctx.stroke();
+    gctx.beginPath(); gctx.moveTo(x2, y1); gctx.lineTo(x2, y2); gctx.stroke();
+    gctx.setLineDash([]);
+    gctx.fillStyle = '#e2e8f0'; gctx.font = '11px Arial'; gctx.textAlign = 'center';
+    gctx.fillText('Δt', (x1 + x2) / 2, y1 + 14);
+    gctx.textAlign = 'left';
+    gctx.fillText('Δ[stof]', x2 + 6, (y1 + y2) / 2);
+
+    gctx.strokeStyle = '#4ade80'; gctx.lineWidth = 2.5;
+    gctx.beginPath(); gctx.moveTo(x1, y1); gctx.lineTo(x2, y2); gctx.stroke();
+
+    drawHandle(state.t1, c1, '#fbbf24', 't₁ = ' + Math.round(state.t1) + ' s');
+    drawHandle(state.t2, c2, '#fbbf24', 't₂ = ' + Math.round(state.t2) + ' s');
+}
+
+// Finder det t-interval hvor tangentlinjen (gennem t0,c0 med given hældning)
+// rent faktisk ligger inden for grafens synlige område [0,T_MAX] x [0,Y_MAX].
+// Uden dette ville en steil tangent (lille t0) blive tegnet med forkert hældning,
+// fordi de to endepunkter først blev klippet hver for sig og derefter forbundet
+// med en lige linje - det giver en helt anden (forkert) hældning end den ægte tangent.
+function tangentTRange(t0, c0, slope) {
+    let tLo = 0, tHi = T_MAX;
+    if (Math.abs(slope) > 1e-12) {
+        const tAtZero = t0 - c0 / slope;
+        const tAtMax = t0 + (Y_MAX - c0) / slope;
+        const tA = Math.min(tAtZero, tAtMax);
+        const tB = Math.max(tAtZero, tAtMax);
+        tLo = Math.max(tLo, tA);
+        tHi = Math.min(tHi, tB);
+    }
+    if (tLo > tHi) { tLo = t0; tHi = t0; }
+    return [tLo, tHi];
+}
+function drawTangentFor(fn, fnPrime, t0, color) {
+    const c0 = fn(t0);
+    const slope = fnPrime(t0);
+    const [tStart, tEnd] = tangentTRange(t0, c0, slope);
+    const cStart = c0 + slope * (tStart - t0);
+    const cEnd = c0 + slope * (tEnd - t0);
+    gctx.setLineDash([6, 4]);
+    gctx.strokeStyle = color; gctx.lineWidth = 2.2;
+    gctx.beginPath(); gctx.moveTo(mapT(tStart), mapC(cStart)); gctx.lineTo(mapT(tEnd), mapC(cEnd)); gctx.stroke();
+    gctx.setLineDash([]);
+}
+function drawTangents() {
+    const t = state.tExplore;
+    if (state.showBr2) drawTangentFor(fBr2, fprimeBr2, t, '#fbbf24');
+    if (state.showBrO3) drawTangentFor(fBrO3, fprimeBrO3, t, '#38bdf8');
+}
+
+/* ================= BEAKER ================= */
+function lerpColor(a, b, f) {
+    return [a[0] + (b[0]-a[0])*f, a[1] + (b[1]-a[1])*f, a[2] + (b[2]-a[2])*f];
+}
+function drawBeaker() {
+    const w = beakerCanvas.width, h = beakerCanvas.height;
+    bctx.clearRect(0, 0, w, h);
+    const t = activeTime();
+    const br2 = fBr2(t);
+    const frac = Math.min(1, br2 / BR2_MAX);
+
+    const clear = [30, 41, 59];
+    const yellow = [217, 158, 10];
+    const col = lerpColor(clear, yellow, frac);
+
+    const topY = 20, botY = h - 15, leftX = 20, rightX = w - 20;
+    const liquidTopY = topY + (botY - topY) * 0.22;
+
+    bctx.fillStyle = 'rgba(' + col[0] + ',' + col[1] + ',' + col[2] + ',0.85)';
+    bctx.fillRect(leftX + 2, liquidTopY, rightX - leftX - 4, botY - liquidTopY);
+
+    bctx.strokeStyle = '#cbd5e1'; bctx.lineWidth = 2.5;
+    bctx.beginPath();
+    bctx.moveTo(leftX, topY);
+    bctx.lineTo(leftX, botY);
+    bctx.lineTo(rightX, botY);
+    bctx.lineTo(rightX, topY);
+    bctx.stroke();
+    bctx.beginPath(); bctx.moveTo(leftX - 4, topY); bctx.lineTo(leftX, topY + 8); bctx.lineTo(leftX + 8, topY); bctx.stroke();
+
+    document.getElementById('bTime').textContent = Math.round(t) + ' s';
+    document.getElementById('bBr2').textContent = formatMM(br2) + ' M';
+    document.getElementById('bBrO3').textContent = formatMM(fBrO3(t)) + ' M';
+}
+
+/* ================= CALC PANEL ================= */
+function updateCalcPanel() {
+    const rows = document.getElementById('calcRows');
+    const resultMain = document.getElementById('calcResultMain');
+    const resultSub = document.getElementById('calcResultSub');
+    const title = document.getElementById('calcTitle');
+    rows.innerHTML = '';
+
+    if (state.mode === 'explore') {
+        title.textContent = 'Øjeblikkelig hastighed, t = ' + Math.round(state.tExplore) + ' s';
+        resultMain.style.fontSize = '1rem';
+        if (state.showBr2) {
+            resultMain.style.display = 'block';
+            resultMain.textContent = 'v(Br₂) = ' + formatSci(fprimeBr2(state.tExplore)) + ' M/s';
+        } else {
+            resultMain.style.display = 'none';
+        }
+        if (state.showBrO3) {
+            resultSub.style.display = 'block';
+            resultSub.textContent = 'v(BrO₃⁻) = ' + formatSci(-fprimeBrO3(state.tExplore)) + ' M/s';
+        } else {
+            resultSub.style.display = 'none';
+        }
+        return;
+    }
+
+    title.textContent = 'Gennemsnitshastighed';
+    resultMain.style.fontSize = '1rem';
+    resultMain.style.display = 'block';
+    resultSub.style.display = 'block';
+    const c1 = fBr2(state.t1), c2 = fBr2(state.t2);
+    const dc = c2 - c1, dt = state.t2 - state.t1;
+    const v = dt !== 0 ? dc / dt : 0;
+    rows.innerHTML =
+        '<div class="calc-row"><span class="k">Δt = t₂ − t₁</span><span class="v">' + Math.round(dt) + ' s</span></div>' +
+        '<div class="calc-row"><span class="k">Δ[Br₂]</span><span class="v">' + formatSci(dc) + ' M</span></div>';
+    resultMain.textContent = 'v(Br₂) = ' + formatSci(v) + ' M/s';
+    resultSub.textContent = 'v(BrO₃⁻) = v(Br₂)/3 = ' + formatSci(v / 3) + ' M/s';
+}
+
+/* ================= MODE / DATASET SWITCHING ================= */
+function setMode(m) {
+    if (m !== 'explore' && state.playing) { state.playing = false; updatePlayBtnUI(); }
+    state.mode = m;
+    const avgBtn = document.getElementById('avgModeBtn');
+    avgBtn.innerHTML = (m === 'average') ? '&#128269; Tilbage til graf' : '&#128207; Gennemsnitshastighed';
+    avgBtn.classList.toggle('active', m === 'average');
+    document.getElementById('datasetRow').style.display = (m === 'explore') ? 'flex' : 'none';
+    document.getElementById('tangentBtn').style.display = (m === 'explore') ? 'block' : 'none';
+    updateInstructions();
+    refreshAll();
+}
+function toggleAverageMode() {
+    setMode(state.mode === 'average' ? 'explore' : 'average');
+}
+function toggleTangent() {
+    state.showTangent = !state.showTangent;
+    document.getElementById('tangentBtn').classList.toggle('active', state.showTangent);
+    refreshAll();
+}
+function toggleDataset(which) {
+    if (which === 'br2') {
+        if (state.showBr2 && !state.showBrO3) return;
+        state.showBr2 = !state.showBr2;
+    } else {
+        if (state.showBrO3 && !state.showBr2) return;
+        state.showBrO3 = !state.showBrO3;
+    }
+    document.getElementById('btnShowBr2').classList.toggle('active', state.showBr2);
+    document.getElementById('btnShowBrO3').classList.toggle('active', state.showBrO3);
+    refreshAll();
+}
+function updateInstructions() {
+    const box = document.getElementById('instructionBox');
+    if (state.mode === 'explore') {
+        box.innerHTML = 'Tryk p&aring; den store ▶ Afspil-knap for at se reaktionen forl&oslash;be, eller tr&aelig;k selv i prikken p&aring; kurven. Den &oslash;jeblikkelige hastighed vises til h&oslash;jre - sl&aring; <b>Vis tangent</b> til der for ogs&aring; at se den som linje(r) p&aring; grafen.';
+    } else {
+        box.innerHTML = '<b>Gennemsnitshastighed:</b> Træk i de to prikker (t₁ og t₂) for at vælge et tidsinterval. Den grønne sekant viser hældningen = gennemsnitshastigheden i intervallet.';
+    }
+}
+
+function refreshAll() {
+    drawGraph();
+    drawBeaker();
+    updateCalcPanel();
+}
+
+/* ================= PLAY / EXPLORE ================= */
+function updatePlayBtnUI() {
+    const btn = document.getElementById('playBtn');
+    btn.innerHTML = state.playing ? '&#9208; Pause' : '&#9654; Afspil';
+    btn.classList.toggle('active', state.playing);
+}
+function togglePlay() {
+    if (state.mode !== 'explore') setMode('explore');
+    state.playing = !state.playing;
+    updatePlayBtnUI();
+    if (state.playing) { state.lastFrameTime = null; requestAnimationFrame(playTick); }
+}
+function resetExplore() {
+    state.tExplore = 0;
+    state.playing = false;
+    updatePlayBtnUI();
+    refreshAll();
+}
+function playTick(now) {
+    if (!state.playing) return;
+    if (state.lastFrameTime === null) state.lastFrameTime = now;
+    const dt = (now - state.lastFrameTime) / 1000;
+    state.lastFrameTime = now;
+    state.tExplore += dt * 42; // simulerede sekunder pr. real-sekund
+    if (state.tExplore >= T_MAX) {
+        state.tExplore = T_MAX;
+        state.playing = false;
+        updatePlayBtnUI();
+    }
+    drawGraph(); drawBeaker(); updateCalcPanel();
+    if (state.playing) requestAnimationFrame(playTick);
+}
+
+/* ================= POINTER DRAGGING ON GRAPH ================= */
+function nearestHandle(px, py) {
+    const candidates = [];
+    if (state.mode === 'explore') candidates.push({ key: 'explore', t: state.tExplore });
+    else { candidates.push({ key: 't1', t: state.t1 }); candidates.push({ key: 't2', t: state.t2 }); }
+
+    let best = null, bestDist = 22;
+    candidates.forEach(c => {
+        const x = mapT(c.t);
+        const d = Math.abs(px - x);
+        if (d < bestDist) { bestDist = d; best = c.key; }
+    });
+    return best;
+}
+
+graphCanvas.addEventListener('pointerdown', e => {
+    const rect = graphCanvas.getBoundingClientRect();
+    const px = e.clientX - rect.left, py = e.clientY - rect.top;
+    const handle = nearestHandle(px, py);
+    if (handle) {
+        state.dragging = handle;
+        graphCanvas.setPointerCapture(e.pointerId);
+    }
+});
+graphCanvas.addEventListener('pointermove', e => {
+    if (!state.dragging) return;
+    const rect = graphCanvas.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    let t = invMapT(px);
+    if (state.dragging === 'explore') { state.tExplore = t; if (state.playing) { state.playing = false; updatePlayBtnUI(); } }
+    else if (state.dragging === 't1') { state.t1 = Math.min(t, state.t2 - 4); }
+    else if (state.dragging === 't2') { state.t2 = Math.max(t, state.t1 + 4); }
+    refreshAll();
+});
+function stopDrag(e) { if (state.dragging) { state.dragging = null; } }
+graphCanvas.addEventListener('pointerup', stopDrag);
+graphCanvas.addEventListener('pointercancel', stopDrag);
+
+/* ================= FACTOR DEMO: CONCENTRATION + TEMPERATURE ================= */
+const concCanvas = document.getElementById('concCanvas');
+const cctx = concCanvas.getContext('2d');
+const concState = {
+    concLevel: 1, tempLevel: 1,
+    particles: [],
+    collisionTimes: []
+};
+const CONC_COUNTS = [4, 8, 14];   // pr. type (blå/orange) -> total 8/16/28
+const TEMP_SPEEDS = [0.5, 1.0, 1.9];
+
+function makeConcParticle(type) {
+    return {
+        type: type,
+        x: 10 + Math.random() * (concCanvas.width - 20),
+        y: 10 + Math.random() * (concCanvas.height - 20),
+        vx: (Math.random() - 0.5) * 2,
+        vy: (Math.random() - 0.5) * 2,
+        r: 5,
+        flash: 0
+    };
+}
+function rebuildConcParticles() {
+    const n = CONC_COUNTS[concState.concLevel];
+    const arr = [];
+    for (let i = 0; i < n; i++) arr.push(makeConcParticle('A'));
+    for (let i = 0; i < n; i++) arr.push(makeConcParticle('B'));
+    concState.particles = arr;
+}
+function setConcLevel(lv) {
+    concState.concLevel = lv;
+    document.querySelectorAll('[data-conc]').forEach(b => b.classList.toggle('active', +b.dataset.conc === lv));
+    rebuildConcParticles();
+}
+function setTempLevel(lv) {
+    concState.tempLevel = lv;
+    document.querySelectorAll('[data-temp]').forEach(b => b.classList.toggle('active', +b.dataset.temp === lv));
+}
+
+function stepConcDemo(dt) {
+    const speed = TEMP_SPEEDS[concState.tempLevel];
+    const w = concCanvas.width, h = concCanvas.height;
+    const ps = concState.particles;
+    for (const p of ps) {
+        p.x += p.vx * speed;
+        p.y += p.vy * speed;
+        if (p.x < p.r || p.x > w - p.r) { p.vx *= -1; p.x = Math.min(w - p.r, Math.max(p.r, p.x)); }
+        if (p.y < p.r || p.y > h - p.r) { p.vy *= -1; p.y = Math.min(h - p.r, Math.max(p.r, p.y)); }
+        if (p.flash > 0) p.flash -= dt * 4;
+    }
+    for (let i = 0; i < ps.length; i++) {
+        for (let j = i + 1; j < ps.length; j++) {
+            const a = ps[i], b = ps[j];
+            const dx = a.x - b.x, dy = a.y - b.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist < a.r + b.r && dist > 0) {
+                const nx = dx / dist, ny = dy / dist;
+                const overlap = (a.r + b.r - dist) / 2;
+                a.x += nx * overlap; a.y += ny * overlap;
+                b.x -= nx * overlap; b.y -= ny * overlap;
+                const avx = a.vx, avy = a.vy;
+                a.vx = b.vx; a.vy = b.vy; b.vx = avx; b.vy = avy;
+                if (a.type !== b.type) {
+                    a.flash = 1; b.flash = 1;
+                    concState.collisionTimes.push(performance.now());
+                }
+            }
+        }
+    }
+    const now = performance.now();
+    concState.collisionTimes = concState.collisionTimes.filter(t2 => now - t2 < 1000);
+}
+function drawConcDemo() {
+    const w = concCanvas.width, h = concCanvas.height;
+    cctx.clearRect(0, 0, w, h);
+    for (const p of concState.particles) {
+        const baseColor = p.type === 'A' ? [56, 189, 248] : [251, 146, 60];
+        const col = p.flash > 0 ? lerpColor(baseColor, [255, 255, 255], p.flash) : baseColor;
+        cctx.beginPath(); cctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        cctx.fillStyle = 'rgb(' + col[0] + ',' + col[1] + ',' + col[2] + ')';
+        cctx.fill();
+    }
+    document.getElementById('concCounter').textContent = concState.collisionTimes.length;
+}
+
+/* ================= FACTOR DEMO: SURFACE AREA ================= */
+const areaCanvas = document.getElementById('areaCanvas');
+const actx = areaCanvas.getContext('2d');
+const areaState = {
+    shape: 'ball',
+    particles: [],
+    rects: [],
+    ball: null,
+    collisionTimes: []
+};
+function buildAreaShape() {
+    const w = areaCanvas.width, h = areaCanvas.height;
+    if (areaState.shape === 'ball') {
+        areaState.ball = { x: w / 2, y: h / 2, r: 32 };
+        areaState.rects = [];
+    } else {
+        // spredt pulver-mønster hen over hele beholderen (ikke klumpet i midten)
+        const coords = [
+            [45, 40], [110, 145], [175, 50], [240, 125], [305, 45], [365, 140],
+            [430, 60], [70, 100], [160, 165], [225, 55], [290, 155], [350, 95],
+            [415, 155], [465, 85], [30, 155], [480, 40]
+        ];
+        areaState.rects = coords.map(([x, y]) => ({ x: x - 7, y: y - 7, w: 14, h: 14 }));
+        areaState.ball = null;
+    }
+}
+function setShape(s) {
+    areaState.shape = s;
+    document.querySelectorAll('[data-shape]').forEach(b => b.classList.toggle('active', b.dataset.shape === s));
+    buildAreaShape();
+}
+function makeAreaParticle() {
+    return {
+        x: 10 + Math.random() * (areaCanvas.width - 20),
+        y: 10 + Math.random() * (areaCanvas.height - 20),
+        vx: (Math.random() - 0.5) * 2.4,
+        vy: (Math.random() - 0.5) * 2.4,
+        r: 4,
+        flash: 0
+    };
+}
+function initAreaParticles() {
+    const arr = [];
+    for (let i = 0; i < 18; i++) arr.push(makeAreaParticle());
+    areaState.particles = arr;
+}
+function resolveBallCollision(p) {
+    const ball = areaState.ball;
+    const dx = p.x - ball.x, dy = p.y - ball.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist < p.r + ball.r) {
+        const nx = dist > 0.0001 ? dx / dist : 0;
+        const ny = dist > 0.0001 ? dy / dist : -1;
+        p.x = ball.x + nx * (ball.r + p.r);
+        p.y = ball.y + ny * (ball.r + p.r);
+        const dot = p.vx * nx + p.vy * ny;
+        p.vx -= 2 * dot * nx; p.vy -= 2 * dot * ny;
+        p.flash = 1;
+        areaState.collisionTimes.push(performance.now());
+    }
+}
+function resolveRectCollision(p, rect) {
+    const nx0 = Math.min(rect.x + rect.w, Math.max(rect.x, p.x));
+    const ny0 = Math.min(rect.y + rect.h, Math.max(rect.y, p.y));
+    const dx = p.x - nx0, dy = p.y - ny0;
+    const dist = Math.hypot(dx, dy);
+    if (dist < p.r) {
+        let nxn, nyn;
+        if (dist > 0.0001) { nxn = dx / dist; nyn = dy / dist; }
+        else { nxn = 0; nyn = -1; }
+        p.x = nx0 + nxn * p.r; p.y = ny0 + nyn * p.r;
+        const dot = p.vx * nxn + p.vy * nyn;
+        p.vx -= 2 * dot * nxn; p.vy -= 2 * dot * nyn;
+        p.flash = 1;
+        areaState.collisionTimes.push(performance.now());
+    }
+}
+function stepAreaDemo(dt) {
+    const w = areaCanvas.width, h = areaCanvas.height;
+    for (const p of areaState.particles) {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < p.r || p.x > w - p.r) { p.vx *= -1; p.x = Math.min(w - p.r, Math.max(p.r, p.x)); }
+        if (p.y < p.r || p.y > h - p.r) { p.vy *= -1; p.y = Math.min(h - p.r, Math.max(p.r, p.y)); }
+        if (p.flash > 0) p.flash -= dt * 4;
+
+        if (areaState.shape === 'ball') resolveBallCollision(p);
+        else { for (const rect of areaState.rects) resolveRectCollision(p, rect); }
+    }
+    const now = performance.now();
+    areaState.collisionTimes = areaState.collisionTimes.filter(t2 => now - t2 < 1000);
+}
+function drawAreaDemo() {
+    const w = areaCanvas.width, h = areaCanvas.height;
+    actx.clearRect(0, 0, w, h);
+    actx.fillStyle = '#94a3b8';
+    if (areaState.shape === 'ball' && areaState.ball) {
+        actx.beginPath(); actx.arc(areaState.ball.x, areaState.ball.y, areaState.ball.r, 0, Math.PI * 2); actx.fill();
+    } else {
+        for (const rect of areaState.rects) actx.fillRect(rect.x, rect.y, rect.w, rect.h);
+    }
+    for (const p of areaState.particles) {
+        const baseColor = [248, 113, 113];
+        const col = p.flash > 0 ? lerpColor(baseColor, [255, 255, 255], p.flash) : baseColor;
+        actx.beginPath(); actx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        actx.fillStyle = 'rgb(' + col[0] + ',' + col[1] + ',' + col[2] + ')';
+        actx.fill();
+    }
+    document.getElementById('areaCounter').textContent = areaState.collisionTimes.length;
+}
+
+/* ================= GLOBAL RAF LOOP FOR DEMOS ================= */
+let lastDemoTime = null;
+function demoLoop(now) {
+    if (lastDemoTime === null) lastDemoTime = now;
+    const dt = Math.min(0.05, (now - lastDemoTime) / 1000);
+    lastDemoTime = now;
+    stepConcDemo(dt); drawConcDemo();
+    stepAreaDemo(dt); drawAreaDemo();
+    requestAnimationFrame(demoLoop);
+}
+
+/* ================= TABS ================= */
+function switchTab(name) {
+    document.getElementById('tabGraph').style.display = name === 'graph' ? 'flex' : 'none';
+    document.getElementById('tabFactors').style.display = name === 'factors' ? 'block' : 'none';
+    document.querySelectorAll('.top-tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+    if (name === 'graph') resizeGraph();
+}
+
+/* ================= TEORI POPUP ================= */
+function openTeori() { document.getElementById('teoriOverlay').style.display = 'block'; }
+function closeTeori() { document.getElementById('teoriOverlay').style.display = 'none'; }
+
+/* ================= QUIZ ================= */
+let quizScore = 0;
+function openQuiz() { document.getElementById('quizOverlay').style.display = 'block'; }
+function closeQuiz() { document.getElementById('quizOverlay').style.display = 'none'; }
+function updateQuizScore() { document.getElementById('quizScore').textContent = 'Rigtige svar: ' + quizScore + ' / 6'; }
+function shuffleQuizOptions() {
+    document.querySelectorAll('.quiz-options').forEach(container => {
+        const opts = Array.from(container.children);
+        for (let i = opts.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [opts[i], opts[j]] = [opts[j], opts[i]];
+        }
+        opts.forEach(o => container.appendChild(o));
+    });
+}
+function resetQuiz() {
+    quizScore = 0;
+    document.querySelectorAll('.quiz-card').forEach(card => {
+        card.querySelectorAll('.quiz-opt').forEach(btn => { btn.disabled = false; btn.classList.remove('correct', 'wrong'); });
+        const fb = card.querySelector('.quiz-fb'); fb.textContent = ''; fb.className = 'quiz-fb';
+    });
+    shuffleQuizOptions();
+    updateQuizScore();
+}
+document.querySelectorAll('.quiz-card').forEach(card => {
+    card.querySelectorAll('.quiz-opt').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const options = card.querySelectorAll('.quiz-opt');
+            const fb = card.querySelector('.quiz-fb');
+            const isCorrect = btn.getAttribute('data-correct') === 'true';
+            options.forEach(o => o.disabled = true);
+            if (isCorrect) {
+                btn.classList.add('correct'); fb.textContent = '✔ Korrekt!'; fb.className = 'quiz-fb ok'; quizScore++;
+            } else {
+                btn.classList.add('wrong');
+                options.forEach(o => { if (o.getAttribute('data-correct') === 'true') o.classList.add('correct'); });
+                fb.textContent = '✘ Ikke helt. Prøv at gense modellen ovenfor.'; fb.className = 'quiz-fb bad';
+            }
+            updateQuizScore();
+        });
+    });
+});
+
+/* ================= INIT ================= */
+function init() {
+    window.addEventListener('resize', resizeGraph);
+    resizeGraph();
+    updateInstructions();
+    rebuildConcParticles();
+    buildAreaShape();
+    initAreaParticles();
+    shuffleQuizOptions();
+    refreshAll();
+    requestAnimationFrame(demoLoop);
+}
+window.onload = init;
+
+/* ================= GUIDED TOUR ================= */
+const guideSteps = [
+    {
+        target: null,
+        title: 'Velkommen!',
+        text: 'Denne animation viser, hvordan koncentrationerne af <b>Br₂</b> (dannet stof) og <b>BrO₃⁻</b> (brugt stof) ændrer sig, mens reaktionen 5Br⁻ + BrO₃⁻ + 6H⁺ → 3Br₂ + 3H₂O forløber. Det bruger vi til at forstå, hvad <b>reaktionshastighed</b> egentlig betyder.'
+    },
+    {
+        target: 'beakerCanvas',
+        title: '1. Bægeret',
+        text: 'Bægeret bliver mere og mere gult, efterhånden som der dannes Br₂ - ligesom i det virkelige forsøg. Tid og koncentrationer aflæses lige nedenunder.'
+    },
+    {
+        target: 'playBtn',
+        title: '2. Afspil reaktionen',
+        text: 'Tryk her for at spole tiden fremad fra 0 til 500 sekunder, og se kurven og bægeret ændre sig live. Du kan også selv trække i prikken på grafen.'
+    },
+    {
+        target: 'datasetRow',
+        title: '3. Vælg hvad grafen viser',
+        text: 'Slå [Br₂] og [BrO₃⁻] til og fra for at se produktets kurve (stigende) og reaktantens kurve (faldende) - hver for sig eller samtidig.'
+    },
+    {
+        target: 'graphCanvasWrap',
+        title: '4. Selve grafen',
+        text: 'Vandret akse er tiden i sekunder, lodret akse er koncentrationen. Læg mærke til, at kurven er stejlest i starten og flader ud - det betyder, at reaktionen er hurtigst i starten og bliver langsommere og langsommere.'
+    },
+    {
+        target: 'calcPanel',
+        title: '5. Aflæs hastigheden',
+        text: 'Her ses den øjeblikkelige reaktionshastighed v(Br₂) og v(BrO₃⁻) ved det tidspunkt, prikken står på. Tryk "Vis tangent på graf" for også at se hastigheden som en tangentlinje til kurven.'
+    },
+    {
+        target: 'avgModeBtn',
+        title: '6. Gennemsnitshastighed',
+        text: 'Skift til dette værktøj for i stedet at vælge to tidspunkter (t₁ og t₂) og beregne gennemsnitshastigheden mellem dem - præcis som eksemplet i bogen.'
+    },
+    {
+        target: null,
+        title: 'Klar til at udforske!',
+        text: 'Tryk "Afslut" og prøv selv. Du kan altid finde den fulde teori under 📖 Teori-knappen, og teste din forståelse med 🧠 Test dig selv.'
+    }
+];
+
+const guide = {
+    steps: guideSteps,
+    idx: 0,
+    active: false,
+
+    start() {
+        this.active = true;
+        this.idx = 0;
+        document.getElementById('guide-tooltip').classList.add('active');
+        this.show(0);
+    },
+
+    show(i) {
+        this.idx = i;
+        const step = this.steps[i];
+        const tooltip = document.getElementById('guide-tooltip');
+        const highlight = document.getElementById('guide-highlight');
+
+        document.getElementById('guide-step-label').innerText = 'Trin ' + (i + 1) + ' af ' + this.steps.length;
+        document.getElementById('guide-title').innerText = step.title;
+        document.getElementById('guide-text').innerHTML = step.text;
+        document.getElementById('guide-prev-btn').style.visibility = i === 0 ? 'hidden' : 'visible';
+        document.getElementById('guide-next-btn').innerText = i === this.steps.length - 1 ? 'Afslut' : 'Næste →';
+
+        if (step.target) {
+            const el = document.getElementById(step.target);
+            el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            setTimeout(() => this.position(el, tooltip, highlight), 220);
+        } else {
+            highlight.classList.remove('active');
+            this.centerTooltip(tooltip);
+        }
+    },
+
+    position(el, tooltip, highlight) {
+        const r = el.getBoundingClientRect();
+        const pad = 8;
+        highlight.classList.add('active');
+        highlight.style.top = (r.top - pad) + 'px';
+        highlight.style.left = (r.left - pad) + 'px';
+        highlight.style.width = (r.width + pad * 2) + 'px';
+        highlight.style.height = (r.height + pad * 2) + 'px';
+
+        tooltip.style.transform = '';
+        const tw = tooltip.offsetWidth || 320;
+        const th = tooltip.offsetHeight || 180;
+        let left = r.right + 20;
+        let top = r.top;
+        if (left + tw > window.innerWidth - 10) {
+            left = Math.max(10, r.left);
+            top = r.bottom + 16;
+            if (top + th > window.innerHeight - 10) {
+                top = Math.max(10, r.top - th - 16);
+            }
+        }
+        left = Math.min(Math.max(10, left), window.innerWidth - tw - 10);
+        top = Math.min(Math.max(10, top), window.innerHeight - th - 10);
+        tooltip.style.left = left + 'px';
+        tooltip.style.top = top + 'px';
+    },
+
+    centerTooltip(tooltip) {
+        tooltip.style.left = '50%';
+        tooltip.style.top = '50%';
+        tooltip.style.transform = 'translate(-50%, -50%)';
+    },
+
+    next() {
+        if (this.idx >= this.steps.length - 1) { this.close(); return; }
+        this.show(this.idx + 1);
+    },
+
+    prev() {
+        if (this.idx > 0) this.show(this.idx - 1);
+    },
+
+    close() {
+        this.active = false;
+        document.getElementById('guide-highlight').classList.remove('active');
+        document.getElementById('guide-tooltip').classList.remove('active');
+    }
+};
+
+function startGuide() {
+    switchTab('graph');
+    guide.start();
+}
+
+document.addEventListener('keydown', (e) => {
+    if (!guide.active) return;
+    if (e.key === 'Escape') { guide.close(); return; }
+    if (e.key === 'Enter' || e.key === 'ArrowRight') { guide.next(); return; }
+    if (e.key === 'ArrowLeft') { guide.prev(); }
+});
+</script>
+
+<div id="guide-highlight"></div>
+<div id="guide-tooltip">
+    <div id="guide-step-label"></div>
+    <div id="guide-title"></div>
+    <div id="guide-text"></div>
+    <div class="guide-nav">
+        <button id="guide-prev-btn" class="guide-nav-btn" onclick="guide.prev()">← Tilbage</button>
+        <button class="guide-nav-btn guide-skip" onclick="guide.close()">Spring over</button>
+        <button id="guide-next-btn" class="guide-nav-btn guide-primary" onclick="guide.next()">Næste →</button>
+    </div>
+</div>
+</body>
+</html>

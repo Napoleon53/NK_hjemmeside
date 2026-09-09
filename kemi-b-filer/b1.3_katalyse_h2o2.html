@@ -1,0 +1,2223 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katalyse af hydrogenperoxid &ndash; homogen &amp; heterogen (Kemi B)</title>
+    <style>
+        :root {
+            --bg-dark: #121215;
+            --panel-bg: #1e1e24;
+            --text-main: #e0e0e0;
+            --text-muted: #9e9e9e;
+            --accent-blue: #3498db;
+            --accent-red: #e74c3c;
+            --accent-green: #2ecc71;
+            --accent-purple: #9b59b6;
+            --accent-orange: #f39c12;
+            --border: #333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Nødvendig, fordi display:flex ellers overtrumfer hidden-attributten */
+        [hidden] { display: none !important; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: #111;
+            padding: 12px 20px;
+            border-bottom: 2px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex: 0 0 auto;
+        }
+
+        header h1 { font-size: 1.3rem; font-weight: 600; }
+
+        .eq-box {
+            font-size: 1.3rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            color: #eef0f5;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid #4a4a55;
+            border-radius: 7px;
+            padding: 10px 20px;
+            white-space: nowrap;
+        }
+
+        #app-container { display: flex; flex: 1; overflow: hidden; }
+
+        /* ---------- VENSTRE: SCENE + QUIZ ---------- */
+        #stage {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .view-tabs {
+            flex: 0 0 auto;
+            display: flex;
+            gap: 6px;
+            padding: 10px 16px 0;
+            background: #17171c;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .view-tab {
+            flex: 0 0 auto;
+            padding: 9px 18px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-bottom: none;
+            border-radius: 7px 7px 0 0;
+            color: var(--text-muted);
+            font-size: 0.86rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .view-tab:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .view-tab.active {
+            background: var(--bg-dark);
+            color: var(--accent-blue);
+            border-color: var(--accent-blue);
+            box-shadow: inset 0 3px 0 var(--accent-blue);
+        }
+
+        #visuals {
+            flex: 1 1 auto;
+            min-height: 200px;
+            position: relative;
+            background: radial-gradient(circle at center, #252530 0%, #121215 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            overflow: hidden;
+        }
+
+        canvas {
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            display: block;
+            cursor: pointer;
+        }
+
+        #scene-msg {
+            position: absolute;
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.88);
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            border: 1px solid #555;
+            text-align: center;
+            max-width: 88%;
+        }
+        .success-text { color: var(--accent-green); }
+        .fail-text { color: var(--accent-red); }
+
+        #quiz-dock {
+            flex: 0 0 auto;
+            background: #17171c;
+            border-top: 1px solid var(--border);
+        }
+
+        #quiz-launch { padding: 12px 20px; display: flex; justify-content: center; }
+
+        .btn-quiz-open {
+            flex: 0 0 auto;
+            padding: 11px 26px;
+            background: rgba(46, 204, 113, 0.12);
+            border: 1px solid rgba(46, 204, 113, 0.45);
+            color: #7ee2a8;
+            border-radius: 8px;
+            font-size: 0.92rem;
+        }
+        .btn-quiz-open:hover { background: rgba(46, 204, 113, 0.25); color: #fff; }
+
+        #quiz-panel {
+            padding: 14px 22px 18px;
+            max-height: 44vh;
+            overflow-y: auto;
+            border-top: 3px solid var(--accent-green);
+        }
+
+        .quiz-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .quiz-head h3 {
+            font-size: 0.85rem;
+            color: var(--accent-green);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .quiz-head span { color: var(--text-muted); margin-left: 8px; letter-spacing: 0; }
+
+        .btn-quiz-close {
+            flex: 0 0 auto;
+            padding: 6px 12px;
+            background: transparent;
+            border: 1px solid #555;
+            color: var(--text-muted);
+            border-radius: 5px;
+            font-size: 0.78rem;
+            font-weight: normal;
+        }
+        .btn-quiz-close:hover { border-color: #888; color: #fff; }
+
+        #task-text { font-size: 1rem; line-height: 1.5; margin-bottom: 12px; }
+
+        #task-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        #task-options label {
+            display: flex;
+            gap: 9px;
+            align-items: flex-start;
+            font-size: 0.88rem;
+            line-height: 1.45;
+            background: rgba(255,255,255,0.045);
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        #task-options label:hover { border-color: rgba(46,204,113,0.45); }
+        #task-options input { margin-top: 3px; accent-color: var(--accent-green); }
+
+        #task-feedback { font-size: 0.9rem; line-height: 1.45; margin-bottom: 12px; min-height: 20px; }
+
+        .quiz-actions { display: flex; gap: 10px; max-width: 460px; }
+        .btn-check-task { background-color: var(--accent-green); color: #000; }
+        .btn-check-task:hover { background-color: #27ae60; }
+        .btn-skip { background: #3a3a42; color: #ccc; }
+        .btn-skip:hover { background: #4a4a55; }
+
+        /* ---------- HØJRE: KONTROLPANEL ---------- */
+        #controls {
+            flex: 1;
+            min-width: 350px;
+            max-width: 440px;
+            background-color: var(--panel-bg);
+            border-left: 1px solid var(--border);
+            padding: 18px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .control-group {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 14px;
+            border-radius: 8px;
+        }
+
+        .control-group h3 {
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hint { font-size: 0.76rem; color: var(--text-muted); line-height: 1.45; margin-top: 8px; }
+
+        button {
+            flex: 1;
+            padding: 11px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-row { display: flex; gap: 8px; }
+        .btn-test { background-color: var(--accent-green); color: #000; text-transform: uppercase; }
+        .btn-test:hover { background-color: #27ae60; }
+        .btn-test:disabled { background-color: #555; color: #888; cursor: not-allowed; }
+        .btn-reset { background-color: #444; color: #fff; text-transform: uppercase; }
+        .btn-reset:hover { background-color: #555; }
+
+        .btn-splint {
+            background: rgba(243, 156, 18, 0.15);
+            border: 1px solid rgba(243, 156, 18, 0.45);
+            color: #f5c069;
+        }
+        .btn-splint:hover { background: rgba(243, 156, 18, 0.3); color: #fff; }
+        .btn-splint:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        .slider-container { margin-top: 12px; }
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-size: 0.88rem;
+        }
+        .slider-header span:last-child {
+            font-variant-numeric: tabular-nums;
+            color: #fff;
+            font-weight: 600;
+        }
+        input[type="range"] { width: 100%; accent-color: var(--accent-blue); cursor: pointer; }
+
+        /* Glasvælger */
+        .tube-picker { display: flex; flex-wrap: wrap; gap: 6px; }
+        .btn-tube {
+            flex: 1 1 46%;
+            padding: 9px 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            background: rgba(52,152,219,0.10);
+            border: 1px solid rgba(52,152,219,0.30);
+            color: #9ed2f0;
+            border-radius: 6px;
+        }
+        .btn-tube:hover { background: rgba(52,152,219,0.25); color: #fff; }
+        .btn-tube.active { background: var(--accent-blue); color: #fff; border-color: #fff; }
+
+        /* Infokort om det valgte glas */
+        #tube-card h4 { font-size: 1rem; margin-bottom: 6px; color: #fff; }
+        .badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            padding: 3px 9px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+        }
+        .badge-het { background: rgba(243,156,18,0.18); color: #f5c069; border: 1px solid rgba(243,156,18,0.5); }
+        .badge-hom { background: rgba(52,152,219,0.18); color: #8ecdf5; border: 1px solid rgba(52,152,219,0.5); }
+        .badge-ingen { background: rgba(158,158,158,0.15); color: #bbb; border: 1px solid #555; }
+        .card-line { font-size: 0.86rem; line-height: 1.5; margin-bottom: 8px; }
+        .card-line b { color: #fff; }
+
+        /* Forklaringspopup */
+        #modal-baggrund {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.72);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            z-index: 50;
+        }
+
+        #modal-boks {
+            background: var(--panel-bg);
+            border: 1px solid #45454f;
+            border-radius: 12px;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
+            width: 100%;
+            max-width: 640px;
+            max-height: 82vh;
+            overflow-y: auto;
+            padding: 22px 26px 26px;
+        }
+
+        #modal-hoved {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 6px;
+        }
+
+        #modal-titel { font-size: 1.15rem; color: #fff; }
+
+        .btn-modal-luk {
+            flex: 0 0 auto;
+            padding: 6px 12px;
+            background: transparent;
+            border: 1px solid #555;
+            color: var(--text-muted);
+            border-radius: 5px;
+            font-size: 0.78rem;
+            font-weight: normal;
+        }
+        .btn-modal-luk:hover { border-color: #888; color: #fff; }
+
+        #modal-indhold p { font-size: 0.92rem; line-height: 1.6; margin-bottom: 12px; }
+        #modal-indhold b { color: #fff; }
+        #modal-indhold p.mek-tip {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #3a3a44;
+            font-size: 0.86rem;
+            color: var(--text-muted);
+        }
+        #modal-indhold p.mek-tip b { color: #9ed2f0; }
+
+        /* Mekanismetrin */
+        ol.steps { margin: 0 0 0 20px; }
+        ol.steps li {
+            font-size: 0.83rem;
+            line-height: 1.45;
+            margin-bottom: 7px;
+            color: #9e9e9e;
+            transition: color 0.2s;
+        }
+        ol.steps li.now { color: #fff; font-weight: 600; }
+
+        .check-row { display: flex; align-items: center; gap: 9px; margin-bottom: 9px; font-size: 0.86rem; cursor: pointer; }
+        .check-row:last-child { margin-bottom: 0; }
+        .check-row input { accent-color: var(--accent-blue); cursor: pointer; }
+        .swatch { width: 22px; height: 4px; border-radius: 2px; flex: 0 0 auto; }
+
+        @media (max-width: 900px) {
+            body { height: auto; overflow: auto; }
+            #app-container { flex-direction: column; }
+            #stage { overflow: visible; }
+            #visuals { height: 52vh; }
+            #controls { max-width: none; border-left: none; border-top: 1px solid var(--border); }
+            #quiz-panel { max-height: none; }
+            .eq-box { font-size: 1.02rem; padding: 7px 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>
+            <h1>Kemi B: Katalyse af hydrogenperoxid &ndash; homogen &amp; heterogen</h1>
+        </div>
+        <div class="eq-box" id="eq-box">2 H₂O₂ (aq) ⟶ 2 H₂O (l) + O₂ (g)</div>
+    </header>
+
+    <div id="app-container">
+
+        <!-- VENSTRE SIDE: scene øverst, quiz nederst -->
+        <div id="stage">
+
+            <div class="view-tabs">
+                <button class="view-tab active" id="tab-forsog" onclick="setView('forsog')">🧪 Forsøget</button>
+                <button class="view-tab" id="tab-molekyler" onclick="setView('molekyler')">🔬 Mikroniveau</button>
+                <button class="view-tab" id="tab-energi" onclick="setView('energi')">📈 Energiprofil</button>
+            </div>
+
+            <div id="visuals">
+                <canvas id="simCanvas"></canvas>
+                <div id="scene-msg"></div>
+            </div>
+
+            <div id="quiz-dock">
+                <div id="quiz-launch">
+                    <button class="btn-quiz-open" onclick="startQuiz()">▶ Start efterbehandlingsquiz</button>
+                </div>
+
+                <div id="quiz-panel" hidden>
+                    <div class="quiz-head">
+                        <h3>Efterbehandling <span id="task-counter">1/14</span></h3>
+                        <button class="btn-quiz-close" onclick="closeQuiz()">Afslut quiz ✕</button>
+                    </div>
+                    <p id="task-text"></p>
+                    <div id="task-options"></div>
+                    <div id="task-feedback"></div>
+                    <div class="quiz-actions">
+                        <button class="btn-check-task" onclick="checkTask()">Tjek svar</button>
+                        <button class="btn-skip" onclick="nextTask()">Spring over ▸</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HØJRE SIDE: kontrolpanel -->
+        <div id="controls">
+
+            <!-- ===== VISNING 1: FORSØGET ===== -->
+            <div class="control-group" id="grp-forsog">
+                <h3>Udfør forsøget</h3>
+                <div class="btn-row" style="margin-bottom:10px;">
+                    <button class="btn-reset" onclick="nulstilForsog()">Nulstil forsøget</button>
+                </div>
+                <p class="hint" style="margin-top:0;">Vælg et glas i stativet, og tilsæt katalysator dér.</p>
+            </div>
+
+            <div class="control-group" id="grp-card">
+                <h3>Valgt reagensglas</h3>
+                <div class="tube-picker" id="tube-picker"></div>
+                <div id="tube-card" style="margin-top:14px;"></div>
+                <button class="btn-tube" id="btn-forklaring" style="width:100%; margin-top:12px;" onclick="visForklaring()">📖 Forklaring</button>
+                <div class="btn-row" style="margin-top:8px;">
+                    <button class="btn-tube" id="btn-tilsaet" onclick="tilsaetValgt()">Tilsæt her</button>
+                    <button class="btn-splint" id="btn-splint" onclick="glodepind()">🔥 Glødepind</button>
+                </div>
+            </div>
+
+            <!-- ===== VISNING 2: MOLEKYLENIVEAU ===== -->
+            <div class="control-group" id="grp-mek" hidden>
+                <h3>Vælg mekanisme</h3>
+                <div class="tube-picker">
+                    <button class="btn-tube" id="mek-mno2" onclick="setMek('mno2')">MnO₂ (s)<br>heterogen</button>
+                    <button class="btn-tube" id="mek-ki" onclick="setMek('ki')">I⁻ (aq)<br>homogen</button>
+                    <button class="btn-tube" id="mek-enzym" onclick="setMek('enzym')">Katalase<br>enzym</button>
+                    <button class="btn-tube" id="mek-ingen" onclick="setMek('ingen')">Ingen<br>katalysator</button>
+                </div>
+                <ol class="steps" id="mek-steps" style="margin-top:14px;"></ol>
+                <div class="btn-row" style="margin-top:6px;">
+                    <button class="btn-tube" id="btn-pause" onclick="togglePause()">⏸ Pause</button>
+                    <button class="btn-tube" onclick="naesteTrin()">Næste trin ▸</button>
+                </div>
+                <p class="hint" id="mek-note"></p>
+            </div>
+
+            <!-- ===== VISNING 3: ENERGIPROFIL ===== -->
+            <div class="control-group" id="grp-energi" hidden>
+                <h3>Vis reaktionsveje</h3>
+                <label class="check-row"><input type="checkbox" id="ep-ingen" checked onchange="tegn()"><span class="swatch" style="background:#e74c3c"></span>Ukatalyseret &nbsp;<b>E<sub>a</sub> ≈ 75 kJ/mol</b></label>
+                <label class="check-row"><input type="checkbox" id="ep-ki" checked onchange="tegn()"><span class="swatch" style="background:#3498db"></span>I⁻ (aq), homogen &nbsp;<b>≈ 56 kJ/mol</b></label>
+                <label class="check-row"><input type="checkbox" id="ep-mno2" checked onchange="tegn()"><span class="swatch" style="background:#f39c12"></span>MnO₂ (s), heterogen &nbsp;<b>≈ 50 kJ/mol</b></label>
+                <label class="check-row"><input type="checkbox" id="ep-enzym" checked onchange="tegn()"><span class="swatch" style="background:#2ecc71"></span>Katalase, enzym &nbsp;<b>≈ 8 kJ/mol</b></label>
+                <p class="hint">Vejledende litteraturværdier for spaltning af H₂O₂. Læg mærke til, at <b>alle fire veje ender samme sted</b>: ΔH ≈ −196 kJ/mol er uændret. Katalysatoren ændrer kun vejen derhen &ndash; ikke start- og slutenergien.</p>
+                <p class="hint">Tallet yderst i signaturen er et <b>forholdstal uden enhed</b>: et groft Arrhenius-skøn over, hvor mange gange hurtigere reaktionen forløber end den ukatalyserede ved 25 °C, hvis kun E<sub>a</sub> ændres.</p>
+                <p class="hint">De katalyserede veje har <b>to toppe</b>, fordi reaktionen forløber i to trin med et mellemprodukt (IO⁻, adsorberet molekyle eller enzym-substrat-kompleks).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup med forklaring til det valgte glas -->
+    <div id="modal-baggrund" hidden onclick="lukForklaring(event)">
+        <div id="modal-boks" onclick="event.stopPropagation()">
+            <div id="modal-hoved">
+                <h4 id="modal-titel"></h4>
+                <button class="btn-modal-luk" onclick="lukForklaring()">Luk ✕</button>
+            </div>
+            <div id="modal-indhold"></div>
+        </div>
+    </div>
+
+    <script>
+    "use strict";
+
+    /* ========================================================
+       1) DATA: DE FIRE REAGENSGLAS
+       ======================================================== */
+    const TUBES = [
+        {
+            id: 'mno2',
+            kort: 'MnO₂',
+            navn: 'H₂O₂ + MnO₂ (brunsten)',
+            under: 'fast stof (s)',
+            type: 'heterogen',
+            badgeTekst: 'Heterogen katalyse',
+            rate: 1.0,
+            kilde: 'korn',
+            sker: 'Kraftig, øjeblikkelig bruse. Boblerne dannes <b>på selve kornene</b> af det sorte pulver, og glasset bliver varmt.',
+        },
+        {
+            id: 'ki',
+            kort: 'KI (aq)',
+            navn: 'H₂O₂ + KI (0,1 M)',
+            under: 'opløst (aq)',
+            type: 'homogen',
+            badgeTekst: 'Homogen katalyse',
+            rate: 0.65,
+            kilde: 'overalt',
+            sker: 'Bruser overalt i væsken, og opløsningen bliver gullig-brun (spor af I₂). Boblerne dannes i <b>hele volumenet</b> &ndash; ikke kun ét sted.',
+        },
+        {
+            id: 'frisk',
+            kort: 'Frisk kartoffel',
+            navn: 'H₂O₂ + frisk kartoffel',
+            under: 'enzym i cellevæv',
+            type: 'heterogen',
+            badgeTekst: 'Enzym (biokatalysator)',
+            rate: 0.85,
+            kilde: 'kartoffel',
+            sker: 'Voldsom skumdannelse ud fra kartoffelstykkets overflade &ndash; skummet kan vokse op i glasset.',
+        },
+        {
+            id: 'kogt',
+            kort: 'Kogt kartoffel',
+            navn: 'H₂O₂ + kogt kartoffel',
+            under: 'denatureret enzym',
+            type: 'ingen',
+            badgeTekst: 'Katalysen er slået fra',
+            rate: 0.06,
+            kilde: 'kartoffel',
+            sker: 'Stort set ingenting &ndash; ganske få bobler, ligesom hvis man slet ikke havde tilsat noget.',
+        }
+    ];
+
+    /* Henviser fra forklaringen videre til den tilsvarende mekanisme */
+    function TIP(navn, ekstra) {
+        return '<p class="mek-tip">Du kan se selve reaktionsmekanismen trin for trin i fanen ' +
+               '<b>»Mikroniveau«</b> foroven &ndash; vælg <b>' + navn + '</b>' +
+               (ekstra ? ' ' + ekstra : '') + '.</p>';
+    }
+
+    /* Indholdet i forklaringspopup'en – ét glas ad gangen, kort og i almindelig prosa */
+    const FORKLARINGER = {
+        mno2:
+            '<p>Brunsten er et <b>fast stof</b>, mens H₂O₂ er opløst i vand. Katalysator og reaktant er altså i hver sin fase, og derfor kaldes det <b>heterogen katalyse</b>.</p>' +
+            '<p>Reaktionen kan kun foregå dér, hvor de to faser mødes: på kornenes overflade. Et H₂O₂-molekyle binder sig kortvarigt til overfladen, O–O-bindingen brydes, og H₂O og O₂ slipper fri igen. Derfor virker fint pulver bedre end én stor klump &ndash; overfladen er større.</p>' +
+            '<p>Filtrerer man brunstenen fra bagefter, vejer den det samme. Katalysatoren er ikke forbrugt, og derfor står den heller ikke i reaktionsskemaet.</p>' +
+            TIP('MnO₂ (s) – heterogen'),
+        ki:
+            '<p>Iodid-ionerne fra KI er <b>opløst i vandet ligesom H₂O₂ selv</b>. Katalysator og reaktant er i samme fase, og det kaldes <b>homogen katalyse</b>.</p>' +
+            '<p>De mødes derfor overalt i væsken, og boblerne dannes i hele volumenet på én gang &ndash; ikke kun ét bestemt sted. Reaktionen forløber i to trin: først bliver I⁻ til IO⁻, og i andet trin dannes I⁻ igen. Den gullige farve skyldes lidt frit iod undervejs.</p>' +
+            '<p>Iodid er heller ikke forbrugt til sidst, men en opløst katalysator er til gengæld svær at skille fra blandingen bagefter.</p>' +
+            TIP('I⁻ (aq) – homogen'),
+        frisk:
+            '<p>Kartoflen indeholder enzymet <b>katalase</b>, som beskytter cellerne mod det giftige H₂O₂. Et enzym er et protein med et <b>aktivt center</b>, der passer præcis til det molekyle, det skal omdanne.</p>' +
+            '<p>Her falder aktiveringsenergien fra ca. 75 til ca. 8 kJ/mol, og derfor går det så voldsomt: ét katalase-molekyle kan nå omkring 10 millioner H₂O₂-molekyler i sekundet.</p>' +
+            '<p>Enzymet sidder fast i cellevævet, så reaktionen foregår ved kartoffelstykkets overflade &ndash; altså heterogent, ligesom med brunstenen.</p>' +
+            TIP('Katalase – enzym'),
+        kogt:
+            '<p>Kartoflen indeholder stadig katalase, men enzymet virker ikke længere. Ved kogning <b>denatureres</b> proteinet: den foldede struktur går i stykker, ligesom når æggehvide bliver hvid og fast.</p>' +
+            '<p>Når formen er ødelagt, passer det <b>aktive center</b> ikke længere til H₂O₂, og katalysen stopper.</p>' +
+            '<p>Glasset er forsøgets kontrol: det viser, at det kraftige skum i glas 3 skyldes et enzym og ikke bare "noget kartoffel". De få bobler, man alligevel ser, skyldes at H₂O₂ spaltes ganske langsomt helt af sig selv.</p>' +
+            TIP('Katalase – enzym', 'og se, hvad det denaturerede enzym ikke længere kan')
+    };
+
+    /* Mekanismer på molekyleniveau: fire trin hver */
+    const MEKANISMER = {
+        mno2: {
+            titel: 'MnO₂ (s) &ndash; heterogen katalyse',
+            trin: [
+                'To H₂O₂-molekyler i opløsningen rammer overfladen af det faste MnO₂.',
+                'Adsorption: begge molekyler bindes til hver sin <b>aktive plads</b>.',
+                'O–O-bindingerne brydes, og de to frie O-atomer finder sammen som O₂.',
+                'Desorption: 2 H₂O og O₂ forlader overfladen &ndash; pladserne er frie igen.'
+            ],
+            note: 'Alt sker på <b>overfladen</b>. Derfor virker findelt pulver bedre end én stor klump: flere aktive pladser pr. gram. Katalysatoren kan filtreres fra bagefter.'
+        },
+        ki: {
+            titel: 'I⁻ (aq) &ndash; homogen katalyse',
+            fart: 1.2,
+            trin: [
+                'I⁻ er opløst i den samme vandfase som H₂O₂ &ndash; de mødes overalt.',
+                'Trin 1: H₂O₂ + I⁻ ⟶ H₂O + IO⁻ (katalysatoren indgår i reaktionen).',
+                'Trin 2: H₂O₂ + IO⁻ ⟶ H₂O + O₂ + I⁻ (ilten frigives).',
+                'I⁻ er <b>genskabt</b> og kan straks tage fat på nye H₂O₂-molekyler.'
+            ],
+            note: 'Lægger man de to trin sammen, går IO⁻ og I⁻ ud: <b>2 H₂O₂ ⟶ 2 H₂O + O₂</b>. Katalysatoren står ikke i det samlede reaktionsskema, fordi den ikke er forbrugt.'
+        },
+        enzym: {
+            titel: 'Katalase &ndash; enzym (frisk kartoffel)',
+            trin: [
+                'Katalase er et stort protein med et <b>aktivt center</b>, der passer til H₂O₂.',
+                'To H₂O₂ (substratet) binder sig i det aktive center: enzym-substrat-kompleks.',
+                'Enzymet trækker i bindingerne: O–O brydes, og der dannes 2 H₂O og O₂.',
+                'Produkterne slipper fri &ndash; enzymet er uændret og klar igen.'
+            ],
+            note: 'Koger man kartoflen, <b>denatureres</b> proteinet: det aktive center mister sin form, og katalysen stopper. Det er præcis forskellen på glas 3 og glas 4.'
+        },
+        ingen: {
+            titel: 'Uden katalysator &ndash; to temperaturer',
+            trin: [
+                '<b>Stuetemperatur:</b> molekylerne er langsomme, og sammenstødene er for energifattige.',
+                '<b>Høj temperatur:</b> nu farer molekylerne rundt og støder hårdt sammen.',
+                'To H₂O₂ presses sammen til det <b>aktiverede kompleks</b> &ndash; toppen af energibakken.',
+                'Komplekset er <b>ekstremt ustabilt</b> og falder straks fra hinanden til 2 H₂O + O₂.'
+            ],
+            note: 'Reaktionen er exoterm og forløber altså <b>gerne</b> &ndash; det er alene aktiveringsenergien, der holder farten nede. Varme hjælper, fordi flere molekyler får energi nok. En katalysator gør noget andet: den sænker selve E<sub>a</sub>.'
+        }
+    };
+
+    /* Energiprofiler: keypoints (t, E i kJ/mol). E = 0 er 2 H₂O₂ (aq). */
+    const VEJE = {
+        ingen: { navn: 'Ukatalyseret',        ea: 75, farve: '#e74c3c', chk: 'ep-ingen',
+                 pkt: [[0,0],[0.16,0],[0.50,75],[0.84,-196],[1,-196]] },
+        ki:    { navn: 'I⁻ (aq), homogen',    ea: 56, farve: '#3498db', chk: 'ep-ki',
+                 pkt: [[0,0],[0.12,0],[0.30,56],[0.48,-80],[0.66,-30],[0.86,-196],[1,-196]] },
+        mno2:  { navn: 'MnO₂ (s), heterogen', ea: 50, farve: '#f39c12', chk: 'ep-mno2',
+                 pkt: [[0,0],[0.12,0],[0.41,50],[0.55,-92],[0.71,-48],[0.89,-196],[1,-196]] },
+        enzym: { navn: 'Katalase, enzym',     ea: 8,  farve: '#2ecc71', chk: 'ep-enzym',
+                 pkt: [[0,0],[0.10,0],[0.23,8],[0.43,-118],[0.61,-100],[0.83,-196],[1,-196]] }
+    };
+    const DELTA_H = -196;   // kJ/mol for 2 H₂O₂ ⟶ 2 H₂O + O₂
+
+    /* ========================================================
+       2) TILSTAND
+       ======================================================== */
+    const state = {
+        view: 'forsog',        // 'forsog' | 'molekyler' | 'energi'
+        valgt: 0,              // indeks i TUBES (starter på MnO₂)
+
+        mek: 'mno2',           // valgt mekanisme i molekylevisningen
+        mekTid: 0,             // sekunder inde i den aktuelle cyklus
+        paused: false,
+
+        splint: null,          // {tube, t, faseTid, ok}
+        quizOpen: false,
+        taskIndex: 0,
+        mcChoice: -1,
+        rigtigPlads: 0         // hvor det rigtige svar havnede efter blandingen
+    };
+
+    /* Kørende data pr. reagensglas */
+    const glas = TUBES.map(function (t) {
+        return { tilsat: false, o2: 0, bobler: [], skum: 0, tid: 0, korn: [], blink: 0, faerdig: false };
+    });
+
+    const TRIN_TID = 2.6;        // sekunder pr. trin i mekanismevisningen
+    const ANTAL_TRIN = 4;
+    const FORSOEG_FART = 0.8;    // forsøget kører roligt, så man kan nå at se boblerne
+
+    /* ========================================================
+       3) CANVAS-OPSÆTNING (logiske koordinater + DPR-skalering)
+       ======================================================== */
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    const LW = 1000, LH = 580;
+
+    /* Geometri for reagensglassene */
+    const G = { top: 168, bund: 462, halvB: 48, vaeskeTop: 268 };
+    function tubeX(i) { return 170 + i * 220; }
+
+    function resizeCanvas() {
+        const wrap = document.getElementById('visuals');
+        const availW = Math.max(300, wrap.clientWidth - 32);
+        const availH = Math.max(180, wrap.clientHeight - 32);
+        const s = Math.min(availW / LW, availH / LH);
+        const cssW = LW * s, cssH = LH * s;
+        const dpr = window.devicePixelRatio || 1;
+
+        canvas.style.width = cssW + 'px';
+        canvas.style.height = cssH + 'px';
+        canvas.width = Math.round(cssW * dpr);
+        canvas.height = Math.round(cssH * dpr);
+        ctx.setTransform(canvas.width / LW, 0, 0, canvas.height / LH, 0, 0);
+    }
+
+    /* ========================================================
+       4) SMÅ TEGNEHJÆLPERE
+       ======================================================== */
+    function smooth(n) { return n * n * (3 - 2 * n); }            // blød overgang 0→1
+    function lerp(a, b, n) { return a + (b - a) * n; }
+    function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
+
+    function rundtRekt(x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+    }
+
+    /* Omridset af et reagensglas (åbent foroven, halvkugle forneden) */
+    function glasSti(cx) {
+        const w = G.halvB;
+        ctx.beginPath();
+        ctx.moveTo(cx - w, G.top);
+        ctx.lineTo(cx - w, G.bund - w);
+        ctx.arc(cx, G.bund - w, w, Math.PI, 0, true);
+        ctx.lineTo(cx + w, G.top);
+    }
+
+    function tekst(s, x, y, farve, størrelse, justering, fed) {
+        ctx.fillStyle = farve;
+        ctx.font = (fed ? 'bold ' : '') + størrelse + 'px "Segoe UI", sans-serif';
+        ctx.textAlign = justering || 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(s, x, y);
+    }
+
+    /* ========================================================
+       5) VISNING 1: FORSØGET (5 reagensglas)
+       ======================================================== */
+
+    /* Hvor dannes en ny boble? Det er her forskellen på homogen og
+       heterogen katalyse bliver synlig for eleverne. */
+    function boblePosition(i) {
+        const cx = tubeX(i), t = TUBES[i];
+        if (t.kilde === 'korn' && glas[i].korn.length) {
+            const k = glas[i].korn[Math.floor(Math.random() * glas[i].korn.length)];
+            return { x: k.x + (Math.random() - 0.5) * 10, y: k.y - 5 };
+        }
+        if (t.kilde === 'overalt') {          // homogen: overalt i væsken
+            return {
+                x: cx + (Math.random() - 0.5) * 76,
+                y: G.vaeskeTop + 14 + Math.random() * (G.bund - 30 - G.vaeskeTop)
+            };
+        }
+        if (t.kilde === 'kartoffel') {        // langs kartoffelstykkets overflade
+            const v = Math.random() * Math.PI * 2;
+            return { x: cx + Math.cos(v) * 31, y: 320 + Math.sin(v) * 21 };
+        }
+        return { x: cx + (Math.random() - 0.5) * 70, y: G.bund - 22 };
+    }
+
+    function opdaterForsog(dt) {
+        for (let i = 0; i < TUBES.length; i++) {
+            const g = glas[i], t = TUBES[i];
+            if (g.blink > 0) g.blink = Math.max(0, g.blink - dt);
+            if (!g.tilsat) continue;
+
+            g.tid += dt;
+
+            /* H₂O₂ bruges op undervejs: farten aftager, og til sidst er reaktionen slut */
+            if (!g.faerdig) {
+                g.o2 += t.rate * dt * 0.19 * (0.25 + 0.75 * (1 - g.o2));
+                if (g.o2 >= 0.999) { g.o2 = 1; g.faerdig = true; opdaterKort(); }
+            }
+
+            /* Nye bobler – antallet pr. sekund følger reaktionshastigheden */
+            const antal = g.faerdig ? 0 : t.rate * 26 * dt * (0.3 + 0.7 * (1 - g.o2));
+            let n = Math.floor(antal) + (Math.random() < (antal % 1) ? 1 : 0);
+            for (; n > 0 && g.bobler.length < 260; n--) {
+                const p = boblePosition(i);
+                g.bobler.push({
+                    x: p.x, y: p.y,
+                    r: 2 + Math.random() * (2 + 4 * t.rate),
+                    v: 26 + Math.random() * 60 * (0.4 + t.rate),
+                    f: Math.random() * 6.28
+                });
+            }
+
+            /* Bobler stiger, vugger og brister ved overfladen */
+            const overflade = G.vaeskeTop - g.skum;
+            for (let b = g.bobler.length - 1; b >= 0; b--) {
+                const bo = g.bobler[b];
+                bo.y -= bo.v * dt;
+                bo.f += dt * 4;
+                bo.x += Math.sin(bo.f) * 12 * dt;
+                if (bo.y - bo.r <= overflade) g.bobler.splice(b, 1);
+            }
+
+            /* Skumlag – kraftigst i kartoffelglasset. Når reaktionen er slut, falder skummet sammen igen. */
+            const maalSkum = g.faerdig ? 0 : Math.min(1, g.o2 * 2.2) * (t.rate > 0.5 ? 74 * t.rate : 4);
+            g.skum += (maalSkum - g.skum) * Math.min(1, dt * (g.faerdig ? 0.4 : 0.9));
+        }
+
+        /* Glødepindsprøven */
+        if (state.splint) {
+            const sp = state.splint;
+            sp.t += dt;
+            if (!sp.meldt && sp.t > 1.05) {
+                sp.meldt = true;
+                if (sp.ok) visBesked('Pinden bryder i lys lue → der er dannet O₂ (g)!', 'ok');
+                else if (sp.faerdig) visBesked('Reaktionen er løbet til ende – al H₂O₂ er brugt op, så der udvikles ikke mere O₂.', 'fail');
+                else visBesked('Pinden gløder blot videre – der udvikles for lidt O₂.', 'fail');
+            }
+            if (sp.t > 3.8) { state.splint = null; visBesked(''); }
+        }
+    }
+
+    function tegnForsog() {
+        ctx.fillStyle = '#16161b';
+        ctx.fillRect(0, 0, LW, LH);
+
+        tekst('Klik på et glas for at vælge det \u00B7 Læg mærke til HVOR i glasset boblerne dannes',
+              LW / 2, 34, '#8a8a96', 15);
+
+        /* Stativets bagerste tværstang */
+        ctx.fillStyle = '#3a3028';
+        ctx.fillRect(48, 352, LW - 96, 20);
+        ctx.fillStyle = 'rgba(255,255,255,0.06)';
+        ctx.fillRect(48, 352, LW - 96, 5);
+
+        for (let i = 0; i < TUBES.length; i++) tegnGlas(i);
+
+        /* Stativets forkant tegnes kun mellem glassene, så de ser ud til at stå i huller */
+        const kanter = [[48, tubeX(0) - G.halvB]];
+        for (let i = 0; i < TUBES.length - 1; i++) kanter.push([tubeX(i) + G.halvB, tubeX(i + 1) - G.halvB]);
+        kanter.push([tubeX(TUBES.length - 1) + G.halvB, LW - 48]);
+        ctx.fillStyle = '#5c4a3a';
+        for (const k of kanter) ctx.fillRect(k[0], 352, k[1] - k[0], 20);
+
+        /* Stativets bundplade og ben */
+        ctx.fillStyle = '#4a3d31';
+        ctx.fillRect(48, 470, LW - 96, 16);
+        ctx.fillStyle = 'rgba(0,0,0,0.35)';
+        ctx.fillRect(48, 482, LW - 96, 4);
+
+        for (let i = 0; i < TUBES.length; i++) tegnO2maaler(i);
+
+        tegnSplint();
+    }
+
+    function tegnGlas(i) {
+        const cx = tubeX(i), g = glas[i], t = TUBES[i];
+        const w = G.halvB;
+
+        /* Markering af det valgte glas */
+        if (i === state.valgt) {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(52,152,219,0.75)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([7, 5]);
+            rundtRekt(cx - 70, 62, 140, 412, 12);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        /* Kort glimt, når der lige er tilsat noget */
+        if (g.blink > 0) {
+            ctx.strokeStyle = 'rgba(255,255,255,' + (g.blink * 0.8) + ')';
+            ctx.lineWidth = 4;
+            glasSti(cx);
+            ctx.stroke();
+        }
+
+        /* Etiketter over glasset */
+        tekst('GLAS ' + (i + 1), cx, 80, '#6f6f7c', 12, 'center', true);
+        tekst(t.kort, cx, 102, '#ffffff', 15, 'center', true);
+        const badgeFarve = t.type === 'homogen' ? '#8ecdf5' : (t.type === 'heterogen' ? '#f5c069' : '#8a8a96');
+        tekst(t.type === 'ingen' ? 'ingen katalysator' : t.type + ' katalyse', cx, 124, badgeFarve, 12);
+        tekst(t.under, cx, 143, '#6f6f7c', 11);
+
+        /* Væske (klippet til glassets indre) */
+        ctx.save();
+        glasSti(cx);
+        ctx.lineTo(cx + w, G.top);
+        ctx.closePath();
+        ctx.clip();
+
+        const braendt = t.id === 'ki' ? Math.min(0.78, g.o2 * 1.1) : 0;
+        const R = Math.round(lerp(150, 208, braendt));
+        const Gr = Math.round(lerp(200, 168, braendt));
+        const B = Math.round(lerp(228, 58, braendt));
+        ctx.fillStyle = 'rgba(' + R + ',' + Gr + ',' + B + ',' + (0.42 + 0.26 * braendt) + ')';
+        ctx.fillRect(cx - w, G.vaeskeTop, w * 2, G.bund - G.vaeskeTop);
+
+        /* Fast katalysator i bunden / kartoffelstykke */
+        if (t.id === 'mno2' && g.korn.length) {
+            for (const k of g.korn) {
+                ctx.fillStyle = '#26262b';
+                ctx.beginPath();
+                ctx.ellipse(k.x, k.y, k.r, k.r * 0.72, k.v, 0, 6.283);
+                ctx.fill();
+                ctx.fillStyle = 'rgba(255,255,255,0.10)';
+                ctx.beginPath();
+                ctx.ellipse(k.x - k.r * 0.3, k.y - k.r * 0.35, k.r * 0.35, k.r * 0.22, k.v, 0, 6.283);
+                ctx.fill();
+            }
+        }
+        if ((t.id === 'frisk' || t.id === 'kogt') && g.tilsat) {
+            const frisk = t.id === 'frisk';
+            ctx.fillStyle = frisk ? '#e8d391' : '#d5cdb4';
+            ctx.strokeStyle = frisk ? '#b39a4e' : '#a49c88';
+            ctx.lineWidth = 2;
+            rundtRekt(cx - 33, 300, 66, 40, 9);
+            ctx.fill();
+            ctx.stroke();
+            tekst(frisk ? 'frisk' : 'kogt', cx, 320, frisk ? '#7a6828' : '#7d7666', 11, 'center', true);
+        }
+
+        /* Hvor foregår reaktionen? Heterogen: kun ved overfladen. Homogen: i hele væsken. */
+        if (g.tilsat && !g.faerdig && t.rate > 0.2) {
+            const puls = 0.30 + 0.16 * Math.sin(g.tid * 4);
+            if (t.kilde === 'korn') {
+                for (const k of g.korn) {
+                    const gl = ctx.createRadialGradient(k.x, k.y, 1, k.x, k.y, 20);
+                    gl.addColorStop(0, 'rgba(243,156,18,' + puls + ')');
+                    gl.addColorStop(1, 'rgba(243,156,18,0)');
+                    ctx.fillStyle = gl;
+                    ctx.beginPath();
+                    ctx.arc(k.x, k.y, 20, 0, 6.283);
+                    ctx.fill();
+                }
+            } else if (t.kilde === 'kartoffel') {
+                const gl = ctx.createRadialGradient(cx, 320, 20, cx, 320, 52);
+                gl.addColorStop(0, 'rgba(243,156,18,' + puls + ')');
+                gl.addColorStop(1, 'rgba(243,156,18,0)');
+                ctx.fillStyle = gl;
+                ctx.beginPath();
+                ctx.arc(cx, 320, 52, 0, 6.283);
+                ctx.fill();
+            } else if (t.kilde === 'overalt') {
+                /* Homogen: reaktionen sker overalt i opløsningen på én gang */
+                const h = G.bund - 34 - G.vaeskeTop;
+                for (let j = 0; j < 16; j++) {
+                    const px = cx - 37 + ((j * 41) % 74);
+                    const py = G.vaeskeTop + 18 + ((j * 59) % h);
+                    const a = puls * (0.6 + 0.4 * Math.sin(g.tid * 5 + j));
+                    const gl = ctx.createRadialGradient(px, py, 1, px, py, 15);
+                    gl.addColorStop(0, 'rgba(120,205,255,' + Math.max(0, a) + ')');
+                    gl.addColorStop(1, 'rgba(120,205,255,0)');
+                    ctx.fillStyle = gl;
+                    ctx.beginPath();
+                    ctx.arc(px, py, 15, 0, 6.283);
+                    ctx.fill();
+                }
+            }
+        }
+
+        /* Bobler */
+        ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+        ctx.lineWidth = 1;
+        for (const b of g.bobler) {
+            ctx.fillStyle = 'rgba(235,248,255,0.30)';
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, b.r, 0, 6.283);
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        /* Skumlag oven på væsken */
+        if (g.skum > 1) {
+            const top = Math.max(G.top + 4, G.vaeskeTop - g.skum);
+            ctx.fillStyle = 'rgba(245,252,255,0.34)';
+            ctx.fillRect(cx - w, top, w * 2, G.vaeskeTop - top);
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            for (let s = 0; s < 26; s++) {
+                const sx = cx - w + ((s * 37) % (w * 2));
+                const sy = top + ((s * 53) % Math.max(6, G.vaeskeTop - top));
+                ctx.beginPath();
+                ctx.arc(sx, sy, 3 + (s % 3), 0, 6.283);
+                ctx.fill();
+            }
+        }
+        ctx.restore();
+
+        /* Selve glasset */
+        glasSti(cx);
+        ctx.strokeStyle = 'rgba(215,235,248,0.6)';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(cx - w + 11, G.top + 22);
+        ctx.lineTo(cx - w + 11, G.bund - 70);
+        ctx.stroke();
+
+        /* Varme udvikles – reaktionen er exoterm */
+        if (!g.faerdig && g.o2 * t.rate > 0.18) tekst('🌡 varmt', cx, G.top - 6, '#f39c12', 12, 'center', true);
+    }
+
+    function hastighedsord(i) {
+        const t = TUBES[i];
+        if (!glas[i].tilsat) return 'ikke tilsat endnu';
+        if (glas[i].faerdig) return '✓ færdig – al H₂O₂ er brugt op';
+        if (t.rate >= 0.8) return 'meget kraftig bruse';
+        if (t.rate >= 0.5) return 'kraftig bruse';
+        if (t.rate >= 0.2) return 'langsom';
+        return 'næsten ingen bobler';
+    }
+
+    function tegnO2maaler(i) {
+        const cx = tubeX(i), g = glas[i];
+        const bx = cx - 60, by = 502, bw = 120, bh = 13;
+
+        rundtRekt(bx, by, bw, bh, 6);
+        ctx.fillStyle = '#26262e';
+        ctx.fill();
+        ctx.strokeStyle = '#3a3a44';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        if (g.o2 > 0.005) {
+            ctx.save();
+            rundtRekt(bx, by, bw, bh, 6);
+            ctx.clip();
+            ctx.fillStyle = TUBES[i].rate > 0.4 ? '#2ecc71' : '#7f8c8d';
+            ctx.fillRect(bx, by, bw * g.o2, bh);
+            ctx.restore();
+        }
+        tekst('O₂ dannet: ' + Math.round(g.o2 * 100) + ' %', cx, 530, '#b9b9c4', 12);
+        tekst(hastighedsord(i), cx, 550, '#75757f', 12);
+    }
+
+    function tegnSplint() {
+        const sp = state.splint;
+        if (!sp) return;
+        const cx = tubeX(sp.i);
+
+        /* Pinden føres ned mod glasmundingen og trækkes op igen */
+        let p;
+        if (sp.t < 1.0) p = smooth(sp.t / 1.0);
+        else if (sp.t < 2.8) p = 1;
+        else p = 1 - smooth(clamp((sp.t - 2.8) / 1.0, 0, 1));
+        const spids = lerp(G.top - 105, G.top + 58, p);
+
+        ctx.save();
+        ctx.strokeStyle = '#a97a41';
+        ctx.lineWidth = 7;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(cx + 74, spids - 116);
+        ctx.lineTo(cx, spids);
+        ctx.stroke();
+
+        /* Glød i spidsen */
+        const glod = ctx.createRadialGradient(cx, spids, 0, cx, spids, 16);
+        glod.addColorStop(0, 'rgba(255,190,90,0.95)');
+        glod.addColorStop(1, 'rgba(255,120,20,0)');
+        ctx.fillStyle = glod;
+        ctx.beginPath();
+        ctx.arc(cx, spids, 16, 0, 6.283);
+        ctx.fill();
+
+        /* Flamme, hvis der er ilt nok */
+        if (sp.ok && sp.t > 1.0 && sp.t < 2.9) {
+            const f = Math.min(1, (sp.t - 1.0) * 3) * (sp.t > 2.5 ? (2.9 - sp.t) / 0.4 : 1);
+            const h = 40 * f;
+            const flamme = ctx.createRadialGradient(cx, spids - h * 0.35, 2, cx, spids - h * 0.35, h);
+            flamme.addColorStop(0, 'rgba(255,255,220,0.95)');
+            flamme.addColorStop(0.45, 'rgba(255,180,40,0.8)');
+            flamme.addColorStop(1, 'rgba(255,80,0,0)');
+            ctx.fillStyle = flamme;
+            ctx.beginPath();
+            ctx.moveTo(cx - 14 * f, spids + 6);
+            ctx.quadraticCurveTo(cx - 10 * f, spids - h, cx, spids - h * 1.35);
+            ctx.quadraticCurveTo(cx + 10 * f, spids - h, cx + 14 * f, spids + 6);
+            ctx.closePath();
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+
+    /* ========================================================
+       6) VISNING 2: MOLEKYLENIVEAU
+       ======================================================== */
+    const BOKS = { x0: 50, y0: 92, x1: 950, y1: 470 };
+
+    function udenTags(s) {
+        return s.replace(/<[^>]*>/g, '')
+                .replace(/&ndash;/g, '–').replace(/&amp;/g, '&')
+                .replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+    }
+
+    function atom(x, y, r, farve, mærke, tekstfarve) {
+        ctx.fillStyle = farve;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, 6.283);
+        ctx.fill();
+
+        /* Blød glans – tegnes uden om midten, så et evt. bogstav stadig kan læses */
+        ctx.fillStyle = 'rgba(255,255,255,0.30)';
+        ctx.beginPath();
+        ctx.ellipse(x - r * 0.34, y - r * 0.42, r * 0.40, r * 0.26, -0.6, 0, 6.283);
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, 6.283);
+        ctx.stroke();
+        if (mærke) tekst(mærke, x, y + 1, tekstfarve || '#fff', r * 1.05, 'center', true);
+    }
+
+    function binding(x1, y1, x2, y2, farve, bredde) {
+        ctx.strokeStyle = farve || 'rgba(255,255,255,0.55)';
+        ctx.lineWidth = bredde || 5;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+    }
+
+    /* Tegner ét molekyle/ion. brud ∈ [0;1] trækker O–O-bindingen fra hinanden. */
+    function molekyle(type, x, y, s, brud) {
+        s = s || 1;
+        brud = brud || 0;
+        const O = '#e74c3c', H = '#ecf0f1', I = '#9b59b6';
+
+        if (type === 'h2o2') {
+            const d = (16 + 22 * brud) * s;
+            binding(x - d, y, x + d, y, brud > 0.05 ? 'rgba(231,76,60,0.5)' : 'rgba(255,255,255,0.5)', 5 * s);
+            binding(x - d, y, x - d - 15 * s, y - 15 * s, 'rgba(255,255,255,0.4)', 4 * s);
+            binding(x + d, y, x + d + 15 * s, y + 15 * s, 'rgba(255,255,255,0.4)', 4 * s);
+            atom(x - d - 15 * s, y - 15 * s, 8 * s, H, '', '#333');
+            atom(x + d + 15 * s, y + 15 * s, 8 * s, H, '', '#333');
+            atom(x - d, y, 15 * s, O, 'O');
+            atom(x + d, y, 15 * s, O, 'O');
+            if (s >= 0.9) tekst('H₂O₂', x, y - 34 * s, '#ff9d92', 13, 'center', true);
+        } else if (type === 'h2o') {
+            binding(x, y, x - 16 * s, y + 13 * s, 'rgba(255,255,255,0.4)', 4 * s);
+            binding(x, y, x + 16 * s, y + 13 * s, 'rgba(255,255,255,0.4)', 4 * s);
+            atom(x - 16 * s, y + 13 * s, 8 * s, H, '', '#333');
+            atom(x + 16 * s, y + 13 * s, 8 * s, H, '', '#333');
+            atom(x, y, 15 * s, O, 'O');
+            if (s >= 0.8) tekst('H₂O', x, y - 26 * s, '#9fd8f5', 13, 'center', true);
+        } else if (type === 'o2') {
+            binding(x - 13 * s, y - 2, x + 13 * s, y - 2, 'rgba(255,255,255,0.6)', 4 * s);
+            binding(x - 13 * s, y + 4, x + 13 * s, y + 4, 'rgba(255,255,255,0.6)', 4 * s);
+            atom(x - 13 * s, y, 15 * s, O, 'O');
+            atom(x + 13 * s, y, 15 * s, O, 'O');
+            if (s >= 0.8) tekst('O₂', x, y - 26 * s, '#ffd7a0', 13, 'center', true);
+        } else if (type === 'i') {
+            atom(x, y, 19 * s, I, 'I');
+            tekst('I⁻', x, y + 34 * s, '#d3a9e6', 13, 'center', true);
+        } else if (type === 'io') {
+            binding(x - 13 * s, y, x + 15 * s, y, 'rgba(255,255,255,0.5)', 5 * s);
+            atom(x + 15 * s, y, 13 * s, O, 'O');
+            atom(x - 13 * s, y, 19 * s, I, 'I');
+            tekst('IO⁻', x, y + 36 * s, '#d3a9e6', 13, 'center', true);
+        }
+    }
+
+    /* Nogle mekanismer har brug for mere tid pr. trin end andre */
+    function trinTid() { return TRIN_TID * (MEKANISMER[state.mek].fart || 1); }
+    function mekTrin() { return Math.floor(state.mekTid / trinTid()) % ANTAL_TRIN; }
+    function mekLokalT() { return (state.mekTid % trinTid()) / trinTid(); }
+
+    const BUNDTEKST = {
+        ki: ['Trin 1:  H₂O₂ + I⁻  ⟶  H₂O + IO⁻',
+             'Trin 2:  H₂O₂ + IO⁻  ⟶  H₂O + O₂ + I⁻',
+             'I alt:  2 H₂O₂  ⟶  2 H₂O + O₂     (I⁻ går ud – den er ikke forbrugt)'],
+        mno2: ['2 H₂O₂ adsorberes  ⟶  bindingsbrud  ⟶  2 H₂O + O₂ desorberes',
+               'I alt:  2 H₂O₂  ⟶  2 H₂O + O₂     (MnO₂ vejer det samme bagefter)',
+               'Kun overfladen tæller – findelt pulver har flere aktive pladser pr. gram'],
+        enzym: ['E + 2 S  ⟶  ES₂  ⟶  E + 2 H₂O + O₂      (E = katalase, S = H₂O₂)',
+                'I alt:  2 H₂O₂  ⟶  2 H₂O + O₂     (enzymet er uændret bagefter)',
+                'Kogning denaturerer proteinet → det aktive center virker ikke længere'],
+        ingen: ['2 H₂O₂  ⟶  [ H₄O₄ ]‡  ⟶  2 H₂O + O₂      Eₐ ≈ 75 kJ/mol',
+                'Det aktiverede kompleks er reaktionsvejens højeste punkt – det kan ikke isoleres',
+                'Ved høj temperatur har flere molekyler energi nok til at nå derop']
+    };
+
+    function tegnMolekyler() {
+        ctx.fillStyle = '#16161b';
+        ctx.fillRect(0, 0, LW, LH);
+
+        const m = MEKANISMER[state.mek];
+        const trin = mekTrin(), t = mekLokalT();
+
+        tekst(udenTags(m.titel), LW / 2, 28, '#8a8a96', 14);
+        tekst(udenTags(m.trin[trin]), LW / 2, 58, '#ffffff', 17, 'center', true);
+
+        ctx.save();
+        rundtRekt(BOKS.x0, BOKS.y0, BOKS.x1 - BOKS.x0, BOKS.y1 - BOKS.y0, 12);
+        ctx.clip();
+
+        if (state.mek === 'ki') sceneHomogen(trin, t);
+        else if (state.mek === 'mno2') sceneHeterogen(trin, t);
+        else if (state.mek === 'enzym') sceneEnzym(trin, t);
+        else sceneIngen(trin, t);
+
+        ctx.restore();
+
+        rundtRekt(BOKS.x0, BOKS.y0, BOKS.x1 - BOKS.x0, BOKS.y1 - BOKS.y0, 12);
+        ctx.strokeStyle = '#3a3a44';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        /* Trinprikker */
+        for (let k = 0; k < ANTAL_TRIN; k++) {
+            ctx.fillStyle = k === trin ? '#3498db' : '#3a3a44';
+            ctx.beginPath();
+            ctx.arc(LW / 2 - 30 + k * 20, 78, k === trin ? 6 : 4, 0, 6.283);
+            ctx.fill();
+        }
+
+        const linjer = BUNDTEKST[state.mek];
+        tekst(linjer[0], LW / 2, 500, '#d5d5d5', 15);
+        tekst(linjer[1], LW / 2, 524, '#d5d5d5', 15);
+        tekst(linjer[2], LW / 2, 550, '#75757f', 13);
+    }
+
+    /* ---------- Homogen katalyse: I⁻ i samme fase ---------- */
+    function sceneHomogen(step, t) {
+        const C = { x: 470, y: 292 };
+
+        ctx.fillStyle = 'rgba(90,150,200,0.10)';
+        ctx.fillRect(BOKS.x0, BOKS.y0, BOKS.x1 - BOKS.x0, BOKS.y1 - BOKS.y0);
+        tekst('ÉN FASE: alt er opløst i vand (aq)', BOKS.x0 + 20, BOKS.y0 + 24, '#8ecdf5', 13, 'left', true);
+
+        /* Baggrund: mange H₂O₂ overalt i opløsningen */
+        ctx.globalAlpha = 0.3;
+        for (let k = 0; k < 7; k++) {
+            const x = 130 + k * 118 + Math.sin(state.mekTid * 0.5 + k) * 16;
+            const y = 150 + ((k * 83) % 250) + Math.cos(state.mekTid * 0.45 + k * 1.7) * 12;
+            molekyle('h2o2', x, y, 0.5);
+        }
+        ctx.globalAlpha = 1;
+
+        let katForm = 'i';
+        if (step === 1 && t >= 0.5) katForm = 'io';
+        if (step === 2 && t < 0.5) katForm = 'io';
+
+        if (step === 0) {
+            const p = smooth(t);
+            molekyle('h2o2', lerp(780, 640, p), lerp(170, 240, p), 1);
+            tekst('I⁻ svømmer frit rundt – samme fase som H₂O₂', C.x, C.y + 84, '#d3a9e6', 14, 'center', true);
+        } else if (step === 1) {
+            if (t < 0.5) {
+                const p = smooth(t / 0.5);
+                molekyle('h2o2', lerp(640, C.x + 78, p), lerp(240, C.y - 12, p), 1);
+            } else {
+                const p = smooth((t - 0.5) / 0.5);
+                molekyle('h2o', lerp(C.x + 78, 235, p), lerp(C.y - 12, 165, p), 1);
+                tekst('Katalysatoren INDGÅR i reaktionen', C.x, C.y + 84, '#f5c069', 14, 'center', true);
+            }
+        } else if (step === 2) {
+            if (t < 0.5) {
+                const p = smooth(t / 0.5);
+                molekyle('h2o2', lerp(790, C.x + 82, p), lerp(400, C.y + 20, p), 1);
+            } else {
+                const p = smooth((t - 0.5) / 0.5);
+                molekyle('h2o', lerp(C.x + 82, 255, p), lerp(C.y + 20, 415, p), 1);
+                ctx.globalAlpha = 1 - p * 0.5;
+                molekyle('o2', lerp(C.x + 30, C.x + 6, p), lerp(C.y - 40, 132, p), 1);
+                ctx.globalAlpha = 1;
+                tekst('… og bliver GENSKABT i trin 2', C.x, C.y + 84, '#2ecc71', 14, 'center', true);
+            }
+        } else {
+            const puls = 22 + Math.sin(state.mekTid * 5) * 4;
+            ctx.strokeStyle = 'rgba(46,204,113,0.7)';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(C.x, C.y, puls, 0, 6.283);
+            ctx.stroke();
+            tekst('I⁻ er uforbrugt og klar igen', C.x, C.y + 84, '#2ecc71', 15, 'center', true);
+        }
+
+        molekyle(katForm, C.x, C.y + Math.sin(state.mekTid * 1.6) * 4, 1);
+    }
+
+    /* ---------- Heterogen katalyse: fast MnO₂-overflade ---------- */
+    function sceneHeterogen(step, t) {
+        const yOverflade = 388;
+        const S = { x: 500, y: yOverflade };
+
+        ctx.fillStyle = 'rgba(90,150,200,0.10)';
+        ctx.fillRect(BOKS.x0, BOKS.y0, BOKS.x1 - BOKS.x0, yOverflade - BOKS.y0);
+        tekst('FASE 1: opløsning med H₂O₂ (aq)', BOKS.x0 + 20, BOKS.y0 + 24, '#8ecdf5', 13, 'left', true);
+
+        /* Det faste stof */
+        ctx.fillStyle = '#292930';
+        ctx.fillRect(BOKS.x0, yOverflade, BOKS.x1 - BOKS.x0, BOKS.y1 - yOverflade);
+        ctx.fillStyle = '#33333c';
+        for (let r = 0; r < 3; r++) {
+            for (let c = 0; c < 24; c++) {
+                ctx.beginPath();
+                ctx.arc(BOKS.x0 + 22 + c * 38 + (r % 2) * 19, yOverflade + 20 + r * 24, 8, 0, 6.283);
+                ctx.fill();
+            }
+        }
+        ctx.strokeStyle = '#5a5a68';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(BOKS.x0, yOverflade);
+        ctx.lineTo(BOKS.x1, yOverflade);
+        ctx.stroke();
+        tekst('FASE 2: MnO₂ (s) – fast stof, en HELT anden fase', BOKS.x0 + 20, BOKS.y1 - 22, '#f5c069', 13, 'left', true);
+
+        /* Aktive pladser på overfladen */
+        for (const sx of [220, 420, 580, 780]) {
+            const fri = !((sx === 420 || sx === 580) && (step === 1 || step === 2));
+            ctx.fillStyle = fri ? 'rgba(243,156,18,0.75)' : 'rgba(243,156,18,0.28)';
+            ctx.beginPath();
+            ctx.arc(sx, yOverflade, 11, Math.PI, 0, true);
+            ctx.fill();
+        }
+        tekst('aktive pladser', 780, yOverflade + 30, '#a8843f', 12, 'center');
+
+        /* Baggrundsmolekyler i opløsningen */
+        ctx.globalAlpha = 0.3;
+        for (let k = 0; k < 5; k++) {
+            const x = 160 + k * 165 + Math.sin(state.mekTid * 0.5 + k) * 18;
+            const y = 150 + ((k * 61) % 140) + Math.cos(state.mekTid * 0.4 + k) * 10;
+            molekyle('h2o2', x, y, 0.5);
+        }
+        ctx.globalAlpha = 1;
+
+        /* To H₂O₂ omsættes til 2 H₂O + O₂ – to nabopladser på overfladen */
+        const A = 420, B = 580;
+
+        if (step === 0) {
+            const p = smooth(t);
+            molekyle('h2o2', lerp(250, A, p), lerp(160, 268, p), 1);
+            molekyle('h2o2', lerp(790, B, p), lerp(180, 268, p), 1);
+            tekst('To H₂O₂ skal nå hen til overfladen', S.x, 150, '#8ecdf5', 15, 'center', true);
+        } else if (step === 1) {
+            const p = smooth(t);
+            const y = lerp(268, S.y - 34, p);
+            molekyle('h2o2', A, y, 1);
+            molekyle('h2o2', B, y, 1);
+            if (p > 0.55) {
+                bindTilOverflade(A, y, S.y, 0);
+                bindTilOverflade(B, y, S.y, 0);
+                tekst('ADSORPTION – én plads til hvert molekyle', S.x, 150, '#f39c12', 16, 'center', true);
+            }
+        } else if (step === 2) {
+            const brud = smooth(t);
+            molekyle('h2o2', A, S.y - 34, 1, brud);
+            molekyle('h2o2', B, S.y - 34, 1, brud);
+            bindTilOverflade(A, S.y - 34, S.y, brud);
+            bindTilOverflade(B, S.y - 34, S.y, brud);
+            if (brud > 0.45) {
+                ctx.strokeStyle = 'rgba(46,204,113,' + ((brud - 0.45) / 0.55) + ')';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(A + 16 + 22 * brud, S.y - 34);
+                ctx.lineTo(B - 16 - 22 * brud, S.y - 34);
+                ctx.stroke();
+                tekst('de to frie O-atomer binder sig til hinanden', S.x, 432, '#2ecc71', 14);
+            }
+            tekst('Overfladen svækker begge O–O-bindinger', S.x, 150, '#f39c12', 15, 'center', true);
+        } else {
+            const p = smooth(t);
+            molekyle('h2o', lerp(A - 20, 210, p), lerp(S.y - 40, 190, p), 1);
+            molekyle('h2o', lerp(B + 20, 800, p), lerp(S.y - 40, 190, p), 1);
+            molekyle('o2', lerp(S.x, S.x, p), lerp(S.y - 44, 140, p), 1);
+            tekst('DESORPTION – 2 H₂O + O₂ forlader overfladen', S.x, 150, '#2ecc71', 16, 'center', true);
+            tekst('pladserne er frie igen', S.x, 432, '#75757f', 14);
+        }
+    }
+
+    /* Stiplede bindinger fra et adsorberet molekyle ned til overfladen */
+    function bindTilOverflade(x, y, yOverflade, brud) {
+        ctx.save();
+        ctx.setLineDash([5, 4]);
+        ctx.strokeStyle = 'rgba(243,156,18,0.9)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x - 16 - 22 * brud, y + 14); ctx.lineTo(x - 16 - 22 * brud, yOverflade - 2);
+        ctx.moveTo(x + 16 + 22 * brud, y + 14); ctx.lineTo(x + 16 + 22 * brud, yOverflade - 2);
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    /* ---------- Enzymkatalyse: katalase i frisk kartoffel ---------- */
+    function sceneEnzym(step, t) {
+        const P = { x: 380, y: 300 };
+        const K = { x: P.x + 148, y: P.y - 12 };   // det aktive center
+
+        ctx.fillStyle = 'rgba(90,150,200,0.10)';
+        ctx.fillRect(BOKS.x0, BOKS.y0, BOKS.x1 - BOKS.x0, BOKS.y1 - BOKS.y0);
+
+        /* Proteinet – lidt "knudret" som en foldet aminosyrekæde */
+        const klem = step === 2 ? 1 + Math.sin(state.mekTid * 8) * 0.02 : 1;
+        const g = ctx.createRadialGradient(P.x - 40, P.y - 50, 20, P.x, P.y, 175);
+        g.addColorStop(0, '#3fae6b');
+        g.addColorStop(1, '#1d6b41');
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.ellipse(P.x, P.y, 152 * klem, 122 * klem, 0, 0, 6.283);
+        ctx.fill();
+        for (let k = 0; k < 9; k++) {
+            const v = k * 0.698;
+            ctx.beginPath();
+            ctx.arc(P.x + Math.cos(v) * 138, P.y + Math.sin(v) * 108, 30, 0, 6.283);
+            ctx.fill();
+        }
+        tekst('KATALASE', P.x, P.y + 6, 'rgba(255,255,255,0.85)', 22, 'center', true);
+        tekst('et protein', P.x, P.y + 32, 'rgba(255,255,255,0.55)', 14);
+
+        /* Det aktive center – en lomme med plads til to H₂O₂ */
+        ctx.fillStyle = '#1a2026';
+        ctx.beginPath();
+        ctx.ellipse(K.x, K.y, 52, 64, 0, 0, 6.283);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        tekst('aktivt center', K.x + 10, K.y + 86, '#a8e6c0', 13, 'center', true);
+
+        const S1 = { x: K.x, y: K.y - 30 }, S2 = { x: K.x, y: K.y + 30 };
+
+        if (step === 0) {
+            molekyle('h2o2', 810 + Math.sin(state.mekTid) * 10, 235, 0.75);
+            molekyle('h2o2', 810 + Math.sin(state.mekTid + 2) * 10, 365, 0.75);
+            tekst('Kun molekyler, der PASSER i lommen, katalyseres', LW / 2, 130, '#a8e6c0', 15, 'center', true);
+        } else if (step === 1) {
+            const p = smooth(t);
+            molekyle('h2o2', lerp(810, S1.x, p), lerp(235, S1.y, p), lerp(0.75, 0.6, p));
+            molekyle('h2o2', lerp(810, S2.x, p), lerp(365, S2.y, p), lerp(0.75, 0.6, p));
+            if (p > 0.7) tekst('ENZYM-SUBSTRAT-KOMPLEKS: to H₂O₂ ad gangen', LW / 2, 130, '#2ecc71', 16, 'center', true);
+        } else if (step === 2) {
+            const brud = smooth(t);
+            molekyle('h2o2', S1.x, S1.y, 0.6, brud);
+            molekyle('h2o2', S2.x, S2.y, 0.6, brud);
+            if (brud > 0.45) {
+                ctx.strokeStyle = 'rgba(46,204,113,' + ((brud - 0.45) / 0.55) + ')';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(K.x + (16 + 22 * brud) * 0.6, S1.y);
+                ctx.lineTo(K.x + (16 + 22 * brud) * 0.6, S2.y);
+                ctx.stroke();
+            }
+            tekst('Eₐ falder fra ca. 75 til ca. 8 kJ/mol', LW / 2, 130, '#2ecc71', 16, 'center', true);
+            tekst('2 H₂O₂ ⟶ 2 H₂O + O₂ inde i det aktive center', LW / 2, 440, '#a8e6c0', 14);
+        } else {
+            const p = smooth(t);
+            molekyle('h2o', lerp(S1.x, 830, p), lerp(S1.y, 165, p), lerp(0.6, 1, p));
+            molekyle('h2o', lerp(S2.x, 830, p), lerp(S2.y, 415, p), lerp(0.6, 1, p));
+            molekyle('o2', lerp(K.x, 890, p), lerp(K.y, 292, p), lerp(0.6, 1, p));
+            tekst('2 H₂O og O₂ slipper fri – enzymet er uændret', LW / 2, 130, '#2ecc71', 15, 'center', true);
+            tekst('katalase kan nå ~10⁷ molekyler i sekundet', LW / 2, 440, '#75757f', 13);
+        }
+    }
+
+    /* ---------- Uden katalysator: ét koldt trin, tre varme ---------- */
+    function sceneIngen(step, t) {
+        const varm = step >= 1;
+        const cy = 292;
+
+        ctx.fillStyle = varm ? 'rgba(200,100,35,0.13)' : 'rgba(90,150,200,0.10)';
+        ctx.fillRect(BOKS.x0, BOKS.y0, BOKS.x1 - BOKS.x0, BOKS.y1 - BOKS.y0);
+        tekst(varm ? '🌡 HØJ TEMPERATUR – molekylerne farer hurtigt rundt'
+                   : 'STUETEMPERATUR – molekylerne bevæger sig roligt',
+              BOKS.x0 + 20, BOKS.y0 + 24, varm ? '#f5a05a' : '#8ecdf5', 13, 'left', true);
+
+        /* Baggrundsmolekyler – farten viser temperaturen */
+        const fart = varm ? 2.6 : 0.7;
+        ctx.globalAlpha = 0.35;
+        for (let k = 0; k < 8; k++) {
+            const x = 120 + ((k * 137) % 780) + Math.sin(state.mekTid * fart + k) * (varm ? 46 : 26);
+            const y = 150 + ((k * 91) % 250) + Math.cos(state.mekTid * fart * 0.9 + k * 2.1) * (varm ? 34 : 20);
+            molekyle('h2o2', x, y, 0.5);
+        }
+        ctx.globalAlpha = 1;
+
+        if (step === 0) {
+            /* To molekyler mødes – men sammenstødet er for svagt */
+            const naer = t < 0.45 ? smooth(t / 0.45) : (t < 0.55 ? 1 : 1 - smooth((t - 0.55) / 0.45));
+            molekyle('h2o2', lerp(230, 430, naer), cy, 1);
+            molekyle('h2o2', lerp(770, 570, naer), cy, 1);
+
+            if (t > 0.42 && t < 0.62) {
+                ctx.strokeStyle = '#e74c3c';
+                ctx.lineWidth = 6;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(485, cy - 22); ctx.lineTo(515, cy + 8);
+                ctx.moveTo(515, cy - 22); ctx.lineTo(485, cy + 8);
+                ctx.stroke();
+                tekst('for lidt energi – de preller af', 500, cy - 66, '#e74c3c', 16, 'center', true);
+            }
+            tekst('Kun ca. 1 ud af 10⁹ sammenstød har E ≥ Eₐ ved stuetemperatur',
+                  LW / 2, 432, '#e0e0e0', 14, 'center', true);
+
+        } else if (step === 1) {
+            /* Nu er farten høj: de to molekyler suser mod hinanden */
+            const p = smooth(t);
+            molekyle('h2o2', lerp(180, 380, p), cy, 1);
+            molekyle('h2o2', lerp(820, 620, p), cy, 1);
+            tekst('Nu er sammenstødet kraftigt nok', LW / 2, 140, '#f39c12', 17, 'center', true);
+            tekst('flere molekyler har E ≥ Eₐ, når temperaturen stiger', LW / 2, 432, '#f5a05a', 14);
+
+        } else if (step === 2) {
+            /* De to H₂O₂ presses sammen til det aktiverede kompleks */
+            const p = smooth(t);
+            const d = lerp(200, 52, p);
+            const brud = smooth(t) * 0.55;
+            if (t > 0.25) tegnKompleks(cy, Math.min(1, (t - 0.25) / 0.3));
+            molekyle('h2o2', LW / 2 - d, cy, 1, brud);
+            molekyle('h2o2', LW / 2 + d, cy, 1, brud);
+            tekst('AKTIVERET KOMPLEKS', LW / 2, 140, '#f39c12', 17, 'center', true);
+            tekst('2 H₂O₂ i én klump – bindingerne er halvt brudte og halvt dannede',
+                  LW / 2, 432, '#f5a05a', 14);
+
+        } else {
+            /* Komplekset er ustabilt og falder straks fra hinanden */
+            const p = smooth(t);
+            if (t < 0.3) tegnKompleks(cy, 1 - t / 0.3);
+            molekyle('h2o', lerp(LW / 2 - 40, 250, p), lerp(cy, 180, p), 1);
+            molekyle('h2o', lerp(LW / 2 - 40, 250, p), lerp(cy, 404, p), 1);
+            molekyle('o2', lerp(LW / 2 + 40, 760, p), lerp(cy, 292, p), 1);
+            tekst('… og falder straks fra hinanden til 2 H₂O + O₂', LW / 2, 140, '#2ecc71', 17, 'center', true);
+            tekst('Levetiden er ca. 10⁻¹³ s – komplekset kan ikke isoleres', LW / 2, 432, '#e0e0e0', 14);
+        }
+    }
+
+    /* Skarp parentes med dobbeltkryds om det aktiverede kompleks */
+    function tegnKompleks(cy, styrke) {
+        const x0 = LW / 2 - 150, x1 = LW / 2 + 150;
+        const gl = ctx.createRadialGradient(LW / 2, cy, 10, LW / 2, cy, 165);
+        gl.addColorStop(0, 'rgba(243,156,18,' + (0.32 * styrke) + ')');
+        gl.addColorStop(1, 'rgba(243,156,18,0)');
+        ctx.fillStyle = gl;
+        ctx.beginPath();
+        ctx.arc(LW / 2, cy, 165, 0, 6.283);
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(243,156,18,' + (0.9 * styrke) + ')';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(x0 + 18, cy - 74); ctx.lineTo(x0, cy - 74);
+        ctx.lineTo(x0, cy + 74); ctx.lineTo(x0 + 18, cy + 74);
+        ctx.moveTo(x1 - 18, cy - 74); ctx.lineTo(x1, cy - 74);
+        ctx.lineTo(x1, cy + 74); ctx.lineTo(x1 - 18, cy + 74);
+        ctx.stroke();
+        tekst('‡', x1 + 16, cy - 66, 'rgba(243,156,18,' + styrke + ')', 26, 'center', true);
+    }
+
+    /* ========================================================
+       7) VISNING 3: ENERGIPROFIL
+       ======================================================== */
+    const EP = { left: 120, right: 940, top: 92, bottom: 458, eMin: -232, eMax: 112 };
+
+    function eY(E) { return EP.bottom - ((E - EP.eMin) / (EP.eMax - EP.eMin)) * (EP.bottom - EP.top); }
+    function eX(t) { return EP.left + t * (EP.right - EP.left); }
+
+    /* Energien på en reaktionsvej ved reaktionsforløb t ∈ [0;1] */
+    function vejE(pkt, t) {
+        for (let i = 0; i < pkt.length - 1; i++) {
+            const a = pkt[i], b = pkt[i + 1];
+            if (t >= a[0] && t <= b[0]) {
+                const d = b[0] - a[0];
+                return d === 0 ? b[1] : lerp(a[1], b[1], smooth((t - a[0]) / d));
+            }
+        }
+        return pkt[pkt.length - 1][1];
+    }
+
+    const OPHOEJET = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+    function op(n) { return String(n).split('').map(function (c) { return OPHOEJET[c] || c; }).join(''); }
+
+    /* Groft skøn over hastighedsforøgelsen ud fra Arrhenius ved 25 °C */
+    function faktor(ea) {
+        const f = Math.exp((VEJE.ingen.ea - ea) * 1000 / (8.314 * 298));
+        if (f < 1000) return '× ' + Math.round(f);
+        const e = Math.floor(Math.log10(f));
+        return '× ' + (f / Math.pow(10, e)).toFixed(1).replace('.', ',') + '·10' + op(e);
+    }
+
+    function synligeVeje() {
+        return Object.keys(VEJE).filter(function (k) {
+            const el = document.getElementById(VEJE[k].chk);
+            return el && el.checked;
+        });
+    }
+
+    function tegnEnergi() {
+        ctx.fillStyle = '#16161b';
+        ctx.fillRect(0, 0, LW, LH);
+        tekst('Katalysatoren giver reaktionen en ny vej med lavere aktiveringsenergi', LW / 2, 34, '#8a8a96', 15);
+
+        /* Gitter og y-akse */
+        ctx.strokeStyle = '#2a2a32';
+        ctx.lineWidth = 1;
+        ctx.font = '12px "Segoe UI", sans-serif';
+        for (let E = -200; E <= 100; E += 50) {
+            const y = eY(E);
+            ctx.beginPath();
+            ctx.moveTo(EP.left, y);
+            ctx.lineTo(EP.right, y);
+            ctx.stroke();
+            tekst(String(E), EP.left - 12, y, '#5f5f6b', 12, 'right');
+        }
+        ctx.strokeStyle = '#55555f';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(EP.left, EP.top - 6);
+        ctx.lineTo(EP.left, EP.bottom + 6);
+        ctx.lineTo(EP.right, EP.bottom + 6);
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(46, (EP.top + EP.bottom) / 2);
+        ctx.rotate(-Math.PI / 2);
+        tekst('Energi (kJ/mol)', 0, 0, '#9e9e9e', 14, 'center', true);
+        ctx.restore();
+        tekst('Reaktionsforløb ⟶', (EP.left + EP.right) / 2, EP.bottom + 30, '#9e9e9e', 14, 'center', true);
+
+        /* Niveauer for reaktanter og produkter */
+        ctx.save();
+        ctx.setLineDash([6, 5]);
+        ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(EP.left, eY(0)); ctx.lineTo(EP.right, eY(0));
+        ctx.moveTo(EP.left, eY(DELTA_H)); ctx.lineTo(EP.right, eY(DELTA_H));
+        ctx.stroke();
+        ctx.restore();
+        tekst('2 H₂O₂ (aq)', EP.left + 8, eY(0) - 16, '#b9b9c4', 14, 'left', true);
+        tekst('2 H₂O (l) + O₂ (g)', EP.left + 8, eY(DELTA_H) + 20, '#b9b9c4', 14, 'left', true);
+
+        /* Kurverne */
+        const synlige = synligeVeje();
+        for (const k of synlige) {
+            const v = VEJE[k];
+            ctx.strokeStyle = v.farve;
+            ctx.lineWidth = 3.5;
+            ctx.beginPath();
+            for (let i = 0; i <= 200; i++) {
+                const t = i / 200;
+                const x = eX(t), y = eY(vejE(v.pkt, t));
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            /* Prik i toppen af den højeste bakke */
+            let bt = 0, bE = -999;
+            for (const p of v.pkt) if (p[1] > bE) { bE = p[1]; bt = p[0]; }
+            ctx.fillStyle = v.farve;
+            ctx.beginPath();
+            ctx.arc(eX(bt), eY(bE), 5, 0, 6.283);
+            ctx.fill();
+            tekst('Eₐ ≈ ' + v.ea + (k === 'ingen' ? ' kJ/mol' : ''), eX(bt), eY(bE) - 20, v.farve, 13, 'center', true);
+        }
+
+        tegnEaPil(synlige);
+        tegnDeltaHPil();
+        tegnSignatur(synlige);
+    }
+
+    function pil(x1, y1, x2, y2, farve) {
+        ctx.strokeStyle = farve;
+        ctx.fillStyle = farve;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+        const v = Math.atan2(y2 - y1, x2 - x1);
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - 7 * Math.cos(v - 0.4), y2 - 7 * Math.sin(v - 0.4));
+        ctx.lineTo(x2 - 7 * Math.cos(v + 0.4), y2 - 7 * Math.sin(v + 0.4));
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    /* Sådan aflæses aktiveringsenergien – vist for den øverste synlige vej */
+    function tegnEaPil(synlige) {
+        if (!synlige.length) return;
+        const v = VEJE[synlige[0]];
+        let bt = 0, bE = -999;
+        for (const p of v.pkt) if (p[1] > bE) { bE = p[1]; bt = p[0]; }
+        const x = eX(bt);
+        pil(x, eY(0), x, eY(bE) + 4, 'rgba(255,255,255,0.75)');
+        pil(x, eY(bE), x, eY(0) - 4, 'rgba(255,255,255,0.75)');
+        tekst('Eₐ', x - 16, (eY(0) + eY(bE)) / 2, '#ffffff', 15, 'right', true);
+    }
+
+    function tegnDeltaHPil() {
+        const x = eX(0.965);
+        pil(x, eY(0), x, eY(DELTA_H) - 4, '#2ecc71');
+        tekst('ΔH ≈ −196 kJ/mol', x - 14, (eY(0) + eY(DELTA_H)) / 2 - 10, '#2ecc71', 14, 'right', true);
+        tekst('(exoterm – uændret af katalysatoren)', x - 14, (eY(0) + eY(DELTA_H)) / 2 + 10, '#7fcf9c', 12, 'right');
+    }
+
+    function tegnSignatur(synlige) {
+        if (!synlige.length) return;
+        const bx = 628, by = 100, bw = 308, rh = 19;
+        const bh = 22 + synlige.length * rh + 10;
+
+        rundtRekt(bx, by, bw, bh, 8);
+        ctx.fillStyle = 'rgba(20,20,26,0.92)';
+        ctx.fill();
+        ctx.strokeStyle = '#3a3a44';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        tekst('Eₐ i kJ/mol · fart i forhold til ukatalyseret (25 °C)', bx + 12, by + 16, '#8a8a96', 11.5, 'left', true);
+
+        synlige.forEach(function (k, i) {
+            const v = VEJE[k], y = by + 34 + i * rh;
+            ctx.strokeStyle = v.farve;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(bx + 12, y);
+            ctx.lineTo(bx + 34, y);
+            ctx.stroke();
+            tekst(v.navn + '  (' + v.ea + ')', bx + 42, y, '#d5d5d5', 12, 'left');
+            tekst(k === 'ingen' ? 'reference' : faktor(v.ea), bx + bw - 12, y, '#ffffff', 12, 'right', true);
+        });
+    }
+
+    /* ========================================================
+       8) ANIMATIONSLØKKE
+       ======================================================== */
+    function tegn() {
+        if (state.view === 'forsog') tegnForsog();
+        else if (state.view === 'molekyler') tegnMolekyler();
+        else tegnEnergi();
+    }
+
+    let sidsteTid = performance.now();
+    let sidsteTrin = -1;
+
+    function loop(nu) {
+        const raa = Math.min(0.05, (nu - sidsteTid) / 1000);
+        sidsteTid = nu;
+
+        if (state.view === 'forsog') {
+            opdaterForsog(raa * FORSOEG_FART);
+        } else if (state.view === 'molekyler' && !state.paused) {
+            state.mekTid += raa;
+            const tr = mekTrin();
+            if (tr !== sidsteTrin) { sidsteTrin = tr; markerTrin(); }
+        }
+
+        tegn();
+        requestAnimationFrame(loop);
+    }
+
+    /* ========================================================
+       9) BRUGERFLADE
+       ======================================================== */
+    function visBesked(t, type) {
+        const el = document.getElementById('scene-msg');
+        if (!t) { el.style.opacity = 0; return; }
+        el.className = type === 'ok' ? 'success-text' : (type === 'fail' ? 'fail-text' : '');
+        el.innerHTML = t;
+        el.style.opacity = 1;
+    }
+
+    function setView(v) {
+        state.view = v;
+        ['forsog', 'molekyler', 'energi'].forEach(function (k) {
+            document.getElementById('tab-' + k).classList.toggle('active', k === v);
+        });
+        document.getElementById('grp-forsog').hidden = v !== 'forsog';
+        document.getElementById('grp-card').hidden = v !== 'forsog';
+        document.getElementById('grp-mek').hidden = v !== 'molekyler';
+        document.getElementById('grp-energi').hidden = v !== 'energi';
+        visBesked('');
+        if (v === 'molekyler') { sidsteTrin = -1; markerTrin(); }
+        tegn();
+    }
+
+    /* ---------- Visning 1: glasvælger og infokort ---------- */
+    function byggGlasvaelger() {
+        const box = document.getElementById('tube-picker');
+        box.innerHTML = '';
+        TUBES.forEach(function (t, i) {
+            const b = document.createElement('button');
+            b.className = 'btn-tube';
+            b.id = 'pick-' + i;
+            b.innerHTML = 'Glas ' + (i + 1) + '<br>' + t.kort;
+            b.onclick = function () { vaelgGlas(i); };
+            box.appendChild(b);
+        });
+    }
+
+    function vaelgGlas(i) {
+        state.valgt = i;
+        TUBES.forEach(function (t, k) {
+            document.getElementById('pick-' + k).classList.toggle('active', k === i);
+        });
+        opdaterKort();
+    }
+
+    function opdaterKort() {
+        const i = state.valgt, t = TUBES[i], g = glas[i];
+        const badge = t.type === 'homogen' ? 'badge-hom' : (t.type === 'heterogen' ? 'badge-het' : 'badge-ingen');
+
+        let html = '<h4>Glas ' + (i + 1) + ': ' + t.navn + '</h4>';
+        html += '<span class="badge ' + badge + '">' + t.badgeTekst + '</span>';
+        html += '<div class="card-line"><b>Hvad sker der?</b><br>' +
+                (g.tilsat ? t.sker : 'Tilsæt for at se det.') + '</div>';
+        document.getElementById('tube-card').innerHTML = html;
+
+        const btn = document.getElementById('btn-tilsaet');
+        btn.innerText = g.faerdig ? '↻ Gentag her' : (g.tilsat ? 'Reaktionen kører …' : 'Tilsæt her');
+        btn.disabled = g.tilsat && !g.faerdig;
+        document.getElementById('btn-splint').disabled = !g.tilsat;
+    }
+
+    /* ---------- Forklaringspopup ---------- */
+    function visForklaring() {
+        const i = state.valgt, t = TUBES[i];
+        document.getElementById('modal-titel').innerHTML = 'Glas ' + (i + 1) + ': ' + t.navn;
+        document.getElementById('modal-indhold').innerHTML = FORKLARINGER[t.id];
+        document.getElementById('modal-baggrund').hidden = false;
+    }
+
+    function lukForklaring(e) {
+        if (e && e.target !== document.getElementById('modal-baggrund')) return;
+        document.getElementById('modal-baggrund').hidden = true;
+    }
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') document.getElementById('modal-baggrund').hidden = true;
+    });
+
+    function lavKorn(i) {
+        const cx = tubeX(i), R = G.halvB;
+        const korn = [];
+        for (let j = 0; j < 11; j++) {
+            const r = 4 + Math.random() * 3.5;
+            const ang = Math.PI * (0.10 + 0.80 * j / 10);
+            korn.push({
+                x: cx + Math.cos(ang) * (R - r - 2),
+                y: (G.bund - R) + Math.sin(ang) * (R - r - 2),
+                r: r,
+                v: Math.random() * 3
+            });
+        }
+        for (let j = 0; j < 7; j++) {
+            const r = 4 + Math.random() * 3;
+            korn.push({
+                x: cx + (Math.random() - 0.5) * 52,
+                y: G.bund - 30 - Math.random() * 22,
+                r: r,
+                v: Math.random() * 3
+            });
+        }
+        return korn;
+    }
+
+    function tilsaet(i) {
+        const g = glas[i];
+        if (g.tilsat) return;
+        g.tilsat = true;
+        g.tid = 0;
+        g.faerdig = false;
+        g.blink = 0.6;
+        if (TUBES[i].id === 'mno2') g.korn = lavKorn(i);
+    }
+
+    /* Hæld frisk H₂O₂ i glasset og kør forsøget igen – katalysatoren bliver liggende,
+       for den er jo ikke forbrugt. */
+    function gentag(i) {
+        const g = glas[i];
+        if (!g.tilsat) return;
+        g.o2 = 0;
+        g.tid = 0;
+        g.faerdig = false;
+        g.blink = 0.6;
+    }
+
+    function gentagValgt() {
+        gentag(state.valgt);
+        opdaterKort();
+        visBesked('Frisk H₂O₂ i glasset – katalysatoren er den samme som før.');
+        setTimeout(function () { if (!state.splint) visBesked(''); }, 4000);
+    }
+
+    function tilsaetValgt() {
+        if (glas[state.valgt].faerdig) { gentagValgt(); return; }
+        tilsaet(state.valgt);
+        opdaterKort();
+        visBesked('');
+    }
+
+    function nulstilForsog() {
+        for (let i = 0; i < TUBES.length; i++) {
+            glas[i].tilsat = false;
+            glas[i].o2 = 0;
+            glas[i].bobler = [];
+            glas[i].skum = 0;
+            glas[i].tid = 0;
+            glas[i].korn = [];
+            glas[i].faerdig = false;
+        }
+        state.splint = null;
+        visBesked('');
+        opdaterKort();
+    }
+
+    function glodepind() {
+        const i = state.valgt, g = glas[i];
+        if (!g.tilsat) { visBesked('Tilsæt først noget i glasset.', 'fail'); return; }
+        state.splint = {
+            i: i,
+            t: 0,
+            ok: !g.faerdig && g.o2 * TUBES[i].rate >= 0.10,
+            faerdig: g.faerdig,
+            meldt: false
+        };
+    }
+
+    /* ---------- Visning 2: mekanismer ---------- */
+    function setMek(m) {
+        state.mek = m;
+        state.mekTid = 0;
+        sidsteTrin = -1;
+        ['mno2', 'ki', 'enzym', 'ingen'].forEach(function (k) {
+            document.getElementById('mek-' + k).classList.toggle('active', k === m);
+        });
+        const mek = MEKANISMER[m];
+        document.getElementById('mek-steps').innerHTML =
+            mek.trin.map(function (s) { return '<li>' + s + '</li>'; }).join('');
+        document.getElementById('mek-note').innerHTML = mek.note;
+        markerTrin();
+        tegn();
+    }
+
+    function markerTrin() {
+        const li = document.querySelectorAll('#mek-steps li');
+        const tr = mekTrin();
+        li.forEach(function (el, i) { el.classList.toggle('now', i === tr); });
+    }
+
+    function togglePause() {
+        state.paused = !state.paused;
+        document.getElementById('btn-pause').innerHTML = state.paused ? '▶ Afspil' : '⏸ Pause';
+    }
+
+    function naesteTrin() {
+        state.mekTid = (Math.floor(state.mekTid / trinTid()) + 1) * trinTid();
+        sidsteTrin = -1;
+        markerTrin();
+        tegn();
+    }
+
+    /* ---------- Klik direkte på et reagensglas ---------- */
+    canvas.addEventListener('click', function (e) {
+        if (state.view !== 'forsog') return;
+        const r = canvas.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width * LW;
+        const y = (e.clientY - r.top) / r.height * LH;
+        for (let i = 0; i < TUBES.length; i++) {
+            const cx = tubeX(i);
+            if (x > cx - 70 && x < cx + 70 && y > 62 && y < 474) { vaelgGlas(i); return; }
+        }
+    });
+
+    /* ========================================================
+       10) EFTERBEHANDLINGSQUIZ
+       ======================================================== */
+    /* Svarmulighederne holdes bevidst lige lange, og rækkefølgen blandes ved visning,
+       så hverken længden eller placeringen røber det rigtige svar. options[answer]
+       er det rigtige – her altid nr. 0, fordi listen alligevel blandes. */
+    const opgaver = [
+        {
+            text: 'Alle fire reagensglas indeholder H₂O₂. Hvilken reaktion er det, katalysatorerne sætter fart på?',
+            options: ['2 H₂O₂ (aq) ⟶ 2 H₂O (l) + O₂ (g)',
+                      '2 H₂O₂ (aq) ⟶ 2 H₂O (l) + H₂ (g)',
+                      '2 H₂O₂ (aq) ⟶ 2 H₂ (g) + 2 O₂ (g)',
+                      '2 H₂O₂ (aq) ⟶ 2 H₂O (g) + 2 O (g)'],
+            answer: 0,
+            ok: 'Der dannes vand og ilt. Det er netop ilten, glødepinden påviser.'
+        },
+        {
+            text: 'Hvorfor kaldes katalysen med brunsten (MnO₂) heterogen?',
+            options: ['MnO₂ er et fast stof, mens H₂O₂ er opløst',
+                      'MnO₂ opløses fuldstændigt i H₂O₂-væsken',
+                      'MnO₂ forbruges, efterhånden som H₂O₂ spaltes',
+                      'MnO₂ gør reaktionen betydeligt mere exoterm'],
+            answer: 0,
+            ok: 'Netop: hetero = forskellig. De to faser mødes kun på kornenes overflade.'
+        },
+        {
+            text: 'Hvor i glasset dannes boblerne, når man tilsætter KI (aq)?',
+            options: ['I hele væsken på én gang, fordi I⁻ er opløst',
+                      'Kun på bunden, hvor iodidet har samlet sig',
+                      'Kun i overfladen, hvor ilten kan slippe ud',
+                      'Kun på glasvæggen, hvor boblerne kan sidde'],
+            answer: 0,
+            ok: 'Det er den synlige forskel på homogen og heterogen katalyse i forsøget.'
+        },
+        {
+            text: 'Den glødende træpind blusser op, da den holdes ned i glasset. Hvad viser det?',
+            options: ['At der er dannet O₂ (g)',
+                      'At der er dannet H₂ (g)',
+                      'At der er dannet CO₂ (g)',
+                      'At der er dannet vanddamp'],
+            answer: 0,
+            ok: 'Ilt får gløden til at blusse op – det er den klassiske påvisning af O₂. Pinden skal gløde, ikke brænde med flamme, og føres ned til væskeoverfladen, mens det stadig bruser.'
+        },
+        {
+            text: 'Den friske kartoffel skummer kraftigt, den kogte gør næsten ingenting. Hvad er forklaringen?',
+            options: ['Enzymet katalase denatureres, når kartoflen koges',
+                      'Den kogte kartoffel har mistet alt sit vandindhold',
+                      'Kogningen har fjernet al stivelsen i kartoflen',
+                      'Den kogte kartoffel virker som inhibitor i stedet'],
+            answer: 0,
+            ok: 'Katalase er et protein. Mister det sin foldning, passer H₂O₂ ikke længere i det aktive center.'
+        },
+        {
+            text: 'Hvad er der sket med katalysatoren, når reaktionen er løbet til ende?',
+            options: ['Ingenting – den genskabes og er uforbrugt',
+                      'Den er blevet omdannet til vand undervejs',
+                      'Den er forbrugt i samme mængde som H₂O₂',
+                      'Den er sluppet ud af glasset som O₂-gas'],
+            answer: 0,
+            ok: 'Derfor kan man filtrere brunstenen fra og veje den samme mængde igen.'
+        },
+        {
+            text: 'Hvordan påvirker en katalysator energiforholdene i reaktionen?',
+            options: ['Eₐ sænkes, mens ΔH er uændret',
+                      'ΔH sænkes, mens Eₐ er uændret',
+                      'Både Eₐ og ΔH sænkes tilsvarende',
+                      'Både Eₐ og ΔH er helt uændrede'],
+            answer: 0,
+            ok: 'Katalysatoren giver en ny vej – start- og slutenergi er de samme. Se energiprofilen.'
+        },
+        {
+            text: 'Hvorfor virker MnO₂ bedre som fint pulver end som én stor klump?',
+            options: ['Overfladen bliver større med flere aktive pladser',
+                      'Pulveret opløses i vandet og blander sig med H₂O₂',
+                      'Pulveret har en meget lavere aktiveringsenergi',
+                      'Pulveret bliver varmere end den store klump gør'],
+            answer: 0,
+            ok: 'Overfladen er alt ved heterogen katalyse – derfor bruger industrien porøse katalysatorer.'
+        },
+        {
+            text: 'Iodid-katalysen forløber i to trin:  H₂O₂ + I⁻ ⟶ H₂O + IO⁻   og   H₂O₂ + IO⁻ ⟶ H₂O + O₂ + I⁻.  Hvad er IO⁻?',
+            options: ['Et mellemprodukt, der dannes og bruges op igen',
+                      'Selve katalysatoren, som ikke bliver forbrugt',
+                      'Et slutprodukt, man kan isolere til sidst',
+                      'Det aktiverede kompleks på toppen af barrieren'],
+            answer: 0,
+            ok: 'I⁻ er katalysatoren, IO⁻ er mellemproduktet. Lægges trinnene sammen, går begge ud.'
+        },
+        {
+            text: 'Hvad er det, der afgør, om en katalyse kaldes homogen eller heterogen?',
+            options: ['Om katalysatoren er i samme fase som reaktanterne',
+                      'Om katalysatoren er et grundstof eller en forbindelse',
+                      'Om reaktionen er exoterm eller endoterm i forløbet',
+                      'Om katalysatoren bliver forbrugt eller genskabes'],
+            answer: 0,
+            ok: 'Homo = ens, hetero = forskellig. KI (aq) er homogen, MnO₂ (s) er heterogen.'
+        },
+        {
+            text: 'I hvilket glas er det nemmest at få katalysatoren ud af blandingen igen bagefter?',
+            options: ['MnO₂-glasset – det faste stof kan filtreres fra',
+                      'KI-glasset – iodidet fordamper helt af sig selv',
+                      'Lige nemt i begge – begge forsvinder undervejs',
+                      'Ingen af dem – katalysatoren er brugt helt op'],
+            answer: 0,
+            ok: 'Netop derfor foretrækker industrien heterogene katalysatorer: produktet kan skilles fra.'
+        },
+        {
+            text: 'I en bils katalysator strømmer udstødningsgasserne hen over en fast, porøs overflade af platin og rhodium. Hvilken type katalyse er det?',
+            options: ['Heterogen – fast katalysator, gasformige reaktanter',
+                      'Homogen – alt befinder sig inde i udstødningsrøret',
+                      'Enzymatisk – platin virker som et kunstigt enzym',
+                      'Inhibering – katalysatoren bremser reaktionerne'],
+            answer: 0,
+            ok: 'Samme princip som brunstenen: reaktionen sker på overfladen, og den porøse struktur giver et kæmpe areal.'
+        },
+        {
+            text: 'Hvad betyder det, at katalasen bliver "denatureret", når kartoflen koges?',
+            options: ['Proteinets foldede 3D-struktur ødelægges',
+                      'Enzymet opløses i vandet og fortyndes væk',
+                      'Enzymet omdannes til H₂O og O₂ ved kogning',
+                      'Enzymet bliver til en inhibitor i stedet'],
+            answer: 0,
+            ok: 'Præcis som når æggehvide bliver hvid og fast ved opvarmning – formen kan ikke foldes tilbage.'
+        },
+        {
+            text: 'Hvorfor er det vigtigt, at forsøget både har et glas med frisk OG et med kogt kartoffel?',
+            options: ['Det er en kontrol: virkningen skyldes et enzym',
+                      'For at kunne sammenligne to forskellige enzymer',
+                      'For at få dobbelt så meget ilt ud af forsøget',
+                      'Fordi kogt kartoffel er den bedste katalysator'],
+            answer: 0,
+            ok: 'De to glas er ens på alt undtagen ét: om enzymet stadig virker. Det er en god forsøgsopstilling.'
+        }
+    ];
+
+    function startQuiz() {
+        state.quizOpen = true;
+        state.taskIndex = 0;
+        document.getElementById('quiz-launch').hidden = true;
+        document.getElementById('quiz-panel').hidden = false;
+        hentOpgave();
+        resizeCanvas();
+    }
+
+    function closeQuiz() {
+        state.quizOpen = false;
+        document.getElementById('quiz-panel').hidden = true;
+        document.getElementById('quiz-launch').hidden = false;
+        visReaktionsskema();
+        resizeCanvas();
+    }
+
+    /* Første spørgsmål handler om selve reaktionsskemaet, så det skjules imens */
+    function visReaktionsskema() {
+        document.getElementById('eq-box').hidden = state.quizOpen && state.taskIndex === 0;
+    }
+
+    function hentOpgave() {
+        const o = opgaver[state.taskIndex];
+        state.mcChoice = -1;
+        document.getElementById('task-counter').innerText = (state.taskIndex + 1) + '/' + opgaver.length;
+        document.getElementById('task-text').innerText = o.text;
+        document.getElementById('task-feedback').innerHTML = '';
+        visReaktionsskema();
+
+        /* Bland rækkefølgen (Fisher-Yates), så det rigtige svar ikke altid står samme sted */
+        const orden = o.options.map(function (_, i) { return i; });
+        for (let i = orden.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const bytte = orden[i]; orden[i] = orden[j]; orden[j] = bytte;
+        }
+        state.rigtigPlads = orden.indexOf(o.answer);
+
+        const box = document.getElementById('task-options');
+        box.innerHTML = '';
+        orden.forEach(function (kilde, i) {
+            const lab = document.createElement('label');
+            const inp = document.createElement('input');
+            inp.type = 'radio';
+            inp.name = 'mc';
+            inp.value = i;
+            inp.addEventListener('change', function () { state.mcChoice = i; });
+            lab.appendChild(inp);
+            lab.appendChild(document.createTextNode(o.options[kilde]));
+            box.appendChild(lab);
+        });
+    }
+
+    function nextTask() {
+        if (state.taskIndex < opgaver.length - 1) {
+            state.taskIndex++;
+            hentOpgave();
+        } else {
+            document.getElementById('task-feedback').innerHTML =
+                "<span style='color:var(--accent-purple)'>Det var den sidste opgave.</span>";
+        }
+    }
+
+    function checkTask() {
+        const o = opgaver[state.taskIndex];
+        const fb = document.getElementById('task-feedback');
+
+        if (state.mcChoice < 0) {
+            fb.innerHTML = "<span style='color:var(--accent-orange)'>Vælg et svar først.</span>";
+            return;
+        }
+        if (state.mcChoice === state.rigtigPlads) {
+            fb.innerHTML = "<span style='color:var(--accent-green)'>✔ " + o.ok + "</span>";
+            if (state.taskIndex < opgaver.length - 1) {
+                setTimeout(function () { state.taskIndex++; hentOpgave(); }, 2800);
+            } else {
+                setTimeout(function () {
+                    fb.innerHTML = "<span style='color:var(--accent-purple)'>🎉 Du har gennemført hele efterbehandlingen!</span>";
+                }, 2800);
+            }
+        } else {
+            fb.innerHTML = "<span style='color:var(--accent-red)'>✘ Ikke helt. Prøv igen – kig eventuelt på animationen en gang til.</span>";
+        }
+    }
+
+    /* ========================================================
+       11) START
+       ======================================================== */
+
+    window.addEventListener('resize', function () { resizeCanvas(); tegn(); });
+
+    byggGlasvaelger();
+    vaelgGlas(0);
+    setMek('mno2');
+    setView('forsog');
+    resizeCanvas();
+    requestAnimationFrame(loop);
+
+    </script>
+
+</body>
+</html>
