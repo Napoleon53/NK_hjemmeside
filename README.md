@@ -35,30 +35,35 @@ Det gamle menupunkt "Download" var et udsagnsord brugt som kategori; det hedder 
 ## Mapper
 
 ```
-C:\NK_hjemmeside\
+C:\NK_hjemmeside\            <- selve git-repoet (github.com/Napoleon53/NK_hjemmeside)
 ├── *.html                   De ni sider
 ├── assets\
 │   ├── style.css            ALT styling
 │   ├── site.js              Kun mobilmenuen (siden virker uden JS)
 │   └── img\                 Logo og skærmbilleder
-├── animationer\   ─┐        genvej (junction) til "HTML animationer\"
-├── downloads\     ─┘        genvej (junction) til "Filer_hjemmeside\LiveOpdatering\"
-├── HTML animationer\        de rigtige animationsfiler (eget git-repo)
-└── Filer_hjemmeside\        de rigtige download- og billedfiler
+├── animationer\             De rigtige animationsfiler
+├── superanimationer\        Udkast til superanimationer
+├── downloads\               genvej (junction) til "files\downloads\"
+└── files\
+    ├── downloads\           de rigtige downloadfiler
+    └── Billeder\            billedfiler
 ```
 
-### Om `animationer\` og `downloads\`
+### Om `downloads\`
 
-Det er ikke rigtige mapper, men **Windows-genveje (junctions)**. De peger på de
-mapper, hvor filerne allerede lå, så der kun findes én udgave af hver fil, og så
-`HTML animationer\` kan blive ved med at være sit eget git-repo.
+Det er ikke en rigtig mappe, men en **Windows-genvej (junction)**. Den peger på
+`files\downloads\`, hvor filerne ligger, så der kun findes én udgave af hver fil,
+mens HTML-siderne kan henvise til den korte sti `downloads/`.
 
-Skal de laves igen (fx efter en flytning), køres i en almindelig kommandoprompt:
+Skal den laves igen (fx efter en flytning), køres i en almindelig kommandoprompt:
 
 ```
-mklink /J "C:\NK_hjemmeside\animationer" "C:\NK_hjemmeside\HTML animationer"
-mklink /J "C:\NK_hjemmeside\downloads"   "C:\NK_hjemmeside\Filer_hjemmeside\LiveOpdatering"
+mklink /J "C:\NK_hjemmeside\downloads" "C:\NK_hjemmeside\files\downloads"
 ```
+
+`animationer\` var tidligere også en junction til `HTML animationer\`, som havde
+sit eget git-repo. Nu er hele `C:\NK_hjemmeside\` ét repo, og `animationer\` er
+en helt almindelig mappe i det.
 
 ## Sådan retter du noget
 
@@ -67,7 +72,7 @@ mklink /J "C:\NK_hjemmeside\downloads"   "C:\NK_hjemmeside\Filer_hjemmeside\Live
 - **Tekst** → direkte i den enkelte `.html`-fil.
 - **Menu og footer** → står i alle ni HTML-filer. Rettes ét sted, skal det rettes
   alle ni steder. Bed Claude Code om at gøre det, så bliver de ens.
-- **Nyt download** → læg filen i `Filer_hjemmeside\LiveOpdatering\` og henvis til
+- **Nyt download** → læg filen i `files\downloads\` og henvis til
   den som `downloads/filnavn.ext`.
 
 ## Når siden skal live
@@ -76,11 +81,11 @@ mklink /J "C:\NK_hjemmeside\downloads"   "C:\NK_hjemmeside\Filer_hjemmeside\Live
 2. Upload til webhotellets webrod:
    - alle `.html`-filer
    - mappen `assets\`
-   - indholdet af `HTML animationer\` → som mappen **`animationer`**
-   - indholdet af `Filer_hjemmeside\LiveOpdatering\` → som mappen **`downloads`**
+   - indholdet af `animationer\` → som mappen **`animationer`**
+   - indholdet af `files\downloads\` → som mappen **`downloads`**
 
-   Junctions skal altså *ikke* uploades — de to mapper skal hedde `animationer`
-   og `downloads` på serveren, ligesom i dag.
+   Junctionen `downloads\` skal altså *ikke* uploades — mappen skal hedde
+   `downloads` på serveren, ligesom i dag.
 3. Send de gamle adresser videre, så eksisterende links og Googles resultater
    ikke ender i en fejlside. På Apache-hosting lægges dette i `.htaccess`:
 
