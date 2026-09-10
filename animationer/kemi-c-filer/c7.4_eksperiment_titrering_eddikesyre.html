@@ -226,7 +226,6 @@
         }
         #curveCanvas {
             display: block;
-            height: 100%; width: auto; max-width: 100%;
             background: #fff; touch-action: none;
         }
 
@@ -387,7 +386,10 @@
     <div class="modal-content">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom:20px;">
             <h2 style="color:#2c3e50; margin:0; border:none;">Resultatbehandling</h2>
-            <button onclick="location.reload()" style="background:#95a5a6; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer;">Genstart</button>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <button onclick="location.reload()" style="background:#95a5a6; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer;">Genstart</button>
+                <button onclick="Lab.closeCalculation()" title="Fold sammen og gå tilbage til forsøget" style="border:none; background:transparent; font-size:24px; cursor:pointer; line-height:1;">&times;</button>
+            </div>
         </div>
 
         <div id="step-1" class="calc-step active">
@@ -971,6 +973,12 @@ class Lab {
     static openCalculation() {
         document.getElementById('calc-modal').classList.remove('hidden');
     }
+
+    static closeCalculation() {
+        // Folder resultatbehandlingen sammen igen - fremgangen i skridtene bevares,
+        // så eleven bare kan trykke "Afslut & Beregn" for at fortsætte hvor de slap.
+        document.getElementById('calc-modal').classList.add('hidden');
+    }
 }
 
 class Calc {
@@ -1150,7 +1158,11 @@ const Curve = {
         window.addEventListener('keydown', (e) => {
             if (e.key !== 'Escape') return;
             const dataModal = document.getElementById('curve-data-modal');
+            const calcModal = document.getElementById('calc-modal');
+            const theoryModal = document.getElementById('modal-theory');
             if (!dataModal.classList.contains('hidden')) this.closeTable();
+            else if (!calcModal.classList.contains('hidden')) Lab.closeCalculation();
+            else if (!theoryModal.classList.contains('hidden')) theoryModal.classList.add('hidden');
             else if (this.isOpen()) this.toggle(false);
         });
 
@@ -1178,14 +1190,23 @@ const Curve = {
     },
 
     resize() {
-        const rect = this.canvas.getBoundingClientRect();
-        const cssW = rect.width || this.W;
+        const box = this.canvas.parentElement;   // .curve-body
+        const boxW = box.clientWidth  || this.W;
+        const boxH = box.clientHeight || this.H;
+        const fit  = Math.min(boxW / this.W, boxH / this.H) || 1;
+
+        const cssW = this.W * fit;
+        const cssH = this.H * fit;
         const dpr = window.devicePixelRatio || 1;
 
+        // Eksplicit pixel-størrelse - undgår at CSS "auto" gætter ud fra
+        // canvas-bufferens eget billedformat (som ellers giver en forskudt museaflæsning).
+        this.canvas.style.width = cssW + "px";
+        this.canvas.style.height = cssH + "px";
         this.canvas.width = Math.round(cssW * dpr);
-        this.canvas.height = Math.round(cssW * (this.H / this.W) * dpr);
+        this.canvas.height = Math.round(cssH * dpr);
 
-        const s = (cssW / this.W) * dpr;
+        const s = fit * dpr;
         this.ctx.setTransform(s, 0, 0, s, 0, 0);
         this.draw();
     },
@@ -1217,12 +1238,13 @@ const Curve = {
     // --- Aflæsning: kun når musen er på et punkt på kurven --------
     onMove(e) {
         const rect = this.canvas.getBoundingClientRect();
-        const scale = this.W / (rect.width || this.W);
-        const px = (e.clientX - rect.left) * scale;
-        const py = (e.clientY - rect.top) * scale;
+        const scaleX = this.W / (rect.width  || this.W);
+        const scaleY = this.H / (rect.height || this.H);
+        const px = (e.clientX - rect.left) * scaleX;
+        const py = (e.clientY - rect.top) * scaleY;
 
         // Fangstområde: 28 px på skærmen, uanset hvor stort panelet er
-        const tol = 28 * scale;
+        const tol = 28 * scaleX;
         let best = -1, bestDist = tol * tol;
         for (let i = 0; i < this.live.length; i++) {
             const p = this.live[i];
