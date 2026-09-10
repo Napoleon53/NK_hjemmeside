@@ -18,6 +18,14 @@ try {
         Log "Committed: $msg"
     }
 
+    $pullResult = git pull origin main 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        Log "PULL FAILED (needs manual conflict resolution): $pullResult"
+    }
+    elseif ($pullResult -notmatch "Already up to date") {
+        Log "Pulled: $pullResult"
+    }
+
     $ahead = git rev-list --count '@{u}..HEAD' 2>$null
     if ($ahead -and [int]$ahead -gt 0) {
         $pushResult = git push origin main 2>&1
