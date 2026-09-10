@@ -901,7 +901,10 @@ select:focus-visible {
     .faneknap .nr { width: 17px; height: 17px; font-size: 0.65rem; }
     .tidsboks .mrk { display: none; }
     .tidsknap { padding: 4px 5px; min-width: 28px; font-size: 0.72rem; }
-    .ops { position: absolute; inset: 0 auto 0 0; z-index: 15; box-shadow: var(--skygge); }
+    /* Panelet ligger her som et lag oven paa scenen, saa det skal
+       starte lidt lavere end normalt - ellers kommer det til at ligge
+       lige under fuldskaerm-knappen i venstre hjoerne. */
+    .ops { position: absolute; inset: 0 auto 0 0; z-index: 15; padding-top: 52px; box-shadow: var(--skygge); }
     main { position: relative; }
 }
 
