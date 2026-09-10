@@ -43,6 +43,15 @@
         this.drypUr = 0;
         this.sidstePunkt = -1;
         this.faerdig = false;      /* buretten er toemt */
+        this.ind = null;           /* egen indikator; ellers den faelles */
+        this.glasKap = 250;        /* baegerglassets stoerrelse paa tegningen */
+    };
+
+    /* Hvilken indikator ser man i glasset? Laboratoriet bruger den, der
+       er valgt i venstre spalte; den ukendte proeve maales med pH-meter
+       alene og saetter sin egen. */
+    NK.Bord.prototype.indikator = function () {
+        return this.ind || NK.Ops.indikator();
     };
 
     /* ----- Opstilling ------------------------------------------------ */
@@ -53,6 +62,7 @@
         for (var i = 0; i < trin.length; i++) {
             if (trin[i] >= ops.Vmaks - 1e-9) { this.kapacitet = trin[i]; break; }
         }
+        this.glasKap = (ops.V0 + ops.Vmaks) * 1.15;
         this.pHTitrator = (ops.titrator.stof && ops.titrator.c > 0)
             ? Kemi.pH([{ stof: ops.titrator.stof, c: ops.titrator.c }])
             : 7;
@@ -159,12 +169,12 @@
     /* En draabe er landet: ring paa overfladen og en sky af titrator,
        som endnu ikke er roert ud. */
     NK.Bord.prototype.ramt = function (x) {
-        var overflade = NK.Apparat.overflade(this.rumfang());
+        var overflade = NK.Apparat.overflade(this.rumfang(), this.glasKap);
         this.ringe.push({ x: x, r: 3, styrke: 0.5, t: 0 });
 
         /* Lokal pH lige dér: taet paa titratorens egen. */
         var lokal = this.pH + (this.pHTitrator - this.pH) * 0.78;
-        var ind = NK.Ops ? NK.Ops.indikator() : null;
+        var ind = this.indikator();
         var farve = ind ? Kemi.indikatorFarve(ind, lokal) : [0, 0, 0, 0];
         if (farve[3] > 0.02) {
             this.skyer.push({
@@ -222,7 +232,7 @@
         this.pHVist += (this.pH - this.pHVist) * (1 - Math.exp(-9 * dt));
 
         /* --- Draaber falder --- */
-        var overflade = NK.Apparat.overflade(this.rumfang());
+        var overflade = NK.Apparat.overflade(this.rumfang(), this.glasKap);
         for (i = this.draaber.length - 1; i >= 0; i--) {
             var d = this.draaber[i];
             d.v += TYNGDE * dt;
@@ -253,11 +263,12 @@
 
     /* ----- Til tegningen ---------------------------------------------- */
     NK.Bord.prototype.tilstand = function (ekstra) {
-        var ind = NK.Ops.indikator();
+        var ind = this.indikator();
         var t = {
             V: this.V,
             kapacitet: this.kapacitet,
             rumfang: this.rumfang(),
+            glasKapacitet: this.glasKap,
             pH: this.pHVist,
             farve: Kemi.indikatorFarve(ind, this.pH),
             aaben: this.aaben,

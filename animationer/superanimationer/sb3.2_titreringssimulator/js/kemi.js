@@ -379,16 +379,16 @@ var NK = (typeof window !== "undefined") ? (window.NK = window.NK || {}) : {};
        farveloes, saa den har a = 0. */
     Kemi.INDIKATORER = [
         { id: "ingen", navn: "Ingen indikator", pKa: [], farver: [[0, 0, 0, 0]], omslag: "–" },
-        { id: "phenolphthalein", navn: "Phenolphthalein", pKa: [9.4], farver: [[0, 0, 0, 0], [232, 45, 140, 0.85]], omslag: "8,2 – 10,0" },
-        { id: "bromthymolblaat", navn: "Bromthymolblåt", pKa: [7.1], farver: [[240, 205, 40, 0.8], [40, 90, 225, 0.85]], omslag: "6,0 – 7,6" },
-        { id: "methylorange", navn: "Methylorange", pKa: [3.46], farver: [[225, 45, 40, 0.85], [245, 190, 40, 0.8]], omslag: "3,1 – 4,4" },
-        { id: "methylroedt", navn: "Methylrødt", pKa: [5.0], farver: [[220, 40, 50, 0.85], [245, 210, 50, 0.8]], omslag: "4,4 – 6,2" },
-        { id: "bromcresolgroent", navn: "Bromcresolgrønt", pKa: [4.7], farver: [[240, 205, 40, 0.8], [40, 100, 220, 0.85]], omslag: "3,8 – 5,4" },
-        { id: "lakmus", navn: "Lakmus", pKa: [6.5], farver: [[220, 60, 70, 0.8], [70, 80, 210, 0.8]], omslag: "4,5 – 8,3" },
-        { id: "phenolroedt", navn: "Phenolrødt", pKa: [7.9], farver: [[240, 200, 40, 0.8], [225, 50, 60, 0.85]], omslag: "6,8 – 8,4" },
-        { id: "thymolblaat", navn: "Thymolblåt", pKa: [1.65, 8.9], farver: [[225, 45, 40, 0.85], [240, 205, 40, 0.8], [40, 90, 225, 0.85]], omslag: "1,2 – 2,8 og 8,0 – 9,6" },
-        { id: "thymolphthalein", navn: "Thymolphthalein", pKa: [9.9], farver: [[0, 0, 0, 0], [40, 80, 210, 0.85]], omslag: "9,3 – 10,5" },
-        { id: "alizaringult", navn: "Alizaringult R", pKa: [11.0], farver: [[245, 210, 60, 0.8], [215, 55, 45, 0.85]], omslag: "10,1 – 12,0" },
+        { id: "phenolphthalein", navn: "Phenolphthalein", pKa: [9.4], farver: [[0, 0, 0, 0], [232, 45, 140, 0.85]], omraade: [8.2, 10.0], omslag: "8,2 – 10,0" },
+        { id: "bromthymolblaat", navn: "Bromthymolblåt", pKa: [7.1], farver: [[240, 205, 40, 0.8], [40, 90, 225, 0.85]], omraade: [6.0, 7.6], omslag: "6,0 – 7,6" },
+        { id: "methylorange", navn: "Methylorange", pKa: [3.46], farver: [[225, 45, 40, 0.85], [245, 190, 40, 0.8]], omraade: [3.1, 4.4], omslag: "3,1 – 4,4" },
+        { id: "methylroedt", navn: "Methylrødt", pKa: [5.0], farver: [[220, 40, 50, 0.85], [245, 210, 50, 0.8]], omraade: [4.4, 6.2], omslag: "4,4 – 6,2" },
+        { id: "bromcresolgroent", navn: "Bromcresolgrønt", pKa: [4.7], farver: [[240, 205, 40, 0.8], [40, 100, 220, 0.85]], omraade: [3.8, 5.4], omslag: "3,8 – 5,4" },
+        { id: "lakmus", navn: "Lakmus", pKa: [6.5], farver: [[220, 60, 70, 0.8], [70, 80, 210, 0.8]], omraade: [4.5, 8.3], omslag: "4,5 – 8,3" },
+        { id: "phenolroedt", navn: "Phenolrødt", pKa: [7.9], farver: [[240, 200, 40, 0.8], [225, 50, 60, 0.85]], omraade: [6.8, 8.4], omslag: "6,8 – 8,4" },
+        { id: "thymolblaat", navn: "Thymolblåt", pKa: [1.65, 8.9], farver: [[225, 45, 40, 0.85], [240, 205, 40, 0.8], [40, 90, 225, 0.85]], omraade: [8.0, 9.6], omslag: "1,2 – 2,8 og 8,0 – 9,6" },
+        { id: "thymolphthalein", navn: "Thymolphthalein", pKa: [9.9], farver: [[0, 0, 0, 0], [40, 80, 210, 0.85]], omraade: [9.3, 10.5], omslag: "9,3 – 10,5" },
+        { id: "alizaringult", navn: "Alizaringult R", pKa: [11.0], farver: [[245, 210, 60, 0.8], [215, 55, 45, 0.85]], omraade: [10.1, 12.0], omslag: "10,1 – 12,0" },
         { id: "universal", navn: "Universalindikator", pKa: [], skala: true, farver: [], omslag: "hele skalaen" }
     ];
 

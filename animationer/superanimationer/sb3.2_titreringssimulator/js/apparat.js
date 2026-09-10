@@ -40,16 +40,20 @@
     var G_TOP = 470;
     var G_BUND = 612;
     var G_VAEG = 5;
-    var G_KAPACITET = 250;     /* mL ved kanten */
+    var G_KAPACITET = 250;     /* mL ved kanten, hvis intet andet er sagt */
     var G_INDRE_BUND = G_BUND - G_VAEG - 2;
     var G_INDRE_TOP = G_TOP + 10;
 
     Apparat.dryphoejde = B_DRYP;
     Apparat.drypX = B_MIDT;
 
-    /* Vaeskeoverfladens hoejde for et rumfang i mL. */
-    Apparat.overflade = function (mL) {
-        var f = NK.klamp(mL / G_KAPACITET, 0.02, 1);
+    /* Vaeskeoverfladens hoejde for et rumfang i mL.
+       Glasset skaleres efter forsoeget: et 20 mL proevemaal i et
+       rigtigt 250 mL baegerglas ville vaere en stribe i bunden, og saa
+       kunne man ikke se niveauet stige undervejs. Maalestregerne paa
+       glasset viser stadig rigtige mL. */
+    Apparat.overflade = function (mL, kapacitet) {
+        var f = NK.klamp(mL / (kapacitet || G_KAPACITET), 0.04, 1);
         return G_INDRE_BUND - f * (G_INDRE_BUND - G_INDRE_TOP);
     };
 
@@ -307,9 +311,10 @@
         maerkat(ctx, NK.tal(s.V, 2) + " mL", B_MIDT + B_HALV + 10, menisk, "#f2c53d");
         ctx.restore();
 
-        /* Hvad staar der i buretten */
+        /* Hvad staar der i buretten - over roeret, saa den aldrig
+           lander oven i aflaesningen ved menisken */
         if (s.titratorNavn) {
-            maerkat(ctx, s.titratorNavn, B_MIDT + B_HALV + 10, B_TOP + 26, "#7fc4f2");
+            maerkat(ctx, s.titratorNavn, B_MIDT, B_TOP - 30, "#7fc4f2", "midt");
         }
     }
 
@@ -340,7 +345,8 @@
         ctx.fill();
 
         /* Vaesken */
-        var overflade = Apparat.overflade(s.rumfang);
+        var kap = s.glasKapacitet || G_KAPACITET;
+        var overflade = Apparat.overflade(s.rumfang, kap);
         ctx.save();
         baegerSti(ctx, true);
         ctx.closePath();
@@ -430,18 +436,19 @@
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        /* Maalestreger paa glasset */
-        for (i = 1; i <= 4; i++) {
-            var mL = i * 50;
-            var y = Apparat.overflade(mL);
+        /* Maalestreger paa glasset - rigtige mL, uanset skaleringen */
+        var streg = NK.paenTrin(kap / 4);
+        for (i = 1; i * streg < kap * 0.99; i++) {
+            var mL = i * streg;
+            var y = Apparat.overflade(mL, kap);
             ctx.beginPath();
             ctx.moveTo(G_VENSTRE + G_VAEG + 4, y);
-            ctx.lineTo(G_VENSTRE + G_VAEG + (i === 2 || i === 4 ? 26 : 16), y);
+            ctx.lineTo(G_VENSTRE + G_VAEG + (i % 2 === 0 ? 26 : 16), y);
             ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
             ctx.lineWidth = 1.2;
             ctx.stroke();
-            if (i === 2 || i === 4) {
-                NK.tekst(ctx, mL + "", G_VENSTRE + G_VAEG + 30, y, {
+            if (i % 2 === 0) {
+                NK.tekst(ctx, NK.tal(mL, streg < 1 ? 1 : 0), G_VENSTRE + G_VAEG + 30, y, {
                     font: "600 9px 'Segoe UI', sans-serif",
                     linje: "middle", farve: "rgba(255, 255, 255, 0.5)"
                 });
