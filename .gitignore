@@ -1,0 +1,5 @@
+# Filerne i files\downloads\ ligger allerede i repoet som downloads\, fordi git
+# følger junctionen. GitHub Pages skal bruge den korte sti downloads/, så det er
+# den udgave der committes -- og denne der holdes udenfor, så hver fil kun
+# fylder ét sted i historikken.
+files/downloads/

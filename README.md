@@ -61,6 +61,10 @@ Skal den laves igen (fx efter en flytning), køres i en almindelig kommandopromp
 mklink /J "C:\NK_hjemmeside\downloads" "C:\NK_hjemmeside\files\downloads"
 ```
 
+Git følger junctionen og gemmer filerne i repoet som `downloads/` — det er den
+udgave GitHub Pages serverer. Derfor står `files/downloads/` i `.gitignore`, så
+de samme filer ikke også committes derfra.
+
 `animationer\` var tidligere også en junction til `HTML animationer\`, som havde
 sit eget git-repo. Nu er hele `C:\NK_hjemmeside\` ét repo, og `animationer\` er
 en helt almindelig mappe i det.
