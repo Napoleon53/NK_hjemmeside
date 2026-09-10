@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="da">
+<head><meta charset="UTF-8"><title>selvtest</title></head>
+<body style="margin:0;background:#ffffff;">
+<pre id="ud" style="margin:0;padding:14px;font:15px/1.65 Consolas,monospace;color:#111;white-space:pre-wrap;">kører...</pre>
+<iframe id="ramme" src="index.html" style="width:1400px;height:800px;border:0;position:absolute;top:2000px;"></iframe>
+<script>
+function koer(sim, sekunder, dt) {
+    var n = Math.round(sekunder / dt);
+    for (var i = 0; i < n; i++) sim.opdater(dt);
+}
+function r(v, d) { return Number(v).toFixed(d === undefined ? 2 : d); }
+
+document.getElementById("ramme").addEventListener("load", function () {
+    var linjer = [];
+    try {
+        var W = document.getElementById("ramme").contentWindow;
+        var S = W.NK.sims;
+
+        /* ---- BRO ---- */
+        var bro = S["fane-bro"];
+        koer(bro, 120, 1 / 60);
+        linjer.push("BRO efter 120 s:  Fyn=" + bro.nFyn + "  Jyl=" + bro.nJyl +
+            "  paaVej=" + bro.paaVej.length +
+            "  Y=" + r(bro.nJyl / bro.nFyn) + "  K=" + r(bro.kFrem / bro.kTilbage) +
+            "  ialt=" + (bro.nFyn + bro.nJyl + bro.paaVej.length));
+        var foerY = bro.nJyl / bro.nFyn;
+        bro.nFyn += 200;
+        koer(bro, 120, 1 / 60);
+        linjer.push("BRO efter +200 biler paa Fyn og 120 s:  Fyn=" + bro.nFyn +
+            "  Jyl=" + bro.nJyl + "  Y=" + r(bro.nJyl / bro.nFyn) +
+            "  (var " + r(foerY) + " for indgrebet)");
+        bro.kTilbage = 0.06;
+        koer(bro, 150, 1 / 60);
+        linjer.push("BRO med k(frem)=k(tilbage):  Y=" + r(bro.nJyl / bro.nFyn) + "  K=1,00");
+
+        /* ---- NATUR ---- */
+        var nat = S["fane-natur"];
+        koer(nat, 300, 1 / 60);
+        linjer.push("NATUR efter 300 s:  R=" + r(nat.rensdyr, 0) + "  F=" + r(nat.foede, 0) +
+            "  beregnet balance=" + r(nat.balance().R, 0) + " / F*=" + r(nat.balance().F, 0));
+        nat.rensdyr += 1000;
+        koer(nat, 400, 1 / 60);
+        linjer.push("NATUR efter +1000 rensdyr og 400 s:  R=" + r(nat.rensdyr, 0) +
+            "  (balance=" + r(nat.balance().R, 0) + ")");
+        nat.baereevne += 700;
+        koer(nat, 400, 1 / 60);
+        linjer.push("NATUR med stoerre baereevne:  R=" + r(nat.rensdyr, 0) +
+            "  (balance=" + r(nat.balance().R, 0) + ")");
+
+        /* ---- MARKED ---- */
+        var mrk = S["fane-marked"];
+        koer(mrk, 200, 1 / 60);
+        linjer.push("MARKED efter 200 s:  pris=" + r(mrk.pris) +
+            "  p*=" + r(mrk.ligevaegtspris()) +
+            "  S=" + r(mrk.udbud(mrk.pris)) + "  D=" + r(mrk.efterspoergsel(mrk.pris)) +
+            "  lager=" + r(mrk.lager, 0));
+        mrk.S0 *= 2;
+        koer(mrk, 200, 1 / 60);
+        linjer.push("MARKED efter god host:  pris=" + r(mrk.pris) + "  p*=" + r(mrk.ligevaegtspris()));
+        mrk.D0 *= 1.6;
+        koer(mrk, 200, 1 / 60);
+        linjer.push("MARKED efter flere kunder:  pris=" + r(mrk.pris) + "  p*=" + r(mrk.ligevaegtspris()));
+
+        /* ---- KEMI ---- */
+        var kem = S["fane-kemi"];
+        koer(kem, 120, 1 / 60);
+        var t = kem.taeller(), k = kem.konstanter(), e = 100 * kem.volumen;
+        linjer.push("KEMI 298 K efter 120 s:  n1=" + t.n1 + "  n2=" + t.n2 +
+            "  Y=" + r(Math.pow(t.n2 / e, 2) / (t.n1 / e), 3) + "  K=" + r(k.K, 3) +
+            "  N-atomer=" + (2 * t.n1 + t.n2));
+        kem.temperatur = 340;
+        koer(kem, 200, 1 / 60);
+        t = kem.taeller(); k = kem.konstanter();
+        linjer.push("KEMI 340 K:  n1=" + t.n1 + "  n2=" + t.n2 +
+            "  Y=" + r(Math.pow(t.n2 / e, 2) / (t.n1 / e), 3) + "  K=" + r(k.K, 3));
+        kem.temperatur = 260;
+        koer(kem, 300, 1 / 60);
+        t = kem.taeller(); k = kem.konstanter();
+        linjer.push("KEMI 260 K:  n1=" + t.n1 + "  n2=" + t.n2 +
+            "  Y=" + r(Math.pow(t.n2 / e, 2) / (t.n1 / e), 3) + "  K=" + r(k.K, 3));
+        kem.temperatur = 298;
+        koer(kem, 200, 1 / 60);
+        var foer = kem.taeller();
+        kem.volumen = 0.5;
+        koer(kem, 200, 1 / 60);
+        t = kem.taeller(); k = kem.konstanter(); e = 100 * kem.volumen;
+        linjer.push("KEMI presset sammen til V=0,5 L:  n1=" + foer.n1 + "→" + t.n1 +
+            "  n2=" + foer.n2 + "→" + t.n2 +
+            "  Y=" + r(Math.pow(t.n2 / e, 2) / (t.n1 / e), 3) + "  K=" + r(k.K, 3));
+    } catch (fejl) {
+        linjer.push("FEJL: " + fejl.message + "\n" + fejl.stack);
+    }
+    document.getElementById("ud").textContent = linjer.join("\n");
+});
+</script>
+</body>
+</html>

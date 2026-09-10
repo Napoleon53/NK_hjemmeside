@@ -34,12 +34,17 @@
             minTop: { fart: 20 }
         });
 
-        /* Modellens konstanter */
+        /* Modellens konstanter.
+           De er valgt, saa balancen naas roligt og uden svingninger:
+           foeden skal staa OVER halvdelen af baereevnen i balancepunktet,
+           ellers bliver systemet en ustabil spiral, der kredser i stedet
+           for at falde til ro. Derfor er baereevnen ogsaa loftet ved
+           2200 - over det begynder bestanden at svinge. */
         this.bMaks = 0.18;    // hoejeste fodselsrate pr. rensdyr
         this.dBasis = 0.06;   // dodsrate pr. rensdyr, naar der er rigeligt foede
-        this.fHalv = 600;     // foedemaengde hvor halvdelen af maksimum naas
-        this.rF = 0.35;       // foedens vaekstrate
-        this.graes = 0.55;    // foede spist pr. rensdyr pr. tidsenhed
+        this.fHalv = 720;     // foedemaengde hvor halvdelen af maksimum naas
+        this.rF = 0.90;       // foedens vaekstrate
+        this.graes = 0.87;    // foede spist pr. rensdyr pr. tidsenhed
         this.fart = 1.4;      // gor simulationen lidt hurtigere at se paa
 
         this.tid = 0;
@@ -62,8 +67,8 @@
 
     NK.SimNatur.prototype.nulstil = function () {
         this.rensdyr = 200;
-        this.foede = 1000;
-        this.baereevne = 2500;
+        this.foede = 600;
+        this.baereevne = 1400;
         this.vFoedsel = 0;
         this.vDoed = 0;
         this.dyr.length = 0;
@@ -75,7 +80,7 @@
         NK.el("nat-tilfoej-rensdyr").addEventListener("click", function () { mig.rensdyr += 1000; });
         NK.el("nat-vinter").addEventListener("click", function () { mig.foede *= 0.3; });
         NK.el("nat-mos").addEventListener("click", function () {
-            mig.baereevne = Math.min(5000, mig.baereevne + 700);
+            mig.baereevne = Math.min(2200, mig.baereevne + 400);
         });
         NK.el("nat-nulstil").addEventListener("click", function () { mig.nulstil(); });
         NK.grafSkift("nat", this.graf);
@@ -226,7 +231,7 @@
             var traerskel = i / pladser;
             if (andel <= traerskel) { rm(); continue; }
             var styrke = NK.klamp((andel - traerskel) * 4, 0, 1);
-            var my2 = jordY + 26 + myp * (h - jordY - 42);
+            var my2 = jordY + 26 + myp * (h - jordY - 80);
             NK.Sprites.tegnStaaende(ctx, "mos", mxp * b, my2, 20 + rm() * 12, 0.35 + styrke * 0.65, "#5f9e52");
         }
 
@@ -234,7 +239,7 @@
         for (i = 0; i < this.dyr.length; i++) {
             var d = this.dyr[i];
             var dx = d.x * b;
-            var dy = jordY + 30 + d.y * (h - jordY - 46) + Math.sin(this.tid * 5 + d.fase) * 1.2;
+            var dy = jordY + 30 + d.y * (h - jordY - 86) + Math.sin(this.tid * 5 + d.fase) * 1.2;
             var dbred = 30 + d.y * 14;
             var dhoej = NK.Sprites.hoejde("rensdyr", dbred);
             ctx.save();
@@ -257,7 +262,7 @@
         NK.tekst(ctx, "Føde: " + NK.tal(this.foede) + " af " + NK.tal(this.baereevne), 18, 52, {
             farve: "#a8e6bd", font: "600 14px 'Segoe UI', sans-serif"
         });
-        NK.tekst(ctx, "1 figur ≈ 8 rensdyr", 18, h - 14, {
+        NK.tekst(ctx, "1 figur ≈ 8 rensdyr", 18, h - 46, {
             farve: "#5c6b7a", font: "11px 'Segoe UI', sans-serif"
         });
 

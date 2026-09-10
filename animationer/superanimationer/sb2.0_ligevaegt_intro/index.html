@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dynamisk ligevægt: introduktion</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="pil">⇌</span> Dynamisk ligevægt<span class="lang"> — introduktion</span></h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg model">
+        <button class="faneknap aktiv" data-fane="fane-bro" role="tab" aria-selected="true"><span class="nr">1</span>Lillebæltsbroerne</button>
+        <button class="faneknap" data-fane="fane-natur" role="tab" aria-selected="false"><span class="nr">2</span>Rensdyr og føde</button>
+        <button class="faneknap" data-fane="fane-marked" role="tab" aria-selected="false"><span class="nr">3</span>Torvet</button>
+        <button class="faneknap kemi" data-fane="fane-kemi" role="tab" aria-selected="false"><span class="nr">4</span>Kemien</button>
+    </div>
+
+    <div class="tidsboks">
+        <span class="mrk">Fart</span>
+        <button class="tidsknap" data-fart="0.5">0,5×</button>
+        <button class="tidsknap aktiv" data-fart="1">1×</button>
+        <button class="tidsknap" data-fart="3">3×</button>
+        <button class="tidsknap pause" id="pauseknap" aria-label="Pause">❚❚</button>
+    </div>
+
+    <button class="ikonknap" id="hjaelpknap" title="Hjælp og genveje" aria-label="Hjælp">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: LILLEBÆLTSBROERNE                                          -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-bro" role="tabpanel" aria-label="Lillebæltsbroerne">
+    <div class="scene">
+        <canvas id="bro-laerred"></canvas>
+        <div class="scene-mrk">Tallene står stille, men bilerne kører hele tiden. Det er hele pointen med <b>dynamisk</b> ligevægt.</div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort fremhaev">
+            <h2>Trafik over Lillebælt</h2>
+            <p>Biler kører frem og tilbage mellem Middelfart og Fredericia. Jo flere biler der holder på den ene side, jo flere kører derfra — helt som en reaktionshastighed vokser med koncentrationen.</p>
+            <p>Når de to hastigheder bliver lige store, holder tallene op med at ændre sig. Ingen biler er stoppet: der kører bare lige mange hver vej.</p>
+            <div class="ligning">Biler(<span class="frem">Fyn</span>) <span class="hj">⇌</span> Biler(<span class="tilbage">Jylland</span>)</div>
+        </div>
+
+        <div class="kort">
+            <div class="grafhoved">
+                <h2>Forløb</h2>
+                <div class="grafskift">
+                    <button class="aktiv" data-graf="bro" data-gruppe="antal">Antal</button>
+                    <button data-graf="bro" data-gruppe="fart">Hastighed</button>
+                </div>
+            </div>
+            <div class="grafboks"><canvas id="bro-graf"></canvas></div>
+        </div>
+
+        <div class="kort">
+            <h2>Hastigheder</h2>
+            <div class="maaler">
+                <span class="navn"><i>v</i>(frem)</span>
+                <div class="spor"><div class="fyld frem" id="bro-vfrem-fyld"></div></div>
+                <span class="vaerdi" id="bro-vfrem-val">0</span>
+            </div>
+            <div class="maaler">
+                <span class="navn"><i>v</i>(tilbage)</span>
+                <div class="spor"><div class="fyld tilbage" id="bro-vtilbage-fyld"></div></div>
+                <span class="vaerdi" id="bro-vtilbage-val">0</span>
+            </div>
+            <div class="badge" id="bro-badge"><span class="tegn">⇌</span> LIGEVÆGT</div>
+        </div>
+
+        <div class="kort">
+            <h2>Reaktionsbrøk mod K</h2>
+            <div class="yk-spor">
+                <div class="yk-k"></div>
+                <div class="yk-maerke" id="bro-yk-maerke"></div>
+            </div>
+            <div class="yk-tekst">
+                <span>Y = n(Jylland)/n(Fyn) = <b id="bro-y">0,00</b></span>
+                <span>K = <b id="bro-kref">3,00</b></span>
+            </div>
+        </div>
+
+        <div class="kort">
+            <h2>Tal</h2>
+            <div class="talraekke"><span>Biler på Fyn</span><span class="tal blaa" id="bro-n-fyn">0</span></div>
+            <div class="talraekke"><span>Biler i Jylland</span><span class="tal orange" id="bro-n-jyl">0</span></div>
+            <div class="talraekke"><span>Biler på broerne</span><span class="tal" id="bro-n-bro">0</span></div>
+            <div class="talraekke"><span>I alt (bevares)</span><span class="tal groen" id="bro-n-alt">0</span></div>
+        </div>
+
+        <div class="kort">
+            <h2>Hvad bestemmer K?</h2>
+            <div class="skyder">
+                <label><span><i>k</i>(frem) — mod Jylland</span><b id="bro-kfrem-vis">0,060</b></label>
+                <input type="range" id="bro-kfrem" min="0.01" max="0.15" step="0.005" value="0.06">
+            </div>
+            <div class="skyder orange">
+                <label><span><i>k</i>(tilbage) — mod Fyn</span><b id="bro-ktilbage-vis">0,020</b></label>
+                <input type="range" id="bro-ktilbage" min="0.01" max="0.15" step="0.005" value="0.02">
+            </div>
+            <div class="kformel">K = <i>k</i>(frem) / <i>k</i>(tilbage) = <b id="bro-k">3,00</b></div>
+        </div>
+
+        <div class="kort">
+            <h2>Indgreb</h2>
+            <div class="knapper">
+                <button class="knap blaa" id="bro-tilfoej-fyn"><span>Tilføj 50 biler på Fyn</span><span class="tegn">➔</span></button>
+                <button class="knap orange" id="bro-tilfoej-jyl"><span>Tilføj 50 biler i Jylland</span><span class="tegn">⬅</span></button>
+                <div class="knaprad">
+                    <button class="knap" id="bro-fjern-fyn">− 50 Fyn</button>
+                    <button class="knap" id="bro-fjern-jyl">− 50 Jylland</button>
+                </div>
+                <button class="knap nulstil" id="bro-nulstil"><span>Nulstil</span><span class="tegn">↺</span></button>
+            </div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: RENSDYR OG FØDE                                            -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-natur" role="tabpanel" aria-label="Rensdyr og føde">
+    <div class="scene">
+        <canvas id="nat-laerred"></canvas>
+        <div class="scene-mrk">Bestanden står stille, fordi der fødes lige så mange, som der dør. To modsatrettede processer i balance.</div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort fremhaev">
+            <h2>Balance i naturen</h2>
+            <p>Rensdyrene formerer sig, når der er føde nok, og dør hurtigere, når der er mangel. Bestanden lander dér, hvor fødsler og dødsfald går lige op — en <b>stationær tilstand</b>.</p>
+            <p>Pas på: her findes ingen ligevægtskonstant. Balancen flytter sig, hvis bæreevnen ændres. Det er forskellen på den her balance og en rigtig kemisk ligevægt.</p>
+            <div class="ligning"><span class="frem">Fødsler</span> <span class="hj">⇌</span> <span class="tilbage">Dødsfald</span></div>
+        </div>
+
+        <div class="kort">
+            <div class="grafhoved">
+                <h2>Forløb</h2>
+                <div class="grafskift">
+                    <button class="aktiv" data-graf="nat" data-gruppe="antal">Bestand</button>
+                    <button data-graf="nat" data-gruppe="fart">Hastighed</button>
+                </div>
+            </div>
+            <div class="grafboks"><canvas id="nat-graf"></canvas></div>
+        </div>
+
+        <div class="kort">
+            <h2>Hastigheder</h2>
+            <div class="maaler">
+                <span class="navn">Fødsler</span>
+                <div class="spor"><div class="fyld frem" id="nat-vfoedsel-fyld"></div></div>
+                <span class="vaerdi" id="nat-vfoedsel-val">0</span>
+            </div>
+            <div class="maaler">
+                <span class="navn">Dødsfald</span>
+                <div class="spor"><div class="fyld tilbage" id="nat-vdoed-fyld"></div></div>
+                <span class="vaerdi" id="nat-vdoed-val">0</span>
+            </div>
+            <div class="badge" id="nat-badge"><span class="tegn">⇌</span> BALANCE</div>
+        </div>
+
+        <div class="kort">
+            <h2>Tal</h2>
+            <div class="talraekke"><span>Rensdyr</span><span class="tal orange" id="nat-rensdyr">0</span></div>
+            <div class="talraekke"><span>Føde (mos og lav)</span><span class="tal groen" id="nat-foede">0</span></div>
+            <div class="talraekke"><span>Mætning</span><span class="tal" id="nat-maetning">0 %</span></div>
+            <div class="talraekke"><span>Bæreevne</span><span class="tal" id="nat-baereevne">0</span></div>
+            <div class="talraekke"><span>Beregnet balance</span><span class="tal blaa" id="nat-balance">0</span></div>
+        </div>
+
+        <div class="kort">
+            <h2>Indgreb</h2>
+            <div class="knapper">
+                <button class="knap orange" id="nat-tilfoej-rensdyr"><span>Indsæt 1000 rensdyr</span><span class="tegn">🦌</span></button>
+                <button class="knap blaa" id="nat-vinter"><span>Hård vinter (føden styrtdykker)</span><span class="tegn">❄</span></button>
+                <button class="knap" id="nat-mos"><span>Større bæreevne: plant mos</span><span class="tegn">🌱</span></button>
+                <button class="knap nulstil" id="nat-nulstil"><span>Nulstil</span><span class="tegn">↺</span></button>
+            </div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: TORVET                                                     -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-marked" role="tabpanel" aria-label="Torvet">
+    <div class="scene">
+        <canvas id="mrk-laerred"></canvas>
+        <div class="scene-mrk">Prisen flytter sig, indtil udbud og efterspørgsel er lige store. Et indgreb giver en <b>ny</b> ligevægt — ikke den gamle.</div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort fremhaev">
+            <h2>Udbud og efterspørgsel</h2>
+            <p>Er prisen høj, vil mange sælge og få købe. Er den lav, er det omvendt. Prisen skubbes af forskellen mellem de to og lander, hvor kurverne krydser.</p>
+            <p>Prisen spiller samme rolle som reaktionsbrøken: den er det tal, der indstiller sig, indtil de to modsatrettede strømme er lige store.</p>
+            <div class="ligning"><span class="frem">Udbud</span> <span class="hj">⇌</span> <span class="tilbage">Efterspørgsel</span></div>
+        </div>
+
+        <div class="kort">
+            <div class="grafhoved">
+                <h2>Forløb</h2>
+                <div class="grafskift">
+                    <button class="aktiv" data-graf="mrk" data-gruppe="pris">Pris</button>
+                    <button data-graf="mrk" data-gruppe="fart">Mængder</button>
+                </div>
+            </div>
+            <div class="grafboks"><canvas id="mrk-graf"></canvas></div>
+        </div>
+
+        <div class="kort">
+            <h2>Strømme</h2>
+            <div class="maaler">
+                <span class="navn">Udbud</span>
+                <div class="spor"><div class="fyld frem" id="mrk-vudbud-fyld"></div></div>
+                <span class="vaerdi" id="mrk-vudbud-val">0</span>
+            </div>
+            <div class="maaler">
+                <span class="navn">Efterspørgsel</span>
+                <div class="spor"><div class="fyld tilbage" id="mrk-vefter-fyld"></div></div>
+                <span class="vaerdi" id="mrk-vefter-val">0</span>
+            </div>
+            <div class="badge" id="mrk-badge"><span class="tegn">⇌</span> MARKEDSLIGEVÆGT</div>
+        </div>
+
+        <div class="kort">
+            <h2>Tal</h2>
+            <div class="talraekke"><span>Pris lige nu</span><span class="tal" id="mrk-pris">0 kr.</span></div>
+            <div class="talraekke"><span>Ligevægtspris</span><span class="tal groen" id="mrk-ligepris">0 kr.</span></div>
+            <div class="talraekke"><span>På bordet</span><span class="tal blaa" id="mrk-lager">0</span></div>
+            <div class="talraekke"><span>Omsætning i alt</span><span class="tal orange" id="mrk-omsaetning">0 kr.</span></div>
+        </div>
+
+        <div class="kort">
+            <h2>Indgreb</h2>
+            <div class="knapper">
+                <button class="knap blaa" id="mrk-hoest"><span>God høst: dobbelt udbud</span><span class="tegn">🍅</span></button>
+                <button class="knap orange" id="mrk-kunder"><span>Flere kunder på torvet</span><span class="tegn">👥</span></button>
+                <button class="knap nulstil" id="mrk-nulstil"><span>Nulstil</span><span class="tegn">↺</span></button>
+            </div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 4: KEMIEN                                                     -->
+<!-- ================================================================= -->
+<section class="fane kemi" id="fane-kemi" role="tabpanel" aria-label="Kemien">
+    <div class="scene">
+        <canvas id="kem-laerred"></canvas>
+        <div class="scene-mrk">Nu med rigtige molekyler. Farven står stille, når ligevægten er indstillet — men molekylerne reagerer stadig begge veje.</div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort fremhaev">
+            <h2>N₂O₄ ⇌ 2 NO₂</h2>
+            <p>Farveløs N₂O₄ spaltes til rødbrun NO₂. Frem afhænger af [N₂O₄], tilbage af [NO₂]² — for der skal <b>to</b> NO₂-molekyler til at danne ét N₂O₄.</p>
+            <p>Sæt de to hastigheder lig hinanden, og ligevægtsloven falder ud af sig selv.</p>
+            <div class="ligning"><span class="frem">k(frem)·[N₂O₄]</span> <span class="hj">=</span> <span class="tilbage">k(tilbage)·[NO₂]²</span></div>
+        </div>
+
+        <div class="kort">
+            <div class="grafhoved">
+                <h2>Forløb</h2>
+                <div class="grafskift">
+                    <button class="aktiv" data-graf="kem" data-gruppe="antal">Koncentration</button>
+                    <button data-graf="kem" data-gruppe="fart">Hastighed</button>
+                </div>
+            </div>
+            <div class="grafboks"><canvas id="kem-graf"></canvas></div>
+        </div>
+
+        <div class="kort">
+            <h2>Hastigheder</h2>
+            <div class="maaler">
+                <span class="navn"><i>v</i>(frem)</span>
+                <div class="spor"><div class="fyld frem" id="kem-vfrem-fyld"></div></div>
+                <span class="vaerdi" id="kem-vfrem-val">0</span>
+            </div>
+            <div class="maaler">
+                <span class="navn"><i>v</i>(tilbage)</span>
+                <div class="spor"><div class="fyld tilbage" id="kem-vtilbage-fyld"></div></div>
+                <span class="vaerdi" id="kem-vtilbage-val">0</span>
+            </div>
+            <div class="badge" id="kem-badge"><span class="tegn">⇌</span> LIGEVÆGT</div>
+        </div>
+
+        <div class="kort">
+            <h2>Reaktionsbrøk mod K</h2>
+            <div class="yk-spor">
+                <div class="yk-k"></div>
+                <div class="yk-maerke" id="kem-yk-maerke"></div>
+            </div>
+            <div class="yk-tekst">
+                <span>Y = [NO₂]²/[N₂O₄] = <b id="kem-y">0,00</b></span>
+                <span>K = <b id="kem-kref">1,43</b></span>
+            </div>
+        </div>
+
+        <div class="kort">
+            <h2>Tal</h2>
+            <div class="talraekke"><span>[N₂O₄]</span><span class="tal blaa" id="kem-c1">0,00</span></div>
+            <div class="talraekke"><span>[NO₂]</span><span class="tal orange" id="kem-c2">0,00</span></div>
+            <div class="talraekke"><span>Molekyler N₂O₄</span><span class="tal" id="kem-n1">0</span></div>
+            <div class="talraekke"><span>Molekyler NO₂</span><span class="tal" id="kem-n2">0</span></div>
+            <div class="talraekke"><span>K ved denne temperatur</span><span class="tal groen" id="kem-k">0,00</span></div>
+        </div>
+
+        <div class="kort">
+            <h2>Betingelser</h2>
+            <div class="skyder roed">
+                <label><span>Temperatur (<span id="kem-temp-c">25 °C</span>)</span><b id="kem-temp-vis">298 K</b></label>
+                <input type="range" id="kem-temp" min="250" max="350" step="1" value="298">
+            </div>
+            <div class="skyder lilla">
+                <label><span>Volumen (stemplet)</span><b id="kem-vol-vis">1,00 L</b></label>
+                <input type="range" id="kem-vol" min="0.5" max="1.4" step="0.05" value="1">
+            </div>
+            <div class="kformel">Frem er endoterm (ΔH = +57 kJ/mol): varme flytter K opad. Volumen ændrer <i>ikke</i> K — kun koncentrationerne.</div>
+        </div>
+
+        <div class="kort">
+            <h2>Indgreb</h2>
+            <div class="knapper">
+                <button class="knap blaa" id="kem-tilfoej-n2o4"><span>Tilsæt 20 N₂O₄</span><span class="tegn">＋</span></button>
+                <button class="knap orange" id="kem-tilfoej-no2"><span>Tilsæt 20 NO₂</span><span class="tegn">＋</span></button>
+                <button class="knap nulstil" id="kem-nulstil"><span>Nulstil</span><span class="tegn">↺</span></button>
+            </div>
+        </div>
+
+        <div class="kort">
+            <details class="oversaet" open>
+                <summary>Fra broen til kemien</summary>
+                <table class="oversaet-tabel">
+                    <tr><th>Lillebælt</th><th>N₂O₄ ⇌ 2 NO₂</th></tr>
+                    <tr><td>Bil på Fyn</td><td>N₂O₄-molekyle</td></tr>
+                    <tr><td>Bil i Jylland</td><td>NO₂-molekyle</td></tr>
+                    <tr><td>Antal biler pr. plads</td><td>Koncentration</td></tr>
+                    <tr><td><i>k</i>(frem)·n(Fyn)</td><td><i>k</i>(frem)·[N₂O₄]</td></tr>
+                    <tr><td><i>k</i>(tilbage)·n(Jyl)</td><td><i>k</i>(tilbage)·[NO₂]²</td></tr>
+                    <tr><td>Y = n(Jyl)/n(Fyn)</td><td>Y = [NO₂]²/[N₂O₄]</td></tr>
+                    <tr><td>Flere biler i den ene ende</td><td>Tilsæt stof</td></tr>
+                    <tr><td>—</td><td>Ændr temperatur eller volumen</td></tr>
+                </table>
+                <p class="kort" style="border:none;padding:8px 0 0 0;background:none;font-size:0.78rem;color:#8d95a1;">Kvadratet er den eneste rigtige forskel: to NO₂ skal mødes, før der kan dannes et N₂O₄. Koefficienten i reaktionsskemaet bliver til en eksponent i ligevægtsloven.</p>
+            </details>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="hjaelp">
+    <div class="overlay-boks">
+        <h2>Dynamisk ligevægt — introduktion</h2>
+        <p>Fire modeller af den samme idé: <b>når to modsatrettede processer kører lige hurtigt, står tallene stille, selvom der stadig sker noget.</b></p>
+
+        <h3>De fire faner</h3>
+        <ul>
+            <li><b>Lillebæltsbroerne</b> — den rene model. Se, at systemet vender tilbage til det samme <i>forhold</i> mellem de to sider, uanset hvor mange biler du hælder i. Det forhold er K.</li>
+            <li><b>Rensdyr og føde</b> — en balance af samme slags, men uden ligevægtskonstant. Her flytter balancen sig, når bæreevnen ændres.</li>
+            <li><b>Torvet</b> — prisen indstiller sig, hvor udbud og efterspørgsel krydser. Et indgreb giver en ny ligevægt.</li>
+            <li><b>Kemien</b> — den rigtige reaktion N₂O₄ ⇌ 2 NO₂, med temperatur, volumen og farveskift.</li>
+        </ul>
+
+        <h3>Prøv det her</h3>
+        <ul>
+            <li>Sæt K = 3 på fane 1, og tilføj biler på Fyn. Hvad sker der med <i>forholdet</i> bagefter?</li>
+            <li>Skru k(frem) og k(tilbage) ens. Hvad bliver K så?</li>
+            <li>Varm gassen op på fane 4. Bliver den brunere eller lysere — og hvad siger det om, hvilken vej der er endoterm?</li>
+            <li>Klem stemplet sammen. K står stille, men farven ændrer sig. Hvorfor?</li>
+        </ul>
+
+        <h3>Genveje</h3>
+        <p>
+            <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> skift fane &nbsp;·&nbsp;
+            <kbd>mellemrum</kbd> pause &nbsp;·&nbsp;
+            <kbd>R</kbd> nulstil fanen &nbsp;·&nbsp;
+            <kbd>H</kbd> denne hjælp &nbsp;·&nbsp;
+            <kbd>Esc</kbd> luk
+        </p>
+
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="hjaelp-luk" style="justify-content:center;">Luk og kom i gang</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/graf.js"></script>
+<script src="js/sim_bro.js"></script>
+<script src="js/sim_natur.js"></script>
+<script src="js/sim_marked.js"></script>
+<script src="js/sim_kemi.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -357,7 +357,7 @@
     /* Parkeringsplads: et gitter af biler, saa "koncentrationen" ses. */
     NK.SimBro.prototype.tegnParkering = function (ctx, x0, x1, h, antal, vinkel, sprite, farve) {
         var y0 = h * 0.18;
-        var y1 = h * 0.94;
+        var y1 = h * 0.90;
         var bredde = x1 - x0;
 
         ctx.fillStyle = "rgba(12, 16, 22, 0.42)";
@@ -369,13 +369,13 @@
 
         var celle = NK.klamp(bredde / 12, 12, 22);
         var kolonner = Math.max(1, Math.floor((bredde - 10) / celle));
-        var raekker = Math.max(1, Math.floor((y1 - y0 - 26) / celle));
+        var raekker = Math.max(1, Math.floor((y1 - y0 - 32) / celle));
         var plads = kolonner * raekker;
         var vist = Math.min(antal, plads);
 
         for (var i = 0; i < vist; i++) {
             var kx = x0 + 5 + (i % kolonner) * celle + celle / 2;
-            var ky = y0 + 20 + Math.floor(i / kolonner) * celle + celle / 2;
+            var ky = y0 + 26 + Math.floor(i / kolonner) * celle + celle / 2;
             NK.Sprites.tegn(ctx, sprite, kx, ky, celle * 0.92, vinkel, 1, farve);
         }
 

@@ -230,21 +230,24 @@ main {
     height: 100%;
 }
 
-/* Lille tekstboks der svaever oven paa scenen */
+/* Billedtekst nederst paa scenen. Den ligger som en fuldbred stribe med
+   blod overgang, saa den aldrig lander oven i en overskrift paa selve
+   laerredet - uanset hvilken fane man staar paa. */
 .scene-mrk {
     position: absolute;
-    top: 12px;
-    left: 14px;
-    background-color: rgba(12, 12, 18, 0.62);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: var(--radius-lil);
-    padding: 6px 11px;
-    font-size: 0.8rem;
-    color: #eef1f4;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 26px 18px 9px;
+    background: linear-gradient(to top, rgba(8, 8, 13, 0.9) 40%, rgba(8, 8, 13, 0));
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: #dde3ea;
+    text-align: center;
     pointer-events: none;
-    max-width: 62%;
-    line-height: 1.35;
 }
+
+.scene-mrk b { color: #ffffff; }
 
 .panel {
     background-color: var(--panel);
