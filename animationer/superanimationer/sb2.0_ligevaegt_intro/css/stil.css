@@ -765,6 +765,17 @@ summary:focus-visible {
     .top h1 .lang { display: none; }
 }
 
+/* Under ca. 1080 px er der ikke plads til fire fanenavne i fuld
+   stoerrelse. Vi strammer knapperne ind i stedet for at lade den
+   sidste fane blive klippet af. */
+@media (max-width: 1080px) {
+    .top { gap: 12px; padding: 8px 12px; }
+    .faneknap { padding: 7px 10px; font-size: 0.8rem; gap: 6px; }
+    .faneknap .nr { width: 17px; height: 17px; font-size: 0.65rem; }
+    .tidsboks .mrk { display: none; }
+    .tidsknap { padding: 4px 6px; min-width: 30px; font-size: 0.74rem; }
+}
+
 @media (max-width: 880px) {
     body { overflow: auto; }
     .top { flex-wrap: wrap; gap: 10px; }

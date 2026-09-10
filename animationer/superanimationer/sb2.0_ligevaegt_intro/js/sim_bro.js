@@ -89,11 +89,8 @@
         this.tid += dt;
 
         var b = this.l.b;
-        var h = this.l.h;
         var xVand0 = b * 0.30;
         var xVand1 = b * 0.70;
-        var yBroA = h * 0.34;
-        var yBroB = h * 0.62;
         var fart = Math.max(60, (xVand1 - xVand0) / 2.4);
 
         /* --- afgange fra hver side ---------------------------------- */
@@ -110,7 +107,8 @@
             this.nFyn--;
             this.paaVej.push({
                 x: xVand0 - 14,
-                y: yBroA - h * 0.012 + Math.random() * h * 0.024,
+                bro: 0,                       // 0 = gamle bro (mod Jylland)
+                bane: Math.random(),          // hvor paa broklappen bilen koerer
                 vx: fart * (0.85 + Math.random() * 0.3),
                 maalX: xVand1 + 14,
                 til: "jyl",
@@ -125,7 +123,8 @@
             this.nJyl--;
             this.paaVej.push({
                 x: xVand1 + 14,
-                y: yBroB - h * 0.012 + Math.random() * h * 0.024,
+                bro: 1,                       // 1 = nye bro (mod Fyn)
+                bane: Math.random(),
                 vx: -fart * (0.85 + Math.random() * 0.3),
                 maalX: xVand0 - 14,
                 til: "fyn",
@@ -259,8 +258,8 @@
 
         var xVand0 = b * 0.30;
         var xVand1 = b * 0.70;
-        var yBroA = h * 0.34;
-        var yBroB = h * 0.62;
+        var yBroA = h * 0.30;
+        var yBroB = h * 0.66;
         var tyk = NK.klamp(h * 0.045, 14, 26);
 
         ctx.clearRect(0, 0, b, h);
@@ -306,17 +305,20 @@
         var bilB = NK.klamp(tyk * 1.15, 16, 30);
         for (i = 0; i < this.paaVej.length; i++) {
             var bil = this.paaVej[i];
-            NK.Sprites.tegn(ctx, bil.sprite, bil.x, bil.y, bilB,
+            /* Banen regnes ud paa ny hver gang, saa bilerne bliver paa
+               broklappen ogsaa efter et vinduesskift. */
+            var baneY = (bil.bro === 0 ? yBroA : yBroB) + (bil.bane - 0.5) * tyk * 0.6;
+            NK.Sprites.tegn(ctx, bil.sprite, bil.x, baneY, bilB,
                 bil.vx > 0 ? 0 : Math.PI, 1, "#dfe7ee");
         }
 
         /* --- hastighedspile ----------------------------------------- */
         var maks = Math.max(2, this.vVist.frem, this.vVist.tilbage);
         var maksPil = (xVand1 - xVand0) * 0.42;
-        tegnPil(ctx, (xVand0 + xVand1) / 2, yBroA + tyk * 2.1,
+        tegnPil(ctx, (xVand0 + xVand1) / 2, yBroA + tyk * 1.5,
             20 + maksPil * (this.vVist.frem / maks), 1, "#7ec8f5",
             "v(frem) = " + NK.tal(this.vVist.frem, 1) + " biler/s");
-        tegnPil(ctx, (xVand0 + xVand1) / 2, yBroB + tyk * 2.1,
+        tegnPil(ctx, (xVand0 + xVand1) / 2, yBroB + tyk * 1.5,
             20 + maksPil * (this.vVist.tilbage / maks), -1, "#f5bd7e",
             "v(tilbage) = " + NK.tal(this.vVist.tilbage, 1) + " biler/s");
 

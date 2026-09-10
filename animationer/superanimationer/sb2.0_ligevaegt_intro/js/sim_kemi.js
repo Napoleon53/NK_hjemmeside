@@ -203,8 +203,6 @@
         NK.saetTekst("kem-temp-c", NK.tal(this.temperatur - 273, 0) + " °C");
         NK.saetTekst("kem-vol-vis", NK.tal(this.volumen, 2) + " L");
 
-        this.graf.saetReference(this.graf.gruppe === "fart" ? null : null);
-
         this.grafUr += dt;
         if (this.grafUr >= 0.18) {
             this.grafUr = 0;
