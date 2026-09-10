@@ -201,11 +201,14 @@
             NK.saetTekst("lab-hover", "");
         }
 
+        /* Ækvivalenspunktet vises med vilje IKKE her: pointen med
+           laboratoriet er selv at opdage, hvor det ligger, ved at
+           foelge kurven og pH-metret - ikke faa det peget ud paa
+           forhaand. Den beregnede kurve (kun tilgaengelig via "Vis den
+           beregnede kurve") og fane 2 "Kurven" viser det gerne. */
         this.graf.tegn({
             Vmaks: b.maksV(),
             kurver: kurver,
-            aekv: this.aekv,
-            visAekv: true,
             indikator: ind.omraade ? {
                 navn: ind.navn, lav: ind.omraade[0], hoej: ind.omraade[1],
                 farve: NK.Kemi.rgba(Kemi.indikatorFarve(ind, ind.omraade[1] + 1.5), 0.22)

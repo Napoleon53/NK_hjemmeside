@@ -25,7 +25,7 @@
 
     var C_TITRATOR = [0.0500, 0.1000, 0.2000];
     var V_PROEVE = [10, 20, 25];
-    var VMAKS_TRIN = [20, 25, 30, 40, 50];
+    var VMAKS = 30;      /* buretten er altid 30 mL, ligesom i laboratoriet */
 
     /* Hvor taet skal svaret vaere for at kunne godkendes. */
     var TOL_V = 0.02;      /* relativt */
@@ -64,28 +64,24 @@
         var titrator = Kemi.findStof(erSyre ? "naoh" : "hcl");
 
         /* Vaelg en titratorkoncentration, saa aekvivalensvolumenet lander
-           et sted, en buret kan naa. */
+           et sted inde i den 30 mL buret, med luft nok til at overtitrere
+           lidt uden at loebe toer. */
         var cT = null, Vae = 0;
         var blandet = C_TITRATOR.slice().sort(function () { return Math.random() - 0.5; });
         for (var i = 0; i < blandet.length; i++) {
             var forsoeg = c * V0 / blandet[i];
-            if (forsoeg >= 8 && forsoeg <= 38) { cT = blandet[i]; Vae = forsoeg; break; }
+            if (forsoeg >= 5 && forsoeg <= 24) { cT = blandet[i]; Vae = forsoeg; break; }
         }
         if (cT === null) {
-            cT = Math.round(c * V0 / 22 * 10000) / 10000;
+            cT = Math.round(c * V0 / 15 * 10000) / 10000;
             Vae = c * V0 / cT;
-        }
-
-        var Vmaks = VMAKS_TRIN[VMAKS_TRIN.length - 1];
-        for (i = 0; i < VMAKS_TRIN.length; i++) {
-            if (VMAKS_TRIN[i] >= Vae * 1.7) { Vmaks = VMAKS_TRIN[i]; break; }
         }
 
         var ops = {
             proeve: [{ stof: stof, c: c }],
             V0: V0,
             titrator: { stof: titrator, c: cT },
-            Vmaks: Vmaks
+            Vmaks: VMAKS
         };
 
         this.opgave = {

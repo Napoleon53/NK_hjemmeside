@@ -64,6 +64,17 @@
         return { s: s, dx: (b - BREDDE * s) / 2, dy: (h - HOEJDE * s) / 2 };
     };
 
+    /* Hvor tit skal buretten have en talmaerket streg, og hvor tit en
+       lille imellem? Valgt saa det matcher rigtige bureter i hver
+       stoerrelse - en 30 mL buret har tal for hver 5 mL og streg for
+       hver 1 mL, en 250 mL for hver 25 hhv. 5 mL, og saa videre. */
+    function buretTrin(kap) {
+        if (kap <= 50) return { label: 5, minor: 1 };
+        if (kap <= 100) return { label: 10, minor: 2 };
+        if (kap <= 250) return { label: 25, minor: 5 };
+        return { label: 50, minor: 10 };
+    }
+
     /* ----- Smaa tegnehjaelpere --------------------------------------- */
     function glasFyld(ctx, x0, y0, x1, y1) {
         var g = ctx.createLinearGradient(x0, y0, x1, y1);
@@ -229,20 +240,24 @@
         ctx.stroke();
         ctx.restore();
 
-        /* Inddeling: 0 foroven, kapaciteten forneden */
-        var trin = kap / 50;
+        /* Inddeling: 0 foroven, kapaciteten forneden. Talmaerkerne staar
+           paa runde mL-tal (5, 10, 25 ...), ikke paa en brøkdel af
+           kapaciteten - saa de er til at laese, uanset hvor stor
+           buretten er. */
+        var t = buretTrin(kap);
         ctx.textBaseline = "middle";
-        for (i = 0; i <= 50; i++) {
-            var y = B_SKALA_TOP + (i / 50) * (B_SKALA_BUND - B_SKALA_TOP);
-            var lang = (i % 5 === 0);
+        for (i = 0; i * t.minor <= kap + 1e-9; i++) {
+            var mL = i * t.minor;
+            var y = B_SKALA_TOP + (mL / kap) * (B_SKALA_BUND - B_SKALA_TOP);
+            var lang = (mL % t.label === 0);
             ctx.beginPath();
             ctx.moveTo(B_MIDT + B_HALV - (lang ? 11 : 6), y);
             ctx.lineTo(B_MIDT + B_HALV - 1, y);
             ctx.strokeStyle = lang ? "rgba(230, 242, 252, 0.85)" : "rgba(210, 230, 245, 0.45)";
             ctx.lineWidth = lang ? 1.3 : 0.9;
             ctx.stroke();
-            if (i % 10 === 0) {
-                NK.tekst(ctx, NK.tal(i * trin, 0), B_MIDT - B_HALV - 4, y, {
+            if (lang) {
+                NK.tekst(ctx, NK.tal(mL, 0), B_MIDT - B_HALV - 4, y, {
                     font: "600 10px 'Segoe UI', sans-serif",
                     justering: "right", linje: "middle",
                     farve: "rgba(215, 232, 245, 0.85)"
@@ -613,20 +628,13 @@
             justering: "right", farve: "rgba(110, 242, 168, 0.5)"
         });
 
-        /* Knapper */
-        var navne = ["CAL", "MODE", "HOLD"];
-        for (var i = 0; i < 3; i++) {
-            NK.rundtRekt(ctx, x + 14 + i * 45, y + 78, 38, 20, 4);
-            ctx.fillStyle = "#5a6074";
-            ctx.fill();
-            ctx.strokeStyle = "#1d212b";
-            ctx.lineWidth = 1;
-            ctx.stroke();
-            NK.tekst(ctx, navne[i], x + 33 + i * 45, y + 92, {
-                font: "700 8px 'Segoe UI', sans-serif",
-                justering: "center", farve: "rgba(255, 255, 255, 0.75)"
-            });
-        }
+        /* Et lille maerkat under displayet - ingen knapper. Instrumentet
+           skal se ud som noget, man laeser af, ikke noget, man klikker
+           paa. */
+        NK.tekst(ctx, "pH-METER", x + b / 2, y + 90, {
+            font: "700 9px 'Segoe UI', sans-serif",
+            justering: "center", farve: "rgba(255, 255, 255, 0.25)"
+        });
     }
 
     /* ================================================================

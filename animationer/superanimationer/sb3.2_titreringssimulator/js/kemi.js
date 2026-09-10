@@ -363,12 +363,17 @@ var NK = (typeof window !== "undefined") ? (window.NK = window.NK || {}) : {};
     };
 
     /* Paent maks-volumen: ca. dobbelt op paa sidste aekvivalenspunkt. */
+    /* Buretten er som udgangspunkt altid 30 mL - det er den stoerrelse,
+       der staar paa bordet i "Laboratoriet" og "Ukendt proeve". Kun hvis
+       den sidste aekvivalens slet ikke kan naas inden for 30 mL (meget
+       fortyndet titrator, stort proevevolumen), vokser forslaget til
+       naeste paene stoerrelse, saa titreringen stadig kan gennemfoeres. */
     Kemi.forslaaVmaks = function (ops) {
         var kopi = { proeve: ops.proeve, V0: ops.V0, titrator: ops.titrator, Vmaks: 1e9 };
         var ae = Kemi.aekvivalenspunkter(kopi);
-        if (ae.length === 0) return 50;
-        var v = ae[ae.length - 1].V * 2;
-        var trin = [5, 10, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150, 200, 250, 300, 400, 500];
+        if (ae.length === 0) return 30;
+        var v = ae[ae.length - 1].V + 5;      /* 5 mL luft efter sidste aekvivalens */
+        var trin = [30, 40, 50, 60, 80, 100, 150, 200, 250, 300, 400, 500];
         for (var i = 0; i < trin.length; i++) if (trin[i] >= v - 1e-9) return trin[i];
         return 500;
     };

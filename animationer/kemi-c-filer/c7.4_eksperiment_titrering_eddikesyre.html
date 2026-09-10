@@ -185,26 +185,29 @@
         .curve-toggle .chev { transition: transform 0.3s; font-size: 12px; }
         .curve-toggle.open .chev { transform: rotate(180deg); }
 
+        /* Forsøg og graf side om side, når kurven er foldet ud */
+        #sim-container { display: flex; align-items: stretch; }
+        #stage { position: relative; flex: 1 1 auto; min-width: 0; }
+
         #curve-panel {
-            position: absolute;
-            top: 70px; left: 20px;
-            width: min(660px, calc(100% - 40px));
+            flex: 0 0 min(720px, 56%);
+            min-width: 320px;
+            display: flex;
+            flex-direction: column;
             background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.35);
-            border: 1px solid #b8c2cc;
+            border-left: 2px solid #b8c2cc;
+            box-shadow: -8px 0 24px rgba(0,0,0,0.20);
             z-index: 20;
-            max-height: calc(100% - 90px);
-            overflow-y: auto;
-            transform-origin: top center;
+            overflow: hidden;
             animation: curveIn 0.25s ease;
         }
-        @keyframes curveIn { from { opacity: 0; transform: translateY(-12px) scaleY(0.96); } to { opacity: 1; transform: none; } }
+        @keyframes curveIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: none; } }
 
         .curve-header {
             display: flex; align-items: center; justify-content: space-between;
             background: var(--panel-bg); color: #fff;
             padding: 10px 14px; font-weight: bold; font-size: 15px;
+            flex: 0 0 auto;
         }
         .curve-header-tools { display: flex; align-items: center; gap: 8px; }
         .curve-header-tools button {
@@ -216,42 +219,52 @@
         .curve-header-tools button.close-x { background: transparent; font-size: 20px; padding: 0 6px; line-height: 1; }
         .curve-header-tools button.close-x:hover { color: #e74c3c; background: transparent; }
 
-        #curveCanvas { display: block; width: 100%; height: auto; background: #fff; cursor: crosshair; touch-action: none; }
+        .curve-body {
+            flex: 1 1 auto; min-height: 0;
+            display: flex; align-items: center; justify-content: center;
+            padding: 8px 10px;
+        }
+        #curveCanvas {
+            display: block;
+            height: 100%; width: auto; max-width: 100%;
+            background: #fff; touch-action: none;
+        }
 
         .curve-footer {
+            flex: 0 0 auto;
             display: flex; align-items: center; justify-content: space-between; gap: 10px;
             padding: 8px 14px 10px; font-size: 12px; color: #5d6d7e;
             border-top: 1px solid #ecf0f1; background: #f8f9fa; flex-wrap: wrap;
         }
         .curve-footer label { display: flex; align-items: center; gap: 5px; cursor: pointer; user-select: none; }
-        #curve-readout { font-family: 'Courier New', monospace; font-weight: bold; color: var(--text-dark); }
+        #curve-status { font-family: 'Courier New', monospace; font-weight: bold; color: var(--text-dark); }
     </style>
 </head>
 <body>
 
 <div id="sim-container">
-    <canvas id="simCanvas"></canvas>
-    <div id="guide-overlay">Klargøring: Afvej 2,00 g eddike-prøve.</div>
+    <div id="stage">
+        <canvas id="simCanvas"></canvas>
+        <div id="guide-overlay">Klargøring: Afvej 2,00 g eddike-prøve.</div>
+    </div>
 
     <div id="curve-panel" class="hidden">
         <div class="curve-header">
             <span>📈 Titreringskurve</span>
             <div class="curve-header-tools">
-                <button onclick="Curve.undo()" title="Fortryd sidste punkt">↩ Fortryd</button>
-                <button onclick="Curve.clear()" title="Slet alle punkter">🗑 Ryd</button>
                 <button onclick="Curve.saveImage()" title="Gem grafen som billede">⬇ Gem</button>
                 <button class="close-x" onclick="Curve.toggle(false)" title="Luk">&times;</button>
             </div>
         </div>
-        <canvas id="curveCanvas"></canvas>
+        <div class="curve-body">
+            <canvas id="curveCanvas"></canvas>
+        </div>
         <div class="curve-footer">
-            <span>Klik for at sætte et punkt · træk et punkt for at flytte · dobbeltklik på et punkt for at slette</span>
-            <label><input type="checkbox" id="curve-connect" checked onchange="Curve.draw()"> Forbind punkter</label>
-            <span id="curve-readout">V = – mL · pH = –</span>
+            <label><input type="checkbox" id="curve-marks" checked onchange="Curve.draw()"> Vis målepunkter</label>
+            <span id="curve-status">Tilsat: 0,0 mL · pH: –</span>
         </div>
     </div>
 </div>
-
 <div id="sidebar">
     <div class="sidebar-header">
         <h1>Analyse af Eddike</h1>
@@ -298,7 +311,8 @@
         <span class="chev">▼</span>
     </button>
     <div style="font-size:11px; color:#95a5a6; margin-top:6px;">
-        pH (uden enhed) op ad y-aksen, tilsat NaOH 0,1 M (0-25 mL) hen ad x-aksen.
+        Kurven tegnes automatisk, mens du titrerer: pH (uden enhed) op ad y-aksen,
+        tilsat NaOH 0,1 M (0-25 mL) hen ad x-aksen.
     </div>
 
     <button class="finish-btn" onclick="Lab.openCalculation()">Afslut & Beregn</button>
@@ -500,6 +514,11 @@ class Lab {
     
     static width;
     static height;
+
+    // Fast koordinatsystem for selve opstillingen - skaleres ved tegning,
+    // så hele forsøget kan ses, også når titreringskurven er foldet ud.
+    static SCENE_W = 320;
+    static SCENE_H = 700;
     
     // Simulation State
     static buretteVol = 0; 
@@ -548,8 +567,9 @@ class Lab {
     }
 
     static resize() {
-        this.width = this.canvas.width = document.getElementById('sim-container').clientWidth;
-        this.height = this.canvas.height = document.getElementById('sim-container').clientHeight;
+        const stage = document.getElementById('stage');
+        this.width = this.canvas.width = stage.clientWidth;
+        this.height = this.canvas.height = stage.clientHeight;
     }
 
     static action(type) {
@@ -592,6 +612,7 @@ class Lab {
         this.draw();
         this.drawZoom(this.zCtx, this.zCanvas.width, this.zCanvas.height);
         this.drawZoom(this.calcZCtx, this.calcZCanvas.width, this.calcZCanvas.height);
+        Curve.tick();
         requestAnimationFrame(() => this.loop());
     }
 
@@ -607,7 +628,7 @@ class Lab {
             const dropChance = this.valveOpen * 0.3; // Max 30% chance pr frame
             if(Math.random() < dropChance) {
                 this.drops.push({
-                    x: this.width/2, y: 320, vy: 2, 
+                    x: Lab.SCENE_W/2, y: 320, vy: 2, 
                     color: 'rgba(236, 240, 241, 0.9)', type: 'base'
                 });
             }
@@ -644,6 +665,36 @@ class Lab {
         } else {
             this.colorIntensity = 0;
         }
+
+        // Titreringskurven opdateres i takt med, at der tilsættes NaOH
+        if (this.volWater >= 20) {
+            Curve.record(this.volBase, this.pHAt(this.volBase));
+        }
+    }
+
+    // pH i kolben ved en given tilsat mængde NaOH.
+    // Findes af ladningsbalancen for eddikesyre/acetat:
+    //   c(Na+) + [H+] = [OH-] + [CH3COO-]
+    static pHAt(vBaseML) {
+        const Ka = 1.75e-5;    // eddikesyre
+        const Kw = 1.0e-14;
+
+        const nAcid = (this.correctVolEq / 1000) * CONST.M_NAOH;   // mol syre i kolben
+        const nBase = (vBaseML / 1000) * CONST.M_NAOH;             // mol tilsat NaOH
+        const vTot  = (this.volVinegar + this.volWater + vBaseML) / 1000;   // L
+        if (vTot <= 0) return NaN;
+
+        const cAcid = nAcid / vTot;
+        const cBase = nBase / vTot;
+
+        // f er voksende i [H+], så nulpunktet findes ved halvering på log-skala
+        const f = (h) => cBase + h - Kw / h - cAcid * Ka / (Ka + h);
+        let lo = 1e-14, hi = 1;
+        for (let i = 0; i < 60; i++) {
+            const mid = Math.sqrt(lo * hi);
+            if (f(mid) > 0) hi = mid; else lo = mid;
+        }
+        return -Math.log10(Math.sqrt(lo * hi));
     }
 
     static triggerEquivalenceReached() {
@@ -669,11 +720,19 @@ class Lab {
 
     static draw() {
         const ctx = this.ctx;
-        const w = this.width;
-        const h = this.height;
-        const cx = w/2;
 
-        ctx.clearRect(0,0,w,h);
+        ctx.clearRect(0, 0, this.width, this.height);
+
+        // Opstillingen tegnes i scene-koordinater og skaleres, så den
+        // altid er fuldt synlig - også i det smallere felt ved siden af grafen.
+        const w = Lab.SCENE_W;
+        const h = Lab.SCENE_H;
+        const cx = w/2;
+        const s = Math.min(this.width / w, this.height / h, 1.25);
+
+        ctx.save();
+        ctx.translate((this.width - w*s)/2, (this.height - h*s)/2);
+        ctx.scale(s, s);
 
         // --- MAGNETOMRØRER ---
         const stirY = 620;
@@ -787,6 +846,8 @@ class Lab {
             ctx.beginPath(); ctx.arc(d.x, d.y, 3, 0, Math.PI*2);
             ctx.fillStyle = d.color; ctx.fill();
         });
+
+        ctx.restore();
     }
 
     static drawZoom(ctx, w, h) {
@@ -997,58 +1058,62 @@ class Calc {
 
 /* ---------------------------------------------------------------
    TITRERINGSKURVE
-   Udfoldeligt panel hvor eleven selv plotter sin titreringskurve.
+   Panel der foldes ud ved siden af forsøget. Kurven tegnes
+   automatisk, i takt med at der tilsættes NaOH.
    y-akse: pH 2-12 (uden enhed)   x-akse: tilsat NaOH 0,1 M, 0-25 mL
    --------------------------------------------------------------- */
 const Curve = {
-    // Logisk tegneflade (skaleres til panelets bredde)
-    W: 660, H: 470,
-    PAD: { l: 62, r: 20, t: 18, b: 56 },
+    // Logisk tegneflade (skaleres til panelets størrelse)
+    W: 660, H: 560,
+    PAD: { l: 62, r: 22, t: 18, b: 56 },
 
     X_MIN: 0, X_MAX: 25,   // mL NaOH 0,1 M
     Y_MIN: 2, Y_MAX: 12,   // pH
 
+    MIN_STEP: 0.05,        // mL mellem to registrerede målepunkter
+
     canvas: null,
     ctx: null,
-    points: [],            // [{v: mL, ph: pH}]
-    history: [],
-    hover: null,           // {v, ph} under musen
-    dragIndex: -1,
-    pressPos: null,
-    moved: false,
+    live: [],              // [{v: mL, ph: pH}] - registreres af Lab under titreringen
+    hoverIndex: -1,
+    dirty: true,
 
     init() {
         this.canvas = document.getElementById('curveCanvas');
         this.ctx = this.canvas.getContext('2d');
 
-        this.canvas.addEventListener('pointerdown', (e) => this.onDown(e));
         this.canvas.addEventListener('pointermove', (e) => this.onMove(e));
-        this.canvas.addEventListener('pointerup', (e) => this.onUp(e));
-        this.canvas.addEventListener('pointercancel', () => { this.dragIndex = -1; this.pressPos = null; });
-        this.canvas.addEventListener('pointerleave', () => { this.hover = null; this.updateReadout(); this.draw(); });
-        this.canvas.addEventListener('dblclick', (e) => this.onDblClick(e));
+        this.canvas.addEventListener('pointerleave', () => {
+            this.hoverIndex = -1;
+            this.updateStatus();
+            this.dirty = true;
+        });
 
         window.addEventListener('resize', () => this.resize());
         window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !document.getElementById('curve-panel').classList.contains('hidden')) {
-                this.toggle(false);
-            }
+            if (e.key === 'Escape' && this.isOpen()) this.toggle(false);
         });
 
         this.resize();
     },
 
     // --- Panel ---------------------------------------------------
+    isOpen() {
+        return !document.getElementById('curve-panel').classList.contains('hidden');
+    },
+
     toggle(force) {
         const panel = document.getElementById('curve-panel');
         const btn = document.getElementById('curve-toggle');
-        const show = (force === undefined) ? panel.classList.contains('hidden') : force;
+        const show = (force === undefined) ? !this.isOpen() : force;
 
         panel.classList.toggle('hidden', !show);
         btn.classList.toggle('open', show);
         btn.querySelector('span').innerText = show ? '📈 Fold titreringskurve sammen' : '📈 Fold titreringskurve ud';
 
-        if (show) this.resize();
+        // Forsøget skal tilpasse sig den nye bredde
+        Lab.resize();
+        if (show) requestAnimationFrame(() => this.resize());
     },
 
     resize() {
@@ -1064,117 +1129,63 @@ const Curve = {
         this.draw();
     },
 
+    // --- Data ----------------------------------------------------
+    record(v, ph) {
+        if (!isFinite(ph)) return;
+        const last = this.live[this.live.length - 1];
+        if (last && Math.abs(v - last.v) < this.MIN_STEP) return;
+        this.live.push({ v: v, ph: ph });
+        this.dirty = true;
+    },
+
+    // Kaldes fra Lab's animationsløkke - tegner kun når der er nyt at vise
+    tick() {
+        if (this.dirty && this.isOpen()) {
+            this.dirty = false;
+            this.draw();
+        }
+    },
+
     // --- Koordinatomregning --------------------------------------
     plotW() { return this.W - this.PAD.l - this.PAD.r; },
     plotH() { return this.H - this.PAD.t - this.PAD.b; },
     xTo(v)  { return this.PAD.l + (v - this.X_MIN) / (this.X_MAX - this.X_MIN) * this.plotW(); },
     yTo(ph) { return this.PAD.t + (this.Y_MAX - ph) / (this.Y_MAX - this.Y_MIN) * this.plotH(); },
+    inRange(p) { return p.ph >= this.Y_MIN && p.ph <= this.Y_MAX && p.v >= this.X_MIN && p.v <= this.X_MAX; },
 
-    // Musekoordinat -> (mL, pH)
-    toData(e) {
+    // --- Aflæsning: kun når musen er på et punkt på kurven --------
+    onMove(e) {
         const rect = this.canvas.getBoundingClientRect();
         const scale = this.W / (rect.width || this.W);
         const px = (e.clientX - rect.left) * scale;
         const py = (e.clientY - rect.top) * scale;
-        return {
-            px, py,
-            v: this.X_MIN + (px - this.PAD.l) / this.plotW() * (this.X_MAX - this.X_MIN),
-            ph: this.Y_MAX - (py - this.PAD.t) / this.plotH() * (this.Y_MAX - this.Y_MIN)
-        };
-    },
 
-    inPlot(px, py) {
-        return px >= this.PAD.l - 6 && px <= this.W - this.PAD.r + 6 &&
-               py >= this.PAD.t - 6 && py <= this.H - this.PAD.b + 6;
-    },
-
-    hitTest(px, py) {
-        for (let i = this.points.length - 1; i >= 0; i--) {
-            const dx = this.xTo(this.points[i].v) - px;
-            const dy = this.yTo(this.points[i].ph) - py;
-            if (dx * dx + dy * dy <= 121) return i;   // 11 px
+        let best = -1, bestDist = 144;   // 12 px
+        for (let i = 0; i < this.live.length; i++) {
+            const p = this.live[i];
+            if (!this.inRange(p)) continue;
+            const dx = this.xTo(p.v) - px;
+            const dy = this.yTo(p.ph) - py;
+            const d = dx * dx + dy * dy;
+            if (d < bestDist) { bestDist = d; best = i; }
         }
-        return -1;
-    },
 
-    clampPoint(v, ph) {
-        return {
-            v:  Math.min(this.X_MAX, Math.max(this.X_MIN, v)),
-            ph: Math.min(this.Y_MAX, Math.max(this.Y_MIN, ph))
-        };
-    },
-
-    // --- Interaktion ---------------------------------------------
-    onDown(e) {
-        const d = this.toData(e);
-        this.pressPos = d;
-        this.moved = false;
-        this.dragIndex = this.hitTest(d.px, d.py);
-        if (this.dragIndex >= 0) {
-            this.pushHistory();
-            this.canvas.setPointerCapture(e.pointerId);
-        }
-    },
-
-    onMove(e) {
-        const d = this.toData(e);
-        this.hover = this.inPlot(d.px, d.py) ? this.clampPoint(d.v, d.ph) : null;
-
-        if (this.pressPos && (Math.abs(d.px - this.pressPos.px) > 3 || Math.abs(d.py - this.pressPos.py) > 3)) {
-            this.moved = true;
-        }
-        if (this.dragIndex >= 0) {
-            this.points[this.dragIndex] = this.clampPoint(d.v, d.ph);
-        }
-        this.updateReadout();
-        this.draw();
-    },
-
-    onUp(e) {
-        const d = this.toData(e);
-        if (this.dragIndex < 0 && !this.moved && this.inPlot(d.px, d.py)) {
-            this.pushHistory();
-            this.points.push(this.clampPoint(d.v, d.ph));
-        }
-        this.dragIndex = -1;
-        this.pressPos = null;
-        this.draw();
-    },
-
-    onDblClick(e) {
-        const d = this.toData(e);
-        const i = this.hitTest(d.px, d.py);
-        if (i >= 0) {
-            this.pushHistory();
-            this.points.splice(i, 1);
+        if (best !== this.hoverIndex) {
+            this.hoverIndex = best;
+            this.updateStatus();
+            this.dirty = true;
             this.draw();
         }
+        this.canvas.style.cursor = best >= 0 ? 'pointer' : 'default';
     },
 
-    pushHistory() {
-        this.history.push(this.points.map(p => ({ v: p.v, ph: p.ph })));
-        if (this.history.length > 60) this.history.shift();
-    },
-
-    undo() {
-        if (!this.history.length) return;
-        this.points = this.history.pop();
-        this.draw();
-    },
-
-    clear() {
-        if (!this.points.length) return;
-        this.pushHistory();
-        this.points = [];
-        this.draw();
-    },
-
-    updateReadout() {
-        const el = document.getElementById('curve-readout');
+    updateStatus() {
+        const el = document.getElementById('curve-status');
         if (!el) return;
-        el.innerText = this.hover
-            ? 'V = ' + this.fmt(this.hover.v, 1) + ' mL · pH = ' + this.fmt(this.hover.ph, 2)
-            : 'V = – mL · pH = –';
+        const p = this.live[this.hoverIndex];
+        el.innerText = p
+            ? 'V = ' + this.fmt(p.v, 1) + ' mL · pH = ' + this.fmt(p.ph, 2)
+            : 'Hold musen over kurven for at aflæse et punkt';
     },
 
     fmt(x, dec) { return x.toFixed(dec).replace('.', ','); },
@@ -1189,7 +1200,7 @@ const Curve = {
         ctx.fillStyle = '#fff';
         ctx.fillRect(0, 0, this.W, this.H);
 
-        // Finmasket gitter (som millimeterpapir)
+        // Finmasket gitter
         ctx.lineWidth = 1;
         ctx.strokeStyle = '#eef1f4';
         ctx.beginPath();
@@ -1256,77 +1267,118 @@ const Curve = {
         ctx.fillText('pH', 0, 0);
         ctx.restore();
 
-        // Sigtekors ved musen
-        if (this.hover && this.dragIndex < 0) {
-            ctx.save();
-            ctx.setLineDash([4, 4]);
-            ctx.strokeStyle = '#95a5a6';
-            ctx.lineWidth = 1;
-            const hx = this.xTo(this.hover.v), hy = this.yTo(this.hover.ph);
-            ctx.beginPath();
-            ctx.moveTo(L, hy); ctx.lineTo(R, hy);
-            ctx.moveTo(hx, T); ctx.lineTo(hx, B);
-            ctx.stroke();
-            ctx.restore();
-        }
-
         this.drawSeries(ctx);
 
-        if (!this.points.length) {
+        if (this.live.length < 2) {
             ctx.fillStyle = '#95a5a6';
             ctx.font = 'italic 14px "Segoe UI", sans-serif';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('Klik i koordinatsystemet for at plotte dine målepunkter (mL, pH)',
+            ctx.fillText('Kurven tegnes automatisk, når du tilsætter NaOH fra buretten',
                          L + this.plotW() / 2, T + this.plotH() / 2);
         }
+
+        this.drawHover(ctx);
     },
 
     drawSeries(ctx) {
-        const sorted = this.points.slice().sort((a, b) => a.v - b.v);
-        const connect = document.getElementById('curve-connect');
+        if (!this.live.length) return;
+        const L = this.PAD.l, T = this.PAD.t;
 
-        if (sorted.length > 1 && (!connect || connect.checked)) {
-            ctx.save();
-            ctx.beginPath();
-            ctx.rect(this.PAD.l, this.PAD.t, this.plotW(), this.plotH());
-            ctx.clip();
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(L, T, this.plotW(), this.plotH());
+        ctx.clip();
 
+        // Selve kurven
+        if (this.live.length > 1) {
             ctx.strokeStyle = '#2980b9';
             ctx.lineWidth = 2.5;
             ctx.lineJoin = 'round';
             ctx.lineCap = 'round';
             ctx.beginPath();
-            ctx.moveTo(this.xTo(sorted[0].v), this.yTo(sorted[0].ph));
-
-            // Blod kurve gennem punkterne (Catmull-Rom -> Bezier)
-            for (let i = 0; i < sorted.length - 1; i++) {
-                const p0 = sorted[Math.max(0, i - 1)];
-                const p1 = sorted[i];
-                const p2 = sorted[i + 1];
-                const p3 = sorted[Math.min(sorted.length - 1, i + 2)];
-
-                const c1x = this.xTo(p1.v + (p2.v - p0.v) / 6);
-                const c1y = this.yTo(p1.ph + (p2.ph - p0.ph) / 6);
-                const c2x = this.xTo(p2.v - (p3.v - p1.v) / 6);
-                const c2y = this.yTo(p2.ph - (p3.ph - p1.ph) / 6);
-
-                ctx.bezierCurveTo(c1x, c1y, c2x, c2y, this.xTo(p2.v), this.yTo(p2.ph));
-            }
+            this.live.forEach((p, i) => {
+                const x = this.xTo(p.v), y = this.yTo(p.ph);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            });
             ctx.stroke();
-            ctx.restore();
         }
 
-        this.points.forEach((p, i) => {
-            const x = this.xTo(p.v), y = this.yTo(p.ph);
+        // Målepunkter for hver hele mL
+        const marks = document.getElementById('curve-marks');
+        if (!marks || marks.checked) {
+            let nextMark = 0;
+            ctx.fillStyle = '#2980b9';
+            this.live.forEach((p) => {
+                if (p.v + 1e-9 < nextMark || !this.inRange(p)) return;
+                nextMark = Math.floor(p.v) + 1;
+                ctx.beginPath();
+                ctx.arc(this.xTo(p.v), this.yTo(p.ph), 3.5, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        // Kurvens spids = forsøgets nuværende tilstand
+        const last = this.live[this.live.length - 1];
+        if (this.inRange(last)) {
+            const x = this.xTo(last.v), y = this.yTo(last.ph);
             ctx.beginPath();
-            ctx.arc(x, y, i === this.dragIndex ? 7 : 5, 0, Math.PI * 2);
-            ctx.fillStyle = i === this.dragIndex ? '#e67e22' : '#2980b9';
+            ctx.arc(x, y, 6, 0, Math.PI * 2);
+            ctx.fillStyle = '#e67e22';
             ctx.fill();
             ctx.lineWidth = 2;
             ctx.strokeStyle = '#fff';
             ctx.stroke();
-        });
+        }
+        ctx.restore();
+    },
+
+    drawHover(ctx) {
+        const p = this.live[this.hoverIndex];
+        if (!p) return;
+
+        const L = this.PAD.l, T = this.PAD.t;
+        const B = this.H - this.PAD.b;
+        const x = this.xTo(p.v), y = this.yTo(p.ph);
+
+        // Hjælpelinjer ud til akserne
+        ctx.save();
+        ctx.setLineDash([4, 4]);
+        ctx.strokeStyle = '#e67e22';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(L, y); ctx.lineTo(x, y);
+        ctx.moveTo(x, B); ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.restore();
+
+        // Punktet
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = '#2c3e50';
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#fff';
+        ctx.stroke();
+
+        // Talboks
+        const txt = 'V = ' + this.fmt(p.v, 1) + ' mL   pH = ' + this.fmt(p.ph, 2);
+        ctx.font = 'bold 12px "Segoe UI", sans-serif';
+        const bw = ctx.measureText(txt).width + 16;
+        const bh = 24;
+        let bx = x + 12, by = y - bh - 10;
+        if (bx + bw > this.W - this.PAD.r) bx = x - bw - 12;
+        if (by < T) by = y + 12;
+
+        ctx.fillStyle = 'rgba(44, 62, 80, 0.95)';
+        ctx.beginPath();
+        ctx.roundRect ? ctx.roundRect(bx, by, bw, bh, 5) : ctx.rect(bx, by, bw, bh);
+        ctx.fill();
+
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(txt, bx + 8, by + bh / 2);
     },
 
     // --- Gem grafen som billede -----------------------------------
@@ -1338,10 +1390,10 @@ const Curve = {
         const octx = off.getContext('2d');
         octx.setTransform(scale, 0, 0, scale, 0, 0);
 
-        const savedHover = this.hover;
-        this.hover = null;
+        const savedHover = this.hoverIndex;
+        this.hoverIndex = -1;
         this.draw(octx);
-        this.hover = savedHover;
+        this.hoverIndex = savedHover;
 
         const a = document.createElement('a');
         a.download = 'titreringskurve.png';
@@ -1349,7 +1401,6 @@ const Curve = {
         a.click();
     }
 };
-
 
 Lab.init();
 Curve.init();

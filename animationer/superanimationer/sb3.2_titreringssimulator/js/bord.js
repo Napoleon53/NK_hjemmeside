@@ -57,7 +57,12 @@
     /* ----- Opstilling ------------------------------------------------ */
     NK.Bord.prototype.saetOps = function (ops) {
         this.ops = ops;
-        var trin = [10, 25, 50, 100, 250, 500];
+        /* Buretten paa tegningen er altid 30 mL - det er den stoerrelse,
+           der staar paa bordet. Kraever opstillingen mere (et stort
+           proevevolumen eller en meget fortyndet titrator), vokser
+           buretten til den naeste paene stoerrelse, saa titreringen
+           stadig kan gennemfoeres. */
+        var trin = [30, 40, 50, 60, 80, 100, 150, 200, 250, 300, 400, 500];
         this.kapacitet = trin[trin.length - 1];
         for (var i = 0; i < trin.length; i++) {
             if (trin[i] >= ops.Vmaks - 1e-9) { this.kapacitet = trin[i]; break; }

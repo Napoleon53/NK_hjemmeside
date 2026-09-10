@@ -24,7 +24,7 @@
         V0: 20,
         titrator: { id: "naoh", c: 0.1 },
         indikator: "phenolphthalein",
-        Vmaks: 40,
+        Vmaks: 30,
         autoVmaks: true,
         egen: { syre: [4.50, NaN, NaN], base: [9.50, NaN, NaN] }
     };
