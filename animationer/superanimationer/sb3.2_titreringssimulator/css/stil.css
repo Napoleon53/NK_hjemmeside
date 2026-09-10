@@ -468,6 +468,12 @@ main {
 .stofrad { margin-top: 10px; }
 .stofrad + .stofrad { margin-top: 12px; }
 
+/* Den anden oploesning er skjult som udgangspunkt - kun knappen
+   nedenunder (eller et faerdigt forsoeg med to stoffer) faar den frem.
+   JS saetter display:"block" direkte, naar den skal vises. */
+#proeve-rad-1 { display: none; }
+.tilfoej-knap { margin-top: 10px; }
+
 .pksrad {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));

@@ -385,16 +385,16 @@ var NK = (typeof window !== "undefined") ? (window.NK = window.NK || {}) : {};
        af de to pKs'er). 'a' er farvens daekkraft i kolben -
        phenolphthaleins farveloese former har a = 0.
 
-       Phenolphthalein har med vilje TO pKs'er, ikke en: ud over det
+       Phenolphthalein har med vilje flere pKs'er, ikke en: ud over det
        velkendte skift fra farveloes til pink omkring pH 8-10 bliver den
        ogsaa farveloes IGEN i staerkt basisk oplosning (over ca. pH 12-13),
        fordi der dannes en tredje, ogsaa farveloes form. Det er ikke en
        "rigtig" syre-base-ligevaegt (det sidste trin er egentlig OH--
-       addition, ikke protontab), men den samme to-pKs-mekanik som
+       addition, ikke protontab), men den samme fler-pKs-mekanik som
        thymolblaat bruger, giver den rigtige farvekurve alligevel. */
     Kemi.INDIKATORER = [
         { id: "ingen", navn: "Ingen indikator", pKa: [], farver: [[0, 0, 0, 0]], omslag: "–" },
-        { id: "phenolphthalein", navn: "Phenolphthalein", pKa: [9.4, 13.0], farver: [[0, 0, 0, 0], [232, 45, 140, 0.85], [0, 0, 0, 0]], omraade: [8.2, 10.0], omslag: "8,2 – 10,0 (og farveløs igen over pH ≈ 13)" },
+        { id: "phenolphthalein", navn: "Phenolphthalein", pKa: [-2, 9.4, 13.0], farver: [[214, 48, 36, 0.85], [0, 0, 0, 0], [232, 45, 140, 0.85], [0, 0, 0, 0]], omraade: [8.2, 10.0], omslag: "8,2 – 10,0 (og farveløs igen over pH ≈ 13)" },
         { id: "bromthymolblaat", navn: "Bromthymolblåt", pKa: [7.1], farver: [[240, 205, 40, 0.8], [40, 90, 225, 0.85]], omraade: [6.0, 7.6], omslag: "6,0 – 7,6" },
         { id: "methylorange", navn: "Methylorange", pKa: [3.46], farver: [[225, 45, 40, 0.85], [245, 190, 40, 0.8]], omraade: [3.1, 4.4], omslag: "3,1 – 4,4" },
         { id: "methylroedt", navn: "Methylrødt", pKa: [5.0], farver: [[220, 40, 50, 0.85], [245, 210, 50, 0.8]], omraade: [4.4, 6.2], omslag: "4,4 – 6,2" },

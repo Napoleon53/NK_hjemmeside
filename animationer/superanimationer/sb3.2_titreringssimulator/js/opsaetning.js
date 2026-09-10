@@ -156,6 +156,13 @@
     var GRUPPER = ["Stærke syrer", "Svage syrer", "Flerprotonede syrer", "Aminosyrer",
                    "Stærke baser", "Svage baser", "Salte", "Andet"];
 
+    /* Som udgangspunkt er der kun én opløsning i bægerglasset, og kun
+       den foerste raekke af felter er synlig - det goer det tydeligt,
+       at der normalt kun er ét stof. Knappen "Tilføj opløsning" folder
+       den anden raekke ud, og et faerdigt forsoeg med to rigtige stoffer
+       (fx pufferen) folder den ud af sig selv. */
+    var andenOploesningVist = false;
+
     function fyldStofVaelger(vaelger, medEgen) {
         var i, g, gruppe, o;
         for (g = 0; g < GRUPPER.length; g++) {
@@ -223,6 +230,11 @@
             NK.el("proeve-c-" + i).value = NK.tal(Ops.t.proeve[i].c, 3);
             NK.el("proeve-c-" + i).parentNode.style.opacity = (Ops.t.proeve[i].id === "vand") ? "0.35" : "1";
         }
+        NK.el("proeve-rad-1").style.display = andenOploesningVist ? "block" : "none";
+        NK.saetTekst("proeve-tilfoej-tekst", andenOploesningVist ? "Fjern anden opløsning" : "Tilføj opløsning");
+        NK.saetTekst("proeve-tilfoej-tegn", andenOploesningVist ? "×" : "+");
+        NK.el("proeve-tilfoej").classList.toggle("blaa", !andenOploesningVist);
+        NK.el("proeve-tilfoej").classList.toggle("roed", andenOploesningVist);
         NK.el("proeve-v0").value = NK.tal(Ops.t.V0, 1);
         NK.el("titrator-stof").value = Ops.t.titrator.id;
         NK.el("titrator-c").value = NK.tal(Ops.t.titrator.c, 3);
@@ -300,6 +312,20 @@
                     function (v) { Ops.t.proeve[n].c = v; }, 0, 5);
             }(i));
         }
+        NK.el("proeve-tilfoej").addEventListener("click", function () {
+            if (andenOploesningVist) {
+                /* Fjern: rens raekken, saa der ikke ligger et glemt
+                   stof og venter, naar man folder den ud igen. */
+                andenOploesningVist = false;
+                Ops.t.proeve[1] = { id: "vand", c: 0 };
+                opdaterFelter();
+                Ops.meld("opstilling");
+            } else {
+                andenOploesningVist = true;
+                opdaterFelter();
+            }
+        });
+
         bindStof(NK.el("titrator-stof"), function (v) { Ops.t.titrator.id = v; });
         bindTal("titrator-c", function () { return Ops.t.titrator.c; },
             function (v) { Ops.t.titrator.c = v; }, 0.0001, 5);
@@ -357,6 +383,10 @@
             { id: f.saet.proeve[0].id, c: f.saet.proeve[0].c },
             { id: f.saet.proeve[1].id, c: f.saet.proeve[1].c }
         ];
+        /* Forsoeget bestemmer selv, om der er brug for den anden
+           raekke - fx pufferen og blandingen har to rigtige stoffer,
+           resten kun ét. */
+        andenOploesningVist = (f.saet.proeve[1].id !== "vand");
         Ops.t.V0 = f.saet.V0;
         Ops.t.titrator = { id: f.saet.titrator.id, c: f.saet.titrator.c };
         Ops.t.indikator = f.saet.indikator;
