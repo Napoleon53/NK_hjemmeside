@@ -172,6 +172,59 @@
         .summary-box { text-align: center; margin-top: 30px; padding: 20px; background: #ecf0f1; border-radius: 8px; display: none; }
         .theory-gradient { height: 30px; width: 100%; background: linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 50%, rgba(255,20,147,1) 100%); border: 1px solid #ccc; margin: 10px 0; border-radius:4px; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- TITRERINGSKURVE (udfoldeligt panel) --- */
+        .curve-toggle {
+            width: 100%;
+            display: flex; align-items: center; justify-content: space-between; gap: 8px;
+            background: #34495e; border: 2px solid #46637f; color: #ecf0f1;
+            padding: 12px; border-radius: 6px; cursor: pointer;
+            font-weight: 600; font-size: 14px; transition: 0.2s;
+        }
+        .curve-toggle:hover { border-color: #3498db; color: #3498db; }
+        .curve-toggle .chev { transition: transform 0.3s; font-size: 12px; }
+        .curve-toggle.open .chev { transform: rotate(180deg); }
+
+        #curve-panel {
+            position: absolute;
+            top: 70px; left: 20px;
+            width: min(660px, calc(100% - 40px));
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.35);
+            border: 1px solid #b8c2cc;
+            z-index: 20;
+            max-height: calc(100% - 90px);
+            overflow-y: auto;
+            transform-origin: top center;
+            animation: curveIn 0.25s ease;
+        }
+        @keyframes curveIn { from { opacity: 0; transform: translateY(-12px) scaleY(0.96); } to { opacity: 1; transform: none; } }
+
+        .curve-header {
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--panel-bg); color: #fff;
+            padding: 10px 14px; font-weight: bold; font-size: 15px;
+        }
+        .curve-header-tools { display: flex; align-items: center; gap: 8px; }
+        .curve-header-tools button {
+            background: #46637f; color: #ecf0f1; border: none;
+            padding: 6px 10px; border-radius: 4px; cursor: pointer;
+            font-size: 12px; font-weight: 600;
+        }
+        .curve-header-tools button:hover { background: var(--accent); }
+        .curve-header-tools button.close-x { background: transparent; font-size: 20px; padding: 0 6px; line-height: 1; }
+        .curve-header-tools button.close-x:hover { color: #e74c3c; background: transparent; }
+
+        #curveCanvas { display: block; width: 100%; height: auto; background: #fff; cursor: crosshair; touch-action: none; }
+
+        .curve-footer {
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            padding: 8px 14px 10px; font-size: 12px; color: #5d6d7e;
+            border-top: 1px solid #ecf0f1; background: #f8f9fa; flex-wrap: wrap;
+        }
+        .curve-footer label { display: flex; align-items: center; gap: 5px; cursor: pointer; user-select: none; }
+        #curve-readout { font-family: 'Courier New', monospace; font-weight: bold; color: var(--text-dark); }
     </style>
 </head>
 <body>
@@ -179,6 +232,24 @@
 <div id="sim-container">
     <canvas id="simCanvas"></canvas>
     <div id="guide-overlay">Klargøring: Afvej 2,00 g eddike-prøve.</div>
+
+    <div id="curve-panel" class="hidden">
+        <div class="curve-header">
+            <span>📈 Titreringskurve</span>
+            <div class="curve-header-tools">
+                <button onclick="Curve.undo()" title="Fortryd sidste punkt">↩ Fortryd</button>
+                <button onclick="Curve.clear()" title="Slet alle punkter">🗑 Ryd</button>
+                <button onclick="Curve.saveImage()" title="Gem grafen som billede">⬇ Gem</button>
+                <button class="close-x" onclick="Curve.toggle(false)" title="Luk">&times;</button>
+            </div>
+        </div>
+        <canvas id="curveCanvas"></canvas>
+        <div class="curve-footer">
+            <span>Klik for at sætte et punkt · træk et punkt for at flytte · dobbeltklik på et punkt for at slette</span>
+            <label><input type="checkbox" id="curve-connect" checked onchange="Curve.draw()"> Forbind punkter</label>
+            <span id="curve-readout">V = – mL · pH = –</span>
+        </div>
+    </div>
 </div>
 
 <div id="sidebar">
@@ -220,6 +291,16 @@
         </div>
     </div>
     
+
+    <h2 style="margin-top:20px;">4. Titreringskurve</h2>
+    <button id="curve-toggle" class="curve-toggle" onclick="Curve.toggle()">
+        <span>📈 Fold titreringskurve ud</span>
+        <span class="chev">▼</span>
+    </button>
+    <div style="font-size:11px; color:#95a5a6; margin-top:6px;">
+        pH (uden enhed) op ad y-aksen, tilsat NaOH 0,1 M (0-25 mL) hen ad x-aksen.
+    </div>
+
     <button class="finish-btn" onclick="Lab.openCalculation()">Afslut & Beregn</button>
 
     <div style="font-size:0.9em; color:#bdc3c7; margin-top:auto;">
@@ -914,7 +995,364 @@ class Calc {
     }
 }
 
+/* ---------------------------------------------------------------
+   TITRERINGSKURVE
+   Udfoldeligt panel hvor eleven selv plotter sin titreringskurve.
+   y-akse: pH 2-12 (uden enhed)   x-akse: tilsat NaOH 0,1 M, 0-25 mL
+   --------------------------------------------------------------- */
+const Curve = {
+    // Logisk tegneflade (skaleres til panelets bredde)
+    W: 660, H: 470,
+    PAD: { l: 62, r: 20, t: 18, b: 56 },
+
+    X_MIN: 0, X_MAX: 25,   // mL NaOH 0,1 M
+    Y_MIN: 2, Y_MAX: 12,   // pH
+
+    canvas: null,
+    ctx: null,
+    points: [],            // [{v: mL, ph: pH}]
+    history: [],
+    hover: null,           // {v, ph} under musen
+    dragIndex: -1,
+    pressPos: null,
+    moved: false,
+
+    init() {
+        this.canvas = document.getElementById('curveCanvas');
+        this.ctx = this.canvas.getContext('2d');
+
+        this.canvas.addEventListener('pointerdown', (e) => this.onDown(e));
+        this.canvas.addEventListener('pointermove', (e) => this.onMove(e));
+        this.canvas.addEventListener('pointerup', (e) => this.onUp(e));
+        this.canvas.addEventListener('pointercancel', () => { this.dragIndex = -1; this.pressPos = null; });
+        this.canvas.addEventListener('pointerleave', () => { this.hover = null; this.updateReadout(); this.draw(); });
+        this.canvas.addEventListener('dblclick', (e) => this.onDblClick(e));
+
+        window.addEventListener('resize', () => this.resize());
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !document.getElementById('curve-panel').classList.contains('hidden')) {
+                this.toggle(false);
+            }
+        });
+
+        this.resize();
+    },
+
+    // --- Panel ---------------------------------------------------
+    toggle(force) {
+        const panel = document.getElementById('curve-panel');
+        const btn = document.getElementById('curve-toggle');
+        const show = (force === undefined) ? panel.classList.contains('hidden') : force;
+
+        panel.classList.toggle('hidden', !show);
+        btn.classList.toggle('open', show);
+        btn.querySelector('span').innerText = show ? '📈 Fold titreringskurve sammen' : '📈 Fold titreringskurve ud';
+
+        if (show) this.resize();
+    },
+
+    resize() {
+        const rect = this.canvas.getBoundingClientRect();
+        const cssW = rect.width || this.W;
+        const dpr = window.devicePixelRatio || 1;
+
+        this.canvas.width = Math.round(cssW * dpr);
+        this.canvas.height = Math.round(cssW * (this.H / this.W) * dpr);
+
+        const s = (cssW / this.W) * dpr;
+        this.ctx.setTransform(s, 0, 0, s, 0, 0);
+        this.draw();
+    },
+
+    // --- Koordinatomregning --------------------------------------
+    plotW() { return this.W - this.PAD.l - this.PAD.r; },
+    plotH() { return this.H - this.PAD.t - this.PAD.b; },
+    xTo(v)  { return this.PAD.l + (v - this.X_MIN) / (this.X_MAX - this.X_MIN) * this.plotW(); },
+    yTo(ph) { return this.PAD.t + (this.Y_MAX - ph) / (this.Y_MAX - this.Y_MIN) * this.plotH(); },
+
+    // Musekoordinat -> (mL, pH)
+    toData(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        const scale = this.W / (rect.width || this.W);
+        const px = (e.clientX - rect.left) * scale;
+        const py = (e.clientY - rect.top) * scale;
+        return {
+            px, py,
+            v: this.X_MIN + (px - this.PAD.l) / this.plotW() * (this.X_MAX - this.X_MIN),
+            ph: this.Y_MAX - (py - this.PAD.t) / this.plotH() * (this.Y_MAX - this.Y_MIN)
+        };
+    },
+
+    inPlot(px, py) {
+        return px >= this.PAD.l - 6 && px <= this.W - this.PAD.r + 6 &&
+               py >= this.PAD.t - 6 && py <= this.H - this.PAD.b + 6;
+    },
+
+    hitTest(px, py) {
+        for (let i = this.points.length - 1; i >= 0; i--) {
+            const dx = this.xTo(this.points[i].v) - px;
+            const dy = this.yTo(this.points[i].ph) - py;
+            if (dx * dx + dy * dy <= 121) return i;   // 11 px
+        }
+        return -1;
+    },
+
+    clampPoint(v, ph) {
+        return {
+            v:  Math.min(this.X_MAX, Math.max(this.X_MIN, v)),
+            ph: Math.min(this.Y_MAX, Math.max(this.Y_MIN, ph))
+        };
+    },
+
+    // --- Interaktion ---------------------------------------------
+    onDown(e) {
+        const d = this.toData(e);
+        this.pressPos = d;
+        this.moved = false;
+        this.dragIndex = this.hitTest(d.px, d.py);
+        if (this.dragIndex >= 0) {
+            this.pushHistory();
+            this.canvas.setPointerCapture(e.pointerId);
+        }
+    },
+
+    onMove(e) {
+        const d = this.toData(e);
+        this.hover = this.inPlot(d.px, d.py) ? this.clampPoint(d.v, d.ph) : null;
+
+        if (this.pressPos && (Math.abs(d.px - this.pressPos.px) > 3 || Math.abs(d.py - this.pressPos.py) > 3)) {
+            this.moved = true;
+        }
+        if (this.dragIndex >= 0) {
+            this.points[this.dragIndex] = this.clampPoint(d.v, d.ph);
+        }
+        this.updateReadout();
+        this.draw();
+    },
+
+    onUp(e) {
+        const d = this.toData(e);
+        if (this.dragIndex < 0 && !this.moved && this.inPlot(d.px, d.py)) {
+            this.pushHistory();
+            this.points.push(this.clampPoint(d.v, d.ph));
+        }
+        this.dragIndex = -1;
+        this.pressPos = null;
+        this.draw();
+    },
+
+    onDblClick(e) {
+        const d = this.toData(e);
+        const i = this.hitTest(d.px, d.py);
+        if (i >= 0) {
+            this.pushHistory();
+            this.points.splice(i, 1);
+            this.draw();
+        }
+    },
+
+    pushHistory() {
+        this.history.push(this.points.map(p => ({ v: p.v, ph: p.ph })));
+        if (this.history.length > 60) this.history.shift();
+    },
+
+    undo() {
+        if (!this.history.length) return;
+        this.points = this.history.pop();
+        this.draw();
+    },
+
+    clear() {
+        if (!this.points.length) return;
+        this.pushHistory();
+        this.points = [];
+        this.draw();
+    },
+
+    updateReadout() {
+        const el = document.getElementById('curve-readout');
+        if (!el) return;
+        el.innerText = this.hover
+            ? 'V = ' + this.fmt(this.hover.v, 1) + ' mL · pH = ' + this.fmt(this.hover.ph, 2)
+            : 'V = – mL · pH = –';
+    },
+
+    fmt(x, dec) { return x.toFixed(dec).replace('.', ','); },
+
+    // --- Tegning --------------------------------------------------
+    draw(ctx) {
+        ctx = ctx || this.ctx;
+        const L = this.PAD.l, T = this.PAD.t;
+        const R = this.W - this.PAD.r, B = this.H - this.PAD.b;
+
+        ctx.clearRect(0, 0, this.W, this.H);
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, this.W, this.H);
+
+        // Finmasket gitter (som millimeterpapir)
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = '#eef1f4';
+        ctx.beginPath();
+        for (let v = this.X_MIN; v <= this.X_MAX + 1e-9; v += 1) {
+            const x = Math.round(this.xTo(v)) + 0.5;
+            ctx.moveTo(x, T); ctx.lineTo(x, B);
+        }
+        for (let ph = this.Y_MIN; ph <= this.Y_MAX + 1e-9; ph += 0.2) {
+            const y = Math.round(this.yTo(ph)) + 0.5;
+            ctx.moveTo(L, y); ctx.lineTo(R, y);
+        }
+        ctx.stroke();
+
+        // Hovedgitter
+        ctx.strokeStyle = '#d6dde4';
+        ctx.beginPath();
+        for (let v = this.X_MIN; v <= this.X_MAX + 1e-9; v += 5) {
+            const x = Math.round(this.xTo(v)) + 0.5;
+            ctx.moveTo(x, T); ctx.lineTo(x, B);
+        }
+        for (let ph = this.Y_MIN; ph <= this.Y_MAX + 1e-9; ph += 1) {
+            const y = Math.round(this.yTo(ph)) + 0.5;
+            ctx.moveTo(L, y); ctx.lineTo(R, y);
+        }
+        ctx.stroke();
+
+        // Akser
+        ctx.strokeStyle = '#2c3e50';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(L + 0.5, T); ctx.lineTo(L + 0.5, B + 0.5); ctx.lineTo(R, B + 0.5);
+        ctx.stroke();
+
+        // Delestreger og tal
+        ctx.fillStyle = '#2c3e50';
+        ctx.font = '12px "Segoe UI", sans-serif';
+        ctx.strokeStyle = '#2c3e50';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        for (let v = this.X_MIN; v <= this.X_MAX + 1e-9; v += 5) {
+            const x = Math.round(this.xTo(v)) + 0.5;
+            ctx.moveTo(x, B); ctx.lineTo(x, B + 6);
+            ctx.fillText(String(v), x, B + 10);
+        }
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        for (let ph = this.Y_MIN; ph <= this.Y_MAX + 1e-9; ph += 1) {
+            const y = Math.round(this.yTo(ph)) + 0.5;
+            ctx.moveTo(L - 6, y); ctx.lineTo(L, y);
+            ctx.fillText(String(Math.round(ph)), L - 10, y);
+        }
+        ctx.stroke();
+
+        // Aksetitler
+        ctx.font = 'bold 13px "Segoe UI", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillText('Tilsat NaOH 0,1 M (mL)', L + this.plotW() / 2, this.H - 12);
+        ctx.save();
+        ctx.translate(16, T + this.plotH() / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText('pH', 0, 0);
+        ctx.restore();
+
+        // Sigtekors ved musen
+        if (this.hover && this.dragIndex < 0) {
+            ctx.save();
+            ctx.setLineDash([4, 4]);
+            ctx.strokeStyle = '#95a5a6';
+            ctx.lineWidth = 1;
+            const hx = this.xTo(this.hover.v), hy = this.yTo(this.hover.ph);
+            ctx.beginPath();
+            ctx.moveTo(L, hy); ctx.lineTo(R, hy);
+            ctx.moveTo(hx, T); ctx.lineTo(hx, B);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        this.drawSeries(ctx);
+
+        if (!this.points.length) {
+            ctx.fillStyle = '#95a5a6';
+            ctx.font = 'italic 14px "Segoe UI", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('Klik i koordinatsystemet for at plotte dine målepunkter (mL, pH)',
+                         L + this.plotW() / 2, T + this.plotH() / 2);
+        }
+    },
+
+    drawSeries(ctx) {
+        const sorted = this.points.slice().sort((a, b) => a.v - b.v);
+        const connect = document.getElementById('curve-connect');
+
+        if (sorted.length > 1 && (!connect || connect.checked)) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(this.PAD.l, this.PAD.t, this.plotW(), this.plotH());
+            ctx.clip();
+
+            ctx.strokeStyle = '#2980b9';
+            ctx.lineWidth = 2.5;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(this.xTo(sorted[0].v), this.yTo(sorted[0].ph));
+
+            // Blod kurve gennem punkterne (Catmull-Rom -> Bezier)
+            for (let i = 0; i < sorted.length - 1; i++) {
+                const p0 = sorted[Math.max(0, i - 1)];
+                const p1 = sorted[i];
+                const p2 = sorted[i + 1];
+                const p3 = sorted[Math.min(sorted.length - 1, i + 2)];
+
+                const c1x = this.xTo(p1.v + (p2.v - p0.v) / 6);
+                const c1y = this.yTo(p1.ph + (p2.ph - p0.ph) / 6);
+                const c2x = this.xTo(p2.v - (p3.v - p1.v) / 6);
+                const c2y = this.yTo(p2.ph - (p3.ph - p1.ph) / 6);
+
+                ctx.bezierCurveTo(c1x, c1y, c2x, c2y, this.xTo(p2.v), this.yTo(p2.ph));
+            }
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        this.points.forEach((p, i) => {
+            const x = this.xTo(p.v), y = this.yTo(p.ph);
+            ctx.beginPath();
+            ctx.arc(x, y, i === this.dragIndex ? 7 : 5, 0, Math.PI * 2);
+            ctx.fillStyle = i === this.dragIndex ? '#e67e22' : '#2980b9';
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#fff';
+            ctx.stroke();
+        });
+    },
+
+    // --- Gem grafen som billede -----------------------------------
+    saveImage() {
+        const scale = 2;
+        const off = document.createElement('canvas');
+        off.width = this.W * scale;
+        off.height = this.H * scale;
+        const octx = off.getContext('2d');
+        octx.setTransform(scale, 0, 0, scale, 0, 0);
+
+        const savedHover = this.hover;
+        this.hover = null;
+        this.draw(octx);
+        this.hover = savedHover;
+
+        const a = document.createElement('a');
+        a.download = 'titreringskurve.png';
+        a.href = off.toDataURL('image/png');
+        a.click();
+    }
+};
+
+
 Lab.init();
+Curve.init();
 </script>
 </body>
 </html>

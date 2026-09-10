@@ -247,76 +247,114 @@ var NK = (typeof window !== "undefined") ? (window.NK = window.NK || {}) : {};
     };
 
     /* ----- Titrerbare "pladser" ------------------------------------
-       Et stof, der tilsaettes som HkB, kan afgive k protoner (pKs'erne
-       for de sidste k trin) og modtage n - k protoner. Staerke baser
-       modtager 'oh' protoner ved pKs = pKw. */
+       En plads er et trin, der kan titreres: { pKa, pseudo }.
+       Et stof, der tilsaettes som HkB, kan AFGIVE k protoner (pKs'erne
+       for de sidste k trin) og MODTAGE n - k protoner. Staerke baser
+       har ingen pKs-liste; deres OH- taeller som en pseudo-plads ved
+       pKs = pKw, for den proton lander i vandet i stedet. */
     Kemi.donorPladser = function (s) {
         var n = s.pKa.length;
-        return s.pKa.slice(n - s.k);                       /* stigende pKs */
+        var ud = [];
+        for (var i = n - s.k; i < n; i++) ud.push({ pKa: s.pKa[i], pseudo: false });
+        ud.sort(function (a, b) { return a.pKa - b.pKa; });   /* lettest foerst */
+        return ud;
     };
 
     Kemi.acceptorPladser = function (s) {
-        var n = s.pKa.length;
-        var liste = s.pKa.slice(0, n - s.k);
-        for (var i = 0; i < (s.oh || 0); i++) liste.push(Kemi.pKw);
-        liste.sort(function (a, b) { return b - a; });      /* faldende pKs */
-        return liste;
+        var ud = [], i;
+        for (i = 0; i < s.pKa.length - s.k; i++) ud.push({ pKa: s.pKa[i], pseudo: false });
+        for (i = 0; i < (s.oh || 0); i++) ud.push({ pKa: Kemi.pKw, pseudo: true });
+        ud.sort(function (a, b) { return b.pKa - a.pKa; });   /* lettest foerst */
+        return ud;
+    };
+
+    /* Gennemsnitligt antal protoner paa stoffets syre/base-former. */
+    Kemi.middelProtoner = function (pH, s) {
+        if (s.pKa.length === 0) return 0;
+        var a = Kemi.fraktioner(pH, s);
+        var sum = 0;
+        for (var j = 0; j < a.length; j++) sum += j * a[j];
+        return sum;
     };
 
     /* Hvad er titratoren - en syre eller en base - og hvor mange
        protoner flytter den pr. formelenhed? */
     Kemi.titratorType = function (s) {
         if (!s) return { type: "ingen", kap: 0, pKa: NaN };
-        var don = Kemi.donorPladser(s).filter(function (p) { return p < 11; });
-        if (don.length > 0) return { type: "syre", kap: don.length, pKa: don[0] };
-        var acc = Kemi.acceptorPladser(s).filter(function (p) { return p > 3; });
-        if (acc.length > 0) return { type: "base", kap: acc.length, pKa: acc[0] };
+        var don = Kemi.donorPladser(s).filter(function (p) { return p.pKa < 11; });
+        if (don.length > 0) return { type: "syre", kap: don.length, pKa: don[0].pKa };
+        var acc = Kemi.acceptorPladser(s).filter(function (p) { return p.pKa > 3; });
+        if (acc.length > 0) return { type: "base", kap: acc.length, pKa: acc[0].pKa };
         return { type: "ingen", kap: 0, pKa: NaN };
     };
 
-    /* Aekvivalenspunkter: for hver titrerbar plads i proeven (sorteret
-       efter hvor let den titreres) laegges stofmaengderne sammen, og
-       V = n / (c_titrator * kapacitet). Returnerer
-       [{ V, pH, pKa, stof, nr, Vhalv }] sorteret efter V, kun under Vmaks. */
+    /* Hvor stor en del af et trin skal vaere omsat ved sit eget
+       aekvivalenspunkt, foer det taeller med som et rigtigt punkt.
+       Det er den her groense, der sorterer de utitrerbare trin fra -
+       fx 3. trin i phosphorsyre (pKs 12,35), som NaOH ikke kan naa. */
+    Kemi.MIN_OMSAETNING = 0.6;
+
+    /* Aekvivalenspunkter: for hver titrerbar plads i proeven - sorteret
+       efter hvor let den titreres - laegges stofmaengderne sammen, og
+       V = n / (c_titrator * kapacitet).
+
+       Hvert punkt proeves af: er trinnet i praksis omsat ved sit eget
+       aekvivalenspunkt? Er det ikke, stopper listen der. Det er derfor
+       H3PO4 giver to punkter med NaOH og ikke tre.
+
+       Returnerer [{ V, pH, pKa, stof, nr, Vhalv }] sorteret efter V. */
     Kemi.aekvivalenspunkter = function (ops) {
         var t = Kemi.titratorType(ops.titrator.stof);
         var ct = ops.titrator.c;
         if (t.type === "ingen" || !(ct > 0)) return [];
+        var medBase = (t.type === "base");
 
         var pladser = [];
-        var i, j, liste, graense;
+        var maal = [];
+        var i, j, liste;
         for (i = 0; i < ops.proeve.length; i++) {
             var p = ops.proeve[i];
+            maal.push(p.stof ? p.stof.k : 0);
             if (!p.stof || !(p.c > 0)) continue;
-            if (t.type === "base") {
-                graense = Math.min(t.pKa - 2, 11.5);
-                liste = Kemi.donorPladser(p.stof);
-                for (j = 0; j < liste.length; j++) {
-                    if (liste[j] < graense) pladser.push({ pKa: liste[j], mol: p.c * ops.V0 / 1000, stof: p.stof });
-                }
-            } else {
-                graense = Math.max(t.pKa + 2, 2.5);
-                liste = Kemi.acceptorPladser(p.stof);
-                for (j = 0; j < liste.length; j++) {
-                    if (liste[j] > graense) pladser.push({ pKa: liste[j], mol: p.c * ops.V0 / 1000, stof: p.stof });
-                }
+            liste = medBase ? Kemi.donorPladser(p.stof) : Kemi.acceptorPladser(p.stof);
+            for (j = 0; j < liste.length; j++) {
+                pladser.push({
+                    pKa: liste[j].pKa,
+                    pseudo: liste[j].pseudo,
+                    mol: p.c * ops.V0 / 1000,
+                    stof: p.stof,
+                    komp: i
+                });
             }
         }
-        if (t.type === "base") pladser.sort(function (a, b) { return a.pKa - b.pKa; });
+        if (medBase) pladser.sort(function (a, b) { return a.pKa - b.pKa; });
         else pladser.sort(function (a, b) { return b.pKa - a.pKa; });
 
         var ud = [];
         var sum = 0;
         for (i = 0; i < pladser.length; i++) {
-            sum += pladser[i].mol;
+            var pl = pladser[i];
+            sum += pl.mol;
             var V = sum / (ct * t.kap) * 1000;
             if (V > ops.Vmaks + 1e-9) break;
+            var pH = Kemi.pHVed(ops, V);
+
+            /* Er trinnet reelt omsat her? OH- fra en staerk base sidder
+               ikke i pKs-listen og slipper uden om proeven. */
+            if (!pl.pseudo) {
+                var faktisk = Kemi.middelProtoner(pH, pl.stof);
+                var grad = medBase ? (maal[pl.komp] - faktisk) : (faktisk - maal[pl.komp]);
+                if (grad < Kemi.MIN_OMSAETNING) break;
+            }
+            maal[pl.komp] += medBase ? -1 : 1;
+
             var forrige = ud.length ? ud[ud.length - 1].V : 0;
             ud.push({
                 V: V,
-                pH: Kemi.pHVed(ops, V),
-                pKa: pladser[i].pKa,
-                stof: pladser[i].stof,
+                pH: pH,
+                pKa: pl.pKa,
+                pseudo: pl.pseudo,
+                stof: pl.stof,
                 nr: ud.length + 1,
                 Vhalv: forrige + 0.5 * (V - forrige)
             });
