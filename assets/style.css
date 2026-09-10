@@ -551,28 +551,31 @@ code {
 .kort .download-liste { margin-top: auto; padding-top: 4px; }
 .kort .info-boks { margin-bottom: 18px; }
 
-/* -------------------------------------------------- To spor paa forsiden */
+/* --------------------------------------------------- Forsidens to spalter */
 
-.hero-smal h1 { max-width: 20ch; }
-.hero-smal .manchet { max-width: 64ch; }
-.hero-smal .manchet strong { color: var(--tekst); }
+.hero-smal h1 { max-width: none; font-size: clamp(1.75rem, 1.1rem + 2.1vw, 2.5rem); }
+.hero-smal .manchet { max-width: 66ch; margin-bottom: 0; }
 
-.spor h3 { font-size: 1.32rem; margin-bottom: .45em; }
-.spor p { margin-bottom: 18px; }
+.spalte h2 { font-size: 1.42rem; margin-bottom: .45em; }
+.spalte p { margin-bottom: 18px; }
 
-.spor .formel-kort.mini { box-shadow: none; margin-bottom: 20px; }
-.spor .formel-kort.mini .kort-bar { padding: 9px 16px; }
-.spor .formel-kort.mini .formel-liste li { padding: 10px 16px; gap: 12px; }
-.spor .formel-kort.mini .tast { min-width: 82px; font-size: .84rem; }
-.spor .formel-kort.mini .formel { font-size: 1.12rem; }
+.spalte .formel-kort.mini { box-shadow: none; margin-bottom: 20px; }
+.spalte .formel-kort.mini .kort-bar { padding: 9px 16px; }
+.spalte .formel-kort.mini .formel-liste li { padding: 10px 16px; gap: 12px; }
+.spalte .formel-kort.mini .tast { min-width: 82px; font-size: .84rem; }
+.spalte .formel-kort.mini .formel { font-size: 1.12rem; }
 
-.spor-liste {
+.spalte-liste {
   list-style: none; margin: 0 0 20px; padding: 16px 0 0;
   border-top: 1px solid var(--kant); display: grid; gap: 10px;
 }
-.spor-liste a { font-weight: 600; font-size: .95rem; text-decoration: none; }
-.spor-liste a::after { content: " \2192"; }
-.spor-liste a:hover { text-decoration: underline; }
-/* kortene faar hver sin hoejde i stedet for et hul i det korteste */
-.spor-grid { align-items: start; }
-.spor > .knap { margin-top: 4px; }
+.spalte-liste a { font-weight: 600; font-size: .95rem; text-decoration: none; }
+.spalte-liste a::after { content: " \2192"; }
+.spalte-liste a:hover { text-decoration: underline; }
+
+/* spalterne faar hver sin hoejde i stedet for et hul i den korteste */
+.spalte-grid { align-items: start; }
+.spalte > .knap { margin-top: 4px; }
+
+/* spalterne skal ligge taet paa introteksten */
+.sektion-taet { padding-top: clamp(30px, 3.5vw, 44px); }
