@@ -427,11 +427,9 @@ tbody th { font-weight: 650; }
   box-shadow: var(--skygge-hover); overflow: hidden;
 }
 .formel-kort .kort-bar {
-  display: flex; gap: 6px; align-items: center;
-  padding: 12px 16px; background: var(--bg-daempet); border-bottom: 1px solid var(--kant);
+  padding: 11px 20px; background: var(--bg-daempet); border-bottom: 1px solid var(--kant);
 }
-.formel-kort .prik { width: 10px; height: 10px; border-radius: 50%; background: var(--kant-staerk); }
-.formel-kort .bar-titel { margin-left: 8px; font-size: .8rem; color: var(--tekst-daempet); font-weight: 600; }
+.formel-kort .bar-titel { font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--tekst-daempet); }
 
 .formel-liste { list-style: none; margin: 0; padding: 0; }
 .formel-liste li { display: flex; align-items: center; gap: 14px; padding: 13px 20px; }
@@ -552,3 +550,29 @@ code {
 
 .kort .download-liste { margin-top: auto; padding-top: 4px; }
 .kort .info-boks { margin-bottom: 18px; }
+
+/* -------------------------------------------------- To spor paa forsiden */
+
+.hero-smal h1 { max-width: 20ch; }
+.hero-smal .manchet { max-width: 64ch; }
+.hero-smal .manchet strong { color: var(--tekst); }
+
+.spor h3 { font-size: 1.32rem; margin-bottom: .45em; }
+.spor p { margin-bottom: 18px; }
+
+.spor .formel-kort.mini { box-shadow: none; margin-bottom: 20px; }
+.spor .formel-kort.mini .kort-bar { padding: 9px 16px; }
+.spor .formel-kort.mini .formel-liste li { padding: 10px 16px; gap: 12px; }
+.spor .formel-kort.mini .tast { min-width: 82px; font-size: .84rem; }
+.spor .formel-kort.mini .formel { font-size: 1.12rem; }
+
+.spor-liste {
+  list-style: none; margin: 0 0 20px; padding: 16px 0 0;
+  border-top: 1px solid var(--kant); display: grid; gap: 10px;
+}
+.spor-liste a { font-weight: 600; font-size: .95rem; text-decoration: none; }
+.spor-liste a::after { content: " \2192"; }
+.spor-liste a:hover { text-decoration: underline; }
+/* kortene faar hver sin hoejde i stedet for et hul i det korteste */
+.spor-grid { align-items: start; }
+.spor > .knap { margin-top: 4px; }

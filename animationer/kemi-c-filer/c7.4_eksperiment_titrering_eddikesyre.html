@@ -261,7 +261,7 @@
         </div>
         <div class="curve-footer">
             <label><input type="checkbox" id="curve-marks" checked onchange="Curve.draw()"> Vis målepunkter</label>
-            <span id="curve-status">Tilsat: 0,0 mL · pH: –</span>
+            <span id="curve-status">Hold musen over kurven for at aflæse et punkt</span>
         </div>
     </div>
 </div>
@@ -593,7 +593,10 @@ class Lab {
             let w = 0;
             const i = setInterval(() => {
                 w+=1; this.volWater = w;
-                if(w >= 20) clearInterval(i);
+                if(w >= 20) {
+                    clearInterval(i);
+                    Curve.record(0, this.pHAt(0));   // kurvens startpunkt
+                }
             }, 15);
             document.getElementById('btn-water').disabled = true;
             document.getElementById('btn-indicator').disabled = false;
@@ -667,7 +670,8 @@ class Lab {
         }
 
         // Titreringskurven opdateres i takt med, at der tilsættes NaOH
-        if (this.volWater >= 20) {
+        const lastPoint = Curve.live[Curve.live.length - 1];
+        if (this.volWater >= 20 && (!lastPoint || this.volBase - lastPoint.v >= Curve.MIN_STEP)) {
             Curve.record(this.volBase, this.pHAt(this.volBase));
         }
     }
@@ -1094,6 +1098,7 @@ const Curve = {
             if (e.key === 'Escape' && this.isOpen()) this.toggle(false);
         });
 
+        this.updateStatus();
         this.resize();
     },
 
