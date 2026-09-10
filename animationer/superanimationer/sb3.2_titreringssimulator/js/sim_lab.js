@@ -21,6 +21,7 @@
     NK.SimLab = function () {
         this.l = new NK.Laerred(NK.el("lab-laerred"));
         this.graf = new NK.Kurve(NK.el("lab-graf"), {});
+        this.indBar = new NK.IndikatorBjaelke(NK.el("lab-ind-laerred"));
         this.bord = new NK.Bord();
         this.teori = null;
         this.aekv = [];
@@ -97,17 +98,11 @@
         return null;
     };
 
-    /* ----- Indikatorens bjaelke -------------------------------------- */
+    /* ----- Indikatorens note ------------------------------------------
+       Selve baren tegnes hvert billede i tegn() ud fra den rigtige
+       farve (se js/indikatorbar.js); her staar kun teksten under den. */
     NK.SimLab.prototype.opdaterIndikator = function () {
         var ind = NK.Ops.indikator();
-        var vindue = NK.el("lab-ind-vindue");
-        if (ind.omraade) {
-            vindue.style.display = "block";
-            vindue.style.left = (ind.omraade[0] / 14 * 100).toFixed(2) + "%";
-            vindue.style.width = ((ind.omraade[1] - ind.omraade[0]) / 14 * 100).toFixed(2) + "%";
-        } else {
-            vindue.style.display = "none";
-        }
         var tekst;
         if (ind.id === "ingen") {
             tekst = "Uden indikator ser man kun pH-metret.";
@@ -123,6 +118,7 @@
     NK.SimLab.prototype.tilpas = function () {
         this.l.tilpas();
         this.graf.tilpas();
+        this.indBar.tilpas();
     };
 
     NK.SimLab.prototype.opdater = function (dt) {
@@ -230,14 +226,11 @@
         NK.saetTekst("lab-omsat", reference > 0 ? NK.tal(b.V / reference * 100, 0) + " %" : "–");
         NK.saetTekst("lab-status", this.status());
 
-        /* Indikatorens farve og naal */
-        var f = Kemi.indikatorFarve(ind, b.pH);
-        var prik = NK.el("lab-farveprik");
-        prik.style.backgroundColor = "rgb(" +
-            Math.round(255 * (1 - f[3]) + f[0] * f[3]) + "," +
-            Math.round(255 * (1 - f[3]) + f[1] * f[3]) + "," +
-            Math.round(255 * (1 - f[3]) + f[2] * f[3]) + ")";
-        NK.el("lab-ind-naal").style.left = (NK.klamp(b.pH, 0, 14) / 14 * 100).toFixed(2) + "%";
+        /* Indikatorens farve og bjaelke */
+        var f = Kemi.indikatorPaaHvid(ind, b.pH);
+        NK.el("lab-farveprik").style.backgroundColor =
+            "rgb(" + Math.round(f[0]) + "," + Math.round(f[1]) + "," + Math.round(f[2]) + ")";
+        this.indBar.tegn({ indikator: ind, pHNu: b.pH });
 
         /* Hanens knap */
         var knap = NK.el("lab-hane");

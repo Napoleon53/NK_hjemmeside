@@ -26,10 +26,20 @@
     /* ----- Venstre spalte -------------------------------------------- */
     function opdaterOps() {
         /* Den ukendte proeve har sin egen opstilling, som eleven ikke
-           maa kunne kigge i. */
-        var skjul = (aktivFane === "fane-ukendt") || !opsOenskes;
+           maa kunne kigge i - saa dér findes knappen slet ikke. */
+        var paaUkendt = (aktivFane === "fane-ukendt");
+        var skjul = paaUkendt || !opsOenskes;
         NK.el("opsaetning").classList.toggle("skjult", skjul);
-        NK.el("opsknap").disabled = (aktivFane === "fane-ukendt");
+
+        var knap = NK.el("opsknap");
+        knap.classList.toggle("vaek", paaUkendt);
+        if (!paaUkendt) {
+            knap.classList.toggle("panel-skjult", !opsOenskes);
+            var tekst = opsOenskes ? "Skjul venstre panel" : "Vis venstre panel";
+            knap.title = tekst;
+            knap.setAttribute("aria-label", tekst);
+            knap.setAttribute("aria-pressed", opsOenskes ? "false" : "true");
+        }
     }
 
     /* ----- Faner ------------------------------------------------------ */

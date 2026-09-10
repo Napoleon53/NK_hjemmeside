@@ -379,12 +379,22 @@ var NK = (typeof window !== "undefined") ? (window.NK = window.NK || {}) : {};
     };
 
     /* ----- Indikatorer ---------------------------------------------
-       farver gaar fra syreform til baseform som [r, g, b, a].
-       'a' er farvens daekkraft i kolben - phenolphthaleins syreform er
-       farveloes, saa den har a = 0. */
+       farver gaar fra syreform til baseform som [r, g, b, a], en efter
+       hver pKs - et to-farvet indikator som methylorange har to stop,
+       et tre-farvet som thymolblaat har tre (en for hver side af hver
+       af de to pKs'er). 'a' er farvens daekkraft i kolben -
+       phenolphthaleins farveloese former har a = 0.
+
+       Phenolphthalein har med vilje TO pKs'er, ikke en: ud over det
+       velkendte skift fra farveloes til pink omkring pH 8-10 bliver den
+       ogsaa farveloes IGEN i staerkt basisk oplosning (over ca. pH 12-13),
+       fordi der dannes en tredje, ogsaa farveloes form. Det er ikke en
+       "rigtig" syre-base-ligevaegt (det sidste trin er egentlig OH--
+       addition, ikke protontab), men den samme to-pKs-mekanik som
+       thymolblaat bruger, giver den rigtige farvekurve alligevel. */
     Kemi.INDIKATORER = [
         { id: "ingen", navn: "Ingen indikator", pKa: [], farver: [[0, 0, 0, 0]], omslag: "–" },
-        { id: "phenolphthalein", navn: "Phenolphthalein", pKa: [9.4], farver: [[0, 0, 0, 0], [232, 45, 140, 0.85]], omraade: [8.2, 10.0], omslag: "8,2 – 10,0" },
+        { id: "phenolphthalein", navn: "Phenolphthalein", pKa: [9.4, 13.0], farver: [[0, 0, 0, 0], [232, 45, 140, 0.85], [0, 0, 0, 0]], omraade: [8.2, 10.0], omslag: "8,2 – 10,0 (og farveløs igen over pH ≈ 13)" },
         { id: "bromthymolblaat", navn: "Bromthymolblåt", pKa: [7.1], farver: [[240, 205, 40, 0.8], [40, 90, 225, 0.85]], omraade: [6.0, 7.6], omslag: "6,0 – 7,6" },
         { id: "methylorange", navn: "Methylorange", pKa: [3.46], farver: [[225, 45, 40, 0.85], [245, 190, 40, 0.8]], omraade: [3.1, 4.4], omslag: "3,1 – 4,4" },
         { id: "methylroedt", navn: "Methylrødt", pKa: [5.0], farver: [[220, 40, 50, 0.85], [245, 210, 50, 0.8]], omraade: [4.4, 6.2], omslag: "4,4 – 6,2" },
@@ -441,6 +451,20 @@ var NK = (typeof window !== "undefined") ? (window.NK = window.NK || {}) : {};
            "udvander" farven mod sort. */
         if (vaegt > 1e-9) for (i = 0; i < 3; i++) rgb[i] /= vaegt;
         return [rgb[0], rgb[1], rgb[2], aSum];
+    };
+
+    /* Indikatorens farve, saadan som oejet faktisk ser den: den
+       fortyndede, delvist gennemsigtige farve blandet ned i hvidt lys
+       (glasset og det, der er bag ved det) - i stedet for oven paa en
+       sort baggrund. Bruges baade til farveprikken og til
+       indikatorbjaelken. */
+    Kemi.indikatorPaaHvid = function (ind, pH) {
+        var f = Kemi.indikatorFarve(ind, pH);
+        return [
+            255 * (1 - f[3]) + f[0] * f[3],
+            255 * (1 - f[3]) + f[1] * f[3],
+            255 * (1 - f[3]) + f[2] * f[3]
+        ];
     };
 
     Kemi.rgba = function (f, aSkala) {

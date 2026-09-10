@@ -238,6 +238,20 @@
         }
         .curve-footer label { display: flex; align-items: center; gap: 5px; cursor: pointer; user-select: none; }
         #curve-status { font-family: 'Courier New', monospace; font-weight: bold; color: var(--text-dark); }
+
+        /* Datatabel */
+        .data-controls { display: flex; align-items: center; justify-content: space-between; gap: 15px; flex-wrap: wrap; font-size: 14px; }
+        .data-controls select { padding: 6px 8px; border: 2px solid #bdc3c7; border-radius: 4px; font-size: 14px; margin-left: 6px; }
+        .data-table-wrap { max-height: 45vh; overflow-y: auto; border: 1px solid #dfe4e8; border-radius: 6px; }
+        .data-table { border-collapse: collapse; width: 100%; font-family: 'Courier New', monospace; font-size: 14px; }
+        .data-table th {
+            position: sticky; top: 0;
+            background: var(--panel-bg); color: #fff; font-family: 'Segoe UI', sans-serif;
+            font-size: 13px; padding: 8px 12px; text-align: right;
+        }
+        .data-table td { padding: 5px 12px; text-align: right; border-bottom: 1px solid #eef1f4; }
+        .data-table tbody tr:nth-child(even) { background: #f8f9fa; }
+        .data-table tbody tr:hover { background: #eaf4fb; }
     </style>
 </head>
 <body>
@@ -252,7 +266,7 @@
         <div class="curve-header">
             <span>📈 Titreringskurve</span>
             <div class="curve-header-tools">
-                <button onclick="Curve.saveImage()" title="Gem grafen som billede">⬇ Gem</button>
+                <button onclick="Curve.openTable()" title="Se måledata som tabel">📋 Datatabel</button>
                 <button class="close-x" onclick="Curve.toggle(false)" title="Luk">&times;</button>
             </div>
         </div>
@@ -493,6 +507,45 @@
             <button class="action" style="width:auto; margin-top:10px;" onclick="location.reload()">Start Forfra</button>
         </div>
 
+    </div>
+</div>
+
+<div id="curve-data-modal" class="modal hidden">
+    <div class="modal-content" style="width: 520px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ccc; padding-bottom:10px; margin-bottom:15px;">
+            <h2 style="margin:0; color:#2c3e50; border:none;">Måledata til titreringskurven</h2>
+            <button onclick="Curve.closeTable()" style="border:none; background:transparent; font-size:24px; cursor:pointer;">&times;</button>
+        </div>
+
+        <div class="data-controls">
+            <label>Vis en værdi for hver
+                <select id="data-step" onchange="Curve.fillTable()">
+                    <option value="0.25">0,25 mL</option>
+                    <option value="0.5" selected>0,50 mL</option>
+                    <option value="1">1,00 mL</option>
+                </select>
+            </label>
+            <button class="action" style="width:auto; padding:8px 14px;" onclick="Curve.copyTable()">
+                <span id="copy-label">Kopiér tabellen</span>
+            </button>
+        </div>
+
+        <p style="font-size:0.85em; color:#7f8c8d; margin:10px 0;">
+            Kopiér tabellen og sæt den direkte ind i Excel - de to kolonner lander i hver sin kolonne.
+            Du kan også markere tabellen med musen og kopiere med Ctrl+C.
+        </p>
+
+        <div class="data-table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Tilsat NaOH 0,1 M (mL)</th>
+                        <th>pH</th>
+                    </tr>
+                </thead>
+                <tbody id="data-tbody"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -1095,7 +1148,10 @@ const Curve = {
 
         window.addEventListener('resize', () => this.resize());
         window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.isOpen()) this.toggle(false);
+            if (e.key !== 'Escape') return;
+            const dataModal = document.getElementById('curve-data-modal');
+            if (!dataModal.classList.contains('hidden')) this.closeTable();
+            else if (this.isOpen()) this.toggle(false);
         });
 
         this.updateStatus();
@@ -1165,7 +1221,9 @@ const Curve = {
         const px = (e.clientX - rect.left) * scale;
         const py = (e.clientY - rect.top) * scale;
 
-        let best = -1, bestDist = 144;   // 12 px
+        // Fangstområde: 28 px på skærmen, uanset hvor stort panelet er
+        const tol = 28 * scale;
+        let best = -1, bestDist = tol * tol;
         for (let i = 0; i < this.live.length; i++) {
             const p = this.live[i];
             if (!this.inRange(p)) continue;
@@ -1386,24 +1444,94 @@ const Curve = {
         ctx.fillText(txt, bx + 8, by + bh / 2);
     },
 
-    // --- Gem grafen som billede -----------------------------------
-    saveImage() {
-        const scale = 2;
-        const off = document.createElement('canvas');
-        off.width = this.W * scale;
-        off.height = this.H * scale;
-        const octx = off.getContext('2d');
-        octx.setTransform(scale, 0, 0, scale, 0, 0);
+    // --- Datatabel ------------------------------------------------
+    // Vælger det målte punkt, der ligger tættest på et ønsket volumen
+    nearestPoint(v) {
+        let best = null, bestDiff = Infinity;
+        for (const p of this.live) {
+            const d = Math.abs(p.v - v);
+            if (d < bestDiff) { bestDiff = d; best = p; }
+        }
+        return (best && bestDiff <= 0.15) ? best : null;
+    },
 
-        const savedHover = this.hoverIndex;
-        this.hoverIndex = -1;
-        this.draw(octx);
-        this.hoverIndex = savedHover;
+    // Tabellens rækker: en værdi for hvert interval + det sidst målte punkt
+    tableRows() {
+        if (!this.live.length) return [];
+        const stepEl = document.getElementById('data-step');
+        const step = stepEl ? parseFloat(stepEl.value) : 0.5;
+        const last = this.live[this.live.length - 1];
 
-        const a = document.createElement('a');
-        a.download = 'titreringskurve.png';
-        a.href = off.toDataURL('image/png');
-        a.click();
+        const rows = [];
+        for (let v = 0; v <= last.v + 1e-9; v += step) {
+            const p = this.nearestPoint(v);
+            if (p) rows.push([v, p.ph]);
+        }
+        // Slutpunktet tages med, hvis titreringen er stoppet mellem to trin
+        const lastRow = rows[rows.length - 1];
+        if (!lastRow || Math.abs(lastRow[0] - last.v) > 0.05) rows.push([last.v, last.ph]);
+        return rows;
+    },
+
+    openTable() {
+        this.fillTable();
+        document.getElementById('curve-data-modal').classList.remove('hidden');
+    },
+
+    closeTable() {
+        document.getElementById('curve-data-modal').classList.add('hidden');
+    },
+
+    fillTable() {
+        const tbody = document.getElementById('data-tbody');
+        const rows = this.tableRows();
+
+        if (!rows.length) {
+            tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; color:#7f8c8d;">' +
+                'Der er endnu ingen måledata - åbn hanen og tilsæt NaOH.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = rows.map((r) =>
+            '<tr><td>' + this.fmt(r[0], 2) + '</td><td>' + this.fmt(r[1], 2) + '</td></tr>'
+        ).join('');
+    },
+
+    // Tabulator-adskilt tekst - rammer to kolonner, når den sættes ind i Excel
+    tableAsText() {
+        const rows = this.tableRows();
+        const lines = ['Tilsat NaOH 0,1 M (mL)\tpH'];
+        rows.forEach((r) => lines.push(this.fmt(r[0], 2) + '\t' + this.fmt(r[1], 2)));
+        return lines.join('\n');
+    },
+
+    copyTable() {
+        const rows = this.tableRows();
+        if (!rows.length) return;
+        const text = this.tableAsText();
+
+        const done = () => {
+            const label = document.getElementById('copy-label');
+            label.innerText = 'Kopieret ✓';
+            setTimeout(() => { label.innerText = 'Kopiér tabellen'; }, 2000);
+        };
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done, () => this.copyFallback(text, done));
+        } else {
+            this.copyFallback(text, done);
+        }
+    },
+
+    copyFallback(text, done) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) { /* browseren blokerer kopiering */ }
+        document.body.removeChild(ta);
     }
 };
 

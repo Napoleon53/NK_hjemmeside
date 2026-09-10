@@ -202,6 +202,43 @@ main {
     min-width: 0;
 }
 
+/* Flyder i toppen af scenen paa den aktive fane - uanset hvilken det
+   er, for den ligger som soskende til alle .fane-sektionerne med sin
+   egen z-index, ikke inde i en enkelt af dem. Den staar altid over
+   baade laerredet og den venstre spalte, ogsaa naar spalten selv ligger
+   ovenpaa som et lag paa smalle skaerme (se .ops i mediereglerne). */
+.scene-udvid {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 16;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(20, 20, 26, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 7px;
+    color: #dde3ea;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.scene-udvid:hover {
+    background-color: rgba(61, 158, 224, 0.3);
+    border-color: var(--blaa);
+    color: #ffffff;
+}
+
+.scene-udvid svg { display: block; }
+.scene-udvid .ikon-fold { display: none; }
+.scene-udvid.panel-skjult .ikon-udvid { display: none; }
+.scene-udvid.panel-skjult .ikon-fold { display: block; }
+
+/* Paa den ukendte proeve findes der intet panel at aabne eller lukke. */
+.scene-udvid.vaek { display: none; }
+
 .fane {
     position: absolute;
     inset: 0;
@@ -578,39 +615,16 @@ main {
 
 /* ---------------------------------------------------------------------
    INDIKATORBJAELKE
+   Tegnes helt i canvas (js/indikatorbar.js) med den valgte indikators
+   egen farve hen over pH -1 til 15 - ikke en fast regnbue.
    --------------------------------------------------------------------- */
 .indikatorbjaelke {
-    position: relative;
-    height: 26px;
+    height: 46px;
     border-radius: var(--radius-lil);
-    border: 1px solid #3a3a47;
     overflow: hidden;
-    background: linear-gradient(90deg,
-        #c81428 0%, #de372d 14%, #f06923 21%, #f6a023 28%,
-        #f2d232 35%, #c8dc3c 43%, #3caf50 50%, #2da096 57%,
-        #2d7dc3 64%, #375ab4 71%, #5541a5 78%, #692d96 85%, #4b196e 100%);
 }
 
-.indikator-vindue {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    background-color: rgba(255, 255, 255, 0.28);
-    border-left: 2px solid #ffffff;
-    border-right: 2px solid #ffffff;
-    display: none;
-}
-
-.indikator-naal {
-    position: absolute;
-    top: -2px;
-    bottom: -2px;
-    width: 3px;
-    margin-left: -1.5px;
-    background-color: #14141a;
-    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.85);
-    transition: left 0.12s linear;
-}
+.indikatorbjaelke canvas { display: block; width: 100%; height: 100%; }
 
 /* ---------------------------------------------------------------------
    TABELLER OG LISTER

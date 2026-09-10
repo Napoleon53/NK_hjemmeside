@@ -392,5 +392,42 @@
 <script src="js/sim_fordeling.js"></script>
 <script src="js/sim_ukendt.js"></script>
 <script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var NK = window.NK, hash = (location.hash || '').replace('#', '');
+  function fane(id) {
+    var k = document.querySelectorAll('.faneknap');
+    for (var i = 0; i < k.length; i++) if (k[i].getAttribute('data-fane') === id) k[i].click();
+  }
+  function tjek(id, v) {
+    var e = document.getElementById(id);
+    e.checked = v;
+    e.dispatchEvent(new Event('change'));
+  }
+  if (hash === 'labmidt') {
+    NK.Ops.hentForsoeg('eddike');
+    NK.sims['fane-lab'].bord.tilfoej(20.2);
+    NK.sims['fane-lab'].bord.saetHane(true);
+    tjek('lab-vis-facit', true);
+  } else if (hash === 'kurve') {
+    NK.Ops.hentForsoeg('phosphor');
+    NK.sims['fane-lab'].bord.tilfoej(14);
+    tjek('kur-vis-afledt', true);
+    fane('fane-kurve');
+  } else if (hash === 'fordeling') {
+    NK.Ops.hentForsoeg('phosphor');
+    NK.sims['fane-lab'].bord.tilfoej(14);
+    fane('fane-fordeling');
+  } else if (hash === 'ukendt') {
+    fane('fane-ukendt');
+    NK.sims['fane-ukendt'].bord.tilfoej(9);
+    NK.sims['fane-ukendt'].bord.saetHane(true);
+  } else if (hash === 'soda') {
+    NK.Ops.hentForsoeg('soda');
+    NK.sims['fane-lab'].bord.tilfoej(11.6);
+    NK.sims['fane-lab'].bord.saetHane(true);
+  }
+});
+</script>
 </body>
 </html>
