@@ -97,7 +97,7 @@ p  { margin: 0 0 1.1em; }
 
 .brand {
   display: flex; align-items: center; gap: 10px;
-  font-weight: 700; font-size: 1.14rem; letter-spacing: -.02em;
+  font-weight: 700; font-size: 1.5rem; letter-spacing: -.02em;
   color: var(--tekst); text-decoration: none; margin-right: auto;
   white-space: nowrap;
 }
