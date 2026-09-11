@@ -1,0 +1,149 @@
+/* =====================================================================
+   app.js - binder de fire faner sammen
+
+   Faneskift, fart, tastaturgenveje og tegneloekken. Kun den aktive
+   fane opdateres og tegnes, saa de tre andre koster ingenting.
+   ===================================================================== */
+(function () {
+    "use strict";
+
+    var NK = window.NK;
+
+    var sims = {};
+    var faner = ["fane-byg", "fane-isotop", "fane-ion", "fane-salt"];
+    var aktivFane = "fane-byg";
+    var sidsteTid = 0;
+
+    /* ----- Faner ------------------------------------------------------ */
+    function visFane(id) {
+        var afsnit = document.querySelectorAll(".fane");
+        var knapper = document.querySelectorAll(".faneknap");
+        var i;
+        for (i = 0; i < afsnit.length; i++) afsnit[i].classList.toggle("aktiv", afsnit[i].id === id);
+        for (i = 0; i < knapper.length; i++) {
+            var valgt = knapper[i].getAttribute("data-fane") === id;
+            knapper[i].classList.toggle("aktiv", valgt);
+            knapper[i].setAttribute("aria-selected", valgt ? "true" : "false");
+        }
+        aktivFane = id;
+        if (sims[id]) sims[id].tilpas();
+    }
+
+    /* ----- Fart -------------------------------------------------------- */
+    function saetFart(vaerdi, knap) {
+        NK.tid.skala = vaerdi;
+        var knapper = document.querySelectorAll(".tidsknap[data-fart]");
+        for (var i = 0; i < knapper.length; i++) knapper[i].classList.remove("aktiv");
+        if (knap) knap.classList.add("aktiv");
+    }
+
+    function skiftPause() {
+        var pauseKnap = document.querySelector('.tidsknap[data-fart="0"]');
+        if (NK.tid.skala === 0) {
+            saetFart(1, document.querySelector('.tidsknap[data-fart="1"]'));
+        } else {
+            saetFart(0, pauseKnap);
+        }
+    }
+
+    /* ----- Hjaelp ------------------------------------------------------ */
+    function visHjaelp(vis) {
+        NK.el("hjaelp").classList.toggle("vis", vis);
+    }
+
+    /* ----- Tegneloekken ------------------------------------------------ */
+    function loekke(tidsstempel) {
+        var dt = (tidsstempel - sidsteTid) / 1000;
+        sidsteTid = tidsstempel;
+        if (!isFinite(dt) || dt < 0) dt = 0;
+        if (dt > 0.1) dt = 0.1;                    /* undgaa spring efter faneskift */
+
+        var sim = sims[aktivFane];
+        if (sim) {
+            sim.tilpas();
+            sim.opdater(dt * NK.tid.skala);
+            sim.tegn();
+        }
+        window.requestAnimationFrame(loekke);
+    }
+
+    /* ----- Tastatur ----------------------------------------------------- */
+    function tastatur(e) {
+        if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+        var sim = sims[aktivFane];
+
+        if (e.key >= "1" && e.key <= "4") {
+            visFane(faner[parseInt(e.key, 10) - 1]);
+            return;
+        }
+        if (e.code === "Space") { e.preventDefault(); skiftPause(); return; }
+        if (e.key === "Escape") { visHjaelp(false); return; }
+        if (e.key === "?" || e.key === "h" || e.key === "H") {
+            visHjaelp(!NK.el("hjaelp").classList.contains("vis"));
+            return;
+        }
+        if (e.key === "r" || e.key === "R") {
+            if (sim && sim.nulstil) sim.nulstil();
+            return;
+        }
+        /* Paa byggefanen kan partiklerne ogsaa laegges i fra tastaturet:
+           lille bogstav laegger til, stort bogstav tager fra. */
+        if (aktivFane === "fane-byg" && sim) {
+            var kort = { p: "p", P: "p", n: "n", N: "n", e: "e", E: "e" };
+            var slags = kort[e.key];
+            if (slags) sim.aendr(slags, e.key === e.key.toUpperCase() ? -1 : 1);
+        }
+    }
+
+    /* ----- Opstart ------------------------------------------------------- */
+    function start() {
+        sims["fane-byg"] = new NK.SimByg();
+        sims["fane-isotop"] = new NK.SimIsotop();
+        sims["fane-ion"] = new NK.SimIon();
+        sims["fane-salt"] = new NK.SimSalt();
+        NK.sims = sims;              /* saa modellerne kan pilles ved fra konsollen */
+
+        var knapper = document.querySelectorAll(".faneknap");
+        function bindFane(knap) {
+            knap.addEventListener("click", function () { visFane(knap.getAttribute("data-fane")); });
+        }
+        for (var i = 0; i < knapper.length; i++) bindFane(knapper[i]);
+
+        var fartknapper = document.querySelectorAll(".tidsknap[data-fart]");
+        function bindFart(knap) {
+            knap.addEventListener("click", function () {
+                saetFart(parseFloat(knap.getAttribute("data-fart")), knap);
+            });
+        }
+        for (var j = 0; j < fartknapper.length; j++) bindFart(fartknapper[j]);
+
+        NK.el("hjaelpknap").addEventListener("click", function () { visHjaelp(true); });
+        NK.el("hjaelp-luk").addEventListener("click", function () { visHjaelp(false); });
+        NK.el("hjaelp").addEventListener("click", function (e) {
+            if (e.target.id === "hjaelp") visHjaelp(false);
+        });
+
+        document.addEventListener("keydown", tastatur);
+
+        for (var navn in sims) {
+            if (Object.prototype.hasOwnProperty.call(sims, navn)) sims[navn].tilpas();
+        }
+
+        /* Man kan linke direkte til en fane med fx  index.html#isotop  */
+        var oenske = (window.location.hash || "").replace(/^#/, "").toLowerCase();
+        visFane(sims["fane-" + oenske] ? "fane-" + oenske : "fane-byg");
+
+        sims["fane-byg"].nyOpgave();
+
+        window.requestAnimationFrame(function (ts) {
+            sidsteTid = ts;
+            window.requestAnimationFrame(loekke);
+        });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", start);
+    } else {
+        start();
+    }
+}());

@@ -221,3 +221,257 @@
         }
         this.fordeling = fordeling;
     };
+
+    /* ----- Opdatering --------------------------------------------------- */
+    NK.Atom.prototype.opdater = function (dt) {
+        if (dt > 0.05) dt = 0.05;
+        this.tid += dt;
+        this.puls = Math.max(0, this.puls - dt * 2.2);
+
+        var i;
+        for (i = this.nukleoner.length - 1; i >= 0; i--) {
+            var nu = this.nukleoner[i];
+            if (nu.tilstand === "kommer") {
+                nu.t += dt / FLYVETID;
+                if (nu.t >= 1) { nu.tilstand = "inde"; nu.x *= 0.2; nu.y *= 0.2; }
+                else {
+                    var f = blod(nu.t);
+                    nu.x = nu.sx * (1 - f);
+                    nu.y = nu.sy * (1 - f);
+                }
+            } else if (nu.tilstand === "gaar") {
+                nu.t += dt / FLYVETID;
+                if (nu.t >= 1) { this.nukleoner.splice(i, 1); continue; }
+                nu.x += nu.sx * 300 * dt;
+                nu.y += nu.sy * 300 * dt;
+            } else {
+                nu.fase += dt * 2.4;
+            }
+        }
+        this.pakKerne(dt);
+
+        for (i = this.elektroner.length - 1; i >= 0; i--) {
+            var el = this.elektroner[i];
+            el.glimt = Math.max(0, el.glimt - dt * 1.4);
+            if (el.tilstand === "kommer") {
+                el.t += dt / FLYVETID;
+                if (el.t >= 1) { el.tilstand = "inde"; el.glimt = 1; }
+            } else if (el.tilstand === "gaar") {
+                el.t += dt / FLYVETID;
+                if (el.t >= 1) { this.elektroner.splice(i, 1); continue; }
+            }
+        }
+
+        /* Skallerne drejer hver sin vej, saa billedet ikke stivner. */
+        for (i = 0; i < 4; i++) {
+            this.faser[i] += dt * ((i % 2 === 0) ? 1 : -1) * (0.72 - i * 0.12);
+        }
+    };
+
+    /* ----- Geometri ------------------------------------------------------ */
+    /* Alt regnes i "modelpixels" og skaleres foerst ved tegningen. Den
+       ydre stoerrelse er fast, saa et stort atom ogsaa SER stoerre ud
+       end et lille - i stedet for at hvert atom fylder det hele. */
+    var MODEL_YDRE = 176;
+
+    NK.Atom.prototype.geometri = function () {
+        var a = 0, i;
+        for (i = 0; i < this.nukleoner.length; i++) {
+            if (this.nukleoner[i].tilstand !== "gaar") a++;
+        }
+        var rN = nukleonRadius(a);
+        var rKerne = a <= 1 ? rN + 2 : rN * Math.pow(a, 1 / 3) * 1.05 + 2;
+        var rInder = rKerne + 30;
+        var rSkal = [];
+        for (i = 0; i < 4; i++) rSkal.push(rInder + i * 34);
+        return { rNukleon: rN, rKerne: rKerne, rSkal: rSkal, antalNukleoner: a };
+    };
+
+    /* Hvor skal elektron nr. plads af iSkal i skal nr. skal ligge?
+       lewis = true laaser den yderste skal fast i elektronprikformlens
+       moenster: én i hvert verdenshjoerne foerst, derefter par. */
+    NK.Atom.prototype.elektronVinkel = function (el, geo, lewis, yderste) {
+        var r = geo.rSkal[el.skal];
+        if (lewis && el.skal === yderste) {
+            var parAfstand = 8 / r;                      /* halv afstand i et par */
+            var hjoerner = [-Math.PI / 2, Math.PI / 2, 0, Math.PI];
+            if (el.iSkal <= 2 && el.skal === 0) {
+                if (el.iSkal === 1) return -Math.PI / 2;
+                return -Math.PI / 2 + (el.plads === 0 ? -parAfstand : parAfstand);
+            }
+            var i = el.plads;
+            if (i < 4) {
+                /* Faar denne plads en makker senere, rykker den til side. */
+                var faarPar = el.iSkal > 4 + i;
+                return hjoerner[i] + (faarPar ? -parAfstand : 0);
+            }
+            return hjoerner[i - 4] + parAfstand;
+        }
+        return this.faser[el.skal] + Math.PI * 2 * el.plads / Math.max(1, el.iSkal);
+    };
+
+    /* ----- Tegning -------------------------------------------------------- */
+    /* plads er den radius, atomet maa fylde. opt:
+         lewis           yderste skal laases i prikformlens moenster
+         fremhaevValens  ring om den yderste skal
+         ladning         farvet skaer: roedt for plus, blaat for minus
+         maerkat         tekst under atomet
+         daempet         0-1, hvor gennemsigtigt det hele tegnes         */
+    NK.Atom.prototype.tegn = function (ctx, cx, cy, plads, opt) {
+        opt = opt || {};
+        var geo = this.geometri();
+        var s = plads / MODEL_YDRE;
+        var i;
+        this.sidsteGeo = { cx: cx, cy: cy, s: s, geo: geo };
+
+        ctx.save();
+        if (opt.daempet) ctx.globalAlpha = 1 - opt.daempet;
+
+        var antalSkaller = this.fordeling.length;
+        var yderste = antalSkaller - 1;
+
+        /* Ladningens skaer ligger bagest, saa det ikke sloerer partiklerne. */
+        if (opt.ladning) {
+            var ydreR = (geo.rSkal[Math.max(0, yderste)] + 26) * s;
+            NK.skaer(ctx, cx, cy, ydreR,
+                opt.ladning > 0 ? "rgba(224, 84, 70, 0.20)" : "rgba(61, 158, 224, 0.22)");
+        }
+
+        /* Skallerne */
+        for (i = 0; i < antalSkaller; i++) {
+            var erValens = (i === yderste);
+            ctx.beginPath();
+            ctx.arc(cx, cy, geo.rSkal[i] * s, 0, Math.PI * 2);
+            ctx.strokeStyle = (erValens && opt.fremhaevValens) ? FARVE.skalValens : FARVE.skal;
+            ctx.lineWidth = (erValens && opt.fremhaevValens) ? 2 : 1;
+            ctx.stroke();
+        }
+
+        /* Kernen: et skaer, og saa partiklerne oven i hinanden */
+        var rK = geo.rKerne * s;
+        NK.skaer(ctx, cx, cy, rK * 2.6, "rgba(224, 84, 70, 0.18)");
+        if (this.puls > 0) NK.skaer(ctx, cx, cy, rK * 3.4, "rgba(255, 255, 255, 0.16)", this.puls);
+
+        var sorteret = this.nukleoner.slice().sort(function (a, b) { return a.y - b.y; });
+        var rN = geo.rNukleon * s;
+        for (i = 0; i < sorteret.length; i++) {
+            var nu = sorteret[i];
+            var alfa = nu.tilstand === "gaar" ? (1 - nu.t) : 1;
+            tegnKugle(ctx, cx + nu.x * s, cy + nu.y * s, rN,
+                nu.slags === "proton" ? FARVE.protonLys : FARVE.neutronLys,
+                nu.slags === "proton" ? FARVE.proton : FARVE.neutron, alfa);
+            if (nu.slags === "proton" && rN > 6.2) {
+                NK.tekst(ctx, "+", cx + nu.x * s, cy + nu.y * s + 0.5, {
+                    font: "700 " + Math.round(rN * 1.25) + "px 'Segoe UI', sans-serif",
+                    justering: "center", linje: "middle",
+                    farve: "rgba(255, 255, 255, " + (0.85 * alfa) + ")"
+                });
+            }
+        }
+
+        /* Elektronerne */
+        var rE = NK.klamp(6.6 * s, 3.4, 8);
+        for (i = 0; i < this.elektroner.length; i++) {
+            var el = this.elektroner[i];
+            var alfaE = 1;
+
+            if (el.tilstand === "gaar") {
+                if (!el.fanget) {
+                    el.fanget = true;
+                    var l = Math.sqrt(el.x * el.x + el.y * el.y) || 1;
+                    el.sx = el.x; el.sy = el.y;
+                    el.rx = this.retning ? this.retning.x : el.x / l;
+                    el.ry = this.retning ? this.retning.y : el.y / l;
+                }
+                el.x = el.sx + el.rx * el.t * 340;
+                el.y = el.sy + el.ry * el.t * 340;
+                alfaE = 1 - el.t;
+            } else {
+                var v = this.elektronVinkel(el, geo, opt.lewis, yderste);
+                var r = geo.rSkal[el.skal];
+                var mx = Math.cos(v) * r, my = Math.sin(v) * r;
+                if (el.tilstand === "kommer") {
+                    var f = blod(el.t);
+                    el.x = NK.lerp(el.sx, mx, f);
+                    el.y = NK.lerp(el.sy, my, f);
+                } else {
+                    el.x = mx; el.y = my;
+                }
+            }
+
+            var ex = cx + el.x * s, ey = cy + el.y * s;
+            if (el.glimt > 0) NK.skaer(ctx, ex, ey, rE * 4, "rgba(242, 197, 61, 0.55)", el.glimt * alfaE);
+            NK.skaer(ctx, ex, ey, rE * 2.1, "rgba(242, 197, 61, 0.30)", alfaE);
+            tegnKugle(ctx, ex, ey, rE, FARVE.elektronLys, FARVE.elektron, alfaE);
+        }
+
+        if (opt.maerkat) {
+            var underR = (geo.rSkal[Math.max(0, yderste)]) * s + 24;
+            NK.tekst(ctx, opt.maerkat, cx, cy + underR, {
+                font: "700 " + Math.round(NK.klamp(19 * s, 13, 21)) + "px 'Segoe UI', sans-serif",
+                justering: "center", linje: "middle", farve: "#e9eef4", kant: true
+            });
+        }
+
+        ctx.restore();
+    };
+
+    function tegnKugle(ctx, x, y, r, lys, moerk, alfa) {
+        var g = ctx.createRadialGradient(x - r * 0.35, y - r * 0.35, r * 0.1, x, y, r);
+        g.addColorStop(0, lys);
+        g.addColorStop(1, moerk);
+        ctx.globalAlpha = alfa === undefined ? 1 : alfa;
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    }
+    NK.tegnKugle = tegnKugle;
+}());
+
+/* =====================================================================
+   Skalmaerkaterne: "2/2", "8/8", "1/8" lige uden for hver skal.
+
+   De staar skraat nedad til venstre, hvor der hverken er en
+   elektronprikformel eller en tekst i vejen, og de siger baade hvor
+   mange elektroner der ER i skallen, og hvor mange der er PLADS til.
+   Det er den halvdel af oktetreglen, tegninger plejer at udelade.
+   ===================================================================== */
+(function () {
+    "use strict";
+
+    var NK = window.NK;
+
+    NK.tegnSkaltal = function (ctx, atom, vinkel) {
+        var g = atom.sidsteGeo;
+        if (!g || !atom.fordeling.length) return;
+        var v = vinkel === undefined ? Math.PI * 0.75 : vinkel;
+        var pladser = NK.Data.SKALPLADSER;
+
+        for (var i = 0; i < atom.fordeling.length; i++) {
+            var r = g.geo.rSkal[i] * g.s + 15;
+            var x = g.cx + Math.cos(v) * r;
+            var y = g.cy + Math.sin(v) * r;
+            var fuld = atom.fordeling[i] === pladser[i];
+            var tekst = atom.fordeling[i] + "/" + pladser[i];
+
+            ctx.save();
+            ctx.font = "700 11px 'Segoe UI', sans-serif";
+            var b = ctx.measureText(tekst).width + 12;
+            NK.rundtRekt(ctx, x - b / 2, y - 9, b, 18, 9);
+            ctx.fillStyle = fuld ? "rgba(63, 174, 114, 0.22)" : "rgba(20, 20, 26, 0.78)";
+            ctx.fill();
+            ctx.strokeStyle = fuld ? "rgba(63, 174, 114, 0.75)" : "rgba(255, 255, 255, 0.16)";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.restore();
+
+            NK.tekst(ctx, tekst, x, y + 0.5, {
+                font: "700 11px 'Segoe UI', sans-serif",
+                justering: "center", linje: "middle",
+                farve: fuld ? "#7ee0a8" : "#c8ced6"
+            });
+        }
+    };
+}());

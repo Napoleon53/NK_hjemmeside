@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atombyggeren</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚛</span> Atom<span class="lang">byggeren</span></h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-byg" role="tab" aria-selected="true"><span class="nr">1</span>Byg et atom</button>
+        <button class="faneknap" data-fane="fane-isotop" role="tab" aria-selected="false"><span class="nr">2</span>Isotoper</button>
+        <button class="faneknap" data-fane="fane-ion" role="tab" aria-selected="false"><span class="nr">3</span>Skaller og ioner</button>
+        <button class="faneknap" data-fane="fane-salt" role="tab" aria-selected="false"><span class="nr">4</span>Salte</button>
+    </div>
+
+    <div class="tidsboks">
+        <span class="mrk">Elektroner</span>
+        <button class="tidsknap" data-fart="0" title="Sæt elektronerne på pause">⏸</button>
+        <button class="tidsknap" data-fart="0.5">0,5×</button>
+        <button class="tidsknap aktiv" data-fart="1">1×</button>
+        <button class="tidsknap" data-fart="2">2×</button>
+    </div>
+
+    <button class="ikonknap" id="hjaelpknap" title="Hjælp og genveje" aria-label="Hjælp">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: BYG ET ATOM                                                -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-byg" role="tabpanel" aria-label="Byg et atom">
+    <div class="scene medtekst">
+        <canvas id="byg-laerred"></canvas>
+
+        <div class="nuklid" aria-label="Det du har bygget">
+            <span class="a" id="byg-nuklid-a">1</span>
+            <span class="z" id="byg-nuklid-z">1</span>
+            <span class="sym" id="byg-nuklid-sym">H</span>
+            <span class="q" id="byg-nuklid-q"></span>
+        </div>
+
+        <div class="scene-mrk" id="byg-hint">Læg protoner, neutroner og elektroner i — og hold øje med, hvad hver af dem gør ved atomet.</div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort">
+            <h2>Læg partikler i</h2>
+
+            <div class="partikel">
+                <span class="prik proton"></span>
+                <span class="pnavn">Protoner <b>p⁺</b><em>bestemmer grundstoffet</em></span>
+                <button class="talknap" id="byg-p-minus" type="button" aria-label="Fjern en proton">−</button>
+                <span class="antal" id="byg-p-antal">1</span>
+                <button class="talknap plus" id="byg-p-plus" type="button" aria-label="Tilføj en proton">+</button>
+            </div>
+
+            <div class="partikel">
+                <span class="prik neutron"></span>
+                <span class="pnavn">Neutroner <b>n</b><em>bestemmer isotopen</em></span>
+                <button class="talknap" id="byg-n-minus" type="button" aria-label="Fjern en neutron">−</button>
+                <span class="antal" id="byg-n-antal">0</span>
+                <button class="talknap plus" id="byg-n-plus" type="button" aria-label="Tilføj en neutron">+</button>
+            </div>
+
+            <div class="partikel">
+                <span class="prik elektron"></span>
+                <span class="pnavn">Elektroner <b>e⁻</b><em>bestemmer ladningen</em></span>
+                <button class="talknap" id="byg-e-minus" type="button" aria-label="Fjern en elektron">−</button>
+                <span class="antal" id="byg-e-antal">1</span>
+                <button class="talknap plus" id="byg-e-plus" type="button" aria-label="Tilføj en elektron">+</button>
+            </div>
+
+            <div class="knaprad">
+                <button class="knap" id="byg-neutral" type="button">Gør det neutralt</button>
+                <button class="knap" id="byg-almindelig" type="button">Almindelig isotop</button>
+            </div>
+            <label class="tjek"><input type="checkbox" id="byg-lewis"><span>Lås elektronerne i prikformel</span></label>
+            <button class="knap nulstil" id="byg-nulstil" type="button"><span>Ryd alt, og byg fra bunden</span><span class="tegn">↺</span></button>
+        </div>
+
+        <div class="kort fremhaev">
+            <h2>Det har du bygget</h2>
+            <div class="stor" id="byg-grundstof">Hydrogen</div>
+            <span class="maerke groen" id="byg-type">Neutralt atom</span>
+            <div class="talraekke"><span>Massetal A = p + n</span><span class="tal" id="byg-massetal">1 (1 + 0)</span></div>
+            <div class="talraekke"><span>Ladning = p − e</span><span class="tal groen" id="byg-ladning">0  (1 − 1)</span></div>
+            <div class="talraekke"><span>Elektroner i skallerne</span><span class="tal gul" id="byg-fordeling">1</span></div>
+            <p class="besked god" id="byg-kerne" style="margin-top:9px;"></p>
+        </div>
+
+        <div class="kort">
+            <h2>De tre regler</h2>
+            <div class="regel" id="byg-regel-p"><b>Protoner</b> → hvilket grundstof det er. Ændrer du protontallet, er det et helt andet stof.</div>
+            <div class="regel" id="byg-regel-n"><b>Neutroner</b> → hvilken isotop det er. Samme stof, anden masse.</div>
+            <div class="regel" id="byg-regel-e"><b>Elektroner</b> → hvilken ladning det har. Lige mange som protoner = neutralt atom; ellers en ion.</div>
+        </div>
+
+        <div class="kort opgavekort">
+            <h2>Opgave <span class="taeller">løst: <b id="byg-opgave-tal">0</b></span></h2>
+            <p class="besked" id="byg-opgave">Tryk på "Ny opgave" for at komme i gang.</p>
+            <div class="knaprad">
+                <button class="knap blaa" id="byg-opgave-ny" type="button">Ny opgave</button>
+                <button class="knap" id="byg-opgave-svar" type="button">Vis svaret</button>
+            </div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: ISOTOPER                                                   -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-isotop" role="tabpanel" aria-label="Isotoper">
+    <div class="scene medtekst">
+        <canvas id="iso-laerred"></canvas>
+        <div class="scene-mrk">Vippen balancerer dér, hvor den <b>gennemsnitlige atommasse</b> ligger. Store lodder trækker mest — derfor ligger gennemsnittet tæt på den isotop, der er mest af.</div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort">
+            <h2>Vælg grundstof</h2>
+            <select id="iso-grundstof" class="vaelger"></select>
+            <p class="note" id="iso-forklaring"></p>
+        </div>
+
+        <div class="kort">
+            <h2>Blandingen</h2>
+            <p class="note" style="margin-top:0;">Skru på andelene, og se balancepunktet flytte sig.</p>
+            <div id="iso-liste"></div>
+            <button class="knap groen" id="iso-natur" type="button" style="margin-top:10px;"><span>Tilbage til naturens blanding</span><span class="tegn">🌍</span></button>
+        </div>
+
+        <div class="kort maaling">
+            <div class="massevis">
+                <span class="mmrk">Gennemsnitlig atommasse</span>
+                <span class="mtal" id="iso-masse">35,453 u</span>
+            </div>
+            <div class="talraekke"><span>Står i det periodiske system</span><span class="tal blaa" id="iso-tabelmasse">35,450 u</span></div>
+            <p class="besked god" id="iso-afvig" style="margin-top:9px;"></p>
+        </div>
+
+        <div class="kort">
+            <h2>Regnestykket</h2>
+            <div class="ligning" id="iso-regnestykke"></div>
+            <p class="note">Hver isotops masse ganges med, hvor stor en del af stoffet den udgør. Derfor er atommassen næsten aldrig et helt tal.</p>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: SKALLER OG IONER                                           -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-ion" role="tabpanel" aria-label="Skaller og ioner">
+    <div class="scene medtekst">
+        <canvas id="ion-laerred"></canvas>
+        <div class="scene-mrk" id="ion-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort">
+            <h2>Grundstof</h2>
+            <div class="grundhoved">
+                <span class="gsymbol" id="ion-symbol">Na</span>
+                <span class="gnavn"><b id="ion-navn">Natrium</b><em>atomnummer <span id="ion-z">11</span></em></span>
+                <span class="maerke roed" id="ion-type">Metal</span>
+            </div>
+            <div class="skyder">
+                <label><span>Vælg grundstof (1–20)</span></label>
+                <input type="range" id="ion-skyder" min="1" max="20" step="1" value="11">
+            </div>
+            <div class="talraekke"><span>Elektroner i skallerne</span><span class="tal gul" id="ion-fordeling">2, 8, 1</span></div>
+            <div class="talraekke"><span>I yderste skal</span><span class="tal" id="ion-valens">1</span></div>
+            <label class="tjek"><input type="checkbox" id="ion-lewis" checked><span>Lås yderste skal i prikformel</span></label>
+        </div>
+
+        <div class="kort fremhaev">
+            <h2>Vejen til en ædelgas</h2>
+            <div class="maaler"><div class="maalerfyld groen" id="ion-afstand-bar"></div></div>
+            <div class="tal groen" id="ion-afstand" style="display:block;margin-top:6px;font-size:0.88rem;"></div>
+            <p class="besked" id="ion-oktet" style="margin-top:9px;"></p>
+        </div>
+
+        <div class="kort">
+            <h2>Bliver det til en ion?</h2>
+            <button class="knap stor orange" id="ion-gaet-knap" type="button"><span>Gæt ionens ladning</span><span class="tegn">?</span></button>
+
+            <div class="gaetboks" id="ion-gaet-boks">
+                <p class="gaetsp" id="ion-gaet-sp"></p>
+                <p class="note" id="ion-gaet-hint" style="margin-top:0;"></p>
+                <div class="gaetvalg" id="ion-gaet-valg"></div>
+                <p class="besked" id="ion-gaet-svar"></p>
+            </div>
+
+            <button class="knap stor groen" id="ion-videre" type="button" style="display:none;"><span>Vis mig elektronerne</span><span class="tegn">→</span></button>
+            <p class="besked" id="ion-resultat" style="margin-top:9px;"></p>
+            <div class="knaprad">
+                <button class="knap" id="ion-nulstil" type="button" style="display:none;">Tilbage til atomet</button>
+                <button class="knap blaa" id="ion-naeste" type="button" style="display:none;">Prøv et nyt grundstof</button>
+            </div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 4: SALTE                                                      -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-salt" role="tabpanel" aria-label="Salte">
+    <div class="scene medtekst">
+        <canvas id="salt-laerred"></canvas>
+        <div class="scene-mrk" id="salt-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort">
+            <h2>Vælg to grundstoffer</h2>
+            <label class="vlabel" for="salt-metal">Metal — afgiver elektroner</label>
+            <select id="salt-metal" class="vaelger"></select>
+            <p class="note" id="salt-metal-info"></p>
+
+            <label class="vlabel" for="salt-ikkemetal" style="margin-top:12px;">Ikke-metal — optager elektroner</label>
+            <select id="salt-ikkemetal" class="vaelger"></select>
+            <p class="note" id="salt-ikkemetal-info"></p>
+        </div>
+
+        <div class="kort fremhaev">
+            <h2>Hvor mange af hver?</h2>
+            <p class="besked" id="salt-forhold"></p>
+        </div>
+
+        <div class="kort maaling">
+            <div class="formelvis">
+                <span class="fformel" id="salt-formel">NaCl</span>
+                <span class="fnavn" id="salt-navn">natriumchlorid</span>
+            </div>
+            <div class="ligning" id="salt-balance"></div>
+            <p class="note">Ladningerne skal gå lige op. Et salt er altid neutralt udadtil.</p>
+        </div>
+
+        <div class="kort">
+            <h2>Kør forsøget</h2>
+            <button class="knap stor orange" id="salt-overfoer" type="button"><span>Overfør elektronerne</span><span class="tegn">⚡</span></button>
+            <button class="knap stor groen" id="salt-saml" type="button" style="margin-top:7px;"><span>Saml ionerne til et salt</span><span class="tegn">🧂</span></button>
+            <button class="knap nulstil" id="salt-nulstil" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="hjaelp">
+    <div class="overlay-boks">
+        <h2>Atombyggeren</h2>
+        <p>Fire faner om det samme spørgsmål: <b>hvad er et atom lavet af, og hvad sker der, når man ændrer på delene?</b> Alt bygger på de samme tre tal — protoner, neutroner og elektroner — så det, du lærer på én fane, kan bruges på de næste.</p>
+
+        <h3>De fire faner</h3>
+        <ul>
+            <li><b>Byg et atom</b> — læg partiklerne i én ad gangen. Hver gang får du at vide, hvad der skete: nyt grundstof, ny isotop eller ny ladning. Løs opgaverne, og byg fx ¹⁴C eller Mg²⁺.</li>
+            <li><b>Isotoper</b> — hvorfor står der 35,45 ved chlor, når ingen chlorkerne vejer 35,45? Flyt på blandingen, og se balancepunktet følge med.</li>
+            <li><b>Skaller og ioner</b> — den yderste skal afgør det hele. Gæt ladningen, før du får den at se, og hold øje med, at kernen aldrig ændrer sig.</li>
+            <li><b>Salte</b> — kombinér et metal og et ikke-metal frit. Modellen tæller selv ud, hvor mange atomer der skal til, før elektronregnskabet går op.</li>
+        </ul>
+
+        <h3>Prøv det her</h3>
+        <ul>
+            <li>Byg hydrogen, og tilføj så én neutron. Samme grundstof — men nu deuterium. Tilføj én mere: tritium, som er radioaktiv.</li>
+            <li>Byg natrium, og fjern én elektron. Læg mærke til, at kernen slet ikke ændrer sig — det er stadig natrium, bare som ion.</li>
+            <li>Tag 6 protoner og 8 neutroner. Det er ¹⁴C, den isotop man daterer oldtidsfund med.</li>
+            <li>Sæt chlor på isotopfanen, og træk ³⁷Cl op på 50 %. Hvad sker der med atommassen — og hvorfor passer den så ikke længere med det periodiske system?</li>
+            <li>Sæt aluminium sammen med oxygen på saltfanen. Hvorfor bliver det Al₂O₃ og ikke AlO?</li>
+        </ul>
+
+        <h3>Genveje</h3>
+        <p>
+            <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> skift fane &nbsp;·&nbsp;
+            <kbd>p</kbd> <kbd>n</kbd> <kbd>e</kbd> læg en partikel i &nbsp;·&nbsp;
+            <kbd>P</kbd> <kbd>N</kbd> <kbd>E</kbd> tag en ud &nbsp;·&nbsp;
+            <kbd>mellemrum</kbd> pause &nbsp;·&nbsp;
+            <kbd>R</kbd> nulstil fanen &nbsp;·&nbsp;
+            <kbd>H</kbd> denne hjælp &nbsp;·&nbsp;
+            <kbd>Esc</kbd> luk
+        </p>
+
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="hjaelp-luk" style="justify-content:center;">Luk og kom i gang</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/atom.js"></script>
+<script src="js/sim_byg.js"></script>
+<script src="js/sim_isotop.js"></script>
+<script src="js/sim_ion.js"></script>
+<script src="js/sim_salt.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
