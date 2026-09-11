@@ -35,9 +35,11 @@
 
     /* Mere end 5 af samme slags proppet ind i klumpen ser bare fjollet ud
        - smaa prikker der overlapper hinanden, umulige at taelle. Derfor
-       vises hoejst 5 af hver slags; det praecise antal staar i forvejen i
-       nuklidmaerkatet og i tal-panelet. */
+       samles de i ÉT symbol med et multiplikationstal paa - "16×" i
+       stedet for seksten overlappende cirkler. Det praecise antal staar
+       i forvejen ogsaa i nuklidmaerkatet og i tal-panelet. */
     var VIS_MAKS_NUKLEON = 5;
+    var GRUPPE_SKALA = 1.65;  /* hvor meget stoerre gruppe-symbolet er */
 
     function blod(t) { return t * t * (3 - 2 * t); }
 
@@ -51,6 +53,8 @@
         var r = straks ? Math.random() * 12 : 150 + Math.random() * 60;
         return {
             slags: slags,
+            gruppe: false,        /* staar for flere end VIS_MAKS_NUKLEON */
+            gruppeAntal: 1,
             x: Math.cos(v) * r,
             y: Math.sin(v) * r,
             fase: Math.random() * Math.PI * 2,
@@ -99,16 +103,44 @@
         this.nukleoner.length = 0;
         this.elektroner.length = 0;
         this.p = p; this.n = n; this.e = e;
-        var i;
-        for (i = 0; i < Math.min(p, VIS_MAKS_NUKLEON); i++) this.nukleoner.push(nyNukleon("proton", true));
-        for (i = 0; i < Math.min(n, VIS_MAKS_NUKLEON); i++) this.nukleoner.push(nyNukleon("neutron", true));
+        var i, ny;
+
+        if (p > VIS_MAKS_NUKLEON) {
+            ny = nyNukleon("proton", true);
+            ny.gruppe = true; ny.gruppeAntal = p;
+            this.nukleoner.push(ny);
+        } else {
+            for (i = 0; i < p; i++) this.nukleoner.push(nyNukleon("proton", true));
+        }
+
+        if (n > VIS_MAKS_NUKLEON) {
+            ny = nyNukleon("neutron", true);
+            ny.gruppe = true; ny.gruppeAntal = n;
+            this.nukleoner.push(ny);
+        } else {
+            for (i = 0; i < n; i++) this.nukleoner.push(nyNukleon("neutron", true));
+        }
+
         for (i = 0; i < e; i++) this.elektroner.push(nyElektron(true));
         this.fordelElektroner();
     };
 
+    /* Sender en nukleon paa vej ud af klumpen. */
+    function udGaaende(u) {
+        u.tilstand = "gaar";
+        u.t = 0;
+        var laengde = Math.sqrt(u.x * u.x + u.y * u.y) || 1;
+        u.sx = u.x / laengde;
+        u.sy = u.y / laengde;
+    }
+
     /* ----- Kernen ------------------------------------------------------ */
+    /* Er der flere end 5 af denne slags, vises de IKKE enkeltvis - i
+       stedet faar man ét symbol med et multiplikationstal paa, "16×",
+       ligesom man selv ville forkorte det paa papir. */
     NK.Atom.prototype.saetNukleoner = function (slags, antal) {
-        var maal = Math.min(antal, VIS_MAKS_NUKLEON);
+        var grupperet = antal > VIS_MAKS_NUKLEON;
+        var maal = grupperet ? 1 : antal;
         var levende = [];
         var i;
         for (i = 0; i < this.nukleoner.length; i++) {
@@ -116,28 +148,50 @@
                 levende.push(this.nukleoner[i]);
             }
         }
+
+        /* Skifter man mellem enkeltvis og grupperet visning, forlader de
+           gamle symboler klumpen, og den nye slags flyver ind i stedet -
+           man blander ikke fx tre prikker med ét gruppesymbol. */
+        if (levende.length && !!levende[0].gruppe !== grupperet) {
+            for (i = 0; i < levende.length; i++) udGaaende(levende[i]);
+            levende = [];
+            this.puls = 1;
+        }
+
         var forskel = maal - levende.length;
         if (forskel > 0) {
-            for (i = 0; i < forskel; i++) this.nukleoner.push(nyNukleon(slags, false));
+            for (i = 0; i < forskel; i++) {
+                var ny = nyNukleon(slags, false);
+                ny.gruppe = grupperet;
+                ny.gruppeAntal = antal;
+                this.nukleoner.push(ny);
+            }
             this.puls = 1;
         } else if (forskel < 0) {
             /* Den yderste ryger foerst - saa ser man den forlade klumpen. */
             levende.sort(function (a, b) {
                 return (b.x * b.x + b.y * b.y) - (a.x * a.x + a.y * a.y);
             });
-            for (i = 0; i < -forskel; i++) {
-                var u = levende[i];
-                u.tilstand = "gaar";
-                u.t = 0;
-                var laengde = Math.sqrt(u.x * u.x + u.y * u.y) || 1;
-                u.sx = u.x / laengde;
-                u.sy = u.y / laengde;
-            }
+            for (i = 0; i < -forskel; i++) udGaaende(levende[i]);
             this.puls = 1;
+        }
+
+        /* Gruppens tal skal altid vaere det sande antal, ogsaa naar det
+           aendrer sig, uden at et nyt symbol flyver ind. */
+        if (grupperet) {
+            for (i = 0; i < this.nukleoner.length; i++) {
+                var nu = this.nukleoner[i];
+                if (nu.slags === slags && nu.tilstand !== "gaar" && nu.gruppeAntal !== antal) {
+                    nu.gruppeAntal = antal;
+                    this.puls = 1;
+                }
+            }
         }
     };
 
-    /* Pakker nukleonerne: traek mod midten, og skub overlap fra hinanden. */
+    /* Pakker nukleonerne: traek mod midten, og skub overlap fra hinanden.
+       Gruppesymboler er GRUPPE_SKALA gange saa store, saa de skal ogsaa
+       skubbes laengere fra hinanden end de enkeltvise symboler. */
     NK.Atom.prototype.pakKerne = function (dt) {
         var inde = [];
         var i, j;
@@ -156,12 +210,14 @@
             a.y += Math.sin(a.fase * 1.3) * 5 * dt;
         }
 
+        function effektivR(u) { return u.gruppe ? r * GRUPPE_SKALA : r; }
+
         /* To gennemloeb er rigeligt til at faa klumpen til at ligge paent. */
-        var mindst = r * 1.86;
         for (var runde = 0; runde < 2; runde++) {
             for (i = 0; i < inde.length; i++) {
                 for (j = i + 1; j < inde.length; j++) {
                     var p = inde[i], q = inde[j];
+                    var mindst = (effektivR(p) + effektivR(q)) * 0.93;
                     var dx = q.x - p.x, dy = q.y - p.y;
                     var d2 = dx * dx + dy * dy;
                     if (d2 > mindst * mindst || d2 === 0) continue;
