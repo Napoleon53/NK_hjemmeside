@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saltbyggeren</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚖</span> Salt<span class="lang">byggeren</span></h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-byg" role="tab" aria-selected="true"><span class="nr">1</span>Byg et salt</button>
+        <button class="faneknap" data-fane="fane-navn" role="tab" aria-selected="false"><span class="nr">2</span>Fra navn til formel</button>
+        <button class="faneknap" data-fane="fane-formel" role="tab" aria-selected="false"><span class="nr">3</span>Fra formel til navn</button>
+        <button class="faneknap" data-fane="fane-vand" role="tab" aria-selected="false"><span class="nr">4</span>Opløs i vand</button>
+    </div>
+
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Hjælp og genveje" aria-label="Hjælp">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: BYG ET SALT                                                -->
+<!-- Hylderne og knapperne ud for raekkerne bygges af bord.js           -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-byg" role="tabpanel" aria-label="Byg et salt">
+    <div class="scene medtekst" id="byg-scene">
+        <canvas id="byg-laerred"></canvas>
+        <div class="scene-mrk" id="byg-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling">
+            <h2>Formlen</h2>
+            <div class="formelvis">
+                <span class="fformel" id="byg-formel"></span>
+                <span class="fnavn" id="byg-navn"></span>
+            </div>
+            <p class="note" id="byg-atomer"></p>
+            <p class="besked gul" id="byg-note" style="margin-top:8px; display:none;"></p>
+        </div>
+
+        <div class="kort">
+            <h2>Ladningsregnskab</h2>
+            <div class="talraekke"><span id="byg-l-kat"></span><span class="tal roed" id="byg-q-kat">0</span></div>
+            <div class="talraekke"><span id="byg-l-an"></span><span class="tal blaa" id="byg-q-an">0</span></div>
+            <div class="talraekke sum"><span>I alt</span><span class="tal" id="byg-q-sum">0</span></div>
+        </div>
+
+        <div class="kort">
+            <button class="knap stor blaa" id="byg-afstem" type="button"><span>Afstem for mig</span><span class="tegn">⚖</span></button>
+            <label class="tjek"><input type="checkbox" id="byg-navne" checked> Vis navne på ionerne</label>
+            <button class="knap nulstil" id="byg-ryd" type="button"><span>Ryd bordet</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: FRA NAVN TIL FORMEL                                        -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-navn" role="tabpanel" aria-label="Fra navn til formel">
+    <div class="scene medtekst" id="navn-scene">
+        <canvas id="navn-laerred"></canvas>
+        <div class="scene-mrk" id="navn-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort">
+            <h2>Byg stoffet <span class="taeller">løst: <b id="navn-loest">0</b></span></h2>
+            <div class="opgave-prompt" id="navn-prompt"></div>
+            <ol class="trin">
+                <li class="trin-punkt" id="navn-t1">Find de to ioner</li>
+                <li class="trin-punkt" id="navn-t2">Få ladningen til at gå op</li>
+                <li class="trin-punkt" id="navn-t3">Vælg den rigtige formel</li>
+            </ol>
+        </div>
+
+        <div class="kort" id="navn-valgkort" hidden>
+            <h2>Hvordan skrives formlen?</h2>
+            <div class="valg" id="navn-valg"></div>
+            <p class="besked" id="navn-svar"></p>
+        </div>
+
+        <div class="kort">
+            <div class="knaprad taet">
+                <button class="knap" id="navn-vis" type="button">Vis svaret</button>
+                <button class="knap blaa" id="navn-ny" type="button">Ny opgave</button>
+            </div>
+            <label class="tjek"><input type="checkbox" id="navn-navne"> Vis navne på ionerne</label>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: FRA FORMEL TIL NAVN                                        -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-formel" role="tabpanel" aria-label="Fra formel til navn">
+    <div class="scene medtekst" id="formel-scene">
+        <canvas id="formel-laerred"></canvas>
+        <div class="scene-mrk" id="formel-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort">
+            <h2>Hvad er det for et stof? <span class="taeller">løst: <b id="formel-loest">0</b></span></h2>
+            <div class="opgave-prompt" id="formel-prompt"></div>
+            <ol class="trin">
+                <li class="trin-punkt" id="formel-t1">Læg ionerne på bordet</li>
+                <li class="trin-punkt" id="formel-t2">Vælg det rigtige navn</li>
+            </ol>
+        </div>
+
+        <div class="kort" id="formel-valgkort" hidden>
+            <h2>Hvad hedder stoffet?</h2>
+            <div class="valg navne" id="formel-valg"></div>
+            <p class="besked" id="formel-svar"></p>
+        </div>
+
+        <div class="kort">
+            <div class="knaprad taet">
+                <button class="knap" id="formel-vis" type="button">Vis svaret</button>
+                <button class="knap blaa" id="formel-ny" type="button">Ny opgave</button>
+            </div>
+            <label class="tjek"><input type="checkbox" id="formel-navne"> Vis navne på ionerne</label>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 4: OPLØS I VAND                                               -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-vand" role="tabpanel" aria-label="Opløs i vand">
+    <div class="scene medtekst">
+        <canvas id="vand-laerred"></canvas>
+        <div class="scene-mrk" id="vand-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort opgavekort">
+            <h2><span id="vand-overskrift">Hvad kommer der ud i vandet?</span> <span class="taeller">løst: <b id="vand-loest">0</b></span></h2>
+            <p class="opgave-spm" id="vand-spm"></p>
+            <div class="valg en-spalte" id="vand-valg"></div>
+            <p class="besked" id="vand-svar"></p>
+            <div class="knaprad">
+                <button class="knap" id="vand-vis" type="button">Vis svaret</button>
+                <button class="knap blaa" id="vand-ny" type="button">Ny opgave</button>
+            </div>
+        </div>
+
+        <div class="kort maaling" id="vand-talkort" hidden>
+            <h2>I glasset</h2>
+            <div class="talraekke"><span id="vand-l-kat"></span><span class="tal roed" id="vand-n-kat"></span></div>
+            <div class="talraekke"><span id="vand-l-an"></span><span class="tal blaa" id="vand-n-an"></span></div>
+            <div class="talraekke"><span>Forhold</span><span class="tal groen" id="vand-forhold"></span></div>
+        </div>
+
+        <div class="kort">
+            <h2>Vælg selv et salt</h2>
+            <select id="vand-kat" class="vaelger" aria-label="Positiv ion"></select>
+            <select id="vand-an" class="vaelger" aria-label="Negativ ion" style="margin-top:6px;"></select>
+            <button class="knap stor groen" id="vand-haeld" type="button" style="margin-top:9px;"><span>Hæld det i vandet</span><span class="tegn">↓</span></button>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="hjaelp">
+    <div class="overlay-boks">
+        <h2>Saltbyggeren</h2>
+        <p>Et salt er bygget af positive og negative ioner, og det er altid <b>neutralt</b>: der er lige så meget plus som minus. Alle fire faner handler om den regel.</p>
+
+        <h3>Lynlåsen</h3>
+        <p>Hvert kort er lige så bredt, som ionen har ladning. Plusserne og minusserne mødes på midten som tænderne i en lynlås. Lukker den hele vejen, er saltet neutralt. Mangler der noget, så giv den korteste række én ion mere.</p>
+
+        <h3>De fire faner</h3>
+        <ul>
+            <li><b>Byg et salt</b> — byg frit, og se formlen og navnet.</li>
+            <li><b>Fra navn til formel</b> — byg stoffet ud fra navnet, og vælg den rigtige skrivemåde.</li>
+            <li><b>Fra formel til navn</b> — find ionerne i formlen, og navngiv stoffet.</li>
+            <li><b>Opløs i vand</b> — hvad bliver der af ionerne, når saltet opløses?</li>
+        </ul>
+
+        <h3>Prøv det her</h3>
+        <ul>
+            <li>Læg Al³⁺ og SO₄²⁻ på bordet. Hvorfor bliver det Al₂(SO₄)₃?</li>
+            <li>Byg 2 Mg²⁺ og 2 SO₄²⁻. Lynlåsen lukker — men hvorfor hedder formlen MgSO₄?</li>
+            <li>Hæld calciumphosphat i vandet på fane 4. Hvad sker der?</li>
+        </ul>
+
+        <h3>Genveje</h3>
+        <p>
+            <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> skift fane &nbsp;·&nbsp;
+            <kbd>R</kbd> start forfra &nbsp;·&nbsp;
+            <kbd>H</kbd> denne hjælp &nbsp;·&nbsp;
+            <kbd>Esc</kbd> luk
+        </p>
+
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="hjaelp-luk" type="button" style="justify-content:center;">Luk og kom i gang</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/opgave.js"></script>
+<script src="js/bord.js"></script>
+<script src="js/sim_byg.js"></script>
+<script src="js/sim_navn.js"></script>
+<script src="js/sim_formel.js"></script>
+<script src="js/sim_vand.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
