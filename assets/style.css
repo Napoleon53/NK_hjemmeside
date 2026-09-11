@@ -217,6 +217,8 @@ p  { margin: 0 0 1.1em; }
 .sektion-hoved { max-width: var(--bredde-tekst); margin-bottom: 34px; }
 .sektion-hoved p { color: var(--tekst-daempet); margin-bottom: 0; }
 
+.h2-lille { font-size: 1.5rem; }
+
 .sidehoved {
   padding: clamp(38px, 5vw, 60px) 0 clamp(20px, 3vw, 30px);
   border-bottom: 1px solid var(--kant); background: var(--bg-sektion);
