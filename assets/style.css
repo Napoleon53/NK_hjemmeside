@@ -479,7 +479,9 @@ tbody th { font-weight: 650; }
   flex-shrink: 0; min-width: 36px; padding: 2px 7px; text-align: center;
   background: var(--bg-daempet); border: 1px solid var(--kant); border-radius: 999px;
   font-size: .69rem; font-weight: 700; letter-spacing: .04em; color: var(--accent);
+  text-decoration: none; transition: background .15s, border-color .15s;
 }
+a.emne-kode:hover, a.emne-kode:focus-visible { background: var(--accent); border-color: var(--accent); color: #fff; }
 .emne-liste b { font-weight: 650; }
 .emne-liste span.emne-tekst { color: var(--tekst-daempet); }
 
