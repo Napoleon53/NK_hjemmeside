@@ -197,7 +197,7 @@
 
         NK.saetTekst("byg-grundstof", g ? g.navn : "— endnu ikke et grundstof —");
         NK.saetTekst("byg-massetal", this.p ? String(a) : "–");
-        NK.saetTekst("byg-ladning", NK.ladningstekst(q) + "  (" + this.p + " − " + this.e + ")");
+        NK.saetTekst("byg-ladning", NK.ladningstekst(q));
         NK.saetKlasse("byg-ladning", "tal " + (q > 0 ? "roed" : (q < 0 ? "blaa" : "groen")));
 
         var fordeling = D.skalfordeling(this.e);
@@ -212,22 +212,23 @@
         NK.saetTekst("byg-type", maerkat);
         NK.saetKlasse("byg-type", maerkatKlasse);
 
-        /* Kernen: findes den overhovedet? */
+        /* Kernen: findes den overhovedet? Teksten staar under selve
+           atommodellen i scenen - se tegn(). */
         var k = D.kerne(this.p, this.n);
         var kerneTekst, kerneKlasse;
-        if (!g) { kerneTekst = "Læg en proton i for at komme i gang."; kerneKlasse = "besked"; }
+        if (!g) { kerneTekst = "Læg en proton i for at komme i gang."; kerneKlasse = ""; }
         else if (k.art === "naturlig") {
             kerneTekst = g.symbol + "-" + a + " findes i naturen (" + NK.tal(k.isotop.andel, k.isotop.andel < 1 ? 4 : 2) + " % af alt " + g.navn.toLowerCase() + ").";
-            kerneKlasse = "besked god";
+            kerneKlasse = "god";
         } else if (k.art === "radioaktiv") {
             kerneTekst = "☢ " + g.symbol + "-" + a + " findes, men er radioaktiv — " + k.isotop.note + ".";
-            kerneKlasse = "besked gul";
+            kerneKlasse = "gul";
         } else {
             kerneTekst = "Der findes ingen kerne med " + this.p + " protoner og " + this.n + " neutroner. Den ville falde fra hinanden.";
-            kerneKlasse = "besked skidt";
+            kerneKlasse = "skidt";
         }
         NK.saetTekst("byg-kerne", kerneTekst);
-        NK.saetKlasse("byg-kerne", kerneKlasse);
+        NK.saetKlasse("byg-kerne", "kernekort" + (kerneKlasse ? " " + kerneKlasse : ""));
 
         /* Radioaktiv kerne: et blinkende maerke ved atomsymbolet, saa det
            kan ses uden at laese teksten i panelet. */
@@ -411,12 +412,14 @@
         l.ryd("#14141a");
 
         var cx = l.b / 2;
-        var cy = l.h * 0.57;
-        var plads = NK.klamp(Math.min(l.b / 2 - 40, l.h * 0.40), 70, 300);
+        var cy = l.h * 0.54;
+        var plads = NK.klamp(Math.min(l.b / 2 - 40, l.h * 0.38), 70, 300);
         var nuklidBoks = NK.el("byg-nuklid");
+        var kerneBoks = NK.el("byg-kerne");
 
         if (this.p === 0 && this.n === 0 && this.e === 0) {
             nuklidBoks.style.display = "none";
+            kerneBoks.style.display = "none";
             c.save();
             c.setLineDash([7, 7]);
             c.strokeStyle = "rgba(160, 190, 220, 0.25)";
@@ -449,5 +452,11 @@
         nuklidBoks.style.display = "";
         nuklidBoks.style.left = cx + "px";
         nuklidBoks.style.top = (cy - ydreR - 14) + "px";
+
+        /* Og svaret om kernen lige under atomet - dog aldrig saa langt
+           nede, at det falder ud af scenen paa en lav skaerm. */
+        kerneBoks.style.display = "";
+        kerneBoks.style.left = cx + "px";
+        kerneBoks.style.top = Math.min(cy + ydreR + 16, l.h - 74) + "px";
     };
 }());

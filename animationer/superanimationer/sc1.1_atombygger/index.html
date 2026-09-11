@@ -108,16 +108,14 @@
 <!-- FANE 2: ISOTOPER                                                   -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-isotop" role="tabpanel" aria-label="Isotoper">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="iso-laerred"></canvas>
-        <div class="scene-mrk">Vippen balancerer dér, hvor den <b>gennemsnitlige atommasse</b> ligger. Store lodder trækker mest — derfor ligger gennemsnittet tæt på den isotop, der er mest af.</div>
     </div>
 
     <aside class="panel">
         <div class="kort">
             <h2>Vælg grundstof</h2>
             <select id="iso-grundstof" class="vaelger"></select>
-            <p class="note" id="iso-forklaring"></p>
         </div>
 
         <div class="kort">
@@ -127,19 +125,8 @@
             <button class="knap groen" id="iso-natur" type="button" style="margin-top:10px;"><span>Tilbage til naturens blanding</span><span class="tegn">🌍</span></button>
         </div>
 
-        <div class="kort maaling">
-            <div class="massevis">
-                <span class="mmrk">Gennemsnitlig atommasse</span>
-                <span class="mtal" id="iso-masse">35,453 u</span>
-            </div>
-            <div class="talraekke"><span>Står i det periodiske system</span><span class="tal blaa" id="iso-tabelmasse">35,450 u</span></div>
-            <p class="besked god" id="iso-afvig" style="margin-top:9px;"></p>
-        </div>
-
         <div class="kort">
-            <h2>Regnestykket</h2>
-            <div class="ligning" id="iso-regnestykke"></div>
-            <p class="note">Hver isotops masse ganges med, hvor stor en del af stoffet den udgør. Derfor er atommassen næsten aldrig et helt tal.</p>
+            <button class="knap stor blaa" id="iso-vis-beregning" type="button"><span>Vis beregningen</span><span class="tegn">=</span></button>
         </div>
     </aside>
 </section>
@@ -167,13 +154,6 @@
             </div>
             <div class="talraekke"><span>Elektronstruktur</span><span class="tal gul" id="ion-fordeling">2, 8, 1</span></div>
             <div class="talraekke"><span>I yderste skal</span><span class="tal" id="ion-valens">1</span></div>
-        </div>
-
-        <div class="kort fremhaev">
-            <h2>Vejen til en ædelgas</h2>
-            <div class="maaler"><div class="maalerfyld groen" id="ion-afstand-bar"></div></div>
-            <div class="tal groen" id="ion-afstand" style="display:block;margin-top:6px;font-size:0.88rem;"></div>
-            <p class="besked" id="ion-oktet" style="margin-top:9px;"></p>
         </div>
 
         <div class="kort">
@@ -242,6 +222,17 @@
 </section>
 
 </main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="iso-beregning">
+    <div class="overlay-boks">
+        <h2>Den gennemsnitlige atommasse</h2>
+        <div class="ligning beregning" id="iso-regnestykke"></div>
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="iso-beregning-luk" style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
 
 <!-- ================================================================= -->
 <div class="overlay" id="hjaelp">

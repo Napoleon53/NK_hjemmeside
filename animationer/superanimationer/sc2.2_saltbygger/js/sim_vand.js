@@ -31,8 +31,8 @@
         this.loeste = 0;
         this.nr = 0;
         this.ioner = [];
-        this.niveau = 0.8;
-        this.niveauMaal = 0.8;
+        this.niveau = 0.84;
+        this.niveauMaal = 0.84;
         this.ur = 0;
         this.fase = "tom";
         this.G = this.maal();
@@ -97,7 +97,7 @@
         this.salt = salt;
         this.k = NK.klamp(Math.round(10 / (salt.p + salt.n)), 2, 4);
         this.ligning = false;
-        this.niveauMaal = 0.8;
+        this.niveauMaal = 0.84;
         this.efterLanding = null;
         this.art = "let";
     };
@@ -131,10 +131,17 @@
         this.opdaterTal();
     };
 
-    /* Frit valg: hæld et hvilket som helst af saltene i. */
+    /* Frit valg: hæld et hvilket som helst af saltene i. Fane 1 kalder
+       haeldSalt direkte, saa man kan opløse det salt, man selv har bygget. */
     NK.SimVand.prototype.haeldFrit = function () {
-        var kat = D.ion(NK.el("vand-kat").value), an = D.ion(NK.el("vand-an").value);
+        this.haeldSalt(NK.el("vand-kat").value, NK.el("vand-an").value);
+    };
+
+    NK.SimVand.prototype.haeldSalt = function (katId, anId) {
+        var kat = D.ion(katId), an = D.ion(anId);
         var salt = D.salt(kat.id, an.id);
+        NK.el("vand-kat").value = kat.id;
+        if (D.VAND_ANIONER.indexOf(an.id) >= 0) NK.el("vand-an").value = an.id;
         this.mode = "frit";
         this.type = "frit";
         this.besvaret = true;
@@ -150,7 +157,14 @@
         if (this.art === "findes-ikke") {
             this.ioner = [];
             this.fase = "tom";
+            this.tomBesked = "<b>" + salt.formel + "</b> findes ikke som fast stof, så der er intet at hælde i.";
             NK.saetHTML("vand-svar", D.findesIkke(kat, an));
+            NK.saetKlasse("vand-svar", "besked gul");
+        } else if (this.art === "reagerer") {
+            this.ioner = [];
+            this.fase = "tom";
+            this.tomBesked = "<b>" + salt.formel + "</b> reagerer med vandet i stedet for bare at gå i opløsning.";
+            NK.saetHTML("vand-svar", "Oxider og sulfider reagerer med vandet — det ligger uden for denne animation.");
             NK.saetKlasse("vand-svar", "besked gul");
         } else {
             NK.saetHTML("vand-svar", this.art === "tung"
@@ -191,7 +205,7 @@
 
     NK.SimVand.prototype.celle = function () {
         var r = Math.max(NK.ionGeo(this.salt.kat).R, NK.ionGeo(this.salt.an).R);
-        return 2 * r * this.G.s + 3;
+        return 2 * r * this.G.s * 0.94 + 2;
     };
 
     /* Pladserne i krystallen: plus og minus skiftevis, saa vidt det
@@ -531,7 +545,7 @@
         var sammIon = s.an.sammensat ? s.an : (s.kat.sammensat ? s.kat : null);
         switch (this.fase) {
             case "tom":
-                return "<b>" + s.formel + "</b> findes ikke som fast stof, så der er intet at hælde i.";
+                return this.tomBesked || "";
             case "falder":
             case "krystal":
                 return this.mode === "frit" ? "Saltet synker ned i vandet …"

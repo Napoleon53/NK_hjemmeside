@@ -121,6 +121,21 @@
 
     D.MAKS_Z = D.GRUNDSTOFFER.length;
 
+    /* De otte grundstoffer, isotopfanen tilbyder. Alle andre ville enten
+       have én isotop (intet at tage gennemsnit af) eller sige det samme
+       en gang til. Hver af disse otte viser noget nyt:
+         H   to isotoper, men den ene fylder 99,99 % - gennemsnittet
+             lander naesten oven i den
+         B   19,9 mod 80,1 - derfor ender massen paa 10,81, midt imellem
+         C   ¹²C er selve definitionen paa 1 u, og ¹⁴C kender alle
+         Ne  tre isotoper, hvor den mellemste naesten ikke findes
+         Cl  skolebogens eksempel: 35,45 - ingen chlorkerne vejer det
+         Ar  99,6 % ligger paa den TUNGESTE isotop
+         K   ligger lige efter argon i det periodiske system, men vejer
+             mindre - saml Ar og K, og se hvorfor
+         Ca  seks isotoper paa én gang */
+    D.ISOTOP_UDVALG = [1, 5, 6, 10, 17, 18, 19, 20];
+
     /* ----- Opslag ----------------------------------------------------- */
     D.grundstof = function (z) {
         return (z >= 1 && z <= D.MAKS_Z) ? D.GRUNDSTOFFER[z - 1] : null;

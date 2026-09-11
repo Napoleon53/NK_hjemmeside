@@ -100,12 +100,11 @@
         var mig = this;
         var vaelger = NK.el("iso-grundstof");
         vaelger.innerHTML = "";
-        for (var i = 0; i < D.GRUNDSTOFFER.length; i++) {
-            var g = D.GRUNDSTOFFER[i];
+        for (var i = 0; i < D.ISOTOP_UDVALG.length; i++) {
+            var g = D.grundstof(D.ISOTOP_UDVALG[i]);
             var o = document.createElement("option");
             o.value = String(g.z);
-            o.textContent = g.navn + " (" + g.symbol + ") — "
-                + (g.isotoper.length === 1 ? "1 isotop" : g.isotoper.length + " isotoper");
+            o.textContent = g.navn + " (" + g.symbol + ") — " + g.isotoper.length + " isotoper";
             vaelger.appendChild(o);
         }
         vaelger.value = String(this.z);
@@ -115,6 +114,16 @@
         });
 
         NK.el("iso-natur").addEventListener("click", function () { mig.tilNaturen(); });
+
+        NK.el("iso-vis-beregning").addEventListener("click", function () {
+            NK.el("iso-beregning").classList.add("vis");
+        });
+        NK.el("iso-beregning-luk").addEventListener("click", function () {
+            NK.el("iso-beregning").classList.remove("vis");
+        });
+        NK.el("iso-beregning").addEventListener("click", function (e) {
+            if (e.target.id === "iso-beregning") this.classList.remove("vis");
+        });
     };
 
     NK.SimIsotop.prototype.tilNaturen = function () {
@@ -147,36 +156,25 @@
             this.pctFelter[i].textContent = NK.tal(pct[i], pct[i] > 0 && pct[i] < 0.1 ? 3 : 1) + " %";
         }
 
-        NK.saetTekst("iso-masse", masse > 0 ? NK.tal(masse, 3) + " u" : "–");
-        NK.saetTekst("iso-tabelmasse", NK.tal(g.masse, 3) + " u");
-
-        /* Regnestykket skrevet ud, som man ville goere det i haanden. */
-        var led = [], udeladt = 0;
-        for (i = 0; i < g.isotoper.length; i++) {
-            if (pct[i] < 0.05) { if (pct[i] > 0) udeladt++; continue; }
-            led.push(NK.tal(pct[i] / 100, 4) + " · " + NK.tal(g.isotoper[i].masse, 3));
-        }
-        NK.saetTekst("iso-regnestykke", led.length
-            ? led.join("  +  ") + "  =  " + NK.tal(masse, 3) + " u" + (udeladt ? "   (de mindste andele er udeladt)" : "")
-            : "Skru op for mindst én isotop.");
-
-        var forskel = Math.abs(masse - g.masse);
-        var naturlig = forskel < 0.015;
-        NK.saetTekst("iso-afvig", naturlig
-            ? "Din blanding er naturens blanding — derfor rammer du præcis den atommasse, der står i det periodiske system."
-            : "Din blanding er ikke naturens. Derfor ligger gennemsnittet " + NK.tal(forskel, 3)
-              + " u fra den atommasse, der står i det periodiske system.");
-        NK.saetKlasse("iso-afvig", naturlig ? "besked god" : "besked gul");
-
-        /* Den korte pointe skifter med, hvad eleven har valgt. */
-        var flest = 0;
-        for (i = 1; i < pct.length; i++) if (pct[i] > pct[flest]) flest = i;
-        NK.saetTekst("iso-forklaring", g.isotoper.length === 1
-            ? g.navn + " har kun én isotop i naturen. Derfor ligger atommassen helt tæt på et helt tal — der er ikke noget at tage gennemsnit af."
-            : "Gennemsnittet trækkes altid tættest mod den isotop, der er mest af: her "
-              + NK.haevet(g.isotoper[flest].a) + g.symbol + " med " + NK.tal(pct[flest], 1) + " %.");
-
+        NK.saetTekst("iso-regnestykke", this.beregning(pct, masse));
         this.maalVippe = masse;
+    };
+
+    /* Regnestykket, som man ville skrive det i haanden: ét led pr.
+       isotop under hinanden, og facit til sidst. Lighedstegnene flugter,
+       fordi linjerne saettes med fast bredde i pop op-vinduet. */
+    NK.SimIsotop.prototype.beregning = function (pct, masse) {
+        var g = this.grundstof();
+        var linjer = [];
+        for (var i = 0; i < g.isotoper.length; i++) {
+            if (pct[i] <= 0) continue;
+            var led = NK.tal(pct[i] / 100, 4) + " · " + NK.tal(g.isotoper[i].masse, 3) + " u"
+                + "      (" + NK.haevet(g.isotoper[i].a) + g.symbol + ")";
+            linjer.push((linjer.length === 0 ? "m(gns) = " : "       + ") + led);
+        }
+        if (!linjer.length) return "Skru op for mindst én isotop.";
+        linjer.push("       = " + NK.tal(masse, 3) + " u");
+        return linjer.join("\n");
     };
 
     /* ----- Tegning ---------------------------------------------------------- */
@@ -232,11 +230,11 @@
             c.lineWidth = 1;
             c.stroke();
             NK.tekst(c, String(m), xm, yBom - 17, {
-                font: "600 10px 'Segoe UI', sans-serif", justering: "center", linje: "alphabetic", farve: "#7e8590"
+                font: "600 13px 'Segoe UI', sans-serif", justering: "center", linje: "alphabetic", farve: "#8f97a2"
             });
         }
         NK.tekst(c, "masse i u", l.b - margen + 16, yBom + 1, {
-            font: "600 11px 'Segoe UI', sans-serif", justering: "left", linje: "middle", farve: "#7e8590"
+            font: "600 13px 'Segoe UI', sans-serif", justering: "left", linje: "middle", farve: "#8f97a2"
         });
 
         /* Lodderne: ét pr. isotop, stoerrelsen er andelen */
@@ -257,12 +255,12 @@
             NK.tegnKugle(c, x, y, r, lysere(FARVER[i % FARVER.length]), FARVER[i % FARVER.length], 1);
             if (r > 15) {
                 NK.tekst(c, NK.tal(pct[i], pct[i] < 10 ? 1 : 0) + " %", x, y, {
-                    font: "700 " + Math.round(NK.klamp(r * 0.52, 9, 15)) + "px 'Segoe UI', sans-serif",
+                    font: "700 " + Math.round(NK.klamp(r * 0.55, 12, 21)) + "px 'Segoe UI', sans-serif",
                     justering: "center", linje: "middle", farve: "rgba(255, 255, 255, 0.95)"
                 });
             }
-            NK.tekst(c, NK.haevet(g.isotoper[i].a) + g.symbol, x, y + r + 15, {
-                font: "700 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
+            NK.tekst(c, NK.haevet(g.isotoper[i].a) + g.symbol, x, y + r + 18, {
+                font: "700 17px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
                 farve: "#e9eef4", kant: true
             });
         }
@@ -279,36 +277,31 @@
     NK.SimIsotop.prototype.tegnKerner = function (c, bredde, hoejde, pct) {
         var g = this.grundstof();
         var antal = this.kerner.length;
-        var raekkebredde = Math.min(bredde, antal * 230);
+        var raekkebredde = Math.min(bredde, antal * 260);
         var venstre = (bredde - raekkebredde) / 2;
         var celle = raekkebredde / antal;
         var i;
 
-        NK.tekst(c, "Alle kerner har " + g.z + " protoner — det er dét, der gør dem til " + g.navn.toLowerCase()
-            + ". Kun neutronerne er forskellige.", bredde / 2, 22, {
-            font: "600 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#a9b0ba"
-        });
-
         /* Samme skala til alle, saa den tungeste kerne SER tungest ud. */
         var stoerst = 0;
         for (i = 0; i < antal; i++) stoerst = Math.max(stoerst, this.kerner[i].geometri().rKerne);
-        var s = Math.min(1.7, (celle * 0.34) / stoerst, (hoejde * 0.30) / stoerst);
+        var s = Math.min(2.8, (celle * 0.42) / stoerst, (hoejde * 0.40) / stoerst);
 
         for (i = 0; i < antal; i++) {
             var x = venstre + celle * (i + 0.5);
-            var y = hoejde * 0.5;
+            var y = hoejde * 0.46;
             var med = pct[i] > 0;
             this.kerner[i].tegn(c, x, y, s * 176, { daempet: med ? 0 : 0.72 });
 
             var iso = g.isotoper[i];
             var naevn = NK.haevet(iso.a) + g.symbol;
-            NK.tekst(c, naevn, x, hoejde - 30, {
-                font: "700 15px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
+            NK.tekst(c, naevn, x, hoejde - 34, {
+                font: "700 22px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
                 farve: med ? "#f2f3f5" : "#5f656e", kant: true
             });
             NK.tekst(c, (iso.a - g.z) + " neutroner · " + NK.tal(pct[i], pct[i] > 0 && pct[i] < 0.1 ? 3 : 1) + " %",
                 x, hoejde - 13, {
-                font: "600 11px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
+                font: "600 14px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
                 farve: med ? FARVER[i % FARVER.length] : "#4d525a"
             });
         }
@@ -318,9 +311,11 @@
     NK.SimIsotop.prototype.tegnBalance = function (c, xFor, yBom, l) {
         var g = this.grundstof();
         var x = xFor(this.vippe);
-        var tekst = "gennemsnit: " + NK.tal(this.vippe, 3) + " u";
+        var vaerdi = NK.tal(this.vippe, 3) + " u";
+        var mrk = "GENNEMSNITLIG ATOMMASSE";
 
-        /* Naturens vaerdi som stiplet streg, naar eleven har flyttet paa den. */
+        /* Naturens vaerdi som stiplet streg, naar eleven har flyttet paa
+           den - med tallet skrevet ved selve stregen. */
         if (Math.abs(this.vippe - g.masse) > 0.012) {
             var xt = xFor(g.masse);
             c.save();
@@ -333,17 +328,9 @@
             c.stroke();
             c.restore();
 
-            c.save();
-            c.setLineDash([5, 5]);
-            c.strokeStyle = "rgba(169, 176, 186, 0.65)";
-            c.lineWidth = 1.5;
-            c.beginPath();
-            c.moveTo(14, l.h - 16);
-            c.lineTo(38, l.h - 16);
-            c.stroke();
-            c.restore();
-            NK.tekst(c, "det periodiske system: " + NK.tal(g.masse, 3) + " u", 44, l.h - 16, {
-                font: "600 11px 'Segoe UI', sans-serif", justering: "left", linje: "middle", farve: "#a9b0ba"
+            NK.tekst(c, "periodiske system: " + NK.tal(g.masse, 3) + " u", xt, yBom - 44, {
+                font: "600 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
+                farve: "#a9b0ba", kant: true
             });
         }
 
@@ -351,26 +338,37 @@
         c.save();
         c.beginPath();
         c.moveTo(x, yBom - 26);
-        c.lineTo(x - 8, yBom - 41);
-        c.lineTo(x + 8, yBom - 41);
+        c.lineTo(x - 9, yBom - 43);
+        c.lineTo(x + 9, yBom - 43);
         c.closePath();
         c.fillStyle = "#f2c53d";
         c.fill();
         c.restore();
 
+        /* Selve tallet - det er hele pointen med fanen, saa det fylder. */
+        var stor = "800 34px 'Segoe UI', sans-serif";
+        var lille = "700 12px 'Segoe UI', sans-serif";
         c.save();
-        c.font = "700 13px 'Segoe UI', sans-serif";
-        var b = c.measureText(tekst).width + 20;
-        var px = NK.klamp(x - b / 2, 8, l.b - b - 8);
-        NK.rundtRekt(c, px, yBom - 66, b, 22, 11);
-        c.fillStyle = "rgba(242, 197, 61, 0.16)";
+        c.font = stor;
+        var b = c.measureText(vaerdi).width;
+        c.font = lille;
+        b = Math.max(b, c.measureText(mrk).width) + 36;
+        var h = 72;
+        var py = yBom - 60 - h;
+        var px = NK.klamp(x - b / 2, 8, Math.max(8, l.b - b - 8));
+        NK.rundtRekt(c, px, py, b, h, 14);
+        c.fillStyle = "rgba(242, 197, 61, 0.14)";
         c.fill();
         c.strokeStyle = "rgba(242, 197, 61, 0.7)";
-        c.lineWidth = 1;
+        c.lineWidth = 1.5;
         c.stroke();
         c.restore();
-        NK.tekst(c, tekst, px + b / 2, yBom - 54, {
-            font: "700 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#f2c53d"
+
+        NK.tekst(c, mrk, px + b / 2, py + 19, {
+            font: lille, justering: "center", linje: "middle", farve: "rgba(242, 197, 61, 0.75)"
+        });
+        NK.tekst(c, vaerdi, px + b / 2, py + 47, {
+            font: stor, justering: "center", linje: "middle", farve: "#f2c53d"
         });
     };
 }());

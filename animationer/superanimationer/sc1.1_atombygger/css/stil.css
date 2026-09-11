@@ -309,6 +309,45 @@ main { flex: 1; position: relative; min-height: 0; }
     box-shadow: var(--skygge);
 }
 
+/* Genstart ligger i scenens hoejre tophjoerne - modsat opgavekortet. */
+.scene-knap {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: auto;
+    gap: 9px;
+    justify-content: center;
+    background-color: rgba(43, 43, 54, 0.92);
+    border-color: #5b3b39;
+    color: #e08b81;
+    box-shadow: var(--skygge);
+}
+
+.scene-knap:hover:not(:disabled) { background-color: rgba(224, 84, 70, 0.22); border-color: var(--roed); }
+
+/* Svaret paa "findes kernen i naturen?" - staar under atommodellen,
+   placeret af sim_byg.js hvert billede. Ankeret er midt foroven. */
+.kernekort {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(-50%, 0);
+    max-width: min(460px, calc(100% - 36px));
+    text-align: center;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    color: #c8ced6;
+    background-color: rgba(20, 20, 26, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius);
+    padding: 9px 15px;
+    pointer-events: none;
+}
+
+.kernekort.god   { color: #7ee0a8; border-color: rgba(63, 174, 114, 0.45); }
+.kernekort.gul   { color: #f0d77a; border-color: rgba(242, 197, 61, 0.45); }
+.kernekort.skidt { color: #f0918a; border-color: rgba(224, 84, 70, 0.45); }
+
 /* ---------------------------------------------------------------------
    HOEJRE SPALTE
    --------------------------------------------------------------------- */
@@ -384,6 +423,18 @@ main { flex: 1; position: relative; min-height: 0; }
     font-weight: 700;
     line-height: 1.6;
     word-break: break-word;
+}
+
+/* Regnestykket i pop op-vinduet: linjerne skal staa praecis under
+   hinanden, saa lighedstegnene flugter som i en haandskreven udregning. */
+.ligning.beregning {
+    white-space: pre;
+    overflow-x: auto;
+    text-align: left;
+    font-size: 0.95rem;
+    line-height: 1.9;
+    padding: 14px 16px;
+    margin-top: 0;
 }
 
 /* ---------------------------------------------------------------------

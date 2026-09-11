@@ -381,6 +381,15 @@ main { flex: 1; position: relative; min-height: 0; }
 .fformel .ukendt { color: var(--tekst-mat); }
 .fnavn { font-size: 0.86rem; color: #7ee0a8; }
 
+/* Et glimt, naar formlen lige er blevet gyldig. */
+@keyframes formelglimt {
+    0%   { box-shadow: 0 0 0 0 rgba(63, 174, 114, 0.55); }
+    70%  { box-shadow: 0 0 0 12px rgba(63, 174, 114, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(63, 174, 114, 0); }
+}
+
+.formelvis.ny { animation: formelglimt 0.9s ease-out 1; }
+
 /* ----- Talraekker ---------------------------------------------------- */
 .talraekke {
     display: flex;
@@ -678,6 +687,12 @@ select:focus-visible {
     .chip { min-width: 44px; padding: 4px 7px 3px; }
     .chip .cformel { font-size: 0.94rem; }
     .hylde { gap: 5px 14px; padding: 7px 10px; }
+}
+
+@media (max-width: 700px) {
+    .styr { gap: 4px; }
+    .styr .talknap { width: 26px; }
+    .styr-antal { min-width: 28px; font-size: 0.9rem; }
 }
 
 @media (max-width: 860px) {

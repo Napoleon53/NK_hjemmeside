@@ -305,8 +305,8 @@
         if (m > p) return regn + ": der mangler plus. Læg en positiv ion mere.";
         var g = NK.gcd(this.nKat, this.nAn);
         if (g > 1) {
-            return "Neutral — men " + this.nKat + " : " + this.nAn + " kan forkortes til " + (this.nKat / g) + " : "
-                + (this.nAn / g) + ". Formlen viser kun én gul enhed.";
+            return "Neutral — men der ligger <b>" + g + " ens enheder</b> på bordet (de gule streger). "
+                + "Formlen viser den mindste: " + (this.nKat / g) + " : " + (this.nAn / g) + ".";
         }
         return "<b>" + p + "+</b> og <b>" + m + "−</b> går lige op. Forbindelsen er neutral.";
     };
@@ -323,13 +323,15 @@
         var y1 = Math.min(br.top - cr.top, H) - 16;
         if (y1 - y0 < 180) { var midt = (y0 + y1) / 2; y0 = midt - 90; y1 = midt + 90; }
         var felter = Math.max(this.plus(), this.minus(), 6);
-        var venstre = 136, hoejre = 96;
-        var U = NK.klamp((W - venstre - hoejre) / felter, 34, 96);
+        var smal = W < 640;
+        var venstre = smal ? 102 : 136, hoejre = smal ? 54 : 96;
+        var U = NK.klamp((W - venstre - hoejre) / felter, 30, 84);
         var r = NK.klamp(U * 0.15, 7, 11);
         var gab = r + 3;
-        var hc = NK.klamp((y1 - y0) / 2 - gab - 12, 56, 124);
+        var hc = NK.klamp((y1 - y0) / 2 - gab - 12, 56, 128);
         var x0 = venstre + Math.max(0, (W - venstre - hoejre - felter * U) / 2);
-        return { W: W, H: H, y0: y0, y1: y1, zy: (y0 + y1) / 2, U: U, r: r, gab: gab, hc: hc, x0: x0, felter: felter };
+        return { W: W, H: H, y0: y0, y1: y1, zy: (y0 + y1) / 2, U: U, r: r, gab: gab, hc: hc, x0: x0,
+                 felter: felter, styrB: smal ? 98 : 128 };
     };
 
     NK.Bord.prototype.startKort = function (k, g) {
@@ -569,7 +571,7 @@
         var top = kat ? k.y + 7 + fs + 5 : k.y + g.r + 5;
         var bund = kat ? k.y + k.h - g.r - 5 : k.y + k.h - 6 - fs - 5;
         var geo = NK.ionGeo(k.ion);
-        var s = Math.min((k.b - 12) / (2 * geo.halvB), (bund - top) / (2 * geo.halvH), 25);
+        var s = Math.min((k.b - 14) / (2 * geo.halvB), (bund - top) / (2 * geo.halvH), 34);
         if (s > 2) NK.tegnIon(c, k.ion, k.x + k.b / 2, (top + bund) / 2, s, { alpha: k.a });
     };
 
@@ -621,7 +623,7 @@
     };
 
     NK.Bord.prototype.placerStyr = function (g) {
-        var x = Math.max(6, g.x0 - 128);
+        var x = Math.max(4, g.x0 - g.styrB);
         var yk = g.zy - g.gab - g.hc / 2, ya = g.zy + g.gab + g.hc / 2;
         var noegle = Math.round(x) + "|" + Math.round(yk) + "|" + Math.round(ya);
         if (noegle === this._styrNoegle) return;

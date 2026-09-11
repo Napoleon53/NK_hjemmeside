@@ -18,6 +18,14 @@
         });
         NK.el("byg-afstem").addEventListener("click", function () { mig.bord.afstem(); });
         NK.el("byg-ryd").addEventListener("click", function () { mig.bord.ryd(); });
+        /* Tag saltet med over i vandfanen - det er den samme forbindelse,
+           bare set nedefra: hvad bliver der af ionerne, naar det opløses? */
+        NK.el("byg-vand").addEventListener("click", function () {
+            var b = mig.bord;
+            if (!b.neutral()) return;
+            NK.visFane("fane-vand");
+            NK.sims["fane-vand"].haeldSalt(b.kat.id, b.an.id);
+        });
         NK.el("byg-navne").addEventListener("change", function () { mig.bord.saetNavne(this.checked); });
         this.opdaterPanel();
     };
@@ -54,6 +62,17 @@
         NK.el("byg-note").style.display = note ? "" : "none";
 
         NK.el("byg-afstem").disabled = !begge || (b.neutral() && b.forkortet());
+        NK.el("byg-vand").disabled = !b.neutral();
+
+        /* Et lille glimt, naar lynlaasen lige er lukket. */
+        var neutral = b.neutral();
+        if (neutral && !this.varNeutral) {
+            var e = NK.el("byg-formelvis");
+            e.classList.remove("ny");
+            void e.offsetWidth;
+            e.classList.add("ny");
+        }
+        this.varNeutral = neutral;
     };
 
     NK.SimByg.prototype.tilpas = function () { this.bord.tilpas(); };
