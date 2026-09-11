@@ -230,6 +230,8 @@ p  { margin: 0 0 1.1em; }
 .brodtekst { max-width: var(--bredde-tekst); }
 .brodtekst h2 { margin-top: 1.8em; }
 .brodtekst h2:first-child { margin-top: 0; }
+.brodtekst ol { padding-left: 1.3em; }
+.brodtekst ol li + li { margin-top: .4em; }
 
 /* -------------------------------------------------------------------- Kort */
 
