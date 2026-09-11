@@ -324,6 +324,7 @@ tbody th { font-weight: 650; }
   overflow: hidden; background: var(--bg-daempet); box-shadow: var(--skygge);
 }
 .skaermbillede img { width: 100%; }
+.skaermbillede > a { display: block; cursor: zoom-in; }
 .skaermbillede figcaption {
   padding: 11px 16px; font-size: .87rem; color: var(--tekst-daempet);
   border-top: 1px solid var(--kant); background: #fff;
@@ -487,12 +488,13 @@ tbody th { font-weight: 650; }
 .medie-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
 .medie-grid > figure { margin: 0; }
 .medie-grid .brodtekst { max-width: none; }
+.medie-grid.tekst-bred { grid-template-columns: 3fr 2fr; }
 
 .kort.bred { max-width: none; }
 .kort > .knap { align-self: flex-start; margin-top: 20px; }
 
 @media (max-width: 860px) {
-  .medie-grid { grid-template-columns: 1fr; gap: 28px; }
+  .medie-grid, .medie-grid.tekst-bred { grid-template-columns: 1fr; gap: 28px; }
   .medie-grid > figure { order: -1; }
 }
 
