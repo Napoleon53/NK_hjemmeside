@@ -32,6 +32,7 @@
         this.lynlaas = [];        /* hvor lukket hvert felt er, 0..1 */
         this.land = { kat: 0, an: 0 };   /* felter, der er landet paa bordet */
         this.laast = false;
+        this.visFormel = !!opt.visFormel;   /* formlen under bordet (kun fane 1) */
         this.demo = null;         /* "Afstem for mig" i gang */
         this.besked = null;       /* kortvarig besked */
         this.ur = 0;
@@ -469,6 +470,17 @@
         if (begge && p === m && this.land.kat === p && this.land.an === m) {
             var enheder = NK.gcd(this.nKat, this.nAn);
             if (enheder > 1) this.tegnEnheder(c, g, enheder);
+            /* Formlen staar under bordet, saa man ser den blive til:
+               antallet af kort bliver til de smaa tal i formlen. */
+            var plads = g.y1 - (g.zy + g.gab + g.hc);
+            if (this.visFormel && plads > 46) {
+                NK.tekstDele(c, [
+                    { t: D.formeldel(this.kat, this.nKat / enheder), farve: "#f7a79d" },
+                    { t: D.formeldel(this.an, this.nAn / enheder), farve: "#97cff5" }
+                ], g.x0 + p * g.U / 2, g.zy + g.gab + g.hc + Math.min(34, plads * 0.5), {
+                    font: "600 " + NK.klamp(plads * 0.5, 20, 32).toFixed(0) + "px 'Segoe UI', sans-serif", kant: true
+                });
+            }
             if (this.laast) {
                 c.save();
                 c.strokeStyle = "rgba(63, 174, 114, 0.75)";

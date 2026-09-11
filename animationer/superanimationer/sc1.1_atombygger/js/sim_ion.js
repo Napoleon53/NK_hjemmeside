@@ -4,10 +4,9 @@
    Her er grundstoffet givet, og spoergsmaalet er et andet: hvad goer
    atomet ved sine elektroner, og hvorfor?
 
-   Maaleren er med vilje IKKE en procentskala for "reaktivitet". Den
-   taeller noget, eleven kan efterproeve: hvor mange elektroner der skal
-   flyttes, foer elektronskyen ser ud som en aedelgas. Det er den samme
-   optaelling, man selv laver i hovedet.
+   Begrundelsen (hvorfor netop den ladning?) staar ikke fremme hele
+   tiden - den gemmes i oktetTekst og bliver foerst vist, naar eleven
+   HAR gaettet. Ellers stod svaret jo og ventede ved siden af.
    ===================================================================== */
 (function () {
     "use strict";
@@ -29,18 +28,6 @@
     };
 
     NK.SimIon.prototype.grundstof = function () { return D.grundstof(this.z); };
-
-    /* Hvor mange elektroner skal der flyttes, foer skyen ligner en aedelgas?
-       Positivt tal = afgive, negativt = optage. */
-    function tilAedelgas(z) {
-        var afstand = null;
-        var maal = [2, 10, 18];
-        for (var i = 0; i < maal.length; i++) {
-            var d = z - maal[i];
-            if (afstand === null || Math.abs(d) < Math.abs(afstand)) afstand = d;
-        }
-        return afstand;
-    }
 
     NK.SimIon.prototype.koblKnapper = function () {
         var mig = this;
@@ -71,7 +58,6 @@
 
         var fordeling = D.skalfordeling(z);
         var valens = fordeling[fordeling.length - 1];
-        var afstand = tilAedelgas(z);
 
         NK.saetTekst("ion-navn", g.navn);
         NK.saetTekst("ion-symbol", g.symbol);
@@ -84,34 +70,13 @@
         NK.saetKlasse("ion-type", "maerke " + (g.type === "metal" ? "roed"
             : (g.type === "ikkemetal" ? "blaa" : (g.type === "aedelgas" ? "groen" : "gul"))));
 
-        /* Maaleren: antal elektroner der skal flyttes. */
-        this.visAfstand(afstand, g);
         this.visOktet(g, fordeling, valens);
         this.visKnapper();
         NK.saetTekst("ion-resultat", "");
         NK.saetKlasse("ion-resultat", "besked");
         NK.el("ion-gaet-boks").classList.remove("vis");
         this.visStatus(g.navn + " har " + valens + " elektron" + (valens === 1 ? "" : "er")
-            + " i yderste skal. Det er dem, kemien handler om.", "");
-    };
-
-    NK.SimIon.prototype.visAfstand = function (afstand, g) {
-        var antal = Math.abs(afstand);
-        var tekst, klasse, andel;
-        if (antal === 0) {
-            tekst = "0 — elektronskyen ER allerede en ædelgas";
-            klasse = "groen"; andel = 0;
-        } else {
-            tekst = antal + " elektron" + (antal === 1 ? "" : "er") + " skal "
-                + (afstand > 0 ? "AFGIVES" : "OPTAGES");
-            klasse = antal === 1 ? "groen" : (antal === 2 ? "gul" : "roed");
-            andel = antal / 4;
-        }
-        NK.saetTekst("ion-afstand", tekst);
-        NK.saetKlasse("ion-afstand", "tal " + klasse);
-        var bar = NK.el("ion-afstand-bar");
-        bar.style.width = Math.round(andel * 100) + "%";
-        bar.className = "maalerfyld " + klasse;
+            + " i yderste skal.", "");
     };
 
     /* ----- Oktetreglen, sagt for dette grundstof ---------------------------- */
@@ -138,7 +103,7 @@
                 + " i at have " + (g.z < 5 ? "2" : "8") + ". Det er nemmere at hente " + mangler
                 + " end at slippe af med " + valens + (efter2 ? ". Med dem på plads ligner skyen " + efter2.navn.toLowerCase() : "") + ".";
         }
-        NK.saetTekst("ion-oktet", tekst);
+        this.oktetTekst = tekst;
     };
 
     NK.SimIon.prototype.visKnapper = function () {
@@ -201,7 +166,7 @@
             else if (v === gaet) knapper[i].classList.add(skarpt ? "rigtig" : "forkert");
         }
 
-        var begrundelse = NK.el("ion-oktet").textContent;
+        var begrundelse = this.oktetTekst;
         var tekst;
         if (traf) {
             tekst = "Rigtigt — ladningen bliver " + NK.ladningstekst(rigtig) + ". " + begrundelse;
@@ -274,11 +239,23 @@
         if (geo && this.atom.fordeling.length) {
             var yderste = this.atom.fordeling.length - 1;
             var r = geo.geo.rSkal[yderste] * geo.s;
-            var x = geo.cx + Math.cos(-Math.PI * 0.25) * (r + 16);
-            var y = geo.cy + Math.sin(-Math.PI * 0.25) * (r + 16);
-            NK.tekst(c, "yderste skal", x, y, {
-                font: "600 11px 'Segoe UI', sans-serif", justering: "left", linje: "middle",
-                farve: "#f2c53d", kant: true
+            var x = geo.cx + Math.cos(-Math.PI * 0.25) * (r + 10);
+            var y = geo.cy + Math.sin(-Math.PI * 0.25) * (r + 10);
+
+            /* En kort streg fra skallen ud til teksten, saa der ikke er
+               tvivl om, HVILKEN ring der er den yderste. */
+            c.save();
+            c.strokeStyle = "rgba(242, 197, 61, 0.75)";
+            c.lineWidth = 1.5;
+            c.beginPath();
+            c.moveTo(x, y);
+            c.lineTo(x + 16, y - 16);
+            c.stroke();
+            c.restore();
+
+            NK.tekst(c, "yderste skal", x + 21, y - 18, {
+                font: "800 19px 'Segoe UI', sans-serif", justering: "left", linje: "middle",
+                farve: "#f2c53d", kant: true, kantBredde: 4
             });
         }
     };

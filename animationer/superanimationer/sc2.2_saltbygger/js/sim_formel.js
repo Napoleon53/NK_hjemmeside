@@ -51,6 +51,7 @@
         NK.el("formel-vis").disabled = false;
         this.bord.laas(false);
         this.bord.ryd();                   /* kalder tjek() */
+        this.visStatus();
     };
 
     NK.SimFormel.prototype.tjek = function () {
@@ -136,9 +137,14 @@
 
     NK.SimFormel.prototype.tilpas = function () { this.bord.tilpas(); };
 
+    /* Statuslinjen: opgavens egen besked, ellers bordets. */
+    NK.SimFormel.prototype.visStatus = function () {
+        NK.saetHTML("formel-status", this.status || this.bord.beskriv());
+    };
+
     NK.SimFormel.prototype.opdater = function (dt) {
         this.bord.opdater(dt);
-        NK.saetHTML("formel-status", this.status || this.bord.beskriv());
+        this.visStatus();
     };
 
     NK.SimFormel.prototype.tegn = function () { this.bord.tegn(); };

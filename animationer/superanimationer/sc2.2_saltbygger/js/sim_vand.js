@@ -91,6 +91,7 @@
             this.lavFrie();
         }
         this.opdaterTal();
+        this.visStatus();
     };
 
     NK.SimVand.prototype.saetSalt = function (salt) {
@@ -175,6 +176,7 @@
             this.efterLanding = this.art === "tung" ? "tung" : "oploes";
         }
         this.opdaterTal();
+        this.visStatus();
     };
 
     /* Taellingen i panelet - skjult, mens eleven selv skal taelle. */
@@ -306,9 +308,13 @@
         else this.startOpgave(this.salt, this.type);
     };
 
+    NK.SimVand.prototype.visStatus = function () {
+        NK.saetHTML("vand-status", this.statusTekst());
+    };
+
     NK.SimVand.prototype.opdater = function (dt) {
         this.bevaeg(dt);
-        NK.saetHTML("vand-status", this.statusTekst());
+        this.visStatus();
     };
 
     NK.SimVand.prototype.bevaeg = function (dt) {

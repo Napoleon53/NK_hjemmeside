@@ -14,6 +14,7 @@
     NK.SimByg = function () {
         var mig = this;
         this.bord = new NK.Bord(NK.el("byg-scene"), {
+            visFormel: true,
             lyt: function (hvad) { if (hvad === "aendret") mig.opdaterPanel(); }
         });
         NK.el("byg-afstem").addEventListener("click", function () { mig.bord.afstem(); });

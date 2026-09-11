@@ -27,7 +27,7 @@
         elektron:    "#f2c53d",
         elektronLys: "#fff2b8",
         skal:        "rgba(160, 190, 220, 0.22)",
-        skalValens:  "rgba(242, 197, 61, 0.5)"
+        skalValens:  "rgba(242, 197, 61, 0.9)"
     };
     NK.FARVE = FARVE;
 
@@ -370,6 +370,31 @@
         return { rNukleon: rN, rKerne: rKerne, rSkal: rSkal, antalNukleoner: a };
     };
 
+    /* Hvor meget fylder klumpen rent faktisk paa skaermen?
+
+       rKerne er kernens fysiske stoerrelse - den styrer, hvor skallerne
+       ligger. Men de pakkede prikker breder sig laengere ud end det, og
+       skal man skalere flere kerner ved siden af hinanden (isotopfanen),
+       er det DEN bredde, der maa passe i feltet.
+
+       Tallet er et skoen ud fra, hvor mange symboler der tegnes, og hvor
+       taet de kan pakkes - ikke en maaling paa de enkelte prikker. Ellers
+       ville tallet sitre, hver gang prikkerne rykker sig, og hele raekken
+       ville pumpe i takt. */
+    NK.Atom.prototype.klumpRadius = function () {
+        var geo = this.geometri();
+        var symboler = 0, stoerst = 0, i;
+        for (i = 0; i < this.nukleoner.length; i++) {
+            var nu = this.nukleoner[i];
+            if (nu.tilstand === "gaar") continue;
+            symboler++;
+            var r = (nu.gruppe && nu.gruppeAntal > 1) ? geo.rNukleon * GRUPPE_SKALA : geo.rNukleon;
+            if (r > stoerst) stoerst = r;
+        }
+        if (!symboler) return geo.rKerne;
+        return Math.max(geo.rKerne, stoerst * Math.sqrt(symboler / 0.62));
+    };
+
     /* Hvor skal elektron nr. plads af iSkal i skal nr. skal ligge?
        Alle skaller laases fast i elektronprikformlens moenster: én i
        hvert verdenshjoerne foerst, derefter par - saa elektronerne
@@ -426,7 +451,7 @@
             ctx.beginPath();
             ctx.arc(cx, cy, geo.rSkal[i] * s, 0, Math.PI * 2);
             ctx.strokeStyle = (erValens && opt.fremhaevValens) ? FARVE.skalValens : FARVE.skal;
-            ctx.lineWidth = (erValens && opt.fremhaevValens) ? 2 : 1;
+            ctx.lineWidth = (erValens && opt.fremhaevValens) ? 3 : 1;
             ctx.stroke();
         }
 

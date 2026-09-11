@@ -51,6 +51,7 @@
         NK.el("navn-vis").disabled = false;
         this.bord.laas(false);
         this.bord.ryd();                   /* kalder tjek() */
+        this.visStatus();
     };
 
     /* Trin 1 og 2 - kaldes efter hver aendring paa bordet. */
@@ -127,9 +128,14 @@
 
     NK.SimNavn.prototype.tilpas = function () { this.bord.tilpas(); };
 
+    /* Statuslinjen: opgavens egen besked, ellers bordets. */
+    NK.SimNavn.prototype.visStatus = function () {
+        NK.saetHTML("navn-status", this.status || this.bord.beskriv());
+    };
+
     NK.SimNavn.prototype.opdater = function (dt) {
         this.bord.opdater(dt);
-        NK.saetHTML("navn-status", this.status || this.bord.beskriv());
+        this.visStatus();
     };
 
     NK.SimNavn.prototype.tegn = function () { this.bord.tegn(); };

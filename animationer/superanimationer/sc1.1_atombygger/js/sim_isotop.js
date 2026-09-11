@@ -165,14 +165,27 @@
        fordi linjerne saettes med fast bredde i pop op-vinduet. */
     NK.SimIsotop.prototype.beregning = function (pct, masse) {
         var g = this.grundstof();
-        var linjer = [];
-        for (var i = 0; i < g.isotoper.length; i++) {
+        var led = [], navne = [], bredde = 0, i;
+
+        for (i = 0; i < g.isotoper.length; i++) {
             if (pct[i] <= 0) continue;
-            var led = NK.tal(pct[i] / 100, 4) + " · " + NK.tal(g.isotoper[i].masse, 3) + " u"
-                + "      (" + NK.haevet(g.isotoper[i].a) + g.symbol + ")";
-            linjer.push((linjer.length === 0 ? "m(gns) = " : "       + ") + led);
+            /* De sjaeldneste isotoper skal have decimaler nok til IKKE at
+               staa som 0,0000 - ellers ser leddet ud som gange med nul. */
+            var andel = pct[i] / 100;
+            var t = NK.tal(andel, andel < 0.001 ? 6 : 4) + " · " + NK.tal(g.isotoper[i].masse, 3) + " u";
+            if (t.length > bredde) bredde = t.length;
+            led.push(t);
+            /* Skrevet som Ca-48, ikke ⁴⁸Ca: de haevede tal findes ikke i
+               den faste skrifttype, regnestykket saettes med. */
+            navne.push(g.symbol + "-" + g.isotoper[i].a);
         }
-        if (!linjer.length) return "Skru op for mindst én isotop.";
+        if (!led.length) return "Skru op for mindst én isotop.";
+
+        var linjer = [];
+        for (i = 0; i < led.length; i++) {
+            while (led[i].length < bredde) led[i] += " ";
+            linjer.push((i === 0 ? "m(gns) = " : "       + ") + led[i] + "   (" + navne[i] + ")");
+        }
         linjer.push("       = " + NK.tal(masse, 3) + " u");
         return linjer.join("\n");
     };
@@ -194,7 +207,7 @@
         var i;
         l.ryd("#14141a");
 
-        var kerneHoejde = Math.min(250, l.h * 0.36);
+        var kerneHoejde = Math.min(300, l.h * 0.38);
         this.tegnKerner(c, l.b, kerneHoejde, pct);
 
         /* ----- Vippen ----- */
@@ -282,10 +295,12 @@
         var celle = raekkebredde / antal;
         var i;
 
-        /* Samme skala til alle, saa den tungeste kerne SER tungest ud. */
+        /* Samme skala til alle, saa den tungeste kerne SER tungest ud.
+           Der maales paa klumpens faktiske bredde - ellers ville en kerne
+           med 48 prikker flyde ud over sit felt. */
         var stoerst = 0;
-        for (i = 0; i < antal; i++) stoerst = Math.max(stoerst, this.kerner[i].geometri().rKerne);
-        var s = Math.min(2.8, (celle * 0.42) / stoerst, (hoejde * 0.40) / stoerst);
+        for (i = 0; i < antal; i++) stoerst = Math.max(stoerst, this.kerner[i].klumpRadius());
+        var s = Math.min(2.8, (celle * 0.38) / stoerst, (hoejde * 0.38) / stoerst);
 
         for (i = 0; i < antal; i++) {
             var x = venstre + celle * (i + 0.5);
@@ -323,13 +338,19 @@
             c.strokeStyle = "rgba(169, 176, 186, 0.65)";
             c.lineWidth = 1.5;
             c.beginPath();
-            c.moveTo(xt, yBom - 34);
+            c.moveTo(xt, yBom - 48);
             c.lineTo(xt, yBom + 12);
             c.stroke();
             c.restore();
 
-            NK.tekst(c, "periodiske system: " + NK.tal(g.masse, 3) + " u", xt, yBom - 44, {
-                font: "600 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
+            /* Teksten skrives vaek fra viseren: ligger tabelvaerdien til
+               venstre for gennemsnittet, gaar teksten mod venstre. Ellers
+               ville den lande under det store gennemsnitstal. */
+            var modVenstre = xt < x;
+            NK.tekst(c, "periodiske system: " + NK.tal(g.masse, 3) + " u",
+                xt + (modVenstre ? -9 : 9), yBom - 55, {
+                font: "600 13px 'Segoe UI', sans-serif",
+                justering: modVenstre ? "right" : "left", linje: "middle",
                 farve: "#a9b0ba", kant: true
             });
         }
@@ -354,7 +375,7 @@
         c.font = lille;
         b = Math.max(b, c.measureText(mrk).width) + 36;
         var h = 72;
-        var py = yBom - 60 - h;
+        var py = yBom - 80 - h;
         var px = NK.klamp(x - b / 2, 8, Math.max(8, l.b - b - 8));
         NK.rundtRekt(c, px, py, b, h, 14);
         c.fillStyle = "rgba(242, 197, 61, 0.14)";

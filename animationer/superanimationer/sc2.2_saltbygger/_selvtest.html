@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest — sc2.2 Saltbyggeren</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1200px; height:800px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at kemien i data.js stemmer (formler, navne,
+   atomtal, ladningsbalance, opløselighed), at ingen opgave kan stilles
+   med et stof, der ikke findes, at hvert sæt svarmuligheder har præcis
+   ét rigtigt svar — og at fanernes egen logik reagerer rigtigt.
+
+   Åbn den gennem en lokal server (eller i Firefox). Chrome nægter en
+   side på file:// at kigge ind i sin egen iframe.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+
+window.addEventListener("load", function () { setTimeout(koer, 1400); });
+
+function koer() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument;
+    var NK = ramme.contentWindow.NK;
+    var i, j;
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) { vis(); return; }
+    var D = NK.Data;
+    paastand("alle fire faner er bygget", !!(NK.sims && NK.sims["fane-byg"] && NK.sims["fane-navn"]
+        && NK.sims["fane-formel"] && NK.sims["fane-vand"]));
+
+    overskrift("2. Panelerne er fyldt ud ved opstart");
+    var skalHaveTekst = ["byg-formel", "byg-navn", "byg-l-kat", "byg-q-kat", "byg-q-sum", "byg-status",
+        "navn-prompt", "navn-status", "formel-prompt", "formel-status", "vand-spm", "vand-status", "vand-overskrift"];
+    var tomme = [];
+    for (i = 0; i < skalHaveTekst.length; i++) {
+        var e = d.getElementById(skalHaveTekst[i]);
+        if (!e || !e.textContent.replace(/\s/g, "")) tomme.push(skalHaveTekst[i]);
+    }
+    paastand(skalHaveTekst.length + " udlæsninger fyldt ud", tomme.length === 0, "tomme: " + tomme.join(", "));
+
+    overskrift("3. Faneskift — præcis én aktiv ad gangen");
+    var faner = ["fane-byg", "fane-navn", "fane-formel", "fane-vand", "fane-byg"];
+    for (i = 0; i < faner.length; i++) {
+        var knap = d.querySelector('.faneknap[data-fane="' + faner[i] + '"]');
+        knap.click();
+        var afsnit = d.querySelectorAll(".fane.aktiv");
+        var knapper = d.querySelectorAll(".faneknap.aktiv");
+        paastand(faner[i] + ": 1 afsnit + 1 knap",
+            afsnit.length === 1 && knapper.length === 1 && afsnit[0].id === faner[i] && knapper[0] === knap,
+            afsnit.length + " afsnit / " + knapper.length + " knapper");
+    }
+
+    overskrift("4. Formler");
+    var formler = [["Al", "SO4", "Al₂(SO₄)₃"], ["NH4", "SO4", "(NH₄)₂SO₄"], ["Ca", "OH", "Ca(OH)₂"],
+        ["Na", "HCO3", "NaHCO₃"], ["Fe3", "SO4", "Fe₂(SO₄)₃"], ["Ca", "PO4", "Ca₃(PO₄)₂"],
+        ["K", "CO3", "K₂CO₃"], ["NH4", "NO3", "NH₄NO₃"], ["Ag", "NO3", "AgNO₃"], ["Al", "OH", "Al(OH)₃"],
+        ["Mg", "PO4", "Mg₃(PO₄)₂"], ["Na", "Cl", "NaCl"], ["NH4", "PO4", "(NH₄)₃PO₄"], ["Fe2", "SO4", "FeSO₄"]];
+    for (i = 0; i < formler.length; i++) {
+        var fs = D.salt(formler[i][0], formler[i][1]);
+        paastand(formler[i][0] + " + " + formler[i][1] + " -> " + fs.formel, fs.formel === formler[i][2],
+            "ventede " + formler[i][2]);
+    }
+
+    overskrift("5. Navne");
+    var navne = [["Al", "SO4", "aluminiumsulfat"], ["NH4", "SO4", "ammoniumsulfat"], ["Ca", "OH", "calciumhydroxid"],
+        ["Na", "HCO3", "natriumhydrogencarbonat"], ["Fe3", "SO4", "jern(III)sulfat"], ["Fe2", "OH", "jern(II)hydroxid"],
+        ["Cu", "NO3", "kobber(II)nitrat"], ["Ag", "PO4", "sølvphosphat"], ["Ca", "PO4", "calciumphosphat"]];
+    for (i = 0; i < navne.length; i++) {
+        var ns = D.salt(navne[i][0], navne[i][1]);
+        paastand(ns.formel + " -> " + ns.navn, ns.navn === navne[i][2], "ventede " + navne[i][2]);
+    }
+
+    overskrift("6. Atomerne i formlen");
+    var atomer = [["Al", 2, "SO4", 3, "Al 2  ·  S 3  ·  O 12"], ["NH4", 2, "SO4", 1, "N 2  ·  H 8  ·  S 1  ·  O 4"],
+        ["Ca", 1, "NO3", 2, "Ca 1  ·  N 2  ·  O 6"], ["Na", 1, "HCO3", 1, "Na 1  ·  H 1  ·  C 1  ·  O 3"]];
+    for (i = 0; i < atomer.length; i++) {
+        var a = atomer[i];
+        var tekst = D.atomTekst(D.atomtal(D.ion(a[0]), a[1], D.ion(a[2]), a[3]));
+        paastand(D.formel(D.ion(a[0]), D.ion(a[2]), a[1], a[3]) + " -> " + tekst, tekst === a[4], "ventede " + a[4]);
+    }
+
+    overskrift("7. Alle opgaver: ladningsbalance, mindste forhold, findes");
+    var lister = [["fane 2", D.NAVN_OPGAVER], ["fane 3", D.FORMEL_OPGAVER], ["fane 4", D.VAND_OPGAVER]];
+    for (i = 0; i < lister.length; i++) {
+        var daarlige = [];
+        for (j = 0; j < lister[i][1].length; j++) {
+            var o = lister[i][1][j];
+            var s = D.salt(o.kat, o.an);
+            var balance = s.p * s.kat.q + s.n * s.an.q;
+            if (balance !== 0 || NK.gcd(s.p, s.n) !== 1 || D.findesIkke(s.kat, s.an)) daarlige.push(s.formel);
+        }
+        paastand(lister[i][0] + ": " + lister[i][1].length + " opgaver er neutrale, forkortede og findes",
+            daarlige.length === 0, daarlige.join(", "));
+    }
+
+    overskrift("8. Svarmulighederne: fire forskellige, præcis ét rigtigt svar");
+    function tjekValg(navn, valg, ventet) {
+        var set = {}, rigtige = 0, udenGrund = 0;
+        for (var k = 0; k < valg.length; k++) {
+            set[valg[k].tekst] = 1;
+            if (valg[k].rigtig) rigtige++;
+            if (!valg[k].forklaring) udenGrund++;
+        }
+        var unikke = Object.keys(set).length;
+        var rigtigTekst = valg.filter(function (v) { return v.rigtig; }).map(function (v) { return v.tekst; })[0];
+        if (valg.length !== 4 || unikke !== 4 || rigtige !== 1 || udenGrund || rigtigTekst !== ventet) {
+            return navn + " (" + valg.length + " svar, " + unikke + " unikke, " + rigtige + " rigtige, svar: " + rigtigTekst + ")";
+        }
+        return null;
+    }
+    var problemer = [];
+    for (j = 0; j < D.NAVN_OPGAVER.length; j++) {
+        var n2 = D.NAVN_OPGAVER[j], s2 = D.salt(n2.kat, n2.an);
+        var p2 = tjekValg(s2.formel, D.formelValg(s2.kat, s2.an), s2.formel);
+        if (p2) problemer.push(p2);
+    }
+    paastand("formelValg for " + D.NAVN_OPGAVER.length + " opgaver", problemer.length === 0, problemer.slice(0, 4).join(" | "));
+
+    problemer = [];
+    for (j = 0; j < D.FORMEL_OPGAVER.length; j++) {
+        var n3 = D.FORMEL_OPGAVER[j], s3 = D.salt(n3.kat, n3.an);
+        var p3 = tjekValg(s3.navn, D.navneValg(s3.kat, s3.an), s3.navn);
+        if (p3) problemer.push(p3);
+    }
+    paastand("navneValg for " + D.FORMEL_OPGAVER.length + " opgaver", problemer.length === 0, problemer.slice(0, 4).join(" | "));
+
+    problemer = [];
+    for (j = 0; j < D.VAND_OPGAVER.length; j++) {
+        var n4 = D.VAND_OPGAVER[j], s4 = D.salt(n4.kat, n4.an);
+        var p4 = tjekValg(s4.formel + " opløst", D.oploesValg(s4), D.oploesHoejre(s4));
+        if (p4) problemer.push(p4);
+        var p5 = tjekValg(s4.formel + " talt", D.saltValg(s4, 3), s4.formel);
+        if (p5) problemer.push(p5);
+    }
+    paastand("oploesValg og saltValg for " + D.VAND_OPGAVER.length + " opgaver", problemer.length === 0,
+        problemer.slice(0, 4).join(" | "));
+
+    overskrift("9. Opløselighed");
+    var ikkeLet = [];
+    for (j = 0; j < D.VAND_OPGAVER.length; j++) {
+        var v4 = D.VAND_OPGAVER[j];
+        if (D.oploeselighed(D.ion(v4.kat), D.ion(v4.an)) !== "let") ikkeLet.push(v4.kat + v4.an);
+    }
+    paastand("alle salte på vandfanen er letopløselige", ikkeLet.length === 0, ikkeLet.join(", "));
+    var opl = [["Ba", "SO4", "tung"], ["Ag", "Cl", "tung"], ["Na", "Cl", "let"], ["Ca", "PO4", "tung"],
+        ["Mg", "OH", "tung"], ["Ba", "OH", "let"], ["K", "PO4", "let"], ["NH4", "OH", "findes-ikke"],
+        ["Na", "O", "reagerer"], ["Cu", "NO3", "let"]];
+    for (i = 0; i < opl.length; i++) {
+        var art = D.oploeselighed(D.ion(opl[i][0]), D.ion(opl[i][1]));
+        paastand(D.salt(opl[i][0], opl[i][1]).formel + " -> " + art, art === opl[i][2], "ventede " + opl[i][2]);
+    }
+
+    overskrift("10. Tegningen passer med formlen");
+    var uenige = [];
+    for (i = 0; i < D.IONER.length; i++) {
+        var ion = D.IONER[i];
+        if (!ion.sammensat) continue;
+        var tegnet = {};
+        ion.atomer.forEach(function (at) { tegnet[at[0]] = (tegnet[at[0]] || 0) + 1; });
+        D.sammensaetning(ion).forEach(function (at) {
+            if (tegnet[at[0]] !== at[1]) uenige.push(ion.formel + ": " + at[0] + " " + at[1] + " i formlen, "
+                + (tegnet[at[0]] || 0) + " i tegningen");
+        });
+    }
+    paastand("alle sammensatte ioner er tegnet med de rigtige atomer", uenige.length === 0, uenige.join(" | "));
+
+    overskrift("11. Bordet");
+    var b = NK.sims["fane-byg"].bord;
+    b.laas(false);
+    b.ryd();
+    b.vaelg(D.ion("Al"));
+    b.vaelg(D.ion("SO4"));
+    paastand("Al³⁺ + SO₄²⁻ giver 3+ mod 2−", b.plus() === 3 && b.minus() === 2 && !b.neutral(),
+        b.plus() + "+ / " + b.minus() + "−");
+    b.tilfoej("kat");
+    b.tilfoej("an");
+    b.tilfoej("an");
+    paastand("2 Al³⁺ og 3 SO₄²⁻ er neutralt og forkortet", b.neutral() && b.forkortet());
+    b.tilfoej("kat");
+    b.tilfoej("an");
+    paastand("én mere af hver bryder balancen igen", b.plus() === 9 && b.minus() === 8 && !b.neutral(),
+        b.plus() + "+ / " + b.minus() + "−");
+    b.tilfoej("kat");
+    b.tilfoej("an");
+    b.tilfoej("an");
+    paastand("4 Al³⁺ og 6 SO₄²⁻ er neutralt, men ikke forkortet", b.neutral() && !b.forkortet(),
+        b.nKat + " : " + b.nAn);
+    b.vaelg(D.ion("Na"));
+    paastand("ny positiv ion nulstiller antallet", b.kat.id === "Na" && b.nKat === 1, b.nKat + " stk.");
+    b.ryd();
+    paastand("Ryd bordet tømmer begge rækker", !b.kat && !b.an && b.nKat === 0 && b.nAn === 0);
+
+    overskrift("12. Fane 2: fra navn til formel");
+    var f2 = NK.sims["fane-navn"];
+    f2.startOpgave(D.salt("Al", "SO4"));
+    paastand("opgaven starter i byggefasen", f2.fase === "byg" && d.getElementById("navn-valgkort").hidden);
+    f2.bord.vaelg(D.ion("S"));
+    paastand("sulfid i stedet for sulfat giver en besked om forskellen", /sulfid/.test(f2.status || ""), f2.status);
+    f2.bord.saet(D.ion("Al"), 2, D.ion("SO4"), 3);
+    paastand("de rigtige ioner åbner formelvalget", f2.fase === "skriv" && !d.getElementById("navn-valgkort").hidden);
+    var rigtig2 = -1;
+    for (i = 0; i < f2.svar.valg.length; i++) if (f2.svar.valg[i].rigtig) rigtig2 = i;
+    f2.svar.knapper[rigtig2].click();
+    paastand("rigtigt svar tæller med", f2.fase === "faerdig" && f2.loeste === 1, "løst: " + f2.loeste);
+
+    overskrift("13. Fane 3: fra formel til navn");
+    var f3 = NK.sims["fane-formel"];
+    f3.startOpgave(D.salt("Fe3", "SO4"));
+    f3.bord.saet(D.ion("Fe2"), 2, D.ion("SO4"), 3);
+    paastand("Fe²⁺ med formlens tal giver besked om ladningen", f3.fase === "byg" && /jern/i.test(f3.status || ""), f3.status);
+    f3.bord.saet(D.ion("Fe3"), 2, D.ion("SO4"), 3);
+    paastand("Fe³⁺ åbner navnevalget", f3.fase === "navn");
+    var rigtig3 = -1;
+    for (i = 0; i < f3.svar.valg.length; i++) if (f3.svar.valg[i].rigtig) rigtig3 = i;
+    paastand("det rigtige navn er jern(III)sulfat", f3.svar.valg[rigtig3].tekst === "jern(III)sulfat",
+        f3.svar.valg[rigtig3].tekst);
+
+    overskrift("14. Fane 4: opløsning");
+    var f4 = NK.sims["fane-vand"];
+    f4.startOpgave(D.salt("Na", "SO4"), "forudsig");
+    var antal = { kat: 0, an: 0 };
+    f4.ioner.forEach(function (o) { antal[o.ion.q > 0 ? "kat" : "an"]++; });
+    paastand("krystallen har 2 Na⁺ pr. SO₄²⁻", antal.kat === 2 * antal.an, antal.kat + " Na⁺ / " + antal.an + " SO₄²⁻");
+    f4.haeldSalt("Ba", "SO4");
+    paastand("bariumsulfat bliver liggende", f4.art === "tung");
+    f4.haeldSalt("NH4", "OH");
+    paastand("ammoniumhydroxid findes ikke", f4.fase === "tom" && f4.ioner.length === 0);
+    f4.haeldSalt("Na", "O");
+    paastand("natriumoxid reagerer med vandet", f4.fase === "tom");
+    f4.haeldSalt("K", "NO3");
+    paastand("kaliumnitrat går i opløsning", f4.art === "let" && f4.ioner.length > 0);
+
+    vis();
+}
+
+function vis() {
+    skriv("\n" + (fejl === 0 ? "ALT OK" : fejl + " FEJL"), fejl === 0 ? "ok" : "fejl");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+</script>
+</body>
+</html>
