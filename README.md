@@ -20,7 +20,7 @@ animationer og downloads.
 |---|---|---|
 | `index.html` | Forside | `/` |
 | `animationer.html` | Animationer og spil | `/index.php/animationer/` |
-| `materialer.html` | Overblik over materiale | `/index.php/download/` |
+| `materialer.html` | Overblik over downloads | `/index.php/download/` |
 | `autocorrect.html` | Autocorrect til kemi | `/index.php/autocorrect/` |
 | `manuel-installation.html` | Manuel installation | `/index.php/manuel-installation/` |
 | `tastatur.html` | Udvid dit tastaturlayout | `/index.php/tastaturlayout/` |
@@ -28,9 +28,10 @@ animationer og downloads.
 | `formelsamling.html` | Formelsamling til kemi | `/index.php/digital-formelsamling/` |
 | `404.html` | Siden findes ikke | — |
 
-Menuen er samlet i tre indgange: **Forside · Animationer · Materialer**.
-Det gamle menupunkt "Download" var et udsagnsord brugt som kategori; det hedder nu
-"Materialer", og selve download-knapperne ligger på emnesiderne.
+Menuen er samlet i tre indgange: **Forside · Animationer · Downloads**.
+Menupunktet hed en overgang "Materialer", men det var for upræcist – animationerne
+kunne i princippet også kaldes "materiale". Filen bag punktet hedder stadig
+`materialer.html`, kun menuteksten og overskrifterne er ændret til "Downloads".
 
 ## Mapper
 
