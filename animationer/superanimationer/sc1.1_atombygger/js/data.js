@@ -31,7 +31,7 @@
         { z: 1, symbol: "H", navn: "Hydrogen", type: "ikkemetal", ion: 1, masse: 1.008,
           isotoper: [ { a: 1, masse: 1.007825, andel: 99.9885, navn: "protium" },
                       { a: 2, masse: 2.014102, andel: 0.0115, navn: "deuterium" } ],
-          andre: [ { a: 3, navn: "tritium", note: "radioaktiv, dannes i atmosfæren" } ] },
+          andre: [ { a: 3, navn: "tritium", note: "dannes højt oppe i atmosfæren" } ] },
 
         { z: 2, symbol: "He", navn: "Helium", type: "aedelgas", ion: 0, masse: 4.0026,
           isotoper: [ { a: 3, masse: 3.016029, andel: 0.000134 },
@@ -43,7 +43,7 @@
 
         { z: 4, symbol: "Be", navn: "Beryllium", type: "metal", ion: 2, masse: 9.0122,
           isotoper: [ { a: 9, masse: 9.012183, andel: 100 } ],
-          andre: [ { a: 10, navn: "beryllium-10", note: "radioaktiv, bruges til datering af is" } ] },
+          andre: [ { a: 10, navn: "beryllium-10", note: "bruges til at datere iskerner" } ] },
 
         { z: 5, symbol: "B", navn: "Bor", type: "halvmetal", ion: null, masse: 10.81,
           isotoper: [ { a: 10, masse: 10.012937, andel: 19.9 },
@@ -52,7 +52,7 @@
         { z: 6, symbol: "C", navn: "Carbon", type: "ikkemetal", ion: null, masse: 12.011,
           isotoper: [ { a: 12, masse: 12.000000, andel: 98.93 },
                       { a: 13, masse: 13.003355, andel: 1.07 } ],
-          andre: [ { a: 14, navn: "carbon-14", note: "radioaktiv, bruges til kulstof-14-datering" } ] },
+          andre: [ { a: 14, navn: "carbon-14", note: "kendt fra kulstof-14-datering af oldtidsfund" } ] },
 
         { z: 7, symbol: "N", navn: "Nitrogen", type: "ikkemetal", ion: -3, masse: 14.007,
           isotoper: [ { a: 14, masse: 14.003074, andel: 99.636 },
@@ -108,7 +108,7 @@
         { z: 19, symbol: "K", navn: "Kalium", type: "metal", ion: 1, masse: 39.098,
           isotoper: [ { a: 39, masse: 38.963706, andel: 93.2581 },
                       { a: 41, masse: 40.961825, andel: 6.7302 } ],
-          andre: [ { a: 40, navn: "kalium-40", note: "radioaktiv — 0,0117 % af alt kalium, også i din krop" } ] },
+          andre: [ { a: 40, navn: "kalium-40", note: "udgør kun 0,0117 % af alt kalium, men er også i din krop" } ] },
 
         { z: 20, symbol: "Ca", navn: "Calcium", type: "metal", ion: 2, masse: 40.078,
           isotoper: [ { a: 40, masse: 39.962591, andel: 96.941 },

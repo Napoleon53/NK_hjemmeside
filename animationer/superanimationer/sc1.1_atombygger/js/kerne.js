@@ -65,12 +65,11 @@ window.NK = NK;
         return String(s).split("").map(function (c) { return SAENKET[c] || c; }).join("");
     };
 
-    /* Ladning som kemikere skriver den: 0, 1+ bliver til "+", 2- til "2-". */
+    /* Ladningen som tal, saadan som den staar i bogen: 0, 1+, 2-.
+       Det haevede symbol efter et grundstof (Na⁺) er ladningHaevet. */
     NK.ladningstekst = function (q) {
         if (q === 0) return "0";
-        var fortegn = q > 0 ? "+" : "−";
-        var stoerrelse = Math.abs(q);
-        return (stoerrelse === 1 ? "" : String(stoerrelse)) + fortegn;
+        return Math.abs(q) + (q > 0 ? "+" : "−");
     };
 
     /* Samme, men som haevet skrift til brug efter et symbol: Na⁺, O²⁻ */

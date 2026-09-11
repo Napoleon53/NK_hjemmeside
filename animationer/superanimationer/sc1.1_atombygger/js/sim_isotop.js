@@ -196,7 +196,7 @@
         var i;
         l.ryd("#14141a");
 
-        var kerneHoejde = Math.min(190, l.h * 0.42);
+        var kerneHoejde = Math.min(250, l.h * 0.36);
         this.tegnKerner(c, l.b, kerneHoejde, pct);
 
         /* ----- Vippen ----- */
@@ -211,7 +211,7 @@
         var bredde = l.b - margen * 2;
         function xFor(m) { return margen + (m - m0) / (m1 - m0) * bredde; }
 
-        var yBom = kerneHoejde + (l.h - kerneHoejde) * 0.34;
+        var yBom = kerneHoejde + (l.h - kerneHoejde) * 0.46;
 
         /* Massestokken med hakkene */
         c.save();
@@ -243,7 +243,8 @@
         for (i = 0; i < g.isotoper.length; i++) {
             if (pct[i] <= 0) continue;
             var x = xFor(g.isotoper[i].masse);
-            var r = 9 + 26 * Math.sqrt(pct[i] / 100);
+            var maksR = NK.klamp((l.h - yBom - 62) / 2.3, 15, 58);
+            var r = 11 + (maksR - 11) * Math.sqrt(pct[i] / 100);
             var y = yBom + 22 + r;
 
             c.beginPath();
@@ -278,7 +279,9 @@
     NK.SimIsotop.prototype.tegnKerner = function (c, bredde, hoejde, pct) {
         var g = this.grundstof();
         var antal = this.kerner.length;
-        var celle = bredde / antal;
+        var raekkebredde = Math.min(bredde, antal * 230);
+        var venstre = (bredde - raekkebredde) / 2;
+        var celle = raekkebredde / antal;
         var i;
 
         NK.tekst(c, "Alle kerner har " + g.z + " protoner — det er dét, der gør dem til " + g.navn.toLowerCase()
@@ -292,7 +295,7 @@
         var s = Math.min(1.7, (celle * 0.34) / stoerst, (hoejde * 0.30) / stoerst);
 
         for (i = 0; i < antal; i++) {
-            var x = celle * (i + 0.5);
+            var x = venstre + celle * (i + 0.5);
             var y = hoejde * 0.5;
             var med = pct[i] > 0;
             this.kerner[i].tegn(c, x, y, s * 176, { daempet: med ? 0 : 0.72 });

@@ -223,7 +223,7 @@
             kerneTekst = g.symbol + "-" + a + " findes i naturen (" + NK.tal(k.isotop.andel, k.isotop.andel < 1 ? 4 : 2) + " % af alt " + g.navn.toLowerCase() + ").";
             kerneKlasse = "besked god";
         } else if (k.art === "radioaktiv") {
-            kerneTekst = g.symbol + "-" + a + " findes, men er radioaktiv: " + k.isotop.note + ".";
+            kerneTekst = g.symbol + "-" + a + " findes, men er radioaktiv — " + k.isotop.note + ".";
             kerneKlasse = "besked gul";
         } else {
             kerneTekst = "Der findes ingen kerne med " + this.p + " protoner og " + this.n + " neutroner. Den ville falde fra hinanden.";
@@ -404,7 +404,7 @@
 
         var cx = l.b / 2;
         var cy = (l.h - 52) / 2 + 6;
-        var plads = NK.klamp(Math.min(l.b / 2 - 34, (l.h - 78) / 2), 70, 250);
+        var plads = NK.klamp(Math.min(l.b / 2 - 34, (l.h - 78) / 2), 70, 330);
 
         if (this.p === 0 && this.n === 0 && this.e === 0) {
             c.save();

@@ -195,10 +195,8 @@ main { flex: 1; position: relative; min-height: 0; }
     right: 0;
     bottom: 0;
     min-height: 58px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 20px 10px;
+    display: block;
+    padding: 17px 20px 12px;
     background: linear-gradient(to top, rgba(8, 8, 13, 0.94) 45%, rgba(8, 8, 13, 0));
     font-size: 0.85rem;
     line-height: 1.45;
@@ -209,3 +207,640 @@ main { flex: 1; position: relative; min-height: 0; }
 
 .scene-mrk b { color: #ffffff; }
 .scene-mrk.advarsel { color: #f0a49c; }
+
+/* ---------------------------------------------------------------------
+   NUKLIDSYMBOLET - kemikerens skrivemaade oeverst i scenen
+   Massetallet over protontallet til venstre for symbolet, ladningen
+   haevet bagefter. Præcis som i bogen.
+   --------------------------------------------------------------------- */
+.nuklid {
+    position: absolute;
+    top: 16px;
+    left: 18px;
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-template-rows: auto auto;
+    column-gap: 4px;
+    align-items: center;
+    background-color: rgba(20, 20, 26, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius);
+    padding: 10px 16px 10px 12px;
+    pointer-events: none;
+    font-variant-numeric: tabular-nums;
+}
+
+.nuklid .a, .nuklid .z {
+    grid-column: 1;
+    text-align: right;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.nuklid .a { grid-row: 1; color: var(--gul); align-self: end; }
+.nuklid .z { grid-row: 2; color: var(--proton); align-self: start; }
+
+.nuklid .sym {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    font-size: 2.5rem;
+    font-weight: 300;
+    line-height: 1;
+    color: var(--tekst);
+}
+
+.nuklid .q {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: start;
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1;
+    min-width: 16px;
+}
+
+.nuklid .q.plus  { color: var(--proton); }
+.nuklid .q.minus { color: var(--blaa); }
+
+/* ---------------------------------------------------------------------
+   HOEJRE SPALTE
+   --------------------------------------------------------------------- */
+.panel {
+    background-color: var(--panel);
+    border-left: 1px solid #1f1f27;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    min-width: 0;
+    scrollbar-width: thin;
+    scrollbar-color: #4d4d5c var(--panel);
+}
+
+.panel::-webkit-scrollbar { width: 9px; }
+.panel::-webkit-scrollbar-track { background: var(--panel); }
+.panel::-webkit-scrollbar-thumb { background: #4d4d5c; border-radius: 5px; }
+
+.kort {
+    background-color: rgba(0, 0, 0, 0.22);
+    border: 1px solid #3a3a47;
+    border-radius: var(--radius);
+    padding: 11px;
+}
+
+.kort > h2 {
+    margin: 0 0 8px 0;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--gul);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.kort.fremhaev { border-left: 3px solid var(--blaa); }
+.kort.maaling { border-left: 3px solid var(--groen); }
+.kort.opgavekort { border-left: 3px solid var(--lilla); }
+
+.kort > h2 .taeller {
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    color: var(--tekst-mat);
+}
+
+.kort > h2 .taeller b { color: var(--tekst); }
+
+.note { margin: 8px 0 0 0; font-size: 0.76rem; line-height: 1.45; color: var(--tekst-mat); }
+
+.besked { margin: 0; font-size: 0.82rem; line-height: 1.5; color: #c8ced6; }
+.besked.god   { color: #7ee0a8; }
+.besked.skidt { color: #f0918a; }
+.besked.gul   { color: #f0d77a; }
+
+.stor { font-size: 1.35rem; font-weight: 600; line-height: 1.2; margin-bottom: 7px; }
+
+.ligning {
+    font-family: "Cascadia Mono", Consolas, "Courier New", monospace;
+    background-color: #111117;
+    border: 1px solid #3f3f4d;
+    border-radius: var(--radius-lil);
+    color: var(--groen);
+    text-align: center;
+    padding: 8px 6px;
+    margin-top: 9px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.6;
+    word-break: break-word;
+}
+
+/* ---------------------------------------------------------------------
+   PARTIKELRAEKKERNE PAA BYGGEFANEN
+   --------------------------------------------------------------------- */
+.partikel {
+    display: grid;
+    grid-template-columns: 16px minmax(0, 1fr) 30px 34px 30px;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 8px;
+    border-radius: var(--radius-lil);
+    background-color: rgba(255, 255, 255, 0.045);
+}
+
+.partikel + .partikel { margin-top: 6px; }
+
+.prik { width: 14px; height: 14px; border-radius: 50%; }
+.prik.proton   { background: radial-gradient(circle at 32% 30%, #ff9384, #e05446); }
+.prik.neutron  { background: radial-gradient(circle at 32% 30%, #b8bfc9, #7e8590); }
+.prik.elektron { background: radial-gradient(circle at 32% 30%, #fff2b8, #f2c53d); }
+
+.pnavn { font-size: 0.82rem; color: #dde3ea; line-height: 1.25; min-width: 0; }
+.pnavn b { font-weight: 700; color: var(--tekst); }
+.pnavn em {
+    display: block;
+    font-style: normal;
+    font-size: 0.68rem;
+    color: var(--tekst-mat);
+    margin-top: 1px;
+}
+
+.talknap {
+    background-color: var(--panel-2);
+    color: var(--tekst);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    height: 30px;
+    font-family: inherit;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.14s ease, transform 0.08s ease;
+}
+
+.talknap:hover:not(:disabled) { background-color: var(--panel-3); }
+.talknap:active:not(:disabled) { transform: scale(0.92); }
+.talknap:disabled { opacity: 0.28; cursor: not-allowed; }
+.talknap.plus { background-color: var(--blaa-mork); border-color: var(--blaa); }
+.talknap.plus:hover:not(:disabled) { background-color: var(--blaa); }
+
+.antal {
+    text-align: center;
+    font-family: "Cascadia Mono", Consolas, monospace;
+    font-size: 1.05rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------------
+   DE TRE REGLER - den, der lige blev vist, lyser op
+   --------------------------------------------------------------------- */
+.regel {
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--tekst-mat);
+    padding: 7px 9px;
+    border-left: 3px solid #3a3a47;
+    border-radius: 0 var(--radius-lil) var(--radius-lil) 0;
+    background-color: rgba(255, 255, 255, 0.03);
+    transition: color 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.regel + .regel { margin-top: 6px; }
+.regel b { color: var(--tekst-svag); }
+
+.regel.lyser {
+    color: #dde3ea;
+    border-left-color: var(--gul);
+    background-color: rgba(242, 197, 61, 0.1);
+}
+
+.regel.lyser b { color: var(--gul); }
+
+/* ---------------------------------------------------------------------
+   MAERKATER, TALRAEKKER OG MAALERE
+   --------------------------------------------------------------------- */
+.maerke {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 3px 9px;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.08);
+    color: var(--tekst-svag);
+    margin-bottom: 8px;
+}
+
+.maerke.groen { background-color: rgba(63, 174, 114, 0.18); color: #7ee0a8; }
+.maerke.roed  { background-color: rgba(224, 84, 70, 0.18);  color: #f0918a; }
+.maerke.blaa  { background-color: rgba(61, 158, 224, 0.18); color: #8fcaf0; }
+.maerke.gul   { background-color: rgba(242, 197, 61, 0.16); color: #f0d77a; }
+
+.talraekke {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.045);
+    border-radius: var(--radius-lil);
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    color: #c8ced6;
+}
+
+.talraekke + .talraekke { margin-top: 5px; }
+
+.talraekke .tal {
+    font-weight: 700;
+    color: var(--tekst);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.tal.blaa { color: var(--blaa); }
+.tal.groen { color: #7ee0a8; }
+.tal.gul { color: var(--gul); }
+.tal.roed { color: #f0918a; }
+
+.maaler {
+    width: 100%;
+    height: 9px;
+    background-color: #14141a;
+    border: 1px solid #3a3a47;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.maalerfyld {
+    height: 100%;
+    width: 0;
+    border-radius: 4px;
+    transition: width 0.45s ease, background-color 0.45s ease;
+    background-color: var(--groen);
+}
+
+.maalerfyld.groen { background-color: var(--groen); }
+.maalerfyld.gul   { background-color: var(--gul); }
+.maalerfyld.roed  { background-color: var(--roed); }
+
+/* ---------------------------------------------------------------------
+   GRUNDSTOFHOVEDET PAA IONFANEN
+   --------------------------------------------------------------------- */
+.grundhoved {
+    display: grid;
+    grid-template-columns: 54px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.gsymbol {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 54px;
+    border-radius: var(--radius-lil);
+    background-color: rgba(255, 255, 255, 0.06);
+    border: 1px solid #3a3a47;
+    font-size: 1.5rem;
+    font-weight: 300;
+}
+
+.gnavn { min-width: 0; line-height: 1.3; }
+.gnavn b { display: block; font-size: 1.05rem; font-weight: 600; }
+.gnavn em { font-style: normal; font-size: 0.72rem; color: var(--tekst-mat); }
+.grundhoved .maerke { margin-bottom: 0; }
+
+/* ---------------------------------------------------------------------
+   GAETTEBOKSEN
+   --------------------------------------------------------------------- */
+.gaetboks { display: none; margin-top: 4px; }
+.gaetboks.vis { display: block; }
+
+.gaetsp { margin: 0 0 4px 0; font-size: 0.86rem; font-weight: 600; line-height: 1.4; }
+
+.gaetvalg {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    margin: 10px 0;
+}
+
+.gaetknap {
+    background-color: var(--panel-2);
+    color: var(--tekst);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 9px 4px;
+    font-family: "Cascadia Mono", Consolas, monospace;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.14s ease, transform 0.08s ease;
+}
+
+.gaetknap:hover:not(:disabled) { background-color: var(--panel-3); }
+.gaetknap:active:not(:disabled) { transform: scale(0.95); }
+.gaetknap:disabled { cursor: default; opacity: 0.55; }
+.gaetknap.rigtig { background-color: var(--groen-mork); border-color: var(--groen); color: #ffffff; opacity: 1; }
+.gaetknap.forkert { background-color: var(--roed-mork); border-color: var(--roed); color: #ffffff; opacity: 1; }
+
+/* ---------------------------------------------------------------------
+   ISOTOPFANEN
+   --------------------------------------------------------------------- */
+.isorad { margin-top: 11px; }
+.isorad:first-child { margin-top: 4px; }
+
+.isorad label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: #c8ced6;
+    margin-bottom: 5px;
+}
+
+.isorad .chip { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+.isorad .navn { flex: 1; min-width: 0; }
+.isorad .pct { color: var(--tekst); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.massevis {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    background-color: #0e1a14;
+    border: 1px solid #21402f;
+    border-radius: var(--radius-lil);
+    padding: 8px 12px;
+    margin-bottom: 9px;
+}
+
+.mmrk { font-size: 0.72rem; font-weight: 700; color: rgba(110, 242, 168, 0.6); line-height: 1.25; }
+
+.mtal {
+    flex: 1;
+    font-family: "Cascadia Mono", Consolas, monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #6ef2a8;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+}
+
+/* ---------------------------------------------------------------------
+   SALTFANEN
+   --------------------------------------------------------------------- */
+.formelvis {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    background-color: #0e1a14;
+    border: 1px solid #21402f;
+    border-radius: var(--radius-lil);
+    padding: 9px 12px;
+}
+
+.fformel { font-size: 1.6rem; font-weight: 600; color: #6ef2a8; }
+.fnavn { font-size: 0.82rem; color: var(--tekst-svag); text-align: right; }
+
+.vlabel { display: block; font-size: 0.78rem; color: #c8ced6; margin-bottom: 5px; }
+
+/* ---------------------------------------------------------------------
+   FELTER, VAELGERE OG SKYDERE
+   --------------------------------------------------------------------- */
+.vaelger {
+    width: 100%;
+    background-color: #1a1a22;
+    color: var(--tekst);
+    border: 1px solid #464655;
+    border-radius: var(--radius-lil);
+    padding: 7px 8px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    cursor: pointer;
+}
+
+.vaelger:hover { border-color: #5e5e70; }
+.vaelger option { background-color: #1a1a22; color: var(--tekst); }
+
+.tjek {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: #c8ced6;
+    cursor: pointer;
+    margin-top: 9px;
+    line-height: 1.35;
+}
+
+.tjek input { accent-color: var(--blaa); width: 15px; height: 15px; cursor: pointer; flex-shrink: 0; }
+
+.skyder { margin-top: 10px; }
+
+.skyder label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.78rem;
+    color: #c8ced6;
+    margin-bottom: 5px;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 5px;
+    border-radius: 3px;
+    background-color: #14141a;
+    border: 1px solid #3a3a47;
+    outline: none;
+    cursor: pointer;
+    margin: 0;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    background-color: var(--blaa);
+    border: 2px solid #16161d;
+    cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: var(--blaa);
+    border: 2px solid #16161d;
+    cursor: pointer;
+}
+
+/* ---------------------------------------------------------------------
+   KNAPPER
+   --------------------------------------------------------------------- */
+.knapper { display: flex; flex-direction: column; gap: 7px; }
+
+.knap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background-color: var(--panel-2);
+    color: var(--tekst);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 8px 11px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+}
+
+.knap:hover:not(:disabled) { background-color: var(--panel-3); border-color: #5e5e70; }
+.knap:active:not(:disabled) { transform: scale(0.985); }
+.knap:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.knap .tegn { font-size: 1rem; flex-shrink: 0; }
+.knap.stor { padding: 11px 13px; font-size: 0.9rem; width: 100%; }
+
+.knap.blaa { background-color: var(--blaa-mork); border-color: var(--blaa); }
+.knap.blaa:hover:not(:disabled) { background-color: var(--blaa); }
+.knap.groen { background-color: var(--groen-mork); border-color: var(--groen); }
+.knap.groen:hover:not(:disabled) { background-color: var(--groen); }
+.knap.orange { background-color: var(--orange-mork); border-color: var(--orange); }
+.knap.orange:hover:not(:disabled) { background-color: var(--orange); }
+
+.knap.nulstil {
+    background-color: transparent;
+    border-color: #5b3b39;
+    color: #e08b81;
+    margin-top: 8px;
+}
+
+.knap.nulstil:hover:not(:disabled) { background-color: rgba(224, 84, 70, 0.16); border-color: var(--roed); }
+
+.knaprad { display: flex; gap: 6px; margin-top: 9px; }
+.knaprad .knap { flex: 1; justify-content: center; padding: 8px 6px; }
+
+/* Den knap, der er det naturlige naeste skridt, banker stille. */
+@keyframes bank {
+    0%   { box-shadow: 0 0 0 0 rgba(155, 107, 214, 0.55); }
+    70%  { box-shadow: 0 0 0 11px rgba(155, 107, 214, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(155, 107, 214, 0); }
+}
+
+.knap.banker { animation: bank 1.7s ease-out infinite; }
+
+/* ---------------------------------------------------------------------
+   HJAELPE-OVERLAY
+   --------------------------------------------------------------------- */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(8, 8, 12, 0.78);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 50;
+}
+
+.overlay.vis { display: flex; }
+
+.overlay-boks {
+    background-color: var(--panel);
+    border: 1px solid var(--linje);
+    border-radius: 14px;
+    box-shadow: var(--skygge);
+    max-width: 660px;
+    width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 24px 26px;
+}
+
+.overlay-boks h2 { margin: 0 0 6px 0; font-size: 1.15rem; color: var(--blaa); }
+
+.overlay-boks h3 {
+    margin: 18px 0 6px 0;
+    font-size: 0.78rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--gul);
+}
+
+.overlay-boks p, .overlay-boks li {
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: #c8ced6;
+    margin: 0 0 8px 0;
+}
+
+.overlay-boks ul { margin: 0; padding-left: 20px; }
+
+kbd {
+    background-color: #14141a;
+    border: 1px solid #4a4a58;
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-family: "Cascadia Mono", Consolas, monospace;
+    font-size: 0.8rem;
+    color: var(--tekst);
+}
+
+/* ---------------------------------------------------------------------
+   TILGAENGELIGHED OG SMALLE SKAERME
+   --------------------------------------------------------------------- */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 2px solid var(--gul);
+    outline-offset: 2px;
+}
+
+@media (max-width: 1320px) {
+    :root { --panel-bredde: 336px; }
+    .top h1 .lang { display: none; }
+    .tidsboks .mrk { display: none; }
+}
+
+@media (max-width: 1040px) {
+    .top { gap: 10px; padding: 8px 12px; }
+    .faneknap { padding: 7px 10px; font-size: 0.8rem; gap: 6px; }
+    .faneknap .nr { width: 17px; height: 17px; font-size: 0.65rem; }
+    .tidsknap { padding: 4px 5px; min-width: 28px; font-size: 0.72rem; }
+}
+
+@media (max-width: 860px) {
+    body { overflow: auto; }
+    .top { flex-wrap: wrap; gap: 10px; }
+    .faneknapper { order: 3; width: 100%; flex: none; }
+    main { overflow: visible; }
+    .fane { position: static; grid-template-columns: minmax(0, 1fr); }
+    .fane.aktiv { display: grid; }
+    .scene { height: 58vh; min-height: 340px; }
+    .panel { border-left: none; border-top: 1px solid #1f1f27; }
+    .nuklid { top: 10px; left: 10px; padding: 7px 12px 7px 9px; }
+    .nuklid .sym { font-size: 2rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}

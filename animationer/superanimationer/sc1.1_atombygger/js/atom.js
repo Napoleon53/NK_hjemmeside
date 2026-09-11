@@ -183,8 +183,8 @@
                 var v = this.retning
                     ? Math.atan2(-this.retning.y, -this.retning.x)
                     : Math.random() * Math.PI * 2;
-                ny.sx = Math.cos(v) * 340;
-                ny.sy = Math.sin(v) * 340;
+                ny.sx = Math.cos(v) * 250;
+                ny.sy = Math.sin(v) * 250;
                 ny.x = ny.sx;
                 ny.y = ny.sy;
                 this.elektroner.push(ny);
@@ -325,7 +325,7 @@
         this.sidsteGeo = { cx: cx, cy: cy, s: s, geo: geo };
 
         ctx.save();
-        if (opt.daempet) ctx.globalAlpha = 1 - opt.daempet;
+        var dmp = opt.daempet ? 1 - opt.daempet : 1;
 
         var antalSkaller = this.fordeling.length;
         var yderste = antalSkaller - 1;
@@ -334,7 +334,7 @@
         if (opt.ladning) {
             var ydreR = (geo.rSkal[Math.max(0, yderste)] + 26) * s;
             NK.skaer(ctx, cx, cy, ydreR,
-                opt.ladning > 0 ? "rgba(224, 84, 70, 0.20)" : "rgba(61, 158, 224, 0.22)");
+                opt.ladning > 0 ? "rgba(224, 84, 70, 0.20)" : "rgba(61, 158, 224, 0.22)", dmp);
         }
 
         /* Skallerne */
@@ -349,14 +349,14 @@
 
         /* Kernen: et skaer, og saa partiklerne oven i hinanden */
         var rK = geo.rKerne * s;
-        NK.skaer(ctx, cx, cy, rK * 2.6, "rgba(224, 84, 70, 0.18)");
-        if (this.puls > 0) NK.skaer(ctx, cx, cy, rK * 3.4, "rgba(255, 255, 255, 0.16)", this.puls);
+        NK.skaer(ctx, cx, cy, rK * 2.6, "rgba(224, 84, 70, 0.18)", dmp);
+        if (this.puls > 0) NK.skaer(ctx, cx, cy, rK * 3.4, "rgba(255, 255, 255, 0.16)", this.puls * dmp);
 
         var sorteret = this.nukleoner.slice().sort(function (a, b) { return a.y - b.y; });
         var rN = geo.rNukleon * s;
         for (i = 0; i < sorteret.length; i++) {
             var nu = sorteret[i];
-            var alfa = nu.tilstand === "gaar" ? (1 - nu.t) : 1;
+            var alfa = (nu.tilstand === "gaar" ? (1 - nu.t) : 1) * dmp;
             tegnKugle(ctx, cx + nu.x * s, cy + nu.y * s, rN,
                 nu.slags === "proton" ? FARVE.protonLys : FARVE.neutronLys,
                 nu.slags === "proton" ? FARVE.proton : FARVE.neutron, alfa);
@@ -373,7 +373,7 @@
         var rE = NK.klamp(6.6 * s, 3.4, 8);
         for (i = 0; i < this.elektroner.length; i++) {
             var el = this.elektroner[i];
-            var alfaE = 1;
+            var alfaE = dmp;
 
             if (el.tilstand === "gaar") {
                 if (!el.fanget) {
@@ -383,9 +383,9 @@
                     el.rx = this.retning ? this.retning.x : el.x / l;
                     el.ry = this.retning ? this.retning.y : el.y / l;
                 }
-                el.x = el.sx + el.rx * el.t * 340;
-                el.y = el.sy + el.ry * el.t * 340;
-                alfaE = 1 - el.t;
+                el.x = el.sx + el.rx * el.t * 300;
+                el.y = el.sy + el.ry * el.t * 300;
+                alfaE = (1 - el.t) * dmp;
             } else {
                 var v = this.elektronVinkel(el, geo, opt.lewis, yderste);
                 var r = geo.rSkal[el.skal];
@@ -450,7 +450,7 @@
         var pladser = NK.Data.SKALPLADSER;
 
         for (var i = 0; i < atom.fordeling.length; i++) {
-            var r = g.geo.rSkal[i] * g.s + 15;
+            var r = g.geo.rSkal[i] * g.s + 21;
             var x = g.cx + Math.cos(v) * r;
             var y = g.cy + Math.sin(v) * r;
             var fuld = atom.fordeling[i] === pladser[i];

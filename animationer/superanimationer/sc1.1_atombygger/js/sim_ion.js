@@ -264,7 +264,7 @@
         var q = (this.tilstand === "ion") ? g.ion : 0;
         var cx = l.b / 2;
         var cy = (l.h - 52) / 2 + 6;
-        var plads = NK.klamp(Math.min(l.b / 2 - 34, (l.h - 92) / 2), 70, 250);
+        var plads = NK.klamp(Math.min(l.b / 2 - 34, (l.h - 92) / 2), 70, 330);
 
         this.atom.tegn(c, cx, cy, plads, {
             lewis: this.lewis,
