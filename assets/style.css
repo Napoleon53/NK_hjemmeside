@@ -449,6 +449,12 @@ tbody th { font-weight: 650; }
   background: var(--bg-sektion); font-size: .84rem; color: var(--tekst-daempet);
 }
 
+.formel-kort.mini { box-shadow: none; }
+.formel-kort.mini .kort-bar { padding: 9px 16px; }
+.formel-kort.mini .formel-liste li { padding: 10px 16px; gap: 12px; }
+.formel-kort.mini .tast { min-width: 82px; font-size: .84rem; }
+.formel-kort.mini .formel { font-size: 1.12rem; }
+
 @media (max-width: 900px) {
   .hero-grid { grid-template-columns: 1fr; gap: 36px; }
   .hero h1 { max-width: none; }
@@ -559,11 +565,7 @@ code {
 .spalte h2 { font-size: 1.42rem; margin-bottom: .45em; }
 .spalte p { margin-bottom: 18px; }
 
-.spalte .formel-kort.mini { box-shadow: none; margin-bottom: 20px; }
-.spalte .formel-kort.mini .kort-bar { padding: 9px 16px; }
-.spalte .formel-kort.mini .formel-liste li { padding: 10px 16px; gap: 12px; }
-.spalte .formel-kort.mini .tast { min-width: 82px; font-size: .84rem; }
-.spalte .formel-kort.mini .formel { font-size: 1.12rem; }
+.spalte .formel-kort.mini { margin-bottom: 20px; }
 
 .spalte-liste {
   list-style: none; margin: 0 0 20px; padding: 16px 0 0;
