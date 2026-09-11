@@ -580,3 +580,47 @@ code {
 
 /* spalterne skal ligge taet paa introteksten */
 .sektion-taet { padding-top: clamp(30px, 3.5vw, 44px); }
+
+/* ------------------------------------------- Grupper i rammer (downloads) */
+
+.gruppe-stak { display: grid; gap: 20px; }
+
+.gruppe {
+  padding: 16px;
+  background: var(--bg-sektion);
+  border: 1px solid var(--kant); border-radius: calc(var(--radius) + 4px);
+}
+
+/* diskret etiket i stedet for en stor h2 */
+.gruppe-hoved { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; margin: 0 4px 12px; }
+.gruppe-hoved h2 {
+  margin: 0; font-size: .78rem; font-weight: 700; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--accent);
+}
+.gruppe-hoved p { margin: 0; font-size: .92rem; color: var(--tekst-daempet); }
+
+.gruppe-grid { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* kort med ikonet ved siden af teksten i stedet for over den */
+.kort.kompakt {
+  --kort-padding: 20px;
+  display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto 1fr auto;
+  column-gap: 16px;
+}
+.kort.kompakt .kort-ikon { grid-row: 1 / 4; align-self: start; width: 42px; height: 42px; margin-bottom: 0; }
+.kort.kompakt h3 { font-size: 1.08rem; margin-bottom: .25em; }
+.kort.kompakt .kort-fod { margin-top: 0; padding-top: 10px; }
+
+/* en linje i stedet for en hel sektion */
+.henvisning {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px;
+  padding: 14px 20px;
+  border: 1px dashed var(--kant-staerk); border-radius: var(--radius);
+}
+.henvisning p { margin: 0; color: var(--tekst-daempet); }
+.henvisning strong { color: var(--tekst); }
+
+@media (max-width: 720px) {
+  .gruppe { padding: 12px; }
+  .gruppe-grid { grid-template-columns: 1fr; }
+}
