@@ -180,23 +180,27 @@ main { flex: 1; position: relative; min-height: 0; }
 .scene-mrk.advarsel { color: #f0a49c; }
 
 /* ---------------------------------------------------------------------
-   NUKLIDSYMBOLET - kemikerens skrivemaade oeverst i scenen
+   NUKLIDSYMBOLET - kemikerens skrivemaade, svaevende over atomet
    Massetallet over protontallet til venstre for symbolet, ladningen
-   haevet bagefter. Præcis som i bogen.
+   haevet bagefter. Præcis som i bogen. Positionen (left/top) saettes
+   af JavaScript hver eneste billede, saa mærkatet altid haenger lige
+   over det atom, der rent faktisk er tegnet - se sim_byg.js. Ankeret
+   er midt for-neden, derfor translate(-50%, -100%).
    --------------------------------------------------------------------- */
 .nuklid {
     position: absolute;
-    top: 16px;
-    left: 18px;
+    top: 0;
+    left: 0;
+    transform: translate(-50%, -100%);
     display: grid;
     grid-template-columns: auto auto auto;
     grid-template-rows: auto auto;
-    column-gap: 4px;
+    column-gap: 5px;
     align-items: center;
     background-color: rgba(20, 20, 26, 0.72);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: var(--radius);
-    padding: 10px 16px 10px 12px;
+    padding: 11px 18px 11px 13px;
     pointer-events: none;
     font-variant-numeric: tabular-nums;
 }
@@ -204,7 +208,7 @@ main { flex: 1; position: relative; min-height: 0; }
 .nuklid .a, .nuklid .z {
     grid-column: 1;
     text-align: right;
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     font-weight: 700;
     line-height: 1.15;
 }
@@ -215,7 +219,7 @@ main { flex: 1; position: relative; min-height: 0; }
 .nuklid .sym {
     grid-column: 2;
     grid-row: 1 / span 2;
-    font-size: 2.5rem;
+    font-size: 2.9rem;
     font-weight: 300;
     line-height: 1;
     color: var(--tekst);
@@ -225,10 +229,10 @@ main { flex: 1; position: relative; min-height: 0; }
     grid-column: 3;
     grid-row: 1;
     align-self: start;
-    font-size: 1.15rem;
+    font-size: 1.3rem;
     font-weight: 700;
     line-height: 1;
-    min-width: 16px;
+    min-width: 18px;
 }
 
 .nuklid .q.plus  { color: var(--proton); }
@@ -269,7 +273,7 @@ main { flex: 1; position: relative; min-height: 0; }
    --------------------------------------------------------------------- */
 .opgave-boks {
     position: absolute;
-    top: 116px;
+    top: 18px;
     left: 18px;
     width: 300px;
     max-width: calc(100% - 36px);
@@ -823,9 +827,9 @@ select:focus-visible {
     .fane.aktiv { display: grid; }
     .scene { height: 58vh; min-height: 340px; }
     .panel { border-left: none; border-top: 1px solid #1f1f27; }
-    .nuklid { top: 10px; left: 10px; padding: 7px 12px 7px 9px; }
-    .nuklid .sym { font-size: 2rem; }
-    .opgave-boks { top: 96px; width: calc(100% - 30px); left: 15px; }
+    .nuklid { padding: 8px 13px 8px 10px; }
+    .nuklid .sym { font-size: 2.2rem; }
+    .opgave-boks { top: 15px; width: calc(100% - 30px); left: 15px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

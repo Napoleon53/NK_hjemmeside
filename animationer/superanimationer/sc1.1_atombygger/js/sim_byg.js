@@ -413,8 +413,10 @@
         var cx = l.b / 2;
         var cy = l.h * 0.57;
         var plads = NK.klamp(Math.min(l.b / 2 - 40, l.h * 0.40), 70, 300);
+        var nuklidBoks = NK.el("byg-nuklid");
 
         if (this.p === 0 && this.n === 0 && this.e === 0) {
+            nuklidBoks.style.display = "none";
             c.save();
             c.setLineDash([7, 7]);
             c.strokeStyle = "rgba(160, 190, 220, 0.25)";
@@ -432,14 +434,20 @@
             return;
         }
 
-        var g = D.grundstof(this.p);
         this.atom.tegn(c, cx, cy, plads, {
             fremhaevValens: true,
-            ladning: this.p - this.e,
-            maerkat: g ? g.symbol : null,
-            maerkatOver: true,
-            maerkatStor: true
+            ladning: this.p - this.e
         });
         NK.tegnSkaltal(c, this.atom);
+
+        /* Nuklidmaerkatet (massetal, atomnummer, symbol, ladning) svaever
+           lige over atomet i stedet for at ligge fast i et hjoerne - saa
+           det altid peger paa netop det atom, der er tegnet. */
+        var geo = this.atom.sidsteGeo;
+        var yderste = this.atom.fordeling.length - 1;
+        var ydreR = geo.geo.rSkal[Math.max(0, yderste)] * geo.s;
+        nuklidBoks.style.display = "";
+        nuklidBoks.style.left = cx + "px";
+        nuklidBoks.style.top = (cy - ydreR - 14) + "px";
     };
 }());

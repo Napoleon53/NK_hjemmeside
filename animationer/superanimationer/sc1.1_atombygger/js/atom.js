@@ -33,6 +33,12 @@
 
     var FLYVETID = 0.55;      /* sekunder for en partikel ind eller ud */
 
+    /* Mere end 5 af samme slags proppet ind i klumpen ser bare fjollet ud
+       - smaa prikker der overlapper hinanden, umulige at taelle. Derfor
+       vises hoejst 5 af hver slags; det praecise antal staar i forvejen i
+       nuklidmaerkatet og i tal-panelet. */
+    var VIS_MAKS_NUKLEON = 5;
+
     function blod(t) { return t * t * (3 - 2 * t); }
 
     function nukleonRadius(a) {
@@ -94,14 +100,15 @@
         this.elektroner.length = 0;
         this.p = p; this.n = n; this.e = e;
         var i;
-        for (i = 0; i < p; i++) this.nukleoner.push(nyNukleon("proton", true));
-        for (i = 0; i < n; i++) this.nukleoner.push(nyNukleon("neutron", true));
+        for (i = 0; i < Math.min(p, VIS_MAKS_NUKLEON); i++) this.nukleoner.push(nyNukleon("proton", true));
+        for (i = 0; i < Math.min(n, VIS_MAKS_NUKLEON); i++) this.nukleoner.push(nyNukleon("neutron", true));
         for (i = 0; i < e; i++) this.elektroner.push(nyElektron(true));
         this.fordelElektroner();
     };
 
     /* ----- Kernen ------------------------------------------------------ */
     NK.Atom.prototype.saetNukleoner = function (slags, antal) {
+        var maal = Math.min(antal, VIS_MAKS_NUKLEON);
         var levende = [];
         var i;
         for (i = 0; i < this.nukleoner.length; i++) {
@@ -109,7 +116,7 @@
                 levende.push(this.nukleoner[i]);
             }
         }
-        var forskel = antal - levende.length;
+        var forskel = maal - levende.length;
         if (forskel > 0) {
             for (i = 0; i < forskel; i++) this.nukleoner.push(nyNukleon(slags, false));
             this.puls = 1;
