@@ -43,6 +43,12 @@
             <span class="q" id="byg-nuklid-q"></span>
         </div>
 
+        <!-- Findes kernen i naturen? Staar lige under selve atommodellen,
+             saa svaret er dér, hvor man kigger. Placeres af sim_byg.js. -->
+        <div class="kernekort" id="byg-kerne" aria-live="polite"></div>
+
+        <button class="knap scene-knap" id="byg-nulstil" type="button"><span>Genstart</span><span class="tegn">↺</span></button>
+
         <div class="kort opgavekort opgave-boks" id="opgave-boks">
             <h2>Opgave <span class="taeller">løst: <b id="byg-opgave-tal">0</b></span></h2>
             <p class="besked" id="byg-opgave">Tryk på “Start opgave” for at få en opgave, du selv skal bygge.</p>
@@ -85,7 +91,6 @@
                 <button class="knap" id="byg-neutral" type="button">Gør det neutralt</button>
                 <button class="knap" id="byg-almindelig" type="button">Almindelig isotop</button>
             </div>
-            <button class="knap nulstil" id="byg-nulstil" type="button"><span>Ryd alt, og byg fra bunden</span><span class="tegn">↺</span></button>
         </div>
 
         <div class="kort fremhaev">
@@ -93,9 +98,8 @@
             <div class="stor" id="byg-grundstof">Hydrogen</div>
             <span class="maerke groen" id="byg-type">Neutralt atom</span>
             <div class="talraekke"><span>Massetal A = Z + N</span><span class="tal" id="byg-massetal">1</span></div>
-            <div class="talraekke"><span>Ladning = p − e</span><span class="tal groen" id="byg-ladning">0  (1 − 1)</span></div>
+            <div class="talraekke"><span>Ladning</span><span class="tal groen" id="byg-ladning">0</span></div>
             <div class="talraekke"><span>Elektronstruktur</span><span class="tal gul" id="byg-fordeling">1</span></div>
-            <p class="besked god" id="byg-kerne" style="margin-top:9px;"></p>
         </div>
     </aside>
 </section>
