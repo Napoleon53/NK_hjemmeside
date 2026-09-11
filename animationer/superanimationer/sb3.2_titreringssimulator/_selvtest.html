@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest — titreringssimulator</title>
+<style>
+body {
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    background-color: #1b1b21;
+    color: #f2f3f5;
+    margin: 0;
+    padding: 26px 30px 60px;
+    line-height: 1.5;
+}
+h1 { font-size: 1.25rem; margin: 0 0 4px 0; }
+h2 {
+    font-size: 0.76rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #f2c53d;
+    margin: 26px 0 8px 0;
+}
+p.info { color: #a9b0ba; font-size: 0.86rem; max-width: 760px; margin: 0 0 6px 0; }
+#dom {
+    display: inline-block;
+    margin: 14px 0 4px 0;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+}
+#dom.god { background-color: rgba(63, 174, 114, 0.18); border: 1px solid #3fae72; color: #7ee0a8; }
+#dom.skidt { background-color: rgba(224, 84, 70, 0.18); border: 1px solid #e05446; color: #f0918a; }
+table { border-collapse: collapse; width: 100%; max-width: 1000px; font-size: 0.83rem; }
+th {
+    text-align: left;
+    color: #7e8590;
+    font-weight: 600;
+    border-bottom: 1px solid #464655;
+    padding: 5px 8px;
+}
+td { padding: 4px 8px; border-bottom: 1px solid rgba(70, 70, 85, 0.4); color: #c8ced6; }
+td.tal { font-family: "Cascadia Mono", Consolas, monospace; text-align: right; font-variant-numeric: tabular-nums; }
+tr.fejl td { background-color: rgba(224, 84, 70, 0.13); color: #f0a49c; }
+tr.ok td:first-child { color: #7ee0a8; }
+.kilde { color: #7e8590; font-size: 0.78rem; }
+</style>
+</head>
+<body>
+
+<h1>Selvtest af kemien bag titreringssimulatoren</h1>
+<p class="info">
+Siden regner pH ud med <code>js/kemi.js</code> og sammenligner med værdier,
+der er regnet i hånden eller slået op. Den bruges ikke af animationen og kan
+slettes. Kør den, hvis du har rettet i pKs-værdierne eller i selve løseren.
+</p>
+
+<div id="dom">Regner …</div>
+
+<h2>pH i enkeltopløsninger</h2>
+<table id="tabel-ph"><thead><tr>
+    <th>Opløsning</th><th style="width:90px">Beregnet</th><th style="width:90px">Ventet</th>
+    <th style="width:70px">Afvig.</th><th>Hvorfor</th>
+</tr></thead><tbody></tbody></table>
+
+<h2>Titreringer</h2>
+<table id="tabel-titrering"><thead><tr>
+    <th>Titrering</th><th style="width:90px">Beregnet</th><th style="width:90px">Ventet</th>
+    <th style="width:70px">Afvig.</th><th>Hvorfor</th>
+</tr></thead><tbody></tbody></table>
+
+<h2>Ækvivalenspunkter, der skal frasorteres</h2>
+<table id="tabel-antal"><thead><tr>
+    <th>Opstilling</th><th style="width:90px">Fundet</th><th style="width:90px">Ventet</th>
+    <th style="width:70px"></th><th>Hvorfor</th>
+</tr></thead><tbody></tbody></table>
+
+<script src="js/kemi.js"></script>
+<script src="js/kerne.js"></script>
+<script>
+(function () {
+    "use strict";
+    var Kemi = NK.Kemi;
+    var s = function (id) { return Kemi.findStof(id); };
+    var fejl = 0;
+
+    function rad(tabel, navn, faktisk, ventet, tol, hvorfor, decimaler) {
+        decimaler = decimaler === undefined ? 2 : decimaler;
+        var afvig = Math.abs(faktisk - ventet);
+        var ok = afvig <= tol;
+        if (!ok) fejl++;
+        var tr = document.createElement("tr");
+        tr.className = ok ? "ok" : "fejl";
+        function td(tekst, klasse) {
+            var e = document.createElement("td");
+            if (klasse) e.className = klasse;
+            e.textContent = tekst;
+            tr.appendChild(e);
+        }
+        td((ok ? "✓  " : "✗  ") + navn);
+        td(NK.tal(faktisk, decimaler), "tal");
+        td(NK.tal(ventet, decimaler), "tal");
+        td(NK.tal(afvig, decimaler), "tal");
+        td(hvorfor || "");
+        document.querySelector("#" + tabel + " tbody").appendChild(tr);
+    }
+
+    /* ---------- pH i enkeltopløsninger ---------- */
+    var p = "tabel-ph";
+    rad(p, "0,1 M HCl", Kemi.pH([{ stof: s("hcl"), c: 0.1 }]), 1.00, 0.01, "stærk syre: pH = −log c");
+    rad(p, "0,1 M NaOH", Kemi.pH([{ stof: s("naoh"), c: 0.1 }]), 13.00, 0.01, "stærk base: pOH = 1");
+    rad(p, "0,05 M Ba(OH)₂", Kemi.pH([{ stof: s("baoh2"), c: 0.05 }]), 13.00, 0.01, "to OH⁻ pr. formelenhed");
+    rad(p, "rent vand", Kemi.pH([]), 7.00, 0.005, "Kw alene");
+    rad(p, "1·10⁻⁸ M HCl", Kemi.pH([{ stof: s("hcl"), c: 1e-8 }]), 6.98, 0.01, "så fortyndet at vandet dominerer — her fejler pH = −log c");
+    rad(p, "0,1 M eddikesyre", Kemi.pH([{ stof: s("eddikesyre"), c: 0.1 }]), 2.88, 0.01, "√(Ks·c)");
+    rad(p, "0,1 M ammoniak", Kemi.pH([{ stof: s("ammoniak"), c: 0.1 }]), 11.12, 0.01, "svag base");
+    rad(p, "0,1 M natriumacetat", Kemi.pH([{ stof: s("natriumacetat"), c: 0.1 }]), 8.88, 0.01, "korresponderende base hydrolyserer");
+    rad(p, "0,1 M NH₄Cl", Kemi.pH([{ stof: s("ammoniumchlorid"), c: 0.1 }]), 5.12, 0.01, "korresponderende syre");
+    rad(p, "0,1 M NaHCO₃", Kemi.pH([{ stof: s("nahco3"), c: 0.1 }]), 8.34, 0.02, "amfolyt: pH ≈ ½(pKs1 + pKs2)");
+    rad(p, "0,1 M H₃PO₄", Kemi.pH([{ stof: s("phosphorsyre"), c: 0.1 }]), 1.62, 0.03, "flerprotonet, kun 1. trin tæller");
+    rad(p, "0,1 M H₂SO₄", Kemi.pH([{ stof: s("h2so4"), c: 0.1 }]), 0.96, 0.03, "1. trin stærkt, 2. trin pKs 1,99");
+    rad(p, "0,1 M HAc + 0,1 M NaAc", Kemi.pH([{ stof: s("eddikesyre"), c: 0.1 }, { stof: s("natriumacetat"), c: 0.1 }]), 4.76, 0.01, "puffer med lige meget af hver: pH = pKs");
+    rad(p, "0,1 M glycin", Kemi.pH([{ stof: s("glycin"), c: 0.1 }]), 6.07, 0.05, "isoelektrisk punkt ≈ ½(pKs1 + pKs2)");
+
+    /* ---------- titreringer ---------- */
+    var t = "tabel-titrering";
+    function ops(proeve, V0, titrator, cT, Vmaks) {
+        var liste = [];
+        for (var i = 0; i < proeve.length; i++) liste.push({ stof: s(proeve[i][0]), c: proeve[i][1] });
+        return { proeve: liste, V0: V0, titrator: { stof: s(titrator), c: cT }, Vmaks: Vmaks };
+    }
+
+    var hac = ops([["eddikesyre", 0.1]], 20, "naoh", 0.1, 40);
+    var aeHac = Kemi.aekvivalenspunkter(hac);
+    rad(t, "HAc/NaOH: ækvivalensvolumen", aeHac[0].V, 20.00, 0.001, "n(HAc) = n(NaOH)");
+    rad(t, "HAc/NaOH: pH ved ækvivalens", aeHac[0].pH, 8.73, 0.03, "kun acetat tilbage, fortyndet til 40 mL");
+    rad(t, "HAc/NaOH: pH ved halv titrering", Kemi.pHVed(hac, 10), 4.76, 0.01, "her aflæses pKs");
+
+    var hcl = ops([["hcl", 0.1]], 25, "naoh", 0.1, 50);
+    var aeHcl = Kemi.aekvivalenspunkter(hcl);
+    rad(t, "HCl/NaOH: pH ved ækvivalens", aeHcl[0].pH, 7.00, 0.01, "stærk mod stærk giver neutralt");
+    rad(t, "HCl/NaOH: pH ved 24,90 mL", Kemi.pHVed(hcl, 24.9), 3.70, 0.02, "0,1 mL fra ækvivalens");
+    rad(t, "HCl/NaOH: pH ved 25,10 mL", Kemi.pHVed(hcl, 25.1), 10.30, 0.02, "0,1 mL efter — springet er 6,6 pH-enheder");
+
+    var nh3 = ops([["ammoniak", 0.1]], 20, "hcl", 0.1, 40);
+    rad(t, "NH₃/HCl: pH ved ækvivalens", Kemi.aekvivalenspunkter(nh3)[0].pH, 5.28, 0.03, "svag base titreret med stærk syre ender surt");
+
+    var svagsvag = ops([["eddikesyre", 0.1]], 20, "ammoniak", 0.1, 40);
+    rad(t, "HAc/NH₃: pH ved ækvivalens", Kemi.aekvivalenspunkter(svagsvag)[0].pH, 7.00, 0.02, "pKs(HAc) og pKs(NH₄⁺) ligger symmetrisk om 7");
+
+    var soda = ops([["na2co3", 0.05]], 20, "hcl", 0.1, 40);
+    var aeSoda = Kemi.aekvivalenspunkter(soda);
+    rad(t, "Na₂CO₃/HCl: 1. ækvivalens (mL)", aeSoda[0].V, 10.00, 0.001, "til hydrogencarbonat");
+    rad(t, "Na₂CO₃/HCl: 1. ækvivalens (pH)", aeSoda[0].pH, 8.34, 0.03, "amfolytten HCO₃⁻");
+    rad(t, "Na₂CO₃/HCl: 2. ækvivalens (mL)", aeSoda[1].V, 20.00, 0.001, "dobbelt så meget — deraf dobbeltindikator");
+
+    var h3po4 = ops([["phosphorsyre", 0.05]], 20, "naoh", 0.1, 40);
+    var aePo4 = Kemi.aekvivalenspunkter(h3po4);
+    rad(t, "H₃PO₄/NaOH: 1. ækvivalens (pH)", aePo4[0].pH, 4.68, 0.06, "amfolytten H₂PO₄⁻");
+    rad(t, "H₃PO₄/NaOH: 2. ækvivalens (pH)", aePo4[1].pH, 9.70, 0.15, "amfolytten HPO₄²⁻");
+
+    var blanding = ops([["hcl", 0.05], ["eddikesyre", 0.05]], 20, "naoh", 0.1, 40);
+    var aeBl = Kemi.aekvivalenspunkter(blanding);
+    rad(t, "HCl + HAc: 1. ækvivalens (mL)", aeBl[0].V, 10.00, 0.001, "kun den stærke syre er omsat her");
+    rad(t, "HCl + HAc: 2. ækvivalens (mL)", aeBl[1].V, 20.00, 0.001, "nu er begge omsat");
+
+    var h2so4 = ops([["naoh", 0.1]], 20, "h2so4", 0.05, 40);
+    rad(t, "NaOH titreret med H₂SO₄ (mL)", Kemi.aekvivalenspunkter(h2so4)[0].V, 20.00, 0.001, "svovlsyre afgiver to protoner pr. molekyle");
+
+    /* ---------- antal ækvivalenspunkter ---------- */
+    var a = "tabel-antal";
+    rad(a, "H₃PO₄ med NaOH", aePo4.length, 2, 0, "3. trin har pKs 12,35 og kan ikke titreres i vand", 0);
+    rad(a, "Na₂CO₃ med HCl", aeSoda.length, 2, 0, "begge trin kan titreres", 0);
+    rad(a, "Citronsyre med NaOH", Kemi.aekvivalenspunkter(ops([["citronsyre", 0.03]], 25, "naoh", 0.1, 40)).length, 3, 0, "tre trin findes — men springene smelter sammen", 0);
+    rad(a, "Ascorbinsyre med NaOH", Kemi.aekvivalenspunkter(ops([["ascorbinsyre", 0.05]], 20, "naoh", 0.1, 40)).length, 2, 0, "2. trin (pKs 11,79) er omsat, men springet er 0,01 pH — kurvefanen skriver derfor »intet brugbart spring«", 0);
+    rad(a, "Vand med NaOH", Kemi.aekvivalenspunkter(ops([["vand", 0]], 20, "naoh", 0.1, 40)).length, 0, 0, "der er ikke noget at titrere", 0);
+    rad(a, "Eddikesyre med natriumacetat", Kemi.aekvivalenspunkter(ops([["eddikesyre", 0.1]], 20, "natriumacetat", 0.1, 40)).length, 0, 0, "acetat kan ikke omsætte eddikesyre", 0);
+    rad(a, "Glycin med HCl", Kemi.aekvivalenspunkter(ops([["glycin", 0.1]], 20, "hcl", 0.1, 40)).length, 1, 0, "carboxylatgruppen protoneres", 0);
+    rad(a, "Glycin med NaOH", Kemi.aekvivalenspunkter(ops([["glycin", 0.1]], 20, "naoh", 0.1, 40)).length, 1, 0, "ammoniumgruppen afgiver sin proton", 0);
+
+    /* ---------- dom ---------- */
+    var dom = document.getElementById("dom");
+    dom.className = fejl ? "skidt" : "god";
+    dom.textContent = fejl
+        ? fejl + (fejl === 1 ? " test fejlede" : " tests fejlede")
+        : "Alle tests er i orden";
+}());
+</script>
+</body>
+</html>

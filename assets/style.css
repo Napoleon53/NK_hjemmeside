@@ -25,6 +25,7 @@
   --kort-padding:  26px;
   --radius:        12px;
   --radius-lille:  8px;
+  --header-hoejde: 84px;          /* logoet (68px) + luft over og under */
   --skygge:        0 1px 2px rgba(20, 32, 31, .06), 0 4px 12px rgba(20, 32, 31, .05);
   --skygge-hover:  0 2px 4px rgba(20, 32, 31, .07), 0 12px 28px rgba(20, 32, 31, .10);
 
@@ -90,17 +91,17 @@ p  { margin: 0 0 1.1em; }
 
 .header-inder {
   display: flex; align-items: center; gap: 16px;
-  min-height: 68px;
+  min-height: var(--header-hoejde);
   width: 100%; max-width: var(--bredde); margin-inline: auto; padding-inline: 24px;
 }
 
 .brand {
   display: flex; align-items: center; gap: 10px;
-  font-weight: 700; font-size: 1.14rem; letter-spacing: -.02em;
+  font-weight: 700; font-size: 1.5rem; letter-spacing: -.02em;
   color: var(--tekst); text-decoration: none; margin-right: auto;
   white-space: nowrap;
 }
-.brand img { width: 34px; height: 34px; }
+.brand img { width: 68px; height: 68px; }
 .brand:hover { color: var(--accent); }
 
 /* Hamburger */
@@ -155,7 +156,7 @@ p  { margin: 0 0 1.1em; }
 
 .hero {
   position: relative; overflow: hidden;
-  padding: clamp(52px, 7vw, 92px) 0 clamp(44px, 6vw, 76px);
+  padding: clamp(28px, 3.5vw, 48px) 0 clamp(44px, 6vw, 76px);
   background:
     radial-gradient(760px 340px at 12% -8%, #e0f0ee 0%, rgba(224, 240, 238, 0) 62%),
     radial-gradient(620px 320px at 92% 4%, #eaf6e9 0%, rgba(234, 246, 233, 0) 60%),
@@ -217,6 +218,8 @@ p  { margin: 0 0 1.1em; }
 .sektion-hoved { max-width: var(--bredde-tekst); margin-bottom: 34px; }
 .sektion-hoved p { color: var(--tekst-daempet); margin-bottom: 0; }
 
+.h2-lille { font-size: 1.5rem; }
+
 .sidehoved {
   padding: clamp(38px, 5vw, 60px) 0 clamp(20px, 3vw, 30px);
   border-bottom: 1px solid var(--kant); background: var(--bg-sektion);
@@ -227,6 +230,8 @@ p  { margin: 0 0 1.1em; }
 .brodtekst { max-width: var(--bredde-tekst); }
 .brodtekst h2 { margin-top: 1.8em; }
 .brodtekst h2:first-child { margin-top: 0; }
+.brodtekst ol { padding-left: 1.3em; }
+.brodtekst ol li + li { margin-top: .4em; }
 
 /* -------------------------------------------------------------------- Kort */
 
@@ -319,6 +324,7 @@ tbody th { font-weight: 650; }
   overflow: hidden; background: var(--bg-daempet); box-shadow: var(--skygge);
 }
 .skaermbillede img { width: 100%; }
+.skaermbillede > a { display: block; cursor: zoom-in; }
 .skaermbillede figcaption {
   padding: 11px 16px; font-size: .87rem; color: var(--tekst-daempet);
   border-top: 1px solid var(--kant); background: #fff;
@@ -345,15 +351,12 @@ tbody th { font-weight: 650; }
   background: #101a19; color: #b8c8c6; font-size: .94rem;
   border-top: 3px solid var(--gul);
 }
-.footer-grid { display: grid; gap: 34px; grid-template-columns: minmax(230px, 1.4fr) repeat(auto-fit, minmax(150px, 1fr)); }
+.footer-grid { display: grid; gap: 34px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
 .site-footer h2 { font-size: .82rem; text-transform: uppercase; letter-spacing: .07em; color: #fff; margin-bottom: 14px; }
 .site-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
 .site-footer a { color: #b8c8c6; text-decoration: none; }
 .site-footer a:hover { color: var(--gul); text-decoration: underline; }
 .site-footer p { color: #8b9d9b; }
-
-.footer-brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.1rem; color: #fff; margin-bottom: 12px; }
-.footer-brand img { width: 30px; height: 30px; background: #fff; border-radius: 6px; padding: 2px; }
 
 .footer-bund {
   margin-top: 34px; padding-top: 20px; border-top: 1px solid #253433;
@@ -371,7 +374,7 @@ tbody th { font-weight: 650; }
     position: absolute; top: 100%; left: 0; right: 0;
     background: #fff; border-bottom: 1px solid var(--kant);
     box-shadow: var(--skygge-hover);
-    max-height: calc(100dvh - 68px); overflow-y: auto;
+    max-height: calc(100dvh - var(--header-hoejde)); overflow-y: auto;
     display: none;
   }
   .hovedmenu.aaben { display: block; }
@@ -427,11 +430,9 @@ tbody th { font-weight: 650; }
   box-shadow: var(--skygge-hover); overflow: hidden;
 }
 .formel-kort .kort-bar {
-  display: flex; gap: 6px; align-items: center;
-  padding: 12px 16px; background: var(--bg-daempet); border-bottom: 1px solid var(--kant);
+  padding: 11px 20px; background: var(--bg-daempet); border-bottom: 1px solid var(--kant);
 }
-.formel-kort .prik { width: 10px; height: 10px; border-radius: 50%; background: var(--kant-staerk); }
-.formel-kort .bar-titel { margin-left: 8px; font-size: .8rem; color: var(--tekst-daempet); font-weight: 600; }
+.formel-kort .bar-titel { font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--tekst-daempet); }
 
 .formel-liste { list-style: none; margin: 0; padding: 0; }
 .formel-liste li { display: flex; align-items: center; gap: 14px; padding: 13px 20px; }
@@ -450,6 +451,12 @@ tbody th { font-weight: 650; }
   padding: 12px 20px; border-top: 1px solid var(--kant);
   background: var(--bg-sektion); font-size: .84rem; color: var(--tekst-daempet);
 }
+
+.formel-kort.mini { box-shadow: none; }
+.formel-kort.mini .kort-bar { padding: 9px 16px; }
+.formel-kort.mini .formel-liste li { padding: 10px 16px; gap: 12px; }
+.formel-kort.mini .tast { min-width: 82px; font-size: .84rem; }
+.formel-kort.mini .formel { font-size: 1.12rem; }
 
 @media (max-width: 900px) {
   .hero-grid { grid-template-columns: 1fr; gap: 36px; }
@@ -481,12 +488,13 @@ tbody th { font-weight: 650; }
 .medie-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
 .medie-grid > figure { margin: 0; }
 .medie-grid .brodtekst { max-width: none; }
+.medie-grid.tekst-bred { grid-template-columns: 3fr 2fr; }
 
 .kort.bred { max-width: none; }
 .kort > .knap { align-self: flex-start; margin-top: 20px; }
 
 @media (max-width: 860px) {
-  .medie-grid { grid-template-columns: 1fr; gap: 28px; }
+  .medie-grid, .medie-grid.tekst-bred { grid-template-columns: 1fr; gap: 28px; }
   .medie-grid > figure { order: -1; }
 }
 
@@ -513,7 +521,6 @@ code {
    footer-gitteret og kort-gitteret havde haarde minimumsbredder. */
 @media (max-width: 860px) {
   .footer-grid { grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 28px; }
-  .footer-grid > div:first-child { grid-column: 1 / -1; }
 }
 @media (max-width: 620px) {
   .kort-grid, .kort-grid.to-kolonner { grid-template-columns: 1fr; }
@@ -552,3 +559,72 @@ code {
 
 .kort .download-liste { margin-top: auto; padding-top: 4px; }
 .kort .info-boks { margin-bottom: 18px; }
+
+/* --------------------------------------------------- Forsidens to spalter */
+
+.hero-smal h1 { max-width: none; font-size: clamp(1.75rem, 1.1rem + 2.1vw, 2.5rem); }
+.hero-smal .manchet { max-width: 66ch; margin-bottom: 0; }
+
+.spalte h2 { font-size: 1.42rem; margin-bottom: .45em; }
+.spalte p { margin-bottom: 18px; }
+
+.spalte .formel-kort.mini { margin-bottom: 20px; }
+
+.spalte-liste {
+  list-style: none; margin: 0 0 20px; padding: 16px 0 0;
+  border-top: 1px solid var(--kant); display: grid; gap: 10px;
+}
+.spalte-liste a { font-weight: 600; font-size: .95rem; text-decoration: none; }
+.spalte-liste a::after { content: " \2192"; }
+.spalte-liste a:hover { text-decoration: underline; }
+
+/* spalterne faar hver sin hoejde i stedet for et hul i den korteste */
+.spalte-grid { align-items: start; }
+.spalte > .knap { margin-top: 4px; }
+
+/* spalterne skal ligge taet paa introteksten */
+.sektion-taet { padding-top: clamp(30px, 3.5vw, 44px); }
+
+/* ------------------------------------------- Grupper i rammer (downloads) */
+
+.gruppe-stak { display: grid; gap: 20px; }
+
+.gruppe {
+  padding: 16px;
+  background: var(--bg-sektion);
+  border: 1px solid var(--kant); border-radius: calc(var(--radius) + 4px);
+}
+
+/* diskret etiket i stedet for en stor h2 */
+.gruppe-hoved { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; margin: 0 4px 12px; }
+.gruppe-hoved h2 {
+  margin: 0; font-size: .78rem; font-weight: 700; letter-spacing: .07em;
+  text-transform: uppercase; color: var(--accent);
+}
+.gruppe-hoved p { margin: 0; font-size: .92rem; color: var(--tekst-daempet); }
+
+.gruppe-grid { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* kort med ikonet ved siden af teksten i stedet for over den */
+.kort.kompakt {
+  --kort-padding: 20px;
+  display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto 1fr auto;
+  column-gap: 16px;
+}
+.kort.kompakt .kort-ikon { grid-row: 1 / 4; align-self: start; width: 42px; height: 42px; margin-bottom: 0; }
+.kort.kompakt h3 { font-size: 1.08rem; margin-bottom: .25em; }
+.kort.kompakt .kort-fod { margin-top: 0; padding-top: 10px; }
+
+/* en linje i stedet for en hel sektion */
+.henvisning {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px;
+  padding: 14px 20px;
+  border: 1px dashed var(--kant-staerk); border-radius: var(--radius);
+}
+.henvisning p { margin: 0; color: var(--tekst-daempet); }
+.henvisning strong { color: var(--tekst); }
+
+@media (max-width: 720px) {
+  .gruppe { padding: 12px; }
+  .gruppe-grid { grid-template-columns: 1fr; }
+}

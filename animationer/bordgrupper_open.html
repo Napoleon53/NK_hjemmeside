@@ -374,8 +374,9 @@ Elev 28</textarea>
       <input type="number" id="rotationWeeks" value="2" min="1" max="52" style="font-weight:400; padding:6px 8px; border:1px solid var(--border); border-radius:6px; width:60px;">
     </label>
     <label style="margin:0; font-weight:600; display:flex; align-items:center; gap:6px;">
-      Hvor mange nye bordgrupper skal laves
-      <input type="number" id="groupingCount" value="5" min="1" max="30" style="font-weight:400; padding:6px 8px; border:1px solid var(--border); border-radius:6px; width:60px;">
+      Hvor mange uger skal planen dække
+      <input type="number" id="planWeeks" value="10" min="1" max="52" style="font-weight:400; padding:6px 8px; border:1px solid var(--border); border-radius:6px; width:60px;">
+      <span id="groupingCountHint" style="font-weight:400; color:var(--muted); font-size:.8rem;"></span>
     </label>
   </div>
   <div class="row">
@@ -1462,10 +1463,24 @@ Elev 28</textarea>
   }
 
   // ---------- Klassenavn / antal grupperinger / filnavn ----------
+  // Læreren angiver antal skoleuger; antal bordgrupper = uger / skifte-interval, rundet op,
+  // så planen altid dækker mindst de ønskede uger.
+  function getPlanWeeks(){
+    var v = parseInt(document.getElementById('planWeeks').value, 10);
+    if(!v || v < 1) return 10;
+    return Math.min(v, 52);
+  }
+
   function getGroupingCount(){
-    var v = parseInt(document.getElementById('groupingCount').value, 10);
-    if(!v || v < 1) return 5;
-    return Math.min(v, 30);
+    return Math.min(Math.ceil(getPlanWeeks() / getRotationWeeks()), 30);
+  }
+
+  function updateGroupingCountHint(){
+    var n = getGroupingCount();
+    var weeks = n * getRotationWeeks();
+    var text = '(= ' + n + (n === 1 ? ' bordgruppe' : ' bordgrupper');
+    if(weeks !== getPlanWeeks()) text += ', dækker ' + weeks + ' uger';
+    document.getElementById('groupingCountHint').textContent = text + ')';
   }
 
   function getISOWeek(date){
@@ -1631,13 +1646,16 @@ Elev 28</textarea>
 
   document.getElementById('startWeek').value = defaultStartWeek();
   document.getElementById('currentWeekHint').textContent = '(vi er i uge ' + getISOWeek(new Date()) + ' nu)';
+  document.getElementById('planWeeks').addEventListener('input', updateGroupingCountHint);
+  document.getElementById('rotationWeeks').addEventListener('input', updateGroupingCountHint);
+  updateGroupingCountHint();
 
   // ---------- Præsentér programmet: kort guidet rundtur med gule ringe ----------
   var tourSteps = [
     { sel:'#names', text:'Indsæt elevernes navne her, ét pr. linje. Feltet er forudfyldt så du hurtigt kan se, hvordan det virker.' },
     { sel:'#shortenNamesBtn', text:'Forkort navne til fornavn + efternavns-forbogstav. Virker også hvis du indsætter en elevliste direkte fra Lectio - den fjerner selv id-numre og holdinformation automatisk.' },
     { sel:'#importBtn', text:'Importér klassen for at sætte avancerede betingelser - fx at to elever aldrig skal være i samme gruppe eller altid skal være sammen. Du kan også sætte køn på eleverne og vælge blandet eller ens køn i makkerparrene.' },
-    { sel:'#groupingCount', text:'Vælg hvor mange nye bordgrupper du vil have, fra hvilken uge de gælder, og hvor tit de skal skiftes. Skoleferie-uger springes automatisk over.' },
+    { sel:'#planWeeks', text:'Vælg fra hvilken uge grupperne gælder, hvor tit de skal skiftes, og hvor mange uger planen skal dække. Programmet regner selv ud, hvor mange bordgrupper der skal laves (rundet op). Skoleferie-uger springes automatisk over.' },
     { sel:'#generateBtn', text:'Klik her for at danne makkerpar, bordgrupper og grupper til lokaler med rækker og 6-mandsborde. Resultatet vises nedenfor i tre faner: Firemandsborde, Sekskantede borde og Rækkeopstilling.' },
     { sel:'#exportBtn', text:'Til sidst kan du eksportere alle bordgrupperne til Word eller PDF, klar til udskrift.' }
   ];
