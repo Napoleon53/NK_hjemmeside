@@ -18,14 +18,6 @@
         <button class="faneknap" data-fane="fane-salt" role="tab" aria-selected="false"><span class="nr">4</span>Salte</button>
     </div>
 
-    <div class="tidsboks">
-        <span class="mrk">Elektroner</span>
-        <button class="tidsknap" data-fart="0" title="Sæt elektronerne på pause">⏸</button>
-        <button class="tidsknap" data-fart="0.5">0,5×</button>
-        <button class="tidsknap aktiv" data-fart="1">1×</button>
-        <button class="tidsknap" data-fart="2">2×</button>
-    </div>
-
     <button class="ikonknap" id="hjaelpknap" title="Hjælp og genveje" aria-label="Hjælp">?</button>
 </header>
 
@@ -35,17 +27,25 @@
 <!-- FANE 1: BYG ET ATOM                                                -->
 <!-- ================================================================= -->
 <section class="fane aktiv" id="fane-byg" role="tabpanel" aria-label="Byg et atom">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="byg-laerred"></canvas>
 
         <div class="nuklid" aria-label="Det du har bygget">
+            <span class="rad-ikon" id="byg-rad-ikon" title="Radioaktiv isotop">☢</span>
             <span class="a" id="byg-nuklid-a">1</span>
             <span class="z" id="byg-nuklid-z">1</span>
             <span class="sym" id="byg-nuklid-sym">H</span>
             <span class="q" id="byg-nuklid-q"></span>
         </div>
 
-        <div class="scene-mrk" id="byg-hint">Læg protoner, neutroner og elektroner i — og hold øje med, hvad hver af dem gør ved atomet.</div>
+        <div class="kort opgavekort opgave-boks" id="opgave-boks">
+            <h2>Opgave <span class="taeller">løst: <b id="byg-opgave-tal">0</b></span></h2>
+            <p class="besked" id="byg-opgave">Tryk på “Start opgave” for at få en opgave, du selv skal bygge.</p>
+            <div class="knaprad">
+                <button class="knap blaa" id="byg-opgave-ny" type="button">Start opgave</button>
+                <button class="knap" id="byg-opgave-svar" type="button" style="display:none;">Vis svaret</button>
+            </div>
+        </div>
     </div>
 
     <aside class="panel">
@@ -80,7 +80,6 @@
                 <button class="knap" id="byg-neutral" type="button">Gør det neutralt</button>
                 <button class="knap" id="byg-almindelig" type="button">Almindelig isotop</button>
             </div>
-            <label class="tjek"><input type="checkbox" id="byg-lewis"><span>Lås elektronerne i prikformel</span></label>
             <button class="knap nulstil" id="byg-nulstil" type="button"><span>Ryd alt, og byg fra bunden</span><span class="tegn">↺</span></button>
         </div>
 
@@ -88,26 +87,10 @@
             <h2>Det har du bygget</h2>
             <div class="stor" id="byg-grundstof">Hydrogen</div>
             <span class="maerke groen" id="byg-type">Neutralt atom</span>
-            <div class="talraekke"><span>Massetal A = p + n</span><span class="tal" id="byg-massetal">1 (1 + 0)</span></div>
+            <div class="talraekke"><span>Massetal A = Z + N</span><span class="tal" id="byg-massetal">1</span></div>
             <div class="talraekke"><span>Ladning = p − e</span><span class="tal groen" id="byg-ladning">0  (1 − 1)</span></div>
-            <div class="talraekke"><span>Elektroner i skallerne</span><span class="tal gul" id="byg-fordeling">1</span></div>
+            <div class="talraekke"><span>Elektronstruktur</span><span class="tal gul" id="byg-fordeling">1</span></div>
             <p class="besked god" id="byg-kerne" style="margin-top:9px;"></p>
-        </div>
-
-        <div class="kort">
-            <h2>De tre regler</h2>
-            <div class="regel" id="byg-regel-p"><b>Protoner</b> → hvilket grundstof det er. Ændrer du protontallet, er det et helt andet stof.</div>
-            <div class="regel" id="byg-regel-n"><b>Neutroner</b> → hvilken isotop det er. Samme stof, anden masse.</div>
-            <div class="regel" id="byg-regel-e"><b>Elektroner</b> → hvilken ladning det har. Lige mange som protoner = neutralt atom; ellers en ion.</div>
-        </div>
-
-        <div class="kort opgavekort">
-            <h2>Opgave <span class="taeller">løst: <b id="byg-opgave-tal">0</b></span></h2>
-            <p class="besked" id="byg-opgave">Tryk på "Ny opgave" for at komme i gang.</p>
-            <div class="knaprad">
-                <button class="knap blaa" id="byg-opgave-ny" type="button">Ny opgave</button>
-                <button class="knap" id="byg-opgave-svar" type="button">Vis svaret</button>
-            </div>
         </div>
     </aside>
 </section>
@@ -173,9 +156,8 @@
                 <label><span>Vælg grundstof (1–20)</span></label>
                 <input type="range" id="ion-skyder" min="1" max="20" step="1" value="11">
             </div>
-            <div class="talraekke"><span>Elektroner i skallerne</span><span class="tal gul" id="ion-fordeling">2, 8, 1</span></div>
+            <div class="talraekke"><span>Elektronstruktur</span><span class="tal gul" id="ion-fordeling">2, 8, 1</span></div>
             <div class="talraekke"><span>I yderste skal</span><span class="tal" id="ion-valens">1</span></div>
-            <label class="tjek"><input type="checkbox" id="ion-lewis" checked><span>Lås yderste skal i prikformel</span></label>
         </div>
 
         <div class="kort fremhaev">
@@ -280,7 +262,6 @@
             <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> skift fane &nbsp;·&nbsp;
             <kbd>p</kbd> <kbd>n</kbd> <kbd>e</kbd> læg en partikel i &nbsp;·&nbsp;
             <kbd>P</kbd> <kbd>N</kbd> <kbd>E</kbd> tag en ud &nbsp;·&nbsp;
-            <kbd>mellemrum</kbd> pause &nbsp;·&nbsp;
             <kbd>R</kbd> nulstil fanen &nbsp;·&nbsp;
             <kbd>H</kbd> denne hjælp &nbsp;·&nbsp;
             <kbd>Esc</kbd> luk

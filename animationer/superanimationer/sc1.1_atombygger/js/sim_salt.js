@@ -288,7 +288,6 @@
             b = this.brikker[i];
             var q = visLadning ? b.g.ion : 0;
             b.atom.tegn(c, b.x, b.y, this.plads, {
-                lewis: true,
                 fremhaevValens: this.fase === "atomer",
                 ladning: q,
                 maerkat: b.g.symbol + NK.ladningHaevet(q)

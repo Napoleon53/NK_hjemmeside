@@ -22,7 +22,6 @@
         this.atom = new NK.Atom();
         this.z = 11;                  /* natrium: det klassiske eksempel */
         this.tilstand = "atom";       /* atom | gaet | ion */
-        this.lewis = true;
         this.atom.saetStraks(this.z, D.hyppigsteIsotop(this.z).a - this.z, this.z);
 
         this.koblKnapper();
@@ -60,10 +59,6 @@
             NK.el("ion-skyder").value = String(ny);
             mig.visGrundstof(ny, true);
         });
-
-        var lewis = NK.el("ion-lewis");
-        lewis.checked = true;
-        lewis.addEventListener("change", function () { mig.lewis = lewis.checked; });
     };
 
     /* ----- Grundstoffet ----------------------------------------------------- */
@@ -267,7 +262,6 @@
         var plads = NK.klamp(Math.min(l.b / 2 - 34, (l.h - 92) / 2), 70, 330);
 
         this.atom.tegn(c, cx, cy, plads, {
-            lewis: this.lewis,
             fremhaevValens: true,
             ladning: q,
             maerkat: g.symbol + NK.ladningHaevet(q)

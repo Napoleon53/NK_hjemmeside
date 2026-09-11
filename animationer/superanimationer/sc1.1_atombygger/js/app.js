@@ -1,8 +1,11 @@
 /* =====================================================================
    app.js - binder de fire faner sammen
 
-   Faneskift, fart, tastaturgenveje og tegneloekken. Kun den aktive
-   fane opdateres og tegnes, saa de tre andre koster ingenting.
+   Faneskift, tastaturgenveje og tegneloekken. Kun den aktive fane
+   opdateres og tegnes, saa de tre andre koster ingenting. Der er ingen
+   fartvaelger - elektronerne staar fast i deres skaller, og de eneste
+   ting der bevaeger sig (partikler der flyver ind eller ud) koerer
+   altid i normal hastighed.
    ===================================================================== */
 (function () {
     "use strict";
@@ -27,23 +30,6 @@
         }
         aktivFane = id;
         if (sims[id]) sims[id].tilpas();
-    }
-
-    /* ----- Fart -------------------------------------------------------- */
-    function saetFart(vaerdi, knap) {
-        NK.tid.skala = vaerdi;
-        var knapper = document.querySelectorAll(".tidsknap[data-fart]");
-        for (var i = 0; i < knapper.length; i++) knapper[i].classList.remove("aktiv");
-        if (knap) knap.classList.add("aktiv");
-    }
-
-    function skiftPause() {
-        var pauseKnap = document.querySelector('.tidsknap[data-fart="0"]');
-        if (NK.tid.skala === 0) {
-            saetFart(1, document.querySelector('.tidsknap[data-fart="1"]'));
-        } else {
-            saetFart(0, pauseKnap);
-        }
     }
 
     /* ----- Hjaelp ------------------------------------------------------ */
@@ -76,7 +62,6 @@
             visFane(faner[parseInt(e.key, 10) - 1]);
             return;
         }
-        if (e.code === "Space") { e.preventDefault(); skiftPause(); return; }
         if (e.key === "Escape") { visHjaelp(false); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") {
             visHjaelp(!NK.el("hjaelp").classList.contains("vis"));
@@ -109,14 +94,6 @@
         }
         for (var i = 0; i < knapper.length; i++) bindFane(knapper[i]);
 
-        var fartknapper = document.querySelectorAll(".tidsknap[data-fart]");
-        function bindFart(knap) {
-            knap.addEventListener("click", function () {
-                saetFart(parseFloat(knap.getAttribute("data-fart")), knap);
-            });
-        }
-        for (var j = 0; j < fartknapper.length; j++) bindFart(fartknapper[j]);
-
         NK.el("hjaelpknap").addEventListener("click", function () { visHjaelp(true); });
         NK.el("hjaelp-luk").addEventListener("click", function () { visHjaelp(false); });
         NK.el("hjaelp").addEventListener("click", function (e) {
@@ -132,8 +109,6 @@
         /* Man kan linke direkte til en fane med fx  index.html#isotop  */
         var oenske = (window.location.hash || "").replace(/^#/, "").toLowerCase();
         visFane(sims["fane-" + oenske] ? "fane-" + oenske : "fane-byg");
-
-        sims["fane-byg"].nyOpgave();
 
         window.requestAnimationFrame(function (ts) {
             sidsteTid = ts;

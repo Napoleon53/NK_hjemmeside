@@ -12,8 +12,10 @@ window.NK = NK;
     "use strict";
 
     /* ----- Global tidsstyring --------------------------------------- */
+    /* Der er ingen fartvaelger i denne superanimation - elektronerne
+       staar fast, saa alt koerer altid ved normal hastighed. */
     NK.tid = {
-        skala: 1.0        /* 0x (pause) - 0,5x - 1x - 2x */
+        skala: 1.0
     };
 
     /* ----- Smaa hjaelpere -------------------------------------------- */

@@ -26,7 +26,6 @@
         this.l = new NK.Laerred(NK.el("byg-laerred"));
         this.atom = new NK.Atom();
         this.p = 1; this.n = 0; this.e = 1;
-        this.lewis = false;
         this.opgave = null;
         this.loeste = 0;
         this.beskedTid = 0;
@@ -34,6 +33,7 @@
 
         this.koblKnapper();
         this.opdaterPanel("start");
+        this.visOpgaveStart();
     };
 
     /* ----- Knapper -------------------------------------------------------- */
@@ -75,9 +75,6 @@
             mig.atom.saet(0, 0, 0);
             mig.opdaterPanel("tom");
         });
-
-        var lewis = NK.el("byg-lewis");
-        lewis.addEventListener("change", function () { mig.lewis = lewis.checked; });
 
         NK.el("byg-opgave-ny").addEventListener("click", function () { mig.nyOpgave(); });
         NK.el("byg-opgave-svar").addEventListener("click", function () { mig.visSvar(); });
@@ -199,7 +196,7 @@
         NK.saetKlasse("byg-nuklid-q", q > 0 ? "q plus" : (q < 0 ? "q minus" : "q"));
 
         NK.saetTekst("byg-grundstof", g ? g.navn : "— endnu ikke et grundstof —");
-        NK.saetTekst("byg-massetal", this.p ? a + " (" + this.p + " + " + this.n + ")" : "–");
+        NK.saetTekst("byg-massetal", this.p ? String(a) : "–");
         NK.saetTekst("byg-ladning", NK.ladningstekst(q) + "  (" + this.p + " − " + this.e + ")");
         NK.saetKlasse("byg-ladning", "tal " + (q > 0 ? "roed" : (q < 0 ? "blaa" : "groen")));
 
@@ -223,7 +220,7 @@
             kerneTekst = g.symbol + "-" + a + " findes i naturen (" + NK.tal(k.isotop.andel, k.isotop.andel < 1 ? 4 : 2) + " % af alt " + g.navn.toLowerCase() + ").";
             kerneKlasse = "besked god";
         } else if (k.art === "radioaktiv") {
-            kerneTekst = g.symbol + "-" + a + " findes, men er radioaktiv — " + k.isotop.note + ".";
+            kerneTekst = "☢ " + g.symbol + "-" + a + " findes, men er radioaktiv — " + k.isotop.note + ".";
             kerneKlasse = "besked gul";
         } else {
             kerneTekst = "Der findes ingen kerne med " + this.p + " protoner og " + this.n + " neutroner. Den ville falde fra hinanden.";
@@ -232,11 +229,9 @@
         NK.saetTekst("byg-kerne", kerneTekst);
         NK.saetKlasse("byg-kerne", kerneKlasse);
 
-        /* Den regel, der lige blev demonstreret, lyser op. */
-        var regler = ["p", "n", "e"];
-        for (var i = 0; i < regler.length; i++) {
-            NK.saetKlasse("byg-regel-" + regler[i], "regel" + (regler[i] === slags ? " lyser" : ""));
-        }
+        /* Radioaktiv kerne: et blinkende maerke ved atomsymbolet, saa det
+           kan ses uden at laese teksten i panelet. */
+        NK.saetKlasse("byg-rad-ikon", "rad-ikon" + (g && k.art === "radioaktiv" ? " vis" : ""));
 
         NK.el("byg-p-minus").disabled = this.p <= 0;
         NK.el("byg-n-minus").disabled = this.n <= 0;
@@ -344,6 +339,17 @@
         }
     ];
 
+    /* Udgangspunktet: ingen opgave er i gang endnu - eleven skal selv
+       bede om én, saa opgaven ikke bare dukker op uopfordret. */
+    NK.SimByg.prototype.visOpgaveStart = function () {
+        this.opgave = null;
+        NK.saetTekst("byg-opgave", "Tryk på “Start opgave” for at få en opgave, du selv skal bygge.");
+        NK.saetKlasse("byg-opgave", "besked");
+        NK.el("byg-opgave-svar").style.display = "none";
+        NK.el("byg-opgave-ny").textContent = "Start opgave";
+        NK.el("byg-opgave-ny").classList.remove("banker");
+    };
+
     NK.SimByg.prototype.nyOpgave = function () {
         var forsoeg = 0;
         do {
@@ -353,7 +359,9 @@
         this.opgave.loest = false;
         NK.saetTekst("byg-opgave", this.opgave.tekst);
         NK.saetKlasse("byg-opgave", "besked");
+        NK.el("byg-opgave-svar").style.display = "";
         NK.el("byg-opgave-svar").disabled = false;
+        NK.el("byg-opgave-ny").textContent = "Ny opgave";
         NK.el("byg-opgave-ny").classList.remove("banker");
         this.tjekOpgave();
     };
@@ -403,8 +411,8 @@
         l.ryd("#14141a");
 
         var cx = l.b / 2;
-        var cy = (l.h - 52) / 2 + 6;
-        var plads = NK.klamp(Math.min(l.b / 2 - 34, (l.h - 78) / 2), 70, 330);
+        var cy = l.h * 0.57;
+        var plads = NK.klamp(Math.min(l.b / 2 - 40, l.h * 0.40), 70, 300);
 
         if (this.p === 0 && this.n === 0 && this.e === 0) {
             c.save();
@@ -424,10 +432,13 @@
             return;
         }
 
+        var g = D.grundstof(this.p);
         this.atom.tegn(c, cx, cy, plads, {
-            lewis: this.lewis,
-            fremhaevValens: this.lewis,
-            ladning: this.p - this.e
+            fremhaevValens: true,
+            ladning: this.p - this.e,
+            maerkat: g ? g.symbol : null,
+            maerkatOver: true,
+            maerkatStor: true
         });
         NK.tegnSkaltal(c, this.atom);
     };

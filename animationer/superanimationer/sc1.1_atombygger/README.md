@@ -62,7 +62,7 @@ js/atom.js          ÉT atom: tre tal (p, n, e), partikler der flyver ind og ud,
                     kernepakning og hele tegningen. Bruges af alle fire faner
 js/sim_byg.js       fane 1     js/sim_isotop.js  fane 2
 js/sim_ion.js       fane 3     js/sim_salt.js    fane 4
-js/app.js           faneskift, fart, tastatur, tegneløkke
+js/app.js           faneskift, tastatur, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen (se nedenfor)
 ```
 

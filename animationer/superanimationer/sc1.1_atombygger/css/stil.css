@@ -121,35 +121,6 @@ body {
 .faneknap.aktiv { background-color: var(--blaa); color: #ffffff; }
 .faneknap.aktiv .nr { background-color: rgba(255, 255, 255, 0.25); color: #ffffff; }
 
-.tidsboks {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    background-color: rgba(0, 0, 0, 0.3);
-    border: 1px solid #3b3b48;
-    border-radius: var(--radius-lil);
-    padding: 4px 6px;
-    flex-shrink: 0;
-}
-
-.tidsboks .mrk { font-size: 0.72rem; color: var(--tekst-mat); padding: 0 4px; white-space: nowrap; }
-
-.tidsknap {
-    background: transparent;
-    color: var(--tekst-svag);
-    border: 1px solid #4a4a58;
-    border-radius: 4px;
-    padding: 4px 7px;
-    font-family: inherit;
-    font-size: 0.76rem;
-    font-weight: 600;
-    cursor: pointer;
-    min-width: 32px;
-}
-
-.tidsknap:hover { background-color: var(--panel-3); color: var(--tekst); }
-.tidsknap.aktiv { background-color: var(--groen); border-color: var(--groen); color: #10281c; }
-
 .ikonknap {
     background: transparent;
     border: 1px solid #4a4a58;
@@ -262,6 +233,48 @@ main { flex: 1; position: relative; min-height: 0; }
 
 .nuklid .q.plus  { color: var(--proton); }
 .nuklid .q.minus { color: var(--blaa); }
+
+/* En radioaktiv kerne faar et blinkende maerke i hjoernet af nuklid-
+   boksen - synligt uden at man skal laese teksten i panelet. */
+.rad-ikon {
+    display: none;
+    position: absolute;
+    top: -9px;
+    right: -9px;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background-color: var(--gul);
+    color: #1b1b21;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+    box-shadow: 0 0 0 2px #14141a, 0 0 10px rgba(242, 197, 61, 0.7);
+    animation: rad-puls 1.4s ease-in-out infinite;
+}
+
+.rad-ikon.vis { display: flex; }
+
+@keyframes rad-puls {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 2px #14141a, 0 0 6px rgba(242, 197, 61, 0.55); }
+    50% { transform: scale(1.18); box-shadow: 0 0 0 2px #14141a, 0 0 16px rgba(242, 197, 61, 1); }
+}
+
+/* ---------------------------------------------------------------------
+   OPGAVEBOKSEN PAA BYGGEFANEN
+   Ligger som et overlay i selve scenen - venstre side, hvor der er god
+   plads, saa den ikke drukner nederst i det hoejre panel. Genbruger
+   .kort og .opgavekort for udseendet, kun placeringen er ny.
+   --------------------------------------------------------------------- */
+.opgave-boks {
+    position: absolute;
+    top: 116px;
+    left: 18px;
+    width: 300px;
+    max-width: calc(100% - 36px);
+    box-shadow: var(--skygge);
+}
 
 /* ---------------------------------------------------------------------
    HOEJRE SPALTE
@@ -397,31 +410,6 @@ main { flex: 1; position: relative; min-height: 0; }
     font-weight: 700;
     font-variant-numeric: tabular-nums;
 }
-
-/* ---------------------------------------------------------------------
-   DE TRE REGLER - den, der lige blev vist, lyser op
-   --------------------------------------------------------------------- */
-.regel {
-    font-size: 0.78rem;
-    line-height: 1.45;
-    color: var(--tekst-mat);
-    padding: 7px 9px;
-    border-left: 3px solid #3a3a47;
-    border-radius: 0 var(--radius-lil) var(--radius-lil) 0;
-    background-color: rgba(255, 255, 255, 0.03);
-    transition: color 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
-}
-
-.regel + .regel { margin-top: 6px; }
-.regel b { color: var(--tekst-svag); }
-
-.regel.lyser {
-    color: #dde3ea;
-    border-left-color: var(--gul);
-    background-color: rgba(242, 197, 61, 0.1);
-}
-
-.regel.lyser b { color: var(--gul); }
 
 /* ---------------------------------------------------------------------
    MAERKATER, TALRAEKKER OG MAALERE
@@ -818,14 +806,12 @@ select:focus-visible {
 @media (max-width: 1320px) {
     :root { --panel-bredde: 336px; }
     .top h1 .lang { display: none; }
-    .tidsboks .mrk { display: none; }
 }
 
 @media (max-width: 1040px) {
     .top { gap: 10px; padding: 8px 12px; }
     .faneknap { padding: 7px 10px; font-size: 0.8rem; gap: 6px; }
     .faneknap .nr { width: 17px; height: 17px; font-size: 0.65rem; }
-    .tidsknap { padding: 4px 5px; min-width: 28px; font-size: 0.72rem; }
 }
 
 @media (max-width: 860px) {
@@ -839,6 +825,7 @@ select:focus-visible {
     .panel { border-left: none; border-top: 1px solid #1f1f27; }
     .nuklid { top: 10px; left: 10px; padding: 7px 12px 7px 9px; }
     .nuklid .sym { font-size: 2rem; }
+    .opgave-boks { top: 96px; width: calc(100% - 30px); left: 15px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -73,7 +73,6 @@
         this.nukleoner = [];
         this.elektroner = [];
         this.fordeling = [];
-        this.faser = [0, 0, 0, 0];
         this.retning = null;   /* hvilken vej nye elektroner kommer fra */
         this.puls = 0;         /* kort lysglimt naar noget aendrer sig */
         this.tid = 0;
@@ -261,11 +260,6 @@
                 if (el.t >= 1) { this.elektroner.splice(i, 1); continue; }
             }
         }
-
-        /* Skallerne drejer hver sin vej, saa billedet ikke stivner. */
-        for (i = 0; i < 4; i++) {
-            this.faser[i] += dt * ((i % 2 === 0) ? 1 : -1) * (0.72 - i * 0.12);
-        }
     };
 
     /* ----- Geometri ------------------------------------------------------ */
@@ -288,34 +282,34 @@
     };
 
     /* Hvor skal elektron nr. plads af iSkal i skal nr. skal ligge?
-       lewis = true laaser den yderste skal fast i elektronprikformlens
-       moenster: én i hvert verdenshjoerne foerst, derefter par. */
-    NK.Atom.prototype.elektronVinkel = function (el, geo, lewis, yderste) {
+       Alle skaller laases fast i elektronprikformlens moenster: én i
+       hvert verdenshjoerne foerst, derefter par - saa elektronerne
+       staar stille, og billedet altid ligner den formel, man selv ville
+       tegne paa papir. */
+    NK.Atom.prototype.elektronVinkel = function (el, geo) {
         var r = geo.rSkal[el.skal];
-        if (lewis && el.skal === yderste) {
-            var parAfstand = 8 / r;                      /* halv afstand i et par */
-            var hjoerner = [-Math.PI / 2, Math.PI / 2, 0, Math.PI];
-            if (el.iSkal <= 2 && el.skal === 0) {
-                if (el.iSkal === 1) return -Math.PI / 2;
-                return -Math.PI / 2 + (el.plads === 0 ? -parAfstand : parAfstand);
-            }
-            var i = el.plads;
-            if (i < 4) {
-                /* Faar denne plads en makker senere, rykker den til side. */
-                var faarPar = el.iSkal > 4 + i;
-                return hjoerner[i] + (faarPar ? -parAfstand : 0);
-            }
-            return hjoerner[i - 4] + parAfstand;
+        var parAfstand = 8 / r;                      /* halv afstand i et par */
+        var hjoerner = [-Math.PI / 2, Math.PI / 2, 0, Math.PI];
+        if (el.iSkal <= 2 && el.skal === 0) {
+            if (el.iSkal === 1) return -Math.PI / 2;
+            return -Math.PI / 2 + (el.plads === 0 ? -parAfstand : parAfstand);
         }
-        return this.faser[el.skal] + Math.PI * 2 * el.plads / Math.max(1, el.iSkal);
+        var i = el.plads;
+        if (i < 4) {
+            /* Faar denne plads en makker senere, rykker den til side. */
+            var faarPar = el.iSkal > 4 + i;
+            return hjoerner[i] + (faarPar ? -parAfstand : 0);
+        }
+        return hjoerner[i - 4] + parAfstand;
     };
 
     /* ----- Tegning -------------------------------------------------------- */
     /* plads er den radius, atomet maa fylde. opt:
-         lewis           yderste skal laases i prikformlens moenster
          fremhaevValens  ring om den yderste skal
          ladning         farvet skaer: roedt for plus, blaat for minus
-         maerkat         tekst under atomet
+         maerkat         tekst ved atomet (som standard under det)
+         maerkatOver     tegn maerkatet over atomet i stedet for under
+         maerkatStor     et godt stykke stoerre skrift til maerkatet
          daempet         0-1, hvor gennemsigtigt det hele tegnes         */
     NK.Atom.prototype.tegn = function (ctx, cx, cy, plads, opt) {
         opt = opt || {};
@@ -387,7 +381,7 @@
                 el.y = el.sy + el.ry * el.t * 300;
                 alfaE = (1 - el.t) * dmp;
             } else {
-                var v = this.elektronVinkel(el, geo, opt.lewis, yderste);
+                var v = this.elektronVinkel(el, geo);
                 var r = geo.rSkal[el.skal];
                 var mx = Math.cos(v) * r, my = Math.sin(v) * r;
                 if (el.tilstand === "kommer") {
@@ -406,10 +400,15 @@
         }
 
         if (opt.maerkat) {
-            var underR = (geo.rSkal[Math.max(0, yderste)]) * s + 24;
-            NK.tekst(ctx, opt.maerkat, cx, cy + underR, {
-                font: "700 " + Math.round(NK.klamp(19 * s, 13, 21)) + "px 'Segoe UI', sans-serif",
-                justering: "center", linje: "middle", farve: "#e9eef4", kant: true
+            var afstand = (geo.rSkal[Math.max(0, yderste)]) * s + (opt.maerkatStor ? 32 : 24);
+            var my = opt.maerkatOver ? (cy - afstand) : (cy + afstand);
+            var fontStr = opt.maerkatStor
+                ? "800 " + Math.round(NK.klamp(34 * s, 24, 42)) + "px 'Segoe UI', sans-serif"
+                : "700 " + Math.round(NK.klamp(19 * s, 13, 21)) + "px 'Segoe UI', sans-serif";
+            NK.tekst(ctx, opt.maerkat, cx, my, {
+                font: fontStr,
+                justering: "center", linje: "middle", farve: "#e9eef4",
+                kant: true, kantBredde: opt.maerkatStor ? 5 : 3.5
             });
         }
 
