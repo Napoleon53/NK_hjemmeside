@@ -94,6 +94,20 @@
         }
         for (var i = 0; i < knapper.length; i++) bindFane(knapper[i]);
 
+        /* Kernevisningen (enkeltvis/antal) gaelder alle faner paa én gang. */
+        var visKnapper = document.querySelectorAll(".visknap");
+        function bindVis(knap) {
+            knap.addEventListener("click", function () {
+                var v = knap.getAttribute("data-vis");
+                for (var j = 0; j < visKnapper.length; j++) visKnapper[j].classList.toggle("aktiv", visKnapper[j] === knap);
+                NK.saetKerneVisning(v);
+            });
+        }
+        for (var vi = 0; vi < visKnapper.length; vi++) {
+            visKnapper[vi].classList.toggle("aktiv", visKnapper[vi].getAttribute("data-vis") === NK.indstil.kerneVisning);
+            bindVis(visKnapper[vi]);
+        }
+
         NK.el("hjaelpknap").addEventListener("click", function () { visHjaelp(true); });
         NK.el("hjaelp-luk").addEventListener("click", function () { visHjaelp(false); });
         NK.el("hjaelp").addEventListener("click", function (e) {

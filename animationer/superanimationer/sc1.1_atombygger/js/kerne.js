@@ -18,6 +18,24 @@ window.NK = NK;
         skala: 1.0
     };
 
+    /* ----- Global indstilling: hvordan vises protoner og neutroner? --- */
+    /* "enkelt" - hver partikel for sig, men de fylder lidt mindre jo
+                  flere der er, saa der ogsaa er plads til fx 50 stk.
+       "tal"    - ét symbol pr. slags med et multiplikationstal paa,
+                  fx "15×", midt i kernen. */
+    NK.indstil = { kerneVisning: "enkelt" };
+    try {
+        var gemtVisning = window.localStorage && window.localStorage.getItem("nk-sc11-kernevisning");
+        if (gemtVisning === "enkelt" || gemtVisning === "tal") NK.indstil.kerneVisning = gemtVisning;
+    } catch (fejl) { /* file:// eller privat browsing kan blokere localStorage */ }
+
+    NK.saetKerneVisning = function (v) {
+        if (v !== "enkelt" && v !== "tal") return;
+        NK.indstil.kerneVisning = v;
+        try { window.localStorage && window.localStorage.setItem("nk-sc11-kernevisning", v); } catch (fejl) {}
+        if (NK.Atom && NK.Atom.opdaterAlleVisninger) NK.Atom.opdaterAlleVisninger();
+    };
+
     /* ----- Smaa hjaelpere -------------------------------------------- */
     NK.el = function (id) {
         return document.getElementById(id);

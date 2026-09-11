@@ -33,12 +33,12 @@
 
     var FLYVETID = 0.55;      /* sekunder for en partikel ind eller ud */
 
-    /* Mere end 5 af samme slags proppet ind i klumpen ser bare fjollet ud
-       - smaa prikker der overlapper hinanden, umulige at taelle. Derfor
-       samles de i ÉT symbol med et multiplikationstal paa - "16×" i
-       stedet for seksten overlappende cirkler. Det praecise antal staar
-       i forvejen ogsaa i nuklidmaerkatet og i tal-panelet. */
-    var VIS_MAKS_NUKLEON = 5;
+    /* Man kan selv vaelge, hvordan protoner og neutroner vises - se
+       NK.indstil.kerneVisning i kerne.js:
+         "enkelt"  hver partikel for sig, men de fylder lidt mindre jo
+                   flere der er, saa der ogsaa er plads til fx 50 stk.
+         "tal"     ÉT symbol pr. slags, med et multiplikationstal paa -
+                   "16×" - midt i kernen, i stedet for seksten prikker. */
     var GRUPPE_SKALA = 1.65;  /* hvor meget stoerre gruppe-symbolet er */
 
     function blod(t) { return t * t * (3 - 2 * t); }
@@ -53,7 +53,7 @@
         var r = straks ? Math.random() * 12 : 150 + Math.random() * 60;
         return {
             slags: slags,
-            gruppe: false,        /* staar for flere end VIS_MAKS_NUKLEON */
+            gruppe: false,        /* staar for hele antallet af denne slags */
             gruppeAntal: 1,
             x: Math.cos(v) * r,
             y: Math.sin(v) * r,
@@ -86,6 +86,20 @@
         this.retning = null;   /* hvilken vej nye elektroner kommer fra */
         this.puls = 0;         /* kort lysglimt naar noget aendrer sig */
         this.tid = 0;
+        alleAtomer.push(this);
+    };
+
+    /* Alle atomer, der nogensinde er bygget - saa kerneVisning-knappen
+       kan give besked til dem alle sammen, uanset hvilken fane de hoerer
+       til. Gamle atomer fra fx isotopfanens skiftende grundstofvalg
+       ligger bare uskadeligt tilbage her; listen forbliver lille. */
+    var alleAtomer = [];
+    NK.Atom.opdaterAlleVisninger = function () {
+        for (var i = 0; i < alleAtomer.length; i++) {
+            var a = alleAtomer[i];
+            a.saetNukleoner("proton", a.p);
+            a.saetNukleoner("neutron", a.n);
+        }
     };
 
     /* Saet antallene. Forskellen animeres. */
@@ -104,8 +118,9 @@
         this.elektroner.length = 0;
         this.p = p; this.n = n; this.e = e;
         var i, ny;
+        var grupperet = NK.indstil.kerneVisning === "tal";
 
-        if (p > VIS_MAKS_NUKLEON) {
+        if (grupperet && p > 0) {
             ny = nyNukleon("proton", true);
             ny.gruppe = true; ny.gruppeAntal = p;
             this.nukleoner.push(ny);
@@ -113,7 +128,7 @@
             for (i = 0; i < p; i++) this.nukleoner.push(nyNukleon("proton", true));
         }
 
-        if (n > VIS_MAKS_NUKLEON) {
+        if (grupperet && n > 0) {
             ny = nyNukleon("neutron", true);
             ny.gruppe = true; ny.gruppeAntal = n;
             this.nukleoner.push(ny);
@@ -139,7 +154,7 @@
        stedet faar man ét symbol med et multiplikationstal paa, "16×",
        ligesom man selv ville forkorte det paa papir. */
     NK.Atom.prototype.saetNukleoner = function (slags, antal) {
-        var grupperet = antal > VIS_MAKS_NUKLEON;
+        var grupperet = NK.indstil.kerneVisning === "tal" && antal > 0;
         var maal = grupperet ? 1 : antal;
         var levende = [];
         var i;
@@ -200,7 +215,9 @@
         }
         if (!inde.length) return;
 
-        var r = nukleonRadius(inde.length);
+        var total = 0;
+        for (i = 0; i < inde.length; i++) total += inde[i].gruppe ? inde[i].gruppeAntal : 1;
+        var r = nukleonRadius(total);
         var traek = Math.min(1, dt * 5);
         for (i = 0; i < inde.length; i++) {
             var a = inde[i];
@@ -210,7 +227,7 @@
             a.y += Math.sin(a.fase * 1.3) * 5 * dt;
         }
 
-        function effektivR(u) { return u.gruppe ? r * GRUPPE_SKALA : r; }
+        function effektivR(u) { return (u.gruppe && u.gruppeAntal > 1) ? r * GRUPPE_SKALA : r; }
 
         /* To gennemloeb er rigeligt til at faa klumpen til at ligge paent. */
         for (var runde = 0; runde < 2; runde++) {
@@ -334,11 +351,20 @@
     NK.Atom.prototype.geometri = function () {
         var a = 0, i;
         for (i = 0; i < this.nukleoner.length; i++) {
-            if (this.nukleoner[i].tilstand !== "gaar") a++;
+            var nu = this.nukleoner[i];
+            if (nu.tilstand === "gaar") continue;
+            a += nu.gruppe ? nu.gruppeAntal : 1;
         }
         var rN = nukleonRadius(a);
         var rKerne = a <= 1 ? rN + 2 : rN * Math.pow(a, 1 / 3) * 1.05 + 2;
-        var rInder = rKerne + 30;
+
+        /* I "tal"-visning er selve symbolet stoerre end en enkelt
+           nukleon (GRUPPE_SKALA) - kernen skal mindst vaere stor nok
+           til at rumme det, ellers stikker det udenfor. */
+        var rGruppeMaks = rN * GRUPPE_SKALA + 2;
+        if (rGruppeMaks > rKerne) rKerne = rGruppeMaks;
+
+        var rInder = rKerne + 38;   /* god plads, foer elektronerne begynder */
         var rSkal = [];
         for (i = 0; i < 4; i++) rSkal.push(rInder + i * 34);
         return { rNukleon: rN, rKerne: rKerne, rSkal: rSkal, antalNukleoner: a };
@@ -414,12 +440,21 @@
         for (i = 0; i < sorteret.length; i++) {
             var nu = sorteret[i];
             var alfa = (nu.tilstand === "gaar" ? (1 - nu.t) : 1) * dmp;
-            tegnKugle(ctx, cx + nu.x * s, cy + nu.y * s, rN,
+            var storGruppe = nu.gruppe && nu.gruppeAntal > 1;
+            var rThis = storGruppe ? rN * GRUPPE_SKALA : rN;
+            tegnKugle(ctx, cx + nu.x * s, cy + nu.y * s, rThis,
                 nu.slags === "proton" ? FARVE.protonLys : FARVE.neutronLys,
                 nu.slags === "proton" ? FARVE.proton : FARVE.neutron, alfa);
-            if (nu.slags === "proton" && rN > 6.2) {
+            if (storGruppe) {
+                NK.tekst(ctx, nu.gruppeAntal + "×", cx + nu.x * s, cy + nu.y * s + 0.5, {
+                    font: "800 " + Math.round(NK.klamp(rThis * 0.92, 9, 22)) + "px 'Segoe UI', sans-serif",
+                    justering: "center", linje: "middle",
+                    farve: "rgba(255, 255, 255, " + (0.92 * alfa) + ")",
+                    kant: true, kantBredde: NK.klamp(rThis * 0.3, 1.5, 3.5)
+                });
+            } else if (nu.slags === "proton" && rThis > 6.2) {
                 NK.tekst(ctx, "+", cx + nu.x * s, cy + nu.y * s + 0.5, {
-                    font: "700 " + Math.round(rN * 1.25) + "px 'Segoe UI', sans-serif",
+                    font: "700 " + Math.round(rThis * 1.25) + "px 'Segoe UI', sans-serif",
                     justering: "center", linje: "middle",
                     farve: "rgba(255, 255, 255, " + (0.85 * alfa) + ")"
                 });

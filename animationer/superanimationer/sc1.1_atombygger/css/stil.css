@@ -135,6 +135,35 @@ body {
 
 .ikonknap:hover { background-color: var(--panel-3); color: var(--tekst); }
 
+/* Vaelg mellem at se kernepartiklerne enkeltvis eller som et antal -
+   gaelder alle fire faner, derfor ligger den i toplinjen. */
+.visvalg {
+    display: flex;
+    gap: 2px;
+    background-color: var(--panel-2);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 2px;
+    flex-shrink: 0;
+}
+
+.visknap {
+    background: transparent;
+    color: var(--tekst-svag);
+    border: none;
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.16s ease, color 0.16s ease;
+}
+
+.visknap:hover { color: var(--tekst); }
+.visknap.aktiv { background-color: var(--orange-mork); color: #ffffff; }
+
 /* ---------------------------------------------------------------------
    HOVEDLAYOUT
    --------------------------------------------------------------------- */
