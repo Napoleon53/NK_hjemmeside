@@ -345,15 +345,12 @@ tbody th { font-weight: 650; }
   background: #101a19; color: #b8c8c6; font-size: .94rem;
   border-top: 3px solid var(--gul);
 }
-.footer-grid { display: grid; gap: 34px; grid-template-columns: minmax(230px, 1.4fr) repeat(auto-fit, minmax(150px, 1fr)); }
+.footer-grid { display: grid; gap: 34px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
 .site-footer h2 { font-size: .82rem; text-transform: uppercase; letter-spacing: .07em; color: #fff; margin-bottom: 14px; }
 .site-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
 .site-footer a { color: #b8c8c6; text-decoration: none; }
 .site-footer a:hover { color: var(--gul); text-decoration: underline; }
 .site-footer p { color: #8b9d9b; }
-
-.footer-brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.1rem; color: #fff; margin-bottom: 12px; }
-.footer-brand img { width: 30px; height: 30px; background: #fff; border-radius: 6px; padding: 2px; }
 
 .footer-bund {
   margin-top: 34px; padding-top: 20px; border-top: 1px solid #253433;
@@ -517,7 +514,6 @@ code {
    footer-gitteret og kort-gitteret havde haarde minimumsbredder. */
 @media (max-width: 860px) {
   .footer-grid { grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 28px; }
-  .footer-grid > div:first-child { grid-column: 1 / -1; }
 }
 @media (max-width: 620px) {
   .kort-grid, .kort-grid.to-kolonner { grid-template-columns: 1fr; }
