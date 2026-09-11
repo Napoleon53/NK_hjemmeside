@@ -2,6 +2,55 @@
 #SingleInstance Force
 ; 2026 Niels Kræmmer
 ; ==============================================================================
+; INDSTILLINGER
+; ==============================================================================
+; Som standard er autocorrect slået FRA i Word og PowerPoint, så det ikke
+; konflikter med kemi-autocorrect i Word.
+; Det ændres ikke her i filen, men via ikonet ved uret: højreklik på det grønne
+; H og vælg "Indstillinger...". Valget huskes i en ini-fil under %AppData%.
+
+IndstillingsMappe := A_AppData "\KemiAutocorrect"
+IndstillingsFil := IndstillingsMappe "\indstillinger.ini"
+AktivIWord := IniRead(IndstillingsFil, "Indstillinger", "AktivIWord", "0") = "1"
+
+IndstillingsVindue := Gui("+AlwaysOnTop -MinimizeBox", "Kemi-autocorrect – indstillinger")
+IndstillingsVindue.SetFont("s10", "Segoe UI")
+IndstillingsVindue.AddText("w380", "Autocorrect virker i alle programmer. I Word og PowerPoint er det som standard slået fra, så det ikke konflikter med kemi-autocorrect i Word.")
+WordValg := IndstillingsVindue.AddCheckbox("y+14", "Brug også autocorrect i Word og PowerPoint")
+IndstillingsVindue.AddButton("y+18 w90 Default", "Gem").OnEvent("Click", GemIndstillinger)
+IndstillingsVindue.AddButton("x+8 w90", "Annuller").OnEvent("Click", (*) => IndstillingsVindue.Hide())
+IndstillingsVindue.OnEvent("Escape", (*) => IndstillingsVindue.Hide())
+
+A_TrayMenu.Insert("1&", "Indstillinger...", VisIndstillinger)
+A_TrayMenu.Insert("2&")
+A_TrayMenu.Default := "Indstillinger..."
+OpdaterIkonTekst()
+
+; Bruges af #HotIf længere nede: hotstrings er slået fra i Word og PowerPoint,
+; medmindre det er slået til i indstillingerne
+HotstringsTilladt() {
+    return AktivIWord || !(WinActive("ahk_class OpusApp") || WinActive("ahk_class PPTFrameClass"))
+}
+
+VisIndstillinger(*) {
+    WordValg.Value := AktivIWord
+    IndstillingsVindue.Show()
+}
+
+GemIndstillinger(*) {
+    global AktivIWord := WordValg.Value = 1
+    DirCreate IndstillingsMappe
+    IniWrite AktivIWord ? 1 : 0, IndstillingsFil, "Indstillinger", "AktivIWord"
+    IndstillingsVindue.Hide()
+    OpdaterIkonTekst()
+    TrayTip "Autocorrect er nu slået " (AktivIWord ? "TIL" : "FRA") " i Word og PowerPoint.", "Kemi-autocorrect"
+}
+
+OpdaterIkonTekst() {
+    A_IconTip := "Kemi-autocorrect`nWord og PowerPoint: " (AktivIWord ? "slået til" : "slået fra")
+}
+
+; ==============================================================================
 ; SCANNER HOTKEY: Win+Shift+Q
 ; ==============================================================================
 #+q::
@@ -67,8 +116,9 @@
 ; C1: Do not conform to input case (output is always as defined below)
 #Hotstring C1 EndChars "/\ `n`t
 
-; Exclude Word and PowerPoint
-;#HotIf !(WinActive("ahk_class OpusApp") or WinActive("ahk_class PPTFrameClass"))
+; Hotstrings herfra og ned til "#HotIf" længere nede følger indstillingen for
+; Word og PowerPoint (se INDSTILLINGER øverst)
+#HotIf HotstringsTilladt()
 ::aluminium#::Al
 ::aluminiumion#::Al³⁺
 ::aluminiumbromid#::AlBr₃
@@ -8961,6 +9011,7 @@
 
 #HotIf
 
+; Enhederne herunder virker i alle programmer – også i Word og PowerPoint
 :c0:m^2::m²
 :c0:m^-1::m⁻¹
 :c0:m^-2::m⁻²
