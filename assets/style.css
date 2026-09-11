@@ -224,6 +224,7 @@ p  { margin: 0 0 1.1em; }
   border-bottom: 1px solid var(--kant); background: var(--bg-sektion);
 }
 .sidehoved h1 { margin-bottom: .3em; }
+.sidehoved + .sektion { padding-top: clamp(30px, 3.5vw, 44px); }
 .sidehoved .manchet { max-width: 62ch; color: var(--tekst-daempet); font-size: 1.08rem; margin-bottom: 0; }
 
 .brodtekst { max-width: var(--bredde-tekst); }
