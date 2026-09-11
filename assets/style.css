@@ -156,7 +156,7 @@ p  { margin: 0 0 1.1em; }
 
 .hero {
   position: relative; overflow: hidden;
-  padding: clamp(52px, 7vw, 92px) 0 clamp(44px, 6vw, 76px);
+  padding: clamp(28px, 3.5vw, 48px) 0 clamp(44px, 6vw, 76px);
   background:
     radial-gradient(760px 340px at 12% -8%, #e0f0ee 0%, rgba(224, 240, 238, 0) 62%),
     radial-gradient(620px 320px at 92% 4%, #eaf6e9 0%, rgba(234, 246, 233, 0) 60%),

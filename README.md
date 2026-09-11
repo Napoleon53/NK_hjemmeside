@@ -20,7 +20,7 @@ animationer og downloads.
 |---|---|---|
 | `index.html` | Forside | `/` |
 | `animationer.html` | Animationer og spil | `/index.php/animationer/` |
-| `materialer.html` | Overblik over downloads | `/index.php/download/` |
+| `downloads.html` | Overblik over downloads | `/index.php/download/` |
 | `autocorrect.html` | Autocorrect til kemi | `/index.php/autocorrect/` |
 | `manuel-installation.html` | Manuel installation | `/index.php/manuel-installation/` |
 | `tastatur.html` | Udvid dit tastaturlayout | `/index.php/tastaturlayout/` |
@@ -29,9 +29,12 @@ animationer og downloads.
 | `404.html` | Siden findes ikke | — |
 
 Menuen er samlet i tre indgange: **Forside · Animationer · Downloads**.
-Menupunktet hed en overgang "Materialer", men det var for upræcist – animationerne
-kunne i princippet også kaldes "materiale". Filen bag punktet hedder stadig
-`materialer.html`, kun menuteksten og overskrifterne er ændret til "Downloads".
+Menupunktet hed en overgang "Materialer" (`materialer.html`), men det var for
+upræcist – animationerne kunne i princippet også kaldes "materiale". Nu hedder
+både menupunkt og fil "Downloads" (`downloads.html`).
+
+Link altid til `downloads.html` *med* `.html`. Adressen `/downloads` uden
+endelse er mappen med downloadfilerne, ikke oversigtssiden.
 
 ## Mapper
 
@@ -97,12 +100,12 @@ en helt almindelig mappe i det.
 ```apache
 ErrorDocument 404 /404.html
 
-Redirect 301 /index.php/download/             /materialer.html
+Redirect 301 /index.php/download/             /downloads.html
 Redirect 301 /index.php/autocorrect/          /autocorrect.html
 Redirect 301 /index.php/tastaturlayout/       /tastatur.html
 Redirect 301 /index.php/selvrettendeopgaver/  /opgaver.html
 Redirect 301 /index.php/digital-formelsamling/ /formelsamling.html
-Redirect 301 /index.php/links-til-kemia/      /materialer.html
+Redirect 301 /index.php/links-til-kemia/      /downloads.html
 Redirect 301 /index.php/animationer/          /animationer.html
 Redirect 301 /index.php/manuel-installation/  /manuel-installation.html
 ```
@@ -123,7 +126,7 @@ Indholdet er ordret det samme, bortset fra:
 
 - **Linksiden er fjernet.** Tiden var løbet fra samlingen af eksterne kemilinks,
   og siden findes ikke længere. Den gamle adresse sendes videre til
-  /materialer.html.
+  /downloads.html.
 - **Forsiden er en ren landingsside** med overskrift, kort introduktion, to
   knapper og en demo af, hvad autocorrect gør. Kategorierne nås via menuen.
 - **Autocorrect-siden er skrevet om** til to valgkort side om side — Word
