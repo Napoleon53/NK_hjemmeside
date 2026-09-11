@@ -5,18 +5,20 @@
 ; INDSTILLINGER
 ; ==============================================================================
 ; Som standard er autocorrect slået FRA i Word og PowerPoint, så det ikke
-; konflikter med kemi-autocorrect i Word.
+; konflikter med kemi-autocorrect i Word. I OneNote er det som standard slået TIL.
 ; Det ændres ikke her i filen, men via ikonet ved uret: højreklik på det grønne
-; H og vælg "Indstillinger...". Valget huskes i en ini-fil under %AppData%.
+; H og vælg "Indstillinger...". Valgene huskes i en ini-fil under %AppData%.
 
 IndstillingsMappe := A_AppData "\KemiAutocorrect"
 IndstillingsFil := IndstillingsMappe "\indstillinger.ini"
 AktivIWord := IniRead(IndstillingsFil, "Indstillinger", "AktivIWord", "0") = "1"
+AktivIOneNote := IniRead(IndstillingsFil, "Indstillinger", "AktivIOneNote", "1") = "1"
 
 IndstillingsVindue := Gui("+AlwaysOnTop -MinimizeBox", "Kemi-autocorrect – indstillinger")
 IndstillingsVindue.SetFont("s10", "Segoe UI")
-IndstillingsVindue.AddText("w380", "Autocorrect virker i alle programmer. I Word og PowerPoint er det som standard slået fra, så det ikke konflikter med kemi-autocorrect i Word.")
+IndstillingsVindue.AddText("w380", "Autocorrect virker i alle programmer. Her kan du vælge, om det også skal virke i Word, PowerPoint og OneNote. I Word og PowerPoint er det som standard slået fra, så det ikke konflikter med kemi-autocorrect i Word.")
 WordValg := IndstillingsVindue.AddCheckbox("y+14", "Brug også autocorrect i Word og PowerPoint")
+OneNoteValg := IndstillingsVindue.AddCheckbox("y+8", "Brug også autocorrect i OneNote")
 IndstillingsVindue.AddButton("y+18 w90 Default", "Gem").OnEvent("Click", GemIndstillinger)
 IndstillingsVindue.AddButton("x+8 w90", "Annuller").OnEvent("Click", (*) => IndstillingsVindue.Hide())
 IndstillingsVindue.OnEvent("Escape", (*) => IndstillingsVindue.Hide())
@@ -26,29 +28,37 @@ A_TrayMenu.Insert("2&")
 A_TrayMenu.Default := "Indstillinger..."
 OpdaterIkonTekst()
 
-; Bruges af #HotIf længere nede: hotstrings er slået fra i Word og PowerPoint,
-; medmindre det er slået til i indstillingerne
+; Bruges af #HotIf længere nede: afgør om hotstrings må bruges i det aktive vindue
 HotstringsTilladt() {
-    return AktivIWord || !(WinActive("ahk_class OpusApp") || WinActive("ahk_class PPTFrameClass"))
+    if WinActive("ahk_class OpusApp") || WinActive("ahk_class PPTFrameClass")
+        return AktivIWord
+    if WinActive("ahk_exe ONENOTE.EXE")
+        return AktivIOneNote
+    return true
 }
 
 VisIndstillinger(*) {
     WordValg.Value := AktivIWord
+    OneNoteValg.Value := AktivIOneNote
     IndstillingsVindue.Show()
 }
 
 GemIndstillinger(*) {
     global AktivIWord := WordValg.Value = 1
+    global AktivIOneNote := OneNoteValg.Value = 1
     DirCreate IndstillingsMappe
     IniWrite AktivIWord ? 1 : 0, IndstillingsFil, "Indstillinger", "AktivIWord"
+    IniWrite AktivIOneNote ? 1 : 0, IndstillingsFil, "Indstillinger", "AktivIOneNote"
     IndstillingsVindue.Hide()
     OpdaterIkonTekst()
-    TrayTip "Autocorrect er nu slået " (AktivIWord ? "TIL" : "FRA") " i Word og PowerPoint.", "Kemi-autocorrect"
+    TrayTip "Word og PowerPoint: " TilFra(AktivIWord) "`nOneNote: " TilFra(AktivIOneNote), "Kemi-autocorrect – indstillinger gemt"
 }
 
 OpdaterIkonTekst() {
-    A_IconTip := "Kemi-autocorrect`nWord og PowerPoint: " (AktivIWord ? "slået til" : "slået fra")
+    A_IconTip := "Kemi-autocorrect`nWord og PowerPoint: " TilFra(AktivIWord) "`nOneNote: " TilFra(AktivIOneNote)
 }
+
+TilFra(Aktiv) => Aktiv ? "slået til" : "slået fra"
 
 ; ==============================================================================
 ; SCANNER HOTKEY: Win+Shift+Q
@@ -116,8 +126,8 @@ OpdaterIkonTekst() {
 ; C1: Do not conform to input case (output is always as defined below)
 #Hotstring C1 EndChars "/\ `n`t
 
-; Hotstrings herfra og ned til "#HotIf" længere nede følger indstillingen for
-; Word og PowerPoint (se INDSTILLINGER øverst)
+; Hotstrings herfra og ned til "#HotIf" længere nede følger indstillingerne for
+; Word, PowerPoint og OneNote (se INDSTILLINGER øverst)
 #HotIf HotstringsTilladt()
 ::aluminium#::Al
 ::aluminiumion#::Al³⁺
@@ -9011,7 +9021,7 @@ OpdaterIkonTekst() {
 
 #HotIf
 
-; Enhederne herunder virker i alle programmer – også i Word og PowerPoint
+; Enhederne herunder virker i alle programmer – også i Word, PowerPoint og OneNote
 :c0:m^2::m²
 :c0:m^-1::m⁻¹
 :c0:m^-2::m⁻²
