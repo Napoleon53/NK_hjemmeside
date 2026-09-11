@@ -25,6 +25,7 @@
   --kort-padding:  26px;
   --radius:        12px;
   --radius-lille:  8px;
+  --header-hoejde: 84px;          /* logoet (68px) + luft over og under */
   --skygge:        0 1px 2px rgba(20, 32, 31, .06), 0 4px 12px rgba(20, 32, 31, .05);
   --skygge-hover:  0 2px 4px rgba(20, 32, 31, .07), 0 12px 28px rgba(20, 32, 31, .10);
 
@@ -90,7 +91,7 @@ p  { margin: 0 0 1.1em; }
 
 .header-inder {
   display: flex; align-items: center; gap: 16px;
-  min-height: 68px;
+  min-height: var(--header-hoejde);
   width: 100%; max-width: var(--bredde); margin-inline: auto; padding-inline: 24px;
 }
 
@@ -100,7 +101,7 @@ p  { margin: 0 0 1.1em; }
   color: var(--tekst); text-decoration: none; margin-right: auto;
   white-space: nowrap;
 }
-.brand img { width: 34px; height: 34px; }
+.brand img { width: 68px; height: 68px; }
 .brand:hover { color: var(--accent); }
 
 /* Hamburger */
@@ -370,7 +371,7 @@ tbody th { font-weight: 650; }
     position: absolute; top: 100%; left: 0; right: 0;
     background: #fff; border-bottom: 1px solid var(--kant);
     box-shadow: var(--skygge-hover);
-    max-height: calc(100dvh - 68px); overflow-y: auto;
+    max-height: calc(100dvh - var(--header-hoejde)); overflow-y: auto;
     display: none;
   }
   .hovedmenu.aaben { display: block; }
