@@ -65,7 +65,7 @@ a:hover { color: var(--accent-mork); }
 
 h1, h2, h3 { line-height: 1.2; letter-spacing: -.01em; margin: 0 0 .5em; }
 h1 { font-size: clamp(1.9rem, 1.3rem + 2.4vw, 2.9rem); }
-h2 { font-size: clamp(1.45rem, 1.2rem + 1.1vw, 1.95rem); }
+h2 { font-size: clamp(1.3rem, 1.15rem + .6vw, 1.5rem); }
 h3 { font-size: 1.2rem; }
 p  { margin: 0 0 1.1em; }
 
@@ -218,7 +218,6 @@ p  { margin: 0 0 1.1em; }
 .sektion-hoved { max-width: var(--bredde-tekst); margin-bottom: 34px; }
 .sektion-hoved p { color: var(--tekst-daempet); margin-bottom: 0; }
 
-.h2-lille { font-size: 1.5rem; }
 
 .sidehoved {
   padding: clamp(38px, 5vw, 60px) 0 clamp(20px, 3vw, 30px);
@@ -248,7 +247,7 @@ p  { margin: 0 0 1.1em; }
 a.kort { text-decoration: none; color: inherit; }
 a.kort:hover { transform: translateY(-3px); box-shadow: var(--skygge-hover); border-color: var(--kant-staerk); color: inherit; }
 
-.kort h3 { margin-bottom: .4em; }
+.kort h2, .kort h3 { font-size: 1.2rem; margin-bottom: .4em; }
 a.kort:hover h3 { color: var(--accent); }
 .kort p { color: var(--tekst-daempet); font-size: .96rem; margin-bottom: 0; }
 .kort .kort-fod { margin-top: auto; padding-top: 18px; font-weight: 600; font-size: .94rem; color: var(--accent); }
@@ -564,10 +563,10 @@ code {
 
 /* --------------------------------------------------- Forsidens to spalter */
 
-.hero-smal h1 { max-width: none; font-size: clamp(1.75rem, 1.1rem + 2.1vw, 2.5rem); }
+.hero-smal h1 { max-width: none; }
 .hero-smal .manchet { max-width: 66ch; margin-bottom: 0; }
 
-.spalte h2 { font-size: 1.42rem; margin-bottom: .45em; }
+.spalte h2 { margin-bottom: .45em; }
 .spalte p { margin-bottom: 18px; }
 
 .spalte .formel-kort.mini { margin-bottom: 20px; }
@@ -615,7 +614,7 @@ code {
   column-gap: 16px;
 }
 .kort.kompakt .kort-ikon { grid-row: 1 / 4; align-self: start; width: 42px; height: 42px; margin-bottom: 0; }
-.kort.kompakt h3 { font-size: 1.08rem; margin-bottom: .25em; }
+.kort.kompakt h3 { margin-bottom: .25em; }
 .kort.kompakt .kort-fod { margin-top: 0; padding-top: 10px; }
 
 /* en linje i stedet for en hel sektion */
