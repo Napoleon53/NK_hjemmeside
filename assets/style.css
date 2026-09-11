@@ -586,6 +586,7 @@ code {
 
 /* spalterne skal ligge taet paa introteksten */
 .sektion-taet { padding-top: clamp(30px, 3.5vw, 44px); }
+.sidehoved .medie-grid { align-items: center; }
 
 /* ------------------------------------------- Grupper i rammer (downloads) */
 
