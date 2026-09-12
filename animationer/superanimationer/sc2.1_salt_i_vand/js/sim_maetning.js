@@ -51,6 +51,7 @@
         this.koblMus();
         NK.Valg.paa(this.nulstil.bind(this));
         this.tilpas();
+        this.opdaterPanel();
     };
 
     var P = NK.SimMaetning.prototype;
@@ -132,9 +133,9 @@
 
         this.graf = {
             x: grafFelt.x + 58,
-            y: grafFelt.y + 34,
+            y: grafFelt.y + 50,
             b: Math.max(60, grafFelt.b - 58 - 26),
-            h: Math.max(60, grafFelt.h - 34 - 46)
+            h: Math.max(60, grafFelt.h - 50 - 48)
         };
     };
 
@@ -387,9 +388,13 @@
         var tilX = function (t) { return g.x + (t / 100) * g.b; };
         var tilY = function (v) { return g.y + g.h - NK.klamp(v / ymax, 0, 1) * g.h; };
 
-        /* Overskrift */
-        NK.tekst(ctx, "Hvor meget kan der opløses?", g.x - 42, g.y - 16, {
+        /* Overskrift og enhed. Kurven er den eneste kurve, saa den har
+           ikke brug for en signaturforklaring - den staar i overskriften. */
+        NK.tekst(ctx, salt.formel + " — hvor meget kan der opløses?", g.x - 46, g.y - 32, {
             farve: "#dde3ea", font: "600 13.5px 'Segoe UI', sans-serif"
+        });
+        NK.tekst(ctx, "gram pr. 100 mL vand", g.x - 46, g.y - 14, {
+            farve: "rgba(126, 133, 144, 0.95)", font: "500 11.5px 'Segoe UI', sans-serif"
         });
 
         /* Gitter og y-akse */
@@ -421,17 +426,14 @@
         ctx.restore();
 
         for (i = 0; i <= 100; i += 20) {
-            NK.tekst(ctx, i + "°", tilX(i), g.y + g.h + 16, {
+            NK.tekst(ctx, String(i), tilX(i), g.y + g.h + 16, {
                 justering: "center", farve: "rgba(169, 176, 186, 0.85)",
                 font: "500 11px 'Segoe UI', sans-serif"
             });
         }
-        NK.tekst(ctx, "temperatur", g.x + g.b / 2, g.y + g.h + 34, {
+        NK.tekst(ctx, "temperatur (°C)", g.x + g.b / 2, g.y + g.h + 34, {
             justering: "center", farve: "rgba(126, 133, 144, 0.95)",
             font: "500 11.5px 'Segoe UI', sans-serif"
-        });
-        NK.tekst(ctx, "gram pr. 100 mL vand", g.x - 42, g.y - 1, {
-            farve: "rgba(126, 133, 144, 0.95)", font: "500 11.5px 'Segoe UI', sans-serif"
         });
 
         /* Selve kurven, punkt for punkt */
@@ -463,16 +465,11 @@
         ctx.stroke();
         ctx.restore();
 
-        /* Navnet staar paa kurven, saa der ikke skal en signaturforklaring til */
-        var maerkeI = Math.round(punkter.length * 0.34);
-        NK.tekst(ctx, salt.formel + " — grænsen", punkter[maerkeI][0], punkter[maerkeI][1] - 10, {
-            farve: "#8fc8ea", font: "600 11.5px 'Segoe UI', sans-serif", kant: true, kantBredde: 4
-        });
-
-        /* Det, man har haeldt i */
+        /* Det, man har haeldt i. Ligger maengden over grafens kant, bliver
+           linjen liggende lige under kanten med en pil paa. */
         if (this.tilsat > 0) {
             var overKanten = this.tilsat > ymax;
-            var ty = tilY(this.tilsat);
+            var ty = overKanten ? g.y + 4 : tilY(this.tilsat);
             ctx.save();
             ctx.strokeStyle = FARVE_TILSAT;
             ctx.lineWidth = 2;
@@ -484,8 +481,8 @@
             ctx.restore();
 
             NK.tekst(ctx, "hældt i: " + NK.gram(this.tilsat) + " g" + (overKanten ? " ↑" : ""),
-                g.x + g.b, ty - 8, {
-                    justering: "right", farve: FARVE_TILSAT,
+                g.x + 8, overKanten ? ty + 15 : ty - 8, {
+                    farve: FARVE_TILSAT,
                     font: "600 11.5px 'Segoe UI', sans-serif", kant: true, kantBredde: 4
                 });
         }
@@ -539,13 +536,13 @@
         });
 
         /* To ord, der siger, hvad de to omraader betyder */
-        NK.tekst(ctx, "bundfald", g.x + g.b - 8, g.y + 14, {
-            justering: "right", farve: "rgba(230, 137, 42, 0.85)",
+        NK.tekst(ctx, "her bliver der bundfald", g.x + g.b - 8, g.y + 15, {
+            justering: "right", farve: "rgba(240, 160, 74, 0.9)",
             font: "600 11.5px 'Segoe UI', sans-serif", kant: true, kantBredde: 4
         });
-        NK.tekst(ctx, "alt er opløst", g.x + 8, g.y + g.h - 8, {
-            farve: "rgba(126, 224, 168, 0.8)", font: "600 11.5px 'Segoe UI', sans-serif",
-            kant: true, kantBredde: 4
+        NK.tekst(ctx, "her opløses det hele", g.x + g.b - 8, g.y + g.h - 9, {
+            justering: "right", farve: "rgba(126, 224, 168, 0.85)",
+            font: "600 11.5px 'Segoe UI', sans-serif", kant: true, kantBredde: 4
         });
     };
 

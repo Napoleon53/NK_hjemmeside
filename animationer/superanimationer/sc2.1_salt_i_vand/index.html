@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salt i vand</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">💧</span> Salt<span class="lang"> i vand</span></h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-oploes" role="tab" aria-selected="true"><span class="nr">1</span>Opløsningen</button>
+        <button class="faneknap" data-fane="fane-maetning" role="tab" aria-selected="false"><span class="nr">2</span>Hvor meget kan der være?</button>
+    </div>
+
+    <button class="ikonknap" id="teoriknap" type="button" title="Teori (T)" aria-label="Teori">📖</button>
+    <button class="ikonknap" id="quizknap" type="button" title="Tjek dig selv (Q)" aria-label="Tjek dig selv">🧠</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Hjælp og genveje (H)" aria-label="Hjælp">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: OPLOESNINGEN                                               -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-oploes" role="tabpanel" aria-label="Opløsningen">
+    <div class="scene medtekst">
+        <canvas id="oploes-laerred"></canvas>
+        <div class="scene-mrk" id="oploes-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort">
+            <h2>Vælg et salt</h2>
+            <div class="saltvalg" id="oploes-saltvalg"></div>
+            <div class="talraekke" style="margin-top:9px;">
+                <span id="oploes-navn">natriumchlorid</span>
+                <span class="maerke groen" id="oploes-type">letopløseligt</span>
+            </div>
+            <p class="note" id="oploes-hverdag"></p>
+        </div>
+
+        <div class="kort">
+            <h2>Temperatur</h2>
+            <div class="tilstandsvalg" id="oploes-temp" role="group" aria-label="Temperatur"></div>
+        </div>
+
+        <div class="kort maaling">
+            <h2>Det sker der</h2>
+            <div class="ligning" id="oploes-ligning"></div>
+            <div class="talraekke" style="margin-top:9px;"><span>Ude i vandet</span><span class="tal groen" id="oploes-ude">0</span></div>
+            <div class="talraekke"><span>Tilbage i krystallen</span><span class="tal" id="oploes-fast">30</span></div>
+            <div class="talraekke"><span>Der kan opløses</span><span class="tal blaa" id="oploes-graense">—</span></div>
+            <p class="besked" id="oploes-besked" style="margin-top:9px;"></p>
+        </div>
+
+        <div class="kort">
+            <div class="tegnforklaring">
+                <span class="tf-punkt"><span class="tf-prik plus">+</span>positiv ion</span>
+                <span class="tf-punkt"><span class="tf-prik minus">−</span>negativ ion</span>
+                <span class="tf-punkt"><span class="tf-prik vand">δ</span>vandmolekyle</span>
+            </div>
+            <label class="tjek"><input type="checkbox" id="oploes-delta" checked> Vis δ+ og δ− på vandet</label>
+            <button class="knap nulstil" id="oploes-nulstil" type="button"><span>Ny krystal</span><span class="tegn">↺</span></button>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: HVOR MEGET KAN DER VAERE?                                   -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-maetning" role="tabpanel" aria-label="Hvor meget kan der være?">
+    <div class="scene medtekst">
+        <canvas id="maet-laerred"></canvas>
+        <div class="scene-mrk" id="maet-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort">
+            <h2>Vælg et salt</h2>
+            <div class="saltvalg" id="maet-saltvalg"></div>
+            <div class="talraekke" style="margin-top:9px;">
+                <span id="maet-navn">natriumchlorid</span>
+                <span class="maerke groen" id="maet-type">letopløseligt</span>
+            </div>
+            <p class="note" id="maet-hverdag"></p>
+        </div>
+
+        <div class="kort">
+            <h2>Temperatur</h2>
+            <div class="skyder">
+                <label for="maet-temp"><span>Vandets temperatur</span><b id="maet-temp-tal">20 °C</b></label>
+                <input type="range" id="maet-temp" min="0" max="100" step="1" value="20">
+                <div class="skala"><span>0 °C</span><span>50 °C</span><span>100 °C</span></div>
+            </div>
+            <p class="note">Du kan også trække i kurven ude i billedet.</p>
+        </div>
+
+        <div class="kort">
+            <h2>Hæld salt i</h2>
+            <div class="knaprad taet">
+                <button class="knap blaa" id="maet-lidt" type="button">+ 5 g</button>
+                <button class="knap blaa" id="maet-meget" type="button">+ 25 g</button>
+            </div>
+            <button class="knap nulstil" id="maet-toem" type="button"><span>Tøm glasset</span><span class="tegn">↺</span></button>
+        </div>
+
+        <div class="kort maaling">
+            <h2>I glasset <span class="maerke groen" id="maet-maerke">tomt glas</span></h2>
+            <div class="talraekke"><span>Hældt i</span><span class="tal" id="maet-tilsat">0 g</span></div>
+            <div class="talraekke"><span>Opløst</span><span class="tal groen" id="maet-oploest">0 g</span></div>
+            <div class="talraekke"><span>Bundfald</span><span class="tal roed" id="maet-bundfald">0 g</span></div>
+            <div class="talraekke sum"><span>Grænsen lige nu</span><span class="tal gul" id="maet-graense">—</span></div>
+            <p class="besked" id="maet-besked" style="margin-top:9px;"></p>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIBOKSEN - valgfri, aabnes med knappen eller T                   -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Teori: salt i vand</h2>
+        <p>Otte korte afsnit. Du behøver ikke læse dem for at bruge animationen.</p>
+        <div class="teoriliste" id="teori-liste"></div>
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="teori-luk" type="button" style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<div class="overlay" id="quiz">
+    <div class="overlay-boks" style="max-width:520px;">
+        <div id="quiz-indhold"></div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<div class="overlay" id="hjaelp">
+    <div class="overlay-boks">
+        <h2>Salt i vand</h2>
+        <p>To faner om det samme spørgsmål: <b>hvad sker der, når et salt kommer i vand?</b> Den første viser det tæt på, ion for ion. Den anden viser det, man kan måle: hvor meget der kan være i vandet.</p>
+
+        <h3>De to faner</h3>
+        <ul>
+            <li><b>Opløsningen</b> — vandmolekylerne finder ionerne i krystallens overflade og vender den rigtige ende ind mod dem. Når fire har fat, river de ionen løs. Skru på temperaturen, og se tempoet ændre sig.</li>
+            <li><b>Hvor meget kan der være?</b> — hæld salt i 100 mL vand. Det, der er plads til, opløses; resten bliver liggende som bundfald. Kurven til højre er grænsen, og den gule linje er det, du har hældt i.</li>
+        </ul>
+
+        <h3>De ni salte</h3>
+        <p>Den grønne streg over knappen betyder <b>letopløseligt</b>, den orange <b>tungtopløseligt</b>. Det salt, du vælger, følger med over på den anden fane.</p>
+
+        <h3>Prøv det her</h3>
+        <ul>
+            <li>Vælg AgCl på fane 1. Der slipper et par ioner — og så sker der ikke mere. Det er, hvad tungtopløselig betyder.</li>
+            <li>Vælg CaCl₂, og tæl ionerne i krystallen. Der er to Cl⁻ for hver Ca²⁺ — præcis som i formlen.</li>
+            <li>Hæld 50 g NaCl i på fane 2, og varm vandet helt op til 100 °C. Hvorfor forsvinder bundfaldet ikke?</li>
+            <li>Gør det samme med KNO₃. Her sker der noget helt andet.</li>
+            <li>Vælg Ca(OH)₂, hæld 0,2 g i, og varm op. Det her salt opløses <i>dårligere</i>, jo varmere vandet bliver.</li>
+        </ul>
+
+        <h3>Genveje</h3>
+        <p>
+            <kbd>1</kbd> <kbd>2</kbd> skift fane &nbsp;·&nbsp;
+            <kbd>T</kbd> teori &nbsp;·&nbsp;
+            <kbd>Q</kbd> tjek dig selv &nbsp;·&nbsp;
+            <kbd>R</kbd> start fanen forfra &nbsp;·&nbsp;
+            <kbd>H</kbd> denne hjælp &nbsp;·&nbsp;
+            <kbd>Esc</kbd> luk
+        </p>
+
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="hjaelp-luk" type="button" style="justify-content:center;">Luk og kom i gang</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/valg.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/sim_oploes.js"></script>
+<script src="js/sim_maetning.js"></script>
+<script src="js/quiz.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

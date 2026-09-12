@@ -40,11 +40,6 @@
         return ion.formel + NK.ladningHaevet(ion.q);
     };
 
-    /* Navnet, som det staar i saltets navn: kobber(II) faar romertallet med. */
-    D.ionNavn = function (ion) {
-        return ion.navn + (ion.romertal ? "(" + ion.romertal + ")" : "");
-    };
-
     /* ----- Temperaturerne, oploeselighederne er maalt ved -------------- */
     D.TEMPER = [0, 20, 40, 60, 80, 100];
 
@@ -131,26 +126,11 @@
     };
 
     /* ----- Oploesningsligningen ----------------------------------------- */
-    /* Delene kommer med farve, saa baade panelet og laerredet kan skrive
-       den samme ligning med de samme farver. */
-    D.FARVE_KAT = "#f7a79d";
-    D.FARVE_AN  = "#97cff5";
-
     function led(antal, tekst) { return (antal > 1 ? antal + " " : "") + tekst; }
 
     D.venstreLed = function (salt) { return salt.formel + "(s)"; };
     D.katLed = function (salt) { return led(salt.p, D.ionTekst(D.ion(salt.kat))) + "(aq)"; };
     D.anLed  = function (salt) { return led(salt.n, D.ionTekst(D.ion(salt.an)))  + "(aq)"; };
-
-    D.ligningDele = function (salt) {
-        return [
-            { t: D.venstreLed(salt) },
-            { t: "  →  ", farve: "#7e8590" },
-            { t: D.katLed(salt), farve: D.FARVE_KAT },
-            { t: "  +  ", farve: "#7e8590" },
-            { t: D.anLed(salt), farve: D.FARVE_AN }
-        ];
-    };
 
     D.ligningHTML = function (salt) {
         return '<span class="fast">' + D.venstreLed(salt) + "</span>" +

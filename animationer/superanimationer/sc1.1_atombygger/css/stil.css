@@ -224,7 +224,7 @@ main { flex: 1; position: relative; min-height: 0; }
     display: grid;
     grid-template-columns: auto auto auto;
     grid-template-rows: auto auto;
-    column-gap: 5px;
+    column-gap: 2px;
     align-items: center;
     background-color: rgba(20, 20, 26, 0.72);
     border: 1px solid rgba(255, 255, 255, 0.12);
@@ -242,8 +242,8 @@ main { flex: 1; position: relative; min-height: 0; }
     line-height: 1.15;
 }
 
-.nuklid .a { grid-row: 1; color: var(--gul); align-self: end; }
-.nuklid .z { grid-row: 2; color: var(--proton); align-self: start; }
+.nuklid .a { grid-row: 1; color: var(--gul); align-self: end; margin-bottom: 4px; }
+.nuklid .z { grid-row: 2; color: var(--proton); align-self: start; margin-top: 4px; }
 
 .nuklid .sym {
     grid-column: 2;

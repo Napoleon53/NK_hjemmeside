@@ -192,7 +192,9 @@
         NK.saetTekst("byg-nuklid-sym", g ? g.symbol : "?");
         NK.saetTekst("byg-nuklid-a", this.p ? String(a) : "");
         NK.saetTekst("byg-nuklid-z", this.p ? String(this.p) : "");
-        NK.saetTekst("byg-nuklid-q", q === 0 ? "" : NK.ladningstekst(q));
+        /* Kemikerens skrivemaade dropper "1"-tallet: en enkelt ladning
+           skrives bare "+" eller "−", ikke "1+" eller "1−". */
+        NK.saetTekst("byg-nuklid-q", q === 0 ? "" : (Math.abs(q) === 1 ? (q > 0 ? "+" : "−") : NK.ladningstekst(q)));
         NK.saetKlasse("byg-nuklid-q", q > 0 ? "q plus" : (q < 0 ? "q minus" : "q"));
 
         NK.saetTekst("byg-grundstof", g ? g.navn : "— endnu ikke et grundstof —");

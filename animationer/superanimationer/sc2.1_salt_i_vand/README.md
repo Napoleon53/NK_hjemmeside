@@ -1,0 +1,199 @@
+# sc2.1 — Salt i vand
+
+En superanimation: i modsætning til de øvrige animationer, som er én enkelt
+HTML-fil, ligger denne i sin egen mappe med adskilt CSS og JavaScript.
+
+Åbn **`index.html`**. Mappen er selvstændig — den henter kun filer inde fra sig
+selv og bruger hverken `fetch` eller moduler, så den virker også, når den åbnes
+direkte fra harddisken, og kan flyttes hvorhen som helst.
+
+Den afløser `animationer/kemi-c-filer/c2.1_salte_vand_oploest.html`. Det, der var
+værd at tage med derfra, er taget med: vandmolekylerne, der vender den rigtige
+ende ind mod ionerne og fire og fire river dem løs, de tre temperaturknapper og
+en kort selvtest. Resten er bygget om.
+
+## Hvad viser den
+
+To faner om det samme spørgsmål: *hvad sker der, når et salt kommer i vand?*
+
+| # | Fane | Hvad man gør | Pointe |
+|---|------|--------------|--------|
+| 1 | Opløsningen | vælger et salt og en temperatur og ser efter | vandet river ionerne løs **udefra og ind** — og for nogle salte stopper det næsten med det samme |
+| 2 | Hvor meget kan der være? | hælder salt i 100 mL vand, ske for ske | der er en **grænse**. Alt over grænsen bliver liggende som bundfald |
+
+Saltet følger med fra fane til fane. Vælger man kridt på fane 1, er det stadig
+kridt på fane 2.
+
+### De ni salte
+
+Den grønne streg over knappen betyder letopløseligt, den orange tungtopløseligt.
+Grænsen er sat ved **1 g pr. 100 mL vand ved 20 °C**.
+
+| Salt | | Hvorfor netop det |
+|------|---|-------------------|
+| NaCl | let | køkkensalt — og kurven er næsten flad. Varmt vand hjælper ikke |
+| KNO₃ | let | det modsatte: fra 13 g til 246 g mellem 0 og 100 °C |
+| CaCl₂ | let | 1:2, så gitteret og ligningen viser to Cl⁻ for hver Ca²⁺ |
+| K₂SO₄ | let | 2:1 den anden vej, og med en sammensat ion |
+| CuSO₄ | let | farver opløsningen blå, så man kan *se* koncentrationen stige |
+| Ca(OH)₂ | tung | undtagelsen: opløses **dårligere**, jo varmere vandet er |
+| CaCO₃ | tung | kridt og kalk — 0,0014 g pr. 100 mL |
+| BaSO₄ | tung | drikkes før en røntgenundersøgelse, netop fordi det ikke opløses |
+| AgCl | tung | 0,00015 g pr. 100 mL. Bundfaldet fra fældningsforsøgene |
+
+De fire tungtopløselige er det, fanerne står og falder med: uden dem er
+"opløselighed" bare et ord.
+
+### Fane 1 — opløsningen
+
+Et lille udsnit af en krystal ligger i bunden af glasset, bygget med saltets
+rigtige forhold. Ni vandmolekyler arbejder:
+
+* de finder en ion **i overfladen** — en ion inde midt i krystallen er dækket på
+  alle fire sider, og der er ikke plads til vand omkring den. Derfor forsvinder
+  krystallen udefra og ind, ikke i tilfældig orden
+* undervejs vender de den rigtige ende ind mod ionen: δ− mod plus, δ+ mod minus
+* når fire har fat, river de ionen løs og bærer den ud i vandet
+* den frie ion beholder et lag vand omkring sig — det er dét, `(aq)` betyder
+
+Ligningen står i panelet og skrives om, så snart man skifter salt:
+CaCl₂(s) → Ca²⁺(aq) + 2 Cl⁻(aq).
+
+**Temperaturen** bestemmer tempoet. Ved *koldt* tager det omkring halvandet
+minut at opløse krystallen, ved *varmt* under et halvt.
+
+**Tungtopløselige salte stopper.** Der slipper nogle få ioner ud, og så sker der
+ikke mere: vandet er mættet, og resten bliver liggende. Antallet kommer fra
+`D.frieIoner` og følger saltets rigtige opløselighed — AgCl slipper to ioner i
+koldt vand og fire i varmt.
+
+### Fane 2 — hvor meget kan der være?
+
+Venstre side er glasset med 100 mL vand, højre side er saltets
+**opløselighedskurve**. De to ting hænger sammen:
+
+* den blå kurve er grænsen, og den gule stiplede linje er det, man har hældt i
+* ligger den gule linje **under** kurven, er alt opløst
+* ligger den **over**, er forskellen bundfald — og præcis så meget ligger der i
+  bunden af glasset ved siden af
+* skyderen flytter temperaturen, og det gør kurvens punkt også. Man kan også
+  klikke eller trække direkte i grafen
+
+Det er hele grunden til, at glasset og grafen står i det samme billede: man kan
+se den samme mængde salt to steder på én gang.
+
+De opløste ioner tegnes som prikker i vandet, så mange som der er gram af dem.
+Ved AgCl bliver vandet derfor helt klart, mens hele skefulden ligger i bunden.
+
+### Den valgfrie teoriboks
+
+Knappen 📖 i toplinjen åbner otte korte afsnit: det skæve vandmolekyle, hvorfor
+det kan trække i ioner, (s) og (aq), at ionerne ikke bliver til noget nyt,
+mættet, let og tungt, hvad temperaturen gør — og et afsnit om, hvor forenklet
+tegningen er. Ingen af dem er nødvendige for at bruge animationen.
+
+Ordene *kinetisk energi* og *hydratisering* er med vilje ikke brugt noget sted.
+Selvtesten holder øje med det.
+
+Knappen 🧠 åbner otte spørgsmål med forklaring på svaret.
+
+### Det nye i forhold til den gamle animation
+
+* **Der er flere salte end ét.** Den gamle kunne kun NaCl. Nu er der ni, og
+  gitteret bygges med saltets eget forhold, så CaCl₂ rent faktisk har dobbelt så
+  mange Cl⁻ som Ca²⁺.
+* **Tungtopløselige salte er kommet med.** Det var slet ikke muligt at vise før,
+  og det er den halvdel af emnet, der peger videre mod fældning (c2.4).
+* **Krystallen opløses udefra.** Den gamle kunne rive en ion ud af midten af
+  gitteret og efterlade et hul.
+* **Mætning findes.** Den gamle havde ingen grænse: alting opløstes altid.
+* **Opløselighedskurven er ny** — og den er ikke pynt, men det sted, hvor man
+  aflæser, hvor meget der bliver til bundfald.
+* **Teksten er flyttet ud af billedet.** Den gamle havde en fast tekstspalte med
+  teori, som man ikke kunne slippe for. Nu står der én linje under billedet, og
+  resten ligger i en boks, man selv åbner.
+* **Temperaturen gør nu to ting.** I den gamle ændrede den kun tempoet. Her
+  flytter den også grænsen for, hvor meget der kan opløses — og Ca(OH)₂ er med
+  netop for at vise, at det ikke altid går den vej, man tror.
+
+Direkte link: `index.html#maetning` åbner fane 2 med det samme.
+
+Genveje: <kbd>1</kbd> <kbd>2</kbd> faner · <kbd>T</kbd> teori · <kbd>Q</kbd> quiz ·
+<kbd>R</kbd> start fanen forfra · <kbd>H</kbd> hjælp · <kbd>Esc</kbd> luk.
+
+## Filer
+
+```
+index.html            markup for begge faner + de tre overlays
+css/stil.css          alt udseende. NB: decimaltal med PUNKTUM i CSS
+js/kerne.js           NK-navnerum, dansk talformat, hævet/sænket skrift,
+                      DPR-skarpt canvas, tegnehjælpere
+js/data.js            ionerne, de ni salte, opløselighedstallene,
+                      teksterne til teoriboksen og quizzen
+js/valg.js            det valgte salt — deles af begge faner
+js/tegning.js         en ion, et vandmolekyle og et bægerglas
+js/sim_oploes.js      fane 1 — krystallen og vandmolekylerne
+js/sim_maetning.js    fane 2 — glasset og opløselighedskurven
+js/quiz.js            selvtesten i sit overlay
+js/app.js             faneskift, overlays, tastatur, tegneløkke
+_selvtest.html        udviklerværktøj, indgår ikke i animationen (se nedenfor)
+```
+
+Der er ingen billedfiler — ioner, vandmolekyler, glas, bundfald og graf er
+tegnet i kode. Hver fane er et objekt med `tilpas()`, `opdater(dt)`, `tegn()` og
+`nulstil()`. `app.js` kalder kun den aktive fane, så den anden koster ingenting.
+
+## At rette i den
+
+**Et nyt salt** er én linje i `D.SALTE` øverst i `js/data.js`: de to ioner, hvor
+mange der er af hver, formlen, navnet, en hverdagsting og seks opløselighedstal
+(0, 20, 40, 60, 80 og 100 °C, i gram pr. 100 mL vand). Resten — gitteret,
+ligningen, let/tung, kurven, farven på knappen — følger af sig selv. Skal saltet
+farve vandet, tilføjes `vandfarve`.
+
+**Ionerne** står i `D.IONER`. `r` er ionens størrelse i forhold til de andre;
+tallene er ikke målfaste, men rækkefølgen er rigtig (Na⁺ er mindre end Cl⁻).
+`sammensat: true` er dét, der sætter parentes i formlen: Ca(OH)₂.
+
+**Opløselighedstallene** er omtrentlige tabelværdier. De er runde nok til et
+C-niveau, men forholdet mellem saltene er rigtigt, og det er dét, fanerne viser.
+Mellem to tabelpunkter regnes der med en ret linje.
+
+**Hvor mange ioner der slipper fri på fane 1** afgøres af `D.frieIoner`. Et
+letopløseligt salt forsvinder helt; et tungtopløseligt slipper 2–10 ioner og
+står så stille. Tallene er valgt, så forskellen kan ses — i virkeligheden
+slipper der endnu færre, og det står der i teoriboksen.
+
+**Kurvens mål** ligger i `tilpas()` i `js/sim_maetning.js`. Er lærredet bredere
+end 640 px, står glasset og grafen ved siden af hinanden; ellers over hinanden.
+y-aksen skaleres efter saltets egen største værdi, for ellers ville AgCl's kurve
+ligge oven på nul-linjen, når NaCl lige har været fremme.
+
+**Teksterne til teoriboksen og quizzen** står samlet nederst i data.js, så de kan
+rettes uden at åbne en eneste af simulationerne.
+
+**`_selvtest.html`** åbner index.html i en iframe og kontrollerer det, man ikke
+kan se på et skærmbillede: at formlerne kan regnes ud af ionerne, at ladningerne
+går op, at opløselighedstallene passer med let/tung-inddelingen, at
+opløst + bundfald altid giver det, man har hældt i, at krystallen faktisk går i
+opløsning, når man lader tiden gå, at et tungtopløseligt salt ikke slipper flere
+ioner end det må, at grafen kan klikkes på — og at ingen af teksterne bruger
+fagord over C-niveau. Kør den efter ændringer i data.js.
+
+Den skal åbnes gennem en lokal server (eller i Firefox): Chrome nægter en side
+på `file://` at kigge ind i sin egen iframe. Filen bruges ikke af animationen og
+kan slettes.
+
+## Hvis den skal ind i menuen
+
+Den er med vilje ikke linket ind endnu. `animationer/kemi-c-filer/samling_c2.html`
+har allerede en knap med `data-emne="c2.1"`, som peger på den gamle animation.
+Skal den nye afløse den, er det den ene linje, der skal skiftes ud — bemærk
+`../`, fordi superanimationerne ligger uden for kapitlets egen mappe:
+
+```html
+<button class="tab-btn" data-emne="c2.1"
+    data-beskrivelse="Se vandet rive ionerne løs af en saltkrystal, og find ud af, hvor meget der overhovedet kan opløses, før resten bliver til bundfald."
+    onclick="visAnimation(this, '../superanimationer/sc2.1_salt_i_vand/index.html')"
+    title="Salt i vand"><span class="btn-num">1</span><span class="btn-text">Salt i vand</span></button>
+```

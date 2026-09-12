@@ -42,7 +42,7 @@
             b.setAttribute("aria-label", salt.navn);
             b.innerHTML = '<span class="sformel"></span><span class="snavn"></span>';
             b.querySelector(".sformel").textContent = salt.formel;
-            b.querySelector(".snavn").textContent = salt.navn.replace("(II)", "");
+            b.querySelector(".snavn").textContent = salt.navn;
             b.addEventListener("click", function () { V.saet(salt.id); });
             vaert.appendChild(b);
             knapper.push({ el: b, id: salt.id });

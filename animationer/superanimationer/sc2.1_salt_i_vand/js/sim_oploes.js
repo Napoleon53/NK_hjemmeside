@@ -41,6 +41,7 @@
         this.koblPanel();
         NK.Valg.paa(this.nulstil.bind(this));
         this.nulstil();
+        this.opdaterPanel();
     };
 
     var P = NK.SimOploes.prototype;
@@ -134,6 +135,7 @@
 
         this.bygget = salt.id;
         this.frie = 0;
+        this.paabegyndt = 0;   /* frie + dem, der er ved at blive revet loes */
         this.layout(true);
     };
 
@@ -176,10 +178,22 @@
 
         for (var j = 0; j < this.vand.length; j++) {
             var v = this.vand[j];
-            v.hjemX = this.glasX + this.glasB * (0.08 + j * (0.84 / (VAND_I_ARBEJDE - 1)));
-            v.hjemY = this.overflade + 30;
-            if (v.tilstand === "hjemme" || flytAlt) { v.x = v.hjemX; v.y = v.hjemY; }
+            if (flytAlt || v.tilstand === "hjemme") {
+                this.nytHjem(v);
+                v.x = v.hjemX;
+                v.y = v.hjemY;
+            }
         }
+    };
+
+    /* Et nyt sted at svoemme hen. Vandmolekylerne bor ikke oeverst i
+       glasset - de er over det hele, og naar de har afleveret en ion,
+       driver de bare lidt vaek og finder den naeste. */
+    P.nytHjem = function (v) {
+        var top = this.overflade + 24;
+        var bund = Math.max(top + 10, this.gitterTop - 14);
+        v.hjemX = this.glasX + 26 + Math.random() * Math.max(10, this.glasB - 52);
+        v.hjemY = top + Math.random() * (bund - top);
     };
 
     P.tilpas = function () {
@@ -254,7 +268,10 @@
                 } else {
                     o.x = o.maalX; o.y = o.maalY;
                     o.tilstand = "fri";
-                    for (var b = 0; b < o.baerere.length; b++) o.baerere[b].tilstand = "hjem";
+                    for (var b = 0; b < o.baerere.length; b++) {
+                        this.nytHjem(o.baerere[b]);
+                        o.baerere[b].tilstand = "hjem";
+                    }
                     o.baerere = [];
                     o.vx = (Math.random() - 0.5) * 26;
                     o.vy = (Math.random() - 0.5) * 26;
@@ -272,7 +289,7 @@
         }
 
         /* Vandmolekylerne */
-        for (i = 0; i < this.vand.length; i++) this.opdaterVand(this.vand[i], 108 * fart * dt);
+        for (i = 0; i < this.vand.length; i++) this.opdaterVand(this.vand[i], 145 * fart * dt, dt);
 
         /* Baggrundsvandet */
         for (i = 0; i < this.baggrund.length; i++) {
@@ -287,25 +304,32 @@
         this.opdaterPanel();
     };
 
-    P.opdaterVand = function (v, skridt) {
+    P.opdaterVand = function (v, skridt, dt) {
         var o = v.maal;
 
         switch (v.tilstand) {
         case "hjemme":
-            if (this.faerdig()) { v.vinkel += 0.004; break; }
-            o = this.naermesteFrie(v);
+            o = this.tilbage() === 0 ? null : this.naermesteFrie(v);
+            /* En ion, der ikke er begyndt endnu, taeller med i graensen med
+               det samme. Ellers ville de ioner, der allerede er i gang,
+               naa at komme ud, efter graensen var naaet - og et
+               tungtoploeseligt salt ville slippe flere ioner end det maa. */
+            if (o && o.reserveret === 0) {
+                if (this.paabegyndt >= this.maxFrie()) o = null;
+                else this.paabegyndt++;
+            }
             if (o) {
                 v.plads = o.reserveret;
                 o.reserveret++;
                 v.maal = o;
                 v.tilstand = "soeger";
             } else {
-                v.vinkel += 0.004;
+                v.vinkel += 0.25 * dt;
             }
             break;
 
         case "soeger": {
-            if (!o || o.tilstand !== "fast") { v.maal = null; v.tilstand = "hjem"; break; }
+            if (!o || o.tilstand !== "fast") { v.maal = null; this.nytHjem(v); v.tilstand = "hjem"; break; }
             var vinkel = o.grundvinkel + v.plads * (Math.PI / 2);
             var afstand = this.ionRadius(o) + this.celle * 0.46;
             var maalX = o.x + Math.cos(vinkel) * afstand;
@@ -334,7 +358,7 @@
             v.x = o.x + v.afX;
             v.y = o.y + v.afY;
             v.vinkel = T.vendMod(v.x, v.y, o.x, o.y, o.ion.q > 0);
-            if (o.tilstand === "fri") { v.maal = null; v.tilstand = "hjem"; }
+            if (o.tilstand === "fri") { v.maal = null; this.nytHjem(v); v.tilstand = "hjem"; }
             break;
 
         case "hjem": {
@@ -343,7 +367,7 @@
             if (hd > skridt) {
                 v.x += (hx / hd) * skridt;
                 v.y += (hy / hd) * skridt;
-                v.vinkel += 0.05;
+                v.vinkel += 3 * dt;
             } else {
                 v.x = v.hjemX; v.y = v.hjemY;
                 v.maal = null;
@@ -456,7 +480,11 @@
         /* Ioner paa vej ud tegnes efter baererne, saa de ligger oeverst */
         for (i = 0; i < this.vand.length; i++) {
             var v = this.vand[i];
-            T.vand(ctx, v.x, v.y, v.vinkel, this.celle / 26, { delta: this.visDelta, alpha: 0.95 });
+            var arbejder = v.tilstand === "soeger" || v.tilstand === "fast";
+            T.vand(ctx, v.x, v.y, v.vinkel, this.celle / 26, {
+                delta: this.visDelta,
+                alpha: arbejder ? 1 : 0.55
+            });
         }
         for (i = 0; i < this.ioner.length; i++) {
             var pv = this.ioner[i];

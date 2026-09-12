@@ -296,6 +296,7 @@ main { flex: 1; position: relative; min-height: 0; }
 .tal.blaa  { color: var(--minus-lys); }
 .tal.groen { color: #7ee0a8; }
 .tal.roed  { color: var(--plus-lys); }
+.tal.gul   { color: var(--gul); }
 
 /* ----- Opgaverne ------------------------------------------------------ */
 .opgave-prompt {
