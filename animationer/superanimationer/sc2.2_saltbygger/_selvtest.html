@@ -47,12 +47,11 @@ function koer() {
     paastand("NK findes", !!NK);
     if (!NK) { vis(); return; }
     var D = NK.Data;
-    paastand("alle fire faner er bygget", !!(NK.sims && NK.sims["fane-byg"] && NK.sims["fane-navn"]
-        && NK.sims["fane-formel"] && NK.sims["fane-vand"]));
+    paastand("begge faner er bygget", !!(NK.sims && NK.sims["fane-bord"] && NK.sims["fane-vand"]));
 
     overskrift("2. Panelerne er fyldt ud ved opstart");
-    var skalHaveTekst = ["byg-formel", "byg-navn", "byg-l-kat", "byg-q-kat", "byg-q-sum", "byg-status",
-        "navn-prompt", "navn-status", "formel-prompt", "formel-status", "vand-spm", "vand-status", "vand-overskrift"];
+    var skalHaveTekst = ["byg-formel", "byg-navn", "byg-l-kat", "byg-q-kat", "byg-q-sum", "bord-status",
+        "vand-spm", "vand-status", "vand-overskrift"];
     var tomme = [];
     for (i = 0; i < skalHaveTekst.length; i++) {
         var e = d.getElementById(skalHaveTekst[i]);
@@ -61,7 +60,7 @@ function koer() {
     paastand(skalHaveTekst.length + " udlæsninger fyldt ud", tomme.length === 0, "tomme: " + tomme.join(", "));
 
     overskrift("3. Faneskift — præcis én aktiv ad gangen");
-    var faner = ["fane-byg", "fane-navn", "fane-formel", "fane-vand", "fane-byg"];
+    var faner = ["fane-bord", "fane-vand", "fane-bord"];
     for (i = 0; i < faner.length; i++) {
         var knap = d.querySelector('.faneknap[data-fane="' + faner[i] + '"]');
         knap.click();
@@ -102,7 +101,7 @@ function koer() {
     }
 
     overskrift("7. Alle opgaver: ladningsbalance, mindste forhold, findes");
-    var lister = [["fane 2", D.NAVN_OPGAVER], ["fane 3", D.FORMEL_OPGAVER], ["fane 4", D.VAND_OPGAVER]];
+    var lister = [["navn → formel", D.NAVN_OPGAVER], ["formel → navn", D.FORMEL_OPGAVER], ["opløsning", D.VAND_OPGAVER]];
     for (i = 0; i < lister.length; i++) {
         var daarlige = [];
         for (j = 0; j < lister[i][1].length; j++) {
@@ -187,7 +186,7 @@ function koer() {
     paastand("alle sammensatte ioner er tegnet med de rigtige atomer", uenige.length === 0, uenige.join(" | "));
 
     overskrift("11. Bordet");
-    var b = NK.sims["fane-byg"].bord;
+    var b = NK.sims["fane-bord"].bord;
     b.laas(false);
     b.ryd();
     b.vaelg(D.ion("Al"));
@@ -212,32 +211,33 @@ function koer() {
     b.ryd();
     paastand("Ryd bordet tømmer begge rækker", !b.kat && !b.an && b.nKat === 0 && b.nAn === 0);
 
-    overskrift("12. Fane 2: fra navn til formel");
-    var f2 = NK.sims["fane-navn"];
-    f2.startOpgave(D.salt("Al", "SO4"));
-    paastand("opgaven starter i byggefasen", f2.fase === "byg" && d.getElementById("navn-valgkort").hidden);
+    overskrift("12. Opgave: fra navn til formel");
+    var f2 = NK.sims["fane-bord"];
+    f2.saetTilstand("opgave");
+    f2.startOpgave(D.salt("Al", "SO4"), "navn");
+    paastand("opgaven starter i byggefasen", f2.fase === "byg" && d.getElementById("opgave-valgkort").hidden);
     f2.bord.vaelg(D.ion("S"));
     paastand("sulfid i stedet for sulfat giver en besked om forskellen", /sulfid/.test(f2.status || ""), f2.status);
     f2.bord.saet(D.ion("Al"), 2, D.ion("SO4"), 3);
-    paastand("de rigtige ioner åbner formelvalget", f2.fase === "skriv" && !d.getElementById("navn-valgkort").hidden);
+    paastand("de rigtige ioner åbner formelvalget", f2.fase === "valg" && !d.getElementById("opgave-valgkort").hidden);
     var rigtig2 = -1;
     for (i = 0; i < f2.svar.valg.length; i++) if (f2.svar.valg[i].rigtig) rigtig2 = i;
     f2.svar.knapper[rigtig2].click();
     paastand("rigtigt svar tæller med", f2.fase === "faerdig" && f2.loeste === 1, "løst: " + f2.loeste);
 
-    overskrift("13. Fane 3: fra formel til navn");
-    var f3 = NK.sims["fane-formel"];
-    f3.startOpgave(D.salt("Fe3", "SO4"));
+    overskrift("13. Opgave: fra formel til navn");
+    var f3 = NK.sims["fane-bord"];
+    f3.startOpgave(D.salt("Fe3", "SO4"), "formel");
     f3.bord.saet(D.ion("Fe2"), 2, D.ion("SO4"), 3);
     paastand("Fe²⁺ med formlens tal giver besked om ladningen", f3.fase === "byg" && /jern/i.test(f3.status || ""), f3.status);
     f3.bord.saet(D.ion("Fe3"), 2, D.ion("SO4"), 3);
-    paastand("Fe³⁺ åbner navnevalget", f3.fase === "navn");
+    paastand("Fe³⁺ åbner navnevalget", f3.fase === "valg");
     var rigtig3 = -1;
     for (i = 0; i < f3.svar.valg.length; i++) if (f3.svar.valg[i].rigtig) rigtig3 = i;
     paastand("det rigtige navn er jern(III)sulfat", f3.svar.valg[rigtig3].tekst === "jern(III)sulfat",
         f3.svar.valg[rigtig3].tekst);
 
-    overskrift("14. Fane 4: opløsning");
+    overskrift("14. Fane 2: opløsning i vand");
     var f4 = NK.sims["fane-vand"];
     f4.startOpgave(D.salt("Na", "SO4"), "forudsig");
     var antal = { kat: 0, an: 0 };
@@ -251,6 +251,24 @@ function koer() {
     paastand("natriumoxid reagerer med vandet", f4.fase === "tom");
     f4.haeldSalt("K", "NO3");
     paastand("kaliumnitrat går i opløsning", f4.art === "let" && f4.ioner.length > 0);
+
+    overskrift("15. De to tilstande på byggefanen");
+    var fb = NK.sims["fane-bord"];
+    fb.saetTilstand("frit");
+    paastand("Byg frit viser formel og regnskab, ikke opgaven",
+        !d.getElementById("frit-formelkort").hidden && !d.getElementById("frit-regnskab").hidden
+        && d.getElementById("opgave-kort").hidden);
+    paastand("bordet er låst op i Byg frit", !fb.bord.laast);
+    fb.saetTilstand("opgave");
+    paastand("Opgaver viser opgavekortet, ikke formlen",
+        d.getElementById("frit-formelkort").hidden && !d.getElementById("opgave-kort").hidden);
+    paastand("der står en opgave klar", !!fb.opgave && fb.fase === "byg",
+        fb.opgave ? fb.opgave.formel + " / " + fb.fase : "ingen");
+    var retninger = {};
+    for (i = 0; i < 6; i++) { fb.nyOpgave(); retninger[fb.retning] = (retninger[fb.retning] || 0) + 1; }
+    paastand("begge opgaveretninger kommer på skift", retninger.navn === 3 && retninger.formel === 3,
+        JSON.stringify(retninger));
+    fb.saetTilstand("frit");
 
     vis();
 }

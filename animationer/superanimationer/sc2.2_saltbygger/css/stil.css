@@ -709,3 +709,42 @@ select:focus-visible {
 @media (prefers-reduced-motion: reduce) {
     * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
+
+/* ---------------------------------------------------------------------
+   TILSTANDSVALG: byg frit eller opgaver - samme bord, to maader
+   --------------------------------------------------------------------- */
+.tilstandsvalg {
+    display: flex;
+    gap: 4px;
+    background-color: rgba(0, 0, 0, 0.22);
+    border: 1px solid #3a3a47;
+    border-radius: var(--radius);
+    padding: 4px;
+}
+
+.tilstandsknap {
+    flex: 1;
+    background: transparent;
+    color: var(--tekst-svag);
+    border: none;
+    border-radius: var(--radius-lil);
+    padding: 9px 6px;
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.16s ease, color 0.16s ease;
+}
+
+.tilstandsknap:hover { color: var(--tekst); background-color: var(--panel-2); }
+.tilstandsknap.aktiv { background-color: var(--blaa); color: #ffffff; }
+
+/* ---------------------------------------------------------------------
+   TRAEK OG SLIP
+   touch-action: none, saa en finger paa en tablet traekker ionen i
+   stedet for at rulle siden.
+   --------------------------------------------------------------------- */
+.chip, .scene > canvas { touch-action: none; }
+.chip { cursor: grab; }
+.chip:active:not(:disabled) { cursor: grabbing; }
+.traekker .chip { cursor: grabbing; }

@@ -1,5 +1,5 @@
 /* =====================================================================
-   bord.js - det faelles arbejdsbord for fane 1-3
+   bord.js - arbejdsbordet paa byggefanen
 
    Oeverst en hylde med de positive ioner, nederst en med de negative.
    Klikker man paa en ion, flyver den ned paa bordet som et kort, der er
@@ -37,6 +37,8 @@
         this.besked = null;       /* kortvarig besked */
         this.ur = 0;
         this.mus = null;
+        this.traek = null;        /* ion paa vej fra hylden ned paa bordet */
+        this.kortTraek = null;    /* kort, der traekkes rundt paa bordet */
         this.maerkeX = NaN;
         this.g = null;
 
@@ -58,7 +60,11 @@
             b.className = "chip " + (ion.q > 0 ? "kat" : "an") + (ion.sammensat ? " sammensat" : "");
             b.innerHTML = '<span class="cformel">' + D.ionTekst(ion) + '</span><span class="cnavn">' + D.ionNavn(ion) + "</span>";
             b.title = D.ionNavn(ion) + "  " + D.ionTekst(ion);
-            b.addEventListener("click", function () { mig.vaelg(ion, b); });
+            b.addEventListener("click", function () {
+                if (mig.slugKlik) { mig.slugKlik = false; return; }
+                mig.vaelg(ion, b);
+            });
+            b.addEventListener("pointerdown", function (e) { mig.startTraek(ion, b, e); });
             mig.chips[ion.id] = b;
             return b;
         }
@@ -112,18 +118,46 @@
             var r = mig.canvas.getBoundingClientRect();
             return { x: e.clientX - r.left, y: e.clientY - r.top };
         }
-        this.canvas.addEventListener("pointermove", function (e) {
-            mig.mus = pos(e);
-            mig.canvas.style.cursor = (!mig.laast && mig.kortVed(mig.mus)) ? "pointer" : "default";
+        /* Et kort kan baade klikkes vaek og traekkes vaek. */
+        this.canvas.addEventListener("pointerdown", function (e) {
+            if (mig.laast || e.button > 0) return;
+            var p = pos(e);
+            var k = mig.kortVed(p);
+            if (!k) return;
+            mig.kortTraek = { kort: k, dx: k.x - p.x, dy: k.y - p.y, x0: p.x, y0: p.y, flyttet: false };
+            k.fastholdt = true;
+            try { mig.canvas.setPointerCapture(e.pointerId); } catch (fejl) {}
         });
+        this.canvas.addEventListener("pointermove", function (e) {
+            var p = pos(e);
+            mig.mus = p;
+            var t = mig.kortTraek;
+            if (t) {
+                if (Math.abs(p.x - t.x0) + Math.abs(p.y - t.y0) > 5) t.flyttet = true;
+                t.kort.x = p.x + t.dx;
+                t.kort.y = p.y + t.dy;
+                mig.canvas.style.cursor = "grabbing";
+                return;
+            }
+            mig.canvas.style.cursor = (!mig.laast && mig.kortVed(p)) ? "grab" : "default";
+        });
+        function slipKort(e) {
+            var t = mig.kortTraek;
+            if (!t) return;
+            mig.kortTraek = null;
+            t.kort.fastholdt = false;
+            mig.canvas.style.cursor = "default";
+            var p = pos(e);
+            var g = mig.g;
+            var udenfor = !!g && (p.y < g.y0 - 24 || p.y > g.y1 + 24);
+            /* Et klik fjerner ionen - og et traek ud af bordet goer det samme. */
+            if (!t.flyttet || udenfor) mig.fjern(t.kort.side, t.kort);
+        }
+        this.canvas.addEventListener("pointerup", slipKort);
+        this.canvas.addEventListener("pointercancel", slipKort);
         this.canvas.addEventListener("pointerleave", function () {
             mig.mus = null;
-            mig.canvas.style.cursor = "default";
-        });
-        this.canvas.addEventListener("click", function (e) {
-            if (mig.laast) return;
-            var k = mig.kortVed(pos(e));
-            if (k) mig.fjern(k.side, k);
+            if (!mig.kortTraek) mig.canvas.style.cursor = "default";
         });
     };
 
@@ -147,7 +181,7 @@
     NK.Bord.prototype.nytKort = function (side, vent, fra) {
         var ion = this[side];
         this.kort.push({ side: side, ion: ion, x: NaN, y: NaN, b: 0, h: 0, a: 0, felt: 0,
-            mx: 0, my: 0, mb: 0, mh: 0, ma: 1, doer: false, vent: vent || 0, fra: fra || this.chips[ion.id] });
+            mx: 0, my: 0, mb: 0, mh: 0, ma: 1, doer: false, vent: vent || 0, fra: fra || this.chips[ion.id], slip: this.slipPunkt || null });
     };
 
     NK.Bord.prototype.tilfoejIntern = function (side, fra) {
@@ -297,9 +331,9 @@
     NK.Bord.prototype.beskriv = function () {
         if (this.besked) return this.besked.tekst;
         if (this.demo) return this.demo.tekst;
-        if (!this.kat && !this.an) return "Klik på en <b>positiv ion</b> øverst og en <b>negativ ion</b> nederst.";
-        if (!this.an) return "Vælg nu en <b>negativ ion</b> nederst.";
-        if (!this.kat) return "Vælg nu en <b>positiv ion</b> øverst.";
+        if (!this.kat && !this.an) return "Træk en <b>positiv ion</b> ned fra hylden øverst og en <b>negativ ion</b> op fra hylden nederst — eller klik på dem.";
+        if (!this.an) return "Træk nu en <b>negativ ion</b> op fra hylden nederst.";
+        if (!this.kat) return "Træk nu en <b>positiv ion</b> ned fra hylden øverst.";
         var p = this.plus(), m = this.minus();
         var regn = "<b>" + p + "+</b> mod <b>" + m + "−</b>";
         if (p > m) return regn + ": der mangler minus. Læg en negativ ion mere.";
@@ -338,7 +372,8 @@
     NK.Bord.prototype.startKort = function (k, g) {
         var cr = this.canvas.getBoundingClientRect();
         var fx = NaN, fy = NaN;
-        if (k.fra) {
+        if (k.slip) { fx = k.slip.x; fy = k.slip.y; }
+        else if (k.fra) {
             var r = k.fra.getBoundingClientRect();
             if (r.width) { fx = r.left + r.width / 2 - cr.left; fy = r.top + r.height / 2 - cr.top; }
         }
@@ -373,6 +408,12 @@
             }
             if (isNaN(k.x)) this.startKort(k, g);
             if (k.vent > 0) { k.vent -= dt; continue; }
+            if (k.fastholdt) {
+                /* Kortet sidder under fingeren. Det taeller ikke med i
+                   lynlaasen, saa laasen aabner sig, mens ionen er loeftet. */
+                k.a = NK.mod(k.a, 1, 9, dt);
+                continue;
+            }
             k.x = NK.mod(k.x, k.mx, 11, dt);
             k.y = NK.mod(k.y, k.my, 11, dt);
             k.b = NK.mod(k.b, k.mb, 11, dt);
@@ -491,6 +532,7 @@
             }
         }
         this.tegnMaerke(c, g, p, m, begge);
+        if (this.traek) this.tegnTraek(c, g);
         this.placerStyr(g);
     };
 
@@ -539,7 +581,7 @@
         NK.rundtRekt(c, x, y, b, g.hc, 10);
         c.stroke();
         c.restore();
-        NK.tekst(c, kat ? "Klik på en positiv ion  ↑" : "Klik på en negativ ion  ↓", x + b / 2, y + g.hc / 2, {
+        NK.tekst(c, kat ? "Træk en positiv ion herned  ↑" : "Træk en negativ ion herop  ↓", x + b / 2, y + g.hc / 2, {
             font: "600 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
             farve: kat ? "rgba(243, 154, 143, 0.8)" : "rgba(143, 202, 240, 0.8)"
         });
@@ -632,6 +674,75 @@
             font: "600 11px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
             farve: begge && sum === 0 ? "#7ee0a8" : "#7e8590"
         });
+    };
+
+    /* ----- Traek en ion fra hylden ned paa bordet -------------------------
+       Klik virker stadig; traekket er bare den vej, de fleste proever
+       foerst. Ionen foelger fingeren i laerredet, og den raekke, den
+       lander i, lyser op undervejs. */
+    NK.Bord.prototype.startTraek = function (ion, chip, e) {
+        if (this.laast || e.button > 0) return;
+        var mig = this;
+        var startX = e.clientX, startY = e.clientY;
+        var aktiv = false;
+        try { chip.setPointerCapture(e.pointerId); } catch (fejl) {}
+
+        function flyt(ev) {
+            if (!aktiv) {
+                if (Math.abs(ev.clientX - startX) + Math.abs(ev.clientY - startY) < 6) return;
+                aktiv = true;
+                mig.demo = null;
+                mig.scene.classList.add("traekker");
+            }
+            mig.traek = mig.traekPunkt(ion, ev);
+        }
+        function slip(ev) {
+            chip.removeEventListener("pointermove", flyt);
+            chip.removeEventListener("pointerup", slip);
+            chip.removeEventListener("pointercancel", slip);
+            try { chip.releasePointerCapture(ev.pointerId); } catch (fejl) {}
+            mig.scene.classList.remove("traekker");
+            mig.traek = null;
+            if (!aktiv) return;
+            mig.slugKlik = true;            /* klikket bagefter skal ikke ogsaa taelle */
+            var p = mig.traekPunkt(ion, ev);
+            if (!p.over) return;
+            mig.slipPunkt = { x: p.x, y: p.y };
+            mig.vaelg(ion, chip);
+            mig.slipPunkt = null;
+        }
+        chip.addEventListener("pointermove", flyt);
+        chip.addEventListener("pointerup", slip);
+        chip.addEventListener("pointercancel", slip);
+    };
+
+    /* Hvor er fingeren i laerredet - og er den over bordet? */
+    NK.Bord.prototype.traekPunkt = function (ion, ev) {
+        var r = this.canvas.getBoundingClientRect();
+        var x = ev.clientX - r.left, y = ev.clientY - r.top;
+        var g = this.g;
+        return { ion: ion, x: x, y: y,
+                 over: !!g && x > 0 && x < g.W && y > g.y0 - 24 && y < g.y1 + 24 };
+    };
+
+    NK.Bord.prototype.tegnTraek = function (c, g) {
+        var t = this.traek;
+        var kat = t.ion.q > 0;
+        var f = kat ? NK.FARVE.kat : NK.FARVE.an;
+        if (t.over) {
+            var y = kat ? g.zy - g.gab - g.hc : g.zy + g.gab;
+            c.save();
+            c.setLineDash([7, 5]);
+            c.lineWidth = 2;
+            c.strokeStyle = "rgba(" + f.glorie + ", 0.85)";
+            NK.rundtRekt(c, g.x0 - 7, y - 7, g.felter * g.U + 14, g.hc + 14, 13);
+            c.stroke();
+            c.restore();
+        }
+        c.save();
+        c.globalAlpha = t.over ? 1 : 0.55;
+        NK.tegnIon(c, t.ion, t.x, t.y, Math.min(30, g.U * 0.42), { glorie: true, ladning: true });
+        c.restore();
     };
 
     NK.Bord.prototype.placerStyr = function (g) {

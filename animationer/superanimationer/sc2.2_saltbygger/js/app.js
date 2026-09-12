@@ -1,8 +1,8 @@
 /* =====================================================================
-   app.js - binder de fire faner sammen
+   app.js - binder de to faner sammen
 
    Faneskift, tastaturgenveje og tegneloekken. Kun den aktive fane
-   opdateres og tegnes, saa de tre andre koster ingenting.
+   opdateres og tegnes, saa den anden koster ingenting.
    ===================================================================== */
 (function () {
     "use strict";
@@ -10,8 +10,8 @@
     var NK = window.NK;
 
     var sims = {};
-    var faner = ["fane-byg", "fane-navn", "fane-formel", "fane-vand"];
-    var aktivFane = "fane-byg";
+    var faner = ["fane-bord", "fane-vand"];
+    var aktivFane = "fane-bord";
     var sidsteTid = 0;
 
     /* ----- Faner ------------------------------------------------------ */
@@ -56,7 +56,7 @@
         if (e.ctrlKey || e.metaKey || e.altKey) return;
         var sim = sims[aktivFane];
 
-        if (e.key >= "1" && e.key <= "4") {
+        if (e.key === "1" || e.key === "2") {
             visFane(faner[parseInt(e.key, 10) - 1]);
             return;
         }
@@ -72,9 +72,7 @@
 
     /* ----- Opstart ------------------------------------------------------- */
     function start() {
-        sims["fane-byg"] = new NK.SimByg();
-        sims["fane-navn"] = new NK.SimNavn();
-        sims["fane-formel"] = new NK.SimFormel();
+        sims["fane-bord"] = new NK.SimBord();
         sims["fane-vand"] = new NK.SimVand();
         NK.sims = sims;              /* saa modellerne kan pilles ved fra konsollen */
         NK.visFane = visFane;
@@ -93,9 +91,17 @@
 
         document.addEventListener("keydown", tastatur);
 
-        /* Man kan linke direkte til en fane med fx  index.html#formel  */
+        /* Man kan linke direkte til en fane med fx  index.html#vand
+           - og til opgaverne med  index.html#opgaver */
         var oenske = (window.location.hash || "").replace(/^#/, "").toLowerCase();
-        visFane(sims["fane-" + oenske] ? "fane-" + oenske : "fane-byg");
+        if (oenske === "vand") {
+            visFane("fane-vand");
+        } else {
+            visFane("fane-bord");
+            if (oenske === "opgaver" || oenske === "opgave" || oenske === "navn" || oenske === "formel") {
+                sims["fane-bord"].saetTilstand("opgave");
+            }
+        }
 
         window.requestAnimationFrame(function (ts) {
             sidsteTid = ts;
