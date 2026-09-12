@@ -311,6 +311,20 @@
         .btn-tube:hover { background: rgba(52,152,219,0.25); color: #fff; }
         .btn-tube.active { background: var(--accent-blue); color: #fff; border-color: #fff; }
 
+        /* "Næste trin" - eneste måde mekanismen skrider frem på (ingen autoplay).
+           Blinker efter nogle sekunders inaktivitet, så den ikke bliver overset. */
+        .btn-naeste-trin {
+            background: var(--accent-blue);
+            color: #fff;
+            border: 1px solid #5dade2;
+        }
+        .btn-naeste-trin:hover { background: #2e86c1; }
+        .btn-naeste-trin.blink { animation: naeste-trin-blink 1s ease-in-out infinite; }
+        @keyframes naeste-trin-blink {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(52,152,219,0.85); transform: scale(1); }
+            50% { box-shadow: 0 0 0 10px rgba(52,152,219,0); transform: scale(1.04); }
+        }
+
         /* Infokort om det valgte glas */
         #tube-card h4 { font-size: 1rem; margin-bottom: 6px; color: #fff; }
         .badge {
@@ -492,10 +506,7 @@
                     <button class="btn-tube" id="mek-ingen" onclick="setMek('ingen')">Ingen<br>katalysator</button>
                 </div>
                 <ol class="steps" id="mek-steps" style="margin-top:14px;"></ol>
-                <div class="btn-row" style="margin-top:6px;">
-                    <button class="btn-tube" id="btn-pause" onclick="togglePause()">⏸ Pause</button>
-                    <button class="btn-tube" onclick="naesteTrin()">Næste trin ▸</button>
-                </div>
+                <button class="btn-naeste-trin" id="btn-naeste-trin" style="width:100%; margin-top:10px;" onclick="naesteTrin()">Næste trin ▸</button>
                 <p class="hint" id="mek-note"></p>
             </div>
 
@@ -622,7 +633,7 @@
         },
         ki: {
             titel: 'I⁻ (aq) &ndash; homogen katalyse',
-            fart: 1.2,
+            fart: 1.6,
             trin: [
                 'I⁻ er opløst i den samme vandfase som H₂O₂ &ndash; de mødes overalt.',
                 'Trin 1: H₂O₂ + I⁻ ⟶ H₂O + IO⁻ (katalysatoren indgår i reaktionen).',
@@ -644,9 +655,8 @@
         ingen: {
             titel: 'Uden katalysator &ndash; to temperaturer',
             trin: [
-                '<b>Stuetemperatur:</b> molekylerne er langsomme, og sammenstødene er for energifattige.',
-                '<b>Høj temperatur:</b> nu farer molekylerne rundt og støder hårdt sammen.',
-                'To H₂O₂ presses sammen til det <b>aktiverede kompleks</b> &ndash; toppen af energibakken.',
+                '<b>Stuetemperatur:</b> to langsomme molekyler mødes, men sammenstødet er for energifattigt.',
+                '<b>Høj temperatur:</b> to hurtige molekyler støder hårdt sammen og danner det <b>aktiverede kompleks</b>.',
                 'Komplekset er <b>ekstremt ustabilt</b> og falder straks fra hinanden til 2 H₂O + O₂.'
             ],
             note: 'Reaktionen er exoterm og forløber altså <b>gerne</b> &ndash; det er alene aktiveringsenergien, der holder farten nede. Varme hjælper, fordi flere molekyler får energi nok. En katalysator gør noget andet: den sænker selve E<sub>a</sub>.'
@@ -674,8 +684,10 @@
         valgt: 0,              // indeks i TUBES (starter på MnO₂)
 
         mek: 'mno2',           // valgt mekanisme i molekylevisningen
-        mekTid: 0,             // sekunder inde i den aktuelle cyklus
-        paused: false,
+        mekTid: 0,             // et evigt løbende ur - bruges kun til baggrundens jitter
+        trinIndex: 0,          // hvilket trin i mekanismen der vises (skiftes kun ved klik)
+        trinStart: 0,          // mekTid-værdien da det aktuelle trin startede
+        sidstAktivitet: 0,     // performance.now() ved sidste klik - styrer "næste trin"-blink
 
         splint: null,          // {tube, t, faseTid, ok}
         quizOpen: false,
@@ -690,7 +702,7 @@
     });
 
     const TRIN_TID = 2.6;        // sekunder pr. trin i mekanismevisningen
-    const ANTAL_TRIN = 4;
+    const BLINK_VENTETID = 5000; // ms uden klik, før "Næste trin"-knappen begynder at blinke
     const FORSOEG_FART = 0.8;    // forsøget kører roligt, så man kan nå at se boblerne
 
     /* ========================================================
@@ -1182,8 +1194,12 @@
 
     /* Nogle mekanismer har brug for mere tid pr. trin end andre */
     function trinTid() { return TRIN_TID * (MEKANISMER[state.mek].fart || 1); }
-    function mekTrin() { return Math.floor(state.mekTid / trinTid()) % ANTAL_TRIN; }
-    function mekLokalT() { return (state.mekTid % trinTid()) / trinTid(); }
+    function antalTrin() { return MEKANISMER[state.mek].trin.length; }
+    /* Trinnet skifter kun ved klik på "Næste trin" - aldrig af sig selv */
+    function mekTrin() { return state.trinIndex; }
+    /* Det enkelte trins animation spiller én gang og fryser så på sit sluttrin,
+       indtil brugeren klikker videre - der er ingen automatisk fremdrift */
+    function mekLokalT() { return Math.min(1, (state.mekTid - state.trinStart) / trinTid()); }
 
     const BUNDTEKST = {
         ki: ['Trin 1:  H₂O₂ + I⁻  ⟶  H₂O + IO⁻',
@@ -1227,10 +1243,12 @@
         ctx.stroke();
 
         /* Trinprikker */
-        for (let k = 0; k < ANTAL_TRIN; k++) {
+        const antalPrikker = antalTrin();
+        const prikStartX = LW / 2 - (antalPrikker - 1) * 10;
+        for (let k = 0; k < antalPrikker; k++) {
             ctx.fillStyle = k === trin ? '#3498db' : '#3a3a44';
             ctx.beginPath();
-            ctx.arc(LW / 2 - 30 + k * 20, 78, k === trin ? 6 : 4, 0, 6.283);
+            ctx.arc(prikStartX + k * 20, 78, k === trin ? 6 : 4, 0, 6.283);
             ctx.fill();
         }
 
@@ -1474,7 +1492,7 @@
         }
     }
 
-    /* ---------- Uden katalysator: ét koldt trin, tre varme ---------- */
+    /* ---------- Uden katalysator: ét koldt trin, to varme ---------- */
     function sceneIngen(step, t) {
         const varm = step >= 1;
         const cy = 292;
@@ -1496,12 +1514,13 @@
         ctx.globalAlpha = 1;
 
         if (step === 0) {
-            /* To molekyler mødes – men sammenstødet er for svagt */
-            const naer = t < 0.45 ? smooth(t / 0.45) : (t < 0.55 ? 1 : 1 - smooth((t - 0.55) / 0.45));
-            molekyle('h2o2', lerp(230, 430, naer), cy, 1);
-            molekyle('h2o2', lerp(770, 570, naer), cy, 1);
+            /* To langsomme molekyler mødes - sammenstødet er for svagt, og de
+               bliver stående i det prellede øjeblik, indtil man klikker videre */
+            const p = t < 0.6 ? smooth(t / 0.6) : 1;
+            molekyle('h2o2', lerp(230, 430, p), cy, 1);
+            molekyle('h2o2', lerp(770, 570, p), cy, 1);
 
-            if (t > 0.42 && t < 0.62) {
+            if (t >= 0.55) {
                 ctx.strokeStyle = '#e74c3c';
                 ctx.lineWidth = 6;
                 ctx.lineCap = 'round';
@@ -1515,24 +1534,26 @@
                   LW / 2, 432, '#e0e0e0', 14, 'center', true);
 
         } else if (step === 1) {
-            /* Nu er farten høj: de to molekyler suser mod hinanden */
-            const p = smooth(t);
-            molekyle('h2o2', lerp(180, 380, p), cy, 1);
-            molekyle('h2o2', lerp(820, 620, p), cy, 1);
-            tekst('Nu er sammenstødet kraftigt nok', LW / 2, 140, '#f39c12', 17, 'center', true);
-            tekst('flere molekyler har E ≥ Eₐ, når temperaturen stiger', LW / 2, 432, '#f5a05a', 14);
-
-        } else if (step === 2) {
-            /* De to H₂O₂ presses sammen til det aktiverede kompleks */
-            const p = smooth(t);
-            const d = lerp(200, 52, p);
-            const brud = smooth(t) * 0.55;
-            if (t > 0.25) tegnKompleks(cy, Math.min(1, (t - 0.25) / 0.3));
-            molekyle('h2o2', LW / 2 - d, cy, 1, brud);
-            molekyle('h2o2', LW / 2 + d, cy, 1, brud);
-            tekst('AKTIVERET KOMPLEKS', LW / 2, 140, '#f39c12', 17, 'center', true);
-            tekst('2 H₂O₂ i én klump – bindingerne er halvt brudte og halvt dannede',
-                  LW / 2, 432, '#f5a05a', 14);
+            if (t < 0.4) {
+                /* Fase 1: to hurtige molekyler suser direkte mod hinanden */
+                const p = smooth(t / 0.4);
+                molekyle('h2o2', lerp(180, 380, p), cy, 1);
+                molekyle('h2o2', lerp(820, 620, p), cy, 1);
+                tekst('Nu er sammenstødet kraftigt nok', LW / 2, 140, '#f39c12', 17, 'center', true);
+                tekst('flere molekyler har E ≥ Eₐ, når temperaturen stiger', LW / 2, 432, '#f5a05a', 14);
+            } else {
+                /* Fase 2: de presses sammen til det aktiverede kompleks - og
+                   bliver stående sådan, indtil man klikker videre */
+                const p = smooth(Math.min(1, (t - 0.4) / 0.6));
+                const d = lerp(200, 52, p);
+                const brud = p * 0.55;
+                if (p > 0.25) tegnKompleks(cy, Math.min(1, (p - 0.25) / 0.3));
+                molekyle('h2o2', LW / 2 - d, cy, 1, brud);
+                molekyle('h2o2', LW / 2 + d, cy, 1, brud);
+                tekst('AKTIVERET KOMPLEKS', LW / 2, 140, '#f39c12', 17, 'center', true);
+                tekst('2 H₂O₂ i én klump – bindingerne er halvt brudte og halvt dannede',
+                      LW / 2, 432, '#f5a05a', 14);
+            }
 
         } else {
             /* Komplekset er ustabilt og falder straks fra hinanden */
@@ -1753,7 +1774,6 @@
     }
 
     let sidsteTid = performance.now();
-    let sidsteTrin = -1;
 
     function loop(nu) {
         const raa = Math.min(0.05, (nu - sidsteTid) / 1000);
@@ -1761,10 +1781,14 @@
 
         if (state.view === 'forsog') {
             opdaterForsog(raa * FORSOEG_FART);
-        } else if (state.view === 'molekyler' && !state.paused) {
+        } else if (state.view === 'molekyler') {
+            /* Uret løber altid videre (baggrundens jitter), men selve trinnet
+               skifter aldrig af sig selv - kun ved klik på "Næste trin" */
             state.mekTid += raa;
-            const tr = mekTrin();
-            if (tr !== sidsteTrin) { sidsteTrin = tr; markerTrin(); }
+
+            const knap = document.getElementById('btn-naeste-trin');
+            const idle = nu - state.sidstAktivitet;
+            knap.classList.toggle('blink', idle >= BLINK_VENTETID);
         }
 
         tegn();
@@ -1792,7 +1816,7 @@
         document.getElementById('grp-mek').hidden = v !== 'molekyler';
         document.getElementById('grp-energi').hidden = v !== 'energi';
         visBesked('');
-        if (v === 'molekyler') { sidsteTrin = -1; markerTrin(); }
+        if (v === 'molekyler') { registrerAktivitet(); markerTrin(); }
         tegn();
     }
 
@@ -1939,10 +1963,19 @@
     }
 
     /* ---------- Visning 2: mekanismer ---------- */
+    /* Der er ingen autoplay: trinnet skifter kun ved klik. Blinker "Næste trin"
+       efter BLINK_VENTETID ms uden aktivitet, så man ikke overser knappen. */
+    function registrerAktivitet() {
+        state.sidstAktivitet = performance.now();
+        document.getElementById('btn-naeste-trin').classList.remove('blink');
+    }
+
     function setMek(m) {
         state.mek = m;
         state.mekTid = 0;
-        sidsteTrin = -1;
+        state.trinIndex = 0;
+        state.trinStart = 0;
+        registrerAktivitet();
         ['mno2', 'ki', 'enzym', 'ingen'].forEach(function (k) {
             document.getElementById('mek-' + k).classList.toggle('active', k === m);
         });
@@ -1960,14 +1993,10 @@
         li.forEach(function (el, i) { el.classList.toggle('now', i === tr); });
     }
 
-    function togglePause() {
-        state.paused = !state.paused;
-        document.getElementById('btn-pause').innerHTML = state.paused ? '▶ Afspil' : '⏸ Pause';
-    }
-
     function naesteTrin() {
-        state.mekTid = (Math.floor(state.mekTid / trinTid()) + 1) * trinTid();
-        sidsteTrin = -1;
+        state.trinIndex = (state.trinIndex + 1) % antalTrin();
+        state.trinStart = state.mekTid;
+        registrerAktivitet();
         markerTrin();
         tegn();
     }
