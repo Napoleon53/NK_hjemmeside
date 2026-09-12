@@ -156,38 +156,50 @@
             this.pctFelter[i].textContent = NK.tal(pct[i], pct[i] > 0 && pct[i] < 0.1 ? 3 : 1) + " %";
         }
 
-        NK.saetTekst("iso-regnestykke", this.beregning(pct, masse));
+        this.beregning(pct, masse);
         this.maalVippe = masse;
     };
 
     /* Regnestykket, som man ville skrive det i haanden: ét led pr.
-       isotop under hinanden, og facit til sidst. Lighedstegnene flugter,
-       fordi linjerne saettes med fast bredde i pop op-vinduet. */
+       isotop i sin egen raekke, og facit til sidst. Bygget som et grid
+       af elementer i stedet for én stor tekststreng, saa lighedstegnene
+       staar i deres egen koloonne uden at laene sig op ad en skrifttype
+       med fast bredde. */
     NK.SimIsotop.prototype.beregning = function (pct, masse) {
         var g = this.grundstof();
-        var led = [], navne = [], bredde = 0, i;
+        var boks = NK.el("iso-regnestykke");
+        boks.innerHTML = "";
+        var i, antalLed = 0;
+
+        function celle(klasse, tekst) {
+            var s = document.createElement("span");
+            s.className = klasse;
+            s.textContent = tekst;
+            boks.appendChild(s);
+        }
 
         for (i = 0; i < g.isotoper.length; i++) {
             if (pct[i] <= 0) continue;
             /* De sjaeldneste isotoper skal have decimaler nok til IKKE at
                staa som 0,0000 - ellers ser leddet ud som gange med nul. */
             var andel = pct[i] / 100;
-            var t = NK.tal(andel, andel < 0.001 ? 6 : 4) + " · " + NK.tal(g.isotoper[i].masse, 3) + " u";
-            if (t.length > bredde) bredde = t.length;
-            led.push(t);
-            /* Skrevet som Ca-48, ikke ⁴⁸Ca: de haevede tal findes ikke i
-               den faste skrifttype, regnestykket saettes med. */
-            navne.push(g.symbol + "-" + g.isotoper[i].a);
-        }
-        if (!led.length) return "Skru op for mindst én isotop.";
+            var led = NK.tal(andel, andel < 0.001 ? 6 : 4) + " · " + NK.tal(g.isotoper[i].masse, 3) + " u";
+            var navn = NK.haevet(g.isotoper[i].a) + g.symbol;
 
-        var linjer = [];
-        for (i = 0; i < led.length; i++) {
-            while (led[i].length < bredde) led[i] += " ";
-            linjer.push((i === 0 ? "m(gns) = " : "       + ") + led[i] + "   (" + navne[i] + ")");
+            celle("r-label", antalLed === 0 ? "m(gns) =" : "+");
+            celle("r-led", led);
+            celle("r-navn", navn);
+            antalLed++;
         }
-        linjer.push("       = " + NK.tal(masse, 3) + " u");
-        return linjer.join("\n");
+
+        if (!antalLed) {
+            boks.textContent = "Skru op for mindst én isotop.";
+            return;
+        }
+
+        celle("r-label", "=");
+        celle("r-led r-facit", NK.tal(masse, 3) + " u");
+        celle("r-navn", "");
     };
 
     /* ----- Tegning ---------------------------------------------------------- */

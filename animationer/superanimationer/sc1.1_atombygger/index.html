@@ -132,9 +132,9 @@
 
         <div class="kort">
             <h2>Blandingen</h2>
-            <p class="note" style="margin-top:0;">Skru på andelene, og se balancepunktet flytte sig.</p>
+            <p class="note" style="margin-top:0;">Skyderne viser, hvor stor en andel hver isotop udgør af blandingen. Skru på dem, og se den gennemsnitlige atommasse ændre sig med det samme.</p>
             <div id="iso-liste"></div>
-            <button class="knap groen" id="iso-natur" type="button" style="margin-top:10px;"><span>Tilbage til naturens blanding</span><span class="tegn">🌍</span></button>
+            <button class="knap groen" id="iso-natur" type="button" style="margin-top:10px;"><span>Vis naturlig forekomst</span><span class="tegn">🌍</span></button>
         </div>
 
         <div class="kort">
@@ -298,7 +298,8 @@
 <div class="overlay" id="iso-beregning">
     <div class="overlay-boks">
         <h2>Den gennemsnitlige atommasse</h2>
-        <div class="ligning beregning" id="iso-regnestykke"></div>
+        <div class="regnestykke" id="iso-regnestykke"></div>
+        <p class="note" style="margin-top:12px;">Hver isotops masse tæller med efter sin andel af blandingen — jo større andel, jo mere trækker den i gennemsnittet. Læg bidragene sammen, og du får netop den masse, der står ved grundstoffet i det periodiske system.</p>
         <div class="knapper" style="margin-top:18px;">
             <button class="knap blaa" id="iso-beregning-luk" style="justify-content:center;">Luk</button>
         </div>

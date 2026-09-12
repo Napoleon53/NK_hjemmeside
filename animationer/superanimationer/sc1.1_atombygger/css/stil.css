@@ -453,17 +453,47 @@ main { flex: 1; position: relative; min-height: 0; }
     word-break: break-word;
 }
 
-/* Regnestykket i pop op-vinduet: linjerne skal staa praecis under
-   hinanden, saa lighedstegnene flugter som i en haandskreven udregning. */
-.ligning.beregning {
-    white-space: pre;
-    overflow-x: auto;
-    text-align: left;
-    font-size: 0.95rem;
-    line-height: 1.9;
+/* Regnestykket i pop op-vinduet. Et grid frem for monospace-tekst med
+   mellemrum: lighedstegnene flugter, fordi de staar i deres egen
+   koloonne, ikke fordi skriften er fast bredde - saa kan selve tallene
+   staa med almindelig, laesbar skrift. */
+.regnestykke {
+    display: grid;
+    grid-template-columns: auto minmax(0, auto) auto;
+    column-gap: 10px;
+    row-gap: 5px;
+    align-items: baseline;
+    background-color: #111117;
+    border: 1px solid #3f3f4d;
+    border-radius: var(--radius-lil);
     padding: 14px 16px;
-    margin-top: 0;
+    font-size: 0.95rem;
+    overflow-x: auto;
 }
+
+.regnestykke .r-label {
+    text-align: right;
+    font-weight: 700;
+    color: var(--tekst-svag);
+    white-space: nowrap;
+}
+
+.regnestykke .r-led {
+    text-align: left;
+    color: var(--groen);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.regnestykke .r-navn {
+    text-align: left;
+    color: var(--tekst-mat);
+    font-size: 0.82rem;
+    font-weight: 400;
+    white-space: nowrap;
+}
+
+.regnestykke .r-facit { font-size: 1.05rem; }
 
 /* ---------------------------------------------------------------------
    PARTIKELRAEKKERNE PAA BYGGEFANEN
