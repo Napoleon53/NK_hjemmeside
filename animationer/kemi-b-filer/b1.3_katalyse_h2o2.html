@@ -1224,7 +1224,11 @@
         const trin = mekTrin(), t = mekLokalT();
 
         tekst(udenTags(m.titel), LW / 2, 28, '#8a8a96', 14);
-        tekst(udenTags(m.trin[trin]), LW / 2, 58, '#ffffff', 17, 'center', true);
+        /* For I⁻ er reaktionsskemaet ovenover fjernet - det gentages i stedet
+           forstørret og trinvist afsløret nedenunder animationen */
+        if (state.mek !== 'ki') {
+            tekst(udenTags(m.trin[trin]), LW / 2, 58, '#ffffff', 17, 'center', true);
+        }
 
         ctx.save();
         rundtRekt(BOKS.x0, BOKS.y0, BOKS.x1 - BOKS.x0, BOKS.y1 - BOKS.y0, 12);
@@ -1252,10 +1256,34 @@
             ctx.fill();
         }
 
-        const linjer = BUNDTEKST[state.mek];
-        tekst(linjer[0], LW / 2, 500, '#d5d5d5', 15);
-        tekst(linjer[1], LW / 2, 524, '#d5d5d5', 15);
-        tekst(linjer[2], LW / 2, 550, '#75757f', 13);
+        if (state.mek === 'ki') {
+            tegnKiBundtekst(trin, t);
+        } else {
+            const linjer = BUNDTEKST[state.mek];
+            tekst(linjer[0], LW / 2, 500, '#d5d5d5', 15);
+            tekst(linjer[1], LW / 2, 524, '#d5d5d5', 15);
+            tekst(linjer[2], LW / 2, 550, '#75757f', 13);
+        }
+    }
+
+    /* I⁻: reaktionsskemaet nedenunder afsløres trinvist i takt med animationen.
+       Trin 1-ligningen dukker først op, når man er nået videre til trin 2
+       (altså efter man har set trin 1 færdigt) - og trin 2-ligningen dukker op
+       samtidig med, at animationen selv viser trin 2. Den samlede ligning
+       kommer til sidst, når hele forløbet er gennemgået. */
+    function tegnKiBundtekst(trin, t) {
+        const linjer = BUNDTEKST.ki;
+
+        function tegnLinje(str, y, stoerrelse, farve, visFraTrin) {
+            if (trin < visFraTrin) return;
+            ctx.globalAlpha = (trin === visFraTrin) ? smooth(Math.min(1, t * 3)) : 1;
+            tekst(str, LW / 2, y, farve, stoerrelse, 'center', true);
+            ctx.globalAlpha = 1;
+        }
+
+        tegnLinje(linjer[0], 496, 19, '#d5d5d5', 2);
+        tegnLinje(linjer[1], 530, 19, '#d5d5d5', 2);
+        tegnLinje(linjer[2], 564, 16, '#8ecdf5', 3);
     }
 
     /* ---------- Homogen katalyse: I⁻ i samme fase ---------- */
