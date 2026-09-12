@@ -51,7 +51,7 @@ function koer() {
 
     overskrift("2. Panelerne er fyldt ud ved opstart");
     var skalHaveTekst = ["byg-formel", "byg-navn", "byg-l-kat", "byg-q-kat", "byg-q-sum", "bord-status",
-        "vand-spm", "vand-status", "vand-overskrift"];
+        "vand-spm", "vand-overskrift"];
     var tomme = [];
     for (i = 0; i < skalHaveTekst.length; i++) {
         var e = d.getElementById(skalHaveTekst[i]);
@@ -252,6 +252,32 @@ function koer() {
     f4.haeldSalt("K", "NO3");
     paastand("kaliumnitrat går i opløsning", f4.art === "let" && f4.ioner.length > 0);
 
+    overskrift("14b. Krystalgitteret: ioner med samme fortegn rører aldrig hinanden");
+    var par = [["Na", "Cl"], ["Mg", "Cl"], ["Na", "O"], ["Al", "Cl"], ["Na", "PO4"], ["Al", "SO4"], ["Ca", "PO4"]];
+    f4.tilpas();
+    paastand("lærredet i fane-vand har fået en rigtig størrelse", f4.G && f4.G.klar, "l.b=" + f4.l.b);
+    var fejlPar = [];
+    for (i = 0; i < par.length; i++) {
+        var salt5 = D.salt(par[i][0], par[i][1]);
+        f4.startOpgave(salt5, "forudsig");
+        f4.opdater(0.05);
+        f4.opdater(0.05);
+        var samlingFejl = false;
+        for (var a5 = 0; a5 < f4.ioner.length && !samlingFejl; a5++) {
+            for (var b5 = a5 + 1; b5 < f4.ioner.length; b5++) {
+                var ia = f4.ioner[a5], ib = f4.ioner[b5];
+                if ((ia.ion.q > 0) !== (ib.ion.q > 0)) continue;   /* forskelligt fortegn - maa gerne røre */
+                var dx5 = ia.mx - ib.mx, dy5 = ia.my - ib.my;
+                var d5 = Math.sqrt(dx5 * dx5 + dy5 * dy5);
+                var min5 = NK.ionGeo(ia.ion).R * f4.G.s + NK.ionGeo(ib.ion).R * f4.G.s;
+                if (d5 < min5 - 0.5) samlingFejl = true;
+            }
+        }
+        if (samlingFejl) fejlPar.push(salt5.formel + " (" + salt5.p + ":" + salt5.n + ")");
+    }
+    paastand("ingen to ioner med samme fortegn rører hinanden i " + par.length + " gittertyper",
+        fejlPar.length === 0, fejlPar.join(", "));
+
     overskrift("15. De to tilstande på byggefanen");
     var fb = NK.sims["fane-bord"];
     fb.saetTilstand("frit");
@@ -269,6 +295,36 @@ function koer() {
     paastand("begge opgaveretninger kommer på skift", retninger.navn === 3 && retninger.formel === 3,
         JSON.stringify(retninger));
     fb.saetTilstand("frit");
+
+    overskrift("16. Sværhedsgrad i Opgaver");
+    fb.saetTilstand("opgave");
+    paastand("Let er valgt fra start, og navnene vises",
+        fb.svaerhedsgrad === "let" && !d.getElementById("bord-scene").classList.contains("skjul-navne"));
+    paastand("sværhedsknapperne er synlige, den almindelige navne-boks er skjult",
+        !d.getElementById("svaerhed-valg").hidden && d.getElementById("byg-navne-label").hidden);
+    d.getElementById("svaerhed-svaer").click();
+    paastand("Svær skjuler alle navnene",
+        fb.svaerhedsgrad === "svaer" && d.getElementById("bord-scene").classList.contains("skjul-navne"));
+    d.getElementById("svaerhed-let").click();
+    paastand("Let viser navnene igen", !d.getElementById("bord-scene").classList.contains("skjul-navne"));
+    fb.saetTilstand("frit");
+    paastand("i Byg frit er sværhedsknapperne skjulte, og den almindelige navne-boks vises",
+        d.getElementById("svaerhed-valg").hidden && !d.getElementById("byg-navne-label").hidden);
+
+    overskrift("17. Ioner med ladningen 1 hedder + eller −, ikke 1+ eller 1−");
+    var ladn = [[1, "+"], [-1, "−"], [2, "2+"], [-3, "3−"], [0, "0"]];
+    for (i = 0; i < ladn.length; i++) {
+        paastand("ladningstekst(" + ladn[i][0] + ") = \"" + ladn[i][1] + "\"",
+            NK.ladningstekst(ladn[i][0]) === ladn[i][1], "fik \"" + NK.ladningstekst(ladn[i][0]) + "\"");
+    }
+    paastand("Na⁺ er skrevet uden 1-tal", D.ionTekst(D.ion("Na")) === "Na⁺", D.ionTekst(D.ion("Na")));
+    paastand("Cl⁻ er skrevet uden 1-tal", D.ionTekst(D.ion("Cl")) === "Cl⁻", D.ionTekst(D.ion("Cl")));
+
+    overskrift("18. Boksen om \"i glasset\" er væk");
+    paastand("vand-talkort findes ikke længere", !d.getElementById("vand-talkort"));
+    paastand("vand-status (kommentaren under glasset) findes ikke længere", !d.getElementById("vand-status"));
+    paastand("opgaven på fane 2 ligger som et overlay i scenen, ikke i panelet",
+        !!d.querySelector("#fane-vand .scene .opgave-boks#vand-opgave-boks"));
 
     vis();
 }

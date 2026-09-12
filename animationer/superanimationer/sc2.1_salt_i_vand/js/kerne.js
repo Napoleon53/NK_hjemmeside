@@ -93,7 +93,7 @@ window.NK = NK;
         var negativ = v < 0;
         var s = Math.abs(v).toFixed(decimaler);
         var dele = s.split(".");
-        dele[0] = dele[0].replace(/B(?=(d{3})+(?!d))/g, ".");
+        dele[0] = dele[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         return (negativ ? "−" : "") + dele.join(",");
     };
 
@@ -148,6 +148,33 @@ window.NK = NK;
         e.className = klasse;
         klasseCache[id] = klasse;
     };
+
+    /* ----- Tekst, der altid skal vaere paa én linje ------------------- */
+    /* Formindsker skriftstoerrelsen paa et element, til teksten er paa
+       én linje i sin beholder - bruges til ligninger, hvor laengden
+       skifter med det valgte stof. Kaldes kun, naar teksten faktisk
+       aendrer sig (se saetHTML), plus ved vinduesomrids. */
+    var enLinjeListe = [];
+    function koerTilpasEnLinje(e) {
+        e.style.fontSize = "";
+        var stoerrelse = parseFloat(getComputedStyle(e).fontSize);
+        while (e.scrollWidth > e.clientWidth + 1 && stoerrelse > 11) {
+            stoerrelse -= 1;
+            e.style.fontSize = stoerrelse + "px";
+        }
+    }
+    NK.tilpasEnLinje = function (id) {
+        var e = NK.el(id);
+        if (!e) return;
+        if (enLinjeListe.indexOf(id) < 0) enLinjeListe.push(id);
+        koerTilpasEnLinje(e);
+    };
+    window.addEventListener("resize", function () {
+        enLinjeListe.forEach(function (id) {
+            var e = NK.el(id);
+            if (e) koerTilpasEnLinje(e);
+        });
+    });
 
     /* ----- Laerred: canvas med korrekt skarphed paa alle skaerme ------ */
     NK.Laerred = function (canvas) {

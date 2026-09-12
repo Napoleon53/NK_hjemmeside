@@ -1,5 +1,5 @@
 /* =====================================================================
-   sim_vand.js - fane 4: Opløs i vand
+   sim_vand.js - fane 2: Opløs i vand
 
    Et baegerglas med vand. Et salt ligger som en lille krystal i bunden,
    og naar det opløses, rives ionerne løs én ad gangen og svoemmer rundt
@@ -90,8 +90,6 @@
             this.svar.vis(D.saltValg(salt, this.k));
             this.lavFrie();
         }
-        this.opdaterTal();
-        this.visStatus();
     };
 
     NK.SimVand.prototype.saetSalt = function (salt) {
@@ -129,7 +127,6 @@
         NK.el("vand-vis").disabled = true;
         if (this.type === "forudsig") this.startOploesning();
         else this.startInddampning();
-        this.opdaterTal();
     };
 
     /* Frit valg: hæld et hvilket som helst af saltene i. Fane 1 kalder
@@ -175,79 +172,95 @@
             this.lavKrystal();
             this.efterLanding = this.art === "tung" ? "tung" : "oploes";
         }
-        this.opdaterTal();
-        this.visStatus();
     };
 
-    /* Taellingen i panelet - skjult, mens eleven selv skal taelle. */
-    NK.SimVand.prototype.opdaterTal = function () {
-        var s = this.salt;
-        var vis = !!s && ((this.besvaret && (this.fase === "oploeser" || this.fase === "oploest"))
-            || this.fase === "inddamper" || this.fase === "inddampet");
-        NK.el("vand-talkort").hidden = !vis;
-        if (!vis) return;
-        NK.saetTekst("vand-l-kat", D.ionTekst(s.kat) + "  " + D.ionNavn(s.kat));
-        NK.saetTekst("vand-n-kat", String(this.k * s.p));
-        NK.saetTekst("vand-l-an", D.ionTekst(s.an) + "  " + D.ionNavn(s.an));
-        NK.saetTekst("vand-n-an", String(this.k * s.n));
-        NK.saetTekst("vand-forhold", s.p + " : " + s.n);
-    };
-
-    /* ----- Glasset og krystallen -------------------------------------------- */
-    NK.SimVand.prototype.maal = function () {
-        var W = Math.max(this.l.b, 320), H = Math.max(this.l.h, 320);
-        var bb = Math.min(W - 60, 540);
-        var top = 78;
-        var bh = Math.max(200, H - 24 - top);
-        var bx = (W - bb) / 2;
-        var s = NK.klamp(bb / 24, 11, 19);
-        return { W: W, H: H, bx: bx, bb: bb, top: top, bund: top + bh, bh: bh, s: s,
-                 wy: top + bh * (1 - this.niveau), klar: this.l.b > 50 };
-    };
-
-    NK.SimVand.prototype.celle = function () {
-        var r = Math.max(NK.ionGeo(this.salt.kat).R, NK.ionGeo(this.salt.an).R);
-        return 2 * r * this.G.s * 0.94 + 2;
-    };
-
-    /* Pladserne i krystallen: plus og minus skiftevis, saa vidt det
-       gaar, raekke for raekke fra bunden. r, c og n (antal i raekken)
-       - selve koordinaterne regner pladsXY ud hvert billede. */
-    NK.SimVand.prototype.krystalPladser = function () {
-        var s = this.salt;
-        var ialt = this.k * (s.p + s.n);
-        var soejler = Math.ceil(Math.sqrt(ialt * 1.6));
-        var raekker = Math.ceil(ialt / soejler);
-        var tilbage = { kat: this.k * s.p, an: this.k * s.n };
-        var ud = [];
-        for (var r = 0; r < raekker; r++) {
-            var n = Math.min(soejler, ialt - r * soejler);
-            for (var c = 0; c < n; c++) {
-                var side = (r + c) % 2 === 0 ? "kat" : "an";
-                if (!tilbage[side]) side = side === "kat" ? "an" : "kat";
-                tilbage[side]--;
-                ud.push({ side: side, r: r, c: c, n: n });
+    /* ----- Krystalgitteret --------------------------------------------------
+       Reglen er, at to ioner med samme fortegn ALDRIG maa ligge side om
+       side. Hver formelenhed (p kationer, n anioner) lægges som sin egen
+       lille "rosét": er forholdet 1:1, 2:1 eller 3:2 (eller spejlet),
+       kan ionerne ligge på en række, hvor de skiftevis rammer + og -.
+       Er forholdet 3:1 (fx K3PO4), kan det IKKE lade sig gøre på én
+       række uden at to ens fortegn støder sammen - dér sættes den ene
+       ion i midten med de tre andre spredt rundt om den i en trekant.
+       Rosetterne lægges saa side om side i et gitter med et lille
+       mellemrum, saa ioner fra to forskellige roset­ter aldrig rører
+       hinanden - heller ikke to med samme fortegn. ------------------- */
+    function rosetteEnheder(p, n) {
+        var storst = p >= n;
+        var cA = storst ? p : n, cB = storst ? n : p;
+        var A = storst ? "kat" : "an", B = storst ? "an" : "kat";
+        if (cA === 3 && cB === 1) {
+            var ud = [{ side: B, u: 0, v: 0 }];
+            for (var i = 0; i < 3; i++) {
+                var vink = -Math.PI / 2 + i * (Math.PI * 2 / 3);
+                ud.push({ side: A, u: Math.cos(vink) * 1.05, v: Math.sin(vink) * 1.05 });
             }
+            return ud;
+        }
+        var raekke;
+        if (cA === 1 && cB === 1) raekke = [A, B];
+        else if (cA === 2 && cB === 1) raekke = [A, B, A];
+        else raekke = [A, B, A, B, A];              /* 3 : 2 */
+        return raekke.map(function (side, i) { return { side: side, u: i - (raekke.length - 1) / 2, v: 0 }; });
+    }
+
+    /* Maalene for ÉN formelenhed, skaleret til det aktuelle laerred:
+       hvor langt ud fra midten (dx, dy) hver ion sidder, og hvor stor
+       en firkant hele rosetten fylder (half). */
+    NK.SimVand.prototype.rosetteMaal = function () {
+        var s = this.salt, G = this.G;
+        var rKat = NK.ionGeo(s.kat).R * G.s, rAn = NK.ionGeo(s.an).R * G.s;
+        var pitch = (rKat + rAn) * 0.92 + 2;
+        var halvB = 0, halvH = 0;
+        var enheder = rosetteEnheder(s.p, s.n).map(function (e) {
+            var r = e.side === "kat" ? rKat : rAn;
+            var dx = e.u * pitch, dy = e.v * pitch;
+            halvB = Math.max(halvB, Math.abs(dx) + r);
+            halvH = Math.max(halvH, Math.abs(dy) + r);
+            return { side: e.side, dx: dx, dy: dy };
+        });
+        return { enheder: enheder, half: Math.max(halvB, halvH) };
+    };
+
+    /* De k formelenheder som en liste af {side, rosette, enhedIdx} -
+       kun antal og fortegn afgøres her. Selve pixel-positionen regnes
+       hvert billede i pladsXY, saa den følger med, hvis vinduet skifter
+       størrelse. */
+    NK.SimVand.prototype.krystalPladser = function () {
+        var rm = this.rosetteMaal();
+        var ud = [];
+        for (var i = 0; i < this.k; i++) {
+            rm.enheder.forEach(function (e, ei) { ud.push({ side: e.side, rosette: i, enhedIdx: ei }); });
         }
         return ud;
     };
 
+    /* Rosetterne lægges i et gitter, bundlinjen først, og vokser opad -
+       ligesom en krystal der har lagt sig i bunden af glasset. */
     NK.SimVand.prototype.pladsXY = function (ion) {
-        var G = this.G, cel = this.celle();
-        return { x: G.bx + G.bb / 2 + (ion.c - (ion.n - 1) / 2) * cel, y: G.bund - 8 - (ion.r + 0.5) * cel };
+        var rm = this._rm, G = this.G;
+        var soejler = Math.ceil(Math.sqrt(this.k));
+        var gab = 6, trin = rm.half * 2 + gab;
+        var r = Math.floor(ion.rosette / soejler), c = ion.rosette % soejler;
+        var iRaekke = Math.min(soejler, this.k - r * soejler);
+        var cx = G.bx + G.bb / 2 + (c - (iRaekke - 1) / 2) * trin;
+        var cy = G.bund - 8 - rm.half - r * trin;
+        var e = rm.enheder[ion.enhedIdx];
+        return { x: cx + e.dx, y: cy + e.dy };
     };
 
     function nyIon(ion) {
         return { ion: ion, x: NaN, y: NaN, mx: 0, my: 0, vx: 0, vy: 0, a: 0, fri: false, boost: 0, vent: 0,
-                 r: 0, c: 0, n: 1, vinkel: 0, vv: ion.sammensat ? (Math.random() - 0.5) * 1.4 : 0 };
+                 rosette: 0, enhedIdx: 0, vinkel: 0, vv: ion.sammensat ? (Math.random() - 0.5) * 1.4 : 0 };
     }
 
     /* Krystallen daler ned gennem vandet og lander i bunden. */
     NK.SimVand.prototype.lavKrystal = function () {
         var mig = this;
+        this._rm = this.rosetteMaal();
         this.ioner = this.krystalPladser().map(function (p) {
             var ion = nyIon(p.side === "kat" ? mig.salt.kat : mig.salt.an);
-            ion.r = p.r; ion.c = p.c; ion.n = p.n;
+            ion.rosette = p.rosette; ion.enhedIdx = p.enhedIdx;
             return ion;
         });
         this.fase = "falder";
@@ -276,27 +289,26 @@
         /* Oeverste raekke og yderste ioner slipper foerst. */
         var midt = this.G.bx + this.G.bb / 2;
         this.koe = this.ioner.slice().sort(function (a, b) {
-            return (b.r - a.r) || (Math.abs(b.mx - midt) - Math.abs(a.mx - midt));
+            return (b.my - a.my) || (Math.abs(b.mx - midt) - Math.abs(a.mx - midt));
         });
         this.fase = "oploeser";
         this.naeste = 0.15;
-        this.opdaterTal();
     };
 
     NK.SimVand.prototype.startInddampning = function () {
+        var pladser = this.krystalPladser();
         var ledige = { kat: [], an: [] };
-        this.krystalPladser().forEach(function (p) { ledige[p.side].push(p); });
+        pladser.forEach(function (p) { ledige[p.side].push(p); });
         for (var i = 0; i < this.ioner.length; i++) {
             var ion = this.ioner[i];
             var p = ledige[ion.ion.q > 0 ? "kat" : "an"].shift();
-            ion.r = p.r; ion.c = p.c; ion.n = p.n;
+            ion.rosette = p.rosette; ion.enhedIdx = p.enhedIdx;
             ion.fri = false;
             ion.vent = 0.4 + Math.random() * 1.6;
         }
         this.niveauMaal = 0.07;
         this.fase = "inddamper";
         this.inddampTid = 0;
-        this.opdaterTal();
     };
 
     /* ----- Bevaegelse ----------------------------------------------------- */
@@ -308,13 +320,8 @@
         else this.startOpgave(this.salt, this.type);
     };
 
-    NK.SimVand.prototype.visStatus = function () {
-        NK.saetHTML("vand-status", this.statusTekst());
-    };
-
     NK.SimVand.prototype.opdater = function (dt) {
         this.bevaeg(dt);
-        this.visStatus();
     };
 
     NK.SimVand.prototype.bevaeg = function (dt) {
@@ -322,6 +329,7 @@
         this.niveau = NK.mod(this.niveau, this.niveauMaal, this.fase === "inddamper" ? 0.9 : 3, dt);
         var G = this.G = this.maal();
         if (!G.klar) return;
+        if (this.salt) this._rm = this.rosetteMaal();
         var i, ion;
 
         if (this.fase === "falder") {
@@ -345,14 +353,13 @@
                 } else {
                     this.fase = "oploest";
                     this.ligning = true;
-                    this.opdaterTal();
                 }
             }
         } else if (this.fase === "tung") {
             this.tungTid += dt;
         } else if (this.fase === "inddamper") {
             this.inddampTid += dt;
-            if (this.inddampTid > 3.2) { this.fase = "inddampet"; this.opdaterTal(); }
+            if (this.inddampTid > 3.2) this.fase = "inddampet";
         }
 
         for (i = 0; i < this.ioner.length; i++) {
@@ -449,6 +456,7 @@
         }
         this.tegnGlas(c, G);
         this.tegnOverskrift(c, G);
+        this.tegnFastStofMaerke(c, G);
     };
 
     NK.SimVand.prototype.tegnVand = function (c, G) {
@@ -509,8 +517,7 @@
     };
 
     /* Ligningen oeverst, naar saltet er opløst - og formlen over
-       krystallen, naar vandet er fordampet, eller saltet ikke vil
-       gaa i opløsning. */
+       krystallen, naar vandet er fordampet. */
     NK.SimVand.prototype.tegnOverskrift = function (c, G) {
         var s = this.salt;
         if (!s) return;
@@ -523,16 +530,11 @@
                 { t: "  +  ", farve: "#7e8590" },
                 { t: D.ionLed(s.an, s.n), farve: "#8fcaf0" }
             ], G.W / 2, 38, { font: font, kant: true });
-        } else if (this.fase === "tung") {
-            NK.tekstDele(c, [
-                { t: D.oploesVenstre(s), farve: "#f2f3f5" },
-                { t: "   tungtopløseligt — bliver liggende", farve: "#f0d77a" }
-            ], G.W / 2, 38, { font: font, kant: true });
         }
-        if (this.fase === "inddampet" || this.fase === "tung" || (this.fase === "inddamper" && this.inddampTid > 2)) {
+        if (this.fase === "inddampet" || (this.fase === "inddamper" && this.inddampTid > 2)) {
             var top = Infinity;
             for (var i = 0; i < this.ioner.length; i++) top = Math.min(top, this.ioner[i].my);
-            var y = top - this.celle() / 2 - 14;
+            var y = top - (this._rm ? this._rm.half : 20) - 14;
             NK.tekst(c, s.formel, G.W / 2, y - 18, {
                 font: "700 24px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
                 farve: "#f2f3f5", kant: true, kantBredde: 5
@@ -543,36 +545,45 @@
         }
     };
 
-    /* Én saetning om, hvad der sker lige nu. */
-    NK.SimVand.prototype.statusTekst = function () {
+    /* Et lille maerke over krystallen, mens den endnu ligger som fast
+       stof: formlen med "(s)" og en pil ned til den, plus en kort
+       undertekst om hvorfor den ligger dér. Erstatter den gamle
+       kommentar under hele glasset. */
+    NK.SimVand.prototype.tegnFastStofMaerke = function (c, G) {
         var s = this.salt;
-        if (!s) return "";
-        var k = this.k;
-        var sammIon = s.an.sammensat ? s.an : (s.kat.sammensat ? s.kat : null);
-        switch (this.fase) {
-            case "tom":
-                return this.tomBesked || "";
-            case "falder":
-            case "krystal":
-                return this.mode === "frit" ? "Saltet synker ned i vandet …"
-                    : "Saltet ligger i bunden af glasset. <b>Hvad kommer der ud i vandet</b>, når det opløses?";
-            case "oploeser":
-                return sammIon ? "Ionerne rives løs én ad gangen. Se " + D.ionTekst(sammIon) + ": den holder sammen hele vejen."
-                    : "Ionerne rives løs én ad gangen og svømmer ud i vandet.";
-            case "oploest":
-                if (this.type === "hvilket" && !this.besvaret) {
-                    return "Ionerne svømmer hver for sig. <b>Tæl dem</b> — hvilket salt kommer de fra?";
-                }
-                return "Opløst: " + (k * s.p) + " " + D.ionTekst(s.kat) + " og " + (k * s.n) + " " + D.ionTekst(s.an)
-                    + " — samme forhold som i formlen, <b>" + s.p + " : " + s.n + "</b>.";
-            case "tung":
-                return "<b>" + NK.stort(s.navn) + "</b> er tungtopløseligt. Det bliver liggende som bundfald.";
-            case "inddamper":
-                return "Vandet fordamper, og ionerne samles igen i en krystal.";
-            case "inddampet":
-                return "Tilbage er <b>" + s.formel + "</b>: " + (k * s.p) + " " + D.ionTekst(s.kat) + " og " + (k * s.n)
-                    + " " + D.ionTekst(s.an) + " er det samme som " + s.p + " : " + s.n + ".";
+        if (!s || !this.ioner.length) return;
+        var undertekst;
+        if (this.fase === "falder" || this.fase === "krystal") undertekst = "endnu ikke opløst i vandet";
+        else if (this.fase === "tung") undertekst = "tungtopløseligt — bliver liggende";
+        else return;
+
+        var top = Infinity, midtX = 0, n = this.ioner.length;
+        for (var i = 0; i < n; i++) {
+            var ion = this.ioner[i];
+            top = Math.min(top, ion.y - NK.ionGeo(ion.ion).R * G.s);
+            midtX += ion.x;
         }
-        return "";
+        midtX /= n;
+        var y = top - 36;
+
+        NK.tekst(c, s.formel + "(s)", midtX, y, {
+            font: "700 15px 'Segoe UI', sans-serif", justering: "center", linje: "bottom", farve: "#f2f3f5", kant: true
+        });
+        NK.tekst(c, undertekst, midtX, y + 4, {
+            font: "italic 400 11px 'Segoe UI', sans-serif", justering: "center", linje: "top",
+            farve: "#a9b0ba", kant: true, kantBredde: 3
+        });
+
+        c.save();
+        c.strokeStyle = "rgba(169, 176, 186, 0.6)";
+        c.lineWidth = 1.5;
+        c.beginPath();
+        c.moveTo(midtX, y + 21);
+        c.lineTo(midtX, top - 6);
+        c.moveTo(midtX - 4, top - 12);
+        c.lineTo(midtX, top - 6);
+        c.lineTo(midtX + 4, top - 12);
+        c.stroke();
+        c.restore();
     };
 }());

@@ -53,9 +53,12 @@
         this.retning = "navn";
         this.fase = "byg";
         this.status = null;
+        this.svaerhedsgrad = "let";  /* let: navne vises · svær: alle navne skjules */
 
         NK.el("tilstand-frit").addEventListener("click", function () { mig.saetTilstand("frit"); });
         NK.el("tilstand-opgave").addEventListener("click", function () { mig.saetTilstand("opgave"); });
+        NK.el("svaerhed-let").addEventListener("click", function () { mig.saetSvaerhed("let"); });
+        NK.el("svaerhed-svaer").addEventListener("click", function () { mig.saetSvaerhed("svaer"); });
         NK.el("byg-afstem").addEventListener("click", function () { mig.bord.afstem(); });
         NK.el("byg-navne").addEventListener("change", function () { mig.bord.saetNavne(this.checked); });
         NK.el("byg-ryd").addEventListener("click", function () {
@@ -82,6 +85,8 @@
         this.tilstand = t;
         NK.el("tilstand-frit").classList.toggle("aktiv", !opgave);
         NK.el("tilstand-opgave").classList.toggle("aktiv", opgave);
+        NK.el("svaerhed-valg").hidden = !opgave;
+        NK.el("byg-navne-label").hidden = opgave;
         NK.el("frit-formelkort").hidden = opgave;
         NK.el("frit-regnskab").hidden = opgave;
         NK.el("frit-knapper").hidden = opgave;
@@ -89,6 +94,9 @@
         NK.el("opgave-knapper").hidden = !opgave;
 
         if (opgave) {
+            /* Sværhedsgraden bestemmer alene, om navnene vises i denne
+               tilstand - den almindelige "vis navne"-boks er skjult. */
+            this.bord.saetNavne(this.svaerhedsgrad === "let");
             /* En opgave, der ikke er færdig, tages op igen — ellers en ny. */
             if (this.opgave && this.fase !== "faerdig") this.startOpgave(this.opgave, this.retning);
             else this.nyOpgave();
@@ -97,9 +105,20 @@
             this.svar.ryd();
             this.bord.laas(false);
             this.bord.visFormel = true;
+            this.bord.saetNavne(NK.el("byg-navne").checked);
             this.status = null;
             this.opdaterPanel();
         }
+    };
+
+    /* Let: alle navne staar paa hylden, som normalt. Svær: alle navne
+       forsvinder paa én gang - eleven skal kunne ionerne paa formlen
+       og ladningen alene. */
+    NK.SimBord.prototype.saetSvaerhed = function (grad) {
+        this.svaerhedsgrad = grad;
+        NK.el("svaerhed-let").classList.toggle("aktiv", grad === "let");
+        NK.el("svaerhed-svaer").classList.toggle("aktiv", grad === "svaer");
+        if (this.tilstand === "opgave") this.bord.saetNavne(grad === "let");
     };
 
     NK.SimBord.prototype.aendret = function () {

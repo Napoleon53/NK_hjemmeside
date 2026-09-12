@@ -1,9 +1,10 @@
 /* =====================================================================
    sim_oploes.js - fane 1: hvad vandet goer ved krystallen
 
-   Et lille udsnit af en krystal ligger i bunden af glasset. Ni
+   Et lille udsnit af en krystal ligger i bunden af glasset. Otte
    vandmolekyler arbejder: de finder en ion i overfladen, vender den
-   rigtige ende ind mod den, og naar fire har fat, river de den loes.
+   rigtige ende ind mod den, og naar fire har fat, river de den loes -
+   to fulde hold paa fire kan altsaa arbejde parallelt.
 
    To ting bestemmer, hvor langt det gaar:
      temperaturen   - hvor hurtigt vandmolekylerne arbejder
@@ -17,9 +18,14 @@
     var D = NK.Data;
     var T = NK.Tegn;
 
-    var VAND_I_ARBEJDE = 9;      /* aktive vandmolekyler */
+    var VAND_I_ARBEJDE = 8;      /* aktive vandmolekyler - to hold paa fire */
     var PAAKRAEVET = 4;          /* saa mange skal have fat, foer ionen slipper */
     var RAEKKER = 5;
+
+    /* Naar en ion er revet loes, krymper den og sit vandlag lidt - den
+       fylder mindre som fri ion i vaesken, end den gjorde i krystallen. */
+    var FRI_SKALA = 0.6;
+    var FRI_SKALA_FART = 2.0;
 
     /* De tre knapper. temp er den temperatur, oploeseligheden slaas op ved. */
     var TEMPERATURER = [
@@ -106,7 +112,8 @@
                     baerere: [],
                     reserveret: 0,
                     grundvinkel: Math.random() * Math.PI * 2,
-                    skalfase: Math.random() * Math.PI * 2
+                    skalfase: Math.random() * Math.PI * 2,
+                    skala: 1
                 });
                 this.optaget[r + ":" + c] = true;
             }
@@ -186,14 +193,22 @@
         }
     };
 
-    /* Et nyt sted at svoemme hen. Vandmolekylerne bor ikke oeverst i
-       glasset - de er over det hele, og naar de har afleveret en ion,
-       driver de bare lidt vaek og finder den naeste. */
-    P.nytHjem = function (v) {
+    /* Et nyt sted at svoemme hen. Vandmolekylerne bor ikke ét bestemt sted -
+       de er spredt ud over hele det frie vand. undgaa (valgfri, {x,y}) er
+       den ion, molekylet lige har afleveret: hjemmet loddes om, til det
+       ligger et stykke derfra, saa det ikke bare ser ud, som om det samme
+       molekyle dukker op igen lige dér, hvor ionen var. */
+    P.nytHjem = function (v, undgaa) {
         var top = this.overflade + 24;
         var bund = Math.max(top + 10, this.gitterTop - 14);
-        v.hjemX = this.glasX + 26 + Math.random() * Math.max(10, this.glasB - 52);
-        v.hjemY = top + Math.random() * (bund - top);
+        var forsoeg = 0, x, y;
+        do {
+            x = this.glasX + 26 + Math.random() * Math.max(10, this.glasB - 52);
+            y = top + Math.random() * (bund - top);
+            forsoeg++;
+        } while (undgaa && forsoeg < 6 && Math.hypot(x - undgaa.x, y - undgaa.y) < 70);
+        v.hjemX = x;
+        v.hjemY = y;
     };
 
     P.tilpas = function () {
@@ -269,7 +284,7 @@
                     o.x = o.maalX; o.y = o.maalY;
                     o.tilstand = "fri";
                     for (var b = 0; b < o.baerere.length; b++) {
-                        this.nytHjem(o.baerere[b]);
+                        this.nytHjem(o.baerere[b], { x: o.x, y: o.y });
                         o.baerere[b].tilstand = "hjem";
                     }
                     o.baerere = [];
@@ -277,6 +292,7 @@
                     o.vy = (Math.random() - 0.5) * 26;
                 }
             } else if (o.tilstand === "fri") {
+                o.skala = NK.mod(o.skala, FRI_SKALA, FRI_SKALA_FART, dt);
                 o.x += o.vx * dt * fart;
                 o.y += o.vy * dt * fart;
                 var vLav = this.overflade + 22, vHoej = this.gitterTop - 20;
@@ -289,7 +305,7 @@
         }
 
         /* Vandmolekylerne */
-        for (i = 0; i < this.vand.length; i++) this.opdaterVand(this.vand[i], 145 * fart * dt, dt);
+        for (i = 0; i < this.vand.length; i++) this.opdaterVand(this.vand[i], 190 * fart * dt, dt);
 
         /* Baggrundsvandet */
         for (i = 0; i < this.baggrund.length; i++) {
@@ -329,7 +345,12 @@
             break;
 
         case "soeger": {
-            if (!o || o.tilstand !== "fast") { v.maal = null; this.nytHjem(v); v.tilstand = "hjem"; break; }
+            if (!o || o.tilstand !== "fast") {
+                v.maal = null;
+                this.nytHjem(v, o ? { x: o.x, y: o.y } : undefined);
+                v.tilstand = "hjem";
+                break;
+            }
             var vinkel = o.grundvinkel + v.plads * (Math.PI / 2);
             var afstand = this.ionRadius(o) + this.celle * 0.46;
             var maalX = o.x + Math.cos(vinkel) * afstand;
@@ -358,7 +379,7 @@
             v.x = o.x + v.afX;
             v.y = o.y + v.afY;
             v.vinkel = T.vendMod(v.x, v.y, o.x, o.y, o.ion.q > 0);
-            if (o.tilstand === "fri") { v.maal = null; this.nytHjem(v); v.tilstand = "hjem"; }
+            if (o.tilstand === "fri") { v.maal = null; this.nytHjem(v, { x: o.x, y: o.y }); v.tilstand = "hjem"; }
             break;
 
         case "hjem": {
@@ -390,7 +411,8 @@
     };
 
     P.ionRadius = function (o) {
-        return this.celle * 0.40 * o.ion.r;
+        var s = o.skala === undefined ? 1 : o.skala;
+        return this.celle * 0.40 * o.ion.r * s;
     };
 
     /* ----- Panelteksten ----------------------------------------------------- */
@@ -399,14 +421,17 @@
         var tung = D.erTung(salt);
         var loest = D.oploeselighed(salt, this.tempValg.temp);
 
-        NK.saetHTML("oploes-ligning", D.ligningHTML(salt));
+        var ligningHTML = D.ligningHTML(salt);
+        if (this._sidsteLigning !== ligningHTML) {
+            NK.saetHTML("oploes-ligning", ligningHTML);
+            NK.tilpasEnLinje("oploes-ligning");
+            this._sidsteLigning = ligningHTML;
+        }
         NK.saetTekst("oploes-navn", salt.navn);
         NK.saetTekst("oploes-hverdag", salt.hverdag);
         NK.saetTekst("oploes-type", tung ? "tungtopløseligt" : "letopløseligt");
         NK.saetKlasse("oploes-type", "maerke " + (tung ? "orange" : "groen"));
         NK.saetTekst("oploes-graense", NK.gram(loest) + " g pr. 100 mL");
-        NK.saetTekst("oploes-ude", String(this.frie));
-        NK.saetTekst("oploes-fast", String(this.tilbage()));
 
         var besked, klasse = "besked";
         if (this.tilbage() === 0) {
@@ -435,8 +460,6 @@
                 ? "Mættet: der er kun plads til nogle ganske få ioner i vandet."
                 : "Vandet kan ikke opløse mere.";
         }
-        if (this.tempValg.id === "varm") return "Varmt vand: molekylerne farer rundt og river ionerne løs i en fart.";
-        if (this.tempValg.id === "kold") return "Koldt vand: molekylerne bevæger sig langsomt, så det tager tid.";
         return "Fire vandmolekyler skal have fat, før en ion slipper.";
     };
 
@@ -483,7 +506,8 @@
             var arbejder = v.tilstand === "soeger" || v.tilstand === "fast";
             T.vand(ctx, v.x, v.y, v.vinkel, this.celle / 26, {
                 delta: this.visDelta,
-                alpha: arbejder ? 1 : 0.55
+                alpha: arbejder ? 1 : 0.55,
+                spidsH: v.maal ? v.maal.ion.q < 0 : false
             });
         }
         for (i = 0; i < this.ioner.length; i++) {
@@ -491,25 +515,5 @@
             if (pv.tilstand !== "paavej") continue;
             T.ion(ctx, pv.x, pv.y, pv.ion, this.ionRadius(pv), { fremhaev: true });
         }
-
-        /* Skillelinjen mellem (s) og (aq). Maerkaterne staar i hoejre side,
-           hvor der altid er frit - krystallen er smallere end glasset. */
-        var hoejre = this.glasX + this.glasB - 12;
-        ctx.save();
-        ctx.setLineDash([5, 6]);
-        ctx.strokeStyle = "rgba(200, 214, 230, 0.22)";
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(this.glasX + 6, this.gitterTop - 4);
-        ctx.lineTo(hoejre, this.gitterTop - 4);
-        ctx.stroke();
-        ctx.restore();
-
-        var maerkat = {
-            justering: "right", farve: "rgba(214, 224, 236, 0.72)",
-            font: "600 12px 'Segoe UI', sans-serif", kant: true
-        };
-        NK.tekst(ctx, "(aq) opløst i vandet", hoejre, this.gitterTop - 12, maerkat);
-        NK.tekst(ctx, "(s) fast salt", hoejre, this.gitterTop + 16, maerkat);
     };
 }());

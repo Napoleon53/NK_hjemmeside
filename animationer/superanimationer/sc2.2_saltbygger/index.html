@@ -37,6 +37,11 @@
             <button class="tilstandsknap" id="tilstand-opgave" type="button">🎯 Opgaver</button>
         </div>
 
+        <div class="sv-valg" id="svaerhed-valg" role="group" aria-label="Vælg sværhedsgrad" hidden>
+            <button class="svknap aktiv" id="svaerhed-let" type="button">Let</button>
+            <button class="svknap" id="svaerhed-svaer" type="button">Svær</button>
+        </div>
+
         <!-- Byg frit -->
         <div class="kort maaling" id="frit-formelkort">
             <h2>Formlen</h2>
@@ -86,7 +91,7 @@
 
         <!-- Fælles -->
         <div class="kort">
-            <label class="tjek" style="margin-top:0;"><input type="checkbox" id="byg-navne" checked> Vis navne på ionerne</label>
+            <label class="tjek" id="byg-navne-label" style="margin-top:0;"><input type="checkbox" id="byg-navne" checked> Vis navne på ionerne</label>
             <button class="knap nulstil" id="byg-ryd" type="button"><span>Ryd bordet</span><span class="tegn">↺</span></button>
         </div>
     </aside>
@@ -96,13 +101,13 @@
 <!-- FANE 2: OPLØS I VAND                                               -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-vand" role="tabpanel" aria-label="Opløs i vand">
-    <div class="scene medtekst">
+    <div class="scene" id="vand-scene">
         <canvas id="vand-laerred"></canvas>
-        <div class="scene-mrk" id="vand-status"></div>
-    </div>
 
-    <aside class="panel">
-        <div class="kort opgavekort">
+        <!-- Opgaven ligger ovenpå billedet i venstre side, adskilt fra
+             "Vælg selv et salt" i panelet til højre, så det er tydeligt,
+             at de to ting ikke hænger sammen. -->
+        <div class="kort opgavekort opgave-boks" id="vand-opgave-boks">
             <h2><span id="vand-overskrift">Hvad kommer der ud i vandet?</span> <span class="taeller">løst: <b id="vand-loest">0</b></span></h2>
             <p class="opgave-spm" id="vand-spm"></p>
             <div class="valg en-spalte" id="vand-valg"></div>
@@ -112,16 +117,12 @@
                 <button class="knap blaa" id="vand-ny" type="button">Ny opgave</button>
             </div>
         </div>
+    </div>
 
-        <div class="kort maaling" id="vand-talkort" hidden>
-            <h2>I glasset</h2>
-            <div class="talraekke"><span id="vand-l-kat"></span><span class="tal roed" id="vand-n-kat"></span></div>
-            <div class="talraekke"><span id="vand-l-an"></span><span class="tal blaa" id="vand-n-an"></span></div>
-            <div class="talraekke"><span>Forhold</span><span class="tal groen" id="vand-forhold"></span></div>
-        </div>
-
+    <aside class="panel">
         <div class="kort">
             <h2>Vælg selv et salt</h2>
+            <p class="note" style="margin-top:0;">Vælg saltets positive ion og negative ion, og se hvad der sker, når du lægger det i vand.</p>
             <select id="vand-kat" class="vaelger" aria-label="Positiv ion"></select>
             <select id="vand-an" class="vaelger" aria-label="Negativ ion" style="margin-top:6px;"></select>
             <button class="knap stor groen" id="vand-haeld" type="button" style="margin-top:9px;"><span>Hæld det i vandet</span><span class="tegn">↓</span></button>

@@ -46,6 +46,7 @@
         this.sidsteBundfald = 0;
         this.varsel = "";
         this.varselUr = 0;
+        this.autoSkala = false;   /* fast 0-100 g som udgangspunkt */
 
         this.koblPanel();
         this.koblMus();
@@ -70,6 +71,10 @@
         NK.el("maet-lidt").addEventListener("click", function () { mig.haeldI(5); });
         NK.el("maet-meget").addEventListener("click", function () { mig.haeldI(25); });
         NK.el("maet-toem").addEventListener("click", function () { mig.nulstil(); });
+
+        NK.el("maet-skala-knap").addEventListener("click", function () {
+            mig.autoSkala = !mig.autoSkala;
+        });
     };
 
     P.saetTemp = function (t) {
@@ -126,7 +131,7 @@
         var gb = Math.min(glasFelt.b * 0.62, 210);
         this.glasB = gb;
         this.glasX = glasFelt.x + (glasFelt.b - gb) / 2;
-        this.glasY = glasFelt.y + Math.max(30, glasFelt.h * 0.13);
+        this.glasY = glasFelt.y + Math.max(52, glasFelt.h * 0.13);  /* plads til knapraden ovenpaa */
         this.glasH = glasFelt.h - (this.glasY - glasFelt.y) - 30;
         this.overflade = this.glasY + Math.max(16, this.glasH * 0.12);
         this.bund = this.glasY + this.glasH;
@@ -137,6 +142,24 @@
             b: Math.max(60, grafFelt.b - 58 - 26),
             h: Math.max(60, grafFelt.h - 50 - 48)
         };
+
+        this.positionerOverlays();
+    };
+
+    /* De to knapraeker (hæld salt i / skaler grafen) er rigtige HTML-
+       knapper, der ligger ovenpaa canvas'et - de skal flyttes med, naar
+       glasset eller grafen flytter sig. */
+    P.positionerOverlays = function () {
+        var knapper = NK.el("maet-glasknapper");
+        if (knapper) {
+            knapper.style.left = (this.glasX + this.glasB / 2) + "px";
+            knapper.style.top = (this.glasY - 6) + "px";
+        }
+        var skalaKnap = NK.el("maet-skala-knap");
+        if (skalaKnap) {
+            skalaKnap.style.left = (this.graf.x + this.graf.b) + "px";
+            skalaKnap.style.top = (this.graf.y - 34) + "px";
+        }
     };
 
     /* ----- Musen over grafen ------------------------------------------------ */
@@ -284,6 +307,8 @@
         NK.saetTekst("maet-maerke", maettet ? "mættet" : (this.tilsat > 0 ? "umættet" : "tomt glas"));
         NK.saetKlasse("maet-maerke", "maerke " + (maettet ? "orange" : "groen"));
 
+        NK.saetTekst("maet-skala-knap", this.autoSkala ? "Fast skala: 0–100 g" : "Skaler til stoffet");
+
         var besked, klasse = "besked";
         if (this.tilsat === 0) {
             besked = "100 mL vand. Hæld salt i, og se, hvor meget der kan være.";
@@ -328,7 +353,7 @@
             ? NK.klamp(this.oploest() / 60, 0, 1)
             : 0;
         T.glas(ctx, this.glasX, this.glasY, this.glasB, this.glasH,
-               this.overflade, salt.vandfarve, toning);
+               this.overflade, salt.vandfarve, toning, { graduering: true });
 
         /* Bundfaldet: en bunke smaa krystaller */
         if (this.bunke > 0.6) {
@@ -384,7 +409,11 @@
         var g = this.graf;
         var i;
 
-        var ymax = D.stoersteOploeselighed(salt) * 1.16;
+        /* Som udgangspunkt staar aksen fast paa 0-100 g, saa saltene kan
+           sammenlignes direkte. Skala-knappen kan zoome ind paa netop
+           dette stof i stedet - noedvendigt for et salt som AgCl, hvor
+           0-100 g ellers ville gøre kurven usynlig langs bunden. */
+        var ymax = this.autoSkala ? D.stoersteOploeselighed(salt) * 1.16 : 100;
         var tilX = function (t) { return g.x + (t / 100) * g.b; };
         var tilY = function (v) { return g.y + g.h - NK.klamp(v / ymax, 0, 1) * g.h; };
 

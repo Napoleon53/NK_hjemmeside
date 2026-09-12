@@ -343,6 +343,22 @@ main { flex: 1; position: relative; min-height: 0; }
 .kort.maaling { border-left: 3px solid var(--groen); }
 .kort.opgavekort { border-left: 3px solid var(--lilla); }
 
+/* Opgaven som et overlay ovenpå scenen (fane 2) - i venstre side, saa
+   den holdes adskilt fra det uafhaengige "Vælg selv et salt" i panelet. */
+.opgave-boks {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    width: 320px;
+    max-width: calc(100% - 36px);
+    max-height: calc(100% - 36px);
+    overflow-y: auto;
+    background-color: rgba(43, 43, 54, 0.94);
+    backdrop-filter: blur(2px);
+    box-shadow: var(--skygge);
+    z-index: 5;
+}
+
 .kort > h2 .taeller {
     font-size: 0.68rem;
     letter-spacing: 0.04em;
@@ -704,6 +720,7 @@ select:focus-visible {
     .fane.aktiv { display: grid; }
     .scene { height: 70vh; min-height: 460px; }
     .panel { border-left: none; border-top: 1px solid #1f1f27; }
+    .opgave-boks { top: 12px; left: 12px; width: calc(100% - 24px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -738,6 +755,32 @@ select:focus-visible {
 
 .tilstandsknap:hover { color: var(--tekst); background-color: var(--panel-2); }
 .tilstandsknap.aktiv { background-color: var(--blaa); color: #ffffff; }
+
+/* Sværhedsgrad - kun synlig i Opgaver-tilstanden, lige under knapperne
+   ovenfor. Lilla, saa den ikke forveksles med blaa (tilstand) eller
+   groen/roed (rigtig/forkert svar). */
+.sv-valg {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.svknap {
+    flex: 1;
+    background-color: var(--panel-2);
+    color: var(--tekst-svag);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 6px 6px;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.16s ease, color 0.16s ease, border-color 0.16s ease;
+}
+
+.svknap:hover { color: var(--tekst); border-color: #5e5e70; }
+.svknap.aktiv { background-color: var(--lilla); color: #ffffff; border-color: var(--lilla); }
 
 /* ---------------------------------------------------------------------
    TRAEK OG SLIP

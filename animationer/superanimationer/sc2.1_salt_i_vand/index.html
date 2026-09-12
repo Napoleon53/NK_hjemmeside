@@ -16,8 +16,8 @@
         <button class="faneknap" data-fane="fane-maetning" role="tab" aria-selected="false"><span class="nr">2</span>Hvor meget kan der være?</button>
     </div>
 
-    <button class="ikonknap" id="teoriknap" type="button" title="Teori (T)" aria-label="Teori">📖</button>
-    <button class="ikonknap" id="quizknap" type="button" title="Tjek dig selv (Q)" aria-label="Tjek dig selv">🧠</button>
+    <button class="topknap" id="teoriknap" type="button" title="Teori (T)">📖 <span>Teori</span></button>
+    <button class="topknap" id="quizknap" type="button" title="Tjek dig selv (Q)">🧠 <span>Quiz</span></button>
     <button class="ikonknap" id="hjaelpknap" type="button" title="Hjælp og genveje (H)" aria-label="Hjælp">?</button>
 </header>
 
@@ -51,9 +51,7 @@
         <div class="kort maaling">
             <h2>Det sker der</h2>
             <div class="ligning" id="oploes-ligning"></div>
-            <div class="talraekke" style="margin-top:9px;"><span>Ude i vandet</span><span class="tal groen" id="oploes-ude">0</span></div>
-            <div class="talraekke"><span>Tilbage i krystallen</span><span class="tal" id="oploes-fast">30</span></div>
-            <div class="talraekke"><span>Der kan opløses</span><span class="tal blaa" id="oploes-graense">—</span></div>
+            <div class="talraekke" style="margin-top:9px;"><span>Der kan opløses</span><span class="tal blaa" id="oploes-graense">—</span></div>
             <p class="besked" id="oploes-besked" style="margin-top:9px;"></p>
         </div>
 
@@ -75,6 +73,17 @@
 <section class="fane" id="fane-maetning" role="tabpanel" aria-label="Hvor meget kan der være?">
     <div class="scene medtekst">
         <canvas id="maet-laerred"></canvas>
+
+        <!-- Ligger henover baegerglasset, paa den plads bordet aabner op --
+             positionen saettes af sim_maetning.js, saa den foelger glasset. -->
+        <div class="glas-knapper" id="maet-glasknapper">
+            <button class="knap lille blaa" id="maet-lidt" type="button">+ 5 g</button>
+            <button class="knap lille blaa" id="maet-meget" type="button">+ 25 g</button>
+            <button class="knap lille nulstil" id="maet-toem" type="button" title="Tøm glasset" aria-label="Tøm glasset">↺</button>
+        </div>
+
+        <button class="graf-skala-knap" id="maet-skala-knap" type="button">Skaler til stoffet</button>
+
         <div class="scene-mrk" id="maet-status"></div>
     </div>
 
@@ -99,15 +108,6 @@
             <p class="note">Du kan også trække i kurven ude i billedet.</p>
         </div>
 
-        <div class="kort">
-            <h2>Hæld salt i</h2>
-            <div class="knaprad taet">
-                <button class="knap blaa" id="maet-lidt" type="button">+ 5 g</button>
-                <button class="knap blaa" id="maet-meget" type="button">+ 25 g</button>
-            </div>
-            <button class="knap nulstil" id="maet-toem" type="button"><span>Tøm glasset</span><span class="tegn">↺</span></button>
-        </div>
-
         <div class="kort maaling">
             <h2>I glasset <span class="maerke groen" id="maet-maerke">tomt glas</span></h2>
             <div class="talraekke"><span>Hældt i</span><span class="tal" id="maet-tilsat">0 g</span></div>
@@ -115,6 +115,7 @@
             <div class="talraekke"><span>Bundfald</span><span class="tal roed" id="maet-bundfald">0 g</span></div>
             <div class="talraekke sum"><span>Grænsen lige nu</span><span class="tal gul" id="maet-graense">—</span></div>
             <p class="besked" id="maet-besked" style="margin-top:9px;"></p>
+            <p class="note">Hæld salt i oven i glasset i selve billedet.</p>
         </div>
     </aside>
 </section>
@@ -151,10 +152,10 @@
         <h3>De to faner</h3>
         <ul>
             <li><b>Opløsningen</b> — vandmolekylerne finder ionerne i krystallens overflade og vender den rigtige ende ind mod dem. Når fire har fat, river de ionen løs. Skru på temperaturen, og se tempoet ændre sig.</li>
-            <li><b>Hvor meget kan der være?</b> — hæld salt i 100 mL vand. Det, der er plads til, opløses; resten bliver liggende som bundfald. Kurven til højre er grænsen, og den gule linje er det, du har hældt i.</li>
+            <li><b>Hvor meget kan der være?</b> — knapperne ovenpå glasset hælder salt i. Aksen står som udgangspunkt fast på 0–100 g, så saltene kan sammenlignes direkte; "Skaler til stoffet" zoomer ind på netop det valgte salt. Kurven er grænsen, og den gule linje er det, du har hældt i.</li>
         </ul>
 
-        <h3>De ni salte</h3>
+        <h3>De seks salte</h3>
         <p>Den grønne streg over knappen betyder <b>letopløseligt</b>, den orange <b>tungtopløseligt</b>. Det salt, du vælger, følger med over på den anden fane.</p>
 
         <h3>Prøv det her</h3>
@@ -163,7 +164,7 @@
             <li>Vælg CaCl₂, og tæl ionerne i krystallen. Der er to Cl⁻ for hver Ca²⁺ — præcis som i formlen.</li>
             <li>Hæld 50 g NaCl i på fane 2, og varm vandet helt op til 100 °C. Hvorfor forsvinder bundfaldet ikke?</li>
             <li>Gør det samme med KNO₃. Her sker der noget helt andet.</li>
-            <li>Vælg Ca(OH)₂, hæld 0,2 g i, og varm op. Det her salt opløses <i>dårligere</i>, jo varmere vandet bliver.</li>
+            <li>Vælg CuSO₄ på fane 2, og hæld lidt i ad gangen. Se vandet blive tydeligt blåt, efterhånden som mere opløses.</li>
         </ul>
 
         <h3>Genveje</h3>

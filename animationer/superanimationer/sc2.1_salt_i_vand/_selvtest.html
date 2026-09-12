@@ -47,7 +47,7 @@ function koer() {
     paastand("NK findes", !!NK);
     if (!NK) { vis(); return; }
     var D = NK.Data;
-    paastand("data.js er kørt", !!(D && D.SALTE && D.SALTE.length === 9), D ? "antal salte: " + D.SALTE.length : "ingen Data");
+    paastand("data.js er kørt", !!(D && D.SALTE && D.SALTE.length === 6), D ? "antal salte: " + D.SALTE.length : "ingen Data");
     paastand("begge faner er bygget", !!(NK.sims && NK.sims["fane-oploes"] && NK.sims["fane-maetning"]));
     if (!NK.sims) { vis(); return; }
 
@@ -61,9 +61,13 @@ function koer() {
     }
     paastand(skalHaveTekst.length + " udlæsninger fyldt ud", tomme.length === 0, "tomme: " + tomme.join(", "));
     paastand("saltknapper i begge paneler",
-        d.querySelectorAll("#oploes-saltvalg .saltknap").length === 9 &&
-        d.querySelectorAll("#maet-saltvalg .saltknap").length === 9);
+        d.querySelectorAll("#oploes-saltvalg .saltknap").length === 6 &&
+        d.querySelectorAll("#maet-saltvalg .saltknap").length === 6);
     paastand("teoriboksen er bygget", d.querySelectorAll("#teori-liste .teorikort").length === D.TEORI.length);
+
+    var teoriknap = d.getElementById("teoriknap"), quizknap = d.getElementById("quizknap");
+    paastand("teori-knappen har synlig tekst", teoriknap.textContent.trim().length > 4, teoriknap.textContent.trim());
+    paastand("quiz-knappen har synlig tekst", quizknap.textContent.trim().length > 4, quizknap.textContent.trim());
 
     overskrift("3. Faneskift — præcis én aktiv ad gangen");
     var faner = ["fane-maetning", "fane-oploes", "fane-maetning"];
@@ -117,7 +121,7 @@ function koer() {
         naer(D.oploeselighed(nacl, -40), nacl.kurve[0]) && naer(D.oploeselighed(nacl, 250), nacl.kurve[5]));
 
     overskrift("7. Let og tungt");
-    var vaentetTunge = ["CaOH2", "CaCO3", "BaSO4", "AgCl"];
+    var vaentetTunge = ["CaCO3", "AgCl"];
     D.SALTE.forEach(function (salt) {
         var tung = D.erTung(salt);
         paastand(salt.formel + " er " + D.typeNavn(salt),
@@ -134,9 +138,25 @@ function koer() {
     var caCl2 = D.salt("CaCl2");
     paastand("CaCl₂ giver 2 Cl⁻(aq)", D.anLed(caCl2) === "2 Cl⁻(aq)", D.anLed(caCl2));
     paastand("CaCl₂ giver 1 Ca²⁺(aq) uden koefficient", D.katLed(caCl2) === "Ca²⁺(aq)", D.katLed(caCl2));
-    var k2so4 = D.salt("K2SO4");
-    paastand("K₂SO₄ giver 2 K⁺(aq)", D.katLed(k2so4) === "2 K⁺(aq)", D.katLed(k2so4));
-    paastand("K₂SO₄ giver SO₄²⁻(aq)", D.anLed(k2so4) === "SO₄²⁻(aq)", D.anLed(k2so4));
+    var cuso4 = D.salt("CuSO4");
+    paastand("CuSO₄ giver Cu²⁺(aq) uden koefficient", D.katLed(cuso4) === "Cu²⁺(aq)", D.katLed(cuso4));
+    paastand("CuSO₄ giver SO₄²⁻(aq)", D.anLed(cuso4) === "SO₄²⁻(aq)", D.anLed(cuso4));
+
+    d.querySelector('.faneknap[data-fane="fane-oploes"]').click();
+    var simOploes = NK.sims["fane-oploes"];
+    var ligningEl = d.getElementById("oploes-ligning");
+    NK.Valg.saet("CaCl2");
+    simOploes.opdater(0.016);
+    paastand("ligningen holder sig på én linje (CaCl₂)",
+        ligningEl.scrollWidth <= ligningEl.clientWidth + 1,
+        ligningEl.scrollWidth + " <= " + ligningEl.clientWidth);
+    NK.Valg.saet("CuSO4");
+    simOploes.opdater(0.016);
+    paastand("ligningen holder sig på én linje (CuSO₄)",
+        ligningEl.scrollWidth <= ligningEl.clientWidth + 1,
+        ligningEl.scrollWidth + " <= " + ligningEl.clientWidth);
+    NK.Valg.saet("NaCl");
+    simOploes.opdater(0.016);
 
     overskrift("9. Fane 1 — krystallen går i opløsning");
     var s1 = NK.sims["fane-oploes"];
@@ -145,20 +165,19 @@ function koer() {
     var iAlt = s1.ioner.length;
     paastand("krystallen har lige mange af hver (NaCl)", tael(s1, 1) === tael(s1, -1),
         tael(s1, 1) + " positive / " + tael(s1, -1) + " negative");
+    paastand("otte vandmolekyler i arbejde", s1.vand.length === 8, String(s1.vand.length));
     koerTid(s1, 60, 0.05);
     paastand("NaCl: ioner er revet løs efter tre sekunder", s1.frie > 0, "frie: " + s1.frie);
-    koerTid(s1, 1140, 0.05);
-    paastand("NaCl: hele krystallen forsvinder inden et minut", s1.tilbage() === 0, "tilbage: " + s1.tilbage());
+    koerTid(s1, 1000, 0.05);
+    paastand("NaCl: godt i gang efter et minut", s1.tilbage() <= iAlt - 10, "tilbage: " + s1.tilbage());
+    koerTid(s1, 1800, 0.05);
+    paastand("NaCl: hele krystallen forsvinder", s1.tilbage() === 0, "tilbage: " + s1.tilbage());
+    paastand("frie ioner krymper", s1.ioner[0].skala < 0.9, "skala: " + s1.ioner[0].skala);
 
     NK.Valg.saet("CaCl2");
     s1.tilpas();
     paastand("CaCl₂: dobbelt så mange Cl⁻ som Ca²⁺", tael(s1, -1) === 2 * tael(s1, 1),
         tael(s1, 1) + " Ca²⁺ / " + tael(s1, -1) + " Cl⁻");
-
-    NK.Valg.saet("K2SO4");
-    s1.tilpas();
-    paastand("K₂SO₄: dobbelt så mange K⁺ som SO₄²⁻", tael(s1, 1) === 2 * tael(s1, -1),
-        tael(s1, 1) + " K⁺ / " + tael(s1, -1) + " SO₄²⁻");
 
     NK.Valg.saet("AgCl");
     s1.tilpas();
@@ -195,15 +214,6 @@ function koer() {
     paastand("100 g KNO₃ ved 20 °C giver bundfald", s2.bundfald() > 60, String(s2.bundfald()));
     s2.saetTemp(100);
     paastand("100 g KNO₃ ved 100 °C er helt opløst", s2.bundfald() === 0, String(s2.bundfald()));
-
-    NK.Valg.saet("CaOH2");
-    s2.nulstil();
-    s2.saetTemp(0);
-    s2.haeldI(5);
-    var koldt = s2.oploest();
-    s2.saetTemp(100);
-    paastand("Ca(OH)₂ opløses dårligere i varmt vand", s2.oploest() < koldt,
-        koldt + " ved 0 °C mod " + s2.oploest() + " ved 100 °C");
 
     NK.Valg.saet("AgCl");
     s2.nulstil();
@@ -255,6 +265,23 @@ function koer() {
     klikVedTemperatur(5);
     paastand("klik i grafen ved 5 °C", Math.abs(s2.temp - 5) < 1.5, String(s2.temp));
     s2.saetTemp(20);
+
+    overskrift("11c. Aksen: fast 0-100 g som udgangspunkt, med skalerings-knap");
+    paastand("aksen er fast som udgangspunkt", s2.autoSkala === false, String(s2.autoSkala));
+    var skalaKnap = d.getElementById("maet-skala-knap");
+    paastand("skala-knappen findes og har tekst", !!skalaKnap && skalaKnap.textContent.trim().length > 3);
+    skalaKnap.click();
+    paastand("knappen slaar om til tilpasset skala", s2.autoSkala === true, String(s2.autoSkala));
+    skalaKnap.click();
+    paastand("og tilbage igen til fast skala", s2.autoSkala === false, String(s2.autoSkala));
+
+    overskrift("11d. Knapperne ligger ovenpå glasset");
+    var glasKnapper = d.getElementById("maet-glasknapper");
+    paastand("knapraden er positioneret ovenpå glasset",
+        glasKnapper && glasKnapper.style.left !== "" && glasKnapper.style.top !== "",
+        glasKnapper ? (glasKnapper.style.left + " / " + glasKnapper.style.top) : "mangler");
+    paastand("de tre knapper (5 g, 25 g, tøm) er der",
+        !!d.getElementById("maet-lidt") && !!d.getElementById("maet-meget") && !!d.getElementById("maet-toem"));
 
     overskrift("12. Quizzen");
     paastand(D.QUIZ.length + " spørgsmål", D.QUIZ.length >= 6);

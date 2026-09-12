@@ -4,7 +4,7 @@
    Oploeselighederne er omtrentlige tabelvaerdier i gram salt pr. 100 mL
    vand ved 0, 20, 40, 60, 80 og 100 °C. De er runde nok til et
    C-niveau, men forholdene mellem saltene er rigtige: NaCl er naesten
-   uafhaengig af temperaturen, KNO₃ stiger voldsomt, og Ca(OH)₂ falder.
+   uafhaengig af temperaturen, og KNO₃ stiger voldsomt.
 
    Et nyt salt kraever én linje i SALTE - resten regner animationen selv.
    ===================================================================== */
@@ -62,31 +62,16 @@
           hverdag: "tøsalt på vejene om vinteren",
           kurve: [59.5, 74.5, 115, 137, 147, 159] },
 
-        { id: "K2SO4", kat: "K",  an: "SO4", p: 2, n: 1,
-          formel: "K₂SO₄",   navn: "kaliumsulfat",
-          hverdag: "gødning til markerne",
-          kurve: [7.4, 11.1, 14.8, 18.2, 21.4, 24.1] },
-
         { id: "CuSO4", kat: "Cu", an: "SO4", p: 1, n: 1,
           formel: "CuSO₄",   navn: "kobber(II)sulfat",
           hverdag: "farver opløsningen klart blå",
           vandfarve: "#2f7fb8",
           kurve: [23.1, 32.0, 44.6, 61.8, 83.8, 114] },
 
-        { id: "CaOH2", kat: "Ca", an: "OH",  p: 1, n: 2,
-          formel: "Ca(OH)₂", navn: "calciumhydroxid",
-          hverdag: "læsket kalk — det, kalkvand er lavet af",
-          kurve: [0.189, 0.173, 0.141, 0.121, 0.094, 0.077] },
-
         { id: "CaCO3", kat: "Ca", an: "CO3", p: 1, n: 1,
           formel: "CaCO₃",   navn: "calciumcarbonat",
           hverdag: "kridt, kalk og marmor",
           kurve: [0.0015, 0.0014, 0.0013, 0.0012, 0.0011, 0.0010] },
-
-        { id: "BaSO4", kat: "Ba", an: "SO4", p: 1, n: 1,
-          formel: "BaSO₄",   navn: "bariumsulfat",
-          hverdag: "kontrastmiddel før en røntgenundersøgelse",
-          kurve: [0.00019, 0.00024, 0.00030, 0.00034, 0.00038, 0.00041] },
 
         { id: "AgCl",  kat: "Ag", an: "Cl",  p: 1, n: 1,
           formel: "AgCl",    navn: "sølvchlorid",
@@ -190,8 +175,8 @@
         { h: "Hvad temperaturen gør",
           p: ["Jo varmere vandet er, jo hurtigere farer vandmolekylerne rundt, og jo hurtigere river de ionerne løs. " +
               "Saltet opløses altså <b>hurtigere</b>.",
-              "For de fleste salte kan der <b>også opløses mere</b> i varmt vand. Men ikke for alle: " +
-              "calciumhydroxid opløses dårligere, jo varmere vandet bliver."] },
+              "For næsten alle salte kan der også <b>opløses mere</b> i varmt vand — kurven på fane 2 stiger. " +
+              "Der findes dog undtagelser i naturen, hvor kurven går den anden vej."] },
 
         { h: "Om tegningen",
           p: ["Billedet er voldsomt forstørret og forenklet. Selv det mindste saltkorn består af mange milliarder ioner, " +
@@ -257,7 +242,7 @@
                  "Ionerne mister deres ladning",
                  "Vandmolekylerne bevæger sig langsommere"],
           rigtig: 0,
-          hvorfor: "Varmt vand betyder hurtigere vandmolekyler. Der er dog undtagelser: Ca(OH)₂ opløses dårligere i varmt vand." },
+          hvorfor: "Varmt vand betyder hurtigere vandmolekyler. De fleste salte følger med og opløses bedre — men det er ikke en naturlov, og der findes undtagelser." },
 
         { q: "Bliver ionerne til nye stoffer, når saltet opløses?",
           svar: ["Nej — det er de samme ioner, de er bare kommet fra hinanden",

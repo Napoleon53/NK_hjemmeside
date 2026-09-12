@@ -73,10 +73,12 @@ window.NK = NK;
         return String(s).split("").map(function (c) { return SAENKET[c] || c; }).join("");
     };
 
-    /* Ladningen som tal, saadan som den staar i bogen: 0, 1+, 2- */
+    /* Ladningen som tal, saadan som den staar i bogen: 0, +, 2−.
+       En ion med ladning 1 hedder ikke "1+" - den hedder bare "+". */
     NK.ladningstekst = function (q) {
         if (q === 0) return "0";
-        return Math.abs(q) + (q > 0 ? "+" : "−");
+        var stoerrelse = Math.abs(q);
+        return (stoerrelse === 1 ? "" : stoerrelse) + (q > 0 ? "+" : "−");
     };
 
     /* Samme, men som haevet skrift til brug efter et symbol: Na⁺, O²⁻ */

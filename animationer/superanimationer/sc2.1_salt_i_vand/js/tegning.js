@@ -93,6 +93,12 @@
         return positivIon ? v + Math.PI / 2 : v - Math.PI / 2;
     };
 
+    /* opt.spidsH: naar sand, er det hydrogenerne (ikke oxygen), der
+       sidder naermest ankerpunktet (x,y). Det er dét, der goer, at
+       hydrogen-enden - og ikke oxygen - kan pege ind mod en negativ ion:
+       oxygen (δ−) hoerer hjemme ved en positiv ion, hydrogen (δ+) ved en
+       negativ. Uden denne omvending ville oxygen altid ligge naermest
+       ionen, uanset ladning, fordi oxygen er tegnet i (0,0). */
     T.vand = function (ctx, x, y, vinkel, skala, opt) {
         opt = opt || {};
         var oR = 12 * skala;
@@ -103,6 +109,7 @@
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(vinkel);
+        if (opt.spidsH) ctx.translate(0, -hy);
         ctx.globalAlpha = opt.alpha === undefined ? 1 : opt.alpha;
 
         ctx.strokeStyle = "rgba(226, 234, 242, 0.55)";
@@ -153,9 +160,13 @@
 
     /* ----- Baegerglasset ------------------------------------------------- */
     /* x, y, b, h er glassets indvendige maal. vandTop er y-vaerdien for
-       vandoverfladen. farve toner vandet, saa fx CuSO₄ kan farve det blaat. */
-    T.glas = function (ctx, x, y, b, h, vandTop, farve, klarhed) {
+       vandoverfladen. farve toner vandet, saa fx CuSO₄ kan farve det blaat.
+       opt.graduering: true tegner mL-streger op ad hoejre side - kun
+       relevant, naar hoejden rent faktisk svarer til 100 mL (fane 2). */
+    T.glas = function (ctx, x, y, b, h, vandTop, farve, klarhed, opt) {
+        opt = opt || {};
         var bund = y + h;
+        var top = y - 14;
 
         ctx.save();
 
@@ -181,19 +192,51 @@
         ctx.lineTo(x + b, vandTop);
         ctx.stroke();
 
-        /* Selve glasset: to sider og en bund, aabent foroven */
+        /* Selve glasset: to sider og en bund, med en lille hældetud i
+           toppen til hoejre - det er dét, der goer det til et baegerglas
+           og ikke bare et rektangel. */
         ctx.strokeStyle = "rgba(200, 220, 240, 0.42)";
         ctx.lineWidth = 3;
         ctx.lineJoin = "round";
         ctx.lineCap = "round";
         ctx.beginPath();
-        ctx.moveTo(x, y - 14);
+        ctx.moveTo(x, top);
         ctx.lineTo(x, bund - 10);
         ctx.quadraticCurveTo(x, bund, x + 10, bund);
         ctx.lineTo(x + b - 10, bund);
         ctx.quadraticCurveTo(x + b, bund, x + b, bund - 10);
-        ctx.lineTo(x + b, y - 14);
+        ctx.lineTo(x + b, top + 9);
+        ctx.quadraticCurveTo(x + b, top - 1, x + b + 8, top - 8);
         ctx.stroke();
+
+        /* Randen foroven - en flad ellipsebue antyder glassets tykkelse
+           og runder aabningen af, i stedet for at den bare stopper brat. */
+        ctx.beginPath();
+        ctx.ellipse(x + b / 2, top, b / 2, 4.5, 0, 0, Math.PI, true);
+        ctx.stroke();
+
+        /* mL-graduering: fire streger med tal, ligesom paa et rigtigt
+           maalebaegerglas. Kun paa den fane, hvor hoejden er 100 mL. */
+        if (opt.graduering) {
+            var maerker = [25, 50, 75, 100];
+            ctx.save();
+            ctx.strokeStyle = "rgba(214, 226, 238, 0.5)";
+            ctx.fillStyle = "rgba(202, 214, 228, 0.78)";
+            ctx.lineWidth = 1.3;
+            ctx.font = "500 10.5px 'Segoe UI', sans-serif";
+            ctx.textAlign = "left";
+            ctx.textBaseline = "middle";
+            maerker.forEach(function (ml) {
+                var yy = bund - (ml / 100) * (bund - vandTop);
+                var laengde = ml === 100 ? 12 : 7;
+                ctx.beginPath();
+                ctx.moveTo(x + b - laengde, yy);
+                ctx.lineTo(x + b, yy);
+                ctx.stroke();
+                ctx.fillText(String(ml), x + b + 4, yy);
+            });
+            ctx.restore();
+        }
 
         /* Et enkelt lysglimt ned ad venstre side */
         ctx.strokeStyle = "rgba(255, 255, 255, 0.16)";
