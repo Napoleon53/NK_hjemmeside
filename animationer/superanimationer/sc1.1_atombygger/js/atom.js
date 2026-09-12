@@ -571,17 +571,18 @@
         var v = vinkel === undefined ? Math.PI * 0.75 : vinkel;
         var pladser = NK.Data.SKALPLADSER;
 
+        var skrift = "700 14px 'Segoe UI', sans-serif";
         for (var i = 0; i < atom.fordeling.length; i++) {
-            var r = g.geo.rSkal[i] * g.s + 21;
+            var r = g.geo.rSkal[i] * g.s + 23;
             var x = g.cx + Math.cos(v) * r;
             var y = g.cy + Math.sin(v) * r;
             var fuld = atom.fordeling[i] === pladser[i];
             var tekst = atom.fordeling[i] + "/" + pladser[i];
 
             ctx.save();
-            ctx.font = "700 11px 'Segoe UI', sans-serif";
-            var b = ctx.measureText(tekst).width + 12;
-            NK.rundtRekt(ctx, x - b / 2, y - 9, b, 18, 9);
+            ctx.font = skrift;
+            var b = ctx.measureText(tekst).width + 15;
+            NK.rundtRekt(ctx, x - b / 2, y - 11, b, 22, 11);
             ctx.fillStyle = fuld ? "rgba(63, 174, 114, 0.22)" : "rgba(20, 20, 26, 0.78)";
             ctx.fill();
             ctx.strokeStyle = fuld ? "rgba(63, 174, 114, 0.75)" : "rgba(255, 255, 255, 0.16)";
@@ -590,7 +591,7 @@
             ctx.restore();
 
             NK.tekst(ctx, tekst, x, y + 0.5, {
-                font: "700 11px 'Segoe UI', sans-serif",
+                font: skrift,
                 justering: "center", linje: "middle",
                 farve: fuld ? "#7ee0a8" : "#c8ced6"
             });

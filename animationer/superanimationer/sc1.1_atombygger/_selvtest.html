@@ -49,7 +49,7 @@ function koer() {
     overskrift("2. Panelerne er fyldt ud ved opstart");
     var skalHaveTekst = ["byg-grundstof", "byg-massetal", "byg-ladning", "byg-kerne",
         "byg-opgave", "iso-regnestykke",
-        "ion-navn", "ion-fordeling", "ion-status",
+        "ion-navn", "ion-fordeling",
         "salt-formel", "salt-navn", "salt-balance", "salt-forhold", "salt-metal-info"];
     var tomme = [];
     for (i = 0; i < skalHaveTekst.length; i++) {
@@ -137,7 +137,7 @@ function koer() {
     paastand("én elektron faerre giver ladning 1+",
         d.getElementById("byg-ladning").textContent.indexOf("1+") === 0,
         d.getElementById("byg-ladning").textContent);
-    paastand("og maerkatet siger kation",
+    paastand("og maerkatet siger positiv ion",
         d.getElementById("byg-type").textContent.indexOf("Positiv") === 0,
         d.getElementById("byg-type").textContent);
 

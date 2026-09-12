@@ -207,8 +207,8 @@
         var maerkat, maerkatKlasse;
         if (!g) { maerkat = "Ingenting endnu"; maerkatKlasse = "maerke"; }
         else if (q === 0) { maerkat = "Neutralt atom"; maerkatKlasse = "maerke groen"; }
-        else if (q > 0) { maerkat = "Positiv ion (kation)"; maerkatKlasse = "maerke roed"; }
-        else { maerkat = "Negativ ion (anion)"; maerkatKlasse = "maerke blaa"; }
+        else if (q > 0) { maerkat = "Positiv ion"; maerkatKlasse = "maerke roed"; }
+        else { maerkat = "Negativ ion"; maerkatKlasse = "maerke blaa"; }
         NK.saetTekst("byg-type", maerkat);
         NK.saetKlasse("byg-type", maerkatKlasse);
 

@@ -38,6 +38,10 @@
         });
 
         NK.el("ion-gaet-knap").addEventListener("click", function () { mig.startGaet(); });
+        NK.el("ion-gaet-hint-knap").addEventListener("click", function () {
+            var vis = NK.el("ion-gaet-hint").classList.toggle("vis");
+            this.textContent = vis ? "Skjul hint" : "Vis hint";
+        });
         NK.el("ion-videre").addEventListener("click", function () { mig.visIon(); });
         NK.el("ion-nulstil").addEventListener("click", function () { mig.visGrundstof(mig.z, true); });
         NK.el("ion-naeste").addEventListener("click", function () {
@@ -75,8 +79,7 @@
         NK.saetTekst("ion-resultat", "");
         NK.saetKlasse("ion-resultat", "besked");
         NK.el("ion-gaet-boks").classList.remove("vis");
-        this.visStatus(g.navn + " har " + valens + " elektron" + (valens === 1 ? "" : "er")
-            + " i yderste skal.", "");
+        this.visStatus("", "");
     };
 
     /* ----- Oktetreglen, sagt for dette grundstof ---------------------------- */
@@ -120,13 +123,18 @@
     /* ----- Gaettet ---------------------------------------------------------- */
     NK.SimIon.prototype.startGaet = function () {
         var g = this.grundstof();
-        var fordeling = D.skalfordeling(g.z);
         var mig = this;
         this.tilstand = "gaet";
 
         NK.saetTekst("ion-gaet-sp", "Hvilken ladning får " + g.navn.toLowerCase() + ", når det bliver til en ion?");
-        NK.saetTekst("ion-gaet-hint", "Til hjælp: elektronfordelingen er (" + fordeling.join(", ") + "), altså "
-            + fordeling[fordeling.length - 1] + " elektroner i yderste skal.");
+
+        /* Hintet peger paa AEDELGASREGLEN uden at afsloere selve svaret -
+           eleven skal stadig selv taelle efter i sin egen elektronfordeling. */
+        NK.saetTekst("ion-gaet-hint", "Atomer “vil” gerne ende med samme elektronantal som den nærmeste ædelgas "
+            + "(2, 10 eller 18 elektroner). Tæl selv, om " + g.navn.toLowerCase()
+            + " kommer dertil hurtigst ved at afgive eller optage elektroner — og hvor mange der skal til.");
+        NK.saetKlasse("ion-gaet-hint", "note hint");
+        NK.saetTekst("ion-gaet-hint-knap", "Vis hint");
 
         var boks = NK.el("ion-gaet-valg");
         boks.innerHTML = "";

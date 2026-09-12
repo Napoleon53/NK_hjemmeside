@@ -577,6 +577,25 @@ main { flex: 1; position: relative; min-height: 0; }
 
 .gaetsp { margin: 0 0 4px 0; font-size: 0.86rem; font-weight: 600; line-height: 1.4; }
 
+.hintknap {
+    display: inline-block;
+    background: transparent;
+    border: none;
+    color: var(--gul);
+    font-family: inherit;
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+    margin: 0 0 8px 0;
+}
+
+.hintknap:hover { color: #ffffff; }
+
+.note.hint { display: none; }
+.note.hint.vis { display: block; margin-bottom: 8px; }
+
 .gaetvalg {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
