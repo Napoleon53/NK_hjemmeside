@@ -120,6 +120,27 @@
         NK.el("ion-videre").style.display = "none";
     };
 
+    /* Hintet peger paa AEDELGASREGLEN ved at navngive den konkrete
+       ædelgas, grundstoffet stiler mod - ikke en generel liste af tal
+       (2, 10, 18), som let forveksles med et maal i sig selv. Reglen
+       handler om YDERSTE skal, ikke om totalen. Eleven skal stadig selv
+       taelle efter, om der skal afgives eller optages. */
+    NK.SimIon.prototype.hintTekst = function (g) {
+        var maalE = g.z - g.ion;
+        var aedel = D.aedelgasStruktur(maalE);
+        if (aedel) {
+            var struktur = D.skalfordeling(aedel.z).join(", ");
+            return g.navn + " vil gerne ligne sin nærmeste ædelgas " + aedel.navn + " (" + aedel.symbol
+                + "), som har elektronstrukturen " + struktur + ". Elektroner er negativt ladede, så tæl efter, "
+                + "om " + g.navn.toLowerCase() + " skal afgive eller optage elektroner for at få den samme struktur i yderste skal.";
+        }
+        /* Kun hydrogen rammer hertil: mister det sin ene elektron, staar
+           der 0 elektroner tilbage, og det ligner ingen ædelgas. */
+        var valens = D.skalfordeling(g.z)[D.skalfordeling(g.z).length - 1];
+        return g.navn + " har kun " + valens + " elektron i sin eneste skal. Elektroner er negativt ladede, "
+            + "så overvej, hvad der sker med atomets ladning, hvis den elektron forsvinder helt.";
+    };
+
     /* ----- Gaettet ---------------------------------------------------------- */
     NK.SimIon.prototype.startGaet = function () {
         var g = this.grundstof();
@@ -128,11 +149,7 @@
 
         NK.saetTekst("ion-gaet-sp", "Hvilken ladning får " + g.navn.toLowerCase() + ", når det bliver til en ion?");
 
-        /* Hintet peger paa AEDELGASREGLEN uden at afsloere selve svaret -
-           eleven skal stadig selv taelle efter i sin egen elektronfordeling. */
-        NK.saetTekst("ion-gaet-hint", "Atomer “vil” gerne ende med samme elektronantal som den nærmeste ædelgas "
-            + "(2, 10 eller 18 elektroner). Tæl selv, om " + g.navn.toLowerCase()
-            + " kommer dertil hurtigst ved at afgive eller optage elektroner — og hvor mange der skal til.");
+        NK.saetTekst("ion-gaet-hint", this.hintTekst(g));
         NK.saetKlasse("ion-gaet-hint", "note hint");
         NK.saetTekst("ion-gaet-hint-knap", "Vis hint");
 
