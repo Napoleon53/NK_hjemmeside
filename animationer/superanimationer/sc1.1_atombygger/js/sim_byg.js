@@ -55,8 +55,8 @@
             var forskel = mig.p - mig.e;
             mig.e = mig.p;
             mig.anvend(forskel > 0
-                ? "Du fyldte " + tal(forskel, "elektron", "elektroner") + " på. Nu er der lige mange protoner og elektroner — atomet er neutralt."
-                : "Du fjernede " + tal(-forskel, "elektron", "elektroner") + ". Nu er der lige mange protoner og elektroner — atomet er neutralt.");
+                ? "Du fyldte " + NK.talform(forskel, "elektron", "elektroner") + " på. Nu er der lige mange protoner og elektroner — atomet er neutralt."
+                : "Du fjernede " + NK.talform(-forskel, "elektron", "elektroner") + ". Nu er der lige mange protoner og elektroner — atomet er neutralt.");
         });
 
         NK.el("byg-almindelig").addEventListener("click", function () {
@@ -79,10 +79,6 @@
         NK.el("byg-opgave-ny").addEventListener("click", function () { mig.nyOpgave(); });
         NK.el("byg-opgave-svar").addEventListener("click", function () { mig.visSvar(); });
     };
-
-    function tal(n, ental, flertal) {
-        return n + " " + (n === 1 ? ental : flertal);
-    }
 
     /* ----- Aendring af ét tal ---------------------------------------------- */
     NK.SimByg.prototype.aendr = function (slags, retning) {
@@ -192,9 +188,7 @@
         NK.saetTekst("byg-nuklid-sym", g ? g.symbol : "?");
         NK.saetTekst("byg-nuklid-a", this.p ? String(a) : "");
         NK.saetTekst("byg-nuklid-z", this.p ? String(this.p) : "");
-        /* Kemikerens skrivemaade dropper "1"-tallet: en enkelt ladning
-           skrives bare "+" eller "−", ikke "1+" eller "1−". */
-        NK.saetTekst("byg-nuklid-q", q === 0 ? "" : (Math.abs(q) === 1 ? (q > 0 ? "+" : "−") : NK.ladningstekst(q)));
+        NK.saetTekst("byg-nuklid-q", q === 0 ? "" : NK.ladningstekst(q));
         NK.saetKlasse("byg-nuklid-q", q > 0 ? "q plus" : (q < 0 ? "q minus" : "q"));
 
         NK.saetTekst("byg-grundstof", g ? g.navn : "— endnu ikke et grundstof —");
@@ -275,7 +269,7 @@
                 tekst: "Byg et neutralt atom af " + g.navn.toLowerCase() + " (" + g.symbol + ") med massetal " + i.a + ".",
                 p: g.z, n: i.a - g.z, e: g.z,
                 svar: "Massetal = protoner + neutroner, så " + i.a + " − " + g.z + " = "
-                    + tal(i.a - g.z, "neutron", "neutroner") + ". Neutralt betyder lige mange elektroner som protoner."
+                    + NK.talform(i.a - g.z, "neutron", "neutroner") + ". Neutralt betyder lige mange elektroner som protoner."
             };
         },
         /* 2. En ion af et grundstof, der danner ioner. */
@@ -286,7 +280,7 @@
             return {
                 tekst: "Byg ionen " + g.symbol + NK.ladningHaevet(g.ion) + " med den kerne, der er mest af i naturen.",
                 p: g.z, n: i.a - g.z, e: g.z - g.ion,
-                svar: "Ladningen " + NK.ladningstekst(g.ion) + " betyder " + tal(Math.abs(g.ion), "elektron", "elektroner")
+                svar: "Ladningen " + NK.ladningstekst(g.ion) + " betyder " + NK.talform(Math.abs(g.ion), "elektron", "elektroner")
                     + " " + (g.ion > 0 ? "færre" : "flere") + " end protoner."
                     + (aedel ? " Elektronerne ligger nu som i " + aedel.navn.toLowerCase() + "." : "")
             };
@@ -304,7 +298,7 @@
                 tekst: "Naturens " + g.navn.toLowerCase() + " er for det meste " + g.symbol + "-" + almindelig.a
                     + ". Byg det neutrale atom af den sjældnere isotop " + g.symbol + "-" + valgt.a + ".",
                 p: g.z, n: valgt.a - g.z, e: g.z,
-                svar: "Stadig " + tal(g.z, "proton", "protoner") + ", for de bestemmer grundstoffet. Kun neutrontallet skifter fra "
+                svar: "Stadig " + NK.talform(g.z, "proton", "protoner") + ", for de bestemmer grundstoffet. Kun neutrontallet skifter fra "
                     + (almindelig.a - g.z) + " til " + (valgt.a - g.z) + "."
             };
         },
@@ -315,8 +309,8 @@
             var q = g.ion === null ? 0 : g.ion;
             var e = NK.klamp(g.z - q, 0, MAKS_E);
             return {
-                tekst: "Byg partiklen med " + tal(g.z, "proton", "protoner") + ", " + tal(i.a - g.z, "neutron", "neutroner")
-                    + " og " + tal(e, "elektron", "elektroner") + ". Hvad er det, du har bygget?",
+                tekst: "Byg partiklen med " + NK.talform(g.z, "proton", "protoner") + ", " + NK.talform(i.a - g.z, "neutron", "neutroner")
+                    + " og " + NK.talform(e, "elektron", "elektroner") + ". Hvad er det, du har bygget?",
                 p: g.z, n: i.a - g.z, e: e,
                 svar: "Det er " + g.symbol + NK.ladningHaevet(g.z - e) + " med massetal " + i.a + ". Altså "
                     + g.navn.toLowerCase() + "-" + i.a + (g.z - e === 0 ? " som neutralt atom." : " som ion.")
@@ -336,9 +330,9 @@
                 tekst: "Byg en ion med ladningen " + NK.ladningstekst(g.ion) + ", som har præcis samme elektronstruktur som "
                     + aedel.navn.toLowerCase() + " (" + D.skalfordeling(aedel.z).join(", ") + "). Brug den almindelige kerne.",
                 p: g.z, n: iso.a - g.z, e: g.z - g.ion,
-                svar: "Der skal " + tal(g.z - g.ion, "elektron", "elektroner") + " til for at ligne "
+                svar: "Der skal " + NK.talform(g.z - g.ion, "elektron", "elektroner") + " til for at ligne "
                     + aedel.navn.toLowerCase() + ". Ladningen " + NK.ladningstekst(g.ion) + " svarer så til "
-                    + tal(g.z, "proton", "protoner") + ": " + g.navn.toLowerCase() + "."
+                    + NK.talform(g.z, "proton", "protoner") + ": " + g.navn.toLowerCase() + "."
             };
         }
     ];

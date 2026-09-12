@@ -182,26 +182,22 @@
 <!-- FANE 4: SALTE                                                      -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-salt" role="tabpanel" aria-label="Salte">
-    <div class="scene medtekst">
+    <div class="scene">
         <canvas id="salt-laerred"></canvas>
-        <div class="scene-mrk" id="salt-status"></div>
+
+        <div class="saltvalg saltvalg-metal">
+            <label for="salt-metal">Metal · afgiver e⁻</label>
+            <select id="salt-metal" class="vaelger"></select>
+        </div>
+        <div class="saltvalg saltvalg-ikkemetal">
+            <label for="salt-ikkemetal">Ikke-metal · optager e⁻</label>
+            <select id="salt-ikkemetal" class="vaelger"></select>
+        </div>
     </div>
 
     <aside class="panel">
         <div class="kort">
-            <h2>Vælg to grundstoffer</h2>
-            <label class="vlabel" for="salt-metal">Metal — afgiver elektroner</label>
-            <select id="salt-metal" class="vaelger"></select>
-            <p class="note" id="salt-metal-info"></p>
-
-            <label class="vlabel" for="salt-ikkemetal" style="margin-top:12px;">Ikke-metal — optager elektroner</label>
-            <select id="salt-ikkemetal" class="vaelger"></select>
-            <p class="note" id="salt-ikkemetal-info"></p>
-        </div>
-
-        <div class="kort fremhaev">
-            <h2>Hvor mange af hver?</h2>
-            <p class="besked" id="salt-forhold"></p>
+            <button class="knap stor blaa" id="salt-laes-mere" type="button"><span>Læs mere om reaktionen</span><span class="tegn">?</span></button>
         </div>
 
         <div class="kort maaling">
@@ -217,7 +213,6 @@
             <h2>Kør forsøget</h2>
             <button class="knap stor orange" id="salt-overfoer" type="button"><span>Overfør elektronerne</span><span class="tegn">⚡</span></button>
             <button class="knap stor groen" id="salt-saml" type="button" style="margin-top:7px;"><span>Saml ionerne til et salt</span><span class="tegn">🧂</span></button>
-            <button class="knap nulstil" id="salt-nulstil" type="button"><span>Start forfra</span><span class="tegn">↺</span></button>
         </div>
     </aside>
 </section>
@@ -231,6 +226,17 @@
         <div class="ligning beregning" id="iso-regnestykke"></div>
         <div class="knapper" style="margin-top:18px;">
             <button class="knap blaa" id="iso-beregning-luk" style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<div class="overlay" id="salt-forklaring">
+    <div class="overlay-boks">
+        <h2 id="salt-forklaring-titel">Hvorfor NaCl?</h2>
+        <p id="salt-forklaring-tekst"></p>
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="salt-forklaring-luk" style="justify-content:center;">Luk</button>
         </div>
     </div>
 </div>

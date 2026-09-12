@@ -49,6 +49,18 @@ window.NK = NK;
         return a + (b - a) * t;
     };
 
+    /* "1 elektron" mod "2 elektroner" - bruges alle steder, et tal
+       skrives ud sammen med et navneord. */
+    NK.talform = function (n, ental, flertal) {
+        return n + " " + (n === 1 ? ental : flertal);
+    };
+
+    /* Blod tallet 0-1 til en S-kurve - samme glidende start/stop som
+       resten af animationerne, til brug uden for atom.js. */
+    NK.blod = function (t) {
+        return t * t * (3 - 2 * t);
+    };
+
     /* Blod bevaegelse mod et maal, uafhaengigt af billedraten. */
     NK.mod = function (nu, maal, hastighed, dt) {
         var t = 1 - Math.exp(-hastighed * dt);
@@ -85,11 +97,14 @@ window.NK = NK;
         return String(s).split("").map(function (c) { return SAENKET[c] || c; }).join("");
     };
 
-    /* Ladningen som tal, saadan som den staar i bogen: 0, 1+, 2-.
-       Det haevede symbol efter et grundstof (Na⁺) er ladningHaevet. */
+    /* Ladningen som tal, saadan som den staar i bogen: 0, +, 2-.
+       Encifrede ladninger skrives uden tallet (+, ikke 1+) - praecis som
+       i kemikerens egen skrivemaade. Det haevede symbol efter et
+       grundstof (Na⁺) er ladningHaevet. */
     NK.ladningstekst = function (q) {
         if (q === 0) return "0";
-        return Math.abs(q) + (q > 0 ? "+" : "−");
+        var stoerrelse = Math.abs(q);
+        return (stoerrelse === 1 ? "" : stoerrelse) + (q > 0 ? "+" : "−");
     };
 
     /* Samme, men som haevet skrift til brug efter et symbol: Na⁺, O²⁻ */

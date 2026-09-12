@@ -50,7 +50,7 @@ function koer() {
     var skalHaveTekst = ["byg-grundstof", "byg-massetal", "byg-ladning", "byg-kerne",
         "byg-opgave", "iso-regnestykke",
         "ion-navn", "ion-fordeling",
-        "salt-formel", "salt-navn", "salt-balance", "salt-forhold", "salt-metal-info"];
+        "salt-formel", "salt-navn", "salt-balance"];
     var tomme = [];
     for (i = 0; i < skalHaveTekst.length; i++) {
         var e = d.getElementById(skalHaveTekst[i]);
@@ -126,16 +126,16 @@ function koer() {
     paastand("6 protoner giver carbon", d.getElementById("byg-grundstof").textContent === "Carbon");
     byg.aendr("p", 1);
     paastand("én proton mere giver nitrogen", d.getElementById("byg-grundstof").textContent === "Nitrogen");
-    paastand("og elektronerne foelger ikke med, saa ladningen bliver 1+",
-        d.getElementById("byg-ladning").textContent.indexOf("1+") === 0,
+    paastand("og elektronerne foelger ikke med, saa ladningen bliver +",
+        d.getElementById("byg-ladning").textContent.indexOf("+") === 0,
         d.getElementById("byg-ladning").textContent);
     d.getElementById("byg-neutral").click();
     paastand("\"Goer det neutralt\" nulstiller ladningen",
         d.getElementById("byg-ladning").textContent.indexOf("0") === 0,
         d.getElementById("byg-ladning").textContent);
     byg.aendr("e", -1);
-    paastand("én elektron faerre giver ladning 1+",
-        d.getElementById("byg-ladning").textContent.indexOf("1+") === 0,
+    paastand("én elektron faerre giver ladning +",
+        d.getElementById("byg-ladning").textContent.indexOf("+") === 0,
         d.getElementById("byg-ladning").textContent);
     paastand("og maerkatet siger positiv ion",
         d.getElementById("byg-type").textContent.indexOf("Positiv") === 0,

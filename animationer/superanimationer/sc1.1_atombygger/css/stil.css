@@ -348,6 +348,34 @@ main { flex: 1; position: relative; min-height: 0; }
 .kernekort.gul   { color: #f0d77a; border-color: rgba(242, 197, 61, 0.45); }
 .kernekort.skidt { color: #f0918a; border-color: rgba(224, 84, 70, 0.45); }
 
+/* Grundstofvalget paa saltfanen sidder oven paa scenen, lige over hver
+   sin soejle af atomer - saa valget og resultatet haenger sammen visuelt
+   i stedet for at ligge i et panel langt fra det, det paavirker. */
+.saltvalg {
+    position: absolute;
+    top: 14px;
+    width: 196px;
+    max-width: calc(50% - 22px);
+    background-color: rgba(20, 20, 26, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius);
+    padding: 8px 10px;
+    box-shadow: var(--skygge);
+}
+
+.saltvalg label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--tekst-mat);
+    margin-bottom: 4px;
+    white-space: nowrap;
+}
+
+.saltvalg-metal     { left: 27%; transform: translateX(-50%); }
+.saltvalg-ikkemetal { left: 73%; transform: translateX(-50%); }
+
 /* ---------------------------------------------------------------------
    HOEJRE SPALTE
    --------------------------------------------------------------------- */
@@ -658,8 +686,6 @@ main { flex: 1; position: relative; min-height: 0; }
 .fformel { font-size: 1.6rem; font-weight: 600; color: #6ef2a8; }
 .fnavn { font-size: 0.82rem; color: var(--tekst-svag); text-align: right; }
 
-.vlabel { display: block; font-size: 0.78rem; color: #c8ced6; margin-bottom: 5px; }
-
 /* ---------------------------------------------------------------------
    FELTER, VAELGERE OG SKYDERE
    --------------------------------------------------------------------- */
@@ -772,15 +798,6 @@ input[type="range"]::-moz-range-thumb {
 .knap.orange { background-color: var(--orange-mork); border-color: var(--orange); }
 .knap.orange:hover:not(:disabled) { background-color: var(--orange); }
 
-.knap.nulstil {
-    background-color: transparent;
-    border-color: #5b3b39;
-    color: #e08b81;
-    margin-top: 8px;
-}
-
-.knap.nulstil:hover:not(:disabled) { background-color: rgba(224, 84, 70, 0.16); border-color: var(--roed); }
-
 .knaprad { display: flex; gap: 6px; margin-top: 9px; }
 .knaprad .knap { flex: 1; justify-content: center; padding: 8px 6px; }
 
@@ -884,6 +901,9 @@ select:focus-visible {
     .nuklid { padding: 8px 13px 8px 10px; }
     .nuklid .sym { font-size: 2.2rem; }
     .opgave-boks { top: 15px; width: calc(100% - 30px); left: 15px; }
+    .saltvalg { width: auto; top: 70px; padding: 6px 8px; }
+    .saltvalg label { font-size: 0.6rem; white-space: normal; }
+    .saltvalg select { font-size: 0.7rem; padding: 6px 4px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
