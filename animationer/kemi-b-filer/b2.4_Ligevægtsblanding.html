@@ -1037,13 +1037,19 @@
 
         let pForward, pBackward;
 
-        if (isAtEquilibrium(counts, currentK)) {
+        if (Date.now() < instantHoldUntil) {
+            // Der skal altid gå mindst et sekund fra et indgreb, til ligevægten
+            // begynder at indstille sig igen - ellers når man slet ikke at se,
+            // at der lige er sket noget
+            pForward = 0;
+            pBackward = 0;
+        } else if (isAtEquilibrium(counts, currentK)) {
             // Systemet står ved ligevægtspunktet (det nåelige tilstand tættest på K)
             if (dynamicMode) {
                 // Reaktionen forløber tydeligt i begge retninger på mikroplan,
                 // selvom Y og K samlet set er konstante (dynamisk ligevægt)
-                pForward = 0.12;
-                pBackward = 0.018;
+                pForward = 0.096;
+                pBackward = 0.0144;
             } else {
                 // Ved ligevægtspunktet kan der ikke ske reaktioner, så antallet af
                 // Fe³⁺, SCN⁻ og FeSCN²⁺ forbliver helt stabilt
@@ -1052,12 +1058,14 @@
             }
         } else if (currentY < currentK) {
             // For lidt kompleks i forhold til K -> fremadrettet reaktion fremmes
-            pForward = 0.3;
-            pBackward = 0.0005;
+            // (hastigheden er sat 20% ned i forhold til de oprindelige værdier)
+            pForward = 0.24;
+            pBackward = 0.0004;
         } else {
             // For meget kompleks i forhold til K -> tilbagereaktion fremmes
-            pForward = 0.01;
-            pBackward = 0.015;
+            // (hastigheden er sat 20% ned i forhold til de oprindelige værdier)
+            pForward = 0.008;
+            pBackward = 0.012;
         }
 
         // Tjek for dissociation (FeSCN -> Fe + SCN)
@@ -1686,14 +1694,16 @@
         }
     }
 
-    // Efter et indgreb i instant-tilstand: vis først selve indgrebet på grafen, og
-    // lad derefter systemet falde på plads i ligevægtspunktet
+    // Efter ethvert indgreb: hold reaktionen tilbage i mindst et sekund, så
+    // indgrebet selv når at blive vist på grafen, før noget begynder at ændre
+    // sig igen. I instant-tilstand springer systemet derefter direkte til
+    // ligevægtspunktet; ellers falder det bare selv på plads i sit eget tempo.
     function scheduleInstantEquilibrium() {
-        if (!isInstantMode()) return;
-
         holdInstantEquilibrium();
         pushHistory();
         drawGraph();
+
+        if (!isInstantMode()) return;
 
         setTimeout(function() {
             instantHoldUntil = 0; // Den løbende korrektion må køre igen
