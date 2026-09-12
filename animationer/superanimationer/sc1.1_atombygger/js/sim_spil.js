@@ -277,11 +277,10 @@
        ikke noget, man kan se paa ét skaermbillede. */
     NK.SPIL_BANER = BANER;
 
-    function stjerner(rigtige) {
-        var antal = rigtige >= 5 ? 3 : (rigtige >= 4 ? 2 : (rigtige >= 3 ? 1 : 0));
-        var ud = "";
-        for (var i = 0; i < 3; i++) ud += (i < antal ? "★" : "☆");
-        return ud;
+    /* Kun det fulde hus giver et hjerte. Alt andet staar bare som sit
+       eget tal - ingen halve trofaeer at samle paa. */
+    function hjerte(rigtige) {
+        return rigtige === SPOERGSMAAL_PR_BANE ? "♥" : "";
     }
 
     function dom(rigtige) {
@@ -307,7 +306,7 @@
     }
 
     function banestatustekst(b) {
-        if (b.perfekt) return "★ 5/5";
+        if (b.perfekt) return "♥ 5/5";
         if (b.faerdig) return b.rigtige + "/5 rigtige";
         if (b.nr > 0) return "spm. " + b.nr + "/5";
         return "ikke prøvet";
@@ -455,7 +454,7 @@
         if (b.faerdig) {
             NK.saetTekst("spil-resultatnavn", BANER[this.aktiv].navn);
             NK.saetTekst("spil-score", b.rigtige + " / " + SPOERGSMAAL_PR_BANE);
-            NK.saetTekst("spil-stjerner", stjerner(b.rigtige));
+            NK.saetTekst("spil-hjerte", hjerte(b.rigtige));
             NK.saetTekst("spil-dom", dom(b.rigtige));
             return;
         }
@@ -548,12 +547,15 @@
         var b = this.baner[this.aktiv];
 
         if (b.faerdig) {
-            NK.tekst(c, b.rigtige + " / " + SPOERGSMAAL_PR_BANE, cx, cy - 26, {
+            var fuldtHus = (b.rigtige === SPOERGSMAAL_PR_BANE);
+            NK.tekst(c, b.rigtige + " / " + SPOERGSMAAL_PR_BANE, cx, fuldtHus ? cy - 26 : cy, {
                 font: "800 76px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#f2c53d"
             });
-            NK.tekst(c, stjerner(b.rigtige), cx, cy + 44, {
-                font: "400 44px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#f2c53d"
-            });
+            if (fuldtHus) {
+                NK.tekst(c, "♥", cx, cy + 46, {
+                    font: "400 52px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#ff7b8a"
+                });
+            }
             return;
         }
 

@@ -760,8 +760,9 @@ button.pcelle:hover { border-color: rgba(255, 255, 255, 0.55); }
 }
 
 .baneknap.aktiv .bstatus { color: rgba(255, 255, 255, 0.8); }
-.baneknap.perfekt { border-left-color: var(--gul); }
-.baneknap.perfekt .bstatus { color: var(--gul); }
+.baneknap.perfekt { border-left-color: #ff7b8a; }
+.baneknap.perfekt .bstatus { color: #ff7b8a; }
+.baneknap.aktiv.perfekt .bstatus { color: #ffc2c9; }
 
 /* Belaanningen: Niels Bohr nede i hjoernet, naar alle tre baner er
    klaret med 5/5. */
@@ -798,13 +799,16 @@ button.pcelle:hover { border-color: rgba(255, 255, 255, 0.55); }
     100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
-.spilstjerner {
+/* Hjertet staar kun frem ved 5/5. Ved alt andet er elementet tomt, saa
+   der ikke haenger en halvtom praemie og minder om, hvad man ikke fik. */
+.spilhjerte {
     text-align: center;
     font-size: 1.5rem;
-    letter-spacing: 0.14em;
-    color: var(--gul);
-    margin-top: 2px;
+    line-height: 1.2;
+    color: #ff7b8a;
 }
+
+.spilhjerte:empty { display: none; }
 
 /* ---------------------------------------------------------------------
    GAETTEBOKSEN
