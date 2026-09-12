@@ -160,7 +160,7 @@
             var knap = document.createElement("button");
             knap.className = "gaetknap";
             knap.type = "button";
-            knap.textContent = Math.abs(v) + (v > 0 ? "+" : "−");
+            knap.textContent = NK.ladningstekst(v);
             knap.setAttribute("data-vaerdi", String(v));
             knap.addEventListener("click", function () {
                 mig.svar(parseInt(this.getAttribute("data-vaerdi"), 10));
