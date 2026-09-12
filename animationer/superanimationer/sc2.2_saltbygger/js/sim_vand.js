@@ -187,92 +187,120 @@
     };
 
     /* ----- Krystalgitteret --------------------------------------------------
-       Reglen er, at to ioner med samme fortegn ALDRIG maa ligge side om
-       side. Hver formelenhed (p kationer, n anioner) lægges som sin egen
-       lille "rosét": er forholdet 1:1, 2:1 eller 3:2 (eller spejlet),
-       kan ionerne ligge på en række, hvor de skiftevis rammer + og -.
-       Er forholdet 3:1 (fx K3PO4), kan det IKKE lade sig gøre på én
-       række uden at to ens fortegn støder sammen - dér sættes den ene
-       ion i midten med de tre andre spredt rundt om den i en trekant.
-       Rosetterne lægges saa side om side i et gitter med et lille
-       mellemrum, saa ioner fra to forskellige roset­ter aldrig rører
-       hinanden - heller ikke to med samme fortegn. ------------------- */
-    function rosetteEnheder(p, n) {
-        var storst = p >= n;
-        var cA = storst ? p : n, cB = storst ? n : p;
-        var A = storst ? "kat" : "an", B = storst ? "an" : "kat";
-        if (cA === 3 && cB === 1) {
-            var ud = [{ side: B, u: 0, v: 0 }];
-            for (var i = 0; i < 3; i++) {
-                var vink = -Math.PI / 2 + i * (Math.PI * 2 / 3);
-                ud.push({ side: A, u: Math.cos(vink) * 1.05, v: Math.sin(vink) * 1.05 });
+       Ionerne "falder på plads" ved en lille fysik-afslapning: modsatte
+       ladninger trækker i hinanden til de rører hinanden, ens ladninger
+       støder fra hinanden med luft imellem. Det er den samme regel, et
+       rigtigt krystalgitter bygger på, så resultatet bliver tæt og
+       sammenhængende af sig selv - også for forhold, der ikke går op i
+       en pæn række, som 3:1 (fx K₃PO₄, hvor PO₄³⁻ ender omkranset af
+       sine tre K⁺).
+
+       Regnes ÉN gang pr. krystal i "enheds"-koordinater (radius = de
+       rigtige ionradier, ikke ganget med laerredets skala), så resultatet
+       er uafhaengigt af vinduets størrelse - det skaleres bare op hvert
+       billede i pladsXY. ------------------------------------------------- */
+    function settleKrystal(s, k) {
+        var rKat = NK.ionGeo(s.kat).R, rAn = NK.ionGeo(s.an).R;
+        var katN = k * s.p, anN = k * s.n, i;
+
+        /* Start: løst spredt i en spiral (det gyldne vinkel-trick giver
+           en jaevn, ikke-symmetrisk startopstilling), kationer og
+           anioner blandet tilfældigt. */
+        var liste = [];
+        for (i = 0; i < katN; i++) liste.push("kat");
+        for (i = 0; i < anN; i++) liste.push("an");
+        liste = NK.bland(liste);
+        var skridt = (rKat + rAn) * 1.3;
+        var punkter = liste.map(function (side, idx) {
+            var vinkel = idx * 2.399963;
+            var rad = skridt * 0.55 * Math.sqrt(idx + 0.5);
+            return { side: side, r: side === "kat" ? rKat : rAn,
+                     x: Math.cos(vinkel) * rad, y: Math.sin(vinkel) * rad };
+        });
+
+        /* Fysikken koeres i to trin hver runde:
+           1. Stoed: to ioner maa aldrig ligge taettere end deres egen
+              radius tilsammen - og ens fortegn skal ovenikoebet holde
+              en lille luftafstand (MARGIN). Gaelder ALLE par.
+           2. Traek: hver ion soeger mod sin ENESTE naermeste modsatte
+              nabo - ikke mod alle paa én gang. Trækker man i alle modsat
+              ladede ioner samtidig (som fysikken ellers ville), bliver
+              systemet overbestemt og kan aldrig lande et sted, hvor
+              stoedet ogsaa er tilfredsstillet; med kun ét maal ad gangen
+              finder hver ion en naturlig partner, ligesom en rigtig
+              ionbinding. */
+        var MARGIN = Math.min(rKat, rAn) * 0.32;
+        var n = punkter.length;
+        var runde, a, b;
+        for (runde = 0; runde < 320; runde++) {
+            for (a = 0; a < n; a++) {
+                for (b = a + 1; b < n; b++) {
+                    var pa = punkter[a], pb = punkter[b];
+                    var dx = pb.x - pa.x, dy = pb.y - pa.y;
+                    var dist = Math.sqrt(dx * dx + dy * dy) || 0.0001;
+                    var samme = pa.side === pb.side;
+                    var maal = pa.r + pb.r + (samme ? MARGIN : 0);
+                    if (dist < maal) {
+                        var f = (maal - dist) * 0.5 / dist;
+                        pa.x -= dx * f; pa.y -= dy * f;
+                        pb.x += dx * f; pb.y += dy * f;
+                    }
+                }
             }
-            return ud;
+            for (a = 0; a < n; a++) {
+                var pa2 = punkter[a], bedst = -1, bedstD = Infinity, bedstDx = 0, bedstDy = 0;
+                for (b = 0; b < n; b++) {
+                    if (b === a || punkter[b].side === pa2.side) continue;
+                    var ddx = punkter[b].x - pa2.x, ddy = punkter[b].y - pa2.y;
+                    var dd = ddx * ddx + ddy * ddy;
+                    if (dd < bedstD) { bedstD = dd; bedst = b; bedstDx = ddx; bedstDy = ddy; }
+                }
+                if (bedst < 0) continue;
+                var afstand = Math.sqrt(bedstD) || 0.0001;
+                var maalD = pa2.r + punkter[bedst].r;
+                if (afstand > maalD) {
+                    var traek = Math.min((afstand - maalD) * 0.1, 0.4) / afstand;
+                    pa2.x += bedstDx * traek; pa2.y += bedstDy * traek;
+                }
+            }
         }
-        var raekke;
-        if (cA === 1 && cB === 1) raekke = [A, B];
-        else if (cA === 2 && cB === 1) raekke = [A, B, A];
-        else raekke = [A, B, A, B, A];              /* 3 : 2 */
-        return raekke.map(function (side, i) { return { side: side, u: i - (raekke.length - 1) / 2, v: 0 }; });
+
+        /* Centrér vandret, og maal hvor stor klyngen blev, saa den kan
+           bundes til gulvet i glasset og fylde det rigtige areal. */
+        var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        for (i = 0; i < n; i++) {
+            var p = punkter[i];
+            minX = Math.min(minX, p.x - p.r); maxX = Math.max(maxX, p.x + p.r);
+            minY = Math.min(minY, p.y - p.r); maxY = Math.max(maxY, p.y + p.r);
+        }
+        var midtX = (minX + maxX) / 2;
+        punkter.forEach(function (p) {
+            p.dx = p.x - midtX;
+            p.dyFraBund = maxY - p.y;      /* 0 = klyngens nederste kant, vokser opad */
+        });
+        return { punkter: punkter, halvB: (maxX - minX) / 2, hoejde: maxY - minY };
     }
 
-    /* Maalene for ÉN formelenhed, skaleret til det aktuelle laerred:
-       hvor langt ud fra midten (dx, dy) hver ion sidder, og hvor stor
-       en firkant hele rosetten fylder (half). */
-    NK.SimVand.prototype.rosetteMaal = function () {
-        var s = this.salt, G = this.G;
-        var rKat = NK.ionGeo(s.kat).R * G.s, rAn = NK.ionGeo(s.an).R * G.s;
-        var pitch = (rKat + rAn) * 0.92 + 2;
-        var halvB = 0, halvH = 0;
-        var enheder = rosetteEnheder(s.p, s.n).map(function (e) {
-            var r = e.side === "kat" ? rKat : rAn;
-            var dx = e.u * pitch, dy = e.v * pitch;
-            halvB = Math.max(halvB, Math.abs(dx) + r);
-            halvH = Math.max(halvH, Math.abs(dy) + r);
-            return { side: e.side, dx: dx, dy: dy };
-        });
-        return { enheder: enheder, half: Math.max(halvB, halvH) };
-    };
-
-    /* De k formelenheder som en liste af {side, rosette, enhedIdx} -
-       kun antal og fortegn afgøres her. Selve pixel-positionen regnes
-       hvert billede i pladsXY, saa den følger med, hvis vinduet skifter
-       størrelse. */
-    NK.SimVand.prototype.krystalPladser = function () {
-        var rm = this.rosetteMaal();
-        var ud = [];
-        for (var i = 0; i < this.k; i++) {
-            rm.enheder.forEach(function (e, ei) { ud.push({ side: e.side, rosette: i, enhedIdx: ei }); });
-        }
-        return ud;
-    };
-
-    /* Rosetterne lægges i et gitter, bundlinjen først, og vokser opad -
-       ligesom en krystal der har lagt sig i bunden af glasset. */
+    /* Klyngen fra settleKrystal() er allerede formet - her skaleres den
+       bare op til laerredets nuvaerende størrelse, saa den passer, ogsaa
+       hvis vinduet aendrer størrelse undervejs. */
     NK.SimVand.prototype.pladsXY = function (ion) {
-        var rm = this._rm, G = this.G;
-        var soejler = Math.ceil(Math.sqrt(this.k));
-        var gab = 6, trin = rm.half * 2 + gab;
-        var r = Math.floor(ion.rosette / soejler), c = ion.rosette % soejler;
-        var iRaekke = Math.min(soejler, this.k - r * soejler);
-        var cx = G.bx + G.bb / 2 + (c - (iRaekke - 1) / 2) * trin;
-        var cy = G.bund - 8 - rm.half - r * trin;
-        var e = rm.enheder[ion.enhedIdx];
-        return { x: cx + e.dx, y: cy + e.dy };
+        var p = this._layout.punkter[ion.layoutIdx], G = this.G;
+        return { x: G.bx + G.bb / 2 + p.dx * G.s, y: G.bund - 8 - p.dyFraBund * G.s };
     };
 
     function nyIon(ion) {
         return { ion: ion, x: NaN, y: NaN, mx: 0, my: 0, vx: 0, vy: 0, a: 0, fri: false, boost: 0, vent: 0,
-                 rosette: 0, enhedIdx: 0, vinkel: 0, vv: ion.sammensat ? (Math.random() - 0.5) * 1.4 : 0 };
+                 layoutIdx: 0, vinkel: 0, vv: ion.sammensat ? (Math.random() - 0.5) * 1.4 : 0 };
     }
 
     /* Krystallen daler ned gennem vandet og lander i bunden. */
     NK.SimVand.prototype.lavKrystal = function () {
         var mig = this;
-        this._rm = this.rosetteMaal();
-        this.ioner = this.krystalPladser().map(function (p) {
+        this._layout = settleKrystal(this.salt, this.k);
+        this.ioner = this._layout.punkter.map(function (p, idx) {
             var ion = nyIon(p.side === "kat" ? mig.salt.kat : mig.salt.an);
-            ion.rosette = p.rosette; ion.enhedIdx = p.enhedIdx;
+            ion.layoutIdx = idx;
             return ion;
         });
         this.fase = "falder";
@@ -308,13 +336,12 @@
     };
 
     NK.SimVand.prototype.startInddampning = function () {
-        var pladser = this.krystalPladser();
+        this._layout = settleKrystal(this.salt, this.k);
         var ledige = { kat: [], an: [] };
-        pladser.forEach(function (p) { ledige[p.side].push(p); });
+        this._layout.punkter.forEach(function (p, idx) { ledige[p.side].push(idx); });
         for (var i = 0; i < this.ioner.length; i++) {
             var ion = this.ioner[i];
-            var p = ledige[ion.ion.q > 0 ? "kat" : "an"].shift();
-            ion.rosette = p.rosette; ion.enhedIdx = p.enhedIdx;
+            ion.layoutIdx = ledige[ion.ion.q > 0 ? "kat" : "an"].shift();
             ion.fri = false;
             ion.vent = 0.4 + Math.random() * 1.6;
         }
@@ -341,7 +368,6 @@
         this.niveau = NK.mod(this.niveau, this.niveauMaal, this.fase === "inddamper" ? 0.9 : 3, dt);
         var G = this.G = this.maal();
         if (!G.klar) return;
-        if (this.salt) this._rm = this.rosetteMaal();
         var i, ion;
 
         if (this.fase === "falder") {
@@ -463,7 +489,7 @@
             if (isNaN(ion.x)) continue;
             var dx = ryst ? Math.sin(this.ur * 26 + i * 1.7) * ryst : 0;
             NK.tegnIon(c, ion.ion, ion.x + dx, ion.y, G.s, {
-                vinkel: ion.vinkel, alpha: ion.a, glorie: ion.fri, ladning: ion.fri
+                vinkel: ion.vinkel, alpha: ion.a, glorie: ion.fri, ladning: ion.fri, enkel: true
             });
         }
         this.tegnGlas(c, G);
@@ -545,8 +571,10 @@
         }
         if (this.fase === "inddampet" || (this.fase === "inddamper" && this.inddampTid > 2)) {
             var top = Infinity;
-            for (var i = 0; i < this.ioner.length; i++) top = Math.min(top, this.ioner[i].my);
-            var y = top - (this._rm ? this._rm.half : 20) - 14;
+            for (var i = 0; i < this.ioner.length; i++) {
+                top = Math.min(top, this.ioner[i].my - NK.ionGeo(this.ioner[i].ion).R * G.s);
+            }
+            var y = top - 20;
             NK.tekst(c, s.formel, G.W / 2, y - 18, {
                 font: "700 24px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
                 farve: "#f2f3f5", kant: true, kantBredde: 5

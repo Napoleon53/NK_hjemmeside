@@ -494,11 +494,11 @@
         ctx.stroke();
         ctx.restore();
 
-        /* Det, man har haeldt i. Ligger maengden over grafens kant, bliver
-           linjen liggende lige under kanten med en pil paa. */
-        if (this.tilsat > 0) {
-            var overKanten = this.tilsat > ymax;
-            var ty = overKanten ? g.y + 4 : tilY(this.tilsat);
+        /* Det, man har haeldt i. Ligger maengden over grafens kant, er den
+           ganske enkelt uden for billedet - linjen forsvinder opad i stedet
+           for at ligge fastklemt langs 100-linjen, som om den var dér. */
+        if (this.tilsat > 0 && this.tilsat <= ymax) {
+            var ty = tilY(this.tilsat);
             ctx.save();
             ctx.strokeStyle = FARVE_TILSAT;
             ctx.lineWidth = 2;
@@ -509,11 +509,10 @@
             ctx.stroke();
             ctx.restore();
 
-            NK.tekst(ctx, "hældt i: " + NK.gram(this.tilsat) + " g" + (overKanten ? " ↑" : ""),
-                g.x + 8, overKanten ? ty + 15 : ty - 8, {
-                    farve: FARVE_TILSAT,
-                    font: "600 11.5px 'Segoe UI', sans-serif", kant: true, kantBredde: 4
-                });
+            NK.tekst(ctx, "hældt i: " + NK.gram(this.tilsat) + " g", g.x + 8, ty - 8, {
+                farve: FARVE_TILSAT,
+                font: "600 11.5px 'Segoe UI', sans-serif", kant: true, kantBredde: 4
+            });
         }
 
         /* Den temperatur, der er valgt */

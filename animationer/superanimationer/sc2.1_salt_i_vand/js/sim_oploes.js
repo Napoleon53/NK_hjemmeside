@@ -23,9 +23,13 @@
     var RAEKKER = 5;
 
     /* Naar en ion er revet loes, krymper den og sit vandlag lidt - den
-       fylder mindre som fri ion i vaesken, end den gjorde i krystallen. */
+       fylder mindre som fri ion i vaesken, end den gjorde i krystallen.
+       Den maa dog aldrig blive saa lille, at bogstaverne (fx K⁺) ikke
+       laengere kan laeses - MIN_TEKST_RADIUS er den mindste radius, hvor
+       T.ion stadig skriver teksten paa. */
     var FRI_SKALA = 0.6;
     var FRI_SKALA_FART = 2.0;
+    var MIN_TEKST_RADIUS = 11;
 
     /* De tre knapper. temp er den temperatur, oploeseligheden slaas op ved. */
     var TEMPERATURER = [
@@ -194,21 +198,14 @@
     };
 
     /* Et nyt sted at svoemme hen. Vandmolekylerne bor ikke ét bestemt sted -
-       de er spredt ud over hele det frie vand. undgaa (valgfri, {x,y}) er
-       den ion, molekylet lige har afleveret: hjemmet loddes om, til det
-       ligger et stykke derfra, saa det ikke bare ser ud, som om det samme
-       molekyle dukker op igen lige dér, hvor ionen var. */
-    P.nytHjem = function (v, undgaa) {
+       de er spredt tilfaeldigt ud over hele det frie vand, saa det ikke ser
+       ud som om det samme molekyle bare bliver ved med at dukke op dér, hvor
+       en ion lige er blevet revet loes. */
+    P.nytHjem = function (v) {
         var top = this.overflade + 24;
         var bund = Math.max(top + 10, this.gitterTop - 14);
-        var forsoeg = 0, x, y;
-        do {
-            x = this.glasX + 26 + Math.random() * Math.max(10, this.glasB - 52);
-            y = top + Math.random() * (bund - top);
-            forsoeg++;
-        } while (undgaa && forsoeg < 6 && Math.hypot(x - undgaa.x, y - undgaa.y) < 70);
-        v.hjemX = x;
-        v.hjemY = y;
+        v.hjemX = this.glasX + 26 + Math.random() * Math.max(10, this.glasB - 52);
+        v.hjemY = top + Math.random() * (bund - top);
     };
 
     P.tilpas = function () {
@@ -284,7 +281,7 @@
                     o.x = o.maalX; o.y = o.maalY;
                     o.tilstand = "fri";
                     for (var b = 0; b < o.baerere.length; b++) {
-                        this.nytHjem(o.baerere[b], { x: o.x, y: o.y });
+                        this.nytHjem(o.baerere[b]);
                         o.baerere[b].tilstand = "hjem";
                     }
                     o.baerere = [];
@@ -292,7 +289,9 @@
                     o.vy = (Math.random() - 0.5) * 26;
                 }
             } else if (o.tilstand === "fri") {
-                o.skala = NK.mod(o.skala, FRI_SKALA, FRI_SKALA_FART, dt);
+                var fuldRadius = this.celle * 0.40 * o.ion.r;
+                var bundSkala = fuldRadius > 0 ? Math.min(1, MIN_TEKST_RADIUS / fuldRadius) : 1;
+                o.skala = NK.mod(o.skala, Math.max(FRI_SKALA, bundSkala), FRI_SKALA_FART, dt);
                 o.x += o.vx * dt * fart;
                 o.y += o.vy * dt * fart;
                 var vLav = this.overflade + 22, vHoej = this.gitterTop - 20;
@@ -347,7 +346,7 @@
         case "soeger": {
             if (!o || o.tilstand !== "fast") {
                 v.maal = null;
-                this.nytHjem(v, o ? { x: o.x, y: o.y } : undefined);
+                this.nytHjem(v);
                 v.tilstand = "hjem";
                 break;
             }
@@ -379,7 +378,7 @@
             v.x = o.x + v.afX;
             v.y = o.y + v.afY;
             v.vinkel = T.vendMod(v.x, v.y, o.x, o.y, o.ion.q > 0);
-            if (o.tilstand === "fri") { v.maal = null; this.nytHjem(v, { x: o.x, y: o.y }); v.tilstand = "hjem"; }
+            if (o.tilstand === "fri") { v.maal = null; this.nytHjem(v); v.tilstand = "hjem"; }
             break;
 
         case "hjem": {
@@ -496,7 +495,7 @@
             var f = this.ioner[i];
             if (f.tilstand !== "fri") continue;
             var r = this.ionRadius(f);
-            T.vandskal(ctx, f.x, f.y, r, f.skalfase, 4);
+            T.vandskal(ctx, f.x, f.y, r, f.skalfase, 4, f.ion.q > 0);
             T.ion(ctx, f.x, f.y, f.ion, r);
         }
 

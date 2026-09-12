@@ -275,7 +275,7 @@ window.NK = NK;
         ctx.save();
         ctx.globalAlpha = alpha === undefined ? 1 : alpha;
         var g = ctx.createRadialGradient(x - r * 0.35, y - r * 0.4, r * 0.1, x, y, r);
-        if (positiv) { g.addColorStop(0, "#ff9a8c"); g.addColorStop(1, "#c63b2e"); }
+        if (positiv) { g.addColorStop(0, "#caa0f2"); g.addColorStop(1, "#7a3fc0"); }
         else { g.addColorStop(0, "#8fd0ff"); g.addColorStop(1, "#1f6fae"); }
         ctx.fillStyle = g;
         ctx.beginPath();

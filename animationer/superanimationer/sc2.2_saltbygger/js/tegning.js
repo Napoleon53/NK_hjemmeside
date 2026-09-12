@@ -63,13 +63,65 @@
         c.stroke();
     }
 
+    /* Den forenklede tegning: én kugle i ionens farve, med formlen
+       skrevet henover - samme radius (geo.R), farve og ladningsmaerke
+       som den detaljerede tegning, saa den passer ind samme steder. */
+    function tegnKugleIon(c, ion, x, y, s, opt, geo, f) {
+        var r = geo.R * s;
+        c.save();
+        c.globalAlpha = opt.alpha === undefined ? 1 : opt.alpha;
+
+        if (opt.glorie) {
+            c.fillStyle = "rgba(" + f.glorie + ", 0.10)";
+            c.beginPath();
+            c.arc(x, y, r + 5, 0, Math.PI * 2);
+            c.fill();
+            c.setLineDash([4, 4]);
+            c.strokeStyle = "rgba(" + f.glorie + ", 0.55)";
+            c.lineWidth = 1.2;
+            c.stroke();
+            c.setLineDash([]);
+        }
+
+        kugle(c, x, y, r, f.midt);
+
+        /* Formlen skal kunne staa inden i kuglen - skrumper skriften,
+           hvis den ellers ville stikke ud over kanten. */
+        var fs = r * 0.62;
+        c.font = "700 " + fs.toFixed(1) + "px 'Segoe UI', sans-serif";
+        var bredde = c.measureText(ion.formel).width;
+        var loft = r * 1.7;
+        if (bredde > loft) fs *= loft / bredde;
+        NK.tekst(c, ion.formel, x, y + fs * 0.04, {
+            font: "700 " + fs.toFixed(1) + "px 'Segoe UI', sans-serif",
+            justering: "center", linje: "middle", farve: "#ffffff"
+        });
+
+        if (opt.ladning) {
+            NK.tekst(c, NK.ladningstekst(ion.q), x + r * 0.74, y - r * 0.74, {
+                font: "700 " + Math.max(11, s * 0.52).toFixed(1) + "px 'Segoe UI', sans-serif",
+                justering: "left", linje: "bottom", farve: f.ladning, kant: true
+            });
+        }
+        c.restore();
+    }
+
     /* Tegn ionen med centrum i (x, y). s er pixels pr. binding.
        opt: vinkel (radianer), alpha, glorie (stiplet ring om en
-       sammensat ion), ladning (en lille "2−" ved siden af). */
+       sammensat ion), ladning (en lille "2−" ved siden af), enkel
+       (tegn en sammensat ion som én kugle med formlen skrevet paa -
+       man skal ikke forstaa lewisstrukturen for at forstaa, at NO₃⁻
+       er ÉN ion, der hverken deler sig eller aendrer sig i vandet). */
     NK.tegnIon = function (c, ion, x, y, s, opt) {
         opt = opt || {};
         var geo = NK.ionGeo(ion);
         var f = ion.q > 0 ? FARVE.kat : FARVE.an;
+
+        if (opt.enkel && ion.sammensat) {
+            tegnKugleIon(c, ion, x, y, s, opt, geo, f);
+            return;
+        }
+
         var v = opt.vinkel || 0;
         var cos = Math.cos(v), sin = Math.sin(v);
         var pos = [], i, a;

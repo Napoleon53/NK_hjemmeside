@@ -172,7 +172,18 @@ function koer() {
     paastand("NaCl: godt i gang efter et minut", s1.tilbage() <= iAlt - 10, "tilbage: " + s1.tilbage());
     koerTid(s1, 1800, 0.05);
     paastand("NaCl: hele krystallen forsvinder", s1.tilbage() === 0, "tilbage: " + s1.tilbage());
-    paastand("frie ioner krymper", s1.ioner[0].skala < 0.9, "skala: " + s1.ioner[0].skala);
+
+    /* Frie ioner maa gerne krympe, men aldrig saa meget, at bogstaverne
+       (fx K⁺) ikke laengere kan laeses - T.ion skriver kun teksten paa,
+       naar radius er mindst 8 px. Cl⁻ er stor nok til, at krympningen
+       rent faktisk kan ses; mindre ioner (Na⁺) faar lov at blive stort
+       set ved fuld stoerrelse, naar cellerne er store. */
+    var frieNu = s1.ioner.filter(function (o) { return o.tilstand === "fri"; });
+    var altidLaesbart = frieNu.every(function (o) { return s1.ionRadius(o) >= 7.99; });
+    paastand("frie ioner er aldrig for smaa til at laese",
+        altidLaesbart, "mindste radius: " + Math.min.apply(null, frieNu.map(function (o) { return s1.ionRadius(o); })).toFixed(1));
+    var mindsteSkala = Math.min.apply(null, frieNu.map(function (o) { return o.skala; }));
+    paastand("og krymper rent faktisk, når der er råd til det", mindsteSkala < 0.95, "mindste skala: " + mindsteSkala);
 
     NK.Valg.saet("CaCl2");
     s1.tilpas();

@@ -62,21 +62,29 @@ En ion med ladningen 1 hedder ikke "1+" — den hedder "+", ligesom i bogen
 
 ### Krystalgitteret på vandfanen
 
-Saltet ligger som en lille krystal i bunden af glasset, bygget af ægte
-formelenheder — ikke bare ioner strøet tilfældigt. Reglen er, at to ioner med
-samme fortegn **aldrig** ligger side om side:
+Saltet ligger som en lille krystal i bunden af glasset, og krystallen er et
+rigtigt gitter — ikke isolerede formelenheder med luft imellem. To regler
+gælder samtidig:
 
-* Er forholdet 1:1, 2:1 eller 3:2 (eller spejlet), lægges hver formelenhed på
-  en lille række, der skiftevis rammer plus og minus.
-* Er forholdet 3:1 (fx K₃PO₄), kan det ikke lade sig gøre på én række — så
-  sættes den ene ion i midten med de tre andre spredt i en trekant omkring
-  den, som en lille "blomst".
+* To ioner med **samme** fortegn rører **aldrig** hinanden.
+* To ioner med **modsat** fortegn rører så vidt muligt hinanden — krystallen
+  skal hænge sammen, ikke flyde som adskilte øer.
 
-Formelenhederne ligger tæt side om side med kun et lille mellemrum, så
-krystallen fylder kompakt — også når ionerne selv er sammensatte. Mens saltet
-endnu ikke er opløst, peger en pil ned på krystallen med formlen og "(s)", og
-en kort undertekst ("endnu ikke opløst i vandet" / "tungtopløseligt —
-bliver liggende").
+Det klares af en lille fysik-afslapning (`settleKrystal` i sim_vand.js), i
+stedet for en håndtegnet skabelon: hver ion trækkes mod sin nærmeste
+modsatte nabo, og alle ioner med samme fortegn skubber hinanden væk, hvis de
+kommer for tæt på. Kørt et par hundrede gange lander det i en tæt, naturligt
+formet klump — samme princip, som binder et rigtigt ionkrystal sammen,
+uanset om forholdet er 1:1, 2:1, 3:1 eller 3:2. Mens saltet endnu ikke er
+opløst, peger en pil ned på krystallen med formlen og "(s)", og en kort
+undertekst ("endnu ikke opløst i vandet" / "tungtopløseligt — bliver
+liggende").
+
+**Sammensatte ioner er tegnet som én kugle** på denne fane — kun formlen
+(fx "NO₃") skrevet henover, ikke atomerne og bindingerne. Pointen her er, at
+NO₃⁻ er én ion, der hverken deler sig eller ændrer sig, når saltet opløses —
+ikke hvordan den er bygget indeni. På byggefanen (fane 1) vises den stadig i
+fuld atomdetalje, for dér skal man kunne tælle atomerne i formlen.
 
 Opgaven ligger som et overlay ovenpå billedet i venstre side — adskilt fra
 "Vælg selv et salt" i panelet til højre, som er en helt uafhængig ting.
@@ -168,14 +176,26 @@ bordet) i bord.js. Begge bruger pointer-hændelser, så det virker med både mus
 finger og pen; `touch-action: none` i stilarket er dét, der gør, at en finger på
 en tablet trækker ionen i stedet for at rulle siden.
 
-**Krystalgitteret** bygges af `rosetteEnheder(p, n)` i sim_vand.js — den
-placerer ÉN formelenheds ioner, så to med samme fortegn aldrig rører hinanden.
-Kun forholdet 3:1 (eller 1:3) kan ikke ligge på en række uden det sker, og får
-derfor sin egen stjerneform. Selve krystallen er så bare disse formelenheder
-gentaget k gange, lagt i et gitter med et lille mellemrum imellem — det
-mellemrum er hele garantien for, at ioner fra to forskellige formelenheder
-heller ikke rører hinanden. `_selvtest.html`'s afsnit 14b tjekker det
-empirisk for alle mulige forhold.
+**Krystalgitteret** bygges af `settleKrystal(salt, k)` i sim_vand.js: alle
+ionerne sættes løst i en spiral, og så køres ~320 runder, hvor (1) to ioner
+med samme fortegn skubbes fra hinanden, hvis de er tættere end deres egen
+radius plus en lille margen, og (2) hver ion trækkes mod sin ENESTE nærmeste
+modsatte nabo. Punkt 2 er med vilje begrænset til én nabo ad gangen — trækker
+man i alle modsat ladede ioner på samme tid (hvad den elektriske tiltrækning
+"burde" gøre), bliver systemet overbestemt og lander aldrig et sted, hvor
+frastødningen også er tilfredsstillet. Resultatet regnes i "enheds"-koordinater
+(ionradier, ikke pixels) og skaleres først til laerredets størrelse i
+`pladsXY`, så det ikke skal regnes om ved vinduesskift. `_selvtest.html`'s
+afsnit 14b tjekker empirisk for syv forskellige forhold, at intet par med
+samme fortegn ender tættere på hinanden end deres egen radius.
+
+**Ionerne på vandfanen** tegnes forenklet: `NK.tegnIon(..., { enkel: true })`
+i tegning.js springer atomerne og bindingerne over for en sammensat ion og
+tegner i stedet én kugle med `ion.formel` skrevet på, i samme størrelse
+(`NK.ionGeo(ion).R`) som den detaljerede tegning ville have fyldt. Skal en ny
+fane også vise ionerne enkelt, er det den samme `enkel`-flag, der skal sættes
+i dens `NK.tegnIon`-kald - bord.js (fane 1) sætter den bevidst IKKE, fordi man
+dér skal kunne se og tælle atomerne.
 
 **Sværhedsgraden** (`svaerhedsgrad` i sim_bord.js) styrer kun, om ionernes
 navne vises. Rører man ved noget, der viser en ions navn et nyt sted i koden —

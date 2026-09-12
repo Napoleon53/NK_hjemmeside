@@ -3,9 +3,10 @@
    og et baegerglas.
 
    Farvesproget er det samme hele vejen igennem:
-     positiv ion  = varm roed      negativ ion = kold blaa
+     positiv ion  = violet         negativ ion = blaa
      oxygen (δ−)  = roed           hydrogen (δ+) = lys graa
-   ===================================================================== */
+   Ionerne har med vilje ingen af de to farver, vandmolekylet selv har -
+   ellers ville en positiv ion ligne oxygen for meget. */
 (function () {
     "use strict";
 
@@ -28,7 +29,7 @@
         ctx.globalAlpha = alpha;
 
         var g = ctx.createRadialGradient(x - r * 0.36, y - r * 0.4, r * 0.1, x, y, r);
-        if (positiv) { g.addColorStop(0, "#ff9c8e"); g.addColorStop(1, "#b6362a"); }
+        if (positiv) { g.addColorStop(0, "#caa0f2"); g.addColorStop(1, "#7a3fc0"); }
         else         { g.addColorStop(0, "#8ed0ff"); g.addColorStop(1, "#1a6099"); }
         ctx.fillStyle = g;
         ctx.beginPath();
@@ -38,7 +39,7 @@
         ctx.lineWidth = Math.max(1, r * 0.09);
         ctx.strokeStyle = opt.fremhaev
             ? "#f2c53d"
-            : (positiv ? "rgba(255, 190, 180, 0.55)" : "rgba(170, 215, 250, 0.55)");
+            : (positiv ? "rgba(214, 180, 245, 0.55)" : "rgba(170, 215, 250, 0.55)");
         ctx.stroke();
 
         if (r >= 8) {
@@ -58,8 +59,10 @@
     };
 
     /* Den vandskal, der lukker sig om en ion, naar den er kommet fri.
-       Tegnes som et svagt skaer plus nogle faa smaa vandmolekyler. */
-    T.vandskal = function (ctx, x, y, r, fase, antal) {
+       Tegnes som et svagt skaer plus nogle faa smaa vandmolekyler - vendt
+       rigtigt, ligesom de aktive vandmolekyler: oxygen naermest en positiv
+       ion, hydrogen naermest en negativ. */
+    T.vandskal = function (ctx, x, y, r, fase, antal, positiv) {
         var i, vinkel;
         ctx.save();
         var g = ctx.createRadialGradient(x, y, r * 0.8, x, y, r * 2.05);
@@ -78,7 +81,7 @@
                 y + Math.sin(vinkel) * r * 1.52,
                 vinkel + Math.PI / 2,
                 r * 0.030,
-                { alpha: 0.5 });
+                { alpha: 0.5, spidsH: !positiv });
         }
     };
 
