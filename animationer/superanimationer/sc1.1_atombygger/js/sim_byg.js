@@ -300,7 +300,7 @@
             var valgt = tilfaeldig(andre);
             return {
                 tekst: "Naturens " + g.navn.toLowerCase() + " er for det meste " + g.symbol + "-" + almindelig.a
-                    + ". Byg det neutrale atom af den SJÆLDNERE isotop " + g.symbol + "-" + valgt.a + ".",
+                    + ". Byg det neutrale atom af den sjældnere isotop " + g.symbol + "-" + valgt.a + ".",
                 p: g.z, n: valgt.a - g.z, e: g.z,
                 svar: "Stadig " + tal(g.z, "proton", "protoner") + ", for de bestemmer grundstoffet. Kun neutrontallet skifter fra "
                     + (almindelig.a - g.z) + " til " + (valgt.a - g.z) + "."
