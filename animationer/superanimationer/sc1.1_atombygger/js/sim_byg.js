@@ -27,7 +27,7 @@
         this.atom = new NK.Atom();
         this.p = 1; this.n = 0; this.e = 1;
         this.opgave = null;
-        this.loeste = 0;
+        this.opgaveNr = 0;      /* taeller 1-5 og starter forfra - se nyOpgave() */
         this.beskedTid = 0;
         this.atom.saetStraks(this.p, this.n, this.e);
 
@@ -272,8 +272,8 @@
             return {
                 tekst: "Byg et neutralt atom af " + g.navn.toLowerCase() + " (" + g.symbol + ") med massetal " + i.a + ".",
                 p: g.z, n: i.a - g.z, e: g.z,
-                svar: "Massetallet er protoner + neutroner, så " + i.a + " − " + g.z + " = " + (i.a - g.z)
-                    + " neutroner. Neutralt vil sige lige så mange elektroner som protoner."
+                svar: "Massetal = protoner + neutroner, så " + i.a + " − " + g.z + " = "
+                    + tal(i.a - g.z, "neutron", "neutroner") + ". Neutralt betyder lige mange elektroner som protoner."
             };
         },
         /* 2. En ion af et grundstof, der danner ioner. */
@@ -284,9 +284,9 @@
             return {
                 tekst: "Byg ionen " + g.symbol + NK.ladningHaevet(g.ion) + " med den kerne, der er mest af i naturen.",
                 p: g.z, n: i.a - g.z, e: g.z - g.ion,
-                svar: "Ladningen " + NK.ladningstekst(g.ion) + " betyder " + Math.abs(g.ion)
-                    + (g.ion > 0 ? " elektron(er) FÆRRE" : " elektron(er) FLERE") + " end protoner."
-                    + (aedel ? " Og se: elektronerne sidder nu som i " + aedel.navn.toLowerCase() + "." : "")
+                svar: "Ladningen " + NK.ladningstekst(g.ion) + " betyder " + tal(Math.abs(g.ion), "elektron", "elektroner")
+                    + " " + (g.ion > 0 ? "færre" : "flere") + " end protoner."
+                    + (aedel ? " Elektronerne ligger nu som i " + aedel.navn.toLowerCase() + "." : "")
             };
         },
         /* 3. En isotop, der IKKE er den almindelige - kernen skal aendres. */
@@ -302,7 +302,7 @@
                 tekst: "Naturens " + g.navn.toLowerCase() + " er for det meste " + g.symbol + "-" + almindelig.a
                     + ". Byg det neutrale atom af den SJÆLDNERE isotop " + g.symbol + "-" + valgt.a + ".",
                 p: g.z, n: valgt.a - g.z, e: g.z,
-                svar: "Samme " + g.z + " protoner — ellers var det ikke " + g.navn.toLowerCase() + " mere. Kun neutrontallet skifter fra "
+                svar: "Stadig " + tal(g.z, "proton", "protoner") + ", for de bestemmer grundstoffet. Kun neutrontallet skifter fra "
                     + (almindelig.a - g.z) + " til " + (valgt.a - g.z) + "."
             };
         },
@@ -313,11 +313,11 @@
             var q = g.ion === null ? 0 : g.ion;
             var e = NK.klamp(g.z - q, 0, MAKS_E);
             return {
-                tekst: "Byg partiklen med " + g.z + " protoner, " + (i.a - g.z) + " neutroner og " + e
-                    + " elektroner. Hvad er det, du har bygget?",
+                tekst: "Byg partiklen med " + tal(g.z, "proton", "protoner") + ", " + tal(i.a - g.z, "neutron", "neutroner")
+                    + " og " + tal(e, "elektron", "elektroner") + ". Hvad er det, du har bygget?",
                 p: g.z, n: i.a - g.z, e: e,
-                svar: "Det er " + g.symbol + NK.ladningHaevet(g.z - e) + " med massetal " + i.a
-                    + " — altså " + g.navn.toLowerCase() + "-" + i.a + (g.z - e === 0 ? " som neutralt atom." : " som ion.")
+                svar: "Det er " + g.symbol + NK.ladningHaevet(g.z - e) + " med massetal " + i.a + ". Altså "
+                    + g.navn.toLowerCase() + "-" + i.a + (g.z - e === 0 ? " som neutralt atom." : " som ion.")
             };
         },
         /* 5. Bagvendt: elektronstrukturen er givet, kernen skal findes. */
@@ -334,8 +334,9 @@
                 tekst: "Byg en ion med ladningen " + NK.ladningstekst(g.ion) + ", som har præcis samme elektronstruktur som "
                     + aedel.navn.toLowerCase() + " (" + D.skalfordeling(aedel.z).join(", ") + "). Brug den almindelige kerne.",
                 p: g.z, n: iso.a - g.z, e: g.z - g.ion,
-                svar: "Der skal " + (g.z - g.ion) + " elektroner til for at ligne " + aedel.navn.toLowerCase()
-                    + ". Med ladningen " + NK.ladningstekst(g.ion) + " giver det " + g.z + " protoner — altså " + g.navn.toLowerCase() + "."
+                svar: "Der skal " + tal(g.z - g.ion, "elektron", "elektroner") + " til for at ligne "
+                    + aedel.navn.toLowerCase() + ". Ladningen " + NK.ladningstekst(g.ion) + " svarer så til "
+                    + tal(g.z, "proton", "protoner") + ": " + g.navn.toLowerCase() + "."
             };
         }
     ];
@@ -349,8 +350,13 @@
         NK.el("byg-opgave-svar").style.display = "none";
         NK.el("byg-opgave-ny").textContent = "Start opgave";
         NK.el("byg-opgave-ny").classList.remove("banker");
+        NK.el("byg-opgave-taeller").style.display = "none";
     };
 
+    /* Taelleren viser altid "X/5" - en runde paa fem opgaver, som starter
+       forfra bagefter. Det er en illusion: der findes uendeligt mange
+       opgaver at traekke fra, men en runde med en synlig ende er mere
+       motiverende at gaa i gang med end en taeller, der bare stiger. */
     NK.SimByg.prototype.nyOpgave = function () {
         var forsoeg = 0;
         do {
@@ -358,12 +364,15 @@
             forsoeg++;
         } while (forsoeg < 8 && this.opgave.p === this.p && this.opgave.n === this.n && this.opgave.e === this.e);
         this.opgave.loest = false;
+        this.opgaveNr++;
         NK.saetTekst("byg-opgave", this.opgave.tekst);
         NK.saetKlasse("byg-opgave", "besked");
         NK.el("byg-opgave-svar").style.display = "";
         NK.el("byg-opgave-svar").disabled = false;
         NK.el("byg-opgave-ny").textContent = "Ny opgave";
         NK.el("byg-opgave-ny").classList.remove("banker");
+        NK.el("byg-opgave-taeller").style.display = "";
+        NK.saetTekst("byg-opgave-taeller", (((this.opgaveNr - 1) % 5) + 1) + "/5");
         this.tjekOpgave();
     };
 
@@ -384,10 +393,8 @@
         if (!o || o.loest) return;
         if (o.p !== this.p || o.n !== this.n || o.e !== this.e) return;
         o.loest = true;
-        this.loeste++;
         NK.saetTekst("byg-opgave", "Rigtigt! " + o.svar);
         NK.saetKlasse("byg-opgave", "besked god");
-        NK.saetTekst("byg-opgave-tal", String(this.loeste));
         NK.el("byg-opgave-svar").disabled = true;
         NK.el("byg-opgave-ny").classList.add("banker");
     };
