@@ -32,6 +32,11 @@ Fane 1 har to tilstande, som deler det samme bord:
   * *formel → navn:* find ionerne i fx Fe₂(SO₄)₃, og navngiv stoffet. Formlen
     **afslører ladningen**: med tre sulfationer må jernet være Fe³⁺.
 
+  Lige under fane-knapperne skiftes der mellem **Let** (alle navne står på
+  hylden) og **Svær** (alle navne er væk — kun formel og ladning at gå efter).
+  Skiftet er skjult indgang, ikke afsløring: navnet ryger også ud af
+  museover-tooltippen og af fejlbeskeden, hvis man vælger en forkert ion.
+
 ### Lynlåsen
 
 Hele animationen hviler på ét billede. Hvert kort på bordet er lige så bredt,
@@ -51,6 +56,30 @@ eller et minus på kanten ind mod midten, og dér skal de mødes to og to.
 
 Når ladningen går op, skrives formlen frem under bordet. Under en opgave er den
 slået fra, indtil opgaven er løst — ellers ville den røbe svaret.
+
+En ion med ladningen 1 hedder ikke "1+" — den hedder "+", ligesom i bogen
+(Na⁺, ikke Na¹⁺). Det gælder overalt: på kortene, i vandet og i teksterne.
+
+### Krystalgitteret på vandfanen
+
+Saltet ligger som en lille krystal i bunden af glasset, bygget af ægte
+formelenheder — ikke bare ioner strøet tilfældigt. Reglen er, at to ioner med
+samme fortegn **aldrig** ligger side om side:
+
+* Er forholdet 1:1, 2:1 eller 3:2 (eller spejlet), lægges hver formelenhed på
+  en lille række, der skiftevis rammer plus og minus.
+* Er forholdet 3:1 (fx K₃PO₄), kan det ikke lade sig gøre på én række — så
+  sættes den ene ion i midten med de tre andre spredt i en trekant omkring
+  den, som en lille "blomst".
+
+Formelenhederne ligger tæt side om side med kun et lille mellemrum, så
+krystallen fylder kompakt — også når ionerne selv er sammensatte. Mens saltet
+endnu ikke er opløst, peger en pil ned på krystallen med formlen og "(s)", og
+en kort undertekst ("endnu ikke opløst i vandet" / "tungtopløseligt —
+bliver liggende").
+
+Opgaven ligger som et overlay ovenpå billedet i venstre side — adskilt fra
+"Vælg selv et salt" i panelet til højre, som er en helt uafhængig ting.
 
 ### Det nye i forhold til den gamle animation
 
@@ -139,12 +168,29 @@ bordet) i bord.js. Begge bruger pointer-hændelser, så det virker med både mus
 finger og pen; `touch-action: none` i stilarket er dét, der gør, at en finger på
 en tablet trækker ionen i stedet for at rulle siden.
 
+**Krystalgitteret** bygges af `rosetteEnheder(p, n)` i sim_vand.js — den
+placerer ÉN formelenheds ioner, så to med samme fortegn aldrig rører hinanden.
+Kun forholdet 3:1 (eller 1:3) kan ikke ligge på en række uden det sker, og får
+derfor sin egen stjerneform. Selve krystallen er så bare disse formelenheder
+gentaget k gange, lagt i et gitter med et lille mellemrum imellem — det
+mellemrum er hele garantien for, at ioner fra to forskellige formelenheder
+heller ikke rører hinanden. `_selvtest.html`'s afsnit 14b tjekker det
+empirisk for alle mulige forhold.
+
+**Sværhedsgraden** (`svaerhedsgrad` i sim_bord.js) styrer kun, om ionernes
+navne vises. Rører man ved noget, der viser en ions navn et nyt sted i koden —
+en tooltip, en fejlbesked — så husk at gøre det betinget af `svaerhedsgrad`,
+ellers lækker "svær" navnet ad bagvejen (se `saetNavne` i bord.js, som også
+opdaterer chippenes `title`-attribut, ikke kun CSS'en).
+
 **`_selvtest.html`** åbner index.html i en iframe og kontrollerer det, man ikke
 kan se på et skærmbillede: at formler, navne og atomtal er rigtige, at ingen
 opgave kan stilles med et stof, der ikke findes, at hvert sæt svarmuligheder har
 præcis ét rigtigt svar og en forklaring på alle fire, at opløselighederne
-stemmer, at tegningerne passer med formlerne — og at fanernes og tilstandenes
-egen logik reagerer rigtigt. Kør den efter ændringer i data.js.
+stemmer, at tegningerne passer med formlerne, at krystalgitteret aldrig lægger
+to ens fortegn ved siden af hinanden (for alle syv mulige forhold), at
+sværhedsgraden rent faktisk skjuler navnene overalt — og at fanernes og
+tilstandenes egen logik reagerer rigtigt. Kør den efter ændringer i data.js.
 
 Den skal åbnes gennem en lokal server (eller i Firefox): Chrome nægter en side
 på `file://` at kigge ind i sin egen iframe. Filen bruges ikke af animationen og

@@ -254,8 +254,11 @@ function koer() {
 
     overskrift("14b. Krystalgitteret: ioner med samme fortegn rører aldrig hinanden");
     var par = [["Na", "Cl"], ["Mg", "Cl"], ["Na", "O"], ["Al", "Cl"], ["Na", "PO4"], ["Al", "SO4"], ["Ca", "PO4"]];
+    /* Lærredet faar kun en rigtig størrelse, naar fanen rent faktisk er
+       synlig (display:none giver 0×0) - skift dertil foerst. */
+    d.querySelector('.faneknap[data-fane="fane-vand"]').click();
     f4.tilpas();
-    paastand("lærredet i fane-vand har fået en rigtig størrelse", f4.G && f4.G.klar, "l.b=" + f4.l.b);
+    paastand("lærredet i fane-vand har fået en rigtig størrelse", f4.l.b > 50, "l.b=" + f4.l.b);
     var fejlPar = [];
     for (i = 0; i < par.length; i++) {
         var salt5 = D.salt(par[i][0], par[i][1]);
@@ -277,6 +280,23 @@ function koer() {
     }
     paastand("ingen to ioner med samme fortegn rører hinanden i " + par.length + " gittertyper",
         fejlPar.length === 0, fejlPar.join(", "));
+    d.querySelector('.faneknap[data-fane="fane-bord"]').click();
+
+    overskrift("14c. Svær skjuler navnene helt - ogsaa i tooltip og beskeder");
+    var fb0 = NK.sims["fane-bord"];
+    fb0.saetTilstand("opgave");
+    fb0.saetSvaerhed("svaer");
+    paastand("en ions chip-tooltip viser kun formlen i svær",
+        fb0.bord.chips["Na"].title === "Na⁺", "fik \"" + fb0.bord.chips["Na"].title + "\"");
+    fb0.startOpgave(D.salt("Na", "Cl"), "navn");                 /* garanteret "navn"-retning */
+    fb0.bord.vaelg(D.ion("O"));                                   /* helt sikkert den forkerte anion */
+    var laekker = fb0.status && (fb0.status.indexOf(D.ionNavn(D.ion("O"))) >= 0
+        || fb0.status.indexOf(D.ionNavn(D.ion("Cl"))) >= 0);
+    paastand("fejlbeskeden i svær nævner ikke ionernes navne", !laekker, fb0.status);
+    fb0.saetSvaerhed("let");
+    paastand("i let viser tooltippen navnet igen",
+        fb0.bord.chips["Na"].title === "natriumion  Na⁺", "fik \"" + fb0.bord.chips["Na"].title + "\"");
+    fb0.saetTilstand("frit");
 
     overskrift("15. De to tilstande på byggefanen");
     var fb = NK.sims["fane-bord"];

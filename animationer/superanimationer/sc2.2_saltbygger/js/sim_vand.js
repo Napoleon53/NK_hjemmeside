@@ -174,6 +174,18 @@
         }
     };
 
+    /* ----- Glasset ---------------------------------------------------------- */
+    NK.SimVand.prototype.maal = function () {
+        var W = Math.max(this.l.b, 320), H = Math.max(this.l.h, 320);
+        var bb = Math.min(W - 60, 540);
+        var top = 78;
+        var bh = Math.max(200, H - 24 - top);
+        var bx = (W - bb) / 2;
+        var s = NK.klamp(bb / 24, 11, 19);
+        return { W: W, H: H, bx: bx, bb: bb, top: top, bund: top + bh, bh: bh, s: s,
+                 wy: top + bh * (1 - this.niveau), klar: this.l.b > 50 };
+    };
+
     /* ----- Krystalgitteret --------------------------------------------------
        Reglen er, at to ioner med samme fortegn ALDRIG maa ligge side om
        side. Hver formelenhed (p kationer, n anioner) lægges som sin egen

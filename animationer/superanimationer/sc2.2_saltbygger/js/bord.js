@@ -59,7 +59,6 @@
             b.type = "button";
             b.className = "chip " + (ion.q > 0 ? "kat" : "an") + (ion.sammensat ? " sammensat" : "");
             b.innerHTML = '<span class="cformel">' + D.ionTekst(ion) + '</span><span class="cnavn">' + D.ionNavn(ion) + "</span>";
-            b.title = D.ionNavn(ion) + "  " + D.ionTekst(ion);
             b.addEventListener("click", function () {
                 if (mig.slugKlik) { mig.slugKlik = false; return; }
                 mig.vaelg(ion, b);
@@ -300,9 +299,17 @@
         this.opdaterKnapper();
     };
 
+    /* Navnet paa chippen kan skjules med CSS, men title-attributten
+       (museover-tooltippen) er ikke en del af siden CSS kan skjule -
+       den skal opdateres for sig, ellers lækker den navnet alligevel. */
     NK.Bord.prototype.saetNavne = function (vis) {
         this.navne = !!vis;
         this.scene.classList.toggle("skjul-navne", !this.navne);
+        for (var id in this.chips) {
+            if (!Object.prototype.hasOwnProperty.call(this.chips, id)) continue;
+            var ion = D.ion(id);
+            this.chips[id].title = this.navne ? (D.ionNavn(ion) + "  " + D.ionTekst(ion)) : D.ionTekst(ion);
+        }
     };
 
     NK.Bord.prototype.aendret = function (hvad, side) {

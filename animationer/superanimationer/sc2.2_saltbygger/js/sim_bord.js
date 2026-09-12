@@ -224,8 +224,12 @@
         if (forkert) {
             t1 = "fejl";
             var maal = forkert.q > 0 ? o.kat : o.an;
-            this.status = "<b>" + D.ionTekst(forkert) + "</b> hedder " + D.ionNavn(forkert)
-                + " — du skal bruge " + D.ionNavn(maal) + ".";
+            /* I "svær" skal navnet ikke stå i beskeden heller - det ville
+               jo bare afsløre det, chippen selv holder skjult. */
+            this.status = this.svaerhedsgrad === "svaer"
+                ? "<b>" + D.ionTekst(forkert) + "</b> er ikke den rigtige ion her."
+                : "<b>" + D.ionTekst(forkert) + "</b> hedder " + D.ionNavn(forkert)
+                    + " — du skal bruge " + D.ionNavn(maal) + ".";
         } else if (b.kat && b.an) {
             t1 = "ok";
             t2 = "aktiv";
