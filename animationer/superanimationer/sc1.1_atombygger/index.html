@@ -12,10 +12,11 @@
     <h1><span class="ikon">⚛</span> Atom<span class="lang">byggeren</span></h1>
 
     <div class="faneknapper" role="tablist" aria-label="Vælg fane">
-        <button class="faneknap aktiv" data-fane="fane-byg" role="tab" aria-selected="true"><span class="nr">1</span>Byg et atom</button>
+        <button class="faneknap aktiv" data-fane="fane-byg" role="tab" aria-selected="true"><span class="nr">1</span>Atomets opbygning</button>
         <button class="faneknap" data-fane="fane-isotop" role="tab" aria-selected="false"><span class="nr">2</span>Isotoper</button>
         <button class="faneknap" data-fane="fane-ion" role="tab" aria-selected="false"><span class="nr">3</span>Skaller og ioner</button>
         <button class="faneknap" data-fane="fane-salt" role="tab" aria-selected="false"><span class="nr">4</span>Salte</button>
+        <button class="faneknap" data-fane="fane-spil" role="tab" aria-selected="false"><span class="nr">5</span>Spil</button>
     </div>
 
     <div class="visvalg" role="group" aria-label="Visning af protoner og neutroner">
@@ -100,6 +101,17 @@
             <div class="talraekke"><span>Massetal A = Z + N</span><span class="tal" id="byg-massetal">1</span></div>
             <div class="talraekke"><span>Ladning (p⁺ − e⁻)</span><span class="tal groen" id="byg-ladning">0</span></div>
             <div class="talraekke"><span>Elektronstruktur</span><span class="tal gul" id="byg-fordeling">1</span></div>
+        </div>
+
+        <div class="kort">
+            <h2>Det periodiske system</h2>
+            <div id="byg-pertabel"></div>
+            <div class="pnoegle">
+                <span class="metal">metal</span>
+                <span class="ikkemetal">ikke-metal</span>
+                <span class="halvmetal">halvmetal</span>
+                <span class="aedelgas">ædelgas</span>
+            </div>
         </div>
     </aside>
 </section>
@@ -217,6 +229,44 @@
     </aside>
 </section>
 
+<!-- ================================================================= -->
+<!-- FANE 5: SPIL                                                       -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-spil" role="tabpanel" aria-label="Spil">
+    <div class="scene">
+        <canvas id="spil-laerred"></canvas>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="spil-vaelg">
+            <h2>Vælg en bane</h2>
+            <button class="knap stor blaa banevalg" type="button" data-bane="0"><span>1 · Atomets partikler</span><span class="tegn">→</span></button>
+            <button class="knap stor blaa banevalg" type="button" data-bane="1" style="margin-top:7px;"><span>2 · Isotoper og ioner</span><span class="tegn">→</span></button>
+            <button class="knap stor blaa banevalg" type="button" data-bane="2" style="margin-top:7px;"><span>3 · Ioner og salte</span><span class="tegn">→</span></button>
+            <p class="note">Fem spørgsmål ad gangen. Du får at vide, hvorfor svaret er rigtigt.</p>
+        </div>
+
+        <div class="kort fremhaev" id="spil-boks" style="display:none;">
+            <h2>Spørgsmål <span class="taeller" id="spil-taeller">1/5</span></h2>
+            <p class="gaetsp" id="spil-sp"></p>
+            <div class="spilvalg" id="spil-svarvalg"></div>
+            <p class="besked" id="spil-svar"></p>
+            <button class="knap stor groen" id="spil-naeste" type="button" style="display:none;"><span>Næste</span><span class="tegn">→</span></button>
+        </div>
+
+        <div class="kort maaling" id="spil-resultat" style="display:none;">
+            <h2>Resultat</h2>
+            <div class="spilscore" id="spil-score">0 / 5</div>
+            <div class="spilstjerner" id="spil-stjerner"></div>
+            <p class="besked" id="spil-dom" style="margin-top:9px;"></p>
+            <div class="knaprad">
+                <button class="knap blaa" id="spil-igen" type="button">Spil banen igen</button>
+                <button class="knap" id="spil-tilbage" type="button">Vælg en anden bane</button>
+            </div>
+        </div>
+    </aside>
+</section>
+
 </main>
 
 <!-- ================================================================= -->
@@ -245,14 +295,15 @@
 <div class="overlay" id="hjaelp">
     <div class="overlay-boks">
         <h2>Atombyggeren</h2>
-        <p>Fire faner om det samme spørgsmål: <b>hvad er et atom lavet af, og hvad sker der, når man ændrer på delene?</b> Alt bygger på de samme tre tal — protoner, neutroner og elektroner — så det, du lærer på én fane, kan bruges på de næste.</p>
+        <p>Fem faner om det samme spørgsmål: <b>hvad er et atom lavet af, og hvad sker der, når man ændrer på delene?</b> Alt bygger på de samme tre tal — protoner, neutroner og elektroner — så det, du lærer på én fane, kan bruges på de næste.</p>
 
-        <h3>De fire faner</h3>
+        <h3>De fem faner</h3>
         <ul>
-            <li><b>Byg et atom</b> — læg partiklerne i én ad gangen. Hver gang får du at vide, hvad der skete: nyt grundstof, ny isotop eller ny ladning. Løs opgaverne, og byg fx ¹⁴C eller Mg²⁺.</li>
+            <li><b>Atomets opbygning</b> — læg partiklerne i én ad gangen. Hver gang får du at vide, hvad der skete: nyt grundstof, ny isotop eller ny ladning. Løs opgaverne, og byg fx ¹⁴C eller Mg²⁺.</li>
             <li><b>Isotoper</b> — hvorfor står der 35,45 ved chlor, når ingen chlorkerne vejer 35,45? Flyt på blandingen, og se balancepunktet følge med.</li>
             <li><b>Skaller og ioner</b> — den yderste skal afgør det hele. Gæt ladningen, før du får den at se, og hold øje med, at kernen aldrig ændrer sig.</li>
             <li><b>Salte</b> — kombinér et metal og et ikke-metal frit. Modellen tæller selv ud, hvor mange atomer der skal til, før elektronregnskabet går op.</li>
+            <li><b>Spil</b> — tre baner med fem spørgsmål i hver. Du får begrundelsen med, også når du svarer rigtigt.</li>
         </ul>
 
         <h3>Prøv det her</h3>
@@ -266,7 +317,7 @@
 
         <h3>Genveje</h3>
         <p>
-            <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> skift fane &nbsp;·&nbsp;
+            <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> <kbd>5</kbd> skift fane &nbsp;·&nbsp;
             <kbd>p</kbd> <kbd>n</kbd> <kbd>e</kbd> læg en partikel i &nbsp;·&nbsp;
             <kbd>P</kbd> <kbd>N</kbd> <kbd>E</kbd> tag en ud &nbsp;·&nbsp;
             <kbd>R</kbd> nulstil fanen &nbsp;·&nbsp;
@@ -283,10 +334,12 @@
 <script src="js/kerne.js"></script>
 <script src="js/data.js"></script>
 <script src="js/atom.js"></script>
+<script src="js/pertabel.js"></script>
 <script src="js/sim_byg.js"></script>
 <script src="js/sim_isotop.js"></script>
 <script src="js/sim_ion.js"></script>
 <script src="js/sim_salt.js"></script>
+<script src="js/sim_spil.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

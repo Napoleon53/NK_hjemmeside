@@ -43,8 +43,9 @@ function koer() {
     overskrift("1. Indlaesning");
     paastand("NK findes", !!NK);
     if (!NK) { vis(); return; }
-    paastand("alle fire simulationer er bygget", !!(NK.sims &&
-        NK.sims["fane-byg"] && NK.sims["fane-isotop"] && NK.sims["fane-ion"] && NK.sims["fane-salt"]));
+    paastand("alle fem simulationer er bygget", !!(NK.sims &&
+        NK.sims["fane-byg"] && NK.sims["fane-isotop"] && NK.sims["fane-ion"]
+        && NK.sims["fane-salt"] && NK.sims["fane-spil"]));
 
     overskrift("2. Panelerne er fyldt ud ved opstart");
     var skalHaveTekst = ["byg-grundstof", "byg-massetal", "byg-ladning", "byg-kerne",
@@ -59,7 +60,7 @@ function koer() {
     paastand(skalHaveTekst.length + " udlaesninger fyldt ud", tomme.length === 0, "tomme: " + tomme.join(", "));
 
     overskrift("3. Faneskift — praecis én aktiv ad gangen");
-    var faner = ["fane-byg", "fane-isotop", "fane-ion", "fane-salt", "fane-byg"];
+    var faner = ["fane-byg", "fane-isotop", "fane-ion", "fane-salt", "fane-spil", "fane-byg"];
     for (var f = 0; f < faner.length; f++) {
         var knap = d.querySelector('.faneknap[data-fane="' + faner[f] + '"]');
         knap.click();
@@ -140,6 +141,33 @@ function koer() {
     paastand("og maerkatet siger positiv ion",
         d.getElementById("byg-type").textContent.indexOf("Positiv") === 0,
         d.getElementById("byg-type").textContent);
+
+    overskrift("9. Spilbanerne laver gyldige spoergsmaal");
+    var baner = NK.SPIL_BANER;
+    for (var b = 0; b < baner.length; b++) {
+        var problemer = [];
+        for (var runde = 0; runde < 300; runde++) {
+            for (var s = 0; s < baner[b].slags.length; s++) {
+                var sp = baner[b].slags[s]();
+                var fejltekst = "";
+                if (!sp.tekst) fejltekst = "ingen tekst";
+                else if (!sp.forklaring) fejltekst = "ingen forklaring";
+                else if (!sp.valg || sp.valg.length !== 4) fejltekst = "har " + (sp.valg ? sp.valg.length : 0) + " svar";
+                else if (sp.rigtig < 0 || sp.rigtig >= sp.valg.length) fejltekst = "det rigtige svar mangler";
+                else {
+                    for (var q = 0; q < sp.valg.length; q++) {
+                        for (var w = q + 1; w < sp.valg.length; w++) {
+                            if (sp.valg[q] === sp.valg[w]) fejltekst = "to ens svar (" + sp.valg[q] + ")";
+                        }
+                        if (sp.valg[q] === "" || sp.valg[q] === undefined) fejltekst = "tomt svar";
+                    }
+                }
+                if (fejltekst && problemer.length < 4) problemer.push(sp.tekst + ": " + fejltekst);
+            }
+        }
+        paastand("bane " + (b + 1) + " (" + baner[b].navn + "): 300 runder uden fejl",
+            problemer.length === 0, problemer.join(" | "));
+    }
 
     vis();
 }

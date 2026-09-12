@@ -12,15 +12,20 @@ gæt-ladningen-øvelsen og elektronoverførslen til et salt. Resten er bygget om
 
 ## Hvad viser den
 
-Fire faner om det samme spørgsmål: *hvad er et atom lavet af, og hvad sker der,
+Fem faner om det samme spørgsmål: *hvad er et atom lavet af, og hvad sker der,
 når man ændrer på delene?*
 
 | # | Fane | Hvad man gør | Pointe |
 |---|------|--------------|--------|
-| 1 | Byg et atom | lægger protoner, neutroner og elektroner i én ad gangen | **protoner** = grundstoffet, **neutroner** = isotopen, **elektroner** = ladningen |
+| 1 | Atomets opbygning | lægger protoner, neutroner og elektroner i én ad gangen | **protoner** = grundstoffet, **neutroner** = isotopen, **elektroner** = ladningen |
 | 2 | Isotoper | skruer på, hvor meget der er af hver isotop | atommassen i det periodiske system er et **vejet gennemsnit** — derfor 35,45 for chlor |
 | 3 | Skaller og ioner | vælger grundstof, gætter ionens ladning | den yderste skal afgør det hele, og **kernen ændrer sig ikke**, når ionen dannes |
 | 4 | Salte | kombinerer et metal og et ikke-metal frit | formlen følger af, at **elektronregnskabet skal gå op**: Mg²⁺ + 2 Cl⁻ → MgCl₂ |
+| 5 | Spil | tager en bane på fem spørgsmål | det hele én gang til, men som spørgsmål — og med begrundelsen med, også når man rammer rigtigt |
+
+Fanen hedder med vilje ikke "Byg et atom": PhET har en sim med det navn, og selv
+om koden her er skrevet fra bunden, er der ingen grund til at lægge sig så tæt
+op ad den.
 
 ### Det nye i forhold til den gamle animation
 
@@ -42,26 +47,29 @@ når man ændrer på delene?*
 * **Bor og silicium danner ikke ioner** i modellen. Den gamle lod Bor afgive tre
   elektroner og blive B³⁺, hvilket ikke er rigtigt.
 
-Direkte link til en bestemt fane: `index.html#isotop`, `#ion`, `#salt`
+Direkte link til en bestemt fane: `index.html#isotop`, `#ion`, `#salt`, `#spil`
 (`#byg` eller ingenting giver fane 1).
 
-Genveje: <kbd>1</kbd>–<kbd>4</kbd> faner · <kbd>p</kbd> <kbd>n</kbd> <kbd>e</kbd>
+Genveje: <kbd>1</kbd>–<kbd>5</kbd> faner · <kbd>p</kbd> <kbd>n</kbd> <kbd>e</kbd>
 læg en partikel i · <kbd>P</kbd> <kbd>N</kbd> <kbd>E</kbd> tag en ud ·
-<kbd>mellemrum</kbd> pause · <kbd>R</kbd> nulstil fanen · <kbd>H</kbd> hjælp.
+<kbd>R</kbd> nulstil fanen · <kbd>H</kbd> hjælp.
 
 ## Filer
 
 ```
-index.html          markup for alle fire faner + hjælpe-overlay
+index.html          markup for alle fem faner + hjælpe-overlay
 css/stil.css        alt udseende. NB: decimaltal med PUNKTUM i CSS
 js/kerne.js         NK-navnerum, dansk talformat, hævet/sænket skrift,
                     DPR-skarpt canvas, tegnehjælpere
 js/data.js          grundstofferne 1–20: isotoper med rigtige kernemasser og
-                    andele, ionladninger, saltformler og -navne
+                    andele, ionladninger, saltformler og -navne, plads i det
+                    periodiske system
 js/atom.js          ÉT atom: tre tal (p, n, e), partikler der flyver ind og ud,
-                    kernepakning og hele tegningen. Bruges af alle fire faner
+                    kernepakning og hele tegningen. Bruges af alle faner
+js/pertabel.js      det periodiske system i lommeformat, 18 søjler
 js/sim_byg.js       fane 1     js/sim_isotop.js  fane 2
 js/sim_ion.js       fane 3     js/sim_salt.js    fane 4
+js/sim_spil.js      fane 5
 js/app.js           faneskift, tastatur, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen (se nedenfor)
 ```
@@ -99,6 +107,18 @@ man hæve loftet i `plads`-beregningen i `sim_byg.js` og `sim_ion.js`, ikke
 `js/sim_byg.js`. Hver skabelon returnerer `{tekst, p, n, e, svar}`, og resten
 klarer sig selv — opgaven tjekkes efter hver eneste ændring, så eleven får
 svaret i samme øjeblik, atomet er rigtigt.
+
+**Spørgsmålene** på fane 5 er `sp_`-funktionerne i `js/sim_spil.js`, samlet i
+tre baner i `BANER`. Hver funktion returnerer `{tekst, valg, rigtig,
+forklaring}` plus det, der skal tegnes (`atom`, `nuklid` eller `stortekst`), og
+bygger både spørgsmål, svarmuligheder og begrundelse ud af `data.js` — så et
+spørgsmål aldrig kan komme til at sige noget andet end resten af animationen.
+Distraktorerne er med vilje de fejl, eleven faktisk laver: protontallet i
+stedet for neutrontallet, ombyttede indekstal i saltformlen.
+
+Fordi spørgsmålene trækkes tilfældigt, tjekker `_selvtest.html` 300 runder af
+hver bane for, at der altid er fire *forskellige* svarmuligheder med præcis ét
+rigtigt iblandt. Det er ikke noget, man kan se på ét skærmbillede.
 
 **`_selvtest.html`** åbner `index.html` i en iframe og kontrollerer det, man
 ikke kan se på et skærmbillede: at faneskiftet rammer én fane ad gangen, at

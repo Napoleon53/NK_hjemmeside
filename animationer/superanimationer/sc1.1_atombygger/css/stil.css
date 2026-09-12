@@ -598,6 +598,117 @@ main { flex: 1; position: relative; min-height: 0; }
 .grundhoved .maerke { margin-bottom: 0; }
 
 /* ---------------------------------------------------------------------
+   DET PERIODISKE SYSTEM I LOMMEFORMAT
+   18 soejler, saa grupperne staar rigtigt. Cellerne er kvadratiske og
+   skalerer med panelets bredde.
+   --------------------------------------------------------------------- */
+.pertabel {
+    display: grid;
+    grid-template-columns: repeat(18, 1fr);
+    gap: 2px;
+}
+
+.pcelle {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    background-color: rgba(255, 255, 255, 0.07);
+    font-family: inherit;
+    font-size: 0.56rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #e9eef4;
+}
+
+button.pcelle { cursor: pointer; }
+button.pcelle:hover { border-color: rgba(255, 255, 255, 0.55); }
+
+.pcelle.metal     { background-color: rgba(224, 84, 70, 0.30); }
+.pcelle.ikkemetal { background-color: rgba(61, 158, 224, 0.30); }
+.pcelle.halvmetal { background-color: rgba(242, 197, 61, 0.26); }
+.pcelle.aedelgas  { background-color: rgba(63, 174, 114, 0.30); }
+
+.pcelle.valgt {
+    border-color: var(--gul);
+    box-shadow: 0 0 0 2px rgba(242, 197, 61, 0.45);
+    color: #ffffff;
+}
+
+.pnoegle {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    margin-top: 8px;
+    font-size: 0.6rem;
+    color: var(--tekst-mat);
+}
+
+.pnoegle span { display: flex; align-items: center; gap: 4px; }
+
+.pnoegle span::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.pnoegle .metal::before     { background-color: rgba(224, 84, 70, 0.75); }
+.pnoegle .ikkemetal::before { background-color: rgba(61, 158, 224, 0.75); }
+.pnoegle .halvmetal::before { background-color: rgba(242, 197, 61, 0.7); }
+.pnoegle .aedelgas::before  { background-color: rgba(63, 174, 114, 0.75); }
+
+/* ---------------------------------------------------------------------
+   SPILFANEN
+   --------------------------------------------------------------------- */
+.spilvalg {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    margin: 10px 0;
+}
+
+.spilknap {
+    background-color: var(--panel-2);
+    color: var(--tekst);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.14s ease, transform 0.08s ease;
+}
+
+.spilknap:hover:not(:disabled) { background-color: var(--panel-3); }
+.spilknap:active:not(:disabled) { transform: scale(0.99); }
+.spilknap:disabled { cursor: default; opacity: 0.5; }
+.spilknap.rigtig  { background-color: var(--groen-mork); border-color: var(--groen); color: #ffffff; opacity: 1; }
+.spilknap.forkert { background-color: var(--roed-mork); border-color: var(--roed); color: #ffffff; opacity: 1; }
+
+.spilscore {
+    text-align: center;
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: var(--gul);
+    font-variant-numeric: tabular-nums;
+}
+
+.spilstjerner {
+    text-align: center;
+    font-size: 1.5rem;
+    letter-spacing: 0.14em;
+    color: var(--gul);
+    margin-top: 2px;
+}
+
+/* ---------------------------------------------------------------------
    GAETTEBOKSEN
    --------------------------------------------------------------------- */
 .gaetboks { display: none; margin-top: 4px; }

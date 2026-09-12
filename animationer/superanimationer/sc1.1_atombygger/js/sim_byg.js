@@ -78,6 +78,26 @@
 
         NK.el("byg-opgave-ny").addEventListener("click", function () { mig.nyOpgave(); });
         NK.el("byg-opgave-svar").addEventListener("click", function () { mig.visSvar(); });
+
+        /* Det periodiske system i panelet viser, hvor det byggede atom
+           hoerer hjemme. Man kan ogsaa springe direkte til et grundstof
+           ved at trykke paa det. */
+        this.pertabel = new NK.PeriodiskSystem(NK.el("byg-pertabel"), function (z) {
+            mig.vaelgGrundstof(z);
+        });
+    };
+
+    /* Spring direkte til et grundstof: den almindelige kerne og lige
+       mange protoner og elektroner. */
+    NK.SimByg.prototype.vaelgGrundstof = function (z) {
+        var g = D.grundstof(z);
+        var iso = D.hyppigsteIsotop(z);
+        if (!g || (this.p === z && this.n === iso.a - z && this.e === z)) return;
+        this.p = z;
+        this.n = iso.a - z;
+        this.e = z;
+        this.anvend("Du sprang til " + g.navn.toLowerCase() + ": " + NK.talform(z, "proton", "protoner")
+            + " i kernen, og lige så mange elektroner, så atomet er neutralt.");
     };
 
     /* ----- Aendring af ét tal ---------------------------------------------- */
@@ -198,6 +218,8 @@
 
         var fordeling = D.skalfordeling(this.e);
         NK.saetTekst("byg-fordeling", this.e ? fordeling.join(", ") : "ingen elektroner");
+
+        if (this.pertabel) this.pertabel.marker(g ? this.p : 0);
 
         /* Hvad ER det, eleven har bygget? */
         var maerkat, maerkatKlasse;

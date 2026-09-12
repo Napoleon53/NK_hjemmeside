@@ -121,6 +121,19 @@
 
     D.MAKS_Z = D.GRUNDSTOFFER.length;
 
+    /* Grundstoffets plads i det periodiske system: [periode, gruppe].
+       Springet fra gruppe 2 til gruppe 13 i 2. og 3. periode er med
+       vilje: det er netop hullet, der goer det til et PERIODISK system
+       og ikke bare en nummereret liste. */
+    D.PLADS = [
+        null,
+        [1, 1],                                                            /* H */
+        [1, 18],                                                           /* He */
+        [2, 1], [2, 2], [2, 13], [2, 14], [2, 15], [2, 16], [2, 17], [2, 18],
+        [3, 1], [3, 2], [3, 13], [3, 14], [3, 15], [3, 16], [3, 17], [3, 18],
+        [4, 1], [4, 2]                                                     /* K, Ca */
+    ];
+
     /* De otte grundstoffer, isotopfanen tilbyder. Alle andre ville enten
        have én isotop (intet at tage gennemsnit af) eller sige det samme
        en gang til. Hver af disse otte viser noget nyt:
