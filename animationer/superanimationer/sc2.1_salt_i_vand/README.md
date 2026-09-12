@@ -62,7 +62,13 @@ Ligningen står i panelet og skrives om, så snart man skifter salt:
 CaCl₂(s) → Ca²⁺(aq) + 2 Cl⁻(aq).
 
 **Temperaturen** bestemmer tempoet. Ved *koldt* tager det et par minutter at
-opløse krystallen, ved *varmt* omkring et minut.
+opløse krystallen, ved *varmt* under et minut.
+
+**Vandmolekylerne genbruges ikke.** Når de fire bærere har afleveret deres ion
+ude i vandet, forsvinder de, og friske toner op på tilfældige pladser i
+opløsningen. Ellers ville de samme fire blive ved med at dukke op lige dér, hvor
+saltet sidst gik i opløsning — og det er hverken kønt eller rigtigt: der er vand
+overalt i glasset.
 
 **Tungtopløselige salte stopper.** Der slipper nogle få ioner ud, og så sker der
 ikke mere: vandet er mættet, og resten bliver liggende. Antallet kommer fra

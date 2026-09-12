@@ -204,6 +204,85 @@ function koer() {
     paastand("CaCO₃: graensen overskrides ikke", s1.frie === maksK,
         "frie: " + s1.frie + ", må højst være " + maksK);
 
+    overskrift("9b. Vandet vender rigtigt om en fri ion");
+    /* Tegner en fri ion med sin vandskal på et skjult lærred og går udad
+       fra midten langs 180 stråler: hvor langt ude ligger den første røde
+       (oxygen) og den første lyse (hydrogen) pixel? Oxygen skal ligge
+       inderst ved en positiv ion, hydrogen inderst ved en negativ. */
+    function skalAfstande(ion) {
+        var c = d.createElement("canvas");
+        c.width = 400; c.height = 400;
+        var k = c.getContext("2d");
+        k.fillStyle = "#000"; k.fillRect(0, 0, 400, 400);
+        var r = 60;
+        NK.Tegn.vandskal(k, 200, 200, r, 0, 4, ion.q > 0);
+        NK.Tegn.ion(k, 200, 200, ion, r);
+        var px = k.getImageData(0, 0, 400, 400).data;
+        var sumO = 0, nO = 0, sumH = 0, nH = 0;
+        for (var a = 0; a < 360; a += 2) {
+            var fO = 0, fH = 0;
+            for (var afst = r * 1.02; afst < r * 2.6; afst += 0.5) {
+                var x = Math.round(200 + Math.cos(a * Math.PI / 180) * afst);
+                var y = Math.round(200 + Math.sin(a * Math.PI / 180) * afst);
+                var p = (y * 400 + x) * 4, R = px[p], G = px[p + 1], B = px[p + 2];
+                if (!fO && R > 60 && R > G * 1.6 && R > B * 1.6) fO = afst;
+                if (!fH && R > 80 && Math.abs(R - G) < 25 && Math.abs(G - B) < 25) fH = afst;
+                if (fO && fH) break;
+            }
+            if (fO) { sumO += fO; nO++; }
+            if (fH) { sumH += fH; nH++; }
+        }
+        return { o: nO ? sumO / nO / r : 99, h: nH ? sumH / nH / r : 99 };
+    }
+    var skalPlus = skalAfstande({ formel: "Na", q: 1, r: 0.70 });
+    var skalMinus = skalAfstande({ formel: "Cl", q: -1, r: 1.00 });
+    paastand("positiv ion: oxygen ligger inderst", skalPlus.o < skalPlus.h,
+        "oxygen " + skalPlus.o.toFixed(2) + "r mod hydrogen " + skalPlus.h.toFixed(2) + "r");
+    paastand("negativ ion: hydrogen ligger inderst", skalMinus.h < skalMinus.o,
+        "hydrogen " + skalMinus.h.toFixed(2) + "r mod oxygen " + skalMinus.o.toFixed(2) + "r");
+
+    overskrift("9c. Nye vandmolekyler kommer fra hele opløsningen");
+    NK.Valg.saet("NaCl");
+    s1.tilpas();
+    var prove = s1.vand[0];
+    var xer = [], yer = [];
+    for (var sp = 0; sp < 250; sp++) {
+        prove.x = s1.glasX + 40; prove.y = s1.overflade + 30;   /* altid samme udgangspunkt */
+        s1.sendVaek(prove);
+        xer.push(prove.x); yer.push(prove.y);
+    }
+    var xSpredning = Math.max.apply(null, xer) - Math.min.apply(null, xer);
+    var ySpredning = Math.max.apply(null, yer) - Math.min.apply(null, yer);
+    paastand("stederne dækker glassets bredde", xSpredning > s1.glasB * 0.7,
+        xSpredning.toFixed(0) + " af " + s1.glasB.toFixed(0) + " px");
+    paastand("stederne dækker vandets højde", ySpredning > (s1.gitterTop - s1.overflade) * 0.5,
+        ySpredning.toFixed(0) + " af " + (s1.gitterTop - s1.overflade).toFixed(0) + " px");
+
+    /* Og i praksis: når en ion lander ude i vandet, må bærerne ikke stå
+       tilbage som en klump lige dér, hvor den blev sluppet. Et enkelt
+       molekyle kan sagtens lande tæt på ved et tilfælde - derfor måles
+       gennemsnittet over mange frigivelser. Med fire bærere siddende fast
+       ville tallet være mindst 4 hver eneste gang; er de spredt
+       tilfældigt ud, ligger det omkring et halvt. */
+    s1.nulstil(); s1.tilpas();
+    var naerSum = 0, naerAntal = 0, varPaavej = {};
+    for (var trin = 0; trin < 12000 && naerAntal < 10; trin++) {
+        s1.ioner.forEach(function (o, n) { varPaavej[n] = (o.tilstand === "paavej"); });
+        s1.opdater(0.05);
+        for (var n = 0; n < s1.ioner.length && naerAntal < 10; n++) {
+            var ion = s1.ioner[n];
+            if (!varPaavej[n] || ion.tilstand !== "fri") continue;
+            naerSum += s1.vand.filter(function (v) {
+                return Math.hypot(v.x - ion.x, v.y - ion.y) < 70;
+            }).length;
+            naerAntal++;
+        }
+    }
+    var naerSnit = naerAntal ? naerSum / naerAntal : 99;
+    paastand("bærerne bliver ikke liggende som en klump ved ionen",
+        naerAntal >= 5 && naerSnit < 2,
+        "gennemsnit " + naerSnit.toFixed(2) + " vandmolekyler inden for 70 px over " + naerAntal + " frigivelser");
+
     overskrift("10. Fane 2 — opløst + bundfald går op");
     var s2 = NK.sims["fane-maetning"];
     NK.Valg.saet("NaCl");

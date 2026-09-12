@@ -76,10 +76,14 @@
 
         for (i = 0; i < antal; i++) {
             vinkel = fase + i * (Math.PI * 2 / antal);
-            T.vand(ctx,
-                x + Math.cos(vinkel) * r * 1.52,
-                y + Math.sin(vinkel) * r * 1.52,
-                vinkel + Math.PI / 2,
+            /* Samme regnestykke som for de arbejdende vandmolekyler: T.vendMod
+               vender den rigtige ende ind mod ionen, og spidsH flytter selve
+               ankerpunktet, saa den ende ogsaa ligger naermest. De to skal
+               foelges ad - ellers ender hydrogen inderst ved en positiv ion. */
+            var sx = x + Math.cos(vinkel) * r * 1.52;
+            var sy = y + Math.sin(vinkel) * r * 1.52;
+            T.vand(ctx, sx, sy,
+                T.vendMod(sx, sy, x, y, positiv),
                 r * 0.030,
                 { alpha: 0.5, spidsH: !positiv });
         }

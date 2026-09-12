@@ -128,7 +128,8 @@
             this.vand.push({
                 x: 0, y: 0, hjemX: 0, hjemY: 0,
                 vinkel: 0, tilstand: "hjemme",
-                maal: null, plads: 0, afX: 0, afY: 0
+                maal: null, plads: 0, afX: 0, afY: 0,
+                fade: 1                       /* toner op, naar molekylet er nyt et sted */
             });
         }
 
@@ -208,6 +209,22 @@
         v.hjemY = top + Math.random() * (bund - top);
     };
 
+    /* Det molekyle, der er faerdigt med sin ion, bliver ikke ved med at
+       svoemme videre derfra - saa ville de fire baerere blive ved med at
+       dukke op praecis dér, hvor saltet lige er gaaet i oploesning. I
+       stedet forsvinder det, og et friskt et toner op et tilfaeldigt sted
+       i vandet. Det er ogsaa naermere sandheden: der er vand overalt, og
+       det er ikke de samme fire molekyler, der loeber frem og tilbage. */
+    P.sendVaek = function (v) {
+        this.nytHjem(v);
+        v.x = v.hjemX;
+        v.y = v.hjemY;
+        v.maal = null;
+        v.tilstand = "hjemme";
+        v.vinkel = Math.random() * Math.PI * 2;
+        v.fade = 0;
+    };
+
     P.tilpas = function () {
         if (this.L.tilpas()) this.layout(true);
     };
@@ -281,8 +298,7 @@
                     o.x = o.maalX; o.y = o.maalY;
                     o.tilstand = "fri";
                     for (var b = 0; b < o.baerere.length; b++) {
-                        this.nytHjem(o.baerere[b]);
-                        o.baerere[b].tilstand = "hjem";
+                        this.sendVaek(o.baerere[b]);
                     }
                     o.baerere = [];
                     o.vx = (Math.random() - 0.5) * 26;
@@ -322,6 +338,8 @@
     P.opdaterVand = function (v, skridt, dt) {
         var o = v.maal;
 
+        if (v.fade < 1) v.fade = Math.min(1, v.fade + dt * 3);
+
         switch (v.tilstand) {
         case "hjemme":
             o = this.tilbage() === 0 ? null : this.naermesteFrie(v);
@@ -344,12 +362,7 @@
             break;
 
         case "soeger": {
-            if (!o || o.tilstand !== "fast") {
-                v.maal = null;
-                this.nytHjem(v);
-                v.tilstand = "hjem";
-                break;
-            }
+            if (!o || o.tilstand !== "fast") { this.sendVaek(v); break; }
             var vinkel = o.grundvinkel + v.plads * (Math.PI / 2);
             var afstand = this.ionRadius(o) + this.celle * 0.46;
             var maalX = o.x + Math.cos(vinkel) * afstand;
@@ -374,27 +387,12 @@
         }
 
         case "fast":
-            if (!o) { v.tilstand = "hjem"; break; }
+            if (!o) { this.sendVaek(v); break; }
             v.x = o.x + v.afX;
             v.y = o.y + v.afY;
             v.vinkel = T.vendMod(v.x, v.y, o.x, o.y, o.ion.q > 0);
-            if (o.tilstand === "fri") { v.maal = null; this.nytHjem(v); v.tilstand = "hjem"; }
+            if (o.tilstand === "fri") this.sendVaek(v);
             break;
-
-        case "hjem": {
-            var hx = v.hjemX - v.x, hy = v.hjemY - v.y;
-            var hd = Math.hypot(hx, hy);
-            if (hd > skridt) {
-                v.x += (hx / hd) * skridt;
-                v.y += (hy / hd) * skridt;
-                v.vinkel += 3 * dt;
-            } else {
-                v.x = v.hjemX; v.y = v.hjemY;
-                v.maal = null;
-                v.tilstand = "hjemme";
-            }
-            break;
-        }
         }
     };
 
@@ -505,7 +503,7 @@
             var arbejder = v.tilstand === "soeger" || v.tilstand === "fast";
             T.vand(ctx, v.x, v.y, v.vinkel, this.celle / 26, {
                 delta: this.visDelta,
-                alpha: arbejder ? 1 : 0.55,
+                alpha: (arbejder ? 1 : 0.55) * v.fade,
                 spidsH: v.maal ? v.maal.ion.q < 0 : false
             });
         }
