@@ -839,8 +839,8 @@
         ctx.fillStyle = '#16161b';
         ctx.fillRect(0, 0, LW, LH);
 
-        tekst('Klik på et glas for at vælge det \u00B7 Læg mærke til HVOR i glasset boblerne dannes',
-              LW / 2, 34, '#8a8a96', 15);
+        tekst('Klik på et glas for at vælge det · Læg mærke til HVOR i glasset boblerne dannes',
+              LW / 2, 34, '#c5c5d1', 16);
 
         /* Stativets bagerste tværstang */
         ctx.fillStyle = '#3a3028';
@@ -892,11 +892,11 @@
         }
 
         /* Etiketter over glasset */
-        tekst('GLAS ' + (i + 1), cx, 80, '#6f6f7c', 12, 'center', true);
-        tekst(t.kort, cx, 102, '#ffffff', 15, 'center', true);
-        const badgeFarve = t.type === 'homogen' ? '#8ecdf5' : (t.type === 'heterogen' ? '#f5c069' : '#8a8a96');
-        tekst(t.type === 'ingen' ? 'ingen katalysator' : t.type + ' katalyse', cx, 124, badgeFarve, 12);
-        tekst(t.under, cx, 143, '#6f6f7c', 11);
+        tekst('GLAS ' + (i + 1), cx, 80, '#c5c5d1', 13, 'center', true);
+        tekst(t.kort, cx, 103, '#ffffff', 17, 'center', true);
+        const badgeFarve = t.type === 'homogen' ? '#8ecdf5' : (t.type === 'heterogen' ? '#f5c069' : '#c5c5d1');
+        tekst(t.type === 'ingen' ? 'ingen katalysator' : t.type + ' katalyse', cx, 125, badgeFarve, 13);
+        tekst(t.under, cx, 144, '#c5c5d1', 12);
 
         /* Væske (klippet til glassets indre) */
         ctx.save();
@@ -1047,8 +1047,8 @@
             ctx.fillRect(bx, by, bw * g.o2, bh);
             ctx.restore();
         }
-        tekst('O₂ dannet: ' + Math.round(g.o2 * 100) + ' %', cx, 530, '#b9b9c4', 12);
-        tekst(hastighedsord(i), cx, 550, '#75757f', 12);
+        tekst('O₂ dannet: ' + Math.round(g.o2 * 100) + ' %', cx, 530, '#d5d5de', 13);
+        tekst(hastighedsord(i), cx, 550, '#c5c5d1', 13);
     }
 
     function tegnSplint() {

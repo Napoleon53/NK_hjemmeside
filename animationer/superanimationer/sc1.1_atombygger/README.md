@@ -115,15 +115,26 @@ svaret i samme øjeblik, atomet er rigtigt.
 
 **Spørgsmålene** på fane 5 er `sp_`-funktionerne i `js/sim_spil.js`, samlet i
 tre baner i `BANER`. Hver funktion returnerer `{tekst, valg, rigtig,
-forklaring}` plus det, der skal tegnes (`atom`, `nuklid` eller `stortekst`), og
-bygger både spørgsmål, svarmuligheder og begrundelse ud af `data.js` — så et
-spørgsmål aldrig kan komme til at sige noget andet end resten af animationen.
-Distraktorerne er med vilje de fejl, eleven faktisk laver: protontallet i
-stedet for neutrontallet, ombyttede indekstal i saltformlen.
+forklaring, noegle}` plus det, der skal tegnes (`atom`, `nuklid` eller
+`stortekst`), og bygger både spørgsmål, svarmuligheder og begrundelse ud af
+`data.js` — så et spørgsmål aldrig kan komme til at sige noget andet end
+resten af animationen. Distraktorerne er med vilje de fejl, eleven faktisk
+laver: protontallet i stedet for neutrontallet, fortegnsfejl på ladningen.
+Bane 3 ("Ioner") ruller ikke ind i salte — det kommer eleven først til på
+fane 4 — men gætter til gengæld elektrontallet ud fra selve ionskrivemåden
+(fx N³⁻), uden et billede at tælle prikker på.
+
+`noegle` bruges til at sikre, at de fem spørgsmål i én runde altid handler om
+fem forskellige grundstoffer: `nytSpoergsmaal()` i `sim_spil.js` trækker en ny
+opgave, indtil dens `(slags, noegle)`-par ikke allerede er brugt i denne
+runde. Uden det kunne man sagtens få "hvilken ladning får kalium" to gange i
+samme runde, bare pakket i to forskellige spørgsmålstyper.
 
 Fordi spørgsmålene trækkes tilfældigt, tjekker `_selvtest.html` 300 runder af
 hver bane for, at der altid er fire *forskellige* svarmuligheder med præcis ét
-rigtigt iblandt. Det er ikke noget, man kan se på ét skærmbillede.
+rigtigt iblandt, og yderligere 200 runder for, at ingen af de fem spørgsmål i
+én runde gentager samme (type, grundstof)-par. Det er ikke noget, man kan se
+på ét skærmbillede.
 
 **`_selvtest.html`** åbner `index.html` i en iframe og kontrollerer det, man
 ikke kan se på et skærmbillede: at faneskiftet rammer én fane ad gangen, at

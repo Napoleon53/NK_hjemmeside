@@ -118,7 +118,9 @@
         text-align: center;
         line-height: 1.6;
         color: #23272f;
-        padding: 0 104px;
+        padding: 0 16px;
+        max-width: 100%;
+        white-space: nowrap;
     }
 
     #ligning .lille-ligning { font-size: 0.92rem; font-weight: normal; color: #55606d; }
@@ -511,7 +513,7 @@ var SYSTEMER = [
     beholder: "reagensglas",
     pletter: ["#e8709b", "#2d5fd2"],
     ligning: '<span style="color:#c94a7a">Co(H₂O)₆²⁺</span>(aq) + 4 Cl⁻(aq) <span class="rx-pil">⇌</span> <span style="color:#2453b8">CoCl₄²⁻</span>(aq) + 6 H₂O(l)',
-    entalpi: "Reaktionen mod højre optager varme (endoterm, ΔH &gt; 0).",
+    entalpi: "Reaktionen mod højre optager varme (endoterm).",
     beskrivelse: "Det lyserøde Co(H₂O)₆²⁺ og det blå CoCl₄²⁻ står i ligevægt. Farven afslører med det samme, hvor ligevægten er.",
     barVenstre: "lyserød = Co(H₂O)₆²⁺",
     barHoejre: "blå = CoCl₄²⁻",
@@ -735,7 +737,7 @@ var SYSTEMER = [
     beholder: "sproejte",
     pletter: ["#94441a", "#e8ecef"],
     ligning: '2 <span style="color:#94441a">NO₂</span>(g) <span class="rx-pil">⇌</span> <span style="color:#5a6673">N₂O₄</span>(g)',
-    entalpi: "Reaktionen mod højre udvikler varme (exoterm, ΔH &lt; 0). NO₂ er brun, N₂O₄ er farveløs.",
+    entalpi: "Reaktionen mod højre udvikler varme (exoterm). NO₂ er brun, N₂O₄ er farveløs.",
     beskrivelse: "En lukket gassprøjte med en blanding af brun NO₂ og farveløs N₂O₄. Her kan vi både ændre temperaturen og rumfanget.",
     barVenstre: "brun = meget NO₂",
     barHoejre: "lys = meget N₂O₄",
@@ -951,7 +953,7 @@ var SYSTEMER = [
     tags: "temperatur · gasafgang · fælles ion",
     beholder: "baegerglas",
     pletter: ["#206ec6", "#e4cd2d"],
-    ligning: '<span class="lille-ligning">CO₂(g) ⇌ CO₂(aq)</span><br><span style="color:#4a6070">CO₂</span>(aq) + 2 H₂O(l) <span class="rx-pil">⇌</span> <span style="color:#c05028">H₃O⁺</span>(aq) + HCO₃⁻(aq)',
+    ligning: '<span class="lille-ligning">CO₂(g) ⇌ CO₂(aq);</span> <span style="color:#4a6070">CO₂</span>(aq) + 2 H₂O(l) <span class="rx-pil">⇌</span> <span style="color:#c05028">H₃O⁺</span>(aq) + HCO₃⁻(aq)',
     entalpi: "Bromthymolblåt er tilsat: gul i sur opløsning, grøn omkring pH 7, blå i basisk.",
     beskrivelse: "Vand med bromthymolblåt, som der er pustet CO₂ ned i. To ligevægte hænger sammen: opløsningen af CO₂ og dannelsen af kulsyre.",
     barVenstre: "blå = lidt CO₂",
@@ -1058,7 +1060,7 @@ var SYSTEMER = [
     beholder: "fastStof",
     pletter: ["#1e63c8", "#eef1f4"],
     ligning: '<span style="color:#1a56b0">CuSO₄·5H₂O</span>(s) <span class="rx-pil">⇌</span> <span style="color:#6a7580">CuSO₄</span>(s) + 5 H₂O(g)',
-    entalpi: "Reaktionen mod højre optager varme (endoterm, ΔH &gt; 0). Kun vanddampen indgår i reaktionsbrøken — faste stoffer gør ikke.",
+    entalpi: "Reaktionen mod højre optager varme (endoterm). Kun vanddampen indgår i reaktionsbrøken — faste stoffer gør ikke.",
     beskrivelse: "Blåt kobbersulfat med krystalvand står i ligevægt med hvidt, vandfrit kobbersulfat og vanddamp. En heterogen ligevægt mellem faste stoffer og en gas.",
     barVenstre: "blå = CuSO₄·5H₂O",
     barHoejre: "hvid = CuSO₄",
@@ -1220,6 +1222,17 @@ var labCtx = labCanvas.getContext("2d");
 var grafCanvas = document.getElementById("graf");
 var grafCtx = grafCanvas.getContext("2d");
 
+/* Reaktionsskemaet skal altid stå på én linje - skaler skriften ned, hvis den er for bred til pladsen. */
+function tilpasLigningStoerrelse() {
+    var stoerrelse = 1.3;
+    elLigning.style.fontSize = stoerrelse + "rem";
+    var maxBredde = elLigning.clientWidth;
+    while (elLigning.scrollWidth > maxBredde && stoerrelse > 0.7) {
+        stoerrelse -= 0.05;
+        elLigning.style.fontSize = stoerrelse + "rem";
+    }
+}
+
 function kopiTilstand(t) {
     var ny = { konc: {}, temp: t.temp, volumen: t.volumen, bundfald: t.bundfald, bobler: t.bobler };
     for (var k in t.konc) { if (t.konc.hasOwnProperty(k)) { ny.konc[k] = t.konc[k]; } }
@@ -1276,6 +1289,7 @@ function vaelgSystem(s) {
     elLab.style.display = "flex";
     elGrafKnap.classList.remove("skjult");
     elLigning.innerHTML = s.ligning;
+    tilpasLigningStoerrelse();
     elEntalpi.innerHTML = s.entalpi;
     elBar.style.background = "linear-gradient(90deg," + s.pletter[0] + "," + s.pletter[1] + ")";
     elBarV.textContent = s.barVenstre;
@@ -2516,7 +2530,10 @@ document.addEventListener("keydown", function (e) {
     }
 });
 
-window.addEventListener("resize", function () { tegnAlt(); });
+window.addEventListener("resize", function () {
+    tegnAlt();
+    if (sys) { tilpasLigningStoerrelse(); }
+});
 
 byggMenu();
 requestAnimationFrame(loop);

@@ -103,7 +103,8 @@
             forklaring: "Elektronerne sidder (" + D.skalfordeling(g.z).join(", ") + "), altså "
                 + NK.talform(g.z, "elektron", "elektroner") + " i alt. Atomet er neutralt, så der er lige så mange "
                 + "protoner, og " + g.z + " protoner betyder " + g.navn.toLowerCase() + ".",
-            atom: { p: g.z, n: iso.a - g.z, e: g.z }
+            atom: { p: g.z, n: iso.a - g.z, e: g.z },
+            noegle: g.z
         };
     }
 
@@ -118,7 +119,8 @@
             valg: o.valg, rigtig: o.rigtig,
             forklaring: "Massetallet " + iso.a + " tæller protoner og neutroner sammen, så "
                 + iso.a + " − " + g.z + " = " + NK.talform(n, "neutron", "neutroner") + ".",
-            nuklid: { a: iso.a, z: g.z, symbol: g.symbol }
+            nuklid: { a: iso.a, z: g.z, symbol: g.symbol },
+            noegle: g.z
         };
     }
 
@@ -132,7 +134,8 @@
             valg: o.valg, rigtig: o.rigtig,
             forklaring: g.navn + " har elektronstrukturen " + D.skalfordeling(g.z).join(", ") + ", så der er "
                 + NK.talform(valens, "elektron", "elektroner") + " i yderste skal.",
-            atom: { p: g.z, n: D.hyppigsteIsotop(g.z).a - g.z, e: g.z }
+            atom: { p: g.z, n: D.hyppigsteIsotop(g.z).a - g.z, e: g.z },
+            noegle: g.z
         };
     }
 
@@ -149,7 +152,8 @@
                 + NK.talform(n, "neutron", "neutroner") + ". Hvad er massetallet?",
             valg: o.valg, rigtig: o.rigtig,
             forklaring: "Massetallet er protoner + neutroner: " + g.z + " + " + n + " = " + iso.a + ".",
-            atom: { p: g.z, n: n, e: g.z }
+            atom: { p: g.z, n: n, e: g.z },
+            noegle: g.z
         };
     }
 
@@ -165,7 +169,8 @@
             valg: o.valg, rigtig: o.rigtig,
             forklaring: "Ladningen er protoner minus elektroner: " + g.z + " − " + e + " = "
                 + NK.ladningstekst(g.ion) + ".",
-            atom: { p: g.z, n: D.hyppigsteIsotop(g.z).a - g.z, e: e }
+            atom: { p: g.z, n: D.hyppigsteIsotop(g.z).a - g.z, e: e },
+            noegle: g.z
         };
     }
 
@@ -183,7 +188,8 @@
             forklaring: "Kernen har " + NK.talform(g.z, "proton", "protoner") + ", så det er "
                 + g.navn.toLowerCase() + ". Der er kun " + NK.talform(e, "elektron", "elektroner")
                 + ", og så er ladningen " + NK.ladningstekst(g.ion) + ".",
-            atom: { p: g.z, n: D.hyppigsteIsotop(g.z).a - g.z, e: e }
+            atom: { p: g.z, n: D.hyppigsteIsotop(g.z).a - g.z, e: e },
+            noegle: g.z
         };
     }
 
@@ -201,7 +207,8 @@
             valg: o.valg, rigtig: o.rigtig,
             forklaring: "Isotoper har samme protontal, men forskelligt neutrontal. " + rigtig + " har også "
                 + NK.talform(g.z, "proton", "protoner") + ", så det er stadig " + g.navn.toLowerCase() + ".",
-            nuklid: { a: vist.a, z: g.z, symbol: g.symbol }
+            nuklid: { a: vist.a, z: g.z, symbol: g.symbol },
+            noegle: g.z
         };
     }
 
@@ -222,32 +229,28 @@
                              : "optager " + NK.talform(-g.ion, "elektron", "elektroner"))
                 + (aedel ? " for at ligne " + aedel.navn.toLowerCase() : "")
                 + ". Elektroner er negativt ladede, så ladningen bliver " + NK.ladningstekst(g.ion) + ".",
-            atom: { p: g.z, n: D.hyppigsteIsotop(g.z).a - g.z, e: g.z }
+            atom: { p: g.z, n: D.hyppigsteIsotop(g.z).a - g.z, e: g.z },
+            noegle: g.z
         };
     }
 
-    function formelMed(m, ik, a, b) {
-        return m.symbol + (a > 1 ? NK.saenket(a) : "") + ik.symbol + (b > 1 ? NK.saenket(b) : "");
-    }
-
-    function sp_saltformel() {
-        var m = D.findSymbol(tilfaeldig(D.SALT_METALLER));
-        var ik = D.findSymbol(tilfaeldig(D.SALT_IKKEMETALLER));
-        var f = D.formelforhold(m.ion, ik.ion);
-        var rigtig = D.saltformel(m, ik);
-        var o = opstil(rigtig, [
-            formelMed(m, ik, 1, 1),
-            formelMed(m, ik, f.antalNegative, f.antalPositive),
-            formelMed(m, ik, Math.abs(ik.ion), Math.abs(m.ion))
-        ], function (i) { return formelMed(m, ik, 1, i + 2); });
+    /* Given ionens skrivemaade (fx N³⁻), gaet elektrontallet. Ingen atom
+       tegnes til denne - saa er det symbolet, man skal regne ud fra, ikke
+       prikkerne man kan taelle. */
+    function sp_elektronantal() {
+        var g = tilfaeldig(ionDannere());
+        var e = g.z - g.ion;
+        var symTekst = g.symbol + NK.ladningHaevet(g.ion);
+        var o = opstil(String(e), [String(g.z), String(g.z + g.ion)],
+            function (i) { return String(e + (i % 2 === 0 ? 1 : -1) * (Math.floor(i / 2) + 1)); });
         return {
-            tekst: "Hvad er formlen for saltet af " + m.navn.toLowerCase() + " og " + ik.navn.toLowerCase() + "?",
+            tekst: "Hvor mange elektroner er der i ionen " + symTekst + "?",
             valg: o.valg, rigtig: o.rigtig,
-            forklaring: "Hvert " + m.symbol + " afgiver " + NK.talform(Math.abs(m.ion), "elektron", "elektroner")
-                + ", og hvert " + ik.symbol + " optager " + NK.talform(Math.abs(ik.ion), "elektron", "elektroner")
-                + ". Det går først op ved " + f.antalPositive + " " + m.symbol + " og " + f.antalNegative + " "
-                + ik.symbol + ", altså " + rigtig + ".",
-            stortekst: m.symbol + NK.ladningHaevet(m.ion) + "  +  " + ik.symbol + NK.ladningHaevet(ik.ion)
+            forklaring: g.navn + " har " + NK.talform(g.z, "proton", "protoner") + ", og det ændrer en ion sig "
+                + "ikke ved. Ladningen " + NK.ladningstekst(g.ion) + " betyder " + NK.talform(Math.abs(g.ion), "elektron", "elektroner")
+                + " " + (g.ion > 0 ? "færre" : "flere") + " end protoner, altså " + NK.talform(e, "elektron", "elektroner") + ".",
+            stortekst: symTekst,
+            noegle: g.z
         };
     }
 
@@ -261,14 +264,15 @@
             forklaring: g.symbol + NK.ladningHaevet(g.ion) + " har " + (g.z - g.ion)
                 + " elektroner fordelt (" + D.skalfordeling(g.z - g.ion).join(", ")
                 + "), og det er præcis " + aedel.navn.toLowerCase() + "s elektronstruktur.",
-            atom: { p: g.z, n: D.hyppigsteIsotop(g.z).a - g.z, e: g.z }
+            atom: { p: g.z, n: D.hyppigsteIsotop(g.z).a - g.z, e: g.z },
+            noegle: g.z
         };
     }
 
     var BANER = [
         { navn: "Atomets partikler", slags: [sp_grundstof, sp_neutroner, sp_yderste] },
         { navn: "Isotoper og ioner", slags: [sp_massetal, sp_ladning, sp_partikel, sp_isotop] },
-        { navn: "Ioner og salte", slags: [sp_ionladning, sp_saltformel, sp_aedelgas] }
+        { navn: "Ioner", slags: [sp_ionladning, sp_elektronantal, sp_aedelgas] }
     ];
 
     /* Lagt frem, saa _selvtest.html kan traekke tusindvis af spoergsmaal
@@ -301,7 +305,8 @@
             valgt: -1,          /* -1 = ikke svaret endnu */
             faerdig: false,
             perfekt: false,     /* 5/5 opnaaet mindst én gang */
-            sidsteSlags: null
+            sidsteSlags: null,
+            brugte: []          /* "slagsnavn:noegle" for hvert spoergsmaal i denne runde */
         };
     }
 
@@ -379,18 +384,29 @@
         this.visBane();
     };
 
+    /* Traekker et nyt spoergsmaal, der hverken har samme slags som det
+       lige overstaaede, eller samme (slags, grundstof) som noget, der
+       allerede er spurgt om i denne runde - saa de fem spoergsmaal i en
+       sekvens altid er indbyrdes forskellige, ikke bare ikke-ens naboer. */
     NK.SimSpil.prototype.nytSpoergsmaal = function () {
         var b = this.baner[this.aktiv];
-
-        /* Aldrig samme slags spoergsmaal to gange i traek. */
         var slags = BANER[this.aktiv].slags;
-        var pulje = slags;
-        if (slags.length > 1 && b.sidsteSlags) {
-            pulje = slags.filter(function (f) { return f !== b.sidsteSlags; });
-        }
-        var valgt = tilfaeldig(pulje);
+
+        var valgt, opgave, noegle, forsoeg = 0;
+        do {
+            var pulje = slags;
+            if (slags.length > 1 && b.sidsteSlags) {
+                pulje = slags.filter(function (f) { return f !== b.sidsteSlags; });
+            }
+            valgt = tilfaeldig(pulje);
+            opgave = valgt();
+            noegle = valgt.name + ":" + opgave.noegle;
+            forsoeg++;
+        } while (forsoeg < 60 && b.brugte.indexOf(noegle) !== -1);
+
         b.sidsteSlags = valgt;
-        b.opgave = valgt();
+        b.brugte.push(noegle);
+        b.opgave = opgave;
         b.valgt = -1;
         b.nr++;
     };

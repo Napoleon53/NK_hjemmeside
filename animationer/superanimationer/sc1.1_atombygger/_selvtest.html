@@ -169,6 +169,28 @@ function koer() {
             problemer.length === 0, problemer.join(" | "));
     }
 
+    overskrift("10. Fem spørgsmål i en runde er altid indbyrdes forskellige");
+    var spil = NK.sims["fane-spil"];
+    for (var bn = 0; bn < baner.length; bn++) {
+        var gentagelser = 0, eksempel = "";
+        for (var kort = 0; kort < 200; kort++) {
+            spil.aktiv = bn;
+            var status = { nr: 0, rigtige: 0, opgave: null, valgt: -1, faerdig: false, perfekt: false,
+                sidsteSlags: null, brugte: [] };
+            spil.baner[bn] = status;
+            var set = {};
+            for (var qn = 0; qn < 5; qn++) {
+                spil.nytSpoergsmaal();
+                var noeg = status.brugte[status.brugte.length - 1];
+                if (set[noeg]) { gentagelser++; eksempel = status.opgave.tekst; }
+                set[noeg] = true;
+            }
+        }
+        paastand("bane " + (bn + 1) + " (" + baner[bn].navn + "): 200 runder, ingen gentagne spørgsmål",
+            gentagelser === 0, gentagelser + " gentagelser, fx: " + eksempel);
+    }
+    spil.nulstil();
+
     vis();
 }
 

@@ -1095,7 +1095,6 @@ select:focus-visible {
 
 @media (max-width: 1320px) {
     :root { --panel-bredde: 336px; }
-    .top h1 .lang { display: none; }
 }
 
 @media (max-width: 1040px) {
