@@ -1,5 +1,5 @@
 /* =====================================================================
-   sc1.1 - Atombyggeren
+   sc1.1 - Atomets opbygning
    Stilark.
    BEMAERK: decimaltal skrives med PUNKTUM i CSS (0.25rem) - aldrig med
    dansk komma. Dansk komma bruges kun i tekst, som brugeren laeser.
@@ -662,6 +662,25 @@ button.pcelle:hover { border-color: rgba(255, 255, 255, 0.55); }
 .pnoegle .halvmetal::before { background-color: rgba(242, 197, 61, 0.7); }
 .pnoegle .aedelgas::before  { background-color: rgba(63, 174, 114, 0.75); }
 
+/* Den store udgave i pop op-vinduet: plads til atomnummeret over
+   symbolet, saa man kan slaa protontallet op midt i et spoergsmaal. */
+.pertabel.stor { gap: 4px; }
+
+.pertabel.stor .pcelle {
+    flex-direction: column;
+    justify-content: center;
+    gap: 1px;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.pertabel.stor .pz {
+    font-size: 0.62rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1;
+}
+
 /* ---------------------------------------------------------------------
    SPILFANEN
    --------------------------------------------------------------------- */
@@ -698,6 +717,85 @@ button.pcelle:hover { border-color: rgba(255, 255, 255, 0.55); }
     font-weight: 800;
     color: var(--gul);
     font-variant-numeric: tabular-nums;
+}
+
+/* Banerne staar altid fremme, saa man frit kan hoppe mellem dem.
+   Hver knap baerer sin egen status, for det er den eneste maade at se,
+   hvor langt man er naaet i en bane, man ikke er inde i lige nu. */
+.baneknap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    background-color: var(--panel-2);
+    color: var(--tekst-svag);
+    border: 1px solid #4a4a58;
+    border-left: 3px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 8px 11px;
+    font-family: inherit;
+    font-size: 0.84rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.14s ease, color 0.14s ease, border-color 0.14s ease;
+}
+
+.baneknap + .baneknap { margin-top: 6px; }
+.baneknap:hover { background-color: var(--panel-3); color: var(--tekst); }
+
+.baneknap.aktiv {
+    background-color: var(--blaa-mork);
+    border-color: var(--blaa);
+    border-left-color: var(--blaa);
+    color: #ffffff;
+}
+
+.baneknap .bstatus {
+    font-size: 0.68rem;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--tekst-mat);
+}
+
+.baneknap.aktiv .bstatus { color: rgba(255, 255, 255, 0.8); }
+.baneknap.perfekt { border-left-color: var(--gul); }
+.baneknap.perfekt .bstatus { color: var(--gul); }
+
+/* Belaanningen: Niels Bohr nede i hjoernet, naar alle tre baner er
+   klaret med 5/5. */
+.bohr {
+    position: absolute;
+    right: 18px;
+    bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 14px 10px;
+    background-color: rgba(20, 20, 26, 0.88);
+    border: 1px solid rgba(242, 197, 61, 0.55);
+    border-radius: var(--radius);
+    box-shadow: var(--skygge);
+    pointer-events: none;
+    animation: bohr-ind 0.6s ease-out;
+}
+
+.bohr[hidden] { display: none; }
+
+.bohr span {
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--gul);
+    text-align: center;
+}
+
+@keyframes bohr-ind {
+    0%   { transform: scale(0.4) rotate(-14deg); opacity: 0; }
+    60%  { transform: scale(1.08) rotate(4deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
 .spilstjerner {
@@ -948,6 +1046,8 @@ input[type="range"]::-moz-range-thumb {
     overflow-y: auto;
     padding: 24px 26px;
 }
+
+.overlay-boks.bred { max-width: 900px; }
 
 .overlay-boks h2 { margin: 0 0 6px 0; font-size: 1.15rem; color: var(--blaa); }
 

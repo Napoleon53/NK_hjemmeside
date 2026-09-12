@@ -82,8 +82,8 @@
         /* Det periodiske system i panelet viser, hvor det byggede atom
            hoerer hjemme. Man kan ogsaa springe direkte til et grundstof
            ved at trykke paa det. */
-        this.pertabel = new NK.PeriodiskSystem(NK.el("byg-pertabel"), function (z) {
-            mig.vaelgGrundstof(z);
+        this.pertabel = new NK.PeriodiskSystem(NK.el("byg-pertabel"), {
+            vedKlik: function (z) { mig.vaelgGrundstof(z); }
         });
     };
 

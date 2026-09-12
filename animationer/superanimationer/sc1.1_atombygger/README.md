@@ -1,4 +1,4 @@
-# sc1.1 — Atombyggeren
+# sc1.1 — Atomets opbygning
 
 En superanimation: i modsætning til de øvrige animationer, som er én enkelt
 HTML-fil, ligger denne i sin egen mappe med adskilt CSS og JavaScript.
@@ -17,15 +17,20 @@ når man ændrer på delene?*
 
 | # | Fane | Hvad man gør | Pointe |
 |---|------|--------------|--------|
-| 1 | Atomets opbygning | lægger protoner, neutroner og elektroner i én ad gangen | **protoner** = grundstoffet, **neutroner** = isotopen, **elektroner** = ladningen |
+| 1 | Atommodellen | lægger protoner, neutroner og elektroner i én ad gangen | **protoner** = grundstoffet, **neutroner** = isotopen, **elektroner** = ladningen |
 | 2 | Isotoper | skruer på, hvor meget der er af hver isotop | atommassen i det periodiske system er et **vejet gennemsnit** — derfor 35,45 for chlor |
 | 3 | Skaller og ioner | vælger grundstof, gætter ionens ladning | den yderste skal afgør det hele, og **kernen ændrer sig ikke**, når ionen dannes |
 | 4 | Salte | kombinerer et metal og et ikke-metal frit | formlen følger af, at **elektronregnskabet skal gå op**: Mg²⁺ + 2 Cl⁻ → MgCl₂ |
 | 5 | Spil | tager en bane på fem spørgsmål | det hele én gang til, men som spørgsmål — og med begrundelsen med, også når man rammer rigtigt |
 
-Fanen hedder med vilje ikke "Byg et atom": PhET har en sim med det navn, og selv
-om koden her er skrevet fra bunden, er der ingen grund til at lægge sig så tæt
-op ad den.
+Hverken værktøjet eller fane 1 hedder "Byg et atom": PhET har en sim med det
+navn, og selv om koden her er skrevet fra bunden, er der ingen grund til at
+lægge sig så tæt op ad den.
+
+Fane 1 har det periodiske system i lommeformat nederst i panelet. Det viser,
+hvor det byggede atom hører hjemme, og man kan trykke sig direkte til et
+grundstof. Fane 5 kan slå den samme tabel op i stort format midt i et
+spørgsmål — dér med atomnummeret i felterne.
 
 ### Det nye i forhold til den gamle animation
 
@@ -138,9 +143,9 @@ Skal den nye afløse den, er det den ene linje, der skal skiftes ud — bemærk
 <button class="tab-btn" data-emne="c1.1"
     data-beskrivelse="Byg selv atomet af protoner, neutroner og elektroner, og se hvordan de tre tal bestemmer grundstof, isotop og ladning."
     onclick="visAnimation(this, '../superanimationer/sc1.1_atombygger/index.html')"
-    title="Atombyggeren"><span class="btn-num">1</span><span class="btn-text">Atombyggeren</span></button>
+    title="Atomets opbygning"><span class="btn-num">1</span><span class="btn-text">Atomets opbygning</span></button>
 ```
 
 Feedback-boksen i `animationer/samling_alt.html` har allerede pladsen: i
-`FEEDBACK_EMNER` står `C1: Atomer` med `{ nr: 1, navn: 'Atommodel' }`. Skal
-navnet følge med, rettes det ene `navn` til `'Atombyggeren'`.
+`FEEDBACK_EMNER` står `C1: Atomer` med `{ nr: 1, navn: 'Atommodel' }` — det navn
+passer allerede.

@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Atombyggeren</title>
+<title>Atomets opbygning</title>
 <link rel="stylesheet" href="css/stil.css">
 </head>
 <body>
 
 <header class="top">
-    <h1><span class="ikon">⚛</span> Atom<span class="lang">byggeren</span></h1>
+    <h1><span class="ikon">⚛</span> Atomets<span class="lang"> opbygning</span></h1>
 
     <div class="faneknapper" role="tablist" aria-label="Vælg fane">
-        <button class="faneknap aktiv" data-fane="fane-byg" role="tab" aria-selected="true"><span class="nr">1</span>Atomets opbygning</button>
+        <button class="faneknap aktiv" data-fane="fane-byg" role="tab" aria-selected="true"><span class="nr">1</span>Atommodellen</button>
         <button class="faneknap" data-fane="fane-isotop" role="tab" aria-selected="false"><span class="nr">2</span>Isotoper</button>
         <button class="faneknap" data-fane="fane-ion" role="tab" aria-selected="false"><span class="nr">3</span>Skaller og ioner</button>
         <button class="faneknap" data-fane="fane-salt" role="tab" aria-selected="false"><span class="nr">4</span>Salte</button>
@@ -235,34 +235,59 @@
 <section class="fane" id="fane-spil" role="tabpanel" aria-label="Spil">
     <div class="scene">
         <canvas id="spil-laerred"></canvas>
+
+        <!-- Belønningen for 5/5 i alle tre baner. Tegnet her i stedet for
+             hentet som emoji, saa den kan vises i det hjoerne, den skal. -->
+        <div class="bohr" id="spil-bohr" hidden>
+            <svg viewBox="0 0 130 118" width="104" height="94" role="img" aria-label="Niels Bohr giver tommelfinger op">
+                <g fill="none" stroke="#f2c53d" stroke-width="2" opacity="0.55">
+                    <ellipse cx="52" cy="52" rx="47" ry="19" transform="rotate(-24 52 52)"/>
+                    <ellipse cx="52" cy="52" rx="47" ry="19" transform="rotate(26 52 52)"/>
+                </g>
+                <circle cx="94" cy="32" r="3.4" fill="#f2c53d"/>
+                <circle cx="11" cy="69" r="3.4" fill="#f2c53d"/>
+
+                <circle cx="52" cy="54" r="29" fill="#f2cfa8"/>
+                <circle cx="24" cy="58" r="5" fill="#e6bd93"/>
+                <circle cx="80" cy="58" r="5" fill="#e6bd93"/>
+                <path d="M23 55 A29 29 0 0 1 81 55 C81 47 74 42 66 45 C60 31 44 31 38 45 C30 42 23 47 23 55 Z" fill="#c8ccd3"/>
+                <path d="M36 48 q6 -4 12 -1" stroke="#9aa0a8" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <path d="M56 47 q6 -3 12 1" stroke="#9aa0a8" stroke-width="3" stroke-linecap="round" fill="none"/>
+                <circle cx="42" cy="56" r="3.4" fill="#3a3a44"/>
+                <circle cx="62" cy="56" r="3.4" fill="#3a3a44"/>
+                <path d="M52 58 q3 6 -1 8" stroke="#d9a978" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+                <path d="M40 68 q12 10 24 0" stroke="#b3703f" stroke-width="3" stroke-linecap="round" fill="none"/>
+
+                <path d="M94 82 C93 69 97 60 102 60 C107 60 109 65 106 72 L104 82 Z" fill="#f2cfa8"/>
+                <rect x="88" y="78" width="30" height="27" rx="9" fill="#f2cfa8"/>
+                <path d="M96 88 h15 M96 95 h15" stroke="#dbb187" stroke-width="2" stroke-linecap="round"/>
+                <rect x="86" y="101" width="34" height="9" rx="4" fill="#3d9ee0"/>
+            </svg>
+            <span>Niels Bohr er imponeret<br>5/5 i alle tre baner</span>
+        </div>
     </div>
 
     <aside class="panel">
-        <div class="kort" id="spil-vaelg">
-            <h2>Vælg en bane</h2>
-            <button class="knap stor blaa banevalg" type="button" data-bane="0"><span>1 · Atomets partikler</span><span class="tegn">→</span></button>
-            <button class="knap stor blaa banevalg" type="button" data-bane="1" style="margin-top:7px;"><span>2 · Isotoper og ioner</span><span class="tegn">→</span></button>
-            <button class="knap stor blaa banevalg" type="button" data-bane="2" style="margin-top:7px;"><span>3 · Ioner og salte</span><span class="tegn">→</span></button>
-            <p class="note">Fem spørgsmål ad gangen. Du får at vide, hvorfor svaret er rigtigt.</p>
+        <div class="kort">
+            <h2>Baner</h2>
+            <div id="spil-baner"></div>
+            <button class="knap" id="spil-pertabel-knap" type="button" style="margin-top:9px;"><span>Slå op i det periodiske system</span><span class="tegn">⊞</span></button>
         </div>
 
-        <div class="kort fremhaev" id="spil-boks" style="display:none;">
-            <h2>Spørgsmål <span class="taeller" id="spil-taeller">1/5</span></h2>
+        <div class="kort fremhaev" id="spil-boks">
+            <h2><span id="spil-banenavn">Atomets partikler</span> <span class="taeller" id="spil-taeller">1/5</span></h2>
             <p class="gaetsp" id="spil-sp"></p>
             <div class="spilvalg" id="spil-svarvalg"></div>
             <p class="besked" id="spil-svar"></p>
-            <button class="knap stor groen" id="spil-naeste" type="button" style="display:none;"><span>Næste</span><span class="tegn">→</span></button>
+            <button class="knap stor groen" id="spil-naeste" type="button" style="display:none;"><span>Næste spørgsmål</span><span class="tegn">→</span></button>
         </div>
 
         <div class="kort maaling" id="spil-resultat" style="display:none;">
-            <h2>Resultat</h2>
+            <h2><span id="spil-resultatnavn">Resultat</span></h2>
             <div class="spilscore" id="spil-score">0 / 5</div>
             <div class="spilstjerner" id="spil-stjerner"></div>
             <p class="besked" id="spil-dom" style="margin-top:9px;"></p>
-            <div class="knaprad">
-                <button class="knap blaa" id="spil-igen" type="button">Spil banen igen</button>
-                <button class="knap" id="spil-tilbage" type="button">Vælg en anden bane</button>
-            </div>
+            <button class="knap stor blaa" id="spil-igen" type="button" style="margin-top:9px;"><span>Spil banen igen</span><span class="tegn">↺</span></button>
         </div>
     </aside>
 </section>
@@ -281,6 +306,24 @@
 </div>
 
 <!-- ================================================================= -->
+<div class="overlay" id="spil-pertabel">
+    <div class="overlay-boks bred">
+        <h2>Det periodiske system</h2>
+        <div id="spil-pertabel-gitter"></div>
+        <div class="pnoegle" style="margin-top:12px;">
+            <span class="metal">metal</span>
+            <span class="ikkemetal">ikke-metal</span>
+            <span class="halvmetal">halvmetal</span>
+            <span class="aedelgas">ædelgas</span>
+        </div>
+        <p class="note">Hold musen over et felt for at se navnet. Det lille tal er atomnummeret, altså antallet af protoner.</p>
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="spil-pertabel-luk" style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
 <div class="overlay" id="salt-forklaring">
     <div class="overlay-boks">
         <h2 id="salt-forklaring-titel">Hvorfor NaCl?</h2>
@@ -294,12 +337,12 @@
 <!-- ================================================================= -->
 <div class="overlay" id="hjaelp">
     <div class="overlay-boks">
-        <h2>Atombyggeren</h2>
+        <h2>Atomets opbygning</h2>
         <p>Fem faner om det samme spørgsmål: <b>hvad er et atom lavet af, og hvad sker der, når man ændrer på delene?</b> Alt bygger på de samme tre tal — protoner, neutroner og elektroner — så det, du lærer på én fane, kan bruges på de næste.</p>
 
         <h3>De fem faner</h3>
         <ul>
-            <li><b>Atomets opbygning</b> — læg partiklerne i én ad gangen. Hver gang får du at vide, hvad der skete: nyt grundstof, ny isotop eller ny ladning. Løs opgaverne, og byg fx ¹⁴C eller Mg²⁺.</li>
+            <li><b>Atommodellen</b> — læg partiklerne i én ad gangen. Hver gang får du at vide, hvad der skete: nyt grundstof, ny isotop eller ny ladning. Løs opgaverne, og byg fx ¹⁴C eller Mg²⁺.</li>
             <li><b>Isotoper</b> — hvorfor står der 35,45 ved chlor, når ingen chlorkerne vejer 35,45? Flyt på blandingen, og se balancepunktet følge med.</li>
             <li><b>Skaller og ioner</b> — den yderste skal afgør det hele. Gæt ladningen, før du får den at se, og hold øje med, at kernen aldrig ændrer sig.</li>
             <li><b>Salte</b> — kombinér et metal og et ikke-metal frit. Modellen tæller selv ud, hvor mange atomer der skal til, før elektronregnskabet går op.</li>
