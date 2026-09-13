@@ -46,6 +46,14 @@
             <span class="q" id="byg-nuklid-q"></span>
         </div>
 
+        <!-- Hvor taet er elektronskyen paa en aedelgasstruktur lige nu?
+             Se D.reaktivitet() i data.js og opdaterPanel() i sim_byg.js. -->
+        <div class="reaktivkort" id="byg-reaktiv" aria-live="polite" hidden>
+            <span class="reaktivkort-etiket">Reaktivitet</span>
+            <div class="reaktivkort-bar"><div class="reaktivkort-fyld" id="byg-reaktiv-fyld"></div></div>
+            <span class="reaktivkort-tekst" id="byg-reaktiv-tekst"></span>
+        </div>
+
         <!-- Findes kernen i naturen? Staar lige under selve atommodellen,
              saa svaret er dér, hvor man kigger. Placeres af sim_byg.js. -->
         <div class="kernekort" id="byg-kerne" aria-live="polite"></div>
@@ -60,15 +68,6 @@
                 <span class="ikkemetal">ikke-metal</span>
                 <span class="halvmetal">halvmetal</span>
                 <span class="aedelgas">ædelgas</span>
-            </div>
-        </div>
-
-        <div class="kort opgavekort opgave-boks" id="opgave-boks">
-            <h2>Opgave <span class="taeller" id="byg-opgave-taeller" style="display:none;">1/5</span></h2>
-            <p class="besked" id="byg-opgave">Tryk på “Start opgave” for at få en opgave, du selv skal bygge.</p>
-            <div class="knaprad">
-                <button class="knap blaa" id="byg-opgave-ny" type="button">Start opgave</button>
-                <button class="knap" id="byg-opgave-svar" type="button" style="display:none;">Vis svaret</button>
             </div>
         </div>
     </div>
@@ -107,16 +106,13 @@
             </div>
         </div>
 
-        <div class="kort fremhaev" id="byg-panel-atom">
-            <h2>Atomet</h2>
-            <div class="grundhoved">
-                <span class="gsymbol" id="byg-symbol">H</span>
-                <span class="gnavn"><b id="byg-grundstof">Hydrogen</b><em id="byg-z">atomnummer 1</em></span>
-                <span class="maerke groen" id="byg-type">Neutralt atom</span>
+        <div class="kort opgavekort" id="opgave-boks">
+            <h2>Opgave <span class="taeller" id="byg-opgave-taeller" style="display:none;">1/5</span></h2>
+            <p class="besked" id="byg-opgave">Tryk på “Start opgave” for at få en opgave, du selv skal bygge.</p>
+            <div class="knaprad">
+                <button class="knap blaa" id="byg-opgave-ny" type="button">Start opgave</button>
+                <button class="knap" id="byg-opgave-svar" type="button" style="display:none;">Vis svaret</button>
             </div>
-            <div class="talraekke"><span>Massetal A = Z + N</span><span class="tal" id="byg-massetal">1</span></div>
-            <div class="talraekke"><span>Ladning (p⁺ − e⁻)</span><span class="tal groen" id="byg-ladning">0</span></div>
-            <div class="talraekke"><span>Elektronstruktur</span><span class="tal gul" id="byg-fordeling">1</span></div>
         </div>
     </aside>
 </section>

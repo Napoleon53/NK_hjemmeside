@@ -211,26 +211,19 @@
         NK.saetTekst("byg-nuklid-q", q === 0 ? "" : NK.ladningstekst(q));
         NK.saetKlasse("byg-nuklid-q", q > 0 ? "q plus" : (q < 0 ? "q minus" : "q"));
 
-        NK.saetTekst("byg-symbol", g ? g.symbol : "?");
-        NK.saetTekst("byg-grundstof", g ? g.navn : "Intet grundstof");
-        NK.saetTekst("byg-z", g ? "atomnummer " + g.z : "ingen protoner");
-        NK.saetTekst("byg-massetal", this.p ? String(a) : "–");
-        NK.saetTekst("byg-ladning", NK.ladningstekst(q));
-        NK.saetKlasse("byg-ladning", "tal " + (q > 0 ? "roed" : (q < 0 ? "blaa" : "groen")));
-
-        var fordeling = D.skalfordeling(this.e);
-        NK.saetTekst("byg-fordeling", this.e ? fordeling.join(", ") : "ingen elektroner");
-
         if (this.pertabel) this.pertabel.marker(g ? this.p : 0);
 
-        /* Hvad ER det, eleven har bygget? */
-        var maerkat, maerkatKlasse;
-        if (!g) { maerkat = "Ingenting endnu"; maerkatKlasse = "maerke"; }
-        else if (q === 0) { maerkat = "Neutralt atom"; maerkatKlasse = "maerke groen"; }
-        else if (q > 0) { maerkat = "Positiv ion"; maerkatKlasse = "maerke roed"; }
-        else { maerkat = "Negativ ion"; maerkatKlasse = "maerke blaa"; }
-        NK.saetTekst("byg-type", maerkat);
-        NK.saetKlasse("byg-type", maerkatKlasse);
+        /* Reaktivitetsindikatoren: hvor taet er elektronskyen paa en
+           aedelgasstruktur lige nu? Kun relevant, naar der rent faktisk
+           er et grundstof og elektroner at vurdere. */
+        var reakt = g ? D.reaktivitet(this.e) : null;
+        NK.el("byg-reaktiv").hidden = !reakt;
+        if (reakt) {
+            NK.el("byg-reaktiv-fyld").style.width = reakt.andel + "%";
+            NK.saetKlasse("byg-reaktiv-fyld", "reaktivkort-fyld " + reakt.farve);
+            NK.saetTekst("byg-reaktiv-tekst", reakt.tekst);
+            NK.saetKlasse("byg-reaktiv-tekst", "reaktivkort-tekst " + reakt.farve);
+        }
 
         /* Kernen: findes den overhovedet? Teksten staar under selve
            atommodellen i scenen - se tegn(). */
@@ -422,11 +415,11 @@
     /* ----- Tegning ---------------------------------------------------------- */
     NK.SimByg.prototype.tilpas = function () { this.l.tilpas(); };
 
-    /* Hvor atomet skal staa: til hoejre for venstre soejle (periodisk
-       system oven paa opgavekortet), saa hverken skallerne eller
-       nuklidmaerkatet gemmer sig under dem. Der regnes med fire fulde
-       skaller for alle grundstoffer, saa maalestokken er den samme, og
-       atomet ikke skifter stoerrelse, naar man laegger en proton i.
+    /* Hvor atomet skal staa: til hoejre for det periodiske system, saa
+       hverken skallerne eller nuklidmaerkatet gemmer sig under det.
+       Der regnes med fire fulde skaller for alle grundstoffer, saa
+       maalestokken er den samme, og atomet ikke skifter stoerrelse,
+       naar man laegger en proton i.
 
        Stoerrelsen findes ved at LOESE uligheden for den stoerste radius,
        der stadig levner plads til nuklidmaerkat foroven, kernetekst
@@ -450,13 +443,12 @@
 
     NK.SimByg.prototype.placering = function () {
         var l = this.l;
-        var opgave = NK.el("opgave-boks");
         var tabelKort = document.querySelector("#fane-byg .pertabel-boks");
 
         function maal(e) {
             return e && e.offsetWidth ? [e.offsetLeft, e.offsetTop, e.offsetWidth, e.offsetHeight] : null;
         }
-        var noegle = l.b + "x" + l.h + "|" + JSON.stringify(maal(opgave)) + "|" + JSON.stringify(maal(tabelKort));
+        var noegle = l.b + "x" + l.h + "|" + JSON.stringify(maal(tabelKort));
         if (this.stedNoegle === noegle) return this.sted;
         this.stedNoegle = noegle;
 
@@ -465,21 +457,16 @@
            flow under laerredet (smal skaerm, se stil.css) - kendetegnet
            ved at dens offsetTop saa ligger uden for laerredets egen
            hoejde. De to tilstande laegger atomet helt forskelligt: en
-           smal soejle skubber atomet til siden (vandret, ny model),
-           mens en fuldbred opgave-bjaelke foroven skubber det nedad
-           (lodret, den oprindelige model - opgavekortet er selv en
-           fuldbred bjaelke paa mobil, se .opgave-boks i stil.css). */
+           smal soejle skubber atomet til siden (vandret), mens en
+           tabel under laerredet lader atomet fylde hele scenens bredde
+           (lodret). */
         var tabelISoejle = !!(tabelKort && tabelKort.offsetTop < l.h);
 
-        /* Den hoejre kant af venstre soejle - konservativt den bredeste
-           af de to kort, uanset at opgavekortet normalt er smallest.
-           Tabellen maales altid som synlig (ogsaa naar den lige nu er
-           skjult), saa vi kan opdage, naar der igen bliver plads til den. */
+        /* Den hoejre kant af tabellen. Den maales altid som synlig
+           (ogsaa naar den lige nu er skjult), saa vi kan opdage, naar
+           der igen bliver plads til den. */
         function hoejreKant(medTabel) {
             var x = 0;
-            if (opgave && opgave.offsetWidth && opgave.offsetTop < l.h) {
-                x = Math.max(x, opgave.offsetLeft + opgave.offsetWidth);
-            }
             if (medTabel && tabelKort) {
                 var vist = tabelKort.classList.contains("skjult");
                 if (vist) tabelKort.classList.remove("skjult");
@@ -489,16 +476,6 @@
                 if (vist) tabelKort.classList.add("skjult");
             }
             return x;
-        }
-
-        /* Bunden af opgave-bjaelken - den mobile model, hvor kun
-           opgavekortet (ikke tabellen) ligger ovenpaa scenen. */
-        function bund() {
-            var b = 0;
-            if (opgave && opgave.offsetWidth && opgave.offsetTop < l.h) {
-                b = Math.max(b, opgave.offsetTop + opgave.offsetHeight);
-            }
-            return b;
         }
 
         var R, cx, cy, tabelSkjult = false;
@@ -520,29 +497,21 @@
             tabelKort.classList.toggle("skjult", tabelSkjult);
             R = Math.max(R, MIN_PLADS * YDRE_ANDEL);
 
-            /* Opgavekortet haenger lige under tabellen, saa de to danner
-               én soejle. Skjules tabellen af pladshensyn, ryger
-               opgavekortet tilbage til sin egen faste plads foroven. */
-            if (opgave) opgave.style.top = !tabelSkjult
-                ? (tabelKort.offsetTop + tabelKort.offsetHeight + 14) + "px" : "";
-
             var cyMinS = LUFT + NUKLID_H + 14 + R;
             var cyMaxS = l.h - R - 16 - KERNE_H;
             cy = NK.klamp(l.h * 0.54, cyMinS, Math.max(cyMinS, cyMaxS));
             cx = NK.klamp(kant + SOEJLE_LUFT + (l.b - kant - SOEJLE_LUFT) / 2,
                 kant + SOEJLE_LUFT + R, l.b - HOEJRE_LUFT - R);
         } else {
-            if (opgave) opgave.style.top = "";
             if (tabelKort) tabelKort.classList.remove("skjult");
 
             var normalPladsL = NK.klamp(Math.min(l.b / 2 - 40, l.h * 0.38), 70, 300);
-            var b = bund();
             R = Math.min(normalPladsL * YDRE_ANDEL,
-                (l.h - b - LUFT - NUKLID_H - KERNE_H - 30) / 2,
+                (l.h - LUFT - NUKLID_H - KERNE_H - 30) / 2,
                 l.b / 2 - 40);
             R = Math.max(R, MIN_PLADS * YDRE_ANDEL);
 
-            var cyMinL = b + LUFT + NUKLID_H + 14 + R;
+            var cyMinL = LUFT + NUKLID_H + 14 + R;
             var cyMaxL = l.h - R - 16 - KERNE_H;
             cy = NK.klamp(l.h * 0.54, cyMinL, Math.max(cyMinL, cyMaxL));
             cx = l.b / 2;

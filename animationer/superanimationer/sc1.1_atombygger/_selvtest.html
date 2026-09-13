@@ -48,7 +48,7 @@ function koer() {
         && NK.sims["fane-salt"] && NK.sims["fane-spil"]));
 
     overskrift("2. Panelerne er fyldt ud ved opstart");
-    var skalHaveTekst = ["byg-grundstof", "byg-massetal", "byg-ladning", "byg-kerne",
+    var skalHaveTekst = ["byg-nuklid-sym", "byg-nuklid-a", "byg-nuklid-z", "byg-reaktiv-tekst", "byg-kerne",
         "byg-opgave", "iso-regnestykke",
         "salt-formel", "salt-navn", "salt-knap-tekst"];
     var tomme = [];
@@ -123,23 +123,23 @@ function koer() {
     byg.p = 6; byg.n = 6; byg.e = 6;
     byg.atom.saet(6, 6, 6);
     byg.opdaterPanel("");
-    paastand("6 protoner giver carbon", d.getElementById("byg-grundstof").textContent === "Carbon");
+    paastand("6 protoner giver symbolet C (kulstof)", d.getElementById("byg-nuklid-sym").textContent === "C");
     byg.aendr("p", 1);
-    paastand("én proton mere giver nitrogen", d.getElementById("byg-grundstof").textContent === "Nitrogen");
+    paastand("én proton mere giver symbolet N (nitrogen)", d.getElementById("byg-nuklid-sym").textContent === "N");
     paastand("og elektronerne foelger ikke med, saa ladningen bliver +",
-        d.getElementById("byg-ladning").textContent.indexOf("+") === 0,
-        d.getElementById("byg-ladning").textContent);
+        d.getElementById("byg-nuklid-q").textContent.indexOf("+") === 0,
+        d.getElementById("byg-nuklid-q").textContent);
     d.getElementById("byg-neutral").click();
     paastand("\"Goer det neutralt\" nulstiller ladningen",
-        d.getElementById("byg-ladning").textContent.indexOf("0") === 0,
-        d.getElementById("byg-ladning").textContent);
+        d.getElementById("byg-nuklid-q").textContent === "",
+        d.getElementById("byg-nuklid-q").textContent);
     byg.aendr("e", -1);
     paastand("én elektron faerre giver ladning +",
-        d.getElementById("byg-ladning").textContent.indexOf("+") === 0,
-        d.getElementById("byg-ladning").textContent);
-    paastand("og maerkatet siger positiv ion",
-        d.getElementById("byg-type").textContent.indexOf("Positiv") === 0,
-        d.getElementById("byg-type").textContent);
+        d.getElementById("byg-nuklid-q").textContent.indexOf("+") === 0,
+        d.getElementById("byg-nuklid-q").textContent);
+    paastand("og maerkatet faar klassen for positiv ion",
+        d.getElementById("byg-nuklid-q").className.indexOf("plus") !== -1,
+        d.getElementById("byg-nuklid-q").className);
 
     overskrift("9. Spilbanerne laver gyldige spoergsmaal");
     var baner = NK.SPIL_BANER;
