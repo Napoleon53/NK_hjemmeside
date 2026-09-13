@@ -282,29 +282,69 @@
         }
     };
 
-    /* Et lille, beskaaret udsnit af det uendelige iongitter - skiftevis
-       plus og minus i et fast moenster, uafhaengigt af saltets virkelige
-       formelforhold (som i stedet staar helt praecist i panelet og i
-       "Læs mere"). Ionerne er med vilje forenklede uden skaller - ved
-       den staerke udzoomning handler det om MOENSTERET, ikke om den
-       enkelte atommodel. */
+    /* Et lille, indrammet udsnit af iongitteret - ikke hele laerredet
+       fyldt op, for et gitter, der daekker skaermkant til skaermkant,
+       ser ikke ud af noget. Rammen goer det tydeligt, at det er en
+       byggesten, hentet ud af et moenster, der fortsaetter udenfor.
+
+       Forholdet mellem kationer og anioner foelger saltets virkelige
+       formelforhold (this.forhold), IKKE altid 1:1: moenstret gentager
+       en celle paa (antalPositive + antalNegative) felter paa skraa, saa
+       fx MgCl₂ rent faktisk viser dobbelt saa mange Cl som Mg. Ved 1:1
+       (NaCl, CaO, ...) reducerer det praecis til det gamle skakbraet.
+       Det er ikke den rigtige krystalstruktur - den er tit lagdelt og
+       tredimensionel paa maader, et fladt gitter ikke kan vise - men
+       forholdstallet er rigtigt, og det er dét, eleven skal kunne se. */
     NK.SimSalt.prototype.tegnGitter = function (c) {
         var l = this.l;
-        var baand = l.h - 74;
-        var oeverst = 18;
-        var trin = NK.klamp(l.b / 8, 42, 66);
-        var rMaks = trin * 0.34;
         var blod = NK.blod(NK.klamp(this.gitterUr / 0.6, 0, 1));
+
+        var formel = D.saltformel(this.metal, this.ikkemetal);
+        NK.tekst(c, formel, l.b / 2, 28, {
+            font: "700 28px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
+            farve: "rgba(242, 243, 245, " + blod + ")", kant: true, kantBredde: 5
+        });
+        NK.tekst(c, D.saltnavn(this.metal, this.ikkemetal), l.b / 2, 52, {
+            font: "600 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
+            farve: "rgba(169, 176, 186, " + blod + ")", kant: true
+        });
+
+        /* Vinduet, gitteret vises igennem. */
+        var vTop = 76;
+        var vBund = l.h - 58;
+        var vindueH = NK.klamp(vBund - vTop, 140, 340);
+        var vindueB = NK.klamp(l.b * 0.56, 260, 480);
+        var vx = (l.b - vindueB) / 2;
+        var vy = vTop;
+
+        c.save();
+        c.globalAlpha = blod;
+        NK.rundtRekt(c, vx, vy, vindueB, vindueH, 10);
+        c.fillStyle = "rgba(255, 255, 255, 0.03)";
+        c.fill();
+        c.strokeStyle = "rgba(255, 255, 255, 0.16)";
+        c.lineWidth = 1.5;
+        c.stroke();
+        c.restore();
+
+        var trin = NK.klamp(vindueB / 6, 38, 60);
+        var rMaks = trin * 0.34;
         var r = rMaks * blod;
+        var f = this.forhold;
+        var enhed = f.antalPositive + f.antalNegative;
 
         var mFarve = ["#ff9384", "#e05446"];    /* proton-roed: metallets kationer */
         var ikFarve = ["#8fcaf0", "#3d9ee0"];   /* blaa: ikke-metallets anioner */
 
+        c.save();
+        NK.rundtRekt(c, vx, vy, vindueB, vindueH, 10);
+        c.clip();
+
         var raekke = 0;
-        for (var y = oeverst - trin * 0.3; y < oeverst + baand + trin * 0.3; y += trin, raekke++) {
+        for (var y = vy - trin; y < vy + vindueH + trin; y += trin, raekke++) {
             var soejle = 0;
-            for (var x = -trin * 0.3; x < l.b + trin * 0.3; x += trin, soejle++) {
-                var erMetal = (raekke + soejle) % 2 === 0;
+            for (var x = vx - trin; x < vx + vindueB + trin; x += trin, soejle++) {
+                var erMetal = ((raekke + soejle) % enhed) < f.antalPositive;
                 var g = erMetal ? this.metal : this.ikkemetal;
                 var farve = erMetal ? mFarve : ikFarve;
                 NK.tegnKugle(c, x, y, r, farve[0], farve[1], blod);
@@ -317,21 +357,14 @@
                 }
             }
         }
-
-        /* Titlen sidder paa en mørk bjaelke, saa den er laesbar ovenpaa gitteret. */
-        c.save();
-        c.globalAlpha = blod;
-        c.fillStyle = "rgba(10, 10, 15, 0.72)";
-        c.fillRect(0, 0, l.b, 62);
         c.restore();
 
-        var formel = D.saltformel(this.metal, this.ikkemetal);
-        NK.tekst(c, formel, l.b / 2, 26, {
-            font: "700 30px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
-            farve: "rgba(242, 243, 245, " + blod + ")", kant: true, kantBredde: 5
+        NK.tekst(c, "Udsnit af gitteret. Moenstret fortsætter i alle retninger.", l.b / 2, vy + vindueH + 22, {
+            font: "600 12px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
+            farve: "rgba(169, 176, 186, " + blod + ")", kant: true
         });
-        NK.tekst(c, D.saltnavn(this.metal, this.ikkemetal), l.b / 2, 50, {
-            font: "600 14px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
+        NK.tekst(c, "Talt op er ladningen neutral: lige mange plus og minus.", l.b / 2, vy + vindueH + 40, {
+            font: "600 12px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
             farve: "rgba(169, 176, 186, " + blod + ")", kant: true
         });
     };
