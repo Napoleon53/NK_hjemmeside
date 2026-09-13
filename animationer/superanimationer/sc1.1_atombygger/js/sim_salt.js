@@ -141,8 +141,14 @@
     NK.SimSalt.prototype.opdaterPanel = function () {
         var m = this.metal, ik = this.ikkemetal;
 
-        NK.saetTekst("salt-formel", D.saltformel(m, ik));
-        NK.saetTekst("salt-navn", D.saltnavn(m, ik));
+        if (this.fase === "atomer") {
+            NK.saetTekst("salt-formel", m.symbol + " og " + ik.symbol);
+        } else if (this.fase === "overfoert") {
+            NK.saetTekst("salt-formel", m.symbol + NK.ladningHaevet(m.ion) + " og " + ik.symbol + NK.ladningHaevet(ik.ion));
+        } else {
+            NK.saetTekst("salt-formel", D.saltformel(m, ik));
+        }
+        NK.saetTekst("salt-navn", this.fase === "samlet" ? D.saltnavn(m, ik) : (m.navn.toLowerCase() + " og " + ik.navn.toLowerCase()));
 
         var knap = NK.el("salt-knap");
         if (this.fase === "atomer") {
