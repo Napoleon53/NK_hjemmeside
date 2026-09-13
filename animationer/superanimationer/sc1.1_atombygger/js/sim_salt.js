@@ -34,20 +34,22 @@
     };
 
     NK.SimSalt.prototype.fyldVaelgere = function () {
-        function fyld(id, symboler, valgt) {
+        function fyld(id, symboler, valgt, erMetal) {
             var v = NK.el(id);
             v.innerHTML = "";
             for (var i = 0; i < symboler.length; i++) {
                 var g = D.findSymbol(symboler[i]);
                 var o = document.createElement("option");
                 o.value = g.symbol;
-                o.textContent = g.symbol + " (" + NK.ladningstekst(g.ion) + ")";
+                var antal = Math.abs(g.ion);
+                var verbum = erMetal ? "afgiver" : "optager";
+                o.textContent = g.symbol + " (" + verbum + " " + NK.talform(antal, "e⁻", "e⁻") + ")";
                 v.appendChild(o);
             }
             v.value = valgt;
         }
-        fyld("salt-metal", D.SALT_METALLER, this.metal.symbol);
-        fyld("salt-ikkemetal", D.SALT_IKKEMETALLER, this.ikkemetal.symbol);
+        fyld("salt-metal", D.SALT_METALLER, this.metal.symbol, true);
+        fyld("salt-ikkemetal", D.SALT_IKKEMETALLER, this.ikkemetal.symbol, false);
     };
 
     NK.SimSalt.prototype.koblKnapper = function () {
