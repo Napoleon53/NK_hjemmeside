@@ -104,10 +104,10 @@
                 + NK.talform(g.z, "elektron", "elektroner") + " i alt. Atomet er neutralt, så der er lige så mange "
                 + "protoner, og " + g.z + " protoner betyder " + g.navn.toLowerCase() + ".",
             atom: { p: g.z, n: iso.a - g.z, e: g.z },
-            /* Protontal = grundstof, og atomet er neutralt, saa
-               elektrontallet ville afsloere det samme - begge tal i
-               partikelstat-boksen maa derfor vaere skjulte. */
-            skjulStat: ["p", "e"],
+            /* Der spørges om grundstoffets NAVN, ikke om et antal - saa
+               p og e maa gerne staa i partikelstat-boksen. Det kraever
+               stadig, at eleven selv slaar protontallet op i det
+               periodiske system for at faa navnet. */
             noegle: g.z
         };
     }
@@ -200,9 +200,12 @@
                 + g.navn.toLowerCase() + ". Der er kun " + NK.talform(e, "elektron", "elektroner")
                 + ", og så er ladningen " + NK.ladningstekst(g.ion) + ".",
             atom: { p: g.z, n: D.hyppigsteIsotop(g.z).a - g.z, e: e },
-            /* Identitet OG ladning er selve svarmulighederne her, saa
-               alle tre tal i partikelstat-boksen skal skjules. */
-            skjulStat: ["p", "e", "q"],
+            /* Svarmuligheden er en notation som "Cl⁻", ikke et rent tal -
+               p, e og ladning maa derfor gerne staa i boksen. Eleven skal
+               stadig selv slaa protontallet op og saette det sammen med
+               ladningen til den rigtige skrivemaade. Maerkatet paa selve
+               atomet forbliver dog tomt, for det ER svarmuligheden
+               ordret. */
             noegle: g.z
         };
     }
