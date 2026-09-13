@@ -354,10 +354,13 @@ main { flex: 1; position: relative; min-height: 0; }
 }
 
 /* ---------------------------------------------------------------------
-   OPGAVEBOKSEN PAA BYGGEFANEN
-   Ligger som et overlay i selve scenen - venstre side, hvor der er god
-   plads, saa den ikke drukner nederst i det hoejre panel. Genbruger
-   .kort og .opgavekort for udseendet, kun placeringen er ny.
+   VENSTRE SOEJLE PAA BYGGEFANEN: periodisk system oven paa opgaven
+   Begge ligger som et overlay i scenens venstre side. Det periodiske
+   system har fast plads foroven (top: 18px); opgavekortets top saettes
+   i stedet af sim_byg.js, lige under tabellens maalte bund, saa de to
+   altid haenger sammen som én soejle - ogsaa naar tabellen viger for
+   kraftigt zoom (se placering() og .skjult). Atommodellen faar resten
+   af scenen, til hoejre for denne soejle.
    --------------------------------------------------------------------- */
 .opgave-boks {
     position: absolute;
@@ -368,15 +371,12 @@ main { flex: 1; position: relative; min-height: 0; }
     box-shadow: var(--skygge);
 }
 
-/* Det periodiske system i scenens hoejre tophjoerne, over for
-   opgavekortet. max-width holder det fri af opgavekortet, naar scenen
-   bliver smal (18 + 300 + 18 til kortet og 18 i hver side). */
 .pertabel-boks {
     position: absolute;
     top: 18px;
-    right: 18px;
+    left: 18px;
     width: 420px;
-    max-width: calc(100% - 354px);
+    max-width: calc(100% - 36px);
     background-color: rgba(24, 24, 31, 0.92);
     box-shadow: var(--skygge);
 }

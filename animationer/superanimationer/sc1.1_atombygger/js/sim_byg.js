@@ -422,18 +422,19 @@
     /* ----- Tegning ---------------------------------------------------------- */
     NK.SimByg.prototype.tilpas = function () { this.l.tilpas(); };
 
-    /* Hvor atomet skal staa, saa hverken skallerne eller nuklidmaerkatet
-       gemmer sig under opgavekortet eller det periodiske system. Atomet
-       flyttes foerst ned og goeres dernaest mindre. Der regnes med fire
-       fulde skaller for alle grundstoffer, saa maalestokken er den samme,
-       og atomet ikke skifter stoerrelse, naar man laegger en proton i.
+    /* Hvor atomet skal staa: til hoejre for venstre soejle (periodisk
+       system oven paa opgavekortet), saa hverken skallerne eller
+       nuklidmaerkatet gemmer sig under dem. Der regnes med fire fulde
+       skaller for alle grundstoffer, saa maalestokken er den samme, og
+       atomet ikke skifter stoerrelse, naar man laegger en proton i.
 
        Stoerrelsen findes ved at LOESE uligheden for den stoerste radius,
-       der stadig levner plads til nuklidmaerkat foroven og kernetekst
-       forneden - ikke ved at proeve sig frem i et hak-for-hak loekke. Det
-       betyder, at der aldrig kan vaere en stoerrelse, som rent faktisk
-       ville passe, men som en soegning bare ikke naaede at proeve: enten
-       findes loesningen, eller ogsaa er der bevisligt ikke plads.
+       der stadig levner plads til nuklidmaerkat foroven, kernetekst
+       forneden og venstre soejle i siden - ikke ved at proeve sig frem i
+       et hak-for-hak loekke. Det betyder, at der aldrig kan vaere en
+       stoerrelse, som rent faktisk ville passe, men som en soegning bare
+       ikke naaede at proeve: enten findes loesningen, eller ogsaa er der
+       bevisligt ikke plads.
 
        Er der ikke plads til et laeseligt atom, selv naar det periodiske
        system fylder mindst muligt, viger tabellen helt - det er sikringen
@@ -444,6 +445,7 @@
     var KERNE_H = 74;           /* svarer til loftet i tegn(): 74 px over scenens bund */
     var SKJUL_GRAENSE = 90;     /* under denne plads-stoerrelse viger det periodiske system */
     var MIN_PLADS = 55;         /* absolut bund, ogsaa hvis tabellen ikke er nok i sig selv */
+    var SOEJLE_LUFT = 28;       /* luft mellem venstre soejle og atomet */
 
     NK.SimByg.prototype.placering = function () {
         var l = this.l;
@@ -457,52 +459,95 @@
         if (this.stedNoegle === noegle) return this.sted;
         this.stedNoegle = noegle;
 
-        var normalPlads = NK.klamp(Math.min(l.b / 2 - 40, l.h * 0.38), 70, 300);
-        var normalCy = l.h * 0.54;
+        /* Tabellen ligger enten ovenpaa scenen som en smal soejle
+           (desktop, position: absolute) eller er flyttet ud i normal
+           flow under laerredet (smal skaerm, se stil.css) - kendetegnet
+           ved at dens offsetTop saa ligger uden for laerredets egen
+           hoejde. De to tilstande laegger atomet helt forskelligt: en
+           smal soejle skubber atomet til siden (vandret, ny model),
+           mens en fuldbred opgave-bjaelke foroven skubber det nedad
+           (lodret, den oprindelige model - opgavekortet er selv en
+           fuldbred bjaelke paa mobil, se .opgave-boks i stil.css). */
+        var tabelISoejle = !!(tabelKort && tabelKort.offsetTop < l.h);
 
-        /* Bunden af de faste kort foroven - konservativt den laveste
-           kant af begge, uanset at de staar i hver sit hjoerne. Tabellen
-           maales altid som synlig (ogsaa naar den lige nu er skjult),
-           saa vi kan opdage, naar der igen bliver plads til den. Et kort,
-           der starter uden for laerredets egen hoejde, taeller ikke med -
-           paa smal skaerm ligger tabellen under laerredet i normal flow,
-           ikke ovenpaa det, og skal ikke tvinge atomet til at vige. */
-        function bund(medTabel) {
-            var b = 0;
+        /* Den hoejre kant af venstre soejle - konservativt den bredeste
+           af de to kort, uanset at opgavekortet normalt er smallest.
+           Tabellen maales altid som synlig (ogsaa naar den lige nu er
+           skjult), saa vi kan opdage, naar der igen bliver plads til den. */
+        function hoejreKant(medTabel) {
+            var x = 0;
             if (opgave && opgave.offsetWidth && opgave.offsetTop < l.h) {
-                b = Math.max(b, opgave.offsetTop + opgave.offsetHeight);
+                x = Math.max(x, opgave.offsetLeft + opgave.offsetWidth);
             }
             if (medTabel && tabelKort) {
                 var vist = tabelKort.classList.contains("skjult");
                 if (vist) tabelKort.classList.remove("skjult");
                 if (tabelKort.offsetWidth && tabelKort.offsetTop < l.h) {
-                    b = Math.max(b, tabelKort.offsetTop + tabelKort.offsetHeight);
+                    x = Math.max(x, tabelKort.offsetLeft + tabelKort.offsetWidth);
                 }
                 if (vist) tabelKort.classList.add("skjult");
+            }
+            return x;
+        }
+
+        /* Bunden af opgave-bjaelken - den mobile model, hvor kun
+           opgavekortet (ikke tabellen) ligger ovenpaa scenen. */
+        function bund() {
+            var b = 0;
+            if (opgave && opgave.offsetWidth && opgave.offsetTop < l.h) {
+                b = Math.max(b, opgave.offsetTop + opgave.offsetHeight);
             }
             return b;
         }
 
-        function stoersteR(b) {
-            var geom = (l.h - b - LUFT - NUKLID_H - KERNE_H - 30) / 2;
-            var vandret = l.b / 2 - 40;
-            return Math.min(normalPlads * YDRE_ANDEL, geom, vandret);
+        var R, cx, cy, tabelSkjult = false;
+
+        if (tabelISoejle) {
+            var normalPladsV = NK.klamp(Math.min(l.b * 0.30, l.h * 0.40), 70, 340);
+            var kant = hoejreKant(true);
+            R = Math.min(normalPladsV * YDRE_ANDEL,
+                (l.h - LUFT - NUKLID_H - KERNE_H - 30) / 2,
+                (l.b - kant - SOEJLE_LUFT - 16) / 2);
+
+            if (R < SKJUL_GRAENSE * YDRE_ANDEL) {
+                var kantUden = hoejreKant(false);
+                var Ruden = Math.min(normalPladsV * YDRE_ANDEL,
+                    (l.h - LUFT - NUKLID_H - KERNE_H - 30) / 2,
+                    (l.b - kantUden - SOEJLE_LUFT - 16) / 2);
+                if (Ruden > R) { tabelSkjult = true; R = Ruden; kant = kantUden; }
+            }
+            tabelKort.classList.toggle("skjult", tabelSkjult);
+            R = Math.max(R, MIN_PLADS * YDRE_ANDEL);
+
+            /* Opgavekortet haenger lige under tabellen, saa de to danner
+               én soejle. Skjules tabellen af pladshensyn, ryger
+               opgavekortet tilbage til sin egen faste plads foroven. */
+            if (opgave) opgave.style.top = !tabelSkjult
+                ? (tabelKort.offsetTop + tabelKort.offsetHeight + 14) + "px" : "";
+
+            var cyMinS = LUFT + NUKLID_H + 14 + R;
+            var cyMaxS = l.h - R - 16 - KERNE_H;
+            cy = NK.klamp(l.h * 0.54, cyMinS, Math.max(cyMinS, cyMaxS));
+            cx = NK.klamp(kant + SOEJLE_LUFT + (l.b - kant - SOEJLE_LUFT) / 2,
+                kant + SOEJLE_LUFT + R, l.b - 16 - R);
+        } else {
+            if (opgave) opgave.style.top = "";
+            if (tabelKort) tabelKort.classList.remove("skjult");
+
+            var normalPladsL = NK.klamp(Math.min(l.b / 2 - 40, l.h * 0.38), 70, 300);
+            var b = bund();
+            R = Math.min(normalPladsL * YDRE_ANDEL,
+                (l.h - b - LUFT - NUKLID_H - KERNE_H - 30) / 2,
+                l.b / 2 - 40);
+            R = Math.max(R, MIN_PLADS * YDRE_ANDEL);
+
+            var cyMinL = b + LUFT + NUKLID_H + 14 + R;
+            var cyMaxL = l.h - R - 16 - KERNE_H;
+            cy = NK.klamp(l.h * 0.54, cyMinL, Math.max(cyMinL, cyMaxL));
+            cx = l.b / 2;
         }
 
-        var R = stoersteR(bund(true));
-        var tabelSkjult = false;
-        if (R < SKJUL_GRAENSE * YDRE_ANDEL && tabelKort) {
-            var Ruden = stoersteR(bund(false));
-            if (Ruden > R) { tabelSkjult = true; R = Ruden; }
-        }
-        if (tabelKort) tabelKort.classList.toggle("skjult", tabelSkjult);
-        R = Math.max(R, MIN_PLADS * YDRE_ANDEL);
-
-        var cyMin = bund(!tabelSkjult) + LUFT + NUKLID_H + 14 + R;
-        var cyMax = l.h - R - 16 - KERNE_H;
-        var cy = NK.klamp(normalCy, cyMin, Math.max(cyMin, cyMax));
-
-        this.sted = { plads: R / YDRE_ANDEL, cy: cy };
+        this.sted = { plads: R / YDRE_ANDEL, cy: cy, cx: cx };
         return this.sted;
     };
 
@@ -522,8 +567,8 @@
         var l = this.l, c = l.ctx;
         l.ryd("#14141a");
 
-        var cx = l.b / 2;
         var sted = this.placering();
+        var cx = sted.cx;
         var cy = sted.cy;
         var plads = sted.plads;
         var nuklidBoks = NK.el("byg-nuklid");
