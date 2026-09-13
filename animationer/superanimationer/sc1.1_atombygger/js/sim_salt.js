@@ -299,18 +299,32 @@
         var l = this.l;
         var blod = NK.blod(NK.klamp(this.gitterUr / 0.6, 0, 1));
 
+        /* Formlen skal staa UNDER grundstofvaelgerne, ikke klemt ind
+           imellem dem: ved en smal scene er der ikke vandret luft nok
+           til en centreret titel mellem de to bokse. Maalt direkte i
+           DOM'en, saa det virker uanset skaermbredde og de mobile
+           regler, der aendrer vaelgernes stoerrelse. */
+        var mV = document.querySelector(".saltvalg-metal");
+        var ikV = document.querySelector(".saltvalg-ikkemetal");
+        var vaelgerBund = 0;
+        if (mV && mV.offsetWidth) vaelgerBund = Math.max(vaelgerBund, mV.offsetTop + mV.offsetHeight);
+        if (ikV && ikV.offsetWidth) vaelgerBund = Math.max(vaelgerBund, ikV.offsetTop + ikV.offsetHeight);
+
+        var formelY = vaelgerBund + 28;
+        var navnY = vaelgerBund + 50;
+
         var formel = D.saltformel(this.metal, this.ikkemetal);
-        NK.tekst(c, formel, l.b / 2, 28, {
-            font: "700 28px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
+        NK.tekst(c, formel, l.b / 2, formelY, {
+            font: "700 26px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
             farve: "rgba(242, 243, 245, " + blod + ")", kant: true, kantBredde: 5
         });
-        NK.tekst(c, D.saltnavn(this.metal, this.ikkemetal), l.b / 2, 52, {
+        NK.tekst(c, D.saltnavn(this.metal, this.ikkemetal), l.b / 2, navnY, {
             font: "600 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
             farve: "rgba(169, 176, 186, " + blod + ")", kant: true
         });
 
         /* Vinduet, gitteret vises igennem. */
-        var vTop = 76;
+        var vTop = navnY + 22;
         var vBund = l.h - 58;
         var vindueH = NK.klamp(vBund - vTop, 140, 340);
         var vindueB = NK.klamp(l.b * 0.56, 260, 480);
