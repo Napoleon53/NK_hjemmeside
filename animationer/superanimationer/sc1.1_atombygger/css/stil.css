@@ -788,45 +788,64 @@ button.pcelle:hover { border-color: rgba(255, 255, 255, 0.55); }
 /* Banerne staar altid fremme, saa man frit kan hoppe mellem dem.
    Hver knap baerer sin egen status, for det er den eneste maade at se,
    hvor langt man er naaet i en bane, man ikke er inde i lige nu. */
+/* Samme visuelle sprog som fanerne oeverst (rund nummer-plakette +
+   navn): det goer det tydeligt, at en bane er et valg paa linje med
+   fanerne, ikke bare endnu en knap i raekke med svarmulighederne
+   nedenunder, der ser helt anderledes ud (.spilknap). */
 .baneknap {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 8px;
+    gap: 9px;
     width: 100%;
-    background-color: var(--panel-2);
+    background-color: transparent;
     color: var(--tekst-svag);
-    border: 1px solid #4a4a58;
-    border-left: 3px solid #4a4a58;
+    border: 1px solid transparent;
     border-radius: var(--radius-lil);
-    padding: 8px 11px;
+    padding: 6px 9px;
     font-family: inherit;
-    font-size: 0.84rem;
+    font-size: 0.8rem;
     font-weight: 600;
     text-align: left;
     cursor: pointer;
     transition: background-color 0.14s ease, color 0.14s ease, border-color 0.14s ease;
 }
 
-.baneknap + .baneknap { margin-top: 6px; }
+.baneknap + .baneknap { margin-top: 3px; }
 .baneknap:hover { background-color: var(--panel-3); color: var(--tekst); }
+
+.baneknap .bnr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: var(--panel-3);
+    color: var(--tekst-svag);
+    font-size: 0.7rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.baneknap .bnavn { flex: 1; }
 
 .baneknap.aktiv {
     background-color: var(--blaa-mork);
     border-color: var(--blaa);
-    border-left-color: var(--blaa);
     color: #ffffff;
 }
 
+.baneknap.aktiv .bnr { background-color: rgba(255, 255, 255, 0.25); color: #ffffff; }
+
 .baneknap .bstatus {
-    font-size: 0.68rem;
+    font-size: 0.66rem;
     font-weight: 700;
     white-space: nowrap;
     color: var(--tekst-mat);
 }
 
 .baneknap.aktiv .bstatus { color: rgba(255, 255, 255, 0.8); }
-.baneknap.perfekt { border-left-color: #ff7b8a; }
+.baneknap.perfekt { border-left: 3px solid #ff7b8a; padding-left: 7px; }
 .baneknap.perfekt .bstatus { color: #ff7b8a; }
 .baneknap.aktiv.perfekt .bstatus { color: #ffc2c9; }
 
@@ -1064,6 +1083,21 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .knap:hover:not(:disabled) { background-color: var(--panel-3); border-color: #5e5e70; }
+
+/* Opslag i det periodiske system ligger i selve spillescenen (fane 5),
+   ligesom genstart og andre hjaelpemidler, i stedet for nede i panelet
+   sammen med baner og svarmuligheder. */
+.scene-knap-pertabel {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: auto;
+    background-color: rgba(20, 20, 26, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: var(--skygge);
+}
+
+.scene-knap-pertabel:hover:not(:disabled) { background-color: rgba(61, 158, 224, 0.22); border-color: var(--blaa); }
 .knap:active:not(:disabled) { transform: scale(0.985); }
 .knap:disabled { opacity: 0.4; cursor: not-allowed; }
 

@@ -361,11 +361,16 @@
             knap.type = "button";
             knap.setAttribute("data-bane", String(i));
 
+            var nr = document.createElement("span");
+            nr.className = "bnr";
+            nr.textContent = String(i + 1);
             var navn = document.createElement("span");
-            navn.textContent = (i + 1) + " · " + BANER[i].navn;
+            navn.className = "bnavn";
+            navn.textContent = BANER[i].navn;
             var status = document.createElement("span");
             status.className = "bstatus";
 
+            knap.appendChild(nr);
             knap.appendChild(navn);
             knap.appendChild(status);
             knap.addEventListener("click", function () {
