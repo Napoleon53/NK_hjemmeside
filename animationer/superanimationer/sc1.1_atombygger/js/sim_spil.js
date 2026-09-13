@@ -104,6 +104,10 @@
                 + NK.talform(g.z, "elektron", "elektroner") + " i alt. Atomet er neutralt, så der er lige så mange "
                 + "protoner, og " + g.z + " protoner betyder " + g.navn.toLowerCase() + ".",
             atom: { p: g.z, n: iso.a - g.z, e: g.z },
+            /* Protontal = grundstof, og atomet er neutralt, saa
+               elektrontallet ville afsloere det samme - begge tal i
+               partikelstat-boksen maa derfor vaere skjulte. */
+            skjulStat: ["p", "e"],
             noegle: g.z
         };
     }
@@ -154,9 +158,8 @@
             forklaring: "Massetallet er protoner + neutroner: " + g.z + " + " + n + " = " + iso.a + ".",
             atom: { p: g.z, n: n, e: g.z },
             /* Hverken p, n eller e er hemmelige her - de staar jo i
-               spørgsmålsteksten - saa atomet maa gerne tegnes fuldt ud
-               med maerkat, skaltal og partikelstat-boksen. */
-            synlighed: "vist",
+               spørgsmålsteksten - saa intet af partikelstat-boksen skal
+               skjules. */
             maerkatSymbol: g.symbol,
             noegle: g.z
         };
@@ -175,6 +178,9 @@
             forklaring: "Ladningen er protoner minus elektroner: " + g.z + " − " + e + " = "
                 + NK.ladningstekst(g.ion) + ".",
             atom: { p: g.z, n: D.hyppigsteIsotop(g.z).a - g.z, e: e },
+            /* Proton- og elektrontallet staar allerede i teksten - det er
+               kun selve ladningen (facit), der skal skjules. */
+            skjulStat: ["q"],
             noegle: g.z
         };
     }
@@ -194,6 +200,9 @@
                 + g.navn.toLowerCase() + ". Der er kun " + NK.talform(e, "elektron", "elektroner")
                 + ", og så er ladningen " + NK.ladningstekst(g.ion) + ".",
             atom: { p: g.z, n: D.hyppigsteIsotop(g.z).a - g.z, e: e },
+            /* Identitet OG ladning er selve svarmulighederne her, saa
+               alle tre tal i partikelstat-boksen skal skjules. */
+            skjulStat: ["p", "e", "q"],
             noegle: g.z
         };
     }
@@ -236,12 +245,15 @@
                 + (aedel ? " for at ligne " + aedel.navn.toLowerCase() : "")
                 + ". Elektroner er negativt ladede, så ladningen bliver " + NK.ladningstekst(g.ion) + ".",
             atom: { p: g.z, n: iso.a - g.z, e: g.z },
+            /* Det tegnede atom er (endnu) neutralt, og det er ikke
+               hemmeligt - grundstoffet staar jo i selve spørgsmålet.
+               Ladningen 0 er derfor heller ikke noget at skjule; det er
+               den FREMTIDIGE ion, spørgsmålet handler om, ikke det, der
+               star tegnet lige nu. Svarer man rigtigt, faar man vist
+               selve iondannelsen - lige som paa den gamle "Skaller og
+               ioner"-fane: elektronerne flyver ud eller ind, og maerkatet
+               faar ladningen paa - se svar() og afsloerIon(). */
             maerkatSymbol: g.symbol,
-            /* Svarer man rigtigt, faar man vist selve iondannelsen - lige
-               som paa den gamle "Skaller og ioner"-fane: elektronerne
-               flyver ud eller ind, og maerkat + skaltal + partikelstat
-               dukker op. Foer man har svaret, ville det jo afsloere
-               svaret - se svar() og tegn(). */
             ionAfsloering: { p: g.z, n: iso.a - g.z, e: g.z - g.ion },
             noegle: g.z
         };
@@ -447,18 +459,19 @@
        senere baneskift frem og tilbage ikke nulstiller den. */
     NK.SimSpil.prototype.afsloerIon = function (o) {
         var r = o.ionAfsloering;
-        o.synlighed = "vist";
         o.atom = { p: r.p, n: r.n, e: r.e };
         this.atom.saet(r.p, r.n, r.e);
-        this.visStat(r.p, r.e);
     };
 
-    /* Partikelstat-boksens tal - opdateres straks, ikke hen ad vejen
-       med flyveanimationen, ligesom paa den gamle ion-fane. */
-    NK.SimSpil.prototype.visStat = function (p, e) {
-        NK.saetTekst("spil-stat-p", String(p));
-        NK.saetTekst("spil-stat-e", String(e));
-        NK.saetTekst("spil-stat-q", NK.ladningstekst(p - e));
+    /* Partikelstat-boksens tal - opdateres straks, ikke hen ad vejen med
+       flyveanimationen, ligesom paa den gamle ion-fane. skjul er en liste
+       af "p"/"e"/"q", for de tal, spørgsmålet selv handler om - de vises
+       som "?", saa boksen ikke kommer til at afsløre facit. */
+    NK.SimSpil.prototype.visStat = function (p, e, skjul) {
+        skjul = skjul || [];
+        NK.saetTekst("spil-stat-p", skjul.indexOf("p") !== -1 ? "?" : String(p));
+        NK.saetTekst("spil-stat-e", skjul.indexOf("e") !== -1 ? "?" : String(e));
+        NK.saetTekst("spil-stat-q", skjul.indexOf("q") !== -1 ? "?" : NK.ladningstekst(p - e));
     };
 
     NK.SimSpil.prototype.naeste = function () {
@@ -525,11 +538,12 @@
             }
         }
 
-        /* Partikelstat-boksen maa kun vises, naar intet af den ville
-           afsloere svaret - se synlighed paa den enkelte opgave. */
-        var visStatBoks = !!(b.opgave.atom && b.opgave.synlighed === "vist");
+        /* Partikelstat-boksen staar fremme, naar der overhovedet er et
+           atom at vise tal for - kun de tal, spørgsmålet selv spørger
+           om, skjules som "?" (se skjulStat paa den enkelte opgave). */
+        var visStatBoks = !!b.opgave.atom;
         NK.el("spil-stat").hidden = !visStatBoks;
-        if (visStatBoks) this.visStat(this.atom.p, this.atom.e);
+        if (visStatBoks) this.visStat(this.atom.p, this.atom.e, b.opgave.skjulStat);
 
         NK.saetTekst("spil-banenavn", BANER[this.aktiv].navn);
         NK.saetTekst("spil-taeller", b.nr + "/" + SPOERGSMAAL_PR_BANE);
@@ -628,24 +642,23 @@
         if (!o) return;
 
         if (o.atom) {
+            /* Skaltallene (de smaa groenne "2/2, 8/8" -maerkater) staar
+               altid fremme, naar der er et atom at vise - ligesom paa den
+               gamle "Skaller og ioner"-fane. Maerkatet (symbol + ladning
+               haevet) og ladningsskaeret vises kun, naar hverken
+               identiteten eller ladningen er hemmelig lige nu - se
+               skjulStat paa den enkelte opgave og visStat(). */
             var plads = NK.klamp(Math.min(l.b / 2 - 40, l.h * 0.40), 70, 300);
-            if (o.synlighed === "vist") {
-                /* Intet hemmeligt tilbage (enten var det aldrig hemmeligt,
-                   eller ogsaa er der lige svaret rigtigt) - saa tegnes
-                   atomet fuldt ud, som paa den gamle "Skaller og
-                   ioner"-fane: maerkat, ladningsskaer og skaltal. */
-                var q = this.atom.p - this.atom.e;
-                this.atom.tegn(c, cx, cy, plads, {
-                    fremhaevValens: true,
-                    ladning: q,
-                    maerkat: (o.maerkatSymbol || "") + NK.ladningHaevet(q)
-                });
-                NK.tegnSkaltal(c, this.atom);
-            } else {
-                /* Hverken maerkat, ladningsskaer eller skaltal: de ville
-                   staa og afsloere netop det, der bliver spurgt om. */
-                this.atom.tegn(c, cx, cy, plads, { fremhaevValens: true });
-            }
+            var skjul = o.skjulStat || [];
+            var q = this.atom.p - this.atom.e;
+            var visQ = skjul.indexOf("q") === -1;
+            var maerkat = o.maerkatSymbol ? (o.maerkatSymbol + (visQ ? NK.ladningHaevet(q) : "")) : "";
+            this.atom.tegn(c, cx, cy, plads, {
+                fremhaevValens: true,
+                ladning: visQ ? q : 0,
+                maerkat: maerkat
+            });
+            NK.tegnSkaltal(c, this.atom);
         } else if (o.nuklid) {
             tegnNuklid(c, cx, cy, o.nuklid);
         } else if (o.stortekst) {

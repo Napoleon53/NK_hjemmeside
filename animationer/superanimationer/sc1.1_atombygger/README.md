@@ -68,15 +68,16 @@ lagt ned, fordi bane 4's "Hvilken ladning får X?"-spørgsmål allerede spurgte
 om det samme. I stedet er den fanes grafik flyttet med ind i spilfanen:
 
 * Svarer man rigtigt på et ladningsspørgsmål, dannes ionen for øjnene af én -
-  elektronerne flyver ud eller ind, og atomet får maerkat, ladningsskaer og
-  skaltal, akkurat som den gamle fane viste det. Se `afsloerIon()` i
-  `js/sim_spil.js`.
+  elektronerne flyver ud eller ind, og maerkatet får ladningen på. Se
+  `afsloerIon()` i `js/sim_spil.js`.
 * Den lille "partikelstat"-boks (protoner, elektroner, ladning) fra den gamle
-  fane findes stadig, nu som `#spil-stat` i `index.html`, og bruges også ved
-  massetals-spørgsmål, hvor intet af det er hemmeligt.
-* Ingen af de andre spørgsmålstyper viser maerkat, skaltal eller
-  partikelstat - det ville afsløre netop det, der bliver spurgt om. Se
-  `synlighed`-feltet på hver opgave i `sim_spil.js`.
+  fane findes stadig, nu som `#spil-stat` i `index.html` - og den lille
+  skaltal-oversigt over elektroner pr. skal ("2/2, 8/8, …") er altid fremme,
+  når der overhovedet er et atom at vise. Kun de(t) tal, spørgsmålet selv
+  handler om, vises som "?" i boksen i stedet for facit - se `skjulStat` på
+  hver opgave i `sim_spil.js` (en liste af `"p"`, `"e"`, `"q"`). Maerkatet
+  (symbol + ladning) vises kun, når `maerkatSymbol` er sat, og aldrig med
+  ladning haevet paa, hvis `"q"` er skjult.
 
 Direkte link til en bestemt fane: `index.html#isotop`, `#salt`, `#spil`
 (`#byg` eller ingenting giver fane 1).
@@ -149,11 +150,12 @@ laver: protontallet i stedet for neutrontallet, fortegnsfejl på ladningen.
 Bane 3 ("Ioner") ruller ikke ind i salte — det kommer eleven først til på
 fane 3 (Salte) — men gætter til gengæld elektrontallet ud fra selve
 ionskrivemåden (fx N³⁻), uden et billede at tælle prikker på. Et opgave-objekt
-kan desuden have `synlighed: "vist"` (atomet tegnes fuldt ud med maerkat,
-ladning og skaltal — intet af det er hemmeligt her) eller `ionAfsloering`
-(kun ladningsspørgsmålet: svarer man rigtigt, dannes ionen for øjnene af én,
-se afsnittet "Spilfanen viser hele iondannelsen" ovenfor). Uden et af de to
-felter tegnes atomet bart, uden noget der kan afsløre svaret.
+med `atom` kan desuden have `skjulStat` (en liste af `"p"`, `"e"`, `"q"` -
+de tal i partikelstat-boksen, der skal vises som "?", fordi de er selve
+svaret) og `maerkatSymbol` (vises kun, når identiteten ikke er hemmelig).
+`ionAfsloering` er kun sat på ladningsspørgsmålet: svarer man rigtigt, dannes
+ionen for øjnene af én, se afsnittet "Spilfanen viser hele iondannelsen"
+ovenfor.
 
 `noegle` bruges til at sikre, at de fem spørgsmål i én runde altid handler om
 fem forskellige grundstoffer: `nytSpoergsmaal()` i `sim_spil.js` trækker en ny
