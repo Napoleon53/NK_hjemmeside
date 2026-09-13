@@ -135,6 +135,21 @@ body {
 
 .ikonknap:hover { background-color: var(--panel-3); color: var(--tekst); }
 
+/* Hjaelpeknappen starter en rundvisning i stedet for at aabne en lang
+   tekstvaeg - stoerre og roed, saa den skiller sig ud fra de oevrige,
+   diskrete ikonknapper i toplinjen. */
+#hjaelpknap {
+    width: 38px;
+    height: 36px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    background-color: var(--roed-mork);
+    border-color: var(--roed);
+    color: #d9dde3;
+}
+
+#hjaelpknap:hover { background-color: var(--roed); color: #ffffff; }
+
 /* Vaelg mellem at se kernepartiklerne enkeltvis eller som et antal -
    gaelder alle fire faner, derfor ligger den i toplinjen. */
 .visvalg {
@@ -1167,7 +1182,7 @@ input[type="range"]::-moz-range-thumb {
 .knap.banker { animation: bank 1.7s ease-out infinite; }
 
 /* ---------------------------------------------------------------------
-   HJAELPE-OVERLAY
+   POP OP-OVERLAYS (iso-beregning, spil-pertabel, salt-forklaring)
    --------------------------------------------------------------------- */
 .overlay {
     position: fixed;
@@ -1215,16 +1230,86 @@ input[type="range"]::-moz-range-thumb {
 
 .overlay-boks ul { margin: 0; padding-left: 20px; }
 
-kbd {
-    background-color: #14141a;
-    border: 1px solid #4a4a58;
-    border-bottom-width: 2px;
-    border-radius: 4px;
-    padding: 1px 6px;
-    font-family: "Cascadia Mono", Consolas, monospace;
-    font-size: 0.8rem;
-    color: var(--tekst);
+/* ---------------------------------------------------------------------
+   RUNDVISNINGEN
+   Spotlight paa ét element ad gangen, i stedet for en lang tekstvaeg.
+   Selve moerklaegningen laves med ét enkelt box-shadow-trick paa
+   .rundvisning-spot: en gennemsigtig boks, der sidder praecis oven paa
+   maalelementet, med en kaempe skygge udenom, som moerklaegger resten
+   af skaermen. Ingen ekstra lag, og den flytter sig i en blid overgang,
+   naar man skifter trin. En usynlig fuldskaerms-baggrund fanger klik
+   uden for boksen, saa man ikke kommer til at aendre i selve fanen,
+   mens man bliver vist rundt.
+   --------------------------------------------------------------------- */
+.rundvisning { position: fixed; inset: 0; z-index: 200; }
+.rundvisning[hidden] { display: none; }
+
+.rundvisning-baggrund {
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    cursor: pointer;
 }
+
+.rundvisning-spot {
+    position: fixed;
+    border-radius: 10px;
+    box-shadow: 0 0 0 9999px rgba(8, 8, 13, 0.74);
+    outline: 2px solid var(--gul);
+    outline-offset: 3px;
+    pointer-events: none;
+    transition: top 0.22s ease, left 0.22s ease, width 0.22s ease, height 0.22s ease;
+}
+
+.rundvisning-boks {
+    position: fixed;
+    width: 300px;
+    max-width: calc(100vw - 28px);
+    background-color: var(--panel);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius);
+    box-shadow: var(--skygge);
+    padding: 14px 16px;
+    transition: top 0.22s ease, left 0.22s ease;
+}
+
+.rundvisning-hoved {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.rundvisning-tal {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    color: var(--tekst-mat);
+}
+
+.rundvisning-luk {
+    background: transparent;
+    border: none;
+    color: var(--tekst-svag);
+    font-size: 0.9rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 4px;
+}
+
+.rundvisning-luk:hover { color: var(--tekst); }
+
+.rundvisning-boks h3 { margin: 0 0 6px 0; font-size: 1rem; color: var(--gul); }
+.rundvisning-boks p { margin: 0; font-size: 0.85rem; line-height: 1.5; color: #c8ced6; }
+
+.rundvisning-knapper {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.rundvisning-knapper .knap { flex: 1; justify-content: center; }
 
 /* ---------------------------------------------------------------------
    TILGAENGELIGHED OG SMALLE SKAERME

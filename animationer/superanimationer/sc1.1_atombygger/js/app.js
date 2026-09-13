@@ -30,13 +30,10 @@
         }
         aktivFane = id;
         if (sims[id]) sims[id].tilpas();
+        NK.Rundvisning.luk();      /* rundvisningens trin hoerer til den fane, man forlader */
     }
 
-    /* ----- Hjaelp og andre pop op-vinduer ------------------------------ */
-    function visHjaelp(vis) {
-        NK.el("hjaelp").classList.toggle("vis", vis);
-    }
-
+    /* ----- Pop op-vinduer ------------------------------------------------ */
     function lukOverlay() {
         var aabne = document.querySelectorAll(".overlay.vis");
         for (var i = 0; i < aabne.length; i++) aabne[i].classList.remove("vis");
@@ -67,11 +64,13 @@
             visFane(faner[parseInt(e.key, 10) - 1]);
             return;
         }
-        if (e.key === "Escape") { lukOverlay(); return; }
+        if (e.key === "Escape") { lukOverlay(); NK.Rundvisning.luk(); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") {
-            visHjaelp(!NK.el("hjaelp").classList.contains("vis"));
+            if (NK.Rundvisning.aktiv()) NK.Rundvisning.luk();
+            else NK.Rundvisning.start(aktivFane);
             return;
         }
+        if (NK.Rundvisning.aktiv()) return;   /* rundvisningen blokerer ogsaa for tastaturgenveje, ligesom den blokerer klik */
         if (e.key === "r" || e.key === "R") {
             if (sim && sim.nulstil) sim.nulstil();
             return;
@@ -114,11 +113,7 @@
             bindVis(visKnapper[vi]);
         }
 
-        NK.el("hjaelpknap").addEventListener("click", function () { visHjaelp(true); });
-        NK.el("hjaelp-luk").addEventListener("click", function () { visHjaelp(false); });
-        NK.el("hjaelp").addEventListener("click", function (e) {
-            if (e.target.id === "hjaelp") visHjaelp(false);
-        });
+        NK.el("hjaelpknap").addEventListener("click", function () { NK.Rundvisning.start(aktivFane); });
 
         document.addEventListener("keydown", tastatur);
 

@@ -62,12 +62,12 @@ Direkte link til en bestemt fane: `index.html#isotop`, `#ion`, `#salt`, `#spil`
 
 Genveje: <kbd>1</kbd>–<kbd>5</kbd> faner · <kbd>p</kbd> <kbd>n</kbd> <kbd>e</kbd>
 læg en partikel i · <kbd>P</kbd> <kbd>N</kbd> <kbd>E</kbd> tag en ud ·
-<kbd>R</kbd> nulstil fanen · <kbd>H</kbd> hjælp.
+<kbd>R</kbd> nulstil fanen · <kbd>H</kbd> rundvisning på den aktive fane.
 
 ## Filer
 
 ```
-index.html          markup for alle fem faner + hjælpe-overlay
+index.html          markup for alle fem faner + rundvisningens skal
 css/stil.css        alt udseende. NB: decimaltal med PUNKTUM i CSS
 js/kerne.js         NK-navnerum, dansk talformat, hævet/sænket skrift,
                     DPR-skarpt canvas, tegnehjælpere
@@ -80,6 +80,7 @@ js/pertabel.js      det periodiske system i lommeformat, 18 søjler
 js/sim_byg.js       fane 1     js/sim_isotop.js  fane 2
 js/sim_ion.js       fane 3     js/sim_salt.js    fane 4
 js/sim_spil.js      fane 5
+js/rundvisning.js   spotlight-rundvisningen bag hjælpeknappen (se nedenfor)
 js/app.js           faneskift, tastatur, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen (se nedenfor)
 ```
@@ -147,6 +148,17 @@ panelerne er fyldt ud, at alle 20 isotopblandinger rammer tabellens atommasse,
 at skalfordelingerne er rigtige, og at saltformlerne har ladningsbalance. Brug
 den efter ændringer i `data.js`. Filen bruges ikke af animationen og kan
 slettes.
+
+**Rundvisningen** (hjælpeknappen, `?`) viser ikke længere én lang tekstvæg om
+alle fem faner. Den peger i stedet på ét element ad gangen på den fane, man
+rent faktisk står på — kun fane 1's rundvisning slutter af med at pege på de
+fire andre faner, uden at gå i dybden med dem. Trinene står i `TURE` i
+`js/rundvisning.js`, ét array pr. fane-id, som en liste af `{sel, titel,
+tekst}`. `sel` er en CSS-selector (kommasepareret for at fremhæve flere
+elementer på én gang, se saltfanens to grundstofvælgere) — findes elementet
+ikke lige nu, springes trinnet automatisk over. Rundvisningen blokerer klik
+og tastaturgenveje på resten af siden, mens den er åben, og lukker sig selv,
+hvis man skifter fane.
 
 ## Den er nu i menuen
 
