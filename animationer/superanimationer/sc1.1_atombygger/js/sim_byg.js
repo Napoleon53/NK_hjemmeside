@@ -211,7 +211,9 @@
         NK.saetTekst("byg-nuklid-q", q === 0 ? "" : NK.ladningstekst(q));
         NK.saetKlasse("byg-nuklid-q", q > 0 ? "q plus" : (q < 0 ? "q minus" : "q"));
 
-        NK.saetTekst("byg-grundstof", g ? g.navn : "— endnu ikke et grundstof —");
+        NK.saetTekst("byg-symbol", g ? g.symbol : "?");
+        NK.saetTekst("byg-grundstof", g ? g.navn : "Intet grundstof");
+        NK.saetTekst("byg-z", g ? "atomnummer " + g.z : "ingen protoner");
         NK.saetTekst("byg-massetal", this.p ? String(a) : "–");
         NK.saetTekst("byg-ladning", NK.ladningstekst(q));
         NK.saetKlasse("byg-ladning", "tal " + (q > 0 ? "roed" : (q < 0 ? "blaa" : "groen")));
@@ -420,6 +422,62 @@
     /* ----- Tegning ---------------------------------------------------------- */
     NK.SimByg.prototype.tilpas = function () { this.l.tilpas(); };
 
+    /* Hvor atomet skal staa, saa hverken skallerne eller nuklidmaerkatet
+       gemmer sig under opgavekortet eller det periodiske system. Atomet
+       flyttes foerst ned og goeres dernaest mindre. Der regnes med fire
+       fulde skaller for alle grundstoffer, saa maalestokken er den samme,
+       og atomet ikke skifter stoerrelse, naar man laegger en proton i. */
+    var YDRE_ANDEL = 0.93;     /* yderste skals radius i forhold til plads, fire skaller */
+    /* KERNE_H svarer til loftet i tegn(): teksten under atomet kommer
+       aldrig laengere ned end 74 px over bunden. */
+    var NUKLID_H = 78, NUKLID_HALV = 66, KERNE_H = 74, LUFT = 10;
+
+    NK.SimByg.prototype.placering = function () {
+        var l = this.l;
+        var hindringer = [];
+        var kilder = [NK.el("opgave-boks"), document.querySelector("#fane-byg .pertabel-boks")];
+        var i, noegle = l.b + "x" + l.h;
+        for (i = 0; i < kilder.length; i++) {
+            var e = kilder[i];
+            if (!e || !e.offsetWidth) continue;
+            var r = { v: e.offsetLeft, t: e.offsetTop, h: e.offsetLeft + e.offsetWidth, b: e.offsetTop + e.offsetHeight };
+            hindringer.push(r);
+            noegle += "|" + r.v + "," + r.t + "," + r.h + "," + r.b;
+        }
+        if (this.stedNoegle === noegle) return this.sted;
+
+        var cx = l.b / 2;
+        var normalPlads = NK.klamp(Math.min(l.b / 2 - 40, l.h * 0.38), 70, 300);
+        var normalCy = l.h * 0.54;
+
+        function fri(cy, R) {
+            var n = { v: cx - NUKLID_HALV, t: cy - R - 14 - NUKLID_H, h: cx + NUKLID_HALV, b: cy - R - 14 };
+            for (var j = 0; j < hindringer.length; j++) {
+                var o = hindringer[j];
+                if (o.t >= l.h) continue;
+                if (n.v < o.h + LUFT && n.h > o.v - LUFT && n.t < o.b + LUFT && n.b > o.t - LUFT) return false;
+                var dx = Math.max(o.v - cx, 0, cx - o.h);
+                var dy = Math.max(o.t - cy, 0, cy - o.b);
+                if (dx * dx + dy * dy < (R + LUFT) * (R + LUFT)) return false;
+            }
+            return true;
+        }
+
+        var sted = null;
+        for (var f = 1; f >= 0.5 && !sted; f -= 0.04) {
+            var plads = Math.max(70, normalPlads * f);
+            var R = plads * YDRE_ANDEL;
+            var cyFra = Math.max(normalCy, R + 14 + NUKLID_H + LUFT);
+            var cyTil = l.h - R - 16 - KERNE_H;
+            for (var cy = cyFra; cy <= cyTil; cy += 4) {
+                if (fri(cy, R)) { sted = { plads: plads, cy: cy }; break; }
+            }
+        }
+        this.sted = sted || { plads: Math.max(70, normalPlads * 0.5), cy: normalCy };
+        this.stedNoegle = noegle;
+        return this.sted;
+    };
+
     NK.SimByg.prototype.opdater = function (dt) {
         this.atom.opdater(dt);
         this.beskedTid += dt;
@@ -437,8 +495,9 @@
         l.ryd("#14141a");
 
         var cx = l.b / 2;
-        var cy = l.h * 0.54;
-        var plads = NK.klamp(Math.min(l.b / 2 - 40, l.h * 0.38), 70, 300);
+        var sted = this.placering();
+        var cy = sted.cy;
+        var plads = sted.plads;
         var nuklidBoks = NK.el("byg-nuklid");
         var kerneBoks = NK.el("byg-kerne");
 

@@ -309,10 +309,26 @@ main { flex: 1; position: relative; min-height: 0; }
     box-shadow: var(--skygge);
 }
 
-/* Genstart ligger i scenens hoejre tophjoerne - modsat opgavekortet. */
-.scene-knap {
+/* Det periodiske system i scenens hoejre tophjoerne, over for
+   opgavekortet. max-width holder det fri af opgavekortet, naar scenen
+   bliver smal (18 + 300 + 18 til kortet og 18 i hver side). */
+.pertabel-boks {
     position: absolute;
     top: 18px;
+    right: 18px;
+    width: 420px;
+    max-width: calc(100% - 354px);
+    background-color: rgba(24, 24, 31, 0.92);
+    box-shadow: var(--skygge);
+}
+
+.pertabel-boks .pcelle { font-size: 0.7rem; border-radius: 4px; }
+
+/* Genstart ligger nede i scenens hoejre hjoerne. Toppen er optaget af
+   opgavekortet til venstre og det periodiske system til hoejre. */
+.scene-knap {
+    position: absolute;
+    bottom: 18px;
     right: 18px;
     width: auto;
     gap: 9px;
@@ -332,7 +348,7 @@ main { flex: 1; position: relative; min-height: 0; }
     top: 0;
     left: 0;
     transform: translate(-50%, 0);
-    max-width: min(460px, calc(100% - 36px));
+    max-width: min(460px, calc(100% - 260px));   /* holder sig fri af genstart i hjoernet */
     text-align: center;
     font-size: 0.95rem;
     line-height: 1.45;
@@ -1145,6 +1161,14 @@ select:focus-visible {
     .nuklid { padding: 8px 13px 8px 10px; }
     .nuklid .sym { font-size: 2.2rem; }
     .opgave-boks { top: 15px; width: calc(100% - 30px); left: 15px; }
+
+    /* Paa smal skaerm er der ikke plads til tabellen oven i atomet, saa
+       den lander under laerredet, og genstart foelger laerredets bund. */
+    #fane-byg .scene { height: auto; min-height: 0; }
+    #byg-laerred { height: max(58vh, 340px); }
+    .pertabel-boks { position: static; width: auto; max-width: none; margin: 0 12px 12px; }
+    #fane-byg .scene-knap { position: static; width: max-content; margin: 10px 12px 10px auto; }
+    .kernekort { max-width: calc(100% - 30px); }
     .saltvalg { width: auto; top: 70px; padding: 6px 8px; }
     .saltvalg label { font-size: 0.6rem; white-space: normal; }
     .saltvalg select { font-size: 0.7rem; padding: 6px 4px; }
