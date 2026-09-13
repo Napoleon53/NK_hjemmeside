@@ -222,6 +222,49 @@ main { flex: 1; position: relative; min-height: 0; }
 }
 
 .scene-mrk b { color: #ffffff; }
+
+/* Overblikket over proton- og elektrontal paa fane 3, i scenens
+   venstre tophjoerne - samme translucente kortstil som kernekort og
+   saltvalg, saa det hoerer visuelt til scenen, ikke panelet. */
+.ionstat {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    min-width: 176px;
+    background-color: rgba(20, 20, 26, 0.82);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius);
+    padding: 11px 14px;
+    box-shadow: var(--skygge);
+    pointer-events: none;
+}
+
+.ionstat-raekke {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--tekst-svag);
+}
+
+.ionstat-raekke + .ionstat-raekke { margin-top: 5px; }
+
+.ionstat-raekke span:last-child {
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+#ion-stat-p { color: #ff9384; }
+#ion-stat-e { color: #f2c53d; }
+
+.ionstat-raekke.ladning {
+    margin-top: 8px;
+    padding-top: 7px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
 .scene-mrk.advarsel { color: #f0a49c; }
 
 /* ---------------------------------------------------------------------

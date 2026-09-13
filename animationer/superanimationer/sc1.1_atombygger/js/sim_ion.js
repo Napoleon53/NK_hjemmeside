@@ -80,6 +80,16 @@
         NK.saetKlasse("ion-resultat", "besked");
         NK.el("ion-gaet-boks").classList.remove("vis");
         this.visStatus("", "");
+        this.visStat(g.z, g.z);
+    };
+
+    /* Overblikstallene i scenens tophjoerne - opdateres hver gang
+       proton- eller elektrontallet aendrer sig, saa eleven kan se
+       netop DE tal, der aendrer sig, naar ionen dannes. */
+    NK.SimIon.prototype.visStat = function (p, e) {
+        NK.saetTekst("ion-stat-p", String(p));
+        NK.saetTekst("ion-stat-e", String(e));
+        NK.saetTekst("ion-stat-q", NK.ladningstekst(p - e));
     };
 
     /* ----- Oktetreglen, sagt for dette grundstof ---------------------------- */
@@ -227,6 +237,7 @@
         this.visStatus("Ionen " + g.symbol + NK.ladningHaevet(g.ion) + " er dannet. "
             + Math.abs(g.ion) + " elektron" + (Math.abs(g.ion) === 1 ? "" : "er") + " "
             + (g.ion > 0 ? "forlod" : "kom til") + " atomet — kernen rørte sig ikke.", "");
+        this.visStat(g.z, nyE);
     };
 
     NK.SimIon.prototype.visStatus = function (tekst, klasse) {

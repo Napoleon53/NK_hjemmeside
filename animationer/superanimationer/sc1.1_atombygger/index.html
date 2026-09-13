@@ -155,6 +155,26 @@
 <section class="fane" id="fane-ion" role="tabpanel" aria-label="Skaller og ioner">
     <div class="scene medtekst">
         <canvas id="ion-laerred"></canvas>
+
+        <!-- Overblik over de to tal, hele fanen handler om: hvor mange
+             protoner (uændrede) og hvor mange elektroner (dem, der flytter
+             sig). Staar fremme hele tiden, saa man kan se dem skifte i
+             samme øjeblik, ionen dannes. -->
+        <div class="ionstat" id="ion-stat" aria-live="polite">
+            <div class="ionstat-raekke">
+                <span>Protoner (p⁺)</span>
+                <span id="ion-stat-p">11</span>
+            </div>
+            <div class="ionstat-raekke">
+                <span>Elektroner (e⁻)</span>
+                <span id="ion-stat-e">11</span>
+            </div>
+            <div class="ionstat-raekke ladning">
+                <span>Ladning (p⁺ − e⁻)</span>
+                <span id="ion-stat-q">0</span>
+            </div>
+        </div>
+
         <div class="scene-mrk" id="ion-status"></div>
     </div>
 
