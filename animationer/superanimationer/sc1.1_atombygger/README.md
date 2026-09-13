@@ -10,6 +10,11 @@ Den afløser `animationer/kemi-c-filer/c1.1_atommodel_ioner.html`. Det, der var
 værd at tage med derfra, er taget med: skyderen gennem de første 20 grundstoffer,
 gæt-ladningen-øvelsen og elektronoverførslen til et salt. Resten er bygget om.
 
+Den gamle animation ligger nu i `animationer/kemi-c-filer/arkiv/c1.1_atommodel_ioner_oldversion.html`.
+Den oprindelige sti, `c1.1_atommodel_ioner.html`, er en genvej (meta-refresh +
+JS-redirect) til denne superanimations `index.html`, så de eksisterende knapper
+i `samling_c1.html` og `samling_NV.html` ikke behøvede at blive ændret.
+
 ## Hvad viser den
 
 Fem faner om det samme spørgsmål: *hvad er et atom lavet af, og hvad sker der,
@@ -143,19 +148,11 @@ at skalfordelingerne er rigtige, og at saltformlerne har ladningsbalance. Brug
 den efter ændringer i `data.js`. Filen bruges ikke af animationen og kan
 slettes.
 
-## Hvis den skal ind i menuen
+## Den er nu i menuen
 
-Den er med vilje ikke linket ind endnu. `animationer/kemi-c-filer/samling_c1.html`
-har allerede en knap med `data-emne="c1.1"`, som peger på den gamle animation.
-Skal den nye afløse den, er det den ene linje, der skal skiftes ud — bemærk
-`../`, fordi superanimationerne ligger uden for kapitlets egen mappe:
-
-```html
-<button class="tab-btn" data-emne="c1.1"
-    data-beskrivelse="Byg selv atomet af protoner, neutroner og elektroner, og se hvordan de tre tal bestemmer grundstof, isotop og ladning."
-    onclick="visAnimation(this, '../superanimationer/sc1.1_atombygger/index.html')"
-    title="Atomets opbygning"><span class="btn-num">1</span><span class="btn-text">Atomets opbygning</span></button>
-```
+`samling_c1.html` og `samling_NV.html` peger stadig på den gamle sti
+(`c1.1_atommodel_ioner.html`), men den sti er nu selv genvejen til denne
+superanimation — se ovenfor. Ingen af knapperne er derfor ændret.
 
 Feedback-boksen i `animationer/samling_alt.html` har allerede pladsen: i
 `FEEDBACK_EMNER` står `C1: Atomer` med `{ nr: 1, navn: 'Atommodel' }` — det navn

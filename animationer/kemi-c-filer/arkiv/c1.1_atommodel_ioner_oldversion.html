@@ -1,0 +1,1859 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Udvidet Atom- og Lewis Model Simulator</title>
+    <style>
+        :root {
+            --primary-dark: #1a252f;
+            --primary-light: #3498db;
+            --accent: #e74c3c;
+            --success: #2ecc71;
+            --nucleus: #9b59b6;
+            --electron: #f1c40f;
+            --text-main: #ecf0f1;
+            --panel-bg: rgba(255, 255, 255, 0.95);
+            --panel-text: #2c3e50;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .background-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(52, 152, 219, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(52, 152, 219, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .main-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .visualization-panel {
+            flex: 2;
+            min-width: 480px;
+            background: rgba(20, 30, 40, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            height: 550px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Stats Box Styling */
+        .particle-stats-box {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            color: var(--panel-text);
+            z-index: 20;
+            min-width: 180px;
+            border-left: 4px solid var(--primary-light);
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .stat-row span:last-child {
+            margin-left: 15px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+        /* Stability Meter (Creative Extension) */
+        .stability-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 160px;
+            background: rgba(255,255,255,0.9);
+            padding: 10px;
+            border-radius: 10px;
+            z-index: 20;
+            text-align: center;
+        }
+        
+        .stability-label {
+            color: var(--panel-text);
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .stability-bar-bg {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .stability-bar-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease, background-color 0.5s ease;
+        }
+
+        .control-panel {
+            flex: 1;
+            min-width: 300px;
+            background: var(--panel-bg);
+            color: var(--panel-text);
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .atom-display {
+            position: relative;
+            width: 450px;
+            height: 450px;
+            transition: opacity 0.22s ease;
+        }
+
+        .atom-display.atom-fading {
+            opacity: 0.1;
+        }
+
+        .nucleus {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 44px;
+            height: 44px;
+            background: radial-gradient(circle at 30% 30%, #d2b4de, var(--nucleus));
+            border-radius: 50%;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 0 20px rgba(155, 89, 182, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        .shell {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px dashed rgba(255, 255, 255, 0.2); /* Dashed for orbital representation */
+            border-radius: 50%;
+            z-index: 1;
+            transition: all 0.5s ease;
+        }
+
+        .electron {
+            position: absolute;
+            width: 13px;
+            height: 13px;
+            background: radial-gradient(circle at 30% 30%, #fff, var(--electron));
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 8px rgba(241, 196, 15, 0.8);
+        }
+
+        .shell-readout {
+            position: absolute;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 20;
+        }
+
+        .shell-readout-label {
+            display: block;
+            font-size: 0.75rem;
+            color: rgba(236, 240, 241, 0.6);
+            margin-bottom: 2px;
+        }
+
+        .shell-readout-numbers {
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--text-main);
+            text-shadow: 0 0 8px rgba(52, 152, 219, 0.6);
+        }
+
+        .electron.added {
+            background: radial-gradient(circle at 30% 30%, #fff, var(--success));
+            box-shadow: 0 0 8px rgba(46, 204, 113, 0.8);
+        }
+
+        .electron.removed {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(3);
+        }
+
+        .info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .element-symbol-large {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            background: #eee;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 12px;
+        }
+
+        .element-details h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+        }
+
+        .element-details span {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--primary-dark);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+            transition: background 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: #2980b9;
+        }
+
+        .btn-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-ion {
+            background-color: var(--accent);
+            color: white;
+            grid-column: span 2;
+        }
+
+        .btn-ion:hover {
+            background-color: #c0392b;
+            box-shadow: 0 4px 10px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn-reset {
+            background-color: #95a5a6;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .btn-next {
+            background-color: var(--success);
+            color: white;
+            grid-column: span 2;
+        }
+
+        .btn-next:hover {
+            background-color: #27ae60;
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.4);
+        }
+
+        .help-fab {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 100;
+            background: var(--primary-light);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 10px 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+            transition: all 0.2s;
+        }
+
+        .help-fab:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+        }
+
+        .status-message {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .status-neutral {
+            background-color: #d5f5e3;
+            color: #27ae60;
+            border: 1px solid #abebc6;
+        }
+
+        .status-changed {
+            background-color: #fadbd8;
+            color: #c0392b;
+            border: 1px solid #f5b7b1;
+        }
+
+        /* Guess-first panel */
+        .guess-panel {
+            background: #eef6fc;
+            border: 1px solid #d3e6f3;
+            border-radius: 12px;
+            padding: 18px;
+        }
+
+        .guess-question {
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .guess-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .guess-option {
+            padding: 10px 5px;
+            border: 2px solid var(--primary-light);
+            background: white;
+            color: var(--primary-light);
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.15s;
+        }
+
+        .guess-option:hover:not(:disabled) {
+            background: var(--primary-light);
+            color: white;
+        }
+
+        .guess-option:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .guess-option.guess-correct {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+            opacity: 1;
+        }
+
+        .guess-option.guess-wrong {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            opacity: 1;
+        }
+
+        .guess-feedback {
+            text-align: center;
+            font-weight: 600;
+            min-height: 1.4em;
+            margin-bottom: 10px;
+        }
+
+        .guess-feedback-correct {
+            color: #27ae60;
+        }
+
+        .guess-feedback-wrong {
+            color: #c0392b;
+        }
+
+        .btn-continue {
+            width: 100%;
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .btn-continue:hover {
+            background-color: #2980b9;
+        }
+
+        /* Tabs */
+        .tab-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 22px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-main);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .tab-btn.active {
+            background: var(--primary-light);
+            border-color: var(--primary-light);
+            color: white;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: flex;
+        }
+
+        /* Electron transfer tab */
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 0.95rem;
+            background: white;
+            color: var(--panel-text);
+        }
+
+        .transfer-panel {
+            height: 380px;
+            flex-direction: column;
+        }
+
+        .transfer-stage {
+            position: relative;
+            width: 480px;
+            max-width: 100%;
+            height: 260px;
+            transition: opacity 0.22s ease;
+        }
+
+        .transfer-stage.atom-fading {
+            opacity: 0.1;
+        }
+
+        .mini-nucleus {
+            position: absolute;
+            top: 150px;
+            width: 50px;
+            height: 50px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 15px;
+            color: white;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        #metalNucleus {
+            left: 130px;
+            background: radial-gradient(circle at 30% 30%, #f5b7b1, var(--accent));
+            box-shadow: 0 0 16px rgba(231, 76, 60, 0.6);
+        }
+
+        #nonmetalNucleus {
+            left: 350px;
+            background: radial-gradient(circle at 30% 30%, #a9cce3, var(--primary-light));
+            box-shadow: 0 0 16px rgba(52, 152, 219, 0.6);
+        }
+
+        .transfer-arrow {
+            position: absolute;
+            left: 240px;
+            top: 150px;
+            transform: translate(-50%, -50%);
+            font-size: 1.8rem;
+            color: rgba(236, 240, 241, 0.4);
+        }
+
+        .mini-electron {
+            position: absolute;
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff, var(--electron));
+            box-shadow: 0 0 6px rgba(241, 196, 15, 0.8);
+            transform: translate(-50%, -50%);
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 6;
+        }
+
+        .mini-electron.transferred {
+            background: radial-gradient(circle at 30% 30%, #fff, var(--success));
+            box-shadow: 0 0 6px rgba(46, 204, 113, 0.8);
+        }
+
+        .transfer-formula {
+            margin-top: 10px;
+            text-align: center;
+            min-height: 2.2em;
+        }
+
+        .transfer-formula-main {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .transfer-formula-names {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: rgba(236, 240, 241, 0.6);
+            margin-top: 2px;
+        }
+
+        /* ---------- Guided intro tour ---------- */
+        .intro-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 500;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .intro-overlay.hidden {
+            display: none;
+        }
+
+        .intro-card {
+            background: var(--panel-bg);
+            color: var(--panel-text);
+            max-width: 460px;
+            width: 100%;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border-top: 5px solid var(--primary-light);
+        }
+
+        .intro-step-dots {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+
+        .intro-step-dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #dbe4ea;
+        }
+
+        .intro-step-dots span.active {
+            background: var(--primary-light);
+        }
+
+        .intro-card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+            color: var(--primary-dark);
+            text-align: center;
+        }
+
+        .intro-card p {
+            font-size: 1rem;
+            line-height: 1.5;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .intro-nav {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .intro-nav .btn {
+            flex: 1;
+        }
+
+        .btn-intro-skip {
+            background: transparent;
+            color: #7f8c8d;
+            border: 1px solid #ccc;
+        }
+
+        .btn-intro-next {
+            background: var(--primary-light);
+            color: white;
+        }
+
+        .btn-intro-next:hover {
+            background: #2980b9;
+        }
+
+        .intro-highlight {
+            position: relative;
+            z-index: 501;
+            outline: 4px solid var(--electron);
+            outline-offset: 6px;
+            border-radius: 16px;
+            box-shadow: 0 0 30px 6px rgba(241, 196, 15, 0.7);
+        }
+
+        /* ---------- Reveal secondary info after first interaction ---------- */
+        .reveal-later {
+            display: none;
+        }
+
+        .stat-row.reveal-later.shown {
+            display: flex;
+            animation: fadeInReveal 0.5s ease;
+        }
+
+        .stability-container.reveal-later.shown {
+            display: block;
+            animation: fadeInReveal 0.5s ease;
+        }
+
+        @keyframes fadeInReveal {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: none; }
+        }
+
+        .stability-caption {
+            display: block;
+            font-size: 0.65rem;
+            color: #7f8c8d;
+            margin-top: 4px;
+            line-height: 1.3;
+        }
+
+        /* ---------- "Next step" nudge highlighting ---------- */
+        @keyframes btnPulseRed {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.6); }
+            70% { box-shadow: 0 0 0 14px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+
+        @keyframes btnPulseGray {
+            0% { box-shadow: 0 0 0 0 rgba(149, 165, 166, 0.6); }
+            70% { box-shadow: 0 0 0 14px rgba(149, 165, 166, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(149, 165, 166, 0); }
+        }
+
+        @keyframes btnPulseBlue {
+            0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.6); }
+            70% { box-shadow: 0 0 0 14px rgba(52, 152, 219, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+        }
+
+        @keyframes btnPulseGreen {
+            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.6); }
+            70% { box-shadow: 0 0 0 14px rgba(46, 204, 113, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        }
+
+        .btn-pulse { position: relative; }
+        .btn-ion.btn-pulse { animation: btnPulseRed 1.6s ease-out infinite; }
+        .btn-reset.btn-pulse { animation: btnPulseGray 1.6s ease-out infinite; }
+        .btn-continue.btn-pulse { animation: btnPulseBlue 1.6s ease-out infinite; }
+        .btn-next.btn-pulse { animation: btnPulseGreen 1.6s ease-out infinite; }
+
+        .slider-pulse-hint {
+            animation: sliderGroupPulse 1.5s ease-in-out infinite;
+            border-radius: 12px;
+            padding: 10px;
+            margin: -10px -10px 5px -10px;
+        }
+
+        @keyframes sliderGroupPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.5); background: rgba(52, 152, 219, 0.05); }
+            50% { box-shadow: 0 0 0 8px rgba(52, 152, 219, 0); background: rgba(52, 152, 219, 0.15); }
+        }
+
+        /* ---------- Guess panel hint ---------- */
+        .guess-hint {
+            font-size: 0.9rem;
+            color: #34495e;
+            background: #fff;
+            border: 1px dashed #b8d4ea;
+            border-radius: 8px;
+            padding: 8px 10px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="background-grid"></div>
+
+    <button class="help-fab" id="helpBtn" type="button">❓ Hjælp</button>
+
+    <div class="intro-overlay hidden" id="introOverlay">
+        <div class="intro-card">
+            <div class="intro-step-dots" id="introDots"></div>
+            <h2 id="introTitle"></h2>
+            <p id="introText"></p>
+            <div class="intro-nav">
+                <button class="btn btn-intro-skip" id="introSkipBtn">Spring over</button>
+                <button class="btn btn-intro-next" id="introNextBtn">Næste →</button>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <h1>Atomer og Ioner</h1>
+        <p>Udforsk elektronstruktur, og se hvordan atomer bliver til ioner</p>
+    </header>
+
+    <div class="tab-bar">
+        <button class="tab-btn active" data-tab="single">Byg et Atom</button>
+        <button class="tab-btn" data-tab="transfer">Elektronoverførsel</button>
+    </div>
+
+    <div class="main-container tab-panel active" id="tab-single">
+        <div class="visualization-panel">
+            <div class="particle-stats-box">
+                <div class="stat-row">
+                    <span>Antal Protoner (p⁺)</span>
+                    <span id="protonCount" style="color: var(--nucleus)">3</span>
+                </div>
+                <div class="stat-row">
+                    <span>Antal Elektroner (e⁻)</span>
+                    <span id="electronCount" style="color: var(--electron); text-shadow: 0 0 1px black;">3</span>
+                </div>
+                <div class="stat-row reveal-later" id="netChargeRow" style="margin-top: 8px; padding-top: 5px; border-top: 1px solid #eee;">
+                    <span>Ladning (protoner − elektroner)</span>
+                    <span id="netChargeDisplay">0</span>
+                </div>
+            </div>
+
+            <div class="stability-container reveal-later" id="stabilityContainer">
+                <span class="stability-label" id="stabilityLabel">Reaktivitet</span>
+                <div class="stability-bar-bg">
+                    <div class="stability-bar-fill" id="stabilityBar"></div>
+                </div>
+                <span class="stability-caption">Jo længere til højre, jo mere stabilt (tættest på en ædelgas)</span>
+            </div>
+
+            <div class="atom-display" id="atomContainer">
+                <div class="nucleus" id="nucleus">Li</div>
+            </div>
+
+            <div class="shell-readout">
+                <span class="shell-readout-label">Elektroner i hver skal</span>
+                <span class="shell-readout-numbers" id="shellReadoutNumbers">2 - 1</span>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <div class="info-header">
+                <div class="element-details">
+                    <h2 id="elementName">Lithium</h2>
+                    <span>Atomnummer: <b id="atomicNumber">3</b></span><br>
+                    <span>Elektroner i hver skal: <b id="electronConfig">(2, 1)</b></span>
+                </div>
+                <div class="element-symbol-large" id="elementSymbol">Li</div>
+            </div>
+
+            <div class="control-group" id="sliderGroup">
+                <label for="protonSlider">Vælg et grundstof (atomnummer 1-20)</label>
+                <input type="range" id="protonSlider" min="1" max="20" value="3">
+            </div>
+
+            <div class="btn-container" id="btnContainer">
+                <button class="btn btn-ion" id="ionizeBtn">Gæt Ionladningen</button>
+                <button class="btn btn-next" id="nextElementBtn" style="display: none;">🎲 Prøv et nyt grundstof</button>
+                <button class="btn btn-reset" id="resetBtn" style="display: none;">Nulstil til Atom</button>
+            </div>
+
+            <div class="guess-panel" id="guessPanel" style="display: none;">
+                <p class="guess-question" id="guessQuestion">Hvilken ladning tror du atomet får, når det bliver en ion?</p>
+                <p class="guess-hint" id="guessHint"></p>
+                <div class="guess-options" id="guessOptions"></div>
+                <div class="guess-feedback" id="guessFeedback"></div>
+                <button class="btn btn-continue" id="continueBtn" style="display: none;">Vis mig elektronerne →</button>
+            </div>
+
+            <div id="statusMessage" class="status-message status-neutral">
+                Neutralt atom (lige mange protoner og elektroner)
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container tab-panel" id="tab-transfer">
+        <div class="visualization-panel transfer-panel">
+            <div class="transfer-stage" id="transferStage">
+                <div class="mini-nucleus" id="metalNucleus">Na</div>
+                <div class="mini-nucleus" id="nonmetalNucleus">Cl</div>
+                <div class="transfer-arrow">→</div>
+            </div>
+            <div class="transfer-formula">
+                <div class="transfer-formula-main" id="transferFormulaMain"></div>
+                <div class="transfer-formula-names" id="transferFormulaNames"></div>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <div class="control-group">
+                <label for="metalSelect">Vælg et metal (afgiver elektroner)</label>
+                <select id="metalSelect"></select>
+            </div>
+
+            <div class="control-group">
+                <label for="nonmetalSelect">Vælg et ikke-metal (modtager elektroner)</label>
+                <select id="nonmetalSelect"></select>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn btn-ion" id="transferBtn">Vis Elektronoverførsel</button>
+                <button class="btn btn-next" id="transferNextBtn" style="display: none;">🎲 Nyt eksempel</button>
+                <button class="btn btn-reset" id="transferResetBtn" style="display: none;">Nulstil</button>
+            </div>
+
+            <div id="transferStatus" class="status-message status-neutral">
+                Vælg to grundstoffer, og se hvordan en ionforbindelse dannes.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const elementsData = [
+            { z: 1, symbol: 'H', name: 'Hydrogen' },
+            { z: 2, symbol: 'He', name: 'Helium' },
+            { z: 3, symbol: 'Li', name: 'Lithium' },
+            { z: 4, symbol: 'Be', name: 'Beryllium' },
+            { z: 5, symbol: 'B', name: 'Bor' },
+            { z: 6, symbol: 'C', name: 'Carbon' },
+            { z: 7, symbol: 'N', name: 'Nitrogen' },
+            { z: 8, symbol: 'O', name: 'Oxygen' },
+            { z: 9, symbol: 'F', name: 'Fluor' },
+            { z: 10, symbol: 'Ne', name: 'Neon' },
+            { z: 11, symbol: 'Na', name: 'Natrium' },
+            { z: 12, symbol: 'Mg', name: 'Magnesium' },
+            { z: 13, symbol: 'Al', name: 'Aluminium' },
+            { z: 14, symbol: 'Si', name: 'Silicium' },
+            { z: 15, symbol: 'P', name: 'Phosphor' },
+            { z: 16, symbol: 'S', name: 'Svovl' },
+            { z: 17, symbol: 'Cl', name: 'Chlor' },
+            { z: 18, symbol: 'Ar', name: 'Argon' },
+            { z: 19, symbol: 'K', name: 'Kalium' },
+            { z: 20, symbol: 'Ca', name: 'Calcium' }
+        ];
+
+        const superScriptMap = {
+            '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', 
+            '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', 
+            '+': '⁺', '-': '⁻'
+        };
+
+        class AtomVisualizer {
+            constructor() {
+                this.currentZ = 3;
+                this.isIonized = false;
+                this.maxShellCapacity = [2, 8, 8, 2];
+                this.shellRadii = [60, 100, 140, 180];
+
+                this.pendingTarget = null;
+                this.pendingCharge = null;
+                this.readyForButtonNudge = false;
+
+                this.dom = {
+                    container: document.getElementById('atomContainer'),
+                    nucleus: document.getElementById('nucleus'),
+                    slider: document.getElementById('protonSlider'),
+                    sliderGroup: document.getElementById('sliderGroup'),
+                    name: document.getElementById('elementName'),
+                    symbol: document.getElementById('elementSymbol'),
+                    atomicNum: document.getElementById('atomicNumber'),
+                    config: document.getElementById('electronConfig'),
+                    ionBtn: document.getElementById('ionizeBtn'),
+                    resetBtn: document.getElementById('resetBtn'),
+                    nextElementBtn: document.getElementById('nextElementBtn'),
+                    status: document.getElementById('statusMessage'),
+                    statProtons: document.getElementById('protonCount'),
+                    statElectrons: document.getElementById('electronCount'),
+                    statCharge: document.getElementById('netChargeDisplay'),
+                    netChargeRow: document.getElementById('netChargeRow'),
+                    stabilityContainer: document.getElementById('stabilityContainer'),
+                    stabilityBar: document.getElementById('stabilityBar'),
+                    stabilityLabel: document.getElementById('stabilityLabel'),
+                    shellReadout: document.getElementById('shellReadoutNumbers'),
+                    btnContainer: document.getElementById('btnContainer'),
+                    guessPanel: document.getElementById('guessPanel'),
+                    guessQuestion: document.getElementById('guessQuestion'),
+                    guessHint: document.getElementById('guessHint'),
+                    guessOptions: document.getElementById('guessOptions'),
+                    guessFeedback: document.getElementById('guessFeedback'),
+                    continueBtn: document.getElementById('continueBtn')
+                };
+
+                this.initListeners();
+                this.render(this.currentZ);
+            }
+
+            // Runs automatically on load (no forced intro anymore — that's now
+            // an optional "Hjælp" button): pulses the slider as the first thing
+            // to try, then reveals the stability meter and hands the nudge over
+            // to the ionize button once the student has actually touched it.
+            startOnboardingNudge() {
+                this.dom.sliderGroup.classList.add('slider-pulse-hint');
+
+                const clearSliderHint = () => {
+                    this.dom.sliderGroup.classList.remove('slider-pulse-hint');
+                    this.dom.stabilityContainer.classList.add('shown');
+                    this.readyForButtonNudge = true;
+                    this.updateButtons(elementsData[this.currentZ - 1]);
+                };
+
+                this._sliderHintTimeout = setTimeout(clearSliderHint, 4000);
+                this.dom.slider.addEventListener('input', () => {
+                    clearTimeout(this._sliderHintTimeout);
+                    clearSliderHint();
+                }, { once: true });
+            }
+
+            // Ensures exactly one button is highlighted as the obvious next step.
+            setPrimaryAction(btn) {
+                [this.dom.ionBtn, this.dom.resetBtn, this.dom.continueBtn, this.dom.nextElementBtn]
+                    .forEach(b => b.classList.remove('btn-pulse'));
+                if (btn) btn.classList.add('btn-pulse');
+            }
+
+            // Plain-language reasoning used both when confirming a correct guess
+            // and when explaining a wrong one.
+            explainReasoning(data, config, correctCharge) {
+                const valence = config[config.length - 1];
+                if (correctCharge > 0) {
+                    return `${data.name} har kun ${valence} elektron${valence > 1 ? 'er' : ''} i yderste skal. Det er nemmest at afgive ${valence === 1 ? 'den' : 'dem'}, så ${data.symbol} bliver til en positiv ion.`;
+                }
+                const need = 8 - valence;
+                return `${data.name} har ${valence} elektron${valence > 1 ? 'er' : ''} i yderste skal og mangler kun ${need}, for at have 8. Det er nemmest at optage ${need === 1 ? 'én til' : need + ' til'}, så ${data.symbol} bliver til en negativ ion.`;
+            }
+
+            initListeners() {
+                this.dom.slider.addEventListener('input', (e) => {
+                    this.currentZ = parseInt(e.target.value);
+                    this.isIonized = false;
+                    this.exitGuessMode();
+                    this.render(this.currentZ);
+                });
+
+                this.dom.ionBtn.addEventListener('click', () => {
+                    if (!this.isIonized) this.startGuessMode();
+                });
+
+                this.dom.resetBtn.addEventListener('click', () => {
+                    this.isIonized = false;
+                    this.exitGuessMode();
+                    this.render(this.currentZ);
+                });
+
+                this.dom.nextElementBtn.addEventListener('click', () => {
+                    this.goToNextElement();
+                });
+
+                this.dom.continueBtn.addEventListener('click', () => {
+                    this.revealIon();
+                });
+            }
+
+            toUnicodeSuperscript(numStr) {
+                return numStr.toString().split('').map(char => superScriptMap[char] || char).join('');
+            }
+
+            getElectronConfiguration(totalElectrons) {
+                let remaining = totalElectrons;
+                const config = [];
+                for (let capacity of this.maxShellCapacity) {
+                    if (remaining <= 0) break;
+                    const amount = Math.min(remaining, capacity);
+                    config.push(amount);
+                    remaining -= amount;
+                }
+                return config;
+            }
+
+            createShells(config) {
+                const existingShells = document.querySelectorAll('.shell');
+                existingShells.forEach(el => el.remove());
+
+                config.forEach((_, index) => {
+                    const radius = this.shellRadii[index];
+                    const shell = document.createElement('div');
+                    shell.className = 'shell';
+                    shell.style.width = `${radius * 2}px`;
+                    shell.style.height = `${radius * 2}px`;
+                    this.dom.container.appendChild(shell);
+                });
+            }
+
+            // CORE LOGIC FOR LEWIS-STYLE PAIRING
+            getElectronPosition(shellIndex, electronIndexInShell) {
+                const radius = this.shellRadii[shellIndex];
+                let angle = 0;
+                let offset = 0;
+
+                // Shell 1 (K-shell): Holds max 2.
+                // Usually represented paired at top (like Helium) or 1 at top.
+                if (shellIndex === 0) {
+                    if (electronIndexInShell === 0) angle = -90; // Top
+                    if (electronIndexInShell === 1) {
+                        // Pair them at top slightly offset
+                        return [
+                            { angle: -100, r: radius }, // Adjust first one
+                            { angle: -80, r: radius }   // Second one
+                        ];
+                    }
+                } 
+                // Outer shells (L, M, N...): Max 8.
+                // Fill order: Top, Bottom, Right, Left (Max distance) -> Then pair.
+                else {
+                    // Mapping standard index 0-7 to quadrants
+                    // 0: Top, 1: Bottom, 2: Right, 3: Left
+                    // 4: Top(pair), 5: Bottom(pair), 6: Right(pair), 7: Left(pair)
+                    
+                    const quadrantAngles = [-90, 90, 0, 180]; // Top, Bottom, Right, Left
+                    const quadrantIndex = electronIndexInShell % 4;
+                    const baseAngle = quadrantAngles[quadrantIndex];
+                    
+                    const isPairing = electronIndexInShell >= 4;
+                    
+                    // Offset for pairing visually
+                    const pairOffset = 12; // degrees
+                    
+                    if (isPairing) {
+                        angle = baseAngle + pairOffset;
+                    } else {
+                        // If it's going to be paired later, we might need to shift the original.
+                        // But for simplicity, let's just place singles centered, 
+                        // and pairs offset.
+                        // Actually, purely centered for singles looks best.
+                        // When a pair exists, we should ideally move the existing one.
+                        // However, simpler logic:
+                        // Place at baseAngle - pairOffset if it's the first of a pair?
+                        // Let's stick to simple: 
+                        // 0-3: baseAngle
+                        // 4-7: baseAngle + offset.
+                        // Ideally, if a spot has a pair, the first one shifts to baseAngle - offset.
+                        // We handle this in the loop below dynamically.
+                        angle = baseAngle;
+                    }
+                    
+                    // Logic to visually separate pairs:
+                    if (isPairing) {
+                        return { angle: baseAngle + pairOffset, r: radius };
+                    } else {
+                        return { angle: baseAngle - (electronIndexInShell < 4 ? 0 : pairOffset), r: radius };
+                    }
+                }
+                
+                return { angle: angle, r: radius };
+            }
+
+            createElectrons(config, isIonFormation = false, oldTotal = 0) {
+                const existingElectrons = Array.from(document.querySelectorAll('.electron'));
+                const newTotal = config.reduce((a, b) => a + b, 0);
+                
+                if (!isIonFormation) {
+                    existingElectrons.forEach(el => el.remove());
+                }
+
+                let globalIndex = 0;
+                
+                config.forEach((count, shellIndex) => {
+                    const radius = this.shellRadii[shellIndex];
+
+                    for (let i = 0; i < count; i++) {
+                        globalIndex++;
+                        
+                        // If we are animating ion formation, skip existing ones
+                        if (isIonFormation && globalIndex <= Math.min(newTotal, oldTotal)) continue; 
+
+                        // Determine Position based on Lewis/Paired Logic
+                        let angle = 0;
+                        const pairOffset = 8; // Degrees separation for pairs
+
+                        // Special Case Shell 1 (K)
+                        if (shellIndex === 0) {
+                            if (count === 1) angle = -90;
+                            else if (count === 2) {
+                                // For Helium pair
+                                angle = i === 0 ? -90 - pairOffset : -90 + pairOffset;
+                            }
+                        } else {
+                            // Logic: 1=Top, 2=Top+Bottom, 3=Top+Bot+Right, 4=Cross.
+                            // 5=TopPair, 6=BotPair...
+                            
+                            // Map index i (0-7) to quadrants [Top, Bottom, Right, Left]
+                            // Order of filling for max distance: 0(-90), 1(90), 2(0), 3(180)
+                            const anglesOrder = [-90, 90, 0, 180];
+                            
+                            if (i < 4) {
+                                // Singles
+                                angle = anglesOrder[i];
+                                // If this specific quadrant will eventually have a pair (count > 4 + i?), 
+                                // we should shift it.
+                                // Logic: If count > 4, Top becomes a pair.
+                                // If count > 5, Bottom becomes a pair.
+                                if (i === 0 && count > 4) angle -= pairOffset;
+                                else if (i === 1 && count > 5) angle -= pairOffset;
+                                else if (i === 2 && count > 6) angle -= pairOffset;
+                                else if (i === 3 && count > 7) angle -= pairOffset;
+                            } else {
+                                // Pairs (The second electron in the pair)
+                                angle = anglesOrder[i - 4] + pairOffset;
+                            }
+                        }
+
+                        const rad = angle * (Math.PI / 180);
+                        const x = Math.cos(rad) * radius + 225; // 225 is center of 450px container
+                        const y = Math.sin(rad) * radius + 225;
+
+                        const electron = document.createElement('div');
+                        electron.className = 'electron';
+                        
+                        if (isIonFormation && newTotal > oldTotal) {
+                            electron.classList.add('added');
+                            electron.style.left = '50%';
+                            electron.style.top = '50%';
+                            setTimeout(() => {
+                                electron.style.left = `${x}px`;
+                                electron.style.top = `${y}px`;
+                            }, 50);
+                        } else {
+                            electron.style.left = `${x}px`;
+                            electron.style.top = `${y}px`;
+                        }
+
+                        this.dom.container.appendChild(electron);
+                    }
+                });
+
+                // Remove electrons if needed (Cation formation)
+                if (isIonFormation && newTotal < oldTotal) {
+                    const diff = oldTotal - newTotal;
+                    for(let i = 0; i < diff; i++) {
+                        const elToRemove = existingElectrons[existingElectrons.length - 1 - i];
+                        if(elToRemove) {
+                            elToRemove.classList.add('removed');
+                            setTimeout(() => elToRemove.remove(), 600);
+                        }
+                    }
+                }
+                
+                // If not animating, but we have pairs that shifted position (e.g., going from 4 to 5 valence e-),
+                // we need to redraw all if purely static. 
+                // The current createElectrons deletes all if !isIonFormation, so positions update correctly.
+            }
+
+            calculateStability(valence, z) {
+                // Returns object { percentage, color, label }
+                if (z === 2 || z === 10 || z === 18) return { p: 100, c: '#2ecc71', l: 'Ædelgas (Stabil)' }; // Noble
+                if (valence === 7 || valence === 1) return { p: 10, c: '#e74c3c', l: 'Meget Reaktiv' }; // Halogen/Alkali
+                if (valence === 2 || valence === 6) return { p: 30, c: '#e67e22', l: 'Reaktiv' };
+                if (valence === 8) return { p: 100, c: '#2ecc71', l: 'Oktet Opfyldt (Stabil)' };
+                return { p: 50, c: '#f1c40f', l: 'Middel Reaktiv' };
+            }
+
+            updateUI(data, electronTotal) {
+                const charge = data.z - electronTotal;
+                
+                this.dom.name.textContent = data.name;
+                this.dom.atomicNum.textContent = data.z;
+                this.dom.statProtons.textContent = data.z;
+                this.dom.statElectrons.textContent = electronTotal; // Now shows electrons
+                
+                const chargeSign = charge > 0 ? '+' : (charge < 0 ? '-' : '');
+                const chargeText = charge === 0 ? '0' : `${Math.abs(charge)}${chargeSign}`;
+                this.dom.statCharge.textContent = chargeText;
+                this.dom.statCharge.style.color = charge === 0 ? '#2c3e50' : (charge > 0 ? '#e74c3c' : '#2ecc71');
+
+                if (this.isIonized && charge !== 0) {
+                    const absCharge = Math.abs(charge);
+                    const chargeSuffix = absCharge === 1 ? (charge > 0 ? '⁺' : '⁻') : this.toUnicodeSuperscript(absCharge) + (charge > 0 ? '⁺' : '⁻');
+                    this.dom.symbol.textContent = data.symbol + chargeSuffix;
+                } else {
+                    this.dom.symbol.textContent = data.symbol;
+                }
+
+                const config = this.getElectronConfiguration(electronTotal);
+                this.dom.config.textContent = `(${config.join(', ')})`;
+                this.dom.shellReadout.textContent = config.join(' - ');
+                this.dom.nucleus.textContent = data.symbol;
+
+                // Creative Extension: Update Stability Meter
+                const valence = config[config.length-1];
+                const stability = this.calculateStability(valence, electronTotal); // Based on current electrons
+                
+                this.dom.stabilityBar.style.width = `${stability.p}%`;
+                this.dom.stabilityBar.style.backgroundColor = stability.c;
+                this.dom.stabilityLabel.textContent = stability.l;
+
+                this.updateStatus(charge, data.z);
+                this.updateButtons(data);
+            }
+
+            updateStatus(charge, z) {
+                if (charge === 0) {
+                    this.dom.status.textContent = "Neutralt atom (lige mange protoner og elektroner)";
+                    this.dom.status.className = 'status-message status-neutral';
+                } else if (z === 1 && charge > 0) {
+                    // H+ has zero electrons left – it's not a stable noble-gas structure,
+                    // just a bare proton, which is why it doesn't exist freely in nature.
+                    this.dom.status.textContent = "Positiv ion (H⁺): Har mistet sin eneste elektron. Det er nu blot en 'nøgen' proton – ikke en stabil elektronstruktur. Derfor findes H⁺ stort set aldrig frit i naturen, men optræder typisk bundet til vand som H₃O⁺.";
+                    this.dom.status.className = 'status-message status-changed';
+                } else {
+                    const type = charge > 0 ? "Positiv ion" : "Negativ ion";
+                    const action = charge > 0 ? "mistet" : "optaget";
+                    const count = Math.abs(charge);
+                    this.dom.status.textContent = `${type}: Har ${action} ${count} elektron${count > 1 ? 'er' : ''}, så den nu har en stabil elektronstruktur.`;
+                    this.dom.status.className = 'status-message status-changed';
+                }
+            }
+
+            updateButtons(data) {
+                const config = this.getElectronConfiguration(data.z);
+                const valence = config[config.length - 1];
+                const isNoble = (valence === 8 && data.z > 2) || data.z === 2 || data.z === 18;
+                const isCarbonGroup = valence === 4;
+
+                if (isNoble) {
+                    this.dom.ionBtn.textContent = "Er allerede stabil (Ædelgas)";
+                    this.dom.ionBtn.disabled = true;
+                } else if (isCarbonGroup) {
+                    this.dom.ionBtn.textContent = "Danner sjældent ioner";
+                    this.dom.ionBtn.disabled = true;
+                } else {
+                    this.dom.ionBtn.textContent = "Gæt Ionladningen";
+                    this.dom.ionBtn.disabled = this.isIonized;
+                }
+
+                // "Nulstil til Atom" er kun relevant, når ladningen faktisk er
+                // ændret. "Prøv et nyt grundstof" skal derimod også være
+                // tilgængelig når gæt-knappen er låst (ædelgas/carbon-gruppen),
+                // så eleven ikke sidder fast uden mulighed for at gå videre.
+                const canGuess = !this.dom.ionBtn.disabled;
+                this.dom.ionBtn.style.display = this.isIonized ? 'none' : '';
+                this.dom.resetBtn.style.display = this.isIonized ? '' : 'none';
+                this.dom.nextElementBtn.style.display = (this.isIonized || !canGuess) ? '' : 'none';
+
+                // Keep exactly one button highlighted as the obvious next step.
+                if (this.isIonized) {
+                    this.setPrimaryAction(this.dom.nextElementBtn);
+                } else if (this.readyForButtonNudge) {
+                    this.setPrimaryAction(canGuess ? this.dom.ionBtn : this.dom.nextElementBtn);
+                }
+            }
+
+            computeTargetElectrons(z) {
+                const config = this.getElectronConfiguration(z);
+                const valence = config[config.length - 1];
+                let newTotalElectrons = z;
+
+                if (z === 1) {
+                    newTotalElectrons = 0;
+                } else if (valence <= 3) {
+                    newTotalElectrons = z - valence;
+                } else if (valence >= 5) {
+                    newTotalElectrons = z + (8 - valence);
+                }
+                return newTotalElectrons;
+            }
+
+            formatCharge(charge) {
+                if (charge === 0) return '0';
+                const sign = charge > 0 ? '+' : '-';
+                return `${Math.abs(charge)}${sign}`;
+            }
+
+            startGuessMode() {
+                const data = elementsData[this.currentZ - 1];
+                const config = this.getElectronConfiguration(this.currentZ);
+                const valence = config[config.length - 1];
+                const target = this.computeTargetElectrons(this.currentZ);
+                this.pendingTarget = target;
+                this.pendingCharge = this.currentZ - target;
+
+                this.dom.guessQuestion.textContent = `Hvilken ladning tror du, ${data.name} får som ion?`;
+                this.dom.guessHint.textContent = `Hint: ${data.name} har elektronstrukturen (${config.join(', ')}) — altså ${valence} elektron${valence > 1 ? 'er' : ''} i yderste skal.`;
+
+                const options = [-3, -2, -1, 1, 2, 3];
+                this.dom.guessOptions.innerHTML = '';
+                options.forEach(value => {
+                    const btn = document.createElement('button');
+                    btn.className = 'guess-option';
+                    btn.textContent = this.formatCharge(value);
+                    btn.dataset.value = value;
+                    btn.addEventListener('click', () => this.handleGuess(value));
+                    this.dom.guessOptions.appendChild(btn);
+                });
+
+                this.dom.guessFeedback.textContent = '';
+                this.dom.guessFeedback.className = 'guess-feedback';
+                this.dom.continueBtn.style.display = 'none';
+                this.dom.btnContainer.style.display = 'none';
+                this.dom.guessPanel.style.display = 'block';
+                // Ingen knap fremhæves her — eleven skal selv vælge blandt mulighederne.
+                this.setPrimaryAction(null);
+            }
+
+            handleGuess(guess) {
+                const data = elementsData[this.currentZ - 1];
+                const config = this.getElectronConfiguration(this.currentZ);
+                const correct = this.pendingCharge;
+                const isRight = guess === correct;
+                // Hydrogen kan også optage 1 elektron og danne en negativ ion (samme
+                // elektronstruktur som Helium) — lige så korrekt kemisk som H⁺.
+                const isCleverAlt = !isRight && this.currentZ === 1 && guess === -1;
+                const reasoning = this.explainReasoning(data, config, correct);
+
+                Array.from(this.dom.guessOptions.children).forEach(btn => {
+                    btn.disabled = true;
+                    const value = parseInt(btn.dataset.value);
+                    if (value === correct) btn.classList.add('guess-correct');
+                    else if (value === guess) btn.classList.add(isCleverAlt ? 'guess-correct' : 'guess-wrong');
+                });
+
+                if (isRight) {
+                    this.dom.guessFeedback.textContent = `Korrekt! ${reasoning} Ladningen bliver ${this.formatCharge(correct)}.`;
+                } else if (isCleverAlt) {
+                    this.dom.guessFeedback.textContent = `Skarpt gættet! Hydrogen kan faktisk også optage en elektron og blive til en negativ ion med samme elektronstruktur som Helium. Vi viser her den mest almindelige udgave: en positiv ion.`;
+                } else {
+                    this.dom.guessFeedback.textContent = `Ikke helt. ${reasoning} Den rigtige ladning er ${this.formatCharge(correct)}.`;
+                }
+                this.dom.guessFeedback.className = 'guess-feedback ' + (isRight || isCleverAlt ? 'guess-feedback-correct' : 'guess-feedback-wrong');
+                this.dom.continueBtn.style.display = 'block';
+                this.setPrimaryAction(this.dom.continueBtn);
+            }
+
+            exitGuessMode() {
+                this.pendingTarget = null;
+                this.pendingCharge = null;
+                this.dom.guessPanel.style.display = 'none';
+                this.dom.btnContainer.style.display = 'grid';
+            }
+
+            revealIon() {
+                const data = elementsData[this.currentZ - 1];
+                const newTotalElectrons = this.pendingTarget;
+
+                this.isIonized = true;
+                const newConfig = this.getElectronConfiguration(newTotalElectrons);
+
+                this.createShells(newConfig);
+                this.createElectrons(newConfig, true, this.currentZ);
+                this.updateUI(data, newTotalElectrons);
+
+                this.dom.netChargeRow.classList.add('shown');
+
+                this.dom.guessPanel.style.display = 'none';
+                this.dom.btnContainer.style.display = 'grid';
+            }
+
+            render(z, animate = false) {
+                const data = elementsData[z - 1];
+                const config = this.getElectronConfiguration(z);
+
+                if (!animate) {
+                    this.createShells(config);
+                    this.createElectrons(config, false);
+                    this.updateUI(data, z);
+                    return;
+                }
+
+                // Glidende overgang til det næste grundstof: kort nedtoning,
+                // så det ikke bare springer/klipper til det nye atom.
+                this.dom.container.classList.add('atom-fading');
+                setTimeout(() => {
+                    this.createShells(config);
+                    this.createElectrons(config, false);
+                    this.updateUI(data, z);
+                    this.dom.container.classList.remove('atom-fading');
+                }, 220);
+            }
+
+            // "Prøv et nyt grundstof": leder eleven automatisk videre til et nyt,
+            // tilfældigt grundstof i stedet for at de selv skal finde skyderen igen.
+            goToNextElement() {
+                let newZ;
+                do {
+                    newZ = Math.floor(Math.random() * 20) + 1;
+                } while (newZ === this.currentZ);
+
+                this.currentZ = newZ;
+                this.dom.slider.value = newZ;
+                this.isIonized = false;
+                this.exitGuessMode();
+                this.render(newZ, true);
+            }
+        }
+
+        // Grundstoffer der typisk afgiver elektroner (metaller)
+        const loseElements = [
+            { symbol: 'Li', name: 'Lithium', valence: 1 },
+            { symbol: 'Na', name: 'Natrium', valence: 1 },
+            { symbol: 'K', name: 'Kalium', valence: 1 },
+            { symbol: 'Be', name: 'Beryllium', valence: 2 },
+            { symbol: 'Mg', name: 'Magnesium', valence: 2 },
+            { symbol: 'Ca', name: 'Calcium', valence: 2 },
+            { symbol: 'B', name: 'Bor', valence: 3 },
+            { symbol: 'Al', name: 'Aluminium', valence: 3 }
+        ];
+
+        // Grundstoffer der typisk modtager elektroner (ikke-metaller)
+        const gainElements = [
+            { symbol: 'F', name: 'Fluor', valence: 7 },
+            { symbol: 'Cl', name: 'Chlor', valence: 7 },
+            { symbol: 'O', name: 'Oxygen', valence: 6 },
+            { symbol: 'S', name: 'Svovl', valence: 6 },
+            { symbol: 'N', name: 'Nitrogen', valence: 5 },
+            { symbol: 'P', name: 'Phosphor', valence: 5 }
+        ];
+
+        class TransferVisualizer {
+            constructor() {
+                this.metalCenter = { x: 130, y: 150 };
+                this.nonmetalCenter = { x: 350, y: 150 };
+                this.radius = 55;
+
+                this.dom = {
+                    metalSelect: document.getElementById('metalSelect'),
+                    nonmetalSelect: document.getElementById('nonmetalSelect'),
+                    metalNucleus: document.getElementById('metalNucleus'),
+                    nonmetalNucleus: document.getElementById('nonmetalNucleus'),
+                    stage: document.getElementById('transferStage'),
+                    transferBtn: document.getElementById('transferBtn'),
+                    nextBtn: document.getElementById('transferNextBtn'),
+                    resetBtn: document.getElementById('transferResetBtn'),
+                    formulaMain: document.getElementById('transferFormulaMain'),
+                    formulaNames: document.getElementById('transferFormulaNames'),
+                    status: document.getElementById('transferStatus')
+                };
+
+                this.isTransferred = false;
+
+                this.populateMetals();
+                this.populateNonmetals(loseElements[0].valence);
+                this.initListeners();
+                this.reset();
+            }
+
+            populateMetals() {
+                this.dom.metalSelect.innerHTML = loseElements.map((el, i) =>
+                    `<option value="${i}">${el.name} (${el.symbol})</option>`).join('');
+            }
+
+            populateNonmetals(matchMagnitude = null) {
+                const options = gainElements
+                    .map((el, i) => ({ el, i, gain: 8 - el.valence }))
+                    .filter(o => matchMagnitude === null || o.gain === matchMagnitude);
+
+                this.dom.nonmetalSelect.innerHTML = options.map(o =>
+                    `<option value="${o.i}">${o.el.name} (${o.el.symbol})</option>`).join('');
+            }
+
+            getMetal() {
+                return loseElements[parseInt(this.dom.metalSelect.value)];
+            }
+
+            getNonmetal() {
+                return gainElements[parseInt(this.dom.nonmetalSelect.value)];
+            }
+
+            initListeners() {
+                this.dom.metalSelect.addEventListener('change', () => {
+                    this.populateNonmetals(this.getMetal().valence);
+                    this.reset();
+                });
+                this.dom.nonmetalSelect.addEventListener('change', () => this.reset());
+                this.dom.transferBtn.addEventListener('click', () => this.transfer());
+                this.dom.resetBtn.addEventListener('click', () => this.reset());
+                this.dom.nextBtn.addEventListener('click', () => this.newRandomExample());
+            }
+
+            // Holder styr på, hvilken knap der er det oplagte næste skridt —
+            // samme princip som i "Byg et Atom"-fanen.
+            setPrimaryAction(btn) {
+                [this.dom.transferBtn, this.dom.resetBtn, this.dom.nextBtn].forEach(b => b.classList.remove('btn-pulse'));
+                if (btn) btn.classList.add('btn-pulse');
+            }
+
+            // "Nulstil" og "Nyt eksempel" er kun relevante, når der rent faktisk
+            // er dannet ioner — ellers er der intet at nulstille eller sammenligne med.
+            updateButtonVisibility() {
+                this.dom.transferBtn.style.display = this.isTransferred ? 'none' : '';
+                this.dom.nextBtn.style.display = this.isTransferred ? '' : 'none';
+                this.dom.resetBtn.style.display = this.isTransferred ? '' : 'none';
+
+                if (this.isTransferred) {
+                    this.setPrimaryAction(this.dom.nextBtn);
+                } else if (!this.dom.transferBtn.disabled) {
+                    this.setPrimaryAction(this.dom.transferBtn);
+                } else {
+                    this.setPrimaryAction(null);
+                }
+            }
+
+            chargeSuffix(count, sign) {
+                const symbol = sign === '+' ? '⁺' : '⁻';
+                if (count === 1) return symbol;
+                return count.toString().split('').map(ch => superScriptMap[ch] || ch).join('') + symbol;
+            }
+
+            positionOnRing(center, index, count) {
+                // Samme kvadrant/par-logik som i atom-visningen: Top, Bund, Højre, Venstre,
+                // og herefter parring tæt på hver side i stedet for jævn cirkelfordeling.
+                const anglesOrder = [-90, 90, 0, 180];
+                const pairOffset = 8;
+                let angle;
+
+                if (index < 4) {
+                    angle = anglesOrder[index];
+                    if (index === 0 && count > 4) angle -= pairOffset;
+                    else if (index === 1 && count > 5) angle -= pairOffset;
+                    else if (index === 2 && count > 6) angle -= pairOffset;
+                    else if (index === 3 && count > 7) angle -= pairOffset;
+                } else {
+                    angle = anglesOrder[index - 4] + pairOffset;
+                }
+
+                const rad = angle * (Math.PI / 180);
+                return {
+                    x: center.x + Math.cos(rad) * this.radius,
+                    y: center.y + Math.sin(rad) * this.radius
+                };
+            }
+
+            renderDots(center, count) {
+                const dots = [];
+                for (let i = 0; i < count; i++) {
+                    const pos = this.positionOnRing(center, i, count);
+                    const dot = document.createElement('div');
+                    dot.className = 'mini-electron';
+                    dot.style.left = `${pos.x}px`;
+                    dot.style.top = `${pos.y}px`;
+                    this.dom.stage.appendChild(dot);
+                    dots.push(dot);
+                }
+                return dots;
+            }
+
+            applyReset() {
+                const metal = this.getMetal();
+                const nonmetal = this.getNonmetal();
+
+                document.querySelectorAll('.mini-electron').forEach(el => el.remove());
+
+                this.dom.metalNucleus.textContent = metal.symbol;
+                this.dom.nonmetalNucleus.textContent = nonmetal.symbol;
+
+                this.metalDots = this.renderDots(this.metalCenter, metal.valence);
+                this.nonmetalDots = this.renderDots(this.nonmetalCenter, nonmetal.valence);
+
+                this.dom.formulaMain.textContent = '';
+                this.dom.formulaNames.textContent = '';
+                this.dom.status.textContent = `${metal.name} har ${metal.valence} valenselektron${metal.valence > 1 ? 'er' : ''}, ${nonmetal.name} har ${nonmetal.valence}. Tryk på knappen for at se overførslen.`;
+                this.dom.status.className = 'status-message status-neutral';
+                this.dom.transferBtn.disabled = false;
+                this.isTransferred = false;
+                this.updateButtonVisibility();
+            }
+
+            reset() {
+                this.applyReset();
+            }
+
+            // Glidende overgang til et nyt eksempel: kort nedtoning af scenen,
+            // så skiftet ikke bare springer/klipper.
+            resetWithFade() {
+                this.dom.stage.classList.add('atom-fading');
+                setTimeout(() => {
+                    this.applyReset();
+                    this.dom.stage.classList.remove('atom-fading');
+                }, 220);
+            }
+
+            // "Nyt eksempel": vælger automatisk et nyt, tilfældigt metal/ikke-metal-par
+            // i stedet for at eleven selv skal finde rundt i de to rullelister igen.
+            newRandomExample() {
+                const currentMetalIndex = parseInt(this.dom.metalSelect.value);
+                let metalIndex = currentMetalIndex;
+                if (loseElements.length > 1) {
+                    do {
+                        metalIndex = Math.floor(Math.random() * loseElements.length);
+                    } while (metalIndex === currentMetalIndex);
+                }
+                this.dom.metalSelect.value = metalIndex;
+                this.populateNonmetals(loseElements[metalIndex].valence);
+                this.dom.nonmetalSelect.selectedIndex = Math.floor(Math.random() * this.dom.nonmetalSelect.options.length);
+                this.resetWithFade();
+            }
+
+            transfer() {
+                const metal = this.getMetal();
+                const nonmetal = this.getNonmetal();
+                const moved = metal.valence; // matcher altid nonmetal-behovet (8 - nonmetal.valence)
+                const finalCount = nonmetal.valence + moved;
+
+                const finalPositions = [];
+                for (let i = 0; i < finalCount; i++) {
+                    finalPositions.push(this.positionOnRing(this.nonmetalCenter, i, finalCount));
+                }
+
+                this.nonmetalDots.forEach((dot, i) => {
+                    dot.style.left = `${finalPositions[i].x}px`;
+                    dot.style.top = `${finalPositions[i].y}px`;
+                });
+
+                this.metalDots.forEach((dot, i) => {
+                    const target = finalPositions[nonmetal.valence + i];
+                    dot.classList.add('transferred');
+                    dot.style.left = `${target.x}px`;
+                    dot.style.top = `${target.y}px`;
+                });
+
+                setTimeout(() => {
+                    this.dom.metalNucleus.textContent = metal.symbol + this.chargeSuffix(moved, '+');
+                    this.dom.nonmetalNucleus.textContent = nonmetal.symbol + this.chargeSuffix(moved, '-');
+                    this.dom.formulaMain.textContent = `${metal.symbol} + ${nonmetal.symbol} → ${metal.symbol}${nonmetal.symbol}`;
+                    this.dom.formulaNames.textContent = `${metal.name} + ${nonmetal.name}`;
+                    this.dom.status.textContent = `${metal.symbol} afgav ${moved} elektron${moved > 1 ? 'er' : ''} til ${nonmetal.symbol}. Begge har nu 8 elektroner i yderste skal (oktetreglen).`;
+                    this.dom.status.className = 'status-message status-changed';
+                    this.isTransferred = true;
+                    this.updateButtonVisibility();
+                }, 850);
+
+                this.dom.transferBtn.disabled = true;
+                this.setPrimaryAction(null);
+            }
+        }
+
+        function initTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                    btn.classList.add('active');
+                    document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+                });
+            });
+        }
+
+        // Kort guidet rundvisning, som møder eleven helt fra start: forklarer
+        // kerne, elektroner og skyder, ét trin ad gangen, før eleven selv skal styre noget.
+        const introSteps = [
+            {
+                target: null,
+                title: 'Velkommen!',
+                text: 'Denne animation viser dig, hvordan et atom er bygget op — og hvordan det kan blive til en ion. Tryk "Næste" for at se hvordan.'
+            },
+            {
+                target: '#nucleus',
+                title: 'Kernen',
+                text: 'Den lilla kugle i midten er atomets kerne. Her sidder protonerne (+).'
+            },
+            {
+                target: '#atomContainer',
+                title: 'Elektronerne',
+                text: 'De gule prikker er elektroner (−). De bevæger sig rundt om kernen i ringe, som kaldes skaller.'
+            },
+            {
+                target: '#sliderGroup',
+                title: 'Prøv selv',
+                text: 'Træk i skyderen for at vælge et andet grundstof, og se atomet ændre sig med det samme.'
+            }
+        ];
+        let introStepIndex = 0;
+
+        function renderIntroStep() {
+            const step = introSteps[introStepIndex];
+            document.querySelectorAll('.intro-highlight').forEach(el => el.classList.remove('intro-highlight'));
+            if (step.target) {
+                const el = document.querySelector(step.target);
+                if (el) el.classList.add('intro-highlight');
+            }
+            document.getElementById('introTitle').textContent = step.title;
+            document.getElementById('introText').textContent = step.text;
+            document.getElementById('introNextBtn').textContent =
+                (introStepIndex === introSteps.length - 1) ? 'Kom i gang →' : 'Næste →';
+
+            const dots = document.getElementById('introDots');
+            dots.innerHTML = '';
+            introSteps.forEach((_, i) => {
+                const dot = document.createElement('span');
+                if (i === introStepIndex) dot.classList.add('active');
+                dots.appendChild(dot);
+            });
+        }
+
+        function closeIntro() {
+            document.querySelectorAll('.intro-highlight').forEach(el => el.classList.remove('intro-highlight'));
+            document.getElementById('introOverlay').classList.add('hidden');
+        }
+
+        function openIntro() {
+            introStepIndex = 0;
+            renderIntroStep();
+            document.getElementById('introOverlay').classList.remove('hidden');
+        }
+
+        // Rundvisningen er nu et frivilligt "Hjælp"-tilbud i stedet for en
+        // tvungen popup ved åbning — den kommer ikke af sig selv.
+        function initIntro() {
+            document.getElementById('introNextBtn').addEventListener('click', () => {
+                if (introStepIndex < introSteps.length - 1) {
+                    introStepIndex++;
+                    renderIntroStep();
+                } else {
+                    closeIntro();
+                }
+            });
+            document.getElementById('introSkipBtn').addEventListener('click', closeIntro);
+            document.getElementById('helpBtn').addEventListener('click', openIntro);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.atomViz = new AtomVisualizer();
+            new TransferVisualizer();
+            initTabs();
+            initIntro();
+            window.atomViz.startOnboardingNudge();
+        });
+    </script>
+</body>
+</html>
