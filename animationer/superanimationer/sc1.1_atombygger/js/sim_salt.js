@@ -41,7 +41,7 @@
                 var g = D.findSymbol(symboler[i]);
                 var o = document.createElement("option");
                 o.value = g.symbol;
-                o.textContent = g.navn + " (" + g.symbol + ") · " + NK.ladningstekst(g.ion);
+                o.textContent = g.symbol + " (" + NK.ladningstekst(g.ion) + ")";
                 v.appendChild(o);
             }
             v.value = valgt;
@@ -60,12 +60,15 @@
             mig.ikkemetal = D.findSymbol(this.value);
             mig.nyOpstilling();
         });
-        NK.el("salt-overfoer").addEventListener("click", function () { mig.overfoer(); });
-        NK.el("salt-saml").addEventListener("click", function () { mig.saml(); });
+        NK.el("salt-knap").addEventListener("click", function () {
+            if (mig.fase === "atomer") mig.overfoer();
+            else if (mig.fase === "overfoert") mig.saml();
+        });
 
         NK.el("salt-laes-mere").addEventListener("click", function () {
             NK.saetTekst("salt-forklaring-titel", "Hvorfor " + D.saltformel(mig.metal, mig.ikkemetal) + "?");
             NK.saetTekst("salt-forklaring-tekst", mig.forklaringTekst());
+            NK.saetTekst("salt-forklaring-skema", mig.reaktionsskema());
             NK.el("salt-forklaring").classList.add("vis");
         });
         NK.el("salt-forklaring-luk").addEventListener("click", function () {
@@ -134,15 +137,39 @@
 
     /* ----- Panelet ------------------------------------------------------------ */
     NK.SimSalt.prototype.opdaterPanel = function () {
-        var m = this.metal, ik = this.ikkemetal, f = this.forhold;
+        var m = this.metal, ik = this.ikkemetal;
 
         NK.saetTekst("salt-formel", D.saltformel(m, ik));
         NK.saetTekst("salt-navn", D.saltnavn(m, ik));
-        NK.saetTekst("salt-balance", f.antalPositive + " · (" + NK.ladningstekst(m.ion) + ")   +   "
-            + f.antalNegative + " · (" + NK.ladningstekst(ik.ion) + ")   =   0");
 
-        NK.el("salt-overfoer").disabled = this.fase !== "atomer";
-        NK.el("salt-saml").disabled = this.fase !== "overfoert";
+        var knap = NK.el("salt-knap");
+        if (this.fase === "atomer") {
+            NK.saetTekst("salt-knap-tekst", "Overfør elektronerne");
+            NK.saetTekst("salt-knap-tegn", "⚡");
+            knap.disabled = false;
+            knap.classList.remove("groen");
+            knap.classList.add("orange");
+        } else if (this.fase === "overfoert") {
+            NK.saetTekst("salt-knap-tekst", "Saml ionerne til et salt");
+            NK.saetTekst("salt-knap-tegn", "🧂");
+            knap.disabled = false;
+            knap.classList.remove("orange");
+            knap.classList.add("groen");
+        } else {
+            NK.saetTekst("salt-knap-tekst", "Saltet er dannet");
+            NK.saetTekst("salt-knap-tegn", "✓");
+            knap.disabled = true;
+        }
+    };
+
+    /* Reaktionsskemaet, altid med eksplicit koefficient (ogsaa "1"),
+       saa det matcher den skrivemaade, eleven moeder i teoribogen:
+       3 K⁺ + 1 N³⁻ ⟶ K₃N */
+    NK.SimSalt.prototype.reaktionsskema = function () {
+        var m = this.metal, ik = this.ikkemetal, f = this.forhold;
+        return f.antalPositive + " " + m.symbol + NK.ladningHaevet(m.ion) + " + "
+            + f.antalNegative + " " + ik.symbol + NK.ladningHaevet(ik.ion) + " ⟶ "
+            + D.saltformel(m, ik);
     };
 
     /* Den fulde forklaring bag "Læs mere": hvorfor netop dette forhold,
@@ -177,11 +204,24 @@
         return t;
     };
 
+    /* Bunden af grundstofvaelgerne (de to dropdowns), maalt direkte i
+       DOM'en. Bruges alle steder, scenen skal holde sig under dem, saa
+       hverken atommodeller, pil eller gitter ryger op i dem - saerligt
+       vigtigt ved 1:3-forhold, hvor tre atomer stables i én soejle. */
+    NK.SimSalt.prototype.vaelgerBund = function () {
+        var mV = document.querySelector(".saltvalg-metal");
+        var ikV = document.querySelector(".saltvalg-ikkemetal");
+        var bund = 0;
+        if (mV && mV.offsetWidth) bund = Math.max(bund, mV.offsetTop + mV.offsetHeight);
+        if (ikV && ikV.offsetWidth) bund = Math.max(bund, ikV.offsetTop + ikV.offsetHeight);
+        return bund;
+    };
+
     /* ----- Hvor skal atomerne staa, foer de er samlet? ------------------------- */
     NK.SimSalt.prototype.laegUd = function () {
         var l = this.l;
-        var baand = l.h - 74;
-        var oeverst = 18;
+        var oeverst = Math.max(18, this.vaelgerBund() + 14);
+        var baand = l.h - oeverst - 56;
         var i, b;
 
         /* To soejler: metallerne til venstre, ikke-metallerne til hoejre.
@@ -234,7 +274,8 @@
         if (this.fase === "samlet") { this.tegnGitter(c); return; }
 
         /* Pilen mellem soejlerne: elektronerne gaar kun én vej. */
-        var y = 18 + (l.h - 74) / 2;
+        var oeverst = Math.max(18, this.vaelgerBund() + 14);
+        var y = oeverst + (l.h - oeverst - 56) / 2;
         var x1 = l.b * 0.42, x2 = l.b * 0.58;
         var staerk = this.fase === "overfoert";
         c.save();
@@ -301,14 +342,8 @@
 
         /* Formlen skal staa UNDER grundstofvaelgerne, ikke klemt ind
            imellem dem: ved en smal scene er der ikke vandret luft nok
-           til en centreret titel mellem de to bokse. Maalt direkte i
-           DOM'en, saa det virker uanset skaermbredde og de mobile
-           regler, der aendrer vaelgernes stoerrelse. */
-        var mV = document.querySelector(".saltvalg-metal");
-        var ikV = document.querySelector(".saltvalg-ikkemetal");
-        var vaelgerBund = 0;
-        if (mV && mV.offsetWidth) vaelgerBund = Math.max(vaelgerBund, mV.offsetTop + mV.offsetHeight);
-        if (ikV && ikV.offsetWidth) vaelgerBund = Math.max(vaelgerBund, ikV.offsetTop + ikV.offsetHeight);
+           til en centreret titel mellem de to bokse. */
+        var vaelgerBund = this.vaelgerBund();
 
         var formelY = vaelgerBund + 28;
         var navnY = vaelgerBund + 50;
@@ -373,7 +408,7 @@
         }
         c.restore();
 
-        NK.tekst(c, "Udsnit af gitteret. Moenstret fortsætter i alle retninger.", l.b / 2, vy + vindueH + 22, {
+        NK.tekst(c, "Udsnit af gitteret. Mønstret fortsætter i alle retninger.", l.b / 2, vy + vindueH + 22, {
             font: "600 12px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
             farve: "rgba(169, 176, 186, " + blod + ")", kant: true
         });

@@ -20,8 +20,11 @@
     </div>
 
     <div class="visvalg" role="group" aria-label="Visning af protoner og neutroner">
-        <button class="visknap aktiv" id="vis-enkelt" type="button" data-vis="enkelt" title="Vis hver proton og neutron for sig selv">Enkeltvis</button>
-        <button class="visknap" id="vis-tal" type="button" data-vis="tal" title="Vis protoner og neutroner som et antal midt i kernen">Antal</button>
+        <span class="visvalg-etiket">Kernen vises som</span>
+        <div class="visvalg-knapper">
+            <button class="visknap aktiv" id="vis-enkelt" type="button" data-vis="enkelt" title="Vis hver proton og neutron for sig selv">Enkeltvis</button>
+            <button class="visknap" id="vis-tal" type="button" data-vis="tal" title="Vis protoner og neutroner som et antal midt i kernen">Antal</button>
+        </div>
     </div>
 
     <button class="ikonknap" id="hjaelpknap" title="Hjælp og genveje" aria-label="Hjælp">?</button>
@@ -220,14 +223,11 @@
                 <span class="fformel" id="salt-formel">NaCl</span>
                 <span class="fnavn" id="salt-navn">natriumchlorid</span>
             </div>
-            <div class="ligning" id="salt-balance"></div>
-            <p class="note">Ladningerne skal gå lige op. Et salt er altid neutralt udadtil.</p>
         </div>
 
         <div class="kort">
             <h2>Kør forsøget</h2>
-            <button class="knap stor orange" id="salt-overfoer" type="button"><span>Overfør elektronerne</span><span class="tegn">⚡</span></button>
-            <button class="knap stor groen" id="salt-saml" type="button" style="margin-top:7px;"><span>Saml ionerne til et salt</span><span class="tegn">🧂</span></button>
+            <button class="knap stor orange" id="salt-knap" type="button"><span id="salt-knap-tekst">Overfør elektronerne</span><span class="tegn" id="salt-knap-tegn">⚡</span></button>
         </div>
     </aside>
 </section>
@@ -332,6 +332,7 @@
     <div class="overlay-boks">
         <h2 id="salt-forklaring-titel">Hvorfor NaCl?</h2>
         <p id="salt-forklaring-tekst"></p>
+        <div class="ligning" id="salt-forklaring-skema" style="font-size:1rem;"></div>
         <div class="knapper" style="margin-top:18px;">
             <button class="knap blaa" id="salt-forklaring-luk" style="justify-content:center;">Luk</button>
         </div>
