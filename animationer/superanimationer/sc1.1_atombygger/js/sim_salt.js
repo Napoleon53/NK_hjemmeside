@@ -148,7 +148,13 @@
         } else {
             NK.saetTekst("salt-formel", D.saltformel(m, ik));
         }
-        NK.saetTekst("salt-navn", this.fase === "samlet" ? D.saltnavn(m, ik) : (m.navn.toLowerCase() + " og " + ik.navn.toLowerCase()));
+        if (this.fase === "atomer") {
+            NK.saetTekst("salt-navn", m.navn.toLowerCase() + " og " + ik.navn.toLowerCase());
+        } else if (this.fase === "overfoert") {
+            NK.saetTekst("salt-navn", D.kationNavn(m) + " og " + D.anionNavn(ik));
+        } else {
+            NK.saetTekst("salt-navn", D.saltnavn(m, ik));
+        }
 
         var knap = NK.el("salt-knap");
         if (this.fase === "atomer") {

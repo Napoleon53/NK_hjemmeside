@@ -279,4 +279,13 @@
         var anion = D.ANIONNAVN[ikkemetal.symbol] || ikkemetal.navn.toLowerCase();
         return metal.navn.toLowerCase() + anion;
     };
+
+    /* Ionnavne hver for sig, foer de er samlet til et salt: en
+       natriumion og en chloridion. */
+    D.kationNavn = function (metal) {
+        return metal.navn.toLowerCase() + "ion";
+    };
+    D.anionNavn = function (ikkemetal) {
+        return D.ANIONNAVN[ikkemetal.symbol] || ikkemetal.navn.toLowerCase() + "id";
+    };
 }());
