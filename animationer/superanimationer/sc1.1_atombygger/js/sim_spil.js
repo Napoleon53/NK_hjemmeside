@@ -541,12 +541,20 @@
             }
         }
 
-        /* Partikelstat-boksen staar fremme, naar der overhovedet er et
-           atom at vise tal for - kun de tal, spørgsmålet selv spørger
-           om, skjules som "?" (se skjulStat paa den enkelte opgave). */
-        var visStatBoks = !!b.opgave.atom;
+        /* Partikelstat-boksen staar fremme, naar der overhovedet er
+           protoner og elektroner at vise tal for - ogsaa ved et
+           nuklidsymbol, for boksen siger jo intet om neutrontallet, som
+           er det, sp_neutroner og sp_isotop spørger om. Kun de tal,
+           spørgsmålet selv spørger om, skjules som "?" (se skjulStat). */
+        var visStatBoks = !!(b.opgave.atom || b.opgave.nuklid);
         NK.el("spil-stat").hidden = !visStatBoks;
-        if (visStatBoks) this.visStat(this.atom.p, this.atom.e, b.opgave.skjulStat);
+        if (b.opgave.atom) {
+            this.visStat(this.atom.p, this.atom.e, b.opgave.skjulStat);
+        } else if (b.opgave.nuklid) {
+            /* Nuklidspørgsmålene er altid neutrale atomer - ingen ion
+               indgaar i den slags spørgsmål. */
+            this.visStat(b.opgave.nuklid.z, b.opgave.nuklid.z, b.opgave.skjulStat);
+        }
 
         NK.saetTekst("spil-banenavn", BANER[this.aktiv].navn);
         NK.saetTekst("spil-taeller", b.nr + "/" + SPOERGSMAAL_PR_BANE);
