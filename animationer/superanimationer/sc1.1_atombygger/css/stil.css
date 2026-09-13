@@ -238,10 +238,11 @@ main { flex: 1; position: relative; min-height: 0; }
 
 .scene-mrk b { color: #ffffff; }
 
-/* Overblikket over proton- og elektrontal paa fane 3, i scenens
-   venstre tophjoerne - samme translucente kortstil som kernekort og
-   saltvalg, saa det hoerer visuelt til scenen, ikke panelet. */
-.ionstat {
+/* Overblikket over proton- og elektrontal - samme translucente kortstil
+   som kernekort og saltvalg, saa det hoerer visuelt til scenen, ikke
+   panelet. Bruges paa spilfanen, naar et spoergsmaal godt maa vise det
+   (se sim_spil.js) - samme boks, den gamle "Skaller og ioner"-fane brugte. */
+.partikelstat {
     position: absolute;
     top: 18px;
     left: 18px;
@@ -254,7 +255,9 @@ main { flex: 1; position: relative; min-height: 0; }
     pointer-events: none;
 }
 
-.ionstat-raekke {
+.partikelstat[hidden] { display: none; }
+
+.partikelstat-raekke {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
@@ -264,22 +267,23 @@ main { flex: 1; position: relative; min-height: 0; }
     color: var(--tekst-svag);
 }
 
-.ionstat-raekke + .ionstat-raekke { margin-top: 5px; }
+.partikelstat-raekke + .partikelstat-raekke { margin-top: 5px; }
 
-.ionstat-raekke span:last-child {
+.partikelstat-raekke span:last-child {
     font-size: 0.95rem;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
 }
 
-#ion-stat-p { color: #ff9384; }
-#ion-stat-e { color: #f2c53d; }
+.partikelstat-raekke .p-tal { color: #ff9384; }
+.partikelstat-raekke .e-tal { color: #f2c53d; }
 
-.ionstat-raekke.ladning {
+.partikelstat-raekke.ladning {
     margin-top: 8px;
     padding-top: 7px;
     border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
+
 .scene-mrk.advarsel { color: #f0a49c; }
 
 /* ---------------------------------------------------------------------
@@ -953,58 +957,7 @@ button.pcelle:hover { border-color: rgba(255, 255, 255, 0.55); }
 
 .spilhjerte:empty { display: none; }
 
-/* ---------------------------------------------------------------------
-   GAETTEBOKSEN
-   --------------------------------------------------------------------- */
-.gaetboks { display: none; margin-top: 4px; }
-.gaetboks.vis { display: block; }
-
 .gaetsp { margin: 0 0 4px 0; font-size: 0.86rem; font-weight: 600; line-height: 1.4; }
-
-.hintknap {
-    display: inline-block;
-    background: transparent;
-    border: none;
-    color: var(--gul);
-    font-family: inherit;
-    font-size: 0.76rem;
-    font-weight: 700;
-    text-decoration: underline;
-    cursor: pointer;
-    padding: 0;
-    margin: 0 0 8px 0;
-}
-
-.hintknap:hover { color: #ffffff; }
-
-.note.hint { display: none; }
-.note.hint.vis { display: block; margin-bottom: 8px; }
-
-.gaetvalg {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 6px;
-    margin: 10px 0;
-}
-
-.gaetknap {
-    background-color: var(--panel-2);
-    color: var(--tekst);
-    border: 1px solid #4a4a58;
-    border-radius: var(--radius-lil);
-    padding: 9px 4px;
-    font-family: "Cascadia Mono", Consolas, monospace;
-    font-size: 0.95rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.14s ease, transform 0.08s ease;
-}
-
-.gaetknap:hover:not(:disabled) { background-color: var(--panel-3); }
-.gaetknap:active:not(:disabled) { transform: scale(0.95); }
-.gaetknap:disabled { cursor: default; opacity: 0.55; }
-.gaetknap.rigtig { background-color: var(--groen-mork); border-color: var(--groen); color: #ffffff; opacity: 1; }
-.gaetknap.forkert { background-color: var(--roed-mork); border-color: var(--roed); color: #ffffff; opacity: 1; }
 
 /* ---------------------------------------------------------------------
    ISOTOPFANEN
@@ -1072,17 +1025,6 @@ button.pcelle:hover { border-color: rgba(255, 255, 255, 0.55); }
 }
 
 .tjek input { accent-color: var(--blaa); width: 15px; height: 15px; cursor: pointer; flex-shrink: 0; }
-
-.skyder { margin-top: 10px; }
-
-.skyder label {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    font-size: 0.78rem;
-    color: #c8ced6;
-    margin-bottom: 5px;
-}
 
 input[type="range"] {
     -webkit-appearance: none;

@@ -153,6 +153,11 @@
             valg: o.valg, rigtig: o.rigtig,
             forklaring: "Massetallet er protoner + neutroner: " + g.z + " + " + n + " = " + iso.a + ".",
             atom: { p: g.z, n: n, e: g.z },
+            /* Hverken p, n eller e er hemmelige her - de staar jo i
+               spørgsmålsteksten - saa atomet maa gerne tegnes fuldt ud
+               med maerkat, skaltal og partikelstat-boksen. */
+            synlighed: "vist",
+            maerkatSymbol: g.symbol,
             noegle: g.z
         };
     }
@@ -218,6 +223,7 @@
         var g = tilfaeldig(ionDannere());
         var valens = D.valenselektroner(g.z);
         var aedel = D.aedelgasStruktur(g.z - g.ion);
+        var iso = D.hyppigsteIsotop(g.z);
         var o = opstil(NK.ladningstekst(g.ion),
             ["0", NK.ladningstekst(-g.ion), NK.ladningstekst(g.ion > 0 ? g.ion + 1 : g.ion - 1)],
             function (i) { return NK.ladningstekst(i + 2); });
@@ -229,7 +235,14 @@
                              : "optager " + NK.talform(-g.ion, "elektron", "elektroner"))
                 + (aedel ? " for at ligne " + aedel.navn.toLowerCase() : "")
                 + ". Elektroner er negativt ladede, så ladningen bliver " + NK.ladningstekst(g.ion) + ".",
-            atom: { p: g.z, n: D.hyppigsteIsotop(g.z).a - g.z, e: g.z },
+            atom: { p: g.z, n: iso.a - g.z, e: g.z },
+            maerkatSymbol: g.symbol,
+            /* Svarer man rigtigt, faar man vist selve iondannelsen - lige
+               som paa den gamle "Skaller og ioner"-fane: elektronerne
+               flyver ud eller ind, og maerkat + skaltal + partikelstat
+               dukker op. Foer man har svaret, ville det jo afsloere
+               svaret - se svar() og tegn(). */
+            ionAfsloering: { p: g.z, n: iso.a - g.z, e: g.z - g.ion },
             noegle: g.z
         };
     }
@@ -418,10 +431,34 @@
 
     NK.SimSpil.prototype.svar = function (nr) {
         var b = this.baner[this.aktiv];
+        var o = b.opgave;
         if (b.valgt !== -1) return;
         b.valgt = nr;
-        if (nr === b.opgave.rigtig) b.rigtige++;
+        if (nr === o.rigtig) {
+            b.rigtige++;
+            if (o.ionAfsloering) this.afsloerIon(o);
+        }
         this.visBane();
+    };
+
+    /* Viser selve iondannelsen, naar man har gaettet ladningen rigtigt:
+       elektronerne flyver ud eller ind, akkurat som paa den gamle
+       "Skaller og ioner"-fane. o.atom opdateres til ionens tal, saa et
+       senere baneskift frem og tilbage ikke nulstiller den. */
+    NK.SimSpil.prototype.afsloerIon = function (o) {
+        var r = o.ionAfsloering;
+        o.synlighed = "vist";
+        o.atom = { p: r.p, n: r.n, e: r.e };
+        this.atom.saet(r.p, r.n, r.e);
+        this.visStat(r.p, r.e);
+    };
+
+    /* Partikelstat-boksens tal - opdateres straks, ikke hen ad vejen
+       med flyveanimationen, ligesom paa den gamle ion-fane. */
+    NK.SimSpil.prototype.visStat = function (p, e) {
+        NK.saetTekst("spil-stat-p", String(p));
+        NK.saetTekst("spil-stat-e", String(e));
+        NK.saetTekst("spil-stat-q", NK.ladningstekst(p - e));
     };
 
     NK.SimSpil.prototype.naeste = function () {
@@ -473,6 +510,7 @@
         NK.el("spil-resultat").style.display = b.faerdig ? "" : "none";
 
         if (b.faerdig) {
+            NK.el("spil-stat").hidden = true;
             NK.saetTekst("spil-resultatnavn", BANER[this.aktiv].navn);
             NK.saetTekst("spil-score", b.rigtige + " / " + SPOERGSMAAL_PR_BANE);
             NK.saetTekst("spil-hjerte", hjerte(b.rigtige));
@@ -486,6 +524,12 @@
                 this.atom.saetStraks(a.p, a.n, a.e);
             }
         }
+
+        /* Partikelstat-boksen maa kun vises, naar intet af den ville
+           afsloere svaret - se synlighed paa den enkelte opgave. */
+        var visStatBoks = !!(b.opgave.atom && b.opgave.synlighed === "vist");
+        NK.el("spil-stat").hidden = !visStatBoks;
+        if (visStatBoks) this.visStat(this.atom.p, this.atom.e);
 
         NK.saetTekst("spil-banenavn", BANER[this.aktiv].navn);
         NK.saetTekst("spil-taeller", b.nr + "/" + SPOERGSMAAL_PR_BANE);
@@ -583,11 +627,25 @@
         var o = b.opgave;
         if (!o) return;
 
-        /* Hverken maerkat, ladningsskaer eller skaltal: de ville staa og
-           afsloere netop det, der bliver spurgt om. */
         if (o.atom) {
             var plads = NK.klamp(Math.min(l.b / 2 - 40, l.h * 0.40), 70, 300);
-            this.atom.tegn(c, cx, cy, plads, { fremhaevValens: true });
+            if (o.synlighed === "vist") {
+                /* Intet hemmeligt tilbage (enten var det aldrig hemmeligt,
+                   eller ogsaa er der lige svaret rigtigt) - saa tegnes
+                   atomet fuldt ud, som paa den gamle "Skaller og
+                   ioner"-fane: maerkat, ladningsskaer og skaltal. */
+                var q = this.atom.p - this.atom.e;
+                this.atom.tegn(c, cx, cy, plads, {
+                    fremhaevValens: true,
+                    ladning: q,
+                    maerkat: (o.maerkatSymbol || "") + NK.ladningHaevet(q)
+                });
+                NK.tegnSkaltal(c, this.atom);
+            } else {
+                /* Hverken maerkat, ladningsskaer eller skaltal: de ville
+                   staa og afsloere netop det, der bliver spurgt om. */
+                this.atom.tegn(c, cx, cy, plads, { fremhaevValens: true });
+            }
         } else if (o.nuklid) {
             tegnNuklid(c, cx, cy, o.nuklid);
         } else if (o.stortekst) {

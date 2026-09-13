@@ -43,14 +43,13 @@ function koer() {
     overskrift("1. Indlaesning");
     paastand("NK findes", !!NK);
     if (!NK) { vis(); return; }
-    paastand("alle fem simulationer er bygget", !!(NK.sims &&
-        NK.sims["fane-byg"] && NK.sims["fane-isotop"] && NK.sims["fane-ion"]
+    paastand("alle fire simulationer er bygget", !!(NK.sims &&
+        NK.sims["fane-byg"] && NK.sims["fane-isotop"]
         && NK.sims["fane-salt"] && NK.sims["fane-spil"]));
 
     overskrift("2. Panelerne er fyldt ud ved opstart");
     var skalHaveTekst = ["byg-grundstof", "byg-massetal", "byg-ladning", "byg-kerne",
         "byg-opgave", "iso-regnestykke",
-        "ion-navn", "ion-fordeling",
         "salt-formel", "salt-navn", "salt-knap-tekst"];
     var tomme = [];
     for (i = 0; i < skalHaveTekst.length; i++) {
@@ -60,7 +59,7 @@ function koer() {
     paastand(skalHaveTekst.length + " udlaesninger fyldt ud", tomme.length === 0, "tomme: " + tomme.join(", "));
 
     overskrift("3. Faneskift — praecis én aktiv ad gangen");
-    var faner = ["fane-byg", "fane-isotop", "fane-ion", "fane-salt", "fane-spil", "fane-byg"];
+    var faner = ["fane-byg", "fane-isotop", "fane-salt", "fane-spil", "fane-byg"];
     for (var f = 0; f < faner.length; f++) {
         var knap = d.querySelector('.faneknap[data-fane="' + faner[f] + '"]');
         knap.click();

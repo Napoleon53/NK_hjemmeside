@@ -1,10 +1,10 @@
 /* =====================================================================
    rundvisning.js - spotlight-rundvisning paa hjaelpeknappen
 
-   I stedet for én lang tekstvaeg om alle fem faner paa én gang, viser
+   I stedet for én lang tekstvaeg om alle faner paa én gang, viser
    rundvisningen kun rundt paa den fane, man rent faktisk staar paa -
    ét element ad gangen, med en kort billedtekst. Kun paa fane 1 slutter
-   den af med at pege paa de fire andre faner, uden at gaa i dybden med
+   den af med at pege paa de tre andre faner, uden at gaa i dybden med
    dem: det er dér, man lander foerst, og dér, det giver mening at vide,
    der er mere at udforske.
 
@@ -27,17 +27,12 @@
             { sel: "#byg-nuklid", titel: "Mærkatet", tekst: "Massetal, atomnummer, symbol og ladning — skrevet på samme måde som i kemibogen." },
             { sel: "#byg-panel-atom", titel: "Atomet", tekst: "Massetal, ladning og elektronstruktur opdateres, mens du bygger." },
             { sel: "#byg-nulstil", titel: "Genstart", tekst: "Nulstil til det simpleste atom: én proton og én elektron." },
-            { sel: ".faneknapper", titel: "De øvrige faner", tekst: "Isotoper, ioner, salte og et afsluttende quizspil bygger videre på det samme." }
+            { sel: ".faneknapper", titel: "De øvrige faner", tekst: "Isotoper, salte og et afsluttende quizspil bygger videre på det samme." }
         ],
         "fane-isotop": [
             { sel: "#iso-panel-grundstof", titel: "Vælg grundstof", tekst: "Vælg et grundstof, der har mere end én isotop i naturen." },
             { sel: "#iso-panel-blanding", titel: "Blandingen", tekst: "Skru på andelene, og se den gennemsnitlige atommasse følge med — eller genskab de rigtige naturlige andele." },
             { sel: "#iso-panel-beregning", titel: "Beregningen", tekst: "Se hele regnestykket bag den vejede gennemsnitsmasse." }
-        ],
-        "fane-ion": [
-            { sel: "#ion-panel-grundstof", titel: "Grundstof", tekst: "Vælg et grundstof med skyderen, og se dets elektronstruktur og yderste skal." },
-            { sel: "#ion-stat", titel: "Protoner og elektroner", tekst: "Følg de to tal, mens ionen dannes. Læg mærke til, at kun elektrontallet ændrer sig." },
-            { sel: "#ion-panel-gaet", titel: "Gæt ladningen", tekst: "Gæt ionens ladning, før du får den at se, og få en begrundelse med." }
         ],
         "fane-salt": [
             { sel: ".saltvalg-metal, .saltvalg-ikkemetal", titel: "Vælg to grundstoffer", tekst: "Vælg frit et metal og et ikke-metal. Modellen tæller selv ud, hvor mange atomer der skal til." },

@@ -17,16 +17,20 @@ i `samling_c1.html` og `samling_NV.html` ikke behøvede at blive ændret.
 
 ## Hvad viser den
 
-Fem faner om det samme spørgsmål: *hvad er et atom lavet af, og hvad sker der,
+Fire faner om det samme spørgsmål: *hvad er et atom lavet af, og hvad sker der,
 når man ændrer på delene?*
 
 | # | Fane | Hvad man gør | Pointe |
 |---|------|--------------|--------|
 | 1 | Atommodellen | lægger protoner, neutroner og elektroner i én ad gangen | **protoner** = grundstoffet, **neutroner** = isotopen, **elektroner** = ladningen |
 | 2 | Isotoper | skruer på, hvor meget der er af hver isotop | atommassen i det periodiske system er et **vejet gennemsnit** — derfor 35,45 for chlor |
-| 3 | Skaller og ioner | vælger grundstof, gætter ionens ladning | den yderste skal afgør det hele, og **kernen ændrer sig ikke**, når ionen dannes |
-| 4 | Salte | kombinerer et metal og et ikke-metal frit | formlen følger af, at **elektronregnskabet skal gå op**: Mg²⁺ + 2 Cl⁻ → MgCl₂ |
-| 5 | Spil | tager en bane på fem spørgsmål | det hele én gang til, men som spørgsmål — og med begrundelsen med, også når man rammer rigtigt |
+| 3 | Salte | kombinerer et metal og et ikke-metal frit | formlen følger af, at **elektronregnskabet skal gå op**: Mg²⁺ + 2 Cl⁻ → MgCl₂ |
+| 4 | Spil | tager en bane på fem spørgsmål | det hele én gang til, men som spørgsmål — og med begrundelsen med, også når man rammer rigtigt |
+
+Der er ikke længere en selvstændig "Skaller og ioner"-fane: dens gæt-ladningen-
+øvelse mindede for meget om spørgsmålene i fane 4's "Ioner"-bane til at
+retfærdiggøre begge dele. Grafikken og pointen lever videre dér i stedet — se
+"Spilfanen viser hele iondannelsen" nedenfor.
 
 Hverken værktøjet eller fane 1 hedder "Byg et atom": PhET har en sim med det
 navn, og selv om koden her er skrevet fra bunden, er der ingen grund til at
@@ -34,7 +38,7 @@ lægge sig så tæt op ad den.
 
 Fane 1 har det periodiske system i lommeformat nederst i panelet. Det viser,
 hvor det byggede atom hører hjemme, og man kan trykke sig direkte til et
-grundstof. Fane 5 kan slå den samme tabel op i stort format midt i et
+grundstof. Fane 4 kan slå den samme tabel op i stort format midt i et
 spørgsmål — dér med atomnummeret i felterne.
 
 ### Det nye i forhold til den gamle animation
@@ -57,17 +61,34 @@ spørgsmål — dér med atomnummeret i felterne.
 * **Bor og silicium danner ikke ioner** i modellen. Den gamle lod Bor afgive tre
   elektroner og blive B³⁺, hvilket ikke er rigtigt.
 
-Direkte link til en bestemt fane: `index.html#isotop`, `#ion`, `#salt`, `#spil`
+### Spilfanen viser hele iondannelsen
+
+Den gamle "Skaller og ioner"-fane (gæt ionens ladning, se den bagefter) er
+lagt ned, fordi bane 4's "Hvilken ladning får X?"-spørgsmål allerede spurgte
+om det samme. I stedet er den fanes grafik flyttet med ind i spilfanen:
+
+* Svarer man rigtigt på et ladningsspørgsmål, dannes ionen for øjnene af én -
+  elektronerne flyver ud eller ind, og atomet får maerkat, ladningsskaer og
+  skaltal, akkurat som den gamle fane viste det. Se `afsloerIon()` i
+  `js/sim_spil.js`.
+* Den lille "partikelstat"-boks (protoner, elektroner, ladning) fra den gamle
+  fane findes stadig, nu som `#spil-stat` i `index.html`, og bruges også ved
+  massetals-spørgsmål, hvor intet af det er hemmeligt.
+* Ingen af de andre spørgsmålstyper viser maerkat, skaltal eller
+  partikelstat - det ville afsløre netop det, der bliver spurgt om. Se
+  `synlighed`-feltet på hver opgave i `sim_spil.js`.
+
+Direkte link til en bestemt fane: `index.html#isotop`, `#salt`, `#spil`
 (`#byg` eller ingenting giver fane 1).
 
-Genveje: <kbd>1</kbd>–<kbd>5</kbd> faner · <kbd>p</kbd> <kbd>n</kbd> <kbd>e</kbd>
+Genveje: <kbd>1</kbd>–<kbd>4</kbd> faner · <kbd>p</kbd> <kbd>n</kbd> <kbd>e</kbd>
 læg en partikel i · <kbd>P</kbd> <kbd>N</kbd> <kbd>E</kbd> tag en ud ·
 <kbd>R</kbd> nulstil fanen · <kbd>H</kbd> rundvisning på den aktive fane.
 
 ## Filer
 
 ```
-index.html          markup for alle fem faner + rundvisningens skal
+index.html          markup for alle fire faner + rundvisningens skal
 css/stil.css        alt udseende. NB: decimaltal med PUNKTUM i CSS
 js/kerne.js         NK-navnerum, dansk talformat, hævet/sænket skrift,
                     DPR-skarpt canvas, tegnehjælpere
@@ -78,8 +99,7 @@ js/atom.js          ÉT atom: tre tal (p, n, e), partikler der flyver ind og ud,
                     kernepakning og hele tegningen. Bruges af alle faner
 js/pertabel.js      det periodiske system i lommeformat, 18 søjler
 js/sim_byg.js       fane 1     js/sim_isotop.js  fane 2
-js/sim_ion.js       fane 3     js/sim_salt.js    fane 4
-js/sim_spil.js      fane 5
+js/sim_salt.js      fane 3     js/sim_spil.js    fane 4
 js/rundvisning.js   spotlight-rundvisningen bag hjælpeknappen (se nedenfor)
 js/app.js           faneskift, tastatur, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen (se nedenfor)
@@ -111,7 +131,7 @@ uanset hvor mange partikler man propper i.
 radius, et atom med fire fyldte skaller ville have, og alt skaleres i forhold
 til den. Derfor fylder hydrogen mindre i billedet end calcium — i stedet for at
 hvert atom blæses op til at fylde hele scenen. Vil man have store atomer, skal
-man hæve loftet i `plads`-beregningen i `sim_byg.js` og `sim_ion.js`, ikke
+man hæve loftet i `plads`-beregningen i `sim_byg.js` og `sim_spil.js`, ikke
 `MODEL_YDRE`.
 
 **Opgaverne** på fane 1 er fem skabeloner øverst i `OPGAVETYPER` i
@@ -119,7 +139,7 @@ man hæve loftet i `plads`-beregningen i `sim_byg.js` og `sim_ion.js`, ikke
 klarer sig selv — opgaven tjekkes efter hver eneste ændring, så eleven får
 svaret i samme øjeblik, atomet er rigtigt.
 
-**Spørgsmålene** på fane 5 er `sp_`-funktionerne i `js/sim_spil.js`, samlet i
+**Spørgsmålene** på fane 4 er `sp_`-funktionerne i `js/sim_spil.js`, samlet i
 tre baner i `BANER`. Hver funktion returnerer `{tekst, valg, rigtig,
 forklaring, noegle}` plus det, der skal tegnes (`atom`, `nuklid` eller
 `stortekst`), og bygger både spørgsmål, svarmuligheder og begrundelse ud af
@@ -127,8 +147,13 @@ forklaring, noegle}` plus det, der skal tegnes (`atom`, `nuklid` eller
 resten af animationen. Distraktorerne er med vilje de fejl, eleven faktisk
 laver: protontallet i stedet for neutrontallet, fortegnsfejl på ladningen.
 Bane 3 ("Ioner") ruller ikke ind i salte — det kommer eleven først til på
-fane 4 — men gætter til gengæld elektrontallet ud fra selve ionskrivemåden
-(fx N³⁻), uden et billede at tælle prikker på.
+fane 3 (Salte) — men gætter til gengæld elektrontallet ud fra selve
+ionskrivemåden (fx N³⁻), uden et billede at tælle prikker på. Et opgave-objekt
+kan desuden have `synlighed: "vist"` (atomet tegnes fuldt ud med maerkat,
+ladning og skaltal — intet af det er hemmeligt her) eller `ionAfsloering`
+(kun ladningsspørgsmålet: svarer man rigtigt, dannes ionen for øjnene af én,
+se afsnittet "Spilfanen viser hele iondannelsen" ovenfor). Uden et af de to
+felter tegnes atomet bart, uden noget der kan afsløre svaret.
 
 `noegle` bruges til at sikre, at de fem spørgsmål i én runde altid handler om
 fem forskellige grundstoffer: `nytSpoergsmaal()` i `sim_spil.js` trækker en ny
@@ -150,9 +175,9 @@ den efter ændringer i `data.js`. Filen bruges ikke af animationen og kan
 slettes.
 
 **Rundvisningen** (hjælpeknappen, `?`) viser ikke længere én lang tekstvæg om
-alle fem faner. Den peger i stedet på ét element ad gangen på den fane, man
+alle faner. Den peger i stedet på ét element ad gangen på den fane, man
 rent faktisk står på — kun fane 1's rundvisning slutter af med at pege på de
-fire andre faner, uden at gå i dybden med dem. Trinene står i `TURE` i
+tre andre faner, uden at gå i dybden med dem. Trinene står i `TURE` i
 `js/rundvisning.js`, ét array pr. fane-id, som en liste af `{sel, titel,
 tekst}`. `sel` er en CSS-selector (kommasepareret for at fremhæve flere
 elementer på én gang, se saltfanens to grundstofvælgere) — findes elementet

@@ -1,5 +1,5 @@
 /* =====================================================================
-   app.js - binder de fem faner sammen
+   app.js - binder de fire faner sammen
 
    Faneskift, tastaturgenveje og tegneloekken. Kun den aktive fane
    opdateres og tegnes, saa de tre andre koster ingenting. Der er ingen
@@ -13,7 +13,7 @@
     var NK = window.NK;
 
     var sims = {};
-    var faner = ["fane-byg", "fane-isotop", "fane-ion", "fane-salt", "fane-spil"];
+    var faner = ["fane-byg", "fane-isotop", "fane-salt", "fane-spil"];
     var aktivFane = "fane-byg";
     var sidsteTid = 0;
 
@@ -60,7 +60,7 @@
         if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
         var sim = sims[aktivFane];
 
-        if (e.key >= "1" && e.key <= "5") {
+        if (e.key >= "1" && e.key <= "4") {
             visFane(faner[parseInt(e.key, 10) - 1]);
             return;
         }
@@ -88,7 +88,6 @@
     function start() {
         sims["fane-byg"] = new NK.SimByg();
         sims["fane-isotop"] = new NK.SimIsotop();
-        sims["fane-ion"] = new NK.SimIon();
         sims["fane-salt"] = new NK.SimSalt();
         sims["fane-spil"] = new NK.SimSpil();
         NK.sims = sims;              /* saa modellerne kan pilles ved fra konsollen */

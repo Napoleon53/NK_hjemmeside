@@ -14,9 +14,8 @@
     <div class="faneknapper" role="tablist" aria-label="Vælg fane">
         <button class="faneknap aktiv" data-fane="fane-byg" role="tab" aria-selected="true"><span class="nr">1</span>Atommodellen</button>
         <button class="faneknap" data-fane="fane-isotop" role="tab" aria-selected="false"><span class="nr">2</span>Isotoper</button>
-        <button class="faneknap" data-fane="fane-ion" role="tab" aria-selected="false"><span class="nr">3</span>Skaller og ioner</button>
-        <button class="faneknap" data-fane="fane-salt" role="tab" aria-selected="false"><span class="nr">4</span>Salte</button>
-        <button class="faneknap" data-fane="fane-spil" role="tab" aria-selected="false"><span class="nr">5</span>Spil</button>
+        <button class="faneknap" data-fane="fane-salt" role="tab" aria-selected="false"><span class="nr">3</span>Salte</button>
+        <button class="faneknap" data-fane="fane-spil" role="tab" aria-selected="false"><span class="nr">4</span>Spil</button>
     </div>
 
     <div class="visvalg" role="group" aria-label="Visning af protoner og neutroner">
@@ -150,74 +149,7 @@
 </section>
 
 <!-- ================================================================= -->
-<!-- FANE 3: SKALLER OG IONER                                           -->
-<!-- ================================================================= -->
-<section class="fane" id="fane-ion" role="tabpanel" aria-label="Skaller og ioner">
-    <div class="scene medtekst">
-        <canvas id="ion-laerred"></canvas>
-
-        <!-- Overblik over de to tal, hele fanen handler om: hvor mange
-             protoner (uændrede) og hvor mange elektroner (dem, der flytter
-             sig). Staar fremme hele tiden, saa man kan se dem skifte i
-             samme øjeblik, ionen dannes. -->
-        <div class="ionstat" id="ion-stat" aria-live="polite">
-            <div class="ionstat-raekke">
-                <span>Protoner (p⁺)</span>
-                <span id="ion-stat-p">11</span>
-            </div>
-            <div class="ionstat-raekke">
-                <span>Elektroner (e⁻)</span>
-                <span id="ion-stat-e">11</span>
-            </div>
-            <div class="ionstat-raekke ladning">
-                <span>Ladning (p⁺ − e⁻)</span>
-                <span id="ion-stat-q">0</span>
-            </div>
-        </div>
-
-        <div class="scene-mrk" id="ion-status"></div>
-    </div>
-
-    <aside class="panel">
-        <div class="kort" id="ion-panel-grundstof">
-            <h2>Grundstof</h2>
-            <div class="grundhoved">
-                <span class="gsymbol" id="ion-symbol">Na</span>
-                <span class="gnavn"><b id="ion-navn">Natrium</b><em>atomnummer <span id="ion-z">11</span></em></span>
-                <span class="maerke roed" id="ion-type">Metal</span>
-            </div>
-            <div class="skyder">
-                <label><span>Vælg grundstof (1–20)</span></label>
-                <input type="range" id="ion-skyder" min="1" max="20" step="1" value="11">
-            </div>
-            <div class="talraekke"><span>Elektronstruktur</span><span class="tal gul" id="ion-fordeling">2, 8, 1</span></div>
-            <div class="talraekke"><span>I yderste skal</span><span class="tal" id="ion-valens">1</span></div>
-        </div>
-
-        <div class="kort" id="ion-panel-gaet">
-            <h2>Bliver det til en ion?</h2>
-            <button class="knap stor orange" id="ion-gaet-knap" type="button"><span>Gæt ionens ladning</span><span class="tegn">?</span></button>
-
-            <div class="gaetboks" id="ion-gaet-boks">
-                <p class="gaetsp" id="ion-gaet-sp"></p>
-                <button class="hintknap" id="ion-gaet-hint-knap" type="button">Vis hint</button>
-                <p class="note hint" id="ion-gaet-hint" style="margin-top:0;"></p>
-                <div class="gaetvalg" id="ion-gaet-valg"></div>
-                <p class="besked" id="ion-gaet-svar"></p>
-            </div>
-
-            <button class="knap stor groen" id="ion-videre" type="button" style="display:none;"><span>Vis mig elektronerne</span><span class="tegn">→</span></button>
-            <p class="besked" id="ion-resultat" style="margin-top:9px;"></p>
-            <div class="knaprad">
-                <button class="knap" id="ion-nulstil" type="button" style="display:none;">Tilbage til atomet</button>
-                <button class="knap blaa" id="ion-naeste" type="button" style="display:none;">Prøv et nyt grundstof</button>
-            </div>
-        </div>
-    </aside>
-</section>
-
-<!-- ================================================================= -->
-<!-- FANE 4: SALTE                                                      -->
+<!-- FANE 3: SALTE                                                      -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-salt" role="tabpanel" aria-label="Salte">
     <div class="scene">
@@ -253,11 +185,30 @@
 </section>
 
 <!-- ================================================================= -->
-<!-- FANE 5: SPIL                                                       -->
+<!-- FANE 4: SPIL                                                       -->
 <!-- ================================================================= -->
 <section class="fane" id="fane-spil" role="tabpanel" aria-label="Spil">
     <div class="scene">
         <canvas id="spil-laerred"></canvas>
+
+        <!-- Overblik over protoner, elektroner og ladning - samme boks
+             som den gamle "Skaller og ioner"-fane brugte. Staar skjult,
+             indtil et spoergsmaal rent faktisk maa vise den (se
+             sim_spil.js: kun naar intet af det ville afsloere svaret). -->
+        <div class="partikelstat" id="spil-stat" aria-live="polite" hidden>
+            <div class="partikelstat-raekke">
+                <span>Protoner (p⁺)</span>
+                <span class="p-tal" id="spil-stat-p">11</span>
+            </div>
+            <div class="partikelstat-raekke">
+                <span>Elektroner (e⁻)</span>
+                <span class="e-tal" id="spil-stat-e">11</span>
+            </div>
+            <div class="partikelstat-raekke ladning">
+                <span>Ladning (p⁺ − e⁻)</span>
+                <span id="spil-stat-q">0</span>
+            </div>
+        </div>
 
         <!-- Belønningen for 5/5 i alle tre baner. Tegnet her i stedet for
              hentet som emoji, saa den kan vises i det hjoerne, den skal. -->
@@ -386,7 +337,6 @@
 <script src="js/pertabel.js"></script>
 <script src="js/sim_byg.js"></script>
 <script src="js/sim_isotop.js"></script>
-<script src="js/sim_ion.js"></script>
 <script src="js/sim_salt.js"></script>
 <script src="js/sim_spil.js"></script>
 <script src="js/rundvisning.js"></script>
