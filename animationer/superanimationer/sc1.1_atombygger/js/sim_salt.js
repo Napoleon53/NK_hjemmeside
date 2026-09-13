@@ -423,11 +423,7 @@
         c.restore();
 
         NK.tekst(c, "Udsnit af gitteret. Mønstret fortsætter i alle retninger.", l.b / 2, vy + vindueH + 22, {
-            font: "600 12px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
-            farve: "rgba(169, 176, 186, " + blod + ")", kant: true
-        });
-        NK.tekst(c, "Talt op er ladningen neutral: lige mange plus og minus.", l.b / 2, vy + vindueH + 40, {
-            font: "600 12px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
+            font: "600 18px 'Segoe UI', sans-serif", justering: "center", linje: "middle",
             farve: "rgba(169, 176, 186, " + blod + ")", kant: true
         });
     };
