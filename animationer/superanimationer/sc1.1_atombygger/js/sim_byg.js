@@ -445,7 +445,8 @@
     var KERNE_H = 74;           /* svarer til loftet i tegn(): 74 px over scenens bund */
     var SKJUL_GRAENSE = 90;     /* under denne plads-stoerrelse viger det periodiske system */
     var MIN_PLADS = 55;         /* absolut bund, ogsaa hvis tabellen ikke er nok i sig selv */
-    var SOEJLE_LUFT = 28;       /* luft mellem venstre soejle og atomet */
+    var SOEJLE_LUFT = 18;       /* luft mellem venstre soejle og atomet */
+    var HOEJRE_LUFT = 12;       /* luft mellem atomet og scenens hoejre kant */
 
     NK.SimByg.prototype.placering = function () {
         var l = this.l;
@@ -503,17 +504,17 @@
         var R, cx, cy, tabelSkjult = false;
 
         if (tabelISoejle) {
-            var normalPladsV = NK.klamp(Math.min(l.b * 0.30, l.h * 0.40), 70, 340);
+            var normalPladsV = NK.klamp(Math.min(l.b * 0.33, l.h * 0.45), 70, 380);
             var kant = hoejreKant(true);
             R = Math.min(normalPladsV * YDRE_ANDEL,
                 (l.h - LUFT - NUKLID_H - KERNE_H - 30) / 2,
-                (l.b - kant - SOEJLE_LUFT - 16) / 2);
+                (l.b - kant - SOEJLE_LUFT - HOEJRE_LUFT) / 2);
 
             if (R < SKJUL_GRAENSE * YDRE_ANDEL) {
                 var kantUden = hoejreKant(false);
                 var Ruden = Math.min(normalPladsV * YDRE_ANDEL,
                     (l.h - LUFT - NUKLID_H - KERNE_H - 30) / 2,
-                    (l.b - kantUden - SOEJLE_LUFT - 16) / 2);
+                    (l.b - kantUden - SOEJLE_LUFT - HOEJRE_LUFT) / 2);
                 if (Ruden > R) { tabelSkjult = true; R = Ruden; kant = kantUden; }
             }
             tabelKort.classList.toggle("skjult", tabelSkjult);
@@ -529,7 +530,7 @@
             var cyMaxS = l.h - R - 16 - KERNE_H;
             cy = NK.klamp(l.h * 0.54, cyMinS, Math.max(cyMinS, cyMaxS));
             cx = NK.klamp(kant + SOEJLE_LUFT + (l.b - kant - SOEJLE_LUFT) / 2,
-                kant + SOEJLE_LUFT + R, l.b - 16 - R);
+                kant + SOEJLE_LUFT + R, l.b - HOEJRE_LUFT - R);
         } else {
             if (opgave) opgave.style.top = "";
             if (tabelKort) tabelKort.classList.remove("skjult");
