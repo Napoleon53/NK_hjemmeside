@@ -324,6 +324,10 @@ main { flex: 1; position: relative; min-height: 0; }
 
 .pertabel-boks .pcelle { font-size: 0.7rem; border-radius: 4px; }
 
+/* Sikringen mod kraftigt zoom: sim_byg.js skjuler tabellen helt, hvis
+   der ikke er plads til den og et laeseligt atom paa samme tid. */
+.pertabel-boks.skjult { display: none; }
+
 /* Genstart ligger nede i scenens hoejre hjoerne. Toppen er optaget af
    opgavekortet til venstre og det periodiske system til hoejre. */
 .scene-knap {
