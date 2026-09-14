@@ -296,6 +296,64 @@
         return true;
     };
 
+    /* ----- Heptanflasken paa gulvet: laereren rydder op ------------------ */
+    var HEPTAN_SVAR = [
+        ["Nu lugter hele lokalet af tankstation.", "Ny flaske. Den bliver stående på bordet."],
+        ["Igen? Jeg begynder at tro, det er en hobby.", "Sidste flaske. Den står bedst på bordet."],
+        ["Heptan er ikke en jonglørkugle.", "Flasken står på bordet. Den har det godt der."]
+    ];
+
+    P.laererHeptan = function () {
+        var L = this.laerer, sp = this.heptanSpild;
+        if (!L || !sp || L.scene || L.spiseHaand) return false;
+        sp.fase = "laerer";
+        var n = (this.antalHeptanTab - 1) % HEPTAN_SVAR.length;
+        var x = NK.klamp(sp.x - 170, 140, 640);
+        this.laererKoer("heptan", [
+            { udtryk: { vrede: 1, humoer: -0.8, roed: 0.4, skeptisk: 0.5 } },
+            { gaa: x },
+            { sig: HEPTAN_SVAR[n][0], vis: 3.2, tid: 3.0 },
+            { kald: function () { this.laerer.baerer = "kost"; } },
+            { arm: 2.0, tid: 0.4 },
+            { tid: 2.6, hver: function (t) {
+                this.laerer.arm = 2.0 + Math.sin(t * Math.PI * 10) * 0.25;
+                if (sp.pyt) sp.pyt.vaad = Math.min(sp.pyt.vaad, 1 - t);
+                sp.skaar.forEach(function (s) { s.alfa = Math.min(s.alfa, 1.2 - 1.2 * t); });
+                if (Math.random() < 0.12 && NK.Lyd) NK.Lyd.fej();
+            } },
+            { kald: function () {
+                sp.pyt = null;
+                sp.skaar = [];
+                this.laerer.baerer = null;
+                this.nyHeptan();
+            } },
+            { arm: HAENGER, tid: 0.3 },
+            { sig: HEPTAN_SVAR[n][1], vis: 2.8, tid: 2.4 },
+            { udtryk: { skeptisk: 0, roed: 0 } },
+            { gaa: UDE },
+            { kald: function () {
+                this.heptanSpild = null;
+                this.aendret("heptanRyddet");
+            } }
+        ]);
+        return true;
+    };
+
+    /* ----- Endnu en knust petriskaal ------------------------------------ */
+    P.laererSkaal = function (antal) {
+        var L = this.laerer;
+        if (!L || L.scene || L.spiseHaand) return false;
+        var tekst = antal === 2 ? "To petriskåle. Jeg fører regnskab." : "Petriskål nummer " + antal + ". Regnskabet vokser.";
+        this.laererKoer("skaal", [
+            { udtryk: { vrede: 0.7, humoer: -0.3, roed: 0.2, skeptisk: 1 } },
+            { gaa: 170 },
+            { sig: tekst, vis: 3.0, tid: 3.2 },
+            { udtryk: { skeptisk: 0, roed: 0 } },
+            { gaa: UDE }
+        ], false);
+        return true;
+    };
+
     /* ----- Ros ---------------------------------------------------------- */
     P.laererRos = function () {
         var L = this.laerer;
@@ -596,6 +654,9 @@
             NK.Sprites.tegnPositur(ctx, "pose", { x: hd.x - 10, y: hd.y - 6, v: 0.35 }, S.ANKER.pose, 1, 0.85);
         } else if (L.baerer === "kaffekop") {
             NK.Sprites.tegnPositur(ctx, "kaffekop", { x: hd.x + 8, y: hd.y + 26, v: 0 }, S.ANKER.kaffekop);
+        } else if (L.baerer === "kost") {
+            /* Skaftets ende i haanden, boersterne ned mod gulvet */
+            NK.Sprites.tegnPositur(ctx, "kost", { x: hd.x, y: hd.y, v: -0.8 + (L.arm - 2.0) * 0.8 }, { x: 120, y: 17 });
         } else if (L.baerer === "brandbundt") {
             NK.Sprites.tegnPositur(ctx, "trefod", { x: hd.x + 10, y: hd.y - 10, v: 0.3 }, S.ANKER.trefod, 1, 0.8);
             NK.Sprites.tegn(ctx, "braender", hd.x - 6, hd.y + 20, 42, 63);

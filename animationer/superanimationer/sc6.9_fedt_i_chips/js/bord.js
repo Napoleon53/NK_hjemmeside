@@ -45,6 +45,10 @@
             var l = this.overLaerer(pt);
             if (l) return l;
         }
+        if (this.oprydning && this.overOprydning) {
+            var u = this.overOprydning(pt);
+            if (u) return u;
+        }
         if (!g.kaffekop.skjult && S.inden("kaffekop", g.kaffekop.p, g.kaffekop.anker, pt.x, pt.y, 6)) return "kaffekop";
         if (!g.pose.skjult && S.inden("pose", g.pose.p, g.pose.anker, pt.x, pt.y, 4)) return "pose";
         /* Vejebaaden: ogsaa bunken af chips oven paa den tæller med */
@@ -74,6 +78,7 @@
     /* ----- Mus og beroering --------------------------------------------- */
     P.ned = function (pt) {
         if (NK.Lyd) NK.Lyd.laasOp();
+        if (this.oprydning && this.nedOprydning && this.nedOprydning(pt)) return true;
         var navn = this.hvad(pt);
         if (!navn) return false;
         var optaget = this.laererOptaget && this.laererOptaget();
@@ -97,6 +102,7 @@
 
     /* nu: tidspunktet for musebevaegelsen i ms (ev.timeStamp) */
     P.flyt = function (pt, nu) {
+        if (this.oprydning && this.flytOprydning && this.flytOprydning(pt)) return;
         var h = this.holdt;
         if (!h) {
             this.hover = this.hvad(pt);
@@ -151,6 +157,7 @@
     };
 
     P.op = function () {
+        if (this.oprydning && this.opOprydning && this.opOprydning()) return;
         var h = this.holdt;
         if (!h) return;
         this.holdt = null;
@@ -322,7 +329,7 @@
         /* Morter og pistil. Pistillen staar i morteren; mens den er loeftet
            op, tegnes den foran. */
         var pi = g.pistil, mor = g.morter;
-        var pistilLoeftet = hn === "afvej" || hn === "overfoer";
+        var pistilLoeftet = hn === "afvej" || hn === "overfoer" || !!this.oprydning;
         if (!pistilLoeftet) NK.Sprites.tegnPositur(ctx, "pistil", pi.p, pi.anker);
         if (hjemme(mor)) {
             S.skygge(ctx, S.MORTER.midt, 38, 0.3);
@@ -337,6 +344,7 @@
         }
         if (pistilLoeftet) oppe.push(function () { NK.Sprites.tegnPositur(ctx, "pistil", pi.p, pi.anker); });
         if (this.markeret("pistil")) S.tegnMarkering(ctx, S.rekt("pistil", pi.p, pi.anker, 0), tid);
+        if (this.tegnOprydning) this.tegnOprydning(ctx, "bord", tid);
 
         /* Stinkskabet: braender og trefod */
         if (!this.braenderVaek) {
@@ -349,6 +357,7 @@
 
         ["vand", "heptan"].forEach(function (navn) {
             var fl = g[navn];
+            if (fl.skjult) return;
             if (hjemme(fl)) {
                 S.skygge(ctx, fl.hjem.x - (navn === "vand" ? 21 : 0), 22, 0.3);
                 this.tegnFlaske(ctx, navn);
@@ -373,6 +382,8 @@
         S.tegnVarmeplade(ctx, this.pladeTemp, this.pladeTaendt, tid);
         if (s.sted === "plade" && !s.traekkes) this.tegnS(ctx, tid);
 
+        if (this.tegnOprydning) this.tegnOprydning(ctx, "redskaber", tid);
+
         /* Maalet under den genstand, der traekkes */
         var ht = this.holdt;
         if (ht && ht.type === "traek" && ht.flyttet && this.traekMaal) S.tegnMarkering(ctx, NK.TRAEKREKT[this.traekMaal], tid);
@@ -386,6 +397,8 @@
         S.tegnDampe(ctx, this.dampe);
         if (this.tegnUheld) this.tegnUheld(ctx, tid);
         S.tegnRoeg(ctx, this.roeg);
+        if (this.tegnOprydning) this.tegnOprydning(ctx, "top", tid);
+        if (this.tegnHeptanSpild) this.tegnHeptanSpild(ctx);
 
         /* Zoomboblen */
         if (this.bobleAlfa > 0.01 && this.bobleMaal) {

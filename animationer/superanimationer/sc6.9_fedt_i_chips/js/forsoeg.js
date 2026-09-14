@@ -74,6 +74,8 @@
         this.urMinutter = 5;
         this.braenderVaek = false;
         this.koppenVaek = false;
+        this.antalSkaalKnust = 0;
+        this.antalHeptanTab = 0;
         this.vedAendring = null;
         this.vedBesked = null;
         this.vedIagttagelse = null;
@@ -134,6 +136,9 @@
         this.flamme = 0;
         this.brandUr = 0;
         this.uheld = null;
+        this.oprydning = null;
+        this.heptanSpild = null;
+        this.skaalTid = 0;
         this.alarm = false;
         this.laagT = 0;
         this.haandAlfa = 0;
@@ -217,6 +222,7 @@
     };
 
     P.aktueltTrin = function () {
+        if (this.oprydning) return this.oprydningTrin ? this.oprydningTrin() : null;
         if (this.uheld) return null;
         for (var i = 0; i < TRIN.length; i++) if (!this.trinGjort(TRIN[i].id)) return TRIN[i];
         return null;
@@ -313,6 +319,8 @@
         if (NK.Lyd) NK.Lyd.laasOp();
         if (navn === "laerer") return this.klikLaerer ? this.klikLaerer() : false;
         if (this.laererOptaget && this.laererOptaget()) return false;
+        if (this.heptanSpild) return false;
+        if (this.oprydning) return this.klikOprydning ? this.klikOprydning(navn) : false;
         if (this.uheld) { this.besked("Start et nyt forsøg.", "advarsel"); return false; }
         if (this.handling || this.holdt || this.arbejdKilde) return false;
         switch (navn) {
@@ -449,7 +457,7 @@
 
     /* ----- Knusning ------------------------------------------------------ */
     P.kanKnuse = function () {
-        return !!(this.gjort.afvej && !this.gjort.overfoer && !this.uheld && !this.handling);
+        return !!(this.gjort.afvej && !this.gjort.overfoer && !this.uheld && !this.handling && !this.oprydning && !this.heptanSpild);
     };
 
     /* vej: pistillens vej i tegneenheder, fart: musens fart */
@@ -473,6 +481,12 @@
             var retning = Math.random() < 0.5 ? -1 : 1;
             this.flyvende.push({ x: mor.x + retning * 30, y: mor.y - 50, vx: retning * r(60, 200), vy: -r(150, 320), a: r(0, 6), va: r(-10, 10), r: r(2.2, 3.4), fysik: true, farve: "#eec15c" });
             this.iagttag("krummer");
+        }
+
+        /* Paaskeaeg: helt urimeligt voldsomt, og pistillen knuser petriskaalen */
+        if (fart > M.KNUS.skaalFart && this.g.skaal.sted === "hjem" && this.knusSkaal) {
+            this.skaalTid += Math.min(0.1, vej / fart);
+            if (this.skaalTid >= M.KNUS.skaalTid && this.knusSkaal()) return;
         }
 
         /* Paaskeaeg: bliver eleven ved med at gaa amok, kommer laereren */
@@ -604,7 +618,7 @@
     };
 
     P.kanTraekke = function (navn) {
-        if (this.handling || this.uheld || this.arbejdKilde || (this.laererOptaget && this.laererOptaget())) return false;
+        if (this.handling || this.uheld || this.oprydning || this.heptanSpild || this.arbejdKilde || (this.laererOptaget && this.laererOptaget())) return false;
         var s = this.g.skaal, baad = this.g.vejebaad;
         switch (navn) {
             case "vejebaad":
@@ -713,7 +727,7 @@
     };
 
     P.kanRoere = function () {
-        return !!(this.midl && !this.gjort.filtrer && !this.uheld && !this.handling);
+        return !!(this.midl && !this.gjort.filtrer && !this.uheld && !this.handling && !this.oprydning && !this.heptanSpild);
     };
 
     /* ----- Filtrering --------------------------------------------------- */
@@ -940,7 +954,7 @@
     };
 
     P.mikroTilstand = function () {
-        if (this.uheld) return null;
+        if (this.uheld || this.oprydning) return null;
         var m = this.midlObj();
         var e = m ? M.ekstraktion(m, this.knust, this.roerTid) : { fedt: 0, salt: 0 };
         var s = this.g.skaal, a = this.g.baegerA;
@@ -1002,6 +1016,10 @@
         if (h && h.navn === "vand" && h.t0 !== undefined && this.tid - h.t0 > 1 && !this.midl && !this.vandAdvaret && this.laererVand) {
             if (this.laererVand()) this.vandAdvaret = true;
         }
+        /* Paaskeaeg: heptanflasken holdt for laenge glider ud af haanden */
+        if (h && h.navn === "heptan" && h.t0 !== undefined && this.tid - h.t0 > M.TAB.heptanTid && this.tabHeptan) this.tabHeptan();
+        if (this.opdaterOprydning) this.opdaterOprydning(dt);
+        if (this.opdaterHeptanSpild) this.opdaterHeptanSpild(dt);
         if (this.mark) { this.mark.ur -= dt; if (this.mark.ur <= 0) this.mark = null; }
         this.ryk = this.ryk > 0.2 ? this.ryk * (1 - dt * 7) : 0;
 
@@ -1073,6 +1091,7 @@
         var k = this.arbejdKilde;
         this.musFart *= Math.exp(-4 * dt);
         this.amokTid = Math.max(0, this.amokTid - dt * 0.5);
+        this.skaalTid = Math.max(0, this.skaalTid - dt * 0.5);
         this.amokPause -= dt;
         var maal = 0;
         if (k === "knap-knus" && this.kanKnuse()) {
@@ -1120,7 +1139,7 @@
     /* Knappen Knus / Roer rundt (og tasten R): til = trykket ned */
     P.arbejdKnap = function (til) {
         if (til) {
-            if (this.arbejdKilde || this.handling || this.holdt || this.uheld) return false;
+            if (this.arbejdKilde || this.handling || this.holdt || this.uheld || this.oprydning || this.heptanSpild) return false;
             if (this.laererOptaget && this.laererOptaget()) return false;
             if (this.kanKnuse()) { this.startArbejde("knap-knus"); return true; }
             if (this.kanRoere()) { this.startArbejde("knap-roer"); return true; }

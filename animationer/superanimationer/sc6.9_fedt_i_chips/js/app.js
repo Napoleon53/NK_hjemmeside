@@ -18,6 +18,7 @@
     /* ----- Forloebet ---------------------------------------------------- */
     function trinListe() {
         var f = forsoeg;
+        if (f.oprydning) return f.oprydningListe();
         if (f.uheld) {
             return [
                 { id: "sluk", tekst: "Ilden slukkes", gjort: !!f.uheld.slukket },
@@ -46,9 +47,9 @@
             li.appendChild(document.createTextNode(t.tekst));
             ol.appendChild(li);
         });
-        NK.saetTekst("forloeb-titel", f.uheld ? "Uheld" : "Forløb");
+        NK.saetTekst("forloeb-titel", f.uheld ? "Uheld" : (f.oprydning ? "Oprydning" : "Forløb"));
         NK.saetTekst("forloeb-taeller", f.uheld ? "" : antalGjort + "/" + liste.length);
-        NK.el("forloeb-kort").classList.toggle("uheld", !!f.uheld);
+        NK.el("forloeb-kort").classList.toggle("uheld", !!(f.uheld || f.oprydning));
 
         var id = aktuelt ? aktuelt.id : "";
         if (id !== hintTrin) {
@@ -60,7 +61,7 @@
         var type = f.arbejdsType();
         var ak = NK.el("arbejd-knap");
         var kilde = f.arbejdKilde;
-        ak.hidden = !(type || (kilde && kilde.indexOf("knap") === 0)) || !!f.uheld;
+        ak.hidden = !(type || (kilde && kilde.indexOf("knap") === 0)) || !!f.uheld || !!f.oprydning;
         ak.disabled = !((kilde && kilde.indexOf("knap") === 0) || (type === "knus" ? f.kanKnuse() : (type === "roer" && f.kanRoere())));
         ak.classList.toggle("aktiv", !!(kilde && kilde.indexOf("knap") === 0));
         NK.saetTekst("arbejd-tekst", type === "roer" ? "Rør rundt" : "Knus");
@@ -96,6 +97,7 @@
         return [
             t ? t.id : "", !!f.handling, f.arbejdKilde, f.arbejdsType(), f.kanKnuse(), f.kanRoere(),
             f.uheld ? (f.uheld.slukket ? "s" : "b") + (f.uheld.faerdig ? "f" : "") : "",
+            f.oprydning ? f.oprydning.trin : "", !!f.heptanSpild,
             f.mChips, f.mB, f.mBF, !!f.gjort.beregn, f.resultater.length, f.forsoegNr,
             NK.TRIN.map(function (x) { return f.trinGjort(x.id) ? 1 : 0; }).join("")
         ].join("|");

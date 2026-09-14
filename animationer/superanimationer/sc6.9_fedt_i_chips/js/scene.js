@@ -42,7 +42,10 @@
         laererHoved:  { x: 55, y: 126 },
         laererArm:    { x: 28, y: 142 },
         brandtaeppe:  { x: 75, y: 6 },
-        haand:        { x: 40, y: 46 }
+        haand:        { x: 40, y: 46 },
+        kost:         { x: 43, y: 54 },
+        fejeblad:     { x: 4, y: 52 },
+        glasaffald:   { x: 42, y: 12 }
     };
 
     /* Positur for en genstand, der staar paa underlaget y med midten i x. */
@@ -68,6 +71,7 @@
     S.ALARM = { x: 440, y: 44 };
     S.GASHANE = { x: 516, y: 462 };
     S.A_MIDT = 746;
+    S.GULV = 578;
 
     S.HJEM = {
         pose:     staar("pose", 56),
@@ -266,6 +270,15 @@
         f.addColorStop(1, "#16181d");
         ctx.fillStyle = f;
         ctx.fillRect(-2000, S.BORD + 9, S.BREDDE + 4000, 2000);
+
+        /* Gulvet foran bordet */
+        var gulv = ctx.createLinearGradient(0, S.GULV, 0, S.GULV + 120);
+        gulv.addColorStop(0, "#2a2e36");
+        gulv.addColorStop(1, "#1c1f25");
+        ctx.fillStyle = gulv;
+        ctx.fillRect(-2000, S.GULV, S.BREDDE + 4000, 2000);
+        ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+        ctx.fillRect(-2000, S.GULV, S.BREDDE + 4000, 3);
     };
 
     /* Stinkskabet: bagvaeg, loftpanel og venstre stolpe. */
@@ -954,6 +967,53 @@
         ctx.lineTo(hale + 8, y + h);
         ctx.stroke();
         NK.tekst(ctx, tekst, bx + b / 2, y + h / 2 + 1, { font: "700 17px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#1f2328" });
+        ctx.restore();
+    };
+
+    /* Glasskaar. liste: [{ x, y, a, pts, alfa }] */
+    S.tegnSkaar = function (ctx, liste) {
+        ctx.save();
+        ctx.lineJoin = "round";
+        for (var i = 0; i < liste.length; i++) {
+            var s = liste[i];
+            ctx.save();
+            ctx.globalAlpha = NK.klamp(s.alfa === undefined ? 1 : s.alfa, 0, 1);
+            ctx.translate(s.x, s.y);
+            ctx.rotate(s.a);
+            ctx.beginPath();
+            ctx.moveTo(s.pts[0].x, s.pts[0].y);
+            for (var j = 1; j < s.pts.length; j++) ctx.lineTo(s.pts[j].x, s.pts[j].y);
+            ctx.closePath();
+            ctx.fillStyle = "rgba(207, 230, 247, 0.22)";
+            ctx.fill();
+            ctx.strokeStyle = "rgba(226, 242, 252, 0.8)";
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+            ctx.restore();
+        }
+        ctx.restore();
+    };
+
+    /* En pyt klar vaeske paa gulvet med et svagt, farvet skaer */
+    S.tegnPyt = function (ctx, pyt, y) {
+        if (!pyt || pyt.vaad < 0.01) return;
+        ctx.save();
+        ctx.globalAlpha = NK.klamp(pyt.vaad, 0, 1);
+        ctx.fillStyle = "rgba(205, 220, 232, 0.32)";
+        ctx.beginPath();
+        ctx.ellipse(pyt.x, y, pyt.rx, 6, 0, 0, Math.PI * 2);
+        ctx.ellipse(pyt.x + pyt.rx * 0.55, y + 1, pyt.rx * 0.45, 5, 0, 0, Math.PI * 2);
+        ctx.ellipse(pyt.x - pyt.rx * 0.6, y - 1, pyt.rx * 0.35, 4.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        var g = ctx.createLinearGradient(pyt.x - pyt.rx, 0, pyt.x + pyt.rx, 0);
+        g.addColorStop(0, "rgba(255, 170, 220, 0)");
+        g.addColorStop(0.35, "rgba(170, 220, 255, 0.35)");
+        g.addColorStop(0.6, "rgba(255, 240, 150, 0.3)");
+        g.addColorStop(1, "rgba(255, 170, 220, 0)");
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.ellipse(pyt.x - pyt.rx * 0.1, y - 1, pyt.rx * 0.6, 2.2, 0, 0, Math.PI * 2);
+        ctx.fill();
         ctx.restore();
     };
 

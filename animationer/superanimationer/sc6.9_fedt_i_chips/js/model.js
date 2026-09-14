@@ -42,7 +42,12 @@
 
     /* knust: 0-1. Pistillens samlede vej (tegneenheder) giver fuld
        knusning; under min kan chipsene ikke haeldes over. */
-    var KNUS = { min: 0.5, vej: 2600, voldsom: 2600, krummeMasse: 0.02, maksKrummer: 8, amok: 3200, amokTid: 0.8, spildMasse: 0.03 };
+    var KNUS = { min: 0.5, vej: 2600, voldsom: 2600, krummeMasse: 0.02, maksKrummer: 8, amok: 3200, amokTid: 0.8, spildMasse: 0.03,
+                 skaalFart: 4600, skaalTid: 0.35 };
+
+    /* Paaskeaeg: saa mange sekunder kan heptanflasken holdes, foer den
+       glider ud af haanden */
+    var TAB = { heptanTid: 8 };
 
     /* tid: roeretid i sekunder. Uden roering sker der kun lidt (diffusion). */
     var ROER = { tau: 1.5, min: 0.5, faerdig: 0.95, diffusion: 0.04, fuld: 450 };
@@ -139,6 +144,7 @@
         SKAAL: SKAAL,
         BRAND: BRAND,
         VOLUMEN: VOLUMEN,
+        TAB: TAB,
         FARVE: FARVE,
         roerGrad: roerGrad,
         ekstraktion: ekstraktion,

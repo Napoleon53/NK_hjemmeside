@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="168" height="192" viewBox="0 0 84 96">
+  <!-- Papkasse til glasaffald. Aabningens midte (ankeret) er (42, 12). -->
+  <defs>
+    <linearGradient id="pap" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#9c7447"/>
+      <stop offset="0.4" stop-color="#c9996a"/>
+      <stop offset="1" stop-color="#8a6538"/>
+    </linearGradient>
+  </defs>
+  <!-- Kassen -->
+  <path d="M6 12 L78 12 L76 93 Q76 96 73 96 L11 96 Q8 96 8 93 Z" fill="url(#pap)" stroke="#7a5630" stroke-width="1"/>
+  <path d="M6 12 L78 12 L75 19 L9 19 Z" fill="#3a2a18"/>
+  <!-- Flapper -->
+  <path d="M6 12 L0 2 L30 5 L36 12 Z" fill="#b88a5a" stroke="#7a5630" stroke-width="0.8"/>
+  <path d="M78 12 L84 2 L54 5 L48 12 Z" fill="#b88a5a" stroke="#7a5630" stroke-width="0.8"/>
+  <!-- Tape og maerkat -->
+  <rect x="38" y="19" width="8" height="77" fill="#d8b98a" fill-opacity="0.6"/>
+  <rect x="15" y="34" width="54" height="42" rx="3" fill="#f4efe4" stroke="#7a5630" stroke-width="0.8"/>
+  <g font-family="Segoe UI, Arial, sans-serif" font-weight="800" fill="#2a2f36" text-anchor="middle">
+    <text x="42" y="47" font-size="8.5">GLAS</text>
+    <text x="42" y="57" font-size="8.5">AFFALD</text>
+  </g>
+  <g fill="#8fb3c9" stroke="#46677a" stroke-width="0.6">
+    <path d="M30 70 L35 61 L38 70 Z"/>
+    <path d="M40 71 L44 62 L49 68 Z"/>
+    <path d="M51 70 L54 64 L56 71 Z"/>
+  </g>
+</svg>

@@ -35,6 +35,9 @@
         laererHoved:  { fil: "laerer_hoved.svg", b: 110, h: 130 },
         laererArm:    { fil: "laerer_arm.svg", b: 56, h: 150 },
         brandtaeppe:  { fil: "brandtaeppe.svg", b: 150, h: 100 },
+        kost:         { fil: "kost.svg", b: 130, h: 56 },
+        fejeblad:     { fil: "fejeblad.svg", b: 120, h: 54 },
+        glasaffald:   { fil: "glasaffald.svg", b: 84, h: 96 },
         haand:        { fil: "haand.svg", b: 96, h: 84 },
         lup:          { fil: "lup.svg", b: 40, h: 40 }
     };

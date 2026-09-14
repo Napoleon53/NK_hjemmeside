@@ -365,8 +365,8 @@ function koerTest() {
     paastand("almindelig knusning med musen kalder ikke paa laereren", !f.laerer.scene);
     nyt();
     afvej();
-    for (i = 0; i < 500 && !(f.laerer.scene && f.laerer.scene.navn === "morter"); i++) { f.arbejdKilde = "mus-knus"; f.knus(60, 5000); f.opdater(1 / 60); }
-    paastand("morteren: vedvarende amok kalder laereren ind", f.laerer.scene && f.laerer.scene.navn === "morter" && f.antalAmok === 1, i + " billeder");
+    for (i = 0; i < 500 && !(f.laerer.scene && f.laerer.scene.navn === "morter"); i++) { f.arbejdKilde = "mus-knus"; f.knus(60, 4000); f.opdater(1 / 60); }
+    paastand("morteren: vedvarende amok kalder laereren ind, skaalen holder", f.laerer.scene && f.laerer.scene.navn === "morter" && f.antalAmok === 1 && !f.oprydning, i + " billeder");
     paastand("knusningen stoppes, og scenen er laast", !f.arbejdKilde && f.laererOptaget());
     vent(function () { return !f.laerer.scene; }, 15);
     paastand("laereren er gaaet igen", !f.laerer.scene && f.laerer.x < -200);
@@ -398,6 +398,69 @@ function koerTest() {
     for (i = 0; i < 5; i++) { f.klik("laerer"); adv(0.4); }
     paastand("fem klik paa laereren: damp af oererne, og laereren gaar", f.laerer.damp > 0 && f.laerer.scene && f.laerer.scene.navn === "gaaUd");
     vent(function () { return !f.laerer.scene; }, 10);
+
+    overskrift("7b. Petriskaalen og heptanflasken");
+    function knusVildt() {
+        for (var k = 0; k < 400 && !f.oprydning; k++) { f.arbejdKilde = "mus-knus"; f.knus(60, 5200); f.opdater(1 / 60); }
+        return k;
+    }
+    nyt();
+    afvej();
+    i = knusVildt();
+    paastand("helt urimelig knusning knuser petriskaalen, foer laereren kommer", !!f.oprydning && !f.laerer.scene, i + " billeder");
+    adv(3);
+    var op = f.oprydning;
+    paastand("skaalen er knust, skaar paa bordet og to oprydningstrin", !!op && f.g.skaal.sted === "knust" && op.skaar.length >= 15 && op.trin === "fej" && f.oprydningListe().length === 2);
+    NK.opdaterPanel();
+    paastand("panelet viser Oprydning", d.getElementById("forloeb-titel").textContent === "Oprydning");
+    paastand("resten af forsoeget venter", f.klik("morter") === false && f.arbejdKnap(true) === false && !f.kanTraekke("heptan"));
+    var ko = op.redskaber.kost;
+    var greb = NK.tilVerden(ko.p, ko.anker, 65, 28);
+    paastand("kosten kan tages", f.hvad(greb) === "kost" && f.ned(greb) === true);
+    var minX = Infinity;
+    op.skaar.forEach(function (s) { minX = Math.min(minX, s.x); });
+    var gdx = greb.x - ko.p.x, gdy = greb.y - ko.p.y;
+    var fraX = minX - 50, tilX = op.redskaber.fejeblad.p.x + 20;
+    f.flyt({ x: fraX + gdx, y: S.BORD + gdy }, Date.now());
+    for (i = 1; i <= 40; i++) {
+        f.flyt({ x: fraX + (tilX - fraX) * i / 40 + gdx, y: S.BORD + gdy }, Date.now());
+        f.opdater(1 / 60);
+    }
+    f.op();
+    adv(0.5);
+    var fejet = op.skaar.filter(function (s) { return s.fejet; }).length;
+    paastand("kosten traekkes og fejer skaarene i fejebladet", fejet >= op.skaar.length - 3 || op.trin === "aflever", fejet + "/" + op.skaar.length);
+    if (op.trin === "fej") { f.klik("kost"); adv(6); }
+    paastand("alle skaar i fejebladet: naeste trin", op.trin === "aflever");
+    adv(2);
+    paastand("glasaffaldet tager imod", f.klik("glasaffald") === true);
+    adv(6);
+    paastand("ny petriskaal, og pistillen er tilbage i morteren", !f.oprydning && f.g.skaal.sted === "hjem" && !f.handling && Math.abs(f.g.pistil.p.x - f.g.pistil.hjem.x) < 1);
+    paastand("chipsene er stadig i morteren", f.gjort.afvej && !f.gjort.overfoer && f.stykker.length > 0);
+    knusVildt();
+    adv(3);
+    f.klik("kost"); adv(6);
+    f.klik("glasaffald"); adv(6);
+    paastand("anden knuste skaal: laereren fører regnskab", f.antalSkaalKnust === 2 && f.laerer.scene && f.laerer.scene.navn === "skaal");
+    vent(function () { return !f.laerer.scene; }, 15);
+
+    nyt();
+    var hq = f.g.heptan.p, hqx = hq.x, hqy = hq.y + 50;
+    f.ned({ x: hqx, y: hqy });
+    for (i = 0; i < 60; i++) { f.flyt({ x: 600 + Math.sin(i * 0.4) * 120, y: 300 + Math.cos(i * 0.3) * 60 }, Date.now()); f.opdater(1 / 15); }
+    paastand("heptanflasken holdt i 4 s: intet sker", !f.heptanSpild && !!f.holdt);
+    for (i = 0; i < 80 && !f.heptanSpild; i++) { f.flyt({ x: 600 + Math.sin(i * 0.4) * 120, y: 300 }, Date.now()); f.opdater(1 / 15); }
+    paastand("efter 8 s glider flasken ud af haanden", !!f.heptanSpild && !f.holdt, (4 + i / 15).toFixed(1) + " s");
+    f.op();
+    vent(function () { return f.heptanSpild && f.heptanSpild.fase !== "falder"; }, 5);
+    paastand("flasken knuses paa gulvet med skaar og en pyt", f.g.heptan.skjult && !!f.heptanSpild.pyt && f.heptanSpild.skaar.length > 10);
+    adv(1);
+    paastand("laereren kommer og rydder op", f.laerer.scene && f.laerer.scene.navn === "heptan" && f.laererOptaget());
+    paastand("imens kan intet bruges", f.kanTraekke("vand") === false && f.klik("pose") === false);
+    vent(function () { return !f.heptanSpild; }, 25);
+    adv(2);
+    paastand("ryddet op, og en ny heptanflaske staar paa plads", !f.heptanSpild && !f.g.heptan.skjult && Math.abs(f.g.heptan.p.x - f.g.heptan.hjem.x) < 1 && !f.laerer.scene);
+    paastand("den nye flaske kan bruges", f.kanTraekke("heptan"));
 
     overskrift("8. Quizzen");
     paastand("ti spoergsmaal", NK.QUIZ.length === 10);

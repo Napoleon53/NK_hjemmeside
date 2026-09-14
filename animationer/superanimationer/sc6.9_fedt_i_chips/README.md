@@ -84,6 +84,17 @@ kan skifte. Armen drejer om skulderen. Alt står i `js/laerer.js`.
   musen (`KNUS.amok` og `KNUS.amokTid` i `js/model.js`), kommer læreren og er
   sarkastisk ("Det er en morter. Ikke et trommesæt."). Replikkerne skifter fra
   gang til gang. Knappen Knus kalder aldrig på læreren.
+* **Den knuste petriskål.** Knuses der helt urimeligt voldsomt (`KNUS.skaalFart`
+  i `KNUS.skaalTid` sekunder, over amok-grænsen), glider pistillen ud af hånden
+  og knuser petriskålen ved siden af morteren. Panelet skifter til
+  **Oprydning**: fej skårene op (træk kosten, eller klik på den), og tøm
+  fejebladet i glasaffaldet. Så kommer en ny petriskål, pistillen kommer tilbage
+  i morteren, og forsøget fortsætter. Anden gang siger læreren, at der føres
+  regnskab.
+* **Heptanflasken på gulvet.** Holdes heptanflasken i mere end 8 sekunder
+  (`TAB.heptanTid`), glider den ud af hånden og knuses på gulvet. Heptanen
+  damper af pytten, læreren kommer med en spids bemærkning, fejer op og stiller
+  en ny flaske på bordet.
 * **Lærerens kaffe.** Koppen på hylden. Læreren henter den og drikker.
 * **Vandflasken.** Holdes vandflasken i mere end 1 sekund, før der er valgt
   opløsningsmiddel, kigger læreren ind: "Jeg håber ikke, at du har tænkt dig at
@@ -123,6 +134,8 @@ ankerpunkt (i `S.ANKER` i `js/scene.js`), som den drejes om.
 | `kaffekop.svg` | lærerens kop | bunden (18, 40) |
 | `laerer_krop.svg`, `laerer_hoved.svg`, `laerer_arm.svg` | læreren | halsen (110, 18) og (55, 126); skulderen (28, 142) |
 | `brandtaeppe.svg` | brandtæppe | toppen (75, 6) |
+| `kost.svg`, `fejeblad.svg` | kost og fejeblad, som i sc2.6 | børsterne (43, 54); forkanten (4, 52) |
+| `glasaffald.svg` | papkasse til glasaffald | åbningen (42, 12) |
 | `haand.svg`, `lup.svg` | handske og lup, som i sc2.6 | grebet (40, 46) |
 
 Væsker, indholdet i petriskålen, filtrerpapir, stråler, dråber, dampe, krummer,
@@ -142,6 +155,7 @@ js/scene.js         tegnebordet (1000 x 600): mål, lokalet, udstyr, væsker
 js/mikro.js         partikelmodellen i zoomboblen
 js/forsoeg.js       trinene, tilstanden og handlingerne
 js/bord.js          tegning af bordet og styring med musen
+js/uheld.js         den knuste petriskål med oprydning og den tabte heptanflaske
 js/laerer.js        læreren, påskeæggene og branden
 js/quiz.js          quizkortet og de ti spørgsmål
 js/rundvisning.js   spotlight-rundvisningen bag ?-knappen
@@ -176,7 +190,8 @@ rækkefølgen håndhæves, at heptan giver et resultat tæt på varedeklaratione
 vand omkring 1 %, at skylning hæver resultatet, at iagttagelserne kun er
 fejlkilder og ryddes ved nyt forsøg, at beregningen og guiden godtager de rigtige
 svar og giver de rigtige hints, at brænderen kan tændes og bruges til vand, at
-heptan over flammen antændes, at påskeæggene kan gennemføres, og at der ikke er
+heptan over flammen antændes, at petriskålen kan knuses og ryddes op, at
+heptanflasken kan tabes og ryddes op af læreren, at påskeæggene kan gennemføres, og at der ikke er
 tankestreger eller 1+/1− i teksterne. Den skal åbnes gennem en lokal server:
 Chrome nægter en side på `file://` at kigge ind i sin egen iframe.
 

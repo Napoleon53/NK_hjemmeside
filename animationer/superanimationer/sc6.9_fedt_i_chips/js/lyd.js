@@ -214,6 +214,30 @@
             tone(c, nu + 0.35, 260, 160, 0.15, 0.06);
         },
 
+        plask: function () {
+            var c = klar(); if (!c) return;
+            var nu = c.currentTime;
+            filtreretStoej(c, nu, 0.4, "lowpass", 1400, 0, 0.5);
+            tone(c, nu, 140, 50, 0.2, 0.3);
+        },
+
+        fej: function () {
+            var c = klar(); if (!c) return;
+            filtreretStoej(c, c.currentTime, 0.12, "bandpass", 1600 + Math.random() * 900, 1.2, 0.18);
+        },
+
+        /* Glas, der knuses: et skarpt knaek og en regn af klirrende skaar */
+        glas: function () {
+            var c = klar(); if (!c) return;
+            var nu = c.currentTime;
+            filtreretStoej(c, nu, 0.09, "highpass", 1500, 0, 0.55);
+            for (var i = 0; i < 11; i++) {
+                var t = nu + 0.04 + i * 0.045 + Math.random() * 0.05;
+                filtreretStoej(c, t, 0.06, "bandpass", 3000 + Math.random() * 4000, 6, 0.35, function (q) { return q * q * q; });
+                tone(c, t, 2400 + Math.random() * 3600, 2300, 0.25, 0.05);
+            }
+        },
+
         succes: function () {
             var c = klar(); if (!c) return;
             tone(c, c.currentTime, 660, 662, 0.25, 0.07);
