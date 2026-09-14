@@ -50,9 +50,10 @@
     var BURET = { kapacitet: 50, draabe: 0.05, flow: 1.0, fyldMin: -2.6, fyldMax: -1.2, maksStart: 10 };
 
     /* Blanding pr. sekund uden og med rystning. synlig: den intensitet,
-       hvor en svag lyserød farve kan ses. lilla: kraftigt lilla.
-       aubergine: overskud i mL, hvor laereren kommer. */
-    var TITRER = { blanding: 0.35, rystBlanding: 7, feFart: 6, synlig: 0.05, lilla: 1.2, aubergine: 3, blivende: 2.5 };
+       hvor en svag lyserød farve kan ses. lilla og aubergine: overskud i
+       mL, hvor opløsningen er kraftigt lilla, og hvor laereren kommer.
+       blivende: sekunder farven skal holde. */
+    var TITRER = { blanding: 0.35, rystBlanding: 7, feFart: 6, synlig: 0.05, lilla: 0.6, aubergine: 3, blivende: 2.5 };
 
     var KLOR = { andel: 0.07, fald: 0.06 };
 
@@ -66,7 +67,7 @@
         syre:     { r: 226, g: 236, b: 246, a: 0.22 },
         fe2:      { r: 190, g: 226, b: 160, a: 0.4 },
         fe3:      { r: 238, g: 212, b: 112, a: 0.44 },
-        lyserod:  { r: 240, g: 120, b: 196, a: 0.5 },
+        lyserod:  { r: 246, g: 104, b: 200, a: 0.62 },
         lilla:    { r: 128, g: 28, b: 138, a: 0.9 },
         kmno4:    { r: 96, g: 16, b: 112, a: 0.96 },
         jern:     { r: 138, g: 146, b: 156, a: 1 }
@@ -223,7 +224,7 @@
         f = NK.blandFarve(f, FARVE.fe3, NK.klamp(kem.nFe3 / l / 0.04, 0, 1) * 0.8);
         var I = intensitet(kem);
         if (I > 0.004) {
-            f = NK.blandFarve(f, FARVE.lyserod, NK.klamp(I * 2.4, 0, 0.9));
+            f = NK.blandFarve(f, FARVE.lyserod, NK.klamp(I * 4, 0, 0.9));
             if (I > 0.6) f = NK.blandFarve(f, FARVE.lilla, NK.klamp((I - 0.6) / 3, 0, 1));
         }
         return f;

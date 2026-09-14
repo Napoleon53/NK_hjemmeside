@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="280" height="124" viewBox="0 0 140 62">
-  <!-- Digital vaegt med 0,01 g opløsning. Vejeskaalens overside er y 0.
+  <!-- Digital vaegt med 0,001 g opløsning. Vejeskaalens overside er y 0.
        Displayet (tegnes af animationen) er x 22-92, y 30-50. -->
   <defs>
     <linearGradient id="krop" x1="0" y1="0" x2="0" y2="1">
@@ -24,5 +24,5 @@
   <!-- Knap -->
   <rect x="102" y="33" width="26" height="14" rx="3" fill="#3d7fc4" stroke="#2a5d93" stroke-width="0.8"/>
   <text x="115" y="43" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="6.5" font-weight="700" fill="#ffffff">TARA</text>
-  <text x="115" y="57" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="5" font-weight="600" fill="#5b646f">d = 0,01 g</text>
+  <text x="115" y="57" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="5" font-weight="600" fill="#5b646f">d = 0,001 g</text>
 </svg>

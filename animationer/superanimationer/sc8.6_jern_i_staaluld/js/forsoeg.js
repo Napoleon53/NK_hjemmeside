@@ -597,7 +597,7 @@
             { kald: function () {
                 this.straale = null;
                 if (overloeb) {
-                    if (!this.plet) this.plet = { x: S.FLISE.x1 + 10, y: S.BORD - 1, styrke: 0 };
+                    if (!this.plet) this.plet = { x: B.x + 18, y: S.STATIV.y - 1, styrke: 0 };
                     this.plet.maal = 1;
                     if (this.laererOverloeb) this.laererOverloeb();
                 }
@@ -640,10 +640,11 @@
         if (b.aaben) { this.besked("Hanen er åben."); return false; }
         if (this.vSlut !== null) { this.besked("Titreringen er færdig."); return false; }
         if (this.vStart !== null && this.g.kolbe.sted !== "buret") { this.besked("Stil kolben under buretten først."); this.markér("kolbe", 3); return false; }
-        if (this.tid - this.sidsteDraabe < 0.12) return false;
+        if (this.tid - (this.sidsteKnap || -99) < 0.12) return false;
         if (b.V + M.BURET.draabe > 50) { this.besked("Buretten er tom."); return false; }
         b.V += M.BURET.draabe;
         this.sidsteDraabe = this.tid;
+        this.sidsteKnap = this.tid;
         this.draaber.push({ x: B.x, y: B.spids + 2, vy: 30, r: 2.2, ml: M.BURET.draabe, til: this.destination() });
         this.aendret("draabe");
         return true;
@@ -675,7 +676,7 @@
             if (I < M.TITRER.synlig) { this.besked("Kolben er ikke lyserød. Titreringen er ikke færdig."); return false; }
             if (!this.gjort.titrer) { this.besked("Vent et øjeblik, og se, om farven bliver."); return false; }
             this.vSlut = M.aflaes(b.V);
-            if (I > M.TITRER.lilla) this.iagttag("lilla");
+            if (M.overskudMl(this.kem) > M.TITRER.lilla) this.iagttag("lilla");
             this.maal("slut", this.vSlut);
             if (NK.Lyd) NK.Lyd.bip();
             this.aendret("slut");

@@ -57,10 +57,10 @@
     S.UR = { x: 214, y: 122, r: 24 };
 
     /* Buretten: aflaesning V i mL, 0 foroven og 50 forneden */
-    S.BURET = { x: 876, top: 112, nul: 126, prMl: 3.8, kegle: 324, hane: 334, haneBund: 352, spids: 364, halv: 7 };
+    S.BURET = { x: 888, top: 112, nul: 126, prMl: 3.8, kegle: 324, hane: 334, haneBund: 352, spids: 364, halv: 7 };
     S.BURET.bund = S.BURET.nul + 50 * S.BURET.prMl;
-    S.STATIV = { stang: 812, top: 70, x0: 784, x1: 940, y: 492 };
-    S.FLISE = { x0: 830, x1: 922, y: 486 };
+    S.STATIV = { stang: 824, top: 70, x0: 796, x1: 944, y: 492 };
+    S.FLISE = { x0: 842, x1: 934, y: 486 };
 
     S.HJEM = {
         staaluld:  staar("staaluld", 72),
@@ -69,18 +69,18 @@
         kolbe:     staar("kolbe", 604),
         svovlsyre: staar("svovlsyre", 478),
         saltsyre:  staar("saltsyre", 528),
-        kmno4:     staar("kmno4", 968),
+        kmno4:     staar("kmno4", 971),
         affald:    staar("baegerglas", S.BURET.x, S.FLISE.y),
         kaffekop:  staar("kaffekop", 122, S.HYLDE.y)
     };
-    S.AFFALD_PARKERET = staar("baegerglas", S.STATIV.stang, S.STATIV.y);
+    S.AFFALD_PARKERET = staar("baegerglas", 806);
     S.PAA_PLADE = staar("kolbe", S.PLADE.midt, S.PLADE.y);
     S.UNDER_BURET = staar("kolbe", S.BURET.x, S.FLISE.y);
 
     /* Zoomboblen: over det aabne bord, i stinkskabet eller ved buretten */
     S.BOBLE = {
         ude:   { x: 300, y: 205, r: 96 },
-        skab:  { x: 560, y: 238, r: 96 },
+        skab:  { x: 560, y: 222, r: 96 },
         buret: { x: 690, y: 236, r: 96 }
     };
 

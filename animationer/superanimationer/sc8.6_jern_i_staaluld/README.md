@@ -1,0 +1,158 @@
+# sc8.6 Jern i ståluld
+
+En superanimation: i modsætning til de øvrige animationer, som er én enkelt
+HTML-fil, ligger denne i sin egen mappe med adskilt CSS, JavaScript og sprites.
+
+Åbn **`index.html`**. Mappen er selvstændig og henter kun filer inde fra sig
+selv, så den kan flyttes uden at der knækker noget.
+
+Den afløser `animationer/kemi-c-filer/c8.6_redox_titrering_jernindhold.html`,
+som nu ligger i
+`animationer/kemi-c-filer/arkiv/c8.6_redox_titrering_jernindhold_oldversion.html`.
+Knappen i `samling_c8.html` peger direkte på denne `index.html`. Delte links går
+via `samling_alt.html?emne=c8.6` og er derfor ikke berørt af flytningen.
+
+## Hvad viser den
+
+Eleven bestemmer jernindholdet i ståluld, som i laboratoriet: afvej ca. 0,1 g
+ståluld, opløs den i syre på varmepladen, fyld buretten med 0,0200 M
+kaliumpermanganat, aflæs den, titrer til en svag, blivende lyserød farve, aflæs
+igen og beregn jernindholdet i procent. Resultatet sammenlignes med, at ståluld
+typisk er 98,5 % jern.
+
+* **En rigtig opstilling.** Et åbent laboratoriebord med ståluld og vægt, et
+  stinkskab med svovlsyre, saltsyre, kolbe og varmeplade, og en titreropstilling
+  med stativ, buret, hvid flise, affaldsbæger og flasken med KMnO₄. Genstandene
+  bruges ved at klikke på dem eller trække dem derhen, hvor de skal bruges.
+* **Eleven vælger syren.** Der er ingen forklaring før valget. Med svovlsyre
+  bliver resultatet omkring 98,5 %. Med saltsyre oxiderer permanganat også
+  chlorid: der bruges for meget KMnO₄, den lyserøde farve forsvinder igen, og
+  resultatet bliver over 100 %.
+* **Opløsningen kræver varme.** I kold syre opløses stålulden meget langsomt.
+  På varmepladen tager det ca. 8 sekunder. Stilles kolben under buretten, før
+  alt er opløst, bliver resultatet for lavt.
+* **Buretten.** Når den fyldes, står menisken over nulstregen. Eleven tapper af
+  gennem hanen ned i affaldsbægeret og klikker på buretten for at aflæse.
+  Aflæsningen har sidste ciffer 0 eller 5. Fyldes en fuld buret igen, løber den
+  over.
+* **Titreringen.** Hanen åbnes og lukkes med et klik, knappen **Dråbe** (tasten D)
+  giver én dråbe, og kolben rystes ved at tage fat i den og bevæge musen eller
+  ved at holde knappen **Ryst** (tasten R) nede. Hver dråbe lander som en lilla
+  sky. Så længe der er meget Fe²⁺, forsvinder skyen straks; tæt på endepunktet
+  bliver den hængende, især uden rystning. Endepunktet er nået, når farven har
+  holdt i 2,5 sekunder. Modellen står i `js/model.js`.
+* **Zoomboblen følger indholdet.** Jernatomer i et metalgitter, syren der
+  oxiderer jernet til Fe²⁺ og danner H₂, MnO₄⁻ der tager én elektron fra hver af
+  fem Fe²⁺ og bliver til Mn²⁺, overskud af MnO₄⁻ ved endepunktet, Cl₂ i saltsyre,
+  og burettens skala tæt på, når den skal aflæses.
+* **Iagttagelser er fejlkilder.** Kun det, der kan forklare et resultat, bliver
+  noteret: ståluld der ikke var opløst, opløsning der skvulpede ud, klorlugt, en
+  lyserød farve der forsvandt igen, og en kraftigt lilla opløsning ved
+  aflæsningen. Listen hører til det aktuelle forsøg og ryddes ved nyt forsøg.
+* **Måleskema og beregning.** Massen og aflæsningerne skrives ind i skemaet.
+  Eleven skriver selv jernindholdet. Et forkert svar giver et hint, der passer
+  til fejlen: brøkdel i stedet for procent, massen i gram, slutaflæsningen i
+  stedet for det forbrugte volumen, glemt faktor 5, divideret med 5, mL i stedet
+  for L, eller divisionen vendt om.
+* **Hjælp til beregningen.** Knappen åbner en guide i fem trin: forbrugt volumen,
+  n(MnO₄⁻), n(Fe²⁺), m(Fe) og jernindholdet. Hvert trin tjekkes mod elevens eget
+  svar i trinnet før, og små tal kan skrives som 0,000356 eller 3,56·10^-4.
+* **Flere forsøg.** Nyt forsøg starter forfra. Tidligere resultater bliver
+  stående, så forsøgene kan sammenlignes.
+* **Quiz** med ti spørgsmål, låst op når jernindholdet er beregnet i et forsøg
+  med svovlsyre.
+
+## Påskeæggene
+
+Læreren er den samme som i sc6.9 og står i `js/laerer.js`.
+
+* **Lærerens kaffe.** Koppen på hylden.
+* **Læreren klikkes på.** Stadig kortere svar, rødere i hovedet og til sidst
+  damp af ørerne.
+* **Kolben rystes voldsomt** med musen (`RYST.amok` og `RYST.amokTid` i
+  `js/model.js`): noget skvulper ud, og læreren kommer ("Det er en titrerkolbe.
+  Ikke en cocktailshaker."). Replikkerne skifter. Knappen Ryst kalder aldrig på
+  læreren.
+* **Buretten løber over.** Fyldes den, mens den er fuld, kommer læreren og peger
+  på regel 3 på plakaten. Pletten på bordet bliver stående resten af sessionen.
+* **Langt forbi endepunktet** (`TITRER.aubergine`): "Svagt lyserød. Ikke
+  aubergine."
+* **Over 100 %.** Læreren er skeptisk, og tredje gang kommer et lille vink om
+  syren.
+* **Et godt resultat.** Ligger et resultat med svovlsyre mellem 96 og 100,5 %,
+  siger læreren "Rustfrit."
+
+## Sprites
+
+Alle ligger i `sprites/` som SVG og tegnes med `drawImage`. Hver genstand har et
+ankerpunkt (i `S.ANKER` i `js/scene.js`), som den drejes om.
+
+| Fil | Indhold | Anker og mål, som koden bruger |
+|-----|---------|-------------------------------|
+| `staaluld.svg` | en pude ståluld på papir | bundens midte (45, 50) |
+| `vaegt.svg` | digital vægt, d = 0,001 g | vejeskålen y 0, displayet x 22 til 92 og y 30 til 50 |
+| `vejebaad.svg` | vejebåd | bundens midte (32, 14) |
+| `kolbe.svg` | konisk kolbe 250 mL, som i sc2.6, tegnet 96 x 128 | åbningen (48, 2,5); inderside i `S.KOLBE_INDRE` |
+| `baegerglas.svg` | affaldsbægeret | tuden (68, 3); inderside i `S.BAEGER_INDRE` |
+| `flaske_svovlsyre.svg`, `flaske_saltsyre.svg` | 1 M H₂SO₄ med GHS07, 2 M HCl med GHS05 | åbningen (23, 4); låget tegnes i koden |
+| `flaske_kmno4.svg` | brun flaske med 0,0200 M KMnO₄ | åbningen (23, 4) |
+| `varmeplade.svg` | varmeplade | displayet x 10 til 40, lampen (52, 20) |
+| `kaffekop.svg` | lærerens kop | bunden (18, 40) |
+| `laerer_krop.svg`, `laerer_hoved.svg`, `laerer_arm.svg` | læreren | halsen (110, 18) og (55, 126); skulderen (28, 142) |
+| `haand.svg`, `lup.svg` | handske og lup | grebet (40, 46) |
+
+Buretten, stativet, flisen, væsker, ståluld i vejebåden og kolben, bobler,
+dråber, den lilla sky, dampe, pletten, lokalet, stinkskabet, lærerens ansigt og
+zoomboblen tegnes i koden. Ændres en sprite, skal tallene i `scene.js` passe.
+
+## Filer
+
+```
+index.html          markup: scene, panel, måleskema, guide, teori, rundvisning
+css/stil.css        alt udseende. NB: decimaltal med PUNKTUM i CSS
+js/kerne.js         NK-navnerum, ion-notation, positurer, væskeniveau
+js/model.js         kemien og tallene: opløsning, titrering, farve, beregning, hints
+js/lyd.js           lydene med Web Audio, ingen lydfiler
+js/sprites.js       indlæser SVG'erne og tegner dem drejet om et anker
+js/scene.js         tegnebordet (1000 x 600): mål, lokalet, udstyr, buret, væsker
+js/mikro.js         partikelmodellen i zoomboblen
+js/forsoeg.js       trinene, tilstanden og handlingerne
+js/bord.js          tegning af bordet og styring med musen
+js/laerer.js        læreren og påskeæggene
+js/quiz.js          quizkortet og de ti spørgsmål
+js/rundvisning.js   spotlight-rundvisningen bag ?-knappen
+js/app.js           panel, måleskema, guiden, knapper, tastatur, tegneløkke
+_selvtest.html      udviklerværktøj, indgår ikke i animationen
+```
+
+## At rette i den
+
+**Kemien og tallene** står i `js/model.js`: jernindholdet i stålulden
+(`STAALULD`), afvejningen (`AFVEJ`), syrerne (`SYRER`), opløsningens fart
+(`OPLOES`), buretten (`BURET`), blanding og endepunkt (`TITRER`), chloridets
+bivirkning (`KLOR`), rystningen (`RYST`) og tjekket af elevens svar.
+
+**Trinene** står i `TRIN` øverst i `js/forsoeg.js` med tekst, hint og hvilken
+genstand hintet markerer. Hvornår et trin er gjort, afgøres i `trinGjort`.
+**Iagttagelserne** står i `IAGTTAGELSER` samme sted.
+
+**Koreografierne** (`koer` i `forsoeg.js`) er lister af trin: `flyt` en genstand
+til en positur, vent med `hver` og gør noget undervejs, eller `kald` en
+funktion. Lærerens scener (`laererKoer` i `laerer.js`) virker på samme måde med
+`gaa`, `sig`, `arm` og `udtryk`.
+
+**Guiden** til beregningen står i `js/app.js` (`aabnGuide`, `guideTjek`) med
+tolerancer og hints for hvert af de fem trin.
+
+**`_selvtest.html`** åbner `index.html` i en iframe og kører forsøget igennem:
+at alle sprites indlæses, at modellen giver de forventede resultater, at
+rækkefølgen håndhæves, at svovlsyre giver ca. 98,5 % og saltsyre over 103 %,
+at fejlkilderne noteres og ryddes ved nyt forsøg, at beregningen og guiden
+godtager de rigtige svar og giver de rigtige hints, at zoomboblen tæller rigtigt,
+at påskeæggene kan gennemføres, at scenen kan tegnes i alle faser, og at der
+ikke er tankestreger eller 1+/1− i teksterne. Den skal åbnes gennem en lokal
+server: Chrome nægter en side på `file://` at kigge ind i sin egen iframe.
+
+Genveje: hold <kbd>R</kbd> ryst · <kbd>D</kbd> dråbe · <kbd>O</kbd> åbn og luk
+hanen · <kbd>I</kbd> hint · <kbd>N</kbd> nyt forsøg · <kbd>T</kbd> teori ·
+<kbd>M</kbd> lyd · <kbd>H</kbd> rundvisning · <kbd>Esc</kbd> luk.
