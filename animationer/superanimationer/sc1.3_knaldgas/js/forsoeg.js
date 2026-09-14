@@ -11,8 +11,11 @@
 
    Molekylerne i glasset er ikke pynt: hver streg gas er 2 molekyler,
    og efter knaldet dannes praecis det vand, som model.js regner ud.
-   Vandet farer ud af aabningen og ud i rummet; overskuddet bliver i
-   glasset, saa man ved 5 : 1 ser H2 blive tilbage.
+   Varmen fordeles paa faa nanosekunder paa alle molekyler, saa vand og
+   overskud faar samme temperatur, og ved samme temperatur bevaeger de
+   lette molekyler sig hurtigst (se termisk()). Den varme gas udvider
+   sig, og en del af ALLE molekyler stroemmer ud af aabningen. H2
+   kommer hurtigst ud.
 
    Paaskeaeg: ved det helt rigtige forhold, 4 : 2, knaekker glasset i
    10 % af forsoegene (knaekChance). Saa bliver Genfyld glasset til
@@ -30,7 +33,23 @@
     var FYLD_TID = 0.9;            /* sekunder om at fylde glasset med vand igen */
     var GENFYLD_VENT = 0.7;        /* sekunder efter knaldet, foer glasset kan genfyldes */
 
+    /* Varmebevaegelse. Ved samme temperatur har molekylerne i gennemsnit
+       samme kinetiske energi, saa farten er omvendt proportional med
+       kvadratroden af molmassen: sqrt(18/2) = 3 for H2, 1 for H2O og
+       sqrt(18/32) = 0,75 for O2. RUM_FART er middelfarten for H2O ved
+       stuetemperatur, i tegneenheder pr. sekund. */
+    var MASSEFAKTOR = { h2: Math.sqrt(18 / 2), h2o: 1, o2: Math.sqrt(18 / 32) };
+    var RUM_FART = 30;
+    var VARM_FAKTOR = 9;           /* ved det kraftigste knald stiger T ca. 10 gange */
+    var UDSTROEM_TID = 0.5;        /* sekunder, den varme gas stroemmer ud af aabningen */
+
     function r(a, b) { return a + Math.random() * (b - a); }
+
+    /* Tilfaeldig fart med middelvaerdi 1: Maxwell-Boltzmann-fordelingen
+       i to dimensioner (Rayleigh-fordelingen), klippet ved 3. */
+    function fordeling() {
+        return Math.min(3, 0.798 * Math.sqrt(-2 * Math.log(1 - Math.random())));
+    }
 
     NK.Forsoeg = function (canvas) {
         this.canvas = canvas;
@@ -74,6 +93,8 @@
         this.venter = { h2: 0, o2: 0 };
         this.spawnUr = 0;
         this.varme = 0;
+        this.udstroem = 0;
+        this.udstroemFart = 0;
         this.flow = { h2: 0, o2: 0 };
         this.front = -1;
         this.frontAlfa = 0;
@@ -256,7 +277,11 @@
             this.frontAlfa = 1;
             this.ryst = 16 * styrke;
             this.rekylFart = -320 * styrke;
-            this.varme = 1;
+            this.varme = styrke;
+            /* Den varme gas udvider sig og skubber indholdet mod aabningen:
+               i alt 90-180 enheder af glassets 240, mere jo varmere. */
+            this.udstroem = UDSTROEM_TID;
+            this.udstroemFart = 2 * 240 * (0.25 + 0.5 * styrke) / UDSTROEM_TID;
             this.omdan(rx);
         }
 
@@ -269,8 +294,8 @@
         this.aendret("knald");
     };
 
-    /* Det, der har reageret, bliver til vand. Vandet presses ud af
-       aabningen; overskuddet bliver i glasset. */
+    /* Det, der har reageret, bliver til vand, og alle molekyler - nye
+       som gamle - faar straks den nye temperatur. */
     P.omdan = function (rx) {
         var brugtH2 = rx.h2Brugt, brugtO2 = rx.o2Brugt;
         var pladser = [];
@@ -281,35 +306,45 @@
             if (m.type === "h2" && brugtH2 > 0) { brugtH2--; pladser.push(m); this.molekyler.splice(i, 1); }
             else if (m.type === "o2" && brugtO2 > 0) { brugtO2--; pladser.push(m); this.molekyler.splice(i, 1); }
         }
-        for (i = 0; i < this.molekyler.length; i++) {
-            this.molekyler[i].vx *= 3;
-            this.molekyler[i].vy *= 3;
-        }
         for (i = 0; i < rx.h2o; i++) {
             var fra = pladser[i % Math.max(1, pladser.length)] || { x: G.MIDT, y: 150 };
-            var v = Math.PI / 2 + r(-1.1, 1.1), fart = r(380, 620);
             this.molekyler.push({
                 type: "h2o", x: NK.klamp(fra.x + r(-6, 6), G.V + 12, G.HO - 12), y: fra.y + r(-6, 6),
-                vx: Math.cos(v) * fart, vy: Math.sin(v) * fart, a: r(0, 6.28), va: r(-8, 8),
-                alfa: 1, doer: false, ud: true
+                vx: 0, vy: 0, a: r(0, 6.28), va: r(-4, 4), alfa: 1, doer: false
             });
+        }
+        var grund = RUM_FART * Math.sqrt(1 + VARM_FAKTOR * this.varme);
+        for (i = 0; i < this.molekyler.length; i++) {
+            m = this.molekyler[i];
+            m.fk = fordeling();
+            var v = r(0, Math.PI * 2), fart = grund * MASSEFAKTOR[m.type] * m.fk;
+            m.vx = Math.cos(v) * fart;
+            m.vy = Math.sin(v) * fart;
         }
         for (i = 0; i < rx.h2o * 3; i++) {
             this.dug.push({ x: r(G.V + 4, G.HO - 4), y: r(G.TOP + 6, G.STREG6), r: r(1.1, 2.6), alfa: r(-1.2, -0.4), doer: false });
         }
     };
 
-    /* Et molekyle forlader glasset og flyver videre ude i rummet. */
-    P.frigoer = function (m, g, knust) {
+    /* Et molekyle forlader glasset og flyver videre ude i rummet.
+       Farten er delt i to: varmebevaegelsen (vx, vy), som er molekylets
+       egen, og stroemningen (dx, dy), som er ens for alle og bremses af
+       luften. udFart gemmes, saa selvtesten kan se, hvem der kom
+       hurtigst ud. */
+    P.frigoer = function (m, g, drift, knust) {
         var p = S.glasTilBord(g, m.x, m.y);
         var c = Math.cos(g.vinkel), s = Math.sin(g.vinkel);
-        var vx = m.vx * c - m.vy * s, vy = m.vx * s + m.vy * c;
-        this.fri.push({
+        var fm = {
             type: m.type, x: p.x, y: p.y,
-            vx: vx + (knust ? r(-260, 260) : r(-320, 320)),
-            vy: knust ? vy * 0.6 + r(-300, 100) : vy * 0.55,
-            a: m.a, va: m.va, alfa: m.alfa, liv: r(2.8, 4.2)
-        });
+            vx: m.vx * c - m.vy * s, vy: m.vx * s + m.vy * c,
+            dx: knust ? r(-250, 250) : -drift * s + drift * r(-0.7, 0.7),
+            dy: knust ? r(-300, 60) : drift * c * r(0.5, 0.9),
+            fk: m.fk, varme: this.varme,
+            a: m.a, va: m.va, alfa: m.alfa, liv: r(2.8, 4.2),
+            udTid: this.tid - this.knaldTid
+        };
+        fm.udFart = Math.sqrt((fm.vx + fm.dx) * (fm.vx + fm.dx) + (fm.vy + fm.dy) * (fm.vy + fm.dy));
+        this.fri.push(fm);
     };
 
     /* Paaskeaegget: glasset springer i stumper. */
@@ -317,7 +352,7 @@
         var g = { x: this.glas.x, y: this.glas.y + this.rekyl, vinkel: this.glas.vinkel };
         var i, j;
         this.knust = true;
-        for (i = 0; i < this.molekyler.length; i++) this.frigoer(this.molekyler[i], g, true);
+        for (i = 0; i < this.molekyler.length; i++) this.frigoer(this.molekyler[i], g, 0, true);
         this.molekyler = [];
         this.dug = [];
 
@@ -564,6 +599,7 @@
         }
 
         this.opdaterMolekyler(dt);
+        this.udstroem = Math.max(0, this.udstroem - dt);
         this.opdaterFri(dt);
         this.opdaterSkaar(dt);
         this.opdaterBobler(dt);
@@ -573,9 +609,26 @@
         this.flow.o2 = Math.max(0, this.flow.o2 - dt * 1.3);
     };
 
+    /* Varmebevaegelse for ét molekyle: retningen skifter tilfaeldigt, og
+       farten soeger mod grund * massefaktor * molekylets egen tilfaeldige
+       faktor fk. fk traekkes paa ny, naar molekylet "stoeder sammen" med
+       andre, i gennemsnit fire gange i sekundet. */
+    P.termisk = function (m, grund, dt, hast) {
+        if (m.fk === undefined || Math.random() < dt * 4) m.fk = fordeling();
+        var maal = grund * MASSEFAKTOR[m.type] * m.fk;
+        var fart = Math.sqrt(m.vx * m.vx + m.vy * m.vy);
+        var retning = fart > 0.001 ? Math.atan2(m.vy, m.vx) : r(0, Math.PI * 2);
+        retning += (Math.random() - 0.5) * 14 * dt;
+        var ny = NK.mod(fart, maal, hast, dt);
+        m.vx = Math.cos(retning) * ny;
+        m.vy = Math.sin(retning) * ny;
+    };
+
     P.opdaterMolekyler = function (dt) {
         var bund = G.TOP + this.niveau * G.STREG;
-        var grundfart = 36 + this.varme * 240;
+        var varmeFart = Math.sqrt(1 + VARM_FAKTOR * this.varme);
+        var aaben = this.udstroem > 0;
+        var drift = aaben ? this.udstroemFart * this.udstroem / UDSTROEM_TID : 0;
         var glas = { x: this.glas.x, y: this.glas.y + this.rekyl, vinkel: this.glas.vinkel };
         this.varme = Math.max(0, this.varme - dt * 0.55);
         for (var i = this.molekyler.length - 1; i >= 0; i--) {

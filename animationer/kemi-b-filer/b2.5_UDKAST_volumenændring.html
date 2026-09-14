@@ -102,7 +102,7 @@
 
     #scene { flex: 1; position: relative; min-width: 0; }
 
-    #sim { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+    #sim { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
 
     #scene-knapper {
         position: absolute;
@@ -147,7 +147,7 @@
 
     /* ---------- Højre panel ---------- */
     #panel {
-        width: 350px;
+        width: 380px;
         flex-shrink: 0;
         background: var(--panel);
         border-left: 2px solid var(--line);
@@ -173,52 +173,51 @@
         margin-bottom: 8px;
     }
 
-    /* Opgave */
-    #opgave-indhold { animation: ind 0.35s ease-out; }
-    @keyframes ind { from { transform: translateY(6px); } to { transform: none; } }
+    /* Tæller og nævner */
+    .led { margin-bottom: 11px; }
 
-    .spm { font-size: 0.98rem; font-weight: 600; line-height: 1.45; margin-bottom: 10px; }
-
-    .svar {
-        display: block;
-        width: 100%;
-        text-align: left;
-        background: var(--panel2);
-        border: 1px solid #4c4c5c;
-        color: #e2e2ec;
-        padding: 8px 12px;
-        border-radius: 6px;
+    .led-linje {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        font-size: 0.95rem;
+        white-space: nowrap;
         margin-bottom: 5px;
-        font-size: 0.9rem;
-        font-family: inherit;
-        cursor: pointer;
-        transition: background 0.15s, border-color 0.15s;
     }
-    .svar:hover:not(:disabled) { background: #3d3d4c; border-color: var(--accent); }
-    .svar:disabled { cursor: default; opacity: 0.6; }
-    .svar.rigtig { background: #24503a; border-color: var(--ok); color: #d6ffe6; opacity: 1; }
-    .svar.forkert { background: #4d2a2a; border-color: var(--fejl); color: #ffdede; opacity: 1; }
 
-    .boks { border-radius: 6px; padding: 9px 12px; font-size: 0.88rem; line-height: 1.5; margin-top: 8px; }
-    .boks.hint { background: rgba(0, 0, 0, 0.25); border-left: 3px solid #8a93b8; color: #d8d8e4; }
-    .boks.rigtig { background: rgba(74, 222, 128, 0.12); border-left: 3px solid var(--ok); }
-    .boks.forkert { background: rgba(248, 113, 113, 0.12); border-left: 3px solid var(--fejl); }
-    .boks.svaret { background: rgba(0, 0, 0, 0.25); border-left: 3px solid var(--ok); color: #d8d8e4; }
-
-    .trin-knap {
-        background: none;
-        border: 1px dashed #6a6a80;
-        color: #c9c9d8;
-        padding: 7px 12px;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        font-family: inherit;
-        cursor: pointer;
-        margin-top: 8px;
+    .led-navn {
+        width: 58px;
+        flex-shrink: 0;
+        font-size: 0.75rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
     }
-    .trin-knap:hover { border-color: var(--accent); color: #fff; }
 
-    .skjult { display: none !important; }
+    .bar-linje { display: flex; align-items: center; gap: 10px; }
+
+    .bar {
+        flex: 1;
+        position: relative;
+        height: 9px;
+        border-radius: 5px;
+        background: #3b3b4c;
+    }
+    .bar::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: -4px;
+        bottom: -4px;
+        width: 2px;
+        background: #9a9aab;
+        transform: translateX(-50%);
+    }
+    .bar-fyld { position: absolute; top: 0; bottom: 0; left: 50%; width: 0; border-radius: 5px; }
+
+    .faktor { width: 48px; text-align: right; font-weight: bold; font-variant-numeric: tabular-nums; }
+
+    .bar-note { font-size: 0.8rem; color: var(--muted); text-align: right; margin: -3px 0 12px; }
 
     /* Reaktionsbrøk */
     .brok-linje {
@@ -281,13 +280,6 @@
     .status.ok { color: var(--ok); background: rgba(74, 222, 128, 0.1); }
     .status.skub { color: var(--advar); background: rgba(251, 191, 36, 0.1); }
     .status.neutral { color: var(--muted); background: rgba(255, 255, 255, 0.04); }
-
-    /* Tabel */
-    .tabel { width: 100%; border-collapse: collapse; font-size: 0.93rem; margin-bottom: 12px; }
-    .tabel th { font-weight: 600; text-align: right; padding: 2px 4px 6px; white-space: nowrap; }
-    .tabel th img { height: 22px; width: auto; vertical-align: middle; margin-right: 5px; }
-    .tabel td { text-align: right; padding: 5px 4px; border-top: 1px solid #3a3a46; font-variant-numeric: tabular-nums; }
-    .tabel th:first-child, .tabel td:first-child { text-align: left; color: var(--muted); font-weight: normal; }
 
     /* Graf */
     #graf { width: 100%; height: 150px; display: block; }
@@ -396,32 +388,27 @@
 
         <aside id="panel">
             <section class="gruppe">
-                <div class="gruppe-hoved">Forudsig</div>
-                <div id="opgave-indhold">
-                    <div class="spm" id="spm"></div>
-                    <div id="svar-liste"></div>
-                    <div class="boks hint skjult" id="hint"></div>
-                    <div class="boks skjult" id="feedback"></div>
-                    <button class="trin-knap" id="btn-trin">Giv hint</button>
+                <div class="gruppe-hoved">Reaktionsbrøk</div>
+                <div class="led">
+                    <div class="led-linje"><span class="led-navn">Tæller</span><span class="tal">[N₂O₄] = <span id="taeller">1,00 M</span></span></div>
+                    <div class="bar-linje">
+                        <div class="bar"><div class="bar-fyld" id="bar-taeller" style="background: var(--n2o4)"></div></div>
+                        <span class="faktor c-n2o4" id="faktor-taeller">×1,0</span>
+                    </div>
                 </div>
-            </section>
-
-            <section class="gruppe">
-                <div class="gruppe-hoved">Koncentration og reaktionsbrøk</div>
-                <table class="tabel">
-                    <tr>
-                        <th>V = <span id="v-vaerdi" class="tal">3,0 L</span></th>
-                        <th class="c-no2"><img id="ikon-no2" alt="">NO₂</th>
-                        <th class="c-n2o4"><img id="ikon-n2o4" alt="">N₂O₄</th>
-                    </tr>
-                    <tr><td>n / mol</td><td id="n-no2">6</td><td id="n-n2o4">3</td></tr>
-                    <tr><td>c / M</td><td id="c-no2">2,00</td><td id="c-n2o4">1,00</td></tr>
-                </table>
+                <div class="led">
+                    <div class="led-linje"><span class="led-navn">Nævner</span><span class="tal">[NO₂]² = <span id="naevner">(2,00 M)² = 4,00 M²</span></span></div>
+                    <div class="bar-linje">
+                        <div class="bar"><div class="bar-fyld" id="bar-naevner" style="background: var(--no2)"></div></div>
+                        <span class="faktor c-no2" id="faktor-naevner">×1,0</span>
+                    </div>
+                </div>
+                <div class="bar-note">Faktor i forhold til seneste ligevægt</div>
                 <div class="brok-linje">
                     <span>Y =</span>
                     <span class="brok"><span>[N₂O₄]</span><span>[NO₂]²</span></span>
                     <span>=</span>
-                    <span class="brok tal"><span id="y-taeller">1,00</span><span id="y-naevner">2,00²</span></span>
+                    <span class="brok tal"><span id="y-taeller">1,00 M</span><span id="y-naevner">4,00 M²</span></span>
                     <span>=</span>
                     <span class="tal"><span id="y-vaerdi">0,250</span> M⁻¹</span>
                 </div>
@@ -458,7 +445,7 @@
             <p>For 2 NO₂(g) ⇌ N₂O₄(g) er Y = [N₂O₄] / [NO₂]². Ved ligevægt er Y = K. K afhænger kun af temperaturen og ændres ikke af et nyt volumen.</p>
 
             <h3>Hvorfor forskydes ligevægten?</h3>
-            <p>Bliver volumenet 3 gange mindre, bliver alle koncentrationer 3 gange større. Tælleren i Y vokser med en faktor 3, men nævneren med en faktor 3² = 9. Y bliver derfor 3 gange mindre end K, og reaktionen løber mod højre, indtil Y = K igen.</p>
+            <p>Bliver volumenet 3 gange mindre, bliver alle koncentrationer 3 gange større. Tælleren i Y vokser med en faktor 3, men nævneren med en faktor 3² = 9. Y bliver derfor 3 gange mindre end K, og reaktionen løber mod højre, indtil Y = K igen. Ved den nye ligevægt er både tæller og nævner blevet 4 gange større end før indgrebet.</p>
             <div class="tabel-rul">
                 <table class="teori-tabel">
                     <tr><th></th><th>V</th><th>n(NO₂)</th><th>n(N₂O₄)</th><th>[NO₂]</th><th>[N₂O₄]</th><th>Y</th></tr>
@@ -504,8 +491,7 @@ const START_N2O4 = 3;
 
 /* Animationen kører altid i slowmotion, så hvert sammenstød kan følges */
 const FART = 30;                   // px/s ved R = 30 (skaleres med molekylestørrelsen)
-const STEMPEL_TID = 1.8;           // s, stemplets bevægelse
-const PAUSE_EFTER_INDGREB = 2.2;   // s uden reaktioner, så Y ≠ K kan ses
+const STEMPEL_TID = 1.5;           // s, stemplets bevægelse fra 3,0 L til 1,0 L
 const GRAF_VINDUE = 45;            // s
 
 function tal(x, d) { return x.toFixed(d).replace(".", ","); }
@@ -703,22 +689,28 @@ const ctx = laerred.getContext("2d");
 let visning = "molekyler";
 let partikler = [];
 let effekter = [];
+let bobler = [];           // talebobler i dansevisningen
 let historik = [];
 let tid = 0;
 let grafUr = 0;
 
 let V = V_STOR;
-let stempel = { fra: V_STOR, til: V_STOR, t0: -99 };
-let blokeretTil = 0;       // ingen reaktioner før dette tidspunkt
-let spaltVed = null;       // hvornår næste N₂O₄ spaltes, når Y > K
-let ventetSiden = null;    // hvor længe to NO₂ har skullet mødes, når Y < K
+let stempel = { fra: V_STOR, til: V_STOR, t0: -99, varighed: 0 };
+let traek = null;          // mens håndtaget trækkes: { offset, startY, flyttet }
+let forloeb = null;        // forløbet fra et indgreb til den nye ligevægt
 let naesteBytte = 8;       // næste bytte ved dynamisk ligevægt
+
+/* Tæller og nævner ved seneste ligevægt. Faktorerne i panelet regnes i
+   forhold til den ligevægt, der var, da stemplet sidst blev flyttet. */
+let sidsteLigevaegt = { cNO2: 2, taeller: 1, naevner: 4 };
+let reference = sidsteLigevaegt;
 
 let bredde = 0, hoejde = 0;
 let beholder = { x: 0, y: 0, w: 0, h: 0 };
 let R = 30;                // NO₂'s radius i px; alt andet skaleres herfra
 
-function stempelKoerer() { return tid < stempel.t0 + STEMPEL_TID; }
+function stempelKoerer() { return tid < stempel.t0 + stempel.varighed; }
+function iHvile() { return !traek && !stempelKoerer(); }
 function stempelY(vol) { return beholder.y + beholder.h * (1 - vol / V_STOR); }
 function indre() {
     return { x0: beholder.x, x1: beholder.x + beholder.w, y0: stempelY(V), y1: beholder.y + beholder.h };
@@ -784,13 +776,13 @@ function nulstil() {
     tid = 0;
     grafUr = 0;
     V = V_STOR;
-    stempel = { fra: V_STOR, til: V_STOR, t0: -99 };
-    blokeretTil = 0;
-    spaltVed = null;
-    ventetSiden = null;
+    stempel = { fra: V_STOR, til: V_STOR, t0: -99, varighed: 0 };
+    traek = null;
+    forloeb = null;
     naesteBytte = 8;
     partikler = [];
     effekter = [];
+    bobler = [];
     historik = [];
 
     // Molekylerne fordeles i et gitter med lidt tilfældighed, så de ikke overlapper
@@ -815,18 +807,28 @@ function nulstil() {
     }
     for (const p of partikler) p.foedt = -1;
 
-    visOpgave("ned");
+    sidsteLigevaegt = led();
+    reference = sidsteLigevaegt;
 }
 
+/* Kaldes, når stemplet begynder at bevæge sig */
+function startIndgreb() {
+    reference = sidsteLigevaegt;
+    forloeb = null;
+    bobler = [];
+    naesteBytte = Infinity;
+}
+
+function koerStempel(til) {
+    const varighed = STEMPEL_TID * Math.abs(til - V) / (V_STOR - V_LILLE);
+    stempel = { fra: V, til: til, t0: tid, varighed: varighed };
+}
+
+/* Knappen eller et klik på håndtaget: stemplet kører helt ned eller helt op */
 function flytStempel() {
-    if (stempelKoerer()) return;
-    const til = stempel.til === V_STOR ? V_LILLE : V_STOR;
-    stempel = { fra: V, til: til, t0: tid };
-    blokeretTil = tid + STEMPEL_TID + PAUSE_EFTER_INDGREB;
-    spaltVed = null;
-    ventetSiden = null;
-    naesteBytte = tid + 16;
-    opgaveVenterPaaLigevaegt = true;
+    if (!iHvile()) return;
+    startIndgreb();
+    koerStempel(V > (V_STOR + V_LILLE) / 2 ? V_LILLE : V_STOR);
 }
 
 /* =====================================================================
@@ -891,24 +893,22 @@ function bevaeg(dt) {
     return moeder;
 }
 
-/* Hvis to NO₂ skal mødes, men ikke har gjort det længe, styres de to
-   nærmeste forsigtigt mod hinanden */
-function traekSammen(dt) {
-    let bedst = null, bedstD = Infinity;
-    for (let i = 0; i < partikler.length; i++) {
-        if (partikler[i].type !== "no2") continue;
-        for (let j = i + 1; j < partikler.length; j++) {
-            if (partikler[j].type !== "no2") continue;
-            const d = Math.hypot(partikler[j].x - partikler[i].x, partikler[j].y - partikler[i].y);
-            if (d < bedstD) { bedstD = d; bedst = [partikler[i], partikler[j]]; }
-        }
-    }
-    if (!bedst) return;
-    const [a, c] = bedst;
-    const nx = (c.x - a.x) / (bedstD || 1), ny = (c.y - a.y) / (bedstD || 1);
-    const k = FART * (R / 30) * 3 * dt;
-    a.vx += nx * k; a.vy += ny * k;
-    c.vx -= nx * k; c.vy -= ny * k;
+/* Tæller og nævner i Y ved det aktuelle volumen */
+function led() {
+    const n = antal();
+    const cNO2 = n.no2 / V, cN2O4 = n.n2o4 / V;
+    return { cNO2: cNO2, taeller: cN2O4, naevner: cNO2 * cNO2 };
+}
+
+/* Styrer to molekyler mod hinanden; styrke angiver, hvor hurtigt de drejer */
+function styrMod(a, c, dt, styrke) {
+    const dx = c.x - a.x, dy = c.y - a.y;
+    const d = Math.hypot(dx, dy) || 1;
+    const nx = dx / d, ny = dy / d;
+    const fart = FART * (R / 30);
+    const k = Math.min(1, dt * styrke);
+    a.vx += (nx * fart - a.vx) * k; a.vy += (ny * fart - a.vy) * k;
+    c.vx += (-nx * fart - c.vx) * k; c.vy += (-ny * fart - c.vy) * k;
 }
 
 /* =====================================================================
@@ -920,65 +920,159 @@ function fjern(p) {
 }
 
 function slaaSammen(a, c, vis) {
+    const venstre = a.x <= c.x ? a : c, hoejre = venstre === a ? c : a;
     const x = (a.x + c.x) / 2, y = (a.y + c.y) / 2;
     fjern(a);
     fjern(c);
-    const ny = nyPartikel("n2o4", x, y, [a.personer[0], c.personer[0]]);
+    const ny = nyPartikel("n2o4", x, y, [venstre.personer[0], hoejre.personer[0]]);
     ny.vx = (a.vx + c.vx) / 2;
     ny.vy = (a.vy + c.vy) / 2;
     partikler.push(ny);
+    // En taleboble følger danseren over i parret
+    for (const b of bobler) {
+        if (b.p === venstre) { b.p = ny; b.side = -1; }
+        if (b.p === hoejre) { b.p = ny; b.side = 1; }
+    }
     effekter.push({ type: "ring", x: x, y: y, t0: tid, farve: "#62b0ee", stor: vis });
     if (vis) effekter.push({ type: "tekst", x: x, y: y, t0: tid, retning: 1 });
+    return ny;
 }
 
+/* Parret går fra hinanden omtrent vandret, så hver danser bliver på sin side */
 function spalt(p, vis) {
     fjern(p);
-    const v = Math.random() * Math.PI * 2;
+    const v = (Math.random() - 0.5) * 1.2;
     const ux = Math.cos(v), uy = Math.sin(v);
     const fart = FART * (R / 30);
-    const a = nyPartikel("no2", p.x - ux * R, p.y - uy * R, [p.personer[0]]);
-    const c = nyPartikel("no2", p.x + ux * R, p.y + uy * R, [p.personer[1]]);
+    const a = nyPartikel("no2", p.x - ux * R * 0.9, p.y - uy * R * 0.9, [p.personer[0]]);
+    const c = nyPartikel("no2", p.x + ux * R * 0.9, p.y + uy * R * 0.9, [p.personer[1]]);
     a.vx = -ux * fart; a.vy = -uy * fart;
     c.vx = ux * fart; c.vy = uy * fart;
     partikler.push(a, c);
+    for (const b of bobler) {
+        if (b.p === p) { b.p = b.side > 0 ? c : a; b.side = 0; }
+    }
     effekter.push({ type: "ring", x: p.x, y: p.y, t0: tid, farve: "#f09a4e", stor: vis });
     if (vis) effekter.push({ type: "tekst", x: p.x, y: p.y, t0: tid, retning: -1 });
+    return [a, c];
+}
+
+/* =====================================================================
+   FORLØB FRA INDGREB TIL NY LIGEVÆGT
+   Når stemplet står stille, går der ca. 8 s, før reaktionen sker, så Y ≠ K
+   kan ses i panelet. Taleboblerne udfylder ventetiden i dansevisningen;
+   i molekylevisningen er tiderne de samme, men uden bobler.
+   ===================================================================== */
+const REPLIKKER = {
+    ned: ["Hov, her blev trangt!", "Av, min tå!", "Skal vi danse sammen?",
+          "Ja, så fylder vi mindre!", "Nu er der lidt bedre plads."],
+    op: ["Dejligt med mere plads!", "Nu kan jeg strække armene!", "Nu behøver vi ikke danse så tæt.",
+         "Fint, så danser jeg lidt for mig selv.", "Wuhu, fri bane!"]
+};
+
+const BOBLE_TID = 2.1;               // s, hvor længe en taleboble vises
+const REPLIK_TIDER = [0.4, 2.6, 4.8, 7.0];  // s efter stilstand: replik 1-4
+const REAKTION_NED = 7.6;            // s: de to singler danser mod hinanden og danner par
+const REAKTION_OP = 8.6;             // s: parret går fra hinanden
+const SIDSTE_REPLIK = 2.3;           // s efter reaktionen
+
+function sig(p, tekst, side) {
+    bobler.push({ p: p, tekst: tekst, side: side || 0, t0: tid, varighed: BOBLE_TID });
+}
+
+function tilfaeldig(liste) { return liste[Math.floor(Math.random() * liste.length)]; }
+
+/* En tilfældig danser siger noget; er det et par, er det den ene af de to */
+function sigTilfaeldig(tekst, undtagen) {
+    const p = tilfaeldig(partikler.filter(q => q !== undtagen));
+    sig(p, tekst, p.type === "n2o4" ? (Math.random() < 0.5 ? -1 : 1) : 0);
+    return p;
+}
+
+function naermesteSingler() {
+    let bedst = null, bedstD = Infinity;
+    for (const a of partikler) {
+        if (a.type !== "no2") continue;
+        for (const c of partikler) {
+            if (c === a || c.type !== "no2") continue;
+            const d = Math.hypot(c.x - a.x, c.y - a.y);
+            if (d < bedstD) { bedstD = d; bedst = [a, c]; }
+        }
+    }
+    return bedst;
+}
+
+function opdaterForloeb(dt) {
+    const f = forloeb;
+    const t = tid - f.t0;
+    const rep = f.r === 1 ? REPLIKKER.ned : REPLIKKER.op;
+
+    if (f.fase === 0 && t >= REPLIK_TIDER[0]) {
+        f.taler = sigTilfaeldig(rep[0], null);
+        f.fase = 1;
+    } else if (f.fase === 1 && t >= REPLIK_TIDER[1]) {
+        sigTilfaeldig(rep[1], f.taler);
+        f.fase = 2;
+    } else if (f.fase === 2 && t >= REPLIK_TIDER[2]) {
+        if (f.r === 1) {
+            [f.a, f.c] = naermesteSingler();
+            sig(f.a, rep[2], 0);
+        } else {
+            f.a = tilfaeldig(partikler.filter(p => p.type === "n2o4"));
+            sig(f.a, rep[2], -1);
+        }
+        f.fase = 3;
+    } else if (f.fase === 3 && t >= REPLIK_TIDER[3]) {
+        if (f.r === 1) sig(f.c, rep[3], 0); else sig(f.a, rep[3], 1);
+        f.fase = 4;
+    } else if (f.fase === 5 && t >= f.tReaktion + SIDSTE_REPLIK) {
+        sig(f.ny, rep[4], f.ny.type === "n2o4" ? 1 : 0);
+        f.fase = 6;
+    } else if (f.fase === 6 && t >= f.tReaktion + SIDSTE_REPLIK + BOBLE_TID) {
+        forloeb = null;
+        naesteBytte = tid + 12;
+        return;
+    }
+
+    if (f.r === 1 && (f.fase === 3 || f.fase === 4)) {
+        // De to singler nærmer sig hinanden, mens de taler, og danner par ved berøring
+        const d = Math.hypot(f.c.x - f.a.x, f.c.y - f.a.y);
+        if (t >= REAKTION_NED) {
+            styrMod(f.a, f.c, dt, 3);
+            if (d <= radius(f.a) + radius(f.c) + 3 || t >= REAKTION_NED + 2.5) {
+                f.ny = slaaSammen(f.a, f.c, true);
+                f.tReaktion = t;
+                f.fase = 5;
+            }
+        } else if (d > R * 3.5) {
+            styrMod(f.a, f.c, dt, 0.8);
+        }
+    } else if (f.r === -1 && f.fase === 4 && t >= REAKTION_OP) {
+        f.ny = tilfaeldig(spalt(f.a, true));
+        f.tReaktion = t;
+        f.fase = 5;
+    }
 }
 
 function reaktioner(dt, moeder) {
-    const fri = !stempelKoerer() && tid >= blokeretTil;
-    const r = fri ? retning(V) : 0;
-
-    if (r === 1) {
-        if (moeder.length) {
-            slaaSammen(moeder[0][0], moeder[0][1], true);
-            blokeretTil = tid + 1.2;
-            ventetSiden = null;
-        } else {
-            if (ventetSiden === null) ventetSiden = tid;
-            if (tid - ventetSiden > 2.5) traekSammen(dt);
-        }
-    } else {
-        ventetSiden = null;
+    if (!iHvile()) return;
+    if (forloeb) {
+        opdaterForloeb(dt);
+        return;
     }
 
-    if (r === -1) {
-        if (spaltVed === null) spaltVed = tid + 0.6 + Math.random() * 0.8;
-        if (tid >= spaltVed) {
-            const kandidater = partikler.filter(p => p.type === "n2o4");
-            spalt(kandidater[Math.floor(Math.random() * kandidater.length)], true);
-            spaltVed = null;
-            blokeretTil = tid + 1.2;
-        }
-    } else {
-        spaltVed = null;
+    const r = retning(V);
+    if (r !== 0) {
+        forloeb = { r: r, t0: tid, fase: 0 };
+        return;
     }
+    if (naesteBytte === Infinity) naesteBytte = tid + 12;
 
     // Dynamisk ligevægt: et N₂O₄ dannes, samtidig med at et andet spaltes
-    if (fri && r === 0 && tid >= naesteBytte && moeder.length) {
+    if (tid >= naesteBytte && moeder.length) {
         const kandidater = partikler.filter(p => p.type === "n2o4");
         if (kandidater.length) {
-            const gammel = kandidater[Math.floor(Math.random() * kandidater.length)];
+            const gammel = tilfaeldig(kandidater);
             slaaSammen(moeder[0][0], moeder[0][1], false);
             spalt(gammel, false);
             naesteBytte = tid + 10 + Math.random() * 6;
@@ -989,13 +1083,22 @@ function reaktioner(dt, moeder) {
 function opdater(dt) {
     tid += dt;
 
-    const st = klamp((tid - stempel.t0) / STEMPEL_TID, 0, 1);
-    V = stempel.fra + (stempel.til - stempel.fra) * blodt(st);
+    // Mens håndtaget trækkes, sættes V direkte af musen
+    if (!traek) {
+        const st = stempel.varighed > 0 ? klamp((tid - stempel.t0) / stempel.varighed, 0, 1) : 1;
+        V = stempel.fra + (stempel.til - stempel.fra) * blodt(st);
+    }
 
     const moeder = bevaeg(dt);
     reaktioner(dt, moeder);
 
+    if (iHvile()) {
+        const l = led();
+        if (Math.abs(l.taeller / l.naevner - K) < 1e-9) sidsteLigevaegt = l;
+    }
+
     effekter = effekter.filter(e => tid - e.t0 < (e.type === "tekst" ? 2.4 : 0.8));
+    bobler = bobler.filter(b => tid - b.t0 < b.varighed && partikler.includes(b.p));
 
     grafUr += dt;
     if (grafUr >= 0.2) {
@@ -1051,6 +1154,7 @@ function tegn() {
     tegnStempel();
     tegnTekstEffekter();
     tegnLegende();
+    tegnTalebobler();
 }
 
 function tegnSkala() {
@@ -1239,17 +1343,45 @@ function tegnStempel() {
     const y = stempelY(V);
     const cx = beholder.x + beholder.w / 2;
     const stangTop = y - STEMPEL_TYK - 40;
+    const aktiv = hoverHaandtag || traek;
 
     ctx.fillStyle = "#6f7782";
     ctx.fillRect(cx - 8, stangTop, 16, y - STEMPEL_TYK - stangTop);
 
+    if (aktiv) {
+        ctx.fillStyle = "rgba(98, 176, 238, 0.35)";
+        ctx.beginPath();
+        ctx.roundRect(cx - 62, stangTop - 23, 124, 30, 13);
+        ctx.fill();
+    }
     const hg = ctx.createLinearGradient(0, stangTop - 16, 0, stangTop);
-    hg.addColorStop(0, "#b1bac5");
-    hg.addColorStop(1, "#6b737e");
+    hg.addColorStop(0, aktiv ? "#dfe6ee" : "#b1bac5");
+    hg.addColorStop(1, aktiv ? "#8993a0" : "#6b737e");
     ctx.fillStyle = hg;
     ctx.beginPath();
     ctx.roundRect(cx - 55, stangTop - 16, 110, 16, 7);
     ctx.fill();
+
+    // Pulserende pile viser, at håndtaget kan trækkes, indtil det er brugt første gang
+    if (!haandtagBrugt && iHvile() && !forloeb) {
+        const ned = V > (V_STOR + V_LILLE) / 2;
+        const puls = Math.sin(tid * 3);
+        ctx.strokeStyle = "rgba(255, 255, 255, " + (0.55 + 0.35 * puls).toFixed(2) + ")";
+        ctx.lineWidth = 3;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        for (const sx of [cx - 34, cx + 34]) {
+            for (let i = 0; i < 2; i++) {
+                const yy = stangTop + 13 + i * 9 + puls * 3;
+                const d = ned ? 4 : -4;
+                ctx.beginPath();
+                ctx.moveTo(sx - 7, yy - d);
+                ctx.lineTo(sx, yy + d);
+                ctx.lineTo(sx + 7, yy - d);
+                ctx.stroke();
+            }
+        }
+    }
 
     const pg = ctx.createLinearGradient(0, y - STEMPEL_TYK, 0, y);
     pg.addColorStop(0, "#b8c1cc");
@@ -1290,6 +1422,56 @@ function tegnTekstEffekter() {
         ctx.fillText(tekst, x, y);
         ctx.restore();
     }
+}
+
+/* Talebobler over danserne. For et par sidder boblen over den ene af de to */
+function tegnTalebobler() {
+    if (visning !== "dansere" || !bobler.length) return;
+    ctx.save();
+    ctx.font = "600 15px 'Segoe UI', sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    for (const b of bobler) {
+        const p = b.p;
+        const alder = tid - b.t0;
+        const par = p.type === "n2o4";
+        const w = (par ? 3.4 : 1.8) * R;
+        const h = w * (par ? 100 / 116 : 100 / 60);
+        const hovedX = p.x + b.side * w * 0.24;
+        const hovedTop = p.y + R - h;
+
+        const bw = ctx.measureText(b.tekst).width + 26, bh = 32;
+        const bx = klamp(hovedX - bw / 2, 8, bredde - bw - 8);
+        const by = Math.max(8, hovedTop - bh - 14);
+        const spidsX = klamp(hovedX, bx + 16, bx + bw - 16);
+
+        const ind = klamp(alder / 0.2, 0, 1);
+        const ud = klamp((b.varighed - alder) / 0.3, 0, 1);
+        const skala = 0.75 + 0.25 * blodt(ind);
+
+        ctx.save();
+        ctx.globalAlpha = Math.min(ind, ud);
+        ctx.translate(spidsX, by + bh);
+        ctx.scale(skala, skala);
+        ctx.translate(-spidsX, -(by + bh));
+
+        ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetY = 2;
+        ctx.fillStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.roundRect(bx, by, bw, bh, 14);
+        ctx.moveTo(spidsX + 8, by + bh - 1);
+        ctx.lineTo(spidsX + 1, by + bh + 11);
+        ctx.lineTo(spidsX - 8, by + bh - 1);
+        ctx.fill();
+
+        ctx.shadowColor = "transparent";
+        ctx.fillStyle = "#1e1e24";
+        ctx.fillText(b.tekst, bx + bw / 2, by + bh / 2 + 1);
+        ctx.restore();
+    }
+    ctx.restore();
 }
 
 function tegnLegende() {
@@ -1402,111 +1584,9 @@ function tegnGraf() {
 }
 
 /* =====================================================================
-   OPGAVE: forudsig forskydningen, før stemplet flyttes
-   ===================================================================== */
-const el = id => document.getElementById(id);
-let opgaveVenterPaaLigevaegt = false;
-
-const SVARMULIGHEDER = [
-    { id: "venstre", tekst: "Mod venstre: der dannes mere NO₂" },
-    { id: "hoejre", tekst: "Mod højre: der dannes mere N₂O₄" },
-    { id: "ingen", tekst: "Ingen forskydning" }
-];
-
-const OPGAVER = {
-    ned: {
-        spm: "Stemplet presses ned til 1,0 L. Hvilken vej forskydes ligevægten?",
-        rigtig: "hoejre",
-        hint: "Tæl gasmolekylerne på hver side af reaktionspilen. Hvilken side fylder mindst?",
-        svar: "Mod højre. Højre side har færrest gasmolekyler. Alle koncentrationer tredobles, men nævneren [NO₂]² bliver 9 gange større, så Y < K."
-    },
-    op: {
-        spm: "Stemplet trækkes op til 3,0 L. Hvilken vej forskydes ligevægten?",
-        rigtig: "venstre",
-        hint: "Alle koncentrationer bliver en tredjedel. Hvad sker der med tælleren og nævneren i Y?",
-        svar: "Mod venstre. Nævneren [NO₂]² bliver 9 gange mindre, men tælleren kun 3 gange mindre, så Y > K."
-    }
-};
-
-let opgave = { noegle: "ned", trin: 0, afsluttet: false };
-
-function visOpgave(noegle) {
-    opgave = { noegle: noegle, trin: 0, afsluttet: false };
-    const o = OPGAVER[noegle];
-
-    const indhold = el("opgave-indhold");
-    indhold.style.animation = "none";
-    void indhold.offsetWidth;
-    indhold.style.animation = "";
-
-    el("spm").textContent = o.spm;
-    const liste = el("svar-liste");
-    liste.innerHTML = "";
-    for (const m of SVARMULIGHEDER) {
-        const knap = document.createElement("button");
-        knap.className = "svar";
-        knap.textContent = m.tekst;
-        knap.dataset.id = m.id;
-        knap.addEventListener("click", () => vaelgSvar(m.id, knap));
-        liste.appendChild(knap);
-    }
-    el("hint").classList.add("skjult");
-    el("feedback").classList.add("skjult");
-    el("btn-trin").textContent = "Giv hint";
-    el("btn-trin").classList.remove("skjult");
-}
-
-function visFeedback(klasse, html) {
-    const f = el("feedback");
-    f.className = "boks " + klasse;
-    f.innerHTML = html;
-}
-
-function afslutOpgave() {
-    opgave.afsluttet = true;
-    // Kun det rigtige svar bliver stående, så kortet ikke vokser
-    for (const k of el("svar-liste").children) {
-        k.disabled = true;
-        k.classList.toggle("skjult", !k.classList.contains("rigtig"));
-    }
-    el("hint").classList.add("skjult");
-    el("btn-trin").classList.add("skjult");
-}
-
-function vaelgSvar(id, knap) {
-    if (opgave.afsluttet) return;
-    const o = OPGAVER[opgave.noegle];
-    if (id === o.rigtig) {
-        knap.classList.add("rigtig");
-        visFeedback("rigtig", "<b>Rigtigt.</b> " + o.svar);
-        afslutOpgave();
-    } else {
-        knap.classList.add("forkert");
-        knap.disabled = true;
-        visFeedback("forkert", "Ikke rigtigt. Prøv igen.");
-    }
-}
-
-/* Én knap i trin: Giv hint -> Vis svaret */
-function trinKnap() {
-    const o = OPGAVER[opgave.noegle];
-    if (opgave.trin === 0) {
-        el("hint").textContent = o.hint;
-        el("hint").classList.remove("skjult");
-        el("btn-trin").textContent = "Vis svaret";
-        opgave.trin = 1;
-    } else {
-        for (const k of el("svar-liste").children) {
-            if (k.dataset.id === o.rigtig) k.classList.add("rigtig");
-        }
-        visFeedback("svaret", o.svar);
-        afslutOpgave();
-    }
-}
-
-/* =====================================================================
    PANEL
    ===================================================================== */
+const el = id => document.getElementById(id);
 const vistTekst = {};
 
 function saet(id, tekst) {
@@ -1521,27 +1601,45 @@ function saetKlasse(id, klasse) {
     if (e.className !== klasse) e.className = klasse;
 }
 
-function opdaterPanel() {
-    const n = antal();
-    const cNO2 = n.no2 / V, cN2O4 = n.n2o4 / V;
-    const y = reaktionsbroek(n, V);
+function faktorTekst(f) {
+    return f >= 0.9995 ? "×" + tal(f, 1) : "÷" + tal(1 / f, 1);
+}
 
-    saet("v-vaerdi", tal(V, 1) + " L");
-    saet("n-no2", String(n.no2));
-    saet("n-n2o4", String(n.n2o4));
-    saet("c-no2", tal(cNO2, 2));
-    saet("c-n2o4", tal(cN2O4, 2));
-    saet("y-taeller", tal(cN2O4, 2));
-    saet("y-naevner", tal(cNO2, 2) + "²");
+/* Søjlen er logaritmisk med ×1 i midten: ×9 fylder dobbelt så meget som ×3,
+   og ÷3 fylder lige så meget som ×3, bare til den anden side */
+function saetSoejle(id, f) {
+    const andel = klamp(Math.log(f) / Math.log(9), -1, 1) * 50;
+    const s = el(id).style;
+    s.left = (andel >= 0 ? 50 : 50 + andel).toFixed(2) + "%";
+    s.width = Math.abs(andel).toFixed(2) + "%";
+}
+
+/* Tre betydende cifre */
+function tre(x) { return tal(x, x >= 100 ? 0 : x >= 10 ? 1 : 2); }
+
+function opdaterPanel() {
+    const l = led();
+    const y = l.taeller / l.naevner;
+    const fT = l.taeller / reference.taeller;
+    const fN = l.naevner / reference.naevner;
+
+    saet("taeller", tal(l.taeller, 2) + " M");
+    saet("naevner", "(" + tal(l.cNO2, 2) + " M)² = " + tre(l.naevner) + " M²");
+    saet("faktor-taeller", faktorTekst(fT));
+    saet("faktor-naevner", faktorTekst(fN));
+    saetSoejle("bar-taeller", fT);
+    saetSoejle("bar-naevner", fN);
+    saet("y-taeller", tal(l.taeller, 2) + " M");
+    saet("y-naevner", tre(l.naevner) + " M²");
     saet("y-vaerdi", tal(y, 3));
 
     // Måleren er logaritmisk: midten er K, kanterne er K/4 og 4K
     const pos = 50 + 50 * klamp(Math.log(y / K) / Math.log(4), -1, 1);
     el("maaler-y").style.left = pos.toFixed(1) + "%";
 
-    const koerer = stempelKoerer();
+    const hvile = iHvile();
     let status = "Stemplet flyttes", klasse = "neutral", pil = "";
-    if (!koerer) {
+    if (hvile) {
         const r = retning(V);
         if (r === 0) { status = "Y = K: ligevægt"; klasse = "ok"; }
         else if (r === 1) { status = "Y < K: reaktionen løber mod højre"; klasse = "skub"; pil = "hoejre"; }
@@ -1552,38 +1650,88 @@ function opdaterPanel() {
     saetKlasse("rx-pil", "rx-pil " + pil);
     saet("rx-pil", pil === "hoejre" ? "→" : pil === "venstre" ? "←" : "⇌");
 
-    el("btn-stempel").disabled = koerer;
-    saet("btn-stempel", stempel.til === V_STOR ? "⬇ Pres stemplet ned til 1,0 L" : "⬆ Træk stemplet op til 3,0 L");
-
-    // Når den nye ligevægt er nået, kommer opgaven til det næste indgreb
-    if (opgaveVenterPaaLigevaegt && !koerer && tid >= blokeretTil && retning(V) === 0) {
-        opgaveVenterPaaLigevaegt = false;
-        visOpgave(stempel.til === V_STOR ? "ned" : "op");
+    el("btn-stempel").disabled = !hvile;
+    if (hvile) {
+        saet("btn-stempel", V > (V_STOR + V_LILLE) / 2 ? "⬇ Pres stemplet ned til 1,0 L" : "⬆ Træk stemplet op til 3,0 L");
     }
-}
-
-function opdaterIkoner() {
-    const dans = visning === "dansere";
-    el("ikon-no2").src = (dans ? spriteSingle(0, 0) : spriteNO2()).img.src;
-    el("ikon-n2o4").src = (dans ? spritePar(0, 1, 0) : spriteN2O4()).img.src;
 }
 
 /* =====================================================================
    KNAPPER OG START
    ===================================================================== */
 el("btn-stempel").addEventListener("click", flytStempel);
-el("btn-trin").addEventListener("click", trinKnap);
-el("btn-forfra").addEventListener("click", () => {
-    opgaveVenterPaaLigevaegt = false;
-    nulstil();
-});
+el("btn-forfra").addEventListener("click", nulstil);
 
 document.querySelectorAll(".skift").forEach(knap => {
     knap.addEventListener("click", () => {
         visning = knap.dataset.visning;
         document.querySelectorAll(".skift").forEach(k => k.classList.toggle("aktiv", k === knap));
-        opdaterIkoner();
     });
+});
+
+/* Håndtaget: et klik kører stemplet helt ned eller op. Trækkes der, følger
+   stemplet musen, og når det slippes, glider det til nærmeste endestilling. */
+let hoverHaandtag = false;
+let haandtagBrugt = false;
+
+function punkt(e) {
+    const r = laerred.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+
+function paaHaandtag(x, y) {
+    const py = stempelY(V);
+    const cx = beholder.x + beholder.w / 2;
+    const stangTop = py - STEMPEL_TYK - 40;
+    const iHaandtag = Math.abs(x - cx) <= 68 && y >= stangTop - 28 && y <= stangTop + 8;
+    const iStang = Math.abs(x - cx) <= 20 && y >= stangTop && y <= py;
+    const iPlade = x >= beholder.x && x <= beholder.x + beholder.w && y >= py - STEMPEL_TYK - 4 && y <= py + 3;
+    return iHaandtag || iStang || iPlade;
+}
+
+laerred.addEventListener("pointerdown", e => {
+    const p = punkt(e);
+    if (!iHvile() || !paaHaandtag(p.x, p.y)) return;
+    e.preventDefault();
+    laerred.setPointerCapture(e.pointerId);
+    traek = { offset: stempelY(V) - p.y, startY: p.y, flyttet: false };
+    haandtagBrugt = true;
+    laerred.style.cursor = "grabbing";
+});
+
+laerred.addEventListener("pointermove", e => {
+    const p = punkt(e);
+    if (!traek) {
+        hoverHaandtag = iHvile() && paaHaandtag(p.x, p.y);
+        laerred.style.cursor = hoverHaandtag ? "grab" : "";
+        return;
+    }
+    if (!traek.flyttet && Math.abs(p.y - traek.startY) > 4) {
+        traek.flyttet = true;
+        startIndgreb();
+    }
+    if (traek.flyttet) {
+        const pladeY = p.y + traek.offset;
+        V = klamp(V_STOR * (1 - (pladeY - beholder.y) / beholder.h), V_LILLE, V_STOR);
+    }
+});
+
+function slipHaandtag() {
+    if (!traek) return;
+    const flyttet = traek.flyttet;
+    traek = null;
+    laerred.style.cursor = hoverHaandtag ? "grab" : "";
+    if (!flyttet) flytStempel();
+    else koerStempel(V < (V_STOR + V_LILLE) / 2 ? V_LILLE : V_STOR);
+}
+
+laerred.addEventListener("pointerup", slipHaandtag);
+laerred.addEventListener("pointercancel", slipHaandtag);
+laerred.addEventListener("pointerleave", () => {
+    if (!traek) {
+        hoverHaandtag = false;
+        laerred.style.cursor = "";
+    }
 });
 
 const teoriBoks = el("teori");
@@ -1608,7 +1756,6 @@ window.addEventListener("resize", tilpas);
 forudIndlaesSprites();
 tilpas();
 nulstil();
-opdaterIkoner();
 requestAnimationFrame(ramme);
 </script>
 </body>
