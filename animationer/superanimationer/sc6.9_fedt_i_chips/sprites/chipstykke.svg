@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="36" height="28" viewBox="0 0 18 14">
+  <!-- Et stykke af en knust chip, midten er (9, 7). -->
+  <path d="M1 7 Q2 2 7 1 L11 4 L16 2 Q18 7 15 11 L10 13 L8 10 L3 12 Z" fill="#f2c25a" stroke="#b67a22" stroke-width="0.7"/>
+  <path d="M4 5 Q8 3 12 5" stroke="#fff3c8" stroke-width="0.9" fill="none" stroke-opacity="0.8"/>
+  <circle cx="7" cy="8" r="0.7" fill="#c9862a"/>
+</svg>

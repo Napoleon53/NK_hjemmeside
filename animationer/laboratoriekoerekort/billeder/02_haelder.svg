@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <!-- En klassekammerat haelder syre over i et baegerglas. Vejen hen til
+       vasken gaar lige bag ved vedkommende. -->
+  <defs>
+    <linearGradient id="vaeg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9e4e2"/>
+      <stop offset="1" stop-color="#e8efee"/>
+    </linearGradient>
+    <linearGradient id="gulv" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8b3a6"/>
+      <stop offset="1" stop-color="#9d978a"/>
+    </linearGradient>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.6"/>
+      <stop offset="0.2" stop-color="#d4ebfa" stop-opacity="0.2"/>
+      <stop offset="0.8" stop-color="#d4ebfa" stop-opacity="0.15"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.5"/>
+    </linearGradient>
+    <linearGradient id="brun" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2a1407"/>
+      <stop offset="0.35" stop-color="#8a4a1a"/>
+      <stop offset="1" stop-color="#2f1708"/>
+    </linearGradient>
+    <linearGradient id="kittel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#dfe5e8"/>
+      <stop offset="0.45" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#d0d8db"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Vaeg, fliser og gulv -->
+  <rect width="1200" height="600" fill="url(#vaeg)"/>
+  <rect y="290" width="1200" height="130" fill="#f4f7f6"/>
+  <g stroke="#d2dddb" stroke-width="2">
+    <path d="M0 333 H1200 M0 376 H1200"/>
+    <path d="M60 290 V333 M180 290 V333 M300 290 V333 M420 290 V333 M540 290 V333 M660 290 V333 M780 290 V333 M900 290 V333 M1020 290 V333 M1140 290 V333"/>
+    <path d="M0 333 V376 M120 333 V376 M240 333 V376 M360 333 V376 M480 333 V376 M600 333 V376 M720 333 V376 M840 333 V376 M960 333 V376 M1080 333 V376"/>
+    <path d="M60 376 V420 M180 376 V420 M300 376 V420 M420 376 V420 M540 376 V420 M660 376 V420 M780 376 V420 M900 376 V420 M1020 376 V420 M1140 376 V420"/>
+  </g>
+  <rect y="600" width="1200" height="120" fill="url(#gulv)"/>
+
+  <!-- Oejenskylleskilt over vasken -->
+  <g transform="translate(150 170)">
+    <rect x="-56" y="-56" width="112" height="112" rx="8" fill="#ffffff"/>
+    <rect x="-50" y="-50" width="100" height="100" rx="5" fill="#1d8a4e"/>
+    <path d="M-34 6 Q0 -26 34 6 Q0 36 -34 6 Z" fill="#ffffff"/>
+    <circle cy="6" r="12" fill="#1d8a4e"/>
+    <path d="M-10 -40 q-6 10 0 14 q6 -4 0 -14 Z M10 -40 q-6 10 0 14 q6 -4 0 -14 Z" fill="#ffffff"/>
+    <path d="M-30 32 h60" stroke="#ffffff" stroke-width="6" stroke-linecap="round"/>
+  </g>
+
+  <!-- Bord med skabe -->
+  <rect y="420" width="1200" height="22" fill="#56676c"/>
+  <rect y="442" width="1200" height="12" fill="#2c373b"/>
+  <rect y="454" width="1200" height="136" fill="#cfd8d6"/>
+  <g stroke="#b3bfbd" stroke-width="3">
+    <path d="M300 454 V590 M600 454 V590 M900 454 V590"/>
+  </g>
+  <g fill="#8e9a99">
+    <rect x="270" y="478" width="10" height="44" rx="4"/><rect x="320" y="478" width="10" height="44" rx="4"/>
+    <rect x="570" y="478" width="10" height="44" rx="4"/><rect x="620" y="478" width="10" height="44" rx="4"/>
+    <rect x="870" y="478" width="10" height="44" rx="4"/><rect x="920" y="478" width="10" height="44" rx="4"/>
+  </g>
+  <rect y="590" width="1200" height="10" fill="#6f7b7a"/>
+
+  <!-- Vask med hane -->
+  <rect x="70" y="424" width="170" height="14" rx="4" fill="#9aa7ab"/>
+  <path d="M150 424 V340 Q150 312 178 312 Q204 312 204 338 V352" fill="none" stroke="#a9b4b8" stroke-width="12" stroke-linecap="round"/>
+  <rect x="134" y="404" width="32" height="20" rx="3" fill="#8e9a9e"/>
+
+  <!-- Baegerglas paa bordet -->
+  <g transform="translate(712 336)">
+    <ellipse cx="50" cy="86" rx="58" ry="7" fill="#000" opacity="0.2"/>
+    <path d="M8 44 V74 Q8 84 18 84 H82 Q92 84 92 74 V44 Z" fill="#cfe8f6" opacity="0.55"/>
+    <path d="M0 0 H100 L92 8 V74 Q92 84 82 84 H18 Q8 84 8 74 V8 Z" fill="url(#glas)" stroke="#8fb0c4" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M18 16 V70" stroke="#ffffff" stroke-opacity="0.6" stroke-width="5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Straale fra flasken -->
+  <path d="M752 300 Q764 320 762 380" fill="none" stroke="#bfe3f6" stroke-width="7" stroke-linecap="round"/>
+  <g fill="#bfe3f6"><circle cx="740" cy="392" r="4"/><circle cx="786" cy="388" r="3"/></g>
+
+  <!-- Personen, set bagfra -->
+  <g>
+    <ellipse cx="470" cy="706" rx="110" ry="12" fill="#000" opacity="0.18"/>
+    <!-- Ben og sko -->
+    <rect x="430" y="560" width="34" height="138" rx="10" fill="#34495e"/>
+    <rect x="478" y="560" width="34" height="138" rx="10" fill="#2e4053"/>
+    <ellipse cx="444" cy="700" rx="28" ry="12" fill="#1f2328"/>
+    <ellipse cx="498" cy="700" rx="28" ry="12" fill="#1f2328"/>
+    <!-- Venstre arm, ned mod bordet -->
+    <path d="M412 350 Q388 404 392 462" fill="none" stroke="#b9c3c6" stroke-width="40" stroke-linecap="round"/>
+    <path d="M412 350 Q388 404 392 462" fill="none" stroke="#eef2f3" stroke-width="34" stroke-linecap="round"/>
+    <ellipse cx="394" cy="486" rx="15" ry="18" fill="#e2a987"/>
+    <!-- Kittel -->
+    <path d="M408 334 Q470 316 532 334 L566 600 Q470 614 374 600 Z" fill="url(#kittel)" stroke="#b9c3c6" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M470 520 V606" stroke="#b9c3c6" stroke-width="3"/>
+    <path d="M384 470 Q470 482 556 470" fill="none" stroke="#c7d0d3" stroke-width="3"/>
+    <!-- Hoejre arm, loeftet mod flasken -->
+    <path d="M530 354 Q600 420 646 330" fill="none" stroke="#b9c3c6" stroke-width="42" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M530 354 Q600 420 646 330" fill="none" stroke="#f4f6f7" stroke-width="36" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Hals og hoved -->
+    <rect x="452" y="300" width="36" height="34" rx="8" fill="#e2a987"/>
+    <circle cx="428" cy="282" r="10" fill="#e2a987"/>
+    <circle cx="512" cy="282" r="10" fill="#e2a987"/>
+    <circle cx="470" cy="266" r="44" fill="#5b3a24"/>
+    <path d="M428 290 Q470 306 512 290" fill="none" stroke="#5b3a24" stroke-width="16" stroke-linecap="round"/>
+    <!-- Brillestroppen -->
+    <path d="M428 272 Q470 290 512 272" fill="none" stroke="#1f5fa8" stroke-width="9" stroke-linecap="round"/>
+  </g>
+
+  <!-- Flasken, der haeldes fra -->
+  <g transform="translate(664 300) rotate(118)">
+    <rect x="-12" y="-96" width="24" height="30" fill="#5a2c0e"/>
+    <path d="M-12 -68 C-12 -54 -34 -52 -34 -38 V48 Q-34 58 -24 58 H24 Q34 58 34 48 V-38 C34 -52 12 -54 12 -68 Z" fill="url(#brun)"/>
+    <rect x="-26" y="-20" width="52" height="56" rx="3" fill="#f4efe4"/>
+    <path d="M-16 -4 h32 M-16 8 h24" stroke="#4a4f57" stroke-width="4" stroke-linecap="round"/>
+    <rect x="-9" y="18" width="12" height="12" transform="rotate(45 -3 24)" fill="#ffffff" stroke="#d8342a" stroke-width="3"/>
+  </g>
+  <!-- Haand om flasken -->
+  <ellipse cx="650" cy="318" rx="22" ry="18" fill="#e2a987"/>
+  <path d="M634 304 q16 -6 32 4" stroke="#c98f6d" stroke-width="3" fill="none" stroke-linecap="round"/>
+</svg>

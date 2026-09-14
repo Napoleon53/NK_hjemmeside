@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="152" height="220" viewBox="0 0 76 110">
+  <!-- Glastragt. Stilkens spids (ankeret) er (38, 108). Keglens
+       inderside: kanten y 4 fra x 4 til 72, spidsen (38, 52).
+       Filtrerpapiret og vaesken tegnes af animationen bag glasset. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.3"/>
+      <stop offset="0.3" stop-color="#d4ebfa" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.26"/>
+    </linearGradient>
+  </defs>
+  <path d="M1 3 L75 3 L42 54 L42 104 L38 109 L34 104 L34 54 Z" fill="url(#glas)"/>
+  <path d="M1 3 L34 54 L34 104 L38 109 M75 3 L42 54 L42 104 L38 109" fill="none" stroke="#dcecf8" stroke-opacity="0.85" stroke-width="1.5" stroke-linejoin="round"/>
+  <ellipse cx="38" cy="3" rx="37" ry="2.6" fill="none" stroke="#e6f2fb" stroke-opacity="0.9" stroke-width="1.5"/>
+  <path d="M12 9 L33 40" stroke="#ffffff" stroke-opacity="0.28" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

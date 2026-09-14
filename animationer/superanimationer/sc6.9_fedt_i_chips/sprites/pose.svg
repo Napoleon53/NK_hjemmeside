@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="280" viewBox="0 0 100 140">
+  <!-- Chipspose med et opdigtet maerke. Aabningen (klikpunktet for en
+       chip) er (50, 14). Varedeklarationen staar paa maerket nederst. -->
+  <defs>
+    <linearGradient id="folie" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8e1a14"/>
+      <stop offset="0.25" stop-color="#d23a22"/>
+      <stop offset="0.5" stop-color="#e8552c"/>
+      <stop offset="0.78" stop-color="#c7321f"/>
+      <stop offset="1" stop-color="#7d1611"/>
+    </linearGradient>
+    <linearGradient id="chip" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe08a"/>
+      <stop offset="1" stop-color="#e0a33a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Svejsning foroven og forneden -->
+  <path d="M12 4 L16 0 L20 4 L24 0 L28 4 L32 0 L36 4 L40 0 L44 4 L48 0 L52 4 L56 0 L60 4 L64 0 L68 4 L72 0 L76 4 L80 0 L84 4 L88 0 L88 14 L12 14 Z" fill="#b82c1c"/>
+  <path d="M8 128 L92 128 L92 136 L88 140 L84 136 L80 140 L76 136 L72 140 L68 136 L64 140 L60 136 L56 140 L52 136 L48 140 L44 136 L40 140 L36 136 L32 140 L28 136 L24 140 L20 136 L16 140 L12 136 L8 140 Z" fill="#a82717"/>
+
+  <!-- Krop -->
+  <path d="M12 12 Q4 40 6 80 Q6 112 8 130 L92 130 Q94 112 94 80 Q96 40 88 12 Z" fill="url(#folie)"/>
+  <path d="M16 20 Q10 60 14 122" stroke="#ffffff" stroke-opacity="0.22" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M30 14 L28 30 M70 14 L73 28" stroke="#6e130d" stroke-opacity="0.45" stroke-width="1.2"/>
+
+  <!-- Maerke -->
+  <ellipse cx="50" cy="42" rx="34" ry="15" fill="#ffd23f" stroke="#7a1c0e" stroke-width="1.5"/>
+  <text x="50" y="49" text-anchor="middle" font-family="Segoe UI, Arial Black, sans-serif" font-size="19" font-weight="900" fill="#8a1a10" letter-spacing="1">KNAS</text>
+  <text x="50" y="67" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="7.5" font-weight="700" fill="#ffe7b0">CHIPS MED HAVSALT</text>
+
+  <!-- Chips paa forsiden -->
+  <g transform="translate(50 88)">
+    <ellipse cx="-14" cy="2" rx="15" ry="10" transform="rotate(-18 -14 2)" fill="url(#chip)" stroke="#b07420" stroke-width="0.8"/>
+    <ellipse cx="12" cy="-2" rx="15" ry="10" transform="rotate(14 12 -2)" fill="url(#chip)" stroke="#b07420" stroke-width="0.8"/>
+    <circle cx="-18" cy="0" r="1.1" fill="#c58427"/>
+    <circle cx="-9" cy="5" r="0.9" fill="#c58427"/>
+    <circle cx="9" cy="-4" r="1" fill="#c58427"/>
+    <circle cx="16" cy="1" r="0.9" fill="#c58427"/>
+  </g>
+
+  <!-- Varedeklaration -->
+  <rect x="18" y="104" width="64" height="20" rx="3" fill="#fff7e6" stroke="#7a1c0e" stroke-width="0.8"/>
+  <text x="50" y="112" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="6" font-weight="600" fill="#5a1a10">pr. 100 g</text>
+  <text x="50" y="121" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="8" font-weight="800" fill="#2a0f08">Fedt 34 g</text>
+</svg>

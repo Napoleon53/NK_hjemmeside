@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratoriekørekort</title>
+<meta name="description" content="Teoriprøve til laboratoriet: se billedet, og vælg det eller de korrekte svar.">
+<link rel="icon" href="../../assets/img/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../assets/style.css">
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="lk-top">
+    <a class="lk-brand" href="../../index.html"><img src="../../assets/img/logo.svg" alt="" width="34" height="34"><span>Kemiformler</span></a>
+    <span class="lk-titel">Laboratoriekørekort</span>
+    <span class="lk-status" id="status" aria-live="polite"></span>
+</header>
+
+<main id="indhold">
+
+    <!-- ============================================================ FORSIDE -->
+    <section class="lk-forside" id="forside">
+        <div class="lk-forside-grid">
+            <div>
+                <p class="lk-etiket">Teoriprøve</p>
+                <h1>Laboratoriekørekort</h1>
+                <p class="manchet">Prøven skal bestås, før du må tænde en brænder.</p>
+                <ul class="lk-regler">
+                    <li><b id="regel-antal">5</b> billeder fra laboratoriet</li>
+                    <li>Vælg det eller de korrekte svar</li>
+                    <li>Højst <b id="regel-fejl">1</b> fejl for at bestå</li>
+                </ul>
+                <label class="lk-navn" for="navn">Navn på kørekortet</label>
+                <div class="lk-start">
+                    <input id="navn" type="text" maxlength="40" autocomplete="name" placeholder="Fornavn Efternavn">
+                    <button class="knap knap-primaer" id="start" type="button">Start prøven</button>
+                </div>
+            </div>
+            <div class="lk-kort-plads" id="kort-plads-forside">
+                <!-- Koerekortet flyttes til resultatsiden, naar proeven er bestaaet -->
+                <div class="lk-kort" id="kort">
+                    <div class="lk-kort-hoved">
+                        <span class="lk-kort-maerke" aria-hidden="true">LAB</span>
+                        <span class="lk-kort-titel">Laboratoriekørekort</span>
+                    </div>
+                    <div class="lk-kort-krop">
+                        <svg class="lk-kort-foto" viewBox="0 0 120 150" aria-hidden="true">
+                            <rect width="120" height="150" fill="#dfeceb"/>
+                            <path d="M14 150 Q18 108 60 104 Q102 108 106 150 Z" fill="#ffffff" stroke="#b9c3c6" stroke-width="2"/>
+                            <path d="M46 106 L60 128 L74 106 Z" fill="#0f766e"/>
+                            <rect x="50" y="84" width="20" height="24" rx="6" fill="#d39a78"/>
+                            <ellipse cx="60" cy="62" rx="28" ry="32" fill="#e2a987"/>
+                            <path d="M32 58 Q30 26 60 26 Q90 26 88 58 Q78 40 60 40 Q42 40 32 58 Z" fill="#5b3a24"/>
+                            <rect x="34" y="54" width="52" height="20" rx="8" fill="#9ed2ee" fill-opacity="0.75" stroke="#1f5fa8" stroke-width="4"/>
+                            <path d="M60 56 V72" stroke="#1f5fa8" stroke-width="3"/>
+                            <path d="M50 84 q10 6 20 0" fill="none" stroke="#8a4b2e" stroke-width="3" stroke-linecap="round"/>
+                        </svg>
+                        <dl class="lk-kort-felter">
+                            <div><dt>1.</dt><dd id="kort-navn">Dit navn</dd></div>
+                            <div><dt>4a.</dt><dd id="kort-dato">Ikke udstedt</dd></div>
+                            <div><dt>4b.</dt><dd>Gyldig til første spildte syre</dd></div>
+                            <div><dt>9.</dt><dd>Kategori C: brænder, glas og syre</dd></div>
+                        </dl>
+                    </div>
+                    <span class="lk-stempel" id="kort-stempel">Ikke udstedt</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================== PROEVE -->
+    <section class="lk-proeve" id="proeve" hidden>
+        <div class="lk-billede">
+            <div class="lk-billede-slor" id="billede-slor" aria-hidden="true"></div>
+            <img id="billede" src="" alt="">
+        </div>
+
+        <div class="lk-panel">
+            <div class="lk-vaerktoej" id="vaerktoej" hidden>
+                <button class="lk-link" id="laes" type="button">
+                    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    <span>Læs højt</span>
+                </button>
+                <label class="lk-kontakt">
+                    <input type="checkbox" id="auto">
+                    <span class="lk-kontakt-spor" aria-hidden="true"></span>
+                    <span>Auto-oplæsning</span>
+                </label>
+            </div>
+
+            <h2 id="spoergsmaal"></h2>
+            <p class="lk-vejledning">Vælg det eller de korrekte svar</p>
+            <div class="lk-svar" id="svar" role="group" aria-labelledby="spoergsmaal"></div>
+
+            <div class="lk-fod">
+                <button class="knap knap-sekundaer" id="forrige" type="button">Forrige</button>
+                <ol class="lk-prikker" id="prikker" aria-label="Spørgsmål"></ol>
+                <button class="knap knap-primaer" id="naeste" type="button">Næste</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================ RESULTAT -->
+    <section class="lk-resultat" id="resultat" hidden>
+        <div class="lk-resultat-top">
+            <div>
+                <p class="lk-etiket">Resultat</p>
+                <h1 id="res-titel"></h1>
+                <p class="manchet" id="res-tekst"></p>
+                <div class="knap-raekke">
+                    <button class="knap knap-primaer" id="igen" type="button">Tag prøven igen</button>
+                    <button class="knap knap-sekundaer" id="udskriv" type="button" hidden>Udskriv kørekort</button>
+                </div>
+            </div>
+            <div class="lk-kort-plads" id="kort-plads-resultat"></div>
+        </div>
+
+        <div class="gruppe">
+            <div class="gruppe-hoved"><h2>Gennemgang</h2></div>
+            <ol class="lk-gennemgang" id="gennemgang"></ol>
+        </div>
+    </section>
+
+</main>
+
+<script src="js/spoergsmaal.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

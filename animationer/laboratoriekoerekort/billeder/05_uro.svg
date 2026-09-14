@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <!-- Fangeleg og hoej musik i laboratoriet, mens der koger vand over en
+       taendt braender paa dit bord. -->
+  <defs>
+    <linearGradient id="vaeg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9e4e2"/>
+      <stop offset="1" stop-color="#e8efee"/>
+    </linearGradient>
+    <linearGradient id="bord" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#46555a"/>
+      <stop offset="1" stop-color="#2c373b"/>
+    </linearGradient>
+    <linearGradient id="gulv" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8b3a6"/>
+      <stop offset="1" stop-color="#a39d90"/>
+    </linearGradient>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.6"/>
+      <stop offset="0.2" stop-color="#d4ebfa" stop-opacity="0.2"/>
+      <stop offset="0.8" stop-color="#d4ebfa" stop-opacity="0.15"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.5"/>
+    </linearGradient>
+    <linearGradient id="krom" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5a6270"/>
+      <stop offset="0.4" stop-color="#e9eef3"/>
+      <stop offset="1" stop-color="#4c5361"/>
+    </linearGradient>
+    <linearGradient id="flamme" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#2f6fe0"/>
+      <stop offset="0.6" stop-color="#7fb2ff" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#bcd7ff" stop-opacity="0.2"/>
+    </linearGradient>
+
+    <!-- Loebende person set fra siden. Origo er hoften, foedderne ved y 130. -->
+    <g id="loeber">
+      <path d="M0 0 L-44 64 L-92 76" fill="none" stroke="#2e4053" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+      <ellipse cx="-100" cy="72" rx="22" ry="11" transform="rotate(-30 -100 72)" fill="#1f2328"/>
+      <path d="M-26 -118 L-66 -76 L-52 -40" fill="none" stroke="#c5ced1" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M-26 20 L-96 54 L-40 -10 Z" fill="#e6ebed" stroke="#b9c3c6" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M-30 22 L2 -144 L46 -134 L30 26 Z" fill="#ffffff" stroke="#b9c3c6" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M4 0 L56 52 L44 126" fill="none" stroke="#34495e" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+      <ellipse cx="62" cy="128" rx="26" ry="11" fill="#1f2328"/>
+      <rect x="20" y="-166" width="22" height="26" rx="6" fill="#e2a987"/>
+    </g>
+  </defs>
+
+  <!-- Vaeg, fliser og gulv -->
+  <rect width="1200" height="520" fill="url(#vaeg)"/>
+  <rect y="280" width="1200" height="120" fill="#f4f7f6"/>
+  <g stroke="#d2dddb" stroke-width="2">
+    <path d="M0 320 H1200 M0 360 H1200"/>
+    <path d="M60 280 V320 M180 280 V320 M300 280 V320 M420 280 V320 M540 280 V320 M660 280 V320 M780 280 V320 M900 280 V320 M1020 280 V320 M1140 280 V320"/>
+    <path d="M0 320 V360 M120 320 V360 M240 320 V360 M360 320 V360 M480 320 V360 M600 320 V360 M720 320 V360 M840 320 V360 M960 320 V360 M1080 320 V360"/>
+    <path d="M60 360 V400 M180 360 V400 M300 360 V400 M420 360 V400 M540 360 V400 M660 360 V400 M780 360 V400 M900 360 V400 M1020 360 V400 M1140 360 V400"/>
+  </g>
+
+  <!-- Advarselsskilt: brandfarlig -->
+  <g transform="translate(1060 150)">
+    <path d="M0 -74 L78 58 H-78 Z" fill="#ffffff" stroke="#ffffff" stroke-width="16" stroke-linejoin="round"/>
+    <path d="M0 -64 L68 52 H-68 Z" fill="#f2c53d" stroke="#1f2328" stroke-width="8" stroke-linejoin="round"/>
+    <path d="M0 -24 Q22 2 14 20 Q26 14 22 2 Q36 24 22 38 H-22 Q-38 20 -18 -2 Q-18 12 -8 16 Q-16 -4 0 -24 Z" fill="#1f2328"/>
+  </g>
+
+  <!-- Det andet bord med hoejttaler -->
+  <rect y="400" width="1200" height="20" fill="#56676c"/>
+  <rect y="420" width="1200" height="10" fill="#2c373b"/>
+  <rect y="430" width="1200" height="90" fill="#cfd8d6"/>
+  <g stroke="#b3bfbd" stroke-width="3"><path d="M200 430 V520 M500 430 V520 M800 430 V520 M1100 430 V520"/></g>
+  <rect y="520" width="1200" height="90" fill="url(#gulv)"/>
+
+  <g transform="translate(660 336)">
+    <ellipse cx="80" cy="66" rx="92" ry="7" fill="#000" opacity="0.2"/>
+    <rect x="0" y="0" width="160" height="64" rx="24" fill="#2b2f36"/>
+    <circle cx="44" cy="32" r="20" fill="#454b55"/><circle cx="44" cy="32" r="8" fill="#1c1f24"/>
+    <circle cx="116" cy="32" r="20" fill="#454b55"/><circle cx="116" cy="32" r="8" fill="#1c1f24"/>
+    <circle cx="80" cy="14" r="4" fill="#3fae72"/>
+  </g>
+  <g fill="none" stroke="#1f2328" stroke-opacity="0.45" stroke-width="6" stroke-linecap="round">
+    <path d="M632 330 q-22 38 0 76"/><path d="M606 314 q-34 54 0 108"/>
+    <path d="M848 330 q22 38 0 76"/><path d="M874 314 q34 54 0 108"/>
+  </g>
+  <g fill="#1f2328">
+    <ellipse cx="690" cy="270" rx="15" ry="11" transform="rotate(-20 690 270)"/>
+    <path d="M702 266 V206 L740 196 V252" fill="none" stroke="#1f2328" stroke-width="6"/>
+    <ellipse cx="728" cy="258" rx="15" ry="11" transform="rotate(-20 728 258)"/>
+    <path d="M702 216 L740 206" stroke="#1f2328" stroke-width="12"/>
+    <ellipse cx="826" cy="236" rx="14" ry="10" transform="rotate(-20 826 236)"/>
+    <path d="M837 232 V176 q14 10 22 26" fill="none" stroke="#1f2328" stroke-width="6" stroke-linecap="round"/>
+    <ellipse cx="590" cy="200" rx="12" ry="9" transform="rotate(-20 590 200)"/>
+    <path d="M600 197 V150" stroke="#1f2328" stroke-width="5"/>
+  </g>
+
+  <!-- Fangeleg i gangen -->
+  <g transform="translate(410 474) rotate(12)">
+    <use href="#loeber"/>
+    <circle cx="36" cy="-186" r="32" fill="#e2a987"/>
+    <path d="M6 -196 Q14 -226 44 -222 Q70 -218 66 -192 Q52 -206 30 -200 Q20 -186 6 -196 Z" fill="#d9a441"/>
+    <path d="M10 -190 Q-10 -186 -18 -170" fill="none" stroke="#d9a441" stroke-width="10" stroke-linecap="round"/>
+    <path d="M50 -172 q8 6 16 0" fill="none" stroke="#6e3b24" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="52" cy="-192" r="4" fill="#1f1a17"/>
+    <path d="M30 -118 L72 -92 L102 -116" fill="none" stroke="#e6ebed" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="106" cy="-120" r="12" fill="#e2a987"/>
+  </g>
+  <g transform="translate(160 480) rotate(16)">
+    <use href="#loeber"/>
+    <circle cx="36" cy="-186" r="32" fill="#8d5a3b"/>
+    <path d="M6 -200 Q10 -226 40 -224 Q70 -222 66 -196 Q48 -208 22 -202 Z" fill="#1f1a17"/>
+    <circle cx="54" cy="-192" r="4" fill="#1f1a17"/>
+    <path d="M44 -170 Q56 -160 66 -172 Z" fill="#ffffff" stroke="#4a2616" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M30 -122 L130 -130" fill="none" stroke="#e6ebed" stroke-width="24" stroke-linecap="round"/>
+    <circle cx="138" cy="-131" r="12" fill="#8d5a3b"/>
+  </g>
+  <g fill="none" stroke="#1f2328" stroke-opacity="0.3" stroke-width="5" stroke-linecap="round">
+    <path d="M40 300 h-60 M60 340 h-80 M40 380 h-60"/>
+    <path d="M280 296 h-40 M270 336 h-50"/>
+  </g>
+
+  <!-- Dit bord med taendt braender og kogende vand -->
+  <rect y="606" width="1200" height="114" fill="url(#bord)"/>
+  <rect y="602" width="1200" height="8" fill="#56676c"/>
+
+  <g transform="translate(960 0)">
+    <ellipse cx="0" cy="700" rx="130" ry="12" fill="#000" opacity="0.3"/>
+    <!-- Trefod -->
+    <path d="M-58 520 L-104 700 M58 520 L104 700 M0 520 L0 540" stroke="#3a3f47" stroke-width="10" stroke-linecap="round"/>
+    <rect x="-80" y="512" width="160" height="12" rx="3" fill="#3a3f47"/>
+    <rect x="-86" y="504" width="172" height="8" fill="#8e969e"/>
+    <!-- Braender -->
+    <path d="M-52 700 L-40 676 H40 L52 700 Z" fill="#3a3f47"/>
+    <rect x="-12" y="592" width="24" height="86" fill="url(#krom)"/>
+    <rect x="-16" y="640" width="32" height="18" rx="3" fill="#6c7480"/>
+    <path d="M16 690 h70" stroke="#e05446" stroke-width="12" stroke-linecap="round"/>
+    <path d="M-14 594 Q-22 560 0 518 Q22 560 14 594 Z" fill="url(#flamme)"/>
+    <path d="M-7 594 Q-8 572 0 554 Q8 572 7 594 Z" fill="#9fe0ff"/>
+    <!-- Baegerglas -->
+    <path d="M-62 440 V492 Q-62 504 -50 504 H50 Q62 504 62 492 V440 Z" fill="#8cc7ea" opacity="0.45"/>
+    <path d="M-72 400 H72 L62 410 V492 Q62 504 50 504 H-50 Q-62 504 -62 492 V410 Z" fill="url(#glas)" stroke="#e6f2fb" stroke-width="3" stroke-linejoin="round"/>
+    <g fill="#ffffff" fill-opacity="0.8">
+      <circle cx="-30" cy="482" r="5"/><circle cx="10" cy="470" r="6"/><circle cx="32" cy="488" r="4"/>
+      <circle cx="-8" cy="454" r="4"/><circle cx="24" cy="450" r="5"/>
+    </g>
+    <path d="M-50 412 V490" stroke="#ffffff" stroke-opacity="0.4" stroke-width="5" stroke-linecap="round"/>
+    <g fill="none" stroke="#ffffff" stroke-opacity="0.75" stroke-width="7" stroke-linecap="round">
+      <path d="M-30 392 q-14 -24 2 -48 q14 -22 0 -46"/>
+      <path d="M22 390 q14 -24 -2 -48 q-14 -22 2 -44"/>
+    </g>
+  </g>
+</svg>

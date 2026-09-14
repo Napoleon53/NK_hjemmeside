@@ -1,0 +1,419 @@
+/* =====================================================================
+   Laboratoriekoerekort
+   Bygger paa ../../assets/style.css (farver, knapper, .gruppe).
+   Proevesiden er opbygget som teoriproeven til koerekort: billedet til
+   venstre, spoergsmaal og afkrydsning til hoejre.
+   ===================================================================== */
+
+[hidden] { display: none !important; }
+
+body { background: var(--bg-sektion); }
+
+/* ------------------------------------------------------------ Toplinje */
+.lk-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 56px;
+    padding: 8px 20px;
+    background: #fff;
+    border-bottom: 1px solid var(--kant);
+}
+
+.lk-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: var(--tekst);
+    text-decoration: none;
+}
+.lk-brand img { width: 34px; height: 34px; }
+
+.lk-titel,
+.lk-etiket {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+.lk-titel { padding-left: 14px; border-left: 1px solid var(--kant-staerk); }
+.lk-etiket { margin: 0 0 8px; }
+
+.lk-status { margin-left: auto; font-size: 0.9rem; font-weight: 600; color: var(--tekst-daempet); }
+
+/* ------------------------------------------------------------- Forside */
+.lk-forside,
+.lk-resultat {
+    max-width: var(--bredde);
+    margin: 0 auto;
+    padding: clamp(28px, 5vw, 56px) 24px 56px;
+}
+
+.lk-forside-grid,
+.lk-resultat-top {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 48px;
+    align-items: center;
+}
+.lk-resultat-top { margin-bottom: 32px; }
+
+.lk-forside .manchet,
+.lk-resultat .manchet { color: var(--tekst-daempet); font-size: 1.08rem; margin-bottom: 18px; }
+
+.lk-regler {
+    list-style: none;
+    margin: 0 0 22px;
+    padding: 14px 0;
+    border-block: 1px solid var(--kant);
+    display: grid;
+    gap: 8px;
+}
+.lk-regler li { position: relative; padding-left: 18px; }
+.lk-regler li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+}
+
+.lk-navn { display: block; margin-bottom: 6px; font-size: 0.9rem; font-weight: 600; }
+
+.lk-start { display: flex; flex-wrap: wrap; gap: 10px; }
+.lk-start input {
+    flex: 1 1 220px;
+    padding: 11px 14px;
+    font: inherit;
+    border: 1px solid var(--kant-staerk);
+    border-radius: var(--radius-lille);
+    background: #fff;
+}
+.lk-start input:focus { outline: 3px solid var(--accent); outline-offset: 1px; }
+
+/* ----------------------------------------------------------- Koerekortet */
+.lk-kort-plads { display: flex; justify-content: center; }
+
+.lk-kort {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
+    aspect-ratio: 85.6 / 54;
+    padding: 16px 20px;
+    overflow: hidden;
+    border-radius: 16px;
+    border: 1px solid #b9d9d4;
+    background:
+        repeating-radial-gradient(circle at 80% 120%, rgba(15, 118, 110, 0.06) 0 2px, transparent 2px 10px),
+        linear-gradient(135deg, #e3f2f0 0%, #cfe8e3 55%, #f5efd6 100%);
+    box-shadow: var(--skygge-hover);
+    transform: rotate(-2deg);
+}
+
+.lk-kort-hoved { display: flex; align-items: center; gap: 10px; }
+.lk-kort-maerke {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+}
+.lk-kort-titel {
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-mork);
+}
+
+.lk-kort-krop {
+    display: grid;
+    grid-template-columns: 28% 1fr;
+    gap: 16px;
+    margin-top: 12px;
+    align-items: start;
+}
+.lk-kort-foto { width: 100%; height: auto; border-radius: 6px; border: 2px solid #fff; }
+
+.lk-kort-felter { margin: 0; display: grid; gap: 5px; }
+.lk-kort-felter div { display: flex; gap: 8px; align-items: baseline; }
+.lk-kort-felter dt { min-width: 26px; font-size: 0.7rem; font-weight: 700; color: var(--tekst-daempet); }
+.lk-kort-felter dd { margin: 0; font-size: 0.9rem; font-weight: 600; line-height: 1.3; }
+
+.lk-stempel {
+    position: absolute;
+    right: 18px;
+    bottom: 14px;
+    padding: 3px 12px;
+    border: 3px solid #b3392c;
+    border-radius: 6px;
+    color: #b3392c;
+    font-size: 0.9rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transform: rotate(-12deg);
+    opacity: 0.85;
+}
+.lk-stempel.bestaaet { border-color: #1d8a4e; color: #1d8a4e; }
+
+/* ------------------------------------------------------------- Proeven */
+.lk-proeve {
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(340px, 1fr);
+    min-height: calc(100vh - 57px);
+}
+
+.lk-billede {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #1b2426;
+}
+/* sloeret kopi af billedet fylder ud over og under det */
+.lk-billede-slor {
+    position: absolute;
+    inset: -40px;
+    background: center / cover no-repeat;
+    filter: blur(28px) brightness(0.7);
+}
+.lk-billede img { position: relative; width: 100%; height: auto; }
+
+.lk-panel {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 32px 24px;
+    background: var(--bg-daempet);
+}
+
+.lk-vaerktoej { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 24px; margin-bottom: 14px; }
+
+.lk-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    background: none;
+    border: 0;
+    font: inherit;
+    font-size: 0.95rem;
+    color: var(--tekst);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+.lk-link:hover { color: var(--accent); }
+
+.lk-kontakt { display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem; cursor: pointer; }
+.lk-kontakt input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.lk-kontakt-spor {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    border-radius: 999px;
+    background: #b7c5c8;
+    transition: background 0.15s;
+}
+.lk-kontakt-spor::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.15s;
+}
+.lk-kontakt input:checked + .lk-kontakt-spor { background: var(--accent); }
+.lk-kontakt input:checked + .lk-kontakt-spor::after { transform: translateX(16px); }
+.lk-kontakt input:focus-visible + .lk-kontakt-spor { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+#spoergsmaal { margin: 0 0 0.35em; }
+#spoergsmaal:focus { outline: none; }
+
+.lk-vejledning { margin: 0 0 14px; font-size: 0.95rem; color: var(--tekst-daempet); }
+
+.lk-svar { display: grid; gap: 12px; }
+
+.lk-valg {
+    display: flex;
+    align-items: stretch;
+    background: #fff;
+    border: 1px solid var(--kant);
+    border-radius: 10px;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+.lk-valg:hover { border-color: var(--kant-staerk); }
+.lk-valg:has(input:checked) {
+    border-color: var(--accent);
+    background: var(--accent-lys);
+    box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.lk-valg-label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 15px 18px;
+    line-height: 1.4;
+    cursor: pointer;
+}
+
+.lk-valg input {
+    appearance: none;
+    -webkit-appearance: none;
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    border: 2px solid #6f8083;
+    border-radius: 5px;
+    background: #fff center / 16px no-repeat;
+    cursor: pointer;
+}
+.lk-valg input:checked {
+    border-color: var(--accent);
+    background-color: var(--accent);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3 3 7-7' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.lk-laes-svar {
+    flex-shrink: 0;
+    padding: 0 16px;
+    background: none;
+    border: 0;
+    color: var(--tekst-daempet);
+    cursor: pointer;
+}
+.lk-laes-svar:hover { color: var(--accent); }
+
+.lk-fod {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 24px;
+}
+.lk-fod .knap { padding: 10px 20px; }
+.lk-fod .knap:disabled { opacity: 0.45; cursor: default; }
+
+.lk-prikker { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.lk-prikker button {
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--kant-staerk);
+    border-radius: 6px;
+    background: #fff;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--tekst-daempet);
+    cursor: pointer;
+}
+.lk-prikker button.besvaret { background: var(--accent-lys); border-color: var(--accent); color: var(--accent-mork); }
+.lk-prikker button.aktiv { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ------------------------------------------------------------ Resultat */
+#res-titel.bestaaet { color: var(--accent); }
+#res-titel.ikke-bestaaet { color: #b3392c; }
+
+.lk-gennemgang { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.lk-gennemgang > li {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 18px;
+    padding: 14px;
+    background: #fff;
+    border: 1px solid var(--kant);
+    border-radius: var(--radius);
+    box-shadow: var(--skygge);
+}
+.lk-gennemgang img { width: 100%; border-radius: var(--radius-lille); }
+.lk-gennemgang h3 { margin: 4px 0 8px; }
+
+.lk-gg-maerke {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+.lk-gg-maerke.rigtigt { background: #e1f3e7; color: #1d7a43; }
+.lk-gg-maerke.forkert { background: #fbe6e3; color: #a83226; }
+
+.lk-gg-svar { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; font-size: 0.95rem; }
+.lk-gg-svar li { display: flex; gap: 8px; align-items: baseline; color: var(--tekst-daempet); }
+.lk-gg-svar li::before { content: "\2715"; flex-shrink: 0; width: 1em; font-weight: 700; color: #a9b4b6; }
+.lk-gg-svar li.korrekt { color: var(--tekst); }
+.lk-gg-svar li.korrekt::before { content: "\2713"; color: #1d8a4e; }
+.lk-gg-svar li.valgt { font-weight: 650; }
+.lk-gg-svar li.valgt:not(.korrekt) { color: #a83226; }
+.lk-gg-svar li.valgt:not(.korrekt)::before { color: #a83226; }
+
+.lk-gg-valg {
+    flex-shrink: 0;
+    padding: 0 7px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.lk-gg-kommentar {
+    margin: 10px 0 0;
+    padding-left: 10px;
+    border-left: 3px solid var(--gul);
+    font-size: 0.95rem;
+    color: var(--tekst-daempet);
+}
+
+/* ---------------------------------------------------- Smalle skaerme */
+@media (max-width: 900px) {
+    .lk-forside-grid,
+    .lk-resultat-top { grid-template-columns: 1fr; gap: 32px; }
+    .lk-proeve { grid-template-columns: 1fr; min-height: 0; }
+    .lk-billede img { height: auto; }
+    .lk-panel { padding: 18px 16px 22px; }
+    .lk-gennemgang > li { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 520px) {
+    .lk-top { padding: 8px 16px; }
+    .lk-brand span { display: none; }
+    .lk-titel { padding-left: 0; border-left: 0; }
+    .lk-forside, .lk-resultat { padding-inline: 16px; }
+    .lk-fod { flex-wrap: wrap; }
+    .lk-prikker { order: -1; width: 100%; }
+    .lk-fod .knap { flex: 1; }
+    .lk-kort { padding: 12px 14px; transform: none; }
+    .lk-kort-titel { font-size: 0.78rem; }
+    .lk-kort-felter dd { font-size: 0.78rem; }
+    .lk-kort-krop { gap: 10px; margin-top: 8px; }
+    .lk-stempel { font-size: 0.72rem; }
+}
+
+/* ------------------------------------------------ Udskriv koerekortet */
+@media print {
+    body { background: #fff; }
+    .lk-top, .lk-resultat .gruppe, .lk-resultat-top > div:first-child { display: none !important; }
+    .lk-resultat-top { display: block; }
+    .lk-kort { transform: none; box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

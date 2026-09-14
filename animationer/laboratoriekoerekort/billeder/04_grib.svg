@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <!-- En klassekammerat paa den anden side af lokalet har lige kastet en
+       konisk kolbe med blaa vaeske mod dig og raaber "Grib!". -->
+  <defs>
+    <linearGradient id="vaeg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9e4e2"/>
+      <stop offset="1" stop-color="#e8efee"/>
+    </linearGradient>
+    <linearGradient id="bord" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#46555a"/>
+      <stop offset="1" stop-color="#2c373b"/>
+    </linearGradient>
+    <linearGradient id="gulv" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8b3a6"/>
+      <stop offset="1" stop-color="#a39d90"/>
+    </linearGradient>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.7"/>
+      <stop offset="0.2" stop-color="#d4ebfa" stop-opacity="0.25"/>
+      <stop offset="0.8" stop-color="#d4ebfa" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.6"/>
+    </linearGradient>
+    <linearGradient id="kittel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#dfe5e8"/>
+      <stop offset="0.45" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#d0d8db"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Vaeg, fliser og gulv -->
+  <rect width="1200" height="520" fill="url(#vaeg)"/>
+  <rect y="280" width="1200" height="120" fill="#f4f7f6"/>
+  <g stroke="#d2dddb" stroke-width="2">
+    <path d="M0 320 H1200 M0 360 H1200"/>
+    <path d="M60 280 V320 M180 280 V320 M300 280 V320 M420 280 V320 M540 280 V320 M660 280 V320 M780 280 V320 M900 280 V320 M1020 280 V320 M1140 280 V320"/>
+    <path d="M0 320 V360 M120 320 V360 M240 320 V360 M360 320 V360 M480 320 V360 M600 320 V360 M720 320 V360 M840 320 V360 M960 320 V360 M1080 320 V360"/>
+    <path d="M60 360 V400 M180 360 V400 M300 360 V400 M420 360 V400 M540 360 V400 M660 360 V400 M780 360 V400 M900 360 V400 M1020 360 V400 M1140 360 V400"/>
+  </g>
+  <rect y="520" width="1200" height="90" fill="url(#gulv)"/>
+
+  <!-- Forbudsskilt: der kastes ikke -->
+  <g transform="translate(1060 150)">
+    <rect x="-7" y="62" width="14" height="10" fill="#9aa9a7"/>
+    <circle r="68" fill="#ffffff"/>
+    <circle r="54" fill="#ffffff" stroke="#d8342a" stroke-width="12"/>
+    <circle cx="8" cy="-8" r="16" fill="#1f2328"/>
+    <path d="M-34 4 q14 -4 22 -10 M-38 20 q18 -4 30 -14 M-26 34 q16 -6 24 -18" fill="none" stroke="#1f2328" stroke-width="6" stroke-linecap="round"/>
+    <path d="M-38 -38 L38 38" stroke="#d8342a" stroke-width="12"/>
+  </g>
+
+  <!-- Personen bag det andet bord -->
+  <g>
+    <!-- Arm, der hviler -->
+    <path d="M276 282 Q246 336 252 392" fill="none" stroke="#b9c3c6" stroke-width="42" stroke-linecap="round"/>
+    <path d="M276 282 Q246 336 252 392" fill="none" stroke="#eef2f3" stroke-width="36" stroke-linecap="round"/>
+    <!-- Kittel -->
+    <path d="M272 270 Q330 252 388 270 L412 404 H248 Z" fill="url(#kittel)" stroke="#b9c3c6" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M308 262 L330 316 L352 262 Z" fill="#e0703a"/>
+    <path d="M300 264 L330 330 L296 404 M360 264 L330 330 L364 404" fill="none" stroke="#b9c3c6" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Kastearmen, loeftet -->
+    <path d="M384 282 Q430 250 444 176" fill="none" stroke="#b9c3c6" stroke-width="42" stroke-linecap="round"/>
+    <path d="M384 282 Q430 250 444 176" fill="none" stroke="#f4f6f7" stroke-width="36" stroke-linecap="round"/>
+    <circle cx="446" cy="148" r="22" fill="#b97a56"/>
+    <path d="M430 132 l-8 -18 M442 128 l-2 -22 M454 128 l4 -20 M464 138 l12 -14" stroke="#b97a56" stroke-width="10" stroke-linecap="round"/>
+    <!-- Hoved -->
+    <rect x="314" y="238" width="32" height="30" rx="8" fill="#a86c4b"/>
+    <circle cx="284" cy="212" r="10" fill="#b97a56"/>
+    <circle cx="376" cy="212" r="10" fill="#b97a56"/>
+    <ellipse cx="330" cy="206" rx="46" ry="50" fill="#b97a56"/>
+    <path d="M284 196 Q280 150 330 148 Q380 150 376 196 Q360 172 330 172 Q300 172 284 196 Z" fill="#1f1a17"/>
+    <!-- Brillerne sidder i panden -->
+    <path d="M286 176 Q330 166 374 176" fill="none" stroke="#1f5fa8" stroke-width="8"/>
+    <rect x="296" y="160" width="68" height="26" rx="10" fill="#9ed2ee" fill-opacity="0.7" stroke="#1f5fa8" stroke-width="5"/>
+    <path d="M330 162 V184" stroke="#1f5fa8" stroke-width="4"/>
+    <!-- Ansigt -->
+    <circle cx="313" cy="206" r="5" fill="#1f1a17"/>
+    <circle cx="347" cy="206" r="5" fill="#1f1a17"/>
+    <path d="M304 194 q9 -5 18 0 M338 194 q9 -5 18 0" fill="none" stroke="#1f1a17" stroke-width="3.5" stroke-linecap="round"/>
+    <path d="M308 224 Q330 250 352 224 Z" fill="#ffffff" stroke="#6e3b24" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Taleboble -->
+  <g>
+    <path d="M86 70 H236 Q256 70 256 90 V132 Q256 152 236 152 H206 L262 196 L176 152 H86 Q66 152 66 132 V90 Q66 70 86 70 Z" fill="#ffffff" stroke="#1f2328" stroke-width="4" stroke-linejoin="round"/>
+    <text x="161" y="126" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="40" font-weight="800" fill="#1f2328">Grib!</text>
+  </g>
+
+  <!-- Det andet bord -->
+  <rect y="400" width="1200" height="20" fill="#56676c"/>
+  <rect y="420" width="1200" height="10" fill="#2c373b"/>
+  <rect y="430" width="1200" height="90" fill="#cfd8d6"/>
+  <g stroke="#b3bfbd" stroke-width="3"><path d="M200 430 V520 M500 430 V520 M800 430 V520 M1100 430 V520"/></g>
+
+  <!-- Kolbens bane -->
+  <path d="M470 130 Q600 60 730 190" fill="none" stroke="#1f2328" stroke-opacity="0.25" stroke-width="5" stroke-dasharray="4 16" stroke-linecap="round"/>
+
+  <!-- Kolben i luften -->
+  <g transform="translate(820 300) rotate(38) scale(1.35)">
+    <g fill="none" stroke="#1f2328" stroke-opacity="0.35" stroke-width="4" stroke-linecap="round">
+      <path d="M-104 -70 Q-120 -10 -104 50"/>
+      <path d="M-128 -50 Q-140 -6 -128 34"/>
+    </g>
+    <path d="M-50 12 L-70 54 Q-72 64 -60 64 H60 Q72 64 70 54 L50 12 Z" fill="#3d8fd6" fill-opacity="0.8"/>
+    <path d="M-16 -112 V-50 L-72 52 Q-78 70 -58 70 H58 Q78 70 72 52 L16 -50 V-112 Z" fill="url(#glas)" stroke="#5f8fb0" stroke-width="3.5" stroke-linejoin="round"/>
+    <rect x="-22" y="-120" width="44" height="10" rx="4" fill="#d4ebfa" fill-opacity="0.5" stroke="#5f8fb0" stroke-width="3"/>
+    <path d="M-6 -100 V-56 M-26 -20 L-54 40" stroke="#ffffff" stroke-opacity="0.8" stroke-width="6" stroke-linecap="round"/>
+    <g fill="#3d8fd6" fill-opacity="0.85">
+      <path d="M-4 -132 q-8 -14 0 -22 q8 8 0 22 Z"/>
+      <circle cx="18" cy="-150" r="6"/>
+      <circle cx="-22" cy="-160" r="5"/>
+      <circle cx="6" cy="-178" r="4"/>
+    </g>
+  </g>
+
+  <!-- Dit eget bord i forgrunden -->
+  <rect y="606" width="1200" height="114" fill="url(#bord)"/>
+  <rect y="602" width="1200" height="8" fill="#56676c"/>
+  <g transform="translate(150 668) rotate(-5)">
+    <rect x="-110" y="-44" width="220" height="120" rx="3" fill="#fbfaf5"/>
+    <path d="M-86 -18 h150 M-86 4 h172 M-86 26 h120" stroke="#b7bec4" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(420 676) rotate(-18)">
+    <rect x="-80" y="-7" width="150" height="14" rx="3" fill="#f2c53d"/>
+    <path d="M70 -7 L96 0 L70 7 Z" fill="#e8c9a0"/>
+    <rect x="-92" y="-7" width="14" height="14" rx="3" fill="#e05446"/>
+  </g>
+</svg>

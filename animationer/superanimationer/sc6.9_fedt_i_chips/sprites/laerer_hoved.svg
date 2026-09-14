@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="260" viewBox="0 0 110 130">
+  <!-- Laererens hoved uden oejne, bryn og mund; dem tegner animationen.
+       Halsen (ankeret) er (55, 126). Brillernes midter er (37, 60) og
+       (73, 60), munden sidder ved (55, 97). -->
+  <defs>
+    <radialGradient id="hud" cx="0.45" cy="0.4" r="0.65">
+      <stop offset="0" stop-color="#f7d3b2"/>
+      <stop offset="0.75" stop-color="#eebf98"/>
+      <stop offset="1" stop-color="#d69f78"/>
+    </radialGradient>
+  </defs>
+  <!-- Hals -->
+  <rect x="42" y="104" width="26" height="26" rx="6" fill="#e2b089"/>
+  <!-- Oerer -->
+  <ellipse cx="13" cy="66" rx="8" ry="12" fill="#e7b48d"/>
+  <ellipse cx="97" cy="66" rx="8" ry="12" fill="#e7b48d"/>
+  <path d="M11 60 Q15 66 11 72 M99 60 Q95 66 99 72" stroke="#c98f68" stroke-width="1.5" fill="none"/>
+  <!-- Ansigt -->
+  <path d="M55 8 Q94 8 94 56 Q94 96 76 110 Q66 118 55 118 Q44 118 34 110 Q16 96 16 56 Q16 8 55 8 Z" fill="url(#hud)"/>
+  <!-- Blank isse og graa haartotter -->
+  <ellipse cx="44" cy="22" rx="14" ry="6" fill="#ffffff" fill-opacity="0.35" transform="rotate(-18 44 22)"/>
+  <path d="M14 58 Q8 40 18 28 Q20 40 26 46 Q22 36 28 30 Q28 44 32 50 L20 62 Z" fill="#a9adb3"/>
+  <path d="M96 58 Q102 40 92 28 Q90 40 84 46 Q88 36 82 30 Q82 44 78 50 L90 62 Z" fill="#a9adb3"/>
+  <path d="M40 12 Q50 2 62 10 Q54 8 48 14 Z" fill="#a9adb3"/>
+  <!-- Naese -->
+  <path d="M55 62 Q50 76 48 80 Q52 84 58 82" fill="none" stroke="#c98f68" stroke-width="2.2" stroke-linecap="round"/>
+  <!-- Overskaeg -->
+  <path d="M38 90 Q46 82 55 86 Q64 82 72 90 Q66 92 60 90 Q55 92 50 90 Q44 92 38 90 Z" fill="#8f949b"/>
+</svg>

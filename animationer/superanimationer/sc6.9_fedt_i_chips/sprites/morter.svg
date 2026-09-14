@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="112" viewBox="0 0 100 56">
+  <!-- Morter i porcelaen. Kanten er en ellipse med midte (50, 9),
+       halvakser 45 og 6. Bundens midte er (50, 56). -->
+  <defs>
+    <linearGradient id="skaal" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b9c0c8"/>
+      <stop offset="0.35" stop-color="#ffffff"/>
+      <stop offset="0.7" stop-color="#e6eaee"/>
+      <stop offset="1" stop-color="#a7afb8"/>
+    </linearGradient>
+    <linearGradient id="inde" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8c949d"/>
+      <stop offset="1" stop-color="#d6dbe0"/>
+    </linearGradient>
+  </defs>
+  <path d="M5 9 Q8 42 34 48 L34 52 Q34 56 38 56 L62 56 Q66 56 66 52 L66 48 Q92 42 95 9 Z" fill="url(#skaal)" stroke="#9aa3ad" stroke-width="1"/>
+  <ellipse cx="50" cy="9" rx="45" ry="6" fill="url(#inde)" stroke="#f4f6f8" stroke-width="1.4"/>
+  <path d="M14 18 Q20 36 38 43" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" fill="none" stroke-opacity="0.8"/>
+  <path d="M8 9 Q50 2 92 9" stroke="#ffffff" stroke-opacity="0.35" stroke-width="1" fill="none"/>
+</svg>

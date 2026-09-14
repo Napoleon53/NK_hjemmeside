@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="68" viewBox="0 0 90 34">
+  <!-- Varmeplade. Pladens overside er y 0. Displayet (tegnes af
+       animationen) er x 10-40, y 14-27. Lampen er (52, 20). -->
+  <defs>
+    <linearGradient id="krop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef1f4"/>
+      <stop offset="1" stop-color="#b3bbc4"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="0" width="82" height="7" rx="2" fill="#3a3f47" stroke="#22262c" stroke-width="0.8"/>
+  <path d="M8 2 h74" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1"/>
+  <path d="M1 8 Q1 6 3 6 L87 6 Q89 6 89 8 L89 32 Q89 34 87 34 L3 34 Q1 34 1 32 Z" fill="url(#krop)" stroke="#8d96a1" stroke-width="0.9"/>
+  <rect x="9" y="13" width="32" height="15" rx="2" fill="#2a3036"/>
+  <circle cx="70" cy="20" r="8" fill="#2f343b" stroke="#1d2126" stroke-width="0.8"/>
+  <circle cx="70" cy="20" r="5.5" fill="#434a53"/>
+</svg>

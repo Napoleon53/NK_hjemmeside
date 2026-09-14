@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="92" height="240" viewBox="0 0 46 120">
+  <!-- Klar reagensflaske med heptan. Laaget tegnes af animationen.
+       Aabningen er (23, 4). Faresymboler: GHS02 (brandfarlig), GHS07
+       (sundhedsskadelig), GHS08 (sundhedsfare) og GHS09 (miljoefare). -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#cfe6f5" stop-opacity="0.5"/>
+      <stop offset="0.25" stop-color="#e8f4fb" stop-opacity="0.2"/>
+      <stop offset="0.75" stop-color="#e8f4fb" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#bcd8ea" stop-opacity="0.45"/>
+    </linearGradient>
+  </defs>
+  <!-- Vaesken -->
+  <path d="M5 44 L41 44 L41 112 Q41 117 36 117 L10 117 Q5 117 5 112 Z" fill="#eef4f8" fill-opacity="0.22"/>
+  <path d="M5 44 L41 44" stroke="#ffffff" stroke-opacity="0.45" stroke-width="1"/>
+  <!-- Glasset -->
+  <path d="M16 4 L30 4 L30 22 Q30 28 38 32 Q43 35 43 42 L43 112 Q43 119 36 119 L10 119 Q3 119 3 112 L3 42 Q3 35 8 32 Q16 28 16 22 Z" fill="url(#glas)" stroke="#dcecf8" stroke-opacity="0.85" stroke-width="1.4" stroke-linejoin="round"/>
+  <path d="M8 46 L8 110" stroke="#ffffff" stroke-opacity="0.3" stroke-width="2.4" stroke-linecap="round"/>
+  <!-- Etiket -->
+  <rect x="6" y="54" width="34" height="54" rx="2.5" fill="#f7f5ee" stroke="#c8c1ae" stroke-width="0.7"/>
+  <text x="23" y="65" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="8" font-weight="800" fill="#1f2328">Heptan</text>
+  <text x="23" y="74" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="6.5" font-weight="600" fill="#4a4f57">C<tspan font-size="4.8" dy="1.6">7</tspan><tspan dy="-1.6">H</tspan><tspan font-size="4.8" dy="1.6">16</tspan></text>
+  <!-- GHS02: brandfarlig -->
+  <g transform="translate(15 84)">
+    <rect x="-4.6" y="-4.6" width="9.2" height="9.2" transform="rotate(45)" fill="#ffffff" stroke="#d8342a" stroke-width="1.2"/>
+    <path d="M0 -3.6 Q2.6 -1 2.2 1.4 Q2 3 0 3.2 Q-2 3 -2.2 1.4 Q-2.4 -0.6 -0.6 -1.4 Q0.2 -2.4 0 -3.6 Z" fill="#111111"/>
+    <path d="M-3 3.8 h6" stroke="#111111" stroke-width="0.8"/>
+  </g>
+  <!-- GHS07: udraabstegn -->
+  <g transform="translate(31 84)">
+    <rect x="-4.6" y="-4.6" width="9.2" height="9.2" transform="rotate(45)" fill="#ffffff" stroke="#d8342a" stroke-width="1.2"/>
+    <path d="M0 -3.4 L0 1" stroke="#111111" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="0" cy="3" r="0.8" fill="#111111"/>
+  </g>
+  <!-- GHS08: sundhedsfare -->
+  <g transform="translate(15 98)">
+    <rect x="-4.6" y="-4.6" width="9.2" height="9.2" transform="rotate(45)" fill="#ffffff" stroke="#d8342a" stroke-width="1.2"/>
+    <circle cx="0" cy="-2.6" r="1.1" fill="#111111"/>
+    <path d="M-2.4 3.6 L-2.4 -0.4 Q-2.4 -1.3 -1.4 -1.3 L1.4 -1.3 Q2.4 -1.3 2.4 -0.4 L2.4 3.6 Z" fill="#111111"/>
+    <path d="M0 -0.6 L0.6 0.8 L-0.6 0.8 Z M0 2.6 L0.6 1.2 L-0.6 1.2 Z" fill="#ffffff"/>
+  </g>
+  <!-- GHS09: miljoefare -->
+  <g transform="translate(31 98)">
+    <rect x="-4.6" y="-4.6" width="9.2" height="9.2" transform="rotate(45)" fill="#ffffff" stroke="#d8342a" stroke-width="1.2"/>
+    <path d="M-2.2 2.6 L-2.2 -2.2 M-2.2 -1.2 L-3.4 -2.6 M-2.2 -0.4 L-0.9 -2" stroke="#111111" stroke-width="0.7" stroke-linecap="round"/>
+    <path d="M-0.4 1.6 q1.3 -1.3 2.8 0 q-1.5 1.3 -2.8 0 Z M2.4 1.6 l0.9 -0.7 v1.4 Z" fill="#111111"/>
+  </g>
+</svg>
