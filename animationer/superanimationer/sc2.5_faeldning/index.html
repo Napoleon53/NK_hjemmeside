@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fældning</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<!-- Én fane: det er ét forsoeg. Derfor ingen fanelinje i toppen. -->
+<header class="top">
+    <h1><span class="ikon">◍</span> Fældning <span class="undertitel">Dråbeforsøg på folie</span></h1>
+
+    <div class="top-hoejre">
+        <button class="knap topknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+        <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+    </div>
+</header>
+
+<main class="forsoeg">
+    <div class="scenekolonne">
+        <div class="scene" id="scene">
+            <canvas id="scene-laerred" aria-label="Forsøgsopstilling: dråbeflasker i et stativ, en plastlomme med et skema og en lup"></canvas>
+
+            <!-- Forloebet i tre trin. Det aktive trin lyser; se trin() i forsoeg.js. -->
+            <ol class="trinlinje" aria-label="Forløb">
+                <li id="trin-1"><span class="nr">1</span>Dryp i felterne</li>
+                <li id="trin-2"><span class="nr">2</span>Brug luppen</li>
+                <li id="trin-3"><span class="nr">3</span>Opskriv reaktionen</li>
+            </ol>
+
+            <div class="scenebesked" id="scenebesked" aria-live="polite"></div>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort fremhaev" id="skema-kort">
+            <h2>Skema <span class="taeller" id="skema-taeller">0 af 12 felter</span></h2>
+            <table class="skema" id="skema-tabel"></table>
+            <div class="knaprad">
+                <button class="knap" id="knap-toer" type="button" title="Tør feltet i luppen af (Delete)"><span>Tør feltet af</span></button>
+                <button class="knap" id="knap-toer-alt" type="button" title="Tør hele folien af (R)"><span>Tør folien af</span></button>
+            </div>
+        </div>
+
+        <div class="kort opgavekort" id="opgave-kort">
+            <h2><span>Reaktionsskema</span> <span class="taeller" id="opg-taeller">0 af 9</span></h2>
+            <p class="besked" id="opg-tekst"></p>
+
+            <div id="opg-bygger" hidden>
+                <div class="ionvalg" id="opg-ioner" aria-label="Ionerne i dråben"></div>
+                <div class="skemalinje" id="opg-linje">
+                    <button class="koef" id="opg-k1" type="button" title="Koefficient. Klik for at ændre." aria-label="Koefficient for den positive ion">1</button>
+                    <span class="plads tom" id="opg-kat">?</span><span class="tilst">(aq)</span>
+                    <span class="tegn-plus">+</span>
+                    <button class="koef" id="opg-k2" type="button" title="Koefficient. Klik for at ændre." aria-label="Koefficient for den negative ion">1</button>
+                    <span class="plads tom" id="opg-an">?</span><span class="tilst">(aq)</span>
+                    <span class="tegn-pil">→</span>
+                    <span class="plads tom" id="opg-produkt">?</span><span class="tilst">(s)</span>
+                </div>
+                <div class="knaprad">
+                    <button class="knap blaa" id="opg-tjek" type="button"><span>Tjek</span><span class="tegn">✓</span></button>
+                    <button class="knap" id="opg-svar" type="button" hidden><span>Vis svaret</span></button>
+                </div>
+            </div>
+
+            <p class="besked" id="opg-besked" hidden></p>
+            <button class="knap stor blaa" id="opg-naeste" type="button" hidden><span>Næste felt med bundfald</span><span class="tegn">→</span></button>
+        </div>
+    </aside>
+</main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Fældning</h2>
+        <p>Blandes to opløsninger af salte, kan en positiv ion fra den ene og en negativ ion fra den anden danne et tungtopløseligt salt. Saltet kan ikke være opløst og ses som et bundfald.</p>
+        <div class="ligning">Pb²⁺(aq) + 2 I⁻(aq) → PbI₂(s)</div>
+
+        <h3>Tilskuerioner</h3>
+        <p>De øvrige ioner er opløst både før og efter blandingen. De skrives ikke med i reaktionsskemaet.</p>
+
+        <h3>Koefficienterne</h3>
+        <p>Bundfaldet har ingen samlet ladning. Koefficienterne vælges, så den positive og den negative ladning går op, med de mindste hele tal.</p>
+
+        <h3>Huskeregel</h3>
+        <p>Nitrater og alle salte med natrium, kalium og ammonium er letopløselige.</p>
+
+        <div class="knapper">
+            <button class="knap blaa" id="teori-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: spotlight paa ét element ad gangen - se js/rundvisning.js -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/scene.js"></script>
+<script src="js/mikro.js"></script>
+<script src="js/forsoeg.js"></script>
+<script src="js/opgave.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

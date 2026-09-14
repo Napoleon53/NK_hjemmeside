@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="144" height="88" viewBox="0 0 72 44">
+  <!-- Et krammet stykke koekkenrulle. Midten er (36, 22). -->
+  <path d="M6 10 L22 3 L40 7 L58 2 L70 12 L66 26 L70 38 L50 42 L32 38 L14 42 L2 32 L7 22 Z" fill="#f7f5ef" stroke="#cfc9ba" stroke-width="1.2" stroke-linejoin="round"/>
+  <g fill="none" stroke="#d9d3c4" stroke-width="1" stroke-linecap="round">
+    <path d="M22 3 L26 20 L14 42"/>
+    <path d="M40 7 L36 22 L50 42"/>
+    <path d="M58 2 L52 20 L66 26"/>
+    <path d="M7 22 L26 20 L36 22 L52 20"/>
+  </g>
+  <path d="M10 14 h54" stroke="#bdb6a4" stroke-width="0.9" stroke-dasharray="2 2.5"/>
+</svg>

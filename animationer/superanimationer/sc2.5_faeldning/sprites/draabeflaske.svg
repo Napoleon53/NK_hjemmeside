@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="300" viewBox="0 0 60 150">
+  <!-- Draabeflaske af blød plast.
+       Spidsen er (30, 2). Væsken tegnes af animationen bag denne fil,
+       inden for x 9-51, y 66-143. Etiketten er x 8-52, y 90-126;
+       formlen skrives ovenpå af animationen. -->
+  <defs>
+    <linearGradient id="plast" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f4f7fa" stop-opacity="0.6"/>
+      <stop offset="0.2" stop-color="#f4f7fa" stop-opacity="0.18"/>
+      <stop offset="0.7" stop-color="#f4f7fa" stop-opacity="0.1"/>
+      <stop offset="1" stop-color="#f4f7fa" stop-opacity="0.48"/>
+    </linearGradient>
+    <linearGradient id="spids" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c7cfd8"/>
+      <stop offset="0.45" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#aab4bf"/>
+    </linearGradient>
+    <linearGradient id="kappe" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b3bcc7"/>
+      <stop offset="0.4" stop-color="#f1f4f7"/>
+      <stop offset="1" stop-color="#939eab"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Spids -->
+  <path d="M28.6 2 L31.4 2 L36 30 L24 30 Z" fill="url(#spids)" stroke="#8e98a4" stroke-width="0.8"/>
+  <path d="M29.4 5 L27.2 27" stroke="#ffffff" stroke-opacity="0.7" stroke-width="0.9"/>
+
+  <!-- Skruelaag -->
+  <rect x="17" y="30" width="26" height="17" rx="2.5" fill="url(#kappe)" stroke="#7f8995" stroke-width="0.8"/>
+  <path d="M20.5 33 v11 M24.5 33 v11 M28.5 33 v11 M32.5 33 v11 M36.5 33 v11 M40 33 v11" stroke="#7f8995" stroke-width="0.9" stroke-opacity="0.55"/>
+
+  <!-- Skulder og krop -->
+  <path d="M19 47 L41 47 C41 54 54 56 54 66 L54 140 Q54 146 48 146 L12 146 Q6 146 6 140 L6 66 C6 56 19 54 19 47 Z"
+        fill="url(#plast)" stroke="#e3e9ef" stroke-opacity="0.9" stroke-width="1.4"/>
+  <path d="M10 66 C10 60 16 57 20 52" fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Genskin -->
+  <rect x="11" y="70" width="4" height="68" rx="2" fill="#ffffff" fill-opacity="0.32"/>
+  <rect x="47" y="72" width="2" height="62" rx="1" fill="#ffffff" fill-opacity="0.18"/>
+
+  <!-- Etiket -->
+  <rect x="8" y="90" width="44" height="36" rx="3" fill="#f3f0e4" stroke="#c9c3ad" stroke-width="0.8"/>
+  <path d="M10 121 h40" stroke="#c9c3ad" stroke-width="0.7"/>
+</svg>

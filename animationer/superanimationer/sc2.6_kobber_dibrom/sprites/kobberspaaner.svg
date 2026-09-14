@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="68" viewBox="0 0 90 34">
+  <!-- En lille bunke kobberspaaner. Bunden er y 33, midten x 45. -->
+  <defs>
+    <linearGradient id="bunke" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8652e"/>
+      <stop offset="1" stop-color="#5e2c10"/>
+    </linearGradient>
+  </defs>
+  <path d="M2 33 Q10 16 26 12 Q40 3 56 8 Q76 11 88 33 Z" fill="url(#bunke)"/>
+  <g fill="none" stroke-linecap="round">
+    <g stroke="#e39a5a" stroke-width="2">
+      <path d="M10 29 c3 -8 12 -9 11 -3 c-1 5 -8 4 -6 -2"/>
+      <path d="M30 19 c4 -6 13 -5 11 1 c-2 5 -9 3 -6 -3"/>
+      <path d="M52 14 c5 -4 12 -1 9 4 c-3 4 -8 1 -5 -4"/>
+      <path d="M64 27 c3 -7 12 -7 10 -1 c-2 5 -8 3 -5 -3"/>
+    </g>
+    <g stroke="#f3c08a" stroke-width="1.2">
+      <path d="M20 26 c4 -5 10 -3 8 2"/>
+      <path d="M42 24 c3 -6 11 -6 10 0 c-1 4 -6 3 -4 -1"/>
+      <path d="M36 10 c3 -3 8 -2 7 2"/>
+      <path d="M74 20 c2 -3 7 -2 6 2"/>
+    </g>
+    <g stroke="#8a4115" stroke-width="1.6">
+      <path d="M16 20 c4 -3 9 -1 7 3"/>
+      <path d="M48 28 c3 -4 10 -3 9 1"/>
+      <path d="M58 20 c3 -4 9 -3 8 1"/>
+      <path d="M26 30 c2 -3 7 -3 7 0"/>
+    </g>
+  </g>
+</svg>

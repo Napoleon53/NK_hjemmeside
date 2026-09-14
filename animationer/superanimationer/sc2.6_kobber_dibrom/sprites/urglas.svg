@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="56" viewBox="0 0 120 28">
+  <!-- Urglas set fra siden. Kanten er y 7, bunden hviler paa bordet. -->
+  <defs>
+    <linearGradient id="skaal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.34"/>
+    </linearGradient>
+  </defs>
+  <path d="M3 7 Q60 48 117 7 Z" fill="url(#skaal)"/>
+  <path d="M3 7 Q60 48 117 7" fill="none" stroke="#dcecf8" stroke-opacity="0.85" stroke-width="1.6"/>
+  <ellipse cx="60" cy="7" rx="57" ry="4.5" fill="#d4ebfa" fill-opacity="0.08" stroke="#e6f2fb" stroke-opacity="0.75" stroke-width="1.2"/>
+  <path d="M18 13 Q34 21 50 22" fill="none" stroke="#ffffff" stroke-opacity="0.3" stroke-width="2" stroke-linecap="round"/>
+</svg>

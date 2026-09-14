@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="112" viewBox="0 0 600 56">
+  <!-- Stativets forside. Den tegnes efter flaskerne og dækker deres
+       nederste del. Hullerne og etiketfelterne er centreret i
+       x 55, 133, 211 og 311, 389, 467, 545. Etiketfelterne er y 24-46;
+       formlerne skrives af animationen. -->
+  <defs>
+    <linearGradient id="blok" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d7dde3"/>
+      <stop offset="0.2" stop-color="#b9c1ca"/>
+      <stop offset="1" stop-color="#7e8894"/>
+    </linearGradient>
+    <linearGradient id="top" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f3f5f7"/>
+      <stop offset="1" stop-color="#cfd5dc"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Forsiden og oversiden -->
+  <rect x="0" y="6" width="600" height="50" rx="7" fill="url(#blok)"/>
+  <rect x="0" y="0" width="600" height="13" rx="5" fill="url(#top)"/>
+  <path d="M4 13 H596" stroke="#6f7984" stroke-opacity="0.45" stroke-width="1"/>
+
+  <!-- Forkanten af hullerne -->
+  <g fill="none" stroke="#6b7580" stroke-width="1.6" stroke-opacity="0.75">
+    <path d="M28 6 A27 5 0 0 0 82 6"/>
+    <path d="M106 6 A27 5 0 0 0 160 6"/>
+    <path d="M184 6 A27 5 0 0 0 238 6"/>
+    <path d="M284 6 A27 5 0 0 0 338 6"/>
+    <path d="M362 6 A27 5 0 0 0 416 6"/>
+    <path d="M440 6 A27 5 0 0 0 494 6"/>
+    <path d="M518 6 A27 5 0 0 0 572 6"/>
+  </g>
+
+  <!-- Skillerille mellem de to grupper -->
+  <path d="M261 15 V52" stroke="#5f6974" stroke-opacity="0.55" stroke-width="2"/>
+  <path d="M263 15 V52" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1"/>
+
+  <!-- Etiketfelter -->
+  <g fill="#fbfaf4" stroke="#6f7985" stroke-width="1">
+    <rect x="23" y="24" width="64" height="22" rx="3"/>
+    <rect x="101" y="24" width="64" height="22" rx="3"/>
+    <rect x="179" y="24" width="64" height="22" rx="3"/>
+    <rect x="279" y="24" width="64" height="22" rx="3"/>
+    <rect x="357" y="24" width="64" height="22" rx="3"/>
+    <rect x="435" y="24" width="64" height="22" rx="3"/>
+    <rect x="513" y="24" width="64" height="22" rx="3"/>
+  </g>
+
+  <!-- Genskin paa forkanten -->
+  <rect x="6" y="15" width="588" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.3"/>
+</svg>

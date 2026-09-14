@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest - sc2.5 Fældning</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:800px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i animationen og kan slettes.
+
+   Aabner index.html i en iframe og kontrollerer det, man ikke kan se
+   paa et skaermbillede: at formlerne og ladningerne gaar op, at skemaet
+   giver de rigtige bundfald, at draaberne havner, hvor de skal, at
+   ionerne i luppen passer med reaktionsskemaet, at opgaven kun godtager
+   det rigtige svar og giver et hint, der passer til fejlen, og at
+   teksterne hverken har tankestreger eller "1+".
+
+   Skal aabnes gennem en lokal server (eller i Firefox): Chrome nægter
+   en side paa file:// at kigge ind i sin egen iframe.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+function koer() {
+    var ramme = document.getElementById("ramme");
+    var d, NK;
+    try {
+        d = ramme.contentDocument;
+        NK = ramme.contentWindow.NK;
+    } catch (e) {
+        skriv("Kan ikke kigge ind i iframen. Åbn siden gennem en lokal server.", "fejl");
+        fejl++;
+        vis();
+        return;
+    }
+    var tekster = [];
+
+    overskrift("1. Indlaesning");
+    paastand("NK findes", !!NK);
+    if (!NK) { vis(); return; }
+    paastand("forsoeg og opgave er bygget", !!(NK.forsoeg && NK.opgave));
+    NK.Sprites.NAVNE.forEach(function (n) { paastand("sprite " + n + " er indlaest", NK.Sprites.klar(n)); });
+
+    var D = NK.Data, f = NK.forsoeg, O = NK.opgave;
+    function adv(sek) { for (var k = 0; k < Math.round(sek * 60); k++) f.opdater(1 / 60); }
+    function dryp(nr, oplId) { f.tagFlaske(D.opl(oplId).nr); adv(0.3); var ok = f.drypI(nr); adv(1.2); return ok; }
+    function udfoer(nr) { var F = D.FELTER[nr]; dryp(nr, F.soejle); dryp(nr, F.raekke); f.saetTilbage(); adv(0.2); }
+    function frisk() { f.nulstil(); NK.opdaterPanel(); }
+
+    overskrift("2. Kemien i data.js");
+    var formler = D.OPLOESNINGER.map(function (o) { return o.formel; }).join(" ");
+    paastand("flaskernes formler", formler === "AgNO₃ BaCl₂ CuSO₄ NaCl Na₂SO₄ Na₂CO₃ Na₃PO₄", formler);
+    paastand("ladningerne gaar op i alle opløsninger", D.OPLOESNINGER.every(function (o) {
+        return o.p * D.IONER[o.kat].q + o.n * D.IONER[o.an].q === 0;
+    }));
+    var kat = ["Ag", "Ba", "Cu", "Na"], an = ["NO3", "Cl", "SO4", "CO3", "PO4"], mangler = [];
+    kat.forEach(function (k) { an.forEach(function (a) { if (D.tungtoploeseligt(k, a) && !D.BUNDFALD[k + "-" + a]) mangler.push(k + "-" + a); }); });
+    paastand("alle tungtopløselige par har en farve", mangler.length === 0, mangler.join(", "));
+
+    var VENTET = ["Ag-Cl", "", "", "Ag-SO4", "Ba-SO4", "", "Ag-CO3", "Ba-CO3", "Cu-CO3", "Ag-PO4", "Ba-PO4", "Cu-PO4"];
+    var fik = D.FELTER.map(function (F) { var b = D.forventet(F).bundfald; return b.length ? b.map(function (x) { return x.noegle; }).join("+") : ""; });
+    paastand("skemaet giver de rigtige bundfald i alle 12 felter", fik.join(",") === VENTET.join(","), fik.join(","));
+    var FORMLER = { "Ag-Cl": "AgCl", "Ag-SO4": "Ag₂SO₄", "Ag-CO3": "Ag₂CO₃", "Ag-PO4": "Ag₃PO₄", "Ba-SO4": "BaSO₄",
+        "Ba-CO3": "BaCO₃", "Ba-PO4": "Ba₃(PO₄)₂", "Cu-CO3": "CuCO₃", "Cu-PO4": "Cu₃(PO₄)₂" };
+    Object.keys(FORMLER).forEach(function (n) {
+        var p = n.split("-");
+        paastand("formlen for " + FORMLER[n], D.bundfaldFormel(p[0], p[1]) === FORMLER[n], D.bundfaldFormel(p[0], p[1]));
+    });
+    var skema = D.reaktionsskema("Ba", "PO4");
+    paastand("reaktionsskemaet for Ba₃(PO₄)₂", skema === "3 Ba²⁺(aq) + 2 PO₄³⁻(aq) → Ba₃(PO₄)₂(s)", skema);
+    var ionTekster = Object.keys(D.IONER).map(D.ionTekst).join(" ");
+    paastand("ioner med ladning ±1 skrives uden 1", ionTekster === "Ag⁺ Ba²⁺ Cu²⁺ Na⁺ NO₃⁻ Cl⁻ SO₄²⁻ CO₃²⁻ PO₄³⁻", ionTekster);
+    paastand("ingen bundfald er dobbelt i ét rigtigt udfoert felt", D.FELTER.every(function (F) { return D.forventet(F).bundfald.length <= 1; }));
+
+    overskrift("3. Draabeflasker og felter");
+    frisk();
+    paastand("alle flasker staar i stativet fra start", f.flasker.every(function (x) { return x.iStativ; }) && f.haand === -1);
+    f.tagFlaske(0);
+    paastand("en flaske kan tages op", f.haand === 0 && !f.flasker[0].iStativ);
+    paastand("uden en flaske i haanden kan der ikke dryppes", (function () { f.saetTilbage(); return f.drypI(0) === false; }()));
+    dryp(0, "AgNO3");
+    paastand("én draabe AgNO₃ i feltet AgNO₃ + NaCl", f.felter[0].draaber.AgNO3 === 1 && f.status(0) === "delvis", JSON.stringify(f.felter[0].draaber));
+    paastand("draaben er landet paa folien", f.felter[0].r > 10 && f.faldende.length === 0, f.felter[0].r.toFixed(1));
+    dryp(0, "NaCl");
+    paastand("NaCl ovenpaa giver bundfald", f.status(0) === "bundfald" && f.felter[0].blandTid >= 0);
+    paastand("den forrige flaske er sat tilbage, naar en ny tages", f.flasker[0].iStativ && f.haand === D.opl("NaCl").nr);
+    adv(2);
+    paastand("bundfaldet er fuldt synligt efter et par sekunder", f.makroGrad(0) === 1);
+    f.saetTilbage();
+    adv(1.5);
+    paastand("Esc/saetTilbage staar flasken i stativet igen", f.flasker.every(function (x) { return x.iStativ; }));
+
+    udfoer(1);
+    paastand("BaCl₂ + NaCl giver intet bundfald", f.status(1) === "intet" && f.felter[1].blandTid === -1);
+    dryp(1, "Na3PO4");
+    f.saetTilbage();
+    paastand("en fremmed opløsning goer feltet forurenet", f.status(1) === "forurenet");
+    paastand("Ba₃(PO₄)₂ dannes ogsaa i det forurenede felt", f.felter[1].analyse.bundfald.some(function (b) { return b.noegle === "Ba-PO4"; }));
+
+    var n4 = 0;
+    for (var i = 0; i < 4; i++) if (dryp(2, "CuSO4")) n4++;
+    paastand("et felt kan rumme " + f.MAKS_DRAABER + " draaber", n4 === 4 && f.felter[2].antal === 4);
+    paastand("den femte draabe afvises", dryp(2, "CuSO4") === false && f.felter[2].antal === 4);
+    f.saetTilbage();
+
+    f.toerAf(2);
+    adv(1);
+    paastand("Tør feltet af tømmer netop det felt", f.status(2) === "tom" && f.status(0) === "bundfald");
+    f.toerAlt();
+    adv(2);
+    paastand("Tør folien af tømmer alle felter", f.felter.every(function (x) { return x.antal === 0; }));
+    paastand("antal udfoerte felter er 0 igen", f.antalUdfoert() === 0);
+
+    overskrift("4. Luppen og ionerne");
+    frisk();
+    [9, 10, 3, 7].forEach(udfoer);
+    paastand("et tomt felt kan ikke vaelges", (f.vaelgFelt(0), f.valgt === -1));
+    f.vaelgFelt(9);
+    adv(0.1);
+    function tael() { return f.mikro.optael(); }
+    var t = tael();
+    paastand("AgNO₃ + Na₃PO₄: 6 Ag⁺, 6 NO₃⁻, 18 Na⁺ og 6 PO₄³⁻", t.Ag.fri + t.Ag.bundet === 6 && t.NO3.fri === 6 && t.Na.fri === 18 && t.PO4.fri + t.PO4.bundet === 6, JSON.stringify(t));
+    paastand("bundfaldet er 6 Ag⁺ og 2 PO₄³⁻, resten er i overskud", t.Ag.bundet === 6 && t.PO4.bundet === 2 && t.PO4.fri === 4);
+    paastand("tilskuerionerne er ikke med i bundfaldet", t.Na.bundet === 0 && t.NO3.bundet === 0);
+    adv(4);
+    paastand("efter reaktionen ligger alle bundne ioner paa plads", f.mikro.ioner.every(function (x) { return !x.bundet || x.fremme; }));
+    paastand("at se bundfaldet i luppen fuldfoerer trin 2", f.harKigget && f.trin() === 3);
+    var Z = NK.Scene.ZOOM;
+    paastand("alle ioner er inden for cirklen", f.mikro.ioner.every(function (x) {
+        var dx = x.x - Z.x, dy = x.y - Z.y; return Math.sqrt(dx * dx + dy * dy) <= Z.r;
+    }));
+
+    f.vaelgFelt(10);
+    adv(0.1);
+    t = tael();
+    paastand("BaCl₂ + Na₃PO₄: 6 Ba²⁺ og 4 PO₄³⁻ i bundfaldet, 12 Cl⁻ frie", t.Ba.bundet === 6 && t.PO4.bundet === 4 && t.Cl.fri === 12 && t.Cl.bundet === 0, JSON.stringify(t));
+    f.vaelgFelt(3);
+    adv(0.1);
+    t = tael();
+    paastand("AgNO₃ + Na₂SO₄: 6 Ag⁺ og 3 SO₄²⁻ i bundfaldet", t.Ag.bundet === 6 && t.SO4.bundet === 3 && t.SO4.fri === 3, JSON.stringify(t));
+    var ladning = 0;
+    f.mikro.ioner.forEach(function (x) { if (x.bundet) ladning += D.IONER[x.id].q; });
+    paastand("bundfaldet i luppen har ingen samlet ladning", ladning === 0, ladning);
+    paastand("med mere end to draaber er der faerre ioner pr. draabe", f.mikro.PR_DRAABE(3) < f.mikro.PR_DRAABE(2));
+
+    overskrift("5. Reaktionsskemaet");
+    f.vaelgFelt(9);
+    NK.opdaterPanel();
+    var bygger = d.getElementById("opg-bygger");
+    paastand("byggeren vises for et felt med bundfald", !bygger.hidden);
+    paastand("de fire ioner i draaben kan vaelges", d.querySelectorAll("#opg-ioner .ionchip").length === 4);
+    paastand("Tjek uden ioner taeller ikke som et forkert svar", O.tjek() === false && O.fejl === 0);
+    O.vaelgIon("Na"); O.vaelgIon("PO4");
+    paastand("Na⁺ og PO₄³⁻ er forkert", O.tjek() === false && O.fejl === 1);
+    var hint1 = d.getElementById("opg-besked").textContent;
+    tekster.push(hint1);
+    paastand("hintet handler om Na⁺", hint1.indexOf("Na⁺") >= 0, hint1);
+    paastand("Vis svaret skjules efter én fejl", d.getElementById("opg-svar").hidden);
+    O.vaelgIon("Ag");
+    paastand("kationen skiftes ved at vaelge en anden", O.kat === "Ag");
+    paastand("Ag⁺ + PO₄³⁻ med 1 og 1 er forkert", O.tjek() === false && O.fejl === 2);
+    var hint2 = d.getElementById("opg-besked").textContent;
+    tekster.push(hint2);
+    paastand("hintet regner ladningerne ud", hint2.indexOf("+1") >= 0 && hint2.indexOf("−3") >= 0, hint2);
+    paastand("Vis svaret kommer efter to fejl", !d.getElementById("opg-svar").hidden);
+    d.getElementById("opg-k1").click(); d.getElementById("opg-k1").click();
+    paastand("koefficienten skifter ved klik", O.kKat === 3);
+    paastand("3 Ag⁺ + PO₄³⁻ er rigtigt", O.tjek() === true && f.felter[9].loest);
+    tekster.push(d.getElementById("opg-besked").textContent);
+    paastand("produktet vises", d.getElementById("opg-produkt").textContent === "Ag₃PO₄");
+    paastand("efterskriften naevner tilskuerionerne", d.getElementById("opg-besked").textContent.indexOf("Na⁺ og NO₃⁻ er tilskuerioner") >= 0, d.getElementById("opg-besked").textContent);
+    NK.opdaterPanel();
+    paastand("der er 9 felter med bundfald at opskrive", O.ANTAL === 9, O.ANTAL);
+    paastand("taelleren siger 1 af 9", d.getElementById("opg-taeller").textContent === "1 af 9", d.getElementById("opg-taeller").textContent);
+    paastand("Næste felt med bundfald vises", !d.getElementById("opg-naeste").hidden);
+    d.getElementById("opg-naeste").click();
+    NK.opdaterPanel();
+    paastand("og vaelger et andet uløst felt", f.valgt !== 9 && f.status(f.valgt) === "bundfald" && !f.felter[f.valgt].loest, f.valgt);
+
+    f.vaelgFelt(7);
+    NK.opdaterPanel();
+    O.vaelgIon("Ba"); O.vaelgIon("Cl");
+    O.tjek();
+    var hint3 = d.getElementById("opg-besked").textContent;
+    tekster.push(hint3);
+    paastand("Cl⁻ i BaCl₂ + Na₂CO₃ peger paa feltet BaCl₂ + NaCl", hint3.indexOf("BaCl₂ + NaCl") >= 0, hint3);
+    O.tjek();
+    d.getElementById("opg-svar").click();
+    tekster.push(d.getElementById("opg-besked").textContent, d.getElementById("opg-tekst").textContent);
+    paastand("Vis svaret viser svaret uden at taelle med", O.kat === "Ba" && O.an === "CO3" && !f.felter[7].loest);
+    f.vaelgFelt(9);
+    NK.opdaterPanel();
+    paastand("et løst felt vises laast med svaret", O.laast && d.getElementById("opg-tjek").hidden);
+    f.vaelgFelt(7);
+    NK.opdaterPanel();
+    paastand("et vist svar kan proeves igen", !O.laast && O.fejl === 0);
+
+    O.vaelgIon("Ag");
+    paastand("ioner, der ikke er i draaben, kan ikke vaelges i panelet", d.querySelector('#opg-ioner [data-ion="Ag"]') === null);
+
+    overskrift("6. Skemaet i panelet");
+    var felter = d.querySelectorAll("#skema-tabel .skemafelt");
+    paastand("12 felter", felter.length === 12);
+    paastand("feltet AgNO₃ + Na₃PO₄ er markeret som løst", felter[9].classList.contains("loest") && felter[9].classList.contains("bundfald"));
+    paastand("taelleren siger 4 af 12 felter", d.getElementById("skema-taeller").textContent === "4 af 12 felter", d.getElementById("skema-taeller").textContent);
+    felter[3].click();
+    paastand("klik i skemaet vaelger feltet til luppen", f.valgt === 3);
+
+    overskrift("7. Sprog");
+    frisk();
+    tekster.push(d.body.textContent);
+    f.besked = function (t) { tekster.push(t); };
+    dryp(0, "BaCl2"); dryp(0, "CuSO4"); dryp(0, "CuSO4"); dryp(0, "CuSO4"); dryp(0, "CuSO4");
+    f.vaelgFelt(0);
+    NK.opdaterPanel();
+    tekster.push(d.getElementById("opg-tekst").textContent);
+    var alt = tekster.join(" ");
+    paastand("ingen tankestreger i teksterne", !/[—–]/.test(alt));
+    paastand("ingen 1+ eller 1− i teksterne", !/(¹⁺|¹⁻|1\+|1−)/.test(alt));
+    delete f.besked;
+
+    frisk();
+    vis();
+}
+
+function vis() {
+    skriv("\n" + (fejl === 0 ? "ALT OK" : fejl + " FEJL"), fejl === 0 ? "ok" : "fejl");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+</script>
+</body>
+</html>

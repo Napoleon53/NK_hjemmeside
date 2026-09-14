@@ -1,0 +1,558 @@
+/* =====================================================================
+   sc2.5 - Fældning
+   Stilark. Samme farver og kortstil som de oevrige superanimationer.
+   BEMAERK: decimaltal skrives med PUNKTUM i CSS (0.25rem), aldrig med
+   dansk komma.
+   ===================================================================== */
+
+:root {
+    --bund:        #1b1b21;
+    --scene-bund:  #1c1f26;
+    --panel:       #2b2b36;
+    --panel-2:     #333340;
+    --panel-3:     #3d3d4b;
+    --linje:       #464655;
+    --tekst:       #f2f3f5;
+    --tekst-svag:  #c8ced6;
+    --tekst-mat:   #9fa6af;
+
+    --blaa:        #3d9ee0;
+    --blaa-mork:   #2a76ac;
+    --orange:      #e6892a;
+    --groen:       #3fae72;
+    --groen-mork:  #2b7d51;
+    --roed:        #e05446;
+    --roed-mork:   #a33529;
+    --gul:         #f2c53d;
+    --lilla:       #9b6bd6;
+
+    --radius:      10px;
+    --radius-lil:  6px;
+    --skygge:      0 4px 14px rgba(0, 0, 0, 0.35);
+    --panel-bredde: 360px;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; height: 100%; }
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bund);
+    color: var(--tekst);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------------
+   TOPLINJE
+   --------------------------------------------------------------------- */
+.top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 9px 16px;
+    background-color: #15151b;
+    border-bottom: 1px solid #33333f;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+    z-index: 20;
+    flex-shrink: 0;
+}
+
+.top h1 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.top h1 .ikon { font-size: 1.15rem; margin-right: 3px; color: var(--gul); }
+.top h1 .undertitel { margin-left: 8px; font-size: 0.85rem; font-weight: 400; color: var(--tekst-mat); }
+
+.top-hoejre { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+.ikonknap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid #4a4a58;
+    color: var(--tekst-svag);
+    border-radius: var(--radius-lil);
+    width: 36px;
+    height: 34px;
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.ikonknap:hover { background-color: var(--panel-3); color: var(--tekst); }
+
+#hjaelpknap {
+    font-size: 1.1rem;
+    font-weight: 700;
+    background-color: var(--roed-mork);
+    border-color: var(--roed);
+    color: #d9dde3;
+}
+
+#hjaelpknap:hover { background-color: var(--roed); color: #ffffff; }
+
+.topknap { padding: 7px 14px; height: 34px; }
+
+/* ---------------------------------------------------------------------
+   HOVEDLAYOUT: scenen til venstre, panelet til hoejre
+   --------------------------------------------------------------------- */
+main.forsoeg {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) var(--panel-bredde);
+}
+
+.scenekolonne {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    background-color: var(--scene-bund);
+}
+
+.scene {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.scene > canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    user-select: none;
+}
+
+.trinlinje {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    display: flex;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    pointer-events: none;
+}
+
+.trinlinje li {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px 5px 6px;
+    border-radius: 20px;
+    background-color: rgba(20, 20, 26, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--tekst-mat);
+    white-space: nowrap;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.trinlinje .nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    background-color: var(--panel-3);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--tekst-svag);
+}
+
+.trinlinje li.aktiv { background-color: rgba(42, 118, 172, 0.92); border-color: var(--blaa); color: #ffffff; }
+.trinlinje li.aktiv .nr { background-color: rgba(255, 255, 255, 0.25); color: #ffffff; }
+.trinlinje li.gjort { color: var(--tekst-svag); }
+.trinlinje li.gjort .nr { background-color: var(--groen-mork); color: #ffffff; }
+
+.scenebesked {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translate(-50%, 8px);
+    max-width: calc(100% - 40px);
+    padding: 8px 18px;
+    border-radius: var(--radius);
+    background-color: rgba(20, 20, 26, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: var(--skygge);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--tekst-svag);
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.scenebesked.vis { opacity: 1; transform: translate(-50%, 0); }
+.scenebesked.advarsel { color: #f0d77a; border-color: rgba(242, 197, 61, 0.45); }
+
+/* ---------------------------------------------------------------------
+   HOEJRE SPALTE
+   --------------------------------------------------------------------- */
+.panel {
+    background-color: var(--panel);
+    border-left: 1px solid #1f1f27;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    min-width: 0;
+    scrollbar-width: thin;
+    scrollbar-color: #4d4d5c var(--panel);
+}
+
+.kort {
+    background-color: rgba(0, 0, 0, 0.22);
+    border: 1px solid #3a3a47;
+    border-radius: var(--radius);
+    padding: 11px;
+}
+
+.kort > h2 {
+    margin: 0 0 9px 0;
+    font-size: 0.84rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--gul);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.kort > h2 .taeller {
+    font-size: 0.78rem;
+    letter-spacing: 0.02em;
+    text-transform: none;
+    color: var(--tekst-mat);
+}
+
+.kort.fremhaev { border-left: 3px solid var(--blaa); }
+.kort.opgavekort { border-left: 3px solid var(--lilla); }
+
+.besked { margin: 0; font-size: 0.9rem; line-height: 1.5; color: var(--tekst-svag); }
+.besked[hidden] { display: none; }
+.besked.god   { color: #7ee0a8; }
+.besked.skidt { color: #f0a29b; }
+#opg-besked { margin-top: 9px; }
+
+/* ----- Skemaet ------------------------------------------------------- */
+.skema {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 3px;
+    table-layout: fixed;
+    margin: -3px 0 0;
+}
+
+.skema th {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--tekst-svag);
+    padding: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.skema thead th { text-align: center; }
+.skema thead th:first-child { width: 27%; }
+.skema tbody th { text-align: left; padding-left: 4px; }
+
+.skemafelt {
+    width: 100%;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border-radius: 5px;
+    background-color: #16161c;
+    border: 1px solid #3a3a47;
+    color: var(--tekst-mat);
+    font-family: inherit;
+    font-size: 0.74rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.skemafelt:hover { border-color: #5e5e70; }
+.skemafelt i { width: 15px; height: 15px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35); }
+.skemafelt b { color: #7ee0a8; font-size: 0.85rem; }
+.skemafelt.delvis { color: var(--tekst-svag); font-size: 0.9rem; }
+.skemafelt.forurenet { color: #f0918a; border-color: var(--roed-mork); font-weight: 800; font-size: 0.9rem; }
+.skemafelt.bundfald { background-color: #20242e; }
+.skemafelt.loest { border-color: var(--groen-mork); }
+.skemafelt.valgt { outline: 2px solid var(--gul); outline-offset: 1px; }
+
+/* ----- Reaktionsskemaet -------------------------------------------- */
+#opg-bygger[hidden] { display: none; }
+
+.ionvalg { display: flex; flex-wrap: wrap; gap: 6px; margin: 9px 0 10px; }
+
+.ionchip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 11px 5px 6px;
+    border-radius: 16px;
+    background-color: var(--panel-2);
+    border: 1px solid #4a4a58;
+    color: var(--tekst);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.14s ease, border-color 0.14s ease;
+}
+
+.ionchip i { width: 13px; height: 13px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35); }
+.ionchip:hover:not(:disabled) { background-color: var(--panel-3); }
+.ionchip.valgt { background-color: var(--blaa-mork); border-color: var(--blaa); }
+.ionchip:disabled { cursor: default; opacity: 0.7; }
+.ionchip.valgt:disabled { opacity: 1; }
+
+.skemalinje {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 4px 3px;
+    padding: 10px 6px;
+    border-radius: var(--radius-lil);
+    background-color: #111117;
+    border: 1px solid #3f3f4d;
+    font-size: 1.02rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.skemalinje.loest { border-color: var(--groen); color: #9be8bd; }
+
+.koef {
+    min-width: 26px;
+    height: 28px;
+    padding: 0 5px;
+    border-radius: 5px;
+    background-color: var(--panel-3);
+    border: 1px solid #5a5a6a;
+    color: var(--tekst);
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.koef:hover:not(:disabled) { background-color: #4a4a5a; border-color: var(--blaa); }
+.koef.en { color: var(--tekst-mat); }
+.koef:disabled { cursor: default; background-color: transparent; border-color: transparent; }
+.koef.en:disabled { visibility: hidden; width: 0; min-width: 0; padding: 0; border: none; }
+
+.plads { min-width: 28px; text-align: center; }
+.plads.tom { color: var(--tekst-mat); border-bottom: 1px dashed #6a6a7a; }
+.tilst { font-size: 0.72rem; font-weight: 500; color: var(--tekst-mat); margin-right: 2px; }
+.tegn-plus, .tegn-pil { color: var(--tekst-mat); margin: 0 3px; }
+
+#opg-naeste { margin-top: 10px; }
+#opg-naeste[hidden] { display: none; }
+
+/* ---------------------------------------------------------------------
+   KNAPPER
+   --------------------------------------------------------------------- */
+.knap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background-color: var(--panel-2);
+    color: var(--tekst);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 8px 11px;
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+}
+
+.knap:hover:not(:disabled) { background-color: var(--panel-3); border-color: #5e5e70; }
+.knap:active:not(:disabled) { transform: scale(0.985); }
+.knap:disabled { opacity: 0.4; cursor: not-allowed; }
+.knap[hidden] { display: none; }
+.knap .tegn { font-size: 1rem; flex-shrink: 0; }
+.knap.stor { padding: 11px 13px; font-size: 0.92rem; width: 100%; }
+
+.knap.blaa { background-color: var(--blaa-mork); border-color: var(--blaa); }
+.knap.blaa:hover:not(:disabled) { background-color: var(--blaa); }
+
+.knaprad { display: flex; gap: 6px; margin-top: 10px; }
+.knaprad .knap { flex: 1; justify-content: center; padding: 9px 8px; font-size: 0.88rem; }
+
+.knapper { display: flex; justify-content: flex-end; margin-top: 18px; }
+.knapper .knap { justify-content: center; min-width: 110px; }
+
+@keyframes bank {
+    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.6); }
+    70%  { box-shadow: 0 0 0 11px rgba(242, 197, 61, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
+}
+
+.banker:not(:disabled) { animation: bank 1.7s ease-out infinite; }
+
+/* ---------------------------------------------------------------------
+   TEORI
+   --------------------------------------------------------------------- */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(8, 8, 12, 0.78);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 50;
+}
+
+.overlay.vis { display: flex; }
+
+.overlay-boks {
+    background-color: var(--panel);
+    border: 1px solid var(--linje);
+    border-radius: 14px;
+    box-shadow: var(--skygge);
+    max-width: 580px;
+    width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 22px 26px;
+}
+
+.overlay-boks h2 { margin: 0 0 8px 0; font-size: 1.15rem; color: var(--blaa); }
+
+.overlay-boks h3 {
+    margin: 18px 0 6px 0;
+    font-size: 0.8rem;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--gul);
+}
+
+.overlay-boks p { font-size: 0.92rem; line-height: 1.55; color: var(--tekst-svag); margin: 0 0 8px 0; }
+
+.ligning {
+    background-color: #111117;
+    border: 1px solid #3f3f4d;
+    border-radius: var(--radius-lil);
+    color: #7ee0a8;
+    text-align: center;
+    padding: 12px 8px;
+    margin: 10px 0 4px;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+/* ---------------------------------------------------------------------
+   RUNDVISNINGEN (samme som sc1.3)
+   --------------------------------------------------------------------- */
+.rundvisning { position: fixed; inset: 0; z-index: 200; }
+.rundvisning[hidden] { display: none; }
+
+.rundvisning-baggrund { position: fixed; inset: 0; background: transparent; cursor: pointer; }
+
+.rundvisning-spot {
+    position: fixed;
+    border-radius: 10px;
+    box-shadow: 0 0 0 9999px rgba(8, 8, 13, 0.74);
+    outline: 2px solid var(--gul);
+    outline-offset: 3px;
+    pointer-events: none;
+    transition: top 0.22s ease, left 0.22s ease, width 0.22s ease, height 0.22s ease;
+}
+
+.rundvisning-boks {
+    position: fixed;
+    width: 300px;
+    max-width: calc(100vw - 28px);
+    background-color: var(--panel);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius);
+    box-shadow: var(--skygge);
+    padding: 14px 16px;
+    transition: top 0.22s ease, left 0.22s ease;
+}
+
+.rundvisning-hoved { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.rundvisning-tal { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.07em; color: var(--tekst-mat); }
+
+.rundvisning-luk {
+    background: transparent;
+    border: none;
+    color: var(--tekst-svag);
+    font-size: 0.9rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 4px;
+}
+
+.rundvisning-boks h3 { margin: 0 0 6px 0; font-size: 1rem; color: var(--gul); }
+.rundvisning-boks p { margin: 0; font-size: 0.88rem; line-height: 1.5; color: var(--tekst-svag); }
+.rundvisning-knapper { display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; }
+.rundvisning-knapper .knap { flex: 1; justify-content: center; }
+
+/* ---------------------------------------------------------------------
+   TILGAENGELIGHED OG SMALLE SKAERME
+   --------------------------------------------------------------------- */
+button:focus-visible {
+    outline: 2px solid var(--gul);
+    outline-offset: 2px;
+}
+
+@media (max-width: 1100px) {
+    :root { --panel-bredde: 320px; }
+    .top h1 .undertitel { display: none; }
+}
+
+@media (max-width: 900px) {
+    .trinlinje li { font-size: 0.72rem; padding: 3px 9px 3px 4px; }
+}
+
+@media (max-width: 820px) {
+    body { overflow: auto; }
+    main.forsoeg { display: block; }
+    .scenekolonne { height: auto; }
+    .scene { height: 62vw; min-height: 300px; flex: none; }
+    .panel { border-left: none; border-top: 1px solid #1f1f27; overflow: visible; }
+    .trinlinje { left: 8px; right: auto; top: 6px; flex-wrap: wrap; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}

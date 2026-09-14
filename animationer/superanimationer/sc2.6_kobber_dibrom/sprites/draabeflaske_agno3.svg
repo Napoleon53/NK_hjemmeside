@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="92" height="220" viewBox="0 0 46 110">
+  <!-- Draabeflaske med soelvnitrat i brun plast (lysfoelsomt). Spidsen er (23, 0). -->
+  <defs>
+    <linearGradient id="krop" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#4a2408"/>
+      <stop offset="0.38" stop-color="#9a5a22"/>
+      <stop offset="1" stop-color="#3d1d07"/>
+    </linearGradient>
+    <linearGradient id="laag" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#15171b"/>
+      <stop offset="0.45" stop-color="#4d535c"/>
+      <stop offset="1" stop-color="#111316"/>
+    </linearGradient>
+  </defs>
+  <path d="M20 18 L21.6 2 Q23 -0.5 24.4 2 L26 18 Z" fill="#e9eef2" stroke="#b9c4cd" stroke-width="0.8"/>
+  <rect x="12" y="16" width="22" height="25" rx="3" fill="url(#laag)"/>
+  <path d="M16 20 v18 M20 20 v18 M24 20 v18 M28 20 v18" stroke="#000000" stroke-opacity="0.5" stroke-width="1"/>
+  <path d="M12 40 Q4 42 3 52 L3 100 Q3 108 11 108 L35 108 Q43 108 43 100 L43 52 Q42 42 34 40 Z" fill="url(#krop)"/>
+  <rect x="5" y="57" width="36" height="38" rx="2" fill="#f4efe4" stroke="#c8bda6" stroke-width="0.8"/>
+  <text x="23" y="75" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="9.5" font-weight="700" fill="#1f2328">AgNO<tspan font-size="6.5" dy="2.5">3</tspan></text>
+  <text x="23" y="89" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="8" font-weight="600" fill="#4a4f57">(aq)</text>
+  <rect x="7" y="46" width="3" height="56" rx="1.5" fill="#ffffff" fill-opacity="0.22"/>
+</svg>

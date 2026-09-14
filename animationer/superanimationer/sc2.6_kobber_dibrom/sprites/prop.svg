@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="88" height="72" viewBox="0 0 44 36">
+  <!-- Gummiprop. Bunden (22, 36) sidder i kolbens hals. -->
+  <defs>
+    <linearGradient id="gummi" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3a3f47"/>
+      <stop offset="0.35" stop-color="#7d8591"/>
+      <stop offset="0.6" stop-color="#565d68"/>
+      <stop offset="1" stop-color="#2c3037"/>
+    </linearGradient>
+  </defs>
+  <path d="M3 0 L41 0 Q44 0 43.4 3 L38 33 Q37.5 36 35 36 L9 36 Q6.5 36 6 33 L0.6 3 Q0 0 3 0 Z" fill="url(#gummi)"/>
+  <ellipse cx="22" cy="2.6" rx="19" ry="2.2" fill="#9aa2ad" fill-opacity="0.55"/>
+  <path d="M9 6 L12 31" stroke="#ffffff" stroke-opacity="0.2" stroke-width="2" stroke-linecap="round"/>
+</svg>

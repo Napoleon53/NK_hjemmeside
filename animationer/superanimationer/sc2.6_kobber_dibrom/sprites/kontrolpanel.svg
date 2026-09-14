@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="152" viewBox="0 0 220 76">
+  <!-- Stinkskabets kontrolpanel. Animationen tegner bag/oven paa:
+       ventilatorens vinger bag risten om (42, 38), lampen (112, 34),
+       tallet i displayet (112, 55) og vippekontakten om (178, 38). -->
+  <defs>
+    <linearGradient id="hus" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d3d8df"/>
+      <stop offset="1" stop-color="#98a0ab"/>
+    </linearGradient>
+  </defs>
+  <rect x="1" y="1" width="218" height="74" rx="8" fill="url(#hus)" stroke="#5c6470" stroke-width="1.5"/>
+  <path d="M42 38 m-26 0 a26 26 0 1 0 52 0 a26 26 0 1 0 -52 0 Z M42 38 m-21 0 a21 21 0 1 1 42 0 a21 21 0 1 1 -42 0 Z" fill="#3d434c" fill-rule="evenodd"/>
+  <g stroke="#3d434c" stroke-width="1.4" stroke-linecap="round">
+    <path d="M21 38 H63 M42 17 V59 M27.2 23.2 L56.8 52.8 M56.8 23.2 L27.2 52.8"/>
+  </g>
+  <circle cx="42" cy="38" r="4" fill="#3d434c"/>
+  <text x="112" y="17" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="9.5" font-weight="700" letter-spacing="0.8" fill="#2b3038">UDSUGNING</text>
+  <circle cx="112" cy="33" r="6.5" fill="#2a2e35" stroke="#6d7580" stroke-width="1"/>
+  <rect x="86" y="45" width="52" height="19" rx="3" fill="#15201a" stroke="#6d7580" stroke-width="1"/>
+  <rect x="156" y="12" width="44" height="52" rx="6" fill="#3b414a" stroke="#6d7580" stroke-width="1"/>
+  <g fill="#6d7580">
+    <circle cx="8" cy="8" r="1.8"/><circle cx="212" cy="8" r="1.8"/>
+    <circle cx="8" cy="68" r="1.8"/><circle cx="212" cy="68" r="1.8"/>
+  </g>
+  <text x="178" y="72" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="6.5" font-weight="700" fill="#3b414a">0 / I</text>
+</svg>

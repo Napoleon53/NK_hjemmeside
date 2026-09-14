@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1232" height="764" viewBox="0 0 616 382">
+  <!-- Plastlomme med et sort skema inden i.
+       Papiret er x 38-602, y 12-370. Stregerne og formlerne i skemaet
+       tegnes af animationen ovenpå. -->
+  <defs>
+    <linearGradient id="film" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e8f2fb" stop-opacity="0.15"/>
+      <stop offset="0.35" stop-color="#e8f2fb" stop-opacity="0.04"/>
+      <stop offset="0.5" stop-color="#e8f2fb" stop-opacity="0.1"/>
+      <stop offset="0.62" stop-color="#e8f2fb" stop-opacity="0.03"/>
+      <stop offset="1" stop-color="#e8f2fb" stop-opacity="0.09"/>
+    </linearGradient>
+    <linearGradient id="papir" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b2f38"/>
+      <stop offset="1" stop-color="#1e2229"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Selve lommen -->
+  <rect x="1" y="1" width="614" height="380" rx="6" fill="#dfe9f3" fill-opacity="0.07" stroke="#dfe9f3" stroke-opacity="0.45" stroke-width="1.5"/>
+
+  <!-- Hulstrimmel med svejsning -->
+  <rect x="1" y="1" width="28" height="380" rx="5" fill="#dfe9f3" fill-opacity="0.1"/>
+  <path d="M29 5 V377" stroke="#dfe9f3" stroke-opacity="0.35" stroke-width="1" stroke-dasharray="3 2"/>
+  <g fill="#15171c" stroke="#dfe9f3" stroke-opacity="0.4" stroke-width="1">
+    <circle cx="15" cy="70" r="5.5"/>
+    <circle cx="15" cy="150" r="5.5"/>
+    <circle cx="15" cy="232" r="5.5"/>
+    <circle cx="15" cy="312" r="5.5"/>
+  </g>
+
+  <!-- Papiret inde i lommen -->
+  <rect x="38" y="12" width="564" height="358" rx="2" fill="url(#papir)"/>
+
+  <!-- Filmen ovenpaa -->
+  <rect x="31" y="3" width="582" height="376" rx="4" fill="url(#film)"/>
+  <path d="M170 3 L236 3 L126 379 L60 379 Z" fill="#ffffff" fill-opacity="0.028"/>
+  <path d="M474 3 L498 3 L388 379 L364 379 Z" fill="#ffffff" fill-opacity="0.025"/>
+  <path d="M34 3.5 H610" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1"/>
+  <path d="M612.5 6 V376" stroke="#ffffff" stroke-opacity="0.15" stroke-width="1"/>
+</svg>

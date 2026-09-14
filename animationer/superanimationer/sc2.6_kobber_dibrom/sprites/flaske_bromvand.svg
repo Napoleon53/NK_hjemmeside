@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="340" viewBox="0 0 80 170">
+  <!-- Brun reagensflaske med bromvand. Laaget er en separat sprite
+       (skruelaag.svg). Aabningen er (40, 4). Faresymboler: GHS05
+       (aetsende), GHS06 (akut giftig) og GHS09 (miljoefare). -->
+  <defs>
+    <linearGradient id="brun" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2a1407"/>
+      <stop offset="0.2" stop-color="#5a2c0e"/>
+      <stop offset="0.4" stop-color="#8a4a1a"/>
+      <stop offset="0.62" stop-color="#5e2f10"/>
+      <stop offset="1" stop-color="#241106"/>
+    </linearGradient>
+    <linearGradient id="brunV" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3b1d0a"/>
+      <stop offset="0.45" stop-color="#8a4a1a"/>
+      <stop offset="1" stop-color="#2f1708"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Hals med gevind -->
+  <rect x="29" y="4" width="22" height="28" fill="url(#brunV)"/>
+  <path d="M29 12 h22 M29 18 h22 M29 24 h22" stroke="#1f0e04" stroke-opacity="0.6" stroke-width="1.2"/>
+  <rect x="27" y="1.5" width="26" height="5" rx="2" fill="url(#brunV)"/>
+
+  <!-- Krop -->
+  <path d="M29 30 C29 44 6 46 5 60 L5 160 Q5 168 13 168 L67 168 Q75 168 75 160 L75 60 C74 46 51 44 51 30 Z" fill="url(#brun)"/>
+  <path d="M10 64 L10 158" stroke="#ffffff" stroke-opacity="0.16" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Etiket -->
+  <rect x="11" y="68" width="58" height="80" rx="4" fill="#f4efe4" stroke="#c8bda6" stroke-width="0.8"/>
+  <text x="40" y="88" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="700" fill="#1f2328">Br<tspan font-size="9" dy="3">2</tspan><tspan dy="-3" font-size="10" font-weight="600"> (aq)</tspan></text>
+  <text x="40" y="101" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="8.5" font-weight="600" fill="#4a4f57">Bromvand</text>
+
+  <!-- GHS05: aetsende -->
+  <g transform="translate(22 127)">
+    <rect x="-6" y="-6" width="12" height="12" transform="rotate(45)" fill="#ffffff" stroke="#d8342a" stroke-width="1.6"/>
+    <path d="M-4.5 -4 l3 -1.4 l0.8 1.6 l-3 1.4 Z M0.8 -4.6 l3 1.2 l-0.7 1.6 l-3 -1.2 Z" fill="#111111"/>
+    <circle cx="-1.8" cy="-0.6" r="0.7" fill="#111111"/>
+    <circle cx="2.2" cy="-0.6" r="0.7" fill="#111111"/>
+    <path d="M-4.6 2.4 h3.6 v1.6 h-3.6 Z M0.8 2.2 q2 -0.8 3.8 0.4 v1.4 h-3.8 Z" fill="#111111"/>
+  </g>
+  <!-- GHS06: akut giftig -->
+  <g transform="translate(40 127)">
+    <rect x="-6" y="-6" width="12" height="12" transform="rotate(45)" fill="#ffffff" stroke="#d8342a" stroke-width="1.6"/>
+    <path d="M-2.6 -1.2 a2.6 2.6 0 1 1 5.2 0 q0 1.6 -1 2 v0.9 h-3.2 v-0.9 q-1 -0.4 -1 -2 Z" fill="#111111"/>
+    <circle cx="-1" cy="-1.2" r="0.75" fill="#ffffff"/>
+    <circle cx="1" cy="-1.2" r="0.75" fill="#ffffff"/>
+    <path d="M-3.6 2.2 L3.6 4.6 M3.6 2.2 L-3.6 4.6" stroke="#111111" stroke-width="1" stroke-linecap="round"/>
+  </g>
+  <!-- GHS09: miljoefare -->
+  <g transform="translate(58 127)">
+    <rect x="-6" y="-6" width="12" height="12" transform="rotate(45)" fill="#ffffff" stroke="#d8342a" stroke-width="1.6"/>
+    <path d="M-3 3.4 L-3 -3 M-3 -1.6 L-4.6 -3.4 M-3 -0.6 L-1.2 -2.8" stroke="#111111" stroke-width="0.9" stroke-linecap="round"/>
+    <path d="M-0.6 2.2 q1.8 -1.8 3.8 0 q-2 1.8 -3.8 0 Z M3.2 2.2 l1.2 -0.9 v1.8 Z" fill="#111111"/>
+    <path d="M-4.4 4 h8.8" stroke="#111111" stroke-width="0.8"/>
+  </g>
+</svg>

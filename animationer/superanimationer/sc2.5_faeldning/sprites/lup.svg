@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 160 160">
+  <!-- Lup. Linsens midte er (58, 58), inderradius 42.
+       Det forstørrede billede tegnes af animationen bag denne fil. -->
+  <defs>
+    <linearGradient id="skaft" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a6f9f"/>
+      <stop offset="1" stop-color="#1c3a58"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eef2f6"/>
+      <stop offset="0.5" stop-color="#a9b3be"/>
+      <stop offset="1" stop-color="#6c7784"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Skaft -->
+  <path d="M100 100 L147 147" stroke="url(#skaft)" stroke-width="17" stroke-linecap="round"/>
+  <path d="M104 101 L142 139" stroke="#9cc3e6" stroke-opacity="0.35" stroke-width="3" stroke-linecap="round"/>
+  <path d="M90 90 L104 104" stroke="#aeb7c2" stroke-width="16"/>
+  <path d="M91 88 L103 100" stroke="#ffffff" stroke-opacity="0.4" stroke-width="2.5"/>
+
+  <!-- Linse og ring -->
+  <circle cx="58" cy="58" r="42" fill="#cfe8ff" fill-opacity="0.06"/>
+  <circle cx="58" cy="58" r="47" fill="none" stroke="url(#ring)" stroke-width="9"/>
+  <circle cx="58" cy="58" r="42.5" fill="none" stroke="#5f6b78" stroke-width="1.4"/>
+  <circle cx="58" cy="58" r="51.5" fill="none" stroke="#5f6b78" stroke-width="1"/>
+  <path d="M28 44 A33 33 0 0 1 46 26" fill="none" stroke="#ffffff" stroke-opacity="0.55" stroke-width="4" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="280" viewBox="0 0 64 140">
+  <!-- Sprayflaske med natriumthiosulfat til at uskadeliggoere brom.
+       Dysen er (3, 18) og peger mod venstre. -->
+  <defs>
+    <linearGradient id="krop" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b3bec7"/>
+      <stop offset="0.35" stop-color="#eef3f7"/>
+      <stop offset="1" stop-color="#a1adb7"/>
+    </linearGradient>
+    <linearGradient id="hoved" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4fc088"/>
+      <stop offset="1" stop-color="#23794c"/>
+    </linearGradient>
+  </defs>
+  <path d="M22 38 h20 v14 h-20 Z" fill="url(#hoved)"/>
+  <path d="M18 10 Q18 4 26 4 L46 4 Q52 4 52 12 L52 30 Q52 38 44 38 L22 38 Q18 38 18 32 L18 24 L4 22 Q1 21 1 18 Q1 15 4 14 L18 12 Z" fill="url(#hoved)" stroke="#1d6440" stroke-width="1"/>
+  <path d="M20 26 Q12 30 13 44 L19 44 Q19 34 24 30 Z" fill="#23794c" stroke="#1d6440" stroke-width="1"/>
+  <path d="M12 52 Q8 56 8 64 L8 130 Q8 138 16 138 L48 138 Q56 138 56 130 L56 64 Q56 56 52 52 Z" fill="url(#krop)"/>
+  <rect x="12" y="72" width="40" height="42" rx="3" fill="#ffffff" stroke="#8d99a4" stroke-width="0.8"/>
+  <text x="32" y="89" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="8.5" font-weight="700" fill="#1f2328">Na<tspan font-size="6" dy="2">2</tspan><tspan dy="-2">S</tspan><tspan font-size="6" dy="2">2</tspan><tspan dy="-2">O</tspan><tspan font-size="6" dy="2">3</tspan></text>
+  <text x="32" y="102" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="7.5" font-weight="600" fill="#4a4f57">(aq)</text>
+  <rect x="12" y="60" width="3" height="68" rx="1.5" fill="#ffffff" fill-opacity="0.5"/>
+</svg>
