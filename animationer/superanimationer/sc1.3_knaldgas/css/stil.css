@@ -463,6 +463,7 @@ main.forsoeg {
 .knap:hover:not(:disabled) { background-color: var(--panel-3); border-color: #5e5e70; }
 .knap:active:not(:disabled) { transform: scale(0.985); }
 .knap:disabled { opacity: 0.4; cursor: not-allowed; }
+.knap[hidden] { display: none; }
 .knap .tegn { font-size: 1rem; flex-shrink: 0; }
 .knap.stor { padding: 11px 13px; font-size: 0.92rem; width: 100%; }
 .knap.lille { padding: 4px 10px; font-size: 0.78rem; }

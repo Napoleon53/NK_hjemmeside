@@ -5,12 +5,18 @@
      "klar"    staar i vandbadet og kan fyldes
      "traek"   eleven traekker det rundt
      "flyver"  glider af sig selv (hen til flammen eller hjem igen)
-     "knald"   holdes ind over flammen, lige efter reaktionen
-     "fylder"  er kommet hjem efter et knald og fyldes med vand igen
+     "knald"   staar ved flammen efter reaktionen, indtil eleven trykker
+               Genfyld glasset
+     "fylder"  er kommet hjem og fyldes med vand igen
 
    Molekylerne i glasset er ikke pynt: hver streg gas er 2 molekyler,
-   og efter knaldet ligger der praecis det vand og det overskud, som
-   model.js regner ud. Ved 5 : 1 ser man altsaa H2 blive tilbage.
+   og efter knaldet dannes praecis det vand, som model.js regner ud.
+   Vandet farer ud af aabningen og ud i rummet; overskuddet bliver i
+   glasset, saa man ved 5 : 1 ser H2 blive tilbage.
+
+   Paaskeaeg: ved det helt rigtige forhold, 4 : 2, knaekker glasset i
+   10 % af forsoegene (knaekChance). Saa bliver Genfyld glasset til
+   Nyt glas.
    ===================================================================== */
 (function () {
     "use strict";
@@ -21,8 +27,8 @@
     var G = S.GLAS;
 
     var TYNGDE = 900;
-    var KNALD_HOLD = 2.1;          /* sekunder ved flammen efter knaldet */
     var FYLD_TID = 0.9;            /* sekunder om at fylde glasset med vand igen */
+    var GENFYLD_VENT = 0.7;        /* sekunder efter knaldet, foer glasset kan genfyldes */
 
     function r(a, b) { return a + Math.random() * (b - a); }
 
@@ -34,6 +40,7 @@
         this.senesteH = -1;
         this.senesteTid = -10;
         this.harFyldt = false;
+        this.knaekChance = 0.1;
         this.vedAendring = null;
         this.vedBesked = null;
         this.hover = null;
@@ -54,10 +61,14 @@
         this.traek = null;
         this.skalFyldes = false;
         this.fyldUr = 0;
-        this.knaldUr = 0;
+        this.knaldTid = -10;
+        this.knaekUr = -1;
+        this.knust = false;
         this.niveau = 0;
         this.vand = 1;
         this.molekyler = [];
+        this.fri = [];
+        this.skaar = [];
         this.dug = [];
         this.bobler = [];
         this.venter = { h2: 0, o2: 0 };
@@ -91,6 +102,7 @@
     P.kanFylde = function () { return this.tilstand === "klar" && !this.fuld(); };
     P.kanAntaende = function () { return this.tilstand === "klar" && this.fuld(); };
     P.kanToemme = function () { return this.tilstand === "klar" && this.h + this.o > 0; };
+    P.kanGenfylde = function () { return this.tilstand === "knald" && this.tid - this.knaldTid >= GENFYLD_VENT; };
 
     /* Hvilket af de tre trin paa scenen er eleven naaet til? */
     P.trin = function () {
@@ -109,6 +121,10 @@
 
     /* ----- Indgreb ------------------------------------------------------ */
     P.tilfoej = function (gas) {
+        if (this.tilstand === "knald") {
+            this.besked("Tryk på Genfyld glasset først.", "info");
+            return false;
+        }
         if (this.tilstand !== "klar") return false;
         if (this.fuld()) {
             this.besked("Glasset er fuldt.", "info");
@@ -141,6 +157,10 @@
 
     P.antaend = function () {
         if (NK.Lyd) NK.Lyd.laasOp();
+        if (this.tilstand === "knald") {
+            this.besked("Tryk på Genfyld glasset først.", "info");
+            return false;
+        }
         if (this.tilstand !== "klar") return false;
         if (!this.fuld()) {
             this.besked("Fyld glasset helt op (6 streger), før du antænder.", "advarsel");
@@ -151,7 +171,30 @@
         return true;
     };
 
-    P.flyv = function (til, varighed, efter) {
+    /* Glasset tilbage i vandbadet - eller et nyt, hvis det gamle knak. */
+    P.genfyld = function () {
+        if (!this.kanGenfylde()) return false;
+        if (this.knust) {
+            this.knust = false;
+            this.glas.x = S.HJEM.x;
+            this.glas.y = S.HJEM.y - 360;
+            this.glas.vinkel = 0;
+            this.rekyl = 0;
+            this.rekylFart = 0;
+            this.vand = 0;
+            this.niveau = M.MAKS;
+            this.molekyler = [];
+            this.dug = [];
+            for (var i = 0; i < this.skaar.length; i++) this.skaar[i].doer = true;
+            this.flyv(S.HJEM, 0.9, this.ankomHjem, 0);
+        } else {
+            this.flyv(S.HJEM, 1.0, this.ankomHjem);
+        }
+        this.aendret("genfyld");
+        return true;
+    };
+
+    P.flyv = function (til, varighed, efter, loeft) {
         var dx = til.x - this.glas.x, dy = til.y - this.glas.y;
         var afstand = Math.sqrt(dx * dx + dy * dy);
         this.bane = {
@@ -159,7 +202,7 @@
             til: { x: til.x, y: til.y },
             t: 0,
             varighed: varighed,
-            loeft: Math.min(36, afstand * 0.2 + 8),
+            loeft: loeft === undefined ? Math.min(36, afstand * 0.2 + 8) : loeft,
             efter: efter
         };
         this.tilstand = "flyver";
@@ -174,7 +217,7 @@
         var styrke = rx.styrke / 100;
         this.sidsteReaktion = rx;
         this.tilstand = "knald";
-        this.knaldUr = KNALD_HOLD;
+        this.knaldTid = this.tid;
         this.skalFyldes = true;
         this.fyldtSidenKnald = false;
         this.traek = null;
@@ -205,6 +248,10 @@
                     farve: "hsl(" + Math.round(r(25, 55)) + ", 100%, " + Math.round(r(55, 75)) + "%)"
                 });
             }
+            var puf = Math.round(5 + 10 * styrke);
+            for (i = 0; i < puf; i++) {
+                e.roeg.push({ x: e.x + r(-12, 12), y: e.y + r(0, 14), vx: r(-30, 30), vy: r(-40, -12), r: r(6, 12), liv: r(0.8, 1.2) });
+            }
             this.front = 0;
             this.frontAlfa = 1;
             this.ryst = 16 * styrke;
@@ -212,10 +259,8 @@
             this.varme = 1;
             this.omdan(rx);
         }
-        var puf = styrke > 0 ? Math.round(5 + 10 * styrke) : 4;
-        for (i = 0; i < puf; i++) {
-            e.roeg.push({ x: e.x + r(-12, 12), y: e.y + r(0, 14), vx: r(-30, 30), vy: r(-40, -12), r: r(6, 12), liv: r(0.8, 1.2) });
-        }
+
+        if (rx.h === 4 && rx.o === 2 && Math.random() < this.knaekChance) this.knaekUr = 0.13;
 
         this.h = 0;
         this.o = 0;
@@ -224,7 +269,8 @@
         this.aendret("knald");
     };
 
-    /* Det, der har reageret, bliver til vand. Overskuddet bliver. */
+    /* Det, der har reageret, bliver til vand. Vandet presses ud af
+       aabningen; overskuddet bliver i glasset. */
     P.omdan = function (rx) {
         var brugtH2 = rx.h2Brugt, brugtO2 = rx.o2Brugt;
         var pladser = [];
@@ -235,22 +281,106 @@
             if (m.type === "h2" && brugtH2 > 0) { brugtH2--; pladser.push(m); this.molekyler.splice(i, 1); }
             else if (m.type === "o2" && brugtO2 > 0) { brugtO2--; pladser.push(m); this.molekyler.splice(i, 1); }
         }
+        for (i = 0; i < this.molekyler.length; i++) {
+            this.molekyler[i].vx *= 3;
+            this.molekyler[i].vy *= 3;
+        }
         for (i = 0; i < rx.h2o; i++) {
             var fra = pladser[i % Math.max(1, pladser.length)] || { x: G.MIDT, y: 150 };
-            var v = r(0, Math.PI * 2);
+            var v = Math.PI / 2 + r(-1.1, 1.1), fart = r(380, 620);
             this.molekyler.push({
                 type: "h2o", x: NK.klamp(fra.x + r(-6, 6), G.V + 12, G.HO - 12), y: fra.y + r(-6, 6),
-                vx: Math.cos(v) * 200, vy: Math.sin(v) * 200, a: r(0, 6.28), va: r(-4, 4), alfa: 1, doer: false
+                vx: Math.cos(v) * fart, vy: Math.sin(v) * fart, a: r(0, 6.28), va: r(-8, 8),
+                alfa: 1, doer: false, ud: true
             });
-        }
-        for (i = 0; i < this.molekyler.length; i++) {
-            m = this.molekyler[i];
-            m.vx *= 4;
-            m.vy *= 4;
         }
         for (i = 0; i < rx.h2o * 3; i++) {
             this.dug.push({ x: r(G.V + 4, G.HO - 4), y: r(G.TOP + 6, G.STREG6), r: r(1.1, 2.6), alfa: r(-1.2, -0.4), doer: false });
         }
+    };
+
+    /* Et molekyle forlader glasset og flyver videre ude i rummet. */
+    P.frigoer = function (m, g, knust) {
+        var p = S.glasTilBord(g, m.x, m.y);
+        var c = Math.cos(g.vinkel), s = Math.sin(g.vinkel);
+        var vx = m.vx * c - m.vy * s, vy = m.vx * s + m.vy * c;
+        this.fri.push({
+            type: m.type, x: p.x, y: p.y,
+            vx: vx + (knust ? r(-260, 260) : r(-320, 320)),
+            vy: knust ? vy * 0.6 + r(-300, 100) : vy * 0.55,
+            a: m.a, va: m.va, alfa: m.alfa, liv: r(2.8, 4.2)
+        });
+    };
+
+    /* Paaskeaegget: glasset springer i stumper. */
+    P.knaek = function () {
+        var g = { x: this.glas.x, y: this.glas.y + this.rekyl, vinkel: this.glas.vinkel };
+        var i, j;
+        this.knust = true;
+        for (i = 0; i < this.molekyler.length; i++) this.frigoer(this.molekyler[i], g, true);
+        this.molekyler = [];
+        this.dug = [];
+
+        /* Roeret deles i et skaevt gitter, og hver celle bliver ét
+           eller to skaar. Foden knaekker i to. */
+        var kol = 3, raek = 8, p = [];
+        for (i = 0; i <= kol; i++) {
+            p.push([]);
+            for (j = 0; j <= raek; j++) {
+                p[i].push({
+                    x: 12 + i * (66 / kol) + (i > 0 && i < kol ? r(-6, 6) : 0),
+                    y: 12 + j * (280 / raek) + (j > 0 && j < raek ? r(-9, 9) : 0)
+                });
+            }
+        }
+        var stykker = [];
+        for (i = 0; i < kol; i++) {
+            for (j = 0; j < raek; j++) {
+                var a = p[i][j], b = p[i + 1][j], c = p[i + 1][j + 1], d = p[i][j + 1];
+                var valg = Math.random();
+                if (valg < 0.5) stykker.push([a, b, c, d]);
+                else if (valg < 0.75) { stykker.push([a, b, c]); stykker.push([a, c, d]); }
+                else { stykker.push([a, b, d]); stykker.push([b, c, d]); }
+            }
+        }
+        var fodDel = r(30, 60);
+        stykker.push([{ x: 2, y: 0 }, { x: fodDel, y: 0 }, { x: fodDel, y: 12 }, { x: 2, y: 12 }]);
+        stykker.push([{ x: fodDel, y: 0 }, { x: 88, y: 0 }, { x: 88, y: 12 }, { x: fodDel, y: 12 }]);
+
+        var cos = Math.cos(g.vinkel), sin = Math.sin(g.vinkel);
+        for (i = 0; i < stykker.length; i++) {
+            var poly = stykker[i];
+            var cx = 0, cy = 0;
+            for (j = 0; j < poly.length; j++) { cx += poly[j].x; cy += poly[j].y; }
+            cx /= poly.length;
+            cy /= poly.length;
+            var midt = S.glasTilBord(g, cx, cy);
+            var pts = [];
+            for (j = 0; j < poly.length; j++) {
+                var dx = poly[j].x - cx, dy = poly[j].y - cy;
+                pts.push({ x: dx * cos - dy * sin, y: dx * sin + dy * cos });
+            }
+            var kraft = 0.45 + 0.55 * cy / G.MUND;
+            this.skaar.push({
+                x: midt.x, y: midt.y, a: 0, va: r(-11, 11),
+                vx: (cx - G.MIDT) * r(4, 9) + r(-110, 110),
+                vy: -r(140, 460) * kraft,
+                pts: pts, alfa: 1, doer: false, hvile: false
+            });
+        }
+
+        for (i = 0; i < 40; i++) {
+            var vv = r(0, Math.PI * 2), fart = r(80, 380);
+            this.e.gnister.push({
+                x: g.x + r(-30, 30), y: g.y - r(0, 280),
+                vx: Math.cos(vv) * fart, vy: Math.sin(vv) * fart - 120,
+                liv: r(0.5, 1), r: r(0.8, 1.8), farve: "rgba(225, 242, 255, 0.95)"
+            });
+        }
+
+        if (NK.Lyd) NK.Lyd.glas();
+        this.besked("Glasset knækkede!", "knald");
+        this.aendret("knaek");
     };
 
     P.nytMolekyle = function () {
@@ -289,6 +419,7 @@
     };
 
     P.overGlas = function (p) {
+        if (this.knust) return false;
         var l = S.bordTilGlas({ x: this.glas.x, y: this.glas.y + this.rekyl, vinkel: this.glas.vinkel }, p.x, p.y);
         return l.x > -14 && l.x < G.B + 14 && l.y > -12 && l.y < G.H + 8;
     };
@@ -305,6 +436,10 @@
     P.ned = function (p) {
         if (NK.Lyd) NK.Lyd.laasOp();
         if (this.overGlas(p)) {
+            if (this.tilstand === "knald") {
+                this.besked("Tryk på Genfyld glasset for at sætte det tilbage i karret.", "info");
+                return false;
+            }
             if (this.tilstand !== "klar") return false;
             if (!this.fuld()) {
                 this.besked("Fyld glasset helt op (6 streger), før du tager det op.", "advarsel");
@@ -339,10 +474,9 @@
         this.traek = null;
         var dx = S.HJEM.x - this.glas.x, dy = S.HJEM.y - this.glas.y;
         var afstand = Math.sqrt(dx * dx + dy * dy);
-        var mig = this;
         this.flyv(S.HJEM, 0.3 + afstand / 900, function () {
-            mig.tilstand = "klar";
-            mig.aendret("hjem");
+            this.tilstand = "klar";
+            this.aendret("hjem");
         });
     };
 
@@ -395,9 +529,9 @@
         this.glas.vinkel = NK.mod(this.glas.vinkel, this.vinkelMaal, 10, dt);
         if (this.tilstand === "traek") this.vinkelMaal = NK.mod(this.vinkelMaal, 0, 6, dt);
 
-        if (this.tilstand === "knald") {
-            this.knaldUr -= dt;
-            if (this.knaldUr <= 0) this.flyv(S.HJEM, 1.0, this.ankomHjem);
+        if (this.knaekUr >= 0) {
+            this.knaekUr -= dt;
+            if (this.knaekUr < 0) this.knaek();
         }
 
         if (this.tilstand === "fylder") {
@@ -415,7 +549,7 @@
         var underVand = this.glas.y + this.rekyl > S.BAD.overflade + 4 && this.glas.x > S.BAD.indreV && this.glas.x < S.BAD.indreH;
         /* Vandet under stregerne loeber ud af aabningen, naar glasset
            loeftes op af badet. */
-        if (!underVand && this.vand > 0.7) {
+        if (!this.knust && !underVand && this.vand > 0.7) {
             for (i = 0; i < 2; i++) {
                 this.e.draaber.push({ x: this.glas.x + r(-24, 24), y: this.glas.y + this.rekyl + r(-2, 2), vy: r(20, 80), liv: 1 });
             }
@@ -430,6 +564,8 @@
         }
 
         this.opdaterMolekyler(dt);
+        this.opdaterFri(dt);
+        this.opdaterSkaar(dt);
         this.opdaterBobler(dt);
         this.opdaterEffekter(dt);
 
@@ -440,30 +576,46 @@
     P.opdaterMolekyler = function (dt) {
         var bund = G.TOP + this.niveau * G.STREG;
         var grundfart = 36 + this.varme * 240;
+        var glas = { x: this.glas.x, y: this.glas.y + this.rekyl, vinkel: this.glas.vinkel };
         this.varme = Math.max(0, this.varme - dt * 0.55);
         for (var i = this.molekyler.length - 1; i >= 0; i--) {
             var m = this.molekyler[i];
+            var rad = S.MOLEKYLRADIUS[m.type];
             if (m.doer) {
                 m.alfa -= dt * 2.4;
                 if (m.alfa <= 0) { this.molekyler.splice(i, 1); continue; }
             } else {
                 m.alfa = Math.min(1, m.alfa + dt * 4);
             }
-            m.vx += (Math.random() - 0.5) * 260 * dt;
-            m.vy += (Math.random() - 0.5) * 260 * dt;
-            var fart = Math.sqrt(m.vx * m.vx + m.vy * m.vy) || 1;
-            var ny = NK.mod(fart, grundfart, 2.5, dt);
-            m.vx *= ny / fart;
-            m.vy *= ny / fart;
+
+            if (m.ud) {
+                /* Det nydannede vand presses ud af aabningen */
+                m.vy += 700 * dt;
+            } else {
+                m.vx += (Math.random() - 0.5) * 260 * dt;
+                m.vy += (Math.random() - 0.5) * 260 * dt;
+                var fart = Math.sqrt(m.vx * m.vx + m.vy * m.vy) || 1;
+                var ny = NK.mod(fart, grundfart, 2.5, dt);
+                m.vx *= ny / fart;
+                m.vy *= ny / fart;
+            }
             m.x += m.vx * dt;
             m.y += m.vy * dt;
             m.a += m.va * dt;
 
-            var rad = S.MOLEKYLRADIUS[m.type];
-            var x0 = G.V + rad, x1 = G.HO - rad, y0 = G.TOP + rad, y1 = Math.max(y0, bund - rad);
+            var x0 = G.V + rad, x1 = G.HO - rad, y0 = G.TOP + rad;
             if (m.x < x0) { m.x = x0; m.vx = Math.abs(m.vx); }
             if (m.x > x1) { m.x = x1; m.vx = -Math.abs(m.vx); }
             if (m.y < y0) { m.y = y0; m.vy = Math.abs(m.vy); }
+
+            if (m.ud) {
+                if (m.y > G.MUND + rad) {
+                    this.frigoer(m, glas, false);
+                    this.molekyler.splice(i, 1);
+                }
+                continue;
+            }
+            var y1 = Math.max(y0, bund - rad);
             if (m.y > y1) { m.y = y1; m.vy = -Math.abs(m.vy); }
         }
         for (var d = this.dug.length - 1; d >= 0; d--) {
@@ -474,6 +626,68 @@
             } else if (dr.alfa < 1) {
                 dr.alfa += dt * 1.6;
             }
+        }
+    };
+
+    /* Molekyler ude i rummet: bremses af luften, stiger som varm damp,
+       hopper paa bordet og forsvinder efter nogle sekunder. */
+    P.opdaterFri = function (dt) {
+        var brems = Math.max(0, 1 - 1.3 * dt);
+        for (var i = this.fri.length - 1; i >= 0; i--) {
+            var m = this.fri[i];
+            var rad = S.MOLEKYLRADIUS[m.type];
+            m.vx *= brems;
+            m.vy = m.vy * brems - 45 * dt;
+            m.x += m.vx * dt;
+            m.y += m.vy * dt;
+            m.a += m.va * dt;
+            var gulv = (m.x > S.BAD.indreV && m.x < S.BAD.indreH) ? S.BAD.overflade : S.BORD;
+            if (m.y > gulv - rad) { m.y = gulv - rad; m.vy = -Math.abs(m.vy) * 0.45; }
+            m.liv -= dt;
+            m.alfa = Math.min(1, m.liv);
+            if (m.liv <= 0 || m.x < -500 || m.x > 1500 || m.y < -500) this.fri.splice(i, 1);
+        }
+    };
+
+    P.opdaterSkaar = function (dt) {
+        for (var i = this.skaar.length - 1; i >= 0; i--) {
+            var s = this.skaar[i];
+            if (s.doer) {
+                s.alfa -= dt * 2.5;
+                if (s.alfa <= 0) { this.skaar.splice(i, 1); continue; }
+            }
+            if (s.hvile) continue;
+
+            var iBad = s.x > S.BAD.indreV && s.x < S.BAD.indreH && s.y > S.BAD.overflade;
+            s.vy += TYNGDE * (iBad ? 0.25 : 1) * dt;
+            if (iBad) {
+                var vand = Math.max(0, 1 - 5 * dt);
+                s.vx *= vand;
+                s.vy *= vand;
+                s.va *= vand;
+            }
+            s.x += s.vx * dt;
+            s.y += s.vy * dt;
+            s.a += s.va * dt;
+
+            /* Det laveste hjoerne rammer bordet (eller bunden af karret) */
+            var c = Math.cos(s.a), si = Math.sin(s.a), lav = -1e9;
+            for (var j = 0; j < s.pts.length; j++) lav = Math.max(lav, s.pts[j].x * si + s.pts[j].y * c);
+            var gulv = (s.x > S.BAD.indreV && s.x < S.BAD.indreH) ? S.BAD.bund : S.BORD;
+            if (s.y + lav > gulv) {
+                s.y = gulv - lav;
+                if (Math.abs(s.vy) < 70) {
+                    s.vy = 0;
+                    s.vx *= Math.max(0, 1 - 8 * dt);
+                    s.va *= Math.max(0, 1 - 10 * dt);
+                    if (Math.abs(s.vx) < 4 && Math.abs(s.va) < 0.3) s.hvile = true;
+                } else {
+                    s.vy = -s.vy * 0.3;
+                    s.vx *= 0.7;
+                    s.va *= 0.6;
+                }
+            }
+            if (s.x < -300 || s.x > 1300) this.skaar.splice(i, 1);
         }
     };
 
@@ -566,19 +780,24 @@
         S.tegnSlange(ctx, "o2", this.flow.o2, this.tid);
         S.tegnSlange(ctx, "h2", this.flow.h2, this.tid);
         S.tegnBraender(ctx, this.tid);
+        S.tegnSkaar(ctx, this.skaar, true);
 
-        S.tegnGlas(ctx, {
-            x: this.glas.x, y: this.glas.y + this.rekyl, vinkel: this.glas.vinkel,
-            niveau: this.niveau, vand: this.vand,
-            molekyler: this.molekyler, dug: this.dug,
-            front: this.front, frontAlfa: this.frontAlfa,
-            fremhaev: klar && this.fuld() ? 1 : 0,
-            s: sk.s
-        }, this.tid);
+        if (!this.knust) {
+            S.tegnGlas(ctx, {
+                x: this.glas.x, y: this.glas.y + this.rekyl, vinkel: this.glas.vinkel,
+                niveau: this.niveau, vand: this.vand,
+                molekyler: this.molekyler, dug: this.dug,
+                front: this.front, frontAlfa: this.frontAlfa,
+                fremhaev: klar && this.fuld() ? 1 : 0,
+                s: sk.s
+            }, this.tid);
+        }
         S.tegnBad(ctx);
         S.tegnBobler(ctx, this.bobler);
         if (klar && this.fuld()) S.tegnPil(ctx, this.glas, this.tid);
         S.tegnKnald(ctx, this.e);
+        S.tegnSkaar(ctx, this.skaar, false);
+        for (var i = 0; i < this.fri.length; i++) S.tegnMolekyle(ctx, this.fri[i]);
         ctx.restore();
     };
 }());

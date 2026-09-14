@@ -90,9 +90,20 @@
   <circle cx="87" cy="226" r="13" fill="url(#atom)" stroke="#7a2019" stroke-width="0.8"/>
   <text x="75" y="286" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="700" fill="#f2f3f5">O<tspan font-size="21" dy="7">2</tspan></text>
 
+  <!-- Faresymbol GHS04: gas under tryk, kan eksplodere ved opvarmning -->
+  <g transform="translate(97 356) scale(1.15)">
+    <rect x="-13" y="-13" width="26" height="26" transform="rotate(45)" fill="#ffffff" stroke="#d8342a" stroke-width="2.8"/>
+    <g transform="rotate(-30)">
+      <rect x="-9" y="-3.8" width="14" height="7.6" rx="3.6" fill="#111111"/>
+      <rect x="4.4" y="-1.8" width="2.6" height="3.6" fill="#111111"/>
+      <rect x="6.6" y="-2.8" width="2.4" height="5.6" rx="0.6" fill="#111111"/>
+      <path d="M-6.5 -1.6 H2" stroke="#ffffff" stroke-width="0.8" stroke-linecap="round"/>
+    </g>
+  </g>
+
   <!-- Faresymbol GHS03: brandnaerende -->
-  <g transform="translate(75 352)">
-    <rect x="-13" y="-13" width="26" height="26" transform="rotate(45)" fill="#ffffff" stroke="#d8342a" stroke-width="3.2"/>
+  <g transform="translate(53 356) scale(1.15)">
+    <rect x="-13" y="-13" width="26" height="26" transform="rotate(45)" fill="#ffffff" stroke="#d8342a" stroke-width="2.8"/>
     <circle cx="0" cy="3.5" r="5.2" fill="none" stroke="#111111" stroke-width="2.4"/>
     <path d="M0 -13 C2.5 -10 5.5 -8 4.5 -4 C4 -2 2 -1.5 0 -1.5 C-2.5 -1.5 -5 -2.5 -5 -5.5 C-5 -8 -3 -8.5 -2 -11 C-1.2 -9 -0.4 -8.5 0 -8 C0.6 -9.5 0.3 -11 0 -13 Z" fill="#111111"/>
     <rect x="-8" y="10" width="16" height="2.2" fill="#111111"/>

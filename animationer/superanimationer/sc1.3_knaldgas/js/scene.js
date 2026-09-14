@@ -32,7 +32,7 @@
     S.GLAS.STREG6 = S.GLAS.TOP + 6 * S.GLAS.STREG;
 
     /* ----- Trykflaskerne ------------------------------------------ */
-    var FK = 118 / 150;
+    var FK = 130 / 150;
     function flaske(x, navn, gas) {
         var top = S.BORD - 416 * FK;
         return {
@@ -43,7 +43,7 @@
             ramme: { x0: x - 50 * FK, x1: x + 50 * FK, y0: top + 24 * FK, y1: S.BORD }
         };
     }
-    S.FLASKER = { h2: flaske(88, "flaskeH2", "h2"), o2: flaske(216, "flaskeO2", "o2") };
+    S.FLASKER = { h2: flaske(86, "flaskeH2", "h2"), o2: flaske(220, "flaskeO2", "o2") };
 
     /* ----- Vandbadet -------------------------------------------------- */
     var BK = 300 / 280;
@@ -52,6 +52,7 @@
         x: 370, y: badY, b: 300, h: 150,
         overflade: badY + 34 * BK,
         hylde: badY + 80 * BK,
+        bund: badY + 131 * BK,
         hulX: 370 + 140 * BK,
         indreV: 370 + 8 * BK,
         indreH: 370 + 272 * BK
@@ -88,8 +89,8 @@
         };
     }
     S.SLANGER = {
-        h2: slange(S.FLASKER.h2, 120, 392, 506, S.HJEM.x - 5),
-        o2: slange(S.FLASKER.o2, 160, 404, 496, S.HJEM.x + 5)
+        h2: slange(S.FLASKER.h2, 100, 392, 506, S.HJEM.x - 5),
+        o2: slange(S.FLASKER.o2, 142, 404, 496, S.HJEM.x + 5)
     };
 
     S.FARVE = { h2: "#dfe7ef", o2: "#ef6a5c" };
@@ -143,8 +144,8 @@
         ctx.fillRect(-2000, S.BORD + 9, S.BREDDE + 4000, 2000);
 
         /* Skygger paa bordpladen */
-        skygge(ctx, S.FLASKER.h2.x, 50);
-        skygge(ctx, S.FLASKER.o2.x, 50);
+        skygge(ctx, S.FLASKER.h2.x, 55);
+        skygge(ctx, S.FLASKER.o2.x, 55);
         skygge(ctx, S.BAD.x + S.BAD.b / 2, 160);
         skygge(ctx, S.BRAENDER.x, 44);
     };
@@ -464,6 +465,33 @@
             ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
+        }
+        ctx.restore();
+    };
+
+    /* Skaar fra et knust glas. iBad: tegn kun dem, der ligger i vandet
+       (de tegnes foer vandbadet, saa vandet farver dem), eller kun resten. */
+    S.tegnSkaar = function (ctx, liste, iBad) {
+        ctx.save();
+        ctx.lineJoin = "round";
+        for (var i = 0; i < liste.length; i++) {
+            var s = liste[i];
+            var erIBad = s.x > S.BAD.indreV && s.x < S.BAD.indreH && s.y > S.BAD.overflade;
+            if (erIBad !== iBad) continue;
+            ctx.save();
+            ctx.globalAlpha = NK.klamp(s.alfa, 0, 1);
+            ctx.translate(s.x, s.y);
+            ctx.rotate(s.a);
+            ctx.beginPath();
+            ctx.moveTo(s.pts[0].x, s.pts[0].y);
+            for (var j = 1; j < s.pts.length; j++) ctx.lineTo(s.pts[j].x, s.pts[j].y);
+            ctx.closePath();
+            ctx.fillStyle = "rgba(207, 230, 247, 0.2)";
+            ctx.fill();
+            ctx.strokeStyle = "rgba(226, 242, 252, 0.75)";
+            ctx.lineWidth = 1.3;
+            ctx.stroke();
+            ctx.restore();
         }
         ctx.restore();
     };

@@ -27,7 +27,7 @@
             celler[i].className = i < f.h ? "h2" : (i < f.h + f.o ? "o2" : "");
         }
 
-        var h2 = NK.el("knap-h2"), o2 = NK.el("knap-o2"), antaend = NK.el("knap-antaend");
+        var h2 = NK.el("knap-h2"), o2 = NK.el("knap-o2"), antaend = NK.el("knap-antaend"), genfyld = NK.el("knap-genfyld");
         h2.disabled = !f.kanFylde();
         o2.disabled = !f.kanFylde();
         NK.el("knap-toem").disabled = !f.kanToemme();
@@ -35,6 +35,15 @@
         h2.classList.toggle("banker", !f.harFyldt && f.kanFylde());
         o2.classList.toggle("banker", !f.harFyldt && f.kanFylde());
         antaend.classList.toggle("banker", f.kanAntaende());
+
+        /* Mens glasset staar ved flammen, sidder Genfyld glasset paa
+           Antaends plads. */
+        var vedFlammen = f.tilstand === "knald";
+        antaend.hidden = vedFlammen;
+        genfyld.hidden = !vedFlammen;
+        genfyld.disabled = !f.kanGenfylde();
+        genfyld.classList.toggle("banker", f.kanGenfylde());
+        NK.saetTekst("knap-genfyld-tekst", f.knust ? "Nyt glas" : "Genfyld glasset");
 
         var trin = f.trin();
         for (var t = 1; t <= 3; t++) {
@@ -54,7 +63,7 @@
     /* Panelet opdateres kun, naar noget af det, det viser, har aendret sig. */
     function signatur() {
         var f = forsoeg;
-        return [f.h, f.o, f.tilstand, f.antalTestet(), f.harFyldt, f.trin()].join("|");
+        return [f.h, f.o, f.tilstand, f.antalTestet(), f.harFyldt, f.trin(), f.kanGenfylde(), f.knust].join("|");
     }
 
     /* ----- Beskeden paa scenen ------------------------------------------ */
@@ -111,10 +120,12 @@
         else if (e.key === "r" || e.key === "R") forsoeg.toem();
         else if (e.key === "m" || e.key === "M") skiftLyd();
         else if (e.key === "t" || e.key === "T") aabnTeori();
+        else if (e.key === "g" || e.key === "G") forsoeg.genfyld();
         else if (e.key === " " || e.key === "Enter") {
             if (e.target && e.target.tagName === "BUTTON") return;   /* knappen klikker selv */
             e.preventDefault();
-            forsoeg.antaend();
+            if (forsoeg.tilstand === "knald") forsoeg.genfyld();
+            else forsoeg.antaend();
         }
     }
 
@@ -157,6 +168,7 @@
         NK.el("knap-o2").addEventListener("click", function () { NK.Lyd.laasOp(); forsoeg.tilfoej("o2"); });
         NK.el("knap-toem").addEventListener("click", function () { forsoeg.toem(); });
         NK.el("knap-antaend").addEventListener("click", function () { forsoeg.antaend(); });
+        NK.el("knap-genfyld").addEventListener("click", function () { forsoeg.genfyld(); });
         NK.el("graf-ryd").addEventListener("click", function () { forsoeg.rydResultater(); });
 
         NK.el("teoriknap").addEventListener("click", aabnTeori);

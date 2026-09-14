@@ -78,6 +78,7 @@ function koer() {
     function frisk() { f.nulstil(); f.resultater = {}; NK.opdaterPanel(); }
 
     overskrift("3. Fyldning og antaending");
+    f.knaekChance = 0;             /* paaskeaegget testes for sig i afsnit 6 */
     frisk();
     fyld(2, 1);
     paastand("et halvt glas kan ikke antaendes", f.antaend() === false && f.tilstand === "klar");
@@ -94,11 +95,19 @@ function koer() {
     paastand("glasset naar flammen og knalder", f.tilstand === "knald");
     paastand("5 : 1 bliver registreret med styrke 50", f.resultater[5] === 50, f.resultater[5]);
     var h2o = 0, h2 = 0, o2 = 0;
-    f.molekyler.forEach(function (m) { if (m.type === "h2o") h2o++; else if (m.type === "h2") h2++; else o2++; });
-    paastand("i glasset: 4 H2O og 6 H2, ingen O2", h2o === 4 && h2 === 6 && o2 === 0, h2o + " H2O, " + h2 + " H2, " + o2 + " O2");
+    f.molekyler.concat(f.fri).forEach(function (m) { if (m.type === "h2o") h2o++; else if (m.type === "h2") h2++; else o2++; });
+    paastand("der dannes 4 H2O, og 6 H2 er tilbage, ingen O2", h2o === 4 && h2 === 6 && o2 === 0, h2o + " H2O, " + h2 + " H2, " + o2 + " O2");
+    adv(1.5);
+    var h2oInde = f.molekyler.filter(function (m) { return m.type === "h2o"; }).length;
+    var h2Inde = f.molekyler.filter(function (m) { return m.type === "h2"; }).length;
+    paastand("vandet er fløjet ud af glasset, overskuddet af H2 er blevet", h2oInde === 0 && h2Inde === 6, h2oInde + " H2O og " + h2Inde + " H2 i glasset");
     NK.opdaterPanel();
-    paastand("Antaend er slaaet fra efter knaldet", d.getElementById("knap-antaend").disabled);
-    adv(5);
+    paastand("Antaend er skjult, Genfyld glasset vises",
+        d.getElementById("knap-antaend").hidden && !d.getElementById("knap-genfyld").hidden && !d.getElementById("knap-genfyld").disabled);
+    adv(6);
+    paastand("glasset bliver ved flammen, indtil der trykkes Genfyld glasset", f.tilstand === "knald" && f.glas.x === S.TAEND.x);
+    paastand("Genfyld glasset virker", f.genfyld() === true);
+    adv(3);
     paastand("glasset er tilbage i vandbadet og klar igen", f.tilstand === "klar"
         && Math.abs(f.glas.x - S.HJEM.x) < 0.5 && Math.abs(f.glas.y - S.HJEM.y) < 0.5, f.tilstand);
     paastand("glasset er tomt for molekyler", f.molekyler.length === 0, f.molekyler.length);
@@ -116,7 +125,9 @@ function koer() {
     f.ned({ x: f.glas.x, y: f.glas.y - 100 });
     f.flyt({ x: S.TAEND.x, y: S.TAEND.y - 100 });
     paastand("traekkes det hen til flammen, knalder det", f.tilstand === "knald" && f.resultater[4] === 100, f.tilstand);
-    adv(5);
+    paastand("Genfyld glasset kan ikke trykkes lige efter knaldet", f.genfyld() === false);
+    adv(1);
+    paastand("glasset kan ikke tages op fra flammen", f.ned({ x: f.glas.x, y: f.glas.y - 100 }) === false && f.tilstand === "knald");
 
     overskrift("5. Rene gasser");
     frisk();
@@ -126,9 +137,36 @@ function koer() {
     adv(1.2);
     paastand("6 : 0 giver ingen reaktion og styrke 0", f.resultater[6] === 0 && f.sidsteReaktion.h2o === 0);
     paastand("molekylerne bliver uaendret H2", f.molekyler.every(function (m) { return m.type === "h2"; }) && f.molekyler.length === 12, f.molekyler.length);
-    adv(5);
+    paastand("ingen lyd ved styrke 0", NK.Lyd.knald(0) === false);
 
-    overskrift("6. Quizzen laases op og i igen");
+    overskrift("6. Paaskeaegget: glasset knaekker ved 4 : 2");
+    frisk();
+    f.knaekChance = 1;
+    fyld(3, 3);
+    adv(2);
+    f.antaend();
+    adv(1.5);
+    paastand("ved 3 : 3 knaekker glasset aldrig", !f.knust && f.skaar.length === 0);
+    frisk();
+    fyld(4, 2);
+    adv(2);
+    f.antaend();
+    adv(1.5);
+    paastand("ved 4 : 2 knaekker glasset i stumper", f.knust && f.skaar.length > 20, f.skaar.length + " skaar");
+    paastand("resultatet registreres stadig som 100", f.resultater[4] === 100);
+    NK.opdaterPanel();
+    paastand("knappen hedder nu Nyt glas", d.getElementById("knap-genfyld-tekst").textContent === "Nyt glas" && !d.getElementById("knap-genfyld").hidden);
+    adv(4);
+    paastand("skaarene falder til ro", f.skaar.every(function (s) { return s.hvile || s.y < S.BORD + 5; }));
+    f.genfyld();
+    adv(3);
+    paastand("et nyt glas staar i vandbadet og er klar", f.tilstand === "klar" && !f.knust
+        && Math.abs(f.glas.x - S.HJEM.x) < 0.5 && Math.abs(f.glas.y - S.HJEM.y) < 0.5, f.tilstand);
+    paastand("skaarene er ryddet", f.skaar.length === 0, f.skaar.length);
+    f.knaekChance = 0.1;
+    paastand("standardchancen er 10 %", f.knaekChance === 0.1);
+
+    overskrift("7. Quizzen laases op og i igen");
     frisk();
     paastand("quizzen er laast fra start", NK.quiz.tilstand === "laast");
     for (h = 0; h <= 6; h++) f.resultater[h] = M.reaktion(h, 6 - h).styrke;
@@ -139,7 +177,7 @@ function koer() {
     f.rydResultater();
     paastand("Ryd resultater laaser quizzen igen", NK.quiz.tilstand === "laast");
 
-    overskrift("7. Quizzens spoergsmaal");
+    overskrift("8. Quizzens spoergsmaal");
     NK.QUIZ.forEach(function (sp, n) {
         var unikke = sp.valg.filter(function (v, k) { return sp.valg.indexOf(v) === k; }).length === 4;
         var blandOk = true;
@@ -151,7 +189,7 @@ function koer() {
             sp.valg.length === 4 && unikke && sp.rigtig >= 0 && sp.rigtig < 4 && !!sp.forklaring && blandOk);
     });
 
-    overskrift("8. Sprog: ingen tankestreger");
+    overskrift("9. Sprog: ingen tankestreger");
     var tekster = [d.body.textContent];
     NK.QUIZ.forEach(function (sp) { tekster.push(sp.sp, sp.forklaring, sp.valg.join(" ")); });
     var alt = tekster.join(" ");

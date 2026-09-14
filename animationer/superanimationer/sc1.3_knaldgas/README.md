@@ -31,11 +31,17 @@ lydstyrken, teorien bag en knap og quizzen. Styrkerne er de samme tal
 * **En rigtig opstilling.** Trykflaskerne er forbundet med slanger til et
   pneumatisk kar, hvor glasset står på hovedet på en hylde. Gassen bobler op i
   glasset og fortrænger vandet. Glasset flyver selv hen til flammen, når man
-  trykker Antænd, og tilbage i badet bagefter.
+  trykker Antænd. Det bliver stående ved flammen, indtil man trykker
+  **Genfyld glasset**, som sidder på Antænds plads så længe.
 * **Molekyler i glasset.** Hver streg er 2 molekyler, så forholdet mellem
-  stregerne også er forholdet mellem molekylerne. Efter knaldet ligger der
-  præcis det vand og det overskud, som reaktionsskemaet giver; ved 5 : 1 ses 6
-  H₂ blive tilbage. Der dannes også dug på indersiden af glasset.
+  stregerne også er forholdet mellem molekylerne. Ved knaldet dannes præcis det
+  vand, som reaktionsskemaet giver, og vandmolekylerne farer ud af åbningen og
+  ud i rummet. Overskuddet bliver i glasset; ved 5 : 1 ses 6 H₂ blive tilbage.
+  Der dannes også dug på indersiden af glasset.
+* **Ingen lyd ved ren H₂ eller ren O₂**, for der sker ingen reaktion.
+* **Påskeæg:** ved det helt rigtige forhold, 4 : 2, knækker glasset i 10 % af
+  forsøgene (`knaekChance` i `js/forsoeg.js`). Skårene falder ned på bordet,
+  og Genfyld glasset hedder da **Nyt glas**. Resultatet tæller stadig.
 * **Kun et fuldt glas kan antændes.** Den gamle lod et halvt glas knalde uden at
   registrere det. Nu siger animationen, at glasset skal fyldes helt op først.
 * **Forløbet i tre trin** (Fyld glasset, Antænd, Aflæs lydstyrken) står øverst
@@ -55,7 +61,7 @@ Alle ligger i `sprites/` som SVG og tegnes med `drawImage`:
 
 | Fil | Indhold | Koordinater, som koden bruger |
 |-----|---------|-------------------------------|
-| `trykflaske_h2.svg`, `trykflaske_o2.svg` | flaske, ventil, manometer, mærkat med molekyle og faresymbol (GHS02 hhv. GHS03) | manometerets midte (36, 56), slangestuds (104, 20) |
+| `trykflaske_h2.svg`, `trykflaske_o2.svg` | flaske, ventil, manometer, mærkat med molekyle og faresymboler: GHS02 (brandfarlig) hhv. GHS03 (brandnærende), begge med GHS04 (gas under tryk, kan eksplodere ved opvarmning) | manometerets midte (36, 56), slangestuds (104, 20) |
 | `maaleglas.svg` | måleglas på hovedet med inddeling | inderside x 15 til 75, lukket ende y 16, streg n ved y 16 + 40·n, åbning y 292 |
 | `vandbad.svg` | glaskar med vand og hylde | vandoverflade y 34, hyldens overside y 80, hul ved x 140 |
 | `braender.svg` | bunsenbrænder | flammens fod (50, 15), gasstuds (94, 131) |
@@ -87,17 +93,22 @@ _selvtest.html      udviklerværktøj, indgår ikke i animationen
 vand i forhold til den bedste blanding (4 : 2 giver 8 H₂O = 100 %).
 
 **Glassets tilstande** er beskrevet øverst i `js/forsoeg.js`: `klar`, `traek`,
-`flyver`, `knald` og `fylder`. Knapperne i panelet er kun slået til i `klar`.
+`flyver`, `knald` og `fylder`. Fyld- og antændknapperne er kun slået til i
+`klar`; Genfyld glasset kun i `knald`, og først 0,7 s efter knaldet, så et
+dobbelttryk på mellemrum ikke sender glasset hjem med det samme.
 
 **Spørgsmålene** står i `SPOERGSMAAL` i `js/quiz.js`. Svarene blandes hver gang.
 
 **`_selvtest.html`** åbner `index.html` i en iframe og kontrollerer: at alle
 sprites indlæses, at styrkerne er rigtige, at atomerne er bevaret i alle 28
-blandinger, at et halvt glas ikke kan antændes eller tages op, at glasset efter
-knaldet indeholder de rigtige molekyler og ender tilbage i badet, at træk med
-musen virker, at quizzen låses op og i igen, og at der ikke er tankestreger i
+blandinger, at et halvt glas ikke kan antændes eller tages op, at knaldet
+danner de rigtige molekyler, at vandet flyver ud og overskuddet bliver, at
+glasset bliver ved flammen indtil Genfyld glasset, at træk med musen virker, at
+ren gas ikke giver lyd, at glasset kun knækker ved 4 : 2 og bagefter kan
+erstattes, at quizzen låses op og i igen, og at der ikke er tankestreger i
 teksterne. Kør den efter ændringer.
 
-Genveje: <kbd>1</kbd> H₂ · <kbd>2</kbd> O₂ · <kbd>mellemrum</kbd> antænd ·
-<kbd>R</kbd> tøm glasset · <kbd>T</kbd> teori · <kbd>M</kbd> lyd ·
-<kbd>H</kbd> rundvisning · <kbd>Esc</kbd> luk.
+Genveje: <kbd>1</kbd> H₂ · <kbd>2</kbd> O₂ · <kbd>mellemrum</kbd> antænd
+eller genfyld · <kbd>G</kbd> genfyld glasset · <kbd>R</kbd> tøm glasset ·
+<kbd>T</kbd> teori · <kbd>M</kbd> lyd · <kbd>H</kbd> rundvisning ·
+<kbd>Esc</kbd> luk.

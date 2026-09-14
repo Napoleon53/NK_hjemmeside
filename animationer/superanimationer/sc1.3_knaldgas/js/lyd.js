@@ -49,20 +49,13 @@
             try { window.localStorage && window.localStorage.setItem("nk-sc13-lyd", til ? "til" : "fra"); } catch (fejl) {}
         },
 
+        /* Ren H2 eller ren O2 reagerer ikke, og saa er der ingen lyd.
+           Returnerer, om der blev spillet noget. */
         knald: function (styrke) {
-            if (!til) return;
+            if (!til || styrke <= 0) return false;
             var c = hent();
-            if (!c) return;
+            if (!c) return false;
             var nu = c.currentTime;
-
-            if (styrke <= 0) {
-                var sus = stoej(c, 0.18, function (r) { return 0.15 * r; });
-                var g0 = c.createGain();
-                g0.gain.setValueAtTime(0.3, nu);
-                sus.connect(g0).connect(c.destination);
-                sus.start(nu);
-                return;
-            }
 
             var varighed = 0.15 + (styrke / 100) * 0.35;
             var kilde = stoej(c, varighed, function (r) { return r * r; });
@@ -85,6 +78,49 @@
             tone.connect(toneGain).connect(c.destination);
             tone.start(nu);
             tone.stop(nu + varighed);
+            return true;
+        },
+
+        /* Glas, der knaekker: et skarpt knaek og en regn af klirrende
+           smaa skaar. */
+        glas: function () {
+            if (!til) return false;
+            var c = hent();
+            if (!c) return false;
+            var nu = c.currentTime;
+
+            var knaek = stoej(c, 0.09, function (r) { return r * r; });
+            var hp = c.createBiquadFilter();
+            hp.type = "highpass";
+            hp.frequency.setValueAtTime(1500, nu);
+            var gk = c.createGain();
+            gk.gain.setValueAtTime(0.55, nu);
+            knaek.connect(hp).connect(gk).connect(c.destination);
+            knaek.start(nu);
+
+            for (var i = 0; i < 9; i++) {
+                var t = nu + 0.04 + i * 0.045 + Math.random() * 0.05;
+                var klir = stoej(c, 0.06, function (r) { return r * r * r; });
+                var bp = c.createBiquadFilter();
+                bp.type = "bandpass";
+                bp.frequency.setValueAtTime(3000 + Math.random() * 4000, t);
+                bp.Q.setValueAtTime(6, t);
+                var gs = c.createGain();
+                gs.gain.setValueAtTime(0.35, t);
+                klir.connect(bp).connect(gs).connect(c.destination);
+                klir.start(t);
+
+                var ping = c.createOscillator();
+                ping.type = "sine";
+                ping.frequency.setValueAtTime(2400 + Math.random() * 3600, t);
+                var gp = c.createGain();
+                gp.gain.setValueAtTime(0.06, t);
+                gp.gain.exponentialRampToValueAtTime(0.0005, t + 0.25);
+                ping.connect(gp).connect(c.destination);
+                ping.start(t);
+                ping.stop(t + 0.26);
+            }
+            return true;
         }
     };
 }());
