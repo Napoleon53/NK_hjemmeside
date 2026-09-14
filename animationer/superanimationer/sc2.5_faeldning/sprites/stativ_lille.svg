@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="112" viewBox="0 0 180 56">
+  <!-- Det lille stativ til de to ekstra flasker. Samme udseende som
+       stativ.svg. Hullerne og etiketfelterne er centreret i x 45 og 135,
+       etiketfelterne er y 24-46. -->
+  <defs>
+    <linearGradient id="blok" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d7dde3"/>
+      <stop offset="0.2" stop-color="#b9c1ca"/>
+      <stop offset="1" stop-color="#7e8894"/>
+    </linearGradient>
+    <linearGradient id="top" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f3f5f7"/>
+      <stop offset="1" stop-color="#cfd5dc"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="6" width="180" height="50" rx="7" fill="url(#blok)"/>
+  <rect x="0" y="0" width="180" height="13" rx="5" fill="url(#top)"/>
+  <path d="M4 13 H176" stroke="#6f7984" stroke-opacity="0.45" stroke-width="1"/>
+
+  <g fill="none" stroke="#6b7580" stroke-width="1.6" stroke-opacity="0.75">
+    <path d="M18 6 A27 5 0 0 0 72 6"/>
+    <path d="M108 6 A27 5 0 0 0 162 6"/>
+  </g>
+
+  <g fill="#fbfaf4" stroke="#6f7985" stroke-width="1">
+    <rect x="13" y="24" width="64" height="22" rx="3"/>
+    <rect x="103" y="24" width="64" height="22" rx="3"/>
+  </g>
+
+  <rect x="6" y="15" width="168" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.3"/>
+</svg>

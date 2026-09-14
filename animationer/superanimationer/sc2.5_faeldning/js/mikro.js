@@ -84,7 +84,13 @@
                 var j;
                 for (j = 0; j < k.an; j++) enhed.push(frieA[e * k.an + j]);
                 for (j = 0; j < k.kat; j++) enhed.splice(Math.min(enhed.length, 1 + 2 * j), 0, frieK[e * k.kat + j]);
-                enhed.forEach(function (ion) { ion.bundet = true; ion.enhed = enheder.length; ion.info = b.info; });
+                enhed.forEach(function (ion) {
+                    ion.bundet = true;
+                    ion.enhed = enheder.length;
+                    ion.info = b.info;
+                    /* Fe³⁺ og CO₃²⁻: carbonationen bliver til CO₂ og stiger op */
+                    ion.gas = !!b.info.gas && D.IONER[ion.id].q < 0;
+                });
                 enheder.push(enhed);
             }
         });
@@ -93,7 +99,7 @@
         var pladser = [];
         var raekke = 0;
         var antalBundet = 0;
-        enheder.forEach(function (e) { antalBundet += e.length; });
+        enheder.forEach(function (e) { e.forEach(function (ion) { if (!ion.gas) antalBundet++; }); });
         while (pladser.length < antalBundet && raekke < 12) {
             var y = Z.y + Z.r - 18 - raekke * AFSTAND * 0.88;
             var halv = Math.sqrt(Math.max(0, (Z.r - 16) * (Z.r - 16) - (y - Z.y) * (y - Z.y)));
@@ -105,7 +111,9 @@
         }
         var p = 0;
         enheder.forEach(function (e) {
-            e.forEach(function (ion) { ion.plads = pladser[p++] || { x: Z.x, y: Z.y + Z.r - 18 }; });
+            e.forEach(function (ion) {
+                if (!ion.gas) ion.plads = pladser[p++] || { x: Z.x, y: Z.y + Z.r - 18 };
+            });
         });
 
         this.ioner = ioner;
@@ -130,6 +138,16 @@
             var ion = this.ioner[i];
             var R = D.IONER[ion.id].r;
             var aktiv = ion.bundet && grad * this.enheder > ion.enhed;
+            if (aktiv && ion.gas) {
+                /* CO₂ stiger op og forsvinder */
+                ion.co2 = true;
+                ion.vy = NK.mod(ion.vy, -45, 3, dt);
+                ion.x += Math.sin(ion.y * 0.08) * 12 * dt;
+                ion.y = Math.max(Z.y - Z.r + 18, ion.y + ion.vy * dt);
+                ion.alfa = Math.max(0, (ion.alfa === undefined ? 1 : ion.alfa) - dt * 0.4);
+                ion.fremme = true;
+                continue;
+            }
             if (aktiv) {
                 ion.x = NK.mod(ion.x, ion.plads.x, 2.8, dt);
                 ion.y = NK.mod(ion.y, ion.plads.y, 2.8, dt);
@@ -165,9 +183,11 @@
         var n = this.ioner.length, styrke = Math.min(1, dt * 12);
         for (var i = 0; i < n; i++) {
             var a = this.ioner[i];
+            if (a.co2) continue;
             var aFast = a.bundet && grad * this.enheder > a.enhed;
             for (var j = i + 1; j < n; j++) {
                 var b = this.ioner[j];
+                if (b.co2) continue;
                 var bFast = b.bundet && grad * this.enheder > b.enhed;
                 if (aFast && bFast) continue;
                 var dx = b.x - a.x, dy = b.y - a.y;
@@ -188,6 +208,21 @@
     };
 
     function tegnIon(ctx, ion) {
+        if (ion.co2) {
+            if (ion.alfa <= 0) return;
+            ctx.save();
+            ctx.globalAlpha = ion.alfa;
+            ctx.fillStyle = "rgba(225, 232, 238, 0.25)";
+            ctx.strokeStyle = "rgba(235, 240, 245, 0.8)";
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.arc(ion.x, ion.y, 13, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            NK.tekst(ctx, "CO₂", ion.x, ion.y + 0.5, { str: 10, vaegt: 700, justering: "center", linje: "middle", farve: "#eef2f6" });
+            ctx.restore();
+            return;
+        }
         var I = D.IONER[ion.id];
         var R = I.r;
         var g = ctx.createRadialGradient(ion.x - R * 0.35, ion.y - R * 0.4, R * 0.1, ion.x, ion.y, R);
@@ -211,7 +246,7 @@
         /* Et svagt skaer i bundfaldets farve bag de ioner, der er fremme */
         for (i = 0; i < this.ioner.length; i++) {
             var ion = this.ioner[i];
-            if (ion.bundet && ion.fremme && ion.info) {
+            if (ion.bundet && ion.fremme && ion.info && !ion.gas) {
                 NK.skaer(ctx, ion.x, ion.y, 24, NK.rgba(ion.info.farve, 0.5), 0.5);
             }
         }

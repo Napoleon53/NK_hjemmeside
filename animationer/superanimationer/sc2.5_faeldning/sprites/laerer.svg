@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="380" height="500" viewBox="0 0 190 250">
+  <!-- Kemilæreren, der kigger op over bordkanten med et løftet øjenbryn.
+       Munden er ved (84, 141); talebobblens hale peger derhen.
+       Figuren er skåret af forneden. -->
+  <defs>
+    <linearGradient id="kittel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c9d1d9"/>
+      <stop offset="0.35" stop-color="#f4f6f8"/>
+      <stop offset="1" stop-color="#bcc5ce"/>
+    </linearGradient>
+    <radialGradient id="hud" cx="0.42" cy="0.38" r="0.72">
+      <stop offset="0" stop-color="#f6d4b6"/>
+      <stop offset="1" stop-color="#d9a07c"/>
+    </radialGradient>
+    <linearGradient id="krus" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2a76ac"/>
+      <stop offset="0.4" stop-color="#4fb0ef"/>
+      <stop offset="1" stop-color="#22618f"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Kittel -->
+  <path d="M2 250 L9 206 C13 186 34 175 62 169 L128 169 C156 175 177 186 181 206 L188 250 Z"
+        fill="url(#kittel)" stroke="#8f9aa6" stroke-width="1.5"/>
+  <!-- Skjorte og slips -->
+  <path d="M68 169 L95 222 L122 169 Z" fill="#6f8fb3"/>
+  <path d="M89 172 L101 172 L99 181 L91 181 Z" fill="#6e222a"/>
+  <path d="M91 180 L99 180 L103 214 L95 226 L87 214 Z" fill="#8e2f36"/>
+  <!-- Revers -->
+  <path d="M62 170 L94 236" stroke="#8f9aa6" stroke-width="1.6" fill="none"/>
+  <path d="M128 170 L96 236" stroke="#8f9aa6" stroke-width="1.6" fill="none"/>
+  <!-- Brystlomme med kuglepenne -->
+  <rect x="134" y="194" width="4" height="15" rx="1.5" fill="#2a76ac"/>
+  <rect x="141" y="197" width="4" height="12" rx="1.5" fill="#c0392b"/>
+  <path d="M129 206 h28 v20 h-28 Z" fill="none" stroke="#8f9aa6" stroke-width="1.4"/>
+
+  <!-- Kaffekrus i hånden -->
+  <path d="M40 202 C54 202 54 226 40 226" fill="none" stroke="#22618f" stroke-width="5"/>
+  <rect x="6" y="194" width="36" height="42" rx="4" fill="url(#krus)" stroke="#1d4f75" stroke-width="1"/>
+  <text x="24" y="219" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="9" font-weight="700" fill="#ffffff">KEMI</text>
+  <path d="M16 188 C12 180 20 176 16 168 M28 188 C24 180 32 176 28 168" fill="none" stroke="#ffffff" stroke-opacity="0.45" stroke-width="2" stroke-linecap="round"/>
+  <rect x="30" y="208" width="19" height="24" rx="8" fill="#e3b08c" stroke="#c08a66" stroke-width="1"/>
+
+  <!-- Hals og ører -->
+  <rect x="80" y="144" width="30" height="30" fill="#e3b08c"/>
+  <ellipse cx="45" cy="104" rx="8" ry="13" fill="#e3b08c" stroke="#c08a66" stroke-width="1"/>
+  <ellipse cx="145" cy="104" rx="8" ry="13" fill="#e3b08c" stroke="#c08a66" stroke-width="1"/>
+
+  <!-- Hovedet -->
+  <ellipse cx="95" cy="100" rx="50" ry="57" fill="url(#hud)" stroke="#c08a66" stroke-width="1.2"/>
+  <ellipse cx="78" cy="60" rx="13" ry="6" transform="rotate(-20 78 60)" fill="#ffffff" fill-opacity="0.35"/>
+
+  <!-- Hår i siderne -->
+  <path d="M47 90 C40 62 56 44 68 45 C59 57 55 72 57 94 Z" fill="#8f969d"/>
+  <path d="M143 90 C150 62 134 44 122 45 C131 57 135 72 133 94 Z" fill="#8f969d"/>
+  <path d="M80 47 C86 41 97 41 106 45" fill="none" stroke="#8f969d" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Øjne: det venstre halvt lukket, det højre åbent under det løftede bryn -->
+  <ellipse cx="74" cy="103" rx="8" ry="5" fill="#ffffff"/>
+  <circle cx="71" cy="104" r="3.4" fill="#2b2f37"/>
+  <path d="M63 103 Q74 92 85 103 Z" fill="#e9b995"/>
+  <path d="M64 103 Q74 99 84 103" fill="none" stroke="#9c6a4b" stroke-width="1.6"/>
+  <ellipse cx="116" cy="100" rx="8" ry="6.5" fill="#ffffff"/>
+  <circle cx="113" cy="100" r="3.6" fill="#2b2f37"/>
+
+  <!-- Øjenbryn -->
+  <path d="M59 85 Q72 83 86 88" fill="none" stroke="#6d747b" stroke-width="4.2" stroke-linecap="round"/>
+  <path d="M103 79 Q118 62 134 73" fill="none" stroke="#6d747b" stroke-width="4.2" stroke-linecap="round"/>
+
+  <!-- Briller -->
+  <rect x="58" y="92" width="32" height="22" rx="6" fill="#ffffff" fill-opacity="0.12" stroke="#2b2f37" stroke-width="3"/>
+  <rect x="100" y="89" width="32" height="22" rx="6" fill="#ffffff" fill-opacity="0.12" stroke="#2b2f37" stroke-width="3"/>
+  <path d="M90 101 Q95 96 100 99 M58 99 L46 97 M132 97 L144 95" fill="none" stroke="#2b2f37" stroke-width="2.5"/>
+
+  <!-- Næse, kinder og det skæve smil -->
+  <path d="M95 106 Q89 121 92 125 Q97 128 102 124" fill="none" stroke="#b67e5a" stroke-width="2" stroke-linecap="round"/>
+  <ellipse cx="63" cy="127" rx="8" ry="4" fill="#e8907c" fill-opacity="0.3"/>
+  <ellipse cx="128" cy="124" rx="8" ry="4" fill="#e8907c" fill-opacity="0.3"/>
+  <path d="M78 141 Q92 146 111 134" fill="none" stroke="#7a3b2f" stroke-width="3" stroke-linecap="round"/>
+  <path d="M111 134 q4 -1 5 -5" fill="none" stroke="#7a3b2f" stroke-width="1.6" stroke-linecap="round"/>
+</svg>

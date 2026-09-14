@@ -21,8 +21,10 @@
    paa et skaermbillede: at formlerne og ladningerne gaar op, at skemaet
    giver de rigtige bundfald, at draaberne havner, hvor de skal, at
    ionerne i luppen passer med reaktionsskemaet, at opgaven kun godtager
-   det rigtige svar og giver et hint, der passer til fejlen, og at
-   teksterne hverken har tankestreger eller "1+".
+   det rigtige svar og giver et hint, der passer til fejlen, at laereren
+   dukker op efter nok fjol, at de ekstra flasker og det frie forsøg
+   laases op, at opgaven i det frie forsøg kun godtager det helt rigtige
+   svar, og at teksterne hverken har tankestreger eller "1+".
 
    Skal aabnes gennem en lokal server (eller i Firefox): Chrome nægter
    en side paa file:// at kigge ind i sin egen iframe.
@@ -55,7 +57,7 @@ function koer() {
     overskrift("1. Indlaesning");
     paastand("NK findes", !!NK);
     if (!NK) { vis(); return; }
-    paastand("forsoeg og opgave er bygget", !!(NK.forsoeg && NK.opgave));
+    paastand("forsoeg, opgave og fri opgave er bygget", !!(NK.forsoeg && NK.opgave && NK.fritOpgave));
     NK.Sprites.NAVNE.forEach(function (n) { paastand("sprite " + n + " er indlaest", NK.Sprites.klar(n)); });
 
     var D = NK.Data, f = NK.forsoeg, O = NK.opgave;
@@ -66,11 +68,12 @@ function koer() {
 
     overskrift("2. Kemien i data.js");
     var formler = D.OPLOESNINGER.map(function (o) { return o.formel; }).join(" ");
-    paastand("flaskernes formler", formler === "AgNO₃ BaCl₂ CuSO₄ NaCl Na₂SO₄ Na₂CO₃ Na₃PO₄", formler);
+    paastand("flaskernes formler", formler === "AgNO₃ BaCl₂ CuSO₄ NaCl Na₂SO₄ Na₂CO₃ Na₃PO₄ Na₂S Fe(NO₃)₃", formler);
+    paastand("Na₂S og Fe(NO₃)₃ er de ekstra flasker", D.BONUS.join(",") === "Na2S,FeNO33", D.BONUS.join(","));
     paastand("ladningerne gaar op i alle opløsninger", D.OPLOESNINGER.every(function (o) {
         return o.p * D.IONER[o.kat].q + o.n * D.IONER[o.an].q === 0;
     }));
-    var kat = ["Ag", "Ba", "Cu", "Na"], an = ["NO3", "Cl", "SO4", "CO3", "PO4"], mangler = [];
+    var kat = ["Ag", "Ba", "Cu", "Fe", "Na"], an = ["NO3", "Cl", "SO4", "CO3", "PO4", "S"], mangler = [];
     kat.forEach(function (k) { an.forEach(function (a) { if (D.tungtoploeseligt(k, a) && !D.BUNDFALD[k + "-" + a]) mangler.push(k + "-" + a); }); });
     paastand("alle tungtopløselige par har en farve", mangler.length === 0, mangler.join(", "));
 
@@ -78,7 +81,8 @@ function koer() {
     var fik = D.FELTER.map(function (F) { var b = D.forventet(F).bundfald; return b.length ? b.map(function (x) { return x.noegle; }).join("+") : ""; });
     paastand("skemaet giver de rigtige bundfald i alle 12 felter", fik.join(",") === VENTET.join(","), fik.join(","));
     var FORMLER = { "Ag-Cl": "AgCl", "Ag-SO4": "Ag₂SO₄", "Ag-CO3": "Ag₂CO₃", "Ag-PO4": "Ag₃PO₄", "Ba-SO4": "BaSO₄",
-        "Ba-CO3": "BaCO₃", "Ba-PO4": "Ba₃(PO₄)₂", "Cu-CO3": "CuCO₃", "Cu-PO4": "Cu₃(PO₄)₂" };
+        "Ba-CO3": "BaCO₃", "Ba-PO4": "Ba₃(PO₄)₂", "Cu-CO3": "CuCO₃", "Cu-PO4": "Cu₃(PO₄)₂",
+        "Fe-PO4": "FePO₄", "Fe-S": "Fe₂S₃", "Ag-S": "Ag₂S", "Cu-S": "CuS", "Fe-SO4": "Fe₂(SO₄)₃" };
     Object.keys(FORMLER).forEach(function (n) {
         var p = n.split("-");
         paastand("formlen for " + FORMLER[n], D.bundfaldFormel(p[0], p[1]) === FORMLER[n], D.bundfaldFormel(p[0], p[1]));
@@ -86,8 +90,16 @@ function koer() {
     var skema = D.reaktionsskema("Ba", "PO4");
     paastand("reaktionsskemaet for Ba₃(PO₄)₂", skema === "3 Ba²⁺(aq) + 2 PO₄³⁻(aq) → Ba₃(PO₄)₂(s)", skema);
     var ionTekster = Object.keys(D.IONER).map(D.ionTekst).join(" ");
-    paastand("ioner med ladning ±1 skrives uden 1", ionTekster === "Ag⁺ Ba²⁺ Cu²⁺ Na⁺ NO₃⁻ Cl⁻ SO₄²⁻ CO₃²⁻ PO₄³⁻", ionTekster);
+    paastand("ioner med ladning ±1 skrives uden 1", ionTekster === "Ag⁺ Ba²⁺ Cu²⁺ Fe³⁺ Na⁺ NO₃⁻ Cl⁻ SO₄²⁻ CO₃²⁻ PO₄³⁻ S²⁻", ionTekster);
     paastand("ingen bundfald er dobbelt i ét rigtigt udfoert felt", D.FELTER.every(function (F) { return D.forventet(F).bundfald.length <= 1; }));
+    paastand("BaS er letopløseligt, CuS og Ag₂S tungtopløselige", !D.tungtoploeseligt("Ba", "S") && D.tungtoploeseligt("Cu", "S") && D.tungtoploeseligt("Ag", "S"));
+
+    var jern = D.FRIT_OPGAVE[0].salte.map(function (s) { return s.formel; }).join(" ");
+    var sulfid = D.FRIT_OPGAVE[1].salte.map(function (s) { return s.formel; }).join(" ");
+    paastand("opgavens jern(III)salte, uden Fe₂(CO₃)₃", jern === "Fe(NO₃)₃ FeCl₃ Fe₂(SO₄)₃ FePO₄ Fe₂S₃", jern);
+    paastand("opgavens sulfider", sulfid === "Ag₂S BaS CuS Na₂S Fe₂S₃", sulfid);
+    var tunge = NK.fritOpgave.salte().filter(function (s) { return s.tung; }).map(function (s) { return s.formel; }).join(" ");
+    paastand("de tungtopløselige er FePO₄, Fe₂S₃, Ag₂S og CuS", tunge === "FePO₄ Fe₂S₃ Ag₂S CuS", tunge);
 
     overskrift("3. Draabeflasker og felter");
     frisk();
@@ -146,6 +158,7 @@ function koer() {
     paastand("alle ioner er inden for cirklen", f.mikro.ioner.every(function (x) {
         var dx = x.x - Z.x, dy = x.y - Z.y; return Math.sqrt(dx * dx + dy * dy) <= Z.r;
     }));
+    paastand("luppen ligger ikke paa skraa, mens den bruges", Math.abs(f.lup.vinkel) < 0.05, f.lup.vinkel.toFixed(2));
 
     f.vaelgFelt(10);
     adv(0.1);
@@ -159,6 +172,9 @@ function koer() {
     f.mikro.ioner.forEach(function (x) { if (x.bundet) ladning += D.IONER[x.id].q; });
     paastand("bundfaldet i luppen har ingen samlet ladning", ladning === 0, ladning);
     paastand("med mere end to draaber er der faerre ioner pr. draabe", f.mikro.PR_DRAABE(3) < f.mikro.PR_DRAABE(2));
+    f.vaelgFelt(-1);
+    adv(2);
+    paastand("luppen ligger paa skraa, naar den er lagt fra sig", Math.abs(f.lup.vinkel - NK.Scene.LUP_HVILE.vinkel) < 0.05, f.lup.vinkel.toFixed(2));
 
     overskrift("5. Reaktionsskemaet");
     f.vaelgFelt(9);
@@ -223,18 +239,128 @@ function koer() {
     felter[3].click();
     paastand("klik i skemaet vaelger feltet til luppen", f.valgt === 3);
 
-    overskrift("7. Sprog");
+    overskrift("7. Den sarkastiske laerer");
+    frisk();
+    var L = f.laerer;
+    udfoer(0);
+    paastand("rigtige draaber faar ikke laereren frem", !L.aktiv && f.fjol === 0);
+    dryp(1, "Na3PO4");
+    dryp(2, "AgNO3");
+    f.saetTilbage();
+    paastand("to forkerte felter er ikke nok", f.fjol === 2 && !L.aktiv, f.fjol);
+    dryp(1, "AgNO3");
+    paastand("endnu en fremmed draabe i et felt, der allerede er forkert, taeller ikke", f.fjol === 2, f.fjol);
+    dryp(4, "CuSO4");
+    f.saetTilbage();
+    paastand("det tredje forkerte felt faar laereren frem", f.fjol === 3 && L.aktiv && NK.LAERER_REPLIKKER.fjol.indexOf(L.tekst) >= 0, L.tekst);
+    tekster.push(L.tekst);
+    adv(1);
+    NK.forsoeg.tegn();
+    paastand("laereren og talebobblen kan klikkes paa", L.synlig() && L.omraade && L.omraade.length === 2);
+    var bobbel = L.omraade[1];
+    paastand("et klik paa talebobblen sender laereren vaek", f.ned({ x: bobbel.x + 10, y: bobbel.y + 10 }) === true && !L.aktiv);
+    adv(1.5);
+    paastand("laereren er gaaet igen", !L.synlig());
+    for (i = 0; i < 4; i++) dryp(5, "CuSO4");
+    dryp(5, "CuSO4");
+    dryp(5, "CuSO4");
+    f.saetTilbage();
+    paastand("et fyldt felt taeller én gang, uanset hvor mange forsøg", f.fjol === 4, f.fjol);
+    dryp(6, "BaCl2"); dryp(8, "NaCl");
+    f.saetTilbage();
+    paastand("efter tre fjol mere siger laereren noget igen", f.fjol === 6 && L.aktiv, f.fjol + " " + L.aktiv);
+    tekster.push(L.tekst);
+    paastand("Esc sender laereren vaek", (d.dispatchEvent(new ramme.contentWindow.KeyboardEvent("keydown", { key: "Escape", bubbles: true })), !L.aktiv));
+
+    overskrift("8. De ekstra flasker og det frie forsøg");
+    frisk();
+    var naS = D.opl("Na2S").nr, feN = D.opl("FeNO33").nr;
+    paastand("Na₂S kan ikke tages, foer skemaet er udfoert", f.tagFlaske(naS) === false);
+    paastand("det frie forsøg er laast", f.skiftSide("frit") === false && d.getElementById("sidevalg").hidden);
+    for (i = 0; i < 12; i++) udfoer(i);
+    NK.opdaterPanel();
+    paastand("alle tolv felter udfoert laaser op", f.bonus && f.antalUdfoert() === 12);
+    paastand("laereren siger det", L.aktiv && L.slags === "bonus", L.slags);
+    tekster.push(L.tekst);
+    paastand("knapperne til at skifte side vises", !d.getElementById("sidevalg").hidden);
+    adv(2);
+    paastand("de ekstra flasker staar i det lille stativ", f.flasker[naS].iStativ && f.flasker[feN].iStativ);
+    paastand("og kan tages", f.tagFlaske(naS) === true);
+    f.saetTilbage();
+    adv(1);
+
+    d.querySelector('.sideknap[data-side="frit"]').click();
+    paastand("Frit forsøg skifter folien", f.side === "frit" && f.felter === f.sider.frit);
+    paastand("skemaets draaber er gemt", f.sider.skema.every(function (x) { return x.antal === 2; }));
+    paastand("det frie forsøg starter tomt", f.felter.every(function (x) { return x.antal === 0; }));
+    paastand("reaktionsskemaet er skjult, opgaven om salte vises", d.getElementById("opgave-kort").hidden && !d.getElementById("frit-kort").hidden);
+    paastand("skemaet i panelet hedder Frit forsøg", d.getElementById("skema-titel").textContent === "Frit forsøg");
+
+    var fjolFoer = f.fjol;
+    dryp(0, "FeNO33");
+    paastand("én opløsning i et frit felt", f.status(0) === "enkelt");
+    dryp(0, "Na2S");
+    paastand("Fe(NO₃)₃ + Na₂S giver Fe₂S₃", f.status(0) === "bundfald" && f.felter[0].analyse.bundfald[0].noegle === "Fe-S");
+    dryp(0, "AgNO3");
+    paastand("i det frie forsøg er intet forkert", f.fjol === fjolFoer, f.fjol);
+    dryp(3, "Na2S"); dryp(3, "BaCl2");
+    paastand("Na₂S + BaCl₂ giver intet bundfald", f.status(3) === "intet");
+    dryp(7, "Na2S"); dryp(7, "CuSO4");
+    paastand("Na₂S + CuSO₄ giver CuS, sort", f.felter[7].analyse.bundfald[0].noegle === "Cu-S" && f.felter[7].analyse.bundfald[0].info.ord === "sort");
+    paastand("de to nederste rækker er hvide", NK.Scene.hvidtFelt(7) && !NK.Scene.hvidtFelt(3));
+
+    var noter = [];
+    var gammelBesked = f.vedBesked;
+    f.vedBesked = function (tekst) { noter.push(tekst); };
+    dryp(6, "FeNO33"); dryp(6, "Na2CO3");
+    f.vedBesked = gammelBesked;
+    f.saetTilbage();
+    paastand("Fe(NO₃)₃ + Na₂CO₃ giver en besked om Fe(OH)₃", noter.some(function (x) { return x.indexOf("Fe(OH)₃") >= 0; }), noter.join(" / "));
+    tekster = tekster.concat(noter);
+    f.vaelgFelt(6);
+    adv(0.1);
+    t = tael();
+    paastand("i luppen: 4 Fe³⁺ i bundfaldet og 6 CO₃²⁻ bliver til CO₂", t.Fe.bundet === 4 && t.CO3.bundet === 6 && t.Fe.fri === 2, JSON.stringify(t));
+    adv(5);
+    var co2 = f.mikro.ioner.filter(function (x) { return x.co2; });
+    paastand("CO₂ stiger op og forsvinder", co2.length === 6 && co2.every(function (x) { return x.alfa < 0.2; }), co2.map(function (x) { return x.alfa.toFixed(2); }).join(","));
+
+    NK.skiftSide("skema");
+    paastand("tilbage i skemaet er alt som før", f.side === "skema" && f.antalUdfoert() === 12 && !d.getElementById("opgave-kort").hidden);
+
+    overskrift("9. Opgaven om tungtopløselige salte");
+    NK.skiftSide("frit");
+    var FO = NK.fritOpgave;
+    function chip(noegle) { return d.querySelector('.saltchip[data-salt="' + noegle + '"]'); }
+    paastand("10 knapper, Fe₂S₃ i begge grupper", d.querySelectorAll("#frit-grupper .saltchip").length === 10 && d.querySelectorAll('.saltchip[data-salt="Fe-S"]').length === 2);
+    chip("Fe-S").click();
+    paastand("de to Fe₂S₃-knapper foelges ad", d.querySelectorAll('.saltchip.valgt[data-salt="Fe-S"]').length === 2);
+    chip("Fe-PO4").click(); chip("Ag-S").click();
+    paastand("tre ud af fire er forkert", FO.tjek() === false && d.getElementById("frit-besked").textContent === "Forkert. Prøv igen.");
+    chip("Cu-S").click(); chip("Ba-S").click();
+    paastand("alle fire plus BaS er forkert", FO.tjek() === false);
+    tekster.push(d.getElementById("frit-besked").textContent);
+    chip("Ba-S").click();
+    paastand("de fire tungtopløselige er rigtigt", FO.tjek() === true && d.getElementById("frit-besked").textContent === "Rigtigt.");
+    paastand("knapperne laases, og Tjek svar forsvinder", chip("Cu-S").disabled && d.getElementById("frit-tjek").hidden);
+    paastand("laereren roser modvilligt", L.aktiv && L.slags === "ros", L.slags);
+    tekster.push(L.tekst);
+    NK.skiftSide("skema");
+
+    overskrift("10. Sprog");
     frisk();
     tekster.push(d.body.textContent);
-    f.besked = function (t) { tekster.push(t); };
+    Object.keys(NK.LAERER_REPLIKKER).forEach(function (k) { tekster = tekster.concat(NK.LAERER_REPLIKKER[k]); });
+    Object.keys(D.BUNDFALD).forEach(function (k) { if (D.BUNDFALD[k].note) tekster.push(D.BUNDFALD[k].note); });
+    f.vedBesked = function (tk) { tekster.push(tk); };
     dryp(0, "BaCl2"); dryp(0, "CuSO4"); dryp(0, "CuSO4"); dryp(0, "CuSO4"); dryp(0, "CuSO4");
+    f.vedBesked = gammelBesked;
     f.vaelgFelt(0);
     NK.opdaterPanel();
     tekster.push(d.getElementById("opg-tekst").textContent);
     var alt = tekster.join(" ");
     paastand("ingen tankestreger i teksterne", !/[—–]/.test(alt));
     paastand("ingen 1+ eller 1− i teksterne", !/(¹⁺|¹⁻|1\+|1−)/.test(alt));
-    delete f.besked;
 
     frisk();
     vis();

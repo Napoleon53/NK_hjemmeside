@@ -141,27 +141,27 @@ main.forsoeg {
     user-select: none;
 }
 
+/* Forloebet i tre trin, oeverst i panelet */
 .trinlinje {
-    position: absolute;
-    top: 10px;
-    right: 12px;
     display: flex;
-    gap: 6px;
+    flex-wrap: wrap;
+    gap: 5px;
     margin: 0;
     padding: 0;
     list-style: none;
-    pointer-events: none;
 }
 
 .trinlinje li {
+    flex: 1 1 auto;
+    justify-content: center;
     display: flex;
     align-items: center;
-    gap: 7px;
-    padding: 5px 11px 5px 6px;
+    gap: 6px;
+    padding: 4px 10px 4px 5px;
     border-radius: 20px;
     background-color: rgba(20, 20, 26, 0.78);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    font-size: 0.8rem;
+    font-size: 0.76rem;
     font-weight: 600;
     color: var(--tekst-mat);
     white-space: nowrap;
@@ -303,7 +303,7 @@ main.forsoeg {
 }
 
 .skemafelt:hover { border-color: #5e5e70; }
-.skemafelt i { width: 15px; height: 15px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35); }
+.skemafelt i { width: 15px; height: 15px; border-radius: 50%; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35), inset 0 0 0 1px rgba(0, 0, 0, 0.35); }
 .skemafelt b { color: #7ee0a8; font-size: 0.85rem; }
 .skemafelt.delvis { color: var(--tekst-svag); font-size: 0.9rem; }
 .skemafelt.forurenet { color: #f0918a; border-color: var(--roed-mork); font-weight: 800; font-size: 0.9rem; }
@@ -381,6 +381,80 @@ main.forsoeg {
 
 #opg-naeste { margin-top: 10px; }
 #opg-naeste[hidden] { display: none; }
+
+.kort[hidden] { display: none; }
+
+/* ----- Skift mellem skema og frit forsøg --------------------------- */
+.sidevalg {
+    display: flex;
+    gap: 3px;
+    margin: 0 0 9px;
+    padding: 3px;
+    border-radius: var(--radius-lil);
+    background-color: #15151b;
+    border: 1px solid #3a3a47;
+}
+
+.sidevalg[hidden] { display: none; }
+
+.sideknap {
+    flex: 1;
+    padding: 6px 8px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--tekst-mat);
+    font-family: inherit;
+    font-size: 0.84rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.sideknap:hover { color: var(--tekst); }
+.sideknap.aktiv { background-color: var(--blaa-mork); color: #ffffff; }
+.skemafelt.hvid { background-color: #d9dde2; border-color: #aab2bb; color: #2b313b; }
+.skemafelt.hvid.bundfald { background-color: #cfd4da; }
+.skemafelt.hvid i { box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3); }
+
+/* ----- Opgaven i det frie forsøg ------------------------------------- */
+.gruppe-etiket {
+    margin: 10px 0 5px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--tekst-mat);
+}
+
+.saltvalg { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.saltchip {
+    padding: 6px 11px;
+    border-radius: 16px;
+    background-color: var(--panel-2);
+    border: 1px solid #4a4a58;
+    color: var(--tekst);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.14s ease, border-color 0.14s ease;
+}
+
+.saltchip:hover:not(:disabled) { background-color: var(--panel-3); }
+.saltchip.valgt { background-color: var(--blaa-mork); border-color: var(--blaa); }
+.saltchip.rigtig { background-color: var(--groen-mork); border-color: var(--groen); }
+.saltchip:disabled { cursor: default; }
+
+.frit-knaprad { align-items: center; }
+.frit-knaprad .knap { flex: 0 0 auto; padding: 9px 16px; }
+#frit-besked { flex: 1; font-weight: 600; }
+.besked.blink { animation: blink 0.45s ease-out; }
+
+@keyframes blink {
+    0%   { opacity: 0.2; transform: translateX(-5px); }
+    100% { opacity: 1; transform: none; }
+}
 
 /* ---------------------------------------------------------------------
    KNAPPER
@@ -540,7 +614,7 @@ button:focus-visible {
     .top h1 .undertitel { display: none; }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
     .trinlinje li { font-size: 0.72rem; padding: 3px 9px 3px 4px; }
 }
 
@@ -550,7 +624,6 @@ button:focus-visible {
     .scenekolonne { height: auto; }
     .scene { height: 62vw; min-height: 300px; flex: none; }
     .panel { border-left: none; border-top: 1px solid #1f1f27; overflow: visible; }
-    .trinlinje { left: 8px; right: auto; top: 6px; flex-wrap: wrap; }
 }
 
 @media (prefers-reduced-motion: reduce) {

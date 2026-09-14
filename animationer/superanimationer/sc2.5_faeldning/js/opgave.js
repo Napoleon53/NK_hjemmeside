@@ -48,7 +48,7 @@
     };
 
     O.antalLoest = function () {
-        return this.f.felter.filter(function (f) { return f.loest; }).length;
+        return this.f.sider.skema.filter(function (f) { return f.loest; }).length;
     };
 
     O.rigtig = function () {
@@ -181,6 +181,11 @@
     /* ----- Visning ------------------------------------------------------ */
     O.vis = function (tvungen) {
         var f = this.f;
+        /* I det frie forsøg er kortet skjult; det starter forfra bagefter. */
+        if (f.side !== "skema") {
+            this.felt = -2;
+            return;
+        }
         if (f.valgt !== this.felt) {
             this.felt = f.valgt;
             this.nulstilBygger();

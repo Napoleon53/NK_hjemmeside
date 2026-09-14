@@ -12,6 +12,15 @@
    Luppen traekkes hen over en draabe (eller flyver derhen, naar man
    klikker paa draaben). Saa viser zoomcirklen ionerne i netop den
    draabe, se mikro.js. Et felt tørres af med køkkenrulle.
+
+   To sider paa folien:
+     "skema"  de tolv felter med opløsningerne i kanten
+     "frit"   tolv tomme felter, hvor alt kan blandes. Laases op
+              sammen med Na₂S og Fe(NO₃)₃, naar skemaet er udfoert.
+
+   Drypper eleven noget forkert i skemaet (en fremmed opløsning, eller
+   i et felt, der er fyldt), taeller det som fjol. For hver
+   FJOL_GRAENSE gange siger laereren noget, se laerer.js.
    ===================================================================== */
 (function () {
     "use strict";
@@ -27,6 +36,8 @@
     var MAKRO_TID = 1.4;           /* sekunder om at bundfaldet ses fuldt ud */
     NK.MIKRO_TID = 2.6;            /* sekunder om at samle bundfaldet i luppen */
     var TOER_TID = 0.7;
+    var FJOL_GRAENSE = 3;          /* fjol, foer laereren siger noget, og igen for hver 3 */
+    var SKAFT = 95;                /* luppens skaft, fra linsens midte */
 
     NK.Forsoeg = function (canvas) {
         this.canvas = canvas;
@@ -34,31 +45,43 @@
         this.vedAendring = null;
         this.vedBesked = null;
         this.mikro = new NK.Mikro();
+        this.laerer = new NK.Laerer();
         this.nulstil();
         if (canvas) this.bindMus();
     };
 
     var P = NK.Forsoeg.prototype;
     P.MAKS_DRAABER = MAKS_DRAABER;
+    P.FJOL_GRAENSE = FJOL_GRAENSE;
+
+    function nyeFelter() {
+        return D.FELTER.map(function (F) {
+            return {
+                nr: F.nr, draaber: {}, antal: 0, r: 0, rMaal: 0, bobl: 0,
+                blandTid: -1, analyse: D.analyser({}), loest: false, fyldtTalt: false, froe: F.nr * 37 + 11
+            };
+        });
+    }
 
     P.nulstil = function () {
         this.tid = 0;
-        this.felter = D.FELTER.map(function (F) {
-            return {
-                nr: F.nr, draaber: {}, antal: 0, r: 0, rMaal: 0, bobl: 0,
-                blandTid: -1, analyse: D.analyser({}), loest: false, froe: F.nr * 37 + 11
-            };
-        });
+        this.sider = { skema: nyeFelter(), frit: nyeFelter() };
+        this.side = "skema";
+        this.felter = this.sider.skema;
+        this.bonus = false;
+        this.fjol = 0;
+        this.naesteSpyd = FJOL_GRAENSE;
+        this.laerer.nulstil();
         this.flasker = D.OPLOESNINGER.map(function (o, i) {
             var h = S.hjem(i);
-            return { opl: o.id, nr: i, x: h.x, y: h.y, vinkel: 0, klem: 0, iStativ: true };
+            return { opl: o.id, nr: i, bonus: !!o.bonus, x: h.x, y: h.y, vinkel: 0, klem: 0, iStativ: true };
         });
         this.haand = -1;
         this.dryp = null;
         this.faldende = [];
         this.plask = [];
         this.papir = [];
-        this.lup = { x: S.LUP_HVILE.x, y: S.LUP_HVILE.y, traek: null, over: false };
+        this.lup = { x: S.LUP_HVILE.x, y: S.LUP_HVILE.y, vinkel: S.LUP_HVILE.vinkel, traek: null, over: false };
         this.valgt = -1;
         this.pointer = null;
         this.hover = { felt: -1, flaske: -1, lup: false };
@@ -75,19 +98,26 @@
     };
 
     /* ----- Til panelet -------------------------------------------------- */
-    /* "tom" | "delvis" | "forurenet" | "intet" | "bundfald" */
-    P.status = function (nr) {
-        var f = this.felter[nr], F = D.FELTER[nr];
+    /* skema: "tom" | "delvis" | "forurenet" | "intet" | "bundfald"
+       frit:  "tom" | "enkelt" | "intet" | "bundfald" */
+    P.status = function (nr, side) {
+        side = side || this.side;
+        var f = this.sider[side][nr], F = D.FELTER[nr];
         if (!f.antal) return "tom";
+        if (side === "frit") {
+            if (f.analyse.bundfald.length) return "bundfald";
+            return f.analyse.opl.length > 1 ? "intet" : "enkelt";
+        }
         if (D.fremmede(F, f.draaber).length) return "forurenet";
         if (!D.udfoert(F, f.draaber)) return "delvis";
         return f.analyse.bundfald.length ? "bundfald" : "intet";
     };
 
+    /* Udfoerte felter i skemaet, uanset hvilken side der vises. */
     P.antalUdfoert = function () {
         var n = 0;
-        for (var i = 0; i < this.felter.length; i++) {
-            var s = this.status(i);
+        for (var i = 0; i < D.FELTER.length; i++) {
+            var s = this.status(i, "skema");
             if (s === "bundfald" || s === "intet") n++;
         }
         return n;
@@ -109,9 +139,51 @@
         return this.harKigget ? 3 : 2;
     };
 
+    /* ----- Sider, bonus og fjol ------------------------------------------ */
+    P.skiftSide = function (side) {
+        if (side === this.side || !this.sider[side]) return false;
+        if (side === "frit" && !this.bonus) return false;
+        this.side = side;
+        this.felter = this.sider[side];
+        this.valgt = -1;
+        this.dryp = null;
+        this.faldende = [];
+        this.plask = [];
+        this.papir = [];
+        this.aendret("side");
+        return true;
+    };
+
+    /* Skemaet er udfoert: de ekstra flasker falder ned i det lille stativ. */
+    P.laasOp = function () {
+        if (this.bonus) return false;
+        this.bonus = true;
+        var mig = this;
+        D.BONUS.forEach(function (id, i) {
+            var fl = mig.flasker[D.opl(id).nr];
+            var h = S.hjem(fl.nr);
+            fl.x = h.x;
+            fl.y = h.y - 240 - i * 70;
+            fl.vinkel = 0;
+            fl.iStativ = false;
+        });
+        this.laerer.replik("bonus");
+        this.aendret("bonus");
+        return true;
+    };
+
+    P.fjollet = function (slags) {
+        this.fjol++;
+        if (this.fjol >= this.naesteSpyd) {
+            this.naesteSpyd = this.fjol + FJOL_GRAENSE;
+            this.laerer.replik(slags);
+        }
+    };
+
     /* ----- Flaskerne ------------------------------------------------------ */
     P.tagFlaske = function (i) {
         if (i < 0 || i >= this.flasker.length) return false;
+        if (this.flasker[i].bonus && !this.bonus) return false;
         if (this.haand === i) return true;
         if (this.haand >= 0) this.saetTilbage();
         this.haand = i;
@@ -137,6 +209,10 @@
         var f = this.felter[nr];
         if (f.antal >= MAKS_DRAABER) {
             this.besked("Feltet er fyldt. Tør det af for at begynde forfra.", "advarsel");
+            if (this.side === "skema" && !f.fyldtTalt) {
+                f.fyldtTalt = true;
+                this.fjollet("fyldt");
+            }
             return false;
         }
         this.dryp = { felt: nr, fase: "flyt", t: 0, faeldet: false };
@@ -145,22 +221,31 @@
 
     P.lander = function (d) {
         var f = this.felter[d.felt], F = D.FELTER[d.felt];
+        var skema = this.side === "skema";
         var foer = f.analyse.bundfald.length;
+        var varForurenet = skema && this.status(d.felt) === "forurenet";
+
         f.draaber[d.opl] = (f.draaber[d.opl] || 0) + 1;
         f.antal++;
         f.rMaal = RADIUS * Math.cbrt(f.antal);
         if (f.r < 1) f.r = RADIUS * 0.6;
         f.bobl = 1;
         f.analyse = D.analyser(f.draaber);
-        if (f.analyse.bundfald.length && !foer) f.blandTid = this.tid;
+        if (f.analyse.bundfald.length && !foer) {
+            f.blandTid = this.tid;
+            var note = f.analyse.bundfald[0].info.note;
+            if (note) this.besked(note, "info");
+        }
         if (!f.analyse.bundfald.length) f.blandTid = -1;
         var c = S.felt(d.felt);
         this.plask.push({ x: c.cx, y: c.cy, r: f.r, liv: 1 });
 
-        if (d.opl !== F.soejle && d.opl !== F.raekke) {
+        if (skema && d.opl !== F.soejle && d.opl !== F.raekke) {
             this.besked(D.opl(d.opl).formel + " hører ikke til i feltet " + D.feltNavn(F) + ".", "advarsel");
+            if (!varForurenet) this.fjollet("fjol");
         }
         this.aendret("dryp");
+        if (skema && !this.bonus && this.antalUdfoert() === D.FELTER.length) this.laasOp();
     };
 
     /* ----- Luppen ----------------------------------------------------------- */
@@ -201,6 +286,7 @@
         f.antal = 0;
         f.rMaal = 0;
         f.blandTid = -1;
+        f.fyldtTalt = false;
         f.analyse = D.analyser({});
         if (this.valgt === nr) this.valgt = -1;
         this.aendret("toer");
@@ -215,8 +301,8 @@
 
     P.flaskeVed = function (p) {
         for (var i = 0; i < this.flasker.length; i++) {
+            if (i === this.haand || (this.flasker[i].bonus && !this.bonus)) continue;
             var h = S.hjem(i);
-            if (i === this.haand) continue;
             if (Math.abs(p.x - h.x) < 34 && p.y > 8 && p.y < S.STATIV.y + S.STATIV.h) return i;
         }
         return -1;
@@ -226,15 +312,20 @@
         var L = this.lup;
         var dx = p.x - L.x, dy = p.y - L.y;
         if (dx * dx + dy * dy < 44 * 44) return true;
-        /* skaftet gaar skraat ned til hoejre */
-        var t = NK.klamp((dx + dy) / 2 / 66, 0, 1);
-        var hx = dx - 66 * t, hy = dy - 66 * t;
+        var a = Math.PI / 4 + L.vinkel;
+        var ux = Math.cos(a), uy = Math.sin(a);
+        var t = NK.klamp((dx * ux + dy * uy) / SKAFT, 0, 1);
+        var hx = dx - ux * SKAFT * t, hy = dy - uy * SKAFT * t;
         return t > 0 && hx * hx + hy * hy < 13 * 13;
     };
 
     P.ned = function (p) {
         this.pointer = p;
         var nr, fi;
+        if (this.laerer.ramt(p)) {
+            this.laerer.luk();
+            return true;
+        }
         if (this.haand >= 0) {
             nr = S.feltVed(p);
             if (nr >= 0) { this.drypI(nr); return true; }
@@ -266,6 +357,7 @@
         this.hover.felt = S.feltVed(p);
         this.hover.flaske = this.flaskeVed(p);
         this.hover.lup = this.haand < 0 && this.overLup(p);
+        this.hover.laerer = this.laerer.ramt(p);
     };
 
     P.op = function () {
@@ -277,6 +369,7 @@
 
     P.markoerStil = function () {
         if (this.lup.traek) return "grabbing";
+        if (this.hover.laerer) return "pointer";
         if (this.haand >= 0) return this.hover.felt >= 0 ? "none" : (this.hover.flaske >= 0 ? "pointer" : "default");
         if (this.hover.lup || this.hover.flaske >= 0) return "grab";
         if (this.hover.felt >= 0 && this.felter[this.hover.felt].antal > 0) return "zoom-in";
@@ -304,7 +397,7 @@
         c.addEventListener("pointerleave", function () {
             if (mig.lup.traek) return;
             mig.pointer = null;
-            mig.hover = { felt: -1, flaske: -1, lup: false };
+            mig.hover = { felt: -1, flaske: -1, lup: false, laerer: false };
         });
     };
 
@@ -326,11 +419,14 @@
             }
         }
 
-        for (i = 0; i < this.felter.length; i++) {
-            var f = this.felter[i];
-            f.r = NK.mod(f.r, f.rMaal, 9, dt);
-            if (f.rMaal === 0 && f.r < 0.5) f.r = 0;
-            f.bobl = Math.max(0, f.bobl - dt * 2.5);
+        for (var side in this.sider) {
+            var liste = this.sider[side];
+            for (i = 0; i < liste.length; i++) {
+                var f = liste[i];
+                f.r = NK.mod(f.r, f.rMaal, 9, dt);
+                if (f.rMaal === 0 && f.r < 0.5) f.r = 0;
+                f.bobl = Math.max(0, f.bobl - dt * 2.5);
+            }
         }
 
         for (i = this.plask.length - 1; i >= 0; i--) {
@@ -341,19 +437,22 @@
         }
 
         this.opdaterPapir(dt);
+        this.laerer.opdater(dt);
 
-        /* Luppen */
+        /* Luppen: ligger paa skraa, naar den ikke bruges */
         if (!this.lup.traek) {
             var m = this.lupMaal();
             this.lup.x = NK.mod(this.lup.x, m.x, 8, dt);
             this.lup.y = NK.mod(this.lup.y, m.y, 8, dt);
         }
+        var hviler = this.valgt < 0 && !this.lup.traek;
+        this.lup.vinkel = NK.mod(this.lup.vinkel, hviler ? S.LUP_HVILE.vinkel : 0, 6, dt);
         var K = S.SKEMA;
         this.lup.over = this.lup.x > K.x0 - 30 && this.lup.x < K.x1 + 30 && this.lup.y > K.y0 - 30 && this.lup.y < K.y1 + 30;
 
         if (this.valgt >= 0) {
             var vf = this.felter[this.valgt];
-            this.mikro.byg(vf.draaber, String(this.valgt));
+            this.mikro.byg(vf.draaber, this.side + this.valgt);
             this.mikro.opdater(dt, this.mikroGrad(this.valgt));
             if (!this.harKigget && this.status(this.valgt) === "bundfald" && this.mikroGrad(this.valgt) >= 1) {
                 this.harKigget = true;
@@ -452,8 +551,15 @@
         return {
             x: c.cx, y: c.cy,
             r: f.r * (1 + 0.07 * f.bobl * Math.sin(this.tid * 32)),
-            vaeske: farve, bundfald: b ? b.info : null, grad: this.makroGrad(nr), froe: f.froe
+            vaeske: farve, bundfald: b ? b.info : null, grad: this.makroGrad(nr),
+            siden: f.blandTid < 0 ? 99 : this.tid - f.blandTid, froe: f.froe
         };
+    };
+
+    P.vaeskeFarve = function (draaber) {
+        var farve = null;
+        for (var id in draaber) if (draaber[id] > 0 && D.opl(id).farve) farve = D.opl(id).farve;
+        return farve;
     };
 
     P.tegnFolie = function (ctx, medFremhaev) {
@@ -467,7 +573,7 @@
             }
             fremhaev.markoer = this.markoer;
         }
-        S.tegnLomme(ctx, fremhaev);
+        S.tegnLomme(ctx, fremhaev, this.side);
         for (var i = 0; i < this.felter.length; i++) {
             if (this.felter[i].r > 0.5) S.tegnDraabe(ctx, this.draabeData(i));
         }
@@ -492,22 +598,25 @@
 
         for (i = 0; i < this.flasker.length; i++) {
             var fl = this.flasker[i];
+            if (fl.bonus && !this.bonus) continue;
             if (fl.iStativ && i !== this.haand) {
                 S.tegnFlaske(ctx, { x: fl.x, y: fl.y, vinkel: 0, klem: 0, opl: fl.opl, fremhaev: this.hover.flaske === i && !this.lup.traek });
             }
         }
         S.tegnStativ(ctx);
+        S.tegnStativLille(ctx, this.bonus);
 
         if (this.valgt >= 0) {
             var vf = this.felter[this.valgt];
-            var farve = null;
-            for (var id in vf.draaber) if (D.opl(id).farve) farve = D.opl(id).farve;
+            var titel = this.side === "skema"
+                ? "Dråben i feltet " + D.feltNavn(D.FELTER[this.valgt])
+                : "Dråben: " + D.indholdNavn(vf.draaber);
             S.tegnKegle(ctx, this.lup, 1);
-            S.tegnZoom(ctx, this.mikro, "Dråben i feltet " + D.feltNavn(D.FELTER[this.valgt]), farve);
+            S.tegnZoom(ctx, this.mikro, titel, this.vaeskeFarve(vf.draaber));
         } else {
             S.tegnZoom(ctx, null);
         }
-        S.tegnLup(ctx, { x: this.lup.x, y: this.lup.y, over: this.lup.over, fremhaev: this.hover.lup }, function (c) {
+        S.tegnLup(ctx, { x: this.lup.x, y: this.lup.y, vinkel: this.lup.vinkel, over: this.lup.over, fremhaev: this.hover.lup }, function (c) {
             mig.tegnFolie(c, false);
         });
 
@@ -521,6 +630,7 @@
             if (Math.abs(fh.vinkel - Math.PI) < 0.4) S.tegnHaandSkilt(ctx, fh);
         }
         for (i = 0; i < this.faldende.length; i++) S.tegnFaldendeDraabe(ctx, this.faldende[i]);
+        S.tegnLaerer(ctx, this.laerer);
         ctx.restore();
     };
 }());

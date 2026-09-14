@@ -14,24 +14,24 @@ via `samling_alt.html?emne=c2.5` og er derfor ikke berørt af flytningen.
 ## Kun én fane
 
 Det er ét forsøg, så der er ingen fanelinje. Toppen har kun titel, Teori og
-rundvisningen.
+rundvisningen. Forløbet i tre trin (*Dryp*, *Brug luppen*, *Opskriv*) står
+øverst i panelet, fordi det lille stativ står der, hvor trinene ellers ville
+sidde på scenen.
 
 ## Hvad viser den
 
 Et udsnit af laboratoriebordet set ovenfra:
 
-* et **stativ** med syv dråbeflasker
+* et **stativ** med syv dråbeflasker og et **lille stativ** med to låste pladser
 * en **plastlomme** med et sort skema, tre opløsninger over søjlerne og fire ud
   for rækkerne
 * en **lup** og et stykke **køkkenrulle**
+* en **kemilærer**, der dukker op, når eleven fjoller
 
 Eleven tager en flaske op og klikker på et felt. Flasken vendes, klemmes, og én
 dråbe falder ned på folien. Flasken bliver i hånden, til man klikker ved siden
 af, på stativet eller trykker Esc, så en hel søjle kan dryppes i træk. Mens en
 flaske er i hånden, lyser dens søjle eller række op i skemaet.
-
-Forløbet står i tre trin øverst på scenen: *Dryp i felterne*, *Brug luppen*,
-*Opskriv reaktionen*.
 
 ### Skemaet
 
@@ -64,8 +64,9 @@ flaske i hånden.
 
 ### Luppen
 
-Luppen trækkes hen over en dråbe, eller flyver derhen, når man klikker på
-dråben. Linsen forstørrer dråben, og zoomcirklen til højre viser ionerne i den.
+Luppen ligger på skrå ved zoomcirklen. Den trækkes hen over en dråbe, eller
+flyver derhen, når man klikker på dråben. Linsen forstørrer dråben, og
+zoomcirklen viser ionerne i den.
 
 Ionerne er talt, ikke tegnet på må og få. Hver dråbe har lige mange
 formelenheder (6, eller 3 når der er mere end to dråber i feltet), så en dråbe
@@ -98,6 +99,63 @@ Efter to forkerte svar kommer **Vis svaret**. Et vist svar tæller ikke med, og
 feltet kan prøves igen senere. Et rigtigt svar viser bundfaldets farve, formlen
 og tilskuerionerne.
 
+### Den sarkastiske lærer
+
+Læreren kigger op over bordkanten nede i højre hjørne og siger noget i en
+talebobbel. Han dukker op:
+
+* når eleven har **fjollet tre gange** i skemaet, og igen for hver tredje gang
+  derefter. Fjol er en dråbe af en opløsning, der ikke hører til feltet (kun
+  første gang, feltet bliver forkert), eller et forsøg på at dryppe i et felt,
+  der er fyldt (én gang pr. felt, til det er tørret af). I det frie forsøg kan
+  man ikke fjolle
+* når skemaet er udført, og de ekstra flasker låses op
+* når opgaven i det frie forsøg er løst
+
+Replikkerne står i `js/laerer.js`. Samme replik bruges ikke igen, før alle i
+listen er brugt. Et klik på læreren eller bobblen, eller Esc, sender ham væk;
+ellers går han af sig selv efter nogle sekunder. Grænsen på tre står øverst i
+`js/forsoeg.js` (`FJOL_GRAENSE`).
+
+### Frit forsøg
+
+Når alle tolv felter i skemaet er udført, falder **Na₂S** og **Fe(NO₃)₃** ned i
+det lille stativ, og panelet får to knapper: *Skema* og *Frit forsøg* (eller
+<kbd>F</kbd>).
+
+Det frie forsøg er en ny side på folien med tolv tomme felter, hvor alle ni
+flasker kan blandes frit. De to øverste rækker er sorte, de to nederste hvide, så
+både hvide og sorte bundfald kan ses. Skemaets dråber gemmes, mens man er væk.
+
+| Kombination            | Resultat                                  |
+|------------------------|-------------------------------------------|
+| Na₂S + AgNO₃ / CuSO₄   | Ag₂S / CuS, sort                          |
+| Na₂S + Fe(NO₃)₃        | Fe₂S₃, sort                               |
+| Na₂S + BaCl₂           | intet (BaS er letopløseligt)              |
+| Fe(NO₃)₃ + Na₃PO₄      | FePO₄, gulhvidt                           |
+| Fe(NO₃)₃ + Na₂CO₃      | rødbrunt bundfald og bobler, se nedenfor  |
+| Fe(NO₃)₃ + NaCl / Na₂SO₄ / BaCl₂ / AgNO₃ / CuSO₄ | intet, gul opløsning |
+
+Fe₂(CO₃)₃ findes ikke. Fe³⁺ og CO₃²⁻ giver Fe(OH)₃ og CO₂, og det vises sådan:
+dråben bliver rødbrun med bobler, der kommer en kort besked på scenen, og i
+luppen bliver carbonationerne til CO₂, der stiger op og forsvinder.
+
+### Opgaven om tungtopløselige salte
+
+I det frie forsøg erstattes reaktionsskemaet af en opgave for de dygtige:
+**markér alle jern(III)salte og sulfider, der er tungtopløselige.** Listen
+bygges af ionerne i flaskerne:
+
+* jern(III)salte: Fe(NO₃)₃, FeCl₃, Fe₂(SO₄)₃, FePO₄, Fe₂S₃
+* sulfider: Ag₂S, BaS, CuS, Na₂S, Fe₂S₃
+
+Fe₂S₃ står i begge grupper, og de to knapper følges ad. Fe₂(CO₃)₃ er ikke med,
+fordi det ikke findes. Svaret er FePO₄, Fe₂S₃, Ag₂S og CuS.
+
+Alle skal være markeret, før man trykker **Tjek svar**. Er bare én forkert eller
+mangler, står der kun *Forkert. Prøv igen.* Der er ingen hints, og teoriboksen
+nævner med vilje ikke reglen for sulfider.
+
 ### Det nye i forhold til den gamle animation
 
 * **En rigtig udførelse.** Den gamle havde to knapper, *Tilsæt væske 1* og
@@ -111,6 +169,7 @@ og tilskuerionerne.
   også med overskud, og luppen kan flyttes mellem felterne.
 * **Hints i stedet for fast forklaring.** Den gamle viste tilskuerionerne,
   så snart reaktionen gik i gang. Nu skal eleven selv finde dem.
+* **Et frit forsøg og en lærer**, som ikke fandtes før.
 * **Rettet notation og sprog.** Ladning ±1 skrives + og −, og tankestreger og
   emojis er fjernet.
 
@@ -122,30 +181,35 @@ Alle ligger i `sprites/` som SVG og tegnes med `drawImage`:
 |-----|---------|-------------------------------|
 | `draabeflaske.svg` | dråbeflaske af blød plast med spids, skruelåg og blank etiket | spidsen (30, 2), væsken x 9 til 51 og y 66 til 143, etiketten x 8 til 52 og y 90 til 126 |
 | `stativ.svg` | stativets forside med syv huller og etiketfelter | hullernes midte x 55, 133, 211, 311, 389, 467, 545; etiketfelterne y 24 til 46 |
+| `stativ_lille.svg` | samme stativ med to huller | hullernes midte x 45 og 135; etiketfelterne y 24 til 46 |
 | `plastiklomme.svg` | plastlomme med hulstrimmel og sort papir | papiret x 38 til 602, y 12 til 370 |
 | `lup.svg` | lup med metalring og blåt skaft | linsens midte (58, 58), inderradius 42 |
 | `papir.svg` | et stykke køkkenrulle | midten (50, 35) |
+| `laerer.svg` | kemilærer i kittel med briller, løftet øjenbryn og kaffekrus | munden (84, 141) |
 
-Væsken i flaskerne, formlerne på etiketterne, skemaets streger, dråberne,
-bundfaldet, zoomcirklen og ionerne tegnes i `js/scene.js` og `js/mikro.js`.
-Ændres en sprite, skal tallene øverst i `scene.js` passe.
+Væsken i flaskerne, formlerne på etiketterne, skemaets streger, de hvide rækker
+i det frie forsøg, dråberne, bundfaldet, boblerne, hængelåsen, zoomcirklen,
+ionerne og talebobblen tegnes i `js/scene.js` og `js/mikro.js`. Ændres en
+sprite, skal tallene øverst i `scene.js` passe.
 
 ## Filer
 
 ```
-index.html          markup: scene, skema, reaktionsskema, teori og rundvisning
+index.html          markup: scene, skema, opgaverne, teori og rundvisning
 css/stil.css        alt udseende. NB: decimaltal med PUNKTUM i CSS
 js/kerne.js         NK-navnerum, hævet og sænket skrift, ladningHaevet,
                     DPR-skarpt canvas, tegnehjælpere
 js/data.js          ionerne, flaskerne, skemaet, huskereglen, bundfaldenes
-                    farver, formler og reaktionsskemaer
+                    farver, formler, reaktionsskemaer og saltene i den frie opgave
 js/sprites.js       indlæser SVG'erne
 js/scene.js         tegnebordet (1000 x 600) med alle mål og al tegning
 js/mikro.js         ionerne i zoomcirklen
-js/forsoeg.js       tilstanden: flasker, dryp, felter, lup og køkkenrulle
+js/laerer.js        lærerens replikker og hvornår han er fremme
+js/forsoeg.js       tilstanden: flasker, dryp, felter, sider, fjol, lup og køkkenrulle
 js/opgave.js        reaktionsskema-kortet og hintene
+js/fritopgave.js    opgaven om tungtopløselige salte
 js/rundvisning.js   spotlight-rundvisningen bag ?-knappen
-js/app.js           skemaet i panelet, knapper, tastatur, tegneløkke
+js/app.js           skemaet i panelet, sideskift, knapper, tastatur, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen
 ```
 
@@ -153,34 +217,41 @@ _selvtest.html      udviklerværktøj, indgår ikke i animationen
 
 **En opløsning** er én linje i `D.OPLOESNINGER` øverst i `js/data.js`: kation,
 anion, hvor mange af hver og navnet. Formlen regnes ud af sig selv. Skal den
-ind i skemaet, tilføjes id'et i `D.SOEJLER` eller `D.RAEKKER`. Stativet har syv
-pladser; flere flasker kræver flere huller i `stativ.svg` og i `S.PLADSER` i
+ind i skemaet, tilføjes id'et i `D.SOEJLER` eller `D.RAEKKER`. `bonus: true`
+sætter den i det lille stativ. Stativerne har syv og to pladser; flere flasker
+kræver flere huller i sprite-filen og i `S.PLADSER` eller `S.PLADSER_LILLE` i
 `js/scene.js`.
 
 **En ny ion** står i `D.IONER`: symbol, ladning, farve og radius i luppen.
 `sammensat: true` giver parentes i formlen, når ionen optræder mere end én gang.
 
 **Et nyt bundfald** skal have en farve i `D.BUNDFALD`. Selvtesten fanger
-tungtopløselige par uden farve.
+tungtopløselige par uden farve. `findesIkke: true` holder saltet ude af den frie
+opgave; `gas: true` giver bobler og CO₂ i luppen; `note` vises på scenen, første
+gang blandingen laves.
 
 **Tider og grænser** står øverst i `js/forsoeg.js`: højst 4 dråber pr. felt,
-hvor længe bundfaldet er om at komme til syne, og hvor længe køkkenrullen er om
-at tørre af. Ionernes fart og hvor tæt de ligger i bundfaldet står øverst i
-`js/mikro.js`.
+hvor mange fjol før læreren siger noget, hvor længe bundfaldet er om at komme
+til syne, og hvor længe køkkenrullen er om at tørre af. Ionernes fart og hvor
+tæt de ligger i bundfaldet står øverst i `js/mikro.js`.
 
 **Hintene** står i `js/opgave.js`. De bygges af data, så de passer til ethvert
-skema.
+skema. **Lærerens replikker** står øverst i `js/laerer.js`.
 
 **`_selvtest.html`** åbner `index.html` i en iframe og kontrollerer: at alle
 sprites indlæses, at formler og ladninger går op, at alle tolv felter giver det
 rigtige bundfald, at dråber lander i det rigtige felt, at en fremmed opløsning
 og en femte dråbe håndteres, at aftørring virker, at ionerne i luppen passer med
 reaktionsskemaet og overskuddet, at opgaven kun godtager det rigtige svar og
-giver hints, der passer til fejlen, og at teksterne hverken har tankestreger
+giver hints, der passer til fejlen, at læreren kommer efter tre fjol og kan
+sendes væk, at de ekstra flasker og det frie forsøg først låses op, når skemaet
+er udført, at Fe(OH)₃ og CO₂ vises rigtigt, at opgaven om tungtopløselige salte
+kun godtager det helt rigtige svar, og at teksterne hverken har tankestreger
 eller 1+. Kør den efter ændringer. Den skal åbnes gennem en lokal server (eller
 i Firefox): Chrome nægter en side på `file://` at kigge ind i sin egen iframe.
 
-Genveje: <kbd>1</kbd> til <kbd>7</kbd> tag eller sæt en flaske · piletaster
+Genveje: <kbd>1</kbd> til <kbd>9</kbd> tag eller sæt en flaske · piletaster
 vælg felt · <kbd>mellemrum</kbd> dryp eller se i luppen · <kbd>Delete</kbd> tør
-feltet af · <kbd>R</kbd> tør folien af · <kbd>Esc</kbd> sæt flasken tilbage ·
-<kbd>T</kbd> teori · <kbd>H</kbd> rundvisning.
+feltet af · <kbd>R</kbd> tør folien af · <kbd>F</kbd> skema eller frit forsøg ·
+<kbd>Esc</kbd> send læreren væk eller sæt flasken tilbage · <kbd>T</kbd> teori ·
+<kbd>H</kbd> rundvisning.

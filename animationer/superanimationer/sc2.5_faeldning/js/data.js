@@ -20,14 +20,16 @@
         Ag:  { id: "Ag",  tegn: "Ag",  q:  1, farve: "#dfe3e8", r: 12 },
         Ba:  { id: "Ba",  tegn: "Ba",  q:  2, farve: "#4db6ac", r: 13 },
         Cu:  { id: "Cu",  tegn: "Cu",  q:  2, farve: "#5aa9ec", r: 11 },
+        Fe:  { id: "Fe",  tegn: "Fe",  q:  3, farve: "#d98b4a", r: 11 },
         Na:  { id: "Na",  tegn: "Na",  q:  1, farve: "#c38ad0", r: 11 },
         NO3: { id: "NO3", tegn: "NO₃", q: -1, farve: "#ff8a65", r: 14, sammensat: true },
         Cl:  { id: "Cl",  tegn: "Cl",  q: -1, farve: "#aed581", r: 13 },
         SO4: { id: "SO4", tegn: "SO₄", q: -2, farve: "#ffd54f", r: 15, sammensat: true },
         CO3: { id: "CO3", tegn: "CO₃", q: -2, farve: "#a9bac2", r: 14, sammensat: true },
-        PO4: { id: "PO4", tegn: "PO₄", q: -3, farve: "#ff7a50", r: 15, sammensat: true }
+        PO4: { id: "PO4", tegn: "PO₄", q: -3, farve: "#ff7a50", r: 15, sammensat: true },
+        S:   { id: "S",   tegn: "S",   q: -2, farve: "#d6e36a", r: 14 }
     };
-    D.ION_ORDEN = ["Ag", "Ba", "Cu", "Na", "NO3", "Cl", "SO4", "CO3", "PO4"];
+    D.ION_ORDEN = ["Ag", "Ba", "Cu", "Fe", "Na", "NO3", "Cl", "SO4", "CO3", "PO4", "S"];
 
     /* ----- Draabeflaskerne -------------------------------------------- */
     /* Hver opløsning er ét salt: p kationer og n anioner pr. formelenhed.
@@ -39,7 +41,10 @@
         { id: "NaCl",   kat: "Na", p: 1, an: "Cl",  n: 1, navn: "natriumchlorid" },
         { id: "Na2SO4", kat: "Na", p: 2, an: "SO4", n: 1, navn: "natriumsulfat" },
         { id: "Na2CO3", kat: "Na", p: 2, an: "CO3", n: 1, navn: "natriumcarbonat" },
-        { id: "Na3PO4", kat: "Na", p: 3, an: "PO4", n: 1, navn: "natriumphosphat" }
+        { id: "Na3PO4", kat: "Na", p: 3, an: "PO4", n: 1, navn: "natriumphosphat" },
+        /* De to ekstra flasker laases op, naar alle tolv felter er udfoert. */
+        { id: "Na2S",   kat: "Na", p: 2, an: "S",   n: 1, navn: "natriumsulfid", bonus: true },
+        { id: "FeNO33", kat: "Fe", p: 1, an: "NO3", n: 3, navn: "jern(III)nitrat", farve: [214, 150, 60], bonus: true }
     ];
 
     /* Skemaet paa folien: én opløsning over hver søjle og én ud for
@@ -59,16 +64,26 @@
         "Ba-CO3": { farve: [242, 242, 238], ord: "hvidt" },
         "Ba-PO4": { farve: [240, 240, 234], ord: "hvidt" },
         "Cu-CO3": { farve: [104, 190, 172], ord: "blågrønt" },
-        "Cu-PO4": { farve: [128, 192, 234], ord: "lyseblåt" }
+        "Cu-PO4": { farve: [128, 192, 234], ord: "lyseblåt" },
+        "Fe-PO4": { farve: [236, 222, 168], ord: "gulhvidt" },
+        "Ag-S":   { farve: [30, 30, 32],    ord: "sort" },
+        "Cu-S":   { farve: [28, 28, 30],    ord: "sort" },
+        "Fe-S":   { farve: [36, 33, 30],    ord: "sort" },
+        /* Fe₂(CO₃)₃ findes ikke. Fe³⁺ og CO₃²⁻ giver rødbrunt Fe(OH)₃ og
+           CO₂-bobler. I luppen bliver carbonationerne til CO₂. */
+        "Fe-CO3": { farve: [150, 72, 30],   ord: "rødbrunt", findesIkke: true, gas: true,
+                    note: "Fe₂(CO₃)₃ findes ikke. Bundfaldet er Fe(OH)₃, og boblerne er CO₂." }
     };
 
     /* Samme huskeregel som i sc2.2: nitrater og alle salte med natrium,
        kalium og ammonium er letopløselige. Af resten er AgCl, BaSO₄,
-       Ag₂SO₄ og alle carbonater og phosphater tungtopløselige. */
+       Ag₂SO₄ og alle carbonater og phosphater tungtopløselige. Sulfider
+       er tungtopløselige, paa naer sulfider med calcium og barium. */
     D.tungtoploeseligt = function (kat, an) {
         if (an === "NO3" || kat === "Na" || kat === "K" || kat === "NH4") return false;
         if (an === "Cl") return kat === "Ag";
         if (an === "SO4") return kat === "Ba" || kat === "Ca" || kat === "Ag";
+        if (an === "S") return kat !== "Ba" && kat !== "Ca";
         return an === "CO3" || an === "PO4";
     };
 
@@ -115,6 +130,32 @@
         OPL[o.id] = o;
     });
     D.opl = function (id) { return OPL[id]; };
+    D.BONUS = D.OPLOESNINGER.filter(function (o) { return o.bonus; }).map(function (o) { return o.id; });
+
+    /* Formlerne i en draabe: "Fe(NO₃)₃ + Na₂S" */
+    D.indholdNavn = function (draaber) {
+        return D.OPLOESNINGER.filter(function (o) { return draaber[o.id] > 0; })
+            .map(function (o) { return o.formel; }).join(" + ");
+    };
+
+    /* Opgaven i det frie forsøg: alle jern(III)salte og sulfider, der kan
+       dannes af ionerne i flaskerne. Et salt, der ikke findes, er ikke med. */
+    (function () {
+        var kat = [], an = [];
+        D.OPLOESNINGER.forEach(function (o) {
+            if (kat.indexOf(o.kat) < 0) kat.push(o.kat);
+            if (an.indexOf(o.an) < 0) an.push(o.an);
+        });
+        function salt(k, a) {
+            var info = D.BUNDFALD[k + "-" + a];
+            if (info && info.findesIkke) return null;
+            return { noegle: k + "-" + a, kat: k, an: a, formel: D.bundfaldFormel(k, a), tung: D.tungtoploeseligt(k, a) };
+        }
+        D.FRIT_OPGAVE = [
+            { navn: "Jern(III)salte", salte: an.map(function (a) { return salt("Fe", a); }).filter(Boolean) },
+            { navn: "Sulfider", salte: kat.map(function (k) { return salt(k, "S"); }).filter(Boolean) }
+        ];
+    }());
 
     /* ----- Felterne ------------------------------------------------------ */
     D.FELTER = [];

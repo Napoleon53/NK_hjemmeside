@@ -12,11 +12,13 @@
 
     var MAPPE = "sprites/";
     var FILER = {
-        flaske: "draabeflaske.svg",
-        stativ: "stativ.svg",
-        lomme:  "plastiklomme.svg",
-        lup:    "lup.svg",
-        papir:  "papir.svg"
+        flaske:      "draabeflaske.svg",
+        stativ:      "stativ.svg",
+        stativLille: "stativ_lille.svg",
+        lomme:       "plastiklomme.svg",
+        lup:         "lup.svg",
+        papir:       "papir.svg",
+        laerer:      "laerer.svg"
     };
 
     function indlaes(navn, fil) {

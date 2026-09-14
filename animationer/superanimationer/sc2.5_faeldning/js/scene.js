@@ -2,9 +2,10 @@
    scene.js - udsnittet af bordet, tegnet paa et fast tegnebord
 
    Alt tegnes paa et tegnebord paa 1000 x 600 enheder, som skaleres og
-   centreres i laerredet. Draabeflasker, stativ, plastlomme, lup og
-   køkkenrulle er SVG-filer i sprites/. Skemaet paa papiret, væsken i
-   flaskerne, draaberne, bundfaldet og zoomcirklen tegnes her.
+   centreres i laerredet. Draabeflasker, stativer, plastlomme, lup,
+   køkkenrulle og laerer er SVG-filer i sprites/. Skemaet paa papiret,
+   væsken i flaskerne, draaberne, bundfaldet, zoomcirklen og
+   talebobblen tegnes her.
 
    Filen indeholder kun maal og tegning. Tilstanden ligger i forsoeg.js.
    ===================================================================== */
@@ -28,14 +29,19 @@
         ETIKET: { x: 30, y: 109, b: 40 }
     };
 
-    /* ----- Stativet (stativ.svg er 600 x 56) -------------------------- */
+    /* ----- Stativerne (stativ.svg er 600 x 56, stativ_lille.svg 180 x 56) */
     S.STATIV = { x: 30, y: 150, b: 600, h: 56, etiketY: 35 };
     S.PLADSER = [55, 133, 211, 311, 389, 467, 545];
+    S.STATIV_LILLE = { x: 690, y: 150, b: 180, h: 56, etiketY: 35 };
+    S.PLADSER_LILLE = [45, 135];
     S.FLASKE_TOP = 14;
 
-    /* Hvor flaske nr. i staar i stativet (spidsens position). */
+    /* Hvor flaske nr. i staar i stativet (spidsens position). De ekstra
+       flasker staar i det lille stativ. */
     S.hjem = function (i) {
-        return { x: S.STATIV.x + S.PLADSER[i], y: S.FLASKE_TOP + S.FLASKE.SPIDS.y };
+        var bonus = D.BONUS.indexOf(D.OPLOESNINGER[i].id);
+        var x = bonus >= 0 ? S.STATIV_LILLE.x + S.PLADSER_LILLE[bonus] : S.STATIV.x + S.PLADSER[i];
+        return { x: x, y: S.FLASKE_TOP + S.FLASKE.SPIDS.y };
     };
 
     /* ----- Plastlommen og skemaet ------------------------------------- */
@@ -43,6 +49,8 @@
     S.SKEMA = { x0: 66, x1: 618, y0: 232, y1: 578, hovedB: 120, hovedH: 40 };
     S.SKEMA.cellB = (S.SKEMA.x1 - S.SKEMA.x0 - S.SKEMA.hovedB) / D.SOEJLER.length;
     S.SKEMA.cellH = (S.SKEMA.y1 - S.SKEMA.y0 - S.SKEMA.hovedH) / D.RAEKKER.length;
+    /* I det frie forsøg er de to nederste rækker hvide, saa sorte bundfald kan ses. */
+    S.SKEMA.lysY = S.SKEMA.y0 + S.SKEMA.hovedH + 2 * S.SKEMA.cellH;
 
     S.felt = function (nr) {
         var f = D.FELTER[nr], K = S.SKEMA;
@@ -59,14 +67,21 @@
         return r * D.SOEJLER.length + c;
     };
 
+    S.hvidtFelt = function (nr) {
+        return D.FELTER[nr].r >= 2;
+    };
+
     /* Flasken holdes saa hoejt over feltet, at draaben kan ses falde. */
     S.OVER_FELT = 46;
 
-    /* ----- Luppen og zoomcirklen ----------------------------------------- */
-    S.LUP = { B: 128, H: 128, LINSE: { x: 46.4, y: 46.4, r: 33.6 }, FORSTOER: 1.8 };
-    S.LUP_HVILE = { x: 782, y: 522 };
-    S.ZOOM = { x: 815, y: 288, r: 148 };
+    /* ----- Luppen, zoomcirklen og laereren ----------------------------- */
+    /* Luppen ligger paa skraa, naar den ikke bruges, saa skaftet er inde
+       paa bordet. vinkel er drejningen i forhold til sprite-filen. */
+    S.LUP = { B: 128, H: 128, LINSE: { x: 46.4, y: 46.4, r: 33.6 }, SKAFT: 66, FORSTOER: 1.8 };
+    S.LUP_HVILE = { x: 694, y: 556, vinkel: -Math.PI / 4 };
+    S.ZOOM = { x: 832, y: 358, r: 132 };
     S.PAPIR = { B: 96, H: 67 };
+    S.LAERER = { x: 812, bund: 600, B: 190, H: 250, synlig: 232, MUND: { x: 84, y: 141 } };
 
     S.FARVE_VAND = [205, 222, 240];
 
@@ -104,39 +119,95 @@
         }
         ctx.restore();
 
-        /* Skygger under lommen og stativet */
+        /* Skygger under lommen og stativerne */
         ctx.save();
         ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
         ctx.filter = "blur(6px)";
         ctx.fillRect(S.LOMME.x + 6, S.LOMME.y + 8, S.LOMME.b, S.LOMME.h);
         ctx.fillRect(S.STATIV.x + 4, S.STATIV.y + 10, S.STATIV.b, S.STATIV.h);
+        ctx.fillRect(S.STATIV_LILLE.x + 4, S.STATIV_LILLE.y + 10, S.STATIV_LILLE.b, S.STATIV_LILLE.h);
         ctx.restore();
     };
 
     /* ================================================================
        LOMMEN MED SKEMAET
-       fremhaev: { felt, soejle, raekke } - hvad der skal lyse op
+       fremhaev: { felt, markoer, soejle, raekke } - hvad der skal lyse op
+       side: "skema" eller "frit"
        ================================================================ */
-    S.tegnLomme = function (ctx, fremhaev) {
+    S.tegnLomme = function (ctx, fremhaev, side) {
         var L = S.LOMME, K = S.SKEMA;
-        var i;
+        var frit = side === "frit";
         fremhaev = fremhaev || {};
         NK.Sprites.tegn(ctx, "lomme", L.x, L.y, L.b, L.h, "#2a2e37");
 
-        /* Den søjle og række, der passer til flasken i haanden */
-        ctx.save();
-        ctx.fillStyle = "rgba(242, 197, 61, 0.1)";
-        if (fremhaev.soejle >= 0) {
-            ctx.fillRect(K.x0 + K.hovedB + fremhaev.soejle * K.cellB, K.y0, K.cellB, K.y1 - K.y0);
+        if (frit) {
+            ctx.fillStyle = "#e4e7eb";
+            ctx.fillRect(K.x0, K.lysY, K.x1 - K.x0, K.y1 - K.lysY);
         }
-        if (fremhaev.raekke >= 0) {
-            ctx.fillRect(K.x0, K.y0 + K.hovedH + fremhaev.raekke * K.cellH, K.x1 - K.x0, K.cellH);
-        }
-        ctx.restore();
 
-        /* Stregerne */
+        /* Den søjle og række, der passer til flasken i haanden */
+        if (!frit) {
+            ctx.save();
+            ctx.fillStyle = "rgba(242, 197, 61, 0.1)";
+            if (fremhaev.soejle >= 0) {
+                ctx.fillRect(K.x0 + K.hovedB + fremhaev.soejle * K.cellB, K.y0, K.cellB, K.y1 - K.y0);
+            }
+            if (fremhaev.raekke >= 0) {
+                ctx.fillRect(K.x0, K.y0 + K.hovedH + fremhaev.raekke * K.cellH, K.x1 - K.x0, K.cellH);
+            }
+            ctx.restore();
+        }
+
+        /* Stregerne: lyse paa det sorte papir, moerke paa det hvide */
+        tegnStreger(ctx, "rgba(232, 238, 244, 0.5)", K.y0 - 2, frit ? K.lysY : K.y1 + 2);
+        if (frit) tegnStreger(ctx, "rgba(40, 46, 56, 0.5)", K.lysY, K.y1 + 2);
+
+        if (frit) {
+            NK.tekst(ctx, "FRIT FORSØG", K.x0 + K.hovedB + (K.x1 - K.x0 - K.hovedB) / 2, K.y0 + K.hovedH / 2 + 1, {
+                str: 14, vaegt: 700, justering: "center", linje: "middle", farve: "rgba(238, 242, 246, 0.6)"
+            });
+            for (var r = 0; r < D.RAEKKER.length; r++) {
+                NK.tekst(ctx, r < 2 ? "sort" : "hvid", K.x0 + K.hovedB / 2, K.y0 + K.hovedH + (r + 0.5) * K.cellH + 1, {
+                    str: 14, vaegt: 600, justering: "center", linje: "middle",
+                    farve: r < 2 ? "rgba(238, 242, 246, 0.5)" : "rgba(40, 46, 56, 0.6)"
+                });
+            }
+        } else {
+            D.SOEJLER.forEach(function (id, c) {
+                NK.tekst(ctx, D.opl(id).formel, K.x0 + K.hovedB + (c + 0.5) * K.cellB, K.y0 + K.hovedH / 2 + 1, {
+                    str: 16, vaegt: 700, justering: "center", linje: "middle",
+                    farve: fremhaev.soejle === c ? "#ffe08a" : "#eef2f6"
+                });
+            });
+            D.RAEKKER.forEach(function (id, rr) {
+                NK.tekst(ctx, D.opl(id).formel, K.x0 + K.hovedB / 2, K.y0 + K.hovedH + (rr + 0.5) * K.cellH + 1, {
+                    str: 16, vaegt: 700, justering: "center", linje: "middle",
+                    farve: fremhaev.raekke === rr ? "#ffe08a" : "#eef2f6"
+                });
+            });
+        }
+
+        /* Feltet under musen eller tastaturets markoer */
+        [fremhaev.felt, fremhaev.markoer].forEach(function (nr, n) {
+            if (!(nr >= 0)) return;
+            var f = S.felt(nr);
+            ctx.save();
+            ctx.strokeStyle = n === 0 ? "rgba(242, 197, 61, 0.9)" : "rgba(61, 158, 224, 0.95)";
+            ctx.lineWidth = 2;
+            ctx.setLineDash([6, 5]);
+            NK.rundtRekt(ctx, f.x + 4, f.y + 4, f.b - 8, f.h - 8, 6);
+            ctx.stroke();
+            ctx.restore();
+        });
+    };
+
+    function tegnStreger(ctx, farve, fraY, tilY) {
+        var K = S.SKEMA, i;
         ctx.save();
-        ctx.strokeStyle = "rgba(232, 238, 244, 0.5)";
+        ctx.beginPath();
+        ctx.rect(K.x0 - 4, fraY, K.x1 - K.x0 + 8, tilY - fraY);
+        ctx.clip();
+        ctx.strokeStyle = farve;
         ctx.lineWidth = 1.2;
         ctx.beginPath();
         ctx.rect(K.x0, K.y0, K.x1 - K.x0, K.y1 - K.y0);
@@ -154,39 +225,12 @@
         ctx.lineTo(K.x0 + K.hovedB, K.y0 + K.hovedH);
         ctx.stroke();
         ctx.restore();
-
-        /* Formlerne i kanten */
-        D.SOEJLER.forEach(function (id, c) {
-            NK.tekst(ctx, D.opl(id).formel, K.x0 + K.hovedB + (c + 0.5) * K.cellB, K.y0 + K.hovedH / 2 + 1, {
-                str: 16, vaegt: 700, justering: "center", linje: "middle",
-                farve: fremhaev.soejle === c ? "#ffe08a" : "#eef2f6"
-            });
-        });
-        D.RAEKKER.forEach(function (id, r) {
-            NK.tekst(ctx, D.opl(id).formel, K.x0 + K.hovedB / 2, K.y0 + K.hovedH + (r + 0.5) * K.cellH + 1, {
-                str: 16, vaegt: 700, justering: "center", linje: "middle",
-                farve: fremhaev.raekke === r ? "#ffe08a" : "#eef2f6"
-            });
-        });
-
-        /* Feltet under musen eller tastaturets markoer */
-        [fremhaev.felt, fremhaev.markoer].forEach(function (nr, n) {
-            if (!(nr >= 0)) return;
-            var f = S.felt(nr);
-            ctx.save();
-            ctx.strokeStyle = n === 0 ? "rgba(242, 197, 61, 0.9)" : "rgba(61, 158, 224, 0.95)";
-            ctx.lineWidth = 2;
-            ctx.setLineDash([6, 5]);
-            NK.rundtRekt(ctx, f.x + 4, f.y + 4, f.b - 8, f.h - 8, 6);
-            ctx.stroke();
-            ctx.restore();
-        });
-    };
+    }
 
     /* ================================================================
        EN DRAABE PAA FOLIEN
-       d: { x, y, r, vaeske (rgb), vaeskeAlfa, bundfald (info), grad (0-1),
-            froe, bobl }
+       d: { x, y, r, vaeske (rgb), bundfald (info), grad (0-1),
+            siden (sekunder siden blandingen), froe }
        ================================================================ */
     S.tegnDraabe = function (ctx, d) {
         if (d.r <= 0.5) return;
@@ -233,12 +277,30 @@
                 var frem = NK.klamp(d.grad * 1.6 - rnd() * 0.6, 0, 1);
                 if (frem <= 0) continue;
                 var moerk = rnd() < 0.5 ? 0.82 : 1.06;
+                var lys = b.farve[0] + b.farve[1] + b.farve[2] < 200 ? 40 : 0;
                 ctx.fillStyle = NK.rgba([
-                    Math.min(255, b.farve[0] * moerk), Math.min(255, b.farve[1] * moerk), Math.min(255, b.farve[2] * moerk)
+                    Math.min(255, b.farve[0] * moerk + lys), Math.min(255, b.farve[1] * moerk + lys), Math.min(255, b.farve[2] * moerk + lys)
                 ], frem * (b.taethed || 1));
                 ctx.beginPath();
                 ctx.arc(x + Math.cos(vinkel) * afst, y + Math.sin(vinkel) * afst, kr, 0, Math.PI * 2);
                 ctx.fill();
+            }
+
+            /* Gasbobler, der stiger op og brister de første sekunder */
+            if (b.gas && d.siden < 6) {
+                var rb = NK.froe((d.froe || 1) + 7);
+                ctx.strokeStyle = "rgba(255, 245, 230, 0.9)";
+                ctx.lineWidth = 0.9;
+                for (i = 0; i < 7; i++) {
+                    var fart = 0.8 + rb() * 0.7, start = rb();
+                    var bv = rb() * Math.PI * 2, ba = Math.sqrt(rb()) * r * 0.7;
+                    var fase = (d.siden * fart + start) % 1;
+                    ctx.globalAlpha = (1 - fase) * NK.klamp(2 - d.siden / 3, 0, 1);
+                    ctx.beginPath();
+                    ctx.arc(x + Math.cos(bv) * ba, y + Math.sin(bv) * ba, 1 + fase * 3, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+                ctx.globalAlpha = 1;
             }
         }
 
@@ -301,18 +363,53 @@
     };
 
     /* ================================================================
-       STATIV OG DRAABEFLASKER
+       STATIVER OG DRAABEFLASKER
        fl: { x, y (spidsen), vinkel, klem (0-1), opl, fremhaev }
        ================================================================ */
     S.tegnStativ = function (ctx) {
         var T = S.STATIV;
         NK.Sprites.tegn(ctx, "stativ", T.x, T.y, T.b, T.h, "#9aa4b0");
         D.OPLOESNINGER.forEach(function (o, i) {
+            if (o.bonus) return;
             NK.tekst(ctx, o.formel, T.x + S.PLADSER[i], T.y + T.etiketY + 1, {
                 str: 14, vaegt: 700, justering: "center", linje: "middle", farve: "#1d222a", maks: 58
             });
         });
     };
+
+    /* Det lille stativ. Er det laast, staar der ? paa etiketterne og en
+       haengelaas over hullerne. */
+    S.tegnStativLille = function (ctx, aaben) {
+        var T = S.STATIV_LILLE;
+        NK.Sprites.tegn(ctx, "stativLille", T.x, T.y, T.b, T.h, "#9aa4b0");
+        D.BONUS.forEach(function (id, i) {
+            NK.tekst(ctx, aaben ? D.opl(id).formel : "?", T.x + S.PLADSER_LILLE[i], T.y + T.etiketY + 1, {
+                str: 14, vaegt: 700, justering: "center", linje: "middle", farve: aaben ? "#1d222a" : "#8a929c", maks: 58
+            });
+        });
+        if (!aaben) tegnHaengelaas(ctx, T.x + T.b / 2, T.y - 50);
+    };
+
+    function tegnHaengelaas(ctx, x, y) {
+        ctx.save();
+        ctx.strokeStyle = "rgba(190, 200, 212, 0.5)";
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.arc(x, y - 6, 11, Math.PI, 0);
+        ctx.lineTo(x + 11, y + 2);
+        ctx.moveTo(x - 11, y - 6);
+        ctx.lineTo(x - 11, y + 2);
+        ctx.stroke();
+        ctx.fillStyle = "rgba(190, 200, 212, 0.4)";
+        NK.rundtRekt(ctx, x - 18, y, 36, 28, 5);
+        ctx.fill();
+        ctx.fillStyle = "rgba(20, 22, 28, 0.7)";
+        ctx.beginPath();
+        ctx.arc(x, y + 11, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillRect(x - 1.8, y + 12, 3.6, 9);
+        ctx.restore();
+    }
 
     S.tegnFlaske = function (ctx, fl) {
         var F = S.FLASKE;
@@ -381,7 +478,8 @@
     /* ================================================================
        LUPPEN, KEGLEN OG ZOOMCIRKLEN
        ================================================================ */
-    /* indhold(ctx) tegner det, der ligger under linsen. */
+    /* lup: { x, y, vinkel, over, fremhaev }. indhold(ctx) tegner det,
+       der ligger under linsen. */
     S.tegnLup = function (ctx, lup, indhold) {
         var L = S.LUP;
         ctx.save();
@@ -407,7 +505,9 @@
             ctx.shadowColor = "rgba(242, 197, 61, 0.7)";
             ctx.shadowBlur = 16;
         }
-        NK.Sprites.tegn(ctx, "lup", lup.x - L.LINSE.x, lup.y - L.LINSE.y, L.B, L.H, "#9fb3c7");
+        ctx.translate(lup.x, lup.y);
+        ctx.rotate(lup.vinkel || 0);
+        NK.Sprites.tegn(ctx, "lup", -L.LINSE.x, -L.LINSE.y, L.B, L.H, "#9fb3c7");
         ctx.restore();
     };
 
@@ -451,7 +551,7 @@
             ctx.stroke();
             ctx.restore();
             NK.tekst(ctx, "Træk luppen hen over en dråbe", Z.x, Z.y, {
-                str: 15, vaegt: 600, justering: "center", linje: "middle", farve: "rgba(200, 210, 222, 0.6)"
+                str: 15, vaegt: 600, justering: "center", linje: "middle", farve: "rgba(200, 210, 222, 0.6)", maks: Z.r * 2 - 30
             });
             return;
         }
@@ -482,8 +582,8 @@
         ctx.restore();
 
         if (titel) {
-            NK.tekst(ctx, titel, Z.x, Z.y + Z.r + 26, {
-                str: 15, vaegt: 600, justering: "center", linje: "middle", farve: "#dfe5ec", maks: 330
+            NK.tekst(ctx, titel, Z.x, Z.y + Z.r + 24, {
+                str: 15, vaegt: 600, justering: "center", linje: "middle", farve: "#dfe5ec", maks: 290
             });
         }
     };
@@ -498,5 +598,75 @@
         ctx.rotate(p.vinkel);
         NK.Sprites.tegn(ctx, "papir", -S.PAPIR.B / 2, -S.PAPIR.H / 2, S.PAPIR.B, S.PAPIR.H, "#eef0ec");
         ctx.restore();
+    };
+
+    /* ================================================================
+       LAEREREN OG TALEBOBBLEN
+       l: NK.Laerer. Omraaderne, der kan klikkes paa, gemmes i l.omraade.
+       ================================================================ */
+    function ombryd(ctx, tekst, maks) {
+        var ord = tekst.split(" "), linjer = [], linje = "";
+        for (var i = 0; i < ord.length; i++) {
+            var proeve = linje ? linje + " " + ord[i] : ord[i];
+            if (linje && ctx.measureText(proeve).width > maks) {
+                linjer.push(linje);
+                linje = ord[i];
+            } else {
+                linje = proeve;
+            }
+        }
+        if (linje) linjer.push(linje);
+        return linjer;
+    }
+
+    S.tegnLaerer = function (ctx, l) {
+        if (!l.synlig()) { l.omraade = null; return; }
+        var T = S.LAERER;
+        var t = NK.blod(l.ind);
+        var top = T.bund - T.synlig * t;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(-2000, -2000, S.BREDDE + 4000, 2000 + T.bund);
+        ctx.clip();
+        NK.Sprites.tegn(ctx, "laerer", T.x, top, T.B, T.H, "#c8cfd6");
+        ctx.restore();
+
+        var omraade = [{ x: T.x + 20, y: top + 30, b: T.B - 40, h: T.bund - top - 30 }];
+        var alfa = NK.klamp((t - 0.75) / 0.25, 0, 1);
+        if (alfa > 0 && l.tekst) {
+            var mund = { x: T.x + T.MUND.x, y: top + T.MUND.y };
+            ctx.save();
+            ctx.globalAlpha = alfa;
+            ctx.font = "600 16px 'Segoe UI', sans-serif";
+            var linjer = ombryd(ctx, l.tekst, 250);
+            var bredde = 0;
+            for (var i = 0; i < linjer.length; i++) bredde = Math.max(bredde, ctx.measureText(linjer[i]).width);
+            var bb = bredde + 30, bh = linjer.length * 21 + 22;
+            var bx = Math.max(8, mund.x - 34 - bb);
+            var by = mund.y - 52 - bh;
+
+            ctx.shadowColor = "rgba(0, 0, 0, 0.45)";
+            ctx.shadowBlur = 14;
+            ctx.shadowOffsetY = 4;
+            ctx.fillStyle = "#f7f3e8";
+            NK.rundtRekt(ctx, bx, by, bb, bh, 14);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(bx + bb - 58, by + bh - 1);
+            ctx.lineTo(bx + bb - 26, by + bh - 1);
+            ctx.lineTo(mund.x - 10, mund.y - 12);
+            ctx.closePath();
+            ctx.fill();
+            ctx.shadowColor = "transparent";
+
+            ctx.fillStyle = "#1d222a";
+            ctx.textAlign = "left";
+            ctx.textBaseline = "middle";
+            for (i = 0; i < linjer.length; i++) ctx.fillText(linjer[i], bx + 15, by + 21 + i * 21);
+            ctx.restore();
+            omraade.push({ x: bx, y: by, b: bb, h: bh });
+        }
+        l.omraade = omraade;
     };
 }());
