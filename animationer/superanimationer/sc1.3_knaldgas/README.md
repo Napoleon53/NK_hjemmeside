@@ -6,11 +6,11 @@ HTML-fil, ligger denne i sin egen mappe med adskilt CSS, JavaScript og sprites.
 Åbn **`index.html`**. Mappen er selvstændig og henter kun filer inde fra sig
 selv, så den kan flyttes uden at der knækker noget.
 
-Den afløser `animationer/kemi-c-filer/c1.3_eksperiment_dihydrogen_dioxygen.html`.
-Den gamle animation ligger nu i
-`animationer/kemi-c-filer/arkiv/c1.3_eksperiment_dihydrogen_dioxygen_oldversion.html`,
-og den oprindelige sti er en genvej (meta-refresh + JS-redirect) til denne
-`index.html`, så knappen i `samling_c1.html` ikke skulle ændres.
+Den afløser `animationer/kemi-c-filer/c1.3_eksperiment_dihydrogen_dioxygen.html`,
+som nu ligger i
+`animationer/kemi-c-filer/arkiv/c1.3_eksperiment_dihydrogen_dioxygen_oldversion.html`.
+Knappen i `samling_c1.html` peger direkte på denne `index.html`. Delte links går
+via `samling_alt.html?emne=c1.3` og er derfor ikke berørt af flytningen.
 
 ## Kun én fane
 
