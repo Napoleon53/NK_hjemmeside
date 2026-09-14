@@ -42,19 +42,10 @@
             <p class="hint" id="hint-tekst" hidden></p>
         </div>
 
-        <div class="kort" id="maaling-kort">
-            <h2><span>Målinger</span> <span class="taeller" id="maaling-taeller"></span></h2>
-            <table class="maalinger">
-                <thead><tr><th>Nr.</th><th>Pb(NO₃)₂</th><th>KI</th><th>PbI₂</th><th>Temp.</th></tr></thead>
-                <tbody id="maaling-rader"></tbody>
-            </table>
-            <canvas id="graf" aria-label="Graf med målingerne: g PbI₂ pr. 100 mL vand mod temperaturen"></canvas>
-            <p class="graf-note" id="graf-note"></p>
-        </div>
-
-        <div class="kort" id="iagttagelser-kort">
-            <h2>Iagttagelser</h2>
-            <ul class="iagttagelser" id="iagttagelse-liste"><li class="tom">Endnu ingen.</li></ul>
+        <div class="kort" id="serie-kort">
+            <h2>Tegneserie</h2>
+            <p class="besked" id="serie-tekst">Låses op, når forsøget er slut.</p>
+            <button class="knap stor blaa" id="serieknap" type="button" title="Tegneserie (S)" hidden><span>Se forsøget som tegneserie</span><span class="tegn">→</span></button>
         </div>
 
         <div class="kort opgavekort" id="quiz-kort">
@@ -83,7 +74,7 @@
         <div class="ligning lille">Pb(NO₃)₂ + 2 KI → PbI₂ + 2 KNO₃</div>
 
         <h3>Opløselighed og temperatur</h3>
-        <p>Opløseligheden er den største masse af et stof, der kan opløses i 100 mL vand. For PbI₂ er den 0,069 g ved 20 °C og 0,41 g ved 100 °C. Når bundfaldet netop forsvinder ved opvarmning, er opløsningen mættet, og massen af PbI₂ pr. 100 mL er opløseligheden ved den temperatur. Ved afkøling falder opløseligheden, og PbI₂ krystalliserer igen som glinsende, gule flager.</p>
+        <p>Opløseligheden er den største masse af et stof, der kan opløses i 100 mL vand. For PbI₂ er den 0,069 g ved 20 °C og 0,41 g ved 100 °C. Ved opvarmning opløses bundfaldet. Ved afkøling falder opløseligheden, og PbI₂ krystalliserer igen som glinsende, gule flager. Når de første krystaller kommer, er opløsningen netop mættet, og massen af PbI₂ pr. 100 mL er opløseligheden ved den temperatur.</p>
 
         <h3>Beregning</h3>
         <p>Stofmængden af Pb(NO₃)₂ er n = m / M. Der dannes lige så mange mol PbI₂, og massen er m(PbI₂) = n · 461,0 g/mol.</p>
@@ -93,6 +84,17 @@
 
         <div class="knapper">
             <button class="knap blaa" id="teori-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<div class="overlay" id="tegneserie">
+    <div class="overlay-boks bred">
+        <h2>Forsøget som tegneserie</h2>
+        <div class="serie" id="serie-ruder"></div>
+        <div class="knapper">
+            <button class="knap blaa" id="serie-luk" type="button">Luk</button>
         </div>
     </div>
 </div>
@@ -125,6 +127,7 @@
 <script src="js/bord.js"></script>
 <script src="js/laerer.js"></script>
 <script src="js/graf.js"></script>
+<script src="js/tegneserie.js"></script>
 <script src="js/quiz.js"></script>
 <script src="js/rundvisning.js"></script>
 <script src="js/app.js"></script>

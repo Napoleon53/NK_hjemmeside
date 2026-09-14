@@ -498,7 +498,7 @@ main.forsoeg {
 .rundvisning-knapper .knap { flex: 1; justify-content: center; }
 
 /* ---------------------------------------------------------------------
-   MAALINGER OG GRAF
+   TEGNESERIEN: forsoeget opsummeret i ruder, maalingerne i sidste rude
    --------------------------------------------------------------------- */
 .maalinger { width: 100%; border-collapse: collapse; font-size: 0.8rem; table-layout: fixed; font-variant-numeric: tabular-nums; }
 .maalinger th { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.03em; color: var(--tekst-mat); text-align: right; padding: 2px 3px 4px; }
@@ -507,8 +507,21 @@ main.forsoeg {
 .maalinger tr.igang td { color: var(--tekst-mat); font-weight: 400; }
 .maalinger tr.tom td { color: var(--tekst-mat); font-weight: 400; text-align: left; }
 
-#graf { display: block; width: 100%; height: 190px; margin-top: 8px; }
-.graf-note { margin: 4px 0 0 0; font-size: 0.76rem; line-height: 1.4; color: var(--tekst-mat); }
+.overlay-boks.bred { max-width: 980px; }
+.serie { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 10px; }
+.rude {
+    background-color: #16161c;
+    border: 1px solid #3f3f4d;
+    border-radius: var(--radius-lil);
+    padding: 8px;
+}
+.rude canvas { display: block; width: 100%; border-radius: 5px; background-color: #22262e; }
+.rude p { margin: 7px 0 0 0; font-size: 0.86rem; line-height: 1.45; color: var(--tekst-svag); }
+.rude .nr { color: var(--gul); font-weight: 700; margin-right: 6px; }
+.rude > p:first-child { margin: 2px 0 8px 0; }
+.rude .maalinger { margin-bottom: 8px; }
+#serieknap { margin-top: 10px; }
+#serieknap[hidden] { display: none; }
 
 .knap.groen { background-color: var(--groen-mork); border-color: var(--groen); }
 .knap.groen:hover:not(:disabled) { background-color: var(--groen); }

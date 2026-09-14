@@ -288,7 +288,7 @@
         S.skygge(ctx, S.VAEGT.x + 75, 72, 0.3);
         NK.Sprites.tegn(ctx, "vaegt", S.VAEGT.x, S.VAEGT.y);
         var D = S.VAEGT_DISPLAY;
-        var tekst = NK.Model.komma(Math.max(0, masse), 2);
+        var tekst = NK.Model.komma(Math.max(0, masse), 3);
         NK.skaer(ctx, D.x + D.b / 2, D.y + D.h / 2, 30, "rgba(90, 240, 150, 0.16)");
         NK.tekst(ctx, tekst, D.x + D.b - 13, D.y + D.h / 2 + 1, {
             font: "700 13px Consolas, 'Courier New', monospace", justering: "right", linje: "middle", farve: "#7df0a8"

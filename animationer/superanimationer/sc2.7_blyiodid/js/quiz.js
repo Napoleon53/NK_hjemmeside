@@ -68,21 +68,21 @@
             forklaring: "Reaktionen kræver 2 mol KI pr. mol Pb(NO₃)₂. M(Pb(NO₃)₂) = 331,2 g/mol og M(KI) = 166,0 g/mol, så samme masse giver netop dobbelt så mange mol KI."
         },
         {
-            sp: "Der bruges 0,10 g Pb(NO₃)₂ og 0,10 g KI. Hvor meget PbI₂ kan der højst dannes? M(PbI₂) = 461,0 g/mol.",
-            valg: ["0,14 g", "0,10 g", "0,20 g", "0,28 g"],
+            sp: "Der bruges 0,100 g Pb(NO₃)₂ og 0,100 g KI. Hvor meget PbI₂ kan der højst dannes? M(PbI₂) = 461,0 g/mol.",
+            valg: ["0,139 g", "0,100 g", "0,200 g", "0,278 g"],
             rigtig: 0,
-            forklaring: "n(Pb(NO₃)₂) = 0,10 g / 331,2 g/mol = 0,30 mmol. Der dannes 0,30 mmol PbI₂, og 0,30 mmol · 461,0 g/mol = 0,14 g."
+            forklaring: "n(Pb(NO₃)₂) = 0,100 g / 331,2 g/mol = 0,302 mmol. Der dannes 0,302 mmol PbI₂, og 0,302 mmol · 461,0 g/mol = 0,139 g."
         },
         {
-            sp: "Bundfaldet med 0,14 g PbI₂ i 100 mL vand forsvandt ved 52 °C. Hvad fortæller det?",
+            sp: "Der er 0,139 g PbI₂ i 100 mL vand. Ved afkøling kommer de første krystaller ved 52 °C. Hvad fortæller det?",
             valg: [
-                "Opløseligheden af PbI₂ ved 52 °C er ca. 0,14 g pr. 100 mL",
+                "Opløseligheden af PbI₂ ved 52 °C er ca. 0,139 g pr. 100 mL",
                 "PbI₂ smelter ved 52 °C",
                 "Ved 52 °C kan der ikke opløses PbI₂",
-                "Opløseligheden er 0,14 g pr. 100 mL ved alle temperaturer"
+                "Opløseligheden er 0,139 g pr. 100 mL ved alle temperaturer"
             ],
             rigtig: 0,
-            forklaring: "Ved netop den temperatur er opløsningen mættet med 0,14 g PbI₂. Det er et punkt på opløselighedskurven."
+            forklaring: "Når de første krystaller kommer, er opløsningen netop mættet med 0,139 g PbI₂. Det er et punkt på opløselighedskurven."
         },
         {
             sp: "Opløseligheden af PbI₂ er 0,069 g pr. 100 mL ved 20 °C. Er PbI₂ tungtopløseligt?",

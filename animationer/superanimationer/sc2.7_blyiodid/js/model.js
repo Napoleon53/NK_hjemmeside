@@ -9,8 +9,8 @@
 
    Opløseligheden af PbI2 stiger kraftigt med temperaturen. Bundfaldet
    forsvinder ved opvarmning og kommer igen som glinsende krystaller ved
-   afkoeling (gyldne regn). Den temperatur, hvor det sidste bundfald
-   forsvinder, giver et punkt paa opløselighedskurven.
+   afkoeling (gyldne regn). Den temperatur, hvor de foerste krystaller
+   kommer ved afkoeling, giver et punkt paa opløselighedskurven.
 
    M(Pb(NO3)2) = 331,2 g/mol er naesten praecis 2 * M(KI) = 332,0 g/mol.
    Samme masse af de to stoffer giver derfor stofmaengdeforholdet 1 : 2.
@@ -92,10 +92,17 @@
     /* Opløseligheden s(T) = a * e^(k*T) i g PbI2 pr. 100 mL vand */
     var OPL = { a: 0.044, k: 0.0223 };
 
-    /* En spatelspids er ca. 0,05 g. Der kan hoejst komme 0,30 g
-       Pb(NO3)2 i alt i glasset, og KI maa hoejst afvige 0,02 g fra
-       Pb(NO3)2 i samme tilsaetning. */
-    var SPATEL = { gram: 0.05, spredning: 0.0015, maksPb: 0.30, forskel: 0.02 };
+    /* En spatelspids indeholder mellem min og maks gram, i gennemsnit
+       0,05 g. Spatlen tager fjernMin til fjernMaks gram af igen. Foerste
+       tilsaetning skal vaere ca. foerste gram Pb(NO3)2, de senere ca.
+       senere gram, begge +/- tolerance. KI maa hoejst afvige forskel fra
+       Pb(NO3)2 i samme tilsaetning. Vinduet (2 * tolerance) er stoerre
+       end det mest, spatlen tager af, saa massen altid kan rammes. Der kan
+       hoejst komme maksPb gram Pb(NO3)2 i alt i glasset. */
+    var SPATEL = {
+        gram: 0.05, min: 0.038, maks: 0.062, fjernMin: 0.004, fjernMaks: 0.016,
+        foerste: 0.100, senere: 0.050, tolerance: 0.010, forskel: 0.010, maksPb: 0.30
+    };
 
     /* Varmepladen: opvarmning i °C pr. sekund ved fuld varme, afkoeling
        mod stuetemperaturen pr. sekund og pladens tidskonstant i sekunder

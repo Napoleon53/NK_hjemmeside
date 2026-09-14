@@ -2,17 +2,21 @@
    forsoeg.js - selve forsoeget: tilstand, trin og handlinger
 
    100 mL vand i et baegerglas paa en varmeplade med magnetomroerer.
-   Eleven afvejer Pb(NO3)2 med spatlen paa vaegten og haelder det i,
-   afvejer samme masse KI og haelder det i. Der dannes gult PbI2. Ved
-   opvarmning forsvinder bundfaldet, og eleven noterer temperaturen.
-   Ved afkoeling kommer krystallerne igen (gyldne regn). Med mere stof
+   Eleven afvejer ca. 0,100 g Pb(NO3)2 med spatlen paa vaegten og
+   haelder det i, afvejer samme masse KI og haelder det i. Der dannes
+   gult PbI2. Ved opvarmning forsvinder bundfaldet. Ved afkoeling kommer
+   krystallerne igen (gyldne regn), og eleven noterer temperaturen, naar
+   de foerste krystaller kommer. Med ca. 0,050 g mere af hvert stof
    maales igen, til der er tre punkter paa opløselighedskurven.
 
    En tilsaetning (this.tils) er Pb(NO3)2 og derefter KI. En maaling
-   kan noteres, naar der har vaeret bundfald efter tilsaetningen, og
-   det er vaek igen.
+   kan noteres, naar opløsningen har vaeret helt klar efter
+   tilsaetningen, og der igen er kommet krystaller.
 
-   Trinene (TRIN) er de otte ting, eleven skal naa. Et trin er gjort,
+   Alle iagttagelser gemmes i logbogen med glassets tilstand, saa
+   tegneserien kan tegne dem til sidst.
+
+   Trinene (TRIN) er de syv ting, eleven skal naa. Et trin er gjort,
    naar tilstanden siger det, ikke naar en knap er trykket. Genstandene
    flyttes af smaa koreografier (koer): en liste af trin, der enten
    flytter en genstand, venter og goer noget undervejs, eller kalder en
@@ -38,18 +42,16 @@
     var TRIN = [
         { id: "vand", tekst: "Hæld 100 mL vand i bægerglasset", mark: "maaleglas",
           hint: "Klik på måleglasset. Det indeholder 100 mL vand." },
-        { id: "pb", tekst: "Afvej Pb(NO₃)₂, og hæld det i vandet", mark: "pbGlas",
-          hint: "Klik på glasset med Pb(NO₃)₂. Hvert klik er en spatelspids på ca. 0,05 g. Start med 0,10 g, og klik så på vejebåden." },
+        { id: "pb", tekst: "Afvej ca. 0,100 g Pb(NO₃)₂, og hæld det i vandet", mark: "pbGlas",
+          hint: "Klik på glasset med Pb(NO₃)₂. En spatelspids er 0,04 til 0,06 g. Vægten skal vise mellem 0,090 og 0,110 g. For meget tages af med spatlen. Klik så på vejebåden." },
         { id: "ki", tekst: "Afvej samme masse KI, og hæld det i", mark: "kiGlas",
-          hint: "Klik på glasset med KI, til vægten viser samme masse som Pb(NO₃)₂. Klik så på vejebåden. For meget tages af med spatlen." },
-        { id: "varm", tekst: "Tænd for varmen og omrøringen", mark: "varme",
-          hint: "Klik på de to knapper på varmepladen." },
-        { id: "maal1", tekst: "Notér temperaturen, når bundfaldet er væk", mark: "termometer",
-          hint: "Hold øje med bægerglasset og luppen. Klik på termometret, så snart der ikke er mere bundfald." },
-        { id: "regn", tekst: "Sluk varmen, og se glasset køle af", mark: "varme",
-          hint: "Sluk for varmen. Sluk også omrøringen, så du kan se, hvad der sker i glasset." },
-        { id: "maal3", tekst: "Mål med mere stof, til der er tre målinger", mark: "pbGlas",
-          hint: "Afvej 0,05 g mere af hvert stof, og hæld dem i. Varm op igen, og notér temperaturen, når bundfaldet er væk." },
+          hint: "Klik på glasset med KI, til vægten viser samme masse som Pb(NO₃)₂, højst 0,010 g fra. For meget tages af med spatlen. Klik så på vejebåden." },
+        { id: "klar", tekst: "Varm op under omrøring, til bundfaldet er væk", mark: "varme",
+          hint: "Tænd for varmen og omrøringen med knapperne på varmepladen. Hold øje med glasset og luppen." },
+        { id: "maal1", tekst: "Sluk varmen, og notér temperaturen, når der kommer krystaller", mark: "varme",
+          hint: "Sluk for varmen og omrøringen. Klik på termometret, så snart de første krystaller kommer." },
+        { id: "maal3", tekst: "Tilsæt ca. 0,050 g af hvert stof, og mål igen, til der er tre målinger", mark: "pbGlas",
+          hint: "Afvej ca. 0,050 g Pb(NO₃)₂ og samme masse KI, og hæld dem i. Varm op, til bundfaldet er væk, sluk varmen, og notér temperaturen, når der kommer krystaller." },
         { id: "affald", tekst: "Aflever resterne", mark: "dunk",
           hint: "Resterne indeholder bly. Klik på dunken til tungmetalaffald." }
     ];
@@ -64,9 +66,9 @@
         klar:        { tekst: "Ved opvarmning forsvinder bundfaldet, og opløsningen bliver klar og farveløs.", farve: null },
         regn:        { tekst: "Ved afkøling kommer der glinsende, gule krystaller, der daler ned gennem væsken.", farve: M.FARVE.pbi2 },
         koger:       { tekst: "Vandet koger, men der er stadig bundfald.", farve: M.FARVE.pbi2 },
-        maaling:     { tekst: "Måling {n}: bundfaldet var væk ved {T} °C.", farve: null },
+        maaling:     { tekst: "Måling {n}: de første krystaller kom ved {T} °C.", farve: null },
         kurve:       { tekst: "De tre punkter ligger på opløselighedskurven for PbI₂.", farve: null },
-        kurve_afvig: { tekst: "Nogle punkter ligger langt fra kurven. Temperaturen skal noteres, lige når bundfaldet er væk.", farve: null },
+        kurve_afvig: { tekst: "Nogle punkter ligger langt fra kurven. Temperaturen skal noteres, lige når de første krystaller kommer.", farve: null },
         spild:       { tekst: "Der blev spildt {stof} på bordet.", farve: { r: 244, g: 243, b: 238, a: 1 } },
         affald:      { tekst: "Resterne er afleveret som tungmetalaffald.", farve: null }
     };
@@ -98,6 +100,7 @@
     P.nulstil = function () {
         this.gjort = {};
         this.iagttaget = {};
+        this.logbog = [];
         this.trinStart = this.tid;
         this.sidsteTrin = "";
         this.urMinutter = M.UR.start;
@@ -127,6 +130,7 @@
         };
         this.tils = null;
         this.maalinger = [];
+        this.tilsaetninger = [];
         this.mikro = new NK.Mikro();
         this.mikroPb = 0;
         this.mikroKI = 0;
@@ -165,7 +169,7 @@
             case "vand": return !!gj.vand;
             case "pb": return n > 0 || !!(t && t.pb !== null) || !!gj.affald;
             case "ki": return n > 0 || !!(t && t.ki !== null) || !!gj.affald;
-            case "varm": return !!gj.varm || n > 0;
+            case "klar": return n > 0 || !!(t && t.klarSet) || !!gj.affald;
             case "maal1": return n >= 1;
             case "maal3": return n >= 3;
             default: return !!gj[id];
@@ -188,8 +192,17 @@
     /* Kan temperaturen noteres nu? */
     P.kanNotere = function () {
         var t = this.tils;
-        return !!(t && t.ki !== null && !t.noteret && t.forsvundet && !this.handling);
+        return !!(t && t.ki !== null && !t.noteret && t.klarSet && this.b.fast > 1e-6 && !this.handling);
     };
+
+    /* Den masse Pb(NO3)2, der skal afvejes nu */
+    P.maalMasse = function () {
+        return this.b.pb < 0.001 ? M.SPATEL.foerste : M.SPATEL.senere;
+    };
+
+    function tre(x) {
+        return Math.round(x * 1000) / 1000;
+    }
 
     /* Hint til det aktuelle trin. Genstanden, det handler om, faar en
        pulserende ramme i fem sekunder. */
@@ -200,13 +213,13 @@
         var baad = this.g.vejebaad, t = this.tils, b = this.b;
         switch (trin.id) {
             case "pb":
-                if (baad.stof === "pb") mark = "vejebaad";
+                if (baad.stof === "pb") mark = this.baadMark(this.maalMasse(), M.SPATEL.tolerance, "pbGlas");
                 break;
             case "ki":
-                if (baad.stof === "ki") mark = baad.masse > t.pb + M.SPATEL.forskel ? "spatel" : "vejebaad";
+                if (baad.stof === "ki") mark = this.baadMark(t.pb, M.SPATEL.forskel, "kiGlas");
                 break;
-            case "varm":
-                mark = this.varme ? "omroer" : "varme";
+            case "klar":
+                mark = this.varme ? (this.omroer ? "baegerglas" : "omroer") : "varme";
                 break;
             case "maal1":
             case "maal3":
@@ -214,16 +227,19 @@
                     tekst = "Der er for meget stof til 100 mL vand. Start forfra, og brug mindre.";
                     mark = null;
                 } else if (!t || t.ki === null || t.noteret) {
-                    if (baad.stof) mark = "vejebaad";
+                    if (baad.stof === "pb") mark = this.baadMark(this.maalMasse(), M.SPATEL.tolerance, "pbGlas");
+                    else if (baad.stof === "ki") mark = this.baadMark(t.pb, M.SPATEL.forskel, "kiGlas");
                     else mark = t && t.pb !== null && t.ki === null ? "kiGlas" : "pbGlas";
-                } else if (!this.varme && !t.forsvundet) {
+                } else if (!t.klarSet) {
+                    tekst = "Varm op under omrøring, til bundfaldet er væk.";
+                    mark = this.varme ? "baegerglas" : "varme";
+                } else if (this.varme) {
+                    tekst = "Sluk for varmen. Klik på termometret, så snart de første krystaller kommer.";
                     mark = "varme";
                 } else {
+                    tekst = "Hold øje med glasset og luppen. Klik på termometret, så snart de første krystaller kommer.";
                     mark = "termometer";
                 }
-                break;
-            case "regn":
-                mark = this.varme ? "varme" : (this.omroer ? "omroer" : "baegerglas");
                 break;
             case "affald":
                 if (b.T > 50) {
@@ -234,6 +250,14 @@
         }
         if (mark) this.markér(mark, 5);
         return tekst;
+    };
+
+    /* Hvad skal markeres, naar der ligger stof paa vejebaaden? */
+    P.baadMark = function (maal, tol, glas) {
+        var m = tre(this.g.vejebaad.masse);
+        if (m > maal + tol + 1e-9) return "spatel";
+        if (m < maal - tol - 1e-9) return glas;
+        return "vejebaad";
     };
 
     P.markér = function (navn, sek) {
@@ -262,6 +286,11 @@
         if (erstat) {
             tekst = tekst.replace("{n}", erstat.n).replace("{T}", erstat.T).replace("{stof}", erstat.stof);
         }
+        var b = this.b;
+        this.logbog.push({
+            noegle: noegle, tekst: tekst, n: erstat ? erstat.n : null, stof: erstat ? erstat.stof : null,
+            T: b.T, pb: b.pb, ki: b.ki, fast: b.fast, varme: this.varme, omroer: this.omroer
+        });
         if (this.vedIagttagelse) this.vedIagttagelse({ noegle: noegle, tekst: tekst, farve: i.farve });
     };
 
@@ -388,6 +417,11 @@
         if (stof === "pb") {
             if (t && t.pb !== null && t.ki === null) { this.besked("Afvej nu samme masse KI."); this.markér("kiGlas"); return false; }
             if (baad.stof === "ki") { this.besked("Hæld først KI fra vejebåden i bægerglasset."); this.markér("vejebaad"); return false; }
+            if (baad.masse > this.maalMasse() + 0.03) {
+                this.besked("Der er allerede for meget på vejebåden. Klik på spatlen for at tage lidt af.", "advarsel");
+                this.markér("spatel");
+                return false;
+            }
             if (b.pb + baad.masse + M.SPATEL.gram > M.SPATEL.maksPb + 0.01) {
                 this.besked("Der kan ikke opløses mere Pb(NO₃)₂ i 100 mL vand, selv når det koger.", "advarsel");
                 return false;
@@ -398,8 +432,8 @@
                 this.markér(baad.stof === "pb" ? "vejebaad" : "pbGlas");
                 return false;
             }
-            if (baad.masse + M.SPATEL.gram > t.pb + 0.07) {
-                this.besked("Der er allerede mere KI end Pb(NO₃)₂ på vejebåden.", "advarsel");
+            if (baad.masse > t.pb + 0.03) {
+                this.besked("Der er allerede for meget på vejebåden. Klik på spatlen for at tage lidt af.", "advarsel");
                 this.markér("spatel");
                 return false;
             }
@@ -431,7 +465,7 @@
         } });
         liste.push({ tid: 0.3, hver: function (t) { sp.p.v = S.OVER_BAAD.v + Math.sin(t * Math.PI * 4) * 0.12; } });
         liste.push({ kald: function () {
-            baad.masse += M.SPATEL.gram + r(-M.SPATEL.spredning, M.SPATEL.spredning);
+            baad.masse += r(M.SPATEL.min, M.SPATEL.maks);
             baad.stof = stof;
             sp.svaev = { stof: stof, ur: 1.8 };
             if (NK.Lyd) NK.Lyd.bip();
@@ -491,9 +525,17 @@
             this.markér(t && t.pb !== null && t.ki === null ? "kiGlas" : "pbGlas");
             return false;
         }
-        if (baad.stof === "ki" && Math.abs(baad.masse - t.pb) > M.SPATEL.forskel + 1e-9) {
-            this.besked("Massen af KI skal være den samme som massen af Pb(NO₃)₂: " + M.komma(t.pb) + " g.", "advarsel");
-            this.markér(baad.masse > t.pb ? "spatel" : "kiGlas");
+        var m = tre(baad.masse);
+        if (baad.stof === "pb") {
+            var maal = this.maalMasse(), tol = M.SPATEL.tolerance;
+            if (Math.abs(m - maal) > tol + 1e-9) {
+                this.besked("Afvej ca. " + M.komma(maal, 3) + " g Pb(NO₃)₂, mellem " + M.komma(maal - tol, 3) + " og " + M.komma(maal + tol, 3) + " g.", "advarsel");
+                this.markér(m > maal ? "spatel" : "pbGlas");
+                return false;
+            }
+        } else if (Math.abs(m - t.pb) > M.SPATEL.forskel + 1e-9) {
+            this.besked("KI skal have samme masse som Pb(NO₃)₂: " + M.komma(t.pb, 3) + " g, højst " + M.komma(M.SPATEL.forskel, 3) + " g fra.", "advarsel");
+            this.markér(m > t.pb ? "spatel" : "kiGlas");
             return false;
         }
         this.haeldBaad();
@@ -502,7 +544,7 @@
 
     P.haeldBaad = function () {
         var baad = this.g.vejebaad, b = this.b;
-        var start = baad.masse, stof = baad.stof;
+        var start = tre(baad.masse), stof = baad.stof;
         var liste = this.g.spatel.svaev || this.g.pbGlas.laagT > 0 || this.g.kiGlas.laagT > 0 ? this.spatelHjemListe() : [];
         liste.push({ flyt: baad, til: S.HAELD_BAAD, tid: 0.8, loeft: 40 });
         liste.push({ kald: function () { if (NK.Lyd) NK.Lyd.drys(0.8); } });
@@ -518,13 +560,14 @@
             baad.stof = null;
             if (stof === "pb") {
                 b.pb += start;
-                this.tils = { pb: start, ki: null, bundfaldSet: false, forsvundet: false, noteret: false };
+                this.tils = { pb: start, ki: null, bundfaldSet: false, klarSet: false, forsvundet: false, noteret: false };
                 var nPb = Math.round(b.pb / M.MIKRO.gramPrEnhed) - this.mikroPb;
                 if (nPb > 0) { this.mikro.tilfoejPb(nPb); this.mikroPb += nPb; }
                 this.iagttag("pb_oploest");
             } else {
                 b.ki += start;
                 this.tils.ki = start;
+                this.tilsaetninger.push({ pb: this.tils.pb, ki: start });
                 b.blanding = 1.5;
                 var nKI = Math.round(b.ki / M.MIKRO.gramPrEnhed) - this.mikroKI;
                 if (nKI > 0) { this.mikro.tilfoejKI(nKI); this.mikroKI += nKI; }
@@ -548,8 +591,8 @@
         liste.push({ flyt: sp, til: { x: baad.p.x - 4, y: baad.p.y - 12, v: -0.3 }, tid: 0.55, loeft: 30 });
         liste.push({ kald: function () {
             sp.last = true;
-            baad.masse = Math.max(0, baad.masse - M.SPATEL.gram + r(-M.SPATEL.spredning, M.SPATEL.spredning));
-            if (baad.masse < 0.004) { baad.masse = 0; baad.stof = null; }
+            baad.masse = Math.max(0, baad.masse - r(M.SPATEL.fjernMin, M.SPATEL.fjernMaks));
+            if (baad.masse < 0.002) { baad.masse = 0; baad.stof = null; }
             if (NK.Lyd) NK.Lyd.bip();
             this.aendret("fjern");
         } });
@@ -605,9 +648,14 @@
             return false;
         }
         if (t.noteret) { this.besked("Temperaturen er noteret. Tilsæt mere stof for en ny måling."); return false; }
-        if (b.fast > 1e-6) { this.besked("Der er stadig bundfald i glasset."); return false; }
-        if (!t.bundfaldSet) {
-            this.besked("Der har ikke været bundfald, siden du tilsatte stof. Lad glasset køle af, til der kommer krystaller.");
+        if (!t.klarSet) {
+            this.besked("Varm først op under omrøring, til bundfaldet er væk.");
+            this.markér(this.varme ? "omroer" : "varme");
+            return false;
+        }
+        if (b.fast <= 1e-6) {
+            this.besked(this.varme ? "Der er ingen krystaller. Sluk for varmen, og lad glasset køle af." : "Der er ingen krystaller endnu.");
+            if (this.varme) this.markér("varme");
             return false;
         }
         var T = Math.round(b.T * 10) / 10;
@@ -720,20 +768,23 @@
                 if (!t.bundfaldSet && b.blanding > 0) this.iagttag("bundfald");
                 t.bundfaldSet = true;
             }
-            var klar = t.bundfaldSet && b.fast <= 1e-6;
+            /* Klar: bundfaldet er opløst igen, eller der kom aldrig noget,
+               fordi glasset var varmt, da KI kom i */
+            var klar = b.fast <= 1e-6 && (t.bundfaldSet || b.blanding <= 0);
+            if (klar && !t.klarSet) {
+                t.klarSet = true;
+                if (t.bundfaldSet) this.iagttag("klar");
+                this.aendret("klar");
+            }
             if (klar !== t.forsvundet) {
                 t.forsvundet = klar;
-                if (klar) {
-                    b.harVaeretKlar = true;
-                    this.iagttag("klar");
-                }
                 this.aendret("klar");
             }
             if (b.blanding <= 0 && b.blanding > -dt * 1.5 && !t.bundfaldSet) this.iagttag("intet");
         }
 
         /* Gyldne regn: krystaller kommer igen ved afkoeling */
-        if (foerFast <= 1e-6 && b.fast > 1e-6 && b.blanding <= 0 && b.harVaeretKlar) {
+        if (foerFast <= 1e-6 && b.fast > 1e-6 && b.blanding <= 0 && t && t.klarSet) {
             if (!this.gjort.regn) {
                 this.gjort.regn = true;
                 this.iagttag("regn");
@@ -799,7 +850,7 @@
         b.bundlag = NK.mod(b.bundlag, bundMaal, b.fast > 1e-6 ? 1.2 : 3, dt);
 
         /* Krystallerne */
-        var antal = b.fast > 1e-6 && b.vand && !b.flytter ? Math.min(80, 16 + Math.round(b.fast * 300)) : 0;
+        var antal = b.fast > 1e-6 && b.vand && !b.flytter ? Math.min(80, 5 + Math.round(b.fast * 400)) : 0;
         var levende = 0;
         for (i = 0; i < b.flager.length; i++) if (!b.flager[i].doed) levende++;
         while (levende < antal) {
