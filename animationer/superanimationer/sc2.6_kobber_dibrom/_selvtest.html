@@ -139,7 +139,9 @@ function koerTest() {
     paastand("NO₃⁻ og Cu²⁺ er tilskuerioner", tael(m2, "no3") === 6 && tael(m2, "cu2") === 3);
     NK.opdaterPanel();
     paastand("quizzen er laast op", NK.quiz.tilstand === "klar" && !d.getElementById("quiz-knap").hidden);
-    paastand("fem iagttagelser staar i panelet", d.querySelectorAll("#iagttagelse-liste li:not(.tom)").length === 5, d.querySelectorAll("#iagttagelse-liste li").length);
+    paastand("syv iagttagelser staar i panelet, heraf to farveloese draaber",
+        d.querySelectorAll("#iagttagelse-liste li:not(.tom)").length === 7 && d.querySelectorAll("#iagttagelse-liste .farveloes").length === 2,
+        d.querySelectorAll("#iagttagelse-liste li").length);
     adv(3.5);
     paastand("affaldet afleveres", f.klik("dunk") === true);
     vent(function () { return f.gjort.affald; }, 20);
@@ -246,8 +248,18 @@ function koerTest() {
     paastand("uden vaeske er der kun to oprydningstrin", !!f.uheld && f.uheld.trinene.join(",") === "fej,aflever", f.uheld && f.uheld.trinene.join(","));
 
     overskrift("8. Quizzens spoergsmaal");
+    var vt = NK.Quiz.valgTekst;
+    var medFarve = NK.QUIZ.filter(function (sp) { return typeof sp.valg[0] !== "string"; });
+    paastand("quizzen har 10 spoergsmaal, heraf 2 med farveproever", NK.QUIZ.length === 10 && medFarve.length === 2);
+    NK.quiz.tilstand = "sp";
+    NK.quiz.nr = NK.QUIZ.indexOf(medFarve[0]);
+    NK.quiz.nyt();
+    NK.quiz.vis();
+    paastand("farvespoergsmaalet vises med fire farveproever, farveloes ternet",
+        d.querySelectorAll("#quiz-valg .farveprove").length === 4 && d.querySelectorAll("#quiz-valg .farveprove.farveloes").length === 1);
     NK.QUIZ.forEach(function (sp, n) {
-        var unikke = sp.valg.filter(function (v, k) { return sp.valg.indexOf(v) === k; }).length === 4;
+        var tekster = sp.valg.map(vt);
+        var unikke = tekster.filter(function (v, k) { return tekster.indexOf(v) === k; }).length === 4;
         var blandOk = true;
         for (i = 0; i < 100; i++) {
             var b = NK.quiz.bland(sp);
@@ -259,7 +271,7 @@ function koerTest() {
 
     overskrift("9. Sprog og notation");
     var tekster = [d.body.textContent];
-    NK.QUIZ.forEach(function (sp) { tekster.push(sp.sp, sp.forklaring, sp.valg.join(" ")); });
+    NK.QUIZ.forEach(function (sp) { tekster.push(sp.sp, sp.forklaring, sp.valg.map(NK.Quiz.valgTekst).join(" ")); });
     NK.TRIN.forEach(function (t) { tekster.push(t.tekst, t.hint); });
     Object.keys(NK.UHELD_TRIN).forEach(function (k) { tekster.push(NK.UHELD_TRIN[k].tekst, NK.UHELD_TRIN[k].hint); });
     Object.keys(NK.IAGTTAGELSER).forEach(function (k) { tekster.push(NK.IAGTTAGELSER[k].tekst); });

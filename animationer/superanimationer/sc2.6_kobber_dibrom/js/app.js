@@ -85,8 +85,9 @@
         var li = document.createElement("li");
         if (i.noegle === "uheld") li.className = "uheld";
         var farve = document.createElement("span");
-        farve.className = "farve";
-        farve.style.backgroundColor = NK.css({ r: i.farve.r, g: i.farve.g, b: i.farve.b, a: 1 });
+        farve.className = "farve" + (i.farve ? "" : " farveloes");
+        if (i.farve) farve.style.backgroundColor = NK.css({ r: i.farve.r, g: i.farve.g, b: i.farve.b, a: 1 });
+        else farve.title = "Farveløs";
         li.appendChild(farve);
         var tekst = document.createElement("span");
         tekst.textContent = i.tekst;

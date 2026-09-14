@@ -4,11 +4,21 @@
    Kortet er laast, indtil begge tests er lavet. Svarene blandes hver
    gang. Der er ét forsoeg pr. spoergsmaal, og begrundelsen vises
    bagefter, ogsaa naar svaret er rigtigt.
+
+   Et svar er enten en tekst eller { tekst, farve }. Med farve vises en
+   lille farveproeve foran teksten; farve: null betyder farveloes og
+   vises ternet.
    ===================================================================== */
 (function () {
     "use strict";
 
     var NK = window.NK;
+    var M = NK.Model;
+
+    function farve(navn) {
+        var f = M.FARVE[navn];
+        return NK.css({ r: f.r, g: f.g, b: f.b, a: 1 });
+    }
 
     var SPOERGSMAAL = [
         {
@@ -56,16 +66,49 @@
             forklaring: "Reaktionen stopper, når et af stofferne er brugt op. Der var mere kobber, end Br₂ kunne reagere med."
         },
         {
-            sp: "Et glas får tilsat AgNO₃, og der dannes et lysegult bundfald. Hvilken ion påviser det i opløsningen?",
+            sp: "Efter rystningen er opløsningen i kolben svagt blågrøn. Hvilken ion giver farven?",
+            valg: ["Cu²⁺", "Br⁻", "Br₂", "Kobberatomer, der svæver i væsken"],
+            rigtig: 0,
+            forklaring: "Br₂ er brugt op, og Br⁻-ioner er farveløse. Farven kommer fra Cu²⁺-ionerne i opløsningen."
+        },
+        {
+            sp: "Hvilken farve har opløsningen med Ag⁺ i dråbeflasken, før den dryppes i reagensglasset?",
+            valg: [
+                { tekst: "Farveløs", farve: null },
+                { tekst: "Brun", farve: "#7a3f16" },
+                { tekst: "Lysegul", farve: farve("bundfald") },
+                { tekst: "Mørkeblå", farve: farve("kompleks") }
+            ],
+            rigtig: 0,
+            forklaring: "AgNO₃(aq) er farveløs, ligesom NH₃(aq). Flasken er brun, fordi sølvnitrat påvirkes af lys. Farven i glasset opstår først ved reaktionen."
+        },
+        {
+            sp: "Hvilken farve har bundfaldet, der dannes, når AgNO₃ dryppes i glasset?",
+            valg: [
+                { tekst: "Lysegul", farve: farve("bundfald") },
+                { tekst: "Hvid", farve: "#f4f6f8" },
+                { tekst: "Mørkeblå", farve: farve("kompleks") },
+                { tekst: "Rødbrun", farve: "#8a3b17" }
+            ],
+            rigtig: 0,
+            forklaring: "Bundfaldet er sølvbromid, AgBr, som er lysegult. Hverken Ag⁺ eller Br⁻ har farve i opløsning, men det faste stof har."
+        },
+        {
+            sp: "Bundfaldet med AgNO₃ påviser en ion i opløsningen fra kolben. Hvilken?",
             valg: ["Br⁻", "Cu²⁺", "NO₃⁻", "Ag⁺"],
             rigtig: 0,
             forklaring: "Ag⁺ fra sølvnitraten og Br⁻ fra opløsningen danner det tungtopløselige salt AgBr: Ag⁺ + Br⁻ → AgBr(s)."
         },
         {
-            sp: "Hvilken ion viser den mørkeblå farve, når der dryppes NH₃ i et af glassene?",
-            valg: ["Cu²⁺", "Br⁻", "Br₂", "NO₃⁻"],
+            sp: "Hvilket stof er mørkeblåt i glasset med NH₃?",
+            valg: [
+                "Ionen [Cu(NH₃)₄]²⁺, hvor fire NH₃ er bundet til hver Cu²⁺",
+                "NH₃, fordi ammoniakvand er blåt",
+                "Br⁻, som skifter farve, når NH₃ tilsættes",
+                "Kobberspåner, som er opløst af NH₃"
+            ],
             rigtig: 0,
-            forklaring: "NH₃-molekyler binder sig til Cu²⁺, fire pr. ion. Ionen [Cu(NH₃)₄]²⁺ er mørkeblå."
+            forklaring: "NH₃(aq) er farveløs, og opløsningen var kun svagt blågrøn før. Hver Cu²⁺ binder fire NH₃-molekyler, og ionen [Cu(NH₃)₄]²⁺ er mørkeblå. Derfor påviser farven Cu²⁺."
         },
         {
             sp: "Hvorfor laves forsøget i stinkskab med udsugning?",
@@ -83,7 +126,6 @@
     NK.QUIZ = SPOERGSMAAL;
 
     NK.Quiz = function () {
-        this.laast = true;
         this.tilstand = "laast";      /* laast | klar | sp | slut */
         this.nr = 0;
         this.rigtige = 0;
@@ -93,6 +135,10 @@
         var mig = this;
         NK.el("quiz-knap").addEventListener("click", function () { mig.knap(); });
         this.vis();
+    };
+
+    NK.Quiz.valgTekst = function (v) {
+        return typeof v === "string" ? v : v.tekst;
     };
 
     var Q = NK.Quiz.prototype;
@@ -134,11 +180,20 @@
         var boks = NK.el("quiz-valg");
         boks.innerHTML = "";
         var mig = this;
-        this.aktuel.valg.forEach(function (tekst, i) {
+        this.aktuel.valg.forEach(function (valg, i) {
             var b = document.createElement("button");
             b.type = "button";
             b.className = "valgknap";
-            b.textContent = tekst;
+            if (typeof valg === "string") {
+                b.textContent = valg;
+            } else {
+                b.classList.add("medfarve");
+                var proeve = document.createElement("span");
+                proeve.className = "farveprove" + (valg.farve ? "" : " farveloes");
+                if (valg.farve) proeve.style.backgroundColor = valg.farve;
+                b.appendChild(proeve);
+                b.appendChild(document.createTextNode(valg.tekst));
+            }
             b.addEventListener("click", function () { mig.svar(i); });
             boks.appendChild(b);
         });

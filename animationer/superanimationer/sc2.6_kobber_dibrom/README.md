@@ -41,14 +41,19 @@ animation. Det nye er:
   hvor meget Br₂ der er tilbage i boblen, og en test er færdig, når alle Cu²⁺
   har fire NH₃, eller når alt Br⁻ er fældet.
 * **Dråbe for dråbe.** Hvert klik på en dråbeflaske er én dråbe. Der skal tre
-  til hver test, og farven og bundfaldet bygges gradvist op.
+  til hver test, og farven og bundfaldet bygges gradvist op. Dråberne tegnes
+  som klare perler, så man kan se, at begge opløsninger er farveløse, også
+  AgNO₃ i den brune flaske. Det noteres også i iagttagelserne.
 * **Forløb, hint og iagttagelser i panelet.** Trinene får flueben efter
   tilstanden, ikke efter knaptryk. Hint giver en kort tekst til det aktuelle
   trin og markerer den genstand, det handler om. Knappen banker, når eleven
   har stået på samme trin i 25 sekunder. Det, eleven ser, skrives som
   iagttagelser med en farveprøve. Der er ingen teori foran forsøget; den
   ligger bag knappen Teori.
-* **Quiz** med syv spørgsmål, låst op når begge tests er lavet.
+* **Quiz** med ti spørgsmål, låst op når begge tests er lavet. Flere handler
+  om farverne: hvilken ion der giver den blågrønne farve, hvilken farve
+  AgNO₃-opløsningen og bundfaldet har, og hvilket stof der er mørkeblåt. I
+  farvespørgsmålene har svarene en farveprøve, og farveløs vises ternet.
 
 ## Påskeægget
 
@@ -117,7 +122,7 @@ js/scene.js         tegnebordet (1000 x 600): maal, stinkskab, vaesker
 js/mikro.js         partikelmodellen i zoomboblerne
 js/forsoeg.js       trinene, klik, rystning, haeldning, draaber, affald
 js/uheld.js         paaskeaegget: kolben tabes, og der ryddes op
-js/quiz.js          quizkortet og de syv spoergsmaal
+js/quiz.js          quizkortet og de ti spoergsmaal
 js/rundvisning.js   spotlight-rundvisningen bag ?-knappen
 js/app.js           panel, knapper, tastatur, tegneloekke
 _selvtest.html      udviklervaerktoej, indgaar ikke i animationen

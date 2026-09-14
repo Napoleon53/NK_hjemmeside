@@ -193,6 +193,8 @@
         reageret: { tekst: "Den orange farve forsvinder. Opløsningen bliver svagt blågrøn, og der er kobber tilbage.", farve: M.FARVE.kobberbromid },
         nh3:      { tekst: "Glas {n} med NH₃: opløsningen bliver mørkeblå.", farve: M.FARVE.kompleks },
         agno3:    { tekst: "Glas {n} med AgNO₃: der dannes et lysegult bundfald.", farve: M.FARVE.bundfald },
+        draabe_nh3:   { tekst: "Dråberne af NH₃(aq) er farveløse.", farve: null },
+        draabe_agno3: { tekst: "Dråberne af AgNO₃(aq) er farveløse, selv om flasken er brun.", farve: null },
         uheld:    { tekst: "Kolben blev tabt og knust. Der er ryddet op.", farve: { r: 150, g: 160, b: 172, a: 1 } }
     };
     NK.IAGTTAGELSER = IAGTTAGELSER;
@@ -602,8 +604,7 @@
         liste.push({ tid: 0.15 });
         liste.push({ kald: function () {
             this.draaber.push({
-                x: d.p.x, y: d.p.y + 3, vy: 40, r: 2.8, liv: 1,
-                farve: navn === "nh3" ? { r: 225, g: 238, b: 248, a: 0.95 } : { r: 236, g: 236, b: 236, a: 0.95 },
+                x: d.p.x, y: d.p.y + 4, vy: 40, r: 3.6, liv: 1, farveloes: true,
                 glas: glas, reagens: navn
             });
             d.svaev = { glas: glas, ur: 2.6 };
@@ -615,6 +616,7 @@
 
     P.draabeLander = function (dr) {
         var gl = dr.glas;
+        this.iagttag("draabe_" + dr.reagens);
         gl.draaber++;
         gl.areal += 14;
         var m = this.mikro[gl.navn];

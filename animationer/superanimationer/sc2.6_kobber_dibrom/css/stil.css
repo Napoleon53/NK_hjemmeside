@@ -292,6 +292,13 @@ main.forsoeg {
     border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
+/* Ternet baggrund betyder farveloes, som i et tegneprogram */
+.farveloes {
+    background-color: #f4f6f8;
+    background-image: repeating-conic-gradient(#c3c9d1 0% 25%, transparent 0% 50%);
+    background-size: 8px 8px;
+}
+
 @keyframes ind {
     from { opacity: 0; transform: translateY(-4px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -320,6 +327,15 @@ main.forsoeg {
 .valgknap:disabled { cursor: default; opacity: 0.5; }
 .valgknap.rigtig  { background-color: var(--groen-mork); border-color: var(--groen); color: #ffffff; opacity: 1; }
 .valgknap.forkert { background-color: var(--roed-mork); border-color: var(--roed); color: #ffffff; opacity: 1; }
+.valgknap.medfarve { display: flex; align-items: center; gap: 10px; }
+
+.farveprove {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+}
 
 .quiz-score {
     text-align: center;

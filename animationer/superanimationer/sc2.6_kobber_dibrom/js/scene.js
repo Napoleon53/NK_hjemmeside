@@ -532,10 +532,23 @@
         for (var i = 0; i < draaber.length; i++) {
             var d = draaber[i];
             ctx.globalAlpha = NK.klamp(d.liv, 0, 1);
-            ctx.fillStyle = NK.css(d.farve, 1);
             ctx.beginPath();
             ctx.ellipse(d.x, d.y, d.r * 0.8, d.r, 0, 0, Math.PI * 2);
-            ctx.fill();
+            if (d.farveloes) {
+                /* En farveloes draabe: klar perle med kant og genskin */
+                ctx.fillStyle = "rgba(210, 230, 245, 0.18)";
+                ctx.fill();
+                ctx.strokeStyle = "rgba(235, 245, 255, 0.85)";
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
+                ctx.beginPath();
+                ctx.arc(d.x - d.r * 0.25, d.y - d.r * 0.35, d.r * 0.25, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                ctx.fillStyle = NK.css(d.farve, 1);
+                ctx.fill();
+            }
         }
         ctx.restore();
     };

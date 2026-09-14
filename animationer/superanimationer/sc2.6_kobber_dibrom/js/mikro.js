@@ -200,18 +200,26 @@
             p.vy = Math.sin(retning) * fart;
 
             /* NH3 soeger mod en Cu2+ med ledig plads, Ag+ mod en fri Br− */
-            var mod = null;
-            if (p.type === "nh3") mod = naermeste(liste, p, function (c) { return c.type === "cu2" && (!c.ligander || c.ligander.length < 4); });
-            else if (p.type === "ag") mod = naermeste(liste, p, function (c) { return c.type === "br"; });
+            var mod = null, traek = 90;
+            if (p.type === "nh3") mod = naermeste(liste, p, aabenCu);
+            else if (p.type === "ag") mod = naermeste(liste, p, friBr);
+            else if (p.type === "br2" && ryst > 0.05) {
+                /* Rystningen blander vaesken og foerer Br2 hen til kobberet */
+                mod = naermeste(liste, p, function (c) { return c.type === "cu" && !c.laast; });
+                traek = 110 * ryst;
+            }
             if (mod) {
                 var mx = mod.x - p.x, my = mod.y - p.y, md = Math.sqrt(mx * mx + my * my) || 1;
-                p.vx += mx / md * 90 * dt;
-                p.vy += my / md * 90 * dt;
+                p.vx += mx / md * traek * dt;
+                p.vy += my / md * traek * dt;
                 p.jagt = (p.jagt || 0) + dt;
             } else {
                 p.jagt = 0;
             }
-            if (ryst > 0.05) p.vy += r(-1, 1.6) * 120 * ryst * dt;
+            if (ryst > 0.05) {
+                p.vx += r(-1, 1) * 80 * ryst * dt;
+                p.vy += r(-1, 1) * 80 * ryst * dt;
+            }
 
             p.x += p.vx * dt;
             p.y += p.vy * dt;
@@ -237,7 +245,7 @@
             /* Sikkerhedsnet: en NH3 eller Ag+, der har soegt sin partner i
                over 4 s uden at naa frem, reagerer med den naermeste. Saa
                kan en test aldrig gaa i staa. */
-            if (p.jagt > 4) {
+            if ((p.type === "nh3" || p.type === "ag") && p.jagt > 4) {
                 var partner = naermeste(liste, p, p.type === "nh3" ? aabenCu : friBr);
                 if (partner) {
                     if (p.type === "nh3") this.bind(p, partner); else this.faeld(p, partner);
@@ -249,6 +257,8 @@
             for (j = 0; j < liste.length; j++) {
                 q = liste[j];
                 if (q === p || q.laast || q.vaert || q.type === "agbr") continue;
+                /* Br2 skubbes ikke af ionerne, ellers kan de spaerre for kobberet */
+                if ((p.type === "br2" && q.type !== "cu") || q.type === "br2") continue;
                 var dx = p.x - q.x, dy = p.y - q.y;
                 var min = p.rad + q.rad + 0.5;
                 var dd = dx * dx + dy * dy;
