@@ -231,6 +231,75 @@
             color: #8fd694;
         }
 
+        /* Skift mellem kemi B og C: kun i udklappet panel, og kun ved at holde knappen nede */
+        .skift-btn {
+            position: relative;
+            overflow: hidden;
+            margin-top: auto;
+            background: transparent;
+            border: none;
+            border-top: 1px solid #222;
+            color: #777;
+            padding: 8px 12px;
+            font-size: 12px;
+            text-align: left;
+            white-space: nowrap;
+            width: 100%;
+            box-sizing: border-box;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            touch-action: none;
+        }
+
+        .skift-btn:hover {
+            background-color: #1a1a1a;
+            color: #ccc;
+        }
+
+        .sidebar.collapsed .skift-btn {
+            display: none;
+        }
+
+        .sidebar:not(.collapsed) .skift-btn + .feedback-btn {
+            margin-top: 0;
+        }
+
+        .skift-besked,
+        .skift-fyld {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        .skift-besked {
+            right: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #111;
+            color: #f1c40f;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+
+        .skift-btn.vis-besked .skift-besked {
+            opacity: 1;
+        }
+
+        .skift-fyld {
+            width: 0;
+            background-color: rgba(241, 196, 15, 0.3);
+        }
+
+        .skift-btn.holder .skift-fyld {
+            width: 100%;
+            transition: width 1s linear;
+        }
+
         /* Feedback-modal */
         .feedback-overlay {
             display: none;
@@ -402,6 +471,7 @@
             <button class="tab-btn" data-beskrivelse="Se hvordan glucose og fructose lukker ring og danner alfa- og beta-anomerer." onclick="visKategori(this, 'kemi-b-filer/samling_b7.html')" title="B7: Kulhydrater"><span class="btn-num">B7</span><span class="btn-text">Kulhydrater</span></button>
             <button class="tab-btn" data-beskrivelse="Absorptionsspektre og Lambert-Beers lov, inkl. et rigtigt forsøg med azofarvestof i en Breezer." onclick="visKategori(this, 'kemi-b-filer/samling_b9.html')" title="B9: Spektroskopi"><span class="btn-num">B9</span><span class="btn-text">Spektroskopi</span></button>
 
+            <button class="skift-btn" id="skiftKnap" data-href="samling_alt.html"><span>Skift til kemi C</span><span class="skift-besked">Hold nede i 1 sekund</span><span class="skift-fyld"></span></button>
             <button class="tab-btn feedback-btn" data-beskrivelse="Alle animationerne bliver løbende forbedret, og al feedback du sender bliver læst og forsøgt implementeret." onclick="visFeedback()" title="Giv feedback (rettelser eller forslag)"><span class="btn-num">✎</span><span class="btn-text">Feedback</span></button>
 
         </div>
@@ -532,6 +602,50 @@
             if (event.data === 'animationFocus') {
                 document.getElementById('sidebarMenu').classList.add('collapsed');
             }
+        });
+
+        // ===== Skift til det andet animationspanel (hold nede i 1 sekund) =====
+        var skiftKnap = document.getElementById('skiftKnap');
+        var skiftHoldTimer = null;
+        var skiftBeskedTimer = null;
+
+        function startSkift(event) {
+            if (event.type === 'pointerdown' && event.button !== 0) return;
+            if (event.type === 'keydown') {
+                if (event.key !== 'Enter' && event.key !== ' ') return;
+                event.preventDefault();
+            }
+            if (skiftHoldTimer) return;
+            clearTimeout(skiftBeskedTimer);
+            skiftKnap.classList.add('vis-besked', 'holder');
+            skiftHoldTimer = setTimeout(function() {
+                window.location.href = skiftKnap.getAttribute('data-href');
+            }, 1000);
+        }
+
+        function stopSkift() {
+            if (!skiftHoldTimer) return;
+            clearTimeout(skiftHoldTimer);
+            skiftHoldTimer = null;
+            skiftKnap.classList.remove('holder');
+            skiftBeskedTimer = setTimeout(function() {
+                skiftKnap.classList.remove('vis-besked');
+            }, 4000);
+        }
+
+        skiftKnap.addEventListener('pointerdown', startSkift);
+        skiftKnap.addEventListener('keydown', startSkift);
+        ['pointerup', 'pointerleave', 'pointercancel', 'keyup', 'blur'].forEach(function(type) {
+            skiftKnap.addEventListener(type, stopSkift);
+        });
+        skiftKnap.addEventListener('contextmenu', function(event) { event.preventDefault(); });
+
+        // Tilbage-knappen kan gendanne siden midt i et hold; start da forfra.
+        window.addEventListener('pageshow', function() {
+            clearTimeout(skiftHoldTimer);
+            clearTimeout(skiftBeskedTimer);
+            skiftHoldTimer = null;
+            skiftKnap.classList.remove('vis-besked', 'holder');
         });
 
         // ===== Feedback-funktion =====
