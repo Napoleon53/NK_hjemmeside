@@ -16,11 +16,6 @@
 
     <div class="opgave-menu" id="opgave-menu"></div>
 
-    <div id="maal-boks">
-        <img id="maal-sprite" alt="">
-        <span id="maal-formel">-</span>
-    </div>
-
     <button class="ikonknap" id="rundvisning-knap" type="button" title="Rundvisning" aria-label="Rundvisning">?</button>
 </header>
 
@@ -49,10 +44,13 @@
         <div id="valens-knapper"></div>
     </div>
 
-    <div id="sejr-overlay" class="overlay-boks skjult">
-        <h2>Korrekt prikformel!</h2>
-        <p>Alle atomer opfylder oktetreglen (eller duetreglen for hydrogen).</p>
-        <button class="knap groen" id="naeste-knap" type="button">Næste opgave</button>
+    <div id="sejr-overlay" class="sejr-kort skjult">
+        <img id="sejr-sprite" alt="">
+        <div>
+            <h2>Korrekt elektronprikformel</h2>
+            <p>Alle atomer opfylder oktetreglen, og hydrogen har to elektroner.</p>
+            <button class="knap groen" id="naeste-knap" type="button">Næste opgave</button>
+        </div>
     </div>
 
     <div id="toast"></div>

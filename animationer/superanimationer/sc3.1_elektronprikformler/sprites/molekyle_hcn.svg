@@ -1,20 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-94.0 -36.0 188.0 72.0">
-    <line x1="-38.0" y1="0.0" x2="-20.0" y2="0.0" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
-    <line x1="20.0" y1="-8.5" x2="38.0" y2="-8.5" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
-    <line x1="20.0" y1="0.0" x2="38.0" y2="0.0" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
-    <line x1="20.0" y1="8.5" x2="38.0" y2="8.5" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
-    
-    <circle cx="-58.0" cy="0.0" r="20" fill="#e8eaed" stroke="#9ca3af" stroke-width="2"/>
-    <ellipse cx="-64.4" cy="-7.6" rx="8.4" ry="5.6" fill="#ffffff" opacity="0.22"/>
-    <text x="-58.0" y="0.0" font-family="'Segoe UI', sans-serif" font-weight="700" font-size="20" fill="#111827" text-anchor="middle" dominant-baseline="central">H</text>
-
-    <circle cx="0.0" cy="0.0" r="20" fill="#4b5563" stroke="#9ca3af" stroke-width="2"/>
-    <ellipse cx="-6.4" cy="-7.6" rx="8.4" ry="5.6" fill="#ffffff" opacity="0.22"/>
-    <text x="0.0" y="0.0" font-family="'Segoe UI', sans-serif" font-weight="700" font-size="20" fill="#f9fafb" text-anchor="middle" dominant-baseline="central">C</text>
-
-    <circle cx="58.0" cy="0.0" r="20" fill="#4f8ef7" stroke="#2f6fe0" stroke-width="2"/>
-    <ellipse cx="51.6" cy="-7.6" rx="8.4" ry="5.6" fill="#ffffff" opacity="0.22"/>
-    <text x="58.0" y="0.0" font-family="'Segoe UI', sans-serif" font-weight="700" font-size="20" fill="#f9fafb" text-anchor="middle" dominant-baseline="central">N</text>
-    <circle cx="72.0" cy="4.4" r="4.2" fill="#fbbf24" stroke="#78350f" stroke-width="0.6"/>
-    <circle cx="72.0" cy="-4.4" r="4.2" fill="#fbbf24" stroke="#78350f" stroke-width="0.6"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-95.8 -17.5 202.9 35.0">
+  <g font-family="'Segoe UI', Arial, sans-serif" font-weight="700" font-size="32" fill="#f2f3f5" text-anchor="middle" dominant-baseline="central">
+    <text x="-78.0" y="0.0">H</text>
+    <text x="0.0" y="0.0">C</text>
+    <text x="78.0" y="0.0">N</text>
+  </g>
+  <g fill="#f2c53d">
+    <circle cx="-39.0" cy="-4.6" r="3.2"/>
+    <circle cx="-39.0" cy="4.6" r="3.2"/>
+    <circle cx="30.0" cy="-4.6" r="3.2"/>
+    <circle cx="30.0" cy="4.6" r="3.2"/>
+    <circle cx="39.0" cy="-4.6" r="3.2"/>
+    <circle cx="39.0" cy="4.6" r="3.2"/>
+    <circle cx="48.0" cy="-4.6" r="3.2"/>
+    <circle cx="48.0" cy="4.6" r="3.2"/>
+    <circle cx="97.8" cy="4.6" r="3.2"/>
+    <circle cx="97.8" cy="-4.6" r="3.2"/>
+  </g>
 </svg>

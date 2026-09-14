@@ -46,13 +46,14 @@
 
         this.traekAtom = null;
         this.snapMaal = null;
+        this.hoverAtom = null;
 
         this._byggOpgaveMenu();
         this._bindInteraktion();
         this.initNiveau(loadFremskridt());
     };
 
-    /* ----- Opgavemenuen: én sprite-knap pr. molekyle ------------------- */
+    /* ----- Opgavemenuen: én knap pr. molekylformel --------------------- */
     NK.SimByg.prototype._byggOpgaveMenu = function () {
         var self = this;
         var menu = NK.el("opgave-menu");
@@ -60,9 +61,9 @@
         NK.OPGAVER.forEach(function (opg, i) {
             var knap = document.createElement("button");
             knap.className = "opgave-knap";
-            knap.title = opg.f + " (" + opg.navn + ")";
-            knap.innerHTML = '<img src="sprites/' + opg.sprite + '" alt="" class="opgave-knap-sprite">' +
-                '<span class="opgave-knap-nr">' + (i + 1) + "</span>";
+            knap.type = "button";
+            knap.title = opg.navn;
+            knap.textContent = opg.f;
             knap.addEventListener("click", function () { self.initNiveau(i); });
             menu.appendChild(knap);
         });
@@ -90,10 +91,7 @@
         s.partikler = [];
         localStorage.setItem(GEM_FREMSKRIDT, idx);
 
-        var opg = NK.OPGAVER[idx];
         NK.el("niveau-nu").textContent = idx + 1;
-        NK.el("maal-formel").textContent = opg.f;
-        NK.el("maal-sprite").src = "sprites/" + opg.sprite;
         NK.el("sejr-overlay").classList.add("skjult");
         NK.el("tjek-knap").classList.add("skjult");
         NK.el("nulstil-knap").classList.add("skjult");
@@ -187,7 +185,7 @@
                 id: i, z: z,
                 x: cx + Math.cos(vinkel) * r,
                 y: cy + Math.sin(vinkel) * r,
-                r: 35, traekkes: false
+                r: 30
             });
         });
     };
@@ -208,6 +206,7 @@
 
         if (!fejlAtom) {
             s.fase = "sejr";
+            NK.el("sejr-sprite").src = "sprites/" + NK.OPGAVER[s.niveau].sprite;
             NK.el("sejr-overlay").classList.remove("skjult");
             NK.el("tjek-knap").classList.add("skjult");
             NK.el("nulstil-knap").classList.add("skjult");
@@ -261,6 +260,36 @@
     };
 
     /* ----- Traek og slip ------------------------------------------------- */
+    NK.SimByg.prototype._musPunkt = function (e) {
+        var r = this.laerred.canvas.getBoundingClientRect();
+        return { x: e.clientX - r.left, y: e.clientY - r.top };
+    };
+
+    NK.SimByg.prototype._bindingVed = function (p) {
+        var b = this.state.bindinger;
+        for (var i = 0; i < b.length; i++) {
+            if (Math.hypot(p.x - (b[i].s.x + b[i].t.x) / 2, p.y - (b[i].s.y + b[i].t.y) / 2) < 16) return i;
+        }
+        return -1;
+    };
+
+    NK.SimByg.prototype._atomVed = function (p) {
+        var a = this.state.atomer;
+        for (var i = 0; i < a.length; i++) {
+            if (Math.hypot(p.x - a[i].x, p.y - a[i].y) < a[i].r) return a[i];
+        }
+        return null;
+    };
+
+    /* Laeg atomet i bindingslaengde fra det andet, i den retning det har nu. */
+    NK.SimByg.prototype._placerVed = function (atom, andet) {
+        var dx = atom.x - andet.x, dy = atom.y - andet.y;
+        var len = Math.hypot(dx, dy);
+        if (len < 1) { dx = 1; dy = 0; len = 1; }
+        atom.x = NK.klamp(andet.x + (dx / len) * NK.BINDINGSLAENGDE, 40, this.laerred.b - 40);
+        atom.y = NK.klamp(andet.y + (dy / len) * NK.BINDINGSLAENGDE, 40, this.laerred.h - 40);
+    };
+
     NK.SimByg.prototype._bindInteraktion = function () {
         var self = this;
         var cvs = this.laerred.canvas;
@@ -268,38 +297,34 @@
         cvs.addEventListener("mousedown", function (e) {
             var s = self.state;
             if (s.fase !== "aktion") return;
-            var r = cvs.getBoundingClientRect();
-            var mx = e.clientX - r.left, my = e.clientY - r.top;
-
-            for (var i = 0; i < s.bindinger.length; i++) {
-                var b = s.bindinger[i];
-                var bx = (b.s.x + b.t.x) / 2, by = (b.s.y + b.t.y) / 2;
-                if (Math.hypot(mx - bx, my - by) < 20) {
-                    if (b.orden >= 3) s.bindinger.splice(i, 1);
-                    else b.orden++;
-                    return;
-                }
+            var p = self._musPunkt(e);
+            var i = self._bindingVed(p);
+            if (i >= 0) {
+                if (s.bindinger[i].orden >= 3) s.bindinger.splice(i, 1);
+                else s.bindinger[i].orden++;
+                return;
             }
-            for (var j = 0; j < s.atomer.length; j++) {
-                var a = s.atomer[j];
-                if (Math.hypot(mx - a.x, my - a.y) < a.r) {
-                    self.traekAtom = a; a.traekkes = true; return;
-                }
-            }
+            self.traekAtom = self._atomVed(p);
+            if (self.traekAtom) cvs.style.cursor = "grabbing";
         });
 
         window.addEventListener("mousemove", function (e) {
-            if (!self.traekAtom) return;
-            var r = cvs.getBoundingClientRect();
-            var x = NK.klamp(e.clientX - r.left, 40, self.laerred.b - 40);
-            var y = NK.klamp(e.clientY - r.top, 40, self.laerred.h - 40);
-            self.traekAtom.x = x; self.traekAtom.y = y;
+            var p = self._musPunkt(e);
+            var t = self.traekAtom;
+            if (!t) {
+                var aktiv = self.state.fase === "aktion";
+                self.hoverAtom = aktiv ? self._atomVed(p) : null;
+                cvs.style.cursor = !aktiv ? "default" : self._bindingVed(p) >= 0 ? "pointer" : self.hoverAtom ? "grab" : "default";
+                return;
+            }
+            t.x = NK.klamp(p.x, 40, self.laerred.b - 40);
+            t.y = NK.klamp(p.y, 40, self.laerred.h - 40);
 
             self.snapMaal = null;
             var bedsteAfstand = SNAP_AFSTAND;
             self.state.atomer.forEach(function (a) {
-                if (a === self.traekAtom) return;
-                var d = Math.hypot(self.traekAtom.x - a.x, self.traekAtom.y - a.y);
+                if (a === t) return;
+                var d = Math.hypot(t.x - a.x, t.y - a.y);
                 if (d < bedsteAfstand) { bedsteAfstand = d; self.snapMaal = a; }
             });
         });
@@ -307,26 +332,26 @@
         window.addEventListener("mouseup", function () {
             var t = self.traekAtom;
             if (t) {
-                t.traekkes = false;
-                self.state.bindinger = self.state.bindinger.filter(function (b) {
+                var s = self.state;
+                s.bindinger = s.bindinger.filter(function (b) {
                     if (b.s !== t && b.t !== t) return true;
-                    var andet = (b.s === t) ? b.t : b.s;
-                    return Math.hypot(t.x - andet.x, t.y - andet.y) <= BRYD_AFSTAND;
+                    var modpart = (b.s === t) ? b.t : b.s;
+                    return Math.hypot(t.x - modpart.x, t.y - modpart.y) <= BRYD_AFSTAND;
                 });
 
-                if (self.snapMaal) {
-                    var andet = self.snapMaal;
-                    var findes = self.state.bindinger.some(function (b) {
-                        return (b.s === t && b.t === andet) || (b.s === andet && b.t === t);
-                    });
-                    if (!findes) {
-                        self.state.bindinger.push({ s: t, t: andet, orden: 1 });
-                        var dx = t.x - andet.x, dy = t.y - andet.y;
-                        var len = Math.hypot(dx, dy) || 1;
-                        t.x = andet.x + (dx / len) * 90;
-                        t.y = andet.y + (dy / len) * 90;
-                    }
+                var andet = self.snapMaal;
+                var findes = andet && s.bindinger.some(function (b) {
+                    return (b.s === t && b.t === andet) || (b.s === andet && b.t === t);
+                });
+                if (andet && !findes) {
+                    s.bindinger.push({ s: t, t: andet, orden: 1 });
+                    self._placerVed(t, andet);
+                } else {
+                    /* Et endeatom falder tilbage i bindingslaengde, naar det slippes. */
+                    var mine = s.bindinger.filter(function (b) { return b.s === t || b.t === t; });
+                    if (mine.length === 1) self._placerVed(t, mine[0].s === t ? mine[0].t : mine[0].s);
                 }
+                cvs.style.cursor = "grab";
             }
             self.traekAtom = null;
             self.snapMaal = null;
@@ -353,7 +378,7 @@
         var geo = NK.OPGAVE_GEOMETRI[this.state.niveau];
         if (this.state.fase === "aktion" || this.state.fase === "sejr") {
             NK.tegnStregformel(this.linjeLaerred.ctx, this.linjeLaerred.b, this.linjeLaerred.h, opg, geo, this.state);
-            NK.tegnSpil(ctx, this.state, this.snapMaal);
+            NK.tegnSpil(ctx, this.state, { snap: this.snapMaal, hover: this.hoverAtom, traek: this.traekAtom });
         }
     };
 }());

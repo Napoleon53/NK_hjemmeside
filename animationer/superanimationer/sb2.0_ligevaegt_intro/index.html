@@ -37,15 +37,32 @@
 <section class="fane aktiv" id="fane-bro" role="tabpanel" aria-label="Lillebæltsbroerne">
     <div class="scene">
         <canvas id="bro-laerred"></canvas>
-        <div class="scene-mrk">Tallene står stille, men bilerne kører hele tiden. Det er hele pointen med <b>dynamisk</b> ligevægt.</div>
+        <div class="scene-mrk">Tallene står stille, men bilerne kører hele tiden: <b>dynamisk</b> ligevægt.</div>
     </div>
 
     <aside class="panel">
         <div class="kort fremhaev">
             <h2>Trafik over Lillebælt</h2>
-            <p>Biler kører frem og tilbage mellem Middelfart og Fredericia. Jo flere biler der holder på den ene side, jo flere kører derfra — helt som en reaktionshastighed vokser med koncentrationen.</p>
-            <p>Når de to hastigheder bliver lige store, holder tallene op med at ændre sig. Ingen biler er stoppet: der kører bare lige mange hver vej.</p>
+            <p>Jo flere biler der holder på den ene side, jo flere kører derfra.</p>
             <div class="ligning">Biler(<span class="frem">Fyn</span>) <span class="hj">⇌</span> Biler(<span class="tilbage">Jylland</span>)</div>
+        </div>
+
+        <div class="kort">
+            <h2>Indgreb</h2>
+            <div class="indgreb">
+                <button class="knap haendelse" id="bro-vejarbejde"><span class="ikon">🚧</span><span class="navn">Vejarbejde</span><span class="note">Ny bro: 80 km/t</span></button>
+                <button class="knap haendelse" id="bro-ulykke"><span class="ikon">💥</span><span class="navn">Bilulykke</span><span class="note">Spærrer et spor</span></button>
+                <button class="knap haendelse" id="bro-storm"><span class="ikon">🌬️</span><span class="navn">Storm</span><span class="note">Gl. bro: 40 km/t</span></button>
+            </div>
+            <div class="knaprad">
+                <button class="knap blaa" id="bro-tilfoej-fyn">+30 Fyn</button>
+                <button class="knap orange" id="bro-tilfoej-jyl">+30 Jylland</button>
+            </div>
+            <div class="knaprad">
+                <button class="knap" id="bro-fjern-fyn">−30 Fyn</button>
+                <button class="knap" id="bro-fjern-jyl">−30 Jylland</button>
+            </div>
+            <button class="knap nulstil fuld" id="bro-nulstil"><span>Nulstil</span><span class="tegn">↺</span></button>
         </div>
 
         <div class="kort">
@@ -90,34 +107,22 @@
             <h2>Tal</h2>
             <div class="talraekke"><span>Biler på Fyn</span><span class="tal blaa" id="bro-n-fyn">0</span></div>
             <div class="talraekke"><span>Biler i Jylland</span><span class="tal orange" id="bro-n-jyl">0</span></div>
-            <div class="talraekke"><span>Biler på broerne</span><span class="tal" id="bro-n-bro">0</span></div>
+            <div class="talraekke"><span>På broerne</span><span class="tal" id="bro-n-bro">0</span></div>
+            <div class="talraekke"><span>I kø på land</span><span class="tal roed" id="bro-n-koe">0</span></div>
             <div class="talraekke"><span>I alt (bevares)</span><span class="tal groen" id="bro-n-alt">0</span></div>
         </div>
 
         <div class="kort">
             <h2>Hvad bestemmer K?</h2>
             <div class="skyder">
-                <label><span><i>k</i>(frem) — mod Jylland</span><b id="bro-kfrem-vis">0,060</b></label>
+                <label><span><i>k</i>(frem), mod Jylland</span><b id="bro-kfrem-vis">0,060</b></label>
                 <input type="range" id="bro-kfrem" min="0.01" max="0.15" step="0.005" value="0.06">
             </div>
             <div class="skyder orange">
-                <label><span><i>k</i>(tilbage) — mod Fyn</span><b id="bro-ktilbage-vis">0,020</b></label>
+                <label><span><i>k</i>(tilbage), mod Fyn</span><b id="bro-ktilbage-vis">0,020</b></label>
                 <input type="range" id="bro-ktilbage" min="0.01" max="0.15" step="0.005" value="0.02">
             </div>
             <div class="kformel">K = <i>k</i>(frem) / <i>k</i>(tilbage) = <b id="bro-k">3,00</b></div>
-        </div>
-
-        <div class="kort">
-            <h2>Indgreb</h2>
-            <div class="knapper">
-                <button class="knap blaa" id="bro-tilfoej-fyn"><span>Tilføj 50 biler på Fyn</span><span class="tegn">➔</span></button>
-                <button class="knap orange" id="bro-tilfoej-jyl"><span>Tilføj 50 biler i Jylland</span><span class="tegn">⬅</span></button>
-                <div class="knaprad">
-                    <button class="knap" id="bro-fjern-fyn">− 50 Fyn</button>
-                    <button class="knap" id="bro-fjern-jyl">− 50 Jylland</button>
-                </div>
-                <button class="knap nulstil" id="bro-nulstil"><span>Nulstil</span><span class="tegn">↺</span></button>
-            </div>
         </div>
     </aside>
 </section>
@@ -374,6 +379,7 @@
         <ul>
             <li>Sæt K = 3 på fane 1, og tilføj biler på Fyn. Hvad sker der med <i>forholdet</i> bagefter?</li>
             <li>Skru k(frem) og k(tilbage) ens. Hvad bliver K så?</li>
+            <li>Lav vejarbejde eller storm på fane 1, når ligevægten har indstillet sig. Ændrer Y sig bagefter?</li>
             <li>Varm gassen op på fane 4. Bliver den brunere eller lysere — og hvad siger det om, hvilken vej der er endoterm?</li>
             <li>Klem stemplet sammen. K står stille, men farven ændrer sig. Hvorfor?</li>
         </ul>

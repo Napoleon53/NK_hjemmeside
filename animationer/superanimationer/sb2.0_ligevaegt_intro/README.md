@@ -14,7 +14,7 @@ står tallene stille, selvom der stadig sker noget.*
 
 | # | Fane | Model | Pointe |
 |---|------|-------|--------|
-| 1 | Lillebæltsbroerne | v(frem) = k(frem)·n(Fyn), v(tilbage) = k(tilbage)·n(Jylland) | Systemet vender tilbage til samme **forhold**, ikke samme tal. K = k(frem)/k(tilbage) |
+| 1 | Lillebæltsbroerne | v(frem) = k(frem)·n(Fyn), v(tilbage) = k(tilbage)·n(Jylland). Trafik begge veje på begge broer; den nye har tre spor og 110 km/t, den gamle ét spor og 70 km/t. Indgreb: vejarbejde, bilulykke, storm | Systemet vender tilbage til samme **forhold**, ikke samme tal. K = k(frem)/k(tilbage). Kø forsinker ligevægten, men flytter den ikke |
 | 2 | Rensdyr og føde | fødsler mod dødsfald, føde vokser logistisk | Samme slags balance, men **uden** ligevægtskonstant — den flytter sig med bæreevnen |
 | 3 | Torvet | udbud S(p) mod efterspørgsel D(p) | Et indgreb giver en **ny** ligevægt, ikke den gamle |
 | 4 | Kemien | N₂O₄ ⇌ 2 NO₂ med Arrhenius og van 't Hoff | Den rigtige vare, med koefficienten som eksponent i ligevægtsloven |

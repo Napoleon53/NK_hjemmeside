@@ -10,8 +10,7 @@
     var NK = window.NK;
 
     var TRIN_KANDIDATER = [
-        { sel: "#opgave-menu", tekst: "Ikonerne foroven viser molekylet for hver opgave. Klik på et ikon for at hoppe direkte til den opgave. Et grønt ikon betyder, at du allerede har løst opgaven." },
-        { sel: "#maal-boks", tekst: "Her ser du formlen for det molekyle, du er i gang med at bygge en prikformel for." },
+        { sel: "#opgave-menu", tekst: "Vælg molekylet her. Det blå felt er den opgave, du er i gang med, og grøn skrift betyder, at opgaven er løst." },
         { sel: "#opsaetning-overlay", tekst: "Find atomet i det periodiske system, og klik på den firkant, der viser antallet af elektroner i dets yderste skal (valenselektroner)." },
         { sel: "footer", tekst: "Træk atomerne sammen for at danne bindinger. Klik på en binding for at skifte mellem enkelt-, dobbelt- og tripelbinding. Sidder du fast, kan du bede om et hint. Tryk \"Tjek svar\", når alle atomer opfylder oktetreglen." }
     ];

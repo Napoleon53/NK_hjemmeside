@@ -1,27 +1,19 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-77.0 -77.0 154.0 154.0">
-    <line x1="14.1" y1="14.1" x2="26.9" y2="26.9" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
-    <line x1="-14.1" y1="14.1" x2="-26.9" y2="26.9" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
-    <line x1="-14.1" y1="-14.1" x2="-26.9" y2="-26.9" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
-    <line x1="14.1" y1="-14.1" x2="26.9" y2="-26.9" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
-    
-    <circle cx="0.0" cy="0.0" r="20" fill="#4b5563" stroke="#9ca3af" stroke-width="2"/>
-    <ellipse cx="-6.4" cy="-7.6" rx="8.4" ry="5.6" fill="#ffffff" opacity="0.22"/>
-    <text x="0.0" y="0.0" font-family="'Segoe UI', sans-serif" font-weight="700" font-size="20" fill="#f9fafb" text-anchor="middle" dominant-baseline="central">C</text>
-
-    <circle cx="41.0" cy="41.0" r="20" fill="#e8eaed" stroke="#9ca3af" stroke-width="2"/>
-    <ellipse cx="34.6" cy="33.4" rx="8.4" ry="5.6" fill="#ffffff" opacity="0.22"/>
-    <text x="41.0" y="41.0" font-family="'Segoe UI', sans-serif" font-weight="700" font-size="20" fill="#111827" text-anchor="middle" dominant-baseline="central">H</text>
-
-    <circle cx="-41.0" cy="41.0" r="20" fill="#e8eaed" stroke="#9ca3af" stroke-width="2"/>
-    <ellipse cx="-47.4" cy="33.4" rx="8.4" ry="5.6" fill="#ffffff" opacity="0.22"/>
-    <text x="-41.0" y="41.0" font-family="'Segoe UI', sans-serif" font-weight="700" font-size="20" fill="#111827" text-anchor="middle" dominant-baseline="central">H</text>
-
-    <circle cx="-41.0" cy="-41.0" r="20" fill="#e8eaed" stroke="#9ca3af" stroke-width="2"/>
-    <ellipse cx="-47.4" cy="-48.6" rx="8.4" ry="5.6" fill="#ffffff" opacity="0.22"/>
-    <text x="-41.0" y="-41.0" font-family="'Segoe UI', sans-serif" font-weight="700" font-size="20" fill="#111827" text-anchor="middle" dominant-baseline="central">H</text>
-
-    <circle cx="41.0" cy="-41.0" r="20" fill="#e8eaed" stroke="#9ca3af" stroke-width="2"/>
-    <ellipse cx="34.6" cy="-48.6" rx="8.4" ry="5.6" fill="#ffffff" opacity="0.22"/>
-    <text x="41.0" y="-41.0" font-family="'Segoe UI', sans-serif" font-weight="700" font-size="20" fill="#111827" text-anchor="middle" dominant-baseline="central">H</text>
-    
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-73.0 -72.7 146.0 145.3">
+  <g font-family="'Segoe UI', Arial, sans-serif" font-weight="700" font-size="32" fill="#f2f3f5" text-anchor="middle" dominant-baseline="central">
+    <text x="0.0" y="0.0">C</text>
+    <text x="55.2" y="55.2">H</text>
+    <text x="-55.2" y="55.2">H</text>
+    <text x="-55.2" y="-55.2">H</text>
+    <text x="55.2" y="-55.2">H</text>
+  </g>
+  <g fill="#f2c53d">
+    <circle cx="30.8" cy="24.3" r="3.2"/>
+    <circle cx="24.3" cy="30.8" r="3.2"/>
+    <circle cx="-24.3" cy="30.8" r="3.2"/>
+    <circle cx="-30.8" cy="24.3" r="3.2"/>
+    <circle cx="-30.8" cy="-24.3" r="3.2"/>
+    <circle cx="-24.3" cy="-30.8" r="3.2"/>
+    <circle cx="24.3" cy="-30.8" r="3.2"/>
+    <circle cx="30.8" cy="-24.3" r="3.2"/>
+  </g>
 </svg>

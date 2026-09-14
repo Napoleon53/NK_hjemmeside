@@ -25,11 +25,21 @@ document.getElementById("ramme").addEventListener("load", function () {
             "  Y=" + r(bro.nJyl / bro.nFyn) + "  K=" + r(bro.kFrem / bro.kTilbage) +
             "  ialt=" + (bro.nFyn + bro.nJyl + bro.paaVej.length));
         var foerY = bro.nJyl / bro.nFyn;
-        bro.nFyn += 200;
+        bro.nFyn += 60;
         koer(bro, 120, 1 / 60);
-        linjer.push("BRO efter +200 biler paa Fyn og 120 s:  Fyn=" + bro.nFyn +
+        linjer.push("BRO efter +60 biler paa Fyn og 120 s:  Fyn=" + bro.nFyn +
             "  Jyl=" + bro.nJyl + "  Y=" + r(bro.nJyl / bro.nFyn) +
             "  (var " + r(foerY) + " for indgrebet)");
+        bro.saetVejarbejde(true);
+        bro.saetStorm(true);
+        bro.startUlykke();
+        koer(bro, 150, 1 / 60);
+        linjer.push("BRO med vejarbejde, storm og uheld, 150 s:  Fyn=" + bro.nFyn +
+            "  Jyl=" + bro.nJyl + "  paaVej=" + bro.paaVej.length +
+            "  koe=" + (bro.koeF + bro.koeJ) + "  Y=" + r(bro.nJyl / bro.nFyn) +
+            "  ialt=" + (bro.nFyn + bro.nJyl + bro.koeF + bro.koeJ + bro.paaVej.length));
+        bro.saetVejarbejde(false);
+        bro.saetStorm(false);
         bro.kTilbage = 0.06;
         koer(bro, 150, 1 / 60);
         linjer.push("BRO med k(frem)=k(tilbage):  Y=" + r(bro.nJyl / bro.nFyn) + "  K=1,00");

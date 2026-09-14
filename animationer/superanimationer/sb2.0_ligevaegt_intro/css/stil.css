@@ -516,6 +516,7 @@ main {
 .talraekke .tal.blaa { color: var(--blaa); }
 .talraekke .tal.orange { color: var(--orange); }
 .talraekke .tal.groen { color: var(--groen); }
+.talraekke .tal.roed { color: var(--roed); }
 
 /* ---------------------------------------------------------------------
    SKYDERE
@@ -635,6 +636,37 @@ main {
 
 .knaprad { display: flex; gap: 7px; }
 .knaprad .knap { flex: 1; justify-content: center; }
+.knaprad + .knaprad,
+.indgreb + .knaprad { margin-top: 7px; }
+.knap.fuld { width: 100%; margin-top: 7px; }
+
+/* Indgrebspanelet paa fane 1: tre fliser med ikon, navn og kort note */
+.indgreb {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+}
+
+.knap.haendelse {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 2px;
+    padding: 9px 4px 8px;
+    text-align: center;
+}
+
+.knap.haendelse .ikon { font-size: 1.35rem; line-height: 1.2; }
+.knap.haendelse .navn { font-size: 0.8rem; }
+.knap.haendelse .note { font-size: 0.66rem; font-weight: 500; color: var(--tekst-mat); }
+
+.knap.haendelse.slaaet-til {
+    background-color: rgba(242, 197, 61, 0.16);
+    border-color: var(--gul);
+    box-shadow: 0 0 10px rgba(242, 197, 61, 0.2);
+}
+
+.knap.haendelse.slaaet-til .note { color: #f7dc86; }
 
 /* ---------------------------------------------------------------------
    OVERSAETTELSESTABEL (kemi-fanen)
