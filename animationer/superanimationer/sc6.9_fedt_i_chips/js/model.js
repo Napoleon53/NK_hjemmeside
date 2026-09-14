@@ -45,13 +45,16 @@
     var KNUS = { min: 0.5, vej: 2600, voldsom: 2600, krummeMasse: 0.02, maksKrummer: 8 };
 
     /* tid: roeretid i sekunder. Uden roering sker der kun lidt (diffusion). */
-    var ROER = { tau: 2.2, min: 0.5, faerdig: 0.95, diffusion: 0.04, vej: 900 };
+    var ROER = { tau: 1.5, min: 0.5, faerdig: 0.95, diffusion: 0.04, fuld: 450 };
 
     var FILTER = { tilbage: 0.12, efterSkyl: 0.02 };
 
     var BAEGER = { min: 46.5, max: 53.5 };
 
     var BRAND = { tid: 1.6 };
+
+    /* Opløsningsmidlet i baegerglasset, maalt som areal paa tegnebordet */
+    var VOLUMEN = 1450;
 
     var FARVE = {
         fedt:     { r: 244, g: 200, b: 64, a: 0.95 },
@@ -134,6 +137,7 @@
         FILTER: FILTER,
         BAEGER: BAEGER,
         BRAND: BRAND,
+        VOLUMEN: VOLUMEN,
         FARVE: FARVE,
         roerGrad: roerGrad,
         ekstraktion: ekstraktion,

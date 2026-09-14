@@ -1,0 +1,362 @@
+/* =====================================================================
+   app.js - binder forsoeget, maaleskemaet, quizzen og panelet sammen
+
+   Knapper, tastatur, pop op-vinduer og tegneloekken.
+   ===================================================================== */
+(function () {
+    "use strict";
+
+    var NK = window.NK;
+    var M = NK.Model;
+
+    var forsoeg, quiz;
+    var sidsteTid = 0;
+    var sidsteSignatur = "";
+    var beskedUr = null;
+    var hintTrin = "";
+
+    /* ----- Forloebet ---------------------------------------------------- */
+    function trinListe() {
+        var f = forsoeg;
+        if (f.uheld) {
+            return [
+                { id: "sluk", tekst: "Ilden slukkes", gjort: !!f.uheld.slukket },
+                { id: "nyt", tekst: "Start et nyt forsøg", gjort: false }
+            ];
+        }
+        return NK.TRIN.map(function (t) { return { id: t.id, tekst: t.tekst, gjort: f.trinGjort(t.id) }; });
+    }
+
+    function opdaterPanel() {
+        var f = forsoeg;
+        var liste = trinListe();
+        var aktuelt = f.aktueltTrin();
+        var aktivId = f.uheld ? (f.uheld.slukket ? "nyt" : "sluk") : (aktuelt ? aktuelt.id : "");
+        var ol = NK.el("trin-liste");
+        ol.innerHTML = "";
+        var antalGjort = 0;
+        liste.forEach(function (t, i) {
+            var li = document.createElement("li");
+            if (t.gjort) { li.className = "gjort"; antalGjort++; }
+            else if (t.id === aktivId) li.className = "aktiv";
+            var nr = document.createElement("span");
+            nr.className = "nr";
+            nr.textContent = t.gjort ? "✓" : String(i + 1);
+            li.appendChild(nr);
+            li.appendChild(document.createTextNode(t.tekst));
+            ol.appendChild(li);
+        });
+        NK.saetTekst("forloeb-titel", f.uheld ? "Uheld" : "Forløb");
+        NK.saetTekst("forloeb-taeller", f.uheld ? "" : antalGjort + "/" + liste.length);
+        NK.el("forloeb-kort").classList.toggle("uheld", !!f.uheld);
+
+        var id = aktuelt ? aktuelt.id : "";
+        if (id !== hintTrin) {
+            hintTrin = id;
+            NK.el("hint-tekst").hidden = true;
+        }
+        NK.el("hint-knap").disabled = !aktuelt || id === "beregn";
+
+        var type = f.arbejdsType();
+        var ak = NK.el("arbejd-knap");
+        var kilde = f.arbejdKilde;
+        ak.hidden = !(type || (kilde && kilde.indexOf("knap") === 0)) || !!f.uheld;
+        ak.disabled = !((kilde && kilde.indexOf("knap") === 0) || (type === "knus" ? f.kanKnuse() : (type === "roer" && f.kanRoere())));
+        ak.classList.toggle("aktiv", !!(kilde && kilde.indexOf("knap") === 0));
+        NK.saetTekst("arbejd-tekst", type === "roer" ? "Rør rundt" : "Knus");
+
+        NK.el("uheld-boks").hidden = !(f.uheld && f.uheld.faerdig);
+
+        /* Maaleskemaet */
+        NK.saetTekst("maal-nr", "Forsøg " + f.forsoegNr);
+        NK.saetTekst("m-chips", f.mChips !== null ? M.komma(f.mChips) + " g" : "");
+        NK.saetTekst("m-b", f.mB !== null ? M.komma(f.mB) + " g" : "");
+        NK.saetTekst("m-bf", f.mBF !== null ? M.komma(f.mBF) + " g" : "");
+        var kanBeregne = f.mBF !== null && !f.gjort.beregn;
+        var beregn = NK.el("beregn");
+        if (kanBeregne && beregn.hidden) {
+            beregn.hidden = false;
+            NK.el("svar").value = "";
+            NK.el("svar").classList.remove("forkert");
+        } else if (!kanBeregne) {
+            beregn.hidden = true;
+        }
+        if (f.mBF === null) NK.el("beregn-hint").hidden = true;
+        visSammenligning();
+        visTidligere();
+
+        quiz.saetLaast(!f.harHeptanResultat());
+        sidsteSignatur = signatur();
+    }
+
+    function signatur() {
+        var f = forsoeg;
+        var t = f.aktueltTrin();
+        return [
+            t ? t.id : "", !!f.handling, f.arbejdKilde, f.arbejdsType(), f.kanKnuse(), f.kanRoere(),
+            f.uheld ? (f.uheld.slukket ? "s" : "b") + (f.uheld.faerdig ? "f" : "") : "",
+            f.mChips, f.mB, f.mBF, !!f.gjort.beregn, f.resultater.length, f.forsoegNr,
+            NK.TRIN.map(function (x) { return f.trinGjort(x.id) ? 1 : 0; }).join("")
+        ].join("|");
+    }
+
+    function visHint() {
+        var tekst = forsoeg.hint();
+        var el = NK.el("hint-tekst");
+        if (!tekst) { el.hidden = true; return; }
+        el.textContent = tekst;
+        el.hidden = false;
+        NK.el("hint-knap").classList.remove("banker");
+    }
+
+    /* ----- Beregningen -------------------------------------------------- */
+    var HINT = {
+        tom: "Skriv fedtindholdet som et tal.",
+        broek: "Tallet er en brøkdel. Fedtindholdet skal angives i procent.",
+        gram: "Det er massen af fedtet. Hvor mange procent er det af chipsenes masse?",
+        baeger: "Bægerglasset vejer også noget. Træk massen af det tomme bægerglas fra.",
+        omvendt: "Du har divideret den forkerte vej. Fedtet er en del af chipsene."
+    };
+
+    function tjek() {
+        var input = NK.el("svar");
+        var svar = forsoeg.tjekSvar(input.value);
+        if (!svar) return;
+        var hint = NK.el("beregn-hint");
+        if (svar.slags === "rigtig") {
+            hint.hidden = true;
+            input.classList.remove("forkert");
+            opdaterPanel();
+            return;
+        }
+        input.classList.add("forkert");
+        var tekst = HINT[svar.slags];
+        if (!tekst) {
+            tekst = svar.forkerte >= 2
+                ? "Fedtindhold = m(fedt) / m(chips) · 100 %. Find først m(fedt) ud fra de to vejninger af bægerglasset."
+                : "Find først massen af fedtet ud fra de to vejninger af bægerglasset.";
+        }
+        hint.textContent = tekst;
+        hint.hidden = false;
+        input.focus();
+        input.select();
+    }
+
+    function visSammenligning() {
+        var f = forsoeg;
+        var boks = NK.el("sammenligning");
+        var sidste = f.gjort.beregn ? f.resultater[f.resultater.length - 1] : null;
+        if (!sidste || sidste.procent === null) { boks.hidden = true; return; }
+        boks.hidden = false;
+        var dekl = M.CHIPS.deklaration;
+        var skala = 40;
+        NK.el("soejle-resultat").style.width = NK.klamp(sidste.procent / skala * 100, 0, 100) + "%";
+        NK.el("soejle-dekl").style.width = (dekl / skala * 100) + "%";
+        NK.saetTekst("tal-resultat", M.komma(sidste.procent, 1) + " %");
+        NK.saetTekst("tal-dekl", dekl + " %");
+        var tekst;
+        if (sidste.midl === "vand") tekst = "Resultatet er langt fra varedeklarationen. Prøv et andet opløsningsmiddel.";
+        else if (sidste.procent < dekl - 3) tekst = "Resultatet er lavere end varedeklarationen. Hvor kan resten af fedtet være blevet af?";
+        else tekst = "Resultatet ligger tæt på varedeklarationen.";
+        NK.saetTekst("sammenligning-tekst", tekst);
+    }
+
+    function visTidligere() {
+        var ul = NK.el("tidligere");
+        var f = forsoeg;
+        var tekst = f.resultater.map(function (x) {
+            return x.nr + "|" + (x.midl || "") + "|" + (x.procent === null ? "brand" : M.komma(x.procent, 1));
+        }).join(";");
+        if (ul.getAttribute("data-noegle") === tekst) return;
+        ul.setAttribute("data-noegle", tekst);
+        ul.innerHTML = "";
+        f.resultater.forEach(function (x) {
+            var li = document.createElement("li");
+            var b = document.createElement("b");
+            b.textContent = "Forsøg " + x.nr;
+            li.appendChild(b);
+            var midl = x.midl ? M.MIDLER[x.midl].navn : "";
+            var del = x.brand ? "brand, intet resultat" : M.komma(x.procent, 1) + " %";
+            li.appendChild(document.createTextNode(": " + midl + ", " + del));
+            ul.appendChild(li);
+        });
+    }
+
+    function maaling(hvad) {
+        var raekke = NK.el("raekke-" + hvad);
+        opdaterPanel();
+        if (!raekke) return;
+        raekke.classList.remove("ny");
+        void raekke.offsetWidth;
+        raekke.classList.add("ny");
+    }
+
+    /* ----- Iagttagelser -------------------------------------------------- */
+    function iagttagelse(i) {
+        var ul = NK.el("iagttagelse-liste");
+        var tom = ul.querySelector(".tom");
+        if (tom) tom.remove();
+        var li = document.createElement("li");
+        if (i.noegle === "brand") li.className = "uheld";
+        var farve = document.createElement("span");
+        farve.className = "farve" + (i.farve ? "" : " farveloes");
+        if (i.farve) farve.style.backgroundColor = NK.css({ r: i.farve.r, g: i.farve.g, b: i.farve.b, a: 1 });
+        li.appendChild(farve);
+        var tekst = document.createElement("span");
+        var nr = document.createElement("span");
+        nr.className = "fnr";
+        nr.textContent = "F" + i.nr;
+        tekst.appendChild(nr);
+        tekst.appendChild(document.createTextNode(i.tekst));
+        li.appendChild(tekst);
+        ul.appendChild(li);
+    }
+
+    /* ----- Beskeden paa scenen ------------------------------------------ */
+    function besked(tekst, slags) {
+        var el = NK.el("scenebesked");
+        el.className = "scenebesked";
+        void el.offsetWidth;
+        el.textContent = tekst;
+        el.className = "scenebesked vis " + slags;
+        window.clearTimeout(beskedUr);
+        beskedUr = window.setTimeout(function () { el.classList.remove("vis"); }, 2800);
+    }
+
+    /* ----- Pop op-vinduer, lyd og nyt forsoeg ------------------------------ */
+    function aabnTeori() {
+        NK.Rundvisning.luk();
+        NK.el("teori").classList.add("vis");
+    }
+
+    function lukOverlay() {
+        var aabne = document.querySelectorAll(".overlay.vis");
+        for (var i = 0; i < aabne.length; i++) aabne[i].classList.remove("vis");
+    }
+
+    function visLyd() {
+        var til = NK.Lyd.erTil();
+        var knap = NK.el("lydknap");
+        knap.classList.toggle("fra", !til);
+        knap.setAttribute("aria-pressed", til ? "true" : "false");
+    }
+
+    function skiftLyd() {
+        NK.Lyd.saet(!NK.Lyd.erTil());
+        NK.Lyd.laasOp();
+        visLyd();
+    }
+
+    function nytForsoeg() {
+        forsoeg.stopArbejde();
+        forsoeg.holdt = null;
+        forsoeg.nulstil();
+        NK.el("hint-tekst").hidden = true;
+        NK.el("beregn-hint").hidden = true;
+        NK.el("beregn").hidden = true;
+        opdaterPanel();
+    }
+
+    /* ----- Tastatur ----------------------------------------------------- */
+    function tastNed(e) {
+        if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) {
+            if (e.target.id === "svar" && e.key === "Enter") { e.preventDefault(); tjek(); }
+            return;
+        }
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+        if (e.key === "Escape") { lukOverlay(); NK.Rundvisning.luk(); return; }
+        if (e.key === "?" || e.key === "h" || e.key === "H") {
+            if (NK.Rundvisning.aktiv()) NK.Rundvisning.luk();
+            else { lukOverlay(); NK.Rundvisning.start(); }
+            return;
+        }
+        if (NK.Rundvisning.aktiv() || document.querySelector(".overlay.vis")) return;
+
+        NK.Lyd.laasOp();
+        if (e.key === "r" || e.key === "R") { if (!e.repeat) forsoeg.arbejdKnap(true); }
+        else if (e.key === "i" || e.key === "I") visHint();
+        else if (e.key === "m" || e.key === "M") skiftLyd();
+        else if (e.key === "t" || e.key === "T") aabnTeori();
+        else if (e.key === "n" || e.key === "N") nytForsoeg();
+    }
+
+    function tastOp(e) {
+        if (e.key === "r" || e.key === "R") forsoeg.arbejdKnap(false);
+    }
+
+    /* ----- Tegneloekken ------------------------------------------------ */
+    function loekke(ts) {
+        var dt = (ts - sidsteTid) / 1000;
+        sidsteTid = ts;
+        if (!isFinite(dt) || dt < 0) dt = 0;
+        if (dt > 0.1) dt = 0.1;
+
+        forsoeg.tilpas();
+        forsoeg.opdater(dt);
+        forsoeg.tegn();
+
+        if (signatur() !== sidsteSignatur) opdaterPanel();
+        var sidderFast = forsoeg.aktueltTrin() && forsoeg.tid - forsoeg.trinStart > 25 && NK.el("hint-tekst").hidden && !NK.el("hint-knap").disabled;
+        NK.el("hint-knap").classList.toggle("banker", !!sidderFast);
+        window.requestAnimationFrame(loekke);
+    }
+
+    /* ----- Opstart ------------------------------------------------------- */
+    function start() {
+        NK.Sprites.start();
+        quiz = new NK.Quiz();
+        forsoeg = new NK.Forsoeg(NK.el("scene-laerred"));
+
+        /* Saa modellen kan pilles ved fra konsollen og fra _selvtest.html */
+        NK.forsoeg = forsoeg;
+        NK.quiz = quiz;
+        NK.opdaterPanel = opdaterPanel;
+        NK.tjek = tjek;
+        NK.nytForsoeg = nytForsoeg;
+
+        forsoeg.vedAendring = function () { if (quiz) opdaterPanel(); };
+        forsoeg.vedBesked = besked;
+        forsoeg.vedIagttagelse = iagttagelse;
+        forsoeg.vedMaaling = maaling;
+
+        var ak = NK.el("arbejd-knap");
+        ak.addEventListener("pointerdown", function (e) {
+            NK.Lyd.laasOp();
+            if (forsoeg.arbejdKnap(true)) { try { ak.setPointerCapture(e.pointerId); } catch (fejl) {} }
+        });
+        ["pointerup", "pointercancel", "lostpointercapture"].forEach(function (type) {
+            ak.addEventListener(type, function () { forsoeg.arbejdKnap(false); });
+        });
+        ak.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+
+        NK.el("hint-knap").addEventListener("click", visHint);
+        NK.el("tjek-knap").addEventListener("click", tjek);
+        NK.el("nytknap").addEventListener("click", nytForsoeg);
+        NK.el("uheld-nyt").addEventListener("click", nytForsoeg);
+        NK.el("teoriknap").addEventListener("click", aabnTeori);
+        NK.el("teori-luk").addEventListener("click", lukOverlay);
+        NK.el("teori").addEventListener("click", function (e) { if (e.target === this) lukOverlay(); });
+        NK.el("lydknap").addEventListener("click", skiftLyd);
+        NK.el("hjaelpknap").addEventListener("click", function () { lukOverlay(); NK.Rundvisning.start(); });
+
+        document.addEventListener("keydown", tastNed);
+        document.addEventListener("keyup", tastOp);
+        window.addEventListener("blur", function () { forsoeg.arbejdKnap(false); });
+
+        visLyd();
+        forsoeg.tilpas();
+        opdaterPanel();
+
+        window.requestAnimationFrame(function (ts) {
+            sidsteTid = ts;
+            window.requestAnimationFrame(loekke);
+        });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", start);
+    } else {
+        start();
+    }
+}());
