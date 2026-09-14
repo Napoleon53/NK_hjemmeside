@@ -282,7 +282,7 @@ main#scene {
 
 #hint-boks.vis { opacity: 1; transform: translateY(0); pointer-events: auto; }
 #hint-boks-titel { font-size: 0.68rem; color: var(--lilla); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; font-weight: 700; }
-#hint-tekst { font-size: 0.86rem; line-height: 1.5; color: #dcd0f0; margin: 0; }
+#hint-tekst { font-size: 0.92rem; line-height: 1.5; color: var(--tekst); margin: 0; }
 
 /* ----- Fejlbesked (toast) ---------------------------------------------- */
 #toast {

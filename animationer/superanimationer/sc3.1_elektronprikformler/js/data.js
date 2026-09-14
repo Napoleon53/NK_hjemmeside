@@ -32,39 +32,39 @@ window.NK = NK;
     NK.OPGAVER = [
         {
             f: "H₂O", navn: "Vand", atomer: [1, 8, 1], sprite: "molekyle_h2o.svg",
-            hint: "Tæl ilts valenselektroner. Hvor mange bruges på de to bindinger til hydrogen - og hvor mange bliver tilbage som frie par?"
+            hint: "Oxygen har 6 valenselektroner. Hvor mange bruges på de to bindinger til hydrogen, og hvor mange bliver tilbage som frie elektronpar?"
         },
         {
             f: "NH₃", navn: "Ammoniak", atomer: [1, 7, 1, 1], sprite: "molekyle_nh3.svg",
-            hint: "Nitrogen har 5 valenselektroner. Tre bruges på bindingerne til hydrogen - hvad sker der med den femte?"
+            hint: "Nitrogen har 5 valenselektroner. Tre bruges på bindingerne til hydrogen. Hvad sker der med de to sidste?"
         },
         {
             f: "Br₂", navn: "Dibrom", atomer: [35, 35], sprite: "molekyle_br2.svg",
-            hint: "Brom har 7 valenselektroner hver. Én binding giver hvert atom del i to elektroner mere - tæl efter, om det rækker til oktetreglen."
+            hint: "Brom har 7 valenselektroner og mangler én. Hvor mange bindinger skal der så være mellem de to bromatomer?"
         },
         {
             f: "CO₂", navn: "Kuldioxid", atomer: [8, 6, 8], sprite: "molekyle_co2.svg",
-            hint: "Prøv at tælle, hvor mange elektroner kulstof når op på med kun enkeltbindinger til begge iltatomer. Er det nok?"
+            hint: "Med to enkeltbindinger har carbon kun 6 elektroner omkring sig. Klik på de fælles elektroner mellem to atomer for at lave en dobbeltbinding."
         },
         {
             f: "CH₄", navn: "Methan", atomer: [6, 1, 1, 1, 1], sprite: "molekyle_ch4.svg",
-            hint: "Kulstof har 4 valenselektroner og danner 4 bindinger. Bliver der noget tilbage til frie par?"
+            hint: "Carbon har 4 valenselektroner og danner 4 bindinger. Bliver der nogen elektroner tilbage til frie elektronpar?"
         },
         {
             f: "HCN", navn: "Blåsyre", atomer: [1, 6, 7], sprite: "molekyle_hcn.svg",
-            hint: "Kulstof skal i alt bruge 4 elektroner på bindinger. Én går til hydrogen - hvor stærk skal bindingen til nitrogen så være?"
+            hint: "Carbon skal have 4 bindinger i alt, og én går til hydrogen. Hvor mange skal der så være til nitrogen? Klik flere gange på de fælles elektroner for at lave flere bindinger."
         },
         {
             f: "N₂", navn: "Kvælstof", atomer: [7, 7], sprite: "molekyle_n2.svg",
-            hint: "Nitrogen har 5 valenselektroner. Med kun én binding mangler der elektroner i oktetten - prøv en stærkere binding."
+            hint: "Nitrogen har 5 valenselektroner og mangler 3. Hvor mange elektronpar skal de to nitrogenatomer dele?"
         },
         {
             f: "CH₂O", navn: "Formaldehyd", atomer: [8, 6, 1, 1], sprite: "molekyle_ch2o.svg",
-            hint: "Kulstof skal bruge 4 elektroner på bindinger i alt. To går til hydrogenatomerne - hvor stærk skal bindingen til ilt så være?"
+            hint: "Carbon skal have 4 bindinger i alt, og to går til hydrogen. Hvor mange skal der så være til oxygen?"
         },
         {
             f: "C₂H₂", navn: "Ethyn", atomer: [1, 6, 6, 1], sprite: "molekyle_c2h2.svg",
-            hint: "Hvert kulstof binder kun til ét hydrogen og det andet kulstof. Hvor stærk skal bindingen mellem de to kulstofatomer være, for at begge kulstofatomer når oktetreglen?"
+            hint: "Hvert carbonatom binder til ét hydrogenatom og til det andet carbonatom. Hvor mange bindinger skal der være mellem de to carbonatomer, før begge har 8 elektroner?"
         }
     ];
 

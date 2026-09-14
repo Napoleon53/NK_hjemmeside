@@ -12,7 +12,7 @@
     var TRIN_KANDIDATER = [
         { sel: "#opgave-menu", tekst: "Vælg molekylet her. Det blå felt er den opgave, du er i gang med, og grøn skrift betyder, at opgaven er løst." },
         { sel: "#opsaetning-overlay", tekst: "Find atomet i det periodiske system, og klik på den firkant, der viser antallet af elektroner i dets yderste skal (valenselektroner)." },
-        { sel: "footer", tekst: "Træk atomerne sammen for at danne bindinger. Klik på en binding for at skifte mellem enkelt-, dobbelt- og tripelbinding. Sidder du fast, kan du bede om et hint. Tryk \"Tjek svar\", når alle atomer opfylder oktetreglen." }
+        { sel: "footer", tekst: "Træk atomerne sammen for at danne bindinger. Klik på de fælles elektroner mellem to atomer for at skifte mellem enkelt-, dobbelt- og tripelbinding. Sidder du fast, kan du bede om et hint. Tryk \"Tjek svar\", når alle atomer opfylder oktetreglen." }
     ];
 
     var trin = [], trinIdx = 0, baggrund = null, boble = null;
