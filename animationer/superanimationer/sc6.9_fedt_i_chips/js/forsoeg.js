@@ -33,23 +33,23 @@
 
     var TRIN = [
         { id: "afvej", tekst: "Afvej ca. 5 g chips", mark: "pose",
-          hint: "Klik på chipsposen, til vægten viser mellem 4,5 og 5,5 g. Klik så på vejebåden." },
+          hint: "Klik på chipsposen, til vægten viser mellem 4,5 og 5,5 g. Træk så vejebåden hen til morteren." },
         { id: "knus", tekst: "Knus chipsene i morteren", mark: "pistil",
           hint: "Tag fat i pistillen, og bevæg den rundt i morteren, eller hold knappen Knus nede." },
         { id: "overfoer", tekst: "Kom chipsene i bægerglasset", mark: "morter",
           hint: "Klik på morteren." },
         { id: "midl", tekst: "Tilsæt et opløsningsmiddel", mark: "flasker",
-          hint: "Vælg en af de to flasker i stinkskabet." },
+          hint: "Træk en af de to flasker i stinkskabet hen over bægerglasset." },
         { id: "roer", tekst: "Rør rundt", mark: "stav",
           hint: "Tag fat i glasstaven, og rør rundt, eller hold knappen Rør rundt nede. Følg med i luppen." },
         { id: "vejTom", tekst: "Vej den tomme petriskål", mark: "skaal",
-          hint: "Klik på petriskålen ved siden af vægten." },
+          hint: "Træk petriskålen hen på vægten." },
         { id: "filtrer", tekst: "Filtrer blandingen", mark: "baegerA",
-          hint: "Klik på bægerglasset med blandingen. Petriskålen står under tragten." },
+          hint: "Træk bægerglasset med blandingen hen over tragten. Petriskålen står under tragten." },
         { id: "inddamp", tekst: "Inddamp opløsningsmidlet", mark: "skaal",
-          hint: "Klik på petriskålen under tragten. Den skal varmes op, til al væsken er fordampet." },
+          hint: "Træk petriskålen fra tragten hen på varmepladen. Den skal varmes op, til al væsken er fordampet." },
         { id: "vejRest", tekst: "Vej petriskålen igen", mark: "skaal",
-          hint: "Klik på petriskålen, når al væsken er fordampet, og skålen er kølet af." },
+          hint: "Træk petriskålen hen på vægten, når al væsken er fordampet, og skålen er kølet af." },
         { id: "beregn", tekst: "Beregn fedtindholdet", mark: null,
           hint: "Brug de tre masser i måleskemaet." }
     ];
@@ -98,6 +98,7 @@
 
         this.chips = [];
         this.iLuften = 0;
+        this.chipsIFlugt = 0;
         this.mChips = null;
         this.mB = null;
         this.mBF = null;
@@ -105,6 +106,8 @@
         this.krummerUd = 0;
         this.skaalMasse = M.afrund(r(M.SKAAL.min, M.SKAAL.max), 2);
         this.antalForkerte = 0;
+        this.vandAdvaret = false;
+        this.traekMaal = null;
 
         this.knust = 0;
         this.knusVej = 0;
@@ -361,12 +364,17 @@
         }
         var m = M.afrund(r(M.AFVEJ.chipMin, M.AFVEJ.chipMax), 2);
         var pose = this.g.pose.p, baad = this.g.vejebaad.p;
+        /* Chips i luften taelles som heltal. Summen af masserne alene gaar
+           ikke altid tilbage til praecis 0 og ville spaerre vejebaaden. */
         this.iLuften += m;
+        this.chipsIFlugt++;
         this.flyvende.push({
             chip: true, x: pose.x + r(-8, 8), y: pose.y - 4, a: r(0, 6), va: r(-8, 8), s: 1,
             fra: { x: pose.x, y: pose.y - 4 }, til: { x: baad.x + r(-12, 12), y: baad.y - 8 }, t: 0, varighed: 0.5,
             vedLanding: function () {
                 this.iLuften -= m;
+                this.chipsIFlugt--;
+                if (this.chipsIFlugt <= 0) { this.chipsIFlugt = 0; this.iLuften = 0; }
                 this.chips.push({ m: m, dx: r(-16, 16), dy: -4 - this.chips.length * 1.6, a: r(-0.6, 0.6), s: r(0.8, 1) });
                 if (NK.Lyd) NK.Lyd.tik();
                 this.aendret("chip");
@@ -378,7 +386,7 @@
 
     P.klikVejebaad = function () {
         if (this.gjort.afvej) { this.besked("Vejebåden er tom."); return false; }
-        if (this.iLuften > 0) return false;
+        if (this.chipsIFlugt > 0) return false;
         var m = M.afrund(this.chipsMasse(), 2);
         if (!this.chips.length) {
             this.besked("Klik på chipsposen for at lægge chips i vejebåden.");
@@ -518,22 +526,146 @@
     };
 
     /* ----- Opløsningsmiddel og roering ------------------------------------ */
+    /* Flaskerne skal traekkes. Et klik fortaeller kun hvorhen. */
     P.klikFlaske = function (navn) {
-        if (!this.gjort.overfoer) { this.besked("Kom chipsene i bægerglasset først."); return false; }
-        if (this.midl && this.midl !== navn) {
-            this.besked("Der er allerede " + M.MIDLER[this.midl].navn.toLowerCase() + " i bægerglasset.");
-            return false;
-        }
-        if (this.midl && this.gjort.filtrer) {
-            if (this.skyllet) { this.besked("Filteret er skyllet."); return false; }
-            if (this.g.skaal.sted !== "tragt") { this.besked("Petriskålen er flyttet fra tragten."); return false; }
-            if (this.tragt.areal > 20) return false;
-            this.skyl();
+        if (this.midl === navn && this.gjort.filtrer && !this.skyllet) this.besked("Træk flasken hen over tragten for at skylle filteret.");
+        else this.besked("Træk flasken hen over bægerglasset.");
+        return false;
+    };
+
+    P.slipFlaske = function (navn, maal) {
+        if (maal === "baegerA") {
+            if (!this.gjort.overfoer) { this.besked("Kom chipsene i bægerglasset først."); return false; }
+            if (this.gjort.filtrer) { this.besked("Bægerglasset er tomt. Filteret skylles ved at trække flasken hen over tragten."); return false; }
+            if (this.midl && this.midl !== navn) {
+                this.besked("Der er allerede " + M.MIDLER[this.midl].navn.toLowerCase() + " i bægerglasset.");
+                return false;
+            }
+            if (this.midl) { this.besked("Der er opløsningsmiddel nok i bægerglasset. Rør rundt."); this.markér("stav", 3); return false; }
+            this.haeldMidl(navn, M.VOLUMEN);
             return true;
         }
-        if (this.midl) { this.besked("Der er opløsningsmiddel nok i bægerglasset. Rør rundt."); this.markér("stav", 3); return false; }
-        this.haeldMidl(navn, M.VOLUMEN);
+        if (maal === "tragt") {
+            if (this.midl === navn && this.gjort.filtrer && !this.skyllet && this.g.skaal.sted === "tragt" && this.tragt.areal <= 20) {
+                this.skyl();
+                return true;
+            }
+            if (navn === "vand" && this.laererVandITragt) this.laererVandITragt();
+            if (!this.gjort.filtrer) this.besked("Opløsningsmidlet skal i bægerglasset med chipsene.");
+            else if (this.midl !== navn) this.besked("Filteret skal skylles med det samme opløsningsmiddel.", "advarsel");
+            else if (this.skyllet) this.besked("Filteret er skyllet.");
+            else this.besked("Petriskålen skal stå under tragten.");
+            return false;
+        }
+        return false;
+    };
+
+    /* ----- Traek med musen -------------------------------------------------
+       Vejebaaden, flaskerne, baegerglasset og petriskaalen kan traekkes hen
+       til et maal. Zonerne er ellipser om maalets midte; det naermeste gyldige
+       maal vinder. Rektanglerne markeres, mens genstanden holdes over dem. */
+    var MAAL = {
+        morter:  { x: S.MORTER.midt, y: 450, rx: 72, ry: 72 },
+        baegerA: { x: S.A_MIDT, y: 430, rx: 62, ry: 95 },
+        tragt:   { x: S.TRAGT.x, y: 385, rx: 58, ry: 95 },
+        vaegt:   { x: S.VAEGT.midt, y: 440, rx: 85, ry: 75 },
+        plade:   { x: S.PLADE.midt, y: 450, rx: 58, ry: 75 },
+        trefod:  { x: S.TREFOD.x, y: 400, rx: 52, ry: 85 }
+    };
+    NK.TRAEKREKT = {
+        morter:  { x: S.MORTER.midt - 52, y: 440, b: 104, h: 60 },
+        baegerA: { x: S.A_MIDT - 38, y: 408, b: 76, h: 92 },
+        tragt:   { x: S.TRAGT.x - 40, y: 352, b: 80, h: 108 },
+        vaegt:   { x: S.VAEGT.x, y: 432, b: 140, h: 68 },
+        plade:   { x: S.PLADE.x, y: S.PLADE.y - 10, b: 90, h: 44 },
+        trefod:  { x: S.TREFOD.x - 38, y: S.TREFOD.top - 4, b: 76, h: S.BORD - S.TREFOD.top + 4 }
+    };
+    var MULIGE = {
+        vejebaad: ["morter"],
+        heptan: ["baegerA", "tragt"],
+        vand: ["baegerA", "tragt"],
+        baegerA: ["tragt"],
+        skaal: ["vaegt", "plade", "trefod"]
+    };
+
+    P.kanTraekke = function (navn) {
+        if (this.handling || this.uheld || this.arbejdKilde || (this.laererOptaget && this.laererOptaget())) return false;
+        var s = this.g.skaal, baad = this.g.vejebaad;
+        switch (navn) {
+            case "vejebaad":
+                return !this.gjort.afvej && this.chips.length > 0 && this.chipsIFlugt === 0 &&
+                    Math.abs(baad.p.x - baad.hjem.x) + Math.abs(baad.p.y - baad.hjem.y) < 2;
+            case "heptan": case "vand":
+                return true;
+            case "baegerA":
+                return !!(this.midl && !this.gjort.filtrer);
+            case "skaal":
+                if (s.sted === "hjem") return !!this.gjort.afvej && this.mB === null;
+                if (s.sted === "tragt") return !!this.gjort.filtrer && this.tragt.areal <= 20;
+                if (s.sted === "trefod") return this.mBF === null && (!!this.gjort.inddamp || !this.braenderTaendt);
+                if (s.sted === "plade") return !!this.gjort.inddamp && this.mBF === null;
+                return false;
+        }
+        return false;
+    };
+
+    P.findMaal = function (navn, pt) {
+        var liste = MULIGE[navn] || [], bedst = null, afst = Infinity;
+        for (var i = 0; i < liste.length; i++) {
+            if (liste[i] === "trefod" && this.braenderVaek) continue;
+            var z = MAAL[liste[i]];
+            var dx = (pt.x - z.x) / z.rx, dy = (pt.y - z.y) / z.ry;
+            var d = dx * dx + dy * dy;
+            if (d <= 1 && d < afst) { afst = d; bedst = liste[i]; }
+        }
+        return bedst;
+    };
+
+    /* Slipper genstanden over et maal. Returnerer, om noget skete. */
+    P.slipTil = function (navn, maal) {
+        switch (navn) {
+            case "vejebaad": return this.slipVejebaad(maal);
+            case "heptan": case "vand": return this.slipFlaske(navn, maal);
+            case "baegerA": return maal === "tragt" ? this.klikBaegerA() : false;
+            case "skaal": return this.slipSkaal(maal);
+        }
+        return false;
+    };
+
+    P.slipVejebaad = function (maal) {
+        if (maal !== "morter" || this.gjort.afvej || this.chipsIFlugt > 0 || !this.chips.length) return false;
+        var m = M.afrund(this.chipsMasse(), 2);
+        if (m > M.AFVEJ.max) { this.besked("Der er for meget i vejebåden. Klik på vejebåden for at lægge en chip tilbage.", "advarsel"); return false; }
+        if (m < M.AFVEJ.min) { this.besked("Vægten skal vise ca. 5 g. Læg flere chips i."); this.markér("pose", 3); return false; }
+        this.overfoerTilMorter(m);
         return true;
+    };
+
+    P.slipSkaal = function (maal) {
+        var s = this.g.skaal;
+        if (!maal) return false;
+        if (s.sted === "hjem") {
+            if (maal !== "vaegt") return false;
+            if (!this.gjort.afvej) { this.besked("Vægten er optaget af vejebåden. Afvej chipsene først."); return false; }
+            this.vejTom();
+            return true;
+        }
+        if (s.sted === "tragt") {
+            if (maal !== "plade" && maal !== "trefod") return false;
+            return this.tilVarme(maal);
+        }
+        if (s.sted === "trefod" && !this.gjort.inddamp) {
+            if (maal !== "plade") return false;
+            return this.tilVarme("plade");
+        }
+        if ((s.sted === "plade" || s.sted === "trefod") && this.gjort.inddamp) {
+            if (maal !== "vaegt") return false;
+            if (s.sted === "trefod" && this.braenderTaendt) { this.besked("Sluk brænderen, og lad skålen køle af."); this.markér("braender", 3); return false; }
+            if (this.temp > 40) { this.besked("Skålen er stadig varm. Vent, til den er kølet af."); return false; }
+            this.vejIgen();
+            return true;
+        }
+        return false;
     };
 
     P.haeldMidl = function (navn, maengde, efter) {
@@ -576,7 +708,7 @@
         if (this.gjort.filtrer) { this.besked("Bægerglasset er tomt."); return false; }
         if (this.roerGrad() < M.ROER.min) { this.besked("Rør rundt først.", "advarsel"); this.markér("stav", 3); return false; }
         if (this.mB === null) { this.besked("Vej først den tomme petriskål. Den skal stå under tragten.", "advarsel"); this.markér("skaal", 3); return false; }
-        if (this.g.skaal.sted !== "tragt") return false;
+        if (this.g.skaal.sted !== "tragt") { this.besked("Petriskålen skal stå under tragten."); return false; }
         this.filtrer();
         return true;
     };
@@ -849,6 +981,12 @@
         this.opdaterHandling(dt);
         this.opdaterArbejde(dt);
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
+
+        /* Paaskeaeg: vandflasken holdt i mere end 1 sekund */
+        var h = this.holdt;
+        if (h && h.navn === "vand" && h.t0 !== undefined && this.tid - h.t0 > 1 && !this.vandAdvaret && this.laererVand) {
+            if (this.laererVand()) this.vandAdvaret = true;
+        }
         if (this.mark) { this.mark.ur -= dt; if (this.mark.ur <= 0) this.mark = null; }
         this.ryk = this.ryk > 0.2 ? this.ryk * (1 - dt * 7) : 0;
 
@@ -1026,6 +1164,7 @@
             this.besked(paaTrefod ? "Al væsken er fordampet. Sluk brænderen, og lad skålen køle af." : "Al væsken er fordampet. Lad skålen køle af.", "god");
             if (NK.Lyd) { NK.Lyd.klik(); NK.Lyd.succes(); }
             this.aendret("inddamp");
+            if (m.id === "vand" && this.laererSalt) this.laererSalt();
         }
     };
 

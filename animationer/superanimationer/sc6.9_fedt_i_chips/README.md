@@ -24,6 +24,11 @@ procent. Resultatet sammenlignes med varedeklarationen på posen (34 g fedt pr.
   petriskål og morter, og et stinkskab med bunsenbrænder på trefod, vand,
   heptan, bægerglas, filtrering og varmeplade. Genstandene bruges ved at klikke
   på dem, og de flyver selv hen og hælder, filtrerer eller stiller sig på vægten.
+* **Træk med musen.** Flaskerne skal trækkes hen over bægerglasset (eller
+  tragten, for at skylle filteret); et klik giver kun en besked. Vejebåden,
+  bægerglasset og petriskålen kan også trækkes derhen, hvor de skal bruges,
+  men kan stadig klikkes. Mens en genstand holdes, markeres målet under den, og
+  slippes den et forkert sted, flyver den tilbage.
 * **Knusning og røring med musen.** Eleven tager fat i pistillen eller
   glasstaven og bevæger musen. Knappen **Knus** eller **Rør rundt** (tasten R)
   gør det samme, så længe den holdes nede. Knuses der meget voldsomt, springer
@@ -31,14 +36,14 @@ procent. Resultatet sammenlignes med varedeklarationen på posen (34 g fedt pr.
 * **Eleven vælger opløsningsmidlet.** Der er ingen forklaring før valget. Med
   vand bliver fedtet i chipsene, og kun saltet opløses; resultatet er omkring
   1 %. Med heptan opløses fedtet.
-* **To varmekilder.** Petriskålen kan stilles på varmepladen (klik på skålen)
-  eller på trefoden over bunsenbrænderen (klik på trefoden). Brænderen tændes og
+* **To varmekilder.** Petriskålen kan trækkes hen på varmepladen (eller klik på
+  skålen) eller på trefoden over bunsenbrænderen (eller klik på trefoden). Brænderen tændes og
   slukkes ved at klikke på den eller på gashanen. Vand kan inddampes over
   brænderen; heptan antændes (se påskeæggene). Står skålen over en tændt
   brænder, skal brænderen slukkes, før skålen kan køle af og vejes.
 * **Tallene afhænger af, hvordan forsøget udføres.** Hvor godt chipsene er
   knust, hvor længe der er rørt, og om filteret skylles med lidt mere
-  opløsningsmiddel (klik på flasken igen efter filtreringen), giver forskellige
+  opløsningsmiddel (træk flasken hen over tragten efter filtreringen), giver forskellige
   resultater. Uden skylning bliver resultatet ca. 29 %, med skylning ca. 32 %.
   Modellen står i `js/model.js`.
 * **Zoomboblen følger indholdet.** Chipsstykker af stivelseskæder med
@@ -79,6 +84,12 @@ kan skifte. Armen drejer om skulderen. Alt står i `js/laerer.js`.
   sarkastisk ("Det er en morter. Ikke et trommesæt."). Replikkerne skifter fra
   gang til gang. Knappen Knus kalder aldrig på læreren.
 * **Lærerens kaffe.** Koppen på hylden. Læreren henter den og drikker.
+* **Vandflasken.** Holdes vandflasken i mere end 1 sekund, kigger læreren ind:
+  "Jeg håber ikke, at du har tænkt dig at hælde det i tragten." Én gang pr.
+  forsøg. Slippes vandet så alligevel over tragten (uden at det er en skylning
+  med vand), svarer læreren igen.
+* **Salt.** Når vand er inddampet, og der kun er salt tilbage, kommer læreren
+  med en sarkastisk bemærkning. Replikkerne skifter fra gang til gang.
 * **Læreren klikkes på.** Stadig kortere svar, rødere i hovedet og til sidst
   damp af ørerne.
 * **Heptan over bunsenbrænderen.** Står heptanfiltratet over en tændt brænder,
@@ -146,7 +157,9 @@ svar.
 
 **Trinene** står i `TRIN` øverst i `js/forsoeg.js` med tekst, hint og hvilken
 genstand hintet markerer. Hvornår et trin er gjort, afgøres i `trinGjort`.
-**Iagttagelserne** står i `IAGTTAGELSER` samme sted.
+**Iagttagelserne** står i `IAGTTAGELSER` samme sted. **Trækzonerne** står i
+`MAAL`, `NK.TRAEKREKT` og `MULIGE` i `js/forsoeg.js`; hvad der sker, når noget
+slippes, afgøres i `slipTil`.
 
 **Koreografierne** (`koer` i `forsoeg.js`) er lister af trin: `flyt` en genstand
 til en positur, vent med `hver` og gør noget undervejs, eller `kald` en

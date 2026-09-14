@@ -453,6 +453,7 @@
 
         if (g.vandAreal > 2) vandNiveau = NK.vaeskeNiveau(verden, g.vandAreal);
         if (g.hexAreal > 2) topNiveau = NK.vaeskeNiveau(verden, g.vandAreal + g.hexAreal);
+        g.niveauTop = topNiveau;
 
         if (topNiveau !== null) S.tegnLag(ctx, verden, topNiveau, vandNiveau === null ? null : vandNiveau + 1, g.hexFarve, { boelge: g.boelge, tid: tid });
         if (vandNiveau !== null) S.tegnLag(ctx, verden, vandNiveau, null, g.vandFarve, { boelge: g.hexAreal > 2 ? (g.boelge || 0) * 0.5 : g.boelge, tid: tid, uklar: g.uklar, uklarFarve: NK.Model.FARVE.bundfald, kant: g.hexAreal > 2 ? 0.45 : 0.3 });
@@ -537,15 +538,15 @@
         return vandNiveau;
     };
 
-    /* pH-strimmel: { x, y, v, farve, dyp (0-1), alfa }. Ankeret er
+    /* pH-strimmel: { p: { x, y, v }, farve, dyp (0-1), alfa }. Ankeret er
        strimlens top; den er 8 bred og 44 lang. */
     S.STRIMMEL = { b: 8, l: 44 };
     S.tegnStrimmel = function (ctx, s) {
         var b = S.STRIMMEL.b, l = S.STRIMMEL.l;
         ctx.save();
         ctx.globalAlpha = NK.klamp(s.alfa === undefined ? 1 : s.alfa, 0, 1);
-        ctx.translate(s.x, s.y);
-        ctx.rotate(s.v || 0);
+        ctx.translate(s.p.x, s.p.y);
+        ctx.rotate(s.p.v || 0);
         ctx.fillStyle = NK.css(NK.Model.FARVE.papir);
         NK.rundtRekt(ctx, -b / 2, 0, b, l, 1.5);
         ctx.fill();

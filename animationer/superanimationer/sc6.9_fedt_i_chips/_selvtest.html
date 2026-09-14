@@ -69,11 +69,11 @@ function koerTest() {
         afvej();
         f.arbejdKnap(true); adv(opt.knusTid || 3.5); f.arbejdKnap(false); adv(0.5);
         f.klik("morter"); adv(5.5);
-        f.klik(opt.midl); adv(4.5);
+        f.slipTil(opt.midl, "baegerA"); adv(4.5);
         f.arbejdKnap(true); adv(opt.roerTid || 6); f.arbejdKnap(false); adv(1);
         f.klik("skaal"); adv(5);
         f.klik("baegerA"); adv(10);
-        if (opt.skyl) { f.klik(opt.midl); adv(8); }
+        if (opt.skyl) { f.slipTil(opt.midl, "tragt"); adv(8); }
     }
     function helt(opt) {
         tilFiltrat(opt);
@@ -116,7 +116,7 @@ function koerTest() {
     overskrift("3. Raekkefoelge");
     nyt();
     paastand("morteren er tom foer afvejning", f.klik("morter") === false);
-    paastand("flaskerne kan ikke bruges foer chipsene er i glasset", f.klik("heptan") === false && !f.midl);
+    paastand("flaskerne kan ikke bruges foer chipsene er i glasset", f.slipTil("heptan", "baegerA") === false && !f.midl);
     paastand("petriskaalen kan ikke vejes, mens vejebaaden staar paa vaegten", f.klik("skaal") === false);
     paastand("vejebaaden uden chips giver ingen overfoersel", f.klik("vejebaad") === false);
     f.klik("pose"); adv(0.8);
@@ -135,9 +135,10 @@ function koerTest() {
     paastand("knust helt", f.knust === 1);
     f.klik("morter"); adv(5.5);
     paastand("chipsene er i baegerglasset, og pistillen staar i morteren igen", f.gjort.overfoer && f.g.baegerA.krummer.length > 10 && Math.abs(f.g.pistil.p.x - f.g.pistil.hjem.x) < 1);
-    f.klik("heptan"); adv(4.5);
+    paastand("et klik paa flasken haelder ikke", f.klik("heptan") === false && !f.midl && !f.handling);
+    f.slipTil("heptan", "baegerA"); adv(4.5);
     paastand("heptanen er haeldt i", f.midl === "heptan" && f.g.baegerA.areal === M.VOLUMEN);
-    paastand("den anden flaske afvises", f.klik("vand") === false);
+    paastand("den anden flaske afvises", f.slipTil("vand", "baegerA") === false);
     paastand("uden roering kan der ikke filtreres", f.roerGrad() < M.ROER.min && f.klik("baegerA") === false);
     f.arbejdKnap(true); adv(2.2); f.arbejdKnap(false); adv(0.5);
     paastand("uden vejet petriskaal kan der ikke filtreres", f.klik("baegerA") === false && !f.handling);
@@ -220,8 +221,10 @@ function koerTest() {
     var knust = helt({ midl: "heptan", knusTid: 1.6 });
     paastand("halvt knuste chips giver mindre og noteres", knust !== null && knust < uden && f.iagttaget.halvknust, knust && komma(knust) + " %");
 
+    var saltFoer = f.antalSalt;
     var vand = helt({ midl: "vand" });
     paastand("vand giver ca. 1 % (salt)", vand !== null && vand > 0.5 && vand < 2, vand && komma(vand) + " %");
+    paastand("inddampet salt: laereren kommer med en bemærkning", f.antalSalt === saltFoer + 1);
     svar(komma(vand));
     paastand("sammenligningen foreslaar et andet opløsningsmiddel", /andet opløsningsmiddel/.test(d.getElementById("sammenligning-tekst").textContent));
 
@@ -259,6 +262,71 @@ function koerTest() {
     paastand("panelet viser Start et nyt forsøg", !d.getElementById("uheld-boks").hidden);
     nyt();
     paastand("nyt forsoeg rydder uheldet, braenderen er stadig vaek", !f.uheld && f.braenderVaek && f.klik("braender") === false && f.klik("trefod") === false);
+
+    overskrift("6b. Traek med musen");
+    function traek(fra, til) {
+        var greb = f.ned(fra);
+        for (var k = 1; k <= 12; k++) {
+            f.flyt({ x: fra.x + (til.x - fra.x) * k / 12, y: fra.y + (til.y - fra.y) * k / 12 }, Date.now());
+            f.opdater(1 / 60);
+        }
+        f.op();
+        return greb;
+    }
+    nyt();
+    for (i = 0; i < 14 && f.chipsMasse() + f.iLuften < 5; i++) { f.klik("pose"); adv(0.15); }
+    adv(1);
+    paastand("chips i luften taelles helt ned til 0", f.chipsIFlugt === 0 && f.iLuften === 0);
+    for (i = 0; i < 10 && f.chipsMasse() > M.AFVEJ.max; i++) { f.klik("vejebaad"); adv(0.7); }
+    for (i = 0; i < 10 && f.chipsMasse() < M.AFVEJ.min; i++) { f.klik("pose"); adv(0.7); }
+    var bp = f.g.vejebaad.p;
+    paastand("vejebaaden rammes ogsaa oven paa chipsbunken", f.hvad({ x: bp.x + 10, y: bp.y - 28 }) === "vejebaad");
+    paastand("vejebaaden kan tages", traek({ x: bp.x, y: bp.y - 6 }, { x: S.MORTER.midt, y: 450 }) === true);
+    adv(4);
+    paastand("traekket hen til morteren: chipsene er haeldt i", f.gjort.afvej && f.mChips !== null);
+    f.arbejdKnap(true); adv(3.5); f.arbejdKnap(false); adv(0.5);
+    f.klik("morter"); adv(5.5);
+    var hp = f.g.heptan.p, hx = hp.x, hy = hp.y + 50;
+    f.ned({ x: hx, y: hy }); f.op(); adv(0.2);
+    paastand("et klik paa flasken giver kun en besked", !f.midl && !f.handling);
+    traek({ x: hx, y: hy }, { x: 300, y: 250 });
+    adv(1);
+    paastand("sluppet et forkert sted flyver flasken hjem", !f.midl && Math.abs(f.g.heptan.p.x - f.g.heptan.hjem.x) < 1);
+    traek({ x: hx, y: hy }, { x: S.A_MIDT, y: 430 });
+    adv(4.5);
+    paastand("traekket hen over baegerglasset: heptanen haeldes i", f.midl === "heptan");
+    f.arbejdKnap(true); adv(6); f.arbejdKnap(false); adv(1);
+    var sp = f.g.skaal.p;
+    traek({ x: sp.x, y: sp.y - 6 }, { x: S.VAEGT.midt, y: 440 });
+    adv(5);
+    paastand("petriskaalen traekkes paa vaegten og vejes", f.mB !== null && f.g.skaal.sted === "tragt");
+    var ap = f.g.baegerA.p;
+    traek({ x: ap.x - 36, y: ap.y + 60 }, { x: S.TRAGT.x, y: 390 });
+    adv(10);
+    paastand("baegerglasset traekkes hen over tragten og filtreres", f.gjort.filtrer);
+    traek({ x: hx, y: hy }, { x: S.TRAGT.x, y: 390 });
+    adv(8);
+    paastand("heptan traekket hen over tragten skyller filteret", f.skyllet);
+    sp = f.g.skaal.p;
+    traek({ x: sp.x, y: sp.y - 6 }, { x: S.PLADE.midt, y: 450 });
+    adv(2);
+    paastand("petriskaalen traekkes paa varmepladen", f.g.skaal.sted === "plade");
+
+    nyt();
+    var vp = f.g.vand.p, vx = vp.x - 20, vy = vp.y + 60;
+    f.ned({ x: vx, y: vy });
+    adv(0.8);
+    paastand("vandflasken holdt under 1 s: ingen laerer", !f.laerer.scene);
+    adv(0.5);
+    paastand("vandflasken holdt over 1 s: laereren kommer", f.laerer.scene && f.laerer.scene.navn === "vand" && f.vandAdvaret);
+    f.op(); adv(0.3);
+    paastand("laereren laaser ikke scenen", !f.laererOptaget());
+    f.slipTil("vand", "tragt");
+    adv(0.2);
+    paastand("vand sluppet over tragten: laereren svarer igen", /præcis det/.test(f.laerer.tale));
+    vent(function () { return !f.laerer.scene; }, 15);
+    f.ned({ x: vx, y: vy }); adv(1.5); f.op();
+    paastand("advarslen kommer kun én gang pr. forsøg", !f.laerer.scene);
 
     overskrift("7. Paaskeaeg");
     nyt();

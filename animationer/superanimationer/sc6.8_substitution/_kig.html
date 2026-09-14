@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>kig</title>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#000} iframe{border:0;width:100%;height:100%;display:block}</style>
+</head>
+<body>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* Midlertidigt: koerer forsoeget frem til et bestemt sted og lader
+   det staa, saa der kan tages et skaermbillede. ?trin=0|1|2|3 */
+var trin = parseInt((location.search.match(/trin=(\d+)/) || [0, 0])[1], 10);
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+function koer() {
+    var NK = document.getElementById("ramme").contentWindow.NK;
+    var f = NK.forsoeg;
+    function adv(sek) { for (var k = 0; k < Math.round(sek * 60); k++) f.opdater(1 / 60); }
+    if (trin === 0) return;
+    f.klik("kontakt");
+    f.klik("bromflaske"); adv(5); f.klik("bromflaske"); adv(5);
+    f.vaelg("glas1"); f.klik("hexan"); adv(4); f.klik("prop1"); adv(1.5);
+    f.rystKnap(true); adv(4); f.rystKnap(false); adv(1);
+    f.klik("lampe"); adv(2);
+    f.vaelg("glas2"); f.klik("hexan"); adv(4); f.klik("prop2"); adv(1.5);
+    f.rystKnap(true); adv(4); f.rystKnap(false); adv(1);
+    if (trin === 1) { f.vaelg("glas1"); adv(6); NK.opdaterPanel(); return; }
+    f.klik("folie"); adv(3);
+    var t = 0; while (!f.gjort.reageret && t < 60) { adv(0.5); t += 0.5; }
+    if (trin === 2) { f.vaelg("glas1"); adv(1); NK.opdaterPanel(); return; }
+    f.vaelg("glas1"); f.klik("phpapir"); adv(6);
+    f.klik("phpapir"); adv(7);
+    f.vaelg("glas1");
+    for (var i = 0; i < 3; i++) { f.klik("agno3"); adv(2.2); }
+    adv(4);
+    for (i = 0; i < 3; i++) { f.klik("agno3"); adv(2.2); }
+    adv(2);
+    f.vaelg("glas1");
+    adv(3);
+    NK.opdaterPanel();
+}
+</script>
+</body>
+</html>

@@ -10,7 +10,7 @@
     var NK = window.NK;
 
     var TUR = [
-        { sel: "#scene", titel: "Laboratoriet", tekst: "Klik på genstandene for at bruge dem. Pistillen og glasstaven kan du tage fat i og bevæge med musen." },
+        { sel: "#scene", titel: "Laboratoriet", tekst: "Klik på genstandene for at bruge dem. Flaskerne, vejebåden, bægerglasset og petriskålen trækkes derhen, hvor de skal bruges. Pistillen og glasstaven bevæges med musen." },
         { sel: "#forloeb-kort", titel: "Forløbet", tekst: "Trinene får flueben, efterhånden som du når dem. Hint hjælper med det trin, du er ved." },
         { sel: "#maal-kort", titel: "Måleskema", tekst: "Vejningerne skrives ind her. Til sidst beregner du fedtindholdet." },
         { sel: "#iagttagelser-kort", titel: "Iagttagelser", tekst: "Det, du ser undervejs, bliver skrevet her." },

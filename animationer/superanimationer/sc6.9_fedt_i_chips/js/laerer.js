@@ -46,6 +46,8 @@
         };
         this.spist = 0;
         this.antalAmok = 0;
+        this.antalSalt = 0;
+        this.saltVenter = false;
         this.poseTaget = false;
     };
 
@@ -233,6 +235,67 @@
         return true;
     };
 
+    /* ----- Vandflasken: holdt i mere end 1 sekund ------------------------ */
+    P.laererVand = function () {
+        var L = this.laerer;
+        if (!L || L.scene || L.spiseHaand) return false;
+        this.laererKoer("vand", [
+            { udtryk: { vrede: 0.5, humoer: -0.3, roed: 0, skeptisk: 1 } },
+            { gaa: 200 },
+            { sig: "Jeg håber ikke, at du har tænkt dig at hælde det i tragten.", vis: 3.4, tid: 3.6 },
+            { udtryk: { skeptisk: 0 } },
+            { gaa: UDE }
+        ], false);
+        return true;
+    };
+
+    /* ... og saa blev vandet alligevel sluppet over tragten */
+    P.laererVandITragt = function () {
+        var L = this.laerer;
+        if (!L) return;
+        if (L.scene && L.scene.navn === "vand") {
+            this.laererSig("Det var lige præcis det, jeg mente.", 2.6);
+            L.roedMaal = 0.5;
+            L.vredeMaal = 1;
+            if (NK.Lyd) NK.Lyd.brum();
+            return;
+        }
+        if (L.scene || L.spiseHaand) return;
+        this.laererKoer("vandTragt", [
+            { udtryk: { vrede: 0.9, humoer: -0.6, roed: 0.4, skeptisk: 0.6 } },
+            { gaa: 200 },
+            { sig: "Vand i tragten. Selvfølgelig.", vis: 2.8, tid: 3.0 },
+            { kald: function () { if (NK.Lyd) NK.Lyd.brum(); } },
+            { udtryk: { skeptisk: 0, roed: 0 } },
+            { gaa: UDE }
+        ], false);
+    };
+
+    /* ----- Salt i petriskaalen efter inddampning af vand ----------------- */
+    var SALT_SVAR = [
+        "Tillykke. Du har udvundet salt af chips med havsalt.",
+        "Salt igen? Det har vi også i kantinen.",
+        "Stadig intet fedt. Men sikke noget salt."
+    ];
+
+    P.laererSalt = function () {
+        var L = this.laerer;
+        if (!L) return false;
+        if (L.scene || L.spiseHaand) { this.saltVenter = true; return false; }
+        this.saltVenter = false;
+        var tekst = SALT_SVAR[this.antalSalt % SALT_SVAR.length];
+        this.antalSalt++;
+        this.laererKoer("salt", [
+            { udtryk: { vrede: 0.3, humoer: 0.3, roed: 0, skeptisk: 1 } },
+            { gaa: 220 },
+            { sig: tekst, vis: 3.4, tid: 3.6 },
+            { kald: function () { if (NK.Lyd) NK.Lyd.brum(); } },
+            { udtryk: { skeptisk: 0 } },
+            { gaa: UDE }
+        ], false);
+        return true;
+    };
+
     /* ----- Ros ---------------------------------------------------------- */
     P.laererRos = function () {
         var L = this.laerer;
@@ -354,6 +417,8 @@
             sc.i++;
             sc.t = 0;
         }
+
+        if (!L.scene && this.saltVenter && !L.spiseHaand) this.laererSalt();
 
         /* Gang */
         var fart = L.loeb ? 820 : 430;

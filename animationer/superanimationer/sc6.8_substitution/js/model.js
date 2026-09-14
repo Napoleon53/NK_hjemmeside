@@ -93,7 +93,7 @@
 
     /* Lysets styrke under lampen, i lokalets lys og i folien. k er
        reaktionens hastighed pr. sekund ved fuldt lys. */
-    var LYS = { lampe: 1, rum: 0.03, folie: 0, k: 0.15, faerdig: 0.95, begyndt: 0.15 };
+    var LYS = { lampe: 1, rum: 0.01, folie: 0, k: 0.15, faerdig: 0.95, begyndt: 0.15, synlig: 0.12 };
 
     /* Fordeling af Br2 mellem vand og hexan. Naesten alt ender i hexanen.
        ryst er farten ved fuld rystning, diffusion uden rystning. */
@@ -103,7 +103,7 @@
        giver fuld rystning. Rystes der voldsommere end KNUS_FART i
        KNUS_TID sekunder, springer proppen af. Anden gang skal der mere
        til, og efter MAKS_UHELD uheld sker det ikke mere. */
-    var RYST = { FULD: 900, KNUS_FART: [2300, 2900], KNUS_TID: [0.7, 0.9], MAKS_UHELD: 2 };
+    var RYST = { FULD: 900, KNUS_FART: [2300, 3600], KNUS_TID: [0.7, 0.9], MAKS_UHELD: 2 };
 
     /* Vaeguret: minutter pr. sekund og starttidspunkt */
     var UR = { minPerSek: 0.5, start: 10 * 60 + 5 };

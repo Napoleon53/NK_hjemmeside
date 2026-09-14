@@ -47,6 +47,10 @@
         }
         if (!g.kaffekop.skjult && S.inden("kaffekop", g.kaffekop.p, g.kaffekop.anker, pt.x, pt.y, 6)) return "kaffekop";
         if (!g.pose.skjult && S.inden("pose", g.pose.p, g.pose.anker, pt.x, pt.y, 4)) return "pose";
+        /* Vejebaaden: ogsaa bunken af chips oven paa den tæller med */
+        var baad = g.vejebaad;
+        var lb = NK.tilLokal(baad.p, baad.anker, pt.x, pt.y);
+        if (lb.x > -12 && lb.x < 76 && lb.y > -36 && lb.y < 24) return "vejebaad";
         if (this.stavSynlig() && pt.y < 412 && afstandTilLinje(pt, this.stav.bund, this.stavTop()) < 9) return "stav";
         if (!this.gjort.overfoer && S.inden("pistil", g.pistil.p, g.pistil.anker, pt.x, pt.y, 8)) return "pistil";
         var navne = ["vejebaad", "morter", "skaal", "baegerA", "heptan", "vand"];
@@ -76,9 +80,16 @@
         if (!optaget && !this.handling && !this.arbejdKilde && !this.uheld) {
             if ((navn === "pistil" && this.kanKnuse()) || (navn === "stav" && this.kanRoere())) {
                 var b = this.stav.bund;
-                this.holdt = { navn: navn, start: pt, sidst: pt, t: Date.now(), flyttet: false, dx: b.x - pt.x, dy: b.y - pt.y };
+                this.holdt = { type: "arbejd", navn: navn, start: pt, sidst: pt, t: Date.now(), flyttet: false, dx: b.x - pt.x, dy: b.y - pt.y };
                 return true;
             }
+        }
+        /* Genstande, der kan traekkes. Uden bevaegelse bliver det et klik. */
+        if (this.kanTraekke(navn)) {
+            var gg = this.g[navn];
+            this.holdt = { type: "traek", navn: navn, start: pt, sidst: pt, flyttet: false, dx: gg.p.x - pt.x, dy: gg.p.y - pt.y,
+                fra: { x: gg.p.x, y: gg.p.y, v: gg.p.v }, t0: this.tid };
+            return true;
         }
         this.klik(navn);
         return false;
@@ -92,6 +103,22 @@
             return;
         }
         if (nu === undefined) nu = Date.now();
+        if (h.type === "traek") {
+            var gt = this.g[h.navn];
+            if (!h.flyttet) {
+                if (Math.abs(pt.x - h.start.x) + Math.abs(pt.y - h.start.y) < 6) return;
+                h.flyttet = true;
+                gt.traekkes = true;
+                if (NK.Lyd) NK.Lyd.klik();
+            }
+            var vx = pt.x - h.sidst.x;
+            h.sidst = pt;
+            gt.p.x = NK.klamp(pt.x + h.dx, 10, S.BREDDE - 10);
+            gt.p.y = NK.klamp(pt.y + h.dy, 120, S.BORD + 30);
+            gt.p.v = NK.lerp(gt.p.v, h.fra.v + NK.klamp(vx * 0.02, -0.3, 0.3), 0.3);
+            this.traekMaal = this.findMaal(h.navn, pt);
+            return;
+        }
         if (!h.flyttet) {
             if (Math.abs(pt.x - h.start.x) + Math.abs(pt.y - h.start.y) < 6) return;
             h.flyttet = true;
@@ -127,6 +154,17 @@
         var h = this.holdt;
         if (!h) return;
         this.holdt = null;
+        if (h.type === "traek") {
+            var gg = this.g[h.navn];
+            var maal = this.traekMaal;
+            this.traekMaal = null;
+            gg.traekkes = false;
+            if (!h.flyttet) { this.klik(h.navn); return; }
+            var ok = maal ? this.slipTil(h.navn, maal) : false;
+            if (!ok && !this.handling) this.koer([{ flyt: gg, til: h.fra, tid: 0.45, loeft: 25 }], "tilbage");
+            this.aendret("slip");
+            return;
+        }
         if (!h.flyttet) { this.klik(h.navn); return; }
         this.stopArbejde();
     };
@@ -143,7 +181,7 @@
         c.addEventListener("pointermove", function (ev) {
             mig.flyt(mig.tilBord(ev), ev.timeStamp || Date.now());
             var hv = mig.hover;
-            var greb = (hv === "pistil" && mig.kanKnuse()) || (hv === "stav" && mig.kanRoere());
+            var greb = (hv === "pistil" && mig.kanKnuse()) || (hv === "stav" && mig.kanRoere()) || (hv && mig.kanTraekke(hv));
             c.style.cursor = mig.holdt ? "grabbing" : (greb ? "grab" : (hv ? "pointer" : "default"));
         });
         c.addEventListener("pointerup", function () { mig.op(); });
@@ -278,8 +316,8 @@
         }
 
         var s = g.skaal;
-        if (s.sted === "hjem" || s.sted === "vaegt") this.tegnS(ctx, tid);
-        else if (s.sted === "flytter") oppe.push(function () { this.tegnS(ctx, tid); });
+        if (s.traekkes || s.sted === "flytter") oppe.push(function () { this.tegnS(ctx, tid); });
+        else if (s.sted === "hjem" || s.sted === "vaegt") this.tegnS(ctx, tid);
 
         /* Morter og pistil. Pistillen staar i morteren; mens den er loeftet
            op, tegnes den foran. */
@@ -307,7 +345,7 @@
         } else {
             S.tegnSeddel(ctx, tid);
         }
-        if (s.sted === "trefod") this.tegnS(ctx, tid);
+        if (s.sted === "trefod" && !s.traekkes) this.tegnS(ctx, tid);
 
         ["vand", "heptan"].forEach(function (navn) {
             var fl = g[navn];
@@ -321,7 +359,7 @@
         if (this.markeret("flasker")) S.tegnMarkering(ctx, { x: 593, y: 380, b: 96, h: 120 }, tid);
 
         NK.Sprites.tegn(ctx, "filterstativ", S.STATIV.x, S.STATIV.y);
-        if (s.sted === "tragt") this.tegnS(ctx, tid);
+        if (s.sted === "tragt" && !s.traekkes) this.tegnS(ctx, tid);
         S.tegnTragt(ctx, this.tragt, tid);
 
         var a = g.baegerA;
@@ -333,7 +371,11 @@
         }
 
         S.tegnVarmeplade(ctx, this.pladeTemp, this.pladeTaendt, tid);
-        if (s.sted === "plade") this.tegnS(ctx, tid);
+        if (s.sted === "plade" && !s.traekkes) this.tegnS(ctx, tid);
+
+        /* Maalet under den genstand, der traekkes */
+        var ht = this.holdt;
+        if (ht && ht.type === "traek" && ht.flyttet && this.traekMaal) S.tegnMarkering(ctx, NK.TRAEKREKT[this.traekMaal], tid);
 
         /* Det, der er i luften */
         for (i = 0; i < oppe.length; i++) oppe[i].call(this);
@@ -360,6 +402,7 @@
             greb = { x: NK.lerp(this.stav.bund.x, st.x, 0.85), y: NK.lerp(this.stav.bund.y, st.y, 0.85) };
             v = Math.atan2(st.x - this.stav.bund.x, this.stav.bund.y - st.y);
         }
+        if (ht && ht.type === "traek" && ht.flyttet) { greb = { x: ht.sidst.x, y: ht.sidst.y + 6 }; v = this.g[ht.navn].p.v; }
         this.haandAlfa = NK.mod(this.haandAlfa, greb ? 1 : 0, 10, 1 / 60);
         if (greb) this.sidsteGreb = { x: greb.x, y: greb.y, v: v };
         if (this.haandAlfa > 0.01 && this.sidsteGreb) {
