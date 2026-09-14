@@ -44,6 +44,8 @@
         return { x: x - f.b / 2 + a.x, y: S.BORD - f.h + a.y, v: 0 };
     }
 
+    S.paaBord = paaBord;
+
     S.HJEM = {
         urglas:     paaBord("urglas", 80),
         bromflaske: paaBord("bromflaske", 190),

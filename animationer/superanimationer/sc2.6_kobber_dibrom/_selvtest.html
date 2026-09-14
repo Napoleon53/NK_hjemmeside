@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest - sc2.6 Kobber og dibrom</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:800px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i animationen og kan slettes.
+
+   Aabner index.html i en iframe og koerer hele forsoeget igennem med
+   de samme funktioner, som klik og rystning bruger: sikkerhedsregler,
+   reaktionen i partikelmodellen (atomer bevares), fordelingen, begge
+   tests, affaldet, paaskeaegget med oprydning, 3 %-chancen, quizzen,
+   sproget og ion-notationen.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+
+window.addEventListener("load", function () { setTimeout(koer, 1800); });
+
+function koer() {
+    try { koerTest(); } catch (e) { fejl++; skriv("UNDTAGELSE: " + e.message + "\n" + e.stack, "fejl"); }
+    vis();
+}
+
+function koerTest() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument;
+    var NK = ramme.contentWindow.NK;
+    var i;
+
+    overskrift("1. Indlaesning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    paastand("forsoeg og quiz er bygget", !!(NK.forsoeg && NK.quiz));
+    Object.keys(NK.Sprites.FILER).forEach(function (n) {
+        paastand("sprite " + n + " er indlaest", NK.Sprites.klar(n));
+    });
+
+    var M = NK.Model, S = NK.Scene, f = NK.forsoeg;
+
+    overskrift("2. Kemien og notationen");
+    ["syntese", "kompleks", "faeldning"].forEach(function (n) {
+        paastand(n + " er afstemt i atomer og ladning", M.afstemt(M.REAKTIONER[n]));
+    });
+    paastand("et forkert skema bliver fanget", !M.afstemt({ venstre: [[1, "Cu"], [1, "Br2"]], hoejre: [[1, "Cu2+"], [1, "Br-"]] }));
+    paastand("Cu + Br₂ → Cu²⁺ + 2 Br⁻", M.ligning(M.REAKTIONER.syntese) === "Cu + Br₂ → Cu²⁺ + 2 Br⁻", M.ligning(M.REAKTIONER.syntese));
+    paastand("Ag⁺ og Br⁻ skrives uden 1", M.formel("Ag+") === "Ag⁺" && M.formel("Br-") === "Br⁻" && M.formel("NO3-") === "NO₃⁻");
+    paastand("etiketterne i zoomboblen har ingen ¹", !/¹/.test(JSON.stringify(NK.Mikro.ETIKET)));
+
+    function adv(sek) { for (var k = 0; k < Math.round(sek * 60); k++) f.opdater(1 / 60); }
+    function frisk() { f.nulstil(); f.tabeChance = 0; NK.opdaterPanel(); }
+    function vent(betingelse, maks) { var t = 0; while (!betingelse() && t < maks) { adv(0.25); t += 0.25; } return t; }
+    function tael(m, type) { return m.antal(type); }
+
+    overskrift("3. Sikkerhed og raekkefoelge");
+    frisk();
+    paastand("bromvand kan ikke aabnes uden udsugning", f.klik("bromflaske") === false && !f.handling);
+    paastand("kontakten taender udsugningen", f.klik("kontakt") === true && f.udsugning);
+    paastand("en tom kolbe kan ikke rystes", f.rystKnap(true) === false && !f.rystKilde);
+    paastand("kobberet kommer i kolben", f.klik("urglas") === true);
+    adv(3);
+    paastand("kobbergitteret har " + NK.Mikro.GITTER + " atomer", f.gjort.kobber && tael(f.mikro.kolbe, "cu") === NK.Mikro.GITTER);
+    paastand("bromvandet haeldes i", f.klik("bromflaske") === true);
+    adv(5);
+    paastand("kolben er fyldt, og der er 6 Br₂", f.gjort.brom && Math.abs(f.g.kolbe.areal - S.KOLBE_FULD) < 1 && tael(f.mikro.kolbe, "br2") + f.mikro.kolbe.haendelser.length === 6);
+    paastand("flasken har laaget paa igen", f.laagT === 0 && !f.handling);
+    paastand("udsugningen kan ikke slukkes med aaben kolbe", f.klik("kontakt") === false && f.udsugning);
+    paastand("uden prop kan kolben ikke rystes", f.rystKnap(true) === false);
+    paastand("uden prop kan kolben ikke haeldes over", f.klik("kolbe") === false);
+    paastand("proppen saettes i", f.klik("prop") === true);
+    adv(1.5);
+    paastand("proppen sidder i kolben", f.g.kolbe.prop && f.g.prop.iKolbe);
+    adv(5);
+    paastand("uden rystning gaar reaktionen langsomt", f.mikro.kolbe.brAndel() > 0.5, f.mikro.kolbe.brAndel().toFixed(2));
+
+    overskrift("4. Rystning og reaktionen");
+    paastand("Ryst kolben starter", f.rystKnap(true) === true && f.rystKilde === "knap");
+    var tid = vent(function () { return f.gjort.reageret; }, 30);
+    paastand("med rystning er al Br₂ brugt inden 20 s", f.gjort.reageret && tid < 20, tid + " s");
+    f.rystKnap(false);
+    adv(3);
+    var mk = f.mikro.kolbe;
+    paastand("6 Cu er blevet til 6 Cu²⁺", tael(mk, "cu") === NK.Mikro.GITTER - 6 && tael(mk, "cu2") === 6, tael(mk, "cu") + " Cu, " + tael(mk, "cu2") + " Cu²⁺");
+    paastand("Br er bevaret: 12 Br⁻ og ingen Br₂", tael(mk, "br") === 12 && tael(mk, "br2") === 0);
+    var ladning = 2 * tael(mk, "cu2") - tael(mk, "br");
+    paastand("opløsningen er neutral", ladning === 0, ladning);
+    paastand("farven er blevet blågrøn", Math.abs(f.kolbeFarve().b - M.FARVE.kobberbromid.b) < 3 && Math.abs(f.kolbeFarve().r - M.FARVE.kobberbromid.r) < 3);
+    paastand("kolben er hjemme igen", f.kolbeHjemme() && !f.rystKilde);
+
+    overskrift("5. Fordeling i reagensglassene");
+    paastand("med prop i kan der ikke haeldes", f.klik("kolbe") === false);
+    f.klik("prop");
+    adv(1.5);
+    paastand("proppen er taget af", !f.g.kolbe.prop);
+    paastand("kolben haeldes over", f.klik("kolbe") === true);
+    adv(7);
+    paastand("fordelt, og kolben er hjemme", f.gjort.fordelt && f.kolbeHjemme() && !f.handling);
+    ["glas1", "glas2"].forEach(function (n) {
+        var m = f.mikro[n];
+        paastand(n + " har 3 Cu²⁺ og 6 Br⁻", tael(m, "cu2") === 3 && tael(m, "br") === 6, tael(m, "cu2") + " / " + tael(m, "br"));
+    });
+    paastand("kobberet blev i kolben uden ioner", tael(mk, "cu") === NK.Mikro.GITTER - 6 && tael(mk, "cu2") === 0 && tael(mk, "br") === 0);
+
+    overskrift("6. Testene");
+    paastand("vasken afvises", f.klik("vask") === false);
+    paastand("affald kan ikke afleveres foer testene", f.klik("dunk") === false);
+    for (i = 0; i < 3; i++) { f.klik("nh3"); adv(1.3); }
+    paastand("NH₃ gik i glas 1 med 3 draaber", f.g.glas1.reagens === "nh3" && f.g.glas1.draaber === 3, f.g.glas1.draaber);
+    vent(function () { return f.gjort.nh3; }, 20);
+    var m1 = f.mikro.glas1;
+    paastand("alle 3 Cu²⁺ har 4 NH₃: moerkeblaa", f.gjort.nh3 && m1.kompleksAndel() === 1);
+    adv(3.5);
+    for (i = 0; i < 3; i++) { f.klik("agno3"); adv(1.3); }
+    paastand("AgNO₃ gik i glas 2 med 3 draaber", f.g.glas2.reagens === "agno3" && f.g.glas2.draaber === 3, f.g.glas2.draaber);
+    vent(function () { return f.gjort.agno3; }, 20);
+    var m2 = f.mikro.glas2;
+    paastand("6 AgBr, ingen Br⁻ eller Ag⁺ tilbage", tael(m2, "agbr") === 6 && tael(m2, "br") === 0 && tael(m2, "ag") === 0);
+    paastand("NO₃⁻ og Cu²⁺ er tilskuerioner", tael(m2, "no3") === 6 && tael(m2, "cu2") === 3);
+    NK.opdaterPanel();
+    paastand("quizzen er laast op", NK.quiz.tilstand === "klar" && !d.getElementById("quiz-knap").hidden);
+    paastand("fem iagttagelser staar i panelet", d.querySelectorAll("#iagttagelse-liste li:not(.tom)").length === 5, d.querySelectorAll("#iagttagelse-liste li").length);
+    adv(3.5);
+    paastand("affaldet afleveres", f.klik("dunk") === true);
+    vent(function () { return f.gjort.affald; }, 20);
+    adv(1);
+    paastand("forsoeget er slut, alle trin er gjort", f.gjort.affald && f.aktueltTrin() === null);
+
+    overskrift("7. Paaskeaegget: kolben tabes");
+    frisk();
+    paastand("standardchancen er 3 %", M.MAENGDE.TABE_CHANCE === 0.03);
+    var gemt = f.vedAendring;
+    f.vedAendring = null;
+    f.tabeChance = M.MAENGDE.TABE_CHANCE;
+    var tabt = 0, N = 40000;
+    for (i = 0; i < N; i++) { f.startRyst("knap"); if (f.tabUr >= 0) tabt++; f.rystKilde = null; }
+    f.tabeChance = 0;
+    f.vedAendring = gemt;
+    paastand("40000 rystninger giver ca. 3 % uheld", tabt / N > 0.027 && tabt / N < 0.033, (100 * tabt / N).toFixed(2) + " %");
+
+    function klarTilRyst() {
+        f.klik("kontakt"); f.klik("urglas"); adv(3); f.klik("bromflaske"); adv(5); f.klik("prop"); adv(1.5);
+    }
+    frisk();
+    klarTilRyst();
+    f.tabeChance = 0;
+    f.rystKnap(true);
+    adv(15);
+    f.rystKnap(false);
+    adv(1);
+    paastand("med chance 0 sker der aldrig uheld", !f.uheld);
+
+    frisk();
+    klarTilRyst();
+    f.tabeChance = 1;
+    f.rystKnap(true);
+    adv(2.5);
+    f.rystKnap(false);
+    var u = f.uheld;
+    paastand("kolben knuses", !!u && !u.falder && f.g.kolbe.skjult);
+    if (!u) return;
+    paastand("skaar, kobber og en pyt med brom", u.skaar.length >= 30 && !!u.pyt && u.pyt.brom);
+    paastand("oprydningen har fire trin", u.trinene.join(",") === "neutraliser,toer,fej,aflever", u.trinene.join(","));
+    paastand("proppen er sprunget af", !f.g.prop.iKolbe && !f.g.kolbe.prop);
+    paastand("udsugningen kan ikke slukkes over bromvandet", f.klik("kontakt") === false);
+    adv(1.5);
+    paastand("andre genstande afvises under oprydningen", f.klik("nh3") === false);
+    paastand("sprayflasken virker", f.klik("spray") === true);
+    adv(3.5);
+    paastand("pytten er uskadeliggjort, trin 2", u.pyt.neutral === 1 && !u.pyt.brom && u.trin === "toer", u.trin);
+    adv(1.5);
+    paastand("koekkenrullen tørrer op", f.klik("papir") === true);
+    adv(4);
+    paastand("pytten er væk, trin 3", u.pyt.vaad === 0 && u.trin === "fej", u.trin);
+    adv(2.5);
+    paastand("kosten fejer", f.klik("kost") === true);
+    adv(6);
+    paastand("alle skaar er i fejebladet, trin 4", u.skaar.every(function (s) { return s.fejet; }) && u.trin === "aflever", u.trin);
+    adv(1.5);
+    paastand("fejebladet toemmes i dunken", f.klik("dunk") === true);
+    adv(6);
+    paastand("ny kolbe staar klar", !f.uheld && !f.g.kolbe.skjult && f.kolbeHjemme() && !f.handling);
+    paastand("nyt kobber, men udsugningen koerer stadig", f.g.urglas.kobber && !f.gjort.kobber && !f.gjort.brom && f.udsugning);
+    paastand("uheldet er talt og noteret", f.antalUheld >= 1 && f.iagttaget.uheld);
+
+    frisk();
+    f.klik("kontakt"); f.klik("urglas"); adv(3); f.klik("prop"); adv(1.5);
+    f.tabeChance = 1;
+    f.rystKnap(true);
+    adv(2.5);
+    f.rystKnap(false);
+    paastand("uden vaeske er der kun to oprydningstrin", !!f.uheld && f.uheld.trinene.join(",") === "fej,aflever", f.uheld && f.uheld.trinene.join(","));
+
+    overskrift("8. Quizzens spoergsmaal");
+    NK.QUIZ.forEach(function (sp, n) {
+        var unikke = sp.valg.filter(function (v, k) { return sp.valg.indexOf(v) === k; }).length === 4;
+        var blandOk = true;
+        for (i = 0; i < 100; i++) {
+            var b = NK.quiz.bland(sp);
+            if (b.valg[b.rigtig] !== sp.valg[sp.rigtig]) blandOk = false;
+        }
+        paastand("spoergsmaal " + (n + 1) + ": fire forskellige svar, blandingen holder styr paa det rigtige",
+            sp.valg.length === 4 && unikke && !!sp.forklaring && blandOk);
+    });
+
+    overskrift("9. Sprog og notation");
+    var tekster = [d.body.textContent];
+    NK.QUIZ.forEach(function (sp) { tekster.push(sp.sp, sp.forklaring, sp.valg.join(" ")); });
+    NK.TRIN.forEach(function (t) { tekster.push(t.tekst, t.hint); });
+    Object.keys(NK.UHELD_TRIN).forEach(function (k) { tekster.push(NK.UHELD_TRIN[k].tekst, NK.UHELD_TRIN[k].hint); });
+    Object.keys(NK.IAGTTAGELSER).forEach(function (k) { tekster.push(NK.IAGTTAGELSER[k].tekst); });
+    var alt = tekster.join(" ");
+    paastand("ingen tankestreger", !/[—–]/.test(alt));
+    paastand("ingen ladning skrevet som 1+ eller 1−", !/[¹][⁺⁻]|[A-Za-z)\]₀-₉]1[+−-]/.test(alt));
+
+    frisk();
+    f.tabeChance = M.MAENGDE.TABE_CHANCE;
+}
+
+function vis() {
+    skriv("\n" + (fejl === 0 ? "ALT OK" : fejl + " FEJL"), fejl === 0 ? "ok" : "fejl");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+</script>
+</body>
+</html>

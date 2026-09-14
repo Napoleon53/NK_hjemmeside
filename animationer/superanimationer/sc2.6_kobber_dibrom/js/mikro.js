@@ -207,6 +207,9 @@
                 var mx = mod.x - p.x, my = mod.y - p.y, md = Math.sqrt(mx * mx + my * my) || 1;
                 p.vx += mx / md * 90 * dt;
                 p.vy += my / md * 90 * dt;
+                p.jagt = (p.jagt || 0) + dt;
+            } else {
+                p.jagt = 0;
             }
             if (ryst > 0.05) p.vy += r(-1, 1.6) * 120 * ryst * dt;
 
@@ -230,9 +233,22 @@
         for (i = 0; i < liste.length; i++) {
             p = liste[i];
             if (p.fast || p.laast || p.vaert || p.type === "agbr") continue;
+
+            /* Sikkerhedsnet: en NH3 eller Ag+, der har soegt sin partner i
+               over 4 s uden at naa frem, reagerer med den naermeste. Saa
+               kan en test aldrig gaa i staa. */
+            if (p.jagt > 4) {
+                var partner = naermeste(liste, p, p.type === "nh3" ? aabenCu : friBr);
+                if (partner) {
+                    if (p.type === "nh3") this.bind(p, partner); else this.faeld(p, partner);
+                    i = -1;
+                    continue;
+                }
+            }
+
             for (j = 0; j < liste.length; j++) {
                 q = liste[j];
-                if (q === p || q.laast || q.vaert) continue;
+                if (q === p || q.laast || q.vaert || q.type === "agbr") continue;
                 var dx = p.x - q.x, dy = p.y - q.y;
                 var min = p.rad + q.rad + 0.5;
                 var dd = dx * dx + dy * dy;
@@ -244,25 +260,14 @@
                     p.koel = 0.25;
                     if (Math.random() < 0.03 + 0.8 * ryst) { this.startReaktion(q, p); break; }
                 }
-                if (p.type === "nh3" && q.type === "cu2" && (!q.ligander || q.ligander.length < 4)) {
-                    q.ligander = q.ligander || [];
-                    p.vaert = q;
-                    p.nr = q.ligander.length;
-                    q.ligander.push(p);
-                    break;
-                }
-                if (p.type === "ag" && q.type === "br") {
-                    var ab = this.ny("agbr", (p.x + q.x) / 2, (p.y + q.y) / 2);
-                    ab.alfa = 1;
-                    ab.plads = this.bund++;
-                    this.blink.push({ x: ab.x, y: ab.y, liv: 1, farve: "255, 240, 170" });
-                    this.fjern(p);
-                    this.fjern(q);
-                    i = -1;
-                    break;
-                }
+                var nh3 = p.type === "nh3" ? p : (q.type === "nh3" ? q : null);
+                var cu2 = p.type === "cu2" ? p : (q.type === "cu2" ? q : null);
+                if (nh3 && cu2 && aabenCu(cu2)) { this.bind(nh3, cu2); break; }
+                var ag = p.type === "ag" ? p : (q.type === "ag" ? q : null);
+                var br = p.type === "br" ? p : (q.type === "br" ? q : null);
+                if (ag && br) { this.faeld(ag, br); i = -1; break; }
 
-                var skub = (min - afst) * (q.fast || q.type === "agbr" ? 1 : 0.5);
+                var skub = (min - afst) * (q.fast ? 1 : 0.5);
                 p.x += ux * skub;
                 p.y += uy * skub;
                 var vn2 = p.vx * ux + p.vy * uy;
@@ -286,6 +291,31 @@
             this.blink[i].liv -= dt * 2.2;
             if (this.blink[i].liv <= 0) this.blink.splice(i, 1);
         }
+    };
+
+    function aabenCu(c) { return c.type === "cu2" && (!c.ligander || c.ligander.length < 4); }
+    function friBr(c) { return c.type === "br"; }
+
+    /* NH3 saetter sig paa en Cu2+ med ledig plads */
+    P.bind = function (nh3, cu2) {
+        cu2.ligander = cu2.ligander || [];
+        if (cu2.ligander.length >= 4) return false;
+        nh3.vaert = cu2;
+        nh3.nr = cu2.ligander.length;
+        nh3.jagt = 0;
+        cu2.ligander.push(nh3);
+        return true;
+    };
+
+    /* Ag+ og Br- danner AgBr, der synker til bunds */
+    P.faeld = function (ag, br) {
+        var ab = this.ny("agbr", (ag.x + br.x) / 2, (ag.y + br.y) / 2);
+        ab.alfa = 1;
+        ab.plads = this.bund++;
+        this.blink.push({ x: ab.x, y: ab.y, liv: 1, farve: "255, 240, 170" });
+        this.fjern(ag);
+        this.fjern(br);
+        return true;
     };
 
     P.startReaktion = function (cu, br2) {
