@@ -258,6 +258,16 @@
             color: #ccc;
         }
 
+        .skift-btn.holder {
+            color: #fff;
+        }
+
+        /* Lagdeling: fyld nederst, knaptekst over fyldet, besked øverst */
+        .skift-tekst {
+            position: relative;
+            z-index: 1;
+        }
+
         .sidebar.collapsed .skift-btn {
             display: none;
         }
@@ -277,6 +287,7 @@
 
         .skift-besked {
             right: 0;
+            z-index: 2;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -475,7 +486,7 @@
             <button class="tab-btn" data-beskrivelse="Test din viden i quizzer og spil, der gør kemi-emnerne til en konkurrence." onclick="visKategori(this, 'kemi-c-filer/samling_c_spil.html')" title="Spil"><span class="btn-num">spil</span><span class="btn-text">Spil</span></button>
             <!-- <button class="tab-btn" onclick="visKategori(this, 'samling_b4,5,6.html')" title="B4: Organisk B"><span class="btn-num">B4</span><span class="btn-text">Organisk B</span></button> -->
 
-            <button class="skift-btn" id="skiftKnap" data-href="samling_alt_b.html"><span>Skift til kemi B</span><span class="skift-besked">Hold nede i 1 sekund</span><span class="skift-fyld"></span></button>
+            <button class="skift-btn" id="skiftKnap" data-href="samling_alt_b.html"><span class="skift-tekst">Skift til kemi B</span><span class="skift-besked">Hold nede i 1 sekund</span><span class="skift-fyld"></span></button>
             <button class="tab-btn feedback-btn" data-beskrivelse="Alle animationerne bliver løbende forbedret, og al feedback du sender bliver læst og forsøgt implementeret." onclick="visFeedback()" title="Giv feedback (rettelser eller forslag)"><span class="btn-num">✎</span><span class="btn-text">Feedback</span></button>
 
         </div>
@@ -618,8 +629,10 @@
                 event.preventDefault();
             }
             if (skiftHoldTimer) return;
+            // Beskeden skjules under hold, så knapteksten kan ses bag fyldet.
             clearTimeout(skiftBeskedTimer);
-            skiftKnap.classList.add('vis-besked', 'holder');
+            skiftKnap.classList.remove('vis-besked');
+            skiftKnap.classList.add('holder');
             skiftHoldTimer = setTimeout(function() {
                 window.location.href = skiftKnap.getAttribute('data-href');
             }, 1000);
@@ -630,9 +643,10 @@
             clearTimeout(skiftHoldTimer);
             skiftHoldTimer = null;
             skiftKnap.classList.remove('holder');
+            skiftKnap.classList.add('vis-besked');
             skiftBeskedTimer = setTimeout(function() {
                 skiftKnap.classList.remove('vis-besked');
-            }, 4000);
+            }, 2000);
         }
 
         skiftKnap.addEventListener('pointerdown', startSkift);
