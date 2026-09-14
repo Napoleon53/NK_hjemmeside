@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <!-- Hele holdet stimler sammen foran stinkskabet for at se forsoeget.
+       Bordet i forgrunden staar urydet hen. -->
+  <defs>
+    <linearGradient id="vaeg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9e4e2"/>
+      <stop offset="1" stop-color="#e8efee"/>
+    </linearGradient>
+    <linearGradient id="gulv" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8b3a6"/>
+      <stop offset="1" stop-color="#9d978a"/>
+    </linearGradient>
+    <linearGradient id="bord" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#46555a"/>
+      <stop offset="1" stop-color="#2c373b"/>
+    </linearGradient>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b5d6ea" stop-opacity="0.6"/>
+      <stop offset="0.2" stop-color="#b5d6ea" stop-opacity="0.2"/>
+      <stop offset="0.8" stop-color="#b5d6ea" stop-opacity="0.15"/>
+      <stop offset="1" stop-color="#b5d6ea" stop-opacity="0.5"/>
+    </linearGradient>
+    <linearGradient id="kittel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d7dee1"/>
+      <stop offset="0.45" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#cbd3d6"/>
+    </linearGradient>
+    <linearGradient id="flamme" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#2f6fe0"/>
+      <stop offset="0.6" stop-color="#7fb2ff" stop-opacity="0.8"/>
+      <stop offset="1" stop-color="#bcd7ff" stop-opacity="0.2"/>
+    </linearGradient>
+    <pattern id="fliser" width="120" height="80" patternUnits="userSpaceOnUse" y="300">
+      <rect width="120" height="80" fill="#f4f7f6"/>
+      <path d="M0 1 H120 M0 41 H120 M60 0 V40 M1 40 V80" stroke="#d2dddb" stroke-width="2"/>
+    </pattern>
+    <!-- Elev set bagfra. Foedderne i (0, 0), skuldrene ved y -250. -->
+    <g id="ryg">
+      <rect x="-30" y="-70" width="26" height="70" rx="8" fill="#34495e"/>
+      <rect x="4" y="-70" width="26" height="70" rx="8" fill="#2e4053"/>
+      <path d="M-50 -248 Q0 -262 50 -248 L62 -60 H-62 Z" fill="url(#kittel)" stroke="#aeb9bc" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M0 -130 V-60" stroke="#aeb9bc" stroke-width="3"/>
+      <rect x="-14" y="-272" width="28" height="26" rx="7" fill="#d39a78"/>
+    </g>
+  </defs>
+
+  <rect width="1200" height="430" fill="url(#vaeg)"/>
+  <rect y="300" width="1200" height="130" fill="url(#fliser)"/>
+  <rect y="430" width="1200" height="290" fill="url(#gulv)"/>
+
+  <!-- Stinkskab med forsoeget -->
+  <g>
+    <rect x="400" y="20" width="400" height="420" rx="6" fill="#c9d3d1"/>
+    <rect x="424" y="64" width="352" height="340" fill="#f3f7f2"/>
+    <rect x="424" y="64" width="352" height="20" fill="#fffbe0"/>
+    <path d="M540 250 L562 150 M660 250 L638 150 M548 150 H652" stroke="#3a3f47" stroke-width="7" stroke-linecap="round"/>
+    <path d="M590 250 Q582 214 600 176 Q618 214 610 250 Z" fill="url(#flamme)"/>
+    <path d="M566 94 V140 Q566 148 574 148 H626 Q634 148 634 140 V94 Z" fill="#8cc7ea" fill-opacity="0.5"/>
+    <path d="M560 80 H640 L634 86 V140 Q634 148 626 148 H574 Q566 148 566 140 V86 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="424" y="206" width="352" height="198" fill="#cfe3ef" fill-opacity="0.35" stroke="#9fb1b0" stroke-width="5"/>
+    <rect x="566" y="208" width="68" height="10" rx="4" fill="#8e9a99"/>
+    <rect x="400" y="20" width="400" height="34" rx="6" fill="#b3bfbd"/>
+    <circle cx="768" cy="37" r="7" fill="#2eb04f"/>
+  </g>
+
+  <!-- Baegerglas paa kanten, der bliver skubbet -->
+  <g transform="translate(360 402) rotate(-24)">
+    <path d="M0 0 H60 L55 6 V52 Q55 58 49 58 H11 Q5 58 5 52 V6 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M6 32 V52 Q6 57 11 57 H49 Q54 57 54 52 V32 Z" fill="#e05446" fill-opacity="0.5"/>
+  </g>
+  <g fill="#e05446" fill-opacity="0.6"><circle cx="352" cy="386" r="5"/><circle cx="340" cy="372" r="3.5"/></g>
+
+  <!-- Bageste raekke -->
+  <g transform="translate(360 500) scale(0.8)"><use href="#ryg"/><circle cy="-292" r="34" fill="#1f1a17"/></g>
+  <g transform="translate(452 486) scale(0.8)"><use href="#ryg"/><circle cy="-292" r="34" fill="#c9974a"/></g>
+  <g transform="translate(548 494) scale(0.8)"><use href="#ryg"/><circle cy="-292" r="34" fill="#5b3a24"/></g>
+  <g transform="translate(646 482) scale(0.8)"><use href="#ryg"/><circle cy="-292" r="34" fill="#8a3b22"/></g>
+  <g transform="translate(742 496) scale(0.8)"><use href="#ryg"/><circle cy="-292" r="34" fill="#1f1a17"/></g>
+  <g transform="translate(838 490) scale(0.8)"><use href="#ryg"/><circle cy="-292" r="34" fill="#6b4424"/></g>
+
+  <!-- Mobil i luften, der filmer -->
+  <path d="M676 300 Q690 236 700 190" fill="none" stroke="#f4f6f7" stroke-width="20" stroke-linecap="round"/>
+  <rect x="684" y="138" width="34" height="56" rx="6" fill="#1f2328"/>
+  <rect x="688" y="144" width="26" height="42" rx="3" fill="#3d8fd6"/>
+
+  <!-- Forreste raekke -->
+  <g transform="translate(300 616)"><use href="#ryg"/><circle cy="-292" r="34" fill="#d9a441"/></g>
+  <g transform="translate(424 606)"><use href="#ryg"/><circle cy="-292" r="34" fill="#3b2a20"/></g>
+  <g transform="translate(560 620)"><use href="#ryg"/><circle cy="-292" r="34" fill="#1f1a17"/></g>
+  <g transform="translate(694 604)"><use href="#ryg"/><circle cy="-292" r="34" fill="#9a5b34"/></g>
+  <g transform="translate(830 618)"><use href="#ryg"/><circle cy="-292" r="34" fill="#5b3a24"/></g>
+  <g transform="translate(196 640) scale(0.86)"><use href="#ryg"/><circle cy="-292" r="34" fill="#2b1e18"/></g>
+
+  <!-- Taleboble fra en af de bageste -->
+  <g>
+    <path d="M40 150 H250 Q268 150 268 168 V214 Q268 232 250 232 H200 L220 268 L166 232 H40 Q22 232 22 214 V168 Q22 150 40 150 Z" fill="#ffffff" stroke="#1f2328" stroke-width="4" stroke-linejoin="round"/>
+    <text x="145" y="200" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#1f2328">Jeg kan ikke se!</text>
+  </g>
+
+  <!-- Urydet bord i forgrunden -->
+  <path d="M930 560 H1200 V720 H890 Z" fill="url(#bord)"/>
+  <path d="M930 556 H1200 V566 H928 Z" fill="#56676c"/>
+  <g transform="translate(980 600)">
+    <path d="M0 0 H80 L73 8 V70 Q73 78 65 78 H15 Q7 78 7 70 V8 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M8 50 V70 Q8 77 15 77 H65 Q72 77 72 70 V50 Z" fill="#6b4a2a" fill-opacity="0.6"/>
+  </g>
+  <g transform="translate(1090 590) rotate(8)">
+    <path d="M0 0 H70 L64 7 V62 Q64 70 56 70 H14 Q6 70 6 62 V7 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M7 46 V62 Q7 69 14 69 H56 Q63 69 63 62 V46 Z" fill="#3d8fd6" fill-opacity="0.5"/>
+  </g>
+  <path d="M960 700 q30 -30 60 -10 q30 20 20 -10" fill="none" stroke="#f3f1ea" stroke-width="12" stroke-linecap="round"/>
+</svg>

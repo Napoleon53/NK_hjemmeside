@@ -40,7 +40,7 @@
   <rect y="600" width="1200" height="120" fill="url(#gulv)"/>
 
   <!-- Oejenskylleskilt over vasken -->
-  <g transform="translate(150 170)">
+  <g transform="translate(300 170)">
     <rect x="-56" y="-56" width="112" height="112" rx="8" fill="#ffffff"/>
     <rect x="-50" y="-50" width="100" height="100" rx="5" fill="#1d8a4e"/>
     <path d="M-34 6 Q0 -26 34 6 Q0 36 -34 6 Z" fill="#ffffff"/>
@@ -63,10 +63,12 @@
   </g>
   <rect y="590" width="1200" height="10" fill="#6f7b7a"/>
 
-  <!-- Vask med hane -->
-  <rect x="70" y="424" width="170" height="14" rx="4" fill="#9aa7ab"/>
-  <path d="M150 424 V340 Q150 312 178 312 Q204 312 204 338 V352" fill="none" stroke="#a9b4b8" stroke-width="12" stroke-linecap="round"/>
-  <rect x="134" y="404" width="32" height="20" rx="3" fill="#8e9a9e"/>
+  <!-- Vask med hane, lige ved siden af personen -->
+  <g transform="translate(150 0)">
+    <rect x="70" y="424" width="170" height="14" rx="4" fill="#9aa7ab"/>
+    <path d="M150 424 V340 Q150 312 178 312 Q204 312 204 338 V352" fill="none" stroke="#a9b4b8" stroke-width="12" stroke-linecap="round"/>
+    <rect x="134" y="404" width="32" height="20" rx="3" fill="#8e9a9e"/>
+  </g>
 
   <!-- Baegerglas paa bordet -->
   <g transform="translate(712 336)">

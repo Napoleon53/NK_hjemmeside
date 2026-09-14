@@ -388,7 +388,7 @@
         if (stof === "pb") {
             if (t && t.pb !== null && t.ki === null) { this.besked("Afvej nu samme masse KI."); this.markér("kiGlas"); return false; }
             if (baad.stof === "ki") { this.besked("Hæld først KI fra vejebåden i bægerglasset."); this.markér("vejebaad"); return false; }
-            if (b.pb + baad.masse + M.SPATEL.gram > M.SPATEL.maksPb + 0.004) {
+            if (b.pb + baad.masse + M.SPATEL.gram > M.SPATEL.maksPb + 0.01) {
                 this.besked("Der kan ikke opløses mere Pb(NO₃)₂ i 100 mL vand, selv når det koger.", "advarsel");
                 return false;
             }
@@ -793,20 +793,20 @@
         var top = 126 - M.VAND.mL * 0.46 + 3;
         var fastAndel = NK.klamp(b.fast / 0.08, 0, 1);
 
-        var uklarMaal = b.fast > 1e-6 ? fastAndel * (0.12 + 0.45 * omroer) + (b.blanding > 0 ? 0.35 : 0) + 0.04 : 0;
-        b.uklar = NK.mod(b.uklar, uklarMaal, b.fast > 1e-6 ? 1.2 : 4, dt);
-        var bundMaal = b.fast > 1e-6 ? (1 - omroer) * (1.5 + NK.klamp(b.fast / 0.3, 0, 1) * 7) : 0;
-        b.bundlag = NK.mod(b.bundlag, bundMaal, b.fast > 1e-6 ? 0.5 : 3, dt);
+        var uklarMaal = b.fast > 1e-6 ? Math.min(0.9, 0.2 + 0.7 * fastAndel) * (0.35 + 0.65 * omroer) + (b.blanding > 0 ? 0.3 : 0) : 0;
+        b.uklar = NK.mod(b.uklar, uklarMaal, b.fast > 1e-6 ? 1.5 : 4, dt);
+        var bundMaal = b.fast > 1e-6 ? (1 - omroer) * (2.5 + NK.klamp(b.fast / 0.2, 0, 1) * 10) : 0;
+        b.bundlag = NK.mod(b.bundlag, bundMaal, b.fast > 1e-6 ? 1.2 : 3, dt);
 
         /* Krystallerne */
-        var antal = b.fast > 1e-6 && b.vand && !b.flytter ? Math.min(70, 8 + Math.round(b.fast * 260)) : 0;
+        var antal = b.fast > 1e-6 && b.vand && !b.flytter ? Math.min(80, 16 + Math.round(b.fast * 300)) : 0;
         var levende = 0;
         for (i = 0; i < b.flager.length; i++) if (!b.flager[i].doed) levende++;
         while (levende < antal) {
             var nyBlanding = b.blanding > 0;
             b.flager.push({
                 x: r(14, 98), y: nyBlanding ? r(top, top + 16) : r(top + 6, 116),
-                a: r(0, 6.28), s: r(1.2, 2.7), alfa: 0, fart: r(1.5, 4.5), fase: r(0, 6.28),
+                a: r(0, 6.28), s: r(1.8, 3.6), alfa: 0, fart: r(1.5, 4.5), fase: r(0, 6.28),
                 vy: r(5, 11), rx: r(8, 42), theta: r(0, 6.28), ymaal: r(top + 8, 118)
             });
             levende++;

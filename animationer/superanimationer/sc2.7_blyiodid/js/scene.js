@@ -591,7 +591,7 @@
 
         if (o.vandAreal > 4) {
             niveau = NK.vaeskeNiveau(verden, o.vandAreal);
-            var opt = { boelge: o.boelge || 0, tid: tid, hvirvel: o.hvirvel || 0, uklar: o.uklar, uklarFarve: M.FARVE.pbi2 };
+            var opt = { boelge: o.boelge || 0, tid: tid, hvirvel: o.hvirvel || 0, uklar: o.uklar, uklarFarve: { r: 255, g: 214, b: 58, a: 1 } };
             S.tegnLag(ctx, verden, niveau, M.FARVE.vand, opt);
 
             ctx.save();
@@ -619,10 +619,18 @@
                 ctx.save();
                 ctx.translate(f.x, f.y);
                 ctx.rotate(f.a);
+                ctx.globalAlpha = NK.klamp(f.alfa, 0, 1) * 0.35;
+                ctx.fillStyle = "#ffd84a";
+                ctx.beginPath();
+                ctx.arc(0, 0, f.s * 1.9, 0, Math.PI * 2);
+                ctx.fill();
                 ctx.globalAlpha = NK.klamp(f.alfa, 0, 1);
                 sekskant(ctx, f.s);
-                ctx.fillStyle = "#ffcf2e";
+                ctx.fillStyle = "#ffd22e";
                 ctx.fill();
+                ctx.strokeStyle = "rgba(170, 110, 0, 0.6)";
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
                 var glimt = Math.pow(Math.max(0, Math.sin(tid * f.fart + f.fase)), 12);
                 if (glimt > 0.05) {
                     ctx.globalAlpha = NK.klamp(f.alfa, 0, 1) * glimt;

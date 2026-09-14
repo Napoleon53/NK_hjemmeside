@@ -188,5 +188,65 @@ window.SPOERGSMAAL = [
             { tekst: "D", rigtig: true }
         ],
         kommentar: "Bægerglas, konisk kolbe og reagensglas tåler varme. Et måleglas må ikke varmes op: det kan revne, og målestregerne passer ikke længere."
+    },
+    {
+        billede: "billeder/14_plads.svg",
+        alt: "En hylde med mærkede pladser til kemikalieflasker. Pladsen mærket NaOH er tom, og flasken med natriumhydroxid står ude på bordet ved et brugt bægerglas.",
+        spoergsmaal: "Du er færdig med natriumhydroxiden. Hvordan vil du fortsætte?",
+        svar: [
+            { tekst: "Jeg stiller flasken tilbage på dens plads på hylden.", rigtig: true },
+            { tekst: "Jeg lader den stå. Den næste kan bare lede.", rigtig: false },
+            { tekst: "Jeg stiller den, hvor der er plads. En hylde er en hylde.", rigtig: false },
+            { tekst: "Jeg gemmer den under mit bord, så jeg ved, hvor den er næste gang.", rigtig: false }
+        ],
+        kommentar: "Står flasken et andet sted, finder den næste den ikke eller tager den forkerte. Hver flaske har en fast plads."
+    },
+    {
+        billede: "billeder/15_traengsel.svg",
+        alt: "Hele holdet står tæt samlet foran stinkskabet for at se et forsøg. En elev bagerst kan ikke se noget, en anden filmer med mobilen, og et bord i forgrunden står urydet.",
+        spoergsmaal: "Hele holdet vil se forsøget på én gang. Hvordan vil I fortsætte?",
+        svar: [
+            { tekst: "Vi skiftes til at se forsøget i mindre grupper.", rigtig: true },
+            { tekst: "Nogle rydder op, mens de andre ser forsøget.", rigtig: true },
+            { tekst: "Vi stiller os tættere, så de bagerste kan læne sig ind over de forreste.", rigtig: false },
+            { tekst: "De bagerste hopper, så de også kan se noget.", rigtig: false }
+        ],
+        kommentar: "Femten albuer omkring ét stinkskab vælter glas, og den forreste kan ikke træde tilbage, hvis noget går galt. Del gruppen op, og brug ventetiden til oprydning."
+    },
+    {
+        billede: "billeder/16_spild.svg",
+        alt: "Der er spildt en klar væske på bordet ved en flaske natriumchlorid og en flaske saltsyre. En køkkenrulle står ubrugt, og en arm i kittel er på vej ned i pytten.",
+        spoergsmaal: "Du har spildt lidt natriumchloridopløsning. Hvordan vil du fortsætte?",
+        svar: [
+            { tekst: "Jeg tørrer op med det samme.", rigtig: true },
+            { tekst: "Jeg lader det tørre. Det er bare saltvand.", rigtig: false },
+            { tekst: "Jeg lægger kladdehæftet over, så ingen sætter albuen i det.", rigtig: false },
+            { tekst: "Jeg husker det og siger det til den næste, der bruger bordet.", rigtig: false }
+        ],
+        kommentar: "Ingen kan se, om en klar væske er saltvand eller saltsyre. Alt spild tørres op med det samme, også det ufarlige."
+    },
+    {
+        billede: "billeder/17_handsker.svg",
+        alt: "Øvelsen er ikke gået i gang, og flaskerne er lukkede. Dine hænder har allerede handsker på og holder en mobil, og på bordet ligger en handske pustet op som en ballon med ansigt.",
+        spoergsmaal: "Øvelsen er ikke gået i gang endnu. Hvad skal du være særlig opmærksom på?",
+        svar: [
+            { tekst: "Handskerne skal først på, når der skal arbejdes med kemikalierne.", rigtig: true },
+            { tekst: "Handsker er engangsudstyr, ikke balloner.", rigtig: true },
+            { tekst: "Ingenting. Med handsker på fra start er mobilen også beskyttet.", rigtig: false },
+            { tekst: "At ballonen får et navn, før den bliver sprængt.", rigtig: false }
+        ],
+        kommentar: "Handsker, der har rørt mobil, ansigt og dørhåndtag, flytter kemikalier rundt i stedet for at holde dem væk. Tag dem på, når de skal bruges, og smid dem ud bagefter."
+    },
+    {
+        billede: "billeder/18_hamstre.svg",
+        alt: "Et bord er fyldt med tre stablede vægte, en mur af bægerglas og et glas fuldt af spatler. Hylden til fælles udstyr er tom, og en anden gruppe spørger efter vægtene.",
+        spoergsmaal: "Hvad skal du være særlig opmærksom på?",
+        svar: [
+            { tekst: "Vægtene er fælles og skal stå på hylden, når de ikke bruges.", rigtig: true },
+            { tekst: "Der skal kun hentes det udstyr, gruppen har brug for nu.", rigtig: true },
+            { tekst: "Ingenting. Den, der kommer først, maler først.", rigtig: false },
+            { tekst: "At muren af bægerglas er høj nok til, at ingen kan se vægtene.", rigtig: false }
+        ],
+        kommentar: "Udstyr, der står ubrugt på ét bord, mangler på alle de andre. Fælles ting som vægten hentes, bruges og stilles tilbage."
     }
 ];

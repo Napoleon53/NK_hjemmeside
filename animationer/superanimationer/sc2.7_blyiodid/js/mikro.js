@@ -66,17 +66,26 @@
     };
 
     /* ----- Tilsaetninger ------------------------------------------------ */
+    /* Nye ioner daler ind oppefra og spredes, foer de bevaeger sig frit */
+    P.falderInd = function (type) {
+        var p = this.ny(type, r(-40, 40), r(-90, -78), r(-40, 40), r(50, 80));
+        p.falder = true;
+        p.stop = r(-55, 10);
+        return p;
+    };
+
     P.tilfoejPb = function (portioner) {
         for (var i = 0; i < portioner; i++) {
-            this.ny("pb", r(-34, 34), -92 + r(-3, 3), r(-8, 8), r(55, 75)).falder = true;
-            for (var j = 0; j < 2; j++) this.ny("no3", r(-44, 44), -86 + r(-5, 5), r(-10, 10), r(45, 70)).falder = true;
+            this.falderInd("pb");
+            this.falderInd("no3");
+            this.falderInd("no3");
         }
     };
 
     P.tilfoejKI = function (portioner) {
         for (var i = 0; i < portioner * 2; i++) {
-            this.ny("k", r(-44, 44), -88 + r(-5, 5), r(-10, 10), r(45, 70)).falder = true;
-            this.ny("i", r(-36, 36), -92 + r(-4, 4), r(-8, 8), r(55, 75)).falder = true;
+            this.falderInd("k");
+            this.falderInd("i");
         }
     };
 
@@ -185,7 +194,7 @@
             if (p.falder) {
                 p.y += p.vy * dt;
                 p.x += p.vx * dt;
-                if (p.y > -62) p.falder = false;
+                if (p.y > p.stop) { p.falder = false; p.vy *= 0.3; }
                 continue;
             }
 
@@ -198,10 +207,6 @@
             fart = NK.mod(fart, maal, 2.5, dt);
             p.vx = Math.cos(retning) * fart;
             p.vy = Math.sin(retning) * fart;
-            if (omroer) {
-                p.vx += -p.y * 0.5 * dt;
-                p.vy += p.x * 0.5 * dt;
-            }
 
             p.x += p.vx * dt;
             p.y += p.vy * dt;

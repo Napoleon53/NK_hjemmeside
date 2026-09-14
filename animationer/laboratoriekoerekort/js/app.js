@@ -69,7 +69,7 @@
     /* ---------------------------------------------------------- Sider */
     function visSide(id) {
         ["forside", "proeve", "resultat"].forEach(function (s) { el(s).hidden = s !== id; });
-        window.scrollTo(0, 0);
+        window.scrollTo({ top: 0, behavior: "instant" });   /* sitets style.css ruller ellers blødt */
     }
 
     function start() {
