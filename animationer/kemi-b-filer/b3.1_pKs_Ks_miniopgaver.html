@@ -6,800 +6,1136 @@
     <title>Kemi-Træner: Fra Ks til pKs</title>
     <style>
         :root {
-            --bg:       #0f1115;
-            --panel:    #1a1d24;
-            --main:     #f3f4f6;
-            --muted:    #9ca3af;
-            --blue:     #3b82f6;
-            --green:    #10b981;
-            --red:      #ef4444;
-            --radius:   12px;
+            --bg:         #0f1115;
+            --panel:      #171a21;
+            --panel-2:    #20242d;
+            --kant:       #2b303b;
+            --tekst:      #f3f4f6;
+            --daempet:    #9ca3af;
+            --groen:      #10b981;
+            --roed:       #ef4444;
+            --gul:        #fbbf24;
+            /* Korresponderende syre-basepar, samme farver som c7.1:
+               par 1 = syren og dens base, par 2 = H2O og H3O+ */
+            --par1:       #3498db;
+            --par1-tekst: #74b9ec;
+            --par2:       #9b59b6;
+            --par2-tekst: #c9a0e2;
+            --radius:     12px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        [hidden] { display: none !important; }
 
-        body {
-            background: var(--bg);
-            color: var(--main);
-            min-height: 100vh;
-        }
+        body { background: var(--bg); color: var(--tekst); }
+        button { font: inherit; color: inherit; }
 
-        /* ── HEADER ── */
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: #14161a;
-            padding: 11px 28px;
-            border-bottom: 2px solid #232730;
+        /* Sænket og hævet skrift uden at ændre linjehøjden */
+        sub, sup { font-size: 0.7em; line-height: 0; position: relative; vertical-align: baseline; }
+        sub { bottom: -0.3em; }
+        sup { top: -0.55em; }
+
+        /* ── TOPBJÆLKE ── */
+        .topbar {
             display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-        }
-
-        header h1 { font-size: 1.15rem; color: var(--blue); letter-spacing: 1px; text-transform: uppercase; }
-
-        .stats { display: flex; gap: 14px; }
-        .stat-box {
-            background: rgba(255,255,255,0.05);
-            padding: 5px 13px;
-            border-radius: 8px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            font-size: 0.88rem;
-        }
-        .stat-value { color: var(--green); font-size: 1rem; }
-
-        /* ── PAGE ── */
-        .page {
-            padding: 28px 16px 60px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .column {
-            width: 100%;
-            max-width: 660px;
-            display: flex;
-            flex-direction: column;
             gap: 16px;
+            padding: 9px 20px;
+            background: #14161a;
+            border-bottom: 1px solid var(--kant);
         }
 
-        /* ── CARDS ── */
-        .card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: var(--radius);
-            padding: 20px;
-        }
+        .topbar h1 { font-size: 1.15rem; white-space: nowrap; }
 
-        .step-card {
-            border-left: 3px solid var(--blue);
-            transition: opacity 0.4s, border-left-color 0.3s;
-        }
-
-        .step-card.locked {
-            opacity: 0.28;
-            pointer-events: none;
-        }
-
-        .step-card.done { border-left-color: var(--green); }
-
-        /* ── ACID INFO ── */
-        .acid-display { text-align: center; }
-        .acid-name { font-size: 1.7rem; font-weight: bold; color: white; margin-bottom: 6px; }
-        .acid-formula {
-            display: inline-block;
-            font-size: 1.1rem;
-            color: var(--blue);
-            background: rgba(59,130,246,0.1);
-            padding: 4px 16px;
-            border-radius: 20px;
-        }
-        .acid-subtitle {
-            margin-top: 10px;
-            font-size: 0.85rem;
-            color: var(--muted);
-            font-style: italic;
-        }
-
-        /* ── STEP HEADER ── */
-        .step-header {
+        .trinlinje { display: flex; gap: 4px; list-style: none; }
+        .trinlinje li {
             display: flex;
-            align-items: flex-start;
-            gap: 11px;
-            margin-bottom: 16px;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px 3px 3px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--daempet);
         }
-
-        .step-num {
-            background: var(--blue);
-            color: white;
-            width: 27px;
-            height: 27px;
+        .trinlinje .nr {
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 0.8rem;
             font-weight: bold;
-            font-size: 0.85rem;
-            flex-shrink: 0;
-            margin-top: 2px;
-            transition: background 0.3s;
+            background: var(--panel-2);
+            border: 1px solid var(--kant);
         }
+        .trinlinje li.aktiv { color: var(--tekst); background: rgba(255,255,255,0.06); }
+        .trinlinje li.aktiv .nr { background: var(--tekst); border-color: var(--tekst); color: var(--bg); }
+        .trinlinje li.faerdig .nr { background: var(--groen); border-color: var(--groen); color: white; }
 
-        .step-card.done .step-num { background: var(--green); }
-
-        .step-title { font-size: 1rem; font-weight: bold; line-height: 1.3; }
-        .step-sub { font-size: 0.82rem; color: var(--muted); margin-top: 3px; }
-
-        /* ── REACTION (step 1) ── */
-        .reaction-row {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-            margin: 14px 0;
-            font-size: 1.05rem;
-        }
-
-        .chem-box {
-            font-weight: bold;
-            padding: 5px 11px;
-            border-radius: 6px;
-        }
-
-        .chem-acid  { color: var(--blue);  background: rgba(59,130,246,0.12); }
-        .chem-water { color: #60a5fa;      background: rgba(96,165,250,0.1); }
-        .chem-h3o   { color: var(--green); background: rgba(16,185,129,0.1); }
-        .chem-op    { color: var(--muted); font-size: 1rem; }
-
-        /* ── KS FRACTION (step 2) ── */
-        .fraction-wrap {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
-            margin: 16px 0;
-        }
-
-        .ks-label { font-size: 1.15rem; font-weight: bold; white-space: nowrap; }
-
-        .fraction {
-            display: inline-flex;
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .frac-top {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 0 8px 5px;
-            border-bottom: 2px solid rgba(255,255,255,0.55);
-        }
-
-        .frac-bot {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 5px 8px 0;
-        }
-
-        .frac-dot { color: var(--muted); font-size: 1.1rem; font-weight: bold; }
-
-        /* ── SELECTS ── */
-        .sel {
-            padding: 7px 9px;
-            background: rgba(0,0,0,0.45);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            font-size: 0.96rem;
-            border-radius: 7px;
-            cursor: pointer;
-            transition: border-color 0.2s;
-        }
-
-        .sel:focus { outline: none; border-color: var(--blue); }
-        .sel option { background: var(--panel); }
-
-        /* ── KS GIVEN (step 3) ── */
-        .ks-reveal {
-            background: rgba(139,92,246,0.1);
-            border: 1px solid rgba(139,92,246,0.25);
-            border-radius: 8px;
-            padding: 14px 16px;
-            text-align: center;
-            margin-bottom: 16px;
-        }
-
-        .ks-reveal-label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-        .ks-reveal-value { font-size: 1.25rem; font-weight: bold; color: white; }
-
-        /* ── FORMULA REMINDER ── */
-        .formula-box {
-            background: rgba(59,130,246,0.07);
-            border: 1px solid rgba(59,130,246,0.18);
-            border-radius: 8px;
-            padding: 10px 12px;
-            margin-bottom: 14px;
-        }
-
-        .formula-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-        .formula-main  { font-size: 1.1rem; font-weight: bold; color: var(--blue); text-align: center; margin-bottom: 8px; }
-
-        .btn-hint {
-            width: 100%;
-            text-align: left;
-            background: transparent;
-            border: 1px solid rgba(59,130,246,0.22);
-            color: var(--blue);
-            font-size: 0.85rem;
-            padding: 5px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .btn-hint:hover { background: rgba(59,130,246,0.1); }
-
-        .hint-box {
-            display: none;
-            margin-top: 8px;
-            padding: 8px 10px;
-            background: rgba(0,0,0,0.25);
-            border-radius: 6px;
-        }
-
-        .hint-step {
-            display: flex;
-            gap: 8px;
-            padding: 5px 0;
-            font-size: 0.88rem;
-            line-height: 1.5;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-        }
-
-        .hint-step:last-child { border-bottom: none; }
-        .hint-num { color: var(--blue); font-weight: bold; flex-shrink: 0; min-width: 18px; }
-
-        /* ── pKs INPUT ── */
-        .pks-input-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 14px 0;
-        }
-
-        .pks-input-label { font-size: 1.05rem; font-weight: bold; color: var(--muted); white-space: nowrap; }
-
-        input[type="text"] {
-            width: 110px;
-            padding: 9px 12px;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            font-size: 1.05rem;
-            text-align: center;
-            border-radius: 7px;
-            transition: border-color 0.2s;
-        }
-
-        input[type="text"]:focus { outline: none; border-color: var(--blue); }
-
-        /* ── STRENGTH (step 4) ── */
-        .pks-computed-box {
-            background: rgba(16,185,129,0.1);
-            border-left: 4px solid var(--green);
-            border-radius: 0 8px 8px 0;
-            padding: 10px 14px;
-            margin-bottom: 14px;
-            font-size: 1.05rem;
-        }
-
-        .strength-hints {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 10px;
-        }
-
-        .strength-chip {
+        .stats { display: flex; gap: 8px; }
+        .stat {
             background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 20px;
-            padding: 3px 10px;
-            font-size: 0.78rem;
-            color: var(--muted);
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--daempet);
+            white-space: nowrap;
+        }
+        .stat b { color: var(--tekst); margin-left: 6px; }
+
+        /* ── SIDE ── */
+        .side { max-width: 900px; margin: 0 auto; padding: 12px 16px; }
+
+        /* ── TAVLEN: løsningen bygges op række for række ── */
+        .tavle {
+            position: relative;
+            background: var(--panel);
+            border: 1px solid var(--kant);
+            border-radius: var(--radius);
+            padding: 8px 20px 12px;
         }
 
-        /* ── FEEDBACK ── */
-        .step-feedback {
-            display: none;
-            margin-top: 10px;
-            padding: 9px 12px;
-            border-radius: 7px;
-            font-size: 0.88rem;
-            line-height: 1.5;
+        .syrenavn { position: absolute; top: 8px; left: 18px; font-size: 1.2rem; font-weight: bold; }
+        .syrenavn.over { position: static; margin-top: 4px; }
+
+        .raekke {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 8px;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .skjult { visibility: hidden; opacity: 0; }
+
+        /* Reaktionsskema */
+        .skema { position: relative; flex-wrap: wrap; align-items: flex-start; gap: 0 10px; padding-top: 30px; margin-top: 0; }
+        .skemadel { display: flex; align-items: flex-start; gap: 0 10px; }
+        .bue { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+        .bue.frem { animation: fadeIn 0.5s; }
+        .bue text { fill: #e5e7eb; font-size: 15px; font-weight: 600; }
+
+        .art { display: flex; flex-direction: column; align-items: center; }
+        .formel {
+            height: 40px;
+            line-height: 40px;
+            padding: 0 6px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            white-space: nowrap;
+            border-radius: 8px;
+            transition: color 0.5s;
+        }
+        .tf { font-size: 0.95rem; font-weight: normal; color: var(--daempet); margin-left: 2px; }
+        .formel.slot {
+            min-width: 110px;
+            line-height: 36px;
+            text-align: center;
+            border: 2px dashed #5b6270;
+            color: var(--daempet);
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .formel.slot.fejl { border-color: var(--roed); background: rgba(239,68,68,0.12); }
+
+        .rolle { height: 20px; line-height: 20px; font-size: 0.9rem; visibility: hidden; }
+        .skema.farvet .rolle { visibility: visible; animation: fadeIn 0.5s; }
+        .op  { font-size: 1.5rem; line-height: 40px; color: var(--daempet); }
+        .pil { font-size: 1.6rem; line-height: 40px; padding: 0 4px; }
+
+        .skema.farvet .p1 .formel, .p1 .rolle { color: var(--par1-tekst); }
+        .skema.farvet .p2 .formel, .p2 .rolle { color: var(--par2-tekst); }
+
+        /* Ks-udtryk */
+        .ks { gap: 12px; font-size: 1.3rem; flex-wrap: wrap; }
+        .ks-navn, .ks-vaerdi { white-space: nowrap; font-weight: 600; }
+        .ks-vaerdi { transition: opacity 0.4s; }
+        .brok { display: inline-flex; flex-direction: column; }
+        .taeller, .naevner { display: flex; justify-content: center; align-items: center; gap: 6px; padding: 3px 6px; }
+        .taeller { border-bottom: 2px solid rgba(255,255,255,0.6); }
+        .prik { color: var(--daempet); }
+
+        .plads {
+            min-width: 96px;
+            height: 34px;
+            padding: 0 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: 2px dashed #5b6270;
+            border-radius: 8px;
+            color: var(--daempet);
+            font-size: 1.2rem;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .plads:hover:not(:disabled) { border-color: #8b93a1; }
+        .plads.fyldt { border-style: solid; border-color: #3a404c; background: rgba(255,255,255,0.03); }
+        .plads.aktiv { border-color: var(--tekst); box-shadow: 0 0 0 3px rgba(255,255,255,0.12); }
+        .plads.fejl  { border-color: var(--roed); background: rgba(239,68,68,0.12); }
+        .plads.p1 { color: var(--par1-tekst); }
+        .plads.p2 { color: var(--par2-tekst); }
+        .ks.faerdig .plads { min-width: 0; padding: 0 2px; border-color: transparent; background: none; box-shadow: none; cursor: default; }
+
+        /* pKs */
+        .pks { min-height: 34px; font-size: 1.3rem; font-weight: 600; }
+
+        /* Skala for syrestyrke */
+        .styrke { display: block; max-width: 640px; margin: 10px auto 0; }
+        .skala { position: relative; height: 72px; padding-top: 22px; }
+        .skala-bar { display: flex; height: 30px; border: 1px solid var(--kant); border-radius: 6px; overflow: hidden; }
+        .zone {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            color: var(--daempet);
+            white-space: nowrap;
+            overflow: hidden;
+            background: rgba(255,255,255,0.03);
+        }
+        .zone + .zone { border-left: 1px solid var(--kant); }
+        .zone.aktiv { background: rgba(16,185,129,0.2); color: var(--tekst); font-weight: 600; }
+        .zone.uden-tekst { color: transparent; }
+        .streg { position: absolute; bottom: 0; transform: translateX(-50%); font-size: 0.85rem; color: var(--daempet); }
+
+        /* Markøren er to hak i bjælkens kanter, så den ikke skærer zonenavnet over */
+        .markoer { position: absolute; top: 16px; width: 0; height: 36px; }
+        .markoer::before, .markoer::after { content: ""; position: absolute; left: -1px; width: 2px; background: var(--tekst); }
+        .markoer::before { top: 0; height: 12px; }
+        .markoer::after  { bottom: 0; height: 6px; }
+        .markoer > span {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            transform: translateX(-50%);
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .markoer.venstre > span { transform: translateX(-10px); }
+        .markoer.hoejre > span  { transform: translateX(calc(-100% + 10px)); }
+
+        /* ── ARBEJDSFELT: står altid lige under den række, der arbejdes på ── */
+        .arbejde { margin-top: 14px; }
+        .opgavetekst { font-size: 1.1rem; text-align: center; margin-bottom: 10px; }
+
+        .valg { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+        .brik {
+            min-width: 92px;
+            padding: 5px 14px;
+            background: var(--panel-2);
+            border: 1px solid #3a404c;
+            border-radius: 8px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s, transform 0.1s, opacity 0.2s;
+        }
+        .brik:hover:not(:disabled)  { border-color: #8b93a1; }
+        .brik:active:not(:disabled) { transform: scale(0.97); }
+        .brik.p1 { color: var(--par1-tekst); border-color: rgba(52,152,219,0.5); }
+        .brik.p2 { color: var(--par2-tekst); border-color: rgba(155,89,182,0.5); }
+        .brik.ord { font-size: 1.05rem; padding: 8px 16px; }
+        .brik.traekbar { cursor: grab; touch-action: none; user-select: none; }
+        .brik.forkert { border-color: var(--roed); color: #fca5a5; text-decoration: line-through; opacity: 0.55; cursor: not-allowed; }
+        .brik.rigtig  { border-color: var(--groen); background: rgba(16,185,129,0.15); }
+        .brik:disabled:not(.forkert):not(.rigtig) { opacity: 0.45; cursor: default; }
+
+        /* Træk og slip */
+        .brik.loeftet { opacity: 0.3; }
+        .spoegelse {
+            position: fixed;
+            z-index: 100;
+            margin: 0;
+            pointer-events: none;
+            background: #2a2f3a;
+            box-shadow: 0 10px 24px rgba(0,0,0,0.55);
+        }
+        body.traekker, body.traekker * { cursor: grabbing !important; }
+        .formel.slot.over, .plads.over { border-style: solid; border-color: var(--tekst); background: rgba(255,255,255,0.1); }
+
+        .svarlinje { display: flex; justify-content: center; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: 600; }
+        .svarlinje input {
+            width: 130px;
+            padding: 5px 10px;
+            background: rgba(0,0,0,0.35);
+            border: 1px solid #3a404c;
+            border-radius: 8px;
+            color: var(--tekst);
+            font-size: 1.25rem;
+            text-align: center;
+        }
+        .svarlinje input:focus { outline: none; border-color: var(--tekst); }
+
+        .hint {
+            max-width: 640px;
+            margin: 10px auto 0;
+            padding: 6px 12px;
+            border-left: 3px solid var(--gul);
+            border-radius: 0 6px 6px 0;
+            background: rgba(251,191,36,0.08);
+            color: #fde68a;
             animation: fadeIn 0.3s;
         }
 
-        .step-feedback.ok  { display: block; background: rgba(16,185,129,0.12);  border: 1px solid var(--green); color: #a7f3d0; }
-        .step-feedback.err { display: block; background: rgba(239,68,68,0.12); border: 1px solid var(--red);   color: #fecaca; }
-
-        /* ── BUTTONS ── */
-        .btn-check {
-            width: 100%;
-            margin-top: 12px;
-            padding: 11px;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            cursor: pointer;
-            letter-spacing: 0.5px;
-            transition: all 0.25s;
-            background: linear-gradient(135deg, rgba(59,130,246,0.75), rgba(37,99,235,0.75));
-            color: white;
+        .fod {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid var(--kant);
         }
+        .besked { flex: 1; line-height: 1.4; }
+        .besked.ok   { color: #6ee7b7; }
+        .besked.fejl { color: #fca5a5; }
+        .besked.svar { color: var(--daempet); }
 
-        .btn-check:hover { opacity: 0.85; transform: translateY(-1px); }
-
-        #btn-next {
-            display: none;
-            width: 100%;
-            padding: 13px;
-            border: none;
+        .knap {
+            flex-shrink: 0;
+            min-width: 130px;
+            padding: 9px 20px;
+            background: var(--panel-2);
+            border: 1px solid #454b58;
             border-radius: 8px;
-            font-size: 1.05rem;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.25s;
-            background: linear-gradient(135deg, var(--green) 0%, #059669 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(16,185,129,0.3);
         }
+        .knap:hover { background: #2a2f3a; border-color: #6b7280; }
+        .knap.tjek  { border-color: var(--tekst); }
+        .knap.groen { background: rgba(16,185,129,0.2); border-color: var(--groen); }
+        .knap.groen:hover { background: rgba(16,185,129,0.32); }
 
-        #btn-next:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16,185,129,0.5); }
+        /* Den knap, der er det naturlige næste skridt, banker stille. */
+        .knap.banker { animation: bank 1.7s ease-out infinite; }
+        @keyframes bank {
+            0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); }
+            70%  { box-shadow: 0 0 0 10px rgba(16,185,129,0); }
+            100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+        }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-4px); }
             to   { opacity: 1; transform: translateY(0); }
         }
+
+        @media (max-width: 760px) {
+            .topbar { flex-wrap: wrap; padding: 8px 16px; }
+            .trinlinje .navn { display: none; }
+            .trinlinje li { padding: 3px; }
+            .tavle { padding: 8px 12px 12px; }
+            .formel, .op, .pil { font-size: 1.2rem; }
+            .ks, .pks { font-size: 1.1rem; }
+            .fod { flex-wrap: wrap; }
+        }
     </style>
 </head>
 <body>
 
-<header>
+<header class="topbar">
     <h1>Fra K<sub>s</sub> til pK<sub>s</sub></h1>
+    <ol class="trinlinje" id="trinlinje">
+        <li><span class="nr">1</span><span class="navn">Reaktion</span></li>
+        <li><span class="nr">2</span><span class="navn">K<sub>s</sub></span></li>
+        <li><span class="nr">3</span><span class="navn">pK<sub>s</sub></span></li>
+        <li><span class="nr">4</span><span class="navn">Styrke</span></li>
+    </ol>
     <div class="stats">
-        <div class="stat-box">Streak: <span id="streak-counter" class="stat-value">0</span></div>
-        <div class="stat-box">Point: <span id="score-counter" class="stat-value">0</span></div>
+        <div class="stat">I træk<b id="i-traek">0</b></div>
+        <div class="stat">Point<b id="point">0</b></div>
     </div>
 </header>
 
-<div class="page">
-<div class="column">
+<main class="side">
+    <section class="tavle">
+        <div class="syrenavn" id="syrenavn"></div>
 
-    <!-- ── SYRE-INFO ── -->
-    <div class="card" id="acid-card">
-        <div class="acid-display">
-            <div id="acid-name" class="acid-name">Indlæser...</div>
-            <div id="acid-formula" class="acid-formula">...</div>
-            <div class="acid-subtitle">Gennemfør de fire trin nedenfor</div>
-        </div>
-    </div>
-
-    <!-- ── TRIN 1: Reaktionen ── -->
-    <div class="card step-card" id="step1-card">
-        <div class="step-header">
-            <div class="step-num">1</div>
-            <div>
-                <div class="step-title">Skriv reaktionen</div>
-                <div class="step-sub">Hvad dannes når syren afgiver H⁺ til vand?</div>
+        <!-- ── LØSNINGEN: en række pr. trin ── -->
+        <div class="raekke skema" id="skema">
+            <svg class="bue" id="bue"></svg>
+            <!-- To dele, så skemaet brydes efter pilen på smal skærm -->
+            <div class="skemadel">
+                <div class="art p1" id="art-syre"><span class="formel"></span><span class="rolle">syre 1</span></div>
+                <span class="op">+</span>
+                <div class="art p2" id="art-vand"><span class="formel">H<sub>2</sub>O<span class="tf">(l)</span></span><span class="rolle">base 2</span></div>
+                <span class="pil" id="pil">⇌</span>
+            </div>
+            <div class="skemadel">
+                <div class="art p1" id="art-base"><span class="formel slot">?</span><span class="rolle">base 1</span></div>
+                <span class="op">+</span>
+                <div class="art p2"><span class="formel">H<sub>3</sub>O<sup>+</sup><span class="tf">(aq)</span></span><span class="rolle">syre 2</span></div>
             </div>
         </div>
 
-        <div class="reaction-row">
-            <span class="chem-box chem-acid" id="step1-acid">HA</span>
-            <span class="chem-op">+</span>
-            <span class="chem-box chem-water">H₂O</span>
-            <span class="chem-op">⇌</span>
-            <select class="sel" id="step1-conj">
-                <option value="">-- Vælg produkt --</option>
-            </select>
-            <span class="chem-op">+</span>
-            <span class="chem-box chem-h3o">H₃O⁺</span>
+        <div class="raekke ks" id="ks" hidden>
+            <span class="ks-navn">K<sub>s</sub> =</span>
+            <span class="brok">
+                <span class="taeller">
+                    <button class="plads" data-plads="0" data-slip="plads"></button>
+                    <span class="prik">·</span>
+                    <button class="plads" data-plads="1" data-slip="plads"></button>
+                </span>
+                <span class="naevner">
+                    <button class="plads" data-plads="2" data-slip="plads"></button>
+                </span>
+            </span>
+            <span class="ks-vaerdi skjult" id="ks-vaerdi"></span>
         </div>
 
-        <button class="btn-check" onclick="checkStep1()">Tjek reaktion</button>
-        <div class="step-feedback" id="step1-fb"></div>
-    </div>
+        <div class="raekke pks" id="pks" hidden></div>
 
-    <!-- ── TRIN 2: Ks-udtryk ── -->
-    <div class="card step-card locked" id="step2-card">
-        <div class="step-header">
-            <div class="step-num">2</div>
-            <div>
-                <div class="step-title">Opstil K<sub>s</sub>-udtrykket</div>
-                <div class="step-sub">Produkter i tæller &middot; reaktant i nævner &mdash; H₂O udelades som opløsningsmiddel</div>
+        <div class="raekke styrke" id="styrke" hidden></div>
+
+        <!-- ── ARBEJDSFELT: det aktive trin ── -->
+        <div class="arbejde" id="arbejde">
+            <div class="opgavetekst" id="opgavetekst"></div>
+
+            <div class="valg" id="valg1"></div>
+            <div class="valg" id="valg2" hidden></div>
+            <div class="svarlinje" id="felt3" hidden>
+                <label for="input-pks">pK<sub>s</sub> =</label>
+                <input type="text" id="input-pks" inputmode="decimal" autocomplete="off">
+            </div>
+            <div class="valg" id="valg4" hidden></div>
+
+            <div class="hint" id="hint" hidden></div>
+
+            <div class="fod">
+                <div class="besked" id="besked"></div>
+                <button class="knap" id="knap"></button>
             </div>
         </div>
-
-        <div class="fraction-wrap">
-            <span class="ks-label">K<sub>s</sub> =</span>
-            <div class="fraction">
-                <div class="frac-top">
-                    <select class="sel" id="step2-n1"><option value="">?</option></select>
-                    <span class="frac-dot">&middot;</span>
-                    <select class="sel" id="step2-n2"><option value="">?</option></select>
-                </div>
-                <div class="frac-bot">
-                    <select class="sel" id="step2-d"><option value="">?</option></select>
-                </div>
-            </div>
-        </div>
-
-        <button class="btn-check" onclick="checkStep2()">Tjek K<sub>s</sub>-udtryk</button>
-        <div class="step-feedback" id="step2-fb"></div>
-    </div>
-
-    <!-- ── TRIN 3: Beregn pKs (givet Ks) ── -->
-    <div class="card step-card locked" id="step3-card">
-        <div class="step-header">
-            <div class="step-num">3</div>
-            <div>
-                <div class="step-title">Beregn pK<sub>s</sub></div>
-                <div class="step-sub">Du får nu oplyst K<sub>s</sub>-værdien</div>
-            </div>
-        </div>
-
-        <div class="ks-reveal">
-            <div class="ks-reveal-label">Givet fra måling</div>
-            <div class="ks-reveal-value" id="ks-display">K<sub>s</sub> = &mdash;</div>
-        </div>
-
-        <div class="formula-box">
-            <div class="formula-label">Huskeformel</div>
-            <div class="formula-main">pK<sub>s</sub> = &minus;log<sub>10</sub>(K<sub>s</sub>)</div>
-            <button class="btn-hint" id="hint-btn" onclick="toggleHint()">▶ Vis fremgangsmåde trin for trin</button>
-            <div class="hint-box" id="hint-box"></div>
-        </div>
-
-        <div class="pks-input-row">
-            <span class="pks-input-label">pK<sub>s</sub> =</span>
-            <input type="text" id="input-pks" placeholder="fx 4,76" autocomplete="off">
-        </div>
-
-        <button class="btn-check" onclick="checkStep3()">Tjek pK<sub>s</sub>-beregning</button>
-        <div class="step-feedback" id="step3-fb"></div>
-    </div>
-
-    <!-- ── TRIN 4: Klassificer styrke ── -->
-    <div class="card step-card locked" id="step4-card">
-        <div class="step-header">
-            <div class="step-num">4</div>
-            <div>
-                <div class="step-title">Klassificer syrestyrken</div>
-                <div class="step-sub">Basér det på den pK<sub>s</sub>-værdi du beregnede</div>
-            </div>
-        </div>
-
-        <div class="pks-computed-box">
-            Du beregnede: <strong>pK<sub>s</sub> = <span id="pks-result-display"></span></strong>
-        </div>
-
-        <select class="sel" id="input-strength" style="width:100%">
-            <option value="none">-- Vælg styrke --</option>
-            <option value="stærk">Stærk syre &nbsp;(pKs &lt; 0)</option>
-            <option value="middelstærk">Middelstærk syre &nbsp;(0 &lt; pKs &lt; 4)</option>
-            <option value="svag">Svag syre &nbsp;(4 &lt; pKs &lt; 12)</option>
-            <option value="meget svag">Meget svag syre &nbsp;(pKs &gt; 12)</option>
-        </select>
-
-        <div class="strength-hints">
-            <span class="strength-chip">Stærk: fuldstændig dissociation</span>
-            <span class="strength-chip">Middelstærk: delvis dissociation</span>
-            <span class="strength-chip">Svag: minimal dissociation</span>
-        </div>
-
-        <button class="btn-check" id="btn-check4" onclick="checkStep4()">Tjek klassificering</button>
-        <div class="step-feedback" id="step4-fb"></div>
-    </div>
-
-    <!-- ── NÆSTE OPGAVE ── -->
-    <button id="btn-next" onclick="generateTask()">Næste opgave &nbsp;&#8594;</button>
-
-</div>
-</div>
+    </section>
+</main>
 
 <script>
-    var acidDatabase = [
-        { name: "Saltsyre",     formulaHTML: "HCl",                         formulaUnicode: "HCl",     pKa: -7.0,  strength: "stærk",      conjHTML: "Cl⁻",                     conjUnicode: "Cl⁻" },
-        { name: "Salpetersyre", formulaHTML: "HNO<sub>3</sub>",             formulaUnicode: "HNO₃",    pKa: -1.4,  strength: "stærk",      conjHTML: "NO<sub>3</sub>⁻",         conjUnicode: "NO₃⁻" },
-        { name: "Phosphorsyre", formulaHTML: "H<sub>3</sub>PO<sub>4</sub>", formulaUnicode: "H₃PO₄",  pKa:  2.12, strength: "middelstærk", conjHTML: "H<sub>2</sub>PO<sub>4</sub>⁻", conjUnicode: "H₂PO₄⁻" },
-        { name: "Flussyre",     formulaHTML: "HF",                          formulaUnicode: "HF",      pKa:  3.17, strength: "middelstærk", conjHTML: "F⁻",                      conjUnicode: "F⁻" },
-        { name: "Eddikesyre",   formulaHTML: "CH<sub>3</sub>COOH",          formulaUnicode: "CH₃COOH", pKa:  4.76, strength: "svag",        conjHTML: "CH<sub>3</sub>COO⁻",      conjUnicode: "CH₃COO⁻" },
-        { name: "Kulsyre",      formulaHTML: "H<sub>2</sub>CO<sub>3</sub>", formulaUnicode: "H₂CO₃",  pKa:  6.37, strength: "svag",        conjHTML: "HCO<sub>3</sub>⁻",        conjUnicode: "HCO₃⁻" },
-        { name: "Ammoniumion",  formulaHTML: "NH<sub>4</sub><sup>+</sup>",  formulaUnicode: "NH₄⁺",   pKa:  9.25, strength: "svag",        conjHTML: "NH<sub>3</sub>",           conjUnicode: "NH₃" }
+    /* ────────────────────────────────
+       DATA
+    ──────────────────────────────── */
+    function st(f, q) { return { f: f, q: q || 0 }; }
+
+    var VAND    = st("H2O");
+    var OXONIUM = st("H3O", 1);
+    var HPLUS   = "H<sup>+</sup>";
+    var TF_AQ   = '<span class="tf">(aq)</span>';
+
+    /* Hver syre har sin korresponderende base og tre forkerte bud. Hvert
+       bud svarer til en typisk fejl, som FEJLTEKST giver et konkret svar på. */
+    var SYRER = [
+        { navn: "Saltsyre",            syre: st("HCl"),      base: st("Cl", -1),     pKs: -7.00,
+          fejl: [[st("Cl"), "ladning"], [st("H2Cl", 1), "optag"], [st("OH", -1), "oh"]] },
+        { navn: "Salpetersyre",        syre: st("HNO3"),     base: st("NO3", -1),    pKs: -1.40,
+          fejl: [[st("NO3"), "ladning"], [st("H2NO3", 1), "optag"], [st("OH", -1), "oh"]] },
+        { navn: "Hydrogensulfation",   syre: st("HSO4", -1), base: st("SO4", -2),    pKs:  1.99,
+          fejl: [[st("SO4", -1), "ladning"], [st("H2SO4"), "optag"], [st("HSO4"), "brint"]] },
+        { navn: "Phosphorsyre",        syre: st("H3PO4"),    base: st("H2PO4", -1),  pKs:  2.12,
+          fejl: [[st("H2PO4"), "ladning"], [st("PO4", -3), "flere"], [st("H4PO4", 1), "optag"]] },
+        { navn: "Flussyre",            syre: st("HF"),       base: st("F", -1),      pKs:  3.17,
+          fejl: [[st("F"), "ladning"], [st("H2F", 1), "optag"], [st("OH", -1), "oh"]] },
+        { navn: "Methansyre",          syre: st("HCOOH"),    base: st("HCOO", -1),   pKs:  3.75,
+          fejl: [[st("HCOO"), "ladning"], [st("HCOOH2", 1), "optag"], [st("OH", -1), "oh"]] },
+        { navn: "Eddikesyre",          syre: st("CH3COOH"),  base: st("CH3COO", -1), pKs:  4.76,
+          fejl: [[st("CH3COO"), "ladning"], [st("CH3COOH2", 1), "optag"], [st("OH", -1), "oh"]] },
+        { navn: "Kulsyre",             syre: st("H2CO3"),    base: st("HCO3", -1),   pKs:  6.37,
+          fejl: [[st("HCO3"), "ladning"], [st("CO3", -2), "flere"], [st("H3CO3", 1), "optag"]] },
+        { navn: "Hypochlorsyrling",    syre: st("HClO"),     base: st("ClO", -1),    pKs:  7.53,
+          fejl: [[st("ClO"), "ladning"], [st("H2ClO", 1), "optag"], [st("OH", -1), "oh"]] },
+        { navn: "Ammoniumion",         syre: st("NH4", 1),   base: st("NH3"),        pKs:  9.25,
+          fejl: [[st("NH3", -1), "ladning"], [st("NH4"), "brint"], [st("NH5", 2), "optag"]] },
+        { navn: "Hydrogenphosphation", syre: st("HPO4", -2), base: st("PO4", -3),    pKs: 12.32,
+          fejl: [[st("PO4", -2), "ladning"], [st("H2PO4", -1), "optag"], [st("OH", -1), "oh"]] }
     ];
 
-    var currentTask = null;
-    var score = 0, streak = 0;
+    var FEJLTEKST = {
+        ladning: function ()  { return "Tjek ladningen. " + HPLUS + " tager én positiv ladning med, så ladningen falder med 1."; },
+        brint:   function ()  { return "Tjek antallet af H. Syren afgiver ét H-atom."; },
+        flere:   function ()  { return "Syren afgiver kun én " + HPLUS + " ad gangen."; },
+        optag:   function (s) { return formel(s) + " dannes, hvis syren optager " + HPLUS + ". Her afgiver den " + HPLUS + "."; },
+        oh:      function ()  { return formel(st("OH", -1)) + " dannes, når vand afgiver " + HPLUS + ". Her optager vand " + HPLUS + "."; }
+    };
 
-    function formatDanish(n) { return n.toString().replace(".", ","); }
+    /* Grænser for syrestyrke. En syre hører til den første gruppe,
+       hvis øvre grænse dens pKs ligger under. */
+    var GRAENSER = [
+        { navn: "stærk",       til: 0 },
+        { navn: "middelstærk", til: 4 },
+        { navn: "svag",        til: 12 },
+        { navn: "meget svag",  til: Infinity }
+    ];
+    var STYRKETEKST = [
+        "pK<sub>s</sub> er under 0. En stærk syre reagerer fuldstændigt med vand, så pilen bliver →.",
+        "pK<sub>s</sub> ligger mellem 0 og 4.",
+        "pK<sub>s</sub> ligger mellem 4 og 12.",
+        "pK<sub>s</sub> er over 12."
+    ];
+    var SKALA_MIN = -8, SKALA_MAX = 16;
 
-    function formatKs(ks) {
-        var exp  = Math.floor(Math.log10(Math.abs(ks)));
-        var base = ks / Math.pow(10, exp);
-        return formatDanish(base.toFixed(2)) + " &middot; 10<sup>" + exp + "</sup> M";
-    }
-
-    /* ────────────────────────────────
-       TRIN 1 — Reaktionen
-    ──────────────────────────────── */
-    function populateStep1() {
-        document.getElementById("step1-acid").innerHTML = currentTask.formulaHTML;
-
-        var all = acidDatabase.map(function(a) { return a.conjUnicode; })
-                              .sort(function() { return 0.5 - Math.random(); });
-
-        var sel = document.getElementById("step1-conj");
-        sel.innerHTML = '<option value="">-- Vælg produkt --</option>';
-        all.forEach(function(v) {
-            var o = document.createElement("option");
-            o.value = v; o.textContent = v;
-            sel.appendChild(o);
-        });
-        sel.disabled = false;
-    }
-
-    function checkStep1() {
-        var sel = document.getElementById("step1-conj");
-        var fb  = document.getElementById("step1-fb");
-
-        if (sel.value === currentTask.conjUnicode) {
-            fb.className = "step-feedback ok";
-            fb.innerHTML = "Korrekt! " + currentTask.formulaUnicode + " afgiver H⁺ til vand og danner " +
-                           currentTask.conjUnicode + " som konjugeret base.";
-            sel.disabled = true;
-            markDone("step1-card");
-            unlockCard("step2-card");
-            populateStep2();
-            scrollTo("step2-card");
-        } else {
-            fb.className = "step-feedback err";
-            fb.innerHTML = "Ikke korrekt. Hvad mister " + currentTask.formulaUnicode +
-                           " når det afgiver et H⁺?";
-        }
-    }
+    var OPGAVETEKST = {
+        1: function () { return "Hvad dannes, når " + formel(opg.syre) + " afgiver " + HPLUS + " til vand?"; },
+        2: function () { return "Opstil K<sub>s</sub>-udtrykket. Træk stofferne ind i brøken."; },
+        3: function () { return "Beregn pK<sub>s</sub> ud fra K<sub>s</sub>."; },
+        4: function () { return "Hvor stærk er syren?"; }
+    };
 
     /* ────────────────────────────────
-       TRIN 2 — Ks-udtryk
+       TILSTAND
     ──────────────────────────────── */
-    function populateStep2() {
-        var opts = [currentTask.formulaUnicode, currentTask.conjUnicode, "H₂O", "H₃O⁺"];
-
-        ["step2-n1","step2-n2","step2-d"].forEach(function(id) {
-            var shuffled = opts.slice().sort(function() { return 0.5 - Math.random(); });
-            var sel = document.getElementById(id);
-            sel.innerHTML = '<option value="">?</option>';
-            shuffled.forEach(function(v) {
-                var o = document.createElement("option");
-                o.value = v; o.textContent = v;
-                sel.appendChild(o);
-            });
-            sel.disabled = false;
-        });
-    }
-
-    function checkStep2() {
-        var n1   = document.getElementById("step2-n1").value;
-        var n2   = document.getElementById("step2-n2").value;
-        var den  = document.getElementById("step2-d").value;
-        var fb   = document.getElementById("step2-fb");
-        var conj = currentTask.conjUnicode;
-        var acid = currentTask.formulaUnicode;
-
-        var numOk = (n1 === conj && n2 === "H₃O⁺") || (n1 === "H₃O⁺" && n2 === conj);
-        var denOk = den === acid;
-
-        if (numOk && denOk) {
-            fb.className = "step-feedback ok";
-            fb.innerHTML = "Korrekt! Tæller: [" + conj + "] &middot; [H₃O⁺] &mdash; de to produkter. " +
-                           "Nævner: [" + acid + "] &mdash; reaktanten. " +
-                           "H₂O udelades fordi det er rent opløsningsmiddel (konstant aktivitet &asymp; 1).";
-            ["step2-n1","step2-n2","step2-d"].forEach(function(id) {
-                document.getElementById(id).disabled = true;
-            });
-            markDone("step2-card");
-            unlockCard("step3-card");
-
-            // Reveal Ks value
-            document.getElementById("ks-display").innerHTML = "K<sub>s</sub> = " + formatKs(currentTask.trueKs);
-            scrollTo("step3-card");
-        } else {
-            var msgs = [];
-            if (!numOk) msgs.push("Tælleren skal have de to <em>produkter</em>: " + conj + " og H₃O⁺");
-            if (!denOk) msgs.push("Nævneren skal have <em>reaktanten</em>: " + acid + " (ikke H₂O)");
-            fb.className = "step-feedback err";
-            fb.innerHTML = msgs.join("<br>");
-        }
-    }
-
-    /* ────────────────────────────────
-       TRIN 3 — Beregn pKs
-    ──────────────────────────────── */
-    function toggleHint() {
-        var box = document.getElementById("hint-box");
-        var btn = document.getElementById("hint-btn");
-
-        if (box.style.display !== "block") {
-            var ksFormatted = formatKs(currentTask.trueKs);
-            var ksExp = currentTask.trueKs.toExponential(2).replace("e+","·10^").replace("e-","·10^-").replace("e","·10^");
-            box.innerHTML =
-                '<div class="hint-step"><span class="hint-num">①</span><span>Start med den givne K<sub>s</sub>-værdi: K<sub>s</sub> = ' + ksFormatted + '</span></div>' +
-                '<div class="hint-step"><span class="hint-num">②</span><span>Indsæt i formlen: pK<sub>s</sub> = &minus;log<sub>10</sub>(K<sub>s</sub>)</span></div>' +
-                '<div class="hint-step"><span class="hint-num">③</span><span>Tast på lommeregneren: &minus;log(' + ksExp + ')</span></div>' +
-                '<div class="hint-step"><span class="hint-num">④</span><span>Afrund resultatet til 2 decimaler og opskriv pK<sub>s</sub></span></div>';
-            box.style.display = "block";
-            btn.innerHTML = "▼ Skjul fremgangsmåde";
-        } else {
-            box.style.display = "none";
-            btn.innerHTML = "▶ Vis fremgangsmåde trin for trin";
-        }
-    }
-
-    function checkStep3() {
-        var raw     = document.getElementById("input-pks").value.replace(/\s+/g,"").replace(",",".");
-        var userPks = parseFloat(raw);
-        var fb      = document.getElementById("step3-fb");
-
-        if (isNaN(userPks)) {
-            fb.className = "step-feedback err";
-            fb.innerHTML = "Indtast en talværdi for pK<sub>s</sub>.";
-            return;
-        }
-
-        if (Math.abs(userPks - currentTask.pKa) <= 0.1) {
-            fb.className = "step-feedback ok";
-            fb.innerHTML = "Korrekt! pK<sub>s</sub> = " + formatDanish(currentTask.pKa) +
-                           ". Jo lavere pK<sub>s</sub>, desto stærkere er syren.";
-            document.getElementById("input-pks").disabled = true;
-            markDone("step3-card");
-
-            // Pass pKs value to step 4
-            document.getElementById("pks-result-display").innerHTML = formatDanish(currentTask.pKa);
-
-            unlockCard("step4-card");
-            scrollTo("step4-card");
-        } else {
-            fb.className = "step-feedback err";
-            fb.innerHTML = "Ikke korrekt. Husk: pK<sub>s</sub> = &minus;log<sub>10</sub>(K<sub>s</sub>). " +
-                           "Brug 'Vis fremgangsmåde' for hjælp.";
-        }
-    }
-
-    /* ────────────────────────────────
-       TRIN 4 — Klassificer styrke
-    ──────────────────────────────── */
-    function checkStep4() {
-        var sel = document.getElementById("input-strength");
-        var fb  = document.getElementById("step4-fb");
-
-        if (sel.value === "none") {
-            fb.className = "step-feedback err";
-            fb.innerHTML = "Vælg en syrestyrke fra menuen.";
-            return;
-        }
-
-        if (sel.value !== currentTask.strength) {
-            fb.className = "step-feedback err";
-            fb.innerHTML = "Ikke korrekt. pK<sub>s</sub> = " + formatDanish(currentTask.pKa) +
-                           " — sammenlign med grænserne i menuen.";
-            streak = 0;
-            updateStats();
-            return;
-        }
-
-        var explanations = {
-            "stærk":       "pK<sub>s</sub> = " + formatDanish(currentTask.pKa) + " &lt; 0 — syren er fuldstændig dissocieret i vand.",
-            "middelstærk": "0 &lt; pK<sub>s</sub> = " + formatDanish(currentTask.pKa) + " &lt; 4 — syren er delvist dissocieret.",
-            "svag":        "4 &lt; pK<sub>s</sub> = " + formatDanish(currentTask.pKa) + " &lt; 12 — syren er kun svagt dissocieret.",
-            "meget svag":  "pK<sub>s</sub> = " + formatDanish(currentTask.pKa) + " &gt; 12 — syren reagerer næsten ikke med vand."
-        };
-
-        fb.className = "step-feedback ok";
-        fb.innerHTML = "Korrekt! " + (explanations[currentTask.strength] || "");
-
-        sel.disabled = true;
-        document.getElementById("btn-check4").style.display = "none";
-        markDone("step4-card");
-
-        score += 100 + (streak * 20);
-        streak += 1;
-        updateStats();
-
-        document.getElementById("btn-next").style.display = "block";
-        scrollTo("btn-next");
-    }
+    var opg = null, sidste = -1;
+    var trin = 1;
+    var loest = false;       // det aktive trin er løst eller vist
+    var hintVist = false;    // hint vist i det aktive trin
+    var svarVist = false;    // et svar er vist et sted i opgaven
+    var pladser = [null, null, null], aktivPlads = 0, fejlPladser = [];
+    var ubekraeftet = false; // trin 3: indtastning, der ikke er tjekket
+    var point = 0, iTraek = 0;
 
     /* ────────────────────────────────
        HJÆLPEFUNKTIONER
     ──────────────────────────────── */
-    function markDone(id) { document.getElementById(id).classList.add("done"); }
-    function unlockCard(id) { document.getElementById(id).classList.remove("locked"); }
+    function el(id) { return document.getElementById(id); }
+    function vis(id) { el(id).classList.remove("skjult"); }
+    function skjul(id) { el(id).classList.add("skjult"); }
 
-    function scrollTo(id) {
-        setTimeout(function() {
-            document.getElementById(id).scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 120);
+    function noegle(s) { return s.f + "|" + s.q; }
+    function ens(a, b) { return !!a && !!b && a.f === b.f && a.q === b.q; }
+    function par(s) { return ens(s, VAND) || ens(s, OXONIUM) ? "p2" : "p1"; }
+
+    /* Ladning ±1 skrives som + eller − alene (Na⁺, ikke Na¹⁺) */
+    function ladningHaevet(q) {
+        if (q === 0) return "";
+        var n = Math.abs(q);
+        return "<sup>" + (n === 1 ? "" : n) + (q > 0 ? "+" : "−") + "</sup>";
     }
 
-    function updateStats() {
-        document.getElementById("score-counter").textContent = score;
-        document.getElementById("streak-counter").textContent = streak;
-        document.getElementById("streak-counter").style.color = streak >= 3 ? "#fbbf24" : "var(--green)";
+    function formel(s) { return s.f.replace(/(\d+)/g, "<sub>$1</sub>") + ladningHaevet(s.q); }
+
+    function tal(x, dec) { return x.toFixed(dec).replace(".", ",").replace("-", "−"); }
+    function stort(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
+
+    function ksDele(pKs) {
+        var ks  = Math.pow(10, -pKs);
+        var exp = Math.floor(Math.log10(ks) + 1e-9);
+        var m   = ks / Math.pow(10, exp);
+        if (Number(m.toFixed(2)) >= 10) { m /= 10; exp += 1; }
+        return { m: m, exp: exp };
+    }
+
+    function ksHTML(pKs) {
+        var d = ksDele(pKs);
+        return tal(d.m, 2) + " · 10<sup>" + String(d.exp).replace("-", "−") + "</sup>";
+    }
+
+    function styrkeIndeks(pKs) {
+        for (var i = 0; i < GRAENSER.length; i++) if (pKs < GRAENSER[i].til) return i;
+    }
+
+    function blandet(liste) {
+        var a = liste.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = a[i]; a[i] = a[j]; a[j] = t;
+        }
+        return a;
+    }
+
+    function saetBesked(klasse, html) {
+        el("besked").className = "besked " + klasse;
+        el("besked").innerHTML = html;
+    }
+
+    function lavBrik(klasse, html, klik) {
+        var b = document.createElement("button");
+        b.className = "brik " + klasse;
+        b.innerHTML = html;
+        b.onclick = function () { if (!undertrykKlik) klik(); };
+        return b;
+    }
+
+    /* En ny række skubber arbejdsfeltet ned. Feltet glider på plads, så
+       man kan se, at brikkerne flytter med ned under rækken. */
+    function visRaekke(id) {
+        var felt = el("arbejde");
+        var foer = felt.getBoundingClientRect().top;
+        el(id).hidden = false;
+        var efter = felt.getBoundingClientRect().top;
+        if (efter !== foer && felt.animate) {
+            felt.animate([{ transform: "translateY(" + (foer - efter) + "px)" }, { transform: "none" }],
+                         { duration: 350, easing: "ease-out" });
+        }
     }
 
     /* ────────────────────────────────
-       GENERER NY OPGAVE
+       TRÆK OG SLIP
+       Brikkerne i trin 1 og 2 kan trækkes hen på en plads. Et klik uden
+       bevægelse virker som et almindeligt klik.
     ──────────────────────────────── */
-    function generateTask() {
-        // Reset step cards
-        ["step1-card","step2-card","step3-card","step4-card"].forEach(function(id) {
-            document.getElementById(id).classList.remove("done","locked");
+    var traek = null;
+    var undertrykKlik = false;
+
+    function goerTraekbar(b, slip) {
+        b.classList.add("traekbar");
+        b.slip = slip;
+        b.addEventListener("pointerdown", function (e) {
+            if (b.disabled || e.button !== 0) return;
+            traek = { brik: b, x0: e.clientX, y0: e.clientY, spoegelse: null, maal: null };
+            b.setPointerCapture(e.pointerId);
         });
-        document.getElementById("step2-card").classList.add("locked");
-        document.getElementById("step3-card").classList.add("locked");
-        document.getElementById("step4-card").classList.add("locked");
-
-        // Reset feedbacks
-        ["step1-fb","step2-fb","step3-fb","step4-fb"].forEach(function(id) {
-            var el = document.getElementById(id);
-            el.className = "step-feedback"; el.innerHTML = "";
-        });
-
-        // Reset inputs
-        document.getElementById("step1-conj").value    = "";
-        document.getElementById("step1-conj").disabled = false;
-        ["step2-n1","step2-n2","step2-d"].forEach(function(id) {
-            document.getElementById(id).value    = "";
-            document.getElementById(id).disabled = false;
-        });
-        document.getElementById("input-pks").value    = "";
-        document.getElementById("input-pks").disabled = false;
-        document.getElementById("input-strength").value    = "none";
-        document.getElementById("input-strength").disabled = false;
-
-        // Reset hint
-        document.getElementById("hint-box").style.display = "none";
-        document.getElementById("hint-btn").innerHTML = "▶ Vis fremgangsmåde trin for trin";
-
-        // Reset buttons
-        document.getElementById("btn-next").style.display   = "none";
-        document.getElementById("btn-check4").style.display = "block";
-
-        // Pick acid
-        var idx = Math.floor(Math.random() * acidDatabase.length);
-        currentTask = acidDatabase[idx];
-        currentTask.trueKs = Math.pow(10, -currentTask.pKa);
-
-        document.getElementById("acid-name").innerHTML    = currentTask.name;
-        document.getElementById("acid-formula").innerHTML = currentTask.formulaHTML;
-        document.getElementById("ks-display").innerHTML   = "K<sub>s</sub> = &mdash;";
-
-        populateStep1();
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        b.addEventListener("pointermove", flytTraek);
+        b.addEventListener("pointerup", function () { slutTraek(false); });
+        b.addEventListener("pointercancel", function () { slutTraek(true); });
     }
 
-    window.onload = generateTask;
+    function flytTraek(e) {
+        if (!traek) return;
+        var t = traek;
+
+        if (!t.spoegelse) {
+            if (Math.abs(e.clientX - t.x0) + Math.abs(e.clientY - t.y0) < 6) return;
+            var r = t.brik.getBoundingClientRect();
+            t.dx = t.x0 - r.left;
+            t.dy = t.y0 - r.top;
+            t.spoegelse = t.brik.cloneNode(true);
+            t.spoegelse.classList.add("spoegelse");
+            t.spoegelse.style.width = r.width + "px";
+            document.body.appendChild(t.spoegelse);
+            t.brik.classList.add("loeftet");
+            document.body.classList.add("traekker");
+        }
+
+        t.spoegelse.style.left = (e.clientX - t.dx) + "px";
+        t.spoegelse.style.top  = (e.clientY - t.dy) + "px";
+
+        var under = document.elementFromPoint(e.clientX, e.clientY);
+        var maal = under ? under.closest('[data-slip="' + (trin === 1 ? "base" : "plads") + '"]') : null;
+        if (maal && maal.disabled) maal = null;
+        if (maal !== t.maal) {
+            if (t.maal) t.maal.classList.remove("over");
+            if (maal) maal.classList.add("over");
+            t.maal = maal;
+        }
+    }
+
+    function slutTraek(afbrudt) {
+        if (!traek) return;
+        var t = traek;
+        traek = null;
+        if (!t.spoegelse) return;
+
+        t.spoegelse.remove();
+        t.brik.classList.remove("loeftet");
+        document.body.classList.remove("traekker");
+        if (t.maal) t.maal.classList.remove("over");
+
+        /* Brikken får et klik lige efter slip, som ikke også skal tælle */
+        undertrykKlik = true;
+        setTimeout(function () { undertrykKlik = false; }, 0);
+
+        if (t.maal && !afbrudt) t.brik.slip(t.maal);
+    }
+
+    /* ────────────────────────────────
+       NY OPGAVE
+    ──────────────────────────────── */
+    function nyOpgave(indeks) {
+        if (indeks === undefined) {
+            do { indeks = Math.floor(Math.random() * SYRER.length); } while (indeks === sidste);
+        }
+        sidste = indeks;
+        opg = SYRER[indeks];
+        svarVist = false;
+
+        el("syrenavn").textContent = opg.navn;
+
+        el("skema").classList.remove("farvet");
+        el("bue").innerHTML = "";
+        el("pil").textContent = "⇌";
+        el("art-syre").querySelector(".formel").innerHTML = formel(opg.syre) + TF_AQ;
+        var slot = el("art-base").querySelector(".formel");
+        slot.className = "formel slot";
+        slot.dataset.slip = "base";
+        slot.innerHTML = "?";
+
+        pladser = [null, null, null]; aktivPlads = 0; fejlPladser = [];
+        el("ks").classList.remove("faerdig");
+        el("ks-vaerdi").innerHTML = "= " + ksHTML(opg.pKs) + " M";
+        skjul("ks-vaerdi");
+        el("pks").innerHTML = "<span>pK<sub>s</sub> = −log(" + ksHTML(opg.pKs) + ") = " + tal(opg.pKs, 2) + "</span>";
+        visSkala(false);
+        el("ks").hidden = el("pks").hidden = el("styrke").hidden = true;
+
+        var input = el("input-pks");
+        input.value = "";
+        input.disabled = false;
+        ubekraeftet = false;
+
+        byggValg1();
+        byggValg2();
+        byggValg4();
+        startTrin(1);
+        placerNavn();
+    }
+
+    function startTrin(n) {
+        trin = n; loest = false; hintVist = false;
+
+        el("opgavetekst").innerHTML = OPGAVETEKST[n]();
+        el("valg1").hidden = n !== 1;
+        el("valg2").hidden = n !== 2;
+        el("felt3").hidden = n !== 3;
+        el("valg4").hidden = n !== 4;
+        el("hint").hidden = true;
+        saetBesked("", "");
+
+        if (n === 2) { tegnPladser(); visRaekke("ks"); }
+
+        opdaterTrinlinje();
+        opdaterKnap();
+
+        el("knap").blur();
+        if (n === 3) el("input-pks").focus({ preventScroll: true });
+    }
+
+    /* Afslutter det aktive trin, uanset om eleven løste det, eller svaret blev vist. */
+    function trinLoest(klasse, tekst) {
+        loest = true;
+        saetBesked(klasse, tekst);
+        if (trin === 4) afslutOpgave();
+        opdaterTrinlinje();
+        opdaterKnap();
+        el("knap").focus({ preventScroll: true });
+    }
+
+    function afslutOpgave() {
+        if (svarVist) {
+            iTraek = 0;
+        } else {
+            point += 100 + iTraek * 20;
+            iTraek += 1;
+        }
+        el("point").textContent = point;
+        el("i-traek").textContent = iTraek;
+        el("i-traek").style.color = iTraek >= 3 ? "var(--gul)" : "";
+    }
+
+    function opdaterTrinlinje() {
+        var lis = el("trinlinje").children;
+        for (var i = 0; i < lis.length; i++) {
+            var t = i + 1;
+            var k = t === trin ? "aktiv" : "";
+            if (t < trin || (t === trin && loest)) k += " faerdig";
+            lis[i].className = k;
+        }
+    }
+
+    /* ────────────────────────────────
+       KNAPPEN
+       Der er kun én knap, og den viser det næste skridt:
+         Giv hint → Vis svaret → Næste trin (Ny opgave efter trin 4)
+       Løser eleven selv trinnet, springer knappen direkte til Næste trin.
+       Selve svaret tjekkes, når eleven vælger en brik. I trin 3 bliver
+       knappen til Tjek svar, så længe der står et utjekket tal i feltet.
+    ──────────────────────────────── */
+    function opdaterKnap() {
+        var k = el("knap");
+        if (loest) {
+            k.textContent = trin < 4 ? "Næste trin" : "Ny opgave";
+            k.className = "knap groen banker";
+        } else if (trin === 3 && ubekraeftet) {
+            k.textContent = "Tjek svar";
+            k.className = "knap tjek";
+        } else {
+            k.textContent = hintVist ? "Vis svaret" : "Giv hint";
+            k.className = "knap";
+        }
+    }
+
+    function knapKlik() {
+        if (loest) {
+            if (trin < 4) startTrin(trin + 1); else nyOpgave();
+            return;
+        }
+        if (trin === 3 && ubekraeftet) { tjekTrin3(); return; }
+        if (!hintVist) visHint(); else visSvar();
+    }
+
+    function visHint() {
+        hintVist = true;
+        var h = el("hint");
+        if (trin === 1) h.innerHTML = HPLUS + " består af ét H-atom og én positiv ladning.";
+        if (trin === 2) h.innerHTML = "Tæller: de to produkter. Nævner: syren. Vand er opløsningsmiddel og tages ikke med.";
+        if (trin === 3) h.innerHTML = "pK<sub>s</sub> = −log(K<sub>s</sub>). Brug log, ikke ln.";
+        if (trin === 4) {
+            visRaekke("styrke");
+            tilpasSkala();
+            h.innerHTML = "Find pK<sub>s</sub> = " + tal(opg.pKs, 2) + " på skalaen.";
+        }
+        h.hidden = false;
+        opdaterKnap();
+    }
+
+    function visSvar() {
+        svarVist = true;
+        if (trin === 1) {
+            el("valg1").querySelector('[data-noegle="' + noegle(opg.base) + '"]').classList.add("rigtig");
+            visBase();
+        }
+        if (trin === 2) {
+            pladser = [opg.base, OXONIUM, opg.syre];
+            loesTrin2();
+        }
+        if (trin === 3) {
+            ubekraeftet = false;
+            visPks();
+        }
+        if (trin === 4) {
+            el("valg4").querySelector('[data-styrke="' + GRAENSER[styrkeIndeks(opg.pKs)].navn + '"]').classList.add("rigtig");
+            visStyrke();
+        }
+        trinLoest("svar", "Svaret står på tavlen.");
+    }
+
+    /* ────────────────────────────────
+       TRIN 1: Reaktionen
+    ──────────────────────────────── */
+    function byggValg1() {
+        var boks = el("valg1");
+        boks.innerHTML = "";
+        blandet([[opg.base, null]].concat(opg.fejl)).forEach(function (bud) {
+            function vaelg() { vaelgBase(b, bud[0], bud[1]); }
+            var b = lavBrik("", formel(bud[0]), vaelg);
+            b.dataset.noegle = noegle(bud[0]);
+            goerTraekbar(b, vaelg);
+            boks.appendChild(b);
+        });
+    }
+
+    function vaelgBase(b, s, fejltype) {
+        if (trin !== 1 || loest) return;
+
+        if (!fejltype) {
+            b.classList.add("rigtig");
+            visBase();
+            trinLoest("ok", "Rigtigt. " + formel(opg.syre) + " og " + formel(opg.base) + " er et korresponderende syre-basepar.");
+            return;
+        }
+
+        b.classList.add("forkert");
+        b.disabled = true;
+        var slot = el("art-base").querySelector(".formel");
+        slot.classList.add("fejl");
+        setTimeout(function () { slot.classList.remove("fejl"); }, 700);
+        saetBesked("fejl", FEJLTEKST[fejltype](s));
+    }
+
+    /* Basen sættes ind, og skemaet farves efter syre-basepar med roller og H+-bue. */
+    function visBase() {
+        var slot = el("art-base").querySelector(".formel");
+        slot.className = "formel";
+        slot.removeAttribute("data-slip");
+        slot.innerHTML = formel(opg.base) + TF_AQ;
+        el("valg1").querySelectorAll(".brik").forEach(function (b) { b.disabled = true; });
+        el("skema").classList.add("farvet");
+        tegnBue();
+        el("bue").classList.remove("frem");
+        void el("bue").getBoundingClientRect();
+        el("bue").classList.add("frem");
+    }
+
+    /* Navnet står i tavlens hjørne, men flyttes op over skemaet, hvis det
+       ville ramme buen fra syren (lange navne eller smal skærm). */
+    function placerNavn() {
+        var navn = el("syrenavn");
+        navn.classList.remove("over");
+        var n = navn.getBoundingClientRect();
+        var a = el("art-syre").querySelector(".formel").getBoundingClientRect();
+        if (n.right + 24 > a.left + a.width / 2) navn.classList.add("over");
+    }
+
+    /* Buen viser, at H+ går fra syren til vand. Den tegnes ud fra, hvor
+       formlerne faktisk står, og udelades, hvis skemaet er brudt over. */
+    function tegnBue() {
+        var svg = el("bue");
+        if (!el("skema").classList.contains("farvet")) { svg.innerHTML = ""; return; }
+
+        var r = el("skema").getBoundingClientRect();
+        var a = el("art-syre").querySelector(".formel").getBoundingClientRect();
+        var v = el("art-vand").querySelector(".formel").getBoundingClientRect();
+        if (Math.abs(a.top - v.top) > 4) { svg.innerHTML = ""; return; }
+
+        var x1 = a.left + a.width / 2 - r.left;
+        var x2 = v.left + v.width / 2 - r.left - 6;
+        var y  = a.top - r.top + 4;
+        var mx = (x1 + x2) / 2;
+
+        svg.innerHTML =
+            '<defs><marker id="spids" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">' +
+            '<path d="M0,0 L8,4 L0,8 z" fill="#d1d5db"/></marker></defs>' +
+            '<path d="M' + x1 + ',' + y + ' Q' + mx + ',' + (y - 36) + ' ' + x2 + ',' + y + '"' +
+            ' fill="none" stroke="#d1d5db" stroke-width="1.8" marker-end="url(#spids)"/>' +
+            '<text x="' + mx + '" y="' + (y - 21) + '" text-anchor="middle">H<tspan dy="-6" font-size="11">+</tspan></text>';
+    }
+
+    /* ────────────────────────────────
+       TRIN 2: Ks-udtrykket
+    ──────────────────────────────── */
+    function byggValg2() {
+        var boks = el("valg2");
+        boks.innerHTML = "";
+        [opg.syre, VAND, opg.base, OXONIUM].forEach(function (s) {
+            var b = lavBrik(par(s), formel(s), function () { saetIPlads(s); });
+            b.dataset.noegle = noegle(s);
+            goerTraekbar(b, function (maal) { saetIPlads(s, Number(maal.dataset.plads)); });
+            boks.appendChild(b);
+        });
+    }
+
+    /* Et stof sættes på pladsen i (trukket derhen) eller på den markerede
+       plads (klik). Når alle tre pladser er fyldt, tjekkes udtrykket. */
+    function saetIPlads(s, i) {
+        if (trin !== 2 || loest) return;
+        if (i === undefined) i = aktivPlads;
+        if (i < 0) return;
+
+        pladser[i] = s;
+        fejlPladser = fejlPladser.filter(function (j) { return j !== i; });
+
+        var tom = naesteTomme(i);
+        if (tom >= 0) {
+            aktivPlads = tom;
+            tegnPladser();
+        } else {
+            tjekTrin2();
+        }
+    }
+
+    function naesteTomme(fra) {
+        for (var i = 1; i <= 3; i++) {
+            var j = (fra + i) % 3;
+            if (!pladser[j]) return j;
+        }
+        return -1;
+    }
+
+    /* Klik på en plads: den tømmes og bliver den markerede plads. */
+    function klikPlads(i) {
+        if (trin !== 2 || loest) return;
+        pladser[i] = null;
+        fejlPladser = fejlPladser.filter(function (j) { return j !== i; });
+        aktivPlads = i;
+        tegnPladser();
+    }
+
+    function tegnPladser() {
+        el("ks").querySelectorAll(".plads").forEach(function (b) {
+            var i = Number(b.dataset.plads), s = pladser[i];
+            var k = "plads";
+            if (s) k += " fyldt " + par(s);
+            if (i === aktivPlads && !loest) k += " aktiv";
+            if (fejlPladser.indexOf(i) >= 0) k += " fejl";
+            b.className = k;
+            b.innerHTML = s ? "[" + formel(s) + "]" : "?";
+            b.disabled = loest;
+        });
+    }
+
+    function tjekTrin2() {
+        var t0 = pladser[0], t1 = pladser[1], n = pladser[2];
+        function produkt(s) { return ens(s, opg.base) || ens(s, OXONIUM); }
+
+        fejlPladser = [];
+        if (!produkt(t0)) fejlPladser.push(0);
+        if (!produkt(t1) || ens(t0, t1)) fejlPladser.push(1);
+        if (!ens(n, opg.syre)) fejlPladser.push(2);
+
+        if (fejlPladser.length === 0) {
+            loesTrin2();
+            trinLoest("ok", "Rigtigt. For " + opg.navn.toLowerCase() + " er K<sub>s</sub> = " + ksHTML(opg.pKs) + " M.");
+            return;
+        }
+
+        var tekst;
+        if (pladser.some(function (s) { return ens(s, VAND); })) {
+            tekst = "Vand er opløsningsmiddel og indgår ikke i K<sub>s</sub>-udtrykket.";
+        } else if (fejlPladser.indexOf(2) >= 0 || !produkt(t0) || !produkt(t1)) {
+            tekst = "Produkterne står i tælleren, og syren står i nævneren.";
+        } else {
+            tekst = "Begge produkter skal stå i tælleren.";
+        }
+        aktivPlads = fejlPladser[0];
+        tegnPladser();
+        saetBesked("fejl", tekst);
+    }
+
+    function loesTrin2() {
+        loest = true;
+        aktivPlads = -1;
+        fejlPladser = [];
+        el("ks").classList.add("faerdig");
+        tegnPladser();
+        vis("ks-vaerdi");
+        el("valg2").querySelectorAll(".brik").forEach(function (b) { b.disabled = true; });
+    }
+
+    /* ────────────────────────────────
+       TRIN 3: Beregn pKs
+    ──────────────────────────────── */
+    function tolkTal(tekst) {
+        var t = tekst.replace(/\s+/g, "").replace(",", ".").replace(/[−–]/g, "-");
+        return t === "" ? NaN : Number(t);
+    }
+
+    function tjekTrin3() {
+        var u = tolkTal(el("input-pks").value);
+        var p = opg.pKs;
+        ubekraeftet = false;
+
+        /* Regnet ud fra den afrundede Ks og afrundet til to decimaler
+           afviger svaret højst 0,007 fra tabelværdien. */
+        if (isNaN(u)) {
+            saetBesked("fejl", "Skriv pK<sub>s</sub> som et tal.");
+        } else if (Math.abs(u - p) < 0.008) {
+            visPks();
+            trinLoest("ok", "Rigtigt.");
+            return;
+        } else if (Math.abs(u + p) < 0.008) {
+            saetBesked("fejl", "Tjek fortegnet. Husk minus foran log.");
+        } else if (Math.abs(Math.abs(u) - Math.abs(p) * Math.LN10) < 0.03) {
+            saetBesked("fejl", "Du har brugt ln. pK<sub>s</sub> beregnes med log.");
+        } else if (Math.abs(u + ksDele(p).exp) < 0.011) {
+            saetBesked("fejl", "Tag hele K<sub>s</sub>-værdien med, ikke kun eksponenten.");
+        } else if (Math.abs(u - p) < 0.1) {
+            saetBesked("fejl", "Tæt på. Tjek afrundingen, og angiv to decimaler.");
+        } else {
+            saetBesked("fejl", "Ikke rigtigt. Tjek beregningen.");
+        }
+        opdaterKnap();
+    }
+
+    /* Indtastningen erstattes af den færdige række på tavlen. */
+    function visPks() {
+        el("input-pks").disabled = true;
+        el("felt3").hidden = true;
+        visRaekke("pks");
+    }
+
+    /* ────────────────────────────────
+       TRIN 4: Syrestyrke
+    ──────────────────────────────── */
+    function byggValg4() {
+        var boks = el("valg4");
+        boks.innerHTML = "";
+        GRAENSER.forEach(function (g, i) {
+            var b = lavBrik("ord", stort(g.navn), function () { vaelgStyrke(b, i); });
+            b.dataset.styrke = g.navn;
+            boks.appendChild(b);
+        });
+    }
+
+    function vaelgStyrke(b, i) {
+        if (trin !== 4 || loest) return;
+        var rigtig = styrkeIndeks(opg.pKs);
+
+        if (i === rigtig) {
+            b.classList.add("rigtig");
+            visStyrke();
+            trinLoest("ok", "Rigtigt. " + STYRKETEKST[rigtig]);
+            return;
+        }
+
+        b.classList.add("forkert");
+        b.disabled = true;
+        saetBesked("fejl", i < rigtig ? "Syren er svagere end det." : "Syren er stærkere end det.");
+    }
+
+    function visStyrke() {
+        visSkala(true);
+        if (el("styrke").hidden) visRaekke("styrke");
+        tilpasSkala();
+        if (styrkeIndeks(opg.pKs) === 0) {
+            el("pil").textContent = "→";
+            tegnBue();
+        }
+    }
+
+    /* Skala fra SKALA_MIN til SKALA_MAX med de fire grupper. Uden svar
+       (hintet) vises kun grupperne; med svar markeres syrens pKs. */
+    function visSkala(medSvar) {
+        var rigtig = styrkeIndeks(opg.pKs);
+        function pct(v) { return (v - SKALA_MIN) / (SKALA_MAX - SKALA_MIN) * 100; }
+
+        var zoner = "", streger = "", fra = SKALA_MIN;
+        GRAENSER.forEach(function (g, i) {
+            var til = Math.min(g.til, SKALA_MAX);
+            zoner += '<div class="zone' + (medSvar && i === rigtig ? " aktiv" : "") + '" style="flex:' + (til - fra) + '">' + stort(g.navn) + '</div>';
+            if (g.til < SKALA_MAX) streger += '<span class="streg" style="left:' + pct(g.til) + '%">' + g.til + '</span>';
+            fra = til;
+        });
+
+        var markoer = "";
+        if (medSvar) {
+            markoer = '<div class="markoer" style="left:' + pct(opg.pKs) + '%"><span>' +
+                      '<span class="kat" hidden>' + stort(GRAENSER[rigtig].navn) + ' · </span>' +
+                      'pK<sub>s</sub> = ' + tal(opg.pKs, 2) + '</span></div>';
+        }
+
+        el("styrke").innerHTML = '<div class="skala"><div class="skala-bar">' + zoner + '</div>' + streger + markoer + '</div>';
+    }
+
+    /* Zonenavne, der ikke kan være i deres felt (smal skærm), skjules, og
+       markøren får så gruppens navn med. Markørteksten skubbes ind, hvis
+       den ellers stikker ud over skalaens kant. Kræver at rækken vises. */
+    function tilpasSkala() {
+        var boks = el("styrke");
+        if (boks.hidden) return;
+
+        boks.querySelectorAll(".zone").forEach(function (z) {
+            z.classList.remove("uden-tekst");
+            if (z.scrollWidth > z.clientWidth + 1) z.classList.add("uden-tekst");
+        });
+
+        var m = boks.querySelector(".markoer");
+        if (!m) return;
+        var aktiv = boks.querySelector(".zone.aktiv");
+        m.querySelector(".kat").hidden = !(aktiv && aktiv.classList.contains("uden-tekst"));
+        m.classList.remove("venstre", "hoejre");
+        var s = boks.querySelector(".skala").getBoundingClientRect();
+        var t = m.firstChild.getBoundingClientRect();
+        if (t.left < s.left) m.classList.add("venstre");
+        else if (t.right > s.right) m.classList.add("hoejre");
+    }
+
+    /* ────────────────────────────────
+       START
+    ──────────────────────────────── */
+    el("knap").onclick = knapKlik;
+
+    el("ks").querySelectorAll(".plads").forEach(function (b) {
+        b.onclick = function () { klikPlads(Number(b.dataset.plads)); };
+    });
+
+    el("input-pks").addEventListener("input", function () {
+        if (trin !== 3 || loest) return;
+        ubekraeftet = this.value.trim() !== "";
+        opdaterKnap();
+    });
+
+    el("input-pks").addEventListener("keydown", function (e) {
+        if (e.key !== "Enter") return;
+        e.preventDefault();
+        if (!loest && ubekraeftet) tjekTrin3();
+    });
+
+    window.addEventListener("resize", function () {
+        placerNavn();
+        tegnBue();
+        tilpasSkala();
+    });
+
+    window.onload = function () { nyOpgave(); };
 </script>
 </body>
 </html>

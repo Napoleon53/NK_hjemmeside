@@ -34,7 +34,7 @@
     --radius:      10px;
     --radius-lil:  6px;
     --skygge:      0 4px 14px rgba(0, 0, 0, 0.35);
-    --panel-bredde: 382px;
+    --panel-bredde: 430px;
 }
 
 * { box-sizing: border-box; }
@@ -312,6 +312,8 @@ main { flex: 1; position: relative; min-height: 0; }
     font-variant-numeric: tabular-nums;
 }
 
+.nuklid[hidden] { display: none; }
+
 .nuklid .a, .nuklid .z {
     grid-column: 1;
     text-align: right;
@@ -345,6 +347,23 @@ main { flex: 1; position: relative; min-height: 0; }
 .nuklid .q.plus  { color: var(--proton); }
 .nuklid .q.minus { color: var(--blaa); }
 
+/* Facit-udgaven i opgavekortet: samme opstilling som maerkatet over
+   atomet, men liggende i den normale tekstflow i stedet for at svaeve
+   ovenpaa scenen - se opgave-boks i index.html og visOpgaveNuklid()
+   i sim_byg.js. */
+.nuklid-svar {
+    position: static;
+    transform: none;
+    margin-top: 8px;
+    padding: 7px 14px 7px 10px;
+    background-color: rgba(255, 255, 255, 0.05);
+    justify-self: start;
+}
+
+.nuklid-svar .sym { font-size: 1.9rem; }
+.nuklid-svar .a, .nuklid-svar .z { font-size: 0.78rem; }
+.nuklid-svar .q { font-size: 0.95rem; min-width: 12px; }
+
 /* En radioaktiv kerne faar et blinkende maerke i hjoernet af nuklid-
    boksen - synligt uden at man skal laese teksten i panelet. */
 .rad-ikon {
@@ -373,29 +392,28 @@ main { flex: 1; position: relative; min-height: 0; }
 }
 
 /* ---------------------------------------------------------------------
-   VENSTRE SOEJLE PAA BYGGEFANEN: det periodiske system
-   Ligger som et overlay i scenens venstre side, med fast plads foroven
-   (top: 18px). Atommodellen faar resten af scenen, til hoejre for
-   denne soejle - se placering() i sim_byg.js.
+   DET PERIODISKE SYSTEM PAA BYGGEFANEN
+   Staar som et almindeligt kort i panelet til hoejre, lige under
+   partikelraekkerne: det er dér, man slaar protontallet op, mens man
+   bygger. Hele scenen er dermed atommodellens - se placering() i
+   sim_byg.js.
    --------------------------------------------------------------------- */
-.pertabel-boks {
-    position: absolute;
-    top: 18px;
-    left: 18px;
-    width: 494px;
-    max-width: calc(100% - 36px);
-    background-color: rgba(24, 24, 31, 0.92);
-    box-shadow: var(--skygge);
+
+/* Grupperne 3-12 (overgangsmetallerne) er altid tomme, saa langt som
+   denne tabel raekker (kun grundstof 1-20). De faar derfor kun en
+   tynd strimmel plads i stedet for fulde soejler - det er det, der
+   presser den ellers meget brede, tomme midte sammen. */
+#byg-pertabel {
+    grid-template-columns: repeat(2, 1fr) repeat(10, 0.2fr) repeat(6, 1fr);
+    /* Paa en smal skaerm fylder panelet hele bredden. Uden loft ville
+       felterne (som er kvadratiske) vokse helt ud af proportion. */
+    max-width: 400px;
+    margin-inline: auto;
 }
 
-.pertabel-boks .pcelle { font-size: 0.9rem; border-radius: 4px; }
+.pertabel-boks .pcelle { font-size: 1.05rem; border-radius: 4px; }
 
-/* Sikringen mod kraftigt zoom: sim_byg.js skjuler tabellen helt, hvis
-   der ikke er plads til den og et laeseligt atom paa samme tid. */
-.pertabel-boks.skjult { display: none; }
-
-/* Genstart ligger nede i scenens hoejre hjoerne. Toppen er optaget af
-   opgavekortet til venstre og det periodiske system til hoejre. */
+/* Genstart ligger nede i scenens hoejre hjoerne. */
 .scene-knap {
     position: absolute;
     bottom: 18px;
@@ -433,68 +451,6 @@ main { flex: 1; position: relative; min-height: 0; }
 .kernekort.god   { color: #7ee0a8; border-color: rgba(63, 174, 114, 0.45); }
 .kernekort.gul   { color: #f0d77a; border-color: rgba(242, 197, 61, 0.45); }
 .kernekort.skidt { color: #f0918a; border-color: rgba(224, 84, 70, 0.45); }
-
-/* Reaktivitetsindikatoren i hjoernet oven over atommodellen: hvor taet
-   er elektronskyen paa en aedelgasstruktur lige nu? Se D.reaktivitet()
-   i data.js. Skjules, naar der ikke er noget grundstof/elektroner at
-   vurdere (samme moenster som .partikelstat og .bohr). */
-.reaktivkort {
-    position: absolute;
-    top: 18px;
-    right: 18px;
-    width: 168px;
-    background-color: rgba(20, 20, 26, 0.82);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: var(--radius);
-    padding: 10px 13px;
-    box-shadow: var(--skygge);
-    pointer-events: none;
-    text-align: center;
-}
-
-.reaktivkort[hidden] { display: none; }
-
-.reaktivkort-etiket {
-    display: block;
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--tekst-mat);
-    margin-bottom: 6px;
-}
-
-.reaktivkort-bar {
-    width: 100%;
-    height: 7px;
-    border-radius: 4px;
-    background-color: rgba(255, 255, 255, 0.14);
-    overflow: hidden;
-}
-
-.reaktivkort-fyld {
-    height: 100%;
-    width: 0%;
-    border-radius: 4px;
-    transition: width 0.35s ease, background-color 0.35s ease;
-}
-
-.reaktivkort-fyld.groen  { background-color: var(--groen); }
-.reaktivkort-fyld.orange { background-color: var(--orange); }
-.reaktivkort-fyld.roed   { background-color: var(--roed); }
-.reaktivkort-fyld.gul    { background-color: var(--gul); }
-
-.reaktivkort-tekst {
-    display: block;
-    margin-top: 6px;
-    font-size: 0.74rem;
-    font-weight: 700;
-}
-
-.reaktivkort-tekst.groen  { color: #7ee0a8; }
-.reaktivkort-tekst.orange { color: #f0b46b; }
-.reaktivkort-tekst.roed   { color: #f0918a; }
-.reaktivkort-tekst.gul    { color: #f0d77a; }
 
 /* Grundstofvalget paa saltfanen sidder oven paa scenen, lige over hver
    sin soejle af atomer - saa valget og resultatet haenger sammen visuelt
@@ -552,8 +508,8 @@ main { flex: 1; position: relative; min-height: 0; }
 }
 
 .kort > h2 {
-    margin: 0 0 8px 0;
-    font-size: 0.74rem;
+    margin: 0 0 9px 0;
+    font-size: 0.84rem;
     font-weight: 700;
     letter-spacing: 0.09em;
     text-transform: uppercase;
@@ -569,7 +525,7 @@ main { flex: 1; position: relative; min-height: 0; }
 .kort.opgavekort { border-left: 3px solid var(--lilla); }
 
 .kort > h2 .taeller {
-    font-size: 0.68rem;
+    font-size: 0.76rem;
     letter-spacing: 0.04em;
     text-transform: none;
     color: var(--tekst-mat);
@@ -579,7 +535,7 @@ main { flex: 1; position: relative; min-height: 0; }
 
 .note { margin: 8px 0 0 0; font-size: 0.76rem; line-height: 1.45; color: var(--tekst-mat); }
 
-.besked { margin: 0; font-size: 0.82rem; line-height: 1.5; color: #c8ced6; }
+.besked { margin: 0; font-size: 0.87rem; line-height: 1.5; color: #c8ced6; }
 .besked.god   { color: #7ee0a8; }
 .besked.skidt { color: #f0918a; }
 .besked.gul   { color: #f0d77a; }
@@ -648,29 +604,29 @@ main { flex: 1; position: relative; min-height: 0; }
    --------------------------------------------------------------------- */
 .partikel {
     display: grid;
-    grid-template-columns: 16px minmax(0, 1fr) 30px 34px 30px;
+    grid-template-columns: 18px minmax(0, 1fr) 34px 40px 34px;
     align-items: center;
-    gap: 7px;
-    padding: 7px 8px;
+    gap: 8px;
+    padding: 8px 9px;
     border-radius: var(--radius-lil);
     background-color: rgba(255, 255, 255, 0.045);
 }
 
-.partikel + .partikel { margin-top: 6px; }
+.partikel + .partikel { margin-top: 7px; }
 
-.prik { width: 14px; height: 14px; border-radius: 50%; }
+.prik { width: 16px; height: 16px; border-radius: 50%; }
 .prik.proton   { background: radial-gradient(circle at 32% 30%, #ff9384, #e05446); }
 .prik.neutron  { background: radial-gradient(circle at 32% 30%, #b8bfc9, #7e8590); }
 .prik.elektron { background: radial-gradient(circle at 32% 30%, #fff2b8, #f2c53d); }
 
-.pnavn { font-size: 0.82rem; color: #dde3ea; line-height: 1.25; min-width: 0; }
+.pnavn { font-size: 0.94rem; color: #dde3ea; line-height: 1.25; min-width: 0; }
 .pnavn b { font-weight: 700; color: var(--tekst); }
 .pnavn em {
     display: block;
     font-style: normal;
-    font-size: 0.68rem;
+    font-size: 0.78rem;
     color: var(--tekst-mat);
-    margin-top: 1px;
+    margin-top: 2px;
 }
 
 .talknap {
@@ -678,9 +634,9 @@ main { flex: 1; position: relative; min-height: 0; }
     color: var(--tekst);
     border: 1px solid #4a4a58;
     border-radius: var(--radius-lil);
-    height: 30px;
+    height: 34px;
     font-family: inherit;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: 700;
     line-height: 1;
     cursor: pointer;
@@ -696,7 +652,7 @@ main { flex: 1; position: relative; min-height: 0; }
 .antal {
     text-align: center;
     font-family: "Cascadia Mono", Consolas, monospace;
-    font-size: 1.05rem;
+    font-size: 1.18rem;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
 }
@@ -839,6 +795,12 @@ button.pcelle:hover { border-color: rgba(255, 255, 255, 0.55); }
 .pnoegle .ikkemetal::before { background-color: rgba(61, 158, 224, 0.75); }
 .pnoegle .halvmetal::before { background-color: rgba(242, 197, 61, 0.7); }
 .pnoegle .aedelgas::before  { background-color: rgba(63, 174, 114, 0.75); }
+
+/* Fane 1's periodiske system: legenden er stoerre end normalt, men lige
+   akkurat saa lille, at alle fire naevn staar paa samme linje. */
+.pertabel-boks .pnoegle { font-size: 0.78rem; gap: 6px 13px; margin-top: 9px; }
+.pertabel-boks .pnoegle span { gap: 5px; }
+.pertabel-boks .pnoegle span::before { width: 11px; height: 11px; }
 
 /* Den store udgave i pop op-vinduet: plads til atomnummeret over
    symbolet, saa man kan slaa protontallet op midt i et spoergsmaal. */
@@ -1314,7 +1276,7 @@ select:focus-visible {
 }
 
 @media (max-width: 1320px) {
-    :root { --panel-bredde: 336px; }
+    :root { --panel-bredde: 372px; }
 }
 
 @media (max-width: 1040px) {
@@ -1334,13 +1296,6 @@ select:focus-visible {
     .panel { border-left: none; border-top: 1px solid #1f1f27; }
     .nuklid { padding: 8px 13px 8px 10px; }
     .nuklid .sym { font-size: 2.2rem; }
-
-    /* Paa smal skaerm er der ikke plads til tabellen oven i atomet, saa
-       den lander under laerredet, og genstart foelger laerredets bund. */
-    #fane-byg .scene { height: auto; min-height: 0; }
-    #byg-laerred { height: max(58vh, 340px); }
-    .pertabel-boks { position: static; width: auto; max-width: none; margin: 0 12px 12px; }
-    #fane-byg .scene-knap { position: static; width: max-content; margin: 10px 12px 10px auto; }
     .kernekort { max-width: calc(100% - 30px); }
     .saltvalg { width: auto; top: 70px; padding: 6px 8px; }
     .saltvalg label { font-size: 0.6rem; white-space: normal; }

@@ -810,3 +810,13 @@ input[type="range"] {
 .quiz-bund { display: flex; justify-content: space-between; gap: 8px; margin-top: 16px; }
 .quiz-bund .knap { padding: 9px 16px; }
 .quiz-score { font-size: 1.5rem; font-weight: 600; color: var(--gul); margin: 4px 0 8px; }
+
+/* ---------------------------------------------------------------------
+   OPGAVEKORTET - samme kort paa begge faner (js/opgave.js)
+   --------------------------------------------------------------------- */
+.opgavekort .opgave-spm { margin: 0; font-size: 0.9rem; color: var(--tekst); }
+.opgave-spm:empty { display: none; }
+.opgavekort .valg { margin: 9px 0 0; }
+.opgavekort .valg.en-spalte .valgknap { min-height: 40px; font-size: 0.88rem; }
+.opgavekort .besked { margin-top: 8px; }
+.opgavekort .knaprad { margin-top: 10px; }

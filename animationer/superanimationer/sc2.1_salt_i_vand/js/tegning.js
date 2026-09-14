@@ -58,12 +58,30 @@
         ctx.restore();
     };
 
-    /* Den vandskal, der lukker sig om en ion, naar den er kommet fri.
-       Tegnes som et svagt skaer plus nogle faa smaa vandmolekyler - vendt
-       rigtigt, ligesom de aktive vandmolekyler: oxygen naermest en positiv
-       ion, hydrogen naermest en negativ. */
+    /* Ét vandmolekyle i vandskallen om en ion, vendt rigtigt: oxygen
+       naermest en positiv ion, hydrogen naermest en negativ. T.vendMod
+       vender den rigtige ende ind, og spidsH flytter ankerpunktet, saa
+       den ende ogsaa ligger naermest. De to skal foelges ad.
+       opt.forkert vender molekylet om (opgaven "find fejlen").
+       Med ctx = null tegnes intet; funktionen giver bare molekylets midte
+       tilbage, saa et klik kan rammes. */
+    T.skalVand = function (ctx, ionX, ionY, ionR, vinkel, skala, positivIon, opt) {
+        opt = opt || {};
+        var p = opt.forkert ? !positivIon : positivIon;
+        var afstand = ionR + (p ? 12 : 7) * skala * 1.08;
+        var sx = ionX + Math.cos(vinkel) * afstand;
+        var sy = ionY + Math.sin(vinkel) * afstand;
+        if (ctx) {
+            T.vand(ctx, sx, sy, T.vendMod(sx, sy, ionX, ionY, p), skala, {
+                alpha: opt.alpha, delta: opt.delta, spidsH: !p, ring: opt.ring
+            });
+        }
+        var midt = afstand + 8.1 * skala;
+        return { x: ionX + Math.cos(vinkel) * midt, y: ionY + Math.sin(vinkel) * midt, r: 17 * skala };
+    };
+
+    /* En hel vandskal med et svagt skaer bag. Bruges af selvtesten. */
     T.vandskal = function (ctx, x, y, r, fase, antal, positiv) {
-        var i, vinkel;
         ctx.save();
         var g = ctx.createRadialGradient(x, y, r * 0.8, x, y, r * 2.05);
         g.addColorStop(0, "rgba(150, 200, 240, 0.20)");
@@ -74,18 +92,8 @@
         ctx.fill();
         ctx.restore();
 
-        for (i = 0; i < antal; i++) {
-            vinkel = fase + i * (Math.PI * 2 / antal);
-            /* Samme regnestykke som for de arbejdende vandmolekyler: T.vendMod
-               vender den rigtige ende ind mod ionen, og spidsH flytter selve
-               ankerpunktet, saa den ende ogsaa ligger naermest. De to skal
-               foelges ad - ellers ender hydrogen inderst ved en positiv ion. */
-            var sx = x + Math.cos(vinkel) * r * 1.52;
-            var sy = y + Math.sin(vinkel) * r * 1.52;
-            T.vand(ctx, sx, sy,
-                T.vendMod(sx, sy, x, y, positiv),
-                r * 0.030,
-                { alpha: 0.5, spidsH: !positiv });
+        for (var i = 0; i < antal; i++) {
+            T.skalVand(ctx, x, y, r, fase + i * (Math.PI * 2 / antal), r / 22, positiv, { alpha: 0.9 });
         }
     };
 
@@ -149,20 +157,98 @@
         ctx.arc(0, 0, oR, 0, Math.PI * 2);
         ctx.fill();
 
+        /* En ring om hele molekylet, fx naar opgaven peger paa det. */
+        if (opt.ring) {
+            ctx.globalAlpha = 1;
+            ctx.strokeStyle = opt.ring;
+            ctx.lineWidth = Math.max(2, 2.2 * skala);
+            ctx.beginPath();
+            ctx.arc(0, hy * 0.5, hy * 1.35, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        ctx.restore();
+
         /* δ-maerkerne staar kun paa de store molekyler - ellers bliver
-           billedet til stoej. */
+           billedet til stoej. De skrives UDEN for det drejede
+           koordinatsystem, saa de altid staar paa ret køl og kan laeses,
+           uanset hvilken vej molekylet vender. */
         if (opt.delta && skala >= 0.85) {
+            var cos = Math.cos(vinkel), sin = Math.sin(vinkel);
+            var forskud = opt.spidsH ? -hy : 0;
+            var til = function (lx, ly) {
+                ly += forskud;
+                return [x + lx * cos - ly * sin, y + lx * sin + ly * cos];
+            };
+            var pO = til(0, 0), pH1 = til(-hx, hy), pH2 = til(hx, hy);
+            ctx.save();
+            ctx.globalAlpha = opt.alpha === undefined ? 1 : opt.alpha;
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.font = "600 " + (10 * skala).toFixed(1) + "px 'Segoe UI', sans-serif";
             ctx.fillStyle = "#ffffff";
-            ctx.fillText("δ−", 0, 0);
+            ctx.fillText("δ−", pO[0], pO[1]);
             ctx.fillStyle = "#3a3a47";
             ctx.font = "600 " + (8 * skala).toFixed(1) + "px 'Segoe UI', sans-serif";
-            ctx.fillText("δ+", -hx, hy);
-            ctx.fillText("δ+", hx, hy);
+            ctx.fillText("δ+", pH1[0], pH1[1]);
+            ctx.fillText("δ+", pH2[0], pH2[1]);
+            ctx.restore();
+        }
+    };
+
+    /* ----- Tingene paa bordet -------------------------------------------- */
+    /* Vandets form i et baegerglas: lige sider og afrundede hjoerner i
+       bunden. Kun stien - kalderen fylder og klipper selv. */
+    T.vandSti = function (ctx, x0, x1, top, bund, r) {
+        ctx.beginPath();
+        ctx.moveTo(x0, top);
+        ctx.lineTo(x1, top);
+        ctx.lineTo(x1, bund - r);
+        ctx.quadraticCurveTo(x1, bund, x1 - r, bund);
+        ctx.lineTo(x0 + r, bund);
+        ctx.quadraticCurveTo(x0, bund, x0, bund - r);
+        ctx.closePath();
+    };
+
+    /* Varmepladen (sprites/varmeplade.svg). gloed 0-1 farver pladen roed;
+       roer taender den blaa lampe for omroereren. */
+    T.varmeplade = function (ctx, x, y, b, gloed, roer) {
+        var S = NK.Sprites, MP = S.MAAL.varmeplade, s = b / MP.b;
+        S.tegn(ctx, "varmeplade", x, y, b);
+        ctx.save();
+        if (gloed > 0) {
+            ctx.globalAlpha = gloed;
+            var g = ctx.createLinearGradient(0, y, 0, y + MP.pladeBund * s);
+            g.addColorStop(0, "rgba(255, 120, 60, 0.95)");
+            g.addColorStop(1, "rgba(200, 50, 30, 0.75)");
+            ctx.fillStyle = g;
+            NK.rundtRekt(ctx, x + MP.pladeV * s, y + 1, (MP.pladeH - MP.pladeV) * s, (MP.pladeBund - 1) * s, 2 * s);
+            ctx.fill();
+            ctx.fillStyle = "#ff6a3d";
+            ctx.beginPath();
+            ctx.arc(x + MP.lampeVarme[0] * s, y + MP.lampeVarme[1] * s, MP.lampeR * s, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        if (roer) {
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = "#5cc0ff";
+            ctx.beginPath();
+            ctx.arc(x + MP.lampeRoer[0] * s, y + MP.lampeRoer[1] * s, MP.lampeR * s, 0, Math.PI * 2);
+            ctx.fill();
         }
         ctx.restore();
+    };
+
+    /* Termometeret (sprites/termometer.svg) med den roede soejle. */
+    T.termometer = function (ctx, x, y, b, temp) {
+        var S = NK.Sprites, MT = S.MAAL.termometer;
+        if (!S.tegn(ctx, "termometer", x, y, b)) return false;
+        var s = b / MT.b;
+        var yT = y + (MT.nul - (MT.nul - MT.hundrede) * NK.klamp(temp, 0, 100) / 100) * s;
+        ctx.save();
+        ctx.fillStyle = "#d9453a";
+        ctx.fillRect(x + MT.soejleV * s, yT, (MT.soejleH - MT.soejleV) * s, y + MT.soejleBund * s - yT);
+        ctx.restore();
+        return true;
     };
 
     /* ----- Baegerglasset ------------------------------------------------- */

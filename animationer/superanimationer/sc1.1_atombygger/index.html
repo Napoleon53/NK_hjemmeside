@@ -46,30 +46,11 @@
             <span class="q" id="byg-nuklid-q"></span>
         </div>
 
-        <!-- Hvor taet er elektronskyen paa en aedelgasstruktur lige nu?
-             Se D.reaktivitet() i data.js og opdaterPanel() i sim_byg.js. -->
-        <div class="reaktivkort" id="byg-reaktiv" aria-live="polite" hidden>
-            <span class="reaktivkort-etiket">Reaktivitet</span>
-            <div class="reaktivkort-bar"><div class="reaktivkort-fyld" id="byg-reaktiv-fyld"></div></div>
-            <span class="reaktivkort-tekst" id="byg-reaktiv-tekst"></span>
-        </div>
-
         <!-- Findes kernen i naturen? Staar lige under selve atommodellen,
              saa svaret er dér, hvor man kigger. Placeres af sim_byg.js. -->
         <div class="kernekort" id="byg-kerne" aria-live="polite"></div>
 
         <button class="knap scene-knap" id="byg-nulstil" type="button"><span>Genstart</span><span class="tegn">↺</span></button>
-
-        <div class="kort pertabel-boks">
-            <h2>Det periodiske system</h2>
-            <div id="byg-pertabel"></div>
-            <div class="pnoegle">
-                <span class="metal">metal</span>
-                <span class="ikkemetal">ikke-metal</span>
-                <span class="halvmetal">halvmetal</span>
-                <span class="aedelgas">ædelgas</span>
-            </div>
-        </div>
     </div>
 
     <aside class="panel">
@@ -106,12 +87,36 @@
             </div>
         </div>
 
+        <div class="kort pertabel-boks">
+            <h2>Det periodiske system</h2>
+            <div id="byg-pertabel"></div>
+            <div class="pnoegle">
+                <span class="metal">metal</span>
+                <span class="ikkemetal">ikke-metal</span>
+                <span class="halvmetal">halvmetal</span>
+                <span class="aedelgas">ædelgas</span>
+            </div>
+        </div>
+
         <div class="kort opgavekort" id="opgave-boks">
             <h2>Opgave <span class="taeller" id="byg-opgave-taeller" style="display:none;">1/5</span></h2>
             <p class="besked" id="byg-opgave">Tryk på “Start opgave” for at få en opgave, du selv skal bygge.</p>
+
+            <!-- Hintet: det fulde atomsymbol med massetal, atomnummer og
+                 ladning, praecis som i kemibogen. Vises foerst naar eleven
+                 beder om et hint eller om svaret - se opgaveKnap() i
+                 sim_byg.js. -->
+            <div class="nuklid nuklid-svar" id="byg-opgave-nuklid" hidden>
+                <span class="a" id="byg-opgave-nuklid-a"></span>
+                <span class="z" id="byg-opgave-nuklid-z"></span>
+                <span class="sym" id="byg-opgave-nuklid-sym"></span>
+                <span class="q" id="byg-opgave-nuklid-q"></span>
+            </div>
+
+            <!-- Én knap, der aendrer sig med, hvor langt man er:
+                 Start opgave -> Giv hint -> Vis svaret -> Ny opgave. -->
             <div class="knaprad">
-                <button class="knap blaa" id="byg-opgave-ny" type="button">Start opgave</button>
-                <button class="knap" id="byg-opgave-svar" type="button" style="display:none;">Vis svaret</button>
+                <button class="knap blaa" id="byg-opgave-knap" type="button">Start opgave</button>
             </div>
         </div>
     </aside>

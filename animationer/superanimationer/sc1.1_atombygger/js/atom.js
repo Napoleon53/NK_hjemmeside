@@ -307,6 +307,13 @@
         this.tid += dt;
         this.puls = Math.max(0, this.puls - dt * 2.2);
 
+        /* Lukker en skal, glider maalestokken tilbage, saa det lille atom
+           igen fylder pladsen ud - i stedet for at springe i stoerrelse.
+           Den anden vej stopper tegningen glidningen med det samme, for
+           en ny skal skal kunne vaere der nu og ikke om et halvt sekund. */
+        var maalYdre = this.ydreModel();
+        this.ydre = this.ydre === undefined ? maalYdre : NK.mod(this.ydre, maalYdre, 7, dt);
+
         var i;
         for (i = this.nukleoner.length - 1; i >= 0; i--) {
             var nu = this.nukleoner[i];
@@ -346,7 +353,9 @@
     /* Alt regnes i "modelpixels" og skaleres foerst ved tegningen. Den
        ydre stoerrelse er fast, saa et stort atom ogsaa SER stoerre ud
        end et lille - i stedet for at hvert atom fylder det hele. */
-    var MODEL_YDRE = 176;
+    var MODEL_YDRE = 176;       /* fire fulde skaller plus luft */
+    var MODEL_MINDST = 120;     /* saa lidt maa et atom med faa skaller noejes med */
+    var YDRE_LUFT = 26;         /* luft uden om den yderste skal, der er i brug */
 
     NK.Atom.prototype.geometri = function () {
         var a = 0, i;
@@ -368,6 +377,18 @@
         var rSkal = [];
         for (i = 0; i < 4; i++) rSkal.push(rInder + i * 34);
         return { rNukleon: rN, rKerne: rKerne, rSkal: rSkal, antalNukleoner: a };
+    };
+
+    /* Hvor stor en del af modelrummet atomet rent faktisk bruger lige nu.
+       Med fire skaller i brug er det hele MODEL_YDRE, og atomet tegnes
+       praecis som foer. Bruges kun de inderste skaller, er tallet mindre,
+       og saa fylder tegningen til gengaeld mere af den plads, den har
+       faaet - ellers ligger et hydrogenatom som en prik i et tomt felt.
+       Kun kaldere, der beder om det (opt.tilpasSkaller), faar det. */
+    NK.Atom.prototype.ydreModel = function (geo) {
+        geo = geo || this.geometri();
+        var yderste = Math.max(0, this.fordeling.length - 1);
+        return NK.klamp(geo.rSkal[yderste] + YDRE_LUFT, MODEL_MINDST, MODEL_YDRE);
     };
 
     /* Hvor meget fylder klumpen rent faktisk paa skaermen?
@@ -424,11 +445,21 @@
          maerkat         tekst ved atomet (som standard under det)
          maerkatOver     tegn maerkatet over atomet i stedet for under
          maerkatStor     et godt stykke stoerre skrift til maerkatet
+         tilpasSkaller   lad atomet fylde pladsen ud, naar det bruger
+                         faerre end fire skaller - se ydreModel()
          daempet         0-1, hvor gennemsigtigt det hele tegnes         */
     NK.Atom.prototype.tegn = function (ctx, cx, cy, plads, opt) {
         opt = opt || {};
         var geo = this.geometri();
-        var s = plads / MODEL_YDRE;
+        var ydre = MODEL_YDRE;
+        if (opt.tilpasSkaller) {
+            /* Aldrig mindre end det, skallerne kraever lige nu: saa kan en
+               glidning i gang aldrig naa at tegne atomet uden for den
+               plads, det har faaet. */
+            var kraev = this.ydreModel(geo);
+            ydre = this.ydre === undefined ? kraev : Math.max(this.ydre, kraev);
+        }
+        var s = plads / ydre;
         var i;
         this.sidsteGeo = { cx: cx, cy: cy, s: s, geo: geo };
 

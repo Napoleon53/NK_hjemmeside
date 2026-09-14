@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="90" height="110" viewBox="0 0 90 110">
+  <!-- Pulverglas med etiket. Animationen tegner:
+       pulveret BAG filen i omraadet x 10-80, y 80-106,
+       formlen ovenpaa etiketten med midte i (45, 63). -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#cfe6f7" stop-opacity="0.26"/>
+      <stop offset="0.2" stop-color="#cfe6f7" stop-opacity="0.07"/>
+      <stop offset="0.85" stop-color="#cfe6f7" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#cfe6f7" stop-opacity="0.22"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="24" width="74" height="84" rx="10" fill="url(#glas)" stroke="#d6eaf8" stroke-opacity="0.75" stroke-width="1.4"/>
+  <rect x="19" y="18" width="52" height="8" rx="2" fill="#cfe6f7" fill-opacity="0.12" stroke="#d6eaf8" stroke-opacity="0.6" stroke-width="1"/>
+  <rect x="14" y="3" width="62" height="17" rx="3" fill="#3b4252" stroke="#6a7385" stroke-width="1"/>
+  <g stroke="#566074" stroke-width="1">
+    <path d="M22 6 v11 M30 6 v11 M38 6 v11 M46 6 v11 M54 6 v11 M62 6 v11 M70 6 v11"/>
+  </g>
+  <rect x="15" y="45" width="60" height="34" rx="3" fill="#f4efe2" stroke="#cfc6b0" stroke-width="1"/>
+  <rect x="15" y="45" width="60" height="6" rx="2" fill="#3d9ee0" fill-opacity="0.85"/>
+  <rect x="14" y="30" width="4" height="70" rx="2" fill="#ffffff" fill-opacity="0.16"/>
+</svg>

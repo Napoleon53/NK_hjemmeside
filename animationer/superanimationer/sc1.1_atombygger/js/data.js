@@ -204,21 +204,6 @@
         return null;
     };
 
-    /* Hvor reaktiv er elektronskyen lige nu, ud fra dens yderste skal?
-       Ikke en fysisk noejagtig stoerrelse - kun en pejling, der bygger
-       videre paa oktetreglen: tæt paa en aedelgasstruktur (fuld skal
-       eller 8 valenselektroner) er stabilt, langt fra er reaktivt. */
-    D.reaktivitet = function (antalElektroner) {
-        if (!antalElektroner) return null;
-        if (D.aedelgasStruktur(antalElektroner)) {
-            return { andel: 100, farve: "groen", tekst: "Stabil — ædelgasstruktur" };
-        }
-        var v = D.valenselektroner(antalElektroner);
-        if (v === 1 || v === 7) return { andel: 15, farve: "roed", tekst: "Meget reaktiv" };
-        if (v === 2 || v === 6) return { andel: 40, farve: "orange", tekst: "Reaktiv" };
-        return { andel: 65, farve: "gul", tekst: "Middel reaktiv" };
-    };
-
     /* ----- Kerner ------------------------------------------------------ */
     /* Hvad ved vi om kernen med z protoner og n neutroner?
        art: "naturlig" | "radioaktiv" | "findes-ikke" */

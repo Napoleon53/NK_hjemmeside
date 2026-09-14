@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Knaldgas</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<!-- Én fane: det er ét forsoeg. Derfor ingen fanelinje i toppen. -->
+<header class="top">
+    <h1><span class="ikon">✹</span> Knaldgas <span class="undertitel">Forsøg med H₂ og O₂</span></h1>
+
+    <div class="top-hoejre">
+        <button class="knap topknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+        <button class="ikonknap" id="lydknap" type="button" title="Lyd til og fra (M)" aria-label="Lyd til og fra" aria-pressed="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/>
+                <path class="boelger" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path class="kryds" d="M16.5 9.5l5 5M21.5 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </button>
+        <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+    </div>
+</header>
+
+<main class="forsoeg">
+    <div class="scenekolonne">
+        <div class="scene" id="scene">
+            <canvas id="scene-laerred" aria-label="Forsøgsopstilling: trykflasker med H₂ og O₂, måleglas i vandbad og brænder"></canvas>
+
+            <!-- Forloebet i tre trin. Det aktive trin lyser; se trin() i forsoeg.js. -->
+            <ol class="trinlinje" aria-label="Forløb">
+                <li id="trin-1"><span class="nr">1</span>Fyld glasset</li>
+                <li id="trin-2"><span class="nr">2</span>Antænd</li>
+                <li id="trin-3"><span class="nr">3</span>Aflæs lydstyrken</li>
+            </ol>
+
+            <div class="scenebesked" id="scenebesked" aria-live="polite"></div>
+        </div>
+
+        <section class="resultat" id="resultat" aria-label="Resultater">
+            <div class="resultat-hoved">
+                <h2>Lydstyrke</h2>
+                <span class="forklar"><b class="h2farve">H₂</b> : <b class="o2farve">O₂</b> i streger</span>
+                <span class="taeller" id="graf-taeller">0/7 testet</span>
+                <button class="knap lille" id="graf-ryd" type="button">Ryd resultater</button>
+            </div>
+            <div class="grafboks"><canvas id="graf-laerred"></canvas></div>
+        </section>
+    </div>
+
+    <aside class="panel">
+        <div class="kort fremhaev" id="glas-kort">
+            <h2>Glasset <span class="taeller" id="glas-taeller">0 af 6 streger</span></h2>
+
+            <div class="blanding">
+                <div class="forhold" aria-label="Forholdet mellem H₂ og O₂">
+                    <span class="h2farve" id="vis-h">0</span><span class="kolon">:</span><span class="o2farve" id="vis-o">0</span>
+                </div>
+                <div class="stregbar" id="stregbar" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                </div>
+            </div>
+
+            <div class="gasrad">
+                <span class="molikon h2" aria-hidden="true"><i></i><i></i></span>
+                <span class="gasnavn">H₂ <em>dihydrogen</em></span>
+                <button class="talknap plus" id="knap-h2" type="button" title="Luk en streg H₂ ind (1)" aria-label="Luk en streg H₂ ind">+</button>
+            </div>
+            <div class="gasrad">
+                <span class="molikon o2" aria-hidden="true"><i></i><i></i></span>
+                <span class="gasnavn">O₂ <em>dioxygen</em></span>
+                <button class="talknap plus" id="knap-o2" type="button" title="Luk en streg O₂ ind (2)" aria-label="Luk en streg O₂ ind">+</button>
+            </div>
+
+            <div class="knaprad">
+                <button class="knap" id="knap-toem" type="button" title="Tøm glasset (R)"><span>Tøm glasset</span><span class="tegn">↺</span></button>
+                <button class="knap orange" id="knap-antaend" type="button" title="Antænd (mellemrum)"><span>Antænd</span><span class="tegn">🔥</span></button>
+                <!-- Afloeser Antaend, mens glasset staar ved flammen efter et knald -->
+                <button class="knap blaa" id="knap-genfyld" type="button" title="Genfyld glasset (G)" hidden><span id="knap-genfyld-tekst">Genfyld glasset</span><span class="tegn">↩</span></button>
+            </div>
+            <p class="note">Du kan også trække det fyldte glas hen til flammen.</p>
+        </div>
+
+        <div class="kort opgavekort" id="quiz-kort">
+            <h2><span>Quiz</span> <span class="taeller" id="quiz-taeller"></span></h2>
+            <p class="besked" id="quiz-tekst"></p>
+            <div class="valg" id="quiz-valg" hidden></div>
+            <p class="besked" id="quiz-forklaring" hidden></p>
+            <div class="quiz-score" id="quiz-score" hidden></div>
+            <button class="knap stor blaa" id="quiz-knap" type="button" hidden><span id="quiz-knap-tekst">Start quiz</span><span class="tegn">→</span></button>
+        </div>
+    </aside>
+</main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Reaktionen</h2>
+        <p>Dihydrogen og dioxygen reagerer og danner vand:</p>
+        <div class="ligning">2 H₂(g) + O₂(g) → 2 H₂O(g)</div>
+
+        <h3>Forholdet 2 : 1</h3>
+        <p>Koefficienterne viser, at hvert O₂-molekyle reagerer med to H₂-molekyler. Lige store rumfang gas indeholder lige mange molekyler ved samme tryk og temperatur. Forholdet gælder derfor også for rumfang: 4 streger H₂ reagerer med 2 streger O₂.</p>
+
+        <h3>Knaldet</h3>
+        <p>Reaktionen er exoterm. Når blandingen antændes, frigives energien på en brøkdel af et sekund. Gassen opvarmes og udvider sig pludseligt, og det høres som et knald. Er der overskud af den ene gas, reagerer der mindre, og knaldet bliver svagere.</p>
+
+        <div class="knapper">
+            <button class="knap blaa" id="teori-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: spotlight paa ét element ad gangen - se js/rundvisning.js -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/model.js"></script>
+<script src="js/lyd.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/scene.js"></script>
+<script src="js/forsoeg.js"></script>
+<script src="js/graf.js"></script>
+<script src="js/quiz.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
