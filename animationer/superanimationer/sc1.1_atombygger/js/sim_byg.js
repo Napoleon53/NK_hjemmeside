@@ -27,7 +27,7 @@
         this.atom = new NK.Atom();
         this.p = 1; this.n = 0; this.e = 1;
         this.opgave = null;
-        this.opgaveNr = 0;      /* taeller 1-5 og starter forfra - se nyOpgave() */
+        this.rigtige = 0;       /* selv-loeste opgaver i denne runde - se tjekOpgave() */
         this.beskedTid = 0;
         this.atom.saetStraks(this.p, this.n, this.e);
 
@@ -347,20 +347,27 @@
 
     /* Der er kun ÉN knap i opgavekortet, og den viser det naeste skridt:
 
-         start  -> Start opgave    traekker en opgave
-         hint   -> Giv hint        viser opgavens atomsymbol
-         svar   -> Vis svaret      bygger den og forklarer hvorfor
-         ny     -> Ny opgave       rydder scenen og traekker en ny
+         start   -> Start opgave    traekker en opgave
+         hint    -> Giv hint        viser opgavens atomsymbol
+         svar    -> Vis svaret      bygger den og forklarer hvorfor
+         ny      -> Ny opgave       rydder scenen og traekker en ny
+         faerdig -> Start forfra    runden er vundet - nulstil og begynd igen
 
        Loeser man selv opgaven undervejs, springer knappen direkte til
        "Ny opgave". Trappen er den samme vej hele vejen igennem: man
        faar aldrig mere hjaelp, end man selv har bedt om. */
     var KNAPTRIN = {
-        start: { tekst: "Start opgave", klasse: "knap blaa" },
-        hint:  { tekst: "Giv hint",     klasse: "knap" },
-        svar:  { tekst: "Vis svaret",   klasse: "knap" },
-        ny:    { tekst: "Ny opgave",    klasse: "knap blaa banker" }
+        start:   { tekst: "Start opgave", klasse: "knap blaa" },
+        hint:    { tekst: "Giv hint",     klasse: "knap" },
+        svar:    { tekst: "Vis svaret",   klasse: "knap" },
+        ny:      { tekst: "Ny opgave",    klasse: "knap blaa banker" },
+        faerdig: { tekst: "Start forfra", klasse: "knap groen banker" }
     };
+
+    /* Maalet for runden: opgaver taeller kun med, naar de er loest selv -
+       hverken forkerte forsoeg eller et afsloeret svar rykker taelleren,
+       men et hint undervejs er stadig en selv-loest opgave. */
+    var MAAL_RIGTIGE = 6;
 
     NK.SimByg.prototype.saetOpgaveTrin = function (trin) {
         this.opgaveTrin = trin;
@@ -371,17 +378,28 @@
     NK.SimByg.prototype.opgaveKnap = function () {
         if (this.opgaveTrin === "hint") { this.visHint(); return; }
         if (this.opgaveTrin === "svar") { this.visSvar(); return; }
+        if (this.opgaveTrin === "faerdig") { this.startForfra(); return; }
         if (this.opgaveTrin === "ny") this.ryd();
         this.nyOpgave();
+    };
+
+    /* Runden er vundet: nulstil taelleren, ryd atomet, og vend tilbage
+       til udgangspunktet, saa naeste runde begynder paa samme maade som
+       den foerste. */
+    NK.SimByg.prototype.startForfra = function () {
+        this.rigtige = 0;
+        this.ryd();
+        this.visOpgaveStart();
     };
 
     /* Udgangspunktet: ingen opgave er i gang endnu - eleven skal selv
        bede om én, saa opgaven ikke bare dukker op uopfordret. */
     NK.SimByg.prototype.visOpgaveStart = function () {
         this.opgave = null;
-        NK.saetTekst("byg-opgave", "Tryk på “Start opgave” for at få en opgave, du selv skal bygge.");
+        NK.saetTekst("byg-opgave", "Løs " + MAAL_RIGTIGE + " opgaver rigtigt for at gennemføre runden. Et hint tæller stadig med, men et afsløret svar gør ikke. Tryk på “Start opgave” for at komme i gang.");
         NK.saetKlasse("byg-opgave", "besked");
-        NK.el("byg-opgave-taeller").style.display = "none";
+        NK.el("byg-opgave-taeller").style.display = "";
+        NK.saetTekst("byg-opgave-taeller", this.rigtige + "/" + MAAL_RIGTIGE);
         NK.el("byg-opgave-nuklid").hidden = true;
         this.saetOpgaveTrin("start");
     };
@@ -408,10 +426,9 @@
         NK.el("byg-opgave-nuklid").hidden = false;
     };
 
-    /* Taelleren viser altid "X/5" - en runde paa fem opgaver, som starter
-       forfra bagefter. Det er en illusion: der findes uendeligt mange
-       opgaver at traekke fra, men en runde med en synlig ende er mere
-       motiverende at gaa i gang med end en taeller, der bare stiger. */
+    /* Taelleren viser "X/6" - hvor mange opgaver, der er loest selv i
+       denne runde. Den staar fast, mens en ny opgave er i gang, og
+       rykker foerst, naar tjekOpgave() godkender et selv-bygget svar. */
     NK.SimByg.prototype.nyOpgave = function () {
         var forsoeg = 0;
         do {
@@ -419,11 +436,10 @@
             forsoeg++;
         } while (forsoeg < 8 && this.opgave.p === this.p && this.opgave.n === this.n && this.opgave.e === this.e);
         this.opgave.loest = false;
-        this.opgaveNr++;
         NK.saetTekst("byg-opgave", this.opgave.tekst);
         NK.saetKlasse("byg-opgave", "besked");
         NK.el("byg-opgave-taeller").style.display = "";
-        NK.saetTekst("byg-opgave-taeller", (((this.opgaveNr - 1) % 5) + 1) + "/5");
+        NK.saetTekst("byg-opgave-taeller", this.rigtige + "/" + MAAL_RIGTIGE);
         NK.el("byg-opgave-nuklid").hidden = true;
         this.saetOpgaveTrin("hint");
         this.tjekOpgave();
@@ -446,10 +462,19 @@
         if (!o || o.loest) return;
         if (o.p !== this.p || o.n !== this.n || o.e !== this.e) return;
         o.loest = true;
-        NK.saetTekst("byg-opgave", "Rigtigt! " + o.svar);
-        NK.saetKlasse("byg-opgave", "besked god");
+        this.rigtige++;
+        NK.saetTekst("byg-opgave-taeller", this.rigtige + "/" + MAAL_RIGTIGE);
         this.visOpgaveNuklid(o);
-        this.saetOpgaveTrin("ny");
+
+        if (this.rigtige >= MAAL_RIGTIGE) {
+            NK.saetTekst("byg-opgave", "Rigtigt! " + o.svar + " Du har nu løst " + MAAL_RIGTIGE + " opgaver rigtigt selv — runden er gennemført.");
+            NK.saetKlasse("byg-opgave", "besked god");
+            this.saetOpgaveTrin("faerdig");
+        } else {
+            NK.saetTekst("byg-opgave", "Rigtigt! " + o.svar);
+            NK.saetKlasse("byg-opgave", "besked god");
+            this.saetOpgaveTrin("ny");
+        }
     };
 
     /* ----- Tegning ---------------------------------------------------------- */
