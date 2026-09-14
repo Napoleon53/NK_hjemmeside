@@ -195,6 +195,62 @@
         }
     };
 
+    /* ----- Tingene paa bordet -------------------------------------------- */
+    /* Vandets form i et baegerglas: lige sider og afrundede hjoerner i
+       bunden. Kun stien - kalderen fylder og klipper selv. */
+    T.vandSti = function (ctx, x0, x1, top, bund, r) {
+        ctx.beginPath();
+        ctx.moveTo(x0, top);
+        ctx.lineTo(x1, top);
+        ctx.lineTo(x1, bund - r);
+        ctx.quadraticCurveTo(x1, bund, x1 - r, bund);
+        ctx.lineTo(x0 + r, bund);
+        ctx.quadraticCurveTo(x0, bund, x0, bund - r);
+        ctx.closePath();
+    };
+
+    /* Varmepladen (sprites/varmeplade.svg). gloed 0-1 farver pladen roed;
+       roer taender den blaa lampe for omroereren. */
+    T.varmeplade = function (ctx, x, y, b, gloed, roer) {
+        var S = NK.Sprites, MP = S.MAAL.varmeplade, s = b / MP.b;
+        S.tegn(ctx, "varmeplade", x, y, b);
+        ctx.save();
+        if (gloed > 0) {
+            ctx.globalAlpha = gloed;
+            var g = ctx.createLinearGradient(0, y, 0, y + MP.pladeBund * s);
+            g.addColorStop(0, "rgba(255, 120, 60, 0.95)");
+            g.addColorStop(1, "rgba(200, 50, 30, 0.75)");
+            ctx.fillStyle = g;
+            NK.rundtRekt(ctx, x + MP.pladeV * s, y + 1, (MP.pladeH - MP.pladeV) * s, (MP.pladeBund - 1) * s, 2 * s);
+            ctx.fill();
+            ctx.fillStyle = "#ff6a3d";
+            ctx.beginPath();
+            ctx.arc(x + MP.lampeVarme[0] * s, y + MP.lampeVarme[1] * s, MP.lampeR * s, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        if (roer) {
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = "#5cc0ff";
+            ctx.beginPath();
+            ctx.arc(x + MP.lampeRoer[0] * s, y + MP.lampeRoer[1] * s, MP.lampeR * s, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.restore();
+    };
+
+    /* Termometeret (sprites/termometer.svg) med den roede soejle. */
+    T.termometer = function (ctx, x, y, b, temp) {
+        var S = NK.Sprites, MT = S.MAAL.termometer;
+        if (!S.tegn(ctx, "termometer", x, y, b)) return false;
+        var s = b / MT.b;
+        var yT = y + (MT.nul - (MT.nul - MT.hundrede) * NK.klamp(temp, 0, 100) / 100) * s;
+        ctx.save();
+        ctx.fillStyle = "#d9453a";
+        ctx.fillRect(x + MT.soejleV * s, yT, (MT.soejleH - MT.soejleV) * s, y + MT.soejleBund * s - yT);
+        ctx.restore();
+        return true;
+    };
+
     /* ----- Baegerglasset ------------------------------------------------- */
     /* x, y, b, h er glassets indvendige maal. vandTop er y-vaerdien for
        vandoverfladen. farve toner vandet, saa fx CuSO₄ kan farve det blaat.

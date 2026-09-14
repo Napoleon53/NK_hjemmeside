@@ -85,7 +85,7 @@
 
     Q.visResultat = function () {
         var pct = Math.round(100 * Q.rigtige / D.QUIZ.length);
-        var ord = pct === 100 ? "Alt rigtigt — flot."
+        var ord = pct === 100 ? "Alt rigtigt."
             : pct >= 60 ? "Godt gået. Kig teorien igennem for de sidste."
             : "Åbn teoriboksen, og prøv igen bagefter.";
 

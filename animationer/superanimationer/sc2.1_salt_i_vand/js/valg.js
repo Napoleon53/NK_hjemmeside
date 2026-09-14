@@ -38,7 +38,7 @@
             var b = document.createElement("button");
             b.type = "button";
             b.className = "saltknap " + (D.erTung(salt) ? "tung" : "let");
-            b.title = salt.navn + " — " + salt.hverdag;
+            b.title = salt.navn + ": " + salt.hverdag;
             b.setAttribute("aria-label", salt.navn);
             b.innerHTML = '<span class="sformel"></span><span class="snavn"></span>';
             b.querySelector(".sformel").textContent = salt.formel;

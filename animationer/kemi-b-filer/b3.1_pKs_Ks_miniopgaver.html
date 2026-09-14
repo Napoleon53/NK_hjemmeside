@@ -1118,7 +1118,7 @@
     });
 
     el("input-pks").addEventListener("input", function () {
-        if (loest) return;
+        if (trin !== 3 || loest) return;
         ubekraeftet = this.value.trim() !== "";
         opdaterKnap();
     });

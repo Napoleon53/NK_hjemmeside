@@ -162,6 +162,9 @@
         if (!o || o.afsluttet) return;
         this.loeste++;
         NK.saetTekst(this.id("loest"), String(this.loeste));
+        /* Ved et valgspoergsmaal vises svaret ogsaa i billedet bagefter,
+           saa eleven kan se, at det passer. */
+        if (o.valg && o.visSvar) o.visSvar(this.sim);
         this.besked("svar", "Rigtigt. " + o.svar, "besked god");
         this.afslut(o);
     };
