@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-94.0 -36.0 188.0 72.0">
+    <line x1="-38.0" y1="-5.0" x2="-20.0" y2="-5.0" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+    <line x1="-38.0" y1="5.0" x2="-20.0" y2="5.0" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+    <line x1="20.0" y1="-5.0" x2="38.0" y2="-5.0" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+    <line x1="20.0" y1="5.0" x2="38.0" y2="5.0" stroke="#cbd5e1" stroke-width="5" stroke-linecap="round"/>
+    
+    <circle cx="-58.0" cy="0.0" r="20" fill="#ef5350" stroke="#d32f2f" stroke-width="2"/>
+    <ellipse cx="-64.4" cy="-7.6" rx="8.4" ry="5.6" fill="#ffffff" opacity="0.22"/>
+    <text x="-58.0" y="0.0" font-family="'Segoe UI', sans-serif" font-weight="700" font-size="20" fill="#fff5f5" text-anchor="middle" dominant-baseline="central">O</text>
+
+    <circle cx="0.0" cy="0.0" r="20" fill="#4b5563" stroke="#9ca3af" stroke-width="2"/>
+    <ellipse cx="-6.4" cy="-7.6" rx="8.4" ry="5.6" fill="#ffffff" opacity="0.22"/>
+    <text x="0.0" y="0.0" font-family="'Segoe UI', sans-serif" font-weight="700" font-size="20" fill="#f9fafb" text-anchor="middle" dominant-baseline="central">C</text>
+
+    <circle cx="58.0" cy="0.0" r="20" fill="#ef5350" stroke="#d32f2f" stroke-width="2"/>
+    <ellipse cx="51.6" cy="-7.6" rx="8.4" ry="5.6" fill="#ffffff" opacity="0.22"/>
+    <text x="58.0" y="0.0" font-family="'Segoe UI', sans-serif" font-weight="700" font-size="20" fill="#fff5f5" text-anchor="middle" dominant-baseline="central">O</text>
+    <circle cx="-72.4" cy="2.9" r="4.2" fill="#fbbf24" stroke="#78350f" stroke-width="0.6"/>
+    <circle cx="-68.2" cy="10.6" r="4.2" fill="#fbbf24" stroke="#78350f" stroke-width="0.6"/>
+    <circle cx="-68.2" cy="-10.6" r="4.2" fill="#fbbf24" stroke="#78350f" stroke-width="0.6"/>
+    <circle cx="-72.4" cy="-2.9" r="4.2" fill="#fbbf24" stroke="#78350f" stroke-width="0.6"/>
+    <circle cx="72.4" cy="-2.9" r="4.2" fill="#fbbf24" stroke="#78350f" stroke-width="0.6"/>
+    <circle cx="68.2" cy="-10.6" r="4.2" fill="#fbbf24" stroke="#78350f" stroke-width="0.6"/>
+    <circle cx="68.2" cy="10.6" r="4.2" fill="#fbbf24" stroke="#78350f" stroke-width="0.6"/>
+    <circle cx="72.4" cy="2.9" r="4.2" fill="#fbbf24" stroke="#78350f" stroke-width="0.6"/>
+</svg>
