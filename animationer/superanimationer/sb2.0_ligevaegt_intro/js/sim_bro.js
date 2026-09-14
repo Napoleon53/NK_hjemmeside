@@ -988,7 +988,8 @@
                             ctx.fillStyle = "rgba(224, 84, 70, 0.32)";
                             ctx.fillRect(a, yTop, e - a, halv);
                             maerkater.push({
-                                x: NK.klamp((a + e) / 2, 24, this.l.b - 24),
+                                /* Holdes fri af "+n i kø" ved kanterne */
+                                x: NK.klamp((a + e) / 2, 110, this.l.b - 110),
                                 y: r < 0 ? y - tyk / 2 - 12 : y + tyk / 2 + 12
                             });
                         }
