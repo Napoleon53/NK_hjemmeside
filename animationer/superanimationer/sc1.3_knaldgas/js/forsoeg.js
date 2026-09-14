@@ -159,7 +159,7 @@
             til: { x: til.x, y: til.y },
             t: 0,
             varighed: varighed,
-            loeft: Math.min(120, afstand * 0.45 + 10),
+            loeft: Math.min(36, afstand * 0.2 + 8),
             efter: efter
         };
         this.tilstand = "flyver";
@@ -381,7 +381,7 @@
             var u = 1 - t;
             var nx = u * u * u * b.fra.x + 3 * u * u * t * b.fra.x + 3 * u * t * t * b.til.x + t * t * t * b.til.x;
             var ny = u * u * u * b.fra.y + 3 * u * u * t * top + 3 * u * t * t * top + t * t * t * b.til.y;
-            this.vinkelMaal = NK.klamp((nx - this.glas.x) / Math.max(dt, 0.001) * 0.0009, -0.3, 0.3);
+            this.vinkelMaal = NK.klamp((nx - this.glas.x) / Math.max(dt, 0.001) * 0.0005, -0.2, 0.2);
             this.glas.x = nx;
             this.glas.y = ny;
             if (b.t >= 1) {
@@ -413,9 +413,11 @@
         var maalNiveau = this.skalFyldes ? (this.tilstand === "fylder" ? 0 : M.MAKS) : this.h + this.o;
         this.niveau = NK.mod(this.niveau, maalNiveau, this.tilstand === "fylder" ? 7 : 5, dt);
         var underVand = this.glas.y + this.rekyl > S.BAD.overflade + 4 && this.glas.x > S.BAD.indreV && this.glas.x < S.BAD.indreH;
-        if (!underVand && this.vand > 0.6) {
-            for (i = 0; i < 6; i++) {
-                this.e.draaber.push({ x: this.glas.x + r(-26, 26), y: this.glas.y + r(-4, 4), vy: r(0, 60), liv: 1 });
+        /* Vandet under stregerne loeber ud af aabningen, naar glasset
+           loeftes op af badet. */
+        if (!underVand && this.vand > 0.7) {
+            for (i = 0; i < 2; i++) {
+                this.e.draaber.push({ x: this.glas.x + r(-24, 24), y: this.glas.y + this.rekyl + r(-2, 2), vy: r(20, 80), liv: 1 });
             }
         }
         this.vand = underVand ? NK.mod(this.vand, 1, 6, dt) : Math.max(0, this.vand - dt * 3);
@@ -531,7 +533,8 @@
             d.vy += TYNGDE * dt;
             d.y += d.vy * dt;
             d.liv -= dt * 1.2;
-            if (d.liv <= 0 || d.y > S.BORD) e.draaber.splice(i, 1);
+            var iBad = d.x > S.BAD.indreV && d.x < S.BAD.indreH && d.y > S.BAD.overflade;
+            if (d.liv <= 0 || d.y > S.BORD || iBad) e.draaber.splice(i, 1);
         }
 
         /* Glasset hopper op ved knaldet og falder til ro igen */

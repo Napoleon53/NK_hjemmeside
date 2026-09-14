@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest - sc1.3 Knaldgas</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1200px; height:800px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i animationen og kan slettes.
+
+   Aabner index.html i en iframe og kontrollerer det, man ikke kan se
+   paa et skaermbillede: at kemien i model.js gaar op (atomer bevares,
+   styrkerne er de rigtige), at glasset kun kan antaendes fuldt, at
+   hele forloebet ender tilbage i vandbadet, at quizzen laases op og i
+   igen, og at teksterne ikke bruger tankestreger.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+function koer() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument;
+    var NK = ramme.contentWindow.NK;
+    var i, h, o;
+
+    overskrift("1. Indlaesning");
+    paastand("NK findes", !!NK);
+    if (!NK) { vis(); return; }
+    paastand("forsoeg, graf og quiz er bygget", !!(NK.forsoeg && NK.graf && NK.quiz));
+    ["flaskeH2", "flaskeO2", "maaleglas", "vandbad", "braender"].forEach(function (n) {
+        paastand("sprite " + n + " er indlaest", NK.Sprites.klar(n));
+    });
+
+    overskrift("2. Kemien i model.js");
+    var M = NK.Model;
+    var ventet = [0, 25, 50, 75, 100, 50, 0];
+    for (h = 0; h <= 6; h++) {
+        var rx = M.reaktion(h, 6 - h);
+        paastand(h + " : " + (6 - h) + " giver styrke " + ventet[h], rx.styrke === ventet[h], "fik " + rx.styrke);
+    }
+    var bevaret = true, begraenset = true, eks = "";
+    for (h = 0; h <= 6; h++) {
+        for (o = 0; o <= 6 - h; o++) {
+            var r = M.reaktion(h, o);
+            var hFoer = 2 * r.h2, hEfter = 2 * r.restH2 + 2 * r.h2o;
+            var oFoer = 2 * r.o2, oEfter = 2 * r.restO2 + r.h2o;
+            if (hFoer !== hEfter || oFoer !== oEfter) { bevaret = false; eks = h + ":" + o; }
+            if (r.h2 > 0 && r.o2 > 0 && r.restH2 > 0 && r.restO2 > 0) { begraenset = false; eks = h + ":" + o; }
+        }
+    }
+    paastand("H- og O-atomer er bevaret i alle 28 blandinger", bevaret, eks);
+    paastand("den begraensende gas bliver altid brugt helt op", begraenset, eks);
+    var r51 = M.reaktion(5, 1);
+    paastand("5 : 1 giver 4 H2O og 6 H2 i overskud", r51.h2o === 4 && r51.restH2 === 6 && r51.restO2 === 0);
+    paastand("ordet ved 100 er KABOOM!, ved 0 Ingen reaktion", M.ord(100) === "KABOOM!" && M.ord(0) === "Ingen reaktion");
+
+    var f = NK.forsoeg;
+    var S = NK.Scene;
+    function adv(sek) { for (var k = 0; k < Math.round(sek * 60); k++) f.opdater(1 / 60); }
+    function fyld(hh, oo) { for (var a = 0; a < hh; a++) f.tilfoej("h2"); for (var b = 0; b < oo; b++) f.tilfoej("o2"); }
+    function frisk() { f.nulstil(); f.resultater = {}; NK.opdaterPanel(); }
+
+    overskrift("3. Fyldning og antaending");
+    frisk();
+    fyld(2, 1);
+    paastand("et halvt glas kan ikke antaendes", f.antaend() === false && f.tilstand === "klar");
+    paastand("et halvt glas kan ikke tages op", f.ned({ x: f.glas.x, y: f.glas.y - 100 }) === false && f.tilstand === "klar");
+    fyld(3, 2);
+    paastand("glasset stopper ved 6 streger", f.h + f.o === 6, f.h + " + " + f.o);
+    NK.opdaterPanel();
+    paastand("+ knapperne er slaaet fra, Antaend er slaaet til",
+        d.getElementById("knap-h2").disabled && d.getElementById("knap-o2").disabled && !d.getElementById("knap-antaend").disabled);
+    adv(2.5);
+    paastand("glasset indeholder 12 molekyler (2 pr. streg)", f.molekyler.length === 12, f.molekyler.length);
+    paastand("Antaend starter turen hen til flammen", f.antaend() === true && f.tilstand === "flyver");
+    adv(1.2);
+    paastand("glasset naar flammen og knalder", f.tilstand === "knald");
+    paastand("5 : 1 bliver registreret med styrke 50", f.resultater[5] === 50, f.resultater[5]);
+    var h2o = 0, h2 = 0, o2 = 0;
+    f.molekyler.forEach(function (m) { if (m.type === "h2o") h2o++; else if (m.type === "h2") h2++; else o2++; });
+    paastand("i glasset: 4 H2O og 6 H2, ingen O2", h2o === 4 && h2 === 6 && o2 === 0, h2o + " H2O, " + h2 + " H2, " + o2 + " O2");
+    NK.opdaterPanel();
+    paastand("Antaend er slaaet fra efter knaldet", d.getElementById("knap-antaend").disabled);
+    adv(5);
+    paastand("glasset er tilbage i vandbadet og klar igen", f.tilstand === "klar"
+        && Math.abs(f.glas.x - S.HJEM.x) < 0.5 && Math.abs(f.glas.y - S.HJEM.y) < 0.5, f.tilstand);
+    paastand("glasset er tomt for molekyler", f.molekyler.length === 0, f.molekyler.length);
+
+    overskrift("4. Traek med musen");
+    frisk();
+    fyld(4, 2);
+    adv(2);
+    paastand("det fulde glas kan tages op", f.ned({ x: f.glas.x, y: f.glas.y - 100 }) === true && f.tilstand === "traek");
+    f.flyt({ x: 700, y: 280 });
+    f.op();
+    paastand("slippes det et andet sted, glider det hjem", f.tilstand === "flyver");
+    adv(2);
+    paastand("og er klar igen med gassen i behold", f.tilstand === "klar" && f.h === 4 && f.o === 2);
+    f.ned({ x: f.glas.x, y: f.glas.y - 100 });
+    f.flyt({ x: S.TAEND.x, y: S.TAEND.y - 100 });
+    paastand("traekkes det hen til flammen, knalder det", f.tilstand === "knald" && f.resultater[4] === 100, f.tilstand);
+    adv(5);
+
+    overskrift("5. Rene gasser");
+    frisk();
+    fyld(6, 0);
+    adv(2);
+    f.antaend();
+    adv(1.2);
+    paastand("6 : 0 giver ingen reaktion og styrke 0", f.resultater[6] === 0 && f.sidsteReaktion.h2o === 0);
+    paastand("molekylerne bliver uaendret H2", f.molekyler.every(function (m) { return m.type === "h2"; }) && f.molekyler.length === 12, f.molekyler.length);
+    adv(5);
+
+    overskrift("6. Quizzen laases op og i igen");
+    frisk();
+    paastand("quizzen er laast fra start", NK.quiz.tilstand === "laast");
+    for (h = 0; h <= 6; h++) f.resultater[h] = M.reaktion(h, 6 - h).styrke;
+    NK.opdaterPanel();
+    paastand("alle syv testet laaser quizzen op", NK.quiz.tilstand === "klar" && !d.getElementById("quiz-knap").hidden);
+    d.getElementById("quiz-knap").click();
+    paastand("Start quiz viser spoergsmaal 1 med fire svar", NK.quiz.tilstand === "sp" && d.querySelectorAll("#quiz-valg .valgknap").length === 4);
+    f.rydResultater();
+    paastand("Ryd resultater laaser quizzen igen", NK.quiz.tilstand === "laast");
+
+    overskrift("7. Quizzens spoergsmaal");
+    NK.QUIZ.forEach(function (sp, n) {
+        var unikke = sp.valg.filter(function (v, k) { return sp.valg.indexOf(v) === k; }).length === 4;
+        var blandOk = true;
+        for (i = 0; i < 100; i++) {
+            var b = NK.quiz.bland(sp);
+            if (b.valg[b.rigtig] !== sp.valg[sp.rigtig]) blandOk = false;
+        }
+        paastand("spoergsmaal " + (n + 1) + ": fire forskellige svar, blandingen holder styr paa det rigtige",
+            sp.valg.length === 4 && unikke && sp.rigtig >= 0 && sp.rigtig < 4 && !!sp.forklaring && blandOk);
+    });
+
+    overskrift("8. Sprog: ingen tankestreger");
+    var tekster = [d.body.textContent];
+    NK.QUIZ.forEach(function (sp) { tekster.push(sp.sp, sp.forklaring, sp.valg.join(" ")); });
+    var alt = tekster.join(" ");
+    paastand("ingen — eller – i sidens tekst og quizzen", !/[—–]/.test(alt));
+
+    frisk();
+    vis();
+}
+
+function vis() {
+    skriv("\n" + (fejl === 0 ? "ALT OK" : fejl + " FEJL"), fejl === 0 ? "ok" : "fejl");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+</script>
+</body>
+</html>

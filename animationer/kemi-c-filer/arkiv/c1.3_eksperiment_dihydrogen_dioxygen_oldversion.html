@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title>Knaldgas: Eksperiment</title>
+    <style>
+        body { margin: 0; padding: 0; background-color: #ecf0f1; font-family: 'Segoe UI', sans-serif; overflow: hidden; height: 100vh; user-select: none; }
+
+        #game-container { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+        canvas { box-shadow: 0 0 20px rgba(0,0,0,0.1); background: #fff; border-radius: 4px; }
+
+        /* UI Layer */
+        #ui-layer { position: absolute; width: 900px; height: 650px; pointer-events: none; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+
+        /* Knapper */
+        .btn { pointer-events: auto; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 rgba(0,0,0,0.2); transition: all 0.1s; font-size: 14px; color: white; text-transform: uppercase; }
+        .btn:active { transform: translateY(4px); box-shadow: none; }
+        .btn:disabled { background-color: #bdc3c7; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* Tank Controls */
+        .tank-controls { position: absolute; bottom: 150px; width: 120px; text-align: center; pointer-events: auto; }
+        .btn-gas { width: 100%; margin-bottom: 8px; font-size: 16px; padding: 15px 5px; }
+
+        /* Navigations Knapper */
+        #btnTheory { position: absolute; bottom: 20px; left: 20px; background: #8e44ad; width: auto; font-size: 12px; }
+        #btnReset { position: absolute; bottom: 20px; right: 20px; background: #c0392b; width: auto; font-size: 12px; }
+        #btnClearAll { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: #7f8c8d; width: auto; font-size: 12px; }
+        #btnSound { position: absolute; top: 15px; right: 15px; background: #34495e; width: auto; font-size: 14px; padding: 8px 10px; border-radius: 50%; }
+
+        /* Resultat Panel (Top) */
+        #results-panel {
+            position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+            width: 600px; height: 185px;
+            background: rgba(255,255,255,0.95);
+            padding: 5px 20px;
+            border-radius: 0 0 15px 15px;
+            border: 1px solid #bdc3c7; border-top: none;
+            pointer-events: auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        #missionText { font-size: 13px; font-weight: bold; color: #2c3e50; text-align: center; min-height: 16px; margin: 4px 0; }
+
+        .checklist-row { display: flex; justify-content: center; gap: 6px; margin: 6px 0; }
+        .check-item { width: 28px; height: 28px; border-radius: 50%; background: #ecf0f1; border: 2px solid #bdc3c7; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: #7f8c8d; transition: all .2s; }
+        .check-item.tested { color: white; }
+
+        /* Modal & Overlay */
+        #theory-modal, #overlay, #quiz-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100; display: flex; align-items: center; justify-content: center; pointer-events: auto; }
+        #theory-content { background: white; padding: 30px; border-radius: 8px; max-width: 500px; position: relative; }
+
+        .step-strip { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 25px 0; }
+        .step-strip .step { text-align: center; }
+        .step-strip .step .icon { font-size: 42px; line-height: 1; }
+        .step-strip .step .label { font-size: 12px; margin-top: 4px; color: #ddd; }
+        .step-strip .arrow { font-size: 26px; color: #f1c40f; }
+
+        /* Start-nudge: peger på +H2/+O2 knapperne indtil brugeren har fyldt gas første gang */
+        @keyframes bounceHint { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+        @keyframes pulseGlow { 0%, 100% { box-shadow: 0 4px 0 rgba(0,0,0,0.2), 0 0 0 rgba(241,196,15,0); } 50% { box-shadow: 0 4px 0 rgba(0,0,0,0.2), 0 0 22px 8px rgba(241,196,15,0.9); } }
+        .hint-arrow { font-size: 30px; text-align: center; margin-bottom: 4px; animation: bounceHint 1s infinite; pointer-events: none; }
+        .btn-gas.pulse-hint { animation: pulseGlow 1.2s infinite; }
+
+        /* Quiz */
+        @keyframes quizPulse { 0%, 100% { box-shadow: 0 4px 0 rgba(0,0,0,0.2), 0 0 0 rgba(22,160,133,0); } 50% { box-shadow: 0 4px 0 rgba(0,0,0,0.2), 0 0 18px 6px rgba(22,160,133,0.8); } }
+        #btnStartQuizInline { background: #16a085; margin-left: 10px; padding: 5px 12px; font-size: 11px; animation: quizPulse 1.4s infinite; }
+        #quiz-content { background: white; padding: 30px; border-radius: 8px; width: 480px; max-width: 90vw; position: relative; }
+        #quizProgress { font-size: 12px; color: #7f8c8d; font-weight: bold; text-transform: uppercase; margin-bottom: 6px; }
+        #quizQuestionText { font-size: 17px; font-weight: bold; color: #2c3e50; margin: 4px 0 18px 0; line-height: 1.4; }
+        .quiz-option { display: block; width: 100%; text-align: left; background: #f0f2f5; color: #2c3e50; border: 2px solid #dfe4ea; border-radius: 6px; padding: 10px 14px; margin-bottom: 10px; font-size: 14px; cursor: pointer; box-shadow: none; text-transform: none; font-weight: normal; transition: all .15s; }
+        .quiz-option:hover:not(:disabled) { border-color: #16a085; background: #eafaf6; }
+        .quiz-option:disabled { cursor: default; }
+        .quiz-option.correct { background: #27ae60; border-color: #27ae60; color: white; }
+        .quiz-option.wrong { background: #e74c3c; border-color: #e74c3c; color: white; }
+        #quizFeedback { font-size: 13px; background: #f0f2f5; padding: 10px; border-left: 4px solid #16a085; border-radius: 4px; margin: 10px 0; display: none; }
+        #quizNextBtn { background: #16a085; margin-top: 6px; display: none; }
+        #quizResult { display: none; text-align: center; }
+        #quizResult .score { font-size: 40px; font-weight: bold; color: #16a085; margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <canvas id="simCanvas" width="900" height="650"></canvas>
+
+    <div id="ui-layer">
+        <div id="results-panel">
+            <div class="checklist-row" id="checklistRow"></div>
+            <div id="missionText"></div>
+            <h3 style="font-size:13px; margin: 2px 0 2px 0; color:#333; text-align:center;">Resultater (Lydstyrke vs. H₂-andel)</h3>
+            <canvas id="graphCanvas" width="480" height="88" style="display:block; margin:0 auto;"></canvas>
+            <div id="graphLegend" style="font-size:10px; color:#555; text-align:center; margin-top:2px;">
+                Søjlens højde = hvor kraftigt knaldet var (lydstyrke). Højere søjle = kraftigere knald.
+            </div>
+        </div>
+
+        <div class="tank-controls" style="left: 30px;">
+            <div class="hint-arrow" id="hintH2">👇</div>
+            <button id="btnAddH2" class="btn btn-gas" style="background: #2980b9;">+ H₂</button>
+            <div style="font-size:12px; color:#555; background:rgba(255,255,255,0.8); padding:5px; border-radius:4px;">
+                H₂ Streger: <span id="countH2" style="font-weight:bold; color:#2980b9;">0</span>
+            </div>
+        </div>
+
+        <div class="tank-controls" style="right: 30px;">
+            <div class="hint-arrow" id="hintO2">👇</div>
+            <button id="btnAddO2" class="btn btn-gas" style="background: #e67e22;">+ O₂</button>
+            <div style="font-size:12px; color:#555; background:rgba(255,255,255,0.8); padding:5px; border-radius:4px;">
+                O₂ Streger: <span id="countO2" style="font-weight:bold; color:#e67e22;">0</span>
+            </div>
+        </div>
+
+        <div style="position:absolute; bottom:70px; left:50%; transform:translateX(-50%); text-align:center; pointer-events:auto;">
+            <button id="btnIgnite" class="btn" style="background:#e74c3c; font-size:15px; padding:12px 28px;">🔥 Antænd</button>
+            <div style="font-size:10px; color:#555; margin-top:3px;">(eller træk glasset op til ilden)</div>
+        </div>
+
+        <button id="btnTheory" class="btn">📘 Teori</button>
+        <button id="btnClearAll" class="btn">🗑️ Ryd alle resultater</button>
+        <button id="btnReset" class="btn">🔄 Tøm Måleglas</button>
+        <button id="btnSound" class="btn">🔊</button>
+    </div>
+</div>
+
+<div id="overlay">
+    <div style="text-align:center; color:white; max-width:480px; padding:20px;">
+        <h1 style="margin-bottom:5px;">Knaldgas: Eksperiment 💥</h1>
+        <p style="font-size:16px;">Lav den perfekte blanding ved at blande ilt (O₂) og brint (H₂).</p>
+        <div class="step-strip">
+            <div class="step"><div class="icon">🧪</div><div class="label">Fyld glasset</div></div>
+            <div class="arrow">→</div>
+            <div class="step"><div class="icon">🔥</div><div class="label">Tryk Antænd</div></div>
+            <div class="arrow">→</div>
+            <div class="step"><div class="icon">📊</div><div class="label">Se resultatet</div></div>
+        </div>
+        <p style="font-size:13px; opacity:0.85; margin-top:-10px;">Teorien åbner automatisk, når du trykker start.</p>
+        <button class="btn" id="btnStart" style="background: #27ae60; font-size: 18px; padding: 15px 40px;">Start Laboratorie 🥽</button>
+    </div>
+</div>
+
+<div id="theory-modal" style="display:none;">
+    <div id="theory-content">
+        <span id="closeTheory" style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:20px;">✖</span>
+        <h3>Det Kemiske Grundlag</h3>
+        <p>Reaktionen mellem dihydrogen og dioxygen udvikler varme (exoterm) og foregår efter følgende reaktionsskema:</p>
+        <div style="text-align:center; font-size: 20px; margin: 15px 0; font-weight:bold; color:#2c3e50;">
+            2 H₂(g) + O₂(g) → 2 H₂O(g)
+        </div>
+        <p><strong>Koefficienterne viser vejen:</strong><br>
+        Læg mærke til forholdet <strong>2 : 1</strong>. Det betyder, at der skal bruges præcis to mængder hydrogen for hver mængde oxygen for at alt stoffet reagerer.</p>
+        <p style="background:#f0f2f5; padding:10px; border-left: 4px solid #8e44ad;">
+        <strong>Hvorfor smælder det?</strong><br>
+        Når blandingsforholdet rammer 2:1 (svarende til 4 streger H₂ og 2 streger O₂), sker reaktionen hurtigst, og al energien frigives på én gang som lyd og varme.
+        </p>
+    </div>
+</div>
+
+<div id="quiz-modal" style="display:none;">
+    <div id="quiz-content">
+        <span id="closeQuiz" style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:20px;">✖</span>
+        <h3 style="margin-top:0;">🧠 Quiz: Test din teori</h3>
+
+        <div id="quizQuestionBlock">
+            <div id="quizProgress"></div>
+            <div id="quizQuestionText"></div>
+            <div id="quizOptions"></div>
+            <div id="quizFeedback"></div>
+            <button id="quizNextBtn" class="btn">Næste →</button>
+        </div>
+
+        <div id="quizResult">
+            <div class="score" id="quizScoreText"></div>
+            <p id="quizScoreMsg"></p>
+            <button id="quizRetryBtn" class="btn" style="background:#16a085;">🔁 Prøv igen</button>
+            <button id="quizCloseBtn" class="btn" style="background:#7f8c8d;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/* --- SETUP --- */
+const cvs = document.getElementById('simCanvas');
+const ctx = cvs.getContext('2d');
+const gCvs = document.getElementById('graphCanvas');
+const gCtx = gCvs.getContext('2d');
+
+const btnAddH2 = document.getElementById('btnAddH2');
+const btnAddO2 = document.getElementById('btnAddO2');
+const dispH2 = document.getElementById('countH2');
+const dispO2 = document.getElementById('countO2');
+const overlay = document.getElementById('overlay');
+const theoryModal = document.getElementById('theory-modal');
+const missionText = document.getElementById('missionText');
+const checklistRow = document.getElementById('checklistRow');
+const btnSound = document.getElementById('btnSound');
+
+/* --- QUIZ --- */
+const quizModal = document.getElementById('quiz-modal');
+const quizQuestionBlock = document.getElementById('quizQuestionBlock');
+const quizResultBlock = document.getElementById('quizResult');
+const quizProgress = document.getElementById('quizProgress');
+const quizQuestionText = document.getElementById('quizQuestionText');
+const quizOptions = document.getElementById('quizOptions');
+const quizFeedback = document.getElementById('quizFeedback');
+const quizNextBtn = document.getElementById('quizNextBtn');
+
+const quizQuestions = [
+    {
+        q: "Måleglasset er fyldt med ren brint (6 streger H₂, 0 streger O₂). Hvad sker der, når du holder det til flammen?",
+        options: [
+            "Et kraftigt knald, fordi brint er meget brandbart",
+            "Næsten ingen reaktion, fordi der ikke er noget O₂ at reagere med",
+            "Der dannes vand øjeblikkeligt, men helt uden lyd",
+            "Glasset eksploderer altid, uanset indhold"
+        ],
+        correct: 1,
+        explain: "Brint kan kun reagere med ilt (O₂). Uden oxygen er der intet at reagere med – selvom brint i sig selv er brandbart, kræver forbrændingen begge stoffer."
+    },
+    {
+        q: "Måleglasset er i stedet fyldt med ren ilt (0 streger H₂, 6 streger O₂). Hvad sker der?",
+        options: [
+            "Kraftig eksplosion, fordi ilt er så reaktivt",
+            "Det danner ozon i stedet for vand",
+            "Ingen reaktion, da der mangler H₂ til at reagere med ilten",
+            "Det brænder langsomt af sig selv"
+        ],
+        correct: 2,
+        explain: "Ligesom med rent brint kræver reaktionen begge stoffer. Uden H₂ er der intet, som O₂ kan reagere med."
+    },
+    {
+        q: "Ved hvilket forhold mellem H₂ og O₂ bliver knaldet allerkraftigst – og hvorfor?",
+        options: [
+            "6 streger H₂ og 0 streger O₂ (rent brint)",
+            "3 streger H₂ og 3 streger O₂ (lige mange af hver)",
+            "4 streger H₂ og 2 streger O₂ (forholdet 2:1)",
+            "1 streg H₂ og 5 streger O₂ (overskud af O₂)"
+        ],
+        correct: 2,
+        explain: "Reaktionsskemaet 2 H₂ + O₂ → 2 H₂O viser et mængdeforhold på 2:1. Med 4 streger H₂ og 2 streger O₂ reagerer alt stoffet uden overskud af nogen af gasserne, så al energien frigives på én gang."
+    },
+    {
+        q: "Hvorfor kommer der overhovedet et knald, når H₂ og O₂ reagerer?",
+        options: [
+            "Reaktionen er endoterm og optager lyd fra omgivelserne",
+            "Reaktionen er exoterm og frigiver energi hurtigt, så luften udvider sig eksplosivt",
+            "Vanddampen, der dannes, er i sig selv meget højlydt",
+            "Det er en optisk illusion – der er ikke reelt nogen lyd"
+        ],
+        correct: 1,
+        explain: "Reaktionen er stærkt exoterm. Når store mængder energi frigives på meget kort tid, opvarmes gassen/luften omkring pludseligt og udvider sig voldsomt – det opleves som et knald."
+    }
+];
+
+let quizState = { current: 0, score: 0, answered: false };
+
+function openQuiz() {
+    unlockAudio();
+    quizState = { current: 0, score: 0, answered: false };
+    quizResultBlock.style.display = 'none';
+    quizQuestionBlock.style.display = 'block';
+    quizModal.style.display = 'flex';
+    renderQuizQuestion();
+}
+
+function renderQuizQuestion() {
+    const original = quizQuestions[quizState.current];
+    const order = original.options.map((_, i) => i);
+    for (let i = order.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [order[i], order[j]] = [order[j], order[i]];
+    }
+    const item = {
+        ...original,
+        options: order.map(i => original.options[i]),
+        correct: order.indexOf(original.correct)
+    };
+    quizState.answered = false;
+    quizState.currentItem = item;
+    quizProgress.textContent = `Spørgsmål ${quizState.current + 1} af ${quizQuestions.length}`;
+    quizQuestionText.textContent = item.q;
+    quizFeedback.style.display = 'none';
+    quizFeedback.textContent = '';
+    quizNextBtn.style.display = 'none';
+    quizNextBtn.textContent = quizState.current === quizQuestions.length - 1 ? 'Se resultat →' : 'Næste →';
+
+    quizOptions.innerHTML = '';
+    item.options.forEach((opt, idx) => {
+        const b = document.createElement('button');
+        b.className = 'quiz-option';
+        b.textContent = opt;
+        b.onclick = () => selectQuizAnswer(idx);
+        quizOptions.appendChild(b);
+    });
+}
+
+function selectQuizAnswer(idx) {
+    if (quizState.answered) return;
+    quizState.answered = true;
+    const item = quizState.currentItem;
+    const buttons = quizOptions.querySelectorAll('.quiz-option');
+    buttons.forEach((b, i) => {
+        b.disabled = true;
+        if (i === item.correct) b.classList.add('correct');
+        else if (i === idx) b.classList.add('wrong');
+    });
+    if (idx === item.correct) quizState.score++;
+    quizFeedback.textContent = item.explain;
+    quizFeedback.style.display = 'block';
+    quizNextBtn.style.display = 'inline-block';
+}
+
+function nextQuizQuestion() {
+    quizState.current++;
+    if (quizState.current < quizQuestions.length) {
+        renderQuizQuestion();
+    } else {
+        showQuizResults();
+    }
+}
+
+function showQuizResults() {
+    quizQuestionBlock.style.display = 'none';
+    quizResultBlock.style.display = 'block';
+    document.getElementById('quizScoreText').textContent = `${quizState.score} / ${quizQuestions.length}`;
+    let msg = "";
+    if (quizState.score === quizQuestions.length) msg = "Perfekt! Du har styr på teorien bag knaldgas. 🎉";
+    else if (quizState.score >= quizQuestions.length / 2) msg = "Fint klaret! Kig evt. Teori-knappen igennem igen for de sidste detaljer.";
+    else msg = "Prøv Teori-knappen og eksperimentet igen, og tag så quizzen om.";
+    document.getElementById('quizScoreMsg').textContent = msg;
+}
+
+quizNextBtn.onclick = nextQuizQuestion;
+document.getElementById('quizRetryBtn').onclick = openQuiz;
+document.getElementById('quizCloseBtn').onclick = () => quizModal.style.display = 'none';
+document.getElementById('closeQuiz').onclick = () => quizModal.style.display = 'none';
+missionText.addEventListener('click', e => {
+    if (e.target && e.target.id === 'btnStartQuizInline') openQuiz();
+});
+
+const HITPAD = 10; // ekstra "gribe-margen" udenom glasset, matcher glød-ringen visuelt
+
+// State
+let state = {
+    cyl: { x: 415, y: 300, w: 70, h: 180, h2: 0, o2: 0, max: 6, angle: 0 },
+    burner: { x: 420, y: 550, w: 60, h: 100, isOn: true },
+    tanks: {
+        h2: { x: 20, y: 150, w: 140, h: 350, color: '#34495e', label: 'H₂', labelBg: '#1c2833' },
+        o2: { x: 740, y: 150, w: 140, h: 350, color: '#34495e', label: 'O₂', labelBg: '#1c2833' }
+    },
+    drag: null,
+    particles: [],
+    bubbles: [],
+    results: [],
+    tested: new Set(),
+    completed: false,
+    hasFilledOnce: false,
+    soundOn: true,
+    shake: 0,
+    msg: { text: "", timer: 0 }
+};
+
+const COLORS = { glass: 'rgba(230,240,255,0.5)', border: '#7f8c8d', h2: 'rgba(255,255,255,0.9)', o2: 'rgba(255,160,122,0.6)', water: 'rgba(52,152,219,0.4)' };
+
+/* --- TJEKLISTE (7 cirkler, ren visuel fremdrift - ingen tekst at læse) --- */
+for (let i = 0; i <= 6; i++) {
+    const d = document.createElement('div');
+    d.className = 'check-item';
+    d.id = 'chk' + i;
+    d.textContent = i;
+    checklistRow.appendChild(d);
+}
+
+/* --- AUDIO (Web Audio API, ingen eksterne filer) --- */
+let audioCtx = null;
+function getAudioCtx() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+}
+function unlockAudio() {
+    const c = getAudioCtx();
+    if (c.state === 'suspended') c.resume();
+}
+function playBang(intensity, isValid) {
+    if (!state.soundOn) return;
+    const c = getAudioCtx();
+    const now = c.currentTime;
+
+    if (!isValid || intensity <= 0) {
+        const dur = 0.15;
+        const buffer = c.createBuffer(1, c.sampleRate * dur, c.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * 0.15 * (1 - i / data.length);
+        const noise = c.createBufferSource(); noise.buffer = buffer;
+        const gain = c.createGain(); gain.gain.setValueAtTime(0.3, now);
+        noise.connect(gain).connect(c.destination);
+        noise.start(now);
+        return;
+    }
+
+    const dur = 0.15 + (intensity / 100) * 0.35;
+    const buffer = c.createBuffer(1, c.sampleRate * dur, c.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / data.length, 2);
+    const noise = c.createBufferSource(); noise.buffer = buffer;
+    const filter = c.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.setValueAtTime(1200 + intensity * 10, now);
+    const gain = c.createGain(); gain.gain.setValueAtTime(Math.min(1, 0.3 + intensity / 100), now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    noise.connect(filter).connect(gain).connect(c.destination);
+    noise.start(now);
+
+    const osc = c.createOscillator(); osc.type = 'sine';
+    osc.frequency.setValueAtTime(80, now); osc.frequency.exponentialRampToValueAtTime(30, now + dur);
+    const oGain = c.createGain();
+    oGain.gain.setValueAtTime(Math.min(0.8, intensity / 100), now);
+    oGain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+    osc.connect(oGain).connect(c.destination);
+    osc.start(now); osc.stop(now + dur);
+}
+
+/* --- INPUT HANDLING --- */
+document.getElementById('btnStart').addEventListener('click', unlockAudio, { once: true });
+document.getElementById('btnStart').onclick = () => {
+    overlay.style.display = 'none';
+    theoryModal.style.display = 'flex'; // Teorien vises automatisk, så eleven ved hvad forsøget handler om
+};
+document.getElementById('btnTheory').onclick = () => theoryModal.style.display = 'flex';
+document.getElementById('closeTheory').onclick = () => theoryModal.style.display = 'none';
+document.getElementById('btnReset').onclick = resetCyl;
+document.getElementById('btnClearAll').onclick = fullReset;
+btnSound.onclick = () => {
+    state.soundOn = !state.soundOn;
+    btnSound.textContent = state.soundOn ? '🔊' : '🔇';
+};
+
+btnAddH2.onclick = () => addGas('h2');
+btnAddO2.onclick = () => addGas('o2');
+
+const btnIgnite = document.getElementById('btnIgnite');
+btnIgnite.onclick = () => {
+    unlockAudio();
+    if (state.cyl.h2 + state.cyl.o2 > 0) explode();
+};
+
+function resetCyl() {
+    state.cyl.h2 = 0; state.cyl.o2 = 0;
+    state.cyl.x = 415; state.cyl.y = 300;
+    updateUI();
+    flashMsg("Måleglas tømt");
+}
+
+function fullReset() {
+    state.results = [];
+    state.tested = new Set();
+    state.completed = false;
+    resetCyl();
+}
+
+function addGas(type) {
+    if (state.cyl.h2 + state.cyl.o2 >= state.cyl.max) {
+        flashMsg("Glasset er fuldt!");
+        return;
+    }
+    for(let i=0; i<8; i++) {
+        state.bubbles.push({
+            x: state.cyl.x + 10 + Math.random()*(state.cyl.w-20),
+            y: state.cyl.y + state.cyl.h,
+            r: 2+Math.random()*3, s: 2+Math.random()*4, col: type === 'h2' ? 'white' : '#ffa07a'
+        });
+    }
+    if(type === 'h2') state.cyl.h2++; else state.cyl.o2++;
+    state.hasFilledOnce = true;
+    updateUI();
+}
+
+function updateUI() {
+    dispH2.innerText = state.cyl.h2;
+    dispO2.innerText = state.cyl.o2;
+    const isFull = state.cyl.h2 + state.cyl.o2 >= state.cyl.max;
+    btnAddH2.disabled = isFull;
+    btnAddO2.disabled = isFull;
+    btnIgnite.disabled = (state.cyl.h2 + state.cyl.o2) === 0;
+    updateChecklist();
+    updateStartHint();
+    missionText.innerHTML = state.completed ? '🎉 Alle forhold testet! <button id="btnStartQuizInline" class="btn">🧠 Start Quiz</button>' : "";
+}
+
+function updateStartHint() {
+    const showHint = !state.hasFilledOnce;
+    btnAddH2.classList.toggle('pulse-hint', showHint);
+    btnAddO2.classList.toggle('pulse-hint', showHint);
+    document.getElementById('hintH2').style.visibility = showHint ? 'visible' : 'hidden';
+    document.getElementById('hintO2').style.visibility = showHint ? 'visible' : 'hidden';
+}
+
+function updateChecklist() {
+    for (let i = 0; i <= 6; i++) {
+        const el = document.getElementById('chk' + i);
+        const r = state.results.find(res => res.h2 === i);
+        el.classList.toggle('tested', !!r);
+        if (r) {
+            let col = '#e74c3c';
+            if (r.val >= 90) col = '#27ae60';
+            else if (r.val >= 40) col = '#f39c12';
+            else col = '#f1c40f';
+            el.style.background = col;
+            el.style.borderColor = col;
+        } else {
+            el.style.background = '#ecf0f1';
+            el.style.borderColor = '#bdc3c7';
+        }
+    }
+}
+
+function isOverCyl(mx, my) {
+    return mx > state.cyl.x - HITPAD && mx < state.cyl.x + state.cyl.w + HITPAD &&
+           my > state.cyl.y - HITPAD && my < state.cyl.y + state.cyl.h + HITPAD;
+}
+
+cvs.addEventListener('mousedown', e => {
+    const r = cvs.getBoundingClientRect();
+    const mx = e.clientX - r.left; const my = e.clientY - r.top;
+    if (isOverCyl(mx, my)) {
+        state.drag = { offX: mx - state.cyl.x, offY: my - state.cyl.y };
+        cvs.style.cursor = 'grabbing';
+    }
+});
+
+window.addEventListener('mousemove', e => {
+    const r = cvs.getBoundingClientRect();
+    const mx = e.clientX - r.left; const my = e.clientY - r.top;
+    if (state.drag) {
+        state.cyl.x = mx - state.drag.offX;
+        state.cyl.y = my - state.drag.offY;
+        state.cyl.angle = (e.movementX * 0.5) * (Math.PI/180);
+        checkBurner();
+    } else {
+        cvs.style.cursor = isOverCyl(mx, my) ? 'grab' : 'default';
+    }
+});
+
+window.addEventListener('mouseup', () => { state.drag = null; });
+
+/* Touch-understøttelse (tablets/iPads) */
+cvs.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    const r = cvs.getBoundingClientRect();
+    const mx = t.clientX - r.left; const my = t.clientY - r.top;
+    if (isOverCyl(mx, my)) {
+        state.drag = { offX: mx - state.cyl.x, offY: my - state.cyl.y };
+        e.preventDefault();
+    }
+}, { passive: false });
+
+window.addEventListener('touchmove', e => {
+    if (!state.drag) return;
+    const t = e.touches[0];
+    const r = cvs.getBoundingClientRect();
+    state.cyl.x = (t.clientX - r.left) - state.drag.offX;
+    state.cyl.y = (t.clientY - r.top) - state.drag.offY;
+    checkBurner();
+    e.preventDefault();
+}, { passive: false });
+
+window.addEventListener('touchend', () => { state.drag = null; });
+
+/* --- LOGIC --- */
+function checkBurner() {
+    const bTipX = state.burner.x + state.burner.w/2;
+    const bTipY = state.burner.y - 30;
+    const cylX = state.cyl.x + state.cyl.w/2;
+    const cylY = state.cyl.y + state.cyl.h;
+
+    if (Math.hypot(bTipX - cylX, bTipY - cylY) < 60) {
+        if (state.cyl.h2 + state.cyl.o2 > 0) explode();
+    }
+}
+
+function explode() {
+    state.drag = null;
+    const h2 = state.cyl.h2;
+    const o2 = state.cyl.o2;
+    const total = h2 + o2;
+    const isValidTest = total === state.cyl.max;
+
+    // Beregn "Reaktions Enheder" (Pairs)
+    let reactionPairs = Math.min(h2/2, o2); // Max mulige reaktioner
+
+    // Beregn Intensitet (0-100)
+    let intensity = (reactionPairs / 2) * 100;
+
+    // Visuel justering
+    if (intensity < 5 && (h2 > 0 || o2 > 0)) intensity = 5;
+    if (h2 === 0 || o2 === 0) intensity = 0;
+
+    createParticles(state.cyl.x + state.cyl.w/2, state.cyl.y + state.cyl.h, intensity);
+    playBang(intensity, isValidTest);
+    triggerShake(intensity);
+
+    let txt = "";
+
+    if (!isValidTest) {
+        txt = "⚠️ Fyld helt op!";
+    } else if (intensity >= 95) {
+        txt = "KABOOM!";
+    } else if (intensity >= 45) {
+        txt = "STORT PUF";
+    } else if (intensity > 10) {
+        txt = "Lille Puf";
+    } else if (intensity > 0) {
+        txt = "Fuser...";
+    } else {
+        txt = "Ingen reaktion";
+    }
+
+    flashMsg(txt);
+
+    if (isValidTest) {
+        let existing = state.results.find(r => r.h2 === h2);
+        if(existing) existing.val = intensity;
+        else state.results.push({h2, val: intensity});
+        state.tested.add(h2);
+        if (state.tested.size === 7) state.completed = true;
+    }
+
+    state.cyl.h2 = 0; state.cyl.o2 = 0;
+    updateUI();
+}
+
+function triggerShake(intensity) { state.shake = (intensity/100) * 15; }
+
+function flashMsg(t) { state.msg.text = t; state.msg.timer = 150; }
+
+/* --- DRAWING --- */
+function draw() {
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.clearRect(0,0,900,650);
+    ctx.save();
+    if (state.shake > 0.5) {
+        ctx.translate((Math.random()-0.5)*state.shake, (Math.random()-0.5)*state.shake);
+        state.shake *= 0.85;
+    } else {
+        state.shake = 0;
+    }
+
+    if (!state.drag) {
+        const full = state.cyl.h2 + state.cyl.o2 >= state.cyl.max;
+        state.cyl.angle = full ? Math.sin(Date.now()/400)*0.08 : 0;
+    }
+
+    drawBench();
+    drawTank(state.tanks.h2, 'left');
+    drawTank(state.tanks.o2, 'right');
+    drawBurner();
+    drawDragHint();
+    drawCylinder();
+    drawParticles();
+    drawBubbles();
+    drawOverlayText();
+    ctx.restore();
+    drawGraph();
+    requestAnimationFrame(draw);
+}
+
+function drawBench() {
+    ctx.fillStyle = '#bdc3c7'; ctx.fillRect(0, 600, 900, 50);
+    ctx.fillStyle = '#95a5a6'; ctx.fillRect(0, 600, 900, 5);
+}
+
+function drawTank(t, side) {
+    let g = ctx.createLinearGradient(t.x, 0, t.x+t.w, 0);
+    g.addColorStop(0, '#2c3e50'); g.addColorStop(0.5, t.color); g.addColorStop(1, '#2c3e50');
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(t.x+t.w/2, t.y, t.w/2, Math.PI, 0); ctx.rect(t.x, t.y, t.w, t.h); ctx.fill();
+    ctx.fillStyle = t.labelBg; ctx.fillRect(t.x+20, t.y+40, t.w-40, 50);
+    ctx.fillStyle = 'white'; ctx.font='bold 30px Arial'; ctx.textAlign='center';
+    ctx.fillText(t.label, t.x+t.w/2, t.y+75);
+    ctx.fillStyle = '#f39c12'; ctx.beginPath(); ctx.arc(t.x+t.w/2, t.y-30, 15, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#7f8c8d';
+    if(side === 'left') ctx.fillRect(t.x+t.w, t.y+100, 20, 10);
+    else ctx.fillRect(t.x-20, t.y+100, 20, 10);
+}
+
+function drawBurner() {
+    let b = state.burner;
+    ctx.fillStyle = '#2c3e50'; ctx.beginPath(); ctx.ellipse(b.x+30, b.y+80, 40, 10, 0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#7f8c8d'; ctx.fillRect(b.x+15, b.y, 30, 80);
+    if(b.isOn) {
+        let f = Math.random()*4;
+        ctx.fillStyle = '#e67e22'; ctx.beginPath();
+        ctx.moveTo(b.x+15, b.y); ctx.quadraticCurveTo(b.x-5, b.y-50-f, b.x+30, b.y-90-f);
+        ctx.quadraticCurveTo(b.x+65, b.y-50-f, b.x+45, b.y); ctx.fill();
+        ctx.fillStyle = '#f1c40f'; ctx.beginPath();
+        ctx.moveTo(b.x+20, b.y); ctx.quadraticCurveTo(b.x+15, b.y-30, b.x+30, b.y-50);
+        ctx.quadraticCurveTo(b.x+45, b.y-30, b.x+40, b.y); ctx.fill();
+    }
+}
+
+/* Visuelle "nudges": glød om glasset (altid), samt pil + hånd hen mod flammen når glasset er fuldt */
+function drawDragHint() {
+    const p = state.cyl;
+    const t = Date.now()/1000;
+
+    const pulse = 0.15 + Math.sin(t*2.2)*0.1;
+    ctx.save();
+    ctx.translate(p.x + p.w/2, p.y + p.h/2);
+    ctx.rotate(p.angle);
+    ctx.translate(-(p.x + p.w/2), -(p.y + p.h/2));
+    ctx.strokeStyle = `rgba(241, 196, 15, ${pulse})`;
+    ctx.lineWidth = 3;
+    ctx.setLineDash([6,5]);
+    ctx.strokeRect(p.x-HITPAD, p.y-HITPAD, p.w+HITPAD*2, p.h+HITPAD*2);
+    ctx.restore();
+
+    const full = p.h2 + p.o2 >= p.max;
+    if (full && !state.drag) {
+        const bx = state.burner.x + state.burner.w/2;
+        const by = state.burner.y - 30;
+        const cx = p.x + p.w/2;
+        const cy = p.y + p.h;
+
+        ctx.save();
+        ctx.strokeStyle = '#e74c3c';
+        ctx.lineWidth = 3;
+        ctx.setLineDash([10,8]);
+        ctx.lineDashOffset = -(t*40);
+        ctx.beginPath();
+        ctx.moveTo(cx, cy+15);
+        ctx.quadraticCurveTo((cx+bx)/2, Math.max(cy,by)+50, bx, by);
+        ctx.stroke();
+        ctx.restore();
+
+        const bob = Math.sin(t*4)*6;
+        ctx.font = '28px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('✋', cx, cy + 40 + bob);
+    }
+}
+
+function drawCylinder() {
+    let p = state.cyl;
+    ctx.save();
+    ctx.translate(p.x + p.w/2, p.y + p.h/2);
+    ctx.rotate(p.angle);
+    ctx.translate(-(p.x + p.w/2), -(p.y + p.h/2));
+    ctx.lineWidth = 2; ctx.strokeStyle = COLORS.border; ctx.fillStyle = COLORS.glass;
+    ctx.fillRect(p.x, p.y, p.w, p.h); ctx.strokeRect(p.x, p.y, p.w, p.h);
+    ctx.fillStyle = '#95a5a6'; ctx.fillRect(p.x-5, p.y-10, p.w+10, 10);
+    let u = p.h / p.max;
+    if(p.h2 > 0) { ctx.fillStyle = COLORS.h2; ctx.fillRect(p.x+1, p.y, p.w-2, p.h2*u); ctx.fillStyle='#333'; ctx.font='12px Arial'; ctx.fillText("H₂", p.x+p.w/2, p.y+(p.h2*u)/2+4); }
+    if(p.o2 > 0) { ctx.fillStyle = COLORS.o2; ctx.fillRect(p.x+1, p.y+p.h2*u, p.w-2, p.o2*u); ctx.fillStyle='#333'; ctx.fillText("O₂", p.x+p.w/2, p.y+p.h2*u+(p.o2*u)/2+4); }
+    let w = p.max - p.h2 - p.o2;
+    if(w > 0) { ctx.fillStyle = COLORS.water; ctx.fillRect(p.x+1, p.y+(p.h2+p.o2)*u, p.w-2, w*u); }
+    ctx.beginPath(); ctx.strokeStyle='rgba(0,0,0,0.4)';
+    for(let i=1; i<6; i++) { let y = p.y + i*u; ctx.moveTo(p.x, y); ctx.lineTo(p.x+15, y); ctx.moveTo(p.x+p.w, y); ctx.lineTo(p.x+p.w-15, y); }
+    ctx.stroke();
+    ctx.restore();
+}
+
+function drawGraph() {
+    gCtx.clearRect(0,0,480,88);
+    gCtx.strokeStyle = '#f0f0f0';
+    gCtx.beginPath();
+    for(let i=1; i<4; i++) { let y = 80 - i*20; gCtx.moveTo(32, y); gCtx.lineTo(464, y); }
+    gCtx.stroke();
+
+    gCtx.strokeStyle = '#999'; gCtx.lineWidth = 1;
+    gCtx.beginPath(); gCtx.moveTo(32, 4); gCtx.lineTo(32, 80); gCtx.lineTo(472, 80); gCtx.stroke();
+
+    const startX = 40; const step = 60; const barW = 36;
+    let bestH2 = -1, bestVal = -1;
+
+    for(let i=0; i<=6; i++) {
+        let x = startX + i*step;
+        gCtx.fillStyle = '#7f8c8d'; gCtx.textAlign = 'center'; gCtx.font = '10px Arial';
+        gCtx.fillText(`${i}/6`, x + barW/2, 88);
+
+        let r = state.results.find(res => res.h2 === i);
+        if(r) {
+            let h = (r.val/100) * 72;
+            gCtx.fillStyle = '#3498db';
+            gCtx.fillRect(x, 80-h, barW, h);
+
+            if (r.val > bestVal) { bestVal = r.val; bestH2 = i; }
+        } else {
+            gCtx.fillStyle = '#f7f7f7'; gCtx.fillRect(x, 8, barW, 72);
+        }
+    }
+
+    if (state.completed && bestH2 >= 0) {
+        const x = startX + bestH2*step + barW/2;
+        const h = (bestVal/100) * 72;
+        gCtx.font = '13px Arial'; gCtx.textAlign = 'center';
+        gCtx.fillText('🏆', x, Math.max(16, 80-h-6));
+    }
+}
+
+function drawOverlayText() {
+    if (state.msg.timer > 0) {
+        ctx.font = "bold 32px Segoe UI";
+        ctx.fillStyle = `rgba(44, 62, 80, ${state.msg.timer/100})`;
+        ctx.textAlign = "center";
+        ctx.fillText(state.msg.text, 450, 250);
+        state.msg.timer--;
+    }
+}
+
+function createParticles(x,y,int) { for(let i=0; i<int*3; i++) state.particles.push({x:x, y:y, vx:(Math.random()-0.5)*int/5, vy:(Math.random()-0.5)*int/5, life:1, col:`hsl(${Math.random()*60},100%,50%)`, s:Math.random()*5}); }
+function drawParticles() { for(let i=state.particles.length-1; i>=0; i--) { let p=state.particles[i]; p.x+=p.vx; p.y+=p.vy; p.life-=0.02; if(p.life<=0) state.particles.splice(i,1); else { ctx.globalAlpha=p.life; ctx.fillStyle=p.col; ctx.beginPath(); ctx.arc(p.x,p.y,p.s,0,Math.PI*2); ctx.fill(); ctx.globalAlpha=1; } } }
+function drawBubbles() { for(let i=state.bubbles.length-1; i>=0; i--) { let b=state.bubbles[i]; b.y-=b.s; if(b.y<state.cyl.y) state.bubbles.splice(i,1); else { ctx.strokeStyle=b.col; ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2); ctx.stroke(); } } }
+
+updateUI();
+draw();
+</script>
+</body>
+</html>

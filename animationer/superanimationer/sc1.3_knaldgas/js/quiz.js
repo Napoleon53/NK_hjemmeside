@@ -62,13 +62,12 @@
                 "Reaktionen er endoterm og optager energi fra omgivelserne",
                 "Reaktionen er exoterm og frigiver energien på meget kort tid, så gassen udvider sig voldsomt",
                 "Den dannede vanddamp udsender selv lyd",
-                "Glasset slår mod braenderen"
+                "Glasset slår mod brænderen"
             ],
             rigtig: 1,
             forklaring: "Reaktionen er exoterm. Energien frigives på en brøkdel af et sekund, gassen opvarmes og udvider sig pludseligt, og trykbølgen høres som et knald."
         }
     ];
-    SPOERGSMAAL[4].valg[3] = "Glasset slår mod brænderen";
 
     NK.QUIZ = SPOERGSMAAL;
 
@@ -119,6 +118,8 @@
             else this.nyt();
         }
         this.vis();
+        /* Panelet kan vaere for lavt til hele kortet */
+        if (this.tilstand !== "laast") NK.el("quiz-kort").scrollIntoView({ block: "nearest" });
     };
 
     Q.nyt = function () {
@@ -152,6 +153,7 @@
         fk.textContent = (rigtigt ? "Rigtigt. " : "Forkert. ") + this.aktuel.forklaring;
         fk.className = "besked " + (rigtigt ? "god" : "skidt");
         this.vis();
+        NK.el("quiz-knap").scrollIntoView({ block: "nearest" });
     };
 
     Q.vis = function () {
