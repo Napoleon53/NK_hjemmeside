@@ -22,6 +22,7 @@
         morter:       { fil: "morter.svg", b: 100, h: 56 },
         pistil:       { fil: "pistil.svg", b: 22, h: 96 },
         baegerglas:   { fil: "baegerglas.svg", b: 72, h: 90 },
+        skaal:        { fil: "petriskaal.svg", b: 80, h: 22 },
         heptan:       { fil: "flaske_heptan.svg", b: 46, h: 120 },
         vand:         { fil: "sproejteflaske.svg", b: 46, h: 120 },
         tragt:        { fil: "tragt.svg", b: 76, h: 110 },

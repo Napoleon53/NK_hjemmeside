@@ -151,6 +151,12 @@
             tone(c, c.currentTime, 2400, 2400, 0.09, 0.05, "square", 4000);
         },
 
+        /* Braenderen taendes: et kort, blødt pust */
+        taend: function () {
+            var c = klar(); if (!c) return;
+            filtreretStoej(c, c.currentTime, 0.35, "lowpass", 900, 0, 0.35, function (r) { return Math.min(1, (1 - r) * 10) * r; });
+        },
+
         /* Stikflammen: et dybt sus */
         sus: function () {
             var c = klar(); if (!c) return;

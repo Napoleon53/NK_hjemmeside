@@ -3,9 +3,9 @@
 
    Alt tegnes paa et tegnebord paa 1000 x 600 enheder, som skaleres og
    centreres i laerredet. Til venstre staar det aabne bord med chips-
-   posen, vaegten, morteren og bunsenbraenderen. Til hoejre er stink-
-   skabet med opløsningsmidlerne, baegerglasset, filtreringen og
-   varmepladen. Genstandene er SVG-filer i sprites/. Hver genstand har
+   posen, vaegten, petriskaalen og morteren. Til hoejre er stinkskabet
+   med bunsenbraenderen, opløsningsmidlerne, baegerglasset, filtreringen
+   og varmepladen. Genstandene er SVG-filer i sprites/. Hver genstand har
    et ankerpunkt og en positur { x, y, v }: hvor ankeret staar, og hvor
    meget den haelder.
 
@@ -32,6 +32,7 @@
         morter:       { x: 50, y: 56 },
         pistil:       { x: 11, y: 92 },
         baegerglas:   { x: 68, y: 3 },
+        skaal:        { x: 40, y: 21 },
         heptan:       { x: 23, y: 4 },
         vand:         { x: 44, y: 9 },
         tragt:        { x: 38, y: 108 },
@@ -51,43 +52,45 @@
     }
     S.staar = staar;
 
-    S.SKAB = { x0: 566, x1: 586, loft: 60, glas: 112 };
-    S.VAEGT = { x: 170, y: 438, midt: 240 };
-    S.VAEGT.skaal = { x: 240, y: 438 };
-    S.VAEGT.display = { x: 170 + 22, y: 438 + 30, b: 70, h: 20 };
-    S.MORTER = { midt: 448 };
-    S.TREFOD = { x: 530, top: 400 };
-    S.BRAENDER = { x: 505, y: 425, b: 50, h: 75, flamme: { x: 530, y: 432 } };
-    S.STATIV = { x: 812, y: S.BORD - 250 };
-    S.TRAGT = { x: 870, y: 418 };
+    S.SKAB = { x0: 486, x1: 504, loft: 60, glas: 112 };
+    S.VAEGT = { x: 162, y: 438, midt: 232 };
+    S.VAEGT.vejeskaal = { x: 232, y: 438 };
+    S.VAEGT.display = { x: 162 + 22, y: 438 + 30, b: 70, h: 20 };
+    S.MORTER = { midt: 432 };
+    S.TREFOD = { x: 550, top: 400 };
+    S.BRAENDER = { x: 525, y: 425, b: 50, h: 75, flamme: { x: 550, y: 432 } };
+    S.STATIV = { x: 800, y: S.BORD - 250 };
+    S.TRAGT = { x: 858, y: 458 };
     S.PLADE = { x: 910, y: S.BORD - 34, midt: 955 };
     S.HYLDE = { x0: 26, x1: 156, y: 300 };
     S.PLAKAT = { x: 24, y: 96, b: 138, h: 140 };
-    S.UR = { x: 214, y: 126, r: 24 };
-    S.ALARM = { x: 530, y: 62 };
-    S.GASHANE = { x: 572, y: 470 };
+    S.UR = { x: 202, y: 122, r: 24 };
+    S.ALARM = { x: 440, y: 44 };
+    S.GASHANE = { x: 516, y: 462 };
+    S.A_MIDT = 746;
 
     S.HJEM = {
         pose:     staar("pose", 56),
-        vejebaad: { x: S.VAEGT.skaal.x, y: S.VAEGT.skaal.y, v: 0 },
-        parkeret: { x: 138, y: S.BORD, v: 0 },
-        baegerB:  staar("baegerglas", 350),
+        vejebaad: { x: S.VAEGT.vejeskaal.x, y: S.VAEGT.vejeskaal.y, v: 0 },
+        parkeret: { x: 130, y: S.BORD, v: 0 },
+        skaal:    staar("skaal", 342),
         morter:   staar("morter", S.MORTER.midt),
-        pistil:   { x: 462, y: 470, v: 0.34 },
-        vand:     staar("vand", 620),
-        heptan:   staar("heptan", 672),
-        baegerA:  staar("baegerglas", 758),
+        pistil:   { x: 446, y: 470, v: 0.34 },
+        vand:     staar("vand", 616),
+        heptan:   staar("heptan", 666),
+        baegerA:  staar("baegerglas", S.A_MIDT),
         kaffekop: staar("kaffekop", 122, S.HYLDE.y)
     };
-    S.PAA_VAEGT = staar("baegerglas", S.VAEGT.midt, S.VAEGT.y);
-    S.UNDER_TRAGT = staar("baegerglas", S.TRAGT.x, S.BORD - 12);
-    S.PAA_PLADE = staar("baegerglas", S.PLADE.midt, S.PLADE.y);
-    S.PAA_TREFOD = staar("baegerglas", S.TREFOD.x, S.TREFOD.top);
+    S.PAA_VAEGT = staar("skaal", S.VAEGT.midt, S.VAEGT.y);
+    S.UNDER_TRAGT = staar("skaal", S.TRAGT.x, S.BORD - 12);
+    S.PAA_PLADE = staar("skaal", S.PLADE.midt, S.PLADE.y);
+    S.PAA_TREFOD = staar("skaal", S.TREFOD.x, S.TREFOD.top);
     S.TREFOD_POSITUR = { x: S.TREFOD.x, y: S.TREFOD.top, v: 0 };
+    S.LAAG_PAA_BORD = { x: 699, y: S.BORD - 5 };
 
     /* Zoomboblen staar over det aabne bord eller inde i stinkskabet */
     S.BOBLE = {
-        ude:  { x: 398, y: 196, r: 96 },
+        ude:  { x: 330, y: 196, r: 96 },
         inde: { x: 700, y: 222, r: 96 }
     };
 
@@ -151,28 +154,13 @@
         ctx.stroke();
         ctx.restore();
 
-        /* Sod paa vaeggen over trefoden efter branden */
-        if (v.sod > 0.01) {
-            ctx.save();
-            ctx.globalAlpha = NK.klamp(v.sod, 0, 1);
-            var sg = ctx.createRadialGradient(S.TREFOD.x, 300, 6, S.TREFOD.x, 290, 90);
-            sg.addColorStop(0, "rgba(8, 8, 10, 0.85)");
-            sg.addColorStop(0.5, "rgba(12, 12, 14, 0.45)");
-            sg.addColorStop(1, "rgba(12, 12, 14, 0)");
-            ctx.fillStyle = sg;
-            ctx.beginPath();
-            ctx.ellipse(S.TREFOD.x, 300, 60, 100, 0, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-        }
-
         /* Loft med lysstofroer og roegalarm */
         ctx.fillStyle = "#2b3139";
         ctx.fillRect(-2000, -2000, S.BREDDE + 4000, 2000 + 44);
         ctx.fillStyle = "rgba(255, 248, 225, 0.55)";
-        NK.rundtRekt(ctx, 70, 38, 400, 5, 2.5);
+        NK.rundtRekt(ctx, 40, 38, 340, 5, 2.5);
         ctx.fill();
-        NK.skaer(ctx, 270, 46, 180, "rgba(255, 248, 225, 0.1)");
+        NK.skaer(ctx, 210, 46, 170, "rgba(255, 248, 225, 0.1)");
         var A = S.ALARM;
         ctx.fillStyle = "#e9ecef";
         ctx.beginPath();
@@ -299,7 +287,7 @@
         ctx.restore();
 
         ctx.fillStyle = "#0d0f13";
-        for (var i = 0; i < 5; i++) {
+        for (var i = 0; i < 6; i++) {
             NK.rundtRekt(ctx, K.x1 + 26 + i * 84, 140, 60, 6, 3);
             ctx.fill();
         }
@@ -328,10 +316,10 @@
         kant.addColorStop(1, "#4a515b");
         ctx.fillStyle = kant;
         ctx.fillRect(K.x0, K.glas - 12, 3000, 12);
-        NK.tekst(ctx, "STINKSKAB", 640, K.loft + 26, { font: "800 11px 'Segoe UI', sans-serif", farve: "rgba(230, 236, 242, 0.55)" });
-        NK.skaer(ctx, 740, K.loft + 22, 14, "rgba(80, 230, 140, 0.8)", 0.6);
-        NK.kugle(ctx, 740, K.loft + 22, 4.2, "#b9ffd6", "#1fae5c");
-        NK.tekst(ctx, "Udsugning", 750, K.loft + 26, { font: "600 10px 'Segoe UI', sans-serif", farve: "rgba(200, 240, 215, 0.7)" });
+        NK.tekst(ctx, "STINKSKAB", 560, K.loft + 26, { font: "800 11px 'Segoe UI', sans-serif", farve: "rgba(230, 236, 242, 0.55)" });
+        NK.skaer(ctx, 660, K.loft + 22, 14, "rgba(80, 230, 140, 0.8)", 0.6);
+        NK.kugle(ctx, 660, K.loft + 22, 4.2, "#b9ffd6", "#1fae5c");
+        NK.tekst(ctx, "Udsugning", 670, K.loft + 26, { font: "600 10px 'Segoe UI', sans-serif", farve: "rgba(200, 240, 215, 0.7)" });
 
         /* Venstre stolpe */
         var st = ctx.createLinearGradient(K.x0, 0, K.x1, 0);
@@ -342,14 +330,19 @@
         ctx.fillRect(K.x0, K.loft, K.x1 - K.x0, S.BORD - K.loft);
     };
 
-    /* Gasslangen fra hanen paa stolpen til braenderen */
-    S.tegnGas = function (ctx, braender) {
+    /* Gashanen paa stinkskabets bagvaeg og slangen til braenderen.
+       aaben: hanen staar paa langs, naar braenderen er taendt. */
+    S.tegnGas = function (ctx, braender, aaben) {
         var G = S.GASHANE;
-        ctx.fillStyle = "#c9a227";
-        NK.rundtRekt(ctx, G.x - 6, G.y - 16, 12, 10, 2);
-        ctx.fill();
         ctx.fillStyle = "#8a929c";
-        ctx.fillRect(G.x - 3, G.y - 8, 6, 10);
+        ctx.fillRect(G.x - 3, G.y - 22, 6, 24);
+        ctx.save();
+        ctx.translate(G.x, G.y - 14);
+        ctx.rotate(aaben ? Math.PI / 2 : 0);
+        ctx.fillStyle = "#c9a227";
+        NK.rundtRekt(ctx, -3, -11, 6, 22, 2.5);
+        ctx.fill();
+        ctx.restore();
         if (!braender) return;
         ctx.save();
         ctx.strokeStyle = "#b8321f";
@@ -357,8 +350,24 @@
         ctx.lineCap = "round";
         ctx.beginPath();
         ctx.moveTo(G.x, G.y);
-        ctx.bezierCurveTo(G.x - 4, 500, 560, 498, S.BRAENDER.x + 47, S.BRAENDER.y + 66);
+        ctx.bezierCurveTo(G.x, 499, 540, 499, S.BRAENDER.x + 46, S.BRAENDER.y + 66);
         ctx.stroke();
+        ctx.restore();
+    };
+
+    /* Sod paa stinkskabets bagvaeg over trefoden efter branden */
+    S.tegnSod = function (ctx, sod) {
+        if (sod < 0.01) return;
+        ctx.save();
+        ctx.globalAlpha = NK.klamp(sod, 0, 1);
+        var g = ctx.createRadialGradient(S.TREFOD.x, 300, 6, S.TREFOD.x, 290, 90);
+        g.addColorStop(0, "rgba(8, 8, 10, 0.85)");
+        g.addColorStop(0.5, "rgba(12, 12, 14, 0.45)");
+        g.addColorStop(1, "rgba(12, 12, 14, 0)");
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.ellipse(S.TREFOD.x, 290, 60, 100, 0, 0, Math.PI * 2);
+        ctx.fill();
         ctx.restore();
     };
 

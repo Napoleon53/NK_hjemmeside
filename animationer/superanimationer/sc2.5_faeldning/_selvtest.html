@@ -183,6 +183,34 @@ function koer() {
     paastand("byggeren vises for et felt med bundfald", !bygger.hidden);
     paastand("de fire ioner i draaben kan vaelges", d.querySelectorAll("#opg-ioner .ionchip").length === 4);
     paastand("Tjek uden ioner taeller ikke som et forkert svar", O.tjek() === false && O.fejl === 0);
+    /* Aftørring maa ikke faa tegningen til at gaa i staa (en draabe, der
+       skrumper, gav før en negativ radius, og flaskerne forsvandt). */
+    udfoer(0);
+    f.toerAf(0);
+    var tegneFejl = null;
+    for (i = 0; i < 90 && !tegneFejl; i++) {
+        f.opdater(1 / 60);
+        try { f.tegn(); } catch (e) { tegneFejl = e.message; }
+    }
+    paastand("et felt kan tørres af, uden at tegningen går i stå", tegneFejl === null && f.status(0) === "tom", tegneFejl);
+
+    f.vaelgFelt(7);
+    NK.opdaterPanel();
+    O.vaelgIon("Ba"); O.vaelgIon("CO3"); O.tjek();
+    d.getElementById("opg-i1").click(); d.getElementById("opg-i2").click();
+    paastand("Ba₂(CO₃)₂ er ikke de mindste hele tal", O.tjek() === false && d.getElementById("opg-besked").textContent === "Ladningerne går op, men brug de mindste hele tal.", d.getElementById("opg-besked").textContent);
+    f.vaelgFelt(10);
+    NK.opdaterPanel();
+    O.vaelgIon("Ba"); O.vaelgIon("PO4"); O.tjek();
+    d.getElementById("opg-i1").click(); d.getElementById("opg-i1").click(); d.getElementById("opg-i2").click();
+    paastand("formlen får parentes, når der er mere end én PO₄³⁻",
+        !d.getElementById("opg-p1").hidden && !d.getElementById("opg-p2").hidden &&
+        d.getElementById("opg-i1").textContent === "3" && d.getElementById("opg-i2").textContent === "2");
+
+    f.vaelgFelt(9);
+    NK.opdaterPanel();
+    paastand("spørgsmålet er, hvilke 2 ioner der går sammen", d.getElementById("opg-tekst").textContent === "Hvilke 2 ioner går sammen og danner den tungtopløselige forbindelse?", d.getElementById("opg-tekst").textContent);
+    paastand("reaktionspilen er skjult, indtil ionerne er rigtige", d.getElementById("opg-produktdel").hidden);
     O.vaelgIon("Na"); O.vaelgIon("PO4");
     paastand("Na⁺ og PO₄³⁻ er forkert", O.tjek() === false && O.fejl === 1);
     var hint1 = d.getElementById("opg-besked").textContent;
@@ -191,16 +219,27 @@ function koer() {
     paastand("Vis svaret skjules efter én fejl", d.getElementById("opg-svar").hidden);
     O.vaelgIon("Ag");
     paastand("kationen skiftes ved at vaelge en anden", O.kat === "Ag");
-    paastand("Ag⁺ + PO₄³⁻ med 1 og 1 er forkert", O.tjek() === false && O.fejl === 2);
+    paastand("Ag⁺ og PO₄³⁻ er de rigtige ioner", O.tjek() === true && O.trin === "formel" && !f.felter[9].loest);
+    paastand("reaktionspilen dukker op", !d.getElementById("opg-produktdel").hidden);
+    paastand("beskeden beder om den neutrale formel", d.getElementById("opg-tekst").textContent === "Opskriv den neutrale kemiske formel for det udfældede salt.", d.getElementById("opg-tekst").textContent);
+    O.vaelgIon("Na");
+    paastand("ionerne kan ikke skiftes, mens formlen skrives", O.kat === "Ag");
+    paastand("AgPO₄ er forkert", O.tjek() === false && O.fejl === 1);
     var hint2 = d.getElementById("opg-besked").textContent;
     tekster.push(hint2);
-    paastand("hintet regner ladningerne ud", hint2.indexOf("+1") >= 0 && hint2.indexOf("−3") >= 0, hint2);
-    paastand("Vis svaret kommer efter to fejl", !d.getElementById("opg-svar").hidden);
-    d.getElementById("opg-k1").click(); d.getElementById("opg-k1").click();
-    paastand("koefficienten skifter ved klik", O.kKat === 3);
-    paastand("3 Ag⁺ + PO₄³⁻ er rigtigt", O.tjek() === true && f.felter[9].loest);
+    paastand("hintet regner formlens ladning ud", hint2 === "AgPO₄ har ladningen 1 · (+1) + 1 · (−3) = −2. Formlen skal være neutral.", hint2);
+    paastand("Vis svaret skjules efter én fejl i formlen", d.getElementById("opg-svar").hidden);
+    d.getElementById("opg-i1").click();
+    paastand("Ag₂PO₄ er forkert", O.tjek() === false && O.fejl === 2);
     tekster.push(d.getElementById("opg-besked").textContent);
-    paastand("produktet vises", d.getElementById("opg-produkt").textContent === "Ag₃PO₄");
+    paastand("Vis svaret kommer efter to fejl", !d.getElementById("opg-svar").hidden);
+    d.getElementById("opg-i1").click();
+    paastand("tallet skifter ved klik", O.iKat === 3 && d.getElementById("opg-i1").textContent === "3");
+    paastand("ingen parentes om én PO₄³⁻", d.getElementById("opg-p1").hidden && d.getElementById("opg-p2").hidden);
+    paastand("Ag₃PO₄ er rigtigt", O.tjek() === true && f.felter[9].loest);
+    tekster.push(d.getElementById("opg-besked").textContent);
+    var facit = d.getElementById("opg-facit");
+    paastand("hele reaktionsskemaet vises", !facit.hidden && d.getElementById("opg-linje").hidden && facit.textContent === "3 Ag⁺(aq) + PO₄³⁻(aq) → Ag₃PO₄(s)", facit.textContent);
     paastand("efterskriften naevner tilskuerionerne", d.getElementById("opg-besked").textContent.indexOf("Na⁺ og NO₃⁻ er tilskuerioner") >= 0, d.getElementById("opg-besked").textContent);
     NK.opdaterPanel();
     paastand("der er 9 felter med bundfald at opskrive", O.ANTAL === 9, O.ANTAL);

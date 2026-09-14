@@ -80,10 +80,18 @@ Trin 2 regnes som gjort, når man har set et bundfald blive samlet i luppen.
 
 ### Reaktionsskemaet
 
-For hvert af de ni felter med bundfald skal fældningsreaktionen opskrives.
-Ionerne i dråben står som knapper; eleven vælger den positive og den negative
-ion og klikker på koefficienterne for at ændre dem (1, 2, 3). Produktet står som
-? til svaret er rigtigt.
+For hvert af de ni felter med bundfald opskrives fældningsreaktionen i to trin:
+
+1. **Hvilke 2 ioner går sammen og danner den tungtopløselige forbindelse?**
+   Ionerne i dråben står som knapper; eleven vælger en positiv og en negativ.
+2. Er ionerne rigtige, glider en **reaktionspil** ind, og der står **Opskriv den
+   neutrale kemiske formel for det udfældede salt.** Eleven klikker på de små
+   tal efter hvert symbol (1, 2, 3). Parentesen om en sammensat ion kommer af
+   sig selv, når der er mere end én.
+
+Når formlen er rigtig, vises hele reaktionsskemaet med koefficienter, fx
+3 Ag⁺(aq) + PO₄³⁻(aq) → Ag₃PO₄(s), sammen med bundfaldets farve og
+tilskuerionerne.
 
 Der er ingen forklaring før opgaven. Et forkert svar giver et hint, der passer
 til fejlen:
@@ -92,12 +100,12 @@ til fejlen:
   rigtige partner uden at give bundfald, fx *I feltet BaCl₂ + NaCl er der både
   Ba²⁺ og Cl⁻, men intet bundfald.* Er feltet ikke dryppet endnu, opfordres
   eleven til at gøre det. Findes der intet sådant felt, peges der på luppen
-* **forkerte koefficienter:** ladningerne for de valgte tal regnes ud
+* **formel med ladning:** formlens samlede ladning regnes ud, fx *Ag₂PO₄ har
+  ladningen 2 · (+1) + 1 · (−3) = −1. Formlen skal være neutral.*
 * **rigtige forhold, men ikke mindste tal:** det bliver sagt
 
-Efter to forkerte svar kommer **Vis svaret**. Et vist svar tæller ikke med, og
-feltet kan prøves igen senere. Et rigtigt svar viser bundfaldets farve, formlen
-og tilskuerionerne.
+Efter to forkerte svar i samme trin kommer **Vis svaret**. Et vist svar tæller
+ikke med, og feltet kan prøves igen senere.
 
 ### Den sarkastiske lærer
 

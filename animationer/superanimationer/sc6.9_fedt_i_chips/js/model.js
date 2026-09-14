@@ -42,14 +42,15 @@
 
     /* knust: 0-1. Pistillens samlede vej (tegneenheder) giver fuld
        knusning; under min kan chipsene ikke haeldes over. */
-    var KNUS = { min: 0.5, vej: 2600, voldsom: 2600, krummeMasse: 0.02, maksKrummer: 8 };
+    var KNUS = { min: 0.5, vej: 2600, voldsom: 2600, krummeMasse: 0.02, maksKrummer: 8, amok: 3200, amokTid: 0.8 };
 
     /* tid: roeretid i sekunder. Uden roering sker der kun lidt (diffusion). */
     var ROER = { tau: 1.5, min: 0.5, faerdig: 0.95, diffusion: 0.04, fuld: 450 };
 
     var FILTER = { tilbage: 0.12, efterSkyl: 0.02 };
 
-    var BAEGER = { min: 46.5, max: 53.5 };
+    /* Massen af en tom petriskaal i glas */
+    var SKAAL = { min: 31.5, max: 38.5 };
 
     var BRAND = { tid: 1.6 };
 
@@ -135,7 +136,7 @@
         KNUS: KNUS,
         ROER: ROER,
         FILTER: FILTER,
-        BAEGER: BAEGER,
+        SKAAL: SKAAL,
         BRAND: BRAND,
         VOLUMEN: VOLUMEN,
         FARVE: FARVE,
