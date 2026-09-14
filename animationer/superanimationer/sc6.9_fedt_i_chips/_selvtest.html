@@ -135,6 +135,8 @@ function koerTest() {
     paastand("knust helt", f.knust === 1);
     f.klik("morter"); adv(5.5);
     paastand("chipsene er i baegerglasset, og pistillen staar i morteren igen", f.gjort.overfoer && f.g.baegerA.krummer.length > 10 && Math.abs(f.g.pistil.p.x - f.g.pistil.hjem.x) < 1);
+    paastand("de fleste krummer rammer glasset, og hver krumme er talt", f.g.baegerA.krummer.length + f.krummerSpildt === 24 && f.krummerSpildt <= 6, f.krummerSpildt + " ved siden af");
+    paastand("krummer ved siden af bliver liggende paa bordet", f.flyvende.filter(function (k) { return k.spild && k.hvile && Math.abs(k.y - (S.BORD - 1)) < 1; }).length === f.krummerSpildt);
     paastand("et klik paa flasken haelder ikke", f.klik("heptan") === false && !f.midl && !f.handling);
     f.slipTil("heptan", "baegerA"); adv(4.5);
     paastand("heptanen er haeldt i", f.midl === "heptan" && f.g.baegerA.areal === M.VOLUMEN);
@@ -159,7 +161,7 @@ function koerTest() {
 
     overskrift("4. Iagttagelser (fejlkilder)");
     var ia = iagttagelser();
-    paastand("krummer, kort roering og vaadt filter er noteret", f.iagttaget.krummer && f.iagttaget.kortRoer && f.iagttaget.vaad && ia.length === 3, ia.join(" | "));
+    paastand("krummer, kort roering og vaadt filter er noteret", f.iagttaget.krummer && f.iagttaget.kortRoer && f.iagttaget.vaad && ia.length === 3 + (f.iagttaget.spild ? 1 : 0), ia.join(" | "));
     paastand("ingen forsoegsnumre i listen", !/\bF\d/.test(ia.join(" ")));
     nyt();
     paastand("nyt forsoeg rydder listen", iagttagelser().length === 0);
@@ -167,7 +169,7 @@ function koerTest() {
     overskrift("5. Resultater og beregning");
     var uden = helt({ midl: "heptan" });
     paastand("heptan uden skylning: 27 til 30,5 %", uden !== null && uden > 27 && uden < 30.5, uden && komma(uden) + " %");
-    paastand("kun det vaade filter er noteret", iagttagelser().length === 1 && f.iagttaget.vaad, iagttagelser().join(" | "));
+    paastand("kun det vaade filter (og evt. spildte krummer) er noteret", iagttagelser().length === 1 + (f.iagttaget.spild ? 1 : 0) && f.iagttaget.vaad, iagttagelser().join(" | "));
     paastand("knappen Hjælp til beregningen vises efter de ni trin", !d.getElementById("hjaelp-beregn").hidden);
     var r = M.fedtprocent(f.mChips, f.mB, f.mBF);
     paastand("hint: massen i gram", /massen af fedtet/.test(svar(M.komma(f.mBF - f.mB))));
@@ -296,6 +298,10 @@ function koerTest() {
     adv(4.5);
     paastand("traekket hen over baegerglasset: heptanen haeldes i", f.midl === "heptan");
     f.arbejdKnap(true); adv(6); f.arbejdKnap(false); adv(1);
+    var mk = f.mikro;
+    paastand("roering: stivelsen synker, fedt og heptan trækkes opad",
+        mk.lag > 0.9 && mk.gennemsnitY("stivelse") > mk.gennemsnitY("fedtFri") + 20 && mk.gennemsnitY("heptan") < mk.gennemsnitY("stivelse") - 20,
+        "stivelse " + Math.round(mk.gennemsnitY("stivelse")) + ", fedt " + Math.round(mk.gennemsnitY("fedtFri")) + ", heptan " + Math.round(mk.gennemsnitY("heptan")));
     var sp = f.g.skaal.p;
     traek({ x: sp.x, y: sp.y - 6 }, { x: S.VAEGT.midt, y: 440 });
     adv(5);
@@ -312,21 +318,45 @@ function koerTest() {
     adv(2);
     paastand("petriskaalen traekkes paa varmepladen", f.g.skaal.sted === "plade");
 
-    nyt();
-    var vp = f.g.vand.p, vx = vp.x - 20, vy = vp.y + 60;
-    f.ned({ x: vx, y: vy });
-    adv(0.8);
+    function tilBaegerglas() {
+        nyt();
+        afvej();
+        f.arbejdKnap(true); adv(3.5); f.arbejdKnap(false); adv(0.5);
+        f.klik("morter"); adv(5.5);
+    }
+    function holdVand(sek) {
+        var vp = f.g.vand.p;
+        f.ned({ x: vp.x - 20, y: vp.y + 60 });
+        adv(sek);
+    }
+    tilBaegerglas();
+    holdVand(0.8);
     paastand("vandflasken holdt under 1 s: ingen laerer", !f.laerer.scene);
     adv(0.5);
-    paastand("vandflasken holdt over 1 s: laereren kommer", f.laerer.scene && f.laerer.scene.navn === "vand" && f.vandAdvaret);
+    var vandReplik = f.laerer.scene ? f.laerer.scene.trin.map(function (t) { return t.sig || ""; }).join(" ") : "";
+    paastand("vandflasken holdt over 1 s: laereren advarer om baegerglasset", f.laerer.scene && f.laerer.scene.navn === "vand" && f.vandAdvaret && /hælde det i bægerglasset/.test(vandReplik), vandReplik);
     f.op(); adv(0.3);
     paastand("laereren laaser ikke scenen", !f.laererOptaget());
-    f.slipTil("vand", "tragt");
+    f.slipTil("vand", "baegerA");
     adv(0.2);
-    paastand("vand sluppet over tragten: laereren svarer igen", /præcis det/.test(f.laerer.tale));
+    paastand("vandet haeldes alligevel i: laereren svarer igen", f.midl === null && /præcis det/.test(f.laerer.tale), f.laerer.tale);
+    adv(5);
+    paastand("og vandet er i baegerglasset", f.midl === "vand");
     vent(function () { return !f.laerer.scene; }, 15);
-    f.ned({ x: vx, y: vy }); adv(1.5); f.op();
+
+    tilBaegerglas();
+    holdVand(1.3); f.op();
+    vent(function () { return !f.laerer.scene; }, 15);
+    holdVand(1.5); f.op(); adv(0.2);
     paastand("advarslen kommer kun én gang pr. forsøg", !f.laerer.scene);
+    f.slipTil("vand", "baegerA"); adv(0.3);
+    paastand("vand haeldt i efter advarslen: laereren kommer tilbage", f.laerer.scene && f.laerer.scene.navn === "vandBaeger");
+    vent(function () { return !f.laerer.scene && !f.handling; }, 15);
+
+    tilBaegerglas();
+    f.slipTil("heptan", "baegerA"); adv(4.5);
+    holdVand(1.5); f.op(); adv(0.2);
+    paastand("ingen advarsel, naar opløsningsmidlet er valgt", !f.laerer.scene);
 
     overskrift("7. Paaskeaeg");
     nyt();

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="28" viewBox="0 0 64 14">
+  <!-- Vejebaad i hvid plast. Bundens midte er (32, 14). -->
+  <path d="M1 1 L63 1 L56 13 Q55.5 14 54 14 L10 14 Q8.5 14 8 13 Z" fill="#f3f5f7" stroke="#aeb6bf" stroke-width="1"/>
+  <path d="M5 3.5 L59 3.5" stroke="#c9d0d7" stroke-width="1"/>
+  <path d="M4 2 L12 12" stroke="#ffffff" stroke-width="1.4" stroke-opacity="0.9"/>
+</svg>

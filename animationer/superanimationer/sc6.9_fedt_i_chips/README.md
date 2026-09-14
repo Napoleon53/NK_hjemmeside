@@ -47,11 +47,12 @@ procent. Resultatet sammenlignes med varedeklarationen på posen (34 g fedt pr.
   resultater. Uden skylning bliver resultatet ca. 29 %, med skylning ca. 32 %.
   Modellen står i `js/model.js`.
 * **Zoomboblen følger indholdet.** Chipsstykker af stivelseskæder med
-  fedtstofmolekyler imellem, heptan der omgiver fedtet og trækker det ud, vand
+  fedtstofmolekyler imellem, heptan der omgiver fedtet og trækker det ud (under omrøringen samles heptan og
+  opløst fedt foroven, mens stivelsen synker mod bunden), vand
   der holder sammen med sig selv og opløser Na⁺ og Cl⁻, filtrerpapirets porer,
   og opløsningsmidlet der forlader overfladen ved inddampningen.
 * **Iagttagelser er fejlkilder.** Kun det, der kan forklare et resultat, bliver
-  noteret: krummer der sprang ud af morteren, delvist knuste chips, en blanding
+  noteret: krummer der sprang ud af morteren eller faldt ved siden af bægerglasset, delvist knuste chips, en blanding
   der blev filtreret før den var rørt færdig, og våde chipsrester i filteret
   (når der ikke er skyllet). Listen hører til det aktuelle forsøg og ryddes ved
   nyt forsøg.
@@ -84,10 +85,10 @@ kan skifte. Armen drejer om skulderen. Alt står i `js/laerer.js`.
   sarkastisk ("Det er en morter. Ikke et trommesæt."). Replikkerne skifter fra
   gang til gang. Knappen Knus kalder aldrig på læreren.
 * **Lærerens kaffe.** Koppen på hylden. Læreren henter den og drikker.
-* **Vandflasken.** Holdes vandflasken i mere end 1 sekund, kigger læreren ind:
-  "Jeg håber ikke, at du har tænkt dig at hælde det i tragten." Én gang pr.
-  forsøg. Slippes vandet så alligevel over tragten (uden at det er en skylning
-  med vand), svarer læreren igen.
+* **Vandflasken.** Holdes vandflasken i mere end 1 sekund, før der er valgt
+  opløsningsmiddel, kigger læreren ind: "Jeg håber ikke, at du har tænkt dig at
+  hælde det i bægerglasset." Én gang pr. forsøg. Hældes vandet så alligevel i,
+  svarer læreren igen.
 * **Salt.** Når vand er inddampet, og der kun er salt tilbage, kommer læreren
   med en sarkastisk bemærkning. Replikkerne skifter fra gang til gang.
 * **Læreren klikkes på.** Stadig kortere svar, rødere i hovedet og til sidst

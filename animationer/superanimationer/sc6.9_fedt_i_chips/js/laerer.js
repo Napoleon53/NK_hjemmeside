@@ -242,15 +242,15 @@
         this.laererKoer("vand", [
             { udtryk: { vrede: 0.5, humoer: -0.3, roed: 0, skeptisk: 1 } },
             { gaa: 200 },
-            { sig: "Jeg håber ikke, at du har tænkt dig at hælde det i tragten.", vis: 3.4, tid: 3.6 },
+            { sig: "Jeg håber ikke, at du har tænkt dig at hælde det i bægerglasset.", vis: 3.4, tid: 3.6 },
             { udtryk: { skeptisk: 0 } },
             { gaa: UDE }
         ], false);
         return true;
     };
 
-    /* ... og saa blev vandet alligevel sluppet over tragten */
-    P.laererVandITragt = function () {
+    /* ... og saa blev vandet alligevel haeldt i baegerglasset */
+    P.laererVandIBaeger = function () {
         var L = this.laerer;
         if (!L) return;
         if (L.scene && L.scene.navn === "vand") {
@@ -260,11 +260,11 @@
             if (NK.Lyd) NK.Lyd.brum();
             return;
         }
-        if (L.scene || L.spiseHaand) return;
-        this.laererKoer("vandTragt", [
+        if (!this.vandAdvaret || L.scene || L.spiseHaand) return;
+        this.laererKoer("vandBaeger", [
             { udtryk: { vrede: 0.9, humoer: -0.6, roed: 0.4, skeptisk: 0.6 } },
             { gaa: 200 },
-            { sig: "Vand i tragten. Selvfølgelig.", vis: 2.8, tid: 3.0 },
+            { sig: "Nå. Så blev det alligevel vand.", vis: 2.8, tid: 3.0 },
             { kald: function () { if (NK.Lyd) NK.Lyd.brum(); } },
             { udtryk: { skeptisk: 0, roed: 0 } },
             { gaa: UDE }

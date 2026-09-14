@@ -42,7 +42,7 @@
 
     /* knust: 0-1. Pistillens samlede vej (tegneenheder) giver fuld
        knusning; under min kan chipsene ikke haeldes over. */
-    var KNUS = { min: 0.5, vej: 2600, voldsom: 2600, krummeMasse: 0.02, maksKrummer: 8, amok: 3200, amokTid: 0.8 };
+    var KNUS = { min: 0.5, vej: 2600, voldsom: 2600, krummeMasse: 0.02, maksKrummer: 8, amok: 3200, amokTid: 0.8, spildMasse: 0.03 };
 
     /* tid: roeretid i sekunder. Uden roering sker der kun lidt (diffusion). */
     var ROER = { tau: 1.5, min: 0.5, faerdig: 0.95, diffusion: 0.04, fuld: 450 };

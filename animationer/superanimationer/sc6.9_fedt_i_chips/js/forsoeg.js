@@ -57,6 +57,7 @@
 
     var IAGTTAGELSER = {
         krummer:   { tekst: "Nogle krummer sprang ud af morteren." },
+        spild:     { tekst: "Nogle krummer faldt ved siden af bægerglasset." },
         halvknust: { tekst: "Chipsene var kun delvist knust." },
         kortRoer:  { tekst: "Blandingen blev filtreret, før den var rørt færdig." },
         vaad:      { tekst: "Chipsresterne i filteret var stadig våde." }
@@ -104,6 +105,7 @@
         this.mBF = null;
         this.mTab = 0;
         this.krummerUd = 0;
+        this.krummerSpildt = 0;
         this.skaalMasse = M.afrund(r(M.SKAAL.min, M.SKAAL.max), 2);
         this.antalForkerte = 0;
         this.vandAdvaret = false;
@@ -493,7 +495,9 @@
         if (this.gjort.overfoer) { this.besked("Morteren er tom."); return false; }
         if (this.knust < M.KNUS.min) { this.besked("Knus chipsene mere først.", "advarsel"); this.markér("pistil", 3); return false; }
         var mor = this.g.morter, pi = this.g.pistil, a = this.g.baegerA;
-        var over = { x: a.p.x - 24, y: a.p.y - 60, v: 1.9 };
+        /* Morteren haelder fra kanten, der ved denne positur staar midt over
+           baegerglasset og et stykke over aabningen */
+        var over = { x: S.A_MIDT - 29, y: 318, v: 1.9 };
         var mig = this;
         var n = 0;
         this.koer([
@@ -503,7 +507,10 @@
                 while (n < t * 24) {
                     n++;
                     var kant = NK.tilVerden(mor.p, mor.anker, 94, 10);
-                    this.flyvende.push({ x: kant.x + r(-4, 4), y: kant.y, vx: r(-20, 20), vy: r(0, 40), a: r(0, 6), va: r(-8, 8), r: r(2.2, 3.2), fysik: true, maal: "baegerA", farve: "#eec15c" });
+                    /* Enkelte krummer faar et puf til siden og ryger forbi */
+                    var vild = Math.random() < 0.05;
+                    var vx = vild ? r(120, 200) * (Math.random() < 0.5 ? -1 : 1) : r(-12, 12);
+                    this.flyvende.push({ x: kant.x + r(-3, 3), y: kant.y, vx: vx, vy: r(0, 30), a: r(0, 6), va: r(-8, 8), r: r(2.2, 3.2), fysik: true, maal: "baegerA", farve: "#eec15c" });
                 }
                 mig.stykker = mig.stykker.slice(0, Math.floor(mig.stykker.length * (1 - t)));
             } },
@@ -517,6 +524,14 @@
             { flyt: pi, til: pi.hjem, tid: 0.45, loeft: 10 }
         ], "overfoer");
         return true;
+    };
+
+    /* En krumme ramte ved siden af baegerglasset: den bliver liggende paa
+       bordet, og dens masse er tabt */
+    P.spildt = function () {
+        this.krummerSpildt++;
+        this.mTab += M.KNUS.spildMasse;
+        this.iagttag("spild");
     };
 
     P.nyKrummeIA = function () {
@@ -543,6 +558,7 @@
             }
             if (this.midl) { this.besked("Der er opløsningsmiddel nok i bægerglasset. Rør rundt."); this.markér("stav", 3); return false; }
             this.haeldMidl(navn, M.VOLUMEN);
+            if (navn === "vand" && this.laererVandIBaeger) this.laererVandIBaeger();
             return true;
         }
         if (maal === "tragt") {
@@ -550,7 +566,6 @@
                 this.skyl();
                 return true;
             }
-            if (navn === "vand" && this.laererVandITragt) this.laererVandITragt();
             if (!this.gjort.filtrer) this.besked("Opløsningsmidlet skal i bægerglasset med chipsene.");
             else if (this.midl !== navn) this.besked("Filteret skal skylles med det samme opløsningsmiddel.", "advarsel");
             else if (this.skyllet) this.besked("Filteret er skyllet.");
@@ -984,7 +999,7 @@
 
         /* Paaskeaeg: vandflasken holdt i mere end 1 sekund */
         var h = this.holdt;
-        if (h && h.navn === "vand" && h.t0 !== undefined && this.tid - h.t0 > 1 && !this.vandAdvaret && this.laererVand) {
+        if (h && h.navn === "vand" && h.t0 !== undefined && this.tid - h.t0 > 1 && !this.midl && !this.vandAdvaret && this.laererVand) {
             if (this.laererVand()) this.vandAdvaret = true;
         }
         if (this.mark) { this.mark.ur -= dt; if (this.mark.ur <= 0) this.mark = null; }
@@ -1216,8 +1231,24 @@
                 f.x += f.vx * dt;
                 f.y += f.vy * dt;
                 if (f.maal === "baegerA") {
-                    var bund = NK.tilVerden(this.g.baegerA.p, this.g.baegerA.anker, 36, 80).y;
-                    if (f.y > bund) { this.flyvende.splice(i, 1); this.nyKrummeIA(); }
+                    /* Ved kanten afgoeres det, om krummen rammer aabningen */
+                    var ga = this.g.baegerA;
+                    var kantV = NK.tilVerden(ga.p, ga.anker, 10, 6), kantH = NK.tilVerden(ga.p, ga.anker, 62, 6);
+                    if (!f.inde && f.y >= kantV.y) {
+                        if (f.x > kantV.x && f.x < kantH.x) {
+                            f.inde = true;
+                        } else {
+                            f.maal = null;
+                            f.spild = true;
+                            this.spildt();
+                            continue;
+                        }
+                    }
+                    if (f.inde) {
+                        f.x = NK.klamp(f.x, kantV.x + 3, kantH.x - 3);
+                        var bund = NK.tilVerden(ga.p, ga.anker, 36, 80).y;
+                        if (f.y > bund) { this.flyvende.splice(i, 1); this.nyKrummeIA(); }
+                    }
                 } else if (f.y > S.BORD - 1) {
                     f.y = S.BORD - 1;
                     f.vx *= 0.5;

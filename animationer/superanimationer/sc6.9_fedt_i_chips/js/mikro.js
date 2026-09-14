@@ -78,6 +78,7 @@
         this.fordamper = [];
         this.saltFri = false;
         this.knust = 0;
+        this.lag = 0;
         this.s = {};
     };
 
@@ -89,6 +90,8 @@
         if (s.scene !== this.scene) this.skiftScene(s.scene);
         if (s.midl !== this.midl) this.saetMidl(s.midl);
         this.knust = NK.mod(this.knust, s.knust || 0, 3, dt);
+        /* lag 0-1: hvor langt adskillelsen er naaet under roeringen */
+        if (this.scene === "ekstraktion" && this.midl) this.lag = Math.min(1, this.lag + dt * (s.roer || 0) * 0.35);
 
         var nOpl = Math.round(N_FEDT * NK.klamp(s.fedtOploest || 0, 0, 1));
         var nTilbage = Math.round(nOpl * (s.tilbage || 0));
@@ -182,17 +185,29 @@
 
     /* Hvor et bundet fedtmolekyle sidder */
     P.bundetPlads = function (f) {
-        var st = this.stykkePlads(f.stykke);
-        var bx = f.bx, by = f.by;
-        if (this.scene === "filter") { bx *= 0.85; by = -14 + (by - 8) * 0.45; }
+        return this.klump(f.bx, f.by, f.stykke);
+    };
+
+    /* Hvor en del af chipsstykket sidder (stivelse, bundet fedt, salt).
+       Under roering synker stykkerne mod bunden og pakkes lidt sammen. */
+    P.klump = function (bx, by, stykke) {
+        var st = this.stykkePlads(stykke);
+        if (this.scene === "filter") {
+            bx *= 0.85;
+            by = -14 + (by - 8) * 0.45;
+        } else if (this.scene === "ekstraktion" && this.lag > 0) {
+            bx *= 1 - 0.1 * this.lag;
+            by = 8 + (by - 8) * (1 - 0.35 * this.lag) + 34 * this.lag;
+        }
         return { x: bx + st.x, y: by + st.y };
     };
 
     P.stykkePlads = function (nr) {
         var k = this.knust * (this.scene === "filter" ? 0.4 : 1);
         var d = STYKKE_RETNING[nr];
+        var lag = this.scene === "ekstraktion" ? this.lag : 0;
         var t = this.s.roer ? Math.sin(Date.now() / 1000 * 3 + nr) * 3 * this.s.roer : 0;
-        return { x: d[0] * 34 * k + t, y: d[1] * 26 * k + (this.scene === "ekstraktion" ? 6 : 0) };
+        return { x: d[0] * 34 * k + t, y: d[1] * 26 * k * (1 - 0.6 * lag) + (this.scene === "ekstraktion" ? 6 : 0) };
     };
 
     /* En fri partikel i vaesken. Hvor maa den vaere? */
@@ -214,6 +229,13 @@
             if (gennem) { y0 = FIBER.y1 + 8; y1 = 90; }
             else if (erFedt && p.holdtTilbage) { y0 = -30; y1 = FIBER.y0 - 8; }
             else { y0 = -88; y1 = FIBER.y0 - 8; }
+        } else if (sc === "ekstraktion") {
+            /* Under roeringen traekkes heptan og det opløste fedt opad */
+            y0 = OVERFLADE + 8;
+            if (this.midl === "heptan" && (erFedt || p.type === "heptan")) {
+                y1 = NK.lerp(90, 14, this.lag);
+                if (this.s.roer > 0.05) p.vy -= 70 * this.s.roer * dt;
+            }
         } else if (sc === "filtrat" || sc === "inddamp") {
             y0 = this.overflade() + 8;
             y1 = 90;
@@ -273,10 +295,11 @@
                 w.y += dy / d * (20 - d) * Math.min(1, dt * 8);
             }
         }
-        var st = [0, 1, 2].map(this.stykkePlads, this);
+        var mig = this;
+        var st = [0, 1, 2].map(function (nr) { return mig.klump(0, 8, nr); });
         if (this.scene === "ekstraktion" || this.scene === "chips") {
             for (var k = 0; k < st.length; k++) {
-                var sx = w.x - st[k].x, sy = w.y - (st[k].y + 8), sd = Math.sqrt(sx * sx + sy * sy);
+                var sx = w.x - st[k].x, sy = w.y - st[k].y, sd = Math.sqrt(sx * sx + sy * sy);
                 if (sd < 34 && sd > 0.01 && Math.random() < 0.02) { w.vx += sx / sd * 20; w.vy += sy / sd * 20; }
             }
         }
@@ -295,12 +318,12 @@
 
     P.frigoerSalt = function () {
         this.saltFri = true;
-        var st = this.stykkePlads(0);
+        var sp = this.klump(SALTPLADS[0], SALTPLADS[1], 0);
         this.ioner = [];
         for (var i = 0; i < 4; i++) {
             this.ioner.push({
                 type: i % 2 === 0 ? "na" : "cl", nr: i,
-                x: SALTPLADS[0] + st.x + r(-4, 4), y: SALTPLADS[1] + st.y + r(-4, 4),
+                x: sp.x + r(-4, 4), y: sp.y + r(-4, 4),
                 vx: r(-20, 20), vy: r(-30, -10), rad: i % 2 === 0 ? 6 : 8
             });
         }
@@ -336,6 +359,20 @@
         }
         if (navn === "chips") this.fedt.forEach(function (f) { f.tilstand = "bundet"; });
         if (fra === "chips" && navn !== "chips") this.fedt.forEach(function (f) { var b = mig.bundetPlads(f); f.x = b.x; f.y = b.y; });
+    };
+
+    /* Til selvtesten: gennemsnitlig hoejde (y) af stivelsen, det frie
+       fedt eller et opløsningsmiddel. Stoerre y er laengere nede. */
+    P.gennemsnitY = function (hvad) {
+        var sum = 0, n = 0, mig = this;
+        if (hvad === "stivelse") {
+            KAEDER.forEach(function (k) { sum += mig.klump(k[0], k[1], k[3]).y; n++; });
+        } else if (hvad === "fedtFri") {
+            this.fedt.forEach(function (f) { if (f.tilstand !== "bundet") { sum += f.y; n++; } });
+        } else {
+            this.midler.forEach(function (m) { if (m.type === hvad && !m.borte) { sum += m.y; n++; } });
+        }
+        return n ? sum / n : NaN;
     };
 
     /* Til selvtesten: hvor mange fedtmolekyler er i hver tilstand? */
@@ -552,15 +589,12 @@
         if (sc === "chips" || sc === "ekstraktion" || sc === "filter") {
             for (i = 0; i < KAEDER.length; i++) {
                 var kd = KAEDER[i];
-                var st = this.stykkePlads(kd[3]);
-                var kx = kd[0], ky = kd[1];
-                if (sc === "filter") { kx *= 0.85; ky = -14 + (ky - 8) * 0.45; }
-                tegnStivelse(ctx, kx + st.x, ky + st.y, kd[2]);
+                var kp = this.klump(kd[0], kd[1], kd[3]);
+                tegnStivelse(ctx, kp.x, kp.y, kd[2]);
             }
             if (!this.saltFri) {
-                var ss = this.stykkePlads(0);
-                var sy = sc === "filter" ? -14 + (SALTPLADS[1] - 8) * 0.45 : SALTPLADS[1];
-                tegnSaltkrystal(ctx, SALTPLADS[0] * (sc === "filter" ? 0.85 : 1) + ss.x, sy + ss.y);
+                var sk = this.klump(SALTPLADS[0], SALTPLADS[1], 0);
+                tegnSaltkrystal(ctx, sk.x, sk.y);
             }
         }
 
