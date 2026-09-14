@@ -1552,8 +1552,9 @@
             /* To langsomme molekyler mødes - sammenstødet er for svagt, og de
                bliver stående i det prellede øjeblik, indtil man klikker videre */
             const p = t < 0.6 ? smooth(t / 0.6) : 1;
-            molekyle('h2o2', lerp(230, 430, p), cy, 1);
-            molekyle('h2o2', lerp(770, 570, p), cy, 1);
+            const k = fireSeparat(lerp(230, 440, p), lerp(770, 560, p));
+            tegnFireO(k);
+            tegnH2O2Etiketter(k, 1);
 
             if (t >= 0.55) {
                 ctx.strokeStyle = '#e74c3c';
@@ -1563,7 +1564,7 @@
                 ctx.moveTo(485, cy - 22); ctx.lineTo(515, cy + 8);
                 ctx.moveTo(515, cy - 22); ctx.lineTo(485, cy + 8);
                 ctx.stroke();
-                tekst('For lidt energi: molekylerne preller af', 500, cy - 66, '#e74c3c', 16, 'center', true);
+                tekst('For lidt energi: molekylerne preller af', 500, 158, '#e74c3c', 16, 'center', true);
             }
 
         } else if (step === 1) {
@@ -1573,31 +1574,133 @@
             if (t < 0.4) {
                 /* Fase 1: to hurtige molekyler suser direkte mod hinanden */
                 const p = smooth(t / 0.4);
-                molekyle('h2o2', lerp(180, 380, p), cy, 1);
-                molekyle('h2o2', lerp(820, 620, p), cy, 1);
+                const k = fireSeparat(lerp(180, 400, p), lerp(820, 600, p));
+                tegnFireO(k);
+                tegnH2O2Etiketter(k, 1);
             } else {
-                /* Fase 2: de presses sammen til det aktiverede kompleks - og
+                /* Fase 2: de smelter sammen til ét aktiveret kompleks - og
                    bliver stående sådan, indtil man klikker videre */
                 const p = smooth(Math.min(1, (t - 0.4) / 0.6));
-                const d = lerp(200, 52, p);
-                const brud = p * 0.55;
+                const k = fireMellem(fireSeparat(400, 600), FIRE_KOMPLEKS, p);
                 if (p > 0.25) tegnKompleks(cy, Math.min(1, (p - 0.25) / 0.3));
-                molekyle('h2o2', LW / 2 - d, cy, 1, brud);
-                molekyle('h2o2', LW / 2 + d, cy, 1, brud);
+                tegnFireO(k);
+                tegnH2O2Etiketter(k, 1 - Math.min(1, p * 2.5));
             }
 
         } else {
-            /* Komplekset er ustabilt og falder straks fra hinanden */
-            const p = smooth(t);
+            /* Komplekset er ustabilt og falder straks fra hinanden: O₂ fra de
+               to nye O–O-bindinger foroven, H₂O fra de to nederste O-atomer */
             if (t < 0.3) tegnKompleks(cy, 1 - t / 0.3);
-            molekyle('h2o', lerp(LW / 2 - 40, 250, p), lerp(cy, 180, p), 1);
-            molekyle('h2o', lerp(LW / 2 - 40, 250, p), lerp(cy, 404, p), 1);
-            molekyle('o2', lerp(LW / 2 + 40, 760, p), lerp(cy, 292, p), 1);
+            if (t < 0.35) {
+                tegnFireO(fireMellem(FIRE_KOMPLEKS, fireProdukter(0), smooth(t / 0.35)));
+            } else {
+                const r = smooth((t - 0.35) / 0.65);
+                const k = fireProdukter(r);
+                tegnFireO(k);
+                ctx.globalAlpha = Math.min(1, r * 2);
+                tekst('O₂', (k.a[0] + k.b[0]) / 2, k.a[1] - 26, '#ffd7a0', 13, 'center', true);
+                tekst('H₂O', k.c[0], k.c[1] - 26, '#9fd8f5', 13, 'center', true);
+                tekst('H₂O', k.d[0], k.d[1] - 26, '#9fd8f5', 13, 'center', true);
+                ctx.globalAlpha = 1;
+            }
             tekst('Komplekset er ustabilt og falder straks fra hinanden', LW / 2, 158, '#2ecc71', 16, 'center', true);
         }
     }
 
-    /* Skarp parentes med dobbeltkryds om det aktiverede kompleks */
+    /* ---------- To H₂O₂ atom for atom ----------
+       Uden katalysator tegnes de to H₂O₂ atom for atom, så de kan smelte sammen
+       til ét aktiveret kompleks: en firkant af fire O-atomer. Venstre molekyle
+       er a-c med H-atomerne ha og hc, højre molekyle er b-d med hb og hd.
+       I komplekset er de gamle bindinger (a-c, b-d, a-ha, b-hb) halvt brudt,
+       og de nye (a-b til O₂, c-ha og d-hb til H₂O) halvt dannet. */
+    const FIRE_Y = 292;
+
+    /* [atom, atom, binding, ny binding, dobbeltbinding] */
+    const FIRE_BINDINGER = [
+        ['a', 'c', 'ac', false], ['b', 'd', 'bd', false], ['a', 'b', 'ab', true, true],
+        ['a', 'ha', 'aha', false], ['c', 'ha', 'cha', true], ['c', 'hc', 'chc', false],
+        ['b', 'hb', 'bhb', false], ['d', 'hb', 'dhb', true], ['d', 'hd', 'dhd', false]
+    ];
+
+    /* To adskilte H₂O₂ med O–O-bindingen lodret og H-atomerne udad */
+    function fireSeparat(xL, xR) {
+        const y = FIRE_Y;
+        return {
+            a: [xL, y - 16], c: [xL, y + 16], ha: [xL - 15, y - 31], hc: [xL - 15, y + 31],
+            b: [xR, y - 16], d: [xR, y + 16], hb: [xR + 15, y - 31], hd: [xR + 15, y + 31],
+            bind: { ac: 1, bd: 1, ab: 0, aha: 1, cha: 0, chc: 1, bhb: 1, dhb: 0, dhd: 1 }
+        };
+    }
+
+    const FIRE_KOMPLEKS = {
+        a: [466, FIRE_Y - 34], b: [534, FIRE_Y - 34], c: [466, FIRE_Y + 34], d: [534, FIRE_Y + 34],
+        ha: [436, FIRE_Y], hc: [451, FIRE_Y + 49], hb: [564, FIRE_Y], hd: [549, FIRE_Y + 49],
+        bind: { ac: 0.5, bd: 0.5, ab: 0.5, aha: 0.5, cha: 0.5, chc: 1, bhb: 0.5, dhb: 0.5, dhd: 1 }
+    };
+
+    /* Produkterne: r = 0 lige dannet ved midten, r = 1 fløjet ud til siderne */
+    function fireProdukter(r) {
+        const o2 = [500, lerp(FIRE_Y - 62, 214, r)];
+        const vL = [lerp(446, 290, r), lerp(FIRE_Y + 48, 400, r)];
+        const vR = [lerp(554, 710, r), lerp(FIRE_Y + 48, 400, r)];
+        return {
+            a: [o2[0] - 13, o2[1]], b: [o2[0] + 13, o2[1]],
+            c: vL, ha: [vL[0] - 16, vL[1] + 13], hc: [vL[0] + 16, vL[1] + 13],
+            d: vR, hb: [vR[0] + 16, vR[1] + 13], hd: [vR[0] - 16, vR[1] + 13],
+            bind: { ac: 0, bd: 0, ab: 1, aha: 0, cha: 1, chc: 1, bhb: 0, dhb: 1, dhd: 1 }
+        };
+    }
+
+    function fireMellem(k1, k2, p) {
+        const k = { bind: {} };
+        for (const n in k1) if (n !== 'bind') k[n] = [lerp(k1[n][0], k2[n][0], p), lerp(k1[n][1], k2[n][1], p)];
+        for (const n in k1.bind) k.bind[n] = lerp(k1.bind[n], k2.bind[n], p);
+        return k;
+    }
+
+    /* Hele bindinger er hvide og fuldt optrukne. Halve bindinger er stiplede:
+       røde, når en gammel binding brydes, grønne, når en ny dannes. */
+    function tegnFireO(k) {
+        for (const [p, q, n, ny, dobbelt] of FIRE_BINDINGER) {
+            const s = k.bind[n];
+            if (s <= 0.02) continue;
+            const A = k[p], B = k[q];
+            const OO = q.length === 1;
+            const hel = s >= 0.98;
+            ctx.save();
+            ctx.globalAlpha = Math.min(1, s * 2);
+            ctx.lineWidth = OO ? 5 : 4;
+            if (hel) {
+                ctx.strokeStyle = OO ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.4)';
+            } else {
+                ctx.setLineDash([6, 5]);
+                ctx.strokeStyle = ny ? 'rgba(46,204,113,0.95)' : 'rgba(231,76,60,0.9)';
+            }
+            if (dobbelt && hel) {
+                binding(A[0], A[1] - 3, B[0], B[1] - 3, ctx.strokeStyle, 4);
+                binding(A[0], A[1] + 4, B[0], B[1] + 4, ctx.strokeStyle, 4);
+            } else {
+                ctx.beginPath();
+                ctx.moveTo(A[0], A[1]);
+                ctx.lineTo(B[0], B[1]);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+        for (const h of ['ha', 'hb', 'hc', 'hd']) atom(k[h][0], k[h][1], 8, '#ecf0f1', '', '#333');
+        for (const o of ['a', 'b', 'c', 'd']) atom(k[o][0], k[o][1], 15, '#e74c3c', 'O');
+    }
+
+    function tegnH2O2Etiketter(k, alfa) {
+        if (alfa <= 0) return;
+        ctx.globalAlpha = alfa;
+        tekst('H₂O₂', k.a[0] - 8, k.a[1] - 40, '#ff9d92', 13, 'center', true);
+        tekst('H₂O₂', k.b[0] + 8, k.b[1] - 40, '#ff9d92', 13, 'center', true);
+        ctx.globalAlpha = 1;
+    }
+
+    /* Aktiveret kompleks: fælles skal om de fire O-atomer, skarp parentes og
+       dobbeltkryds, så det ses, at de to H₂O₂ er smeltet sammen til én partikel */
     function tegnKompleks(cy, styrke) {
         const x0 = LW / 2 - 150, x1 = LW / 2 + 150;
         const gl = ctx.createRadialGradient(LW / 2, cy, 10, LW / 2, cy, 165);
@@ -1607,6 +1710,14 @@
         ctx.beginPath();
         ctx.arc(LW / 2, cy, 165, 0, 6.283);
         ctx.fill();
+
+        ctx.fillStyle = 'rgba(243,156,18,' + (0.16 * styrke) + ')';
+        ctx.strokeStyle = 'rgba(243,156,18,' + (0.75 * styrke) + ')';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(LW / 2, cy + 2, 105, 68, 0, 0, 6.283);
+        ctx.fill();
+        ctx.stroke();
 
         ctx.strokeStyle = 'rgba(243,156,18,' + (0.9 * styrke) + ')';
         ctx.lineWidth = 3;
