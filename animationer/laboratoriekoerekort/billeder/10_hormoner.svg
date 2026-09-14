@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <!-- En af drengene ved det andet bord aflaeser koncentreret en kolbe.
+       Hjerter stiger op fra dit bord, hvor haeftet er fyldt med hjerter. -->
+  <defs>
+    <linearGradient id="vaeg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9e4e2"/>
+      <stop offset="1" stop-color="#e8efee"/>
+    </linearGradient>
+    <linearGradient id="bord" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#46555a"/>
+      <stop offset="1" stop-color="#2c373b"/>
+    </linearGradient>
+    <linearGradient id="gulv" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8b3a6"/>
+      <stop offset="1" stop-color="#a39d90"/>
+    </linearGradient>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.7"/>
+      <stop offset="0.2" stop-color="#d4ebfa" stop-opacity="0.25"/>
+      <stop offset="0.8" stop-color="#d4ebfa" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.6"/>
+    </linearGradient>
+    <linearGradient id="kittel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#dfe5e8"/>
+      <stop offset="0.45" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#d0d8db"/>
+    </linearGradient>
+    <pattern id="fliser" width="120" height="80" patternUnits="userSpaceOnUse" y="280">
+      <rect width="120" height="80" fill="#f4f7f6"/>
+      <path d="M0 1 H120 M0 41 H120 M60 0 V40 M1 40 V80" stroke="#d2dddb" stroke-width="2"/>
+    </pattern>
+    <path id="hjerte" d="M0 26 C-44 -4 -30 -40 0 -16 C30 -40 44 -4 0 26 Z"/>
+  </defs>
+
+  <rect width="1200" height="520" fill="url(#vaeg)"/>
+  <rect y="280" width="1200" height="120" fill="url(#fliser)"/>
+  <rect y="520" width="1200" height="90" fill="url(#gulv)"/>
+
+  <!-- Drengen bag det andet bord -->
+  <g>
+    <path d="M646 282 Q616 336 622 392" fill="none" stroke="#b9c3c6" stroke-width="42" stroke-linecap="round"/>
+    <path d="M646 282 Q616 336 622 392" fill="none" stroke="#eef2f3" stroke-width="36" stroke-linecap="round"/>
+    <path d="M642 270 Q700 252 758 270 L782 404 H618 Z" fill="url(#kittel)" stroke="#b9c3c6" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M678 262 L700 316 L722 262 Z" fill="#3d6fb3"/>
+    <path d="M670 264 L700 330 L666 404 M730 264 L700 330 L734 404" fill="none" stroke="#b9c3c6" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Arm, der holder kolben op -->
+    <path d="M754 284 Q826 300 834 222" fill="none" stroke="#b9c3c6" stroke-width="42" stroke-linecap="round"/>
+    <path d="M754 284 Q826 300 834 222" fill="none" stroke="#f4f6f7" stroke-width="36" stroke-linecap="round"/>
+    <g transform="translate(836 150) scale(0.62)">
+      <path d="M-50 12 L-70 54 Q-72 64 -60 64 H60 Q72 64 70 54 L50 12 Z" fill="#5fbf7a" fill-opacity="0.8"/>
+      <path d="M-16 -112 V-50 L-72 52 Q-78 70 -58 70 H58 Q78 70 72 52 L16 -50 V-112 Z" fill="url(#glas)" stroke="#5f8fb0" stroke-width="4" stroke-linejoin="round"/>
+      <path d="M-26 -20 L-54 40" stroke="#ffffff" stroke-opacity="0.8" stroke-width="7" stroke-linecap="round"/>
+    </g>
+    <ellipse cx="836" cy="206" rx="22" ry="18" fill="#e2a987"/>
+    <!-- Hoved -->
+    <rect x="684" y="238" width="32" height="30" rx="8" fill="#d39a78"/>
+    <circle cx="654" cy="212" r="10" fill="#e2a987"/>
+    <circle cx="746" cy="212" r="10" fill="#e2a987"/>
+    <ellipse cx="700" cy="206" rx="46" ry="50" fill="#e2a987"/>
+    <path d="M654 198 Q648 150 700 150 Q754 150 746 198 Q738 176 716 172 Q712 182 700 178 Q680 172 654 198 Z" fill="#6b4424"/>
+    <!-- Brillerne sidder, hvor de skal -->
+    <path d="M656 206 H664 M736 206 H746" stroke="#1f5fa8" stroke-width="6"/>
+    <rect x="664" y="190" width="72" height="32" rx="11" fill="#9ed2ee" fill-opacity="0.55" stroke="#1f5fa8" stroke-width="5"/>
+    <path d="M700 192 V220" stroke="#1f5fa8" stroke-width="4"/>
+    <circle cx="690" cy="203" r="4.5" fill="#1f1a17"/>
+    <circle cx="724" cy="203" r="4.5" fill="#1f1a17"/>
+    <path d="M688 236 q12 3 24 -1" fill="none" stroke="#8a4b2e" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- Det andet bord -->
+  <rect y="400" width="1200" height="20" fill="#56676c"/>
+  <rect y="420" width="1200" height="10" fill="#2c373b"/>
+  <rect y="430" width="1200" height="90" fill="#cfd8d6"/>
+  <g stroke="#b3bfbd" stroke-width="3"><path d="M200 430 V520 M500 430 V520 M800 430 V520 M1100 430 V520"/></g>
+
+  <!-- Hjerter, der stiger op mod ham -->
+  <path d="M250 600 Q330 440 470 380 Q560 330 610 250" fill="none" stroke="#e0557a" stroke-opacity="0.35" stroke-width="5" stroke-dasharray="4 16" stroke-linecap="round"/>
+  <use href="#hjerte" transform="translate(262 560) rotate(-12) scale(1.6)" fill="#e0557a"/>
+  <use href="#hjerte" transform="translate(386 452) rotate(10) scale(1.2)" fill="#f28aa5"/>
+  <use href="#hjerte" transform="translate(500 360) rotate(-8) scale(0.95)" fill="#e0557a"/>
+  <use href="#hjerte" transform="translate(584 282) rotate(14) scale(0.7)" fill="#f28aa5"/>
+  <use href="#hjerte" transform="translate(150 470) rotate(-20) scale(0.6)" fill="#f7b6c8"/>
+  <use href="#hjerte" transform="translate(470 250) rotate(-16) scale(0.5)" fill="#f7b6c8"/>
+
+  <!-- Dit eget bord med haeftet -->
+  <rect y="606" width="1200" height="114" fill="url(#bord)"/>
+  <rect y="602" width="1200" height="8" fill="#56676c"/>
+  <g transform="translate(900 672) rotate(-4)">
+    <rect x="-150" y="-50" width="300" height="130" rx="3" fill="#fbfaf5"/>
+    <path d="M-120 -24 h120 M-120 0 h90 M-120 24 h130" stroke="#b7bec4" stroke-width="5" stroke-linecap="round"/>
+    <g fill="none" stroke="#e0557a" stroke-width="3.5">
+      <use href="#hjerte" transform="translate(70 -18) scale(0.55)"/>
+      <use href="#hjerte" transform="translate(112 6) rotate(12) scale(0.45)"/>
+      <use href="#hjerte" transform="translate(40 30) rotate(-10) scale(0.4)"/>
+    </g>
+  </g>
+  <g transform="translate(640 684) rotate(-22)">
+    <rect x="-70" y="-6" width="130" height="12" rx="3" fill="#e0557a"/>
+    <path d="M60 -6 L82 0 L60 6 Z" fill="#e8c9a0"/>
+  </g>
+</svg>

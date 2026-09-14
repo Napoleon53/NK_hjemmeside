@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <!-- Laboratoriet set i perspektiv. Carsten staar ved tavlen i den
+       modsatte ende af lokalet. Forsvindingspunkt (600, 290); en dybde s
+       giver x = 600 + (X - 600)s og y = 290 + (Y - 290)s. -->
+  <defs>
+    <linearGradient id="gulv" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#aba699"/>
+      <stop offset="1" stop-color="#999386"/>
+    </linearGradient>
+    <linearGradient id="kittel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#dfe5e8"/>
+      <stop offset="0.45" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#d0d8db"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rum -->
+  <path d="M0 0 H1200 L780 203 H420 Z" fill="#eef3f2"/>
+  <path d="M0 0 L420 203 V419 L0 720 Z" fill="#dde7e5"/>
+  <path d="M1200 0 L780 203 V419 L1200 720 Z" fill="#d3dfdd"/>
+  <path d="M0 720 L420 419 H780 L1200 720 Z" fill="url(#gulv)"/>
+  <rect x="420" y="203" width="360" height="216" fill="#e6eeec"/>
+
+  <!-- Loftslys -->
+  <g fill="#fffbe0" stroke="#d9dcc8" stroke-width="2">
+    <path d="M505 14 H695 L685 44 H515 Z"/>
+    <path d="M540 116 H660 L650 145 H550 Z"/>
+    <path d="M560 174 H640 L635 188 H565 Z"/>
+  </g>
+
+  <!-- Vinduer i hoejre vaeg -->
+  <g fill="#cfe6f5" stroke="#b3c2c0" stroke-width="6" stroke-linejoin="round">
+    <path d="M1140 137 L1020 171 V353 L1140 371 Z"/>
+    <path d="M960 188 L870 213 V331 L960 344 Z"/>
+  </g>
+  <path d="M1080 154 V362 M915 200 V337" stroke="#b3c2c0" stroke-width="4"/>
+
+  <!-- Periodisk system paa venstre vaeg -->
+  <path d="M120 178 L240 206 V314 L120 322 Z" fill="#ffffff" stroke="#c7d3d2" stroke-width="3"/>
+  <g stroke-width="7">
+    <path d="M132 196 L148 200 M216 214 L230 217" stroke="#e6892a"/>
+    <path d="M132 214 L228 234 M132 232 L228 250 M132 250 L228 266" stroke="#8cc7ea"/>
+    <path d="M150 290 L220 294 M150 302 L220 304" stroke="#9bd3a9"/>
+  </g>
+
+  <!-- Tavle paa bagvaeggen -->
+  <rect x="470" y="236" width="260" height="96" rx="3" fill="#ffffff" stroke="#b9c3c6" stroke-width="4"/>
+  <path d="M492 262 h90 M492 282 h130 M492 302 h70 M630 262 q20 20 50 0 M640 300 h60" fill="none" stroke="#5f8fb0" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Venstre bord -->
+  <path d="M90 451 H311 L481 356 H390 Z" fill="#56676c"/>
+  <path d="M311 451 L481 356 V440 L311 655 Z" fill="#cfd8d6"/>
+  <path d="M345 432 V612 M396 404 V548 M447 375 V483" stroke="#b3bfbd" stroke-width="3"/>
+  <rect x="90" y="451" width="221" height="204" fill="#bcc8c6"/>
+  <rect x="90" y="451" width="221" height="12" fill="#2c373b"/>
+  <g>
+    <rect x="150" y="410" width="30" height="44" rx="4" fill="#6b3a17"/>
+    <rect x="200" y="420" width="26" height="34" rx="4" fill="#cfe3ef"/>
+    <rect x="330" y="376" width="20" height="30" rx="3" fill="#ffffff"/>
+  </g>
+
+  <!-- Hoejre bord -->
+  <path d="M889 451 H1110 L810 356 H719 Z" fill="#56676c"/>
+  <path d="M889 451 L719 356 V440 L889 655 Z" fill="#c5cfcd"/>
+  <path d="M855 432 V612 M804 404 V548 M753 375 V483" stroke="#aeb9b7" stroke-width="3"/>
+  <rect x="889" y="451" width="221" height="204" fill="#bcc8c6"/>
+  <rect x="889" y="451" width="221" height="12" fill="#2c373b"/>
+  <g>
+    <rect x="1000" y="414" width="34" height="40" rx="4" fill="#ffffff"/>
+    <rect x="1050" y="404" width="28" height="50" rx="4" fill="#6b3a17"/>
+    <rect x="850" y="380" width="18" height="30" rx="3" fill="#cfe3ef"/>
+  </g>
+
+  <!-- Carsten ved tavlen -->
+  <g>
+    <ellipse cx="600" cy="460" rx="34" ry="5" fill="#000" opacity="0.18"/>
+    <rect x="584" y="398" width="13" height="60" rx="4" fill="#34495e"/>
+    <rect x="603" y="398" width="13" height="60" rx="4" fill="#2e4053"/>
+    <path d="M580 316 Q574 350 576 388" fill="none" stroke="#b9c3c6" stroke-width="14" stroke-linecap="round"/>
+    <path d="M580 316 Q574 350 576 388" fill="none" stroke="#eef2f3" stroke-width="10" stroke-linecap="round"/>
+    <path d="M580 308 Q600 302 620 308 L630 402 H570 Z" fill="url(#kittel)" stroke="#b9c3c6" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M592 306 L600 324 L608 306 Z" fill="#6b7f8e"/>
+    <path d="M620 314 Q640 312 650 290" fill="none" stroke="#b9c3c6" stroke-width="14" stroke-linecap="round"/>
+    <path d="M620 314 Q640 312 650 290" fill="none" stroke="#f4f6f7" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="651" cy="285" r="6" fill="#e2a987"/>
+    <rect x="594" y="296" width="12" height="12" rx="3" fill="#d39a78"/>
+    <circle cx="600" cy="286" r="16" fill="#e2a987"/>
+    <path d="M584 284 Q582 268 600 268 Q618 268 616 284 Q610 276 600 276 Q590 276 584 284 Z" fill="#4a3a30"/>
+    <circle cx="595" cy="287" r="1.8" fill="#1f1a17"/>
+    <circle cx="606" cy="287" r="1.8" fill="#1f1a17"/>
+  </g>
+
+  <!-- Navneskilt -->
+  <g>
+    <path d="M540 196 H660 Q670 196 670 206 V230 Q670 240 660 240 H612 L600 256 L588 240 H540 Q530 240 530 230 V206 Q530 196 540 196 Z" fill="#ffffff" stroke="#0f766e" stroke-width="4" stroke-linejoin="round"/>
+    <text x="600" y="226" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="700" fill="#0b544e">Carsten</text>
+  </g>
+
+  <!-- Elever ved bordene, set bagfra -->
+  <g>
+    <ellipse cx="433" cy="554" rx="50" ry="8" fill="#000" opacity="0.15"/>
+    <rect x="410" y="446" width="20" height="104" rx="7" fill="#34495e"/>
+    <rect x="436" y="446" width="20" height="104" rx="7" fill="#2e4053"/>
+    <path d="M404 312 Q433 302 462 312 L474 452 H392 Z" fill="url(#kittel)" stroke="#b9c3c6" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="424" y="294" width="18" height="20" rx="5" fill="#b97a56"/>
+    <circle cx="433" cy="282" r="25" fill="#1f1a17"/>
+  </g>
+  <g>
+    <ellipse cx="740" cy="503" rx="40" ry="6" fill="#000" opacity="0.15"/>
+    <rect x="722" y="418" width="16" height="84" rx="6" fill="#34495e"/>
+    <rect x="743" y="418" width="16" height="84" rx="6" fill="#2e4053"/>
+    <path d="M716 306 Q740 298 764 306 L774 422 H706 Z" fill="url(#kittel)" stroke="#b9c3c6" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="733" y="292" width="14" height="16" rx="4" fill="#e2a987"/>
+    <circle cx="740" cy="283" r="20" fill="#c9974a"/>
+  </g>
+</svg>

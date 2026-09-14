@@ -1,22 +1,24 @@
 /* =====================================================================
    Laboratoriekoerekort - forside, proeve og resultat
 
-   Proeven traekker ANTAL spoergsmaal fra puljen i spoergsmaal.js og
-   blander svarene. Eleven kan gaa frem og tilbage og aendre svar, indtil
-   der afleveres. Et spoergsmaal er rigtigt, naar praecis de rigtige svar
-   er valgt. Hoejst ANDEL_FEJL af spoergsmaalene maa vaere forkerte.
+   Proeven tager ANTAL spoergsmaal fra puljen i spoergsmaal.js i
+   tilfaeldig raekkefoelge og blander svarene (medmindre blandSvar er
+   false). Eleven faar at vide, hvor mange svar der skal vaelges: ét svar
+   giver runde valgknapper, flere svar giver afkrydsning med en taeller.
+   Et spoergsmaal er rigtigt, naar praecis de rigtige svar er valgt.
+   Hoejst ANDEL_FEJL af spoergsmaalene maa vaere forkerte.
    ===================================================================== */
 (function () {
     "use strict";
 
     var PULJE = window.SPOERGSMAAL || [];
-    var ANTAL = 5;
+    var ANTAL = Infinity;      /* alle spoergsmaal; saet fx 10 for et tilfaeldigt udvalg */
     var ANDEL_FEJL = 0.2;
 
     var antal = Math.min(ANTAL, PULJE.length);
     var maksFejl = Math.floor(antal * ANDEL_FEJL);
 
-    var proeve = [];   /* { sp, svar (blandet), valgt: [bool] } */
+    var proeve = [];   /* { sp, svar, krav (antal rigtige), valgt: [bool] } */
     var nr = 0;
 
     var HOEJTTALER = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
@@ -39,6 +41,10 @@
         return e;
     }
 
+    function antalValgt(p) { return p.valgt.filter(Boolean).length; }
+
+    function vejledningstekst(p) { return p.krav === 1 ? "Vælg ét svar" : "Vælg " + p.krav + " svar"; }
+
     /* ------------------------------------------------------ Oplaesning */
     var kanTale = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
 
@@ -55,7 +61,7 @@
 
     function laesSpoergsmaal() {
         var p = proeve[nr];
-        var dele = [p.sp.spoergsmaal];
+        var dele = [p.sp.spoergsmaal, vejledningstekst(p) + "."];
         p.svar.forEach(function (s, i) { dele.push((i + 1) + ". " + s.tekst); });
         sig(dele.join(" "));
     }
@@ -68,8 +74,13 @@
 
     function start() {
         proeve = bland(PULJE).slice(0, antal).map(function (sp) {
-            var svar = bland(sp.svar);
-            return { sp: sp, svar: svar, valgt: svar.map(function () { return false; }) };
+            var svar = sp.blandSvar === false ? sp.svar.slice() : bland(sp.svar);
+            return {
+                sp: sp,
+                svar: svar,
+                krav: svar.filter(function (s) { return s.rigtig; }).length,
+                valgt: svar.map(function () { return false; })
+            };
         });
         nr = 0;
         byggPrikker();
@@ -88,18 +99,26 @@
         el("spoergsmaal").textContent = p.sp.spoergsmaal;
         el("status").textContent = "Spørgsmål " + (nr + 1) + " af " + antal;
 
+        var vejledning = el("vejledning");
+        vejledning.textContent = vejledningstekst(p);
+        vejledning.classList.toggle("flere", p.krav > 1);
+        if (p.krav > 1) {
+            var taeller = lav("span", "lk-taeller");
+            taeller.id = "taeller";
+            vejledning.appendChild(taeller);
+            opdaterTaeller(p);
+        }
+
         var boks = el("svar");
         boks.innerHTML = "";
         p.svar.forEach(function (s, i) {
             var raekke = lav("div", "lk-valg");
             var label = lav("label", "lk-valg-label");
             var afkryds = document.createElement("input");
-            afkryds.type = "checkbox";
+            afkryds.type = p.krav > 1 ? "checkbox" : "radio";
+            afkryds.name = "svar";
             afkryds.checked = p.valgt[i];
-            afkryds.addEventListener("change", function () {
-                p.valgt[i] = afkryds.checked;
-                opdaterPrikker();
-            });
+            afkryds.addEventListener("change", function () { vaelg(p, i, afkryds); });
             label.appendChild(afkryds);
             label.appendChild(lav("span", "", s.tekst));
             raekke.appendChild(label);
@@ -123,6 +142,30 @@
             window.speechSynthesis.cancel();
             if (el("auto").checked) laesSpoergsmaal();
         }
+    }
+
+    function vaelg(p, i, afkryds) {
+        if (p.krav === 1) {
+            p.valgt = p.valgt.map(function (v, j) { return j === i; });
+        } else if (afkryds.checked && antalValgt(p) >= p.krav) {
+            /* Der er allerede valgt det antal svar, der skal vaelges */
+            afkryds.checked = false;
+            var taeller = el("taeller");
+            taeller.classList.remove("ryst");
+            void taeller.offsetWidth;
+            taeller.classList.add("ryst");
+        } else {
+            p.valgt[i] = afkryds.checked;
+        }
+        opdaterTaeller(p);
+        opdaterPrikker();
+    }
+
+    function opdaterTaeller(p) {
+        var taeller = el("taeller");
+        if (!taeller) return;
+        taeller.textContent = antalValgt(p) + " af " + p.krav + " valgt";
+        taeller.classList.toggle("fuld", antalValgt(p) === p.krav);
     }
 
     function gaaTil(i) {
@@ -149,7 +192,7 @@
         var knapper = el("prikker").querySelectorAll("button");
         proeve.forEach(function (p, i) {
             knapper[i].classList.toggle("aktiv", i === nr);
-            knapper[i].classList.toggle("besvaret", p.valgt.indexOf(true) >= 0);
+            knapper[i].classList.toggle("besvaret", antalValgt(p) >= p.krav);
             if (i === nr) knapper[i].setAttribute("aria-current", "step");
             else knapper[i].removeAttribute("aria-current");
         });
@@ -161,9 +204,9 @@
     }
 
     function aflever() {
-        var ubesvaret = proeve.filter(function (p) { return p.valgt.indexOf(true) < 0; }).length;
-        if (ubesvaret > 0) {
-            var tekst = ubesvaret === 1 ? "1 spørgsmål er ikke besvaret." : ubesvaret + " spørgsmål er ikke besvaret.";
+        var mangler = proeve.filter(function (p) { return antalValgt(p) < p.krav; }).length;
+        if (mangler > 0) {
+            var tekst = mangler === 1 ? "1 spørgsmål mangler svar." : mangler + " spørgsmål mangler svar.";
             if (!window.confirm(tekst + " Vil du aflevere alligevel?")) return;
         }
         if (kanTale) window.speechSynthesis.cancel();

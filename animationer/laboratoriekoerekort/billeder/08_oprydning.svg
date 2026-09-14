@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <!-- Oevelsen er slut og klokken ringer. Bordet er fyldt med spild,
+       brugt udstyr, pulver og papir. -->
+  <defs>
+    <linearGradient id="vaeg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9e4e2"/>
+      <stop offset="1" stop-color="#e8efee"/>
+    </linearGradient>
+    <linearGradient id="bord" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#46555a"/>
+      <stop offset="1" stop-color="#2c373b"/>
+    </linearGradient>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.6"/>
+      <stop offset="0.2" stop-color="#d4ebfa" stop-opacity="0.2"/>
+      <stop offset="0.8" stop-color="#d4ebfa" stop-opacity="0.15"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.5"/>
+    </linearGradient>
+    <pattern id="fliser" width="120" height="76" patternUnits="userSpaceOnUse" y="318">
+      <rect width="120" height="76" fill="#f4f7f6"/>
+      <path d="M0 1 H120 M0 39 H120 M60 0 V38 M1 38 V76" stroke="#d2dddb" stroke-width="2"/>
+    </pattern>
+    <g id="papir">
+      <path d="M-50 -10 Q-58 -40 -24 -44 Q0 -60 26 -42 Q58 -40 52 -8 Q64 20 34 34 Q6 50 -22 36 Q-60 30 -50 -10 Z" fill="#fbfaf5" stroke="#d3d6d2" stroke-width="2"/>
+      <path d="M-30 -20 L-6 -4 L-20 18 M10 -34 L4 -6 L30 10 M-6 -4 L4 -6 M-10 26 L12 12" fill="none" stroke="#c4c8c3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </defs>
+
+  <rect width="1200" height="470" fill="url(#vaeg)"/>
+  <rect y="318" width="1200" height="152" fill="url(#fliser)"/>
+  <rect y="470" width="1200" height="250" fill="url(#bord)"/>
+  <rect y="466" width="1200" height="8" fill="#56676c"/>
+
+  <!-- Vaegur, der ringer ud -->
+  <g transform="translate(600 150)">
+    <g fill="none" stroke="#1f2328" stroke-opacity="0.5" stroke-width="6" stroke-linecap="round">
+      <path d="M-104 -40 q-16 40 0 80"/><path d="M-128 -60 q-24 60 0 120"/>
+      <path d="M104 -40 q16 40 0 80"/><path d="M128 -60 q24 60 0 120"/>
+    </g>
+    <circle r="84" fill="#ffffff" stroke="#1f2328" stroke-width="8"/>
+    <g stroke="#1f2328" stroke-width="5" stroke-linecap="round">
+      <path d="M0 -70 v12 M0 70 v-12 M-70 0 h12 M70 0 h-12"/>
+      <path d="M35 -60.6 l-4 7 M60.6 -35 l-7 4 M60.6 35 l-7 -4 M35 60.6 l-4 -7 M-35 60.6 l4 -7 M-60.6 35 l7 -4 M-60.6 -35 l7 4 M-35 -60.6 l4 7"/>
+    </g>
+    <path d="M0 0 L-3 -40" stroke="#1f2328" stroke-width="9" stroke-linecap="round"/>
+    <path d="M0 0 L-30 -52" stroke="#1f2328" stroke-width="6" stroke-linecap="round"/>
+    <circle r="7" fill="#d8342a"/>
+  </g>
+
+  <!-- Reagensglasstativ med brugte glas -->
+  <g transform="translate(780 372)">
+    <ellipse cx="90" cy="100" rx="110" ry="9" fill="#000" opacity="0.25"/>
+    <rect x="0" y="40" width="180" height="16" rx="3" fill="#e9eef0"/>
+    <rect x="0" y="88" width="180" height="12" rx="3" fill="#c9d1d3"/>
+    <path d="M8 56 V88 M172 56 V88" stroke="#c9d1d3" stroke-width="8"/>
+    <g stroke="#e6f2fb" stroke-width="2.5">
+      <rect x="24" y="-14" width="22" height="104" rx="10" fill="url(#glas)"/>
+      <rect x="62" y="-14" width="22" height="104" rx="10" fill="url(#glas)"/>
+      <rect x="100" y="-14" width="22" height="104" rx="10" fill="url(#glas)"/>
+      <rect x="138" y="-14" width="22" height="104" rx="10" fill="url(#glas)"/>
+    </g>
+    <path d="M26 70 V80 Q35 90 44 80 V70 Z" fill="#6b4a2a" opacity="0.8"/>
+    <path d="M64 62 V80 Q73 90 82 80 V62 Z" fill="#3d8fd6" opacity="0.7"/>
+    <path d="M140 74 V80 Q149 90 158 80 V74 Z" fill="#6ba34a" opacity="0.7"/>
+    <path d="M102 20 q8 10 0 30" fill="none" stroke="#6b4a2a" stroke-opacity="0.6" stroke-width="3"/>
+  </g>
+
+  <!-- Vaeltet baegerglas med spild -->
+  <path d="M170 560 Q260 530 380 548 Q470 560 450 598 Q430 640 330 636 Q250 650 190 624 Q120 596 170 560 Z" fill="#3d8fd6" fill-opacity="0.45" stroke="#8cc7ea" stroke-opacity="0.6" stroke-width="3"/>
+  <ellipse cx="470" cy="640" rx="16" ry="5" fill="#3d8fd6" fill-opacity="0.45"/>
+  <g transform="translate(260 530) rotate(-96)">
+    <path d="M12 24 H34 V132 Q34 142 24 142 Q12 140 12 128 Z" fill="#3d8fd6" fill-opacity="0.55"/>
+    <path d="M0 0 H130 L120 12 V132 Q120 146 106 146 H24 Q10 146 10 132 V12 Z" fill="url(#glas)" stroke="#e6f2fb" stroke-width="3" stroke-linejoin="round"/>
+    <ellipse cx="65" cy="3" rx="64" ry="16" fill="#d4ebfa" fill-opacity="0.2" stroke="#e6f2fb" stroke-width="3"/>
+    <path d="M100 30 h14 M100 60 h14 M100 90 h14" stroke="#eef6fc" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+
+  <!-- Spatel, pulver og vejebaad -->
+  <ellipse cx="660" cy="596" rx="44" ry="12" fill="#f3f1ea"/>
+  <g fill="#f3f1ea"><circle cx="720" cy="610" r="4"/><circle cx="604" cy="616" r="3"/><circle cx="740" cy="590" r="3"/><circle cx="690" cy="628" r="3"/></g>
+  <g transform="translate(700 640) rotate(-12)">
+    <rect x="-150" y="-5" width="220" height="10" rx="5" fill="#b8c1c6"/>
+    <ellipse cx="86" cy="0" rx="24" ry="13" fill="#d7dde0" stroke="#9aa5ab" stroke-width="2"/>
+    <ellipse cx="86" cy="-2" rx="14" ry="7" fill="#f3f1ea"/>
+  </g>
+  <g transform="translate(900 560)">
+    <path d="M-56 -22 H56 L40 22 H-40 Z" fill="#ffffff" stroke="#c7d3d2" stroke-width="3" stroke-linejoin="round"/>
+    <ellipse cx="0" cy="-8" rx="30" ry="8" fill="#f3f1ea"/>
+  </g>
+
+  <!-- Engangspipette -->
+  <g transform="translate(520 690) rotate(-8)">
+    <rect x="-90" y="-7" width="150" height="14" rx="7" fill="#f6f8f8" fill-opacity="0.9"/>
+    <path d="M60 -3 L130 -1 L130 1 L60 3 Z" fill="#f6f8f8" fill-opacity="0.9"/>
+    <ellipse cx="-96" cy="0" rx="26" ry="14" fill="#f6f8f8"/>
+  </g>
+
+  <!-- Brugt handske -->
+  <g transform="translate(1080 600) rotate(24)">
+    <path d="M-40 60 L-44 0 Q-50 -16 -40 -18 Q-32 -18 -30 -6 L-28 -40 Q-28 -52 -18 -52 Q-8 -52 -8 -40 L-6 -58 Q-6 -70 4 -70 Q14 -70 14 -58 L14 -46 Q16 -58 26 -56 Q34 -54 34 -42 L32 -30 Q36 -40 44 -38 Q52 -34 48 -20 L36 30 L34 60 Z" fill="#5b8def" stroke="#3563c4" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Kroellede papirservietter -->
+  <use href="#papir" transform="translate(110 660) rotate(10)"/>
+  <use href="#papir" transform="translate(960 668) rotate(-20) scale(0.9)"/>
+  <use href="#papir" transform="translate(560 520) rotate(40) scale(0.7)"/>
+</svg>

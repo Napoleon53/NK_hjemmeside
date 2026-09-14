@@ -6,14 +6,14 @@ HTML-fil, ligger denne i sin egen mappe med adskilt CSS og JavaScript.
 Åbn **`index.html`**. Mappen er selvstændig — den henter kun filer inde fra sig
 selv, så den kan flyttes hvorhen som helst uden at der knækker noget.
 
-Den afløser `animationer/kemi-c-filer/c3.1_elektronprikformel.html`. Spillet
-er det samme (vælg valenselektroner i det periodiske system, træk atomer
-sammen, byg bindinger, tjek mod oktetreglen), men koden er delt op efter
-sitets vante mønster, og tegningen er lavet om.
+Den afløser `animationer/kemi-c-filer/c3.1_elektronprikformel.html`, som nu
+ligger i `animationer/kemi-c-filer/arkiv/c3.1_elektronprikformel_oldversion.html`.
+Spillet er det samme (vælg valenselektroner i det periodiske system, træk
+atomer sammen, byg bindinger, tjek mod oktetreglen), men koden er delt op
+efter sitets vante mønster, og tegningen er lavet om.
 
-**Dette er et udkast.** Den gamle fil `c3.1_elektronprikformel.html` er
-endnu ikke lavet om til en genvej hertil, og `samling_c3.html` peger stadig
-på den gamle sti.
+Knapperne i `samling_c3.html` og `samling_NV.html` peger direkte på denne
+mappes `index.html`.
 
 ## Hvad er nyt i forhold til den gamle animation
 
@@ -78,8 +78,6 @@ hvert atom har det rigtige elektrontal (oktet, eller duet for hydrogen), og
 at atomerne hænger sammen. For de ni molekyler giver det samme struktur som
 facit.
 
-## Mangler / naturlige næste skridt
+## Mangler
 
 * `_selvtest.html` er ikke lavet endnu.
-* Den gamle sti `c3.1_elektronprikformel.html` peger endnu ikke herhen, og
-  `samling_c3.html` er ikke rettet til.

@@ -246,6 +246,47 @@ body { background: var(--bg-sektion); }
 
 .lk-vejledning { margin: 0 0 14px; font-size: 0.95rem; color: var(--tekst-daempet); }
 
+/* Flere rigtige svar: gul boks med taeller, saa det ikke kan overses */
+.lk-vejledning.flere {
+    align-self: flex-start;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+    padding: 7px 8px 7px 14px;
+    background: #fdf3c4;
+    border: 1px solid #ead37a;
+    border-radius: var(--radius-lille);
+    font-weight: 700;
+    color: var(--tekst);
+}
+
+.lk-taeller {
+    display: inline-block;
+    padding: 1px 10px;
+    border: 1px solid #ead37a;
+    border-radius: 999px;
+    background: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--tekst-daempet);
+}
+.lk-taeller.fuld { background: var(--accent); border-color: var(--accent); color: #fff; }
+.lk-taeller.ryst { animation: lk-ryst 0.4s; }
+
+@keyframes lk-ryst {
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Ét rigtigt svar: runde valgknapper */
+.lk-valg input[type="radio"] { border-radius: 50%; }
+.lk-valg input[type="radio"]:checked {
+    background-color: var(--accent);
+    background-image: none;
+    box-shadow: inset 0 0 0 4px #fff;
+}
+
 .lk-svar { display: grid; gap: 12px; }
 
 .lk-valg {
