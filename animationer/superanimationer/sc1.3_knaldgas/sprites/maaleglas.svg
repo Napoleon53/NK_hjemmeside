@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="584" viewBox="0 0 90 292">
+  <!-- Maaleglasset staar paa hovedet: foden er oeverst, aabningen nederst.
+       Indholdet (gas, vand, molekyler) tegnes af animationen bag denne fil.
+       Inderside: x 15-75, lukket ende y 16, stregerne 1-6 ved y 56, 96,
+       136, 176, 216 og 256, aabningen ved y 292. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#cfe6f7" stop-opacity="0.34"/>
+      <stop offset="0.12" stop-color="#cfe6f7" stop-opacity="0.08"/>
+      <stop offset="0.8" stop-color="#cfe6f7" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#cfe6f7" stop-opacity="0.28"/>
+    </linearGradient>
+    <linearGradient id="fod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e2f0fa" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#9fbfd8" stop-opacity="0.38"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fod -->
+  <rect x="2" y="0" width="86" height="12" rx="3" fill="url(#fod)" stroke="#d8ebf8" stroke-opacity="0.75" stroke-width="1.2"/>
+
+  <!-- Roer med kant ved aabningen -->
+  <path d="M12 12 L12 283 Q12 287 8 288 L8 292 L82 292 L82 288 Q78 287 78 283 L78 12 Z" fill="url(#glas)"/>
+  <path d="M12 12 L12 283 Q12 287 8 288 L8 292" fill="none" stroke="#d6eaf8" stroke-opacity="0.8" stroke-width="1.6"/>
+  <path d="M78 12 L78 283 Q78 287 82 288 L82 292" fill="none" stroke="#d6eaf8" stroke-opacity="0.8" stroke-width="1.6"/>
+  <path d="M15 14 L15 292 M75 14 L75 292" stroke="#d6eaf8" stroke-opacity="0.22" stroke-width="1"/>
+  <path d="M8 292 L15 292 M75 292 L82 292" stroke="#d6eaf8" stroke-opacity="0.8" stroke-width="1.6"/>
+
+  <!-- Genskin -->
+  <rect x="20" y="18" width="5" height="262" rx="2.5" fill="#ffffff" fill-opacity="0.2"/>
+  <rect x="66" y="18" width="2.5" height="262" rx="1.2" fill="#ffffff" fill-opacity="0.1"/>
+
+  <!-- Inddeling -->
+  <g stroke="#eef6fc" stroke-opacity="0.95" stroke-width="1.8" stroke-linecap="round">
+    <path d="M13 56 h18 M13 96 h18 M13 136 h18 M13 176 h18 M13 216 h18 M13 256 h18"/>
+  </g>
+  <g stroke="#eef6fc" stroke-opacity="0.5" stroke-width="1.2" stroke-linecap="round">
+    <path d="M13 36 h9 M13 76 h9 M13 116 h9 M13 156 h9 M13 196 h9 M13 236 h9"/>
+  </g>
+</svg>

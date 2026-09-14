@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Volumenændring og ligevægt</title>
+<style>
+    :root {
+        --bg: #1e1e24;
+        --panel: #2b2b36;
+        --panel2: #343442;
+        --text: #f5f5f5;
+        --muted: #a3a3b2;
+        --accent: #e2596b;
+        --ok: #4ade80;
+        --fejl: #f87171;
+        --advar: #fbbf24;
+        --line: #44444f;
+        --no2: #f09a4e;
+        --n2o4: #62b0ee;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { margin: 0; height: 100%; }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        overflow: hidden;
+    }
+
+    #app { display: flex; flex-direction: column; height: 100vh; }
+
+    /* ---------- Topbjælke ---------- */
+    #top {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 9px 18px;
+        background: var(--panel);
+        border-bottom: 2px solid var(--line);
+        flex-shrink: 0;
+    }
+
+    #top h1 { font-size: 1.15rem; margin: 0; color: var(--accent); white-space: nowrap; }
+
+    #ligning {
+        flex: 1;
+        text-align: center;
+        font-size: 1.3rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    #ligning .fase { font-size: 0.85rem; font-weight: normal; color: var(--muted); }
+    .c-no2 { color: var(--no2); }
+    .c-n2o4 { color: var(--n2o4); }
+
+    .rx-pil { display: inline-block; margin: 0 10px; transition: color 0.3s, transform 0.3s; }
+    .rx-pil.hoejre { color: var(--ok); transform: scale(1.35); }
+    .rx-pil.venstre { color: var(--advar); transform: scale(1.35); }
+
+    .top-hoejre { display: flex; gap: 10px; align-items: center; }
+
+    .skifter {
+        display: flex;
+        background: #22222b;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 3px;
+    }
+
+    .skift {
+        background: none;
+        border: none;
+        color: var(--muted);
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-family: inherit;
+        cursor: pointer;
+    }
+    .skift:hover { color: #fff; }
+    .skift.aktiv { background: var(--panel2); color: #fff; box-shadow: inset 0 0 0 1px #5a5a6c; }
+
+    .top-knap {
+        background: rgba(98, 176, 238, 0.12);
+        border: 1px solid var(--n2o4);
+        color: #d3e9fb;
+        padding: 7px 14px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-family: inherit;
+        cursor: pointer;
+    }
+    .top-knap:hover { background: var(--n2o4); color: #0d2233; }
+
+    /* ---------- Scene ---------- */
+    #krop { flex: 1; display: flex; min-height: 0; }
+
+    #scene { flex: 1; position: relative; min-width: 0; }
+
+    #sim { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+    #scene-knapper {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 18px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        pointer-events: none;
+    }
+    #scene-knapper button { pointer-events: auto; }
+
+    .stor-knap {
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        padding: 12px 22px;
+        min-width: 260px;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: bold;
+        font-family: inherit;
+        cursor: pointer;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+    .stor-knap:hover:not(:disabled) { filter: brightness(1.12); }
+    .stor-knap:disabled { opacity: 0.55; cursor: default; }
+
+    .lille-knap {
+        background: var(--panel2);
+        color: #ddd;
+        border: 1px solid #55556a;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-family: inherit;
+        cursor: pointer;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    }
+    .lille-knap:hover { border-color: var(--accent); color: #fff; }
+
+    /* ---------- Højre panel ---------- */
+    #panel {
+        width: 350px;
+        flex-shrink: 0;
+        background: var(--panel);
+        border-left: 2px solid var(--line);
+        overflow-y: auto;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .gruppe {
+        background: rgba(0, 0, 0, 0.18);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 11px 14px 13px;
+    }
+
+    .gruppe-hoved {
+        font-size: 0.75rem;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 8px;
+    }
+
+    /* Opgave */
+    #opgave-indhold { animation: ind 0.35s ease-out; }
+    @keyframes ind { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+
+    .spm { font-size: 0.98rem; font-weight: 600; line-height: 1.45; margin-bottom: 10px; }
+
+    .svar {
+        display: block;
+        width: 100%;
+        text-align: left;
+        background: var(--panel2);
+        border: 1px solid #4c4c5c;
+        color: #e2e2ec;
+        padding: 9px 12px;
+        border-radius: 6px;
+        margin-bottom: 6px;
+        font-size: 0.9rem;
+        font-family: inherit;
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s;
+    }
+    .svar:hover:not(:disabled) { background: #3d3d4c; border-color: var(--accent); }
+    .svar:disabled { cursor: default; opacity: 0.6; }
+    .svar.rigtig { background: #24503a; border-color: var(--ok); color: #d6ffe6; opacity: 1; }
+    .svar.forkert { background: #4d2a2a; border-color: var(--fejl); color: #ffdede; opacity: 1; }
+
+    .boks { border-radius: 6px; padding: 9px 12px; font-size: 0.88rem; line-height: 1.5; margin-top: 8px; }
+    .boks.hint { background: rgba(0, 0, 0, 0.25); border-left: 3px solid #8a93b8; color: #d8d8e4; }
+    .boks.rigtig { background: rgba(74, 222, 128, 0.12); border-left: 3px solid var(--ok); }
+    .boks.forkert { background: rgba(248, 113, 113, 0.12); border-left: 3px solid var(--fejl); }
+    .boks.svaret { background: rgba(0, 0, 0, 0.25); border-left: 3px solid var(--ok); color: #d8d8e4; }
+
+    .trin-knap {
+        background: none;
+        border: 1px dashed #6a6a80;
+        color: #c9c9d8;
+        padding: 7px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-family: inherit;
+        cursor: pointer;
+        margin-top: 8px;
+    }
+    .trin-knap:hover { border-color: var(--accent); color: #fff; }
+
+    .skjult { display: none !important; }
+
+    /* Reaktionsbrøk */
+    .brok-linje {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        flex-wrap: wrap;
+        font-size: 1rem;
+    }
+
+    .brok { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.3; }
+    .brok > span:first-child { border-bottom: 1.5px solid currentColor; padding: 0 5px; }
+    .brok > span:last-child { padding: 0 5px; }
+
+    .tal { font-variant-numeric: tabular-nums; }
+    #y-vaerdi { font-weight: bold; font-size: 1.15rem; }
+
+    #maaler {
+        position: relative;
+        height: 10px;
+        margin: 16px 8px 0;
+        border-radius: 5px;
+        background: linear-gradient(90deg, #3b3b4c, #4b4b5e 50%, #3b3b4c);
+    }
+
+    #maaler-k {
+        position: absolute;
+        left: 50%;
+        top: -6px;
+        bottom: -6px;
+        width: 3px;
+        border-radius: 2px;
+        background: var(--ok);
+        transform: translateX(-50%);
+    }
+
+    #maaler-y {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--advar);
+        transform: translate(-50%, -50%);
+    }
+
+    .maaler-tekst {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: var(--muted);
+        margin: 8px 0 10px;
+    }
+    .maaler-tekst .k-tekst { color: var(--ok); }
+
+    .status { text-align: center; font-weight: 600; font-size: 0.92rem; padding: 6px; border-radius: 6px; }
+    .status.ok { color: var(--ok); background: rgba(74, 222, 128, 0.1); }
+    .status.skub { color: var(--advar); background: rgba(251, 191, 36, 0.1); }
+    .status.neutral { color: var(--muted); background: rgba(255, 255, 255, 0.04); }
+
+    /* Tabel */
+    .tabel { width: 100%; border-collapse: collapse; font-size: 0.93rem; }
+    .tabel th { font-weight: 600; text-align: right; padding: 2px 4px 6px; white-space: nowrap; }
+    .tabel th img { height: 22px; width: auto; vertical-align: middle; margin-right: 5px; }
+    .tabel td { text-align: right; padding: 5px 4px; border-top: 1px solid #3a3a46; font-variant-numeric: tabular-nums; }
+    .tabel th:first-child, .tabel td:first-child { text-align: left; color: var(--muted); font-weight: normal; }
+
+    /* Graf */
+    #graf { width: 100%; height: 200px; display: block; }
+
+    .graf-legende { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.82rem; color: #cfcfdc; margin-top: 6px; }
+    .graf-legende i { display: inline-block; width: 16px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
+    .graf-legende i.stiplet { background: repeating-linear-gradient(90deg, var(--ok) 0 4px, transparent 4px 7px); }
+
+    /* ---------- Teori ---------- */
+    .modal-baggrund {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.72);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        padding: 20px;
+    }
+    .modal-baggrund[hidden] { display: none; }
+
+    .modal {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        width: 100%;
+        max-width: 700px;
+        max-height: 88vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-hoved {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--line);
+    }
+    .modal-hoved h2 { margin: 0; font-size: 1.2rem; color: var(--accent); }
+
+    .luk {
+        background: none;
+        border: 1px solid #5a5a6c;
+        color: #ddd;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+    .luk:hover { border-color: var(--accent); color: #fff; }
+
+    .modal-indhold { padding: 4px 22px 20px; overflow-y: auto; font-size: 0.93rem; line-height: 1.6; color: #d8d8e2; }
+    .modal-indhold h3 { font-size: 0.75rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); margin: 18px 0 4px; }
+    .modal-indhold p { margin: 0 0 8px; }
+    .modal-indhold strong { color: #fff; }
+
+    .tabel-rul { overflow-x: auto; }
+    .teori-tabel { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin: 6px 0 4px; }
+    .teori-tabel th, .teori-tabel td { padding: 5px 7px; border-bottom: 1px solid #3a3a46; text-align: right; white-space: nowrap; }
+    .teori-tabel th:first-child, .teori-tabel td:first-child { text-align: left; white-space: normal; }
+    .teori-tabel th { color: var(--muted); font-weight: 600; }
+    .teori-tabel tr.fremhaev td { color: var(--advar); }
+
+    .model-note { font-size: 0.82rem; color: #9090a0; }
+
+    /* ---------- Smal skærm ---------- */
+    @media (max-width: 860px) {
+        #top h1 { display: none; }
+        #krop { flex-direction: column; }
+        #scene { min-height: 55vh; }
+        #panel { width: 100%; border-left: none; border-top: 2px solid var(--line); max-height: 45vh; }
+        .stor-knap { min-width: 0; }
+    }
+</style>
+</head>
+<body>
+
+<div id="app">
+    <header id="top">
+        <h1>Volumenændring</h1>
+        <div id="ligning">
+            <span class="c-no2">2 NO₂</span><span class="fase">(g)</span>
+            <span id="rx-pil" class="rx-pil">⇌</span>
+            <span class="c-n2o4">N₂O₄</span><span class="fase">(g)</span>
+        </div>
+        <div class="top-hoejre">
+            <div class="skifter">
+                <button class="skift aktiv" data-visning="molekyler">Molekyler</button>
+                <button class="skift" data-visning="dansere">Dansere</button>
+            </div>
+            <button class="top-knap" id="btn-teori">📖 Teori</button>
+        </div>
+    </header>
+
+    <div id="krop">
+        <main id="scene">
+            <canvas id="sim"></canvas>
+            <div id="scene-knapper">
+                <button class="stor-knap" id="btn-stempel">⬇ Pres stemplet ned til 1,0 L</button>
+                <button class="lille-knap" id="btn-forfra" title="Start forfra">↺ Forfra</button>
+            </div>
+        </main>
+
+        <aside id="panel">
+            <section class="gruppe">
+                <div class="gruppe-hoved">Forudsig</div>
+                <div id="opgave-indhold">
+                    <div class="spm" id="spm"></div>
+                    <div id="svar-liste"></div>
+                    <div class="boks hint skjult" id="hint"></div>
+                    <div class="boks skjult" id="feedback"></div>
+                    <button class="trin-knap" id="btn-trin">Giv hint</button>
+                </div>
+            </section>
+
+            <section class="gruppe">
+                <div class="gruppe-hoved">Reaktionsbrøk</div>
+                <div class="brok-linje">
+                    <span>Y =</span>
+                    <span class="brok"><span>[N₂O₄]</span><span>[NO₂]²</span></span>
+                    <span>=</span>
+                    <span class="brok tal"><span id="y-taeller">1,00</span><span id="y-naevner">2,00²</span></span>
+                    <span>=</span>
+                    <span class="tal"><span id="y-vaerdi">0,250</span> M⁻¹</span>
+                </div>
+                <div id="maaler"><div id="maaler-k"></div><div id="maaler-y"></div></div>
+                <div class="maaler-tekst"><span>Y &lt; K</span><span class="k-tekst">K = 0,250 M⁻¹</span><span>Y &gt; K</span></div>
+                <div class="status ok" id="status">Y = K: ligevægt</div>
+            </section>
+
+            <section class="gruppe">
+                <div class="gruppe-hoved">Stofmængde og koncentration</div>
+                <table class="tabel">
+                    <tr>
+                        <th>V = <span id="v-vaerdi" class="tal">3,0 L</span></th>
+                        <th class="c-no2"><img id="ikon-no2" alt="">NO₂</th>
+                        <th class="c-n2o4"><img id="ikon-n2o4" alt="">N₂O₄</th>
+                    </tr>
+                    <tr><td>n / mol</td><td id="n-no2">6</td><td id="n-n2o4">3</td></tr>
+                    <tr><td>c / M</td><td id="c-no2">2,00</td><td id="c-n2o4">1,00</td></tr>
+                </table>
+            </section>
+
+            <section class="gruppe">
+                <div class="gruppe-hoved">Graf</div>
+                <canvas id="graf"></canvas>
+                <div class="graf-legende">
+                    <span><i style="background: var(--no2)"></i>[NO₂]</span>
+                    <span><i style="background: var(--n2o4)"></i>[N₂O₄]</span>
+                    <span><i style="background: var(--advar)"></i>Y</span>
+                    <span><i class="stiplet"></i>K</span>
+                </div>
+            </section>
+        </aside>
+    </div>
+</div>
+
+<div class="modal-baggrund" id="teori" hidden>
+    <div class="modal" role="dialog" aria-labelledby="teori-titel">
+        <div class="modal-hoved">
+            <h2 id="teori-titel">Teori: volumenændring</h2>
+            <button class="luk" id="btn-luk-teori" aria-label="Luk">✕</button>
+        </div>
+        <div class="modal-indhold">
+            <h3>Le Châteliers princip</h3>
+            <p>Mindskes volumenet af en gasblanding i ligevægt, forskydes ligevægten mod den side af reaktionsskemaet, der har <strong>færrest gasmolekyler</strong>. Øges volumenet, forskydes den mod siden med flest.</p>
+
+            <h3>Reaktionsbrøken</h3>
+            <p>For 2 NO₂(g) ⇌ N₂O₄(g) er Y = [N₂O₄] / [NO₂]². Ved ligevægt er Y = K. K afhænger kun af temperaturen og ændres ikke af et nyt volumen.</p>
+
+            <h3>Hvorfor forskydes ligevægten?</h3>
+            <p>Bliver volumenet 3 gange mindre, bliver alle koncentrationer 3 gange større. Tælleren i Y vokser med en faktor 3, men nævneren med en faktor 3² = 9. Y bliver derfor 3 gange mindre end K, og reaktionen løber mod højre, indtil Y = K igen.</p>
+            <div class="tabel-rul">
+                <table class="teori-tabel">
+                    <tr><th></th><th>V</th><th>n(NO₂)</th><th>n(N₂O₄)</th><th>[NO₂]</th><th>[N₂O₄]</th><th>Y</th></tr>
+                    <tr><td>Ligevægt</td><td>3,0 L</td><td>6 mol</td><td>3 mol</td><td>2,00 M</td><td>1,00 M</td><td>0,250 M⁻¹</td></tr>
+                    <tr class="fremhaev"><td>Lige efter sammenpresning</td><td>1,0 L</td><td>6 mol</td><td>3 mol</td><td>6,00 M</td><td>3,00 M</td><td>0,083 M⁻¹</td></tr>
+                    <tr><td>Ny ligevægt</td><td>1,0 L</td><td>4 mol</td><td>4 mol</td><td>4,00 M</td><td>4,00 M</td><td>0,250 M⁻¹</td></tr>
+                </table>
+            </div>
+
+            <h3>Dansemetaforen</h3>
+            <p>En single svarer til et NO₂-molekyle, og et par svarer til et N₂O₄-molekyle. Når dansegulvet bliver mindre, finder flere singler sammen i par. Et par tæller som én enhed på gulvet, så trængslen mindskes.</p>
+
+            <h3>Dynamisk ligevægt</h3>
+            <p>Også ved ligevægt reagerer molekylerne. Med mellemrum dannes et N₂O₄, samtidig med at et andet spaltes. Stofmængderne og Y er derfor uændrede.</p>
+
+            <h3>Farven</h3>
+            <p>NO₂ er rødbrun, og N₂O₄ er farveløs. Lige efter sammenpresningen bliver gassen mørkere, fordi [NO₂] stiger. Når ligevægten forskydes, bliver den lidt lysere igen, men den forbliver mørkere end før indgrebet.</p>
+
+            <p class="model-note">Hver figur svarer til 1 mol. Stofmængderne er valgt, så ligevægten rammer K præcist ved både 3,0 L og 1,0 L. NO₂ har en uparret elektron (den gule prik), og derfor kan to NO₂ binde sig sammen til N₂O₄.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+"use strict";
+
+/* =====================================================================
+   MODEL
+   2 NO₂(g) ⇌ N₂O₄(g),   Y = [N₂O₄] / [NO₂]²
+
+   Hver figur svarer til 1 mol. Stofmængderne er valgt, så begge
+   volumener har en ligevægt, der rammer K præcist:
+     3,0 L:  6 NO₂ + 3 N₂O₄   ->  Y = 1,00 / 2,00² = 0,250 M⁻¹
+     1,0 L:  4 NO₂ + 4 N₂O₄   ->  Y = 4,00 / 4,00² = 0,250 M⁻¹
+   Presses stemplet ned, dannes der altså netop ét N₂O₄, og trækkes
+   det op igen, spaltes netop ét.
+   ===================================================================== */
+const K = 0.25;
+const V_STOR = 3.0;
+const V_LILLE = 1.0;
+const START_NO2 = 6;
+const START_N2O4 = 3;
+
+/* Animationen kører altid i slowmotion, så hvert sammenstød kan følges */
+const FART = 30;                   // px/s ved R = 30 (skaleres med molekylestørrelsen)
+const STEMPEL_TID = 1.8;           // s, stemplets bevægelse
+const PAUSE_EFTER_INDGREB = 2.2;   // s uden reaktioner, så Y ≠ K kan ses
+const GRAF_VINDUE = 45;            // s
+
+function tal(x, d) { return x.toFixed(d).replace(".", ","); }
+function klamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
+function blodt(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+
+/* =====================================================================
+   SPRITES
+   Tegnes som SVG i koden og indlæses som billeder, så siden fortsat er
+   én fil og virker direkte fra harddisken.
+   ===================================================================== */
+function radialGradient(id, lys, mid, moerk) {
+    return '<radialGradient id="' + id + '" cx="36%" cy="30%" r="72%">' +
+        '<stop offset="0" stop-color="' + lys + '"/>' +
+        '<stop offset="0.5" stop-color="' + mid + '"/>' +
+        '<stop offset="1" stop-color="' + moerk + '"/></radialGradient>';
+}
+
+const ATOM_DEFS = '<defs>' +
+    radialGradient("n", "#bcd2fb", "#4a78d8", "#22418f") +
+    radialGradient("o", "#ffc4b8", "#e2483a", "#951f12") +
+    '</defs>';
+
+function atom(type, x, y, r) {
+    return '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" fill="url(#' + type + ')" ' +
+        'stroke="rgba(0,0,0,0.28)" stroke-width="1.2"/>';
+}
+
+function binding(x1, y1, x2, y2) {
+    return '<path d="M' + x1 + ' ' + y1 + ' L' + x2 + ' ' + y2 + '"/>';
+}
+
+function svgStart(b, h) {
+    // Dobbelt opløsning, så sprites er skarpe, når de tegnes store
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="' + (b * 2) + '" height="' + (h * 2) +
+        '" viewBox="0 0 ' + b + ' ' + h + '">';
+}
+
+function svgNO2() {
+    return svgStart(100, 90) + ATOM_DEFS +
+        '<g stroke="#77808e" stroke-width="8" stroke-linecap="round">' +
+        binding(50, 42, 22, 66) + binding(50, 42, 78, 66) + '</g>' +
+        atom("o", 22, 66, 16) + atom("o", 78, 66, 16) + atom("n", 50, 42, 19) +
+        // Den uparrede elektron, der gør, at to NO₂ kan binde sig sammen
+        '<circle cx="50" cy="12" r="6" fill="#fff3a8" stroke="#c9a400" stroke-width="1.6"/>' +
+        '</svg>';
+}
+
+function svgN2O4() {
+    return svgStart(150, 90) + ATOM_DEFS +
+        '<g stroke="#77808e" stroke-width="8" stroke-linecap="round">' +
+        binding(57, 45, 93, 45) +
+        binding(57, 45, 27, 20) + binding(57, 45, 27, 70) +
+        binding(93, 45, 123, 20) + binding(93, 45, 123, 70) + '</g>' +
+        atom("o", 27, 20, 16) + atom("o", 27, 70, 16) +
+        atom("o", 123, 20, 16) + atom("o", 123, 70, 16) +
+        atom("n", 57, 45, 19) + atom("n", 93, 45, 19) +
+        '</svg>';
+}
+
+/* Fire forskellige dansere. Stoffet ses på lyskeglen på gulvet under dem
+   (orange = single = NO₂, blå = par = N₂O₄), så den enkelte danser kan
+   beholde sit udseende, når et par dannes eller går fra hinanden. */
+const PERSONER = [
+    { hud: "#f3c9a4", haar: "#4a3222", frisure: 0, top: "#e85d75", bund: "#2f3b52" },
+    { hud: "#c88c5e", haar: "#1d1714", frisure: 1, top: "#f2b134", bund: "#3b3050" },
+    { hud: "#eab88e", haar: "#b8621f", frisure: 2, top: "#4fc3a1", bund: "#26344a" },
+    { hud: "#8a5a3c", haar: "#121010", frisure: 3, top: "#a07cf0", bund: "#35353d" }
+];
+
+function frisure(p) {
+    const f = ' fill="' + p.haar + '"';
+    if (p.frisure === 0) {
+        return '<path d="M19 18 Q19 5 30 5 Q41 5 41 18 Q36 11 30 12 Q23 11 19 18 Z"' + f + '/>';
+    }
+    if (p.frisure === 1) {
+        return '<path d="M19 18 Q19 5 30 5 Q41 5 41 17 Q35 11 26 12 Q21 13 19 18 Z"' + f + '/>' +
+            '<path d="M38 9 Q51 11 48 30 Q44 21 37 15 Z"' + f + '/>';
+    }
+    if (p.frisure === 2) {
+        return '<circle cx="21" cy="12" r="5"' + f + '/><circle cx="27" cy="7" r="5.5"' + f + '/>' +
+            '<circle cx="34" cy="7" r="5.5"' + f + '/><circle cx="40" cy="12" r="5"' + f + '/>' +
+            '<circle cx="18.5" cy="19" r="4"' + f + '/><circle cx="41.5" cy="19" r="4"' + f + '/>';
+    }
+    return '<circle cx="30" cy="4" r="5.5"' + f + '/>' +
+        '<path d="M19 18 Q19 7 30 7 Q41 7 41 18 Q35 12 30 13 Q24 12 19 18 Z"' + f + '/>';
+}
+
+/* Én danser i et felt på 60 × 100. arme og ben er stier, fødder og
+   hænder er punkter. */
+function person(p, arme, haender, ben, foedder) {
+    let s = '<g stroke="' + p.bund + '" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none">' +
+        '<path d="' + ben[0] + '"/><path d="' + ben[1] + '"/></g>';
+    for (const [x, y] of foedder) {
+        s += '<ellipse cx="' + x + '" cy="' + y + '" rx="6" ry="3.5" fill="#23232b"/>';
+    }
+    s += '<path d="M19 34 Q30 28 41 34 L44 64 Q30 69 16 64 Z" fill="' + p.top + '"/>';
+    s += '<g stroke="' + p.hud + '" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none">' +
+        '<path d="' + arme[0] + '"/><path d="' + arme[1] + '"/></g>';
+    for (const [x, y] of haender) {
+        s += '<circle cx="' + x + '" cy="' + y + '" r="3.6" fill="' + p.hud + '"/>';
+    }
+    s += '<circle cx="21" cy="37" r="5" fill="' + p.top + '"/><circle cx="39" cy="37" r="5" fill="' + p.top + '"/>';
+    s += '<rect x="27" y="26" width="6" height="7" fill="' + p.hud + '"/>';
+    s += '<circle cx="30" cy="18" r="11" fill="' + p.hud + '"/>' + frisure(p);
+    s += '<circle cx="26" cy="19" r="1.5" fill="#2a2a2a"/><circle cx="34" cy="19" r="1.5" fill="#2a2a2a"/>';
+    s += '<path d="M26 23 Q30 26.5 34 23" stroke="#7a3b2b" stroke-width="1.5" fill="none" stroke-linecap="round"/>';
+    return s;
+}
+
+/* To trin i dansen: armen skifter side, og det ene ben sparker ud */
+const SINGLE_TRIN = [
+    {
+        arme: ["M21 37 L13 24 L11 11", "M39 37 L50 44 L56 36"], haender: [[11, 10], [56, 35]],
+        ben: ["M25 62 L22 93", "M35 62 L42 78 L47 89"], foedder: [[20, 95], [49, 91]]
+    },
+    {
+        arme: ["M21 37 L10 44 L4 36", "M39 37 L47 24 L49 11"], haender: [[4, 35], [49, 10]],
+        ben: ["M25 62 L18 78 L13 89", "M35 62 L38 93"], foedder: [[11, 91], [40, 95]]
+    }
+];
+
+function svgSingle(pi, trin) {
+    const t = SINGLE_TRIN[trin];
+    return svgStart(60, 100) + person(PERSONER[pi], t.arme, t.haender, t.ben, t.foedder) + '</svg>';
+}
+
+/* Et par: to dansere holder i hånden, og de ydre arme skifter op og ned */
+function svgPar(a, b, trin) {
+    const op = trin === 0;
+    const armeA = ["M21 37 L" + (op ? "13 24 L11 11" : "11 46 L5 54"), "M39 37 L49 30 L57 24"];
+    const haendA = [op ? [11, 10] : [5, 55]];
+    const armeB = ["M21 37 L11 30 L3 24", "M39 37 L" + (op ? "49 46 L55 54" : "47 24 L49 11")];
+    const haendB = [op ? [55, 55] : [49, 10]];
+    const benA = op ? ["M25 62 L18 78 L13 89", "M35 62 L37 93"] : ["M25 62 L24 93", "M35 62 L38 93"];
+    const fodA = op ? [[11, 91], [39, 95]] : [[23, 95], [39, 95]];
+    const benB = op ? ["M25 62 L23 93", "M35 62 L42 78 L47 89"] : ["M25 62 L22 93", "M35 62 L36 93"];
+    const fodB = op ? [[22, 95], [49, 91]] : [[21, 95], [37, 95]];
+    return svgStart(116, 100) +
+        '<g>' + person(PERSONER[a], armeA, haendA, benA, fodA) + '</g>' +
+        '<g transform="translate(56 0)">' + person(PERSONER[b], armeB, haendB, benB, fodB) + '</g>' +
+        '<circle cx="58" cy="24" r="4.2" fill="' + PERSONER[a].hud + '"/>' +
+        '<path d="M58 14 C50 8 52 0.5 58 5 C64 0.5 66 8 58 14 Z" fill="#ff6b8a" stroke="#c23a5a" stroke-width="1"/>' +
+        '</svg>';
+}
+
+const spriteLager = {};
+
+function sprite(noegle, lavSvg) {
+    let s = spriteLager[noegle];
+    if (!s) {
+        s = { img: new Image(), klar: false };
+        s.img.onload = function () { s.klar = true; };
+        s.img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(lavSvg());
+        spriteLager[noegle] = s;
+    }
+    return s;
+}
+
+const spriteNO2 = () => sprite("no2", svgNO2);
+const spriteN2O4 = () => sprite("n2o4", svgN2O4);
+const spriteSingle = (pi, trin) => sprite("s" + pi + "_" + trin, () => svgSingle(pi, trin));
+const spritePar = (a, b, trin) => sprite("p" + a + b + "_" + trin, () => svgPar(a, b, trin));
+
+function forudIndlaesSprites() {
+    spriteNO2();
+    spriteN2O4();
+    for (let a = 0; a < PERSONER.length; a++) {
+        for (let trin = 0; trin < 2; trin++) {
+            spriteSingle(a, trin);
+            for (let b = 0; b < PERSONER.length; b++) spritePar(a, b, trin);
+        }
+    }
+}
+
+/* Tegner et sprite centreret i (x, y) med den ønskede bredde */
+function tegnSprite(ctx, s, x, y, bredde, vinkel, alfa) {
+    if (!s.klar) return false;
+    const h = bredde * s.img.naturalHeight / s.img.naturalWidth;
+    ctx.save();
+    if (alfa !== undefined) ctx.globalAlpha = alfa;
+    ctx.translate(x, y);
+    if (vinkel) ctx.rotate(vinkel);
+    ctx.drawImage(s.img, -bredde / 2, -h / 2, bredde, h);
+    ctx.restore();
+    return true;
+}
+
+/* =====================================================================
+   TILSTAND
+   ===================================================================== */
+const laerred = document.getElementById("sim");
+const ctx = laerred.getContext("2d");
+
+let visning = "molekyler";
+let partikler = [];
+let effekter = [];
+let historik = [];
+let tid = 0;
+let grafUr = 0;
+
+let V = V_STOR;
+let stempel = { fra: V_STOR, til: V_STOR, t0: -99 };
+let blokeretTil = 0;       // ingen reaktioner før dette tidspunkt
+let spaltVed = null;       // hvornår næste N₂O₄ spaltes, når Y > K
+let ventetSiden = null;    // hvor længe to NO₂ har skullet mødes, når Y < K
+let naesteBytte = 8;       // næste bytte ved dynamisk ligevægt
+
+let bredde = 0, hoejde = 0;
+let beholder = { x: 0, y: 0, w: 0, h: 0 };
+let R = 30;                // NO₂'s radius i px; alt andet skaleres herfra
+
+function stempelKoerer() { return tid < stempel.t0 + STEMPEL_TID; }
+function stempelY(vol) { return beholder.y + beholder.h * (1 - vol / V_STOR); }
+function indre() {
+    return { x0: beholder.x, x1: beholder.x + beholder.w, y0: stempelY(V), y1: beholder.y + beholder.h };
+}
+
+function radius(p) { return p.type === "no2" ? R : R * 1.38; }
+
+/* Danserne er højere end deres cirkel, så de holdes lidt længere fra stemplet */
+function topAfstand(p) { return radius(p) + (visning === "dansere" ? R * 0.45 : 0); }
+
+function nyPartikel(type, x, y, personer) {
+    const v = Math.random() * Math.PI * 2;
+    const fart = FART * (R / 30);
+    return {
+        type: type, x: x, y: y,
+        vx: Math.cos(v) * fart, vy: Math.sin(v) * fart,
+        vinkel: Math.random() * Math.PI * 2,
+        spin: (Math.random() < 0.5 ? -1 : 1) * (0.15 + Math.random() * 0.3),
+        fase: Math.random() * 2,
+        personer: personer,
+        foedt: tid
+    };
+}
+
+function antal() {
+    let no2 = 0, n2o4 = 0;
+    for (const p of partikler) {
+        if (p.type === "no2") no2++; else n2o4++;
+    }
+    return { no2: no2, n2o4: n2o4 };
+}
+
+function reaktionsbroek(n, vol) {
+    const a = n.no2 / vol;
+    return a > 0 ? (n.n2o4 / vol) / (a * a) : Infinity;
+}
+
+/* Afstand fra Y til K på logaritmisk skala */
+function afstand(no2, n2o4, vol) {
+    if (no2 <= 0 || n2o4 <= 0) return Infinity;
+    return Math.abs(Math.log(reaktionsbroek({ no2: no2, n2o4: n2o4 }, vol) / K));
+}
+
+/* Hvilken vej reaktionen skal løbe for at komme nærmere K:
+   +1 = mod højre (2 NO₂ -> N₂O₄), -1 = mod venstre, 0 = ligevægt */
+function retning(vol) {
+    const n = antal();
+    const nu = afstand(n.no2, n.n2o4, vol);
+    const frem = n.no2 >= 2 ? afstand(n.no2 - 2, n.n2o4 + 1, vol) : Infinity;
+    const tilbage = n.n2o4 >= 1 ? afstand(n.no2 + 2, n.n2o4 - 1, vol) : Infinity;
+    if (frem < nu - 1e-9 && frem <= tilbage) return 1;
+    if (tilbage < nu - 1e-9) return -1;
+    return 0;
+}
+
+/* =====================================================================
+   START
+   ===================================================================== */
+function nulstil() {
+    tid = 0;
+    grafUr = 0;
+    V = V_STOR;
+    stempel = { fra: V_STOR, til: V_STOR, t0: -99 };
+    blokeretTil = 0;
+    spaltVed = null;
+    ventetSiden = null;
+    naesteBytte = 8;
+    partikler = [];
+    effekter = [];
+    historik = [];
+
+    // Molekylerne fordeles i et gitter med lidt tilfældighed, så de ikke overlapper
+    const n = START_NO2 + START_N2O4;
+    const kol = 3, raekker = Math.ceil(n / kol);
+    const pladser = [];
+    for (let i = 0; i < n; i++) pladser.push(i);
+    pladser.sort(() => Math.random() - 0.5);
+
+    const forskyd = Math.floor(Math.random() * PERSONER.length);
+    let pi = 0;
+    const naestePerson = () => (forskyd + pi++) % PERSONER.length;
+
+    for (let i = 0; i < n; i++) {
+        const plads = pladser[i];
+        const cx = beholder.x + beholder.w * ((plads % kol) + 0.5) / kol;
+        const cy = beholder.y + beholder.h * (Math.floor(plads / kol) + 0.5) / raekker;
+        const x = cx + (Math.random() - 0.5) * beholder.w * 0.08;
+        const y = cy + (Math.random() - 0.5) * beholder.h * 0.06;
+        if (i < START_N2O4) partikler.push(nyPartikel("n2o4", x, y, [naestePerson(), naestePerson()]));
+        else partikler.push(nyPartikel("no2", x, y, [naestePerson()]));
+    }
+    for (const p of partikler) p.foedt = -1;
+
+    visOpgave("ned");
+}
+
+function flytStempel() {
+    if (stempelKoerer()) return;
+    const til = stempel.til === V_STOR ? V_LILLE : V_STOR;
+    stempel = { fra: V, til: til, t0: tid };
+    blokeretTil = tid + STEMPEL_TID + PAUSE_EFTER_INDGREB;
+    spaltVed = null;
+    ventetSiden = null;
+    naesteBytte = tid + 16;
+    opgaveVenterPaaLigevaegt = true;
+}
+
+/* =====================================================================
+   BEVÆGELSE
+   ===================================================================== */
+function bevaeg(dt) {
+    const b = indre();
+    const fart = FART * (R / 30);
+    const moeder = [];
+
+    for (const p of partikler) {
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vinkel += p.spin * dt;
+
+        // Farten holdes konstant, så ingen molekyler går i stå eller farer afsted
+        const maal = fart * (p.type === "no2" ? 1 : 0.8);
+        const s = Math.hypot(p.vx, p.vy);
+        if (s > 0.001) {
+            const k = 1 + (maal / s - 1) * Math.min(1, dt * 2);
+            p.vx *= k;
+            p.vy *= k;
+        } else {
+            p.vx = maal;
+        }
+    }
+
+    // To gennemløb, så molekylerne også skilles, når de er klemt sammen
+    for (let gang = 0; gang < 2; gang++) {
+        for (let i = 0; i < partikler.length; i++) {
+            for (let j = i + 1; j < partikler.length; j++) {
+                const a = partikler[i], c = partikler[j];
+                const dx = c.x - a.x, dy = c.y - a.y;
+                const d = Math.hypot(dx, dy);
+                const min = radius(a) + radius(c);
+                if (d >= min || d < 0.001) continue;
+
+                const nx = dx / d, ny = dy / d;
+                const over = (min - d) / 2;
+                a.x -= nx * over; a.y -= ny * over;
+                c.x += nx * over; c.y += ny * over;
+
+                const rel = (c.vx - a.vx) * nx + (c.vy - a.vy) * ny;
+                if (rel < 0) {
+                    a.vx += rel * nx; a.vy += rel * ny;
+                    c.vx -= rel * nx; c.vy -= rel * ny;
+                    if (gang === 0 && a.type === "no2" && c.type === "no2") moeder.push([a, c]);
+                }
+            }
+        }
+
+        for (const p of partikler) {
+            const r = radius(p);
+            const top = b.y0 + topAfstand(p);
+            if (p.x < b.x0 + r) { p.x = b.x0 + r; p.vx = Math.abs(p.vx); }
+            if (p.x > b.x1 - r) { p.x = b.x1 - r; p.vx = -Math.abs(p.vx); }
+            if (p.y > b.y1 - r) { p.y = b.y1 - r; p.vy = -Math.abs(p.vy); }
+            if (p.y < top) { p.y = top; p.vy = Math.abs(p.vy); }
+            if (top > b.y1 - r) p.y = (top + b.y1 - r) / 2;
+        }
+    }
+    return moeder;
+}
+
+/* Hvis to NO₂ skal mødes, men ikke har gjort det længe, styres de to
+   nærmeste forsigtigt mod hinanden */
+function traekSammen(dt) {
+    let bedst = null, bedstD = Infinity;
+    for (let i = 0; i < partikler.length; i++) {
+        if (partikler[i].type !== "no2") continue;
+        for (let j = i + 1; j < partikler.length; j++) {
+            if (partikler[j].type !== "no2") continue;
+            const d = Math.hypot(partikler[j].x - partikler[i].x, partikler[j].y - partikler[i].y);
+            if (d < bedstD) { bedstD = d; bedst = [partikler[i], partikler[j]]; }
+        }
+    }
+    if (!bedst) return;
+    const [a, c] = bedst;
+    const nx = (c.x - a.x) / (bedstD || 1), ny = (c.y - a.y) / (bedstD || 1);
+    const k = FART * (R / 30) * 3 * dt;
+    a.vx += nx * k; a.vy += ny * k;
+    c.vx -= nx * k; c.vy -= ny * k;
+}
+
+/* =====================================================================
+   REAKTIONER
+   ===================================================================== */
+function fjern(p) {
+    const i = partikler.indexOf(p);
+    if (i >= 0) partikler.splice(i, 1);
+}
+
+function slaaSammen(a, c, vis) {
+    const x = (a.x + c.x) / 2, y = (a.y + c.y) / 2;
+    fjern(a);
+    fjern(c);
+    const ny = nyPartikel("n2o4", x, y, [a.personer[0], c.personer[0]]);
+    ny.vx = (a.vx + c.vx) / 2;
+    ny.vy = (a.vy + c.vy) / 2;
+    partikler.push(ny);
+    effekter.push({ type: "ring", x: x, y: y, t0: tid, farve: "#62b0ee", stor: vis });
+    if (vis) effekter.push({ type: "tekst", x: x, y: y, t0: tid, retning: 1 });
+}
+
+function spalt(p, vis) {
+    fjern(p);
+    const v = Math.random() * Math.PI * 2;
+    const ux = Math.cos(v), uy = Math.sin(v);
+    const fart = FART * (R / 30);
+    const a = nyPartikel("no2", p.x - ux * R, p.y - uy * R, [p.personer[0]]);
+    const c = nyPartikel("no2", p.x + ux * R, p.y + uy * R, [p.personer[1]]);
+    a.vx = -ux * fart; a.vy = -uy * fart;
+    c.vx = ux * fart; c.vy = uy * fart;
+    partikler.push(a, c);
+    effekter.push({ type: "ring", x: p.x, y: p.y, t0: tid, farve: "#f09a4e", stor: vis });
+    if (vis) effekter.push({ type: "tekst", x: p.x, y: p.y, t0: tid, retning: -1 });
+}
+
+function reaktioner(dt, moeder) {
+    const fri = !stempelKoerer() && tid >= blokeretTil;
+    const r = fri ? retning(V) : 0;
+
+    if (r === 1) {
+        if (moeder.length) {
+            slaaSammen(moeder[0][0], moeder[0][1], true);
+            blokeretTil = tid + 1.2;
+            ventetSiden = null;
+        } else {
+            if (ventetSiden === null) ventetSiden = tid;
+            if (tid - ventetSiden > 2.5) traekSammen(dt);
+        }
+    } else {
+        ventetSiden = null;
+    }
+
+    if (r === -1) {
+        if (spaltVed === null) spaltVed = tid + 0.6 + Math.random() * 0.8;
+        if (tid >= spaltVed) {
+            const kandidater = partikler.filter(p => p.type === "n2o4");
+            spalt(kandidater[Math.floor(Math.random() * kandidater.length)], true);
+            spaltVed = null;
+            blokeretTil = tid + 1.2;
+        }
+    } else {
+        spaltVed = null;
+    }
+
+    // Dynamisk ligevægt: et N₂O₄ dannes, samtidig med at et andet spaltes
+    if (fri && r === 0 && tid >= naesteBytte && moeder.length) {
+        const kandidater = partikler.filter(p => p.type === "n2o4");
+        if (kandidater.length) {
+            const gammel = kandidater[Math.floor(Math.random() * kandidater.length)];
+            slaaSammen(moeder[0][0], moeder[0][1], false);
+            spalt(gammel, false);
+            naesteBytte = tid + 10 + Math.random() * 6;
+        }
+    }
+}
+
+function opdater(dt) {
+    tid += dt;
+
+    const st = klamp((tid - stempel.t0) / STEMPEL_TID, 0, 1);
+    V = stempel.fra + (stempel.til - stempel.fra) * blodt(st);
+
+    const moeder = bevaeg(dt);
+    reaktioner(dt, moeder);
+
+    effekter = effekter.filter(e => tid - e.t0 < (e.type === "tekst" ? 2.4 : 0.8));
+
+    grafUr += dt;
+    if (grafUr >= 0.2) {
+        grafUr = 0;
+        const n = antal();
+        historik.push({ t: tid, no2: n.no2 / V, n2o4: n.n2o4 / V, y: reaktionsbroek(n, V) });
+        while (historik.length && historik[0].t < tid - GRAF_VINDUE - 1) historik.shift();
+    }
+}
+
+/*@@DEL_C@@*/
+
+/*@@DEL_D@@*/
+</script>
+</body>
+</html>

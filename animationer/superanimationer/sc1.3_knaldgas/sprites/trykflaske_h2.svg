@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="840" viewBox="0 0 150 420">
+  <defs>
+    <linearGradient id="krop" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1c212a"/>
+      <stop offset="0.16" stop-color="#363e4d"/>
+      <stop offset="0.36" stop-color="#697488"/>
+      <stop offset="0.52" stop-color="#4b5467"/>
+      <stop offset="0.84" stop-color="#2a303b"/>
+      <stop offset="1" stop-color="#171a21"/>
+    </linearGradient>
+    <linearGradient id="skulder" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#262b35"/>
+      <stop offset="0.18" stop-color="#4a5262"/>
+      <stop offset="0.38" stop-color="#8a95a8"/>
+      <stop offset="0.54" stop-color="#626c80"/>
+      <stop offset="0.86" stop-color="#363d4a"/>
+      <stop offset="1" stop-color="#1f232b"/>
+    </linearGradient>
+    <linearGradient id="fod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3d4351"/>
+      <stop offset="1" stop-color="#15181e"/>
+    </linearGradient>
+    <linearGradient id="krom" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5d6574"/>
+      <stop offset="0.42" stop-color="#e6ebf1"/>
+      <stop offset="1" stop-color="#525a68"/>
+    </linearGradient>
+    <linearGradient id="kromV" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e6ebf1"/>
+      <stop offset="1" stop-color="#565e6c"/>
+    </linearGradient>
+    <linearGradient id="messing" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7c5d22"/>
+      <stop offset="0.4" stop-color="#e8c878"/>
+      <stop offset="1" stop-color="#6e5020"/>
+    </linearGradient>
+    <radialGradient id="kromR" cx="0.35" cy="0.3" r="0.8">
+      <stop offset="0" stop-color="#f1f4f8"/>
+      <stop offset="1" stop-color="#5b6371"/>
+    </radialGradient>
+    <radialGradient id="atom" cx="0.35" cy="0.3" r="0.75">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#aeb8c5"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Fodring -->
+  <rect x="22" y="398" width="106" height="18" rx="5" fill="url(#fod)"/>
+
+  <!-- Flaskens krop og skulder -->
+  <path d="M28 402 L28 158 C28 114 50 92 75 92 C100 92 122 114 122 158 L122 402 Z" fill="url(#krop)"/>
+  <path d="M28 158 C28 114 50 92 75 92 C100 92 122 114 122 158 Z" fill="url(#skulder)"/>
+  <rect x="28" y="156" width="94" height="3" fill="#10131a" opacity="0.55"/>
+  <rect x="46" y="166" width="8" height="228" rx="4" fill="#ffffff" opacity="0.09"/>
+  <path d="M44 150 C44 126 55 110 69 103" fill="none" stroke="#ffffff" stroke-opacity="0.2" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Hals, krave og ventil -->
+  <rect x="64" y="72" width="22" height="22" fill="url(#krom)"/>
+  <rect x="59" y="86" width="32" height="8" rx="2" fill="url(#krom)"/>
+  <rect x="62" y="44" width="26" height="30" rx="3" fill="url(#messing)"/>
+  <rect x="62" y="58" width="26" height="2" fill="#5a4318" opacity="0.5"/>
+  <rect x="71" y="36" width="8" height="10" fill="url(#krom)"/>
+  <rect x="55" y="28" width="40" height="10" rx="5" fill="#1c2028"/>
+  <path d="M62 30 v6 M68 30 v6 M74 30 v6 M80 30 v6 M86 30 v6" stroke="#3b414d" stroke-width="1.5"/>
+
+  <!-- Manometer (viseren tegnes af animationen) -->
+  <rect x="48" y="54" width="16" height="8" fill="url(#kromV)"/>
+  <circle cx="36" cy="56" r="19" fill="url(#kromR)"/>
+  <circle cx="36" cy="56" r="15.5" fill="#f3f5f7"/>
+  <g stroke="#2b2f37" stroke-width="1.4" stroke-linecap="round">
+    <path d="M26.45 65.55 L28.58 63.42"/>
+    <path d="M22.5 56 L25.5 56"/>
+    <path d="M26.45 46.45 L28.58 48.58"/>
+    <path d="M36 42.5 L36 45.5"/>
+    <path d="M45.55 46.45 L43.42 48.58"/>
+    <path d="M49.5 56 L46.5 56"/>
+    <path d="M45.55 65.55 L43.42 63.42"/>
+  </g>
+  <path d="M48 56 A12 12 0 0 1 44.49 64.49" fill="none" stroke="#d8342a" stroke-width="2.6"/>
+  <path d="M25 50 A12 12 0 0 1 33 43.5" fill="none" stroke="#ffffff" stroke-opacity="0.9" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Udgang med slangestuds -->
+  <rect x="86" y="56" width="20" height="7" fill="url(#kromV)"/>
+  <rect x="100" y="22" width="8" height="41" rx="2" fill="url(#krom)"/>
+  <path d="M99 28 h10 M99 34 h10" stroke="#5f6776" stroke-width="1.2"/>
+
+  <!-- Maerkat -->
+  <rect x="40" y="192" width="70" height="116" rx="8" fill="#0e1117" stroke="#5a6478" stroke-width="1.5"/>
+  <circle cx="66" cy="226" r="11.5" fill="url(#atom)" stroke="#8792a0" stroke-width="0.8"/>
+  <circle cx="85" cy="226" r="11.5" fill="url(#atom)" stroke="#8792a0" stroke-width="0.8"/>
+  <text x="75" y="286" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="34" font-weight="700" fill="#f2f3f5">H<tspan font-size="21" dy="7">2</tspan></text>
+
+  <!-- Faresymbol GHS02: brandfarlig -->
+  <g transform="translate(75 352)">
+    <rect x="-13" y="-13" width="26" height="26" transform="rotate(45)" fill="#ffffff" stroke="#d8342a" stroke-width="3.2"/>
+    <path d="M0 -12 C3 -7 8 -4 6 3 C5 7 2 8 0 8 C-3 8 -7 6 -7 1 C-7 -3 -4 -4 -3 -8 C-2 -5 -1 -4 0 -3 C1 -6 0 -9 0 -12 Z" fill="#111111"/>
+    <rect x="-8" y="9" width="16" height="2.2" fill="#111111"/>
+  </g>
+</svg>
