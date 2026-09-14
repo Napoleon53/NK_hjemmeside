@@ -38,7 +38,7 @@
     ];
 
     var FULD_KMT = 110;       // fartfaktor 1
-    var TRANSIT = 5.6;        // sekunder fra kyst til kyst ved 110 km/t
+    var TRANSIT = 6.5;        // sekunder fra kyst til kyst ved 110 km/t
     var TIDSLUGE = 0.32;      // afstand til bilen foran, i sekunder
     var MIN_GAB = 5;          // mindste afstand mellem kofangere (px)
     var MAKS_BILER = 220;
@@ -476,12 +476,18 @@
     /* ----- Talebobler ---------------------------------------------- */
     NK.SimBro.prototype.opdaterBobler = function (dt) {
         var aktive = 0;
+        var optaget = [];
         var i, bil;
         for (i = 0; i < this.paaVej.length; i++) {
             bil = this.paaVej[i];
             if (!bil.boble) continue;
             bil.bobleTid -= dt;
-            if (bil.bobleTid <= 0) bil.boble = null; else aktive++;
+            if (bil.bobleTid <= 0) {
+                bil.boble = null;
+            } else {
+                aktive++;
+                optaget.push({ x: this.xFraP(bil.p, bil.retning), y: bil.visY });
+            }
         }
         this.bobleUr -= dt;
         if (this.bobleUr > 0 || aktive >= 3 || !this.paaVej.length) return;
@@ -496,6 +502,14 @@
         for (var k = 0; k < this.paaVej.length; k++) {
             bil = this.paaVej[(start + k) % this.paaVej.length];
             if (bil.boble || bil.p < 0.12 || bil.p > 0.85) continue;
+
+            /* Ingen bobler oven i hinanden */
+            var bx = this.xFraP(bil.p, bil.retning);
+            var fri = true;
+            for (var o = 0; o < optaget.length; o++) {
+                if (Math.abs(optaget[o].x - bx) < 180 && Math.abs(optaget[o].y - bil.visY) < 70) fri = false;
+            }
+            if (!fri) continue;
             if (bil.grund === "fuld" && bil.p < 0.35 && !valgt) { valgt = bil; tekst = vilkaarlig(BOBLE_GAMMEL); }
             if (this.storm && bil.bane.bro === GAMMEL && !stormBud) stormBud = bil;
             if (bil.stopTid > 1.2 && !koeBud) koeBud = bil;
@@ -1021,7 +1035,8 @@
 
         var top = u.bane.bro === NY ? g.yNy - g.tykNy / 2 : g.yGl - g.tykGl / 2;
         var bund = u.bane.bro === NY ? g.yNy + g.tykNy / 2 : g.yGl + g.tykGl / 2;
-        var ty = u.bane.retning < 0 ? top - 14 : bund + 14;
+        /* Laengere ude end KØ-maerkaterne, saa de ikke daekker hinanden */
+        var ty = u.bane.retning < 0 ? top - 34 : bund + 34;
         tegnMaerkat(ctx, "UHELD  " + Math.ceil(u.tid) + " s", x, ty, "#2a1512", "#ff8a6b", "#ffb39e");
     };
 
