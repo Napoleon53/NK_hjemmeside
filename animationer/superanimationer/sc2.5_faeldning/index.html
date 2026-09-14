@@ -54,15 +54,17 @@
 
             <div id="opg-bygger" hidden>
                 <div class="ionvalg" id="opg-ioner" aria-label="Ionerne i dråben"></div>
+                <!-- Trin 1: de to ioner. Trin 2: pilen og formlen kommer frem. Se js/opgave.js. -->
                 <div class="skemalinje" id="opg-linje">
-                    <button class="koef" id="opg-k1" type="button" title="Koefficient. Klik for at ændre." aria-label="Koefficient for den positive ion">1</button>
                     <span class="plads tom" id="opg-kat">?</span><span class="tilst">(aq)</span>
                     <span class="tegn-plus">+</span>
-                    <button class="koef" id="opg-k2" type="button" title="Koefficient. Klik for at ændre." aria-label="Koefficient for den negative ion">1</button>
                     <span class="plads tom" id="opg-an">?</span><span class="tilst">(aq)</span>
-                    <span class="tegn-pil">→</span>
-                    <span class="plads tom" id="opg-produkt">?</span><span class="tilst">(s)</span>
+                    <span class="produktdel" id="opg-produktdel" hidden>
+                        <span class="tegn-pil">→</span>
+                        <span class="formel"><span id="opg-f-kat"></span><button class="indeks" id="opg-i1" type="button" title="Antal. Klik for at ændre." aria-label="Antal af den positive ion">1</button><span class="parentes" id="opg-p1" hidden>(</span><span id="opg-f-an"></span><span class="parentes" id="opg-p2" hidden>)</span><button class="indeks" id="opg-i2" type="button" title="Antal. Klik for at ændre." aria-label="Antal af den negative ion">1</button></span><span class="tilst">(s)</span>
+                    </span>
                 </div>
+                <div class="skemalinje loest" id="opg-facit" hidden></div>
                 <div class="knaprad">
                     <button class="knap blaa" id="opg-tjek" type="button"><span>Tjek</span><span class="tegn">✓</span></button>
                     <button class="knap" id="opg-svar" type="button" hidden><span>Vis svaret</span></button>

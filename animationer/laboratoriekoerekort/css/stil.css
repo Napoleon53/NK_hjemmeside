@@ -344,6 +344,7 @@ body { background: var(--bg-sektion); }
 
 .lk-fod {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
@@ -353,10 +354,21 @@ body { background: var(--bg-sektion); }
 .lk-fod .knap { padding: 10px 20px; }
 .lk-fod .knap:disabled { opacity: 0.45; cursor: default; }
 
-.lk-prikker { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 0; padding: 0; list-style: none; }
+/* numrene faar deres egen raekke over knapperne */
+.lk-prikker {
+    order: -1;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
 .lk-prikker button {
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
     border: 1px solid var(--kant-staerk);
     border-radius: 6px;
     background: #fff;

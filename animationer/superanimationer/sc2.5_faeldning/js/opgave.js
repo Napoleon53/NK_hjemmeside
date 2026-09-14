@@ -1,17 +1,22 @@
 /* =====================================================================
    opgave.js - kortet "Reaktionsskema" i panelet
 
-   For hvert felt med bundfald skal eleven opskrive fældningsreaktionen:
-   vaelge de to ioner fra draaben, der danner bundfaldet, og de
-   koefficienter, der faar ladningerne til at gaa op.
+   For hvert felt med bundfald opskrives fældningsreaktionen i to trin:
+     ioner   Hvilke 2 ioner går sammen og danner den tungtopløselige
+             forbindelse? Eleven vaelger en positiv og en negativ ion
+             fra draaben.
+     formel  Reaktionspilen dukker op, og eleven opskriver den neutrale
+             formel for bundfaldet ved at klikke paa de smaa tal efter
+             hvert symbol.
+   Naar formlen er rigtig, vises hele reaktionsskemaet med koefficienter.
 
    Der er ingen forklaring foer opgaven. Svarer eleven forkert, kommer
    et hint, der passer til netop den fejl:
      forkert ion        peger paa et felt i skemaet med samme ion og
                         intet bundfald, eller paa luppen
-     forkerte tal       regner ladningerne ud for de valgte tal
-   Efter to forkerte svar kan eleven faa svaret vist. Et vist svar
-   taeller ikke med, og feltet kan proeves igen senere.
+     forkert formel     regner formlens samlede ladning ud
+   Efter to forkerte svar i samme trin kan eleven faa svaret vist. Et
+   vist svar taeller ikke med, og feltet kan proeves igen senere.
    ===================================================================== */
 (function () {
     "use strict";
@@ -19,17 +24,21 @@
     var NK = window.NK;
     var D = NK.Data;
 
-    var MAKS_KOEF = 3;
+    var MAKS_INDEKS = 3;
+    var SPOERG_IONER = "Hvilke 2 ioner går sammen og danner den tungtopløselige forbindelse?";
+    var SPOERG_FORMEL = "Opskriv den neutrale kemiske formel for det udfældede salt.";
 
     NK.Opgave = function (forsoeg) {
         this.f = forsoeg;
         this.felt = -2;
         this.nulstilBygger();
         this.ANTAL = D.FELTER.filter(function (F) { return D.forventet(F).bundfald.length > 0; }).length;
+        this.SPOERG_IONER = SPOERG_IONER;
+        this.SPOERG_FORMEL = SPOERG_FORMEL;
 
         var mig = this;
-        NK.el("opg-k1").addEventListener("click", function () { mig.skiftKoef("kKat"); });
-        NK.el("opg-k2").addEventListener("click", function () { mig.skiftKoef("kAn"); });
+        NK.el("opg-i1").addEventListener("click", function () { mig.skiftIndeks("iKat"); });
+        NK.el("opg-i2").addEventListener("click", function () { mig.skiftIndeks("iAn"); });
         NK.el("opg-tjek").addEventListener("click", function () { mig.tjek(); });
         NK.el("opg-svar").addEventListener("click", function () { mig.visSvar(); });
         NK.el("opg-naeste").addEventListener("click", function () { mig.naeste(); });
@@ -38,11 +47,12 @@
     var O = NK.Opgave.prototype;
 
     O.nulstilBygger = function () {
+        this.trin = "ioner";      /* "ioner" eller "formel" */
         this.kat = null;
         this.an = null;
-        this.kKat = 1;
-        this.kAn = 1;
-        this.fejl = 0;
+        this.iKat = 1;            /* tallene i formlen: Ag₃PO₄ er iKat 3, iAn 1 */
+        this.iAn = 1;
+        this.fejl = 0;            /* forkerte svar i det aktuelle trin */
         this.laast = false;
         this.besked = null;       /* { tekst, slags } */
     };
@@ -57,31 +67,46 @@
 
     /* ----- Indgreb ------------------------------------------------------ */
     O.vaelgIon = function (id) {
-        if (this.laast) return;
+        if (this.laast || this.trin !== "ioner") return;
         if (D.IONER[id].q > 0) this.kat = this.kat === id ? null : id;
         else this.an = this.an === id ? null : id;
         this.besked = null;
         this.vis(true);
     };
 
-    O.skiftKoef = function (hvilken) {
-        if (this.laast) return;
-        this[hvilken] = this[hvilken] % MAKS_KOEF + 1;
+    O.skiftIndeks = function (hvilken) {
+        if (this.laast || this.trin !== "formel") return;
+        this[hvilken] = this[hvilken] % MAKS_INDEKS + 1;
         this.besked = null;
         this.vis(true);
     };
 
-    /* Returnerer true, naar svaret er rigtigt. */
+    /* Returnerer true, naar svaret i det aktuelle trin er rigtigt. */
     O.tjek = function () {
         if (this.laast || this.felt < 0 || this.f.status(this.felt) !== "bundfald") return false;
-        if (!this.kat || !this.an) {
-            this.besked = { tekst: "Vælg en positiv og en negativ ion fra dråben.", slags: "skidt" };
+        var b = this.rigtig();
+
+        if (this.trin === "ioner") {
+            if (!this.kat || !this.an) {
+                this.besked = { tekst: "Vælg en positiv og en negativ ion fra dråben.", slags: "skidt" };
+                this.vis(true);
+                return false;
+            }
+            if (this.kat === b.kat && this.an === b.an) {
+                this.trin = "formel";
+                this.fejl = 0;
+                this.besked = null;
+                this.vis(true);
+                return true;
+            }
+            this.fejl++;
+            this.besked = { tekst: this.ionHint(b), slags: "skidt" };
             this.vis(true);
             return false;
         }
-        var b = this.rigtig();
+
         var k = D.koefficienter(b.kat, b.an);
-        if (this.kat === b.kat && this.an === b.an && this.kKat === k.kat && this.kAn === k.an) {
+        if (this.iKat === k.kat && this.iAn === k.an) {
             this.f.felter[this.felt].loest = true;
             this.laast = true;
             this.besked = { tekst: "Rigtigt. " + this.efterskrift(), slags: "god" };
@@ -90,7 +115,7 @@
             return true;
         }
         this.fejl++;
-        this.besked = { tekst: this.hint(), slags: "skidt" };
+        this.besked = { tekst: this.formelHint(), slags: "skidt" };
         this.vis(true);
         return false;
     };
@@ -101,8 +126,9 @@
         var k = D.koefficienter(b.kat, b.an);
         this.kat = b.kat;
         this.an = b.an;
-        this.kKat = k.kat;
-        this.kAn = k.an;
+        this.iKat = k.kat;
+        this.iAn = k.an;
+        this.trin = "formel";
         this.laast = true;
         this.besked = { tekst: this.efterskrift(), slags: "" };
         this.vis(true);
@@ -137,32 +163,16 @@
         return tekst;
     };
 
-    O.hint = function () {
-        var b = this.rigtig();
-        var fejlIon = this.kat !== b.kat ? this.kat : (this.an !== b.an ? this.an : null);
-        if (fejlIon) {
-            var partner = D.IONER[fejlIon].q > 0 ? b.an : b.kat;
-            return this.ionHint(fejlIon, partner);
-        }
-        var ladK = this.kKat * D.IONER[b.kat].q;
-        var ladA = this.kAn * D.IONER[b.an].q;
-        if (ladK + ladA !== 0) {
-            return "Ionerne er rigtige. " + led(this.kKat, b.kat) + " har ladningen " + NK.fortegn(ladK) + ", og " +
-                led(this.kAn, b.an) + " har " + NK.fortegn(ladA) + ". Bundfaldet skal være uden ladning.";
-        }
-        return "Ladningerne går op, men brug de mindste hele tal.";
-    };
-
-    function led(tal, id) { return (tal > 1 ? tal + " " : "") + D.ionTekst(id); }
-
     function indeholder(analyse, id) {
         return analyse.kationer.indexOf(id) >= 0 || analyse.anioner.indexOf(id) >= 0;
     }
 
-    /* Et felt i skemaet, hvor ionen ogsaa er, men hvor der ikke dannes
-       bundfald. Helst et felt, hvor den ogsaa moeder den ion, eleven
-       skulle have valgt i stedet. Findes intet, peges der paa luppen. */
-    O.ionHint = function (ion, partner) {
+    /* Et felt i skemaet, hvor den forkerte ion ogsaa er, men hvor der
+       ikke dannes bundfald. Helst et felt, hvor den ogsaa moeder den ion,
+       eleven skulle have valgt i stedet. Findes intet, peges der paa luppen. */
+    O.ionHint = function (b) {
+        var ion = this.kat !== b.kat ? this.kat : this.an;
+        var partner = D.IONER[ion].q > 0 ? b.an : b.kat;
         var egen = this.felt;
         var kandidater = D.FELTER.filter(function (F) {
             var a = D.forventet(F);
@@ -171,11 +181,22 @@
         if (kandidater.length) {
             var F = kandidater[0];
             var tekst = "I feltet " + D.feltNavn(F) + " er der både " + D.ionTekst(ion) + " og " + D.ionTekst(partner) + ", men intet bundfald.";
-            var s = this.f.status(F.nr);
-            if (s !== "intet") tekst += " Dryp det felt, og se efter.";
+            if (this.f.status(F.nr, "skema") !== "intet") tekst += " Dryp det felt, og se efter.";
             return tekst;
         }
         return "Kig i luppen. " + D.ionTekst(ion) + " bevæger sig frit rundt og er ikke med i bundfaldet.";
+    };
+
+    /* Ag₂PO₄ har ladningen 2 · (+1) + 1 · (−3) = −1. */
+    O.formelHint = function () {
+        var qk = D.IONER[this.kat].q, qa = D.IONER[this.an].q;
+        var sum = this.iKat * qk + this.iAn * qa;
+        if (sum !== 0) {
+            return D.formel(this.kat, this.iKat, this.an, this.iAn) + " har ladningen " +
+                this.iKat + " · (" + NK.fortegn(qk) + ") + " + this.iAn + " · (" + NK.fortegn(qa) + ") = " +
+                NK.fortegn(sum) + ". Formlen skal være neutral.";
+        }
+        return "Ladningerne går op, men brug de mindste hele tal.";
     };
 
     /* ----- Visning ------------------------------------------------------ */
@@ -201,7 +222,8 @@
         if (status === "bundfald" && loest && !this.laast) {
             var rb = this.rigtig();
             var rk = D.koefficienter(rb.kat, rb.an);
-            this.kat = rb.kat; this.an = rb.an; this.kKat = rk.kat; this.kAn = rk.an;
+            this.kat = rb.kat; this.an = rb.an; this.iKat = rk.kat; this.iAn = rk.an;
+            this.trin = "formel";
             this.laast = true;
             this.besked = { tekst: this.efterskrift(), slags: "god" };
             tvungen = true;
@@ -225,7 +247,7 @@
         } else if (this.laast) {
             tekst = "Svaret er vist. Feltet tæller ikke med, men kan prøves igen.";
         } else {
-            tekst = "Opskriv fældningsreaktionen i feltet " + D.feltNavn(D.FELTER[this.felt]) + ".";
+            tekst = this.trin === "ioner" ? SPOERG_IONER : SPOERG_FORMEL;
         }
         NK.saetTekst("opg-tekst", tekst);
 
@@ -251,13 +273,17 @@
     O.tegnBygger = function () {
         var mig = this;
         var a = this.f.felter[this.felt].analyse;
+        var b = this.rigtig();
+        var ionTrin = this.trin === "ioner" && !this.laast;
+        var formelTrin = this.trin === "formel" && !this.laast;
+
         var boks = NK.el("opg-ioner");
         boks.innerHTML = "";
         a.kationer.concat(a.anioner).forEach(function (id) {
             var knap = document.createElement("button");
             knap.type = "button";
             knap.className = "ionchip" + (mig.kat === id || mig.an === id ? " valgt" : "");
-            knap.disabled = mig.laast;
+            knap.disabled = !ionTrin;
             knap.dataset.ion = id;
             var prik = document.createElement("i");
             prik.style.backgroundColor = D.IONER[id].farve;
@@ -267,23 +293,38 @@
             boks.appendChild(knap);
         });
 
-        var k1 = NK.el("opg-k1"), k2 = NK.el("opg-k2");
-        k1.textContent = String(this.kKat);
-        k2.textContent = String(this.kAn);
-        k1.classList.toggle("en", this.kKat === 1);
-        k2.classList.toggle("en", this.kAn === 1);
-        k1.disabled = k2.disabled = this.laast;
+        saetPlads("opg-kat", this.kat ? D.ionTekst(this.kat) : "?", !!this.kat, formelTrin);
+        saetPlads("opg-an", this.an ? D.ionTekst(this.an) : "?", !!this.an, formelTrin);
 
-        saetPlads("opg-kat", this.kat ? D.ionTekst(this.kat) : "?", !!this.kat);
-        saetPlads("opg-an", this.an ? D.ionTekst(this.an) : "?", !!this.an);
-        var b = this.rigtig();
-        saetPlads("opg-produkt", this.laast ? D.bundfaldFormel(b.kat, b.an) : "?", this.laast);
-        NK.el("opg-linje").classList.toggle("loest", this.laast);
+        /* Reaktionspilen og formlen kommer frem, naar ionerne er rigtige */
+        NK.el("opg-linje").hidden = this.laast;
+        NK.el("opg-produktdel").hidden = !formelTrin;
+        if (formelTrin) {
+            NK.el("opg-f-kat").textContent = D.IONER[this.kat].tegn;
+            NK.el("opg-f-an").textContent = D.IONER[this.an].tegn;
+            saetIndeks("opg-i1", this.iKat);
+            saetIndeks("opg-i2", this.iAn);
+            var parentes = !!D.IONER[this.an].sammensat && this.iAn > 1;
+            NK.el("opg-p1").hidden = !parentes;
+            NK.el("opg-p2").hidden = !parentes;
+        }
+
+        /* Hele reaktionsskemaet, naar opgaven er løst eller svaret vist */
+        var facit = NK.el("opg-facit");
+        facit.hidden = !this.laast;
+        facit.textContent = this.laast ? D.reaktionsskema(b.kat, b.an) : "";
     };
 
-    function saetPlads(id, tekst, fyldt) {
+    function saetPlads(id, tekst, fyldt, ok) {
         var el = NK.el(id);
         el.textContent = tekst;
         el.classList.toggle("tom", !fyldt);
+        el.classList.toggle("ok", !!ok);
+    }
+
+    function saetIndeks(id, tal) {
+        var el = NK.el(id);
+        el.textContent = String(tal);
+        el.classList.toggle("en", tal === 1);
     }
 }());

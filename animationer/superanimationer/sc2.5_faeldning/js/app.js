@@ -209,17 +209,24 @@
 
     /* ----- Tegneloekken ------------------------------------------------ */
     function loekke(ts) {
+        /* Naeste billede bestilles foerst, saa en fejl i ét billede ikke
+           fryser hele animationen. */
+        window.requestAnimationFrame(loekke);
         var dt = (ts - sidsteTid) / 1000;
         sidsteTid = ts;
         if (!isFinite(dt) || dt < 0) dt = 0;
         if (dt > 0.1) dt = 0.1;
 
-        forsoeg.tilpas();
-        forsoeg.opdater(dt);
-        forsoeg.tegn();
+        try {
+            forsoeg.tilpas();
+            forsoeg.opdater(dt);
+            forsoeg.tegn();
+        } catch (fejl) {
+            if (window.console) console.error(fejl);
+            forsoeg.laerred.nulstil();
+        }
 
         if (signatur() !== sidsteSignatur) opdaterPanel();
-        window.requestAnimationFrame(loekke);
     }
 
     /* ----- Opstart ------------------------------------------------------- */

@@ -355,27 +355,47 @@ main.forsoeg {
 
 .skemalinje.loest { border-color: var(--groen); color: #9be8bd; }
 
-.koef {
-    min-width: 26px;
-    height: 28px;
-    padding: 0 5px;
-    border-radius: 5px;
+.skemalinje[hidden], .produktdel[hidden], .parentes[hidden] { display: none; }
+
+/* Pilen og formlen glider ind, naar ionerne er rigtige */
+.produktdel {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    animation: pil-ind 0.45s ease-out;
+}
+
+@keyframes pil-ind {
+    from { opacity: 0; transform: translateX(-10px); }
+    to   { opacity: 1; transform: none; }
+}
+
+.formel { display: inline-flex; align-items: center; }
+
+/* De smaa tal i formlen: klik for at skifte mellem 1, 2 og 3 */
+.indeks {
+    min-width: 18px;
+    height: 21px;
+    padding: 0 3px;
+    margin: 0 1px;
+    transform: translateY(6px);
+    border-radius: 4px;
     background-color: var(--panel-3);
     border: 1px solid #5a5a6a;
     color: var(--tekst);
     font-family: inherit;
-    font-size: 1rem;
+    font-size: 0.78rem;
     font-weight: 700;
+    line-height: 1;
     cursor: pointer;
 }
 
-.koef:hover:not(:disabled) { background-color: #4a4a5a; border-color: var(--blaa); }
-.koef.en { color: var(--tekst-mat); }
-.koef:disabled { cursor: default; background-color: transparent; border-color: transparent; }
-.koef.en:disabled { visibility: hidden; width: 0; min-width: 0; padding: 0; border: none; }
+.indeks:hover { background-color: #4a4a5a; border-color: var(--blaa); }
+.indeks.en { color: var(--tekst-mat); }
 
 .plads { min-width: 28px; text-align: center; }
 .plads.tom { color: var(--tekst-mat); border-bottom: 1px dashed #6a6a7a; }
+.plads.ok { color: #9be8bd; }
 .tilst { font-size: 0.72rem; font-weight: 500; color: var(--tekst-mat); margin-right: 2px; }
 .tegn-plus, .tegn-pil { color: var(--tekst-mat); margin: 0 3px; }
 

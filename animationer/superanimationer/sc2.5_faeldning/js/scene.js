@@ -308,7 +308,9 @@
         ctx.strokeStyle = "rgba(0, 0, 0, 0.28)";
         ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.arc(x, y, r - 1.2, 0.2, Math.PI * 1.1);
+        /* Radius maa aldrig blive negativ, heller ikke naar draaben
+           skrumper under aftørring: saa kaster canvas en fejl. */
+        ctx.arc(x, y, Math.max(0.1, r - 1.2), 0.2, Math.PI * 1.1);
         ctx.stroke();
         ctx.strokeStyle = "rgba(255, 255, 255, 0.38)";
         ctx.lineWidth = 1;

@@ -125,6 +125,12 @@ window.NK = NK;
         return true;
     };
 
+    /* Glemmer stoerrelsen, saa naeste tilpas() saetter laerredet op paa ny.
+       Det nulstiller ogsaa alt, hvad der er gemt med save() og clip(). */
+    NK.Laerred.prototype.nulstil = function () {
+        this._dpr = 0;
+    };
+
     /* ----- Tegnehjaelpere -------------------------------------------- */
     NK.rundtRekt = function (ctx, x, y, b, h, r) {
         var m = Math.max(0, Math.min(r, b / 2, h / 2));
