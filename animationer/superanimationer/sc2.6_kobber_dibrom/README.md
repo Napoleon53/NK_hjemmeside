@@ -29,9 +29,11 @@ animation. Det nye er:
   fremme. Fra en åben kolbe stiger rødbrune dampe, som udsugningen suger op.
   Vasken afviser rester med tungmetalioner.
 * **Rystning med musen.** Eleven tager fat i kolben og bevæger den frem og
-  tilbage. En handske holder om halsen, og væsken skvulper. Knappen
+  tilbage. En handske holder om halsen, og væsken skvulper. Det er musens
+  fart, der tæller, så små, hurtige bevægelser virker også. Knappen
   **Ryst kolben** (eller tasten R) gør det samme, så længe den holdes nede.
-  Uden rystning går reaktionen meget langsomt.
+  Uden rystning går reaktionen meget langsomt. Proppen tages af ved at klikke
+  på selve proppen. Et tryk længere nede tager fat i kolben.
 * **Zoombobler med partikelniveauet.** Over kolben ses Br₂ ramme
   kobberoverfladen, to elektroner springe over, og Cu²⁺ og 2 Br⁻ blive dannet.
   Over reagensglassene ses NH₃ sætte sig på Cu²⁺ og Ag⁺ danne AgBr med Br⁻,
@@ -50,10 +52,16 @@ animation. Det nye er:
 
 ## Påskeægget
 
-Hver gang eleven begynder at ryste kolben, er der **3 % chance** for, at kolben
-glider ud af hånden lidt senere (`MAENGDE.TABE_CHANCE` i `js/model.js`, kopieret
-til `forsoeg.tabeChance`). Kolben falder, knuses på bordet, proppen springer af,
-og indholdet løber ud. Er der stadig brom i pytten, stiger der dampe op fra den.
+Kolben glider kun ud af hånden, hvis eleven ryster **meget voldsomt** med musen
+i lidt tid. Lige før grænsen begynder kolben at vakle i hånden. Anden gang skal
+der rystes endnu voldsommere, og efter to uheld kan kolben ikke gå i stykker.
+Knappen Ryst kolben taber aldrig kolben. Grænserne står i `RYST` i
+`js/model.js`: musens fart i tegneenheder pr. sekund (`KNUS_FART`), hvor længe
+den skal holdes (`KNUS_TID`) og det største antal uheld (`MAKS_UHELD`). Farten
+er udjævnet og ligger på ca. 85 % af musens gennemsnitsfart.
+
+Kolben falder, knuses på bordet, proppen springer af, og indholdet løber ud.
+Er der stadig brom i pytten, stiger der dampe op fra den.
 
 Panelet skifter til **Oprydning**, og redskaberne kommer ind ét ad gangen:
 
@@ -133,9 +141,11 @@ funktion. Mens en koreografi kører, ignoreres nye klik på scenen.
 igennem: at alle sprites indlæses, at skemaerne er afstemt, at ion-notationen er
 rigtig, at bromvandet kræver udsugning, at der skal prop i før rystning, at
 reaktionen bevarer atomer og ladning og bliver færdig inden 20 sekunders
-rystning, at glassene får 3 Cu²⁺ og 6 Br⁻ hver, at begge tests bliver færdige,
-at quizzen låses op, at 40000 rystninger giver ca. 3 % uheld, at hele
-oprydningen kan gennemføres, og at der ikke er tankestreger eller 1+/1− i
+rystning, at et tryk på proppen tager proppen og ikke kolben, at glassene får
+3 Cu²⁺ og 6 Br⁻ hver, at begge tests bliver færdige, at quizzen låses op, at
+almindelig rystning med musen ikke taber kolben, at meget voldsom rystning gør,
+at anden gang kræver mere, at kolben ikke kan gå i stykker efter to uheld, at
+hele oprydningen kan gennemføres, og at der ikke er tankestreger eller 1+/1− i
 teksterne. Kør den efter ændringer.
 
 Genveje: hold <kbd>R</kbd> ryst · <kbd>U</kbd> udsugning · <kbd>I</kbd> hint ·

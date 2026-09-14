@@ -1,8 +1,8 @@
 /* =====================================================================
    uheld.js - paaskeaegget: kolben tabes og skal ryddes op
 
-   forsoeg.js kalder tab(), naar terningen er faldet ud under en
-   rystning (tabeChance, 3 %). Kolben flyver ud af haanden, rammer
+   forsoeg.js kalder tab(), naar eleven har rystet meget voldsomt med
+   musen (graenserne staar i M.RYST). Kolben flyver ud af haanden, rammer
    bordet og knuses. Det, der var i den, havner paa bordet:
      pyt      bromvand eller opløsning, alt efter hvor langt eleven var
      skaar    glasskaar og kobberspaaner
@@ -66,11 +66,12 @@
         var hp = NK.tilVerden(k.p, k.anker, 75, 38);
         var brom = !!(this.gjort.brom && this.visBr > 0.03);
         var vaeske = k.areal > 5;
-        var retning = Math.random() < 0.5 ? -1 : 1;
+        var retning = this.musVx < 0 ? -1 : 1;
 
         this.rystKilde = null;
         this.holdt = null;
-        this.tabUr = -1;
+        this.farligTid = 0;
+        this.uro = 0;
         this.handling = null;
         this.haandAlfa = 0;
         this.ryst = 0;
@@ -87,7 +88,9 @@
             redskaber: {}, traek: null, fejUr: 0, dampUr: 0, propFart: null
         };
         this.musVx = 0;
-        this.besked("Kolben gled ud af hånden!", "advarsel");
+        this.musFart = 0;
+        this.vold = 0;
+        this.besked(this.antalUheld ? "Igen! Kolben gled ud af hånden." : "Kolben gled ud af hånden!", "advarsel");
         this.aendret("uheld");
     };
 
@@ -403,7 +406,10 @@
         this.koerEfter([
             { flyt: k, til: k.hjem, tid: 0.9, loeft: 0 },
             { flyt: pr, til: pr.hjem, tid: 0.7, loeft: 40 },
-            { kald: function () { this.besked("Ny kolbe og nye kobberspåner. Start igen."); this.aendret("nykolbe"); } }
+            { kald: function () {
+                this.besked(this.knusGraense() ? "Ny kolbe og nye kobberspåner. Start igen." : "Ny kolbe. Den her kan ikke gå i stykker.");
+                this.aendret("nykolbe");
+            } }
         ], "nykolbe");
         this.aendret("nykolbe");
     };

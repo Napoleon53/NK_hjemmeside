@@ -65,7 +65,7 @@ function koerTest() {
     paastand("etiketterne i zoomboblen har ingen ¹", !/¹/.test(JSON.stringify(NK.Mikro.ETIKET)));
 
     function adv(sek) { for (var k = 0; k < Math.round(sek * 60); k++) f.opdater(1 / 60); }
-    function frisk() { f.nulstil(); f.tabeChance = 0; NK.opdaterPanel(); }
+    function frisk() { f.nulstil(); f.antalUheld = 0; NK.opdaterPanel(); }
     function vent(betingelse, maks) { var t = 0; while (!betingelse() && t < maks) { adv(0.25); t += 0.25; } return t; }
     function tael(m, type) { return m.antal(type); }
 
@@ -106,9 +106,13 @@ function koerTest() {
 
     overskrift("5. Fordeling i reagensglassene");
     paastand("med prop i kan der ikke haeldes", f.klik("kolbe") === false);
-    f.klik("prop");
+    var pp = f.propIKolbe();
+    paastand("et tryk lige under proppen tager fat i kolben", f.ned({ x: pp.x, y: pp.y + 60 }) === true && !!f.holdt);
+    f.op();
+    adv(0.5);
+    paastand("et tryk paa proppen tager fat i proppen, ikke kolben", f.ned({ x: pp.x + 6, y: pp.y - 20 }) === false && !f.holdt && !!f.handling);
     adv(1.5);
-    paastand("proppen er taget af", !f.g.kolbe.prop);
+    paastand("proppen er taget af", !f.g.kolbe.prop && !f.g.prop.iKolbe);
     paastand("kolben haeldes over", f.klik("kolbe") === true);
     adv(7);
     paastand("fordelt, og kolben er hjemme", f.gjort.fordelt && f.kolbeHjemme() && !f.handling);
@@ -142,38 +146,64 @@ function koerTest() {
     adv(1);
     paastand("forsoeget er slut, alle trin er gjort", f.gjort.affald && f.aktueltTrin() === null);
 
-    overskrift("7. Paaskeaegget: kolben tabes");
-    frisk();
-    paastand("standardchancen er 3 %", M.MAENGDE.TABE_CHANCE === 0.03);
-    var gemt = f.vedAendring;
-    f.vedAendring = null;
-    f.tabeChance = M.MAENGDE.TABE_CHANCE;
-    var tabt = 0, N = 40000;
-    for (i = 0; i < N; i++) { f.startRyst("knap"); if (f.tabUr >= 0) tabt++; f.rystKilde = null; }
-    f.tabeChance = 0;
-    f.vedAendring = gemt;
-    paastand("40000 rystninger giver ca. 3 % uheld", tabt / N > 0.027 && tabt / N < 0.033, (100 * tabt / N).toFixed(2) + " %");
+    overskrift("7. Paaskeaegget: kolben tabes kun ved meget voldsom rystning");
+    var R = M.RYST;
+    paastand("anden gang skal der rystes voldsommere, og hoejst 2 uheld", R.KNUS_FART[1] > R.KNUS_FART[0] && R.KNUS_TID[1] >= R.KNUS_TID[0] && R.MAKS_UHELD === 2);
 
-    function klarTilRyst() {
-        f.klik("kontakt"); f.klik("urglas"); adv(3); f.klik("bromflaske"); adv(5); f.klik("prop"); adv(1.5);
+    /* Rystning med musen: A tegneenheder ud til hver side, hz svingninger
+       i sekundet, saa musens gennemsnitsfart er 4 * A * hz. Returnerer,
+       hvor mange sekunder der blev rystet, eller -1. */
+    var musTid = 0;
+    function musRyst(A, hz, sek, stop) {
+        var k = f.g.kolbe, x0 = k.hjem.x, y0 = k.hjem.y + 120, s;
+        f.ned({ x: x0, y: y0 });
+        if (!f.holdt) return -1;
+        for (s = 0; s <= Math.round(sek * 60); s++) {
+            musTid += 1000 / 60;
+            f.flyt({ x: x0 + 12 + A * Math.sin(2 * Math.PI * hz * s / 60), y: y0 }, musTid);
+            f.opdater(1 / 60);
+            if (f.uheld || (stop && stop())) break;
+        }
+        f.op();
+        adv(1);
+        return s / 60;
     }
+    function klarTilRyst() {
+        if (!f.udsugning) f.klik("kontakt");
+        f.klik("urglas"); adv(3); f.klik("bromflaske"); adv(5); f.klik("prop"); adv(1.5);
+    }
+    function ryd() {
+        for (var n = 0; n < 12 && f.uheld; n++) {
+            adv(1.5);
+            var t = f.uheld && f.uheld.trin;
+            if (t === "neutraliser") f.klik("spray");
+            else if (t === "toer") f.klik("papir");
+            else if (t === "fej") f.klik("kost");
+            else if (t === "aflever") f.klik("dunk");
+            adv(5);
+        }
+        adv(3);
+    }
+
     frisk();
     klarTilRyst();
-    f.tabeChance = 0;
     f.rystKnap(true);
-    adv(15);
+    adv(20);
     f.rystKnap(false);
     adv(1);
-    paastand("med chance 0 sker der aldrig uheld", !f.uheld);
+    paastand("knappen Ryst kolben taber aldrig kolben", !f.uheld && f.gjort.reageret);
 
     frisk();
     klarTilRyst();
-    f.tabeChance = 1;
-    f.rystKnap(true);
-    adv(2.5);
-    f.rystKnap(false);
+    var rolig = musRyst(50, 3, 30, function () { return f.gjort.reageret; });
+    paastand("almindelig rystning med musen goer reaktionen faerdig inden 20 s", rolig >= 0 && f.gjort.reageret && rolig < 20, rolig.toFixed(1) + " s");
+    paastand("almindelig rystning taber ikke kolben", !f.uheld);
+
+    frisk();
+    klarTilRyst();
+    musRyst(120, 8, 3);
     var u = f.uheld;
-    paastand("kolben knuses", !!u && !u.falder && f.g.kolbe.skjult);
+    paastand("meget voldsom rystning taber og knuser kolben", !!u && !u.falder && f.g.kolbe.skjult);
     if (!u) return;
     paastand("skaar, kobber og en pyt med brom", u.skaar.length >= 30 && !!u.pyt && u.pyt.brom);
     paastand("oprydningen har fire trin", u.trinene.join(",") === "neutraliser,toer,fej,aflever", u.trinene.join(","));
@@ -197,14 +227,22 @@ function koerTest() {
     adv(6);
     paastand("ny kolbe staar klar", !f.uheld && !f.g.kolbe.skjult && f.kolbeHjemme() && !f.handling);
     paastand("nyt kobber, men udsugningen koerer stadig", f.g.urglas.kobber && !f.gjort.kobber && !f.gjort.brom && f.udsugning);
-    paastand("uheldet er talt og noteret", f.antalUheld >= 1 && f.iagttaget.uheld);
+    paastand("uheldet er talt og noteret", f.antalUheld === 1 && f.iagttaget.uheld);
+
+    klarTilRyst();
+    musRyst(120, 8, 3);
+    paastand("anden gang taber samme voldsomhed ikke kolben", !f.uheld);
+    musRyst(160, 9, 3);
+    paastand("endnu voldsommere rystning taber kolben anden gang", !!f.uheld && f.antalUheld === 2);
+    ryd();
+    paastand("anden oprydning giver en ny kolbe", !f.uheld && !f.g.kolbe.skjult && f.kolbeHjemme());
+    klarTilRyst();
+    musRyst(220, 10, 4);
+    paastand("efter to uheld kan kolben ikke gaa i stykker", !f.uheld && f.knusGraense() === null);
 
     frisk();
     f.klik("kontakt"); f.klik("urglas"); adv(3); f.klik("prop"); adv(1.5);
-    f.tabeChance = 1;
-    f.rystKnap(true);
-    adv(2.5);
-    f.rystKnap(false);
+    musRyst(120, 8, 3);
     paastand("uden vaeske er der kun to oprydningstrin", !!f.uheld && f.uheld.trinene.join(",") === "fej,aflever", f.uheld && f.uheld.trinene.join(","));
 
     overskrift("8. Quizzens spoergsmaal");
@@ -230,7 +268,6 @@ function koerTest() {
     paastand("ingen ladning skrevet som 1+ eller 1−", !/[¹][⁺⁻]|[A-Za-z)\]₀-₉]1[+−-]/.test(alt));
 
     frisk();
-    f.tabeChance = M.MAENGDE.TABE_CHANCE;
 }
 
 function vis() {

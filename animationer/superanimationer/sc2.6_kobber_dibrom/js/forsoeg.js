@@ -11,9 +11,10 @@
    eller holder knappen Ryst kolben nede. Rystningen (0-1) styrer
    partikelmodellen i mikro.js, og den styrer farven.
 
-   Paaskeaeg: hver gang der begyndes paa en rystning, er der 3 % chance
-   (tabeChance) for, at kolben glider ud af haanden lidt senere. Uheldet
-   og oprydningen staar i uheld.js.
+   Paaskeaeg: rystes der meget voldsomt med musen, glider kolben ud af
+   haanden (graenserne staar i M.RYST). Anden gang skal der rystes endnu
+   voldsommere, og efter to uheld kan kolben ikke gaa i stykker. Knappen
+   Ryst kolben taber aldrig kolben. Uheldet og oprydningen staar i uheld.js.
    ===================================================================== */
 (function () {
     "use strict";
@@ -36,9 +37,9 @@
         { id: "prop", tekst: "Sæt prop i kolben", mark: "prop",
           hint: "Proppen står til højre for kolben." },
         { id: "reageret", tekst: "Ryst kolben", mark: "kolbe",
-          hint: "Tag fat i kolben, og bevæg den hurtigt frem og tilbage, eller hold knappen Ryst kolben nede. Hold øje med farven." },
+          hint: "Tag fat i kolben, og ryst den frem og tilbage, eller hold knappen Ryst kolben nede. Hold øje med farven." },
         { id: "fordelt", tekst: "Hæld væsken over i reagensglassene", mark: "kolbe",
-          hint: "Tag proppen af, og klik så på kolben. Kobberet bliver i kolben." },
+          hint: "Klik på proppen for at tage den af, og klik så på kolben. Kobberet bliver i kolben." },
         { id: "nh3", tekst: "Dryp NH₃ i det ene glas", mark: "nh3",
           hint: "Klik på den hvide dråbeflaske flere gange. Stop, når farven ikke ændrer sig mere." },
         { id: "agno3", tekst: "Dryp AgNO₃ i det andet glas", mark: "agno3",
@@ -53,7 +54,6 @@
         this.canvas = canvas;
         this.laerred = new NK.Laerred(canvas);
         this.tid = 0;
-        this.tabeChance = M.MAENGDE.TABE_CHANCE;
         this.antalUheld = 0;
         this.vedAendring = null;
         this.vedBesked = null;
@@ -112,9 +112,11 @@
         this.hover = null;
         this.rystKilde = null;
         this.ryst = 0;
-        this.rystTid = 0;
-        this.tabUr = -1;
+        this.farligTid = 0;
+        this.vold = 0;
+        this.uro = 0;
         this.musVx = 0;
+        this.musFart = 0;
         this.skvulpUr = 0;
         this.haandAlfa = 0;
         this.mark = null;
@@ -455,15 +457,17 @@
 
     P.startRyst = function (kilde) {
         this.rystKilde = kilde;
-        this.rystTid = 0;
-        this.tabUr = Math.random() < this.tabeChance ? r(0.45, 1.1) : -1;
+        this.farligTid = 0;
         this.aendret("ryst");
     };
 
     P.stopRyst = function () {
         if (!this.rystKilde) return;
         this.rystKilde = null;
-        this.tabUr = -1;
+        this.farligTid = 0;
+        this.musFart = 0;
+        this.vold = 0;
+        this.uro = 0;
         if (!this.uheld) {
             var k = this.g.kolbe;
             this.koer([hjemTil(k, 0.35, 0)], "hjem");
@@ -483,9 +487,18 @@
         return false;
     };
 
+    /* Hvor voldsomt skal der rystes, foer kolben tabes? null, naar den
+       ikke kan gaa i stykker mere. */
+    P.knusGraense = function () {
+        var n = this.antalUheld;
+        if (n >= M.RYST.MAKS_UHELD) return null;
+        return { fart: M.RYST.KNUS_FART[n], tid: M.RYST.KNUS_TID[n] };
+    };
+
     P.opdaterRyst = function (dt) {
         var k = this.g.kolbe;
         var maal = 0;
+        this.uro = 0;
         if (this.rystKilde === "knap") {
             var w = this.tid * 17;
             k.p.x = k.hjem.x + Math.sin(w) * 34;
@@ -493,19 +506,29 @@
             k.p.v = Math.cos(w) * 0.2;
             maal = 1;
         } else if (this.rystKilde === "mus") {
+            /* musFart er musens vej pr. sekund. Den falder, naar musen
+               staar stille, og vold er den samme fart udjaevnet lidt mere. */
+            this.musFart *= Math.exp(-4 * dt);
             this.musVx *= Math.exp(-5 * dt);
-            maal = NK.klamp(Math.abs(this.musVx) / 900, 0, 1);
-            k.p.v = NK.mod(k.p.v, NK.klamp(-this.musVx * 0.00035, -0.35, 0.35), 12, dt);
+            this.vold = NK.mod(this.vold, this.musFart, 4, dt);
+            maal = NK.klamp(this.musFart / M.RYST.FULD, 0, 1);
+
+            /* Paaskeaegget: kun meget voldsom rystning taber kolben. Lige
+               foer graensen begynder kolben at vakle i haanden. */
+            var g = this.knusGraense();
+            if (g) {
+                if (this.vold > g.fart) this.farligTid += dt;
+                else this.farligTid = Math.max(0, this.farligTid - dt);
+                this.uro = NK.klamp((this.vold / g.fart - 0.7) / 0.3, 0, 1);
+                if (this.farligTid >= g.tid && this.tab) {
+                    this.farligTid = 0;
+                    this.tab();
+                    return;
+                }
+            }
+            k.p.v = NK.mod(k.p.v, NK.klamp(-this.musVx * 0.0004, -0.4, 0.4), 12, dt) + (Math.random() - 0.5) * 0.14 * this.uro;
         }
         this.ryst = NK.mod(this.ryst, maal, maal > this.ryst ? 6 : 3, dt);
-
-        if (this.rystKilde) {
-            if (this.ryst > 0.3) this.rystTid += dt;
-            if (this.tabUr >= 0 && this.rystTid >= this.tabUr) {
-                this.tabUr = -1;
-                if (this.tab) this.tab();
-            }
-        }
         this.skvulpUr -= dt;
         if (this.ryst > 0.35 && this.skvulpUr <= 0 && this.gjort.brom && NK.Lyd) {
             NK.Lyd.skvulp(this.ryst);
@@ -653,6 +676,10 @@
         }
         var K = S.KONTAKT;
         if (pt.x > K.x0 && pt.x < K.x1 && pt.y > K.y0 && pt.y < K.y1) return "kontakt";
+        /* Proppen sidder i kolbens hals. Den skal vinde over kolben, ellers
+           tager man fat i kolben, naar man vil tage proppen af. */
+        var k = this.g.kolbe;
+        if (k.prop && !k.skjult && S.inden("prop", this.propIKolbe(), S.ANKER.prop, pt.x, pt.y, 12)) return "prop";
         for (var i = 0; i < RAEKKEFOELGE.length; i++) {
             var gg = this.g[RAEKKEFOELGE[i]];
             if (gg.skjult || (gg.navn === "prop" && gg.iKolbe)) continue;
@@ -682,7 +709,8 @@
         return false;
     };
 
-    P.flyt = function (pt) {
+    /* nu: tidspunktet for musebevaegelsen i ms (ev.timeStamp) */
+    P.flyt = function (pt, nu) {
         if (this.uheld && this.flytUheld && this.flytUheld(pt)) return;
         var h = this.holdt;
         if (!h) {
@@ -691,19 +719,23 @@
         }
         if (this.uheld) { this.holdt = null; return; }
         var k = this.g.kolbe;
+        if (nu === undefined) nu = Date.now();
         if (!h.flyttet) {
             if (Math.abs(pt.x - h.start.x) + Math.abs(pt.y - h.start.y) < 8) return;
             if (!this.kanRyste()) { this.holdt = null; return; }
             h.flyttet = true;
+            h.sidst = pt;
+            h.t = nu;
             this.startRyst("mus");
         }
-        var nu = Date.now();
-        var dts = Math.max(8, nu - h.t) / 1000;
-        this.musVx = NK.lerp(this.musVx, (pt.x - h.sidst.x) / dts, 0.5);
+        var dts = Math.max(4, nu - h.t) / 1000;
+        var dx = pt.x - h.sidst.x, dy = pt.y - h.sidst.y;
+        this.musVx = NK.lerp(this.musVx, dx / dts, 0.5);
+        this.musFart = NK.lerp(this.musFart, Math.sqrt(dx * dx + dy * dy) / dts, 0.35);
         h.sidst = pt;
         h.t = nu;
-        k.p.x = NK.klamp(pt.x - h.dx, k.hjem.x - 75, k.hjem.x + 75);
-        k.p.y = NK.klamp(pt.y - h.dy, k.hjem.y - 70, k.hjem.y);
+        k.p.x = NK.klamp(pt.x - h.dx, k.hjem.x - 90, k.hjem.x + 90);
+        k.p.y = NK.klamp(pt.y - h.dy, k.hjem.y - 80, k.hjem.y);
     };
 
     P.op = function () {
@@ -725,7 +757,7 @@
             }
         });
         c.addEventListener("pointermove", function (ev) {
-            mig.flyt(mig.tilBord(ev));
+            mig.flyt(mig.tilBord(ev), ev.timeStamp || Date.now());
             c.style.cursor = mig.holdt || (mig.uheld && mig.uheld.traek) ? "grabbing" : (mig.hover ? (mig.hover === "kolbe" && mig.kanRysteNu() ? "grab" : "pointer") : "default");
         });
         c.addEventListener("pointerup", function () { mig.op(); });
@@ -751,7 +783,7 @@
         this.ryk = this.ryk > 0.2 ? this.ryk * (1 - dt * 7) : 0;
 
         /* Partikelmodellerne og farverne */
-        this.mikro.kolbe.opdater(dt, k.prop && this.rystKilde ? this.ryst : 0);
+        this.mikro.kolbe.opdater(dt, k.prop && this.rystKilde ? Math.min(1, this.ryst * 1.4) : 0);
         if (this.gjort.brom && !this.uheld) this.visBr = NK.mod(this.visBr, this.mikro.kolbe.brAndel(), 1.4, dt);
 
         if (this.gjort.brom && !this.gjort.reageret && !this.uheld && this.mikro.kolbe.brAndel() === 0 && !this.mikro.kolbe.travl()) {

@@ -80,8 +80,19 @@
         BR2: 6,
         NH3_PR_DRAABE: 4,
         AG_PR_DRAABE: 2,
-        MAKS_DRAABER: 6,
-        TABE_CHANCE: 0.03
+        MAKS_DRAABER: 6
+    };
+
+    /* Rystning med musen. Farten er musens udjaevnede vej pr. sekund i
+       tegneenheder (ca. 85 % af gennemsnitsfarten). Ved FULD rystes der
+       fuldt ud. Kolben tabes kun, hvis farten er over KNUS_FART[n] i
+       KNUS_TID[n] sekunder, hvor n er antallet af tidligere uheld. Efter
+       MAKS_UHELD uheld kan kolben ikke gaa i stykker. */
+    var RYST = {
+        FULD: 450,
+        KNUS_FART: [2600, 3600],
+        KNUS_TID: [0.7, 0.9],
+        MAKS_UHELD: 2
     };
     MAENGDE.CU2_PR_GLAS = MAENGDE.BR2 / 2;
     MAENGDE.BR_PR_GLAS = MAENGDE.BR2;
@@ -109,6 +120,7 @@
         STOFFER: STOFFER,
         REAKTIONER: REAKTIONER,
         MAENGDE: MAENGDE,
+        RYST: RYST,
         FARVE: FARVE,
         formel: formel,
         afstemt: afstemt,

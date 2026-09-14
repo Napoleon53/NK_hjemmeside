@@ -10,7 +10,7 @@
     var NK = window.NK;
 
     var TUR = [
-        { sel: "#scene", titel: "Stinkskabet", tekst: "Klik på genstandene for at bruge dem. Kolben kan du tage fat i og ryste." },
+        { sel: "#scene", titel: "Stinkskabet", tekst: "Klik på genstandene for at bruge dem. Tag fat i kolben for at ryste den, og klik på proppen for at tage den af." },
         { sel: "#forloeb-kort", titel: "Forløbet", tekst: "Trinene får flueben, efterhånden som du når dem. Hint hjælper med det trin, du er ved." },
         { sel: "#iagttagelser-kort", titel: "Iagttagelser", tekst: "Det, du ser undervejs, bliver skrevet her." },
         { sel: "#quiz-kort", titel: "Quiz", tekst: "Låses op, når begge tests er lavet." },
