@@ -13,8 +13,6 @@
     var S = NK.Scene;
     var P = NK.Forsoeg.prototype;
 
-    var A_MIDT = 758;
-
     /* ----- Musens position paa tegnebordet ------------------------------ */
     P.tilBord = function (ev) {
         var rect = this.canvas.getBoundingClientRect();
@@ -24,7 +22,7 @@
 
     P.stavTop = function () {
         var b = this.stav.bund;
-        var v = 0.3 + (b.x - A_MIDT) * 0.006;
+        var v = 0.3 + (b.x - S.A_MIDT) * 0.006;
         return { x: b.x + Math.sin(v) * 112, y: b.y - Math.cos(v) * 112 };
     };
 
@@ -51,15 +49,20 @@
         if (!g.pose.skjult && S.inden("pose", g.pose.p, g.pose.anker, pt.x, pt.y, 4)) return "pose";
         if (this.stavSynlig() && pt.y < 412 && afstandTilLinje(pt, this.stav.bund, this.stavTop()) < 9) return "stav";
         if (!this.gjort.overfoer && S.inden("pistil", g.pistil.p, g.pistil.anker, pt.x, pt.y, 8)) return "pistil";
-        var navne = ["vejebaad", "morter", "baegerB", "baegerA", "heptan", "vand"];
+        var navne = ["vejebaad", "morter", "skaal", "baegerA", "heptan", "vand"];
         for (var i = 0; i < navne.length; i++) {
             var gg = g[navne[i]];
-            if (gg.skjult) continue;
-            if (S.inden(gg.sprite, gg.p, gg.anker, pt.x, pt.y, navne[i] === "vejebaad" ? 12 : 5)) return navne[i];
+            if (gg.skjult || (navne[i] === "skaal" && gg.sted === "vaek")) continue;
+            if (S.inden(gg.sprite, gg.p, gg.anker, pt.x, pt.y, navne[i] === "vejebaad" || navne[i] === "skaal" ? 10 : 5)) return navne[i];
         }
-        if (!this.braenderVaek && Math.abs(pt.x - S.TREFOD.x) < 38 && pt.y > S.TREFOD.top - 8 && pt.y < S.BORD + 4) return "braender";
+        if (!this.braenderVaek) {
+            var G = S.GASHANE, dx = Math.abs(pt.x - S.TREFOD.x);
+            if (Math.abs(pt.x - G.x) < 14 && pt.y > G.y - 30 && pt.y < G.y + 4) return "braender";
+            if (dx < 22 && pt.y > 424 && pt.y < S.BORD + 4) return "braender";
+            if (dx < 38 && pt.y > S.TREFOD.top - 12 && pt.y < S.BORD + 4) return "trefod";
+        }
         if (pt.x > S.PLADE.x && pt.x < S.PLADE.x + 90 && pt.y > S.PLADE.y - 4 && pt.y < S.BORD + 2) return "varmeplade";
-        if (Math.abs(pt.x - S.TRAGT.x) < 40 && pt.y > 306 && pt.y < 420) return "tragt";
+        if (Math.abs(pt.x - S.TRAGT.x) < 40 && pt.y > 346 && pt.y < S.TRAGT.y + 2) return "tragt";
         if (pt.x > S.VAEGT.x && pt.x < S.VAEGT.x + 140 && pt.y > S.VAEGT.y - 4 && pt.y < S.BORD) return "vaegt";
         return null;
     };
@@ -115,7 +118,7 @@
             this.knus(Math.min(bev, 60), this.musFart);
         } else {
             if (!this.kanRoere()) { this.op(); return; }
-            this.stav.bund.x = NK.klamp(pt.x + h.dx, A_MIDT - 22, A_MIDT + 22);
+            this.stav.bund.x = NK.klamp(pt.x + h.dx, S.A_MIDT - 22, S.A_MIDT + 22);
             this.stav.bund.y = NK.klamp(pt.y + h.dy, 470, 494);
         }
     };
@@ -163,13 +166,13 @@
         if (this.markeret(navn)) S.tegnMarkering(ctx, S.rekt(sprite, gg.p, gg.anker, 0), tid);
     };
 
-    P.tegnB = function (ctx, tid) {
-        var b = this.g.baegerB;
-        b.niveau = S.tegnBaeger(ctx, {
-            p: b.p, areal: b.areal, farve: b.farve, uklar: b.uklar, fedt: b.fedt, salt: b.salt,
-            sod: b.sod, bobler: b.sted === "plade" || b.sted === "trefod" ? this.bobler : null,
-            boelge: this.fordampet > 0 && !this.gjort.inddamp ? 0.8 : 0,
-            fremhaev: this.markeret("baegerB")
+    P.tegnS = function (ctx, tid) {
+        var s = this.g.skaal;
+        if (s.sted === "hjem") S.skygge(ctx, S.HJEM.skaal.x, 38, 0.3);
+        s.flade = S.tegnSkaal(ctx, {
+            p: s.p, fyld: s.fyld, farve: s.farve, uklar: s.uklar, fedt: s.fedt, salt: s.salt, sod: s.sod,
+            bobler: s.sted === "plade" || s.sted === "trefod" ? this.bobler : null,
+            fremhaev: this.markeret("skaal")
         }, tid);
     };
 
@@ -201,14 +204,14 @@
         }
     };
 
-    P.tegnFlaske = function (ctx, navn, tid) {
+    P.tegnFlaske = function (ctx, navn) {
         var fl = this.g[navn];
         NK.Sprites.tegnPositur(ctx, navn, fl.p, fl.anker);
         if (navn === "heptan") {
             /* Laaget: skrues af og laegges paa bordet ved siden af */
             var paa = NK.tilVerden(fl.p, fl.anker, 23, 4);
             var t = NK.blod(this.laagT);
-            var x = NK.lerp(paa.x, 708, t), y = NK.lerp(paa.y, S.BORD - 5, t) - Math.sin(Math.PI * t) * 30;
+            var x = NK.lerp(paa.x, S.LAAG_PAA_BORD.x, t), y = NK.lerp(paa.y, S.LAAG_PAA_BORD.y, t) - Math.sin(Math.PI * t) * 30;
             ctx.save();
             ctx.translate(x, y);
             ctx.rotate(NK.lerp(fl.p.v, 0, t));
@@ -228,15 +231,17 @@
         var sk = S.skala(L.b, L.h);
         var tid = this.tid, g = this.g, i;
         var lv = this.laererVisning ? this.laererVisning() : {};
+        var hn = this.handling ? this.handling.navn : "";
 
         ctx.save();
         ctx.translate(sk.dx, sk.dy);
         ctx.scale(sk.s, sk.s);
         if (this.ryk > 0) ctx.translate((Math.random() - 0.5) * this.ryk, (Math.random() - 0.5) * this.ryk);
 
-        S.tegnBaggrund(ctx, { sod: this.sod, alarm: this.alarm, tid: tid, urMinutter: this.urMinutter, plakatRegel: lv.plakatRegel || 0 });
+        S.tegnBaggrund(ctx, { alarm: this.alarm, tid: tid, urMinutter: this.urMinutter, plakatRegel: lv.plakatRegel || 0 });
         S.tegnStinkskab(ctx, tid);
-        S.tegnGas(ctx, !this.braenderVaek);
+        S.tegnSod(ctx, this.sod);
+        S.tegnGas(ctx, !this.braenderVaek, this.braenderTaendt && !this.braenderVaek);
 
         var oppe = [];
 
@@ -255,7 +260,7 @@
                 ctx.restore();
             }
         }
-        if (!g.pose.skjult && !g.pose.iHaand) {
+        if (!g.pose.skjult) {
             S.skygge(ctx, S.HJEM.pose.x, 46, 0.3);
             NK.Sprites.tegnPositur(ctx, "pose", g.pose.p, g.pose.anker);
             this.tegnMark(ctx, "pose", "pose", g.pose, tid);
@@ -272,23 +277,15 @@
             oppe.push(function () { S.tegnVejebaad(ctx, baad.p, this.chips); });
         }
 
-        var b = g.baegerB;
-        if (b.sted === "hjem" || b.sted === "vaegt") {
-            if (b.sted === "hjem") S.skygge(ctx, 350, 34, 0.3);
-            this.tegnB(ctx, tid);
-        } else if (b.sted === "flytter") {
-            oppe.push(function () { this.tegnB(ctx, tid); });
-        }
+        var s = g.skaal;
+        if (s.sted === "hjem" || s.sted === "vaegt") this.tegnS(ctx, tid);
+        else if (s.sted === "flytter") oppe.push(function () { this.tegnS(ctx, tid); });
 
-        if (!this.braenderVaek) S.tegnBraender(ctx, this.flamme, tid);
-        else S.tegnSeddel(ctx, tid);
-        if (b.sted === "trefod") this.tegnB(ctx, tid);
-
-        /* Morter og pistil. Pistillen staar i morteren, indtil chipsene
-           er haeldt over; saa ligger den foran. */
+        /* Morter og pistil. Pistillen staar i morteren; mens den er loeftet
+           op, tegnes den foran. */
         var pi = g.pistil, mor = g.morter;
-        var pistilIMorter = !this.gjort.overfoer && !(this.handling && this.handling.navn === "overfoer");
-        if (pistilIMorter) NK.Sprites.tegnPositur(ctx, "pistil", pi.p, pi.anker);
+        var pistilLoeftet = hn === "afvej" || hn === "overfoer";
+        if (!pistilLoeftet) NK.Sprites.tegnPositur(ctx, "pistil", pi.p, pi.anker);
         if (hjemme(mor)) {
             S.skygge(ctx, S.MORTER.midt, 38, 0.3);
             NK.Sprites.tegnPositur(ctx, "morter", mor.p, mor.anker);
@@ -300,37 +297,43 @@
                 S.tegnMorterIndhold(ctx, mor.p, this.stykker, this.knust);
             });
         }
-        if (!pistilIMorter) NK.Sprites.tegnPositur(ctx, "pistil", pi.p, pi.anker);
+        if (pistilLoeftet) oppe.push(function () { NK.Sprites.tegnPositur(ctx, "pistil", pi.p, pi.anker); });
         if (this.markeret("pistil")) S.tegnMarkering(ctx, S.rekt("pistil", pi.p, pi.anker, 0), tid);
 
-        /* Stinkskabet */
+        /* Stinkskabet: braender og trefod */
+        if (!this.braenderVaek) {
+            S.tegnBraender(ctx, this.flamme, tid);
+            if (this.markeret("braender")) S.tegnMarkering(ctx, { x: S.TREFOD.x - 30, y: S.TREFOD.top, b: 60, h: S.BORD - S.TREFOD.top }, tid);
+        } else {
+            S.tegnSeddel(ctx, tid);
+        }
+        if (s.sted === "trefod") this.tegnS(ctx, tid);
+
         ["vand", "heptan"].forEach(function (navn) {
             var fl = g[navn];
             if (hjemme(fl)) {
                 S.skygge(ctx, fl.hjem.x - (navn === "vand" ? 21 : 0), 22, 0.3);
-                this.tegnFlaske(ctx, navn, tid);
+                this.tegnFlaske(ctx, navn);
             } else {
-                oppe.push(function () { this.tegnFlaske(ctx, navn, tid); });
+                oppe.push(function () { this.tegnFlaske(ctx, navn); });
             }
         }, this);
-        if (this.markeret("flasker")) {
-            S.tegnMarkering(ctx, { x: 597, y: 380, b: 98, h: 120 }, tid);
-        }
+        if (this.markeret("flasker")) S.tegnMarkering(ctx, { x: 593, y: 380, b: 96, h: 120 }, tid);
 
         NK.Sprites.tegn(ctx, "filterstativ", S.STATIV.x, S.STATIV.y);
-        if (b.sted === "tragt") this.tegnB(ctx, tid);
+        if (s.sted === "tragt") this.tegnS(ctx, tid);
         S.tegnTragt(ctx, this.tragt, tid);
 
         var a = g.baegerA;
         if (hjemme(a)) {
-            S.skygge(ctx, A_MIDT, 34, 0.3);
+            S.skygge(ctx, S.A_MIDT, 34, 0.3);
             this.tegnA(ctx, tid);
         } else {
             oppe.push(function () { this.tegnA(ctx, tid); });
         }
 
-        S.tegnVarmeplade(ctx, this.temp, this.pladeTaendt, tid);
-        if (b.sted === "plade") this.tegnB(ctx, tid);
+        S.tegnVarmeplade(ctx, this.pladeTemp, this.pladeTaendt, tid);
+        if (s.sted === "plade") this.tegnS(ctx, tid);
 
         /* Det, der er i luften */
         for (i = 0; i < oppe.length; i++) oppe[i].call(this);

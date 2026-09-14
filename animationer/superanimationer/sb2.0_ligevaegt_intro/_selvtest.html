@@ -19,30 +19,20 @@ document.getElementById("ramme").addEventListener("load", function () {
 
         /* ---- BRO ---- */
         var bro = S["fane-bro"];
-        koer(bro, 120, 1 / 60);
-        linjer.push("BRO efter 120 s:  Fyn=" + bro.nFyn + "  Jyl=" + bro.nJyl +
-            "  paaVej=" + bro.paaVej.length +
-            "  Y=" + r(bro.nJyl / bro.nFyn) + "  K=" + r(bro.kFrem / bro.kTilbage) +
-            "  ialt=" + (bro.nFyn + bro.nJyl + bro.paaVej.length));
-        var foerY = bro.nJyl / bro.nFyn;
-        bro.nFyn += 60;
-        koer(bro, 120, 1 / 60);
-        linjer.push("BRO efter +60 biler paa Fyn og 120 s:  Fyn=" + bro.nFyn +
-            "  Jyl=" + bro.nJyl + "  Y=" + r(bro.nJyl / bro.nFyn) +
-            "  (var " + r(foerY) + " for indgrebet)");
-        bro.saetVejarbejde(true);
-        bro.saetStorm(true);
-        bro.startUlykke();
-        koer(bro, 150, 1 / 60);
-        linjer.push("BRO med vejarbejde, storm og uheld, 150 s:  Fyn=" + bro.nFyn +
-            "  Jyl=" + bro.nJyl + "  paaVej=" + bro.paaVej.length +
-            "  koe=" + (bro.koeF + bro.koeJ) + "  Y=" + r(bro.nJyl / bro.nFyn) +
-            "  ialt=" + (bro.nFyn + bro.nJyl + bro.koeF + bro.koeJ + bro.paaVej.length));
-        bro.saetVejarbejde(false);
+        function broLinje(navn) {
+            return "BRO " + navn + ":  trafik=" + r(bro.trafik()) + "/s  ny bro=" + r(100 * bro.andelNy, 0) +
+                " %  rejsetid ny=" + r(bro.tidFor(0), 1) + "  gl=" + r(bro.tidFor(1), 1) +
+                "  i koe=" + bro.koeIalt() + "  paa vejen=" + bro.paaVej.length;
+        }
+        bro.urStop = true;
+        bro.saetKlokke(2); koer(bro, 90, 1 / 60); linjer.push(broLinje("nat"));
+        bro.saetKlokke(11.5); koer(bro, 120, 1 / 60); linjer.push(broLinje("middag"));
+        bro.saetKlokke(8); koer(bro, 150, 1 / 60); linjer.push(broLinje("myldretid"));
+        bro.saetStorm(true); koer(bro, 150, 1 / 60); linjer.push(broLinje("myldretid + storm"));
+        bro.saetKlokke(2); koer(bro, 150, 1 / 60); linjer.push(broLinje("nat + storm"));
+        bro.saetKlokke(11.5); koer(bro, 150, 1 / 60); linjer.push(broLinje("middag + storm"));
         bro.saetStorm(false);
-        bro.kTilbage = 0.06;
-        koer(bro, 150, 1 / 60);
-        linjer.push("BRO med k(frem)=k(tilbage):  Y=" + r(bro.nJyl / bro.nFyn) + "  K=1,00");
+        bro.urStop = false;
 
         /* ---- NATUR ---- */
         var nat = S["fane-natur"];

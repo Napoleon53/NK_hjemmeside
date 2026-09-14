@@ -27,7 +27,7 @@
 
 <main class="forsoeg">
     <div class="scene" id="scene">
-        <canvas id="scene-laerred" aria-label="Laboratoriebord med chipspose, vægt, morter og bunsenbrænder, og et stinkskab med heptan, vand, bægerglas, filtrering og varmeplade"></canvas>
+        <canvas id="scene-laerred" aria-label="Laboratoriebord med chipspose, vægt, petriskål og morter, og et stinkskab med bunsenbrænder, heptan, vand, bægerglas, filtrering og varmeplade"></canvas>
         <div class="scenebesked" id="scenebesked" aria-live="polite"></div>
     </div>
 
@@ -50,8 +50,8 @@
             <h2><span>Måleskema</span> <span class="taeller" id="maal-nr">Forsøg 1</span></h2>
             <table class="maaleskema">
                 <tr id="raekke-chips"><th>m(chips)</th><td id="m-chips"></td></tr>
-                <tr id="raekke-baeger"><th>m(tomt bægerglas)</th><td id="m-b"></td></tr>
-                <tr id="raekke-baegerFedt"><th>m(bægerglas med rest)</th><td id="m-bf"></td></tr>
+                <tr id="raekke-skaal"><th>m(tom petriskål)</th><td id="m-b"></td></tr>
+                <tr id="raekke-skaalRest"><th>m(petriskål med rest)</th><td id="m-bf"></td></tr>
             </table>
             <div class="beregn" id="beregn" hidden>
                 <label for="svar">Fedtindhold</label>
@@ -59,6 +59,7 @@
                 <span class="enhed">%</span>
                 <button class="knap blaa" id="tjek-knap" type="button">Tjek</button>
             </div>
+            <button class="knap lille" id="hjaelp-beregn" type="button" hidden><span>Hjælp til beregningen</span><span class="tegn">?</span></button>
             <p class="hint" id="beregn-hint" hidden></p>
             <div class="sammenligning" id="sammenligning" hidden>
                 <div class="soejle"><span>Dit resultat</span><span class="spor"><span class="fyld" id="soejle-resultat"></span></span><span class="tal" id="tal-resultat"></span></div>
@@ -99,13 +100,68 @@
 
         <h3>Beregning</h3>
         <div class="ligning">fedtindhold = m(fedt) / m(chips) · 100 %</div>
-        <p>Massen af fedtet er forskellen mellem bægerglasset med fedt og det tomme bægerglas.</p>
+        <p>Massen af fedtet er forskellen mellem petriskålen med fedt og den tomme petriskål.</p>
 
         <h3>Sikkerhed</h3>
-        <p>Heptan er meget brandfarligt og sundhedsskadeligt. Der arbejdes i stinkskab uden åben ild i nærheden, og filtratet inddampes på en varmeplade.</p>
+        <p>Heptan er meget brandfarligt og sundhedsskadeligt. Der arbejdes i stinkskab. Heptandampe kan antændes af en åben flamme, også i et stinkskab, så filtratet inddampes på en varmeplade.</p>
 
         <div class="knapper">
             <button class="knap blaa" id="teori-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Guidet hjaelp til beregningen: tre trin, der laases op ét ad gangen -->
+<div class="overlay" id="guide">
+    <div class="overlay-boks guide-boks">
+        <h2>Beregn fedtindholdet</h2>
+        <ol class="guide">
+            <li id="g1">
+                <span class="nr">1</span>
+                <div>
+                    <p class="guide-titel">Massen af fedtet</p>
+                    <p class="guide-formel">m(fedt) = m(petriskål med rest) − m(tom petriskål)</p>
+                    <div class="guide-regning">
+                        <span id="g1-tal"></span>
+                        <input id="g1-svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Massen af fedtet i gram">
+                        <span class="enhed">g</span>
+                        <button class="knap blaa" id="g1-tjek" type="button">Tjek</button>
+                    </div>
+                    <p class="hint" id="g1-hint" hidden></p>
+                </div>
+            </li>
+            <li id="g2">
+                <span class="nr">2</span>
+                <div>
+                    <p class="guide-titel">Fedtets andel af chipsene</p>
+                    <p class="guide-formel">andel = m(fedt) / m(chips)</p>
+                    <div class="guide-regning">
+                        <span id="g2-tal"></span>
+                        <input id="g2-svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Fedtets andel som decimaltal">
+                        <button class="knap blaa" id="g2-tjek" type="button">Tjek</button>
+                    </div>
+                    <p class="hint" id="g2-hint" hidden></p>
+                </div>
+            </li>
+            <li id="g3">
+                <span class="nr">3</span>
+                <div>
+                    <p class="guide-titel">Fedtindholdet i procent</p>
+                    <p class="guide-formel">fedtindhold = andel · 100 %</p>
+                    <div class="guide-regning">
+                        <span id="g3-tal"></span>
+                        <input id="g3-svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Fedtindholdet i procent">
+                        <span class="enhed">%</span>
+                        <button class="knap blaa" id="g3-tjek" type="button">Tjek</button>
+                    </div>
+                    <p class="hint" id="g3-hint" hidden></p>
+                </div>
+            </li>
+        </ol>
+        <div class="knapper">
+            <button class="knap" id="guide-luk" type="button">Luk</button>
+            <button class="knap blaa" id="guide-brug" type="button" hidden>Skriv svaret i måleskemaet</button>
         </div>
     </div>
 </div>

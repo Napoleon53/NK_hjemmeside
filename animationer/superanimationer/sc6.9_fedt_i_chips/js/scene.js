@@ -748,6 +748,94 @@
         return w(38, 108);
     };
 
+    /* Petriskaalen. s: { p, fyld (0-1), farve, uklar, fedt (0-1), salt (0-1),
+       sod (0-1), bobler, fremhaev }. Returnerer vaeskens overflade (y). */
+    S.tegnSkaal = function (ctx, s, tid) {
+        var a = S.ANKER.skaal;
+        var cx = s.p.x, bund = s.p.y - a.y + 16;
+        var rx = 35, ry = 4.4, i;
+        var flade = bund;
+
+        if (s.fyld > 0.005 && s.farve) {
+            var h = 1 + 7 * NK.klamp(s.fyld, 0, 1);
+            flade = bund - h;
+            ctx.save();
+            ctx.beginPath();
+            ctx.ellipse(cx, bund, rx, ry, 0, 0, Math.PI);
+            ctx.lineTo(cx - rx, flade);
+            ctx.ellipse(cx, flade, rx, ry, 0, Math.PI, Math.PI * 2);
+            ctx.closePath();
+            ctx.fillStyle = NK.css(s.farve, 1.3);
+            ctx.fill();
+            if (s.uklar > 0.01) {
+                ctx.fillStyle = NK.css(NK.Model.FARVE.uklart, NK.klamp(s.uklar, 0, 1));
+                ctx.fill();
+            }
+            ctx.beginPath();
+            ctx.ellipse(cx, flade, rx, ry, 0, 0, Math.PI * 2);
+            ctx.fillStyle = NK.css(s.farve, 0.9);
+            ctx.fill();
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            if (s.bobler) {
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
+                for (i = 0; i < s.bobler.length; i++) {
+                    var bo = s.bobler[i];
+                    ctx.globalAlpha = NK.klamp(bo.liv, 0, 1);
+                    ctx.beginPath();
+                    ctx.arc(cx + bo.x, flade + bo.y, bo.r * (1.4 - 0.4 * bo.liv), 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+                ctx.globalAlpha = 1;
+            }
+            ctx.restore();
+        }
+
+        /* Fedtet: en gul, olieagtig plet i bunden */
+        if (s.fedt > 0.01) {
+            var fr = 8 + 26 * NK.klamp(s.fedt, 0, 1);
+            ctx.save();
+            var g = ctx.createRadialGradient(cx - fr * 0.3, bund - 1.5, 1, cx, bund - 0.5, fr);
+            g.addColorStop(0, "rgba(255, 236, 150, 0.95)");
+            g.addColorStop(0.7, "rgba(238, 190, 60, 0.9)");
+            g.addColorStop(1, "rgba(214, 160, 40, 0.75)");
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.ellipse(cx, bund - 0.5, fr, Math.min(ry, 1.2 + fr * 0.1), 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
+            ctx.beginPath();
+            ctx.ellipse(cx - fr * 0.35, bund - 1.4, fr * 0.25, 0.8, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        /* Saltet: en tynd, hvid belaegning */
+        if (s.salt > 0.01) {
+            ctx.save();
+            ctx.fillStyle = "rgba(248, 248, 242, " + (0.85 * NK.klamp(s.salt, 0, 1)).toFixed(3) + ")";
+            for (i = 0; i < 40; i++) {
+                var vv = i * 2.39996, rr = Math.sqrt((i + 0.5) / 40);
+                ctx.fillRect(cx + Math.cos(vv) * rr * 30 - 0.8, bund + Math.sin(vv) * rr * 3.6 - 0.8, 1.6, 1.6);
+            }
+            ctx.restore();
+        }
+
+        if (s.sod > 0.01) {
+            ctx.save();
+            ctx.fillStyle = "rgba(22, 20, 18, " + (0.75 * NK.klamp(s.sod, 0, 1)).toFixed(3) + ")";
+            ctx.beginPath();
+            ctx.ellipse(cx, bund - 4, rx + 3, ry + 4, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        NK.Sprites.tegnPositur(ctx, "skaal", s.p, a);
+        if (s.fremhaev) S.tegnMarkering(ctx, S.rekt("skaal", s.p, a, 2), tid);
+        return flade;
+    };
+
     /* Chips i vejebaaden. liste: [{ dx, dy, a, s }] */
     S.tegnVejebaad = function (ctx, p, chips) {
         NK.Sprites.tegnPositur(ctx, "vejebaad", p, S.ANKER.vejebaad);

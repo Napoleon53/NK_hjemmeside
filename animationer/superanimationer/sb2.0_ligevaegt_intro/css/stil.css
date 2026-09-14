@@ -668,6 +668,71 @@ main {
 
 .knap.haendelse.slaaet-til .note { color: #f7dc86; }
 
+/* Doegnet paa fane 1: ur, doegnkurve og genveje til tidspunkter */
+.kort.med-knap { position: relative; }
+
+.hjoerneknap {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background-color: var(--panel-2);
+    color: var(--tekst-svag);
+    border: 1px solid #4a4a58;
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-family: inherit;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.hjoerneknap:hover { background-color: var(--panel-3); color: var(--tekst); }
+.hjoerneknap.slaaet-til { background-color: var(--gul); border-color: var(--gul); color: #302700; }
+
+.urlinje {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 2px 0 6px;
+}
+
+.urlinje b { font-size: 1.35rem; color: var(--tekst); font-variant-numeric: tabular-nums; }
+.urlinje span { font-size: 0.85rem; font-weight: 700; color: var(--gul); }
+
+.doegnboks {
+    height: 58px;
+    background-color: #17171e;
+    border: 1px solid #3a3a47;
+    border-radius: var(--radius-lil);
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.doegnboks canvas { display: block; width: 100%; height: 100%; }
+
+.faseknapper {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.faseknapper button {
+    flex: 1 1 auto;
+    background-color: var(--panel-2);
+    color: var(--tekst-svag);
+    border: 1px solid #4a4a58;
+    border-radius: 4px;
+    padding: 5px 6px;
+    font-family: inherit;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.faseknapper button:hover { background-color: var(--panel-3); color: var(--tekst); }
+
+.maaler + .talraekke { margin-top: 10px; }
+
 /* ---------------------------------------------------------------------
    OVERSAETTELSESTABEL (kemi-fanen)
    --------------------------------------------------------------------- */

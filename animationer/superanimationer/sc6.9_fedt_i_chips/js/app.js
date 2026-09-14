@@ -73,6 +73,7 @@
         NK.saetTekst("m-b", f.mB !== null ? M.komma(f.mB) + " g" : "");
         NK.saetTekst("m-bf", f.mBF !== null ? M.komma(f.mBF) + " g" : "");
         var kanBeregne = f.mBF !== null && !f.gjort.beregn;
+        NK.el("hjaelp-beregn").hidden = !kanBeregne;
         var beregn = NK.el("beregn");
         if (kanBeregne && beregn.hidden) {
             beregn.hidden = false;
@@ -114,7 +115,7 @@
         tom: "Skriv fedtindholdet som et tal.",
         broek: "Tallet er en brøkdel. Fedtindholdet skal angives i procent.",
         gram: "Det er massen af fedtet. Hvor mange procent er det af chipsenes masse?",
-        baeger: "Bægerglasset vejer også noget. Træk massen af det tomme bægerglas fra.",
+        baeger: "Petriskålen vejer også noget. Træk massen af den tomme petriskål fra.",
         omvendt: "Du har divideret den forkerte vej. Fedtet er en del af chipsene."
     };
 
@@ -133,8 +134,8 @@
         var tekst = HINT[svar.slags];
         if (!tekst) {
             tekst = svar.forkerte >= 2
-                ? "Fedtindhold = m(fedt) / m(chips) · 100 %. Find først m(fedt) ud fra de to vejninger af bægerglasset."
-                : "Find først massen af fedtet ud fra de to vejninger af bægerglasset.";
+                ? "Fedtindhold = m(fedt) / m(chips) · 100 %. Du kan også bruge Hjælp til beregningen."
+                : "Find først massen af fedtet ud fra de to vejninger af petriskålen.";
         }
         hint.textContent = tekst;
         hint.hidden = false;
@@ -192,24 +193,106 @@
     }
 
     /* ----- Iagttagelser -------------------------------------------------- */
+    /* Kun iagttagelser, der kan forklare resultatet. De hoerer til det
+       aktuelle forsoeg og ryddes ved nyt forsoeg. */
     function iagttagelse(i) {
         var ul = NK.el("iagttagelse-liste");
         var tom = ul.querySelector(".tom");
         if (tom) tom.remove();
         var li = document.createElement("li");
-        if (i.noegle === "brand") li.className = "uheld";
-        var farve = document.createElement("span");
-        farve.className = "farve" + (i.farve ? "" : " farveloes");
-        if (i.farve) farve.style.backgroundColor = NK.css({ r: i.farve.r, g: i.farve.g, b: i.farve.b, a: 1 });
-        li.appendChild(farve);
-        var tekst = document.createElement("span");
-        var nr = document.createElement("span");
-        nr.className = "fnr";
-        nr.textContent = "F" + i.nr;
-        tekst.appendChild(nr);
-        tekst.appendChild(document.createTextNode(i.tekst));
-        li.appendChild(tekst);
+        li.textContent = i.tekst;
         ul.appendChild(li);
+    }
+
+    function rydIagttagelser() {
+        NK.el("iagttagelse-liste").innerHTML = '<li class="tom">Endnu ingen.</li>';
+    }
+
+    /* ----- Guidet hjaelp til beregningen ------------------------------- */
+    var guide = { trin: 1, andel: null, procent: null };
+
+    function guideVis() {
+        for (var n = 1; n <= 3; n++) {
+            var li = NK.el("g" + n);
+            li.className = n < guide.trin ? "gjort" : (n === guide.trin ? "aktiv" : "laast");
+            NK.el("g" + n + "-svar").disabled = n !== guide.trin;
+            NK.el("g" + n + "-tjek").disabled = n !== guide.trin;
+        }
+        NK.el("guide-brug").hidden = guide.trin < 4;
+    }
+
+    function aabnGuide() {
+        var t = forsoeg.fedtTal();
+        if (!t || forsoeg.gjort.beregn) return;
+        guide = { trin: 1, andel: null, procent: null };
+        NK.el("g1-tal").textContent = M.komma(t.mBF) + " g − " + M.komma(t.mB) + " g =";
+        NK.el("g2-tal").textContent = "m(fedt) / " + M.komma(t.mChips) + " g =";
+        NK.el("g3-tal").textContent = "andel · 100 % =";
+        for (var n = 1; n <= 3; n++) {
+            var input = NK.el("g" + n + "-svar");
+            input.value = "";
+            input.classList.remove("forkert");
+            NK.el("g" + n + "-hint").hidden = true;
+        }
+        guideVis();
+        NK.Rundvisning.luk();
+        NK.el("guide").classList.add("vis");
+        NK.el("g1-svar").focus();
+    }
+
+    function guideTjek(n) {
+        if (n !== guide.trin) return;
+        var t = forsoeg.fedtTal();
+        if (!t) return;
+        var input = NK.el("g" + n + "-svar");
+        var hint = NK.el("g" + n + "-hint");
+        var v = M.tal(input.value);
+        var fejltekst = null;
+        if (isNaN(v)) {
+            fejltekst = "Skriv et tal.";
+        } else if (n === 1) {
+            if (Math.abs(v - t.mF) > 0.006) {
+                fejltekst = Math.abs(v + t.mF) <= 0.006 ? "Træk den mindste masse fra den største."
+                    : "Træk massen af den tomme petriskål fra massen af petriskålen med rest.";
+            }
+        } else if (n === 2) {
+            var tol = Math.max(0.0006, t.andel * 0.004);
+            if (Math.abs(v - t.andel) > tol) {
+                if (Math.abs(v - t.andel) <= 0.006) fejltekst = "Næsten. Brug mindst tre decimaler.";
+                else if (t.mF > 0 && Math.abs(v - t.mChips / t.mF) <= Math.max(0.05, t.mChips / t.mF * 0.02)) fejltekst = "Du har divideret den forkerte vej. Andelen er mindre end 1.";
+                else if (Math.abs(v - t.andel * 100) <= Math.max(0.3, t.andel)) fejltekst = "Det er allerede i procent. Skriv andelen som et decimaltal.";
+                else fejltekst = "Divider massen af fedtet med massen af chipsene.";
+            }
+        } else {
+            var fraAndel = guide.andel * 100;
+            if (!(Math.abs(v - fraAndel) <= 0.06 || Math.abs(v - t.procent) <= Math.max(0.15, t.procent * 0.01))) {
+                fejltekst = "Gang andelen med 100 for at få fedtindholdet i procent.";
+            }
+        }
+        if (fejltekst) {
+            hint.textContent = fejltekst;
+            hint.hidden = false;
+            input.classList.add("forkert");
+            input.focus();
+            input.select();
+            return;
+        }
+        hint.hidden = true;
+        input.classList.remove("forkert");
+        if (n === 1) NK.el("g2-tal").textContent = M.komma(t.mF) + " g / " + M.komma(t.mChips) + " g =";
+        if (n === 2) { guide.andel = v; NK.el("g3-tal").textContent = String(v).replace(".", ",") + " · 100 % ="; }
+        if (n === 3) guide.procent = v;
+        guide.trin = n + 1;
+        guideVis();
+        if (n < 3) NK.el("g" + (n + 1) + "-svar").focus();
+        else NK.el("guide-brug").focus();
+    }
+
+    function guideBrug() {
+        if (guide.trin < 4) return;
+        NK.el("svar").value = String(guide.procent).replace(".", ",");
+        lukOverlay();
+        tjek();
     }
 
     /* ----- Beskeden paa scenen ------------------------------------------ */
@@ -251,6 +334,8 @@
         forsoeg.stopArbejde();
         forsoeg.holdt = null;
         forsoeg.nulstil();
+        lukOverlay();
+        rydIagttagelser();
         NK.el("hint-tekst").hidden = true;
         NK.el("beregn-hint").hidden = true;
         NK.el("beregn").hidden = true;
@@ -260,7 +345,12 @@
     /* ----- Tastatur ----------------------------------------------------- */
     function tastNed(e) {
         if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) {
-            if (e.target.id === "svar" && e.key === "Enter") { e.preventDefault(); tjek(); }
+            if (e.key === "Enter") {
+                var gm = /^g([123])-svar$/.exec(e.target.id);
+                if (e.target.id === "svar") { e.preventDefault(); tjek(); }
+                else if (gm) { e.preventDefault(); guideTjek(Number(gm[1])); }
+            }
+            if (e.key === "Escape") lukOverlay();
             return;
         }
         if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -332,6 +422,14 @@
 
         NK.el("hint-knap").addEventListener("click", visHint);
         NK.el("tjek-knap").addEventListener("click", tjek);
+        NK.el("hjaelp-beregn").addEventListener("click", aabnGuide);
+        [1, 2, 3].forEach(function (n) {
+            NK.el("g" + n + "-tjek").addEventListener("click", function () { guideTjek(n); });
+        });
+        NK.el("guide-brug").addEventListener("click", guideBrug);
+        NK.el("guide-luk").addEventListener("click", lukOverlay);
+        NK.el("guide").addEventListener("click", function (e) { if (e.target === this) lukOverlay(); });
+        NK.guide = { aabn: aabnGuide, tjek: guideTjek, brug: guideBrug, tilstand: function () { return guide; } };
         NK.el("nytknap").addEventListener("click", nytForsoeg);
         NK.el("uheld-nyt").addEventListener("click", nytForsoeg);
         NK.el("teoriknap").addEventListener("click", aabnTeori);

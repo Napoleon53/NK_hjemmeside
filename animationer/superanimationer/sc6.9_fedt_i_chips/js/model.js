@@ -121,7 +121,7 @@
         var mF = mBF - mB;
         function naer(x, tol) { return Math.abs(v - x) <= tol; }
         if (naer(rigtig, Math.max(0.15, Math.abs(rigtig) * 0.01))) return { slags: "rigtig", vaerdi: rigtig };
-        if (naer(rigtig / 100, Math.max(0.0015, rigtig / 100 * 0.01))) return { slags: "broek" };
+        if (naer(rigtig / 100, Math.max(0.0051, rigtig / 100 * 0.02))) return { slags: "broek" };
         if (naer(mF, 0.02)) return { slags: "gram" };
         if (naer(mBF / mChips * 100, 3)) return { slags: "baeger" };
         if (naer(mBF / mChips, 0.05) || naer(mB / mChips * 100, 3)) return { slags: "baeger" };

@@ -57,15 +57,15 @@
             forklaring: "Heptan koger ved 98 °C. Fedtstofmolekylerne er meget større og tiltrækker hinanden kraftigere, så de fordamper ikke ved den temperatur."
         },
         {
-            sp: "Hvorfor vejes det tomme bægerglas, før filtratet hældes i?",
+            sp: "Hvorfor vejes den tomme petriskål, før filtratet hældes i?",
             valg: [
                 "Så massen af fedtet kan findes som forskellen mellem to vejninger",
                 "Så vægten kan nulstilles",
-                "For at se, om glasset er rent",
-                "Fordi glasset bliver lettere af at blive varmet op"
+                "For at se, om skålen er ren",
+                "Fordi skålen bliver lettere af at blive varmet op"
             ],
             rigtig: 0,
-            forklaring: "Massen af fedtet er massen af glasset med fedt minus massen af det tomme glas."
+            forklaring: "Massen af fedtet er massen af petriskålen med fedt minus massen af den tomme petriskål."
         },
         {
             sp: "5,00 g chips giver 1,60 g fedt. Hvad er fedtindholdet?",
@@ -79,21 +79,21 @@
                 "Noget af opløsningen med fedt blev i filteret og chipsresterne",
                 "Heptanen var ikke fordampet helt, da glasset blev vejet",
                 "Chipsene indeholdt salt",
-                "Det tomme bægerglas blev vejet først"
+                "Den tomme petriskål blev vejet først"
             ],
             rigtig: 0,
             forklaring: "Filtrerpapiret og chipsresterne holder på lidt af opløsningen. Skylles filteret med lidt mere heptan, kommer mere af fedtet med. Rester af heptan ville give et for højt resultat."
         },
         {
-            sp: "Hvorfor inddampes heptanen på en varmeplade i stinkskab og ikke over en bunsenbrænder?",
+            sp: "Hvorfor inddampes heptanen på en varmeplade og ikke over bunsenbrænderen, selv om begge står i stinkskabet?",
             valg: [
                 "Heptandampe er brandfarlige og kan antændes af en åben flamme",
                 "En bunsenbrænder er ikke varm nok",
                 "Varmepladen får fedtet til at fordampe",
-                "Udsugningen gør heptanen upolær"
+                "Udsugningen fjerner al brandfare"
             ],
             rigtig: 0,
-            forklaring: "Heptan er meget brandfarligt. Dampene kan antændes af en flamme, selv et stykke fra væsken. Udsugningen fjerner dampene."
+            forklaring: "Heptan er meget brandfarligt. Dampene kan antændes af en flamme, også i et stinkskab. Udsugningen fjerner dampene, men ikke brandfaren."
         },
         {
             sp: "Hvilken del af et fedtstofmolekyle gør det upolært?",

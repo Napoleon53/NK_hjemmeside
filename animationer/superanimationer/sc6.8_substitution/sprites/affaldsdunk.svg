@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="260" viewBox="0 0 90 130">
+  <!-- Affaldsdunk til halogenholdigt organisk affald.
+       Aabningen er (45, 12). -->
+  <defs>
+    <linearGradient id="krop" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5a3a10"/>
+      <stop offset="0.35" stop-color="#b8792b"/>
+      <stop offset="1" stop-color="#4f320d"/>
+    </linearGradient>
+    <linearGradient id="laag" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a86f28"/>
+      <stop offset="1" stop-color="#5a3a10"/>
+    </linearGradient>
+  </defs>
+  <path d="M9 24 L81 24 L75 125 Q74.5 130 69 130 L21 130 Q15.5 130 15 125 Z" fill="url(#krop)"/>
+  <path d="M32 2 Q32 0 34 0 L56 0 Q58 0 58 2 L58 13 L52 13 L52 6 L38 6 L38 13 L32 13 Z" fill="#5a3a10"/>
+  <rect x="4" y="11" width="82" height="15" rx="4" fill="url(#laag)" stroke="#43290a" stroke-width="1"/>
+  <rect x="18" y="40" width="54" height="62" rx="3" fill="#ffffff" stroke="#9aa6b3" stroke-width="0.8"/>
+  <g font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#1f2328" text-anchor="middle">
+    <text x="45" y="52" font-size="6.2">HALOGENHOLDIGT</text>
+    <text x="45" y="61" font-size="6.2">ORGANISK</text>
+    <text x="45" y="70" font-size="6.2">AFFALD</text>
+  </g>
+  <!-- GHS02: brandfarlig -->
+  <g transform="translate(34 88)">
+    <rect x="-6" y="-6" width="12" height="12" transform="rotate(45)" fill="#ffffff" stroke="#d8342a" stroke-width="1.6"/>
+    <path d="M0 -4.6 Q3.4 -1.4 2.8 1.8 Q2.6 4 0 4.2 Q-2.6 4 -2.8 1.8 Q-3.2 -0.8 -0.8 -1.8 Q0.2 -3.2 0 -4.6 Z" fill="#111111"/>
+    <path d="M-3.8 5 h7.6" stroke="#111111" stroke-width="0.9"/>
+  </g>
+  <!-- GHS09: miljoefare -->
+  <g transform="translate(56 88)">
+    <rect x="-6" y="-6" width="12" height="12" transform="rotate(45)" fill="#ffffff" stroke="#d8342a" stroke-width="1.6"/>
+    <path d="M-3 3.4 L-3 -3 M-3 -1.6 L-4.6 -3.4 M-3 -0.6 L-1.2 -2.8" stroke="#111111" stroke-width="0.9" stroke-linecap="round"/>
+    <path d="M-0.6 2.2 q1.8 -1.8 3.8 0 q-2 1.8 -3.8 0 Z M3.2 2.2 l1.2 -0.9 v1.8 Z" fill="#111111"/>
+    <path d="M-4.4 4 h8.8" stroke="#111111" stroke-width="0.8"/>
+  </g>
+  <rect x="16" y="30" width="4" height="90" rx="2" fill="#ffffff" fill-opacity="0.16"/>
+</svg>

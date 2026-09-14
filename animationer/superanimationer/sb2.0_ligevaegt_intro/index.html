@@ -37,14 +37,28 @@
 <section class="fane aktiv" id="fane-bro" role="tabpanel" aria-label="Lillebæltsbroerne">
     <div class="scene">
         <canvas id="bro-laerred"></canvas>
-        <div class="scene-mrk">Tallene står stille, men bilerne kører hele tiden: <b>dynamisk</b> ligevægt.</div>
+        <div class="scene-mrk">Bilerne kører hele tiden, men fordelingen mellem broerne falder til ro: <b>dynamisk</b> balance.</div>
     </div>
 
     <aside class="panel">
         <div class="kort fremhaev">
-            <h2>Trafik over Lillebælt</h2>
-            <p>Jo flere biler der holder på den ene side, jo flere kører derfra.</p>
-            <div class="ligning">Biler(<span class="frem">Fyn</span>) <span class="hj">⇌</span> Biler(<span class="tilbage">Jylland</span>)</div>
+            <h2>Vejvalg over Lillebælt</h2>
+            <p>Bilisterne vælger den bro, der er hurtigst lige nu.</p>
+            <div class="ligning"><span class="frem">Ny bro</span> <span class="hj">⇌</span> <span class="tilbage">Gammel bro</span></div>
+        </div>
+
+        <div class="kort med-knap">
+            <h2>Døgnet</h2>
+            <button class="hjoerneknap" id="bro-urstop">❚❚ Stop uret</button>
+            <div class="urlinje"><b id="bro-klokke">06:00</b><span id="bro-fase">Morgentrafik</span></div>
+            <div class="doegnboks"><canvas id="bro-doegn" title="Klik for at stille uret"></canvas></div>
+            <div class="faseknapper">
+                <button data-klokke="7.8">Morgen</button>
+                <button data-klokke="11.5">Middag</button>
+                <button data-klokke="16.3">Eftermiddag</button>
+                <button data-klokke="20">Aften</button>
+                <button data-klokke="2">Nat</button>
+            </div>
         </div>
 
         <div class="kort">
@@ -52,77 +66,38 @@
             <div class="indgreb">
                 <button class="knap haendelse" id="bro-vejarbejde"><span class="ikon">🚧</span><span class="navn">Vejarbejde</span><span class="note">Ny bro: 80 km/t</span></button>
                 <button class="knap haendelse" id="bro-ulykke"><span class="ikon">💥</span><span class="navn">Bilulykke</span><span class="note">Spærrer et spor</span></button>
-                <button class="knap haendelse" id="bro-storm"><span class="ikon">🌬️</span><span class="navn">Storm</span><span class="note">Gl. bro: 40 km/t</span></button>
-            </div>
-            <div class="knaprad">
-                <button class="knap blaa" id="bro-tilfoej-fyn">+30 Fyn</button>
-                <button class="knap orange" id="bro-tilfoej-jyl">+30 Jylland</button>
-            </div>
-            <div class="knaprad">
-                <button class="knap" id="bro-fjern-fyn">−30 Fyn</button>
-                <button class="knap" id="bro-fjern-jyl">−30 Jylland</button>
+                <button class="knap haendelse" id="bro-storm"><span class="ikon">🌬️</span><span class="navn">Storm</span><span class="note">Ny bro: 50 km/t</span></button>
             </div>
             <button class="knap nulstil fuld" id="bro-nulstil"><span>Nulstil</span><span class="tegn">↺</span></button>
+        </div>
+
+        <div class="kort">
+            <h2>Vejvalg</h2>
+            <div class="maaler">
+                <span class="navn">Ny bro</span>
+                <div class="spor"><div class="fyld frem" id="bro-andel-ny-fyld"></div></div>
+                <span class="vaerdi" id="bro-andel-ny">0 %</span>
+            </div>
+            <div class="maaler">
+                <span class="navn">Gammel bro</span>
+                <div class="spor"><div class="fyld tilbage" id="bro-andel-gl-fyld"></div></div>
+                <span class="vaerdi" id="bro-andel-gl">0 %</span>
+            </div>
+            <div class="talraekke"><span>Rejsetid, ny bro</span><span class="tal blaa" id="bro-tid-ny">0 min</span></div>
+            <div class="talraekke"><span>Rejsetid, gammel bro</span><span class="tal orange" id="bro-tid-gl">0 min</span></div>
+            <div class="talraekke"><span>Biler i kø</span><span class="tal roed" id="bro-koe">0</span></div>
+            <div class="badge" id="bro-badge"><span class="tegn">⇌</span> LIGE HURTIGE BROER</div>
         </div>
 
         <div class="kort">
             <div class="grafhoved">
                 <h2>Forløb</h2>
                 <div class="grafskift">
-                    <button class="aktiv" data-graf="bro" data-gruppe="antal">Antal</button>
-                    <button data-graf="bro" data-gruppe="fart">Hastighed</button>
+                    <button class="aktiv" data-graf="bro" data-gruppe="andel">Fordeling</button>
+                    <button data-graf="bro" data-gruppe="tid">Rejsetid</button>
                 </div>
             </div>
             <div class="grafboks"><canvas id="bro-graf"></canvas></div>
-        </div>
-
-        <div class="kort">
-            <h2>Hastigheder</h2>
-            <div class="maaler">
-                <span class="navn"><i>v</i>(frem)</span>
-                <div class="spor"><div class="fyld frem" id="bro-vfrem-fyld"></div></div>
-                <span class="vaerdi" id="bro-vfrem-val">0</span>
-            </div>
-            <div class="maaler">
-                <span class="navn"><i>v</i>(tilbage)</span>
-                <div class="spor"><div class="fyld tilbage" id="bro-vtilbage-fyld"></div></div>
-                <span class="vaerdi" id="bro-vtilbage-val">0</span>
-            </div>
-            <div class="badge" id="bro-badge"><span class="tegn">⇌</span> LIGEVÆGT</div>
-        </div>
-
-        <div class="kort">
-            <h2>Reaktionsbrøk mod K</h2>
-            <div class="yk-spor">
-                <div class="yk-k"></div>
-                <div class="yk-maerke" id="bro-yk-maerke"></div>
-            </div>
-            <div class="yk-tekst">
-                <span>Y = n(Jylland)/n(Fyn) = <b id="bro-y">0,00</b></span>
-                <span>K = <b id="bro-kref">3,00</b></span>
-            </div>
-        </div>
-
-        <div class="kort">
-            <h2>Tal</h2>
-            <div class="talraekke"><span>Biler på Fyn</span><span class="tal blaa" id="bro-n-fyn">0</span></div>
-            <div class="talraekke"><span>Biler i Jylland</span><span class="tal orange" id="bro-n-jyl">0</span></div>
-            <div class="talraekke"><span>På broerne</span><span class="tal" id="bro-n-bro">0</span></div>
-            <div class="talraekke"><span>I kø på land</span><span class="tal roed" id="bro-n-koe">0</span></div>
-            <div class="talraekke"><span>I alt (bevares)</span><span class="tal groen" id="bro-n-alt">0</span></div>
-        </div>
-
-        <div class="kort">
-            <h2>Hvad bestemmer K?</h2>
-            <div class="skyder">
-                <label><span><i>k</i>(frem), mod Jylland</span><b id="bro-kfrem-vis">0,060</b></label>
-                <input type="range" id="bro-kfrem" min="0.01" max="0.15" step="0.005" value="0.06">
-            </div>
-            <div class="skyder orange">
-                <label><span><i>k</i>(tilbage), mod Fyn</span><b id="bro-ktilbage-vis">0,020</b></label>
-                <input type="range" id="bro-ktilbage" min="0.01" max="0.15" step="0.005" value="0.02">
-            </div>
-            <div class="kformel">K = <i>k</i>(frem) / <i>k</i>(tilbage) = <b id="bro-k">3,00</b></div>
         </div>
     </aside>
 </section>
@@ -344,16 +319,13 @@
                 <summary>Fra broen til kemien</summary>
                 <table class="oversaet-tabel">
                     <tr><th>Lillebælt</th><th>N₂O₄ ⇌ 2 NO₂</th></tr>
-                    <tr><td>Bil på Fyn</td><td>N₂O₄-molekyle</td></tr>
-                    <tr><td>Bil i Jylland</td><td>NO₂-molekyle</td></tr>
-                    <tr><td>Antal biler pr. plads</td><td>Koncentration</td></tr>
-                    <tr><td><i>k</i>(frem)·n(Fyn)</td><td><i>k</i>(frem)·[N₂O₄]</td></tr>
-                    <tr><td><i>k</i>(tilbage)·n(Jyl)</td><td><i>k</i>(tilbage)·[NO₂]²</td></tr>
-                    <tr><td>Y = n(Jyl)/n(Fyn)</td><td>Y = [NO₂]²/[N₂O₄]</td></tr>
-                    <tr><td>Flere biler i den ene ende</td><td>Tilsæt stof</td></tr>
-                    <tr><td>—</td><td>Ændr temperatur eller volumen</td></tr>
+                    <tr><td>Trafik over begge broer hele tiden</td><td>Reaktion begge veje hele tiden</td></tr>
+                    <tr><td>Fordelingen mellem broerne står stille</td><td>Koncentrationerne står stille</td></tr>
+                    <tr><td>Rejsetiderne bliver lige lange</td><td><i>v</i>(frem) = <i>v</i>(tilbage)</td></tr>
+                    <tr><td>Myldretid eller storm giver en ny fordeling</td><td>Tilsat stof, tryk eller temperatur giver en ny ligevægt</td></tr>
+                    <tr><td>Ingen ligevægtskonstant</td><td>K = [NO₂]²/[N₂O₄]</td></tr>
                 </table>
-                <p class="kort" style="border:none;padding:8px 0 0 0;background:none;font-size:0.78rem;color:#8d95a1;">Kvadratet er den eneste rigtige forskel: to NO₂ skal mødes, før der kan dannes et N₂O₄. Koefficienten i reaktionsskemaet bliver til en eksponent i ligevægtsloven.</p>
+                <p class="kort" style="border:none;padding:8px 0 0 0;background:none;font-size:0.78rem;color:#8d95a1;">Broerne viser, hvordan en balance indstiller sig. Kemien har desuden en ligevægtskonstant, og koefficienten i reaktionsskemaet bliver til en eksponent i ligevægtsloven.</p>
             </details>
         </div>
     </aside>
@@ -369,7 +341,7 @@
 
         <h3>De fire faner</h3>
         <ul>
-            <li><b>Lillebæltsbroerne</b> — den rene model. Se, at systemet vender tilbage til det samme <i>forhold</i> mellem de to sider, uanset hvor mange biler du hælder i. Det forhold er K.</li>
+            <li><b>Lillebæltsbroerne</b>: bilisterne vælger den hurtigste bro. Fordelingen falder til ro, når rejsetiderne er lige lange, og flytter sig med døgnets trafik og vejret.</li>
             <li><b>Rensdyr og føde</b> — en balance af samme slags, men uden ligevægtskonstant. Her flytter balancen sig, når bæreevnen ændres.</li>
             <li><b>Torvet</b> — prisen indstiller sig, hvor udbud og efterspørgsel krydser. Et indgreb giver en ny ligevægt.</li>
             <li><b>Kemien</b> — den rigtige reaktion N₂O₄ ⇌ 2 NO₂, med temperatur, volumen og farveskift.</li>
@@ -377,9 +349,8 @@
 
         <h3>Prøv det her</h3>
         <ul>
-            <li>Sæt K = 3 på fane 1, og tilføj biler på Fyn. Hvad sker der med <i>forholdet</i> bagefter?</li>
-            <li>Skru k(frem) og k(tilbage) ens. Hvad bliver K så?</li>
-            <li>Lav vejarbejde eller storm på fane 1, når ligevægten har indstillet sig. Ændrer Y sig bagefter?</li>
+            <li>Stop uret i myldretiden på fane 1. Hvor mange tager den gamle bro, og hvad viser rejsetidstavlerne?</li>
+            <li>Slå storm til om natten og i myldretiden på fane 1. Hvornår giver det kø?</li>
             <li>Varm gassen op på fane 4. Bliver den brunere eller lysere — og hvad siger det om, hvilken vej der er endoterm?</li>
             <li>Klem stemplet sammen. K står stille, men farven ændrer sig. Hvorfor?</li>
         </ul>

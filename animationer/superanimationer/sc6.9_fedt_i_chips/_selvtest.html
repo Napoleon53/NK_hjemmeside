@@ -19,8 +19,9 @@
 
    Aabner index.html i en iframe og koerer forsoeget igennem med de
    samme funktioner, som klik og knapper bruger: modellen, raekke-
-   foelgen, heptan med og uden skylning, vand, beregningen og hintene,
-   paaskeaeggene, branden, quizzen, sproget og ion-notationen.
+   foelgen, heptan med og uden skylning, vand, bunsenbraenderen,
+   iagttagelserne, beregningen og den guidede hjaelp, paaskeaeggene,
+   branden, quizzen, sproget og ion-notationen.
    Skal aabnes gennem en lokal server (Chrome afviser iframes paa file://).
    ===================================================================== */
 var linjer = [];
@@ -43,6 +44,7 @@ function koerTest() {
     var ramme = document.getElementById("ramme");
     var d = ramme.contentDocument;
     var NK = ramme.contentWindow.NK;
+    var i;
 
     overskrift("1. Indlaesning");
     paastand("NK findes", !!NK);
@@ -52,7 +54,7 @@ function koerTest() {
         paastand("sprite " + n + " er indlaest", NK.Sprites.klar(n));
     });
 
-    var M = NK.Model, f = NK.forsoeg;
+    var M = NK.Model, f = NK.forsoeg, S = NK.Scene;
     function adv(sek) { for (var k = 0; k < Math.round(sek * 60); k++) f.opdater(1 / 60); }
     function vent(betingelse, maks) { var t = 0; while (!betingelse() && t < maks) { adv(0.25); t += 0.25; } return t; }
     function nyt() { NK.nytForsoeg(); adv(0.1); }
@@ -66,19 +68,22 @@ function koerTest() {
         nyt();
         afvej();
         f.arbejdKnap(true); adv(opt.knusTid || 3.5); f.arbejdKnap(false); adv(0.5);
-        f.klik("morter"); adv(5);
+        f.klik("morter"); adv(5.5);
         f.klik(opt.midl); adv(4.5);
         f.arbejdKnap(true); adv(opt.roerTid || 6); f.arbejdKnap(false); adv(1);
-        f.klik("baegerB"); adv(5);
+        f.klik("skaal"); adv(5);
         f.klik("baegerA"); adv(10);
         if (opt.skyl) { f.klik(opt.midl); adv(8); }
     }
     function helt(opt) {
         tilFiltrat(opt);
-        f.klik(opt.braender ? "braender" : "baegerB"); adv(3);
+        if (opt.trefod) { f.klik("braender"); adv(0.3); f.klik("trefod"); }
+        else f.klik("skaal");
+        adv(3);
         vent(function () { return f.gjort.inddamp || !!f.uheld; }, 40);
-        adv(6);
-        f.klik("baegerB"); adv(4);
+        if (f.braenderTaendt) { f.klik("braender"); }
+        adv(8);
+        f.klik("skaal"); adv(4.5);
         return f.mBF !== null ? M.fedtprocent(f.mChips, f.mB, f.mBF) : null;
     }
     function svar(tekst) {
@@ -87,6 +92,9 @@ function koerTest() {
         return d.getElementById("beregn-hint").hidden ? "" : d.getElementById("beregn-hint").textContent;
     }
     function komma(x) { return String(Math.round(x * 10) / 10).replace(".", ","); }
+    function iagttagelser() {
+        return Array.prototype.map.call(d.querySelectorAll("#iagttagelse-liste li:not(.tom)"), function (li) { return li.textContent; });
+    }
 
     overskrift("2. Modellen");
     paastand("uden roering er intet opløst", M.roerGrad(1, 0) === 0);
@@ -95,13 +103,13 @@ function koerTest() {
     paastand("heptan opløser intet salt", M.ekstraktion(M.MIDLER.heptan, 1, 10).salt === 0);
     paastand("skylning giver mere fedt med", M.opsamlet(1, true) > M.opsamlet(1, false));
     paastand("5,00 g chips og 1,60 g fedt giver 32 %", Math.abs(M.fedtprocent(5, 50, 51.6) - 32) < 1e-9);
-    paastand("komma-format 4,50", M.komma(4.5) === "4,50" && M.komma(-0.001) === "0,00", M.komma(-0.001));
+    paastand("komma-format 4,50", M.komma(4.5) === "4,50" && M.komma(-0.001) === "0,00");
     var T = function (s) { return M.tjek(s, 5, 50, 51.6).slags; };
     paastand("tjek: 32 og 32,0 % er rigtige", T("32") === "rigtig" && T("32,0 %") === "rigtig" && T(" 31.8") === "rigtig");
-    paastand("tjek: 0,32 er en brøkdel", T("0,32") === "broek", T("0,32"));
-    paastand("tjek: 1,6 er massen i gram", T("1,6") === "gram", T("1,6"));
-    paastand("tjek: 1032 mangler at trække glasset fra", T("1032") === "baeger", T("1032"));
-    paastand("tjek: 312,5 er divideret omvendt", T("312,5") === "omvendt", T("312,5"));
+    paastand("tjek: 0,32 er en brøkdel", T("0,32") === "broek");
+    paastand("tjek: 1,6 er massen i gram", T("1,6") === "gram");
+    paastand("tjek: 1032 mangler at trække skålen fra", T("1032") === "baeger");
+    paastand("tjek: 312,5 er divideret omvendt", T("312,5") === "omvendt");
     paastand("tjek: tomt og tekst er tomt", T("") === "tom" && T("abc") === "tom");
     paastand("tjek: 17 er en anden fejl", T("17") === "andet");
 
@@ -109,7 +117,7 @@ function koerTest() {
     nyt();
     paastand("morteren er tom foer afvejning", f.klik("morter") === false);
     paastand("flaskerne kan ikke bruges foer chipsene er i glasset", f.klik("heptan") === false && !f.midl);
-    paastand("det tomme glas kan ikke vejes, mens vejebaaden staar paa vaegten", f.klik("baegerB") === false);
+    paastand("petriskaalen kan ikke vejes, mens vejebaaden staar paa vaegten", f.klik("skaal") === false);
     paastand("vejebaaden uden chips giver ingen overfoersel", f.klik("vejebaad") === false);
     f.klik("pose"); adv(0.8);
     paastand("en chip lander i vejebaaden", f.chips.length === 1 && f.vaegtMaal() > 0.3);
@@ -122,79 +130,149 @@ function koerTest() {
     adv(4);
     paastand("chipsenes masse er noteret", f.gjort.afvej && f.mChips === 4.8);
     paastand("ukrummede chips kan ikke haeldes over", f.klik("morter") === false);
-    for (var i = 0; i < Math.ceil(M.KNUS.vej / 40) + 2; i++) f.knus(40, 5000);
-    paastand("meget voldsom knusning taber krummer", f.krummerUd > 0 && f.mTab > 0, f.krummerUd + " krummer");
+    for (i = 0; i < Math.ceil(M.KNUS.vej / 40) + 2; i++) { f.knus(40, 2900); f.opdater(1 / 60); }
+    paastand("voldsom knusning taber krummer, men laereren kommer ikke", f.krummerUd > 0 && f.mTab > 0 && !f.laerer.scene, f.krummerUd + " krummer");
     paastand("knust helt", f.knust === 1);
-    f.klik("morter"); adv(5);
-    paastand("chipsene er i baegerglasset", f.gjort.overfoer && f.g.baegerA.krummer.length > 10);
+    f.klik("morter"); adv(5.5);
+    paastand("chipsene er i baegerglasset, og pistillen staar i morteren igen", f.gjort.overfoer && f.g.baegerA.krummer.length > 10 && Math.abs(f.g.pistil.p.x - f.g.pistil.hjem.x) < 1);
     f.klik("heptan"); adv(4.5);
     paastand("heptanen er haeldt i", f.midl === "heptan" && f.g.baegerA.areal === M.VOLUMEN);
     paastand("den anden flaske afvises", f.klik("vand") === false);
     paastand("uden roering kan der ikke filtreres", f.roerGrad() < M.ROER.min && f.klik("baegerA") === false);
-    f.arbejdKnap(true); adv(6); f.arbejdKnap(false); adv(0.5);
-    paastand("roeringen er faerdig", f.trinGjort("roer"));
-    paastand("uden vejet glas kan der ikke filtreres", f.klik("baegerA") === false && !f.handling);
-    f.klik("baegerB"); adv(5);
-    paastand("det tomme glas er vejet og staar under tragten", f.mB === f.baegerMasse && f.g.baegerB.sted === "tragt");
+    f.arbejdKnap(true); adv(2.2); f.arbejdKnap(false); adv(0.5);
+    paastand("uden vejet petriskaal kan der ikke filtreres", f.klik("baegerA") === false && !f.handling);
+    f.klik("skaal"); adv(5);
+    paastand("petriskaalen er vejet og staar under tragten", f.mB === f.skaalMasse && f.g.skaal.sted === "tragt");
+    paastand("m(tom petriskål) staar i maaleskemaet", d.getElementById("m-b").textContent === M.komma(f.mB) + " g");
     f.klik("baegerA"); adv(10);
-    paastand("filtreret, og der er filtrat i glasset", f.gjort.filtrer && f.g.baegerB.areal > 1000);
-    f.klik("baegerB"); adv(3);
-    paastand("glasset kan ikke vejes foer inddampningen er faerdig", f.klik("baegerB") === false);
+    paastand("filtreret, og der er filtrat i skaalen", f.gjort.filtrer && f.g.skaal.fyld > 0.5, f.g.skaal.fyld.toFixed(2));
+    f.klik("skaal"); adv(3);
+    paastand("skaalen kan ikke vejes foer inddampningen er faerdig", f.klik("skaal") === false);
     vent(function () { return f.gjort.inddamp; }, 30);
-    paastand("inddampet", f.gjort.inddamp && f.g.baegerB.areal === 0);
-    paastand("et varmt glas kan ikke vejes", f.klik("baegerB") === false);
-    adv(6);
-    paastand("et afkoelet glas kan vejes", f.klik("baegerB") === true);
-    adv(4);
+    paastand("inddampet", f.gjort.inddamp && f.g.skaal.fyld === 0 && f.g.skaal.fedt > 0.3);
+    paastand("en varm skaal kan ikke vejes", f.klik("skaal") === false);
+    adv(7);
+    paastand("en afkoelet skaal kan vejes", f.klik("skaal") === true);
+    adv(4.5);
     paastand("tabte krummer giver et lavere resultat", f.mBF !== null && M.fedtprocent(f.mChips, f.mB, f.mBF) < 29.5, komma(M.fedtprocent(f.mChips, f.mB, f.mBF)) + " %");
 
-    overskrift("4. Resultater");
+    overskrift("4. Iagttagelser (fejlkilder)");
+    var ia = iagttagelser();
+    paastand("krummer, kort roering og vaadt filter er noteret", f.iagttaget.krummer && f.iagttaget.kortRoer && f.iagttaget.vaad && ia.length === 3, ia.join(" | "));
+    paastand("ingen forsoegsnumre i listen", !/\bF\d/.test(ia.join(" ")));
+    nyt();
+    paastand("nyt forsoeg rydder listen", iagttagelser().length === 0);
+
+    overskrift("5. Resultater og beregning");
     var uden = helt({ midl: "heptan" });
     paastand("heptan uden skylning: 27 til 30,5 %", uden !== null && uden > 27 && uden < 30.5, uden && komma(uden) + " %");
+    paastand("kun det vaade filter er noteret", iagttagelser().length === 1 && f.iagttaget.vaad, iagttagelser().join(" | "));
+    paastand("knappen Hjælp til beregningen vises efter de ni trin", !d.getElementById("hjaelp-beregn").hidden);
     var r = M.fedtprocent(f.mChips, f.mB, f.mBF);
     paastand("hint: massen i gram", /massen af fedtet/.test(svar(M.komma(f.mBF - f.mB))));
     paastand("hint: broekdel", /procent/.test(svar(String(Math.round(r) / 100).replace(".", ","))));
-    paastand("hint: glasset er ikke trukket fra", /Træk massen/.test(svar(komma(f.mBF / f.mChips * 100))));
+    paastand("hint: skaalen er ikke trukket fra", /Træk massen af den tomme petriskål/.test(svar(komma(f.mBF / f.mChips * 100))));
     paastand("hint: divideret omvendt", /forkerte vej/.test(svar(komma(f.mChips / (f.mBF - f.mB) * 100))));
-    paastand("hint efter flere forkerte: formlen", /m\(fedt\) \/ m\(chips\)/.test(svar("17")));
-    svar(komma(r));
-    paastand("det rigtige svar godtages", f.gjort.beregn && f.resultater.length > 0);
-    paastand("sammenligningen vises", !d.getElementById("sammenligning").hidden);
+    paastand("hint efter flere forkerte: formlen og hjaelpen", /m\(fedt\) \/ m\(chips\)/.test(svar("17")) && /Hjælp til beregningen/.test(d.getElementById("beregn-hint").textContent));
+
+    var G = NK.guide, tal = f.fedtTal();
+    G.aabn();
+    paastand("guiden aabnes med trin 1 aktivt", d.getElementById("guide").classList.contains("vis") && G.tilstand().trin === 1 && d.getElementById("g2-svar").disabled);
+    d.getElementById("g1-svar").value = "0";
+    G.tjek(1);
+    paastand("guide trin 1: forkert giver hint", G.tilstand().trin === 1 && !d.getElementById("g1-hint").hidden);
+    d.getElementById("g1-svar").value = M.komma(-tal.mF);
+    G.tjek(1);
+    paastand("guide trin 1: negativt tal giver hint om fortegn", /mindste masse/.test(d.getElementById("g1-hint").textContent));
+    d.getElementById("g1-svar").value = M.komma(tal.mF);
+    G.tjek(1);
+    paastand("guide trin 1: rigtigt laaser trin 2 op", G.tilstand().trin === 2 && !d.getElementById("g2-svar").disabled);
+    d.getElementById("g2-svar").value = String(Math.round((tal.andel + 0.004) * 1000) / 1000).replace(".", ",");
+    G.tjek(2);
+    paastand("guide trin 2: upraecist giver Næsten", G.tilstand().trin === 2 && /Næsten/.test(d.getElementById("g2-hint").textContent));
+    d.getElementById("g2-svar").value = String(Math.round(tal.mChips / tal.mF * 100) / 100).replace(".", ",");
+    G.tjek(2);
+    paastand("guide trin 2: omvendt division giver hint", /forkerte vej/.test(d.getElementById("g2-hint").textContent));
+    var andel = Math.round(tal.andel * 1000) / 1000;
+    d.getElementById("g2-svar").value = String(andel).replace(".", ",");
+    G.tjek(2);
+    paastand("guide trin 2: tre decimaler godtages", G.tilstand().trin === 3);
+    d.getElementById("g3-svar").value = "3";
+    G.tjek(3);
+    paastand("guide trin 3: forkert giver hint", G.tilstand().trin === 3 && /Gang andelen med 100/.test(d.getElementById("g3-hint").textContent));
+    d.getElementById("g3-svar").value = komma(andel * 100);
+    G.tjek(3);
+    paastand("guide trin 3: rigtigt viser knappen", G.tilstand().trin === 4 && !d.getElementById("guide-brug").hidden);
+    G.brug();
+    paastand("svaret fra guiden godtages i maaleskemaet", f.gjort.beregn && !d.getElementById("guide").classList.contains("vis"));
+    NK.opdaterPanel();
+    paastand("hjaelpeknappen skjules, naar beregningen er gjort", d.getElementById("hjaelp-beregn").hidden);
     paastand("quizzen er laast op efter heptan", NK.quiz.tilstand === "klar");
     paastand("intet ros ved et lavt resultat", !f.laerer.rost);
 
     var med = helt({ midl: "heptan", skyl: true });
     paastand("skylning hæver resultatet til 30,5 til 33,5 %", med !== null && med > 30.5 && med < 33.5 && med > uden, med && komma(med) + " %");
+    paastand("skyllet filter noteres ikke som vaadt", !f.iagttaget.vaad);
     svar(komma(M.fedtprocent(f.mChips, f.mB, f.mBF)));
     paastand("godt resultat: laereren roser", f.laerer.rost && f.laerer.scene && f.laerer.scene.navn === "ros");
     adv(6);
 
     var knust = helt({ midl: "heptan", knusTid: 1.6 });
-    paastand("halvt knuste chips giver mindre", knust !== null && knust < uden, knust && komma(knust) + " %");
+    paastand("halvt knuste chips giver mindre og noteres", knust !== null && knust < uden && f.iagttaget.halvknust, knust && komma(knust) + " %");
 
     var vand = helt({ midl: "vand" });
     paastand("vand giver ca. 1 % (salt)", vand !== null && vand > 0.5 && vand < 2, vand && komma(vand) + " %");
-    paastand("iagttagelsen om den hvide belaegning", f.iagttaget.rest_vand);
     svar(komma(vand));
     paastand("sammenligningen foreslaar et andet opløsningsmiddel", /andet opløsningsmiddel/.test(d.getElementById("sammenligning-tekst").textContent));
 
-    overskrift("5. Braenderen");
-    var vb = helt({ midl: "vand", braender: true });
-    paastand("vand kan inddampes over braenderen uden brand", !f.uheld && vb !== null, vb && komma(vb) + " %");
+    overskrift("6. Bunsenbraenderen");
+    nyt();
+    paastand("braenderen taendes med et klik", f.klik("braender") === true && f.braenderTaendt);
+    adv(1);
+    paastand("flammen braender", f.flamme > 0.9);
+    paastand("og slukkes igen", f.klik("braender") === true && !f.braenderTaendt);
+    paastand("trefoden kan ikke bruges uden filtrat", f.klik("trefod") === false);
+    tilFiltrat({ midl: "vand" });
+    paastand("filtratet flyttes til trefoden", f.klik("trefod") === true);
+    adv(4);
+    paastand("uden flamme sker der intet", f.g.skaal.sted === "trefod" && f.fordampet === 0);
+    f.klik("braender");
+    vent(function () { return f.gjort.inddamp; }, 40);
+    paastand("vand inddampes over braenderen uden brand", f.gjort.inddamp && !f.uheld);
+    adv(6);
+    paastand("skaalen kan ikke vejes, mens braenderen er taendt", f.klik("skaal") === false);
+    f.klik("braender"); adv(8);
+    paastand("efter slukning kan skaalen vejes", f.klik("skaal") === true);
+    adv(4.5);
+    paastand("resultatet er noteret", f.mBF !== null);
+
     tilFiltrat({ midl: "heptan" });
-    f.klik("braender"); adv(1.6 + M.BRAND.tid);
-    paastand("heptan over braenderen antaendes", !!f.uheld && f.uheld.ild > 0.5 && f.alarm);
-    paastand("scenen er laast under branden", f.klik("heptan") === false && f.klik("baegerB") === false);
+    f.klik("braender"); adv(0.3);
+    f.klik("trefod"); adv(1.5 + M.BRAND.tid);
+    paastand("heptan over den taendte braender antaendes", !!f.uheld && f.uheld.ild > 0.5 && f.alarm);
+    paastand("scenen er laast under branden", f.klik("heptan") === false && f.klik("skaal") === false);
     vent(function () { return f.uheld && f.uheld.faerdig; }, 30);
-    paastand("laereren slukker og konfiskerer braenderen", f.uheld.faerdig && f.uheld.slukket && f.braenderVaek && !f.alarm);
-    paastand("sod paa vaeggen", f.sod > 0.3, f.sod.toFixed(2));
+    paastand("laereren slukker og konfiskerer braenderen", f.uheld.faerdig && f.uheld.slukket && f.braenderVaek && !f.alarm && !f.braenderTaendt);
+    paastand("sod paa stinkskabets vaeg", f.sod > 0.3, f.sod.toFixed(2));
     paastand("branden staar i resultaterne", f.resultater[f.resultater.length - 1].brand === true);
     NK.opdaterPanel();
     paastand("panelet viser Start et nyt forsøg", !d.getElementById("uheld-boks").hidden);
     nyt();
-    paastand("nyt forsoeg rydder uheldet, braenderen er stadig vaek", !f.uheld && f.braenderVaek && f.klik("braender") === false);
+    paastand("nyt forsoeg rydder uheldet, braenderen er stadig vaek", !f.uheld && f.braenderVaek && f.klik("braender") === false && f.klik("trefod") === false);
 
-    overskrift("6. Paaskeaeg");
+    overskrift("7. Paaskeaeg");
+    nyt();
+    afvej();
+    for (i = 0; i < 300; i++) { f.knus(30, 900); f.opdater(1 / 60); }
+    paastand("almindelig knusning med musen kalder ikke paa laereren", !f.laerer.scene);
+    nyt();
+    afvej();
+    for (i = 0; i < 500 && !(f.laerer.scene && f.laerer.scene.navn === "morter"); i++) { f.arbejdKilde = "mus-knus"; f.knus(60, 5000); f.opdater(1 / 60); }
+    paastand("morteren: vedvarende amok kalder laereren ind", f.laerer.scene && f.laerer.scene.navn === "morter" && f.antalAmok === 1, i + " billeder");
+    paastand("knusningen stoppes, og scenen er laast", !f.arbejdKilde && f.laererOptaget());
+    vent(function () { return !f.laerer.scene; }, 15);
+    paastand("laereren er gaaet igen", !f.laerer.scene && f.laerer.x < -200);
+
     nyt();
     afvej();
     f.klik("pose"); adv(1.2);
@@ -223,7 +301,7 @@ function koerTest() {
     paastand("fem klik paa laereren: damp af oererne, og laereren gaar", f.laerer.damp > 0 && f.laerer.scene && f.laerer.scene.navn === "gaaUd");
     vent(function () { return !f.laerer.scene; }, 10);
 
-    overskrift("7. Quizzen");
+    overskrift("8. Quizzen");
     paastand("ti spoergsmaal", NK.QUIZ.length === 10);
     NK.QUIZ.forEach(function (sp, n) {
         var unikke = sp.valg.filter(function (v, k) { return sp.valg.indexOf(v) === k; }).length === 4;
@@ -235,7 +313,7 @@ function koerTest() {
         paastand("spoergsmaal " + (n + 1) + ": fire forskellige svar, blandingen holder styr paa det rigtige", sp.valg.length === 4 && unikke && !!sp.forklaring && blandOk);
     });
 
-    overskrift("8. Sprog og notation");
+    overskrift("9. Sprog og notation");
     var tekster = [d.body.textContent];
     NK.QUIZ.forEach(function (sp) { tekster.push(sp.sp, sp.forklaring, sp.valg.join(" ")); });
     NK.TRIN.forEach(function (t) { tekster.push(t.tekst, t.hint); });
@@ -244,6 +322,7 @@ function koerTest() {
     var alt = tekster.join(" ");
     paastand("ingen tankestreger", !/[—–]/.test(alt));
     paastand("ingen ladning skrevet som 1+ eller 1−", !/[¹][⁺⁻]|[A-Za-z)\]₀-₉]1[+−-]/.test(alt));
+    paastand("intet bægerglas, hvor der skal stå petriskål", !/tom(t|me) bægerglas|bægerglas med rest/.test(alt));
     paastand("Na⁺ og Cl⁻ i zoomboblen", NK.Mikro.NAVNE.na === "Na⁺" && NK.Mikro.NAVNE.cl === "Cl⁻");
 
     nyt();

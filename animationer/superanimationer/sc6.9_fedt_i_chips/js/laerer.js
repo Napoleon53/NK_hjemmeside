@@ -37,14 +37,15 @@
             x: UDE, maalX: UDE, y: 392, loeb: false, gang: 0,
             scene: null,
             tale: "", taleUr: 0, taleAlfa: 0, taleLaengde: 0,
-            vrede: 0.5, humoer: -0.5, roed: 0,
-            vredeMaal: 0.5, humoerMaal: -0.5, roedMaal: 0,
+            vrede: 0.5, humoer: -0.5, roed: 0, skeptisk: 0,
+            vredeMaal: 0.5, humoerMaal: -0.5, roedMaal: 0, skeptiskMaal: 0,
             aaben: 0, blinkUr: 2, blink: 0, nik: 0, damp: 0,
             arm: HAENGER, armFra: HAENGER, armTil: HAENGER,
             baerer: null, klik: 0, plakatRegel: 0, rost: false,
             spiseHaand: null, dampe: []
         };
         this.spist = 0;
+        this.antalAmok = 0;
         this.poseTaget = false;
     };
 
@@ -200,6 +201,38 @@
         if (NK.Lyd) NK.Lyd.mumle(Math.max(1, Math.min(8, Math.round(tekst.length / 5))));
     };
 
+    /* ----- Morteren: eleven gaar amok ------------------------------------ */
+    var MORTER_SVAR = [
+        "Det er en morter. Ikke et trommesæt.",
+        "Chipsene har ikke gjort dig noget.",
+        "Skal jeg hente en forhammer til dig?",
+        "Imponerende. Nu er der chips på hele bordet.",
+        "Jeg går ud fra, at det er et nyt forskningsprojekt."
+    ];
+
+    P.laererMorter = function () {
+        var L = this.laerer;
+        if (!L || L.scene || L.spiseHaand) return false;
+        this.antalAmok++;
+        this.stopArbejde();
+        this.holdt = null;
+        var n = (this.antalAmok - 1) % MORTER_SVAR.length;
+        var tekst = MORTER_SVAR[n];
+        if (n === 3 && this.krummerUd === 0) tekst = "Imponerende. Morteren overlevede.";
+        this.laererKoer("morter", [
+            { udtryk: { vrede: 0.6, humoer: -0.2, roed: 0.1, skeptisk: 1 } },
+            { gaa: 240 },
+            { sig: tekst, vis: 3.2, tid: 0.3 },
+            { arm: 1.62, tid: 0.45 },
+            { tid: 2.4 },
+            { kald: function () { if (NK.Lyd) NK.Lyd.brum(); } },
+            { udtryk: { skeptisk: 0 } },
+            { arm: HAENGER, tid: 0.4 },
+            { gaa: UDE }
+        ]);
+        return true;
+    };
+
     /* ----- Ros ---------------------------------------------------------- */
     P.laererRos = function () {
         var L = this.laerer;
@@ -218,13 +251,11 @@
     /* ----- Branden ------------------------------------------------------- */
     P.startBrand = function () {
         if (this.uheld) return;
-        var b = this.g.baegerB;
-        this.uheld = { type: "brand", t: 0, ild: 0, slukket: false, slukketT: 0, taeppe: null, faerdig: false };
+        this.uheld ={ type: "brand", t: 0, ild: 0, slukket: false, slukketT: 0, taeppe: null, faerdig: false };
         this.alarm = true;
         this.alarmUr = 0;
         this.ryk = 9;
         if (NK.Lyd) NK.Lyd.sus();
-        this.iagttag("brand");
         this.besked("Heptandampene er antændt!", "advarsel");
         var L = this.laerer;
         L.scene = null;
@@ -233,7 +264,7 @@
         this.laererKoer("brand", [
             { tid: 0.5 },
             { udtryk: { vrede: 1, humoer: -1, roed: 0.3 } },
-            { gaa: 300, loeb: true },
+            { gaa: 330, loeb: true },
             { sig: "Træd tilbage!", vis: 1.4, tid: 0.2 },
             { arm: -1.4, tid: 0.3 },
             { kald: function () {
@@ -244,30 +275,30 @@
                 var tp = this.uheld.taeppe;
                 var e = NK.blod(t);
                 tp.x = NK.lerp(tp.fra.x, S.TREFOD.x, e);
-                tp.y = NK.lerp(tp.fra.y, 306, e) - Math.sin(Math.PI * e) * 90;
+                tp.y = NK.lerp(tp.fra.y, 360, e) - Math.sin(Math.PI * e) * 90;
                 tp.v = NK.lerp(-0.6, 0, e);
             } },
             { kald: function () {
                 var u = this.uheld;
                 u.taeppe.landet = true;
                 u.slukket = true;
-                this.flammeTaendt = false;
+                this.braenderTaendt = false;
                 this.ryk = 6;
                 if (NK.Lyd) NK.Lyd.dunk();
                 for (var i = 0; i < 22; i++) {
-                    this.roeg.push({ x: S.TREFOD.x + r(-60, 60), y: r(290, 330), vx: r(-40, 40), vy: -r(10, 60), r: r(8, 16), liv: 1, alfa: 0.45, farve: "#3a3c40", henfald: 0.4 });
+                    this.roeg.push({ x: S.TREFOD.x + r(-60, 60), y: r(330, 370), vx: r(-40, 40), vy: -r(10, 60), r: r(8, 16), liv: 1, alfa: 0.45, farve: "#3a3c40", henfald: 0.4 });
                 }
                 this.besked("Ilden er slukket.");
             } },
             { arm: HAENGER, tid: 0.4 },
             { tid: 1.1 },
             { udtryk: { vrede: 1, humoer: -1, roed: 0.9 } },
-            { sig: "Heptan og åben ild? Aldrig.", vis: 2.9, tid: 3.0 },
+            { sig: "Heptan og åben ild? Heller ikke i et stinkskab.", vis: 3.2, tid: 3.3 },
             { sig: "Brænderen tager jeg.", vis: 2.1, tid: 0.4 },
             { arm: 1.38, tid: 0.55 },
             { kald: function () {
                 this.braenderVaek = true;
-                this.g.baegerB.sted = "vaek";
+                this.g.skaal.sted = "vaek";
                 this.uheld.taeppe = null;
                 this.laerer.baerer = "brandbundt";
                 this.aendret("braender");
@@ -302,6 +333,7 @@
                 if (tr.udtryk.vrede !== undefined) L.vredeMaal = tr.udtryk.vrede;
                 if (tr.udtryk.humoer !== undefined) L.humoerMaal = tr.udtryk.humoer;
                 if (tr.udtryk.roed !== undefined) L.roedMaal = tr.udtryk.roed;
+                if (tr.udtryk.skeptisk !== undefined) L.skeptiskMaal = tr.udtryk.skeptisk;
                 sc.i++; sc.t = 0;
                 continue;
             }
@@ -337,6 +369,7 @@
         L.vrede = NK.mod(L.vrede, L.vredeMaal, 5, dt);
         L.humoer = NK.mod(L.humoer, L.humoerMaal, 5, dt);
         L.roed = NK.mod(L.roed, L.roedMaal, 3, dt);
+        L.skeptisk = NK.mod(L.skeptisk, L.skeptiskMaal, 5, dt);
         L.taleUr -= dt;
         L.taleAlfa = NK.mod(L.taleAlfa, L.taleUr > 0 ? 1 : 0, 12, dt);
         var taler = L.taleUr > 0 && this.tid - (L.taleStart || 0) < L.taleLaengde;
@@ -379,14 +412,14 @@
         var u = this.uheld;
         if (u && u.type === "brand") {
             u.t += dt;
-            var b = this.g.baegerB;
+            var sk = this.g.skaal;
             if (!u.slukket) {
                 u.ild = NK.mod(u.ild, 1, 6, dt);
-                b.areal = Math.max(0, b.areal - 260 * dt);
-                b.sod = Math.min(1, b.sod + dt * 0.6);
+                sk.fyld = Math.max(0, sk.fyld - 0.2 * dt);
+                sk.sod = Math.min(1, sk.sod + dt * 0.6);
                 this.sod = Math.min(1, this.sod + dt * 0.28);
                 if (Math.random() < dt * 14) {
-                    this.roeg.push({ x: S.TREFOD.x + r(-18, 18), y: 250 - r(0, 30), vx: r(-12, 12), vy: -r(30, 60), r: r(6, 11), liv: 1, alfa: 0.4, farve: "#2a2b2e", henfald: 0.3 });
+                    this.roeg.push({ x: S.TREFOD.x + r(-18, 18), y: 300 - r(0, 30), vx: r(-12, 12), vy: -r(30, 60), r: r(6, 11), liv: 1, alfa: 0.4, farve: "#2a2b2e", henfald: 0.3 });
                 }
             } else {
                 u.ild = NK.mod(u.ild, 0, 9, dt);
@@ -404,7 +437,7 @@
     P.tegnUheld = function (ctx, tid) {
         var u = this.uheld;
         if (!u || u.type !== "brand") return;
-        if (u.ild > 0.01) S.tegnIld(ctx, S.TREFOD.x, 314, u.ild, tid);
+        if (u.ild > 0.01) S.tegnIld(ctx, S.TREFOD.x, 386, u.ild, tid);
         var tp = u.taeppe;
         if (tp) NK.Sprites.tegnPositur(ctx, "brandtaeppe", { x: tp.x, y: tp.y, v: tp.v }, S.ANKER.brandtaeppe, 1, tp.landet ? 1 : 0.7);
     };
@@ -464,23 +497,24 @@
         ctx.arc(70, 56, 6, Math.PI * 1.1, Math.PI * 1.45);
         ctx.stroke();
         /* Bryn: vrede saenker de inderste ender */
-        var v = L.vrede, hm = Math.max(0, L.humoer);
+        /* Skeptisk: det hoejre bryn loeftes, og munden bliver skaev */
+        var v = L.vrede, hm = Math.max(0, L.humoer), sk = L.skeptisk || 0;
         ctx.strokeStyle = "#6d737a";
         ctx.lineWidth = 4.2;
         ctx.lineCap = "round";
         ctx.beginPath();
-        ctx.moveTo(24, 42 + v * 1 - hm * 2);
-        ctx.lineTo(47, 42 + v * 8 - hm * 3);
-        ctx.moveTo(86, 42 + v * 1 - hm * 2);
-        ctx.lineTo(63, 42 + v * 8 - hm * 3);
+        ctx.moveTo(24, 42 + v * 1 - hm * 2 + sk * 2);
+        ctx.lineTo(47, 42 + v * 8 - hm * 3 + sk * 2);
+        ctx.moveTo(86, 42 + v * 1 - hm * 2 - sk * 11);
+        ctx.lineTo(63, 42 + v * 8 - hm * 3 - sk * 7);
         ctx.stroke();
         /* Mund under overskaegget */
         var h = L.humoer;
         ctx.strokeStyle = "#7a3b2e";
         ctx.lineWidth = 2.4;
         ctx.beginPath();
-        ctx.moveTo(45, 98 - h * 2);
-        ctx.quadraticCurveTo(55, 98 + h * 7, 65, 98 - h * 2);
+        ctx.moveTo(45, 98 - h * 2 + sk * 1.5);
+        ctx.quadraticCurveTo(55, 98 + h * 7, 65, 98 - h * 2 - sk * 5);
         ctx.stroke();
         if (L.aaben > 0.05) {
             ctx.fillStyle = "#4a1f18";
