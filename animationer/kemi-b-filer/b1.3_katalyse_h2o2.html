@@ -131,7 +131,7 @@
             padding: 10px 22px;
             border-radius: 20px;
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 1.1rem;
             opacity: 0;
             transition: opacity 0.3s;
             pointer-events: none;
@@ -271,8 +271,6 @@
         .btn-test { background-color: var(--accent-green); color: #000; text-transform: uppercase; }
         .btn-test:hover { background-color: #27ae60; }
         .btn-test:disabled { background-color: #555; color: #888; cursor: not-allowed; }
-        .btn-reset { background-color: #444; color: #fff; text-transform: uppercase; }
-        .btn-reset:hover { background-color: #555; }
 
         .btn-splint {
             background: rgba(243, 156, 18, 0.15);
@@ -326,10 +324,14 @@
         }
 
         /* Infokort om det valgte glas */
-        #tube-card h4 { font-size: 1rem; margin-bottom: 6px; color: #fff; }
+        /* Forsøget: panelets tekst et trin større end i de andre visninger */
+        #grp-card h3 { font-size: 0.95rem; }
+        #grp-card .btn-tube { font-size: 0.88rem; }
+        #grp-card .btn-splint { font-size: 1.05rem; }
+        #tube-card h4 { font-size: 1.1rem; margin-bottom: 6px; color: #fff; }
         .badge {
             display: inline-block;
-            font-size: 0.7rem;
+            font-size: 0.78rem;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 0.6px;
@@ -340,8 +342,7 @@
         .badge-het { background: rgba(243,156,18,0.18); color: #f5c069; border: 1px solid rgba(243,156,18,0.5); }
         .badge-hom { background: rgba(52,152,219,0.18); color: #8ecdf5; border: 1px solid rgba(52,152,219,0.5); }
         .badge-ingen { background: rgba(158,158,158,0.15); color: #bbb; border: 1px solid #555; }
-        .card-line { font-size: 0.86rem; line-height: 1.5; margin-bottom: 8px; }
-        .card-line b { color: #fff; }
+        .badge-enzym { background: rgba(46,204,113,0.15); color: #7ee2a8; border: 1px solid rgba(46,204,113,0.5); }
 
         /* Forklaringspopup */
         #modal-baggrund {
@@ -375,7 +376,7 @@
             margin-bottom: 6px;
         }
 
-        #modal-titel { font-size: 1.15rem; color: #fff; }
+        #modal-titel { font-size: 1.25rem; color: #fff; }
 
         .btn-modal-luk {
             flex: 0 0 auto;
@@ -389,13 +390,13 @@
         }
         .btn-modal-luk:hover { border-color: #888; color: #fff; }
 
-        #modal-indhold p { font-size: 0.92rem; line-height: 1.6; margin-bottom: 12px; }
+        #modal-indhold p { font-size: 1rem; line-height: 1.6; margin-bottom: 12px; }
         #modal-indhold b { color: #fff; }
         #modal-indhold p.mek-tip {
             margin-top: 16px;
             padding-top: 12px;
             border-top: 1px solid #3a3a44;
-            font-size: 0.86rem;
+            font-size: 0.94rem;
             color: var(--text-muted);
         }
         #modal-indhold p.mek-tip b { color: #9ed2f0; }
@@ -481,14 +482,6 @@
         <div id="controls">
 
             <!-- ===== VISNING 1: FORSØGET ===== -->
-            <div class="control-group" id="grp-forsog">
-                <h3>Udfør forsøget</h3>
-                <div class="btn-row" style="margin-bottom:10px;">
-                    <button class="btn-reset" onclick="nulstilForsog()">Nulstil forsøget</button>
-                </div>
-                <p class="hint" style="margin-top:0;">Vælg et glas i stativet, og tilsæt katalysator dér.</p>
-            </div>
-
             <div class="control-group" id="grp-card">
                 <h3>Valgt reagensglas</h3>
                 <div class="tube-picker" id="tube-picker"></div>
@@ -553,9 +546,7 @@
             type: 'heterogen',
             badgeTekst: 'Heterogen katalyse',
             rate: 1.0,
-            kilde: 'korn',
-            sker: 'Kraftig, øjeblikkelig bruse. Boblerne dannes <b>på selve kornene</b> af det sorte pulver, og glasset bliver varmt.',
-        },
+            kilde: 'korn',        },
         {
             id: 'ki',
             kort: 'KI (aq)',
@@ -564,20 +555,16 @@
             type: 'homogen',
             badgeTekst: 'Homogen katalyse',
             rate: 0.65,
-            kilde: 'overalt',
-            sker: 'Bruser overalt i væsken, og opløsningen bliver gullig-brun (spor af I₂). Boblerne dannes i <b>hele volumenet</b> &ndash; ikke kun ét sted.',
-        },
+            kilde: 'overalt',        },
         {
             id: 'frisk',
             kort: 'Frisk kartoffel',
             navn: 'H₂O₂ + frisk kartoffel',
-            under: 'enzym i cellevæv',
-            type: 'heterogen',
+            under: 'katalase i cellevæv',
+            type: 'enzym',
             badgeTekst: 'Enzym (biokatalysator)',
             rate: 0.85,
-            kilde: 'kartoffel',
-            sker: 'Voldsom skumdannelse ud fra kartoffelstykkets overflade &ndash; skummet kan vokse op i glasset.',
-        },
+            kilde: 'kartoffel',        },
         {
             id: 'kogt',
             kort: 'Kogt kartoffel',
@@ -586,9 +573,7 @@
             type: 'ingen',
             badgeTekst: 'Katalysen er slået fra',
             rate: 0.06,
-            kilde: 'kartoffel',
-            sker: 'Stort set ingenting &ndash; ganske få bobler, ligesom hvis man slet ikke havde tilsat noget.',
-        }
+            kilde: 'kartoffel',        }
     ];
 
     /* Henviser fra forklaringen videre til den tilsvarende mekanisme */
@@ -845,9 +830,6 @@
         ctx.fillStyle = '#16161b';
         ctx.fillRect(0, 0, LW, LH);
 
-        tekst('Klik på et glas for at vælge det · Læg mærke til HVOR i glasset boblerne dannes',
-              LW / 2, 34, '#c5c5d1', 16);
-
         /* Stativets bagerste tværstang */
         ctx.fillStyle = '#3a3028';
         ctx.fillRect(48, 352, LW - 96, 20);
@@ -884,7 +866,7 @@
             ctx.strokeStyle = 'rgba(52,152,219,0.75)';
             ctx.lineWidth = 2;
             ctx.setLineDash([7, 5]);
-            rundtRekt(cx - 70, 62, 140, 412, 12);
+            rundtRekt(cx - 90, 40, 180, 434, 12);
             ctx.stroke();
             ctx.restore();
         }
@@ -898,11 +880,12 @@
         }
 
         /* Etiketter over glasset */
-        tekst('GLAS ' + (i + 1), cx, 80, '#c5c5d1', 13, 'center', true);
-        tekst(t.kort, cx, 103, '#ffffff', 17, 'center', true);
-        const badgeFarve = t.type === 'homogen' ? '#8ecdf5' : (t.type === 'heterogen' ? '#f5c069' : '#c5c5d1');
-        tekst(t.type === 'ingen' ? 'ingen katalysator' : t.type + ' katalyse', cx, 125, badgeFarve, 13);
-        tekst(t.under, cx, 144, '#c5c5d1', 12);
+        tekst('GLAS ' + (i + 1), cx, 58, '#c5c5d1', 15, 'center', true);
+        tekst(t.kort, cx, 85, '#ffffff', 19, 'center', true);
+        const badgeFarve = { homogen: '#8ecdf5', heterogen: '#f5c069', enzym: '#7ee2a8' }[t.type] || '#c5c5d1';
+        const typeTekst = { homogen: 'homogen katalyse', heterogen: 'heterogen katalyse', enzym: 'enzym', ingen: 'ingen katalysator' }[t.type];
+        tekst(typeTekst, cx, 111, badgeFarve, 15);
+        tekst(t.under, cx, 134, '#c5c5d1', 14);
 
         /* Væske (klippet til glassets indre) */
         ctx.save();
@@ -939,7 +922,7 @@
             rundtRekt(cx - 33, 300, 66, 40, 9);
             ctx.fill();
             ctx.stroke();
-            tekst(frisk ? 'frisk' : 'kogt', cx, 320, frisk ? '#7a6828' : '#7d7666', 11, 'center', true);
+            tekst(frisk ? 'frisk' : 'kogt', cx, 320, frisk ? '#7a6828' : '#7d7666', 13, 'center', true);
         }
 
         /* Hvor foregår reaktionen? Heterogen: kun ved overfladen. Homogen: i hele væsken. */
