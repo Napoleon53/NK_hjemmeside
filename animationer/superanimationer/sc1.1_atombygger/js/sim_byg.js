@@ -396,7 +396,7 @@
        bede om én, saa opgaven ikke bare dukker op uopfordret. */
     NK.SimByg.prototype.visOpgaveStart = function () {
         this.opgave = null;
-        NK.saetTekst("byg-opgave", "Løs " + MAAL_RIGTIGE + " opgaver rigtigt for at gennemføre runden. Et hint tæller stadig med, men et afsløret svar gør ikke. Tryk på “Start opgave” for at komme i gang.");
+        NK.saetTekst("byg-opgave", "Løs " + MAAL_RIGTIGE + " opgaver rigtigt for at gennemføre runden. Tryk på “Start opgave” for at komme i gang.");
         NK.saetKlasse("byg-opgave", "besked");
         NK.el("byg-opgave-taeller").style.display = "";
         NK.saetTekst("byg-opgave-taeller", this.rigtige + "/" + MAAL_RIGTIGE);
