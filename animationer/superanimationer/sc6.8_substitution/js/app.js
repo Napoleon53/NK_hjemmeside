@@ -14,6 +14,7 @@
     var sidsteSignatur = "";
     var beskedUr = null;
     var hintTrin = "";
+    var serieSet = false;
 
     /* ----- Forloebet ---------------------------------------------------- */
     function opdaterPanel() {
@@ -50,6 +51,9 @@
         rk.classList.toggle("aktiv", f.rystKilde === "knap");
 
         opdaterResultater();
+        NK.el("serieknap").hidden = !f.gjort.affald;
+        NK.saetTekst("serie-tekst", f.gjort.affald ? "Forsøget er slut." : "Låses op, når forsøget er slut.");
+        NK.el("serieknap").classList.toggle("banker", !!f.gjort.affald && !serieSet);
         quiz.saetLaast(!f.testsFaerdige());
         sidsteSignatur = signatur();
     }
@@ -102,7 +106,7 @@
         }).join(";");
         return [
             t ? t.id : "", !!f.handling, f.rystKilde, f.kanRysteNu(), f.valgt, f.lampeTaendt, f.udsugning, glas,
-            NK.TRIN.map(function (x) { return f.trinGjort(x.id) ? 1 : 0; }).join("")
+            NK.TRIN.map(function (x) { return f.trinGjort(x.id) ? 1 : 0; }).join(""), !!f.gjort.affald
         ].join("|");
     }
 
@@ -115,30 +119,14 @@
         NK.el("hint-knap").classList.remove("banker");
     }
 
-    /* ----- Iagttagelser -------------------------------------------------- */
-    function iagttagelse(i) {
-        var ul = NK.el("iagttagelse-liste");
-        var tom = ul.querySelector(".tom");
-        if (tom) tom.remove();
-        var li = document.createElement("li");
-        if (i.noegle === "uheld") li.className = "uheld";
-        var farve = document.createElement("span");
-        farve.className = "farve" + (i.farve ? "" : " farveloes");
-        if (i.farve) farve.style.backgroundColor = NK.css({ r: i.farve.r, g: i.farve.g, b: i.farve.b, a: 1 });
-        li.appendChild(farve);
-        var tekst = document.createElement("span");
-        tekst.textContent = i.tekst;
-        li.appendChild(tekst);
-        ul.appendChild(li);
-    }
-
-    function rydIagttagelser() {
-        var ul = NK.el("iagttagelse-liste");
-        ul.innerHTML = "";
-        var li = document.createElement("li");
-        li.className = "tom";
-        li.textContent = "Endnu ingen.";
-        ul.appendChild(li);
+    /* ----- Tegneserien --------------------------------------------------- */
+    function aabnSerie() {
+        if (!forsoeg.gjort.affald) return;
+        serieSet = true;
+        NK.Rundvisning.luk();
+        NK.Tegneserie.byg(forsoeg, NK.el("serie-ruder"));
+        NK.el("tegneserie").classList.add("vis");
+        NK.el("serieknap").classList.remove("banker");
     }
 
     /* ----- Beskeden paa scenen ------------------------------------------ */
@@ -181,7 +169,7 @@
         forsoeg.stopRyst();
         forsoeg.holdt = null;
         forsoeg.nulstil();
-        rydIagttagelser();
+        serieSet = false;
         NK.el("hint-tekst").hidden = true;
         opdaterPanel();
     }
@@ -191,7 +179,7 @@
         if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
         if (e.ctrlKey || e.metaKey || e.altKey) return;
 
-        if (e.key === "Escape") { lukOverlay(); NK.Rundvisning.luk(); return; }
+        if (e.key === "Escape") { lukOverlay(); NK.Rundvisning.luk(); forsoeg.lukStor(); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") {
             if (NK.Rundvisning.aktiv()) NK.Rundvisning.luk();
             else { lukOverlay(); NK.Rundvisning.start(); }
@@ -205,6 +193,7 @@
         else if (e.key === "i" || e.key === "I") visHint();
         else if (e.key === "m" || e.key === "M") skiftLyd();
         else if (e.key === "t" || e.key === "T") aabnTeori();
+        else if (e.key === "s" || e.key === "S") aabnSerie();
     }
 
     function tastOp(e) {
@@ -242,7 +231,6 @@
 
         forsoeg.vedAendring = function () { if (quiz) opdaterPanel(); };
         forsoeg.vedBesked = besked;
-        forsoeg.vedIagttagelse = iagttagelse;
 
         var rk = NK.el("ryst-knap");
         rk.addEventListener("pointerdown", function (e) {
@@ -258,6 +246,10 @@
         NK.el("forfraknap").addEventListener("click", startForfra);
         NK.el("teoriknap").addEventListener("click", aabnTeori);
         NK.el("teori-luk").addEventListener("click", lukOverlay);
+        NK.el("serieknap").addEventListener("click", aabnSerie);
+        NK.el("serie-luk").addEventListener("click", lukOverlay);
+        NK.el("tegneserie").addEventListener("click", function (e) { if (e.target === this) lukOverlay(); });
+        NK.aabnSerie = aabnSerie;
         NK.el("teori").addEventListener("click", function (e) { if (e.target === this) lukOverlay(); });
         NK.el("lydknap").addEventListener("click", skiftLyd);
         NK.el("hjaelpknap").addEventListener("click", function () { lukOverlay(); NK.Rundvisning.start(); });

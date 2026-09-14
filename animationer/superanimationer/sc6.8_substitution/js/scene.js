@@ -35,6 +35,7 @@
         folie:       { x: 38, y: 22 },
         dunk:        { x: 45, y: 12 },
         kaffekop:    { x: 18, y: 40 },
+        heks:        { x: 32, y: 72 },
         papir:       { x: 36, y: 22 },
         laererKrop:  { x: 110, y: 18 },
         laererHoved: { x: 55, y: 126 },
@@ -56,7 +57,7 @@
     S.DUNK = { x: 875, y: S.BORD - 130, aabning: { x: 920, y: S.BORD - 118 } };
     S.PANEL = { x: 770, y: 6 };
     S.KONTAKT = { x0: 770 + 150, x1: 770 + 206, y0: 6 + 8, y1: 6 + 70 };
-    S.HYLDE = { x0: 16, x1: 116, y: 268 };
+    S.HYLDE = { x0: 16, x1: 156, y: 268 };
     S.UR = { x: 160, y: 186, r: 24 };
     S.LAAG_PAA_BORD = { x: 18, y: S.BORD, v: 0 };
 
@@ -70,12 +71,17 @@
         prop1:      staar("prop", 490),
         prop2:      staar("prop", 518),
         folie:      staar("folie", 590),
-        kaffekop:   staar("kaffekop", 60, S.HYLDE.y)
+        kaffekop:   staar("kaffekop", 50, S.HYLDE.y),
+        heks:       staar("heks", 116, S.HYLDE.y)
     };
     S.UNDER_LAMPE = { x: S.HOLDER.midt, y: S.GLAS_Y, v: 0 };
 
     /* Zoomboblen og det punkt paa glasset, luppen sidder paa */
     S.BOBLE = { x: 530, y: 200, r: 98 };
+
+    /* Den store visning af reaktionen: boblen fylder scenen, og lampens
+       skaerm anes i toppen. */
+    S.STOR = { x: 500, y: 314, r: 232 };
     S.LUP = { x: 15, y: 118 };
 
     /* ----- Indersider (lokale koordinater) ------------------------------ */
@@ -637,6 +643,56 @@
         ctx.beginPath();
         ctx.ellipse(pyt.x - pyt.rx * 0.2, S.BORD + 1.5, pyt.rx * 0.4, 1.3, 0, 0, Math.PI * 2);
         ctx.fill();
+        ctx.restore();
+    };
+
+    /* Lampens skaerm i toppen af den store visning. taendt: 0-1 */
+    S.tegnStorLampe = function (ctx, cx, top, taendt, tid) {
+        ctx.save();
+        if (taendt > 0.01) {
+            var flimmer = 1 - 0.03 * Math.sin(tid * 37);
+            ctx.globalAlpha = taendt * flimmer;
+            var g = ctx.createLinearGradient(0, top + 40, 0, top + 260);
+            g.addColorStop(0, "rgba(255, 236, 160, 0.4)");
+            g.addColorStop(1, "rgba(255, 236, 160, 0)");
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.moveTo(cx - 92, top + 42);
+            ctx.lineTo(cx + 92, top + 42);
+            ctx.lineTo(cx + 190, top + 260);
+            ctx.lineTo(cx - 190, top + 260);
+            ctx.closePath();
+            ctx.fill();
+            ctx.globalAlpha = 1;
+        }
+        var s = ctx.createLinearGradient(cx - 100, 0, cx + 100, 0);
+        s.addColorStop(0, "#1f2329");
+        s.addColorStop(0.3, "#6b7480");
+        s.addColorStop(0.55, "#4a525c");
+        s.addColorStop(1, "#1a1d22");
+        ctx.fillStyle = s;
+        ctx.beginPath();
+        ctx.moveTo(cx - 40, top - 30);
+        ctx.lineTo(cx + 40, top - 30);
+        ctx.lineTo(cx + 100, top + 40);
+        ctx.lineTo(cx - 100, top + 40);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = "#0f1216";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.fillStyle = "#0f1216";
+        ctx.beginPath();
+        ctx.ellipse(cx, top + 40, 100, 14, 0, 0, Math.PI * 2);
+        ctx.fill();
+        if (taendt > 0.01) {
+            NK.skaer(ctx, cx, top + 40, 70, "rgba(255, 240, 190, 0.95)", taendt);
+            ctx.globalAlpha = taendt;
+            ctx.fillStyle = "#fff6d6";
+            ctx.beginPath();
+            ctx.ellipse(cx, top + 40, 72, 9, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
         ctx.restore();
     };
 

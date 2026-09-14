@@ -47,11 +47,11 @@
         { id: "reageret", tekst: "Vent, til farven i lyset er væk", mark: "lampe",
           hint: "Lampen skal være tændt. Følg med i luppen, mens uret går." },
         { id: "ph", tekst: "Test vandfasen i begge glas med pH-papir", mark: "phpapir",
-          hint: "Klik på æsken med pH-papir. Strimlen dyppes i vandfasen i det valgte glas. Klik på et glas for at vælge det." },
+          hint: "Klik på æsken med pH-papir. Strimlen dyppes i vandfasen, og folien tages af, når glasset i mørke testes." },
         { id: "agno3", tekst: "Dryp AgNO₃ i begge glas", mark: "agno3",
           hint: "Klik på dråbeflasken tre gange for hvert glas. Hold øje med vandfasen." },
-        { id: "affald", tekst: "Aflever resterne", mark: "dunk",
-          hint: "Bromhexan er halogenholdigt organisk affald. Klik på dunken." }
+        { id: "affald", tekst: "Hæld resterne i affaldsdunken", mark: "dunk",
+          hint: "Klik på den brune dunk til højre. Bromhexan er halogenholdigt organisk affald." }
     ];
     NK.TRIN = TRIN;
 
@@ -188,7 +188,15 @@
 
         this.bobleAlfa = 0;
         this.bobleGlas = null;
+        this.stor = null;
+        this.storAlfa = 0;
+        this.tidFart = 1;
+        this.tidFartUr = 0;
+        this.lampeTomUr = 0;
+        this.lampeSlukTid = 0;
+        this.kontrolFoer = false;
         if (this.laererNyt) this.laererNyt();
+        if (this.heksNyt) this.heksNyt();
         if (NK.Lyd) NK.Lyd.udsugning(false);
         this.aendret("nulstil");
     };
@@ -260,6 +268,12 @@
     P.aktueltTrin = function () {
         for (var i = 0; i < TRIN.length; i++) if (!this.trinGjort(TRIN[i].id)) return TRIN[i];
         return null;
+    };
+
+    /* Et saerlig godt forsoeg: ingen uheld, kontrolglasset pakket ind i
+       tide, og lampen hoejst slukket kort undervejs. */
+    P.flotUdfoert = function () {
+        return this.antalUheld === 0 && this.kontrolFoer && this.lampeSlukTid < M.FLOT.slukTid;
     };
 
     P.testsFaerdige = function () {
@@ -374,6 +388,7 @@
         switch (navn) {
             case "kaffekop": return this.klikKop ? this.klikKop() : false;
             case "glas1": case "glas2":
+                if (this.g[navn].folie) return this.klik("glasfolie");
                 this.vaelg(navn);
                 this.besked("Glas " + this.g[navn].nr + " er valgt.");
                 return true;
@@ -381,6 +396,14 @@
             case "hexan": return this.proevHexan();
             case "prop1": case "prop2": return this.proevProp(navn);
             case "lampe": case "holder": return this.proevLampe();
+            case "lampekontakt": return this.skiftLampe();
+            case "ur": return this.skiftTid();
+            case "boble": return this.skiftStor();
+            case "heks": return this.klikHeks ? this.klikHeks() : false;
+            case "glasfolie":
+                this.besked(this.gjort.reageret ? "Glasset er pakket ind. Klik på pH-papiret eller AgNO₃, så tages folien af." : "Glasset er pakket ind. Vent, til farven i lyset er væk.");
+                if (this.gjort.reageret) this.markér(this.andetGlas(this.valgtGlas()).ph === null && this.valgtGlas().ph === null ? "phpapir" : "agno3", 4);
+                return false;
             case "folie": return this.proevFolie();
             case "phpapir": return this.proevPH();
             case "agno3": return this.proevAgNO3();
@@ -492,13 +515,63 @@
         return true;
     };
 
+    /* Kontakten paa lampens fod taender og slukker, uanset hvad der staar
+       under den. */
+    P.skiftLampe = function () {
+        this.lampeTaendt = !this.lampeTaendt;
+        if (NK.Lyd) NK.Lyd.kontakt();
+        var under = this.glasVed("lampe");
+        if (this.lampeTaendt && under) this.gjort.lys = true;
+        this.besked(this.lampeTaendt ? (under ? "Lampen er tændt." : "Lampen er tændt, men der står ikke noget under den.") : "Lampen er slukket.");
+        this.aendret("lampe");
+        return true;
+    };
+
+    /* Uret: et klik faar tiden til at gaa hurtigere et stykke tid */
+    P.skiftTid = function () {
+        if (this.tidFart > 1) {
+            this.tidFart = 1;
+            this.tidFartUr = 0;
+            this.besked("Tiden går normalt igen.");
+        } else {
+            this.tidFart = M.UR.hurtig;
+            this.tidFartUr = M.UR.hurtigTid;
+            this.besked("Tiden går hurtigere.");
+        }
+        if (NK.Lyd) NK.Lyd.klik();
+        this.aendret("tid");
+        return true;
+    };
+
+    /* Den store visning af det valgte glas */
+    P.aabnStor = function (gl) {
+        if (!gl || !gl.brom) return false;
+        this.stor = gl;
+        this.vaelg(gl.navn);
+        this.besked("Klik hvor som helst for at lukke den store visning.");
+        this.aendret("stor");
+        return true;
+    };
+
+    P.lukStor = function () {
+        if (!this.stor) return false;
+        this.stor = null;
+        this.aendret("stor");
+        return true;
+    };
+
+    P.skiftStor = function () {
+        if (this.stor) return this.lukStor();
+        return this.aabnStor(this.valgtGlas());
+    };
+
     P.proevFolie = function () {
         var v = this.valgtGlas(), mig = this;
-        if (v.folie) { this.folieAf(v); return true; }
         var g = this.maalGlas(function (gl) { return mig.klarTilLys(gl); });
         if (!g) {
             var a = this.andetGlas(v);
-            if (v.sted === "lampe" && a.folie) this.besked("Glasset under lampen skal ikke pakkes ind. Det andet glas er i folie.");
+            if (v.folie || a.folie) this.besked("Det ene glas er i folie. Folien tages af, når glasset testes.");
+            else if (v.sted === "lampe") this.besked("Glasset under lampen skal ikke pakkes ind.");
             else this.forklarIkkeKlar(v);
             return false;
         }
@@ -669,6 +742,7 @@
                 if (NK.Lyd) NK.Lyd.kontakt();
                 this.besked("Lampen er tændt. Følg med i farven.");
                 this.aendret("lys");
+                if (!this.gjort.storVist) { this.gjort.storVist = true; this.aabnStor(gl); }
             } }
         ], "lampe");
     };
@@ -693,7 +767,10 @@
                 gl.folie = true;
                 gl.folieVis = 1;
                 this.gjort.moerke = true;
+                if (!this.gjort.reageret) this.kontrolFoer = true;
                 this.besked("Glasset er pakket ind. Der kommer ikke lys til.");
+                var andet = this.andetGlas(gl);
+                if (andet.brom) this.vaelg(andet.navn);
                 this.aendret("moerke");
             } },
             hjemTil(fo, 0.8, 50)
@@ -865,7 +942,9 @@
         this.aendret("ryst");
     };
 
-    P.stopRyst = function () {
+    /* pt: hvor musen slap glasset. Slippes det over lampen eller stativet,
+       flyttes det derhen; ellers gaar det tilbage, hvor det kom fra. */
+    P.stopRyst = function (pt) {
         if (!this.rystKilde) return;
         var gl = this.rystGlas;
         this.rystKilde = null;
@@ -874,8 +953,22 @@
         this.musFart = 0;
         this.vold = 0;
         this.uro = 0;
-        if (gl && !this.handling) this.koer([{ flyt: gl, til: this.hjemFor(gl), tid: 0.35, loeft: 0 }], "hjem");
+        if (gl && !this.handling) this.slipGlas(gl, pt);
         this.aendret("ryst");
+    };
+
+    P.slipGlas = function (gl, pt) {
+        var overLampe = pt && pt.x > 630 && pt.x < 850 && pt.y > 262;
+        var overStativ = pt && pt.x > S.STATIV.x && pt.x < S.STATIV.x + 150 && pt.y > 300;
+        if (overLampe && gl.sted !== "lampe") {
+            if (this.glasVed("lampe")) this.besked("Der er kun plads til ét glas under lampen.");
+            else if (this.klarTilLys(gl)) { this.tilLampe(gl); return; }
+            else this.forklarIkkeKlar(gl);
+        } else if (overStativ && gl.sted === "lampe") {
+            this.tilStativ(gl);
+            return;
+        }
+        this.koer([{ flyt: gl, til: this.hjemFor(gl), tid: 0.35, loeft: 0 }], "hjem");
     };
 
     /* Knappen Ryst glasset (og tasten R): til = trykket ned */
@@ -992,7 +1085,7 @@
         var nHex = NK.klamp(Math.round(M.MAENGDE.BR2 * gl.brHex), 0, M.MAENGDE.BR2 - nReageret);
         var nVand = M.MAENGDE.BR2 - nReageret - nHex;
         return {
-            ryst: ryst, lys: lys, moerke: gl.folie,
+            ryst: ryst, lys: lys, moerke: gl.folie, stor: this.stor === gl,
             brHex: gl.brHex, brVand: gl.brVand,
             nHex: nHex, nVand: nVand, nReageret: nReageret
         };
@@ -1002,7 +1095,8 @@
         var i;
         if (dt > 0.1) dt = 0.1;
         this.tid += dt;
-        this.urMinutter += dt * M.UR.minPerSek;
+        var dtM = dt * this.tidFart;
+        this.urMinutter += dtM * M.UR.minPerSek;
         var g = this.g;
 
         this.opdaterHandling(dt);
@@ -1021,10 +1115,10 @@
             var lys = mig.lysStyrke(gl);
             var ryst = mig.rystGlas === gl ? mig.ryst : 0;
             var foerReag = gl.reageret, harHexBrom = gl.brom && gl.hexan;
-            M.skridt(gl, dt, ryst, lys);
+            M.skridt(gl, dtM, ryst, lys);
             if (harHexBrom) {
-                if (gl.sted === "lampe" && mig.lampeTaendt) gl.lysTid += dt * M.UR.minPerSek;
-                if (gl.folie) gl.moerkeTid += dt * M.UR.minPerSek;
+                if (gl.sted === "lampe" && mig.lampeTaendt) gl.lysTid += dtM * M.UR.minPerSek;
+                if (gl.folie) gl.moerkeTid += dtM * M.UR.minPerSek;
                 if (!gl.erRystet && M.fordelt(gl) >= M.FORDELING.faerdig) {
                     gl.erRystet = true;
                     mig.besked("Farven er flyttet op i hexanlaget.", "god");
@@ -1058,8 +1152,28 @@
 
         if (this.testsFaerdige() && !this.gjort.rost) {
             this.gjort.rost = true;
-            if (this.laererRos) this.laererRos();
+            if (this.flotUdfoert() && this.laererDab) this.laererDab();
+            else if (this.laererRos) this.laererRos();
+            this.markér("dunk", 6);
         }
+
+        /* Lampen taendt uden glas: efter et stykke tid kommer laereren */
+        if (this.lampeTaendt && !this.glasVed("lampe")) {
+            this.lampeTomUr += dt;
+            if (this.lampeTomUr > 20 && this.laererSlukLampe && this.laerer && !this.laerer.scene) { this.lampeTomUr = -60; this.laererSlukLampe(); }
+        } else {
+            this.lampeTomUr = Math.min(this.lampeTomUr, 0);
+        }
+        var under = this.glasVed("lampe");
+        if (under && !this.lampeTaendt && under.reageret > 0.03 && under.reageret < M.LYS.faerdig) this.lampeSlukTid += dt;
+
+        if (this.tidFart > 1) {
+            this.tidFartUr -= dt;
+            if (this.tidFartUr <= 0) { this.tidFart = 1; this.aendret("tid"); }
+        }
+        if (this.stor && (!this.stor.brom || this.stor.sted === "flytter")) this.stor = null;
+        this.storAlfa = NK.mod(this.storAlfa, this.stor ? 1 : 0, 7, dt);
+        if (this.opdaterHeks) this.opdaterHeks(dt);
 
         /* Draabeflasken svaever over glasset lidt tid og gaar saa hjem */
         var d = g.agno3;

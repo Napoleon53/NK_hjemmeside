@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="112" viewBox="0 0 130 56">
+  <!-- Haandkost. Boersternes midte forneden er (43, 54). -->
+  <defs>
+    <linearGradient id="trae" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9a766"/>
+      <stop offset="1" stop-color="#8f5d2a"/>
+    </linearGradient>
+  </defs>
+  <path d="M72 14 L122 10 Q129 10 129 17 Q129 24 122 24 L72 28 Z" fill="url(#trae)"/>
+  <circle cx="120" cy="17" r="3" fill="#3a2410"/>
+  <g stroke="#d8c08a" stroke-width="1.6" stroke-linecap="round">
+    <path d="M12 34 L10 54 M17 34 L16 54 M22 34 L21.5 54 M27 34 L27 54 M32 34 L32.5 54 M37 34 L38 54 M42 34 L43 54 M47 34 L48.5 54 M52 34 L54 54 M57 34 L59.5 54 M62 34 L65 54 M67 34 L70.5 54 M72 34 L76 54"/>
+  </g>
+  <g stroke="#b39a62" stroke-width="1" stroke-linecap="round">
+    <path d="M14.5 36 L13 53 M19.5 36 L19 53 M24.5 36 L24.5 53 M29.5 36 L30 53 M34.5 36 L35 53 M39.5 36 L40.5 53 M44.5 36 L46 53 M49.5 36 L51 53 M54.5 36 L57 53 M59.5 36 L62 53 M64.5 36 L68 53 M69.5 36 L73 53"/>
+  </g>
+  <rect x="8" y="18" width="70" height="17" rx="4" fill="url(#trae)"/>
+  <path d="M11 21 h64" stroke="#f0c98f" stroke-opacity="0.7" stroke-width="1.2"/>
+</svg>

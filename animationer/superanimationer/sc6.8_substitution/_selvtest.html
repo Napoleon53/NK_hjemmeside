@@ -60,6 +60,20 @@ function koerTest() {
     function g1() { return f.g.glas1; }
     function g2() { return f.g.glas2; }
     function komma(x) { return String(Math.round(x * 100) / 100).replace(".", ","); }
+    var musTid = 0;
+    /* Baerer et glas med musen fra dets plads til punktet (x, y) */
+    function baer(gl, x, y) {
+        var x0 = gl.p.x, y0 = gl.p.y + 80;
+        f.ned({ x: x0, y: y0 });
+        if (!f.holdt) return false;
+        for (var s = 1; s <= 40; s++) {
+            musTid += 40;
+            f.flyt({ x: x0 + (x - x0) * s / 40, y: y0 + (y - y0) * s / 40 }, musTid);
+            f.opdater(1 / 60);
+        }
+        f.op();
+        return true;
+    }
 
     overskrift("2. Modellen");
     paastand("substitutionen er afstemt", M.afstemt(M.REAKTIONER.substitution));
@@ -121,9 +135,17 @@ function koerTest() {
     paastand("Br2 er flyttet op i hexanen", f.rystet(g1()) && g1().brHex > 0.9 && g1().brVand < 0.1, komma(M.fordelt(g1())));
     paastand("fordelingen er noteret", f.iagttaget.fordelt);
     paastand("glasset er tilbage i stativet", Math.abs(g1().p.x - g1().hjem.x) < 2 && !f.rystKilde);
-    paastand("glas 1 stilles under lampen", f.klik("lampe") === true);
+    paastand("glas 1 baeres med musen hen til lampen", baer(g1(), 700, 400) && !f.antalUheld);
     adv(2);
     paastand("lampen er taendt, og glasset staar i holderen", g1().sted === "lampe" && f.lampeTaendt && f.gjort.lys && Math.abs(g1().p.x - S.UNDER_LAMPE.x) < 2);
+    paastand("den store visning aabner af sig selv foerste gang", f.stor === g1() && f.gjort.storVist);
+    adv(0.5);
+    paastand("partikelmodellen koerer langsomt i den store visning", g1().mikro.langsom > 1);
+    paastand("et klik lukker den store visning", f.ned({ x: 500, y: 300 }) === false && !f.stor);
+    adv(0.5);
+    paastand("et klik paa boblen aabner den igen", f.klik("boble") === true && f.stor === g1());
+    f.lukStor();
+    paastand("lampens kontakt slukker og taender", f.klik("lampekontakt") === true && !f.lampeTaendt && f.klik("lampekontakt") === true && f.lampeTaendt);
     paastand("boblen viser glas 1 under lampen", f.bobleGlas === g1() && f.bobleTitel(g1()).indexOf("lampen") > 0);
     paastand("lampen slukkes med et klik", f.klik("lampe") === true && !f.lampeTaendt);
     var foer = g1().reageret;
@@ -145,6 +167,9 @@ function koerTest() {
     paastand("glas 2 pakkes i folie", f.klik("folie") === true);
     adv(3);
     paastand("glas 2 er i folie, trin 5 gjort", g2().folie && g2().folieVis === 1 && f.gjort.moerke && !f.handling);
+    paastand("glas 1 er valgt igen efter indpakningen", f.valgt === "glas1");
+    paastand("et glas i folie kan ikke vaelges eller tages fat i", f.hvad({ x: g2().p.x, y: g2().p.y + 80 }) === "glasfolie" && f.klik("glasfolie") === false && f.valgt === "glas1" && f.ned({ x: g2().p.x, y: g2().p.y + 80 }) === false && !f.holdt);
+    paastand("folien tages ikke af med rullen", f.klik("folie") === false && g2().folie);
     paastand("knappen ryster glas 1 i stedet, fordi glas 2 er i folie", f.rystKnap(true) === true && f.rystGlas === g1());
     f.rystKnap(false);
     adv(1);
@@ -156,6 +181,7 @@ function koerTest() {
     paastand("farven i lyset er vaek inden 45 s", f.gjort.reageret && M.br2Tilbage(g1()) < 0.05, t + " s");
     paastand("glas 2 i folie er stadig orange", g2().reageret < 0.1 && M.br2Tilbage(g2()) > 0.85, komma(g2().reageret));
     paastand("iagttagelser om lyset", f.iagttaget.lys_start && f.iagttaget.lys_faerdig1);
+    paastand("forklaringen under boblen naevner ikke lys", g1().mikro.typer().indexOf("lys") < 0);
     var mk = g1().mikro;
     paastand("partikelmodellen har dannet H3O+ og Br−", mk.h3oAntal() >= 4 && mk.brAntal() >= 4 && mk.antal("br2") <= 1, mk.h3oAntal() + " H3O+, " + mk.brAntal() + " Br-");
     paastand("hexan er blevet til bromhexan", mk.antal("bromhexan") >= 4, mk.antal("bromhexan"));
@@ -183,19 +209,24 @@ function koerTest() {
     paastand("glas 2: ingen forandring", g2().agTest && g2().agNoteret && g2().mikro.agbrAndel() === 0 && f.iagttaget.ag_intet2);
     paastand("en fjerde draabe afvises", f.klik("agno3") === false);
     paastand("begge tests er gjort, quizzen er laast op", f.testsFaerdige() && NK.quiz.tilstand !== "laast");
-    paastand("laereren roser", f.laerer.rost);
+    paastand("forsoeget er gjort saerlig godt, og laereren dabber", f.flotUdfoert() && f.laerer.rost && f.laerer.scene && f.laerer.scene.navn === "dab");
+    paastand("tegneserien er laast foer forsoeget er slut", d.getElementById("serieknap").hidden);
     adv(8);
     paastand("resultatskemaet er udfyldt", d.getElementById("r1-ph").textContent.indexOf("pH") === 0 && d.getElementById("r2-ag").textContent.indexOf("ingen") === 0 && d.getElementById("r1-sted").textContent === "Lys" && d.getElementById("r2-sted").textContent === "Mørke", d.getElementById("r1-ph").textContent);
     paastand("resterne afleveres", f.klik("dunk") === true);
     adv(12);
     paastand("forsoeget er slut, glassene er tomme", f.gjort.affald && !g1().brom && !g2().brom && !f.handling && f.aktueltTrin() === null);
     paastand("alle ni trin er gjort", NK.TRIN.every(function (tr) { return f.trinGjort(tr.id); }));
+    paastand("tegneserien er laast op", !d.getElementById("serieknap").hidden);
+    NK.aabnSerie();
+    paastand("tegneserien har syv ruder med elevens tal", d.querySelectorAll("#serie-ruder .rude").length === 7 && d.getElementById("tegneserie").classList.contains("vis") && d.getElementById("serie-ruder").textContent.indexOf("pH ≈ 2") > 0);
+    d.getElementById("serie-luk").click();
+    paastand("tegneserien lukkes", !d.getElementById("tegneserie").classList.contains("vis"));
     paastand("udsugningen kan slukkes nu", f.klik("kontakt") === true && !f.udsugning);
 
     overskrift("5. Paaskeaegget: proppen springer af");
     var R = M.RYST;
     paastand("anden gang skal der rystes voldsommere, og hoejst 2 uheld", R.KNUS_FART[1] > R.KNUS_FART[0] && R.KNUS_TID[1] >= R.KNUS_TID[0] && R.MAKS_UHELD === 2);
-    var musTid = 0;
     function musRyst(gl, A, hz, sek, stop) {
         var x0 = gl.p.x, y0 = gl.p.y + 80, s;
         f.ned({ x: x0, y: y0 });
@@ -234,6 +265,7 @@ function koerTest() {
     paastand("laereren har toerret op og er gaaet", !f.pyt && !f.laererOptaget() && f.laerer.x < -200);
     paastand("proppen er tilbage paa bordet", !f.g.prop1.flyver && Math.abs(f.g.prop1.p.x - f.g.prop1.hjem.x) < 2);
     paastand("glas 1 kan fyldes igen", f.klik("bromflaske") === true);
+    paastand("uheldet udelukker et saerlig godt forsoeg", f.flotUdfoert() === false);
     adv(5);
     f.klik("hexan"); adv(4); f.klik("prop1"); adv(1.5);
     musRyst(g1(), 120, 8, 3);
@@ -245,11 +277,48 @@ function koerTest() {
     musRyst(g1(), 220, 10, 4);
     paastand("efter to uheld springer proppen ikke mere", f.antalUheld === 2 && f.knusGraense() === null && g1().prop);
 
-    overskrift("6. Kaffen og laereren");
+    overskrift("6. Kaffen, uret, lampen og heksen");
     frisk();
     paastand("laereren henter kaffen", f.klik("kaffekop") === true);
-    adv(10);
+    adv(1.5);
+    paastand("laereren siger, at der ikke drikkes i laboratoriet", f.laerer.tale.indexOf("drikkes") >= 0);
+    adv(12);
     paastand("koppen er vaek, og laereren er gaaet", f.g.kaffekop.skjult && !f.laererOptaget());
+    paastand("uret faar tiden til at gaa hurtigere", f.klik("ur") === true && f.tidFart === M.UR.hurtig);
+    var urFoer = f.urMinutter;
+    adv(2);
+    paastand("vaeguret loeber hurtigere", f.urMinutter - urFoer > 2 * M.UR.minPerSek * 3);
+    adv(M.UR.hurtigTid);
+    paastand("tiden gaar normalt igen", f.tidFart === 1);
+    paastand("lampen kan taendes paa kontakten uden glas", f.klik("lampekontakt") === true && f.lampeTaendt);
+    adv(21.5);
+    paastand("laereren kommer for at slukke lampen", f.laerer.scene && f.laerer.scene.navn === "sluklampe");
+    adv(12);
+    paastand("lampen er slukket, og laereren er gaaet", !f.lampeTaendt && !f.laererOptaget());
+    var H = f.heks;
+    paastand("heksen sidder paa hylden", !!H && f.hvad({ x: H.p.x, y: H.p.y - 30 }) === "heks");
+    paastand("heksen svarer", f.klik("heks") === true && H.tale.length > 0);
+    adv(3);
+    paastand("heksen flyver en tur", f.klik("heks") === true && !!H.flyver);
+    adv(2);
+    paastand("heksen er paa vej", Math.abs(H.p.x - S.HJEM.heks.x) > 50 && f.hvad({ x: S.HJEM.heks.x, y: S.HJEM.heks.y - 30 }) !== "heks");
+    adv(4);
+    paastand("heksen er hjemme igen", !H.flyver && Math.abs(H.p.x - S.HJEM.heks.x) < 1);
+    paastand("uden glas under lampen er der intet at forhekse", f.klik("heks") === true && H.tale.indexOf("intet") >= 0);
+    adv(3);
+    paastand("heksens remse", f.klik("heks") === true && H.tale.indexOf("fjorten") >= 0);
+    frisk();
+    f.klik("kontakt"); f.klik("bromflaske"); adv(5); f.klik("hexan"); adv(4); f.klik("prop1"); adv(1.5);
+    f.rystKnap(true); adv(4); f.rystKnap(false); adv(1);
+    f.klik("lampe"); adv(2); f.lukStor();
+    f.klik("heks"); adv(3); f.klik("heks"); adv(7);
+    paastand("heksen forhekser lampen", f.lampeTaendt && f.klik("heks") === true && !f.lampeTaendt && H.tale === "Mørke!");
+    adv(3);
+    f.klik("heks"); adv(3); f.klik("heks"); adv(3); f.klik("heks"); adv(6);
+    paastand("og taender den igen i naeste omgang", f.klik("heks") === true && f.lampeTaendt);
+    paastand("glasset kan baeres tilbage til stativet", baer(g1(), 395, 400));
+    adv(2);
+    paastand("glasset staar i stativet, og lampen er slukket", g1().sted === "stativ" && !f.lampeTaendt);
 
     overskrift("7. Quizzens spoergsmaal");
     paastand("quizzen har 10 spoergsmaal", NK.QUIZ.length === 10);
@@ -269,6 +338,7 @@ function koerTest() {
     NK.QUIZ.forEach(function (sp) { tekster.push(sp.sp, sp.forklaring, sp.valg.join(" ")); });
     NK.TRIN.forEach(function (tr) { tekster.push(tr.tekst, tr.hint); });
     Object.keys(NK.IAGTTAGELSER).forEach(function (k) { tekster.push(NK.IAGTTAGELSER[k].tekst); });
+    Object.keys(NK.HEKS_REPLIKKER).forEach(function (k) { tekster.push(String(NK.HEKS_REPLIKKER[k])); });
     Object.keys(NK.Mikro.ETIKET).forEach(function (k) { tekster.push(NK.Mikro.ETIKET[k]); });
     var alt = tekster.join(" ");
     paastand("ingen tankestreger", !/[—–]/.test(alt));

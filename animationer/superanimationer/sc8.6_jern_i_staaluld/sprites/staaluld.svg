@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="100" viewBox="0 0 90 50">
+  <!-- En pude ståluld på et stykke papir. Bundens midte er (45, 50). -->
+  <path d="M1 45 L89 42.5 L87 50 L3 50 Z" fill="#efe9d8" stroke="#c9c1aa" stroke-width="0.8" stroke-linejoin="round"/>
+  <path d="M6 46.5 L84 44.2" stroke="#ffffff" stroke-opacity="0.7" stroke-width="0.8"/>
+  <!-- Selve puden -->
+  <path d="M10 40 Q4 30 14 22 Q22 12 40 13 Q58 10 72 18 Q86 26 80 38 Q74 47 45 46 Q16 47 10 40 Z" fill="#6d757e"/>
+  <path d="M14 38 Q10 30 18 24 Q28 16 44 17 Q60 15 70 22 Q80 29 75 37 Q68 43 45 43 Q20 44 14 38 Z" fill="#838c96"/>
+  <g fill="none" stroke-linecap="round">
+    <g stroke="#c3cad2" stroke-width="0.9" stroke-opacity="0.9">
+      <path d="M14 30 Q24 18 36 26 Q46 34 58 22 Q66 14 76 26"/>
+      <path d="M12 36 Q22 28 30 36 Q40 44 50 34 Q60 24 72 34"/>
+      <path d="M20 22 Q30 30 40 20 Q52 10 62 20"/>
+      <path d="M26 40 Q34 32 44 40 Q56 48 66 38 Q72 32 78 36"/>
+      <path d="M18 27 Q14 34 22 38 M60 28 Q70 24 68 34 M38 30 Q46 24 50 30 Q52 36 44 36"/>
+    </g>
+    <g stroke="#4f565e" stroke-width="0.8" stroke-opacity="0.9">
+      <path d="M16 34 Q26 24 34 32 Q44 40 54 28 Q62 20 74 30"/>
+      <path d="M22 18 Q34 26 46 16 Q58 8 70 22"/>
+      <path d="M10 38 Q20 44 32 38 M56 42 Q66 36 76 40"/>
+      <path d="M30 24 Q24 30 30 34 Q38 36 36 28"/>
+    </g>
+    <g stroke="#e6ebf0" stroke-width="0.6" stroke-opacity="0.8">
+      <path d="M24 20 Q32 16 40 18 M50 16 Q58 14 64 18 M20 32 Q26 30 28 34"/>
+    </g>
+  </g>
+</svg>

@@ -53,9 +53,10 @@
             </table>
         </div>
 
-        <div class="kort" id="iagttagelser-kort">
-            <h2>Iagttagelser</h2>
-            <ul class="iagttagelser" id="iagttagelse-liste"><li class="tom">Endnu ingen.</li></ul>
+        <div class="kort" id="serie-kort">
+            <h2>Tegneserie</h2>
+            <p class="besked" id="serie-tekst">Låses op, når forsøget er slut.</p>
+            <button class="knap stor blaa" id="serieknap" type="button" hidden><span>Se forsøget som tegneserie</span><span class="tegn">→</span></button>
         </div>
 
         <div class="kort opgavekort" id="quiz-kort">
@@ -102,6 +103,17 @@
 </div>
 
 <!-- ================================================================= -->
+<div class="overlay" id="tegneserie">
+    <div class="overlay-boks bred">
+        <h2>Forsøget som tegneserie</h2>
+        <div class="serie" id="serie-ruder"></div>
+        <div class="knapper">
+            <button class="knap blaa" id="serie-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
 <div class="rundvisning" id="rundvisning" hidden>
     <div class="rundvisning-baggrund" id="rv-baggrund"></div>
     <div class="rundvisning-spot" id="rv-spot"></div>
@@ -128,6 +140,8 @@
 <script src="js/forsoeg.js"></script>
 <script src="js/bord.js"></script>
 <script src="js/laerer.js"></script>
+<script src="js/heks.js"></script>
+<script src="js/tegneserie.js"></script>
 <script src="js/quiz.js"></script>
 <script src="js/rundvisning.js"></script>
 <script src="js/app.js"></script>

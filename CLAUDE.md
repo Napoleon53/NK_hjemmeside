@@ -21,6 +21,13 @@ statiske sider i roden, downloads i `downloads/`.
 - Lav i stedet korte hints knyttet til den konkrete opgave — vis dem når eleven
   sidder fast, ikke som fast forklaringstekst før opgaven.
 
+## Superanimationer
+
+- Ingen løbende liste af iagttagelser i panelet. Forsøget opsummeres i stedet
+  som en tegneserie i en pop-up bag en knap, der først låses op, når forsøget
+  er slut (mønster: `sc6.8_substitution/js/tegneserie.js`).
+- Sidepanelet er 430 px bredt (`--panel-bredde` i `css/stil.css`).
+
 ## Layout
 
 - Kompakte layouts, få lag af overskrifter. Grupper i rammer med en lille,

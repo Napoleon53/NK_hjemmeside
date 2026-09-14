@@ -29,8 +29,12 @@
             var l = this.overLaerer(pt);
             if (l) return l;
         }
+        if (this.stor) return "stor";
         var K = S.KONTAKT;
         if (pt.x > K.x0 && pt.x < K.x1 && pt.y > K.y0 && pt.y < K.y1) return "kontakt";
+        if (Math.sqrt((pt.x - S.UR.x) * (pt.x - S.UR.x) + (pt.y - S.UR.y) * (pt.y - S.UR.y)) < S.UR.r + 6) return "ur";
+        if (this.bobleAlfa > 0.5 && Math.sqrt((pt.x - S.BOBLE.x) * (pt.x - S.BOBLE.x) + (pt.y - S.BOBLE.y) * (pt.y - S.BOBLE.y)) < S.BOBLE.r) return "boble";
+        if (this.heks && !this.heks.flyver && S.inden("heks", this.heks.p, A.heks, pt.x, pt.y, 4)) return "heks";
         var kop = g.kaffekop;
         if (!kop.skjult && !kop.iHaand && S.inden("kaffekop", kop.p, kop.anker, pt.x, pt.y, 6)) return "kaffekop";
 
@@ -42,7 +46,7 @@
         }
         for (i = 0; i < glas.length; i++) {
             var gl = g[glas[i]];
-            if (S.inden("reagensglas", gl.p, gl.anker, pt.x, pt.y, 6)) return gl.navn;
+            if (S.inden("reagensglas", gl.p, gl.anker, pt.x, pt.y, 6)) return gl.folie ? "glasfolie" : gl.navn;
         }
         for (i = 0; i < propper.length; i++) {
             var pr2 = g[propper[i]];
@@ -53,6 +57,8 @@
             var gg = g[navne[i]];
             if (S.inden(gg.sprite, gg.p, gg.anker, pt.x, pt.y, 5)) return gg.navn;
         }
+        var LK = S.LAMPE.kontakt;
+        if (Math.sqrt((pt.x - LK.x) * (pt.x - LK.x) + (pt.y - LK.y) * (pt.y - LK.y)) < 16) return "lampekontakt";
         var H = S.HOLDER;
         if (pt.x > H.x - 6 && pt.x < H.x + H.b + 6 && pt.y > H.y - 6 && pt.y < S.BORD + 2) return "holder";
         if (pt.x > 630 && pt.x < 850 && pt.y > 262 && pt.y < S.BORD + 2) return "lampe";
@@ -64,6 +70,7 @@
     /* ----- Mus og beroering --------------------------------------------- */
     P.ned = function (pt) {
         if (NK.Lyd) NK.Lyd.laasOp();
+        if (this.stor) { this.lukStor(); return false; }
         var navn = this.hvad(pt);
         if (!navn) return false;
         var optaget = this.laererOptaget && this.laererOptaget();
@@ -101,9 +108,9 @@
         this.musFart = NK.lerp(this.musFart, Math.sqrt(dx * dx + dy * dy) / dts, 0.35);
         h.sidst = pt;
         h.t = nu;
-        var hj = this.hjemFor(gl);
-        gl.p.x = NK.klamp(pt.x - h.dx, hj.x - 90, hj.x + 90);
-        gl.p.y = NK.klamp(pt.y - h.dy, hj.y - 80, hj.y);
+        /* Glasset foelger musen frit, saa det kan baeres hen til lampen */
+        gl.p.x = NK.klamp(pt.x - h.dx, 40, 960);
+        gl.p.y = NK.klamp(pt.y - h.dy, 110, S.GLAS_Y + 8);
     };
 
     P.op = function () {
@@ -111,7 +118,7 @@
         if (!h) return;
         this.holdt = null;
         if (!h.flyttet) { this.klik(h.navn); return; }
-        this.stopRyst();
+        this.stopRyst(h.sidst);
     };
 
     P.bindMus = function () {
@@ -208,6 +215,42 @@
         if (mark) S.tegnMarkering(ctx, S.rekt(gg.sprite, gg.p, gg.anker, 0), tid);
     };
 
+    /* Den store visning: scenen daempes, og boblen fylder den. Lampens
+       skaerm anes i toppen, naar glasset staar under lampen. */
+    P.tegnStor = function (ctx, tid) {
+        var a = this.storAlfa;
+        if (a < 0.01) return;
+        var gl = this.stor || this.sidsteStor;
+        if (!gl) return;
+        this.sidsteStor = gl;
+        var B = S.STOR;
+        ctx.save();
+        ctx.fillStyle = "rgba(4, 6, 12, " + (0.72 * a).toFixed(3) + ")";
+        ctx.fillRect(-2000, -2000, 5000, 5000);
+        var k = NK.blod(a);
+        var r = NK.lerp(S.BOBLE.r, B.r, k), x = NK.lerp(S.BOBLE.x, B.x, k), y = NK.lerp(S.BOBLE.y, B.y, k);
+        gl.mikro.tegn(ctx, { x: x, y: y, r: r }, a, this.bobleTitel(gl), tid);
+        if (gl.sted === "lampe") {
+            ctx.save();
+            ctx.globalAlpha = a;
+            ctx.beginPath();
+            ctx.arc(x, y, r - 2, 0, Math.PI * 2);
+            ctx.clip();
+            S.tegnStorLampe(ctx, x, y - r + 6, this.lampeVis, tid);
+            ctx.restore();
+        }
+        ctx.globalAlpha = a;
+        ctx.fillStyle = "rgba(20, 22, 28, 0.9)";
+        ctx.beginPath();
+        ctx.arc(x + r * 0.72, y - r * 0.72, 15, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        NK.tekst(ctx, "\u2715", x + r * 0.72, y - r * 0.72 + 1, { font: "700 15px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#dfe5ec" });
+        ctx.restore();
+    };
+
     P.bobleTitel = function (gl) {
         var t = "Glas " + gl.nr;
         if (gl.sted === "lampe") t += this.lampeTaendt ? " under lampen" : " under den slukkede lampe";
@@ -294,7 +337,9 @@
         S.tegnDraaber(ctx, this.draaber);
         for (i = 0; i < this.strimler.length; i++) S.tegnStrimmel(ctx, this.strimler[i]);
         S.tegnDampe(ctx, this.dampe);
+        if (this.tegnHeks) this.tegnHeks(ctx, tid);
         if (this.tegnLaerer) this.tegnLaerer(ctx, tid);
+        this.tegnStor(ctx, tid);
         ctx.restore();
     };
 }());

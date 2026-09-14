@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="92" height="240" viewBox="0 0 46 120">
+  <!-- Klar reagensflaske med 1 M svovlsyre. Laaget tegnes af animationen.
+       Aabningen er (23, 4). Faresymbol: GHS07 (irriterer hud og øjne). -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#cfe6f5" stop-opacity="0.5"/>
+      <stop offset="0.25" stop-color="#e8f4fb" stop-opacity="0.2"/>
+      <stop offset="0.75" stop-color="#e8f4fb" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#bcd8ea" stop-opacity="0.45"/>
+    </linearGradient>
+  </defs>
+  <path d="M5 44 L41 44 L41 112 Q41 117 36 117 L10 117 Q5 117 5 112 Z" fill="#eef4f8" fill-opacity="0.22"/>
+  <path d="M5 44 L41 44" stroke="#ffffff" stroke-opacity="0.45" stroke-width="1"/>
+  <path d="M16 4 L30 4 L30 22 Q30 28 38 32 Q43 35 43 42 L43 112 Q43 119 36 119 L10 119 Q3 119 3 112 L3 42 Q3 35 8 32 Q16 28 16 22 Z" fill="url(#glas)" stroke="#dcecf8" stroke-opacity="0.85" stroke-width="1.4" stroke-linejoin="round"/>
+  <path d="M8 46 L8 110" stroke="#ffffff" stroke-opacity="0.3" stroke-width="2.4" stroke-linecap="round"/>
+  <!-- Etiket -->
+  <rect x="6" y="54" width="34" height="54" rx="2.5" fill="#f7f5ee" stroke="#c8c1ae" stroke-width="0.7"/>
+  <rect x="6" y="54" width="34" height="5" rx="1.5" fill="#2f7fbf"/>
+  <text x="23" y="68" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="6.4" font-weight="800" fill="#1f2328">Svovlsyre</text>
+  <text x="23" y="77" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="6.5" font-weight="600" fill="#4a4f57">H<tspan font-size="4.8" dy="1.6">2</tspan><tspan dy="-1.6">SO</tspan><tspan font-size="4.8" dy="1.6">4</tspan></text>
+  <text x="23" y="87" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="7" font-weight="800" fill="#1f2328">1 M</text>
+  <!-- GHS07: udraabstegn -->
+  <g transform="translate(23 99)">
+    <rect x="-4.6" y="-4.6" width="9.2" height="9.2" transform="rotate(45)" fill="#ffffff" stroke="#d8342a" stroke-width="1.2"/>
+    <path d="M0 -3.4 L0 1" stroke="#111111" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="0" cy="3" r="0.8" fill="#111111"/>
+  </g>
+</svg>

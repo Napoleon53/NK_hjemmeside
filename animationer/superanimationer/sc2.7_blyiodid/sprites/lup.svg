@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 40 40">
+  <!-- Lup, der markerer, hvilket glas zoomboblen viser. Linsens midte er (15, 15). -->
+  <path d="M23 23 L36 36" stroke="#2b1a0c" stroke-width="7.5" stroke-linecap="round"/>
+  <path d="M23 23 L36 36" stroke="#8a5a2c" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="15" cy="15" r="11" fill="#a8d0f0" fill-opacity="0.28" stroke="#1d2129" stroke-width="5"/>
+  <circle cx="15" cy="15" r="11" fill="none" stroke="#e7ecf2" stroke-width="3"/>
+  <path d="M9 11 Q11 7 15 6.5" fill="none" stroke="#ffffff" stroke-opacity="0.85" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

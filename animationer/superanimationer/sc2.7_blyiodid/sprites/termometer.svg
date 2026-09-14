@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="168" viewBox="0 0 64 84">
+  <!-- Digitalt termometer. Displayet er x 8-56, y 18-40; tallene tegnes
+       af animationen. Ledningen sidder i (32, 3). -->
+  <defs>
+    <linearGradient id="krop" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#c98d1d"/>
+      <stop offset="0.3" stop-color="#f0b83a"/>
+      <stop offset="1" stop-color="#b57d16"/>
+    </linearGradient>
+  </defs>
+  <rect x="27" y="1" width="10" height="9" rx="2" fill="#3a3f46"/>
+  <rect x="2" y="8" width="60" height="76" rx="8" fill="url(#krop)"/>
+  <rect x="6" y="14.5" width="52" height="29" rx="3.5" fill="#1b1f24"/>
+  <rect x="8" y="17" width="48" height="24" rx="2" fill="#cfd9c4"/>
+  <text x="32" y="55" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="6" font-weight="700" fill="#3b2a08">TEMP</text>
+  <circle cx="21" cy="69" r="5" fill="#2a2f36"/>
+  <circle cx="43" cy="69" r="5" fill="#2a2f36"/>
+  <circle cx="19.8" cy="67.6" r="1.6" fill="#ffffff" fill-opacity="0.25"/>
+  <circle cx="41.8" cy="67.6" r="1.6" fill="#ffffff" fill-opacity="0.25"/>
+</svg>

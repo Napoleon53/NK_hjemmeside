@@ -14,26 +14,22 @@
 
     /* Navn: fil og stoerrelse i tegneenheder (viewBox). */
     var FILER = {
-        bromflaske:   { fil: "flaske_bromvand.svg", b: 80, h: 170 },
-        skruelaag:    { fil: "skruelaag.svg", b: 34, h: 22 },
-        hexan:        { fil: "flaske_hexan.svg", b: 46, h: 120 },
-        reagensglas:  { fil: "reagensglas.svg", b: 30, h: 160 },
-        stativ:       { fil: "stativ.svg", b: 150, h: 100 },
-        prop:         { fil: "prop_lille.svg", b: 26, h: 26 },
-        agno3:        { fil: "draabeflaske_agno3.svg", b: 46, h: 110 },
-        phpapir:      { fil: "phpapir.svg", b: 64, h: 34 },
-        lampe:        { fil: "lampe.svg", b: 220, h: 300 },
-        folie:        { fil: "alufolie.svg", b: 76, h: 44 },
-        dunk:         { fil: "affaldsdunk.svg", b: 90, h: 130 },
-        kontrolpanel: { fil: "kontrolpanel.svg", b: 220, h: 76 },
-        kaffekop:     { fil: "kaffekop.svg", b: 42, h: 40 },
-        heks:         { fil: "heks.svg", b: 64, h: 72 },
-        papir:        { fil: "koekkenrulle.svg", b: 72, h: 44 },
-        laererKrop:   { fil: "laerer_krop.svg", b: 220, h: 250 },
-        laererHoved:  { fil: "laerer_hoved.svg", b: 110, h: 130 },
-        laererArm:    { fil: "laerer_arm.svg", b: 56, h: 150 },
-        haand:        { fil: "haand.svg", b: 96, h: 84 },
-        lup:          { fil: "lup.svg", b: 40, h: 40 }
+        pbGlas:      { fil: "glas_pbno32.svg", b: 58, h: 84 },
+        kiGlas:      { fil: "glas_ki.svg", b: 58, h: 84 },
+        vaegt:       { fil: "vaegt.svg", b: 150, h: 58 },
+        vejebaad:    { fil: "vejebaad.svg", b: 60, h: 16 },
+        spatel:      { fil: "spatel.svg", b: 96, h: 12 },
+        maaleglas:   { fil: "maaleglas.svg", b: 44, h: 220 },
+        baegerglas:  { fil: "baegerglas.svg", b: 112, h: 132 },
+        varmeplade:  { fil: "varmeplade.svg", b: 180, h: 72 },
+        termometer:  { fil: "termometer.svg", b: 64, h: 84 },
+        dunk:        { fil: "affaldsdunk.svg", b: 90, h: 130 },
+        kaffekop:    { fil: "kaffekop.svg", b: 42, h: 40 },
+        papir:       { fil: "koekkenrulle.svg", b: 72, h: 44 },
+        laererKrop:  { fil: "laerer_krop.svg", b: 220, h: 250 },
+        laererHoved: { fil: "laerer_hoved.svg", b: 110, h: 130 },
+        laererArm:   { fil: "laerer_arm.svg", b: 56, h: 150 },
+        lup:         { fil: "lup.svg", b: 40, h: 40 }
     };
 
     function indlaes(navn, fil) {
@@ -42,7 +38,7 @@
         post.img.addEventListener("load", function () { post.klar = true; });
         post.img.addEventListener("error", function () {
             post.fejlet = true;
-            if (window.console) console.warn("sc6.8: kunne ikke indlaese " + MAPPE + fil);
+            if (window.console) console.warn("sc2.7: kunne ikke indlaese " + MAPPE + fil);
         });
         post.img.src = MAPPE + fil;
     }

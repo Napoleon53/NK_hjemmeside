@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="32" viewBox="0 0 60 16">
+  <!-- Vejebaad af hvid plast. Bundens midte er (30, 16). Pulveret
+       tegnes af animationen. -->
+  <defs>
+    <linearGradient id="hvid" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#cfd6dd"/>
+    </linearGradient>
+  </defs>
+  <path d="M1 2 L59 2 L52 14.8 Q51.2 16 49.5 16 L10.5 16 Q8.8 16 8 14.8 Z" fill="url(#hvid)" fill-opacity="0.92" stroke="#9aa4ae" stroke-width="0.8" stroke-linejoin="round"/>
+  <path d="M1.2 2 L58.8 2" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round"/>
+</svg>

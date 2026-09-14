@@ -37,6 +37,7 @@
             vredeMaal: 0.5, humoerMaal: -0.5, roedMaal: 0,
             aaben: 0, blinkUr: 2, blink: 0, nik: 0, damp: 0,
             arm: HAENGER, armFra: HAENGER, armTil: HAENGER,
+            hovedV: 0, hovedDx: 0, hovedDy: 0,
             baerer: null, klik: 0, rost: false, dampe: []
         };
     };
@@ -52,6 +53,7 @@
             L.taleUr = 0;
             L.arm = HAENGER;
         }
+        L.hovedV = 0; L.hovedDx = 0; L.hovedDy = 0;
         L.baerer = null;
         L.rost = false;
     };
@@ -89,16 +91,18 @@
         this.laererKoer("kaffe", [
             { udtryk: { vrede: 0.8, humoer: -0.6, roed: 0.1 } },
             { gaa: 130 },
-            { sig: "Det er min kaffe.", vis: 2.2, tid: 0.3 },
+            { sig: "Der drikkes ikke i laboratoriet.", vis: 2.6, tid: 0.3 },
             { arm: -0.5, tid: 0.55 },
-            { kald: function () { kop.iHaand = true; this.laerer.baerer = "kaffekop"; } },
-            { arm: -0.98, tid: 0.6 },
+            { kald: function () { kop.iHaand = true; this.laerer.baerer = "kaffekop"; kop.skjult = true; this.koppenVaek = true; } },
+            { arm: -0.3, tid: 0.5 },
+            { tid: 1.2 },
+            { kald: function () { if (NK.Lyd) NK.Lyd.brum(); } },
+            { gaa: -40 },
+            { arm: -0.98, tid: 0.5 },
             { kald: function () { if (NK.Lyd) NK.Lyd.slurk(); } },
-            { udtryk: { vrede: 0.1, humoer: 0.5, roed: 0 } },
-            { tid: 1.0 },
-            { sig: "Ahh.", vis: 1.3, tid: 1.1 },
-            { kald: function () { kop.skjult = true; this.koppenVaek = true; } },
-            { arm: -0.3, tid: 0.4 },
+            { udtryk: { vrede: 0.1, humoer: 0.6, roed: 0 } },
+            { sig: "Ahh.", vis: 1.3, tid: 1.2 },
+            { arm: -0.3, tid: 0.3 },
             { gaa: UDE },
             { kald: function () { this.laerer.baerer = null; } }
         ]);
@@ -157,6 +161,52 @@
             { kald: function () { this.laerer.nik = 0; } },
             { gaa: UDE }
         ], false);
+    };
+
+    /* Et saerlig godt forsoeg: laereren dabber */
+    P.laererDab = function () {
+        var L = this.laerer;
+        if (L.rost || L.scene) return;
+        L.rost = true;
+        this.laererKoer("dab", [
+            { udtryk: { vrede: 0, humoer: 1, roed: 0 } },
+            { gaa: 210 },
+            { sig: "Flot!", vis: 1.2, tid: 0.9 },
+            { kald: function () { if (NK.Lyd) NK.Lyd.bom(); } },
+            { arm: -2.35, tid: 0.28, hver: function (t) {
+                var e = NK.blod(t);
+                this.laerer.hovedV = 0.6 * e;
+                this.laerer.hovedDx = 18 * e;
+                this.laerer.hovedDy = 14 * e;
+            } },
+            { tid: 1.4, hver: function (t) { this.laerer.nik = Math.sin(t * Math.PI * 4) * 2; } },
+            { arm: HAENGER, tid: 0.4, hver: function (t) {
+                var e = 1 - NK.blod(t);
+                this.laerer.hovedV = 0.6 * e;
+                this.laerer.hovedDx = 18 * e;
+                this.laerer.hovedDy = 14 * e;
+                this.laerer.nik = 0;
+            } },
+            { sig: "Et rigtigt kontrolforsøg.", vis: 2.2, tid: 1.6 },
+            { gaa: UDE }
+        ], false);
+    };
+
+    /* Lampen staar taendt uden glas under sig */
+    P.laererSlukLampe = function () {
+        var L = this.laerer;
+        if (L.scene) return;
+        this.laererKoer("sluklampe", [
+            { udtryk: { vrede: 0.8, humoer: -0.6, roed: 0.1 } },
+            { gaa: 640 },
+            { sig: "Sluk lampen, når den ikke bruges.", vis: 2.6, tid: 0.4 },
+            { arm: -0.9, tid: 0.5 },
+            { kald: function () { this.lampeTaendt = false; if (NK.Lyd) NK.Lyd.kontakt(); this.aendret("lampe"); } },
+            { tid: 0.5 },
+            { kald: function () { if (NK.Lyd) NK.Lyd.brum(); } },
+            { arm: HAENGER, tid: 0.4 },
+            { gaa: UDE }
+        ]);
     };
 
     /* ----- Uheldet: proppen sprang af ------------------------------------ */
@@ -379,7 +429,7 @@
         NK.Sprites.tegnPositur(ctx, "laererKrop", krop, S.ANKER.laererKrop);
 
         var ryst = L.taleUr > 0 ? Math.sin(tid * 9) * 0.05 * L.vrede * (L.humoer < 0 ? 1 : 0) : 0;
-        var hoved = { x: krop.x, y: krop.y + 14 + L.nik, v: krop.v + ryst };
+        var hoved = { x: krop.x + L.hovedDx, y: krop.y + 14 + L.nik + L.hovedDy, v: krop.v + ryst + L.hovedV };
         NK.Sprites.tegnPositur(ctx, "laererHoved", hoved, S.ANKER.laererHoved);
         ctx.save();
         ctx.translate(hoved.x, hoved.y);

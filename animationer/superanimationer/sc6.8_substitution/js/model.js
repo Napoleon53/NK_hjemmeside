@@ -93,7 +93,7 @@
 
     /* Lysets styrke under lampen, i lokalets lys og i folien. k er
        reaktionens hastighed pr. sekund ved fuldt lys. */
-    var LYS = { lampe: 1, rum: 0.01, folie: 0, k: 0.15, faerdig: 0.95, begyndt: 0.15, synlig: 0.12 };
+    var LYS = { lampe: 1, rum: 0.01, folie: 0, k: 0.12, faerdig: 0.95, begyndt: 0.15, synlig: 0.12 };
 
     /* Fordeling af Br2 mellem vand og hexan. Naesten alt ender i hexanen.
        ryst er farten ved fuld rystning, diffusion uden rystning. */
@@ -106,7 +106,11 @@
     var RYST = { FULD: 900, KNUS_FART: [2300, 3600], KNUS_TID: [0.7, 0.9], MAKS_UHELD: 2 };
 
     /* Vaeguret: minutter pr. sekund og starttidspunkt */
-    var UR = { minPerSek: 0.5, start: 10 * 60 + 5 };
+    var UR = { minPerSek: 0.5, start: 10 * 60 + 5, hurtig: 4, hurtigTid: 12 };
+
+    /* Et saerlig godt forsoeg: ingen uheld, kontrolglasset pakket ind, foer
+       lyset var faerdigt, og lampen hoejst slukket kort undervejs. */
+    var FLOT = { slukTid: 4 };
 
     var FARVE = {
         bromvand:  { r: 222, g: 118, b: 28, a: 0.85 },
@@ -197,6 +201,7 @@
         FORDELING: FORDELING,
         RYST: RYST,
         UR: UR,
+        FLOT: FLOT,
         FARVE: FARVE,
         formel: formel,
         afstemt: afstemt,

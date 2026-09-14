@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="116" viewBox="0 0 150 58">
+  <!-- Digital vaegt med 0,01 g opløsning. Vejeskaalens overflade er
+       y 5 (x 28-122). Displayet er x 44-106, y 28-46; tallene tegnes af
+       animationen. -->
+  <defs>
+    <linearGradient id="staal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef1f4"/>
+      <stop offset="1" stop-color="#8f98a2"/>
+    </linearGradient>
+    <linearGradient id="krop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e3e7eb"/>
+      <stop offset="0.5" stop-color="#c7cdd3"/>
+      <stop offset="1" stop-color="#9ea6ae"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Skaal og fod -->
+  <rect x="28" y="4.5" width="94" height="5" rx="2.5" fill="url(#staal)" stroke="#7d8690" stroke-width="0.5"/>
+  <rect x="68" y="9.5" width="14" height="6.5" fill="#4a5058"/>
+
+  <!-- Krop -->
+  <path d="M5 16 L145 16 Q150 16 150 21 L148 53 Q148 58 143 58 L7 58 Q2 58 2 53 L0 21 Q0 16 5 16 Z" fill="url(#krop)"/>
+  <path d="M6 18 L144 18" stroke="#ffffff" stroke-opacity="0.7" stroke-width="1"/>
+
+  <!-- Display -->
+  <rect x="40" y="24.5" width="70" height="25" rx="3" fill="#1b1f24"/>
+  <rect x="44" y="28" width="62" height="18" rx="2" fill="#26382c"/>
+
+  <!-- Knapper -->
+  <rect x="116" y="27" width="24" height="8" rx="2" fill="#39414b"/>
+  <rect x="116" y="38" width="24" height="8" rx="2" fill="#39414b"/>
+  <g font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#dfe5ec" text-anchor="middle" font-size="4.6">
+    <text x="128" y="32.8">TARA</text>
+    <text x="128" y="43.8">ON</text>
+  </g>
+  <text x="21" y="35" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="4.6" font-weight="700" fill="#4a525c">0,01 g</text>
+  <text x="21" y="42" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="4" fill="#5b636d">maks. 200 g</text>
+</svg>

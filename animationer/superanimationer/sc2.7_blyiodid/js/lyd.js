@@ -1,9 +1,10 @@
 /* =====================================================================
    lyd.js - lydene, lavet med Web Audio (ingen lydfiler)
 
-   Udsugningens sus, haeldning, skvulp i glasset, proppen, dryp, papir,
-   lampens kontakt, et pop naar proppen springer, laererens brummen og
-   mumlen, en slurk kaffe og et lille signal, naar noget er lykkedes.
+   Haeldning, pulver fra spatlen, vaegtens bip, knapperne paa
+   varmepladen, omroererens summen, kogebobler, glimt fra krystallerne,
+   spild, laererens brummen og mumlen, en slurk kaffe og et lille signal,
+   naar noget er lykkedes.
    ===================================================================== */
 (function () {
     "use strict";
@@ -11,10 +12,10 @@
     var NK = window.NK;
     var ctx = null;
     var til = true;
-    var sus = null;
+    var summen = null;
 
     try {
-        var gemt = window.localStorage && window.localStorage.getItem("nk-sc68-lyd");
+        var gemt = window.localStorage && window.localStorage.getItem("nk-sc27-lyd");
         if (gemt === "fra") til = false;
     } catch (fejl) { /* file:// eller privat browsing */ }
 
@@ -89,8 +90,8 @@
 
         saet: function (v) {
             til = !!v;
-            try { window.localStorage && window.localStorage.setItem("nk-sc68-lyd", til ? "til" : "fra"); } catch (fejl) {}
-            if (!til) NK.Lyd.udsugning(false);
+            try { window.localStorage && window.localStorage.setItem("nk-sc27-lyd", til ? "til" : "fra"); } catch (fejl) {}
+            if (!til) NK.Lyd.omroering(false);
         },
 
         klik: function () {
@@ -99,37 +100,33 @@
             tone(c, c.currentTime, 1800, 900, 0.04, 0.06, "square");
         },
 
-        /* Et lavt, vedvarende sus, mens udsugningen koerer. */
-        udsugning: function (paa) {
+        /* En lav summen, mens magnetomroereren koerer. */
+        omroering: function (paa) {
             var c = hent();
             if (!paa || !til) {
-                if (sus) {
-                    var gammel = sus;
-                    sus = null;
+                if (summen) {
+                    var gammel = summen;
+                    summen = null;
                     try {
-                        gammel.g.gain.setTargetAtTime(0, c.currentTime, 0.15);
-                        gammel.kilde.stop(c.currentTime + 0.6);
+                        gammel.g.gain.setTargetAtTime(0, c.currentTime, 0.12);
+                        gammel.o.stop(c.currentTime + 0.5);
                     } catch (fejl) {}
                 }
                 return;
             }
-            if (sus || !c) return;
-            var kilde = stoej(c, 2, function () { return 1; });
-            kilde.loop = true;
+            if (summen || !c) return;
+            var o = c.createOscillator();
+            o.type = "sawtooth";
+            o.frequency.setValueAtTime(96, c.currentTime);
             var f = c.createBiquadFilter();
             f.type = "lowpass";
-            f.frequency.setValueAtTime(420, c.currentTime);
+            f.frequency.setValueAtTime(260, c.currentTime);
             var g = c.createGain();
             g.gain.setValueAtTime(0, c.currentTime);
-            g.gain.setTargetAtTime(0.05, c.currentTime, 0.4);
-            kilde.connect(f).connect(g).connect(c.destination);
-            kilde.start();
-            sus = { kilde: kilde, g: g };
-        },
-
-        skvulp: function (styrke) {
-            var c = klar(); if (!c) return;
-            filtreretStoej(c, c.currentTime, 0.12, "bandpass", 700 + Math.random() * 700, 1.6, 0.1 + 0.25 * NK.klamp(styrke, 0, 1));
+            g.gain.setTargetAtTime(0.025, c.currentTime, 0.3);
+            o.connect(f).connect(g).connect(c.destination);
+            o.start();
+            summen = { o: o, g: g };
         },
 
         haeld: function (varighed) {
@@ -142,35 +139,49 @@
             }
         },
 
+        /* Pulver, der drysser fra spatlen eller vejebaaden */
+        drys: function (varighed) {
+            var c = klar(); if (!c) return;
+            var nu = c.currentTime;
+            var n = Math.max(2, Math.round((varighed || 0.3) * 18));
+            for (var i = 0; i < n; i++) {
+                filtreretStoej(c, nu + i * 0.018 + Math.random() * 0.012, 0.025, "highpass", 4200 + Math.random() * 2500, 0, 0.12);
+            }
+        },
+
+        /* Vaegten falder til ro */
+        bip: function () {
+            var c = klar(); if (!c) return;
+            tone(c, c.currentTime, 2400, 2400, 0.07, 0.04, "square", 5000);
+        },
+
         plip: function () {
             var c = klar(); if (!c) return;
             tone(c, c.currentTime, 700 + Math.random() * 200, 1500, 0.08, 0.1);
         },
 
-        /* Proppen saettes i */
-        prop: function () {
+        boble: function () {
             var c = klar(); if (!c) return;
-            filtreretStoej(c, c.currentTime, 0.06, "lowpass", 900, 0, 0.35);
-            tone(c, c.currentTime, 420, 300, 0.07, 0.08);
+            var f = 300 + Math.random() * 500;
+            tone(c, c.currentTime, f, f * 1.8, 0.05, 0.05);
         },
 
-        /* Proppen springer af */
-        pop: function () {
+        /* Krystallerne glimter */
+        glimt: function () {
             var c = klar(); if (!c) return;
             var nu = c.currentTime;
-            filtreretStoej(c, nu, 0.05, "bandpass", 1400, 2, 0.6);
-            tone(c, nu, 900, 200, 0.12, 0.25);
+            tone(c, nu, 2600 + Math.random() * 600, 3200, 0.18, 0.025);
+            tone(c, nu + 0.07, 3300 + Math.random() * 500, 3900, 0.2, 0.018);
         },
 
-        /* Vaeske, der sprøjter ud */
+        /* Pulver, der spildes paa bordet */
         plask: function () {
             var c = klar(); if (!c) return;
             var nu = c.currentTime;
-            filtreretStoej(c, nu, 0.4, "lowpass", 1400, 0, 0.45);
-            tone(c, nu, 140, 50, 0.2, 0.25);
+            filtreretStoej(c, nu, 0.35, "highpass", 1800, 0, 0.35);
+            tone(c, nu, 200, 90, 0.12, 0.12);
         },
 
-        /* Papir og folie, der krammes */
         papir: function () {
             var c = klar(); if (!c) return;
             var nu = c.currentTime;
@@ -217,44 +228,6 @@
             filtreretStoej(c, nu, 0.3, "bandpass", 500, 3, 0.25);
             tone(c, nu + 0.05, 300, 180, 0.2, 0.08);
             tone(c, nu + 0.35, 260, 160, 0.15, 0.06);
-        },
-
-        /* Heksens latter: korte, faldende toner */
-        latter: function () {
-            var c = klar(); if (!c) return;
-            var nu = c.currentTime;
-            for (var i = 0; i < 6; i++) tone(c, nu + i * 0.11, 620 - i * 55, 480 - i * 50, 0.09, 0.09, "sawtooth", 1600);
-        },
-
-        /* Trylleri: opadgaaende glissando med glimt */
-        tryl: function () {
-            var c = klar(); if (!c) return;
-            var nu = c.currentTime;
-            tone(c, nu, 500, 2400, 0.5, 0.08);
-            for (var i = 0; i < 5; i++) tone(c, nu + 0.15 + i * 0.07, 1800 + i * 300, 2600 + i * 300, 0.06, 0.05, "triangle");
-        },
-
-        /* Et svusj, naar heksen flyver */
-        svusj: function () {
-            var c = klar(); if (!c) return;
-            var nu = c.currentTime;
-            var kilde = stoej(c, 1.4, function (r) { return Math.sin(r * Math.PI); });
-            var f = c.createBiquadFilter();
-            f.type = "bandpass";
-            f.frequency.setValueAtTime(400, nu);
-            f.frequency.exponentialRampToValueAtTime(2200, nu + 0.7);
-            f.frequency.exponentialRampToValueAtTime(500, nu + 1.4);
-            var g = c.createGain();
-            g.gain.setValueAtTime(0.35, nu);
-            kilde.connect(f).connect(g).connect(c.destination);
-            kilde.start(nu);
-        },
-
-        /* Et enkelt dunk til dab'et */
-        bom: function () {
-            var c = klar(); if (!c) return;
-            filtreretStoej(c, c.currentTime, 0.2, "lowpass", 700, 0, 0.5);
-            tone(c, c.currentTime, 180, 60, 0.25, 0.3);
         },
 
         succes: function () {

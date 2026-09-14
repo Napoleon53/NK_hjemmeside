@@ -30,7 +30,7 @@
     --radius:      10px;
     --radius-lil:  6px;
     --skygge:      0 4px 14px rgba(0, 0, 0, 0.35);
-    --panel-bredde: 340px;
+    --panel-bredde: 430px;
 }
 
 * { box-sizing: border-box; }
@@ -452,6 +452,23 @@ main.forsoeg {
 .ligning.lille { font-size: 1.05rem; padding: 9px 8px; }
 
 /* ---------------------------------------------------------------------
+   TEGNESERIEN: forsoeget opsummeret i ruder
+   --------------------------------------------------------------------- */
+.overlay-boks.bred { max-width: 980px; }
+.serie { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 10px; }
+.rude {
+    background-color: #16161c;
+    border: 1px solid #3f3f4d;
+    border-radius: var(--radius-lil);
+    padding: 8px;
+}
+.rude canvas { display: block; width: 100%; border-radius: 5px; background-color: #22262e; }
+.rude p { margin: 7px 0 0 0; font-size: 0.86rem; line-height: 1.45; color: var(--tekst-svag); }
+.rude .nr { color: var(--gul); font-weight: 700; margin-right: 6px; }
+#serieknap { margin-top: 10px; }
+#serieknap[hidden] { display: none; }
+
+/* ---------------------------------------------------------------------
    RUNDVISNINGEN (samme som sc1.3)
    --------------------------------------------------------------------- */
 .rundvisning { position: fixed; inset: 0; z-index: 200; }
@@ -535,7 +552,7 @@ button:focus-visible {
 }
 
 @media (max-width: 1100px) {
-    :root { --panel-bredde: 300px; }
+    :root { --panel-bredde: 360px; }
     .top h1 .undertitel { display: none; }
 }
 

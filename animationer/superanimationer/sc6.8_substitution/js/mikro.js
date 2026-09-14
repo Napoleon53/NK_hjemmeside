@@ -55,7 +55,7 @@
         this.hexan = false;
         this.bund = 0;
         this.fotonUr = 0;
-        this.s = { ryst: 0, lys: 0, moerke: false, brHex: 0, brVand: 0, nHex: 0, nVand: 0, nReageret: 0 };
+        this.s = { ryst: 0, lys: 0, moerke: false, brHex: 0, brVand: 0, nHex: 0, nVand: 0, nReageret: 0, stor: false };
     };
 
     P.ny = function (type, x, y, vx, vy, fase) {
@@ -162,7 +162,9 @@
     function friBr(c) { return c.type === "br" && !c.laast; }
     function friVand(c) { return c.type === "vand" && !c.laast; }
 
-    /* s = { ryst, lys, moerke, brHex, brVand, nHex, nVand, nReageret } */
+    /* s = { ryst, lys, moerke, brHex, brVand, nHex, nVand, nReageret, stor }
+       stor: den store visning. Saa gaar selve reaktionen langsommere, og
+       der kommer flere fotoner. */
     P.opdater = function (dt, s) {
         this.s = s;
         var i, j, p, q;
@@ -170,6 +172,7 @@
         var ryst = s.ryst || 0;
         var lys = s.moerke ? 0 : (s.lys || 0);
         var mig = this;
+        this.langsom = s.stor ? 2.2 : 1;
 
         /* Br2 fordeles mellem lagene efter modellen */
         if (this.hexan) {
@@ -227,7 +230,7 @@
                 continue;
             }
             if (p.synker) {
-                p.y += 48 * dt;
+                p.y += 48 * dt / (this.langsom || 1);
                 p.x += p.vx * dt;
                 var vandReg = this.region("vand");
                 if (p.y >= vandReg.y0 + 4) { p.synker = false; p.fase = "vand"; p.vy = 10; }
@@ -326,7 +329,7 @@
 
         /* Fotoner oppefra, naar der er lys */
         if (lys > 0.01 && this.hexan) {
-            this.fotonUr -= dt * lys * 5;
+            this.fotonUr -= dt * lys * (s.stor ? 9 : 5);
             if (this.fotonUr <= 0) {
                 this.fotonUr = 1;
                 this.fotoner.push({ x: r(-80, 80), y: -R - 10, vy: 130, liv: 1, maerke: Math.random() < 0.35 });
@@ -334,7 +337,7 @@
         }
         for (i = this.fotoner.length - 1; i >= 0; i--) {
             var f = this.fotoner[i];
-            f.y += f.vy * dt;
+            f.y += f.vy * dt / (this.langsom || 1);
             if (f.y > GRAENSE - 10) f.liv -= dt * 4;
             if (f.liv <= 0 || f.y > R) this.fotoner.splice(i, 1);
         }
@@ -384,9 +387,10 @@
     };
 
     P.opdaterHaendelser = function (dt) {
+        var L = this.langsom || 1;
         for (var i = this.haendelser.length - 1; i >= 0; i--) {
             var h = this.haendelser[i];
-            h.t += dt;
+            h.t += dt / L;
             if (h.type === "subst") {
                 if (h.trin === 0) {
                     h.hex.a += h.hex.va * dt * 0.3;
@@ -401,10 +405,10 @@
                     h.t = 0;
                 } else if (h.trin === 1) {
                     var mp = brPlads(h.hex);
-                    h.a.x = NK.mod(h.a.x, mp.x, 6, dt);
-                    h.a.y = NK.mod(h.a.y, mp.y, 6, dt);
-                    h.b.x += h.b.vx * dt;
-                    h.b.y += h.b.vy * dt;
+                    h.a.x = NK.mod(h.a.x, mp.x, 6 / L, dt);
+                    h.a.y = NK.mod(h.a.y, mp.y, 6 / L, dt);
+                    h.b.x += h.b.vx * dt / L;
+                    h.b.y += h.b.vy * dt / L;
                     if (Math.abs(h.a.x - mp.x) + Math.abs(h.a.y - mp.y) < 3 || h.t > 1.5) {
                         h.hex.type = "bromhexan";
                         this.fjern(h.a);
@@ -416,8 +420,8 @@
                         h.t = 0;
                     }
                 } else {
-                    h.h.x = NK.mod(h.h.x, h.b.x + 7, 7, dt);
-                    h.h.y = NK.mod(h.h.y, h.b.y - 4, 7, dt);
+                    h.h.x = NK.mod(h.h.x, h.b.x + 7, 7 / L, dt);
+                    h.h.y = NK.mod(h.h.y, h.b.y - 4, 7 / L, dt);
                     if (Math.abs(h.h.x - h.b.x - 7) + Math.abs(h.h.y - h.b.y + 4) < 2.5 || h.t > 1.5) {
                         this.fjern(h.h);
                         this.fjern(h.b);
@@ -430,8 +434,8 @@
                 }
             } else {
                 /* HBr afgiver H+ til vand: H3O+ og Br− */
-                h.hbr.x = NK.mod(h.hbr.x, h.vand.x + 9, 6, dt);
-                h.hbr.y = NK.mod(h.hbr.y, h.vand.y, 6, dt);
+                h.hbr.x = NK.mod(h.hbr.x, h.vand.x + 9, 6 / L, dt);
+                h.hbr.y = NK.mod(h.hbr.y, h.vand.y, 6 / L, dt);
                 if (h.t > 0.45) {
                     var h3o = this.ny("h3o", h.vand.x, h.vand.y, r(-15, 15), r(-15, 15), "vand");
                     h3o.alfa = 1;
@@ -686,7 +690,6 @@
         var orden = ["hexan", "bromhexan", "br2", "hbr", "vand", "h3o", "br", "ag", "no3", "agbr"];
         for (var i = 0; i < this.partikler.length; i++) set[this.partikler[i].type] = true;
         orden.forEach(function (t) { if (set[t]) ud.push(t); });
-        if (this.fotoner.length) ud.push("lys");
         return ud;
     };
 
