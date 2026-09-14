@@ -26,6 +26,8 @@ statiske sider i roden, downloads i `downloads/`.
 - Ingen løbende liste af iagttagelser i panelet. Forsøget opsummeres i stedet
   som en tegneserie i en pop-up bag en knap, der først låses op, når forsøget
   er slut (mønster: `sc6.8_substitution/js/tegneserie.js`).
+- Resultatskemaet for forsøget står i tegneseriens sidste rude, ikke som et
+  kort i panelet.
 - Sidepanelet er 430 px bredt (`--panel-bredde` i `css/stil.css`).
 
 ## Layout

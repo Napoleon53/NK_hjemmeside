@@ -11,10 +11,10 @@
       <stop offset="1" stop-color="#2c373b"/>
     </linearGradient>
     <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.6"/>
-      <stop offset="0.2" stop-color="#d4ebfa" stop-opacity="0.2"/>
-      <stop offset="0.8" stop-color="#d4ebfa" stop-opacity="0.15"/>
-      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.5"/>
+      <stop offset="0" stop-color="#b5d6ea" stop-opacity="0.6"/>
+      <stop offset="0.2" stop-color="#b5d6ea" stop-opacity="0.2"/>
+      <stop offset="0.8" stop-color="#b5d6ea" stop-opacity="0.15"/>
+      <stop offset="1" stop-color="#b5d6ea" stop-opacity="0.5"/>
     </linearGradient>
     <pattern id="fliser" width="120" height="76" patternUnits="userSpaceOnUse" y="318">
       <rect width="120" height="76" fill="#f4f7f6"/>
@@ -37,8 +37,8 @@
       <circle cx="22" cy="24" r="2.5"/><circle cx="-30" cy="20" r="2"/><circle cx="4" cy="14" r="2"/>
       <circle cx="-8" cy="-10" r="2"/><circle cx="4" cy="-40" r="1.8"/>
     </g>
-    <path d="M-16 -112 V-50 L-72 52 Q-78 70 -58 70 H58 Q78 70 72 52 L16 -50 V-112 Z" fill="url(#glas)" stroke="#e6f2fb" stroke-width="2.5" stroke-linejoin="round"/>
-    <rect x="-22" y="-120" width="44" height="10" rx="4" fill="#d4ebfa" fill-opacity="0.4" stroke="#e6f2fb" stroke-width="2"/>
+    <path d="M-16 -112 V-50 L-72 52 Q-78 70 -58 70 H58 Q78 70 72 52 L16 -50 V-112 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="2.5" stroke-linejoin="round"/>
+    <rect x="-22" y="-120" width="44" height="10" rx="4" fill="#d4ebfa" fill-opacity="0.4" stroke="#86a9c0" stroke-width="2"/>
     <path d="M-6 -100 V-56 M-26 -20 L-54 40" stroke="#ffffff" stroke-opacity="0.45" stroke-width="5" stroke-linecap="round"/>
   </g>
 
@@ -61,7 +61,7 @@
     <text x="66" y="92" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="14" font-weight="700" fill="#4a4f57">Filtrerpapir</text>
   </g>
   <g transform="translate(950 440) rotate(-78)">
-    <path d="M-50 0 H50 L8 60 V110 H-8 V60 Z" fill="url(#glas)" stroke="#e6f2fb" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M-50 0 H50 L8 60 V110 H-8 V60 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round"/>
   </g>
   <rect x="1000" y="452" width="190" height="14" rx="7" fill="#8e9a99"/>
 

@@ -10,11 +10,12 @@
     var NK = window.NK;
 
     var TUR = [
-        { sel: "#scene", titel: "Stinkskabet", tekst: "Klik på genstandene for at bruge dem. Klik på et glas for at vælge det, og tag fat i det for at ryste." },
+        { sel: "#scene", titel: "Laboratoriebordet", tekst: "Klik på genstandene for at bruge dem. Hvert klik på et glas med stof er en spatelspids." },
         { sel: "#forloeb-kort", titel: "Forløbet", tekst: "Trinene får flueben, efterhånden som du når dem. Hint hjælper med det trin, du er ved." },
-        { sel: "#serie-kort", titel: "Tegneserie", tekst: "Når forsøget er slut, kan du se det opsummeret som en tegneserie med resultaterne for de to glas." },
-        { sel: "#quiz-kort", titel: "Quiz", tekst: "Låses op, når begge glas er testet med pH-papir og AgNO₃." },
-        { sel: "#forfraknap", titel: "Start forfra", tekst: "Starter forsøget forfra med tomme glas." }
+        { sel: "#maaling-kort", titel: "Målinger", tekst: "Temperaturerne, du noterer, kommer i tabellen og som punkter på grafen." },
+        { sel: "#iagttagelser-kort", titel: "Iagttagelser", tekst: "Det, du ser undervejs, bliver skrevet her." },
+        { sel: "#quiz-kort", titel: "Quiz", tekst: "Låses op, når der er tre målinger." },
+        { sel: "#forfraknap", titel: "Start forfra", tekst: "Starter forsøget forfra med et tomt bægerglas." }
     ];
 
     var trinNr = 0;

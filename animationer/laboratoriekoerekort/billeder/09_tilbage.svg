@@ -11,10 +11,10 @@
       <stop offset="1" stop-color="#2c373b"/>
     </linearGradient>
     <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.6"/>
-      <stop offset="0.2" stop-color="#d4ebfa" stop-opacity="0.2"/>
-      <stop offset="0.8" stop-color="#d4ebfa" stop-opacity="0.15"/>
-      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.5"/>
+      <stop offset="0" stop-color="#b5d6ea" stop-opacity="0.6"/>
+      <stop offset="0.2" stop-color="#b5d6ea" stop-opacity="0.2"/>
+      <stop offset="0.8" stop-color="#b5d6ea" stop-opacity="0.15"/>
+      <stop offset="1" stop-color="#b5d6ea" stop-opacity="0.5"/>
     </linearGradient>
     <linearGradient id="dunk" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#d9dfe1"/>
@@ -47,7 +47,7 @@
   <g transform="translate(250 266)">
     <ellipse cx="90" cy="276" rx="104" ry="13" fill="#000" opacity="0.28"/>
     <path d="M8 150 V256 Q8 272 24 272 H156 Q172 272 172 256 V150 Z" fill="#3d8fd6" fill-opacity="0.6"/>
-    <path d="M70 38 H110 V62 C110 80 176 84 176 116 V256 Q176 276 156 276 H24 Q4 276 4 256 V116 C4 84 70 80 70 62 Z" fill="url(#glas)" stroke="#e6f2fb" stroke-width="3"/>
+    <path d="M70 38 H110 V62 C110 80 176 84 176 116 V256 Q176 276 156 276 H24 Q4 276 4 256 V116 C4 84 70 80 70 62 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3"/>
     <rect x="24" y="130" width="132" height="122" rx="6" fill="#fbfaf5" stroke="#c8bda6" stroke-width="2"/>
     <text x="90" y="164" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2328">CuSO<tspan font-size="16" dy="6">4</tspan><tspan dy="-6"> (aq)</tspan></text>
     <text x="90" y="188" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="600" fill="#4a4f57">0,1 M</text>
@@ -55,7 +55,7 @@
     <use href="#ghs09" transform="translate(116 222) scale(0.38)"/>
     <path d="M18 120 V250" stroke="#ffffff" stroke-opacity="0.35" stroke-width="5" stroke-linecap="round"/>
     <!-- Tragt -->
-    <path d="M22 -40 H158 L100 30 V64 H80 V30 Z" fill="url(#glas)" stroke="#e6f2fb" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M22 -40 H158 L100 30 V64 H80 V30 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round"/>
   </g>
   <!-- Laaget ligger ved siden af -->
   <g transform="translate(160 640) rotate(-10)">
@@ -68,9 +68,9 @@
   <g transform="translate(560 356)">
     <ellipse cx="80" cy="190" rx="92" ry="11" fill="#000" opacity="0.28"/>
     <path d="M12 20 V172 Q12 188 28 188 H132 Q148 188 148 172 V20 Z" fill="#3d8fd6" fill-opacity="0.6"/>
-    <path d="M0 0 H160 L148 14 V172 Q148 188 132 188 H28 Q12 188 12 172 V14 Z" fill="url(#glas)" stroke="#e6f2fb" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M0 0 H160 L148 14 V172 Q148 188 132 188 H28 Q12 188 12 172 V14 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round"/>
     <path d="M12 20 H148" stroke="#8cc7ea" stroke-width="3"/>
-    <g stroke="#eef6fc" stroke-width="2.5" stroke-linecap="round">
+    <g stroke="#9dbdd1" stroke-width="2.5" stroke-linecap="round">
       <path d="M112 50 h24 M120 84 h16 M112 118 h24 M120 152 h16"/>
     </g>
     <text x="80" y="110" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="600" fill="#eef6fc" fill-opacity="0.85">250 mL</text>

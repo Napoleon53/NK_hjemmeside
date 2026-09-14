@@ -15,10 +15,10 @@
       <stop offset="1" stop-color="#a39d90"/>
     </linearGradient>
     <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.6"/>
-      <stop offset="0.2" stop-color="#d4ebfa" stop-opacity="0.2"/>
-      <stop offset="0.8" stop-color="#d4ebfa" stop-opacity="0.15"/>
-      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.5"/>
+      <stop offset="0" stop-color="#b5d6ea" stop-opacity="0.6"/>
+      <stop offset="0.2" stop-color="#b5d6ea" stop-opacity="0.2"/>
+      <stop offset="0.8" stop-color="#b5d6ea" stop-opacity="0.15"/>
+      <stop offset="1" stop-color="#b5d6ea" stop-opacity="0.5"/>
     </linearGradient>
     <linearGradient id="krom" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#5a6270"/>
@@ -134,7 +134,7 @@
     <path d="M-7 594 Q-8 572 0 554 Q8 572 7 594 Z" fill="#9fe0ff"/>
     <!-- Baegerglas -->
     <path d="M-62 440 V492 Q-62 504 -50 504 H50 Q62 504 62 492 V440 Z" fill="#8cc7ea" opacity="0.45"/>
-    <path d="M-72 400 H72 L62 410 V492 Q62 504 50 504 H-50 Q-62 504 -62 492 V410 Z" fill="url(#glas)" stroke="#e6f2fb" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M-72 400 H72 L62 410 V492 Q62 504 50 504 H-50 Q-62 504 -62 492 V410 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round"/>
     <g fill="#ffffff" fill-opacity="0.8">
       <circle cx="-30" cy="482" r="5"/><circle cx="10" cy="470" r="6"/><circle cx="32" cy="488" r="4"/>
       <circle cx="-8" cy="454" r="4"/><circle cx="24" cy="450" r="5"/>

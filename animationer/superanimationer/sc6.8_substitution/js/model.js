@@ -31,6 +31,8 @@
         "C6H14":   { atomer: { C: 6, H: 14 }, q: 0, fase: "l" },
         "Br2":     { atomer: { Br: 2 }, q: 0, fase: "aq" },
         "C6H13Br": { atomer: { C: 6, H: 13, Br: 1 }, q: 0, fase: "l" },
+        "C6H12":   { atomer: { C: 6, H: 12 }, q: 0, fase: "l" },
+        "C6H12Br2": { atomer: { C: 6, H: 12, Br: 2 }, q: 0, fase: "l" },
         "HBr":     { atomer: { H: 1, Br: 1 }, q: 0, fase: "aq" },
         "H2O":     { atomer: { H: 2, O: 1 }, q: 0, fase: "l" },
         "H3O+":    { atomer: { H: 3, O: 1 }, q: 1, fase: "aq" },
@@ -43,7 +45,7 @@
     /* Formlerne, som de skrives paa skaermen. Ladningen bygges altid med
        ladningHaevet, saa ±1 bliver + og −. */
     var GRUNDFORMEL = {
-        "C6H14": "C₆H₁₄", "Br2": "Br₂", "C6H13Br": "C₆H₁₃Br", "HBr": "HBr", "H2O": "H₂O",
+        "C6H14": "C₆H₁₄", "Br2": "Br₂", "C6H13Br": "C₆H₁₃Br", "C6H12": "C₆H₁₂", "C6H12Br2": "C₆H₁₂Br₂", "HBr": "HBr", "H2O": "H₂O",
         "H3O+": "H₃O", "Br-": "Br", "Ag+": "Ag", "NO3-": "NO₃", "AgBr": "AgBr"
     };
 
@@ -55,7 +57,8 @@
     var REAKTIONER = {
         substitution: { venstre: [[1, "C6H14"], [1, "Br2"]], hoejre: [[1, "C6H13Br"], [1, "HBr"]] },
         syre:         { venstre: [[1, "HBr"], [1, "H2O"]], hoejre: [[1, "H3O+"], [1, "Br-"]] },
-        faeldning:    { venstre: [[1, "Ag+"], [1, "Br-"]], hoejre: [[1, "AgBr"]] }
+        faeldning:    { venstre: [[1, "Ag+"], [1, "Br-"]], hoejre: [[1, "AgBr"]] },
+        addition:     { venstre: [[1, "C6H12"], [1, "Br2"]], hoejre: [[1, "C6H12Br2"]] }
     };
 
     function regnskab(side) {
@@ -94,6 +97,10 @@
     /* Lysets styrke under lampen, i lokalets lys og i folien. k er
        reaktionens hastighed pr. sekund ved fuldt lys. */
     var LYS = { lampe: 1, rum: 0.01, folie: 0, k: 0.12, faerdig: 0.95, begyndt: 0.15, synlig: 0.12 };
+
+    /* Hex-1-en (uden for forsoeget): Br2 laegges til dobbeltbindingen, ogsaa
+       i moerke. k er hastigheden pr. sekund. */
+    var ADDITION = { k: 0.35 };
 
     /* Fordeling af Br2 mellem vand og hexan. Naesten alt ender i hexanen.
        ryst er farten ved fuld rystning, diffusion uden rystning. */
@@ -178,16 +185,23 @@
     /* Tidens gang i ét glas. ryst: 0-1, lys: 0-1. */
     function skridt(g, dt, ryst, lys) {
         if (!g.brom) return;
-        if (g.hexan) {
+        if (g.hexan || g.alken) {
             var maal = FORDELING.ligevaegt * br2Tilbage(g);
             if (g.brHex < maal) {
                 var flyt = Math.min(maal - g.brHex, g.brVand * (ryst * FORDELING.ryst + FORDELING.diffusion) * dt);
                 g.brHex += flyt;
                 g.brVand -= flyt;
             }
-            var d = g.brHex * (1 - Math.exp(-LYS.k * lys * dt));
-            g.brHex -= d;
-            g.reageret += d;
+            if (g.alken) {
+                /* Addition: hurtig og uden lys */
+                var a = g.brHex * (1 - Math.exp(-ADDITION.k * dt));
+                g.brHex -= a;
+                g.addition = (g.addition || 0) + a;
+            } else {
+                var d = g.brHex * (1 - Math.exp(-LYS.k * lys * dt));
+                g.brHex -= d;
+                g.reageret += d;
+            }
         }
         if (g.brHex < 0) g.brHex = 0;
         if (g.brVand < 0) g.brVand = 0;
@@ -198,6 +212,7 @@
         REAKTIONER: REAKTIONER,
         MAENGDE: MAENGDE,
         LYS: LYS,
+        ADDITION: ADDITION,
         FORDELING: FORDELING,
         RYST: RYST,
         UR: UR,

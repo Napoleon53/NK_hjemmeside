@@ -102,6 +102,10 @@
         gl.brHex = 0;
         gl.brVand = 0;
         gl.reageret = 0;
+        gl.alken = false;
+        gl.addition = 0;
+        gl.slutFarve = null;
+        gl.slutFarveVaerdi = null;
         gl.erRystet = false;
         gl.prop = null;
         gl.sted = "stativ";
@@ -142,6 +146,7 @@
         var g = this.g = {
             bromflaske: genstand("bromflaske", "bromflaske", S.HJEM.bromflaske),
             hexan:      genstand("hexan", "hexan", S.HJEM.hexan),
+            hexen:      genstand("hexen", "hexen", S.HJEM.hexen),
             agno3:      genstand("agno3", "agno3", S.HJEM.agno3),
             phpapir:    genstand("phpapir", "phpapir", S.HJEM.phpapir),
             folie:      genstand("folie", "folie", S.HJEM.folie),
@@ -161,6 +166,7 @@
         this.lampeVis = 0;
         this.laagT = 0;
         this.hexLaagT = 0;
+        this.hexenLaagT = 0;
 
         this.handling = null;
         this.holdt = null;
@@ -196,7 +202,6 @@
         this.lampeSlukTid = 0;
         this.kontrolFoer = false;
         if (this.laererNyt) this.laererNyt();
-        if (this.heksNyt) this.heksNyt();
         if (NK.Lyd) NK.Lyd.udsugning(false);
         this.aendret("nulstil");
     };
@@ -394,12 +399,12 @@
                 return true;
             case "bromflaske": return this.proevBrom();
             case "hexan": return this.proevHexan();
+            case "hexen": return this.proevHexen();
             case "prop1": case "prop2": return this.proevProp(navn);
             case "lampe": case "holder": return this.proevLampe();
             case "lampekontakt": return this.skiftLampe();
             case "ur": return this.skiftTid();
             case "boble": return this.skiftStor();
-            case "heks": return this.klikHeks ? this.klikHeks() : false;
             case "glasfolie":
                 this.besked(this.gjort.reageret ? "Glasset er pakket ind. Klik på pH-papiret eller AgNO₃, så tages folien af." : "Glasset er pakket ind. Vent, til farven i lyset er væk.");
                 if (this.gjort.reageret) this.markér(this.andetGlas(this.valgtGlas()).ph === null && this.valgtGlas().ph === null ? "phpapir" : "agno3", 4);
@@ -450,16 +455,33 @@
     };
 
     P.proevHexan = function () {
-        var g = this.maalGlas(function (gl) { return gl.brom && !gl.hexan && !gl.prop && gl.sted === "stativ" && !gl.folie; });
+        var g = this.maalGlas(function (gl) { return gl.brom && !gl.hexan && !gl.alken && !gl.prop && gl.sted === "stativ" && !gl.folie; });
         if (!g) {
             var v = this.valgtGlas(), a = this.andetGlas(v);
             if (!v.brom && !a.brom) { this.besked("Hæld bromvand i først."); this.markér("bromflaske"); }
+            else if (v.alken) this.besked("Der er hexen i glasset. Tøm det i affaldsdunken, hvis det skal bruges i forsøget.");
             else if (v.hexan && a.hexan) this.besked("Der er hexan i begge glas.");
             else if (v.prop) { this.besked("Tag proppen af først.", "advarsel"); this.markér(v.prop.navn); }
             else { this.besked("Hæld bromvand i glas " + (v.brom ? a.nr : v.nr) + " først."); this.markér("bromflaske"); }
             return false;
         }
         this.haeldHexan(g);
+        return true;
+    };
+
+    /* Hex-1-en er ikke en del af forsoeget, men kan proeves */
+    P.proevHexen = function () {
+        var g = this.maalGlas(function (gl) { return gl.brom && !gl.hexan && !gl.alken && !gl.prop && gl.sted === "stativ" && !gl.folie; });
+        if (!g) {
+            var v = this.valgtGlas(), a = this.andetGlas(v);
+            if (!v.brom && !a.brom) { this.besked("Hæld bromvand i først."); this.markér("bromflaske"); }
+            else if (v.alken) this.besked("Der er allerede hexen i glasset.");
+            else if (v.hexan) this.besked("Der er hexan i glasset. Hexen kan kun komme i et glas med bromvand alene.");
+            else if (v.prop) { this.besked("Tag proppen af først.", "advarsel"); this.markér(v.prop.navn); }
+            else this.besked("Glasset skal stå i stativet.");
+            return false;
+        }
+        this.haeldHexen(g);
         return true;
     };
 
@@ -485,7 +507,8 @@
 
     /* Hvorfor kan glasset ikke stilles i lys eller moerke? */
     P.forklarIkkeKlar = function (v) {
-        if (!v.brom || !v.hexan) { this.besked("Glasset skal have bromvand og hexan først."); this.markér(v.brom ? "hexan" : "bromflaske"); }
+        if (v.alken) { this.besked("Det er hexen i glasset. Det hører ikke til forsøget. Tøm glasset i affaldsdunken."); this.markér("dunk", 4); }
+        else if (!v.brom || !v.hexan) { this.besked("Glasset skal have bromvand og hexan først."); this.markér(v.brom ? "hexan" : "bromflaske"); }
         else if (v.folie) this.besked("Tag folien af først.");
         else if (v.sted === "lampe") this.besked("Glasset står allerede under lampen.");
         else if (!v.prop) { this.besked("Sæt proppen i først.", "advarsel"); this.markér(this.g.prop1.iGlas ? "prop2" : "prop1"); }
@@ -589,6 +612,8 @@
     };
 
     P.proevPH = function () {
+        var alk = this.maalGlas(function (gl) { return gl.alken && gl.brom && gl.ph === null && gl.sted !== "flytter"; });
+        if (alk) { this.phTest(alk); return true; }
         if (!this.klarTilTest()) return false;
         var g = this.maalGlas(function (gl) { return gl.brom && gl.hexan && gl.ph === null && gl.sted !== "flytter"; });
         if (!g) {
@@ -602,6 +627,8 @@
     };
 
     P.proevAgNO3 = function () {
+        var alk = this.maalGlas(function (gl) { return gl.alken && gl.brom && !gl.agTest && gl.sted !== "flytter"; });
+        if (alk) { this.draabe(alk); return true; }
         if (!this.klarTilTest()) return false;
         var g = this.maalGlas(function (gl) { return gl.brom && gl.hexan && !gl.agTest && gl.sted !== "flytter"; });
         if (!g) {
@@ -615,6 +642,8 @@
     };
 
     P.proevAffald = function () {
+        var alk = this.maalGlas(function (gl) { return gl.alken && gl.sted !== "flytter"; });
+        if (alk) { this.toemGlas(alk); return true; }
         if (this.gjort.affald) { this.besked("Resterne er afleveret."); return false; }
         if (!this.testsFaerdige()) { this.besked("Gør begge tests færdige i begge glas først."); return false; }
         this.aflever();
@@ -690,6 +719,70 @@
             hjemTil(fl, 0.9, 50),
             { tid: 0.3, hver: function (t) { this.hexLaagT = 1 - t; } }
         ], "hexan");
+    };
+
+    P.haeldHexen = function (gl) {
+        var fl = this.g.hexen;
+        var pose = { x: gl.p.x - 4, y: gl.p.y - 34, v: 2.05 };
+        this.vaelg(gl.navn);
+        this.koer([
+            { tid: 0.3, hver: function (t) { this.hexenLaagT = t; } },
+            { flyt: fl, til: pose, tid: 0.9, loeft: 50 },
+            { kald: function () { gl.mikro.tilfoejHexen(); if (NK.Lyd) NK.Lyd.haeld(1.2); } },
+            { tid: 1.2, hver: function (t) {
+                gl.hexAreal = S.HEX_AREAL * NK.blod(t);
+                var top = gl.niveauTop === null || gl.niveauTop === undefined ? gl.niveau : gl.niveauTop;
+                this.straale = { fra: { x: fl.p.x, y: fl.p.y }, til: { x: gl.p.x, y: top === null ? gl.p.y + 100 : top }, farve: M.FARVE.hexan, bredde: 2.5 };
+            } },
+            { kald: function () {
+                this.straale = null;
+                gl.alken = true;
+                gl.addition = 0;
+                this.besked("Hexen er ikke en del af forsøget. Sæt prop i, og ryst, hvis du vil se, hvad der sker.");
+                if (!this.gjort.hexenPaatalt && this.laererHexen) { this.gjort.hexenPaatalt = true; this.laererHexen(); }
+                this.aendret("hexen");
+            } },
+            hjemTil(fl, 0.9, 50),
+            { tid: 0.3, hver: function (t) { this.hexenLaagT = 1 - t; } }
+        ], "hexen");
+    };
+
+    /* Et glas med hexen toemmes i dunken, saa det kan bruges igen */
+    P.toemGlas = function (gl) {
+        var d = S.DUNK.aabning;
+        var liste = [];
+        var startV = 0, startH = 0;
+        this.vaelg(gl.navn);
+        if (gl.prop) liste = liste.concat(this.propAfListe(gl.prop));
+        if (gl.folie) liste = liste.concat(this.folieAfListe(gl));
+        liste.push({ kald: function () { gl.sted = "flytter"; } });
+        liste.push({ flyt: gl, til: { x: d.x - 4, y: d.y - 34, v: 2.3 }, tid: 0.9, loeft: 60 });
+        liste.push({ kald: function () { startV = gl.vandAreal; startH = gl.hexAreal; if (NK.Lyd) NK.Lyd.haeld(0.9); } });
+        liste.push({ tid: 0.9, hver: function (t) {
+            gl.hexAreal = startH * Math.max(0, 1 - t * 2);
+            gl.vandAreal = startV * Math.max(0, 1 - Math.max(0, t - 0.4) / 0.6);
+            gl.visBund *= 1 - t;
+            this.straale = { fra: { x: gl.p.x, y: gl.p.y }, til: { x: d.x - 2, y: d.y + 6 }, farve: t < 0.5 ? M.hexanFarve(gl) : M.vandFarve(gl), bredde: 2.5 };
+        } });
+        liste.push({ kald: function () {
+            this.straale = null;
+            this.nulstilGlas(gl);
+            this.besked("Glas " + gl.nr + " er tømt og kan bruges igen.");
+        } });
+        liste.push({ flyt: gl, til: gl.hjem, tid: 0.9, loeft: 60 });
+        liste.push({ kald: function () { gl.sted = "stativ"; this.aendret("toemt"); } });
+        this.koer(liste, "toem");
+    };
+
+    P.nulstilGlas = function (gl) {
+        gl.brom = false; gl.hexan = false; gl.alken = false;
+        gl.slutFarve = null; gl.slutFarveVaerdi = null;
+        gl.brHex = 0; gl.brVand = 0; gl.reageret = 0; gl.addition = 0; gl.erRystet = false;
+        gl.vandAreal = 0; gl.hexAreal = 0; gl.visBund = 0; gl.uklar = 0;
+        gl.ph = null; gl.phFarve = null; gl.papir = null;
+        gl.agDraaber = 0; gl.agTest = false; gl.agNoteret = false;
+        gl.lysTid = 0; gl.moerkeTid = 0;
+        gl.mikro.toem();
     };
 
     /* ----- Propper ------------------------------------------------------------ */
@@ -880,7 +973,12 @@
             var startV = 0, startH = 0;
             if (gl.prop) liste = liste.concat(mig.propAfListe(gl.prop));
             if (gl.folie) liste = liste.concat(mig.folieAfListe(gl));
-            liste.push({ kald: function () { gl.sted = "flytter"; } });
+            liste.push({ kald: function () {
+                gl.sted = "flytter";
+                /* Farven huskes til tegneserien, foer glasset toemmes */
+                gl.slutFarve = M.farveTekst(gl);
+                gl.slutFarveVaerdi = gl.brHex > gl.brVand ? M.hexanFarve(gl) : M.vandFarve(gl);
+            } });
             liste.push({ flyt: gl, til: { x: d.x - 4, y: d.y - 34, v: 2.3 }, tid: 0.9, loeft: 60 });
             liste.push({ kald: function () { startV = gl.vandAreal; startH = gl.hexAreal; if (NK.Lyd) NK.Lyd.haeld(0.9); } });
             liste.push({ tid: 0.9, hver: function (t) {
@@ -1058,17 +1156,7 @@
         }
         this.pyt = { x: NK.klamp(gl.p.x, 340, 460), rx: 8, rxMaal: 62, farve: farve, vaad: 1, brom: brom };
 
-        gl.brom = false;
-        gl.hexan = false;
-        gl.erRystet = false;
-        gl.brHex = 0;
-        gl.brVand = 0;
-        gl.reageret = 0;
-        gl.vandAreal = 0;
-        gl.hexAreal = 0;
-        gl.visBund = 0;
-        gl.uklar = 0;
-        gl.mikro.toem();
+        this.nulstilGlas(gl);
         this.ryk = 5;
         if (NK.Lyd) { NK.Lyd.pop(); NK.Lyd.plask(); }
         this.iagttag("uheld", gl);
@@ -1082,12 +1170,13 @@
     P.mikroTilstand = function (gl, ryst, lys) {
         /* Foerst naar en tydelig del er omdannet, viser boblen det */
         var nReageret = gl.reageret < M.LYS.synlig ? 0 : NK.klamp(Math.round(M.MAENGDE.BR2 * gl.reageret), 0, M.MAENGDE.BR2);
-        var nHex = NK.klamp(Math.round(M.MAENGDE.BR2 * gl.brHex), 0, M.MAENGDE.BR2 - nReageret);
-        var nVand = M.MAENGDE.BR2 - nReageret - nHex;
+        var nAddition = gl.addition < M.LYS.synlig ? 0 : NK.klamp(Math.round(M.MAENGDE.BR2 * gl.addition), 0, M.MAENGDE.BR2 - nReageret);
+        var nHex = NK.klamp(Math.round(M.MAENGDE.BR2 * gl.brHex), 0, M.MAENGDE.BR2 - nReageret - nAddition);
+        var nVand = M.MAENGDE.BR2 - nReageret - nAddition - nHex;
         return {
-            ryst: ryst, lys: lys, moerke: gl.folie, stor: this.stor === gl,
+            ryst: ryst, lys: lys, moerke: gl.folie, stor: this.stor === gl, alken: gl.alken,
             brHex: gl.brHex, brVand: gl.brVand,
-            nHex: nHex, nVand: nVand, nReageret: nReageret
+            nHex: nHex, nVand: nVand, nReageret: nReageret, nAddition: nAddition
         };
     };
 
@@ -1114,7 +1203,7 @@
         [g.glas1, g.glas2].forEach(function (gl) {
             var lys = mig.lysStyrke(gl);
             var ryst = mig.rystGlas === gl ? mig.ryst : 0;
-            var foerReag = gl.reageret, harHexBrom = gl.brom && gl.hexan;
+            var foerReag = gl.reageret, foerAdd = gl.addition, harHexBrom = gl.brom && gl.hexan;
             M.skridt(gl, dtM, ryst, lys);
             if (harHexBrom) {
                 if (gl.sted === "lampe" && mig.lampeTaendt) gl.lysTid += dtM * M.UR.minPerSek;
@@ -1137,6 +1226,11 @@
                     mig.gjort.reageret = true;
                     mig.aendret("reageret");
                 }
+            }
+            if (gl.alken && foerAdd < M.LYS.faerdig && gl.addition >= M.LYS.faerdig) {
+                mig.besked("Farven forsvandt uden lys. Br₂ er lagt til dobbeltbindingen: en addition.", "god");
+                if (NK.Lyd) NK.Lyd.succes();
+                mig.aendret("addition");
             }
             gl.mikro.opdater(dt, mig.mikroTilstand(gl, ryst, lys));
             var bund = gl.mikro.agbrAndel();
@@ -1173,7 +1267,7 @@
         }
         if (this.stor && (!this.stor.brom || this.stor.sted === "flytter")) this.stor = null;
         this.storAlfa = NK.mod(this.storAlfa, this.stor ? 1 : 0, 7, dt);
-        if (this.opdaterHeks) this.opdaterHeks(dt);
+
 
         /* Draabeflasken svaever over glasset lidt tid og gaar saa hjem */
         var d = g.agno3;
@@ -1188,7 +1282,7 @@
         /* Zoomboblen viser det valgte glas */
         var v = this.valgtGlas();
         var hn = this.handling ? this.handling.navn : "";
-        var vis = (v.brom || v.hexan) && hn !== "affald";
+        var vis = (v.brom || v.hexan || v.alken) && hn !== "affald" && hn !== "toem";
         if (vis) this.bobleGlas = v;
         this.bobleAlfa = NK.mod(this.bobleAlfa, vis ? 1 : 0, 5, dt);
 

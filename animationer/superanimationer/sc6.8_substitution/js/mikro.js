@@ -20,6 +20,8 @@
                 finder Br− og danner AgBr, der synker til bunds. NO3− er
                 tilskuerion.
    Moerke:      boblen er moerk, og der kommer ingen fotoner.
+   Hex-1-en:    (uden for forsoeget) Br2 laegges til dobbeltbindingen,
+                ogsaa uden lys: begge Br-atomer saetter sig paa kaeden.
    ===================================================================== */
 (function () {
     "use strict";
@@ -32,9 +34,11 @@
     var GRAENSE = 0;
     var VANDFLADE = -60;
 
-    var RADIUS = { hexan: 13, bromhexan: 13, br2: 7, bra: 6.5, h: 3, hbr: 7, vand: 6, h3o: 7, br: 7.5, ag: 7, no3: 7, agbr: 10 };
-    var FART = { hexan: 15, bromhexan: 15, br2: 24, bra: 30, h: 60, hbr: 22, vand: 18, h3o: 18, br: 18, ag: 26, no3: 20 };
-    var FASE = { hexan: "hex", bromhexan: "hex", vand: "vand", h3o: "vand", br: "vand", ag: "vand", no3: "vand", agbr: "vand" };
+    var RADIUS = { hexan: 13, bromhexan: 13, hexen: 13, dibromhexan: 13, br2: 7, bra: 6.5, h: 3, hbr: 7, vand: 6, h3o: 7, br: 7.5, ag: 7, no3: 7, agbr: 10 };
+    var FART = { hexan: 15, bromhexan: 15, hexen: 15, dibromhexan: 15, br2: 24, bra: 30, h: 60, hbr: 22, vand: 18, h3o: 18, br: 18, ag: 26, no3: 20 };
+    var FASE = { hexan: "hex", bromhexan: "hex", hexen: "hex", dibromhexan: "hex", vand: "vand", h3o: "vand", br: "vand", ag: "vand", no3: "vand", agbr: "vand" };
+
+    var KAEDE = { hexan: 1, bromhexan: 1, hexen: 1, dibromhexan: 1 };
 
     /* Pladserne til AgBr i bunden */
     var BUNDPLADS = [{ x: 0, y: 84 }, { x: -24, y: 82 }, { x: 24, y: 82 }, { x: -12, y: 66 }, { x: 12, y: 66 }, { x: -40, y: 68 }, { x: 40, y: 68 }, { x: 0, y: 50 }];
@@ -53,6 +57,7 @@
         this.fotoner = [];
         this.brom = false;
         this.hexan = false;
+        this.alken = false;
         this.bund = 0;
         this.fotonUr = 0;
         this.s = { ryst: 0, lys: 0, moerke: false, brHex: 0, brVand: 0, nHex: 0, nVand: 0, nReageret: 0, stor: false };
@@ -113,6 +118,17 @@
             this.ny("hexan", q.x, q.y, r(-10, 10), r(-10, 10), "hex");
         }
         /* Vandet og bromen skubbes ned under graensefladen */
+        var reg = this.region("vand");
+        this.partikler.forEach(function (p) { if (p.fase === "vand" && p.y < reg.y0) p.y = r(reg.y0, reg.y1); });
+    };
+
+    P.tilfoejHexen = function () {
+        this.hexan = true;
+        this.alken = true;
+        for (var i = 0; i < M.MAENGDE.HEXAN; i++) {
+            var q = this.plads("hex", 13);
+            this.ny("hexen", q.x, q.y, r(-10, 10), r(-10, 10), "hex");
+        }
         var reg = this.region("vand");
         this.partikler.forEach(function (p) { if (p.fase === "vand" && p.y < reg.y0) p.y = r(reg.y0, reg.y1); });
     };
@@ -194,15 +210,18 @@
 
         /* Reaktionen: saa mange Br2 skal vaere omdannet */
         var reageret = M.MAENGDE.BR2 - this.antal("br2");
-        if (reageret < s.nReageret) {
+        if (reageret < s.nReageret + (s.nAddition || 0)) {
             var kandidat = null;
             for (i = 0; i < liste.length; i++) {
                 p = liste[i];
                 if (p.type !== "br2" || p.laast || p.skifter) continue;
                 if (!kandidat || (p.fase === "hex" && kandidat.fase !== "hex")) kandidat = p;
             }
-            var hex = kandidat ? naermeste(liste, kandidat, function (c) { return c.type === "hexan" && !c.laast; }) : null;
-            if (kandidat && hex) this.startSubstitution(kandidat, hex);
+            var partnerType = this.alken ? "hexen" : "hexan";
+            var hex = kandidat ? naermeste(liste, kandidat, function (c) { return c.type === partnerType && !c.laast; }) : null;
+            if (kandidat && hex) {
+                if (this.alken) this.startAddition(kandidat, hex); else this.startSubstitution(kandidat, hex);
+            }
         }
 
         for (i = 0; i < liste.length; i++) {
@@ -289,7 +308,7 @@
 
             /* Sikkerhedsnet: en Ag+ eller HBr, der har soegt sin partner i
                over 4 s uden at naa frem, reagerer med den naermeste. */
-            if ((p.type === "ag" || (p.type === "hbr" && p.fase === "vand")) && p.jagt > 4) {
+            if ((p.type === "ag" || (p.type === "hbr" && p.fase === "vand")) && p.jagt > 2.5) {
                 var partner = naermeste(liste, p, p.type === "ag" ? friBr : friVand);
                 if (partner) {
                     if (p.type === "ag") this.faeld(p, partner); else this.startSyre(p, partner);
@@ -366,6 +385,14 @@
         return [{ x: m.x - c * 6, y: m.y - s * 6 }, { x: m.x + c * 6, y: m.y + s * 6 }];
     }
 
+    /* De to steder paa hex-1-en, hvor Br-atomerne saetter sig (foerste og
+       andet C-atom) */
+    function addPladser(hex) {
+        var c = Math.cos(hex.a), s = Math.sin(hex.a);
+        function w(lx, ly) { return { x: hex.x + lx * c - ly * s, y: hex.y + lx * s + ly * c }; }
+        return [w(-14, 9.5), w(-7.5, -8.5)];
+    }
+
     /* Det sted paa hexanen, hvor Br saetter sig (andet C-atom) */
     function brPlads(hex) {
         var c = Math.cos(hex.a), s = Math.sin(hex.a);
@@ -378,6 +405,13 @@
         hex.laast = true;
         this.blink.push({ x: br2.x, y: br2.y, liv: 1, farve: "255, 230, 120" });
         this.haendelser.push({ type: "subst", br2: br2, hex: hex, t: 0, trin: 0 });
+    };
+
+    /* Br2 laegges til dobbeltbindingen i hex-1-en */
+    P.startAddition = function (br2, hex) {
+        br2.laast = true;
+        hex.laast = true;
+        this.haendelser.push({ type: "add", br2: br2, hex: hex, t: 0, trin: 0 });
     };
 
     P.startSyre = function (hbr, vand) {
@@ -432,6 +466,38 @@
                         this.haendelser.splice(i, 1);
                     }
                 }
+            } else if (h.type === "add") {
+                var pl = addPladser(h.hex);
+                if (h.trin === 0) {
+                    var midt = { x: (pl[0].x + pl[1].x) / 2, y: (pl[0].y + pl[1].y) / 2 };
+                    h.br2.x = NK.mod(h.br2.x, midt.x - 4, 5 / L, dt);
+                    h.br2.y = NK.mod(h.br2.y, midt.y, 5 / L, dt);
+                    h.hex.a += h.hex.va * dt * 0.3;
+                    if (Math.abs(h.br2.x - midt.x + 4) + Math.abs(h.br2.y - midt.y) < 4 || h.t > 1.4) {
+                        var at2 = bromAtomer(h.br2);
+                        this.fjern(h.br2);
+                        h.a = this.ny("bra", at2[0].x, at2[0].y, 0, 0, "hex");
+                        h.b = this.ny("bra", at2[1].x, at2[1].y, 0, 0, "hex");
+                        h.a.laast = true; h.b.laast = true;
+                        h.a.alfa = 1; h.b.alfa = 1;
+                        this.blink.push({ x: midt.x, y: midt.y, liv: 1, farve: "255, 200, 150" });
+                        h.trin = 1;
+                        h.t = 0;
+                    }
+                } else {
+                    h.a.x = NK.mod(h.a.x, pl[0].x, 6 / L, dt);
+                    h.a.y = NK.mod(h.a.y, pl[0].y, 6 / L, dt);
+                    h.b.x = NK.mod(h.b.x, pl[1].x, 6 / L, dt);
+                    h.b.y = NK.mod(h.b.y, pl[1].y, 6 / L, dt);
+                    var naer = Math.abs(h.a.x - pl[0].x) + Math.abs(h.a.y - pl[0].y) + Math.abs(h.b.x - pl[1].x) + Math.abs(h.b.y - pl[1].y) < 5;
+                    if (naer || h.t > 1.5) {
+                        h.hex.type = "dibromhexan";
+                        this.fjern(h.a);
+                        this.fjern(h.b);
+                        h.hex.laast = false;
+                        this.haendelser.splice(i, 1);
+                    }
+                }
             } else {
                 /* HBr afgiver H+ til vand: H3O+ og Br− */
                 h.hbr.x = NK.mod(h.hbr.x, h.vand.x + 9, 6 / L, dt);
@@ -469,7 +535,7 @@
     var ETIKET = {
         br2: M.formel("Br2"), br: M.formel("Br-"), hbr: M.formel("HBr"), h3o: M.formel("H3O+"),
         ag: M.formel("Ag+"), no3: M.formel("NO3-"), agbr: M.formel("AgBr"),
-        hexan: M.formel("C6H14"), bromhexan: M.formel("C6H13Br"), vand: M.formel("H2O"), lys: "Lys (hν)"
+        hexan: M.formel("C6H14"), bromhexan: M.formel("C6H13Br"), hexen: M.formel("C6H12"), dibromhexan: M.formel("C6H12Br2"), vand: M.formel("H2O"), lys: "Lys (hν)"
     };
     NK.Mikro.ETIKET = ETIKET;
 
@@ -481,15 +547,20 @@
         ctx.fillText(tekst, x, y + 0.5);
     }
 
-    /* Hexan som zigzag af seks C-atomer med H-atomer paa ydersiden.
-       Bromhexan har et Br-atom paa det andet C-atom. */
-    function tegnHexan(ctx, x, y, a, brom) {
+    /* Kaeden af seks C-atomer med H-atomer paa ydersiden.
+         hexan        enkeltbindinger
+         bromhexan    et Br-atom paa det andet C-atom
+         hexen        dobbeltbinding mellem foerste og andet C-atom
+         dibromhexan  Br paa baade foerste og andet C-atom */
+    function tegnKaede(ctx, x, y, a, type) {
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(a);
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
         var j, cx, cy;
+        var dobbelt = type === "hexen";
+        var brPaa = type === "bromhexan" ? { 1: true } : (type === "dibromhexan" ? { 0: true, 1: true } : {});
         ctx.beginPath();
         for (j = 0; j < 6; j++) {
             cx = -12.5 + j * 5; cy = j % 2 ? -2.2 : 2.2;
@@ -498,17 +569,30 @@
         ctx.strokeStyle = "#3a4048";
         ctx.lineWidth = 3.2;
         ctx.stroke();
+        if (dobbelt) {
+            ctx.strokeStyle = "#3a4048";
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.moveTo(-12.5 + 1.2, 2.2 - 2.4);
+            ctx.lineTo(-7.5 + 1.2, -2.2 - 2.4);
+            ctx.stroke();
+        }
         for (j = 0; j < 6; j++) {
             cx = -12.5 + j * 5; cy = j % 2 ? -2.2 : 2.2;
             var ud = j % 2 ? -1 : 1;
-            var erBr = brom && j === 1;
-            if (!erBr) NK.kugle(ctx, cx, cy + ud * 4.6, 1.7, UDSEENDE.h.lys, UDSEENDE.h.moerk);
-            if (j === 0 || j === 5) NK.kugle(ctx, cx + (j === 0 ? -3.6 : 3.6), cy, 1.7, UDSEENDE.h.lys, UDSEENDE.h.moerk);
+            if (!brPaa[j] && !(dobbelt && j === 1)) NK.kugle(ctx, cx, cy + ud * 4.6, 1.7, UDSEENDE.h.lys, UDSEENDE.h.moerk);
+            if (j === 0 && !dobbelt && !brPaa[0]) NK.kugle(ctx, cx - 3.6, cy, 1.7, UDSEENDE.h.lys, UDSEENDE.h.moerk);
+            if (j === 0 && dobbelt) NK.kugle(ctx, cx - 3.6, cy - 1, 1.7, UDSEENDE.h.lys, UDSEENDE.h.moerk);
+            if (j === 5) NK.kugle(ctx, cx + 3.6, cy, 1.7, UDSEENDE.h.lys, UDSEENDE.h.moerk);
             NK.kugle(ctx, cx, cy, 3.3, UDSEENDE.c.lys, UDSEENDE.c.moerk);
         }
-        if (brom) {
+        if (brPaa[1]) {
             NK.kugle(ctx, -7.5, -8.5, 5, UDSEENDE.br2.lys, UDSEENDE.br2.moerk);
             etiket(ctx, "Br", -7.5, -8.5, "#ffffff", 5.5);
+        }
+        if (brPaa[0]) {
+            NK.kugle(ctx, -14, 9.5, 5, UDSEENDE.br2.lys, UDSEENDE.br2.moerk);
+            etiket(ctx, "Br", -14, 9.5, "#ffffff", 5.5);
         }
         ctx.restore();
     }
@@ -549,8 +633,8 @@
     function tegnPartikel(ctx, p) {
         var u = UDSEENDE[p.type];
         ctx.globalAlpha = NK.klamp(p.alfa, 0, 1);
-        if (p.type === "hexan" || p.type === "bromhexan") {
-            tegnHexan(ctx, p.x, p.y, p.a, p.type === "bromhexan");
+        if (KAEDE[p.type]) {
+            tegnKaede(ctx, p.x, p.y, p.a, p.type);
         } else if (p.type === "br2") {
             var at = bromAtomer(p);
             NK.kugle(ctx, at[0].x, at[0].y, p.rad, u.lys, u.moerk);
@@ -634,11 +718,11 @@
 
         for (i = 0; i < this.partikler.length; i++) {
             p = this.partikler[i];
-            if (p.type === "hexan" || p.type === "bromhexan") tegnPartikel(ctx, p);
+            if (KAEDE[p.type]) tegnPartikel(ctx, p);
         }
         for (i = 0; i < this.partikler.length; i++) {
             p = this.partikler[i];
-            if (p.type !== "hexan" && p.type !== "bromhexan") tegnPartikel(ctx, p);
+            if (!KAEDE[p.type]) tegnPartikel(ctx, p);
         }
 
         for (i = 0; i < this.blink.length; i++) {
@@ -687,7 +771,7 @@
     /* De partikeltyper, der kan ses lige nu */
     P.typer = function () {
         var ud = [], set = {};
-        var orden = ["hexan", "bromhexan", "br2", "hbr", "vand", "h3o", "br", "ag", "no3", "agbr"];
+        var orden = ["hexan", "bromhexan", "hexen", "dibromhexan", "br2", "hbr", "vand", "h3o", "br", "ag", "no3", "agbr"];
         for (var i = 0; i < this.partikler.length; i++) set[this.partikler[i].type] = true;
         orden.forEach(function (t) { if (set[t]) ud.push(t); });
         return ud;
@@ -719,7 +803,7 @@
                 var ix = cx + 11;
                 ctx.save();
                 ctx.translate(ix, cy);
-                if (t === "hexan" || t === "bromhexan") { ctx.scale(0.55, 0.55); tegnHexan(ctx, 0, 0, 0, t === "bromhexan"); }
+                if (KAEDE[t]) { ctx.scale(0.55, 0.55); tegnKaede(ctx, 0, 0, 0, t); }
                 else if (t === "br2") { ctx.scale(0.6, 0.6); NK.kugle(ctx, -6, 0, 7, UDSEENDE.br2.lys, UDSEENDE.br2.moerk); NK.kugle(ctx, 6, 0, 7, UDSEENDE.br2.lys, UDSEENDE.br2.moerk); }
                 else if (t === "hbr") { ctx.scale(0.7, 0.7); NK.kugle(ctx, 6, -4, 3, UDSEENDE.h.lys, UDSEENDE.h.moerk); NK.kugle(ctx, 0, 0, 6, UDSEENDE.hbr.lys, UDSEENDE.hbr.moerk); }
                 else if (t === "vand") { ctx.scale(0.8, 0.8); tegnVand(ctx, 0, -1, 0, false); }

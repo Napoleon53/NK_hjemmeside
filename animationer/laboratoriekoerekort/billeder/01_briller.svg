@@ -11,10 +11,10 @@
       <stop offset="1" stop-color="#2c373b"/>
     </linearGradient>
     <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.55"/>
-      <stop offset="0.18" stop-color="#d4ebfa" stop-opacity="0.18"/>
-      <stop offset="0.8" stop-color="#d4ebfa" stop-opacity="0.12"/>
-      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.45"/>
+      <stop offset="0" stop-color="#b5d6ea" stop-opacity="0.55"/>
+      <stop offset="0.18" stop-color="#b5d6ea" stop-opacity="0.18"/>
+      <stop offset="0.8" stop-color="#b5d6ea" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#b5d6ea" stop-opacity="0.45"/>
     </linearGradient>
     <linearGradient id="kittel" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#e3e8ea"/>
@@ -91,7 +91,7 @@
     <ellipse cx="80" cy="244" rx="92" ry="12" fill="#000" opacity="0.28"/>
     <rect x="56" y="0" width="48" height="36" rx="5" fill="#2c6fb3"/>
     <path d="M56 8 h48 M56 16 h48 M56 24 h48" stroke="#1e548a" stroke-width="2"/>
-    <path d="M62 36 H98 V58 C98 74 156 78 156 106 V226 Q156 244 138 244 H22 Q4 244 4 226 V106 C4 78 62 74 62 58 Z" fill="url(#glas)" stroke="#e6f2fb" stroke-width="3"/>
+    <path d="M62 36 H98 V58 C98 74 156 78 156 106 V226 Q156 244 138 244 H22 Q4 244 4 226 V106 C4 78 62 74 62 58 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3"/>
     <path d="M8 150 V226 Q8 240 22 240 H138 Q152 240 152 226 V150 Z" fill="#dff0f8" opacity="0.3"/>
     <rect x="20" y="110" width="120" height="112" rx="6" fill="#fbfaf5" stroke="#c8bda6" stroke-width="2"/>
     <text x="80" y="140" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2328">HCl (aq)</text>
@@ -104,9 +104,9 @@
   <g transform="translate(930 398)">
     <ellipse cx="70" cy="166" rx="80" ry="10" fill="#000" opacity="0.28"/>
     <path d="M10 62 V150 Q10 164 24 164 H116 Q130 164 130 150 V62 Z" fill="#8cc7ea" opacity="0.4"/>
-    <path d="M0 0 H140 L130 12 V150 Q130 164 116 164 H24 Q10 164 10 150 V12 Z" fill="url(#glas)" stroke="#e6f2fb" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M0 0 H140 L130 12 V150 Q130 164 116 164 H24 Q10 164 10 150 V12 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round"/>
     <path d="M10 62 H130" stroke="#bfe3f6" stroke-width="3"/>
-    <g stroke="#eef6fc" stroke-width="2.5" stroke-linecap="round">
+    <g stroke="#9dbdd1" stroke-width="2.5" stroke-linecap="round">
       <path d="M96 40 h22 M104 70 h14 M96 100 h22 M104 130 h14"/>
     </g>
     <path d="M22 24 V140" stroke="#ffffff" stroke-opacity="0.35" stroke-width="6" stroke-linecap="round"/>

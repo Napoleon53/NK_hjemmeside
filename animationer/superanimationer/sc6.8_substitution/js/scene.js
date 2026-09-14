@@ -27,6 +27,7 @@
         bromflaske:  { x: 40, y: 4 },
         skruelaag:   { x: 17, y: 22 },
         hexan:       { x: 23, y: 4 },
+        hexen:       { x: 23, y: 4 },
         reagensglas: { x: 15, y: 2 },
         prop:        { x: 13, y: 26 },
         agno3:       { x: 23, y: 0 },
@@ -35,7 +36,6 @@
         folie:       { x: 38, y: 22 },
         dunk:        { x: 45, y: 12 },
         kaffekop:    { x: 18, y: 40 },
-        heks:        { x: 32, y: 72 },
         papir:       { x: 36, y: 22 },
         laererKrop:  { x: 110, y: 18 },
         laererHoved: { x: 55, y: 126 },
@@ -57,22 +57,22 @@
     S.DUNK = { x: 875, y: S.BORD - 130, aabning: { x: 920, y: S.BORD - 118 } };
     S.PANEL = { x: 770, y: 6 };
     S.KONTAKT = { x0: 770 + 150, x1: 770 + 206, y0: 6 + 8, y1: 6 + 70 };
-    S.HYLDE = { x0: 16, x1: 156, y: 268 };
+    S.HYLDE = { x0: 16, x1: 116, y: 268 };
     S.UR = { x: 160, y: 186, r: 24 };
-    S.LAAG_PAA_BORD = { x: 18, y: S.BORD, v: 0 };
+    S.LAAG_PAA_BORD = { x: 10, y: S.BORD, v: 0 };
 
     S.HJEM = {
-        bromflaske: staar("bromflaske", 78),
-        hexan:      staar("hexan", 158),
-        agno3:      staar("agno3", 212),
-        phpapir:    staar("phpapir", 278),
+        bromflaske: staar("bromflaske", 68),
+        hexan:      staar("hexan", 138),
+        hexen:      staar("hexen", 184),
+        agno3:      staar("agno3", 230),
+        phpapir:    staar("phpapir", 288),
         glas1:      { x: S.STATIV.huller[0], y: S.GLAS_Y, v: 0 },
         glas2:      { x: S.STATIV.huller[1], y: S.GLAS_Y, v: 0 },
         prop1:      staar("prop", 490),
         prop2:      staar("prop", 518),
         folie:      staar("folie", 590),
-        kaffekop:   staar("kaffekop", 50, S.HYLDE.y),
-        heks:       staar("heks", 116, S.HYLDE.y)
+        kaffekop:   staar("kaffekop", 60, S.HYLDE.y)
     };
     S.UNDER_LAMPE = { x: S.HOLDER.midt, y: S.GLAS_Y, v: 0 };
 

@@ -55,14 +55,14 @@ animation. Det nye er:
   er én dråbe; der skal tre til. I glasset fra lyset bliver papiret rødt, og
   der kommer bundfald. I glasset fra mørket er papiret gult, og der sker
   ingenting.
-* **Resultater og hint i panelet.** Resultaterne for de to glas står ved siden
-  af hinanden. Hint giver en kort tekst til det aktuelle trin og markerer den
+* **Hint i panelet.** Hint giver en kort tekst til det aktuelle trin og markerer den
   genstand, det handler om. Der er ingen teori foran forsøget; den ligger bag
   knappen Teori.
 * **Tegneserie.** Når resterne er hældt i dunken, låses knappen Tegneserie op.
-  Den viser forsøget i syv ruder, tegnet med de samme funktioner som scenen og
+  Den viser forsøget i ruder, tegnet med de samme funktioner som scenen og
   med elevens egne resultater: hvilket glas der stod i lys, pH-værdierne og
-  bundfaldet. Var der et uheld, får det sin egen rude.
+  bundfaldet. Sidste rude er resultatskemaet for de to glas. Var der et
+  uheld, får det sin egen rude.
 * **Quiz** med ti spørgsmål, låst op når begge glas er testet med pH-papir og
   AgNO₃.
 
@@ -88,11 +88,12 @@ et sprite uden ansigt; øjne, bryn, mund og rødme tegnes i koden. Alt står i
 * **Lampen tændt uden glas.** Efter 20 sekunder kommer læreren og slukker.
 * **Uret.** Et klik på væguret får tiden til at gå fire gange hurtigere i 12
   sekunder. Et klik til stopper det.
-* **Heksen.** Hun sidder på sin kost på hylden og er ikke en del af forsøget.
-  Klik på hende: hun svarer, flyver en tur gennem stinkskabet med gnister
-  efter sig, forhekser lampen (tænder eller slukker den, hvis der står et
-  glas under den) og siger sin remse om seks C og fjorten H. Alt står i
-  `js/heks.js` og kan slettes uden at forsøget ændres.
+* **Hex-1-en.** Flasken står ved siden af hexan og er ikke en del af forsøget.
+  Hældes den i et glas med bromvand, og der rystes, forsvinder farven på få
+  sekunder, også uden lys: Br₂ lægges til dobbeltbindingen (en addition), og
+  der dannes hverken HBr eller bromid. Læreren påtaler, at det ikke hører til
+  forsøget. pH-papir og AgNO₃ kan prøves i glasset, og det tømmes i dunken, så
+  det kan bruges igen. Reaktionen står i `ADDITION` i `js/model.js`.
 
 ## Sprites
 
@@ -102,7 +103,7 @@ ankerpunkt (i `S.ANKER` i `js/scene.js`), som den drejes om.
 | Fil | Indhold | Anker og mål, som koden bruger |
 |-----|---------|-------------------------------|
 | `flaske_bromvand.svg`, `skruelaag.svg` | brun flaske med bromvand, GHS05, GHS06, GHS09, og låg | åbning (40, 4); lågets bund (17, 22) |
-| `flaske_hexan.svg` | hexan med GHS02, GHS07, GHS08, GHS09 | åbningen (23, 4); låget tegnes i koden |
+| `flaske_hexan.svg`, `flaske_hexen.svg` | hexan og hex-1-en med GHS02, GHS07, GHS08, GHS09 | åbningen (23, 4); låget tegnes i koden |
 | `reagensglas.svg` | reagensglas | åbning (15, 2); inderside i `S.GLAS_INDRE` |
 | `stativ.svg` | træstativ til to glas | huller ved x 45 og 105; tegnes efter glassene |
 | `prop_lille.svg` | gummiprop til reagensglas | bunden (13, 26) |
@@ -112,13 +113,13 @@ ankerpunkt (i `S.ANKER` i `js/scene.js`), som den drejes om.
 | `draabeflaske_agno3.svg` | dråbeflaske med sølvnitrat | spids (23, 0) |
 | `affaldsdunk.svg` | halogenholdigt organisk affald, GHS02, GHS09 | åbning (45, 12) |
 | `kontrolpanel.svg` | stinkskabets panel | vinger, lampe, display og kontakt tegnes i `scene.js` |
-| `kaffekop.svg`, `heks.svg` | lærerens kop og heksen på hylden | bunden (18, 40) og (32, 72) |
+| `kaffekop.svg` | lærerens kop | bunden (18, 40) |
 | `koekkenrulle.svg` | køkkenrulle til pytten | midte (36, 22) |
 | `laerer_krop.svg`, `laerer_hoved.svg`, `laerer_arm.svg` | læreren | halsen (110, 18) og (55, 126); skulderen (28, 142) |
 | `haand.svg`, `lup.svg` | handske og lup, som i sc2.6 | grebet (40, 46) |
 
 Væsker, strålen, dråber, bromdampe, pytten, pH-strimlerne, holderen under
-lampen, lyskeglen, uret, gnister, den store visnings lampeskærm og zoomboblen
+lampen, lyskeglen, uret, den store visnings lampeskærm og zoomboblen
 tegnes i koden. Væskens overflade er altid vandret, uanset hvordan glasset
 hælder: `NK.vaeskeNiveau` i `kerne.js` finder den højde, hvor netop væskens
 areal ligger under overfladen. Ændres en sprite, skal tallene i `scene.js`
@@ -137,9 +138,8 @@ js/scene.js         tegnebordet (1000 x 600): maal, stinkskab, glas, lampe
 js/mikro.js         partikelmodellen i zoomboblen
 js/forsoeg.js       trinene, tilstanden og handlingerne
 js/bord.js          tegning af bordet, den store visning og musen
-js/laerer.js        laereren: kaffe, klik, uheld, ros, dab, lampen
-js/heks.js          heksen paa hylden
-js/tegneserie.js    forsoeget som tegneserie
+js/laerer.js        laereren: kaffe, klik, uheld, ros, dab, lampen, hexen
+js/tegneserie.js    forsoeget som tegneserie med resultatskemaet med resultatskemaet
 js/quiz.js          quizkortet og de ti spoergsmaal
 js/rundvisning.js   spotlight-rundvisningen bag ?-knappen
 js/app.js           panel, resultater, knapper, tastatur, tegneloekke
@@ -173,7 +173,7 @@ glasset kan bæres til lampen og tilbage, at den store visning åbner og lukker,
 at et glas i folie ikke kan røres, at begge tests giver de rigtige resultater i
 begge glas, at tegneserien låses op til sidst, at læreren dabber efter et
 særlig godt forsøg, at almindelig rystning med musen ikke taber proppen, at
-meget voldsom rystning gør, at kaffen, uret, lampen og heksen virker, og at der
+meget voldsom rystning gør, at kaffen, uret og lampen virker, at hex-1-en giver en addition uden lys, og at der
 ikke er tankestreger eller 1+/1− i teksterne. Den skal åbnes gennem en lokal
 server: Chrome nægter en side på `file://` at kigge ind i sin egen iframe.
 

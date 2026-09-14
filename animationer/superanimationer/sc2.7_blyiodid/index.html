@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Substitution i benzin</title>
+<title>Opløselighed af blyiodid</title>
 <link rel="stylesheet" href="css/stil.css">
 </head>
 <body>
 
 <header class="top">
-    <h1><span class="ikon">⚗</span> Substitution i benzin <span class="undertitel">Hexan og Br₂ i lys og mørke</span></h1>
+    <h1><span class="ikon">⚗</span> Opløselighed af blyiodid <span class="undertitel">PbI₂ ved opvarmning og afkøling</span></h1>
 
     <div class="top-hoejre">
         <button class="knap topknap" id="forfraknap" type="button" title="Start forsøget forfra">Start forfra</button>
@@ -27,25 +27,34 @@
 
 <main class="forsoeg">
     <div class="scene" id="scene">
-        <canvas id="scene-laerred" aria-label="Stinkskab med bromvand, hexan, hex-1-en, to reagensglas i et stativ, propper, alufolie, en lampe, pH-papir, sølvnitrat og affaldsdunk"></canvas>
+        <canvas id="scene-laerred" aria-label="Laboratoriebord med Pb(NO₃)₂, KI, vægt med vejebåd, spatel, måleglas med vand, varmeplade med bægerglas, termometer og affaldsdunk"></canvas>
         <div class="scenebesked" id="scenebesked" aria-live="polite"></div>
     </div>
 
     <aside class="panel">
         <div class="kort fremhaev" id="forloeb-kort">
-            <h2><span id="forloeb-titel">Forløb</span> <span class="taeller" id="forloeb-taeller"></span></h2>
+            <h2><span>Forløb</span> <span class="taeller" id="forloeb-taeller"></span></h2>
             <ol class="trinliste" id="trin-liste"></ol>
             <div class="knaprad">
-                <button class="knap orange" id="ryst-knap" type="button" title="Hold nede for at ryste det valgte glas (R)" hidden><span>Ryst glasset</span><span class="tegn">↔</span></button>
+                <button class="knap groen" id="noter-knap" type="button" title="Notér temperaturen (N)" hidden><span>Notér temperatur</span><span class="tegn">°C</span></button>
                 <button class="knap" id="hint-knap" type="button" title="Hint til trinnet (I)"><span>Hint</span><span class="tegn">?</span></button>
             </div>
             <p class="hint" id="hint-tekst" hidden></p>
         </div>
 
-        <div class="kort" id="serie-kort">
-            <h2>Tegneserie</h2>
-            <p class="besked" id="serie-tekst">Låses op, når forsøget er slut.</p>
-            <button class="knap stor blaa" id="serieknap" type="button" hidden><span>Se forsøget som tegneserie</span><span class="tegn">→</span></button>
+        <div class="kort" id="maaling-kort">
+            <h2><span>Målinger</span> <span class="taeller" id="maaling-taeller"></span></h2>
+            <table class="maalinger">
+                <thead><tr><th>Nr.</th><th>Pb(NO₃)₂</th><th>KI</th><th>PbI₂</th><th>Temp.</th></tr></thead>
+                <tbody id="maaling-rader"></tbody>
+            </table>
+            <canvas id="graf" aria-label="Graf med målingerne: g PbI₂ pr. 100 mL vand mod temperaturen"></canvas>
+            <p class="graf-note" id="graf-note"></p>
+        </div>
+
+        <div class="kort" id="iagttagelser-kort">
+            <h2>Iagttagelser</h2>
+            <ul class="iagttagelser" id="iagttagelse-liste"><li class="tom">Endnu ingen.</li></ul>
         </div>
 
         <div class="kort opgavekort" id="quiz-kort">
@@ -62,42 +71,28 @@
 <!-- ================================================================= -->
 <div class="overlay" id="teori">
     <div class="overlay-boks">
-        <h2>Substitution i benzin</h2>
-        <p>Benzin består af alkaner som hexan. Alkaner er upolære og reagerer kun med Br₂, når der er lys til stede.</p>
+        <h2>Opløselighed af blyiodid</h2>
 
-        <h3>Fasefordeling</h3>
-        <p>Hexan blandes ikke med vand og lægger sig øverst. Br₂ er upolært og opløses langt bedre i hexan end i vand. Når glasset rystes, vandrer Br₂ op i hexanlaget, som bliver orange.</p>
+        <h3>Fældning</h3>
+        <p>Pb(NO₃)₂ og KI er letopløselige salte. I vandet findes ionerne Pb²⁺, NO₃⁻, K⁺ og I⁻. Pb²⁺ og I⁻ danner det tungtopløselige salt PbI₂, der fældes som et gult bundfald:</p>
+        <div class="ligning">Pb²⁺(aq) + 2 I⁻(aq) → PbI₂(s)</div>
+        <p>K⁺ og NO₃⁻ er tilskuerioner.</p>
 
-        <h3>Substitution</h3>
-        <p>Lyset spalter Br₂ i to Br-atomer. Et Br-atom erstatter et H-atom i hexan, og det frigjorte H-atom binder sig til det andet Br-atom:</p>
-        <div class="ligning">C₆H₁₄ + Br₂ → C₆H₁₃Br + HBr</div>
-        <p>Farven forsvinder, fordi Br₂ bliver brugt op. I mørke sker der ingenting.</p>
+        <h3>Samme masse</h3>
+        <p>Der skal to I⁻ til hver Pb²⁺. M(Pb(NO₃)₂) = 331,2 g/mol er næsten det dobbelte af M(KI) = 166,0 g/mol. Samme masse af de to stoffer giver derfor dobbelt så mange mol KI som Pb(NO₃)₂:</p>
+        <div class="ligning lille">Pb(NO₃)₂ + 2 KI → PbI₂ + 2 KNO₃</div>
 
-        <h3>Påvisning i vandfasen</h3>
-        <p>HBr er polært og opløses i vandet, hvor det er en stærk syre:</p>
-        <div class="ligning lille">HBr + H₂O → H₃O⁺ + Br⁻</div>
-        <p>H₃O⁺ giver en lav pH, som pH-papiret viser. Br⁻ påvises med AgNO₃, som giver et lysegult bundfald:</p>
-        <div class="ligning lille">Ag⁺ + Br⁻ → AgBr(s)</div>
+        <h3>Opløselighed og temperatur</h3>
+        <p>Opløseligheden er den største masse af et stof, der kan opløses i 100 mL vand. For PbI₂ er den 0,069 g ved 20 °C og 0,41 g ved 100 °C. Når bundfaldet netop forsvinder ved opvarmning, er opløsningen mættet, og massen af PbI₂ pr. 100 mL er opløseligheden ved den temperatur. Ved afkøling falder opløseligheden, og PbI₂ krystalliserer igen som glinsende, gule flager.</p>
 
-        <h3>Kontrolforsøg</h3>
-        <p>Glasset i alufolie er magen til, bortset fra lyset. Det beholder farven, og vandfasen er hverken sur eller indeholder bromid. Forskellen mellem de to glas skyldes derfor lyset.</p>
+        <h3>Beregning</h3>
+        <p>Stofmængden af Pb(NO₃)₂ er n = m / M. Der dannes lige så mange mol PbI₂, og massen er m(PbI₂) = n · 461,0 g/mol.</p>
 
         <h3>Sikkerhed</h3>
-        <p>Br₂ er giftigt og ætsende og fordamper let. Der arbejdes i stinkskab med udsugning. Hexan er brandfarligt. Bromhexan afleveres som halogenholdigt organisk affald.</p>
+        <p>Pb(NO₃)₂ er giftigt, brandnærende og kan skade forplantningsevnen. Brug handsker, og undgå spild. Resterne indeholder bly og afleveres som tungmetalaffald.</p>
 
         <div class="knapper">
             <button class="knap blaa" id="teori-luk" type="button">Luk</button>
-        </div>
-    </div>
-</div>
-
-<!-- ================================================================= -->
-<div class="overlay" id="tegneserie">
-    <div class="overlay-boks bred">
-        <h2>Forsøget som tegneserie</h2>
-        <div class="serie" id="serie-ruder"></div>
-        <div class="knapper">
-            <button class="knap blaa" id="serie-luk" type="button">Luk</button>
         </div>
     </div>
 </div>
@@ -129,7 +124,7 @@
 <script src="js/forsoeg.js"></script>
 <script src="js/bord.js"></script>
 <script src="js/laerer.js"></script>
-<script src="js/tegneserie.js"></script>
+<script src="js/graf.js"></script>
 <script src="js/quiz.js"></script>
 <script src="js/rundvisning.js"></script>
 <script src="js/app.js"></script>

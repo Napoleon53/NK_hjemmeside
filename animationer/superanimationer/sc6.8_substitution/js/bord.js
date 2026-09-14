@@ -34,7 +34,6 @@
         if (pt.x > K.x0 && pt.x < K.x1 && pt.y > K.y0 && pt.y < K.y1) return "kontakt";
         if (Math.sqrt((pt.x - S.UR.x) * (pt.x - S.UR.x) + (pt.y - S.UR.y) * (pt.y - S.UR.y)) < S.UR.r + 6) return "ur";
         if (this.bobleAlfa > 0.5 && Math.sqrt((pt.x - S.BOBLE.x) * (pt.x - S.BOBLE.x) + (pt.y - S.BOBLE.y) * (pt.y - S.BOBLE.y)) < S.BOBLE.r) return "boble";
-        if (this.heks && !this.heks.flyver && S.inden("heks", this.heks.p, A.heks, pt.x, pt.y, 4)) return "heks";
         var kop = g.kaffekop;
         if (!kop.skjult && !kop.iHaand && S.inden("kaffekop", kop.p, kop.anker, pt.x, pt.y, 6)) return "kaffekop";
 
@@ -52,7 +51,7 @@
             var pr2 = g[propper[i]];
             if (!pr2.iGlas && !pr2.flyver && S.inden("prop", pr2.p, pr2.anker, pt.x, pt.y, 8)) return pr2.navn;
         }
-        var navne = ["folie", "phpapir", "agno3", "hexan", "bromflaske"];
+        var navne = ["folie", "phpapir", "agno3", "hexen", "hexan", "bromflaske"];
         for (i = 0; i < navne.length; i++) {
             var gg = g[navne[i]];
             if (S.inden(gg.sprite, gg.p, gg.anker, pt.x, pt.y, 5)) return gg.navn;
@@ -181,12 +180,13 @@
                 NK.Sprites.tegnPositur(ctx, "skruelaag", this.laagPositur(), A.skruelaag);
                 break;
             case "hexan":
-                if (hjemme) S.skygge(ctx, 158, 22, 0.3);
-                NK.Sprites.tegnPositur(ctx, "hexan", gg.p, gg.anker);
-                /* Laaget: skrues af og laegges paa bordet ved siden af */
+            case "hexen":
+                if (hjemme) S.skygge(ctx, gg.hjem.x, 22, 0.3);
+                NK.Sprites.tegnPositur(ctx, gg.sprite, gg.p, gg.anker);
+                /* Laaget: skrues af og laegges paa bordet foran flasken */
                 var paa = NK.tilVerden(gg.p, gg.anker, 23, 4);
-                var t = NK.blod(this.hexLaagT);
-                var x = NK.lerp(paa.x, 126, t), y = NK.lerp(paa.y, S.BORD - 5, t) - Math.sin(Math.PI * t) * 30;
+                var t = NK.blod(gg.navn === "hexan" ? this.hexLaagT : this.hexenLaagT);
+                var x = NK.lerp(paa.x, gg.hjem.x - 6, t), y = NK.lerp(paa.y, S.BORD - 3, t) - Math.sin(Math.PI * t) * 30;
                 ctx.save();
                 ctx.translate(x, y);
                 ctx.rotate(NK.lerp(gg.p.v, 0, t));
@@ -255,6 +255,7 @@
         var t = "Glas " + gl.nr;
         if (gl.sted === "lampe") t += this.lampeTaendt ? " under lampen" : " under den slukkede lampe";
         else if (gl.folie) t += " i folie";
+        else if (gl.alken) t += " med hexen";
         else if (gl.brom) t += " i stativet";
         return t;
     };
@@ -296,7 +297,7 @@
         S.tegnLampe(ctx, this.lampeVis, tid, this.markeret("lampe"));
 
         var aktive = [];
-        var orden = ["bromflaske", "hexan", "agno3", "phpapir", "glas1", "glas2", "STATIV", "PAPIR", "prop1", "prop2", "folie"];
+        var orden = ["bromflaske", "hexan", "hexen", "agno3", "phpapir", "glas1", "glas2", "STATIV", "PAPIR", "prop1", "prop2", "folie"];
         for (i = 0; i < orden.length; i++) {
             if (orden[i] === "STATIV") {
                 S.tegnStativ(ctx);
@@ -337,7 +338,6 @@
         S.tegnDraaber(ctx, this.draaber);
         for (i = 0; i < this.strimler.length; i++) S.tegnStrimmel(ctx, this.strimler[i]);
         S.tegnDampe(ctx, this.dampe);
-        if (this.tegnHeks) this.tegnHeks(ctx, tid);
         if (this.tegnLaerer) this.tegnLaerer(ctx, tid);
         this.tegnStor(ctx, tid);
         ctx.restore();

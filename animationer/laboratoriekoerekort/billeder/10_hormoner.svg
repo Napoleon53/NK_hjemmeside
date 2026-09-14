@@ -15,10 +15,10 @@
       <stop offset="1" stop-color="#a39d90"/>
     </linearGradient>
     <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.7"/>
-      <stop offset="0.2" stop-color="#d4ebfa" stop-opacity="0.25"/>
-      <stop offset="0.8" stop-color="#d4ebfa" stop-opacity="0.2"/>
-      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.6"/>
+      <stop offset="0" stop-color="#b5d6ea" stop-opacity="0.7"/>
+      <stop offset="0.2" stop-color="#b5d6ea" stop-opacity="0.25"/>
+      <stop offset="0.8" stop-color="#b5d6ea" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#b5d6ea" stop-opacity="0.6"/>
     </linearGradient>
     <linearGradient id="kittel" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#dfe5e8"/>

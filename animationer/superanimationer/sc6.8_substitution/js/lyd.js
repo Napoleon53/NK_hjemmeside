@@ -219,37 +219,6 @@
             tone(c, nu + 0.35, 260, 160, 0.15, 0.06);
         },
 
-        /* Heksens latter: korte, faldende toner */
-        latter: function () {
-            var c = klar(); if (!c) return;
-            var nu = c.currentTime;
-            for (var i = 0; i < 6; i++) tone(c, nu + i * 0.11, 620 - i * 55, 480 - i * 50, 0.09, 0.09, "sawtooth", 1600);
-        },
-
-        /* Trylleri: opadgaaende glissando med glimt */
-        tryl: function () {
-            var c = klar(); if (!c) return;
-            var nu = c.currentTime;
-            tone(c, nu, 500, 2400, 0.5, 0.08);
-            for (var i = 0; i < 5; i++) tone(c, nu + 0.15 + i * 0.07, 1800 + i * 300, 2600 + i * 300, 0.06, 0.05, "triangle");
-        },
-
-        /* Et svusj, naar heksen flyver */
-        svusj: function () {
-            var c = klar(); if (!c) return;
-            var nu = c.currentTime;
-            var kilde = stoej(c, 1.4, function (r) { return Math.sin(r * Math.PI); });
-            var f = c.createBiquadFilter();
-            f.type = "bandpass";
-            f.frequency.setValueAtTime(400, nu);
-            f.frequency.exponentialRampToValueAtTime(2200, nu + 0.7);
-            f.frequency.exponentialRampToValueAtTime(500, nu + 1.4);
-            var g = c.createGain();
-            g.gain.setValueAtTime(0.35, nu);
-            kilde.connect(f).connect(g).connect(c.destination);
-            kilde.start(nu);
-        },
-
         /* Et enkelt dunk til dab'et */
         bom: function () {
             var c = klar(); if (!c) return;

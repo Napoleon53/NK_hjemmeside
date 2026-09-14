@@ -192,6 +192,20 @@
         ], false);
     };
 
+    /* Hex-1-en i glasset: en addition, som ikke hoerer til forsoeget */
+    P.laererHexen = function () {
+        var L = this.laerer;
+        if (L.scene) return;
+        this.laererKoer("hexen", [
+            { udtryk: { vrede: 0.7, humoer: -0.4, roed: 0.1 } },
+            { gaa: 200 },
+            { sig: "Hexen? Det giver en addition.", vis: 2.4, tid: 2.5 },
+            { sig: "Det er ikke en del af forsøget.", vis: 2.4, tid: 2.2 },
+            { kald: function () { if (NK.Lyd) NK.Lyd.brum(); } },
+            { gaa: UDE }
+        ], false);
+    };
+
     /* Lampen staar taendt uden glas under sig */
     P.laererSlukLampe = function () {
         var L = this.laerer;

@@ -11,10 +11,10 @@
       <stop offset="1" stop-color="#2c373b"/>
     </linearGradient>
     <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.55"/>
-      <stop offset="0.18" stop-color="#d4ebfa" stop-opacity="0.18"/>
-      <stop offset="0.8" stop-color="#d4ebfa" stop-opacity="0.12"/>
-      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.45"/>
+      <stop offset="0" stop-color="#b5d6ea" stop-opacity="0.55"/>
+      <stop offset="0.18" stop-color="#b5d6ea" stop-opacity="0.18"/>
+      <stop offset="0.8" stop-color="#b5d6ea" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#b5d6ea" stop-opacity="0.45"/>
     </linearGradient>
     <linearGradient id="brun" x1="0" y1="0" x2="1" y2="0">
       <stop offset="0" stop-color="#2a1407"/>
@@ -96,8 +96,8 @@
   <!-- Saltsyre, klar flaske uden laag -->
   <g transform="translate(806 350)">
     <ellipse cx="80" cy="214" rx="92" ry="12" fill="#000" opacity="0.28"/>
-    <rect x="60" y="0" width="40" height="36" fill="#d4ebfa" fill-opacity="0.35" stroke="#e6f2fb" stroke-width="3"/>
-    <path d="M62 36 H98 V52 C98 68 154 72 154 100 V198 Q154 214 138 214 H22 Q6 214 6 198 V100 C6 72 62 68 62 52 Z" fill="url(#glas)" stroke="#e6f2fb" stroke-width="3"/>
+    <rect x="60" y="0" width="40" height="36" fill="#d4ebfa" fill-opacity="0.35" stroke="#86a9c0" stroke-width="3"/>
+    <path d="M62 36 H98 V52 C98 68 154 72 154 100 V198 Q154 214 138 214 H22 Q6 214 6 198 V100 C6 72 62 68 62 52 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3"/>
     <path d="M9 130 V198 Q9 210 22 210 H138 Q151 210 151 198 V130 Z" fill="#dff0f8" opacity="0.3"/>
     <rect x="20" y="92" width="120" height="106" rx="6" fill="#fbfaf5" stroke="#c8bda6" stroke-width="2"/>
     <text x="80" y="122" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#1f2328">HCl (aq)</text>
@@ -125,9 +125,9 @@
     <rect x="0" y="40" width="160" height="16" rx="3" fill="#e9eef0"/>
     <rect x="0" y="80" width="160" height="12" rx="3" fill="#c9d1d3"/>
     <path d="M8 56 V80 M152 56 V80" stroke="#c9d1d3" stroke-width="8"/>
-    <rect x="30" y="-10" width="20" height="96" rx="9" fill="url(#glas)" stroke="#e6f2fb" stroke-width="2.5"/>
-    <rect x="70" y="-10" width="20" height="96" rx="9" fill="url(#glas)" stroke="#e6f2fb" stroke-width="2.5"/>
-    <rect x="110" y="-10" width="20" height="96" rx="9" fill="url(#glas)" stroke="#e6f2fb" stroke-width="2.5"/>
+    <rect x="30" y="-10" width="20" height="96" rx="9" fill="url(#glas)" stroke="#86a9c0" stroke-width="2.5"/>
+    <rect x="70" y="-10" width="20" height="96" rx="9" fill="url(#glas)" stroke="#86a9c0" stroke-width="2.5"/>
+    <rect x="110" y="-10" width="20" height="96" rx="9" fill="url(#glas)" stroke="#86a9c0" stroke-width="2.5"/>
     <path d="M72 50 V84 Q80 90 88 84 V50 Z" fill="#a8d8f0" opacity="0.6"/>
   </g>
 </svg>

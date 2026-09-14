@@ -92,7 +92,60 @@
         return "pH ≈ " + Math.round(gl.ph) + " (" + M.pHTekst(gl.ph) + ")";
     }
 
+    /* ----- Resultatskemaet: de to glas ved siden af hinanden --------------- */
+    function stedTekst(gl) {
+        if (gl.alken) return "hexen";
+        if (gl.sted === "lampe" || gl.lysTid > 0) return "Lys";
+        if (gl.folie || gl.moerkeTid > 0) return "Mørke";
+        return "";
+    }
+
+    function celle(tr, tekst, farve, farveloes) {
+        var td = document.createElement("td");
+        if (farve || farveloes) {
+            var sp = document.createElement("span");
+            sp.className = "farve" + (farve ? "" : " farveloes");
+            if (farve) sp.style.backgroundColor = NK.css({ r: farve.r, g: farve.g, b: farve.b, a: 1 });
+            td.appendChild(sp);
+        }
+        td.appendChild(document.createTextNode(tekst));
+        tr.appendChild(td);
+    }
+
+    function resultatTabel(f) {
+        var tabel = document.createElement("table");
+        tabel.className = "resultater";
+        var glas = [f.g.glas1, f.g.glas2];
+        var hoved = document.createElement("tr");
+        ["", "Glas 1", "Glas 2"].forEach(function (t) { var th = document.createElement("th"); th.textContent = t; hoved.appendChild(th); });
+        tabel.appendChild(hoved);
+        var raekker = [
+            ["Lys eller mørke", function (gl) { celle(this, stedTekst(gl), null, false); }],
+            ["Farve til sidst", function (gl) {
+                var ft = gl.slutFarve || M.farveTekst(gl);
+                if (ft === "farveløs") celle(this, ft, null, true);
+                else celle(this, ft, ft ? (gl.slutFarveVaerdi || (gl.brHex > gl.brVand ? M.hexanFarve(gl) : M.vandFarve(gl))) : null, false);
+            }],
+            ["pH-papir", function (gl) { celle(this, gl.ph === null ? "ikke testet" : "pH ≈ " + Math.round(gl.ph) + ", " + M.pHTekst(gl.ph), gl.phFarve, false); }],
+            ["AgNO₃", function (gl) {
+                if (!gl.agNoteret) celle(this, "ikke testet", null, false);
+                else if (gl.reageret > 0.5) celle(this, "bundfald", M.FARVE.bundfald, false);
+                else celle(this, "ingen forandring", null, true);
+            }]
+        ];
+        raekker.forEach(function (rk) {
+            var tr = document.createElement("tr");
+            var th = document.createElement("th");
+            th.textContent = rk[0];
+            tr.appendChild(th);
+            glas.forEach(function (gl) { rk[1].call(tr, gl); });
+            tabel.appendChild(tr);
+        });
+        return tabel;
+    }
+
     NK.Tegneserie = {
+        resultatTabel: resultatTabel,
         byg: function (f, container) {
             container.innerHTML = "";
             var g1 = f.g.glas1, g2 = f.g.glas2;
@@ -166,6 +219,18 @@
                 tekst(ctx, "kun i lys", 150, GLAS_Y + 118, { farve: "#c8ced6" });
                 tekst(ctx, "i mørke: ingen reaktion", 150, GLAS_Y + 140, { farve: "#c8ced6" });
             });
+
+            var sidste = document.createElement("div");
+            sidste.className = "rude";
+            var overskrift = document.createElement("p");
+            var nrSpan = document.createElement("span");
+            nrSpan.className = "nr";
+            nrSpan.textContent = String(++nr);
+            overskrift.appendChild(nrSpan);
+            overskrift.appendChild(document.createTextNode("Resultater for de to glas."));
+            sidste.appendChild(overskrift);
+            sidste.appendChild(resultatTabel(f));
+            container.appendChild(sidste);
 
             [g1, g2].forEach(function (gl) {
                 if (!f.iagttaget["uheld" + gl.nr]) return;
