@@ -25,7 +25,6 @@
             { sel: "#byg-panel-partikler", titel: "Tilføj elementarpartikler", tekst: "Læg protoner, neutroner og elektroner i én ad gangen, og se hvad hvert tal styrer." },
             { sel: "#opgave-boks", titel: "Opgaven", tekst: "Få en opgave, du selv skal bygge — fx et bestemt grundstof eller en ion." },
             { sel: "#byg-nuklid", titel: "Mærkatet", tekst: "Massetal, atomnummer, symbol og ladning — skrevet på samme måde som i kemibogen." },
-            { sel: "#byg-reaktiv", titel: "Reaktivitet", tekst: "Viser, hvor stabilt atomet er lige nu. Jo taettere på en ædelgasstruktur, jo mere stabilt." },
             { sel: "#byg-nulstil", titel: "Genstart", tekst: "Nulstil til det simpleste atom: én proton og én elektron." },
             { sel: ".faneknapper", titel: "De øvrige faner", tekst: "Isotoper, salte og et afsluttende quizspil bygger videre på det samme." }
         ],

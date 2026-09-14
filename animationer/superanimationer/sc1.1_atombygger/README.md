@@ -52,9 +52,9 @@ spørgsmål — dér med atomnummeret i felterne.
   elektroner, så massetal og isotoper kunne slet ikke vises.
 * **Kernen tegnes som partikler**, ikke som én lilla kugle. Man kan tælle
   protonerne, og kernen vokser synligt, når man lægger mere i.
-* **Reaktivitetsmåleren er erstattet.** Den gamle gav en procentskala, eleven
-  ikke kunne efterprøve. Nu tælles der noget konkret: *hvor mange elektroner
-  skal flyttes, før elektronskyen ligner en ædelgas.*
+* **Reaktivitetsmåleren er fjernet.** Den gamle gav en procentskala, eleven
+  ikke kunne efterprøve. Ædelgasstruktur nævnes i stedet i beskeden, der
+  kommer, når man lægger en elektron i eller fjerner én.
 * **Saltfanen tvinger ikke længere metal og ikke-metal til at passe én til én.**
   Vælger man magnesium og chlor, regner modellen selv ud, at der skal to
   chloratomer til — og skriver forklaringen ud.

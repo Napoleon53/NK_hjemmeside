@@ -46,14 +46,6 @@
             <span class="q" id="byg-nuklid-q"></span>
         </div>
 
-        <!-- Hvor taet er elektronskyen paa en aedelgasstruktur lige nu?
-             Se D.reaktivitet() i data.js og opdaterPanel() i sim_byg.js. -->
-        <div class="reaktivkort" id="byg-reaktiv" aria-live="polite" hidden>
-            <span class="reaktivkort-etiket">Reaktivitet</span>
-            <div class="reaktivkort-bar"><div class="reaktivkort-fyld" id="byg-reaktiv-fyld"></div></div>
-            <span class="reaktivkort-tekst" id="byg-reaktiv-tekst"></span>
-        </div>
-
         <!-- Findes kernen i naturen? Staar lige under selve atommodellen,
              saa svaret er dér, hvor man kigger. Placeres af sim_byg.js. -->
         <div class="kernekort" id="byg-kerne" aria-live="polite"></div>
@@ -109,6 +101,18 @@
         <div class="kort opgavekort" id="opgave-boks">
             <h2>Opgave <span class="taeller" id="byg-opgave-taeller" style="display:none;">1/5</span></h2>
             <p class="besked" id="byg-opgave">Tryk på “Start opgave” for at få en opgave, du selv skal bygge.</p>
+
+            <!-- Det fulde atomsymbol paa opgavens facit: massetal, atomnummer
+                 og ladning, praecis som i kemibogen. Vises foerst naar svaret
+                 afsloeres, saa den ikke spoiler opgaven - se visSvar() og
+                 tjekOpgave() i sim_byg.js. -->
+            <div class="nuklid nuklid-svar" id="byg-opgave-nuklid" hidden>
+                <span class="a" id="byg-opgave-nuklid-a"></span>
+                <span class="z" id="byg-opgave-nuklid-z"></span>
+                <span class="sym" id="byg-opgave-nuklid-sym"></span>
+                <span class="q" id="byg-opgave-nuklid-q"></span>
+            </div>
+
             <div class="knaprad">
                 <button class="knap blaa" id="byg-opgave-ny" type="button">Start opgave</button>
                 <button class="knap" id="byg-opgave-svar" type="button" style="display:none;">Vis svaret</button>

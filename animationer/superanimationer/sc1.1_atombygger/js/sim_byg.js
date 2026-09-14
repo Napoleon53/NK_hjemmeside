@@ -213,18 +213,6 @@
 
         if (this.pertabel) this.pertabel.marker(g ? this.p : 0);
 
-        /* Reaktivitetsindikatoren: hvor taet er elektronskyen paa en
-           aedelgasstruktur lige nu? Kun relevant, naar der rent faktisk
-           er et grundstof og elektroner at vurdere. */
-        var reakt = g ? D.reaktivitet(this.e) : null;
-        NK.el("byg-reaktiv").hidden = !reakt;
-        if (reakt) {
-            NK.el("byg-reaktiv-fyld").style.width = reakt.andel + "%";
-            NK.saetKlasse("byg-reaktiv-fyld", "reaktivkort-fyld " + reakt.farve);
-            NK.saetTekst("byg-reaktiv-tekst", reakt.tekst);
-            NK.saetKlasse("byg-reaktiv-tekst", "reaktivkort-tekst " + reakt.farve);
-        }
-
         /* Kernen: findes den overhovedet? Teksten staar under selve
            atommodellen i scenen - se tegn(). */
         var k = D.kerne(this.p, this.n);
@@ -364,6 +352,23 @@
         NK.el("byg-opgave-ny").textContent = "Start opgave";
         NK.el("byg-opgave-ny").classList.remove("banker");
         NK.el("byg-opgave-taeller").style.display = "none";
+        NK.el("byg-opgave-nuklid").hidden = true;
+    };
+
+    /* Facit-symbolet: massetal, atomnummer, symbol og ladning, skrevet
+       ganske som maerkatet over atomet selv (byg-nuklid). Vises kun
+       naar opgaven er afsloeret eller loest - se visSvar() og
+       tjekOpgave() - saa den ikke spoiler opgaven paa forhaand. */
+    NK.SimByg.prototype.visOpgaveNuklid = function (o) {
+        var g = D.grundstof(o.p);
+        var a = o.p + o.n;
+        var q = o.p - o.e;
+        NK.saetTekst("byg-opgave-nuklid-sym", g ? g.symbol : "?");
+        NK.saetTekst("byg-opgave-nuklid-a", String(a));
+        NK.saetTekst("byg-opgave-nuklid-z", String(o.p));
+        NK.saetTekst("byg-opgave-nuklid-q", q === 0 ? "" : NK.ladningstekst(q));
+        NK.saetKlasse("byg-opgave-nuklid-q", "q" + (q > 0 ? " plus" : (q < 0 ? " minus" : "")));
+        NK.el("byg-opgave-nuklid").hidden = false;
     };
 
     /* Taelleren viser altid "X/5" - en runde paa fem opgaver, som starter
@@ -386,6 +391,7 @@
         NK.el("byg-opgave-ny").classList.remove("banker");
         NK.el("byg-opgave-taeller").style.display = "";
         NK.saetTekst("byg-opgave-taeller", (((this.opgaveNr - 1) % 5) + 1) + "/5");
+        NK.el("byg-opgave-nuklid").hidden = true;
         this.tjekOpgave();
     };
 
@@ -397,6 +403,7 @@
         NK.saetTekst("byg-opgave", this.opgave.tekst + "  →  " + this.opgave.svar);
         NK.saetKlasse("byg-opgave", "besked gul");
         this.opgave.loest = true;
+        this.visOpgaveNuklid(this.opgave);
         NK.el("byg-opgave-svar").disabled = true;
         NK.el("byg-opgave-ny").classList.add("banker");
     };
@@ -408,6 +415,7 @@
         o.loest = true;
         NK.saetTekst("byg-opgave", "Rigtigt! " + o.svar);
         NK.saetKlasse("byg-opgave", "besked god");
+        this.visOpgaveNuklid(o);
         NK.el("byg-opgave-svar").disabled = true;
         NK.el("byg-opgave-ny").classList.add("banker");
     };

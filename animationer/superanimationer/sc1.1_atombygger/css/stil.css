@@ -312,6 +312,8 @@ main { flex: 1; position: relative; min-height: 0; }
     font-variant-numeric: tabular-nums;
 }
 
+.nuklid[hidden] { display: none; }
+
 .nuklid .a, .nuklid .z {
     grid-column: 1;
     text-align: right;
@@ -344,6 +346,23 @@ main { flex: 1; position: relative; min-height: 0; }
 
 .nuklid .q.plus  { color: var(--proton); }
 .nuklid .q.minus { color: var(--blaa); }
+
+/* Facit-udgaven i opgavekortet: samme opstilling som maerkatet over
+   atomet, men liggende i den normale tekstflow i stedet for at svaeve
+   ovenpaa scenen - se opgave-boks i index.html og visOpgaveNuklid()
+   i sim_byg.js. */
+.nuklid-svar {
+    position: static;
+    transform: none;
+    margin-top: 8px;
+    padding: 7px 14px 7px 10px;
+    background-color: rgba(255, 255, 255, 0.05);
+    justify-self: start;
+}
+
+.nuklid-svar .sym { font-size: 1.9rem; }
+.nuklid-svar .a, .nuklid-svar .z { font-size: 0.78rem; }
+.nuklid-svar .q { font-size: 0.95rem; min-width: 12px; }
 
 /* En radioaktiv kerne faar et blinkende maerke i hjoernet af nuklid-
    boksen - synligt uden at man skal laese teksten i panelet. */
@@ -382,13 +401,21 @@ main { flex: 1; position: relative; min-height: 0; }
     position: absolute;
     top: 18px;
     left: 18px;
-    width: 494px;
+    width: 350px;
     max-width: calc(100% - 36px);
     background-color: rgba(24, 24, 31, 0.92);
     box-shadow: var(--skygge);
 }
 
-.pertabel-boks .pcelle { font-size: 0.9rem; border-radius: 4px; }
+/* Grupperne 3-12 (overgangsmetallerne) er altid tomme, saa langt som
+   denne tabel raekker (kun grundstof 1-20). De faar derfor kun en
+   tynd strimmel plads i stedet for fulde soejler - det er det, der
+   presser den ellers meget brede, tomme midte sammen. */
+#byg-pertabel {
+    grid-template-columns: repeat(2, 1fr) repeat(10, 0.2fr) repeat(6, 1fr);
+}
+
+.pertabel-boks .pcelle { font-size: 1.08rem; border-radius: 4px; }
 
 /* Sikringen mod kraftigt zoom: sim_byg.js skjuler tabellen helt, hvis
    der ikke er plads til den og et laeseligt atom paa samme tid. */
@@ -433,68 +460,6 @@ main { flex: 1; position: relative; min-height: 0; }
 .kernekort.god   { color: #7ee0a8; border-color: rgba(63, 174, 114, 0.45); }
 .kernekort.gul   { color: #f0d77a; border-color: rgba(242, 197, 61, 0.45); }
 .kernekort.skidt { color: #f0918a; border-color: rgba(224, 84, 70, 0.45); }
-
-/* Reaktivitetsindikatoren i hjoernet oven over atommodellen: hvor taet
-   er elektronskyen paa en aedelgasstruktur lige nu? Se D.reaktivitet()
-   i data.js. Skjules, naar der ikke er noget grundstof/elektroner at
-   vurdere (samme moenster som .partikelstat og .bohr). */
-.reaktivkort {
-    position: absolute;
-    top: 18px;
-    right: 18px;
-    width: 168px;
-    background-color: rgba(20, 20, 26, 0.82);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: var(--radius);
-    padding: 10px 13px;
-    box-shadow: var(--skygge);
-    pointer-events: none;
-    text-align: center;
-}
-
-.reaktivkort[hidden] { display: none; }
-
-.reaktivkort-etiket {
-    display: block;
-    font-size: 0.62rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--tekst-mat);
-    margin-bottom: 6px;
-}
-
-.reaktivkort-bar {
-    width: 100%;
-    height: 7px;
-    border-radius: 4px;
-    background-color: rgba(255, 255, 255, 0.14);
-    overflow: hidden;
-}
-
-.reaktivkort-fyld {
-    height: 100%;
-    width: 0%;
-    border-radius: 4px;
-    transition: width 0.35s ease, background-color 0.35s ease;
-}
-
-.reaktivkort-fyld.groen  { background-color: var(--groen); }
-.reaktivkort-fyld.orange { background-color: var(--orange); }
-.reaktivkort-fyld.roed   { background-color: var(--roed); }
-.reaktivkort-fyld.gul    { background-color: var(--gul); }
-
-.reaktivkort-tekst {
-    display: block;
-    margin-top: 6px;
-    font-size: 0.74rem;
-    font-weight: 700;
-}
-
-.reaktivkort-tekst.groen  { color: #7ee0a8; }
-.reaktivkort-tekst.orange { color: #f0b46b; }
-.reaktivkort-tekst.roed   { color: #f0918a; }
-.reaktivkort-tekst.gul    { color: #f0d77a; }
 
 /* Grundstofvalget paa saltfanen sidder oven paa scenen, lige over hver
    sin soejle af atomer - saa valget og resultatet haenger sammen visuelt
@@ -839,6 +804,10 @@ button.pcelle:hover { border-color: rgba(255, 255, 255, 0.55); }
 .pnoegle .ikkemetal::before { background-color: rgba(61, 158, 224, 0.75); }
 .pnoegle .halvmetal::before { background-color: rgba(242, 197, 61, 0.7); }
 .pnoegle .aedelgas::before  { background-color: rgba(63, 174, 114, 0.75); }
+
+/* Fane 1's periodiske system: legenden er dobbelt saa stor som normalt. */
+.pertabel-boks .pnoegle { font-size: 1.2rem; gap: 8px 20px; }
+.pertabel-boks .pnoegle span::before { width: 16px; height: 16px; }
 
 /* Den store udgave i pop op-vinduet: plads til atomnummeret over
    symbolet, saa man kan slaa protontallet op midt i et spoergsmaal. */
