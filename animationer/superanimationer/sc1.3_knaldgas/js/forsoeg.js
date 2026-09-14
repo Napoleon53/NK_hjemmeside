@@ -641,29 +641,20 @@
                 m.alfa = Math.min(1, m.alfa + dt * 4);
             }
 
-            if (m.ud) {
-                /* Det nydannede vand presses ud af aabningen */
-                m.vy += 700 * dt;
-            } else {
-                m.vx += (Math.random() - 0.5) * 260 * dt;
-                m.vy += (Math.random() - 0.5) * 260 * dt;
-                var fart = Math.sqrt(m.vx * m.vx + m.vy * m.vy) || 1;
-                var ny = NK.mod(fart, grundfart, 2.5, dt);
-                m.vx *= ny / fart;
-                m.vy *= ny / fart;
-            }
+            this.termisk(m, RUM_FART * varmeFart, dt, 5);
             m.x += m.vx * dt;
-            m.y += m.vy * dt;
-            m.a += m.va * dt;
+            m.y += (m.vy + drift) * dt;
+            m.a += m.va * varmeFart * dt;
 
             var x0 = G.V + rad, x1 = G.HO - rad, y0 = G.TOP + rad;
             if (m.x < x0) { m.x = x0; m.vx = Math.abs(m.vx); }
             if (m.x > x1) { m.x = x1; m.vx = -Math.abs(m.vx); }
             if (m.y < y0) { m.y = y0; m.vy = Math.abs(m.vy); }
 
-            if (m.ud) {
+            /* Mens gassen stroemmer ud, er aabningen aaben for alle */
+            if (aaben) {
                 if (m.y > G.MUND + rad) {
-                    this.frigoer(m, glas, false);
+                    this.frigoer(m, glas, drift, false);
                     this.molekyler.splice(i, 1);
                 }
                 continue;
@@ -682,20 +673,24 @@
         }
     };
 
-    /* Molekyler ude i rummet: bremses af luften, stiger som varm damp,
-       hopper paa bordet og forsvinder efter nogle sekunder. */
+    /* Molekyler ude i rummet: stroemningen bremses af luften, den varme
+       gas stiger, varmebevaegelsen falder, efterhaanden som de koeles af,
+       og de forsvinder efter nogle sekunder. */
     P.opdaterFri = function (dt) {
-        var brems = Math.max(0, 1 - 1.3 * dt);
+        var brems = Math.max(0, 1 - 2.2 * dt);
         for (var i = this.fri.length - 1; i >= 0; i--) {
             var m = this.fri[i];
             var rad = S.MOLEKYLRADIUS[m.type];
-            m.vx *= brems;
-            m.vy = m.vy * brems - 45 * dt;
-            m.x += m.vx * dt;
-            m.y += m.vy * dt;
-            m.a += m.va * dt;
+            m.varme = Math.max(0, m.varme - dt * 0.45);
+            var varmeFart = Math.sqrt(1 + VARM_FAKTOR * m.varme);
+            this.termisk(m, RUM_FART * varmeFart, dt, 3);
+            m.dx *= brems;
+            m.dy = m.dy * brems - 80 * m.varme * dt;
+            m.x += (m.vx + m.dx) * dt;
+            m.y += (m.vy + m.dy) * dt;
+            m.a += m.va * varmeFart * dt;
             var gulv = (m.x > S.BAD.indreV && m.x < S.BAD.indreH) ? S.BAD.overflade : S.BORD;
-            if (m.y > gulv - rad) { m.y = gulv - rad; m.vy = -Math.abs(m.vy) * 0.45; }
+            if (m.y > gulv - rad) { m.y = gulv - rad; m.vy = -Math.abs(m.vy); m.dy = -Math.abs(m.dy) * 0.4; }
             m.liv -= dt;
             m.alfa = Math.min(1, m.liv);
             if (m.liv <= 0 || m.x < -500 || m.x > 1500 || m.y < -500) this.fri.splice(i, 1);

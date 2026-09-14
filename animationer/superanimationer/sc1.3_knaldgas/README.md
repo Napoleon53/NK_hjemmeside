@@ -35,9 +35,15 @@ lydstyrken, teorien bag en knap og quizzen. Styrkerne er de samme tal
   **Genfyld glasset**, som sidder på Antænds plads så længe.
 * **Molekyler i glasset.** Hver streg er 2 molekyler, så forholdet mellem
   stregerne også er forholdet mellem molekylerne. Ved knaldet dannes præcis det
-  vand, som reaktionsskemaet giver, og vandmolekylerne farer ud af åbningen og
-  ud i rummet. Overskuddet bliver i glasset; ved 5 : 1 ses 6 H₂ blive tilbage.
-  Der dannes også dug på indersiden af glasset.
+  vand, som reaktionsskemaet giver. Der dannes også dug på indersiden af glasset.
+* **Varmebevægelse.** Ved samme temperatur har alle molekyler samme
+  gennemsnitlige kinetiske energi, så farten er omvendt proportional med
+  kvadratroden af molmassen: H₂ bevæger sig 3 gange så hurtigt som H₂O og 4
+  gange så hurtigt som O₂. Det enkelte molekyles fart er tilfældig omkring
+  middelværdien (Maxwell-Boltzmann i to dimensioner). Knaldet hæver
+  temperaturen for vand og overskud på én gang, den varme gas udvider sig, og
+  en del af alle molekyler strømmer ud af åbningen. H₂ kommer hurtigst ud.
+  Konstanterne står øverst i `js/forsoeg.js`.
 * **Ingen lyd ved ren H₂ eller ren O₂**, for der sker ingen reaktion.
 * **Påskeæg:** ved det helt rigtige forhold, 4 : 2, knækker glasset i 10 % af
   forsøgene (`knaekChance` i `js/forsoeg.js`). Skårene falder ned på bordet,

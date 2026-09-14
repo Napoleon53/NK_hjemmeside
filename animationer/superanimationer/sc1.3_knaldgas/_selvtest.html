@@ -98,9 +98,11 @@ function koer() {
     f.molekyler.concat(f.fri).forEach(function (m) { if (m.type === "h2o") h2o++; else if (m.type === "h2") h2++; else o2++; });
     paastand("der dannes 4 H2O, og 6 H2 er tilbage, ingen O2", h2o === 4 && h2 === 6 && o2 === 0, h2o + " H2O, " + h2 + " H2, " + o2 + " O2");
     adv(1.5);
-    var h2oInde = f.molekyler.filter(function (m) { return m.type === "h2o"; }).length;
-    var h2Inde = f.molekyler.filter(function (m) { return m.type === "h2"; }).length;
-    paastand("vandet er fløjet ud af glasset, overskuddet af H2 er blevet", h2oInde === 0 && h2Inde === 6, h2oInde + " H2O og " + h2Inde + " H2 i glasset");
+    var inde = f.molekyler.length, ude = f.fri.length;
+    var tael = { h2: 0, o2: 0, h2o: 0 };
+    f.molekyler.concat(f.fri).forEach(function (m) { tael[m.type]++; });
+    paastand("en del af gassen er strømmet ud, en del er blevet i glasset", inde > 0 && ude > 0, inde + " inde, " + ude + " ude");
+    paastand("ingen molekyler er forsvundet undervejs", tael.h2o === 4 && tael.h2 === 6 && tael.o2 === 0, JSON.stringify(tael));
     NK.opdaterPanel();
     paastand("Antaend er skjult, Genfyld glasset vises",
         d.getElementById("knap-antaend").hidden && !d.getElementById("knap-genfyld").hidden && !d.getElementById("knap-genfyld").disabled);
@@ -138,8 +140,49 @@ function koer() {
     paastand("6 : 0 giver ingen reaktion og styrke 0", f.resultater[6] === 0 && f.sidsteReaktion.h2o === 0);
     paastand("molekylerne bliver uaendret H2", f.molekyler.every(function (m) { return m.type === "h2"; }) && f.molekyler.length === 12, f.molekyler.length);
     paastand("ingen lyd ved styrke 0", NK.Lyd.knald(0) === false);
+    adv(1);
+    paastand("uden reaktion stroemmer der ingen gas ud", f.fri.length === 0 && f.molekyler.length === 12, f.fri.length + " ude");
 
-    overskrift("6. Paaskeaegget: glasset knaekker ved 4 : 2");
+    overskrift("6. Varmebevaegelse");
+    function middelfart(liste, type) {
+        var sum = 0, n = 0;
+        liste.forEach(function (m) { if (m.type === type) { sum += Math.sqrt(m.vx * m.vx + m.vy * m.vy); n++; } });
+        return n ? sum / n : 0;
+    }
+    frisk();
+    fyld(3, 3);
+    adv(2);
+    var sumH2 = 0, sumO2 = 0;
+    for (i = 0; i < 360; i++) {
+        f.opdater(1 / 60);
+        sumH2 += middelfart(f.molekyler, "h2");
+        sumO2 += middelfart(f.molekyler, "o2");
+    }
+    paastand("ved stuetemperatur bevæger H2 sig ca. 4 gange så hurtigt som O2", sumH2 / sumO2 > 3 && sumH2 / sumO2 < 5.3, (sumH2 / sumO2).toFixed(2));
+    var o2Foer = sumO2 / 360;
+    f.antaend();
+    adv(1.1);
+    adv(0.05);
+    var o2Efter = middelfart(f.molekyler.concat(f.fri), "o2");
+    paastand("lige efter knaldet bevæger overskuddet af O2 sig mere end dobbelt så hurtigt", o2Efter > 2 * o2Foer, o2Foer.toFixed(0) + " -> " + o2Efter.toFixed(0));
+
+    var udH2 = { fart: 0, n: 0 }, udH2O = { fart: 0, n: 0 };
+    for (var runde = 0; runde < 40; runde++) {
+        frisk();
+        fyld(5, 1);
+        adv(1.8);
+        f.antaend();
+        adv(1.9);
+        f.fri.forEach(function (m) {
+            var u = m.type === "h2" ? udH2 : (m.type === "h2o" ? udH2O : null);
+            if (u) { u.fart += m.udFart; u.n++; }
+        });
+    }
+    paastand("40 knald ved 5 : 1: både vand og overskud strømmer ud", udH2.n > 0 && udH2O.n > 0, udH2.n + " H2, " + udH2O.n + " H2O");
+    paastand("H2 kommer hurtigst ud", udH2.fart / udH2.n > 1.3 * udH2O.fart / udH2O.n,
+        (udH2.fart / udH2.n).toFixed(0) + " mod " + (udH2O.fart / udH2O.n).toFixed(0));
+
+    overskrift("7. Paaskeaegget: glasset knaekker ved 4 : 2");
     frisk();
     f.knaekChance = 1;
     fyld(3, 3);
@@ -166,7 +209,7 @@ function koer() {
     f.knaekChance = 0.1;
     paastand("standardchancen er 10 %", f.knaekChance === 0.1);
 
-    overskrift("7. Quizzen laases op og i igen");
+    overskrift("8. Quizzen laases op og i igen");
     frisk();
     paastand("quizzen er laast fra start", NK.quiz.tilstand === "laast");
     for (h = 0; h <= 6; h++) f.resultater[h] = M.reaktion(h, 6 - h).styrke;
@@ -177,7 +220,7 @@ function koer() {
     f.rydResultater();
     paastand("Ryd resultater laaser quizzen igen", NK.quiz.tilstand === "laast");
 
-    overskrift("8. Quizzens spoergsmaal");
+    overskrift("9. Quizzens spoergsmaal");
     NK.QUIZ.forEach(function (sp, n) {
         var unikke = sp.valg.filter(function (v, k) { return sp.valg.indexOf(v) === k; }).length === 4;
         var blandOk = true;
@@ -189,7 +232,7 @@ function koer() {
             sp.valg.length === 4 && unikke && sp.rigtig >= 0 && sp.rigtig < 4 && !!sp.forklaring && blandOk);
     });
 
-    overskrift("9. Sprog: ingen tankestreger");
+    overskrift("10. Sprog: ingen tankestreger");
     var tekster = [d.body.textContent];
     NK.QUIZ.forEach(function (sp) { tekster.push(sp.sp, sp.forklaring, sp.valg.join(" ")); });
     var alt = tekster.join(" ");
