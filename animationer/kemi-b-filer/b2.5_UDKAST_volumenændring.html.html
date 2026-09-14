@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Chateliers Princip: Volumenændring</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --panel-bg: #1e1e24;
+            --text-color: #e0e0e0;
+            --accent-color: #4cc9f0;
+            --success-color: #4ade80;
+            --warning-color: #ffd166;
+            --danger-color: #ef476f;
+            --piston-color: #5a5a66;
+            --border-color: #333;
+            --no2-color: #e07a5f;
+            --n2o4-color: #81b29a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background-color: #0f0f13;
+            padding: 15px 20px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+        }
+
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            padding: 15px;
+            gap: 15px;
+        }
+
+        /* Canvas Area */
+        .simulation-area {
+            flex: 2;
+            background: #1a1a20;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        canvas#simCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Overlay Controls on Canvas */
+        .canvas-overlay {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            display: flex;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toggle-btn {
+            pointer-events: auto;
+            background: rgba(30, 30, 36, 0.8);
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .toggle-btn:hover {
+            background: var(--accent-color);
+            color: #000;
+        }
+
+        .toggle-btn.active {
+            background: var(--accent-color);
+            color: #000;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        /* Sidebar Area */
+        .sidebar {
+            flex: 1;
+            min-width: 350px;
+            max-width: 450px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .panel h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--warning-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+
+        /* Steps UI */
+        .step-item {
+            padding: 12px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 4px solid #555;
+            border-radius: 4px;
+            transition: all 0.3s;
+            opacity: 0.5;
+        }
+
+        .step-item.active {
+            opacity: 1;
+            border-left-color: var(--success-color);
+            background: rgba(74, 222, 128, 0.1);
+        }
+
+        .step-item.completed {
+            opacity: 0.8;
+            border-left-color: var(--accent-color);
+        }
+
+        .step-title {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.05rem;
+        }
+
+        .step-desc {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: #bbb;
+        }
+
+        /* Math Panel */
+        .math-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .math-box {
+            background: #111;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .math-box span.label {
+            display: block;
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .math-box span.value {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .formula-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .fraction {
+            display: inline-block;
+            vertical-align: middle;
+            margin: 0 5px;
+            text-align: center;
+        }
+
+        .fraction > span {
+            display: block;
+            padding: 2px;
+        }
+
+        .fraction span.numerator {
+            border-bottom: 1px solid #fff;
+        }
+
+        .highlight-y {
+            color: var(--warning-color);
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+        
+        .highlight-k {
+            color: var(--success-color);
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+
+        /* Graph Panel */
+        .graph-container {
+            width: 100%;
+            height: 180px;
+            background: #111;
+            border-radius: 8px;
+            border: 1px solid #333;
+            position: relative;
+        }
+        
+        canvas#graphCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .graph-legend {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        /* Actions */
+        .action-area {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .action-btn {
+            background: var(--success-color);
+            color: #000;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(74, 222, 128, 0.2);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(74, 222, 128, 0.4);
+        }
+
+        .action-btn:disabled {
+            background: #444;
+            color: #777;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .action-btn.reset {
+            background: transparent;
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+            box-shadow: none;
+        }
+        
+        .action-btn.reset:hover {
+            background: rgba(239, 71, 111, 0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>⚗️ Le Chateliers Princip: Volumenændring</h1>
+        <div style="font-size: 1.2rem; color: #aaa;">2 NO₂(g) ⇌ N₂O₄(g)</div>
+    </header>
+
+    <div class="main-container">
+        <!-- Simulation Canvas Area -->
+        <div class="simulation-area" id="canvasContainer">
+            <canvas id="simCanvas"></canvas>
+            <div class="canvas-overlay">
+                <button class="toggle-btn active" id="btnKugle">Kugle-model</button>
+                <button class="toggle-btn" id="btnDanse">Danse-metafor</button>
+                <button class="toggle-btn" id="btnSlowMo" style="margin-left: 20px; border-color: var(--warning-color); color: var(--warning-color);">🐌 Slow-motion</button>
+            </div>
+        </div>
+
+        <!-- Right Sidebar Area -->
+        <div class="sidebar">
+            
+            <!-- Step Logic Panel -->
+            <div class="panel">
+                <h2>Forløb</h2>
+                <div class="step-item active" id="step1">
+                    <span class="step-title">Trin 1: Dynamisk Ligevægt</span>
+                    <span class="step-desc">Molekylerne bevæger sig rundt i et stort volumen (10,0 L). Der dannes og brydes bindinger med samme hastighed. Reaktionsbrøken Y er lig med ligevægtskonstanten K.</span>
+                </div>
+                <div class="step-item" id="step2">
+                    <span class="step-title">Trin 2: Indgrebet (Stress)</span>
+                    <span class="step-desc">Volumen halveres pludseligt. Koncentrationen af alle stoffer fordobles. Da nævneren i reaktionsbrøken er i anden potens, falder den samlede værdi af Y markant (Y < K).</span>
+                </div>
+                <div class="step-item" id="step3">
+                    <span class="step-title">Trin 3: Reaktionen (Forskydning)</span>
+                    <span class="step-desc">Systemet reagerer ved at omdanne singler (NO₂) til par (N₂O₄) for at mindske trængslen. Y stiger langsomt op og bliver igen lig med K. En ny ligevægt er indstillet.</span>
+                </div>
+            </div>
+
+            <!-- Math & Theory Panel -->
+            <div class="panel">
+                <h2>Beregninger</h2>
+                <div class="formula-box">
+                    <span class="highlight-y">Y</span> = 
+                    <div class="fraction">
+                        <span class="numerator">[N₂O₄]</span>
+                        <span class="denominator">[NO₂]²</span>
+                    </div>
+                    = <span class="highlight-k">K</span>
+                </div>
+                
+                <div class="math-grid">
+                    <div class="math-box">
+                        <span class="label">Volumen (V)</span>
+                        <span class="value" id="valVol">10,0 L</span>
+                    </div>
+                    <div class="math-box">
+                        <span class="label">Reaktionsbrøk (Y)</span>
+                        <span class="value highlight-y" id="valY">0,250 M⁻¹</span>
+                    </div>
+                    <div class="math-box">
+                        <span class="label">[NO₂] koncentration</span>
+                        <span class="value" id="valNO2Conc" style="color: var(--no2-color);">4,00 M</span>
+                    </div>
+                    <div class="math-box">
+                        <span class="label">[N₂O₄] koncentration</span>
+                        <span class="value" id="valN2O4Conc" style="color: var(--n2o4-color);">4,00 M</span>
+                    </div>
+                </div>
+                <div style="text-align: center; font-size: 0.9rem; color: #888;">
+                    Ligevægtskonstant K = <span class="highlight-k">0,250 M⁻¹</span>
+                </div>
+            </div>
+
+            <!-- Real-time Graph -->
+            <div class="panel">
+                <h2>Koncentrationer & Y</h2>
+                <div class="graph-container">
+                    <canvas id="graphCanvas"></canvas>
+                </div>
+                <div class="graph-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--no2-color);"></div> [NO₂]
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--n2o4-color);"></div> [N₂O₄]
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--warning-color);"></div> Y-værdi
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="action-area">
+                <button class="action-btn" id="btnNext">Næste Trin ➔</button>
+                <button class="action-btn reset" id="btnReset">🔄 Nulstil Eksperiment</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Kemi-animation: Le Chateliers Princip (Volumenændring)
+         * Udviklet som single-file robust løsning.
+         */
+
+        // -------------------------------------------------------------
+        // HJÆLPEFUNKTIONER & MATEMATIK
+        // -------------------------------------------------------------
+        const formatNum = (num, decimals = 2) => num.toFixed(decimals).replace('.', ',');
+
+        class Vector2D {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+            add(v) { this.x += v.x; this.y += v.y; }
+            sub(v) { return new Vector2D(this.x - v.x, this.y - v.y); }
+            mult(n) { this.x *= n; this.y *= n; }
+            mag() { return Math.hypot(this.x, this.y); }
+            normalize() {
+                let m = this.mag();
+                if (m !== 0) { this.x /= m; this.y /= m; }
+            }
+            static dist(v1, v2) { return Math.hypot(v1.x - v2.x, v1.y - v2.y); }
+        }
+
+        // -------------------------------------------------------------
+        // VISUAL EFFECTS (Partikelsystem til reaktioner)
+        // -------------------------------------------------------------
+        class Sparkle {
+            constructor(x, y, color) {
+                this.pos = new Vector2D(x, y);
+                this.vel = new Vector2D((Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4);
+                this.life = 1.0;
+                this.decay = Math.random() * 0.05 + 0.02;
+                this.color = color;
+            }
+            update(dt) {
+                this.pos.x += this.vel.x * dt * 60;
+                this.pos.y += this.vel.y * dt * 60;
+                this.life -= this.decay * dt * 60;
+            }
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, this.life);
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.pos.x, this.pos.y, 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // -------------------------------------------------------------
+        // KEMI PARTIKEL KLASSE (NO2 og N2O4)
+        // -------------------------------------------------------------
+        class ChemParticle {
+            constructor(x, y, type) {
+                this.pos = new Vector2D(x, y);
+                let speed = Math.random() * 1.5 + 0.5;
+                let angle = Math.random() * Math.PI * 2;
+                this.vel = new Vector2D(Math.cos(angle) * speed, Math.sin(angle) * speed);
+                this.type = type; // 'NO2' eller 'N2O4'
+                this.radius = type === 'NO2' ? 8 : 12;
+                this.id = Math.random().toString(36).substr(2, 9);
+                this.targetMerge = null; // Til brug ved omdannelse
+                this.angle = angle; // Til rotationsanimation i danse-mode
+            }
+
+            update(dt, bounds, stateVolRatio) {
+                let timeScale = dt * 60;
+                this.pos.x += this.vel.x * timeScale;
+                this.pos.y += this.vel.y * timeScale;
+                this.angle += 0.05 * timeScale;
+
+                // Kollision med vægge
+                let padding = 15;
+                if (this.pos.x < bounds.x + padding) {
+                    this.pos.x = bounds.x + padding;
+                    this.vel.x *= -1;
+                }
+                if (this.pos.x > bounds.x + bounds.w - padding) {
+                    this.pos.x = bounds.x + bounds.w - padding;
+                    this.vel.x *= -1;
+                }
+                
+                // Kollision med bund
+                if (this.pos.y > bounds.y + bounds.h - padding) {
+                    this.pos.y = bounds.y + bounds.h - padding;
+                    this.vel.y *= -1;
+                }
+                
+                // Kollision med stempel (loft)
+                let pistonY = bounds.y + bounds.h * (1 - stateVolRatio);
+                if (this.pos.y < pistonY + padding) {
+                    this.pos.y = pistonY + padding;
+                    // Hvis stemplet bevæger sig hurtigt nedad (Trin 2), overfør lidt energi nedad
+                    if (this.vel.y < 0) {
+                        this.vel.y *= -1;
+                    }
+                }
+            }
+
+            draw(ctx, viewMode) {
+                ctx.save();
+                ctx.translate(this.pos.x, this.pos.y);
+                
+                if (viewMode === 'balls') {
+                    if (this.type === 'NO2') {
+                        // Enkelt kugle
+                        ctx.beginPath();
+                        ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                        ctx.fillStyle = '#e07a5f';
+                        ctx.fill();
+                        ctx.strokeStyle = '#fff';
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                        ctx.fillStyle = '#fff';
+                        ctx.font = '8px Arial';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('NO₂', 0, 0);
+                    } else {
+                        // Dobbelt kugle (N2O4)
+                        ctx.rotate(this.angle * 0.2);
+                        ctx.fillStyle = '#81b29a';
+                        ctx.strokeStyle = '#fff';
+                        ctx.lineWidth = 1;
+                        
+                        ctx.beginPath();
+                        ctx.arc(-6, 0, this.radius * 0.8, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+                        
+                        ctx.beginPath();
+                        ctx.arc(6, 0, this.radius * 0.8, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.stroke();
+
+                        ctx.fillStyle = '#000';
+                        ctx.font = '7px Arial';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('N₂O₄', 0, 0);
+                    }
+                } else if (viewMode === 'dance') {
+                    // Danse metafor
+                    ctx.rotate(Math.sin(this.angle) * 0.2); // Rokke bevægelse
+                    
+                    if (this.type === 'NO2') {
+                        // Single danser (pindemand set fra oven / simpel form)
+                        ctx.fillStyle = '#e07a5f';
+                        ctx.beginPath();
+                        ctx.arc(0, -4, 4, 0, Math.PI*2); // Hoved
+                        ctx.fill();
+                        ctx.strokeStyle = '#e07a5f';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(0, 0); ctx.lineTo(0, 8); // Krop
+                        ctx.moveTo(-4, 2); ctx.lineTo(4, 2); // Arme
+                        ctx.stroke();
+                    } else {
+                        // Par der danser
+                        ctx.fillStyle = '#81b29a';
+                        ctx.strokeStyle = '#81b29a';
+                        ctx.lineWidth = 2;
+                        
+                        // Danser 1
+                        ctx.beginPath(); ctx.arc(-5, -4, 4, 0, Math.PI*2); ctx.fill();
+                        ctx.beginPath(); ctx.moveTo(-5, 0); ctx.lineTo(-5, 8); ctx.stroke();
+                        
+                        // Danser 2
+                        ctx.beginPath(); ctx.arc(5, -4, 4, 0, Math.PI*2); ctx.fill();
+                        ctx.beginPath(); ctx.moveTo(5, 0); ctx.lineTo(5, 8); ctx.stroke();
+                        
+                        // Holder i hånd
+                        ctx.beginPath(); ctx.moveTo(-5, 2); ctx.lineTo(5, 2); ctx.stroke();
+                        
+                        // Ydre arme svinger
+                        let swing = Math.sin(this.angle * 2) * 3;
+                        ctx.beginPath(); ctx.moveTo(-5, 2); ctx.lineTo(-9, 2 + swing); ctx.stroke();
+                        ctx.beginPath(); ctx.moveTo(5, 2); ctx.lineTo(9, 2 - swing); ctx.stroke();
+                    }
+                }
+                
+                ctx.restore();
+            }
+        }
+
+        // -------------------------------------------------------------
+        // HOVED SIMULATOR LOGIK
+        // -------------------------------------------------------------
+        const simCanvas = document.getElementById('simCanvas');
+        const ctx = simCanvas.getContext('2d');
+        const graphCanvas = document.getElementById('graphCanvas');
+        const gctx = graphCanvas.getContext('2d');
+
+        // Referencer til DOM
+        const uiStep1 = document.getElementById('step1');
+        const uiStep2 = document.getElementById('step2');
+        const uiStep3 = document.getElementById('step3');
+        const valVol = document.getElementById('valVol');
+        const valY = document.getElementById('valY');
+        const valNO2 = document.getElementById('valNO2Conc');
+        const valN2O4 = document.getElementById('valN2O4Conc');
+        const btnNext = document.getElementById('btnNext');
+        const btnReset = document.getElementById('btnReset');
+        const btnKugle = document.getElementById('btnKugle');
+        const btnDanse = document.getElementById('btnDanse');
+        const btnSlowMo = document.getElementById('btnSlowMo');
+
+        // State variabler
+        let step = 1; // 1: Ligevægt, 2: Indgreb (vol. fald), 3: Forskydning
+        let viewMode = 'balls';
+        let slowMo = false;
+        
+        let containerBounds = { x: 50, y: 50, w: 0, h: 0 };
+        let volumeRatio = 1.0; // Går fra 1.0 -> 0.5
+        let targetVolumeRatio = 1.0;
+
+        let particles = [];
+        let sparkles = [];
+        let graphData = []; // {time, NO2, N2O4, Y}
+        
+        let lastTime = 0;
+        let elapsedSimTime = 0;
+
+        // Kemi matematiske konstanter
+        // Trin 1: V = 10L, n(NO2) = 40 mol, n(N2O4) = 40 mol. [NO2]=4.0, [N2O4]=4.0. Y=0.250.
+        // Trin 3 mål: V = 5L, n(NO2) = 30 mol, n(N2O4) = 45 mol. [NO2]=6.0, [N2O4]=9.0. Y=0.250.
+        const THEORETICAL_K = 0.250;
+        const INITIAL_MOLS_NO2 = 40;
+        const INITIAL_MOLS_N2O4 = 40;
+        const SHIFT_MOLS_CONVERT = 10; // 10 NO2 forsvinder -> 5 N2O4 dannes
+        
+        let currentMolsNO2 = INITIAL_MOLS_NO2;
+        let currentMolsN2O4 = INITIAL_MOLS_N2O4;
+
+        // Resize håndtering
+        function resize() {
+            let container = document.getElementById('canvasContainer');
+            simCanvas.width = container.clientWidth;
+            simCanvas.height = container.clientHeight;
+            
+            containerBounds.w = simCanvas.width - 100;
+            containerBounds.h = simCanvas.height - 100;
+            
+            // Graph resize
+            let gContainer = graphCanvas.parentElement;
+            graphCanvas.width = gContainer.clientWidth;
+            graphCanvas.height = gContainer.clientHeight;
+        }
+        window.addEventListener('resize', resize);
+
+        // Initialisering
+        function initSimulation() {
+            step = 1;
+            volumeRatio = 1.0;
+            targetVolumeRatio = 1.0;
+            currentMolsNO2 = INITIAL_MOLS_NO2;
+            currentMolsN2O4 = INITIAL_MOLS_N2O4;
+            elapsedSimTime = 0;
+            graphData = [];
+            particles = [];
+            sparkles = [];
+
+            // Spawn partikler (1 partikel = 1 mol for at holde visualiseringen overskuelig)
+            let boxTop = containerBounds.y + containerBounds.h * (1 - volumeRatio);
+            for(let i=0; i<currentMolsNO2; i++) {
+                let px = containerBounds.x + 20 + Math.random() * (containerBounds.w - 40);
+                let py = boxTop + 20 + Math.random() * (containerBounds.h * volumeRatio - 40);
+                particles.push(new ChemParticle(px, py, 'NO2'));
+            }
+            for(let i=0; i<currentMolsN2O4; i++) {
+                let px = containerBounds.x + 20 + Math.random() * (containerBounds.w - 40);
+                let py = boxTop + 20 + Math.random() * (containerBounds.h * volumeRatio - 40);
+                particles.push(new ChemParticle(px, py, 'N2O4'));
+            }
+
+            updateDOM();
+        }
+
+        // Toggles
+        btnKugle.addEventListener('click', () => { viewMode = 'balls'; btnKugle.classList.add('active'); btnDanse.classList.remove('active'); });
+        btnDanse.addEventListener('click', () => { viewMode = 'dance'; btnDanse.classList.add('active'); btnKugle.classList.remove('active'); });
+        btnSlowMo.addEventListener('click', () => { 
+            slowMo = !slowMo; 
+            btnSlowMo.style.background = slowMo ? 'var(--warning-color)' : 'transparent';
+            btnSlowMo.style.color = slowMo ? '#000' : 'var(--warning-color)';
+        });
+
+        // Næste Trin Logik
+        btnNext.addEventListener('click', () => {
+            if (step === 1) {
+                step = 2;
+                targetVolumeRatio = 0.5; // Halver volumen
+            } else if (step === 2) {
+                step = 3;
+            }
+            updateDOM();
+        });
+
+        btnReset.addEventListener('click', () => {
+            initSimulation();
+        });
+
+        function updateDOM() {
+            uiStep1.className = 'step-item' + (step === 1 ? ' active' : (step > 1 ? ' completed' : ''));
+            uiStep2.className = 'step-item' + (step === 2 ? ' active' : (step > 2 ? ' completed' : ''));
+            uiStep3.className = 'step-item' + (step === 3 ? ' active' : '');
+            
+            btnNext.disabled = (step === 3);
+            if(step === 3) btnNext.innerText = "Eksperiment Fuldført";
+            else btnNext.innerText = "Næste Trin ➔";
+        }
+
+        function createSparkleExplosion(x, y, color) {
+            for(let i=0; i<15; i++) sparkles.push(new Sparkle(x, y, color));
+        }
+
+        // -------------------------------------------------------------
+        // OPDATERINGS LOOP
+        // -------------------------------------------------------------
+        function update(dt) {
+            if (slowMo) dt *= 0.2; // Gør alting 5 gange langsommere
+            
+            elapsedSimTime += dt;
+
+            // Animer volumen (stempel bevægelse)
+            if (Math.abs(volumeRatio - targetVolumeRatio) > 0.001) {
+                volumeRatio += (targetVolumeRatio - volumeRatio) * (dt * 5.0); // Smooth dampening
+            }
+
+            // Kemi Forskydning i Trin 3
+            // Vi skal langsomt omdanne 10 NO2 til 5 N2O4
+            if (step === 3 && currentMolsNO2 > (INITIAL_MOLS_NO2 - SHIFT_MOLS_CONVERT)) {
+                // Konverterer med en vis sandsynlighed per frame for at gøre det glidende
+                if (Math.random() < dt * 2.0) {
+                    // Find to NO2 partikler der er relativt tæt på hinanden (eller bare to tilfældige)
+                    let no2List = particles.filter(p => p.type === 'NO2');
+                    if (no2List.length >= 2) {
+                        let p1 = no2List[0];
+                        let p2 = no2List[1]; // Simpel udvælgelse for ydeevne
+                        
+                        // Fjern dem fra arrayet
+                        particles = particles.filter(p => p !== p1 && p !== p2);
+                        
+                        // Spawn N2O4 i midten
+                        let midX = (p1.pos.x + p2.pos.x) / 2;
+                        let midY = (p1.pos.y + p2.pos.y) / 2;
+                        particles.push(new ChemParticle(midX, midY, 'N2O4'));
+                        
+                        createSparkleExplosion(midX, midY, '#81b29a');
+                        
+                        currentMolsNO2 -= 2;
+                        currentMolsN2O4 += 1;
+                    }
+                }
+            }
+
+            // Opdater partikler
+            for (let p of particles) p.update(dt, containerBounds, volumeRatio);
+            for (let s of sparkles) s.update(dt);
+            sparkles = sparkles.filter(s => s.life > 0);
+
+            // Beregn og opdater Matematiske Værdier
+            let actualVol = 10.0 * volumeRatio;
+            let concNO2 = currentMolsNO2 / actualVol;
+            let concN2O4 = currentMolsN2O4 / actualVol;
+            let Y = concN2O4 / (concNO2 * concNO2);
+
+            valVol.innerText = formatNum(actualVol, 1) + ' L';
+            valNO2.innerText = formatNum(concNO2, 2) + ' M';
+            valN2O4.innerText = formatNum(concN2O4, 2) + ' M';
+            
+            // Formater Y, hvis det er tæt på K overstyr vi for at undgå floating point noise ved ligevægt
+            let displayY = Y;
+            if (step === 1 || (step === 3 && currentMolsNO2 === (INITIAL_MOLS_NO2 - SHIFT_MOLS_CONVERT))) {
+                displayY = THEORETICAL_K; 
+            }
+            valY.innerText = formatNum(displayY, 3) + ' M⁻¹';
+            
+            // Highlight rød hvis Y < K (ude af ligevægt i Trin 2)
+            if (displayY < THEORETICAL_K - 0.01) {
+                valY.style.color = varDanger;
+            } else {
+                valY.style.color = varWarning;
+            }
+
+            // Gem til graf (ca. hver 0.1 sek)
+            if (Math.floor(elapsedSimTime * 10) > Math.floor((elapsedSimTime - dt) * 10)) {
+                graphData.push({
+                    t: elapsedSimTime,
+                    no2: concNO2,
+                    n2o4: concN2O4,
+                    y: displayY
+                });
+                // Hold array størrelse nede
+                if (graphData.length > 300) graphData.shift();
+            }
+        }
+
+        const varWarning = '#ffd166';
+        const varDanger = '#ef476f';
+
+        // -------------------------------------------------------------
+        // TEGNE LOOP
+        // -------------------------------------------------------------
+        function draw() {
+            ctx.clearRect(0, 0, simCanvas.width, simCanvas.height);
+
+            // Tegn Beholder (Dansegulv/Gasflaske)
+            let bx = containerBounds.x;
+            let by = containerBounds.y;
+            let bw = containerBounds.w;
+            let bh = containerBounds.h;
+            
+            let pistonY = by + bh * (1 - volumeRatio);
+
+            // Bagrund i kassen
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+            ctx.fillRect(bx, pistonY, bw, by + bh - pistonY);
+
+            // Gitterlinjer i baggrunden for "dansegulv" effekt
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            for(let i=bx; i<=bx+bw; i+=40) { ctx.moveTo(i, pistonY); ctx.lineTo(i, by+bh); }
+            for(let i=pistonY; i<=by+bh; i+=40) { ctx.moveTo(bx, i); ctx.lineTo(bx+bw, i); }
+            ctx.stroke();
+
+            // Kant og stempel
+            ctx.strokeStyle = 'var(--border-color)';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(bx, by, bw, bh); // Ydre beholder kant
+
+            // Stempel
+            ctx.fillStyle = 'var(--piston-color)';
+            ctx.fillRect(bx, by, bw, pistonY - by);
+            // Stempel bund kant
+            ctx.strokeStyle = '#888';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(bx, pistonY);
+            ctx.lineTo(bx+bw, pistonY);
+            ctx.stroke();
+            
+            // Håndtag på stempel
+            ctx.fillStyle = '#444';
+            ctx.fillRect(bx + bw/2 - 10, by - 20, 20, 20 + pistonY - by);
+
+            // Tegn Partikler og Sparkles
+            for (let p of particles) p.draw(ctx, viewMode);
+            for (let s of sparkles) s.draw(ctx);
+
+            drawGraph();
+        }
+
+        // -------------------------------------------------------------
+        // GRAF TEGNING
+        // -------------------------------------------------------------
+        function drawGraph() {
+            gctx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+            let gw = graphCanvas.width;
+            let gh = graphCanvas.height;
+            let padX = 35;
+            let padY = 20;
+
+            // Akser
+            gctx.strokeStyle = '#555';
+            gctx.lineWidth = 1;
+            gctx.beginPath();
+            gctx.moveTo(padX, padY); gctx.lineTo(padX, gh - padY); // Y
+            gctx.lineTo(gw - 10, gh - padY); // X
+            gctx.stroke();
+
+            // K-linje (Teoretisk ideal)
+            let maxConc = 10.0; // Fast max Y skala for koncentrationer
+            
+            if (graphData.length < 2) return;
+
+            let startTime = graphData[0].t;
+            let endTime = Math.max(startTime + 10, graphData[graphData.length-1].t);
+            let timeSpan = endTime - startTime;
+
+            let getX = (t) => padX + ((t - startTime) / timeSpan) * (gw - padX - 10);
+            let getY = (val, max) => (gh - padY) - (val / max) * (gh - 2 * padY);
+
+            // Tegn K reference linje for Y
+            let yK = getY(THEORETICAL_K, 1.0); // Y skala går op til 1.0 M^-1
+            gctx.strokeStyle = 'rgba(74, 222, 128, 0.3)';
+            gctx.setLineDash([5, 5]);
+            gctx.beginPath(); gctx.moveTo(padX, yK); gctx.lineTo(gw - 10, yK); gctx.stroke();
+            gctx.setLineDash([]);
+
+            // Plot funktion helper
+            let plotData = (key, color, maxScale, lineWidth=2) => {
+                gctx.strokeStyle = color;
+                gctx.lineWidth = lineWidth;
+                gctx.beginPath();
+                for (let i = 0; i < graphData.length; i++) {
+                    let pt = graphData[i];
+                    let px = getX(pt.t);
+                    let py = getY(pt[key], maxScale);
+                    if (i === 0) gctx.moveTo(px, py);
+                    else gctx.lineTo(px, py);
+                }
+                gctx.stroke();
+            };
+
+            // Plot Kurver
+            plotData('no2', '#e07a5f', maxConc);
+            plotData('n2o4', '#81b29a', maxConc);
+            plotData('y', '#ffd166', 1.0, 1.5); // Y plottes på en skala fra 0 til 1.0
+
+            // Labels
+            gctx.fillStyle = '#888';
+            gctx.font = '10px Arial';
+            gctx.textAlign = 'right';
+            gctx.fillText('Konc', padX - 5, padY + 10);
+            gctx.fillText('0', padX - 5, gh - padY);
+        }
+
+        // -------------------------------------------------------------
+        // ANIMATION LOOP START
+        // -------------------------------------------------------------
+        function loop(timestamp) {
+            let dt = (timestamp - lastTime) / 1000;
+            if (dt > 0.1) dt = 0.1; // Capping ved lag
+            lastTime = timestamp;
+
+            update(dt);
+            draw();
+
+            requestAnimationFrame(loop);
+        }
+
+        // Boot
+        resize();
+        initSimulation();
+        requestAnimationFrame(loop);
+
+    </script>
+</body>
+</html>
