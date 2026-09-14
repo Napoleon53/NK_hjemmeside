@@ -70,14 +70,9 @@
                 + " er den isotop, der er mest af i naturen (" + NK.tal(i.andel, 2) + " %).");
         });
 
-        NK.el("byg-nulstil").addEventListener("click", function () {
-            mig.p = 0; mig.n = 0; mig.e = 0;
-            mig.atom.saet(0, 0, 0);
-            mig.opdaterPanel("tom");
-        });
+        NK.el("byg-nulstil").addEventListener("click", function () { mig.ryd(); });
 
-        NK.el("byg-opgave-ny").addEventListener("click", function () { mig.nyOpgave(); });
-        NK.el("byg-opgave-svar").addEventListener("click", function () { mig.visSvar(); });
+        NK.el("byg-opgave-knap").addEventListener("click", function () { mig.opgaveKnap(); });
 
         /* Det periodiske system i panelet viser, hvor det byggede atom
            hoerer hjemme. Man kan ogsaa springe direkte til et grundstof
@@ -85,6 +80,14 @@
         this.pertabel = new NK.PeriodiskSystem(NK.el("byg-pertabel"), {
             vedKlik: function (z) { mig.vaelgGrundstof(z); }
         });
+    };
+
+    /* Tom scene: ingen partikler tilbage at bygge videre paa. Bruges
+       baade af Genstart og af "Ny opgave", saa man starter forfra. */
+    NK.SimByg.prototype.ryd = function () {
+        this.p = 0; this.n = 0; this.e = 0;
+        this.atom.saet(0, 0, 0);
+        this.opdaterPanel("tom");
     };
 
     /* Spring direkte til et grundstof: den almindelige kerne og lige
@@ -342,23 +345,57 @@
         }
     ];
 
+    /* Der er kun ÉN knap i opgavekortet, og den viser det naeste skridt:
+
+         start  -> Start opgave    traekker en opgave
+         hint   -> Giv hint        viser opgavens atomsymbol
+         svar   -> Vis svaret      bygger den og forklarer hvorfor
+         ny     -> Ny opgave       rydder scenen og traekker en ny
+
+       Loeser man selv opgaven undervejs, springer knappen direkte til
+       "Ny opgave". Trappen er den samme vej hele vejen igennem: man
+       faar aldrig mere hjaelp, end man selv har bedt om. */
+    var KNAPTRIN = {
+        start: { tekst: "Start opgave", klasse: "knap blaa" },
+        hint:  { tekst: "Giv hint",     klasse: "knap" },
+        svar:  { tekst: "Vis svaret",   klasse: "knap" },
+        ny:    { tekst: "Ny opgave",    klasse: "knap blaa banker" }
+    };
+
+    NK.SimByg.prototype.saetOpgaveTrin = function (trin) {
+        this.opgaveTrin = trin;
+        NK.saetTekst("byg-opgave-knap", KNAPTRIN[trin].tekst);
+        NK.saetKlasse("byg-opgave-knap", KNAPTRIN[trin].klasse);
+    };
+
+    NK.SimByg.prototype.opgaveKnap = function () {
+        if (this.opgaveTrin === "hint") { this.visHint(); return; }
+        if (this.opgaveTrin === "svar") { this.visSvar(); return; }
+        if (this.opgaveTrin === "ny") this.ryd();
+        this.nyOpgave();
+    };
+
     /* Udgangspunktet: ingen opgave er i gang endnu - eleven skal selv
        bede om én, saa opgaven ikke bare dukker op uopfordret. */
     NK.SimByg.prototype.visOpgaveStart = function () {
         this.opgave = null;
         NK.saetTekst("byg-opgave", "Tryk på “Start opgave” for at få en opgave, du selv skal bygge.");
         NK.saetKlasse("byg-opgave", "besked");
-        NK.el("byg-opgave-svar").style.display = "none";
-        NK.el("byg-opgave-ny").textContent = "Start opgave";
-        NK.el("byg-opgave-ny").classList.remove("banker");
         NK.el("byg-opgave-taeller").style.display = "none";
         NK.el("byg-opgave-nuklid").hidden = true;
+        this.saetOpgaveTrin("start");
     };
 
-    /* Facit-symbolet: massetal, atomnummer, symbol og ladning, skrevet
-       ganske som maerkatet over atomet selv (byg-nuklid). Vises kun
-       naar opgaven er afsloeret eller loest - se visSvar() og
-       tjekOpgave() - saa den ikke spoiler opgaven paa forhaand. */
+    /* Hintet: opgavens atomsymbol med massetal, atomnummer og ladning,
+       skrevet ganske som maerkatet over atomet selv (byg-nuklid). Saa
+       er der noget konkret at bygge efter, uden at tallene for
+       protoner, neutroner og elektroner er givet. */
+    NK.SimByg.prototype.visHint = function () {
+        if (!this.opgave) return;
+        this.visOpgaveNuklid(this.opgave);
+        this.saetOpgaveTrin("svar");
+    };
+
     NK.SimByg.prototype.visOpgaveNuklid = function (o) {
         var g = D.grundstof(o.p);
         var a = o.p + o.n;
@@ -385,13 +422,10 @@
         this.opgaveNr++;
         NK.saetTekst("byg-opgave", this.opgave.tekst);
         NK.saetKlasse("byg-opgave", "besked");
-        NK.el("byg-opgave-svar").style.display = "";
-        NK.el("byg-opgave-svar").disabled = false;
-        NK.el("byg-opgave-ny").textContent = "Ny opgave";
-        NK.el("byg-opgave-ny").classList.remove("banker");
         NK.el("byg-opgave-taeller").style.display = "";
         NK.saetTekst("byg-opgave-taeller", (((this.opgaveNr - 1) % 5) + 1) + "/5");
         NK.el("byg-opgave-nuklid").hidden = true;
+        this.saetOpgaveTrin("hint");
         this.tjekOpgave();
     };
 
@@ -404,8 +438,7 @@
         NK.saetKlasse("byg-opgave", "besked gul");
         this.opgave.loest = true;
         this.visOpgaveNuklid(this.opgave);
-        NK.el("byg-opgave-svar").disabled = true;
-        NK.el("byg-opgave-ny").classList.add("banker");
+        this.saetOpgaveTrin("ny");
     };
 
     NK.SimByg.prototype.tjekOpgave = function () {
@@ -416,116 +449,46 @@
         NK.saetTekst("byg-opgave", "Rigtigt! " + o.svar);
         NK.saetKlasse("byg-opgave", "besked god");
         this.visOpgaveNuklid(o);
-        NK.el("byg-opgave-svar").disabled = true;
-        NK.el("byg-opgave-ny").classList.add("banker");
+        this.saetOpgaveTrin("ny");
     };
 
     /* ----- Tegning ---------------------------------------------------------- */
     NK.SimByg.prototype.tilpas = function () { this.l.tilpas(); };
 
-    /* Hvor atomet skal staa: til hoejre for det periodiske system, saa
-       hverken skallerne eller nuklidmaerkatet gemmer sig under det.
-       Der regnes med fire fulde skaller for alle grundstoffer, saa
-       maalestokken er den samme, og atomet ikke skifter stoerrelse,
-       naar man laegger en proton i.
+    /* Hvor atomet skal staa: midt i scenen, som nu er atommodellens
+       alene - det periodiske system staar i panelet til hoejre.
 
-       Stoerrelsen findes ved at LOESE uligheden for den stoerste radius,
-       der stadig levner plads til nuklidmaerkat foroven, kernetekst
-       forneden og venstre soejle i siden - ikke ved at proeve sig frem i
-       et hak-for-hak loekke. Det betyder, at der aldrig kan vaere en
-       stoerrelse, som rent faktisk ville passe, men som en soegning bare
-       ikke naaede at proeve: enten findes loesningen, eller ogsaa er der
-       bevisligt ikke plads.
+       Pladsen findes ved at LOESE uligheden for den stoerste radius, der
+       stadig levner plads til nuklidmaerkat foroven og kernetekst
+       forneden - ikke ved at proeve sig frem i et hak-for-hak loekke.
+       Enten findes loesningen, eller ogsaa er der bevisligt ikke plads.
 
-       Er der ikke plads til et laeseligt atom, selv naar det periodiske
-       system fylder mindst muligt, viger tabellen helt - det er sikringen
-       imod kraftigt browserzoom, hvor scenen bliver meget lille i
-       CSS-pixel maalt. Kommer der plads igen, vises den automatisk. */
+       Bemaerk, at pladsen er den samme for alle grundstoffer. Hvor stort
+       atomet SELV tegnes inden for den plads, afhaenger af, hvor mange
+       skaller der er i brug - se tilpasSkaller i atom.js. */
     var YDRE_ANDEL = 0.93;      /* yderste skals radius i forhold til plads, fire skaller */
     var NUKLID_H = 78, LUFT = 10;
     var KERNE_H = 74;           /* svarer til loftet i tegn(): 74 px over scenens bund */
-    var SKJUL_GRAENSE = 90;     /* under denne plads-stoerrelse viger det periodiske system */
-    var MIN_PLADS = 55;         /* absolut bund, ogsaa hvis tabellen ikke er nok i sig selv */
-    var SOEJLE_LUFT = 18;       /* luft mellem venstre soejle og atomet */
-    var HOEJRE_LUFT = 12;       /* luft mellem atomet og scenens hoejre kant */
+    var MIN_PLADS = 55;         /* absolut bund paa en meget lille scene */
+    var SIDE_LUFT = 12;         /* luft mellem atomet og scenens sidekant */
 
     NK.SimByg.prototype.placering = function () {
         var l = this.l;
-        var tabelKort = document.querySelector("#fane-byg .pertabel-boks");
-
-        function maal(e) {
-            return e && e.offsetWidth ? [e.offsetLeft, e.offsetTop, e.offsetWidth, e.offsetHeight] : null;
-        }
-        var noegle = l.b + "x" + l.h + "|" + JSON.stringify(maal(tabelKort));
+        var noegle = l.b + "x" + l.h;
         if (this.stedNoegle === noegle) return this.sted;
         this.stedNoegle = noegle;
 
-        /* Tabellen ligger enten ovenpaa scenen som en smal soejle
-           (desktop, position: absolute) eller er flyttet ud i normal
-           flow under laerredet (smal skaerm, se stil.css) - kendetegnet
-           ved at dens offsetTop saa ligger uden for laerredets egen
-           hoejde. De to tilstande laegger atomet helt forskelligt: en
-           smal soejle skubber atomet til siden (vandret), mens en
-           tabel under laerredet lader atomet fylde hele scenens bredde
-           (lodret). */
-        var tabelISoejle = !!(tabelKort && tabelKort.offsetTop < l.h);
+        var normalPlads = NK.klamp(Math.min(l.b * 0.33, l.h * 0.45), 70, 380);
+        var R = Math.min(normalPlads * YDRE_ANDEL,
+            (l.h - LUFT - NUKLID_H - KERNE_H - 30) / 2,
+            l.b / 2 - SIDE_LUFT);
+        R = Math.max(R, MIN_PLADS * YDRE_ANDEL);
 
-        /* Den hoejre kant af tabellen. Den maales altid som synlig
-           (ogsaa naar den lige nu er skjult), saa vi kan opdage, naar
-           der igen bliver plads til den. */
-        function hoejreKant(medTabel) {
-            var x = 0;
-            if (medTabel && tabelKort) {
-                var vist = tabelKort.classList.contains("skjult");
-                if (vist) tabelKort.classList.remove("skjult");
-                if (tabelKort.offsetWidth && tabelKort.offsetTop < l.h) {
-                    x = Math.max(x, tabelKort.offsetLeft + tabelKort.offsetWidth);
-                }
-                if (vist) tabelKort.classList.add("skjult");
-            }
-            return x;
-        }
+        var cyMin = LUFT + NUKLID_H + 14 + R;
+        var cyMax = l.h - R - 16 - KERNE_H;
+        var cy = NK.klamp(l.h * 0.54, cyMin, Math.max(cyMin, cyMax));
 
-        var R, cx, cy, tabelSkjult = false;
-
-        if (tabelISoejle) {
-            var normalPladsV = NK.klamp(Math.min(l.b * 0.33, l.h * 0.45), 70, 380);
-            var kant = hoejreKant(true);
-            R = Math.min(normalPladsV * YDRE_ANDEL,
-                (l.h - LUFT - NUKLID_H - KERNE_H - 30) / 2,
-                (l.b - kant - SOEJLE_LUFT - HOEJRE_LUFT) / 2);
-
-            if (R < SKJUL_GRAENSE * YDRE_ANDEL) {
-                var kantUden = hoejreKant(false);
-                var Ruden = Math.min(normalPladsV * YDRE_ANDEL,
-                    (l.h - LUFT - NUKLID_H - KERNE_H - 30) / 2,
-                    (l.b - kantUden - SOEJLE_LUFT - HOEJRE_LUFT) / 2);
-                if (Ruden > R) { tabelSkjult = true; R = Ruden; kant = kantUden; }
-            }
-            tabelKort.classList.toggle("skjult", tabelSkjult);
-            R = Math.max(R, MIN_PLADS * YDRE_ANDEL);
-
-            var cyMinS = LUFT + NUKLID_H + 14 + R;
-            var cyMaxS = l.h - R - 16 - KERNE_H;
-            cy = NK.klamp(l.h * 0.54, cyMinS, Math.max(cyMinS, cyMaxS));
-            cx = NK.klamp(kant + SOEJLE_LUFT + (l.b - kant - SOEJLE_LUFT) / 2,
-                kant + SOEJLE_LUFT + R, l.b - HOEJRE_LUFT - R);
-        } else {
-            if (tabelKort) tabelKort.classList.remove("skjult");
-
-            var normalPladsL = NK.klamp(Math.min(l.b / 2 - 40, l.h * 0.38), 70, 300);
-            R = Math.min(normalPladsL * YDRE_ANDEL,
-                (l.h - LUFT - NUKLID_H - KERNE_H - 30) / 2,
-                l.b / 2 - 40);
-            R = Math.max(R, MIN_PLADS * YDRE_ANDEL);
-
-            var cyMinL = LUFT + NUKLID_H + 14 + R;
-            var cyMaxL = l.h - R - 16 - KERNE_H;
-            cy = NK.klamp(l.h * 0.54, cyMinL, Math.max(cyMinL, cyMaxL));
-            cx = l.b / 2;
-        }
-
-        this.sted = { plads: R / YDRE_ANDEL, cy: cy, cx: cx };
+        this.sted = { plads: R / YDRE_ANDEL, cy: cy, cx: l.b / 2 };
         return this.sted;
     };
 
@@ -574,7 +537,8 @@
 
         this.atom.tegn(c, cx, cy, plads, {
             fremhaevValens: true,
-            ladning: this.p - this.e
+            ladning: this.p - this.e,
+            tilpasSkaller: true
         });
         NK.tegnSkaltal(c, this.atom);
 

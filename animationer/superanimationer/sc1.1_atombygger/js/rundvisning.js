@@ -21,9 +21,9 @@
 
     var TURE = {
         "fane-byg": [
-            { sel: "#fane-byg .pertabel-boks", titel: "Det periodiske system", tekst: "Viser, hvor dit atom hører hjemme. Tryk på et felt for at springe direkte til det grundstof." },
             { sel: "#byg-panel-partikler", titel: "Tilføj elementarpartikler", tekst: "Læg protoner, neutroner og elektroner i én ad gangen, og se hvad hvert tal styrer." },
-            { sel: "#opgave-boks", titel: "Opgaven", tekst: "Få en opgave, du selv skal bygge — fx et bestemt grundstof eller en ion." },
+            { sel: "#fane-byg .pertabel-boks", titel: "Det periodiske system", tekst: "Viser, hvor dit atom hører hjemme. Tryk på et felt for at springe direkte til det grundstof." },
+            { sel: "#opgave-boks", titel: "Opgaven", tekst: "Få en opgave, du selv skal bygge. Knappen giver først et hint og derefter svaret, hvis du går i stå." },
             { sel: "#byg-nuklid", titel: "Mærkatet", tekst: "Massetal, atomnummer, symbol og ladning — skrevet på samme måde som i kemibogen." },
             { sel: "#byg-nulstil", titel: "Genstart", tekst: "Nulstil til det simpleste atom: én proton og én elektron." },
             { sel: ".faneknapper", titel: "De øvrige faner", tekst: "Isotoper, salte og et afsluttende quizspil bygger videre på det samme." }
