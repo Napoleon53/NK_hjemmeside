@@ -307,9 +307,10 @@
         this.tid += dt;
         this.puls = Math.max(0, this.puls - dt * 2.2);
 
-        /* Aabner eller lukker en skal, skifter atomets maalestok. Den
-           glider derhen i stedet for at springe, saa man kan se, at det
-           er det SAMME atom, der lige er blevet et lag stoerre. */
+        /* Lukker en skal, glider maalestokken tilbage, saa det lille atom
+           igen fylder pladsen ud - i stedet for at springe i stoerrelse.
+           Den anden vej stopper tegningen glidningen med det samme, for
+           en ny skal skal kunne vaere der nu og ikke om et halvt sekund. */
         var maalYdre = this.ydreModel();
         this.ydre = this.ydre === undefined ? maalYdre : NK.mod(this.ydre, maalYdre, 7, dt);
 
@@ -384,8 +385,8 @@
        og saa fylder tegningen til gengaeld mere af den plads, den har
        faaet - ellers ligger et hydrogenatom som en prik i et tomt felt.
        Kun kaldere, der beder om det (opt.tilpasSkaller), faar det. */
-    NK.Atom.prototype.ydreModel = function () {
-        var geo = this.geometri();
+    NK.Atom.prototype.ydreModel = function (geo) {
+        geo = geo || this.geometri();
         var yderste = Math.max(0, this.fordeling.length - 1);
         return NK.klamp(geo.rSkal[yderste] + YDRE_LUFT, MODEL_MINDST, MODEL_YDRE);
     };
@@ -451,7 +452,13 @@
         opt = opt || {};
         var geo = this.geometri();
         var ydre = MODEL_YDRE;
-        if (opt.tilpasSkaller) ydre = this.ydre === undefined ? this.ydreModel() : this.ydre;
+        if (opt.tilpasSkaller) {
+            /* Aldrig mindre end det, skallerne kraever lige nu: saa kan en
+               glidning i gang aldrig naa at tegne atomet uden for den
+               plads, det har faaet. */
+            var kraev = this.ydreModel(geo);
+            ydre = this.ydre === undefined ? kraev : Math.max(this.ydre, kraev);
+        }
         var s = plads / ydre;
         var i;
         this.sidsteGeo = { cx: cx, cy: cy, s: s, geo: geo };

@@ -405,6 +405,10 @@ main { flex: 1; position: relative; min-height: 0; }
    presser den ellers meget brede, tomme midte sammen. */
 #byg-pertabel {
     grid-template-columns: repeat(2, 1fr) repeat(10, 0.2fr) repeat(6, 1fr);
+    /* Paa en smal skaerm fylder panelet hele bredden. Uden loft ville
+       felterne (som er kvadratiske) vokse helt ud af proportion. */
+    max-width: 400px;
+    margin-inline: auto;
 }
 
 .pertabel-boks .pcelle { font-size: 1.05rem; border-radius: 4px; }
