@@ -86,40 +86,33 @@
         .stat b { color: var(--tekst); margin-left: 6px; }
 
         /* ── SIDE ── */
-        .side {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 12px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+        .side { max-width: 900px; margin: 0 auto; padding: 12px 16px; }
 
-        /* ── TAVLEN: løsningen bygges op her ── */
+        /* ── TAVLEN: løsningen bygges op række for række ── */
         .tavle {
             position: relative;
             background: var(--panel);
             border: 1px solid var(--kant);
             border-radius: var(--radius);
-            padding: 8px 20px 14px;
+            padding: 8px 20px 12px;
         }
 
-        .syrenavn { position: absolute; top: 12px; left: 18px; font-size: 1.2rem; font-weight: bold; }
+        .syrenavn { position: absolute; top: 8px; left: 18px; font-size: 1.2rem; font-weight: bold; }
+        .syrenavn.over { position: static; margin-top: 4px; }
 
         .raekke {
             display: flex;
             justify-content: center;
             align-items: center;
             margin-top: 8px;
-            transition: opacity 0.4s;
+            animation: fadeIn 0.4s ease-out;
         }
 
-        /* Rækker, der ikke er nået endnu, fylder deres plads, så kortet
-           nedenunder ikke flytter sig, når tavlen udfyldes. */
         .skjult { visibility: hidden; opacity: 0; }
 
         /* Reaktionsskema */
         .skema { position: relative; flex-wrap: wrap; align-items: flex-start; gap: 0 10px; padding-top: 30px; margin-top: 0; }
+        .skemadel { display: flex; align-items: flex-start; gap: 0 10px; }
         .bue { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
         .bue.frem { animation: fadeIn 0.5s; }
         .bue text { fill: #e5e7eb; font-size: 15px; font-weight: 600; }
@@ -157,6 +150,7 @@
         /* Ks-udtryk */
         .ks { gap: 12px; font-size: 1.3rem; flex-wrap: wrap; }
         .ks-navn, .ks-vaerdi { white-space: nowrap; font-weight: 600; }
+        .ks-vaerdi { transition: opacity 0.4s; }
         .brok { display: inline-flex; flex-direction: column; }
         .taeller, .naevner { display: flex; justify-content: center; align-items: center; gap: 6px; padding: 3px 6px; }
         .taeller { border-bottom: 2px solid rgba(255,255,255,0.6); }
@@ -187,8 +181,7 @@
         .ks.faerdig .plads { min-width: 0; padding: 0 2px; border-color: transparent; background: none; box-shadow: none; cursor: default; }
 
         /* pKs */
-        .pks { min-height: 34px; font-size: 1.3rem; }
-        .pks b { margin-left: 4px; }
+        .pks { min-height: 34px; font-size: 1.3rem; font-weight: 600; }
 
         /* Skala for syrestyrke */
         .styrke { display: block; max-width: 640px; margin: 10px auto 0; }
@@ -206,9 +199,15 @@
         }
         .zone + .zone { border-left: 1px solid var(--kant); }
         .zone.aktiv { background: rgba(16,185,129,0.2); color: var(--tekst); font-weight: 600; }
+        .zone.uden-tekst { color: transparent; }
         .streg { position: absolute; bottom: 0; transform: translateX(-50%); font-size: 0.85rem; color: var(--daempet); }
-        .markoer { position: absolute; top: 20px; width: 0; height: 36px; border-left: 2px solid var(--tekst); }
-        .markoer span {
+
+        /* Markøren er to hak i bjælkens kanter, så den ikke skærer zonenavnet over */
+        .markoer { position: absolute; top: 16px; width: 0; height: 36px; }
+        .markoer::before, .markoer::after { content: ""; position: absolute; left: -1px; width: 2px; background: var(--tekst); }
+        .markoer::before { top: 0; height: 12px; }
+        .markoer::after  { bottom: 0; height: 6px; }
+        .markoer > span {
             position: absolute;
             bottom: 100%;
             left: 0;
@@ -217,21 +216,14 @@
             font-weight: 600;
             white-space: nowrap;
         }
-        .markoer.venstre span { transform: translateX(-10px); }
-        .markoer.hoejre span  { transform: translateX(calc(-100% + 10px)); }
+        .markoer.venstre > span { transform: translateX(-10px); }
+        .markoer.hoejre > span  { transform: translateX(calc(-100% + 10px)); }
 
-        /* ── OPGAVEKORTET: kun det aktive trin ── */
-        .kort {
-            background: var(--panel);
-            border: 1px solid var(--kant);
-            border-radius: var(--radius);
-            padding: 10px 20px 14px;
-        }
+        /* ── ARBEJDSFELT: står altid lige under den række, der arbejdes på ── */
+        .arbejde { margin-top: 14px; }
+        .opgavetekst { font-size: 1.1rem; text-align: center; margin-bottom: 10px; }
 
-        .etiket { font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--daempet); }
-        .opgavetekst { font-size: 1.1rem; margin: 2px 0 10px; }
-
-        .valg { display: flex; flex-wrap: wrap; gap: 8px; }
+        .valg { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
         .brik {
             min-width: 92px;
             padding: 5px 14px;
@@ -241,18 +233,32 @@
             font-size: 1.3rem;
             font-weight: 600;
             cursor: pointer;
-            transition: border-color 0.2s, background 0.2s, transform 0.1s;
+            transition: border-color 0.2s, background 0.2s, transform 0.1s, opacity 0.2s;
         }
         .brik:hover:not(:disabled)  { border-color: #8b93a1; }
         .brik:active:not(:disabled) { transform: scale(0.97); }
         .brik.p1 { color: var(--par1-tekst); border-color: rgba(52,152,219,0.5); }
         .brik.p2 { color: var(--par2-tekst); border-color: rgba(155,89,182,0.5); }
         .brik.ord { font-size: 1.05rem; padding: 8px 16px; }
+        .brik.traekbar { cursor: grab; touch-action: none; user-select: none; }
         .brik.forkert { border-color: var(--roed); color: #fca5a5; text-decoration: line-through; opacity: 0.55; cursor: not-allowed; }
         .brik.rigtig  { border-color: var(--groen); background: rgba(16,185,129,0.15); }
         .brik:disabled:not(.forkert):not(.rigtig) { opacity: 0.45; cursor: default; }
 
-        .svarlinje { display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: 600; }
+        /* Træk og slip */
+        .brik.loeftet { opacity: 0.3; }
+        .spoegelse {
+            position: fixed;
+            z-index: 100;
+            margin: 0;
+            pointer-events: none;
+            background: #2a2f3a;
+            box-shadow: 0 10px 24px rgba(0,0,0,0.55);
+        }
+        body.traekker, body.traekker * { cursor: grabbing !important; }
+        .formel.slot.over, .plads.over { border-style: solid; border-color: var(--tekst); background: rgba(255,255,255,0.1); }
+
+        .svarlinje { display: flex; justify-content: center; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: 600; }
         .svarlinje input {
             width: 130px;
             padding: 5px 10px;
@@ -266,7 +272,8 @@
         .svarlinje input:focus { outline: none; border-color: var(--tekst); }
 
         .hint {
-            margin-top: 10px;
+            max-width: 640px;
+            margin: 10px auto 0;
             padding: 6px 12px;
             border-left: 3px solid var(--gul);
             border-radius: 0 6px 6px 0;
@@ -275,7 +282,14 @@
             animation: fadeIn 0.3s;
         }
 
-        .fod { display: flex; align-items: center; gap: 14px; margin-top: 12px; }
+        .fod {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid var(--kant);
+        }
         .besked { flex: 1; line-height: 1.4; }
         .besked.ok   { color: #6ee7b7; }
         .besked.fejl { color: #fca5a5; }
@@ -313,11 +327,10 @@
             .topbar { flex-wrap: wrap; padding: 8px 16px; }
             .trinlinje .navn { display: none; }
             .trinlinje li { padding: 3px; }
-            .syrenavn { position: static; margin-top: 4px; }
+            .tavle { padding: 8px 12px 12px; }
             .formel, .op, .pil { font-size: 1.2rem; }
             .ks, .pks { font-size: 1.1rem; }
             .fod { flex-wrap: wrap; }
-            .zone:not(.aktiv) { color: transparent; }
         }
     </style>
 </head>
@@ -338,63 +351,65 @@
 </header>
 
 <main class="side">
-
-    <!-- ── TAVLE ── -->
     <section class="tavle">
         <div class="syrenavn" id="syrenavn"></div>
 
+        <!-- ── LØSNINGEN: en række pr. trin ── -->
         <div class="raekke skema" id="skema">
             <svg class="bue" id="bue"></svg>
-            <div class="art p1" id="art-syre"><span class="formel"></span><span class="rolle">syre 1</span></div>
-            <span class="op">+</span>
-            <div class="art p2"><span class="formel">H<sub>2</sub>O<span class="tf">(l)</span></span><span class="rolle">base 2</span></div>
-            <span class="pil" id="pil">⇌</span>
-            <div class="art p1" id="art-base"><span class="formel slot">?</span><span class="rolle">base 1</span></div>
-            <span class="op">+</span>
-            <div class="art p2"><span class="formel">H<sub>3</sub>O<sup>+</sup><span class="tf">(aq)</span></span><span class="rolle">syre 2</span></div>
+            <!-- To dele, så skemaet brydes efter pilen på smal skærm -->
+            <div class="skemadel">
+                <div class="art p1" id="art-syre"><span class="formel"></span><span class="rolle">syre 1</span></div>
+                <span class="op">+</span>
+                <div class="art p2" id="art-vand"><span class="formel">H<sub>2</sub>O<span class="tf">(l)</span></span><span class="rolle">base 2</span></div>
+                <span class="pil" id="pil">⇌</span>
+            </div>
+            <div class="skemadel">
+                <div class="art p1" id="art-base"><span class="formel slot">?</span><span class="rolle">base 1</span></div>
+                <span class="op">+</span>
+                <div class="art p2"><span class="formel">H<sub>3</sub>O<sup>+</sup><span class="tf">(aq)</span></span><span class="rolle">syre 2</span></div>
+            </div>
         </div>
 
-        <div class="raekke ks skjult" id="ks">
+        <div class="raekke ks" id="ks" hidden>
             <span class="ks-navn">K<sub>s</sub> =</span>
             <span class="brok">
                 <span class="taeller">
-                    <button class="plads" data-plads="0"></button>
+                    <button class="plads" data-plads="0" data-slip="plads"></button>
                     <span class="prik">·</span>
-                    <button class="plads" data-plads="1"></button>
+                    <button class="plads" data-plads="1" data-slip="plads"></button>
                 </span>
                 <span class="naevner">
-                    <button class="plads" data-plads="2"></button>
+                    <button class="plads" data-plads="2" data-slip="plads"></button>
                 </span>
             </span>
             <span class="ks-vaerdi skjult" id="ks-vaerdi"></span>
         </div>
 
-        <div class="raekke pks skjult" id="pks"></div>
+        <div class="raekke pks" id="pks" hidden></div>
 
-        <div class="raekke styrke skjult" id="styrke"></div>
-    </section>
+        <div class="raekke styrke" id="styrke" hidden></div>
 
-    <!-- ── AKTIVT TRIN ── -->
-    <section class="kort">
-        <div class="etiket" id="etiket"></div>
-        <div class="opgavetekst" id="opgavetekst"></div>
+        <!-- ── ARBEJDSFELT: det aktive trin ── -->
+        <div class="arbejde" id="arbejde">
+            <div class="opgavetekst" id="opgavetekst"></div>
 
-        <div class="valg" id="valg1"></div>
-        <div class="valg" id="valg2" hidden></div>
-        <div class="svarlinje" id="felt3" hidden>
-            <label for="input-pks">pK<sub>s</sub> =</label>
-            <input type="text" id="input-pks" inputmode="decimal" autocomplete="off">
+            <div class="valg" id="valg1"></div>
+            <div class="valg" id="valg2" hidden></div>
+            <div class="svarlinje" id="felt3" hidden>
+                <label for="input-pks">pK<sub>s</sub> =</label>
+                <input type="text" id="input-pks" inputmode="decimal" autocomplete="off">
+            </div>
+            <div class="valg" id="valg4" hidden></div>
+
+            <div class="hint" id="hint" hidden></div>
+
+            <div class="fod">
+                <div class="besked" id="besked"></div>
+                <button class="knap" id="knap"></button>
+            </div>
         </div>
-        <div class="valg" id="valg4" hidden></div>
-
-        <div class="hint" id="hint" hidden></div>
-
-        <div class="fod">
-            <div class="besked" id="besked"></div>
-            <button class="knap" id="knap"></button>
-        </div>
     </section>
-
 </main>
 
 <script>
@@ -461,7 +476,7 @@
 
     var OPGAVETEKST = {
         1: function () { return "Hvad dannes, når " + formel(opg.syre) + " afgiver " + HPLUS + " til vand?"; },
-        2: function () { return "Opstil K<sub>s</sub>-udtrykket. Klik på et stof for at sætte det på den markerede plads."; },
+        2: function () { return "Opstil K<sub>s</sub>-udtrykket. Træk stofferne ind i brøken."; },
         3: function () { return "Beregn pK<sub>s</sub> ud fra K<sub>s</sub>."; },
         4: function () { return "Hvor stærk er syren?"; }
     };
@@ -536,14 +551,94 @@
         var b = document.createElement("button");
         b.className = "brik " + klasse;
         b.innerHTML = html;
-        b.onclick = klik;
+        b.onclick = function () { if (!undertrykKlik) klik(); };
         return b;
+    }
+
+    /* En ny række skubber arbejdsfeltet ned. Feltet glider på plads, så
+       man kan se, at brikkerne flytter med ned under rækken. */
+    function visRaekke(id) {
+        var felt = el("arbejde");
+        var foer = felt.getBoundingClientRect().top;
+        el(id).hidden = false;
+        var efter = felt.getBoundingClientRect().top;
+        if (efter !== foer && felt.animate) {
+            felt.animate([{ transform: "translateY(" + (foer - efter) + "px)" }, { transform: "none" }],
+                         { duration: 350, easing: "ease-out" });
+        }
+    }
+
+    /* ────────────────────────────────
+       TRÆK OG SLIP
+       Brikkerne i trin 1 og 2 kan trækkes hen på en plads. Et klik uden
+       bevægelse virker som et almindeligt klik.
+    ──────────────────────────────── */
+    var traek = null;
+    var undertrykKlik = false;
+
+    function goerTraekbar(b, slip) {
+        b.classList.add("traekbar");
+        b.slip = slip;
+        b.addEventListener("pointerdown", function (e) {
+            if (b.disabled || e.button !== 0) return;
+            traek = { brik: b, x0: e.clientX, y0: e.clientY, spoegelse: null, maal: null };
+            b.setPointerCapture(e.pointerId);
+        });
+        b.addEventListener("pointermove", flytTraek);
+        b.addEventListener("pointerup", function () { slutTraek(false); });
+        b.addEventListener("pointercancel", function () { slutTraek(true); });
+    }
+
+    function flytTraek(e) {
+        if (!traek) return;
+        var t = traek;
+
+        if (!t.spoegelse) {
+            if (Math.abs(e.clientX - t.x0) + Math.abs(e.clientY - t.y0) < 6) return;
+            var r = t.brik.getBoundingClientRect();
+            t.dx = t.x0 - r.left;
+            t.dy = t.y0 - r.top;
+            t.spoegelse = t.brik.cloneNode(true);
+            t.spoegelse.classList.add("spoegelse");
+            t.spoegelse.style.width = r.width + "px";
+            document.body.appendChild(t.spoegelse);
+            t.brik.classList.add("loeftet");
+            document.body.classList.add("traekker");
+        }
+
+        t.spoegelse.style.left = (e.clientX - t.dx) + "px";
+        t.spoegelse.style.top  = (e.clientY - t.dy) + "px";
+
+        var under = document.elementFromPoint(e.clientX, e.clientY);
+        var maal = under ? under.closest('[data-slip="' + (trin === 1 ? "base" : "plads") + '"]') : null;
+        if (maal && maal.disabled) maal = null;
+        if (maal !== t.maal) {
+            if (t.maal) t.maal.classList.remove("over");
+            if (maal) maal.classList.add("over");
+            t.maal = maal;
+        }
+    }
+
+    function slutTraek(afbrudt) {
+        if (!traek) return;
+        var t = traek;
+        traek = null;
+        if (!t.spoegelse) return;
+
+        t.spoegelse.remove();
+        t.brik.classList.remove("loeftet");
+        document.body.classList.remove("traekker");
+        if (t.maal) t.maal.classList.remove("over");
+
+        /* Brikken får et klik lige efter slip, som ikke også skal tælle */
+        undertrykKlik = true;
+        setTimeout(function () { undertrykKlik = false; }, 0);
+
+        if (t.maal && !afbrudt) t.brik.slip(t.maal);
     }
 
     /* ────────────────────────────────
        NY OPGAVE
-       Tavlen fyldes på forhånd med hele løsningen, men skjult. Hvert trin
-       viser sin række, når det er løst, så intet flytter sig undervejs.
     ──────────────────────────────── */
     function nyOpgave(indeks) {
         if (indeks === undefined) {
@@ -561,14 +656,16 @@
         el("art-syre").querySelector(".formel").innerHTML = formel(opg.syre) + TF_AQ;
         var slot = el("art-base").querySelector(".formel");
         slot.className = "formel slot";
+        slot.dataset.slip = "base";
         slot.innerHTML = "?";
 
         pladser = [null, null, null]; aktivPlads = 0; fejlPladser = [];
         el("ks").classList.remove("faerdig");
         el("ks-vaerdi").innerHTML = "= " + ksHTML(opg.pKs) + " M";
-        el("pks").innerHTML = "pK<sub>s</sub> = −log(" + ksHTML(opg.pKs) + ") =<b>" + tal(opg.pKs, 2) + "</b>";
+        skjul("ks-vaerdi");
+        el("pks").innerHTML = "<span>pK<sub>s</sub> = −log(" + ksHTML(opg.pKs) + ") = " + tal(opg.pKs, 2) + "</span>";
         visSkala(false);
-        ["ks", "ks-vaerdi", "pks", "styrke"].forEach(skjul);
+        el("ks").hidden = el("pks").hidden = el("styrke").hidden = true;
 
         var input = el("input-pks");
         input.value = "";
@@ -579,12 +676,12 @@
         byggValg2();
         byggValg4();
         startTrin(1);
+        placerNavn();
     }
 
     function startTrin(n) {
         trin = n; loest = false; hintVist = false;
 
-        el("etiket").textContent = "Trin " + n + " af 4";
         el("opgavetekst").innerHTML = OPGAVETEKST[n]();
         el("valg1").hidden = n !== 1;
         el("valg2").hidden = n !== 2;
@@ -593,7 +690,7 @@
         el("hint").hidden = true;
         saetBesked("", "");
 
-        if (n === 2) { vis("ks"); tegnPladser(); }
+        if (n === 2) { tegnPladser(); visRaekke("ks"); }
 
         opdaterTrinlinje();
         opdaterKnap();
@@ -672,8 +769,9 @@
         if (trin === 2) h.innerHTML = "Tæller: de to produkter. Nævner: syren. Vand er opløsningsmiddel og tages ikke med.";
         if (trin === 3) h.innerHTML = "pK<sub>s</sub> = −log(K<sub>s</sub>). Brug log, ikke ln.";
         if (trin === 4) {
-            vis("styrke");
-            h.innerHTML = "Find pK<sub>s</sub> = " + tal(opg.pKs, 2) + " på skalaen på tavlen.";
+            visRaekke("styrke");
+            tilpasSkala();
+            h.innerHTML = "Find pK<sub>s</sub> = " + tal(opg.pKs, 2) + " på skalaen.";
         }
         h.hidden = false;
         opdaterKnap();
@@ -690,11 +788,8 @@
             loesTrin2();
         }
         if (trin === 3) {
-            var input = el("input-pks");
-            input.value = tal(opg.pKs, 2);
-            input.disabled = true;
             ubekraeftet = false;
-            vis("pks");
+            visPks();
         }
         if (trin === 4) {
             el("valg4").querySelector('[data-styrke="' + GRAENSER[styrkeIndeks(opg.pKs)].navn + '"]').classList.add("rigtig");
@@ -710,8 +805,10 @@
         var boks = el("valg1");
         boks.innerHTML = "";
         blandet([[opg.base, null]].concat(opg.fejl)).forEach(function (bud) {
-            var b = lavBrik("", formel(bud[0]), function () { vaelgBase(b, bud[0], bud[1]); });
+            function vaelg() { vaelgBase(b, bud[0], bud[1]); }
+            var b = lavBrik("", formel(bud[0]), vaelg);
             b.dataset.noegle = noegle(bud[0]);
+            goerTraekbar(b, vaelg);
             boks.appendChild(b);
         });
     }
@@ -738,6 +835,7 @@
     function visBase() {
         var slot = el("art-base").querySelector(".formel");
         slot.className = "formel";
+        slot.removeAttribute("data-slip");
         slot.innerHTML = formel(opg.base) + TF_AQ;
         el("valg1").querySelectorAll(".brik").forEach(function (b) { b.disabled = true; });
         el("skema").classList.add("farvet");
@@ -745,6 +843,16 @@
         el("bue").classList.remove("frem");
         void el("bue").getBoundingClientRect();
         el("bue").classList.add("frem");
+    }
+
+    /* Navnet står i tavlens hjørne, men flyttes op over skemaet, hvis det
+       ville ramme buen fra syren (lange navne eller smal skærm). */
+    function placerNavn() {
+        var navn = el("syrenavn");
+        navn.classList.remove("over");
+        var n = navn.getBoundingClientRect();
+        var a = el("art-syre").querySelector(".formel").getBoundingClientRect();
+        if (n.right + 24 > a.left + a.width / 2) navn.classList.add("over");
     }
 
     /* Buen viser, at H+ går fra syren til vand. Den tegnes ud fra, hvor
@@ -755,7 +863,7 @@
 
         var r = el("skema").getBoundingClientRect();
         var a = el("art-syre").querySelector(".formel").getBoundingClientRect();
-        var v = el("skema").querySelectorAll(".art")[1].querySelector(".formel").getBoundingClientRect();
+        var v = el("art-vand").querySelector(".formel").getBoundingClientRect();
         if (Math.abs(a.top - v.top) > 4) { svg.innerHTML = ""; return; }
 
         var x1 = a.left + a.width / 2 - r.left;
@@ -780,16 +888,22 @@
         [opg.syre, VAND, opg.base, OXONIUM].forEach(function (s) {
             var b = lavBrik(par(s), formel(s), function () { saetIPlads(s); });
             b.dataset.noegle = noegle(s);
+            goerTraekbar(b, function (maal) { saetIPlads(s, Number(maal.dataset.plads)); });
             boks.appendChild(b);
         });
     }
 
-    function saetIPlads(s) {
-        if (trin !== 2 || loest || aktivPlads < 0) return;
-        pladser[aktivPlads] = s;
-        fejlPladser = fejlPladser.filter(function (i) { return i !== aktivPlads; });
+    /* Et stof sættes på pladsen i (trukket derhen) eller på den markerede
+       plads (klik). Når alle tre pladser er fyldt, tjekkes udtrykket. */
+    function saetIPlads(s, i) {
+        if (trin !== 2 || loest) return;
+        if (i === undefined) i = aktivPlads;
+        if (i < 0) return;
 
-        var tom = naesteTomme(aktivPlads);
+        pladser[i] = s;
+        fejlPladser = fejlPladser.filter(function (j) { return j !== i; });
+
+        var tom = naesteTomme(i);
         if (tom >= 0) {
             aktivPlads = tom;
             tegnPladser();
@@ -863,6 +977,7 @@
         el("ks").classList.add("faerdig");
         tegnPladser();
         vis("ks-vaerdi");
+        el("valg2").querySelectorAll(".brik").forEach(function (b) { b.disabled = true; });
     }
 
     /* ────────────────────────────────
@@ -874,19 +989,19 @@
     }
 
     function tjekTrin3() {
-        var input = el("input-pks");
-        var u = tolkTal(input.value);
+        var u = tolkTal(el("input-pks").value);
         var p = opg.pKs;
         ubekraeftet = false;
 
+        /* Regnet ud fra den afrundede Ks og afrundet til to decimaler
+           afviger svaret højst 0,007 fra tabelværdien. */
         if (isNaN(u)) {
             saetBesked("fejl", "Skriv pK<sub>s</sub> som et tal.");
-        } else if (Math.abs(u - p) < 0.011) {
-            input.disabled = true;
-            vis("pks");
+        } else if (Math.abs(u - p) < 0.008) {
+            visPks();
             trinLoest("ok", "Rigtigt.");
             return;
-        } else if (Math.abs(u + p) < 0.011) {
+        } else if (Math.abs(u + p) < 0.008) {
             saetBesked("fejl", "Tjek fortegnet. Husk minus foran log.");
         } else if (Math.abs(Math.abs(u) - Math.abs(p) * Math.LN10) < 0.03) {
             saetBesked("fejl", "Du har brugt ln. pK<sub>s</sub> beregnes med log.");
@@ -898,6 +1013,13 @@
             saetBesked("fejl", "Ikke rigtigt. Tjek beregningen.");
         }
         opdaterKnap();
+    }
+
+    /* Indtastningen erstattes af den færdige række på tavlen. */
+    function visPks() {
+        el("input-pks").disabled = true;
+        el("felt3").hidden = true;
+        visRaekke("pks");
     }
 
     /* ────────────────────────────────
@@ -931,7 +1053,8 @@
 
     function visStyrke() {
         visSkala(true);
-        vis("styrke");
+        if (el("styrke").hidden) visRaekke("styrke");
+        tilpasSkala();
         if (styrkeIndeks(opg.pKs) === 0) {
             el("pil").textContent = "→";
             tegnBue();
@@ -954,12 +1077,35 @@
 
         var markoer = "";
         if (medSvar) {
-            var x = pct(opg.pKs);
-            var side = x < 12 ? " venstre" : (x > 88 ? " hoejre" : "");
-            markoer = '<div class="markoer' + side + '" style="left:' + x + '%"><span>pK<sub>s</sub> = ' + tal(opg.pKs, 2) + '</span></div>';
+            markoer = '<div class="markoer" style="left:' + pct(opg.pKs) + '%"><span>' +
+                      '<span class="kat" hidden>' + stort(GRAENSER[rigtig].navn) + ' · </span>' +
+                      'pK<sub>s</sub> = ' + tal(opg.pKs, 2) + '</span></div>';
         }
 
         el("styrke").innerHTML = '<div class="skala"><div class="skala-bar">' + zoner + '</div>' + streger + markoer + '</div>';
+    }
+
+    /* Zonenavne, der ikke kan være i deres felt (smal skærm), skjules, og
+       markøren får så gruppens navn med. Markørteksten skubbes ind, hvis
+       den ellers stikker ud over skalaens kant. Kræver at rækken vises. */
+    function tilpasSkala() {
+        var boks = el("styrke");
+        if (boks.hidden) return;
+
+        boks.querySelectorAll(".zone").forEach(function (z) {
+            z.classList.remove("uden-tekst");
+            if (z.scrollWidth > z.clientWidth + 1) z.classList.add("uden-tekst");
+        });
+
+        var m = boks.querySelector(".markoer");
+        if (!m) return;
+        var aktiv = boks.querySelector(".zone.aktiv");
+        m.querySelector(".kat").hidden = !(aktiv && aktiv.classList.contains("uden-tekst"));
+        m.classList.remove("venstre", "hoejre");
+        var s = boks.querySelector(".skala").getBoundingClientRect();
+        var t = m.firstChild.getBoundingClientRect();
+        if (t.left < s.left) m.classList.add("venstre");
+        else if (t.right > s.right) m.classList.add("hoejre");
     }
 
     /* ────────────────────────────────
@@ -983,7 +1129,12 @@
         if (!loest && ubekraeftet) tjekTrin3();
     });
 
-    window.addEventListener("resize", tegnBue);
+    window.addEventListener("resize", function () {
+        placerNavn();
+        tegnBue();
+        tilpasSkala();
+    });
+
     window.onload = function () { nyOpgave(); };
 </script>
 </body>

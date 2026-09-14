@@ -1004,13 +1004,13 @@
         ctx.stroke();
 
         /* Varme udvikles – reaktionen er exoterm */
-        if (!g.faerdig && g.o2 * t.rate > 0.18) tekst('🌡 varmt', cx, G.top - 6, '#f39c12', 12, 'center', true);
+        if (!g.faerdig && g.o2 * t.rate > 0.18) tekst('🌡 varmt', cx, G.top - 6, '#f39c12', 14, 'center', true);
     }
 
     function hastighedsord(i) {
         const t = TUBES[i];
         if (!glas[i].tilsat) return 'ikke tilsat endnu';
-        if (glas[i].faerdig) return '✓ færdig – al H₂O₂ er brugt op';
+        if (glas[i].faerdig) return '✓ færdig: al H₂O₂ er brugt op';
         if (t.rate >= 0.8) return 'meget kraftig bruse';
         if (t.rate >= 0.5) return 'kraftig bruse';
         if (t.rate >= 0.2) return 'langsom';
@@ -1036,8 +1036,8 @@
             ctx.fillRect(bx, by, bw * g.o2, bh);
             ctx.restore();
         }
-        tekst('O₂ dannet: ' + Math.round(g.o2 * 100) + ' %', cx, 530, '#d5d5de', 13);
-        tekst(hastighedsord(i), cx, 550, '#c5c5d1', 13);
+        tekst('O₂ dannet: ' + Math.round(g.o2 * 100) + ' %', cx, 530, '#d5d5de', 15);
+        tekst(hastighedsord(i), cx, 552, '#c5c5d1', 15);
     }
 
     function tegnSplint() {
@@ -1935,7 +1935,6 @@
         ['forsog', 'molekyler', 'energi'].forEach(function (k) {
             document.getElementById('tab-' + k).classList.toggle('active', k === v);
         });
-        document.getElementById('grp-forsog').hidden = v !== 'forsog';
         document.getElementById('grp-card').hidden = v !== 'forsog';
         document.getElementById('grp-mek').hidden = v !== 'molekyler';
         document.getElementById('grp-energi').hidden = v !== 'energi';
@@ -1969,12 +1968,10 @@
 
     function opdaterKort() {
         const i = state.valgt, t = TUBES[i], g = glas[i];
-        const badge = t.type === 'homogen' ? 'badge-hom' : (t.type === 'heterogen' ? 'badge-het' : 'badge-ingen');
+        const badge = { homogen: 'badge-hom', heterogen: 'badge-het', enzym: 'badge-enzym', ingen: 'badge-ingen' }[t.type];
 
         let html = '<h4>Glas ' + (i + 1) + ': ' + t.navn + '</h4>';
         html += '<span class="badge ' + badge + '">' + t.badgeTekst + '</span>';
-        html += '<div class="card-line"><b>Hvad sker der?</b><br>' +
-                (g.tilsat ? t.sker : 'Tilsæt for at se det.') + '</div>';
         document.getElementById('tube-card').innerHTML = html;
 
         const btn = document.getElementById('btn-tilsaet');
@@ -2060,21 +2057,6 @@
         visBesked('');
     }
 
-    function nulstilForsog() {
-        for (let i = 0; i < TUBES.length; i++) {
-            glas[i].tilsat = false;
-            glas[i].o2 = 0;
-            glas[i].bobler = [];
-            glas[i].skum = 0;
-            glas[i].tid = 0;
-            glas[i].korn = [];
-            glas[i].faerdig = false;
-        }
-        state.splint = null;
-        visBesked('');
-        opdaterKort();
-    }
-
     function glodepind() {
         const i = state.valgt, g = glas[i];
         if (!g.tilsat) { visBesked('Tilsæt først noget i glasset.', 'fail'); return; }
@@ -2144,7 +2126,7 @@
         const y = (e.clientY - r.top) / r.height * LH;
         for (let i = 0; i < TUBES.length; i++) {
             const cx = tubeX(i);
-            if (x > cx - 70 && x < cx + 70 && y > 62 && y < 474) { vaelgGlas(i); return; }
+            if (x > cx - 90 && x < cx + 90 && y > 40 && y < 474) { vaelgGlas(i); return; }
         }
     });
 

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="200" viewBox="0 0 24 200">
+  <!-- Termometer. Animationen tegner den roede soejle ovenpaa:
+       x 11-13, fra y 180 og op. 0 °C ligger ved y 164, 100 °C ved y 24
+       (1,4 enheder pr. grad). -->
+  <rect x="7" y="2" width="10" height="178" rx="5" fill="#dfeaf3" fill-opacity="0.16" stroke="#d6eaf8" stroke-opacity="0.85" stroke-width="1.2"/>
+  <rect x="11" y="8" width="2" height="174" rx="1" fill="#ffffff" fill-opacity="0.14"/>
+  <circle cx="12" cy="187" r="9" fill="#d9453a" stroke="#d6eaf8" stroke-opacity="0.85" stroke-width="1.2"/>
+  <circle cx="9.5" cy="184" r="2.6" fill="#ffffff" fill-opacity="0.45"/>
+
+  <g stroke="#eef6fc" stroke-opacity="0.55" stroke-width="0.9">
+    <path d="M14.5 150 h2 M14.5 136 h2 M14.5 122 h2 M14.5 108 h2 M14.5 80 h2 M14.5 66 h2 M14.5 52 h2 M14.5 38 h2"/>
+  </g>
+  <g stroke="#eef6fc" stroke-opacity="0.9" stroke-width="1.2">
+    <path d="M13.8 164 h3.2 M13.8 94 h3.2 M13.8 24 h3.2"/>
+  </g>
+</svg>

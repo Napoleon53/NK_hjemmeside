@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="64" viewBox="0 0 240 64">
+  <!-- Varmeplade med magnetomroerer. Animationen tegner selv:
+       gloeden paa pladen (x 12-228, y 0-9), lampen for varme i (36, 36)
+       og lampen for omroering i (204, 36), radius 4. -->
+  <defs>
+    <linearGradient id="krop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a5262"/>
+      <stop offset="1" stop-color="#262b35"/>
+    </linearGradient>
+    <linearGradient id="plade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e4e8ed"/>
+      <stop offset="1" stop-color="#9aa4b0"/>
+    </linearGradient>
+    <radialGradient id="knop" cx="0.4" cy="0.35" r="0.7">
+      <stop offset="0" stop-color="#e3e8ee"/>
+      <stop offset="1" stop-color="#7d8794"/>
+    </radialGradient>
+  </defs>
+
+  <rect x="2" y="7" width="236" height="55" rx="8" fill="url(#krop)" stroke="#5f6878" stroke-width="1.2"/>
+  <rect x="8" y="0" width="224" height="10" rx="3" fill="url(#plade)" stroke="#c7ced6" stroke-width="0.8"/>
+
+  <rect x="14" y="19" width="212" height="35" rx="5" fill="#1b1f27" stroke="#3a414e" stroke-width="1"/>
+
+  <!-- Fatninger til de to lamper -->
+  <circle cx="36" cy="36" r="5.5" fill="#0f1217" stroke="#4a5262" stroke-width="1"/>
+  <circle cx="204" cy="36" r="5.5" fill="#0f1217" stroke="#4a5262" stroke-width="1"/>
+
+  <!-- Knap for varme med tre smaa varmebolger -->
+  <circle cx="70" cy="36" r="11" fill="url(#knop)" stroke="#2a2f38" stroke-width="1"/>
+  <path d="M70 27 L70 33" stroke="#2a2f38" stroke-width="2" stroke-linecap="round"/>
+  <g fill="none" stroke="#e6892a" stroke-opacity="0.85" stroke-width="1.5" stroke-linecap="round">
+    <path d="M92 43 q-3 -4 0 -7 q3 -3 0 -7"/>
+    <path d="M98 43 q-3 -4 0 -7 q3 -3 0 -7"/>
+    <path d="M104 43 q-3 -4 0 -7 q3 -3 0 -7"/>
+  </g>
+
+  <!-- Knap for omroering med en rund pil -->
+  <circle cx="170" cy="36" r="11" fill="url(#knop)" stroke="#2a2f38" stroke-width="1"/>
+  <path d="M170 27 L170 33" stroke="#2a2f38" stroke-width="2" stroke-linecap="round"/>
+  <g fill="none" stroke="#3d9ee0" stroke-opacity="0.9" stroke-width="1.5" stroke-linecap="round">
+    <path d="M146 36 a6 6 0 1 1 -2 -4.5"/>
+    <path d="M144 28 l0 4 l4 0"/>
+  </g>
+</svg>
