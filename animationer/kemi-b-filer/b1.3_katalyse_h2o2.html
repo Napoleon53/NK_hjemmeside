@@ -400,16 +400,20 @@
         }
         #modal-indhold p.mek-tip b { color: #9ed2f0; }
 
-        /* Mekanismetrin */
-        ol.steps { margin: 0 0 0 20px; }
+        /* Trinoversigt: udfyldes løbende, ét trin ad gangen */
+        ol.steps { margin: 14px 0 0 20px; }
         ol.steps li {
-            font-size: 0.83rem;
+            font-size: 0.9rem;
             line-height: 1.45;
             margin-bottom: 7px;
             color: #9e9e9e;
-            transition: color 0.2s;
+            animation: trin-ind 0.35s ease-out;
         }
         ol.steps li.now { color: #fff; font-weight: 600; }
+        @keyframes trin-ind {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: none; }
+        }
 
         .check-row { display: flex; align-items: center; gap: 9px; margin-bottom: 9px; font-size: 0.86rem; cursor: pointer; }
         .check-row:last-child { margin-bottom: 0; }
@@ -505,9 +509,8 @@
                     <button class="btn-tube" id="mek-enzym" onclick="setMek('enzym')">Katalase<br>enzym</button>
                     <button class="btn-tube" id="mek-ingen" onclick="setMek('ingen')">Ingen<br>katalysator</button>
                 </div>
-                <ol class="steps" id="mek-steps" style="margin-top:14px;"></ol>
-                <button class="btn-naeste-trin" id="btn-naeste-trin" style="width:100%; margin-top:10px;" onclick="naesteTrin()">Næste trin ▸</button>
-                <p class="hint" id="mek-note"></p>
+                <button class="btn-naeste-trin" id="btn-naeste-trin" style="width:100%; margin-top:14px;" onclick="naesteTrin()">Næste trin ▸</button>
+                <ol class="steps" id="mek-steps"></ol>
             </div>
 
             <!-- ===== VISNING 3: ENERGIPROFIL ===== -->
@@ -619,47 +622,38 @@
             TIP('Katalase – enzym', 'og se, hvad det denaturerede enzym ikke længere kan')
     };
 
-    /* Mekanismer på molekyleniveau: fire trin hver */
+    /* Mekanismer på molekyleniveau. Billedteksten til hvert trin står inde i
+       selve animationen (scene-funktionerne), og reaktionsskemaet bygges op
+       under den (SKEMAER). trin er korte navne til trinoversigten i panelet,
+       som udfyldes løbende. */
     const MEKANISMER = {
         mno2: {
-            titel: 'MnO₂ (s) &ndash; heterogen katalyse',
-            trin: [
-                'To H₂O₂-molekyler i opløsningen rammer overfladen af det faste MnO₂.',
-                'Adsorption: begge molekyler bindes til hver sin <b>aktive plads</b>.',
-                'O–O-bindingerne brydes, og de to frie O-atomer finder sammen som O₂.',
-                'Desorption: 2 H₂O og O₂ forlader overfladen &ndash; pladserne er frie igen.'
-            ],
-            note: 'Alt sker på <b>overfladen</b>. Derfor virker findelt pulver bedre end én stor klump: flere aktive pladser pr. gram. Katalysatoren kan filtreres fra bagefter.'
+            titel: 'Heterogen katalyse med MnO₂ (s)',
+            trin: ['Transport hen til overfladen',
+                   'Adsorption på aktive pladser',
+                   'O–O-bindingerne brydes',
+                   'Desorption af produkterne']
         },
         ki: {
-            titel: 'I⁻ (aq) &ndash; homogen katalyse',
+            titel: 'Homogen katalyse med I⁻ (aq)',
             fart: 1.6,
-            trin: [
-                'I⁻ er opløst i den samme vandfase som H₂O₂ &ndash; de mødes overalt.',
-                'Trin 1: H₂O₂ + I⁻ ⟶ H₂O + IO⁻ (katalysatoren indgår i reaktionen).',
-                'Trin 2: H₂O₂ + IO⁻ ⟶ H₂O + O₂ + I⁻ (ilten frigives).',
-                'I⁻ er <b>genskabt</b> og kan straks tage fat på nye H₂O₂-molekyler.'
-            ],
-            note: 'Lægger man de to trin sammen, går IO⁻ og I⁻ ud: <b>2 H₂O₂ ⟶ 2 H₂O + O₂</b>. Katalysatoren står ikke i det samlede reaktionsskema, fordi den ikke er forbrugt.'
+            trin: ['H₂O₂ og I⁻ mødes i opløsningen',
+                   'I⁻ bliver til IO⁻',
+                   'IO⁻ bliver til I⁻, og O₂ frigives',
+                   'I⁻ er genskabt']
         },
         enzym: {
-            titel: 'Katalase &ndash; enzym (frisk kartoffel)',
-            trin: [
-                'Katalase er et stort protein med et <b>aktivt center</b>, der passer til H₂O₂.',
-                'To H₂O₂ (substratet) binder sig i det aktive center: enzym-substrat-kompleks.',
-                'Enzymet trækker i bindingerne: O–O brydes, og der dannes 2 H₂O og O₂.',
-                'Produkterne slipper fri &ndash; enzymet er uændret og klar igen.'
-            ],
-            note: 'Koger man kartoflen, <b>denatureres</b> proteinet: det aktive center mister sin form, og katalysen stopper. Det er præcis forskellen på glas 3 og glas 4.'
+            titel: 'Enzymkatalyse med katalase',
+            trin: ['Transport ind i det aktive center',
+                   'Enzym-substrat-kompleks dannes',
+                   'O–O-bindingerne brydes',
+                   'Produkterne frigøres']
         },
         ingen: {
-            titel: 'Uden katalysator &ndash; to temperaturer',
-            trin: [
-                '<b>Stuetemperatur:</b> to langsomme molekyler mødes, men sammenstødet er for energifattigt.',
-                '<b>Høj temperatur:</b> to hurtige molekyler støder hårdt sammen og danner det <b>aktiverede kompleks</b>.',
-                'Komplekset er <b>ekstremt ustabilt</b> og falder straks fra hinanden til 2 H₂O + O₂.'
-            ],
-            note: 'Reaktionen er exoterm og forløber altså <b>gerne</b> &ndash; det er alene aktiveringsenergien, der holder farten nede. Varme hjælper, fordi flere molekyler får energi nok. En katalysator gør noget andet: den sænker selve E<sub>a</sub>.'
+            titel: 'Uden katalysator ved to temperaturer',
+            trin: ['Stuetemperatur: for svagt sammenstød',
+                   'Høj temperatur: aktiveret kompleks',
+                   'Komplekset falder fra hinanden']
         }
     };
 
@@ -1117,12 +1111,6 @@
        ======================================================== */
     const BOKS = { x0: 50, y0: 92, x1: 950, y1: 470 };
 
-    function udenTags(s) {
-        return s.replace(/<[^>]*>/g, '')
-                .replace(/&ndash;/g, '–').replace(/&amp;/g, '&')
-                .replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-    }
-
     function atom(x, y, r, farve, mærke, tekstfarve) {
         ctx.fillStyle = farve;
         ctx.beginPath();
@@ -1201,34 +1189,82 @@
        indtil brugeren klikker videre - der er ingen automatisk fremdrift */
     function mekLokalT() { return Math.min(1, (state.mekTid - state.trinStart) / trinTid()); }
 
-    const BUNDTEKST = {
-        ki: ['Trin 1:  H₂O₂ + I⁻  ⟶  H₂O + IO⁻',
-             'Trin 2:  H₂O₂ + IO⁻  ⟶  H₂O + O₂ + I⁻',
-             'I alt:  2 H₂O₂  ⟶  2 H₂O + O₂     (I⁻ går ud – den er ikke forbrugt)'],
-        mno2: ['2 H₂O₂ adsorberes  ⟶  bindingsbrud  ⟶  2 H₂O + O₂ desorberes',
-               'I alt:  2 H₂O₂  ⟶  2 H₂O + O₂     (MnO₂ vejer det samme bagefter)',
-               'Kun overfladen tæller – findelt pulver har flere aktive pladser pr. gram'],
-        enzym: ['E + 2 S  ⟶  ES₂  ⟶  E + 2 H₂O + O₂      (E = katalase, S = H₂O₂)',
-                'I alt:  2 H₂O₂  ⟶  2 H₂O + O₂     (enzymet er uændret bagefter)',
-                'Kogning denaturerer proteinet → det aktive center virker ikke længere'],
-        ingen: ['2 H₂O₂  ⟶  [ H₄O₄ ]‡  ⟶  2 H₂O + O₂      Eₐ ≈ 75 kJ/mol',
-                'Det aktiverede kompleks er reaktionsvejens højeste punkt – det kan ikke isoleres',
-                'Ved høj temperatur har flere molekyler energi nok til at nå derop']
+    /* Reaktionsskemaer under animationen. En del af et skema vises først, når
+       animationen har vist det, delen beskriver. Skemaet deles i dele med |,
+       og vis[i] = [trin, lokal tid i trinnet] er det tidspunkt, hvor del i
+       dukker op. Tekst i {} overstreges fra tidspunktet ud, fordi den går ud,
+       når trinnene lægges sammen. Linjen centreres ud fra hele skemaet, så
+       intet flytter sig, når en ny del kommer til. */
+    const SKEMAER = {
+        mno2: [
+            { y: 508, tekst: '2 H₂O₂  ⟶  2 H₂O + O₂', vis: [[3, 0.6]] },
+            { y: 544, lille: true, tekst: 'MnO₂ er uændret og står derfor ikke i reaktionsskemaet', vis: [[3, 0.6]] }
+        ],
+        ki: [
+            { y: 498, tekst: 'Trin 1:  H₂O₂ + {I⁻}  ⟶  H₂O + {IO⁻}', vis: [[1, 0.5]], ud: [3, 0.2] },
+            { y: 532, tekst: 'Trin 2:  H₂O₂ + {IO⁻}  ⟶  H₂O + O₂ + {I⁻}', vis: [[2, 0.5]], ud: [3, 0.2] },
+            { y: 566, tekst: 'I alt:  2 H₂O₂  ⟶  2 H₂O + O₂', vis: [[3, 0.5]], farve: '#8ecdf5' }
+        ],
+        enzym: [
+            { y: 508, tekst: '2 H₂O₂  ⟶  2 H₂O + O₂', vis: [[3, 0.6]] },
+            { y: 544, lille: true, tekst: 'Katalase er uændret og står derfor ikke i reaktionsskemaet', vis: [[3, 0.6]] }
+        ],
+        ingen: [
+            { y: 516, tekst: '2 H₂O₂  ⟶  [ H₄O₄ ]‡|  ⟶  2 H₂O + O₂', vis: [[1, 0.7], [2, 0.5]] }
+        ]
     };
+
+    /* 0 før tidspunktet [trin, lokal tid], 1 efter, med en kort indtoning */
+    function synlighed(tid, trin, t) {
+        if (trin !== tid[0]) return trin > tid[0] ? 1 : 0;
+        return smooth(clamp((t - tid[1]) / 0.2, 0, 1));
+    }
+
+    function tegnSkema(trin, t) {
+        for (const l of SKEMAER[state.mek]) {
+            const str = l.lille ? 15 : 19, fed = !l.lille;
+            const farve = l.farve || (l.lille ? '#9e9ea8' : '#e6e6ec');
+            ctx.font = (fed ? 'bold ' : '') + str + 'px "Segoe UI", sans-serif';
+
+            const dele = [];
+            l.tekst.split('|').forEach(function (del, i) {
+                del.split(/(\{[^}]*\})/).forEach(function (s) {
+                    if (!s) return;
+                    const ud = s[0] === '{';
+                    if (ud) s = s.slice(1, -1);
+                    dele.push({ s: s, ud: ud, a: synlighed(l.vis[i], trin, t), b: ctx.measureText(s).width });
+                });
+            });
+
+            let x = LW / 2 - dele.reduce(function (sum, d) { return sum + d.b; }, 0) / 2;
+            for (const d of dele) {
+                if (d.a > 0) {
+                    const u = d.ud ? synlighed(l.ud, trin, t) : 0;
+                    ctx.globalAlpha = d.a * (1 - 0.5 * u);
+                    tekst(d.s, x, l.y, farve, str, 'left', fed);
+                    if (u > 0) {
+                        ctx.globalAlpha = d.a * u;
+                        ctx.strokeStyle = '#e74c3c';
+                        ctx.lineWidth = 2.5;
+                        ctx.beginPath();
+                        ctx.moveTo(x - 2, l.y + 9);
+                        ctx.lineTo(x + d.b + 2, l.y - 9);
+                        ctx.stroke();
+                    }
+                }
+                x += d.b;
+            }
+            ctx.globalAlpha = 1;
+        }
+    }
 
     function tegnMolekyler() {
         ctx.fillStyle = '#16161b';
         ctx.fillRect(0, 0, LW, LH);
 
-        const m = MEKANISMER[state.mek];
         const trin = mekTrin(), t = mekLokalT();
 
-        tekst(udenTags(m.titel), LW / 2, 28, '#8a8a96', 14);
-        /* For I⁻ er reaktionsskemaet ovenover fjernet - det gentages i stedet
-           forstørret og trinvist afsløret nedenunder animationen */
-        if (state.mek !== 'ki') {
-            tekst(udenTags(m.trin[trin]), LW / 2, 58, '#ffffff', 17, 'center', true);
-        }
+        tekst(MEKANISMER[state.mek].titel, LW / 2, 36, '#b0b0bc', 16, 'center', true);
 
         ctx.save();
         rundtRekt(BOKS.x0, BOKS.y0, BOKS.x1 - BOKS.x0, BOKS.y1 - BOKS.y0, 12);
@@ -1252,38 +1288,11 @@
         for (let k = 0; k < antalPrikker; k++) {
             ctx.fillStyle = k === trin ? '#3498db' : '#3a3a44';
             ctx.beginPath();
-            ctx.arc(prikStartX + k * 20, 78, k === trin ? 6 : 4, 0, 6.283);
+            ctx.arc(prikStartX + k * 20, 66, k === trin ? 6 : 4, 0, 6.283);
             ctx.fill();
         }
 
-        if (state.mek === 'ki') {
-            tegnKiBundtekst(trin, t);
-        } else {
-            const linjer = BUNDTEKST[state.mek];
-            tekst(linjer[0], LW / 2, 500, '#d5d5d5', 15);
-            tekst(linjer[1], LW / 2, 524, '#d5d5d5', 15);
-            tekst(linjer[2], LW / 2, 550, '#75757f', 13);
-        }
-    }
-
-    /* I⁻: reaktionsskemaet nedenunder afsløres trinvist i takt med animationen.
-       Trin 1-ligningen dukker først op, når man er nået videre til trin 2
-       (altså efter man har set trin 1 færdigt) - og trin 2-ligningen dukker op
-       samtidig med, at animationen selv viser trin 2. Den samlede ligning
-       kommer til sidst, når hele forløbet er gennemgået. */
-    function tegnKiBundtekst(trin, t) {
-        const linjer = BUNDTEKST.ki;
-
-        function tegnLinje(str, y, stoerrelse, farve, visFraTrin) {
-            if (trin < visFraTrin) return;
-            ctx.globalAlpha = (trin === visFraTrin) ? smooth(Math.min(1, t * 3)) : 1;
-            tekst(str, LW / 2, y, farve, stoerrelse, 'center', true);
-            ctx.globalAlpha = 1;
-        }
-
-        tegnLinje(linjer[0], 496, 19, '#d5d5d5', 2);
-        tegnLinje(linjer[1], 530, 19, '#d5d5d5', 2);
-        tegnLinje(linjer[2], 564, 16, '#8ecdf5', 3);
+        tegnSkema(trin, t);
     }
 
     /* ---------- Homogen katalyse: I⁻ i samme fase ---------- */
@@ -1292,7 +1301,7 @@
 
         ctx.fillStyle = 'rgba(90,150,200,0.10)';
         ctx.fillRect(BOKS.x0, BOKS.y0, BOKS.x1 - BOKS.x0, BOKS.y1 - BOKS.y0);
-        tekst('ÉN FASE: alt er opløst i vand (aq)', BOKS.x0 + 20, BOKS.y0 + 24, '#8ecdf5', 13, 'left', true);
+        tekst('Én fase: alt er opløst i vand (aq)', BOKS.x0 + 20, BOKS.y0 + 24, '#8ecdf5', 14, 'left', true);
 
         /* Baggrund: mange H₂O₂ overalt i opløsningen */
         ctx.globalAlpha = 0.3;
@@ -1310,7 +1319,7 @@
         if (step === 0) {
             const p = smooth(t);
             molekyle('h2o2', lerp(780, 640, p), lerp(170, 240, p), 1);
-            tekst('I⁻ svømmer frit rundt – samme fase som H₂O₂', C.x, C.y + 84, '#d3a9e6', 14, 'center', true);
+            tekst('H₂O₂ og I⁻ kan mødes overalt i opløsningen', C.x, C.y + 84, '#d3a9e6', 16, 'center', true);
         } else if (step === 1) {
             if (t < 0.5) {
                 const p = smooth(t / 0.5);
@@ -1318,7 +1327,7 @@
             } else {
                 const p = smooth((t - 0.5) / 0.5);
                 molekyle('h2o', lerp(C.x + 78, 235, p), lerp(C.y - 12, 165, p), 1);
-                tekst('Katalysatoren INDGÅR i reaktionen', C.x, C.y + 84, '#f5c069', 14, 'center', true);
+                tekst('Katalysatoren indgår i reaktionen', C.x, C.y + 84, '#f5c069', 16, 'center', true);
             }
         } else if (step === 2) {
             if (t < 0.5) {
@@ -1330,7 +1339,7 @@
                 ctx.globalAlpha = 1 - p * 0.5;
                 molekyle('o2', lerp(C.x + 30, C.x + 6, p), lerp(C.y - 40, 132, p), 1);
                 ctx.globalAlpha = 1;
-                tekst('… og bliver GENSKABT i trin 2', C.x, C.y + 84, '#2ecc71', 14, 'center', true);
+                tekst('Katalysatoren er genskabt', C.x, C.y + 84, '#2ecc71', 16, 'center', true);
             }
         } else {
             const puls = 22 + Math.sin(state.mekTid * 5) * 4;
@@ -1339,7 +1348,7 @@
             ctx.beginPath();
             ctx.arc(C.x, C.y, puls, 0, 6.283);
             ctx.stroke();
-            tekst('I⁻ er uforbrugt og klar igen', C.x, C.y + 84, '#2ecc71', 15, 'center', true);
+            tekst('I⁻ er klar til et nyt H₂O₂-molekyle', C.x, C.y + 84, '#2ecc71', 16, 'center', true);
         }
 
         molekyle(katForm, C.x, C.y + Math.sin(state.mekTid * 1.6) * 4, 1);
@@ -1352,7 +1361,7 @@
 
         ctx.fillStyle = 'rgba(90,150,200,0.10)';
         ctx.fillRect(BOKS.x0, BOKS.y0, BOKS.x1 - BOKS.x0, yOverflade - BOKS.y0);
-        tekst('FASE 1: opløsning med H₂O₂ (aq)', BOKS.x0 + 20, BOKS.y0 + 24, '#8ecdf5', 13, 'left', true);
+        tekst('Opløsning: H₂O₂ (aq)', BOKS.x0 + 20, BOKS.y0 + 24, '#8ecdf5', 14, 'left', true);
 
         /* Det faste stof */
         ctx.fillStyle = '#292930';
@@ -1371,7 +1380,7 @@
         ctx.moveTo(BOKS.x0, yOverflade);
         ctx.lineTo(BOKS.x1, yOverflade);
         ctx.stroke();
-        tekst('FASE 2: MnO₂ (s) – fast stof, en HELT anden fase', BOKS.x0 + 20, BOKS.y1 - 22, '#f5c069', 13, 'left', true);
+        tekst('Fast stof: MnO₂ (s)', BOKS.x0 + 20, BOKS.y1 - 22, '#f5c069', 14, 'left', true);
 
         /* Aktive pladser på overfladen */
         for (const sx of [220, 420, 580, 780]) {
@@ -1381,7 +1390,7 @@
             ctx.arc(sx, yOverflade, 11, Math.PI, 0, true);
             ctx.fill();
         }
-        tekst('aktive pladser', 780, yOverflade + 30, '#a8843f', 12, 'center');
+        tekst('aktive pladser', 780, yOverflade + 30, '#c79a4a', 14, 'center');
 
         /* Baggrundsmolekyler i opløsningen */
         ctx.globalAlpha = 0.3;
@@ -1399,7 +1408,7 @@
             const p = smooth(t);
             molekyle('h2o2', lerp(250, A, p), lerp(160, 268, p), 1);
             molekyle('h2o2', lerp(790, B, p), lerp(180, 268, p), 1);
-            tekst('To H₂O₂ skal nå hen til overfladen', S.x, 150, '#8ecdf5', 15, 'center', true);
+            tekst('2 H₂O₂ skal hen til overfladen af MnO₂ (s)', S.x, 150, '#8ecdf5', 16, 'center', true);
         } else if (step === 1) {
             const p = smooth(t);
             const y = lerp(268, S.y - 34, p);
@@ -1408,7 +1417,7 @@
             if (p > 0.55) {
                 bindTilOverflade(A, y, S.y, 0);
                 bindTilOverflade(B, y, S.y, 0);
-                tekst('ADSORPTION – én plads til hvert molekyle', S.x, 150, '#f39c12', 16, 'center', true);
+                tekst('Adsorption: hvert H₂O₂ bindes til en aktiv plads', S.x, 150, '#f39c12', 16, 'center', true);
             }
         } else if (step === 2) {
             const brud = smooth(t);
@@ -1423,16 +1432,15 @@
                 ctx.moveTo(A + 16 + 22 * brud, S.y - 34);
                 ctx.lineTo(B - 16 - 22 * brud, S.y - 34);
                 ctx.stroke();
-                tekst('de to frie O-atomer binder sig til hinanden', S.x, 432, '#2ecc71', 14);
             }
-            tekst('Overfladen svækker begge O–O-bindinger', S.x, 150, '#f39c12', 15, 'center', true);
+            if (brud > 0.45) tekst('O–O-bindingerne brydes, og to O-atomer bindes sammen', S.x, 150, '#2ecc71', 16, 'center', true);
+            else tekst('Overfladen svækker O–O-bindingerne', S.x, 150, '#f39c12', 16, 'center', true);
         } else {
             const p = smooth(t);
             molekyle('h2o', lerp(A - 20, 210, p), lerp(S.y - 40, 190, p), 1);
             molekyle('h2o', lerp(B + 20, 800, p), lerp(S.y - 40, 190, p), 1);
-            molekyle('o2', lerp(S.x, S.x, p), lerp(S.y - 44, 140, p), 1);
-            tekst('DESORPTION – 2 H₂O + O₂ forlader overfladen', S.x, 150, '#2ecc71', 16, 'center', true);
-            tekst('pladserne er frie igen', S.x, 432, '#75757f', 14);
+            molekyle('o2', S.x, lerp(S.y - 44, 240, p), 1);
+            tekst('Desorption: produkterne forlader overfladen', S.x, 150, '#2ecc71', 16, 'center', true);
         }
     }
 
@@ -1483,19 +1491,19 @@
         ctx.strokeStyle = 'rgba(255,255,255,0.35)';
         ctx.lineWidth = 2;
         ctx.stroke();
-        tekst('aktivt center', K.x + 10, K.y + 86, '#a8e6c0', 13, 'center', true);
+        tekst('aktivt center', K.x + 10, K.y + 86, '#a8e6c0', 14, 'center', true);
 
         const S1 = { x: K.x, y: K.y - 30 }, S2 = { x: K.x, y: K.y + 30 };
 
         if (step === 0) {
             molekyle('h2o2', 810 + Math.sin(state.mekTid) * 10, 235, 0.75);
             molekyle('h2o2', 810 + Math.sin(state.mekTid + 2) * 10, 365, 0.75);
-            tekst('Kun molekyler, der PASSER i lommen, katalyseres', LW / 2, 130, '#a8e6c0', 15, 'center', true);
+            tekst('2 H₂O₂ skal ind i det aktive center', LW / 2, 130, '#a8e6c0', 16, 'center', true);
         } else if (step === 1) {
             const p = smooth(t);
             molekyle('h2o2', lerp(810, S1.x, p), lerp(235, S1.y, p), lerp(0.75, 0.6, p));
             molekyle('h2o2', lerp(810, S2.x, p), lerp(365, S2.y, p), lerp(0.75, 0.6, p));
-            if (p > 0.7) tekst('ENZYM-SUBSTRAT-KOMPLEKS: to H₂O₂ ad gangen', LW / 2, 130, '#2ecc71', 16, 'center', true);
+            if (p > 0.7) tekst('Enzym-substrat-kompleks: 2 H₂O₂ sidder i det aktive center', LW / 2, 130, '#2ecc71', 16, 'center', true);
         } else if (step === 2) {
             const brud = smooth(t);
             molekyle('h2o2', S1.x, S1.y, 0.6, brud);
@@ -1508,15 +1516,14 @@
                 ctx.lineTo(K.x + (16 + 22 * brud) * 0.6, S2.y);
                 ctx.stroke();
             }
-            tekst('Eₐ falder fra ca. 75 til ca. 8 kJ/mol', LW / 2, 130, '#2ecc71', 16, 'center', true);
-            tekst('2 H₂O₂ ⟶ 2 H₂O + O₂ inde i det aktive center', LW / 2, 440, '#a8e6c0', 14);
+            if (brud > 0.45) tekst('O–O-bindingerne brydes, og to O-atomer bindes sammen', LW / 2, 130, '#2ecc71', 16, 'center', true);
+            else tekst('Enzymet svækker O–O-bindingerne', LW / 2, 130, '#a8e6c0', 16, 'center', true);
         } else {
             const p = smooth(t);
             molekyle('h2o', lerp(S1.x, 830, p), lerp(S1.y, 165, p), lerp(0.6, 1, p));
             molekyle('h2o', lerp(S2.x, 830, p), lerp(S2.y, 415, p), lerp(0.6, 1, p));
             molekyle('o2', lerp(K.x, 890, p), lerp(K.y, 292, p), lerp(0.6, 1, p));
-            tekst('2 H₂O og O₂ slipper fri – enzymet er uændret', LW / 2, 130, '#2ecc71', 15, 'center', true);
-            tekst('katalase kan nå ~10⁷ molekyler i sekundet', LW / 2, 440, '#75757f', 13);
+            tekst('Produkterne forlader det aktive center', LW / 2, 130, '#2ecc71', 16, 'center', true);
         }
     }
 
@@ -1527,9 +1534,9 @@
 
         ctx.fillStyle = varm ? 'rgba(200,100,35,0.13)' : 'rgba(90,150,200,0.10)';
         ctx.fillRect(BOKS.x0, BOKS.y0, BOKS.x1 - BOKS.x0, BOKS.y1 - BOKS.y0);
-        tekst(varm ? '🌡 HØJ TEMPERATUR – molekylerne farer hurtigt rundt'
-                   : 'STUETEMPERATUR – molekylerne bevæger sig roligt',
-              BOKS.x0 + 20, BOKS.y0 + 24, varm ? '#f5a05a' : '#8ecdf5', 13, 'left', true);
+        tekst(varm ? '🌡 Høj temperatur: molekylerne bevæger sig hurtigt'
+                   : 'Stuetemperatur: molekylerne bevæger sig langsomt',
+              BOKS.x0 + 20, BOKS.y0 + 24, varm ? '#f5a05a' : '#8ecdf5', 14, 'left', true);
 
         /* Baggrundsmolekyler – farten viser temperaturen */
         const fart = varm ? 2.6 : 0.7;
@@ -1556,19 +1563,18 @@
                 ctx.moveTo(485, cy - 22); ctx.lineTo(515, cy + 8);
                 ctx.moveTo(515, cy - 22); ctx.lineTo(485, cy + 8);
                 ctx.stroke();
-                tekst('for lidt energi – de preller af', 500, cy - 66, '#e74c3c', 16, 'center', true);
+                tekst('For lidt energi: molekylerne preller af', 500, cy - 66, '#e74c3c', 16, 'center', true);
             }
-            tekst('Kun ca. 1 ud af 10⁹ sammenstød har E ≥ Eₐ ved stuetemperatur',
-                  LW / 2, 432, '#e0e0e0', 14, 'center', true);
 
         } else if (step === 1) {
+            if (t < 0.6) tekst('Hurtige molekyler støder hårdt sammen', LW / 2, 158, '#f39c12', 16, 'center', true);
+            else tekst('Aktiveret kompleks: bindingerne er halvt brudt og halvt dannet', LW / 2, 158, '#f39c12', 16, 'center', true);
+
             if (t < 0.4) {
                 /* Fase 1: to hurtige molekyler suser direkte mod hinanden */
                 const p = smooth(t / 0.4);
                 molekyle('h2o2', lerp(180, 380, p), cy, 1);
                 molekyle('h2o2', lerp(820, 620, p), cy, 1);
-                tekst('Nu er sammenstødet kraftigt nok', LW / 2, 140, '#f39c12', 17, 'center', true);
-                tekst('flere molekyler har E ≥ Eₐ, når temperaturen stiger', LW / 2, 432, '#f5a05a', 14);
             } else {
                 /* Fase 2: de presses sammen til det aktiverede kompleks - og
                    bliver stående sådan, indtil man klikker videre */
@@ -1578,9 +1584,6 @@
                 if (p > 0.25) tegnKompleks(cy, Math.min(1, (p - 0.25) / 0.3));
                 molekyle('h2o2', LW / 2 - d, cy, 1, brud);
                 molekyle('h2o2', LW / 2 + d, cy, 1, brud);
-                tekst('AKTIVERET KOMPLEKS', LW / 2, 140, '#f39c12', 17, 'center', true);
-                tekst('2 H₂O₂ i én klump – bindingerne er halvt brudte og halvt dannede',
-                      LW / 2, 432, '#f5a05a', 14);
             }
 
         } else {
@@ -1590,8 +1593,7 @@
             molekyle('h2o', lerp(LW / 2 - 40, 250, p), lerp(cy, 180, p), 1);
             molekyle('h2o', lerp(LW / 2 - 40, 250, p), lerp(cy, 404, p), 1);
             molekyle('o2', lerp(LW / 2 + 40, 760, p), lerp(cy, 292, p), 1);
-            tekst('… og falder straks fra hinanden til 2 H₂O + O₂', LW / 2, 140, '#2ecc71', 17, 'center', true);
-            tekst('Levetiden er ca. 10⁻¹³ s – komplekset kan ikke isoleres', LW / 2, 432, '#e0e0e0', 14);
+            tekst('Komplekset er ustabilt og falder straks fra hinanden', LW / 2, 158, '#2ecc71', 16, 'center', true);
         }
     }
 
@@ -1816,7 +1818,7 @@
 
             const knap = document.getElementById('btn-naeste-trin');
             const idle = nu - state.sidstAktivitet;
-            knap.classList.toggle('blink', idle >= BLINK_VENTETID);
+            knap.classList.toggle('blink', idle >= BLINK_VENTETID && state.trinIndex < antalTrin() - 1);
         }
 
         tegn();
@@ -1844,7 +1846,8 @@
         document.getElementById('grp-mek').hidden = v !== 'molekyler';
         document.getElementById('grp-energi').hidden = v !== 'energi';
         visBesked('');
-        if (v === 'molekyler') { registrerAktivitet(); markerTrin(); }
+        visReaktionsskema();
+        if (v === 'molekyler') registrerAktivitet();
         tegn();
     }
 
@@ -2007,25 +2010,35 @@
         ['mno2', 'ki', 'enzym', 'ingen'].forEach(function (k) {
             document.getElementById('mek-' + k).classList.toggle('active', k === m);
         });
-        const mek = MEKANISMER[m];
-        document.getElementById('mek-steps').innerHTML =
-            mek.trin.map(function (s) { return '<li>' + s + '</li>'; }).join('');
-        document.getElementById('mek-note').innerHTML = mek.note;
-        markerTrin();
+        opdaterTrinpanel();
         tegn();
     }
 
-    function markerTrin() {
-        const li = document.querySelectorAll('#mek-steps li');
-        const tr = mekTrin();
-        li.forEach(function (el, i) { el.classList.toggle('now', i === tr); });
+    /* Trinoversigten udfyldes løbende: et trin skrives på listen, når
+       animationen når dertil, og listen tømmes, når mekanismen starter forfra.
+       På sidste trin starter knappen mekanismen forfra. */
+    function opdaterTrinpanel() {
+        const liste = document.getElementById('mek-steps');
+        const trin = MEKANISMER[state.mek].trin;
+        if (state.trinIndex === 0) liste.innerHTML = '';
+        while (liste.children.length <= state.trinIndex) {
+            const li = document.createElement('li');
+            li.textContent = trin[liste.children.length];
+            liste.appendChild(li);
+        }
+        Array.prototype.forEach.call(liste.children, function (li, i) {
+            li.classList.toggle('now', i === state.trinIndex);
+        });
+
+        const sidste = state.trinIndex === antalTrin() - 1;
+        document.getElementById('btn-naeste-trin').textContent = sidste ? 'Start forfra ↺' : 'Næste trin ▸';
     }
 
     function naesteTrin() {
         state.trinIndex = (state.trinIndex + 1) % antalTrin();
         state.trinStart = state.mekTid;
         registrerAktivitet();
-        markerTrin();
+        opdaterTrinpanel();
         tegn();
     }
 
@@ -2193,9 +2206,12 @@
         resizeCanvas();
     }
 
-    /* Første spørgsmål handler om selve reaktionsskemaet, så det skjules imens */
+    /* Reaktionsskemaet i toppen skjules på mikroniveau, hvor det bygges op under
+       animationen, og under quizzens første spørgsmål, som handler om netop
+       skemaet. visibility frem for hidden, så headeren ikke skifter højde. */
     function visReaktionsskema() {
-        document.getElementById('eq-box').hidden = state.quizOpen && state.taskIndex === 0;
+        const skjul = state.view === 'molekyler' || (state.quizOpen && state.taskIndex === 0);
+        document.getElementById('eq-box').style.visibility = skjul ? 'hidden' : '';
     }
 
     function hentOpgave() {
