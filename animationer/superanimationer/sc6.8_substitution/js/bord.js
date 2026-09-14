@@ -249,7 +249,6 @@
 
         S.tegnDunk(ctx);
         if (this.markeret("dunk")) S.tegnMarkering(ctx, { x: S.DUNK.x, y: S.DUNK.y, b: 90, h: 130 }, tid);
-        S.tegnPyt(ctx, this.pyt);
         S.tegnHolder(ctx);
         S.tegnLampe(ctx, this.lampeVis, tid, this.markeret("lampe"));
 
@@ -270,6 +269,8 @@
             if (this.oppe(gg)) aktive.push(gg);
             else this.tegnGenstand(ctx, gg, tid, true);
         }
+
+        S.tegnPyt(ctx, this.pyt);
 
         /* Zoomboblen */
         if (this.bobleAlfa > 0.01 && this.bobleGlas) {

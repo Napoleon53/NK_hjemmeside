@@ -102,6 +102,7 @@
         gl.brHex = 0;
         gl.brVand = 0;
         gl.reageret = 0;
+        gl.erRystet = false;
         gl.prop = null;
         gl.sted = "stativ";
         gl.folie = false;
@@ -226,8 +227,10 @@
         return gl.sted === "lampe" ? S.UNDER_LAMPE : gl.hjem;
     };
 
+    /* Er Br2 rystet op i hexanen? Bliver staaende, ogsaa naar Br2 senere
+       er brugt op i lyset. */
     P.rystet = function (gl) {
-        return !!(gl.brom && gl.hexan && M.fordelt(gl) >= M.FORDELING.faerdig);
+        return !!(gl.brom && gl.hexan && (gl.erRystet || M.fordelt(gl) >= M.FORDELING.faerdig));
     };
 
     P.lysStyrke = function (gl) {
@@ -964,6 +967,7 @@
 
         gl.brom = false;
         gl.hexan = false;
+        gl.erRystet = false;
         gl.brHex = 0;
         gl.brVand = 0;
         gl.reageret = 0;
@@ -1016,12 +1020,13 @@
         [g.glas1, g.glas2].forEach(function (gl) {
             var lys = mig.lysStyrke(gl);
             var ryst = mig.rystGlas === gl ? mig.ryst : 0;
-            var foerFord = M.fordelt(gl), foerReag = gl.reageret, harHexBrom = gl.brom && gl.hexan;
+            var foerReag = gl.reageret, harHexBrom = gl.brom && gl.hexan;
             M.skridt(gl, dt, ryst, lys);
             if (harHexBrom) {
                 if (gl.sted === "lampe" && mig.lampeTaendt) gl.lysTid += dt * M.UR.minPerSek;
                 if (gl.folie) gl.moerkeTid += dt * M.UR.minPerSek;
-                if (foerFord < M.FORDELING.faerdig && M.fordelt(gl) >= M.FORDELING.faerdig) {
+                if (!gl.erRystet && M.fordelt(gl) >= M.FORDELING.faerdig) {
+                    gl.erRystet = true;
                     mig.besked("Farven er flyttet op i hexanlaget.", "god");
                     if (NK.Lyd) NK.Lyd.succes();
                     mig.iagttag("fordelt");
