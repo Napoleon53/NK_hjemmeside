@@ -53,27 +53,36 @@
         gg.bund = 0;
     };
 
-    /* Vaeske haeldes eller dryppes i: lander i et lag i toppen, medmindre
-       beholderen er naesten tom, eller laget er stort nok til at blande sig */
-    B.haeldI = function (gg, d) {
+    /* Vaeske kommer i. Haeldes der (blandet = true), blander straalen det
+       meste ind med det samme. Dryppes der, lander draaben i et lag i
+       toppen sammen med lidt af det, der var i forvejen, og reagerer
+       der, til laget blandes ind ved diffusion, rystning eller omroering. */
+    B.haeldI = function (gg, d, blandet) {
         if (d.V <= 0 && Stof.fastIalt(d) <= 0) return;
-        if (gg.indhold.V < 0.5 || (gg.lag && gg.lagBund)) {
+        if (blandet || gg.indhold.V < 0.5 || (gg.lag && gg.lagBund)) {
+            if (gg.lag && !gg.lagBund) { Stof.bland(gg.indhold, gg.lag); gg.lag = null; }
             Stof.bland(gg.indhold, d);
             return;
         }
-        if (!gg.lag) { gg.lag = Stof.ny(d.T); gg.lagBund = false; }
+        if (!gg.lag) {
+            gg.lag = Stof.del(gg.indhold, Math.min(B.BLAND.lagMaks, gg.indhold.V * 0.4));
+            gg.lagBund = false;
+        }
         Stof.bland(gg.lag, d);
-        if (gg.lag.V > gg.indhold.V * 0.6) {
+        if (gg.lag.V > gg.indhold.V * 0.8) {
             Stof.bland(gg.indhold, gg.lag);
             gg.lag = null;
         }
     };
 
-    /* Fast stof lander i bunden og oploeses derfra */
+    /* Fast stof lander i bunden og oploeses i et lag dernede */
     B.tilsaetFast = function (gg, navn, umol) {
         if (gg.indhold.V < 0.5) { Stof.tilsaet(gg.indhold, navn, umol); return; }
         if (gg.lag && !gg.lagBund) { Stof.bland(gg.indhold, gg.lag); gg.lag = null; }
-        if (!gg.lag) { gg.lag = Stof.ny(gg.indhold.T); gg.lagBund = true; }
+        if (!gg.lag) {
+            gg.lag = Stof.del(gg.indhold, Math.min(B.BLAND.lagMaks, gg.indhold.V * 0.3));
+            gg.lagBund = true;
+        }
         Stof.tilsaet(gg.lag, navn, umol);
     };
 

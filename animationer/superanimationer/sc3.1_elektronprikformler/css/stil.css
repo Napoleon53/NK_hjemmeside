@@ -62,6 +62,9 @@ header.top {
     flex-shrink: 0;
 }
 
+/* I en samling i fuld skaerm staar knappen, der gendanner panelet, i hjoernet */
+.samling-fuld header.top { padding-left: 56px; }
+
 header.top h1 {
     margin: 0;
     font-size: 1.05rem;

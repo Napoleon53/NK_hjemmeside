@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="108" viewBox="0 0 120 54">
+  <!-- Fejeblad. Forkanten ligger paa bordet ved (4, 52), og aabningen
+       vender mod venstre. Skaarene i bladet tegnes af animationen. -->
+  <defs>
+    <linearGradient id="plast" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e0584a"/>
+      <stop offset="1" stop-color="#9c2d22"/>
+    </linearGradient>
+  </defs>
+  <path d="M80 26 L114 22 Q120 22 120 27 Q120 32 114 32 L80 36 Z" fill="#8a261d"/>
+  <path d="M2 52 L82 52 L82 20 Q82 12 74 12 L28 12 Q16 12 12 22 Z" fill="url(#plast)" stroke="#7d2219" stroke-width="1"/>
+  <path d="M16 46 L76 46 L76 22 Q76 18 72 18 L30 18 Q22 18 19 26 Z" fill="#6f1d16" fill-opacity="0.45"/>
+  <path d="M1 52 H84" stroke="#5e1811" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M30 15 H72" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

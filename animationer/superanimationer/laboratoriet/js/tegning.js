@@ -385,11 +385,47 @@
             ctx.stroke();
             NK.tekst(ctx, String(gg.nr), m2.x, m2.y + 0.5, { font: "800 12px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: gg.valgt ? "#2a1d04" : "#dfe5ec" });
             ctx.restore();
-        } else if (gg.valgt && t.valgtMaerke) {
-            var m3 = NK.tilVerden(gg.p, gg.anker, t.valgtMaerke.x, t.valgtMaerke.y);
-            NK.kugle(ctx, m3.x, m3.y, 5.5, "#ffe38a", "#b88a12");
+        }
+        /* Det valgte glas har en tynd gul ramme */
+        if (gg.valgt && t.sprite) {
+            ctx.save();
+            ctx.translate(gg.p.x, gg.p.y);
+            ctx.rotate(gg.p.v);
+            ctx.translate(-gg.anker.x, -gg.anker.y);
+            ctx.strokeStyle = "rgba(242, 197, 61, 0.75)";
+            ctx.lineWidth = 1.6;
+            NK.rundtRekt(ctx, -3, -3, t.b + 6, t.h + 6, 6);
+            ctx.stroke();
+            ctx.restore();
         }
         return top;
+    };
+
+    /* Skaar af et knust glas. s: { x, y, a, pts, alfa } */
+    T.tegnSkaar = function (ctx, liste) {
+        if (!liste || !liste.length) return;
+        ctx.save();
+        for (var i = 0; i < liste.length; i++) {
+            var s = liste[i];
+            if (s.alfa <= 0.01) continue;
+            ctx.save();
+            ctx.globalAlpha = NK.klamp(s.alfa, 0, 1);
+            ctx.translate(s.x, s.y);
+            ctx.rotate(s.a);
+            ctx.beginPath();
+            for (var j = 0; j < s.pts.length; j++) {
+                if (j === 0) ctx.moveTo(s.pts[j].x, s.pts[j].y);
+                else ctx.lineTo(s.pts[j].x, s.pts[j].y);
+            }
+            ctx.closePath();
+            ctx.fillStyle = "rgba(222, 236, 246, 0.6)";
+            ctx.fill();
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+            ctx.restore();
+        }
+        ctx.restore();
     };
 
     /* Spatlen med evt. en spatelspids paa */

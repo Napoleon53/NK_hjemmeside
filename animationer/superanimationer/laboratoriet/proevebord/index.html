@@ -35,7 +35,8 @@
     <aside class="panel">
         <div class="kort fremhaev" id="glas-kort">
             <h2><span id="glas-titel">Det valgte glas</span> <span class="taeller" id="glas-volumen"></span></h2>
-            <p class="besked" id="glas-tom">Klik på et glas for at vælge det. Zoomboblen viser partiklerne i det.</p>
+            <p class="besked" id="glas-tom">Klik på et glas eller en flaske for at se, hvad der er i. Alt andet gør du ved at trække.</p>
+            <canvas class="boble" id="boble-laerred" aria-label="Zoom: partiklerne i det valgte glas" hidden></canvas>
             <table class="indhold" id="glas-indhold" hidden></table>
             <p class="besked" id="glas-temp" hidden></p>
         </div>
@@ -53,7 +54,7 @@
 
         <div class="kort" id="uheld-kort">
             <h2><span>Uheld</span> <span class="taeller" id="uheld-taeller">0</span></h2>
-            <p class="besked" id="uheld-tekst">Rystes et åbent glas for voldsomt, skvulper det ud. Et reagensglas kan ikke stå på bordet. Kemichael rydder op.</p>
+            <p class="besked" id="uheld-tekst">Rystes et åbent glas for voldsomt, skvulper det ud. Et reagensglas kan ikke stå på bordet. Glas, der slippes foran bordkanten, falder på gulvet. Kemichael rydder op.</p>
         </div>
     </aside>
 </main>
@@ -64,8 +65,9 @@
         <h2 id="intro-titel">Prøvebordet</h2>
         <p class="intro-formaal">Et laboratoriebord uden opskrift. Alt udstyr kan tages op, sættes ned og bruges på alt andet.</p>
 
-        <h3>Sådan gør du</h3>
+        <h3>Klik viser, træk gør</h3>
         <ol class="intro-trin">
+            <li>Klik på et glas eller en flaske for at se, hvad der er i.</li>
             <li>Tag fat i en flaske, og slip den over et glas for at hælde.</li>
             <li>Slip spatlen over et pulverglas, og derefter over et glas.</li>
             <li>Slip glasstaven eller termometeret over et glas.</li>

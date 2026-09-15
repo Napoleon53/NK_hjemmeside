@@ -36,12 +36,13 @@
 
     P.toem = function () { this.nulstil(); };
 
+    /* Faa, store kugler: en enkelt ion er 14 enheder, lange formler op til 22 */
     function radius(navn) {
         var s = Stof.STOFFER[navn];
-        if (!s) return 10;
-        if (s.fase === "s") return 11;
+        if (!s) return 14;
+        if (s.fase === "s") return 16;
         var l = s.formel.replace(/[₀-₉]/g, "").length;
-        return NK.klamp(8 + l * 1.4, 9, 16);
+        return NK.klamp(11 + l * 1.9, 14, 22);
     }
 
     function farveAf(navn) {
@@ -192,8 +193,8 @@
                 ctx.arc(p.x, p.y, p.rad, 0, Math.PI * 2);
                 ctx.stroke();
             }
-            var str = p.tekst.length > 5 ? 8 : (p.tekst.length > 3 ? 9.5 : 11);
-            NK.tekst(ctx, p.tekst, p.x, p.y + 0.5, { font: "800 " + str + "px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#ffffff", kant: true, kantBredde: 2.5, kantFarve: "rgba(0,0,0,0.55)" });
+            var str = p.tekst.length > 5 ? 11 : (p.tekst.length > 3 ? 13 : 15);
+            NK.tekst(ctx, p.tekst, p.x, p.y + 0.5, { font: "800 " + str + "px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#ffffff", kant: true, kantBredde: 3, kantFarve: "rgba(0,0,0,0.55)" });
         }
         ctx.restore();
 

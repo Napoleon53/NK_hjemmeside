@@ -35,7 +35,19 @@ statiske sider i roden, downloads i `downloads/`.
 - Fælles kode for laboratorieforsøgene ligger i `laboratoriet/` (kerne,
   rundvisning, grundstilark). Forsøgets egen `css/stil.css` har kun det, der
   er særligt for forsøget. Se `laboratoriet/README.md`.
+- Nye laboratorieforsøg bygges på genstandsmodellen i `laboratoriet/js/`
+  (stof, udstyr, beholder, bord): alt kan gribes, sættes ned og bruges på alt,
+  og hvad der sker, afgøres af udstyrets egenskaber, ikke af forsøgets kode.
+  Klik viser, træk gør: et klik vælger kun til aflæsning og zoom, handlinger
+  sker ved at trække. Zoomboblen står i panelet, ikke på scenen.
+  Mønster: `laboratoriet/proevebord/`.
 - Sidepanelet er 430 px bredt (`--panel-bredde` i `laboratoriet/css/grund.css`).
+  Prøvebordet har 473 px, fordi zoomboblen står i panelet.
+- Samlingssiderne (`samling_*.html`) har fuld skærm: sidepanelerne skjules i
+  begge lag, og knappen ☰ nederst til venstre gendanner dem. Superanimationer
+  starter i fuld skærm; for alle andre animationer vælges den med ⛶ i
+  panelets hoved (`fuldSkaerm` i de indre sider, beskederne `fuldSkaerm` og
+  `gendanPanel` til de ydre).
 - Superanimationer om laboratorieforsøg har en intro-popup, der kort siger, hvad
   forsøget undersøger, og hvad eleven skal gøre. Den åbner af sig selv første
   gang og igen med knappen Om forsøget (mønster: `#intro` i

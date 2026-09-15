@@ -62,9 +62,12 @@
         /* Titlen i headeren */
         .header-text {
             font-weight: bold;
-            font-size: 0.9em;
-            letter-spacing: 1px;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
             white-space: nowrap;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* Skjul teksten når menuen er lukket */
@@ -92,11 +95,12 @@
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 2px;
+            flex-shrink: 0;
         }
 
-        .link-btn {
-            font-size: 16px;
+        .header-actions .toggle-btn {
+            font-size: 18px;
+            padding: 3px;
         }
 
         .sidebar.collapsed .link-btn {
@@ -256,6 +260,30 @@
             text-decoration: underline;
         }
 
+
+        /* Fuld skaerm: sidepanelet skjules helt, naar en superanimation vises,
+           og knappen i oeverste venstre hjoerne gendanner det */
+        .sidebar.skjult { width: 0; border-right: none; }
+        .gendan-knap {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            z-index: 5;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background-color: rgba(26, 37, 47, 0.75);
+            color: #ffffff;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .gendan-knap:hover { background-color: rgba(52, 152, 219, 0.9); }
+        .content-area.fuld .gendan-knap { display: flex; }
+
     </style>
 </head>
 <body>
@@ -267,6 +295,7 @@
                 <div class="header-actions">
                     <button class="toggle-btn link-btn" onclick="kopierLink(this)" title="Kopiér link til denne animation">🔗</button>
                     <button class="toggle-btn" onclick="toggleMenu()" title="Vis/Skjul menu">☰</button>
+                    <button class="toggle-btn fuld-btn" onclick="fuldSkaerm(true)" title="Fuld skærm: skjul panelet">⛶</button>
                 </div>
             </div>
 
@@ -279,6 +308,7 @@
         </div>
 
         <div class="content-area">
+            <button class="gendan-knap" id="gendanKnap" onclick="fuldSkaerm(false)" title="Vis samlingen">☰</button>
             <div class="startside" id="startside">
                 <div class="startside-grid" id="startsideGrid"></div>
             </div>
@@ -292,6 +322,7 @@
             document.getElementById('startside').style.display = 'none';
             iframe.style.display = 'block';
             iframe.src = filsti;
+            fuldSkaerm(filsti.indexOf('superanimationer/') >= 0);
 
             var alleKnapper = document.querySelectorAll('.tab-btn');
             alleKnapper.forEach(btn => btn.classList.remove('active'));
@@ -302,6 +333,7 @@
             document.getElementById('visningsVindue').style.display = 'none';
             document.getElementById('startside').style.display = 'block';
             document.getElementById('sidebarMenu').classList.remove('collapsed');
+            fuldSkaerm(false);
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         }
 
@@ -319,6 +351,29 @@
             });
         }
         byggStartside();
+
+        // Fuld skaerm: laboratorieforsoegene (superanimationer) faar hele vinduet.
+        // Sidepanelet skjules, og knappen i hjoernet gendanner det. Det ydre panel
+        // (samling_alt) faar besked, saa det ogsaa skjuler sit.
+        function fuldSkaerm(til) {
+            var menu = document.getElementById('sidebarMenu');
+            menu.classList.toggle('skjult', til);
+            if (!til) menu.classList.remove('collapsed');
+            document.querySelector('.content-area').classList.toggle('fuld', til);
+            if (window.parent !== window) {
+                window.parent.postMessage(til ? 'fuldSkaerm' : 'gendanPanel', '*');
+            }
+            markerFuldSkaerm();
+        }
+
+        // Animationen faar klassen samling-fuld paa <html> i fuld skaerm, saa den kan
+        // give plads til knappen i hjoernet. Saettes igen, hver gang en side er indlaest.
+        function markerFuldSkaerm() {
+            var iframe = document.getElementById('visningsVindue');
+            var til = document.querySelector('.content-area').classList.contains('fuld');
+            try { iframe.contentDocument.documentElement.classList.toggle('samling-fuld', til); } catch (e) {}
+        }
+        document.getElementById('visningsVindue').addEventListener('load', markerFuldSkaerm);
 
         function toggleMenu() {
             var menu = document.getElementById('sidebarMenu');

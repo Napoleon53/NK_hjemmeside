@@ -11,7 +11,7 @@
     var St = NK.Stof;
     var B = NK.Beholder;
 
-    var bord;
+    var bord, bobleL;
     var sidsteTid = 0;
     var sidsteSignatur = "";
     var beskedUr = null;
@@ -25,6 +25,7 @@
         var c = bord.valgtBeholder();
         var tabel = NK.el("glas-indhold");
         NK.saetTekst("uheld-taeller", String(bord.antalUheld));
+        NK.el("boble-laerred").hidden = !c;
         if (!c) {
             NK.saetTekst("glas-titel", "Det valgte glas");
             NK.saetTekst("glas-volumen", "");
@@ -81,6 +82,18 @@
         var dele = [c.navn, Math.round(B.volumen(c) * 10), Math.round(o.T * 2), bord.antalUheld, c.koger ? 1 : 0];
         Object.keys(o.n).sort().forEach(function (n) { dele.push(n + ":" + Math.round(o.n[n] * 10)); });
         return dele.join("|");
+    }
+
+    /* ----- Zoomboblen i panelet ---------------------------------------- */
+    function tegnBoble() {
+        var c = NK.el("boble-laerred");
+        var vis = !!bord.valgtBeholder();
+        if (c.hidden !== !vis) c.hidden = !vis;
+        if (!vis) return;
+        bobleL.tilpas();
+        var ctx = bobleL.ctx;
+        ctx.clearRect(0, 0, bobleL.b, bobleL.h);
+        bord.tegnBoble(ctx, bobleL.b / 2, bobleL.h / 2);
     }
 
     /* ----- Beskeden paa scenen ------------------------------------------ */
@@ -162,6 +175,7 @@
         bord.tilpas();
         bord.opdater(dt);
         bord.tegn();
+        tegnBoble();
 
         if (signatur() !== sidsteSignatur) opdaterPanel();
         window.requestAnimationFrame(loekke);
@@ -173,6 +187,7 @@
         bord = new NK.Bord(NK.el("scene-laerred"), NK.BORD_VALG);
         bord.byg(NK.OPSTILLING);
         bord.bindMus();
+        bobleL = new NK.Laerred(NK.el("boble-laerred"));
 
         /* Saa bordet kan pilles ved fra konsollen og fra _selvtest.html */
         NK.bord = bord;

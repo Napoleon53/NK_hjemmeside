@@ -127,9 +127,19 @@
             sus = { kilde: kilde, g: g };
         },
 
+        /* Vaeske, der skvulper i et glas: bloed, dyb og uden skarp ansats */
         skvulp: function (styrke) {
             var c = klar(); if (!c) return;
-            filtreretStoej(c, c.currentTime, 0.12, "bandpass", 700 + Math.random() * 700, 1.6, 0.1 + 0.25 * NK.klamp(styrke, 0, 1));
+            var s = NK.klamp(styrke, 0, 1);
+            filtreretStoej(c, c.currentTime, 0.28 + 0.1 * s, "bandpass", 260 + Math.random() * 300, 0.7, 0.05 + 0.1 * s, function (r) { return Math.sin(Math.PI * (1 - r)); });
+        },
+
+        /* Glas, der knuses */
+        knus: function () {
+            var c = klar(); if (!c) return;
+            var nu = c.currentTime;
+            filtreretStoej(c, nu, 0.35, "highpass", 2400, 0, 0.35);
+            for (var i = 0; i < 5; i++) tone(c, nu + i * 0.045 + Math.random() * 0.02, 2200 + Math.random() * 1800, 900 + Math.random() * 600, 0.09, 0.07);
         },
 
         haeld: function (varighed) {
