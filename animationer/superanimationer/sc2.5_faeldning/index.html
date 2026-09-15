@@ -13,6 +13,7 @@
     <h1><span class="ikon">◍</span> Fældning <span class="undertitel">Dråbeforsøg på folie</span></h1>
 
     <div class="top-hoejre">
+        <button class="knap topknap" id="introknap" type="button" title="Hvad forsøget handler om">Om forsøget</button>
         <button class="knap topknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
         <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
     </div>
@@ -87,6 +88,29 @@
         </div>
     </aside>
 </main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="intro">
+    <div class="overlay-boks intro-boks" role="dialog" aria-labelledby="intro-titel">
+        <h2 id="intro-titel">Fældning</h2>
+        <p class="intro-formaal">Forsøget undersøger, hvilke saltopløsninger der giver bundfald, når de blandes.</p>
+
+        <h3>Forsøget</h3>
+        <ol class="intro-trin">
+            <li>Dryp to opløsninger i hvert felt i skemaet.</li>
+            <li>Se på dråberne med luppen.</li>
+            <li>Opskriv reaktionsskemaet for hvert bundfald.</li>
+        </ol>
+
+        <h3>Uheld</h3>
+        <p>Forkerte handlinger kan give uheld. Kemichael rydder op.</p>
+
+        <div class="knapper">
+            <button class="knap" id="intro-rundvisning" type="button">Rundvisning</button>
+            <button class="knap blaa" id="intro-start" type="button">Start forsøget</button>
+        </div>
+    </div>
+</div>
 
 <!-- ================================================================= -->
 <div class="overlay" id="teori">

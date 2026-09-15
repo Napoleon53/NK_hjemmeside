@@ -5,18 +5,22 @@
    ../kemichael/kemichael.js. Her staar de scener, der hoerer til dette
    forsoeg.
 
-   Paaskeaeg:
+   Paaskeaeg og uheld:
      kaffe     klik paa koppen paa hylden: laereren tager den med, fordi
                der ikke drikkes i laboratoriet, og drikker paa vej ud
-     uheld     proppen springer af under voldsom rystning: laereren
-               sukker, kommer med koekkenrulle og toerrer pytten op
+     uheld     indholdet sproejter ud af et glas, fordi proppen sprang af
+               under voldsom rystning, eller fordi der blev rystet uden
+               prop: laereren sukker, kommer med koekkenrulle og toerrer
+               pytten op
+     udsugning brom er fremme, og udsugningen er slukket: laereren
+               loeber ind og taender den
      ros       begge tests er lavet i begge glas: laereren roser
      dab       et saerlig godt forsoeg: laereren dabber
      hexen     hex-1-en i et glas: en addition, som ikke hoerer til forsoeget
      sluklampe lampen staar taendt uden glas under sig
 
    Glimt af baggrunden: kaffePause (kaffen), dab, stroem (lampen) og
-   regnskabet over uheld (proppen).
+   regnskabet over uheld (spildet og udsugningen).
    ===================================================================== */
 (function () {
     "use strict";
@@ -29,7 +33,7 @@
     var UDE = K.UDE;
     var HAENGER = K.HAENGER;
 
-    K.paa(P, { fredet: ["uheld"] });
+    K.paa(P, { fredet: ["uheld", "udsugning"] });
 
     P.laererNytEkstra = function () {
         this.laerer.baerer = null;
@@ -140,17 +144,19 @@
         ]));
     };
 
-    /* ----- Uheldet: proppen sprang af ------------------------------------ */
-    P.laererUheld = function (gl) {
+    /* ----- Uheld: indholdet sproejtede ud af et glas ---------------------- */
+    /* slags: "prop" (proppen sprang af) eller "udenProp" */
+    P.laererUheld = function (gl, slags) {
         var L = this.laerer;
         var mig = this;
         L.scene = null;
         this.laererKoer("uheld", [
             { tid: 0.6 },
-            { udtryk: { vrede: 0.9, humoer: -0.8, roed: 0.3 } },
+            { udtryk: { vrede: 0.9, humoer: -0.8, roed: 0.3, skeptisk: slags === "udenProp" ? 0.8 : 0 } },
             { gaa: function () { return (mig.pyt ? mig.pyt.x : 400) - 130; } },
             K.suk(),
-            { sig: "Ryst med omtanke.", vis: 2.4, tid: 0.3 },
+            { sig: slags === "udenProp" ? "Proppen virker bedst i glasset." : "Ryst med omtanke.", vis: 2.4, tid: 0.3 },
+            { udtryk: { skeptisk: 0 } },
             { arm: -1.25, tid: 0.5 },
             { kald: function () { this.laerer.baerer = "papir"; if (NK.Lyd) NK.Lyd.papir(); } },
             { tid: 1.8, hver: function (t) {
@@ -161,6 +167,35 @@
             { kald: function () { this.laerer.baerer = null; if (NK.Lyd) NK.Lyd.brum(); } },
             { arm: HAENGER, tid: 0.4 },
             { sig: "Fyld glas " + gl.nr + " igen.", vis: 2.2, tid: 1.2 }
+        ].concat(K.uheld(), [
+            { gaa: UDE }
+        ]));
+    };
+
+    /* ----- Uheld: brom fremme uden udsugning ------------------------------ */
+    /* Laereren loeber ind under stinkskabets panel, rækker op og taender
+       udsugningen. Replikken skifter, hvis det sker igen. */
+    var UDSUGNING_REPLIKKER = ["Udsugningen er ikke pynt.", "Igen. Den skal være tændt.", "Nu bliver den stående tændt."];
+
+    P.laererUdsugning = function () {
+        var L = this.laerer;
+        if (L.scene) return;
+        this.udsugningUheld = (this.udsugningUheld || 0) + 1;
+        var replik = UDSUGNING_REPLIKKER[Math.min(this.udsugningUheld, UDSUGNING_REPLIKKER.length) - 1];
+        this.laererKoer("udsugning", [
+            { udtryk: { vrede: 0.9, humoer: -0.8, roed: 0.35 } },
+            { gaa: 800, loeb: true },
+            { sig: replik, vis: 2.4, tid: 0.2 },
+            { arm: 0.35, tid: 0.45 },
+            { kald: function () {
+                if (this.udsugning) return;
+                this.udsugning = true;
+                if (NK.Lyd) { NK.Lyd.klik(); NK.Lyd.udsugning(true); }
+                this.aendret("udsugning");
+            } },
+            { tid: 1.2 },
+            { arm: HAENGER, tid: 0.4 },
+            K.suk()
         ].concat(K.uheld(), [
             { gaa: UDE }
         ]));

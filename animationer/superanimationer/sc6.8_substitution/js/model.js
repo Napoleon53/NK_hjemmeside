@@ -109,8 +109,10 @@
     /* Rystning med musen: FULD er den fart (tegneenheder pr. sekund), der
        giver fuld rystning. Rystes der voldsommere end KNUS_FART i
        KNUS_TID sekunder, springer proppen af. Anden gang skal der mere
-       til, og efter MAKS_UHELD uheld sker det ikke mere. */
-    var RYST = { FULD: 900, KNUS_FART: [2300, 3600], KNUS_TID: [0.7, 0.9], MAKS_UHELD: 2 };
+       til, og efter MAKS_UHELD uheld sker det ikke mere. Et glas uden
+       prop sproejter indholdet ud, naar det rystes hurtigere end
+       SPILD_FART i SPILD_TID sekunder. Baeres det roligt, sker der intet. */
+    var RYST = { FULD: 900, KNUS_FART: [2300, 3600], KNUS_TID: [0.7, 0.9], MAKS_UHELD: 2, SPILD_FART: 350, SPILD_TID: 0.5 };
 
     /* Vaeguret: minutter pr. sekund og starttidspunkt */
     var UR = { minPerSek: 0.5, start: 10 * 60 + 5, hurtig: 4, hurtigTid: 12 };

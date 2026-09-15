@@ -102,6 +102,26 @@
         NK.el("teori").classList.add("vis");
     }
 
+    /* Introen aabner af sig selv foerste gang i browseren. Knappen Om
+       forsøget aabner den igen. */
+    var INTRO_GEMT = "nk-sc27-intro";
+
+    function aabnIntro() {
+        NK.Rundvisning.luk();
+        lukOverlay();
+        NK.el("intro").classList.add("vis");
+        NK.el("intro-start").focus({ preventScroll: true });
+    }
+
+    function introFoersteGang() {
+        var set = false;
+        try {
+            set = !!window.localStorage.getItem(INTRO_GEMT);
+            window.localStorage.setItem(INTRO_GEMT, "set");
+        } catch (fejl) { /* file:// eller privat browsing */ }
+        if (!set) aabnIntro();
+    }
+
     function lukOverlay() {
         var aabne = document.querySelectorAll(".overlay.vis");
         for (var i = 0; i < aabne.length; i++) aabne[i].classList.remove("vis");
@@ -198,12 +218,18 @@
         NK.el("tegneserie").addEventListener("click", function (e) { if (e.target === this) lukOverlay(); });
         NK.el("lydknap").addEventListener("click", skiftLyd);
         NK.el("hjaelpknap").addEventListener("click", function () { lukOverlay(); NK.Rundvisning.start(); });
+        NK.el("introknap").addEventListener("click", aabnIntro);
+        NK.el("intro-start").addEventListener("click", lukOverlay);
+        NK.el("intro-rundvisning").addEventListener("click", function () { lukOverlay(); NK.Rundvisning.start(); });
+        NK.el("intro").addEventListener("click", function (e) { if (e.target === this) lukOverlay(); });
+        NK.intro = { aabn: aabnIntro, luk: lukOverlay };
 
         document.addEventListener("keydown", tastNed);
 
         visLyd();
         forsoeg.tilpas();
         opdaterPanel();
+        introFoersteGang();
 
         window.requestAnimationFrame(function (ts) {
             sidsteTid = ts;

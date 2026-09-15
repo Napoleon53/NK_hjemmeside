@@ -57,6 +57,7 @@ function koer() {
     overskrift("1. Indlaesning");
     paastand("NK findes", !!NK);
     if (!NK) { vis(); return; }
+    paastand("introen aabner og lukker", !!NK.intro && (NK.intro.aabn(), d.getElementById("intro").classList.contains("vis")) && (NK.intro.luk(), !d.getElementById("intro").classList.contains("vis")));
     paastand("forsoeg, opgave og fri opgave er bygget", !!(NK.forsoeg && NK.opgave && NK.fritOpgave));
     NK.Sprites.NAVNE.forEach(function (n) { paastand("sprite " + n + " er indlaest", NK.Sprites.klar(n)); });
 

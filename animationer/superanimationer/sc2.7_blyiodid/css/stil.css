@@ -435,6 +435,14 @@ main.forsoeg {
 
 .overlay-boks p { font-size: 0.92rem; line-height: 1.55; color: var(--tekst-svag); margin: 0 0 8px 0; }
 
+/* Introen: hvad forsoeget handler om */
+.intro-boks { max-width: 520px; }
+.overlay-boks .intro-formaal { font-size: 0.98rem; color: var(--tekst); }
+.intro-trin { margin: 0 0 4px 0; padding-left: 22px; font-size: 0.92rem; line-height: 1.55; color: var(--tekst-svag); }
+.intro-trin li { margin-bottom: 2px; }
+.intro-trin li::marker { color: var(--gul); font-weight: 700; }
+.intro-boks .knapper { gap: 8px; }
+
 .ligning {
     background-color: #111117;
     border: 1px solid #3f3f4d;

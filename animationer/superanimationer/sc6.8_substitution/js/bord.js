@@ -132,7 +132,7 @@
         c.addEventListener("pointermove", function (ev) {
             mig.flyt(mig.tilBord(ev), ev.timeStamp || Date.now());
             var hv = mig.hover;
-            var greb = (hv === "glas1" || hv === "glas2") && mig.kanRyste(mig.g[hv]);
+            var greb = (hv === "glas1" || hv === "glas2") && mig.kanTageFat(mig.g[hv]);
             c.style.cursor = mig.holdt ? "grabbing" : (greb ? "grab" : (hv ? "pointer" : "default"));
         });
         c.addEventListener("pointerup", function () { mig.op(); });
@@ -338,6 +338,7 @@
         S.tegnDraaber(ctx, this.draaber);
         for (i = 0; i < this.strimler.length; i++) S.tegnStrimmel(ctx, this.strimler[i]);
         S.tegnDampe(ctx, this.dampe);
+        S.tegnTaage(ctx, this.taage);
         if (this.tegnLaerer) this.tegnLaerer(ctx, tid);
         this.tegnStor(ctx, tid);
         ctx.restore();

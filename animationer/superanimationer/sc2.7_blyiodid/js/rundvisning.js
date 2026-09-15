@@ -14,7 +14,8 @@
         { sel: "#forloeb-kort", titel: "Forløbet", tekst: "Trinene får flueben, efterhånden som du når dem. Hint hjælper med det trin, du er ved." },
         { sel: "#serie-kort", titel: "Tegneserie", tekst: "Når forsøget er slut, kan du se det opsummeret som en tegneserie med dine målinger og opløselighedskurven." },
         { sel: "#quiz-kort", titel: "Quiz", tekst: "Låses op, når der er tre målinger." },
-        { sel: "#forfraknap", titel: "Start forfra", tekst: "Starter forsøget forfra med et tomt bægerglas." }
+        { sel: "#forfraknap", titel: "Start forfra", tekst: "Starter forsøget forfra med et tomt bægerglas." },
+        { sel: "#introknap", titel: "Om forsøget", tekst: "Hvad forsøget undersøger, og forløbet i korte træk." }
     ];
 
     var trinNr = 0;

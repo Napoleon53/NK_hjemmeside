@@ -55,6 +55,9 @@ animation. Det nye er:
   er én dråbe; der skal tre til. I glasset fra lyset bliver papiret rødt, og
   der kommer bundfald. I glasset fra mørket er papiret gult, og der sker
   ingenting.
+* **Intro.** Første gang siden åbnes, siger en pop-up kort, hvad forsøget
+  undersøger, og hvad eleven skal gøre. Knappen Om forsøget åbner den igen.
+  Den huskes i `localStorage` under `nk-sc68-intro`.
 * **Hint i panelet.** Hint giver en kort tekst til det aktuelle trin og markerer den
   genstand, det handler om. Der er ingen teori foran forsøget; den ligger bag
   knappen Teori.
@@ -78,6 +81,14 @@ Figuren og klik på ham er fælles for superanimationerne og står i
   skal der rystes endnu voldsommere, og efter to uheld kan det ikke ske mere.
   Knappen Ryst glasset taber aldrig proppen. Grænserne står i `RYST` i
   `js/model.js`.
+* **Rystning uden prop.** Et glas uden prop kan også tages fat i. Bæres det
+  roligt, sker der intet, men rystes det, sprøjter indholdet ud. Læreren
+  tørrer op ("Proppen virker bedst i glasset."), og glasset skal fyldes igen.
+  Grænsen står i `RYST.SPILD_FART` og `RYST.SPILD_TID`.
+* **Bromvand uden udsugning.** Bromvandet kan åbnes, og udsugningen kan
+  slukkes, selv om der er brom fremme. Dampene kommer så ud i lokalet, og
+  scenen får et rødbrunt slør. Efter 1,6 sekunder løber læreren ind og tænder
+  udsugningen. Replikken skifter, hvis det sker igen.
 * **Et særlig godt forsøg.** Ingen uheld, kontrolglasset pakket ind, før lyset
   var færdigt, og lampen højst slukket kort undervejs: så kommer læreren ind
   og dabber. Ellers roser læreren blot.

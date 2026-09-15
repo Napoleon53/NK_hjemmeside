@@ -16,7 +16,8 @@
         { sel: "#scene", titel: "Antænd", tekst: "Træk det fyldte glas hen til flammen, eller tryk Antænd. Genfyld glasset sætter det tilbage i karret." },
         { sel: "#resultat", titel: "Lydstyrken", tekst: "Hver blanding får sin søjle. Test alle syv blandinger." },
         { sel: "#quiz-kort", titel: "Quiz", tekst: "Låses op, når alle syv blandinger er testet." },
-        { sel: "#teoriknap", titel: "Teori", tekst: "Reaktionsskemaet og forklaringen på knaldet." }
+        { sel: "#teoriknap", titel: "Teori", tekst: "Reaktionsskemaet og forklaringen på knaldet." },
+        { sel: "#introknap", titel: "Om forsøget", tekst: "Hvad forsøget undersøger, og forløbet i korte træk." }
     ];
 
     var trinNr = 0;

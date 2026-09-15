@@ -13,6 +13,7 @@
     <h1><span class="ikon">✹</span> Knaldgas <span class="undertitel">Forsøg med H₂ og O₂</span></h1>
 
     <div class="top-hoejre">
+        <button class="knap topknap" id="introknap" type="button" title="Hvad forsøget handler om">Om forsøget</button>
         <button class="knap topknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
         <button class="ikonknap" id="lydknap" type="button" title="Lyd til og fra (M)" aria-label="Lyd til og fra" aria-pressed="true">
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -94,6 +95,30 @@
         </div>
     </aside>
 </main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="intro">
+    <div class="overlay-boks intro-boks" role="dialog" aria-labelledby="intro-titel">
+        <h2 id="intro-titel">Knaldgas</h2>
+        <p class="intro-formaal">Dihydrogen og dioxygen reagerer og danner vand. Forsøget undersøger, hvilket blandingsforhold der giver det kraftigste knald.</p>
+
+        <h3>Forsøget</h3>
+        <ol class="intro-trin">
+            <li>Fyld måleglasset med H₂ og O₂, i alt 6 streger.</li>
+            <li>Antænd blandingen ved flammen.</li>
+            <li>Aflæs lydstyrken.</li>
+            <li>Gentag med alle syv blandinger.</li>
+        </ol>
+
+        <h3>Uheld</h3>
+        <p>Forkerte handlinger kan give uheld. Kemichael rydder op.</p>
+
+        <div class="knapper">
+            <button class="knap" id="intro-rundvisning" type="button">Rundvisning</button>
+            <button class="knap blaa" id="intro-start" type="button">Start forsøget</button>
+        </div>
+    </div>
+</div>
 
 <!-- ================================================================= -->
 <div class="overlay" id="teori">

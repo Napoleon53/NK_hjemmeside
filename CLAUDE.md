@@ -29,6 +29,13 @@ statiske sider i roden, downloads i `downloads/`.
 - Resultatskemaet for forsøget står i tegneseriens sidste rude, ikke som et
   kort i panelet.
 - Sidepanelet er 430 px bredt (`--panel-bredde` i `css/stil.css`).
+- Superanimationer om laboratorieforsøg har en intro-popup, der kort siger, hvad
+  forsøget undersøger, og hvad eleven skal gøre. Den åbner af sig selv første
+  gang og igen med knappen Om forsøget (mønster: `#intro` i
+  `sc6.8_substitution/index.html`, `aabnIntro` i `js/app.js`).
+- Forkerte handlinger i et forsøg afvises ikke med en besked, når det kan
+  undgås. De udføres og giver et uheld, og Kemichael kommer og rydder op
+  (`kemichael/`). Kun det, der fysisk ikke kan lade sig gøre, afvises.
 
 ## Layout
 

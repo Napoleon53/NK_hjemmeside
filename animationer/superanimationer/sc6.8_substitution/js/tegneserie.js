@@ -245,6 +245,33 @@
                     tekst(ctx, "pop", vX + 50, GLAS_Y + 40, { farve: "#f0918a" });
                 });
             });
+
+            [g1, g2].forEach(function (gl) {
+                if (!f.iagttaget["spildt" + gl.nr]) return;
+                rude(container, ++nr, "Uheld: glas " + gl.nr + " blev rystet uden prop, og indholdet røg ud. Kemichael tørrede op, og glasset blev fyldt igen.", function (ctx) {
+                    S.tegnReagensglas(ctx, glasObj(vX, 0, 0, { nr: gl.nr, udenHexan: true }), 0);
+                    NK.Sprites.tegnPositur(ctx, "prop", { x: hX + 50, y: GLAS_Y + 134, v: 0 }, S.ANKER.prop);
+                    ctx.fillStyle = NK.css(M.FARVE.bromvand, 1);
+                    ctx.beginPath();
+                    ctx.ellipse(hX - 20, GLAS_Y + 162, 42, 5, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    S.tegnDraaber(ctx, [{ x: vX + 24, y: GLAS_Y - 2, r: 2.6, liv: 1, farve: M.FARVE.bromvand }, { x: vX + 40, y: GLAS_Y + 18, r: 2.2, liv: 1, farve: M.FARVE.bromvand }, { x: vX - 22, y: GLAS_Y + 4, r: 2.4, liv: 1, farve: M.FARVE.bromvand }]);
+                    tekst(ctx, "uden prop", hX + 50, GLAS_Y + 100, { farve: "#f0918a" });
+                });
+            });
+
+            if (f.iagttaget.udsugning) {
+                rude(container, ++nr, "Uheld: bromvandet var åbent uden udsugning, og bromdampene kom ud i lokalet. Kemichael tændte udsugningen.", function (ctx) {
+                    ctx.fillStyle = "rgba(200, 97, 26, 0.18)";
+                    ctx.fillRect(0, 0, B, GLAS_Y + 160);
+                    S.tegnReagensglas(ctx, glasObj(vX, 0, 1, { nr: 1, udenHexan: true }), 0);
+                    var dampe = [];
+                    for (var k = 0; k < 9; k++) dampe.push({ x: vX + Math.sin(k * 1.9) * (8 + k * 5), y: GLAS_Y - 4 - k * 2 + Math.cos(k * 2.3) * 10, r: 9 + k * 3, liv: 1 });
+                    S.tegnDampe(ctx, dampe);
+                    tekst(ctx, "udsugning", hX + 20, GLAS_Y + 36, { farve: "#c8ced6" });
+                    tekst(ctx, "0,00 m/s", hX + 20, GLAS_Y + 56, { farve: "#f0918a", font: "700 14px Consolas, 'Courier New', monospace" });
+                });
+            }
         }
     };
 }());

@@ -48,6 +48,7 @@ function koerTest() {
     overskrift("1. Indlaesning");
     paastand("NK findes", !!NK);
     if (!NK) return;
+    paastand("introen aabner og lukker", !!NK.intro && (NK.intro.aabn(), d.getElementById("intro").classList.contains("vis")) && (NK.intro.luk(), !d.getElementById("intro").classList.contains("vis")));
     paastand("forsoeg og quiz er bygget", !!(NK.forsoeg && NK.quiz));
     Object.keys(NK.Sprites.FILER).forEach(function (n) {
         paastand("sprite " + n + " er indlaest", NK.Sprites.klar(n));

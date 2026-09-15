@@ -15,7 +15,8 @@
         { sel: "#maal-kort", titel: "Måleskema", tekst: "Vejningerne skrives ind her. Til sidst beregner du fedtindholdet." },
         { sel: "#iagttagelser-kort", titel: "Iagttagelser", tekst: "Det, du ser undervejs, bliver skrevet her." },
         { sel: "#quiz-kort", titel: "Quiz", tekst: "Låses op, når du har fundet fedtindholdet i chipsene." },
-        { sel: "#nytknap", titel: "Nyt forsøg", tekst: "Starter forfra med nye chips. Resultaterne bliver stående, så forsøgene kan sammenlignes." }
+        { sel: "#nytknap", titel: "Nyt forsøg", tekst: "Starter forfra med nye chips. Resultaterne bliver stående, så forsøgene kan sammenlignes." },
+        { sel: "#introknap", titel: "Om forsøget", tekst: "Hvad forsøget undersøger, og forløbet i korte træk." }
     ];
 
     var trinNr = 0;

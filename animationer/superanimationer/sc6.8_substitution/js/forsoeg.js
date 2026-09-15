@@ -70,6 +70,8 @@
         ag_bundfald: { tekst: "Glas {n}: der dannes et lysegult bundfald i vandfasen med AgNO₃.", farve: M.FARVE.bundfald },
         ag_intet:    { tekst: "Glas {n}: ingen forandring med AgNO₃.", farve: null },
         uheld:       { tekst: "Proppen sprang af glas {n}, og indholdet er tabt.", farve: M.FARVE.bromvand },
+        spildt:      { tekst: "Glas {n} blev rystet uden prop, og indholdet er tabt.", farve: M.FARVE.bromvand },
+        udsugning:   { tekst: "Bromvandet var åbent uden udsugning, og dampene kom ud i lokalet.", farve: M.FARVE.bromvand },
         affald:      { tekst: "Resterne er afleveret som halogenholdigt organisk affald.", farve: null }
     };
     NK.IAGTTAGELSER = IAGTTAGELSER;
@@ -191,6 +193,10 @@
         this.flyvende = [];
         this.strimler = [];
         this.pyt = null;
+        this.spildTid = 0;
+        this.udenUdsugning = 0;
+        this.taage = 0;
+        this.andreUheld = 0;
 
         this.bobleAlfa = 0;
         this.bobleGlas = null;
@@ -275,10 +281,10 @@
         return null;
     };
 
-    /* Et saerlig godt forsoeg: ingen uheld, kontrolglasset pakket ind i
-       tide, og lampen hoejst slukket kort undervejs. */
+    /* Et saerlig godt forsoeg: ingen uheld af nogen slags, kontrolglasset
+       pakket ind i tide, og lampen hoejst slukket kort undervejs. */
     P.flotUdfoert = function () {
-        return this.antalUheld === 0 && this.kontrolFoer && this.lampeSlukTid < M.FLOT.slukTid;
+        return this.antalUheld === 0 && this.andreUheld === 0 && this.kontrolFoer && this.lampeSlukTid < M.FLOT.slukTid;
     };
 
     P.testsFaerdige = function () {
@@ -418,11 +424,10 @@
         return false;
     };
 
+    /* Udsugningen kan slukkes naar som helst. Er der brom fremme uden
+       udsugning, kommer dampene ud i lokalet, og laereren kommer og
+       taender den (se opdater og laerer.js). */
     P.skiftUdsugning = function () {
-        if (this.udsugning && this.bromFremme()) {
-            this.besked("Udsugningen skal køre, så længe der er brom fremme.", "advarsel");
-            return false;
-        }
         this.udsugning = !this.udsugning;
         if (NK.Lyd) { NK.Lyd.klik(); NK.Lyd.udsugning(this.udsugning); }
         this.aendret("udsugning");
@@ -437,11 +442,6 @@
     };
 
     P.proevBrom = function () {
-        if (!this.udsugning) {
-            this.besked("Tænd udsugningen, før du åbner bromvandet.", "advarsel");
-            this.markér("kontakt", 4);
-            return false;
-        }
         var g = this.maalGlas(function (gl) { return !gl.brom && !gl.prop && gl.sted === "stativ" && !gl.folie; });
         if (!g) {
             var v = this.valgtGlas();
@@ -1018,17 +1018,22 @@
         return !!(gl && gl.brom && gl.prop && !gl.folie && gl.sted !== "flytter" && !this.handling && !(this.laererOptaget && this.laererOptaget()));
     };
 
+    /* Et glas uden prop kan ogsaa tages fat i. Rystes det, sproejter
+       indholdet ud (se opdaterRyst). */
+    P.kanTageFat = function (gl) {
+        return !!(gl && gl.brom && !gl.folie && gl.sted !== "flytter" && !this.handling && !(this.laererOptaget && this.laererOptaget()));
+    };
+
     P.kanRysteNu = function () {
         return this.kanRyste(this.g.glas1) || this.kanRyste(this.g.glas2);
     };
 
-    /* Som kanRyste, men med besked om hvorfor ikke */
+    /* Som kanTageFat, men med besked om hvorfor ikke */
     P.proevRyst = function (gl) {
-        if (this.kanRyste(gl)) return true;
+        if (this.kanTageFat(gl)) return true;
         if (this.handling) return false;
         if (!gl.brom) this.besked("Glasset er tomt.");
         else if (gl.folie) this.besked("Tag folien af, før du ryster.");
-        else if (!gl.prop) { this.besked("Sæt proppen i, før du ryster.", "advarsel"); this.markér(this.g.prop1.iGlas ? "prop2" : "prop1"); }
         return false;
     };
 
@@ -1036,6 +1041,7 @@
         this.rystKilde = kilde;
         this.rystGlas = gl;
         this.farligTid = 0;
+        this.spildTid = 0;
         this.vaelg(gl.navn);
         this.aendret("ryst");
     };

@@ -14,7 +14,8 @@
         { sel: "#forloeb-kort", titel: "Forløbet", tekst: "Trinene får flueben, efterhånden som du når dem. Hint hjælper med det trin, du er ved." },
         { sel: "#iagttagelser-kort", titel: "Iagttagelser", tekst: "Det, du ser undervejs, bliver skrevet her." },
         { sel: "#quiz-kort", titel: "Quiz", tekst: "Låses op, når begge tests er lavet." },
-        { sel: "#teoriknap", titel: "Teori", tekst: "Reaktionsskemaerne og sikkerheden bag forsøget." }
+        { sel: "#teoriknap", titel: "Teori", tekst: "Reaktionsskemaerne og sikkerheden bag forsøget." },
+        { sel: "#introknap", titel: "Om forsøget", tekst: "Hvad forsøget undersøger, og forløbet i korte træk." }
     ];
 
     var trinNr = 0;

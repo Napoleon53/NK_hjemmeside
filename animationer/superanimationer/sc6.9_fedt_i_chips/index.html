@@ -13,6 +13,7 @@
 
     <div class="top-hoejre">
         <button class="knap topknap" id="nytknap" type="button" title="Start et nyt forsøg med nye chips (N)">Nyt forsøg</button>
+        <button class="knap topknap" id="introknap" type="button" title="Hvad forsøget handler om">Om forsøget</button>
         <button class="knap topknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
         <button class="ikonknap" id="lydknap" type="button" title="Lyd til og fra (M)" aria-label="Lyd til og fra" aria-pressed="true">
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -84,6 +85,30 @@
         </div>
     </aside>
 </main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="intro">
+    <div class="overlay-boks intro-boks" role="dialog" aria-labelledby="intro-titel">
+        <h2 id="intro-titel">Fedt i chips</h2>
+        <p class="intro-formaal">Forsøget bestemmer, hvor mange procent fedt der er i chips, og sammenligner resultatet med varedeklarationen.</p>
+
+        <h3>Forsøget</h3>
+        <ol class="intro-trin">
+            <li>Afvej chips, og knus dem i morteren.</li>
+            <li>Tilsæt et opløsningsmiddel, rør rundt, og filtrer ned i en vejet petriskål.</li>
+            <li>Inddamp filtratet, og vej petriskålen igen.</li>
+            <li>Beregn fedtindholdet.</li>
+        </ol>
+
+        <h3>Uheld</h3>
+        <p>Forkerte handlinger kan give uheld. Kemichael rydder op.</p>
+
+        <div class="knapper">
+            <button class="knap" id="intro-rundvisning" type="button">Rundvisning</button>
+            <button class="knap blaa" id="intro-start" type="button">Start forsøget</button>
+        </div>
+    </div>
+</div>
 
 <!-- ================================================================= -->
 <div class="overlay" id="teori">

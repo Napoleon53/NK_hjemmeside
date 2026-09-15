@@ -48,6 +48,7 @@ function koerTest() {
     overskrift("1. Indlaesning");
     paastand("NK findes", !!NK);
     if (!NK) return;
+    paastand("introen aabner og lukker", !!NK.intro && (NK.intro.aabn(), d.getElementById("intro").classList.contains("vis")) && (NK.intro.luk(), !d.getElementById("intro").classList.contains("vis")));
     paastand("forsoeg og quiz er bygget", !!(NK.forsoeg && NK.quiz));
     Object.keys(NK.Sprites.FILER).forEach(function (n) {
         paastand("sprite " + n + " er indlaest", NK.Sprites.klar(n));
@@ -106,16 +107,13 @@ function koerTest() {
     overskrift("3. Raekkefoelge");
     frisk();
     paastand("glas 1 er valgt fra start", f.valgt === "glas1");
-    paastand("bromvandet kan ikke aabnes uden udsugning", f.klik("bromflaske") === false && !f.handling);
     paastand("hexan kraever bromvand", f.klik("hexan") === false);
     paastand("proppen kraever bromvand i glasset", f.klik("prop1") === false);
     paastand("lampen kraever et klart glas", f.klik("lampe") === false);
     paastand("pH-papir kraever et glas i lys", f.klik("phpapir") === false);
     paastand("udsugningen taendes", f.klik("kontakt") === true && f.udsugning);
     paastand("bromvand haeldes i glas 1", f.klik("bromflaske") === true);
-    adv(1);
-    paastand("udsugningen kan ikke slukkes, mens flasken er aaben", f.klik("kontakt") === false && f.udsugning);
-    adv(4);
+    adv(5);
     paastand("glas 1 har bromvand, og flasken er hjemme igen", g1().brom && g1().brVand === 1 && !f.handling && g1().vandAreal > 100);
     paastand("bromvandet er noteret som orange", f.iagttaget.brom);
     paastand("bromvand igen gaar i glas 2", f.klik("bromflaske") === true && f.valgt === "glas2");
@@ -127,7 +125,6 @@ function koerTest() {
     adv(4);
     paastand("glas 1 har to lag", g1().hexan && g1().hexAreal > 50 && g1().brHex < 0.1);
     paastand("lampen afviser et glas uden prop", f.klik("lampe") === false && g1().sted === "stativ");
-    paastand("rystning afvises uden prop", f.rystKnap(true) === false && !f.rystKilde);
     paastand("prop i glas 1", f.klik("prop1") === true);
     adv(1.5);
     paastand("proppen sidder i glas 1", g1().prop === f.g.prop1 && f.g.prop1.iGlas === g1());
@@ -281,6 +278,37 @@ function koerTest() {
     klarGlas1();
     musRyst(g1(), 220, 10, 4);
     paastand("efter to uheld springer proppen ikke mere", f.antalUheld === 2 && f.knusGraense() === null && g1().prop);
+
+    overskrift("5b. Uheld: bromvand uden udsugning");
+    frisk();
+    paastand("bromvandet kan aabnes uden udsugning", !f.udsugning && f.klik("bromflaske") === true);
+    t = vent(function () { return !!(f.laerer.scene && f.laerer.scene.navn === "udsugning"); }, 6);
+    paastand("dampene kommer ud i lokalet, og laereren loeber ind", !!(f.laerer.scene && f.laerer.scene.navn === "udsugning") && f.taage > 0.05 && f.andreUheld === 1, t + " s");
+    paastand("uheldet er noteret og udelukker et saerlig godt forsoeg", f.iagttaget.udsugning && f.flotUdfoert() === false);
+    vent(function () { return !f.laererOptaget(); }, 15);
+    paastand("laereren har taendt udsugningen og er gaaet", f.udsugning && !f.laererOptaget() && f.laerer.x < -200);
+    adv(6);
+    paastand("sloeret forsvinder igen", f.taage < 0.1, komma(f.taage));
+    paastand("udsugningen kan slukkes med bromvand i et aabent glas", f.klik("kontakt") === true && !f.udsugning);
+    t = vent(function () { return f.udsugning; }, 20);
+    paastand("laereren taender den igen med en ny replik", f.udsugning && f.andreUheld === 2 && f.laerer.tale.indexOf("Igen") === 0, t + " s");
+    vent(function () { return !f.laererOptaget(); }, 15);
+
+    overskrift("5c. Uheld: rystning uden prop");
+    paastand("hexan i glas 1", f.klik("hexan") === true);
+    adv(4);
+    paastand("glasset uden prop kan baeres roligt uden spild", baer(g1(), 395, 380) && !f.pyt && g1().brom);
+    adv(1);
+    var sek = musRyst(g1(), 50, 3, 4);
+    paastand("rystes det uden prop, sproejter indholdet ud", sek >= 0 && !!f.pyt && !g1().brom && f.andreUheld === 3, sek.toFixed(1) + " s");
+    paastand("uheldet er noteret", f.iagttaget.spildt1);
+    adv(3);
+    paastand("laereren toerrer op og siger noget om proppen", !!(f.laerer.scene && f.laerer.scene.navn === "uheld") && f.laerer.tale.indexOf("Proppen") === 0, f.laerer.tale);
+    vent(function () { return !f.laererOptaget(); }, 15);
+    paastand("pytten er vaek, og laereren er gaaet", !f.pyt && !f.laererOptaget());
+    var serie = d.createElement("div");
+    NK.Tegneserie.byg(f, serie);
+    paastand("tegneserien faar en rude for hvert af de to uheld", serie.textContent.indexOf("uden prop") > 0 && serie.textContent.indexOf("uden udsugning") > 0);
 
     overskrift("6. Kaffen, uret, lampen og heksen");
     frisk();

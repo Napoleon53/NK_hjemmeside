@@ -627,6 +627,19 @@
         ctx.restore();
     };
 
+    /* Bromdampe i lokalet, naar udsugningen er slukket: et roedbrunt sloer
+       over hele scenen, taettest foroven. styrke: 0-1 */
+    S.tegnTaage = function (ctx, styrke) {
+        if (styrke < 0.01) return;
+        ctx.save();
+        var g = ctx.createLinearGradient(0, 0, 0, S.HOEJDE);
+        g.addColorStop(0, "rgba(200, 97, 26, " + (0.32 * styrke).toFixed(3) + ")");
+        g.addColorStop(1, "rgba(200, 97, 26, " + (0.08 * styrke).toFixed(3) + ")");
+        ctx.fillStyle = g;
+        ctx.fillRect(-2000, -2000, S.BREDDE + 4000, S.HOEJDE + 4000);
+        ctx.restore();
+    };
+
     /* Pytten paa bordet efter et uheld */
     S.tegnPyt = function (ctx, pyt) {
         if (!pyt || pyt.vaad < 0.01) return;
