@@ -220,10 +220,11 @@
             var nr = 0;
             var kem = f.kem, gj = f.iagttaget;
             var m = f.mStaal || 0;
-            var sid = M.syreId(kem);
             var vStart = f.vStart === null ? 0 : f.vStart;
             var vSlut = f.vSlut === null ? vStart : f.vSlut;
             var res = f.resultater.length ? f.resultater[f.resultater.length - 1] : null;
+            /* Kolben kan vaere toemt efter beregningen: syren staar i resultatet */
+            var sid = res && f.gjort.beregn ? res.syre : M.syreId(kem);
             var procent = res ? res.procent : (m > 0 ? M.jernprocent(m, vStart, vSlut) : 0);
             var t = M.mellemregning(m || 1, vStart, vSlut);
             var UNDER = S.UNDER_BURET;

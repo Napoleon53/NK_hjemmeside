@@ -49,6 +49,10 @@
         ak.classList.toggle("banker", f.skalAflaese());
         ak.classList.toggle("orange", f.skalAflaese());
 
+        NK.el("hanefart").hidden = !f.kanHurtig();
+        NK.el("fart-langsom").setAttribute("aria-pressed", f.haneFart === "hurtig" ? "false" : "true");
+        NK.el("fart-hurtig").setAttribute("aria-pressed", f.haneFart === "hurtig" ? "true" : "false");
+
         var dk = NK.el("draabe-knap");
         dk.hidden = !(f.buret.fyldt && !f.gjort.beregn);
         dk.disabled = !f.kanDraabe();
@@ -87,7 +91,7 @@
         var t = f.aktueltTrin();
         return [
             t ? t.id : "", !!f.handling, f.arbejdKilde, f.arbejdsType(), f.kanRyste(), f.kanDraabe(),
-            f.buret.fyldt, f.buret.aaben, f.g.kolbe.sted, f.mStaal, f.vStart, f.vSlut, f.kanAflaese(), f.skalAflaese(),
+            f.buret.fyldt, f.buret.aaben, f.g.kolbe.sted, f.mStaal, f.vStart, f.vSlut, f.kanAflaese(), f.skalAflaese(), f.kanHurtig(), f.haneFart,
             !!f.gjort.beregn, f.resultater.length, f.forsoegNr,
             NK.TRIN.map(function (x) { return f.trinGjort(x.id) ? 1 : 0; }).join("")
         ].join("|");
@@ -371,6 +375,7 @@
         else if (tast === "m") skiftLyd();
         else if (tast === "t") aabnTeori();
         else if (tast === "s") aabnSerie();
+        else if (tast === "f") forsoeg.saetHaneFart(forsoeg.haneFart === "hurtig" ? "langsom" : "hurtig");
         else if (tast === "n") nytForsoeg();
     }
 
@@ -415,6 +420,11 @@
         forsoeg.vedMaaling = maaling;
 
         NK.el("aflaes-knap").addEventListener("click", function () { NK.Lyd.laasOp(); forsoeg.klik("buret"); });
+        NK.el("fart-langsom").addEventListener("click", function () { forsoeg.saetHaneFart("langsom"); });
+        NK.el("fart-hurtig").addEventListener("click", function () { forsoeg.saetHaneFart("hurtig"); });
+        NK.visTilskuere = false;
+        NK.el("tilskuer-skift").checked = false;
+        NK.el("tilskuer-skift").addEventListener("change", function () { NK.visTilskuere = this.checked; });
 
         NK.el("draabe-knap").addEventListener("click", function () { NK.Lyd.laasOp(); forsoeg.draabe(); });
         NK.el("hint-knap").addEventListener("click", visHint);

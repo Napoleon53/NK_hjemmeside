@@ -265,6 +265,36 @@ main.forsoeg {
 
 .hint[hidden] { display: none; }
 
+/* Hanens fart under titreringen */
+.hanefart { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.hanefart[hidden] { display: none; }
+.hanefart .etiket { font-size: 0.74rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tekst-mat); }
+.segment { display: flex; flex: 1; border: 1px solid #4a4a58; border-radius: var(--radius-lil); overflow: hidden; }
+.seg {
+    flex: 1;
+    background-color: var(--panel-2);
+    color: var(--tekst-svag);
+    border: 0;
+    padding: 7px 8px;
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.seg + .seg { border-left: 1px solid #4a4a58; }
+.seg:hover { background-color: var(--panel-3); }
+.seg[aria-pressed="true"] { background-color: var(--blaa-mork); color: #ffffff; }
+
+/* Diskret afbryder i toplinjen */
+.skifter { position: relative; display: inline-flex; align-items: center; gap: 7px; margin-right: 6px; font-size: 0.8rem; color: var(--tekst-mat); cursor: pointer; user-select: none; }
+.skifter:hover { color: var(--tekst-svag); }
+.skifter input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.skifter-spor { position: relative; width: 28px; height: 16px; border-radius: 8px; background-color: #3a3a47; border: 1px solid #4a4a58; transition: background-color 0.15s ease; }
+.skifter-spor::after { content: ""; position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; border-radius: 50%; background-color: #9fa6af; transition: transform 0.15s ease; }
+.skifter input:checked + .skifter-spor { background-color: var(--blaa-mork); border-color: var(--blaa); }
+.skifter input:checked + .skifter-spor::after { transform: translateX(12px); background-color: #ffffff; }
+.skifter input:focus-visible + .skifter-spor { outline: 2px solid var(--gul); outline-offset: 2px; }
+
 
 /* ----- Tegneserien ----------------------------------------------------- */
 .overlay-boks.bred { max-width: 980px; }

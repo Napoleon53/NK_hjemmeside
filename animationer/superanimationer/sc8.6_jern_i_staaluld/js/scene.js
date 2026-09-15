@@ -580,7 +580,10 @@
     S.tegnAffald = function (ctx, b, tid) {
         var a = S.ANKER.baegerglas;
         var verden = S.indreVerden(S.BAEGER_INDRE, b.p, a);
-        var niveau = S.tegnVaeske(ctx, verden, b.ml * S.AFFALD_AREAL, NK.Model.FARVE.kmno4, { tid: tid });
+        /* Arealet vokser langsommere, jo mere der er: lidt kan ses, og meget
+           kan vaere der. farve: blandingen af det, der er haeldt i. */
+        var areal = 4300 * (1 - Math.exp(-b.ml / 60));
+        var niveau = S.tegnVaeske(ctx, verden, areal, b.farve || NK.Model.FARVE.kmno4, { tid: tid });
         NK.Sprites.tegnPositur(ctx, "baegerglas", b.p, a);
         var m = NK.tilVerden(b.p, a, 44, 30);
         ctx.save();
@@ -731,7 +734,8 @@
         ctx.stroke();
         ctx.save();
         ctx.translate(B.x, hy);
-        ctx.rotate(b.aaben ? Math.PI / 2 : 0);
+        /* aabning 0 til 1: hvor langt grebet er drejet (hurtig hane = 1) */
+        ctx.rotate((b.aabning === undefined ? (b.aaben ? 1 : 0) : b.aabning) * Math.PI / 2);
         ctx.fillStyle = b.aaben ? "#3fae72" : "#c9ced8";
         NK.rundtRekt(ctx, -17, -3, 34, 6, 3);
         ctx.fill();

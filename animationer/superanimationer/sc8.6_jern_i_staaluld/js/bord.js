@@ -61,7 +61,7 @@
         if (this.kanTraekke(navn)) {
             var gg = this.g[navn];
             this.holdt = { type: "traek", navn: navn, start: pt, sidst: pt, flyttet: false, dx: gg.p.x - pt.x, dy: gg.p.y - pt.y,
-                fra: { x: gg.p.x, y: gg.p.y, v: gg.p.v }, t0: this.tid };
+                fra: { x: gg.p.x, y: gg.p.y, v: gg.p.v }, t0: this.tid, sted: gg.sted };
             return true;
         }
         this.klik(navn);
@@ -82,7 +82,7 @@
                 if (Math.abs(pt.x - h.start.x) + Math.abs(pt.y - h.start.y) < 6) return;
                 h.flyttet = true;
                 gt.traekkes = true;
-                if (h.navn === "kolbe") gt.sted = "traekkes";
+                if (h.navn === "kolbe" || h.navn === "affald") gt.sted = "traekkes";
                 if (NK.Lyd) NK.Lyd.klik();
             }
             var vx = pt.x - h.sidst.x;
@@ -132,7 +132,7 @@
             this.traekMaal = null;
             gg.traekkes = false;
             if (!h.flyttet) { this.klik(h.navn); return; }
-            if (h.navn === "kolbe") gg.sted = (Math.abs(h.fra.x - S.PAA_PLADE.x) < 2 && Math.abs(h.fra.y - S.PAA_PLADE.y) < 2) ? "plade" : "hjem";
+            if (gg.sted === "traekkes") gg.sted = h.sted;
             var ok = maal ? this.slipTil(h.navn, maal) : false;
             if (!ok && !this.handling) this.koer([{ flyt: gg, til: h.fra, tid: 0.45, loeft: 25 }], "tilbage");
             this.aendret("slip");
@@ -204,7 +204,7 @@
 
     P.tegnAf = function (ctx, tid) {
         var af = this.g.affald;
-        af.niveau = S.tegnAffald(ctx, { p: af.p, ml: this.affaldMl }, tid);
+        af.niveau = S.tegnAffald(ctx, { p: af.p, ml: this.affaldMl, farve: this.affaldFarve }, tid);
     };
 
     P.tegn = function () {
@@ -279,18 +279,20 @@
         /* Titreropstillingen */
         S.tegnStativ(ctx);
         var af = g.affald;
-        if (af.sted === "flytter") oppe.push(function () { this.tegnAf(ctx, tid); });
+        if (af.sted === "flytter" || af.sted === "traekkes") oppe.push(function () { this.tegnAf(ctx, tid); });
         else this.tegnAf(ctx, tid);
         if (k.sted === "buret") this.tegnK(ctx, tid);
+        var flow = this.aktuelFlow();
         S.tegnBuret(ctx, {
             V: this.buret.V, fyldt: this.buret.fyldt, tragt: this.vStart === null, aaben: this.buret.aaben,
+            aabning: this.buret.aaben ? (flow >= M.BURET.hurtigFlow ? 1 : (flow >= M.BURET.flow ? 0.55 : 0.35)) : 0,
             fremhaev: this.markeret("buret"), fremhaevHane: this.markeret("hane")
         }, tid);
         S.tegnKlemme(ctx);
         if (this.buret.aaben) {
             ctx.save();
             ctx.strokeStyle = "rgba(120, 26, 138, 0.9)";
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = flow >= M.BURET.hurtigFlow ? 2.8 : 1.5;
             ctx.beginPath();
             ctx.moveTo(B.x, B.spids);
             ctx.lineTo(B.x, this.overflade(this.destination()));

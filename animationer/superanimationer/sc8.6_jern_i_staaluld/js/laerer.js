@@ -211,6 +211,10 @@
         ikkeNulstillet: { tekst: "Buretten stod over nulstregen. Så passer startaflæsningen ikke.", nyt: true },
         affaldTaelt: { tekst: "Efter aflæsningen tæller hver dråbe. Også i affaldet.", nyt: true },
         genfyldt:    { tekst: "Buretten er fyldt op efter aflæsningen. Nu passer tallene ikke.", nyt: true },
+        syreAffald:  { tekst: "Syren var ren. Nu er den affald." },
+        kmno4Affald: { tekst: "Titranten i affaldet. Før titreringen. Effektivt." },
+        toemt:       { tekst: "Kolben er tømt. Så er det forfra med stålulden.", nyt: true },
+        ryddetOp:    { tekst: "Ryddet op. Det sker ikke hver dag." },
         nul:         { tekst: "Næsten 0 % jern. Så er det vist ikke ståluld.", nyt: true },
         negativ:     { tekst: "Negativt jernindhold. Det har jeg ikke set før.", nyt: true },
         lavt:        { tekst: "Hvor blev resten af jernet af?", nyt: true }

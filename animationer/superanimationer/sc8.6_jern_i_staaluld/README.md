@@ -39,6 +39,14 @@ typisk er 98,5 % jern.
   den er lukket. En åben hane kan
   altid lukkes, også mens en animation eller Kemichael kører. Aflæsningen har
   sidste ciffer 0 eller 5. Fyldes en fuld buret igen, løber den over.
+* **Hanens fart.** Efter startaflæsningen vises valget Hane: Langsom eller
+  Hurtig (tasten F) i forløbskortet. Hurtig løber `BURET.hurtigFlow` mL/s, og
+  grebet drejes helt. Under nulstillingen findes valget ikke.
+* **Affaldsbægeret** kan trækkes under buretten eller stilles på bordet. Syre,
+  KMnO₄ og kolben kan hældes ud i det. Tømmes kolben før beregningen, starter
+  kolben forfra med ny ståluld; efter beregningen er det oprydning.
+* **Tilskuerioner.** Afbryderen i toplinjen viser SO₄²⁻ og Cl⁻ i zoomboblen.
+  Den er slået fra, når siden åbnes.
 * **Aflæsning.** Knappen **Aflæs** (tasten A) eller et klik på buretten aflæser
   den. Knappen blinker, når en aflæsning ventes: når der er tappet af til 0, og
   når den lyserøde farve bliver. Glemmes startaflæsningen, skriver Kemichael den

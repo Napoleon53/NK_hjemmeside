@@ -385,7 +385,8 @@
                 }
             }
             if (sc !== "jern") {
-                for (i = 0; i < this.anioner.length; i++) {
+                /* Tilskuerionerne vises kun, naar eleven har slaaet dem til */
+                for (i = 0; NK.visTilskuere && i < this.anioner.length; i++) {
                     p = this.anioner[i];
                     if (p.type === "so4") tegnSO4(ctx, p.x, p.y, p.a);
                     else ion(ctx, p.x, p.y, 7, FARVER.cl, "Cl⁻", 5.4);
@@ -470,7 +471,7 @@
             if (this.mn2.length) ud.push("mn2");
             if (this.cl2.length) ud.push("cl2");
         }
-        if (this.syre) ud.push(this.syre === "saltsyre" ? "cl" : "so4");
+        if (this.syre && NK.visTilskuere) ud.push(this.syre === "saltsyre" ? "cl" : "so4");
         return ud;
     };
 

@@ -51,7 +51,9 @@
        startaflaesningen loeber hanen langsomt (nulFlow), saa det er let
        at ramme 0. Lukkes hanen mindre end fang mL fra nulstregen, lægger
        menisken sig paa 0,00. */
-    var BURET = { kapacitet: 50, draabe: 0.05, flow: 1.0, nulFlow: 0.3, fyldMin: -1.6, fyldMax: -0.8, fang: 0.12 };
+    /* Efter startaflaesningen kan hanen stilles paa langsom (flow) eller
+       hurtig (hurtigFlow). */
+    var BURET = { kapacitet: 50, draabe: 0.05, flow: 1.0, hurtigFlow: 4.0, nulFlow: 0.3, fyldMin: -1.6, fyldMax: -0.8, fang: 0.12 };
 
     /* Graenser for de fejl, eleven kan begaa. lidtStaal og megetStaal:
        masser, som laereren kommenterer. vejebaad og kolbe: hvad der

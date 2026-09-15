@@ -192,6 +192,7 @@ function koerTest() {
     var V0 = f.buret.V;
     adv(1);
     paastand("foer startaflaesningen loeber hanen langsomt", Math.abs(f.buret.V - V0 - M.BURET.nulFlow) < 0.02, komma(f.buret.V - V0, 2) + " mL/s");
+    paastand("hurtig hane kan ikke vaelges under nulstillingen", f.saetHaneFart("hurtig") === false && f.aktuelFlow() === M.BURET.nulFlow);
     vent(function () { return f.buret.V >= -0.08; }, 20);
     f.handling = { liste: [{ tid: 5 }], i: 0, t: 0, navn: "test" };
     paastand("en aaben hane lukkes, selv om noget andet koerer", f.klik("hane") === true && !f.buret.aaben);
@@ -210,7 +211,7 @@ function koerTest() {
     paastand("lidt forbi 0: startaflaesningen tages om", f.klik("buret") === true && f.vStart === M.aflaes(f.buret.V) && f.vStart > 0.2, komma(f.vStart, 2) + " mL");
     paastand("kolben stilles under buretten", f.klik("kolbe") === true);
     adv(4);
-    paastand("kolben staar under, og affaldsbaegeret er flyttet", f.g.kolbe.sted === "buret" && f.g.affald.sted === "parkeret");
+    paastand("kolben staar under, og affaldsbaegeret er flyttet", f.g.kolbe.sted === "buret" && f.g.affald.sted === "bord");
     tegnOk("kolben under buretten");
     var aek = M.aekvivalens(f.kem.nFeTot);
     f.klik("hane");
@@ -218,6 +219,10 @@ function koerTest() {
     tegnOk("titrering med aaben hane");
     f.klik("hane");
     paastand("titreringen loeber med fuld fart", Math.abs(M.BURET.flow - 1) < 1e-9 && f.buret.V - f.vStart >= aek * 0.5);
+    paastand("efter startaflaesningen kan hanen stilles paa hurtig", f.saetHaneFart("hurtig") === true && f.aktuelFlow() === M.BURET.hurtigFlow);
+    NK.opdaterPanel();
+    paastand("valget Hane vises med Hurtig valgt", !d.getElementById("hanefart").hidden && d.getElementById("fart-hurtig").getAttribute("aria-pressed") === "true");
+    f.saetHaneFart("langsom");
     paastand("halvvejs: ingen lyserød farve", M.intensitet(f.kem) < M.TITRER.synlig && f.kem.nFe3 > 0);
     paastand("foer endepunktet kan der aflaeses, og det noteres", f.klik("buret") === true && f.vSlut !== null && f.iagttaget.ikkeLyserod);
     f.draabe(); adv(0.05);
@@ -280,6 +285,11 @@ function koerTest() {
     oploest("svovlsyre");
     paastand("efter opløsning er alle Fe²⁺", f.mikro.taelFe().fe2 === 20, JSON.stringify(f.mikro.taelFe()));
     tegnOk("zoomboblen i stinkskabet");
+    paastand("tilskuerioner er skjult som standard", f.mikro.typer().indexOf("so4") < 0 && !d.getElementById("tilskuer-skift").checked);
+    d.getElementById("tilskuer-skift").click();
+    paastand("afbryderen viser tilskuerionerne", NK.visTilskuere && f.mikro.typer().indexOf("so4") >= 0);
+    tegnOk("zoomboblen med tilskuerioner");
+    d.getElementById("tilskuer-skift").click();
 
     overskrift("6. Fejlkilder og saltsyre");
     nyt();
@@ -347,7 +357,7 @@ function koerTest() {
     paastand("genfyldningen er noteret", f.iagttaget.genfyldt);
     roligt();
     f.g.kolbe.sted = "hjem";
-    f.g.affald.sted = "parkeret";
+    f.g.affald.sted = "bord";
     paastand("hanen aabnes uden noget under", f.klik("hane") === true);
     adv(1);
     paastand("spild paa flisen: plet, og laereren kommer", f.iagttaget.spild && !!f.plet && f.laerer.scene && f.laerer.scene.navn === "spild");
@@ -362,6 +372,36 @@ function koerTest() {
     var antalFejl = ["lidtStaal", "toSyrer", "kmno4Kolbe", "ikkeNulstillet", "genfyldt", "spild"].filter(function (k) { return f.iagttaget[k]; }).length;
     paastand("tegneserien har en roed rude for hver fejl", sr2.fejl >= antalFejl && sr2.ruder === 8 + sr2.fejl, sr2.fejl + " fejlruder");
     tegnOk("efter mange fejl");
+    roligt();
+
+    overskrift("6c. Affaldsbaegeret");
+    nyt();
+    var af = f.g.affald;
+    var st0 = { x: af.p.x - 32, y: af.p.y + 40 };
+    f.ned(st0);
+    paastand("affaldsbaegeret kan tages", !!f.holdt && f.holdt.type === "traek" && f.holdt.navn === "affald");
+    f.flyt({ x: 300, y: 440 }, 1000);
+    f.flyt({ x: 320, y: 450 }, 1020);
+    f.op();
+    adv(1);
+    paastand("affaldsbaegeret stilles paa bordet", af.sted === "bord" && f.destination() === "bord", komma(af.p.x, 0));
+    paastand("syre kan haeldes i affaldet", f.slipTil("svovlsyre", "affald") === true);
+    adv(3.5);
+    paastand("affaldet indeholder syren", f.affaldMl > 19 && !!f.affaldFarve, komma(f.affaldMl, 1) + " mL");
+    tegnOk("affald paa bordet");
+    roligt();
+    paastand("affaldsbaegeret stilles under buretten igen", f.slipTil("affald", "buret") === true);
+    adv(1);
+    paastand("det staar under buretten", af.sted === "buret" && f.destination() === "affald");
+    afvej();
+    f.slipTil("svovlsyre", "kolbe"); adv(4.5);
+    roligt();
+    var mlFoer = f.affaldMl;
+    paastand("kolben kan toemmes i affaldet", f.slipTil("kolbe", "affald") === true);
+    adv(5);
+    paastand("kolben er tom og tilbage, og stålulden skal afvejes igen", f.kem.ml === 0 && f.g.kolbe.sted === "hjem" && !f.gjort.afvej && f.mStaal === null && f.affaldMl > mlFoer + 40, komma(f.affaldMl, 1) + " mL");
+    paastand("vejebaaden staar paa vaegten igen", Math.abs(f.g.vejebaad.p.x - f.g.vejebaad.hjem.x) < 1);
+    tegnOk("affald med indhold");
     roligt();
 
     overskrift("7. Paaskeaeg");

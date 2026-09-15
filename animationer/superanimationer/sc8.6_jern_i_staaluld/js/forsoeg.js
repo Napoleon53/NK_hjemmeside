@@ -49,7 +49,7 @@
         { id: "under", tekst: "Stil kolben under buretten", mark: "kolbe",
           hint: "Træk kolben hen under buretten." },
         { id: "titrer", tekst: "Titrer til en svag, blivende lyserød farve", mark: "hane",
-          hint: "Klik på hanen for at åbne og lukke den. Tilsæt de sidste dråber én ad gangen med knappen Dråbe, og ryst kolben imellem ved at trække i den." },
+          hint: "Klik på hanen for at åbne og lukke den. Vælg Hane: Hurtig i starten. Tilsæt de sidste dråber én ad gangen med knappen Dråbe, og ryst kolben imellem ved at trække i den." },
         { id: "slut", tekst: "Aflæs V(slut)", mark: "buret",
           hint: "Luk hanen, når den lyserøde farve bliver, og klik på knappen Aflæs." },
         { id: "beregn", tekst: "Beregn jernindholdet", mark: null,
@@ -116,7 +116,9 @@
         this.pladeTemp = 22;
         this.pladeTaendt = false;
         this.buret = { V: 50, fyldt: false, aaben: false };
+        this.haneFart = "langsom";
         this.affaldMl = 0;
+        this.affaldFarve = null;
         this.laagT = { svovlsyre: 0, saltsyre: 0, kmno4: 0 };
 
         this.g = {
@@ -304,7 +306,7 @@
             case "hane": return this.klikHane();
             case "buret": return this.klikBuret();
             case "affald":
-                this.besked("Affaldsbægeret opsamler det, der tappes af buretten.");
+                this.besked("Træk affaldsbægeret derhen, hvor det skal stå, eller hæld kemikalier i det.");
                 return false;
             case "varmeplade":
                 if (this.g.kolbe.sted === "hjem" && this.kem.syre && this.kem.opl < M.OPLOES.faerdig) return this.tilPlade();
@@ -414,6 +416,7 @@
             case "buret": return { x: B.x, y: 430, rx: 62, ry: 85 };
             case "buretTop": return { x: B.x, y: 130, rx: 62, ry: 90 };
             case "vaegt": return { x: S.VAEGT.midt, y: S.VAEGT.y - 40, rx: 70, ry: 70 };
+            case "affald": return { x: this.g.affald.p.x - 32, y: this.g.affald.p.y + 40, rx: 58, ry: 85 };
         }
         return null;
     };
@@ -425,6 +428,7 @@
             case "plade": return { x: S.PLADE.x, y: S.PLADE.y - 128, b: 90, h: 162 };
             case "buret": return { x: B.x - 50, y: B.spids, b: 100, h: S.FLISE.y - B.spids };
             case "buretTop": return { x: B.x - 20, y: 88, b: 40, h: 60 };
+            case "affald": return S.rekt("baegerglas", this.g.affald.p, this.g.affald.anker, 4);
         }
         return null;
     };
@@ -432,15 +436,16 @@
     /* Syreflaskerne kan ogsaa slippes over vaegten: et uheld (syrePaaVaegt) */
     var MULIGE = {
         vejebaad: ["kolbe"],
-        svovlsyre: ["kolbe", "vaegt"],
-        saltsyre: ["kolbe", "vaegt"],
-        kmno4: ["buretTop", "kolbe"],
-        kolbe: ["plade", "buret"]
+        svovlsyre: ["kolbe", "vaegt", "affald"],
+        saltsyre: ["kolbe", "vaegt", "affald"],
+        kmno4: ["buretTop", "kolbe", "affald"],
+        kolbe: ["plade", "buret", "affald"],
+        affald: ["buret", "bord"]
     };
 
     P.kanTraekke = function (navn) {
         if (this.handling || this.arbejdKilde || (this.laererOptaget && this.laererOptaget())) return false;
-        var baad = this.g.vejebaad;
+        var baad = this.g.vejebaad, k = this.g.kolbe;
         switch (navn) {
             case "vejebaad":
                 return !this.gjort.afvej && this.stykker.length > 0 && this.iFlugt === 0 &&
@@ -448,15 +453,27 @@
             case "svovlsyre": case "saltsyre": case "kmno4":
                 return true;
             case "kolbe":
-                return this.g.kolbe.sted === "hjem" || this.g.kolbe.sted === "plade";
+                /* Under buretten er et traek en rystning, saa laenge der titreres */
+                return k.sted === "hjem" || k.sted === "plade" || (k.sted === "buret" && !this.kanRyste());
+            case "affald":
+                return this.g.affald.sted === "buret" || this.g.affald.sted === "bord";
         }
         return false;
     };
 
     P.findMaal = function (navn, pt) {
         var liste = MULIGE[navn] || [], bedst = null, afst = Infinity;
+        var fra = this.holdt ? this.holdt.sted : null;
+        /* Affaldsbaegeret: under buretten eller et vilkaarligt sted paa bordet */
+        if (navn === "affald") {
+            var zb = this.maalZone("buret");
+            var bx = (pt.x - zb.x) / zb.rx, by = (pt.y - zb.y) / zb.ry;
+            if (bx * bx + by * by <= 1) return "buret";
+            return pt.y < S.BORD + 40 ? "bord" : null;
+        }
         for (var i = 0; i < liste.length; i++) {
-            if (navn === "kolbe" && liste[i] === "plade" && this.g.kolbe.sted === "plade") continue;
+            if (navn === "kolbe" && liste[i] === fra) continue;
+            if (navn === "kolbe" && liste[i] === "affald" && this.g.affald.sted === "buret") continue;
             var z = this.maalZone(liste[i]);
             var dx = (pt.x - z.x) / z.rx, dy = (pt.y - z.y) / z.ry;
             var d = dx * dx + dy * dy;
@@ -470,14 +487,21 @@
             case "vejebaad": return maal === "kolbe" ? this.klikVejebaad(true) : false;
             case "svovlsyre": case "saltsyre":
                 if (maal === "vaegt") return this.syrePaaVaegt(navn);
+                if (maal === "affald") return this.haeldIAffald(navn);
                 return maal === "kolbe" ? this.slipSyre(navn) : false;
             case "kmno4":
                 if (maal === "buretTop") return this.fyldBuret();
                 if (maal === "kolbe") return this.kmno4IKolbe();
+                if (maal === "affald") return this.haeldIAffald(navn);
                 return false;
             case "kolbe":
                 if (maal === "plade") return this.tilPlade();
                 if (maal === "buret") return this.tilBuret();
+                if (maal === "affald") return this.toemKolbe();
+                return false;
+            case "affald":
+                if (maal === "buret") return this.affaldTilBuret();
+                if (maal === "bord") return this.affaldPaaBord();
                 return false;
         }
         return false;
@@ -517,6 +541,116 @@
             { tid: 0.3, hver: function (t) { mig.laagT.kmno4 = 1 - t; } }
         ], "kmno4Kolbe");
         return true;
+    };
+
+    /* ----- Affaldsbaegeret ------------------------------------------------ */
+    P.tilAffald = function (ml, farve) {
+        if (ml <= 0) return;
+        var i = this.affaldMl + ml;
+        this.affaldFarve = this.affaldFarve ? NK.blandFarve(this.affaldFarve, farve, ml / i) : farve;
+        this.affaldMl = i;
+    };
+
+    P.affaldTilBuret = function () {
+        var af = this.g.affald;
+        if (this.handling) return false;
+        if (this.g.kolbe.sted === "buret") { this.besked("Kolben står under buretten."); return false; }
+        af.sted = "flytter";
+        this.koer([
+            { flyt: af, til: S.HJEM.affald, tid: 0.5, loeft: 20 },
+            { kald: function () { af.sted = "buret"; if (NK.Lyd) NK.Lyd.klirr(); this.aendret("affald"); } }
+        ], "affald");
+        return true;
+    };
+
+    P.affaldPaaBord = function () {
+        var af = this.g.affald;
+        if (this.handling) return false;
+        var til = S.staar("baegerglas", NK.klamp(af.p.x - 32, 50, S.BREDDE - 40));
+        af.sted = "flytter";
+        this.koer([
+            { flyt: af, til: til, tid: 0.35, loeft: 0 },
+            { kald: function () { af.sted = "bord"; if (NK.Lyd) NK.Lyd.klirr(); this.aendret("affald"); } }
+        ], "affald");
+        return true;
+    };
+
+    /* Syre eller KMnO₄ haeldes i affaldsbaegeret, hvor det staar */
+    P.haeldIAffald = function (navn) {
+        var fl = this.g[navn], af = this.g.affald;
+        var mig = this;
+        var ml = navn === "kmno4" ? 10 : 20, tilsat = 0;
+        var farve = navn === "kmno4" ? M.FARVE.kmno4 : M.FARVE.syre;
+        if (this.handling) return false;
+        this.koer([
+            { tid: 0.3, hver: function (t) { mig.laagT[navn] = t; } },
+            { flyt: fl, til: function () { return { x: af.p.x - 58, y: af.p.y - 34, v: 2.05 }; }, tid: 0.9, loeft: 40 },
+            { kald: function () { if (NK.Lyd) NK.Lyd.haeld(1.0); } },
+            { tid: 1.0, hver: function (t) {
+                var nu = ml * NK.blod(t);
+                this.tilAffald(nu - tilsat, farve);
+                tilsat = nu;
+                var spids = NK.tilVerden(fl.p, fl.anker, 23, 4);
+                this.straale = { fra: spids, til: { x: af.p.x - 32, y: af.niveau ? af.niveau : af.p.y + 80 }, farve: farve, bredde: 2.6 };
+            } },
+            { kald: function () {
+                this.straale = null;
+                if (!this.gjort.beregn && this.laererBemaerk) this.laererBemaerk(navn === "kmno4" ? "kmno4Affald" : "syreAffald");
+                this.aendret("affald");
+            } },
+            hjemTil(fl, 0.9, 40),
+            { tid: 0.3, hver: function (t) { mig.laagT[navn] = 1 - t; } }
+        ], "affaldHaeld");
+        return true;
+    };
+
+    /* Kolben toemmes i affaldsbaegeret og stilles tilbage i stinkskabet */
+    P.toemKolbe = function () {
+        var k = this.g.kolbe, af = this.g.affald;
+        if (this.handling) return false;
+        var ml0 = this.kem.ml;
+        var farve = M.kolbeFarve(this.kem) || M.FARVE.syre;
+        if (k.sted === "plade") this.pladeTaendt = false;
+        k.sted = "flytter";
+        this.koer([
+            { flyt: k, til: function () { return { x: af.p.x - 62, y: af.p.y - 48, v: 2.1 }; }, tid: 0.9, loeft: 40 },
+            { kald: function () { if (NK.Lyd && ml0 > 0) NK.Lyd.haeld(1.2); } },
+            { tid: 1.2, hver: function (t) {
+                var rest = ml0 * (1 - NK.blod(t));
+                if (this.kem.ml > rest) { this.tilAffald(this.kem.ml - rest, farve); this.kem.ml = rest; }
+                if (ml0 > 0 && t < 0.98) this.straale = { fra: NK.tilVerden(k.p, k.anker, 48, 2.5), til: { x: af.p.x - 32, y: af.niveau ? af.niveau : af.p.y + 80 }, farve: farve, bredde: 3 };
+            } },
+            { kald: function () { this.straale = null; this.kolbeToemt(); } },
+            { flyt: k, til: S.HJEM.kolbe, tid: 1.0, loeft: 50 },
+            { kald: function () { k.sted = "hjem"; this.aendret("toemt"); } }
+        ], "toem");
+        return true;
+    };
+
+    /* Kolben er tom. Foer beregningen starter kolben forfra med ny ståluld,
+       mens buretten og startaflaesningen bliver. Efter beregningen er det
+       oprydning, og forsoegets tal bliver staaende til tegneserien. */
+    P.kolbeToemt = function () {
+        var efter = !!this.gjort.beregn;
+        this.kem = M.nyKemi();
+        this.kolbeBobler = [];
+        this.lyserodTid = 0;
+        this.mikro = new NK.Mikro();
+        if (!efter) {
+            this.gjort.afvej = false;
+            this.gjort.titrer = false;
+            this.mStaal = null;
+            this.vSlut = null;
+            this.aflaestI = 0;
+            this.kolbeEfterStart = 0;
+            this.kmno4Direkte = 0;
+            this.aubergine = false;
+            ["lidtStaal", "megetStaal", "toSyrer", "kmno4Kolbe", "ingenSyre", "uoploest", "ikkeLyserod", "lilla", "falmer", "klor", "skvulp"].forEach(function (n) { delete this.iagttaget[n]; }, this);
+            this.stykker = [];
+            this.g.vejebaad.p = kopi(this.g.vejebaad.hjem);
+            this.maal("staal", null);
+        }
+        if (this.laererBemaerk) this.laererBemaerk(efter ? "ryddetOp" : "toemt");
     };
 
     /* Uheld: syren haeldes ud over vaegten i stedet for i kolben. Den
@@ -620,11 +754,16 @@
         if (this.handling) return false;
         if (this.gjort.afvej && this.kem.syre && this.kem.opl < M.OPLOES.faerdig) this.iagttag("uoploest", true);
         var fra = k.sted;
+        /* Staar affaldsbaegeret under buretten, flyttes det til side */
+        var flytAffald = af.sted === "buret" ? [
+            { kald: function () { af.sted = "flytter"; } },
+            { flyt: af, til: S.AFFALD_PARKERET, tid: 0.7, loeft: 24 },
+            { kald: function () { af.sted = "bord"; } }
+        ] : [];
         k.sted = "flytter";
         this.koer([
-            { kald: function () { this.pladeTaendt = false; af.sted = "flytter"; } },
-            { flyt: af, til: S.AFFALD_PARKERET, tid: 0.7, loeft: 24 },
-            { kald: function () { af.sted = "parkeret"; } },
+            { kald: function () { this.pladeTaendt = false; } }
+        ].concat(flytAffald, [
             { flyt: k, til: { x: S.UNDER_BURET.x - 76, y: S.UNDER_BURET.y, v: 0 }, tid: 1.1, loeft: fra === "plade" ? 90 : 70 },
             { flyt: k, til: S.UNDER_BURET, tid: 0.55, loeft: 0 },
             { kald: function () {
@@ -633,7 +772,7 @@
                 if (NK.Lyd) NK.Lyd.klirr();
                 this.aendret("under");
             } }
-        ], "under");
+        ]), "under");
         return true;
     };
 
@@ -743,6 +882,26 @@
         if (!this.kanAflaese() || this.buret.aaben) return false;
         if (this.vStart === null) return true;
         return !!this.gjort.titrer && this.vSlut === null;
+    };
+
+    /* Hanens fart: altid langsom under nulstillingen. Efter
+       startaflaesningen kan den stilles paa langsom eller hurtig. */
+    P.kanHurtig = function () {
+        return this.vStart !== null && !this.gjort.beregn;
+    };
+
+    P.aktuelFlow = function () {
+        if (this.vStart === null) return M.BURET.nulFlow;
+        return this.haneFart === "hurtig" ? M.BURET.hurtigFlow : M.BURET.flow;
+    };
+
+    P.saetHaneFart = function (fart) {
+        if (fart === "hurtig" && !this.kanHurtig()) return false;
+        if (this.haneFart === fart) return false;
+        this.haneFart = fart;
+        if (NK.Lyd) NK.Lyd.klik();
+        this.aendret("hanefart");
+        return true;
     };
 
     /* Aflaesningen. Saa laenge der ikke er titreret i kolben, er det
@@ -945,7 +1104,7 @@
     P.opdaterBuret = function (dt) {
         var b = this.buret;
         if (b.aaben) {
-            var flow = this.vStart === null ? M.BURET.nulFlow : M.BURET.flow;
+            var flow = this.aktuelFlow();
             var dv = Math.min(flow * dt, 50 - b.V);
             b.V += dv;
             this.landet(this.destination(), dv);
@@ -999,7 +1158,7 @@
             this.kolbeEfterStart += ml;
             if (!this.kem.syre && this.kolbeEfterStart > 1) this.iagttag("ingenSyre", true);
         } else if (til === "affald") {
-            this.affaldMl += ml;
+            this.tilAffald(ml, M.FARVE.kmno4);
             if (this.vStart !== null && this.vSlut === null) this.affaldEfterStart += ml;
         } else {
             /* Uheld: intet under buretten. KMnO₄ loeber ud paa flisen. */

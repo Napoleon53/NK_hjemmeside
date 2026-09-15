@@ -12,6 +12,11 @@
     <h1><span class="ikon">⚗</span> Jern i ståluld <span class="undertitel">Redoxtitrering med permanganat</span></h1>
 
     <div class="top-hoejre">
+        <label class="skifter" title="Vis også de ioner i zoomboblen, der ikke reagerer">
+            <input type="checkbox" id="tilskuer-skift">
+            <span class="skifter-spor" aria-hidden="true"></span>
+            <span>Tilskuerioner</span>
+        </label>
         <button class="knap topknap" id="nytknap" type="button" title="Start et nyt forsøg (N)">Nyt forsøg</button>
         <button class="knap topknap" id="introknap" type="button" title="Hvad forsøget handler om">Om forsøget</button>
         <button class="knap topknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
@@ -36,6 +41,13 @@
         <div class="kort fremhaev" id="forloeb-kort">
             <h2><span>Forløb</span> <span class="taeller" id="forloeb-taeller"></span></h2>
             <ol class="trinliste" id="trin-liste"></ol>
+            <div class="hanefart" id="hanefart" hidden>
+                <span class="etiket">Hane</span>
+                <div class="segment" role="group" aria-label="Hanens fart">
+                    <button class="seg" id="fart-langsom" type="button" aria-pressed="true">Langsom</button>
+                    <button class="seg" id="fart-hurtig" type="button" aria-pressed="false" title="Hurtig hane (F)">Hurtig</button>
+                </div>
+            </div>
             <div class="knaprad">
                 <button class="knap" id="aflaes-knap" type="button" title="Aflæs buretten (A)" hidden><span>Aflæs</span><span class="tegn">✎</span></button>
                 <button class="knap" id="draabe-knap" type="button" title="Én dråbe (D)" hidden><span>Dråbe</span><span class="tegn">💧</span></button>
