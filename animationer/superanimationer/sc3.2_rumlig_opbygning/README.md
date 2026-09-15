@@ -1,4 +1,10 @@
-# sc3.2: Molekylers rumlige opbygning
+﻿# sc3.2: Molekylers rumlige opbygning
+
+**Status: ikke aktiv.** For mange bugs til at være den viste 3.2 lige nu.
+`samling_c3.html` og `samling_NV.html` peger igen på den gamle
+`animationer/kemi-c-filer/c3.2_rumlig_opbygning.html`. Mappen her ligger
+fortsat blandt superanimationerne, men skal ikke rettes eller genaktiveres,
+før der er overskud til det.
 
 En superanimation: i modsætning til de gamle animationer, som er én HTML-fil,
 ligger den i sin egen mappe med adskilt CSS, JavaScript og sprites.
@@ -6,10 +12,10 @@ ligger den i sin egen mappe med adskilt CSS, JavaScript og sprites.
 Åbn **`index.html`**. Mappen er selvstændig. Den bruger hverken `fetch` eller
 moduler og virker derfor også, når den åbnes direkte fra harddisken.
 
-Den afløser `animationer/kemi-c-filer/c3.2_rumlig_opbygning.html`, som nu
-ligger i `animationer/kemi-c-filer/arkiv/c3.2_rumlig_opbygning_oldversion.html`.
-Knapperne i `samling_c3.html` og `samling_NV.html` peger direkte på denne
-mappes `index.html`.
+Den skulle afløse `animationer/kemi-c-filer/c3.2_rumlig_opbygning.html`, som
+ligger arkiveret i
+`animationer/kemi-c-filer/arkiv/c3.2_rumlig_opbygning_oldversion.html` og nu
+også er kopieret tilbage som den aktive fil.
 
 ## Hvad viser den
 
