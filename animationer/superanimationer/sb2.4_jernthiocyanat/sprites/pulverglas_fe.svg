@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="76" height="104" viewBox="0 0 38 52">
+  <!-- Aabent pulverglas med jern(III)nitrat, fast stof (svagt violette
+       krystaller). Aabningen er (19, 4). -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.45"/>
+      <stop offset="0.25" stop-color="#d4ebfa" stop-opacity="0.12"/>
+      <stop offset="0.8" stop-color="#d4ebfa" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.4"/>
+    </linearGradient>
+  </defs>
+  <path d="M4 34 Q11 30 19 32 Q27 29 34 33 L34 46 Q34 49 31 49 L7 49 Q4 49 4 46 Z" fill="#d6c3e6"/>
+  <path d="M8 36 l2 -1 M14 34 l2 1 M22 34 l1.5 -1 M28 35 l2 1 M11 40 l2 -1 M25 41 l2 1" stroke="#a992c2" stroke-width="0.8"/>
+  <path d="M10 2 L28 2 L28 9 Q36 10 36 17 L36 47 Q36 51 32 51 L6 51 Q2 51 2 47 L2 17 Q2 10 10 9 Z" fill="url(#glas)" stroke="#dcecf8" stroke-opacity="0.85" stroke-width="1.2"/>
+  <rect x="8.5" y="0.8" width="21" height="3.4" rx="1.2" fill="#dcecf8" fill-opacity="0.3" stroke="#e6f2fb" stroke-opacity="0.9" stroke-width="0.8"/>
+  <rect x="5" y="14" width="28" height="14" rx="1.5" fill="#ffffff" stroke="#9aa6b3" stroke-width="0.6"/>
+  <rect x="5" y="14" width="28" height="3.5" rx="1.5" fill="#b8672a"/>
+  <text x="19" y="25.2" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="5.4" font-weight="700" fill="#1f2328">Fe(NO<tspan font-size="3.8" dy="1.2">3</tspan><tspan dy="-1.2">)</tspan><tspan font-size="3.8" dy="1.2">3</tspan></text>
+</svg>

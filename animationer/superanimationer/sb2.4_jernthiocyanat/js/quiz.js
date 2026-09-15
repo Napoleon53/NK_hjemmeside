@@ -1,9 +1,9 @@
 /* =====================================================================
    quiz.js - quizkortet i panelet
 
-   Kortet er laast, indtil glassene er sammenlignet med referencen.
-   Svarene blandes hver gang. Der er ét forsoeg pr. spoergsmaal, og
-   begrundelsen vises bagefter, ogsaa naar svaret er rigtigt.
+   Kortet er laast, indtil der er taget billede af glas 1 til 7. Svarene
+   blandes hver gang. Der er ét forsoeg pr. spoergsmaal, og begrundelsen
+   vises bagefter, ogsaa naar svaret er rigtigt.
    ===================================================================== */
 (function () {
     "use strict";
@@ -12,24 +12,13 @@
 
     var SPOERGSMAAL = [
         {
-            sp: "Hvilket stof giver opløsningen den røde farve?",
-            valg: ["FeSCN²⁺", "Fe³⁺", "SCN⁻", "K⁺"],
+            sp: "Hvilket stof giver stamopløsningen den rødbrune farve?",
+            valg: ["FeSCN²⁺", "Fe³⁺", "SCN⁻", "NO₃⁻"],
             rigtig: 0,
-            forklaring: "Komplekset FeSCN²⁺ er rødt. Fe³⁺ er svagt gult, og SCN⁻ og K⁺ er farveløse. Jo mere FeSCN²⁺, jo mørkere farve."
+            forklaring: "Komplekset FeSCN²⁺ er rødt. Fe³⁺ er svagt gult, og SCN⁻ og NO₃⁻ er farveløse. Jo mere FeSCN²⁺, jo mørkere farve."
         },
         {
-            sp: "Hvorfor skal ét glas stå urørt?",
-            valg: [
-                "Det er referencen, som de andre glas sammenlignes med",
-                "Det skal bruges, hvis et andet glas bliver spildt",
-                "Ligevægten skal have tid til at indstille sig",
-                "Det viser, hvor meget vand der fordamper"
-            ],
-            rigtig: 0,
-            forklaring: "Et glas kan kun kaldes mørkere eller lysere i forhold til noget. Referencen er magen til de andre glas, bortset fra indgrebet."
-        },
-        {
-            sp: "Der dryppes Fe(NO₃)₃ i et glas. Hvad sker der?",
+            sp: "I glas 1 tilsættes fast Fe(NO₃)₃. Hvad sker der?",
             valg: [
                 "Ligevægten forskydes mod højre, og farven bliver mørkere",
                 "Ligevægten forskydes mod venstre, og farven bliver lysere",
@@ -37,22 +26,38 @@
                 "K bliver større, og farven bliver mørkere"
             ],
             rigtig: 0,
-            forklaring: "Noget af det tilsatte Fe³⁺ reagerer med SCN⁻, så der dannes mere FeSCN²⁺. K er uændret, fordi temperaturen er den samme."
+            forklaring: "Mere Fe³⁺ gør Y mindre end K. Ligevægten forskydes mod højre, indtil Y igen er lig med K, og der dannes mere FeSCN²⁺. K er uændret."
         },
         {
-            sp: "Der er tilsat KSCN, og en ny ligevægt har indstillet sig. Hvad er der sket med koncentrationen af frie Fe³⁺-ioner?",
+            sp: "Hvorfor bliver glas 2 lysere, når der tilsættes ascorbinsyre?",
+            valg: [
+                "Ascorbinsyre reducerer Fe³⁺ til Fe²⁺, så ligevægten forskydes mod venstre",
+                "Ascorbinsyre fortynder opløsningen",
+                "Ascorbinsyre fælder SCN⁻ som et bundfald",
+                "Ascorbinsyre gør opløsningen varmere"
+            ],
+            rigtig: 0,
+            forklaring: "2 Fe³⁺ + C₆H₈O₆ → 2 Fe²⁺ + C₆H₆O₆ + 2 H⁺. Fe²⁺ indgår ikke i ligevægten. Når c(Fe³⁺) falder, forskydes ligevægten mod venstre, og FeSCN²⁺ bliver brugt op."
+        },
+        {
+            sp: "I glas 3 er der tilsat KSCN, og en ny ligevægt har indstillet sig. Hvad er der sket med koncentrationen af frie Fe³⁺-ioner?",
             valg: ["Den er faldet", "Den er steget", "Den er uændret", "Den er blevet nul"],
             rigtig: 0,
             forklaring: "Mere SCN⁻ forskyder ligevægten mod højre. Noget af det frie Fe³⁺ bindes i FeSCN²⁺, så c(Fe³⁺) falder."
         },
         {
-            sp: "Hvad er det hvide bundfald, der dannes med AgNO₃?",
-            valg: ["AgSCN", "AgNO₃", "Fe(SCN)₃", "FeSCN²⁺"],
+            sp: "Hvad viser forundersøgelsen med KSCN og AgNO₃ i glas 8?",
+            valg: [
+                "At Ag⁺ og SCN⁻ danner et hvidt bundfald",
+                "At Ag⁺ og Fe³⁺ danner et bundfald",
+                "At KSCN-opløsning er rød",
+                "At AgNO₃ gør opløsningen varm"
+            ],
             rigtig: 0,
-            forklaring: "Ag⁺ og SCN⁻ danner det tungtopløselige salt AgSCN: Ag⁺ + SCN⁻ → AgSCN(s)."
+            forklaring: "I glas 8 er der ingen jernioner. Det hvide bundfald må derfor være AgSCN: Ag⁺ + SCN⁻ → AgSCN(s). Så ved man, hvad Ag⁺ gør ved SCN⁻ i glas 4."
         },
         {
-            sp: "Hvorfor bliver glasset med AgNO₃ lysere?",
+            sp: "Hvorfor bliver glas 4 lysere, når der dryppes AgNO₃ i?",
             valg: [
                 "Ag⁺ fjerner SCN⁻, og ligevægten forskydes mod venstre",
                 "Ag⁺ reagerer med Fe³⁺, så der dannes mere FeSCN²⁺",
@@ -60,10 +65,10 @@
                 "AgNO₃ fortynder opløsningen"
             ],
             rigtig: 0,
-            forklaring: "Når SCN⁻ fældes, falder c(SCN⁻). Ligevægten forskydes mod venstre, og FeSCN²⁺ bliver brugt op."
+            forklaring: "Når SCN⁻ fældes, falder c(SCN⁻), og Y bliver større end K. Ligevægten forskydes mod venstre, og FeSCN²⁺ bliver brugt op."
         },
         {
-            sp: "Glasset i det varme vandbad bliver lysere. Hvad viser det om reaktionen Fe³⁺ + SCN⁻ → FeSCN²⁺?",
+            sp: "Glas 5 i det varme vandbad bliver lysere. Hvad viser det om reaktionen Fe³⁺ + SCN⁻ → FeSCN²⁺?",
             valg: [
                 "Den er exoterm",
                 "Den er endoterm",
@@ -74,27 +79,32 @@
             forklaring: "Ved opvarmning forskydes en ligevægt i den endoterme retning. Farven bliver lysere, så ligevægten forskydes mod venstre. Reaktionen mod højre er derfor exoterm."
         },
         {
-            sp: "Hvad sker der med K, når glasset opvarmes?",
-            valg: ["K bliver mindre", "K bliver større", "K er uændret", "K bliver negativ"],
+            sp: "Hvad sker der med K, når glas 6 står i isbadet?",
+            valg: ["K bliver større", "K bliver mindre", "K er uændret", "K bliver nul"],
             rigtig: 0,
-            forklaring: "K afhænger kun af temperaturen. For en exoterm reaktion bliver K mindre, når temperaturen stiger."
+            forklaring: "K afhænger kun af temperaturen. Reaktionen mod højre er exoterm, så K bliver større, når temperaturen falder. Y er nu mindre end K, og ligevægten forskydes mod højre."
         },
         {
-            sp: "Glasset fra vandbadet stilles tilbage i stativet og køler af. Hvad sker der?",
-            valg: ["Farven bliver mørkere igen", "Farven forbliver lys", "Der dannes bundfald", "Farven bliver gul"],
-            rigtig: 0,
-            forklaring: "Ligevægten indstiller sig efter temperaturen. Når glasset køler af, bliver K større igen, og der dannes mere FeSCN²⁺."
-        },
-        {
-            sp: "Hvorfor kigger man ned gennem glassene mod hvidt papir?",
+            sp: "Hvorfor tilsættes Fe(NO₃)₃ og KSCN som fast stof i glas 1 og 3?",
             valg: [
-                "Lyset går gennem mere væske, så forskelle i farven ses tydeligere",
-                "Det hvide papir reagerer med opløsningen",
-                "Så kan bundfaldet ikke ses",
-                "Farven findes kun, når glasset ses ovenfra"
+                "En opløsning ville også fortynde glasset, så der ikke er variabelkontrol",
+                "Fast stof reagerer hurtigere end opløste ioner",
+                "Fast stof giver altid en mørkere farve",
+                "En opløsning ville fælde jernet"
             ],
             rigtig: 0,
-            forklaring: "Set ovenfra går lyset gennem hele væskesøjlen. Jo længere lysvej, jo kraftigere farve, og små forskelle bliver tydelige."
+            forklaring: "Med fast stof ændres kun koncentrationen af det tilsatte stof. En opløsning ville samtidig fortynde, og fortynding er selv et indgreb, der forskyder ligevægten."
+        },
+        {
+            sp: "Ligevægtsblandingen fortyndes til dobbelt volumen og ses ovenfra. Hvad sker der?",
+            valg: [
+                "Den bliver lysere, fordi Y bliver større end K, og ligevægten forskydes mod venstre",
+                "Den ser ens ud, fordi antallet af farvede partikler er det samme",
+                "Den bliver mørkere, fordi Y bliver mindre end K",
+                "Den bliver lysere, fordi vandet ødelægger FeSCN²⁺"
+            ],
+            rigtig: 0,
+            forklaring: "Når alle koncentrationer halveres, fordobles Y. Y er større end K, så ligevægten forskydes mod venstre, og der bliver færre FeSCN²⁺. Frugtfarve ser derimod ens ud ovenfra, fordi antallet af farvestofmolekyler er det samme."
         }
     ];
 
@@ -194,11 +204,11 @@
 
         if (this.tilstand === "laast") {
             NK.saetTekst("quiz-taeller", "");
-            tekst.textContent = "Låses op, når glassene er sammenlignet med referencen.";
+            tekst.textContent = "Låses op, når der er taget billede af glas 1 til 7.";
             knap.hidden = true;
         } else if (this.tilstand === "klar") {
             NK.saetTekst("quiz-taeller", n + " spørgsmål");
-            tekst.textContent = "Glassene er sammenlignet.";
+            tekst.textContent = "Billedet af glassene er taget.";
             NK.saetTekst("quiz-knap-tekst", "Start quiz");
             knap.hidden = false;
         } else if (this.tilstand === "sp") {

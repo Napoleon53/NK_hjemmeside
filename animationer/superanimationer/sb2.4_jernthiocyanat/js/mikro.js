@@ -1,14 +1,15 @@
 /* =====================================================================
    mikro.js - partikelniveauet i zoomboblen
 
-   Boblen viser den valgte beholder (baegerglasset eller et reagensglas)
-   i en cirkel med radius 100 enheder. Hvor mange partikler der skal
-   vaere af hver slags, kommer fra oploesningen i model.js (mikroMaal).
-   Boblen afstemmer sig selv mod de tal, én haendelse ad gangen:
+   Boblen viser den valgte beholder i en cirkel med radius 100 enheder.
+   Hvor mange partikler der skal vaere af hver slags, kommer fra
+   oploesningen i model.js (mikroMaal). Boblen afstemmer sig selv mod de
+   tal, én haendelse ad gangen:
 
      Fe3+ og SCN- finder hinanden og danner FeSCN2+      (bind)
      FeSCN2+ gaar i stykker til Fe3+ og SCN-             (split)
      Ag+ finder SCN- og danner AgSCN, der synker         (faeld)
+     C6H8O6 finder to Fe3+ og goer dem til Fe2+          (reduk)
 
    Tilsaettes der ioner, falder de ned oppefra. Fortyndes der, toner
    partikler ud. Vandmolekylerne ligger svagt i baggrunden.
@@ -24,8 +25,9 @@
     var R = 100;
     var r = NK.r;
 
-    var RADIUS = { fe: 11, scn: 11, fescn: 16, ag: 9.5, agscn: 11, vand: 6 };
-    var FART = { fe: 22, scn: 26, fescn: 16, ag: 28, agscn: 0, vand: 16 };
+    var TYPER = ["fe", "scn", "fescn", "fe2", "vitc", "ag", "agscn", "farvestof", "vand"];
+    var RADIUS = { fe: 11, scn: 11, fescn: 16, fe2: 10, vitc: 12, ag: 9.5, agscn: 11, farvestof: 12, vand: 6 };
+    var FART = { fe: 22, scn: 26, fescn: 16, fe2: 22, vitc: 18, ag: 28, agscn: 0, farvestof: 14, vand: 16 };
 
     /* Pladserne til AgSCN i bunden */
     var BUNDPLADS = [
@@ -85,12 +87,14 @@
     /* Optaellingen, som den bliver, naar de igangvaerende haendelser er
        faerdige */
     P.telle = function () {
-        var c = { fe: 0, scn: 0, fescn: 0, ag: 0, agscn: 0, vand: 0 };
+        var c = {};
+        TYPER.forEach(function (t) { c[t] = 0; });
         this.partikler.forEach(function (p) { if (!p.laast && !p.fjernes) c[p.type]++; });
         this.haendelser.forEach(function (h) {
             if (h.type === "bind") c.fescn++;
             else if (h.type === "split") { c.fe++; c.scn++; }
             else if (h.type === "faeld") c.agscn++;
+            else if (h.type === "reduk") c.fe2++;
         });
         return c;
     };
@@ -117,11 +121,12 @@
         return bedst;
     };
 
-    /* En ion falder ned oppefra */
+    /* En partikel falder ned oppefra */
     P.spawn = function (type) {
         var p = this.ny(type, r(-55, 55), -R - 14, r(-12, 12), r(80, 105));
         p.falder = true;
         p.alfa = 1;
+        this.spawnUr = 0.09;
         return p;
     };
 
@@ -132,13 +137,12 @@
         return true;
     };
 
-    /* Et kompleks mister den ene del med det samme (ved fortynding) */
-    P.omdan = function (fra, til) {
+    P.omdan = function (fra, til, farve) {
         var p = this.find(fra);
         if (!p) return false;
         p.type = til;
         p.rad = RADIUS[til];
-        this.blink.push({ x: p.x, y: p.y, liv: 1, farve: "255, 230, 150" });
+        this.blink.push({ x: p.x, y: p.y, liv: 1, farve: farve || "255, 230, 150" });
         return true;
     };
 
@@ -152,8 +156,11 @@
     /* ----- Afstemning mod maalet --------------------------------------- */
     P.afstem = function (dt, m) {
         var c = this.telle();
+        var mig = this;
         this.spawnUr -= dt;
         this.evUr -= dt;
+
+        function klar() { return mig.spawnUr <= 0; }
 
         if (c.vand < m.vand) {
             var q = this.plads(6);
@@ -162,26 +169,55 @@
             this.forsvind("vand");
         }
 
-        var agMangler = m.agscn - c.agscn;
-        var cAgAlt = c.ag + c.agscn, tAgAlt = m.ag + m.agscn;
+        if (c.farvestof < m.farvestof && klar()) { this.spawn("farvestof"); c = this.telle(); }
+        else if (c.farvestof > m.farvestof) { this.forsvind("farvestof"); c = this.telle(); }
 
-        /* Jern i alt */
+        var agMangler = m.agscn - c.agscn;
+        var redMangler = m.fe2 - c.fe2;
+
+        /* Ascorbinsyre */
+        if (c.vitc < m.vitc && klar()) { this.spawn("vitc"); c = this.telle(); }
+        else if (c.vitc > m.vitc && redMangler <= 0) { this.forsvind("vitc"); c = this.telle(); }
+
+        /* Jern(III) i alt */
         var cFe = c.fe + c.fescn, tFe = m.fe + m.fescn;
-        if (cFe < tFe && this.spawnUr <= 0) { this.spawn("fe"); this.spawnUr = 0.09; c = this.telle(); }
-        else if (cFe > tFe) { if (!this.forsvind("fe")) this.omdan("fescn", "scn"); c = this.telle(); }
+        if (cFe < tFe && klar()) { this.spawn("fe"); c = this.telle(); }
+        else if (cFe > tFe && redMangler <= 0) { if (!this.forsvind("fe")) this.omdan("fescn", "scn"); c = this.telle(); }
+
+        /* Jern(II) */
+        if (c.fe2 > m.fe2) { this.forsvind("fe2"); c = this.telle(); }
+        else if (redMangler > 0 && c.fe + c.fescn === 0 && klar()) { this.spawn("fe2"); c = this.telle(); }
 
         /* Thiocyanat i alt (det faeldede taeller ikke med) */
+        var cAgAlt = c.ag + c.agscn, tAgAlt = m.ag + m.agscn;
         var cS = c.scn + c.fescn, tS = m.scn + m.fescn;
         var ventAg = agMangler > 0 && (c.ag > 0 || cAgAlt < tAgAlt);
-        if (cS < tS && this.spawnUr <= 0) { this.spawn("scn"); this.spawnUr = 0.09; c = this.telle(); }
+        if (cS < tS && klar()) { this.spawn("scn"); c = this.telle(); }
         else if (cS > tS && !ventAg) { if (!this.forsvind("scn")) this.omdan("fescn", "fe"); c = this.telle(); }
 
         /* Soelv i alt */
         cAgAlt = c.ag + c.agscn;
-        if (cAgAlt < tAgAlt && this.spawnUr <= 0) { this.spawn("ag"); this.spawnUr = 0.09; c = this.telle(); }
+        if (cAgAlt < tAgAlt && klar()) { this.spawn("ag"); c = this.telle(); }
         else if (cAgAlt > tAgAlt) { if (!this.forsvind("ag")) this.forsvind("agscn"); c = this.telle(); }
 
         if (this.haendelser.length >= 3 || this.evUr > 0) return;
+
+        /* Reduktion: ascorbinsyren finder Fe3+. Er der kun komplekser, gaar
+           et af dem i stykker foerst. */
+        redMangler = m.fe2 - c.fe2;
+        if (redMangler > 0 && c.fe + c.fescn > 0) {
+            var v = this.find("vitc");
+            var jern = v ? this.naermeste(v, "fe") : this.find("fe");
+            if (v && jern) { this.startReduk(v, jern); this.evUr = 0.2; return; }
+            if (!jern) {
+                var k0 = this.find("fescn");
+                if (k0) { this.startSplit(k0); this.evUr = 0.25; return; }
+            } else if (!v) {
+                this.omdan("fe", "fe2", "170, 240, 170");
+                this.evUr = 0.2;
+                return;
+            }
+        }
 
         /* Faeldning: Ag+ finder SCN-. Er der ingen fri SCN-, gaar et
            kompleks i stykker foerst. */
@@ -223,6 +259,23 @@
         this.haendelser.push({ type: "faeld", a: ag, b: scn, t: 0 });
     };
 
+    P.startReduk = function (v, fe) {
+        v.laast = true;
+        fe.laast = true;
+        this.haendelser.push({ type: "reduk", v: v, a: fe, t: 0, trin: 0 });
+    };
+
+    function naermer(a, b, fart, dt) {
+        var dx = b.x - a.x, dy = b.y - a.y;
+        var d = Math.sqrt(dx * dx + dy * dy) || 0.01;
+        var skridt = Math.min(fart * dt, d / 2);
+        a.x += dx / d * skridt;
+        a.y += dy / d * skridt;
+        b.x -= dx / d * skridt;
+        b.y -= dy / d * skridt;
+        return d;
+    }
+
     P.opdaterHaendelser = function (dt) {
         for (var i = this.haendelser.length - 1; i >= 0; i--) {
             var h = this.haendelser[i];
@@ -230,12 +283,7 @@
             if (h.type === "bind" || h.type === "faeld") {
                 var a = h.a, b = h.b;
                 var dx = b.x - a.x, dy = b.y - a.y;
-                var d = Math.sqrt(dx * dx + dy * dy) || 0.01;
-                var skridt = Math.min(85 * dt, d / 2);
-                a.x += dx / d * skridt;
-                a.y += dy / d * skridt;
-                b.x -= dx / d * skridt;
-                b.y -= dy / d * skridt;
+                var d = naermer(a, b, 85, dt);
                 a.a += 2 * dt;
                 if (d < a.rad + b.rad - 6 || h.t > 2.2) {
                     var mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
@@ -253,6 +301,25 @@
                         this.blink.push({ x: mx, y: my, liv: 1, farve: "255, 255, 255" });
                     }
                     this.haendelser.splice(i, 1);
+                }
+            } else if (h.type === "reduk") {
+                var dv = naermer(h.v, h.a, 90, dt);
+                if (dv < h.v.rad + h.a.rad - 5 || h.t > 2.2) {
+                    h.a.type = "fe2";
+                    h.a.rad = RADIUS.fe2;
+                    h.a.laast = false;
+                    this.blink.push({ x: h.a.x, y: h.a.y, liv: 1, farve: "170, 240, 170" });
+                    h.trin++;
+                    var andet = h.trin < 2 ? this.naermeste(h.v, "fe") : null;
+                    if (andet) {
+                        andet.laast = true;
+                        h.a = andet;
+                        h.t = 0;
+                    } else {
+                        h.v.laast = false;
+                        h.v.fjernes = true;
+                        this.haendelser.splice(i, 1);
+                    }
                 }
             } else {
                 h.k.x += Math.sin(h.t * 70) * 0.5;
@@ -308,8 +375,6 @@
                 continue;
             }
 
-            /* Varmebevaegelse: retningen skifter tilfaeldigt, farten soeger
-               mod typens fart. Rystning saetter fart paa alt. */
             var maal = (FART[p.type] || 20) * (1 + 3 * ryst);
             var fart = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
             var retning = fart > 0.01 ? Math.atan2(p.vy, p.vx) : r(0, 6.28);
@@ -362,10 +427,12 @@
        TEGNING
        ================================================================ */
     var UDSEENDE = {
-        fe:    { lys: "#ffd98a", moerk: "#a4610f", tekst: "#2b1703" },
-        fescn: { lys: "#ffb08a", moerk: "#9b2d12", tekst: "#ffffff" },
-        ag:    { lys: "#ffffff", moerk: "#8a949e", tekst: "#1a1d22" },
-        agscn: { lys: "#ffffff", moerk: "#b3bac2", tekst: "#2a2f36" },
+        fe:    { lys: "#ffd98a", moerk: "#a4610f" },
+        fescn: { lys: "#ffb08a", moerk: "#9b2d12" },
+        fe2:   { lys: "#e4f7d6", moerk: "#6f9a5a" },
+        ag:    { lys: "#ffffff", moerk: "#8a949e" },
+        agscn: { lys: "#ffffff", moerk: "#b3bac2" },
+        blaa:  { lys: "#8fb6ff", moerk: "#1f4fa8" },
         s:     { lys: "#fff08a", moerk: "#a98a0c" },
         c:     { lys: "#b4bcc6", moerk: "#4a525c" },
         n:     { lys: "#9ec0ff", moerk: "#2a4ea8" },
@@ -374,8 +441,9 @@
     };
 
     var ETIKET = {
-        fe: M.formel("Fe3+"), scn: M.formel("SCN-"), fescn: M.formel("FeSCN2+"),
-        ag: M.formel("Ag+"), agscn: M.formel("AgSCN"), vand: M.formel("H2O")
+        fe: M.formel("Fe3+"), scn: M.formel("SCN-"), fescn: M.formel("FeSCN2+"), fe2: M.formel("Fe2+"),
+        vitc: M.formel("C6H8O6"), ag: M.formel("Ag+"), agscn: M.formel("AgSCN"), farvestof: "farvestof",
+        vand: M.formel("H2O")
     };
     NK.Mikro.ETIKET = ETIKET;
 
@@ -391,7 +459,6 @@
         ctx.fillText(tekst, x, y + 0.5);
     }
 
-    /* SCN-: S, C og N paa en linje */
     function tegnSCN(ctx, x, y, a) {
         var c = Math.cos(a), s = Math.sin(a);
         ctx.strokeStyle = "#3a4048";
@@ -406,7 +473,6 @@
         NK.kugle(ctx, x - c * 9, y - s * 9, 5.8, UDSEENDE.s.lys, UDSEENDE.s.moerk);
     }
 
-    /* FeSCN2+: Fe bundet til N-enden af thiocyanat */
     function tegnFeSCN(ctx, x, y, a, glød) {
         var c = Math.cos(a), s = Math.sin(a);
         if (glød) NK.skaer(ctx, x, y, 26, "rgba(235, 60, 35, 0.6)", 0.8);
@@ -421,6 +487,39 @@
         NK.kugle(ctx, x + c * 11, y + s * 11, 3.8, UDSEENDE.c.lys, UDSEENDE.c.moerk);
         NK.kugle(ctx, x + c * 19, y + s * 19, 5.4, UDSEENDE.s.lys, UDSEENDE.s.moerk);
         NK.kugle(ctx, x - c * 9, y - s * 9, 10, UDSEENDE.fescn.lys, UDSEENDE.fescn.moerk);
+    }
+
+    /* Ascorbinsyre: en femring med to O-atomer */
+    function tegnVitc(ctx, x, y, a) {
+        var i, pkt = [];
+        for (i = 0; i < 5; i++) {
+            var v = a + i * Math.PI * 2 / 5;
+            pkt.push({ x: x + Math.cos(v) * 7, y: y + Math.sin(v) * 7 });
+        }
+        ctx.strokeStyle = "#3a4048";
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        pkt.forEach(function (p, k) { if (k === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
+        ctx.closePath();
+        ctx.stroke();
+        pkt.forEach(function (p, k) {
+            if (k === 1 || k === 3) NK.kugle(ctx, p.x, p.y, 3.4, UDSEENDE.o.lys, UDSEENDE.o.moerk);
+            else NK.kugle(ctx, p.x, p.y, 2.8, UDSEENDE.c.lys, UDSEENDE.c.moerk);
+        });
+    }
+
+    function tegnFarvestof(ctx, x, y, a) {
+        var c = Math.cos(a), s = Math.sin(a);
+        ctx.strokeStyle = "#1c3566";
+        ctx.lineWidth = 2.4;
+        ctx.beginPath();
+        ctx.moveTo(x - c * 9, y - s * 9);
+        ctx.lineTo(x, y);
+        ctx.lineTo(x + c * 7 - s * 6, y + s * 7 + c * 6);
+        ctx.stroke();
+        NK.kugle(ctx, x - c * 9, y - s * 9, 5, UDSEENDE.blaa.lys, UDSEENDE.blaa.moerk);
+        NK.kugle(ctx, x, y, 6, UDSEENDE.blaa.lys, UDSEENDE.blaa.moerk);
+        NK.kugle(ctx, x + c * 7 - s * 6, y + s * 7 + c * 6, 4.6, UDSEENDE.blaa.lys, UDSEENDE.blaa.moerk);
     }
 
     function tegnVand(ctx, x, y, a) {
@@ -444,22 +543,40 @@
        ikke drukner i tekst. Forklaringen under boblen siger resten. */
     function tegnPartikel(ctx, p, medEtiket) {
         ctx.globalAlpha = NK.klamp(p.alfa, 0, 1) * (p.type === "vand" ? 0.45 : 1);
-        if (p.type === "vand") {
-            tegnVand(ctx, p.x, p.y, p.a * 0.3);
-        } else if (p.type === "scn") {
-            tegnSCN(ctx, p.x, p.y, p.a);
-            if (medEtiket) etiket(ctx, ETIKET.scn, p.x, p.y + 15, "#eef2f6", 11);
-        } else if (p.type === "fescn") {
-            tegnFeSCN(ctx, p.x, p.y, p.a, true);
-            if (medEtiket) etiket(ctx, ETIKET.fescn, p.x, p.y + 20, "#ffd6c9", 11);
-        } else if (p.type === "fe") {
-            NK.kugle(ctx, p.x, p.y, p.rad, UDSEENDE.fe.lys, UDSEENDE.fe.moerk);
-            if (medEtiket) etiket(ctx, ETIKET.fe, p.x, p.y, "#ffffff", 11);
-        } else if (p.type === "ag") {
-            NK.kugle(ctx, p.x, p.y, p.rad, UDSEENDE.ag.lys, UDSEENDE.ag.moerk);
-            if (medEtiket) etiket(ctx, ETIKET.ag, p.x, p.y, "#ffffff", 10.5);
-        } else if (p.type === "agscn") {
-            tegnAgSCN(ctx, p.x, p.y, p.a);
+        switch (p.type) {
+            case "vand":
+                tegnVand(ctx, p.x, p.y, p.a * 0.3);
+                break;
+            case "scn":
+                tegnSCN(ctx, p.x, p.y, p.a);
+                if (medEtiket) etiket(ctx, ETIKET.scn, p.x, p.y + 15, "#eef2f6", 11);
+                break;
+            case "fescn":
+                tegnFeSCN(ctx, p.x, p.y, p.a, true);
+                if (medEtiket) etiket(ctx, ETIKET.fescn, p.x, p.y + 20, "#ffd6c9", 11);
+                break;
+            case "fe":
+                NK.kugle(ctx, p.x, p.y, p.rad, UDSEENDE.fe.lys, UDSEENDE.fe.moerk);
+                if (medEtiket) etiket(ctx, ETIKET.fe, p.x, p.y, "#ffffff", 11);
+                break;
+            case "fe2":
+                NK.kugle(ctx, p.x, p.y, p.rad, UDSEENDE.fe2.lys, UDSEENDE.fe2.moerk);
+                if (medEtiket) etiket(ctx, ETIKET.fe2, p.x, p.y, "#ffffff", 10.5);
+                break;
+            case "vitc":
+                tegnVitc(ctx, p.x, p.y, p.a);
+                if (medEtiket) etiket(ctx, ETIKET.vitc, p.x, p.y + 15, "#fff1cf", 10);
+                break;
+            case "ag":
+                NK.kugle(ctx, p.x, p.y, p.rad, UDSEENDE.ag.lys, UDSEENDE.ag.moerk);
+                if (medEtiket) etiket(ctx, ETIKET.ag, p.x, p.y, "#ffffff", 10.5);
+                break;
+            case "agscn":
+                tegnAgSCN(ctx, p.x, p.y, p.a);
+                break;
+            case "farvestof":
+                tegnFarvestof(ctx, p.x, p.y, p.a);
+                break;
         }
         ctx.globalAlpha = 1;
     }
@@ -501,7 +618,7 @@
 
         for (i = 0; i < this.partikler.length; i++) {
             p = this.partikler[i];
-            if (p.type === "vand") tegnPartikel(ctx, p);
+            if (p.type === "vand") tegnPartikel(ctx, p, false);
         }
         var talt = {};
         for (i = 0; i < this.partikler.length; i++) {
@@ -552,9 +669,8 @@
     /* De partikeltyper, der kan ses lige nu */
     P.typer = function () {
         var ud = [], set = {};
-        var orden = ["fe", "scn", "fescn", "ag", "agscn", "vand"];
         for (var i = 0; i < this.partikler.length; i++) set[this.partikler[i].type] = true;
-        orden.forEach(function (t) { if (set[t]) ud.push(t); });
+        TYPER.forEach(function (t) { if (set[t]) ud.push(t); });
         return ud;
     };
 
@@ -567,7 +683,7 @@
         var raekker = [[]], rb = [0];
         typer.forEach(function (t, i) {
             var n = raekker.length - 1;
-            if (rb[n] + bredder[i] > 250 && raekker[n].length) { raekker.push([]); rb.push(0); n++; }
+            if (rb[n] + bredder[i] > 260 && raekker[n].length) { raekker.push([]); rb.push(0); n++; }
             raekker[n].push(i);
             rb[n] += bredder[i];
         });
@@ -588,6 +704,8 @@
                 else if (t === "fescn") { ctx.scale(0.55, 0.55); tegnFeSCN(ctx, -4, 0, 0, false); }
                 else if (t === "vand") { tegnVand(ctx, 0, 0, 0); }
                 else if (t === "agscn") { ctx.scale(0.6, 0.6); tegnAgSCN(ctx, 0, 0, 0); }
+                else if (t === "vitc") { ctx.scale(0.8, 0.8); tegnVitc(ctx, 0, 0, 0); }
+                else if (t === "farvestof") { ctx.scale(0.7, 0.7); tegnFarvestof(ctx, 0, 0, 0); }
                 else { NK.kugle(ctx, 0, 0, 6.5, UDSEENDE[t].lys, UDSEENDE[t].moerk); }
                 ctx.restore();
                 NK.tekst(ctx, ETIKET[t], cx + 27, cy + 0.5, { font: "600 12px 'Segoe UI', sans-serif", linje: "middle", farve: "#cfd6de" });
