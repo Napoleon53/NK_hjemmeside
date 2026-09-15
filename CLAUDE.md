@@ -28,6 +28,10 @@ statiske sider i roden, downloads i `downloads/`.
   er slut (mønster: `sc6.8_substitution/js/tegneserie.js`).
 - Resultatskemaet for forsøget står i tegneseriens sidste rude, ikke som et
   kort i panelet.
+- Zoomboblen med mikroniveauet må gerne være lidt større end i de første
+  superanimationer, så partiklerne kan ses.
+- Sammensatte ioner i zoomboblen tegnes som én kugle med formlen på (fx NO₃⁻),
+  ikke som flere kugler, der sidder sammen.
 - Fælles kode for laboratorieforsøgene ligger i `laboratoriet/` (kerne,
   rundvisning, grundstilark). Forsøgets egen `css/stil.css` har kun det, der
   er særligt for forsøget. Se `laboratoriet/README.md`.
