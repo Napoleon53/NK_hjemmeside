@@ -51,7 +51,14 @@
     display:inline-flex; align-items:center; justify-content:center;
   }
   .step-head h2{margin:0; font-size:.78rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--accent-dark);}
-  .step-cols{display:grid; grid-template-columns:repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap:18px 32px; align-items:start;}
+  /* Trin 1 og 2 står side om side, når der er plads. De fleste bærbare viser 1280-1536 px. */
+  .steps-pair{display:grid; grid-template-columns:minmax(0, 1fr); gap:16px; margin-bottom:16px;}
+  .steps-pair > .step{margin-bottom:0;}
+  @media (min-width:1100px){
+    .steps-pair{grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);}
+  }
+  #stepClass{display:flex; flex-direction:column;}
+  #stepClass textarea{flex:1;}
   .sub-block + .sub-block{border-top:1px solid #edf0f3; margin-top:14px; padding-top:14px;}
   .sub-label{font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:0 0 8px;}
 
@@ -127,7 +134,7 @@
   .edit-panel{margin-top:8px; padding:10px; border:1px solid var(--border); border-radius:6px; background:#fff; max-width:420px;}
   .gender-wrap{
     margin-top:10px;
-    max-height:300px;
+    max-height:260px;
     max-width:420px;
     overflow-y:auto;
     border:1px solid var(--border);
@@ -137,10 +144,10 @@
   .gender-empty{padding:10px;}
   .gender-header, .gender-row{
     display:grid;
-    grid-template-columns:1fr 40px 40px 120px;
+    grid-template-columns:1fr 44px 44px 120px;
     align-items:center;
     gap:2px;
-    padding:4px 6px;
+    padding:2px 8px;
   }
   .gender-header{
     position:sticky;
@@ -166,7 +173,7 @@
   .gender-row .cat-cell select{
     width:100%;
     font-size:.78rem;
-    padding:3px 4px;
+    padding:1px 4px;
     border-radius:4px;
   }
   .category-edit-row{ display:flex; align-items:center; gap:8px; margin-bottom:6px; }
@@ -300,6 +307,7 @@
   <button class="btn-secondary btn-small" id="tourBtn" type="button">Præsentér programmet</button>
 </div>
 
+<div class="steps-pair">
 <section class="step" id="stepClass">
   <div class="step-head"><span class="step-num">1</span><h2>Klasse</h2></div>
   <label class="inline">
@@ -336,8 +344,9 @@ Elev 26
 Elev 27
 Elev 28</textarea>
   <div class="row">
-    <button class="btn-secondary" id="shortenNamesBtn" type="button" title="Fornavn og forbogstav i efternavnet. Id-numre og holdoplysninger fra Lectio fjernes.">Forkort navne</button>
+    <button class="btn-secondary" id="shortenNamesBtn" type="button" title="Fjerner id-numre og holdoplysninger og forkorter lange navne til fornavn og forbogstav i efternavnet. Korte navne som Elev 8 bliver stående.">Forkort navne</button>
     <span class="muted" id="countLabel"></span>
+    <span class="muted" id="shortenHint"></span>
   </div>
   <div class="error" id="namesError" hidden></div>
   <div class="warn" id="namesWarning" hidden></div>
@@ -345,96 +354,97 @@ Elev 28</textarea>
 
 <section class="step" id="stepGroups">
   <div class="step-head"><span class="step-num">2</span><h2>Grupper</h2><span class="muted">Alt her er valgfrit</span></div>
-  <div class="step-cols">
-    <div>
-      <div class="sub-block">
-        <div class="sub-label">Gruppestørrelse</div>
-        <label class="check">
-          <input type="checkbox" id="avoidTriosCheckbox">
-          Undgå grupper på 3, og lav i stedet grupper på 5
-        </label>
-        <p class="muted hint" id="sizeHint"></p>
-      </div>
+  <div class="sub-block">
+    <div class="sub-label">Gruppestørrelse</div>
+    <label class="check">
+      <input type="checkbox" id="avoidTriosCheckbox">
+      Undgå grupper på 3, og lav i stedet grupper på 5
+    </label>
+    <p class="muted hint" id="sizeHint"></p>
+  </div>
 
-      <div class="sub-block">
-        <div class="sub-label">Betingelser</div>
-        <div class="row">
-          <select id="condStudentA"></select>
-          <select id="condType">
-            <option value="avoid">må ikke være i samme gruppe som</option>
-            <option value="together">skal være makker med</option>
-          </select>
-          <select id="condStudentB"></select>
-        </div>
-        <div class="row">
-          <button class="btn-secondary btn-small" id="addCondBtn" type="button">Tilføj betingelse</button>
-          <button class="btn-secondary btn-small" id="clearCondBtn" type="button">Ryd alle</button>
-          <span class="error" id="condError" hidden></span>
-        </div>
-        <div class="cond-list" id="conditionsList"></div>
-      </div>
-
-      <div class="sub-block">
-        <div class="sub-label">Roller</div>
-        <div class="row">
-          <label class="check">
-            <input type="checkbox" id="rolesEnabledCheckbox">
-            Giv eleverne roller i grupperne
-          </label>
-          <label class="inline">
-            Antal roller
-            <select id="roleCount">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-            </select>
-          </label>
-        </div>
-        <div class="edit-panel" id="roleNamesPanel" style="display:none;"></div>
-      </div>
+  <div class="sub-block">
+    <div class="sub-label">Betingelser</div>
+    <div class="row">
+      <select id="condStudentA"></select>
+      <select id="condType">
+        <option value="avoid">må ikke være i samme gruppe som</option>
+        <option value="together">skal være makker med</option>
+      </select>
+      <select id="condStudentB"></select>
     </div>
+    <div class="row">
+      <button class="btn-secondary btn-small" id="addCondBtn" type="button">Tilføj betingelse</button>
+      <button class="btn-secondary btn-small" id="clearCondBtn" type="button">Ryd alle</button>
+      <span class="error" id="condError" hidden></span>
+    </div>
+    <div class="cond-list" id="conditionsList"></div>
+  </div>
 
-    <div>
-      <div class="sub-block">
-        <div class="sub-label">Køn og kategori</div>
-        <div class="row">
-          <label class="inline">
-            Makkerpar skal være
-            <select id="genderPreference">
-              <option value="none">Ingen præference</option>
-              <option value="mixed">Blandet køn</option>
-              <option value="same">Samme køn</option>
-            </select>
-          </label>
+  <div class="sub-block">
+    <div class="sub-label">Køn og kategori</div>
+    <label class="check">
+      <input type="checkbox" id="traitsEnabledCheckbox">
+      Tag hensyn til køn eller kategori
+    </label>
+    <div id="traitsPanel" hidden>
+      <div class="row">
+        <label class="inline">
+          Makkerpar skal være
+          <select id="genderPreference">
+            <option value="none">Ingen præference</option>
+            <option value="mixed">Blandet køn</option>
+            <option value="same">Samme køn</option>
+          </select>
+        </label>
+      </div>
+      <div class="row">
+        <label class="inline">
+          Grupper skal have
+          <select id="categoryPreference">
+            <option value="none">Ingen præference</option>
+            <option value="mixed">Blandet kategori</option>
+            <option value="same">Samme kategori</option>
+          </select>
+        </label>
+        <button class="btn-secondary btn-small" id="editCategoriesBtn" type="button">Navngiv kategorier</button>
+      </div>
+      <div class="edit-panel" id="categoryEditPanel" style="display:none;"></div>
+      <p class="muted hint">Der tages kun hensyn til elever, der har fået køn eller kategori.</p>
+      <div class="gender-wrap">
+        <div class="gender-header">
+          <span></span>
+          <span>Dreng</span>
+          <span>Pige</span>
+          <span class="cat-col">Kategori</span>
         </div>
-        <div class="row">
-          <label class="inline">
-            Grupper skal have
-            <select id="categoryPreference">
-              <option value="none">Ingen præference</option>
-              <option value="mixed">Blandet kategori</option>
-              <option value="same">Samme kategori</option>
-            </select>
-          </label>
-          <button class="btn-secondary btn-small" id="editCategoriesBtn" type="button">Navngiv kategorier</button>
-        </div>
-        <div class="edit-panel" id="categoryEditPanel" style="display:none;"></div>
-        <p class="muted hint">Der tages kun hensyn til elever, der har fået køn eller kategori.</p>
-        <div class="gender-wrap">
-          <div class="gender-header">
-            <span></span>
-            <span>Dreng</span>
-            <span>Pige</span>
-            <span class="cat-col">Kategori</span>
-          </div>
-          <div id="genderList"></div>
-        </div>
+        <div id="genderList"></div>
       </div>
     </div>
   </div>
+
+  <div class="sub-block">
+    <div class="sub-label">Roller</div>
+    <div class="row">
+      <label class="check">
+        <input type="checkbox" id="rolesEnabledCheckbox">
+        Giv eleverne roller i grupperne
+      </label>
+      <label class="inline">
+        Antal roller
+        <select id="roleCount">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </label>
+    </div>
+    <div class="edit-panel" id="roleNamesPanel" style="display:none;"></div>
+  </div>
 </section>
+</div>
 
 <section class="step" id="stepWeeks">
   <div class="step-head"><span class="step-num">3</span><h2>Uger</h2></div>
@@ -579,44 +589,85 @@ Elev 28</textarea>
     return null;
   }
 
-  function shortenName(full){
-    var trimmed = full.trim();
-    var tabFields = trimmed.split('\t').map(function(s){ return s.trim(); });
-
-    var nameSource;
-    if(tabFields.length > 1){
-      // Ligner et indsat Lectio-linje med flere kolonner (id-numre, holdinfo osv.)
-      // - fjern felter der indeholder tal, skråstreg eller kolon, og behold resten som navnet.
-      var nameFields = tabFields.filter(function(f){ return f.length > 0 && !/[\d\/:]/.test(f); });
-      nameSource = nameFields.join(' ');
-    } else {
-      nameSource = trimmed;
-    }
-
-    // Lectios pladsholder-navn for en elev uden rigtigt navn endnu er "Elev <årgang>" - ordet
-    // "elev" skal derfor aldrig kunne blive stående som for- eller efternavn, men bare ignoreres.
-    var parts = nameSource.split(/\s+/).filter(function(p){ return p.length > 0 && p.toLowerCase() !== 'elev'; });
-    if(parts.length === 0) return trimmed;
-    if(parts.length === 1) return parts[0];
-
-    var first = parts[0];
-    var last = parts[parts.length - 1];
-    // Et rent tal skal ikke forkortes til første ciffer - de sammenhængende cifre tæller som ét tegn.
-    if(/^\d+$/.test(last)) return first + ' ' + last;
-    return first + ' ' + last.charAt(0).toUpperCase();
+  // Et navneord består af bogstaver, evt. med bindestreg, apostrof eller punktum (fx "Anna-Marie", "B.").
+  function isNameWord(w){
+    return /^\p{L}[\p{L}\p{M}'’.\-]*$/u.test(w);
   }
 
-  // Forkorter listen og flytter køn, kategori og betingelser med over på de nye navne.
+  // En linje, der allerede er kort: højst to ord uden krimskrams, fx "Anna", "Anna Berg" eller "Elev 8".
+  function isShortLine(line){
+    if(line.indexOf('\t') !== -1 || line.length > 20) return false;
+    var words = line.split(/\s+/);
+    return words.length <= 2 && isNameWord(words[0]) &&
+      (words.length === 1 || isNameWord(words[1]) || /^\d+$/.test(words[1]));
+  }
+
+  // Navneordene i en lang eller rodet linje, uden id-numre, holdkoder og andet krimskrams.
+  function nameWords(line){
+    var fields = line.split('\t').map(function(f){ return f.trim(); }).filter(Boolean);
+    // Indsat fra Lectio med flere kolonner: felter med tal, skråstreg eller kolon er ikke navne.
+    if(fields.length > 1) fields = fields.filter(function(f){ return !/[\d\/:]/.test(f); });
+    var words = fields.join(' ').split(/\s+/)
+      .map(function(w){ return w.replace(/^[(\[,;]+|[)\],;]+$/g, ''); })
+      .filter(isNameWord);
+    // Lectios pladsholder "Elev" tæller kun som navn, hvis der ikke står et andet.
+    var real = words.filter(function(w){ return w.toLowerCase() !== 'elev'; });
+    return real.length ? real : words;
+  }
+
+  // Forkorter kun, når listen har krimskrams eller lange navne. Så får alle navne med efternavn
+  // fornavn og forbogstav, så listen bliver ens, mens navne uden efternavn (fx "Elev 8") bliver
+  // stående. Køn, kategori og betingelser flyttes med over på de nye navne.
   function shortenNames(){
     var textarea = byId('names');
+    var lines = textarea.value.split('\n');
+    var trimmed = lines.map(function(line){ return line.trim(); });
+    if(trimmed.every(function(line){ return !line || isShortLine(line); })){
+      byId('shortenHint').textContent = 'Navnene er allerede korte.';
+      return;
+    }
+
+    var entries = trimmed.map(function(line){
+      if(!line) return null;
+      var short = isShortLine(line);
+      var words = short ? line.split(/\s+/) : nameWords(line);
+      if(words.length >= 2 && isNameWord(words[words.length - 1])){
+        return { first:words[0], last:words[words.length - 1].replace(/\./g, ''), k:1 };
+      }
+      return { text: (short || !words.length) ? line : words[0] };
+    });
+
+    // Samme fornavn og forbogstav: tag flere bogstaver af efternavnet, til navnene kan skelnes.
+    function shortForm(e){
+      var part = e.last.slice(0, e.k);
+      return e.first + ' ' + part.charAt(0).toUpperCase() + part.slice(1);
+    }
+    var named = entries.filter(function(e){ return e && e.first; });
+    var changed = true;
+    while(changed){
+      changed = false;
+      var byForm = {};
+      named.forEach(function(e){
+        var form = shortForm(e);
+        (byForm[form] = byForm[form] || []).push(e);
+      });
+      Object.keys(byForm).forEach(function(form){
+        var lasts = byForm[form].map(function(e){ return e.last.toLowerCase(); });
+        if(lasts.every(function(l){ return l === lasts[0]; })) return;
+        byForm[form].forEach(function(e){
+          if(e.k < e.last.length){ e.k++; changed = true; }
+        });
+      });
+    }
+
     var renames = {};
-    textarea.value = textarea.value.split('\n').map(function(line){
-      var trimmed = line.trim();
-      if(!trimmed) return line;
-      var short = shortenName(trimmed);
-      var oldKey = capName(trimmed), newKey = capName(short);
+    textarea.value = lines.map(function(line, i){
+      var e = entries[i];
+      if(!e) return line;
+      var result = e.first ? shortForm(e) : e.text;
+      var oldKey = capName(trimmed[i]), newKey = capName(result);
       if(oldKey !== newKey) renames[oldKey] = newKey;
-      return short;
+      return result;
     }).join('\n');
     renameStudents(renames);
     syncRoster();
@@ -651,6 +702,7 @@ Elev 28</textarea>
     var key = names.join('\n');
     if(key !== rosterKey){
       rosterKey = key;
+      byId('shortenHint').textContent = '';
       state.roster = names;
       state.sortedRoster = names.filter(function(nm, i){ return names.indexOf(nm) === i; })
         .sort(function(a,b){ return a.localeCompare(b,'da'); });
@@ -807,12 +859,18 @@ Elev 28</textarea>
     }
   }
 
+  // Præferencerne for køn og kategori gælder kun, når der er sat hak i "Tag hensyn til køn eller
+  // kategori". Det, der er sat for eleverne, bliver stående, hvis hakket fjernes.
+  function traitsEnabled(){
+    return byId('traitsEnabledCheckbox').checked;
+  }
+
   function getGenderPreference(){
-    return byId('genderPreference').value;
+    return traitsEnabled() ? byId('genderPreference').value : 'none';
   }
 
   function getCategoryPreference(){
-    return byId('categoryPreference').value;
+    return traitsEnabled() ? byId('categoryPreference').value : 'none';
   }
 
   function getRolesEnabled(){
@@ -1874,7 +1932,7 @@ Elev 28</textarea>
   // ---------- Præsentér programmet: kort guidet rundtur med gule ringe ----------
   var tourSteps = [
     { sel:'#names', text:'Indsæt elevernes navne her, ét pr. linje. Feltet er udfyldt med en eksempelklasse, så du kan prøve programmet med det samme.' },
-    { sel:'#shortenNamesBtn', text:'Forkorter navnene til fornavn og forbogstav i efternavnet. En elevliste kopieret fra Lectio renses samtidig for id-numre og holdoplysninger.' },
+    { sel:'#shortenNamesBtn', text:'Renser en elevliste kopieret fra Lectio for id-numre og holdoplysninger og forkorter lange navne til fornavn og forbogstav i efternavnet. Korte navne bliver stående.' },
     { sel:'#stepGroups', text:'Her kan du vælge gruppestørrelse, sætte betingelser for bestemte elever, tage hensyn til køn og kategori og give eleverne roller. Det bliver stående, selvom du retter i navnelisten.' },
     { sel:'#stepWeeks', text:'Vælg første uge, hvor længe grupperne gælder, og hvor mange uger planen dækker. Ferieuger springes over.' },
     { sel:'#generateBtn', text:'Laver grupper til alle perioder. Makkere og gruppekammerater gentages så lidt som muligt.' },
@@ -1937,6 +1995,10 @@ Elev 28</textarea>
   byId('className').addEventListener('input', renderPlan);
 
   byId('avoidTriosCheckbox').addEventListener('change', function(){ updateSizeHint(); updateStale(); });
+  byId('traitsEnabledCheckbox').addEventListener('change', function(){
+    byId('traitsPanel').hidden = !this.checked;
+    updateStale();
+  });
   byId('genderPreference').addEventListener('change', updateStale);
   byId('categoryPreference').addEventListener('change', updateStale);
   byId('addCondBtn').addEventListener('click', addCondition);
