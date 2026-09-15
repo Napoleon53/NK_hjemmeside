@@ -119,6 +119,7 @@
         bartender:  "Jeg rystede cocktails under studiet. Det her er ikke det.",
         jura:       "Aubergine så jeg sidst i 2011. Han læser jura nu.",
         titrering:  "Min første titrering gav 140 %. Det var en lang nat.",
+        afslag:     "Mit afslag fra et tidsskrift hænger indrammet. Samme grund.",
         regnskab3:  "Tredje uheld på den her computer. Det står i regnskabet.",
         regnskab6:  "Seks uheld på den her computer. Regnskabet har fået en mappe.",
         regnskab10: "Ti uheld. Regnskabet har fået sit eget ringbind."

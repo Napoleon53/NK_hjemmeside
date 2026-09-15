@@ -380,9 +380,26 @@
     };
 
     /* ----- Koreografier ------------------------------------------------ */
+    /* En genstand paa vej hjem blokerer ikke: den nye koreografi koerer
+       efter den, og genstanden fortsaetter fra der, hvor den er. */
     P.koer = function (liste, navn) {
+        var h = this.handling;
+        if (h && h.navn === "hjem") {
+            var rest = h.liste.slice(h.i).map(function (tr, k) {
+                if (k > 0) return tr;
+                var ny = {};
+                for (var n in tr) if (Object.prototype.hasOwnProperty.call(tr, n) && n !== "fra") ny[n] = tr[n];
+                return ny;
+            });
+            liste = rest.concat(liste);
+        }
         this.handling = { liste: liste, i: 0, t: 0, navn: navn || "" };
         this.aendret("handling");
+    };
+
+    /* Er der en koreografi i gang, som scenen skal vente paa? */
+    P.optaget = function () {
+        return !!(this.handling && this.handling.navn !== "hjem");
     };
 
     P.koerEfter = function (liste, navn) {
@@ -434,7 +451,7 @@
         if (navn === "laerer") return this.klikLaerer ? this.klikLaerer() : false;
         if (this.saml) return this.klikSammenlign(navn);
         if (this.laererOptaget && this.laererOptaget()) return false;
-        if (this.handling || this.holdt || this.rystKilde) return false;
+        if (this.optaget() || this.holdt || this.rystKilde) return false;
         switch (navn) {
             case "kaffekop": return this.klikKop ? this.klikKop() : false;
             case "glas1": case "glas2": case "glas3": case "glas4": case "glas5":
@@ -763,8 +780,12 @@
         } });
         liste.push({ kald: function () {
             this.straale = null;
-            if (c.erGlas) nulstilGlasData(c);
-            else {
+            if (c.erGlas) {
+                /* Resultatet til tegneserien skal overleve toemningen */
+                var slut = c.slut;
+                nulstilGlasData(c);
+                c.slut = slut;
+            } else {
                 M.toem(c.b);
                 c.mikro.toem();
                 c.draaber = { fe: 0, scn: 0, ag: 0 };
@@ -794,7 +815,10 @@
         var liste = [];
         this.lukSammenlign();
         this.glasListe().forEach(function (gl) {
-            gl.slut = { opl: M.samlet(gl.b), bundfald: mig.bundfald(gl), indgreb: mig.indgrebTekst(gl) };
+            gl.slut = {
+                opl: M.samlet(gl.b), bundfald: mig.bundfald(gl), indgreb: mig.indgrebTekst(gl), liste: mig.indgrebListe(gl),
+                vurdering: gl.vurdering, afkoelet: gl.afkoelet, uroert: mig.uroert(gl)
+            };
             if (M.volumen(gl.b) < 0.05) return;
             liste = liste.concat(mig.toemListe(gl));
         });
@@ -816,7 +840,7 @@
             this.markér("baeger");
             return false;
         }
-        if (this.handling || this.holdt || this.rystKilde) return false;
+        if (this.optaget() || this.holdt || this.rystKilde) return false;
         this.saml = true;
         this.samlData = this.sammenlignData();
         if (NK.Lyd) NK.Lyd.papir();
@@ -824,9 +848,12 @@
         return true;
     };
 
+    /* Naar visningen lukkes, og alle glas med et indgreb er vurderet, er
+       sammenligningen gjort. Saa kan eleven klikke sig frem til sit svar. */
     P.lukSammenlign = function () {
         if (!this.saml) return false;
         this.saml = false;
+        this.tjekSammenlign();
         this.aendret("saml");
         return true;
     };
@@ -885,7 +912,6 @@
         };
         if (NK.Lyd) NK.Lyd.klik();
         this.samlData = this.sammenlignData();
-        this.tjekSammenlign();
         this.aendret("vurder");
         return true;
     };
@@ -910,7 +936,7 @@
 
     /* ----- Rystning -------------------------------------------------------- */
     P.kanTageFat = function (gl) {
-        return !!(gl && gl.erGlas && gl.sted !== "flytter" && !this.handling && !this.saml && !(this.laererOptaget && this.laererOptaget()));
+        return !!(gl && gl.erGlas && gl.sted !== "flytter" && !this.optaget() && !this.saml && !(this.laererOptaget && this.laererOptaget()));
     };
 
     P.kanRyste = function (gl) {
@@ -987,7 +1013,7 @@
     /* Knappen Ryst glasset (og tasten R): til = trykket ned */
     P.rystKnap = function (til) {
         if (til) {
-            if (this.rystKilde || this.handling || this.holdt) return false;
+            if (this.rystKilde || this.optaget() || this.holdt) return false;
             var v = this.valgtBeholder();
             if (!v || !v.erGlas) {
                 var mig = this;
@@ -1138,7 +1164,7 @@
         }
 
         this.tjekUr -= dt;
-        if (this.tjekUr <= 0) {
+        if (this.tjekUr <= 0 && !this.saml) {
             this.tjekUr = 0.4;
             this.tjekSammenlign();
         }

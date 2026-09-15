@@ -440,22 +440,24 @@
         NK.kugle(ctx, x + 1, y - 6, 4.5, "#ffffff", "#b9c0c7");
     }
 
-    function tegnPartikel(ctx, p) {
+    /* medEtiket: kun de foerste af hver slags faar formlen paa, saa boblen
+       ikke drukner i tekst. Forklaringen under boblen siger resten. */
+    function tegnPartikel(ctx, p, medEtiket) {
         ctx.globalAlpha = NK.klamp(p.alfa, 0, 1) * (p.type === "vand" ? 0.45 : 1);
         if (p.type === "vand") {
             tegnVand(ctx, p.x, p.y, p.a * 0.3);
         } else if (p.type === "scn") {
             tegnSCN(ctx, p.x, p.y, p.a);
-            etiket(ctx, ETIKET.scn, p.x, p.y + 15, "#eef2f6", 11);
+            if (medEtiket) etiket(ctx, ETIKET.scn, p.x, p.y + 15, "#eef2f6", 11);
         } else if (p.type === "fescn") {
             tegnFeSCN(ctx, p.x, p.y, p.a, true);
-            etiket(ctx, ETIKET.fescn, p.x, p.y + 20, "#ffd6c9", 11);
+            if (medEtiket) etiket(ctx, ETIKET.fescn, p.x, p.y + 20, "#ffd6c9", 11);
         } else if (p.type === "fe") {
             NK.kugle(ctx, p.x, p.y, p.rad, UDSEENDE.fe.lys, UDSEENDE.fe.moerk);
-            etiket(ctx, ETIKET.fe, p.x, p.y, "#ffffff", 11);
+            if (medEtiket) etiket(ctx, ETIKET.fe, p.x, p.y, "#ffffff", 11);
         } else if (p.type === "ag") {
             NK.kugle(ctx, p.x, p.y, p.rad, UDSEENDE.ag.lys, UDSEENDE.ag.moerk);
-            etiket(ctx, ETIKET.ag, p.x, p.y, "#ffffff", 10.5);
+            if (medEtiket) etiket(ctx, ETIKET.ag, p.x, p.y, "#ffffff", 10.5);
         } else if (p.type === "agscn") {
             tegnAgSCN(ctx, p.x, p.y, p.a);
         }
@@ -501,9 +503,12 @@
             p = this.partikler[i];
             if (p.type === "vand") tegnPartikel(ctx, p);
         }
+        var talt = {};
         for (i = 0; i < this.partikler.length; i++) {
             p = this.partikler[i];
-            if (p.type !== "vand") tegnPartikel(ctx, p);
+            if (p.type === "vand") continue;
+            talt[p.type] = (talt[p.type] || 0) + 1;
+            tegnPartikel(ctx, p, talt[p.type] <= 4);
         }
 
         for (i = 0; i < this.blink.length; i++) {

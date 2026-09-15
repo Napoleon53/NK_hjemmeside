@@ -60,7 +60,7 @@
         var navn = this.hvad(pt);
         if (!navn) return false;
         var optaget = this.laererOptaget && this.laererOptaget();
-        if (/^glas\d$/.test(navn) && !optaget && !this.handling && !this.rystKilde && !this.saml) {
+        if (/^glas\d$/.test(navn) && !optaget && !this.optaget() && !this.rystKilde && !this.saml) {
             var gl = this.g[navn];
             if (gl.sted !== "flytter") {
                 this.holdt = { navn: navn, start: pt, dx: pt.x - gl.p.x, dy: pt.y - gl.p.y, flyttet: false, sidst: pt, t: Date.now() };

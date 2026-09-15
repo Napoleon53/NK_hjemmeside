@@ -5,7 +5,7 @@ påskeæg og glimtene af hans baggrund ligger her, så han ser ens ud og opføre
 ens alle steder. Hver animation har sine egne scener i sin `js/laerer.js`.
 
 Bruges i sc1.3 Knaldgas, sc2.1 Salt i vand, sc2.6 Kobber og dibrom, sc2.7
-Blyiodid, sc6.8 Substitution, sc6.9 Fedt i chips og sc8.6 Jern i ståluld.
+Blyiodid, sc6.8 Substitution, sc6.9 Fedt i chips, sc8.6 Jern i ståluld og sb2.4 Jernthiocyanat.
 Animationerne henter filer herfra og skal derfor ligge ved siden af denne mappe.
 sc2.1 har intet fast tegnebord; dens `js/laerer.js` laver et `NK.Scene` med de mål,
 figuren bruger, og tegner ham skaleret efter lærredets højde. sc2.5 Fældning har en ældre udgave af ham, der kigger op i hjørnet;
@@ -78,6 +78,7 @@ Idéer til senere glimt i samme stil:
 | `bartender` | kolben rystes første gang (sc8.6) | Jeg rystede cocktails under studiet. Det her er ikke det. |
 | `jura` | aubergine (sc8.6) | Aubergine så jeg sidst i 2011. Han læser jura nu. |
 | `titrering` | "Rustfrit." (sc8.6) | Min første titrering gav 140 %. Det var en lang nat. |
+| `afslag` | alle fem glas har fået et indgreb, ingen reference (sb2.4) | Mit afslag fra et tidsskrift hænger indrammet. Samme grund. |
 | `regnskab3`, `6`, `10` | uheld: heptan, petriskål, varm skål og brand (sc6.9), spild og udsugning (sc6.8, sc2.6), vasken og kolben (sc2.6), spild og varmt glas (sc2.7), buretten og vægten (sc8.6), flammen (sc1.3), overkogningen (sc2.1) | Tredje uheld på den her computer. Det står i regnskabet. |
 
 ## Bevægelser

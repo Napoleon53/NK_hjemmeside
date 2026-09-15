@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest - sb2.4 Jernthiocyanat-ligevægten</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:800px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i animationen og kan slettes.
+
+   Aabner index.html i en iframe og koerer forsoeget igennem med de
+   samme funktioner, som klik og knapper bruger: modellen, hele
+   forloebet, sammenligningen, tegneserien, uheldene, musen, quizzen,
+   sproget og ion-notationen. Chrome skal have lov at kigge ind i
+   iframen: lokal server eller --allow-file-access-from-files.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn + (note !== undefined ? "   (" + note + ")" : ""), "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+
+window.addEventListener("load", function () { setTimeout(koer, 1800); });
+
+function koer() {
+    try { koerTest(); } catch (e) { fejl++; skriv("UNDTAGELSE: " + e.message + "\n" + e.stack, "fejl"); }
+    vis();
+}
+
+function koerTest() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument;
+    var NK = ramme.contentWindow.NK;
+    var i, n, t;
+
+    overskrift("1. Indlaesning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    paastand("introen aabner og lukker", !!NK.intro && (NK.intro.aabn(), d.getElementById("intro").classList.contains("vis")) && (NK.intro.luk(), !d.getElementById("intro").classList.contains("vis")));
+    paastand("forsoeg og quiz er bygget", !!(NK.forsoeg && NK.quiz));
+    Object.keys(NK.Sprites.FILER).forEach(function (navn) {
+        paastand("sprite " + navn + " er indlaest", NK.Sprites.klar(navn));
+    });
+
+    var M = NK.Model, f = NK.forsoeg, S = NK.Scene;
+    function adv(sek) { for (var k = 0; k < Math.round(sek * 60); k++) f.opdater(1 / 60); }
+    function vent(betingelse, maks) { var tt = 0; while (!betingelse() && tt < maks) { adv(0.25); tt += 0.25; } return tt; }
+    function frisk() { NK.startForfra(); adv(0.1); }
+    function G(k) { return f.g["glas" + k]; }
+    function V(c) { return M.volumen(c.b); }
+    function kx(c) { return M.koncX(M.samlet(c.b)); }
+    function komma(x, dec) { var p = Math.pow(10, dec === undefined ? 2 : dec); return String(Math.round(x * p) / p).replace(".", ","); }
+    function scene() { return f.laerer.scene ? f.laerer.scene.navn : ""; }
+    function sml(a, b) { return M.sammenlign(M.samlet(a.b), M.samlet(b.b)); }
+    var musTid = 0;
+    function baer(gl, x, y) {
+        var x0 = gl.p.x, y0 = gl.p.y + 80;
+        f.ned({ x: x0, y: y0 });
+        if (!f.holdt) return false;
+        for (var s = 1; s <= 40; s++) {
+            musTid += 40;
+            f.flyt({ x: x0 + (x - x0) * s / 40, y: y0 + (y - y0) * s / 40 }, musTid);
+            f.opdater(1 / 60);
+        }
+        f.op();
+        return true;
+    }
+    function musRyst(gl, A, hz, sek) {
+        var x0 = gl.p.x, y0 = gl.p.y + 80, s;
+        f.ned({ x: x0, y: y0 });
+        if (!f.holdt) return -1;
+        for (s = 0; s <= Math.round(sek * 60); s++) {
+            musTid += 1000 / 60;
+            f.flyt({ x: x0 + 12 + A * Math.sin(2 * Math.PI * hz * s / 60), y: y0 }, musTid);
+            f.opdater(1 / 60);
+            if (f.pyt) break;
+        }
+        f.op();
+        adv(1);
+        return s / 60;
+    }
+
+    overskrift("2. Modellen");
+    paastand("ligevaegten er afstemt", M.afstemt(M.REAKTIONER.ligevaegt));
+    paastand("faeldningen er afstemt", M.afstemt(M.REAKTIONER.faeldning));
+    paastand("ligningen skrives med ligevaegtspil og faser", M.ligning(M.REAKTIONER.ligevaegt, true) === "Fe³⁺(aq) + SCN⁻(aq) ⇌ FeSCN²⁺(aq)", M.ligning(M.REAKTIONER.ligevaegt, true));
+    paastand("formler med ladning", M.formel("SCN-") === "SCN⁻" && M.formel("Ag+") === "Ag⁺" && M.formel("FeSCN2+") === "FeSCN²⁺" && M.formel("Fe3+") === "Fe³⁺");
+    paastand("K er 140 ved 20 °C, mindre ved 80 °C og stoerre ved 0 °C", Math.abs(M.K(20) - 140) < 1e-9 && M.K(80) < M.K(20) && M.K(0) > M.K(20), komma(M.K(80), 0) + " og " + komma(M.K(0), 0));
+    var k20 = M.K(20) / 1000, x0 = M.ligevaegtsKonc(k20, 0.66, 0.66);
+    paastand("ligevaegtskoncentrationen opfylder ligevaegtsloven", Math.abs(x0 / ((0.66 - x0) * (0.66 - x0)) - k20) < 1e-9, komma(x0, 4) + " mM");
+
+    function stam(dr) { var o = M.nyOpl(); M.tilsaetVand(o, 30); M.tilsaet(o, "fe", dr); M.tilsaet(o, "scn", dr); o.x = M.xLigevaegt(o); return o; }
+    function portion(o, mL) { return M.del(M.kopiOpl(o), mL); }
+    function lv(o) { o.x = M.xLigevaegt(o); return o; }
+    var s4 = stam(4);
+    var ref = portion(s4, 5);
+    paastand("fire draaber af hver giver en brugbar stamoploesning", M.stamVurdering(s4) === "ok", M.farveNavn(s4));
+    var o = portion(s4, 5); M.tilsaet(o, "fe", 2); lv(o);
+    paastand("Fe(NO3)3 giver et moerkere glas", M.sammenlign(o, ref) === "mørkere", komma(M.koncX(o) / M.koncX(ref)));
+    o = portion(s4, 5); M.tilsaet(o, "scn", 2); lv(o);
+    paastand("KSCN giver et moerkere glas", M.sammenlign(o, ref) === "mørkere", komma(M.koncX(o) / M.koncX(ref)));
+    o = portion(s4, 5); M.tilsaet(o, "ag", 1); lv(o);
+    paastand("AgNO3 giver et lysere glas med bundfald", M.sammenlign(o, ref) === "lysere" && o.agscn > 3, komma(o.agscn) + " µmol");
+    o = portion(s4, 5); o.T = 80; lv(o);
+    paastand("80 °C giver et lysere glas", M.sammenlign(o, ref) === "lysere", komma(M.koncX(o) / M.koncX(ref)));
+    o = portion(s4, 5); o.T = 0; lv(o);
+    paastand("0 °C giver et moerkere glas", M.sammenlign(o, ref) === "mørkere", komma(M.koncX(o) / M.koncX(ref)));
+    o = portion(s4, 5); M.tilsaetVand(o, 2); lv(o);
+    paastand("vand giver et lysere glas", M.sammenlign(o, ref) === "lysere", komma(M.koncX(o) / M.koncX(ref)));
+    paastand("mange draaber er for moerkt", M.stamVurdering(stam(14)) === "moerk");
+    paastand("én draabe af hver er for lyst", M.stamVurdering(stam(1)) === "lys");
+    var bare = M.nyOpl(); M.tilsaetVand(bare, 30); M.tilsaet(bare, "fe", 4);
+    paastand("uden KSCN er stamoploesningen farveloes", M.stamVurdering(bare) === "farveloes" && M.farveNavn(lv(bare)) === "farveløs");
+    var b = M.beholder(M.MAENGDE.LAG_GLAS);
+    M.haeldI(b, portion(s4, 5));
+    M.draabe(b, "fe");
+    paastand("en draabe lander i et ublandet lag i toppen", !!b.lag && b.lag.fe / b.lag.V > 3 * b.sol.fe / b.sol.V);
+    for (i = 0; i < 600; i++) M.skridt(b, 1 / 60, { T: 20, tau: 25, bland: M.BLAND.diffusion, ryst: 0 });
+    paastand("uden rystning er draaben ikke blandet efter 10 s", !!b.lag);
+    for (i = 0; i < 120; i++) M.skridt(b, 1 / 60, { T: 20, tau: 25, bland: M.BLAND.diffusion + M.BLAND.ryst, ryst: 1 });
+    paastand("efter 2 s rystning er den blandet", !b.lag);
+    paastand("stofmaengden er bevaret", Math.abs(M.samlet(b).fe - (ref.fe + M.DRAABE.umol)) < 1e-6, komma(M.samlet(b).fe) + " µmol");
+
+    overskrift("3. Forsoeget");
+    frisk();
+    paastand("baegerglasset er valgt fra start", f.valgt === "baeger");
+    paastand("et tomt baegerglas haelder ikke", f.klik("baeger") === true && !f.handling);
+    paastand("vand i baegerglasset", f.klik("vand") === true);
+    adv(3.5);
+    paastand("baegerglasset har 30 mL, trin 1 gjort", Math.abs(V(f.g.baeger) - 30) < 0.01 && f.trinGjort("vand") && !f.handling, komma(V(f.g.baeger)));
+    for (i = 0; i < 4; i++) { f.klik("fe"); adv(1.5); }
+    for (i = 0; i < 4; i++) { f.klik("scn"); adv(1.5); }
+    adv(2);
+    paastand("fire draaber af hver, trin 2 gjort", f.g.baeger.draaber.fe === 4 && f.g.baeger.draaber.scn === 4 && f.trinGjort("reagens"), f.g.baeger.draaber.fe + " og " + f.g.baeger.draaber.scn);
+    paastand("draaberne ligger i et ublandet lag", !!f.g.baeger.b.lag);
+    paastand("glasstaven roerer om", f.klik("glasstav") === true);
+    adv(4.5);
+    paastand("der er roert om, og alt er blandet", f.gjort.roert && !f.g.baeger.b.lag && !f.handling);
+    paastand("baegerglasset fordeler", f.klik("baeger") === true);
+    adv(12);
+    paastand("alle fem glas har 5 mL, trin 4 gjort", [1, 2, 3, 4, 5].every(function (k) { return Math.abs(V(G(k)) - 5) < 0.06 && G(k).fyldt; }) && f.fordelt() && !f.handling, komma(V(G(1))));
+    var kxs = [1, 2, 3, 4, 5].map(function (k) { return kx(G(k)); });
+    paastand("glassene har samme farve", Math.max.apply(null, kxs) / Math.min.apply(null, kxs) < 1.05);
+    paastand("intet glas er valgt efter fordelingen", f.valgt === null);
+    paastand("stamoploesningen er i orden, og laereren siger intet", f.stam.vurdering === "ok" && !f.stam.ujaevn && !(f.laererVent || []).length && !scene());
+    paastand("glas 1 er referencen", f.reference() === G(1));
+    paastand("en draabe kraever et valgt glas", f.klik("fe") === false);
+
+    f.klik("glas2");
+    for (i = 0; i < 2; i++) { paastand("draabe " + (i + 1) + " Fe(NO3)3 i glas 2", f.klik("fe") === true); adv(1.5); }
+    paastand("glas 2 har et ublandet lag, trinnet er ikke gjort", !!G(2).b.lag && !f.trinGjort("fe"));
+    paastand("knappen ryster glas 2", f.rystKnap(true) === true && f.rystGlas === G(2));
+    adv(2.5); f.rystKnap(false); adv(1);
+    paastand("glas 2 er blandet og moerkere end referencen", !G(2).b.lag && sml(G(2), G(1)) === "mørkere" && f.trinGjort("fe"), komma(kx(G(2)) / kx(G(1))));
+
+    f.klik("glas3");
+    f.klik("scn"); adv(1.5); f.klik("scn"); adv(1.5);
+    var sek = musRyst(G(3), 50, 3, 3);
+    paastand("glas 3 rystes med musen uden spild og bliver moerkere", !G(3).b.lag && f.antalUheld === 0 && f.trinGjort("scn") && sml(G(3), G(1)) === "mørkere", komma(sek, 1) + " s");
+
+    f.klik("glas4");
+    f.klik("ag"); adv(1.5);
+    f.rystKnap(true); adv(2); f.rystKnap(false); adv(4);
+    paastand("glas 4 er lysere med bundfald i bunden", sml(G(4), G(1)) === "lysere" && G(4).b.bund > 1 && f.trinGjort("ag"), komma(G(4).b.bund) + " µmol");
+
+    f.klik("glas5");
+    paastand("glas 5 til vandbadet", f.klik("vandbad") === true);
+    adv(12);
+    paastand("glas 5 er varmt og lysere, trin varme gjort", G(5).sted === "vandbad" && G(5).b.sol.T > 70 && sml(G(5), G(1)) === "lysere" && f.trinGjort("varme"), komma(G(5).b.sol.T, 0) + " °C");
+    paastand("zoomboblen viser glas 5 i vandbadet", f.bobleBeholder === G(5) && f.bobleTitel(G(5)).indexOf("vandbadet") > 0);
+    paastand("boblen: glas 5 har faerre komplekser end referencen", G(5).mikro.antal("fescn") < G(1).mikro.antal("fescn"), G(5).mikro.antal("fescn") + " mod " + G(1).mikro.antal("fescn"));
+    paastand("boblen: glas 4 har AgSCN og intet FeSCN2+", G(4).mikro.antal("agscn") >= 3 && G(4).mikro.antal("fescn") === 0, G(4).mikro.antal("agscn"));
+    paastand("boblen: glas 2 har flere Fe3+ end referencen", G(2).mikro.antal("fe") > G(1).mikro.antal("fe") + 5, G(2).mikro.antal("fe") + " mod " + G(1).mikro.antal("fe"));
+
+    overskrift("4. Sammenligningen");
+    paastand("tegneserien er laast, og quizzen er laast", d.getElementById("serieknap").hidden && NK.quiz.tilstand === "laast");
+    paastand("det hvide kort aabner visningen", f.klik("kort") === true && f.saml);
+    var data = f.sammenlignData();
+    paastand("glas 1 er reference, de andre kan vurderes", data.glas[0].ref && !data.glas[0].kanVurderes && data.glas[1].kanVurderes && data.glas[4].kanVurderes);
+    paastand("scenens genstande kan ikke bruges, mens visningen er aaben", f.klik("fe") === false && !f.handling);
+    paastand("knappen under glas 2 rammes paa scenen", S.sammenlignHvad({ x: S.samlX(1), y: S.SAML.cy + 124 }) === "vurder2");
+    f.vurder(2); f.vurder(3); f.vurder(4); f.vurder(4); f.vurder(5);
+    paastand("svarene skifter i raekkefoelge", G(2).vurdering.svar === "mørkere" && G(4).vurdering.svar === "lysere" && G(5).vurdering.svar === "mørkere");
+    f.vurder(5);
+    paastand("sammenligningen er ikke gjort, mens visningen er aaben", !f.gjort.sammenlign);
+    paastand("visningen lukkes med krydset", f.klik("samlLuk") === true && !f.saml);
+    paastand("glassene er sammenlignet uden fejl, quizzen er laast op", f.gjort.sammenlign && f.resultat.refNr === 1 && f.resultat.forkerte.length === 0 && NK.quiz.tilstand !== "laast");
+    t = vent(function () { return scene() === "ros"; }, 4);
+    paastand("laereren roser", scene() === "ros", t + " s");
+
+    paastand("glas 5 tages op af vandbadet", f.klik("vandbad") === true);
+    adv(2);
+    t = vent(function () { return G(5).afkoelet; }, 90);
+    adv(25);
+    paastand("glas 5 koeler af, og farven kommer igen", G(5).sted === "stativ" && G(5).afkoelet && sml(G(5), G(1)) === "som referencen", t + " s, " + komma(G(5).b.sol.T, 0) + " °C");
+    paastand("vurderingen fra vandbadet er gemt", G(5).vurdering && G(5).vurdering.faktisk === "lysere" && G(5).vurdering.sted === "vandbad");
+    paastand("resterne afleveres", f.klik("dunk") === true);
+    adv(24);
+    paastand("forsoeget er slut, alt er toemt", f.gjort.affald && [1, 2, 3, 4, 5].every(function (k) { return V(G(k)) < 0.01; }) && V(f.g.baeger) < 0.01 && !f.handling && f.aktueltTrin() === null);
+    paastand("alle trin er gjort", NK.TRIN.every(function (tr) { return f.trinGjort(tr.id); }));
+    paastand("tegneserien er laast op", !d.getElementById("serieknap").hidden);
+    NK.aabnSerie();
+    var ruder = d.querySelectorAll("#serie-ruder .rude");
+    var serieTekst = d.getElementById("serie-ruder").textContent;
+    paastand("tegneserien har mindst otte ruder", ruder.length >= 8, ruder.length);
+    paastand("tegneserien bruger elevens draaber og glas", serieTekst.indexOf("4 dråber Fe(NO₃)₃") > 0 && serieTekst.indexOf("Glas 2 fik Fe(NO₃)₃ og blev mørkere") >= 0 && serieTekst.indexOf("Glas 5 i det varme vandbad blev lysere") >= 0 && serieTekst.indexOf("mørkere igen") > 0);
+    var sidste = ruder[ruder.length - 1];
+    var raekker = sidste.querySelectorAll("tr");
+    paastand("resultatskemaet staar i sidste rude", !!sidste.querySelector("table.resultater") && raekker.length === 6);
+    paastand("skemaet: glas 1 reference, glas 2 moerkere mod hoejre, glas 4 lysere mod venstre",
+        raekker[1].textContent.indexOf("reference") >= 0 &&
+        raekker[2].textContent.indexOf("mørkere") >= 0 && raekker[2].textContent.indexOf("mod højre") >= 0 &&
+        raekker[4].textContent.indexOf("lysere") >= 0 && raekker[4].textContent.indexOf("mod venstre") >= 0 &&
+        raekker[5].textContent.indexOf("vandbad") >= 0, raekker[5].textContent);
+    d.getElementById("serie-luk").click();
+    paastand("tegneserien lukkes", !d.getElementById("tegneserie").classList.contains("vis"));
+
+    overskrift("5. Uheld og bemaerkninger");
+    function klarStam(fe, scn, roer, ag) {
+        frisk();
+        f.klik("vand"); adv(3.5);
+        for (var k = 0; k < fe; k++) { f.klik("fe"); adv(1.5); }
+        for (k = 0; k < scn; k++) { f.klik("scn"); adv(1.5); }
+        for (k = 0; k < (ag || 0); k++) { f.klik("ag"); adv(1.5); }
+        adv(1);
+        if (roer) { f.klik("glasstav"); adv(4.5); }
+        f.klik("baeger"); adv(12);
+    }
+    klarStam(4, 4, false);
+    kxs = [1, 2, 3, 4, 5].map(function (k) { return kx(G(k)); });
+    paastand("uden omroering faar glassene forskellig farve", f.stam.ujaevn && f.haendt.ujaevn, komma(Math.max.apply(null, kxs) / Math.max(Math.min.apply(null, kxs), 0.004), 1));
+    t = vent(function () { return scene() === "ujaevn"; }, 4);
+    paastand("laereren spoerger, om der blev roert om", scene() === "ujaevn" && (f.laerer.tale.indexOf("Rørte") >= 0 || f.laerer.tale.indexOf("farver") >= 0), t + " s");
+    paastand("et klik, mens en draabeflaske gaar hjem, bliver ikke afvist", (function () {
+        frisk(); f.klik("vand"); adv(3.5); f.klik("fe"); adv(1.5); adv(1.8);
+        var hjem = f.handling && f.handling.navn === "hjem";
+        var ok = f.klik("glasstav") === true;
+        adv(6);
+        return hjem && ok && Math.abs(f.g.fe.p.x - f.g.fe.hjem.x) < 1 && Math.abs(f.g.glasstav.p.x - f.g.glasstav.hjem.x) < 1;
+    }()));
+
+    klarStam(4, 0, true);
+    t = vent(function () { return scene() === "farveloes"; }, 4);
+    paastand("uden KSCN: farveloes, og laereren siger det", f.stam.vurdering === "farveloes" && scene() === "farveloes" && !f.trinGjort("reagens"), t + " s");
+
+    klarStam(14, 14, true);
+    t = vent(function () { return scene() === "moerk"; }, 4);
+    paastand("mange draaber: for moerk, og laereren siger det", f.stam.vurdering === "moerk" && scene() === "moerk", t + " s");
+
+    klarStam(4, 4, true, 1);
+    t = vent(function () { return scene() === "soelv"; }, 4);
+    paastand("AgNO3 i baegerglasset: bundfald i alle glas, og laereren siger det", f.stam.vurdering === "soelv" && scene() === "soelv" && [1, 2, 3, 4, 5].every(function (k) { return G(k).b.sol.agscn + (G(k).b.lag ? G(k).b.lag.agscn : 0) > 0; }), t + " s");
+
+    klarStam(4, 4, true);
+    for (n = 1; n <= 5; n++) { f.klik("glas" + n); f.klik("fe"); adv(1.6); }
+    adv(0.5);
+    paastand("naar alle glas har et indgreb, er baegerglasset referencen", f.haendt.ingenRef && f.reference() === f.g.baeger);
+    t = vent(function () { return scene() === "ingenRef" && f.laerer.tale.indexOf("reference") > 0; }, 8);
+    paastand("laereren siger, at der ingen reference er", scene() === "ingenRef" && f.laerer.tale.indexOf("reference") > 0, t + " s");
+    vent(function () { return !scene(); }, 20);
+    paastand("to slags indgreb er ikke sagt endnu", !f.gjort.blandetSagt);
+    f.klik("glas1"); f.klik("scn"); adv(1.6);
+    t = vent(function () { return scene() === "blandet"; }, 4);
+    paastand("to slags indgreb i samme glas faar laereren til at sige det", f.gjort.blandetSagt && f.haendt.blandet1 && scene() === "blandet", t + " s");
+    paastand("sammenligningen bruger baegerglasset som reference", f.klik("kort") === true && f.sammenlignData().tekst.indexOf("bægerglasset") > 0 && f.sammenlignData().glas.every(function (g) { return g.kanVurderes; }));
+    f.lukSammenlign();
+    vent(function () { return !scene(); }, 20);
+
+    klarStam(4, 4, true);
+    f.klik("glas2");
+    sek = musRyst(G(2), 160, 9, 3);
+    paastand("meget voldsom rystning spilder indholdet", !!f.pyt && V(G(2)) < 0.01 && f.haendt.spild2 && f.antalUheld === 1, komma(sek, 1) + " s");
+    adv(0.8);
+    paastand("laereren kommer og toerrer op", scene() === "spild" && f.laererOptaget());
+    paastand("klik afvises, mens laereren toerrer op", f.klik("fe") === false);
+    vent(function () { return !f.laererOptaget(); }, 15);
+    paastand("pytten er vaek, og glas 2 fyldes igen fra baegerglasset", !f.pyt && f.klik("baeger") === true);
+    adv(4);
+    paastand("glas 2 er fyldt igen", V(G(2)) > 4.5 && G(2).fyldt, komma(V(G(2))));
+    f.klik("glas3");
+    for (i = 0; i < 8 && !f.pyt; i++) { f.klik("vand"); adv(2.6); }
+    paastand("for meget vand faar glas 3 til at loebe over", f.haendt.overloeb3 && V(G(3)) <= M.MAENGDE.GLAS_MAKS + 0.01, komma(V(G(3))) + " mL");
+    vent(function () { return !f.laererOptaget(); }, 15);
+    var serie2 = d.createElement("div");
+    NK.Tegneserie.byg(f, serie2);
+    paastand("tegneserien faar ruder for spild og overloeb", serie2.textContent.indexOf("rystet så voldsomt") > 0 && serie2.textContent.indexOf("løb over") > 0);
+
+    overskrift("6. Glassene flyttes med musen");
+    klarStam(4, 4, true);
+    var vb = S.BAD.vandbad;
+    paastand("glas 4 baeres over i vandbadet", baer(G(4), vb.cx, vb.y - 20));
+    adv(1.5);
+    paastand("glas 4 staar i vandbadet", G(4).sted === "vandbad");
+    paastand("glas 3 kan ikke komme i vandbadet samtidig", baer(G(3), vb.cx, vb.y - 20) && (adv(1), G(3).sted === "stativ"));
+    paastand("glas 4 baeres tilbage til stativet", baer(G(4), 545, 420));
+    adv(1.5);
+    paastand("glas 4 staar i stativet", G(4).sted === "stativ" && Math.abs(G(4).p.x - G(4).hjem.x) < 2);
+    paastand("glas 3 slippes over dunken og toemmes", baer(G(3), S.DUNK.x + 45, S.DUNK.y - 20));
+    adv(5);
+    paastand("glas 3 er tomt og staar i stativet", V(G(3)) < 0.01 && !G(3).fyldt && G(3).sted === "stativ");
+    f.klik("glas1");
+    paastand("glas 1 til isbadet", f.klik("isbad") === true);
+    adv(12);
+    paastand("glas 1 bliver koldt og moerkere end glas 2", G(1).b.sol.T < 3 && sml(G(1), G(2)) === "mørkere", komma(G(1).b.sol.T, 1) + " °C");
+
+    overskrift("7. Kaffen");
+    frisk();
+    paastand("laereren henter kaffen", f.klik("kaffekop") === true && scene() === "kaffe");
+    vent(function () { return !f.laererOptaget(); }, 15);
+    paastand("koppen er vaek, og laereren er gaaet", f.g.kaffekop.skjult && !f.laererOptaget());
+
+    overskrift("8. Quizzens spoergsmaal");
+    paastand("quizzen har 10 spoergsmaal", NK.QUIZ.length === 10);
+    NK.QUIZ.forEach(function (sp, k) {
+        var unikke = sp.valg.filter(function (v, j) { return sp.valg.indexOf(v) === j; }).length === 4;
+        var blandOk = true;
+        for (i = 0; i < 100; i++) {
+            var bl = NK.quiz.bland(sp);
+            if (bl.valg[bl.rigtig] !== sp.valg[sp.rigtig]) blandOk = false;
+        }
+        paastand("spoergsmaal " + (k + 1) + ": fire forskellige svar, blandingen holder styr paa det rigtige", sp.valg.length === 4 && unikke && !!sp.forklaring && blandOk);
+    });
+
+    overskrift("9. Sprog og notation");
+    var tekster = [d.body.textContent, serieTekst, serie2.textContent];
+    NK.QUIZ.forEach(function (sp) { tekster.push(sp.sp, sp.forklaring, sp.valg.join(" ")); });
+    NK.TRIN.forEach(function (tr) { tekster.push(tr.tekst, tr.hint); });
+    Object.keys(NK.Mikro.ETIKET).forEach(function (k) { tekster.push(NK.Mikro.ETIKET[k]); });
+    var alt = tekster.join(" ");
+    paastand("ingen tankestreger", !/[—–]/.test(alt));
+    paastand("ingen ladning skrevet som 1+ eller 1−", !/[¹][⁺⁻]|[A-Za-z)\]₀-₉]1[+−-]/.test(alt));
+
+    frisk();
+}
+
+function vis() {
+    skriv("\n" + (fejl === 0 ? "ALT OK" : fejl + " FEJL"), fejl === 0 ? "ok" : "fejl");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+</script>
+</body>
+</html>

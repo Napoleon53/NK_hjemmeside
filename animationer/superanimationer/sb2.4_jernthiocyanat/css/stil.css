@@ -577,3 +577,17 @@ button:focus-visible {
 @media (prefers-reduced-motion: reduce) {
     * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
+
+/* ---------------------------------------------------------------------
+   SB2.4: sammenligningsknappen og resultatskemaet med fire kolonner
+   --------------------------------------------------------------------- */
+.knaprad .knap { padding: 9px 6px; }
+#sammenlign-knap.aktiv { background-color: var(--blaa); }
+.rude.skema-rude { grid-column: 1 / -1; }
+.resultater.skema { table-layout: auto; font-size: 0.88rem; }
+.resultater.skema tr:first-child th { text-align: left; }
+.resultater.skema tr:first-child th:first-child { width: auto; }
+.resultater.skema th { color: var(--gul); padding: 5px 12px 5px 0; }
+.resultater.skema td { text-align: left; font-weight: 600; padding: 5px 12px 5px 0; }
+.resultater.skema td:empty::after { content: ""; }
+.resultater .facit { display: block; font-weight: 400; font-size: 0.8rem; color: #f0918a; }

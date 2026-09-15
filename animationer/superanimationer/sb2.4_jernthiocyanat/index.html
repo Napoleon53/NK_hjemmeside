@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jernthiocyanat-ligevægten</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚗</span> Jernthiocyanat-ligevægten <span class="undertitel">Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺</span></h1>
+
+    <div class="top-hoejre">
+        <button class="knap topknap" id="forfraknap" type="button" title="Start forsøget forfra">Start forfra</button>
+        <button class="knap topknap" id="introknap" type="button" title="Hvad forsøget handler om">Om forsøget</button>
+        <button class="knap topknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+        <button class="ikonknap" id="lydknap" type="button" title="Lyd til og fra (M)" aria-label="Lyd til og fra" aria-pressed="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/>
+                <path class="boelger" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path class="kryds" d="M16.5 9.5l5 5M21.5 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </button>
+        <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+    </div>
+</header>
+
+<main class="forsoeg">
+    <div class="scene" id="scene">
+        <canvas id="scene-laerred" aria-label="Laboratoriebord med sprøjteflaske, bægerglas, dråbeflasker med Fe(NO₃)₃, KSCN og AgNO₃, fem reagensglas i et stativ foran et hvidt kort, et varmt vandbad, et isbad og en affaldsdunk"></canvas>
+        <div class="scenebesked" id="scenebesked" aria-live="polite"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort fremhaev" id="forloeb-kort">
+            <h2><span>Forløb</span> <span class="taeller" id="forloeb-taeller"></span></h2>
+            <ol class="trinliste" id="trin-liste"></ol>
+            <div class="knaprad">
+                <button class="knap orange" id="ryst-knap" type="button" title="Hold nede for at ryste det valgte glas (R)" hidden><span>Ryst glasset</span><span class="tegn">↔</span></button>
+                <button class="knap blaa" id="sammenlign-knap" type="button" title="Se glassene ovenfra (S)" hidden><span id="sammenlign-tekst">Sammenlign</span><span class="tegn">◎</span></button>
+                <button class="knap" id="hint-knap" type="button" title="Hint til trinnet (I)"><span>Hint</span><span class="tegn">?</span></button>
+            </div>
+            <p class="hint" id="hint-tekst" hidden></p>
+        </div>
+
+        <div class="kort" id="serie-kort">
+            <h2>Tegneserie</h2>
+            <p class="besked" id="serie-tekst">Låses op, når forsøget er slut.</p>
+            <button class="knap stor blaa" id="serieknap" type="button" hidden><span>Se forsøget som tegneserie</span><span class="tegn">→</span></button>
+        </div>
+
+        <div class="kort opgavekort" id="quiz-kort">
+            <h2><span>Quiz</span> <span class="taeller" id="quiz-taeller"></span></h2>
+            <p class="besked" id="quiz-tekst"></p>
+            <div class="valg" id="quiz-valg" hidden></div>
+            <p class="besked" id="quiz-forklaring" hidden></p>
+            <div class="quiz-score" id="quiz-score" hidden></div>
+            <button class="knap stor blaa" id="quiz-knap" type="button" hidden><span id="quiz-knap-tekst">Start quiz</span><span class="tegn">→</span></button>
+        </div>
+    </aside>
+</main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="intro">
+    <div class="overlay-boks intro-boks" role="dialog" aria-labelledby="intro-titel">
+        <h2 id="intro-titel">Jernthiocyanat-ligevægten</h2>
+        <p class="intro-formaal">Forsøget undersøger, hvordan ligevægten Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺ reagerer på tilsatte stoffer og på temperaturen.</p>
+
+        <h3>Forsøget</h3>
+        <ol class="intro-trin">
+            <li>Lav en opløsning af vand, Fe(NO₃)₃ og KSCN i bægerglasset, og rør om.</li>
+            <li>Fordel opløsningen i de fem reagensglas.</li>
+            <li>Lav ét indgreb i hvert glas, og lad ét glas stå urørt som reference.</li>
+            <li>Sammenlign glassene ovenfra med referencen.</li>
+            <li>Aflever resterne.</li>
+        </ol>
+
+        <h3>Uheld</h3>
+        <p>Forkerte handlinger kan give uheld. Kemichael rydder op.</p>
+
+        <div class="knapper">
+            <button class="knap" id="intro-rundvisning" type="button">Rundvisning</button>
+            <button class="knap blaa" id="intro-start" type="button">Start forsøget</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Jern(III)thiocyanat-ligevægten</h2>
+        <p>Jern(III)ioner og thiocyanationer danner et rødt kompleks:</p>
+        <div class="ligning">Fe³⁺(aq) + SCN⁻(aq) ⇌ FeSCN²⁺(aq)</div>
+        <p>Farven viser, hvor meget FeSCN²⁺ der er. En mørkere farve betyder, at ligevægten er forskudt mod højre. En lysere farve betyder, at den er forskudt mod venstre.</p>
+
+        <h3>Ligevægtsloven</h3>
+        <div class="ligning lille">K = [FeSCN²⁺] / ([Fe³⁺] · [SCN⁻])</div>
+        <p>Efter et indgreb er reaktionsbrøken Y forskellig fra K, og ligevægten forskydes, til Y igen er lig med K.</p>
+
+        <h3>Tilsætning og fjernelse</h3>
+        <p>Tilsættes Fe³⁺ eller SCN⁻, forskydes ligevægten mod højre. Ag⁺ fjerner SCN⁻ som et hvidt bundfald, og ligevægten forskydes mod venstre:</p>
+        <div class="ligning lille">Ag⁺(aq) + SCN⁻(aq) → AgSCN(s)</div>
+
+        <h3>Temperatur</h3>
+        <p>Reaktionen mod højre er exoterm. Opvarmning gør K mindre og forskyder ligevægten mod venstre. Afkøling gør K større og forskyder den mod højre.</p>
+
+        <h3>Fortynding</h3>
+        <p>Fortyndes opløsningen med vand, forskydes ligevægten mod den side, der har flest opløste partikler, altså mod venstre.</p>
+
+        <h3>Referencen</h3>
+        <p>Et urørt glas med samme opløsning er referencen. Glassene sammenlignes ovenfra mod hvidt papir, fordi lyset så går gennem hele væskesøjlen.</p>
+
+        <h3>Sikkerhed og affald</h3>
+        <p>AgNO₃ er ætsende og giver sorte pletter på huden. Brug handsker og briller. Resterne indeholder sølv og afleveres som tungmetalaffald.</p>
+
+        <div class="knapper">
+            <button class="knap blaa" id="teori-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<div class="overlay" id="tegneserie">
+    <div class="overlay-boks bred">
+        <h2>Forsøget som tegneserie</h2>
+        <div class="serie" id="serie-ruder"></div>
+        <div class="knapper">
+            <button class="knap blaa" id="serie-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/7</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/model.js"></script>
+<script src="js/lyd.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../kemichael/kemichael.js"></script>
+<script src="js/scene.js"></script>
+<script src="js/mikro.js"></script>
+<script src="js/forsoeg.js"></script>
+<script src="js/bord.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/tegneserie.js"></script>
+<script src="js/quiz.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

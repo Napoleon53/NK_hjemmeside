@@ -48,12 +48,12 @@
 
     S.HYLDE = { x0: 16, x1: 116, y: 268 };
     S.UR = { x: 66, y: 170, r: 24 };
-    S.KORT = { x: 338, y: 262, b: 314, h: 236 };
+    S.KORT = { x: 338, y: 290, b: 314, h: 208 };
     S.STATIV = { x: 350, y: 400, b: 290, huller: [395, 445, 495, 545, 595] };
     S.GLAS_Y = S.BORD - 12 - 154 + 2;
     S.VARMEPLADE = { x: 662, y: 457, skala: 0.6 };
     S.DUNK = { x: 902, y: S.BORD - 130, aabning: { x: 947, y: S.BORD - 118 } };
-    S.BOBLE = { x: 262, y: 160, r: 104 };
+    S.BOBLE = { x: 244, y: 150, r: 104 };
     S.LUP_GLAS = { x: 15, y: 128 };
     S.LUP_BAEGER = { x: 36, y: 88 };
     S.STAV_L = 170;
@@ -537,6 +537,22 @@
             top = S.tegnVaeske(ctx, verden, g.V * S.BAEGER_ML, g.Vsol * S.BAEGER_ML, g.solFarve, g.lagFarve, { boelge: g.boelge, tid: tid, uklar: g.uklar });
             if (g.bund > 0.01) tegnBundfald(ctx, g.p, a, verden, 7, 65, 104, 5 * NK.klamp(g.bund, 0, 2));
         }
+        /* Et tyndt moerkt omrids, saa glasset ogsaa ses mod det hvide kort */
+        ctx.save();
+        ctx.translate(g.p.x, g.p.y);
+        ctx.rotate(g.p.v);
+        ctx.translate(-a.x, -a.y);
+        ctx.strokeStyle = "rgba(55, 70, 85, 0.45)";
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(3, 4);
+        ctx.lineTo(3, 101);
+        ctx.quadraticCurveTo(3, 109, 11, 109);
+        ctx.lineTo(61, 109);
+        ctx.quadraticCurveTo(69, 109, 69, 101);
+        ctx.lineTo(69, 4);
+        ctx.stroke();
+        ctx.restore();
         NK.Sprites.tegnPositur(ctx, "baeger", g.p, a);
         if (g.valgt) {
             var m = NK.tilVerden(g.p, a, 60, -8);
