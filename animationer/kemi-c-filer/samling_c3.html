@@ -62,9 +62,12 @@
         /* Titlen i headeren */
         .header-text {
             font-weight: bold;
-            font-size: 0.9em;
-            letter-spacing: 1px;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
             white-space: nowrap;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* Skjul teksten når menuen er lukket */
@@ -92,11 +95,12 @@
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 2px;
+            flex-shrink: 0;
         }
 
-        .link-btn {
-            font-size: 16px;
+        .header-actions .toggle-btn {
+            font-size: 18px;
+            padding: 3px;
         }
 
         .sidebar.collapsed .link-btn {
@@ -280,9 +284,6 @@
         .gendan-knap:hover { background-color: rgba(52, 152, 219, 0.9); }
         .content-area.fuld .gendan-knap { display: flex; }
 
-        /* Fuld skaerm kan vaelges for enhver animation med knappen i hovedet */
-        .fuld-btn { font-size: 20px; }
-        .sidebar.collapsed .header-actions .toggle-btn { padding: 3px; }
     </style>
 </head>
 <body>
