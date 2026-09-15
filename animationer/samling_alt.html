@@ -464,6 +464,9 @@
             cursor: default;
         }
 
+
+        /* Fuld skaerm: den indre side beder om at faa hele vinduet */
+        .sidebar.skjult { width: 0; border-right: none; }
     </style>
 </head>
 <body>
@@ -534,6 +537,7 @@
             var iframe = document.getElementById('visningsVindue');
             iframe.style.display = 'block';
             iframe.src = filsti;
+            document.getElementById('sidebarMenu').classList.remove('skjult');
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             knap.classList.add('active');
         }
@@ -542,6 +546,7 @@
             document.getElementById('visningsVindue').style.display = 'none';
             document.getElementById('startside').style.display = 'block';
             document.getElementById('sidebarMenu').classList.remove('collapsed');
+            document.getElementById('sidebarMenu').classList.remove('skjult');
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         }
 
@@ -614,6 +619,12 @@
         window.addEventListener('message', function(event) {
             if (event.data === 'animationFocus') {
                 document.getElementById('sidebarMenu').classList.add('collapsed');
+            }
+            if (event.data === 'fuldSkaerm') {
+                document.getElementById('sidebarMenu').classList.add('skjult');
+            }
+            if (event.data === 'gendanPanel') {
+                document.getElementById('sidebarMenu').classList.remove('skjult');
             }
         });
 

@@ -42,6 +42,11 @@ statiske sider i roden, downloads i `downloads/`.
   sker ved at trække. Zoomboblen står i panelet, ikke på scenen.
   Mønster: `laboratoriet/proevebord/`.
 - Sidepanelet er 430 px bredt (`--panel-bredde` i `laboratoriet/css/grund.css`).
+  Prøvebordet har 473 px, fordi zoomboblen står i panelet.
+- Samlingssiderne (`samling_*.html`) viser superanimationer i fuld skærm:
+  sidepanelerne skjules i begge lag, og knappen ☰ nederst til venstre
+  gendanner dem (`fuldSkaerm` i de indre sider, beskederne `fuldSkaerm` og
+  `gendanPanel` til de ydre).
 - Superanimationer om laboratorieforsøg har en intro-popup, der kort siger, hvad
   forsøget undersøger, og hvad eleven skal gøre. Den åbner af sig selv første
   gang og igen med knappen Om forsøget (mønster: `#intro` i

@@ -256,6 +256,29 @@
             text-decoration: underline;
         }
 
+
+        /* Fuld skaerm: sidepanelet skjules helt, naar en superanimation vises,
+           og knappen i nederste venstre hjoerne gendanner det */
+        .sidebar.skjult { width: 0; border-right: none; }
+        .gendan-knap {
+            position: absolute;
+            left: 10px;
+            bottom: 10px;
+            z-index: 5;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background-color: rgba(26, 37, 47, 0.75);
+            color: #ffffff;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .gendan-knap:hover { background-color: rgba(52, 152, 219, 0.9); }
+        .content-area.fuld .gendan-knap { display: flex; }
     </style>
 </head>
 <body>
@@ -284,6 +307,7 @@
         </div>
 
         <div class="content-area">
+            <button class="gendan-knap" id="gendanKnap" onclick="fuldSkaerm(false)" title="Vis samlingen">☰</button>
             <div class="startside" id="startside">
                 <div class="startside-grid" id="startsideGrid"></div>
             </div>
@@ -303,6 +327,7 @@
             document.getElementById('startside').style.display = 'none';
             iframe.style.display = 'block';
             iframe.src = filsti;
+            fuldSkaerm(filsti.indexOf('superanimationer/') >= 0);
             ignorerBlurIndtil = Date.now() + 1200;
 
             var alleKnapper = document.querySelectorAll('.tab-btn');
@@ -314,6 +339,7 @@
             document.getElementById('visningsVindue').style.display = 'none';
             document.getElementById('startside').style.display = 'block';
             document.getElementById('sidebarMenu').classList.remove('collapsed');
+            fuldSkaerm(false);
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         }
 
@@ -331,6 +357,19 @@
             });
         }
         byggStartside();
+
+        // Fuld skaerm: laboratorieforsoegene (superanimationer) faar hele vinduet.
+        // Sidepanelet skjules, og knappen i hjoernet gendanner det. Det ydre panel
+        // (samling_alt) faar besked, saa det ogsaa skjuler sit.
+        function fuldSkaerm(til) {
+            var menu = document.getElementById('sidebarMenu');
+            menu.classList.toggle('skjult', til);
+            if (!til) menu.classList.remove('collapsed');
+            document.querySelector('.content-area').classList.toggle('fuld', til);
+            if (window.parent !== window) {
+                window.parent.postMessage(til ? 'fuldSkaerm' : 'gendanPanel', '*');
+            }
+        }
 
         function toggleMenu() {
             var menu = document.getElementById('sidebarMenu');

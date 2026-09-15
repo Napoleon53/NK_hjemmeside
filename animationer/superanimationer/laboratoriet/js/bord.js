@@ -1149,7 +1149,7 @@
         var vis = !!v && (B.volumen(v) > 0.05 || B.fastIalt(v) > 0.5 || this.mikro.partikler.length > 0) && this.koer.navn() !== "affald";
         if (vis) {
             this.bobleBeholder = v;
-            this.mikro.opdater(dt, Stof.partikelTal(B.samlet(v), 12), { ryst: this.omgivelser(v).ryst });
+            this.mikro.opdater(dt, Stof.partikelTal(B.samlet(v), this.valg.partikler || 6), { ryst: this.omgivelser(v).ryst });
         } else this.mikro.opdater(dt, {}, { ryst: 0 });
         this.bobleAlfa = NK.mod(this.bobleAlfa, vis ? 1 : 0, 5, dt);
 
