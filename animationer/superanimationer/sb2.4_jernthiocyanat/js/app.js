@@ -16,19 +16,22 @@
     var hintTrin = "";
     var serieSet = false;
 
+    var TITEL = { 1: "Del 1: De syv glas", 2: "Del 2: Fortynding" };
+
     /* ----- Forloebet ---------------------------------------------------- */
     function opdaterPanel() {
         var f = forsoeg;
         var aktuelt = f.aktueltTrin();
-        var aktivId = aktuelt ? aktuelt.id : "";
+        var aktivId = aktuelt ? f.station + aktuelt.id : "";
+        var liste = f.trin();
         var ol = NK.el("trin-liste");
         ol.innerHTML = "";
         var antalGjort = 0;
-        NK.TRIN.forEach(function (t, i) {
+        liste.forEach(function (t, i) {
             var gjort = f.trinGjort(t.id);
             var li = document.createElement("li");
             if (gjort) { li.className = "gjort"; antalGjort++; }
-            else if (t.id === aktivId) li.className = "aktiv";
+            else if (aktuelt && t.id === aktuelt.id) li.className = "aktiv";
             var nr = document.createElement("span");
             nr.className = "nr";
             nr.textContent = gjort ? "✓" : String(i + 1);
@@ -36,7 +39,13 @@
             li.appendChild(document.createTextNode(t.tekst));
             ol.appendChild(li);
         });
-        NK.saetTekst("forloeb-taeller", antalGjort + "/" + NK.TRIN.length);
+        NK.saetTekst("forloeb-titel", TITEL[f.station]);
+        NK.saetTekst("forloeb-taeller", antalGjort + "/" + liste.length);
+
+        [1, 2].forEach(function (n) {
+            NK.el("station" + n).classList.toggle("aktiv", f.station === n);
+            NK.el("station" + n).setAttribute("aria-pressed", f.station === n ? "true" : "false");
+        });
 
         if (aktivId !== hintTrin) {
             hintTrin = aktivId;
@@ -50,30 +59,30 @@
         rk.disabled = !viser;
         rk.classList.toggle("aktiv", f.rystKilde === "knap");
 
-        var sk = NK.el("sammenlign-knap");
-        var kan = f.saml || f.glasListe().some(function (gl) { return M.volumen(gl.b) > 0.3; });
-        sk.hidden = !kan;
-        sk.classList.toggle("aktiv", f.saml);
-        sk.classList.toggle("banker", aktivId === "sammenlign" && !f.saml);
-        NK.saetTekst("sammenlign-tekst", f.saml ? "Luk visningen" : "Sammenlign");
+        var vk = NK.el("visning-knap");
+        vk.classList.toggle("aktiv", !!f.visning);
+        vk.classList.toggle("banker", !!aktuelt && (aktuelt.id === "billede" || aktuelt.id === "farveSml" || aktuelt.id === "lvSml") && !f.visning);
+        NK.saetTekst("visning-tekst", f.visning ? "Luk visningen" : (f.station === 1 ? "Tag billede" : "Se ovenfra"));
 
-        NK.el("serieknap").hidden = !f.gjort.affald;
-        NK.saetTekst("serie-tekst", f.gjort.affald ? "Forsøget er slut." : "Låses op, når forsøget er slut.");
-        NK.el("serieknap").classList.toggle("banker", !!f.gjort.affald && !serieSet);
-        quiz.saetLaast(!f.gjort.sammenlign);
+        var faerdig = f.alleFaerdige();
+        NK.el("serieknap").hidden = !faerdig;
+        NK.saetTekst("serie-tekst", faerdig ? "Forsøget er slut." : "Låses op, når begge dele er gjort.");
+        NK.el("serieknap").classList.toggle("banker", faerdig && !serieSet);
+        quiz.saetLaast(!f.gjort.billede);
         sidsteSignatur = signatur();
     }
 
     function signatur() {
         var f = forsoeg;
         var t = f.aktueltTrin();
-        var glas = f.glasListe().map(function (gl) {
-            return [Math.round(M.volumen(gl.b) * 4), gl.sted, !!gl.b.lag, gl.vurdering ? gl.vurdering.svar : "", f.indgrebListe(gl).join("+")].join(",");
+        var beholdere = f.alleBeholdere().map(function (c) {
+            return [Math.round(M.volumen(c.b) * 4), c.sted || "", !!c.b.lag, M.fastIalt(c.b) > 0, c.vurdering ? c.vurdering.svar : "", c.erGlas ? f.indgrebListe(c).join("+") : "", c.maaltT].join(",");
         }).join(";");
+        var d2 = f.del2.vurdering ? f.del2.vurdering.svar + f.del2.vurdering.idx : "";
         return [
-            t ? t.id : "", !!f.handling, f.rystKilde, f.kanRysteNu(), f.valgt, f.saml, glas,
-            Math.round(M.volumen(f.g.baeger.b)), f.g.baeger.draaber.fe, f.g.baeger.draaber.scn,
-            NK.TRIN.map(function (x) { return f.trinGjort(x.id) ? 1 : 0; }).join(""), !!f.gjort.affald, !!f.gjort.sammenlign
+            f.station, t ? t.id : "", !!f.handling, f.rystKilde, f.kanRysteNu(), f.valgt, f.visning, beholdere, d2,
+            NK.TRIN[1].concat(NK.TRIN[2]).map(function (x) { return f.trinGjort(x.id) ? 1 : 0; }).join(""),
+            !!f.gjort.affald, !!f.gjort.billede, !!f.gjort.lvSml
         ].join("|");
     }
 
@@ -88,7 +97,7 @@
 
     /* ----- Tegneserien --------------------------------------------------- */
     function aabnSerie() {
-        if (!forsoeg.gjort.affald) return;
+        if (!forsoeg.alleFaerdige()) return;
         serieSet = true;
         NK.Rundvisning.luk();
         NK.Tegneserie.byg(forsoeg, NK.el("serie-ruder"));
@@ -154,6 +163,7 @@
     function startForfra() {
         forsoeg.stopRyst();
         forsoeg.holdt = null;
+        forsoeg.baerer = null;
         forsoeg.nulstil();
         serieSet = false;
         NK.el("hint-tekst").hidden = true;
@@ -165,7 +175,7 @@
         if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
         if (e.ctrlKey || e.metaKey || e.altKey) return;
 
-        if (e.key === "Escape") { lukOverlay(); NK.Rundvisning.luk(); forsoeg.lukSammenlign(); return; }
+        if (e.key === "Escape") { lukOverlay(); NK.Rundvisning.luk(); forsoeg.lukVisning(); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") {
             if (NK.Rundvisning.aktiv()) NK.Rundvisning.luk();
             else { lukOverlay(); NK.Rundvisning.start(); }
@@ -175,7 +185,9 @@
 
         NK.Lyd.laasOp();
         if (e.key === "r" || e.key === "R") { if (!e.repeat) forsoeg.rystKnap(true); }
-        else if (e.key === "s" || e.key === "S") forsoeg.skiftSammenlign();
+        else if (e.key === "s" || e.key === "S") forsoeg.skiftVisning();
+        else if (e.key === "1") forsoeg.skiftStation(1);
+        else if (e.key === "2") forsoeg.skiftStation(2);
         else if (e.key === "i" || e.key === "I") visHint();
         else if (e.key === "m" || e.key === "M") skiftLyd();
         else if (e.key === "t" || e.key === "T") aabnTeori();
@@ -227,7 +239,9 @@
         });
         rk.addEventListener("contextmenu", function (e) { e.preventDefault(); });
 
-        NK.el("sammenlign-knap").addEventListener("click", function () { NK.Lyd.laasOp(); forsoeg.skiftSammenlign(); });
+        NK.el("station1").addEventListener("click", function () { forsoeg.skiftStation(1); });
+        NK.el("station2").addEventListener("click", function () { forsoeg.skiftStation(2); });
+        NK.el("visning-knap").addEventListener("click", function () { NK.Lyd.laasOp(); forsoeg.skiftVisning(); });
         NK.el("hint-knap").addEventListener("click", visHint);
         NK.el("forfraknap").addEventListener("click", startForfra);
         NK.el("teoriknap").addEventListener("click", aabnTeori);

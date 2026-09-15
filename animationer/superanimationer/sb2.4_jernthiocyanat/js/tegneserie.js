@@ -1,12 +1,11 @@
 /* =====================================================================
    tegneserie.js - forsoeget opsummeret som en tegneserie
 
-   Bag knappen Tegneserie, som laases op, naar resterne er afleveret.
-   Hver rude er et lille laerred, tegnet med de samme funktioner som
-   scenen, og en kort tekst bygget af elevens egne tal: draaberne i
-   stamoploesningen, hvilket glas der fik hvilket indgreb, og hvordan
-   glassene saa ud, da de blev vurderet. Uheld faar deres egen rude.
-   Sidste rude er resultatskemaet med elevens iagttagelser.
+   Bag knappen Tegneserie, som laases op, naar begge dele er gjort. Hver
+   rude er et lille laerred, tegnet med de samme funktioner som scenen,
+   og en kort tekst bygget af elevens egne resultater: hvad hvert glas
+   fik, temperaturerne, farveaendringerne paa billedet og fortyndingen i
+   del 2. Uheld faar deres egen rude. Sidste rude er resultatskemaet.
    ===================================================================== */
 (function () {
     "use strict";
@@ -52,39 +51,29 @@
         container.appendChild(div);
     }
 
-    /* Samme koncentrationer i et andet volumen */
-    function skaler(o, V) {
-        if (!o || o.V <= 0) return null;
-        var ud = M.kopiOpl(o), k = V / o.V;
-        ["V", "fe", "scn", "ag", "agscn", "x"].forEach(function (n) { ud[n] = o[n] * k; });
-        return ud;
-    }
-
-    function glasObj(x, opl, opt) {
-        opt = opt || {};
-        var V = opl ? opl.V : 0;
-        return {
-            p: { x: x, y: GLAS_Y, v: 0 }, V: V, Vsol: V, solFarve: opl ? M.glasFarve(opl) : null, lagFarve: null,
-            bund: opt.bund || 0, uklar: opt.uklar || 0, boelge: 0, fremhaev: false, nr: opt.nr || 0, valgt: false
-        };
+    /* En tegning af et glas flyttet hen til x i ruden */
+    function glasHer(t, x, nr) {
+        var ny = {};
+        for (var k in t) if (Object.prototype.hasOwnProperty.call(t, k)) ny[k] = t[k];
+        ny.p = { x: x, y: GLAS_Y, v: 0 };
+        ny.nr = nr || 0;
+        ny.valgt = false;
+        ny.fremhaev = false;
+        ny.boelge = 0;
+        return ny;
     }
 
     /* Glassets tal: gemt ved afleveringen, ellers som glasset er nu */
     function data(f, gl) {
         if (gl.slut) return gl.slut;
         return {
-            opl: M.samlet(gl.b), bundfald: f.bundfald(gl), indgreb: f.indgrebTekst(gl), liste: f.indgrebListe(gl),
-            vurdering: gl.vurdering, afkoelet: gl.afkoelet, uroert: f.uroert(gl)
+            opl: M.samlet(gl.b), tegning: f.beholderTegning(gl), indgreb: f.indgrebTekst(gl), liste: f.indgrebListe(gl),
+            vurdering: gl.vurdering, maaltT: gl.maaltT, afkoelet: gl.afkoelet, uroert: f.uroert(gl)
         };
     }
 
-    /* Glasset, som det saa ud, da det blev vurderet */
-    function visOpl(d) {
-        return d.vurdering ? d.vurdering.opl : d.opl;
-    }
-
-    function visBund(d) {
-        return (d.vurdering ? d.vurdering.bundfald : d.bundfald) || { bund: 0, uklar: 0 };
+    function visTegning(d) {
+        return d.vurdering ? d.vurdering.tegning : d.tegning;
     }
 
     function ord(rel) {
@@ -92,9 +81,21 @@
         return "ikke synligt anderledes";
     }
 
-    function draaber(n) {
-        return n === 1 ? "dråbe" : "dråber";
-    }
+    var HANDLING = {
+        fe: "fik Fe(NO₃)₃ (s)", vitc: "fik ascorbinsyre", scn: "fik KSCN (s)", kscn: "fik KSCN-opløsning",
+        ag: "fik AgNO₃", vand: "fik vand", varme: "stod i det varme vandbad", kulde: "stod i isbadet"
+    };
+
+    var FORKLARING = {
+        fe: "Mere " + "Fe³⁺" + " forskyder ligevægten mod højre.",
+        vitc: "Ascorbinsyre reducerer Fe³⁺ til Fe²⁺, så c(Fe³⁺) falder, og ligevægten forskydes mod venstre.",
+        scn: "Mere SCN⁻ forskyder ligevægten mod højre.",
+        kscn: "Mere SCN⁻ forskyder ligevægten mod højre, men opløsningen fortynder også glasset.",
+        ag: "Ag⁺ fælder SCN⁻ som AgSCN, og ligevægten forskydes mod venstre.",
+        vand: "Fortynding forskyder ligevægten mod venstre.",
+        varme: "Reaktionen mod højre er exoterm, så opvarmning forskyder ligevægten mod venstre.",
+        kulde: "Afkøling forskyder ligevægten mod højre, fordi reaktionen mod højre er exoterm."
+    };
 
     function tegnBad(ctx, x, varm) {
         var y0 = GLAS_Y + 92, y1 = GLAS_Y + 160, i;
@@ -116,85 +117,99 @@
                 ctx.arc(x - 30 + i * 10, y1 - 10 - (i * 13) % 50, 1.6, 0, Math.PI * 2);
                 ctx.fill();
             }
-            ctx.strokeStyle = "rgba(235, 242, 248, 0.35)";
-            ctx.lineWidth = 2;
-            for (i = 0; i < 3; i++) {
-                ctx.beginPath();
-                ctx.moveTo(x - 22 + i * 22, y0 - 6);
-                ctx.bezierCurveTo(x - 30 + i * 22, y0 - 18, x - 14 + i * 22, y0 - 26, x - 22 + i * 22, y0 - 38);
-                ctx.stroke();
-            }
-            tekst(ctx, M.TEMP.vandbad + " °C", x - 66, y0 + 30, { farve: "#f0a58f" });
         } else {
             for (i = 0; i < 4; i++) {
                 ctx.fillStyle = "rgba(236, 246, 255, 0.8)";
                 NK.rundtRekt(ctx, x - 34 + i * 18, y0 - 4 + (i % 2) * 5, 13, 11, 3);
                 ctx.fill();
             }
-            tekst(ctx, M.TEMP.isbad + " °C", x - 66, y0 + 30, { farve: "#9fd0f2" });
+        }
+        ctx.restore();
+    }
+
+    function korn(ctx, x, stof) {
+        var f = M.FARVE.fast[stof];
+        ctx.save();
+        for (var i = 0; i < 7; i++) {
+            ctx.fillStyle = NK.css(f, 1);
+            ctx.fillRect(x - 6 + (i * 5) % 12, GLAS_Y - 22 + (i * 7) % 14, 3, 3);
         }
         ctx.restore();
     }
 
     /* ----- Resultatskemaet ---------------------------------------------------- */
-    function celle(tr, tekstStr) {
-        var td = document.createElement("td");
-        td.textContent = tekstStr;
-        tr.appendChild(td);
-        return td;
+    function raekke(tabel, celler, overskrift) {
+        var tr = document.createElement("tr");
+        celler.forEach(function (c, i) {
+            var el = document.createElement(overskrift || i === 0 ? "th" : "td");
+            if (typeof c === "string") el.textContent = c;
+            else el.appendChild(c);
+            tr.appendChild(el);
+        });
+        tabel.appendChild(tr);
+        return tr;
+    }
+
+    function iagttagelse(tegning, svar, faktisk) {
+        var span = document.createElement("span");
+        if (tegning && tegning.solFarve) {
+            var sw = document.createElement("span");
+            sw.className = "farve";
+            var f = tegning.solFarve;
+            sw.style.backgroundColor = NK.css({ r: f.r, g: f.g, b: f.b, a: 1 });
+            span.appendChild(sw);
+        }
+        span.appendChild(document.createTextNode(svar || ""));
+        if (svar && faktisk && svar !== faktisk) {
+            var fk = document.createElement("span");
+            fk.className = "facit";
+            fk.textContent = "Glasset var " + faktisk + ".";
+            span.appendChild(fk);
+        }
+        return span;
     }
 
     function resultatTabel(f) {
-        var refNr = f.resultat ? f.resultat.refNr : 0;
         var tabel = document.createElement("table");
         tabel.className = "resultater skema";
-        var hoved = document.createElement("tr");
-        ["Glas", "Indgreb", "Din iagttagelse", "Ligevægten forskydes"].forEach(function (t) {
-            var th = document.createElement("th");
-            th.textContent = t;
-            hoved.appendChild(th);
-        });
-        tabel.appendChild(hoved);
+        raekke(tabel, ["Glas", "Indgreb", "Temperatur", "Farveændring", "⟵ / ⟶"], true);
         f.glasListe().forEach(function (gl) {
+            if (gl.nr > 7) return;
             var d = data(f, gl);
-            var tr = document.createElement("tr");
-            var th = document.createElement("th");
-            th.textContent = String(gl.nr);
-            tr.appendChild(th);
-            var erRef = gl.nr === refNr;
             var tom = (!d.opl || d.opl.V < 0.05) && !d.vurdering;
-            celle(tr, erRef ? "urørt" : (tom ? "tomt" : d.indgreb));
+            var T = d.maaltT !== null && d.maaltT !== undefined ? S.temperaturTekst(d.maaltT) : "";
+            if (gl.nr === 7) {
+                raekke(tabel, ["7", tom ? "tomt" : (d.uroert ? "stuetemperatur" : d.indgreb), T, iagttagelse(d.tegning, "reference"), ""]);
+                return;
+            }
+            var v = d.vurdering;
+            raekke(tabel, [
+                String(gl.nr), tom ? "tomt" : d.indgreb, T,
+                v ? iagttagelse(v.tegning, v.svar, v.faktisk) : (tom ? "" : "ikke noteret"),
+                v && v.faktisk ? (M.forskydning(v.faktisk === "som glas 7" ? "" : v.faktisk) === "ingen" ? "ingen" : M.forskydning(v.faktisk)) : ""
+            ]);
+        });
+        return tabel;
+    }
 
-            var td = document.createElement("td");
-            var farve = tom ? null : M.glasFarve(visOpl(d));
-            if (farve) {
-                var sp = document.createElement("span");
-                sp.className = "farve";
-                sp.style.backgroundColor = NK.css({ r: farve.r, g: farve.g, b: farve.b, a: 1 });
-                td.appendChild(sp);
+    function del2Tabel(f) {
+        var res = f.del2.resultat;
+        if (!res.farve && !res.lv) return null;
+        var tabel = document.createElement("table");
+        tabel.className = "resultater skema";
+        raekke(tabel, ["Opløsning", "Set ovenfra efter fortynding", "⟵ / ⟶"], true);
+        [["frugtfarve", res.farve, "ingen ligevægt"], ["ligevægtsblanding", res.lv, null]].forEach(function (rk) {
+            var r = rk[1];
+            if (!r) return;
+            var svar = document.createElement("span");
+            svar.appendChild(document.createTextNode(r.svar));
+            if (r.faktisk && r.svar !== r.faktisk) {
+                var fk = document.createElement("span");
+                fk.className = "facit";
+                fk.textContent = "Glasset var " + r.faktisk + ".";
+                svar.appendChild(fk);
             }
-            if (erRef) {
-                td.appendChild(document.createTextNode("reference"));
-            } else if (d.vurdering) {
-                td.appendChild(document.createTextNode(d.vurdering.svar));
-                if (d.vurdering.faktisk && d.vurdering.svar !== d.vurdering.faktisk) {
-                    var fk = document.createElement("span");
-                    fk.className = "facit";
-                    fk.textContent = "Glasset var " + d.vurdering.faktisk + ".";
-                    td.appendChild(fk);
-                }
-            } else if (!tom) {
-                td.appendChild(document.createTextNode("ikke vurderet"));
-            }
-            tr.appendChild(td);
-
-            var fs = "";
-            if (!erRef && d.vurdering && d.vurdering.faktisk) {
-                fs = M.forskydning(d.vurdering.faktisk);
-                if (fs === "ingen") fs = "ikke synligt";
-            }
-            celle(tr, fs);
-            tabel.appendChild(tr);
+            raekke(tabel, [rk[0], svar, rk[2] || (r.faktisk === "lysere" ? "⟵" : (r.faktisk === "mørkere" ? "⟶" : "ingen"))]);
         });
         return tabel;
     }
@@ -205,172 +220,117 @@
         byg: function (f, container) {
             container.innerHTML = "";
             var nr = 0;
-            var D = f.glasListe().map(function (gl) { return data(f, gl); });
-            var st = f.stam;
-            var refNr = f.resultat ? f.resultat.refNr : 0;
-            var ref5 = st ? skaler(st.opl, M.MAENGDE.FORDEL) : null;
+            var alle = f.glasListe();
+            var D = alle.map(function (gl) { return data(f, gl); });
+            var d7 = D[6];
+            var ref7 = d7.vurdering ? null : d7.tegning;
 
             /* 1. Stamoploesningen */
-            if (st) {
-                var t1 = "Vand, " + st.draaber.fe + " " + draaber(st.draaber.fe) + " Fe(NO₃)₃ og " + st.draaber.scn + " " + draaber(st.draaber.scn) + " KSCN giver en " + M.farveNavn(st.opl) + " opløsning.";
-                if (st.vurdering === "farveloes") t1 += " Uden begge stoffer dannes der ikke " + M.formel("FeSCN2+") + ".";
-                else t1 += " Farven skyldes " + M.formel("FeSCN2+") + ".";
-                if (st.vurdering === "soelv") t1 += " Der kom også AgNO₃ i, så alle glas fik bundfald.";
-                if (st.vurdering === "moerk") t1 += " Den var så mørk, at forskelle var svære at se.";
-                if (st.vurdering === "lys") t1 += " Den var så lys, at forskelle var svære at se.";
-                if (st.ujaevn) t1 += " Der blev ikke rørt om, så glassene fik forskellig farve.";
-                rude(container, ++nr, t1, function (ctx) {
-                    S.tegnBaeger(ctx, {
-                        p: { x: 150, y: GLAS_Y + 160 - 110 + 4, v: 0 }, V: st.V, Vsol: st.V, solFarve: M.baegerFarve(st.opl),
-                        lagFarve: null, bund: 0, uklar: 0, boelge: 0, fremhaev: false, valgt: false
-                    }, 0, false);
-                    S.tegnDraaber(ctx, [
-                        { x: 136, y: GLAS_Y + 30, r: 3.6, liv: 1, farve: NK.STOF.fe.farve },
-                        { x: 164, y: GLAS_Y + 30, r: 3.6, liv: 1, farveloes: true }
-                    ]);
-                    tekst(ctx, "Fe(NO₃)₃", 62, GLAS_Y + 22, { farve: "#f0d88a" });
-                    tekst(ctx, "KSCN", 238, GLAS_Y + 22, { farve: "#c8ced6" });
-                });
+            rude(container, ++nr, "Stamopløsningen af Fe(NO₃)₃ og KSCN er rødbrun. Farven skyldes FeSCN²⁺. Der hældes lidt i et bægerglas og et par mL i glas 1 til 7.", function (ctx) {
+                var stam = M.stamOpl(30);
+                S.tegnKolbe(ctx, { p: { x: 90, y: GLAS_Y + 160 - 128 + 2.5, v: 0 }, V: 200, farve: M.baegerFarve(stam), fremhaev: false }, 0, false);
+                S.tegnBaeger(ctx, {
+                    p: { x: 210, y: GLAS_Y + 160 - 110 + 4, v: 0 }, V: 30, Vsol: 30, solFarve: M.baegerFarve(stam), lagFarve: null,
+                    bund: 0, uklar: 0, fast: null, boelge: 0, fremhaev: false, valgt: false
+                }, 0, false);
+            });
 
-                /* 2. Fordelingen */
-                var t2 = "Opløsningen er fordelt i fem glas.";
-                if (refNr) t2 += " Glas " + refNr + " står urørt som reference.";
-                else if (f.haendt.ingenRef) t2 += " Alle fem glas fik et indgreb, så der var ingen urørt reference.";
-                rude(container, ++nr, t2, function (ctx) {
-                    for (var i = 0; i < 5; i++) S.tegnGlas(ctx, glasObj(42 + i * 54, ref5, { nr: i + 1 }), 0);
-                    if (refNr) tekst(ctx, "reference", 42 + (refNr - 1) * 54, GLAS_Y + 178, { farve: "#7ee0a8" });
-                });
+            /* 2. Et glas ad gangen ved siden af glas 7 */
+            function refTegning(d) {
+                if (d.vurdering && d.vurdering.ref) return d.vurdering.ref.tegning;
+                return ref7 || d7.tegning;
             }
-
-            /* 3. Indgrebene, ét glas ad gangen ved siden af referencen */
-            function find(slags) {
-                var bedst = -1;
-                D.forEach(function (d, i) {
-                    if (d.liste.indexOf(slags) < 0) return;
-                    if (bedst < 0 || (d.liste.length === 1 && D[bedst].liste.length > 1)) bedst = i;
-                });
-                return bedst;
-            }
-
-            function rel(d) {
-                if (d.vurdering && d.vurdering.faktisk) return d.vurdering.faktisk;
-                return ref5 ? M.sammenlign(d.opl, ref5) : null;
-            }
-
-            function toGlas(i, t, efter) {
-                var d = D[i];
+            D.forEach(function (d, i) {
+                var n = i + 1;
+                if (n >= 7 || !d.liste.length) return;
+                var hoved = d.liste[0];
+                var rel = d.vurdering ? d.vurdering.faktisk : null;
+                var T = d.maaltT !== null && d.maaltT !== undefined && (hoved === "varme" || hoved === "kulde") ? " (" + S.temperaturTekst(d.maaltT) + ")" : "";
+                var t = "Glas " + n + " " + HANDLING[hoved] + T + (rel ? " og blev " + ord(rel) + ". " : ". ") + FORKLARING[hoved];
+                if (d.liste.length > 1) t += " Glasset fik også " + d.liste.slice(1).map(function (k) { return NK.INDGREB_TEKST[k].replace("+ ", ""); }).join(" og ") + ".";
                 rude(container, ++nr, t, function (ctx) {
-                    S.tegnGlas(ctx, glasObj(95, ref5, { nr: refNr }), 0);
-                    var bf = visBund(d);
-                    S.tegnGlas(ctx, glasObj(205, visOpl(d), { nr: i + 1, bund: bf.bund, uklar: bf.uklar }), 0);
-                    if (efter) efter(ctx);
-                    tekst(ctx, "reference", 95, GLAS_Y + 178, { farve: "#7ee0a8" });
-                    tekst(ctx, "glas " + (i + 1), 205, GLAS_Y + 178);
-                });
-            }
-
-            var i = find("fe");
-            if (i >= 0) {
-                toGlas(i, "Glas " + (i + 1) + " fik Fe(NO₃)₃ og blev " + ord(rel(D[i])) + ". Mere " + M.formel("Fe3+") + " forskyder ligevægten mod højre, så der dannes mere " + M.formel("FeSCN2+") + ".", function (ctx) {
-                    S.tegnDraaber(ctx, [{ x: 205, y: GLAS_Y - 10, r: 3.4, liv: 1, farve: NK.STOF.fe.farve }]);
-                    tekst(ctx, "+ " + M.formel("Fe3+"), 262, GLAS_Y + 30, { farve: "#f0d88a" });
-                });
-            }
-            i = find("scn");
-            if (i >= 0) {
-                toGlas(i, "Glas " + (i + 1) + " fik KSCN og blev " + ord(rel(D[i])) + ". Mere " + M.formel("SCN-") + " forskyder ligevægten mod højre, så der dannes mere " + M.formel("FeSCN2+") + ".", function (ctx) {
-                    S.tegnDraaber(ctx, [{ x: 205, y: GLAS_Y - 10, r: 3.4, liv: 1, farveloes: true }]);
-                    tekst(ctx, "+ " + M.formel("SCN-"), 262, GLAS_Y + 30, { farve: "#c8ced6" });
-                });
-            }
-            i = find("ag");
-            if (i >= 0) {
-                toGlas(i, "Glas " + (i + 1) + " fik AgNO₃ og blev " + ord(rel(D[i])) + ". Der dannes et hvidt bundfald: " + M.ligning(M.REAKTIONER.faeldning, false).replace("AgSCN", "AgSCN(s)") + ". Når " + M.formel("SCN-") + " fjernes, forskydes ligevægten mod venstre.", function (ctx) {
-                    S.tegnDraaber(ctx, [{ x: 205, y: GLAS_Y - 10, r: 3.4, liv: 1, farveloes: true }]);
-                    tekst(ctx, "+ " + M.formel("Ag+"), 262, GLAS_Y + 30, { farve: "#c8ced6" });
-                    tekst(ctx, "AgSCN(s)", 262, GLAS_Y + 150, { farve: "#f4f6f8" });
-                });
-            }
-            i = find("varme");
-            if (i >= 0) {
-                toGlas(i, "Glas " + (i + 1) + " i det varme vandbad blev " + ord(rel(D[i])) + ". Reaktionen mod højre er exoterm, så opvarmning forskyder ligevægten mod venstre." + (D[i].afkoelet ? " Da glasset kølede af, blev det mørkere igen." : ""), function (ctx) {
-                    tegnBad(ctx, 205, true);
-                });
-            }
-            i = find("kulde");
-            if (i >= 0) {
-                toGlas(i, "Glas " + (i + 1) + " i isbadet blev " + ord(rel(D[i])) + ". Afkøling forskyder ligevægten mod højre, fordi reaktionen mod højre er exoterm.", function (ctx) {
-                    tegnBad(ctx, 205, false);
-                });
-            }
-            i = find("vand");
-            if (i >= 0) {
-                toGlas(i, "Glas " + (i + 1) + " fik vand og blev " + ord(rel(D[i])) + ". Fortynding forskyder ligevægten mod venstre, hvor der er flest opløste partikler.", function (ctx) {
-                    S.tegnDraaber(ctx, [{ x: 205, y: GLAS_Y - 10, r: 3, liv: 1, farveloes: true }, { x: 199, y: GLAS_Y - 24, r: 2.6, liv: 1, farveloes: true }]);
-                    tekst(ctx, "+ " + M.formel("H2O"), 262, GLAS_Y + 30, { farve: "#9fd0f2" });
-                });
-            }
-
-            /* 4. Glassene set ovenfra */
-            rude(container, ++nr, "Set ovenfra mod hvidt papir går lyset gennem hele væskesøjlen, så forskellene ses tydeligst.", function (ctx) {
-                ctx.fillStyle = "#f4f5f3";
-                NK.rundtRekt(ctx, 8, 26, 284, 158, 8);
-                ctx.fill();
-                D.forEach(function (d, k) {
-                    var x = 36 + k * 57, y = 84;
-                    var o = visOpl(d), bf = visBund(d);
-                    S.tegnOppefra(ctx, x, y, 19, { farve: M.oppefraFarve(o), bund: bf.bund, uklar: bf.uklar, tom: !o || o.V < 0.3 });
-                    tekst(ctx, "glas " + (k + 1), x, y + 40, { farve: "#2a2f36" });
-                    var s = k + 1 === refNr ? "ref." : (d.vurdering ? (d.vurdering.svar === "som referencen" ? "som ref." : d.vurdering.svar) : "");
-                    tekst(ctx, s, x, y + 60, { farve: k + 1 === refNr ? "#2b7d51" : "#56606b", font: "600 12px 'Segoe UI', sans-serif" });
+                    S.tegnGlas(ctx, glasHer(refTegning(d), 95, 7), 0);
+                    S.tegnGlas(ctx, glasHer(visTegning(d), 205, n), 0);
+                    if (hoved === "fe" || hoved === "vitc" || hoved === "scn") korn(ctx, 205, hoved);
+                    if (hoved === "ag" || hoved === "kscn" || hoved === "vand") S.tegnDraaber(ctx, [{ x: 205, y: GLAS_Y - 10, r: 3.4, liv: 1, farveloes: true }]);
+                    if (hoved === "varme") tegnBad(ctx, 205, true);
+                    if (hoved === "kulde") tegnBad(ctx, 205, false);
+                    tekst(ctx, "glas 7", 95, GLAS_Y + 178, { farve: "#7ee0a8" });
+                    tekst(ctx, "glas " + n, 205, GLAS_Y + 178);
                 });
             });
 
-            /* 5. Uheld */
-            D.forEach(function (d, k) {
-                if (f.haendt["spild" + (k + 1)]) {
-                    rude(container, ++nr, "Uheld: glas " + (k + 1) + " blev rystet så voldsomt, at indholdet sprøjtede ud. Kemichael tørrede op.", function (ctx) {
-                        S.tegnGlas(ctx, glasObj(105, null, { nr: k + 1 }), 0);
-                        var fa = ref5 ? M.glasFarve(ref5) : M.FARVE.vand;
-                        ctx.fillStyle = NK.css({ r: fa.r, g: fa.g, b: fa.b, a: 0.85 });
-                        ctx.beginPath();
-                        ctx.ellipse(200, GLAS_Y + 162, 46, 5, 0, 0, Math.PI * 2);
-                        ctx.fill();
-                        S.tegnDraaber(ctx, [
-                            { x: 132, y: GLAS_Y + 4, r: 2.6, liv: 1, farve: fa },
-                            { x: 150, y: GLAS_Y + 22, r: 2.2, liv: 1, farve: fa },
-                            { x: 120, y: GLAS_Y - 8, r: 2.4, liv: 1, farve: fa }
-                        ]);
-                        tekst(ctx, "for voldsomt", 210, GLAS_Y + 70, { farve: "#f0918a" });
-                    });
-                }
-                if (f.haendt["overloeb" + (k + 1)]) {
-                    rude(container, ++nr, "Uheld: glas " + (k + 1) + " løb over, fordi der kom for meget vand i. Kemichael tørrede op.", function (ctx) {
-                        S.tegnGlas(ctx, glasObj(105, skaler(ref5 || M.nyOpl(), M.MAENGDE.GLAS_MAKS), { nr: k + 1 }), 0);
-                        ctx.fillStyle = "rgba(196, 224, 242, 0.7)";
-                        ctx.beginPath();
-                        ctx.ellipse(170, GLAS_Y + 162, 50, 5, 0, 0, Math.PI * 2);
-                        ctx.fill();
-                        tekst(ctx, "fuldt er fuldt", 222, GLAS_Y + 70, { farve: "#f0918a" });
-                    });
+            /* 3. Forundersoegelsen i glas 8 */
+            var d8 = D[7];
+            if (d8.liste.indexOf("kscn") >= 0 && d8.liste.indexOf("ag") >= 0) {
+                rude(container, ++nr, "Forundersøgelsen i glas 8: KSCN og AgNO₃ giver et hvidt bundfald. " + M.ligning(M.REAKTIONER.faeldning).replace("AgSCN", "AgSCN(s)") + ".", function (ctx) {
+                    S.tegnGlas(ctx, glasHer(d8.tegning, 150, 8), 0);
+                    tekst(ctx, "AgSCN(s)", 222, GLAS_Y + 150, { farve: "#f4f6f8" });
+                });
+            }
+
+            /* 4. Billedet af glas 1 til 7 */
+            rude(container, ++nr, "Billedet af glas 1 til 7. Glas 7 ved stuetemperatur er referencen.", function (ctx) {
+                for (var i = 0; i < 7; i++) {
+                    var d = D[i];
+                    var x = 26 + i * 41;
+                    ctx.save();
+                    ctx.translate(x, GLAS_Y + 16);
+                    ctx.scale(0.72, 0.72);
+                    S.tegnGlas(ctx, glasHer(visTegning(d), 0, 0), 0);
+                    ctx.restore();
+                    tekst(ctx, String(i + 1), x, GLAS_Y + 140);
+                    var s = i === 6 ? "ref." : (d.vurdering ? { "mørkere": "mørk", "lysere": "lys", "som glas 7": "som 7" }[d.vurdering.svar] : "");
+                    tekst(ctx, s, x, GLAS_Y + 172, { farve: i === 6 ? "#7ee0a8" : "#c8ced6", font: "600 11px 'Segoe UI', sans-serif" });
                 }
             });
-            if (f.haendt.overloeb0) {
-                rude(container, ++nr, "Uheld: bægerglasset løb over, fordi der kom for meget vand i. Kemichael tørrede op.", function (ctx) {
-                    S.tegnBaeger(ctx, {
-                        p: { x: 110, y: GLAS_Y + 160 - 110 + 4, v: 0 }, V: M.MAENGDE.BAEGER_MAKS, Vsol: M.MAENGDE.BAEGER_MAKS,
-                        solFarve: st ? M.baegerFarve(skaler(st.opl, M.MAENGDE.BAEGER_MAKS)) : M.FARVE.vand, lagFarve: null,
-                        bund: 0, uklar: 0, boelge: 0, fremhaev: false, valgt: false
-                    }, 0, false);
-                    ctx.fillStyle = "rgba(196, 224, 242, 0.7)";
-                    ctx.beginPath();
-                    ctx.ellipse(190, GLAS_Y + 162, 60, 5, 0, 0, Math.PI * 2);
+
+            /* 5. Del 2: fortynding set ovenfra */
+            function del2Rude(r, t) {
+                rude(container, ++nr, t, function (ctx) {
+                    ctx.fillStyle = "#f4f5f3";
+                    NK.rundtRekt(ctx, 12, 18, 276, 166, 8);
                     ctx.fill();
-                    tekst(ctx, "100 mL", 222, GLAS_Y + 60, { farve: "#f0918a" });
+                    S.tegnOppefra(ctx, 95, 92, 44, { farve: r.farver[1] });
+                    S.tegnOppefra(ctx, 205, 92, 44, { farve: r.farver[0] });
+                    tekst(ctx, Math.round(r.V[1]) + " mL", 95, 160, { farve: "#2a2f36" });
+                    tekst(ctx, Math.round(r.V[0]) + " mL", 205, 160, { farve: "#2a2f36" });
                 });
             }
+            var r2 = f.del2.resultat;
+            if (r2.farve) del2Rude(r2.farve, "Frugtfarve: set ovenfra var det fortyndede glas " + r2.farve.svar + ". Antallet af farvestofmolekyler er det samme, så farven ovenfra er uændret.");
+            if (r2.lv) del2Rude(r2.lv, "Ligevægtsblanding: set ovenfra var det fortyndede glas " + r2.lv.svar + ". Fortynding gør Y større end K, så ligevægten forskydes mod venstre.");
 
-            /* 6. Resultatskemaet i sidste rude */
+            /* 6. Uheld */
+            var UHELD = [];
+            alle.forEach(function (gl) {
+                if (f.haendt["spild_" + gl.navn]) UHELD.push("Uheld: glas " + gl.nr + " blev rystet så voldsomt, at indholdet sprøjtede ud. Kemichael tørrede op.");
+                if (f.haendt["overloeb_" + gl.navn]) UHELD.push("Uheld: glas " + gl.nr + " løb over. Kemichael tørrede op.");
+            });
+            [["baegerA", "bægerglasset"], ["baegerV", "det venstre bægerglas"], ["baegerH", "det højre bægerglas"]].forEach(function (b) {
+                if (f.haendt["spild_" + b[0]]) UHELD.push("Uheld: " + b[1] + " blev rystet, så indholdet røg ud. Kemichael tørrede op.");
+                if (f.haendt["overloeb_" + b[0]]) UHELD.push("Uheld: " + b[1] + " løb over. Kemichael tørrede op.");
+            });
+            if (f.haendt.spild_kolbe1 || f.haendt.spild_kolbe2) UHELD.push("Uheld: kolben med stamopløsning blev rystet, så det skvulpede ud. Kemichael tørrede op.");
+            if (f.haendt.spild_vandbad || f.haendt.spild_isbad) UHELD.push("Uheld: et bad blev rystet, så vandet skvulpede ud. Kemichael tørrede op.");
+            if (f.haendt.kolbeDunk) UHELD.push("Uheld: stamopløsningen blev hældt i affaldsdunken. Kemichael hentede mere.");
+            UHELD.forEach(function (t) {
+                rude(container, ++nr, t, function (ctx) {
+                    var fa = M.baegerFarve(M.stamOpl(10));
+                    ctx.fillStyle = NK.css({ r: fa.r, g: fa.g, b: fa.b, a: 0.85 });
+                    ctx.beginPath();
+                    ctx.ellipse(150, GLAS_Y + 162, 70, 5, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    S.tegnDraaber(ctx, [
+                        { x: 120, y: GLAS_Y + 60, r: 2.6, liv: 1, farve: fa },
+                        { x: 150, y: GLAS_Y + 40, r: 2.2, liv: 1, farve: fa },
+                        { x: 182, y: GLAS_Y + 70, r: 2.4, liv: 1, farve: fa }
+                    ]);
+                    tekst(ctx, "køkkenrulle", 150, GLAS_Y + 120, { farve: "#f0918a" });
+                });
+            });
+
+            /* 7. Resultatskemaet i sidste rude */
             var sidste = document.createElement("div");
             sidste.className = "rude skema-rude";
             var overskrift = document.createElement("p");
@@ -378,9 +338,17 @@
             nrSpan.className = "nr";
             nrSpan.textContent = String(++nr);
             overskrift.appendChild(nrSpan);
-            overskrift.appendChild(document.createTextNode("Resultatskema"));
+            overskrift.appendChild(document.createTextNode("Resultatskema, del 1: de syv glas"));
             sidste.appendChild(overskrift);
             sidste.appendChild(resultatTabel(f));
+            var t2 = del2Tabel(f);
+            if (t2) {
+                var o2 = document.createElement("p");
+                o2.className = "del2";
+                o2.textContent = "Del 2: fortynding set ovenfra";
+                sidste.appendChild(o2);
+                sidste.appendChild(t2);
+            }
             container.appendChild(sidste);
         }
     };

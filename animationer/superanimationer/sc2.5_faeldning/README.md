@@ -3,8 +3,9 @@
 En superanimation: i modsætning til de øvrige animationer, som er én enkelt
 HTML-fil, ligger denne i sin egen mappe med adskilt CSS, JavaScript og sprites.
 
-Åbn **`index.html`**. Mappen er selvstændig og henter kun filer inde fra sig
-selv, så den kan flyttes uden at der knækker noget.
+Åbn **`index.html`**. Mappen henter kun filer inde fra sig selv, bortset fra
+den fælles laboratoriekode i `../laboratoriet/`. Den skal derfor ligge ved
+siden af den mappe.
 
 Den afløser `animationer/kemi-c-filer/c2.5_eksperiment_bundfald.html`, som nu
 ligger i `animationer/kemi-c-filer/arkiv/c2.5_eksperiment_bundfald_oldversion.html`.
