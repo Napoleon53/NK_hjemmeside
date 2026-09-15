@@ -67,7 +67,9 @@
         this.koblMus();
         NK.Valg.paa(this.nulstil.bind(this));
         this.tilpas();
-        this.opgaver = new NK.Opgaver("maet", OPGAVER, this);
+        this.tid = 0;               /* et ur, der altid gaar (bruges af laereren) */
+        if (this.laererStart) this.laererStart();
+        this.opgaver = new NK.Opgaver("maet", OPGAVER, this, "Hvor meget kan der være?");
         this.opdaterPanel();
     };
 
@@ -221,6 +223,11 @@
         this.positionerOverlays();
     };
 
+    /* Laereren stiller sig ved glasset. */
+    P.laererPladsPx = function () {
+        return this.felt.x + this.felt.b * 0.32;
+    };
+
     /* Knapraekken over spatlen og skala-knappen over grafen er rigtige
        HTML-knapper, der flyttes med, naar glasset eller grafen flytter sig. */
     P.positionerOverlays = function () {
@@ -256,6 +263,8 @@
         }
 
         c.addEventListener("pointerdown", function (e) {
+            var rk = c.getBoundingClientRect();
+            if (mig.laererKlik && mig.laererKlik(e.clientX - rk.left, e.clientY - rk.top)) return;
             if (!iGrafen(e)) return;
             mig.traekker = true;
             if (c.setPointerCapture) {
@@ -317,6 +326,8 @@
     /* ----- Opdatering -------------------------------------------------------- */
     P.opdater = function (dt) {
         var i;
+        this.tid += dt;
+        if (this.opdaterLaerer) this.opdaterLaerer(dt);
         var oploest = this.oploest();
         var bundfald = this.bundfald();
 
@@ -469,6 +480,7 @@
         L.ryd("#10131a");
         this.tegnBord(ctx);
         this.tegnGraf(ctx);
+        if (this.laererTegnOver) this.laererTegnOver(ctx);
     };
 
     P.tegnBord = function (ctx) {
@@ -486,7 +498,9 @@
         ctx.stroke();
         ctx.restore();
 
-        T.varmeplade(ctx, this.pladeX, this.pladeY, this.pladeB, NK.klamp((this.visTemp - 25) / 75, 0, 1), false);
+        T.varmeplade(ctx, this.pladeX, this.pladeY, this.pladeB, NK.klamp((this.visTemp - 25) / 75, 0, 1), false, {
+            varmeVinkel: -2.2 + 4.4 * NK.klamp((this.visTemp - 20) / 80, 0, 1)
+        });
         this.tegnIndhold(ctx, salt);
         this.tegnTermometer(ctx);
         S.tegn(ctx, "baegerglas", this.bgX, this.bgY, this.bgB);

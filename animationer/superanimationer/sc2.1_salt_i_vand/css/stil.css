@@ -820,3 +820,4 @@ input[type="range"] {
 .opgavekort .valg.en-spalte .valgknap { min-height: 40px; font-size: 0.88rem; }
 .opgavekort .besked { margin-top: 8px; }
 .opgavekort .knaprad { margin-top: 10px; }
+.opgavekort.sejr { border-left-color: var(--groen); animation: formelglimt 0.9s ease-out 2; }

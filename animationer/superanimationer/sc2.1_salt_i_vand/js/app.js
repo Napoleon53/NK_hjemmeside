@@ -93,6 +93,7 @@
 
     /* ----- Opstart --------------------------------------------------------- */
     function start() {
+        NK.Sprites.start();
         bygTeori();
         NK.Quiz.kobl();
 

@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="260" viewBox="0 0 90 130">
+  <!-- Affaldsdunk til tungmetalholdigt kemikalieaffald.
+       Aabningen er (45, 12). -->
+  <defs>
+    <linearGradient id="krop" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1c3d6e"/>
+      <stop offset="0.35" stop-color="#3d70bb"/>
+      <stop offset="1" stop-color="#18365f"/>
+    </linearGradient>
+    <linearGradient id="laag" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a6cb4"/>
+      <stop offset="1" stop-color="#1d3e70"/>
+    </linearGradient>
+  </defs>
+  <path d="M9 24 L81 24 L75 125 Q74.5 130 69 130 L21 130 Q15.5 130 15 125 Z" fill="url(#krop)"/>
+  <path d="M32 2 Q32 0 34 0 L56 0 Q58 0 58 2 L58 13 L52 13 L52 6 L38 6 L38 13 L32 13 Z" fill="#1d3e70"/>
+  <rect x="4" y="11" width="82" height="15" rx="4" fill="url(#laag)" stroke="#16325a" stroke-width="1"/>
+  <rect x="18" y="42" width="54" height="58" rx="3" fill="#ffffff" stroke="#9aa6b3" stroke-width="0.8"/>
+  <g font-family="Segoe UI, Arial, sans-serif" font-weight="700" fill="#1f2328" text-anchor="middle">
+    <text x="45" y="56" font-size="7.6">TUNGMETAL</text>
+    <text x="45" y="66" font-size="7.6">AFFALD</text>
+  </g>
+  <g transform="translate(45 84)">
+    <rect x="-7" y="-7" width="14" height="14" transform="rotate(45)" fill="#ffffff" stroke="#d8342a" stroke-width="1.8"/>
+    <path d="M-3.4 4 L-3.4 -3.4 M-3.4 -1.8 L-5.2 -3.8 M-3.4 -0.6 L-1.4 -3.2" stroke="#111111" stroke-width="1" stroke-linecap="round"/>
+    <path d="M-0.6 2.4 q2 -2 4.2 0 q-2.2 2 -4.2 0 Z M3.6 2.4 l1.3 -1 v2 Z" fill="#111111"/>
+    <path d="M-5 4.6 h10" stroke="#111111" stroke-width="0.9"/>
+  </g>
+  <rect x="16" y="30" width="4" height="90" rx="2" fill="#ffffff" fill-opacity="0.16"/>
+</svg>

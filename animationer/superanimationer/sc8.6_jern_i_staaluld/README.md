@@ -31,10 +31,14 @@ typisk er 98,5 % jern.
 * **Opløsningen kræver varme.** I kold syre opløses stålulden meget langsomt.
   På varmepladen tager det ca. 8 sekunder. Stilles kolben under buretten, før
   alt er opløst, bliver resultatet for lavt.
-* **Buretten.** Når den fyldes, står menisken over nulstregen. Eleven tapper af
-  gennem hanen ned i affaldsbægeret og klikker på buretten for at aflæse.
-  Aflæsningen har sidste ciffer 0 eller 5. Fyldes en fuld buret igen, løber den
-  over.
+* **Buretten.** Når den fyldes, står menisken lidt over nulstregen. Eleven
+  nulstiller den: hanen åbnes, og før startaflæsningen løber den langsomt
+  (`BURET.nulFlow`). Lukkes hanen mindre end `BURET.fang` mL fra nulstregen,
+  lægger menisken sig på 0,00. Lidt forbi 0 er også i orden. Zoomboblen viser
+  skalaen, mens hanen er åben under nulstillingen, og tre sekunder efter, at
+  den er lukket. En åben hane kan
+  altid lukkes, også mens en animation eller Kemichael kører. Aflæsningen har
+  sidste ciffer 0 eller 5. Fyldes en fuld buret igen, løber den over.
 * **Titreringen.** Hanen åbnes og lukkes med et klik, knappen **Dråbe** (tasten D)
   giver én dråbe, og kolben rystes ved at tage fat i den og bevæge musen eller
   ved at holde knappen **Ryst** (tasten R) nede. Hver dråbe lander som en lilla
@@ -45,11 +49,19 @@ typisk er 98,5 % jern.
   oxiderer jernet til Fe²⁺ og danner H₂, MnO₄⁻ der tager én elektron fra hver af
   fem Fe²⁺ og bliver til Mn²⁺, overskud af MnO₄⁻ ved endepunktet, Cl₂ i saltsyre,
   og burettens skala tæt på, når den skal aflæses.
-* **Iagttagelser er fejlkilder.** Kun det, der kan forklare et resultat, bliver
-  noteret: ståluld der ikke var opløst, opløsning der skvulpede ud, klorlugt, en
-  lyserød farve der forsvandt igen, og en kraftigt lilla opløsning ved
-  aflæsningen. Listen hører til det aktuelle forsøg og ryddes ved nyt forsøg.
-* **Måleskema og beregning.** Massen og aflæsningerne skrives ind i skemaet.
+* **Fri leg.** Træk og hæld udføres altid, også når det er forkert: syre før
+  stålulden, to syrer, KMnO₄ direkte i kolben, kolben under buretten før
+  nulstillingen, hanen åben efter startaflæsningen, buretten fyldt op midt i
+  titreringen eller en aflæsning før endepunktet. Kun det, der fysisk ikke kan
+  lade sig gøre, afvises: en fuld vejebåd eller kolbe og en menisk over
+  nulstregen. Et klik uden en bestemt betydning giver en kort vejledning.
+  Kemichael lader fejlen ske og kommenterer den (`BEMAERK` i `js/laerer.js`),
+  ofte med et vink om at starte et nyt forsøg. Buretten kan aflæses igen, så
+  længe jernindholdet ikke er beregnet.
+* **Tegneserie.** Når jernindholdet er beregnet, låses knappen Tegneserie op.
+  Ruderne viser forsøget med elevens egne tal, én rød rude for hver fejl
+  undervejs og til sidst resultatskemaet med alle forsøg (`js/tegneserie.js`).
+* **Beregning.** Massen og aflæsningerne skrives ind i skemaet i panelet.
   Eleven skriver selv jernindholdet. Et forkert svar giver et hint, der passer
   til fejlen: brøkdel i stedet for procent, massen i gram, slutaflæsningen i
   stedet for det forbrugte volumen, glemt faktor 5, divideret med 5, mL i stedet
@@ -116,7 +128,7 @@ zoomboblen tegnes i koden. Ændres en sprite, skal tallene i `scene.js` passe.
 ## Filer
 
 ```
-index.html          markup: scene, panel, måleskema, guide, teori, rundvisning
+index.html          markup: scene, panel, beregning, intro, tegneserie, guide, teori, rundvisning
 css/stil.css        alt udseende. NB: decimaltal med PUNKTUM i CSS
 js/kerne.js         NK-navnerum, ion-notation, positurer, væskeniveau
 js/model.js         kemien og tallene: opløsning, titrering, farve, beregning, hints
@@ -126,7 +138,8 @@ js/scene.js         tegnebordet (1000 x 600): mål, lokalet, udstyr, buret, væs
 js/mikro.js         partikelmodellen i zoomboblen
 js/forsoeg.js       trinene, tilstanden og handlingerne
 js/bord.js          tegning af bordet og styring med musen
-js/laerer.js        Kemichaels scener og påskeæggene
+js/laerer.js        Kemichaels scener, bemærkningerne om fejl og påskeæggene
+js/tegneserie.js    tegneserien med fejlruder og resultatskemaet
 ../kemichael/       Kemichael: figuren og hans sprites, fælles for superanimationerne
 js/quiz.js          quizkortet og de ti spørgsmål
 js/rundvisning.js   spotlight-rundvisningen bag ?-knappen
@@ -143,7 +156,9 @@ bivirkning (`KLOR`), rystningen (`RYST`) og tjekket af elevens svar.
 
 **Trinene** står i `TRIN` øverst i `js/forsoeg.js` med tekst, hint og hvilken
 genstand hintet markerer. Hvornår et trin er gjort, afgøres i `trinGjort`.
-**Iagttagelserne** står i `IAGTTAGELSER` samme sted.
+**Fejlene** noteres med `iagttag(noegle, bemaerk)`; nøglerne står i en kommentar
+under `TRIN`. Kemichaels replik til hver står i `BEMAERK` i `js/laerer.js`, og
+rudens tekst og tegning i `FEJL` i `js/tegneserie.js`.
 
 **Koreografierne** (`koer` i `forsoeg.js`) er lister af trin: `flyt` en genstand
 til en positur, vent med `hver` og gør noget undervejs, eller `kald` en
@@ -155,13 +170,14 @@ tolerancer og hints for hvert af de fem trin.
 
 **`_selvtest.html`** åbner `index.html` i en iframe og kører forsøget igennem:
 at alle sprites indlæses, at modellen giver de forventede resultater, at
-rækkefølgen håndhæves, at svovlsyre giver ca. 98,5 % og saltsyre over 103 %,
-at fejlkilderne noteres og ryddes ved nyt forsøg, at beregningen og guiden
+buretten er let at nulstille, at forkerte handlinger udføres og noteres, at
+svovlsyre giver ca. 98,5 % og saltsyre over 103 %, at tegneserien bygges med
+de rigtige fejlruder og resultatskemaet, at beregningen og guiden
 godtager de rigtige svar og giver de rigtige hints, at zoomboblen tæller rigtigt,
 at påskeæggene kan gennemføres, at scenen kan tegnes i alle faser, og at der
 ikke er tankestreger eller 1+/1− i teksterne. Den skal åbnes gennem en lokal
 server: Chrome nægter en side på `file://` at kigge ind i sin egen iframe.
 
 Genveje: hold <kbd>R</kbd> ryst · <kbd>D</kbd> dråbe · <kbd>O</kbd> åbn og luk
-hanen · <kbd>I</kbd> hint · <kbd>N</kbd> nyt forsøg · <kbd>T</kbd> teori ·
+hanen · <kbd>I</kbd> hint · <kbd>N</kbd> nyt forsøg · <kbd>S</kbd> tegneserie · <kbd>T</kbd> teori ·
 <kbd>M</kbd> lyd · <kbd>H</kbd> rundvisning · <kbd>Esc</kbd> luk.

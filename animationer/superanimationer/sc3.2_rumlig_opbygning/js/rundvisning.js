@@ -10,17 +10,22 @@
     var NK = window.NK;
 
     var TUR = [
-        { sel: ".faneknapper", titel: "Tre faner", tekst: "Byg formen selv, se rigtige molekyler i 3D, og find ud af, om de er polære." },
+        { sel: ".faneknapper", titel: "Fire faner", tekst: "Byg molekyler, se dem i 3D, find ud af, om de er polære, og lav forsøget med vandstrålen." },
 
-        { sel: "#fane-byg.aktiv .scene", titel: "Centralatomet", tekst: "Træk i baggrunden for at dreje. Tag fat i et atom eller et elektronpar, og slip det igen." },
-        { sel: "#byg-saet", titel: "Byggesæt", tekst: "Sæt bindinger og frie elektronpar på centralatomet. Formen finder selv sin plads." },
-        { sel: "#byg-molekyle", titel: "Det har du bygget", tekst: "Formlen står her, når centralatomet har otte elektroner omkring sig." },
+        { sel: "#fane-byg.aktiv .scene", titel: "Molekylet", tekst: "Træk for at dreje. Klik på et atom for at vælge det, og klik på en binding for at skifte mellem enkelt-, dobbelt- og tripelbinding." },
+        { sel: "#byg-atomer", titel: "Atomer", tekst: "Det nye atom sættes på det valgte atom. Hydrogen og frie elektronpar kommer selv på." },
+        { sel: "#byg-bindinger", titel: "Bindinger", tekst: "Her kan bindingerne også skiftes. En binding kan kun blive dobbelt eller tripel, hvis begge atomer har plads til det." },
+        { sel: "#byg-molekyle", titel: "Det har du bygget", tekst: "Navnet står her, når du har bygget et kendt molekyle. Formen gælder for det valgte atom." },
 
         { sel: "#fane-molekyler.aktiv .scene", titel: "Molekylet", tekst: "Træk for at dreje molekylet. Prikformlen i hjørnet er det samme molekyle." },
         { sel: "#mol-menu", titel: "Vælg molekyle", tekst: "Det valgte molekyle følger med over på fanen om polaritet." },
 
         { sel: "#fane-polaritet.aktiv .scene", titel: "Trækket i bindingerne", tekst: "Pilene peger mod det atom, der trækker hårdest i elektronerne." },
         { sel: "#pol-en", titel: "Elektronegativitet", tekst: "En binding er polær, når forskellen er mindst 0,5." },
+
+        { sel: "#fane-vand.aktiv .scene", titel: "Laboratoriebordet", tekst: "Klik på en flaske for at fylde buretten, og klik på hanegrebet for at åbne den. Tag fat i en stav, og gnid den på uldkluden." },
+        { sel: "#vand-forloeb", titel: "Forløbet", tekst: "Trinene får flueben, efterhånden som du når dem. Hint hjælper med det trin, du er ved." },
+        { sel: "#vand-serie", titel: "Tegneserie", tekst: "Når forsøget er slut, kan du se det opsummeret som en tegneserie med et resultatskema." },
 
         { sel: ".fane.aktiv .vinkelknap", titel: "Vinkelmåler", tekst: "Slå vinkelmåleren til, og klik på to atomer, der sidder på samme atom." },
         { sel: ".fane.aktiv .opgavekort", titel: "Opgave", tekst: "Én knap: start en opgave, få et hint, se svaret eller tag en ny." },

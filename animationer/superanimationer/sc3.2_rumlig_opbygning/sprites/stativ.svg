@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="530" viewBox="0 0 220 530">
+  <!-- Stativ med muffe og buretteklemme. Tegnes med oeverste venstre hjoerne
+       i (200, 10) paa scenen: stangen staar i x = 94, og klemmen holder
+       buretten om x = 190. -->
+  <defs>
+    <linearGradient id="stang" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7f8690"/>
+      <stop offset="0.45" stop-color="#e3e7ec"/>
+      <stop offset="1" stop-color="#646a73"/>
+    </linearGradient>
+    <linearGradient id="arm" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e3e7ec"/>
+      <stop offset="1" stop-color="#6d737c"/>
+    </linearGradient>
+    <linearGradient id="fod" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4c5462"/>
+      <stop offset="1" stop-color="#262b33"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="512" width="184" height="18" rx="4" fill="url(#fod)" stroke="#181b21" stroke-width="1"/>
+  <rect x="20" y="513" width="160" height="3" rx="1.5" fill="#ffffff" fill-opacity="0.12"/>
+  <rect x="90" y="6" width="8" height="508" rx="3" fill="url(#stang)"/>
+  <rect x="108" y="97" width="64" height="9" rx="3" fill="url(#arm)"/>
+  <rect x="80" y="86" width="28" height="30" rx="4" fill="#3b4250" stroke="#1f242b" stroke-width="1"/>
+  <circle cx="94" cy="101" r="5" fill="#9aa1ab"/>
+  <path d="M112 90 v-8 h6 v8" fill="none" stroke="#9aa1ab" stroke-width="2"/>
+  <rect x="170" y="86" width="8" height="30" rx="2" fill="#c9602e" stroke="#7d3517" stroke-width="1"/>
+  <rect x="202" y="86" width="8" height="30" rx="2" fill="#c9602e" stroke="#7d3517" stroke-width="1"/>
+  <path d="M178 90 h24 M178 112 h24" stroke="#7d3517" stroke-width="2"/>
+</svg>

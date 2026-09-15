@@ -6,11 +6,10 @@
      atomer     [{ el, p: [x, y, z], sprite?, symbol?, alfa? }]
      bindinger  [{ a, b, orden }]
      frie       [{ atom, u: retning, lille? }]   frie elektronpar
-     balloner   [{ u, type: "bindende" | "fri" }]  kun fane 1
 
    Tegningen er en malermetode: alt sorteres efter afstanden til
-   beskueren og tegnes bagfra. Atomer, elektronpar og balloner er
-   sprites; bindingspindene tegnes i koden.
+   beskueren og tegnes bagfra. Atomer og elektronpar er sprites;
+   bindingspindene tegnes i koden.
 
    Koordinater: x mod hoejre, y opad, z ud mod beskueren. En modelenhed
    svarer omtrent til én aangstroem, saa en C-H-binding er 1,09 lang.
@@ -24,7 +23,6 @@
     var KAMERA = 14;         /* kameraets afstand i modelenheder */
     var PIND_R = 0.085;      /* bindingspindens radius */
     var LAP = 0.8;           /* et frit elektronpars laengde */
-    var BALLON = 1.55;       /* en ballons laengde fra knuden */
     var SPRITE_KUGLE = 128 / 120;   /* atomspritet er 128 bredt, kuglen 120 */
 
     /* ----- Kameraet ------------------------------------------------------ */
@@ -83,7 +81,6 @@
     var T = {};
     NK.Model3D = T;
     T.LAP = LAP;
-    T.BALLON = BALLON;
 
     function atomRadius(a, kalotte) {
         var g = NK.Data.GRUNDSTOFFER[a.el];
@@ -175,8 +172,8 @@
         ctx.restore();
     }
 
-    /* Et frit elektronpar eller en ballon: spritet drejes ud i sin
-       retning og forkortes, naar det peger mod beskueren. */
+    /* Et frit elektronpar: spritet drejes ud i sin retning og forkortes,
+       naar det peger mod beskueren. */
     function tegnLap(ctx, vis, e, navn, anker, sprB, sprH, breddeFaktor, minFaktor) {
         var dx = e.s1.x - e.s0.x, dy = e.s1.y - e.s0.y;
         var fuld = e.laengde * vis.skala * e.sm.f;
@@ -222,24 +219,6 @@
         });
         ctx.restore();
         e.fp._skaerm = { x: e.sm.x, y: e.sm.y, r: Math.max(14, m.fuld * 0.35) };
-    }
-
-    function tegnBallon(ctx, vis, e) {
-        var fri = e.bl.type === "fri";
-        var m = tegnLap(ctx, vis, e, fri ? "ballon_fri" : "ballon_bindende", NK.ANKER.ballon, 80, 130, fri ? 1 : 0.84, 0.5);
-        e.bl._skaerm = { x: e.sm.x, y: e.sm.y, r: Math.max(18, m.fuld * 0.32) };
-    }
-
-    function tegnKnude(ctx, vis) {
-        var c = vis.projicer([0, 0, 0]);
-        var r = Math.max(6, 0.21 * vis.skala);
-        var gr = ctx.createRadialGradient(c.x - r * 0.3, c.y - r * 0.3, r * 0.1, c.x, c.y, r);
-        gr.addColorStop(0, "#6b7480");
-        gr.addColorStop(1, "#1a1d22");
-        ctx.fillStyle = gr;
-        ctx.beginPath();
-        ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
-        ctx.fill();
     }
 
     /* Tegner modellen og returnerer atomernes plads paa skaermen, som
@@ -288,26 +267,11 @@
             });
         }
 
-        if (model.balloner && model.balloner.length) {
-            /* Knuden tegnes sidst, saa den daekker ballonernes snore. */
-            liste.push({ z: Infinity, slags: "knude" });
-            model.balloner.forEach(function (bl) {
-                var laengde = BALLON * (bl.type === "fri" ? 1.06 : 1);
-                var sm = vis.projicer(V.gange(bl.u, laengde * 0.62));
-                liste.push({
-                    z: sm.z, slags: "ballon", bl: bl, laengde: laengde, sm: sm,
-                    s0: vis.projicer([0, 0, 0]), s1: vis.projicer(V.gange(bl.u, laengde))
-                });
-            });
-        }
-
         liste.sort(function (a, b) { return a.z - b.z; });
         liste.forEach(function (e) {
             if (e.slags === "atom") tegnAtom(ctx, e, opt);
             else if (e.slags === "pind") tegnPind(ctx, vis, e);
             else if (e.slags === "fri") tegnFri(ctx, vis, e);
-            else if (e.slags === "ballon") tegnBallon(ctx, vis, e);
-            else if (e.slags === "knude") tegnKnude(ctx, vis);
         });
         return proj;
     };

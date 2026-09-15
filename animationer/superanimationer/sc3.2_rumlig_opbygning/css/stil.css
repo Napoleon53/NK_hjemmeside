@@ -599,6 +599,132 @@ main { flex: 1; position: relative; min-height: 0; }
 .rundvisning-knapper .knap { flex: 1; }
 
 /* ---------------------------------------------------------------------
+   FANE 1: ATOMER OG BINDINGER
+   --------------------------------------------------------------------- */
+.atompalette { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+
+.atomknap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 58px;
+    padding: 0;
+    background-color: var(--panel-2);
+    border: 1px solid #45454f;
+    border-radius: var(--radius-lil);
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+}
+
+.atomknap img { width: 46px; height: 46px; display: block; }
+.atomknap span { position: absolute; font-size: 1.1rem; font-weight: 700; color: #ffffff; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); }
+.atomknap:hover:not(:disabled) { background-color: var(--panel-3); border-color: var(--blaa); }
+.atomknap:active:not(:disabled) { transform: scale(0.96); }
+.atomknap:disabled { opacity: 0.32; cursor: not-allowed; }
+
+.knapgruppe { display: flex; gap: 6px; margin-left: auto; }
+.tjekraekke .knapgruppe .knap.lille { margin-left: 0; }
+
+.note { margin: 0; font-size: 0.86rem; line-height: 1.45; color: var(--tekst-mat); }
+
+.bindingsvalg-raekke {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.045);
+    border-radius: var(--radius-lil);
+    padding: 4px 6px 4px 10px;
+}
+
+.bindingsvalg-raekke + .bindingsvalg-raekke { margin-top: 5px; }
+.bindingsvalg-raekke .bnavn { font-size: 1rem; }
+.bindingsvalg { display: flex; gap: 4px; }
+
+.bindingsvalg button {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 30px;
+    padding: 0;
+    background-color: var(--panel-2);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    cursor: pointer;
+}
+
+.bindingsvalg button:hover:not(:disabled) { background-color: var(--panel-3); }
+.bindingsvalg button.aktiv { background-color: var(--blaa-mork); border-color: var(--blaa); }
+.bindingsvalg button:disabled { opacity: 0.28; cursor: not-allowed; }
+
+/* ---------------------------------------------------------------------
+   FANE 4: FORLOEB, HINT OG TEGNESERIE (som sc6.8)
+   --------------------------------------------------------------------- */
+.kort.fremhaev { border-left: 3px solid var(--blaa); }
+
+.trinliste { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+
+.trinliste li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px 4px 5px;
+    border-radius: var(--radius-lil);
+    font-size: 0.9rem;
+    line-height: 1.3;
+    color: var(--tekst-mat);
+}
+
+.trinliste .nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    background-color: var(--panel-3);
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--tekst-svag);
+}
+
+.trinliste li.gjort { color: var(--tekst-svag); }
+.trinliste li.gjort .nr { background-color: var(--groen-mork); color: #ffffff; }
+.trinliste li.aktiv { background-color: rgba(42, 118, 172, 0.3); color: #ffffff; font-weight: 600; }
+.trinliste li.aktiv .nr { background-color: var(--blaa); color: #ffffff; }
+
+.hint {
+    margin: 9px 0 0 0;
+    padding: 8px 10px;
+    border-radius: var(--radius-lil);
+    background-color: rgba(242, 197, 61, 0.1);
+    border: 1px solid rgba(242, 197, 61, 0.35);
+    color: #f0d77a;
+    font-size: 0.88rem;
+    line-height: 1.45;
+}
+
+.knap.stor { width: 100%; padding: 10px 13px; margin-top: 10px; }
+
+.overlay-boks.bred { max-width: 1000px; }
+.serie { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.rude { background-color: #16161c; border: 1px solid #3f3f4d; border-radius: var(--radius-lil); padding: 8px; }
+.rude canvas { display: block; width: 100%; border-radius: 5px; }
+.rude p { margin: 7px 0 0 0; font-size: 0.88rem; line-height: 1.45; color: var(--tekst-svag); }
+.rude > p:first-child { margin: 2px 0 8px 0; }
+.rude .nr { color: var(--gul); font-weight: 700; margin-right: 6px; }
+
+.resultater { width: 100%; border-collapse: collapse; font-size: 0.86rem; table-layout: fixed; }
+.resultater th { text-align: left; font-weight: 600; color: var(--tekst-svag); padding: 6px 4px 6px 0; }
+.resultater tr:first-child th { text-align: center; color: var(--gul); font-size: 0.76rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.resultater tr:first-child th:first-child { width: 26%; }
+.resultater td { text-align: center; font-weight: 700; color: var(--tekst); padding: 6px 2px; line-height: 1.3; }
+.resultater td.ikke { color: var(--tekst-mat); font-weight: 400; }
+.resultater tr + tr th, .resultater tr + tr td { border-top: 1px solid #3a3a47; }
+
+/* ---------------------------------------------------------------------
    TILGAENGELIGHED OG SMALLE SKAERME
    --------------------------------------------------------------------- */
 button:focus-visible, input:focus-visible { outline: 2px solid var(--gul); outline-offset: 2px; }

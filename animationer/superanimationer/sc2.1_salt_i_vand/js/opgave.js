@@ -3,13 +3,18 @@
 
    Der er kun ÉN knap i kortet, og den viser det naeste skridt:
 
-     start -> Start opgave    traekker en opgave og stiller scenen op
-     hint  -> Giv hint        viser et kort hint til netop denne opgave
-     svar  -> Vis svaret      viser svaret i billedet og forklarer det
-     ny    -> Ny opgave       rydder scenen og traekker en ny
+     start  -> Start opgave    traekker en opgave og stiller scenen op
+     hint   -> Giv hint        viser et kort hint til netop denne opgave
+     svar   -> Vis svaret      viser svaret i billedet og forklarer det
+     ny     -> Ny opgave       rydder scenen og traekker en ny
+     slut   -> Se resultatet   runden er gennemfoert
+     forfra -> Start forfra    en ny runde med alle opgaverne igen
 
    Loeser eleven selv opgaven undervejs, springer knappen direkte til
    "Ny opgave", og svarteksten bliver groen.
+
+   En runde er hver opgavetype én gang i tilfaeldig raekkefoelge. Naar
+   runden er slut, vises resultatet, og laereren kommer med en kort ros.
 
    En opgave er et objekt, som fanen selv bygger:
      tekst            spoergsmaalet
@@ -28,19 +33,27 @@
     var NK = window.NK;
 
     var KNAPTRIN = {
-        start: { tekst: "Start opgave", klasse: "knap blaa" },
-        hint:  { tekst: "Giv hint",     klasse: "knap" },
-        svar:  { tekst: "Vis svaret",   klasse: "knap" },
-        ny:    { tekst: "Ny opgave",    klasse: "knap blaa banker" }
+        start:  { tekst: "Start opgave",  klasse: "knap blaa" },
+        hint:   { tekst: "Giv hint",      klasse: "knap" },
+        svar:   { tekst: "Vis svaret",    klasse: "knap" },
+        ny:     { tekst: "Ny opgave",     klasse: "knap blaa banker" },
+        slut:   { tekst: "Se resultatet", klasse: "knap groen banker" },
+        forfra: { tekst: "Start forfra",  klasse: "knap" }
     };
 
-    NK.Opgaver = function (prefix, typer, sim) {
+    var TALORD = ["nul", "én", "to", "tre", "fire", "fem", "seks"];
+
+    NK.Opgaver = function (prefix, typer, sim, fanenavn) {
         this.p = prefix;
         this.typer = typer;
         this.sim = sim;
+        this.fanenavn = fanenavn || "";
         this.opgave = null;
-        this.sidsteType = -1;
+        this.koe = [];
+        this.gennemfoert = 0;
         this.loeste = 0;
+        this.faerdig = false;
+        NK.Opgaver.alle.push(this);
 
         var mig = this;
         NK.el(this.id("knap")).addEventListener("click", function () { mig.knap(); });
@@ -48,8 +61,11 @@
             var b = e.target.closest ? e.target.closest("button") : null;
             if (b && b.hasAttribute("data-nr")) mig.vaelg(parseInt(b.getAttribute("data-nr"), 10));
         });
+        this.visStatus();
         this.saetTrin("start");
     };
+
+    NK.Opgaver.alle = [];
 
     var P = NK.Opgaver.prototype;
 
@@ -66,6 +82,11 @@
         NK.saetKlasse(this.id(hvor), klasse || "besked");
     };
 
+    P.visStatus = function () {
+        NK.saetTekst(this.id("nr"), String(this.gennemfoert));
+        NK.saetTekst(this.id("antal"), String(this.typer.length));
+    };
+
     /* Er der en opgave i gang, som endnu ikke er loest eller afsloeret? */
     P.igang = function () {
         return !!(this.opgave && !this.opgave.afsluttet);
@@ -74,14 +95,28 @@
     P.knap = function () {
         if (this.trin === "hint") this.visHint();
         else if (this.trin === "svar") this.visSvar();
+        else if (this.trin === "slut") this.visResultat();
+        else if (this.trin === "forfra") { this.nyRunde(); this.ny(); }
         else this.ny();
+    };
+
+    P.nyRunde = function () {
+        this.koe = [];
+        this.gennemfoert = 0;
+        this.loeste = 0;
+        this.faerdig = false;
+        var kort = NK.el(this.id("kort"));
+        if (kort) kort.classList.remove("sejr");
+        this.visStatus();
     };
 
     P.ny = function () {
         this.kaldSlut(this.opgave);
-        var n = this.typer.length, nr;
-        do { nr = Math.floor(Math.random() * n); } while (n > 1 && nr === this.sidsteType);
-        this.sidsteType = nr;
+        if (!this.koe.length) {
+            this.koe = NK.bland(this.typer.map(function (_, i) { return i; }));
+            if (this.gennemfoert >= this.typer.length) this.nyRunde();
+        }
+        var nr = this.koe.shift();
 
         var o = this.typer[nr](this.sim);
         o.afsluttet = false;
@@ -149,7 +184,9 @@
         o.afsluttet = true;
         if (o.valg) { this.markerValg(o.rigtig, "rigtig"); this.laasValg(); }
         this.kaldSlut(o);
-        this.saetTrin("ny");
+        this.gennemfoert++;
+        this.visStatus();
+        this.saetTrin(this.koe.length ? "ny" : "slut");
     };
 
     P.visSvar = function () {
@@ -164,12 +201,28 @@
         var o = this.opgave;
         if (!o || o.afsluttet) return;
         this.loeste++;
-        NK.saetTekst(this.id("loest"), String(this.loeste));
         /* Ved et valgspoergsmaal vises svaret ogsaa i billedet bagefter,
            saa eleven kan se, at det passer. */
         if (o.valg && o.visSvar) o.visSvar(this.sim);
         this.besked("svar", "Rigtigt. " + o.svar, "besked god");
         this.afslut(o);
+    };
+
+    /* Runden er slut: resultatet i kortet og en kort ros fra laereren. */
+    P.visResultat = function () {
+        var n = this.typer.length;
+        this.faerdig = true;
+        this.opgave = null;
+        NK.saetTekst(this.id("tekst"), "Alle " + (TALORD[n] || n) + " opgaver på fanen er gennemført.");
+        this.tegnValg();
+        this.besked("hint", "Du løste " + this.loeste + " af " + n + " uden at se svaret.",
+                    this.loeste === n ? "besked god" : "besked");
+        var mangler = NK.Opgaver.alle.filter(function (a) { return a !== this && !a.faerdig; }, this);
+        this.besked("svar", mangler.length ? "Fanen " + mangler[0].fanenavn + " har også opgaver." : "");
+        var kort = NK.el(this.id("kort"));
+        if (kort) kort.classList.add("sejr");
+        this.saetTrin("forfra");
+        if (this.sim.laererRos) this.sim.laererRos();
     };
 
     /* Kaldes af fanen hvert billede. */

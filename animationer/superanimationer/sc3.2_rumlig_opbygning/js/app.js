@@ -1,8 +1,8 @@
 /* =====================================================================
-   app.js - binder de tre faner sammen
+   app.js - binder de fire faner sammen
 
-   Faneskift, teoriboksen, rundvisningen, tastaturgenveje og
-   tegneloekken. Kun den aktive fane opdateres og tegnes.
+   Faneskift, teoriboksen, tegneserien, rundvisningen, tastatur-
+   genveje og tegneloekken. Kun den aktive fane opdateres og tegnes.
    ===================================================================== */
 (function () {
     "use strict";
@@ -10,7 +10,7 @@
     var NK = window.NK;
 
     var sims = {};
-    var faner = ["fane-byg", "fane-molekyler", "fane-polaritet"];
+    var faner = ["fane-byg", "fane-molekyler", "fane-polaritet", "fane-vand"];
     var aktivFane = faner[0];
     var sidsteTid = 0;
 
@@ -30,9 +30,18 @@
         if (sims[id]) sims[id].tilpas();
     }
 
-    /* ----- Teoriboksen ------------------------------------------------- */
-    function visTeori(aaben) {
-        NK.el("teori").classList.toggle("vis", aaben);
+    /* ----- Teoriboksen og tegneserien ------------------------------------ */
+    function vis(id, aaben) {
+        NK.el(id).classList.toggle("vis", aaben);
+    }
+
+    function lukOverlays() {
+        vis("teori", false);
+        vis("tegneserie", false);
+    }
+
+    function overlayAaben() {
+        return !!document.querySelector(".overlay.vis");
     }
 
     function bygTeori() {
@@ -50,6 +59,15 @@
             });
             vaert.appendChild(kort);
         });
+    }
+
+    function aabnSerie() {
+        var sim = sims["fane-vand"];
+        if (!sim.slut()) return;
+        NK.Rundvisning.luk();
+        NK.Tegneserie.byg(sim, NK.el("serie-ruder"));
+        vis("tegneserie", true);
+        sim.serieSet = true;
     }
 
     /* ----- Tegneloekken ------------------------------------------------- */
@@ -73,10 +91,10 @@
         if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
         if (e.ctrlKey || e.metaKey || e.altKey) return;
 
-        if (e.key === "Escape") { visTeori(false); NK.Rundvisning.luk(); return; }
+        if (e.key === "Escape") { lukOverlays(); NK.Rundvisning.luk(); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") {
             if (NK.Rundvisning.aktiv()) NK.Rundvisning.luk();
-            else { visTeori(false); NK.Rundvisning.start(); }
+            else { lukOverlays(); NK.Rundvisning.start(); }
             return;
         }
         if (NK.Rundvisning.aktiv()) {
@@ -84,14 +102,21 @@
             else if (e.key === "ArrowLeft") NK.Rundvisning.forrige();
             return;
         }
-        if (e.key === "t" || e.key === "T") { visTeori(!NK.el("teori").classList.contains("vis")); return; }
-        if (NK.el("teori").classList.contains("vis")) return;
+        if (e.key === "t" || e.key === "T") {
+            var aaben = NK.el("teori").classList.contains("vis");
+            lukOverlays();
+            vis("teori", !aaben);
+            return;
+        }
+        if (overlayAaben()) return;
 
-        if (e.key === "1" || e.key === "2" || e.key === "3") { visFane(faner[parseInt(e.key, 10) - 1]); return; }
+        if (/^[1-4]$/.test(e.key)) { visFane(faner[parseInt(e.key, 10) - 1]); return; }
         var sim = sims[aktivFane];
         if (!sim) return;
         if (e.key === "r" || e.key === "R") sim.nulstil();
         else if (e.key === "v" || e.key === "V") sim.skiftVinkelmaaler();
+        else if ((e.key === "i" || e.key === "I") && sim.visHint) sim.visHint();
+        else if ((e.key === "s" || e.key === "S") && aktivFane === "fane-vand") aabnSerie();
     }
 
     /* ----- Opstart --------------------------------------------------------- */
@@ -103,21 +128,26 @@
         sims["fane-byg"] = new NK.SimByg();
         sims["fane-molekyler"] = new NK.SimMolekyler();
         sims["fane-polaritet"] = new NK.SimPolaritet();
+        sims["fane-vand"] = new NK.SimVandstraale();
         NK.sims = sims;              /* saa modellerne kan pilles ved fra konsollen og _selvtest.html */
         NK.visFane = visFane;
+        NK.aabnSerie = aabnSerie;
 
         Array.prototype.forEach.call(document.querySelectorAll(".faneknap"), function (knap) {
             knap.addEventListener("click", function () { visFane(knap.getAttribute("data-fane")); });
         });
 
-        NK.el("teoriknap").addEventListener("click", function () { NK.Rundvisning.luk(); visTeori(true); });
-        NK.el("teori-luk").addEventListener("click", function () { visTeori(false); });
-        NK.el("teori").addEventListener("click", function (e) { if (e.target.id === "teori") visTeori(false); });
-        NK.el("hjaelpknap").addEventListener("click", function () { visTeori(false); NK.Rundvisning.start(); });
+        NK.el("teoriknap").addEventListener("click", function () { NK.Rundvisning.luk(); lukOverlays(); vis("teori", true); });
+        NK.el("teori-luk").addEventListener("click", function () { vis("teori", false); });
+        NK.el("teori").addEventListener("click", function (e) { if (e.target.id === "teori") vis("teori", false); });
+        NK.el("vand-serieknap").addEventListener("click", aabnSerie);
+        NK.el("serie-luk").addEventListener("click", function () { vis("tegneserie", false); });
+        NK.el("tegneserie").addEventListener("click", function (e) { if (e.target.id === "tegneserie") vis("tegneserie", false); });
+        NK.el("hjaelpknap").addEventListener("click", function () { lukOverlays(); NK.Rundvisning.start(); });
 
         document.addEventListener("keydown", tastatur);
 
-        /* Man kan linke direkte til en fane med fx  index.html#polaritet  */
+        /* Man kan linke direkte til en fane med fx  index.html#vand  */
         var oenske = "fane-" + (window.location.hash || "").replace(/^#/, "").toLowerCase();
         visFane(sims[oenske] ? oenske : faner[0]);
 

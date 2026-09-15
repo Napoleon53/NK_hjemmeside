@@ -210,8 +210,12 @@
     };
 
     /* Varmepladen (sprites/varmeplade.svg). gloed 0-1 farver pladen roed;
-       roer taender den blaa lampe for omroereren. */
-    T.varmeplade = function (ctx, x, y, b, gloed, roer) {
+       roer taender den blaa lampe for omroereren.
+       opt.varmeVinkel og opt.roerVinkel drejer knapperne (radianer fra
+       lodret: -2,2 er slukket, 2,2 er helt skruet op). opt.hover er
+       "varme" eller "roer", naar musen er over en knap. */
+    T.varmeplade = function (ctx, x, y, b, gloed, roer, opt) {
+        opt = opt || {};
         var S = NK.Sprites, MP = S.MAAL.varmeplade, s = b / MP.b;
         S.tegn(ctx, "varmeplade", x, y, b);
         ctx.save();
@@ -235,7 +239,42 @@
             ctx.arc(x + MP.lampeRoer[0] * s, y + MP.lampeRoer[1] * s, MP.lampeR * s, 0, Math.PI * 2);
             ctx.fill();
         }
+        [["varme", opt.varmeVinkel], ["roer", opt.roerVinkel]].forEach(function (k) {
+            var kn = T.pladeKnap(x, y, b, k[0]);
+            var v = k[1] === undefined ? -2.2 : k[1];
+            ctx.globalAlpha = 1;
+            if (opt.hover === k[0]) {
+                ctx.strokeStyle = "rgba(242, 197, 61, 0.9)";
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.arc(kn.x, kn.y, kn.r + 4, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            var g2 = ctx.createRadialGradient(kn.x - kn.r * 0.3, kn.y - kn.r * 0.35, kn.r * 0.1, kn.x, kn.y, kn.r);
+            g2.addColorStop(0, "#e3e8ee");
+            g2.addColorStop(1, "#7d8794");
+            ctx.fillStyle = g2;
+            ctx.beginPath();
+            ctx.arc(kn.x, kn.y, kn.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = "#2a2f38";
+            ctx.lineWidth = Math.max(1, s);
+            ctx.stroke();
+            ctx.lineWidth = Math.max(1.5, 2.4 * s);
+            ctx.lineCap = "round";
+            ctx.beginPath();
+            ctx.moveTo(kn.x + Math.sin(v) * kn.r * 0.2, kn.y - Math.cos(v) * kn.r * 0.2);
+            ctx.lineTo(kn.x + Math.sin(v) * kn.r * 0.8, kn.y - Math.cos(v) * kn.r * 0.8);
+            ctx.stroke();
+        });
         ctx.restore();
+    };
+
+    /* Midten og radius af en drejeknap paa varmepladen, i pixels. */
+    T.pladeKnap = function (x, y, b, navn) {
+        var MP = NK.Sprites.MAAL.varmeplade, s = b / MP.b;
+        var k = navn === "roer" ? MP.knapRoer : MP.knapVarme;
+        return { x: x + k[0] * s, y: y + k[1] * s, r: MP.knapR * s };
     };
 
     /* Termometeret (sprites/termometer.svg) med den roede soejle. */
