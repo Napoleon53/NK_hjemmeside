@@ -56,7 +56,7 @@
     S.BOBLE = { x: 262, y: 160, r: 104 };
     S.LUP_GLAS = { x: 15, y: 128 };
     S.LUP_BAEGER = { x: 36, y: 88 };
-    S.STAV_L = 130;
+    S.STAV_L = 170;
 
     /* Vandbadet staar paa varmepladen, isbadet paa bordet. Et reagensglas i
        badet staar med bunden lige over badets bund. */

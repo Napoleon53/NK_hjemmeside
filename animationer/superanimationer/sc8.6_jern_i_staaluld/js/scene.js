@@ -79,9 +79,9 @@
 
     /* Zoomboblen: over det aabne bord, i stinkskabet eller ved buretten */
     S.BOBLE = {
-        ude:   { x: 300, y: 205, r: 96 },
-        skab:  { x: 560, y: 222, r: 96 },
-        buret: { x: 690, y: 236, r: 96 }
+        ude:   { x: 300, y: 214, r: 124 },
+        skab:  { x: 575, y: 226, r: 124 },
+        buret: { x: 680, y: 222, r: 124 }
     };
 
     /* ----- Indersider (lokale koordinater) ------------------------------ */

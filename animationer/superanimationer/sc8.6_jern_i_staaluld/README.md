@@ -39,9 +39,14 @@ typisk er 98,5 % jern.
   den er lukket. En åben hane kan
   altid lukkes, også mens en animation eller Kemichael kører. Aflæsningen har
   sidste ciffer 0 eller 5. Fyldes en fuld buret igen, løber den over.
+* **Aflæsning.** Knappen **Aflæs** (tasten A) eller et klik på buretten aflæser
+  den. Knappen blinker, når en aflæsning ventes: når der er tappet af til 0, og
+  når den lyserøde farve bliver. Glemmes startaflæsningen, skriver Kemichael den
+  op, når den første KMnO₄ lander i kolben. Stod menisken over nulstregen,
+  skrives 0,00 mL, og resultatet bliver for lavt.
 * **Titreringen.** Hanen åbnes og lukkes med et klik, knappen **Dråbe** (tasten D)
-  giver én dråbe, og kolben rystes ved at tage fat i den og bevæge musen eller
-  ved at holde knappen **Ryst** (tasten R) nede. Hver dråbe lander som en lilla
+  giver én dråbe, og kolben rystes ved at tage fat i den og bevæge musen. Hver
+  dråbe lander som en lilla
   sky. Så længe der er meget Fe²⁺, forsvinder skyen straks; tæt på endepunktet
   bliver den hængende, især uden rystning. Endepunktet er nået, når farven har
   holdt i 2,5 sekunder. Modellen står i `js/model.js`.
@@ -86,8 +91,7 @@ Læreren Kemichael er fælles for superanimationerne og står i
   damp af ørerne.
 * **Kolben rystes voldsomt** med musen (`RYST.amok` og `RYST.amokTid` i
   `js/model.js`): noget skvulper ud, og læreren kommer ("Det er en titrerkolbe.
-  Ikke en cocktailshaker."). Replikkerne skifter. Knappen Ryst kalder aldrig på
-  læreren.
+  Ikke en cocktailshaker."). Replikkerne skifter.
 * **Buretten løber over.** Fyldes den, mens den er fuld, kommer læreren og peger
   på regel 3 på plakaten. Pletten på bordet bliver stående resten af sessionen.
 * **Syre på vægten.** Syreflaskerne kan også slippes over vægten. Så løber
@@ -178,6 +182,6 @@ at påskeæggene kan gennemføres, at scenen kan tegnes i alle faser, og at der
 ikke er tankestreger eller 1+/1− i teksterne. Den skal åbnes gennem en lokal
 server: Chrome nægter en side på `file://` at kigge ind i sin egen iframe.
 
-Genveje: hold <kbd>R</kbd> ryst · <kbd>D</kbd> dråbe · <kbd>O</kbd> åbn og luk
+Genveje: <kbd>A</kbd> aflæs · <kbd>D</kbd> dråbe · <kbd>O</kbd> åbn og luk
 hanen · <kbd>I</kbd> hint · <kbd>N</kbd> nyt forsøg · <kbd>S</kbd> tegneserie · <kbd>T</kbd> teori ·
 <kbd>M</kbd> lyd · <kbd>H</kbd> rundvisning · <kbd>Esc</kbd> luk.

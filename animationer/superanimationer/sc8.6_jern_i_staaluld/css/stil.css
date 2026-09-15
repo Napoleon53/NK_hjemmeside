@@ -265,8 +265,6 @@ main.forsoeg {
 
 .hint[hidden] { display: none; }
 
-#arbejd-knap { user-select: none; -webkit-user-select: none; touch-action: none; }
-#arbejd-knap.aktiv { background-color: var(--orange); }
 
 /* ----- Tegneserien ----------------------------------------------------- */
 .overlay-boks.bred { max-width: 980px; }

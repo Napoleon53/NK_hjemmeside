@@ -43,11 +43,11 @@
         }
         NK.el("hint-knap").disabled = !aktuelt || aktivId === "beregn";
 
-        var ak = NK.el("arbejd-knap");
-        var knapRyst = f.arbejdKilde === "knap-ryst";
-        ak.hidden = f.arbejdsType() !== "ryst" && !knapRyst;
-        ak.disabled = !(knapRyst || f.kanRyste());
-        ak.classList.toggle("aktiv", knapRyst);
+        var ak = NK.el("aflaes-knap");
+        ak.hidden = !(f.buret.fyldt && !f.gjort.beregn);
+        ak.disabled = !f.kanAflaese();
+        ak.classList.toggle("banker", f.skalAflaese());
+        ak.classList.toggle("orange", f.skalAflaese());
 
         var dk = NK.el("draabe-knap");
         dk.hidden = !(f.buret.fyldt && !f.gjort.beregn);
@@ -87,7 +87,7 @@
         var t = f.aktueltTrin();
         return [
             t ? t.id : "", !!f.handling, f.arbejdKilde, f.arbejdsType(), f.kanRyste(), f.kanDraabe(),
-            f.buret.fyldt, f.buret.aaben, f.g.kolbe.sted, f.mStaal, f.vStart, f.vSlut,
+            f.buret.fyldt, f.buret.aaben, f.g.kolbe.sted, f.mStaal, f.vStart, f.vSlut, f.kanAflaese(), f.skalAflaese(),
             !!f.gjort.beregn, f.resultater.length, f.forsoegNr,
             NK.TRIN.map(function (x) { return f.trinGjort(x.id) ? 1 : 0; }).join("")
         ].join("|");
@@ -364,7 +364,7 @@
 
         NK.Lyd.laasOp();
         var tast = e.key.toLowerCase();
-        if (tast === "r") { if (!e.repeat) forsoeg.arbejdKnap(true); }
+        if (tast === "a") { if (!e.repeat) forsoeg.klik("buret"); }
         else if (tast === "d") { if (!e.repeat) forsoeg.draabe(); }
         else if (tast === "o") { if (!e.repeat) forsoeg.klik("hane"); }
         else if (tast === "i") visHint();
@@ -390,7 +390,9 @@
         forsoeg.tegn();
 
         if (signatur() !== sidsteSignatur) opdaterPanel();
-        var sidderFast = forsoeg.aktueltTrin() && forsoeg.tid - forsoeg.trinStart > 25 && NK.el("hint-tekst").hidden && !NK.el("hint-knap").disabled;
+        /* Hint blinker kun, naar der ikke er sket noget i 25 sekunder */
+        var stille = forsoeg.tid - Math.max(forsoeg.trinStart, forsoeg.sidsteAendring || 0);
+        var sidderFast = forsoeg.aktueltTrin() && stille > 25 && NK.el("hint-tekst").hidden && !NK.el("hint-knap").disabled;
         NK.el("hint-knap").classList.toggle("banker", !!sidderFast);
         window.requestAnimationFrame(loekke);
     }
@@ -412,15 +414,7 @@
         forsoeg.vedBesked = besked;
         forsoeg.vedMaaling = maaling;
 
-        var ak = NK.el("arbejd-knap");
-        ak.addEventListener("pointerdown", function (e) {
-            NK.Lyd.laasOp();
-            if (forsoeg.arbejdKnap(true)) { try { ak.setPointerCapture(e.pointerId); } catch (fejl) {} }
-        });
-        ["pointerup", "pointercancel", "lostpointercapture"].forEach(function (type) {
-            ak.addEventListener(type, function () { forsoeg.arbejdKnap(false); });
-        });
-        ak.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+        NK.el("aflaes-knap").addEventListener("click", function () { NK.Lyd.laasOp(); forsoeg.klik("buret"); });
 
         NK.el("draabe-knap").addEventListener("click", function () { NK.Lyd.laasOp(); forsoeg.draabe(); });
         NK.el("hint-knap").addEventListener("click", visHint);

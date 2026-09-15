@@ -348,8 +348,12 @@
                 ["uoploest", "Kolben kom under buretten, før al stålulden var opløst. Det uopløste jern blev ikke titreret, så resultatet bliver for lavt.", TIT, function (ctx) {
                     opstilling(ctx, vStart, { kolbe: underBuret({ fe2: 0.6, jern: 0.4 }) });
                 }],
-                ["tappetKolbe", "Buretten blev tappet af ned i kolben før startaflæsningen. Den KMnO₄ er ikke målt, så resultatet bliver for lavt.", TIT, function (ctx) {
-                    opstilling(ctx, 0, { kolbe: underBuret({ fe2: 0.8, lokal: 3 }), aaben: true, straaleTil: UNDER.y + 100 });
+                ["glemtStart", "Buretten blev ikke aflæst, før titreringen begyndte. Kemichael skrev V(start) = " + M.komma(vStart, 2) + " mL op.", UDSNIT.buret, function (ctx) {
+                    opstilling(ctx, vStart, { affald: 1.5 });
+                    flaske(ctx, "kmno4", S.HJEM.kmno4);
+                }],
+                ["ikkeNulstillet", "Titreringen begyndte, mens menisken stod over nulstregen. V(start) blev skrevet som 0,00 mL, så resultatet bliver for lavt.", TIT, function (ctx) {
+                    opstilling(ctx, -1.2, { kolbe: underBuret({ fe2: 0.8, lokal: 3 }), aaben: true, straaleTil: UNDER.y + 100 });
                 }],
                 ["affaldTaelt", "Efter startaflæsningen løb KMnO₄ i affaldsbægeret. Det tæller med i forbruget, så resultatet bliver for højt.", TIT, function (ctx) {
                     opstilling(ctx, vStart + 2, { affald: 3, aaben: true, straaleTil: S.HJEM.affald.y + 76 });

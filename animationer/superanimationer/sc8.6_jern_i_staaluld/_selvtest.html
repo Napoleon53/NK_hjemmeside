@@ -198,7 +198,11 @@ function koerTest() {
     f.handling = null;
     paastand("lukket taet paa nulstregen: menisken staar paa 0,00", f.buret.V === 0);
     paastand("det aftappede er i affaldsbaegeret", f.affaldMl > 0.5, komma(f.affaldMl, 2) + " mL");
-    paastand("startaflaesningen er 0,00 mL", f.klik("buret") === true && f.vStart === 0);
+    NK.opdaterPanel();
+    var ak = d.getElementById("aflaes-knap");
+    paastand("knappen Aflæs vises og blinker", !ak.hidden && !ak.disabled && ak.classList.contains("banker"));
+    ak.click();
+    paastand("knappen Aflæs noterer startaflaesningen: 0,00 mL", f.vStart === 0);
     paastand("V(start) staar i skemaet", d.getElementById("v-start").textContent === "0,00 mL");
     f.klik("hane");
     vent(function () { return f.buret.V >= 0.3; }, 5);
@@ -291,6 +295,16 @@ function koerTest() {
     nyt();
     paastand("nyt forsoeg rydder iagttagelserne", iagttagelser().length === 0);
 
+    oploest("svovlsyre");
+    f.slipTil("kmno4", "buretTop"); adv(4.5);
+    f.klik("hane"); vent(function () { return f.buret.V >= 0.2; }, 12); f.klik("hane");
+    var Vglemt = f.buret.V;
+    paastand("kolben stilles under uden startaflaesning", f.slipTil("kolbe", "buret") === true && f.vStart === null);
+    adv(4);
+    f.klik("hane"); adv(0.5); f.klik("hane");
+    paastand("glemt startaflaesning: laereren skriver den op", f.iagttaget.glemtStart && f.vStart === M.aflaes(Vglemt), f.vStart !== null && komma(f.vStart, 2) + " mL");
+    paastand("derefter loeber hanen med fuld fart", f.buret.V - Vglemt > 0.4, komma(f.buret.V - Vglemt, 2) + " mL paa 0,5 s");
+
     var lilla = helt("svovlsyre", { ekstra: 1.5 });
     paastand("for meget KMnO₄ giver et for hoejt resultat og noteres", lilla !== null && lilla > 101 && f.iagttaget.lilla, lilla && komma(lilla) + " %");
 
@@ -325,9 +339,8 @@ function koerTest() {
     adv(4);
     f.slipTil("kmno4", "buretTop"); adv(4.5);
     roligt();
-    f.klik("hane"); vent(function () { return f.buret.V >= 0.5; }, 12); f.klik("hane");
-    paastand("buretten tappes af ned i kolben", f.kolbeFoerStart > 0.5, komma(f.kolbeFoerStart, 2) + " mL");
-    paastand("startaflaesningen noterer det", f.klik("buret") === true && f.iagttaget.tappetKolbe);
+    f.klik("hane"); adv(1); f.klik("hane");
+    paastand("titrering over nulstregen: V(start) skrives som 0,00 mL og noteres", f.vStart === 0 && f.iagttaget.ikkeNulstillet);
     roligt();
     paastand("buretten fyldes op efter aflaesningen", f.slipTil("kmno4", "buretTop") === true);
     adv(4.5);
@@ -346,7 +359,7 @@ function koerTest() {
     svar(komma(f.jernTal().procent, 1));
     paastand("jernindholdet kan beregnes", f.gjort.beregn);
     var sr2 = serie();
-    var antalFejl = ["lidtStaal", "toSyrer", "kmno4Kolbe", "tappetKolbe", "genfyldt", "spild"].filter(function (k) { return f.iagttaget[k]; }).length;
+    var antalFejl = ["lidtStaal", "toSyrer", "kmno4Kolbe", "ikkeNulstillet", "genfyldt", "spild"].filter(function (k) { return f.iagttaget[k]; }).length;
     paastand("tegneserien har en roed rude for hver fejl", sr2.fejl >= antalFejl && sr2.ruder === 8 + sr2.fejl, sr2.fejl + " fejlruder");
     tegnOk("efter mange fejl");
     roligt();

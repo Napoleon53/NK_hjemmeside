@@ -42,14 +42,16 @@
           hint: "Træk kolben hen på varmepladen. Vent, til der ikke er mere ståluld og ikke flere bobler." },
         { id: "fyld", tekst: "Fyld buretten med KMnO₄", mark: "kmno4",
           hint: "Træk flasken med kaliumpermanganat hen over tragten på buretten." },
-        { id: "start", tekst: "Nulstil buretten", mark: "hane",
-          hint: "Klik på hanen, og klik igen, når menisken står på 0. Klik så på buretten for at aflæse den." },
+        { id: "nul", tekst: "Tap af til 0 mL", mark: "hane",
+          hint: "Klik på hanen. Klik igen, når menisken i zoomboblen står på 0." },
+        { id: "start", tekst: "Aflæs V(start)", mark: "buret",
+          hint: "Klik på knappen Aflæs eller på buretten. Aflæsningen skrives i skemaet." },
         { id: "under", tekst: "Stil kolben under buretten", mark: "kolbe",
           hint: "Træk kolben hen under buretten." },
         { id: "titrer", tekst: "Titrer til en svag, blivende lyserød farve", mark: "hane",
-          hint: "Klik på hanen for at åbne og lukke den. Tilsæt de sidste dråber én ad gangen med knappen Dråbe, og ryst kolben imellem." },
-        { id: "slut", tekst: "Aflæs buretten igen", mark: "buret",
-          hint: "Luk hanen, og klik på buretten, når den lyserøde farve bliver." },
+          hint: "Klik på hanen for at åbne og lukke den. Tilsæt de sidste dråber én ad gangen med knappen Dråbe, og ryst kolben imellem ved at trække i den." },
+        { id: "slut", tekst: "Aflæs V(slut)", mark: "buret",
+          hint: "Luk hanen, når den lyserøde farve bliver, og klik på knappen Aflæs." },
         { id: "beregn", tekst: "Beregn jernindholdet", mark: null,
           hint: "Brug massen af stålulden, de to aflæsninger og koncentrationen i skemaet." }
     ];
@@ -57,8 +59,8 @@
 
     /* Fejl og uheld, der noteres i this.iagttaget og vises i tegneserien:
        lidtStaal, megetStaal, toSyrer, kmno4Kolbe, ingenSyre, uoploest,
-       tappetKolbe, affaldTaelt, genfyldt, ikkeLyserod, lilla, falmer,
-       klor, skvulp, overloeb, vaegt og spild. */
+       glemtStart, ikkeNulstillet, affaldTaelt, genfyldt, ikkeLyserod,
+       lilla, falmer, klor, skvulp, overloeb, vaegt og spild. */
 
     NK.Forsoeg = function (canvas) {
         this.canvas = canvas;
@@ -100,10 +102,9 @@
         this.antalForkerte = 0;
         this.traekMaal = null;
 
-        /* mL KMnO₄ fra buretten i kolben foer og efter startaflaesningen,
-           i affaldet efter den og paa flisen, og haeldt direkte i kolben.
+        /* mL KMnO₄ fra buretten i kolben efter startaflaesningen, i
+           affaldet efter den og paa flisen, og haeldt direkte i kolben.
            aflaestI: den lyserøde intensitet ved slutaflaesningen. */
-        this.kolbeFoerStart = 0;
         this.kolbeEfterStart = 0;
         this.affaldEfterStart = 0;
         this.spildMl = 0;
@@ -181,6 +182,7 @@
             case "syre": return !!this.kem.syre;
             case "oploes": return this.kem.opl >= M.OPLOES.faerdig || this.g.kolbe.sted === "buret";
             case "fyld": return this.buret.fyldt;
+            case "nul": return this.vStart !== null || (this.buret.fyldt && !this.buret.aaben && this.buret.V >= -M.BURET.fang);
             case "start": return this.vStart !== null;
             case "under": return this.g.kolbe.sted === "buret" || this.vSlut !== null;
             case "titrer": return !!gj.titrer || this.vSlut !== null;
@@ -201,8 +203,8 @@
         var tekst = t.hint;
         var b = this.buret, m = this.stykMasse();
         if (t.id === "afvej" && m >= M.AFVEJ.min && m <= M.AFVEJ.max) mark = "vejebaad";
-        if (t.id === "start" && !b.aaben && b.V >= -M.BURET.fang) mark = "buret";
-        if (t.id === "start" && b.aaben) tekst = "Klik på hanen igen, når menisken står på 0.";
+        if (t.id === "nul" && b.aaben) tekst = "Klik på hanen igen, når menisken i zoomboblen står på 0.";
+        if (t.id === "nul" && !b.aaben && b.V < -M.BURET.fang) tekst = "Menisken står stadig over 0. Klik på hanen, og tap lidt mere af.";
         if (t.id === "slut" && b.aaben) mark = "hane";
         if (mark) this.markér(mark, 5);
         return tekst;
@@ -217,6 +219,7 @@
     };
 
     P.aendret = function (grund) {
+        this.sidsteAendring = this.tid;
         if (this.vedAendring) this.vedAendring(grund);
     };
 
@@ -584,13 +587,13 @@
                 return false;
             }
             if (this.vStart !== null) return this.tilBuret();
-            this.besked("Stålulden er opløst. Nulstil buretten, før kolben stilles under den.");
+            this.besked("Stålulden er opløst. Tap buretten af til 0, og aflæs den, før kolben stilles under den.");
             this.markér(this.buret.fyldt ? "buret" : "kmno4", 3);
             return false;
         }
         if (k.sted === "buret") {
-            if (this.vSlut !== null) this.besked("Beregn jernindholdet i måleskemaet.");
-            else this.besked("Tag fat i kolben, og ryst den, eller hold knappen Ryst nede.");
+            if (this.vSlut !== null) this.besked("Beregn jernindholdet i skemaet.");
+            else this.besked("Tag fat i kolben, og ryst den ved at trække i den.");
         }
         return false;
     };
@@ -701,6 +704,10 @@
         b.aaben = false;
         this.buretFokusUr = 3;
         if (this.vStart === null && Math.abs(b.V) <= M.BURET.fang) b.V = 0;
+        if (this.vStart === null && b.fyldt) {
+            if (b.V < -M.BURET.fang) this.besked("Menisken står stadig over 0.");
+            else this.besked("Menisken står på " + M.komma(M.aflaes(b.V), 2) + " mL. Aflæs buretten.", "god");
+        }
         if (NK.Lyd) NK.Lyd.klik();
         this.aendret("hane");
         return true;
@@ -726,6 +733,18 @@
         return !!(this.buret.fyldt && !this.buret.aaben && !this.handling && this.buret.V + M.BURET.draabe <= 50);
     };
 
+    /* Knappen Aflaes: kan buretten aflaeses, og ventes der en aflaesning? */
+    P.kanAflaese = function () {
+        var b = this.buret;
+        return !!(b.fyldt && !this.handling && !this.gjort.beregn && b.V >= -M.BURET.fang);
+    };
+
+    P.skalAflaese = function () {
+        if (!this.kanAflaese() || this.buret.aaben) return false;
+        if (this.vStart === null) return true;
+        return !!this.gjort.titrer && this.vSlut === null;
+    };
+
     /* Aflaesningen. Saa laenge der ikke er titreret i kolben, er det
        startaflaesningen, og den kan tages om. Derefter er det
        slutaflaesningen, som ogsaa kan tages om, indtil jernindholdet er
@@ -741,7 +760,6 @@
         if (start) {
             this.vStart = V;
             this.affaldEfterStart = 0;
-            if (this.kolbeFoerStart > 0.2) this.iagttag("tappetKolbe", true);
             this.maal("start", V);
         } else {
             this.vSlut = V;
@@ -956,17 +974,30 @@
         return S.BORD - 1;
     };
 
+    /* Titreringen er begyndt uden startaflaesning: laereren skriver den op.
+       Stod menisken over nulstregen, skrives 0,00 mL. */
+    P.glemtStart = function (ml) {
+        var foer = this.buret.V - ml;
+        if (foer < -M.BURET.fang) {
+            this.vStart = 0;
+            this.iagttag("ikkeNulstillet", true);
+        } else {
+            this.vStart = M.aflaes(Math.max(0, foer));
+            this.iagttag("glemtStart", true);
+        }
+        this.affaldEfterStart = 0;
+        this.maal("start", this.vStart);
+        this.aendret("start");
+    };
+
     P.landet = function (til, ml) {
         if (til === "kolbe") {
             M.tilsaet(this.kem, ml);
             this.lokalX = B.x;
             this.sidsteDraabe = this.tid;
-            if (this.vStart === null) {
-                this.kolbeFoerStart += ml;
-            } else {
-                this.kolbeEfterStart += ml;
-                if (!this.kem.syre && this.kolbeEfterStart > 1) this.iagttag("ingenSyre", true);
-            }
+            if (this.vStart === null && this.buret.fyldt) this.glemtStart(ml);
+            this.kolbeEfterStart += ml;
+            if (!this.kem.syre && this.kolbeEfterStart > 1) this.iagttag("ingenSyre", true);
         } else if (til === "affald") {
             this.affaldMl += ml;
             if (this.vStart !== null && this.vSlut === null) this.affaldEfterStart += ml;
