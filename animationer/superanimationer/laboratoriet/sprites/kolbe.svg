@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400" viewBox="0 0 150 200">
+  <!-- Konisk kolbe (Erlenmeyer), 250 mL. Indholdet tegnes af animationen
+       bag denne fil. Inderside: hals x 59-91 fra y 5 til 65, bunden y 193,
+       bundens inderside x 13-137. Aabningen er (75, 4). -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.36"/>
+      <stop offset="0.14" stop-color="#d4ebfa" stop-opacity="0.08"/>
+      <stop offset="0.78" stop-color="#d4ebfa" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.3"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Krop og hals -->
+  <path d="M55 6 L55 64 L8 178 Q4 197 22 198 L128 198 Q146 197 142 178 L95 64 L95 6 Z" fill="url(#glas)"/>
+  <path d="M55 6 L55 64 L8 178 Q4 197 22 198 L128 198 Q146 197 142 178 L95 64 L95 6" fill="none" stroke="#dcecf8" stroke-opacity="0.85" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M59 6 L59 65 L13 177 Q11 192 22 193 L128 193 Q139 192 137 177 L91 65 L91 6" fill="none" stroke="#dcecf8" stroke-opacity="0.22" stroke-width="1"/>
+
+  <!-- Kant ved aabningen -->
+  <rect x="51" y="0" width="48" height="7" rx="2.5" fill="#dcecf8" fill-opacity="0.28" stroke="#e6f2fb" stroke-opacity="0.9" stroke-width="1.4"/>
+
+  <!-- Genskin -->
+  <rect x="62.5" y="10" width="4" height="50" rx="2" fill="#ffffff" fill-opacity="0.22"/>
+  <path d="M52 86 L24 156" stroke="#ffffff" stroke-opacity="0.24" stroke-width="4" stroke-linecap="round"/>
+  <path d="M104 92 L120 132" stroke="#ffffff" stroke-opacity="0.1" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Inddeling -->
+  <g stroke="#eef6fc" stroke-opacity="0.85" stroke-width="1.4" stroke-linecap="round">
+    <path d="M64 172 h12 M64 146 h12 M64 118 h12"/>
+  </g>
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="8" font-weight="600" fill="#eef6fc" fill-opacity="0.8">
+    <text x="79" y="175">50</text>
+    <text x="79" y="149">100</text>
+    <text x="79" y="121">150</text>
+    <text x="75" y="100" text-anchor="middle" font-size="7.5">250 mL</text>
+  </g>
+</svg>
