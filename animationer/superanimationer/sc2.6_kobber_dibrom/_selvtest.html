@@ -72,7 +72,6 @@ function koerTest() {
 
     overskrift("3. Sikkerhed og raekkefoelge");
     frisk();
-    paastand("bromvand kan ikke aabnes uden udsugning", f.klik("bromflaske") === false && !f.handling);
     paastand("kontakten taender udsugningen", f.klik("kontakt") === true && f.udsugning);
     paastand("en tom kolbe kan ikke rystes", f.rystKnap(true) === false && !f.rystKilde);
     paastand("kobberet kommer i kolben", f.klik("urglas") === true);
@@ -82,8 +81,6 @@ function koerTest() {
     adv(5);
     paastand("kolben er fyldt, og der er 6 Br₂", f.gjort.brom && Math.abs(f.g.kolbe.areal - S.KOLBE_FULD) < 1 && tael(f.mikro.kolbe, "br2") + f.mikro.kolbe.haendelser.length === 6);
     paastand("flasken har laaget paa igen", f.laagT === 0 && !f.handling);
-    paastand("udsugningen kan ikke slukkes med aaben kolbe", f.klik("kontakt") === false && f.udsugning);
-    paastand("uden prop kan kolben ikke rystes", f.rystKnap(true) === false);
     paastand("uden prop kan kolben ikke haeldes over", f.klik("kolbe") === false);
     paastand("proppen saettes i", f.klik("prop") === true);
     adv(1.5);
@@ -124,7 +121,6 @@ function koerTest() {
     paastand("kobberet blev i kolben uden ioner", tael(mk, "cu") === NK.Mikro.GITTER - 6 && tael(mk, "cu2") === 0 && tael(mk, "br") === 0);
 
     overskrift("6. Testene");
-    paastand("vasken afvises", f.klik("vask") === false);
     paastand("affald kan ikke afleveres foer testene", f.klik("dunk") === false);
     for (i = 0; i < 3; i++) { f.klik("nh3"); adv(1.3); }
     paastand("NH₃ gik i glas 1 med 3 draaber", f.g.glas1.reagens === "nh3" && f.g.glas1.draaber === 3, f.g.glas1.draaber);
@@ -211,7 +207,6 @@ function koerTest() {
     paastand("skaar, kobber og en pyt med brom", u.skaar.length >= 30 && !!u.pyt && u.pyt.brom);
     paastand("oprydningen har fire trin", u.trinene.join(",") === "neutraliser,toer,fej,aflever", u.trinene.join(","));
     paastand("proppen er sprunget af", !f.g.prop.iKolbe && !f.g.kolbe.prop);
-    paastand("udsugningen kan ikke slukkes over bromvandet", f.klik("kontakt") === false);
     adv(1.5);
     paastand("andre genstande afvises under oprydningen", f.klik("nh3") === false);
     paastand("sprayflasken virker", f.klik("spray") === true);

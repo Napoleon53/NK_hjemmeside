@@ -142,6 +142,7 @@
         this.antalUheld++;
         if (NK.Lyd) { NK.Lyd.glas(); if (u.vaeske) NK.Lyd.plask(); }
         this.besked("Kolben er knust. Ryd op, før du går videre.", "advarsel");
+        if (this.laererKnust) this.laererKnust();
         u.trin = u.trinene[0];
         this.visRedskaber();
         this.aendret("knust");

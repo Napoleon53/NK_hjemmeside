@@ -20,6 +20,12 @@
    og indholdet sprøjter ud (graenserne staar i M.RYST). Laereren kommer
    og toerrer op (laerer.js). Glasset skal fyldes igen.
 
+   Forkerte handlinger afvises ikke, men giver et uheld, som laereren
+   rydder op efter:
+     rystes et glas uden prop, sproejter indholdet ud (spild)
+     er brom fremme uden udsugning, kommer dampene ud i lokalet, og
+     laereren taender udsugningen (opdater)
+
    Tegningen og musen staar i bord.js, laereren i laerer.js.
    ===================================================================== */
 (function () {
@@ -1075,13 +1081,16 @@
         this.koer([{ flyt: gl, til: this.hjemFor(gl), tid: 0.35, loeft: 0 }], "hjem");
     };
 
-    /* Knappen Ryst glasset (og tasten R): til = trykket ned */
+    /* Knappen Ryst glasset (og tasten R): til = trykket ned. Et glas med
+       prop vaelges foerst. Har intet glas prop, rystes det valgte alligevel,
+       og indholdet sproejter ud. */
     P.rystKnap = function (til) {
         if (til) {
             if (this.rystKilde || this.handling || this.holdt) return false;
             var mig = this;
             var gl = this.maalGlas(function (g) { return mig.kanRyste(g); });
-            if (!gl) { this.proevRyst(this.valgtGlas()); return false; }
+            if (!gl && this.proevRyst(this.valgtGlas())) gl = this.valgtGlas();
+            if (!gl) return false;
             this.startRyst("knap", gl);
             return true;
         }
@@ -1108,6 +1117,7 @@
             gl.p.y = hj.y - 30 + Math.abs(Math.cos(w)) * 6;
             gl.p.v = Math.cos(w) * 0.22;
             maal = 1;
+            if (!gl.prop) this.spildTid += dt;
         } else if (gl && this.rystKilde === "mus") {
             this.musFart *= Math.exp(-4 * dt);
             this.musVx *= Math.exp(-5 * dt);
@@ -1115,7 +1125,12 @@
             maal = NK.klamp(this.musFart / M.RYST.FULD, 0, 1);
 
             var g = this.knusGraense();
-            if (g) {
+            if (!gl.prop) {
+                /* Uden prop skvulper det over kanten, naar der rystes */
+                if (this.vold > M.RYST.SPILD_FART) this.spildTid += dt;
+                else this.spildTid = Math.max(0, this.spildTid - dt);
+                this.uro = NK.klamp(this.spildTid / M.RYST.SPILD_TID, 0, 1);
+            } else if (g) {
                 if (this.vold > g.fart) this.farligTid += dt;
                 else this.farligTid = Math.max(0, this.farligTid - dt);
                 this.uro = NK.klamp((this.vold / g.fart - 0.7) / 0.3, 0, 1);
@@ -1127,6 +1142,17 @@
             }
             gl.p.v = NK.mod(gl.p.v, NK.klamp(-this.musVx * 0.0004, -0.4, 0.4), 12, dt) + (Math.random() - 0.5) * 0.14 * this.uro;
         }
+        if (gl && !gl.prop && this.spildTid > 0.05) {
+            if (Math.random() < dt * 14) {
+                var fs = M.br2Tilbage(gl) > 0.05 ? M.FARVE.bromvand : { r: 190, g: 215, b: 235, a: 0.6 };
+                this.draaber.push({ x: gl.p.x + r(-3, 3), y: gl.p.y, vx: r(-90, 90), vy: -r(60, 160), r: r(1.4, 2.4), liv: 1, farve: fs, fysik: true });
+            }
+            if (this.spildTid >= M.RYST.SPILD_TID) {
+                this.spildTid = 0;
+                this.spild(gl, "udenProp");
+                return;
+            }
+        }
         this.ryst = NK.mod(this.ryst, maal, maal > this.ryst ? 6 : 3, dt);
         this.skvulpUr -= dt;
         if (this.ryst > 0.35 && this.skvulpUr <= 0 && NK.Lyd) {
@@ -1137,13 +1163,22 @@
 
     /* Paaskeaegget: proppen springer af, og indholdet sproejter ud */
     P.propSpringer = function () {
-        var gl = this.rystGlas, pr = gl.prop;
-        var i;
         this.antalUheld++;
+        this.spild(this.rystGlas, "prop");
+    };
+
+    /* Indholdet sproejter ud af glasset, fordi proppen sprang af (slags
+       "prop"), eller fordi der blev rystet uden prop ("udenProp").
+       Laereren kommer og toerrer op (laerer.js). */
+    P.spild = function (gl, slags) {
+        var pr = gl.prop;
+        var i;
+        if (slags !== "prop") this.andreUheld++;
         this.rystKilde = null;
         this.rystGlas = null;
         this.holdt = null;
         this.farligTid = 0;
+        this.spildTid = 0;
         this.uro = 0;
         this.ryst = 0;
         this.musFart = 0;
@@ -1164,11 +1199,11 @@
 
         this.nulstilGlas(gl);
         this.ryk = 5;
-        if (NK.Lyd) { NK.Lyd.pop(); NK.Lyd.plask(); }
-        this.iagttag("uheld", gl);
-        this.besked("Proppen sprang af! Indholdet er tabt.", "advarsel");
+        if (NK.Lyd) { if (pr) NK.Lyd.pop(); NK.Lyd.plask(); }
+        this.iagttag(slags === "prop" ? "uheld" : "spildt", gl);
+        this.besked(slags === "prop" ? "Proppen sprang af! Indholdet er tabt." : "Der var ingen prop i. Indholdet er tabt.", "advarsel");
         this.koer([{ flyt: gl, til: this.hjemFor(gl), tid: 0.5, loeft: 0 }], "hjem");
-        if (this.laererUheld) this.laererUheld(gl);
+        if (this.laererUheld) this.laererUheld(gl, slags);
         this.aendret("uheld");
     };
 
@@ -1267,6 +1302,22 @@
         var under = this.glasVed("lampe");
         if (under && !this.lampeTaendt && under.reageret > 0.03 && under.reageret < M.LYS.faerdig) this.lampeSlukTid += dt;
 
+        /* Brom fremme uden udsugning: dampene kommer ud i lokalet, og
+           efter 1,6 sekunder kommer laereren og taender udsugningen */
+        var udenUdsugning = !this.udsugning && this.bromFremme();
+        this.taage = NK.mod(this.taage, udenUdsugning ? 1 : 0, udenUdsugning ? 0.25 : 0.8, dt);
+        if (udenUdsugning) {
+            this.udenUdsugning += dt;
+            if (this.udenUdsugning > 1.6 && this.laererUdsugning && this.laerer && !this.laerer.scene) {
+                this.andreUheld++;
+                this.iagttag("udsugning");
+                this.besked("Bromdampene kommer ud i lokalet!", "advarsel");
+                this.laererUdsugning();
+            }
+        } else {
+            this.udenUdsugning = 0;
+        }
+
         if (this.tidFart > 1) {
             this.tidFartUr -= dt;
             if (this.tidFartUr <= 0) { this.tidFart = 1; this.aendret("tid"); }
@@ -1355,11 +1406,14 @@
             if (gl.brom && !gl.prop && M.br2Tilbage(gl) > 0.05 && gl.sted !== "flytter") kilder.push({ x: gl.p.x, y: gl.p.y - 2 });
         });
         if (this.pyt && this.pyt.brom && this.pyt.vaad > 0.05) kilder.push({ x: this.pyt.x + r(-30, 30), y: S.BORD - 2 });
+        /* Uden udsugning kommer der flere dampe, og de breder sig ud */
         this.dampUr -= dt;
         if (kilder.length && this.dampUr <= 0) {
-            this.dampUr = 0.32 / kilder.length;
+            var spred = this.udsugning ? 1 : 4;
+            this.dampUr = (this.udsugning ? 0.32 : 0.16) / kilder.length;
             var k = kilder[Math.floor(Math.random() * kilder.length)];
-            this.dampe.push({ x: k.x + r(-6, 6), y: k.y, vx: r(-8, 8), vy: r(-22, -10), r: r(4, 8), liv: 0.9 });
+            this.dampe.push({ x: k.x + r(-6, 6), y: k.y, vx: r(-8, 8) * spred, vy: r(-22, -10), r: r(4, 8), liv: 0.9 });
+            if (this.dampe.length > 120) this.dampe.shift();
         }
         for (i = this.dampe.length - 1; i >= 0; i--) {
             var p = this.dampe[i];

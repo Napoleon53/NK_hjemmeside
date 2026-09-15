@@ -55,7 +55,7 @@
         kilde.start(t);
     }
 
-    function tone(c, t, fra, til2, varighed, styrke, type) {
+    function tone(c, t, fra, til2, varighed, styrke, type, filterFrekvens) {
         var o = c.createOscillator();
         o.type = type || "sine";
         o.frequency.setValueAtTime(fra, t);
@@ -63,7 +63,16 @@
         var g = c.createGain();
         g.gain.setValueAtTime(styrke, t);
         g.gain.exponentialRampToValueAtTime(0.0005, t + varighed);
-        o.connect(g).connect(c.destination);
+        var ud = g;
+        if (filterFrekvens) {
+            var f = c.createBiquadFilter();
+            f.type = "lowpass";
+            f.frequency.setValueAtTime(filterFrekvens, t);
+            g.connect(f);
+            ud = f;
+        }
+        o.connect(g);
+        ud.connect(c.destination);
         o.start(t);
         o.stop(t + varighed + 0.02);
     }
@@ -151,6 +160,40 @@
             var c = klar(); if (!c) return;
             tone(c, c.currentTime, 660, 662, 0.25, 0.07);
             tone(c, c.currentTime + 0.12, 880, 882, 0.35, 0.07);
+        },
+
+        /* Laererens utilfredse brummen */
+        brum: function () {
+            var c = klar(); if (!c) return;
+            var nu = c.currentTime;
+            tone(c, nu, 120, 88, 0.42, 0.16, "sawtooth", 520);
+            tone(c, nu + 0.02, 122, 90, 0.4, 0.06, "square", 380);
+        },
+
+        /* Mumlen, mens laereren taler: korte stavelser */
+        mumle: function (antal) {
+            var c = klar(); if (!c) return;
+            var nu = c.currentTime;
+            var n = antal || 4;
+            for (var i = 0; i < n; i++) {
+                var t = nu + i * 0.13 + Math.random() * 0.03;
+                var f = 130 + Math.random() * 50;
+                tone(c, t, f, f * (0.85 + Math.random() * 0.2), 0.1, 0.1, "sawtooth", 900);
+            }
+        },
+
+        slurk: function () {
+            var c = klar(); if (!c) return;
+            var nu = c.currentTime;
+            filtreretStoej(c, nu, 0.3, "bandpass", 500, 3, 0.25);
+            tone(c, nu + 0.05, 300, 180, 0.2, 0.08);
+            tone(c, nu + 0.35, 260, 160, 0.15, 0.06);
+        },
+
+        /* Koekkenrulle, der rives af */
+        papir: function () {
+            var c = klar(); if (!c) return;
+            filtreretStoej(c, c.currentTime, 0.22, "bandpass", 2600, 0.9, 0.2);
         },
 
         plask: function () {

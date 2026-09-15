@@ -187,7 +187,8 @@ glasset kan bæres til lampen og tilbage, at den store visning åbner og lukker,
 at et glas i folie ikke kan røres, at begge tests giver de rigtige resultater i
 begge glas, at tegneserien låses op til sidst, at læreren dabber efter et
 særlig godt forsøg, at almindelig rystning med musen ikke taber proppen, at
-meget voldsom rystning gør, at kaffen, uret og lampen virker, at hex-1-en giver en addition uden lys, og at der
+meget voldsom rystning gør, at bromvand uden udsugning får læreren til at
+tænde den, at rystning uden prop spilder indholdet, at kaffen, uret og lampen virker, at hex-1-en giver en addition uden lys, og at der
 ikke er tankestreger eller 1+/1− i teksterne. Den skal åbnes gennem en lokal
 server: Chrome nægter en side på `file://` at kigge ind i sin egen iframe.
 

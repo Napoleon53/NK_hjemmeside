@@ -38,15 +38,23 @@
         haand:       { x: 40, y: 46 }
     };
 
-    /* Positur for en genstand, der staar paa bordet med midten i x. */
-    function paaBord(navn, x) {
+    /* Kemichaels ankre (laereren og kaffekoppen) staar i ../kemichael/kemichael.js */
+    Object.keys(NK.Kemichael.ANKER).forEach(function (navn) { S.ANKER[navn] = NK.Kemichael.ANKER[navn]; });
+
+    /* Positur for en genstand, der staar paa bordet (eller paa
+       underlaget y) med midten i x. */
+    function paaBord(navn, x, y) {
         var f = F[navn], a = S.ANKER[navn];
-        return { x: x - f.b / 2 + a.x, y: S.BORD - f.h + a.y, v: 0 };
+        return { x: x - f.b / 2 + a.x, y: (y === undefined ? S.BORD : y) - f.h + a.y, v: 0 };
     }
 
     S.paaBord = paaBord;
 
+    /* Hylden paa bagvaeggen, hvor laererens kaffe staar */
+    S.HYLDE = { x0: 16, x1: 116, y: 268 };
+
     S.HJEM = {
+        kaffekop:   paaBord("kaffekop", 60, S.HYLDE.y),
         urglas:     paaBord("urglas", 80),
         bromflaske: paaBord("bromflaske", 190),
         kolbe:      paaBord("kolbe", 345),
@@ -169,6 +177,16 @@
         k.addColorStop(1, "#4a515b");
         ctx.fillStyle = k;
         ctx.fillRect(-2000, 84, S.BREDDE + 4000, 12);
+
+        /* Hylde til venstre */
+        var H = S.HYLDE;
+        ctx.fillStyle = "#6b4a2c";
+        ctx.fillRect(H.x0, H.y, H.x1 - H.x0, 7);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
+        ctx.fillRect(H.x0, H.y, H.x1 - H.x0, 1.5);
+        ctx.fillStyle = "#4a3320";
+        ctx.fillRect(H.x0 + 10, H.y + 7, 5, 14);
+        ctx.fillRect(H.x1 - 15, H.y + 7, 5, 14);
 
         /* Bordplade og forkant */
         ctx.fillStyle = "#3b404b";
@@ -524,6 +542,19 @@
             ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
             ctx.fill();
         }
+        ctx.restore();
+    };
+
+    /* Bromdampe i lokalet, naar udsugningen er slukket: et roedbrunt sloer
+       over hele scenen, taettest foroven. styrke: 0-1 */
+    S.tegnTaage = function (ctx, styrke) {
+        if (styrke < 0.01) return;
+        ctx.save();
+        var g = ctx.createLinearGradient(0, 0, 0, S.HOEJDE);
+        g.addColorStop(0, "rgba(200, 97, 26, " + (0.32 * styrke).toFixed(3) + ")");
+        g.addColorStop(1, "rgba(200, 97, 26, " + (0.08 * styrke).toFixed(3) + ")");
+        ctx.fillStyle = g;
+        ctx.fillRect(-2000, -2000, S.BREDDE + 4000, S.HOEJDE + 4000);
         ctx.restore();
     };
 

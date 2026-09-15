@@ -83,7 +83,7 @@
         var tom = ul.querySelector(".tom");
         if (tom) tom.remove();
         var li = document.createElement("li");
-        if (i.noegle === "uheld") li.className = "uheld";
+        if (/^(uheld|spildt|udsugning|vask)$/.test(i.noegle)) li.className = "uheld";
         var farve = document.createElement("span");
         farve.className = "farve" + (i.farve ? "" : " farveloes");
         if (i.farve) farve.style.backgroundColor = NK.css({ r: i.farve.r, g: i.farve.g, b: i.farve.b, a: 1 });

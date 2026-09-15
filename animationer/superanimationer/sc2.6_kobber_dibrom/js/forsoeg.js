@@ -15,6 +15,12 @@
    haanden (graenserne staar i M.RYST). Anden gang skal der rystes endnu
    voldsommere, og efter to uheld kan kolben ikke gaa i stykker. Knappen
    Ryst kolben taber aldrig kolben. Uheldet og oprydningen staar i uheld.js.
+
+   Forkerte handlinger afvises ikke, men giver et uheld, som laereren
+   Kemichael (laerer.js) rydder op efter:
+     rystes kolben uden prop, skvulper bromvandet ud
+     er brom fremme uden udsugning, kommer dampene ud i lokalet
+     haeldes resterne i vasken, loeber laereren ind og stopper det
    ===================================================================== */
 (function () {
     "use strict";
@@ -55,9 +61,11 @@
         this.laerred = new NK.Laerred(canvas);
         this.tid = 0;
         this.antalUheld = 0;
+        this.koppenVaek = false;
         this.vedAendring = null;
         this.vedBesked = null;
         this.vedIagttagelse = null;
+        if (this.laererStart) this.laererStart();
         this.nulstil();
         if (canvas) this.bindMus();
     };
@@ -87,8 +95,10 @@
             nh3:        genstand("nh3", "nh3", S.HJEM.nh3),
             agno3:      genstand("agno3", "agno3", S.HJEM.agno3),
             glas1:      genstand("glas1", "reagensglas", S.HJEM.glas1),
-            glas2:      genstand("glas2", "reagensglas", S.HJEM.glas2)
+            glas2:      genstand("glas2", "reagensglas", S.HJEM.glas2),
+            kaffekop:   genstand("kaffekop", "kaffekop", S.HJEM.kaffekop)
         };
+        g.kaffekop.skjult = this.koppenVaek;
         g.urglas.kobberVis = 1;
         g.urglas.kobber = true;
         g.kolbe.areal = 0;
@@ -128,6 +138,11 @@
         this.dampe = [];
         this.dampUr = 0;
         this.uheld = null;
+        this.spildPyt = null;
+        this.spildTid = 0;
+        this.udenUdsugning = 0;
+        this.taage = 0;
+        if (this.laererNyt) this.laererNyt();
         if (NK.Lyd) NK.Lyd.udsugning(false);
     };
 
@@ -156,7 +171,7 @@
     };
 
     P.travl = function () {
-        return !!(this.handling || this.holdt || this.rystKilde || (this.uheld && this.uheld.falder));
+        return !!(this.handling || this.holdt || this.rystKilde || (this.uheld && this.uheld.falder) || (this.laererOptaget && this.laererOptaget()));
     };
 
     /* Hint til det aktuelle trin. Genstanden, det handler om, faar en
@@ -195,7 +210,10 @@
         agno3:    { tekst: "Glas {n} med AgNO₃: der dannes et lysegult bundfald.", farve: M.FARVE.bundfald },
         draabe_nh3:   { tekst: "Dråberne af NH₃(aq) er farveløse.", farve: null },
         draabe_agno3: { tekst: "Dråberne af AgNO₃(aq) er farveløse, selv om flasken er brun.", farve: null },
-        uheld:    { tekst: "Kolben blev tabt og knust. Der er ryddet op.", farve: { r: 150, g: 160, b: 172, a: 1 } }
+        uheld:    { tekst: "Kolben blev tabt og knust. Der er ryddet op.", farve: { r: 150, g: 160, b: 172, a: 1 } },
+        spildt:   { tekst: "Kolben blev rystet uden prop, og bromvandet skvulpede ud. Pytten blev uskadeliggjort og tørret op.", farve: M.FARVE.bromvand },
+        udsugning: { tekst: "Bromvandet var åbent uden udsugning, og dampene kom ud i lokalet.", farve: M.FARVE.bromvand },
+        vask:     { tekst: "Rester med tungmetalioner var på vej ned i vasken. De skal i affaldsdunken.", farve: { r: 150, g: 160, b: 172, a: 1 } }
     };
     NK.IAGTTAGELSER = IAGTTAGELSER;
 
@@ -262,10 +280,13 @@
     /* ----- Klik paa scenen ----------------------------------------------- */
     P.klik = function (navn) {
         if (NK.Lyd) NK.Lyd.laasOp();
+        if (navn === "laerer") return this.klikLaerer ? this.klikLaerer() : false;
         if (navn === "kontakt") return this.skiftUdsugning();
+        if (this.laererOptaget && this.laererOptaget()) return false;
         if (this.uheld) return this.klikUheld ? this.klikUheld(navn) : false;
         if (this.handling || this.holdt || this.rystKilde) return false;
         switch (navn) {
+            case "kaffekop": return this.klikKop ? this.klikKop() : false;
             case "urglas": return this.proevKobber();
             case "bromflaske": return this.proevBrom();
             case "prop": return this.proevProp();
@@ -280,11 +301,10 @@
         return false;
     };
 
+    /* Udsugningen kan slukkes naar som helst. Er der brom fremme uden
+       udsugning, kommer dampene ud i lokalet, og laereren kommer og
+       taender den (se opdater og laerer.js). */
     P.skiftUdsugning = function () {
-        if (this.udsugning && this.bromFremme()) {
-            this.besked("Udsugningen skal køre, så længe der er brom fremme.", "advarsel");
-            return false;
-        }
         this.udsugning = !this.udsugning;
         if (NK.Lyd) { NK.Lyd.klik(); NK.Lyd.udsugning(this.udsugning); }
         this.aendret("udsugning");
@@ -293,6 +313,7 @@
 
     P.bromFremme = function () {
         if (this.laagT > 0) return true;
+        if (this.spildPyt && this.spildPyt.brom && this.spildPyt.vaad > 0.05) return true;
         if (this.uheld) return !!(this.uheld.pyt && this.uheld.pyt.brom && this.uheld.pyt.neutral < 0.99);
         return !!(this.gjort.brom && !this.gjort.reageret && !this.g.kolbe.prop);
     };
@@ -306,11 +327,6 @@
 
     P.proevBrom = function () {
         if (this.gjort.brom) { this.besked("Der er allerede bromvand i kolben."); return false; }
-        if (!this.udsugning) {
-            this.besked("Tænd udsugningen, før du åbner bromvandet.", "advarsel");
-            this.markér("kontakt", 4);
-            return false;
-        }
         if (this.g.kolbe.prop) { this.besked("Tag proppen af først.", "advarsel"); this.markér("prop"); return false; }
         this.brugBrom();
         return true;
@@ -347,12 +363,34 @@
 
     P.proevVask = function () {
         if (this.gjort.fordelt && !this.gjort.affald) {
-            this.besked(M.formel("Cu2+") + " og " + M.formel("Ag+") + " er tungmetalioner. De må ikke hældes i vasken.", "advarsel");
-            this.markér("dunk", 3);
-            return false;
+            this.haeldIVask();
+            return true;
         }
         this.besked("Vasken skal ikke bruges i forsøget.");
         return false;
+    };
+
+    /* Uheld: resterne med tungmetalioner haeldes mod vasken. Glas 1 naar
+       at haelde lidt, saa loeber laereren ind og stopper det, og glasset
+       kommer tilbage i stativet. */
+    P.haeldIVask = function () {
+        var gl = this.g.glas1, start = gl.areal;
+        var bund = { x: S.VASK.midt.x, y: S.VASK.midt.y - 4 };
+        this.koer([
+            { flyt: gl, til: { x: bund.x - 6, y: bund.y - 110, v: 2.3 }, tid: 0.9, loeft: 60 },
+            { kald: function () { if (NK.Lyd) NK.Lyd.haeld(1.2); if (this.laererVask) this.laererVask(); } },
+            { tid: 1.2, hver: function (t) {
+                gl.areal = start * (1 - 0.2 * t);
+                this.straale = { fra: { x: gl.p.x, y: gl.p.y }, til: bund, farve: this.glasFarve(gl), bredde: 2.5 };
+            } },
+            { kald: function () { this.straale = null; } },
+            hjemTil(gl, 0.9, 60),
+            { kald: function () {
+                this.iagttag("vask");
+                this.besked(M.formel("Cu2+") + " og " + M.formel("Ag+") + " må ikke i vasken.", "advarsel");
+                this.aendret("vask");
+            } }
+        ], "vask");
     };
 
     /* ----- Kobber, bromvand og prop --------------------------------------- */
@@ -450,16 +488,19 @@
     };
 
     /* ----- Rystning -------------------------------------------------------- */
+    /* Kolben kan ogsaa rystes uden prop, men saa skvulper bromvandet ud
+       (se opdaterRyst og spildKolbe). */
     P.kanRyste = function () {
         if (this.uheld || this.gjort.fordelt) return false;
+        if (this.laererOptaget && this.laererOptaget()) return false;
         if (!this.gjort.brom && !this.gjort.kobber) { this.besked("Kolben er tom."); return false; }
-        if (!this.g.kolbe.prop) { this.besked("Sæt proppen i, før du ryster.", "advarsel"); this.markér("prop"); return false; }
         return true;
     };
 
     P.startRyst = function (kilde) {
         this.rystKilde = kilde;
         this.farligTid = 0;
+        this.spildTid = 0;
         this.aendret("ryst");
     };
 

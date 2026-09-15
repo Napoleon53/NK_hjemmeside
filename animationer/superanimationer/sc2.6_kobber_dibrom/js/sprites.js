@@ -35,15 +35,18 @@
         lup:          { fil: "lup.svg", b: 40, h: 40 }
     };
 
-    function indlaes(navn, fil) {
+    /* Har en post sin egen mappe, hentes filen derfra. Saadan tilfoejer
+       ../kemichael/kemichael.js laereren og kaffekoppen. */
+    function indlaes(navn, f) {
+        var sti = (f.mappe || MAPPE) + f.fil;
         var post = { img: new Image(), klar: false, fejlet: false };
         lager[navn] = post;
         post.img.addEventListener("load", function () { post.klar = true; });
         post.img.addEventListener("error", function () {
             post.fejlet = true;
-            if (window.console) console.warn("sc2.6: kunne ikke indlaese " + MAPPE + fil);
+            if (window.console) console.warn("sc2.6: kunne ikke indlaese " + sti);
         });
-        post.img.src = MAPPE + fil;
+        post.img.src = sti;
     }
 
     NK.Sprites = {
@@ -51,7 +54,7 @@
 
         start: function () {
             for (var navn in FILER) {
-                if (Object.prototype.hasOwnProperty.call(FILER, navn)) indlaes(navn, FILER[navn].fil);
+                if (Object.prototype.hasOwnProperty.call(FILER, navn)) indlaes(navn, FILER[navn]);
             }
         },
 
