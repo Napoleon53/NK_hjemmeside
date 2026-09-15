@@ -15,7 +15,11 @@
    havner i kolben, hvis den staar under buretten, og ellers i
    affaldsbaegeret.
 
-   Iagttagelserne er kun dem, der kan forklare et resultat: fejlkilder.
+   Eleven maa gerne goere det forkerte. Traek og haeld udfoeres altid;
+   kun det, der fysisk ikke kan lade sig goere, afvises. Et klik uden en
+   bestemt betydning giver en kort vejledning. Fejlene noteres i
+   this.iagttaget, laereren kommenterer dem (laerer.js), og tegneserien
+   viser dem (tegneserie.js).
    ===================================================================== */
 (function () {
     "use strict";
@@ -31,15 +35,15 @@
 
     var TRIN = [
         { id: "afvej", tekst: "Afvej ca. 0,1 g ståluld", mark: "staaluld",
-          hint: "Klik på stålulden, til vægten viser mellem 0,09 og 0,13 g. Træk så vejebåden hen til kolben i stinkskabet." },
+          hint: "Klik på stålulden, til vægten viser ca. 0,1 g. Træk så vejebåden hen til kolben i stinkskabet." },
         { id: "syre", tekst: "Tilsæt syre", mark: "flasker",
           hint: "Træk en af de to syreflasker hen over kolben." },
         { id: "oploes", tekst: "Opløs stålulden", mark: "kolbe",
           hint: "Træk kolben hen på varmepladen. Vent, til der ikke er mere ståluld og ikke flere bobler." },
         { id: "fyld", tekst: "Fyld buretten med KMnO₄", mark: "kmno4",
           hint: "Træk flasken med kaliumpermanganat hen over tragten på buretten." },
-        { id: "start", tekst: "Aflæs buretten", mark: "buret",
-          hint: "Menisken skal stå på skalaen. Klik på hanen for at tappe lidt af, luk hanen igen, og klik så på buretten." },
+        { id: "start", tekst: "Nulstil buretten", mark: "hane",
+          hint: "Klik på hanen, og klik igen, når menisken står på 0. Klik så på buretten for at aflæse den." },
         { id: "under", tekst: "Stil kolben under buretten", mark: "kolbe",
           hint: "Træk kolben hen under buretten." },
         { id: "titrer", tekst: "Titrer til en svag, blivende lyserød farve", mark: "hane",
@@ -47,18 +51,14 @@
         { id: "slut", tekst: "Aflæs buretten igen", mark: "buret",
           hint: "Luk hanen, og klik på buretten, når den lyserøde farve bliver." },
         { id: "beregn", tekst: "Beregn jernindholdet", mark: null,
-          hint: "Brug massen af stålulden, de to aflæsninger og koncentrationen i måleskemaet." }
+          hint: "Brug massen af stålulden, de to aflæsninger og koncentrationen i skemaet." }
     ];
     NK.TRIN = TRIN;
 
-    var IAGTTAGELSER = {
-        uoploest: { tekst: "Der var stadig ståluld i kolben, da titreringen begyndte." },
-        skvulp:   { tekst: "Noget af opløsningen skvulpede ud af kolben." },
-        klor:     { tekst: "Der lugtede svagt af klor." },
-        falmer:   { tekst: "Den lyserøde farve forsvandt igen efter lidt tid." },
-        lilla:    { tekst: "Opløsningen var kraftigt lilla, da buretten blev aflæst." }
-    };
-    NK.IAGTTAGELSER = IAGTTAGELSER;
+    /* Fejl og uheld, der noteres i this.iagttaget og vises i tegneserien:
+       lidtStaal, megetStaal, toSyrer, kmno4Kolbe, ingenSyre, uoploest,
+       tappetKolbe, affaldTaelt, genfyldt, ikkeLyserod, lilla, falmer,
+       klor, skvulp, overloeb, vaegt og spild. */
 
     NK.Forsoeg = function (canvas) {
         this.canvas = canvas;
@@ -71,7 +71,6 @@
         this.plet = null;
         this.vedAendring = null;
         this.vedBesked = null;
-        this.vedIagttagelse = null;
         this.vedMaaling = null;
         if (this.laererStart) this.laererStart();
         this.nulstil();
@@ -100,6 +99,15 @@
         this.vSlut = null;
         this.antalForkerte = 0;
         this.traekMaal = null;
+
+        /* Fejl, der kan maales: KMnO₄ i kolben foer startaflaesningen, i
+           affaldet efter den, og paa flisen. aflaestLyserod: farven i
+           kolben ved slutaflaesningen. */
+        this.kolbeFoerStart = 0;
+        this.affaldEfterStart = 0;
+        this.spildMl = 0;
+        this.kmno4Direkte = 0;
+        this.aflaestLyserod = false;
 
         this.kem = M.nyKemi();
         this.temp = 22;
@@ -173,7 +181,7 @@
             case "oploes": return this.kem.opl >= M.OPLOES.faerdig || this.g.kolbe.sted === "buret";
             case "fyld": return this.buret.fyldt;
             case "start": return this.vStart !== null;
-            case "under": return this.g.kolbe.sted === "buret";
+            case "under": return this.g.kolbe.sted === "buret" || this.vSlut !== null;
             case "titrer": return !!gj.titrer || this.vSlut !== null;
             case "slut": return this.vSlut !== null;
             default: return !!gj[id];
@@ -190,11 +198,11 @@
         if (!t) return null;
         var mark = t.mark;
         var tekst = t.hint;
-        if (t.id === "afvej" && this.stykMasse() >= M.AFVEJ.min && this.stykMasse() <= M.AFVEJ.max) mark = "vejebaad";
-        if (t.id === "start" && this.buret.V >= 0 && !this.buret.aaben) mark = "buret";
-        if (t.id === "start" && this.buret.V < 0) mark = "hane";
-        if (t.id === "start" && this.buret.V > M.BURET.maksStart) { mark = "kmno4"; tekst = "Der er tappet for meget af. Træk flasken hen over buretten igen for at fylde den op."; }
-        if (t.id === "slut" && this.buret.aaben) mark = "hane";
+        var b = this.buret, m = this.stykMasse();
+        if (t.id === "afvej" && m >= M.AFVEJ.min && m <= M.AFVEJ.max) mark = "vejebaad";
+        if (t.id === "start" && !b.aaben && b.V >= -M.BURET.fang) mark = "buret";
+        if (t.id === "start" && b.aaben) tekst = "Klik på hanen igen, når menisken står på 0.";
+        if (t.id === "slut" && b.aaben) mark = "hane";
         if (mark) this.markér(mark, 5);
         return tekst;
     };
@@ -215,10 +223,11 @@
         if (this.vedBesked) this.vedBesked(tekst, slags || "info");
     };
 
-    P.iagttag = function (noegle) {
-        if (this.iagttaget[noegle] || !IAGTTAGELSER[noegle]) return;
+    /* Noterer en fejl til tegneserien. bemaerk: laereren kommenterer den. */
+    P.iagttag = function (noegle, bemaerk) {
+        if (this.iagttaget[noegle]) return;
         this.iagttaget[noegle] = true;
-        if (this.vedIagttagelse) this.vedIagttagelse({ noegle: noegle, tekst: IAGTTAGELSER[noegle].tekst });
+        if (bemaerk && this.laererBemaerk) this.laererBemaerk(noegle);
     };
 
     P.maal = function (hvad, vaerdi) {
@@ -273,6 +282,8 @@
     P.klik = function (navn) {
         if (NK.Lyd) NK.Lyd.laasOp();
         if (navn === "laerer") return this.klikLaerer ? this.klikLaerer() : false;
+        /* En aaben hane kan altid lukkes, ogsaa mens noget andet koerer */
+        if (navn === "hane" && this.buret.aaben) return this.lukHane();
         if (this.laererOptaget && this.laererOptaget()) return false;
         if (this.handling || this.holdt || this.arbejdKilde) return false;
         switch (navn) {
@@ -311,9 +322,8 @@
 
     P.klikStaaluld = function () {
         if (this.gjort.afvej) { this.besked("Der er ståluld nok i kolben."); return false; }
-        if (this.stykMasse() + this.iLuften > M.AFVEJ.max + 0.02) {
-            this.besked("Der er for meget i vejebåden. Klik på vejebåden for at lægge lidt tilbage.", "advarsel");
-            this.markér("vejebaad", 3);
+        if (this.stykMasse() + this.iLuften > M.GRAENSE.vejebaad) {
+            this.besked("Vejebåden er fuld.", "advarsel");
             return false;
         }
         var m = M.afrund(r(M.AFVEJ.stykMin, M.AFVEJ.stykMax), 3);
@@ -336,7 +346,10 @@
         return true;
     };
 
-    P.klikVejebaad = function () {
+    /* Klik: over 0,13 g laegges en tot tilbage, ellers haeldes stålulden i
+       kolben. fraTraek: vejebaaden er trukket hen til kolben, og alt
+       haeldes i, uanset massen. */
+    P.klikVejebaad = function (fraTraek) {
         if (this.gjort.afvej) { this.besked("Vejebåden er tom."); return false; }
         if (this.iFlugt > 0) return false;
         var m = M.afrund(this.stykMasse(), 3);
@@ -345,7 +358,7 @@
             this.markér("staaluld", 3);
             return false;
         }
-        if (m > M.AFVEJ.max) {
+        if (m > M.AFVEJ.max && !fraTraek) {
             var c = this.stykker.pop();
             var baad = this.g.vejebaad.p, su = this.g.staaluld.p;
             this.flyvende.push({ tot: true, x: baad.x, y: baad.y - 4, a: c.a, va: r(-6, 6), r: 6,

@@ -61,30 +61,15 @@ window.NK = NK;
         return "tetraeder";
     };
 
-    /* ----- Fane 1: hvilket molekyle har eleven bygget? ----------------------
-       Enkeltbindinger gaar til H, dobbeltbindinger til O og tripelbindinger
-       til N. Centralatomet er det grundstof, der faar oktet. */
-    D.LIGAND = { 1: { el: "H", laengde: 1.05 }, 2: { el: "O", laengde: 1.2 }, 3: { el: "N", laengde: 1.15 } };
-
-    D.centralatom = function (enkelt, dobbelt, tripel, frie) {
-        var orden = enkelt + 2 * dobbelt + 3 * tripel;
-        if (enkelt + dobbelt + tripel === 0) return null;
-        if (2 * orden + 2 * frie !== 8) return null;
-        return { 4: "C", 5: "N", 6: "O", 7: "Cl" }[orden + 2 * frie] || null;
+    /* ----- Fane 4: vaeskerne i vandstraaleforsoeget --------------------------
+       pol er, hvor kraftigt en ladet stav trækker i strålen (vand = 1).
+       Tallene er ikke maalte, men raekkefoelgen passer med forsoeget. */
+    D.VAESKER = {
+        vand:    { navn: "vand",    formel: "H2O",    pol: 1,    farve: "rgba(150, 205, 245, 0.75)", polaer: true },
+        ethanol: { navn: "ethanol", formel: "C2H5OH", pol: 0.55, farve: "rgba(190, 220, 240, 0.7)", polaer: true },
+        heptan:  { navn: "heptan",  formel: "C7H16",  pol: 0.02, farve: "rgba(240, 232, 190, 0.75)", polaer: false }
     };
-
-    D.BYGGEDE = {
-        "C|4|0|0":  { formel: "CH4",  navn: "methan" },
-        "N|3|0|0":  { formel: "NH3",  navn: "ammoniak" },
-        "O|2|0|0":  { formel: "H2O",  navn: "vand" },
-        "Cl|1|0|0": { formel: "HCl",  navn: "hydrogenchlorid" },
-        "C|0|2|0":  { formel: "CO2",  navn: "carbondioxid" },
-        "C|2|1|0":  { formel: "CH2O", navn: "formaldehyd" },
-        "C|1|0|1":  { formel: "HCN",  navn: "blåsyre" },
-        "O|0|1|0":  { formel: "O2",   navn: "dioxygen" },
-        "N|0|0|1":  { formel: "N2",   navn: "dinitrogen" },
-        "N|1|1|0":  { formel: "HNO",  navn: "" }
-    };
+    D.VAESKE_ORDEN = ["vand", "ethanol", "heptan"];
 
     /* ----- Hjaelpere til koordinaterne -------------------------------------- */
     /* Retning med polarvinkel fra +y og azimut i xz-planen fra +z (grader). */
@@ -399,6 +384,11 @@ window.NK = NK;
         { h: "Polære molekyler",
           p: ["En binding er polær, når forskellen i elektronegativitet er mindst 0,5. Elektronerne trækkes mod det mest elektronegative atom, der bliver δ−.",
               "Et molekyle er polært, når trækkene i bindingerne ikke ophæver hinanden. CO₂ og CCl₄ har polære bindinger, men er symmetriske og derfor upolære."] },
+
+        { h: "Vandstrålen og den ladede stav",
+          p: ["En plastikstav, der gnides med uld, bliver negativ. En glasstav bliver positiv.",
+              "Molekylerne i en polær væske drejer, så den modsat ladede ende vender mod staven, og trækkes hen mod den. Derfor bøjer strålen mod staven, uanset om den er positiv eller negativ.",
+              "Heptan består kun af C og H og er upolært. Molekylerne drejer sig ikke, og strålen løber lige ned."] },
 
         { h: "Modellerne",
           p: ["Kugle-stang-modellen viser bindingerne og vinklerne. Kalotte-modellen viser, hvor meget plads atomerne fylder. Ingen af dem er målfaste."] }

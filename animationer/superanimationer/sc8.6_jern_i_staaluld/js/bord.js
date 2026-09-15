@@ -195,7 +195,7 @@
         var k = this.g.kolbe, kem = this.kem;
         var jern = this.gjort.afvej ? (1 - kem.opl) * NK.klamp((this.mStaal || 0.1) / 0.11, 0.5, 1.3) : 0;
         k.niveau = S.tegnKolbe(ctx, {
-            p: k.p, ml: kem.syre ? kem.ml : 0, farve: M.kolbeFarve(kem),
+            p: k.p, ml: kem.ml, farve: M.kolbeFarve(kem),
             lokal: M.lokalIntensitet(kem), lokalX: this.lokalX + (k.p.x - S.UNDER_BURET.x),
             jern: jern, bobler: this.kolbeBobler, boelge: this.ryst * 1.5, hvirvel: this.ryst,
             fremhaev: this.markeret("kolbe")

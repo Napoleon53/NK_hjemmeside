@@ -45,7 +45,7 @@
         </div>
 
         <div class="kort" id="maal-kort">
-            <h2><span>Måleskema</span> <span class="taeller" id="maal-nr">Forsøg 1</span></h2>
+            <h2><span>Beregning</span> <span class="taeller" id="maal-nr">Forsøg 1</span></h2>
             <table class="maaleskema">
                 <tr id="raekke-staal"><th>m(ståluld)</th><td id="m-staal"></td></tr>
                 <tr id="raekke-konc"><th>c(KMnO₄)</th><td>0,0200 M</td></tr>
@@ -60,17 +60,13 @@
             </div>
             <button class="knap lille" id="hjaelp-beregn" type="button" hidden><span>Hjælp til beregningen</span><span class="tegn">?</span></button>
             <p class="hint" id="beregn-hint" hidden></p>
-            <div class="sammenligning" id="sammenligning" hidden>
-                <div class="soejle"><span>Dit resultat</span><span class="spor"><span class="fyld" id="soejle-resultat"></span></span><span class="tal" id="tal-resultat"></span></div>
-                <div class="soejle dekl"><span>Ståluld</span><span class="spor"><span class="fyld" id="soejle-typisk"></span></span><span class="tal" id="tal-typisk"></span></div>
-                <p class="besked" id="sammenligning-tekst"></p>
-            </div>
-            <ul class="tidligere" id="tidligere"></ul>
+            <p class="besked god" id="beregn-svar" hidden></p>
         </div>
 
-        <div class="kort" id="iagttagelser-kort">
-            <h2>Iagttagelser</h2>
-            <ul class="iagttagelser" id="iagttagelse-liste"><li class="tom">Endnu ingen.</li></ul>
+        <div class="kort" id="serie-kort">
+            <h2>Tegneserie</h2>
+            <p class="besked" id="serie-tekst">Låses op, når jernindholdet er beregnet.</p>
+            <button class="knap stor blaa" id="serieknap" type="button" title="Tegneserie (S)" hidden><span>Se forsøget som tegneserie</span><span class="tegn">→</span></button>
         </div>
 
         <div class="kort opgavekort" id="quiz-kort">
@@ -92,14 +88,14 @@
 
         <h3>Forsøget</h3>
         <ol class="intro-trin">
-            <li>Afvej ståluld, og opløs den i syre på varmepladen.</li>
-            <li>Fyld buretten med KMnO₄, og aflæs den.</li>
-            <li>Titrer, til opløsningen er svagt og blivende lyserød, og aflæs igen.</li>
+            <li>Afvej ca. 0,1 g ståluld, og opløs den i syre på varmepladen.</li>
+            <li>Fyld buretten med KMnO₄, og tap af, til menisken står på 0.</li>
+            <li>Titrer, til opløsningen er svagt og blivende lyserød, og aflæs buretten igen.</li>
             <li>Beregn jernindholdet.</li>
         </ol>
 
         <h3>Uheld</h3>
-        <p>Forkerte handlinger kan give uheld. Kemichael rydder op.</p>
+        <p>Alt kan prøves, også det forkerte. Kemichael rydder op og kommenterer, men forsøget kan altid fortsætte.</p>
 
         <div class="knapper">
             <button class="knap" id="intro-rundvisning" type="button">Rundvisning</button>
@@ -220,6 +216,17 @@
 </div>
 
 <!-- ================================================================= -->
+<div class="overlay" id="tegneserie">
+    <div class="overlay-boks bred">
+        <h2>Forsøget som tegneserie</h2>
+        <div class="serie" id="serie-ruder"></div>
+        <div class="knapper">
+            <button class="knap blaa" id="serie-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
 <div class="rundvisning" id="rundvisning" hidden>
     <div class="rundvisning-baggrund" id="rv-baggrund"></div>
     <div class="rundvisning-spot" id="rv-spot"></div>
@@ -247,6 +254,7 @@
 <script src="js/forsoeg.js"></script>
 <script src="js/bord.js"></script>
 <script src="js/laerer.js"></script>
+<script src="js/tegneserie.js"></script>
 <script src="js/quiz.js"></script>
 <script src="js/rundvisning.js"></script>
 <script src="js/app.js"></script>

@@ -12,8 +12,11 @@
      vaegt      syren haeldes ud over vaegten: laereren toerrer op
      aubergine  der titreres langt forbi endepunktet: laereren kigger ind
                 fra kanten
+     spild      KMnO₄ loeber ud paa flisen: laereren lukker hanen
      over100    et resultat over 100 %
      ros        et godt resultat med svovlsyre: laereren siger "Rustfrit."
+     bemaerk    en fejl, som laereren lader ske og kommenterer (BEMAERK),
+                ofte med et vink om et nyt forsoeg
 
    Glimt af baggrunden: bartender (rystningen), jura (aubergine),
    titrering (rosen) og regnskabet over uheld (overloebet og vaegten).
@@ -29,22 +32,33 @@
     var UDE = K.UDE;
     var HAENGER = K.HAENGER;
 
-    K.paa(P, { kaffeX: 170, fredet: ["vaegt"] });
+    K.paa(P, { kaffeX: 170, fredet: ["vaegt", "spild"] });
 
     P.laererStartEkstra = function () {
         this.antalRyst = 0;
         this.antalOver100 = 0;
+        this.antalNyt = 0;
         this.over100Venter = false;
+        this.bemaerket = {};
+        this.bemaerkKoe = [];
     };
 
     P.laererNytEkstra = function () {
         this.over100Venter = false;
+        this.bemaerket = {};
+        this.bemaerkKoe = [];
         this.laerer.baerer = null;
     };
 
-    /* Resultatet over 100 % ventede, fordi laereren var optaget */
+    /* Scener, der ventede, fordi laereren var optaget */
     P.laererVentende = function () {
-        if (!this.laerer.scene && this.over100Venter) this.laererOver100();
+        if (this.laerer.scene) return;
+        if (this.over100Venter) { this.laererOver100(); return; }
+        while (this.bemaerkKoe.length && !this.laerer.scene) {
+            var id = this.bemaerkKoe.shift();
+            if (this.bemaerket[id]) continue;
+            this.laererBemaerk(id);
+        }
     };
 
     /* ----- Kolben rystes voldsomt --------------------------------------- */
@@ -180,6 +194,83 @@
         ].concat(K.glimtTrin("titrering"), [
             { gaa: UDE }
         ]), false);
+    };
+
+    /* ----- Bemaerkninger om fejl ------------------------------------------
+       Laereren lader fejlen ske og kommer med en bemaerkning. Scenen
+       blokerer ikke, saa eleven kan fortsaette. Hver bemaerkning kommer
+       hoejst én gang pr. forsoeg. Er laereren optaget, venter den. */
+    var BEMAERK = {
+        lidtStaal:   { tekst: "Ca. 0,1 g, stod der. Det der er et fnug." },
+        megetStaal:  { tekst: "Ca. 0,1 g. Det der er en hel pude." },
+        toSyrer:     { tekst: "Svovlsyre og saltsyre i samme kolbe. Modigt.", nyt: true },
+        kmno4Kolbe:  { tekst: "Permanganat hører til i buretten. Ikke i kolben.", nyt: true },
+        ingenSyre:   { tekst: "Uden syre er der intet opløst jern at titrere.", nyt: true },
+        uoploest:    { tekst: "Stålulden er ikke opløst. Det jern tæller ikke med.", nyt: true },
+        tappetKolbe: { tekst: "Det, der tappes af før aflæsningen, skal i affaldet.", nyt: true },
+        affaldTaelt: { tekst: "Efter aflæsningen tæller hver dråbe. Også i affaldet.", nyt: true },
+        genfyldt:    { tekst: "Buretten er fyldt op efter aflæsningen. Nu passer tallene ikke.", nyt: true },
+        nul:         { tekst: "Næsten 0 % jern. Så er det vist ikke ståluld.", nyt: true },
+        negativ:     { tekst: "Negativt jernindhold. Det har jeg ikke set før.", nyt: true },
+        lavt:        { tekst: "Hvor blev resten af jernet af?", nyt: true }
+    };
+    NK.BEMAERK = BEMAERK;
+
+    var NYT_SVAR = [
+        "Knappen Nyt forsøg sidder øverst.",
+        "Et nyt forsøg er en mulighed.",
+        "Du kan også fortsætte. Det bliver spændende."
+    ];
+
+    P.laererBemaerk = function (id) {
+        var b = BEMAERK[id];
+        var L = this.laerer;
+        if (!b || !L || this.bemaerket[id]) return false;
+        if (L.scene) {
+            if (this.bemaerkKoe.indexOf(id) < 0) this.bemaerkKoe.push(id);
+            return false;
+        }
+        this.bemaerket[id] = true;
+        var trin = [
+            { udtryk: { vrede: 0.5, humoer: -0.3, roed: 0.05, skeptisk: 1, briller: 1 } },
+            { gaa: 220 },
+            { sig: b.tekst, vis: 1.6 + b.tekst.length * 0.045, tid: 1.8 + b.tekst.length * 0.045 }
+        ];
+        if (b.nyt) {
+            var nyt = NYT_SVAR[this.antalNyt++ % NYT_SVAR.length];
+            trin.push({ arm: 0.4, tid: 0.4 });
+            trin.push({ sig: nyt, vis: 2.2, tid: 2.2 });
+            trin.push({ arm: HAENGER, tid: 0.4 });
+        }
+        trin.push({ kald: function () { if (NK.Lyd) NK.Lyd.brum(); } });
+        trin.push({ udtryk: { skeptisk: 0, briller: 0 } });
+        trin.push({ gaa: UDE });
+        this.laererKoer("bemaerk", trin, false);
+        return true;
+    };
+
+    /* ----- Uheld: KMnO₄ loeb ud paa flisen, fordi der ikke stod noget
+       under buretten. Laereren lukker hanen; pletten bliver staaende. */
+    P.laererSpild = function () {
+        var L = this.laerer;
+        if (!L) return false;
+        L.scene = null;
+        this.laererKoer("spild", [
+            { udtryk: { vrede: 0.9, humoer: -0.8, roed: 0.3 } },
+            { gaa: S.BURET.x - 190, loeb: true },
+            { sig: "Hanen lukkes, når der ikke står noget under.", vis: 2.8, tid: 0.3 },
+            { arm: 0.9, tid: 0.45 },
+            { kald: function () {
+                if (this.buret.aaben) { this.buret.aaben = false; if (NK.Lyd) NK.Lyd.klik(); this.aendret("hane"); }
+            } },
+            { tid: 1.6 },
+            { arm: HAENGER, tid: 0.4 },
+            K.suk(),
+            { sig: "Permanganat går aldrig helt af.", vis: 2.4, tid: 2.2 }
+        ].concat(K.uheld(), [
+            { gaa: UDE }
+        ]));
+        return true;
     };
 
     /* ----- Tegning ------------------------------------------------------ */

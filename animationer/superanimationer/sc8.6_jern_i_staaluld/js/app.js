@@ -50,7 +50,7 @@
         ak.classList.toggle("aktiv", knapRyst);
 
         var dk = NK.el("draabe-knap");
-        dk.hidden = !(f.buret.fyldt && f.vSlut === null && (f.vStart === null || f.g.kolbe.sted === "buret"));
+        dk.hidden = !(f.buret.fyldt && !f.gjort.beregn);
         dk.disabled = !f.kanDraabe();
 
         /* Maaleskemaet */
@@ -69,8 +69,14 @@
             beregn.hidden = true;
         }
         if (f.vSlut === null) NK.el("beregn-hint").hidden = true;
-        visSammenligning();
-        visTidligere();
+        var sidste = f.gjort.beregn ? f.resultater[f.resultater.length - 1] : null;
+        NK.el("beregn-svar").hidden = !sidste;
+        if (sidste) NK.saetTekst("beregn-svar", "Rigtigt beregnet: " + M.komma(sidste.procent, 1) + " % jern.");
+
+        var slut = !!f.gjort.beregn;
+        NK.el("serieknap").hidden = !slut;
+        NK.saetTekst("serie-tekst", slut ? "Forsøget er slut." : "Låses op, når jernindholdet er beregnet.");
+        NK.el("serieknap").classList.toggle("banker", slut && !serieSet);
 
         quiz.saetLaast(!f.harSvovlsyreResultat());
         sidsteSignatur = signatur();
@@ -132,42 +138,6 @@
         input.select();
     }
 
-    function visSammenligning() {
-        var f = forsoeg;
-        var boks = NK.el("sammenligning");
-        var sidste = f.gjort.beregn ? f.resultater[f.resultater.length - 1] : null;
-        if (!sidste) { boks.hidden = true; return; }
-        boks.hidden = false;
-        var typisk = M.STAALULD.typisk;
-        var skala = 120;
-        NK.el("soejle-resultat").style.width = NK.klamp(sidste.procent / skala * 100, 0, 100) + "%";
-        NK.el("soejle-typisk").style.width = (typisk / skala * 100) + "%";
-        NK.saetTekst("tal-resultat", M.komma(sidste.procent, 1) + " %");
-        NK.saetTekst("tal-typisk", M.komma(typisk, 1) + " %");
-        var tekst;
-        if (sidste.procent > 101) tekst = "Resultatet er over 100 %. Der er brugt mere KMnO₄, end jernet kan forklare.";
-        else if (sidste.procent < 95) tekst = "Resultatet er lavere end forventet. Hvor kan resten af jernet være blevet af?";
-        else tekst = "Resultatet passer med, at ståluld næsten er rent jern.";
-        NK.saetTekst("sammenligning-tekst", tekst);
-    }
-
-    function visTidligere() {
-        var ul = NK.el("tidligere");
-        var f = forsoeg;
-        var noegle = f.resultater.map(function (x) { return x.nr + "|" + x.syre + "|" + M.komma(x.procent, 1); }).join(";");
-        if (ul.getAttribute("data-noegle") === noegle) return;
-        ul.setAttribute("data-noegle", noegle);
-        ul.innerHTML = "";
-        f.resultater.forEach(function (x) {
-            var li = document.createElement("li");
-            var b = document.createElement("b");
-            b.textContent = "Forsøg " + x.nr;
-            li.appendChild(b);
-            li.appendChild(document.createTextNode(": " + M.SYRER[x.syre].navn + ", " + M.komma(x.procent, 1) + " %"));
-            ul.appendChild(li);
-        });
-    }
-
     function maaling(hvad) {
         var raekke = NK.el("raekke-" + hvad);
         opdaterPanel();
@@ -177,18 +147,16 @@
         raekke.classList.add("ny");
     }
 
-    /* ----- Iagttagelser -------------------------------------------------- */
-    function iagttagelse(i) {
-        var ul = NK.el("iagttagelse-liste");
-        var tom = ul.querySelector(".tom");
-        if (tom) tom.remove();
-        var li = document.createElement("li");
-        li.textContent = i.tekst;
-        ul.appendChild(li);
-    }
+    /* ----- Tegneserien --------------------------------------------------- */
+    var serieSet = false;
 
-    function rydIagttagelser() {
-        NK.el("iagttagelse-liste").innerHTML = '<li class="tom">Endnu ingen.</li>';
+    function aabnSerie() {
+        if (!forsoeg.gjort.beregn) return;
+        serieSet = true;
+        NK.Rundvisning.luk();
+        NK.Tegneserie.byg(forsoeg, NK.el("serie-ruder"));
+        NK.el("tegneserie").classList.add("vis");
+        NK.el("serieknap").classList.remove("banker");
     }
 
     /* ----- Guidet hjaelp til beregningen -------------------------------
@@ -366,7 +334,7 @@
         forsoeg.holdt = null;
         forsoeg.nulstil();
         lukOverlay();
-        rydIagttagelser();
+        serieSet = false;
         NK.el("hint-tekst").hidden = true;
         NK.el("beregn-hint").hidden = true;
         NK.el("beregn").hidden = true;
@@ -402,6 +370,7 @@
         else if (tast === "i") visHint();
         else if (tast === "m") skiftLyd();
         else if (tast === "t") aabnTeori();
+        else if (tast === "s") aabnSerie();
         else if (tast === "n") nytForsoeg();
     }
 
@@ -441,7 +410,6 @@
 
         forsoeg.vedAendring = function () { if (quiz) opdaterPanel(); };
         forsoeg.vedBesked = besked;
-        forsoeg.vedIagttagelse = iagttagelse;
         forsoeg.vedMaaling = maaling;
 
         var ak = NK.el("arbejd-knap");
@@ -471,6 +439,10 @@
         NK.el("teori").addEventListener("click", function (e) { if (e.target === this) lukOverlay(); });
         NK.el("lydknap").addEventListener("click", skiftLyd);
         NK.el("hjaelpknap").addEventListener("click", function () { lukOverlay(); NK.Rundvisning.start(); });
+        NK.el("serieknap").addEventListener("click", aabnSerie);
+        NK.el("serie-luk").addEventListener("click", lukOverlay);
+        NK.el("tegneserie").addEventListener("click", function (e) { if (e.target === this) lukOverlay(); });
+        NK.aabnSerie = aabnSerie;
         NK.el("introknap").addEventListener("click", aabnIntro);
         NK.el("intro-start").addEventListener("click", lukOverlay);
         NK.el("intro-rundvisning").addEventListener("click", function () { lukOverlay(); NK.Rundvisning.start(); });
