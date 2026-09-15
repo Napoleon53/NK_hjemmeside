@@ -242,8 +242,12 @@
     border-radius:0;
   }
   .tabbtn.active{color:var(--accent-dark); border-bottom-color:var(--accent);}
-  .tabpanel{display:none;}
-  .tabpanel.active{display:block;}
+  /* Fanerne ligger oven i hinanden, så området altid har den højeste fanes højde,
+     og siden ikke hopper, når man skifter fane. */
+  .tab-stack{display:grid;}
+  .tabpanel{grid-area:1 / 1; visibility:hidden;}
+  .tabpanel.active{visibility:visible;}
+  #resultSection{margin-bottom:max(120px, 25vh);}
   .tabsub{color:var(--muted); font-size:.85rem; margin:-4px 0 16px;}
   .over-note{color:var(--warn); font-weight:600;}
 
@@ -532,17 +536,19 @@ Elev 28</textarea>
     <button class="tabbtn" data-tab="row" type="button">Rækkeopstilling</button>
   </div>
 
-  <div class="tabpanel active" id="tab-groups">
-    <p class="tabsub">Hver kolonne er et makkerpar eller en trio. Ved firemandsborde er hver gruppe ét bord.</p>
-    <div class="card-grid" id="tables-groups"></div>
-  </div>
-  <div class="tabpanel" id="tab-hex">
-    <p class="tabsub">5 borde med 6 pladser. Makkerpar og trioer sidder samlet, og mærket viser elevernes gruppe. <span class="over-note" id="hexNote"></span></p>
-    <div class="tables grid-mode" id="tables-hex"></div>
-  </div>
-  <div class="tabpanel" id="tab-row">
-    <p class="tabsub">3 rækker med 10 pladser. Samme plads står lige bag hinanden i alle rækker, og farven over navnet viser makkerparret. <span class="over-note" id="rowNote"></span></p>
-    <div class="tables" id="tables-row"></div>
+  <div class="tab-stack">
+    <div class="tabpanel active" id="tab-groups">
+      <p class="tabsub">Hver kolonne er et makkerpar eller en trio. Ved firemandsborde er hver gruppe ét bord.</p>
+      <div class="card-grid" id="tables-groups"></div>
+    </div>
+    <div class="tabpanel" id="tab-hex">
+      <p class="tabsub">5 borde med 6 pladser. Makkerpar og trioer sidder samlet, og mærket viser elevernes gruppe. <span class="over-note" id="hexNote"></span></p>
+      <div class="tables grid-mode" id="tables-hex"></div>
+    </div>
+    <div class="tabpanel" id="tab-row">
+      <p class="tabsub">3 rækker med 10 pladser. Samme plads står lige bag hinanden i alle rækker, og farven over navnet viser makkerparret. <span class="over-note" id="rowNote"></span></p>
+      <div class="tables" id="tables-row"></div>
+    </div>
   </div>
 </section>
 
