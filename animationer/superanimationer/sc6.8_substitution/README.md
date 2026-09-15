@@ -3,8 +3,8 @@
 En superanimation: i modsætning til de øvrige animationer, som er én enkelt
 HTML-fil, ligger denne i sin egen mappe med adskilt CSS, JavaScript og sprites.
 
-Åbn **`index.html`**. Mappen er selvstændig og henter kun filer inde fra sig
-selv, så den kan flyttes uden at der knækker noget.
+Åbn **`index.html`**. Mappen henter kun filer inde fra sig selv, bortset fra
+læreren Kemichael i `../kemichael/`. Den skal derfor ligge ved siden af den mappe.
 
 Den afløser `animationer/kemi-c-filer/c6.8_eksperiment_substitution.html`, som
 nu ligger i `animationer/kemi-c-filer/arkiv/c6.8_eksperiment_substitution_oldversion.html`.
@@ -68,9 +68,9 @@ animation. Det nye er:
 
 ## Påskeæggene
 
-Læreren står ikke i panelet, men kommer ind på scenen fra venstre. Hovedet er
-et sprite uden ansigt; øjne, bryn, mund og rødme tegnes i koden. Alt står i
-`js/laerer.js`.
+Læreren Kemichael står ikke i panelet, men kommer ind på scenen fra venstre.
+Figuren og klik på ham er fælles for superanimationerne og står i
+`../kemichael/kemichael.js`. Scenerne her står i `js/laerer.js`.
 
 * **Proppen springer af.** Rystes der **meget voldsomt** med musen i lidt tid,
   springer proppen af, og indholdet sprøjter ud over bordet. Læreren kommer
@@ -86,6 +86,9 @@ et sprite uden ansigt; øjne, bryn, mund og rødme tegnes i koden. Alt står i
 * **Læreren klikkes på.** Stadig kortere svar, rødere i hovedet og til sidst
   damp af ørerne.
 * **Lampen tændt uden glas.** Efter 20 sekunder kommer læreren og slukker.
+* **Glimt af Kemichaels baggrund** ved kaffen, dabben og lampen og et regnskab
+  over uheld, der følger browseren. Hvert glimt kommer én gang; se
+  `../kemichael/README.md`.
 * **Uret.** Et klik på væguret får tiden til at gå fire gange hurtigere i 12
   sekunder. Et klik til stopper det.
 * **Hex-1-en.** Flasken står ved siden af hexan og er ikke en del af forsøget.
@@ -98,7 +101,8 @@ et sprite uden ansigt; øjne, bryn, mund og rødme tegnes i koden. Alt står i
 ## Sprites
 
 Alle ligger i `sprites/` som SVG og tegnes med `drawImage`. Hver genstand har et
-ankerpunkt (i `S.ANKER` i `js/scene.js`), som den drejes om.
+ankerpunkt (i `S.ANKER` i `js/scene.js`), som den drejes om. Kemichael og
+kaffekoppen ligger i `../kemichael/sprites/`.
 
 | Fil | Indhold | Anker og mål, som koden bruger |
 |-----|---------|-------------------------------|
@@ -113,9 +117,7 @@ ankerpunkt (i `S.ANKER` i `js/scene.js`), som den drejes om.
 | `draabeflaske_agno3.svg` | dråbeflaske med sølvnitrat | spids (23, 0) |
 | `affaldsdunk.svg` | halogenholdigt organisk affald, GHS02, GHS09 | åbning (45, 12) |
 | `kontrolpanel.svg` | stinkskabets panel | vinger, lampe, display og kontakt tegnes i `scene.js` |
-| `kaffekop.svg` | lærerens kop | bunden (18, 40) |
 | `koekkenrulle.svg` | køkkenrulle til pytten | midte (36, 22) |
-| `laerer_krop.svg`, `laerer_hoved.svg`, `laerer_arm.svg` | læreren | halsen (110, 18) og (55, 126); skulderen (28, 142) |
 | `haand.svg`, `lup.svg` | handske og lup, som i sc2.6 | grebet (40, 46) |
 
 Væsker, strålen, dråber, bromdampe, pytten, pH-strimlerne, holderen under
@@ -138,7 +140,8 @@ js/scene.js         tegnebordet (1000 x 600): maal, stinkskab, glas, lampe
 js/mikro.js         partikelmodellen i zoomboblen
 js/forsoeg.js       trinene, tilstanden og handlingerne
 js/bord.js          tegning af bordet, den store visning og musen
-js/laerer.js        laereren: kaffe, klik, uheld, ros, dab, lampen, hexen
+js/laerer.js        Kemichaels scener: kaffe, uheld, ros, dab, lampen, hexen
+../kemichael/       Kemichael: figuren og hans sprites, faelles for superanimationerne
 js/tegneserie.js    forsoeget som tegneserie med resultatskemaet med resultatskemaet
 js/quiz.js          quizkortet og de ti spoergsmaal
 js/rundvisning.js   spotlight-rundvisningen bag ?-knappen
@@ -161,7 +164,7 @@ genstand hintet markerer. Hvornår et trin er gjort, afgøres i `trinGjort`.
 **Koreografierne** (`koer` i `forsoeg.js`) er lister af trin: `flyt` en genstand
 til en positur, vent med `hver` og gør noget undervejs, eller `kald` en
 funktion. Lærerens scener (`laererKoer` i `laerer.js`) virker på samme måde med
-`gaa`, `sig`, `arm` og `udtryk`.
+`gaa`, `sig`, `arm` og `udtryk`. Formatet står øverst i `../kemichael/kemichael.js`.
 
 **Tegneseriens ruder** står i `js/tegneserie.js`: hver rude er en tegnefunktion
 og en tekst, som bygges af elevens resultater.

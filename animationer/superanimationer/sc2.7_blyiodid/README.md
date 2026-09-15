@@ -3,8 +3,8 @@
 En superanimation: i modsætning til de øvrige animationer, som er én enkelt
 HTML-fil, ligger denne i sin egen mappe med adskilt CSS, JavaScript og sprites.
 
-Åbn **`index.html`**. Mappen er selvstændig og henter kun filer inde fra sig
-selv, så den kan flyttes uden at der knækker noget.
+Åbn **`index.html`**. Mappen henter kun filer inde fra sig selv, bortset fra
+læreren Kemichael i `../kemichael/`. Den skal derfor ligge ved siden af den mappe.
 
 Den afløser `animationer/kemi-c-filer/c2.7_eksperiment_blynitrat.html`, som nu
 ligger i `animationer/kemi-c-filer/arkiv/c2.7_eksperiment_blynitrat_oldversion.html`.
@@ -69,22 +69,29 @@ er:
 
 ## Påskeæggene
 
-Læreren kommer ind på scenen fra venstre. Alt står i `js/laerer.js`.
+Læreren Kemichael kommer ind på scenen fra venstre. Figuren, kaffen og klik på
+ham er fælles for superanimationerne og står i `../kemichael/kemichael.js`.
+Scenerne her står i `js/laerer.js`.
 
 * **Spild.** Klikkes der hektisk på et stofglas, mens spatlen er i gang (mindst
   4 ekstra klik inden for 1,6 s), ryger pulveret ud over bordet. Læreren kommer
   med køkkenrulle og tørrer op. Anden gang skal der 6 klik til, og efter to uheld
   sker det ikke mere. Grænserne står i `SPILD` i `js/model.js`.
-* **Det koger.** Har vandet kogt i 6 sekunder, siger læreren til.
+* **Det koger.** Har vandet kogt i 6 sekunder, kigger læreren ind fra kanten og
+  siger til.
 * **Lærerens kaffe.** Koppen på hylden. Læreren henter den og drikker.
 * **Læreren klikkes på.** Stadig kortere svar, rødere i hovedet og til sidst
   damp af ørerne.
 * **Ros** ved tre målinger, afhængigt af om punkterne ligger på kurven.
+* **Glimt af Kemichaels baggrund** ved spildet og rosen og et regnskab over
+  uheld, der følger browseren. Hvert glimt kommer én gang; se
+  `../kemichael/README.md`. I tegneserien er det Kemichael, der tørrer op.
 
 ## Sprites
 
 Alle ligger i `sprites/` som SVG og tegnes med `drawImage`. Hver genstand har et
-ankerpunkt (i `S.ANKER` i `js/scene.js`), som den drejes om.
+ankerpunkt (i `S.ANKER` i `js/scene.js`), som den drejes om. Kemichael og
+kaffekoppen ligger i `../kemichael/sprites/`.
 
 | Fil | Indhold | Anker og mål, som koden bruger |
 |-----|---------|-------------------------------|
@@ -98,7 +105,7 @@ ankerpunkt (i `S.ANKER` i `js/scene.js`), som den drejes om.
 | `varmeplade.svg` | varmeplade med magnetomrører | knapperne (52, 46) og (128, 46), lamperne (82, 38) og (158, 38) |
 | `termometer.svg` | digitalt termometer | display x 8-56, y 17-41 |
 | `affaldsdunk.svg` | tungmetalaffald, som i sc2.6 | åbning (45, 12) |
-| `kaffekop.svg`, `koekkenrulle.svg`, `laerer_*.svg` | læreren og hans ting, som i sc6.8 | se `S.ANKER` |
+| `koekkenrulle.svg` | køkkenrulle til spildet, som i sc6.8 | midte (36, 22) |
 | `lup.svg` | lup ved zoomboblens glas | linsens midte (15, 15) |
 
 Væskerne, bundfaldet, krystallerne, kogeboblerne, dampen, pulveret, stativet med
@@ -119,7 +126,8 @@ js/scene.js         tegnebordet (1000 x 600): maal og tegning
 js/mikro.js         ionerne og krystallen i zoomboblen
 js/forsoeg.js       trinene, tilstanden, handlingerne og logbogen
 js/bord.js          tegning af bordet og styring med musen
-js/laerer.js        laereren og paaskeaeggene
+js/laerer.js        Kemichaels scener og paaskeaeggene
+../kemichael/       Kemichael: figuren og hans sprites, faelles for superanimationerne
 js/graf.js          grafen med maalingerne og kurven
 js/tegneserie.js    forsoeget som tegneserie med maalingerne til sidst
 js/quiz.js          quizkortet og de ti spoergsmaal
@@ -142,7 +150,7 @@ genstand hintet markerer. Hvornår et trin er gjort, afgøres i `trinGjort`.
 **Koreografierne** (`koer` i `forsoeg.js`) er lister af trin: `flyt` en genstand
 til en positur, vent med `hver` og gør noget undervejs, eller `kald` en
 funktion. Lærerens scener (`laererKoer` i `laerer.js`) virker på samme måde med
-`gaa`, `sig`, `arm` og `udtryk`.
+`gaa`, `sig`, `arm` og `udtryk`. Formatet står øverst i `../kemichael/kemichael.js`.
 
 **Tegneseriens ruder** står i `RUDER` i `js/tegneserie.js`: én funktion pr.
 iagttagelse, der giver teksten og tegner et udsnit af bordet. Iagttagelserne

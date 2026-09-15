@@ -33,12 +33,11 @@
         svovlsyre:    { x: 23, y: 4 },
         saltsyre:     { x: 23, y: 4 },
         kmno4:        { x: 23, y: 4 },
-        kaffekop:     { x: 18, y: 40 },
-        laererKrop:   { x: 110, y: 18 },
-        laererHoved:  { x: 55, y: 126 },
-        laererArm:    { x: 28, y: 142 },
         haand:        { x: 40, y: 46 }
     };
+
+    /* Kemichaels ankre (laereren og kaffekoppen) staar i ../kemichael/kemichael.js */
+    Object.keys(NK.Kemichael.ANKER).forEach(function (navn) { S.ANKER[navn] = NK.Kemichael.ANKER[navn]; });
 
     /* Positur for en genstand, der staar paa underlaget y med midten i x. */
     function staar(navn, x, y) {
@@ -814,35 +813,6 @@
         ctx.save();
         ctx.globalAlpha = alfa;
         NK.Sprites.tegn(ctx, "lup", punkt.x - 15, punkt.y - 15, 34, 34);
-        ctx.restore();
-    };
-
-    S.tegnTaleboble = function (ctx, x, y, tekst, alfa, hx, hy) {
-        if (alfa < 0.01 || !tekst) return;
-        ctx.save();
-        ctx.globalAlpha = NK.klamp(alfa, 0, 1);
-        ctx.font = "700 17px 'Segoe UI', sans-serif";
-        var b = ctx.measureText(tekst).width + 28, h = 38;
-        var bx = NK.klamp(x - b / 2, 8, S.BREDDE - b - 8);
-        ctx.fillStyle = "#fffdf6";
-        ctx.strokeStyle = "#2a2f36";
-        ctx.lineWidth = 2;
-        NK.rundtRekt(ctx, bx, y, b, h, 12);
-        ctx.fill();
-        ctx.stroke();
-        var hale = NK.klamp(hx, bx + 16, bx + b - 16);
-        ctx.beginPath();
-        ctx.moveTo(hale - 8, y + h - 1);
-        ctx.lineTo(hx, hy);
-        ctx.lineTo(hale + 8, y + h - 1);
-        ctx.closePath();
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(hale - 8, y + h);
-        ctx.lineTo(hx, hy);
-        ctx.lineTo(hale + 8, y + h);
-        ctx.stroke();
-        NK.tekst(ctx, tekst, bx + b / 2, y + h / 2 + 1, { font: "700 17px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#1f2328" });
         ctx.restore();
     };
 }());

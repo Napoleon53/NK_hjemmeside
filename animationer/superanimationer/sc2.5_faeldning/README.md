@@ -107,10 +107,12 @@ til fejlen:
 Efter to forkerte svar i samme trin kommer **Vis svaret**. Et vist svar tæller
 ikke med, og feltet kan prøves igen senere.
 
-### Den sarkastiske lærer
+### Kemichael
 
-Læreren kigger op over bordkanten nede i højre hjørne og siger noget i en
-talebobbel. Han dukker op:
+Læreren er Kemichael fra de andre superanimationer (se
+`../kemichael/README.md`), her i en ældre udgave, der kigger op over bordkanten
+nede i højre hjørne og siger noget i en talebobbel. Han bruger ikke den fælles
+mappe, så denne animation er stadig selvstændig. Han dukker op:
 
 * når eleven har **fjollet tre gange** i skemaet, og igen for hver tredje gang
   derefter. Fjol er en dråbe af en opløsning, der ikke hører til feltet (kun
@@ -193,7 +195,7 @@ Alle ligger i `sprites/` som SVG og tegnes med `drawImage`:
 | `plastiklomme.svg` | plastlomme med hulstrimmel og sort papir | papiret x 38 til 602, y 12 til 370 |
 | `lup.svg` | lup med metalring og blåt skaft | linsens midte (58, 58), inderradius 42 |
 | `papir.svg` | et stykke køkkenrulle | midten (50, 35) |
-| `laerer.svg` | kemilærer i kittel med briller, løftet øjenbryn og kaffekrus | munden (84, 141) |
+| `laerer.svg` | Kemichael i kittel med briller, overskæg, løftet øjenbryn og kaffekrus | munden (84, 141) |
 
 Væsken i flaskerne, formlerne på etiketterne, skemaets streger, de hvide rækker
 i det frie forsøg, dråberne, bundfaldet, boblerne, hængelåsen, zoomcirklen,

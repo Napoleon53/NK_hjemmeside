@@ -3,8 +3,8 @@
 En superanimation: i modsætning til de øvrige animationer, som er én enkelt
 HTML-fil, ligger denne i sin egen mappe med adskilt CSS, JavaScript og sprites.
 
-Åbn **`index.html`**. Mappen er selvstændig og henter kun filer inde fra sig
-selv, så den kan flyttes uden at der knækker noget.
+Åbn **`index.html`**. Mappen henter kun filer inde fra sig selv, bortset fra
+læreren Kemichael i `../kemichael/`. Den skal derfor ligge ved siden af den mappe.
 
 Den afløser `animationer/kemi-c-filer/c8.6_redox_titrering_jernindhold.html`,
 som nu ligger i
@@ -64,7 +64,8 @@ typisk er 98,5 % jern.
 
 ## Påskeæggene
 
-Læreren er den samme som i sc6.9 og står i `js/laerer.js`.
+Læreren Kemichael er fælles for superanimationerne og står i
+`../kemichael/kemichael.js`. Scenerne her står i `js/laerer.js`.
 
 * **Lærerens kaffe.** Koppen på hylden.
 * **Læreren klikkes på.** Stadig kortere svar, rødere i hovedet og til sidst
@@ -81,11 +82,15 @@ Læreren er den samme som i sc6.9 og står i `js/laerer.js`.
   syren.
 * **Et godt resultat.** Ligger et resultat med svovlsyre mellem 96 og 100,5 %,
   siger læreren "Rustfrit."
+* **Glimt af Kemichaels baggrund** ved rystningen, auberginen og rosen og et
+  regnskab over uheld, der følger browseren. Hvert glimt kommer én gang; se
+  `../kemichael/README.md`.
 
 ## Sprites
 
 Alle ligger i `sprites/` som SVG og tegnes med `drawImage`. Hver genstand har et
-ankerpunkt (i `S.ANKER` i `js/scene.js`), som den drejes om.
+ankerpunkt (i `S.ANKER` i `js/scene.js`), som den drejes om. Kemichael og
+kaffekoppen ligger i `../kemichael/sprites/`.
 
 | Fil | Indhold | Anker og mål, som koden bruger |
 |-----|---------|-------------------------------|
@@ -97,8 +102,6 @@ ankerpunkt (i `S.ANKER` i `js/scene.js`), som den drejes om.
 | `flaske_svovlsyre.svg`, `flaske_saltsyre.svg` | 1 M H₂SO₄ med GHS07, 2 M HCl med GHS05 | åbningen (23, 4); låget tegnes i koden |
 | `flaske_kmno4.svg` | brun flaske med 0,0200 M KMnO₄ | åbningen (23, 4) |
 | `varmeplade.svg` | varmeplade | displayet x 10 til 40, lampen (52, 20) |
-| `kaffekop.svg` | lærerens kop | bunden (18, 40) |
-| `laerer_krop.svg`, `laerer_hoved.svg`, `laerer_arm.svg` | læreren | halsen (110, 18) og (55, 126); skulderen (28, 142) |
 | `haand.svg`, `lup.svg` | handske og lup | grebet (40, 46) |
 
 Buretten, stativet, flisen, væsker, ståluld i vejebåden og kolben, bobler,
@@ -118,7 +121,8 @@ js/scene.js         tegnebordet (1000 x 600): mål, lokalet, udstyr, buret, væs
 js/mikro.js         partikelmodellen i zoomboblen
 js/forsoeg.js       trinene, tilstanden og handlingerne
 js/bord.js          tegning af bordet og styring med musen
-js/laerer.js        læreren og påskeæggene
+js/laerer.js        Kemichaels scener og påskeæggene
+../kemichael/       Kemichael: figuren og hans sprites, fælles for superanimationerne
 js/quiz.js          quizkortet og de ti spørgsmål
 js/rundvisning.js   spotlight-rundvisningen bag ?-knappen
 js/app.js           panel, måleskema, guiden, knapper, tastatur, tegneløkke
@@ -139,7 +143,7 @@ genstand hintet markerer. Hvornår et trin er gjort, afgøres i `trinGjort`.
 **Koreografierne** (`koer` i `forsoeg.js`) er lister af trin: `flyt` en genstand
 til en positur, vent med `hver` og gør noget undervejs, eller `kald` en
 funktion. Lærerens scener (`laererKoer` i `laerer.js`) virker på samme måde med
-`gaa`, `sig`, `arm` og `udtryk`.
+`gaa`, `sig`, `arm` og `udtryk`. Formatet står øverst i `../kemichael/kemichael.js`.
 
 **Guiden** til beregningen står i `js/app.js` (`aabnGuide`, `guideTjek`) med
 tolerancer og hints for hvert af de fem trin.

@@ -462,6 +462,22 @@ function koerTest() {
     paastand("ryddet op, og en ny heptanflaske staar paa plads", !f.heptanSpild && !f.g.heptan.skjult && Math.abs(f.g.heptan.p.x - f.g.heptan.hjem.x) < 1 && !f.laerer.scene);
     paastand("den nye flaske kan bruges", f.kanTraekke("heptan"));
 
+    overskrift("7c. Kemichael");
+    var K = NK.Kemichael;
+    K.glimtNulstil();
+    paastand("et glimt vises foerste gang", K.glimt("navn") === K.GLIMT.navn);
+    paastand("hoejst et glimt pr. sidevisning", K.glimt("frokost") === null);
+    K.glimtNulstil();
+    paastand("regnskabet giver et glimt ved tredje uheld", K.uheld().length === 0 && K.uheld().length === 0 && K.uheld().length === 1);
+    paastand("alle glimt er korte", Object.keys(K.GLIMT).every(function (k) { return K.GLIMT[k].length <= 64; }));
+    K.glimtNulstil();
+    f.laererKoer("test", [{ udtryk: { briller: 1, laen: 1 } }, { gaa: K.KANT }, K.suk(0.5), { tid: 3 }], false);
+    adv(2);
+    paastand("han kan kigge ind fra kanten, over brillerne og sukke", Math.abs(f.laerer.x - K.KANT) < 1 && f.laerer.briller > 0.9 && f.laerer.laen > 0.9 && f.laerer.lukket < 0.01);
+    nyt();
+    paastand("nyt forsoeg retter brillerne igen", f.laerer.brillerMaal === 0 && f.laerer.laenMaal === 0);
+    vent(function () { return f.laerer.x < -200; }, 5);
+
     overskrift("8. Quizzen");
     paastand("ti spoergsmaal", NK.QUIZ.length === 10);
     NK.QUIZ.forEach(function (sp, n) {

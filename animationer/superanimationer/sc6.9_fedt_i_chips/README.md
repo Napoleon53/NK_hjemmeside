@@ -3,8 +3,8 @@
 En superanimation: i modsætning til de øvrige animationer, som er én enkelt
 HTML-fil, ligger denne i sin egen mappe med adskilt CSS, JavaScript og sprites.
 
-Åbn **`index.html`**. Mappen er selvstændig og henter kun filer inde fra sig
-selv, så den kan flyttes uden at der knækker noget.
+Åbn **`index.html`**. Mappen henter kun filer inde fra sig selv, bortset fra
+læreren Kemichael i `../kemichael/`. Den skal derfor ligge ved siden af den mappe.
 
 Den afløser `animationer/kemi-c-filer/c6.9_eksperiment_fedtchips.html`, som nu
 ligger i `animationer/kemi-c-filer/arkiv/c6.9_eksperiment_fedtchips_oldversion.html`.
@@ -72,9 +72,9 @@ procent. Resultatet sammenlignes med varedeklarationen på posen (34 g fedt pr.
 
 ## Påskeæggene
 
-Læreren kommer ind på scenen fra venstre. Hovedet er et sprite uden ansigt;
-øjne, bryn, mund, rødme og et skeptisk løftet bryn tegnes i koden, så udtrykket
-kan skifte. Armen drejer om skulderen. Alt står i `js/laerer.js`.
+Læreren Kemichael kommer ind på scenen fra venstre. Figuren, kaffen og klik på
+ham er fælles for superanimationerne og står i `../kemichael/kemichael.js`.
+Scenerne her står i `js/laerer.js`.
 
 * **Chips spises.** Klikkes der på posen, når chipsene er afvejet, tager en
   hånd en chip. Tredje gang kommer læreren med en løftet pegefinger, og regel 2
@@ -111,11 +111,15 @@ kan skifte. Armen drejer om skulderen. Alt står i `js/laerer.js`.
   stinkskabets bagvæg, og forsøget skal startes forfra.
 * **Et godt resultat.** Ligger et resultat med heptan højst 3 procentpoint
   under varedeklarationen, siger læreren "Fedt."
+* **Glimt af Kemichaels baggrund** ved posen, morteren og branden og et
+  regnskab over uheld, der følger browseren. Hvert glimt kommer én gang; se
+  `../kemichael/README.md`.
 
 ## Sprites
 
 Alle ligger i `sprites/` som SVG og tegnes med `drawImage`. Hver genstand har et
-ankerpunkt (i `S.ANKER` i `js/scene.js`), som den drejes om.
+ankerpunkt (i `S.ANKER` i `js/scene.js`), som den drejes om. Kemichael og
+kaffekoppen ligger i `../kemichael/sprites/`.
 
 | Fil | Indhold | Anker og mål, som koden bruger |
 |-----|---------|-------------------------------|
@@ -131,8 +135,6 @@ ankerpunkt (i `S.ANKER` i `js/scene.js`), som den drejes om.
 | `tragt.svg`, `filterstativ.svg` | glastragt og stativ med ring | stilkens spids (38, 108); ringen (58, 130) |
 | `trefod.svg`, `braender.svg` | trefod med trådnet og bunsenbrænder | nettets midte (35, 0) |
 | `varmeplade.svg` | varmeplade | displayet x 10 til 40, lampen (52, 20) |
-| `kaffekop.svg` | lærerens kop | bunden (18, 40) |
-| `laerer_krop.svg`, `laerer_hoved.svg`, `laerer_arm.svg` | læreren | halsen (110, 18) og (55, 126); skulderen (28, 142) |
 | `brandtaeppe.svg` | brandtæppe | toppen (75, 6) |
 | `kost.svg`, `fejeblad.svg` | kost og fejeblad, som i sc2.6 | børsterne (43, 54); forkanten (4, 52) |
 | `glasaffald.svg` | papkasse til glasaffald | åbningen (42, 12) |
@@ -156,7 +158,8 @@ js/mikro.js         partikelmodellen i zoomboblen
 js/forsoeg.js       trinene, tilstanden og handlingerne
 js/bord.js          tegning af bordet og styring med musen
 js/uheld.js         den knuste petriskål med oprydning og den tabte heptanflaske
-js/laerer.js        læreren, påskeæggene og branden
+js/laerer.js        Kemichaels scener i forsøget og branden
+../kemichael/       Kemichael: figuren og hans sprites, fælles for superanimationerne
 js/quiz.js          quizkortet og de ti spørgsmål
 js/rundvisning.js   spotlight-rundvisningen bag ?-knappen
 js/app.js           panel, måleskema, guiden, knapper, tastatur, tegneløkke
@@ -179,7 +182,7 @@ slippes, afgøres i `slipTil`.
 **Koreografierne** (`koer` i `forsoeg.js`) er lister af trin: `flyt` en genstand
 til en positur, vent med `hver` og gør noget undervejs, eller `kald` en
 funktion. Lærerens scener (`laererKoer` i `laerer.js`) virker på samme måde med
-`gaa`, `sig`, `arm` og `udtryk`.
+`gaa`, `sig`, `arm` og `udtryk`. Formatet står øverst i `../kemichael/kemichael.js`.
 
 **Guiden** til beregningen står i `js/app.js` (`aabnGuide`, `guideTjek`) med
 tolerancer og hints for hvert af de tre trin.

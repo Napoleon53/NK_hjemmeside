@@ -172,7 +172,7 @@
             } };
         },
         spild: function (f, e) {
-            return { tekst: e.tekst + " Læreren tørrede op.", tegn: function (ctx) {
+            return { tekst: e.tekst + " Kemichael tørrede op.", tegn: function (ctx) {
                 udsnit(ctx, UDSNIT.vaegt, function () {
                     vaegtUdsnit(ctx, 0);
                     S.tegnSpild(ctx, { x: 250, rx: 34, alfa: 1 });

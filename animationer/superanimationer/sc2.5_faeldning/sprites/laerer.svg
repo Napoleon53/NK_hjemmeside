@@ -78,4 +78,7 @@
   <ellipse cx="128" cy="124" rx="8" ry="4" fill="#e8907c" fill-opacity="0.3"/>
   <path d="M78 141 Q92 146 111 134" fill="none" stroke="#7a3b2f" stroke-width="3" stroke-linecap="round"/>
   <path d="M111 134 q4 -1 5 -5" fill="none" stroke="#7a3b2f" stroke-width="1.6" stroke-linecap="round"/>
+
+  <!-- Overskæg: det er Kemichael fra de andre superanimationer -->
+  <path d="M73 134 Q83 123.5 95 128.7 Q107 123.5 117 134 Q109 136.5 101.5 134 Q95 136.5 88.5 134 Q81 136.5 73 134 Z" fill="#8f949b"/>
 </svg>

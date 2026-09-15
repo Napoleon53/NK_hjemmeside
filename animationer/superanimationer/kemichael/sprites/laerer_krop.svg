@@ -36,8 +36,10 @@
   <rect x="152" y="82" width="4" height="18" rx="1" fill="#2d62b3"/>
   <rect x="159" y="84" width="4" height="16" rx="1" fill="#c0392b"/>
   <rect x="166" y="80" width="4" height="20" rx="1" fill="#2b2f36"/>
-  <rect x="42" y="92" width="44" height="18" rx="3" fill="#ffffff" stroke="#6f7a85" stroke-width="1"/>
-  <text x="64" y="105" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="10" font-weight="800" fill="#2a3038">LÆRER</text>
+  <rect x="34" y="91" width="58" height="19" rx="3" fill="#ffffff" stroke="#6f7a85" stroke-width="1"/>
+  <text x="51" y="104.5" font-family="Segoe UI, Arial, sans-serif" font-size="8.4" font-weight="800" fill="#2a3038">MICHAEL</text>
+  <!-- "KE" er skrevet foran med kuglepen af en elev -->
+  <text x="36.5" y="105.5" font-family="Segoe Print, Comic Sans MS, cursive" font-size="8.5" font-weight="700" fill="#2d62b3" transform="rotate(-9 42 102)">KE</text>
   <!-- Knapper -->
   <circle cx="112" cy="150" r="2.6" fill="#c3ccd4"/>
   <circle cx="111" cy="190" r="2.6" fill="#c3ccd4"/>
