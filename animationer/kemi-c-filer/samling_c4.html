@@ -376,7 +376,17 @@
             if (window.parent !== window) {
                 window.parent.postMessage(til ? 'fuldSkaerm' : 'gendanPanel', '*');
             }
+            markerFuldSkaerm();
         }
+
+        // Animationen faar klassen samling-fuld paa <html> i fuld skaerm, saa den kan
+        // give plads til knappen i hjoernet. Saettes igen, hver gang en side er indlaest.
+        function markerFuldSkaerm() {
+            var iframe = document.getElementById('visningsVindue');
+            var til = document.querySelector('.content-area').classList.contains('fuld');
+            try { iframe.contentDocument.documentElement.classList.toggle('samling-fuld', til); } catch (e) {}
+        }
+        document.getElementById('visningsVindue').addEventListener('load', markerFuldSkaerm);
 
         function toggleMenu() {
             var menu = document.getElementById('sidebarMenu');
