@@ -1,10 +1,10 @@
 # sc2.1: Salt i vand
 
 En superanimation i sin egen mappe med adskilt CSS, JavaScript og SVG-sprites.
+Læreren Kemichael hentes fra `../kemichael/`, så mappen skal ligge ved siden af den.
 
-Åbn **`index.html`**. Mappen er selvstændig: den henter kun filer inde fra sig
-selv og bruger hverken `fetch` eller moduler, så den virker også, når den åbnes
-direkte fra harddisken.
+Åbn **`index.html`**. Animationen bruger hverken `fetch` eller moduler og virker
+derfor også, når den åbnes direkte fra harddisken.
 
 Den afløser `animationer/kemi-c-filer/c2.1_salte_vand_oploest.html`.
 
@@ -35,56 +35,75 @@ Grænsen er sat ved **1 g pr. 100 mL vand ved 20 °C**.
 
 ### Fane 1: opløsningen
 
-Til venstre står et bægerglas på en varmeplade med termometer og et saltkorn i
-bunden. Lupen over kornet viser udsnittet til højre, ion for ion. Kornet i glasset
-bliver mindre, efterhånden som ionerne går i opløsning, og deles i flere korn, når
-krystallen knuses. På en smal skærm ligger glasset som en lille boks i hjørnet af
-lupbilledet.
+Til venstre står et bægerglas på en varmeplade med termometer, magnetomrører og
+et saltkorn i bunden. Lupen over kornet viser udsnittet til højre, ion for ion.
+Kornet bliver mindre, efterhånden som ionerne går i opløsning, og deles i flere
+korn, når krystallen knuses. På en smal skærm ligger glasset som en boks i hjørnet
+af lupbilledet.
 
 * Vandmolekylerne finder en ion **i overfladen** (en side, der vender ud mod
   vandet; bunden af glasset tæller ikke) og vender den rigtige ende ind:
   oxygen (δ−) mod en positiv ion, hydrogen (δ+) mod en negativ.
-* Når fire har fat, river de ionen løs. **De samme fire molekyler bliver siddende
-  som ionens vandskal** og glider jævnt ud hele vejen rundt. Arbejdsmolekylerne
-  selv toner op et andet sted, så et nyt hold kan tage over.
-* Den frie ion beholder sin størrelse. De frie ioner skubber blidt til hinanden,
-  så vandskallerne ikke ligger oven i hinanden.
-* Er der mere end 7 frie ioner i lupen, driver den ældste videre ud i resten af
-  glasset og toner ud. Den er stadig opløst, bare uden for udsnittet.
+* Når fire har fat, rives ionen løs. **De samme fire molekyler bliver med det
+  samme ionens vandskal** og glider jævnt ud, mens ionen svømmer ud til et sted
+  med plads. Arbejdsmolekylerne selv toner op et andet sted.
+* Den frie ion beholder sin størrelse. Er der mere end 6 frie ioner i lupen,
+  driver den ældste videre ud i resten af glasset og toner ud.
 * Tungtopløselige salte stopper efter nogle få ioner (`D.frieIoner`).
+
+**Vandmolekylerne ligger ikke oven i hinanden.** Frie ioner skubber blidt til
+hinanden og viger for ioner på vej ud. Ledige vandmolekyler viger for vandskallerne
+og for hinanden og toner op, hvor der er plads. Et nyt hold starter ikke lige ved
+siden af et hold, der er i gang. Baggrundsvandet toner væk, hvor der ligger andet.
+De frie ioner holder sig så højt, at deres vandskal ikke rammer molekylerne på
+krystallens overside; området vokser, efterhånden som krystallen bliver lavere.
+Selvtesten måler det.
 
 **Temperaturen** (koldt, lunkent, varmt) bestemmer vandmolekylernes fart. Koldt
 vand har isterninger, og varmepladen gløder ved varmt.
 
-**Omrøring** starter magneten i glasset og en hvirvel i lupen. Efter 1, 4 og 8
-sekunder knækker krystallen langs et nyt snit (`SNIT`). Stykkerne lægger sig side
-om side på bunden, og et stykke, der mister sin nederste række, falder ned. Der
-arbejder to hold vandmolekyler pr. stykke, højst fire hold (16 molekyler), og
-vandet bevæger sig 15 % hurtigere. Et tungtopløseligt salt slipper stadig kun
-lige så mange ioner: omrøring ændrer hastigheden, ikke grænsen.
+**Omrøring** starter magneten og en hvirvel i lupen. Efter 1, 4 og 8 sekunder
+knækker krystallen langs et nyt snit (`SNIT`). Stykkerne lægger sig side om side
+på bunden, og et stykke, der mister sin nederste række, falder ned. Der arbejder
+to hold vandmolekyler pr. stykke, højst fire hold, og vandet bevæger sig 15 %
+hurtigere. Et tungtopløseligt salt slipper stadig kun lige så mange ioner.
 
-**Uret** i lupens hjørne viser, hvor lang tid opløsningen har taget, og står stille
-(grønt), når krystallen er væk.
+**Knapperne på varmepladen** kan drejes direkte i billedet. Knappen for omrøring
+tænder og slukker. Knappen for varme går slukket → varm → **max** → slukket. Max
+findes kun her, ikke i panelet. Panelets knapper følger med.
+
+**Overkogning.** Står varmen på max, koger vandet efter 2 s (bobler i glasset og
+i lupen, damp). Efter **30 s** på max koger opløsningen over: skum vælter ud over
+kanten, løber ned ad glasset og breder sig på pladen, og vandstanden falder.
+**5 s** efter kommer Kemichael med en sarkastisk bemærkning om ungdommen og
+foreslår en ny krystal. Han lader varmen være, så eleven kan fortsætte. Skrues
+der ned før tid, starter de 30 s forfra. Ny krystal rydder op, og han kommer igen
+næste gang. Uheldet skrives i hans regnskab (`K.uheld()`).
+
+**Uret** i lupens hjørne viser, hvor lang tid opløsningen har taget, og står
+stille (grønt), når krystallen er væk. Under opgaven "hurtigst" er det stort og
+står over bægerglasset.
 
 Målt af selvtesten for NaCl (tre kørsler hver):
 
 | | står stille | omrøring |
 |---|---|---|
-| koldt | ca. 135 s | ca. 62 s |
-| lunkent | ca. 70 s | ca. 34 s |
-| varmt | ca. 36 s | ca. 17 s |
+| koldt | ca. 60 s | ca. 32 s |
+| lunkent | ca. 34 s | ca. 20 s |
+| varmt | ca. 18 s | ca. 10 s |
+| max | ca. 17 s | |
 
-Derfor er grænsen i opgaven "hurtigst" sat til **25 s** (`GRAENSE_SEK`): den kan
-kun klares med både varmt vand og omrøring. Ændres farten, antallet af hold eller
-snittene, skal tallet måles igen.
+Derfor er grænsen i opgaven "hurtigst" **13 s** (`GRAENSE_SEK`): den kræver både
+varme og omrøring, også hvis man skruer op på max. Ændres farten, antallet af hold,
+snittene eller pladsreglerne, skal tallet måles igen.
 
 ### Fane 2: hvor meget kan der være?
 
 Til venstre et bægerglas med 100 mL vand på en varmeplade, termometer i glasset,
 pulverglas med saltets formel på etiketten og en spatel. Knapperne +5 g og +25 g
 får spatlen til at dykke ned og hælde. Regnskabet er rigtigt med det samme;
-spatel og korn er kun animation. Varmepladen gløder, og termometeret følger
-temperaturen.
+spatel og korn er kun animation. Varmepladen gløder, og knappen på pladen drejer
+med temperaturen.
 
 Til højre saltets **opløselighedskurve**:
 
@@ -97,23 +116,28 @@ ikke knækker ved hvert 20 °C og aldrig vender.
 
 Aksen er som udgangspunkt **fælles for alle salte, 0-250 g**, så ingen kurve bliver
 klemt flad mod kanten, og saltene kan sammenlignes direkte. Hælder man mere i end
-aksen rækker, vokser den med. "Skaler til stoffet" zoomer ind på det valgte salt;
-det er nødvendigt for AgCl og CaCO₃.
+aksen rækker, vokser den med. "Skaler til stoffet" zoomer ind på det valgte salt.
 
 ### Opgaverne
 
-Hver fane har et opgavekort med **én knap**:
+Hver fane har fire opgaver og et kort med **én knap**:
 Start opgave → Giv hint → Vis svaret → Ny opgave. Løser eleven opgaven selv,
-springer knappen til Ny opgave. Mekanikken ligger i `js/opgave.js`; opgaverne
-selv ligger nederst i hver sim-fil.
+springer knappen til Ny opgave.
+
+En **runde** er hver opgave én gang i tilfældig rækkefølge; tælleren i kortet viser
+fx 2/4. Efter den sidste hedder knappen Se resultatet: kortet får en grøn ramme,
+viser hvor mange der blev løst uden at se svaret og henviser til den anden fane,
+hvis den har opgaver tilbage. Kemichael kommer med en kort, tør ros. Start forfra
+begynder en ny runde. Mekanikken ligger i `js/opgave.js`; opgaverne selv ligger
+nederst i hver sim-fil.
 
 **Fane 1**
 
 | Opgave | Sådan tjekkes den |
 |--------|-------------------|
-| Find fejlen: ét vandmolekyle i en vandskal vender forkert | billedet står stille; eleven klikker på molekylet |
+| Find fejlen: ét vandmolekyle i en vandskal vender forkert | vandet holder op med at starte på nye ioner, holdene ved krystallen giver slip, de ledige molekyler toner ud, og billedet står stille, når ingen ion er på vej ud; eleven klikker på molekylet |
 | Opløsningsligningen for et tilfældigt salt | fire svar; de forkerte er typiske fejl (glemt koefficient, ionerne slået sammen, sammensat ion i stykker, ingen ladning, (s) i stedet for (aq), vendte ladninger) |
-| Opløs NaCl-krystallen på under 25 s | uret; eleven skal selv finde varmt vand og omrøring |
+| Opløs NaCl-krystallen på under 13 s | det store ur; eleven skal selv finde varmt vand og omrøring |
 | AgCl: flere ioner ved omrøring? | tre svar; hintet beder eleven prøve det |
 
 **Fane 2**
@@ -127,6 +151,15 @@ selv ligger nederst i hver sim-fil.
 
 Ved valgopgaverne vises svaret også i billedet bagefter (temperaturen sættes, eller
 saltet hældes i), så eleven kan se, at det passer.
+
+### Kemichael
+
+Figuren er fælles for superanimationerne (`../kemichael/kemichael.js`), men den er
+bygget til et fast tegnebord på 1000 x 600 enheder, og det har denne animation
+ikke. `js/laerer.js` laver derfor et `NK.Scene` med de mål, figuren bruger, kobler
+ham på begge faner og tegner ham skaleret efter lærredets højde. Hver fane har et
+ur, der altid går (`tid`), og `laererPladsPx()`, der siger, hvor han stiller sig.
+Man kan klikke på ham. Scenerne er `kogerOver` (fane 1) og `ros` (begge faner).
 
 ### Teori og quiz
 
@@ -147,24 +180,29 @@ css/stil.css          alt udseende. NB: decimaltal med PUNKTUM i CSS
 sprites/              SVG: baegerglas, varmeplade, termometer, spatel,
                       pulverglas, lup
 js/kerne.js           NK-navnerum, dansk talformat, hævet/sænket skrift,
-                      DPR-skarpt canvas, tegnehjælpere
+                      DPR-skarpt canvas, positurer, tegnehjælpere
 js/data.js            ionerne, de seks salte, opløselighedskurven,
                       forkerte ligninger, teori og quiz
-js/sprites.js         indlæser sprites og kender deres mål (MAAL)
+js/sprites.js         spritelisten (FILER), deres mål (MAAL), indlæsning
+../kemichael/         Kemichael: figuren og hans sprites
 js/valg.js            det valgte salt, delt af begge faner
-js/tegning.js         ion, vandmolekyle, vandskal, varmeplade, termometer
-js/opgave.js          opgavekortet med den ene knap
-js/sim_oploes.js      fane 1: lup, krystal, omrøring og opgaverne
+js/tegning.js         ion, vandmolekyle, vandskal, varmeplade med knapper,
+                      termometer
+js/opgave.js          opgavekortet: den ene knap, runden og resultatet
+js/sim_oploes.js      fane 1: lup, krystal, omrøring, kogning og opgaverne
 js/sim_maetning.js    fane 2: glas, spatel, graf og opgaverne
+js/laerer.js          Kemichael koblet på begge faner
 js/quiz.js            selvtesten i sit overlay
-js/app.js             faneskift, overlays, tastatur, tegneløkke
+js/app.js             faneskift, overlays, tastatur, tegneløkke; starter
+                      indlæsningen af sprites
 _selvtest.html        udviklerværktøj (se nedenfor)
 ```
 
 Ioner og vandmolekyler tegnes i kode, fordi de drejes, skaleres og får δ-mærker.
-Glas, varmeplade, termometer, spatel, pulverglas og lup er SVG-filer. Hver fil har
-en kommentar øverst med de koordinater, animationen tegner efter, og de samme tal
-står i `NK.Sprites.MAAL`. Ændres en SVG, skal tallene følge med.
+Glas, varmeplade, termometer, spatel, pulverglas og lup er SVG-filer. Knapperne på
+varmepladen tegnes i koden, så de kan drejes. Hver SVG har en kommentar øverst med
+de koordinater, animationen tegner efter, og de samme tal står i
+`NK.Sprites.MAAL`. Ændres en SVG, skal tallene følge med.
 
 ## At rette i den
 
@@ -174,25 +212,26 @@ hver, formel, navn, en hverdagsting og seks opløselighedstal (0, 20, 40, 60, 80
 faste stof. En sammensat anion skal have `atomer` (bruges til den forkerte ligning
 "ionen går i stykker").
 
-**Opløselighedstallene** er omtrentlige tabelværdier, runde nok til C-niveau.
-
 **Fane 1's tempo** styres af `TEMPERATURER`, `MAKS_HOLD`, `SNIT` og faktoren for
 omrøring i `opdater()` i `js/sim_oploes.js`. Husk `GRAENSE_SEK` (se tabellen ovenfor).
+Overkogningen styres af `KOGE_OVER_SEK` og `LAERER_EFTER_SEK`.
+
+**Kemichaels replikker** i denne animation står øverst i `js/laerer.js`.
 
 **Teksterne** til teoriboksen og quizzen står nederst i `js/data.js`.
 
-**`_selvtest.html`** åbner index.html i en iframe og kontrollerer formler,
-ladninger, kurverne (præcise tabelpunkter, aldrig vendende), let/tung,
-de forkerte ligninger, at krystallen går i opløsning, at vandskallen starter
-præcis dér, hvor bærerne sad, at δ-mærkerne står på ret køl, omrøringens tider og
-knusning, at intet stykke svæver, at alle otte opgavetyper kan løses og passer
-med modellen, regnskabet på fane 2, grafens akse, quizzens svarlængder og at der
-ikke er tankestreger, 1+/1− eller fagord over C-niveau i teksten.
-Kør den efter ændringer:
+**`_selvtest.html`** åbner index.html i en iframe og kontrollerer blandt andet
+formler, ladninger, kurverne, de forkerte ligninger, at krystallen går i
+opløsning, at vandskallen dannes præcis dér, hvor bærerne sad, at δ-mærkerne står
+på ret køl, omrøringens tider og knusning, hvor mange vandmolekyler der ligger
+oven i hinanden, knapperne på varmepladen, overkogningen og Kemichael, at alle
+otte opgavetyper kan løses og passer med modellen, runden og resultatet,
+regnskabet og aksen på fane 2, quizzens svarlængder og at der ikke er
+tankestreger, 1+/1− eller fagord over C-niveau i teksten. Kør den efter ændringer:
 
 ```
-chrome --headless=new --allow-file-access-from-files --window-size=1400,3600
-       --virtual-time-budget=40000 --screenshot=ud.png .../_selvtest.html
+chrome --headless=new --allow-file-access-from-files --window-size=1400,4600
+       --virtual-time-budget=60000 --screenshot=ud.png .../_selvtest.html
 ```
 
 Uden `--allow-file-access-from-files` nægter Chrome siden at kigge ind i sin egen

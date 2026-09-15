@@ -1,5 +1,5 @@
 /* =====================================================================
-   kerne.js - faelles hjaelpefunktioner for sc6.8
+   kerne.js - faelles hjaelpefunktioner for sb2.4
 
    Alt bor i det globale objekt NK. Ingen moduler og ingen fetch:
    mappen skal ogsaa virke, naar index.html aabnes direkte fra

@@ -1,8 +1,8 @@
 /* =====================================================================
    lyd.js - lydene, lavet med Web Audio (ingen lydfiler)
 
-   Udsugningens sus, haeldning, skvulp i glasset, proppen, dryp, papir,
-   lampens kontakt, et pop naar proppen springer, laererens brummen og
+   Haeldning, sproejt, skvulp i glasset, dryp, papir, varmepladens
+   kontakt, et plask ved spild, laererens brummen og
    mumlen, en slurk kaffe og et lille signal, naar noget er lykkedes.
    ===================================================================== */
 (function () {
@@ -14,7 +14,7 @@
     var sus = null;
 
     try {
-        var gemt = window.localStorage && window.localStorage.getItem("nk-sc68-lyd");
+        var gemt = window.localStorage && window.localStorage.getItem("nk-sb24-lyd");
         if (gemt === "fra") til = false;
     } catch (fejl) { /* file:// eller privat browsing */ }
 
@@ -89,7 +89,7 @@
 
         saet: function (v) {
             til = !!v;
-            try { window.localStorage && window.localStorage.setItem("nk-sc68-lyd", til ? "til" : "fra"); } catch (fejl) {}
+            try { window.localStorage && window.localStorage.setItem("nk-sb24-lyd", til ? "til" : "fra"); } catch (fejl) {}
             if (!til) NK.Lyd.udsugning(false);
         },
 

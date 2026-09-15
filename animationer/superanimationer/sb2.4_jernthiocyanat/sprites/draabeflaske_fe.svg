@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="92" height="220" viewBox="0 0 46 110">
+  <!-- Draabeflaske med 0,1 M jern(III)nitrat. Svagt gul oploesning.
+       Spidsen er (23, 0). -->
+  <defs>
+    <linearGradient id="krop" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b9c3cb"/>
+      <stop offset="0.35" stop-color="#f3f6f8"/>
+      <stop offset="1" stop-color="#a4afb8"/>
+    </linearGradient>
+    <linearGradient id="vaeske" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d9b95c"/>
+      <stop offset="0.4" stop-color="#f6e3a4"/>
+      <stop offset="1" stop-color="#caa74a"/>
+    </linearGradient>
+    <linearGradient id="laag" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7a3f0e"/>
+      <stop offset="0.45" stop-color="#c77a2c"/>
+      <stop offset="1" stop-color="#65330b"/>
+    </linearGradient>
+  </defs>
+  <path d="M20 18 L21.6 2 Q23 -0.5 24.4 2 L26 18 Z" fill="#eef3f7" stroke="#b9c4cd" stroke-width="0.8"/>
+  <rect x="12" y="16" width="22" height="25" rx="3" fill="url(#laag)"/>
+  <path d="M16 20 v18 M20 20 v18 M24 20 v18 M28 20 v18" stroke="#3a1d05" stroke-opacity="0.45" stroke-width="1"/>
+  <path d="M12 40 Q4 42 3 52 L3 100 Q3 108 11 108 L35 108 Q43 108 43 100 L43 52 Q42 42 34 40 Z" fill="url(#krop)"/>
+  <path d="M4 62 L42 62 L42 100 Q42 107 35 107 L11 107 Q4 107 4 100 Z" fill="url(#vaeske)" fill-opacity="0.75"/>
+  <rect x="5" y="56" width="36" height="38" rx="2" fill="#ffffff" stroke="#8d99a4" stroke-width="0.8"/>
+  <text x="23" y="72" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="7.4" font-weight="700" fill="#1f2328">Fe(NO<tspan font-size="5.2" dy="2">3</tspan><tspan dy="-2">)</tspan><tspan font-size="5.2" dy="2">3</tspan></text>
+  <text x="23" y="87" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="7.4" font-weight="600" fill="#4a4f57">0,1 M</text>
+  <rect x="7" y="46" width="3" height="56" rx="1.5" fill="#ffffff" fill-opacity="0.5"/>
+</svg>

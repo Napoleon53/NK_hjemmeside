@@ -214,15 +214,12 @@
     T.gnister = function (ctx, gnister) {
         ctx.save();
         gnister.forEach(function (g) {
+            /* Runde prikker, saa gnisterne ikke ligner et plus. */
             ctx.globalAlpha = NK.klamp(g.liv, 0, 1);
-            ctx.strokeStyle = "#ffe58a";
-            ctx.lineWidth = 1.6;
+            ctx.fillStyle = "#ffe58a";
             ctx.beginPath();
-            ctx.moveTo(g.x - 4, g.y);
-            ctx.lineTo(g.x + 4, g.y);
-            ctx.moveTo(g.x, g.y - 4);
-            ctx.lineTo(g.x, g.y + 4);
-            ctx.stroke();
+            ctx.arc(g.x, g.y, 2.4, 0, Math.PI * 2);
+            ctx.fill();
         });
         ctx.restore();
     };
@@ -322,9 +319,6 @@
             else if (vaeske === "ethanol") T.ethanolMolekyle(ctx, x, y, theta, 0.85);
             else T.heptanMolekyle(ctx, x, y, i * 1.3 + tid * 0.4, 0.85);
         }
-        if (tekst !== false) {
-            NK.tekst(ctx, "Molekylerne i strålen", cx + 10, cy + r - 16, { font: "600 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#c8ced6" });
-        }
         ctx.restore();
 
         ctx.strokeStyle = "#d6eaf8";
@@ -332,6 +326,9 @@
         ctx.beginPath();
         ctx.arc(cx, cy, r, 0, Math.PI * 2);
         ctx.stroke();
+        if (tekst !== false) {
+            NK.tekst(ctx, "Lup: molekylerne i strålen", cx, cy - r - 16, { font: "600 14px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#c8ced6", kant: true });
+        }
         ctx.restore();
     };
 }());

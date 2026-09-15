@@ -554,6 +554,7 @@
                 st.vinkel += (0 - st.vinkel) * k;
             }
             st.ladning *= Math.exp(-dt / 90);
+            if (st.ladning >= 0.5) mig.gjort.gnedet = true;
         });
 
         if (this.haneAaben && this.vol > 0) {

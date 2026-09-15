@@ -14,22 +14,19 @@
 
     /* Navn: fil og stoerrelse i tegneenheder (viewBox). */
     var FILER = {
-        bromflaske:   { fil: "flaske_bromvand.svg", b: 80, h: 170 },
-        skruelaag:    { fil: "skruelaag.svg", b: 34, h: 22 },
-        hexan:        { fil: "flaske_hexan.svg", b: 46, h: 120 },
-        hexen:        { fil: "flaske_hexen.svg", b: 46, h: 120 },
-        reagensglas:  { fil: "reagensglas.svg", b: 30, h: 160 },
-        stativ:       { fil: "stativ.svg", b: 150, h: 100 },
-        prop:         { fil: "prop_lille.svg", b: 26, h: 26 },
-        agno3:        { fil: "draabeflaske_agno3.svg", b: 46, h: 110 },
-        phpapir:      { fil: "phpapir.svg", b: 64, h: 34 },
-        lampe:        { fil: "lampe.svg", b: 220, h: 300 },
-        folie:        { fil: "alufolie.svg", b: 76, h: 44 },
-        dunk:         { fil: "affaldsdunk.svg", b: 90, h: 130 },
-        kontrolpanel: { fil: "kontrolpanel.svg", b: 220, h: 76 },
-        papir:        { fil: "koekkenrulle.svg", b: 72, h: 44 },
-        haand:        { fil: "haand.svg", b: 96, h: 84 },
-        lup:          { fil: "lup.svg", b: 40, h: 40 }
+        vand:        { fil: "sproejteflaske.svg", b: 46, h: 120 },
+        baeger:      { fil: "baegerglas_100.svg", b: 72, h: 110 },
+        fe:          { fil: "draabeflaske_fe.svg", b: 46, h: 110 },
+        scn:         { fil: "draabeflaske_kscn.svg", b: 46, h: 110 },
+        ag:          { fil: "draabeflaske_agno3.svg", b: 46, h: 110 },
+        reagensglas: { fil: "reagensglas.svg", b: 30, h: 160 },
+        stativ:      { fil: "stativ5.svg", b: 290, h: 100 },
+        bad:         { fil: "baegerglas.svg", b: 112, h: 132 },
+        varmeplade:  { fil: "varmeplade.svg", b: 180, h: 72 },
+        dunk:        { fil: "affaldsdunk.svg", b: 90, h: 130 },
+        papir:       { fil: "koekkenrulle.svg", b: 72, h: 44 },
+        haand:       { fil: "haand.svg", b: 96, h: 84 },
+        lup:         { fil: "lup.svg", b: 40, h: 40 }
     };
 
     /* Har en post sin egen mappe, hentes filen derfra. Saadan tilfoejer
@@ -41,7 +38,7 @@
         post.img.addEventListener("load", function () { post.klar = true; });
         post.img.addEventListener("error", function () {
             post.fejlet = true;
-            if (window.console) console.warn("sc6.8: kunne ikke indlaese " + sti);
+            if (window.console) console.warn("sb2.4: kunne ikke indlaese " + sti);
         });
         post.img.src = sti;
     }

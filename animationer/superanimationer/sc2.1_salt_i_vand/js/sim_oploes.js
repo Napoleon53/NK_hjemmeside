@@ -13,6 +13,17 @@
                        vandmolekyler kan arbejde paa én gang
      oploeseligheden - hvor mange ioner der overhovedet kan komme ud,
                        foer vandet ikke kan rumme mere (D.frieIoner)
+
+   De to knapper paa varmepladen kan drejes direkte i billedet. Knappen
+   for varme har et trin mere end panelet: max. Staar den paa max i over
+   30 sekunder, koger opløsningen over, og laereren kommer (js/laerer.js).
+
+   Vandmolekylerne maa ikke ligge oven i hinanden:
+     - vandskallen dannes, saa snart ionen rives loes, og glider ud,
+       mens ionen er paa vej
+     - frie ioner og ledige vandmolekyler skubber blidt til hinanden
+     - et nyt hold starter ikke lige ved siden af et hold, der er i gang
+     - baggrundsvandet toner vaek, hvor der ligger andet
    ===================================================================== */
 (function () {
     "use strict";
@@ -25,19 +36,31 @@
     var PAAKRAEVET = 4;          /* saa mange skal have fat, foer ionen slipper */
     var RAEKKER = 5;
     var MAKS_HOLD = 4;           /* hold af vandmolekyler, der kan arbejde paa én gang */
-    var MAKS_SYNLIGE = 7;        /* frie ioner i lupen, foer de aeldste driver videre ud i glasset */
+    var MAKS_SYNLIGE = 6;        /* frie ioner i lupen, foer de aeldste driver videre ud i glasset */
     var FART_ENHED = 34;         /* hastighederne er afstemt til en celle paa 34 px */
-    var GRAENSE_SEK = 25;        /* opgaven "hurtigst": se README for, hvordan tallet er fundet */
+    var GRAENSE_SEK = 13;        /* opgaven "hurtigst": se README for, hvordan tallet er fundet */
+    var KOGE_OVER_SEK = 30;      /* saa laenge paa max, foer opløsningen koger over */
+    var LAERER_EFTER_SEK = 5;    /* saa laenge efter kommer laereren */
+    var SLUKKET = -2.2;          /* knappernes vinkel, naar de er slukket */
 
     /* De fire pladser om en ion ligger alle paa den aabne side af den. */
     var PLADS_VINKLER = [-0.95, -0.32, 0.32, 0.95];
 
-    /* De tre knapper. temp er den temperatur, oploeseligheden slaas op ved. */
+    /* De tre knapper i panelet. temp er den temperatur, oploeseligheden
+       slaas op ved. Max kan kun naas ved at dreje paa varmepladen. */
     var TEMPERATURER = [
-        { id: "kold",   navn: "Koldt",   tegn: "❄️", temp: 5,  fart: 0.55 },
-        { id: "lunken", navn: "Lunkent", tegn: "💧", temp: 20, fart: 1.00 },
-        { id: "varm",   navn: "Varmt",   tegn: "🔥", temp: 70, fart: 1.95 }
+        { id: "kold",   navn: "Koldt",   tegn: "❄️", temp: 5,   fart: 0.55, gloed: 0,    knap: SLUKKET },
+        { id: "lunken", navn: "Lunkent", tegn: "💧", temp: 20,  fart: 1.00, gloed: 0,    knap: SLUKKET },
+        { id: "varm",   navn: "Varmt",   tegn: "🔥", temp: 70,  fart: 1.95, gloed: 0.75, knap: 0.4 },
+        { id: "max",    navn: "Max",     tegn: "",   temp: 100, fart: 2.10, gloed: 1,    knap: 2.2, skjult: true }
     ];
+
+    function temperatur(id) {
+        for (var i = 0; i < TEMPERATURER.length; i++) if (TEMPERATURER[i].id === id) return TEMPERATURER[i];
+        return TEMPERATURER[1];
+    }
+
+    function frac(v) { return v - Math.floor(v); }
 
     /* Omroeringen knuser krystallen i tre omgange. Hvert snit deler de
        stykker, der er, efter ionens plads i gitteret (k = antal kolonner).
@@ -55,6 +78,10 @@
         this.omroering = false;
         this.roerStyrke = 0;         /* 0-1: stroemmen tager lidt tid om at starte og stoppe */
         this.roerFase = 0;
+        this.tid = 0;                /* et ur, der altid gaar (bruges ogsaa af laereren) */
+        this.hover = null;           /* den knap paa varmepladen, musen er over */
+        this.knapVarme = SLUKKET;
+        this.knapRoer = SLUKKET;
         this.ioner = [];
         this.vand = [];
         this.baggrund = [];
@@ -64,9 +91,10 @@
 
         this.koblPanel();
         this.koblMus();
+        if (this.laererStart) this.laererStart();
         NK.Valg.paa(this.nulstil.bind(this));
         this.nulstil();
-        this.opgaver = new NK.Opgaver("oploes", OPGAVER, this);
+        this.opgaver = new NK.Opgaver("oploes", OPGAVER, this, "Opløsningen");
         this.opdaterPanel();
     };
 
@@ -75,6 +103,9 @@
     /* Til selvtesten */
     NK.SimOploes.GRAENSE_SEK = GRAENSE_SEK;
     NK.SimOploes.MAKS_SYNLIGE = MAKS_SYNLIGE;
+    NK.SimOploes.KOGE_OVER_SEK = KOGE_OVER_SEK;
+    NK.SimOploes.LAERER_EFTER_SEK = LAERER_EFTER_SEK;
+    NK.SimOploes.temperatur = temperatur;
 
     /* ----- Panelet ------------------------------------------------------ */
     P.koblPanel = function () {
@@ -84,7 +115,7 @@
 
         var vaert = NK.el("oploes-temp");
         this.tempKnapper = [];
-        TEMPERATURER.forEach(function (t) {
+        TEMPERATURER.filter(function (t) { return !t.skjult; }).forEach(function (t) {
             var b = document.createElement("button");
             b.type = "button";
             b.className = "tilstandsknap" + (t.id === mig.tempValg.id ? " aktiv" : "");
@@ -126,15 +157,51 @@
         }
     };
 
-    /* Et klik i billedet gaar kun til opgaven (fx "find fejlen"). */
+    /* ----- Musen: knapperne paa varmepladen, laereren og opgaverne ------- */
     P.koblMus = function () {
         var mig = this;
         var c = this.L.canvas;
-        c.addEventListener("pointerdown", function (e) {
-            if (!mig.opgaver) return;
+
+        function pos(e) {
             var r = c.getBoundingClientRect();
-            if (mig.opgaver.klik(e.clientX - r.left, e.clientY - r.top)) e.preventDefault();
+            return { x: e.clientX - r.left, y: e.clientY - r.top };
+        }
+
+        c.addEventListener("pointerdown", function (e) {
+            var p = pos(e);
+            var knap = mig.knapVed(p.x, p.y);
+            if (knap) { mig.drejKnap(knap); e.preventDefault(); return; }
+            if (mig.laererKlik && mig.laererKlik(p.x, p.y)) return;
+            if (mig.opgaver && mig.opgaver.klik(p.x, p.y)) e.preventDefault();
         });
+        c.addEventListener("pointermove", function (e) {
+            var p = pos(e);
+            mig.hover = mig.knapVed(p.x, p.y);
+            c.style.cursor = mig.hover ? "pointer" : "default";
+        });
+        c.addEventListener("pointerleave", function () {
+            mig.hover = null;
+            c.style.cursor = "default";
+        });
+    };
+
+    /* Hvilken knap paa varmepladen ligger under punktet? */
+    P.knapVed = function (x, y) {
+        var m = this.makro;
+        if (!m) return null;
+        var navne = ["varme", "roer"];
+        for (var i = 0; i < navne.length; i++) {
+            var k = T.pladeKnap(m.pladeX, m.pladeY, m.pladeB, navne[i]);
+            if (Math.hypot(x - k.x, y - k.y) <= Math.max(k.r * 1.6, 15)) return navne[i];
+        }
+        return null;
+    };
+
+    /* Knappen for varme drejer rundt: slukket -> varm -> max -> slukket. */
+    P.drejKnap = function (navn) {
+        if (navn === "roer") { this.saetOmroering(!this.omroering); return; }
+        var id = this.tempValg.id;
+        this.saetTemp(temperatur(id === "varm" ? "max" : (id === "max" ? "lunken" : "varm")));
     };
 
     /* ----- Krystallen ---------------------------------------------------- */
@@ -192,11 +259,23 @@
         this.bygget = salt.id;
         this.frie = 0;
         this.paabegyndt = 0;         /* frie + dem, der er ved at blive revet loes */
-        this.tid = 0;
+        this.uret = 0;               /* hvor laenge opløsningen har staaet paa */
         this.slutTid = null;
         this.pause = false;
         this.pauseUr = 0;
         this.hvil = false;
+
+        /* Kogning og overkogning */
+        this.kogeTid = 0;
+        this.overkog = 0;            /* 0-1: hvor hoejt skummet staar */
+        this.overkogStart = null;
+        this.laererKom = false;
+        this.vandTab = 0;            /* mL, der er kogt over */
+        this.spild = 0;              /* 0-1: det spildte paa varmepladen */
+        this.bobler = [];
+        this.lupBobler = [];
+        this.damp = [];
+
         this.celle = 0;
         this.layout(true);
         this.justerHold();
@@ -204,6 +283,7 @@
 
     P.nulstil = function () {
         this.byg();
+        if (this.laererNyt) this.laererNyt();
     };
 
     /* ----- Maal ----------------------------------------------------------- */
@@ -214,11 +294,11 @@
 
         this.bred = L.b >= 700;
         if (this.bred) {
-            this.makroB = NK.klamp(L.b * 0.19, 150, 230);
-            this.zoom = { x: this.makroB + 30, y: kant,
-                          b: Math.max(100, L.b - this.makroB - 30 - kant), h: Math.max(100, L.h - 2 * kant) };
+            this.makroB = NK.klamp(L.b * 0.27, 210, 330);
+            this.zoom = { x: this.makroB + 24, y: kant,
+                          b: Math.max(100, L.b - this.makroB - 24 - kant), h: Math.max(100, L.h - 2 * kant) };
         } else {
-            this.makroB = NK.klamp(L.b * 0.28, 96, 140);
+            this.makroB = NK.klamp(L.b * 0.36, 120, 190);
             this.zoom = { x: kant, y: kant, b: Math.max(100, L.b - 2 * kant), h: Math.max(100, L.h - 2 * kant) };
         }
         var z = this.zoom;
@@ -239,11 +319,19 @@
         this.gitterY = this.gulv - this.celle * this.raekker + this.celle / 2;
         this.gitterTop = this.gitterY - this.celle / 2;
 
-        var luft = this.celle * 1.3;
+        /* De frie ioner holder sig saa hoejt oppe, at deres vandskal ikke
+           rammer de molekyler, der arbejder paa krystallens overside. De
+           ledige vandmolekyler maa komme laengere ned. */
+        var luft = this.celle * 1.5;
         this.frit = {
             x0: z.x + luft, x1: z.x + z.b - luft,
             y0: this.overflade + luft,
-            y1: Math.max(this.overflade + luft + 20, this.gitterTop - this.celle * 0.9)
+            y1: Math.max(this.overflade + luft + 20, this.gitterTop - this.celle * 2.3)
+        };
+        this.fritVand = {
+            x0: z.x + this.celle, x1: z.x + z.b - this.celle,
+            y0: this.overflade + this.celle,
+            y1: Math.max(this.overflade + this.celle + 20, this.gitterTop - this.celle)
         };
 
         this.layoutMakro();
@@ -255,6 +343,7 @@
             o.hvileY = this.gitterY + o.r * this.celle;
         }
         this.placerStykker(true);
+        this.opdaterFrit();
         for (i = 0; i < this.ioner.length; i++) {
             var p = this.ioner[i];
             if (p.tilstand === "fast") {
@@ -289,22 +378,23 @@
     P.layoutMakro = function () {
         var MB = S.MAAL.baegerglas, MP = S.MAAL.varmeplade, MT = S.MAAL.termometer;
         var m = {};
-        m.bw = this.makroB * (this.bred ? 0.74 : 0.7);
+        m.bw = this.makroB * (this.bred ? 0.78 : 0.72);
         m.s = m.bw / MB.b;
-        m.hoejde = m.bw * 231 / MB.b + m.bw * 1.2 * MP.h / MP.b;
+        m.pladeB = m.bw * 1.2;
+        m.pladeH = m.pladeB * MP.h / MP.b;
+        m.hoejde = m.bw * 231 / MB.b + m.pladeH + 22;      /* 22: knappernes navne under pladen */
         if (this.bred) {
-            m.x = (this.makroB - m.bw) / 2 + 8;
-            m.y = this.L.h / 2 - m.hoejde / 2 + 10;
+            m.x = (this.makroB - m.bw) / 2 + 6;
+            m.y = this.L.h / 2 - m.hoejde / 2;
         } else {
-            m.boks = { x: this.zoom.x + 8, y: this.zoom.y + 8, b: this.makroB, h: m.hoejde + 34 };
+            m.boks = { x: this.zoom.x + 8, y: this.zoom.y + 8, b: this.makroB, h: m.hoejde + 30 };
             m.x = m.boks.x + (m.boks.b - m.bw) / 2;
-            m.y = m.boks.y + 22;
+            m.y = m.boks.y + 20;
         }
         m.glasX = m.x + MB.indV * m.s;
         m.glasB = (MB.indH - MB.indV) * m.s;
         m.bund = m.y + MB.bund * m.s;
         m.overflade = m.y + MB.ml100 * m.s;
-        m.pladeB = m.bw * 1.2;
         m.pladeX = m.x + m.bw / 2 - m.pladeB / 2;
         m.pladeY = m.y + 231 * m.s;
 
@@ -316,9 +406,14 @@
 
         m.termoH = (MB.bund - 6 + 14) * m.s;
         m.termoB = m.termoH * MT.b / MT.h;
-        m.termoX = m.glasX + 4 * m.s;
+        m.termoX = m.x + 70 * m.s;          /* til hoejre for mL-tallene */
         m.termoY = m.y - 14 * m.s;
         this.makro = m;
+    };
+
+    /* Laereren stiller sig lige til hoejre for glasset. */
+    P.laererPladsPx = function () {
+        return this.bred ? this.makroB + 170 : 170;
     };
 
     /* Stykkerne af krystallen ligger side om side paa bunden. Et stykke,
@@ -368,6 +463,20 @@
         if (this.L.tilpas()) this.layout(true);
     };
 
+    /* Det frie vand begynder, hvor krystallen slutter. Bliver krystallen
+       lavere, faar de frie ioner mere plads. */
+    P.opdaterFrit = function () {
+        var top = this.gulv;
+        for (var i = 0; i < this.ioner.length; i++) {
+            var o = this.ioner[i];
+            if (o.tilstand !== "fast") continue;
+            var st = this.stykker[o.stykke];
+            top = Math.min(top, o.hvileY + (st ? st.mdy : 0) - this.celle / 2);
+        }
+        this.frit.y1 = Math.max(this.frit.y0 + 20, top - this.celle * 2.3);
+        this.fritVand.y1 = Math.max(this.fritVand.y0 + 20, top - this.celle);
+    };
+
     /* ----- Vandmolekylerne -------------------------------------------------- */
     function nytVand() {
         return {
@@ -378,17 +487,44 @@
         };
     }
 
-    /* Et nyt sted at svoemme hen, spredt tilfaeldigt ud over det frie vand. */
-    P.nytHjem = function (v) {
-        var f = this.frit;
-        v.hjemX = f.x0 + Math.random() * Math.max(10, f.x1 - f.x0);
-        v.hjemY = f.y0 + Math.random() * Math.max(10, f.y1 - f.y0);
+    /* Hvor langt ud en ion med vandskal fylder. */
+    P.skalRadius = function (o) {
+        return this.ionRadius(o) + 36 * this.vandSkala;
     };
 
-    /* Et molekyle, der er faerdigt, toner op et nyt, tilfaeldigt sted.
-       Naar det har baaret en ion ud, er det de samme molekyler, der bliver
-       siddende om ionen (se slipFri) - der er vand overalt i glasset, og
-       et nyt molekyle tager over. */
+    /* Et nyt sted at svoemme hen: det bedste af nogle tilfaeldige steder,
+       dvs. det sted, der ligger laengst fra ioner med vandskal og fra de
+       andre ledige vandmolekyler. */
+    P.nytHjem = function (v) {
+        var f = this.fritVand || this.frit, mig = this, vs = this.vandSkala || 1;
+        var hindringer = [];
+        this.ioner.forEach(function (o) {
+            if ((o.tilstand === "fri" || o.tilstand === "paavej") && o.skal) {
+                hindringer.push({ x: o.x, y: o.y, r: mig.skalRadius(o) });
+            }
+        });
+        this.vand.forEach(function (w) {
+            if (w !== v && w.fade > 0.2 && w.tilstand !== "fast") hindringer.push({ x: w.x, y: w.y, r: 22 * vs });
+        });
+        var bedst = null, bedstPlads = -Infinity;
+        for (var n = 0; n < 12; n++) {
+            var x = f.x0 + Math.random() * Math.max(10, f.x1 - f.x0);
+            var y = f.y0 + Math.random() * Math.max(10, f.y1 - f.y0);
+            var plads = Infinity;
+            for (var i = 0; i < hindringer.length; i++) {
+                plads = Math.min(plads, Math.hypot(x - hindringer[i].x, y - hindringer[i].y) - hindringer[i].r);
+            }
+            if (plads > bedstPlads) { bedstPlads = plads; bedst = { x: x, y: y }; }
+            if (plads > 26 * vs) break;
+        }
+        v.hjemX = bedst.x;
+        v.hjemY = bedst.y;
+    };
+
+    /* Et molekyle, der er faerdigt, toner op et nyt sted. Naar det har
+       baaret en ion ud, er det de samme molekyler, der bliver siddende om
+       ionen (se lavSkal) - der er vand overalt i glasset, og et nyt
+       molekyle tager over. */
     P.sendVaek = function (v) {
         this.nytHjem(v);
         v.x = v.hjemX;
@@ -470,14 +606,19 @@
 
     /* Den ion, der er naermest og allerede har flest vandmolekyler paa vej -
        saa bliver en paabegyndt ion faerdig, i stedet for at mange ioner
-       staar halvfaerdige paa én gang. */
+       staar halvfaerdige paa én gang. Et nyt hold starter ikke lige ved
+       siden af et hold, der er i gang, saa de to hold ikke staar oven i
+       hinanden. */
     P.naermesteFrie = function (v) {
+        var afstand = this.celle * 1.5;
+        var igang = this.ioner.filter(function (o) { return o.tilstand === "fast" && o.reserveret > 0; });
         for (var mangler = PAAKRAEVET - 1; mangler >= 0; mangler--) {
             var bedst = null, bedstAfstand = Infinity;
             for (var i = 0; i < this.ioner.length; i++) {
                 var o = this.ioner[i];
                 if (o.tilstand !== "fast" || o.reserveret !== mangler) continue;
                 if (!this.iOverfladen(o)) continue;
+                if (mangler === 0 && igang.some(function (a) { return Math.hypot(a.x - o.x, a.y - o.y) < afstand; })) continue;
                 var d = Math.hypot(o.x - v.x, o.y - v.y);
                 if (d < bedstAfstand) { bedstAfstand = d; bedst = o; }
             }
@@ -531,6 +672,12 @@
     P.opdater = function (dt) {
         if (this.bygget !== NK.Valg.saltId) this.byg();
 
+        this.tid += dt;
+        if (this.opdaterLaerer) this.opdaterLaerer(dt);
+        this.opdaterKogning(dt);
+        this.knapVarme = NK.mod(this.knapVarme, temperatur(this.tempValg.id).knap, 12, dt);
+        this.knapRoer = NK.mod(this.knapRoer, this.omroering ? 0.9 : SLUKKET, 12, dt);
+
         if (this.pauseUr > 0) {
             this.pauseUr -= dt;
             if (this.pauseUr <= 0) {
@@ -553,8 +700,8 @@
         var fart = this.tempValg.fart * (1 + 0.15 * this.roerStyrke);
         var enhed = this.celle / FART_ENHED;
 
-        if (!this.faerdig()) { this.tid += dt; this.slutTid = null; }
-        else if (this.slutTid === null) this.slutTid = this.tid;
+        if (!this.faerdig()) { this.uret += dt; this.slutTid = null; }
+        else if (this.slutTid === null) this.slutTid = this.uret;
 
         if (this.omroering && this.knusTrin < SNIT.length && this.tilbage() > 0) {
             this.roerTid += dt;
@@ -570,6 +717,7 @@
         }
 
         this.justerHold();
+        this.opdaterFrit();
 
         /* Ionerne */
         var rysten = (0.5 + fart * 0.9) * Math.max(1, enhed * 0.7);
@@ -584,6 +732,8 @@
                 var dx = o.maalX - o.x, dy = o.maalY - o.y;
                 var d = Math.hypot(dx, dy);
                 var skridt = 95 * fart * enhed * dt;
+                o.skalfase += dt * 0.35;
+                this.slapSkal(o, dt);
                 if (d > skridt) {
                     o.x += (dx / d) * skridt;
                     o.y += (dy / d) * skridt;
@@ -625,6 +775,7 @@
 
         /* Vandmolekylerne */
         for (i = 0; i < this.vand.length; i++) this.opdaterVand(this.vand[i], 190 * fart * enhed * dt, dt);
+        this.skubVand(dt);
 
         /* Baggrundsvandet */
         for (i = 0; i < this.baggrund.length; i++) {
@@ -642,33 +793,82 @@
     };
 
     /* De frie ioner skubber blidt til hinanden, saa vandskallerne ikke
-       ligger oven i hinanden. */
+       ligger oven i hinanden. En ion paa vej ud flytter sig ikke, men de
+       frie viger for den. */
     P.skubFra = function (dt) {
-        var frie = this.ioner.filter(function (o) { return o.tilstand === "fri"; });
+        var frie = [], paaVej = [];
+        this.ioner.forEach(function (o) {
+            if (o.tilstand === "fri") frie.push(o);
+            else if (o.tilstand === "paavej") paaVej.push(o);
+        });
         var ekstra = 78 * this.vandSkala, k = Math.min(1, dt * 8);
-        for (var i = 0; i < frie.length; i++) {
-            for (var j = i + 1; j < frie.length; j++) {
-                var a = frie[i], b = frie[j];
-                var dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 0.01;
-                var min = this.ionRadius(a) + this.ionRadius(b) + ekstra;
+        var i, j, a, b, dx, dy, d, min;
+        for (i = 0; i < frie.length; i++) {
+            a = frie[i];
+            for (j = i + 1; j < frie.length; j++) {
+                b = frie[j];
+                dx = b.x - a.x; dy = b.y - a.y; d = Math.hypot(dx, dy) || 0.01;
+                min = this.ionRadius(a) + this.ionRadius(b) + ekstra;
                 if (d >= min) continue;
                 var skub = (min - d) * k / 2;
                 dx /= d; dy /= d;
                 a.x -= dx * skub; a.y -= dy * skub;
                 b.x += dx * skub; b.y += dy * skub;
             }
+            for (j = 0; j < paaVej.length; j++) {
+                b = paaVej[j];
+                dx = a.x - b.x; dy = a.y - b.y; d = Math.hypot(dx, dy) || 0.01;
+                min = this.ionRadius(a) + this.ionRadius(b) + ekstra;
+                if (d >= min) continue;
+                a.x += dx / d * (min - d) * k;
+                a.y += dy / d * (min - d) * k;
+            }
         }
+    };
+
+    /* De ledige vandmolekyler viger for ionernes vandskal og for hinanden. */
+    P.skubVand = function (dt) {
+        var vs = this.vandSkala, k = Math.min(1, dt * 6), f = this.fritVand, mig = this, i, j;
+        var ioner = this.ioner.filter(function (o) { return (o.tilstand === "fri" || o.tilstand === "paavej") && o.skal; });
+        var ledige = this.vand.filter(function (v) { return v.tilstand === "hjemme"; });
+        for (i = 0; i < ledige.length; i++) {
+            var v = ledige[i];
+            for (j = 0; j < ioner.length; j++) {
+                var o = ioner[j];
+                var dx = v.x - o.x, dy = v.y - o.y, d = Math.hypot(dx, dy) || 0.01;
+                var min = mig.skalRadius(o) + 20 * vs;
+                if (d < min) {
+                    v.x += dx / d * (min - d) * k;
+                    v.y += dy / d * (min - d) * k;
+                }
+            }
+            for (j = i + 1; j < ledige.length; j++) {
+                var w = ledige[j];
+                var ex = w.x - v.x, ey = w.y - v.y, e = Math.hypot(ex, ey) || 0.01;
+                var mn = 44 * vs;
+                if (e < mn) {
+                    var sk = (mn - e) * k / 2;
+                    v.x -= ex / e * sk; v.y -= ey / e * sk;
+                    w.x += ex / e * sk; w.y += ey / e * sk;
+                }
+            }
+        }
+        ledige.forEach(function (v) {
+            v.x = NK.klamp(v.x, f.x0, f.x1);
+            v.y = NK.klamp(v.y, f.y0, f.y1);
+        });
     };
 
     P.opdaterVand = function (v, skridt, dt) {
         var o = v.maal;
 
-        if (v.fade < 1) v.fade = Math.min(1, v.fade + dt * 3);
+        /* Mens opgaven "find fejlen" venter paa et roligt billede, toner de
+           ledige molekyler ud. */
+        if (this.hvil && v.tilstand === "hjemme") v.fade = Math.max(0, v.fade - dt * 3);
+        else if (v.fade < 1) v.fade = Math.min(1, v.fade + dt * 3);
 
         switch (v.tilstand) {
         case "hjemme": {
-            /* hvil: opgaven "find fejlen" venter paa et roligt billede, saa
-               der startes ikke paa nye ioner imens. */
             o = this.tilbage() === 0 || this.hvil ? null : this.naermesteFrie(v);
             /* En ion, der ikke er begyndt endnu, taeller med i graensen med
                det samme. Ellers ville de ioner, der allerede er i gang,
@@ -686,8 +886,8 @@
             } else {
                 v.vinkel += 0.25 * dt;
                 var sp = this.stroem(v.x, v.y);
-                v.x = NK.klamp(v.x + sp[0] * dt * 0.6, this.frit.x0, this.frit.x1);
-                v.y = NK.klamp(v.y + sp[1] * dt * 0.6, this.frit.y0, this.frit.y1);
+                v.x = NK.klamp(v.x + sp[0] * dt * 0.6, this.fritVand.x0, this.fritVand.x1);
+                v.y = NK.klamp(v.y + sp[1] * dt * 0.6, this.fritVand.y0, this.fritVand.y1);
             }
             break;
         }
@@ -727,14 +927,37 @@
         }
     };
 
+    /* Ionen rives loes. Baererne bliver med det samme til dens vandskal,
+       og ionen svoemmer ud til et sted med plads. */
     P.rivLoes = function (o) {
         o.tilstand = "paavej";
         delete this.optaget[o.r + ":" + o.c];
         this.frie++;
-        var f = this.frit;
-        o.maalX = f.x0 + Math.random() * Math.max(10, f.x1 - f.x0);
-        o.maalY = f.y0 + Math.random() * Math.max(10, f.y1 - f.y0);
+        var sted = this.fritSted();
+        o.maalX = sted.x;
+        o.maalY = sted.y;
+        this.lavSkal(o);
         this.faldNed();
+    };
+
+    /* Det bedste af nogle tilfaeldige steder i det frie vand: det, der
+       ligger laengst fra de andre ioner med vandskal. */
+    P.fritSted = function () {
+        var f = this.frit, mig = this, bedst = null, bedstPlads = -Infinity;
+        var andre = this.ioner.filter(function (o) { return o.tilstand === "fri" || o.tilstand === "paavej"; });
+        for (var n = 0; n < 14; n++) {
+            var x = f.x0 + Math.random() * Math.max(10, f.x1 - f.x0);
+            var y = f.y0 + Math.random() * Math.max(10, f.y1 - f.y0);
+            var plads = Infinity;
+            for (var i = 0; i < andre.length; i++) {
+                var a = andre[i];
+                var ax = a.tilstand === "paavej" ? a.maalX : a.x;
+                var ay = a.tilstand === "paavej" ? a.maalY : a.y;
+                plads = Math.min(plads, Math.hypot(x - ax, y - ay) - 2 * mig.skalRadius(a));
+            }
+            if (plads > bedstPlads) { bedstPlads = plads; bedst = { x: x, y: y }; }
+        }
+        return bedst;
     };
 
     /* Er den nederste raekke i et stykke gaaet i opløsning, falder resten
@@ -754,14 +977,11 @@
         }
     };
 
-    /* Ionen er ude i vandet. De molekyler, der bar den ud, bliver siddende
-       som dens vandskal - praecis dér, hvor de sad - og glider saa jaevnt
-       ud hele vejen rundt. Arbejdsmolekylerne selv starter forfra et andet
-       sted, saa et nyt hold kan tage over. */
-    P.slipFri = function (o) {
-        o.x = o.maalX;
-        o.y = o.maalY;
-        o.tilstand = "fri";
+    /* De molekyler, der rev ionen loes, bliver siddende som dens vandskal -
+       praecis dér, hvor de sad - og glider saa jaevnt ud hele vejen rundt.
+       Arbejdsmolekylerne selv starter forfra et andet sted, saa et nyt
+       hold kan tage over. */
+    P.lavSkal = function (o) {
         o.alder = 0;
         o.skalfase = 0;
 
@@ -781,8 +1001,17 @@
             return { vinkel: midt + dv, maal: midt + (i - (n - 1) / 2) * (Math.PI * 2 / n), forkert: false, ring: null };
         });
 
-        for (var b = 0; b < o.baerere.length; b++) this.sendVaek(o.baerere[b]);
+        var baerere = o.baerere;
         o.baerere = [];
+        for (var b = 0; b < baerere.length; b++) this.sendVaek(baerere[b]);
+    };
+
+    /* Ionen er ude i vandet og begynder at svoemme frit. */
+    P.slipFri = function (o) {
+        o.x = o.maalX;
+        o.y = o.maalY;
+        o.tilstand = "fri";
+        o.alder = 0;
         o.vx = (Math.random() - 0.5) * 26;
         o.vy = (Math.random() - 0.5) * 26;
     };
@@ -799,6 +1028,73 @@
         return this.celle * 0.40 * o.ion.r;
     };
 
+    /* ----- Kogning og overkogning ------------------------------------------ */
+    P.opdaterKogning = function (dt) {
+        var i;
+        var max = this.tempValg.id === "max";
+        if (max) {
+            this.kogeTid += dt;
+        } else {
+            this.kogeTid = 0;
+            this.overkogStart = null;
+        }
+        if (max && this.kogeTid >= KOGE_OVER_SEK && this.overkogStart === null) this.overkogStart = this.tid;
+
+        var koger = max && this.kogeTid > 2;
+        this.overkog = NK.mod(this.overkog, this.overkogStart !== null ? 1 : 0, 1.4, dt);
+        if (this.overkog > 0.7) {
+            this.vandTab = Math.min(45, this.vandTab + dt * 1.5);
+            this.spild = Math.min(1, this.spild + dt * 0.2);
+        } else if (!max) {
+            this.spild = Math.max(0, this.spild - dt * 0.01);
+        }
+
+        /* Laereren kommer én gang pr. krystal og lader varmen vaere. */
+        if (this.overkogStart !== null && !this.laererKom && this.tid - this.overkogStart >= LAERER_EFTER_SEK) {
+            this.laererKom = true;
+            if (this.laererKogerOver) this.laererKogerOver();
+        }
+
+        /* Bobler i glasset og i lupen, damp over glasset */
+        var styrke = koger ? NK.klamp((this.kogeTid - 2) / 6, 0.2, 1) : 0;
+        if (koger && Math.random() < dt * 30 * styrke) {
+            this.bobler.push({ u: 0.08 + Math.random() * 0.84, h: 2, r: 1.5 + Math.random() * 2.5, fart: 60 + Math.random() * 60 });
+        }
+        var top = 121 - this.vandTab * 1.2;
+        for (i = this.bobler.length - 1; i >= 0; i--) {
+            var b = this.bobler[i];
+            b.h += b.fart * dt;
+            b.r += dt * 1.5;
+            if (b.h > top) this.bobler.splice(i, 1);
+        }
+
+        var z = this.zoom;
+        if (koger && z && Math.random() < dt * 1.6 * styrke) {
+            this.lupBobler.push({
+                x: z.x + z.b * (0.1 + Math.random() * 0.8), y: this.gulv - 10,
+                r: this.celle * (0.25 + Math.random() * 0.35), fart: 120 + Math.random() * 80, fase: Math.random() * 6
+            });
+        }
+        for (i = this.lupBobler.length - 1; i >= 0; i--) {
+            var lb = this.lupBobler[i];
+            lb.y -= lb.fart * dt;
+            lb.r += dt * 4;
+            lb.x += Math.sin(this.tid * 3 + lb.fase) * 12 * dt;
+            if (!z || lb.y < z.y - lb.r) this.lupBobler.splice(i, 1);
+        }
+
+        if (koger && Math.random() < dt * 8 * styrke) {
+            this.damp.push({ x: (Math.random() - 0.5) * 0.6, y: 0, r: 4 + Math.random() * 4, liv: 1 });
+        }
+        for (i = this.damp.length - 1; i >= 0; i--) {
+            var dp = this.damp[i];
+            dp.y += 34 * dt;
+            dp.r += 9 * dt;
+            dp.liv -= dt * 0.7;
+            if (dp.liv <= 0) this.damp.splice(i, 1);
+        }
+    };
+
     /* ----- Hjaelp til opgaverne ---------------------------------------------- */
     /* Lader tiden gaa uden at tegne, til betingelsen er opfyldt. */
     P.spolFrem = function (betingelse, maksSek) {
@@ -807,6 +1103,22 @@
             if (betingelse()) return true;
         }
         return false;
+    };
+
+    /* Hold, der er i gang ved krystallen, giver slip igen. Bruges, naar
+       opgaven "find fejlen" vil have et roligt billede. */
+    P.slipHold = function () {
+        var mig = this;
+        this.ioner.forEach(function (o) {
+            if (o.tilstand === "fast" && o.reserveret > 0) {
+                o.reserveret = 0;
+                o.baerere = [];
+                mig.paabegyndt = Math.max(0, mig.paabegyndt - 1);
+            }
+        });
+        this.vand.forEach(function (v) {
+            if (v.tilstand === "soeger" || v.tilstand === "fast") mig.sendVaek(v);
+        });
     };
 
     /* Vender ét molekyle i en vandskal forkert. */
@@ -830,12 +1142,12 @@
     };
 
     /* Det vandmolekyle, der ligger under et klik: i en vandskal eller et
-       af arbejdsmolekylerne. */
+       af de synlige arbejdsmolekyler. */
     P.vandVed = function (x, y) {
         var bedst = null, bedstAfstand = Infinity, i, j;
         for (i = 0; i < this.ioner.length; i++) {
             var o = this.ioner[i];
-            if (!o.skal || (o.tilstand !== "fri" && o.tilstand !== "ud") || o.alpha < 0.5) continue;
+            if (!o.skal || (o.tilstand !== "fri" && o.tilstand !== "ud" && o.tilstand !== "paavej") || o.alpha < 0.5) continue;
             var r = this.ionRadius(o);
             for (j = 0; j < o.skal.length; j++) {
                 var s = o.skal[j];
@@ -846,6 +1158,7 @@
         }
         for (i = 0; i < this.vand.length; i++) {
             var v = this.vand[i];
+            if (v.fade < 0.5) continue;
             var dv = Math.hypot(v.x - x, v.y - y);
             if (dv < 20 * this.vandSkala && dv < bedstAfstand) { bedstAfstand = dv; bedst = { vand: v }; }
         }
@@ -895,6 +1208,8 @@
 
     P.statusTekst = function (tung) {
         if (this.pause) return "Billedet står stille, mens du leder.";
+        if (this.overkogStart !== null) return "Opløsningen koger over.";
+        if (this.tempValg.id === "max" && this.kogeTid > 2) return "Vandet koger.";
         if (this.tilbage() === 0) return "Alt saltet er opløst.";
         if (this.frie >= this.maxFrie()) {
             return tung
@@ -928,11 +1243,12 @@
             this.tegnMakro(ctx, salt);
         }
         this.tegnLup(ctx);
+        if (this.laererTegnOver) this.laererTegnOver(ctx);
     };
 
     /* Det, lupen viser: vand, krystalstykker, ioner og vandmolekyler. */
     P.tegnLupbillede = function (ctx, salt) {
-        var z = this.zoom, vs = this.vandSkala, i, j;
+        var z = this.zoom, vs = this.vandSkala, mig = this, i;
 
         ctx.save();
         NK.rundtRekt(ctx, z.x, z.y, z.b, z.h, 16);
@@ -960,10 +1276,37 @@
         ctx.lineTo(z.x + z.b, this.gulv);
         ctx.stroke();
 
-        /* Baggrundsvand - antyder de mange molekyler, der ikke er tegnet */
+        /* Baggrundsvand - antyder de mange molekyler, der ikke er tegnet. Det
+           toner vaek, hvor der ligger ioner eller andre vandmolekyler. */
+        var hind = [];
+        this.ioner.forEach(function (o) {
+            if (o.tilstand === "fast") hind.push({ x: o.x, y: o.y, r: mig.celle * 0.75 });
+            else if (o.skal && o.tilstand !== "vaek") hind.push({ x: o.x, y: o.y, r: mig.skalRadius(o) });
+        });
+        this.vand.forEach(function (w) { if (w.fade > 0.2) hind.push({ x: w.x, y: w.y, r: 24 * vs }); });
         for (i = 0; i < this.baggrund.length; i++) {
             var g = this.baggrund[i];
-            T.vand(ctx, z.x + g.x * z.b, z.y + g.y * z.h, g.vinkel, vs * g.skala, { alpha: 0.16 });
+            var gx = z.x + g.x * z.b, gy = z.y + g.y * z.h, a = 1;
+            for (var h = 0; h < hind.length && a > 0; h++) {
+                var afst = Math.hypot(gx - hind[h].x, gy - hind[h].y) - hind[h].r;
+                if (afst < 18 * vs) a = Math.min(a, Math.max(0, afst / (18 * vs)));
+            }
+            if (a > 0.02) T.vand(ctx, gx, gy, g.vinkel, vs * g.skala, { alpha: 0.16 * a });
+        }
+
+        /* Dampbobler, naar vandet koger */
+        if (this.lupBobler.length) {
+            ctx.save();
+            ctx.strokeStyle = "rgba(225, 238, 250, 0.5)";
+            ctx.fillStyle = "rgba(225, 238, 250, 0.07)";
+            ctx.lineWidth = 2;
+            this.lupBobler.forEach(function (b) {
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            });
+            ctx.restore();
         }
 
         /* Krystalstykkerne */
@@ -979,22 +1322,13 @@
         /* De frie ioner med deres vandskal */
         for (i = 0; i < this.ioner.length; i++) {
             var f = this.ioner[i];
-            if ((f.tilstand !== "fri" && f.tilstand !== "ud") || !f.skal) continue;
-            var r = this.ionRadius(f);
-            for (j = 0; j < f.skal.length; j++) {
-                var s = f.skal[j];
-                T.skalVand(ctx, f.x, f.y, r, s.vinkel + f.skalfase, vs, f.ion.q > 0, {
-                    alpha: 0.95 * f.alpha,
-                    forkert: s.forkert,
-                    ring: s.ring
-                });
-            }
-            T.ion(ctx, f.x, f.y, f.ion, r, { alpha: f.alpha });
+            if (f.tilstand === "fri" || f.tilstand === "ud") this.tegnHydratiseret(ctx, f, false);
         }
 
         /* Arbejdsmolekylerne */
         for (i = 0; i < this.vand.length; i++) {
             var v = this.vand[i];
+            if (v.fade < 0.02) continue;
             var arbejder = v.tilstand === "soeger" || v.tilstand === "fast";
             T.vand(ctx, v.x, v.y, v.vinkel, vs, {
                 delta: this.visDelta,
@@ -1005,9 +1339,7 @@
 
         /* Ioner paa vej ud tegnes oeverst */
         for (i = 0; i < this.ioner.length; i++) {
-            var pv = this.ioner[i];
-            if (pv.tilstand !== "paavej") continue;
-            T.ion(ctx, pv.x, pv.y, pv.ion, this.ionRadius(pv), { fremhaev: true });
+            if (this.ioner[i].tilstand === "paavej") this.tegnHydratiseret(ctx, this.ioner[i], true);
         }
         ctx.restore();
 
@@ -1019,6 +1351,22 @@
         ctx.restore();
 
         this.tegnUr(ctx);
+    };
+
+    /* En ion med sin vandskal. */
+    P.tegnHydratiseret = function (ctx, f, fremhaev) {
+        var r = this.ionRadius(f);
+        if (f.skal) {
+            for (var j = 0; j < f.skal.length; j++) {
+                var s = f.skal[j];
+                T.skalVand(ctx, f.x, f.y, r, s.vinkel + f.skalfase, this.vandSkala, f.ion.q > 0, {
+                    alpha: 0.95 * f.alpha,
+                    forkert: s.forkert,
+                    ring: s.ring
+                });
+            }
+        }
+        T.ion(ctx, f.x, f.y, f.ion, r, { alpha: f.alpha, fremhaev: fremhaev });
     };
 
     P.tegnKnaek = function (ctx) {
@@ -1044,33 +1392,103 @@
         ctx.restore();
     };
 
-    /* Et lille ur, der viser, hvor lang tid opløsningen har taget. */
+    /* Uret, der viser, hvor lang tid opløsningen har taget. Under opgaven
+       "hurtigst" er det stort og staar oeverst i midten af lupen. */
     P.tegnUr = function (ctx) {
         var z = this.zoom;
         var stoppet = this.slutTid !== null;
-        var tekst = "Tid: " + Math.floor(stoppet ? this.slutTid : this.tid) + " s";
-        var b = 92, h = 28, x = z.x + z.b - b - 12, y = z.y + 12;
+        var sek = stoppet ? this.slutTid : this.uret;
+        var opg = this.opgaver && this.opgaver.igang() ? this.opgaver.opgave : null;
+
+        if (opg && opg.stortUr) {
+            var b = 236, h = 72, x = z.x + (z.b - b) / 2, y = z.y + 14;
+            if (this.bred) {
+                /* Over baegerglasset, hvor det ikke skjuler noget i lupen */
+                var mk = this.makro;
+                x = Math.max(8, mk.x + mk.bw / 2 - b / 2);
+                y = Math.max(8, mk.termoY - h - 26);
+            }
+            var over = sek > GRAENSE_SEK;
+            var farve = over ? "#f0918a" : (stoppet ? "#7ee0a8" : "#ffffff");
+            ctx.save();
+            ctx.fillStyle = "rgba(10, 14, 20, 0.85)";
+            NK.rundtRekt(ctx, x, y, b, h, 12);
+            ctx.fill();
+            ctx.strokeStyle = "rgba(242, 197, 61, 0.9)";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            /* Et stopur med en viser, der gaar én omgang i minuttet */
+            var cx = x + 40, cy = y + h / 2 + 3, r = 21;
+            ctx.strokeStyle = "#e9eef4";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.fillStyle = "#e9eef4";
+            ctx.fillRect(cx - 4, cy - r - 8, 8, 5);
+            var v = (sek % 60) / 60 * Math.PI * 2;
+            ctx.strokeStyle = farve;
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = "round";
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(cx + Math.sin(v) * r * 0.75, cy - Math.cos(v) * r * 0.75);
+            ctx.stroke();
+            ctx.restore();
+
+            NK.tekst(ctx, NK.tal(sek, 1) + " s", x + 76, y + 32, {
+                linje: "middle", farve: farve, font: "700 28px 'Segoe UI', sans-serif"
+            });
+            NK.tekst(ctx, "mål: under " + GRAENSE_SEK + " s", x + 78, y + h - 13, {
+                linje: "middle", farve: "rgba(200, 212, 226, 0.8)", font: "600 12.5px 'Segoe UI', sans-serif"
+            });
+            return;
+        }
+
+        var tekst = "Tid: " + Math.floor(sek) + " s";
+        var bb = 100, hh = 30, xx = z.x + z.b - bb - 12, yy = z.y + 12;
         ctx.save();
         ctx.fillStyle = "rgba(10, 14, 20, 0.72)";
-        NK.rundtRekt(ctx, x, y, b, h, 7);
+        NK.rundtRekt(ctx, xx, yy, bb, hh, 7);
         ctx.fill();
         ctx.restore();
-        NK.tekst(ctx, tekst, x + b / 2, y + h / 2 + 1, {
+        NK.tekst(ctx, tekst, xx + bb / 2, yy + hh / 2 + 1, {
             justering: "center", linje: "middle",
-            farve: stoppet ? "#7ee0a8" : "#e9eef4", font: "600 13px 'Segoe UI', sans-serif"
+            farve: stoppet ? "#7ee0a8" : "#e9eef4", font: "600 14px 'Segoe UI', sans-serif"
         });
     };
 
     /* Glasset, som man ville se det paa bordet. */
     P.tegnMakro = function (ctx, salt) {
-        var m = this.makro;
-        var gloed = NK.klamp((this.tempValg.temp - 25) / 60, 0, 1);
-        T.varmeplade(ctx, m.pladeX, m.pladeY, m.pladeB, gloed, this.omroering);
+        var m = this.makro, tv = temperatur(this.tempValg.id);
+        var max = tv.id === "max";
+        var gloed = max ? 0.9 + 0.1 * Math.sin(this.tid * 9) : (tv.gloed || 0);
+
+        T.varmeplade(ctx, m.pladeX, m.pladeY, m.pladeB, gloed, this.omroering, {
+            varmeVinkel: this.knapVarme, roerVinkel: this.knapRoer, hover: this.hover
+        });
+
+        /* Knappernes navne */
+        var kv = T.pladeKnap(m.pladeX, m.pladeY, m.pladeB, "varme");
+        var kr = T.pladeKnap(m.pladeX, m.pladeY, m.pladeB, "roer");
+        var ly = m.pladeY + m.pladeH + 15;
+        NK.tekst(ctx, max ? "varme: max" : "varme", kv.x, ly, {
+            justering: "center", font: "600 12px 'Segoe UI', sans-serif",
+            farve: max ? "#ff8a5c" : "rgba(200, 212, 226, 0.75)"
+        });
+        NK.tekst(ctx, "omrøring", kr.x, ly, {
+            justering: "center", font: "600 12px 'Segoe UI', sans-serif", farve: "rgba(200, 212, 226, 0.75)"
+        });
 
         var x0 = m.glasX, x1 = m.glasX + m.glasB;
+        var overflade = m.overflade + this.vandTab * 1.2 * m.s;
+        var rand = m.y + 10 * m.s;
+        var koger = max && this.kogeTid > 2;
+
         ctx.save();
-        T.vandSti(ctx, x0, x1, m.overflade, m.bund, 7 * m.s);
-        var v = ctx.createLinearGradient(0, m.overflade, 0, m.bund);
+        T.vandSti(ctx, x0, x1, overflade, m.bund, 7 * m.s);
+        var v = ctx.createLinearGradient(0, overflade, 0, m.bund);
         v.addColorStop(0, "rgba(58, 110, 150, 0.34)");
         v.addColorStop(1, "rgba(30, 66, 96, 0.52)");
         ctx.fillStyle = v;
@@ -1084,14 +1502,14 @@
         ctx.clip();
 
         /* Isterninger i det kolde vand */
-        if (this.tempValg.id === "kold") {
+        if (tv.id === "kold") {
             ctx.fillStyle = "rgba(225, 242, 255, 0.55)";
             ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
             ctx.lineWidth = 1;
             var terning = 16 * m.s;
             [[0.34, -0.2], [0.52, 0.1]].forEach(function (p, i) {
                 ctx.save();
-                ctx.translate(x0 + m.glasB * p[0], m.overflade + terning * 0.35);
+                ctx.translate(x0 + m.glasB * p[0], overflade + terning * 0.35);
                 ctx.rotate(p[1] + i * 0.3);
                 NK.rundtRekt(ctx, -terning / 2, -terning / 2, terning, terning, 3);
                 ctx.fill();
@@ -1109,19 +1527,111 @@
         ctx.fillStyle = "#f2f4f7";
         NK.rundtRekt(ctx, m.roerX - lang * synlig / 2, m.bund - tyk - 1, lang * synlig, tyk, tyk / 2);
         ctx.fill();
+
+        /* Bobler, naar vandet koger */
+        if (this.bobler.length) {
+            ctx.strokeStyle = "rgba(235, 245, 255, 0.75)";
+            ctx.lineWidth = 1;
+            this.bobler.forEach(function (b) {
+                ctx.beginPath();
+                ctx.arc(x0 + b.u * m.glasB, m.bund - b.h * m.s, b.r * m.s * 1.2, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+        }
         ctx.restore();
 
+        /* Overfladen - urolig, naar vandet koger */
         ctx.save();
         ctx.strokeStyle = "rgba(180, 220, 250, 0.6)";
         ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.moveTo(x0, m.overflade);
-        ctx.lineTo(x1, m.overflade);
+        for (var i = 0; i <= 24; i++) {
+            var sx = x0 + m.glasB * i / 24;
+            var sy = overflade + (koger ? Math.sin(this.tid * 11 + i * 1.7) * 1.6 * m.s : 0);
+            if (i === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
+        }
         ctx.stroke();
         ctx.restore();
 
         T.termometer(ctx, m.termoX, m.termoY, m.termoB, this.tempValg.temp);
         S.tegn(ctx, "baegerglas", m.x, m.y, m.bw);
+
+        this.tegnOverkog(ctx, m, x0, overflade, rand);
+    };
+
+    /* Skum, der vaelter ud over kanten, stroemme ned ad glasset, spild paa
+       pladen og damp. */
+    P.tegnOverkog = function (ctx, m, x0, overflade, rand) {
+        var i;
+        if (this.spild > 0.01) {
+            ctx.save();
+            var cx = m.x + m.bw / 2, py = m.pladeY + 2 * m.s;
+            var rx = m.pladeB * (0.3 + 0.35 * this.spild), ry = (2.5 + 3.5 * this.spild) * m.s;
+            ctx.globalAlpha = NK.klamp(this.spild * 4, 0, 0.8);
+            ctx.fillStyle = "rgba(170, 210, 240, 0.8)";
+            ctx.beginPath();
+            ctx.ellipse(cx, py, rx, ry, 0, 0, Math.PI * 2);
+            ctx.fill();
+            if (rx > m.pladeB * 0.5) {
+                var drypH = m.pladeH * NK.klamp((rx - m.pladeB * 0.5) / (m.pladeB * 0.15), 0, 1);
+                var tykD = Math.max(2, 3 * m.s);
+                NK.rundtRekt(ctx, m.pladeX - tykD / 2, py, tykD, drypH, tykD / 2);
+                ctx.fill();
+                NK.rundtRekt(ctx, m.pladeX + m.pladeB - tykD / 2, py, tykD, drypH, tykD / 2);
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        if (this.overkog > 0.02) {
+            var skumTop = overflade - this.overkog * (overflade - rand + 14 * m.s);
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(x0 - 6 * m.s, skumTop - 20 * m.s, m.glasB + 12 * m.s, overflade - skumTop + 20 * m.s);
+            ctx.clip();
+            for (i = 0; i < 46; i++) {
+                var u = frac(Math.sin(i * 12.9898) * 43758.5453);
+                var w = frac(Math.sin(i * 78.233) * 12345.6789);
+                var r = (3 + 4 * frac(i * 0.618)) * m.s * 1.2;
+                var bx = x0 + u * m.glasB + (skumTop < rand ? (u - 0.5) * 10 * m.s * this.overkog : 0);
+                var by = skumTop + w * (overflade - skumTop) + Math.sin(this.tid * 6 + i) * 1.5 * m.s;
+                ctx.fillStyle = "rgba(240, 246, 252, 0.88)";
+                ctx.beginPath();
+                ctx.arc(bx, by, r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = "rgba(160, 185, 205, 0.55)";
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+            ctx.restore();
+
+            var a = NK.klamp((this.overkog - 0.75) / 0.25, 0, 1);
+            if (a > 0) {
+                ctx.save();
+                ctx.globalAlpha = a * 0.8;
+                ctx.fillStyle = "rgba(200, 228, 248, 0.9)";
+                var tyk = Math.max(3, 5 * m.s);
+                var tilY = m.pladeY + 2 * m.s;
+                NK.rundtRekt(ctx, m.x + 15 * m.s - tyk, rand, tyk, tilY - rand, tyk / 2);
+                ctx.fill();
+                NK.rundtRekt(ctx, m.x + 185 * m.s, rand + 8 * m.s, tyk, tilY - rand - 8 * m.s, tyk / 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        if (this.damp.length) {
+            ctx.save();
+            var mx = m.x + m.bw / 2;
+            this.damp.forEach(function (d) {
+                ctx.globalAlpha = 0.28 * d.liv;
+                ctx.fillStyle = "#f2f5f8";
+                ctx.beginPath();
+                ctx.arc(mx + d.x * m.glasB, rand - 6 - d.y, d.r * m.s * 1.2, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.restore();
+        }
     };
 
     /* Saltkornet i glasset: ét korn pr. stykke af krystallen, og hvert
@@ -1173,10 +1683,16 @@
         ctx.restore();
     };
 
+    /* Lupen er drejet, saa skaftet peger op mod hoejre - vaek fra
+       knapperne paa varmepladen. */
     P.tegnLup = function (ctx) {
         var m = this.makro, ML = S.MAAL.lup;
-        var b = m.lupR * ML.b / ML.linseR;
-        S.tegn(ctx, "lup", m.lupX - ML.linseX * b / ML.b, m.lupY - ML.linseY * b / ML.b, b);
+        var b = m.lupR * ML.b / ML.linseR, k = b / ML.b;
+        ctx.save();
+        ctx.translate(m.lupX, m.lupY);
+        ctx.rotate(-Math.PI / 2);
+        S.tegn(ctx, "lup", -ML.linseX * k, -ML.linseY * k, b);
+        ctx.restore();
     };
 
     /* ----- Opgaverne ------------------------------------------------------------ */
@@ -1192,13 +1708,15 @@
                 sim.nulstil();
                 sim.spolFrem(function () { return sim.synligeFrie() >= 3; }, 240);
                 sim.spolFrem(function () { return false; }, 2.5);   /* lad vandskallerne lukke sig */
-                /* Start ikke paa flere ioner, og vent, til ingen er midt paa vej
-                   ud, og de nyeste har naaet at glide fri af de andre. */
+                /* Start ikke paa flere ioner, lad de hold, der er i gang, give
+                   slip, og vent, til ingen ion er midt paa vej ud, og de
+                   nyeste har naaet at glide fri af de andre. */
                 sim.hvil = true;
+                sim.slipHold();
                 sim.spolFrem(function () {
                     return sim.ioner.every(function (ion) {
                         return ion.tilstand !== "paavej" && !(ion.tilstand === "fri" && ion.alder < 1.2);
-                    });
+                    }) && sim.vand.every(function (v) { return v.fade < 0.05; });
                 }, 10);
                 fejl = sim.vaelgFejl();
                 sim.pause = true;
@@ -1248,7 +1766,9 @@
 
     function opgHurtigst() {
         return {
-            tekst: "Få hele NaCl-krystallen opløst på under " + GRAENSE_SEK + " sekunder. Uret i lupen er startet.",
+            tekst: "Opløs hele NaCl-krystallen på under " + GRAENSE_SEK + " sekunder. Uret starter forfra, " +
+                   "når du trykker på Ny krystal.",
+            stortUr: true,
             hint: "To af indstillingerne under Forsøget kan gøre det hurtigere.",
             svar: "Varmt vand og omrøring. Varmen gør vandmolekylerne hurtigere, og omrøringen knuser krystallen, " +
                   "så flere kan tage fat på én gang.",
@@ -1279,7 +1799,8 @@
                    "Der går færre ioner i opløsning"],
             rigtig: 1,
             hint: "Prøv det: slå omrøring til, og tæl de frie ioner i lupen.",
-            svar: "Omrøringen knuser krystallen, så det går hurtigere. Men vandet kan stadig kun rumme nogle få ioner.",
+            svar: "Omrøringen knuser krystallen, så opløsningen hurtigere bliver mættet. " +
+                  "Men det ændrer ikke på, at AgCl er meget tungtopløseligt.",
             start: function (sim) {
                 NK.Valg.saet("AgCl");
                 sim.saetOmroering(false);

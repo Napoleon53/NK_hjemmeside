@@ -368,11 +368,6 @@
             this.aendret("tot");
             return true;
         }
-        if (m < M.AFVEJ.min) {
-            this.besked("Vægten skal vise ca. 0,1 g. Læg mere ståluld i.");
-            this.markér("staaluld", 3);
-            return false;
-        }
         this.overfoerTilKolbe(m);
         return true;
     };

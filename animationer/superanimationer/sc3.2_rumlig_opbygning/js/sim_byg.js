@@ -323,7 +323,10 @@
             k.disabled = grund !== true;
             k.title = grund === true ? D.GRUNDSTOFFER[k.getAttribute("data-el")].navn : grund;
         });
-        NK.saetTekst("byg-valgt", !s.atomer.length ? "vælg det første atom" : valgt ? "sættes på " + valgt.el : "klik på et atom");
+        NK.saetTekst("byg-valgt", !s.atomer.length ? "vælg det første atom"
+            : !valgt ? "klik på et atom"
+            : B.fri(s, valgt.id) > 0 ? "sættes på " + valgt.el
+            : valgt.el + " har ikke plads til flere");
         NK.el("byg-fjern").disabled = !valgt;
 
         var html = "";

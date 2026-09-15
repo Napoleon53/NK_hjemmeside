@@ -271,8 +271,16 @@
             var a = atomer[i];
             var p = foraelder[i];
             var grupper = [];
+            /* Raekkefoelgen er valgt, saa et nyt atom overtager pladsen fra det
+               H, det erstatter: forfaelderen, H'erne, de tunge naboer med de
+               nyeste foerst og til sidst de frie par. */
             if (p >= 0) grupper.push({ type: "binding", til: p, fast: true });
-            a.naboer.forEach(function (nb) { if (nb.atom !== p) grupper.push({ type: "binding", til: nb.atom }); });
+            a.naboer.forEach(function (nb) {
+                if (nb.atom !== p && atomer[nb.atom].el === "H") grupper.push({ type: "binding", til: nb.atom });
+            });
+            a.naboer.filter(function (nb) { return nb.atom !== p && atomer[nb.atom].el !== "H"; })
+                .sort(function (x, y) { return atomer[y.atom].id - atomer[x.atom].id; })
+                .forEach(function (nb) { grupper.push({ type: "binding", til: nb.atom }); });
             for (var k = 0; k < a.frie; k++) grupper.push({ type: "fri", til: null });
 
             var drej = opTil(p >= 0 ? V.enhed(V.minus(P[p], P[i])) : [0, 1, 0]);
