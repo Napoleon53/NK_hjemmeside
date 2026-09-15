@@ -76,6 +76,7 @@
         var mig = this;
         var L = this.laerer;
         if (!L) return;
+        if (slags === "knust") return this.laererKnust(gg);
         L.scene = null;
         this.uheldTal = this.uheldTal || {};
         this.uheldTal[slags] = (this.uheldTal[slags] || 0) + 1;
@@ -100,6 +101,48 @@
             { arm: HAENGER, tid: 0.4 }
         ].concat(K.uheld(), [
             { gaa: UDE }
+        ]));
+    };
+
+    /* ----- Uheld: et glas er knust, han fejer og henter et nyt ------------- */
+    var KNUST = ["Det var et glas. Nu er det affald.", "Glas er skrøbeligt. Det står i navnet.", "Tredje glas. Jeg har en kasse til det."];
+
+    P.laererKnust = function (gg) {
+        var L = this.laerer;
+        L.scene = null;
+        this.uheldTal = this.uheldTal || {};
+        this.uheldTal.knust = (this.uheldTal.knust || 0) + 1;
+        var replik = KNUST[Math.min(this.uheldTal.knust, KNUST.length) - 1];
+        var sx = 0;
+        this.skaar.forEach(function (s) { sx += s.x; });
+        sx = this.skaar.length ? sx / this.skaar.length : gg.p.x;
+        var x = NK.klamp(sx - 150, 60, NK.Scene.BREDDE - 260);
+        this.laererKoer("spild", [
+            { tid: 0.5 },
+            { udtryk: { vrede: 0.9, humoer: -0.9, roed: 0.3, briller: 1 } },
+            { gaa: x },
+            K.suk(1.2),
+            { sig: replik, vis: 2.4, tid: 0.3 },
+            { udtryk: { briller: 0 } },
+            { kald: function () { this.laerer.baerer = "kost"; } },
+            { arm: 2.0, tid: 0.5 },
+            { tid: 2.4, hver: function (t) {
+                this.laerer.arm = 2.0 + Math.sin(t * Math.PI * 6) * 0.25;
+                var maalX = this.laerer.x + 70;
+                this.skaar.forEach(function (s) {
+                    s.hvile = true;
+                    s.x = NK.lerp(s.x, maalX, 0.06);
+                    s.alfa = Math.min(s.alfa, 1.3 - t * 1.3);
+                });
+                this.pytter.forEach(function (p) { p.vaad = Math.min(p.vaad, 1 - t); });
+                if (t >= 0.99) { this.skaar = []; this.pytter = []; }
+            } },
+            { kald: function () { this.laerer.baerer = null; } },
+            { arm: HAENGER, tid: 0.4 },
+            sig("Jeg henter et nyt.")
+        ].concat(K.uheld(), [
+            { gaa: UDE },
+            { kald: function () { this.genopstil(gg); if (NK.Lyd && NK.Lyd.dunk) NK.Lyd.dunk(); } }
         ]));
     };
 
@@ -136,6 +179,8 @@
     P.tegnBaaretEkstra = function (ctx, L, hd) {
         if (L.baerer === "papir") {
             NK.Sprites.tegnPositur(ctx, "koekkenrulle", { x: hd.x + 6, y: hd.y + 8, v: 0.2 }, { x: 36, y: 22 });
+        } else if (L.baerer === "kost") {
+            NK.Sprites.tegnPositur(ctx, "kost", { x: hd.x, y: hd.y, v: -0.8 + (L.arm - 2.0) * 0.8 }, { x: 120, y: 17 });
         }
     };
 }());

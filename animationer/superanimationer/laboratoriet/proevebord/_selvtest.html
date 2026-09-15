@@ -215,7 +215,32 @@ function koerTest() {
     paastand("glasset er sluppet", !bord.baerer && !bord.holdt);
     vent(function () { return !bord.laerer.scene; }, 30);
 
-    overskrift("8. Affald og start forfra");
+    overskrift("8. Knust glas");
+    frisk();
+    var uheldK = bord.antalUheld;
+    bord.haeld(g.fl_cu, g.baeger250, 20); faerdig();
+    traek(g.baeger250, { x: 400, y: 560 });
+    faerdig();
+    paastand("et glas sluppet foran bordkanten falder paa gulvet og knuses", g.baeger250.skjult && g.baeger250.knust && bord.skaar.length > 0 && bord.antalUheld === uheldK + 1, "skaar " + bord.skaar.length + ", uheld " + bord.antalUheld);
+    paastand("indholdet loeb ud paa gulvet", bord.pytter.some(function (p) { return p.y !== undefined && p.y > 550; }));
+    paastand("laereren kommer med kosten", !!(bord.laerer.scene), bord.laerer.scene ? bord.laerer.scene.navn : "ingen");
+    vent(function () { return !bord.laerer.scene && !bord.koer.igang(); }, 40);
+    paastand("skaarene er fejet op", bord.skaar.length === 0 && bord.pytter.length === 0, "skaar " + bord.skaar.length);
+    g = bord.g;
+    paastand("et nyt, tomt baegerglas staar paa sin plads", !!g.baeger250 && !g.baeger250.skjult && V(g.baeger250) < 0.01 && bord.staarPaaBord(g.baeger250) && Math.abs(g.baeger250.p.x - 170 + 56 - 56) < 60, g.baeger250 ? g.baeger250.p.x.toFixed(0) : "mangler");
+    bord.startBaer(g.glas4);
+    bord.vold = 5000; bord.musFart = 5000;
+    adv(0.6);
+    paastand("ekstrem rystning knuser et tomt glas i haanden", g.glas4.knust && bord.antalUheld === uheldK + 2 && bord.skaar.length > 0, "uheld " + bord.antalUheld);
+    vent(function () { return !bord.laerer.scene && !bord.koer.igang(); }, 40);
+    g = bord.g;
+    paastand("glas 4 er tilbage i stativet", !!g.glas4 && !g.glas4.skjult && g.glas4.sted && g.glas4.sted.hul === 6, g.glas4 && g.glas4.sted ? "hul " + g.glas4.sted.hul : "ingen plads");
+    traek(g.vand, { x: 300, y: 560 });
+    faerdig();
+    paastand("sproejteflasken falder paa gulvet uden at gaa i stykker", !g.vand.skjult && !g.vand.knust && bord.fod(g.vand).y > 560, "fod " + bord.fod(g.vand).y.toFixed(0));
+    paastand("den kan tages op igen", bord.grebbar("vand"));
+
+    overskrift("9. Affald og start forfra");
     frisk();
     bord.haeld(g.fl_cu, g.baeger250, 25); faerdig();
     paastand("baegerglasset toemmes i affaldsdunken", bord.toemI(g.baeger250, g.dunk));

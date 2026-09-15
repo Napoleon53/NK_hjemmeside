@@ -71,7 +71,10 @@ over noget andet, afgør egenskaberne, hvad der sker (`NK.Bord.prototype.moede`)
 
 Frihed frem for afvisning: rystes et åbent glas voldsomt, skvulper det ud;
 løber et glas over, bliver der en pyt; sættes et reagensglas på bordet,
-vælter det. Kemichael kommer og tørrer op (`proevebord/js/laerer.js`).
+vælter det; slippes noget foran bordkanten, falder det på gulvet, og glas
+knuses (`type.glas`); rystes et glas ekstremt voldsomt, knuses det i hånden.
+Kemichael kommer og tørrer op eller fejer og henter et nyt
+(`proevebord/js/laerer.js`, `NK.Bord.prototype.genopstil`).
 
 Klik viser, træk gør: et klik vælger det, der rummer noget, til aflæsning
 og zoom, og handlinger sker kun ved at trække. Undtagelser er kontakten på

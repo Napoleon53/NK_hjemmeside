@@ -237,6 +237,13 @@
     });
     NK.Sprites.tilfoej("haand", { fil: "haand.svg", b: 96, h: 84 });
     NK.Sprites.tilfoej("lup", { fil: "lup.svg", b: 40, h: 40 });
+    /* Kost og fejeblad til laereren, naar et glas er knust */
+    NK.Sprites.tilfoej("kost", { fil: "kost.svg", b: 130, h: 56 });
+    NK.Sprites.tilfoej("fejeblad", { fil: "fejeblad.svg", b: 120, h: 54 });
+
+    /* Det, der er af glas, knuses, hvis det tabes paa gulvet eller
+       rystes ekstremt voldsomt */
+    ["reagensglas", "baeger100", "baeger250", "kolbe", "maaleglas", "flaske", "glasstav", "termometer"].forEach(function (n) { TYPER[n].glas = true; });
 
     NK.Udstyr = {
         TYPER: TYPER,
