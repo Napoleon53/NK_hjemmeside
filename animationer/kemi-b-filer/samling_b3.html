@@ -279,6 +279,10 @@
         }
         .gendan-knap:hover { background-color: rgba(52, 152, 219, 0.9); }
         .content-area.fuld .gendan-knap { display: flex; }
+
+        /* Fuld skaerm kan vaelges for enhver animation med knappen i hovedet */
+        .fuld-btn { font-size: 20px; }
+        .sidebar.collapsed .header-actions .toggle-btn { padding: 3px; }
     </style>
 </head>
 <body>
@@ -290,6 +294,7 @@
                 <div class="header-actions">
                     <button class="toggle-btn link-btn" onclick="kopierLink(this)" title="Kopiér link til denne animation">🔗</button>
                     <button class="toggle-btn" onclick="toggleMenu()" title="Vis/Skjul menu">☰</button>
+                    <button class="toggle-btn fuld-btn" onclick="fuldSkaerm(true)" title="Fuld skærm: skjul panelet">⛶</button>
                 </div>
             </div>
 
