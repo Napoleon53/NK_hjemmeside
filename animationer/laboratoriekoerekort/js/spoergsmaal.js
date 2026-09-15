@@ -10,15 +10,15 @@
 window.SPOERGSMAAL = [
     {
         billede: "billeder/01_briller.svg",
-        alt: "Laboratoriebord med en flaske saltsyre og et bægerglas. Sikkerhedsbrillerne ligger på bordet, kitlen hænger på knagen, og på væggen hænger et påbudsskilt for øjenværn.",
-        spoergsmaal: "Du skal fortynde saltsyren. Hvad gør du, før du går i gang?",
+        alt: "En titreringsopstilling med en burette fyldt med natriumhydroxid i et stativ og en konisk kolbe under. Ved siden af står flasken med natriumhydroxid 0,1 M. Sikkerhedsbrillerne ligger på bordet, og på væggen hænger et påbudsskilt for øjenværn.",
+        spoergsmaal: "Du skal titrere med natriumhydroxid. Hvad gør du, før du går i gang?",
         svar: [
             { tekst: "Tager sikkerhedsbrillerne på.", rigtig: true },
-            { tekst: "Tager kitlen på.", rigtig: true },
             { tekst: "Skubber brillerne op i panden, så de er klar, hvis det går galt.", rigtig: false },
+            { tekst: "Ingenting. Opløsningen er kun 0,1 M.", rigtig: false },
             { tekst: "Kniber øjnene sammen. Det virker næsten lige så godt.", rigtig: false }
         ],
-        kommentar: "Briller i panden beskytter panden. Briller og kittel skal på, før flasken åbnes."
+        kommentar: "Briller i panden beskytter panden. Baser som natriumhydroxid er særligt skadelige for øjnene, også i fortyndet opløsning."
     },
     {
         billede: "billeder/02_haelder.svg",
@@ -44,40 +44,40 @@ window.SPOERGSMAAL = [
         kommentar: "Røgen er ammoniumchlorid, dannet af dampene fra de to åbne flasker. Et låg på den forkerte flaske forurener indholdet."
     },
     {
-        billede: "billeder/04_grib.svg",
-        alt: "En klassekammerat med brillerne i panden råber \"Grib!\" og har lige kastet en konisk kolbe med blå væske gennem lokalet. På væggen hænger et forbudsskilt mod at kaste.",
+        billede: "billeder/04_kedsomhed.svg",
+        alt: "En elev bag bordet venter på, at en filtrering bliver færdig, klikker med en lang lighter, så flammen står op, og spørger, hvor længe der er til frikvarter. Ved knagerækken tegner en anden elev med tusch på en af laboratoriekitlerne. På bordet i forgrunden står en slukket brænder og en kasse med lightere.",
         spoergsmaal: "Hvad skal du være særlig opmærksom på?",
         svar: [
-            { tekst: "Kolben kan knuse, og væsken kan sprøjte.", rigtig: true },
-            { tekst: "Der kastes ikke med ting i laboratoriet.", rigtig: true },
-            { tekst: "At gribe med begge hænder. Én hånd er for amatører.", rigtig: false },
-            { tekst: "At kaste noget tilbage, så det er fair.", rigtig: false }
+            { tekst: "Kitlerne er fælles og skal kunne bruges af de næste.", rigtig: true },
+            { tekst: "Lighterne er til at tænde brænderen med, ikke til at lege med.", rigtig: true },
+            { tekst: "Ingenting. En kittel med tegninger på er lettere at kende.", rigtig: false },
+            { tekst: "At der tegnes med vandfast tusch, så tegningen holder.", rigtig: false }
         ],
-        kommentar: "Glas flyver dårligt og lander værre. Ting bæres over, også når der kun er et par meter."
+        kommentar: "Tusch går ikke af kitlen igen, og en tom lighter opdages først, når næste hold skal tænde brænderen. Ventetid bruges på næste trin i øvelsen."
     },
     {
         billede: "billeder/05_uro.svg",
-        alt: "To elever leger fangeleg i gangen, og en højttaler spiller høj musik. På bordet i forgrunden koger vand over en tændt brænder. På væggen hænger et advarselsskilt for brandfare.",
+        alt: "To elever øver karatespark i gangen. Den ene sparker, og den anden vakler baglæns mod bordet ved væggen, hvor deres eget forsøg koger uden opsyn over en tændt brænder. På bordet i forgrunden koger vand over en tændt brænder, og på væggen hænger et advarselsskilt for brandfare.",
         spoergsmaal: "Hvad skal du være særlig opmærksom på?",
         svar: [
-            { tekst: "Der løbes tæt på en tændt brænder og kogende vand.", rigtig: true },
-            { tekst: "Musikken er så høj, at ingen kan høre en advarsel.", rigtig: true },
-            { tekst: "Ingenting. Fangeleg er god motion mellem to forsøg.", rigtig: false },
-            { tekst: "At skrue op, så musikken kan høres over brænderen.", rigtig: false }
+            { tekst: "Der sparkes tæt på tændte brændere og kogende vand.", rigtig: true },
+            { tekst: "Deres eget forsøg står uden opsyn.", rigtig: true },
+            { tekst: "Ingenting. Karate er god motion mellem to forsøg.", rigtig: false },
+            { tekst: "At de har sikkerhedsbriller på, mens de sparker.", rigtig: false }
         ],
-        kommentar: "Et laboratorium er ikke et frikvarter med gasbrændere. Man går roligt og taler, så en advarsel kan høres."
+        kommentar: "Et spark eller et skub ved siden af rammer bordet, brænderen eller glasset. Mens forsøget kører, følger man med i det."
     },
     {
         billede: "billeder/06_vask.svg",
-        alt: "En stor flaske natriumhydroxid og en lille flaske med tragt står på bordet. Der er spildt ved siden af flaskerne og på kladdehæftet. Til venstre er der en vask.",
-        spoergsmaal: "Du skal hælde fra den store flaske over i den lille. Hvor gør du det?",
+        alt: "En stor flaske natriumhydroxid står på bordet ved siden af et stativ med en burette, der har en tragt i toppen. Der er spildt ved foden af stativet og på kladdehæftet. Til venstre er der en vask.",
+        spoergsmaal: "Buretten skal fyldes fra den store flaske. Hvor gør du det?",
         svar: [
             { tekst: "Over vasken.", rigtig: true },
-            { tekst: "Der, hvor flaskerne står. Der er alligevel spildt i forvejen.", rigtig: false },
-            { tekst: "Ved siden af kladdehæftet, så jeg kan notere med det samme.", rigtig: false },
-            { tekst: "Over min sidekammerats forsøg. Der er bedst lys.", rigtig: false }
+            { tekst: "Ved stativet på bordet. Der er alligevel spildt i forvejen.", rigtig: false },
+            { tekst: "Ved siden af kladdehæftet, så jeg kan notere startaflæsningen med det samme.", rigtig: false },
+            { tekst: "Hvor som helst. Der er jo en tragt i buretten.", rigtig: false }
         ],
-        kommentar: "Spild over vasken skylles væk. Spild på bordet ender i hæftet, på ærmet eller i næste gruppes forsøg."
+        kommentar: "En burette løber let over, også med en tragt. Spild over vasken skylles væk, mens spild på bordet ender i hæftet eller på ærmet."
     },
     {
         billede: "billeder/07_ventetid.svg",
@@ -96,8 +96,7 @@ window.SPOERGSMAAL = [
         alt: "Et rodet laboratoriebord med et væltet bægerglas i en blå pøl, spildt pulver, brugte reagensglas, en handske og krøllede servietter. Uret på væggen ringer ud.",
         spoergsmaal: "Øvelsen er slut, og det ringer ud. Hvordan vil du fortsætte?",
         svar: [
-            { tekst: "Jeg vasker udstyret af og stiller det på plads.", rigtig: true },
-            { tekst: "Jeg tørrer bordet af.", rigtig: true },
+            { tekst: "Jeg skyller glassene, stiller dem i opvaskemaskinen og tørrer bordet af med papir.", rigtig: true },
             { tekst: "Jeg lader det stå. Så kan næste hold se, hvordan øvelsen ser ud.", rigtig: false },
             { tekst: "Jeg skubber det hele ind mod væggen, så bordet ser ryddeligt ud.", rigtig: false }
         ],
@@ -105,15 +104,15 @@ window.SPOERGSMAAL = [
     },
     {
         billede: "billeder/09_tilbage.svg",
-        alt: "En stamflaske med kobbersulfatopløsning har en tragt i halsen. Ved siden af står et bægerglas med for meget opløsning og en affaldsdunk til tungmetaller.",
-        spoergsmaal: "Du har hældt for meget kobbersulfatopløsning op. Hvordan vil du fortsætte?",
+        alt: "En stamflaske med kobber(II)sulfatopløsning har en tragt i halsen. Ved siden af står et bægerglas med en lille rest blå opløsning i bunden og en affaldsdunk til tungmetaller.",
+        spoergsmaal: "Der er en lille sjat kobber(II)sulfatopløsning tilbage i bægerglasset. Hvordan vil du fortsætte?",
         svar: [
             { tekst: "Jeg hælder resten i affaldsdunken.", rigtig: true },
             { tekst: "Jeg hælder resten tilbage i flasken. Det er jo det samme stof.", rigtig: false },
             { tekst: "Jeg hælder det i vasken. Det er kun en lille smule.", rigtig: false },
-            { tekst: "Jeg gemmer det i bægerglasset til næste hold.", rigtig: false }
+            { tekst: "Jeg lader det stå i bægerglasset. Der kommer nok nogen og rydder op.", rigtig: false }
         ],
-        kommentar: "Det, der har været ude af flasken, kan være forurenet, og hældes det tilbage, ødelægger det flasken for alle. Kobbersalte må ikke i vasken."
+        kommentar: "Kobbersalte må ikke i vasken, heller ikke en lille rest. Det, der har været ude af flasken, kan være forurenet og hældes ikke tilbage, og ingen ved, hvad et efterladt glas indeholder."
     },
     {
         billede: "billeder/10_hormoner.svg",
@@ -203,15 +202,15 @@ window.SPOERGSMAAL = [
     },
     {
         billede: "billeder/15_traengsel.svg",
-        alt: "Hele holdet står tæt samlet foran stinkskabet for at se et forsøg. En elev bagerst kan ikke se noget, en anden filmer med mobilen, og et bord i forgrunden står urydet.",
-        spoergsmaal: "Hele holdet vil se forsøget på én gang. Hvordan vil I fortsætte?",
+        alt: "Hele holdet trænger sig sammen ved vægtbordet for at se, mens én elev afvejer kobber(II)sulfat. Der er spildt blå krystaller omkring vægten, og en elev yderst med en vejebåd spørger: Må jeg komme til?",
+        spoergsmaal: "Din gruppe skal afveje kobber(II)sulfat, og alle vil med op og se. Hvordan vil I fortsætte?",
         svar: [
-            { tekst: "Vi skiftes til at se forsøget i mindre grupper.", rigtig: true },
-            { tekst: "Nogle rydder op, mens de andre ser forsøget.", rigtig: true },
-            { tekst: "Vi stiller os tættere, så de bagerste kan læne sig ind over de forreste.", rigtig: false },
-            { tekst: "De bagerste hopper, så de også kan se noget.", rigtig: false }
+            { tekst: "Gruppen sender én person op for at afveje.", rigtig: true },
+            { tekst: "Resten af gruppen gør klar ved bordet imens.", rigtig: true },
+            { tekst: "Hele gruppen går med, så flere kan kontrollere tallet på vægten.", rigtig: false },
+            { tekst: "Vi stiller os tæt bag den, der afvejer, så vi kan se over skulderen.", rigtig: false }
         ],
-        kommentar: "Femten albuer omkring ét stinkskab vælter glas, og den forreste kan ikke træde tilbage, hvis noget går galt. Del gruppen op, og brug ventetiden til oprydning."
+        kommentar: "Når hele holdet står om vægtbordet, bliver der skubbet til den, der afvejer, og stoffet ender ved siden af. Én fra hver gruppe afvejer, mens resten gør klar ved bordet."
     },
     {
         billede: "billeder/16_spild.svg",
@@ -228,25 +227,25 @@ window.SPOERGSMAAL = [
     {
         billede: "billeder/17_handsker.svg",
         alt: "Øvelsen er ikke gået i gang, og flaskerne er lukkede. Dine hænder har allerede handsker på og holder en mobil, og på bordet ligger en handske pustet op som en ballon med ansigt.",
-        spoergsmaal: "Øvelsen er ikke gået i gang endnu. Hvad skal du være særlig opmærksom på?",
+        spoergsmaal: "Øvelsen er ikke gået i gang endnu. Hvordan vil du fortsætte?",
         svar: [
-            { tekst: "Handskerne skal først på, når der skal arbejdes med kemikalierne.", rigtig: true },
-            { tekst: "Handsker er engangsudstyr, ikke balloner.", rigtig: true },
-            { tekst: "Ingenting. Med handsker på fra start er mobilen også beskyttet.", rigtig: false },
-            { tekst: "At ballonen får et navn, før den bliver sprængt.", rigtig: false }
+            { tekst: "Jeg venter med handskerne, til der skal arbejdes med kemikalierne.", rigtig: true },
+            { tekst: "Jeg læser vejledningen og koordinerer med mine klassekammerater, hvordan vi bedst kommer i gang.", rigtig: true },
+            { tekst: "Jeg beholder handskerne på. Så er mobilen også beskyttet.", rigtig: false },
+            { tekst: "Jeg giver ballonen et navn, før den bliver sprængt.", rigtig: false }
         ],
-        kommentar: "Handsker, der har rørt mobil, ansigt og dørhåndtag, flytter kemikalier rundt i stedet for at holde dem væk. Tag dem på, når de skal bruges, og smid dem ud bagefter."
+        kommentar: "Handsker, der har rørt mobil, ansigt og dørhåndtag, flytter kemikalier rundt i stedet for at holde dem væk. Tiden før øvelsen bruges på vejledningen og på at fordele opgaverne."
     },
     {
         billede: "billeder/18_hamstre.svg",
-        alt: "Et bord er fyldt med tre stablede vægte, en mur af bægerglas og et glas fuldt af spatler. Hylden til fælles udstyr er tom, og en anden gruppe spørger efter vægtene.",
+        alt: "Tre vægte står side om side på et gruppebord sammen med mange bægerglas og et glas fuldt af spatler. På vægtbordet ved væggen er der kun tomme pladser og løse ledninger, og en anden gruppe spørger efter vægtene.",
         spoergsmaal: "Hvad skal du være særlig opmærksom på?",
         svar: [
-            { tekst: "Vægtene er fælles og skal stå på hylden, når de ikke bruges.", rigtig: true },
+            { tekst: "Vægtene er fælles og skal blive på vægtbordet.", rigtig: true },
             { tekst: "Der skal kun hentes det udstyr, gruppen har brug for nu.", rigtig: true },
             { tekst: "Ingenting. Den, der kommer først, maler først.", rigtig: false },
-            { tekst: "At muren af bægerglas er høj nok til, at ingen kan se vægtene.", rigtig: false }
+            { tekst: "Ingenting. Vi har tre stoffer, der skal afvejes, så vi skal bruge alle tre.", rigtig: false }
         ],
-        kommentar: "Udstyr, der står ubrugt på ét bord, mangler på alle de andre. Fælles ting som vægten hentes, bruges og stilles tilbage."
+        kommentar: "Udstyr, der står ubrugt på ét bord, mangler på alle de andre. Vægtene bliver på vægtbordet, og stoffet tages med derhen."
     }
 ];

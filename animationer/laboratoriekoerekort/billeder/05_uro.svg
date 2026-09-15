@@ -87,10 +87,6 @@
   <g stroke="#b3bfbd" stroke-width="3"><path d="M200 430 V520 M500 430 V520 M800 430 V520 M1100 430 V520"/></g>
   <rect y="520" width="1200" height="90" fill="url(#gulv)"/>
   <use href="#opstilling" transform="translate(840 64) scale(0.48)"/>
-  <g transform="translate(900 356) rotate(-6)">
-    <rect x="0" y="0" width="120" height="44" rx="2" fill="#fbfaf5"/>
-    <path d="M14 14 h80 M14 28 h60" stroke="#b7bec4" stroke-width="4" stroke-linecap="round"/>
-  </g>
 
   <!-- Taleboble -->
   <g>
