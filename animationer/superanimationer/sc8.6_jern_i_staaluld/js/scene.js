@@ -781,6 +781,28 @@
         ctx.restore();
     };
 
+    /* Syre, der er loebet ud over vaegten: { x, rx, alfa } */
+    S.tegnSyrepyt = function (ctx, pyt) {
+        if (!pyt || pyt.alfa < 0.01) return;
+        var y = S.VAEGT.y + 1;
+        ctx.save();
+        ctx.globalAlpha = NK.klamp(pyt.alfa, 0, 1);
+        ctx.fillStyle = "rgba(205, 228, 240, 0.75)";
+        ctx.beginPath();
+        ctx.ellipse(pyt.x, y, pyt.rx, 4.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        /* Draaber, der loeber ned ad vaegtens forkant */
+        for (var i = 0; i < 4; i++) {
+            ctx.beginPath();
+            ctx.ellipse(pyt.x - pyt.rx * 0.8 + i * pyt.rx * 0.5, y + 8 + (i % 2) * 10, 2, 4, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.restore();
+    };
+
     /* ================================================================
        ZOOMBOBLENS FORBINDELSE OG TALEBOBLE
        ================================================================ */

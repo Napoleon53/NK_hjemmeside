@@ -15,6 +15,8 @@
      salt      vandet er inddampet, og der er kun salt tilbage
      heptan    heptanflasken er tabt: laereren fejer op og stiller en ny
      skaal     endnu en knust petriskaal
+     varmSkaal petriskaalen tages op over 40 °C: laereren kigger ind fra
+               kanten
      brand     heptan over bunsenbraenderen: dampene antaendes. Laereren
                kaster et brandtaeppe over og konfiskerer braenderen
      ros       et godt resultat med heptan: laereren siger "Fedt."
@@ -51,6 +53,20 @@
         this.poseTaget = false;
         if (L.baerer === "pose") L.baerer = null;
         L.spiseHaand = null;
+    };
+
+    /* Skaalen var for varm at tage fat i: laereren kigger ind fra kanten */
+    P.laererVarmSkaal = function () {
+        var L = this.laerer;
+        if (!L || L.scene) return;
+        this.laererKoer("varmSkaal", [
+            { udtryk: { vrede: 0.6, humoer: -0.5, roed: 0.1, laen: 1, briller: 1 } },
+            { gaa: K.KANT },
+            { sig: "Glas husker varme længe. Fingre gør også.", vis: 3, tid: 3.2 }
+        ].concat(K.uheld(), [
+            { udtryk: { laen: 0, briller: 0 } },
+            { gaa: UDE }
+        ]), false);
     };
 
     /* Haanden, der tager en chip, laaser ogsaa forsoeget */

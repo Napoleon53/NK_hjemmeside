@@ -299,6 +299,11 @@ function koerTest() {
     vent(function () { return f.laerer.scene && f.laerer.scene.navn === "overloeb"; }, 6);
     paastand("fuld buret fyldes igen: laereren og en plet", f.laerer.scene && f.laerer.scene.navn === "overloeb" && f.plet);
     vent(function () { return !f.laerer.scene; }, 20);
+    paastand("syren kan haeldes ud over vaegten", f.slipTil("svovlsyre", "vaegt") === true);
+    adv(3.2);
+    paastand("der ligger syre paa vaegten, og laereren kommer", !!f.vaegtPyt && !!(f.laerer.scene && f.laerer.scene.navn === "vaegt"));
+    vent(function () { return !f.laerer.scene && !f.handling; }, 20);
+    paastand("laereren har toerret vaegten af og er gaaet", !f.vaegtPyt && f.kem.syre === "svovlsyre");
     f.klik("hane"); vent(function () { return f.buret.V >= 0.4; }, 10); f.klik("hane"); f.klik("buret");
     f.klik("kolbe"); adv(4);
     var st = { x: f.g.kolbe.p.x, y: f.g.kolbe.p.y + 60 }, nu = 1000;

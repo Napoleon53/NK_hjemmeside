@@ -306,10 +306,13 @@
             oppe.push(function () { this.tegnFlaske(ctx, "kmno4"); });
         }
         S.tegnPlet(ctx, this.plet);
+        S.tegnSyrepyt(ctx, this.vaegtPyt);
 
-        /* Maalet under den genstand, der traekkes */
+        /* Maalet under den genstand, der traekkes. Vaegten markeres ikke:
+           den er kun et maal for uheld. */
         var ht = this.holdt;
-        if (ht && ht.type === "traek" && ht.flyttet && this.traekMaal) S.tegnMarkering(ctx, this.traekRekt(this.traekMaal), tid);
+        var tr = this.traekMaal ? this.traekRekt(this.traekMaal) : null;
+        if (ht && ht.type === "traek" && ht.flyttet && tr) S.tegnMarkering(ctx, tr, tid);
 
         for (i = 0; i < oppe.length; i++) oppe[i].call(this);
 

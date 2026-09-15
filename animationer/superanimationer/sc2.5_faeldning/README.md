@@ -55,7 +55,8 @@ blå.
 En dråbe af en opløsning, der ikke hører til feltet, er tilladt, men giver en
 advarsel, og feltet regnes ikke som udført, før det er tørret af. Kemien regnes
 alligevel rigtigt: BaCl₂ og CuSO₄ i samme felt giver BaSO₄. Et felt rummer højst
-4 dråber.
+4 dråber. En dråbe mere får feltet til at løbe over i nabofeltet: læreren siger
+noget, og køkkenrullen tørrer begge felter af.
 
 Skemaet i panelet viser det samme som folien: et tomt felt, ½ når der mangler en
 dråbe, ! ved en forkert opløsning, *intet* eller en prik i bundfaldets farve.
@@ -116,9 +117,9 @@ mappe, så denne animation er stadig selvstændig. Han dukker op:
 
 * når eleven har **fjollet tre gange** i skemaet, og igen for hver tredje gang
   derefter. Fjol er en dråbe af en opløsning, der ikke hører til feltet (kun
-  første gang, feltet bliver forkert), eller et forsøg på at dryppe i et felt,
-  der er fyldt (én gang pr. felt, til det er tørret af). I det frie forsøg kan
-  man ikke fjolle
+  første gang, feltet bliver forkert). I det frie forsøg kan man ikke fjolle
+* når et felt **løber over**, fordi der kommer en femte dråbe i. Køkkenrullen
+  tørrer feltet og nabofeltet af (`loeberOver` i `js/forsoeg.js`)
 * når skemaet er udført, og de ekstra flasker låses op
 * når opgaven i det frie forsøg er løst
 

@@ -49,7 +49,7 @@
             K.suk(),
             { sig: "Proppen virker bedst i kolben.", vis: 2.4, tid: 0.3 },
             { udtryk: { skeptisk: 0 } },
-            { arm: -1.0, tid: 0.5 },
+            { arm: 1.6, tid: 0.5 },
             { kald: function () { this.laerer.baerer = "spray"; if (NK.Lyd) NK.Lyd.spray(); } },
             { tid: 1.4, hver: function (t) {
                 if (this.spildPyt) this.spildPyt.neutral = Math.max(this.spildPyt.neutral, NK.blod(t));

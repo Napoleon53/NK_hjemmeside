@@ -91,6 +91,9 @@ Scenerne her står i `js/laerer.js`.
   fejebladet i glasaffaldet. Så kommer en ny petriskål, pistillen kommer tilbage
   i morteren, og forsøget fortsætter. Anden gang siger læreren, at der føres
   regnskab.
+* **Varm petriskål.** Tages petriskålen op, mens den er over 40 °C, rykker
+  hånden til, og skålen lander, hvor den stod. Læreren kigger ind fra kanten
+  ("Glas husker varme længe. Fingre gør også.").
 * **Heptanflasken på gulvet.** Holdes heptanflasken i mere end 8 sekunder
   (`TAB.heptanTid`), glider den ud af hånden og knuses på gulvet. Heptanen
   damper af pytten, læreren kommer med en spids bemærkning, fejer op og stiller

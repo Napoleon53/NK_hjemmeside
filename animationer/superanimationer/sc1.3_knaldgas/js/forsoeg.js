@@ -60,9 +60,11 @@
         this.senesteTid = -10;
         this.harFyldt = false;
         this.knaekChance = 0.1;
+        this.koppenVaek = false;
         this.vedAendring = null;
         this.vedBesked = null;
         this.hover = null;
+        if (this.laererStart) this.laererStart();
         this.nulstil();
         if (canvas) this.bindMus();
     };

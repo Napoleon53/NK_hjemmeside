@@ -76,6 +76,9 @@ Læreren Kemichael er fælles for superanimationerne og står i
   læreren.
 * **Buretten løber over.** Fyldes den, mens den er fuld, kommer læreren og peger
   på regel 3 på plakaten. Pletten på bordet bliver stående resten af sessionen.
+* **Syre på vægten.** Syreflaskerne kan også slippes over vægten. Så løber
+  syren ud over vejeskålen, og læreren tørrer op ("Vægten er ikke et
+  bægerglas."). Vægten markeres ikke som mål, mens en flaske trækkes.
 * **Langt forbi endepunktet** (`TITRER.aubergine`): "Svagt lyserød. Ikke
   aubergine."
 * **Over 100 %.** Læreren er skeptisk, og tredje gang kommer et lille vink om

@@ -829,9 +829,29 @@
             default:
                 return false;
         }
-        if (this.temp > 40) { this.besked("Skålen er stadig varm. Vent, til den er kølet af."); return false; }
+        if (this.temp > 40) { this.varmSkaal(); return true; }
         this.vejIgen();
         return true;
+    };
+
+    /* Uheld: skaalen er over 40 °C, da eleven tager fat i den. Haanden
+       rykker til, og skaalen lander, hvor den stod. Laereren kigger ind
+       fra kanten (laerer.js). */
+    P.varmSkaal = function () {
+        var s = this.g.skaal;
+        var fra = s.sted;
+        var hjem = fra === "trefod" ? S.PAA_TREFOD : S.PAA_PLADE;
+        s.sted = "flytter";
+        this.koer([
+            { flyt: s, til: { x: s.p.x + 6, y: s.p.y - 22, v: 0.12 }, tid: 0.2, loeft: 0 },
+            { kald: function () {
+                if (NK.Lyd) NK.Lyd.klirr();
+                this.besked("Av! Skålen er over 40 °C.", "advarsel");
+                if (this.laererVarmSkaal) this.laererVarmSkaal();
+            } },
+            { flyt: s, til: hjem, tid: 0.3, loeft: 0 },
+            { kald: function () { s.sted = fra; this.aendret("varmSkaal"); } }
+        ], "varmSkaal");
     };
 
     P.vejTom = function () {

@@ -30,9 +30,10 @@
             "Køkkenrullen ligger lige der. Den bider ikke.",
             "Vi skal nok nå pensum. Engang."
         ],
-        fyldt: [
+        overloeb: [
             "Fire dråber er rigeligt. Det er ikke en svømmepøl.",
-            "Der bliver ikke mere bundfald af at blive ved."
+            "Der bliver ikke mere bundfald af at blive ved. Kun mere køkkenrulle.",
+            "Nu har nabofeltet også fået noget. Det havde det ikke bedt om."
         ],
         bonus: [
             "Nå. Du kan godt følge et skema. Så må du låne Na₂S og Fe(NO₃)₃ og prøve frit."

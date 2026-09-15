@@ -157,7 +157,7 @@
             K.suk(),
             { sig: slags === "udenProp" ? "Proppen virker bedst i glasset." : "Ryst med omtanke.", vis: 2.4, tid: 0.3 },
             { udtryk: { skeptisk: 0 } },
-            { arm: -1.25, tid: 0.5 },
+            { arm: 1.8, tid: 0.5 },
             { kald: function () { this.laerer.baerer = "papir"; if (NK.Lyd) NK.Lyd.papir(); } },
             { tid: 1.8, hver: function (t) {
                 this.laerer.arm = -1.25 + Math.sin(t * Math.PI * 7) * 0.22;

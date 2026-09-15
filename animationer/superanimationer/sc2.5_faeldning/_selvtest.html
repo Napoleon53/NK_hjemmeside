@@ -130,8 +130,11 @@ function koer() {
     var n4 = 0;
     for (var i = 0; i < 4; i++) if (dryp(2, "CuSO4")) n4++;
     paastand("et felt kan rumme " + f.MAKS_DRAABER + " draaber", n4 === 4 && f.felter[2].antal === 4);
-    paastand("den femte draabe afvises", dryp(2, "CuSO4") === false && f.felter[2].antal === 4);
+    paastand("den femte draabe faar feltet til at loebe over i nabofeltet", dryp(2, "CuSO4") === true && f.felter[2].antal === 5 && f.felter[1].draaber.CuSO4 >= 1 && f.laerer.aktiv && f.laerer.slags === "overloeb", f.laerer.tekst);
     f.saetTilbage();
+    adv(2.5);
+    paastand("koekkenrullen toerrer begge felter af", f.status(2) === "tom" && f.status(1) === "tom" && f.overloeb === 1);
+    f.laerer.luk();
 
     f.toerAf(2);
     adv(1);
@@ -303,10 +306,13 @@ function koer() {
     paastand("laereren er gaaet igen", !L.synlig());
     for (i = 0; i < 4; i++) dryp(5, "CuSO4");
     dryp(5, "CuSO4");
-    dryp(5, "CuSO4");
     f.saetTilbage();
-    paastand("et fyldt felt taeller én gang, uanset hvor mange forsøg", f.fjol === 4, f.fjol);
-    dryp(6, "BaCl2"); dryp(8, "NaCl");
+    paastand("et felt, der loeber over, faar laereren frem uden at taelle som fjol", f.fjol === 3 && L.aktiv && L.slags === "overloeb" && NK.LAERER_REPLIKKER.overloeb.indexOf(L.tekst) >= 0, f.fjol + " " + L.tekst);
+    tekster.push(L.tekst);
+    adv(2.5);
+    L.luk();
+    adv(1.5);
+    dryp(6, "BaCl2"); dryp(7, "AgNO3"); dryp(8, "NaCl");
     f.saetTilbage();
     paastand("efter tre fjol mere siger laereren noget igen", f.fjol === 6 && L.aktiv, f.fjol + " " + L.aktiv);
     tekster.push(L.tekst);

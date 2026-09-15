@@ -110,7 +110,7 @@
             { gaa: function () { return (mig.vaegtPyt ? mig.vaegtPyt.x : S.VAEGT.midt) - 130; } },
             { sig: "Vægten er ikke et bægerglas.", vis: 2.6, tid: 0.3 },
             { udtryk: { briller: 0 } },
-            { arm: -1.25, tid: 0.5 },
+            { arm: 1.8, tid: 0.5 },
             { kald: function () { this.laerer.baerer = "papir"; if (NK.Lyd && NK.Lyd.papir) NK.Lyd.papir(); } },
             { tid: 1.8, hver: function (t) {
                 this.laerer.arm = -1.25 + Math.sin(t * Math.PI * 7) * 0.22;

@@ -140,6 +140,7 @@
         this.ryk = 0;
 
         this.straale = null;
+        this.vaegtPyt = null;
         this.flyvende = [];
         this.draaber = [];
         this.dampe = [];
@@ -414,10 +415,11 @@
         return null;
     };
 
+    /* Syreflaskerne kan ogsaa slippes over vaegten: et uheld (syrePaaVaegt) */
     var MULIGE = {
         vejebaad: ["kolbe"],
-        svovlsyre: ["kolbe"],
-        saltsyre: ["kolbe"],
+        svovlsyre: ["kolbe", "vaegt"],
+        saltsyre: ["kolbe", "vaegt"],
         kmno4: ["buretTop", "kolbe"],
         kolbe: ["plade", "buret"]
     };
@@ -452,7 +454,9 @@
     P.slipTil = function (navn, maal) {
         switch (navn) {
             case "vejebaad": return maal === "kolbe" ? this.klikVejebaad() : false;
-            case "svovlsyre": case "saltsyre": return maal === "kolbe" ? this.slipSyre(navn) : false;
+            case "svovlsyre": case "saltsyre":
+                if (maal === "vaegt") return this.syrePaaVaegt(navn);
+                return maal === "kolbe" ? this.slipSyre(navn) : false;
             case "kmno4":
                 if (maal === "buretTop") return this.fyldBuret();
                 if (maal === "kolbe") this.besked("Kaliumpermanganat skal i buretten.");
@@ -474,6 +478,34 @@
         }
         if (this.kem.syre) { this.besked("Der er syre nok i kolben."); return false; }
         this.haeldSyre(navn);
+        return true;
+    };
+
+    /* Uheld: syren haeldes ud over vaegten i stedet for i kolben. Den
+       loeber ud over vejeskaalen, og laereren toerrer op (laerer.js). */
+    P.syrePaaVaegt = function (navn) {
+        var fl = this.g[navn];
+        var sk = S.VAEGT.vejeskaal;
+        var mig = this;
+        this.koer([
+            { tid: 0.3, hver: function (t) { mig.laagT[navn] = t; } },
+            { flyt: fl, til: { x: sk.x - 30, y: sk.y - 64, v: 2.05 }, tid: 0.9, loeft: 50 },
+            { kald: function () { if (NK.Lyd) NK.Lyd.haeld(0.9); } },
+            { tid: 0.9, hver: function (t) {
+                var spids = NK.tilVerden(fl.p, fl.anker, 23, 4);
+                this.straale = { fra: spids, til: { x: sk.x - 8, y: sk.y - 2 }, farve: M.FARVE.syre, bredde: 3 };
+                if (!this.vaegtPyt) this.vaegtPyt = { x: sk.x, rx: 6, alfa: 1 };
+                this.vaegtPyt.rx = 6 + 44 * t;
+            } },
+            { kald: function () {
+                this.straale = null;
+                this.besked("Syren løb ud over vægten.", "advarsel");
+                if (this.laererVaegt) this.laererVaegt();
+                this.aendret("vaegt");
+            } },
+            hjemTil(fl, 0.9, 50),
+            { tid: 0.3, hver: function (t) { mig.laagT[navn] = 1 - t; } }
+        ], "vaegtSyre");
         return true;
     };
 

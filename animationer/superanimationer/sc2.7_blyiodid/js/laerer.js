@@ -77,7 +77,7 @@
             { udtryk: { vrede: 0.9, humoer: -0.8, roed: 0.3 } },
             { gaa: function () { return (mig.spild ? mig.spild.x : 220) - 130; } },
             { sig: stof === "pb" ? "Pb(NO₃)₂ er giftigt. Ro på." : "Ro på med spatlen.", vis: 2.4, tid: 0.3 },
-            { arm: -1.25, tid: 0.5 },
+            { arm: 1.8, tid: 0.5 },
             { kald: function () { this.laerer.baerer = "papir"; if (NK.Lyd) NK.Lyd.papir(); } },
             { tid: 1.8, hver: function (t) {
                 this.laerer.arm = -1.25 + Math.sin(t * Math.PI * 7) * 0.22;
@@ -103,7 +103,7 @@
             { gaa: function () { return (mig.skvulp ? mig.skvulp.x : 590) - 130; } },
             { sig: "Varmt glas ser ud præcis som koldt glas.", vis: 2.8, tid: 0.3 },
             { udtryk: { briller: 0 } },
-            { arm: -1.25, tid: 0.5 },
+            { arm: 1.8, tid: 0.5 },
             { kald: function () { this.laerer.baerer = "papir"; if (NK.Lyd) NK.Lyd.papir(); } },
             { tid: 1.8, hver: function (t) {
                 this.laerer.arm = -1.25 + Math.sin(t * Math.PI * 7) * 0.22;

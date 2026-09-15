@@ -154,8 +154,10 @@ function koerTest() {
     paastand("skaalen kan ikke vejes foer inddampningen er faerdig", f.klik("skaal") === false);
     vent(function () { return f.gjort.inddamp; }, 30);
     paastand("inddampet", f.gjort.inddamp && f.g.skaal.fyld === 0 && f.g.skaal.fedt > 0.3);
-    paastand("en varm skaal kan ikke vejes", f.klik("skaal") === false);
-    adv(7);
+    paastand("tager man fat i den varme skaal, rykker haanden til", f.temp > 40 && f.klik("skaal") === true && f.mBF === null);
+    adv(1);
+    paastand("skaalen staar paa varmepladen igen, og laereren kigger ind", f.g.skaal.sted === "plade" && !f.handling && !!(f.laerer.scene && f.laerer.scene.navn === "varmSkaal"));
+    vent(function () { return !f.laerer.scene && f.temp <= 40; }, 20);
     paastand("en afkoelet skaal kan vejes", f.klik("skaal") === true);
     adv(4.5);
     paastand("tabte krummer giver et lavere resultat", f.mBF !== null && M.fedtprocent(f.mChips, f.mB, f.mBF) < 29.5, komma(M.fedtprocent(f.mChips, f.mB, f.mBF)) + " %");
