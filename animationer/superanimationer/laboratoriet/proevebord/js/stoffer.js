@@ -103,6 +103,7 @@
         bredde: 1420, hoejde: 600, bord: 500,
         hylde: { x0: 16, x1: 220, y: 268 },
         plakat: { x: 1250, y: 90 },
-        boble: { x: 330, y: 140 }, bobleR: 120
+        /* Zoomboblen tegnes i panelet, ikke paa scenen (ingen boble her) */
+        bobleR: 128
     };
 }());

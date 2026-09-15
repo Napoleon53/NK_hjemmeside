@@ -38,6 +38,8 @@ statiske sider i roden, downloads i `downloads/`.
 - Nye laboratorieforsøg bygges på genstandsmodellen i `laboratoriet/js/`
   (stof, udstyr, beholder, bord): alt kan gribes, sættes ned og bruges på alt,
   og hvad der sker, afgøres af udstyrets egenskaber, ikke af forsøgets kode.
+  Klik viser, træk gør: et klik vælger kun til aflæsning og zoom, handlinger
+  sker ved at trække. Zoomboblen står i panelet, ikke på scenen.
   Mønster: `laboratoriet/proevebord/`.
 - Sidepanelet er 430 px bredt (`--panel-bredde` i `laboratoriet/css/grund.css`).
 - Superanimationer om laboratorieforsøg har en intro-popup, der kort siger, hvad

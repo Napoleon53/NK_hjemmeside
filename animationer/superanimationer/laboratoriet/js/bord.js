@@ -81,8 +81,11 @@
         this.liste = [];
         this.koer = new NK.Koer(this);
         this.koer.vedAendring = function (grund) { this.aendret(grund); };
-        this.mikro = new NK.Mikro(valg.bobleR || 120);
-        this.boble = valg.boble || { x: 250, y: 168 };
+        /* Hver beholder faar sin egen zoombobbel, naar den vaelges foerste
+           gang; this.mikro er den valgte beholders */
+        this.bobleR = valg.bobleR || 120;
+        this.mikro = new NK.Mikro(this.bobleR);
+        this.boble = valg.boble || null;
         this.vedBesked = null;
         this.vedAendring = null;
         this.vedHaendelse = null;
@@ -174,7 +177,7 @@
         var mig = this;
         this.koer.afbryd();
         this.nulstilTilstand();
-        this.mikro.nulstil();
+        this.mikro = new NK.Mikro(this.bobleR);
         this.g = {};
         this.liste = [];
         if (NK.Sprites.FILER.kaffekop && NK.Scene.HYLDE) this.lavKaffekop();
@@ -621,17 +624,22 @@
         return this.koer.optaget();
     };
 
-    /* ----- Klik --------------------------------------------------------------- */
+    /* ----- Klik --------------------------------------------------------------
+       Klik viser, traek goer. Et klik vaelger det, der rummer noget, til
+       aflaesning og zoom; handlinger sker kun ved at traekke. Undtagelser:
+       kontakten paa varmepladen, og en draabeflaske, der allerede haenger
+       over et glas (klik igen giver en draabe mere). */
     P.klik = function (navn) {
         if (NK.Lyd) NK.Lyd.laasOp();
         if (navn === "laerer") return this.klikLaerer ? this.klikLaerer() : false;
         if (navn === "kaffekop") return this.klikKop ? this.klikKop() : false;
         if (this.laererOptaget && this.laererOptaget()) return false;
-        if (this.koer.optaget() || this.baerer) return false;
+        if (this.baerer) return false;
         var gg = this.g[navn];
         if (!gg || !this.synlig(gg)) return false;
         var k = gg.kan;
         if (k.varmer) {
+            if (this.koer.optaget()) return false;
             gg.taendt = !gg.taendt;
             if (NK.Lyd && NK.Lyd.kontakt) NK.Lyd.kontakt();
             this.besked(gg.taendt ? "Varmepladen er tændt." : "Varmepladen er slukket.");
@@ -639,23 +647,17 @@
             this.aendret("plade");
             return true;
         }
-        if (k.pulver) {
-            var sp = this.foersteMed("spatel");
-            if (sp && !sp.last) return this.fyldSpatel(sp, gg);
-            this.besked("Tag fat i spatlen, og slip den over pulverglasset.");
-            return false;
-        }
-        if (this.aaben(gg) && k.holder) {
-            if (gg.svaev) return false;
+        if (gg.svaev && k.drypper && !this.koer.optaget()) return this.draabe(gg, gg.svaev.maal);
+        if (k.holder) {
             this.vaelg(navn);
-            this.besked(gg.titel + " er valgt.");
+            this.besked(gg.titel.charAt(0).toUpperCase() + gg.titel.slice(1) + " er valgt. Tag fat i udstyret for at bruge det.");
             return true;
         }
-        if (gg.svaev && k.drypper) return this.draabe(gg, gg.svaev.maal);
-        var maal = this.valgtBeholder();
-        if (maal && this.kanModtage(gg, maal)) return this.moede(gg, maal);
-        if (k.spatel && !gg.last) { this.besked("Slip spatlen over et pulverglas for at tage en spatelspids."); return false; }
-        this.besked("Klik på et glas for at vælge det, eller tag fat i udstyret og slip det over glasset.");
+        if (k.spatel) this.besked(gg.last ? "Slip spatlen over et glas." : "Slip spatlen over et pulverglas for at tage en spatelspids.");
+        else if (k.roerer || k.maaler) this.besked("Slip " + gg.titel + " over et glas.");
+        else if (k.papir) this.besked("Slip køkkenrullen over en pyt.");
+        else if (k.stoette) this.besked("Slip et reagensglas over stativet.");
+        else if (k.affald || k.vask) this.besked("Slip et glas over " + gg.titel + " for at tømme det.");
         return false;
     };
 
@@ -1009,7 +1011,11 @@
 
         /* Zoomboblen viser den valgte beholder */
         var v = this.valgtBeholder();
-        var vis = !!v && (B.volumen(v) > 0.05 || this.mikro.partikler.length > 0) && this.koer.navn() !== "affald";
+        if (v) {
+            if (!v.mikro) v.mikro = new NK.Mikro(this.bobleR);
+            this.mikro = v.mikro;
+        }
+        var vis = !!v && (B.volumen(v) > 0.05 || B.fastIalt(v) > 0.5 || this.mikro.partikler.length > 0) && this.koer.navn() !== "affald";
         if (vis) {
             this.bobleBeholder = v;
             this.mikro.opdater(dt, Stof.partikelTal(B.samlet(v), 12), { ryst: this.omgivelser(v).ryst });
@@ -1125,11 +1131,22 @@
 
         if (this.tegnLaerer) this.tegnLaerer(ctx, tid);
 
+        /* Zoomboblen paa scenen, hvis bordet er sat op med boble: { x, y };
+           ellers tegner siden den selv med tegnBoble, fx i panelet */
         var vb = this.bobleBeholder;
-        if (vb && this.bobleAlfa > 0.01) {
+        if (this.boble && vb && this.bobleAlfa > 0.01) {
             var fo = B.farve(vb) || Stof.VAND;
-            this.mikro.tegn(ctx, this.boble.x, this.boble.y, this.bobleAlfa, tid, this.synlig(vb) ? B.aabning(vb) : null, { r: fo.r * 0.35, g: fo.g * 0.35, b: fo.b * 0.35 });
+            (vb.mikro || this.mikro).tegn(ctx, this.boble.x, this.boble.y, this.bobleAlfa, tid, this.synlig(vb) ? B.aabning(vb) : null, { r: fo.r * 0.35, g: fo.g * 0.35, b: fo.b * 0.35 });
         }
         ctx.restore();
+    };
+
+    /* Zoomboblen tegnet paa et andet laerred med centrum i (cx, cy) */
+    P.tegnBoble = function (ctx, cx, cy) {
+        var vb = this.bobleBeholder;
+        if (!vb || this.bobleAlfa < 0.01) return false;
+        var fo = B.farve(vb) || Stof.VAND;
+        (vb.mikro || this.mikro).tegn(ctx, cx, cy, this.bobleAlfa, this.tid, null, { r: fo.r * 0.35, g: fo.g * 0.35, b: fo.b * 0.35 });
+        return true;
     };
 }());

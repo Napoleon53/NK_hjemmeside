@@ -97,6 +97,12 @@ function koerTest() {
     paastand("glas 1 har 5 mL, baegerglasset 5 mL", Math.abs(V(glas1) - 5) < 0.3 && Math.abs(V(b100) - 5) < 0.3, V(glas1).toFixed(2) + " / " + V(b100).toFixed(2));
     paastand("zoomboblen viser partikler", bord.mikro.partikler.length > 0, bord.mikro.partikler.length);
     paastand("partiklerne har formler med ladning", bord.mikro.partikler.every(function (p) { return p.tekst.length > 0; }) && bord.mikro.partikler.some(function (p) { return p.tekst === "Cu²⁺"; }));
+    NK.opdaterPanel();
+    paastand("zoomboblen staar i panelet, ikke paa scenen", !bord.boble && !d.getElementById("boble-laerred").hidden);
+    var V1 = V(glas1);
+    paastand("et klik paa en flaske vaelger den og haelder ikke", bord.klik("fl_pb") && bord.valgtBeholder() === g.fl_pb && Math.abs(V(glas1) - V1) < 1e-9 && !bord.koer.igang());
+    paastand("panelet viser flaskens indhold", (NK.opdaterPanel(), d.getElementById("glas-titel").textContent.indexOf("Pb(NO₃)₂") >= 0), d.getElementById("glas-titel").textContent);
+    paastand("et klik paa spatlen goer ingenting", !bord.klik("spatel") && !bord.koer.igang() && !g.spatel.last);
 
     overskrift("4. Bundfald, ligevaegt og neutralisation");
     frisk();

@@ -72,7 +72,11 @@ over noget andet, afgør egenskaberne, hvad der sker (`NK.Bord.prototype.moede`)
 Frihed frem for afvisning: rystes et åbent glas voldsomt, skvulper det ud;
 løber et glas over, bliver der en pyt; sættes et reagensglas på bordet,
 vælter det. Kemichael kommer og tørrer op (`proevebord/js/laerer.js`).
-Et klik er en genvej: udstyret bruges på den valgte beholder.
+
+Klik viser, træk gør: et klik vælger det, der rummer noget, til aflæsning
+og zoom, og handlinger sker kun ved at trække. Undtagelser er kontakten på
+varmepladen og en dråbeflaske, der allerede hænger over et glas. Zoomboblen
+tegnes i panelet (`NK.Bord.prototype.tegnBoble`), så den ikke dækker bordet.
 
 Et nyt forsøg på modellen laver sin egen `js/stoffer.js` med stoffer,
 reaktioner og opstilling (`NK.OPSTILLING`, `NK.BORD_VALG`) og en

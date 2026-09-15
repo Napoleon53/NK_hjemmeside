@@ -6,6 +6,10 @@
    dansk komma.
    ===================================================================== */
 
+/* Zoomboblen i panelet */
+.boble { display: block; width: 100%; height: 272px; margin: 2px 0 8px; border-radius: var(--radius-lil); background-color: #16161c; }
+.boble[hidden] { display: none; }
+
 /* Aflaesningen af det valgte glas */
 .indhold { width: 100%; border-collapse: collapse; font-size: 0.86rem; font-variant-numeric: tabular-nums; }
 .indhold th { text-align: left; font-weight: 600; color: var(--tekst-svag); padding: 3px 0; }
