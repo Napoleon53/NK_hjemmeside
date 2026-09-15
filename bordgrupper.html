@@ -2,6 +2,7 @@
 <html lang="da">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gruppegenerator</title>
 <style>
   :root{
@@ -14,13 +15,13 @@
     --accent-dark:#1d4ed8;
     --pair-a:#e0f2fe;
     --pair-a-border:#38bdf8;
-    --pair-b:#fef3c7;
-    --pair-b-border:#f59e0b;
     --trio-bg:#dcfce7;
     --trio-border:#22c55e;
     --four-border:#7c3aed;
+    --warn:#b45309;
   }
   *{box-sizing:border-box;}
+  [hidden]{display:none !important;}
   body{
     margin:0;
     font-family:"Segoe UI", Calibri, Arial, sans-serif;
@@ -28,16 +29,47 @@
     color:var(--ink);
     padding:24px;
   }
-  h1{font-size:1.5rem; margin:0 0 4px;}
-  .sub{color:var(--muted); margin:2px 0 10px; font-size:.85rem;}
-  .panel{
+  .top{display:flex; align-items:center; gap:10px 16px; flex-wrap:wrap; margin-bottom:16px;}
+  h1{font-size:1.5rem; margin:0;}
+  .muted{color:var(--muted); font-size:.85rem;}
+  .hint{margin:8px 0 0;}
+
+  /* Trin: ramme med nummer og lille etiket */
+  .step{
     background:var(--panel);
     border:1px solid var(--border);
     border-radius:10px;
-    padding:18px 20px;
-    margin-bottom:20px;
+    padding:14px 18px 18px;
+    margin-bottom:16px;
   }
-  label{display:block; font-weight:600; margin-bottom:6px;}
+  .step-head{display:flex; align-items:center; gap:4px 10px; flex-wrap:wrap; margin-bottom:12px;}
+  .step-num{
+    width:22px; height:22px; flex:none;
+    border-radius:50%;
+    background:var(--accent); color:#fff;
+    font-size:.75rem; font-weight:700;
+    display:inline-flex; align-items:center; justify-content:center;
+  }
+  .step-head h2{margin:0; font-size:.78rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--accent-dark);}
+  .step-cols{display:grid; grid-template-columns:repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap:18px 32px; align-items:start;}
+  .sub-block + .sub-block{border-top:1px solid #edf0f3; margin-top:14px; padding-top:14px;}
+  .sub-label{font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:0 0 8px;}
+
+  label.field{display:block; font-weight:600; margin:14px 0 6px;}
+  label.inline{display:inline-flex; align-items:center; gap:6px; font-weight:600; margin:0;}
+  label.check{display:flex; align-items:center; gap:6px; font-weight:400; margin:0;}
+  label.check input{margin:0;}
+  input[type=text], input[type=number], select{
+    font-family:inherit;
+    font-size:.9rem;
+    font-weight:400;
+    padding:6px 8px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    background:#fff;
+    color:var(--ink);
+  }
+  input[type=number]{width:64px;}
   textarea{
     width:100%;
     min-height:220px;
@@ -49,6 +81,7 @@
     resize:vertical;
   }
   .row{display:flex; gap:10px; align-items:center; margin-top:12px; flex-wrap:wrap;}
+  .sub-label + .row, .step-head + .row{margin-top:0;}
   button{
     font-family:inherit;
     font-size:.95rem;
@@ -62,83 +95,17 @@
   .btn-primary:hover{background:var(--accent-dark);}
   .btn-secondary{background:#fff; color:var(--ink); border-color:var(--border);}
   .btn-secondary:hover{background:#eef1f4;}
-  .btn-secondary:disabled, .btn-primary:disabled{opacity:.45; cursor:not-allowed;}
-  .count{color:var(--muted); font-size:.9rem;}
-  .error{color:#b91c1c; font-weight:600; margin-top:10px; display:none;}
-  .example-banner{
-    display:inline-block;
-    background:#fef3c7;
-    color:#92400e;
-    border:1px solid #f5d78e;
-    border-radius:6px;
-    padding:6px 12px;
-    font-weight:700;
-    font-size:.9rem;
-    margin-bottom:14px;
-  }
-  .summary{display:flex; gap:22px; flex-wrap:wrap; margin-bottom:14px; font-size:.95rem;}
-  .summary b{color:var(--accent-dark);}
-  .legend{display:flex; gap:16px; flex-wrap:wrap; font-size:.85rem; color:var(--muted); margin-bottom:18px;}
-  .legend span{display:inline-flex; align-items:center; gap:6px;}
-  .swatch{width:14px; height:14px; border-radius:3px; display:inline-block;}
+  .btn-small{padding:6px 12px; font-size:.85rem;}
+  .error{color:#b91c1c; font-weight:600; font-size:.9rem;}
+  .step > .error, .step > .warn{margin-top:10px;}
+  .warn{color:var(--warn); font-weight:600; font-size:.9rem;}
 
-  .tabbar{display:flex; gap:6px; border-bottom:2px solid var(--border); margin-bottom:20px;}
-  .tabbtn{
-    background:none;
-    border:none;
-    padding:10px 16px;
-    font-weight:600;
-    font-size:.95rem;
-    color:var(--muted);
-    cursor:pointer;
-    border-bottom:3px solid transparent;
-    margin-bottom:-2px;
-  }
-  .tabbtn.active{color:var(--accent-dark); border-bottom-color:var(--accent);}
-  .tabpanel{display:none;}
-  .tabpanel.active{display:block;}
-  .tabsub{color:var(--muted); font-size:.85rem; margin:-6px 0 16px;}
-
-  .tables{display:flex; flex-direction:column; gap:22px;}
-  .tables.grid-mode{display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:16px;}
-  .table-block h2{font-size:1.05rem; margin:0 0 10px;}
-  .row-seats{display:flex; flex-wrap:wrap; gap:10px; align-items:flex-start;}
-
-  .unit{display:flex; padding:6px; border-radius:8px;}
-  .unit.pair{border:2px solid var(--pair-a-border); background:var(--pair-a); flex-direction:column;}
-  .unit.three{background:var(--trio-bg); border:2px solid var(--trio-border);}
-  .fourtag{font-size:.75rem; color:var(--four-border); font-weight:700; margin-bottom:2px;}
-  .seat{
-    background:#fff;
-    border:1px solid rgba(0,0,0,.12);
-    border-radius:5px;
-    padding:6px 9px;
-    font-size:.85rem;
-    min-width:90px;
-    text-align:center;
-  }
-  .row-grid{
-    display:grid;
-    grid-template-columns:repeat(10, minmax(0,1fr));
-    gap:6px;
-  }
-  .row-grid .seat{min-width:0; width:100%; box-sizing:border-box;}
-  .row-grid .seat.seat-pair{border-top:4px solid var(--pair-a-border);}
-  .row-grid .seat.seat-three{border-top:4px solid var(--trio-border); background:var(--trio-bg);}
-  .hexblock{
-    border-radius:16px;
-    border:2px solid var(--border);
-    padding:14px;
-    background:#fbfdff;
-  }
-  .hexblock h2{margin-top:0;}
-
-  #resultSection{display:none;}
-
+  .cond-list{margin-top:10px; display:flex; flex-direction:column; gap:6px;}
   .cond-chip{
     display:flex;
     align-items:center;
-    gap:10px;
+    flex-wrap:wrap;
+    gap:4px 10px;
     font-size:.9rem;
     background:#fff;
     border:1px solid var(--border);
@@ -147,6 +114,8 @@
   }
   .cond-chip.avoid{border-left:4px solid #dc2626;}
   .cond-chip.together{border-left:4px solid #16a34a;}
+  .cond-chip.missing > span:first-child{opacity:.55;}
+  .cond-chip .cond-note{font-size:.8rem; color:var(--warn);}
   .cond-chip button{
     margin-left:auto;
     padding:4px 10px;
@@ -155,15 +124,17 @@
     border:1px solid var(--border);
   }
 
+  .edit-panel{margin-top:8px; padding:10px; border:1px solid var(--border); border-radius:6px; background:#fff; max-width:420px;}
   .gender-wrap{
     margin-top:10px;
-    max-height:240px;
+    max-height:300px;
     max-width:420px;
     overflow-y:auto;
     border:1px solid var(--border);
     border-radius:6px;
     background:#fff;
   }
+  .gender-empty{padding:10px;}
   .gender-header, .gender-row{
     display:grid;
     grid-template-columns:1fr 40px 40px 120px;
@@ -196,14 +167,96 @@
     width:100%;
     font-size:.78rem;
     padding:3px 4px;
-    border:1px solid var(--border);
     border-radius:4px;
-    font-family:inherit;
   }
   .category-edit-row{ display:flex; align-items:center; gap:8px; margin-bottom:6px; }
   .category-edit-row .cat-num{ width:18px; color:var(--muted); font-weight:600; font-size:.85rem; }
-  .category-edit-row input[type=text]{ flex:1; padding:5px 8px; border:1px solid var(--border); border-radius:6px; font-family:inherit; }
+  .category-edit-row input[type=text]{ flex:1; padding:5px 8px; }
   .category-edit-row button{ padding:4px 10px; font-size:.8rem; }
+
+  /* Trin 4: planen */
+  .summary{display:flex; gap:4px 20px; flex-wrap:wrap; font-size:.95rem; margin-bottom:12px;}
+  .summary b{color:var(--accent-dark);}
+  .stale{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    background:#fef3c7; color:#92400e;
+    border:1px solid #f5d78e; border-radius:8px;
+    padding:8px 12px; margin-bottom:12px;
+    font-size:.9rem;
+  }
+  .export-row{margin:0 0 16px;}
+  .period-bar{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px;}
+  .period-btn{
+    padding:5px 12px;
+    font-size:.85rem;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:#fff;
+    color:var(--ink);
+  }
+  .period-btn:hover{background:#eef1f4;}
+  .period-btn.active{background:var(--accent); border-color:var(--accent); color:#fff;}
+
+  .tabbar{display:flex; gap:6px; flex-wrap:wrap; border-bottom:2px solid var(--border); margin-bottom:16px;}
+  .tabbtn{
+    background:none;
+    border:none;
+    padding:10px 16px;
+    font-weight:600;
+    font-size:.95rem;
+    color:var(--muted);
+    cursor:pointer;
+    border-bottom:3px solid transparent;
+    margin-bottom:-2px;
+    border-radius:0;
+  }
+  .tabbtn.active{color:var(--accent-dark); border-bottom-color:var(--accent);}
+  .tabpanel{display:none;}
+  .tabpanel.active{display:block;}
+  .tabsub{color:var(--muted); font-size:.85rem; margin:-4px 0 16px;}
+  .over-note{color:var(--warn); font-weight:600;}
+
+  .card-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(210px, 1fr)); gap:14px;}
+  table.gcard{border-collapse:collapse; width:100%; background:#fff;}
+  table.gcard th{font-size:.9rem; background:#dfe7f0; padding:5px 8px; border:1px solid #aab4bf;}
+  table.gcard td{font-size:.85rem; padding:5px 8px; border:1px solid #d0d7de; text-align:center;}
+  table.gcard td.pa{color:#1d63c9; font-weight:600; background:#eaf3fd;}
+  table.gcard td.pb{color:#c9720f; font-weight:600; background:#fdf1e3;}
+  table.gcard td.pc{color:#7c3aed; font-weight:600; background:#f1eafe;}
+  table.gcard td.pt{color:#159957; font-weight:600; background:#e8f9ef;}
+  table.gcard .role-tag{display:block; width:fit-content; margin:0 auto 2px; font-size:.68rem; font-weight:700; color:#fff; background:#b45309; border-radius:3px; padding:1px 5px;}
+  table.gcard .role-tag + br{display:none;}
+
+  .tables{display:flex; flex-direction:column; gap:22px;}
+  .tables.grid-mode{display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:16px;}
+  .table-block h2{font-size:1.05rem; margin:0 0 10px;}
+  .row-seats{display:flex; flex-wrap:wrap; gap:10px; align-items:flex-start;}
+
+  .unit{display:flex; flex-direction:column; padding:6px; border-radius:8px;}
+  .unit.pair{border:2px solid var(--pair-a-border); background:var(--pair-a);}
+  .unit.three{background:var(--trio-bg); border:2px solid var(--trio-border);}
+  .unit-tag{font-size:.75rem; color:var(--four-border); font-weight:700; margin-bottom:2px;}
+  .unit-seats{display:flex; flex-wrap:wrap; gap:4px;}
+  .seat{
+    background:#fff;
+    border:1px solid rgba(0,0,0,.12);
+    border-radius:5px;
+    padding:6px 9px;
+    font-size:.85rem;
+    min-width:90px;
+    text-align:center;
+  }
+  .row-grid{display:grid; gap:6px;}
+  .row-grid .seat{min-width:0; width:100%;}
+  .row-grid .seat.seat-pair{border-top:4px solid var(--pair-a-border);}
+  .row-grid .seat.seat-three{border-top:4px solid var(--trio-border); background:var(--trio-bg);}
+  .hexblock{
+    border-radius:16px;
+    border:2px solid var(--border);
+    padding:14px;
+    background:#fbfdff;
+  }
+  .hexblock h2{margin-top:0;}
 
   @keyframes tourPulse{
     0%{ box-shadow:0 0 0 4px rgba(251,191,36,.95), 0 0 0 4px rgba(251,191,36,.5), 0 0 0 9999px rgba(15,23,42,.55); }
@@ -242,12 +295,18 @@
 </head>
 <body>
 
-<h1>Gruppegenerator</h1>
-<button class="btn-secondary" id="tourBtn" style="margin-bottom:16px;">Præsentér programmet</button>
+<div class="top">
+  <h1>Gruppegenerator</h1>
+  <button class="btn-secondary btn-small" id="tourBtn" type="button">Præsentér programmet</button>
+</div>
 
-<div class="panel">
-  <label for="names">Elevnavne (ét navn pr. linje)</label>
-  <p class="sub">Indsæt elevnavne, og brug eventuelt "forkort navne" til at tilpasse navnet.</p>
+<section class="step" id="stepClass">
+  <div class="step-head"><span class="step-num">1</span><h2>Klasse</h2></div>
+  <label class="inline">
+    Klassenavn
+    <input type="text" id="className" placeholder="fx 2y (valgfrit)" style="width:170px;">
+  </label>
+  <label class="field" for="names">Elevnavne, ét pr. linje</label>
   <textarea id="names" placeholder="Anna&#10;Bertram&#10;Cecilie&#10;...">Elev 1
 Elev 2
 Elev 3
@@ -277,160 +336,217 @@ Elev 26
 Elev 27
 Elev 28</textarea>
   <div class="row">
-    <button class="btn-secondary" id="importBtn">Sæt betingelser</button>
-    <button class="btn-secondary" id="shortenNamesBtn" type="button">Forkort navne</button>
+    <button class="btn-secondary" id="shortenNamesBtn" type="button" title="Fornavn og forbogstav i efternavnet. Id-numre og holdoplysninger fra Lectio fjernes.">Forkort navne</button>
+    <span class="muted" id="countLabel"></span>
   </div>
+  <div class="error" id="namesError" hidden></div>
+  <div class="warn" id="namesWarning" hidden></div>
+</section>
 
-  <div class="panel" id="advancedPanel" style="display:none; background:#f7f9fb; margin-top:14px;">
-    <label style="margin-bottom:2px;">Avancerede betingelser</label>
-    <p class="tabsub" style="margin:0 0 10px;">Vælg to elever fra den importerede klasse og en betingelse mellem dem.</p>
-    <div class="row">
-      <select id="condStudentA" style="padding:6px 8px; border:1px solid var(--border); border-radius:6px;"></select>
-      <select id="condType" style="padding:6px 8px; border:1px solid var(--border); border-radius:6px;">
-        <option value="avoid">må ikke være i samme gruppe som</option>
-        <option value="together">skal altid være sammen med</option>
-      </select>
-      <select id="condStudentB" style="padding:6px 8px; border:1px solid var(--border); border-radius:6px;"></select>
-      <button class="btn-secondary" id="addCondBtn">Tilføj betingelse</button>
-      <button class="btn-secondary" id="clearCondBtn">Ryd alle betingelser</button>
-    </div>
-    <div id="conditionsList" style="margin-top:10px; display:flex; flex-direction:column; gap:6px;"></div>
-
-    <label style="margin:18px 0 2px; display:block;">Gruppestørrelse</label>
-    <label style="margin:0; font-weight:400; display:flex; align-items:center; gap:6px;">
-      <input type="checkbox" id="avoidTriosCheckbox" style="margin:0;">
-      Undgå 3-mandsgrupper (tving i stedet grupper på mindst 4, fx to femmandsgrupper i stedet for en tremandsgruppe)
-    </label>
-
-    <label style="margin:18px 0 2px; display:block;">Køn og kategori</label>
-    <p class="tabsub" style="margin:0 0 10px;">Sæt køn på eleverne, og vælg om makkerparrene skal have blandet eller ens køn. Du kan desuden sætte en kategori (1-9) pr. elev og vælge om grupperne skal blandes eller holdes samlet på tværs af kategorier.</p>
-    <div class="row">
-      <label style="margin:0; font-weight:600; display:flex; align-items:center; gap:6px;">
-        Makkerpar skal være
-        <select id="genderPreference" style="padding:6px 8px; border:1px solid var(--border); border-radius:6px;">
-          <option value="none">Ingen præference</option>
-          <option value="mixed">Blandet køn</option>
-          <option value="same">Samme køn</option>
-        </select>
-      </label>
-    </div>
-    <div class="row">
-      <label style="margin:0; font-weight:600; display:flex; align-items:center; gap:6px;">
-        Grupper skal have
-        <select id="categoryPreference" style="padding:6px 8px; border:1px solid var(--border); border-radius:6px;">
-          <option value="none">Ingen præference</option>
-          <option value="mixed">Blandet kategori</option>
-          <option value="same">Samme kategori</option>
-        </select>
-      </label>
-      <button class="btn-secondary" id="editCategoriesBtn" type="button">Navngiv kategorier</button>
-    </div>
-    <div id="categoryEditPanel" style="display:none; margin-top:8px; padding:10px; border:1px solid var(--border); border-radius:6px; background:#fff; max-width:420px;"></div>
-    <div class="gender-wrap">
-      <div class="gender-header">
-        <span></span>
-        <span>Dreng</span>
-        <span>Pige</span>
-        <span class="cat-col">Kategori</span>
+<section class="step" id="stepGroups">
+  <div class="step-head"><span class="step-num">2</span><h2>Grupper</h2><span class="muted">Alt her er valgfrit</span></div>
+  <div class="step-cols">
+    <div>
+      <div class="sub-block">
+        <div class="sub-label">Gruppestørrelse</div>
+        <label class="check">
+          <input type="checkbox" id="avoidTriosCheckbox">
+          Undgå grupper på 3, og lav i stedet grupper på 5
+        </label>
+        <p class="muted hint" id="sizeHint"></p>
       </div>
-      <div id="genderList"></div>
+
+      <div class="sub-block">
+        <div class="sub-label">Betingelser</div>
+        <div class="row">
+          <select id="condStudentA"></select>
+          <select id="condType">
+            <option value="avoid">må ikke være i samme gruppe som</option>
+            <option value="together">skal være makker med</option>
+          </select>
+          <select id="condStudentB"></select>
+        </div>
+        <div class="row">
+          <button class="btn-secondary btn-small" id="addCondBtn" type="button">Tilføj betingelse</button>
+          <button class="btn-secondary btn-small" id="clearCondBtn" type="button">Ryd alle</button>
+          <span class="error" id="condError" hidden></span>
+        </div>
+        <div class="cond-list" id="conditionsList"></div>
+      </div>
+
+      <div class="sub-block">
+        <div class="sub-label">Roller</div>
+        <div class="row">
+          <label class="check">
+            <input type="checkbox" id="rolesEnabledCheckbox">
+            Giv eleverne roller i grupperne
+          </label>
+          <label class="inline">
+            Antal roller
+            <select id="roleCount">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </select>
+          </label>
+        </div>
+        <div class="edit-panel" id="roleNamesPanel" style="display:none;"></div>
+      </div>
     </div>
 
-    <label style="margin:18px 0 2px; display:block;">Roller</label>
-    <p class="tabsub" style="margin:0 0 10px;">Giv medlemmerne i hver gruppe faste roller (fx kaptajn, sekretær), vist tydeligt i Word/PDF-udgaven. Rolle 1 tildeles automatisk den første elev i hver gruppe, rolle 2 den næste, og så videre.</p>
-    <div class="row">
-      <label style="margin:0; font-weight:600; display:flex; align-items:center; gap:6px;">
-        <input type="checkbox" id="rolesEnabledCheckbox" style="margin:0;">
-        Brug roller i grupperne
-      </label>
-      <label style="margin:0; font-weight:600; display:flex; align-items:center; gap:6px;">
-        Antal aktive roller
-        <select id="roleCount" style="padding:6px 8px; border:1px solid var(--border); border-radius:6px;">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-        </select>
-      </label>
+    <div>
+      <div class="sub-block">
+        <div class="sub-label">Køn og kategori</div>
+        <div class="row">
+          <label class="inline">
+            Makkerpar skal være
+            <select id="genderPreference">
+              <option value="none">Ingen præference</option>
+              <option value="mixed">Blandet køn</option>
+              <option value="same">Samme køn</option>
+            </select>
+          </label>
+        </div>
+        <div class="row">
+          <label class="inline">
+            Grupper skal have
+            <select id="categoryPreference">
+              <option value="none">Ingen præference</option>
+              <option value="mixed">Blandet kategori</option>
+              <option value="same">Samme kategori</option>
+            </select>
+          </label>
+          <button class="btn-secondary btn-small" id="editCategoriesBtn" type="button">Navngiv kategorier</button>
+        </div>
+        <div class="edit-panel" id="categoryEditPanel" style="display:none;"></div>
+        <p class="muted hint">Der tages kun hensyn til elever, der har fået køn eller kategori.</p>
+        <div class="gender-wrap">
+          <div class="gender-header">
+            <span></span>
+            <span>Dreng</span>
+            <span>Pige</span>
+            <span class="cat-col">Kategori</span>
+          </div>
+          <div id="genderList"></div>
+        </div>
+      </div>
     </div>
-    <div id="roleNamesPanel" style="display:none; margin-top:8px; padding:10px; border:1px solid var(--border); border-radius:6px; background:#fff; max-width:420px;"></div>
   </div>
+</section>
 
-  <div class="row" style="margin-top:16px;">
-    <label style="margin:0; font-weight:600; display:flex; align-items:center; gap:6px;">
-      Klassenavn (valgfrit)
-      <input type="text" id="className" placeholder="2y" style="font-weight:400; padding:6px 8px; border:1px solid var(--border); border-radius:6px; width:140px;">
-    </label>
-  </div>
+<section class="step" id="stepWeeks">
+  <div class="step-head"><span class="step-num">3</span><h2>Uger</h2></div>
   <div class="row">
-    <label style="margin:0; font-weight:600; display:flex; align-items:center; gap:6px;">
-      Første uge grupperne gælder fra
-      <input type="number" id="startWeek" min="1" max="53" style="font-weight:400; padding:6px 8px; border:1px solid var(--border); border-radius:6px; width:60px;">
-      <span id="currentWeekHint" style="font-weight:400; color:var(--muted); font-size:.8rem;"></span>
+    <label class="inline">
+      Første uge
+      <input type="number" id="startWeek" min="1" max="53">
     </label>
-    <label style="margin:0; font-weight:600; display:flex; align-items:center; gap:6px;">
-      Hvor ofte skal grupperne skiftes (uger)
-      <input type="number" id="rotationWeeks" value="2" min="1" max="52" style="font-weight:400; padding:6px 8px; border:1px solid var(--border); border-radius:6px; width:60px;">
+    <span class="muted" id="currentWeekHint"></span>
+    <label class="inline">
+      Grupperne gælder i
+      <input type="number" id="rotationWeeks" value="2" min="1" max="52">
+      uger ad gangen
     </label>
-    <label style="margin:0; font-weight:600; display:flex; align-items:center; gap:6px;">
-      Hvor mange uger skal planen dække
-      <input type="number" id="planWeeks" value="10" min="1" max="52" style="font-weight:400; padding:6px 8px; border:1px solid var(--border); border-radius:6px; width:60px;">
-      <span id="groupingCountHint" style="font-weight:400; color:var(--muted); font-size:.8rem;"></span>
+    <label class="inline">
+      Planen dækker
+      <input type="number" id="planWeeks" value="10" min="1" max="52">
+      uger
     </label>
   </div>
+  <p class="muted hint" id="periodHint"></p>
   <div class="row">
-    <button class="btn-primary" id="generateBtn">Generér grupper</button>
-    <span class="count" id="countLabel"></span>
+    <button class="btn-primary" id="generateBtn" type="button">Lav plan</button>
+    <span class="error" id="errorLabel" hidden></span>
   </div>
-  <div class="row">
-    <button class="btn-secondary" id="exportBtn" disabled title="Generér grupper, før du eksporterer">Eksportér til Word</button>
-    <button class="btn-secondary" id="exportPdfBtn" disabled title="Generér grupper, før du eksporterer">Eksportér til PDF</button>
-  </div>
+</section>
 
-  <div class="error" id="errorLabel"></div>
-</div>
-
-<div id="resultSection">
-  <div class="example-banner">Eksempel, der viser bordgrupper til første uge - Download word-filen for at se alle uger</div>
+<section class="step" id="resultSection" hidden>
+  <div class="step-head"><span class="step-num">4</span><h2>Plan</h2></div>
   <div class="summary" id="summaryLine"></div>
-  <div class="legend">
-    <span><span class="swatch" style="background:var(--pair-a-border)"></span>Par</span>
-    <span><span class="swatch" style="background:var(--trio-border)"></span>Trio</span>
-    <span>"Gruppe N" = de par der tilsammen udgør én gruppe (kan sidde ved forskellige borde uden for Firemandsborde-fanen)</span>
+  <div class="stale" id="staleNotice" hidden>
+    Indstillingerne er ændret, siden planen blev lavet. Tryk på Ny lodtrækning for at bruge dem.
   </div>
+  <div class="row export-row">
+    <button class="btn-primary" id="exportBtn" type="button">Hent Word-fil</button>
+    <button class="btn-secondary" id="exportPdfBtn" type="button">Udskriv / gem som PDF</button>
+    <button class="btn-secondary" id="newDrawBtn" type="button">Ny lodtrækning</button>
+    <span class="muted" id="exportHint"></span>
+    <span class="error" id="exportError" hidden></span>
+  </div>
+
+  <div class="period-bar" id="periodBar"></div>
 
   <div class="tabbar">
-    <button class="tabbtn active" data-tab="four">Firemandsborde</button>
-    <button class="tabbtn" data-tab="hex">Sekskantede borde</button>
-    <button class="tabbtn" data-tab="row">Rækkeopstilling</button>
+    <button class="tabbtn active" data-tab="groups" type="button">Grupper</button>
+    <button class="tabbtn" data-tab="hex" type="button">Sekskantede borde</button>
+    <button class="tabbtn" data-tab="row" type="button">Rækkeopstilling</button>
   </div>
 
-  <div class="tabpanel active" id="tab-four">
-    <p class="tabsub">Hvert bord er én gruppe (par bundtet sammen, evt. med en enkelt trio). Der er altid højst 7 grupper. Under avancerede betingelser kan du slå "Undgå 3-mandsgrupper" til, så alle grupper i stedet bliver på mindst 4 (fx to femmandsgrupper).</p>
-    <div class="tables" id="tables-four"></div>
+  <div class="tabpanel active" id="tab-groups">
+    <p class="tabsub">Hver kolonne er et makkerpar eller en trio. Ved firemandsborde er hver gruppe ét bord.</p>
+    <div class="card-grid" id="tables-groups"></div>
   </div>
   <div class="tabpanel" id="tab-hex">
-    <p class="tabsub">5 sekskantede borde, op til 6 elever pr. bord. Makkerpar og trioer holdes altid samlet.</p>
+    <p class="tabsub">5 borde med 6 pladser. Makkerpar og trioer sidder samlet, og mærket viser elevernes gruppe. <span class="over-note" id="hexNote"></span></p>
     <div class="tables grid-mode" id="tables-hex"></div>
   </div>
   <div class="tabpanel" id="tab-row">
-    <p class="tabsub">3 rækker à op til 10 elever, opstillet i et fast gitter så samme sædeplads står lige over hinanden i alle 3 rækker. Makkerpar og trioer holdes altid samlet.</p>
+    <p class="tabsub">3 rækker med 10 pladser. Samme plads står lige bag hinanden i alle rækker, og farven over navnet viser makkerparret. <span class="over-note" id="rowNote"></span></p>
     <div class="tables" id="tables-row"></div>
   </div>
-
-</div>
+</section>
 
 <script>
 (function(){
   var CATEGORY_COUNT = 9;
   var ROLE_COUNT_MAX = 5;
+  var MAX_GROUPS = 7;
+  var MAX_HEX_TABLES = 5;
+  var HEX_CAPACITY = 6;
+  var MAX_ROWS = 3;
+  var ROW_CAPACITY = 10;
+  var MAX_STUDENTS = 33;
+  var MAX_GROUP_SIZE = 5;
+
   var state = {
-    groups:null, layouts:null, roster:[], sortedRoster:[],
+    roster:[], sortedRoster:[],
     constraints:{ together:[], avoid:[] }, genders:{},
     categories:{}, categoryNames:new Array(CATEGORY_COUNT).fill(''), categoryActive:new Array(CATEGORY_COUNT).fill(true),
-    roleNames:new Array(ROLE_COUNT_MAX).fill('')
+    roleNames:new Array(ROLE_COUNT_MAX).fill(''),
+    // Planen laves én gang og både vises og eksporteres derfra. Flere perioder bygges videre
+    // på samme historik, så en ændring af antal uger ikke trækker de første perioder om.
+    plan:null, periodIdx:0
   };
+  var rosterKey = null;
+
+  function byId(id){ return document.getElementById(id); }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"]/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]; });
+  }
+
+  function showMessage(id, text){
+    var node = byId(id);
+    node.textContent = text || '';
+    node.hidden = !text;
+  }
+
+  function joinDa(parts){
+    if(parts.length <= 1) return parts.join('');
+    return parts.slice(0, -1).join(', ') + ' og ' + parts[parts.length - 1];
+  }
+
+  // "7 grupper på 4" eller "7 grupper: 6 på 4 og 1 på 3"
+  function describeSizes(sizes){
+    var counts = {};
+    sizes.forEach(function(s){ counts[s] = (counts[s] || 0) + 1; });
+    var keys = Object.keys(counts).map(Number).sort(function(a,b){ return b - a; });
+    var groupWord = sizes.length === 1 ? ' gruppe' : ' grupper';
+    if(keys.length === 1) return sizes.length + groupWord + ' på ' + keys[0];
+    return sizes.length + groupWord + ': ' + joinDa(keys.map(function(k){ return counts[k] + ' på ' + k; }));
+  }
 
   function categoryLabel(n){
     var custom = (state.categoryNames[n-1] || '').trim();
@@ -457,7 +573,6 @@ Elev 28</textarea>
     return text.split('\n').map(function(s){return s.trim();}).filter(function(s){return s.length>0;}).map(capName);
   }
 
-  // Fælles validering af elevlisten - bruges før både visning, import og eksport.
   function rosterError(names){
     if(names.length < 4) return 'Indsæt mindst 4 elevnavne (ét navn pr. linje).';
     if(names.length > MAX_STUDENTS) return 'Dette program nægter at presse flere end ' + MAX_STUDENTS + ' elever ind i vores klasser. Det er simpelthen ikke forsvarligt i forhold til iltniveauet.';
@@ -491,51 +606,107 @@ Elev 28</textarea>
     return first + ' ' + last.charAt(0).toUpperCase();
   }
 
+  // Forkorter listen og flytter køn, kategori og betingelser med over på de nye navne.
   function shortenNames(){
-    var textarea = document.getElementById('names');
-    var lines = textarea.value.split('\n');
-    textarea.value = lines.map(function(line){
+    var textarea = byId('names');
+    var renames = {};
+    textarea.value = textarea.value.split('\n').map(function(line){
       var trimmed = line.trim();
-      return trimmed ? shortenName(trimmed) : line;
+      if(!trimmed) return line;
+      var short = shortenName(trimmed);
+      var oldKey = capName(trimmed), newKey = capName(short);
+      if(oldKey !== newKey) renames[oldKey] = newKey;
+      return short;
     }).join('\n');
+    renameStudents(renames);
+    syncRoster();
   }
 
-  // ---------- Importér klasse + avancerede betingelser (skal/må ikke være sammen) ----------
-  function importClass(){
-    var names = parseNames(document.getElementById('names').value);
-    var errorLabel = document.getElementById('errorLabel');
-    errorLabel.style.display = 'none';
-    var err = rosterError(names);
-    if(err){
-      errorLabel.textContent = err;
-      errorLabel.style.display = 'block';
-      return;
+  function renameStudents(renames){
+    if(!Object.keys(renames).length) return;
+    function rename(nm){ return Object.prototype.hasOwnProperty.call(renames, nm) ? renames[nm] : nm; }
+    ['genders', 'categories'].forEach(function(key){
+      var next = {};
+      Object.keys(state[key]).forEach(function(nm){
+        var target = rename(nm);
+        if(state[key][nm] || !(target in next)) next[target] = state[key][nm];
+      });
+      state[key] = next;
+    });
+    ['together', 'avoid'].forEach(function(type){
+      var next = [];
+      state.constraints[type].forEach(function(p){
+        var a = rename(p[0]), b = rename(p[1]);
+        if(a !== b && !conditionExists(next, a, b)) next.push([a, b]);
+      });
+      state.constraints[type] = next;
+    });
+  }
+
+  // ---------- Elevlisten: tabellen og betingelserne følger listen af sig selv ----------
+  // Indstillinger gemmes pr. navn og slettes ikke, når et navn forsvinder fra listen,
+  // så de virker igen, hvis navnet kommer tilbage (fx midt i en rettelse).
+  function syncRoster(){
+    var names = parseNames(byId('names').value);
+    var key = names.join('\n');
+    if(key !== rosterKey){
+      rosterKey = key;
+      state.roster = names;
+      state.sortedRoster = names.filter(function(nm, i){ return names.indexOf(nm) === i; })
+        .sort(function(a,b){ return a.localeCompare(b,'da'); });
+      renderStudentSelects();
+      renderGenderList();
+      renderConditions();
     }
-    state.roster = names;
-    state.constraints = { together:[], avoid:[] };
-    state.genders = {};
-    state.categories = {};
-    var sorted = names.slice().sort(function(a,b){ return a.localeCompare(b,'da'); });
-    state.sortedRoster = sorted;
-    ['condStudentA','condStudentB'].forEach(function(id){
-      var sel = document.getElementById(id);
+    updateNamesInfo();
+    updateSizeHint();
+    updateStale();
+  }
+
+  function updateNamesInfo(){
+    var names = state.roster;
+    byId('countLabel').textContent = names.length ? names.length + (names.length === 1 ? ' elev' : ' elever') : '';
+    showMessage('namesError', names.length ? rosterError(names) : null);
+    var seen = {}, dupes = [];
+    names.forEach(function(nm){
+      if(seen[nm] && dupes.indexOf(nm) === -1) dupes.push(nm);
+      seen[nm] = true;
+    });
+    showMessage('namesWarning', dupes.length ? ('Flere elever hedder ' + joinDa(dupes) + '. Tilføj et bogstav mere, så man kan se forskel på dem.') : null);
+  }
+
+  function updateSizeHint(){
+    var n = state.roster.length;
+    byId('sizeHint').textContent = rosterError(state.roster) ? '' :
+      (n + ' elever giver ' + describeSizes(computeSizes(n, getAvoidTrios()).groupSizes) + '.');
+  }
+
+  function renderStudentSelects(){
+    ['condStudentA','condStudentB'].forEach(function(id, k){
+      var sel = byId(id);
+      var prev = sel.value;
       sel.innerHTML = '';
-      sorted.forEach(function(nm){
+      state.sortedRoster.forEach(function(nm){
         var opt = document.createElement('option');
         opt.value = nm; opt.textContent = nm;
         sel.appendChild(opt);
       });
+      if(prev && state.sortedRoster.indexOf(prev) !== -1) sel.value = prev;
+      else sel.selectedIndex = Math.min(k, state.sortedRoster.length - 1);
     });
-    document.getElementById('condStudentB').selectedIndex = Math.min(1, sorted.length-1);
-    document.getElementById('advancedPanel').style.display = 'block';
-    renderConditions();
-    renderGenderList(sorted);
   }
 
-  function renderGenderList(sortedNames){
-    var container = document.getElementById('genderList');
+  function renderGenderList(){
+    var container = byId('genderList');
     container.innerHTML = '';
-    sortedNames.forEach(function(nm){
+    if(!state.sortedRoster.length){
+      var empty = document.createElement('div');
+      empty.className = 'gender-empty muted';
+      empty.textContent = 'Navnene fra trin 1 vises her.';
+      container.appendChild(empty);
+      return;
+    }
+    state.sortedRoster.forEach(function(nm){
       var row = document.createElement('div');
       row.className = 'gender-row';
 
@@ -555,10 +726,12 @@ Elev 28</textarea>
       boyBox.addEventListener('change', function(){
         if(boyBox.checked){ girlBox.checked = false; state.genders[nm] = 'dreng'; }
         else { state.genders[nm] = ''; }
+        updateStale();
       });
       girlBox.addEventListener('change', function(){
         if(girlBox.checked){ boyBox.checked = false; state.genders[nm] = 'pige'; }
         else { state.genders[nm] = ''; }
+        updateStale();
       });
 
       var catCell = document.createElement('div');
@@ -576,7 +749,7 @@ Elev 28</textarea>
         catSelect.appendChild(opt);
       }
       catSelect.value = state.categories[nm] || '';
-      catSelect.addEventListener('change', function(){ state.categories[nm] = catSelect.value; });
+      catSelect.addEventListener('change', function(){ state.categories[nm] = catSelect.value; updateStale(); });
       catCell.appendChild(catSelect);
 
       row.appendChild(span);
@@ -587,12 +760,8 @@ Elev 28</textarea>
     });
   }
 
-  function refreshGenderList(){
-    if(state.sortedRoster && state.sortedRoster.length) renderGenderList(state.sortedRoster);
-  }
-
   function renderCategoryEditPanel(){
-    var panel = document.getElementById('categoryEditPanel');
+    var panel = byId('categoryEditPanel');
     panel.innerHTML = '';
     for(var i=0; i<CATEGORY_COUNT; i++){
       (function(i){
@@ -611,7 +780,7 @@ Elev 28</textarea>
         input.style.opacity = state.categoryActive[i] ? '1' : '.45';
         input.addEventListener('input', function(){
           state.categoryNames[i] = input.value;
-          refreshGenderList();
+          renderGenderList();
         });
 
         var toggleBtn = document.createElement('button');
@@ -626,7 +795,8 @@ Elev 28</textarea>
             });
           }
           renderCategoryEditPanel();
-          refreshGenderList();
+          renderGenderList();
+          updateStale();
         });
 
         row.appendChild(num);
@@ -638,19 +808,19 @@ Elev 28</textarea>
   }
 
   function getGenderPreference(){
-    return document.getElementById('genderPreference').value;
+    return byId('genderPreference').value;
   }
 
   function getCategoryPreference(){
-    return document.getElementById('categoryPreference').value;
+    return byId('categoryPreference').value;
   }
 
   function getRolesEnabled(){
-    return document.getElementById('rolesEnabledCheckbox').checked;
+    return byId('rolesEnabledCheckbox').checked;
   }
 
   function getRoleCount(){
-    var v = parseInt(document.getElementById('roleCount').value, 10);
+    var v = parseInt(byId('roleCount').value, 10);
     if(!v || v < 1) return 1;
     return Math.min(v, ROLE_COUNT_MAX);
   }
@@ -666,7 +836,7 @@ Elev 28</textarea>
   }
 
   function renderRoleNamesPanel(){
-    var panel = document.getElementById('roleNamesPanel');
+    var panel = byId('roleNamesPanel');
     panel.innerHTML = '';
     var count = getRoleCount();
     for(var i=0; i<ROLE_COUNT_MAX; i++){
@@ -686,7 +856,7 @@ Elev 28</textarea>
         input.value = state.roleNames[i];
         input.disabled = !active;
         input.style.opacity = active ? '1' : '.45';
-        input.addEventListener('input', function(){ state.roleNames[i] = input.value; });
+        input.addEventListener('input', function(){ state.roleNames[i] = input.value; renderPlan(); });
 
         row.appendChild(num);
         row.appendChild(input);
@@ -696,7 +866,7 @@ Elev 28</textarea>
   }
 
   function getAvoidTrios(){
-    return document.getElementById('avoidTriosCheckbox').checked;
+    return byId('avoidTriosCheckbox').checked;
   }
 
   // Blødt scoretillæg: straffer en makkerkombination der ikke matcher køns-præferencen
@@ -745,56 +915,72 @@ Elev 28</textarea>
   }
 
   function addCondition(){
-    var a = document.getElementById('condStudentA').value;
-    var b = document.getElementById('condStudentB').value;
-    var type = document.getElementById('condType').value;
-    var errorLabel = document.getElementById('errorLabel');
-    errorLabel.style.display = 'none';
+    var a = byId('condStudentA').value;
+    var b = byId('condStudentB').value;
+    var type = byId('condType').value;
+    showMessage('condError', null);
 
     if(!a || !b || a === b){
-      errorLabel.textContent = 'Vælg to forskellige elever.';
-      errorLabel.style.display = 'block';
+      showMessage('condError', 'Vælg to forskellige elever.');
       return;
     }
     var otherList = type === 'avoid' ? state.constraints.together : state.constraints.avoid;
     if(conditionExists(otherList, a, b)){
-      errorLabel.textContent = 'Disse to elever har allerede den modsatte betingelse.';
-      errorLabel.style.display = 'block';
+      showMessage('condError', 'De to elever har allerede den modsatte betingelse.');
       return;
     }
     var list = state.constraints[type];
     if(conditionExists(list, a, b)) return;
+    if(type === 'together'){
+      // En elev kan kun have én makker, så en betingelse mere ville blive ignoreret.
+      var taken = [a, b].filter(function(nm){
+        return list.some(function(p){ return p[0] === nm || p[1] === nm; });
+      });
+      if(taken.length){
+        showMessage('condError', joinDa(taken) + ' har allerede en fast makker.');
+        return;
+      }
+    }
     list.push([a, b]);
     renderConditions();
+    updateStale();
   }
 
   function removeCondition(type, index){
     state.constraints[type].splice(index, 1);
+    showMessage('condError', null);
     renderConditions();
+    updateStale();
   }
 
   function renderConditions(){
-    var container = document.getElementById('conditionsList');
+    var container = byId('conditionsList');
     container.innerHTML = '';
-    state.constraints.avoid.forEach(function(p, i){
-      var chip = document.createElement('div');
-      chip.className = 'cond-chip avoid';
-      chip.innerHTML = '<span>' + p[0] + ' må <b>ikke</b> være i samme gruppe som ' + p[1] + '</span>';
-      var btn = document.createElement('button');
-      btn.textContent = 'Fjern';
-      btn.addEventListener('click', function(){ removeCondition('avoid', i); });
-      chip.appendChild(btn);
-      container.appendChild(chip);
-    });
-    state.constraints.together.forEach(function(p, i){
-      var chip = document.createElement('div');
-      chip.className = 'cond-chip together';
-      chip.innerHTML = '<span>' + p[0] + ' skal <b>altid</b> være sammen med ' + p[1] + '</span>';
-      var btn = document.createElement('button');
-      btn.textContent = 'Fjern';
-      btn.addEventListener('click', function(){ removeCondition('together', i); });
-      chip.appendChild(btn);
-      container.appendChild(chip);
+    var present = {};
+    state.roster.forEach(function(nm){ present[nm] = true; });
+    [['avoid', 'må ikke være i samme gruppe som'], ['together', 'skal være makker med']].forEach(function(def){
+      var type = def[0];
+      state.constraints[type].forEach(function(p, i){
+        var chip = document.createElement('div');
+        chip.className = 'cond-chip ' + type;
+        var text = document.createElement('span');
+        text.textContent = p[0] + ' ' + def[1] + ' ' + p[1];
+        chip.appendChild(text);
+        var missing = p.filter(function(nm){ return !present[nm]; });
+        if(missing.length){
+          chip.classList.add('missing');
+          var note = document.createElement('span');
+          note.className = 'cond-note';
+          note.textContent = joinDa(missing) + ' står ikke på listen';
+          chip.appendChild(note);
+        }
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = 'Fjern';
+        btn.addEventListener('click', function(){ removeCondition(type, i); });
+        chip.appendChild(btn);
+        container.appendChild(chip);
+      });
     });
   }
 
@@ -806,12 +992,6 @@ Elev 28</textarea>
     }
     return a;
   }
-
-  var MAX_GROUPS = 7;
-  var MAX_HEX_TABLES = 5;
-  var MAX_ROWS = 3;
-  var MAX_STUDENTS = 33;
-  var MAX_GROUP_SIZE = 5;
 
   // Standard: ulige/lige klassestørrelse danner trioer efter mod4-mønsteret (0,3,2,1 trioer for
   // n mod 4 = 0,1,2,3) som enlige 3-mandsgrupper - fx giver 27 elever 6 firemandsgrupper +
@@ -845,15 +1025,26 @@ Elev 28</textarea>
         return sizes;
       }
     }
-    return [n]; // sker ikke i praksis - UI'et sikrer 4 <= n <= MAX_STUDENTS
+    return [n]; // kun gyldig for 4-6 elever; ellers vælger planGroupSizes den anden regel
+  }
+
+  // En plan er kun brugbar, hvis den rummer præcis alle elever i grupper, der kan bygges af
+  // par og trioer (3, 4, 5 eller 6), og holder sig inden for MAX_GROUPS. Små klasser kan falde
+  // uden for den ene regel (fx 5 elever uden eller 7 og 11 elever med "Undgå grupper på 3"),
+  // og så bruges den anden.
+  function validGroupSizes(sizes, n){
+    var sum = sizes.reduce(function(s, x){ return s + x; }, 0);
+    return sum === n && sizes.length <= MAX_GROUPS && sizes.every(function(x){ return x >= 3 && x <= 6; });
   }
 
   function planGroupSizes(n, avoidTrios){
-    if(!avoidTrios){
-      var def = planGroupSizesDefault(n);
-      if(def.length <= MAX_GROUPS) return def;
+    var def = planGroupSizesDefault(n);
+    var noTrio = planGroupSizesNoTrio(n);
+    var order = avoidTrios ? [noTrio, def] : [def, noTrio];
+    for(var i=0; i<order.length; i++){
+      if(validGroupSizes(order[i], n)) return order[i];
     }
-    return planGroupSizesNoTrio(n);
+    return noTrio;
   }
 
   function computeSizes(n, avoidTrios){
@@ -894,13 +1085,10 @@ Elev 28</textarea>
 
   function conflicts(avoidSet, a, b){ return !!avoidSet[historyKey(a, b)]; }
 
-  // Danner trioer/par fra den ledige pulje (efter tvungne par er trukket fra), via en
-  // ombyttelig "pickPartner"-funktion så både den almindelige og historik-bevidste
-  // gruppering kan genbruge samme tvungne-par/undgå-logik.
   // Vælger den elev der har været i færrest trioer indtil nu som "anker" for en ny trio (uafgjort
   // brydes tilfældigt, da "pool" allerede er shufflet) - så det roterer hvem der ender i en
-  // 3-mandsgruppe på tværs af flere ugers grupperinger, i stedet for at det er tilfældigt (og
-  // dermed ofte de samme elever) hver gang. Bruges kun ved "X grupperinger til Word/PDF".
+  // 3-mandsgruppe på tværs af perioderne, i stedet for at det er tilfældigt (og dermed ofte
+  // de samme elever) hver gang.
   function pickTrioAnchor(pool, trioCounts){
     if(!trioCounts) return pool.shift();
     var best = 0;
@@ -912,6 +1100,8 @@ Elev 28</textarea>
     return anchor;
   }
 
+  // Danner trioer/par fra den ledige pulje (efter tvungne par er trukket fra), via en
+  // ombyttelig "pickPartner"-funktion, der står for tvungne-par/undgå/historik-vægtningen.
   function buildBaseGroups(nameList, constraints, pickPartner, avoidTrios, trioCounts){
     constraints = constraints || { together:[], avoid:[] };
     var forced = resolveForcedPairs(nameList, constraints.together);
@@ -993,52 +1183,21 @@ Elev 28</textarea>
     });
   }
 
-  function fourLabelMap(pairsGroups, bundles){
-    var map = {};
-    pairsGroups.forEach(function(p, idx){
-      var b = bundles.filter(function(bb){ return bb.pairs.indexOf(p) !== -1; })[0];
-      if(b) map[idx] = b.label;
+  // Hvilken gruppe hvert par og hver trio hører til, så det kan vises ved borde og rækker.
+  function unitLabels(pairsGroups, triplesGroups, bundles){
+    var labels = { pairs:{}, trios:{} };
+    bundles.forEach(function(b){
+      b.pairs.forEach(function(p){ labels.pairs[pairsGroups.indexOf(p)] = b.label; });
+      if(b.trio) labels.trios[triplesGroups.indexOf(b.trio)] = b.label;
     });
-    return map;
+    return labels;
   }
 
-  // ---------- Grunddata: par, trioer, grupper (mindst 4 elever pr. gruppe) ----------
-  function buildGroups(nameList, constraints, genderInfo, avoidTrios){
-    var avoidSet = avoidSetFromList((constraints || {}).avoid);
-    var genders = (genderInfo || {}).genders || {};
-    var preference = (genderInfo || {}).preference || 'none';
-    var categories = (genderInfo || {}).categories || {};
-    var categoryPreference = (genderInfo || {}).categoryPreference || 'none';
-    var base = buildBaseGroups(nameList, constraints, function(pool, anchor, count){
-      var rest = shuffle(pool);
-      rest.sort(function(a,b){
-        var sa = (conflicts(avoidSet, anchor, a) ? 1000 : 0) + genderMismatchScore(anchor, a, genders, preference) + categoryMismatchScore(anchor, a, categories, categoryPreference);
-        var sb = (conflicts(avoidSet, anchor, b) ? 1000 : 0) + genderMismatchScore(anchor, b, genders, preference) + categoryMismatchScore(anchor, b, categories, categoryPreference);
-        return sa - sb;
-      });
-      var chosen = rest.slice(0, count);
-      chosen.forEach(function(nm){ pool.splice(pool.indexOf(nm), 1); });
-      return chosen;
-    }, avoidTrios);
-
-    var bundles = bundlePairs(base.pairsGroups, base.triplesGroups, avoidSet, base.groupSizes, { categories: categories, preference: categoryPreference });
-
-    return {
-      n: base.n,
-      pairsCount: base.pairsGroups.length,
-      triplesCount: base.triplesGroups.length,
-      pairsGroups: base.pairsGroups,
-      triplesGroups: base.triplesGroups,
-      bundles: bundles,
-      fourLabelByPairIdx: fourLabelMap(base.pairsGroups, bundles)
-    };
+  function bundleSizes(groups){
+    return groups.bundles.map(function(b){ return b.members.length; });
   }
 
-  function pairUnit(p, groups, pairIdx){
-    return { type:'pair', size:2, data:p, fourLabel: groups.fourLabelByPairIdx[pairIdx] || null };
-  }
-
-  // ---------- Historik-bevidst gruppering (bruges kun til "X grupperinger til Word/PDF") ----------
+  // ---------- Gruppering med historik: makkere og gruppekammerater gentages så lidt som muligt ----------
   function historyCount(history, a, b){ return history[historyKey(a,b)] || 0; }
   function bumpHistoryGroup(history, members){
     for(var i=0;i<members.length;i++){
@@ -1049,7 +1208,7 @@ Elev 28</textarea>
     }
   }
 
-  // Tæller hvor mange gange hver elev har været i en 3-mandsgruppe på tværs af rundernes - bruges
+  // Tæller hvor mange gange hver elev har været i en 3-mandsgruppe på tværs af perioderne - bruges
   // af pickTrioAnchor og trio-vægten nedenfor til at rotere hvem der bliver trio-medlem.
   function bumpTrioCounts(trioCounts, triplesGroups){
     (triplesGroups || []).forEach(function(t){
@@ -1088,63 +1247,90 @@ Elev 28</textarea>
 
     return {
       n: base.n,
-      pairsCount: base.pairsGroups.length,
-      triplesCount: base.triplesGroups.length,
       pairsGroups: base.pairsGroups,
       triplesGroups: base.triplesGroups,
       bundles: bundles,
-      fourLabelByPairIdx: fourLabelMap(base.pairsGroups, bundles)
+      labels: unitLabels(base.pairsGroups, base.triplesGroups, bundles)
     };
   }
 
-  // ---------- Layout 1: Firemandsborde (én gruppe pr. bord, altid mindst 4 elever) ----------
-  function buildFourTableLayout(groups){
-    var tables = groups.bundles.map(function(b){
-      var units = [];
-      b.pairs.forEach(function(p){ units.push({ type:'pair', size:2, data:p, fourLabel:null }); });
-      if(b.trio) units.push({ type:'three', size:3, data:b.trio });
-      var size = b.pairs.length*2 + (b.trio ? 3 : 0);
-      return { units:units, size:size };
-    });
-    return shuffle(tables);
+  function pairUnit(p, groups, idx){
+    return { type:'pair', size:2, data:p, groupLabel: groups.labels.pairs[idx] || null };
   }
 
-  // ---------- Layout 2 & 3: balanceret pakning i faste borde/rækker ----------
+  function trioUnit(t, groups, idx){
+    return { type:'three', size:3, data:t, groupLabel: groups.labels.trios[idx] || null };
+  }
+
+  // ---------- Sekskantede borde og rækker: fordel par og trioer på faste borde ----------
+  // Alle fordelinger af trioerne på bordene afprøves (der er få), og parrene lægges på de
+  // mindst besatte borde. Den bedste fordeling har færrest elever ud over pladserne, derefter
+  // det mindst fyldte største bord og derefter de jævneste borde. Er der flere elever end
+  // pladser, får nogle borde ekstra elever, men ingen falder fra.
+  function compositions(total, parts){
+    var out = [];
+    (function rec(prefix, remaining, left){
+      if(left === 1){ out.push(prefix.concat([remaining])); return; }
+      for(var k=0; k<=remaining; k++) rec(prefix.concat([k]), remaining - k, left - 1);
+    })([], total, parts);
+    return out;
+  }
+
   function packBalanced(groups, numTables, capacity){
+    var trios = shuffle(groups.triplesGroups.map(function(t, idx){ return trioUnit(t, groups, idx); }));
+    var pairs = shuffle(groups.pairsGroups.map(function(p, idx){ return pairUnit(p, groups, idx); }));
+
+    var best = [], bestScore = Infinity;
+    compositions(trios.length, numTables).forEach(function(trioCounts){
+      var loads = trioCounts.map(function(k){ return 3*k; });
+      var pairCounts = trioCounts.map(function(){ return 0; });
+      pairs.forEach(function(){
+        var min = Math.min.apply(null, loads);
+        var lowest = [];
+        loads.forEach(function(load, t){ if(load === min) lowest.push(t); });
+        var t = lowest[Math.floor(Math.random()*lowest.length)];
+        loads[t] += 2;
+        pairCounts[t] += 1;
+      });
+      var maxLoad = Math.max.apply(null, loads), minLoad = Math.min.apply(null, loads);
+      var overflow = loads.reduce(function(sum, load){ return sum + Math.max(0, load - capacity); }, 0);
+      var score = overflow*10000 + maxLoad*100 + (maxLoad - minLoad);
+      if(score < bestScore){ bestScore = score; best = []; }
+      if(score === bestScore) best.push({ trios:trioCounts, pairs:pairCounts });
+    });
+
+    var pick = best[Math.floor(Math.random()*best.length)];
     var tables = [];
-    for(var t=0;t<numTables;t++) tables.push({ units:[], size:0 });
-
-    function place(unit, size){
-      var fitting = tables.filter(function(tb){ return tb.size+size<=capacity; });
-      var pool = fitting.length ? fitting : tables;
-      var minSize = Math.min.apply(null, pool.map(function(tb){return tb.size;}));
-      var candidates = pool.filter(function(tb){ return tb.size===minSize; });
-      var chosen = candidates[Math.floor(Math.random()*candidates.length)];
-      chosen.units.push(unit);
-      chosen.size += size;
-      return chosen;
+    var ti = 0, pi = 0;
+    for(var t=0; t<numTables; t++){
+      var units = trios.slice(ti, ti + pick.trios[t]).concat(pairs.slice(pi, pi + pick.pairs[t]));
+      ti += pick.trios[t];
+      pi += pick.pairs[t];
+      tables.push({ units:shuffle(units), size:3*pick.trios[t] + 2*pick.pairs[t] });
     }
-
-    // trioer parres to og to til samme bord først, så en enkelt trio ikke låser et bord under kapacitet
-    var threeUnits = shuffle(groups.triplesGroups.map(function(t){ return { type:'three', size:3, data:t }; }));
-    var i=0;
-    for(; i+1<threeUnits.length; i+=2){
-      var fitting = tables.filter(function(tb){ return tb.size+6<=capacity; });
-      var pool = fitting.length ? fitting : tables;
-      var minSize = Math.min.apply(null, pool.map(function(tb){return tb.size;}));
-      var candidates = pool.filter(function(tb){ return tb.size===minSize; });
-      var chosen = candidates[Math.floor(Math.random()*candidates.length)];
-      chosen.units.push(threeUnits[i]); chosen.units.push(threeUnits[i+1]);
-      chosen.size += 6;
-    }
-    if(threeUnits.length % 2 === 1){
-      place(threeUnits[threeUnits.length-1], 3);
-    }
-
-    var pairUnits = shuffle(groups.pairsGroups.map(function(p, idx){ return pairUnit(p, groups, idx); }));
-    pairUnits.forEach(function(u){ place(u, 2); });
-
     return tables;
+  }
+
+  function buildRound(names, history, constraints, genderInfo, avoidTrios, trioCounts){
+    var groups = buildGroupsHistoryAware(names, history, constraints, genderInfo, avoidTrios, trioCounts);
+    var layouts = {
+      hex: packBalanced(groups, MAX_HEX_TABLES, HEX_CAPACITY),
+      row: packBalanced(groups, MAX_ROWS, ROW_CAPACITY)
+    };
+    return { groups:groups, layouts:layouts };
+  }
+
+  // " Der er 32 elever og 30 pladser, så 2 borde har 7 elever."
+  function capacityNote(n, tables, capacity, singular, plural){
+    var seats = tables.length * capacity;
+    if(n <= seats) return '';
+    var bySize = {};
+    tables.forEach(function(t){ if(t.size > capacity) bySize[t.size] = (bySize[t.size] || 0) + 1; });
+    var parts = Object.keys(bySize).map(Number).sort(function(a,b){ return b - a; }).map(function(size){
+      var k = bySize[size];
+      return k + ' ' + (k === 1 ? singular : plural) + ' har ' + size + ' elever';
+    });
+    return 'Der er ' + n + ' elever og ' + seats + ' pladser, så ' + joinDa(parts) + '.';
   }
 
   // ---------- Rendering ----------
@@ -1157,28 +1343,22 @@ Elev 28</textarea>
 
   function renderUnit(unit){
     var wrap = document.createElement('div');
-    if(unit.type === 'three'){
-      wrap.className = 'unit three';
-      unit.data.forEach(function(nm){ wrap.appendChild(renderSeat(nm)); });
-    } else {
-      wrap.className = 'unit pair';
-      if(unit.fourLabel){
-        var tag = document.createElement('div');
-        tag.className = 'fourtag';
-        tag.textContent = unit.fourLabel;
-        wrap.appendChild(tag);
-      }
-      var seatsRow = document.createElement('div');
-      seatsRow.style.display = 'flex';
-      seatsRow.style.gap = '4px';
-      unit.data.forEach(function(nm){ seatsRow.appendChild(renderSeat(nm)); });
-      wrap.appendChild(seatsRow);
+    wrap.className = 'unit ' + (unit.type === 'three' ? 'three' : 'pair');
+    if(unit.groupLabel){
+      var tag = document.createElement('div');
+      tag.className = 'unit-tag';
+      tag.textContent = unit.groupLabel;
+      wrap.appendChild(tag);
     }
+    var seatsRow = document.createElement('div');
+    seatsRow.className = 'unit-seats';
+    unit.data.forEach(function(nm){ seatsRow.appendChild(renderSeat(nm)); });
+    wrap.appendChild(seatsRow);
     return wrap;
   }
 
   function renderTablesInto(containerId, tables, labelFn, hexStyle, showCount){
-    var container = document.getElementById(containerId);
+    var container = byId(containerId);
     container.innerHTML = '';
     tables.forEach(function(table, ti){
       var block = document.createElement('div');
@@ -1199,11 +1379,26 @@ Elev 28</textarea>
     return names[ti] || ('Ekstra række ' + (ti-2));
   }
 
-  // Rækkeopstilling: alle elever ligger i et fast 10-kolonners gitter, så samme sædeplads
-  // står lige over hinanden i alle 3 rækker, uanset navnelængde.
+  // Sæderne i en række i rækkefølge. Hvert makkerpar får sin egen farve; trioer har ingen.
+  function rowSeats(table){
+    var seats = [], pairColorIdx = 0;
+    table.units.forEach(function(unit){
+      var color = unit.type === 'three' ? null : PAIR_PALETTE[pairColorIdx++ % PAIR_PALETTE.length];
+      unit.data.forEach(function(nm){ seats.push({ name:nm, color:color }); });
+    });
+    return seats;
+  }
+
+  // Gitteret har mindst 10 kolonner, og flere hvis en række har fået ekstra elever,
+  // så samme sædeplads altid står lige over hinanden i alle rækker.
+  function rowColumns(tables){
+    return Math.max(ROW_CAPACITY, Math.max.apply(null, tables.map(function(t){ return t.size; })));
+  }
+
   function renderRowGrid(containerId, tables){
-    var container = document.getElementById(containerId);
+    var container = byId(containerId);
     container.innerHTML = '';
+    var cols = rowColumns(tables);
     tables.forEach(function(table, ti){
       var block = document.createElement('div');
       block.className = 'table-block';
@@ -1212,77 +1407,142 @@ Elev 28</textarea>
       block.appendChild(h);
       var grid = document.createElement('div');
       grid.className = 'row-grid';
-      var pairColorIdx = 0;
-      table.units.forEach(function(unit){
-        if(unit.type === 'three'){
-          unit.data.forEach(function(nm){
-            var seat = renderSeat(nm);
-            seat.classList.add('seat-three');
-            grid.appendChild(seat);
-          });
+      grid.style.gridTemplateColumns = 'repeat(' + cols + ', minmax(0,1fr))';
+      rowSeats(table).forEach(function(s){
+        var seat = renderSeat(s.name);
+        if(s.color){
+          seat.classList.add('seat-pair');
+          seat.style.borderTopColor = s.color;
         } else {
-          var color = PAIR_PALETTE[pairColorIdx % PAIR_PALETTE.length];
-          pairColorIdx++;
-          unit.data.forEach(function(nm){
-            var seat = renderSeat(nm);
-            seat.classList.add('seat-pair');
-            seat.style.borderTopColor = color;
-            grid.appendChild(seat);
-          });
+          seat.classList.add('seat-three');
         }
+        grid.appendChild(seat);
       });
       block.appendChild(grid);
       container.appendChild(block);
     });
   }
 
-  function renderAll(groups, layouts){
-    renderTablesInto('tables-four', layouts.four, function(ti){ return 'Bord ' + (ti+1); }, false, true);
-    renderTablesInto('tables-hex', layouts.hex, function(ti){ return 'Bord ' + (ti+1); }, true, false);
-    renderRowGrid('tables-row', layouts.row);
-
-    var summary = document.getElementById('summaryLine');
-    summary.innerHTML =
-      '<span><b>' + groups.n + '</b> elever</span>' +
-      '<span><b>' + groups.bundles.length + '</b> grupper</span>' +
-      (groups.triplesCount ? '<span>heraf 1 trio</span>' : '');
-
-    document.getElementById('resultSection').style.display = 'block';
+  // Gruppekortene på skærmen er de samme tabeller som i filen.
+  function renderGroupCards(groups){
+    var activeRoleNames = getActiveRoleNames();
+    byId('tables-groups').innerHTML = groups.bundles.map(function(b){
+      return '<div>' + groupCardTable(b.label, bundleColumns(b), bundleRoleMap(b, activeRoleNames)) + '</div>';
+    }).join('');
   }
 
-  function generate(){
-    var text = document.getElementById('names').value;
-    var names = parseNames(text);
-    var errorLabel = document.getElementById('errorLabel');
-    errorLabel.style.display = 'none';
+  // ---------- Planen: laves én gang og vises og eksporteres derfra ----------
+  function copyPairs(list){
+    return list.map(function(p){ return [p[0], p[1]]; });
+  }
 
-    var err = rosterError(names);
-    if(err){
-      errorLabel.textContent = err;
-      errorLabel.style.display = 'block';
-      document.getElementById('resultSection').style.display = 'none';
-      document.getElementById('exportBtn').disabled = true;
-      document.getElementById('exportBtn').title = 'Generér grupper, før du eksporterer';
-      document.getElementById('exportPdfBtn').disabled = true;
-      document.getElementById('exportPdfBtn').title = 'Generér grupper, før du eksporterer';
-      return;
+  // Alt det, der påvirker lodtrækningen. Ændres det efter planen er lavet, vises en besked.
+  function settingsSignature(){
+    var names = state.roster.slice().sort();
+    var present = {};
+    names.forEach(function(nm){ present[nm] = true; });
+    function activePairs(list){
+      return list.filter(function(p){ return present[p[0]] && present[p[1]]; });
     }
+    return JSON.stringify([
+      names,
+      activePairs(state.constraints.together),
+      activePairs(state.constraints.avoid),
+      names.map(function(nm){ return state.genders[nm] || ''; }),
+      names.map(function(nm){ return state.categories[nm] || ''; }),
+      getGenderPreference(), getCategoryPreference(), getAvoidTrios()
+    ]);
+  }
 
-    var groups = buildGroups(names, state.constraints, { genders: state.genders, preference: getGenderPreference(), categories: state.categories, categoryPreference: getCategoryPreference() }, getAvoidTrios());
-    var layouts = {
-      four: buildFourTableLayout(groups),
-      hex: packBalanced(groups, MAX_HEX_TABLES, 6),
-      row: packBalanced(groups, MAX_ROWS, 10)
+  function updateStale(){
+    if(!state.plan) return;
+    byId('staleNotice').hidden = settingsSignature() === state.plan.signature;
+  }
+
+  function makePlan(scroll){
+    syncRoster();
+    var names = state.roster;
+    var err = rosterError(names);
+    showMessage('errorLabel', err);
+    if(err) return;
+
+    state.plan = {
+      signature: settingsSignature(),
+      names: names.slice(),
+      constraints: { together: copyPairs(state.constraints.together), avoid: copyPairs(state.constraints.avoid) },
+      genderInfo: {
+        genders: Object.assign({}, state.genders), preference: getGenderPreference(),
+        categories: Object.assign({}, state.categories), categoryPreference: getCategoryPreference()
+      },
+      avoidTrios: getAvoidTrios(),
+      history: {}, trioCounts: {}, rounds: []
     };
-    state.groups = groups;
-    state.layouts = layouts;
+    state.periodIdx = 0;
+    showMessage('exportError', null);
+    byId('resultSection').hidden = false;
+    renderPlan();
+    if(scroll) byId('resultSection').scrollIntoView({ behavior:'smooth', block:'start' });
+  }
 
-    renderAll(groups, layouts);
-    document.getElementById('exportBtn').disabled = false;
-    document.getElementById('exportBtn').removeAttribute('title');
-    document.getElementById('exportPdfBtn').disabled = false;
-    document.getElementById('exportPdfBtn').removeAttribute('title');
-    document.getElementById('countLabel').textContent = names.length + ' elever indsat';
+  // Perioderne i den aktuelle plan med deres uger. Bliver planen længere, bygges de nye
+  // perioder videre på samme historik; de første perioder ændres ikke.
+  function planRounds(){
+    var p = state.plan;
+    if(!p) return null;
+    var count = getGroupingCount();
+    while(p.rounds.length < count){
+      p.rounds.push(buildRound(p.names, p.history, p.constraints, p.genderInfo, p.avoidTrios, p.trioCounts));
+    }
+    var weekPlan = buildWeekPlan(getStartWeek(), getRotationWeeks(), count);
+    return p.rounds.slice(0, count).map(function(r, i){
+      return { groups:r.groups, layouts:r.layouts, weeks:weekPlan[i] };
+    });
+  }
+
+  function renderPlan(){
+    var rounds = planRounds();
+    if(!rounds) return;
+    if(state.periodIdx >= rounds.length) state.periodIdx = rounds.length - 1;
+    var round = rounds[state.periodIdx];
+    var g = round.groups, l = round.layouts;
+
+    var summary = byId('summaryLine');
+    summary.innerHTML = '';
+    var className = getClassName();
+    if(className){
+      var b = document.createElement('b');
+      b.textContent = className;
+      summary.appendChild(b);
+    }
+    [g.n + ' elever', describeSizes(bundleSizes(g)), rounds.length + (rounds.length === 1 ? ' periode' : ' perioder')].forEach(function(text){
+      var s = document.createElement('span');
+      s.textContent = text;
+      summary.appendChild(s);
+    });
+
+    var bar = byId('periodBar');
+    bar.innerHTML = '';
+    rounds.forEach(function(r, i){
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'period-btn' + (i === state.periodIdx ? ' active' : '');
+      btn.textContent = 'Uge ' + formatWeekRange(r.weeks);
+      btn.addEventListener('click', function(){
+        state.periodIdx = i;
+        renderPlan();
+      });
+      bar.appendChild(btn);
+    });
+
+    renderGroupCards(g);
+    renderTablesInto('tables-hex', l.hex, function(ti){ return 'Bord ' + (ti+1); }, true, true);
+    renderRowGrid('tables-row', l.row);
+    byId('hexNote').textContent = capacityNote(g.n, l.hex, HEX_CAPACITY, 'bord', 'borde');
+    byId('rowNote').textContent = capacityNote(g.n, l.row, ROW_CAPACITY, 'række', 'rækker');
+    byId('exportHint').textContent = rounds.length === 1
+      ? 'Filen indeholder perioden, som den vises her.'
+      : 'Filen indeholder alle ' + rounds.length + ' perioder, som de vises her.';
+    updateStale();
   }
 
   // ---------- Faner ----------
@@ -1291,18 +1551,19 @@ Elev 28</textarea>
       document.querySelectorAll('.tabbtn').forEach(function(b){ b.classList.remove('active'); });
       document.querySelectorAll('.tabpanel').forEach(function(p){ p.classList.remove('active'); });
       btn.classList.add('active');
-      document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+      byId('tab-' + btn.dataset.tab).classList.add('active');
     });
   });
 
-  // ---------- Word-eksport: 5 forskellige grupperinger i forlængelse af hinanden ----------
+  // ---------- Eksport: én side pr. periode ----------
   function unitToWordDiv(unit, plain){
+    var names = escapeHtml(unit.data.join(', '));
     if(unit.type === 'three'){
       var tag3 = plain ? '' : '<span class="tag">Trio</span>';
-      return '<div class="grp three">' + tag3 + unit.data.join(', ') + '</div>';
+      return '<div class="grp three">' + tag3 + names + '</div>';
     }
     var tag = plain ? '' : '<span class="tag">Par</span>';
-    return '<div class="grp">' + tag + unit.data.join(', ') + '</div>';
+    return '<div class="grp">' + tag + names + '</div>';
   }
 
   // Fylder sidste (ujævne) række op med tomme, usynlige celler op til "cols" celler i alt.
@@ -1353,7 +1614,7 @@ Elev 28</textarea>
 
   function groupCardTable(label, columns, roleMap){
     var rows = Math.max.apply(null, columns.map(function(c){ return c.names.length; }));
-    var html = '<table class="gcard"><tr><th colspan="' + columns.length + '">' + label + '</th></tr>';
+    var html = '<table class="gcard"><tr><th colspan="' + columns.length + '">' + escapeHtml(label) + '</th></tr>';
     for(var r=0; r<rows; r++){
       html += '<tr>';
       columns.forEach(function(c){
@@ -1361,7 +1622,7 @@ Elev 28</textarea>
         var cellHtml = '';
         if(nm !== undefined){
           var role = roleMap && roleMap[nm];
-          cellHtml = (role ? '<span class="role-tag">' + role + '</span><br>' : '') + nm;
+          cellHtml = (role ? '<span class="role-tag">' + escapeHtml(role) + '</span><br>' : '') + escapeHtml(nm);
         }
         html += '<td class="' + c.colorClass + '">' + cellHtml + '</td>';
       });
@@ -1371,25 +1632,19 @@ Elev 28</textarea>
     return html;
   }
 
-  // Rækkeopstilling i Word: fast 10-kolonners tabel, så samme sædeplads står lige over hinanden i alle 3 rækker
   function rowGridWordTable(tables){
-    var maxCols = 10;
+    var cols = rowColumns(tables);
+    var width = (92 / cols).toFixed(2);
     var html = '<table class="rowgrid">';
     tables.forEach(function(table, ti){
       html += '<tr><th>' + rowLabel(ti) + '</th>';
-      var seats = [];
-      var pairColorIdx = 0;
-      table.units.forEach(function(unit){
-        if(unit.type === 'three'){
-          unit.data.forEach(function(nm){ seats.push({ name:nm, cls:'st', style:'' }); });
-        } else {
-          var color = PAIR_PALETTE[pairColorIdx % PAIR_PALETTE.length];
-          pairColorIdx++;
-          unit.data.forEach(function(nm){ seats.push({ name:nm, cls:'', style:'border-top:3px solid ' + color + ';' }); });
-        }
-      });
-      for(var c=0; c<maxCols; c++){
-        html += seats[c] ? ('<td class="' + seats[c].cls + '" style="' + seats[c].style + '">' + seats[c].name + '</td>') : '<td></td>';
+      var seats = rowSeats(table);
+      for(var c=0; c<cols; c++){
+        var s = seats[c];
+        if(!s){ html += '<td style="width:' + width + '%;"></td>'; continue; }
+        html += s.color
+          ? '<td style="width:' + width + '%; border-top:3px solid ' + s.color + ';">' + escapeHtml(s.name) + '</td>'
+          : '<td class="st" style="width:' + width + '%;">' + escapeHtml(s.name) + '</td>';
       }
       html += '</tr>';
     });
@@ -1410,20 +1665,11 @@ Elev 28</textarea>
     return html;
   }
 
-  function buildRound(names, history, constraints, genderInfo, avoidTrios, trioCounts){
-    var groups = buildGroupsHistoryAware(names, history, constraints, genderInfo, avoidTrios, trioCounts);
-    var layouts = {
-      hex: packBalanced(groups, MAX_HEX_TABLES, 6),
-      row: packBalanced(groups, MAX_ROWS, 10)
-    };
-    return { groups:groups, layouts:layouts };
-  }
-
-  // Fælles indhold for én gruppering - genbruges af både Word- og PDF-eksport.
+  // Fælles indhold for én periode - genbruges af både Word- og PDF-eksport.
   function roundBodyHtml(g, l, weeks, className){
     var title = (className ? ('Bordgrupper til ' + className + ' i ') : 'Bordgrupper i ') + formatWeekList(weeks) + '.';
-    var html = '<h1>' + title + '</h1>';
-    html += '<p class="dato">' + g.n + ' elever, ' + g.bundles.length + ' grupper' + (g.triplesCount ? ' (heraf 1 trio)' : '') + '</p>';
+    var html = '<h1>' + escapeHtml(title) + '</h1>';
+    html += '<p class="dato">' + g.n + ' elever, ' + describeSizes(bundleSizes(g)) + '</p>';
 
     var activeRoleNames = getActiveRoleNames();
     var cards = g.bundles.map(function(b){ return groupCardTable(b.label, bundleColumns(b), bundleRoleMap(b, activeRoleNames)); });
@@ -1457,30 +1703,22 @@ Elev 28</textarea>
       '.role-tag{display:block; font-size:5.5pt; font-weight:bold; color:#fff; background:#b45309; border-radius:3px; padding:0.5pt 3pt; margin-bottom:1pt; line-height:1.3;}' +
       'table.rowgrid{width:100%; border-collapse:collapse;}' +
       'table.rowgrid th{width:8%; font-size:6.8pt; background:#dfe7f0; padding:2pt 3pt; border:1px solid #aaa; text-align:left;}' +
-      'table.rowgrid td{width:9.2%; font-size:6.5pt; padding:2pt 3pt; border:1px solid #ccc; text-align:center;}' +
+      'table.rowgrid td{font-size:6.5pt; padding:2pt 3pt; border:1px solid #ccc; text-align:center;}' +
       'table.rowgrid td.st{border-top:3px solid #22c55e; background:#eafaf0;}' +
       '.pagebreak{page-break-before:always;}';
   }
 
-  // ---------- Klassenavn / antal grupperinger / filnavn ----------
-  // Læreren angiver antal skoleuger; antal bordgrupper = uger / skifte-interval, rundet op,
+  // ---------- Klassenavn / antal perioder / filnavn ----------
+  // Læreren angiver antal skoleuger; antal perioder = uger / skifte-interval, rundet op,
   // så planen altid dækker mindst de ønskede uger.
   function getPlanWeeks(){
-    var v = parseInt(document.getElementById('planWeeks').value, 10);
+    var v = parseInt(byId('planWeeks').value, 10);
     if(!v || v < 1) return 10;
     return Math.min(v, 52);
   }
 
   function getGroupingCount(){
     return Math.min(Math.ceil(getPlanWeeks() / getRotationWeeks()), 30);
-  }
-
-  function updateGroupingCountHint(){
-    var n = getGroupingCount();
-    var weeks = n * getRotationWeeks();
-    var text = '(= ' + n + (n === 1 ? ' bordgruppe' : ' bordgrupper');
-    if(weeks !== getPlanWeeks()) text += ', dækker ' + weeks + ' uger';
-    document.getElementById('groupingCountHint').textContent = text + ')';
   }
 
   function getISOWeek(date){
@@ -1496,10 +1734,10 @@ Elev 28</textarea>
   }
 
   function getClassName(){
-    return sanitizeFilenamePart(document.getElementById('className').value || '');
+    return sanitizeFilenamePart(byId('className').value || '');
   }
 
-  // ---------- Ugeplan: hvornår hver ny bordgruppe gælder ----------
+  // ---------- Ugeplan: hvornår hver ny periode gælder ----------
   var NON_SCHOOL_WEEKS = [25, 26, 27, 28, 29, 30, 31, 32, 42, 52, 53, 7];
 
   function nextSchoolWeek(w){
@@ -1522,19 +1760,26 @@ Elev 28</textarea>
     return head + ' og uge ' + weeks[weeks.length - 1];
   }
 
+  // Kort form til knapper og oversigter: "38-39", eller "41+43" hvis der er en ferieuge imellem.
+  function formatWeekRange(weeks){
+    var consecutive = weeks.every(function(w, i){ return i === 0 || w === weeks[i-1] + 1; });
+    if(weeks.length > 1 && consecutive) return weeks[0] + '-' + weeks[weeks.length - 1];
+    return weeks.join('+');
+  }
+
   function getStartWeek(){
-    var v = parseInt(document.getElementById('startWeek').value, 10);
+    var v = parseInt(byId('startWeek').value, 10);
     if(!v || v < 1 || v > 53) return defaultStartWeek();
     return v;
   }
 
   function getRotationWeeks(){
-    var v = parseInt(document.getElementById('rotationWeeks').value, 10);
+    var v = parseInt(byId('rotationWeeks').value, 10);
     if(!v || v < 1) return 2;
     return v;
   }
 
-  // Bygger ét array af ugelister - ét pr. bordgruppe - der hver dækker "interval" skoleuger
+  // Bygger ét array af ugelister - ét pr. periode - der hver dækker "interval" skoleuger
   // i træk, startende fra "startWeek", med skoleferie-uger sprunget over.
   function buildWeekPlan(startWeek, interval, count){
     var plans = [];
@@ -1550,6 +1795,13 @@ Elev 28</textarea>
       cursor = w;
     }
     return plans;
+  }
+
+  function updatePeriodHint(){
+    var count = getGroupingCount();
+    var plan = buildWeekPlan(getStartWeek(), getRotationWeeks(), count);
+    byId('periodHint').textContent = count + (count === 1 ? ' periode: uge ' : ' perioder: uge ') +
+      joinDa(plan.map(formatWeekRange)) + '. Ferieuger springes over.';
   }
 
   function buildFilenameBase(){
@@ -1568,33 +1820,9 @@ Elev 28</textarea>
     return parts.join('_');
   }
 
-  function buildRounds(){
-    var names = parseNames(document.getElementById('names').value);
-    if(rosterError(names)) return null;
-    var count = getGroupingCount();
-    var weekPlan = buildWeekPlan(getStartWeek(), getRotationWeeks(), count);
-    var history = {};
-    var trioCounts = {};
-    var genderInfo = { genders: state.genders, preference: getGenderPreference(), categories: state.categories, categoryPreference: getCategoryPreference() };
-    var avoidTrios = getAvoidTrios();
-    var rounds = [];
-    for(var r=0; r<count; r++){
-      var round = buildRound(names, history, state.constraints, genderInfo, avoidTrios, trioCounts);
-      round.weeks = weekPlan[r];
-      rounds.push(round);
-    }
-    return rounds;
-  }
-
-  function showExportError(msg){
-    var errorLabel = document.getElementById('errorLabel');
-    errorLabel.textContent = msg;
-    errorLabel.style.display = 'block';
-  }
-
   function exportWord(){
-    var rounds = buildRounds();
-    if(!rounds){ showExportError(rosterError(parseNames(document.getElementById('names').value)) || 'Indsæt mindst 4 elevnavne (ét navn pr. linje) før eksport.'); return; }
+    var rounds = planRounds();
+    if(!rounds) return;
 
     var html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">';
     html += '<head><meta charset="utf-8"><title>Gruppeoversigt</title>';
@@ -1602,11 +1830,10 @@ Elev 28</textarea>
 
     var className = getClassName();
     rounds.forEach(function(round, idx){
-      var g = round.groups, l = round.layouts;
       // Word ignorerer ofte page-break-before på en almindelig <div> - dette br-tricket
       // er den robuste metode MSO's egen HTML-eksport selv bruger til at tvinge sideskift.
       html += idx>0 ? '<br clear=all style="mso-special-character:line-break;page-break-before:always">' : '';
-      html += '<div>' + roundBodyHtml(g, l, round.weeks, className) + '</div>';
+      html += '<div>' + roundBodyHtml(round.groups, round.layouts, round.weeks, className) + '</div>';
     });
 
     html += '</body></html>';
@@ -1621,18 +1848,18 @@ Elev 28</textarea>
   }
 
   function exportPDF(){
-    var rounds = buildRounds();
-    if(!rounds){ showExportError(rosterError(parseNames(document.getElementById('names').value)) || 'Indsæt mindst 4 elevnavne (ét navn pr. linje) før eksport.'); return; }
+    var rounds = planRounds();
+    if(!rounds) return;
 
     var win = window.open('', '_blank');
-    if(!win){ showExportError('Pop-up blev blokeret - tillad pop-ups for denne side for at eksportere PDF.'); return; }
+    if(!win){ showMessage('exportError', 'Pop-up blev blokeret. Tillad pop-ups for denne side for at udskrive.'); return; }
+    showMessage('exportError', null);
 
-    var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + buildFilenameBase() + '</title>';
+    var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + escapeHtml(buildFilenameBase()) + '</title>';
     html += '<style>' + sharedExportStyles() + '</style></head><body>';
     var className = getClassName();
     rounds.forEach(function(round, idx){
-      var g = round.groups, l = round.layouts;
-      html += '<div' + (idx>0 ? ' class="pagebreak"' : '') + '>' + roundBodyHtml(g, l, round.weeks, className) + '</div>';
+      html += '<div' + (idx>0 ? ' class="pagebreak"' : '') + '>' + roundBodyHtml(round.groups, round.layouts, round.weeks, className) + '</div>';
     });
     html += '</body></html>';
 
@@ -1644,25 +1871,20 @@ Elev 28</textarea>
     setTimeout(function(){ win.print(); }, 300);
   }
 
-  document.getElementById('startWeek').value = defaultStartWeek();
-  document.getElementById('currentWeekHint').textContent = '(vi er i uge ' + getISOWeek(new Date()) + ' nu)';
-  document.getElementById('planWeeks').addEventListener('input', updateGroupingCountHint);
-  document.getElementById('rotationWeeks').addEventListener('input', updateGroupingCountHint);
-  updateGroupingCountHint();
-
   // ---------- Præsentér programmet: kort guidet rundtur med gule ringe ----------
   var tourSteps = [
-    { sel:'#names', text:'Indsæt elevernes navne her, ét pr. linje. Feltet er forudfyldt så du hurtigt kan se, hvordan det virker.' },
-    { sel:'#shortenNamesBtn', text:'Forkort navne til fornavn + efternavns-forbogstav. Virker også hvis du indsætter en elevliste direkte fra Lectio - den fjerner selv id-numre og holdinformation automatisk.' },
-    { sel:'#importBtn', text:'Importér klassen for at sætte avancerede betingelser - fx at to elever aldrig skal være i samme gruppe eller altid skal være sammen. Du kan også sætte køn på eleverne og vælge blandet eller ens køn i makkerparrene.' },
-    { sel:'#planWeeks', text:'Vælg fra hvilken uge grupperne gælder, hvor tit de skal skiftes, og hvor mange uger planen skal dække. Programmet regner selv ud, hvor mange bordgrupper der skal laves (rundet op). Skoleferie-uger springes automatisk over.' },
-    { sel:'#generateBtn', text:'Klik her for at danne makkerpar, bordgrupper og grupper til lokaler med rækker og 6-mandsborde. Resultatet vises nedenfor i tre faner: Firemandsborde, Sekskantede borde og Rækkeopstilling.' },
-    { sel:'#exportBtn', text:'Til sidst kan du eksportere alle bordgrupperne til Word eller PDF, klar til udskrift.' }
+    { sel:'#names', text:'Indsæt elevernes navne her, ét pr. linje. Feltet er udfyldt med en eksempelklasse, så du kan prøve programmet med det samme.' },
+    { sel:'#shortenNamesBtn', text:'Forkorter navnene til fornavn og forbogstav i efternavnet. En elevliste kopieret fra Lectio renses samtidig for id-numre og holdoplysninger.' },
+    { sel:'#stepGroups', text:'Her kan du vælge gruppestørrelse, sætte betingelser for bestemte elever, tage hensyn til køn og kategori og give eleverne roller. Det bliver stående, selvom du retter i navnelisten.' },
+    { sel:'#stepWeeks', text:'Vælg første uge, hvor længe grupperne gælder, og hvor mange uger planen dækker. Ferieuger springes over.' },
+    { sel:'#generateBtn', text:'Laver grupper til alle perioder. Makkere og gruppekammerater gentages så lidt som muligt.' },
+    { sel:'#periodBar', text:'Vælg en periode for at se dens grupper, sekskantede borde og rækkeopstilling.' },
+    { sel:'#exportBtn', text:'Filen indeholder alle perioder, præcis som de vises her.' }
   ];
 
   function clearTourHighlight(){
     document.querySelectorAll('.tour-highlight').forEach(function(el){ el.classList.remove('tour-highlight'); });
-    var tt = document.getElementById('tourTooltip');
+    var tt = byId('tourTooltip');
     if(tt) tt.remove();
   }
 
@@ -1676,13 +1898,17 @@ Elev 28</textarea>
     el.classList.add('tour-highlight');
     el.scrollIntoView({ behavior:'smooth', block:'center' });
 
+    var remaining = tourSteps.slice(i+1).some(function(s){
+      var next = document.querySelector(s.sel);
+      return next && next.offsetParent !== null;
+    });
     var tooltip = document.createElement('div');
     tooltip.id = 'tourTooltip';
     tooltip.className = 'tour-tooltip';
     tooltip.innerHTML = '<div>' + step.text + '</div>' +
       '<div class="tt-actions">' +
         '<button type="button" class="tt-skip">Luk</button>' +
-        '<button type="button" class="tt-next">' + (i === tourSteps.length-1 ? 'Afslut' : 'Næste') + '</button>' +
+        '<button type="button" class="tt-next">' + (remaining ? 'Næste' : 'Afslut') + '</button>' +
       '</div>';
     document.body.appendChild(tooltip);
 
@@ -1699,30 +1925,54 @@ Elev 28</textarea>
     tooltip.querySelector('.tt-skip').addEventListener('click', clearTourHighlight);
   }
 
-  document.getElementById('tourBtn').addEventListener('click', function(){ showTourStep(0); });
+  // ---------- Hændelser ----------
+  byId('tourBtn').addEventListener('click', function(){ showTourStep(0); });
 
-  document.getElementById('generateBtn').addEventListener('click', generate);
-  document.getElementById('exportBtn').addEventListener('click', exportWord);
-  document.getElementById('exportPdfBtn').addEventListener('click', exportPDF);
-  document.getElementById('importBtn').addEventListener('click', importClass);
-  document.getElementById('shortenNamesBtn').addEventListener('click', shortenNames);
-  document.getElementById('editCategoriesBtn').addEventListener('click', function(){
-    var panel = document.getElementById('categoryEditPanel');
+  var syncTimer = null;
+  byId('names').addEventListener('input', function(){
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(syncRoster, 250);
+  });
+  byId('shortenNamesBtn').addEventListener('click', shortenNames);
+  byId('className').addEventListener('input', renderPlan);
+
+  byId('avoidTriosCheckbox').addEventListener('change', function(){ updateSizeHint(); updateStale(); });
+  byId('genderPreference').addEventListener('change', updateStale);
+  byId('categoryPreference').addEventListener('change', updateStale);
+  byId('addCondBtn').addEventListener('click', addCondition);
+  byId('clearCondBtn').addEventListener('click', function(){
+    state.constraints = { together:[], avoid:[] };
+    showMessage('condError', null);
+    renderConditions();
+    updateStale();
+  });
+  byId('editCategoriesBtn').addEventListener('click', function(){
+    var panel = byId('categoryEditPanel');
     var willShow = panel.style.display === 'none';
     if(willShow) renderCategoryEditPanel();
     panel.style.display = willShow ? 'block' : 'none';
   });
-  document.getElementById('rolesEnabledCheckbox').addEventListener('change', function(){
-    var panel = document.getElementById('roleNamesPanel');
+  byId('rolesEnabledCheckbox').addEventListener('change', function(){
+    var panel = byId('roleNamesPanel');
     if(this.checked){ renderRoleNamesPanel(); panel.style.display = 'block'; }
     else { panel.style.display = 'none'; }
+    renderPlan();
   });
-  document.getElementById('roleCount').addEventListener('change', renderRoleNamesPanel);
-  document.getElementById('addCondBtn').addEventListener('click', addCondition);
-  document.getElementById('clearCondBtn').addEventListener('click', function(){
-    state.constraints = { together:[], avoid:[] };
-    renderConditions();
+  byId('roleCount').addEventListener('change', function(){ renderRoleNamesPanel(); renderPlan(); });
+
+  ['startWeek', 'rotationWeeks', 'planWeeks'].forEach(function(id){
+    byId(id).addEventListener('input', function(){ updatePeriodHint(); renderPlan(); });
   });
+
+  byId('generateBtn').addEventListener('click', function(){ makePlan(true); });
+  byId('newDrawBtn').addEventListener('click', function(){ makePlan(false); });
+  byId('exportBtn').addEventListener('click', exportWord);
+  byId('exportPdfBtn').addEventListener('click', exportPDF);
+
+  byId('startWeek').value = defaultStartWeek();
+  byId('currentWeekHint').textContent = '(nu er det uge ' + getISOWeek(new Date()) + ')';
+  syncRoster();
+  updatePeriodHint();
 })();
 </script>
 
