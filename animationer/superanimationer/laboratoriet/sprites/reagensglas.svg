@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="320" viewBox="0 0 30 160">
+  <!-- Reagensglas. Inderside x 6-24, runding med radius 9 om (15, 143),
+       bunden y 152. Aabningen er (15, 2). Indholdet tegnes bag filen. -->
+  <defs>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4ebfa" stop-opacity="0.36"/>
+      <stop offset="0.2" stop-color="#d4ebfa" stop-opacity="0.07"/>
+      <stop offset="0.8" stop-color="#d4ebfa" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#d4ebfa" stop-opacity="0.3"/>
+    </linearGradient>
+  </defs>
+  <path d="M4 4 L4 143 A11 11 0 0 0 26 143 L26 4 Z" fill="url(#glas)"/>
+  <path d="M4 4 L4 143 A11 11 0 0 0 26 143 L26 4" fill="none" stroke="#dcecf8" stroke-opacity="0.85" stroke-width="1.6"/>
+  <rect x="1.5" y="0" width="27" height="5" rx="2" fill="#dcecf8" fill-opacity="0.25" stroke="#e6f2fb" stroke-opacity="0.9" stroke-width="1.2"/>
+  <rect x="8" y="10" width="3" height="128" rx="1.5" fill="#ffffff" fill-opacity="0.22"/>
+</svg>

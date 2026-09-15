@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="24" viewBox="0 0 96 12">
+  <!-- Skespatel af rustfrit staal. Skeens midte er (12, 6). -->
+  <defs>
+    <linearGradient id="staal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f3f5f7"/>
+      <stop offset="0.55" stop-color="#b4bcc5"/>
+      <stop offset="1" stop-color="#7c858f"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="12" cy="6" rx="10.5" ry="4.8" fill="url(#staal)" stroke="#6f7780" stroke-width="0.6"/>
+  <ellipse cx="11.5" cy="5.6" rx="7.2" ry="2.7" fill="#8a929b" fill-opacity="0.55"/>
+  <path d="M21.5 4.7 L33 5.2 L33 6.8 L21.5 7.3 Z" fill="#aab2bb"/>
+  <rect x="32" y="4" width="62" height="4" rx="2" fill="url(#staal)" stroke="#7a838d" stroke-width="0.4"/>
+</svg>

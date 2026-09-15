@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="144" viewBox="0 0 180 72">
+  <!-- Varmeplade med magnetomroerer. Pladen er y 0-10. Knapperne tegnes
+       af animationen: varme i (52, 46), omroering i (128, 46), og
+       lamperne i (82, 38) og (158, 38). -->
+  <defs>
+    <linearGradient id="plade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a5058"/>
+      <stop offset="1" stop-color="#1f2227"/>
+    </linearGradient>
+    <linearGradient id="emalje" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eceff2"/>
+      <stop offset="1" stop-color="#bcc3ca"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Keramisk plade -->
+  <rect x="10" y="0" width="160" height="10" rx="3" fill="url(#plade)"/>
+  <path d="M13 1.5 L167 1.5" stroke="#ffffff" stroke-opacity="0.18" stroke-width="1"/>
+
+  <!-- Krop -->
+  <path d="M3 10 L177 10 L180 64 Q180 72 172 72 L8 72 Q0 72 0 64 Z" fill="url(#emalje)"/>
+  <rect x="12" y="29" width="156" height="36" rx="4" fill="#2a2f36"/>
+
+  <g font-family="Segoe UI, Arial, sans-serif" font-size="6.2" font-weight="700" fill="#3a424c" text-anchor="middle">
+    <text x="52" y="24">VARME</text>
+    <text x="128" y="24">OMRØRING</text>
+  </g>
+
+  <!-- Skalaer om knapperne -->
+  <g stroke="#9aa4ae" stroke-width="0.9" stroke-linecap="round">
+    <path d="M40.7 55.2 l-2 1.6 M38.5 46 h-2.6 M40.7 36.8 l-2 -1.6 M52 33 v-2.6 M63.3 36.8 l2 -1.6 M65.5 46 h2.6 M63.3 55.2 l2 1.6"/>
+    <path d="M116.7 55.2 l-2 1.6 M114.5 46 h-2.6 M116.7 36.8 l-2 -1.6 M128 33 v-2.6 M139.3 36.8 l2 -1.6 M141.5 46 h2.6 M139.3 55.2 l2 1.6"/>
+  </g>
+  <circle cx="52" cy="46" r="12" fill="#15181c"/>
+  <circle cx="128" cy="46" r="12" fill="#15181c"/>
+  <circle cx="82" cy="38" r="3.2" fill="#15181c"/>
+  <circle cx="158" cy="38" r="3.2" fill="#15181c"/>
+</svg>
