@@ -120,7 +120,7 @@
         this.opdaterFaelles(dt);
         var mol = this.mol();
         NK.saetHTML("pol-en-tabel", bindingstabel(mol));
-        NK.saetTekst("pol-formel", mol.formel + " er");
+        NK.saetTekst("pol-formel", mol.navn.charAt(0).toUpperCase() + mol.navn.slice(1) + ", " + mol.formel + ", er");
         if (this.skjul.polaer) {
             NK.saetTekst("pol-polaer", "?");
             NK.saetKlasse("pol-polaer", "maerke graa");

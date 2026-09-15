@@ -202,7 +202,7 @@
         var nyt = this.laerred.tilpas();
         if (this.prik.tilpas()) this.prikNoegle = "";
         this.vis.tilpas(this.laerred.b, this.laerred.h, this.radius(), nyt && !this._tilpasset);
-        this._tilpasset = true;
+        if (this.laerred.b > 10) this._tilpasset = true;
     };
 
     B.opdaterFaelles = function (dt) {

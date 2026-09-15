@@ -226,13 +226,13 @@
 
     function tegnBallon(ctx, vis, e) {
         var fri = e.bl.type === "fri";
-        var m = tegnLap(ctx, vis, e, fri ? "ballon_fri" : "ballon_bindende", NK.ANKER.ballon, 80, 130, fri ? 1.18 : 1, 0.5);
+        var m = tegnLap(ctx, vis, e, fri ? "ballon_fri" : "ballon_bindende", NK.ANKER.ballon, 80, 130, fri ? 1 : 0.84, 0.5);
         e.bl._skaerm = { x: e.sm.x, y: e.sm.y, r: Math.max(18, m.fuld * 0.32) };
     }
 
     function tegnKnude(ctx, vis) {
         var c = vis.projicer([0, 0, 0]);
-        var r = Math.max(4, 0.14 * vis.skala);
+        var r = Math.max(6, 0.21 * vis.skala);
         var gr = ctx.createRadialGradient(c.x - r * 0.3, c.y - r * 0.3, r * 0.1, c.x, c.y, r);
         gr.addColorStop(0, "#6b7480");
         gr.addColorStop(1, "#1a1d22");
@@ -262,10 +262,14 @@
                 var midt = V.gange(V.plus(A.p, B.p), 0.5);
                 var sm = vis.projicer(midt);
                 var retning = { x: proj[b.b].x - proj[b.a].x, y: proj[b.b].y - proj[b.a].y };
-                [[A, proj[b.a]], [B, proj[b.b]]].forEach(function (par) {
-                    var z = vis.projicer(V.gange(V.plus(par[0].p, midt), 0.5)).z;
-                    var alfa = Math.min(A.alfa === undefined ? 1 : A.alfa, B.alfa === undefined ? 1 : B.alfa);
-                    liste.push({ z: z, slags: "pind", fra: par[1], til: sm, orden: b.orden, retning: retning, alfa: alfa });
+                var u = V.enhed(V.minus(B.p, A.p));
+                var alfa = Math.min(A.alfa === undefined ? 1 : A.alfa, B.alfa === undefined ? 1 : B.alfa);
+                /* Pinden begynder ved kuglens overflade, ikke i centrum, saa
+                   den ikke daekker symbolet paa et atom laengere bagude. */
+                [[A, 1], [B, -1]].forEach(function (par) {
+                    var start = V.plus(par[0].p, V.gange(u, atomRadius(par[0], false) * 0.85 * par[1]));
+                    var z = vis.projicer(V.gange(V.plus(start, midt), 0.5)).z;
+                    liste.push({ z: z, slags: "pind", fra: vis.projicer(start), til: sm, orden: b.orden, retning: retning, alfa: alfa });
                 });
             });
         }
@@ -285,7 +289,8 @@
         }
 
         if (model.balloner && model.balloner.length) {
-            liste.push({ z: 0.001, slags: "knude" });
+            /* Knuden tegnes sidst, saa den daekker ballonernes snore. */
+            liste.push({ z: Infinity, slags: "knude" });
             model.balloner.forEach(function (bl) {
                 var laengde = BALLON * (bl.type === "fri" ? 1.06 : 1);
                 var sm = vis.projicer(V.gange(bl.u, laengde * 0.62));

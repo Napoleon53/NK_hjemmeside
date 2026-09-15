@@ -43,6 +43,9 @@
             for (i = 0; i < n; i++) {
                 for (j = i + 1; j < n; j++) {
                     var d = V.minus(grupper[i].u, grupper[j].u);
+                    /* Ligger to grupper oven i hinanden, er der ingen retning at
+                       skubbe i. Saa skubbes de til hver sin side. */
+                    if (V.laengde(d) < 0.02) d = V.gange(V.vinkelret(grupper[i].u), 0.02);
                     var r = V.laengde(d) + 1e-4;
                     var k = styrke(grupper[i], grupper[j]) / Math.pow(r, F.n + 1);
                     ud[i] = V.plus(ud[i], V.gange(d, k));

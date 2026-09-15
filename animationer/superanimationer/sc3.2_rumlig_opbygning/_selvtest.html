@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc3.2 Molekylers rumlige opbygning</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.38; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at molekylerne opfylder oktetreglen, at
+   formerne, vinklerne og polariteten passer med lærebogen, at
+   frastødningen på fane 1 giver de rigtige vinkler, at alle opgaver kan
+   løses, og at teksterne overholder sitets regler (ingen tankestreger,
+   ingen skrift under 12 px).
+
+   Chrome kigger kun ind i en iframe på file://, hvis den startes med
+   --allow-file-access-from-files. Ellers: brug en lokal server eller
+   Firefox.
+   ===================================================================== */
+var linjer = [], fejl = 0, antal = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    antal++;
+    if (sand) skriv("  ok    " + navn, "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function naer(a, b, tol) { return Math.abs(a - b) <= tol; }
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+function koer() {
+    try { koerTest(); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    skriv("\n" + (antal - fejl) + " af " + antal + " påstande holder." + (fejl ? "" : " Alt ok."), fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+function koerTest() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument;
+    var W = ramme.contentWindow;
+    var NK = W.NK;
+
+    overskrift("1. Indlæsning");
+    paastand("NK og de tre faner findes", !!(NK && NK.sims && NK.sims["fane-byg"] && NK.sims["fane-molekyler"] && NK.sims["fane-polaritet"]));
+    if (!NK || !NK.sims) return;
+    var D = NK.Data, V = NK.V;
+    var mangler = Object.keys(NK.Sprites.FILER).filter(function (n) { return !NK.Sprites.klar(n); });
+    paastand("alle " + Object.keys(NK.Sprites.FILER).length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
+
+    overskrift("2. Molekylerne");
+    var VINKEL = { H2O: 104.5, NH3: 107, CH4: 109.47, CO2: 180, HCN: 180, CH2O: 120, C2H4: 120, C2H2: 180, CCl4: 109.47, CH3Cl: 109.47 };
+    var POLAER = { H2O: true, NH3: true, CH4: false, CO2: false, HCN: true, CH2O: true, C2H4: false, C2H2: false, CCl4: false, CH3Cl: true, HCl: true };
+    D.MOLEKYLER.forEach(function (mol) {
+        var oktet = mol.atomer.every(function (a, i) {
+            var sum = mol.naboer[i].reduce(function (s, n) { return s + n.orden; }, 0);
+            return 2 * sum + 2 * mol.frieAntal[i] === (a.el === "H" ? 2 : 8);
+        });
+        var form = mol.centrum === null ? (mol.atomer.length === 2 ? "lineaer" : null)
+            : D.form(mol.naboer[mol.centrum].length, mol.frieAntal[mol.centrum]);
+        var laengder = mol.bindinger.every(function (b) {
+            var l = V.laengde(V.minus(mol.atomer[b[0]].p, mol.atomer[b[1]].p));
+            return l > 0.9 && l < 1.9;
+        });
+        var frieVaek = mol.frie.every(function (fp) {
+            return mol.naboer[fp.atom].every(function (n) {
+                return V.vinkel(fp.u, V.minus(mol.atomer[n.atom].p, mol.atomer[fp.atom].p)) > 99;
+            });
+        });
+        var frieAntalOk = mol.frie.length === mol.frieAntal.reduce(function (s, k) { return s + k; }, 0);
+        var sider = mol.atomer.every(function (a, i) {
+            var r = mol.naboer[i].map(function (n) {
+                var p = mol.atomer[n.atom].prik, q = a.prik, l = Math.hypot(p[0] - q[0], p[1] - q[1]);
+                return [(p[0] - q[0]) / l, (p[1] - q[1]) / l];
+            });
+            return NK.prikSider(r, mol.frieAntal[i]).length === mol.frieAntal[i];
+        });
+        var vinkelOk = mol.vinkel ? naer(mol.vinkelGrader, VINKEL[mol.id], 0.3) : !VINKEL[mol.id];
+        paastand(mol.id + ": oktet, form " + mol.form + ", vinkel " + (mol.vinkel ? NK.grader(mol.vinkelGrader) : "ingen") + ", " + (mol.polaer ? "polært" : "upolært"),
+            oktet && form === mol.form && laengder && frieVaek && frieAntalOk && sider && vinkelOk && mol.polaer === POLAER[mol.id],
+            "oktet " + oktet + ", form " + form + ", længder " + laengder + ", frie væk fra bindinger " + frieVaek + ", antal frie " + frieAntalOk + ", prikformel " + sider + ", vinkel " + vinkelOk + ", polær " + mol.polaer);
+    });
+
+    overskrift("3. Fane 1: frastødningen giver lærebogens vinkler");
+    var byg = NK.sims["fane-byg"];
+    var TILFAELDE = [
+        { maal: { enkelt: 4 }, vinkel: 109.47, formel: "CH4", form: "tetraeder" },
+        { maal: { enkelt: 3, fri: 1 }, vinkel: 107, formel: "NH3", form: "pyramide" },
+        { maal: { enkelt: 2, fri: 2 }, vinkel: 104.5, formel: "H2O", form: "vinklet" },
+        { maal: { dobbelt: 2 }, vinkel: 180, formel: "CO2", form: "lineaer" },
+        { maal: { enkelt: 2, dobbelt: 1 }, vinkel: 120, formel: "CH2O", form: "plan" },
+        { maal: { enkelt: 1, tripel: 1 }, vinkel: 180, formel: "HCN", form: "lineaer" },
+        { maal: { enkelt: 1, fri: 3 }, vinkel: null, formel: "HCl", form: "lineaer" }
+    ];
+    TILFAELDE.forEach(function (t) {
+        for (var gang = 0; gang < 3; gang++) {
+            byg.ryd();
+            byg.saetGrupper(t.maal);
+            for (var i = 0; i < 1500; i++) byg.opdater(1 / 60);
+            var b = byg.grupper.filter(function (g) { return g.type === "binding"; });
+            var vinkler = [];
+            for (var x = 0; x < b.length; x++) for (var y = x + 1; y < b.length; y++) vinkler.push(V.vinkel(b[x].u, b[y].u));
+            var gennemsnit = vinkler.length ? vinkler.reduce(function (s, v) { return s + v; }, 0) / vinkler.length : null;
+            var ta = byg.taelling();
+            var el = byg.centralatom();
+            var kendt = D.BYGGEDE[[el, ta.enkelt, ta.dobbelt, ta.tripel].join("|")];
+            var form = D.form(ta.enkelt + ta.dobbelt + ta.tripel, ta.fri);
+            var ok = (t.vinkel === null || naer(gennemsnit, t.vinkel, t.vinkel === 180 ? 1.5 : 0.8)) &&
+                kendt && kendt.formel === t.formel && form === t.form &&
+                byg.grupper.every(function (g) { return isFinite(g.u[0]) && Math.abs(V.laengde(g.u) - 1) < 1e-6; });
+            if (!ok || gang === 2) {
+                paastand(t.formel + ": " + (gennemsnit === null ? "ingen vinkel" : gennemsnit.toFixed(2) + "°") + ", " + form + (gang < 2 ? " (forsøg " + (gang + 1) + ")" : ""), ok,
+                    "formel " + (kendt && kendt.formel) + ", form " + form);
+                if (!ok) break;
+            }
+        }
+    });
+
+    byg.ryd();
+    byg.saetGrupper({ enkelt: 3, fri: 1 });
+    byg.grupper[1].u = byg.grupper[0].u.slice();
+    for (var k = 0; k < 600; k++) byg.opdater(1 / 60);
+    paastand("to grupper sluppet oven i hinanden glider fra hinanden igen", V.vinkel(byg.grupper[0].u, byg.grupper[1].u) > 100 &&
+        byg.grupper.every(function (g) { return isFinite(g.u[0]); }));
+    paastand("højst fire retninger", (function () { byg.ryd(); for (var i = 0; i < 6; i++) byg.tilfoej("enkelt"); return byg.grupper.length === 4; }()));
+
+    overskrift("4. Opgaverne kan løses");
+    function loestOpgave(sim, o, loes) {
+        sim.opgaver.startOpgave(o);
+        loes(o);
+        sim.opdater(1 / 60);
+        return o.afsluttet && d.getElementById(sim.opgaver.id("knap")).textContent === "Ny opgave";
+    }
+    byg.OPGAVER.forEach(function (lav, i) {
+        var o = lav(byg);
+        var ok = loestOpgave(byg, o, function (o) {
+            if (o.valg) { byg.opgaver.vaelg(o.rigtig); return; }
+            o.visSvar(byg);
+            for (var n = 0; n < 400; n++) byg.opdater(1 / 60);
+            byg.valgt = byg.grupper.filter(function (g) { return g.type === "binding"; }).slice(0, 2);
+        });
+        paastand("fane 1, opgave " + (i + 1) + ": " + o.tekst, ok);
+    });
+
+    ["fane-molekyler", "fane-polaritet"].forEach(function (fane) {
+        var sim = NK.sims[fane];
+        NK.visFane(fane);
+        sim.OPGAVER.forEach(function (lav, i) {
+            var alleOk = true, note = "";
+            for (var gang = 0; gang < 12; gang++) {
+                var o = lav(sim);
+                var mol = D.molekyle(o.mol);
+                var ok = loestOpgave(sim, o, function (o) {
+                    if (o.valg) { sim.opgaver.vaelg(o.rigtig); return; }
+                    sim.opgaver.klik(mol.delta.indexOf(-1));
+                });
+                if (o.valg) ok = ok && o.rigtig >= 0 && o.rigtig < o.valg.length;
+                if (fane === "fane-molekyler" && i === 0) ok = ok && o.valg[o.rigtig] === D.FORMER[mol.form].knap;
+                if (fane === "fane-molekyler" && i === 1) ok = ok && o.valg[o.rigtig] === NK.grader(mol.vinkelGrader);
+                if (fane === "fane-molekyler" && i === 2) ok = ok && o.rigtig === mol.frieAntal[mol.centrum];
+                if (fane === "fane-polaritet" && i === 1) {
+                    var h = mol.delta.indexOf(1) >= 0 ? mol.delta.indexOf(1) : mol.atomer.findIndex(function (a) { return a.el === "H"; });
+                    ok = ok && typeof o.klik(sim, h) === "string";
+                }
+                ok = ok && !sim.menuLaast() && sim.molId() === o.mol;
+                if (!ok) { alleOk = false; note = o.mol + ": " + o.tekst; break; }
+            }
+            paastand(fane.replace("fane-", "") + ", opgavetype " + (i + 1) + " (12 tilfældige)", alleOk, note);
+        });
+    });
+    NK.visFane("fane-byg");
+
+    overskrift("5. Tekster og skrift");
+    var tekster = [d.body.innerText];
+    D.TEORI.forEach(function (a) { tekster.push(a.h); a.p.forEach(function (p) { tekster.push(p); }); });
+    D.MOLEKYLER.forEach(function (m) { tekster.push(m.navn, m.hintForm, m.svarForm, m.hintPol, m.svarPol); });
+    [byg, NK.sims["fane-molekyler"], NK.sims["fane-polaritet"]].forEach(function (sim) {
+        sim.OPGAVER.forEach(function (lav) {
+            var o = lav(sim);
+            tekster.push(o.tekst, o.hint || "", o.svar || "");
+            (o.valg || []).forEach(function (v) { tekster.push(v); });
+        });
+    });
+    NK.Rundvisning.TUR.forEach(function (t) { tekster.push(t.titel, t.tekst); });
+    var alt = tekster.join("\n");
+    var streger = alt.match(/.{0,30}[–—].{0,30}/g);
+    paastand("ingen tankestreger (– eller —)", !streger, streger && streger.slice(0, 3).join(" | "));
+    var etter = alt.match(/.{0,20}[¹1][⁺+−-](?![\d]).{0,10}/g);
+    paastand("ingen ladning skrevet som 1+ eller 1−", !etter || !etter.some(function (s) { return /[A-Z][a-z]?¹[⁺⁻]/.test(s); }));
+
+    var smaa = [];
+    ["fane-byg", "fane-molekyler", "fane-polaritet"].forEach(function (fane) {
+        NK.visFane(fane);
+        var alle = d.querySelectorAll("body *");
+        Array.prototype.forEach.call(alle, function (e) {
+            if (!e.offsetWidth && !e.offsetHeight) return;
+            var harTekst = Array.prototype.some.call(e.childNodes, function (n) { return n.nodeType === 3 && n.textContent.trim(); });
+            if (!harTekst) return;
+            var px = parseFloat(W.getComputedStyle(e).fontSize);
+            if (px < 12) smaa.push((e.id || e.className || e.tagName) + " " + px + "px");
+        });
+    });
+    NK.visFane("fane-byg");
+    paastand("ingen synlig tekst under 12 px", smaa.length === 0, smaa.slice(0, 6).join(", "));
+}
+</script>
+</body>
+</html>

@@ -44,9 +44,8 @@
             b.className = "molknap";
             b.title = mol.navn;
             b.setAttribute("aria-label", mol.navn);
-            b.innerHTML = '<span class="mformel"></span><span class="mnavn"></span>';
+            b.innerHTML = '<span class="mformel"></span>';
             b.querySelector(".mformel").textContent = mol.formel;
-            b.querySelector(".mnavn").textContent = mol.navn;
             b.addEventListener("click", function () { if (!sim.menuLaast()) V.saet(mol.id); });
             vaert.appendChild(b);
             knapper.push({ el: b, id: mol.id });

@@ -109,6 +109,8 @@
         this.OPGAVER = OPGAVER;
         this._bindPanel();
         this._bindMus();
+        /* Man starter med methan, saa formen kan ses med det samme. */
+        this.saetGrupper({ enkelt: 4 });
         this.opdaterPanel();
     };
 
@@ -401,7 +403,7 @@
     };
 
     P.maalepunkt = function (g) {
-        if (this.visning === "balloner") return g.u;
+        if (this.visning === "balloner") return V.gange(g.u, 1.6);
         return V.gange(g.u, D.LIGAND[g.orden].laengde);
     };
 
@@ -409,7 +411,7 @@
     P.tilpas = function () {
         var nyt = this.laerred.tilpas();
         this.vis.tilpas(this.laerred.b, this.laerred.h, RADIUS, nyt && !this._tilpasset);
-        this._tilpasset = true;
+        if (this.laerred.b > 10) this._tilpasset = true;
     };
 
     P.opdater = function (dt) {
