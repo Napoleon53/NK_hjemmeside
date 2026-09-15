@@ -96,8 +96,8 @@ pytten, glassene set ovenfra og zoomboblen tegnes i koden.
 
 ```
 index.html          markup: scene, panel, intro, teori, tegneserie, rundvisning
-css/stil.css        alt udseende. NB: decimaltal med PUNKTUM i CSS
-js/kerne.js         NK-navnerum, ion-notation, positurer, væskeniveau
+../laboratoriet/    fælles for laboratorieforsøgene: kerne.js, rundvisning.js og grund.css
+css/stil.css        kun det særlige for forsøget: resultatskemaet. NB: decimaltal med PUNKTUM i CSS
 js/model.js         kemien og tallene: ligevægt, blanding, farver, sammenligning
 js/lyd.js           lydene med Web Audio, ingen lydfiler
 js/sprites.js       indlæser SVG'erne og tegner dem drejet om et anker
@@ -108,7 +108,7 @@ js/bord.js          tegning af bordet og styring med musen
 js/laerer.js        Kemichaels scener i dette forsøg
 js/tegneserie.js    forsøget som tegneserie med resultatskemaet til sidst
 js/quiz.js          quizkortet og de ti spørgsmål
-js/rundvisning.js   spotlight-rundvisningen bag ?-knappen
+js/tur.js           rundvisningens stop; selve rundvisningen ligger i ../laboratoriet/
 js/app.js           panel, knapper, tastatur, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen
 ```

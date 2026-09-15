@@ -141,8 +141,8 @@ zoomboblen tegnes i koden. Ændres en sprite, skal tallene i `scene.js` passe.
 
 ```
 index.html          markup: scene, panel, beregning, intro, tegneserie, guide, teori, rundvisning
-css/stil.css        alt udseende. NB: decimaltal med PUNKTUM i CSS
-js/kerne.js         NK-navnerum, ion-notation, positurer, væskeniveau
+../laboratoriet/    fælles for laboratorieforsøgene: kerne.js, rundvisning.js og grund.css
+css/stil.css        kun det særlige for forsøget: hanefart, afbryder, skema, guide. NB: decimaltal med PUNKTUM i CSS
 js/model.js         kemien og tallene: opløsning, titrering, farve, beregning, hints
 js/lyd.js           lydene med Web Audio, ingen lydfiler
 js/sprites.js       indlæser SVG'erne og tegner dem drejet om et anker
@@ -154,7 +154,7 @@ js/laerer.js        Kemichaels scener, bemærkningerne om fejl og påskeæggene
 js/tegneserie.js    tegneserien med fejlruder og resultatskemaet
 ../kemichael/       Kemichael: figuren og hans sprites, fælles for superanimationerne
 js/quiz.js          quizkortet og de ti spørgsmål
-js/rundvisning.js   spotlight-rundvisningen bag ?-knappen
+js/tur.js           rundvisningens stop; selve rundvisningen ligger i ../laboratoriet/
 js/app.js           panel, måleskema, guiden, knapper, tastatur, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen
 ```

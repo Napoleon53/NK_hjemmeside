@@ -153,8 +153,8 @@ tegnes i koden. Ændres en sprite, skal tallene i `scene.js` passe.
 
 ```
 index.html          markup: scene, panel, måleskema, guide, teori, rundvisning
-css/stil.css        alt udseende. NB: decimaltal med PUNKTUM i CSS
-js/kerne.js         NK-navnerum, ion-notation, positurer, væskeniveau
+../laboratoriet/    fælles for laboratorieforsøgene: kerne.js, rundvisning.js og grund.css
+css/stil.css        kun det særlige for forsøget: måleskema, guide, søjler. NB: decimaltal med PUNKTUM i CSS
 js/model.js         kemien og tallene: ekstraktion, filter, beregning, hints
 js/lyd.js           lydene med Web Audio, ingen lydfiler
 js/sprites.js       indlæser SVG'erne og tegner dem drejet om et anker
@@ -166,7 +166,7 @@ js/uheld.js         den knuste petriskål med oprydning og den tabte heptanflask
 js/laerer.js        Kemichaels scener i forsøget og branden
 ../kemichael/       Kemichael: figuren og hans sprites, fælles for superanimationerne
 js/quiz.js          quizkortet og de ti spørgsmål
-js/rundvisning.js   spotlight-rundvisningen bag ?-knappen
+js/tur.js           rundvisningens stop; selve rundvisningen ligger i ../laboratoriet/
 js/app.js           panel, måleskema, guiden, knapper, tastatur, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen
 ```

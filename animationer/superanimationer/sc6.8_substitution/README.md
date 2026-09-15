@@ -142,8 +142,8 @@ passe.
 
 ```
 index.html          markup: scene, panel, resultater, tegneserie, teori og rundvisning
-css/stil.css        alt udseende. NB: decimaltal med PUNKTUM i CSS
-js/kerne.js         NK-navnerum, ion-notation, positurer, vaeskeniveau
+../laboratoriet/    faelles for laboratorieforsoegene: kerne.js, rundvisning.js og grund.css
+css/stil.css        kun det saerlige for forsoeget: resultatskemaet. NB: decimaltal med PUNKTUM i CSS
 js/model.js         kemien og tallene: fordeling, lys, pH, farver, rystning
 js/lyd.js           lydene med Web Audio, ingen lydfiler
 js/sprites.js       indlaeser SVG'erne og tegner dem drejet om et anker
@@ -155,7 +155,7 @@ js/laerer.js        Kemichaels scener: kaffe, uheld, ros, dab, lampen, hexen
 ../kemichael/       Kemichael: figuren og hans sprites, faelles for superanimationerne
 js/tegneserie.js    forsoeget som tegneserie med resultatskemaet med resultatskemaet
 js/quiz.js          quizkortet og de ti spoergsmaal
-js/rundvisning.js   spotlight-rundvisningen bag ?-knappen
+js/tur.js           rundvisningens stop; selve rundvisningen ligger i ../laboratoriet/
 js/app.js           panel, resultater, knapper, tastatur, tegneloekke
 _selvtest.html      udviklervaerktoej, indgaar ikke i animationen
 ```
