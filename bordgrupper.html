@@ -51,7 +51,14 @@
     display:inline-flex; align-items:center; justify-content:center;
   }
   .step-head h2{margin:0; font-size:.78rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--accent-dark);}
-  .step-cols{display:grid; grid-template-columns:repeat(auto-fit, minmax(min(380px, 100%), 1fr)); gap:18px 32px; align-items:start;}
+  /* Trin 1 og 2 står side om side, når der er plads. De fleste bærbare viser 1280-1536 px. */
+  .steps-pair{display:grid; grid-template-columns:minmax(0, 1fr); gap:16px; margin-bottom:16px;}
+  .steps-pair > .step{margin-bottom:0;}
+  @media (min-width:1100px){
+    .steps-pair{grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);}
+  }
+  #stepClass{display:flex; flex-direction:column;}
+  #stepClass textarea{flex:1;}
   .sub-block + .sub-block{border-top:1px solid #edf0f3; margin-top:14px; padding-top:14px;}
   .sub-label{font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:0 0 8px;}
 
@@ -127,7 +134,7 @@
   .edit-panel{margin-top:8px; padding:10px; border:1px solid var(--border); border-radius:6px; background:#fff; max-width:420px;}
   .gender-wrap{
     margin-top:10px;
-    max-height:300px;
+    max-height:260px;
     max-width:420px;
     overflow-y:auto;
     border:1px solid var(--border);
@@ -137,10 +144,10 @@
   .gender-empty{padding:10px;}
   .gender-header, .gender-row{
     display:grid;
-    grid-template-columns:1fr 40px 40px 120px;
+    grid-template-columns:1fr 44px 44px 120px;
     align-items:center;
     gap:2px;
-    padding:4px 6px;
+    padding:2px 8px;
   }
   .gender-header{
     position:sticky;
@@ -166,7 +173,7 @@
   .gender-row .cat-cell select{
     width:100%;
     font-size:.78rem;
-    padding:3px 4px;
+    padding:1px 4px;
     border-radius:4px;
   }
   .category-edit-row{ display:flex; align-items:center; gap:8px; margin-bottom:6px; }
@@ -300,6 +307,7 @@
   <button class="btn-secondary btn-small" id="tourBtn" type="button">Præsentér programmet</button>
 </div>
 
+<div class="steps-pair">
 <section class="step" id="stepClass">
   <div class="step-head"><span class="step-num">1</span><h2>Klasse</h2></div>
   <label class="inline">
@@ -336,8 +344,9 @@ Elev 26
 Elev 27
 Elev 28</textarea>
   <div class="row">
-    <button class="btn-secondary" id="shortenNamesBtn" type="button" title="Fornavn og forbogstav i efternavnet. Id-numre og holdoplysninger fra Lectio fjernes.">Forkort navne</button>
+    <button class="btn-secondary" id="shortenNamesBtn" type="button" title="Fjerner id-numre og holdoplysninger og forkorter lange navne til fornavn og forbogstav i efternavnet. Korte navne som Elev 8 bliver stående.">Forkort navne</button>
     <span class="muted" id="countLabel"></span>
+    <span class="muted" id="shortenHint"></span>
   </div>
   <div class="error" id="namesError" hidden></div>
   <div class="warn" id="namesWarning" hidden></div>
@@ -345,96 +354,97 @@ Elev 28</textarea>
 
 <section class="step" id="stepGroups">
   <div class="step-head"><span class="step-num">2</span><h2>Grupper</h2><span class="muted">Alt her er valgfrit</span></div>
-  <div class="step-cols">
-    <div>
-      <div class="sub-block">
-        <div class="sub-label">Gruppestørrelse</div>
-        <label class="check">
-          <input type="checkbox" id="avoidTriosCheckbox">
-          Undgå grupper på 3, og lav i stedet grupper på 5
-        </label>
-        <p class="muted hint" id="sizeHint"></p>
-      </div>
+  <div class="sub-block">
+    <div class="sub-label">Gruppestørrelse</div>
+    <label class="check">
+      <input type="checkbox" id="avoidTriosCheckbox">
+      Undgå grupper på 3, og lav i stedet grupper på 5
+    </label>
+    <p class="muted hint" id="sizeHint"></p>
+  </div>
 
-      <div class="sub-block">
-        <div class="sub-label">Betingelser</div>
-        <div class="row">
-          <select id="condStudentA"></select>
-          <select id="condType">
-            <option value="avoid">må ikke være i samme gruppe som</option>
-            <option value="together">skal være makker med</option>
-          </select>
-          <select id="condStudentB"></select>
-        </div>
-        <div class="row">
-          <button class="btn-secondary btn-small" id="addCondBtn" type="button">Tilføj betingelse</button>
-          <button class="btn-secondary btn-small" id="clearCondBtn" type="button">Ryd alle</button>
-          <span class="error" id="condError" hidden></span>
-        </div>
-        <div class="cond-list" id="conditionsList"></div>
-      </div>
-
-      <div class="sub-block">
-        <div class="sub-label">Roller</div>
-        <div class="row">
-          <label class="check">
-            <input type="checkbox" id="rolesEnabledCheckbox">
-            Giv eleverne roller i grupperne
-          </label>
-          <label class="inline">
-            Antal roller
-            <select id="roleCount">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-            </select>
-          </label>
-        </div>
-        <div class="edit-panel" id="roleNamesPanel" style="display:none;"></div>
-      </div>
+  <div class="sub-block">
+    <div class="sub-label">Betingelser</div>
+    <div class="row">
+      <select id="condStudentA"></select>
+      <select id="condType">
+        <option value="avoid">må ikke være i samme gruppe som</option>
+        <option value="together">skal være makker med</option>
+      </select>
+      <select id="condStudentB"></select>
     </div>
+    <div class="row">
+      <button class="btn-secondary btn-small" id="addCondBtn" type="button">Tilføj betingelse</button>
+      <button class="btn-secondary btn-small" id="clearCondBtn" type="button">Ryd alle</button>
+      <span class="error" id="condError" hidden></span>
+    </div>
+    <div class="cond-list" id="conditionsList"></div>
+  </div>
 
-    <div>
-      <div class="sub-block">
-        <div class="sub-label">Køn og kategori</div>
-        <div class="row">
-          <label class="inline">
-            Makkerpar skal være
-            <select id="genderPreference">
-              <option value="none">Ingen præference</option>
-              <option value="mixed">Blandet køn</option>
-              <option value="same">Samme køn</option>
-            </select>
-          </label>
+  <div class="sub-block">
+    <div class="sub-label">Køn og kategori</div>
+    <label class="check">
+      <input type="checkbox" id="traitsEnabledCheckbox">
+      Tag hensyn til køn eller kategori
+    </label>
+    <div id="traitsPanel" hidden>
+      <div class="row">
+        <label class="inline">
+          Makkerpar skal være
+          <select id="genderPreference">
+            <option value="none">Ingen præference</option>
+            <option value="mixed">Blandet køn</option>
+            <option value="same">Samme køn</option>
+          </select>
+        </label>
+      </div>
+      <div class="row">
+        <label class="inline">
+          Grupper skal have
+          <select id="categoryPreference">
+            <option value="none">Ingen præference</option>
+            <option value="mixed">Blandet kategori</option>
+            <option value="same">Samme kategori</option>
+          </select>
+        </label>
+        <button class="btn-secondary btn-small" id="editCategoriesBtn" type="button">Navngiv kategorier</button>
+      </div>
+      <div class="edit-panel" id="categoryEditPanel" style="display:none;"></div>
+      <p class="muted hint">Der tages kun hensyn til elever, der har fået køn eller kategori.</p>
+      <div class="gender-wrap">
+        <div class="gender-header">
+          <span></span>
+          <span>Dreng</span>
+          <span>Pige</span>
+          <span class="cat-col">Kategori</span>
         </div>
-        <div class="row">
-          <label class="inline">
-            Grupper skal have
-            <select id="categoryPreference">
-              <option value="none">Ingen præference</option>
-              <option value="mixed">Blandet kategori</option>
-              <option value="same">Samme kategori</option>
-            </select>
-          </label>
-          <button class="btn-secondary btn-small" id="editCategoriesBtn" type="button">Navngiv kategorier</button>
-        </div>
-        <div class="edit-panel" id="categoryEditPanel" style="display:none;"></div>
-        <p class="muted hint">Der tages kun hensyn til elever, der har fået køn eller kategori.</p>
-        <div class="gender-wrap">
-          <div class="gender-header">
-            <span></span>
-            <span>Dreng</span>
-            <span>Pige</span>
-            <span class="cat-col">Kategori</span>
-          </div>
-          <div id="genderList"></div>
-        </div>
+        <div id="genderList"></div>
       </div>
     </div>
   </div>
+
+  <div class="sub-block">
+    <div class="sub-label">Roller</div>
+    <div class="row">
+      <label class="check">
+        <input type="checkbox" id="rolesEnabledCheckbox">
+        Giv eleverne roller i grupperne
+      </label>
+      <label class="inline">
+        Antal roller
+        <select id="roleCount">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </label>
+    </div>
+    <div class="edit-panel" id="roleNamesPanel" style="display:none;"></div>
+  </div>
 </section>
+</div>
 
 <section class="step" id="stepWeeks">
   <div class="step-head"><span class="step-num">3</span><h2>Uger</h2></div>
