@@ -60,9 +60,9 @@
                 this.laerer.baerer = "papir";
                 if (NK.Lyd) NK.Lyd.papir();
             } },
-            { arm: -1.25, tid: 0.3 },
+            { arm: 1.8, tid: 0.3 },
             { tid: 1.8, hver: function (t) {
-                this.laerer.arm = -1.25 + Math.sin(t * Math.PI * 7) * 0.22;
+                this.laerer.arm = 1.8 + Math.sin(t * Math.PI * 7) * 0.14;
                 if (this.spildPyt) this.spildPyt.vaad = 1 - t;
                 if (t >= 0.99) this.spildPyt = null;
             } },

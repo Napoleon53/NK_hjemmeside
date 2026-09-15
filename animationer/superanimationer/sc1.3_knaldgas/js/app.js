@@ -34,7 +34,7 @@
         antaend.disabled = !f.kanAntaende();
         h2.classList.toggle("banker", !f.harFyldt && f.kanFylde());
         o2.classList.toggle("banker", !f.harFyldt && f.kanFylde());
-        antaend.classList.toggle("banker", f.kanAntaende());
+        antaend.classList.toggle("banker", f.kanAntaende() && f.fuld());
 
         /* Mens glasset staar ved flammen, sidder Genfyld glasset paa
            Antaends plads. */

@@ -57,6 +57,8 @@ typisk er 98,5 % jern.
 * **Hjælp til beregningen.** Knappen åbner en guide i fem trin: forbrugt volumen,
   n(MnO₄⁻), n(Fe²⁺), m(Fe) og jernindholdet. Hvert trin tjekkes mod elevens eget
   svar i trinnet før, og små tal kan skrives som 0,000356 eller 3,56·10^-4.
+* **Intro.** Første gang siden åbnes, siger en pop-up kort, hvad forsøget
+  undersøger, og hvad eleven skal gøre. Knappen Om forsøget åbner den igen.
 * **Flere forsøg.** Nyt forsøg starter forfra. Tidligere resultater bliver
   stående, så forsøgene kan sammenlignes.
 * **Quiz** med ti spørgsmål, låst op når jernindholdet er beregnet i et forsøg

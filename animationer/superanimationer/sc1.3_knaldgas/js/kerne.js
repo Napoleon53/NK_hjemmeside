@@ -34,6 +34,18 @@ window.NK = NK;
         return nu + (maal - nu) * (1 - Math.exp(-hastighed * dt));
     };
 
+    NK.r = function (a, b) {
+        return a + Math.random() * (b - a);
+    };
+
+    /* Et punkt (lx, ly) i en genstands egne koordinater omregnet til
+       tegnebordet, naar ankeret staar i positur p = { x, y, v } */
+    NK.tilVerden = function (p, anker, lx, ly) {
+        var c = Math.cos(p.v), s = Math.sin(p.v);
+        var dx = lx - anker.x, dy = ly - anker.y;
+        return { x: p.x + dx * c - dy * s, y: p.y + dx * s + dy * c };
+    };
+
     NK.tilfaeldig = function (liste) {
         return liste[Math.floor(Math.random() * liste.length)];
     };

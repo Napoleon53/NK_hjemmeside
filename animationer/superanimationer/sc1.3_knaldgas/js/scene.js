@@ -61,6 +61,13 @@
     /* Glassets aabning hviler paa hylden, lige over hullet. */
     S.HJEM = { x: S.BAD.hulX, y: S.BAD.hylde };
 
+    /* ----- Kemichael: ankre, hylden og kaffekoppen ---------------------- */
+    /* Ankrene til laereren og kaffekoppen staar i ../kemichael/kemichael.js */
+    S.ANKER = { papir: { x: 36, y: 22 } };
+    Object.keys(NK.Kemichael.ANKER).forEach(function (navn) { S.ANKER[navn] = NK.Kemichael.ANKER[navn]; });
+    S.HYLDE = { x0: 16, x1: 116, y: 130 };
+    S.KOP = { x: 60 - 21 + S.ANKER.kaffekop.x, y: S.HYLDE.y - 40 + S.ANKER.kaffekop.y };
+
     /* ----- Braenderen ------------------------------------------------- */
     var BRK = 0.9;
     var brTop = S.BORD - 149 * BRK;
@@ -238,7 +245,8 @@
     /* ================================================================
        BRAENDER, GASHANE OG FLAMME
        ================================================================ */
-    S.tegnBraender = function (ctx, tid) {
+    /* slukket: flammen er slukket af vandet fra et glas, der ikke var fuldt */
+    S.tegnBraender = function (ctx, tid, slukket) {
         var br = S.BRAENDER;
         var hane = { x: 960, y: S.BORD };
 
@@ -272,7 +280,36 @@
         ctx.restore();
 
         NK.Sprites.tegn(ctx, "braender", br.x - br.b / 2, br.top, br.b, br.h, "#6d7686");
-        S.tegnFlamme(ctx, br.flamme.x, br.flamme.y, tid);
+        if (!slukket) S.tegnFlamme(ctx, br.flamme.x, br.flamme.y, tid);
+    };
+
+    /* Vand, der er loebet ud paa bordet: { x, rx, vaad } */
+    S.tegnPyt = function (ctx, pyt) {
+        if (!pyt || pyt.vaad < 0.01) return;
+        ctx.save();
+        ctx.globalAlpha = NK.klamp(pyt.vaad, 0, 1);
+        ctx.fillStyle = "rgba(120, 180, 225, 0.55)";
+        ctx.beginPath();
+        ctx.ellipse(pyt.x, S.BORD + 2.5, pyt.rx, 5, 0, 0, Math.PI * 2);
+        ctx.ellipse(pyt.x + pyt.rx * 0.55, S.BORD + 3, pyt.rx * 0.45, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
+        ctx.beginPath();
+        ctx.ellipse(pyt.x - pyt.rx * 0.2, S.BORD + 1.5, pyt.rx * 0.4, 1.2, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    };
+
+    /* Hylden til laererens kaffe */
+    S.tegnHylde = function (ctx) {
+        var H = S.HYLDE;
+        ctx.fillStyle = "#6b4a2c";
+        ctx.fillRect(H.x0, H.y, H.x1 - H.x0, 7);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
+        ctx.fillRect(H.x0, H.y, H.x1 - H.x0, 1.5);
+        ctx.fillStyle = "#4a3320";
+        ctx.fillRect(H.x0 + 10, H.y + 7, 5, 14);
+        ctx.fillRect(H.x1 - 15, H.y + 7, 5, 14);
     };
 
     S.tegnFlamme = function (ctx, x, y, tid) {

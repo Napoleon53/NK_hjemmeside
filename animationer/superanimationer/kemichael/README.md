@@ -4,9 +4,9 @@ Læreren, der går igen i superanimationerne. Figuren, hans sprites, de fælles
 påskeæg og glimtene af hans baggrund ligger her, så han ser ens ud og opfører sig
 ens alle steder. Hver animation har sine egne scener i sin `js/laerer.js`.
 
-Bruges i sc2.7 Blyiodid, sc6.8 Substitution, sc6.9 Fedt i chips og sc8.6 Jern i
-ståluld. Animationerne henter filer herfra og skal derfor ligge ved siden af
-denne mappe. sc2.5 Fældning har en ældre udgave af ham, der kigger op i hjørnet;
+Bruges i sc1.3 Knaldgas, sc2.6 Kobber og dibrom, sc2.7 Blyiodid, sc6.8
+Substitution, sc6.9 Fedt i chips og sc8.6 Jern i ståluld. Animationerne henter
+filer herfra og skal derfor ligge ved siden af denne mappe. sc2.5 Fældning har en ældre udgave af ham, der kigger op i hjørnet;
 den er tegnet med samme ansigt og overskæg, men bruger ikke mappen.
 
 ## Personen
@@ -76,7 +76,7 @@ Idéer til senere glimt i samme stil:
 | `bartender` | kolben rystes første gang (sc8.6) | Jeg rystede cocktails under studiet. Det her er ikke det. |
 | `jura` | aubergine (sc8.6) | Aubergine så jeg sidst i 2011. Han læser jura nu. |
 | `titrering` | "Rustfrit." (sc8.6) | Min første titrering gav 140 %. Det var en lang nat. |
-| `regnskab3`, `6`, `10` | uheld: heptan, petriskål og brand (sc6.9), proppen (sc6.8), spild (sc2.7), buretten (sc8.6) | Tredje uheld på den her computer. Det står i regnskabet. |
+| `regnskab3`, `6`, `10` | uheld: heptan, petriskål, varm skål og brand (sc6.9), spild og udsugning (sc6.8, sc2.6), vasken og kolben (sc2.6), spild og varmt glas (sc2.7), buretten og vægten (sc8.6), flammen (sc1.3) | Tredje uheld på den her computer. Det står i regnskabet. |
 
 ## Bevægelser
 
@@ -89,6 +89,16 @@ tale og dreje armen kan han:
 * `K.suk()`: øjnene lukkes, og hovedet synker og kommer op igen
 * `{ gaa: K.KANT }`: han kigger kun ind fra venstre kant, fx med `laen: 1`
 * damp af ørerne, når han bliver klikket på for mange gange
+* armen: 0 peger lige op, og `K.HAENGER` (2,9) hænger ned. Over 2 tegnes armen
+  bag kroppen. Når han tørrer op på bordet til højre for sig, bruges 1,8 med en
+  lille svingning (±0,14)
+
+## Uheld
+
+Forkerte handlinger i et forsøg afvises ikke, når det kan undgås. De giver et
+uheld, og læreren kommer og rydder op: tørrer op, tænder udsugningen, stopper
+eleven ved vasken eller tænder brænderen igen. Scenen står i animationens
+`laerer.js` og slutter med `K.uheld()`, så uheldet kommer i regnskabet.
 
 ## Filer
 

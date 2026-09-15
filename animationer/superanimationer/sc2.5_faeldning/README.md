@@ -33,6 +33,9 @@ dråbe falder ned på folien. Flasken bliver i hånden, til man klikker ved side
 af, på stativet eller trykker Esc, så en hel søjle kan dryppes i træk. Mens en
 flaske er i hånden, lyser dens søjle eller række op i skemaet.
 
+Første gang siden åbnes, siger en intro-popup kort, hvad forsøget undersøger,
+og hvad eleven skal gøre. Knappen Om forsøget åbner den igen.
+
 ### Skemaet
 
 |         | AgNO₃            | BaCl₂            | CuSO₄              |

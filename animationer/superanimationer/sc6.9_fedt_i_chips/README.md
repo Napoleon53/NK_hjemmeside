@@ -65,6 +65,8 @@ procent. Resultatet sammenlignes med varedeklarationen på posen (34 g fedt pr.
   fedtets andel af chipsene (med mindst tre decimaler) og fedtindholdet i
   procent. Hvert trin tjekkes, før det næste låses op, og et forkert svar giver
   et hint. Til sidst skrives svaret ind i måleskemaet.
+* **Intro.** Første gang siden åbnes, siger en pop-up kort, hvad forsøget
+  undersøger, og hvad eleven skal gøre. Knappen Om forsøget åbner den igen.
 * **Flere forsøg.** Nyt forsøg starter forfra med nye chips. Tidligere
   resultater bliver stående, så forsøgene kan sammenlignes.
 * **Quiz** med ti spørgsmål, låst op når fedtindholdet er beregnet i et forsøg

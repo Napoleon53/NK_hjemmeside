@@ -113,7 +113,7 @@
             { arm: 1.8, tid: 0.5 },
             { kald: function () { this.laerer.baerer = "papir"; if (NK.Lyd && NK.Lyd.papir) NK.Lyd.papir(); } },
             { tid: 1.8, hver: function (t) {
-                this.laerer.arm = -1.25 + Math.sin(t * Math.PI * 7) * 0.22;
+                this.laerer.arm = 1.8 + Math.sin(t * Math.PI * 7) * 0.14;
                 if (this.vaegtPyt) this.vaegtPyt.alfa = 1 - t;
                 if (t >= 0.99) this.vaegtPyt = null;
             } },

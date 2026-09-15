@@ -82,13 +82,11 @@ function koer() {
     f.knaekChance = 0;             /* paaskeaegget testes for sig i afsnit 6 */
     frisk();
     fyld(2, 1);
-    paastand("et halvt glas kan ikke antaendes", f.antaend() === false && f.tilstand === "klar");
-    paastand("et halvt glas kan ikke tages op", f.ned({ x: f.glas.x, y: f.glas.y - 100 }) === false && f.tilstand === "klar");
     fyld(3, 2);
     paastand("glasset stopper ved 6 streger", f.h + f.o === 6, f.h + " + " + f.o);
     NK.opdaterPanel();
-    paastand("+ knapperne er slaaet fra, Antaend er slaaet til",
-        d.getElementById("knap-h2").disabled && d.getElementById("knap-o2").disabled && !d.getElementById("knap-antaend").disabled);
+    paastand("+ knapperne og Antaend er slaaet til",
+        !d.getElementById("knap-h2").disabled && !d.getElementById("knap-o2").disabled && !d.getElementById("knap-antaend").disabled);
     adv(2.5);
     paastand("glasset indeholder 12 molekyler (2 pr. streg)", f.molekyler.length === 12, f.molekyler.length);
     paastand("Antaend starter turen hen til flammen", f.antaend() === true && f.tilstand === "flyver");
@@ -131,6 +129,32 @@ function koer() {
     paastand("Genfyld glasset kan ikke trykkes lige efter knaldet", f.genfyld() === false);
     adv(1);
     paastand("glasset kan ikke tages op fra flammen", f.ned({ x: f.glas.x, y: f.glas.y - 100 }) === false && f.tilstand === "knald");
+
+    overskrift("4b. Uheld, som laereren rydder op efter");
+    frisk();
+    adv(3);
+    fyld(2, 1);
+    adv(1.5);
+    paastand("et halvt glas kan antaendes", f.antaend() === true && f.tilstand === "flyver");
+    adv(1.3);
+    paastand("vandet slukker flammen, og der knalder ikke", f.flammeSlukket && !!f.pyt && f.resultater[2] === undefined && f.h + f.o === 0);
+    paastand("med slukket flamme kan der ikke antaendes", f.kanAntaende() === false);
+    var tv = 0;
+    while (f.laerer.tale.indexOf("Vand") !== 0 && tv < 8) { adv(0.25); tv += 0.25; }
+    paastand("laereren kommer og taler om vand og flammer", !!(f.laerer.scene && f.laerer.scene.navn === "slukket") && f.laerer.tale.indexOf("Vand") === 0, f.laerer.tale);
+    tv = 0;
+    while ((f.laererOptaget() || f.tilstand !== "klar") && tv < 20) { adv(0.25); tv += 0.25; }
+    paastand("laereren har toerret op og taendt braenderen, og glasset er klar igen", !f.flammeSlukket && !f.pyt && !f.laererOptaget() && f.tilstand === "klar" && f.kanAntaende(), tv + " s");
+    fyld(4, 2);
+    f.tilfoej("h2");
+    paastand("mere gas i et fuldt glas bobler ud under kanten", f.h + f.o === 6 && f.overfyldt === 1 && f.bobler.some(function (b) { return b.ud; }));
+    f.tilfoej("o2");
+    adv(0.5);
+    paastand("anden gang kigger laereren ind fra kanten", !!(f.laerer.scene && f.laerer.scene.navn === "overfyld"));
+    adv(5);
+    paastand("laereren henter kaffen", f.klikKop() === true);
+    adv(10);
+    paastand("koppen er vaek, og laereren er gaaet", f.g.kaffekop.skjult && !f.laererOptaget());
 
     overskrift("5. Rene gasser");
     frisk();

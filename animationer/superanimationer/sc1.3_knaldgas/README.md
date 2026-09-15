@@ -3,8 +3,8 @@
 En superanimation: i modsætning til de øvrige animationer, som er én enkelt
 HTML-fil, ligger denne i sin egen mappe med adskilt CSS, JavaScript og sprites.
 
-Åbn **`index.html`**. Mappen er selvstændig og henter kun filer inde fra sig
-selv, så den kan flyttes uden at der knækker noget.
+Åbn **`index.html`**. Mappen henter kun filer inde fra sig selv, bortset fra
+læreren Kemichael i `../kemichael/`. Den skal derfor ligge ved siden af den mappe.
 
 Den afløser `animationer/kemi-c-filer/c1.3_eksperiment_dihydrogen_dioxygen.html`,
 som nu ligger i
@@ -28,6 +28,8 @@ antænd med knap eller ved at trække glasset til flammen, lyd, søjlediagram ov
 lydstyrken, teorien bag en knap og quizzen. Styrkerne er de samme tal
 (0, 25, 50, 75, 100, 50, 0). Det nye er opstillingen og rækkefølgen:
 
+* **Intro.** Første gang siden åbnes, siger en pop-up kort, hvad forsøget
+  undersøger, og hvad eleven skal gøre. Knappen Om forsøget åbner den igen.
 * **En rigtig opstilling.** Trykflaskerne er forbundet med slanger til et
   pneumatisk kar, hvor glasset står på hovedet på en hylde. Gassen bobler op i
   glasset og fortrænger vandet. Glasset flyver selv hen til flammen, når man
@@ -48,8 +50,8 @@ lydstyrken, teorien bag en knap og quizzen. Styrkerne er de samme tal
 * **Påskeæg:** ved det helt rigtige forhold, 4 : 2, knækker glasset i 10 % af
   forsøgene (`knaekChance` i `js/forsoeg.js`). Skårene falder ned på bordet,
   og Genfyld glasset hedder da **Nyt glas**. Resultatet tæller stadig.
-* **Kun et fuldt glas kan antændes.** Den gamle lod et halvt glas knalde uden at
-  registrere det. Nu siger animationen, at glasset skal fyldes helt op først.
+* **Et halvt glas knalder ikke.** Den gamle lod et halvt glas knalde uden at
+  registrere det. Nu løber vandet ud af glasset og slukker flammen (se Uheld).
 * **Forløbet i tre trin** (Fyld glasset, Antænd, Aflæs lydstyrken) står øverst
   på scenen og følger med. Det erstatter startskærmen, og teorien åbner ikke
   længere af sig selv.
@@ -60,6 +62,24 @@ lydstyrken, teorien bag en knap og quizzen. Styrkerne er de samme tal
   pop op-vindue, og der er kommet et femte spørgsmål om overskud.
 * **Rettet kemi og sprog.** "Brint kan kun reagere med ilt" er skrevet om, og
   tankestreger og talesprog er fjernet.
+
+## Uheld, som læreren rydder op efter
+
+Læreren Kemichael kommer ind på scenen fra venstre. Figuren, kaffen og klik på
+ham er fælles for superanimationerne og står i `../kemichael/kemichael.js`.
+Scenerne her står i `js/laerer.js`.
+
+* **Et glas, der ikke er fuldt.** Det kan antændes og tages op. Så er der vand i
+  glasset, og vandet løber ud undervejs og slukker flammen. Der knalder ikke, og
+  intet bliver registreret. Glasset går hjem og fyldes igen, og læreren tørrer
+  op og tænder brænderen ("Vand og flammer. Gæt, hvem der vinder."). Imens kan
+  der ikke antændes.
+* **Gas i et fuldt glas.** Plusknapperne og flaskerne virker også, når glasset
+  er fuldt. Gassen bobler ud under kanten og forsvinder. Anden gang kigger
+  læreren ind fra kanten.
+* **Lærerens kaffe.** Koppen på hylden. Læreren henter den og drikker.
+* **Læreren klikkes på.** Stadig kortere svar, rødere i hovedet og til sidst
+  damp af ørerne.
 
 ## Sprites
 
@@ -107,7 +127,8 @@ dobbelttryk på mellemrum ikke sender glasset hjem med det samme.
 
 **`_selvtest.html`** åbner `index.html` i en iframe og kontrollerer: at alle
 sprites indlæses, at styrkerne er rigtige, at atomerne er bevaret i alle 28
-blandinger, at et halvt glas ikke kan antændes eller tages op, at knaldet
+blandinger, at et halvt glas slukker flammen, og læreren rydder op, at gas i et
+fuldt glas bobler ud, at knaldet
 danner de rigtige molekyler, at vandet flyver ud og overskuddet bliver, at
 glasset bliver ved flammen indtil Genfyld glasset, at træk med musen virker, at
 ren gas ikke giver lyd, at glasset kun knækker ved 4 : 2 og bagefter kan

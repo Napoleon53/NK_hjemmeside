@@ -106,6 +106,11 @@
         this.fyldtSidenKnald = true;
         this.sidsteReaktion = null;
         this.e = { x: 0, y: 0, styrke: 0, blink: 0, stik: 0, ringe: [], roeg: [], gnister: [], draaber: [] };
+        this.flammeSlukket = false;
+        this.pyt = null;
+        this.overfyldt = 0;
+        this.g = { kaffekop: { navn: "kaffekop", anker: S.ANKER.kaffekop, p: { x: S.KOP.x, y: S.KOP.y, v: 0 }, skjult: this.koppenVaek } };
+        if (this.laererNyt) this.laererNyt();
     };
 
     P.rydResultater = function () {
@@ -122,9 +127,12 @@
     };
 
     P.fuld = function () { return this.h + this.o >= M.MAKS; };
-    P.kanFylde = function () { return this.tilstand === "klar" && !this.fuld(); };
-    P.kanAntaende = function () { return this.tilstand === "klar" && this.fuld(); };
-    P.kanToemme = function () { return this.tilstand === "klar" && this.h + this.o > 0; };
+    P.optaget = function () { return !!(this.laererOptaget && this.laererOptaget()); };
+    /* Der kan ogsaa lukkes gas ind i et fuldt glas (den bobler ud), og et
+       glas, der ikke er fuldt, kan antaendes (vandet slukker flammen). */
+    P.kanFylde = function () { return this.tilstand === "klar" && !this.optaget(); };
+    P.kanAntaende = function () { return this.tilstand === "klar" && !this.flammeSlukket && !this.optaget(); };
+    P.kanToemme = function () { return this.tilstand === "klar" && this.h + this.o > 0 && !this.optaget(); };
     P.kanGenfylde = function () { return this.tilstand === "knald" && this.tid - this.knaldTid >= GENFYLD_VENT; };
 
     /* Hvilket af de tre trin paa scenen er eleven naaet til? */
@@ -148,11 +156,8 @@
             this.besked("Tryk på Genfyld glasset først.", "info");
             return false;
         }
-        if (this.tilstand !== "klar") return false;
-        if (this.fuld()) {
-            this.besked("Glasset er fuldt.", "info");
-            return false;
-        }
+        if (this.tilstand !== "klar" || this.optaget()) return false;
+        if (this.fuld()) return this.overfyld(gas);
         if (gas === "h2") this.h++; else this.o++;
         this.harFyldt = true;
         this.fyldtSidenKnald = true;
@@ -184,13 +189,60 @@
             this.besked("Tryk på Genfyld glasset først.", "info");
             return false;
         }
-        if (this.tilstand !== "klar") return false;
-        if (!this.fuld()) {
-            this.besked("Fyld glasset helt op (6 streger), før du antænder.", "advarsel");
-            return false;
-        }
-        this.flyv(S.TAEND, 1.1, this.knald);
+        if (this.tilstand !== "klar" || this.optaget()) return false;
+        if (this.flammeSlukket) { this.besked("Flammen er slukket.", "info"); return false; }
+        this.flyv(S.TAEND, 1.1, this.fuld() ? this.knald : this.slukker);
         this.aendret("antaend");
+        return true;
+    };
+
+    /* Uheld: glasset er ikke fuldt, saa der er vand i det. Vandet loeber
+       ud undervejs og slukker flammen, og der sker intet knald. Gassen
+       slipper ud, og glasset skal fyldes igen. Laereren toerrer op og
+       taender braenderen (laerer.js). */
+    P.slukker = function () {
+        var i;
+        var fl = S.BRAENDER.flamme;
+        this.traek = null;
+        this.bane = null;
+        this.glas.x = S.TAEND.x;
+        this.glas.y = S.TAEND.y;
+        this.flammeSlukket = true;
+        for (i = 0; i < 16; i++) {
+            this.e.roeg.push({ x: fl.x + r(-14, 14), y: fl.y - r(0, 30), vx: r(-30, 30), vy: r(-60, -20), r: r(6, 12), liv: r(0.8, 1.3) });
+        }
+        for (i = 0; i < 18; i++) {
+            this.e.draaber.push({ x: fl.x + r(-26, 26), y: fl.y - r(0, 20), vy: r(0, 120), liv: 1 });
+        }
+        this.pyt = { x: S.BRAENDER.x - 6, rx: 8, rxMaal: 58, vaad: 1 };
+        this.h = 0;
+        this.o = 0;
+        this.venter.h2 = 0;
+        this.venter.o2 = 0;
+        for (i = 0; i < this.molekyler.length; i++) this.molekyler[i].doer = true;
+        this.skalFyldes = true;
+        this.fyldtSidenKnald = true;
+        this.ryst = 3;
+        if (NK.Lyd) NK.Lyd.sus();
+        this.besked("Vandet i glasset slukkede flammen.", "advarsel");
+        if (this.laererSlukket) this.laererSlukket();
+        this.flyv(S.HJEM, 1.1, this.ankomHjem);
+        this.aendret("slukket");
+    };
+
+    /* Uheld: mere gas i et fuldt glas. Den bobler ud under kanten og
+       forsvinder. Anden gang kigger laereren ind (laerer.js). */
+    P.overfyld = function (gas) {
+        var ende = S.SLANGER[gas].ende;
+        var side = gas === "h2" ? -1 : 1;
+        this.flow[gas] = 1;
+        for (var i = 0; i < 9; i++) {
+            this.bobler.push({ x0: S.HJEM.x + side * r(50, 58), x: ende.x, y: ende.y, r: r(2, 4.5), v: r(70, 115), fase: r(0, 6), vent: i * 0.07, ud: true });
+        }
+        this.overfyldt++;
+        this.besked("Glasset er fuldt. Gassen bobler ud under kanten.", "advarsel");
+        if (this.overfyldt === 2 && this.laererOverfyld) this.laererOverfyld();
+        this.aendret("overfyld");
         return true;
     };
 
@@ -472,16 +524,19 @@
 
     P.ned = function (p) {
         if (NK.Lyd) NK.Lyd.laasOp();
+        if (this.overLaerer && this.overLaerer(p)) { this.klikLaerer(); return false; }
+        var kop = this.g.kaffekop;
+        if (!kop.skjult && !kop.iHaand && p.x > kop.p.x - 20 && p.x < kop.p.x + 26 && p.y > kop.p.y - 42 && p.y < kop.p.y + 2) {
+            if (this.klikKop) this.klikKop();
+            return false;
+        }
+        if (this.optaget()) return false;
         if (this.overGlas(p)) {
             if (this.tilstand === "knald") {
                 this.besked("Tryk på Genfyld glasset for at sætte det tilbage i karret.", "info");
                 return false;
             }
             if (this.tilstand !== "klar") return false;
-            if (!this.fuld()) {
-                this.besked("Fyld glasset helt op (6 streger), før du tager det op.", "advarsel");
-                return false;
-            }
             this.tilstand = "traek";
             this.traek = { dx: p.x - this.glas.x, dy: p.y - this.glas.y };
             this.aendret("traek");
@@ -503,7 +558,10 @@
         this.glas.x = nx;
         this.glas.y = ny;
         var dx = nx - S.TAEND.x, dy = ny - S.TAEND.y;
-        if (dx * dx + dy * dy < 58 * 58) this.knald();
+        if (dx * dx + dy * dy < 58 * 58 && !this.flammeSlukket) {
+            if (this.fuld()) this.knald();
+            else this.slukker();
+        }
     };
 
     P.op = function () {
@@ -529,7 +587,7 @@
         c.addEventListener("pointermove", function (ev) {
             mig.flyt(mig.tilBord(ev));
             c.style.cursor = mig.tilstand === "traek" ? "grabbing"
-                : (mig.hover === "glas" && mig.tilstand === "klar" ? (mig.fuld() ? "grab" : "not-allowed")
+                : (mig.hover === "glas" && mig.tilstand === "klar" ? "grab"
                 : (mig.hover && mig.tilstand === "klar" ? "pointer" : "default"));
         });
         c.addEventListener("pointerup", function () { mig.op(); });
@@ -606,6 +664,8 @@
         this.opdaterSkaar(dt);
         this.opdaterBobler(dt);
         this.opdaterEffekter(dt);
+        if (this.opdaterLaerer) this.opdaterLaerer(dt);
+        if (this.pyt) this.pyt.rx = NK.mod(this.pyt.rx, this.pyt.rxMaal, 3, dt);
 
         this.flow.h2 = Math.max(0, this.flow.h2 - dt * 1.3);
         this.flow.o2 = Math.max(0, this.flow.o2 - dt * 1.3);
@@ -749,6 +809,12 @@
             if (!hjemme) { this.bobler.splice(i, 1); continue; }
             if (b.vent > 0) { b.vent -= dt; continue; }
             b.y -= b.v * dt;
+            if (b.ud) {
+                /* Gassen, der ikke kan vaere i glasset, bobler op forbi kanten */
+                b.x = NK.lerp(b.x, b.x0, NK.klamp(dt * 6, 0, 1)) + Math.sin(this.tid * 9 + b.fase) * 1.6;
+                if (b.y <= S.BAD.overflade) this.bobler.splice(i, 1);
+                continue;
+            }
             b.x = b.x0 + (S.HJEM.x - b.x0) * NK.klamp((S.SLANGER.h2.ende.y - b.y) / 30, 0, 1) + Math.sin(this.tid * 9 + b.fase) * 1.6;
             if (b.y <= graense) this.bobler.splice(i, 1);
         }
@@ -825,11 +891,15 @@
         if (this.ryst > 0) ctx.translate((Math.random() - 0.5) * this.ryst, (Math.random() - 0.5) * this.ryst);
 
         S.tegnBaggrund(ctx);
+        S.tegnHylde(ctx);
+        var kop = this.g.kaffekop;
+        if (!kop.skjult && !kop.iHaand) NK.Sprites.tegnPositur(ctx, "kaffekop", kop.p, kop.anker);
         S.tegnFlaske(ctx, S.FLASKER.h2, klar && !this.fuld() && this.hover === "h2", this.flow.h2);
         S.tegnFlaske(ctx, S.FLASKER.o2, klar && !this.fuld() && this.hover === "o2", this.flow.o2);
         S.tegnSlange(ctx, "o2", this.flow.o2, this.tid);
         S.tegnSlange(ctx, "h2", this.flow.h2, this.tid);
-        S.tegnBraender(ctx, this.tid);
+        S.tegnBraender(ctx, this.tid, this.flammeSlukket);
+        S.tegnPyt(ctx, this.pyt);
         S.tegnSkaar(ctx, this.skaar, true);
 
         if (!this.knust) {
@@ -848,6 +918,7 @@
         S.tegnKnald(ctx, this.e);
         S.tegnSkaar(ctx, this.skaar, false);
         for (var i = 0; i < this.fri.length; i++) S.tegnMolekyle(ctx, this.fri[i]);
+        if (this.tegnLaerer) this.tegnLaerer(ctx, this.tid);
         ctx.restore();
     };
 }());

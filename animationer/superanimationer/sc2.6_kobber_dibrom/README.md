@@ -172,7 +172,8 @@ funktion. Mens en koreografi kører, ignoreres nye klik på scenen.
 
 **`_selvtest.html`** åbner `index.html` i en iframe og kører hele forsøget
 igennem: at alle sprites indlæses, at skemaerne er afstemt, at ion-notationen er
-rigtig, at bromvandet kræver udsugning, at der skal prop i før rystning, at
+rigtig, at bromvand uden udsugning får læreren til at tænde den, at rystning
+uden prop spilder bromvandet, at læreren stopper resterne ved vasken, at
 reaktionen bevarer atomer og ladning og bliver færdig inden 20 sekunders
 rystning, at et tryk på proppen tager proppen og ikke kolben, at glassene får
 3 Cu²⁺ og 6 Br⁻ hver, at begge tests bliver færdige, at quizzen låses op, at
