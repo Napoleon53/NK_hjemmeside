@@ -262,12 +262,12 @@
 
 
         /* Fuld skaerm: sidepanelet skjules helt, naar en superanimation vises,
-           og knappen i nederste venstre hjoerne gendanner det */
+           og knappen i oeverste venstre hjoerne gendanner det */
         .sidebar.skjult { width: 0; border-right: none; }
         .gendan-knap {
             position: absolute;
             left: 10px;
-            bottom: 10px;
+            top: 10px;
             z-index: 5;
             display: none;
             align-items: center;
@@ -291,7 +291,7 @@
     <div class="main-layout">
         <div class="sidebar" id="sidebarMenu">
             <div class="sidebar-header">
-                <span class="header-text clickable" onclick="visStartside()" title="Tilbage til oversigt"> 3 Molekyler</span>
+                <span class="header-text clickable" onclick="visStartside()" title="Tilbage til oversigt">Molekyler</span>
                 <div class="header-actions">
                     <button class="toggle-btn link-btn" onclick="kopierLink(this)" title="Kopiér link til denne animation">🔗</button>
                     <button class="toggle-btn" onclick="toggleMenu()" title="Vis/Skjul menu">☰</button>
