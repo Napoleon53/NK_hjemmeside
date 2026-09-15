@@ -144,7 +144,7 @@
   .gender-empty{padding:10px;}
   .gender-header, .gender-row{
     display:grid;
-    grid-template-columns:1fr 44px 44px 120px;
+    grid-template-columns:1fr 54px 54px 120px;
     align-items:center;
     gap:2px;
     padding:2px 8px;
@@ -164,7 +164,10 @@
   .gender-row{ font-size:.85rem; border-bottom:1px solid #f1f5f9; }
   .gender-row:last-child{ border-bottom:none; }
   .gender-row span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .gender-row input[type=checkbox]{ justify-self:center; margin:0; }
+  .gender-row .check-cell{ display:flex; align-items:center; justify-content:center; align-self:stretch; min-height:30px; border-radius:4px; cursor:pointer; }
+  .gender-row .check-cell:hover{ background:#eef4ff; }
+  .gender-row .check-cell input{ width:20px; height:20px; margin:0; cursor:pointer; accent-color:var(--accent); }
+  .edit-panel > .btn-small{ margin-top:2px; }
   .gender-header span.cat-col, .gender-row .cat-cell{
     border-left:1px dashed var(--border);
     padding-left:8px;
@@ -192,8 +195,9 @@
     font-size:.9rem;
   }
   .export-row{margin:0 0 16px;}
-  .period-bar{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px;}
-  .period-btn{
+  .period-bar, .chip-list{display:flex; flex-wrap:wrap; gap:6px;}
+  .period-bar{margin-bottom:10px;}
+  .chip{
     padding:5px 12px;
     font-size:.85rem;
     border-radius:999px;
@@ -201,8 +205,28 @@
     background:#fff;
     color:var(--ink);
   }
-  .period-btn:hover{background:#eef1f4;}
-  .period-btn.active{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .chip:hover{background:#eef1f4;}
+  .chip.active{background:var(--accent); border-color:var(--accent); color:#fff;}
+  /* Periode med en brudt betingelse */
+  .chip.warn-dot::after{content:""; display:inline-block; width:7px; height:7px; margin-left:6px; border-radius:50%; background:var(--warn); vertical-align:middle;}
+  #conditionWarning{margin:0 0 8px;}
+  .swap-hint{margin:0 0 12px;}
+
+  /* Byt elever: træk et navn hen på et andet, eller klik på begge */
+  [data-u]{cursor:grab; user-select:none;}
+  [data-u].swap-selected{outline:3px solid #f59e0b; outline-offset:-3px;}
+  [data-u].swap-over{outline:3px dashed var(--accent); outline-offset:-3px;}
+  [data-u].swap-dragging{opacity:.45;}
+  @keyframes swapFlash{
+    from{ box-shadow:inset 0 0 0 999px rgba(250,204,21,.6); }
+    to{ box-shadow:inset 0 0 0 999px rgba(250,204,21,0); }
+  }
+  [data-u].swap-done{animation:swapFlash 1.4s ease-out;}
+
+  /* Gemte klasser */
+  #savedBar{margin:0 0 12px;}
+  #classRow{margin-top:0;}
+  #saveRow{margin-top:6px;}
 
   .tabbar{display:flex; gap:6px; flex-wrap:wrap; border-bottom:2px solid var(--border); margin-bottom:16px;}
   .tabbtn{
@@ -310,10 +334,22 @@
 <div class="steps-pair">
 <section class="step" id="stepClass">
   <div class="step-head"><span class="step-num">1</span><h2>Klasse</h2></div>
-  <label class="inline">
-    Klassenavn
-    <input type="text" id="className" placeholder="fx 2y (valgfrit)" style="width:170px;">
-  </label>
+  <div class="row" id="savedBar" hidden>
+    <span class="muted">Gemte klasser:</span>
+    <span class="chip-list" id="savedList"></span>
+  </div>
+  <div class="row" id="classRow">
+    <label class="inline">
+      Klassenavn
+      <input type="text" id="className" placeholder="fx 2y" style="width:150px;">
+    </label>
+    <button class="btn-secondary btn-small" id="newClassBtn" type="button">Ny klasse</button>
+  </div>
+  <div class="row" id="saveRow">
+    <span class="muted" id="saveStatus"></span>
+    <button class="btn-secondary btn-small" id="openExistingBtn" type="button" hidden>Åbn den</button>
+    <button class="btn-secondary btn-small" id="deleteClassBtn" type="button" hidden>Slet klassen</button>
+  </div>
   <label class="field" for="names">Elevnavne, ét pr. linje</label>
   <textarea id="names" placeholder="Anna&#10;Bertram&#10;Cecilie&#10;...">Elev 1
 Elev 2
@@ -407,7 +443,7 @@ Elev 28</textarea>
             <option value="same">Samme kategori</option>
           </select>
         </label>
-        <button class="btn-secondary btn-small" id="editCategoriesBtn" type="button">Navngiv kategorier</button>
+        <button class="btn-secondary btn-small" id="editCategoriesBtn" type="button">Rediger kategorier</button>
       </div>
       <div class="edit-panel" id="categoryEditPanel" style="display:none;"></div>
       <p class="muted hint">Der tages kun hensyn til elever, der har fået køn eller kategori.</p>
@@ -487,6 +523,8 @@ Elev 28</textarea>
   </div>
 
   <div class="period-bar" id="periodBar"></div>
+  <div class="warn" id="conditionWarning" hidden></div>
+  <p class="muted swap-hint">Byt to elever ved at trække det ene navn hen på det andet eller ved at klikke på dem efter hinanden.</p>
 
   <div class="tabbar">
     <button class="tabbtn active" data-tab="groups" type="button">Grupper</button>
@@ -510,7 +548,8 @@ Elev 28</textarea>
 
 <script>
 (function(){
-  var CATEGORY_COUNT = 9;
+  var CATEGORY_MAX = 9;
+  var CATEGORY_START = 3;
   var ROLE_COUNT_MAX = 5;
   var MAX_GROUPS = 7;
   var MAX_HEX_TABLES = 5;
@@ -523,11 +562,13 @@ Elev 28</textarea>
   var state = {
     roster:[], sortedRoster:[],
     constraints:{ together:[], avoid:[] }, genders:{},
-    categories:{}, categoryNames:new Array(CATEGORY_COUNT).fill(''), categoryActive:new Array(CATEGORY_COUNT).fill(true),
+    categories:{}, categoryNames:new Array(CATEGORY_START).fill(''),
     roleNames:new Array(ROLE_COUNT_MAX).fill(''),
     // Planen laves én gang og både vises og eksporteres derfra. Flere perioder bygges videre
     // på samme historik, så en ændring af antal uger ikke trækker de første perioder om.
-    plan:null, periodIdx:0
+    plan:null, periodIdx:0,
+    // Klassens tidligere planer (i gemt form), så en ny plan kan undgå deres makkerpar.
+    earlierPlans:[]
   };
   var rosterKey = null;
 
@@ -768,8 +809,10 @@ Elev 28</textarea>
 
       var boyBox = document.createElement('input');
       boyBox.type = 'checkbox';
+      boyBox.setAttribute('aria-label', nm + ' er en dreng');
       var girlBox = document.createElement('input');
       girlBox.type = 'checkbox';
+      girlBox.setAttribute('aria-label', nm + ' er en pige');
 
       var current = state.genders[nm] || '';
       boyBox.checked = current === 'dreng';
@@ -793,8 +836,7 @@ Elev 28</textarea>
       noneOpt.value = '';
       noneOpt.textContent = '–';
       catSelect.appendChild(noneOpt);
-      for(var c=1; c<=CATEGORY_COUNT; c++){
-        if(!state.categoryActive[c-1]) continue;
+      for(var c=1; c<=state.categoryNames.length; c++){
         var opt = document.createElement('option');
         opt.value = String(c);
         opt.textContent = categoryLabel(c);
@@ -805,58 +847,82 @@ Elev 28</textarea>
       catCell.appendChild(catSelect);
 
       row.appendChild(span);
-      row.appendChild(boyBox);
-      row.appendChild(girlBox);
+      row.appendChild(checkCell(boyBox));
+      row.appendChild(checkCell(girlBox));
       row.appendChild(catCell);
       container.appendChild(row);
     });
   }
 
-  function renderCategoryEditPanel(){
+  // Hele cellen er klikbar, så afkrydsningsfeltet er let at ramme.
+  function checkCell(box){
+    var cell = document.createElement('label');
+    cell.className = 'check-cell';
+    cell.appendChild(box);
+    return cell;
+  }
+
+  function renderCategoryEditPanel(focusLast){
     var panel = byId('categoryEditPanel');
     panel.innerHTML = '';
-    for(var i=0; i<CATEGORY_COUNT; i++){
-      (function(i){
-        var row = document.createElement('div');
-        row.className = 'category-edit-row';
+    var count = state.categoryNames.length;
+    state.categoryNames.forEach(function(name, i){
+      var row = document.createElement('div');
+      row.className = 'category-edit-row';
 
-        var num = document.createElement('span');
-        num.className = 'cat-num';
-        num.textContent = (i+1) + '.';
+      var num = document.createElement('span');
+      num.className = 'cat-num';
+      num.textContent = (i+1) + '.';
 
-        var input = document.createElement('input');
-        input.type = 'text';
-        input.placeholder = 'Navn (valgfrit) - fx "' + (i+1) + '"';
-        input.value = state.categoryNames[i];
-        input.disabled = !state.categoryActive[i];
-        input.style.opacity = state.categoryActive[i] ? '1' : '.45';
-        input.addEventListener('input', function(){
-          state.categoryNames[i] = input.value;
-          renderGenderList();
-        });
+      var input = document.createElement('input');
+      input.type = 'text';
+      input.placeholder = 'Navn (valgfrit)';
+      input.value = name;
+      input.addEventListener('input', function(){
+        state.categoryNames[i] = input.value;
+        renderGenderList();
+      });
 
-        var toggleBtn = document.createElement('button');
-        toggleBtn.type = 'button';
-        toggleBtn.className = 'btn-secondary';
-        toggleBtn.textContent = state.categoryActive[i] ? 'Slet' : 'Gendan';
-        toggleBtn.addEventListener('click', function(){
-          state.categoryActive[i] = !state.categoryActive[i];
-          if(!state.categoryActive[i]){
-            Object.keys(state.categories).forEach(function(nm){
-              if(state.categories[nm] === String(i+1)) state.categories[nm] = '';
-            });
-          }
-          renderCategoryEditPanel();
-          renderGenderList();
-          updateStale();
-        });
+      row.appendChild(num);
+      row.appendChild(input);
+      // Der er altid mindst én kategori.
+      if(count > 1){
+        var removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'btn-secondary';
+        removeBtn.textContent = 'Fjern';
+        removeBtn.addEventListener('click', function(){ removeCategory(i); });
+        row.appendChild(removeBtn);
+      }
+      panel.appendChild(row);
+      if(focusLast && i === count - 1) setTimeout(function(){ input.focus(); }, 0);
+    });
 
-        row.appendChild(num);
-        row.appendChild(input);
-        row.appendChild(toggleBtn);
-        panel.appendChild(row);
-      })(i);
-    }
+    var addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'btn-secondary btn-small';
+    addBtn.textContent = 'Tilføj kategori';
+    addBtn.disabled = count >= CATEGORY_MAX;
+    addBtn.addEventListener('click', function(){
+      state.categoryNames.push('');
+      renderCategoryEditPanel(true);
+      renderGenderList();
+    });
+    panel.appendChild(addBtn);
+  }
+
+  // Kategorierne nummereres forfra, så eleverne i de efterfølgende kategorier følger med.
+  function removeCategory(i){
+    var removed = i + 1;
+    state.categoryNames.splice(i, 1);
+    Object.keys(state.categories).forEach(function(nm){
+      var c = +state.categories[nm];
+      if(c === removed) state.categories[nm] = '';
+      else if(c > removed) state.categories[nm] = String(c - 1);
+    });
+    renderCategoryEditPanel();
+    renderGenderList();
+    updateStale();
   }
 
   // Præferencerne for køn og kategori gælder kun, når der er sat hak i "Tag hensyn til køn eller
@@ -1236,9 +1302,13 @@ Elev 28</textarea>
 
     return shuffle(bundles).map(function(b, i){
       b.label = 'Gruppe ' + (i+1);
-      b.members = b.pairs.reduce(function(acc,p){ return acc.concat(p); }, []).concat(b.trio || []);
+      b.members = bundleMembers(b);
       return b;
     });
+  }
+
+  function bundleMembers(b){
+    return b.pairs.reduce(function(acc,p){ return acc.concat(p); }, []).concat(b.trio || []);
   }
 
   // Hvilken gruppe hvert par og hver trio hører til, så det kan vises ved borde og rækker.
@@ -1312,12 +1382,14 @@ Elev 28</textarea>
     };
   }
 
+  // "ref" peger på navnelisten i perioden ("p3" = par nr. 3, "t1" = trio nr. 1). Borde, rækker og
+  // grupper deler de samme lister, så et byt af to navne ses i alle visninger.
   function pairUnit(p, groups, idx){
-    return { type:'pair', size:2, data:p, groupLabel: groups.labels.pairs[idx] || null };
+    return { type:'pair', size:2, data:p, ref:'p' + idx, groupLabel: groups.labels.pairs[idx] || null };
   }
 
   function trioUnit(t, groups, idx){
-    return { type:'three', size:3, data:t, groupLabel: groups.labels.trios[idx] || null };
+    return { type:'three', size:3, data:t, ref:'t' + idx, groupLabel: groups.labels.trios[idx] || null };
   }
 
   // ---------- Sekskantede borde og rækker: fordel par og trioer på faste borde ----------
@@ -1378,6 +1450,99 @@ Elev 28</textarea>
     return { groups:groups, layouts:layouts };
   }
 
+  // Lægger periodernes makkerpar, trioer og grupper til historikken.
+  function addRoundsToHistory(rounds, history, trioCounts){
+    rounds.forEach(function(r){
+      var g = r.groups;
+      g.pairsGroups.forEach(function(p){ bumpHistoryGroup(history, p); });
+      g.triplesGroups.forEach(function(t){ bumpHistoryGroup(history, t); });
+      bumpTrioCounts(trioCounts, g.triplesGroups);
+      g.bundles.forEach(function(b){ bumpHistoryGroup(history, b.members); });
+    });
+  }
+
+  // En periode i gemt form. Navnelisterne gemmes én gang, og grupper, borde og rækker
+  // henviser til dem med nummer, så de igen deler listerne, når perioden hentes frem.
+  function serializeRound(r){
+    var g = r.groups;
+    function refs(tables){
+      return tables.map(function(t){ return t.units.map(function(u){ return u.ref; }); });
+    }
+    return {
+      pairs: g.pairsGroups.map(function(p){ return p.slice(); }),
+      trios: g.triplesGroups.map(function(t){ return t.slice(); }),
+      bundles: g.bundles.map(function(b){
+        return {
+          label: b.label,
+          pairs: b.pairs.map(function(p){ return g.pairsGroups.indexOf(p); }),
+          trio: b.trio ? g.triplesGroups.indexOf(b.trio) : null
+        };
+      }),
+      hex: refs(r.layouts.hex),
+      row: refs(r.layouts.row)
+    };
+  }
+
+  function restoreRound(data){
+    var groups = {
+      pairsGroups: data.pairs.map(function(p){ return p.slice(); }),
+      triplesGroups: data.trios.map(function(t){ return t.slice(); })
+    };
+    groups.bundles = data.bundles.map(function(b){
+      var bundle = {
+        label: b.label,
+        pairs: b.pairs.map(function(i){ return groups.pairsGroups[i]; }),
+        trio: b.trio === null ? null : groups.triplesGroups[b.trio]
+      };
+      bundle.members = bundleMembers(bundle);
+      return bundle;
+    });
+    groups.n = groups.bundles.reduce(function(sum, b){ return sum + b.members.length; }, 0);
+    groups.labels = unitLabels(groups.pairsGroups, groups.triplesGroups, groups.bundles);
+    function tables(list){
+      return list.map(function(refs){
+        var units = refs.map(function(ref){
+          var idx = +ref.slice(1);
+          return ref.charAt(0) === 'p'
+            ? pairUnit(groups.pairsGroups[idx], groups, idx)
+            : trioUnit(groups.triplesGroups[idx], groups, idx);
+        });
+        return { units:units, size:units.reduce(function(sum, u){ return sum + u.size; }, 0) };
+      });
+    }
+    return { groups:groups, layouts:{ hex:tables(data.hex), row:tables(data.row) } };
+  }
+
+  // Historikken fra tidligere planer, så en ny plan undgår deres makkerpar og gruppekammerater.
+  function seedHistory(p, earlierPlans){
+    p.seedHistory = {};
+    p.seedTrioCounts = {};
+    p.earlierCount = earlierPlans.length;
+    earlierPlans.forEach(function(e){
+      addRoundsToHistory(e.rounds.map(restoreRound), p.seedHistory, p.seedTrioCounts);
+    });
+  }
+
+  // Betingelser, der ikke er overholdt i en periode, fx efter et byt.
+  function brokenConditions(g){
+    function sameUnit(units, a, b){
+      return units.some(function(u){ return u.indexOf(a) !== -1 && u.indexOf(b) !== -1; });
+    }
+    var groupsMembers = g.bundles.map(function(b){ return b.members; });
+    var present = {};
+    groupsMembers.forEach(function(m){ m.forEach(function(nm){ present[nm] = true; }); });
+    var broken = [];
+    state.constraints.avoid.forEach(function(p){
+      if(sameUnit(groupsMembers, p[0], p[1])) broken.push(p[0] + ' og ' + p[1] + ' er i samme gruppe');
+    });
+    state.constraints.together.forEach(function(p){
+      if(present[p[0]] && present[p[1]] && !sameUnit(g.pairsGroups.concat(g.triplesGroups), p[0], p[1])){
+        broken.push(p[0] + ' og ' + p[1] + ' er ikke makkere');
+      }
+    });
+    return broken;
+  }
+
   // " Der er 32 elever og 30 pladser, så 2 borde har 7 elever."
   function capacityNote(n, tables, capacity, singular, plural){
     var seats = tables.length * capacity;
@@ -1392,10 +1557,15 @@ Elev 28</textarea>
   }
 
   // ---------- Rendering ----------
-  function renderSeat(name){
+  function renderSeat(name, ref, idx){
     var d = document.createElement('div');
     d.className = 'seat';
     d.textContent = name;
+    if(ref){
+      d.draggable = true;
+      d.dataset.u = ref;
+      d.dataset.i = idx;
+    }
     return d;
   }
 
@@ -1410,7 +1580,7 @@ Elev 28</textarea>
     }
     var seatsRow = document.createElement('div');
     seatsRow.className = 'unit-seats';
-    unit.data.forEach(function(nm){ seatsRow.appendChild(renderSeat(nm)); });
+    unit.data.forEach(function(nm, i){ seatsRow.appendChild(renderSeat(nm, unit.ref, i)); });
     wrap.appendChild(seatsRow);
     return wrap;
   }
@@ -1442,7 +1612,7 @@ Elev 28</textarea>
     var seats = [], pairColorIdx = 0;
     table.units.forEach(function(unit){
       var color = unit.type === 'three' ? null : PAIR_PALETTE[pairColorIdx++ % PAIR_PALETTE.length];
-      unit.data.forEach(function(nm){ seats.push({ name:nm, color:color }); });
+      unit.data.forEach(function(nm, i){ seats.push({ name:nm, color:color, ref:unit.ref, i:i }); });
     });
     return seats;
   }
@@ -1467,7 +1637,7 @@ Elev 28</textarea>
       grid.className = 'row-grid';
       grid.style.gridTemplateColumns = 'repeat(' + cols + ', minmax(0,1fr))';
       rowSeats(table).forEach(function(s){
-        var seat = renderSeat(s.name);
+        var seat = renderSeat(s.name, s.ref, s.i);
         if(s.color){
           seat.classList.add('seat-pair');
           seat.style.borderTopColor = s.color;
@@ -1485,7 +1655,7 @@ Elev 28</textarea>
   function renderGroupCards(groups){
     var activeRoleNames = getActiveRoleNames();
     byId('tables-groups').innerHTML = groups.bundles.map(function(b){
-      return '<div>' + groupCardTable(b.label, bundleColumns(b), bundleRoleMap(b, activeRoleNames)) + '</div>';
+      return '<div>' + groupCardTable(b.label, bundleColumns(b, groups), bundleRoleMap(b, activeRoleNames), true) + '</div>';
     }).join('');
   }
 
@@ -1513,19 +1683,30 @@ Elev 28</textarea>
   }
 
   function updateStale(){
+    scheduleSave();
     if(!state.plan) return;
     byId('staleNotice').hidden = settingsSignature() === state.plan.signature;
   }
 
   function makePlan(scroll){
+    var startWeek = getStartWeek();
+    var samePeriod = !!state.plan && state.plan.startWeek === startWeek;
+    if(samePeriod && state.plan.swapped && !confirm('En ny lodtrækning fjerner de elever, du har byttet om. Vil du fortsætte?')) return;
     syncRoster();
     var names = state.roster;
     var err = rosterError(names);
     showMessage('errorLabel', err);
     if(err) return;
 
+    if(state.plan && !samePeriod){
+      // Den forrige plan hører til en anden periode. Den gemmes, så den nye plan kan undgå dens makkerpar.
+      state.earlierPlans = [{ startWeek: state.plan.startWeek, rounds: state.plan.rounds.slice(0, state.plan.shownCount).map(serializeRound) }]
+        .concat(state.earlierPlans).slice(0, MAX_EARLIER_PLANS);
+    }
+
     state.plan = {
       signature: settingsSignature(),
+      startWeek: startWeek,
       names: names.slice(),
       constraints: { together: copyPairs(state.constraints.together), avoid: copyPairs(state.constraints.avoid) },
       genderInfo: {
@@ -1533,8 +1714,9 @@ Elev 28</textarea>
         categories: Object.assign({}, state.categories), categoryPreference: getCategoryPreference()
       },
       avoidTrios: getAvoidTrios(),
-      history: {}, trioCounts: {}, rounds: []
+      rounds: [], shownCount: 0, swapped: false
     };
+    seedHistory(state.plan, state.earlierPlans);
     state.periodIdx = 0;
     showMessage('exportError', null);
     byId('resultSection').hidden = false;
@@ -1548,9 +1730,15 @@ Elev 28</textarea>
     var p = state.plan;
     if(!p) return null;
     var count = getGroupingCount();
-    while(p.rounds.length < count){
-      p.rounds.push(buildRound(p.names, p.history, p.constraints, p.genderInfo, p.avoidTrios, p.trioCounts));
+    if(p.rounds.length < count){
+      // Nye perioder bygger videre på tidligere planer og planens egne perioder, også efter byt.
+      var history = Object.assign({}, p.seedHistory), trioCounts = Object.assign({}, p.seedTrioCounts);
+      addRoundsToHistory(p.rounds, history, trioCounts);
+      while(p.rounds.length < count){
+        p.rounds.push(buildRound(p.names, history, p.constraints, p.genderInfo, p.avoidTrios, trioCounts));
+      }
     }
+    p.shownCount = count;
     var weekPlan = buildWeekPlan(getStartWeek(), getRotationWeeks(), count);
     return p.rounds.slice(0, count).map(function(r, i){
       return { groups:r.groups, layouts:r.layouts, weeks:weekPlan[i] };
@@ -1572,7 +1760,10 @@ Elev 28</textarea>
       b.textContent = className;
       summary.appendChild(b);
     }
-    [g.n + ' elever', describeSizes(bundleSizes(g)), rounds.length + (rounds.length === 1 ? ' periode' : ' perioder')].forEach(function(text){
+    var parts = [g.n + ' elever', describeSizes(bundleSizes(g)), rounds.length + (rounds.length === 1 ? ' periode' : ' perioder')];
+    var earlier = state.plan.earlierCount;
+    if(earlier) parts.push('undgår makkere fra ' + earlier + (earlier === 1 ? ' tidligere plan' : ' tidligere planer'));
+    parts.forEach(function(text){
       var s = document.createElement('span');
       s.textContent = text;
       summary.appendChild(s);
@@ -1583,7 +1774,7 @@ Elev 28</textarea>
     rounds.forEach(function(r, i){
       var btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'period-btn' + (i === state.periodIdx ? ' active' : '');
+      btn.className = 'chip' + (i === state.periodIdx ? ' active' : '') + (brokenConditions(r.groups).length ? ' warn-dot' : '');
       btn.textContent = 'Uge ' + formatWeekRange(r.weeks);
       btn.addEventListener('click', function(){
         state.periodIdx = i;
@@ -1600,6 +1791,18 @@ Elev 28</textarea>
     byId('exportHint').textContent = rounds.length === 1
       ? 'Filen indeholder perioden, som den vises her.'
       : 'Filen indeholder alle ' + rounds.length + ' perioder, som de vises her.';
+
+    var broken = brokenConditions(g);
+    showMessage('conditionWarning', broken.length
+      ? (broken.length === 1 ? 'Brudt betingelse: ' : 'Brudte betingelser: ') + joinDa(broken) + '.'
+      : null);
+    swapSelection = null;
+    if(lastSwap){
+      lastSwap.forEach(function(s){
+        swapElements(s).forEach(function(el){ el.classList.add('swap-done'); });
+      });
+      lastSwap = null;
+    }
     updateStale();
   }
 
@@ -1654,10 +1857,12 @@ Elev 28</textarea>
   }
 
   // Lille tabel pr. gruppe: øverste række = gruppenummer, derunder makkerparrene side om side (1 navn pr. celle pr. par/trio-kolonne)
-  function bundleColumns(b){
+  function bundleColumns(b, g){
     var palette = ['pa', 'pb', 'pc'];
-    var cols = b.pairs.map(function(p, i){ return { names:p, colorClass: palette[i % palette.length] }; });
-    if(b.trio) cols.push({ names:b.trio, colorClass:'pt' });
+    var cols = b.pairs.map(function(p, i){
+      return { names:p, colorClass: palette[i % palette.length], ref:'p' + g.pairsGroups.indexOf(p) };
+    });
+    if(b.trio) cols.push({ names:b.trio, colorClass:'pt', ref:'t' + g.triplesGroups.indexOf(b.trio) });
     return cols;
   }
 
@@ -1670,7 +1875,8 @@ Elev 28</textarea>
     return map;
   }
 
-  function groupCardTable(label, columns, roleMap){
+  // "swappable" giver cellerne på skærmen en henvisning til navnet, så det kan byttes. Filen får den ikke.
+  function groupCardTable(label, columns, roleMap, swappable){
     var rows = Math.max.apply(null, columns.map(function(c){ return c.names.length; }));
     var html = '<table class="gcard"><tr><th colspan="' + columns.length + '">' + escapeHtml(label) + '</th></tr>';
     for(var r=0; r<rows; r++){
@@ -1682,7 +1888,8 @@ Elev 28</textarea>
           var role = roleMap && roleMap[nm];
           cellHtml = (role ? '<span class="role-tag">' + escapeHtml(role) + '</span><br>' : '') + escapeHtml(nm);
         }
-        html += '<td class="' + c.colorClass + '">' + cellHtml + '</td>';
+        var attrs = (swappable && nm !== undefined) ? ' draggable="true" data-u="' + c.ref + '" data-i="' + r + '"' : '';
+        html += '<td class="' + c.colorClass + '"' + attrs + '>' + cellHtml + '</td>';
       });
       html += '</tr>';
     }
@@ -1730,7 +1937,7 @@ Elev 28</textarea>
     html += '<p class="dato">' + g.n + ' elever, ' + describeSizes(bundleSizes(g)) + '</p>';
 
     var activeRoleNames = getActiveRoleNames();
-    var cards = g.bundles.map(function(b){ return groupCardTable(b.label, bundleColumns(b), bundleRoleMap(b, activeRoleNames)); });
+    var cards = g.bundles.map(function(b){ return groupCardTable(b.label, bundleColumns(b, g), bundleRoleMap(b, activeRoleNames)); });
     html += '<div class="section"><div class="sectitle">Grupper</div>' + cardsGridHtml(cards, 4) + '</div>';
 
     html += sectionHtml('Sekskantede borde', l.hex, function(ti){ return 'Bord ' + (ti+1); }, 5, false, true);
@@ -1931,12 +2138,13 @@ Elev 28</textarea>
 
   // ---------- Præsentér programmet: kort guidet rundtur med gule ringe ----------
   var tourSteps = [
+    { sel:'#className', text:'Giv klassen et navn, så gemmes navne, hensyn og plan i denne browser. Næste gang vælger du klassen øverst, og en ny plan undgår makkerpar fra den forrige.' },
     { sel:'#names', text:'Indsæt elevernes navne her, ét pr. linje. Feltet er udfyldt med en eksempelklasse, så du kan prøve programmet med det samme.' },
     { sel:'#shortenNamesBtn', text:'Renser en elevliste kopieret fra Lectio for id-numre og holdoplysninger og forkorter lange navne til fornavn og forbogstav i efternavnet. Korte navne bliver stående.' },
     { sel:'#stepGroups', text:'Her kan du vælge gruppestørrelse, sætte betingelser for bestemte elever, tage hensyn til køn og kategori og give eleverne roller. Det bliver stående, selvom du retter i navnelisten.' },
     { sel:'#stepWeeks', text:'Vælg første uge, hvor længe grupperne gælder, og hvor mange uger planen dækker. Ferieuger springes over.' },
     { sel:'#generateBtn', text:'Laver grupper til alle perioder. Makkere og gruppekammerater gentages så lidt som muligt.' },
-    { sel:'#periodBar', text:'Vælg en periode for at se dens grupper, sekskantede borde og rækkeopstilling.' },
+    { sel:'#periodBar', text:'Vælg en periode for at se dens grupper, sekskantede borde og rækkeopstilling. Træk et navn hen på et andet for at bytte to elever.' },
     { sel:'#exportBtn', text:'Filen indeholder alle perioder, præcis som de vises her.' }
   ];
 
@@ -1983,6 +2191,282 @@ Elev 28</textarea>
     tooltip.querySelector('.tt-skip').addEventListener('click', clearTourHighlight);
   }
 
+  // ---------- Byt to elever i den viste periode: træk et navn hen på et andet, eller klik på begge ----------
+  var swapSelection = null, dragSource = null, lastSwap = null;
+
+  function swapRef(el){
+    var target = el && el.closest ? el.closest('[data-u]') : null;
+    return target ? { el:target, u:target.dataset.u, i:+target.dataset.i } : null;
+  }
+
+  function swapElements(s){
+    return document.querySelectorAll('[data-u="' + s.u + '"][data-i="' + s.i + '"]');
+  }
+
+  function clearSwapMarks(cls){
+    document.querySelectorAll('.' + cls).forEach(function(el){ el.classList.remove(cls); });
+  }
+
+  function clearSelection(){
+    swapSelection = null;
+    clearSwapMarks('swap-selected');
+  }
+
+  function unitArray(g, ref){
+    var idx = +ref.slice(1);
+    return ref.charAt(0) === 'p' ? g.pairsGroups[idx] : g.triplesGroups[idx];
+  }
+
+  // De to elever bytter plads som makker, i gruppen, ved bordet og i rækken.
+  function swapStudents(a, b){
+    var round = state.plan && state.plan.rounds[state.periodIdx];
+    if(!round || (a.u === b.u && a.i === b.i)) return;
+    var g = round.groups;
+    var listA = unitArray(g, a.u), listB = unitArray(g, b.u);
+    var tmp = listA[a.i];
+    listA[a.i] = listB[b.i];
+    listB[b.i] = tmp;
+    g.bundles.forEach(function(bundle){ bundle.members = bundleMembers(bundle); });
+    state.plan.swapped = true;
+    lastSwap = [{ u:a.u, i:a.i }, { u:b.u, i:b.i }];
+    renderPlan();
+  }
+
+  var resultSection = byId('resultSection');
+  resultSection.addEventListener('dragstart', function(e){
+    var source = swapRef(e.target);
+    if(!source) return;
+    clearSelection();
+    dragSource = source;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', source.el.textContent);
+    source.el.classList.add('swap-dragging');
+  });
+  resultSection.addEventListener('dragover', function(e){
+    var target = swapRef(e.target);
+    if(!target || !dragSource) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if(!target.el.classList.contains('swap-over')){
+      clearSwapMarks('swap-over');
+      target.el.classList.add('swap-over');
+    }
+  });
+  resultSection.addEventListener('drop', function(e){
+    var target = swapRef(e.target);
+    if(!target || !dragSource) return;
+    e.preventDefault();
+    var source = dragSource;
+    dragSource = null;
+    swapStudents(source, target);
+  });
+  resultSection.addEventListener('dragend', function(){
+    dragSource = null;
+    clearSwapMarks('swap-over');
+    clearSwapMarks('swap-dragging');
+  });
+  resultSection.addEventListener('click', function(e){
+    var target = swapRef(e.target);
+    if(!target){
+      if(swapSelection) clearSelection();
+      return;
+    }
+    if(!swapSelection){
+      swapSelection = { u:target.u, i:target.i };
+      swapElements(swapSelection).forEach(function(el){ el.classList.add('swap-selected'); });
+    } else if(swapSelection.u === target.u && swapSelection.i === target.i){
+      clearSelection();
+    } else {
+      var source = swapSelection;
+      swapSelection = null;
+      swapStudents(source, target);
+    }
+  });
+
+  // ---------- Gemte klasser: gemmes kun i denne browser på denne computer ----------
+  var STORE_KEY = 'bordgrupper.klasser';
+  var MAX_EARLIER_PLANS = 3;
+  var currentKey = null;   // navnet, klassen er gemt under
+  var saveTimer = null;
+  var saveFailed = false;
+  var storageOk = (function(){
+    try { localStorage.getItem(STORE_KEY); return true; } catch(e){ return false; }
+  })();
+
+  function readStore(){
+    if(storageOk){
+      try {
+        var data = JSON.parse(localStorage.getItem(STORE_KEY));
+        if(data && data.classes) return data;
+      } catch(e){}
+    }
+    return { classes:{} };
+  }
+
+  function writeStore(data){
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify(data));
+      return true;
+    } catch(e){
+      return false;
+    }
+  }
+
+  function serializePlan(p){
+    return {
+      signature:p.signature, startWeek:p.startWeek, names:p.names, constraints:p.constraints,
+      genderInfo:p.genderInfo, avoidTrios:p.avoidTrios, shownCount:p.shownCount, swapped:p.swapped,
+      rounds:p.rounds.map(serializeRound)
+    };
+  }
+
+  function restorePlan(data, earlierPlans){
+    var p = Object.assign({}, data, { rounds:data.rounds.map(restoreRound) });
+    seedHistory(p, earlierPlans);
+    return p;
+  }
+
+  function defaultClass(){
+    return {
+      name:'', names:'',
+      constraints:{ together:[], avoid:[] }, genders:{}, categories:{},
+      categoryNames:new Array(CATEGORY_START).fill(''),
+      roleNames:new Array(ROLE_COUNT_MAX).fill(''),
+      avoidTrios:false, traitsEnabled:false, genderPreference:'none', categoryPreference:'none',
+      rolesEnabled:false, roleCount:1,
+      startWeek:defaultStartWeek(), rotationWeeks:2, planWeeks:10,
+      plan:null, earlierPlans:[]
+    };
+  }
+
+  function classSnapshot(name){
+    return {
+      name: name,
+      names: byId('names').value,
+      constraints: state.constraints, genders: state.genders, categories: state.categories,
+      categoryNames: state.categoryNames, roleNames: state.roleNames,
+      avoidTrios: getAvoidTrios(), traitsEnabled: traitsEnabled(),
+      genderPreference: byId('genderPreference').value, categoryPreference: byId('categoryPreference').value,
+      rolesEnabled: getRolesEnabled(), roleCount: getRoleCount(),
+      startWeek: getStartWeek(), rotationWeeks: getRotationWeeks(), planWeeks: getPlanWeeks(),
+      plan: state.plan ? serializePlan(state.plan) : null,
+      earlierPlans: state.earlierPlans
+    };
+  }
+
+  // Gemmer under klassens navn. Et navn, der allerede bruges af en anden gemt klasse, overskrives
+  // ikke. Ændres navnet på en gemt klasse, flyttes den til det nye navn.
+  function saveClass(){
+    clearTimeout(saveTimer);
+    saveTimer = null;
+    var name = getClassName();
+    var store = readStore();
+    if(storageOk && name && (name === currentKey || !store.classes[name])){
+      if(currentKey && currentKey !== name) delete store.classes[currentKey];
+      store.classes[name] = classSnapshot(name);
+      saveFailed = !writeStore(store);
+      if(!saveFailed) currentKey = name;
+      renderSavedClasses();
+    }
+    updateSaveStatus();
+  }
+
+  function scheduleSave(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveClass, 400);
+  }
+
+  function flushSave(){
+    if(saveTimer) saveClass();
+  }
+
+  function updateSaveStatus(){
+    var name = getClassName();
+    var conflict = !!name && name !== currentKey && !!readStore().classes[name];
+    var text = '';
+    if(!storageOk) text = 'Klasser kan ikke gemmes i denne browser.';
+    else if(saveFailed) text = 'Klassen kunne ikke gemmes.';
+    else if(!name) text = 'Giv klassen et navn for at gemme den i denne browser.';
+    else if(conflict) text = 'Der findes allerede en gemt klasse med navnet ' + name + '.';
+    else if(name === currentKey) text = 'Gemt i denne browser.';
+    byId('saveStatus').textContent = text;
+    byId('openExistingBtn').hidden = !conflict;
+    byId('deleteClassBtn').hidden = !currentKey || name !== currentKey;
+  }
+
+  function renderSavedClasses(){
+    var keys = Object.keys(readStore().classes).sort(function(a,b){ return a.localeCompare(b, 'da', { numeric:true }); });
+    byId('savedBar').hidden = !keys.length;
+    var list = byId('savedList');
+    list.innerHTML = '';
+    keys.forEach(function(key){
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'chip' + (key === currentKey ? ' active' : '');
+      btn.textContent = key;
+      btn.addEventListener('click', function(){ if(key !== currentKey) loadClass(key); });
+      list.appendChild(btn);
+    });
+  }
+
+  // Sætter hele siden til en klasse: en gemt klasse eller en tom, ny klasse.
+  function applyClass(saved, key){
+    var c = Object.assign(defaultClass(), saved);
+    clearTimeout(saveTimer);
+    saveTimer = null;
+    currentKey = key;
+
+    byId('className').value = c.name;
+    byId('names').value = c.names;
+    state.constraints = { together:copyPairs(c.constraints.together), avoid:copyPairs(c.constraints.avoid) };
+    state.genders = Object.assign({}, c.genders);
+    state.categories = Object.assign({}, c.categories);
+    state.categoryNames = c.categoryNames.slice();
+    state.roleNames = c.roleNames.slice();
+
+    byId('avoidTriosCheckbox').checked = c.avoidTrios;
+    byId('traitsEnabledCheckbox').checked = c.traitsEnabled;
+    byId('traitsPanel').hidden = !c.traitsEnabled;
+    byId('genderPreference').value = c.genderPreference;
+    byId('categoryPreference').value = c.categoryPreference;
+    byId('categoryEditPanel').style.display = 'none';
+    byId('rolesEnabledCheckbox').checked = c.rolesEnabled;
+    byId('roleCount').value = String(c.roleCount);
+    renderRoleNamesPanel();
+    byId('roleNamesPanel').style.display = c.rolesEnabled ? 'block' : 'none';
+    byId('startWeek').value = c.startWeek;
+    byId('rotationWeeks').value = c.rotationWeeks;
+    byId('planWeeks').value = c.planWeeks;
+    ['condError', 'errorLabel', 'exportError'].forEach(function(id){ showMessage(id, null); });
+
+    state.earlierPlans = c.earlierPlans;
+    state.plan = c.plan ? restorePlan(c.plan, state.earlierPlans) : null;
+    state.periodIdx = 0;
+    rosterKey = null;
+    syncRoster();
+    updatePeriodHint();
+    byId('resultSection').hidden = !state.plan;
+    renderPlan();
+    renderSavedClasses();
+    updateSaveStatus();
+  }
+
+  function loadClass(key){
+    flushSave();
+    var saved = readStore().classes[key];
+    if(saved) applyClass(saved, key);
+  }
+
+  function deleteClass(){
+    if(!currentKey || !confirm('Slet klassen ' + currentKey + ' fra denne browser?')) return;
+    clearTimeout(saveTimer);
+    saveTimer = null;
+    var store = readStore();
+    delete store.classes[currentKey];
+    writeStore(store);
+    applyClass({}, null);
+  }
+
   // ---------- Hændelser ----------
   byId('tourBtn').addEventListener('click', function(){ showTourStep(0); });
 
@@ -1992,7 +2476,15 @@ Elev 28</textarea>
     syncTimer = setTimeout(syncRoster, 250);
   });
   byId('shortenNamesBtn').addEventListener('click', shortenNames);
-  byId('className').addEventListener('input', renderPlan);
+  byId('className').addEventListener('input', function(){ renderPlan(); updateSaveStatus(); });
+  byId('newClassBtn').addEventListener('click', function(){ flushSave(); applyClass({}, null); });
+  byId('openExistingBtn').addEventListener('click', function(){ loadClass(getClassName()); });
+  byId('deleteClassBtn').addEventListener('click', deleteClass);
+  // Alle felter gemmes, når de ændres; knapper og byt gemmes via updateStale.
+  document.addEventListener('input', scheduleSave, true);
+  document.addEventListener('change', scheduleSave, true);
+  window.addEventListener('pagehide', flushSave);
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') clearSelection(); });
 
   byId('avoidTriosCheckbox').addEventListener('change', function(){ updateSizeHint(); updateStale(); });
   byId('traitsEnabledCheckbox').addEventListener('change', function(){
@@ -2035,6 +2527,8 @@ Elev 28</textarea>
   byId('currentWeekHint').textContent = '(nu er det uge ' + getISOWeek(new Date()) + ')';
   syncRoster();
   updatePeriodHint();
+  renderSavedClasses();
+  updateSaveStatus();
 })();
 </script>
 
