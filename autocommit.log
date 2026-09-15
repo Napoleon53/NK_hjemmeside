@@ -275,3 +275,6 @@
 2026-09-15 22:34:23 Pushed (2 commit(s))
 2026-09-15 22:49:15 Committed: Auto-commit 2026-09-15 22:49:14
 2026-09-15 22:49:17 Pushed (1 commit(s))
+2026-09-15 23:04:14 Committed: Auto-commit 2026-09-15 23:04:14
+2026-09-15 23:04:16 Pulled: From https://github.com/Napoleon53/NK_hjemmeside |  * branch            main       -> FETCH_HEAD |    5630a5c..1eb17ff  main       -> origin/main | Merge made by the 'ort' strategy. |  bordgrupper.html | 1388 ++++++++++++++++++++++++++++++++---------------------- |  1 file changed, 819 insertions(+), 569 deletions(-)
+2026-09-15 23:04:18 Pushed (2 commit(s))
