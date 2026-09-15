@@ -204,7 +204,7 @@
             sprite: "varmeplade", fil: "varmeplade.svg", b: 180, h: 72,
             anker: { x: 0, y: 0 },
             kan: { varmer: true, fast: true },
-            plade: { x0: 20, x1: 160, y: 4 }, temperatur: 90,
+            plade: { x0: 20, x1: 160, y: 4 }, temperatur: 250,
             titel: "varmepladen"
         },
         affaldsdunk: {

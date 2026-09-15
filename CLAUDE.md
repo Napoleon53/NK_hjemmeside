@@ -35,6 +35,10 @@ statiske sider i roden, downloads i `downloads/`.
 - Fælles kode for laboratorieforsøgene ligger i `laboratoriet/` (kerne,
   rundvisning, grundstilark). Forsøgets egen `css/stil.css` har kun det, der
   er særligt for forsøget. Se `laboratoriet/README.md`.
+- Nye laboratorieforsøg bygges på genstandsmodellen i `laboratoriet/js/`
+  (stof, udstyr, beholder, bord): alt kan gribes, sættes ned og bruges på alt,
+  og hvad der sker, afgøres af udstyrets egenskaber, ikke af forsøgets kode.
+  Mønster: `laboratoriet/proevebord/`.
 - Sidepanelet er 430 px bredt (`--panel-bredde` i `laboratoriet/css/grund.css`).
 - Superanimationer om laboratorieforsøg har en intro-popup, der kort siger, hvad
   forsøget undersøger, og hvad eleven skal gøre. Den åbner af sig selv første

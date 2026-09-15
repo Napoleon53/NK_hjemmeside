@@ -216,14 +216,17 @@
     }
 
     /* Den xi, hvor reaktionsbroeken er K. t/n stiger med xi, saa der
-       kan halveres. */
+       kan halveres. For et bundfald er K oploselighedsproduktet, dvs.
+       ionproduktet n alene (det faste stof har aktivitet 1), saa
+       betingelsen t/n = 1/K bruges. */
     function ligevaegtXi(o, rx, g) {
         var a = g.min, b = g.maks;
         if (b - a < 1e-12) return 0;
+        var K = rx.slags === "faeld" ? 1 / rx.K : rx.K;
         for (var i = 0; i < 40; i++) {
             var m = (a + b) / 2;
             var q = broek(o, rx, m);
-            var over = q.t >= rx.K * q.n;
+            var over = q.t >= K * q.n;
             if (over) b = m; else a = m;
         }
         return (a + b) / 2;

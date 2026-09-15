@@ -39,6 +39,10 @@
     var U = NK.Udstyr;
     var r = NK.r;
 
+    /* Tegnebordets maal findes allerede ved indlaesning, fordi
+       ../kemichael/kemichael.js laeser NK.Scene, naar laereren kobles paa */
+    NK.Scene = NK.Scene || { BREDDE: 1120, HOEJDE: 600, BORD: 500, ANKER: {} };
+
     var RYST = { FULD: 900, SPILD_FART: 650, SPILD_TID: 0.35 };
     var SPATELSPIDS = 1500;   /* µmol fast stof paa en spatelspids */
     var DRAABE = 0.05;        /* mL */
@@ -322,6 +326,8 @@
         this.spildTid = 0;
         gg.svaev = null;
         this.frigoer(gg);
+        /* Et vaeltet glas rettes op, naar man tager det */
+        if (gg.type.sprite) gg.p.v = 0;
         /* Et termometer, der sidder i glasset, tages med op; en anden
            genstand, der sidder i det, falder hjem */
         this.liste.forEach(function (x) {
@@ -425,7 +431,15 @@
 
     P.hulX = function (st, i) { return st.p.x - st.anker.x + st.type.huller[i]; };
 
-    /* Hvad under punktet vil tage imod den baarne genstand? */
+    /* Genstandens fod: midten af dens underkant paa tegnebordet */
+    P.fod = function (gg) {
+        var t = gg.type;
+        if (t.sprite) return NK.tilVerden(gg.p, gg.anker, t.b / 2, t.h);
+        return NK.tilVerden(gg.p, gg.anker, 0, t.laengde || 100);
+    };
+
+    /* Hvad under punktet vil tage imod den baarne genstand? Stativ og
+       varmeplade afgoeres af, hvor genstandens fod er, ikke musen. */
     P.maalVed = function (gg, pt) {
         if (!pt || !gg) return null;
         if (gg.kan.papir) {
@@ -435,10 +449,12 @@
             }
             return null;
         }
+        var fod = this.fod(gg);
         for (var i = this.liste.length - 1; i >= 0; i--) {
             var c = this.liste[i];
             if (c === gg || !this.synlig(c)) continue;
-            if (!this.inden(c, pt, c.kan.holder ? 10 : 6)) continue;
+            var plads = c.kan.stoette || c.kan.varmer;
+            if (!this.inden(c, plads ? fod : pt, c.kan.stoette ? 12 : (c.kan.varmer ? 30 : (c.kan.holder ? 10 : 6)))) continue;
             if (this.kanModtage(gg, c)) return c.navn;
         }
         return null;
@@ -478,11 +494,13 @@
         var S = NK.Scene, t = gg.type;
         var x = NK.klamp(pt ? pt.x : gg.p.x, 40, S.BREDDE - 40);
         if (t.navn === "reagensglas") {
+            var fod = this.fod(gg);
             for (var i = 0; i < this.liste.length; i++) {
                 var st = this.liste[i];
                 if (!st.kan.stoette || !this.synlig(st)) continue;
-                var hul = this.ledigtHul(st, x);
-                if (hul >= 0 && Math.abs(this.hulX(st, hul) - x) < 26 && Math.abs(pt.y - (st.p.y - st.anker.y + st.type.hulY)) < 130) return this.iStativ(gg, st, hul);
+                var hul = this.ledigtHul(st, fod.x);
+                var hulFod = st.p.y - st.anker.y + st.type.hulY + t.h - t.anker.y;
+                if (hul >= 0 && Math.abs(this.hulX(st, hul) - fod.x) < 26 && Math.abs(fod.y - hulFod) < 70) return this.iStativ(gg, st, hul);
             }
             this.vaelt(gg, x);
             return true;
@@ -564,6 +582,7 @@
 
     P.haendelse = function (type, data) {
         if (this.vedHaendelse) this.vedHaendelse(type, data);
+        if (this.laererHaendelse) this.laererHaendelse(type, data);
     };
 
     P.uheld = function (slags, gg, tekst) {
@@ -709,7 +728,7 @@
             { tid: tid, hver: function (t) {
                 var nu = mL * t;
                 if (!loebOver && nu > givet) {
-                    B.haeldI(c, B.udtag(gg, nu - givet));
+                    B.haeldI(c, B.udtag(gg, nu - givet), true);
                     if (mig.tjekOverloeb(c)) loebOver = true;
                 }
                 givet = nu;
@@ -795,7 +814,7 @@
             { tid: 0.8, hver: function (t) {
                 var nu = mL * t;
                 if (!loebOver && nu > givet) {
-                    B.haeldI(c, Stof.del(gg.indhold, nu - givet));
+                    B.haeldI(c, Stof.del(gg.indhold, nu - givet), true);
                     if (mig.tjekOverloeb(c)) loebOver = true;
                 }
                 givet = nu;

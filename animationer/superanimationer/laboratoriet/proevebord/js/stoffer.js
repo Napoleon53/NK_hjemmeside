@@ -90,8 +90,9 @@
         { navn: "glas3", type: "reagensglas", stativ: "stativ", hul: 4, nr: 3, titel: "glas 3" },
         { navn: "glas4", type: "reagensglas", stativ: "stativ", hul: 6, nr: 4, titel: "glas 4" },
 
-        { navn: "plade", type: "varmeplade", p: { x: 1120, y: 428, v: 0 } },
-        { navn: "baeger100", type: "baeger100", paa: "plade", x: 1210 },
+        /* Fri plads mellem stativet og varmepladen til at saette ting ned */
+        { navn: "plade", type: "varmeplade", p: { x: 1230, y: 428, v: 0 } },
+        { navn: "baeger100", type: "baeger100", paa: "plade", x: 1320 },
 
         { navn: "glasstav", type: "glasstav", x: 300 },
         { navn: "termometer", type: "termometer", x: 450 },
@@ -99,9 +100,9 @@
     ];
 
     NK.BORD_VALG = {
-        bredde: 1300, hoejde: 600, bord: 500,
+        bredde: 1420, hoejde: 600, bord: 500,
         hylde: { x0: 16, x1: 220, y: 268 },
-        plakat: { x: 1150, y: 80 },
+        plakat: { x: 1250, y: 90 },
         boble: { x: 330, y: 140 }, bobleR: 120
     };
 }());
