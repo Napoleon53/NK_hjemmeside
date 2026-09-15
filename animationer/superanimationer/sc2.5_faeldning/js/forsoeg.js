@@ -202,25 +202,50 @@
         return true;
     };
 
-    /* Flasken i haanden flyver hen over feltet og klemmer én draabe ud. */
+    /* Flasken i haanden flyver hen over feltet og klemmer én draabe ud.
+       Er feltet fyldt, loeber det over, naar draaben lander. */
     P.drypI = function (nr) {
         if (this.haand < 0 || nr < 0 || nr >= this.felter.length) return false;
         if (this.dryp) return false;
-        var f = this.felter[nr];
-        if (f.antal >= MAKS_DRAABER) {
-            this.besked("Feltet er fyldt. Tør det af for at begynde forfra.", "advarsel");
-            if (this.side === "skema" && !f.fyldtTalt) {
-                f.fyldtTalt = true;
-                this.fjollet("fyldt");
-            }
-            return false;
-        }
         this.dryp = { felt: nr, fase: "flyt", t: 0, faeldet: false };
         return true;
     };
 
+    /* Uheld: en draabe mere i et fyldt felt faar det til at loebe over i
+       nabofeltet. Laereren siger noget, og koekkenrullen toerrer begge
+       felter af. */
+    P.loeberOver = function (d) {
+        var n = D.SOEJLER.length;
+        var nr = d.felt;
+        var nabo = nr % n < n - 1 ? nr + 1 : nr - 1;
+        var f = this.felter[nr], fn = this.felter[nabo];
+        f.draaber[d.opl] = (f.draaber[d.opl] || 0) + 1;
+        f.antal++;
+        f.rMaal = RADIUS * Math.cbrt(f.antal) * 1.15;
+        f.bobl = 1;
+        f.analyse = D.analyser(f.draaber);
+        for (var id in f.draaber) {
+            if (f.draaber[id] > 0) { fn.draaber[id] = (fn.draaber[id] || 0) + 1; fn.antal++; }
+        }
+        fn.rMaal = RADIUS * Math.cbrt(fn.antal);
+        if (fn.r < 1) fn.r = RADIUS * 0.6;
+        fn.bobl = 1;
+        fn.analyse = D.analyser(fn.draaber);
+        fn.blandTid = fn.analyse.bundfald.length ? this.tid : -1;
+        var c1 = S.felt(nr), c2 = S.felt(nabo);
+        this.plask.push({ x: c1.cx, y: c1.cy, r: f.rMaal, liv: 1 });
+        this.plask.push({ x: (c1.cx + c2.cx) / 2, y: (c1.cy + c2.cy) / 2, r: RADIUS * 1.6, liv: 1 });
+        this.overloeb = (this.overloeb || 0) + 1;
+        this.besked("Feltet løb over i nabofeltet.", "advarsel");
+        this.laerer.replik("overloeb");
+        this.toerAf(nr, 0.9);
+        this.toerAf(nabo, 1.1);
+        this.aendret("overloeb");
+    };
+
     P.lander = function (d) {
         var f = this.felter[d.felt], F = D.FELTER[d.felt];
+        if (f.antal >= MAKS_DRAABER) { this.loeberOver(d); return; }
         var skema = this.side === "skema";
         var foer = f.analyse.bundfald.length;
         var varForurenet = skema && this.status(d.felt) === "forurenet";

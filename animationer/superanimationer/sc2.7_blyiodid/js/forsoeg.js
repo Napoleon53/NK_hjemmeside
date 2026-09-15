@@ -70,6 +70,7 @@
         kurve:       { tekst: "De tre punkter ligger på opløselighedskurven for PbI₂.", farve: null },
         kurve_afvig: { tekst: "Nogle punkter ligger langt fra kurven. Temperaturen skal noteres, lige når de første krystaller kommer.", farve: null },
         spild:       { tekst: "Der blev spildt {stof} på bordet.", farve: { r: 244, g: 243, b: 238, a: 1 } },
+        varmt:       { tekst: "Bægerglasset blev taget op over 50 °C, og der skvulpede lidt ud.", farve: { r: 240, g: 206, b: 90, a: 1 } },
         affald:      { tekst: "Resterne er afleveret som tungmetalaffald.", farve: null }
     };
     NK.IAGTTAGELSER = IAGTTAGELSER;
@@ -156,6 +157,7 @@
         this.dampUr = 0;
         this.bobleUr = 0;
         this.spild = null;
+        this.skvulp = null;
         this.bobleAlfa = 0;
         if (this.laererNyt) this.laererNyt();
         if (NK.Lyd) NK.Lyd.omroering(false);
@@ -686,12 +688,35 @@
         if (this.gjort.affald) { this.besked("Resterne er afleveret."); return false; }
         if (!this.maalingerFaerdige()) { this.besked("Lav tre målinger først."); return false; }
         if (b.T > 50) {
-            this.besked("Bægerglasset er for varmt at tage fat i. Lad det køle af til under 50 °C.", "advarsel");
-            if (this.varme) this.markér("varme");
-            return false;
+            this.varmtGlas();
+            return true;
         }
         this.aflever();
         return true;
+    };
+
+    /* Uheld: glasset er over 50 °C, da eleven tager fat i det. Haanden
+       rykker til, der skvulper lidt ud paa bordet, og glasset lander paa
+       varmepladen igen. Laereren toerrer op (laerer.js). */
+    P.varmtGlas = function () {
+        var bg = this.g.baegerglas, b = this.b;
+        var start = b.vandAreal;
+        var farve = b.fast > 0.002 ? { r: 240, g: 206, b: 90, a: 0.8 } : { r: 200, g: 228, b: 245, a: 0.7 };
+        this.koer([
+            { flyt: bg, til: { x: bg.hjem.x + 8, y: bg.hjem.y - 24, v: 0.14 }, tid: 0.25, loeft: 0 },
+            { kald: function () {
+                b.vandAreal = start * 0.92;
+                this.skvulp = { x: 590, rx: 6, rxMaal: 32, alfa: 1, farve: farve };
+                for (var i = 0; i < 8; i++) this.dampe.push({ x: bg.p.x + r(-30, 30), y: bg.p.y - 4, vx: r(-20, 20), vy: -r(30, 60), r: r(6, 11), liv: 1 });
+                if (NK.Lyd) NK.Lyd.plask();
+                this.iagttag("varmt");
+                this.besked("Av! Glasset er over 50 °C.", "advarsel");
+                if (this.laererVarmt) this.laererVarmt();
+                this.aendret("varmt");
+            } },
+            { tid: 0.3, hver: function (t) { bg.p.v = (1 - t) * (0.14 + Math.sin(t * 20) * 0.05); } },
+            { flyt: bg, til: bg.hjem, tid: 0.3, loeft: 0 }
+        ], "varmt");
     };
 
     P.aflever = function () {
@@ -924,6 +949,7 @@
         }
 
         if (this.spild) this.spild.rx = NK.mod(this.spild.rx, this.spild.rxMaal, 4, dt);
+        if (this.skvulp) this.skvulp.rx = NK.mod(this.skvulp.rx, this.skvulp.rxMaal, 4, dt);
 
         /* Vanddamp over det varme glas */
         if (b.vand && !b.flytter && b.T > 55) {

@@ -243,6 +243,42 @@ function koerTest() {
     musRyst(120, 8, 3);
     paastand("uden vaeske er der kun to oprydningstrin", !!f.uheld && f.uheld.trinene.join(",") === "fej,aflever", f.uheld && f.uheld.trinene.join(","));
 
+    overskrift("7b. Uheld, som laereren rydder op efter");
+    frisk();
+    adv(0.5);
+    f.klik("urglas"); adv(3);
+    paastand("bromvandet kan aabnes uden udsugning", !f.udsugning && f.klik("bromflaske") === true);
+    var tu = vent(function () { return !!(f.laerer.scene && f.laerer.scene.navn === "udsugning"); }, 6);
+    paastand("dampene kommer ud i lokalet, og laereren loeber ind", !!(f.laerer.scene && f.laerer.scene.navn === "udsugning") && f.taage > 0.05 && f.iagttaget.udsugning, tu + " s");
+    vent(function () { return !f.laererOptaget() && !f.handling; }, 15);
+    paastand("laereren har taendt udsugningen og er gaaet", f.udsugning && !f.laererOptaget());
+    var sek = musRyst(50, 3, 4, function () { return !!f.spildPyt; });
+    paastand("rystes kolben uden prop, skvulper bromvandet ud", sek >= 0 && !!f.spildPyt && f.spildPyt.brom && !f.gjort.brom && f.g.kolbe.areal === 0, sek.toFixed(1) + " s");
+    paastand("kobberet er stadig i kolben, og uheldet er noteret", f.gjort.kobber && f.iagttaget.spildt);
+    adv(3);
+    paastand("laereren kommer og siger noget om proppen", !!(f.laerer.scene && f.laerer.scene.navn === "spild") && f.laerer.tale.indexOf("Proppen") === 0, f.laerer.tale);
+    vent(function () { return !f.laererOptaget() && !f.handling; }, 20);
+    paastand("pytten er uskadeliggjort og toerret op", !f.spildPyt && !f.laererOptaget());
+    f.klik("bromflaske"); adv(5); f.klik("prop"); adv(1.5);
+    f.rystKnap(true); vent(function () { return f.gjort.reageret; }, 30); f.rystKnap(false); adv(1.5);
+    f.klik("prop"); adv(1.5); f.klik("kolbe"); adv(7);
+    for (i = 0; i < 3; i++) { f.klik("nh3"); adv(1.3); }
+    vent(function () { return f.gjort.nh3; }, 20); adv(3.5);
+    for (i = 0; i < 3; i++) { f.klik("agno3"); adv(1.3); }
+    vent(function () { return f.gjort.agno3; }, 20); adv(3.5);
+    paastand("begge tests er lavet igen", f.testsFaerdige());
+    paastand("resterne kan haeldes mod vasken", f.klik("vask") === true);
+    adv(2.5);
+    paastand("laereren loeber ind og stopper det", !!(f.laerer.scene && f.laerer.scene.navn === "vask") && f.laerer.tale.indexOf("Stop") === 0, f.laerer.tale);
+    vent(function () { return !f.laererOptaget() && !f.handling; }, 20);
+    paastand("glasset er tilbage, og uheldet er noteret", f.g.glas1.areal > 0 && Math.abs(f.g.glas1.p.x - f.g.glas1.hjem.x) < 2 && f.iagttaget.vask && !f.gjort.affald);
+    paastand("resterne kan stadig afleveres", f.klik("dunk") === true);
+    vent(function () { return f.gjort.affald; }, 20);
+    paastand("forsoeget er slut", f.gjort.affald);
+    paastand("laereren henter kaffen", f.klik("kaffekop") === true);
+    adv(10);
+    paastand("koppen er vaek, og laereren er gaaet", f.g.kaffekop.skjult && !f.laererOptaget());
+
     overskrift("8. Quizzens spoergsmaal");
     var vt = NK.Quiz.valgTekst;
     var medFarve = NK.QUIZ.filter(function (sp) { return typeof sp.valg[0] !== "string"; });

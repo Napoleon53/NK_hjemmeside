@@ -542,12 +542,14 @@
         var k = this.g.kolbe;
         var maal = 0;
         this.uro = 0;
+        var aaben = !k.prop && this.gjort.brom && k.areal > 5;
         if (this.rystKilde === "knap") {
             var w = this.tid * 17;
             k.p.x = k.hjem.x + Math.sin(w) * 34;
             k.p.y = k.hjem.y - 34 + Math.abs(Math.cos(w)) * 6;
             k.p.v = Math.cos(w) * 0.2;
             maal = 1;
+            if (aaben) this.spildTid += dt;
         } else if (this.rystKilde === "mus") {
             /* musFart er musens vej pr. sekund. Den falder, naar musen
                staar stille, og vold er den samme fart udjaevnet lidt mere. */
@@ -557,9 +559,14 @@
             maal = NK.klamp(this.musFart / M.RYST.FULD, 0, 1);
 
             /* Paaskeaegget: kun meget voldsom rystning taber kolben. Lige
-               foer graensen begynder kolben at vakle i haanden. */
+               foer graensen begynder kolben at vakle i haanden. Uden prop
+               skvulper bromvandet i stedet over kanten. */
             var g = this.knusGraense();
-            if (g) {
+            if (aaben) {
+                if (this.vold > M.RYST.SPILD_FART) this.spildTid += dt;
+                else this.spildTid = Math.max(0, this.spildTid - dt);
+                this.uro = NK.klamp(this.spildTid / M.RYST.SPILD_TID, 0, 1);
+            } else if (g) {
                 if (this.vold > g.fart) this.farligTid += dt;
                 else this.farligTid = Math.max(0, this.farligTid - dt);
                 this.uro = NK.klamp((this.vold / g.fart - 0.7) / 0.3, 0, 1);
@@ -571,12 +578,58 @@
             }
             k.p.v = NK.mod(k.p.v, NK.klamp(-this.musVx * 0.0004, -0.4, 0.4), 12, dt) + (Math.random() - 0.5) * 0.14 * this.uro;
         }
+        if (this.rystKilde && aaben && this.spildTid > 0.05) {
+            if (Math.random() < dt * 14) {
+                var ab = NK.tilVerden(k.p, k.anker, 75, 4);
+                this.draaber.push({ x: ab.x + r(-4, 4), y: ab.y, vx: r(-90, 90), vy: -r(60, 160), r: r(1.6, 2.6), liv: 1, farve: this.kolbeFarve() || M.FARVE.bromvand, fysik: true });
+            }
+            if (this.spildTid >= M.RYST.SPILD_TID) {
+                this.spildKolbe();
+                return;
+            }
+        }
         this.ryst = NK.mod(this.ryst, maal, maal > this.ryst ? 6 : 3, dt);
         this.skvulpUr -= dt;
         if (this.ryst > 0.35 && this.skvulpUr <= 0 && this.gjort.brom && NK.Lyd) {
             NK.Lyd.skvulp(this.ryst);
             this.skvulpUr = 0.24 - 0.1 * this.ryst;
         }
+    };
+
+    /* Uheld: kolben blev rystet uden prop, og bromvandet skvulpede ud.
+       Kobberet bliver i kolben. Laereren uskadeliggoer pytten og toerrer
+       den op (laerer.js), og eleven haelder bromvand i igen. */
+    P.spildKolbe = function () {
+        var k = this.g.kolbe;
+        var farve = this.kolbeFarve() || M.FARVE.bromvand;
+        var brom = this.visBr > 0.05 && !this.gjort.reageret;
+        var ab = NK.tilVerden(k.p, k.anker, 75, 4);
+        var i;
+        this.rystKilde = null;
+        this.holdt = null;
+        this.farligTid = 0;
+        this.spildTid = 0;
+        this.uro = 0;
+        this.ryst = 0;
+        this.musFart = 0;
+        this.vold = 0;
+        for (i = 0; i < 26; i++) {
+            this.draaber.push({ x: ab.x + r(-5, 5), y: ab.y, vx: r(-240, 240), vy: -r(120, 340), r: r(1.6, 3), liv: 1, farve: farve, fysik: true });
+        }
+        this.spildPyt = { x: NK.klamp(k.p.x, 280, 420), rx: 10, rxMaal: 70, farve: farve, vaad: 1, neutral: 0, brom: brom };
+        k.areal = 0;
+        this.mikro.kolbe.nulstil();
+        if (this.gjort.kobber) this.mikro.kolbe.tilfoejKobber();
+        this.gjort.brom = false;
+        this.gjort.reageret = false;
+        this.visBr = 1;
+        this.ryk = 5;
+        if (NK.Lyd) NK.Lyd.plask();
+        this.iagttag("spildt");
+        this.besked("Der var ingen prop i. Bromvandet skvulpede ud.", "advarsel");
+        this.koer([hjemTil(k, 0.4, 0)], "hjem");
+        if (this.laererSpild) this.laererSpild();
+        this.aendret("spild");
     };
 
     /* ----- Fordeling i reagensglassene ------------------------------------ */
@@ -713,12 +766,18 @@
     var RAEKKEFOELGE = ["prop", "nh3", "agno3", "bromflaske", "urglas", "kolbe", "glas1", "glas2"];
 
     P.hvad = function (pt) {
+        if (this.overLaerer) {
+            var l = this.overLaerer(pt);
+            if (l) return l;
+        }
         if (this.uheld && this.overUheld) {
             var u = this.overUheld(pt);
             if (u) return u;
         }
         var K = S.KONTAKT;
         if (pt.x > K.x0 && pt.x < K.x1 && pt.y > K.y0 && pt.y < K.y1) return "kontakt";
+        var kop = this.g.kaffekop;
+        if (!kop.skjult && !kop.iHaand && S.inden("kaffekop", kop.p, kop.anker, pt.x, pt.y, 6)) return "kaffekop";
         /* Proppen sidder i kolbens hals. Den skal vinde over kolben, ellers
            tager man fat i kolben, naar man vil tage proppen af. */
         var k = this.g.kolbe;
@@ -743,7 +802,8 @@
         if (this.uheld && this.nedUheld && this.nedUheld(pt)) return true;
         var navn = this.hvad(pt);
         if (!navn) return false;
-        if (navn === "kolbe" && !this.uheld && !this.handling && !this.rystKilde && this.kolbeHjemme()) {
+        var optaget = this.laererOptaget && this.laererOptaget();
+        if (navn === "kolbe" && !optaget && !this.uheld && !this.handling && !this.rystKilde && this.kolbeHjemme()) {
             var k = this.g.kolbe;
             this.holdt = { start: pt, dx: pt.x - k.p.x, dy: pt.y - k.p.y, flyttet: false, sidst: pt, t: Date.now() };
             return true;
@@ -818,6 +878,22 @@
         this.opdaterHandling(dt);
         this.opdaterRyst(dt);
         if (this.opdaterUheld) this.opdaterUheld(dt);
+        if (this.opdaterLaerer) this.opdaterLaerer(dt);
+
+        /* Brom fremme uden udsugning: dampene kommer ud i lokalet, og
+           efter 1,6 sekunder kommer laereren og taender udsugningen */
+        var udenUdsugning = !this.udsugning && this.bromFremme();
+        this.taage = NK.mod(this.taage, udenUdsugning ? 1 : 0, udenUdsugning ? 0.25 : 0.8, dt);
+        if (udenUdsugning) {
+            this.udenUdsugning += dt;
+            if (this.udenUdsugning > 1.6 && this.laererUdsugning && this.laerer && !this.laerer.scene) {
+                this.iagttag("udsugning");
+                this.besked("Bromdampene kommer ud i lokalet!", "advarsel");
+                this.laererUdsugning();
+            }
+        } else {
+            this.udenUdsugning = 0;
+        }
 
         this.vingeFart = NK.mod(this.vingeFart, this.udsugning ? 20 : 0, 1.4, dt);
         this.vinge += this.vingeFart * dt;
@@ -905,6 +981,11 @@
             var d = this.draaber[i];
             d.vy += 900 * dt;
             d.y += d.vy * dt;
+            d.x += (d.vx || 0) * dt;
+            if (d.fysik) {
+                if (d.y > S.BORD - 1) this.draaber.splice(i, 1);
+                continue;
+            }
             var gl = d.glas;
             var flade = gl.niveau ? gl.niveau : NK.tilVerden(gl.p, gl.anker, 15, 150).y;
             if (d.y >= flade) {
@@ -913,12 +994,20 @@
             }
         }
 
-        /* Brom-dampe fra aaben kolbe: udsugningen suger dem opad */
+        if (this.spildPyt) this.spildPyt.rx = NK.mod(this.spildPyt.rx, this.spildPyt.rxMaal, 3, dt);
+
+        /* Brom-dampe fra aaben kolbe og fra pytten efter spild: udsugningen
+           suger dem opad. Uden udsugning kommer der flere, og de breder sig. */
         var aaben = this.gjort.brom && !k.prop && this.visBr > 0.05 && !this.uheld && !this.gjort.fordelt;
+        var sp = this.spildPyt;
+        var pyt = !!(sp && sp.brom && sp.neutral < 0.9 && sp.vaad > 0.1);
+        var spred = this.udsugning ? 1 : 4;
         this.dampUr -= dt;
-        if (aaben && this.dampUr <= 0) {
-            this.dampUr = 0.3;
-            this.dampe.push({ x: k.p.x + r(-8, 8), y: k.p.y - 4, vx: r(-8, 8), vy: r(-22, -10), r: r(5, 9), liv: 0.9 * this.visBr });
+        if ((aaben || pyt) && this.dampUr <= 0) {
+            this.dampUr = this.udsugning ? 0.3 : 0.15;
+            if (aaben) this.dampe.push({ x: k.p.x + r(-8, 8), y: k.p.y - 4, vx: r(-8, 8) * spred, vy: r(-22, -10), r: r(5, 9), liv: 0.9 * this.visBr });
+            if (pyt) this.dampe.push({ x: sp.x + r(-0.8, 0.8) * sp.rx, y: S.BORD - 2, vx: r(-6, 6) * spred, vy: r(-30, -14), r: r(6, 11), liv: 0.9 * (1 - sp.neutral) });
+            if (this.dampe.length > 120) this.dampe.shift();
         }
         for (i = this.dampe.length - 1; i >= 0; i--) {
             var p = this.dampe[i];
@@ -1025,10 +1114,13 @@
         S.tegnBaggrund(ctx);
         S.tegnLuft(ctx, this.luft, tid);
         S.tegnKontrolpanel(ctx, this.udsugning, this.vinge, this.markeret("kontakt"), tid);
+        var kop = g.kaffekop;
+        if (!kop.skjult && !kop.iHaand) NK.Sprites.tegnPositur(ctx, "kaffekop", kop.p, kop.anker);
         S.tegnVask(ctx);
         S.tegnDunk(ctx);
         if (this.markeret("dunk")) S.tegnMarkering(ctx, { x: S.DUNK.x, y: S.DUNK.y, b: 90, h: 130 }, tid);
         if (this.tegnUheld) this.tegnUheld(ctx, "bord", tid);
+        S.tegnPyt(ctx, this.spildPyt);
 
         var aktive = [];
         var orden = ["urglas", "bromflaske", "glas1", "glas2", "STATIV", "nh3", "agno3", "prop", "kolbe"];
@@ -1065,6 +1157,8 @@
         S.tegnDraaber(ctx, this.draaber);
         S.tegnDampe(ctx, this.dampe);
         if (this.tegnUheld) this.tegnUheld(ctx, "top", tid);
+        S.tegnTaage(ctx, this.taage);
+        if (this.tegnLaerer) this.tegnLaerer(ctx, tid);
         ctx.restore();
     };
 }());

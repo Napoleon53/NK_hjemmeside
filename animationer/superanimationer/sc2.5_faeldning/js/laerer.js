@@ -3,10 +3,11 @@
 
    Laereren dukker op nede i hjoernet af scenen og siger noget i en
    talebobbel:
-     fjol   naar eleven har dryppet noget forkert i nok felter i skemaet
-     fyldt  naar eleven bliver ved med at dryppe i et fyldt felt
-     bonus  naar alle tolv felter er udfoert, og de ekstra flasker laases op
-     ros    naar opgaven i det frie forsøg er løst
+     fjol      naar eleven har dryppet noget forkert i nok felter i skemaet
+     overloeb  naar en draabe i et fyldt felt faar det til at loebe over;
+               koekkenrullen toerrer begge felter af (forsoeg.js)
+     bonus     naar alle tolv felter er udfoert, og de ekstra flasker laases op
+     ros       naar opgaven i det frie forsøg er løst
 
    Hvor mange fejl der skal til, styres i forsoeg.js (FJOL_GRAENSE).
    Samme replik bruges ikke igen, foer alle i listen er brugt.

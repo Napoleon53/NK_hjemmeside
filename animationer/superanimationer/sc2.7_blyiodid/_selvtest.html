@@ -167,7 +167,13 @@ function koerTest() {
     paastand("temperaturen stiger med massen", f.maalinger[0].T < f.maalinger[1].T && f.maalinger[1].T < f.maalinger[2].T);
     paastand("kurven er noteret, quizzen er laast op, og laereren roser", f.iagttaget.kurve && NK.quiz.tilstand !== "laast" && f.laerer.rost);
     paastand("tegneserien er laast", d.getElementById("serieknap").hidden);
-    paastand("affald afvises i varmt glas", f.klik("dunk") === false);
+    paastand("det varme glas kan tages op", f.b.T > 50 && f.klik("dunk") === true);
+    adv(1);
+    paastand("der skvulper lidt ud, og uheldet er noteret", !!f.skvulp && f.iagttaget.varmt && f.b.vand && !f.gjort.affald);
+    adv(2.5);
+    paastand("laereren kommer og taler om varmt glas", !!(f.laerer.scene && f.laerer.scene.navn === "varmt") && f.laerer.tale.indexOf("Varmt glas") === 0, f.laerer.tale);
+    vent(function () { return !f.laererOptaget() && !f.handling; }, 15);
+    paastand("laereren har toerret op og er gaaet", !f.skvulp && !f.laererOptaget() && f.laerer.x < -200);
     t = vent(function () { return f.b.T < 50; }, 90);
     paastand("glasset koeler af til under 50 °C", f.b.T < 50, t + " s");
     paastand("resterne afleveres", klik("dunk") === true);

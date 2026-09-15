@@ -24,6 +24,7 @@
         kmno4:        { fil: "flaske_kmno4.svg", b: 46, h: 120 },
         varmeplade:   { fil: "varmeplade.svg", b: 90, h: 34 },
         haand:        { fil: "haand.svg", b: 96, h: 84 },
+        papir:        { fil: "koekkenrulle.svg", b: 72, h: 44 },
         lup:          { fil: "lup.svg", b: 40, h: 40 }
     };
 

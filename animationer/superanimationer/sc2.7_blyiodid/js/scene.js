@@ -363,6 +363,23 @@
         ctx.restore();
     };
 
+    /* Spildt opløsning paa bordet: { x, rx, alfa, farve } */
+    S.tegnSkvulp = function (ctx, s) {
+        if (!s || s.alfa < 0.01) return;
+        ctx.save();
+        ctx.globalAlpha = NK.klamp(s.alfa, 0, 1);
+        ctx.fillStyle = NK.css(s.farve, 1);
+        ctx.beginPath();
+        ctx.ellipse(s.x, S.BORD + 2.5, s.rx, 5, 0, 0, Math.PI * 2);
+        ctx.ellipse(s.x + s.rx * 0.55, S.BORD + 3, s.rx * 0.45, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(255, 255, 255, 0.22)";
+        ctx.beginPath();
+        ctx.ellipse(s.x - s.rx * 0.2, S.BORD + 1.5, s.rx * 0.4, 1.2, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    };
+
     /* ================================================================
        STATIVET, FOELEREN, TERMOMETRET OG VARMEPLADEN
        ================================================================ */

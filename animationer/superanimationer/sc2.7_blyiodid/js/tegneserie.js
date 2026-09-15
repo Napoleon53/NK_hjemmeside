@@ -180,6 +180,15 @@
                 });
             } };
         },
+        varmt: function (f, e) {
+            return { tekst: e.tekst + " Kemichael tørrede op.", tegn: function (ctx) {
+                udsnit(ctx, UDSNIT.glas, function () {
+                    opstilling(ctx, { T: e.T, varme: e.varme, omroer: e.omroer });
+                    S.tegnSkvulp(ctx, { x: 590, rx: 32, alfa: 1, farve: { r: 240, g: 206, b: 90, a: 0.8 } });
+                });
+                tekst(ctx, grader(e.T), 110, 20, { farve: "#f0918a" });
+            } };
+        },
         affald: function (f, e) {
             return { tekst: e.tekst, tegn: function (ctx) {
                 udsnit(ctx, UDSNIT.dunk, function () {

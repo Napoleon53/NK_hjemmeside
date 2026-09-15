@@ -690,7 +690,7 @@
         if ((s.sted === "plade" || s.sted === "trefod") && this.gjort.inddamp) {
             if (maal !== "vaegt") return false;
             if (s.sted === "trefod" && this.braenderTaendt) { this.besked("Sluk brænderen, og lad skålen køle af."); this.markér("braender", 3); return false; }
-            if (this.temp > 40) { this.besked("Skålen er stadig varm. Vent, til den er kølet af."); return false; }
+            if (this.temp > 40) { this.varmSkaal(); return true; }
             this.vejIgen();
             return true;
         }

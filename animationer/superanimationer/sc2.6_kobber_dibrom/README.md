@@ -3,8 +3,8 @@
 En superanimation: i modsætning til de øvrige animationer, som er én enkelt
 HTML-fil, ligger denne i sin egen mappe med adskilt CSS, JavaScript og sprites.
 
-Åbn **`index.html`**. Mappen er selvstændig og henter kun filer inde fra sig
-selv, så den kan flyttes uden at der knækker noget.
+Åbn **`index.html`**. Mappen henter kun filer inde fra sig selv, bortset fra
+læreren Kemichael i `../kemichael/`. Den skal derfor ligge ved siden af den mappe.
 
 Den afløser `animationer/kemi-c-filer/c2.6_eksperiment_kobber_dibrom.html`,
 som nu ligger i
@@ -24,10 +24,11 @@ animation. Det nye er:
   reagensglasstativ, dråbeflasker, vask og affaldsdunk. Genstandene bruges ved
   at klikke på dem, og de flyver selv hen og hælder, drypper eller sætter
   proppen i.
-* **Sikkerhed som en del af forsøget.** Bromvandet kan ikke åbnes, før
-  udsugningen er tændt, og udsugningen kan ikke slukkes, så længe der er brom
-  fremme. Fra en åben kolbe stiger rødbrune dampe, som udsugningen suger op.
-  Vasken afviser rester med tungmetalioner.
+* **Sikkerhed som en del af forsøget.** Fra en åben kolbe stiger rødbrune
+  dampe, som udsugningen suger op. Forkerte handlinger afvises ikke, men giver
+  et uheld, som læreren Kemichael rydder op efter (se Uheld nedenfor).
+* **Intro.** Første gang siden åbnes, siger en pop-up kort, hvad forsøget
+  undersøger, og hvad eleven skal gøre. Knappen Om forsøget åbner den igen.
 * **Rystning med musen.** Eleven tager fat i kolben og bevæger den frem og
   tilbage. En handske holder om halsen, og væsken skvulper. Det er musens
   fart, der tæller, så små, hurtige bevægelser virker også. Knappen
@@ -79,6 +80,33 @@ Panelet skifter til **Oprydning**, og redskaberne kommer ind ét ad gangen:
 
 Derefter kommer en ny kolbe og nye kobberspåner, og eleven starter igen fra
 kobber og bromvand. Udsugningen kører stadig. Uheldet noteres i iagttagelserne.
+
+## Uheld, som læreren rydder op efter
+
+Læreren Kemichael kommer ind på scenen fra venstre. Figuren, kaffen og klik på
+ham er fælles for superanimationerne og står i `../kemichael/kemichael.js`.
+Scenerne her står i `js/laerer.js`.
+
+* **Bromvand uden udsugning.** Bromvandet kan åbnes, og udsugningen kan
+  slukkes, selv om der er brom fremme. Dampene kommer så ud i lokalet, og
+  scenen får et rødbrunt slør. Efter 1,6 sekunder løber læreren ind og tænder
+  udsugningen. Replikken skifter, hvis det sker igen.
+* **Rystning uden prop.** Kolben kan rystes uden prop, med musen eller tasten
+  R. Så skvulper bromvandet ud på bordet, mens kobberet bliver i kolben.
+  Læreren sprøjter natriumthiosulfat på pytten, tørrer op og beder om nyt
+  bromvand. Grænsen står i `RYST.SPILD_FART` og `RYST.SPILD_TID` i
+  `js/model.js`.
+* **Rester i vasken.** Klikkes der på vasken, når væsken er hældt over i
+  reagensglassene, begynder glas 1 at hælde. Læreren løber ind og stopper det,
+  og glasset kommer tilbage i stativet.
+* **Kolben knuses.** Når kolben er tabt (se Påskeægget), kigger læreren ind fra
+  kanten, mens eleven rydder op.
+* **Lærerens kaffe.** Koppen på hylden. Læreren henter den og drikker.
+* **Læreren klikkes på.** Stadig kortere svar, rødere i hovedet og til sidst
+  damp af ørerne.
+
+Uheldene noteres i iagttagelserne og tæller i regnskabet over uheld, der følger
+browseren (se `../kemichael/README.md`).
 
 ## Sprites
 

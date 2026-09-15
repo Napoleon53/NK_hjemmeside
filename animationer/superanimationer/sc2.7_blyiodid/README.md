@@ -64,8 +64,11 @@ er:
   med elevens punkter. Var der spild, får det sin egen rude.
 * **Quiz** med ti spørgsmål, låst op ved tre målinger, blandt andet en
   beregning af m(PbI₂) og hvad et punkt på kurven betyder.
-* **Sikkerhed.** Glasset kan først tømmes under 50 °C. Resterne afleveres som
-  tungmetalaffald.
+* **Sikkerhed.** Resterne afleveres som tungmetalaffald. Tages bægerglasset op
+  over 50 °C, skvulper der lidt ud, og det lander på varmepladen igen (se
+  Påskeæggene).
+* **Intro.** Første gang siden åbnes, siger en pop-up kort, hvad forsøget
+  undersøger, og hvad eleven skal gøre. Knappen Om forsøget åbner den igen.
 
 ## Påskeæggene
 
@@ -77,6 +80,11 @@ Scenerne her står i `js/laerer.js`.
   4 ekstra klik inden for 1,6 s), ryger pulveret ud over bordet. Læreren kommer
   med køkkenrulle og tørrer op. Anden gang skal der 6 klik til, og efter to uheld
   sker det ikke mere. Grænserne står i `SPILD` i `js/model.js`.
+* **Varmt glas.** Klikkes der på dunken, mens bægerglasset er over 50 °C,
+  tager eleven fat i det varme glas. Hånden rykker til, der skvulper lidt ud,
+  og glasset lander på varmepladen igen. Læreren kommer med køkkenrulle
+  ("Varmt glas ser ud præcis som koldt glas.") og peger på termometret.
+  Uheldet får sin egen rude i tegneserien.
 * **Det koger.** Har vandet kogt i 6 sekunder, kigger læreren ind fra kanten og
   siger til.
 * **Lærerens kaffe.** Koppen på hylden. Læreren henter den og drikker.

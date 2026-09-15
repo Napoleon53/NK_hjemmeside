@@ -5,29 +5,31 @@
    i ../kemichael/kemichael.js. Her staar de scener, der hoerer til dette
    forsoeg.
 
-   Paaskeaeg:
+   Paaskeaeg og uheld:
      ryst       kolben rystes saa voldsomt, at det skvulper
      overloeb   buretten fyldes, mens den allerede er fuld: en plet paa
                 bordet, der bliver staaende
+     vaegt      syren haeldes ud over vaegten: laereren toerrer op
      aubergine  der titreres langt forbi endepunktet: laereren kigger ind
                 fra kanten
      over100    et resultat over 100 %
      ros        et godt resultat med svovlsyre: laereren siger "Rustfrit."
 
    Glimt af baggrunden: bartender (rystningen), jura (aubergine),
-   titrering (rosen) og regnskabet over uheld (overloebet).
+   titrering (rosen) og regnskabet over uheld (overloebet og vaegten).
    ===================================================================== */
 (function () {
     "use strict";
 
     var NK = window.NK;
     var K = NK.Kemichael;
+    var S = NK.Scene;
     var P = NK.Forsoeg.prototype;
 
     var UDE = K.UDE;
     var HAENGER = K.HAENGER;
 
-    K.paa(P, { kaffeX: 170 });
+    K.paa(P, { kaffeX: 170, fredet: ["vaegt"] });
 
     P.laererStartEkstra = function () {
         this.antalRyst = 0;
@@ -37,6 +39,7 @@
 
     P.laererNytEkstra = function () {
         this.over100Venter = false;
+        this.laerer.baerer = null;
     };
 
     /* Resultatet over 100 % ventede, fordi laereren var optaget */
@@ -90,6 +93,34 @@
             { kald: function () { this.laerer.plakatRegel = 0; if (NK.Lyd) NK.Lyd.brum(); } }
         ].concat(K.uheld(), [
             { arm: HAENGER, tid: 0.45 },
+            { gaa: UDE }
+        ]));
+        return true;
+    };
+
+    /* ----- Syren blev haeldt ud over vaegten ------------------------------ */
+    P.laererVaegt = function () {
+        var L = this.laerer;
+        var mig = this;
+        if (!L) return false;
+        L.scene = null;
+        this.laererKoer("vaegt", [
+            { tid: 0.3 },
+            { udtryk: { vrede: 0.9, humoer: -0.8, roed: 0.3, briller: 1 } },
+            { gaa: function () { return (mig.vaegtPyt ? mig.vaegtPyt.x : S.VAEGT.midt) - 130; } },
+            { sig: "Vægten er ikke et bægerglas.", vis: 2.6, tid: 0.3 },
+            { udtryk: { briller: 0 } },
+            { arm: -1.25, tid: 0.5 },
+            { kald: function () { this.laerer.baerer = "papir"; if (NK.Lyd && NK.Lyd.papir) NK.Lyd.papir(); } },
+            { tid: 1.8, hver: function (t) {
+                this.laerer.arm = -1.25 + Math.sin(t * Math.PI * 7) * 0.22;
+                if (this.vaegtPyt) this.vaegtPyt.alfa = 1 - t;
+                if (t >= 0.99) this.vaegtPyt = null;
+            } },
+            { kald: function () { this.laerer.baerer = null; if (NK.Lyd) NK.Lyd.brum(); } },
+            { arm: HAENGER, tid: 0.4 },
+            { sig: "Syren skal i kolben.", vis: 2.2, tid: 1.4 }
+        ].concat(K.uheld(), [
             { gaa: UDE }
         ]));
         return true;
@@ -149,5 +180,12 @@
         ].concat(K.glimtTrin("titrering"), [
             { gaa: UDE }
         ]), false);
+    };
+
+    /* ----- Tegning ------------------------------------------------------ */
+    P.tegnBaaretEkstra = function (ctx, L, hd) {
+        if (L.baerer === "papir") {
+            NK.Sprites.tegnPositur(ctx, "papir", { x: hd.x + 6, y: hd.y + 8, v: 0.2 }, S.ANKER.papir);
+        }
     };
 }());

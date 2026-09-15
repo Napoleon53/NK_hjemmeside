@@ -188,6 +188,7 @@
         }
 
         S.tegnSpild(ctx, this.spild);
+        S.tegnSkvulp(ctx, this.skvulp);
 
         /* Zoomboblen */
         if (this.bobleAlfa > 0.01) {

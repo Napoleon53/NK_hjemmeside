@@ -33,7 +33,8 @@
         svovlsyre:    { x: 23, y: 4 },
         saltsyre:     { x: 23, y: 4 },
         kmno4:        { x: 23, y: 4 },
-        haand:        { x: 40, y: 46 }
+        haand:        { x: 40, y: 46 },
+        papir:        { x: 36, y: 22 }
     };
 
     /* Kemichaels ankre (laereren og kaffekoppen) staar i ../kemichael/kemichael.js */

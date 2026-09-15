@@ -398,6 +398,7 @@
             case "plade": return { x: S.PLADE.midt, y: 420, rx: 56, ry: 85 };
             case "buret": return { x: B.x, y: 430, rx: 62, ry: 85 };
             case "buretTop": return { x: B.x, y: 130, rx: 62, ry: 90 };
+            case "vaegt": return { x: S.VAEGT.midt, y: S.VAEGT.y - 40, rx: 70, ry: 70 };
         }
         return null;
     };
