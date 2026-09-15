@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jernthiocyanat-ligevægten</title>
+<title>Indgreb i en kemisk ligevægt</title>
 <link rel="stylesheet" href="css/stil.css">
 </head>
 <body>
 
 <header class="top">
-    <h1><span class="ikon">⚗</span> Jernthiocyanat-ligevægten <span class="undertitel">Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺</span></h1>
+    <h1><span class="ikon">⚗</span> Indgreb i en kemisk ligevægt <span class="undertitel">Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺</span></h1>
 
     <div class="top-hoejre">
         <button class="knap topknap" id="forfraknap" type="button" title="Start forsøget forfra">Start forfra</button>
@@ -28,17 +28,21 @@
 
 <main class="forsoeg">
     <div class="scene" id="scene">
-        <canvas id="scene-laerred" aria-label="Laboratoriebord med sprøjteflaske, bægerglas, dråbeflasker med Fe(NO₃)₃, KSCN og AgNO₃, fem reagensglas i et stativ foran et hvidt kort, et varmt vandbad, et isbad og en affaldsdunk"></canvas>
+        <canvas id="scene-laerred" aria-label="Laboratoriebord med kolbe med stamopløsning, bægerglas, pulverglas, spatel, flasker, otte reagensglas i et stativ, vandbad, isbad, termometer og affaldsdunk. I del 2 to bægerglas på hvidt papir."></canvas>
+        <div class="stationer" id="stationer" role="group" aria-label="Forsøgets dele">
+            <button class="knap stationknap aktiv" id="station1" type="button" title="Del 1 (tast 1)" aria-pressed="true">Del 1: De syv glas</button>
+            <button class="knap stationknap" id="station2" type="button" title="Del 2 (tast 2)" aria-pressed="false">Del 2: Fortynding</button>
+        </div>
         <div class="scenebesked" id="scenebesked" aria-live="polite"></div>
     </div>
 
     <aside class="panel">
         <div class="kort fremhaev" id="forloeb-kort">
-            <h2><span>Forløb</span> <span class="taeller" id="forloeb-taeller"></span></h2>
+            <h2><span id="forloeb-titel">Del 1: De syv glas</span> <span class="taeller" id="forloeb-taeller"></span></h2>
             <ol class="trinliste" id="trin-liste"></ol>
             <div class="knaprad">
                 <button class="knap orange" id="ryst-knap" type="button" title="Hold nede for at ryste det valgte glas (R)" hidden><span>Ryst glasset</span><span class="tegn">↔</span></button>
-                <button class="knap blaa" id="sammenlign-knap" type="button" title="Se glassene ovenfra (S)" hidden><span id="sammenlign-tekst">Sammenlign</span><span class="tegn">◎</span></button>
+                <button class="knap blaa" id="visning-knap" type="button" title="Billede eller glassene ovenfra (S)"><span id="visning-tekst">Tag billede</span><span class="tegn">◎</span></button>
                 <button class="knap" id="hint-knap" type="button" title="Hint til trinnet (I)"><span>Hint</span><span class="tegn">?</span></button>
             </div>
             <p class="hint" id="hint-tekst" hidden></p>
@@ -46,7 +50,7 @@
 
         <div class="kort" id="serie-kort">
             <h2>Tegneserie</h2>
-            <p class="besked" id="serie-tekst">Låses op, når forsøget er slut.</p>
+            <p class="besked" id="serie-tekst">Låses op, når begge dele er gjort.</p>
             <button class="knap stor blaa" id="serieknap" type="button" hidden><span>Se forsøget som tegneserie</span><span class="tegn">→</span></button>
         </div>
 
@@ -64,20 +68,23 @@
 <!-- ================================================================= -->
 <div class="overlay" id="intro">
     <div class="overlay-boks intro-boks" role="dialog" aria-labelledby="intro-titel">
-        <h2 id="intro-titel">Jernthiocyanat-ligevægten</h2>
-        <p class="intro-formaal">Forsøget undersøger, hvordan ligevægten Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺ reagerer på tilsatte stoffer og på temperaturen.</p>
+        <h2 id="intro-titel">Indgreb i en kemisk ligevægt</h2>
+        <p class="intro-formaal">Forsøget undersøger, hvordan ligevægten Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺ reagerer på indgreb og på fortynding.</p>
 
-        <h3>Forsøget</h3>
+        <h3>Del 1: De syv glas</h3>
         <ol class="intro-trin">
-            <li>Lav en opløsning af vand, Fe(NO₃)₃ og KSCN i bægerglasset, og rør om.</li>
-            <li>Fordel opløsningen i de fem reagensglas.</li>
-            <li>Lav ét indgreb i hvert glas, og lad ét glas stå urørt som reference.</li>
-            <li>Sammenlign glassene ovenfra med referencen.</li>
-            <li>Aflever resterne.</li>
+            <li>Hæld stamopløsning i et bægerglas og derfra et par mL i glas 1 til 7.</li>
+            <li>Glas 1 til 3 får Fe(NO₃)₃, ascorbinsyre og KSCN som fast stof. Rør rundt.</li>
+            <li>Lav forundersøgelsen i glas 8, og dryp AgNO₃ i glas 4.</li>
+            <li>Glas 5 i varmt vandbad, glas 6 i isbad og glas 7 ved stuetemperatur. Mål temperaturen.</li>
+            <li>Tag et billede af glassene, og aflever resterne.</li>
         </ol>
 
-        <h3>Uheld</h3>
-        <p>Forkerte handlinger kan give uheld. Kemichael rydder op.</p>
+        <h3>Del 2: Fortynding</h3>
+        <p>Sammenlign to bægerglas ovenfra, når det ene er fortyndet til dobbelt volumen: først med frugtfarve, derefter med ligevægtsblanding.</p>
+
+        <h3>Udstyret</h3>
+        <p>Tag fat i udstyret med musen, og slip det der, hvor det skal bruges. Forkerte handlinger kan give uheld. Kemichael rydder op.</p>
 
         <div class="knapper">
             <button class="knap" id="intro-rundvisning" type="button">Rundvisning</button>
@@ -89,30 +96,32 @@
 <!-- ================================================================= -->
 <div class="overlay" id="teori">
     <div class="overlay-boks">
-        <h2>Jern(III)thiocyanat-ligevægten</h2>
-        <p>Jern(III)ioner og thiocyanationer danner et rødt kompleks:</p>
+        <h2>Indgreb i en kemisk ligevægt</h2>
+        <p>Jern(III)ioner reagerer med thiocyanat og danner et rødt kompleks. Reaktionen er reversibel:</p>
         <div class="ligning">Fe³⁺(aq) + SCN⁻(aq) ⇌ FeSCN²⁺(aq)</div>
-        <p>Farven viser, hvor meget FeSCN²⁺ der er. En mørkere farve betyder, at ligevægten er forskudt mod højre. En lysere farve betyder, at den er forskudt mod venstre.</p>
+        <p>Farven viser, hvor meget FeSCN²⁺ der er. Bliver farven mørkere, er ligevægten forskudt mod højre. Bliver den lysere, er den forskudt mod venstre.</p>
 
         <h3>Ligevægtsloven</h3>
         <div class="ligning lille">K = [FeSCN²⁺] / ([Fe³⁺] · [SCN⁻])</div>
-        <p>Efter et indgreb er reaktionsbrøken Y forskellig fra K, og ligevægten forskydes, til Y igen er lig med K.</p>
+        <p>Efter et indgreb er reaktionsbrøken Y forskellig fra K. Ligevægten forskydes, til Y igen er lig med K.</p>
 
-        <h3>Tilsætning og fjernelse</h3>
-        <p>Tilsættes Fe³⁺ eller SCN⁻, forskydes ligevægten mod højre. Ag⁺ fjerner SCN⁻ som et hvidt bundfald, og ligevægten forskydes mod venstre:</p>
+        <h3>Glas 1 til 4</h3>
+        <p>Fe(NO₃)₃ og KSCN øger koncentrationen af Fe³⁺ og SCN⁻, så ligevægten forskydes mod højre. Ascorbinsyre reducerer Fe³⁺ til Fe²⁺, som ikke indgår i ligevægten:</p>
+        <div class="ligning lille">2 Fe³⁺ + C₆H₈O₆ → 2 Fe²⁺ + C₆H₆O₆ + 2 H⁺</div>
+        <p>Ag⁺ fælder SCN⁻ som et hvidt bundfald. I begge tilfælde forskydes ligevægten mod venstre:</p>
         <div class="ligning lille">Ag⁺(aq) + SCN⁻(aq) → AgSCN(s)</div>
 
-        <h3>Temperatur</h3>
+        <h3>Glas 5 og 6</h3>
         <p>Reaktionen mod højre er exoterm. Opvarmning gør K mindre og forskyder ligevægten mod venstre. Afkøling gør K større og forskyder den mod højre.</p>
 
-        <h3>Fortynding</h3>
-        <p>Fortyndes opløsningen med vand, forskydes ligevægten mod den side, der har flest opløste partikler, altså mod venstre.</p>
+        <h3>Fast stof og variabelkontrol</h3>
+        <p>Fe(NO₃)₃ og KSCN tilsættes som fast stof. En opløsning ville også fortynde glasset, og så var der to indgreb på én gang.</p>
 
-        <h3>Referencen</h3>
-        <p>Et urørt glas med samme opløsning er referencen. Glassene sammenlignes ovenfra mod hvidt papir, fordi lyset så går gennem hele væskesøjlen.</p>
+        <h3>Fortynding</h3>
+        <p>Når en frugtfarve fortyndes, er antallet af farvestofmolekyler det samme, så farven set ovenfra er uændret. Når ligevægtsblandingen fortyndes til dobbelt volumen, halveres alle koncentrationer, og Y bliver dobbelt så stor som K. Ligevægten forskydes mod venstre, og farven ovenfra bliver lysere.</p>
 
         <h3>Sikkerhed og affald</h3>
-        <p>AgNO₃ er ætsende og giver sorte pletter på huden. Brug handsker og briller. Resterne indeholder sølv og afleveres som tungmetalaffald.</p>
+        <p>AgNO₃ er ætsende og giver sorte pletter på huden. Brug handsker og briller. Resterne afleveres som surt uorganisk affald.</p>
 
         <div class="knapper">
             <button class="knap blaa" id="teori-luk" type="button">Luk</button>
@@ -137,7 +146,7 @@
     <div class="rundvisning-spot" id="rv-spot"></div>
     <div class="rundvisning-boks" id="rv-boks">
         <div class="rundvisning-hoved">
-            <span class="rundvisning-tal" id="rv-tal">1/7</span>
+            <span class="rundvisning-tal" id="rv-tal">1/8</span>
             <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
         </div>
         <h3 id="rv-titel"></h3>

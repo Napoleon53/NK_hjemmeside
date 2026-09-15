@@ -1,38 +1,34 @@
 /* =====================================================================
-   laerer.js - Kemichael i jernthiocyanat-forsoeget
+   laerer.js - Kemichael i forsoeget med indgreb i en kemisk ligevaegt
 
    Selve figuren (gang, arm, ansigt, tale, klik paa ham og kaffen) staar
    i ../kemichael/kemichael.js. Her staar de scener, der hoerer til
    dette forsoeg.
 
-   Uheld (laereren toerrer op):
-     spild      et glas blev rystet saa voldsomt, at indholdet
-                sproejtede ud, eller et glas eller baegerglasset loeb over
+   Uheld (laereren toerrer op eller henter mere):
+     spild      et glas, et baegerglas, kolben eller et bad blev rystet saa
+                voldsomt, at det skvulpede ud, eller en beholder loeb over
+     kolbeDunk  stamoploesningen blev haeldt i affaldsdunken
 
    Bemaerkninger (forsoeget fortsaetter):
-     farveloes  stamoploesningen mangler Fe(NO3)3 eller KSCN
-     soelv      der er dryppet AgNO3 i stamoploesningen
-     moerk      stamoploesningen er saa moerk, at intet kan ses
-     lys        stamoploesningen er naesten farveloes
-     ujaevn     der blev ikke roert om, og glassene fik forskellig farve
+     glas7      referenceglasset faar et indgreb
      blandet    et glas faar to slags indgreb
-     ingenRef   alle fem glas har faaet et indgreb
-     ros        glassene er sammenlignet
+     kunst      frugtfarve og ligevaegtsblanding i samme baegerglas
+     ros        billedet af glas 1 til 7 er taget
 
-   Glimt af baggrunden: afslag (ingen reference) og regnskabet over uheld.
+   Glimt af baggrunden: afslag (glas 7) og regnskabet over uheld.
    ===================================================================== */
 (function () {
     "use strict";
 
     var NK = window.NK;
     var K = NK.Kemichael;
-    var M = NK.Model;
     var P = NK.Forsoeg.prototype;
 
     var UDE = K.UDE;
     var HAENGER = K.HAENGER;
 
-    K.paa(P, { kaffeX: 170, fredet: ["spild"] });
+    K.paa(P, { kaffeX: 170, fredet: ["spild", "kolbeDunk"] });
 
     P.laererNytEkstra = function () {
         this.laerer.baerer = null;
@@ -61,8 +57,12 @@
         mig.laererKoer(navn, trin, false);
     }
 
+    function sig(tekst) {
+        return { sig: tekst, vis: 1.4 + tekst.length * 0.05, tid: 1.5 + tekst.length * 0.05 };
+    }
+
     /* ----- Uheld: spild ------------------------------------------------------ */
-    var RYST_REPLIKKER = ["Det skal blandes, ikke kastes.", "Et reagensglas er ikke en rangle.", "Tredje gang. Køkkenrullen slipper op."];
+    var RYST_REPLIKKER = ["Det skal blandes, ikke kastes.", "Glasudstyr er ikke en rangle.", "Tredje gang. Køkkenrullen slipper op."];
 
     P.laererSpild = function (c, slags) {
         var L = this.laerer;
@@ -70,12 +70,10 @@
         L.scene = null;
         var replik;
         if (slags === "overloeb") replik = c.erGlas ? "Fuldt er fuldt." : "Der står 100 mL på glasset. Det er et loft.";
+        else if (slags === "kolbe") replik = "Det var stamopløsning til hele klassen.";
+        else if (slags === "bad") replik = "Badet skal stå stille. Det er det, der er pointen.";
         else replik = RYST_REPLIKKER[Math.min(this.rystUheld, RYST_REPLIKKER.length) - 1];
-        var slut = [];
-        if (slags === "rystet") {
-            if (M.volumen(this.g.baeger.b) >= M.MAENGDE.FORDEL) slut.push({ sig: "Der er mere i bægerglasset.", vis: 2.2, tid: 1.4 });
-            else slut.push({ sig: "Glas " + c.nr + " er tomt nu.", vis: 2, tid: 1.2 });
-        }
+        var slut = slags === "kolbe" ? [sig("Der er mere i forberedelsen.")] : [];
         this.laererKoer("spild", [
             { tid: 0.5 },
             { udtryk: { vrede: 0.9, humoer: -0.8, roed: 0.3, skeptisk: slags === "overloeb" ? 0.8 : 0 } },
@@ -97,61 +95,55 @@
         ]));
     };
 
-    /* ----- Stamoploesningen --------------------------------------------------- */
-    P.laererFarveloes = function () {
-        bemaerkning(this, "farveloes", 190, { vrede: 0.3, humoer: -0.2, skeptisk: 1, briller: 1 },
-            ["Fem glas med noget klart. Spændende.", "Der mangler noget i bægerglasset."],
-            [K.suk(), { sig: "Start et nyt forsøg.", vis: 2, tid: 1.8 }]);
-    };
-
-    P.laererSoelv = function () {
-        bemaerkning(this, "soelv", 190, { vrede: 0.5, humoer: -0.4, skeptisk: 0.8, briller: 1 },
-            ["Sølvnitrat i bægerglasset.", "Nu har alle fem glas bundfald."],
-            [{ sig: "Det skulle kun i ét af dem.", vis: 2.2, tid: 2 }]);
-    };
-
-    P.laererMoerk = function () {
-        bemaerkning(this, "moerk", 190, { vrede: 0.3, humoer: -0.3, skeptisk: 1, briller: 1 },
-            ["Så mørkt, at ingen ser en forskel.", "Færre dråber næste gang."]);
-    };
-
-    P.laererLys = function () {
-        bemaerkning(this, "lys", 190, { vrede: 0.3, humoer: -0.3, skeptisk: 1, briller: 1 },
-            ["Det er næsten vand.", "Lysere end det bliver svært at se."]);
-    };
-
-    P.laererUjaevn = function () {
-        bemaerkning(this, "ujaevn", 190, { vrede: 0.4, humoer: -0.4, skeptisk: 1, briller: 1 },
-            ["Fem glas, fem farver.", "Rørte nogen om?"]);
+    /* ----- Uheld: stamoploesningen i affaldet --------------------------------- */
+    P.laererKolbeDunk = function (k) {
+        var L = this.laerer;
+        L.scene = null;
+        this.laererKoer("kolbeDunk", [
+            { tid: 0.6 },
+            { udtryk: { vrede: 1, humoer: -0.9, roed: 0.45, briller: 1 } },
+            { gaa: 150, loeb: true },
+            sig("Stamopløsning i affaldet."),
+            K.suk(1.4),
+            sig("Den var til hele klassen."),
+            { arm: -0.4, tid: 0.5 },
+            { tid: 0.8 },
+            { kald: function () { k.tom = false; if (NK.Lyd) NK.Lyd.haeld(0.8); this.aendret("kolbe"); } },
+            { arm: HAENGER, tid: 0.4 },
+            { udtryk: { briller: 0 } },
+            sig("Der er mere i forberedelsen. Én gang.")
+        ].concat(K.uheld(), [
+            { gaa: UDE }
+        ]));
     };
 
     /* ----- Glassene ------------------------------------------------------------ */
+    P.laererGlas7 = function () {
+        bemaerkning(this, "glas7", 300, { vrede: 0.5, humoer: -0.5, skeptisk: 1, briller: 1 },
+            ["Glas 7 skulle stå ved stuetemperatur."],
+            K.glimtTrin("afslag").concat([K.suk(), sig("Nu er der ingen urørt reference.")]));
+    };
+
     P.laererBlandet = function (gl) {
-        bemaerkning(this, "blandet", 230, { vrede: 0.3, humoer: -0.2, skeptisk: 1, briller: 1 },
+        bemaerkning(this, "blandet", 300, { vrede: 0.3, humoer: -0.2, skeptisk: 1, briller: 1 },
             ["Ét indgreb pr. glas.", "Ellers ved ingen, hvad der virkede."]);
     };
 
-    P.laererIngenReference = function () {
-        var rest = M.volumen(this.g.baeger.b) > 0.5 && !this.haendt.baegerAendret;
-        bemaerkning(this, "ingenRef", 230, { vrede: 0.5, humoer: -0.5, skeptisk: 1, briller: 1 },
-            ["Fem glas. Ingen reference."],
-            K.glimtTrin("afslag").concat([
-                K.suk(),
-                rest ? { sig: "Resten i bægerglasset er urørt.", vis: 2.4, tid: 2.2 }
-                     : { sig: "Start et nyt forsøg, og lad ét glas være.", vis: 2.6, tid: 2.6 }
-            ]));
+    P.laererKunst = function () {
+        bemaerkning(this, "kunst", 300, { vrede: 0.3, humoer: -0.1, skeptisk: 1, briller: 1 },
+            ["Frugtfarve og ligevægt i samme glas.", "Kunstnerisk. Men ikke et forsøg."]);
     };
 
     /* ----- Ros ------------------------------------------------------------------ */
     P.laererRos = function (forkert) {
         if (forkert) {
-            bemaerkning(this, "ros", 200, { vrede: 0.1, humoer: 0.1, skeptisk: 1, briller: 1 },
+            bemaerkning(this, "ros", 240, { vrede: 0.1, humoer: 0.1, skeptisk: 1, briller: 1 },
                 ["Kig en gang til på glas " + forkert.nr + "."]);
             return;
         }
         this.laererKoer("ros", [
             { udtryk: { vrede: 0, humoer: 0.9, roed: 0 } },
-            { gaa: 200 },
+            { gaa: 240 },
             { tid: 0.3 },
             { sig: "Flot. Det var til at se rødt.", vis: 2.4, tid: 2.4, hver: function (t) { this.laerer.nik = Math.sin(t * Math.PI * 3) * 5; } },
             { kald: function () { this.laerer.nik = 0; } },

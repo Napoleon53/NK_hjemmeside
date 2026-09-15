@@ -591,3 +591,12 @@ button:focus-visible {
 .resultater.skema td { text-align: left; font-weight: 600; padding: 5px 12px 5px 0; }
 .resultater.skema td:empty::after { content: ""; }
 .resultater .facit { display: block; font-weight: 400; font-size: 0.8rem; color: #f0918a; }
+
+/* ---------------------------------------------------------------------
+   SB2.4: knapperne til del 1 og del 2 oven paa scenen
+   --------------------------------------------------------------------- */
+.stationer { position: absolute; top: 10px; left: 12px; display: flex; gap: 6px; z-index: 5; }
+.stationknap { padding: 7px 13px; font-size: 0.88rem; background-color: rgba(51, 51, 64, 0.92); }
+.stationknap.aktiv { background-color: var(--blaa-mork); border-color: var(--blaa); color: #ffffff; }
+#visning-knap.aktiv { background-color: var(--blaa); }
+.rude .del2 { margin: 14px 0 6px 0; font-weight: 700; color: var(--tekst); }
