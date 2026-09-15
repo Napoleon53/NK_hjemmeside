@@ -1,0 +1,1116 @@
+/* =====================================================================
+   bord.js - laboratoriebordet: genstandene, musen og moederne
+
+   Bordet er et fast tegnebord (NK.Scene.BREDDE x HOEJDE), der skaleres
+   ind i laerredet. Alt udstyr er genstande af en type fra udstyr.js:
+
+     { navn, type, anker, p: { x, y, v }, hjem, kan, titel, etiket,
+       indhold (NK.Stof), lag, bund, niveau, T, taendt, last, sted, paa, i }
+
+   Reglerne for frihed:
+     * Alt, der ikke staar fast, kan tages op med musen og saettes ned,
+       hvor man vil. Det bliver staaende der.
+     * Slippes en genstand over en anden, afgoer deres egenskaber (kan),
+       hvad der sker: det, der kan haelde, haelder i det, der kan rumme;
+       draabeflasken drypper; spatlen tager fra pulverglasset og giver
+       til glasset; glasstaven roerer; termometeret maaler; stativet og
+       varmepladen tager imod glas; affald og vask tager imod alt.
+     * Ingen handling afvises, naar den kan lade sig goere. Rystes et
+       aabent glas voldsomt, skvulper det ud. Loeber et glas over,
+       bliver der en pyt. Saettes et reagensglas paa bordet, vaelter det.
+     * Et klik er en genvej: udstyret bruges paa den valgte beholder.
+
+   Hooks, som siden saetter:
+     vedBesked(tekst, slags)   korte beskeder til scenen
+     vedAendring(grund)        noget i tilstanden aendrede sig
+     vedHaendelse(type, data)  haeldt, dryppet, spild, overloeb, vaeltet,
+                               affald, roert, maalt, taendt, stativ, plade
+   Hooks fra laereren (../kemichael/kemichael.js og forsoegets laerer.js)
+   er frivillige: laererStart, laererNyt, opdaterLaerer, tegnLaerer,
+   overLaerer, klikLaerer, klikKop, laererOptaget, laererUheld(slags, gg).
+   ===================================================================== */
+(function () {
+    "use strict";
+
+    var NK = window.NK;
+    var Stof = NK.Stof;
+    var B = NK.Beholder;
+    var T = NK.Tegning;
+    var U = NK.Udstyr;
+    var r = NK.r;
+
+    var RYST = { FULD: 900, SPILD_FART: 650, SPILD_TID: 0.35 };
+    var SPATELSPIDS = 1500;   /* µmol fast stof paa en spatelspids */
+    var DRAABE = 0.05;        /* mL */
+    var SPROEJT = 10;         /* mL fra sproejteflasken */
+
+    function kopi(p) { return { x: p.x, y: p.y, v: p.v }; }
+
+    function udvid(a, b) {
+        var ud = {};
+        [a, b].forEach(function (o) { if (o) Object.keys(o).forEach(function (k) { ud[k] = o[k]; }); });
+        return ud;
+    }
+
+    NK.Bord = function (canvas, valg) {
+        valg = valg || {};
+        var S = NK.Scene = NK.Scene || {};
+        S.BREDDE = valg.bredde || 1120;
+        S.HOEJDE = valg.hoejde || 600;
+        S.BORD = valg.bord || 500;
+        S.HYLDE = valg.hylde === undefined ? { x0: 16, x1: 116, y: 268 } : valg.hylde;
+        S.ANKER = S.ANKER || {};
+        if (NK.Kemichael) Object.keys(NK.Kemichael.ANKER).forEach(function (n) { S.ANKER[n] = NK.Kemichael.ANKER[n]; });
+        S.skala = function (b, h) {
+            var s = Math.min(b / S.BREDDE, h / S.HOEJDE);
+            return { s: s, dx: (b - S.BREDDE * s) / 2, dy: (h - S.HOEJDE * s) / 2 };
+        };
+
+        this.canvas = canvas;
+        this.laerred = new NK.Laerred(canvas);
+        this.valg = valg;
+        this.plakat = valg.plakat || null;
+        this.reaktioner = valg.reaktioner || null;
+        this.stue = valg.stue || B.TEMP.stue;
+        this.specs = [];
+        this.g = {};
+        this.liste = [];
+        this.koer = new NK.Koer(this);
+        this.koer.vedAendring = function (grund) { this.aendret(grund); };
+        this.mikro = new NK.Mikro(valg.bobleR || 120);
+        this.boble = valg.boble || { x: 250, y: 168 };
+        this.vedBesked = null;
+        this.vedAendring = null;
+        this.vedHaendelse = null;
+        this.nulstilTilstand();
+        if (this.laererStart) this.laererStart();
+        if (S.HYLDE && NK.Sprites.FILER.kaffekop) this.lavKaffekop();
+    };
+
+    var P = NK.Bord.prototype;
+
+    P.nulstilTilstand = function () {
+        this.tid = 0;
+        this.holdt = null;
+        this.baerer = null;
+        this.hover = null;
+        this.slipMaal = null;
+        this.valgt = null;
+        this.mark = null;
+        this.straale = null;
+        this.draaber = [];
+        this.dampe = [];
+        this.pytter = [];
+        this.musFart = 0;
+        this.musVx = 0;
+        this.vold = 0;
+        this.uro = 0;
+        this.spildTid = 0;
+        this.ryst = 0;
+        this.skvulpUr = 0;
+        this.ryk = 0;
+        this.haandAlfa = 0;
+        this.bobleAlfa = 0;
+        this.bobleBeholder = null;
+        this.antalUheld = 0;
+        this.haendt = {};
+        this.roerer = null;
+    };
+
+    /* ----- Genstande ------------------------------------------------------ */
+    function staar(t, x, y) {
+        return { x: x - t.b / 2 + t.anker.x, y: y - t.h + t.anker.y, v: 0 };
+    }
+
+    P.lavKaffekop = function () {
+        var S = NK.Scene, F = NK.Sprites.FILER.kaffekop;
+        var t = { navn: "kaffekop", sprite: "kaffekop", b: F.b, h: F.h, anker: S.ANKER.kaffekop, kan: { fast: true }, titel: "kaffekoppen" };
+        var kop = { navn: "kaffekop", type: t, anker: t.anker, kan: t.kan, titel: t.titel, skjult: false, iHaand: false };
+        kop.p = staar(t, S.HYLDE.x0 + 44, S.HYLDE.y);
+        kop.hjem = kopi(kop.p);
+        this.g.kaffekop = kop;
+        this.liste.push(kop);
+    };
+
+    /* spec: { navn, type, x, y, etiket, titel, nr, indhold: { V, T, mM, umol },
+              stativ: navn, hul: i, paa: navn (varmeplade), p, taendt, kan, pulverMaks } */
+    P.tilfoej = function (spec) {
+        var S = NK.Scene;
+        var t = typeof spec.type === "string" ? U.type(spec.type) : spec.type;
+        var gg = {
+            navn: spec.navn, type: t, anker: t.anker, kan: udvid(t.kan, spec.kan),
+            titel: spec.titel || t.titel || spec.navn, etiket: spec.etiket || null, nr: spec.nr || 0,
+            skjult: false, p: null, hjem: null, sted: null, paa: null, i: null, rel: null,
+            T: this.stue, taendt: !!spec.taendt, last: null, indhold: null, lag: null, lagBund: false,
+            bund: 0, korn: [], niveau: null, pulverMaks: spec.pulverMaks || 0, valgt: false, svaev: null, spec: spec
+        };
+        if (gg.kan.holder) gg.indhold = spec.indhold ? Stof.lav(spec.indhold) : Stof.ny(this.stue);
+        if (gg.kan.stoette) gg.glas = t.huller.map(function () { return null; });
+        if (spec.p) gg.p = kopi(spec.p);
+        else if (spec.stativ) gg.p = { x: 0, y: 0, v: 0 };
+        else if (spec.paa) gg.p = { x: 0, y: 0, v: 0 };
+        else if (t.sprite) gg.p = staar(t, spec.x, spec.y === undefined ? S.BORD : spec.y);
+        else gg.p = { x: spec.x, y: (spec.y === undefined ? S.BORD : spec.y) - 3, v: -Math.PI / 2 };
+        gg.hjem = kopi(gg.p);
+        this.g[spec.navn] = gg;
+        this.liste.push(gg);
+        if (spec.stativ) this.iStativ(gg, this.g[spec.stativ], spec.hul, true);
+        if (spec.paa) this.paaPlade(gg, this.g[spec.paa], spec.x, true);
+        return gg;
+    };
+
+    P.byg = function (specs) {
+        var mig = this;
+        this.specs = specs.slice();
+        specs.forEach(function (s) { mig.tilfoej(s); });
+    };
+
+    /* Start forfra: alt staar, som da bordet blev bygget */
+    P.nulstil = function () {
+        var mig = this;
+        this.koer.afbryd();
+        this.nulstilTilstand();
+        this.mikro.nulstil();
+        this.g = {};
+        this.liste = [];
+        if (NK.Sprites.FILER.kaffekop && NK.Scene.HYLDE) this.lavKaffekop();
+        this.specs.forEach(function (s) { mig.tilfoej(s); });
+        if (this.laererNyt) this.laererNyt();
+        this.koppenVaek = false;
+        this.aendret("nulstil");
+    };
+
+    P.beholdere = function () {
+        return this.liste.filter(function (gg) { return B.er(gg) && !gg.skjult; });
+    };
+
+    P.synlig = function (gg) {
+        return !!(gg && !gg.skjult && !(gg.navn === "kaffekop" && gg.iHaand));
+    };
+
+    /* ----- Positioner og traefning ------------------------------------- */
+
+    /* Genstandens rektangel paa tegnebordet */
+    P.rekt = function (gg, pad) {
+        pad = pad || 0;
+        var t = gg.type, hj;
+        if (t.sprite) {
+            hj = [[-pad, -pad], [t.b + pad, -pad], [t.b + pad, t.h + pad], [-pad, t.h + pad]];
+        } else {
+            var L = t.laengde || 100;
+            hj = [[-7 - pad, -pad], [7 + pad, -pad], [7 + pad, L + pad], [-7 - pad, L + pad]];
+        }
+        var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+        hj.forEach(function (h) {
+            var w = NK.tilVerden(gg.p, gg.anker, h[0], h[1]);
+            x0 = Math.min(x0, w.x); y0 = Math.min(y0, w.y);
+            x1 = Math.max(x1, w.x); y1 = Math.max(y1, w.y);
+        });
+        return { x: x0, y: y0, b: x1 - x0, h: y1 - y0 };
+    };
+
+    /* Ligger punktet paa genstanden? */
+    P.inden = function (gg, pt, pad) {
+        pad = pad || 0;
+        var t = gg.type;
+        var l = NK.tilLokal(gg.p, gg.anker, pt.x, pt.y);
+        if (t.sprite) return l.x > -pad && l.x < t.b + pad && l.y > -pad && l.y < t.h + pad;
+        var L = t.laengde || 100;
+        return l.x > -7 - pad && l.x < 7 + pad && l.y > -pad && l.y < L + pad;
+    };
+
+    P.tilBord = function (ev) {
+        var rect = this.canvas.getBoundingClientRect();
+        var sk = NK.Scene.skala(this.laerred.b, this.laerred.h);
+        return { x: (ev.clientX - rect.left - sk.dx) / sk.s, y: (ev.clientY - rect.top - sk.dy) / sk.s };
+    };
+
+    /* Hvad ligger under punktet? Det oeverste foerst. */
+    P.hvad = function (pt) {
+        if (this.overLaerer) {
+            var l = this.overLaerer(pt);
+            if (l) return l;
+        }
+        for (var i = this.liste.length - 1; i >= 0; i--) {
+            var gg = this.liste[i];
+            if (!this.synlig(gg)) continue;
+            if (this.inden(gg, pt, gg.kan.fast ? 2 : 5)) return gg.navn;
+        }
+        return null;
+    };
+
+    P.grebbar = function (navn) {
+        var gg = this.g[navn];
+        if (!gg || gg.kan.fast || !this.synlig(gg)) return false;
+        if (this.koer.optaget() && this.koer.flytter(gg)) return false;
+        return true;
+    };
+
+    /* ----- Mus og beroering ------------------------------------------------ */
+    P.ned = function (pt) {
+        if (NK.Lyd) NK.Lyd.laasOp();
+        var navn = this.hvad(pt);
+        if (!navn) return false;
+        var laererOpt = this.laererOptaget && this.laererOptaget();
+        if (!laererOpt && !this.koer.optaget() && !this.baerer && this.grebbar(navn)) {
+            var gg = this.g[navn];
+            this.koer.slipFri(gg);
+            this.holdt = { navn: navn, start: pt, dx: pt.x - gg.p.x, dy: pt.y - gg.p.y, flyttet: false, sidst: pt, t: Date.now() };
+            return true;
+        }
+        this.klik(navn);
+        return false;
+    };
+
+    P.flyt = function (pt, nu) {
+        var h = this.holdt;
+        if (!h) { this.hover = this.hvad(pt); return; }
+        var gg = this.g[h.navn];
+        if (nu === undefined) nu = Date.now();
+        if (!h.flyttet) {
+            if (Math.abs(pt.x - h.start.x) + Math.abs(pt.y - h.start.y) < 8) return;
+            h.flyttet = true;
+            h.sidst = pt;
+            h.t = nu;
+            this.startBaer(gg);
+        }
+        var dts = Math.max(4, nu - h.t) / 1000;
+        var dx = pt.x - h.sidst.x, dy = pt.y - h.sidst.y;
+        this.musVx = NK.lerp(this.musVx, dx / dts, 0.5);
+        this.musFart = NK.lerp(this.musFart, Math.sqrt(dx * dx + dy * dy) / dts, 0.35);
+        h.sidst = pt;
+        h.t = nu;
+        var S = NK.Scene;
+        gg.p.x = NK.klamp(pt.x - h.dx, 20, S.BREDDE - 20);
+        gg.p.y = NK.klamp(pt.y - h.dy, 40, S.BORD + 40);
+        this.slipMaal = this.maalVed(gg, pt);
+    };
+
+    P.op = function () {
+        var h = this.holdt;
+        if (!h) return;
+        this.holdt = null;
+        if (!h.flyttet) { this.klik(h.navn); return; }
+        this.stopBaer(h.sidst);
+    };
+
+    P.bindMus = function () {
+        var mig = this, c = this.canvas;
+        c.addEventListener("pointerdown", function (ev) {
+            if (ev.button !== undefined && ev.button !== 0) return;
+            if (mig.ned(mig.tilBord(ev))) {
+                try { c.setPointerCapture(ev.pointerId); } catch (fejl) {}
+                ev.preventDefault();
+            }
+        });
+        c.addEventListener("pointermove", function (ev) {
+            mig.flyt(mig.tilBord(ev), ev.timeStamp || Date.now());
+            var hv = mig.hover;
+            var greb = hv && mig.grebbar(hv);
+            c.style.cursor = mig.holdt ? "grabbing" : (greb ? "grab" : (hv ? "pointer" : "default"));
+        });
+        c.addEventListener("pointerup", function () { mig.op(); });
+        c.addEventListener("pointercancel", function () { mig.op(); });
+        c.addEventListener("pointerleave", function () { if (!mig.holdt) mig.hover = null; });
+        c.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+    };
+
+    /* ----- At baere ------------------------------------------------------------ */
+    P.startBaer = function (gg) {
+        var mig = this;
+        this.baerer = gg;
+        this.spildTid = 0;
+        gg.svaev = null;
+        this.frigoer(gg);
+        /* Et termometer, der sidder i glasset, tages med op; en anden
+           genstand, der sidder i det, falder hjem */
+        this.liste.forEach(function (x) {
+            if (x.i === gg) { x.i = null; x.rel = null; mig.koer.start([NK.Koer.hjemTil(x, 0.5, 20)], "hjem"); }
+        });
+        if (gg.kan.holder) this.vaelg(gg.navn);
+        this.aendret("baer");
+    };
+
+    /* Loesner genstanden fra stativ, plade eller det glas, den sad i */
+    P.frigoer = function (gg) {
+        if (gg.sted) {
+            var st = gg.sted.stativ;
+            if (st && st.glas[gg.sted.hul] === gg) st.glas[gg.sted.hul] = null;
+            gg.sted = null;
+        }
+        if (gg.paa) gg.paa = null;
+        if (gg.i) { gg.i = null; gg.rel = null; }
+    };
+
+    P.stopBaer = function (pt) {
+        var gg = this.baerer;
+        this.baerer = null;
+        this.musFart = 0;
+        this.vold = 0;
+        this.uro = 0;
+        this.spildTid = 0;
+        if (gg) this.slip(gg, pt);
+        this.aendret("baer");
+    };
+
+    P.aaben = function (gg) {
+        return !!(gg.kan.holder && !gg.kan.flaske && !gg.kan.sproejter && !gg.kan.pulver && !gg.kan.drypper);
+    };
+
+    /* Rystning og spild, mens noget baeres */
+    P.opdaterRyst = function (dt) {
+        var bb = this.baerer;
+        var maal = 0;
+        this.uro = 0;
+        if (bb) {
+            this.musFart *= Math.exp(-4 * dt);
+            this.musVx *= Math.exp(-5 * dt);
+            this.vold = NK.mod(this.vold, this.musFart, 4, dt);
+            maal = NK.klamp(this.musFart / RYST.FULD, 0, 1);
+            var harVaeske = this.aaben(bb) && B.volumen(bb) > 0.1;
+            if (harVaeske) {
+                if (this.vold > RYST.SPILD_FART) this.spildTid += dt;
+                else this.spildTid = Math.max(0, this.spildTid - dt);
+                this.uro = NK.klamp(this.spildTid / RYST.SPILD_TID, 0, 1);
+            }
+            var hv = bb.type.sprite ? 0 : -Math.PI / 2;
+            bb.p.v = NK.mod(bb.p.v, hv + NK.klamp(-this.musVx * 0.0004, -0.4, 0.4), 12, dt) + (Math.random() - 0.5) * 0.14 * this.uro;
+            if (harVaeske && this.spildTid > 0.08 && Math.random() < dt * 14) {
+                var fo = B.farve(bb) || Stof.VAND;
+                var a = B.aabning(bb);
+                this.draaber.push({ x: a.x + r(-3, 3), y: a.y, vx: r(-90, 90), vy: -r(60, 160), rad: r(1.4, 2.4), liv: 1, farve: { r: fo.r, g: fo.g, b: fo.b, a: 0.8 }, fysik: true });
+            }
+            if (harVaeske && this.spildTid >= RYST.SPILD_TID) {
+                this.spild(bb, "rystet");
+                return;
+            }
+        }
+        this.ryst = NK.mod(this.ryst, maal, maal > this.ryst ? 6 : 3, dt);
+        this.skvulpUr -= dt;
+        if (this.ryst > 0.35 && this.skvulpUr <= 0 && NK.Lyd && NK.Lyd.skvulp) {
+            NK.Lyd.skvulp(this.ryst);
+            this.skvulpUr = 0.24 - 0.1 * this.ryst;
+        }
+    };
+
+    /* ----- Slip: moede eller saet ned ------------------------------------- */
+
+    /* Kan maal tage imod gg, naar gg slippes over det? */
+    P.kanModtage = function (gg, maal) {
+        if (!gg || !maal || gg === maal || !this.synlig(maal)) return false;
+        var k = gg.kan, m = maal.kan;
+        if (m.holder && !m.pulver) {
+            if (k.haelder && B.volumen(gg) > 0.05) return true;
+            if (k.drypper && B.volumen(gg) > 0.05) return true;
+            if (k.sproejter && B.volumen(gg) > 0.05) return true;
+            if (k.spatel && gg.last) return true;
+            if (k.roerer || k.maaler) return B.volumen(maal) > 0.1 || k.maaler;
+        }
+        if (m.pulver && k.spatel && !gg.last) return true;
+        if ((m.affald || m.vask) && k.holder && !B.tom(gg)) return true;
+        if (m.stoette && gg.type.navn === "reagensglas") return this.ledigtHul(maal) >= 0;
+        if (m.varmer && k.holder && !k.flaske && !k.drypper && !k.sproejter && !k.pulver && gg.type.navn !== "reagensglas") return true;
+        return false;
+    };
+
+    P.ledigtHul = function (st, naerX) {
+        var bedst = -1, afst = Infinity;
+        for (var i = 0; i < st.glas.length; i++) {
+            if (st.glas[i]) continue;
+            var d = naerX === undefined ? i : Math.abs(this.hulX(st, i) - naerX);
+            if (d < afst) { afst = d; bedst = i; }
+        }
+        return bedst;
+    };
+
+    P.hulX = function (st, i) { return st.p.x - st.anker.x + st.type.huller[i]; };
+
+    /* Hvad under punktet vil tage imod den baarne genstand? */
+    P.maalVed = function (gg, pt) {
+        if (!pt || !gg) return null;
+        if (gg.kan.papir) {
+            for (var k = 0; k < this.pytter.length; k++) {
+                var py = this.pytter[k];
+                if (py.vaad > 0.05 && Math.abs(pt.x - py.x) < py.rx + 30 && pt.y > NK.Scene.BORD - 60) return "pyt:" + k;
+            }
+            return null;
+        }
+        for (var i = this.liste.length - 1; i >= 0; i--) {
+            var c = this.liste[i];
+            if (c === gg || !this.synlig(c)) continue;
+            if (!this.inden(c, pt, c.kan.holder ? 10 : 6)) continue;
+            if (this.kanModtage(gg, c)) return c.navn;
+        }
+        return null;
+    };
+
+    P.slip = function (gg, pt) {
+        var maal = this.slipMaal || this.maalVed(gg, pt);
+        this.slipMaal = null;
+        if (maal && maal.indexOf("pyt:") === 0) { this.toerOp(gg, +maal.slice(4)); return; }
+        var c = maal ? this.g[maal] : null;
+        if (c && this.moede(gg, c, pt)) return;
+        this.saetNed(gg, pt);
+    };
+
+    /* Genstanden gg bruges paa c. Returnerer true, hvis der skete noget. */
+    P.moede = function (gg, c, pt) {
+        var k = gg.kan, m = c.kan;
+        if (m.affald || m.vask) return this.toemI(gg, c);
+        if (m.stoette && gg.type.navn === "reagensglas") return this.iStativ(gg, c, this.ledigtHul(c, pt ? pt.x : undefined));
+        if (m.varmer && k.holder) return this.paaPlade(gg, c, pt ? pt.x : undefined);
+        if (m.pulver && k.spatel) return this.fyldSpatel(gg, c);
+        if (m.holder) {
+            if (k.spatel && gg.last) return this.toemSpatel(gg, c);
+            if (k.drypper) return this.draabe(gg, c);
+            if (k.sproejter) return this.sproejt(gg, c);
+            if (k.haelder) return this.haeld(gg, c, gg.type.haeldMl);
+            if (k.roerer) return this.roer(gg, c);
+            if (k.maaler) return this.maal(gg, c);
+        }
+        return false;
+    };
+
+    P.brug = P.moede;
+
+    /* Genstanden saettes ned der, hvor den blev sluppet */
+    P.saetNed = function (gg, pt) {
+        var S = NK.Scene, t = gg.type;
+        var x = NK.klamp(pt ? pt.x : gg.p.x, 40, S.BREDDE - 40);
+        if (t.navn === "reagensglas") {
+            for (var i = 0; i < this.liste.length; i++) {
+                var st = this.liste[i];
+                if (!st.kan.stoette || !this.synlig(st)) continue;
+                var hul = this.ledigtHul(st, x);
+                if (hul >= 0 && Math.abs(this.hulX(st, hul) - x) < 26 && Math.abs(pt.y - (st.p.y - st.anker.y + st.type.hulY)) < 130) return this.iStativ(gg, st, hul);
+            }
+            this.vaelt(gg, x);
+            return true;
+        }
+        if (t.sprite) gg.p = staar(t, x, S.BORD);
+        else gg.p = { x: x, y: S.BORD - 3, v: -Math.PI / 2 };
+        gg.hjem = kopi(gg.p);
+        this.tilFront(gg);
+        this.haendelse("satNed", gg);
+        return true;
+    };
+
+    P.tilFront = function (gg) {
+        var i = this.liste.indexOf(gg);
+        if (i >= 0) { this.liste.splice(i, 1); this.liste.push(gg); }
+    };
+
+    /* Et reagensglas, der saettes paa bordet, vaelter */
+    P.vaelt = function (gg, x) {
+        var S = NK.Scene;
+        var mod = x > S.BREDDE / 2 ? -1 : 1;
+        gg.p = { x: x, y: S.BORD - 9, v: mod * Math.PI / 2 };
+        gg.hjem = kopi(gg.p);
+        this.tilFront(gg);
+        if (!B.tom(gg)) {
+            var fo = B.farve(gg) || Stof.VAND;
+            var farve = { r: fo.r, g: fo.g, b: fo.b, a: 0.85 };
+            var a = B.aabning(gg);
+            sproejt(this, a.x, a.y, farve, 14);
+            this.nyPyt(a.x, 40, farve);
+            B.toem(gg);
+            this.uheld("vaeltet", gg, gg.titel + " væltede, og indholdet løb ud.");
+            return;
+        }
+        this.besked(gg.titel + " væltede. Sæt det i stativet.", "advarsel");
+        this.haendelse("vaeltet", gg);
+    };
+
+    /* ----- Pladser: stativ og varmeplade ------------------------------------- */
+    P.iStativ = function (gg, st, hul, stille) {
+        if (!st || hul < 0 || hul === undefined || st.glas[hul]) return false;
+        this.frigoer(gg);
+        st.glas[hul] = gg;
+        gg.sted = { stativ: st, hul: hul };
+        var til = { x: this.hulX(st, hul), y: st.p.y - st.anker.y + st.type.hulY, v: 0 };
+        gg.hjem = kopi(til);
+        if (stille) gg.p = kopi(til);
+        else this.koer.start([{ flyt: gg, til: til, tid: 0.35, loeft: 0 }], "hjem");
+        /* Glasset tegnes lige efter stativet */
+        var i = this.liste.indexOf(gg), j = this.liste.indexOf(st);
+        if (i >= 0 && j >= 0 && i < j) { this.liste.splice(i, 1); this.liste.splice(this.liste.indexOf(st) + 1, 0, gg); }
+        this.haendelse("stativ", gg);
+        return true;
+    };
+
+    P.paaPlade = function (gg, plade, x, stille) {
+        if (!plade) return false;
+        var t = plade.type, p0 = plade.p.x - plade.anker.x, top = plade.p.y - plade.anker.y + t.plade.y;
+        var cx = NK.klamp(x === undefined ? p0 + t.b / 2 : x, p0 + t.plade.x0 + gg.type.b / 2, p0 + t.plade.x1 - gg.type.b / 2);
+        this.frigoer(gg);
+        gg.paa = plade;
+        var til = staar(gg.type, cx, top);
+        gg.hjem = kopi(til);
+        if (stille) gg.p = kopi(til);
+        else this.koer.start([{ flyt: gg, til: til, tid: 0.35, loeft: 10 }], "hjem");
+        this.tilFront(gg);
+        this.haendelse("plade", gg);
+        return true;
+    };
+
+    /* ----- Beskeder, valg, markering ------------------------------------------ */
+    P.besked = function (tekst, slags) {
+        if (this.vedBesked) this.vedBesked(tekst, slags || "info");
+    };
+
+    P.aendret = function (grund) {
+        if (this.vedAendring) this.vedAendring(grund);
+    };
+
+    P.haendelse = function (type, data) {
+        if (this.vedHaendelse) this.vedHaendelse(type, data);
+    };
+
+    P.uheld = function (slags, gg, tekst) {
+        this.antalUheld++;
+        this.haendt[slags + "_" + gg.navn] = true;
+        this.ryk = 4;
+        if (NK.Lyd && NK.Lyd.plask) NK.Lyd.plask();
+        if (tekst) this.besked(tekst, "advarsel");
+        this.haendelse(slags, gg);
+        if (this.laererUheld) this.laererUheld(slags, gg);
+        this.aendret("uheld");
+    };
+
+    P.vaelg = function (navn) {
+        if (this.valgt === navn) return;
+        var mig = this;
+        this.valgt = navn;
+        this.liste.forEach(function (gg) { gg.valgt = gg.navn === navn; });
+        this.aendret("valg");
+    };
+
+    P.valgtBeholder = function () {
+        var c = this.valgt ? this.g[this.valgt] : null;
+        return c && this.synlig(c) && B.er(c) ? c : null;
+    };
+
+    P.markér = function (navn, sek) {
+        this.mark = { navn: navn, ur: sek || 3 };
+    };
+
+    P.markeret = function (navn) {
+        return !!(this.mark && this.mark.navn === navn && this.mark.ur > 0);
+    };
+
+    P.optaget = function () {
+        return this.koer.optaget();
+    };
+
+    /* ----- Klik --------------------------------------------------------------- */
+    P.klik = function (navn) {
+        if (NK.Lyd) NK.Lyd.laasOp();
+        if (navn === "laerer") return this.klikLaerer ? this.klikLaerer() : false;
+        if (navn === "kaffekop") return this.klikKop ? this.klikKop() : false;
+        if (this.laererOptaget && this.laererOptaget()) return false;
+        if (this.koer.optaget() || this.baerer) return false;
+        var gg = this.g[navn];
+        if (!gg || !this.synlig(gg)) return false;
+        var k = gg.kan;
+        if (k.varmer) {
+            gg.taendt = !gg.taendt;
+            if (NK.Lyd && NK.Lyd.kontakt) NK.Lyd.kontakt();
+            this.besked(gg.taendt ? "Varmepladen er tændt." : "Varmepladen er slukket.");
+            this.haendelse("taendt", gg);
+            this.aendret("plade");
+            return true;
+        }
+        if (k.pulver) {
+            var sp = this.foersteMed("spatel");
+            if (sp && !sp.last) return this.fyldSpatel(sp, gg);
+            this.besked("Tag fat i spatlen, og slip den over pulverglasset.");
+            return false;
+        }
+        if (this.aaben(gg) && k.holder) {
+            if (gg.svaev) return false;
+            this.vaelg(navn);
+            this.besked(gg.titel + " er valgt.");
+            return true;
+        }
+        if (gg.svaev && k.drypper) return this.draabe(gg, gg.svaev.maal);
+        var maal = this.valgtBeholder();
+        if (maal && this.kanModtage(gg, maal)) return this.moede(gg, maal);
+        if (k.spatel && !gg.last) { this.besked("Slip spatlen over et pulverglas for at tage en spatelspids."); return false; }
+        this.besked("Klik på et glas for at vælge det, eller tag fat i udstyret og slip det over glasset.");
+        return false;
+    };
+
+    P.foersteMed = function (egenskab) {
+        for (var i = 0; i < this.liste.length; i++) if (this.liste[i].kan[egenskab] && this.synlig(this.liste[i])) return this.liste[i];
+        return null;
+    };
+
+    /* ----- Handlingerne ------------------------------------------------------- */
+
+    /* Beholderen loeber over: det overskydende sproejter ud og bliver en pyt */
+    P.tjekOverloeb = function (c) {
+        var ud = B.overloeb(c);
+        if (!ud) return false;
+        var o = B.aabning(c);
+        var fo = Stof.farve(ud, c.type.vejlaengde) || Stof.VAND;
+        var farve = { r: fo.r, g: fo.g, b: fo.b, a: 0.8 };
+        for (var i = 0; i < 18; i++) {
+            this.draaber.push({ x: o.x + r(-8, 8), y: o.y + 2, vx: r(-120, 120), vy: -r(40, 160), rad: r(1.4, 2.6), liv: 1, farve: farve, fysik: true });
+        }
+        this.nyPyt(o.x, c.type.maks < 30 ? 44 : 70, farve);
+        this.uheld("overloeb", c, c.titel + " løber over.");
+        return true;
+    };
+
+    P.nyPyt = function (x, rx, farve) {
+        var S = NK.Scene;
+        this.pytter.push({ x: NK.klamp(x, 120, S.BREDDE - 120), rx: 8, rxMaal: rx, farve: farve, vaad: 1 });
+        if (this.pytter.length > 6) this.pytter.shift();
+    };
+
+    function sproejt(f, x, y, farve, n) {
+        for (var i = 0; i < n; i++) {
+            f.draaber.push({ x: x + r(-4, 4), y: y, vx: r(-240, 240), vy: -r(120, 360), rad: r(1.6, 3), liv: 1, farve: farve, fysik: true });
+        }
+    }
+
+    /* Et aabent glas blev rystet saa voldsomt, at indholdet sproejtede ud */
+    P.spild = function (gg, slags) {
+        this.holdt = null;
+        this.baerer = null;
+        this.slipMaal = null;
+        this.spildTid = 0;
+        this.uro = 0;
+        this.musFart = 0;
+        this.vold = 0;
+        var fo = B.farve(gg) || Stof.VAND;
+        var farve = { r: fo.r, g: fo.g, b: fo.b, a: 0.85 };
+        var a = B.aabning(gg);
+        sproejt(this, a.x, a.y, farve, 26);
+        this.nyPyt(gg.p.x, gg.type.maks < 30 ? 56 : 66, farve);
+        B.toem(gg);
+        this.koer.start([NK.Koer.hjemTil(gg, 0.6, 20)], "hjem");
+        this.uheld(slags || "spild", gg, "Det skvulpede ud. Indholdet er tabt.");
+    };
+
+    /* Haeldning fra gg til c. mL = 0: alt */
+    P.haeld = function (gg, c, mL) {
+        var mig = this;
+        var V = B.volumen(gg);
+        if (V < 0.05) { this.besked(gg.titel + " er tom."); return false; }
+        mL = Math.min(V, mL || V);
+        var tid = Math.min(1.6, 0.5 + mL * 0.03);
+        var givet = 0, loebOver = false;
+        var farve = B.farve(gg) || Stof.VAND;
+        if (this.aaben(c)) this.vaelg(c.navn);
+        this.koer.start([
+            { flyt: gg, til: function () { return B.haeldPositur(gg, c); }, tid: 0.75, loeft: 40 },
+            { kald: function () { if (NK.Lyd && NK.Lyd.haeld) NK.Lyd.haeld(tid); } },
+            { tid: tid, hver: function (t) {
+                var nu = mL * t;
+                if (!loebOver && nu > givet) {
+                    B.haeldI(c, B.udtag(gg, nu - givet));
+                    if (mig.tjekOverloeb(c)) loebOver = true;
+                }
+                givet = nu;
+                var tud = B.tudVerden(gg), o = B.aabning(c);
+                mig.straale = { fra: tud, til: { x: o.x, y: c.niveau === null || c.niveau === undefined ? o.y + 60 : c.niveau }, farve: farve, bredde: gg.type.maks > 100 ? 3 : 2 };
+            } },
+            { kald: function () {
+                mig.straale = null;
+                mig.haendelse("haeldt", { fra: gg, til: c, mL: givet, loebOver: loebOver });
+                mig.aendret("haeldt");
+            } },
+            NK.Koer.hjemTil(gg, 0.8, 40)
+        ], "haeld");
+        return true;
+    };
+
+    /* Alt haeldes i affaldsdunken eller vasken */
+    P.toemI = function (gg, c) {
+        var mig = this;
+        if (B.tom(gg)) return false;
+        var farve = B.farve(gg) || Stof.VAND;
+        var tid = Math.min(1.5, 0.4 + B.volumen(gg) * 0.02);
+        var o = B.aabning(c);
+        var over = c.kan.vask ? 40 : 24;
+        var vaek = null;
+        this.koer.start([
+            { flyt: gg, til: function () { return B.haeldPositur(gg, c, over); }, tid: 0.75, loeft: 40 },
+            { kald: function () { if (NK.Lyd && NK.Lyd.haeld) NK.Lyd.haeld(tid); vaek = B.udtagAlt(gg); } },
+            { tid: tid, hver: function () {
+                var tud = B.tudVerden(gg);
+                mig.straale = { fra: tud, til: { x: o.x, y: o.y + 30 }, farve: farve, bredde: 2.5 };
+            } },
+            { kald: function () {
+                mig.straale = null;
+                mig.haendelse(c.kan.vask ? "vask" : "affald", { fra: gg, til: c, indhold: vaek });
+                mig.aendret("affald");
+            } },
+            NK.Koer.hjemTil(gg, 0.8, 40)
+        ], "affald");
+        return true;
+    };
+
+    /* Én draabe fra draabeflasken. Flasken bliver haengende lidt, saa der
+       kan dryppes igen med et klik. */
+    P.draabe = function (gg, c) {
+        var mig = this;
+        if (B.volumen(gg) < 0.05) { this.besked(gg.titel + " er tom."); return false; }
+        if (this.aaben(c)) this.vaelg(c.navn);
+        function dryp() {
+            var tip = NK.tilVerden(gg.p, gg.anker, gg.anker.x, gg.anker.y);
+            var d = Stof.del(gg.indhold, DRAABE);
+            var fo = Stof.farve(d, 3) || Stof.VAND;
+            mig.draaber.push({ x: tip.x, y: tip.y + 2, vx: 0, vy: 30, rad: 3.2, liv: 1, farve: { r: fo.r, g: fo.g, b: fo.b, a: fo.a }, c: c, opl: d });
+            if (NK.Lyd && NK.Lyd.plip) NK.Lyd.plip();
+            gg.svaev = { maal: c, ur: 3.5 };
+        }
+        if (gg.svaev && gg.svaev.maal === c && !this.koer.optaget()) { dryp(); return true; }
+        this.koer.start([
+            { flyt: gg, til: function () { return B.overAabning(gg, c, 0, -26, Math.PI); }, tid: 0.6, loeft: 30 },
+            { tid: 0.15 },
+            { kald: dryp }
+        ], "dryp");
+        return true;
+    };
+
+    P.draabeLander = function (dr) {
+        var c = dr.c;
+        B.haeldI(c, dr.opl);
+        this.tjekOverloeb(c);
+        this.haendelse("dryppet", { til: c });
+        this.aendret("dryp");
+    };
+
+    /* En sjat vand fra sproejteflasken */
+    P.sproejt = function (gg, c) {
+        var mig = this;
+        if (B.volumen(gg) < 0.05) { this.besked(gg.titel + " er tom."); return false; }
+        var mL = Math.min(SPROEJT, B.volumen(gg)), givet = 0, loebOver = false;
+        if (this.aaben(c)) this.vaelg(c.navn);
+        this.koer.start([
+            { flyt: gg, til: function () { return B.overAabning(gg, c, -12, -34, 0.55); }, tid: 0.6, loeft: 30 },
+            { kald: function () { if (NK.Lyd && NK.Lyd.haeld) NK.Lyd.haeld(0.8); } },
+            { tid: 0.8, hver: function (t) {
+                var nu = mL * t;
+                if (!loebOver && nu > givet) {
+                    B.haeldI(c, Stof.del(gg.indhold, nu - givet));
+                    if (mig.tjekOverloeb(c)) loebOver = true;
+                }
+                givet = nu;
+                var tud = B.tudVerden(gg), o = B.aabning(c);
+                mig.straale = { fra: tud, til: { x: o.x, y: c.niveau === null || c.niveau === undefined ? o.y + 60 : c.niveau }, farve: { r: 200, g: 228, b: 245, a: 0.6 }, bredde: 2 };
+            } },
+            { kald: function () { mig.straale = null; mig.haendelse("haeldt", { fra: gg, til: c, mL: givet, loebOver: loebOver }); mig.aendret("sproejt"); } },
+            NK.Koer.hjemTil(gg, 0.7, 30)
+        ], "sproejt");
+        return true;
+    };
+
+    /* Spatlen tager en spatelspids fra pulverglasset */
+    P.fyldSpatel = function (sp, jar) {
+        var mig = this;
+        var liste = Stof.faste(jar.indhold);
+        if (!liste.length) { this.besked(jar.titel + " er tomt."); return false; }
+        var f = liste[0];
+        this.koer.start([
+            { flyt: sp, til: function () { return B.overAabning(sp, jar, 6, 6, 0.55); }, tid: 0.55, loeft: 30 },
+            { tid: 0.25 },
+            { kald: function () {
+                var umol = Math.min(SPATELSPIDS, f.umol);
+                Stof.tilsaet(jar.indhold, f.navn, -umol);
+                sp.last = { navn: f.navn, umol: umol, farve: f.stof.farve || { r: 230, g: 230, b: 230 } };
+                mig.haendelse("spatel", { fra: jar, stof: f.navn });
+                mig.aendret("spatel");
+            } },
+            NK.Koer.hjemTil(sp, 0.6, 30)
+        ], "spatel");
+        return true;
+    };
+
+    /* Spatelspidsen haeldes i glasset */
+    P.toemSpatel = function (sp, c) {
+        var mig = this;
+        if (!sp.last) return false;
+        if (this.aaben(c)) this.vaelg(c.navn);
+        var last = sp.last;
+        this.koer.start([
+            { flyt: sp, til: function () { return B.overAabning(sp, c, 0, -12, -0.5); }, tid: 0.55, loeft: 30 },
+            { tid: 0.5, hver: function (t) {
+                if (Math.random() < 0.6) {
+                    var m = NK.tilVerden(sp.p, sp.anker, sp.type.ske.x, sp.type.ske.y);
+                    mig.draaber.push({ x: m.x + r(-3, 3), y: m.y, vx: r(-8, 8), vy: r(20, 60), rad: 1.5, liv: 1, farve: last.farve, korn: true, c: c });
+                }
+                if (t > 0.9) sp.last = null;
+            } },
+            { kald: function () {
+                B.tilsaetFast(c, last.navn, last.umol);
+                sp.last = null;
+                mig.haendelse("fast", { til: c, stof: last.navn, umol: last.umol });
+                mig.aendret("fast");
+            } },
+            NK.Koer.hjemTil(sp, 0.6, 30)
+        ], "spatel");
+        return true;
+    };
+
+    /* Glasstaven roerer rundt */
+    P.roer = function (gg, c) {
+        var mig = this;
+        if (B.volumen(c) < 0.1) { this.besked(c.titel + " er tomt."); return false; }
+        if (this.aaben(c)) this.vaelg(c.navn);
+        var o = B.aabning(c);
+        var dyb = Math.min(gg.type.laengde - 30, c.type.h * 0.7);
+        this.koer.start([
+            { flyt: gg, til: function () { return { x: o.x, y: o.y - (gg.type.laengde - dyb), v: 0.12 }; }, tid: 0.5, loeft: 30 },
+            { kald: function () { mig.roerer = c; } },
+            { tid: 1.4, hver: function (t) {
+                var oo = B.aabning(c);
+                gg.p.x = oo.x + Math.sin(t * 22) * 5;
+                gg.p.v = 0.12 + Math.cos(t * 22) * 0.1;
+            } },
+            { kald: function () { mig.roerer = null; mig.haendelse("roert", { til: c }); mig.aendret("roert"); } },
+            NK.Koer.hjemTil(gg, 0.6, 30)
+        ], "roer");
+        return true;
+    };
+
+    /* Termometeret saettes i glasset og bliver der */
+    P.maal = function (gg, c) {
+        var mig = this;
+        if (this.aaben(c)) this.vaelg(c.navn);
+        var o = B.aabning(c);
+        var dyb = Math.min(gg.type.laengde - 40, c.type.h * 0.6);
+        var til = { x: o.x + 5, y: o.y - (gg.type.laengde - dyb), v: 0.1 };
+        this.koer.start([
+            { flyt: gg, til: til, tid: 0.5, loeft: 30 },
+            { kald: function () {
+                mig.frigoer(gg);
+                gg.i = c;
+                gg.rel = { dx: gg.p.x - c.p.x, dy: gg.p.y - c.p.y, v: gg.p.v };
+                gg.hjem = kopi(gg.p);
+                mig.tilFront(gg);
+                mig.haendelse("maalt", { til: c });
+                mig.aendret("maalt");
+            } }
+        ], "maal");
+        return true;
+    };
+
+    /* Koekkenrullen toerrer en pyt op */
+    P.toerOp = function (gg, k) {
+        var mig = this, py = this.pytter[k];
+        if (!py) { this.saetNed(gg, gg.p); return false; }
+        var S = NK.Scene;
+        this.koer.start([
+            { flyt: gg, til: { x: py.x, y: S.BORD - 12, v: 0 }, tid: 0.4, loeft: 10 },
+            { tid: 1.0, hver: function (t) {
+                gg.p.x = py.x + Math.sin(t * 18) * py.rx * 0.5;
+                py.vaad = Math.max(0, 1 - t * 1.1);
+            } },
+            { kald: function () {
+                if (NK.Lyd && NK.Lyd.papir) NK.Lyd.papir();
+                mig.pytter.splice(mig.pytter.indexOf(py), 1);
+                mig.haendelse("toerret", gg);
+            } },
+            NK.Koer.hjemTil(gg, 0.6, 20)
+        ], "toer");
+        return true;
+    };
+
+    /* Laereren eller siden toerrer alle pytter op */
+    P.toerAlt = function () {
+        this.pytter = [];
+    };
+
+    /* ----- Tidens gang -------------------------------------------------------- */
+    P.omgivelser = function (gg) {
+        var s = { T: this.stue, tau: B.TEMP.tauLuft, ryst: 0, roer: false };
+        if (gg.paa && gg.paa.taendt) { s.T = gg.paa.T; s.tau = B.TEMP.tauVarme; }
+        else if (gg.paa) { s.T = Math.max(this.stue, gg.paa.T); s.tau = B.TEMP.tauVarme; }
+        if (this.baerer === gg) s.ryst = this.ryst;
+        if (this.roerer === gg) { s.roer = true; s.ryst = Math.max(s.ryst, 0.6); }
+        return s;
+    };
+
+    P.opdater = function (dt) {
+        var mig = this, i;
+        if (dt > 0.1) dt = 0.1;
+        this.tid += dt;
+
+        this.koer.opdater(dt);
+        this.opdaterRyst(dt);
+        if (this.opdaterLaerer) this.opdaterLaerer(dt);
+
+        if (this.mark) { this.mark.ur -= dt; if (this.mark.ur <= 0) this.mark = null; }
+        this.ryk = this.ryk > 0.2 ? this.ryk * (1 - dt * 7) : 0;
+
+        this.liste.forEach(function (gg) {
+            if (gg.kan.varmer) {
+                var maalT = gg.taendt ? gg.type.temperatur : mig.stue;
+                gg.T = NK.mod(gg.T, maalT, gg.taendt ? 0.12 : 0.06, dt);
+            }
+        });
+
+        this.beholdere().forEach(function (c) {
+            var s = mig.omgivelser(c);
+            B.skridt(c, dt, s, mig.reaktioner);
+            if (c.indhold.T > B.TEMP.kog) c.indhold.T = B.TEMP.kog;
+            if (c.koger) {
+                var o = B.aabning(c);
+                if (Math.random() < dt * 6) mig.dampe.push({ x: o.x + r(-8, 8), y: (c.niveau || o.y + 20) - 2, vx: r(-6, 6), vy: r(-26, -14), rad: r(5, 9), liv: 0.9 });
+            }
+        });
+
+        /* Termometre foelger det glas, de sidder i */
+        this.liste.forEach(function (gg) {
+            if (gg.kan.maaler) {
+                var c = gg.i;
+                if (c) {
+                    gg.p.x = c.p.x + gg.rel.dx; gg.p.y = c.p.y + gg.rel.dy; gg.p.v = gg.rel.v + c.p.v;
+                    gg.hjem = kopi(gg.p);
+                    gg.T = NK.mod(gg.T, B.volumen(c) > 0.1 ? c.indhold.T : mig.stue, 1.6, dt);
+                } else if (mig.baerer !== gg) {
+                    gg.T = NK.mod(gg.T, mig.stue, 0.25, dt);
+                }
+            }
+            if (gg.svaev) {
+                gg.svaev.ur -= dt;
+                var m = gg.svaev.maal;
+                if (mig.baerer === m || mig.baerer === gg || !mig.synlig(m)) gg.svaev.ur = 0;
+                if (gg.svaev.ur <= 0 && !mig.koer.igang()) {
+                    gg.svaev = null;
+                    mig.koer.start([NK.Koer.hjemTil(gg, 0.6, 40)], "hjem");
+                }
+            }
+        });
+
+        this.opdaterEffekter(dt);
+
+        /* Zoomboblen viser den valgte beholder */
+        var v = this.valgtBeholder();
+        var vis = !!v && (B.volumen(v) > 0.05 || this.mikro.partikler.length > 0) && this.koer.navn() !== "affald";
+        if (vis) {
+            this.bobleBeholder = v;
+            this.mikro.opdater(dt, Stof.partikelTal(B.samlet(v), 12), { ryst: this.omgivelser(v).ryst });
+        } else this.mikro.opdater(dt, {}, { ryst: 0 });
+        this.bobleAlfa = NK.mod(this.bobleAlfa, vis ? 1 : 0, 5, dt);
+
+        this.haandAlfa = NK.mod(this.haandAlfa, this.baerer && this.baerer.type.navn === "reagensglas" ? 1 : 0, 10, dt);
+    };
+
+    P.opdaterEffekter = function (dt) {
+        var S = NK.Scene, i;
+        for (i = this.draaber.length - 1; i >= 0; i--) {
+            var dr = this.draaber[i];
+            dr.vy += 900 * dt;
+            dr.y += dr.vy * dt;
+            dr.x += (dr.vx || 0) * dt;
+            if (dr.fysik) {
+                if (dr.y > S.BORD - 1) this.draaber.splice(i, 1);
+                continue;
+            }
+            var c = dr.c;
+            var flade = c.niveau !== null && c.niveau !== undefined ? c.niveau : B.aabning(c).y + Math.min(60, c.type.h * 0.5);
+            if (dr.y >= flade) {
+                this.draaber.splice(i, 1);
+                if (dr.opl) this.draabeLander(dr);
+            }
+        }
+        this.pytter.forEach(function (py) { py.rx = NK.mod(py.rx, py.rxMaal, 3, dt); });
+        for (i = this.dampe.length - 1; i >= 0; i--) {
+            var p = this.dampe[i];
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+            p.rad += 6 * dt;
+            p.liv -= dt * 0.5;
+            if (p.liv <= 0) this.dampe.splice(i, 1);
+        }
+        if (this.dampe.length > 60) this.dampe.splice(0, this.dampe.length - 60);
+    };
+
+    /* ----- Tegning ------------------------------------------------------------ */
+    P.tilpas = function () {
+        return this.laerred.tilpas();
+    };
+
+    P.staarPaaBord = function (gg) {
+        var S = NK.Scene;
+        if (!gg.type.sprite || gg.sted || gg.i) return false;
+        var bund = gg.p.y - gg.anker.y + gg.type.h;
+        var underlag = gg.paa ? gg.paa.p.y - gg.paa.anker.y + gg.paa.type.plade.y : S.BORD;
+        return Math.abs(gg.p.v) < 0.05 && Math.abs(bund - underlag) < 3;
+    };
+
+    P.tegnGenstand = function (ctx, gg, tid) {
+        var t = gg.type, k = gg.kan;
+        if (gg.navn === "kaffekop") {
+            if (!gg.skjult && !gg.iHaand) NK.Sprites.tegnPositur(ctx, "kaffekop", gg.p, gg.anker);
+            return;
+        }
+        if (this.staarPaaBord(gg) && !k.fast) T.skygge(ctx, gg.p.x - gg.anker.x + t.b / 2, t.b * 0.45, 0.3, gg.p.y - gg.anker.y + t.h - 3);
+        if (k.varmer) T.tegnVarmeplade(ctx, gg, tid);
+        else if (k.holder) gg.niveau = T.tegnBeholder(ctx, gg, tid, { boelge: this.baerer === gg ? this.ryst * 1.5 : (this.roerer === gg ? 0.8 : 0) });
+        else if (k.spatel) T.tegnSpatel(ctx, gg);
+        else if (k.roerer) T.tegnStav(ctx, gg);
+        else if (k.maaler) T.tegnTermometer(ctx, gg, !!gg.i || this.baerer === gg);
+        else if (t.sprite) {
+            if (k.fast) T.skygge(ctx, gg.p.x - gg.anker.x + t.b / 2, t.b * 0.45, 0.3, gg.p.y - gg.anker.y + t.h - 3);
+            NK.Sprites.tegnPositur(ctx, t.sprite, gg.p, gg.anker);
+            T.tegnEtiket(ctx, gg);
+        }
+        if (this.markeret(gg.navn)) T.tegnMarkering(ctx, this.rekt(gg, 0), tid);
+    };
+
+    P.tegn = function () {
+        var L = this.laerred, ctx = L.ctx, S = NK.Scene, mig = this;
+        var tid = this.tid;
+        ctx.clearRect(0, 0, L.b, L.h);
+        var sk = S.skala(L.b, L.h);
+        ctx.save();
+        ctx.translate(sk.dx, sk.dy);
+        ctx.scale(sk.s, sk.s);
+        if (this.ryk > 0) ctx.translate((Math.random() - 0.5) * this.ryk, (Math.random() - 0.5) * this.ryk);
+
+        var lv = this.laererVisning ? this.laererVisning() : {};
+        T.tegnBaggrund(ctx, { plakat: this.plakat ? { x: this.plakat.x, y: this.plakat.y, regel: lv.plakatRegel || 0 } : null });
+
+        this.pytter.forEach(function (py) { T.tegnPyt(ctx, py); });
+
+        var sidst = [];
+        this.liste.forEach(function (gg) {
+            if (!mig.synlig(gg)) return;
+            if (gg === mig.baerer || (gg.i && gg.i === mig.baerer)) { sidst.push(gg); return; }
+            mig.tegnGenstand(ctx, gg, tid);
+        });
+
+        if (this.slipMaal) {
+            if (this.slipMaal.indexOf("pyt:") === 0) {
+                var py = this.pytter[+this.slipMaal.slice(4)];
+                if (py) T.tegnSlipMaal(ctx, { x: py.x - py.rx, y: S.BORD - 8, b: py.rx * 2, h: 14 }, tid);
+            } else {
+                var m = this.g[this.slipMaal];
+                if (m) T.tegnSlipMaal(ctx, this.rekt(m, 0), tid);
+            }
+        }
+
+        if (this.straale) T.tegnStraale(ctx, this.straale.fra, this.straale.til, this.straale.farve, this.straale.bredde, tid);
+        sidst.forEach(function (gg) { mig.tegnGenstand(ctx, gg, tid); });
+        if (this.baerer && this.haandAlfa > 0.01) {
+            var bb = this.baerer;
+            T.tegnHaand(ctx, { x: bb.p.x + 2, y: bb.p.y + 70, v: bb.p.v }, this.haandAlfa);
+        }
+        T.tegnDraaber(ctx, this.draaber);
+        T.tegnDampe(ctx, this.dampe);
+
+        if (this.tegnLaerer) this.tegnLaerer(ctx, tid);
+
+        var vb = this.bobleBeholder;
+        if (vb && this.bobleAlfa > 0.01) {
+            var fo = B.farve(vb) || Stof.VAND;
+            this.mikro.tegn(ctx, this.boble.x, this.boble.y, this.bobleAlfa, tid, this.synlig(vb) ? B.aabning(vb) : null, { r: fo.r * 0.35, g: fo.g * 0.35, b: fo.b * 0.35 });
+        }
+        ctx.restore();
+    };
+}());

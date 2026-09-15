@@ -52,7 +52,11 @@
             farve: e.farve || null,
             k: e.k || 0,
             dansk: e.navn || e.formel || navn,
-            M: e.M || 0
+            M: e.M || 0,
+            /* korn: fast stof, der tegnes som korn i bunden (pulver, der
+               endnu ikke er oploest); ellers tegnes det som bundfald */
+            korn: !!e.korn,
+            atomer: e.atomer || null
         };
         STOFFER[navn] = s;
         return s;
