@@ -12,8 +12,8 @@
     var TUR = [
         { sel: "#scene", titel: "Laboratoriet", tekst: "Klik på genstandene for at bruge dem. Flaskerne, vejebåden og kolben trækkes derhen, hvor de skal bruges. Hanen på buretten åbnes og lukkes med et klik." },
         { sel: "#forloeb-kort", titel: "Forløbet", tekst: "Trinene får flueben, efterhånden som du når dem. Hint hjælper med det trin, du er ved." },
-        { sel: "#maal-kort", titel: "Måleskema", tekst: "Vejningen og aflæsningerne af buretten skrives ind her. Til sidst beregner du jernindholdet." },
-        { sel: "#iagttagelser-kort", titel: "Iagttagelser", tekst: "Det, du ser undervejs, bliver skrevet her." },
+        { sel: "#maal-kort", titel: "Beregning", tekst: "Vejningen og aflæsningerne af buretten skrives ind her. Til sidst beregner du jernindholdet." },
+        { sel: "#serie-kort", titel: "Tegneserie", tekst: "Låses op, når jernindholdet er beregnet. Den viser forsøget, fejlene undervejs og resultaterne." },
         { sel: "#quiz-kort", titel: "Quiz", tekst: "Låses op, når du har fundet jernindholdet i et forsøg med svovlsyre." },
         { sel: "#nytknap", titel: "Nyt forsøg", tekst: "Starter forfra. Resultaterne bliver stående, så forsøgene kan sammenlignes." },
         { sel: "#introknap", titel: "Om forsøget", tekst: "Hvad forsøget undersøger, og forløbet i korte træk." }

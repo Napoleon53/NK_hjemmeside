@@ -79,7 +79,8 @@
         if (s.scene !== this.scene) this.scene = s.scene;
         if (s.syre !== this.syre) this.saetSyre(s.syre);
         if (s.scene === "buret") {
-            this.visV = Math.abs(this.visV - s.V) > 3 ? s.V : NK.mod(this.visV, s.V, 8, dt);
+            /* Uden udjaevning: lukkes hanen, staar menisken stille med det samme */
+            this.visV = s.V;
             return;
         }
         var fart = 1 + 2 * (s.ryst || 0);

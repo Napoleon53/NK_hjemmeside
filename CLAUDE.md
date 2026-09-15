@@ -36,6 +36,9 @@ statiske sider i roden, downloads i `downloads/`.
 - Forkerte handlinger i et forsøg afvises ikke med en besked, når det kan
   undgås. De udføres og giver et uheld, og Kemichael kommer og rydder op
   (`kemichael/`). Kun det, der fysisk ikke kan lade sig gøre, afvises.
+- Eleven skal kunne bevæge sig frit i forsøget og lave vanvittige fejl.
+  Kemichael lader det ske og kommer med en sarkastisk bemærkning om, at man
+  nok bør starte et nyt forsøg, men eleven kan altid fortsætte.
 
 ## Layout
 
