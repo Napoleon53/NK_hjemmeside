@@ -177,51 +177,24 @@
         margin-bottom: 8px;
     }
 
-    /* Tæller og nævner */
-    .led { margin-bottom: 11px; }
+    /* Koncentrationer */
+    .konc-linje { font-size: 0.95rem; margin-bottom: 4px; white-space: nowrap; }
+    .konc-linje + .brok-linje { margin-top: 12px; }
 
-    .led-linje {
-        display: flex;
-        align-items: baseline;
-        gap: 8px;
-        font-size: 0.95rem;
-        white-space: nowrap;
-        margin-bottom: 5px;
-    }
-
-    .led-navn {
-        width: 58px;
-        flex-shrink: 0;
+    /* Tæller og nævner i forklaringsboksen */
+    .tempo-raekke { display: grid; grid-template-columns: 1fr 56px; gap: 5px 12px; align-items: center; margin: 12px 0; }
+    .tempo-tekst { grid-column: 1 / -1; }
+    .tempo-navn {
+        display: inline-block;
+        width: 68px;
         font-size: 0.75rem;
-        letter-spacing: 0.06em;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
         color: var(--muted);
     }
-
-    .bar-linje { display: flex; align-items: center; gap: 10px; }
-
-    .bar {
-        flex: 1;
-        position: relative;
-        height: 9px;
-        border-radius: 5px;
-        background: #3b3b4c;
-    }
-    .bar-fyld { position: absolute; top: 0; bottom: 0; left: 0; width: 0; border-radius: 5px; }
-
-    /* Markering af værdien før indgrebet */
-    .bar-foer, .foer-ikon {
-        width: 3px;
-        background: #f5f5f5;
-        border-radius: 2px;
-        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.55);
-    }
-    .bar-foer { position: absolute; top: -5px; bottom: -5px; transform: translateX(-50%); }
-    .foer-ikon { display: inline-block; height: 13px; vertical-align: -2px; margin-right: 6px; }
-
-    .faktor { width: 48px; text-align: right; font-weight: bold; font-variant-numeric: tabular-nums; }
-
-    .bar-note { font-size: 0.8rem; color: var(--muted); text-align: right; margin: -3px 0 12px; }
+    .tempo-bar { height: 14px; border-radius: 7px; background: #3b3b4c; overflow: hidden; }
+    .tempo-bar span { display: block; height: 100%; border-radius: 7px; }
+    .tempo-faktor { font-size: 1.15rem; font-weight: bold; text-align: right; }
 
     /* Reaktionsbrøk */
     .brok-linje {
@@ -248,7 +221,7 @@
     .status.neutral { color: var(--muted); background: rgba(255, 255, 255, 0.04); }
 
     /* Graf */
-    .graf-knap { width: 100%; box-shadow: none; padding: 9px 12px; }
+    .panel-knap { width: 100%; box-shadow: none; padding: 9px 12px; }
     .gruppe[hidden] { display: none; }
     #graf { width: 100%; height: 170px; display: block; }
 
@@ -357,35 +330,22 @@
         <aside id="panel">
             <section class="gruppe">
                 <div class="gruppe-hoved">Reaktionsbrøk</div>
-                <div class="led">
-                    <div class="led-linje"><span class="led-navn">Tæller</span><span class="tal">[N₂O₄] = <span id="taeller">6 mol / 3,0 L = 2,0 M</span></span></div>
-                    <div class="bar-linje">
-                        <div class="bar"><div class="bar-fyld" id="bar-taeller" style="background: var(--n2o4)"></div><div class="bar-foer" id="foer-taeller"></div></div>
-                        <span class="faktor c-n2o4" id="faktor-taeller">×1,0</span>
-                    </div>
-                </div>
-                <div class="led">
-                    <div class="led-linje"><span class="led-navn">Nævner</span><span class="tal">[NO₂] = <span id="konc-no2">12 mol / 3,0 L = 4,0 M</span></span></div>
-                    <div class="led-linje"><span class="led-navn"></span><span class="tal">[NO₂]² = <span id="naevner">(4,0 M)² = 16 M²</span></span></div>
-                    <div class="bar-linje">
-                        <div class="bar"><div class="bar-fyld" id="bar-naevner" style="background: var(--no2)"></div><div class="bar-foer" id="foer-naevner"></div></div>
-                        <span class="faktor c-no2" id="faktor-naevner">×1,0</span>
-                    </div>
-                </div>
-                <div class="bar-note"><span class="foer-ikon"></span>før indgrebet</div>
+                <div class="konc-linje tal"><span class="c-no2">[NO₂]</span> = <span id="konc-no2">18 mol / 4,0 L = 4,5 M</span></div>
+                <div class="konc-linje tal"><span class="c-n2o4">[N₂O₄]</span> = <span id="konc-n2o4">4 mol / 4,0 L = 1,0 M</span></div>
                 <div class="brok-linje">
                     <span>Y =</span>
                     <span class="brok"><span>[N₂O₄]</span><span>[NO₂]²</span></span>
                     <span>=</span>
-                    <span class="brok tal"><span id="y-taeller">2,0 M</span><span id="y-naevner">16 M²</span></span>
+                    <span class="brok tal"><span id="y-taeller">1,0 M</span><span id="y-naevner">(4,5 M)²</span></span>
                     <span>=</span>
-                    <span class="tal"><span id="y-vaerdi">0,125</span> M⁻¹</span>
+                    <span class="tal"><span id="y-vaerdi">0,049</span> M⁻¹</span>
                 </div>
-                <div class="k-linje">K = 0,125 M⁻¹</div>
+                <div class="k-linje">K = 0,049 M⁻¹</div>
                 <div class="status ok" id="status">Y = K: ligevægt</div>
             </section>
 
-            <button class="lille-knap graf-knap" id="btn-graf">📈 Vis graf</button>
+            <button class="lille-knap panel-knap" id="btn-tempo">Hvorfor ændres Y?</button>
+            <button class="lille-knap panel-knap" id="btn-graf">📈 Vis graf</button>
 
             <section class="gruppe" id="graf-gruppe" hidden>
                 <div class="gruppe-hoved">Graf</div>
@@ -414,19 +374,8 @@
             <h3>Reaktionsbrøken</h3>
             <p>For 2 NO₂(g) ⇌ N₂O₄(g) er Y = [N₂O₄] / [NO₂]². Ved ligevægt er Y = K. K afhænger kun af temperaturen og ændres ikke af et nyt volumen.</p>
 
-            <h3>Hvorfor forskydes ligevægten?</h3>
-            <p>Bliver volumenet 3 gange mindre, bliver alle koncentrationer 3 gange større. Tælleren i Y vokser med en faktor 3, men nævneren med en faktor 3² = 9. Y bliver derfor 3 gange mindre end K, og reaktionen løber mod højre, indtil Y = K igen. Ved den nye ligevægt er både tæller og nævner blevet 4 gange større end før indgrebet.</p>
-            <div class="tabel-rul">
-                <table class="teori-tabel">
-                    <tr><th></th><th>V</th><th>n(NO₂)</th><th>n(N₂O₄)</th><th>[NO₂]</th><th>[N₂O₄]</th><th>Y</th><th>p</th></tr>
-                    <tr><td>Ligevægt</td><td>3,0 L</td><td>12 mol</td><td>6 mol</td><td>4,0 M</td><td>2,0 M</td><td>0,125 M⁻¹</td><td>149 bar</td></tr>
-                    <tr class="fremhaev"><td>Lige efter sammenpresning</td><td>1,0 L</td><td>12 mol</td><td>6 mol</td><td>12 M</td><td>6,0 M</td><td>0,042 M⁻¹</td><td>446 bar</td></tr>
-                    <tr><td>Ny ligevægt</td><td>1,0 L</td><td>8 mol</td><td>8 mol</td><td>8,0 M</td><td>8,0 M</td><td>0,125 M⁻¹</td><td>397 bar</td></tr>
-                </table>
-            </div>
-
             <h3>Trykket</h3>
-            <p>Trykket følger idealgasligningen, p = n·R·T / V, hvor n er den samlede stofmængde gas. Bliver volumenet 3 gange mindre, bliver trykket 3 gange større. Når 2 NO₂ bliver til 1 N₂O₄, falder den samlede stofmængde, og trykket falder lidt igen. Ligevægten modvirker altså trykstigningen, men fjerner den ikke helt.</p>
+            <p>Trykket følger idealgasligningen, p = n·R·T / V, hvor n er den samlede stofmængde gas. Bliver volumenet 4 gange mindre, bliver trykket 4 gange større, her fra 136 bar til 545 bar. Når NO₂ bliver til N₂O₄, falder den samlede stofmængde, og trykket falder til 471 bar. Ligevægten modvirker altså trykstigningen, men fjerner den ikke helt.</p>
 
             <h3>Dansemetaforen</h3>
             <p>En single svarer til et NO₂-molekyle, og et par svarer til et N₂O₄-molekyle. Når dansegulvet bliver mindre, finder flere singler sammen i par. Et par tæller som én enhed på gulvet, så trængslen mindskes.</p>
@@ -437,7 +386,46 @@
             <h3>Farven</h3>
             <p>NO₂ er rødbrun, og N₂O₄ er farveløs. Lige efter sammenpresningen bliver gassen mørkere, fordi [NO₂] stiger. Når ligevægten forskydes, bliver den lidt lysere igen, men den forbliver mørkere end før indgrebet.</p>
 
-            <p class="model-note">Hver figur svarer til 1 mol, så ved 1,0 L er koncentrationen i M lig med antallet af figurer. Stofmængderne er valgt, så ligevægten rammer K præcist ved både 3,0 L og 1,0 L, og tallene bliver runde. I et rigtigt forsøg er koncentrationer og tryk omkring 1000 gange mindre. Trykket er beregnet ved 25 °C. NO₂ har en uparret elektron (den gule prik), og derfor kan to NO₂ binde sig sammen til N₂O₄.</p>
+            <p class="model-note">Hver figur svarer til 1 mol, så ved 1,0 L er koncentrationen i M lig med antallet af figurer. Stofmængderne er valgt, så Y afrundet til to betydende cifre er lig med K ved både 4,0 L og 1,0 L. I et rigtigt forsøg er koncentrationer og tryk omkring 1000 gange mindre. Trykket er beregnet ved 25 °C. NO₂ har en uparret elektron (den gule prik), og derfor kan to NO₂ binde sig sammen til N₂O₄.</p>
+        </div>
+    </div>
+</div>
+
+<div class="modal-baggrund" id="tempo" hidden>
+    <div class="modal" role="dialog" aria-labelledby="tempo-titel">
+        <div class="modal-hoved">
+            <h2 id="tempo-titel">Hvorfor ændres Y?</h2>
+            <button class="luk" id="btn-luk-tempo" aria-label="Luk">✕</button>
+        </div>
+        <div class="modal-indhold">
+            <h3>Tæller og nævner vokser i forskelligt tempo</h3>
+            <p>Presses stemplet fra 4,0 L til 1,0 L, bliver alle koncentrationer 4 gange større. Tælleren og nævneren i Y vokser alligevel ikke lige meget.</p>
+            <div class="tempo-raekke">
+                <div class="tempo-tekst"><span class="tempo-navn">Tæller</span>[N₂O₄]: 1,0 M → 4,0 M</div>
+                <div class="tempo-bar"><span style="width: 25%; background: var(--n2o4)"></span></div>
+                <div class="tempo-faktor c-n2o4">×4</div>
+            </div>
+            <div class="tempo-raekke">
+                <div class="tempo-tekst"><span class="tempo-navn">Nævner</span>[NO₂]²: (4,5 M)² = 20,25 M² → (18 M)² = 324 M²</div>
+                <div class="tempo-bar"><span style="width: 100%; background: var(--no2)"></span></div>
+                <div class="tempo-faktor c-no2">×16</div>
+            </div>
+            <p>[NO₂] står i anden potens. Når [NO₂] bliver 4 gange større, bliver nævneren 4² = 16 gange større.</p>
+
+            <h3>Y bliver mindre end K</h3>
+            <p>Lige efter sammenpresningen er Y = 4,0 M / 324 M² = 0,012 M⁻¹, altså 4 gange mindre end før. Y er nu mindre end K = 0,049 M⁻¹, og reaktionen løber mod højre.</p>
+
+            <h3>Reaktionen retter op</h3>
+            <p>Hver gang to NO₂ bliver til ét N₂O₄, vokser tælleren, og nævneren falder. Efter tre reaktioner er Y igen lig med K.</p>
+            <div class="tabel-rul">
+                <table class="teori-tabel">
+                    <tr><th></th><th>V</th><th>[NO₂]</th><th>Tæller [N₂O₄]</th><th>Nævner [NO₂]²</th><th>Y</th></tr>
+                    <tr><td>Ligevægt</td><td>4,0 L</td><td>4,5 M</td><td>1,0 M</td><td>20,25 M²</td><td>0,049 M⁻¹</td></tr>
+                    <tr class="fremhaev"><td>Lige efter sammenpresning</td><td>1,0 L</td><td>18 M</td><td>4,0 M</td><td>324 M²</td><td>0,012 M⁻¹</td></tr>
+                    <tr><td>Ny ligevægt</td><td>1,0 L</td><td>12 M</td><td>7,0 M</td><td>144 M²</td><td>0,049 M⁻¹</td></tr>
+                </table>
+            </div>
+            <p>Trækkes stemplet op igen, sker det omvendte: nævneren bliver 16 gange mindre, men tælleren kun 4 gange mindre. Y bliver større end K, og reaktionen løber mod venstre.</p>
         </div>
     </div>
 </div>
@@ -449,26 +437,25 @@
    MODEL
    2 NO₂(g) ⇌ N₂O₄(g),   Y = [N₂O₄] / [NO₂]²
 
-   Hver figur svarer til 1 mol. Stofmængderne er valgt, så begge
-   volumener har en ligevægt, der rammer K præcist:
-     3,0 L:  12 NO₂ + 6 N₂O₄  ->  Y = 2,0 / 4,0² = 0,125 M⁻¹
-     1,0 L:   8 NO₂ + 8 N₂O₄  ->  Y = 8,0 / 8,0² = 0,125 M⁻¹
-   Presses stemplet ned, dannes der altså netop to N₂O₄, og trækkes
-   det op igen, spaltes netop to. Ved 1,0 L er koncentrationen i M
+   Hver figur svarer til 1 mol. Med hele figurer kan Y ikke ramme K
+   præcist ved både 4,0 L og 1,0 L, men disse to tilstande er de
+   nærmeste, og begge giver Y = 0,049 M⁻¹ med to betydende cifre:
+     4,0 L:  18 NO₂ + 4 N₂O₄  ->  Y = 1,0 / 4,5²  = 0,0494 M⁻¹
+     1,0 L:  12 NO₂ + 7 N₂O₄  ->  Y = 7,0 / 12²   = 0,0486 M⁻¹
+   Presses stemplet ned, dannes der altså netop tre N₂O₄, og trækkes
+   det op igen, spaltes netop tre. Ved 1,0 L er koncentrationen i M
    lig med antallet af figurer.
    ===================================================================== */
-const K = 0.125;
-const V_STOR = 3.0;
+const K = 0.049;
+const V_STOR = 4.0;
 const V_LILLE = 1.0;
-const START_NO2 = 12;
-const START_N2O4 = 6;
+const START_NO2 = 18;
+const START_N2O4 = 4;
 
 /* Animationen kører altid i slowmotion, så hvert sammenstød kan følges */
-const FART = 40;                   // px/s ved R = 30 (skaleres med figurstørrelsen)
-const STEMPEL_TID = 2.5;           // s, stemplets bevægelse fra 3,0 L til 1,0 L
+const FART = 48;                   // px/s ved R = 30 (skaleres med figurstørrelsen)
+const STEMPEL_TID = 2.5;           // s, stemplets bevægelse fra 4,0 L til 1,0 L
 const RT = 0.08314 * 298.15;       // L·bar/mol ved 25 °C, til trykket
-const TAELLER_MAKS = 8;            // M, største [N₂O₄] (8 mol i 1,0 L); fylder søjlen helt
-const NAEVNER_MAKS = 144;          // M², største [NO₂]² (12 mol i 1,0 L)
 const GRAF_VINDUE = 45;            // s
 
 function tal(x, d) { return x.toFixed(d).replace(".", ","); }
@@ -675,11 +662,11 @@ let V = V_STOR;
 let stempel = { fra: V_STOR, til: V_STOR, t0: -99, varighed: 0 };
 let traek = null;          // mens håndtaget trækkes: { offset, startY, flyttet }
 let forloeb = null;        // forløbet fra et indgreb til den nye ligevægt
-let pVist = 18 * RT / 3;   // trykket, som manometeret viser; glider efter det beregnede
+let pVist = 0;             // trykket, som manometeret viser; glider efter det beregnede
 
 /* Tæller, nævner og tryk ved seneste ligevægt. Panelet og manometeret
    sammenligner med den ligevægt, der var, da stemplet sidst blev flyttet. */
-let sidsteLigevaegt = { n: { no2: 12, n2o4: 6 }, cNO2: 4, taeller: 2, naevner: 16, p: 18 * RT / 3 };
+let sidsteLigevaegt = null; // sættes i nulstil()
 let reference = sidsteLigevaegt;
 
 let bredde = 0, hoejde = 0;
@@ -940,25 +927,27 @@ function spalt(p, vis) {
 
 /* =====================================================================
    FORLØB FRA INDGREB TIL NY LIGEVÆGT
-   Når stemplet står stille, går der ca. 7-8 s, før reaktionen sker, så Y ≠ K
-   kan ses i panelet. Taleboblerne udfylder ventetiden i dansevisningen;
-   i molekylevisningen er tiderne de samme, men uden bobler.
+   Når stemplet står stille, går der ca. 4 s, før den første reaktion sker,
+   så Y ≠ K kan ses i panelet. Taleboblerne udfylder ventetiden i
+   dansevisningen; i molekylevisningen er tiderne de samme, men uden bobler.
    ===================================================================== */
 const REPLIKKER = {
-    ned: ["Hov, her blev trangt!", "Av, min tå!", "Skal vi danse sammen?",
-          "Ja, så fylder vi mindre!", "Os to også!", "Nu er der lidt bedre plads."],
-    op: ["Dejligt med mere plads!", "Nu kan jeg strække armene!", "Nu behøver vi ikke danse så tæt.",
-         "Fint, så danser jeg lidt for mig selv.", "Vi går også hver til sit.", "Wuhu, fri bane!"]
+    ned: { start: "Hov, her blev trangt!", spoerg: "Skal vi danse sammen?", svar: "Ja, så fylder vi mindre!",
+           naeste: ["Os to også!", "Og os!"], slut: "Nu er der lidt bedre plads." },
+    op: { start: "Dejligt med mere plads!", spoerg: "Nu behøver vi ikke danse så tæt.",
+          svar: "Fint, så danser jeg lidt for mig selv.",
+          naeste: ["Vi går også hver til sit.", "Os også!"], slut: "Wuhu, fri bane!" }
 };
 
-const BOBLE_TID = 1.9;                      // s, hvor længe en taleboble vises
-const REPLIK_TIDER = [0.3, 2.2, 4.1, 6.0];  // s efter stilstand: replik 1-4
-const FOERSTE_REAKTION = 6.4;               // s: første par dannes eller går fra hinanden
-const NAESTE_REAKTION = 1.0;                // s fra valg af nye partnere til næste reaktion
-const SIDSTE_REPLIK = 1.6;                  // s efter den sidste reaktion
+const BOBLE_TID = 1.9;                // s, hvor længe en taleboble vises
+const KORT_BOBLE = 1.2;               // s, replikken før de næste reaktioner
+const REPLIK_TIDER = [0.3, 2.2, 3.9]; // s efter stilstand: start, spørgsmål, svar
+const FOERSTE_REAKTION = 4.3;         // s: første par dannes eller går fra hinanden
+const NAESTE_REAKTION = 1.0;          // s fra valg af nye partnere til næste reaktion
+const SIDSTE_REPLIK = 1.6;            // s efter den sidste reaktion
 
-function sig(p, tekst, side) {
-    bobler.push({ p: p, tekst: tekst, side: side || 0, t0: tid, varighed: BOBLE_TID });
+function sig(p, tekst, side, varighed) {
+    bobler.push({ p: p, tekst: tekst, side: side || 0, t0: tid, varighed: varighed || BOBLE_TID });
 }
 
 function tilfaeldig(liste) { return liste[Math.floor(Math.random() * liste.length)]; }
@@ -996,45 +985,44 @@ function vaelgPartnere(f) {
 function reager(f, t) {
     f.ny = f.r === 1 ? slaaSammen(f.a, f.c, true) : tilfaeldig(spalt(f.a, true));
     f.tReaktion = t;
+    f.antal++;
     // Er ligevægten ikke nået endnu, følger der en reaktion mere
-    f.fase = retning(V) !== 0 ? 5 : 6;
+    f.fase = retning(V) !== 0 ? 4 : 5;
 }
 
-/* Faser: 0-3 replikker, 4 venter på reaktion, 5 vælger nye partnere,
-   6 sidste replik, 7 afslutter */
+/* Faser: 0-2 replikker, 3 venter på reaktion, 4 vælger nye partnere,
+   5 sidste replik, 6 afslutter */
 function opdaterForloeb(dt) {
     const f = forloeb;
     const t = tid - f.t0;
     const rep = f.r === 1 ? REPLIKKER.ned : REPLIKKER.op;
 
     if (f.fase === 0 && t >= REPLIK_TIDER[0]) {
-        f.taler = sigTilfaeldig(rep[0], null);
+        sigTilfaeldig(rep.start, null);
         f.fase = 1;
     } else if (f.fase === 1 && t >= REPLIK_TIDER[1]) {
-        sigTilfaeldig(rep[1], f.taler);
+        vaelgPartnere(f);
+        sig(f.a, rep.spoerg, f.r === 1 ? 0 : -1);
+        f.tidligst = FOERSTE_REAKTION;
+        f.antal = 0;
         f.fase = 2;
     } else if (f.fase === 2 && t >= REPLIK_TIDER[2]) {
-        vaelgPartnere(f);
-        sig(f.a, rep[2], f.r === 1 ? 0 : -1);
-        f.tidligst = FOERSTE_REAKTION;
+        if (f.r === 1) sig(f.c, rep.svar, 0); else sig(f.a, rep.svar, 1);
         f.fase = 3;
-    } else if (f.fase === 3 && t >= REPLIK_TIDER[3]) {
-        if (f.r === 1) sig(f.c, rep[3], 0); else sig(f.a, rep[3], 1);
-        f.fase = 4;
-    } else if (f.fase === 5 && t >= f.tReaktion + 0.2) {
+    } else if (f.fase === 4 && t >= f.tReaktion + 0.2) {
         vaelgPartnere(f);
-        sig(f.a, rep[4], f.r === 1 ? 0 : -1);
+        sig(f.a, rep.naeste[Math.min(f.antal, rep.naeste.length) - 1], f.r === 1 ? 0 : -1, KORT_BOBLE);
         f.tidligst = t + NAESTE_REAKTION;
-        f.fase = 4;
-    } else if (f.fase === 6 && t >= f.tReaktion + SIDSTE_REPLIK) {
-        sig(f.ny, rep[5], f.ny.type === "n2o4" ? 1 : 0);
-        f.fase = 7;
-    } else if (f.fase === 7 && t >= f.tReaktion + SIDSTE_REPLIK + BOBLE_TID) {
+        f.fase = 3;
+    } else if (f.fase === 5 && t >= f.tReaktion + SIDSTE_REPLIK) {
+        sig(f.ny, rep.slut, f.ny.type === "n2o4" ? 1 : 0);
+        f.fase = 6;
+    } else if (f.fase === 6 && t >= f.tReaktion + SIDSTE_REPLIK + BOBLE_TID) {
         forloeb = null;
         return;
     }
 
-    if (f.fase !== 3 && f.fase !== 4) return;
+    if (f.fase !== 2 && f.fase !== 3) return;
     if (f.r === 1) {
         // De to singler nærmer sig hinanden, mens de taler, og danner par ved berøring
         const d = Math.hypot(f.c.x - f.a.x, f.c.y - f.a.y);
@@ -1075,7 +1063,7 @@ function opdater(dt) {
     reaktioner(dt);
 
     const l = led();
-    if (iHvile() && Math.abs(l.taeller / l.naevner - K) < 1e-9) sidsteLigevaegt = l;
+    if (iHvile() && retning(V) === 0) sidsteLigevaegt = l;
     pVist += (l.p - pVist) * Math.min(1, dt * 4);
 
     effekter = effekter.filter(e => tid - e.t0 < (e.type === "tekst" ? 2.4 : 0.8));
@@ -1109,7 +1097,7 @@ function tilpas() {
     const bh = klamp(hoejde - top - bund, 200, 720);
     const bw = klamp(Math.min(bredde - 220, bh * 0.92), 220, 620);
     beholder = { x: Math.round((bredde - bw) / 2), y: top, w: Math.round(bw), h: Math.round(bh) };
-    R = klamp(Math.min(bh, bw) * 0.04, 12, 24);
+    R = klamp(Math.min(bh, bw) * 0.033, 10, 20);
 
     // Molekylerne flyttes med, når vinduet ændrer størrelse
     if (gammel.w > 0) {
@@ -1151,7 +1139,7 @@ function tegnSkala() {
     ctx.font = "13px 'Segoe UI', sans-serif";
     ctx.textAlign = "right";
     ctx.textBaseline = "middle";
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= V_STOR * 2; i++) {
         const v = i * 0.5;
         const y = stempelY(v);
         const hel = i % 2 === 0;
@@ -1380,9 +1368,9 @@ function tegnStempel() {
     ctx.fillText("V = " + tal(V, 1) + " L", beholder.x + beholder.w + 22, y - STEMPEL_TYK / 2);
 }
 
-/* Manometer på cylinderens side. Skalaen går fra 0 til 500 bar over 270°.
+/* Manometer på cylinderens side. Skalaen går fra 0 til 600 bar over 270°.
    Den lille grå markering viser trykket ved ligevægten før indgrebet. */
-const P_MAKS = 500;
+const P_MAKS = 600;
 
 function tegnManometer() {
     const x1 = beholder.x + beholder.w;
@@ -1420,7 +1408,7 @@ function tegnManometer() {
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillStyle = "#9a9aab";
-        for (const p of [0, 200, 400]) {
+        for (const p of [0, 300, 600]) {
             const v = vinkel(p);
             ctx.fillText(String(p), cx + Math.cos(v) * (r - 23), cy + Math.sin(v) * (r - 23));
         }
@@ -1610,14 +1598,14 @@ function tilpasGraf() {
 
 function tegnGraf() {
     gctx.clearRect(0, 0, gB, gH);
-    const venstre = 46, hoejre = 6;
+    const venstre = 58, hoejre = 6;
     const tMax = Math.max(GRAF_VINDUE, tid), tMin = tMax - GRAF_VINDUE;
     const xAf = t => venstre + (t - tMin) / GRAF_VINDUE * (gB - venstre - hoejre);
 
     const felter = [
-        { y0: 8, y1: gH * 0.56, maks: 8, streger: [[0, "0"], [2, "2"], [4, "4"], [6, "6"], [8, "8 M"]],
+        { y0: 8, y1: gH * 0.56, maks: 20, streger: [[0, "0"], [5, "5"], [10, "10"], [15, "15"], [20, "20 M"]],
           serier: [["no2", "#f09a4e"], ["n2o4", "#62b0ee"]] },
-        { y0: gH * 0.66, y1: gH - 16, maks: 1, streger: [[0, "0"], [0.5, "0,5"], [1, "1 M⁻¹"]],
+        { y0: gH * 0.66, y1: gH - 16, maks: 0.2, streger: [[0, "0"], [0.1, "0,1"], [0.2, "0,2 M⁻¹"]],
           serier: [["y", "#fbbf24"]], k: true }
     ];
 
@@ -1689,37 +1677,19 @@ function saetKlasse(id, klasse) {
     if (e.className !== klasse) e.className = klasse;
 }
 
-function faktorTekst(f) {
-    return f >= 0.9995 ? "×" + tal(f, 1) : "÷" + tal(1 / f, 1);
-}
-
-/* Søjlerne er lineære, så ×9 er tre gange så lang som ×3. Den hvide streg
-   markerer værdien før indgrebet. */
-function saetSoejle(navn, vaerdi, foer, maks) {
-    el("bar-" + navn).style.width = klamp(vaerdi / maks * 100, 0, 100).toFixed(2) + "%";
-    el("foer-" + navn).style.left = klamp(foer / maks * 100, 0, 100).toFixed(2) + "%";
-}
-
-/* Koncentrationer: én decimal under 10, ellers hele tal (4,0 M, 12 M, 144 M²) */
+/* Koncentrationer: én decimal under 10, ellers hele tal (4,5 M, 18 M) */
 function kTal(x) { return x >= 9.95 ? tal(x, 0) : tal(x, 1); }
 
 function opdaterPanel() {
     const l = led();
     const y = l.taeller / l.naevner;
-    const fT = l.taeller / reference.taeller;
-    const fN = l.naevner / reference.naevner;
 
-    // Koncentration = stofmængde / volumen, vist med tal, så sammenhængen med figurerne ses
+    // Koncentration = stofmængde / volumen, så sammenhængen med figurerne kan ses
     const divV = " / " + tal(V, 1) + " L = ";
-    saet("taeller", l.n.n2o4 + " mol" + divV + kTal(l.taeller) + " M");
     saet("konc-no2", l.n.no2 + " mol" + divV + kTal(l.cNO2) + " M");
-    saet("naevner", "(" + kTal(l.cNO2) + " M)² = " + kTal(l.naevner) + " M²");
-    saet("faktor-taeller", faktorTekst(fT));
-    saet("faktor-naevner", faktorTekst(fN));
-    saetSoejle("taeller", l.taeller, reference.taeller, TAELLER_MAKS);
-    saetSoejle("naevner", l.naevner, reference.naevner, NAEVNER_MAKS);
+    saet("konc-n2o4", l.n.n2o4 + " mol" + divV + kTal(l.taeller) + " M");
     saet("y-taeller", kTal(l.taeller) + " M");
-    saet("y-naevner", kTal(l.naevner) + " M²");
+    saet("y-naevner", "(" + kTal(l.cNO2) + " M)²");
     saet("y-vaerdi", tal(y, 3));
 
     const hvile = iHvile();
@@ -1737,7 +1707,7 @@ function opdaterPanel() {
 
     el("btn-stempel").disabled = !hvile;
     if (hvile) {
-        saet("btn-stempel", V > (V_STOR + V_LILLE) / 2 ? "⬇ Pres stemplet ned til 1,0 L" : "⬆ Træk stemplet op til 3,0 L");
+        saet("btn-stempel", V > (V_STOR + V_LILLE) / 2 ? "⬇ Pres stemplet ned til 1,0 L" : "⬆ Træk stemplet op til 4,0 L");
     }
 }
 
@@ -1826,11 +1796,24 @@ laerred.addEventListener("pointerleave", () => {
     }
 });
 
+/* Teoriboksene åbnes med knapperne og lukkes med ✕, Escape eller et klik udenfor */
 const teoriBoks = el("teori");
-el("btn-teori").addEventListener("click", () => { teoriBoks.hidden = false; });
-el("btn-luk-teori").addEventListener("click", () => { teoriBoks.hidden = true; });
-teoriBoks.addEventListener("click", e => { if (e.target === teoriBoks) teoriBoks.hidden = true; });
-document.addEventListener("keydown", e => { if (e.key === "Escape") teoriBoks.hidden = true; });
+const tempoBoks = el("tempo");
+
+function koblBoks(boks, aabnId, lukId) {
+    el(aabnId).addEventListener("click", () => { boks.hidden = false; });
+    el(lukId).addEventListener("click", () => { boks.hidden = true; });
+    boks.addEventListener("click", e => { if (e.target === boks) boks.hidden = true; });
+}
+
+koblBoks(teoriBoks, "btn-teori", "btn-luk-teori");
+koblBoks(tempoBoks, "btn-tempo", "btn-luk-tempo");
+document.addEventListener("keydown", e => {
+    if (e.key === "Escape") {
+        teoriBoks.hidden = true;
+        tempoBoks.hidden = true;
+    }
+});
 
 let sidsteTid = null;
 

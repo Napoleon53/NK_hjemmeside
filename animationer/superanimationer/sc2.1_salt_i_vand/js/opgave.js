@@ -107,6 +107,9 @@
         vaert.innerHTML = "";
         if (!o || !o.valg) { vaert.hidden = true; return; }
         vaert.hidden = false;
+        /* Korte svar (tal) staar to og to; lange svar (ligninger) én pr. linje. */
+        var kort = o.valg.every(function (t) { return t.length <= 12; });
+        vaert.className = "valg" + (kort ? "" : " en-spalte");
         o.valg.forEach(function (tekst, i) {
             var b = document.createElement("button");
             b.type = "button";
@@ -174,8 +177,15 @@
         var o = this.opgave;
         if (!o || o.afsluttet || !o.tjek) return;
         var r = o.tjek(this.sim);
-        if (r === true) this.loest();
-        else if (typeof r === "string") this.besked("svar", r, "besked skidt");
+        if (r === true) { this.loest(); return; }
+        if (typeof r === "string") {
+            this.besked("svar", r, "besked skidt");
+            o.harBesked = true;
+        } else if (o.harBesked) {
+            /* Beskeden gjaldt et tidligere forsoeg - fjern den igen. */
+            this.besked("svar", "");
+            o.harBesked = false;
+        }
     };
 
     /* Et klik i billedet. Returnerer true, hvis opgaven tog imod det. */

@@ -34,7 +34,7 @@
     --radius:      10px;
     --radius-lil:  6px;
     --skygge:      0 4px 14px rgba(0, 0, 0, 0.35);
-    --panel-bredde: 400px;
+    --panel-bredde: 430px;
 }
 
 * { box-sizing: border-box; }

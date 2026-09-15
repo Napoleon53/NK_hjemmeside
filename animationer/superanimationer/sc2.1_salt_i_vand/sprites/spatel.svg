@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="160" height="40" viewBox="0 0 160 40">
-  <!-- Spatel. Bladets midte er (22, 20); animationen tegner saltbunken
-       ovenpaa bladet og drejer hele spatlen om det punkt, naar der
-       haeldes. -->
+  <!-- Spatel. Bladets midte er (22, 20), spidsen (3, 20) og enden af
+       skaftet (157, 20). Animationen tegner saltbunken ovenpaa bladet og
+       drejer hele spatlen om enden af skaftet, naar der haeldes. -->
   <defs>
     <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#eef2f6"/>

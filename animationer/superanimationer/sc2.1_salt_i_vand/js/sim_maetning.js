@@ -18,6 +18,7 @@
 
     var NK = window.NK;
     var D = NK.Data;
+    var T = NK.Tegn;
     var S = NK.Sprites;
 
     var VAND_ML = 100;
@@ -189,10 +190,17 @@
         this.termoX = this.glasX + this.glasB - 24 * s - this.termoB;
         this.termoY = this.bgY - 14 * s;
 
-        /* Spatlen holdes over glasset med bladet lidt til venstre for midten */
-        this.spatelB = bw * 0.7;
-        this.spatelX = this.glasX + this.glasB * 0.40;
-        this.spatelY = this.bgY - 40;
+        /* Spatlen kommer fra venstre, fra pulverglasset, med bladet lidt
+           til venstre for glassets midte - vaek fra termometeret. Den
+           drejer om enden af skaftet (spatelPX, spatelPY), saa bladet
+           dykker ned i glasset, naar der haeldes. */
+        var MS = S.MAAL.spatel;
+        this.spatelB = bw * 0.62;
+        var ss = this.spatelB / MS.b;
+        this.spatelX = this.glasX + this.glasB * 0.45;
+        this.spatelY = this.bgY - 34;
+        this.spatelPX = this.spatelX - (MS.skaftX - MS.bladX) * ss;
+        this.spatelPY = this.spatelY;
 
         /* Pulverglasset staar paa bordet til venstre for varmepladen */
         var MG = S.MAAL.pulverglas;
@@ -219,7 +227,7 @@
         var knapper = NK.el("maet-glasknapper");
         if (knapper) {
             knapper.style.left = (this.glasX + this.glasB / 2) + "px";
-            knapper.style.top = (this.spatelY - 24) + "px";
+            knapper.style.top = (this.spatelY - 36) + "px";
         }
         var skalaKnap = NK.el("maet-skala-knap");
         if (skalaKnap) {
@@ -283,22 +291,26 @@
     /* ----- Spatlen ------------------------------------------------------------ */
     function blod(t) { return t * t * (3 - 2 * t); }
 
+    /* Vinklen om enden af skaftet: let loeftet i hvile, dykket ned, mens
+       der haeldes. Positiv vinkel = bladet nedad. */
     P.spatelVinkel = function () {
-        if (!this.haeld) return 0;
-        var t = this.haeld.tid, maks = -0.62;
-        if (t < 0.18) return maks * blod(t / 0.18);
+        var hvile = -0.06, maks = 0.4;
+        if (!this.haeld) return hvile;
+        var t = this.haeld.tid;
+        if (t < 0.18) return hvile + (maks - hvile) * blod(t / 0.18);
         if (t < 0.58) return maks;
-        if (t < 0.92) return maks * (1 - blod((t - 0.58) / 0.34));
-        return 0;
+        if (t < 0.92) return maks - (maks - hvile) * blod((t - 0.58) / 0.34);
+        return hvile;
     };
 
     /* Spidsen af bladet, hvor kornene falder fra */
     P.spatelSpids = function () {
+        var MS = S.MAAL.spatel;
         var a = this.spatelVinkel();
-        var ss = this.spatelB / S.MAAL.spatel.b;
+        var laengde = (MS.skaftX - MS.spidsX) * this.spatelB / MS.b;
         return {
-            x: this.spatelX - 19 * ss * Math.cos(a),
-            y: this.spatelY - 19 * ss * Math.sin(a)
+            x: this.spatelPX + laengde * Math.cos(a),
+            y: this.spatelPY + laengde * Math.sin(a)
         };
     };
 
@@ -474,7 +486,7 @@
         ctx.stroke();
         ctx.restore();
 
-        this.tegnVarmeplade(ctx, this.visTemp);
+        T.varmeplade(ctx, this.pladeX, this.pladeY, this.pladeB, NK.klamp((this.visTemp - 25) / 75, 0, 1), false);
         this.tegnIndhold(ctx, salt);
         this.tegnTermometer(ctx);
         S.tegn(ctx, "baegerglas", this.bgX, this.bgY, this.bgB);
@@ -502,29 +514,6 @@
         });
     };
 
-    /* Varmepladen gloeder roedt, jo varmere vandet er. */
-    P.tegnVarmeplade = function (ctx, temp) {
-        var MP = S.MAAL.varmeplade;
-        var s = this.pladeB / MP.b;
-        S.tegn(ctx, "varmeplade", this.pladeX, this.pladeY, this.pladeB);
-        var gloed = NK.klamp((temp - 25) / 75, 0, 1);
-        if (gloed <= 0) return;
-        ctx.save();
-        ctx.globalAlpha = gloed;
-        var g = ctx.createLinearGradient(0, this.pladeY, 0, this.pladeY + MP.pladeBund * s);
-        g.addColorStop(0, "rgba(255, 120, 60, 0.95)");
-        g.addColorStop(1, "rgba(200, 50, 30, 0.75)");
-        ctx.fillStyle = g;
-        NK.rundtRekt(ctx, this.pladeX + MP.pladeV * s, this.pladeY + 1,
-                     (MP.pladeH - MP.pladeV) * s, (MP.pladeBund - 1) * s, 2 * s);
-        ctx.fill();
-        ctx.fillStyle = "#ff6a3d";
-        ctx.beginPath();
-        ctx.arc(this.pladeX + MP.lampeVarme[0] * s, this.pladeY + MP.lampeVarme[1] * s, MP.lampeR * s, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-    };
-
     /* Vandet, bundfaldet og ionerne - alt det, der ligger bag glasset. */
     P.tegnIndhold = function (ctx, salt) {
         var x0 = this.glasX, x1 = this.glasX + this.glasB;
@@ -532,14 +521,7 @@
         var i;
 
         ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(x0, top);
-        ctx.lineTo(x1, top);
-        ctx.lineTo(x1, bund - r);
-        ctx.quadraticCurveTo(x1, bund, x1 - r, bund);
-        ctx.lineTo(x0 + r, bund);
-        ctx.quadraticCurveTo(x0, bund, x0, bund - r);
-        ctx.closePath();
+        T.vandSti(ctx, x0, x1, top, bund, r);
 
         var v = ctx.createLinearGradient(0, top, 0, bund);
         v.addColorStop(0, "rgba(58, 110, 150, 0.34)");
@@ -598,15 +580,7 @@
     };
 
     P.tegnTermometer = function (ctx) {
-        var MT = S.MAAL.termometer;
-        if (!S.tegn(ctx, "termometer", this.termoX, this.termoY, this.termoB)) return;
-        var s = this.termoB / MT.b;
-        var yT = this.termoY + (MT.nul - (MT.nul - MT.hundrede) * this.visTemp / 100) * s;
-        ctx.save();
-        ctx.fillStyle = "#d9453a";
-        ctx.fillRect(this.termoX + MT.soejleV * s, yT, (MT.soejleH - MT.soejleV) * s,
-                     this.termoY + MT.soejleBund * s - yT);
-        ctx.restore();
+        if (!T.termometer(ctx, this.termoX, this.termoY, this.termoB, this.visTemp)) return;
         NK.tekst(ctx, Math.round(this.temp) + " °C", this.termoX + this.termoB / 2, this.termoY - 8, {
             justering: "center", farve: "#f2c53d", font: "700 13px 'Segoe UI', sans-serif", kant: true
         });
@@ -619,17 +593,21 @@
         var t = this.haeld ? this.haeld.tid : 1;
         var bunke = t < 0.22 ? 1 : (t < 0.8 ? 0 : NK.klamp((t - 0.8) / 0.12, 0, 1));
 
+        /* Drejet om enden af skaftet og spejlvendt, saa skaftet peger mod
+           venstre og bladet mod hoejre. Bladets midte ligger i bx. */
+        var bx = -(MS.skaftX - MS.bladX) * ss;
         ctx.save();
-        ctx.translate(this.spatelX, this.spatelY);
+        ctx.translate(this.spatelPX, this.spatelPY);
         ctx.rotate(a);
-        S.tegn(ctx, "spatel", -MS.bladX * ss, -MS.bladY * ss, this.spatelB);
+        ctx.scale(-1, 1);
+        S.tegn(ctx, "spatel", -MS.skaftX * ss, -MS.bladY * ss, this.spatelB);
         if (bunke > 0) {
             ctx.globalAlpha = bunke;
             ctx.fillStyle = D.pulverfarve(salt);
             ctx.beginPath();
-            ctx.moveTo(-15 * ss, -2 * ss);
-            ctx.quadraticCurveTo(-8 * ss, -10 * ss, 0, -10 * ss);
-            ctx.quadraticCurveTo(9 * ss, -10 * ss, 14 * ss, -2 * ss);
+            ctx.moveTo(bx - 15 * ss, -2 * ss);
+            ctx.quadraticCurveTo(bx - 8 * ss, -10 * ss, bx, -10 * ss);
+            ctx.quadraticCurveTo(bx + 9 * ss, -10 * ss, bx + 14 * ss, -2 * ss);
             ctx.closePath();
             ctx.fill();
             ctx.strokeStyle = "rgba(0, 0, 0, 0.25)";
@@ -788,8 +766,10 @@
                 ctx.lineTo(g.x + g.b, ty);
                 ctx.stroke();
                 ctx.restore();
-                NK.tekst(ctx, "hældt i: " + NK.gram(this.tilsat) + " g", g.x + g.b * 0.5, ty - 8, {
-                    justering: "center", farve: FARVE_TILSAT,
+                /* Mærket staar i den side, hvor aflaesningen ved kurven ikke er. */
+                var tilVenstre = tilX(this.temp) > g.x + g.b * 0.5;
+                NK.tekst(ctx, "hældt i: " + NK.gram(this.tilsat) + " g", tilVenstre ? g.x + 8 : g.x + g.b - 8, ty - 8, {
+                    justering: tilVenstre ? "left" : "right", farve: FARVE_TILSAT,
                     font: "600 12px 'Segoe UI', sans-serif", kant: true, kantBredde: 4
                 });
             } else {
@@ -842,7 +822,11 @@
 
         var aflaes = Math.round(vis) + " °C:  " + NK.gram(visV) + " g pr. 100 mL";
         var hoejreSide = vx > g.x + g.b * 0.55;
-        var labelY = vy < g.y + 40 ? vy + 22 : vy - 14;
+        /* Under punktet, hvis der ikke er plads over det, eller hvis den
+           gule linje ligger lige over punktet. */
+        var linjeY = this.tilsat > 0 && this.tilsat <= ymax ? tilY(this.tilsat) : null;
+        var linjeOver = linjeY !== null && linjeY <= vy + 4 && vy - linjeY < 30;
+        var labelY = vy < g.y + 40 || linjeOver ? vy + 22 : vy - 14;
         NK.tekst(ctx, aflaes, hoejreSide ? vx - 10 : vx + 10, labelY, {
             justering: hoejreSide ? "right" : "left",
             farve: "#ffffff", font: "600 12.5px 'Segoe UI', sans-serif", kant: true, kantBredde: 4.5

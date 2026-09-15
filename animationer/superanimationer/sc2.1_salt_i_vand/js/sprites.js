@@ -40,7 +40,7 @@
             varmeplade: { b: 240, h: 64, pladeV: 12, pladeH: 228, pladeTop: 0, pladeBund: 9,
                           lampeVarme: [36, 36], lampeRoer: [204, 36], lampeR: 4 },
             termometer: { b: 24, h: 200, soejleV: 11, soejleH: 13, soejleBund: 180, nul: 164, hundrede: 24 },
-            spatel:     { b: 160, h: 40, bladX: 22, bladY: 20 },
+            spatel:     { b: 160, h: 40, bladX: 22, bladY: 20, spidsX: 3, skaftX: 157 },
             pulverglas: { b: 90, h: 110, pulverV: 10, pulverH: 80, pulverTop: 80, pulverBund: 106, etiketX: 45, etiketY: 63 },
             lup:        { b: 140, h: 140, linseX: 52, linseY: 52, linseR: 38 }
         },

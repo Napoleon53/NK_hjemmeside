@@ -24,13 +24,13 @@
 
     var PAAKRAEVET = 4;          /* saa mange skal have fat, foer ionen slipper */
     var RAEKKER = 5;
-    var MAKS_HOLD = 6;           /* hold af vandmolekyler, der kan arbejde paa én gang */
+    var MAKS_HOLD = 4;           /* hold af vandmolekyler, der kan arbejde paa én gang */
     var MAKS_SYNLIGE = 7;        /* frie ioner i lupen, foer de aeldste driver videre ud i glasset */
     var FART_ENHED = 34;         /* hastighederne er afstemt til en celle paa 34 px */
-    var GRAENSE_SEK = 45;        /* opgaven "hurtigst": se README for, hvordan tallet er fundet */
+    var GRAENSE_SEK = 25;        /* opgaven "hurtigst": se README for, hvordan tallet er fundet */
 
     /* De fire pladser om en ion ligger alle paa den aabne side af den. */
-    var PLADS_VINKLER = [-1.1, -0.37, 0.37, 1.1];
+    var PLADS_VINKLER = [-0.95, -0.32, 0.32, 0.95];
 
     /* De tre knapper. temp er den temperatur, oploeseligheden slaas op ved. */
     var TEMPERATURER = [
@@ -71,6 +71,10 @@
     };
 
     var P = NK.SimOploes.prototype;
+
+    /* Til selvtesten */
+    NK.SimOploes.GRAENSE_SEK = GRAENSE_SEK;
+    NK.SimOploes.MAKS_SYNLIGE = MAKS_SYNLIGE;
 
     /* ----- Panelet ------------------------------------------------------ */
     P.koblPanel = function () {
@@ -273,6 +277,9 @@
                 this.nytHjem(v);
                 v.x = v.hjemX;
                 v.y = v.hjemY;
+            } else if (v.tilstand === "fast" && v.maal) {
+                v.x = v.maal.x + v.afX;
+                v.y = v.maal.y + v.afY;
             }
         }
     };
@@ -430,7 +437,7 @@
         if (tom(o.r, o.c + 1)) { sx += 1; n++; }
         var st = this.stykker[s];
         var underkant = o.hvileY + (st ? st.dy : 0) + this.celle * 1.5;
-        if (tom(o.r + 1, o.c) && underkant < this.gulv) { sy += 1; n++; }
+        if (tom(o.r + 1, o.c) && underkant < this.gulv + 1) { sy += 1; n++; }
         return { n: n, vinkel: (sx === 0 && sy === 0) ? -Math.PI / 2 : Math.atan2(sy, sx) };
     };
 
@@ -541,10 +548,10 @@
         var z = this.zoom;
         this.roerStyrke = NK.mod(this.roerStyrke, this.omroering ? 1 : 0, 1.6, dt);
         this.roerFase += dt * 16 * this.roerStyrke;
-        var fart = this.tempValg.fart * (1 + 0.25 * this.roerStyrke);
+        var fart = this.tempValg.fart * (1 + 0.15 * this.roerStyrke);
         var enhed = this.celle / FART_ENHED;
 
-        if (!this.faerdig()) this.tid += dt;
+        if (!this.faerdig()) { this.tid += dt; this.slutTid = null; }
         else if (this.slutTid === null) this.slutTid = this.tid;
 
         if (this.omroering && this.knusTrin < SNIT.length && this.tilbage() > 0) {
@@ -603,6 +610,8 @@
             }
         }
 
+        this.skubFra(dt);
+
         /* Er der for mange frie ioner i lupen, driver den aeldste videre ud
            i resten af glasset. Den er stadig opløst - den er bare ikke
            laengere i det lille udsnit, lupen viser. */
@@ -628,6 +637,25 @@
 
         if (this.opgaver) this.opgaver.opdater();
         this.opdaterPanel();
+    };
+
+    /* De frie ioner skubber blidt til hinanden, saa vandskallerne ikke
+       ligger oven i hinanden. */
+    P.skubFra = function (dt) {
+        var frie = this.ioner.filter(function (o) { return o.tilstand === "fri"; });
+        var ekstra = 78 * this.vandSkala, k = Math.min(1, dt * 8);
+        for (var i = 0; i < frie.length; i++) {
+            for (var j = i + 1; j < frie.length; j++) {
+                var a = frie[i], b = frie[j];
+                var dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 0.01;
+                var min = this.ionRadius(a) + this.ionRadius(b) + ekstra;
+                if (d >= min) continue;
+                var skub = (min - d) * k / 2;
+                dx /= d; dy /= d;
+                a.x -= dx * skub; a.y -= dy * skub;
+                b.x += dx * skub; b.y += dy * skub;
+            }
+        }
     };
 
     P.opdaterVand = function (v, skridt, dt) {
@@ -702,6 +730,24 @@
         var f = this.frit;
         o.maalX = f.x0 + Math.random() * Math.max(10, f.x1 - f.x0);
         o.maalY = f.y0 + Math.random() * Math.max(10, f.y1 - f.y0);
+        this.faldNed();
+    };
+
+    /* Er den nederste raekke i et stykke gaaet i opløsning, falder resten
+       af stykket ned paa bunden. Stykkerne flytter sig kun lodret, saa de
+       ikke glider rundt, mens vandet arbejder paa dem. */
+    P.faldNed = function () {
+        var nederst = {}, i, id;
+        for (i = 0; i < this.ioner.length; i++) {
+            var o = this.ioner[i];
+            if (o.tilstand !== "fast") continue;
+            nederst[o.stykke] = Math.max(nederst[o.stykke] === undefined ? -1 : nederst[o.stykke], o.r);
+        }
+        for (id in nederst) {
+            if (Object.prototype.hasOwnProperty.call(nederst, id) && this.stykker[id]) {
+                this.stykker[id].mdy = (this.raekker - 1 - nederst[id]) * this.celle;
+            }
+        }
     };
 
     /* Ionen er ude i vandet. De molekyler, der bar den ud, bliver siddende
@@ -935,7 +981,6 @@
                 var s = f.skal[j];
                 T.skalVand(ctx, f.x, f.y, r, s.vinkel + f.skalfase, vs, f.ion.q > 0, {
                     alpha: 0.95 * f.alpha,
-                    delta: this.visDelta && f.alpha > 0.9,
                     forkert: s.forkert,
                     ring: s.ring
                 });
@@ -1143,6 +1188,10 @@
                 sim.nulstil();
                 sim.spolFrem(function () { return sim.synligeFrie() >= 3; }, 240);
                 sim.spolFrem(function () { return false; }, 2.5);   /* lad vandskallerne lukke sig */
+                /* og vent, til ingen ion er midt paa vej ud, saa billedet er roligt */
+                sim.spolFrem(function () {
+                    return sim.ioner.every(function (ion) { return ion.tilstand !== "paavej"; });
+                }, 8);
                 fejl = sim.vaelgFejl();
                 sim.pause = true;
                 if (!fejl) return;
@@ -1165,7 +1214,7 @@
                 if (fejl) fejl.ion.skal[fejl.nr].ring = "#f2c53d";
             },
             slut: function (sim) {
-                sim.pauseUr = 3;
+                sim.pauseUr = 5;
             }
         };
         return o;
