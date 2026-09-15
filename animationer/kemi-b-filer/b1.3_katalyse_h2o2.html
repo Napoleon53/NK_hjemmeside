@@ -993,8 +993,8 @@
        langsomme (kogt kartoffel) kan følges til ende. */
     const grafCanvas = document.getElementById('grafCanvas');
     const gctx = grafCanvas.getContext('2d');
-    const GW = 400, GH = 272;
-    const GRAF = { x0: 56, x1: 386, y0: 14, y1: 182 };
+    const GW = 400, GH = 212;
+    const GRAF = { x0: 56, x1: 380, y0: 14, y1: 140 };
     const GRAF_TIDER = [30, 60, 120, 240];
     const GRAF_MAKS_TID = GRAF_TIDER[GRAF_TIDER.length - 1];
 
@@ -1036,10 +1036,10 @@
         [0, 0.5, 1].forEach(function (a) {
             gtekst(Math.round(a * 100) + ' %', GRAF.x0 - 8, gy(a), '#8a8a96', 13, 'right');
         });
-        [0, T / 2, T].forEach(function (s) {
+        [0, T / 2].forEach(function (s) {
             gtekst(String(s), gx(s), GRAF.y1 + 14, '#8a8a96', 13);
         });
-        gtekst('tid (s)', (GRAF.x0 + GRAF.x1) / 2, GRAF.y1 + 32, '#8a8a96', 13);
+        gtekst(T + ' s', GRAF.x1 + 14, GRAF.y1 + 14, '#8a8a96', 13, 'right');
         gctx.strokeStyle = '#55555f';
         gctx.lineWidth = 1.5;
         gctx.beginPath();
@@ -1061,7 +1061,7 @@
                 });
                 gctx.stroke();
             }
-            const sx = 14 + (i % 2) * 192, sy = 240 + Math.floor(i / 2) * 22;
+            const sx = 14 + (i % 2) * 192, sy = 178 + Math.floor(i / 2) * 22;
             gctx.strokeStyle = t.farve;
             gctx.lineWidth = 3;
             gctx.beginPath();
@@ -1867,7 +1867,9 @@
         const x = eX(bt);
         pil(x, eY(0), x, eY(bE) + 4, 'rgba(255,255,255,0.75)');
         pil(x, eY(bE), x, eY(0) - 4, 'rgba(255,255,255,0.75)');
-        tekst('Eₐ', x - 16, (eY(0) + eY(bE)) / 2, '#ffffff', 15, 'right', true);
+        /* Er pilen for kort til en etiket ved siden af, står Eₐ over toppen */
+        if (eY(0) - eY(bE) < 36) tekst('Eₐ', x, eY(bE) - 20, '#ffffff', 15, 'center', true);
+        else tekst('Eₐ', x - 16, (eY(0) + eY(bE)) / 2, '#ffffff', 15, 'right', true);
     }
 
     function tegnDeltaHPil() {
