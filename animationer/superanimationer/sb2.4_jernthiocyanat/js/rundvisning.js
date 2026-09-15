@@ -11,12 +11,13 @@
     var NK = window.NK;
 
     var TUR = [
-        { sel: "#scene", titel: "Laboratoriebordet", tekst: "Klik på genstandene for at bruge dem. Klik på et glas for at vælge det, og tag fat i det for at ryste det eller flytte det." },
+        { sel: "#scene", titel: "Laboratoriebordet", tekst: "Alt udstyr kan tages med musen og slippes der, hvor det skal bruges. Et klik bruger det på det valgte glas." },
+        { sel: "#stationer", titel: "Del 1 og del 2", tekst: "Skift mellem de syv glas og fortyndingsforsøget." },
         { sel: "#forloeb-kort", titel: "Forløbet", tekst: "Trinene får flueben, efterhånden som du når dem. Hint hjælper med det trin, du er ved." },
-        { sel: "#sammenlign-knap", titel: "Sammenlign", tekst: "Viser glassene ovenfra på hvidt papir. Her noterer du, om hvert glas er mørkere eller lysere end referencen." },
-        { sel: "#serie-kort", titel: "Tegneserie", tekst: "Når forsøget er slut, kan du se det som en tegneserie med dit resultatskema til sidst." },
-        { sel: "#quiz-kort", titel: "Quiz", tekst: "Låses op, når glassene er sammenlignet med referencen." },
-        { sel: "#forfraknap", titel: "Start forfra", tekst: "Starter forsøget forfra med tomme glas." },
+        { sel: "#visning-knap", titel: "Billede og ovenfra", tekst: "I del 1 tager du et billede af glassene, og i del 2 ser du bægerglassene ovenfra. Her noterer du, hvad du ser." },
+        { sel: "#serie-kort", titel: "Tegneserie", tekst: "Når begge dele er gjort, kan du se forsøget som en tegneserie med resultatskemaet til sidst." },
+        { sel: "#quiz-kort", titel: "Quiz", tekst: "Låses op, når der er taget billede af glas 1 til 7." },
+        { sel: "#forfraknap", titel: "Start forfra", tekst: "Starter hele forsøget forfra." },
         { sel: "#introknap", titel: "Om forsøget", tekst: "Hvad forsøget undersøger, og forløbet i korte træk." }
     ];
 

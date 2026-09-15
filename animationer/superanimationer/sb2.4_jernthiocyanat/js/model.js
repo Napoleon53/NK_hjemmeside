@@ -127,7 +127,7 @@
 
     /* Fast stof: µmol pr. spatelspids (ascorbinsyre: nogle faa korn), og
        hvor hurtigt det oploeses pr. sekund uden og med omroering */
-    var FAST = { fe: 30, scn: 60, vitc: 10, oploes: 0.22, roer: 1.6 };
+    var FAST = { fe: 30, scn: 60, vitc: 10, oploes: 0.22, roer: 3.0 };
 
     /* Ascorbinsyrens reduktion af Fe3+ pr. sekund */
     var REDUKTION = { k: 1.2 };
