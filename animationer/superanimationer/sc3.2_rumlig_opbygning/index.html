@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Molekylers rumlige opbygning</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1>Molekylers<span class="lang"> rumlige</span> opbygning</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-byg" role="tab" aria-selected="true"><span class="nr">1</span>Byg formen</button>
+        <button class="faneknap" data-fane="fane-molekyler" role="tab" aria-selected="false"><span class="nr">2</span>Molekylerne</button>
+        <button class="faneknap" data-fane="fane-polaritet" role="tab" aria-selected="false"><span class="nr">3</span>Polær eller upolær?</button>
+    </div>
+
+    <button class="topknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: BYG FORMEN                                                 -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-byg" role="tabpanel" aria-label="Byg formen">
+    <div class="scene">
+        <canvas id="byg-laerred" aria-label="Et centralatom med bindinger og frie elektronpar i 3D"></canvas>
+        <button class="vinkelknap" id="byg-vinkelknap" type="button" aria-pressed="false" title="Vinkelmåler (V)">
+            <img src="sprites/vinkelmaaler.svg" alt=""><span>Vinkelmåler</span>
+        </button>
+        <div class="scenebesked" id="byg-besked" aria-live="polite"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort" id="byg-saet">
+            <h2>Byggesæt <span class="taeller" id="byg-antal">0 af 4 retninger</span></h2>
+            <div class="brikker">
+                <div class="brik">
+                    <span class="brik-ikon enkelt" aria-hidden="true"></span>
+                    <span class="brik-navn">Enkeltbinding <small>til H</small></span>
+                    <button class="talknap" type="button" data-brik="enkelt" data-d="-1" aria-label="Fjern enkeltbinding">−</button>
+                    <b class="brik-tal" id="byg-tal-enkelt">0</b>
+                    <button class="talknap plus" type="button" data-brik="enkelt" data-d="1" aria-label="Tilføj enkeltbinding">+</button>
+                </div>
+                <div class="brik">
+                    <span class="brik-ikon dobbelt" aria-hidden="true"></span>
+                    <span class="brik-navn">Dobbeltbinding <small>til O</small></span>
+                    <button class="talknap" type="button" data-brik="dobbelt" data-d="-1" aria-label="Fjern dobbeltbinding">−</button>
+                    <b class="brik-tal" id="byg-tal-dobbelt">0</b>
+                    <button class="talknap plus" type="button" data-brik="dobbelt" data-d="1" aria-label="Tilføj dobbeltbinding">+</button>
+                </div>
+                <div class="brik">
+                    <span class="brik-ikon tripel" aria-hidden="true"></span>
+                    <span class="brik-navn">Tripelbinding <small>til N</small></span>
+                    <button class="talknap" type="button" data-brik="tripel" data-d="-1" aria-label="Fjern tripelbinding">−</button>
+                    <b class="brik-tal" id="byg-tal-tripel">0</b>
+                    <button class="talknap plus" type="button" data-brik="tripel" data-d="1" aria-label="Tilføj tripelbinding">+</button>
+                </div>
+                <div class="brik">
+                    <span class="brik-ikon fri" aria-hidden="true"></span>
+                    <span class="brik-navn">Frit elektronpar</span>
+                    <button class="talknap" type="button" data-brik="fri" data-d="-1" aria-label="Fjern frit elektronpar">−</button>
+                    <b class="brik-tal" id="byg-tal-fri">0</b>
+                    <button class="talknap plus" type="button" data-brik="fri" data-d="1" aria-label="Tilføj frit elektronpar">+</button>
+                </div>
+            </div>
+            <div class="tilstandsvalg" id="byg-visning" role="group" aria-label="Visning">
+                <button class="tilstandsknap aktiv" type="button" data-visning="molekyle">Molekyle</button>
+                <button class="tilstandsknap" type="button" data-visning="balloner">Balloner</button>
+            </div>
+            <div class="tjekraekke">
+                <label class="tjek"><input type="checkbox" id="byg-frie" checked> Frie elektronpar</label>
+                <button class="knap lille nulstil" id="byg-nulstil" type="button">Ryd <span class="tegn">↺</span></button>
+            </div>
+        </div>
+
+        <div class="kort maaling" id="byg-molekyle">
+            <h2>Det har du bygget</h2>
+            <div class="formelvis" id="byg-formelvis">
+                <span class="fformel" id="byg-formel">?</span>
+                <span class="fnavn" id="byg-navn"></span>
+            </div>
+            <div class="talraekke"><span>Form</span><span class="tal" id="byg-form">-</span></div>
+            <div class="talraekke"><span>Målt vinkel</span><span class="tal gul" id="byg-vinkel">-</span></div>
+        </div>
+
+        <!-- Én knap: Start opgave -> Giv hint -> Vis svaret -> Ny opgave (js/opgave.js) -->
+        <div class="kort opgavekort">
+            <h2>Opgave <span class="taeller">løst: <b id="byg-opg-loest">0</b></span></h2>
+            <p class="opgave-spm" id="byg-opg-tekst"></p>
+            <div class="valg" id="byg-opg-valg" hidden></div>
+            <p class="besked" id="byg-opg-hint"></p>
+            <p class="besked" id="byg-opg-svar"></p>
+            <div class="knaprad"><button class="knap blaa" id="byg-opg-knap" type="button">Start opgave</button></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: MOLEKYLERNE                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-molekyler" role="tabpanel" aria-label="Molekylerne">
+    <div class="scene">
+        <canvas id="mol-laerred" aria-label="Det valgte molekyle i 3D"></canvas>
+        <div class="prikpanel" id="mol-prikpanel">
+            <div class="prik-titel">Prikformel</div>
+            <canvas id="mol-prik"></canvas>
+        </div>
+        <button class="vinkelknap" id="mol-vinkelknap" type="button" aria-pressed="false" title="Vinkelmåler (V)">
+            <img src="sprites/vinkelmaaler.svg" alt=""><span>Vinkelmåler</span>
+        </button>
+        <div class="scenebesked" id="mol-besked" aria-live="polite"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort">
+            <h2>Vælg molekyle</h2>
+            <div class="molvalg" id="mol-menu"></div>
+        </div>
+
+        <div class="kort">
+            <h2>Visning</h2>
+            <div class="tilstandsvalg" id="mol-model" role="group" aria-label="Model">
+                <button class="tilstandsknap aktiv" type="button" data-model="kuglestang">Kugle-stang</button>
+                <button class="tilstandsknap" type="button" data-model="kalotte">Kalotte</button>
+            </div>
+            <div class="tjekraekke">
+                <label class="tjek"><input type="checkbox" id="mol-frie" checked> Frie elektronpar</label>
+                <label class="tjek"><input type="checkbox" id="mol-prikvis" checked> Prikformel</label>
+                <label class="tjek"><input type="checkbox" id="mol-drej" checked> Drej langsomt</label>
+            </div>
+        </div>
+
+        <div class="kort maaling">
+            <h2>Molekylet</h2>
+            <div class="formelvis">
+                <span class="fformel" id="mol-formel"></span>
+                <span class="fnavn" id="mol-navn"></span>
+            </div>
+            <div class="talraekke"><span>Form</span><span class="tal" id="mol-form"></span></div>
+            <div class="talraekke"><span>Bindingsvinkel</span><span class="tal gul" id="mol-vinkel"></span></div>
+            <div class="talraekke"><span>Frie elektronpar på centralatomet</span><span class="tal" id="mol-frie-tal"></span></div>
+        </div>
+
+        <div class="kort opgavekort">
+            <h2>Opgave <span class="taeller">løst: <b id="mol-opg-loest">0</b></span></h2>
+            <p class="opgave-spm" id="mol-opg-tekst"></p>
+            <div class="valg" id="mol-opg-valg" hidden></div>
+            <p class="besked" id="mol-opg-hint"></p>
+            <p class="besked" id="mol-opg-svar"></p>
+            <div class="knaprad"><button class="knap blaa" id="mol-opg-knap" type="button">Start opgave</button></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: POLAER ELLER UPOLAER?                                      -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-polaritet" role="tabpanel" aria-label="Polær eller upolær?">
+    <div class="scene">
+        <canvas id="pol-laerred" aria-label="Det valgte molekyle med træk i de polære bindinger"></canvas>
+        <div class="prikpanel" id="pol-prikpanel">
+            <div class="prik-titel">Prikformel</div>
+            <canvas id="pol-prik"></canvas>
+        </div>
+        <div class="scenebesked" id="pol-besked" aria-live="polite"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort">
+            <h2>Vælg molekyle</h2>
+            <div class="molvalg" id="pol-menu"></div>
+        </div>
+
+        <div class="kort">
+            <h2>Visning</h2>
+            <div class="tjekraekke">
+                <label class="tjek"><input type="checkbox" id="pol-delta" checked> δ+ og δ−</label>
+                <label class="tjek"><input type="checkbox" id="pol-traek" checked> Træk i bindingerne</label>
+                <label class="tjek"><input type="checkbox" id="pol-samlet"> Samlet træk</label>
+                <label class="tjek"><input type="checkbox" id="pol-drej" checked> Drej langsomt</label>
+            </div>
+        </div>
+
+        <div class="kort maaling" id="pol-en">
+            <h2>Bindingerne <span class="taeller">elektronegativitet</span></h2>
+            <div id="pol-en-tabel"></div>
+            <div class="talraekke sum"><span id="pol-formel">Molekylet</span><span class="maerke" id="pol-polaer"></span></div>
+        </div>
+
+        <div class="kort opgavekort">
+            <h2>Opgave <span class="taeller">løst: <b id="pol-opg-loest">0</b></span></h2>
+            <p class="opgave-spm" id="pol-opg-tekst"></p>
+            <div class="valg" id="pol-opg-valg" hidden></div>
+            <p class="besked" id="pol-opg-hint"></p>
+            <p class="besked" id="pol-opg-svar"></p>
+            <div class="knaprad"><button class="knap blaa" id="pol-opg-knap" type="button">Start opgave</button></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIBOKSEN: valgfri, aabnes med knappen eller T                    -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Teori: molekylers rumlige opbygning</h2>
+        <div class="teoriliste" id="teori-liste"></div>
+        <div class="knapper">
+            <button class="knap blaa" id="teori-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/1</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/frastoedning.js"></script>
+<script src="js/model3d.js"></script>
+<script src="js/prikformel.js"></script>
+<script src="js/opgave.js"></script>
+<script src="js/valg.js"></script>
+<script src="js/sim_byg.js"></script>
+<script src="js/sim_molekyler.js"></script>
+<script src="js/sim_polaritet.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
