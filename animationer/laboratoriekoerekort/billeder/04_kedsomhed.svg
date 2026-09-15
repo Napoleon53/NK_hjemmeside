@@ -1,0 +1,166 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <!-- Ventetid: filtreringen drypper, og en elev bag bordet klikker med
+       en lang lighter og spoerger til frikvarteret. Ved knagraekken tegner
+       en anden elev med tusch paa en af kitlerne. -->
+  <defs>
+    <linearGradient id="vaeg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9e4e2"/>
+      <stop offset="1" stop-color="#e8efee"/>
+    </linearGradient>
+    <linearGradient id="bord" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#46555a"/>
+      <stop offset="1" stop-color="#2c373b"/>
+    </linearGradient>
+    <linearGradient id="gulv" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8b3a6"/>
+      <stop offset="1" stop-color="#a39d90"/>
+    </linearGradient>
+    <linearGradient id="glas" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#b5d6ea" stop-opacity="0.7"/>
+      <stop offset="0.2" stop-color="#b5d6ea" stop-opacity="0.25"/>
+      <stop offset="0.8" stop-color="#b5d6ea" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#b5d6ea" stop-opacity="0.6"/>
+    </linearGradient>
+    <linearGradient id="kittel" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#dfe5e8"/>
+      <stop offset="0.45" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#d0d8db"/>
+    </linearGradient>
+    <linearGradient id="krom" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5a6270"/>
+      <stop offset="0.4" stop-color="#e9eef3"/>
+      <stop offset="1" stop-color="#4c5361"/>
+    </linearGradient>
+    <pattern id="fliser" width="120" height="80" patternUnits="userSpaceOnUse" y="280">
+      <rect width="120" height="80" fill="#f4f7f6"/>
+      <path d="M0 1 H120 M0 41 H120 M60 0 V40 M1 40 V80" stroke="#d2dddb" stroke-width="2"/>
+    </pattern>
+    <!-- Kittel paa knage: knagen i (0, 0) -->
+    <g id="knagekittel">
+      <path d="M0 0 v16 q0 10 -10 10" fill="none" stroke="#6f7b7a" stroke-width="6" stroke-linecap="round"/>
+      <path d="M0 18 L-44 44 Q-70 56 -74 90 L-88 380 L-22 392 L0 154 L22 392 L88 380 L74 90 Q70 56 44 44 Z" fill="url(#kittel)" stroke="#b9c3c6" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M0 20 L-22 44 L0 154 L22 44 Z" fill="#cdd5d8"/>
+      <path d="M0 154 V392" stroke="#b9c3c6" stroke-width="3"/>
+      <g fill="#c2cbce"><circle cx="10" cy="190" r="5"/><circle cx="10" cy="250" r="5"/><circle cx="10" cy="310" r="5"/></g>
+      <rect x="24" y="212" width="44" height="8" rx="3" fill="#d3dadd"/>
+    </g>
+    <!-- Elev set bagfra. Foedderne i (0, 0), skuldrene ved y -250. -->
+    <g id="ryg">
+      <rect x="-30" y="-70" width="26" height="70" rx="8" fill="#34495e"/>
+      <rect x="4" y="-70" width="26" height="70" rx="8" fill="#2e4053"/>
+      <path d="M-50 -248 Q0 -262 50 -248 L62 -60 H-62 Z" fill="url(#kittel)" stroke="#aeb9bc" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M0 -130 V-60" stroke="#aeb9bc" stroke-width="3"/>
+      <rect x="-14" y="-272" width="28" height="26" rx="7" fill="#d39a78"/>
+    </g>
+  </defs>
+
+  <!-- Vaeg, fliser og gulv -->
+  <rect width="1200" height="520" fill="url(#vaeg)"/>
+  <rect y="280" width="1200" height="120" fill="url(#fliser)"/>
+  <rect x="640" y="400" width="560" height="120" fill="#e8efee"/>
+  <rect x="640" y="506" width="560" height="14" fill="#c3ccca"/>
+  <rect y="520" width="1200" height="90" fill="url(#gulv)"/>
+
+  <!-- Knagraekke med kitler -->
+  <rect x="680" y="86" width="500" height="14" rx="4" fill="#8e9a99"/>
+  <use href="#knagekittel" transform="translate(790 100)"/>
+  <use href="#knagekittel" transform="translate(960 100)"/>
+  <!-- Gamle tegninger paa den forreste kittel -->
+  <path d="M836 276 l6 14 l15 1 l-12 9 l4 15 l-13 -8 l-13 8 l4 -15 l-12 -9 l15 -1 Z" fill="none" stroke="#1f2328" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M722 340 q10 -12 20 0 t20 0 t20 0" fill="none" stroke="#d8342a" stroke-width="4" stroke-linecap="round"/>
+  <!-- Ny tegning paa den bageste kittel -->
+  <g fill="none" stroke="#1f5fa8" stroke-width="4" stroke-linecap="round">
+    <circle cx="1004" cy="248" r="24"/>
+    <path d="M992 256 q12 12 24 0"/>
+    <path d="M916 300 c-14 -14 -30 4 0 22 c30 -18 14 -36 0 -22 Z"/>
+  </g>
+  <g fill="#1f5fa8"><circle cx="996" cy="242" r="3.5"/><circle cx="1012" cy="242" r="3.5"/></g>
+  <text x="990" y="330" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-style="italic" font-weight="700" fill="#1f5fa8">zzz</text>
+
+  <!-- Eleven, der tegner paa kitlen -->
+  <g transform="translate(1116 598) scale(0.9)"><use href="#ryg"/></g>
+  <circle cx="1116" cy="335" r="31" fill="#c9974a"/>
+  <path d="M1076 386 Q1040 366 1034 312" fill="none" stroke="#b9c3c6" stroke-width="30" stroke-linecap="round"/>
+  <path d="M1076 386 Q1040 366 1034 312" fill="none" stroke="#eef2f3" stroke-width="24" stroke-linecap="round"/>
+  <path d="M1030 300 L1014 274" stroke="#1f5fa8" stroke-width="10" stroke-linecap="round"/>
+  <path d="M1014 274 L1008 264" stroke="#1f2328" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="1032" cy="302" r="13" fill="#d39a78"/>
+
+  <!-- Eleven bag bordet med lighteren -->
+  <g>
+    <path d="M276 282 Q246 336 252 392" fill="none" stroke="#b9c3c6" stroke-width="42" stroke-linecap="round"/>
+    <path d="M276 282 Q246 336 252 392" fill="none" stroke="#eef2f3" stroke-width="36" stroke-linecap="round"/>
+    <path d="M272 270 Q330 252 388 270 L412 404 H248 Z" fill="url(#kittel)" stroke="#b9c3c6" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M308 262 L330 316 L352 262 Z" fill="#2e9b52"/>
+    <path d="M300 264 L330 330 L296 404 M360 264 L330 330 L364 404" fill="none" stroke="#b9c3c6" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M384 282 Q430 250 444 176" fill="none" stroke="#b9c3c6" stroke-width="42" stroke-linecap="round"/>
+    <path d="M384 282 Q430 250 444 176" fill="none" stroke="#f4f6f7" stroke-width="36" stroke-linecap="round"/>
+    <!-- Lang lighter med flamme -->
+    <g transform="translate(446 150) rotate(-30)">
+      <rect x="44" y="-5" width="128" height="10" rx="3" fill="#9aa5ab"/>
+      <rect x="168" y="-7" width="12" height="14" rx="2" fill="#6c7480"/>
+      <rect x="-40" y="-14" width="90" height="28" rx="10" fill="#e0703a"/>
+      <path d="M-4 14 q6 18 24 14" fill="none" stroke="#1f2328" stroke-width="7" stroke-linecap="round"/>
+    </g>
+    <path d="M606 62 Q586 40 602 6 Q608 28 616 18 Q630 44 606 62 Z" fill="#f7b733"/>
+    <path d="M606 58 Q598 46 604 30 Q613 44 606 58 Z" fill="#fde58a"/>
+    <ellipse cx="446" cy="152" rx="24" ry="22" fill="#c68a64"/>
+    <path d="M436 134 q10 -8 22 -2" fill="none" stroke="#c68a64" stroke-width="11" stroke-linecap="round"/>
+    <!-- Hoved -->
+    <rect x="314" y="238" width="32" height="30" rx="8" fill="#b57a55"/>
+    <circle cx="284" cy="212" r="10" fill="#c68a64"/>
+    <circle cx="376" cy="212" r="10" fill="#c68a64"/>
+    <ellipse cx="330" cy="206" rx="46" ry="50" fill="#c68a64"/>
+    <path d="M284 202 Q274 150 330 150 Q386 150 376 202 Q370 180 352 176 Q340 186 326 176 Q306 172 284 202 Z" fill="#3b2a20"/>
+    <path d="M286 206 H294 M366 206 H376" stroke="#1f5fa8" stroke-width="6"/>
+    <rect x="294" y="190" width="72" height="32" rx="11" fill="#9ed2ee" fill-opacity="0.55" stroke="#1f5fa8" stroke-width="5"/>
+    <path d="M330 192 V220" stroke="#1f5fa8" stroke-width="4"/>
+    <path d="M304 203 h18 M338 203 h18" stroke="#1f1a17" stroke-width="4" stroke-linecap="round"/>
+    <path d="M308 205 a5 4 0 0 0 10 0 Z M342 205 a5 4 0 0 0 10 0 Z" fill="#1f1a17"/>
+    <path d="M316 236 h28" stroke="#6e3b24" stroke-width="3.5" stroke-linecap="round"/>
+  </g>
+  <g font-family="Segoe UI, Arial, sans-serif" font-weight="800" fill="#1f2328">
+    <text x="478" y="222" font-size="26" transform="rotate(-10 478 222)">klik</text>
+    <text x="524" y="190" font-size="20" fill-opacity="0.55" transform="rotate(-10 524 190)">klik</text>
+  </g>
+
+  <!-- Taleboble -->
+  <g>
+    <path d="M44 34 H250 Q270 34 270 54 V120 Q270 140 250 140 H232 L284 176 L196 140 H44 Q24 140 24 120 V54 Q24 34 44 34 Z" fill="#ffffff" stroke="#1f2328" stroke-width="4" stroke-linejoin="round"/>
+    <g font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="700" fill="#1f2328" text-anchor="middle">
+      <text x="147" y="80">Hvor længe er der</text>
+      <text x="147" y="114">til frikvarter?</text>
+    </g>
+  </g>
+
+  <!-- Bordet med filtreringen, der drypper -->
+  <rect width="640" y="400" height="20" fill="#56676c"/>
+  <rect width="640" y="420" height="10" fill="#2c373b"/>
+  <rect width="640" y="430" height="90" fill="#cfd8d6"/>
+  <g stroke="#b3bfbd" stroke-width="3"><path d="M200 430 V520 M500 430 V520"/></g>
+  <g transform="translate(560 368) scale(0.45)">
+    <path d="M-50 12 L-70 54 Q-72 64 -60 64 H60 Q72 64 70 54 L50 12 Z" fill="#8cc7ea" fill-opacity="0.5"/>
+    <path d="M-16 -112 V-50 L-72 52 Q-78 70 -58 70 H58 Q78 70 72 52 L16 -50 V-112 Z" fill="url(#glas)" stroke="#5f8fb0" stroke-width="6" stroke-linejoin="round"/>
+  </g>
+  <path d="M518 262 H602 L570 300 V332 H550 V300 Z" fill="url(#glas)" stroke="#5f8fb0" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M526 266 H594 L560 298 Z" fill="#fbfaf5"/>
+  <ellipse cx="560" cy="350" rx="4" ry="6" fill="#8cc7ea"/>
+
+  <!-- Dit bord med slukket braender og kassen med lightere -->
+  <rect y="606" width="1200" height="114" fill="url(#bord)"/>
+  <rect y="602" width="1200" height="8" fill="#56676c"/>
+  <g transform="translate(200 0)">
+    <ellipse cx="0" cy="702" rx="70" ry="8" fill="#000" opacity="0.3"/>
+    <path d="M-52 700 L-40 676 H40 L52 700 Z" fill="#3a3f47"/>
+    <rect x="-12" y="592" width="24" height="86" fill="url(#krom)"/>
+    <rect x="-16" y="640" width="32" height="18" rx="3" fill="#6c7480"/>
+    <path d="M16 690 h70" stroke="#e05446" stroke-width="12" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(860 700)">
+    <ellipse cx="0" cy="4" rx="136" ry="10" fill="#000" opacity="0.28"/>
+    <rect x="-70" y="-120" width="30" height="70" rx="10" fill="#2c6fb3" transform="rotate(-10 -55 -85)"/>
+    <rect x="0" y="-116" width="30" height="70" rx="10" fill="#e0703a" transform="rotate(8 15 -81)"/>
+    <path d="M-120 -72 H120 V0 H-120 Z" fill="#c9a36b" stroke="#a8844f" stroke-width="3" stroke-linejoin="round"/>
+    <text x="0" y="-26" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="800" letter-spacing="1" fill="#5a4220">LIGHTERE</text>
+  </g>
+</svg>

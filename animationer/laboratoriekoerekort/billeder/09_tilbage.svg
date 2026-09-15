@@ -1,6 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
-  <!-- Der er haeldt for meget kobbersulfatopløsning op. En tragt er sat i
-       flaskens hals, og affaldsdunken staar ved siden af. -->
+  <!-- Der er en lille rest kobber(II)sulfatopløsning i bunden af
+       baegerglasset. En tragt er sat i flaskens hals, og affaldsdunken
+       staar ved siden af. -->
   <defs>
     <linearGradient id="vaeg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#d9e4e2"/>
@@ -64,16 +65,16 @@
     <ellipse cx="0" cy="-16" rx="30" ry="8" fill="#3c3c3c"/>
   </g>
 
-  <!-- Baegerglas med alt for meget opløsning -->
+  <!-- Baegerglas med en lille rest i bunden -->
   <g transform="translate(560 356)">
     <ellipse cx="80" cy="190" rx="92" ry="11" fill="#000" opacity="0.28"/>
-    <path d="M12 20 V172 Q12 188 28 188 H132 Q148 188 148 172 V20 Z" fill="#3d8fd6" fill-opacity="0.6"/>
+    <path d="M12 162 V172 Q12 188 28 188 H132 Q148 188 148 172 V162 Z" fill="#3d8fd6" fill-opacity="0.7"/>
+    <path d="M12 162 H148" stroke="#8cc7ea" stroke-width="3"/>
     <path d="M0 0 H160 L148 14 V172 Q148 188 132 188 H28 Q12 188 12 172 V14 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M12 20 H148" stroke="#8cc7ea" stroke-width="3"/>
     <g stroke="#9dbdd1" stroke-width="2.5" stroke-linecap="round">
       <path d="M112 50 h24 M120 84 h16 M112 118 h24 M120 152 h16"/>
     </g>
-    <text x="80" y="110" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="600" fill="#eef6fc" fill-opacity="0.85">250 mL</text>
+    <path d="M40 16 q-4 30 2 60 M58 14 q3 20 -1 38" fill="none" stroke="#3d8fd6" stroke-opacity="0.35" stroke-width="4" stroke-linecap="round"/>
     <path d="M26 30 V170" stroke="#ffffff" stroke-opacity="0.35" stroke-width="6" stroke-linecap="round"/>
   </g>
 

@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
-  <!-- Alle tre faelles vaegte og en mur af baegerglas er samlet paa ét
-       bord. Hylden til faelles udstyr er tom, og nogen spoerger efter
-       vaegtene. -->
+  <!-- Alle tre vaegte er baaret fra vaegtbordet over paa ét gruppebord
+       sammen med alt for mange baegerglas. Paa vaegtbordet er der kun
+       tomme pladser og loese ledninger, og nogen spoerger efter vaegtene. -->
   <defs>
     <linearGradient id="vaeg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#d9e4e2"/>
@@ -21,38 +21,60 @@
       <stop offset="0" stop-color="#eef1f2"/>
       <stop offset="1" stop-color="#bfc8cc"/>
     </linearGradient>
-    <pattern id="fliser" width="120" height="76" patternUnits="userSpaceOnUse" y="318">
+    <pattern id="fliser" width="120" height="76" patternUnits="userSpaceOnUse" y="150">
       <rect width="120" height="76" fill="#f4f7f6"/>
       <path d="M0 1 H120 M0 39 H120 M60 0 V38 M1 38 V76" stroke="#d2dddb" stroke-width="2"/>
     </pattern>
-    <!-- Vaegt: bund i (0, 0), 180 bred -->
+    <!-- Vaegt: bund i (0, 0), 180 bred. Display og nummer saettes paa bagefter. -->
     <g id="vaegt-figur">
       <rect x="-90" y="-50" width="180" height="50" rx="8" fill="url(#vaegt)" stroke="#9aa5ab" stroke-width="3"/>
-      <rect x="-70" y="-38" width="70" height="26" rx="3" fill="#1d2a24"/>
-      <text x="-35" y="-19" text-anchor="middle" font-family="Consolas, 'Courier New', monospace" font-size="17" font-weight="700" fill="#7ee0a8">0,00 g</text>
-      <circle cx="30" cy="-25" r="7" fill="#2e9b52"/>
-      <circle cx="56" cy="-25" r="7" fill="#9aa5ab"/>
+      <rect x="-76" y="-38" width="80" height="26" rx="3" fill="#1d2a24"/>
+      <circle cx="22" cy="-25" r="7" fill="#2e9b52"/>
+      <rect x="42" y="-38" width="36" height="26" rx="4" fill="#ffffff" stroke="#9aa5ab" stroke-width="2"/>
       <rect x="-60" y="-60" width="120" height="10" rx="4" fill="#d7dde0" stroke="#9aa5ab" stroke-width="3"/>
     </g>
     <path id="baeger" d="M0 0 H70 L64 7 V64 Q64 72 56 72 H14 Q6 72 6 64 V7 Z"/>
   </defs>
 
   <rect width="1200" height="470" fill="url(#vaeg)"/>
-  <rect y="318" width="1200" height="152" fill="url(#fliser)"/>
+  <rect y="150" width="1200" height="152" fill="url(#fliser)"/>
 
-  <!-- Hylde til faelles udstyr, nu tom -->
+  <!-- Vaegtbordet ved vaeggen, nu tomt -->
   <g>
-    <rect x="110" y="70" width="330" height="44" rx="4" fill="#0f766e"/>
-    <text x="275" y="100" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="800" letter-spacing="2" fill="#ffffff">FÆLLES UDSTYR</text>
-    <rect x="80" y="240" width="640" height="16" rx="3" fill="#a9b7b5"/>
-    <path d="M130 256 v24 M670 256 v24" stroke="#8e9a99" stroke-width="10"/>
+    <rect x="80" y="54" width="300" height="46" rx="4" fill="#0f766e"/>
+    <text x="230" y="86" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="800" letter-spacing="2" fill="#ffffff">VÆGTBORD</text>
+
+    <rect x="40" y="296" width="760" height="18" fill="#b9c6c4"/>
+    <rect x="40" y="314" width="760" height="12" fill="#56676c"/>
+    <rect x="40" y="326" width="760" height="144" fill="#cfd8d6"/>
+    <g stroke="#b3bfbd" stroke-width="3"><path d="M230 326 V470 M420 326 V470 M610 326 V470"/></g>
+
+    <!-- Stikkontakter med loese ledninger -->
+    <g>
+      <rect x="248" y="170" width="40" height="40" rx="6" fill="#ffffff" stroke="#b9c3c6" stroke-width="2"/>
+      <rect x="458" y="170" width="40" height="40" rx="6" fill="#ffffff" stroke="#b9c3c6" stroke-width="2"/>
+      <rect x="668" y="170" width="40" height="40" rx="6" fill="#ffffff" stroke="#b9c3c6" stroke-width="2"/>
+      <g fill="#6f7f82"><circle cx="262" cy="190" r="3.5"/><circle cx="274" cy="190" r="3.5"/><circle cx="472" cy="190" r="3.5"/><circle cx="484" cy="190" r="3.5"/><circle cx="682" cy="190" r="3.5"/><circle cx="694" cy="190" r="3.5"/></g>
+      <g fill="none" stroke="#2d2d2d" stroke-width="5" stroke-linecap="round">
+        <path d="M268 200 C270 250 240 278 196 292"/>
+        <path d="M478 200 C480 250 450 278 406 292"/>
+        <path d="M688 200 C690 250 660 278 616 292"/>
+      </g>
+      <g fill="#2d2d2d">
+        <rect x="176" y="286" width="24" height="12" rx="3"/>
+        <rect x="386" y="286" width="24" height="12" rx="3"/>
+        <rect x="596" y="286" width="24" height="12" rx="3"/>
+      </g>
+    </g>
+
+    <!-- Tomme pladser -->
     <g fill="none" stroke="#6f7f82" stroke-width="3" stroke-dasharray="9 7">
-      <rect x="100" y="180" width="180" height="60" rx="8"/>
-      <rect x="310" y="180" width="180" height="60" rx="8"/>
-      <rect x="520" y="180" width="180" height="60" rx="8"/>
+      <rect x="90" y="236" width="180" height="60" rx="8"/>
+      <rect x="300" y="236" width="180" height="60" rx="8"/>
+      <rect x="510" y="236" width="180" height="60" rx="8"/>
     </g>
     <g font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="700" fill="#6f7f82" text-anchor="middle">
-      <text x="190" y="217">Vægt 1</text><text x="400" y="217">Vægt 2</text><text x="610" y="217">Vægt 3</text>
+      <text x="180" y="273">Vægt 1</text><text x="390" y="273">Vægt 2</text><text x="600" y="273">Vægt 3</text>
     </g>
   </g>
 
@@ -62,36 +84,48 @@
     <text x="995" y="120" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="27" font-weight="700" fill="#1f2328">Hvem har taget vægtene?</text>
   </g>
 
+  <!-- Gruppebordet -->
   <rect y="470" width="1200" height="250" fill="url(#bord)"/>
   <rect y="466" width="1200" height="8" fill="#56676c"/>
 
-  <!-- Tre vaegte stablet paa hinanden -->
-  <g transform="translate(250 0)">
-    <ellipse cx="0" cy="632" rx="112" ry="12" fill="#000" opacity="0.3"/>
-    <use href="#vaegt-figur" transform="translate(0 630)"/>
-    <use href="#vaegt-figur" transform="translate(8 570) rotate(-3)"/>
-    <use href="#vaegt-figur" transform="translate(-6 510) rotate(4)"/>
+  <!-- De tre vaegte side om side -->
+  <g font-family="Segoe UI, Arial, sans-serif" font-weight="700" text-anchor="middle">
+    <g transform="translate(170 640)">
+      <ellipse cx="0" cy="2" rx="104" ry="11" fill="#000" opacity="0.3"/>
+      <use href="#vaegt-figur"/>
+      <text x="-36" y="-19" font-family="Consolas, 'Courier New', monospace" font-size="17" fill="#7ee0a8">0,00 g</text>
+      <text x="60" y="-18" font-size="17" fill="#1f2328">1</text>
+    </g>
+    <g transform="translate(370 640)">
+      <ellipse cx="0" cy="2" rx="104" ry="11" fill="#000" opacity="0.3"/>
+      <use href="#vaegt-figur"/>
+      <text x="-36" y="-19" font-family="Consolas, 'Courier New', monospace" font-size="17" fill="#7ee0a8">3,52 g</text>
+      <text x="60" y="-18" font-size="17" fill="#1f2328">2</text>
+      <path d="M-44 -78 H44 L32 -60 H-32 Z" fill="#ffffff" stroke="#c7d3d2" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M-26 -68 Q0 -84 26 -68 Z" fill="#3d8fd6"/>
+    </g>
+    <g transform="translate(570 640)">
+      <ellipse cx="0" cy="2" rx="104" ry="11" fill="#000" opacity="0.3"/>
+      <use href="#vaegt-figur"/>
+      <text x="-36" y="-19" font-family="Consolas, 'Courier New', monospace" font-size="17" fill="#7ee0a8">0,00 g</text>
+      <text x="60" y="-18" font-size="17" fill="#1f2328">3</text>
+    </g>
   </g>
 
-  <!-- Mur af baegerglas -->
+  <!-- Alt for mange baegerglas -->
+  <ellipse cx="840" cy="600" rx="170" ry="12" fill="#000" opacity="0.25"/>
   <g fill="url(#glas)" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round">
-    <use href="#baeger" transform="translate(470 540)"/>
-    <use href="#baeger" transform="translate(550 540)"/>
-    <use href="#baeger" transform="translate(630 540)"/>
-    <use href="#baeger" transform="translate(710 540)"/>
-    <use href="#baeger" transform="translate(790 540)"/>
-    <use href="#baeger" transform="translate(510 466)"/>
-    <use href="#baeger" transform="translate(590 466)"/>
-    <use href="#baeger" transform="translate(670 466)"/>
-    <use href="#baeger" transform="translate(750 466)"/>
-    <use href="#baeger" transform="translate(550 392)"/>
-    <use href="#baeger" transform="translate(630 392)"/>
-    <use href="#baeger" transform="translate(710 392)"/>
+    <use href="#baeger" transform="translate(740 474)"/>
+    <use href="#baeger" transform="translate(820 474)"/>
+    <use href="#baeger" transform="translate(900 474)"/>
+    <use href="#baeger" transform="translate(700 526)"/>
+    <use href="#baeger" transform="translate(780 526)"/>
+    <use href="#baeger" transform="translate(860 526)"/>
+    <use href="#baeger" transform="translate(940 526)"/>
   </g>
-  <ellipse cx="670" cy="614" rx="220" ry="12" fill="#000" opacity="0.25"/>
 
-  <!-- Baegerglas fuldt af spatler og en stak vejebaade -->
-  <g transform="translate(900 470)">
+  <!-- Baegerglas fuldt af spatler -->
+  <g transform="translate(1040 470)">
     <ellipse cx="60" cy="148" rx="74" ry="10" fill="#000" opacity="0.28"/>
     <g stroke="#b8c1c6" stroke-width="8" stroke-linecap="round">
       <path d="M30 120 L0 -20 M50 120 L40 -40 M70 120 L80 -30 M90 120 L120 -10 M60 120 L60 -50"/>
@@ -101,7 +135,9 @@
     </g>
     <path d="M0 30 H120 L110 40 V136 Q110 146 100 146 H20 Q10 146 10 136 V40 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round"/>
   </g>
-  <g transform="translate(1100 610)">
+
+  <!-- Stak vejebaade -->
+  <g transform="translate(830 672)">
     <path d="M-56 -22 H56 L40 22 H-40 Z" fill="#ffffff" stroke="#c7d3d2" stroke-width="3" stroke-linejoin="round"/>
     <path d="M-56 -36 H56 L40 8 H-40 Z" fill="#ffffff" stroke="#c7d3d2" stroke-width="3" stroke-linejoin="round"/>
     <path d="M-56 -50 H56 L40 -6 H-40 Z" fill="#ffffff" stroke="#c7d3d2" stroke-width="3" stroke-linejoin="round"/>

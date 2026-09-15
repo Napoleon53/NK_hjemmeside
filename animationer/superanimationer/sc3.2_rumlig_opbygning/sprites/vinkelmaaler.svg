@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="38" viewBox="0 0 64 38">
+  <!-- Vinkelmaaler: ikon paa knappen, der slaar vinkelmaaleren til. -->
+  <path d="M3 35 A 29 29 0 0 1 61 35 Z" fill="#cfe6f7" fill-opacity="0.16" stroke="#d6eaf8" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M15 35 A 17 17 0 0 1 49 35" fill="none" stroke="#d6eaf8" stroke-opacity="0.55" stroke-width="1"/>
+  <g stroke="#d6eaf8" stroke-width="1.5" stroke-linecap="round">
+    <path d="M57.1 20.5 L52.8 23 M46.5 9.9 L44 14.2 M32 6 L32 11 M17.5 9.9 L20 14.2 M6.9 20.5 L11.2 23"/>
+  </g>
+  <g stroke="#d6eaf8" stroke-opacity="0.7" stroke-width="1" stroke-linecap="round">
+    <path d="M60 27.5 L57.6 28.1 M52.5 14.5 L50.7 16.3 M39.5 7 L38.9 9.4 M24.5 7 L25.1 9.4 M11.5 14.5 L13.3 16.3 M4 27.5 L6.4 28.1"/>
+  </g>
+  <line x1="32" y1="35" x2="49" y2="17" stroke="#f2c53d" stroke-width="2.2" stroke-linecap="round"/>
+  <circle cx="32" cy="35" r="2.4" fill="#f2c53d"/>
+</svg>

@@ -1,14 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
-  <!-- Hele holdet stimler sammen foran stinkskabet for at se forsoeget.
-       Bordet i forgrunden staar urydet hen. -->
+  <!-- Hele holdet traenger sig sammen ved vaegtbordet for at se, mens én
+       elev afvejer kobber(II)sulfat. Der er spildt krystaller omkring
+       vaegten, og en elev yderst spoerger, om der er plads. -->
   <defs>
     <linearGradient id="vaeg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#d9e4e2"/>
       <stop offset="1" stop-color="#e8efee"/>
-    </linearGradient>
-    <linearGradient id="gulv" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#b8b3a6"/>
-      <stop offset="1" stop-color="#9d978a"/>
     </linearGradient>
     <linearGradient id="bord" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#46555a"/>
@@ -21,92 +18,192 @@
       <stop offset="1" stop-color="#b5d6ea" stop-opacity="0.5"/>
     </linearGradient>
     <linearGradient id="kittel" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#d7dee1"/>
+      <stop offset="0" stop-color="#dfe5e8"/>
       <stop offset="0.45" stop-color="#ffffff"/>
-      <stop offset="1" stop-color="#cbd3d6"/>
+      <stop offset="1" stop-color="#d0d8db"/>
     </linearGradient>
-    <linearGradient id="flamme" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#2f6fe0"/>
-      <stop offset="0.6" stop-color="#7fb2ff" stop-opacity="0.8"/>
-      <stop offset="1" stop-color="#bcd7ff" stop-opacity="0.2"/>
+    <linearGradient id="vaegt" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef1f2"/>
+      <stop offset="1" stop-color="#bfc8cc"/>
     </linearGradient>
     <pattern id="fliser" width="120" height="80" patternUnits="userSpaceOnUse" y="300">
       <rect width="120" height="80" fill="#f4f7f6"/>
       <path d="M0 1 H120 M0 41 H120 M60 0 V40 M1 40 V80" stroke="#d2dddb" stroke-width="2"/>
     </pattern>
-    <!-- Elev set bagfra. Foedderne i (0, 0), skuldrene ved y -250. -->
-    <g id="ryg">
-      <rect x="-30" y="-70" width="26" height="70" rx="8" fill="#34495e"/>
-      <rect x="4" y="-70" width="26" height="70" rx="8" fill="#2e4053"/>
-      <path d="M-50 -248 Q0 -262 50 -248 L62 -60 H-62 Z" fill="url(#kittel)" stroke="#aeb9bc" stroke-width="3" stroke-linejoin="round"/>
-      <path d="M0 -130 V-60" stroke="#aeb9bc" stroke-width="3"/>
-      <rect x="-14" y="-272" width="28" height="26" rx="7" fill="#d39a78"/>
+    <!-- Elev set forfra: overkrop i kittel. Origo midt mellem skuldrene;
+         color giver troejens farve i halsudskaeringen. -->
+    <g id="krop">
+      <path d="M-58 8 Q0 -10 58 8 L84 250 H-84 Z" fill="url(#kittel)" stroke="#b9c3c6" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M-22 -2 L0 52 L22 -2 Z" fill="currentColor"/>
+      <path d="M-30 0 L0 66 L-34 250 M30 0 L0 66 L34 250" fill="none" stroke="#b9c3c6" stroke-width="3" stroke-linejoin="round"/>
+    </g>
+    <!-- Hoved set forfra med sikkerhedsbriller. Origo midt i ansigtet;
+         color giver hudfarven. Haar og mund tegnes oven paa. -->
+    <g id="hoved">
+      <rect x="-16" y="32" width="32" height="32" rx="8" fill="currentColor"/>
+      <rect x="-16" y="32" width="32" height="32" rx="8" fill="#000" opacity="0.1"/>
+      <circle cx="-46" cy="6" r="10" fill="currentColor"/>
+      <circle cx="46" cy="6" r="10" fill="currentColor"/>
+      <ellipse rx="46" ry="50" fill="currentColor"/>
+      <path d="M-44 0 H-36 M36 0 H44" stroke="#1f5fa8" stroke-width="6"/>
+      <rect x="-36" y="-16" width="72" height="32" rx="11" fill="#9ed2ee" fill-opacity="0.55" stroke="#1f5fa8" stroke-width="5"/>
+      <path d="M0 -14 V14" stroke="#1f5fa8" stroke-width="4"/>
+      <circle cx="-17" cy="-1" r="4.5" fill="#1f1a17"/>
+      <circle cx="17" cy="-1" r="4.5" fill="#1f1a17"/>
+    </g>
+    <path id="haar-kort" d="M-46 -8 Q-52 -58 0 -58 Q54 -58 46 -8 Q38 -32 16 -36 Q12 -26 0 -30 Q-20 -36 -46 -8 Z"/>
+    <path id="haar-glat" d="M-46 -10 Q-50 -58 0 -60 Q50 -58 46 -10 Q30 -36 0 -36 Q-30 -36 -46 -10 Z"/>
+    <path id="haar-langt" d="M-50 -6 Q-58 -62 0 -62 Q58 -62 50 -6 L56 66 Q42 74 38 44 Q40 -22 0 -32 Q-40 -22 -38 44 Q-42 74 -56 66 Z"/>
+    <path id="haar-kroellet" d="M-50 -4 Q-62 -30 -40 -48 Q-36 -70 -10 -64 Q10 -80 30 -62 Q58 -62 54 -30 Q62 -10 48 0 Q40 -30 0 -34 Q-40 -30 -50 -4 Z"/>
+    <!-- Vaegt: bund i (0, 0), 180 bred -->
+    <g id="vaegt-figur">
+      <rect x="-90" y="-50" width="180" height="50" rx="8" fill="url(#vaegt)" stroke="#9aa5ab" stroke-width="3"/>
+      <rect x="-76" y="-38" width="80" height="26" rx="3" fill="#1d2a24"/>
+      <circle cx="34" cy="-25" r="7" fill="#2e9b52"/>
+      <circle cx="60" cy="-25" r="7" fill="#9aa5ab"/>
+      <rect x="-60" y="-60" width="120" height="10" rx="4" fill="#d7dde0" stroke="#9aa5ab" stroke-width="3"/>
     </g>
   </defs>
 
-  <rect width="1200" height="430" fill="url(#vaeg)"/>
-  <rect y="300" width="1200" height="130" fill="url(#fliser)"/>
-  <rect y="430" width="1200" height="290" fill="url(#gulv)"/>
+  <rect width="1200" height="600" fill="url(#vaeg)"/>
+  <rect y="300" width="1200" height="120" fill="url(#fliser)"/>
 
-  <!-- Stinkskab med forsoeget -->
-  <g>
-    <rect x="400" y="20" width="400" height="420" rx="6" fill="#c9d3d1"/>
-    <rect x="424" y="64" width="352" height="340" fill="#f3f7f2"/>
-    <rect x="424" y="64" width="352" height="20" fill="#fffbe0"/>
-    <path d="M540 250 L562 150 M660 250 L638 150 M548 150 H652" stroke="#3a3f47" stroke-width="7" stroke-linecap="round"/>
-    <path d="M590 250 Q582 214 600 176 Q618 214 610 250 Z" fill="url(#flamme)"/>
-    <path d="M566 94 V140 Q566 148 574 148 H626 Q634 148 634 140 V94 Z" fill="#8cc7ea" fill-opacity="0.5"/>
-    <path d="M560 80 H640 L634 86 V140 Q634 148 626 148 H574 Q566 148 566 140 V86 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round"/>
-    <rect x="424" y="206" width="352" height="198" fill="#cfe3ef" fill-opacity="0.35" stroke="#9fb1b0" stroke-width="5"/>
-    <rect x="566" y="208" width="68" height="10" rx="4" fill="#8e9a99"/>
-    <rect x="400" y="20" width="400" height="34" rx="6" fill="#b3bfbd"/>
-    <circle cx="768" cy="37" r="7" fill="#2eb04f"/>
-  </g>
-
-  <!-- Baegerglas paa kanten, der bliver skubbet -->
-  <g transform="translate(360 402) rotate(-24)">
-    <path d="M0 0 H60 L55 6 V52 Q55 58 49 58 H11 Q5 58 5 52 V6 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M6 32 V52 Q6 57 11 57 H49 Q54 57 54 52 V32 Z" fill="#e05446" fill-opacity="0.5"/>
-  </g>
-  <g fill="#e05446" fill-opacity="0.6"><circle cx="352" cy="386" r="5"/><circle cx="340" cy="372" r="3.5"/></g>
+  <!-- Skilt -->
+  <rect x="60" y="56" width="280" height="46" rx="4" fill="#0f766e"/>
+  <text x="200" y="88" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="24" font-weight="800" letter-spacing="2" fill="#ffffff">VÆGTBORD</text>
 
   <!-- Bageste raekke -->
-  <g transform="translate(360 500) scale(0.8)"><use href="#ryg"/><circle cy="-292" r="34" fill="#1f1a17"/></g>
-  <g transform="translate(452 486) scale(0.8)"><use href="#ryg"/><circle cy="-292" r="34" fill="#c9974a"/></g>
-  <g transform="translate(548 494) scale(0.8)"><use href="#ryg"/><circle cy="-292" r="34" fill="#5b3a24"/></g>
-  <g transform="translate(646 482) scale(0.8)"><use href="#ryg"/><circle cy="-292" r="34" fill="#8a3b22"/></g>
-  <g transform="translate(742 496) scale(0.8)"><use href="#ryg"/><circle cy="-292" r="34" fill="#1f1a17"/></g>
-  <g transform="translate(838 490) scale(0.8)"><use href="#ryg"/><circle cy="-292" r="34" fill="#6b4424"/></g>
-
-  <!-- Mobil i luften, der filmer -->
-  <path d="M676 300 Q690 236 700 190" fill="none" stroke="#f4f6f7" stroke-width="20" stroke-linecap="round"/>
-  <rect x="684" y="138" width="34" height="56" rx="6" fill="#1f2328"/>
-  <rect x="688" y="144" width="26" height="42" rx="3" fill="#3d8fd6"/>
+  <g transform="translate(606 356) scale(0.84)">
+    <use href="#krop" color="#2e9b52"/>
+    <g transform="translate(0 -60)">
+      <use href="#hoved" color="#c68a64"/>
+      <use href="#haar-glat" fill="#1f1a17"/>
+      <ellipse cx="0" cy="30" rx="7" ry="9" fill="#6e3b24"/>
+    </g>
+  </g>
+  <g transform="translate(494 404) scale(0.88)">
+    <use href="#krop" color="#e0703a"/>
+    <g transform="translate(0 -60)">
+      <use href="#hoved" color="#f0c9a8"/>
+      <use href="#haar-langt" fill="#6b4424"/>
+      <path d="M-12 30 q12 5 24 0" fill="none" stroke="#6e3b24" stroke-width="3.5" stroke-linecap="round"/>
+    </g>
+  </g>
+  <g transform="translate(714 396) scale(0.88)">
+    <use href="#krop" color="#7a4fb3"/>
+    <g transform="translate(0 -60)">
+      <use href="#hoved" color="#8d5a3b"/>
+      <use href="#haar-kroellet" fill="#1f1a17"/>
+      <path d="M-20 22 Q0 46 20 22 Z" fill="#ffffff" stroke="#4a2616" stroke-width="3" stroke-linejoin="round"/>
+    </g>
+  </g>
 
   <!-- Forreste raekke -->
-  <g transform="translate(300 616)"><use href="#ryg"/><circle cy="-292" r="34" fill="#d9a441"/></g>
-  <g transform="translate(424 606)"><use href="#ryg"/><circle cy="-292" r="34" fill="#3b2a20"/></g>
-  <g transform="translate(560 620)"><use href="#ryg"/><circle cy="-292" r="34" fill="#1f1a17"/></g>
-  <g transform="translate(694 604)"><use href="#ryg"/><circle cy="-292" r="34" fill="#9a5b34"/></g>
-  <g transform="translate(830 618)"><use href="#ryg"/><circle cy="-292" r="34" fill="#5b3a24"/></g>
-  <g transform="translate(196 640) scale(0.86)"><use href="#ryg"/><circle cy="-292" r="34" fill="#2b1e18"/></g>
-
-  <!-- Taleboble fra en af de bageste -->
+  <g transform="translate(250 476) rotate(8)">
+    <use href="#krop" color="#d8342a"/>
+    <g transform="translate(0 -60)">
+      <use href="#hoved" color="#6e452c"/>
+      <use href="#haar-kort" fill="#1f1a17"/>
+      <ellipse cx="0" cy="30" rx="7" ry="9" fill="#3a1d10"/>
+    </g>
+  </g>
+  <g transform="translate(1062 484) rotate(-3)">
+    <use href="#krop" color="#0f766e"/>
+    <g transform="translate(0 -60)">
+      <use href="#hoved" color="#e2a987"/>
+      <use href="#haar-glat" fill="#c9974a"/>
+      <circle cx="0" cy="-66" r="17" fill="#c9974a"/>
+      <path d="M-12 32 q12 -5 24 0" fill="none" stroke="#6e3b24" stroke-width="3.5" stroke-linecap="round"/>
+    </g>
+  </g>
+  <g transform="translate(418 466) rotate(12)">
+    <use href="#krop" color="#2c6fb3"/>
+    <g transform="translate(0 -60)">
+      <use href="#hoved" color="#b97a56"/>
+      <use href="#haar-kort" fill="#3b2a20"/>
+      <path d="M-20 22 Q0 46 20 22 Z" fill="#ffffff" stroke="#4a2616" stroke-width="3" stroke-linejoin="round"/>
+    </g>
+  </g>
+  <g transform="translate(792 466) rotate(-12)">
+    <use href="#krop" color="#f2c53d"/>
+    <g transform="translate(0 -60)">
+      <use href="#hoved" color="#f2d0b5"/>
+      <use href="#haar-langt" fill="#d9a441"/>
+      <ellipse cx="0" cy="30" rx="7" ry="9" fill="#6e3b24"/>
+    </g>
+  </g>
+  <!-- Den, der afvejer -->
+  <g transform="translate(600 446)">
+    <use href="#krop" color="#3d6fb3"/>
+    <g transform="translate(0 -60)">
+      <use href="#hoved" color="#e2a987"/>
+      <use href="#haar-kort" fill="#6b4424"/>
+      <path d="M-10 32 h20" stroke="#6e3b24" stroke-width="3.5" stroke-linecap="round"/>
+    </g>
+  </g>
+  <!-- Haand paa skulderen af den, der afvejer -->
+  <path d="M470 492 Q506 466 542 456" fill="none" stroke="#b9c3c6" stroke-width="36" stroke-linecap="round"/>
+  <path d="M470 492 Q506 466 542 456" fill="none" stroke="#eef2f3" stroke-width="30" stroke-linecap="round"/>
+  <ellipse cx="552" cy="454" rx="16" ry="13" fill="#b97a56"/>
+  <!-- Eleven yderst med en vejebaad -->
   <g>
-    <path d="M40 150 H250 Q268 150 268 168 V214 Q268 232 250 232 H200 L220 268 L166 232 H40 Q22 232 22 214 V168 Q22 150 40 150 Z" fill="#ffffff" stroke="#1f2328" stroke-width="4" stroke-linejoin="round"/>
-    <text x="145" y="200" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="26" font-weight="700" fill="#1f2328">Jeg kan ikke se!</text>
+    <path d="M1012 500 Q1000 532 1030 542" fill="none" stroke="#b9c3c6" stroke-width="34" stroke-linecap="round"/>
+    <path d="M1012 500 Q1000 532 1030 542" fill="none" stroke="#eef2f3" stroke-width="28" stroke-linecap="round"/>
+    <path d="M1108 496 Q1122 532 1092 542" fill="none" stroke="#b9c3c6" stroke-width="34" stroke-linecap="round"/>
+    <path d="M1108 496 Q1122 532 1092 542" fill="none" stroke="#eef2f3" stroke-width="28" stroke-linecap="round"/>
+    <path d="M1016 518 H1106 L1094 538 H1028 Z" fill="#ffffff" stroke="#c7d3d2" stroke-width="3" stroke-linejoin="round"/>
+    <ellipse cx="1034" cy="542" rx="14" ry="12" fill="#e2a987"/>
+    <ellipse cx="1088" cy="542" rx="14" ry="12" fill="#e2a987"/>
   </g>
 
-  <!-- Urydet bord i forgrunden -->
-  <path d="M930 560 H1200 V720 H890 Z" fill="url(#bord)"/>
-  <path d="M930 556 H1200 V566 H928 Z" fill="#56676c"/>
-  <g transform="translate(980 600)">
-    <path d="M0 0 H80 L73 8 V70 Q73 78 65 78 H15 Q7 78 7 70 V8 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M8 50 V70 Q8 77 15 77 H65 Q72 77 72 70 V50 Z" fill="#6b4a2a" fill-opacity="0.6"/>
+  <!-- Vaegtbordet -->
+  <rect y="560" width="1200" height="160" fill="url(#bord)"/>
+  <rect y="556" width="1200" height="8" fill="#56676c"/>
+
+  <!-- Vaegten med vejebaad -->
+  <ellipse cx="600" cy="702" rx="104" ry="11" fill="#000" opacity="0.3"/>
+  <use href="#vaegt-figur" transform="translate(600 700)"/>
+  <text x="564" y="681" text-anchor="middle" font-family="Consolas, 'Courier New', monospace" font-size="17" font-weight="700" fill="#7ee0a8">2,47 g</text>
+  <path d="M556 622 H644 L632 640 H568 Z" fill="#ffffff" stroke="#c7d3d2" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M574 632 Q600 614 626 632 Z" fill="#2f7fd0"/>
+
+  <!-- Glas med kobber(II)sulfat -->
+  <g transform="translate(880 700)">
+    <ellipse cx="0" cy="3" rx="66" ry="9" fill="#000" opacity="0.28"/>
+    <path d="M-56 -100 H56 V-10 Q56 0 46 0 H-46 Q-56 0 -56 -10 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3"/>
+    <path d="M-52 -58 V-10 Q-52 -4 -46 -4 H46 Q52 -4 52 -10 V-58 Z" fill="#2f7fd0" fill-opacity="0.8"/>
+    <rect x="-52" y="-84" width="104" height="36" rx="4" fill="#fbfaf5"/>
+    <text x="0" y="-60" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="700" fill="#1f2328">CuSO₄·5H₂O</text>
   </g>
-  <g transform="translate(1090 590) rotate(8)">
-    <path d="M0 0 H70 L64 7 V62 Q64 70 56 70 H14 Q6 70 6 62 V7 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round"/>
-    <path d="M7 46 V62 Q7 69 14 69 H56 Q63 69 63 62 V46 Z" fill="#3d8fd6" fill-opacity="0.5"/>
+
+  <!-- Armene over bordet -->
+  <path d="M556 464 Q514 540 534 616" fill="none" stroke="#b9c3c6" stroke-width="36" stroke-linecap="round"/>
+  <path d="M556 464 Q514 540 534 616" fill="none" stroke="#eef2f3" stroke-width="30" stroke-linecap="round"/>
+  <ellipse cx="546" cy="628" rx="16" ry="13" fill="#e2a987"/>
+  <path d="M644 464 Q690 540 646 598" fill="none" stroke="#b9c3c6" stroke-width="36" stroke-linecap="round"/>
+  <path d="M644 464 Q690 540 646 598" fill="none" stroke="#eef2f3" stroke-width="30" stroke-linecap="round"/>
+  <path d="M632 606 L608 622" stroke="#b8c1c6" stroke-width="6" stroke-linecap="round"/>
+  <ellipse cx="604" cy="624" rx="11" ry="5" fill="#d7dde0" stroke="#9aa5ab" stroke-width="2"/>
+  <ellipse cx="640" cy="604" rx="15" ry="13" fill="#e2a987"/>
+
+  <path d="M740 484 Q712 560 680 624" fill="none" stroke="#b9c3c6" stroke-width="36" stroke-linecap="round"/>
+  <path d="M740 484 Q712 560 680 624" fill="none" stroke="#eef2f3" stroke-width="30" stroke-linecap="round"/>
+  <circle cx="676" cy="632" r="14" fill="#f2d0b5"/>
+  <path d="M668 642 L654 662" stroke="#f2d0b5" stroke-width="9" stroke-linecap="round"/>
+
+  <!-- Spildte krystaller og en vaeltet vejebaad -->
+  <g fill="#2f7fd0">
+    <circle cx="512" cy="706" r="4"/><circle cx="528" cy="716" r="3"/><circle cx="496" cy="690" r="3"/>
+    <circle cx="694" cy="708" r="4"/><circle cx="712" cy="694" r="3"/><circle cx="560" cy="712" r="3"/><circle cx="650" cy="714" r="3"/>
   </g>
-  <path d="M960 700 q30 -30 60 -10 q30 20 20 -10" fill="none" stroke="#f3f1ea" stroke-width="12" stroke-linecap="round"/>
+  <g transform="translate(760 690) rotate(18)">
+    <path d="M-40 -14 H40 L30 6 H-30 Z" fill="#ffffff" stroke="#c7d3d2" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+  <path d="M726 704 q14 -8 30 -2 q10 6 -4 10 q-16 4 -26 -8 Z" fill="#2f7fd0"/>
+
+  <!-- Taleboble fra eleven yderst -->
+  <g>
+    <path d="M850 234 H1150 Q1170 234 1170 254 V296 Q1170 316 1150 316 H1082 L1066 364 L1040 316 H850 Q830 316 830 296 V254 Q830 234 850 234 Z" fill="#ffffff" stroke="#1f2328" stroke-width="4" stroke-linejoin="round"/>
+    <text x="1000" y="286" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="30" font-weight="700" fill="#1f2328">Må jeg komme til?</text>
+  </g>
 </svg>

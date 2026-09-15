@@ -196,6 +196,7 @@
         this.slutTid = null;
         this.pause = false;
         this.pauseUr = 0;
+        this.hvil = false;
         this.celle = 0;
         this.layout(true);
         this.justerHold();
@@ -535,6 +536,7 @@
             if (this.pauseUr <= 0) {
                 this.pauseUr = 0;
                 this.pause = false;
+                this.hvil = false;
                 this.rydFejl();
             }
         }
@@ -665,7 +667,9 @@
 
         switch (v.tilstand) {
         case "hjemme": {
-            o = this.tilbage() === 0 ? null : this.naermesteFrie(v);
+            /* hvil: opgaven "find fejlen" venter paa et roligt billede, saa
+               der startes ikke paa nye ioner imens. */
+            o = this.tilbage() === 0 || this.hvil ? null : this.naermesteFrie(v);
             /* En ion, der ikke er begyndt endnu, taeller med i graensen med
                det samme. Ellers ville de ioner, der allerede er i gang,
                naa at komme ud, efter graensen var naaet - og et
@@ -1188,10 +1192,14 @@
                 sim.nulstil();
                 sim.spolFrem(function () { return sim.synligeFrie() >= 3; }, 240);
                 sim.spolFrem(function () { return false; }, 2.5);   /* lad vandskallerne lukke sig */
-                /* og vent, til ingen ion er midt paa vej ud, saa billedet er roligt */
+                /* Start ikke paa flere ioner, og vent, til ingen er midt paa vej
+                   ud, og de nyeste har naaet at glide fri af de andre. */
+                sim.hvil = true;
                 sim.spolFrem(function () {
-                    return sim.ioner.every(function (ion) { return ion.tilstand !== "paavej"; });
-                }, 8);
+                    return sim.ioner.every(function (ion) {
+                        return ion.tilstand !== "paavej" && !(ion.tilstand === "fri" && ion.alder < 1.2);
+                    });
+                }, 10);
                 fejl = sim.vaelgFejl();
                 sim.pause = true;
                 if (!fejl) return;

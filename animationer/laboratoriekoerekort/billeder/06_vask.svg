@@ -1,6 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
-  <!-- Der skal haeldes fra en stor flaske over i en lille. Vasken er til
-       venstre, men der er allerede spildt paa bordet og kladdehaeftet. -->
+  <!-- Buretten skal fyldes fra den store flaske. Vasken er til venstre,
+       men buretten staar i stativet paa bordet, og der er allerede spildt
+       ved stativet og paa kladdehaeftet. -->
   <defs>
     <linearGradient id="vaeg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#d9e4e2"/>
@@ -20,17 +21,15 @@
       <stop offset="0" stop-color="#56636a"/>
       <stop offset="1" stop-color="#8b989d"/>
     </linearGradient>
+    <linearGradient id="krom" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5a6270"/>
+      <stop offset="0.4" stop-color="#e9eef3"/>
+      <stop offset="1" stop-color="#4c5361"/>
+    </linearGradient>
     <pattern id="fliser" width="120" height="76" patternUnits="userSpaceOnUse" y="318">
       <rect width="120" height="76" fill="#f4f7f6"/>
       <path d="M0 1 H120 M0 39 H120 M60 0 V38 M1 38 V76" stroke="#d2dddb" stroke-width="2"/>
     </pattern>
-    <g id="ghs05">
-      <rect x="-30" y="-30" width="60" height="60" transform="rotate(45)" fill="#ffffff" stroke="#d8342a" stroke-width="7"/>
-      <path d="M-22 -19 l14 -7 l4 8 l-14 7 Z M4 -23 l14 6 l-3.5 8 l-14 -6 Z" fill="#111"/>
-      <circle cx="-9" cy="-3" r="3.4" fill="#111"/>
-      <circle cx="11" cy="-3" r="3.4" fill="#111"/>
-      <path d="M-23 12 h18 v8 h-18 Z M4 11 q10 -4 19 2 v7 h-19 Z" fill="#111"/>
-    </g>
   </defs>
 
   <rect width="1200" height="470" fill="url(#vaeg)"/>
@@ -39,49 +38,67 @@
   <rect y="466" width="1200" height="8" fill="#56676c"/>
 
   <!-- Vask med hane -->
-  <rect x="90" y="498" width="440" height="150" rx="20" fill="#aab5b9"/>
-  <rect x="114" y="514" width="392" height="120" rx="14" fill="url(#kar)"/>
-  <circle cx="310" cy="596" r="15" fill="#454f54"/>
-  <path d="M300 596 h20 M310 586 v20" stroke="#6f7c80" stroke-width="3"/>
-  <rect x="292" y="470" width="36" height="34" rx="4" fill="#8e9a9e"/>
-  <path d="M310 476 V372 Q310 330 352 330 Q394 330 394 372 V404" fill="none" stroke="#a9b4b8" stroke-width="16" stroke-linecap="round"/>
-  <path d="M254 486 h30 M336 486 h30" stroke="#8e9a9e" stroke-width="10" stroke-linecap="round"/>
+  <rect x="50" y="498" width="400" height="150" rx="20" fill="#aab5b9"/>
+  <rect x="74" y="514" width="352" height="120" rx="14" fill="url(#kar)"/>
+  <circle cx="250" cy="596" r="15" fill="#454f54"/>
+  <path d="M240 596 h20 M250 586 v20" stroke="#6f7c80" stroke-width="3"/>
+  <rect x="232" y="470" width="36" height="34" rx="4" fill="#8e9a9e"/>
+  <path d="M250 476 V372 Q250 330 292 330 Q334 330 334 372 V404" fill="none" stroke="#a9b4b8" stroke-width="16" stroke-linecap="round"/>
+  <path d="M194 486 h30 M276 486 h30" stroke="#8e9a9e" stroke-width="10" stroke-linecap="round"/>
 
   <!-- Stor flaske med natriumhydroxid -->
-  <g transform="translate(660 262)">
+  <g transform="translate(500 262)">
     <ellipse cx="90" cy="276" rx="104" ry="13" fill="#000" opacity="0.28"/>
     <rect x="64" y="0" width="52" height="38" rx="5" fill="#2e9b52"/>
     <path d="M64 9 h52 M64 18 h52 M64 27 h52" stroke="#237a40" stroke-width="2"/>
     <path d="M70 38 H110 V62 C110 80 176 84 176 116 V256 Q176 276 156 276 H24 Q4 276 4 256 V116 C4 84 70 80 70 62 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3"/>
     <path d="M8 130 V256 Q8 272 24 272 H156 Q172 272 172 256 V130 Z" fill="#dff0f8" opacity="0.3"/>
-    <rect x="24" y="130" width="132" height="120" rx="6" fill="#fbfaf5" stroke="#c8bda6" stroke-width="2"/>
-    <text x="90" y="162" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="700" fill="#1f2328">NaOH (aq)</text>
-    <text x="90" y="186" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="17" font-weight="600" fill="#4a4f57">2 M</text>
-    <use href="#ghs05" transform="translate(90 220) scale(0.42)"/>
+    <rect x="24" y="140" width="132" height="92" rx="6" fill="#fbfaf5" stroke="#c8bda6" stroke-width="2"/>
+    <text x="90" y="182" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="25" font-weight="700" fill="#1f2328">NaOH (aq)</text>
+    <text x="90" y="212" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="19" font-weight="600" fill="#4a4f57">0,1 M</text>
     <path d="M18 120 V250" stroke="#ffffff" stroke-opacity="0.35" stroke-width="5" stroke-linecap="round"/>
     <path d="M150 104 q6 40 2 80" fill="none" stroke="#dff0f8" stroke-opacity="0.7" stroke-width="4" stroke-linecap="round"/>
   </g>
 
-  <!-- Lille flaske med tragt -->
-  <g transform="translate(900 380)">
-    <ellipse cx="60" cy="160" rx="72" ry="10" fill="#000" opacity="0.28"/>
-    <path d="M44 30 H76 V44 C76 56 116 60 116 84 V146 Q116 160 102 160 H18 Q4 160 4 146 V84 C4 60 44 56 44 44 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3"/>
-    <rect x="18" y="92" width="84" height="50" rx="4" fill="#fbfaf5" stroke="#c8bda6" stroke-width="2"/>
-    <path d="M30 108 h60 M30 124 h40" stroke="#4a4f57" stroke-width="4" stroke-linecap="round"/>
-    <path d="M10 -40 H110 L68 18 V52 H52 V18 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round"/>
+  <!-- Stativ med tom burette og tragt -->
+  <g>
+    <ellipse cx="1000" cy="628" rx="150" ry="11" fill="#000" opacity="0.28"/>
+    <rect x="870" y="596" width="270" height="28" rx="6" fill="#3a3f47"/>
+    <rect x="870" y="592" width="270" height="9" rx="4" fill="#5a616c"/>
+    <rect x="1094" y="60" width="14" height="540" rx="3" fill="url(#krom)"/>
+    <rect x="1088" y="50" width="26" height="14" rx="4" fill="#6c7480"/>
+    <rect x="976" y="232" width="120" height="12" rx="3" fill="#6c7480"/>
+    <rect x="1084" y="224" width="34" height="28" rx="5" fill="#3a3f47"/>
+    <circle cx="1101" cy="238" r="5" fill="#8e969e"/>
+    <rect x="936" y="224" width="52" height="28" rx="7" fill="#3a3f47"/>
+
+    <rect x="947" y="92" width="30" height="330" rx="4" fill="url(#glas)" stroke="#86a9c0" stroke-width="3"/>
+    <g stroke="#5d6f7a" stroke-width="2">
+      <path d="M949 130 h14 M949 150 h7 M949 170 h7 M949 190 h7 M949 210 h7 M949 230 h14 M949 270 h7 M949 290 h7 M949 310 h7 M949 330 h14 M949 350 h7 M949 370 h7 M949 390 h7 M949 410 h14"/>
+    </g>
+    <rect x="936" y="224" width="10" height="28" rx="3" fill="#3a3f47"/>
+    <rect x="978" y="224" width="10" height="28" rx="3" fill="#3a3f47"/>
+    <path d="M956 110 V410" stroke="#ffffff" stroke-opacity="0.45" stroke-width="4" stroke-linecap="round"/>
+    <path d="M951 420 H973 L968 440 H956 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="930" y="424" width="64" height="12" rx="5" fill="#2c6fb3"/>
+    <circle cx="962" cy="430" r="9" fill="#1e548a"/>
+    <path d="M958 440 L960 488 H964 L966 440 Z" fill="#e4f2f9" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M916 44 H1008 L970 82 V112 H954 V82 Z" fill="url(#glas)" stroke="#86a9c0" stroke-width="3" stroke-linejoin="round"/>
+    <!-- Draaber, der er loebet ned ad buretten -->
+    <path d="M976 250 q4 60 0 120" fill="none" stroke="#dff0f8" stroke-opacity="0.8" stroke-width="4" stroke-linecap="round"/>
   </g>
 
   <!-- Spild paa bordet og haeftet -->
   <g fill="#bfe3f6" fill-opacity="0.45" stroke="#dff0f8" stroke-opacity="0.5" stroke-width="2">
-    <path d="M760 560 q60 -14 120 0 q40 10 10 26 q-50 18 -110 8 q-50 -12 -20 -34 Z"/>
-    <ellipse cx="930" cy="604" rx="18" ry="6"/>
-    <ellipse cx="700" cy="590" rx="12" ry="4"/>
-    <ellipse cx="966" cy="628" rx="10" ry="4"/>
+    <path d="M880 648 q60 -14 120 0 q40 10 10 26 q-50 18 -110 8 q-50 -12 -20 -34 Z"/>
+    <ellipse cx="1060" cy="654" rx="18" ry="6"/>
+    <ellipse cx="830" cy="606" rx="14" ry="5"/>
+    <ellipse cx="760" cy="580" rx="10" ry="4"/>
   </g>
-  <g transform="translate(1060 640) rotate(-8)">
+  <g transform="translate(700 652) rotate(-6)">
     <rect x="-110" y="-70" width="230" height="160" rx="4" fill="#2c6fb3"/>
     <rect x="-100" y="-62" width="212" height="146" rx="2" fill="#fbfaf5"/>
     <path d="M-80 -36 h170 M-80 -10 h150 M-80 16 h170 M-80 42 h110" stroke="#b7bec4" stroke-width="5" stroke-linecap="round"/>
-    <path d="M-60 -50 q46 -14 72 14 q24 30 -8 52 q-36 20 -64 -6 q-24 -26 0 -60 Z" fill="#8cc7ea" fill-opacity="0.35"/>
+    <path d="M40 -50 q46 -14 64 14 q16 30 -12 48 q-34 18 -58 -8 q-20 -26 6 -54 Z" fill="#8cc7ea" fill-opacity="0.35"/>
   </g>
 </svg>
