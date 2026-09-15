@@ -3,8 +3,9 @@
 En superanimation: i modsætning til de øvrige animationer, som er én enkelt
 HTML-fil, ligger denne i sin egen mappe med adskilt CSS, JavaScript og sprites.
 
-Åbn **`index.html`**. Mappen er selvstændig og henter kun filer inde fra sig
-selv, så den kan flyttes uden at der knækker noget.
+Åbn **`index.html`**. Mappen henter kun filer inde fra sig selv, bortset fra
+den fælles laboratoriekode i `../laboratoriet/`. Den skal derfor ligge ved
+siden af den mappe.
 
 Den afløser `animationer/kemi-c-filer/c2.5_eksperiment_bundfald.html`, som nu
 ligger i `animationer/kemi-c-filer/arkiv/c2.5_eksperiment_bundfald_oldversion.html`.
@@ -210,9 +211,8 @@ sprite, skal tallene øverst i `scene.js` passe.
 
 ```
 index.html          markup: scene, skema, opgaverne, teori og rundvisning
+../laboratoriet/    fælles kerne.js og rundvisning.js for laboratorieforsøgene
 css/stil.css        alt udseende. NB: decimaltal med PUNKTUM i CSS
-js/kerne.js         NK-navnerum, hævet og sænket skrift, ladningHaevet,
-                    DPR-skarpt canvas, tegnehjælpere
 js/data.js          ionerne, flaskerne, skemaet, huskereglen, bundfaldenes
                     farver, formler, reaktionsskemaer og saltene i den frie opgave
 js/sprites.js       indlæser SVG'erne
@@ -222,7 +222,7 @@ js/laerer.js        lærerens replikker og hvornår han er fremme
 js/forsoeg.js       tilstanden: flasker, dryp, felter, sider, fjol, lup og køkkenrulle
 js/opgave.js        reaktionsskema-kortet og hintene
 js/fritopgave.js    opgaven om tungtopløselige salte
-js/rundvisning.js   spotlight-rundvisningen bag ?-knappen
+js/tur.js           rundvisningens stop; selve rundvisningen ligger i ../laboratoriet/
 js/app.js           skemaet i panelet, sideskift, knapper, tastatur, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen
 ```

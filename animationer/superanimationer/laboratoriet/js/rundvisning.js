@@ -1,24 +1,21 @@
 /* =====================================================================
    rundvisning.js - spotlight-rundvisning paa hjaelpeknappen
 
-   Samme rundvisning som i sc1.3: ét element ad gangen med en kort
-   tekst. Findes elementet ikke lige nu, springes trinnet over.
+   Faelles for laboratoriets forsoeg: ét element ad gangen med en kort
+   tekst. Stoppene staar i forsoegets egen js/tur.js:
+
+       NK.Rundvisning.tur([{ sel: "#scene", titel: "...", tekst: "..." }, ...]);
+
+   Hvert stop er en CSS-selector plus titel og tekst. Findes elementet
+   ikke lige nu, springes stoppet over. Matcher selectoren flere synlige
+   elementer, laegges spotlyset om dem alle.
    ===================================================================== */
 (function () {
     "use strict";
 
     var NK = window.NK;
 
-    var TUR = [
-        { sel: "#scene", titel: "Laboratoriet", tekst: "Klik på genstandene for at bruge dem. Flaskerne, vejebåden, bægerglasset og petriskålen trækkes derhen, hvor de skal bruges. Pistillen og glasstaven bevæges med musen." },
-        { sel: "#forloeb-kort", titel: "Forløbet", tekst: "Trinene får flueben, efterhånden som du når dem. Hint hjælper med det trin, du er ved." },
-        { sel: "#maal-kort", titel: "Måleskema", tekst: "Vejningerne skrives ind her. Til sidst beregner du fedtindholdet." },
-        { sel: "#iagttagelser-kort", titel: "Iagttagelser", tekst: "Det, du ser undervejs, bliver skrevet her." },
-        { sel: "#quiz-kort", titel: "Quiz", tekst: "Låses op, når du har fundet fedtindholdet i chipsene." },
-        { sel: "#nytknap", titel: "Nyt forsøg", tekst: "Starter forfra med nye chips. Resultaterne bliver stående, så forsøgene kan sammenlignes." },
-        { sel: "#introknap", titel: "Om forsøget", tekst: "Hvad forsøget undersøger, og forløbet i korte træk." }
-    ];
-
+    var TUR = [];
     var trinNr = 0;
     var erAktiv = false;
 
@@ -35,9 +32,20 @@
         var liste = synlige(sel);
         if (!liste.length) return null;
         var r = liste[0].getBoundingClientRect();
-        return { top: r.top, left: r.left, right: r.right, bottom: r.bottom, width: r.width, height: r.height };
+        var top = r.top, left = r.left, right = r.right, bottom = r.bottom;
+        for (var i = 1; i < liste.length; i++) {
+            var r2 = liste[i].getBoundingClientRect();
+            top = Math.min(top, r2.top);
+            left = Math.min(left, r2.left);
+            right = Math.max(right, r2.right);
+            bottom = Math.max(bottom, r2.bottom);
+        }
+        return { top: top, left: left, right: right, bottom: bottom, width: right - left, height: bottom - top };
     }
 
+    /* Boksen laegges der, hvor der er plads: under, over, til hoejre,
+       til venstre, eller midt i elementet, hvis det fylder det meste
+       af skaermen. */
     function placerBoks(rect) {
         var boks = NK.el("rv-boks");
         var margin = 16;
@@ -89,6 +97,7 @@
     }
 
     function start() {
+        if (!TUR.length) return;
         trinNr = 0;
         erAktiv = true;
         NK.el("rundvisning").hidden = false;
@@ -113,6 +122,7 @@
     }
 
     NK.Rundvisning = {
+        tur: function (liste) { TUR = liste; },
         start: start,
         luk: luk,
         aktiv: function () { return erAktiv; }

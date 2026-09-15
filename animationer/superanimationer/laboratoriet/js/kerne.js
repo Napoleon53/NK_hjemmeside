@@ -1,9 +1,13 @@
 /* =====================================================================
-   kerne.js - faelles hjaelpefunktioner for sc6.8
+   kerne.js - faelles hjaelpefunktioner for laboratoriets forsoeg
 
    Alt bor i det globale objekt NK. Ingen moduler og ingen fetch:
    mappen skal ogsaa virke, naar index.html aabnes direkte fra
    harddisken (file://).
+
+   Filen er foreningen af de kerner, forsoegene havde hver for sig.
+   Alt herfra maa bruges i ethvert forsoeg; ingen funktion maa faa
+   aendret betydning, uden at alle forsoeg er tjekket.
    ===================================================================== */
 var NK = window.NK || {};
 window.NK = NK;
@@ -38,12 +42,32 @@ window.NK = NK;
         return a + Math.random() * (b - a);
     };
 
+    NK.tilfaeldig = function (liste) {
+        return liste[Math.floor(Math.random() * liste.length)];
+    };
+
     NK.bland = function (liste) {
         var a = liste.slice();
         for (var i = a.length - 1; i > 0; i--) {
             var j = Math.floor(Math.random() * (i + 1));
             var t = a[i]; a[i] = a[j]; a[j] = t;
         }
+        return a;
+    };
+
+    /* Tilfaeldige tal, der altid er de samme for den samme kerne, saa
+       fx bundfaldet i et felt ikke flimrer fra billede til billede. */
+    NK.froe = function (kerne) {
+        var s = (kerne * 9301 + 49297) % 233280;
+        return function () {
+            s = (s * 9301 + 49297) % 233280;
+            return s / 233280;
+        };
+    };
+
+    NK.gcd = function (a, b) {
+        a = Math.abs(a); b = Math.abs(b);
+        while (b) { var t = a % b; a = b; b = t; }
         return a;
     };
 
@@ -74,6 +98,12 @@ window.NK = NK;
         return (stoerrelse === 1 ? "" : NK.haevet(stoerrelse)) + (q > 0 ? "⁺" : "⁻");
     };
 
+    /* Samlet ladning med fortegn foran: +3, −2, 0 */
+    NK.fortegn = function (q) {
+        if (q === 0) return "0";
+        return (q > 0 ? "+" : "−") + Math.abs(q);
+    };
+
     /* ----- Tekst-opdatering med cache -------------------------------- */
     var tekstCache = {};
     NK.saetTekst = function (id, tekst) {
@@ -95,9 +125,15 @@ window.NK = NK;
         };
     };
 
+    /* Farve som { r, g, b, a } til CSS-streng */
     NK.css = function (f, alfa) {
         var a = (f.a === undefined ? 1 : f.a) * (alfa === undefined ? 1 : alfa);
         return "rgba(" + Math.round(f.r) + ", " + Math.round(f.g) + ", " + Math.round(f.b) + ", " + a.toFixed(3) + ")";
+    };
+
+    /* Farve som [r, g, b] til CSS-streng */
+    NK.rgba = function (rgb, a) {
+        return "rgba(" + Math.round(rgb[0]) + ", " + Math.round(rgb[1]) + ", " + Math.round(rgb[2]) + ", " + a + ")";
     };
 
     /* ----- Positurer ------------------------------------------------------
@@ -181,9 +217,15 @@ window.NK = NK;
         return true;
     };
 
+    /* Glemmer stoerrelsen, saa naeste tilpas() saetter laerredet op paa ny.
+       Det nulstiller ogsaa alt, hvad der er gemt med save() og clip(). */
+    NK.Laerred.prototype.nulstil = function () {
+        this._dpr = 0;
+    };
+
     /* ----- Tegnehjaelpere -------------------------------------------- */
     NK.rundtRekt = function (ctx, x, y, b, h, r) {
-        var m = Math.min(r, b / 2, h / 2);
+        var m = Math.max(0, Math.min(r, b / 2, h / 2));
         ctx.beginPath();
         ctx.moveTo(x + m, y);
         ctx.lineTo(x + b - m, y);
@@ -206,10 +248,25 @@ window.NK = NK;
         ctx.closePath();
     };
 
+    /* Tekst, evt. med moerk kant, saa den kan laeses paa enhver baggrund.
+       Skriften vaelges med opt.font eller med opt.str (px) og opt.vaegt.
+       opt.maks: teksten skrumper, til den kan vaere i den bredde. */
     NK.tekst = function (ctx, tekst, x, y, opt) {
         opt = opt || {};
         ctx.save();
-        ctx.font = opt.font || "600 13px 'Segoe UI', sans-serif";
+        if (opt.font) {
+            ctx.font = opt.font;
+        } else {
+            var str = opt.str || 13;
+            var vaegt = opt.vaegt || 600;
+            ctx.font = vaegt + " " + str + "px 'Segoe UI', sans-serif";
+            if (opt.maks) {
+                while (str > 7 && ctx.measureText(tekst).width > opt.maks) {
+                    str -= 0.5;
+                    ctx.font = vaegt + " " + str + "px 'Segoe UI', sans-serif";
+                }
+            }
+        }
         ctx.textAlign = opt.justering || "left";
         ctx.textBaseline = opt.linje || "alphabetic";
         if (opt.kant) {
@@ -223,6 +280,7 @@ window.NK = NK;
         ctx.restore();
     };
 
+    /* Et blødt lysskaer. */
     NK.skaer = function (ctx, x, y, r, farve, styrke) {
         if (r <= 0) return;
         var g = ctx.createRadialGradient(x, y, 0, x, y, r);

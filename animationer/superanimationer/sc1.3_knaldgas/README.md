@@ -4,7 +4,8 @@ En superanimation: i modsætning til de øvrige animationer, som er én enkelt
 HTML-fil, ligger denne i sin egen mappe med adskilt CSS, JavaScript og sprites.
 
 Åbn **`index.html`**. Mappen henter kun filer inde fra sig selv, bortset fra
-læreren Kemichael i `../kemichael/`. Den skal derfor ligge ved siden af den mappe.
+læreren Kemichael i `../kemichael/` og den fælles laboratoriekode i
+`../laboratoriet/`. Den skal derfor ligge ved siden af de to mapper.
 
 Den afløser `animationer/kemi-c-filer/c1.3_eksperiment_dihydrogen_dioxygen.html`,
 som nu ligger i
@@ -99,8 +100,8 @@ i `js/scene.js`. Ændres en sprite, skal tallene i toppen af `scene.js` passe.
 
 ```
 index.html          markup: scene, graf, panel, teori og rundvisning
+../laboratoriet/    fælles kerne.js og rundvisning.js for laboratorieforsøgene
 css/stil.css        alt udseende. NB: decimaltal med PUNKTUM i CSS
-js/kerne.js         NK-navnerum, DPR-skarpt canvas, tegnehjælpere
 js/model.js         kemien: reaktion(h, o) og ordet efter knaldet
 js/lyd.js           knaldet med Web Audio, ingen lydfiler
 js/sprites.js       indlæser SVG'erne
@@ -108,7 +109,7 @@ js/scene.js         tegnebordet (1000 x 600) med alle mål og al tegning
 js/forsoeg.js       tilstanden: fyldning, træk, flyvning, knald, molekyler
 js/graf.js          søjlediagrammet under scenen
 js/quiz.js          quizkortet og de fem spørgsmål
-js/rundvisning.js   spotlight-rundvisningen bag ?-knappen
+js/tur.js           rundvisningens stop; selve rundvisningen ligger i ../laboratoriet/
 js/app.js           knapper, tastatur, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen
 ```

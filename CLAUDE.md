@@ -28,7 +28,10 @@ statiske sider i roden, downloads i `downloads/`.
   er slut (mønster: `sc6.8_substitution/js/tegneserie.js`).
 - Resultatskemaet for forsøget står i tegneseriens sidste rude, ikke som et
   kort i panelet.
-- Sidepanelet er 430 px bredt (`--panel-bredde` i `css/stil.css`).
+- Fælles kode for laboratorieforsøgene ligger i `laboratoriet/` (kerne,
+  rundvisning, grundstilark). Forsøgets egen `css/stil.css` har kun det, der
+  er særligt for forsøget. Se `laboratoriet/README.md`.
+- Sidepanelet er 430 px bredt (`--panel-bredde` i `laboratoriet/css/grund.css`).
 - Superanimationer om laboratorieforsøg har en intro-popup, der kort siger, hvad
   forsøget undersøger, og hvad eleven skal gøre. Den åbner af sig selv første
   gang og igen med knappen Om forsøget (mønster: `#intro` i

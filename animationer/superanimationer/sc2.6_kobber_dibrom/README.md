@@ -4,7 +4,8 @@ En superanimation: i modsætning til de øvrige animationer, som er én enkelt
 HTML-fil, ligger denne i sin egen mappe med adskilt CSS, JavaScript og sprites.
 
 Åbn **`index.html`**. Mappen henter kun filer inde fra sig selv, bortset fra
-læreren Kemichael i `../kemichael/`. Den skal derfor ligge ved siden af den mappe.
+læreren Kemichael i `../kemichael/` og den fælles laboratoriekode i
+`../laboratoriet/`. Den skal derfor ligge ved siden af de to mapper.
 
 Den afløser `animationer/kemi-c-filer/c2.6_eksperiment_kobber_dibrom.html`,
 som nu ligger i
@@ -141,8 +142,8 @@ under overfladen. Ændres en sprite, skal tallene i `scene.js` passe.
 
 ```
 index.html          markup: scene, panel, teori og rundvisning
-css/stil.css        alt udseende. NB: decimaltal med PUNKTUM i CSS
-js/kerne.js         NK-navnerum, ion-notation, positurer, vaeskeniveau
+../laboratoriet/    faelles for laboratorieforsoegene: kerne.js, rundvisning.js og grund.css
+css/stil.css        kun det saerlige for forsoeget: panelbredden. NB: decimaltal med PUNKTUM i CSS
 js/model.js         kemien: stoffer, afstemning, maengder, farver, 3 %
 js/lyd.js           lydene med Web Audio, ingen lydfiler
 js/sprites.js       indlaeser SVG'erne og tegner dem drejet om et anker
@@ -151,7 +152,7 @@ js/mikro.js         partikelmodellen i zoomboblerne
 js/forsoeg.js       trinene, klik, rystning, haeldning, draaber, affald
 js/uheld.js         paaskeaegget: kolben tabes, og der ryddes op
 js/quiz.js          quizkortet og de ti spoergsmaal
-js/rundvisning.js   spotlight-rundvisningen bag ?-knappen
+js/tur.js           rundvisningens stop; selve rundvisningen ligger i ../laboratoriet/
 js/app.js           panel, knapper, tastatur, tegneloekke
 _selvtest.html      udviklervaerktoej, indgaar ikke i animationen
 ```

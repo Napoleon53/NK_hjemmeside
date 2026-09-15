@@ -4,7 +4,8 @@ En superanimation: i modsætning til de øvrige animationer, som er én enkelt
 HTML-fil, ligger denne i sin egen mappe med adskilt CSS, JavaScript og sprites.
 
 Åbn **`index.html`**. Mappen henter kun filer inde fra sig selv, bortset fra
-læreren Kemichael i `../kemichael/`. Den skal derfor ligge ved siden af den mappe.
+læreren Kemichael i `../kemichael/` og den fælles laboratoriekode i
+`../laboratoriet/`. Den skal derfor ligge ved siden af de to mapper.
 
 Knappen i `samling_b2.html` (emne b2.4) peger direkte på denne `index.html`.
 Den tidligere b2.4, simulationen med partikler og graf, hedder nu
@@ -110,8 +111,8 @@ ovenfra og zoomboblen tegnes i koden. Navnene på bordets forkant står i
 
 ```
 index.html          markup: scene, delene, panel, intro, teori, tegneserie, rundvisning
-css/stil.css        alt udseende. NB: decimaltal med PUNKTUM i CSS
-js/kerne.js         NK-navnerum, ion-notation, positurer, væskeniveau
+../laboratoriet/    fælles for laboratorieforsøgene: kerne.js, rundvisning.js og grund.css
+css/stil.css        kun det særlige for forsøget: resultatskemaet og delknapperne. NB: decimaltal med PUNKTUM i CSS
 js/model.js         kemien og tallene: ligevægt, fast stof, reduktion, farver, fortynding
 js/lyd.js           lydene med Web Audio, ingen lydfiler
 js/sprites.js       indlæser SVG'erne og tegner dem drejet om et anker
@@ -122,7 +123,7 @@ js/bord.js          tegning af bordet og styring med musen
 js/laerer.js        Kemichaels scener i dette forsøg
 js/tegneserie.js    forsøget som tegneserie med resultatskemaet til sidst
 js/quiz.js          quizkortet og de ti spørgsmål
-js/rundvisning.js   spotlight-rundvisningen bag ?-knappen
+js/tur.js           rundvisningens stop; selve rundvisningen ligger i ../laboratoriet/
 js/app.js           panel, knapper, tastatur, tegneløkke
 _selvtest.html      udviklerværktøj, indgår ikke i animationen
 ```
