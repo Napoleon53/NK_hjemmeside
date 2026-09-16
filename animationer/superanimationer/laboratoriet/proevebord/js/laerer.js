@@ -186,7 +186,7 @@
             { kald: function () { this.laerer.baerer = null; } },
             { arm: HAENGER, tid: 0.4 },
             sig("Jeg henter et nyt.")
-        ].concat(K.uheld(), [
+        ].concat(K.glimtTrin("kunst"), K.uheld(), [
             { gaa: UDE },
             { kald: function () { this.genopstil(gg); if (NK.Lyd && NK.Lyd.dunk) NK.Lyd.dunk(); } }
         ]));

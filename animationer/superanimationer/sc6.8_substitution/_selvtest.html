@@ -312,11 +312,14 @@ function koerTest() {
 
     overskrift("6. Kaffen, uret, lampen og heksen");
     frisk();
+    /* Kaffen er faelles og ikke den samme to gange; her vaelges posten */
+    NK.Kemichael.kaffeTvang("ud");
     paastand("laereren henter kaffen", f.klik("kaffekop") === true);
-    adv(1.5);
+    adv(2.0);
     paastand("laereren siger, at der ikke drikkes i laboratoriet", f.laerer.tale.indexOf("drikkes") >= 0);
-    adv(12);
+    adv(16);
     paastand("koppen er vaek, og laereren er gaaet", f.g.kaffekop.skjult && !f.laererOptaget());
+    NK.Kemichael.kaffeTvang(null);
     paastand("uret faar tiden til at gaa hurtigere", f.klik("ur") === true && f.tidFart === M.UR.hurtig);
     var urFoer = f.urMinutter;
     adv(2);

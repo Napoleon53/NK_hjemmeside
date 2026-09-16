@@ -234,9 +234,12 @@ function koerTest() {
     for (i = 0; i < 12; i++) f.klik("pbGlas");
     paastand("efter to uheld sker det ikke mere", f.antalUheld === 2);
     frisk();
+    /* Kaffen er faelles og ikke den samme to gange; her vaelges posten */
+    NK.Kemichael.kaffeTvang("kold");
     paastand("laereren henter kaffen", f.klik("kaffekop") === true);
-    adv(10);
+    adv(16);
     paastand("koppen er vaek, og laereren er gaaet", f.g.kaffekop.skjult && !f.laererOptaget());
+    NK.Kemichael.kaffeTvang(null);
 
     overskrift("7. Quizzens spoergsmaal");
     paastand("quizzen har 10 spoergsmaal", NK.QUIZ.length === 10);

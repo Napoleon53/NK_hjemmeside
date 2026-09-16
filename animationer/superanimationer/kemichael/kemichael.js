@@ -40,8 +40,19 @@
                               laen      han laener sig ind, fx fra kanten
      { tid, hver(t) }       vent; hver kaldes undervejs med t fra 0 til 1
      { kald() }             kald en funktion
+     { taleFaerdig: true }  vent, til taleboblen er ude
      K.suk(tid)             et suk: oejnene lukkes, og hovedet synker
    En scene laaser forsoeget, mens den koerer, medmindre blokerer er false.
+
+   Han bliver ikke afbrudt, mens han taler: et klik paa ham preller af,
+   og en ny scene begynder med at vente, til boblen er faerdig. Boblen
+   staar 10 % laengere end den tid, scenen beder om, og aldrig kortere
+   end det tager at laese linjen (K.taleTid).
+
+   Replikker:
+     K.replik(kategori)        en vending fra puljen REPLIKKER, som ikke er
+                               brugt for nylig (ros, uheld, advarsel, prik1-4)
+     K.replik(navn, liste)     det samme med forsoegets egen liste
 
    Glimt af baggrunden:
      K.glimtTrin(id)   en liste med eet sig-trin, hvis glimtet ikke er vist
@@ -61,9 +72,13 @@
      tegnBaaretEkstra(ctx, L, hd)   andet i haanden end kaffekoppen
 
    Faelles paaskeaeg:
-     kaffe    klik paa koppen paa hylden: laereren henter sin kaffe
-     laerer   klik paa laereren: stadig kortere svar, til sidst roed i
-              hovedet og damp af oererne
+     kaffe    klik paa koppen paa hylden: laereren henter sin kaffe. Hvad
+              der sker, staar i KAFFE og er ikke det samme to gange. Ved
+              nogle poster bliver koppen staaende, saa aegget kan komme
+              igen uden et nyt forsoeg
+     laerer   klik paa laereren: fire svar fra puljerne prik1-4, stadig
+              kortere, og femte klik sender ham ud, roed i hovedet og med
+              damp af oererne
 
    Lydene (NK.Lyd.mumle, brum og slurk) staar i animationens lyd.js,
    fordi de foelger animationens egen lydknap.
@@ -101,7 +116,96 @@
         laererArm:   { x: 28, y: 142 }
     };
 
-    var SVAR = ["Ja?", "Hvad er der?", "Jeg har travlt.", "Lad være med det."];
+    /* ----- Replikker ------------------------------------------------------
+       Listerne er puljer, ikke raekkefoelger. K.replik(kategori, liste)
+       vaelger en, der ikke er brugt for nylig i denne sidevisning, saa den
+       samme vending ikke kommer to gange lige efter hinanden. Et forsoeg
+       kan give sin egen liste med: K.replik("ryst", RYST_SVAR). */
+    var REPLIKKER = {
+        /* Klik paa ham. Et trin for hvert klik; han bliver kortere for
+           hvert. Femte klik sender ham ud (gaaUd). */
+        prik1: [
+            "Ja?",
+            "Hvad er der?",
+            "Jeg står lige midt i noget.",
+            "Det er ikke en knap.",
+            "Jeg er her. Det kan du godt se.",
+            "Var der noget fagligt?"
+        ],
+        prik2: [
+            "Jeg har travlt.",
+            "Det bliver ikke rigtigere af at gentage det.",
+            "Forsøget står stadig derovre.",
+            "Ja. Stadig mig.",
+            "Prøv at prikke til opgaven i stedet.",
+            "Jeg har 28 elever. Du er lige nu alle 28."
+        ],
+        prik3: [
+            "Lad være med det.",
+            "Nu stopper du.",
+            "Det her fører ingen steder hen.",
+            "Jeg tæller også det her.",
+            "Der er en grænse. Den er tæt på.",
+            "Hænderne til dig selv. Også i et forsøg."
+        ],
+        prik4: [
+            "Nej.",
+            "Så er det nok.",
+            "Færdig.",
+            "Jeg har set det før. Det blev ikke sjovere.",
+            "Godt. Så gør vi det på den anden måde.",
+            "Det står i regnskabet."
+        ],
+        gaaUd: [
+            "Nu går jeg.",
+            "Så går jeg. Det er også en reaktion.",
+            "Jeg er i forberedelsen.",
+            "Farvel. Forsøget står der stadig."
+        ],
+        /* Faelles puljer, som forsoegene kan bruge med K.replik(kategori) */
+        ros: [
+            "Fint arbejde.",
+            "Det var rigtigt. Det sker.",
+            "Godt. Skriv det ned, før du glemmer det.",
+            "Sådan. Næsten som i bogen.",
+            "Det holder. Også i morgen."
+        ],
+        uheld: [
+            "Det var ikke meningen. Det er de færreste uheld.",
+            "Jeg henter køkkenrullen. Igen.",
+            "Sådan lærer man det også. Bare langsommere.",
+            "Det står i regnskabet.",
+            "Vi kalder det en observation."
+        ],
+        advarsel: [
+            "Læs etiketten, før du hælder.",
+            "Lidt ad gangen. Altid lidt ad gangen.",
+            "Det står på plakaten. Den hænger der stadig.",
+            "Briller på. De er ikke pynt."
+        ]
+    };
+
+    /* Replikker, der er brugt i denne sidevisning, pr. kategori */
+    var brugte = {};
+
+    function replik(kategori, liste) {
+        liste = liste || REPLIKKER[kategori];
+        if (!liste || !liste.length) return "";
+        var set = brugte[kategori] || (brugte[kategori] = []);
+        if (set.length >= liste.length) set.length = 0;
+        var rest = liste.filter(function (t) { return set.indexOf(t) < 0; });
+        var tekst = rest[Math.floor(Math.random() * rest.length)];
+        set.push(tekst);
+        return tekst;
+    }
+
+    /* Hvor laenge en replik staar. Taleboblen faar 10 % oveni, saa der er
+       tid til at laese den faerdig. */
+    var TALE_EKSTRA = 1.1;
+
+    function taleTid(tekst) {
+        return 1.3 + (tekst ? tekst.length : 0) * 0.055;
+    }
 
     /* ----- Glimt af baggrunden ------------------------------------------- */
     /* Hvert glimt hoerer til en bestemt haendelse; se tabellen i README.md. */
@@ -120,6 +224,11 @@
         jura:       "Aubergine så jeg sidst i 2011. Han læser jura nu.",
         titrering:  "Min første titrering gav 140 %. Det var en lang nat.",
         afslag:     "Mit afslag fra et tidsskrift hænger indrammet. Samme grund.",
+        kaktus:     "Bunsen er min kaktus. Han kan tåle det.",
+        kittel:     "Kitlen er fra min første lærerdag. Skiltet er nyere.",
+        fredag:     "Jeg går aldrig glip af et fredagsmøde. Der er kage.",
+        gave:       "Koppen var en gave fra en klasse, der ryddede op. Én gang.",
+        kunst:      "Skårene gemmer jeg. Det bliver en kunstinstallation.",
         regnskab3:  "Tredje uheld på den her computer. Det står i regnskabet.",
         regnskab6:  "Seks uheld på den her computer. Regnskabet har fået en mappe.",
         regnskab10: "Ti uheld. Regnskabet har fået sit eget ringbind."
@@ -131,7 +240,7 @@
     ];
 
     var LAGER = "nk-kemichael";
-    var hukommelse = { sete: [], uheld: 0 };
+    var hukommelse = { sete: [], uheld: 0, kaffe: [], kaffeTal: 0 };
     var glimtVist = false;
 
     function hent() {
@@ -175,8 +284,9 @@
     }
 
     function glimtNulstil() {
-        gem({ sete: [], uheld: 0 });
+        gem({ sete: [], uheld: 0, kaffe: [], kaffeTal: 0 });
         glimtVist = false;
+        brugte = {};
     }
 
     /* Et suk: oejnene lukkes, og hovedet synker og kommer op igen */
@@ -188,14 +298,301 @@
         } };
     }
 
-    /* Taleboble med hale ned mod (hx, hy) */
+    /* ----- Kaffen ---------------------------------------------------------
+       Koppen er hans, og det bliver aldrig det samme to gange. Hver post er
+       midterstykket mellem "han kommer hen til hylden" og "han gaar igen".
+       Trinene bygges med h, som kobler dem til netop dette forsoeg:
+
+         h.sig(tekst)      en replik, der faar tid til at blive laest
+         h.grib()          han tager koppen
+         h.drik(dybt)      koppen op til munden og en slurk
+         h.vip(v, tid)     koppen vippes (v = -2.4 er paa hovedet)
+         h.udtryk(o)       ansigtet glider derhen
+         h.vent(tid)       en pause
+         h.suk(tid)        et suk
+         h.damp(tid)       damp af oererne
+         h.sprut(antal)    han spytter kaffen ud
+         h.gaa(x, loeb)    han gaar (eller loeber) hen til x
+         h.glimt(id)       teksten til et glimt, hvis det maa vises nu
+         h.tal             hvilken kop i raekken det er
+
+       griber: false   han roerer ikke koppen
+       beholder: true  koppen bliver staaende, saa paaskeaegget kan komme igen
+       krav(tal)       posten kan kun vaelges, naar den passer */
+    var KAFFE = [
+        {
+            id: "kold",
+            sig: "Det er min kaffe.",
+            midte: function (h) {
+                return h.drik().concat(
+                    h.udtryk({ vrede: 0.2, humoer: -0.3, roed: 0 }), h.vent(0.4), h.suk(1.1),
+                    h.sig(h.glimt("kaffeKold") || "Kold. Som altid.")
+                );
+            }
+        },
+        {
+            id: "varm",
+            sig: "Det er min kaffe.",
+            midte: function (h) {
+                return h.drik().concat(
+                    h.udtryk({ vrede: 0.9, humoer: -0.7, roed: 1 }), h.damp(1.6), h.vent(0.9),
+                    h.sig("Den var varm. Det sker en gang om året."),
+                    h.udtryk({ roed: 0.2 })
+                );
+            }
+        },
+        {
+            id: "tom",
+            sig: "Så tager vi den.",
+            midte: function (h) {
+                return h.vip(-2.4, 0.7).concat(
+                    h.vent(1.1), h.udtryk({ humoer: -0.8, skeptisk: 0.5 }), h.vip(0, 0.4),
+                    h.sig("Tom. Så var det den time.")
+                );
+            }
+        },
+        {
+            id: "ud",
+            sig: "Der drikkes ikke i laboratoriet.",
+            midte: function (h) {
+                return h.gaa(-40).concat(
+                    h.drik(true), h.udtryk({ vrede: 0.1, humoer: 0.6, roed: 0 }),
+                    h.sig(h.glimt("kaffePause") || "Uden for døren er det en pause.")
+                );
+            }
+        },
+        {
+            id: "hoejt",
+            sig: "Den står for lavt.",
+            midte: function (h) {
+                return [{ arm: -0.1, tid: 0.6 }].concat(
+                    h.vent(0.5), h.sig("Den står højere fra i dag.")
+                );
+            }
+        },
+        {
+            id: "stirrer",
+            griber: false,
+            beholder: true,
+            midte: function (h) {
+                return h.udtryk({ vrede: 0.6, humoer: -0.5, briller: 1, laen: 0.7 }).concat(
+                    h.vent(2.4), h.sig("Ja."), h.vent(0.3),
+                    h.udtryk({ briller: 0, laen: 0 })
+                );
+            }
+        },
+        {
+            id: "glasstav",
+            midte: function (h) {
+                return h.drik().concat(
+                    h.udtryk({ vrede: 0.7, humoer: -0.6, skeptisk: 1, briller: 1 }), h.vent(0.5),
+                    h.sig("Nogen har rørt i den med en glasstav."),
+                    h.udtryk({ skeptisk: 0, briller: 0 })
+                );
+            }
+        },
+        {
+            id: "ligevaegt",
+            midte: function (h) {
+                return h.drik().concat(
+                    h.vent(0.4), h.sig("Rumtemperatur. Det er også en ligevægt.")
+                );
+            }
+        },
+        {
+            id: "oploesning",
+            sig: "Det er en opløsning.",
+            midte: function (h) {
+                return h.drik().concat(h.sig("Koncentrationen er min."));
+            }
+        },
+        {
+            id: "regnskab",
+            krav: function (tal) { return tal >= 3; },
+            sig: "Igen.",
+            midte: function (h) {
+                return h.vent(0.4).concat(
+                    h.sig("Det er kop nummer " + h.tal + " i regnskabet."), h.drik()
+                );
+            }
+        },
+        {
+            id: "sprut",
+            midte: function (h) {
+                return h.drik().concat(
+                    h.udtryk({ vrede: 1, humoer: -0.9, roed: 0.8 }), h.sprut(14), h.vent(0.6),
+                    h.sig("Den har stået siden i morges."), h.udtryk({ roed: 0.2 })
+                );
+            }
+        },
+        {
+            id: "kaktus",
+            sig: "Resten får Bunsen.",
+            midte: function (h) {
+                return h.vip(-1.9, 0.6).concat(
+                    h.sprut(10, true), h.vent(0.7), h.vip(0, 0.4),
+                    h.sig(h.glimt("kaktus") || "Han er en kaktus. Han kan tåle det.")
+                );
+            }
+        },
+        {
+            id: "kittel",
+            midte: function (h) {
+                return h.drik().concat(
+                    h.sprut(8, true), h.udtryk({ vrede: 0.8, humoer: -0.9, roed: 0.4 }), h.suk(1.2),
+                    h.sig(h.glimt("kittel") || "Der er kaffe på kitlen. Igen.")
+                );
+            }
+        },
+        {
+            id: "fredag",
+            griber: false,
+            beholder: true,
+            midte: function (h) {
+                return h.udtryk({ vrede: 0.2, humoer: 0.5 }).concat(
+                    h.vent(0.5), h.sig("Ikke nu. På fredag er der kage."),
+                    h.sig(h.glimt("fredag") || "")
+                );
+            }
+        },
+        {
+            id: "gave",
+            midte: function (h) {
+                return h.vent(0.6).concat(
+                    h.udtryk({ vrede: 0.2, humoer: 0.3 }),
+                    h.sig(h.glimt("gave") || "Koppen var en gave. Den blev her."),
+                    h.drik()
+                );
+            }
+        },
+        {
+            id: "navneskilt",
+            griber: false,
+            beholder: true,
+            midte: function (h) {
+                return h.udtryk({ vrede: 0.3, humoer: 0.2, briller: 1 }).concat(
+                    h.vent(0.4), h.sig("Der står BEDSTE LÆRER på koppen."),
+                    h.sig("Der står ikke noget på skiltet."), h.udtryk({ briller: 0 })
+                );
+            }
+        },
+        {
+            id: "stroem",
+            griber: false,
+            beholder: true,
+            midte: function (h) {
+                return h.udtryk({ vrede: 0.6, humoer: -0.4, skeptisk: 0.8 }).concat(
+                    h.sig("Kaffemaskinen og udsugningen deler stikkontakt."),
+                    h.sig("Vælg."), h.udtryk({ skeptisk: 0 })
+                );
+            }
+        },
+        {
+            id: "tavs",
+            midte: function (h) {
+                return h.udtryk({ vrede: 0.8, humoer: -0.7, skeptisk: 1 }).concat(
+                    h.vent(1.4), h.udtryk({ skeptisk: 0 })
+                );
+            }
+        },
+        {
+            id: "loeber",
+            loeb: true,
+            sig: "Nej.",
+            midte: function (h) {
+                return h.vent(0.3);
+            }
+        },
+        {
+            id: "tilbud",
+            sig: "Vil du smage?",
+            midte: function (h) {
+                return h.vent(0.7).concat(
+                    h.udtryk({ vrede: 0.7, humoer: -0.6 }), h.sig("Nej. Det vil du ikke."), h.drik()
+                );
+            }
+        },
+        {
+            id: "maalt",
+            midte: function (h) {
+                return [{ arm: -0.75, tid: 0.6 }].concat(
+                    h.udtryk({ briller: 1, skeptisk: 0.6 }), h.vent(0.8),
+                    h.sig("Der manglede 20 mL. Jeg har målt op."),
+                    h.udtryk({ briller: 0, skeptisk: 0 })
+                );
+            }
+        }
+    ];
+
+    /* Selvtesten skal kunne regne med et bestemt forloeb: K.kaffeTvang(id)
+       vaelger den naeste post, K.kaffeTvang(null) slaar det fra igen. */
+    var kaffeTvunget = null;
+
+    function kaffeTvang(id) {
+        kaffeTvunget = id || null;
+    }
+
+    /* Naeste kaffepost: en, der ikke er set foer i denne browser. Er de set
+       alle sammen, begynder raekken forfra. */
+    function kaffeVariant() {
+        var v = hent();
+        v.kaffeTal = (v.kaffeTal || 0) + 1;
+        if (kaffeTvunget) {
+            var tvunget = KAFFE.filter(function (k) { return k.id === kaffeTvunget; })[0];
+            if (tvunget) { gem(v); return { post: tvunget, tal: v.kaffeTal }; }
+        }
+        var sete = v.kaffe || [];
+        function kan(k) { return !k.krav || k.krav(v.kaffeTal); }
+        var rest = KAFFE.filter(function (k) { return kan(k) && sete.indexOf(k.id) < 0; });
+        if (!rest.length) {
+            sete = [];
+            rest = KAFFE.filter(kan);
+        }
+        var valgt = rest[Math.floor(Math.random() * rest.length)];
+        sete.push(valgt.id);
+        v.kaffe = sete;
+        gem(v);
+        return { post: valgt, tal: v.kaffeTal };
+    }
+
+    /* Linjer, der hver er hoejst maks bred. Lange replikker brydes, saa
+       boblen ikke loeber ud over scenen. */
+    var BOBLE_FONT = "700 17px 'Segoe UI', sans-serif";
+    var BOBLE_MAKS = 360;
+    var BOBLE_LINJE = 21;
+
+    function bobleLinjer(ctx, tekst) {
+        ctx.font = BOBLE_FONT;
+        if (ctx.measureText(tekst).width <= BOBLE_MAKS) return [tekst];
+        var ord = tekst.split(" "), linjer = [], nu = "";
+        for (var i = 0; i < ord.length; i++) {
+            var proev = nu ? nu + " " + ord[i] : ord[i];
+            if (nu && ctx.measureText(proev).width > BOBLE_MAKS) { linjer.push(nu); nu = ord[i]; }
+            else nu = proev;
+        }
+        if (nu) linjer.push(nu);
+        return linjer;
+    }
+
+    /* Boblens hoejde, saa den kan tegnes opad fra halen */
+    function bobleHoejde(ctx, tekst) {
+        ctx.save();
+        var n = bobleLinjer(ctx, tekst || "").length;
+        ctx.restore();
+        return 17 + n * BOBLE_LINJE;
+    }
+
+    /* Taleboble med hale ned mod (hx, hy). y er boblens overkant. */
     function tegnTaleboble(ctx, x, y, tekst, alfa, hx, hy) {
         if (alfa < 0.01 || !tekst) return;
         ctx.save();
         ctx.globalAlpha = NK.klamp(alfa, 0, 1);
-        ctx.font = "700 17px 'Segoe UI', sans-serif";
-        var b = ctx.measureText(tekst).width + 28, h = 38;
-        var bx = NK.klamp(x - b / 2, 8, NK.Scene.BREDDE - b - 8);
+        ctx.font = BOBLE_FONT;
+        var linjer = bobleLinjer(ctx, tekst);
+        var bred = 0;
+        linjer.forEach(function (l) { bred = Math.max(bred, ctx.measureText(l).width); });
+        var b = bred + 28, h = 17 + linjer.length * BOBLE_LINJE;
+        var bx = NK.klamp(x - b / 2, 8, Math.max(8, NK.Scene.BREDDE - b - 8));
         ctx.fillStyle = "#fffdf6";
         ctx.strokeStyle = "#2a2f36";
         ctx.lineWidth = 2;
@@ -214,7 +611,9 @@
         ctx.lineTo(hx, hy);
         ctx.lineTo(hale + 8, y + h);
         ctx.stroke();
-        NK.tekst(ctx, tekst, bx + b / 2, y + h / 2 + 1, { font: "700 17px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#1f2328" });
+        linjer.forEach(function (l, i) {
+            NK.tekst(ctx, l, bx + b / 2, y + 9 + BOBLE_LINJE * (i + 0.5) + 1, { font: BOBLE_FONT, justering: "center", linje: "middle", farve: "#1f2328" });
+        });
         ctx.restore();
     }
 
@@ -236,7 +635,7 @@
                 aaben: 0, blinkUr: 2, blink: 0, lukket: 0, nik: 0, damp: 0,
                 arm: HAENGER, armFra: HAENGER, armTil: HAENGER,
                 hovedV: 0, hovedDx: 0, hovedDy: 0,
-                baerer: null, klik: 0, plakatRegel: 0, rost: false,
+                baerer: null, kopV: 0, kopFra: 0, klik: 0, plakatRegel: 0, rost: false,
                 dampe: []
             };
             if (this.laererStartEkstra) this.laererStartEkstra();
@@ -259,6 +658,14 @@
             }
             L.hovedV = 0; L.hovedDx = 0; L.hovedDy = 0;
             L.lukket = 0;
+            L.kopV = 0;
+            /* Nyt forsoeg: koppen staar paa hylden igen, saa paaskeaegget
+               kan komme en gang til */
+            this.koppenVaek = false;
+            if (this.g && this.g.kaffekop) {
+                this.g.kaffekop.skjult = false;
+                this.g.kaffekop.iHaand = false;
+            }
             if (this.laererNytEkstra) this.laererNytEkstra();
         };
 
@@ -271,9 +678,23 @@
             return { plakatRegel: this.laerer ? this.laerer.plakatRegel : 0 };
         };
 
+        /* En ny scene afbryder ikke en replik, der er i gang. Staar boblen
+           endnu, begynder scenen med at vente, til han er talt faerdig. */
         P.laererKoer = function (navn, trin, blokerer) {
-            this.laerer.scene = { navn: navn, trin: trin, i: 0, t: 0, blokerer: blokerer !== false };
+            var L = this.laerer;
+            var rest = L && L.taleUr > 0 ? Math.min(L.taleUr, 3) : 0;
+            L.scene = {
+                navn: navn,
+                trin: rest > 0 ? [{ tid: rest }].concat(trin) : trin,
+                i: 0, t: 0,
+                blokerer: blokerer !== false
+            };
             this.aendret("laerer");
+        };
+
+        /* Sandt, mens taleboblen staar */
+        P.laererTaler = function () {
+            return !!(this.laerer && this.laerer.taleUr > 0);
         };
 
         /* ----- Skulder og haand -------------------------------------------- */
@@ -293,35 +714,121 @@
             return NK.tilVerden({ x: sk.x, y: sk.y, v: this.laerer.arm }, S.ANKER.laererArm, 28, 36);
         };
 
-        /* ----- Kaffen: altid kold, fordi han aldrig faar den drukket ------- */
+        /* Hovedet og munden, saa fx kaffe kan sprutte det rigtige sted fra */
+        P.laererHovedPositur = function () {
+            var L = this.laerer, krop = this.laererKrop();
+            return {
+                x: krop.x + L.hovedDx + L.laen * 10,
+                y: krop.y + 14 + L.nik + L.hovedDy,
+                v: krop.v + L.hovedV + L.laen * 0.18
+            };
+        };
+
+        P.laererMund = function () {
+            return NK.tilVerden(this.laererHovedPositur(), S.ANKER.laererHoved, 55, 97);
+        };
+
+        /* ----- Kaffen ------------------------------------------------------
+           Koppen er hans. Hvad der sker, staar i KAFFE; her bygges scenen
+           omkring posten: han kommer, tager (eller lader vaere), goer sit,
+           og gaar med koppen eller stiller den tilbage. */
+        function kaffeHjaelp(kop, tal) {
+            return {
+                tal: tal,
+                glimt: glimt,
+                sig: function (tekst, vis) {
+                    if (!tekst) return [];
+                    var t = vis || taleTid(tekst);
+                    return [{ sig: tekst, vis: t, tid: t * 0.8 }];
+                },
+                udtryk: function (o) { return [{ udtryk: o }]; },
+                vent: function (tid) { return [{ tid: tid }]; },
+                suk: function (tid) { return [suk(tid)]; },
+                gaa: function (x, loeb) { return [{ gaa: x, loeb: !!loeb }]; },
+                grib: function () {
+                    return [
+                        { arm: -0.5, tid: 0.55 },
+                        { kald: function () { kop.iHaand = true; this.laerer.baerer = "kaffekop"; } }
+                    ];
+                },
+                drik: function (dybt) {
+                    return [
+                        { arm: -0.98, tid: 0.6 },
+                        { kald: function () { if (NK.Lyd) NK.Lyd.slurk(); } },
+                        { tid: dybt ? 1.5 : 0.9 },
+                        { arm: -0.5, tid: 0.4 }
+                    ];
+                },
+                vip: function (v, tid) {
+                    return [
+                        { kald: function () { this.laerer.kopFra = this.laerer.kopV || 0; } },
+                        { tid: tid || 0.6, hver: function (t) {
+                            this.laerer.kopV = NK.lerp(this.laerer.kopFra, v, NK.blod(t));
+                        } }
+                    ];
+                },
+                damp: function (tid) {
+                    return [{ kald: function () { this.laerer.damp = tid || 1.5; if (NK.Lyd) NK.Lyd.brum(); } }];
+                },
+                sprut: function (antal, ned) {
+                    return [{ kald: function () { this.laererSprut(antal, ned); } }];
+                }
+            };
+        }
+
         P.klikKop = function () {
             var L = this.laerer, kop = this.g.kaffekop;
-            if (L.scene || kop.skjult) return false;
-            var kold = glimt("kaffeKold");
-            this.laererKoer("kaffe", [
-                { udtryk: { vrede: 0.8, humoer: -0.6, roed: 0.1 } },
-                { gaa: kaffeX },
-                { sig: "Det er min kaffe.", vis: 2.2, tid: 0.3 },
-                { arm: -0.5, tid: 0.55 },
-                { kald: function () { kop.iHaand = true; this.laerer.baerer = "kaffekop"; } },
-                { arm: -0.98, tid: 0.6 },
-                { kald: function () { if (NK.Lyd) NK.Lyd.slurk(); } }
-            ].concat(kold ? [
-                { udtryk: { vrede: 0.2, humoer: -0.3, roed: 0 } },
-                { tid: 0.5 },
-                suk(1.1),
-                { sig: kold, vis: 1.8, tid: 1.3 }
-            ] : [
-                { udtryk: { vrede: 0.1, humoer: 0.5, roed: 0 } },
-                { tid: 1.0 },
-                { sig: "Ahh.", vis: 1.3, tid: 1.1 }
-            ], [
-                { kald: function () { kop.skjult = true; this.koppenVaek = true; } },
-                { arm: -0.3, tid: 0.4 },
-                { gaa: UDE },
-                { kald: function () { this.laerer.baerer = null; } }
-            ]));
+            if (L.scene || kop.skjult || L.taleUr > 0) return false;
+            var valg = kaffeVariant();
+            var post = valg.post;
+            var h = kaffeHjaelp(kop, valg.tal);
+            var griber = post.griber !== false;
+
+            var trin = [{ udtryk: { vrede: 0.8, humoer: -0.6, roed: 0.1, skeptisk: 0, briller: 0, laen: 0 } }];
+            trin = trin.concat(h.gaa(kaffeX, post.loeb), h.sig(post.sig));
+            if (griber) trin = trin.concat(h.grib());
+            trin = trin.concat(post.midte(h));
+
+            if (griber && !post.beholder) {
+                trin = trin.concat([
+                    { kald: function () { kop.skjult = true; kop.iHaand = false; this.koppenVaek = true; } },
+                    { arm: -0.3, tid: 0.4 }
+                ]);
+            } else if (griber) {
+                trin = trin.concat([
+                    { arm: -0.5, tid: 0.35 },
+                    { kald: function () {
+                        kop.iHaand = false;
+                        this.laerer.baerer = null;
+                        this.laerer.kopV = 0;
+                        if (NK.Lyd && NK.Lyd.dunk) NK.Lyd.dunk();
+                    } },
+                    { arm: HAENGER, tid: 0.4 }
+                ]);
+            }
+            trin = trin.concat([
+                { udtryk: { skeptisk: 0, briller: 0, laen: 0 } },
+                { taleFaerdig: true },
+                { gaa: UDE, loeb: !!post.loeb },
+                { kald: function () { this.laerer.baerer = null; this.laerer.kopV = 0; } }
+            ]);
+            this.laererKoer("kaffe", trin);
             return true;
+        };
+
+        /* Kaffe, der ryger ud af munden (eller ned ad kitlen) */
+        P.laererSprut = function (antal, ned) {
+            var L = this.laerer;
+            var m = this.laererMund();
+            for (var i = 0; i < (antal || 10); i++) {
+                L.dampe.push({
+                    x: m.x + r(-5, 5), y: m.y + r(-3, 3),
+                    vx: ned ? r(-30, 30) : r(70, 230), vy: ned ? r(10, 60) : -r(20, 90),
+                    r: r(2.6, 5.4), vokser: -1.4, tyngde: 620, liv: 1.3,
+                    farve: "rgba(166, 118, 70, 0.92)"
+                });
+            }
+            if (NK.Lyd) NK.Lyd.brum();
         };
 
         /* ----- Klik paa laereren ------------------------------------------ */
@@ -332,32 +839,44 @@
             return null;
         };
 
+        /* Fire prikker giver fire svar, det femte sender ham ud. Prikker
+           midt i en replik gaar han ikke op i: han taler faerdig. */
         P.klikLaerer = function () {
             var L = this.laerer;
             if (!L || L.x < -100 || (L.scene && fredet.indexOf(L.scene.navn) >= 0)) return false;
+            if (L.taleUr > 0) return false;
             L.klik++;
             L.vredeMaal = 1;
             L.humoerMaal = -1;
-            if (L.klik <= SVAR.length) {
+            if (L.klik <= 4) {
                 var navn = L.klik === 1 ? glimt("navn") : null;
-                this.laererSig(navn || SVAR[L.klik - 1], navn ? 2.2 : 1.6);
+                var svar = navn || replik("prik" + L.klik);
+                this.laererSig(svar, taleTid(svar));
                 L.roedMaal = Math.min(1, 0.22 * L.klik);
                 return true;
             }
             L.roedMaal = 1;
             L.damp = 3;
-            this.laererSig("Nu går jeg.", 1.6);
             if (NK.Lyd) NK.Lyd.brum();
+            var farvel = replik("gaaUd");
             var blokerede = L.scene && L.scene.blokerer;
-            this.laererKoer("gaaUd", [{ arm: HAENGER, tid: 0.3 }, { tid: 1.1 }, { gaa: UDE }], !!blokerede);
+            this.laererKoer("gaaUd", [
+                { sig: farvel, vis: taleTid(farvel), tid: 0.3 },
+                { arm: HAENGER, tid: 0.3 },
+                { tid: 0.8 },
+                { taleFaerdig: true },
+                { gaa: UDE }
+            ], !!blokerede);
             return true;
         };
 
+        /* Taleboblen staar 10 % laengere end den tid, scenen beder om, og
+           aldrig kortere end det tager at laese linjen. */
         P.laererSig = function (tekst, vis) {
             var L = this.laerer;
             L.tale = tekst;
-            L.taleUr = vis || 2;
-            L.taleLaengde = Math.min(1.6, 0.12 + tekst.length * 0.045);
+            L.taleUr = Math.max((vis || 2), taleTid(tekst)) * TALE_EKSTRA;
+            L.taleLaengde = Math.min(2.2, 0.12 + tekst.length * 0.045);
             L.taleStart = this.tid;
             if (NK.Lyd) NK.Lyd.mumle(Math.max(1, Math.min(8, Math.round(tekst.length / 5))));
         };
@@ -374,6 +893,13 @@
                 var tr = sc.trin[sc.i];
                 if (!tr) { L.scene = null; this.aendret("laerer"); break; }
                 if (tr.kald) { tr.kald.call(this); sc.i++; sc.t = 0; continue; }
+                /* Vent, til taleboblen er faerdig, saa han ikke gaar fra
+                   sin egen replik */
+                if (tr.taleFaerdig) {
+                    if (L.taleUr > 0) break;
+                    sc.i++; sc.t = 0;
+                    continue;
+                }
                 if (tr.udtryk) {
                     var u = tr.udtryk;
                     if (u.vrede !== undefined) L.vredeMaal = u.vrede;
@@ -438,12 +964,14 @@
                     L.dampe.push({ x: hk.x + side * 44, y: hk.y - 56, vx: side * r(20, 50), vy: -r(40, 80), r: r(4, 7), liv: 1 });
                 }
             }
+            /* Damp stiger og vokser; draaber (tyngde) falder og skrumper */
             for (i = L.dampe.length - 1; i >= 0; i--) {
                 var dp = L.dampe[i];
+                if (dp.tyngde) dp.vy += dp.tyngde * dt;
                 dp.x += dp.vx * dt;
                 dp.y += dp.vy * dt;
-                dp.r += dt * 10;
-                dp.liv -= dt * 1.4;
+                dp.r = Math.max(0.4, dp.r + dt * (dp.vokser === undefined ? 10 : dp.vokser));
+                dp.liv -= dt * (dp.tyngde ? 1.1 : 1.4);
                 if (dp.liv <= 0) L.dampe.splice(i, 1);
             }
 
@@ -539,7 +1067,7 @@
             if (!L.baerer) return;
             var hd = this.laererHaand();
             if (L.baerer === "kaffekop") {
-                NK.Sprites.tegnPositur(ctx, "kaffekop", { x: hd.x + 8, y: hd.y + 26, v: 0 }, S.ANKER.kaffekop);
+                NK.Sprites.tegnPositur(ctx, "kaffekop", { x: hd.x + 8, y: hd.y + 26, v: L.kopV || 0 }, S.ANKER.kaffekop);
             } else if (this.tegnBaaretEkstra) {
                 this.tegnBaaretEkstra(ctx, L, hd);
             }
@@ -574,11 +1102,8 @@
             NK.Sprites.tegnPositur(ctx, "laererKrop", krop, S.ANKER.laererKrop);
 
             var ryst = L.taleUr > 0 ? Math.sin(tid * 9) * 0.05 * L.vrede * (L.humoer < 0 ? 1 : 0) : 0;
-            var hoved = {
-                x: krop.x + L.hovedDx + L.laen * 10,
-                y: krop.y + 14 + L.nik + L.hovedDy,
-                v: krop.v + ryst + L.hovedV + L.laen * 0.18
-            };
+            var hoved = this.laererHovedPositur();
+            hoved.v += ryst;
             NK.Sprites.tegnPositur(ctx, "laererHoved", hoved, S.ANKER.laererHoved);
             ctx.save();
             ctx.translate(hoved.x, hoved.y);
@@ -593,8 +1118,8 @@
             ctx.save();
             for (i = 0; i < L.dampe.length; i++) {
                 var d = L.dampe[i];
-                ctx.globalAlpha = NK.klamp(d.liv, 0, 1) * 0.7;
-                ctx.fillStyle = "#f4f6f8";
+                ctx.globalAlpha = NK.klamp(d.liv, 0, 1) * (d.farve ? 1 : 0.7);
+                ctx.fillStyle = d.farve || "#f4f6f8";
                 ctx.beginPath();
                 ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
                 ctx.fill();
@@ -602,7 +1127,8 @@
             ctx.restore();
 
             var top = krop.y - 118;
-            tegnTaleboble(ctx, krop.x + 150, top - 44, L.tale, L.taleAlfa, krop.x + 52, top + 50);
+            var bh = bobleHoejde(ctx, L.tale);
+            tegnTaleboble(ctx, krop.x + 150, top - 6 - bh, L.tale, L.taleAlfa, krop.x + 52, top + 50);
         };
     }
 
@@ -614,7 +1140,12 @@
         SPRITES: SPRITES,
         ANKER: ANKER,
         GLIMT: GLIMT,
+        REPLIKKER: REPLIKKER,
+        KAFFE: KAFFE,
         tegnTaleboble: tegnTaleboble,
+        taleTid: taleTid,
+        replik: replik,
+        kaffeTvang: kaffeTvang,
         paa: paa,
         glimt: glimt,
         glimtTrin: glimtTrin,

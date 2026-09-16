@@ -6,8 +6,6 @@
    forsoeg.
 
    Paaskeaeg og uheld:
-     kaffe     klik paa koppen paa hylden: laereren tager den med, fordi
-               der ikke drikkes i laboratoriet, og drikker paa vej ud
      uheld     indholdet sproejter ud af et glas, fordi proppen sprang af
                under voldsom rystning, eller fordi der blev rystet uden
                prop: laereren sukker, kommer med koekkenrulle og toerrer
@@ -19,8 +17,8 @@
      hexen     hex-1-en i et glas: en addition, som ikke hoerer til forsoeget
      sluklampe lampen staar taendt uden glas under sig
 
-   Glimt af baggrunden: kaffePause (kaffen), dab, stroem (lampen) og
-   regnskabet over uheld (spildet og udsugningen).
+   Glimt af baggrunden: dab, stroem (lampen) og regnskabet over uheld
+   (spildet og udsugningen). Kaffen er faelles.
    ===================================================================== */
 (function () {
     "use strict";
@@ -38,32 +36,6 @@
     P.laererNytEkstra = function () {
         this.laerer.baerer = null;
         this.laerer.rost = false;
-    };
-
-    /* ----- Kaffen: tages med ud af laboratoriet --------------------------- */
-    P.klikKop = function () {
-        var L = this.laerer, kop = this.g.kaffekop;
-        if (L.scene || kop.skjult) return false;
-        var pause = K.glimt("kaffePause");
-        this.laererKoer("kaffe", [
-            { udtryk: { vrede: 0.8, humoer: -0.6, roed: 0.1 } },
-            { gaa: 130 },
-            { sig: "Der drikkes ikke i laboratoriet.", vis: 2.6, tid: 0.3 },
-            { arm: -0.5, tid: 0.55 },
-            { kald: function () { kop.iHaand = true; this.laerer.baerer = "kaffekop"; kop.skjult = true; this.koppenVaek = true; } },
-            { arm: -0.3, tid: 0.5 },
-            { tid: 1.2 },
-            { kald: function () { if (NK.Lyd) NK.Lyd.brum(); } },
-            { gaa: -40 },
-            { arm: -0.98, tid: 0.5 },
-            { kald: function () { if (NK.Lyd) NK.Lyd.slurk(); } },
-            { udtryk: { vrede: 0.1, humoer: 0.6, roed: 0 } },
-            pause ? { sig: pause, vis: 2.0, tid: 1.8 } : { sig: "Ahh.", vis: 1.3, tid: 1.2 },
-            { arm: -0.3, tid: 0.3 },
-            { gaa: UDE },
-            { kald: function () { this.laerer.baerer = null; } }
-        ]);
-        return true;
     };
 
     /* ----- Ros ---------------------------------------------------------- */

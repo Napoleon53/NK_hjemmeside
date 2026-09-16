@@ -5,7 +5,8 @@ påskeæg og glimtene af hans baggrund ligger her, så han ser ens ud og opføre
 ens alle steder. Hver animation har sine egne scener i sin `js/laerer.js`.
 
 Bruges i sc1.3 Knaldgas, sc2.1 Salt i vand, sc2.6 Kobber og dibrom, sc2.7
-Blyiodid, sc6.8 Substitution, sc6.9 Fedt i chips, sc8.6 Jern i ståluld og sb2.4 Jernthiocyanat.
+Blyiodid, sc6.8 Substitution, sc6.9 Fedt i chips, sc8.6 Jern i ståluld, sb2.4
+Jernthiocyanat og prøvebordet i `laboratoriet/`.
 Animationerne henter filer herfra og skal derfor ligge ved siden af denne mappe.
 sc2.1 har intet fast tegnebord; dens `js/laerer.js` laver et `NK.Scene` med de mål,
 figuren bruger, og tegner ham skaleret efter lærredets højde. sc2.5 Fældning har en ældre udgave af ham, der kigger op i hjørnet;
@@ -27,7 +28,7 @@ ståluld.
 
 **Vaner.**
 
-* Kaffen er hans, og han får den aldrig drukket, mens den er varm.
+* Kaffen er hans. Den er sjældent varm, og han får den aldrig drukket i fred.
 * Han fører regnskab over uheld.
 * Han peger på plakaten med sikkerhedsreglerne med løftet finger.
 * Han kigger over brillerne, når noget er tvivlsomt, og sukker, når det sker igen.
@@ -43,14 +44,18 @@ ståluld.
 * Konfiskerede chips bliver til frokost.
 * Han lærte at dabbe af en 1.g i 2016 og mener stadig, det er moderne.
 * Strømmen og kaffen deler budget.
+* Et indrammet afslag fra et tidsskrift hænger på hans kontor.
+* Skårene gemmer han "til en kunstinstallation".
+* Kitlen er den samme som på hans første lærerdag. Navneskiltet er nyere.
+* Kaktussen i forberedelsesrummet hedder Bunsen og får resten af kaffen.
+* Koppen var en gave fra en klasse, der ryddede op. Én gang.
+* Han går aldrig glip af et fredagsmøde. Der er kage.
 
 Idéer til senere glimt i samme stil:
 
-* Et indrammet afslag fra et tidsskrift hænger på hans kontor.
-* Han gemmer de knuste petriskåle i en kasse "til en kunstinstallation".
-* Kitlen er den samme som på hans første lærerdag. Navneskiltet er skiftet tre gange.
-* Han har en kaktus i forberedelsesrummet, som hedder Bunsen.
-* Han kommer altid til fredagsmøderne. Der er kage.
+* Han har et skema over, hvem der har ødelagt hvad, siden 2009.
+* Sikkerhedsbrillerne på hans kontor er hans egne fra gymnasiet.
+* Han har søgt om et nyt stinkskab hvert år siden 2014.
 
 ## Glimt af baggrunden
 
@@ -66,8 +71,13 @@ Idéer til senere glimt i samme stil:
 | Glimt | Hvornår | Replik |
 |-------|---------|--------|
 | `navn` | første klik på ham | Michael. Ikke Kemichael. |
-| `kaffeKold` | kaffen (sc2.7, sc6.9, sc8.6) | Kold. Som altid. |
-| `kaffePause` | kaffen, der tages med ud (sc6.8) | Uden for døren er det en pause. |
+| `kaffeKold` | kaffen, posten `kold` | Kold. Som altid. |
+| `kaffePause` | kaffen, posten `ud` | Uden for døren er det en pause. |
+| `kaktus` | kaffen, posten `kaktus` | Bunsen er min kaktus. Han kan tåle det. |
+| `kittel` | kaffen, posten `kittel` | Kitlen er fra min første lærerdag. Skiltet er nyere. |
+| `fredag` | kaffen, posten `fredag` | Jeg går aldrig glip af et fredagsmøde. Der er kage. |
+| `gave` | kaffen, posten `gave` | Koppen var en gave fra en klasse, der ryddede op. Én gang. |
+| `kunst` | et knust glas fejes op (prøvebordet) | Skårene gemmer jeg. Det bliver en kunstinstallation. |
 | `phd` | morteren, knust helt vildt (sc6.9) | Sådan så min ph.d. også ud. Den blev aldrig færdig. |
 | `frokost` | han tager chipsposen (sc6.9) | Tak for frokosten. |
 | `oejenbryn` | branden (sc6.9) | Jeg prøvede det i 1994. Spørg mine øjenbryn. |
@@ -81,6 +91,44 @@ Idéer til senere glimt i samme stil:
 | `afslag` | glas 7, referencen, får et indgreb (sb2.4) | Mit afslag fra et tidsskrift hænger indrammet. Samme grund. |
 | `regnskab3`, `6`, `10` | uheld: heptan, petriskål, varm skål og brand (sc6.9), spild og udsugning (sc6.8, sc2.6), vasken og kolben (sc2.6), spild og varmt glas (sc2.7), buretten og vægten (sc8.6), flammen (sc1.3), overkogningen (sc2.1) | Tredje uheld på den her computer. Det står i regnskabet. |
 
+## Replikker
+
+Vendingerne står i `REPLIKKER` i `kemichael.js` som puljer, ikke rækkefølger.
+`K.replik(kategori)` tager en, der ikke er brugt for nylig i samme sidevisning, så
+den samme sætning ikke kommer to gange i træk. Et forsøg kan bruge sin egen liste
+med `K.replik("ryst", RYST_SVAR)`.
+
+| Pulje | Bruges til |
+|-------|------------|
+| `prik1` til `prik4` | de fire svar, når eleven prikker til ham. Femte klik sender ham ud |
+| `gaaUd` | replikken, når han går |
+| `ros`, `uheld`, `advarsel` | fælles vendinger, som et forsøg kan bruge, hvis det ikke har sine egne |
+
+**Han bliver ikke afbrudt.** Et klik på ham preller af, mens taleboblen står, og en
+ny scene begynder med at vente, til han er talt færdig. Trinet
+`{ taleFaerdig: true }` venter på det samme, så han ikke går fra sin egen replik.
+Boblen står 10 % længere end den tid, scenen beder om, og aldrig kortere end det
+tager at læse linjen (`K.taleTid`). Lange replikker brydes over to linjer.
+
+## Kaffen
+
+Klik på koppen på hylden er det samme påskeæg alle steder, men det er ikke det
+samme, der sker. `KAFFE` i `kemichael.js` har 21 poster: han drikker den kold,
+brænder sig, finder den tom, vender den på hovedet, spytter den ud, hælder resten
+til kaktussen, tager den med uden for døren eller lader den stå og siger noget om
+den i stedet. Posterne vises én ad gangen og gentages først, når de er set alle
+sammen (huskes i `localStorage`).
+
+* En post er en liste af trin bygget med `h` (se `KAFFE` i `kemichael.js`):
+  `h.sig`, `h.drik`, `h.vip`, `h.sprut`, `h.damp`, `h.udtryk`, `h.vent`, `h.suk`,
+  `h.gaa`, `h.glimt`.
+* `griber: false` betyder, at han ikke rører koppen. `beholder: true` betyder, at
+  den bliver stående, så påskeægget kan komme igen uden et nyt forsøg.
+* Ved `krav(tal)` kommer posten kun frem, når det passer. `regnskab` kræver fx, at
+  det er tredje kop eller senere.
+* Et nyt forsøg stiller koppen tilbage på hylden.
+* Fem af posterne rummer et glimt af hans baggrund.
+
 ## Bevægelser
 
 Scenerne er lister af trin (formatet står øverst i `kemichael.js`). Ud over at gå,
@@ -91,7 +139,11 @@ tale og dreje armen kan han:
   sig ind)
 * `K.suk()`: øjnene lukkes, og hovedet synker og kommer op igen
 * `{ gaa: K.KANT }`: han kigger kun ind fra venstre kant, fx med `laen: 1`
-* damp af ørerne, når han bliver klikket på for mange gange
+* damp af ørerne, når han bliver klikket på for mange gange, og når kaffen
+  undtagelsesvis er varm (`L.damp` i sekunder)
+* `laererSprut(antal, ned)`: dråber ud af munden, fx kaffe, han spytter ud.
+  `ned` lader dem falde i stedet for at flyve frem
+* `L.kopV`: koppen i hånden vippes, fx på hovedet ved -2,4
 * armen: 0 peger lige op, og `K.HAENGER` (2,9) hænger ned. Over 2 tegnes armen
   bag kroppen. Når han tørrer op på bordet til højre for sig, bruges 1,8 med en
   lille svingning (±0,14)
