@@ -275,9 +275,12 @@ function koerTest() {
     paastand("resterne kan stadig afleveres", f.klik("dunk") === true);
     vent(function () { return f.gjort.affald; }, 20);
     paastand("forsoeget er slut", f.gjort.affald);
+    /* Kaffen er faelles og ikke den samme to gange; her vaelges posten */
+    NK.Kemichael.kaffeTvang("kold");
     paastand("laereren henter kaffen", f.klik("kaffekop") === true);
-    adv(10);
+    adv(16);
     paastand("koppen er vaek, og laereren er gaaet", f.g.kaffekop.skjult && !f.laererOptaget());
+    NK.Kemichael.kaffeTvang(null);
 
     overskrift("8. Quizzens spoergsmaal");
     var vt = NK.Quiz.valgTekst;

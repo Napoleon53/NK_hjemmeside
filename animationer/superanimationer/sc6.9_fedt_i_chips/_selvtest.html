@@ -390,15 +390,23 @@ function koerTest() {
     nyt();
     paastand("posen er tilbage ved nyt forsoeg", !f.g.pose.skjult && !f.poseTaget);
 
+    /* Kaffen er faelles og ikke den samme to gange; her vaelges posten */
+    NK.Kemichael.kaffeTvang("kold");
     paastand("koppen kan hentes", f.klik("kaffekop") === true);
-    vent(function () { return !f.laerer.scene; }, 15);
+    vent(function () { return !f.laerer.scene; }, 20);
     paastand("koppen er vaek", f.koppenVaek && f.g.kaffekop.skjult);
     nyt();
-    paastand("koppen kommer ikke igen", f.g.kaffekop.skjult);
+    paastand("koppen er tilbage ved nyt forsoeg", !f.g.kaffekop.skjult && !f.koppenVaek);
+    NK.Kemichael.kaffeTvang(null);
 
     f.laererKoer("test", [{ gaa: 150 }, { tid: 6 }], false);
     adv(1);
-    for (i = 0; i < 5; i++) { f.klik("laerer"); adv(0.4); }
+    /* Han taler faerdig, foer han svarer paa et nyt prik */
+    function udtalt() { return vent(function () { return f.laerer.taleUr <= 0; }, 8); }
+    f.klik("laerer");
+    paastand("et klik midt i en replik afbryder ham ikke", f.klik("laerer") === false);
+    udtalt();
+    for (i = 0; i < 4; i++) { f.klik("laerer"); udtalt(); }
     paastand("fem klik paa laereren: damp af oererne, og laereren gaar", f.laerer.damp > 0 && f.laerer.scene && f.laerer.scene.navn === "gaaUd");
     vent(function () { return !f.laerer.scene; }, 10);
 

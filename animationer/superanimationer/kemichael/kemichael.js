@@ -648,14 +648,16 @@
             if (L.scene) {
                 L.scene = null;
                 L.maalX = UDE;
-                L.tale = "";
-                L.taleUr = 0;
                 L.arm = HAENGER;
                 L.plakatRegel = 0;
                 L.skeptiskMaal = 0;
                 L.brillerMaal = 0;
                 L.laenMaal = 0;
             }
+            /* Et nyt forsoeg tier han stille om, ogsaa selv om boblen stod
+               uden en scene. Ellers kan den naeste replik ikke komme */
+            L.tale = "";
+            L.taleUr = 0;
             L.hovedV = 0; L.hovedDx = 0; L.hovedDy = 0;
             L.lukket = 0;
             L.kopV = 0;

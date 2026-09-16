@@ -594,7 +594,10 @@
         liste.push({ kald: function () {
             sp.last = true;
             baad.masse = Math.max(0, baad.masse - r(M.SPATEL.fjernMin, M.SPATEL.fjernMaks));
-            if (baad.masse < 0.002) { baad.masse = 0; baad.stof = null; }
+            /* Samme graense som alle andre steder: under 0,004 g er baaden
+               tom. Ellers kunne den staa med en rest, som spatlen naegter
+               at tage, fordi baaden regnes for tom */
+            if (baad.masse < 0.004) { baad.masse = 0; baad.stof = null; }
             if (NK.Lyd) NK.Lyd.bip();
             this.aendret("fjern");
         } });

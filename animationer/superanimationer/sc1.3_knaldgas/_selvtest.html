@@ -152,9 +152,12 @@ function koer() {
     adv(0.5);
     paastand("anden gang kigger laereren ind fra kanten", !!(f.laerer.scene && f.laerer.scene.navn === "overfyld"));
     adv(5);
+    /* Kaffen er faelles og ikke den samme to gange; her vaelges posten */
+    NK.Kemichael.kaffeTvang("kold");
     paastand("laereren henter kaffen", f.klikKop() === true);
-    adv(10);
+    adv(16);
     paastand("koppen er vaek, og laereren er gaaet", f.g.kaffekop.skjult && !f.laererOptaget());
+    NK.Kemichael.kaffeTvang(null);
 
     overskrift("5. Rene gasser");
     frisk();
