@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fælles normer - dagens vurdering</title>
+<link rel="manifest" href="normvurdering.webmanifest">
+<meta name="theme-color" content="#24384f">
+<link rel="icon" href="../assets/img/normer-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="../assets/img/normer-192.png">
+<meta name="mobile-web-app-capable" content="yes">
 <style>
   :root{
     --navy:#24384f;
@@ -48,7 +53,7 @@
   button:disabled{opacity:.45; cursor:default;}
 
   .layout{display:grid; grid-template-columns:minmax(0,1fr); gap:16px;}
-  @media (min-width:1080px){ .layout{grid-template-columns:minmax(0,1fr) 340px;} }
+  @media (min-width:1080px){ .layout{grid-template-columns:minmax(0,1fr) 380px;} }
 
   .gruppe{background:var(--navy-dyb); border:1px solid var(--kant); border-radius:12px; padding:14px 16px 16px;}
   .gruppe-hoved{font-size:.74rem; letter-spacing:.09em; text-transform:uppercase; font-weight:700; color:var(--orange-lys); margin-bottom:10px;}
@@ -82,12 +87,23 @@
   .maaler > span{display:block; height:100%; background:linear-gradient(90deg,var(--orange),var(--orange-lys)); width:0;}
 
   .belon-liste{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px;}
-  .belon-liste li{display:flex; gap:10px; align-items:baseline; font-size:.92rem; padding:5px 8px; border-radius:8px; background:#2a3f5c;}
+  .belon-liste li{display:flex; gap:7px; align-items:baseline; font-size:.92rem; padding:5px 8px; border-radius:8px; background:#2a3f5c;}
   .belon-liste li.laast{opacity:.6;}
   .belon-liste li.naaet{background:#2f5a3f;}
   .belon-liste .krav{font-weight:700; color:var(--orange-lys); min-width:62px;}
   .belon-liste li.naaet .krav{color:#9fe6b6;}
   .belon-liste input{flex:1; min-width:0; background:transparent; border:0; border-bottom:1px dashed #4d6a8e; border-radius:0; padding:2px 0; color:inherit;}
+  .belon-liste .maerke{width:11px; color:#9fe6b6; font-weight:700;}
+  .belon-liste .kravfelt{flex:0 0 50px; width:50px; text-align:right; font-weight:700; color:var(--orange-lys);
+                         -moz-appearance:textfield;}
+  .belon-liste .kravfelt::-webkit-outer-spin-button,
+  .belon-liste .kravfelt::-webkit-inner-spin-button{-webkit-appearance:none; margin:0;}
+  .belon-liste li.naaet .kravfelt{color:#9fe6b6;}
+  .belon-liste .p-enhed{color:var(--muted); font-size:.8rem;}
+  .belon-liste .fjern{flex:0 0 auto; padding:0 7px; font-size:.95rem; line-height:1.5; background:transparent; border-color:transparent; color:var(--muted);}
+  .belon-liste .fjern:hover{background:#3a5678; color:var(--ink);}
+  .belon-knapper{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+  .belon-knapper button{padding:5px 10px; font-size:.85rem;}
 
   .knapraekke{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
 
@@ -127,6 +143,7 @@
     <button id="nyKlasse">Ny klasse</button>
     <button id="visHistorik">Udvikling</button>
     <button id="visBackup">Sikkerhedskopi</button>
+    <button id="installer" hidden>Installer som app</button>
   </div>
 </div>
 
@@ -161,7 +178,11 @@
       <span class="maaler"><span id="maalerFyld"></span></span>
       <p class="muted" id="naeste" style="margin:0 0 10px;"></p>
       <ul class="belon-liste" id="belonninger"></ul>
-      <p class="muted" style="margin:8px 0 0; font-size:.8rem;">Teksterne kan rettes. De gemmes sammen med klassen.</p>
+      <div class="belon-knapper">
+        <button id="belonTilfoej">Tilføj belønning</button>
+        <button id="belonStandard">Gendan standard</button>
+      </div>
+      <p class="muted" style="margin:8px 0 0; font-size:.8rem;">Belønninger og pointkrav kan rettes. De gemmes sammen med klassen.</p>
     </div>
   </div>
 </div>
@@ -195,13 +216,30 @@
       <h2>Sikkerhedskopi</h2>
       <button data-luk="boksBackup">Luk</button>
     </div>
-    <p class="muted">Data ligger kun i denne browser på denne computer. Kopier teksten til en fil, hvis den skal med over på en anden computer, eller indsæt en tidligere kopi og tryk Indlæs.</p>
+    <p class="muted">Data ligger kun i denne browser på denne computer. Appen og browseren bruger de samme data. Kopier teksten til en fil, hvis den skal med over på en anden computer, eller indsæt en tidligere kopi og tryk Indlæs.</p>
+    <p class="muted" id="lagerStatus" style="margin-top:-4px;"></p>
     <textarea id="backupTekst" rows="10" style="width:100%; font-family:Consolas, monospace; font-size:.8rem;"></textarea>
     <div class="knapraekke">
       <button id="backupKopier">Kopier</button>
       <button id="backupIndlaes">Indlæs fra tekst</button>
       <span id="backupBesked" class="muted" style="align-self:center;"></span>
     </div>
+  </div>
+</div>
+
+<div class="boks" id="boksInstaller" hidden>
+  <div class="boks-indhold" style="max-width:520px;">
+    <div class="boks-hoved">
+      <h2>Installer som app</h2>
+      <button data-luk="boksInstaller">Luk</button>
+    </div>
+    <p class="muted" style="margin-top:0;">Browseren tilbyder det ikke lige nu. Gør det i stedet fra menuen:</p>
+    <ul class="muted" style="margin:0; padding-left:18px; line-height:1.6;">
+      <li><b>Chrome:</b> ikonet i adresselinjen, eller menuen ⋮ &rarr; Cast, gem og del &rarr; Installer side som app.</li>
+      <li><b>Edge:</b> menuen ⋯ &rarr; Apps &rarr; Installer dette websted som en app.</li>
+      <li><b>Safari på iPad:</b> Del &rarr; Føj til hjemmeskærm.</li>
+    </ul>
+    <p class="muted">Er siden allerede installeret, står den under Apps i browseren. Appen bruger de samme gemte klasser som browseren.</p>
   </div>
 </div>
 
@@ -222,17 +260,20 @@
 
   var STANDARD_BELON = [
     { krav:100,  tekst:'Musik i arbejdsfaser' },
-    { krav:250,  tekst:'Demonstrationsforsøg sidst i modulet' },
-    { krav:450,  tekst:'Fem minutters ekstra pause' },
+    { krav:250,  tekst:'Fem minutters ekstra pause' },
+    { krav:450,  tekst:'Frit pladsvalg i ét modul' },
     { krav:700,  tekst:'Godbid til holdet' },
-    { krav:1000, tekst:'Kemishow med de store forsøg' }
+    { krav:1000, tekst:'Holdet vælger aktiviteten i et modul' }
   ];
-  // Gamle standardtekster, der skal skiftes ud i klasser, der allerede er gemt.
-  var GAMLE_TEKSTER = {
-    'Frit pladsvalg i ét modul':'Demonstrationsforsøg sidst i modulet',
-    'Kage eller frugt til holdet':'Godbid til holdet',
-    'Holdet vælger aktiviteten i et modul':'Kemishow med de store forsøg'
-  };
+  // Tidligere standardlister. En klasse, der stadig har en af dem uændret, får
+  // den nye standard. Er listen rettet af læreren, bliver den stående.
+  var GAMLE_STANDARDER = [
+    '100:Musik i arbejdsfaser|250:Frit pladsvalg i ét modul|450:Fem minutters ekstra pause|700:Kage eller frugt til holdet|1000:Holdet vælger aktiviteten i et modul',
+    '100:Musik i arbejdsfaser|250:Demonstrationsforsøg sidst i modulet|450:Fem minutters ekstra pause|700:Godbid til holdet|1000:Kemishow med de store forsøg'
+  ];
+  function belonNoegle(liste){
+    return (liste || []).map(function(b){ return b.krav + ':' + b.tekst; }).join('|');
+  }
 
   var EKSTRA_INTERVAL = 300;
   var STORE_KEY = 'normer.klasser';
@@ -251,9 +292,10 @@
         var d = JSON.parse(localStorage.getItem(STORE_KEY));
         if(d && d.klasser){
           Object.keys(d.klasser).forEach(function(navn){
-            (d.klasser[navn].belonninger || []).forEach(function(b){
-              if(GAMLE_TEKSTER[b.tekst]) b.tekst = GAMLE_TEKSTER[b.tekst];
-            });
+            var k = d.klasser[navn];
+            if(GAMLE_STANDARDER.indexOf(belonNoegle(k.belonninger)) !== -1){
+              k.belonninger = standardBelon();
+            }
           });
           return d;
         }
@@ -267,8 +309,11 @@
     try{ localStorage.setItem(STORE_KEY, JSON.stringify(data)); return true; }
     catch(e){ return false; }
   }
+  function standardBelon(){
+    return STANDARD_BELON.map(function(b){ return { krav:b.krav, tekst:b.tekst }; });
+  }
   function nyKlasseData(){
-    return { moduler:[], belonninger:STANDARD_BELON.map(function(b){ return { krav:b.krav, tekst:b.tekst }; }) };
+    return { moduler:[], belonninger:standardBelon() };
   }
   function klasse(){ return aktiv ? data.klasser[aktiv] : null; }
   function samletPoint(){
@@ -399,23 +444,57 @@
     document.getElementById('pointTal').textContent = k ? samletPoint() : 0;
     var liste = k ? k.belonninger : STANDARD_BELON;
     var point = k ? samletPoint() : 0;
+    document.getElementById('belonTilfoej').disabled = !k;
+    document.getElementById('belonStandard').disabled = !k;
     var naeste = null;
     liste.forEach(function(b, i){
       var li = document.createElement('li');
       var naaet = point >= b.krav;
       li.className = naaet ? 'naaet' : 'laast';
-      var krav = document.createElement('span');
-      krav.className = 'krav';
-      krav.textContent = (naaet ? '✓ ' : '') + b.krav + 'p';
+
+      var maerke = document.createElement('span');
+      maerke.className = 'maerke';
+      maerke.textContent = naaet ? '✓' : '';
+
+      var kravInp = document.createElement('input');
+      kravInp.type = 'number'; kravInp.className = 'kravfelt';
+      kravInp.min = '1'; kravInp.step = '10'; kravInp.value = b.krav;
+      kravInp.disabled = !k;
+      kravInp.setAttribute('aria-label', 'Point der kræves for: ' + b.tekst);
+      kravInp.addEventListener('change', function(){
+        var tal = Math.round(parseFloat(kravInp.value));
+        if(!isFinite(tal) || tal < 1){ kravInp.value = liste[i].krav; return; }
+        liste[i].krav = tal;
+        liste.sort(function(a, c){ return a.krav - c.krav; });
+        skriv(); tegnBelonninger();
+      });
+
+      var enhed = document.createElement('span');
+      enhed.className = 'p-enhed'; enhed.textContent = 'p';
+
       var inp = document.createElement('input');
       inp.type = 'text'; inp.value = b.tekst; inp.title = b.tekst;
       inp.disabled = !k;
+      inp.setAttribute('aria-label', 'Belønning ved ' + b.krav + ' point');
       inp.addEventListener('change', function(){
         liste[i].tekst = inp.value.trim() || ('Belønning ' + (i+1));
         inp.value = liste[i].tekst;
-        skriv();
+        skriv(); tegnBelonninger();
       });
-      li.appendChild(krav); li.appendChild(inp);
+
+      var fjern = document.createElement('button');
+      fjern.className = 'fjern'; fjern.textContent = '×';
+      fjern.title = 'Fjern belønningen';
+      fjern.setAttribute('aria-label', 'Fjern: ' + b.tekst);
+      fjern.disabled = !k || liste.length < 2;
+      fjern.addEventListener('click', function(){
+        if(!confirm('Fjern belønningen "' + liste[i].tekst + '"?')) return;
+        liste.splice(i, 1);
+        skriv(); tegnBelonninger();
+      });
+
+      li.appendChild(maerke); li.appendChild(kravInp); li.appendChild(enhed);
+      li.appendChild(inp); li.appendChild(fjern);
       belonEl.appendChild(li);
       if(!naaet && naeste === null) naeste = b;
     });
@@ -456,6 +535,22 @@
     if(point < top.krav) return 0;
     return Math.floor((point - top.krav) / EKSTRA_INTERVAL);
   }
+
+  document.getElementById('belonTilfoej').addEventListener('click', function(){
+    var k = klasse(); if(!k) return;
+    var top = k.belonninger.length ? k.belonninger[k.belonninger.length - 1].krav : 0;
+    k.belonninger.push({ krav: top + 250, tekst:'Ny belønning' });
+    skriv(); tegnBelonninger();
+    var felter = belonEl.querySelectorAll('input[type=text]');
+    if(felter.length){ var sidste = felter[felter.length - 1]; sidste.focus(); sidste.select(); }
+  });
+
+  document.getElementById('belonStandard').addEventListener('click', function(){
+    var k = klasse(); if(!k) return;
+    if(!confirm('Erstat klassens belønninger med standardlisten?')) return;
+    k.belonninger = standardBelon();
+    skriv(); tegnBelonninger();
+  });
 
   // ---------- Gem modul ----------
   document.getElementById('gem').addEventListener('click', function(){
@@ -526,7 +621,7 @@
     tegnHistorik(); visBoks('boksHistorik', true);
   });
   document.addEventListener('keydown', function(ev){
-    if(ev.key === 'Escape'){ visBoks('boksHistorik', false); visBoks('boksBackup', false); }
+    if(ev.key === 'Escape'){ visBoks('boksHistorik', false); visBoks('boksBackup', false); visBoks('boksInstaller', false); }
   });
 
   function tegnHistorik(){
@@ -640,6 +735,57 @@
       besked.textContent = 'Teksten kunne ikke læses.'; besked.className = 'fejl';
     }
   });
+
+  // ---------- Installer som app ----------
+  // Appen er den samme side i sit eget vindue. Den bruger samme lager som
+  // browseren, så klasserne følger med begge veje.
+  var installKnap = document.getElementById('installer');
+  var installTilbud = null;
+  var paaNettet = location.protocol === 'http:' || location.protocol === 'https:';
+  var somApp = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)
+               || window.navigator.standalone === true;
+
+  if(paaNettet && !somApp) installKnap.hidden = false;
+
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    installTilbud = e;
+    if(!somApp) installKnap.hidden = false;
+  });
+
+  installKnap.addEventListener('click', function(){
+    if(!installTilbud){ visBoks('boksInstaller', true); return; }
+    installTilbud.prompt();
+    installTilbud.userChoice.then(function(svar){
+      if(svar && svar.outcome === 'accepted'){ installKnap.hidden = true; sikrLager(); }
+      installTilbud = null;
+    });
+  });
+
+  window.addEventListener('appinstalled', function(){
+    installKnap.hidden = true;
+    sikrLager();
+  });
+
+  // Beder browseren om at beholde data, selv når den rydder op i plads.
+  function sikrLager(){
+    if(!(navigator.storage && navigator.storage.persist)){ visLagerStatus(null); return; }
+    navigator.storage.persist().then(visLagerStatus, function(){ visLagerStatus(null); });
+  }
+  function visLagerStatus(varigt){
+    var el = document.getElementById('lagerStatus');
+    if(!el) return;
+    el.textContent = varigt
+      ? 'Browseren har lovet at beholde disse data, også når den rydder op i plads.'
+      : 'Browseren beholder normalt data, men kan rydde dem, hvis der bliver meget lidt plads. Tag en kopi en gang imellem.';
+  }
+  if(paaNettet) sikrLager(); else visLagerStatus(null);
+
+  if(paaNettet && 'serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('normvurdering-sw.js').catch(function(){});
+    });
+  }
 
   function tegnAlt(){ tegnKlasser(); tegnScore(); tegnBelonninger(); }
 
