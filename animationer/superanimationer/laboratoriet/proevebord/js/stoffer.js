@@ -26,7 +26,8 @@
         { navn: "metal_mg",      type: "pulverglas", x: 432, etiket: "Mg", titel: "glasset med magnesium", indhold: { V: 0, T: 20, umol: { "Mg(s)": 30000 } }, pulverMaks: 30000 },
         { navn: "metal_zn",      type: "pulverglas", x: 476, etiket: "Zn", titel: "glasset med zink", indhold: { V: 0, T: 20, umol: { "Zn(s)": 30000 } }, pulverMaks: 30000 },
         { navn: "metal_cu",      type: "pulverglas", x: 520, etiket: "Cu", titel: "glasset med kobber", indhold: { V: 0, T: 20, umol: { "Cu(s)": 30000 } }, pulverMaks: 30000 },
-        { navn: "spatel", type: "spatel", p: { x: 570, y: 495, v: 0 } },
+        { navn: "metal_fe",      type: "pulverglas", x: 564, etiket: "Fe", titel: "glasset med jern", indhold: { V: 0, T: 20, umol: { "Fe(s)": 30000 } }, pulverMaks: 30000 },
+        { navn: "spatel", type: "spatel", p: { x: 600, y: 495, v: 0 } },
 
         /* Flaskerne paa hylden bag bordet */
         { navn: "fl_pb",    type: "flaske", x: 280, y: HYLDE, etiket: ["Pb(NO₃)₂", "0,1 M"], titel: "flasken med Pb(NO₃)₂", indhold: opl(250, { "Pb2+": 100, "NO3-": 200 }) },
@@ -39,11 +40,12 @@
         { navn: "fl_hac",   type: "flaske", x: 616, y: HYLDE, etiket: ["CH₃COOH", "0,1 M"], titel: "flasken med ethansyre", indhold: opl(250, { "HAc": 100 }) },
         { navn: "fl_h2so4", type: "flaske", x: 664, y: HYLDE, etiket: ["H₂SO₄", "konc. 18 M"], titel: "flasken med koncentreret svovlsyre", indhold: opl(250, { "H2SO4": 18000 }) },
         { navn: "fl_hno3",  type: "flaske", x: 712, y: HYLDE, etiket: ["HNO₃", "konc. 14 M"], titel: "flasken med koncentreret salpetersyre", indhold: opl(250, { "HNO3": 14000 }) },
+        { navn: "fl_ba",    type: "flaske", x: 760, y: HYLDE, etiket: ["BaCl₂", "0,1 M"], titel: "flasken med BaCl₂", indhold: opl(250, { "Ba2+": 100, "Cl-": 200 }) },
 
         /* Draabeflaskerne paa hylden */
-        { navn: "ag",   type: "draabeflaske", x: 772, y: HYLDE, etiket: ["AgNO₃", "0,1 M"], titel: "dråbeflasken med AgNO₃", indhold: opl(60, { "Ag+": 100, "NO3-": 100 }) },
-        { navn: "phph", type: "draabeflaske", x: 824, y: HYLDE, etiket: ["phenol-", "phthalein"], titel: "dråbeflasken med phenolphthalein", indhold: opl(60, { "phph": 30 }) },
-        { navn: "btb",  type: "draabeflaske", x: 876, y: HYLDE, etiket: ["bromthymol-", "blåt"], titel: "dråbeflasken med bromthymolblåt", indhold: opl(60, { "btb": 20 }) },
+        { navn: "ag",   type: "draabeflaske", x: 820, y: HYLDE, etiket: ["AgNO₃", "0,1 M"], titel: "dråbeflasken med AgNO₃", indhold: opl(60, { "Ag+": 100, "NO3-": 100 }) },
+        { navn: "phph", type: "draabeflaske", x: 872, y: HYLDE, etiket: ["phenol-", "phthalein"], titel: "dråbeflasken med phenolphthalein", indhold: opl(60, { "phph": 30 }) },
+        { navn: "btb",  type: "draabeflaske", x: 924, y: HYLDE, etiket: ["bromthymol-", "blåt"], titel: "dråbeflasken med bromthymolblåt", indhold: opl(60, { "btb": 20 }) },
 
         { navn: "stativ", type: "stativ", p: { x: 690, y: 400, v: 0 } },
         { navn: "glas1", type: "reagensglas", stativ: "stativ", hul: 0, nr: 1, titel: "glas 1" },
@@ -67,7 +69,7 @@
 
     NK.BORD_VALG = {
         bredde: 1620, hoejde: 600, bord: 500,
-        hylder: [{ x0: 16, x1: 220, y: 268 }, { x0: 250, x1: 910, y: HYLDE }],
+        hylder: [{ x0: 16, x1: 220, y: 268 }, { x0: 250, x1: 960, y: HYLDE }],
         plakat: { x: 1440, y: 90 },
         /* Zoomboblen tegnes i panelet, ikke paa scenen (ingen boble her) */
         bobleR: 128, partikler: 6

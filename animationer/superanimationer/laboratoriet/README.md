@@ -33,7 +33,9 @@ js/koer.js           koreografier: små bevægelser af genstande (flyt, vent, ka
 js/stof.js           stoffer, opløsninger (µmol og mL), reaktioner (fuld, ligevægt,
                      bundfald, opløsning), redoxpar, pH, gas, varme og farven som lysfiltre
 js/stoftabel.js      den fælles tabel: ioner, syrer, baser, indikatorer, gasser, pulvere,
-                     metaller, bundfald, reaktioner og standardpotentialer
+                     metaller (Mg, Zn, Fe, Pb, Cu, Ag), bundfald (opløselighedstabellen:
+                     chlorider, iodider, sulfater, carbonater, hydroxider, Ag₂O, AgSCN),
+                     reaktioner og standardpotentialer
 js/udstyr.js         kataloget over udstyr: sprite, anker, inderside, rumfang,
                      tud og egenskaber (holder, hælder, drypper, spatel, rører ...)
 js/beholder.js       det, en beholder kan: rumme, blande, hælde, lag, bundfald,
@@ -68,7 +70,12 @@ opfinder ikke kemi, den ikke kender: en blanding uden regel gør ingenting.
 `proevebord/_kombinationer.html` blander alle par af bordets flasker og
 pulvere og skriver, hvad der sker. Læs den igennem som kemiker, hver gang
 et stof eller en regel ændres: "for lidt" er acceptabelt, "forkert" rettes
-i stoftabellen.
+i stoftabellen. Sept. 2026: 232 kombinationer, 171 med reaktion; de stille er
+rigtige (fx Cu + KI, NaCl + KI, Zn + NaOH).
+
+Redox afledes af standardpotentialerne, når reduktionsmidlet er et fast
+stof (metal i saltopløsning eller syre). Redox mellem ioner (Fe³⁺ + I⁻,
+Cu²⁺ + I⁻) står som navngivne reaktioner, ligesom Fe³⁺ + CO₃²⁻.
 
 ## Genstandsmodellen
 

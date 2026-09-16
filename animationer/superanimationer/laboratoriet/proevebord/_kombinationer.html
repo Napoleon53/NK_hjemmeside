@@ -84,7 +84,7 @@ function beskriv(a, b) {
     var f = St.farve(o, 1);
     var farve = f ? "rgb(" + Math.round(f.r) + "," + Math.round(f.g) + "," + Math.round(f.b) + ")" : "transparent";
     var pH1 = St.pH(o);
-    var sker = nye.length || gasser.length || Math.abs(res.maksT - T0) > 2;
+    var sker = nye.length || gasser.length || Math.abs(res.maksT - T0) > 2 || (pH0 !== null && pH1 !== null && Math.abs(pH1 - pH0) > 1);
     var dele = [];
     if (nye.length) dele.push("nyt: " + nye.join(", "));
     if (vaek.length) dele.push("væk: " + vaek.join(", "));

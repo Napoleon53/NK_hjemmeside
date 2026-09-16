@@ -144,7 +144,8 @@ function koerTest() {
     paastand("draabeflasken vender og drypper, mens den holdes", Math.abs(Math.abs(g.ag.p.v) - Math.PI) < 0.3 && V(g.ag) < 59.9, V(g.ag).toFixed(2) + " mL tilbage");
     bord.op(); faerdig();
     vent(function () { return bord.draaber.length === 0; }, 4); adv(1);
-    paastand("draaberne gav AgI med iodidet i glasset", n(b250, "AgI(s)") > 2, n(b250, "AgI(s)").toFixed(1));
+    var agIalt = n(b250, "Ag+") + n(b250, "AgI(s)") + n(b250, "Ag2SO4(s)") + n(b250, "Ag(s)");
+    paastand("draaberne landede i glasset (soelv i alt; iodidet er allerede brugt af kobberionerne til CuI)", agIalt > 2, agIalt.toFixed(1) + " umol Ag, CuI " + n(b250, "CuI(s)").toFixed(0) + ", I2 " + n(b250, "I2").toFixed(0));
 
     overskrift("4. Bundfald, ligevaegt og neutralisation");
     frisk();

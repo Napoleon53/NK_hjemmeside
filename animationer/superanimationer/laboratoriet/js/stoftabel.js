@@ -115,10 +115,51 @@
     St.reaktion({ id: "cu_hno3", venstre: [[1, "Cu(s)"], [4, "H+"], [2, "NO3-"]], hoejre: [[1, "Cu2+"], [2, "NO2(g)"], [2, "H2O"]],
         slags: "fuld", fart: 0.8, dH: -140, min: { "H+": 4000, "NO3-": 4000 } });
 
+    /* ----- Flere ioner og salte fra oploselighedstabellen ------------------- */
+    St.def("Ba2+",       { M: 137.3, formel: "Ba", q: 2, navn: "bariumioner", atomer: { Ba: 1 }, flamme: { r: 180, g: 255, b: 120 } });
+    St.def("I2",         { M: 253.8, formel: "I₂", q: 0, navn: "iod", atomer: { I: 2 }, farve: { r: 170, g: 90, b: 20 }, k: 0.3 });
+    St.def("Fe(s)",      { M: 55.8, formel: "Fe", fase: "s", korn: true, farve: { r: 120, g: 120, b: 125 }, navn: "jern", atomer: { Fe: 1 } });
+    St.def("Pb(s)",      { M: 207.2, formel: "Pb", fase: "s", korn: true, farve: { r: 110, g: 115, b: 125 }, navn: "bly", atomer: { Pb: 1 } });
+    St.def("CuI(s)",     { M: 190.5, formel: "CuI", fase: "s", farve: { r: 235, g: 230, b: 220 }, navn: "kobber(I)iodid", atomer: { Cu: 1, I: 1 } });
+    St.def("PbSO4(s)",   { M: 303.3, formel: "PbSO₄", fase: "s", farve: { r: 240, g: 240, b: 240 }, navn: "blysulfat", atomer: { Pb: 1, S: 1, O: 4 } });
+    St.def("Pb(OH)2(s)", { M: 241.2, formel: "Pb(OH)₂", fase: "s", farve: { r: 240, g: 240, b: 240 }, navn: "blyhydroxid", atomer: { Pb: 1, O: 2, H: 2 } });
+    St.def("PbCO3(s)",   { M: 267.2, formel: "PbCO₃", fase: "s", farve: { r: 240, g: 240, b: 240 }, navn: "blycarbonat", atomer: { Pb: 1, C: 1, O: 3 } });
+    St.def("Ag2SO4(s)",  { M: 311.8, formel: "Ag₂SO₄", fase: "s", farve: { r: 240, g: 240, b: 240 }, navn: "sølvsulfat", atomer: { Ag: 2, S: 1, O: 4 } });
+    St.def("Ag2O(s)",    { M: 231.7, formel: "Ag₂O", fase: "s", farve: { r: 70, g: 55, b: 45 }, navn: "sølvoxid", atomer: { Ag: 2, O: 1 } });
+    St.def("Ag2CO3(s)",  { M: 275.7, formel: "Ag₂CO₃", fase: "s", farve: { r: 235, g: 225, b: 170 }, navn: "sølvcarbonat", atomer: { Ag: 2, C: 1, O: 3 } });
+    St.def("AgSCN(s)",   { M: 166, formel: "AgSCN", fase: "s", farve: { r: 238, g: 238, b: 235 }, navn: "sølvthiocyanat", atomer: { Ag: 1, S: 1, C: 1, N: 1 } });
+    St.def("CuCO3(s)",   { M: 123.6, formel: "CuCO₃", fase: "s", farve: { r: 70, g: 170, b: 150 }, navn: "kobbercarbonat", atomer: { Cu: 1, C: 1, O: 3 } });
+    St.def("MgCO3(s)",   { M: 84.3, formel: "MgCO₃", fase: "s", farve: { r: 240, g: 240, b: 240 }, navn: "magnesiumcarbonat", atomer: { Mg: 1, C: 1, O: 3 } });
+    St.def("ZnCO3(s)",   { M: 125.4, formel: "ZnCO₃", fase: "s", farve: { r: 240, g: 240, b: 240 }, navn: "zinkcarbonat", atomer: { Zn: 1, C: 1, O: 3 } });
+    St.def("BaSO4(s)",   { M: 233.4, formel: "BaSO₄", fase: "s", farve: { r: 245, g: 245, b: 245 }, navn: "bariumsulfat", atomer: { Ba: 1, S: 1, O: 4 } });
+    St.def("BaCO3(s)",   { M: 197.3, formel: "BaCO₃", fase: "s", farve: { r: 245, g: 245, b: 245 }, navn: "bariumcarbonat", atomer: { Ba: 1, C: 1, O: 3 } });
+
+    St.reaktion({ id: "pbso4",  venstre: [[1, "Pb2+"], [1, "SO42-"]],  hoejre: [[1, "PbSO4(s)"]],   slags: "faeld", K: 1.6e-2, fart: 3 });
+    St.reaktion({ id: "pboh2",  venstre: [[1, "Pb2+"], [2, "OH-"]],    hoejre: [[1, "Pb(OH)2(s)"]], slags: "faeld", K: 1.4e-6, fart: 3 });
+    St.reaktion({ id: "pbco3",  venstre: [[1, "Pb2+"], [1, "CO32-"]],  hoejre: [[1, "PbCO3(s)"]],   slags: "faeld", K: 7.4e-8, fart: 3 });
+    St.reaktion({ id: "ag2so4", venstre: [[2, "Ag+"], [1, "SO42-"]],   hoejre: [[1, "Ag2SO4(s)"]],  slags: "faeld", K: 12000, fart: 2 });
+    St.reaktion({ id: "ag2o",   venstre: [[2, "Ag+"], [2, "OH-"]],     hoejre: [[1, "Ag2O(s)"], [1, "H2O"]], slags: "faeld", K: 4e-4, fart: 3 });
+    St.reaktion({ id: "ag2co3", venstre: [[2, "Ag+"], [1, "CO32-"]],   hoejre: [[1, "Ag2CO3(s)"]],  slags: "faeld", K: 8.5e-3, fart: 3 });
+    St.reaktion({ id: "agscn",  venstre: [[1, "Ag+"], [1, "SCN-"]],    hoejre: [[1, "AgSCN(s)"]],   slags: "faeld", K: 1e-6, fart: 4 });
+    St.reaktion({ id: "cuco3",  venstre: [[1, "Cu2+"], [1, "CO32-"]],  hoejre: [[1, "CuCO3(s)"]],   slags: "faeld", K: 1.4e-4, fart: 3 });
+    St.reaktion({ id: "mgco3",  venstre: [[1, "Mg2+"], [1, "CO32-"]],  hoejre: [[1, "MgCO3(s)"]],   slags: "faeld", K: 6.8, fart: 2 });
+    St.reaktion({ id: "znco3",  venstre: [[1, "Zn2+"], [1, "CO32-"]],  hoejre: [[1, "ZnCO3(s)"]],   slags: "faeld", K: 1.5e-4, fart: 3 });
+    St.reaktion({ id: "baso4",  venstre: [[1, "Ba2+"], [1, "SO42-"]],  hoejre: [[1, "BaSO4(s)"]],   slags: "faeld", K: 1.1e-4, fart: 4 });
+    St.reaktion({ id: "baco3",  venstre: [[1, "Ba2+"], [1, "CO32-"]],  hoejre: [[1, "BaCO3(s)"]],   slags: "faeld", K: 2.6e-3, fart: 3 });
+
+    /* Redox mellem ioner: jern(III) og kobber(II) oxiderer iodid til iod */
+    St.reaktion({ id: "fe_i",  venstre: [[2, "Fe3+"], [2, "I-"]], hoejre: [[2, "Fe2+"], [1, "I2"]], slags: "fuld", fart: 1.5, dH: -20 });
+    St.reaktion({ id: "cu_i",  venstre: [[2, "Cu2+"], [4, "I-"]], hoejre: [[2, "CuI(s)"], [1, "I2"]], slags: "fuld", fart: 2, dH: -30 });
+    /* Jern(III) og carbonat: hydroxid faelder, og carbonatet bliver til CO2 */
+    St.reaktion({ id: "fe_co3", venstre: [[2, "Fe3+"], [3, "CO32-"], [3, "H2O"]], hoejre: [[2, "Fe(OH)3(s)"], [3, "CO2(g)"]], slags: "fuld", fart: 2, dH: -10 });
+
     /* ----- Redoxpar (standardpotentialer i V) --------------------------------- */
     St.par({ ox: "Mg2+", red: "Mg(s)", e: 2, E0: -2.37 });
     St.par({ ox: "Zn2+", red: "Zn(s)", e: 2, E0: -0.76 });
+    St.par({ ox: "Fe2+", red: "Fe(s)", e: 2, E0: -0.44 });
+    St.par({ ox: "Pb2+", red: "Pb(s)", e: 2, E0: -0.13 });
     St.par({ ox: "H+",   red: "H2(g)", e: 2, E0: 0, oxKoef: 2 });
     St.par({ ox: "Cu2+", red: "Cu(s)", e: 2, E0: 0.34 });
+    St.par({ ox: "Fe3+", red: "Fe2+",  e: 1, E0: 0.77 });
     St.par({ ox: "Ag+",  red: "Ag(s)", e: 1, E0: 0.80 });
 }());
