@@ -551,7 +551,7 @@
         if (!gg || !maal || gg === maal || !this.synlig(maal)) return false;
         var k = gg.kan, m = maal.kan;
         if (m.holder && !m.pulver) {
-            if (k.haelder && B.volumen(gg) > 0.05) return true;
+            if (k.haelder && (B.volumen(gg) > 0.05 || (gg.type.navn === "vejebaad" && B.fastIalt(gg) > 0.5))) return true;
             if (k.drypper && B.volumen(gg) > 0.05) return true;
             if (k.sproejter && B.volumen(gg) > 0.05) return true;
             if (k.spatel && gg.last) return true;
@@ -561,6 +561,9 @@
         if ((m.affald || m.vask) && k.holder && !B.tom(gg)) return true;
         if (m.stoette && gg.type.navn === "reagensglas") return this.ledigtHul(maal) >= 0;
         if (m.varmer && k.holder && !k.flaske && !k.drypper && !k.sproejter && !k.pulver && gg.type.navn !== "reagensglas") return true;
+        if (m.vaegt && k.holder && gg.type.navn !== "reagensglas") return true;
+        if (m.holder && k.dypper && B.volumen(maal) > 0.05) return true;
+        if (m.flamme && k.dypper && gg.last) return true;
         return false;
     };
 
@@ -598,8 +601,8 @@
         for (var i = this.liste.length - 1; i >= 0; i--) {
             var c = this.liste[i];
             if (c === gg || !this.synlig(c)) continue;
-            var plads = c.kan.stoette || c.kan.varmer;
-            if (!this.inden(c, plads ? fod : pt, c.kan.stoette ? 12 : (c.kan.varmer ? 30 : (c.kan.holder ? 10 : 6)))) continue;
+            var plads = c.kan.stoette || c.kan.varmer || c.kan.vaegt;
+            if (!this.inden(c, plads ? fod : pt, c.kan.stoette ? 12 : (plads ? 30 : (c.kan.holder ? 10 : 6)))) continue;
             if (this.kanModtage(gg, c)) return c.navn;
         }
         return null;
@@ -619,9 +622,11 @@
         var k = gg.kan, m = c.kan;
         if (m.affald || m.vask) return this.toemI(gg, c);
         if (m.stoette && gg.type.navn === "reagensglas") return this.iStativ(gg, c, this.ledigtHul(c, pt ? pt.x : undefined));
-        if (m.varmer && k.holder) return this.paaPlade(gg, c, pt ? pt.x : undefined);
+        if (m.flamme && k.dypper) return this.flammeproeve(gg, c);
+        if ((m.varmer || m.vaegt) && k.holder) return this.paaPlade(gg, c, pt ? pt.x : undefined);
         if (m.pulver && k.spatel) return this.fyldSpatel(gg, c);
         if (m.holder) {
+            if (k.dypper) return this.dyp(gg, c);
             if (k.spatel && gg.last) return this.toemSpatel(gg, c);
             if (k.drypper) return this.draabe(gg, c);
             if (k.sproejter) return this.sproejt(gg, c);
@@ -798,9 +803,17 @@
             if (this.koer.optaget()) return false;
             gg.taendt = !gg.taendt;
             if (NK.Lyd && NK.Lyd.kontakt) NK.Lyd.kontakt();
-            this.besked(gg.taendt ? "Varmepladen er tændt." : "Varmepladen er slukket.");
+            var T = gg.titel.charAt(0).toUpperCase() + gg.titel.slice(1);
+            this.besked(gg.taendt ? T + " er tændt." : T + " er slukket.");
             this.haendelse("taendt", gg);
             this.aendret("plade");
+            return true;
+        }
+        if (k.vaegt) {
+            gg.tara = this.masseePaa(gg);
+            if (NK.Lyd && NK.Lyd.klik) NK.Lyd.klik();
+            this.besked("Vægten er tareret.");
+            this.aendret("tara");
             return true;
         }
         if (gg.svaev && k.drypper && !this.koer.optaget()) return this.draabe(gg, gg.svaev.maal);
@@ -873,10 +886,99 @@
         this.uheld(slags || "spild", gg, "Det skvulpede ud. Indholdet er tabt.");
     };
 
+    /* Massen af det, der staar paa vaegten (glas og indhold) */
+    P.masseePaa = function (vaegt) {
+        var m = 0;
+        this.liste.forEach(function (gg) { if (gg.paa === vaegt && !gg.skjult) m += B.masse(gg); });
+        return m;
+    };
+
+    P.vaegtTekst = function (vaegt) {
+        var m = this.masseePaa(vaegt) - (vaegt.tara || 0);
+        return (m < 0 ? "−" : "") + Math.abs(m).toFixed(2).replace(".", ",") + " g";
+    };
+
+    /* Fast stof haeldes fra en toer beholder (vejebaaden) i c */
+    P.haeldFast = function (gg, c) {
+        var mig = this;
+        var liste = Stof.faste(gg.indhold);
+        if (!liste.length) return false;
+        if (this.aaben(c)) this.vaelg(c.navn);
+        this.koer.start([
+            { flyt: gg, til: function () { return B.haeldPositur(gg, c, 10); }, tid: 0.6, loeft: 30 },
+            { tid: 0.6, hver: function () {
+                if (Math.random() < 0.7) {
+                    var tud = B.tudVerden(gg), f = liste[Math.floor(Math.random() * liste.length)];
+                    mig.draaber.push({ x: tud.x + r(-3, 3), y: tud.y, vx: r(-8, 8), vy: r(20, 60), rad: 1.5, liv: 1, farve: f.stof.farve || { r: 230, g: 230, b: 230 }, korn: true, c: c });
+                }
+            } },
+            { kald: function () {
+                liste.forEach(function (f) { B.tilsaetFast(c, f.navn, f.umol); Stof.tilsaet(gg.indhold, f.navn, -f.umol); });
+                mig.haendelse("fast", { til: c, fra: gg });
+                mig.aendret("fast");
+            } },
+            NK.Koer.hjemTil(gg, 0.6, 30)
+        ], "haeld");
+        return true;
+    };
+
+    /* Podetraaden dyppes i c og tager en draabe med */
+    P.dyp = function (gg, c) {
+        var mig = this;
+        if (B.volumen(c) < 0.05) return false;
+        if (this.aaben(c)) this.vaelg(c.navn);
+        var o = B.aabning(c);
+        var dyb = Math.min(gg.type.laengde - 20, c.type.h * 0.5);
+        this.koer.start([
+            { flyt: gg, til: function () { return { x: o.x, y: o.y - (gg.type.laengde - dyb), v: 0.1 }; }, tid: 0.5, loeft: 30 },
+            { tid: 0.3 },
+            { kald: function () {
+                gg.last = B.udtag(c, 0.02);
+                gg.lastFarve = Stof.farve(gg.last, 3) || Stof.VAND;
+                mig.haendelse("dyppet", { fra: c });
+            } },
+            NK.Koer.hjemTil(gg, 0.6, 30)
+        ], "dyp");
+        return true;
+    };
+
+    /* Flammeproeve: draaben i podetraadens oeje holdes ind i flammen. Farven
+       er stoffernes egen (flamme i stoftabellen), vejet efter maengde. */
+    P.flammeproeve = function (gg, br) {
+        var mig = this;
+        if (!gg.last) return false;
+        if (!br.taendt) { this.besked("Brænderen er ikke tændt."); return false; }
+        var t = br.type, fx = br.p.x - br.anker.x + t.flammePunkt.x, fy = br.p.y - br.anker.y + t.flammePunkt.y;
+        var o = gg.last, sum = 0, fr = 0, fg = 0, fb = 0, navne = [];
+        for (var s in o.n) {
+            if (!Object.prototype.hasOwnProperty.call(o.n, s)) continue;
+            var st = Stof.STOFFER[s];
+            if (!st || !st.flamme || o.n[s] <= 0) continue;
+            sum += o.n[s]; fr += st.flamme.r * o.n[s]; fg += st.flamme.g * o.n[s]; fb += st.flamme.b * o.n[s];
+            navne.push(s);
+        }
+        var farve = sum > 0 ? { r: fr / sum, g: fg / sum, b: fb / sum } : null;
+        this.koer.start([
+            { flyt: gg, til: { x: fx + 2, y: fy - 22 - gg.type.laengde + 14, v: 0.35 }, tid: 0.5, loeft: 20 },
+            { kald: function () {
+                br.flammeFarve = farve;
+                br.flammeStyrke = farve ? 1 : 0;
+                br.flammeUr = 3;
+                mig.besked(farve ? "Flammen skifter farve." : "Flammen skifter ikke farve.");
+                mig.haendelse("flammeproeve", { stoffer: navne, farve: farve });
+            } },
+            { tid: 2.0 },
+            { kald: function () { gg.last = null; gg.lastFarve = null; mig.aendret("flamme"); } },
+            NK.Koer.hjemTil(gg, 0.6, 30)
+        ], "flamme");
+        return true;
+    };
+
     /* Haeldning fra gg til c. mL = 0: alt */
     P.haeld = function (gg, c, mL) {
         var mig = this;
         var V = B.volumen(gg);
+        if (V < 0.05 && B.fastIalt(gg) > 0.5) return this.haeldFast(gg, c);
         if (V < 0.05) { this.besked(gg.titel + " er tom."); return false; }
         mL = Math.min(V, mL || V);
         var tid = Math.min(1.6, 0.5 + mL * 0.03);
@@ -1107,8 +1209,8 @@
     /* ----- Tidens gang -------------------------------------------------------- */
     P.omgivelser = function (gg) {
         var s = { T: this.stue, tau: B.TEMP.tauLuft, ryst: 0, roer: false };
-        if (gg.paa && gg.paa.taendt) { s.T = gg.paa.T; s.tau = B.TEMP.tauVarme; }
-        else if (gg.paa) { s.T = Math.max(this.stue, gg.paa.T); s.tau = B.TEMP.tauVarme; }
+        if (gg.paa && gg.paa.kan.varmer && gg.paa.taendt) { s.T = gg.paa.T; s.tau = gg.paa.kan.flamme ? 6 : B.TEMP.tauVarme; }
+        else if (gg.paa && gg.paa.kan.varmer) { s.T = Math.max(this.stue, gg.paa.T); s.tau = B.TEMP.tauVarme; }
         if (this.baerer === gg) s.ryst = this.ryst;
         if (this.roerer === gg) { s.roer = true; s.ryst = Math.max(s.ryst, 0.6); }
         return s;
@@ -1130,6 +1232,11 @@
             if (gg.kan.varmer) {
                 var maalT = gg.taendt ? gg.type.temperatur : mig.stue;
                 gg.T = NK.mod(gg.T, maalT, gg.taendt ? 0.12 : 0.06, dt);
+            }
+            if (gg.kan.flamme && gg.flammeUr > 0) {
+                gg.flammeUr -= dt;
+                if (gg.flammeUr <= 0) gg.flammeStyrke = 0;
+                else if (gg.flammeUr < 0.8) gg.flammeStyrke = gg.flammeUr / 0.8;
             }
         });
 
@@ -1188,8 +1295,10 @@
                     gg.p.x = c.p.x + gg.rel.dx; gg.p.y = c.p.y + gg.rel.dy; gg.p.v = gg.rel.v + c.p.v;
                     gg.hjem = kopi(gg.p);
                     gg.T = NK.mod(gg.T, B.volumen(c) > 0.1 ? c.indhold.T : mig.stue, 1.6, dt);
+                    if (gg.kan.ph) gg.pH = B.volumen(c) > 0.1 ? Stof.pH(B.samlet(c)) : null;
                 } else if (mig.baerer !== gg) {
                     gg.T = NK.mod(gg.T, mig.stue, 0.25, dt);
+                    if (gg.kan.ph) gg.pH = null;
                 }
             }
             if (gg.svaev) {
@@ -1275,7 +1384,11 @@
             return;
         }
         if (this.staarPaaBord(gg) && !k.fast) T.skygge(ctx, gg.p.x - gg.anker.x + t.b / 2, t.b * 0.45, 0.3, gg.p.y - gg.anker.y + t.h - 3);
-        if (k.varmer) T.tegnVarmeplade(ctx, gg, tid);
+        if (k.flamme) T.tegnBraender(ctx, gg, tid);
+        else if (k.varmer) T.tegnVarmeplade(ctx, gg, tid);
+        else if (k.vaegt) T.tegnVaegt(ctx, gg, this.vaegtTekst(gg), !this.baerer || this.baerer.paa !== gg);
+        else if (k.dypper) T.tegnPodetraad(ctx, gg);
+        else if (k.ph) T.tegnPHmeter(ctx, gg, !!gg.i || this.baerer === gg);
         else if (k.holder) {
             gg.niveau = T.tegnBeholder(ctx, gg, tid, { boelge: this.baerer === gg ? this.ryst * 1.5 : (this.roerer === gg ? 0.8 : 0) });
             if (gg.bobler && gg.bobler.length && !t.skjulIndhold) T.tegnBobler(ctx, gg, gg.bobler);

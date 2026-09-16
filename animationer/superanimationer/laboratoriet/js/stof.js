@@ -69,7 +69,9 @@
             korn: !!e.korn,
             atomer: e.atomer || null,
             dHfort: e.dHfort || 0,
-            indikator: e.indikator || null
+            indikator: e.indikator || null,
+            /* flamme: farven, stoffet giver en flamme (flammeproeve) */
+            flamme: e.flamme || null
         };
         STOFFER[navn] = s;
         return s;

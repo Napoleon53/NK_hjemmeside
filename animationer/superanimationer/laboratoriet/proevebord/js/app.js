@@ -86,6 +86,58 @@
         return dele.join("|");
     }
 
+    /* ----- Logbogen ---------------------------------------------------- */
+    var LOGBOG_GEMT = "nk-proevebord-logbog";
+
+    function logbogHent() {
+        try { NK.el("logbog-tekst").value = window.localStorage.getItem(LOGBOG_GEMT) || ""; } catch (fejl) { /* file:// */ }
+    }
+
+    function logbogGem() {
+        try { window.localStorage.setItem(LOGBOG_GEMT, NK.el("logbog-tekst").value); } catch (fejl) { /* file:// */ }
+    }
+
+    /* Det valgte glas' aflaesning som én linje i logbogen */
+    function aflaesning() {
+        var c = bord.valgtBeholder();
+        if (!c) return null;
+        var o = B.samlet(c);
+        var dele = [c.titel.charAt(0).toUpperCase() + c.titel.slice(1) + ": " + tal(B.volumen(c)) + " mL"];
+        if (B.volumen(c) > 0.05) {
+            dele.push(NK.Tegning.temperaturTekst(o.T));
+            var ph = St.pH(o);
+            if (ph !== null) dele.push("pH " + tal(ph, 1));
+        }
+        var stoffer = [];
+        Object.keys(o.n).sort().forEach(function (navn) {
+            var s = St.stof(navn);
+            if (o.n[navn] < 1e-3) return;
+            if (s.fase === "s") stoffer.push(St.formel(navn, true) + " " + tal(o.n[navn] / 1000, 2) + " mmol");
+            else if (s.fase === "aq") stoffer.push(St.formel(navn) + " " + tal(St.konc(o, navn), St.konc(o, navn) < 1 ? 2 : 1) + " mM");
+        });
+        if (stoffer.length) dele.push(stoffer.join(", "));
+        var v = bord.g.vaegt;
+        if (v && bord.masseePaa(v) > 0 && c.paa === v) dele.push("vægt " + bord.vaegtTekst(v));
+        return dele.join("; ");
+    }
+
+    function logbogNoter() {
+        var linje = aflaesning();
+        if (!linje) { besked("Klik på et glas først.", "advarsel"); return; }
+        var el = NK.el("logbog-tekst");
+        var nu = new Date();
+        var klokken = (nu.getHours() < 10 ? "0" : "") + nu.getHours() + ":" + (nu.getMinutes() < 10 ? "0" : "") + nu.getMinutes();
+        el.value = (el.value ? el.value.replace(/\s+$/, "") + "\n" : "") + klokken + " " + linje;
+        el.scrollTop = el.scrollHeight;
+        logbogGem();
+        if (NK.Lyd && NK.Lyd.klik) NK.Lyd.klik();
+    }
+
+    function logbogRyd() {
+        NK.el("logbog-tekst").value = "";
+        logbogGem();
+    }
+
     /* ----- Zoomboblen i panelet ---------------------------------------- */
     function tegnBoble() {
         var c = NK.el("boble-laerred");
@@ -200,6 +252,11 @@
         bord.vedBesked = besked;
 
         NK.el("forfraknap").addEventListener("click", startForfra);
+        NK.el("logbog-noter").addEventListener("click", logbogNoter);
+        NK.el("logbog-ryd").addEventListener("click", logbogRyd);
+        NK.el("logbog-tekst").addEventListener("input", logbogGem);
+        NK.logbog = { noter: logbogNoter, aflaesning: aflaesning };
+        logbogHent();
         NK.el("lydknap").addEventListener("click", skiftLyd);
         NK.el("hjaelpknap").addEventListener("click", function () { lukOverlay(); NK.Rundvisning.start(); });
         NK.el("introknap").addEventListener("click", aabnIntro);

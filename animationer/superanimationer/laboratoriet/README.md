@@ -88,7 +88,15 @@ over noget andet, afgør egenskaberne, hvad der sker (`NK.Bord.prototype.moede`)
 | affald eller vask  | rumme noget             | alt hældes ud |
 | stativet           | være et reagensglas     | glasset sættes i nærmeste ledige hul |
 | varmepladen        | rumme noget             | det stilles på pladen og varmes |
+| vægten             | rumme noget             | det stilles på vægten, som viser massen (klik tarerer) |
+| en beholder        | dyppe (podetråd)        | podetråden tager en dråbe med |
+| brænderen          | bære en dråbe (podetråd)| flammeprøve: flammen får ionernes farve (`flamme` i stoftabellen) |
 | ingenting          | alt                     | det sættes ned, hvor det slippes |
+
+Måleudstyr: vægten (`vaegt`, med vejebåd til pulver), pH-meteret (`phmeter`,
+sættes i glasset som termometeret), brænderen med trefod (`braender`, en
+varmeplade med flamme) og podetråden (`podetraad`) til flammeprøver. Massen
+regnes af glassets egen masse, vandet og stofferne (M i stoftabellen).
 
 Frihed frem for afvisning: rystes et åbent glas voldsomt, skvulper det ud;
 løber et glas over, bliver der en pyt; sættes et reagensglas på bordet,

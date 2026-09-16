@@ -16,33 +16,33 @@
     var St = NK.Stof;
 
     /* ----- Ioner og molekyler i oploesning ------------------------------ */
-    St.def("H+",      { formel: "H", q: 1, navn: "hydroner", atomer: { H: 1 } });
-    St.def("OH-",     { formel: "OH", q: -1, navn: "hydroxidioner", atomer: { O: 1, H: 1 } });
-    St.def("Na+",     { formel: "Na", q: 1, navn: "natriumioner", atomer: { Na: 1 } });
-    St.def("K+",      { formel: "K", q: 1, navn: "kaliumioner", atomer: { K: 1 } });
-    St.def("Cl-",     { formel: "Cl", q: -1, navn: "chloridioner", atomer: { Cl: 1 } });
-    St.def("I-",      { formel: "I", q: -1, navn: "iodidioner", atomer: { I: 1 } });
-    St.def("NO3-",    { formel: "NO₃", q: -1, navn: "nitrationer", atomer: { N: 1, O: 3 } });
-    St.def("SO42-",   { formel: "SO₄", q: -2, navn: "sulfationer", atomer: { S: 1, O: 4 } });
-    St.def("CO32-",   { formel: "CO₃", q: -2, navn: "carbonationer", atomer: { C: 1, O: 3 } });
-    St.def("Pb2+",    { formel: "Pb", q: 2, navn: "blyioner", atomer: { Pb: 1 } });
-    St.def("Ag+",     { formel: "Ag", q: 1, navn: "sølvioner", atomer: { Ag: 1 } });
-    St.def("Mg2+",    { formel: "Mg", q: 2, navn: "magnesiumioner", atomer: { Mg: 1 } });
-    St.def("Zn2+",    { formel: "Zn", q: 2, navn: "zinkioner", atomer: { Zn: 1 } });
-    St.def("Fe2+",    { formel: "Fe", q: 2, navn: "jern(II)ioner", atomer: { Fe: 1 }, farve: { r: 150, g: 200, b: 160 }, k: 0.004 });
-    St.def("Cu2+",    { formel: "Cu", q: 2, navn: "kobberioner", atomer: { Cu: 1 }, farve: { r: 70, g: 150, b: 225 }, k: 0.012 });
-    St.def("Fe3+",    { formel: "Fe", q: 3, navn: "jern(III)ioner", atomer: { Fe: 1 }, farve: { r: 215, g: 170, b: 80 }, k: 0.02 });
-    St.def("SCN-",    { formel: "SCN", q: -1, navn: "thiocyanationer", atomer: { S: 1, C: 1, N: 1 } });
-    St.def("FeSCN2+", { formel: "FeSCN", q: 2, navn: "jernthiocyanat-komplekset", atomer: { Fe: 1, S: 1, C: 1, N: 1 }, farve: { r: 185, g: 25, b: 20 }, k: 0.35 });
-    St.def("MnO4-",   { formel: "MnO₄", q: -1, navn: "permanganationer", atomer: { Mn: 1, O: 4 }, farve: { r: 130, g: 20, b: 150 }, k: 0.6 });
-    St.def("HAc",     { formel: "CH₃COOH", q: 0, navn: "ethansyre", atomer: { C: 2, H: 4, O: 2 } });
-    St.def("Ac-",     { formel: "CH₃COO", q: -1, navn: "acetationer", atomer: { C: 2, H: 3, O: 2 } });
+    St.def("H+",      { M: 1, formel: "H", q: 1, navn: "hydroner", atomer: { H: 1 } });
+    St.def("OH-",     { M: 17, formel: "OH", q: -1, navn: "hydroxidioner", atomer: { O: 1, H: 1 } });
+    St.def("Na+",     { M: 23, flamme: { r: 255, g: 200, b: 40 }, formel: "Na", q: 1, navn: "natriumioner", atomer: { Na: 1 } });
+    St.def("K+",      { M: 39.1, flamme: { r: 200, g: 150, b: 255 }, formel: "K", q: 1, navn: "kaliumioner", atomer: { K: 1 } });
+    St.def("Cl-",     { M: 35.5, formel: "Cl", q: -1, navn: "chloridioner", atomer: { Cl: 1 } });
+    St.def("I-",      { M: 126.9, formel: "I", q: -1, navn: "iodidioner", atomer: { I: 1 } });
+    St.def("NO3-",    { M: 62, formel: "NO₃", q: -1, navn: "nitrationer", atomer: { N: 1, O: 3 } });
+    St.def("SO42-",   { M: 96.1, formel: "SO₄", q: -2, navn: "sulfationer", atomer: { S: 1, O: 4 } });
+    St.def("CO32-",   { M: 60, formel: "CO₃", q: -2, navn: "carbonationer", atomer: { C: 1, O: 3 } });
+    St.def("Pb2+",    { M: 207.2, formel: "Pb", q: 2, navn: "blyioner", atomer: { Pb: 1 } });
+    St.def("Ag+",     { M: 107.9, formel: "Ag", q: 1, navn: "sølvioner", atomer: { Ag: 1 } });
+    St.def("Mg2+",    { M: 24.3, formel: "Mg", q: 2, navn: "magnesiumioner", atomer: { Mg: 1 } });
+    St.def("Zn2+",    { M: 65.4, formel: "Zn", q: 2, navn: "zinkioner", atomer: { Zn: 1 } });
+    St.def("Fe2+",    { M: 55.8, formel: "Fe", q: 2, navn: "jern(II)ioner", atomer: { Fe: 1 }, farve: { r: 150, g: 200, b: 160 }, k: 0.004 });
+    St.def("Cu2+",    { M: 63.5, flamme: { r: 60, g: 220, b: 130 }, formel: "Cu", q: 2, navn: "kobberioner", atomer: { Cu: 1 }, farve: { r: 70, g: 150, b: 225 }, k: 0.012 });
+    St.def("Fe3+",    { M: 55.8, formel: "Fe", q: 3, navn: "jern(III)ioner", atomer: { Fe: 1 }, farve: { r: 215, g: 170, b: 80 }, k: 0.02 });
+    St.def("SCN-",    { M: 58.1, formel: "SCN", q: -1, navn: "thiocyanationer", atomer: { S: 1, C: 1, N: 1 } });
+    St.def("FeSCN2+", { M: 113.9, formel: "FeSCN", q: 2, navn: "jernthiocyanat-komplekset", atomer: { Fe: 1, S: 1, C: 1, N: 1 }, farve: { r: 185, g: 25, b: 20 }, k: 0.35 });
+    St.def("MnO4-",   { M: 118.9, formel: "MnO₄", q: -1, navn: "permanganationer", atomer: { Mn: 1, O: 4 }, farve: { r: 130, g: 20, b: 150 }, k: 0.6 });
+    St.def("HAc",     { M: 60.1, formel: "CH₃COOH", q: 0, navn: "ethansyre", atomer: { C: 2, H: 4, O: 2 } });
+    St.def("Ac-",     { M: 59.1, formel: "CH₃COO", q: -1, navn: "acetationer", atomer: { C: 2, H: 3, O: 2 } });
     St.def("farve",   { formel: "farvestof", q: 0, navn: "frugtfarve", farve: { r: 225, g: 40, b: 60 }, k: 0.2 });
 
     /* Koncentrerede syrer: molekylet holder, til det er fortyndet, og
        fortyndingen varmer */
-    St.def("H2SO4",   { formel: "H₂SO₄", q: 0, navn: "koncentreret svovlsyre", atomer: { H: 2, S: 1, O: 4 }, dHfort: -95 });
-    St.def("HNO3",    { formel: "HNO₃", q: 0, navn: "koncentreret salpetersyre", atomer: { H: 1, N: 1, O: 3 }, dHfort: -33 });
+    St.def("H2SO4",   { M: 98.1, formel: "H₂SO₄", q: 0, navn: "koncentreret svovlsyre", atomer: { H: 2, S: 1, O: 4 }, dHfort: -95 });
+    St.def("HNO3",    { M: 63, formel: "HNO₃", q: 0, navn: "koncentreret salpetersyre", atomer: { H: 1, N: 1, O: 3 }, dHfort: -33 });
 
     /* ----- Indikatorer ---------------------------------------------------- */
     St.def("phph", { formel: "phenolphthalein", q: 0, navn: "phenolphthalein", k: 6, indikator: { pKa: 9.4, syre: null, base: { r: 230, g: 60, b: 140 } } });
@@ -54,23 +54,23 @@
     St.def("NO2(g)", { formel: "NO₂", fase: "g", navn: "nitrogendioxid", atomer: { N: 1, O: 2 }, farve: { r: 150, g: 70, b: 20 } });
 
     /* ----- Fast stof: pulver, metal og bundfald ----------------------------- */
-    St.def("NaCl(s)",     { formel: "NaCl", fase: "s", korn: true, farve: { r: 240, g: 240, b: 240 }, navn: "natriumchlorid", atomer: { Na: 1, Cl: 1 } });
-    St.def("KI(s)",       { formel: "KI", fase: "s", korn: true, farve: { r: 245, g: 245, b: 240 }, navn: "kaliumiodid", atomer: { K: 1, I: 1 } });
-    St.def("CuSO4(s)",    { formel: "CuSO₄", fase: "s", korn: true, farve: { r: 60, g: 120, b: 210 }, navn: "kobbersulfat", atomer: { Cu: 1, S: 1, O: 4 } });
-    St.def("Pb(NO3)2(s)", { formel: "Pb(NO₃)₂", fase: "s", korn: true, farve: { r: 245, g: 245, b: 245 }, navn: "blynitrat", atomer: { Pb: 1, N: 2, O: 6 } });
-    St.def("Na2CO3(s)",   { formel: "Na₂CO₃", fase: "s", korn: true, farve: { r: 245, g: 245, b: 240 }, navn: "natriumcarbonat", atomer: { Na: 2, C: 1, O: 3 } });
-    St.def("Mg(s)",       { formel: "Mg", fase: "s", korn: true, farve: { r: 205, g: 208, b: 212 }, navn: "magnesium", atomer: { Mg: 1 } });
-    St.def("Zn(s)",       { formel: "Zn", fase: "s", korn: true, farve: { r: 160, g: 170, b: 185 }, navn: "zink", atomer: { Zn: 1 } });
-    St.def("Cu(s)",       { formel: "Cu", fase: "s", korn: true, farve: { r: 184, g: 115, b: 51 }, navn: "kobber", atomer: { Cu: 1 } });
-    St.def("Ag(s)",       { formel: "Ag", fase: "s", korn: true, farve: { r: 200, g: 200, b: 205 }, navn: "sølv", atomer: { Ag: 1 } });
-    St.def("PbI2(s)",     { formel: "PbI₂", fase: "s", farve: { r: 245, g: 210, b: 40 }, navn: "blyiodid", atomer: { Pb: 1, I: 2 } });
-    St.def("AgCl(s)",     { formel: "AgCl", fase: "s", farve: { r: 238, g: 238, b: 235 }, navn: "sølvchlorid", atomer: { Ag: 1, Cl: 1 } });
-    St.def("AgI(s)",      { formel: "AgI", fase: "s", farve: { r: 240, g: 230, b: 150 }, navn: "sølviodid", atomer: { Ag: 1, I: 1 } });
-    St.def("PbCl2(s)",    { formel: "PbCl₂", fase: "s", farve: { r: 240, g: 240, b: 240 }, navn: "blychlorid", atomer: { Pb: 1, Cl: 2 } });
-    St.def("Cu(OH)2(s)",  { formel: "Cu(OH)₂", fase: "s", farve: { r: 90, g: 160, b: 215 }, navn: "kobberhydroxid", atomer: { Cu: 1, O: 2, H: 2 } });
-    St.def("Fe(OH)3(s)",  { formel: "Fe(OH)₃", fase: "s", farve: { r: 150, g: 80, b: 30 }, navn: "jern(III)hydroxid", atomer: { Fe: 1, O: 3, H: 3 } });
-    St.def("Mg(OH)2(s)",  { formel: "Mg(OH)₂", fase: "s", farve: { r: 240, g: 240, b: 240 }, navn: "magnesiumhydroxid", atomer: { Mg: 1, O: 2, H: 2 } });
-    St.def("Zn(OH)2(s)",  { formel: "Zn(OH)₂", fase: "s", farve: { r: 240, g: 240, b: 240 }, navn: "zinkhydroxid", atomer: { Zn: 1, O: 2, H: 2 } });
+    St.def("NaCl(s)",     { M: 58.4, formel: "NaCl", fase: "s", korn: true, farve: { r: 240, g: 240, b: 240 }, navn: "natriumchlorid", atomer: { Na: 1, Cl: 1 } });
+    St.def("KI(s)",       { M: 166, formel: "KI", fase: "s", korn: true, farve: { r: 245, g: 245, b: 240 }, navn: "kaliumiodid", atomer: { K: 1, I: 1 } });
+    St.def("CuSO4(s)",    { M: 159.6, formel: "CuSO₄", fase: "s", korn: true, farve: { r: 60, g: 120, b: 210 }, navn: "kobbersulfat", atomer: { Cu: 1, S: 1, O: 4 } });
+    St.def("Pb(NO3)2(s)", { M: 331.2, formel: "Pb(NO₃)₂", fase: "s", korn: true, farve: { r: 245, g: 245, b: 245 }, navn: "blynitrat", atomer: { Pb: 1, N: 2, O: 6 } });
+    St.def("Na2CO3(s)",   { M: 106, formel: "Na₂CO₃", fase: "s", korn: true, farve: { r: 245, g: 245, b: 240 }, navn: "natriumcarbonat", atomer: { Na: 2, C: 1, O: 3 } });
+    St.def("Mg(s)",       { M: 24.3, formel: "Mg", fase: "s", korn: true, farve: { r: 205, g: 208, b: 212 }, navn: "magnesium", atomer: { Mg: 1 } });
+    St.def("Zn(s)",       { M: 65.4, formel: "Zn", fase: "s", korn: true, farve: { r: 160, g: 170, b: 185 }, navn: "zink", atomer: { Zn: 1 } });
+    St.def("Cu(s)",       { M: 63.5, formel: "Cu", fase: "s", korn: true, farve: { r: 184, g: 115, b: 51 }, navn: "kobber", atomer: { Cu: 1 } });
+    St.def("Ag(s)",       { M: 107.9, formel: "Ag", fase: "s", korn: true, farve: { r: 200, g: 200, b: 205 }, navn: "sølv", atomer: { Ag: 1 } });
+    St.def("PbI2(s)",     { M: 461, formel: "PbI₂", fase: "s", farve: { r: 245, g: 210, b: 40 }, navn: "blyiodid", atomer: { Pb: 1, I: 2 } });
+    St.def("AgCl(s)",     { M: 143.3, formel: "AgCl", fase: "s", farve: { r: 238, g: 238, b: 235 }, navn: "sølvchlorid", atomer: { Ag: 1, Cl: 1 } });
+    St.def("AgI(s)",      { M: 234.8, formel: "AgI", fase: "s", farve: { r: 240, g: 230, b: 150 }, navn: "sølviodid", atomer: { Ag: 1, I: 1 } });
+    St.def("PbCl2(s)",    { M: 278.1, formel: "PbCl₂", fase: "s", farve: { r: 240, g: 240, b: 240 }, navn: "blychlorid", atomer: { Pb: 1, Cl: 2 } });
+    St.def("Cu(OH)2(s)",  { M: 97.6, formel: "Cu(OH)₂", fase: "s", farve: { r: 90, g: 160, b: 215 }, navn: "kobberhydroxid", atomer: { Cu: 1, O: 2, H: 2 } });
+    St.def("Fe(OH)3(s)",  { M: 106.9, formel: "Fe(OH)₃", fase: "s", farve: { r: 150, g: 80, b: 30 }, navn: "jern(III)hydroxid", atomer: { Fe: 1, O: 3, H: 3 } });
+    St.def("Mg(OH)2(s)",  { M: 58.3, formel: "Mg(OH)₂", fase: "s", farve: { r: 240, g: 240, b: 240 }, navn: "magnesiumhydroxid", atomer: { Mg: 1, O: 2, H: 2 } });
+    St.def("Zn(OH)2(s)",  { M: 99.4, formel: "Zn(OH)₂", fase: "s", farve: { r: 240, g: 240, b: 240 }, navn: "zinkhydroxid", atomer: { Zn: 1, O: 2, H: 2 } });
 
     /* ----- Pulver oploeses ------------------------------------------------- */
     St.reaktion({ id: "nacl",   venstre: [[1, "NaCl(s)"]],     hoejre: [[1, "Na+"], [1, "Cl-"]],       slags: "oploes", fart: 0.35, dH: 4 });

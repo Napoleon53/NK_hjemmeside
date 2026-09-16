@@ -51,19 +51,24 @@
         { navn: "glas3", type: "reagensglas", stativ: "stativ", hul: 4, nr: 3, titel: "glas 3" },
         { navn: "glas4", type: "reagensglas", stativ: "stativ", hul: 6, nr: 4, titel: "glas 4" },
 
-        /* Fri plads mellem stativet og varmepladen til at saette ting ned */
-        { navn: "plade", type: "varmeplade", p: { x: 1230, y: 428, v: 0 } },
-        { navn: "baeger100", type: "baeger100", paa: "plade", x: 1320 },
+        /* Braender med trefod, vaegt med vejebaad, fri plads, varmeplade */
+        { navn: "braender", type: "braender", p: { x: 1075, y: 425, v: 0 } },
+        { navn: "vaegt", type: "vaegt", p: { x: 1160, y: 438, v: 0 } },
+        { navn: "vejebaad", type: "vejebaad", paa: "vaegt", x: 1230 },
+        { navn: "plade", type: "varmeplade", p: { x: 1420, y: 428, v: 0 } },
+        { navn: "baeger100", type: "baeger100", paa: "plade", x: 1510 },
 
-        { navn: "glasstav", type: "glasstav", x: 1100 },
-        { navn: "termometer", type: "termometer", x: 1120, y: 440 },
+        { navn: "glasstav", type: "glasstav", x: 700 },
+        { navn: "termometer", type: "termometer", x: 850 },
+        { navn: "phmeter", type: "phmeter", x: 990 },
+        { navn: "podetraad", type: "podetraad", x: 1320 },
         { navn: "papir", type: "koekkenrulle", x: 176, y: 268 }
     ];
 
     NK.BORD_VALG = {
-        bredde: 1420, hoejde: 600, bord: 500,
+        bredde: 1620, hoejde: 600, bord: 500,
         hylder: [{ x0: 16, x1: 220, y: 268 }, { x0: 250, x1: 910, y: HYLDE }],
-        plakat: { x: 1250, y: 90 },
+        plakat: { x: 1440, y: 90 },
         /* Zoomboblen tegnes i panelet, ikke paa scenen (ingen boble her) */
         bobleR: 128, partikler: 6
     };

@@ -575,6 +575,125 @@
         }
     };
 
+    /* Vaegten med displayet. tekst: det, den viser */
+    T.tegnVaegt = function (ctx, gg, tekst, stabil) {
+        var t = gg.type, x = gg.p.x - gg.anker.x, y = gg.p.y - gg.anker.y, D = t.display;
+        T.skygge(ctx, x + t.b / 2, t.b / 2, 0.3, y + t.h - 3);
+        NK.Sprites.tegn(ctx, t.sprite, x, y);
+        NK.tekst(ctx, tekst, x + D.x + D.b - 6, y + D.y + D.h / 2 + 1, { font: "700 13px Consolas, 'Courier New', monospace", justering: "right", linje: "middle", farve: "#7df0a8" });
+        if (stabil) NK.tekst(ctx, "○", x + D.x + 5, y + D.y + 6, { font: "600 6px 'Segoe UI', sans-serif", linje: "middle", farve: "#4fbf7f" });
+    };
+
+    /* Flammen fra braenderen. farve: evt. flammeproevens farve, styrke 0-1 */
+    T.tegnFlamme = function (ctx, x, y, h, tid, farve, styrke) {
+        var f = 1 + 0.06 * Math.sin(tid * 23) + 0.04 * Math.sin(tid * 37 + 1.3);
+        h *= f;
+        var sving = 1.2 * Math.sin(tid * 11);
+        var s = farve ? NK.klamp(styrke === undefined ? 1 : styrke, 0, 1) : 0;
+        var ydre = farve ? { r: NK.lerp(120, farve.r, s), g: NK.lerp(180, farve.g, s), b: NK.lerp(255, farve.b, s) } : { r: 120, g: 180, b: 255 };
+        NK.skaer(ctx, x, y - h * 0.45, 30 + 20 * s, NK.css({ r: ydre.r, g: ydre.g, b: ydre.b, a: 0.45 }), 0.5 + 0.3 * s);
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(x - 6, y);
+        ctx.bezierCurveTo(x - 10, y - h * 0.4, x - 3 + sving, y - h * 0.8, x + sving, y - h);
+        ctx.bezierCurveTo(x + 3 + sving, y - h * 0.8, x + 10, y - h * 0.4, x + 6, y);
+        ctx.closePath();
+        var g = ctx.createLinearGradient(0, y, 0, y - h);
+        g.addColorStop(0, NK.css({ r: ydre.r, g: ydre.g, b: ydre.b, a: 0.85 }));
+        g.addColorStop(0.6, NK.css({ r: NK.lerp(140, ydre.r, s), g: NK.lerp(125, ydre.g, s), b: NK.lerp(255, ydre.b, s), a: 0.55 }));
+        g.addColorStop(1, NK.css({ r: NK.lerp(255, ydre.r, s), g: NK.lerp(170, ydre.g, s), b: NK.lerp(90, ydre.b, s), a: 0 }));
+        ctx.fillStyle = g;
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(x - 4, y);
+        ctx.quadraticCurveTo(x + sving * 0.3, y - h * 0.85, x + 4, y);
+        ctx.closePath();
+        ctx.fillStyle = "rgba(175, 222, 255, 0.92)";
+        ctx.fill();
+        ctx.restore();
+    };
+
+    /* Braenderen med trefod. gg: { taendt, flammeFarve, flammeStyrke } */
+    T.tegnBraender = function (ctx, gg, tid) {
+        var t = gg.type, x = gg.p.x - gg.anker.x, y = gg.p.y - gg.anker.y;
+        T.skygge(ctx, x + t.b / 2, 38, 0.3, y + t.h - 3);
+        if (gg.taendt) T.tegnFlamme(ctx, x + t.flammePunkt.x, y + t.flammePunkt.y, 30 + 12 * (gg.flammeStyrke || 0), tid, gg.flammeFarve, gg.flammeStyrke);
+        NK.Sprites.tegn(ctx, t.sprite, x, y);
+        NK.Sprites.tegn(ctx, "trefod", x + t.b / 2 - 35, y + t.h - 100);
+    };
+
+    /* Podetraaden: en tynd traad fra ankeret (0, 0) til (0, laengde) med en
+       oeje i enden. last: en draabe oploesning, der sidder i oejet */
+    T.tegnPodetraad = function (ctx, gg) {
+        var p = gg.p, e = NK.tilVerden(p, gg.anker, 0, gg.type.laengde);
+        ctx.save();
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "rgba(210, 215, 222, 0.9)";
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(e.x, e.y);
+        ctx.stroke();
+        ctx.strokeStyle = "rgba(90, 60, 30, 0.9)";
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(NK.lerp(p.x, e.x, 0.3), NK.lerp(p.y, e.y, 0.3));
+        ctx.stroke();
+        ctx.strokeStyle = "rgba(210, 215, 222, 0.9)";
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, 3.5, 0, Math.PI * 2);
+        ctx.stroke();
+        if (gg.last) {
+            ctx.fillStyle = NK.css(gg.lastFarve || { r: 200, g: 228, b: 245 }, 0.85);
+            ctx.beginPath();
+            ctx.arc(e.x, e.y, 3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.restore();
+    };
+
+    /* pH-meteret: en sonde fra ankeret (0, 0) ned til spidsen (0, laengde),
+       med et lille display oeverst */
+    T.tegnPHmeter = function (ctx, gg, visTal) {
+        var L = gg.type.laengde, p = gg.p;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.v);
+        ctx.fillStyle = "#2d3239";
+        NK.rundtRekt(ctx, -7, 0, 14, 34, 4);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.fillStyle = "#101418";
+        NK.rundtRekt(ctx, -5, 4, 10, 12, 2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(225, 238, 247, 0.55)";
+        NK.rundtRekt(ctx, -3, 34, 6, L - 40, 3);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(60, 80, 95, 0.65)";
+        ctx.stroke();
+        NK.kugle(ctx, 0, L - 4, 4, "#dfe8f0", "#7a8894");
+        ctx.restore();
+        if (visTal) {
+            var w = NK.tilVerden(p, { x: 0, y: 0 }, 0, -16);
+            var tekst = gg.pH === undefined || gg.pH === null ? "pH –" : "pH " + (Math.round(gg.pH * 10) / 10).toFixed(1).replace(".", ",");
+            ctx.save();
+            ctx.font = "700 14px 'Segoe UI', sans-serif";
+            var b = ctx.measureText(tekst).width + 16;
+            ctx.fillStyle = "rgba(20, 22, 28, 0.92)";
+            NK.rundtRekt(ctx, w.x - b / 2, w.y - 12, b, 24, 12);
+            ctx.fill();
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            NK.tekst(ctx, tekst, w.x, w.y + 0.5, { font: "700 14px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#9fe3ff" });
+            ctx.restore();
+        }
+    };
+
     /* En straale vaeske fra en aabning ned til en overflade. */
     T.tegnStraale = function (ctx, fra, til, farve, bredde, tid) {
         if (!farve) return;

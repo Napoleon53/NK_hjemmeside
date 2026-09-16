@@ -225,8 +225,47 @@
             anker: { x: 36, y: 22 },
             kan: { papir: true },
             titel: "køkkenrullen"
+        },
+        /* Maaleudstyr */
+        vaegt: {
+            sprite: "vaegt", fil: "vaegt.svg", b: 140, h: 62,
+            anker: { x: 0, y: 0 },
+            kan: { vaegt: true, fast: true },
+            plade: { x0: 30, x1: 110, y: 0 }, display: { x: 22, y: 30, b: 70, h: 20 },
+            titel: "vægten"
+        },
+        vejebaad: {
+            sprite: "vejebaad", fil: "vejebaad.svg", b: 64, h: 14,
+            anker: { x: 32, y: 2 },
+            kan: { holder: true, haelder: true },
+            indre: pts([[4, 3], [60, 3], [58, 12], [6, 12]]), mlPrAreal: 100, maks: 4, haeldMl: 0,
+            tud: { x: 4, y: 3, v: -1.4 },
+            vejlaengde: 0.3, titel: "vejebåden", masse: 1.5
+        },
+        braender: {
+            sprite: "braender", fil: "braender.svg", b: 50, h: 75,
+            anker: { x: 0, y: 0 },
+            kan: { varmer: true, flamme: true, fast: true },
+            plade: { x0: -8, x1: 58, y: -25 }, temperatur: 600, flammePunkt: { x: 25, y: 7 },
+            titel: "brænderen"
+        },
+        podetraad: {
+            sprite: null, b: 8, h: 90,
+            anker: { x: 0, y: 0 },
+            kan: { dypper: true },
+            laengde: 90, titel: "podetråden"
+        },
+        phmeter: {
+            sprite: null, b: 16, h: 100,
+            anker: { x: 0, y: 0 },
+            kan: { maaler: true, ph: true },
+            laengde: 100, titel: "pH-meteret"
         }
     };
+
+    /* Glassets egen masse i gram, til vaegten */
+    var MASSE = { reagensglas: 15, baeger100: 50, baeger250: 100, kolbe: 120, maaleglas: 80, flaske: 150, draabeflaske: 20, sproejteflaske: 30, pulverglas: 40, vejebaad: 1.5 };
+    Object.keys(MASSE).forEach(function (n) { TYPER[n].masse = MASSE[n]; });
 
     /* Sprites registreres, saa NK.Sprites.start() henter dem */
     Object.keys(TYPER).forEach(function (navn) {
@@ -237,13 +276,14 @@
     });
     NK.Sprites.tilfoej("haand", { fil: "haand.svg", b: 96, h: 84 });
     NK.Sprites.tilfoej("lup", { fil: "lup.svg", b: 40, h: 40 });
-    /* Kost og fejeblad til laereren, naar et glas er knust */
+    /* Kost og fejeblad til laereren, naar et glas er knust; trefoden til braenderen */
     NK.Sprites.tilfoej("kost", { fil: "kost.svg", b: 130, h: 56 });
     NK.Sprites.tilfoej("fejeblad", { fil: "fejeblad.svg", b: 120, h: 54 });
+    NK.Sprites.tilfoej("trefod", { fil: "trefod.svg", b: 70, h: 100 });
 
     /* Det, der er af glas, knuses, hvis det tabes paa gulvet eller
        rystes ekstremt voldsomt */
-    ["reagensglas", "baeger100", "baeger250", "kolbe", "maaleglas", "flaske", "glasstav", "termometer"].forEach(function (n) { TYPER[n].glas = true; });
+    ["reagensglas", "baeger100", "baeger250", "kolbe", "maaleglas", "flaske", "glasstav", "termometer", "phmeter"].forEach(function (n) { TYPER[n].glas = true; });
 
     NK.Udstyr = {
         TYPER: TYPER,

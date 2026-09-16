@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="140" height="200" viewBox="0 0 70 100">
+  <!-- Trefod med traadnet. Nettets overside, midt (35, 2), er ankeret. -->
+  <g stroke="#3c424b" stroke-width="3.2" stroke-linecap="round">
+    <path d="M12 6 L4 98"/>
+    <path d="M58 6 L66 98"/>
+  </g>
+  <path d="M35 6 L35 92" stroke="#2a2e35" stroke-width="2.4" stroke-linecap="round"/>
+  <ellipse cx="35" cy="6" rx="26" ry="3" fill="none" stroke="#4a515b" stroke-width="2.6"/>
+  <!-- Traadnet med keramisk midte -->
+  <rect x="3" y="0" width="64" height="4" rx="1" fill="#8a929c"/>
+  <path d="M7 1 h56 M7 3 h56" stroke="#5f6772" stroke-width="0.5"/>
+  <rect x="20" y="0.2" width="30" height="3.6" rx="1.5" fill="#e7e2d8"/>
+</svg>

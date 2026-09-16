@@ -167,6 +167,20 @@
         }
     };
 
+    /* Massen i gram: glasset selv, vandet (1 g/mL) og stofferne (µmol · M) */
+    B.masse = function (gg) {
+        var m = gg.type.masse || 0;
+        if (!gg.indhold) return m;
+        var o = B.samlet(gg);
+        m += o.V;
+        for (var s in o.n) {
+            if (!Object.prototype.hasOwnProperty.call(o.n, s)) continue;
+            var st = Stof.STOFFER[s];
+            if (st && st.M) m += o.n[s] * st.M * 1e-6;
+        }
+        return m;
+    };
+
     /* Aabningen paa tegnebordet: ankeret sidder i aabningens midte */
     B.aabning = function (gg) {
         return { x: gg.p.x, y: gg.p.y };

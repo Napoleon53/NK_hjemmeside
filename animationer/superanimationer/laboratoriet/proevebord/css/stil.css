@@ -28,6 +28,24 @@
 #glas-temp { margin-top: 8px; }
 #glas-temp[hidden] { display: none; }
 
+/* Logbogen */
+.logbog {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px 10px;
+    background-color: #16161c;
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    color: var(--tekst);
+    font-family: inherit;
+    font-size: 0.86rem;
+    line-height: 1.45;
+    resize: vertical;
+}
+.logbog:focus { outline: 2px solid var(--gul); outline-offset: 1px; }
+#logbog-kort .knaprad { margin-top: 0; }
+
 /* Ideerne er en simpel liste med en prik */
 .ideer { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; }
 .ideer li { position: relative; padding-left: 16px; font-size: 0.86rem; line-height: 1.4; color: var(--tekst-svag); }
