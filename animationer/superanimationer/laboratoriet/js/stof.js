@@ -74,6 +74,8 @@
             /* fare: [{ over: mM (0 for faste stoffer), maerker: [...], sig: [...] }],
                det foerste trin, hvis koncentration er naaet, gaelder */
             fare: e.fare || null,
+            /* kort: forkortelsen paa kuglen i zoomboblen (legenden viser det fulde navn) */
+            kort: e.kort || null,
             indikator: e.indikator || null,
             /* flamme: farven, stoffet giver en flamme (flammeproeve) */
             flamme: e.flamme || null
@@ -475,7 +477,8 @@
         if (top <= 0) return ud;
         for (s in o.n) {
             if (!Object.prototype.hasOwnProperty.call(o.n, s) || o.n[s] <= 1e-3) continue;
-            if (o.n[s] < top * 0.02) continue;
+            /* En indikator er der lidt af, men den farver alt: altid én kugle */
+            if (o.n[s] < top * 0.02 && !(STOFFER[s] && STOFFER[s].indikator)) continue;
             ud[s] = Math.max(1, Math.round(o.n[s] / top * (maks || 6)));
         }
         return ud;

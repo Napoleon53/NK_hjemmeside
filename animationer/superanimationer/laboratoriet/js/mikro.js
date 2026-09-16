@@ -41,7 +41,7 @@
         var s = Stof.STOFFER[navn];
         if (!s) return 14;
         if (s.fase === "s") return 16;
-        var l = s.formel.replace(/[₀-₉]/g, "").length;
+        var l = (s.kort || s.formel).replace(/[₀-₉]/g, "").length;
         return NK.klamp(11 + l * 1.9, 14, 22);
     }
 
@@ -57,7 +57,7 @@
         var s = Stof.STOFFER[navn];
         var p = {
             navn: navn, x: x, y: y, vx: vx || 0, vy: vy || 0, rad: radius(navn), alfa: 0,
-            fast: !!(s && s.fase === "s"), tekst: Stof.formel(navn), farve: farveAf(navn), fase: r(0, 6.28), doer: false
+            fast: !!(s && s.fase === "s"), tekst: s && s.kort ? s.kort : Stof.formel(navn), farve: farveAf(navn), fase: r(0, 6.28), doer: false
         };
         this.partikler.push(p);
         return p;
@@ -195,6 +195,22 @@
             }
             var str = p.tekst.length > 5 ? 11 : (p.tekst.length > 3 ? 13 : 15);
             NK.tekst(ctx, p.tekst, p.x, p.y + 0.5, { font: "800 " + str + "px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#ffffff", kant: true, kantBredde: 3, kantFarve: "rgba(0,0,0,0.55)" });
+        }
+
+        /* Legende for de forkortede navne, nederst i boblen */
+        var legende = [], set = {};
+        for (i = 0; i < this.partikler.length; i++) {
+            var q = this.partikler[i], sq = Stof.STOFFER[q.navn];
+            if (sq && sq.kort && !set[q.navn] && q.alfa > 0.2) { set[q.navn] = true; legende.push(sq.kort + " = " + sq.dansk); }
+        }
+        if (legende.length) {
+            ctx.globalAlpha = alfa;
+            var lh = 14, ly0 = R - 10 - legende.length * lh;
+            ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
+            ctx.fillRect(-R, ly0 - 6, R * 2, R - ly0 + 6);
+            legende.forEach(function (tekst, k) {
+                NK.tekst(ctx, tekst, 0, ly0 + k * lh + lh / 2, { font: "600 11px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#f2f4f7" });
+            });
         }
         ctx.restore();
 

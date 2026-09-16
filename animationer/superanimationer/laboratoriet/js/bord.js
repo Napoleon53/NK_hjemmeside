@@ -311,6 +311,9 @@
         }
         var ring = this.svaevRing();
         if (ring && Math.hypot(pt.x - ring.x, pt.y - ring.y) < ring.r + 6) return ring.navn;
+        /* Det, der svaever (flasken, man er i gang med), har foerste prioritet */
+        var sv = this.svaevende();
+        if (sv && this.synlig(sv) && this.inden(sv, pt, 8)) return sv.navn;
         for (var i = this.liste.length - 1; i >= 0; i--) {
             var gg = this.liste[i];
             if (!this.synlig(gg)) continue;
@@ -772,7 +775,14 @@
             }
             if (!ramt && tud && c.kan.holder && !plads) {
                 var rk = this.rekt(c, 0);
-                ramt = tud.x > rk.x - 14 && tud.x < rk.x + rk.b + 14 && tud.y > rk.y - 90 && tud.y < rk.y + rk.h * 0.6;
+                if (c.kan.flaske || c.kan.sproejter || c.kan.pulver) {
+                    /* En flaske har en smal hals: tuden skal staa lige over den, ellers
+                       saettes det, man baerer, ned mellem flaskerne */
+                    var ob = B.aabning(c);
+                    ramt = Math.abs(tud.x - ob.x) < 10 && tud.y > ob.y - 40 && tud.y < ob.y + 10;
+                } else {
+                    ramt = tud.x > rk.x - 14 && tud.x < rk.x + rk.b + 14 && tud.y > rk.y - 90 && tud.y < rk.y + rk.h * 0.6;
+                }
             }
             if (!ramt) continue;
             if (this.kanModtage(gg, c)) return c.navn;

@@ -47,7 +47,7 @@ function koerTest() {
     paastand("NK findes", !!NK);
     if (!NK) return;
     var rum = NK.rum, B = NK.Beholder, St = NK.Stof;
-    paastand("rummene er bygget", !!rum && rum.rum.length === 3, rum && rum.rum.length);
+    paastand("rummene er bygget", !!rum && rum.rum.length === 4, rum && rum.rum.length);
     paastand("man starter paa proevebordet", rum.nu.navn === "bord");
     paastand("introen aabner og lukker", !!NK.intro && (NK.intro.aabn(), d.getElementById("intro").classList.contains("vis")) && (NK.intro.luk(), !d.getElementById("intro").classList.contains("vis")));
     var alle = Object.keys(NK.Sprites.FILER);
@@ -64,7 +64,7 @@ function koerTest() {
 
     overskrift("2. At gaa mellem rum");
     var S = NK.Scene;
-    paastand("pilene peger paa naborummene", rum.nu.venstre.navn === "forrum" && rum.nu.hoejre.navn === "stinkskab");
+    paastand("pilene peger paa naborummene", rum.nu.venstre.navn === "depot" && rum.nu.hoejre.navn === "stinkskab");
     paastand("pilen til hoejre traeffes", rum.pilVed({ x: S.BREDDE - 40, y: 200 }) === "hoejre" && rum.pilVed({ x: 400, y: 200 }) === null);
     paastand("gaa til hoejre", rum.gaa("hoejre"));
     paastand("rummet skifter med det samme, og glider ind", rum.nu.navn === "stinkskab" && !!rum.skift && rum.aktiv().forskyd > 100, rum.aktiv().forskyd.toFixed(0));
@@ -78,6 +78,10 @@ function koerTest() {
     paastand("spring direkte til forrummet med knappen", rum.gaaTil("forrum", -1) && rum.nu.navn === "forrum");
     adv(0.8);
     paastand("forrummet har sin egen opstilling", !!bord().g.vask && !!bord().g.kolbe && !bord().g.plade);
+    rum.gaaTil("depot", 1); adv(0.8);
+    paastand("kemikaliedepotet har to hylder med flasker", bord().g.d_h2so4b && bord().g.d_pb && NK.Scene.HYLDER.length === 3);
+    paastand("etiketten paa koncentreret svovlsyre er maerket aetsende", St.faremaerker(bord().g.d_h2so4b.indhold).indexOf("aetsende") >= 0);
+    paastand("0,1 M saltsyre er umaerket", St.faremaerker(bord().g.d_hcl1.indhold).length === 0);
     rum.gaaTil("bord", 1); adv(0.8);
 
     overskrift("3. Det, man har i haanden, kommer med");

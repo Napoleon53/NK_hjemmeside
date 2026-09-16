@@ -87,7 +87,8 @@ Faren er data på stoffet i `stoftabel.js` (`fare`): trin med en nedre
 koncentration (`over` i mM, 0 for faste stoffer), piktogrammerne
 (`maerker`: brandfarlig, oxiderende, aetsende, giftig, sundhedsfare, kronisk,
 miljoe, forenklede GHS-tegn) og det, Kemichael siger første gang flasken
-tages (`sig`). `NK.Stof.faremaerker(o)` giver mærkerne for en opløsning, så
+tages (`sig`). Et stof med et langt navn får et kort navn på kuglen i
+zoomboblen (`kort`, fx PP for phenolphthalein), og boblen viser en legende. `NK.Stof.faremaerker(o)` giver mærkerne for en opløsning, så
 etiketten følger indholdet: en fortyndet syre mister sit ætsende-mærke, og
 affaldsdunken viser, hvad der er i den. Kemichael advarer gennem
 `laererBaer` (`proevebord/js/laerer.js`), én gang pr. stof.
@@ -175,7 +176,10 @@ sender dem til lugen i det andet rum, med termometer og indhold.
 Stinkskabet er et valg på rummet (`stinkskab: { x0, x1, top, aabning }`):
 kabinettet tegnes bag udstyret og ruden foran, udsugningen trækker dampe op,
 og gas-hændelser får `iStinkskab`, så et forsøg kan skelne mellem farlige
-dampe inde og ude. Mønster: `proeverum/` (forrum, prøvebord, stinkskab).
+dampe inde og ude. Mønster: `proeverum/` (forrum, kemikaliedepot, prøvebord,
+stinkskab). Det, der svæver, har første prioritet for musen, og en flaske
+er kun mål for hældning, når tuden står lige over halsen; ellers sættes det
+bårne ned mellem flaskerne.
 Superanimationerne bruger indtil videre ét rum; rummene er til det senere
 spil.
 

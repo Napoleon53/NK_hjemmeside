@@ -46,6 +46,49 @@
         { navn: "phmeter", type: "phmeter", x: 1040 }
     ];
 
+    /* Kemikaliedepotet: to hylder med flasker og pulverglas paa raekke, og
+       god plads paa bordet til at saette ting fra sig */
+    var HYLDE2 = 210;
+    function fl(navn, x, y, etiket, titel, mM) { return { navn: navn, type: "flaske", x: x, y: y, etiket: etiket, titel: titel, indhold: opl(200, mM) }; }
+    var DEPOT = [
+        { navn: "papir", type: "koekkenrulle", x: 176, y: 268 },
+        fl("d_pb",   300, HYLDE2, ["Pb(NO₃)₂", "0,1 M"], "flasken med Pb(NO₃)₂", { "Pb2+": 100, "NO3-": 200 }),
+        fl("d_ki",   360, HYLDE2, ["KI", "0,1 M"], "flasken med KI", { "K+": 100, "I-": 100 }),
+        fl("d_cu",   420, HYLDE2, ["CuSO₄", "0,1 M"], "flasken med CuSO₄", { "Cu2+": 100, "SO42-": 100 }),
+        fl("d_fe",   480, HYLDE2, ["Fe(NO₃)₃", "0,01 M"], "flasken med Fe(NO₃)₃", { "Fe3+": 10, "NO3-": 30 }),
+        fl("d_scn",  540, HYLDE2, ["KSCN", "0,01 M"], "flasken med KSCN", { "K+": 10, "SCN-": 10 }),
+        fl("d_nacl", 600, HYLDE2, ["NaCl", "0,1 M"], "flasken med NaCl", { "Na+": 100, "Cl-": 100 }),
+        fl("d_ba",   660, HYLDE2, ["BaCl₂", "0,1 M"], "flasken med BaCl₂", { "Ba2+": 100, "Cl-": 200 }),
+        fl("d_ag",   720, HYLDE2, ["AgNO₃", "0,1 M"], "flasken med AgNO₃", { "Ag+": 100, "NO3-": 100 }),
+        fl("d_na2co3", 780, HYLDE2, ["Na₂CO₃", "0,1 M"], "flasken med Na₂CO₃", { "Na+": 200, "CO32-": 100 }),
+        { navn: "d_phph", type: "draabeflaske", x: 860, y: HYLDE2, etiket: ["phenol-", "phthalein"], titel: "dråbeflasken med phenolphthalein", indhold: opl(60, { "phph": 30 }) },
+        { navn: "d_btb",  type: "draabeflaske", x: 920, y: HYLDE2, etiket: ["bromthymol-", "blåt"], titel: "dråbeflasken med bromthymolblåt", indhold: opl(60, { "btb": 20 }) },
+        { navn: "d_agd",  type: "draabeflaske", x: 980, y: HYLDE2, etiket: ["AgNO₃", "0,1 M"], titel: "dråbeflasken med AgNO₃", indhold: opl(60, { "Ag+": 100, "NO3-": 100 }) },
+        fl("d_hcl1",  300, HYLDE, ["HCl", "0,1 M"], "flasken med 0,1 M HCl", { "H+": 100, "Cl-": 100 }),
+        fl("d_hcl2",  360, HYLDE, ["HCl", "1 M"], "flasken med 1 M HCl", { "H+": 1000, "Cl-": 1000 }),
+        fl("d_hcl3",  420, HYLDE, ["HCl", "konc. 12 M"], "flasken med koncentreret saltsyre", { "H+": 12000, "Cl-": 12000 }),
+        fl("d_h2so4a", 480, HYLDE, ["H₂SO₄", "0,1 M"], "flasken med 0,1 M H₂SO₄", { "H+": 200, "SO42-": 100 }),
+        fl("d_h2so4b", 540, HYLDE, ["H₂SO₄", "konc. 18 M"], "flasken med koncentreret svovlsyre", { "H2SO4": 18000 }),
+        fl("d_hno3a", 600, HYLDE, ["HNO₃", "0,1 M"], "flasken med 0,1 M HNO₃", { "H+": 100, "NO3-": 100 }),
+        fl("d_hno3b", 660, HYLDE, ["HNO₃", "konc. 14 M"], "flasken med koncentreret salpetersyre", { "HNO3": 14000 }),
+        fl("d_hac",   720, HYLDE, ["CH₃COOH", "0,1 M"], "flasken med ethansyre", { "HAc": 100 }),
+        fl("d_naoh1", 780, HYLDE, ["NaOH", "0,1 M"], "flasken med 0,1 M NaOH", { "Na+": 100, "OH-": 100 }),
+        fl("d_naoh2", 840, HYLDE, ["NaOH", "2 M"], "flasken med 2 M NaOH", { "Na+": 2000, "OH-": 2000 }),
+        pulver("p_nacl", 300, "NaCl", "pulverglasset med NaCl", "NaCl(s)"),
+        pulver("p_cuso4", 350, "CuSO₄", "pulverglasset med CuSO₄", "CuSO4(s)"),
+        pulver("p_na2co3", 400, "Na₂CO₃", "pulverglasset med Na₂CO₃", "Na2CO3(s)"),
+        pulver("p_pb", 450, "Pb(NO₃)₂", "pulverglasset med Pb(NO₃)₂", "Pb(NO3)2(s)"),
+        pulver("p_mg", 520, "Mg", "glasset med magnesium", "Mg(s)"),
+        pulver("p_zn", 570, "Zn", "glasset med zink", "Zn(s)"),
+        pulver("p_fe", 620, "Fe", "glasset med jern", "Fe(s)"),
+        pulver("p_cu", 670, "Cu", "glasset med kobber", "Cu(s)"),
+        { navn: "spatel", type: "spatel", p: { x: 720, y: 495, v: 0 } },
+        { navn: "vand", type: "sproejteflaske", x: 1100, titel: "sprøjteflasken med vand", indhold: opl(500, {}) },
+        { navn: "baegerA", type: "baeger100", x: 1200, titel: "det lille bægerglas" },
+        { navn: "baegerB", type: "baeger250", x: 1300, titel: "det store bægerglas" },
+        { navn: "dunk", type: "affaldsdunk", x: 1500, etiket: ["AFFALD", "uorganisk"] }
+    ];
+
     var BORD = [
         { navn: "dunk", type: "affaldsdunk", x: 66, etiket: ["AFFALD", "uorganisk"] },
         { navn: "baeger250", type: "baeger250", x: 170 },
@@ -116,6 +159,11 @@
                 navn: "forrum", titel: "Forrummet",
                 valg: { bredde: BREDDE, hoejde: 600, bord: 500, hylder: [{ x0: 16, x1: 220, y: 268 }, { x0: 270, x1: 560, y: HYLDE }], plakat: { x: 1440, y: 90 }, bobleR: 128, partikler: 6 },
                 opstilling: FORRUM
+            },
+            {
+                navn: "depot", titel: "Kemikaliedepotet",
+                valg: { bredde: BREDDE, hoejde: 600, bord: 500, hylder: [{ x0: 16, x1: 220, y: 268 }, { x0: 270, x1: 1030, y: HYLDE2 }, { x0: 270, x1: 1030, y: HYLDE }], plakat: { x: 1440, y: 90 }, bobleR: 128, partikler: 6 },
+                opstilling: DEPOT
             },
             {
                 navn: "bord", titel: "Prøvebordet",

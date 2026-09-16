@@ -45,8 +45,8 @@
     St.def("HNO3",    { M: 63, formel: "HNO₃", q: 0, navn: "koncentreret salpetersyre", atomer: { H: 1, N: 1, O: 3 }, dHfort: -33, cRef: 14000 });
 
     /* ----- Indikatorer ---------------------------------------------------- */
-    St.def("phph", { formel: "phenolphthalein", q: 0, navn: "phenolphthalein", k: 6, indikator: { pKa: 9.4, syre: null, base: { r: 230, g: 60, b: 140 } } });
-    St.def("btb",  { formel: "bromthymolblåt", q: 0, navn: "bromthymolblåt", k: 8, indikator: { pKa: 7.1, syre: { r: 230, g: 200, b: 40 }, base: { r: 40, g: 110, b: 200 } } });
+    St.def("phph", { formel: "phenolphthalein", kort: "PP", q: 0, navn: "phenolphthalein", k: 6, indikator: { pKa: 9.4, syre: null, base: { r: 230, g: 60, b: 140 } } });
+    St.def("btb",  { formel: "bromthymolblåt", kort: "BTB", q: 0, navn: "bromthymolblåt", k: 8, indikator: { pKa: 7.1, syre: { r: 230, g: 200, b: 40 }, base: { r: 40, g: 110, b: 200 } } });
 
     /* ----- Gasser ------------------------------------------------------------ */
     St.def("H2(g)",  { formel: "H₂", fase: "g", navn: "dihydrogen", atomer: { H: 2 } });
