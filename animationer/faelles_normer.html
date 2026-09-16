@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fælles normer - dagens vurdering</title>
+<style>
+  :root{
+    --navy:#24384f;
+    --navy-dyb:#1b2b3d;
+    --navy-lys:#2f4767;
+    --orange:#ef8a00;
+    --orange-lys:#ffb03a;
+    --roed:#e0403a;
+    --ink:#eef3f8;
+    --muted:#a9bace;
+    --kant:#3c5573;
+  }
+  *{box-sizing:border-box;}
+  [hidden]{display:none !important;}
+  body{
+    margin:0; padding:18px 20px 28px;
+    font-family:"Segoe UI", Calibri, Arial, sans-serif;
+    background:var(--navy); color:var(--ink);
+  }
+  h1{font-size:1.5rem; margin:0; letter-spacing:.04em; text-transform:uppercase;}
+  h2{font-size:1.2rem; margin:0 0 8px;}
+  .muted{color:var(--muted); font-size:.9rem;}
+
+  .top{display:flex; align-items:flex-end; gap:12px 18px; flex-wrap:wrap; border-bottom:4px solid var(--orange); padding-bottom:12px; margin-bottom:16px;}
+  .top .titel{flex:1 1 260px;}
+  .felt{display:flex; flex-direction:column; gap:4px;}
+  .felt label{font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--orange-lys); font-weight:700;}
+  select, input[type=text], input[type=date], textarea{
+    font:inherit; color:var(--ink); background:var(--navy-dyb);
+    border:1px solid var(--kant); border-radius:8px; padding:7px 10px;
+  }
+  select:focus, input:focus, textarea:focus{outline:2px solid var(--orange); outline-offset:1px;}
+  button{
+    font:inherit; font-weight:600; cursor:pointer;
+    background:var(--navy-lys); color:var(--ink);
+    border:1px solid var(--kant); border-radius:8px; padding:8px 14px;
+  }
+  button:hover{background:#3a5678;}
+  button.primaer{background:var(--orange); border-color:var(--orange); color:#20313f;}
+  button.primaer:hover{background:var(--orange-lys);}
+  button.fare{border-color:#8d3a36; color:#ffb9b5;}
+  button:disabled{opacity:.45; cursor:default;}
+
+  .layout{display:grid; grid-template-columns:minmax(0,1fr); gap:16px;}
+  @media (min-width:1080px){ .layout{grid-template-columns:minmax(0,1fr) 340px;} }
+
+  .gruppe{background:var(--navy-dyb); border:1px solid var(--kant); border-radius:12px; padding:14px 16px 16px;}
+  .gruppe-hoved{font-size:.74rem; letter-spacing:.09em; text-transform:uppercase; font-weight:700; color:var(--orange-lys); margin-bottom:10px;}
+
+  .regel{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:4px 16px; align-items:center;
+         padding:10px 0; border-top:1px solid #33496a;}
+  .regel:first-of-type{border-top:0;}
+  .regel .navn{font-size:1.05rem; font-weight:700;}
+  .regel .navn .prik{color:var(--orange); margin-right:8px;}
+  .regel .uddyb{grid-column:1; font-size:.86rem; color:var(--muted);}
+  .stjerner{grid-column:2; grid-row:1 / span 2; display:flex; gap:4px; align-items:center;}
+  .stjerne{
+    width:40px; height:40px; line-height:1; font-size:1.5rem; padding:0;
+    background:transparent; border:1px solid transparent; color:#4d6a8e;
+    transition:transform .1s;
+  }
+  .stjerne:hover{background:transparent; color:var(--orange-lys); transform:scale(1.12);}
+  .stjerne.fyldt{color:var(--orange);}
+  .regel.urated .navn{color:#b9c9da;}
+  .vurdering-tekst{min-width:118px; text-align:right; font-size:.85rem; color:var(--muted);}
+
+  .score-tal{font-size:3.4rem; font-weight:800; line-height:1; color:var(--orange);}
+  .score-max{font-size:1.1rem; color:var(--muted); font-weight:600;}
+  .stempel{display:inline-block; margin-top:8px; padding:5px 12px; border-radius:999px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; font-size:.78rem;}
+  .stempel.guld{background:#f5c542; color:#3a2c00;}
+  .stempel.soelv{background:#cdd7e0; color:#2a3540;}
+  .stempel.bronze{background:#cd8542; color:#2d1a05;}
+  .stempel.ingen{background:#3c5573; color:var(--muted);}
+
+  .maaler{height:12px; border-radius:999px; background:#33496a; overflow:hidden; margin:8px 0 4px; display:block;}
+  .maaler > span{display:block; height:100%; background:linear-gradient(90deg,var(--orange),var(--orange-lys)); width:0;}
+
+  .belon-liste{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px;}
+  .belon-liste li{display:flex; gap:10px; align-items:baseline; font-size:.92rem; padding:5px 8px; border-radius:8px; background:#2a3f5c;}
+  .belon-liste li.laast{opacity:.6;}
+  .belon-liste li.naaet{background:#2f5a3f;}
+  .belon-liste .krav{font-weight:700; color:var(--orange-lys); min-width:62px;}
+  .belon-liste li.naaet .krav{color:#9fe6b6;}
+  .belon-liste input{flex:1; min-width:0; background:transparent; border:0; border-bottom:1px dashed #4d6a8e; border-radius:0; padding:2px 0; color:inherit;}
+
+  .knapraekke{display:flex; gap:8px; flex-wrap:wrap; margin-top:12px;}
+
+  .boks{position:fixed; inset:0; background:rgba(12,20,30,.72); display:flex; align-items:center; justify-content:center; padding:20px; z-index:20;}
+  .boks-indhold{background:var(--navy-dyb); border:1px solid var(--kant); border-radius:14px; padding:18px 20px; max-width:880px; width:100%; max-height:88vh; overflow:auto;}
+  .boks-hoved{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px;}
+
+  table{border-collapse:collapse; width:100%; font-size:.9rem;}
+  th, td{text-align:left; padding:6px 8px; border-bottom:1px solid #33496a;}
+  th{font-size:.72rem; letter-spacing:.07em; text-transform:uppercase; color:var(--orange-lys);}
+  td.tal, th.tal{text-align:right;}
+
+  .info{background:var(--roed); color:#fff; border-radius:10px; padding:10px 12px; font-size:.9rem;}
+  .fejl{color:#ffb9b5; font-size:.9rem;}
+  .fanfare{position:fixed; left:50%; top:30%; transform:translate(-50%,-50%) scale(.85); z-index:30;
+           background:var(--orange); color:#20313f; font-weight:800; font-size:1.5rem; padding:16px 28px; border-radius:14px;
+           opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; text-align:center;}
+  .fanfare.vis{opacity:1; transform:translate(-50%,-50%) scale(1);}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="titel">
+    <h1>Fælles normer</h1>
+    <p class="muted" style="margin:4px 0 0;">Vurder modulet sammen med klassen. Point samles op og låser belønninger op.</p>
+  </div>
+  <div class="felt">
+    <label for="klasse">Klasse</label>
+    <select id="klasse"></select>
+  </div>
+  <div class="felt">
+    <label for="dato">Dato</label>
+    <input type="date" id="dato">
+  </div>
+  <div class="knapraekke" style="margin:0;">
+    <button id="nyKlasse">Ny klasse</button>
+    <button id="visHistorik">Udvikling</button>
+    <button id="visBackup">Sikkerhedskopi</button>
+  </div>
+</div>
+
+<p id="ingenLager" class="info" hidden>Browseren gemmer ikke data her. Vurderingen virker, men den kan ikke huskes til næste gang.</p>
+
+<div class="layout">
+  <div class="gruppe">
+    <div class="gruppe-hoved">Dagens vurdering</div>
+    <div id="regler"></div>
+    <div class="felt" style="margin-top:12px;">
+      <label for="note">Note til modulet (valgfri)</label>
+      <input type="text" id="note" placeholder="Fx: god ro under øvelsen">
+    </div>
+    <div class="knapraekke">
+      <button class="primaer" id="gem">Gem dagens vurdering</button>
+      <button id="nulstil">Ryd</button>
+      <span id="gemBesked" class="muted" style="align-self:center;"></span>
+    </div>
+  </div>
+
+  <div style="display:flex; flex-direction:column; gap:16px;">
+    <div class="gruppe">
+      <div class="gruppe-hoved">Score</div>
+      <div><span class="score-tal" id="scoreTal">0</span> <span class="score-max">/ 30</span></div>
+      <div id="stempel" class="stempel ingen">Ikke vurderet</div>
+      <p class="muted" id="trend" style="margin:8px 0 0;"></p>
+    </div>
+
+    <div class="gruppe">
+      <div class="gruppe-hoved">Point og belønning</div>
+      <div><b id="pointTal">0</b> <span class="muted">point i alt</span></div>
+      <span class="maaler"><span id="maalerFyld"></span></span>
+      <p class="muted" id="naeste" style="margin:0 0 10px;"></p>
+      <ul class="belon-liste" id="belonninger"></ul>
+      <p class="muted" style="margin:8px 0 0; font-size:.8rem;">Teksterne kan rettes. De gemmes sammen med klassen.</p>
+    </div>
+  </div>
+</div>
+
+<div class="fanfare" id="fanfare"></div>
+
+<div class="boks" id="boksHistorik" hidden>
+  <div class="boks-indhold">
+    <div class="boks-hoved">
+      <h2 id="histTitel">Udvikling</h2>
+      <button data-luk="boksHistorik">Luk</button>
+    </div>
+    <div id="histTom" class="muted" hidden>Der er ingen gemte vurderinger for klassen endnu.</div>
+    <div id="histIndhold">
+      <div id="graf"></div>
+      <h2 style="margin-top:16px;">Gennemsnit pr. norm</h2>
+      <p class="muted" style="margin:0 0 6px;">Seneste fem vurderinger, med gennemsnittet af alle i parentes.</p>
+      <div id="normSnit"></div>
+      <h2 style="margin-top:16px;">Gemte moduler</h2>
+      <table>
+        <thead><tr><th>Dato</th><th>Note</th><th class="tal">Score</th><th class="tal">Point</th><th></th></tr></thead>
+        <tbody id="histTabel"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="boks" id="boksBackup" hidden>
+  <div class="boks-indhold">
+    <div class="boks-hoved">
+      <h2>Sikkerhedskopi</h2>
+      <button data-luk="boksBackup">Luk</button>
+    </div>
+    <p class="muted">Data ligger kun i denne browser på denne computer. Kopier teksten til en fil, hvis den skal med over på en anden computer, eller indsæt en tidligere kopi og tryk Indlæs.</p>
+    <textarea id="backupTekst" rows="10" style="width:100%; font-family:Consolas, monospace; font-size:.8rem;"></textarea>
+    <div class="knapraekke">
+      <button id="backupKopier">Kopier</button>
+      <button id="backupIndlaes">Indlæs fra tekst</button>
+      <span id="backupBesked" class="muted" style="align-self:center;"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var REGLER = [
+    { navn:'Lyt, når andre taler', uddyb:'I plenum og i bordgruppen. Vis hinanden respekt.' },
+    { navn:'Klar på plads ved modulets start', uddyb:'Bordgruppen er samlet, når undervisningen begynder.' },
+    { navn:'Bliv i lokalet', uddyb:'Eller i det arbejdsområde, læreren har anvist.' },
+    { navn:'Mobilen i mobilhotellet', uddyb:'Afleveret ved modulets start og sat i flytilstand.' },
+    { navn:'Brug pauserne', uddyb:'Vand og toiletbesøg klares i pausen, ikke i undervisningen.' },
+    { navn:'Ryd op efter dig selv', uddyb:'Skraldet med og sorteret i de rigtige spande.' }
+  ];
+  var NIVEAU = ['Ikke vurderet','Gik galt','Kan gøres bedre','Nogenlunde','Godt','Forbilledligt'];
+  var MAX = REGLER.length * 5;
+
+  var STANDARD_BELON = [
+    { krav:100,  tekst:'Musik i arbejdsfaser' },
+    { krav:250,  tekst:'Frit pladsvalg i ét modul' },
+    { krav:450,  tekst:'Fem minutters ekstra pause' },
+    { krav:700,  tekst:'Kage eller frugt til holdet' },
+    { krav:1000, tekst:'Holdet vælger aktiviteten i et modul' }
+  ];
+
+  var STORE_KEY = 'normer.klasser';
+  var lagerOk = (function(){ try{ localStorage.getItem(STORE_KEY); return true; }catch(e){ return false; } })();
+  if(!lagerOk) document.getElementById('ingenLager').hidden = false;
+
+  var data = laes();
+  var aktiv = (data.aktiv && data.klasser[data.aktiv]) ? data.aktiv : (Object.keys(data.klasser)[0] || null);
+  var scores = tomScore();
+
+  function tomScore(){ return REGLER.map(function(){ return 0; }); }
+
+  function laes(){
+    if(lagerOk){
+      try{
+        var d = JSON.parse(localStorage.getItem(STORE_KEY));
+        if(d && d.klasser) return d;
+      }catch(e){}
+    }
+    return { klasser:{}, aktiv:null };
+  }
+  function skriv(){
+    data.aktiv = aktiv;
+    if(!lagerOk) return false;
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(data)); return true; }
+    catch(e){ return false; }
+  }
+  function nyKlasseData(){
+    return { moduler:[], belonninger:STANDARD_BELON.map(function(b){ return { krav:b.krav, tekst:b.tekst }; }) };
+  }
+  function klasse(){ return aktiv ? data.klasser[aktiv] : null; }
+  function samletPoint(){
+    var k = klasse(); if(!k) return 0;
+    return k.moduler.reduce(function(s,m){ return s + m.point; }, 0);
+  }
+
+  // ---------- Reglerne ----------
+  var reglerEl = document.getElementById('regler');
+  REGLER.forEach(function(r, i){
+    var rk = document.createElement('div');
+    rk.className = 'regel urated';
+    rk.innerHTML = '<div class="navn"><span class="prik">&bull;</span>' + r.navn + '</div>' +
+                   '<div class="uddyb">' + r.uddyb + '</div>';
+    var stj = document.createElement('div');
+    stj.className = 'stjerner';
+    for(var s=1; s<=5; s++){
+      var b = document.createElement('button');
+      b.className = 'stjerne';
+      b.type = 'button';
+      b.dataset.regel = i; b.dataset.vaerdi = s;
+      b.title = NIVEAU[s];
+      b.setAttribute('aria-label', r.navn + ': ' + NIVEAU[s]);
+      b.textContent = '★';
+      stj.appendChild(b);
+    }
+    var txt = document.createElement('div');
+    txt.className = 'vurdering-tekst';
+    txt.dataset.tekst = i;
+    stj.appendChild(txt);
+    rk.appendChild(stj);
+    reglerEl.appendChild(rk);
+  });
+
+  reglerEl.addEventListener('click', function(ev){
+    var b = ev.target.closest('.stjerne');
+    if(!b) return;
+    var i = +b.dataset.regel, v = +b.dataset.vaerdi;
+    scores[i] = (scores[i] === v) ? 0 : v;   // klik på samme stjerne fjerner vurderingen igen
+    tegnScore();
+  });
+
+  function tegnScore(){
+    var kort = reglerEl.querySelectorAll('.regel');
+    scores.forEach(function(v, i){
+      kort[i].classList.toggle('urated', v === 0);
+      Array.prototype.forEach.call(kort[i].querySelectorAll('.stjerne'), function(s){
+        s.classList.toggle('fyldt', +s.dataset.vaerdi <= v);
+      });
+      kort[i].querySelector('[data-tekst]').textContent = NIVEAU[v];
+    });
+    var sum = scores.reduce(function(a,b){ return a+b; }, 0);
+    document.getElementById('scoreTal').textContent = sum;
+    var st = document.getElementById('stempel');
+    var n = niveauFor(sum, scores);
+    st.className = 'stempel ' + n.klasse;
+    st.textContent = n.navn;
+    document.getElementById('gem').disabled = scores.indexOf(0) !== -1;
+    tegnTrend(sum);
+  }
+
+  function niveauFor(sum, s){
+    if(s.indexOf(0) !== -1) return { navn:'Ikke vurderet', klasse:'ingen' };
+    if(sum >= 28) return { navn:'Guldmodul', klasse:'guld' };
+    if(sum >= 24) return { navn:'Sølvmodul', klasse:'soelv' };
+    if(sum >= 20) return { navn:'Bronzemodul', klasse:'bronze' };
+    return { navn:'Under normen', klasse:'ingen' };
+  }
+
+  // Point = summen af stjerner, plus 5 i bonus hvis ingen norm ligger under 4.
+  function pointFor(sum, s){
+    var p = sum;
+    if(s.indexOf(0) === -1 && Math.min.apply(null, s) >= 4) p += 5;
+    return p;
+  }
+
+  function tegnTrend(sum){
+    var k = klasse(), el = document.getElementById('trend');
+    if(!k || !k.moduler.length){ el.textContent = k ? 'Første vurdering af klassen.' : ''; return; }
+    var sidste = k.moduler.slice(-3);
+    var snit = sidste.reduce(function(a,m){ return a + m.score; }, 0) / sidste.length;
+    if(scores.indexOf(0) !== -1){
+      el.textContent = 'Seneste ' + sidste.length + ' moduler: ' + snit.toFixed(1) + ' i snit.';
+      return;
+    }
+    var d = sum - snit;
+    var pil = d > 0.5 ? '▲ ' : (d < -0.5 ? '▼ ' : '▬ ');
+    el.textContent = pil + 'Seneste ' + sidste.length + ' moduler: ' + snit.toFixed(1) + ' i snit. Forskel: ' +
+                     (d >= 0 ? '+' : '') + d.toFixed(1) + '. Point i dag: ' + pointFor(sum, scores) + '.';
+  }
+
+  // ---------- Klasser ----------
+  var vaelger = document.getElementById('klasse');
+  function tegnKlasser(){
+    var navne = Object.keys(data.klasser).sort(function(a,b){ return a.localeCompare(b,'da'); });
+    vaelger.innerHTML = '';
+    if(!navne.length){
+      var o = document.createElement('option');
+      o.value = ''; o.textContent = 'Ingen klasse endnu';
+      vaelger.appendChild(o);
+    }
+    navne.forEach(function(n){
+      var o = document.createElement('option');
+      o.value = n; o.textContent = n;
+      if(n === aktiv) o.selected = true;
+      vaelger.appendChild(o);
+    });
+  }
+  vaelger.addEventListener('change', function(){
+    aktiv = vaelger.value || null;
+    scores = tomScore();
+    document.getElementById('gemBesked').textContent = '';
+    skriv(); tegnAlt();
+  });
+  document.getElementById('nyKlasse').addEventListener('click', function(){
+    var navn = (prompt('Navn på klassen, fx 1.x Kemi C:') || '').trim();
+    if(!navn) return;
+    if(!data.klasser[navn]) data.klasser[navn] = nyKlasseData();
+    aktiv = navn; scores = tomScore();
+    skriv(); tegnAlt();
+  });
+
+  // ---------- Belønninger ----------
+  var belonEl = document.getElementById('belonninger');
+  function tegnBelonninger(){
+    var k = klasse();
+    belonEl.innerHTML = '';
+    document.getElementById('pointTal').textContent = k ? samletPoint() : 0;
+    var liste = k ? k.belonninger : STANDARD_BELON;
+    var point = k ? samletPoint() : 0;
+    var naeste = null;
+    liste.forEach(function(b, i){
+      var li = document.createElement('li');
+      var naaet = point >= b.krav;
+      li.className = naaet ? 'naaet' : 'laast';
+      var krav = document.createElement('span');
+      krav.className = 'krav';
+      krav.textContent = (naaet ? '✓ ' : '') + b.krav + 'p';
+      var inp = document.createElement('input');
+      inp.type = 'text'; inp.value = b.tekst;
+      inp.disabled = !k;
+      inp.addEventListener('change', function(){
+        liste[i].tekst = inp.value.trim() || ('Belønning ' + (i+1));
+        inp.value = liste[i].tekst;
+        skriv();
+      });
+      li.appendChild(krav); li.appendChild(inp);
+      belonEl.appendChild(li);
+      if(!naaet && naeste === null) naeste = b;
+    });
+    if(naeste){
+      var forrige = 0;
+      liste.forEach(function(b){ if(b.krav < naeste.krav && b.krav > forrige) forrige = b.krav; });
+      var andel = (point - forrige) / (naeste.krav - forrige);
+      document.getElementById('maalerFyld').style.width = Math.max(0, Math.min(1, andel)) * 100 + '%';
+      document.getElementById('naeste').textContent = k
+        ? (naeste.krav - point) + ' point til: ' + naeste.tekst
+        : 'Opret en klasse for at samle point.';
+    } else {
+      document.getElementById('maalerFyld').style.width = '100%';
+      document.getElementById('naeste').textContent = 'Alle belønninger er låst op.';
+    }
+  }
+
+  // ---------- Gem modul ----------
+  document.getElementById('gem').addEventListener('click', function(){
+    if(scores.indexOf(0) !== -1) return;
+    if(!aktiv){
+      var navn = (prompt('Navn på klassen, fx 1.x Kemi C:') || '').trim();
+      if(!navn) return;
+      if(!data.klasser[navn]) data.klasser[navn] = nyKlasseData();
+      aktiv = navn;
+    }
+    var k = klasse();
+    var sum = scores.reduce(function(a,b){ return a+b; }, 0);
+    var point = pointFor(sum, scores);
+    var foer = samletPoint();
+    k.moduler.push({
+      dato: document.getElementById('dato').value || idag(),
+      score: sum, point: point,
+      normer: scores.slice(),
+      note: document.getElementById('note').value.trim()
+    });
+    k.moduler.sort(function(a,b){ return a.dato < b.dato ? -1 : (a.dato > b.dato ? 1 : 0); });
+    var gemt = skriv();
+    var efter = samletPoint();
+    var laast = k.belonninger.filter(function(b){ return b.krav > foer && b.krav <= efter; });
+    var besked = document.getElementById('gemBesked');
+    besked.textContent = gemt ? 'Gemt.' : 'Talt med, men ikke gemt i browseren.';
+    besked.className = gemt ? 'muted' : 'fejl';
+    var tekst = '+' + point + ' point til ' + aktiv;
+    if(laast.length) tekst += '\nBelønning låst op: ' + laast.map(function(b){ return b.tekst; }).join(', ');
+    fanfare(tekst);
+    scores = tomScore();
+    document.getElementById('note').value = '';
+    tegnAlt();
+  });
+
+  document.getElementById('nulstil').addEventListener('click', function(){
+    scores = tomScore();
+    document.getElementById('note').value = '';
+    document.getElementById('gemBesked').textContent = '';
+    tegnScore();
+  });
+
+  var fanfareTimer = null;
+  function fanfare(tekst){
+    var el = document.getElementById('fanfare');
+    el.textContent = '';
+    tekst.split('\n').forEach(function(linje, i){
+      var d = document.createElement('div');
+      d.textContent = linje;
+      if(i) d.style.fontSize = '1rem';
+      el.appendChild(d);
+    });
+    el.classList.add('vis');
+    clearTimeout(fanfareTimer);
+    fanfareTimer = setTimeout(function(){ el.classList.remove('vis'); }, 2800);
+  }
+
+  // ---------- Historik ----------
+  function visBoks(id, vis){ document.getElementById(id).hidden = !vis; }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-luk]'), function(b){
+    b.addEventListener('click', function(){ visBoks(b.dataset.luk, false); });
+  });
+  document.getElementById('visHistorik').addEventListener('click', function(){
+    tegnHistorik(); visBoks('boksHistorik', true);
+  });
+  document.addEventListener('keydown', function(ev){
+    if(ev.key === 'Escape'){ visBoks('boksHistorik', false); visBoks('boksBackup', false); }
+  });
+
+  function tegnHistorik(){
+    var k = klasse();
+    document.getElementById('histTitel').textContent = 'Udvikling' + (aktiv ? ': ' + aktiv : '');
+    var tom = !k || !k.moduler.length;
+    document.getElementById('histTom').hidden = !tom;
+    document.getElementById('histIndhold').hidden = tom;
+    if(tom) return;
+
+    document.getElementById('graf').innerHTML = graf(k.moduler.slice(-14));
+
+    var sidste5 = k.moduler.slice(-5);
+    document.getElementById('normSnit').innerHTML = REGLER.map(function(r, i){
+      var alle = gns(k.moduler.map(function(m){ return m.normer[i]; }));
+      var ny = gns(sidste5.map(function(m){ return m.normer[i]; }));
+      var pct = ny / 5 * 100;
+      return '<div style="display:grid; grid-template-columns:minmax(0,1fr) 140px 130px; gap:10px; align-items:center; padding:4px 0;">' +
+             '<span>' + r.navn + '</span>' +
+             '<span class="maaler" style="margin:0;"><span style="width:' + pct.toFixed(0) + '%"></span></span>' +
+             '<span class="muted" style="text-align:right;">' + ny.toFixed(1) + ' (alle ' + alle.toFixed(1) + ')</span></div>';
+    }).join('');
+
+    var tb = document.getElementById('histTabel');
+    tb.innerHTML = '';
+    k.moduler.slice().reverse().forEach(function(m){
+      var tr = document.createElement('tr');
+      tr.innerHTML = '<td>' + datoTekst(m.dato) + '</td><td>' + undslip(m.note || '') + '</td>' +
+                     '<td class="tal">' + m.score + ' / ' + MAX + '</td><td class="tal">' + m.point + '</td>';
+      var td = document.createElement('td');
+      var slet = document.createElement('button');
+      slet.className = 'fare'; slet.textContent = 'Slet';
+      slet.addEventListener('click', function(){
+        if(!confirm('Slet vurderingen fra ' + datoTekst(m.dato) + '?')) return;
+        var idx = k.moduler.indexOf(m);
+        if(idx !== -1) k.moduler.splice(idx, 1);
+        skriv(); tegnHistorik(); tegnBelonninger();
+      });
+      td.appendChild(slet); tr.appendChild(td);
+      tb.appendChild(tr);
+    });
+  }
+
+  function gns(a){ return a.length ? a.reduce(function(x,y){ return x+y; }, 0) / a.length : 0; }
+
+  function graf(moduler){
+    var b = 44, mellem = 14, h = 200, top = 18, bund = 40;
+    var bredde = Math.max(340, moduler.length * (b + mellem) + 24);
+    var hoejde = h + top + bund;
+    var s = '<svg viewBox="0 0 ' + bredde + ' ' + hoejde + '" width="' + bredde + '" height="' + hoejde + '" role="img" aria-label="Score for de seneste moduler">';
+    [0, 10, 20, 30].forEach(function(v){
+      var y = top + h - v / MAX * h;
+      s += '<line x1="22" y1="' + y + '" x2="' + bredde + '" y2="' + y + '" stroke="#33496a" stroke-width="1"/>';
+      s += '<text x="0" y="' + (y + 4) + '" fill="#a9bace" font-size="11">' + v + '</text>';
+    });
+    moduler.forEach(function(m, i){
+      var x = 26 + i * (b + mellem);
+      var bh = m.score / MAX * h;
+      var farve = m.score >= 28 ? '#f5c542' : (m.score >= 24 ? '#cdd7e0' : (m.score >= 20 ? '#cd8542' : '#e0403a'));
+      s += '<rect x="' + x + '" y="' + (top + h - bh) + '" width="' + b + '" height="' + bh + '" rx="4" fill="' + farve + '"/>';
+      s += '<text x="' + (x + b/2) + '" y="' + (top + h - bh - 5) + '" fill="#eef3f8" font-size="12" font-weight="700" text-anchor="middle">' + m.score + '</text>';
+      s += '<text x="' + (x + b/2) + '" y="' + (top + h + 17) + '" fill="#a9bace" font-size="11" text-anchor="middle">' + kortDato(m.dato) + '</text>';
+    });
+    s += '</svg>';
+    return '<div style="overflow-x:auto;">' + s + '</div>';
+  }
+
+  function kortDato(d){
+    var p = String(d).split('-');
+    return p.length === 3 ? (+p[2]) + '/' + (+p[1]) : d;
+  }
+  function datoTekst(d){
+    var p = String(d).split('-');
+    return p.length === 3 ? (+p[2]) + '/' + (+p[1]) + ' ' + p[0] : d;
+  }
+  function undslip(t){
+    return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function idag(){
+    var d = new Date();
+    var m = String(d.getMonth()+1), da = String(d.getDate());
+    if(m.length < 2) m = '0' + m;
+    if(da.length < 2) da = '0' + da;
+    return d.getFullYear() + '-' + m + '-' + da;
+  }
+
+  // ---------- Sikkerhedskopi ----------
+  document.getElementById('visBackup').addEventListener('click', function(){
+    document.getElementById('backupTekst').value = JSON.stringify(data);
+    document.getElementById('backupBesked').textContent = '';
+    visBoks('boksBackup', true);
+  });
+  document.getElementById('backupKopier').addEventListener('click', function(){
+    var t = document.getElementById('backupTekst');
+    t.select();
+    try{ document.execCommand('copy'); document.getElementById('backupBesked').textContent = 'Kopieret.'; }
+    catch(e){ document.getElementById('backupBesked').textContent = 'Kopier med Ctrl+C.'; }
+  });
+  document.getElementById('backupIndlaes').addEventListener('click', function(){
+    var besked = document.getElementById('backupBesked');
+    try{
+      var d = JSON.parse(document.getElementById('backupTekst').value);
+      if(!d || !d.klasser) throw new Error('mangler klasser');
+      if(!confirm('Erstat de gemte klasser i denne browser?')) return;
+      data = d;
+      aktiv = (data.aktiv && data.klasser[data.aktiv]) ? data.aktiv : (Object.keys(data.klasser)[0] || null);
+      scores = tomScore();
+      skriv(); tegnAlt();
+      besked.textContent = 'Indlæst.'; besked.className = 'muted';
+    }catch(e){
+      besked.textContent = 'Teksten kunne ikke læses.'; besked.className = 'fejl';
+    }
+  });
+
+  function tegnAlt(){ tegnKlasser(); tegnScore(); tegnBelonninger(); }
+
+  document.getElementById('dato').value = idag();
+  tegnAlt();
+})();
+</script>
+</body>
+</html>
