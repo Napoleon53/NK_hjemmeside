@@ -105,6 +105,13 @@ knuses (`type.glas`); rystes et glas ekstremt voldsomt, knuses det i hånden.
 Kemichael kommer og tørrer op eller fejer og henter et nyt
 (`proevebord/js/laerer.js`, `NK.Bord.prototype.genopstil`).
 
+Hældning med hånden: holdes en flaske stille over et glas, vipper den efter
+0,3 s og hælder, så længe den holdes der (`opdaterHaeldning`; farten pr. type
+i `HAELD.fart`). Strålen lander, hvor tuden er, så ved siden af glasset hældes
+der på bordet. Dråbeflasken drypper, sprøjteflasken sprøjter og vejebåden
+drysser på samme måde. Et hurtigt slip over glasset giver én standardportion
+(`haeldMl`). Målet sigtes med tuden, ikke med musen.
+
 Klik viser, træk gør: et klik vælger det, der rummer noget, til aflæsning
 og zoom, og handlinger sker kun ved at trække. Undtagelser er kontakten på
 varmepladen og en dråbeflaske, der allerede hænger over et glas. Zoomboblen

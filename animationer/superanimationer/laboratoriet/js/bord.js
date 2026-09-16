@@ -105,6 +105,7 @@
         this.baerer = null;
         this.hover = null;
         this.slipMaal = null;
+        this.haeldning = null;
         this.valgt = null;
         this.mark = null;
         this.straale = null;
@@ -315,6 +316,103 @@
         gg.p.x = NK.klamp(pt.x - h.dx, 20, S.BREDDE - 20);
         gg.p.y = NK.klamp(pt.y - h.dy, 40, S.BORD + 90);
         this.slipMaal = this.maalVed(gg, pt);
+        this.folgHaeldning(gg);
+    };
+
+    /* ----- Haeldning med haanden -------------------------------------------
+       Holdes en beholder stille over et glas, vipper den efter et oejeblik og
+       haelder, saa laenge den holdes der. Straalen lander, hvor tuden er:
+       ved siden af glasset haeldes der paa bordet. Draabeflasken drypper og
+       sproejteflasken sproejter paa samme maade. Et hurtigt slip giver
+       stadig én standardportion (moede). */
+    var HAELD = { dvael: 0.3, vipTid: 0.5, fart: { reagensglas: 12, baeger100: 25, baeger250: 35, kolbe: 30, maaleglas: 15, flaske: 15, vejebaad: 900, sproejteflaske: 8 }, dryp: 0.45 };
+
+    P.kanHaelde = function (gg) {
+        var k = gg.kan;
+        return !!(k.haelder || k.drypper || k.sproejter) && (B.volumen(gg) > 0.05 || (gg.type.navn === "vejebaad" && B.fastIalt(gg) > 0.5));
+    };
+
+    P.folgHaeldning = function (gg) {
+        var maal = this.slipMaal && this.slipMaal.indexOf("pyt:") < 0 ? this.g[this.slipMaal] : null;
+        if (!maal || !maal.kan.holder || !this.kanHaelde(gg)) {
+            if (this.haeldning) this.haeldning.maal = null;
+            return;
+        }
+        if (!this.haeldning || this.haeldning.maal !== maal) {
+            this.haeldning = { maal: maal, dvael: 0, vip: this.haeldning ? this.haeldning.vip : 0, harHaeldt: this.haeldning ? this.haeldning.harHaeldt : false, spildt: 0, drypUr: 0, lydUr: 0 };
+        }
+    };
+
+    P.opdaterHaeldning = function (dt) {
+        var h = this.haeldning, gg = this.baerer;
+        if (!h) return;
+        if (!gg || !h.maal || !this.kanHaelde(gg)) {
+            h.vip = NK.mod(h.vip, 0, 8, dt);
+            if (h.vip < 0.02) { this.haeldning = null; if (this.straale && this.straale.haand) this.straale = null; }
+            return;
+        }
+        var stille = this.musFart < 160;
+        h.dvael = stille ? h.dvael + dt : Math.max(0, h.dvael - dt * 2);
+        var maalVip = h.dvael > HAELD.dvael ? 1 : 0;
+        h.vip = NK.mod(h.vip, maalVip, maalVip ? 1 / HAELD.vipTid * 1.6 : 8, dt);
+        if (h.vip < 0.5) { if (this.straale && this.straale.haand) this.straale = null; return; }
+        var c = h.maal, k = gg.kan, t = gg.type;
+        var tud = B.tudVerden(gg);
+        /* Rammer straalen glasset? */
+        var v = c.type.indre ? T.indreVerden(c) : null;
+        var x0 = Infinity, x1 = -Infinity;
+        if (v) v.forEach(function (p) { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); });
+        var o = B.aabning(c);
+        var rammer = v ? tud.x > x0 - 4 && tud.x < x1 + 4 && tud.y < o.y + 6 : Math.abs(tud.x - o.x) < 20;
+        var flade = rammer ? (c.niveau === null || c.niveau === undefined ? o.y + 40 : c.niveau) : NK.Scene.BORD;
+        h.harHaeldt = true;
+        if (k.drypper) {
+            h.drypUr -= dt;
+            if (h.drypUr <= 0) {
+                h.drypUr = HAELD.dryp;
+                var d = Stof.del(gg.indhold, 0.05);
+                var fo = Stof.farve(d, 3) || Stof.VAND;
+                this.draaber.push({ x: tud.x, y: tud.y + 2, vx: 0, vy: 30, rad: 3.2, liv: 1, farve: { r: fo.r, g: fo.g, b: fo.b, a: fo.a }, c: rammer ? c : null, opl: rammer ? d : null, fysik: !rammer });
+                if (NK.Lyd && NK.Lyd.plip) NK.Lyd.plip();
+                if (!rammer) this.smaaSpild(h, tud.x, 0.05, fo);
+            }
+            return;
+        }
+        var fart = (HAELD.fart[t.navn] || 15) * (h.vip - 0.5) * 2;
+        if (t.navn === "vejebaad") {
+            var liste = Stof.faste(gg.indhold);
+            if (!liste.length) return;
+            var mig = this;
+            liste.forEach(function (f) {
+                var umol = Math.min(f.umol, fart * dt);
+                Stof.tilsaet(gg.indhold, f.navn, -umol);
+                if (rammer) B.tilsaetFast(c, f.navn, umol);
+                if (Math.random() < 0.5) mig.draaber.push({ x: tud.x + r(-3, 3), y: tud.y, vx: r(-8, 8), vy: r(20, 60), rad: 1.5, liv: 1, farve: f.stof.farve || { r: 230, g: 230, b: 230 }, korn: true, c: rammer ? c : null, fysik: !rammer });
+            });
+            return;
+        }
+        var dV = Math.min(B.volumen(gg), fart * dt);
+        if (dV <= 0) return;
+        var ud = k.sproejter ? Stof.del(gg.indhold, dV) : B.udtag(gg, dV);
+        var farve = Stof.farve(ud, gg.type.vejlaengde) || Stof.VAND;
+        if (rammer) {
+            B.haeldI(c, ud, true);
+            this.tjekOverloeb(c);
+        } else this.smaaSpild(h, tud.x, ud.V, farve);
+        this.straale = { fra: tud, til: { x: tud.x + (rammer ? 0 : 0), y: flade }, farve: farve, bredde: k.sproejter ? 2 : (t.maks > 100 ? 3 : 2), haand: true };
+        h.lydUr -= dt;
+        if (h.lydUr <= 0 && NK.Lyd && NK.Lyd.haeld) { NK.Lyd.haeld(0.5); h.lydUr = 0.45; }
+        this.aendret("haeldning");
+    };
+
+    /* Det, der haeldes ved siden af, samler sig til en pyt paa bordet */
+    P.smaaSpild = function (h, x, mL, farve) {
+        h.spildt += mL;
+        if (h.spildt > 0.8 && !h.pyt) {
+            h.pyt = true;
+            this.nyPyt(x, 40, { r: farve.r, g: farve.g, b: farve.b, a: 0.8 });
+            this.uheld("spild", this.baerer, "Det løber ved siden af.");
+        }
     };
 
     P.op = function () {
@@ -408,7 +506,13 @@
                 this.uro = NK.klamp(this.spildTid / RYST.SPILD_TID, 0, 1);
             }
             var hv = bb.type.sprite ? 0 : -Math.PI / 2;
-            bb.p.v = NK.mod(bb.p.v, hv + NK.klamp(-this.musVx * 0.0004, -0.4, 0.4), 12, dt) + (Math.random() - 0.5) * 0.14 * this.uro;
+            /* Vippet, naar der haeldes med haanden */
+            var vip = this.haeldning && this.haeldning.maal ? this.haeldning.vip : 0;
+            if (vip > 0.01) {
+                var tv = bb.kan.drypper ? Math.PI : (bb.type.tud ? bb.type.tud.v : -1.4);
+                hv = hv + (tv - hv) * NK.blod(vip);
+            }
+            bb.p.v = NK.mod(bb.p.v, hv + NK.klamp(-this.musVx * 0.0004, -0.4, 0.4) * (1 - vip), 12, dt) + (Math.random() - 0.5) * 0.14 * this.uro;
             if (harVaeske && this.spildTid > 0.08 && Math.random() < dt * 14) {
                 var fo = B.farve(bb) || Stof.VAND;
                 var a = B.aabning(bb);
@@ -598,11 +702,18 @@
             return null;
         }
         var fod = this.fod(gg);
+        /* Det, der kan haelde, sigter med tuden: den skal staa over glasset */
+        var tud = (gg.kan.haelder || gg.kan.drypper || gg.kan.sproejter) ? B.tudVerden(gg) : null;
         for (var i = this.liste.length - 1; i >= 0; i--) {
             var c = this.liste[i];
             if (c === gg || !this.synlig(c)) continue;
             var plads = c.kan.stoette || c.kan.varmer || c.kan.vaegt;
-            if (!this.inden(c, plads ? fod : pt, c.kan.stoette ? 12 : (plads ? 30 : (c.kan.holder ? 10 : 6)))) continue;
+            var ramt = this.inden(c, plads ? fod : pt, c.kan.stoette ? 12 : (plads ? 30 : (c.kan.holder ? 10 : 6)));
+            if (!ramt && tud && c.kan.holder && !plads) {
+                var rk = this.rekt(c, 0);
+                ramt = tud.x > rk.x - 14 && tud.x < rk.x + rk.b + 14 && tud.y > rk.y - 90 && tud.y < rk.y + rk.h * 0.6;
+            }
+            if (!ramt) continue;
             if (this.kanModtage(gg, c)) return c.navn;
         }
         return null;
@@ -611,8 +722,18 @@
     P.slip = function (gg, pt) {
         var maal = this.slipMaal || this.maalVed(gg, pt);
         this.slipMaal = null;
+        var h = this.haeldning;
+        this.haeldning = null;
+        if (this.straale && this.straale.haand) this.straale = null;
         if (maal && maal.indexOf("pyt:") === 0) { this.toerOp(gg, +maal.slice(4)); return; }
         var c = maal ? this.g[maal] : null;
+        /* Er der allerede haeldt med haanden, gives ingen portion oveni */
+        if (c && h && h.harHaeldt && c.kan.holder && (gg.kan.haelder || gg.kan.drypper || gg.kan.sproejter)) {
+            gg.svaev = null;
+            this.koer.start([NK.Koer.hjemTil(gg, 0.6, 30)], "hjem");
+            this.aendret("haeldt");
+            return;
+        }
         if (c && this.moede(gg, c, pt)) return;
         this.saetNed(gg, pt);
     };
@@ -1223,6 +1344,7 @@
 
         this.koer.opdater(dt);
         this.opdaterRyst(dt);
+        this.opdaterHaeldning(dt);
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
 
         if (this.mark) { this.mark.ur -= dt; if (this.mark.ur <= 0) this.mark = null; }
@@ -1342,6 +1464,7 @@
                 continue;
             }
             var c = dr.c;
+            if (!c) { if (dr.y > S.BORD - 1) this.draaber.splice(i, 1); continue; }
             var flade = c.niveau !== null && c.niveau !== undefined ? c.niveau : B.aabning(c).y + Math.min(60, c.type.h * 0.5);
             if (dr.y >= flade) {
                 this.draaber.splice(i, 1);
