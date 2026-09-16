@@ -81,6 +81,17 @@ Redox afledes af standardpotentialerne, når reduktionsmidlet er et fast
 stof (metal i saltopløsning eller syre). Redox mellem ioner (Fe³⁺ + I⁻,
 Cu²⁺ + I⁻) står som navngivne reaktioner, ligesom Fe³⁺ + CO₃²⁻.
 
+## Faremærkning og Kemichaels advarsler
+
+Faren er data på stoffet i `stoftabel.js` (`fare`): trin med en nedre
+koncentration (`over` i mM, 0 for faste stoffer), piktogrammerne
+(`maerker`: brandfarlig, oxiderende, aetsende, giftig, sundhedsfare, kronisk,
+miljoe, forenklede GHS-tegn) og det, Kemichael siger første gang flasken
+tages (`sig`). `NK.Stof.faremaerker(o)` giver mærkerne for en opløsning, så
+etiketten følger indholdet: en fortyndet syre mister sit ætsende-mærke, og
+affaldsdunken viser, hvad der er i den. Kemichael advarer gennem
+`laererBaer` (`proevebord/js/laerer.js`), én gang pr. stof.
+
 ## Genstandsmodellen
 
 En genstand på bordet er `{ navn, type, p: { x, y, v }, hjem, kan, indhold, ... }`.
@@ -122,7 +133,9 @@ i `HAELD.fart`). Strålen lander, hvor tuden er, så ved siden af glasset hælde
 der på bordet. Dråbeflasken drypper, sprøjteflasken sprøjter og vejebåden
 drysser på samme måde. Et hurtigt slip over glasset giver én portion:
 flaskens standardportion (`haeldMl`), dog højst en femtedel af glasset
-(`portion`). Målet sigtes med tuden, ikke med musen.
+(`portion`). Målet sigtes med tuden, ikke med musen. Løber glasset over,
+stopper strømmen, til flasken flyttes. Flaskerne er fyldt til 200 mL af 250,
+så der kan hældes i dem.
 
 Det, der lige er brugt, bliver hængende: flasken bliver i hældepositur
 over glasset, dråbeflasken, sprøjteflasken og spatlen bliver i luften over

@@ -71,6 +71,9 @@
             dHfort: e.dHfort || 0,
             /* cRef: koncentrationen (mM), som dHfort regnes fra (flaskens) */
             cRef: e.cRef || 0,
+            /* fare: [{ over: mM (0 for faste stoffer), maerker: [...], sig: [...] }],
+               det foerste trin, hvis koncentration er naaet, gaelder */
+            fare: e.fare || null,
             indikator: e.indikator || null,
             /* flamme: farven, stoffet giver en flamme (flammeproeve) */
             flamme: e.flamme || null
@@ -478,7 +481,36 @@
         return ud;
     }
 
+    /* ----- Faremaerkning ------------------------------------------------------ */
+    var MAERKER = ["brandfarlig", "oxiderende", "aetsende", "giftig", "sundhedsfare", "kronisk", "miljoe"];
+
+    /* Faretrinnet for hvert stof i oploesningen, som er naaet */
+    function farer(o) {
+        var ud = [];
+        if (!o) return ud;
+        for (var s in o.n) {
+            if (!Object.prototype.hasOwnProperty.call(o.n, s)) continue;
+            var st = STOFFER[s];
+            if (!st || !st.fare || o.n[s] <= 0.5) continue;
+            var c = st.fase === "s" ? Infinity : (o.V > 1e-9 ? o.n[s] / o.V : Infinity);
+            for (var i = 0; i < st.fare.length; i++) {
+                if (c >= (st.fare[i].over || 0)) { ud.push({ stof: s, trin: st.fare[i] }); break; }
+            }
+        }
+        return ud;
+    }
+
+    /* Piktogrammerne paa etiketten, i fast raekkefoelge */
+    function faremaerker(o) {
+        var set = {};
+        farer(o).forEach(function (f) { (f.trin.maerker || []).forEach(function (m) { set[m] = true; }); });
+        return MAERKER.filter(function (m) { return set[m]; });
+    }
+
     NK.Stof = {
+        MAERKER: MAERKER,
+        farer: farer,
+        faremaerker: faremaerker,
         STOFFER: STOFFER,
         REAKTIONER: REAKTIONER,
         PAR: PAR,

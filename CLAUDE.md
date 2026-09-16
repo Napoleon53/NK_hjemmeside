@@ -50,7 +50,8 @@ statiske sider i roden, downloads i `downloads/`.
 - Kemien er data, ikke kode: nye stoffer, reaktioner og redoxpar skrives i
   `laboratoriet/js/stoftabel.js` (pKa, Ksp, E°, ΔH, farve), aldrig som
   særtilfælde i et forsøg. Efter ændringer køres
-  `laboratoriet/proevebord/_kombinationer.html` og læses igennem.
+  `laboratoriet/proevebord/_kombinationer.html` og læses igennem. Faremærker
+  og Kemichaels advarsel om et stof er også data der (`fare`).
 - Sidepanelet er 430 px bredt (`--panel-bredde` i `laboratoriet/css/grund.css`).
   Prøvebordet har 473 px, fordi zoomboblen står i panelet.
 - Samlingssiderne (`samling_*.html`) har fuld skærm: sidepanelerne skjules i

@@ -153,6 +153,31 @@
     /* Jern(III) og carbonat: hydroxid faelder, og carbonatet bliver til CO2 */
     St.reaktion({ id: "fe_co3", venstre: [[2, "Fe3+"], [3, "CO32-"], [3, "H2O"]], hoejre: [[2, "Fe(OH)3(s)"], [3, "CO2(g)"]], slags: "fuld", fart: 2, dH: -10 });
 
+    /* ----- Faremaerkning (GHS, nogenlunde) og Kemichaels advarsel -----------
+       over: koncentrationen i mM, hvor trinnet gaelder (0 for faste stoffer).
+       sig: det, Kemichael siger, foerste gang flasken tages. */
+    function fare(navn, liste) { St.STOFFER[navn].fare = liste; }
+    fare("H2SO4", [{ over: 1000, maerker: ["aetsende"], sig: ["Koncentreret svovlsyre. Briller på.", "Syre i vand. Aldrig vand i syre, og lidt ad gangen."] }]);
+    fare("HNO3",  [{ over: 1000, maerker: ["aetsende", "oxiderende"], sig: ["Koncentreret salpetersyre. Den giver brune dampe med metal.", "Det foregår i stinkskabet."] }]);
+    fare("H+",    [{ over: 1000, maerker: ["aetsende", "sundhedsfare"], sig: ["Koncentreret saltsyre. Den damper, og dampen ætser.", "Stinkskab, og låget på igen."] },
+                   { over: 500, maerker: ["sundhedsfare"] }]);
+    fare("OH-",   [{ over: 500, maerker: ["aetsende"], sig: ["Natriumhydroxid. Den ætser, og man mærker det for sent.", "Briller. Og skyl, hvis det kommer på huden."] },
+                   { over: 50, maerker: ["sundhedsfare"] }]);
+    fare("Pb2+",  [{ over: 1, maerker: ["kronisk", "miljoe"], sig: ["Bly. Det hober sig op i kroppen.", "Vask hænder bagefter, og intet i afløbet."] }]);
+    fare("Pb(NO3)2(s)", [{ over: 0, maerker: ["oxiderende", "kronisk", "miljoe"], sig: ["Blynitrat. Det hober sig op i kroppen.", "Intet i afløbet."] }]);
+    fare("Ag+",   [{ over: 20, maerker: ["aetsende", "miljoe"], sig: ["Sølvnitrat giver sorte pletter på huden.", "De går væk. Om en uge."] }]);
+    fare("Ba2+",  [{ over: 20, maerker: ["sundhedsfare"], sig: ["Bariumsalte er giftige at indtage.", "Ikke at man skulle drikke noget herinde."] }]);
+    fare("Cu2+",  [{ over: 20, maerker: ["sundhedsfare", "miljoe"], sig: ["Kobbersalte skal ikke i afløbet.", "Dunken til uorganisk affald."] }]);
+    fare("CuSO4(s)", [{ over: 0, maerker: ["sundhedsfare", "miljoe"], sig: ["Kobbersulfat. Ikke i afløbet, og ikke i munden."] }]);
+    fare("Fe3+",  [{ over: 100, maerker: ["sundhedsfare"] }]);
+    fare("SCN-",  [{ over: 100, maerker: ["sundhedsfare"] }]);
+    fare("I2",    [{ over: 5, maerker: ["sundhedsfare", "miljoe"] }]);
+    fare("Na2CO3(s)", [{ over: 0, maerker: ["sundhedsfare"] }]);
+    fare("phph",  [{ over: 1, maerker: ["brandfarlig", "kronisk"], sig: ["Phenolphthalein er opløst i sprit.", "Ikke i nærheden af flammen."] }]);
+    fare("Mg(s)", [{ over: 0, maerker: ["brandfarlig"], sig: ["Magnesium brænder med et lys, man ikke kigger på.", "Og det slukkes ikke med vand."] }]);
+    fare("Zn(s)", [{ over: 0, maerker: ["brandfarlig", "miljoe"] }]);
+    fare("Fe(s)", [{ over: 0, maerker: ["brandfarlig"] }]);
+
     /* ----- Redoxpar (standardpotentialer i V) --------------------------------- */
     St.par({ ox: "Mg2+", red: "Mg(s)", e: 2, E0: -2.37 });
     St.par({ ox: "Zn2+", red: "Zn(s)", e: 2, E0: -0.76 });

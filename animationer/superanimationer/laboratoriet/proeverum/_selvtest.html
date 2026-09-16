@@ -164,7 +164,7 @@ function koerTest() {
     adv(0.2);
     paastand("man er tilbage paa proevebordet", rum.nu.navn === "bord" && knapAktiv() === "bord");
     b = bord(); g = b.g;
-    paastand("alt staar, som da det blev bygget", !!g.baeger250 && V(g.baeger250) < 0.01 && !g.plade.taendt && Math.abs(V(g.fl_cu) - 250) < 0.01 && g.termometer.i === null);
+    paastand("alt staar, som da det blev bygget", !!g.baeger250 && V(g.baeger250) < 0.01 && !g.plade.taendt && Math.abs(V(g.fl_cu) - 200) < 0.01 && g.termometer.i === null);
     var st2 = rum.find("stinkskab").bord;
     paastand("ogsaa i stinkskabet", !!st2.g.baeger250 && !st2.g["baeger250#2"] && V(st2.g.baeger250) < 0.01);
     paastand("panelet kan opdateres", (NK.opdaterPanel(), true));

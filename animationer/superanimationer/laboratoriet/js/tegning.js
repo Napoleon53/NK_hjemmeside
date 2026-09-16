@@ -308,6 +308,78 @@
         linjer.forEach(function (l, i) {
             NK.tekst(ctx, l, cx, y0 + i * (str + 1.5), { str: i === 0 ? str : str * 0.8, vaegt: i === 0 ? 700 : 600, justering: "center", farve: i === 0 ? "#1f2328" : "#4a4f57", maks: e.b - 3 });
         });
+        /* Faremaerkerne i en raekke under etiketten */
+        var maerker = gg.indhold ? Stof.faremaerker(gg.indhold) : [];
+        if (maerker.length) {
+            var s = Math.min(4.2, (e.b - 2) / (maerker.length * 2.4));
+            var b = maerker.length * s * 2.4;
+            var mx = cx - b / 2 + s * 1.2, my = e.y + e.h + s + 1.5;
+            ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+            NK.rundtRekt(ctx, cx - b / 2 - 1.5, my - s - 1.5, b + 3, s * 2 + 3, 1.5);
+            ctx.fill();
+            maerker.forEach(function (m, i) { T.tegnPiktogram(ctx, m, mx + i * s * 2.4, my, s); });
+        }
+        ctx.restore();
+    };
+
+    /* Et GHS-piktogram (forenklet): roed rombe med sort tegn. s: halv bredde */
+    T.tegnPiktogram = function (ctx, id, cx, cy, s) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.beginPath();
+        ctx.moveTo(0, -s); ctx.lineTo(s, 0); ctx.lineTo(0, s); ctx.lineTo(-s, 0); ctx.closePath();
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+        ctx.strokeStyle = "#c8102e";
+        ctx.lineWidth = Math.max(0.7, s * 0.22);
+        ctx.stroke();
+        ctx.scale(s / 5, s / 5);
+        ctx.fillStyle = "#111";
+        ctx.strokeStyle = "#111";
+        ctx.lineWidth = 0.9;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        function flamme(y) {
+            ctx.beginPath();
+            ctx.moveTo(0, y - 3.2);
+            ctx.quadraticCurveTo(2.6, y - 1, 1.6, y + 1.2);
+            ctx.quadraticCurveTo(1.2, y + 2, 0, y + 2.2);
+            ctx.quadraticCurveTo(-1.4, y + 2, -1.7, y + 0.8);
+            ctx.quadraticCurveTo(-2.2, y - 1, 0, y - 3.2);
+            ctx.closePath();
+            ctx.fill();
+        }
+        if (id === "brandfarlig") { flamme(0); ctx.beginPath(); ctx.moveTo(-2, 2.6); ctx.lineTo(2, 2.6); ctx.stroke(); }
+        else if (id === "oxiderende") { flamme(-1.2); ctx.beginPath(); ctx.arc(0, 2.2, 1.4, 0, Math.PI * 2); ctx.stroke(); }
+        else if (id === "aetsende") {
+            /* to reagensglas, der drypper paa en haand og en stang */
+            ctx.beginPath(); ctx.moveTo(-2.8, -2.6); ctx.lineTo(-1.2, -1.2); ctx.moveTo(2.8, -2.6); ctx.lineTo(1.2, -1.2); ctx.stroke();
+            ctx.beginPath(); ctx.arc(-1.2, 0.2, 0.55, 0, Math.PI * 2); ctx.arc(1.3, 0.4, 0.55, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(-3, 2.2); ctx.lineTo(-0.4, 2.2); ctx.moveTo(0.6, 1.6); ctx.lineTo(3, 2.6); ctx.stroke();
+        }
+        else if (id === "giftig") {
+            ctx.beginPath(); ctx.arc(0, -0.8, 1.9, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = "#fff";
+            ctx.beginPath(); ctx.arc(-0.7, -1.1, 0.45, 0, Math.PI * 2); ctx.arc(0.7, -1.1, 0.45, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(-2.4, 1.2); ctx.lineTo(2.4, 3); ctx.moveTo(2.4, 1.2); ctx.lineTo(-2.4, 3); ctx.stroke();
+        }
+        else if (id === "sundhedsfare") {
+            ctx.lineWidth = 1.5;
+            ctx.beginPath(); ctx.moveTo(0, -3); ctx.lineTo(0, 0.8); ctx.stroke();
+            ctx.beginPath(); ctx.arc(0, 2.6, 0.85, 0, Math.PI * 2); ctx.fill();
+        }
+        else if (id === "kronisk") {
+            ctx.beginPath(); ctx.arc(-0.6, -2.4, 1, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(-2.2, 3); ctx.lineTo(-2.2, 0); ctx.quadraticCurveTo(-0.6, -1.4, 1, 0); ctx.lineTo(1, 3); ctx.closePath(); ctx.fill();
+            ctx.fillStyle = "#fff";
+            for (var k = 0; k < 6; k++) { var a = k * Math.PI / 3; ctx.beginPath(); ctx.moveTo(-0.6, 1); ctx.lineTo(-0.6 + Math.cos(a) * 1.3, 1 + Math.sin(a) * 1.3); ctx.lineWidth = 0.5; ctx.strokeStyle = "#fff"; ctx.stroke(); }
+        }
+        else if (id === "miljoe") {
+            ctx.beginPath(); ctx.moveTo(-2.6, 0.6); ctx.lineTo(-1.2, -3); ctx.lineTo(0.2, 0.6); ctx.closePath(); ctx.fill();
+            ctx.fillRect(-1.6, 0.6, 0.8, 1.2);
+            ctx.beginPath(); ctx.ellipse(1.6, 2.2, 1.5, 0.8, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(3, 2.2); ctx.lineTo(3.6, 1.4); ctx.lineTo(3.6, 3); ctx.closePath(); ctx.fill();
+        }
         ctx.restore();
     };
 

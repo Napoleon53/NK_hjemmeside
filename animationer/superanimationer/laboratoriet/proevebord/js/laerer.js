@@ -30,6 +30,27 @@
         this.laererVent = [];
         this.uheldTal = {};
         this.flaskerFyldt = {};
+        this.advaret = {};
+    };
+
+    /* ----- Farlige kemikalier: en advarsel, foerste gang flasken tages ------ */
+    P.laererBaer = function (gg) {
+        if (!gg.indhold || !this.laerer) return;
+        var St = NK.Stof;
+        var farer = St.farer(gg.indhold).filter(function (f) { return f.trin.sig; });
+        if (!farer.length) return;
+        this.advaret = this.advaret || {};
+        var f = farer[0];
+        if (this.advaret[f.stof]) return;
+        this.advaret[f.stof] = true;
+        this.laererKo("laererAdvarsel", { gg: gg, sig: f.trin.sig, maerker: f.trin.maerker || [] });
+        this.laererVentende();
+    };
+
+    P.laererAdvarsel = function (a) {
+        var alvorlig = a.maerker.indexOf("aetsende") >= 0 || a.maerker.indexOf("giftig") >= 0 || a.maerker.indexOf("brandfarlig") >= 0;
+        var x = NK.klamp((a.gg.hjem ? a.gg.hjem.x : a.gg.p.x) - 200, 60, NK.Scene.BREDDE - 260);
+        bemaerkning(this, "advarsel", x, { vrede: alvorlig ? 0.6 : 0.3, humoer: -0.4, roed: 0, skeptisk: alvorlig ? 0.6 : 0.3, briller: alvorlig ? 1 : 0 }, a.sig);
     };
 
     /* Bemaerkninger, der ventede paa, at laereren blev ledig */

@@ -30,17 +30,17 @@
         { navn: "spatel", type: "spatel", p: { x: 600, y: 495, v: 0 } },
 
         /* Flaskerne paa hylden bag bordet */
-        { navn: "fl_pb",    type: "flaske", x: 280, y: HYLDE, etiket: ["Pb(NO₃)₂", "0,1 M"], titel: "flasken med Pb(NO₃)₂", indhold: opl(250, { "Pb2+": 100, "NO3-": 200 }) },
-        { navn: "fl_ki",    type: "flaske", x: 328, y: HYLDE, etiket: ["KI", "0,1 M"], titel: "flasken med KI", indhold: opl(250, { "K+": 100, "I-": 100 }) },
-        { navn: "fl_cu",    type: "flaske", x: 376, y: HYLDE, etiket: ["CuSO₄", "0,1 M"], titel: "flasken med CuSO₄", indhold: opl(250, { "Cu2+": 100, "SO42-": 100 }) },
-        { navn: "fl_fe",    type: "flaske", x: 424, y: HYLDE, etiket: ["Fe(NO₃)₃", "0,01 M"], titel: "flasken med Fe(NO₃)₃", indhold: opl(250, { "Fe3+": 10, "NO3-": 30 }) },
-        { navn: "fl_scn",   type: "flaske", x: 472, y: HYLDE, etiket: ["KSCN", "0,01 M"], titel: "flasken med KSCN", indhold: opl(250, { "K+": 10, "SCN-": 10 }) },
-        { navn: "fl_naoh",  type: "flaske", x: 520, y: HYLDE, etiket: ["NaOH", "0,1 M"], titel: "flasken med NaOH", indhold: opl(250, { "Na+": 100, "OH-": 100 }) },
-        { navn: "fl_hcl",   type: "flaske", x: 568, y: HYLDE, etiket: ["HCl", "0,1 M"], titel: "flasken med HCl", indhold: opl(250, { "H+": 100, "Cl-": 100 }) },
-        { navn: "fl_hac",   type: "flaske", x: 616, y: HYLDE, etiket: ["CH₃COOH", "0,1 M"], titel: "flasken med ethansyre", indhold: opl(250, { "HAc": 100 }) },
-        { navn: "fl_h2so4", type: "flaske", x: 664, y: HYLDE, etiket: ["H₂SO₄", "konc. 18 M"], titel: "flasken med koncentreret svovlsyre", indhold: opl(250, { "H2SO4": 18000 }) },
-        { navn: "fl_hno3",  type: "flaske", x: 712, y: HYLDE, etiket: ["HNO₃", "konc. 14 M"], titel: "flasken med koncentreret salpetersyre", indhold: opl(250, { "HNO3": 14000 }) },
-        { navn: "fl_ba",    type: "flaske", x: 760, y: HYLDE, etiket: ["BaCl₂", "0,1 M"], titel: "flasken med BaCl₂", indhold: opl(250, { "Ba2+": 100, "Cl-": 200 }) },
+        { navn: "fl_pb",    type: "flaske", x: 280, y: HYLDE, etiket: ["Pb(NO₃)₂", "0,1 M"], titel: "flasken med Pb(NO₃)₂", indhold: opl(200, { "Pb2+": 100, "NO3-": 200 }) },
+        { navn: "fl_ki",    type: "flaske", x: 328, y: HYLDE, etiket: ["KI", "0,1 M"], titel: "flasken med KI", indhold: opl(200, { "K+": 100, "I-": 100 }) },
+        { navn: "fl_cu",    type: "flaske", x: 376, y: HYLDE, etiket: ["CuSO₄", "0,1 M"], titel: "flasken med CuSO₄", indhold: opl(200, { "Cu2+": 100, "SO42-": 100 }) },
+        { navn: "fl_fe",    type: "flaske", x: 424, y: HYLDE, etiket: ["Fe(NO₃)₃", "0,01 M"], titel: "flasken med Fe(NO₃)₃", indhold: opl(200, { "Fe3+": 10, "NO3-": 30 }) },
+        { navn: "fl_scn",   type: "flaske", x: 472, y: HYLDE, etiket: ["KSCN", "0,01 M"], titel: "flasken med KSCN", indhold: opl(200, { "K+": 10, "SCN-": 10 }) },
+        { navn: "fl_naoh",  type: "flaske", x: 520, y: HYLDE, etiket: ["NaOH", "0,1 M"], titel: "flasken med NaOH", indhold: opl(200, { "Na+": 100, "OH-": 100 }) },
+        { navn: "fl_hcl",   type: "flaske", x: 568, y: HYLDE, etiket: ["HCl", "0,1 M"], titel: "flasken med HCl", indhold: opl(200, { "H+": 100, "Cl-": 100 }) },
+        { navn: "fl_hac",   type: "flaske", x: 616, y: HYLDE, etiket: ["CH₃COOH", "0,1 M"], titel: "flasken med ethansyre", indhold: opl(200, { "HAc": 100 }) },
+        { navn: "fl_h2so4", type: "flaske", x: 664, y: HYLDE, etiket: ["H₂SO₄", "konc. 18 M"], titel: "flasken med koncentreret svovlsyre", indhold: opl(200, { "H2SO4": 18000 }) },
+        { navn: "fl_hno3",  type: "flaske", x: 712, y: HYLDE, etiket: ["HNO₃", "konc. 14 M"], titel: "flasken med koncentreret salpetersyre", indhold: opl(200, { "HNO3": 14000 }) },
+        { navn: "fl_ba",    type: "flaske", x: 760, y: HYLDE, etiket: ["BaCl₂", "0,1 M"], titel: "flasken med BaCl₂", indhold: opl(200, { "Ba2+": 100, "Cl-": 200 }) },
 
         /* Draabeflaskerne paa hylden */
         { navn: "ag",   type: "draabeflaske", x: 820, y: HYLDE, etiket: ["AgNO₃", "0,1 M"], titel: "dråbeflasken med AgNO₃", indhold: opl(60, { "Ag+": 100, "NO3-": 100 }) },

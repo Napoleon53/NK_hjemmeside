@@ -392,7 +392,7 @@
             return;
         }
         if (!this.haeldning || this.haeldning.maal !== maal) {
-            this.haeldning = { maal: maal, dvael: 0, vip: this.haeldning ? this.haeldning.vip : 0, harHaeldt: this.haeldning ? this.haeldning.harHaeldt : false, spildt: 0, drypUr: 0, lydUr: 0 };
+            this.haeldning = { maal: maal, dvael: 0, vip: this.haeldning ? this.haeldning.vip : 0, harHaeldt: this.haeldning ? this.haeldning.harHaeldt : false, spildt: 0, drypUr: 0, lydUr: 0, stoppet: false };
         }
     };
 
@@ -406,7 +406,8 @@
         }
         var stille = this.musFart < 160;
         h.dvael = stille ? h.dvael + dt : Math.max(0, h.dvael - dt * 2);
-        var maalVip = h.dvael > HAELD.dvael ? 1 : 0;
+        /* Loeb glasset over, stopper man med at haelde, til flasken flyttes */
+        var maalVip = h.dvael > HAELD.dvael && !h.stoppet ? 1 : 0;
         h.vip = NK.mod(h.vip, maalVip, maalVip ? 1 / HAELD.vipTid * 1.6 : 8, dt);
         if (h.vip < 0.5) { if (this.straale && this.straale.haand) this.straale = null; return; }
         var c = h.maal, k = gg.kan, t = gg.type;
@@ -450,7 +451,7 @@
         var farve = Stof.farve(ud, gg.type.vejlaengde) || Stof.VAND;
         if (rammer) {
             B.haeldI(c, ud, true);
-            this.tjekOverloeb(c);
+            if (this.tjekOverloeb(c)) h.stoppet = true;
         } else this.smaaSpild(h, tud.x, ud.V, farve);
         this.straale = { fra: tud, til: { x: tud.x + (rammer ? 0 : 0), y: flade }, farve: farve, bredde: k.sproejter ? 2 : (t.maks > 100 ? 3 : 2), haand: true };
         h.lydUr -= dt;
@@ -512,6 +513,7 @@
             if (x.i === gg) { x.i = null; x.rel = null; mig.koer.start([NK.Koer.hjemTil(x, 0.5, 20)], "hjem"); }
         });
         if (gg.kan.holder) this.vaelg(gg.navn);
+        if (this.laererBaer) this.laererBaer(gg);
         this.aendret("baer");
     };
 
@@ -761,8 +763,13 @@
         for (var i = this.liste.length - 1; i >= 0; i--) {
             var c = this.liste[i];
             if (c === gg || !this.synlig(c)) continue;
-            var plads = c.kan.stoette || c.kan.varmer || c.kan.vaegt;
+            var plads = c.kan.stoette || c.kan.varmer || c.kan.vaegt || c.kan.luge;
             var ramt = this.inden(c, plads ? fod : pt, c.kan.stoette ? 12 : (plads ? 30 : (c.kan.holder ? 10 : 6)));
+            /* Braenderen: foden skal staa paa trefodens plade, som ligger over spriten */
+            if (!ramt && c.kan.flamme && c.type.plade) {
+                var px = c.p.x - c.anker.x, py = c.p.y - c.anker.y + c.type.plade.y;
+                ramt = fod.x > px + c.type.plade.x0 - 24 && fod.x < px + c.type.plade.x1 + 24 && fod.y > py - 60 && fod.y < py + 70;
+            }
             if (!ramt && tud && c.kan.holder && !plads) {
                 var rk = this.rekt(c, 0);
                 ramt = tud.x > rk.x - 14 && tud.x < rk.x + rk.b + 14 && tud.y > rk.y - 90 && tud.y < rk.y + rk.h * 0.6;
