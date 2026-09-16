@@ -63,6 +63,8 @@ function koerTest() {
     function V(c) { return B.volumen(c); }
     function n(c, s) { return B.samlet(c).n[s] || 0; }
     function frisk() { NK.startForfra(); adv(0.1); g = bord.g; }
+    /* Laereren ser alt i testen, saa den er deterministisk */
+    bord.laererAltid = true;
     /* Som musen: tag genstanden, flyt dens anker til pt, og slip */
     function traek(gg, pt) { bord.startBaer(gg); gg.p.x = pt.x; gg.p.y = pt.y; bord.stopBaer(pt); }
     /* Punktet, ankeret skal staa i, for at foden er i (x, y) */

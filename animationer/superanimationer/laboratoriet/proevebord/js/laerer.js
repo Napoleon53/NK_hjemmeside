@@ -33,15 +33,36 @@
         this.advaret = {};
     };
 
-    /* ----- Farlige kemikalier: en advarsel, foerste gang flasken tages ------ */
+    /* ----- Hvad han opdager --------------------------------------------------
+       Han skal ikke tale hele tiden. Uheld med farlige kemikalier og knust
+       glas ser han altid; alt andet lader han passere i 60 % af tilfaeldene.
+       laererAltid = true (selvtesten) slaar tilfaeldet fra. */
+    var ALVORLIG = ["aetsende", "giftig", "brandfarlig", "oxiderende", "kronisk"];
+
+    function alvorlig(maerker) {
+        return !!maerker && maerker.some(function (m) { return ALVORLIG.indexOf(m) >= 0; });
+    }
+
+    function farligt(o) {
+        return !!o && alvorlig(NK.Stof.faremaerker(o));
+    }
+
+    P.laererOpdager = function (farlig) {
+        if (this.laererAltid || farlig) return true;
+        return Math.random() < 0.4;
+    };
+
+    /* ----- Farlige kemikalier: en advarsel, foerste gang flasken tages ------
+       Kun de alvorlige, og kun hvis han ser det */
     P.laererBaer = function (gg) {
         if (!gg.indhold || !this.laerer) return;
         var St = NK.Stof;
-        var farer = St.farer(gg.indhold).filter(function (f) { return f.trin.sig; });
+        var farer = St.farer(gg.indhold).filter(function (f) { return f.trin.sig && alvorlig(f.trin.maerker); });
         if (!farer.length) return;
         this.advaret = this.advaret || {};
         var f = farer[0];
         if (this.advaret[f.stof]) return;
+        if (!this.laererOpdager(false)) return;
         this.advaret[f.stof] = true;
         this.laererKo("laererAdvarsel", { gg: gg, sig: f.trin.sig, maerker: f.trin.maerker || [] });
         this.laererVentende();
@@ -98,6 +119,10 @@
         var L = this.laerer;
         if (!L) return;
         if (slags === "knust") return this.laererKnust(gg);
+        /* Det, der loeb ud: farligt indhold ser han altid */
+        var maerker = gg.spildtMaerker || (gg.indhold ? NK.Stof.faremaerker(NK.Beholder.samlet(gg)) : []);
+        gg.spildtMaerker = null;
+        if (!this.laererOpdager(alvorlig(maerker))) return;
         L.scene = null;
         this.uheldTal = this.uheldTal || {};
         this.uheldTal[slags] = (this.uheldTal[slags] || 0) + 1;
@@ -169,11 +194,11 @@
 
     /* ----- Bemaerkninger --------------------------------------------------- */
     P.laererHaendelse = function (type, data) {
-        if (type === "affald" && data.fra && data.fra.kan.flaske && data.indhold && data.indhold.V > 20) {
+        if (type === "affald" && data.fra && data.fra.kan.flaske && data.indhold && data.indhold.V > 20 && this.laererOpdager(farligt(data.indhold))) {
             this.laererKo("laererFlaskeAffald", data.fra);
             this.laererVentende();
         }
-        if (type === "voldsom") {
+        if (type === "voldsom" && this.laererOpdager(farligt(data && data.indhold ? NK.Beholder.samlet(data) : null))) {
             this.laererKo("laererVoldsom", data);
             this.laererVentende();
         }

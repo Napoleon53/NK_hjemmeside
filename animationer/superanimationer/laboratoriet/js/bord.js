@@ -1125,6 +1125,7 @@
         var a = B.aabning(gg);
         sproejt(this, a.x, a.y, farve, 26);
         this.nyPyt(gg.p.x, gg.type.maks < 30 ? 56 : 66, farve);
+        gg.spildtMaerker = Stof.faremaerker(B.samlet(gg));
         B.toem(gg);
         this.koer.start([NK.Koer.hjemTil(gg, 0.6, 20)], "hjem");
         this.uheld(slags || "spild", gg, "Det skvulpede ud. Indholdet er tabt.");

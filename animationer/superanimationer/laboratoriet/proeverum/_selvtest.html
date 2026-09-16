@@ -61,6 +61,7 @@ function koerTest() {
     function n(c, s) { return B.samlet(c).n[s] || 0; }
     function bord() { return rum.aktiv(); }
     function knapAktiv() { var k = d.querySelector("#rumknapper .knap.aktiv"); return k ? k.dataset.rum : null; }
+    rum.alle().forEach(function (b) { b.laererAltid = true; });
 
     overskrift("2. At gaa mellem rum");
     var S = NK.Scene;

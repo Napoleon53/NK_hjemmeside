@@ -93,6 +93,11 @@ etiketten følger indholdet: en fortyndet syre mister sit ætsende-mærke, og
 affaldsdunken viser, hvad der er i den. Kemichael advarer gennem
 `laererBaer` (`proevebord/js/laerer.js`), én gang pr. stof.
 
+Kemichael taler ikke hele tiden (`laererOpdager`): uheld med farlige
+kemikalier (ætsende, giftig, brandfarlig, oxiderende, kronisk) og knust glas
+ser han altid; alt andet, også advarslerne, lader han passere i 60 % af
+tilfældene. `laererAltid = true` slår tilfældet fra i selvtestene.
+
 ## Genstandsmodellen
 
 En genstand på bordet er `{ navn, type, p: { x, y, v }, hjem, kan, indhold, ... }`.
