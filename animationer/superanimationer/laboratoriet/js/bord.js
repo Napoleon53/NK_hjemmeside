@@ -891,6 +891,7 @@
             var a = B.aabning(gg);
             sproejt(this, a.x, a.y, farve, 14);
             this.nyPyt(a.x, 40, farve);
+            gg.spildtMaerker = Stof.faremaerker(B.samlet(gg));
             B.toem(gg);
             this.uheld("vaeltet", gg, gg.titel + " væltede, og indholdet løb ud.");
             return;
