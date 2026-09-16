@@ -298,9 +298,10 @@
             { gaa: 150 },
             { tid: 0.3 },
             { sig: "Fedt.", vis: 1.8, tid: 1.8, hver: function (t) { this.laerer.nik = Math.sin(t * Math.PI * 3) * 5; } },
-            { kald: function () { this.laerer.nik = 0; } },
+            { kald: function () { this.laerer.nik = 0; } }
+        ].concat(K.ros(), [
             { gaa: UDE }
-        ], false);
+        ]), false);
     };
 
     /* ----- Branden ------------------------------------------------------- */

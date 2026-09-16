@@ -237,6 +237,29 @@
                 rude(container, ++nr, r.tekst, r.tegn);
             });
 
+            /* Ryddede han op undervejs, faar han sin egen rude */
+            var K = NK.Kemichael;
+            if (K.uheldIForsoeget()) {
+                rude(container, ++nr, K.oprydningsTekst(), function (ctx) {
+                    var bg = ctx.createLinearGradient(0, 0, 0, H);
+                    bg.addColorStop(0, "#262b33");
+                    bg.addColorStop(1, "#1a1e25");
+                    ctx.fillStyle = bg;
+                    ctx.fillRect(0, 0, B, H);
+                    ctx.fillStyle = "#3b404b";
+                    ctx.fillRect(0, 184, B, 16);
+                    ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
+                    ctx.fillRect(0, 184, B, 1.5);
+                    K.tegneserieFigur(ctx, {
+                        x: 150, gulv: 186, skala: 0.46, arm: 2.05,
+                        udtryk: { vrede: 0.9, humoer: -0.8, roed: 0.2, lukket: 1 },
+                        haand: function (c, hd) {
+                            NK.Sprites.tegnPositur(c, "papir", { x: hd.x + 6, y: hd.y + 8, v: 0.2 }, S.ANKER.papir);
+                        }
+                    });
+                });
+            }
+
             /* Sidste rude: maalingerne */
             var sidste = document.createElement("div");
             sidste.className = "rude";

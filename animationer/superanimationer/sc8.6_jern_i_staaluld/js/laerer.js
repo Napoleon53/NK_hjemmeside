@@ -191,7 +191,7 @@
             { tid: 0.3 },
             { sig: "Rustfrit.", vis: 1.8, tid: 1.8, hver: function (t) { this.laerer.nik = Math.sin(t * Math.PI * 3) * 5; } },
             { kald: function () { this.laerer.nik = 0; } }
-        ].concat(K.glimtTrin("titrering"), [
+        ].concat(K.glimtTrin("titrering"), K.ros(), [
             { gaa: UDE }
         ]), false);
     };

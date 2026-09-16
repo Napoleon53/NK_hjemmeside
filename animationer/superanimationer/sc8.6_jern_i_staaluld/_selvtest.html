@@ -44,6 +44,9 @@ function koerTest() {
     var ramme = document.getElementById("ramme");
     var d = ramme.contentDocument;
     var NK = ramme.contentWindow.NK;
+    /* Baggrundslivet (han gaar forbi, naar der er stille) skal ikke
+       blande sig i testens scener */
+    if (NK.Kemichael) NK.Kemichael.baggrundsliv(false);
     var i;
 
     overskrift("1. Indlaesning");
@@ -370,7 +373,9 @@ function koerTest() {
     paastand("jernindholdet kan beregnes", f.gjort.beregn);
     var sr2 = serie();
     var antalFejl = ["lidtStaal", "toSyrer", "kmno4Kolbe", "ikkeNulstillet", "genfyldt", "spild"].filter(function (k) { return f.iagttaget[k]; }).length;
-    paastand("tegneserien har en roed rude for hver fejl", sr2.fejl >= antalFejl && sr2.ruder === 8 + sr2.fejl, sr2.fejl + " fejlruder");
+    /* Ryddede laereren op undervejs, kommer der en rude med ham oveni */
+    var oprydning = NK.Kemichael.uheldIForsoeget() ? 1 : 0;
+    paastand("tegneserien har en roed rude for hver fejl", sr2.fejl >= antalFejl && sr2.ruder === 8 + sr2.fejl + oprydning, sr2.fejl + " fejlruder");
     tegnOk("efter mange fejl");
     roligt();
 
@@ -451,8 +456,10 @@ function koerTest() {
     f.klik("laerer");
     paastand("et klik midt i en replik afbryder ham ikke", f.klik("laerer") === false);
     udtalt();
-    for (i = 0; i < 4; i++) { f.klik("laerer"); udtalt(); }
-    paastand("fem klik paa laereren: damp af oererne, og laereren gaar", f.laerer.damp > 0 && f.laerer.scene && f.laerer.scene.navn === "gaaUd");
+    /* Hvor mange prik han finder sig i, afhaenger af dagsformen */
+    function gaaet() { return !!(f.laerer.damp > 0 && f.laerer.scene && f.laerer.scene.navn === "gaaUd"); }
+    for (i = 0; i < 7 && !gaaet(); i++) { f.klik("laerer"); udtalt(); }
+    paastand("nok prik i traek: damp af oererne, og laereren gaar", gaaet(), i + " klik");
     vent(function () { return !f.laerer.scene; }, 10);
 
     overskrift("8. Quizzen");

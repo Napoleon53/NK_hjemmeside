@@ -146,9 +146,10 @@
             { gaa: 240 },
             { tid: 0.3 },
             { sig: "Flot. Det var til at se rødt.", vis: 2.4, tid: 2.4, hver: function (t) { this.laerer.nik = Math.sin(t * Math.PI * 3) * 5; } },
-            { kald: function () { this.laerer.nik = 0; } },
+            { kald: function () { this.laerer.nik = 0; } }
+        ].concat(K.ros(), [
             { gaa: UDE }
-        ], false);
+        ]), false);
     };
 
     /* ----- Tegning ------------------------------------------------------------- */

@@ -85,9 +85,10 @@
                 { tid: 0.3 },
                 { sig: ROS[fane], vis: 2.8, tid: 2.8,
                   hver: function (t) { this.laerer.nik = Math.sin(t * Math.PI * 3) * 5; } },
-                { kald: function () { this.laerer.nik = 0; } },
+                { kald: function () { this.laerer.nik = 0; } }
+            ].concat(K.ros(), [
                 { gaa: UDE }
-            ], false);
+            ]), false);
         };
     }
 

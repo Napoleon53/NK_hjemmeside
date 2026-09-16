@@ -65,6 +65,8 @@ Idéer til senere glimt i samme stil:
   sidevisning. Det huskes i `localStorage` under `nk-kemichael`.
 * Regnskabet over uheld (`K.uheld()`) tæller på tværs af animationerne i samme
   browser. Ved 3, 6 og 10 uheld kommer et glimt.
+* Modstykket er `K.ros()`, som forsøgets ros-scene slutter med. Den tæller forsøg
+  i træk uden uheld og giver et glimt ved 3, 6 og 10. Et uheld nulstiller stimen.
 * En replik er højst ca. 60 tegn og uden teori.
 * `NK.Kemichael.glimtNulstil()` i konsollen glemmer viste glimt og regnskabet.
 
@@ -100,8 +102,9 @@ med `K.replik("ryst", RYST_SVAR)`.
 
 | Pulje | Bruges til |
 |-------|------------|
-| `prik1` til `prik4` | de fire svar, når eleven prikker til ham. Femte klik sender ham ud |
+| `prik1` til `prik4` | svarene, når eleven prikker til ham. Det næste klik sender ham ud |
 | `gaaUd` | replikken, når han går |
+| `forbi`, `stilstand` | baggrundslivet, se nedenfor |
 | `ros`, `uheld`, `advarsel` | fælles vendinger, som et forsøg kan bruge, hvis det ikke har sine egne |
 
 **Han bliver ikke afbrudt.** Et klik på ham preller af, mens taleboblen står, og en
@@ -109,6 +112,28 @@ ny scene begynder med at vente, til han er talt færdig. Trinet
 `{ taleFaerdig: true }` venter på det samme, så han ikke går fra sin egen replik.
 Boblen står 10 % længere end den tid, scenen beder om, og aldrig kortere end det
 tager at læse linjen (`K.taleTid`). Lange replikker brydes over to linjer.
+
+## Dagsform
+
+Han har en tilstand for hver sidevisning: fredag, dagen efter et langt møde, en
+dårlig nat, ny kaffemaskine, en rettebunke eller tre vikartimer i fysik.
+Dagsformen lægger sine egne vendinger i puljerne (cirka hver tredje replik),
+flytter ansigtet en smule i alle scener og afgør, hvor mange prik han finder sig
+i, før han går (tre til fem). Listen står i `DAGSFORM` i `kemichael.js`.
+`K.dagsform()` siger, hvilken det er, og `K.dagsform("fredag")` vælger en bestemt,
+så selvtesten kan regne med den.
+
+## Baggrundsliv
+
+Har eleven ikke rørt noget i 75 sekunder, sker der noget af sig selv: han går
+tværs over scenen med en papkasse, eller han kigger ind fra kanten og spørger, om
+det står stille. Der går mindst to en halv minut mellem to indslag.
+
+* Tiden måles i rigtige sekunder, ikke i forsøgets tid, og tælles fra sidste klik
+  eller tastetryk i vinduet. Derfor sker det aldrig i en selvtest, der kører timer
+  igennem på få sekunder.
+* Indslagene låser ikke forsøget og viger med det samme, hvis eleven rører noget.
+* `NK.Kemichael.baggrundsliv(false)` slår dem fra. Det gør alle selvtestene.
 
 ## Kaffen
 
@@ -154,6 +179,17 @@ Forkerte handlinger i et forsøg afvises ikke, når det kan undgås. De giver et
 uheld, og læreren kommer og rydder op: tørrer op, tænder udsugningen, stopper
 eleven ved vasken eller tænder brænderen igen. Scenen står i animationens
 `laerer.js` og slutter med `K.uheld()`, så uheldet kommer i regnskabet.
+
+Gik et forsøg godt, slutter ros-scenen med `K.ros()`, som tæller den anden vej.
+
+## Tegneseriens rude om oprydningen
+
+Ryddede han op undervejs, får han en rude i tegneserien: `K.uheldIForsoeget()`
+tæller oprydningerne i det forsøg, der kører nu, `K.oprydningsTekst()` giver
+teksten, og `K.tegneserieFigur(ctx, valg)` tegner ham i ruden. Valgene er `x`,
+`gulv`, `skala` (0,46 passer til en rude på 214 px), `arm`, `udtryk` og
+`haand(ctx, hd)`, som tegner det, han holder, fx køkkenrullen. Mønster:
+`sc6.8_substitution/js/tegneserie.js`.
 
 ## Filer
 

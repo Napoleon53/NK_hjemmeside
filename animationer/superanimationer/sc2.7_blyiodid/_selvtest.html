@@ -43,6 +43,9 @@ function koerTest() {
     var ramme = document.getElementById("ramme");
     var d = ramme.contentDocument;
     var NK = ramme.contentWindow.NK;
+    /* Baggrundslivet (han gaar forbi, naar der er stille) skal ikke
+       blande sig i testens scener */
+    if (NK.Kemichael) NK.Kemichael.baggrundsliv(false);
     var i;
 
     overskrift("1. Indlaesning");
@@ -185,7 +188,10 @@ function koerTest() {
     paastand("tegneserien er laast op", !d.getElementById("serieknap").hidden);
     NK.aabnSerie();
     var ruder = d.querySelectorAll("#serie-ruder .rude");
-    var forventet = f.logbog.filter(function (e) { return !!NK.Tegneserie.RUDER[e.noegle]; }).length + 1;
+    /* En rude pr. iagttagelse, en med maalingerne og en med oprydningen,
+       hvis laereren har ryddet op undervejs */
+    var forventet = f.logbog.filter(function (e) { return !!NK.Tegneserie.RUDER[e.noegle]; }).length + 1
+        + (NK.Kemichael.uheldIForsoeget() ? 1 : 0);
     paastand("én rude pr. iagttagelse og én med maalingerne", ruder.length === forventet && ruder.length >= 8 && d.getElementById("tegneserie").classList.contains("vis"), ruder.length + " ruder");
     var sidste = ruder[ruder.length - 1];
     var raekker = sidste ? sidste.querySelectorAll("table.maalinger tr") : [];

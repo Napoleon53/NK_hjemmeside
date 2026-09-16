@@ -42,6 +42,9 @@ function koerTest() {
     var ramme = document.getElementById("ramme");
     var d = ramme.contentDocument;
     var NK = ramme.contentWindow.NK;
+    /* Baggrundslivet (han gaar forbi, naar der er stille) skal ikke
+       blande sig i testens scener */
+    if (NK.Kemichael) NK.Kemichael.baggrundsliv(false);
 
     overskrift("1. Indlaesning");
     paastand("NK findes", !!NK);

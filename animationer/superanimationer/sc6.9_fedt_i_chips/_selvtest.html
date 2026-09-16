@@ -44,6 +44,9 @@ function koerTest() {
     var ramme = document.getElementById("ramme");
     var d = ramme.contentDocument;
     var NK = ramme.contentWindow.NK;
+    /* Baggrundslivet (han gaar forbi, naar der er stille) skal ikke
+       blande sig i testens scener */
+    if (NK.Kemichael) NK.Kemichael.baggrundsliv(false);
     var i;
 
     overskrift("1. Indlaesning");
@@ -406,8 +409,10 @@ function koerTest() {
     f.klik("laerer");
     paastand("et klik midt i en replik afbryder ham ikke", f.klik("laerer") === false);
     udtalt();
-    for (i = 0; i < 4; i++) { f.klik("laerer"); udtalt(); }
-    paastand("fem klik paa laereren: damp af oererne, og laereren gaar", f.laerer.damp > 0 && f.laerer.scene && f.laerer.scene.navn === "gaaUd");
+    /* Hvor mange prik han finder sig i, afhaenger af dagsformen */
+    function gaaet() { return !!(f.laerer.damp > 0 && f.laerer.scene && f.laerer.scene.navn === "gaaUd"); }
+    for (i = 0; i < 7 && !gaaet(); i++) { f.klik("laerer"); udtalt(); }
+    paastand("nok prik i traek: damp af oererne, og laereren gaar", gaaet(), i + " klik");
     vent(function () { return !f.laerer.scene; }, 10);
 
     overskrift("7b. Petriskaalen og heptanflasken");

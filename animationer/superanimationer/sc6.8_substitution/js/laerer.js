@@ -48,9 +48,10 @@
             { gaa: 150 },
             { tid: 0.3 },
             { sig: "Flot. Et rigtigt kontrolforsøg.", vis: 2.4, tid: 2.4, hver: function (t) { this.laerer.nik = Math.sin(t * Math.PI * 3) * 5; } },
-            { kald: function () { this.laerer.nik = 0; } },
+            { kald: function () { this.laerer.nik = 0; } }
+        ].concat(K.ros(), [
             { gaa: UDE }
-        ], false);
+        ]), false);
     };
 
     /* Et saerlig godt forsoeg: laereren dabber */
@@ -78,7 +79,7 @@
                 this.laerer.nik = 0;
             } },
             { sig: "Et rigtigt kontrolforsøg.", vis: 2.2, tid: 1.6 }
-        ].concat(K.glimtTrin("dab"), [
+        ].concat(K.glimtTrin("dab"), K.ros(), [
             { gaa: UDE }
         ]), false);
     };

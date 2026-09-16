@@ -272,6 +272,21 @@
                     tekst(ctx, "0,00 m/s", hX + 20, GLAS_Y + 56, { farve: "#f0918a", font: "700 14px Consolas, 'Courier New', monospace" });
                 });
             }
+
+            /* Ryddede han op undervejs, faar han den sidste rude */
+            var K = NK.Kemichael;
+            var oprydninger = K.uheldIForsoeget();
+            if (oprydninger) {
+                rude(container, ++nr, K.oprydningsTekst(), function (ctx) {
+                    K.tegneserieFigur(ctx, {
+                        x: 150, gulv: GLAS_Y + 162, skala: 0.46, arm: 2.05,
+                        udtryk: { vrede: 0.9, humoer: -0.8, roed: 0.2, lukket: 1 },
+                        haand: function (c, hd) {
+                            NK.Sprites.tegnPositur(c, "papir", { x: hd.x + 6, y: hd.y + 8, v: 0.2 }, S.ANKER.papir);
+                        }
+                    });
+                });
+            }
         }
     };
 }());

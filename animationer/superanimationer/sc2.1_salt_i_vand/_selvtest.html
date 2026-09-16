@@ -50,6 +50,9 @@ function koerTest() {
     var d = ramme.contentDocument;
     var W = ramme.contentWindow;
     var NK = W.NK;
+    /* Baggrundslivet (han går forbi, når der er stille) skal ikke
+       blande sig i testens scener */
+    if (NK.Kemichael) NK.Kemichael.baggrundsliv(false);
     var i;
 
     overskrift("1. Indlæsning");

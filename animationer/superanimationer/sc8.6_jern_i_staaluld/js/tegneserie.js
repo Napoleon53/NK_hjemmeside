@@ -399,6 +399,23 @@
                 if (gj[fj[0]]) rude(container, ++nr, fj[1], { udsnit: fj[2], tegn: fj[3], fejl: true });
             });
 
+            /* Ryddede han op undervejs, faar han en rude foer skemaet */
+            var K = NK.Kemichael;
+            if (K.uheldIForsoeget()) {
+                rude(container, ++nr, K.oprydningsTekst(), {
+                    udsnit: UDSNIT.skab,
+                    oven: function (ctx) {
+                        K.tegneserieFigur(ctx, {
+                            x: 150, gulv: 196, skala: 0.46, arm: 2.05,
+                            udtryk: { vrede: 0.9, humoer: -0.8, roed: 0.2, lukket: 1 },
+                            haand: function (c, hd) {
+                                NK.Sprites.tegnPositur(c, "papir", { x: hd.x + 6, y: hd.y + 8, v: 0.2 }, S.ANKER.papir);
+                            }
+                        });
+                    }
+                });
+            }
+
             skema(container, ++nr, f);
         }
     };

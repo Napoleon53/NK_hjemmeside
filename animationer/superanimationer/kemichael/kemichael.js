@@ -53,6 +53,20 @@
      K.replik(kategori)        en vending fra puljen REPLIKKER, som ikke er
                                brugt for nylig (ros, uheld, advarsel, prik1-4)
      K.replik(navn, liste)     det samme med forsoegets egen liste
+     K.dagsform()              dagens tilstand (DAGSFORM); den laegger egne
+                               vendinger i puljerne, flytter ansigtet lidt og
+                               afgoer, hvor mange prik han finder sig i.
+                               K.dagsform(id) vaelger en bestemt
+
+   Baggrundsliv (laererBaggrundsliv, kaldes fra opdaterLaerer):
+     Har eleven ikke roert noget i 75 rigtige sekunder, gaar han forbi med en
+     kasse eller kigger ind fra kanten. Indslagene laaser ikke forsoeget og
+     viger, saa snart eleven roerer noget. K.baggrundsliv(false) slaar dem fra.
+
+   Tegneserien:
+     K.uheldIForsoeget()       oprydninger i det forsoeg, der koerer nu
+     K.oprydningsTekst()       teksten til ruden om oprydningen
+     K.tegneserieFigur(ctx, valg)  tegner ham i en rude
 
    Glimt af baggrunden:
      K.glimtTrin(id)   en liste med eet sig-trin, hvis glimtet ikke er vist
@@ -182,16 +196,119 @@
             "Lidt ad gangen. Altid lidt ad gangen.",
             "Det står på plakaten. Den hænger der stadig.",
             "Briller på. De er ikke pynt."
+        ],
+        /* Han kommer forbi uden aerinde */
+        forbi: [
+            "Jeg skal bare forbi.",
+            "Der er kemi i kassen. Bliv siddende.",
+            "Jeg går bare igennem."
+        ],
+        /* Der er ikke sket noget i forsoeget i lang tid */
+        stilstand: [
+            "Står det stille?",
+            "Forsøget gør det ikke selv.",
+            "Det bider ikke.",
+            "Er du gået i stå, eller tænker du?",
+            "Der er ikke sket noget herovre i et stykke tid."
         ]
     };
+
+    /* ----- Dagsform ---------------------------------------------------------
+       Han har en tilstand for hver sidevisning. Den laegger et par
+       vendinger til puljerne, flytter ansigtet en smule og afgoer, hvor
+       mange prik han finder sig i. K.dagsform() siger, hvilken det er, og
+       K.dagsform(id) vaelger en bestemt (selvtesten). */
+    var DAGSFORM = [
+        {
+            id: "fredag", taalmod: 5, humoer: 0.25,
+            ekstra: {
+                prik: ["Det er fredag. Det redder dig.", "Der er kage klokken to. Det redder dig også."],
+                ros: ["Godt. Så kan jeg nå kagen."],
+                uheld: ["På en fredag. Selvfølgelig."],
+                stilstand: ["Det er fredag. Forsøget bliver ikke kortere af at vente."]
+            }
+        },
+        {
+            id: "moede", taalmod: 3, vrede: 0.15, humoer: -0.1,
+            ekstra: {
+                prik: ["Jeg har siddet i møde i fire timer.", "Jeg har brugt dagen på et skema. Det her er nemmere."],
+                ros: ["Det var dagens første, der gik som planlagt."],
+                uheld: ["Det skal jeg også skrive i et skema."],
+                stilstand: ["Jeg har siddet stille hele dagen. Nu er det din tur til at lade være."]
+            }
+        },
+        {
+            id: "soevn", taalmod: 3, vrede: 0.2, humoer: -0.15,
+            ekstra: {
+                prik: ["Jeg har sovet fire timer. Vælg dine ord.", "Ikke i dag."],
+                ros: ["Godt. Så kan jeg sætte mig ned."],
+                uheld: ["Ikke i dag. Bare ikke i dag."],
+                stilstand: ["Vi står begge to stille. Jeg har en undskyldning."]
+            }
+        },
+        {
+            id: "maskine", taalmod: 5, humoer: 0.3,
+            ekstra: {
+                prik: ["Der er ny kaffemaskine. Jeg er et bedre menneske i dag.", "Spørg om noget fagligt, mens jeg er sådan her."],
+                ros: ["Flot. Og kaffen er varm. En god dag."],
+                uheld: ["Selv i dag."],
+                stilstand: ["Jeg har tid. Jeg har lige hentet kaffe."]
+            }
+        },
+        {
+            id: "rettebunke", taalmod: 4, vrede: 0.1,
+            ekstra: {
+                prik: ["Jeg har 62 rapporter at rette. Du er nummer 63.", "Kort version: nej."],
+                ros: ["Skriv det i rapporten. Så bliver den nem at rette."],
+                uheld: ["Det bliver en fodnote i din rapport."],
+                stilstand: ["Jeg retter rapporter, mens du tænker. Sig til."]
+            }
+        },
+        {
+            id: "vikar", taalmod: 4, vrede: 0.05,
+            ekstra: {
+                prik: ["Jeg har haft tre vikartimer i fysik i dag.", "Jeg har forklaret Newton tre gange. Nu er det kemi."],
+                ros: ["Godt. Dagens første rigtige kemi."],
+                uheld: ["Det her var ikke i fysiktimen."],
+                stilstand: ["Jeg har ventet på et rigtigt kemiforsøg hele dagen."]
+            }
+        }
+    ];
+
+    var dagen = DAGSFORM[Math.floor(Math.random() * DAGSFORM.length)];
+
+    function dagsform(id) {
+        if (id) {
+            var valgt = DAGSFORM.filter(function (d) { return d.id === id; })[0];
+            if (valgt) { dagen = valgt; brugte = {}; }
+        }
+        return dagen.id;
+    }
+
+    /* Dagsformens egne vendinger til en pulje. prik1 til prik4 deler pulje. */
+    function dagensLinjer(kategori) {
+        var e = dagen.ekstra || {};
+        return (kategori.indexOf("prik") === 0 ? e.prik : e[kategori]) || [];
+    }
 
     /* Replikker, der er brugt i denne sidevisning, pr. kategori */
     var brugte = {};
 
     function replik(kategori, liste) {
-        liste = liste || REPLIKKER[kategori];
+        var noegle = kategori;
+        if (!liste) {
+            liste = REPLIKKER[kategori];
+            /* Dagsformen fylder cirka hver tredje replik. De fire prik-trin
+               deler dagsformens pulje, saa den samme vending ikke kommer
+               to klik i traek. */
+            var dag = dagensLinjer(kategori);
+            if (dag.length && Math.random() < 0.35) {
+                liste = dag;
+                noegle = (kategori.indexOf("prik") === 0 ? "prik" : kategori) + ":dagen";
+            }
+        }
         if (!liste || !liste.length) return "";
-        var set = brugte[kategori] || (brugte[kategori] = []);
+        var set = brugte[noegle] || (brugte[noegle] = []);
         if (set.length >= liste.length) set.length = 0;
         var rest = liste.filter(function (t) { return set.indexOf(t) < 0; });
         var tekst = rest[Math.floor(Math.random() * rest.length)];
@@ -229,6 +346,9 @@
         fredag:     "Jeg går aldrig glip af et fredagsmøde. Der er kage.",
         gave:       "Koppen var en gave fra en klasse, der ryddede op. Én gang.",
         kunst:      "Skårene gemmer jeg. Det bliver en kunstinstallation.",
+        rene3:      "Tre forsøg uden uheld. Det står også i regnskabet.",
+        rene6:      "Seks i træk uden uheld. Nu leder jeg efter fejlen.",
+        rene10:     "Ti i træk. Jeg har ikke en mappe til den slags.",
         regnskab3:  "Tredje uheld på den her computer. Det står i regnskabet.",
         regnskab6:  "Seks uheld på den her computer. Regnskabet har fået en mappe.",
         regnskab10: "Ti uheld. Regnskabet har fået sit eget ringbind."
@@ -239,8 +359,15 @@
         { antal: 3, id: "regnskab3" }
     ];
 
+    /* Modstykket: forsoeg i traek uden uheld */
+    var RENE = [
+        { antal: 10, id: "rene10" },
+        { antal: 6, id: "rene6" },
+        { antal: 3, id: "rene3" }
+    ];
+
     var LAGER = "nk-kemichael";
-    var hukommelse = { sete: [], uheld: 0, kaffe: [], kaffeTal: 0 };
+    var hukommelse = { sete: [], uheld: 0, rene: 0, kaffe: [], kaffeTal: 0 };
     var glimtVist = false;
 
     function hent() {
@@ -273,20 +400,125 @@
         return tekst ? [{ sig: tekst, vis: 1.4 + tekst.length * 0.045, tid: 1.6 + tekst.length * 0.045 }] : [];
     }
 
+    /* Uheld i det forsoeg, der koerer nu. Nulstilles ved nyt forsoeg og
+       bruges af tegneserien, naar den skal fortaelle, at han ryddede op. */
+    var uheldNu = 0;
+
     function uheld() {
         var v = hent();
         v.uheld = (v.uheld || 0) + 1;
+        v.rene = 0;
         gem(v);
+        uheldNu++;
         for (var i = 0; i < REGNSKAB.length; i++) {
             if (v.uheld >= REGNSKAB[i].antal) return v.sete.indexOf(REGNSKAB[i].id) >= 0 ? [] : glimtTrin(REGNSKAB[i].id);
         }
         return [];
     }
 
+    function uheldIForsoeget() {
+        return uheldNu;
+    }
+
+    /* Teksten til tegneseriens rude om oprydningen */
+    function oprydningsTekst() {
+        if (uheldNu === 1) return "Kemichael kom og ryddede op efter uheldet. Det står i hans regnskab.";
+        return "Kemichael kom og ryddede op " + uheldNu + " gange. Det står i hans regnskab.";
+    }
+
+    /* Modstykket til uheld(): et forsoeg, der gik godt. Kaldes fra
+       forsoegets ros-scene og giver et glimt ved 3, 6 og 10 i traek. */
+    function ros() {
+        var v = hent();
+        v.rene = (v.rene || 0) + 1;
+        gem(v);
+        for (var i = 0; i < RENE.length; i++) {
+            if (v.rene >= RENE[i].antal) return v.sete.indexOf(RENE[i].id) >= 0 ? [] : glimtTrin(RENE[i].id);
+        }
+        return [];
+    }
+
     function glimtNulstil() {
-        gem({ sete: [], uheld: 0, kaffe: [], kaffeTal: 0 });
+        gem({ sete: [], uheld: 0, rene: 0, kaffe: [], kaffeTal: 0 });
         glimtVist = false;
         brugte = {};
+        uheldNu = 0;
+    }
+
+    /* ----- Hvor laenge der er gaaet, siden eleven roerte noget -------------
+       Maales i rigtige sekunder, ikke i forsoegets tid. Baggrundslivet
+       haenger paa den, saa det aldrig sker midt i noget, eleven laver, og
+       aldrig i selvtesten, der koerer timer igennem paa faa sekunder. */
+    var STILLE_FOERSTE = 75;   /* sekunder uden at eleven roerer noget */
+    var STILLE_IGEN = 150;     /* sekunder mellem to indslag */
+
+    var roert = Date.now();
+    var roertTal = 0;          /* taeller, saa et indslag kan se, om eleven har roert noget */
+    var sidsteBaggrund = 0;
+    var baggrundsliv = true;
+
+    function naa() {
+        return Date.now();
+    }
+
+    function stille() {
+        return (naa() - roert) / 1000;
+    }
+
+    function sidenBaggrund() {
+        return (naa() - sidsteBaggrund) / 1000;
+    }
+
+    function baggrundNu() {
+        sidsteBaggrund = naa();
+    }
+
+    function roerteSidst() {
+        return roertTal;
+    }
+
+    /* Selvtesten slaar baggrundslivet fra, saa scenerne er forudsigelige */
+    function slaaBaggrundsliv(til) {
+        baggrundsliv = til !== false;
+    }
+
+    function roerte() {
+        roert = naa();
+        roertTal++;
+    }
+
+    if (window.document && document.addEventListener) {
+        ["pointerdown", "keydown", "wheel", "touchstart"].forEach(function (navn) {
+            document.addEventListener(navn, roerte, true);
+        });
+    }
+
+    /* Papkassen, han baerer forbi. Tegnes i koden, saa den ikke kraever
+       en sprite: (x, y) er midt paa kassens overkant. */
+    function tegnKasse(ctx, x, y) {
+        var b = 66, h = 46;
+        ctx.save();
+        ctx.translate(x - b / 2, y);
+        var g = ctx.createLinearGradient(0, 0, b, 0);
+        g.addColorStop(0, "#a9773f");
+        g.addColorStop(0.5, "#c89355");
+        g.addColorStop(1, "#9c6c39");
+        ctx.fillStyle = g;
+        ctx.strokeStyle = "#6f4a24";
+        ctx.lineWidth = 1.6;
+        ctx.fillRect(0, 0, b, h);
+        ctx.strokeRect(0, 0, b, h);
+        /* Laagets to flapper og tapen ned ad midten */
+        ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
+        ctx.fillRect(0, 0, b, 9);
+        ctx.strokeStyle = "rgba(90, 60, 30, 0.8)";
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(0, 9); ctx.lineTo(b, 9);
+        ctx.moveTo(b / 2, 0); ctx.lineTo(b / 2, 9);
+        ctx.stroke();
+        NK.tekst(ctx, "KEMI", b / 2, h / 2 + 6, { font: "700 11px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "rgba(80, 52, 26, 0.85)" });
+        ctx.restore();
     }
 
     /* Et suk: oejnene lukkes, og hovedet synker og kommer op igen */
@@ -617,6 +849,140 @@
         ctx.restore();
     }
 
+    /* Ansigtet: oejne, bryn, briller, mund og roedme tegnes i koden,
+       saa udtrykket kan skifte. Tegnes i hovedets eget system. */
+    function tegnAnsigt(ctx, L) {
+        var i;
+        var b = L.briller || 0, gy = b * 13;
+        /* Roedme */
+        if (L.roed > 0.02) {
+            var g = ctx.createRadialGradient(55, 70, 10, 55, 66, 48);
+            g.addColorStop(0, "rgba(225, 50, 40, " + (0.5 * L.roed).toFixed(3) + ")");
+            g.addColorStop(1, "rgba(225, 50, 40, 0)");
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.ellipse(55, 66, 40, 50, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        /* Oejne: lukkede ved blink og suk; over brillerne kigger de op */
+        var lukket = L.blink > 0 || (L.lukket || 0) > 0.4;
+        for (i = 0; i < 2; i++) {
+            var ox = i === 0 ? 37 : 73;
+            if (lukket) {
+                ctx.strokeStyle = "#2a2f36";
+                ctx.lineWidth = 1.6;
+                ctx.beginPath();
+                ctx.moveTo(ox - 4, 61);
+                ctx.lineTo(ox + 4, 61);
+                ctx.stroke();
+            } else {
+                ctx.fillStyle = "#ffffff";
+                ctx.beginPath();
+                ctx.ellipse(ox, 61, 5.2, 4.2 - L.vrede * 1.2, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = "#2a2f36";
+                ctx.beginPath();
+                ctx.arc(ox + 1.5, 61.5 - b * 2.2, 2.4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        /* Briller: glider ned ad naesen med b */
+        ctx.strokeStyle = "#23272e";
+        ctx.lineWidth = 2.4;
+        ctx.fillStyle = "rgba(200, 230, 255, 0.12)";
+        [37, 73].forEach(function (bx) {
+            ctx.beginPath();
+            ctx.arc(bx, 60 + gy, 12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+        });
+        ctx.beginPath();
+        ctx.moveTo(49, 59 + gy); ctx.quadraticCurveTo(55, 55 + gy, 61, 59 + gy);
+        ctx.moveTo(25, 58 + gy); ctx.lineTo(15, 55 + gy * 0.4);
+        ctx.moveTo(85, 58 + gy); ctx.lineTo(95, 55 + gy * 0.4);
+        ctx.stroke();
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.arc(34, 56 + gy, 6, Math.PI * 1.1, Math.PI * 1.45);
+        ctx.arc(70, 56 + gy, 6, Math.PI * 1.1, Math.PI * 1.45);
+        ctx.stroke();
+        /* Bryn: vrede saenker de inderste ender. Skeptisk: det hoejre bryn
+           loeftes, og munden bliver skaev. Over brillerne loeftes begge */
+        var v = L.vrede, hm = Math.max(0, L.humoer), sk = L.skeptisk || 0;
+        ctx.strokeStyle = "#6d737a";
+        ctx.lineWidth = 4.2;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(24, 42 + v * 1 - hm * 2 + sk * 2 - b * 3);
+        ctx.lineTo(47, 42 + v * 8 - hm * 3 + sk * 2 - b * 3);
+        ctx.moveTo(86, 42 + v * 1 - hm * 2 - sk * 11 - b * 3);
+        ctx.lineTo(63, 42 + v * 8 - hm * 3 - sk * 7 - b * 3);
+        ctx.stroke();
+        /* Mund under overskaegget */
+        var h = L.humoer;
+        ctx.strokeStyle = "#7a3b2e";
+        ctx.lineWidth = 2.4;
+        ctx.beginPath();
+        ctx.moveTo(45, 98 - h * 2 + sk * 1.5);
+        ctx.quadraticCurveTo(55, 98 + h * 7, 65, 98 - h * 2 - sk * 5);
+        ctx.stroke();
+        if (L.aaben > 0.05) {
+            ctx.fillStyle = "#4a1f18";
+            ctx.beginPath();
+            ctx.ellipse(55, 99 + h * 2, 5.5, 1 + 4.5 * L.aaben, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    /* ----- Kemichael i en tegneserierude ----------------------------------
+       Tegneserien i hvert forsoeg kan sætte ham ind i en rude med
+       K.tegneserieFigur(ctx, valg):
+
+         x        hvor han staar i ruden
+         gulv     gulvlinjen i ruden; han staar paa den
+         skala    0,46 fylder han en rude paa 214 px i hoejden
+         arm      armens vinkel, fx K.HAENGER eller 1,8 (toerrer op)
+         udtryk   vrede, humoer, roed, skeptisk, briller, lukket
+         haand(ctx, hd)  tegner det, han holder, fx koekkenrullen
+
+       Han skal vaere hentet som sprite i forvejen, og det er han i alle
+       forsoeg, hvor han er med. */
+    function tegneserieFigur(ctx, valg) {
+        valg = valg || {};
+        var u = valg.udtryk || {};
+        var L = {
+            vrede: u.vrede === undefined ? 0.7 : u.vrede,
+            humoer: u.humoer === undefined ? -0.4 : u.humoer,
+            roed: u.roed || 0,
+            skeptisk: u.skeptisk || 0,
+            briller: u.briller || 0,
+            lukket: u.lukket || 0,
+            blink: 0, aaben: 0
+        };
+        var arm = valg.arm === undefined ? HAENGER : valg.arm;
+        var skala = valg.skala === undefined ? 0.46 : valg.skala;
+        ctx.save();
+        ctx.translate(valg.x === undefined ? 150 : valg.x, valg.gulv === undefined ? 184 : valg.gulv);
+        ctx.scale(skala, skala);
+        /* Halsen ligger 232 enheder over gulvet: kroppens hoejde minus ankeret */
+        var krop = { x: 0, y: -232, v: 0 };
+        var sk = NK.tilVerden(krop, ANKER.laererKrop, 176, 58);
+        var armPositur = { x: sk.x, y: sk.y, v: arm };
+        var bag = Math.abs(arm) > 2;
+        if (bag) NK.Sprites.tegnPositur(ctx, "laererArm", armPositur, ANKER.laererArm);
+        NK.Sprites.tegnPositur(ctx, "laererKrop", krop, ANKER.laererKrop);
+        var hoved = { x: krop.x, y: krop.y + 14, v: 0 };
+        NK.Sprites.tegnPositur(ctx, "laererHoved", hoved, ANKER.laererHoved);
+        ctx.save();
+        ctx.translate(hoved.x - ANKER.laererHoved.x, hoved.y - ANKER.laererHoved.y);
+        tegnAnsigt(ctx, L);
+        ctx.restore();
+        if (!bag) NK.Sprites.tegnPositur(ctx, "laererArm", armPositur, ANKER.laererArm);
+        if (valg.haand) valg.haand(ctx, NK.tilVerden(armPositur, ANKER.laererArm, 28, 36));
+        ctx.restore();
+    }
+
     /* Kobler Kemichael paa forsoegets prototype */
     function paa(P, valg) {
         valg = valg || {};
@@ -627,7 +993,7 @@
 
         P.laererStart = function () {
             this.laerer = {
-                x: UDE, maalX: UDE, y: 392, loeb: false, gang: 0,
+                x: UDE, maalX: UDE, y: 392, loeb: false, fart: 0, gang: 0,
                 scene: null,
                 tale: "", taleUr: 0, taleAlfa: 0, taleLaengde: 0,
                 vrede: 0.5, humoer: -0.5, roed: 0, skeptisk: 0, briller: 0, laen: 0,
@@ -662,7 +1028,8 @@
             L.lukket = 0;
             L.kopV = 0;
             /* Nyt forsoeg: koppen staar paa hylden igen, saa paaskeaegget
-               kan komme en gang til */
+               kan komme en gang til, og uheldene taelles forfra */
+            uheldNu = 0;
             this.koppenVaek = false;
             if (this.g && this.g.kaffekop) {
                 this.g.kaffekop.skjult = false;
@@ -850,9 +1217,10 @@
             L.klik++;
             L.vredeMaal = 1;
             L.humoerMaal = -1;
-            if (L.klik <= 4) {
+            /* Hvor meget han finder sig i, afhaenger af dagsformen */
+            if (L.klik <= (dagen.taalmod || 4)) {
                 var navn = L.klik === 1 ? glimt("navn") : null;
-                var svar = navn || replik("prik" + L.klik);
+                var svar = navn || replik("prik" + Math.min(L.klik, 4));
                 this.laererSig(svar, taleTid(svar));
                 L.roedMaal = Math.min(1, 0.22 * L.klik);
                 return true;
@@ -883,6 +1251,78 @@
             if (NK.Lyd) NK.Lyd.mumle(Math.max(1, Math.min(8, Math.round(tekst.length / 5))));
         };
 
+        /* ----- Baggrundsliv -------------------------------------------------
+           Har forsoeget staaet uroert laenge, sker der noget af sig selv:
+           han gaar forbi med en kasse, eller han kigger ind og spoerger,
+           om det staar stille. Begge dele viger, saa snart eleven roerer
+           noget, og ingen af dem laaser forsoeget. */
+        P.laererRolig = function () {
+            if (this.travl && this.travl()) return false;
+            if (this.handling || this.baerer) return false;
+            if (this.laererOptaget && this.laererOptaget()) return false;
+            return true;
+        };
+
+        P.laererBaggrundsliv = function () {
+            var L = this.laerer;
+            if (!L || !baggrundsliv) return;
+            /* En scene, der er i gang, viger, saa snart eleven roerer noget */
+            if (L.scene && L.scene.baggrund) {
+                if (roerteSidst() > L.scene.startet) {
+                    L.scene = null;
+                    L.maalX = UDE;
+                    L.baerer = null;
+                    L.armTil = HAENGER;
+                    L.arm = HAENGER;
+                }
+                return;
+            }
+            if (L.scene || L.x > UDE + 1) return;
+            /* Ikke, mens fanen er skjult, eller en popup daekker scenen */
+            if (window.document && document.visibilityState === "hidden") return;
+            if (window.document && document.querySelector(".overlay.vis")) return;
+            if (stille() < STILLE_FOERSTE || sidenBaggrund() < STILLE_IGEN) return;
+            if (!this.laererRolig()) return;
+            if (Math.random() < 0.5) this.laererForbi();
+            else this.laererStilstand();
+        };
+
+        /* Markerer scenen som baggrundsliv, saa den viger for eleven */
+        function baggrund(L) {
+            L.scene.baggrund = true;
+            L.scene.startet = roerteSidst();
+            baggrundNu();
+        }
+
+        /* Han gaar tvaers over med en kasse og siger som regel ingenting */
+        P.laererForbi = function () {
+            var sig = Math.random() < 0.4 ? [{ sig: replik("forbi"), vis: 2.4, tid: 0.3 }] : [];
+            this.laererKoer("forbi", [
+                { udtryk: { vrede: 0.3, humoer: -0.1, roed: 0, skeptisk: 0, briller: 0, laen: 0 } },
+                { arm: 1.95, tid: 0.01 },
+                { kald: function () { this.laerer.baerer = "kasse"; } },
+                { gaa: 210, fart: 250 }
+            ].concat(sig, [
+                { gaa: function () { return S.BREDDE + 220; }, fart: 250 },
+                { kald: function () { this.laerer.baerer = null; this.laerer.x = UDE; this.laerer.maalX = UDE; this.laerer.arm = HAENGER; } }
+            ]), false);
+            baggrund(this.laerer);
+        };
+
+        /* Han kigger ind fra kanten og spoerger, om det staar stille */
+        P.laererStilstand = function () {
+            this.laererKoer("stilstand", [
+                { udtryk: { vrede: 0.3, humoer: -0.1, roed: 0, briller: 1, laen: 1 } },
+                { gaa: KANT },
+                { tid: 0.4 },
+                { sig: replik("stilstand"), vis: 3.0, tid: 2.2 },
+                { udtryk: { briller: 0, laen: 0 } },
+                { taleFaerdig: true },
+                { gaa: UDE }
+            ], false);
+            baggrund(this.laerer);
+        };
+
         /* ----- Tidens gang ------------------------------------------------- */
         P.opdaterLaerer = function (dt) {
             var L = this.laerer;
@@ -903,9 +1343,10 @@
                     continue;
                 }
                 if (tr.udtryk) {
+                    /* Dagsformen flytter ansigtet en smule i alle scener */
                     var u = tr.udtryk;
-                    if (u.vrede !== undefined) L.vredeMaal = u.vrede;
-                    if (u.humoer !== undefined) L.humoerMaal = u.humoer;
+                    if (u.vrede !== undefined) L.vredeMaal = NK.klamp(u.vrede + (dagen.vrede || 0), 0, 1);
+                    if (u.humoer !== undefined) L.humoerMaal = NK.klamp(u.humoer + (dagen.humoer || 0), -1, 1);
                     if (u.roed !== undefined) L.roedMaal = u.roed;
                     if (u.skeptisk !== undefined) L.skeptiskMaal = u.skeptisk;
                     if (u.briller !== undefined) L.brillerMaal = u.briller;
@@ -915,7 +1356,7 @@
                 }
                 if (!tr.startet) {
                     tr.startet = true;
-                    if (tr.gaa !== undefined) { L.maalX = typeof tr.gaa === "function" ? tr.gaa.call(this) : tr.gaa; L.loeb = !!tr.loeb; }
+                    if (tr.gaa !== undefined) { L.maalX = typeof tr.gaa === "function" ? tr.gaa.call(this) : tr.gaa; L.loeb = !!tr.loeb; L.fart = tr.fart || 0; }
                     if (tr.sig) this.laererSig(tr.sig, tr.vis);
                     if (tr.arm !== undefined) { L.armFra = L.arm; L.armTil = tr.arm; }
                 }
@@ -932,9 +1373,10 @@
             }
 
             if (this.laererVentende) this.laererVentende();
+            this.laererBaggrundsliv();
 
             /* Gang */
-            var fart = L.loeb ? 820 : 430;
+            var fart = L.loeb ? 820 : (L.fart || 430);
             if (L.x !== L.maalX) {
                 var d = L.maalX - L.x;
                 L.x += Math.sign(d) * Math.min(Math.abs(d), fart * dt);
@@ -981,95 +1423,14 @@
         };
 
         /* ----- Tegning ----------------------------------------------------- */
-        P.tegnAnsigt = function (ctx, L) {
-            var i;
-            var b = L.briller || 0, gy = b * 13;
-            /* Roedme */
-            if (L.roed > 0.02) {
-                var g = ctx.createRadialGradient(55, 70, 10, 55, 66, 48);
-                g.addColorStop(0, "rgba(225, 50, 40, " + (0.5 * L.roed).toFixed(3) + ")");
-                g.addColorStop(1, "rgba(225, 50, 40, 0)");
-                ctx.fillStyle = g;
-                ctx.beginPath();
-                ctx.ellipse(55, 66, 40, 50, 0, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            /* Oejne: lukkede ved blink og suk; over brillerne kigger de op */
-            var lukket = L.blink > 0 || (L.lukket || 0) > 0.4;
-            for (i = 0; i < 2; i++) {
-                var ox = i === 0 ? 37 : 73;
-                if (lukket) {
-                    ctx.strokeStyle = "#2a2f36";
-                    ctx.lineWidth = 1.6;
-                    ctx.beginPath();
-                    ctx.moveTo(ox - 4, 61);
-                    ctx.lineTo(ox + 4, 61);
-                    ctx.stroke();
-                } else {
-                    ctx.fillStyle = "#ffffff";
-                    ctx.beginPath();
-                    ctx.ellipse(ox, 61, 5.2, 4.2 - L.vrede * 1.2, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = "#2a2f36";
-                    ctx.beginPath();
-                    ctx.arc(ox + 1.5, 61.5 - b * 2.2, 2.4, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-            /* Briller: glider ned ad naesen med b */
-            ctx.strokeStyle = "#23272e";
-            ctx.lineWidth = 2.4;
-            ctx.fillStyle = "rgba(200, 230, 255, 0.12)";
-            [37, 73].forEach(function (bx) {
-                ctx.beginPath();
-                ctx.arc(bx, 60 + gy, 12, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.stroke();
-            });
-            ctx.beginPath();
-            ctx.moveTo(49, 59 + gy); ctx.quadraticCurveTo(55, 55 + gy, 61, 59 + gy);
-            ctx.moveTo(25, 58 + gy); ctx.lineTo(15, 55 + gy * 0.4);
-            ctx.moveTo(85, 58 + gy); ctx.lineTo(95, 55 + gy * 0.4);
-            ctx.stroke();
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
-            ctx.lineWidth = 1.2;
-            ctx.beginPath();
-            ctx.arc(34, 56 + gy, 6, Math.PI * 1.1, Math.PI * 1.45);
-            ctx.arc(70, 56 + gy, 6, Math.PI * 1.1, Math.PI * 1.45);
-            ctx.stroke();
-            /* Bryn: vrede saenker de inderste ender. Skeptisk: det hoejre bryn
-               loeftes, og munden bliver skaev. Over brillerne loeftes begge */
-            var v = L.vrede, hm = Math.max(0, L.humoer), sk = L.skeptisk || 0;
-            ctx.strokeStyle = "#6d737a";
-            ctx.lineWidth = 4.2;
-            ctx.lineCap = "round";
-            ctx.beginPath();
-            ctx.moveTo(24, 42 + v * 1 - hm * 2 + sk * 2 - b * 3);
-            ctx.lineTo(47, 42 + v * 8 - hm * 3 + sk * 2 - b * 3);
-            ctx.moveTo(86, 42 + v * 1 - hm * 2 - sk * 11 - b * 3);
-            ctx.lineTo(63, 42 + v * 8 - hm * 3 - sk * 7 - b * 3);
-            ctx.stroke();
-            /* Mund under overskaegget */
-            var h = L.humoer;
-            ctx.strokeStyle = "#7a3b2e";
-            ctx.lineWidth = 2.4;
-            ctx.beginPath();
-            ctx.moveTo(45, 98 - h * 2 + sk * 1.5);
-            ctx.quadraticCurveTo(55, 98 + h * 7, 65, 98 - h * 2 - sk * 5);
-            ctx.stroke();
-            if (L.aaben > 0.05) {
-                ctx.fillStyle = "#4a1f18";
-                ctx.beginPath();
-                ctx.ellipse(55, 99 + h * 2, 5.5, 1 + 4.5 * L.aaben, 0, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        };
-
+        P.tegnAnsigt = function (ctx, L) { tegnAnsigt(ctx, L); };
         P.tegnBaaret = function (ctx, L) {
             if (!L.baerer) return;
             var hd = this.laererHaand();
             if (L.baerer === "kaffekop") {
                 NK.Sprites.tegnPositur(ctx, "kaffekop", { x: hd.x + 8, y: hd.y + 26, v: L.kopV || 0 }, S.ANKER.kaffekop);
+            } else if (L.baerer === "kasse") {
+                tegnKasse(ctx, hd.x + 2, hd.y + 14);
             } else if (this.tegnBaaretEkstra) {
                 this.tegnBaaretEkstra(ctx, L, hd);
             }
@@ -1144,14 +1505,21 @@
         GLIMT: GLIMT,
         REPLIKKER: REPLIKKER,
         KAFFE: KAFFE,
+        DAGSFORM: DAGSFORM,
         tegnTaleboble: tegnTaleboble,
+        tegneserieFigur: tegneserieFigur,
         taleTid: taleTid,
         replik: replik,
+        dagsform: dagsform,
         kaffeTvang: kaffeTvang,
+        baggrundsliv: slaaBaggrundsliv,
         paa: paa,
         glimt: glimt,
         glimtTrin: glimtTrin,
         uheld: uheld,
+        uheldIForsoeget: uheldIForsoeget,
+        oprydningsTekst: oprydningsTekst,
+        ros: ros,
         glimtNulstil: glimtNulstil,
         suk: suk
     };

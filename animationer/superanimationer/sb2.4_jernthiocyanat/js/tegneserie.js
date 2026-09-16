@@ -330,6 +330,20 @@
                 });
             });
 
+            /* Ryddede han op undervejs, faar han en rude foer skemaet */
+            var K = NK.Kemichael;
+            if (K.uheldIForsoeget()) {
+                rude(container, ++nr, K.oprydningsTekst(), function (ctx) {
+                    K.tegneserieFigur(ctx, {
+                        x: 150, gulv: GLAS_Y + 162, skala: 0.46, arm: 2.05,
+                        udtryk: { vrede: 0.9, humoer: -0.8, roed: 0.2, lukket: 1 },
+                        haand: function (c, hd) {
+                            NK.Sprites.tegnPositur(c, "papir", { x: hd.x + 6, y: hd.y + 8, v: 0.2 }, NK.Scene.ANKER.papir);
+                        }
+                    });
+                });
+            }
+
             /* 7. Resultatskemaet i sidste rude */
             var sidste = document.createElement("div");
             sidste.className = "rude skema-rude";

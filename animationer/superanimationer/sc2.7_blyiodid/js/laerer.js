@@ -47,7 +47,7 @@
             { sig: paaKurven ? "Flot. Punkterne ligger på kurven." : "Tre målinger. Sammenlign med kurven.", vis: 2.6, tid: 2.6,
               hver: function (t) { this.laerer.nik = Math.sin(t * Math.PI * 3) * 5; } },
             { kald: function () { this.laerer.nik = 0; } }
-        ].concat(paaKurven ? K.glimtTrin("laege") : [], [
+        ].concat(paaKurven ? K.glimtTrin("laege") : [], K.ros(), [
             { gaa: UDE }
         ]), false);
     };
