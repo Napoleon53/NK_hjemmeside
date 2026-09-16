@@ -222,12 +222,19 @@
 
   var STANDARD_BELON = [
     { krav:100,  tekst:'Musik i arbejdsfaser' },
-    { krav:250,  tekst:'Frit pladsvalg i ét modul' },
+    { krav:250,  tekst:'Demonstrationsforsøg sidst i modulet' },
     { krav:450,  tekst:'Fem minutters ekstra pause' },
-    { krav:700,  tekst:'Kage eller frugt til holdet' },
-    { krav:1000, tekst:'Holdet vælger aktiviteten i et modul' }
+    { krav:700,  tekst:'Godbid til holdet' },
+    { krav:1000, tekst:'Kemishow med de store forsøg' }
   ];
+  // Gamle standardtekster, der skal skiftes ud i klasser, der allerede er gemt.
+  var GAMLE_TEKSTER = {
+    'Frit pladsvalg i ét modul':'Demonstrationsforsøg sidst i modulet',
+    'Kage eller frugt til holdet':'Godbid til holdet',
+    'Holdet vælger aktiviteten i et modul':'Kemishow med de store forsøg'
+  };
 
+  var EKSTRA_INTERVAL = 300;
   var STORE_KEY = 'normer.klasser';
   var lagerOk = (function(){ try{ localStorage.getItem(STORE_KEY); return true; }catch(e){ return false; } })();
   if(!lagerOk) document.getElementById('ingenLager').hidden = false;
@@ -242,7 +249,14 @@
     if(lagerOk){
       try{
         var d = JSON.parse(localStorage.getItem(STORE_KEY));
-        if(d && d.klasser) return d;
+        if(d && d.klasser){
+          Object.keys(d.klasser).forEach(function(navn){
+            (d.klasser[navn].belonninger || []).forEach(function(b){
+              if(GAMLE_TEKSTER[b.tekst]) b.tekst = GAMLE_TEKSTER[b.tekst];
+            });
+          });
+          return d;
+        }
       }catch(e){}
     }
     return { klasser:{}, aktiv:null };
@@ -394,7 +408,7 @@
       krav.className = 'krav';
       krav.textContent = (naaet ? '✓ ' : '') + b.krav + 'p';
       var inp = document.createElement('input');
-      inp.type = 'text'; inp.value = b.tekst;
+      inp.type = 'text'; inp.value = b.tekst; inp.title = b.tekst;
       inp.disabled = !k;
       inp.addEventListener('change', function(){
         liste[i].tekst = inp.value.trim() || ('Belønning ' + (i+1));
@@ -414,9 +428,33 @@
         ? (naeste.krav - point) + ' point til: ' + naeste.tekst
         : 'Opret en klasse for at samle point.';
     } else {
-      document.getElementById('maalerFyld').style.width = '100%';
-      document.getElementById('naeste').textContent = 'Alle belønninger er låst op.';
+      // Stigen er kørt til ende. Herefter gentages topbelønningen som ekstrarunder.
+      var top = liste[liste.length - 1];
+      var over = point - top.krav;
+      var runder = ekstraRunder(point, liste);
+      document.getElementById('maalerFyld').style.width = (over % EKSTRA_INTERVAL) / EKSTRA_INTERVAL * 100 + '%';
+      document.getElementById('naeste').textContent =
+        (EKSTRA_INTERVAL - (over % EKSTRA_INTERVAL)) + ' point til en ekstrarunde: ' + top.tekst +
+        (runder ? ' (optjent ' + runder + (runder === 1 ? ' gang)' : ' gange)') : '');
+
+      var li = document.createElement('li');
+      li.className = runder ? 'naaet' : 'laast';
+      var krav = document.createElement('span');
+      krav.className = 'krav';
+      krav.textContent = (runder ? '✓ ' : '') + '+' + EKSTRA_INTERVAL + 'p';
+      var txt = document.createElement('span');
+      txt.style.flex = '1';
+      txt.textContent = 'Ekstrarunde: ' + top.tekst;
+      li.appendChild(krav); li.appendChild(txt);
+      belonEl.appendChild(li);
     }
+  }
+
+  // Efter den sidste belønning gentages topbelønningen for hver EKSTRA_INTERVAL point.
+  function ekstraRunder(point, liste){
+    var top = liste[liste.length - 1];
+    if(point < top.krav) return 0;
+    return Math.floor((point - top.krav) / EKSTRA_INTERVAL);
   }
 
   // ---------- Gem modul ----------
@@ -441,12 +479,16 @@
     k.moduler.sort(function(a,b){ return a.dato < b.dato ? -1 : (a.dato > b.dato ? 1 : 0); });
     var gemt = skriv();
     var efter = samletPoint();
-    var laast = k.belonninger.filter(function(b){ return b.krav > foer && b.krav <= efter; });
+    var laast = k.belonninger.filter(function(b){ return b.krav > foer && b.krav <= efter; })
+                             .map(function(b){ return b.tekst; });
+    if(ekstraRunder(efter, k.belonninger) > ekstraRunder(foer, k.belonninger)){
+      laast.push('ekstrarunde med ' + k.belonninger[k.belonninger.length - 1].tekst);
+    }
     var besked = document.getElementById('gemBesked');
     besked.textContent = gemt ? 'Gemt.' : 'Talt med, men ikke gemt i browseren.';
     besked.className = gemt ? 'muted' : 'fejl';
     var tekst = '+' + point + ' point til ' + aktiv;
-    if(laast.length) tekst += '\nBelønning låst op: ' + laast.map(function(b){ return b.tekst; }).join(', ');
+    if(laast.length) tekst += '\nBelønning låst op: ' + laast.join(', ');
     fanfare(tekst);
     scores = tomScore();
     document.getElementById('note').value = '';
