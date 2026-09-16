@@ -173,7 +173,8 @@ Lugen (udstyr `luge`, `{ type: "luge", til: "stinkskab", skilt: "..." }`) er et
 gennemrækningsskab: glas stilles på hylden i den, og et klik på knappen
 sender dem til lugen i det andet rum, med termometer og indhold.
 
-Stinkskabet er et valg på rummet (`stinkskab: { x0, x1, top, aabning }`):
+Stinkskabet er et valg på rummet (`stinkskab: { x0, x1, top, aabning, rude }`,
+`rude: false` tegner ingen rude foran udstyret):
 kabinettet tegnes bag udstyret og ruden foran, udsugningen trækker dampe op,
 og gas-hændelser får `iStinkskab`, så et forsøg kan skelne mellem farlige
 dampe inde og ude. Mønster: `proeverum/` (forrum, kemikaliedepot, prøvebord,

@@ -958,6 +958,8 @@
         var Sc = S(), BORD = Sc.BORD, x0 = sk.x0, x1 = sk.x1, b = x1 - x0;
         var top = sk.top === undefined ? 92 : sk.top;
         var bund = BORD - (sk.aabning === undefined ? 150 : sk.aabning);
+        /* rude: false: ruden er skubbet helt op, saa den ikke daekker noget */
+        if (sk.rude === false || bund <= top + 10) return;
         ctx.save();
         var g = ctx.createLinearGradient(x0, top, x1, bund);
         g.addColorStop(0, "rgba(200, 225, 245, 0.10)");

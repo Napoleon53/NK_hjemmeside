@@ -172,7 +172,7 @@
             },
             {
                 navn: "stinkskab", titel: "Stinkskabet",
-                valg: { bredde: BREDDE, hoejde: 600, bord: 500, hylder: [{ x0: 16, x1: 220, y: 268 }, { x0: 400, x1: 700, y: HYLDE }], stinkskab: { x0: 340, x1: 1300, top: 92, aabning: 150 }, bobleR: 128, partikler: 6 },
+                valg: { bredde: BREDDE, hoejde: 600, bord: 500, hylder: [{ x0: 16, x1: 220, y: 268 }, { x0: 400, x1: 700, y: HYLDE }], stinkskab: { x0: 340, x1: 1300, top: 92, rude: false }, bobleR: 128, partikler: 6 },
                 opstilling: STINKSKAB
             }
         ]

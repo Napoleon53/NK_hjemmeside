@@ -124,9 +124,18 @@
         }
         this.pilAlfa = 0;
         if (NK.Lyd && NK.Lyd.klik) NK.Lyd.klik();
+        this.opdaterSus();
         if (this.vedSkift) this.vedSkift(til, fra);
         if (this.vedAendring) this.vedAendring("rum", til);
         return true;
+    };
+
+    /* Udsugningen suser, mens man staar i et rum med stinkskab
+       (stinkskab.lyd: false slaar det fra) */
+    P.opdaterSus = function () {
+        if (!NK.Lyd || !NK.Lyd.udsugning) return;
+        var sk = this.nu.bord.stinkskab;
+        NK.Lyd.udsugning(!!(sk && sk.lyd !== false && sk.taendt !== false));
     };
 
     /* ----- Lugen ------------------------------------------------------------- */
@@ -277,6 +286,7 @@
         var forrige = this.nu;
         this.nu = start;
         start.bord.saetScene();
+        this.opdaterSus();
         if (forrige !== start && this.vedSkift) this.vedSkift(start, forrige);
     };
 

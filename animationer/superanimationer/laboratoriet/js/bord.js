@@ -779,7 +779,7 @@
                     /* En flaske har en smal hals: tuden skal staa lige over den, ellers
                        saettes det, man baerer, ned mellem flaskerne */
                     var ob = B.aabning(c);
-                    ramt = Math.abs(tud.x - ob.x) < 10 && tud.y > ob.y - 40 && tud.y < ob.y + 10;
+                    ramt = Math.abs(tud.x - ob.x) < 6 && tud.y > ob.y - 22 && tud.y < ob.y + 6;
                 } else {
                     ramt = tud.x > rk.x - 14 && tud.x < rk.x + rk.b + 14 && tud.y > rk.y - 90 && tud.y < rk.y + rk.h * 0.6;
                 }
@@ -836,12 +836,15 @@
        foran bordkanten, falder den paa gulvet. */
     P.saetNed = function (gg, pt) {
         var S = NK.Scene, t = gg.type;
+        /* Genstanden lander der, hvor den er, ikke der, hvor musen er: den
+           kan vaere grebet i kanten */
+        var fod = this.fod(gg);
         if (pt && pt.y > S.BORD + 30) return this.tab(gg);
-        var x = NK.klamp(pt ? pt.x : gg.p.x, 40, S.BREDDE - 40);
-        /* Paa en hylde, hvis den slippes lige over den */
+        var x = NK.klamp(t.sprite ? fod.x : gg.p.x, 40, S.BREDDE - 40);
+        /* Paa en hylde, hvis foden er lige over den */
         var hylde = null;
         (S.HYLDER || []).forEach(function (H) {
-            if (pt && pt.x > H.x0 - 10 && pt.x < H.x1 + 10 && pt.y > H.y - 150 && pt.y < H.y + 12) hylde = H;
+            if (fod.x > H.x0 - 10 && fod.x < H.x1 + 10 && fod.y > H.y - 60 && fod.y < H.y + 40) hylde = H;
         });
         if (hylde && t.sprite && t.navn !== "reagensglas") {
             gg.p = staar(t, NK.klamp(x, hylde.x0 + t.b / 2, hylde.x1 - t.b / 2), hylde.y);

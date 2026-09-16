@@ -106,24 +106,37 @@
                     var gammel = sus;
                     sus = null;
                     try {
-                        gammel.g.gain.setTargetAtTime(0, c.currentTime, 0.15);
-                        gammel.kilde.stop(c.currentTime + 0.6);
+                        gammel.g.gain.setTargetAtTime(0, c.currentTime, 0.3);
+                        gammel.kilde.stop(c.currentTime + 1.2);
+                        if (gammel.lfo) gammel.lfo.stop(c.currentTime + 1.2);
                     } catch (fejl) {}
                 }
                 return;
             }
             if (sus || !c) return;
-            var kilde = stoej(c, 2, function () { return 1; });
+            /* Et dybt, blidt sus: stoej gennem to lave filtre, saa der ingen
+               hvislen er, med en langsom boelgen som fra en ventilator */
+            var kilde = stoej(c, 3, function () { return 1; });
             kilde.loop = true;
-            var f = c.createBiquadFilter();
-            f.type = "lowpass";
-            f.frequency.setValueAtTime(420, c.currentTime);
+            var f1 = c.createBiquadFilter();
+            f1.type = "lowpass";
+            f1.frequency.setValueAtTime(150, c.currentTime);
+            f1.Q.setValueAtTime(0.6, c.currentTime);
+            var f2 = c.createBiquadFilter();
+            f2.type = "lowpass";
+            f2.frequency.setValueAtTime(320, c.currentTime);
             var g = c.createGain();
             g.gain.setValueAtTime(0, c.currentTime);
-            g.gain.setTargetAtTime(0.05, c.currentTime, 0.4);
-            kilde.connect(f).connect(g).connect(c.destination);
+            g.gain.setTargetAtTime(0.028, c.currentTime, 0.8);
+            var lfo = c.createOscillator();
+            lfo.frequency.setValueAtTime(0.23, c.currentTime);
+            var dybde = c.createGain();
+            dybde.gain.setValueAtTime(0.006, c.currentTime);
+            lfo.connect(dybde).connect(g.gain);
+            lfo.start();
+            kilde.connect(f1).connect(f2).connect(g).connect(c.destination);
             kilde.start();
-            sus = { kilde: kilde, g: g };
+            sus = { kilde: kilde, g: g, lfo: lfo };
         },
 
         skvulp: function (styrke) {

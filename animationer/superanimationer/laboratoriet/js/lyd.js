@@ -107,24 +107,37 @@
                     var gammel = sus;
                     sus = null;
                     try {
-                        gammel.g.gain.setTargetAtTime(0, c.currentTime, 0.15);
-                        gammel.kilde.stop(c.currentTime + 0.6);
+                        gammel.g.gain.setTargetAtTime(0, c.currentTime, 0.3);
+                        gammel.kilde.stop(c.currentTime + 1.2);
+                        if (gammel.lfo) gammel.lfo.stop(c.currentTime + 1.2);
                     } catch (fejl) {}
                 }
                 return;
             }
             if (sus || !c) return;
-            var kilde = stoej(c, 2, function () { return 1; });
+            /* Et dybt, blidt sus: stoej gennem to lave filtre, saa der ingen
+               hvislen er, med en langsom boelgen som fra en ventilator */
+            var kilde = stoej(c, 3, function () { return 1; });
             kilde.loop = true;
-            var f = c.createBiquadFilter();
-            f.type = "lowpass";
-            f.frequency.setValueAtTime(420, c.currentTime);
+            var f1 = c.createBiquadFilter();
+            f1.type = "lowpass";
+            f1.frequency.setValueAtTime(150, c.currentTime);
+            f1.Q.setValueAtTime(0.6, c.currentTime);
+            var f2 = c.createBiquadFilter();
+            f2.type = "lowpass";
+            f2.frequency.setValueAtTime(320, c.currentTime);
             var g = c.createGain();
             g.gain.setValueAtTime(0, c.currentTime);
-            g.gain.setTargetAtTime(0.05, c.currentTime, 0.4);
-            kilde.connect(f).connect(g).connect(c.destination);
+            g.gain.setTargetAtTime(0.028, c.currentTime, 0.8);
+            var lfo = c.createOscillator();
+            lfo.frequency.setValueAtTime(0.23, c.currentTime);
+            var dybde = c.createGain();
+            dybde.gain.setValueAtTime(0.006, c.currentTime);
+            lfo.connect(dybde).connect(g.gain);
+            lfo.start();
+            kilde.connect(f1).connect(f2).connect(g).connect(c.destination);
             kilde.start();
-            sus = { kilde: kilde, g: g };
+            sus = { kilde: kilde, g: g, lfo: lfo };
         },
 
         /* Vaeske, der skvulper i et glas: bloed, dyb og uden skarp ansats */
@@ -142,13 +155,17 @@
             for (var i = 0; i < 5; i++) tone(c, nu + i * 0.045 + Math.random() * 0.02, 2200 + Math.random() * 1800, 900 + Math.random() * 600, 0.09, 0.07);
         },
 
+        /* Haeldning: et sammenhaengende, blidt sus af vaeske med et par
+           kluk undervejs. varighed i sekunder. */
         haeld: function (varighed) {
             var c = klar(); if (!c) return;
             var nu = c.currentTime;
-            var n = Math.round(varighed * 11);
+            var d = Math.max(0.3, varighed);
+            filtreretStoej(c, nu, d, "bandpass", 420, 1.2, 0.09, function (r) { var p = 1 - r; return Math.sin(Math.PI * Math.min(1, p * 4)) * (p < 0.25 ? 1 : 0.7 + 0.3 * Math.sin(p * 40)); });
+            var n = Math.max(1, Math.round(d * 2.5));
             for (var i = 0; i < n; i++) {
-                var t = nu + i * (varighed / n) + Math.random() * 0.03;
-                filtreretStoej(c, t, 0.07, "bandpass", 280 + Math.random() * 520, 5, 0.2);
+                var t = nu + 0.08 + i * (d / n) + Math.random() * 0.12;
+                if (t < nu + d - 0.05) tone(c, t, 210 + Math.random() * 60, 120, 0.07, 0.05, "sine");
             }
         },
 
@@ -205,8 +222,9 @@
         brum: function () {
             var c = klar(); if (!c) return;
             var nu = c.currentTime;
-            tone(c, nu, 120, 88, 0.42, 0.16, "sawtooth", 520);
-            tone(c, nu + 0.02, 122, 90, 0.4, 0.06, "square", 380);
+            /* Et "hm" med lukket mund: bloed trekantboelge, lavt filtreret */
+            tone(c, nu, 112, 94, 0.45, 0.09, "triangle", 360);
+            tone(c, nu + 0.03, 224, 188, 0.4, 0.02, "sine");
         },
 
         /* Mumlen, mens laereren taler: korte stavelser */
