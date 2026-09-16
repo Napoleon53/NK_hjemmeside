@@ -69,6 +69,8 @@
             korn: !!e.korn,
             atomer: e.atomer || null,
             dHfort: e.dHfort || 0,
+            /* cRef: koncentrationen (mM), som dHfort regnes fra (flaskens) */
+            cRef: e.cRef || 0,
             indikator: e.indikator || null,
             /* flamme: farven, stoffet giver en flamme (flammeproeve) */
             flamme: e.flamme || null
@@ -228,17 +230,28 @@
         return ud;
     }
 
-    /* Fortyndingsvarmen, naar stofferne i 'fra' fortyndes fra V1 til V2:
-       en andel af den fulde fortyndingsvarme, svarende til hvor meget
-       koncentrationen falder. Returnerer J. */
-    function fortyndingsVarme(fra, V1, V2) {
-        var J = 0;
-        if (V1 <= 1e-9 || V2 <= V1) return 0;
-        for (var s in fra.n) {
-            if (!Object.prototype.hasOwnProperty.call(fra.n, s)) continue;
+    /* Fortyndingsvarmen er en tilstandsfunktion af koncentrationen: n µmol
+       ved c mM har afgivet -dHfort · n · (1 - c/cRef) siden flasken (cRef).
+       Ved blanding frigives forskellen, saa syre i syre giver ingen varme,
+       og syre haeldt i smaa portioner giver det samme som paa én gang. */
+    function fortyndingsTilstand(st, n, c) {
+        if (!n || !st.cRef) return 0;
+        return -st.dHfort * 1000 * n * 1e-6 * (1 - Math.min(1, c / st.cRef));
+    }
+
+    /* Varmen (J), naar til og d blandes til V mL */
+    function fortyndingsVarme(til, d, V) {
+        var J = 0, set = {};
+        [til, d].forEach(function (o) { for (var s in o.n) if (Object.prototype.hasOwnProperty.call(o.n, s)) set[s] = true; });
+        for (var s in set) {
+            if (!Object.prototype.hasOwnProperty.call(set, s)) continue;
             var st = STOFFER[s];
             if (!st || !st.dHfort) continue;
-            J += -st.dHfort * 1000 * fra.n[s] * 1e-6 * (1 - V1 / V2);
+            var n1 = til.n[s] || 0, n2 = d.n[s] || 0;
+            if (n1 + n2 <= 0 || V <= 1e-9) continue;
+            var foer = fortyndingsTilstand(st, n1, til.V > 1e-9 ? n1 / til.V : st.cRef) + fortyndingsTilstand(st, n2, d.V > 1e-9 ? n2 / d.V : st.cRef);
+            var efter = fortyndingsTilstand(st, n1 + n2, (n1 + n2) / V);
+            J += efter - foer;
         }
         return J;
     }
@@ -247,7 +260,7 @@
        fortyndingsvarmen. */
     function bland(til, d) {
         var V = til.V + d.V;
-        var J = fortyndingsVarme(til, til.V, V) + fortyndingsVarme(d, d.V, V);
+        var J = fortyndingsVarme(til, d, V);
         if (V > 1e-9) til.T = (til.T * til.V + d.T * d.V) / V + J / (V * VARMEKAP);
         til.V = V;
         for (var s in d.n) if (Object.prototype.hasOwnProperty.call(d.n, s)) tilsaet(til, s, d.n[s]);

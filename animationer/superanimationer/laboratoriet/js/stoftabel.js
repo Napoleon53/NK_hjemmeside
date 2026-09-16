@@ -41,8 +41,8 @@
 
     /* Koncentrerede syrer: molekylet holder, til det er fortyndet, og
        fortyndingen varmer */
-    St.def("H2SO4",   { M: 98.1, formel: "H₂SO₄", q: 0, navn: "koncentreret svovlsyre", atomer: { H: 2, S: 1, O: 4 }, dHfort: -95 });
-    St.def("HNO3",    { M: 63, formel: "HNO₃", q: 0, navn: "koncentreret salpetersyre", atomer: { H: 1, N: 1, O: 3 }, dHfort: -33 });
+    St.def("H2SO4",   { M: 98.1, formel: "H₂SO₄", q: 0, navn: "koncentreret svovlsyre", atomer: { H: 2, S: 1, O: 4 }, dHfort: -95, cRef: 18000 });
+    St.def("HNO3",    { M: 63, formel: "HNO₃", q: 0, navn: "koncentreret salpetersyre", atomer: { H: 1, N: 1, O: 3 }, dHfort: -33, cRef: 14000 });
 
     /* ----- Indikatorer ---------------------------------------------------- */
     St.def("phph", { formel: "phenolphthalein", q: 0, navn: "phenolphthalein", k: 6, indikator: { pKa: 9.4, syre: null, base: { r: 230, g: 60, b: 140 } } });

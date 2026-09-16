@@ -45,12 +45,16 @@ js/tegning.js        baggrund, plakat, væske, bundfald, korn, etiketter, stav,
 js/mikro.js          zoomboblen: én kugle pr. partikel med formlen på
 js/bord.js           bordet: genstande, greb og slip, møder afgjort af
                      egenskaber, stativ og varmeplade, uheld, tidens gang, tegning
+js/rum.js            rummene: flere borde på ét lærred, pile og piletaster,
+                     glidning, det man bærer kommer med, lugen, stinkskabet
 css/grund.css        farver, toplinje, scene og panel, kort, forløb, quiz,
                      knapper, overlays, tegneserie og rundvisning
 sprites/             generisk glasudstyr uden etiketter (etiketten tegnes i koden)
 proevebord/          det frie bord: index.html, css/stil.css, js/stoffer.js
                      (stoffer, reaktioner, opstilling), js/laerer.js, js/tur.js,
                      js/app.js, _selvtest.html
+proeverum/           tre rum med luge og stinkskab: js/plan.js (rummene),
+                     js/app.js, js/tur.js, _selvtest.html
 ```
 
 ## Kemilogikken
@@ -116,8 +120,21 @@ Hældning med hånden: holdes en flaske stille over et glas, vipper den efter
 0,3 s og hælder, så længe den holdes der (`opdaterHaeldning`; farten pr. type
 i `HAELD.fart`). Strålen lander, hvor tuden er, så ved siden af glasset hældes
 der på bordet. Dråbeflasken drypper, sprøjteflasken sprøjter og vejebåden
-drysser på samme måde. Et hurtigt slip over glasset giver én standardportion
-(`haeldMl`). Målet sigtes med tuden, ikke med musen.
+drysser på samme måde. Et hurtigt slip over glasset giver én portion:
+flaskens standardportion (`haeldMl`), dog højst en femtedel af glasset
+(`portion`). Målet sigtes med tuden, ikke med musen.
+
+Det, der lige er brugt, bliver hængende: flasken bliver i hældepositur
+over glasset, dråbeflasken, sprøjteflasken og spatlen bliver i luften over
+det, de blev brugt på (`svaev`, `svaevVed`). En gul ring med en pil ved
+siden af viser, at et klik gentager handlingen (en portion til, en dråbe
+til, en spatelspids til). Resten af bordet venter, til det trækkes væk; så
+går det hjem. Der tegnes ingen hånd.
+
+Fortyndingsvarmen (`dHfort`, `cRef` i stoftabellen) er en tilstandsfunktion
+af koncentrationen, så syre i syre giver ingen varme, og syre hældt i små
+portioner giver det samme som på én gang. Lige dele koncentreret svovlsyre
+og vand koger stadig; det er rigtigt.
 
 Klik viser, træk gør: et klik vælger det, der rummer noget, til aflæsning
 og zoom, og handlinger sker kun ved at trække. Undtagelser er kontakten på
@@ -128,6 +145,26 @@ Et nyt forsøg på modellen laver sin egen `js/stoffer.js` med stoffer,
 reaktioner og opstilling (`NK.OPSTILLING`, `NK.BORD_VALG`) og en
 `js/laerer.js` med sine egne scener. Forløbet skal kun genkende tilstanden
 (`vedHaendelse`, `vedAendring`), aldrig spærre for handlinger.
+
+## Rum
+
+`js/rum.js` gør laboratoriet til flere rum på ét lærred (`NK.Rum`). Hvert rum
+er et bord med sin egen opstilling og sine egne valg; kun det rum, man står
+i, tegnes og tager imod musen, mens de andre går stille videre
+(`opdaterStille`: varmeplader, reaktioner, termometre). Pilene i siderne og
+piletasterne fører til naborummene, rummet glider ind, og det, man bærer,
+kommer med (`tagUd`, `tagImod`). Alle rum har samme bredde og højde.
+
+Lugen (udstyr `luge`, `{ type: "luge", til: "stinkskab", skilt: "..." }`) er et
+gennemrækningsskab: glas stilles på hylden i den, og et klik på knappen
+sender dem til lugen i det andet rum, med termometer og indhold.
+
+Stinkskabet er et valg på rummet (`stinkskab: { x0, x1, top, aabning }`):
+kabinettet tegnes bag udstyret og ruden foran, udsugningen trækker dampe op,
+og gas-hændelser får `iStinkskab`, så et forsøg kan skelne mellem farlige
+dampe inde og ude. Mønster: `proeverum/` (forrum, prøvebord, stinkskab).
+Superanimationerne bruger indtil videre ét rum; rummene er til det senere
+spil.
 
 ## Sådan bruger et forsøg mappen
 
@@ -174,5 +211,5 @@ reaktioner og opstilling (`NK.OPSTILLING`, `NK.BORD_VALG`) og en
 * sb2.4 lægges over på genstandsmodellen som første rigtige forsøg; derefter
   sc6.8 og sc8.6.
 * Rammen for `quiz.js`, `tegneserie.js` og `app.js` samles.
-* Et rum, hvor forsøgene er stationer, man kan gå imellem. Prøvebordet er
-  den første station.
+* Et rum, hvor forsøgene er stationer, man kan gå imellem. Prøverummet er
+  motoren; prøvebordet er den første station.

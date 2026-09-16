@@ -781,4 +781,160 @@
         if (alfa <= 0.01) return;
         NK.Sprites.tegnPositur(ctx, "haand", p, NK.Udstyr.HAAND_ANKER, alfa);
     };
+
+    /* Den gule ring ved siden af det, der svaever. ring: { x, y, r } */
+    T.tegnSvaevRing = function (ctx, ring, tid, hover) {
+        var puls = 1 + 0.06 * Math.sin(tid * 4);
+        ctx.save();
+        NK.skaer(ctx, ring.x, ring.y, ring.r * 2.2 * puls, "rgba(242, 197, 61, 0.35)");
+        ctx.fillStyle = hover ? "rgba(242, 197, 61, 0.35)" : "rgba(20, 20, 26, 0.55)";
+        ctx.beginPath(); ctx.arc(ring.x, ring.y, ring.r * puls, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "#f2c53d";
+        ctx.lineWidth = 3.5;
+        ctx.stroke();
+        /* Pilen ned: "en portion til" */
+        ctx.strokeStyle = "#f7f0c8";
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        ctx.moveTo(ring.x, ring.y - 6); ctx.lineTo(ring.x, ring.y + 6);
+        ctx.moveTo(ring.x - 5, ring.y + 1); ctx.lineTo(ring.x, ring.y + 6); ctx.lineTo(ring.x + 5, ring.y + 1);
+        ctx.stroke();
+        ctx.restore();
+    };
+
+    /* ----- Rum: lugen og stinkskabet ---------------------------------------- */
+
+    /* Lugen (gennemraekningsskabet). tekst: skiltet, fx "TIL STINKSKABET"; lys:
+       0-1 naar den lige har sendt */
+    T.tegnLuge = function (ctx, gg, tekst, lys, tid) {
+        var t = gg.type, x = gg.p.x - gg.anker.x, y = gg.p.y - gg.anker.y;
+        T.skygge(ctx, x + t.b / 2, t.b / 2, 0.3, y + t.h - 3);
+        NK.Sprites.tegn(ctx, t.sprite, x, y);
+        if (tekst) NK.tekst(ctx, tekst, x + t.skilt.x + t.skilt.b / 2, y + t.skilt.y + t.skilt.h / 2 + 0.5, { font: "800 7.5px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#e9edf1" });
+        var kx = x + t.knap.x, ky = y + t.knap.y;
+        NK.kugle(ctx, kx, ky, 5, "#f7f0c8", "#b99a2a");
+        NK.tekst(ctx, "SEND", kx, ky + 14, { font: "800 5px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#2f343b" });
+        var lampe = lys > 0.01 ? lys : 0;
+        if (lampe > 0.01) NK.skaer(ctx, kx, ky + 24, 7, "rgba(126, 224, 168, 0.9)", lampe * (0.7 + 0.3 * Math.sin(tid * 8)));
+        NK.kugle(ctx, kx, ky + 24, 2.2, lampe > 0.3 ? "#c8ffd9" : "#3d4a42", lampe > 0.3 ? "#3fae72" : "#243029");
+    };
+
+    /* Stinkskabet: kabinettet bag udstyret. sk: { x0, x1, top, aabning } paa bordet */
+    T.tegnStinkskabBag = function (ctx, sk, tid) {
+        var Sc = S(), BORD = Sc.BORD, x0 = sk.x0, x1 = sk.x1, b = x1 - x0;
+        var top = sk.top === undefined ? 92 : sk.top;
+        ctx.save();
+        /* Bagvaeg med udsugningsslidser */
+        ctx.fillStyle = "#262b33";
+        ctx.fillRect(x0, top, b, BORD - top);
+        for (var y = top + 60; y < BORD - 30; y += 34) {
+            ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+            ctx.fillRect(x0 + 24, y, b - 48, 4);
+            ctx.fillStyle = "#1a1d23";
+            ctx.fillRect(x0 + 24, y + 4, b - 48, 2);
+        }
+        /* Loftskassen med ventilator og lys */
+        var g = ctx.createLinearGradient(0, top - 50, 0, top);
+        g.addColorStop(0, "#8d96a2");
+        g.addColorStop(1, "#5f6874");
+        ctx.fillStyle = g;
+        ctx.fillRect(x0 - 12, top - 50, b + 24, 52);
+        ctx.fillStyle = "rgba(255, 248, 225, 0.75)";
+        NK.rundtRekt(ctx, x0 + 30, top - 4, b - 60, 4, 2);
+        ctx.fill();
+        NK.skaer(ctx, x0 + b / 2, top + 20, 160, "rgba(255, 248, 225, 0.08)");
+        /* Ventilatoren drejer, naar skabet suger */
+        var vx = x0 + b / 2, vy = top - 25;
+        ctx.fillStyle = "#3a4049";
+        ctx.beginPath(); ctx.arc(vx, vy, 16, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "#aab3bd";
+        ctx.lineWidth = 2;
+        for (var k = 0; k < 4; k++) {
+            var v = tid * (sk.taendt === false ? 0 : 9) + k * Math.PI / 2;
+            ctx.beginPath(); ctx.moveTo(vx, vy); ctx.lineTo(vx + Math.cos(v) * 13, vy + Math.sin(v) * 13); ctx.stroke();
+        }
+        ctx.strokeStyle = "#dfe5ea";
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(vx, vy, 16, 0, Math.PI * 2); ctx.stroke();
+        NK.tekst(ctx, "STINKSKAB", x0 + 22, top - 25, { font: "800 11px 'Segoe UI', sans-serif", linje: "middle", farve: "#e9edf1" });
+        /* Hylder inde i skabet tegnes igen oven paa bagvaeggen */
+        (Sc.HYLDER || []).forEach(function (H) {
+            if (H.x0 < x0 || H.x1 > x1) return;
+            ctx.fillStyle = "#8d96a2";
+            ctx.fillRect(H.x0, H.y, H.x1 - H.x0, 7);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.35)";
+            ctx.fillRect(H.x0, H.y, H.x1 - H.x0, 1.5);
+            ctx.fillStyle = "#5f6874";
+            for (var hx = H.x0 + 10; hx < H.x1 - 12; hx += 180) ctx.fillRect(hx, H.y + 7, 5, 14);
+            ctx.fillRect(H.x1 - 15, H.y + 7, 5, 14);
+        });
+        /* Sidestolper */
+        ctx.fillStyle = "#6b747f";
+        ctx.fillRect(x0 - 12, top - 50, 12, BORD - top + 50);
+        ctx.fillRect(x1, top - 50, 12, BORD - top + 50);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
+        ctx.fillRect(x0 - 12, top - 50, 2, BORD - top + 50);
+        ctx.fillRect(x1, top - 50, 2, BORD - top + 50);
+        ctx.restore();
+    };
+
+    /* Stinkskabets glasrude foran udstyret. Ruden er skubbet op, saa der
+       er en aabning nederst (sk.aabning, standard 150) at arbejde i */
+    T.tegnStinkskabFor = function (ctx, sk) {
+        var Sc = S(), BORD = Sc.BORD, x0 = sk.x0, x1 = sk.x1, b = x1 - x0;
+        var top = sk.top === undefined ? 92 : sk.top;
+        var bund = BORD - (sk.aabning === undefined ? 150 : sk.aabning);
+        ctx.save();
+        var g = ctx.createLinearGradient(x0, top, x1, bund);
+        g.addColorStop(0, "rgba(200, 225, 245, 0.10)");
+        g.addColorStop(0.45, "rgba(200, 225, 245, 0.03)");
+        g.addColorStop(0.55, "rgba(255, 255, 255, 0.10)");
+        g.addColorStop(1, "rgba(200, 225, 245, 0.05)");
+        ctx.fillStyle = g;
+        ctx.fillRect(x0, top, b, bund - top);
+        /* Rudens ramme og haandtag */
+        ctx.fillStyle = "#8d96a2";
+        ctx.fillRect(x0, bund - 4, b, 10);
+        ctx.fillStyle = "#dfe5ea";
+        ctx.fillRect(x0, bund - 4, b, 1.5);
+        ctx.fillStyle = "#5f6874";
+        ctx.fillRect(x0 + b / 2 - 40, bund + 6, 80, 5);
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.25)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x0 + 0.5, top + 0.5, b - 1, bund - top - 1);
+        /* Refleks */
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.10)";
+        ctx.lineWidth = 6;
+        ctx.beginPath(); ctx.moveTo(x0 + b * 0.15, bund - 10); ctx.lineTo(x0 + b * 0.35, top + 10); ctx.stroke();
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(x0 + b * 0.22, bund - 10); ctx.lineTo(x0 + b * 0.42, top + 10); ctx.stroke();
+        ctx.restore();
+    };
+
+    /* Pilen til naborummet. side: "venstre" | "hoejre"; alfa 0-1 */
+    T.tegnRumpil = function (ctx, side, y, titel, alfa, tid) {
+        var Sc = S(), x = side === "venstre" ? 40 : Sc.BREDDE - 40;
+        var puls = 1 + 0.04 * Math.sin(tid * 3);
+        ctx.save();
+        ctx.globalAlpha = alfa;
+        NK.skaer(ctx, x, y, 34 * puls, "rgba(242, 197, 61, 0.35)");
+        ctx.fillStyle = "rgba(20, 20, 26, 0.85)";
+        ctx.beginPath(); ctx.arc(x, y, 24, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "#f2c53d";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.strokeStyle = "#f7f0c8";
+        ctx.lineWidth = 3.5;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        var d = side === "venstre" ? -1 : 1;
+        ctx.beginPath();
+        ctx.moveTo(x - d * 8, y); ctx.lineTo(x + d * 8, y);
+        ctx.moveTo(x + d * 1, y - 7); ctx.lineTo(x + d * 8, y); ctx.lineTo(x + d * 1, y + 7);
+        ctx.stroke();
+        if (titel) NK.tekst(ctx, titel, x, y + 40, { font: "700 12px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#f7f0c8" });
+        ctx.restore();
+    };
 }());

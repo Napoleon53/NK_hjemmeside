@@ -1,0 +1,10 @@
+/* =====================================================================
+   Proeverummet
+   Det, der er saerligt for denne side. Grundstilen og proevebordets
+   stilark (panelbredde, zoomboble, aflaesning, ideer) indlaeses foer.
+   ===================================================================== */
+
+/* Rumknapperne: det rum, man er i, er fremhaevet */
+.rumknapper { display: flex; gap: 6px; margin: 2px 0 8px; }
+.rumknapper .knap { flex: 1 1 0; padding: 7px 6px; font-size: 0.86rem; }
+.rumknapper .knap.aktiv { background-color: var(--gul); color: #1a1a1f; border-color: var(--gul); cursor: default; }

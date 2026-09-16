@@ -58,6 +58,8 @@ function koerTest() {
     function adv(sek) { for (var k = 0; k < Math.round(sek * 60); k++) bord.opdater(1 / 60); }
     function vent(betingelse, maks) { var t = 0; while (!betingelse() && t < maks) { adv(0.25); t += 0.25; } return t; }
     function faerdig() { vent(function () { return !bord.koer.igang(); }, 8); }
+    /* Det, der svaever, traekkes vaek (som med musen): det gaar hjem */
+    function vaek(gg) { if (!gg.svaev) return; gg.svaev = null; bord.koer.start([NK.Koer.hjemTil(gg, 0.3, 20)], "hjem"); faerdig(); }
     function V(c) { return B.volumen(c); }
     function n(c, s) { return B.samlet(c).n[s] || 0; }
     function frisk() { NK.startForfra(); adv(0.1); g = bord.g; }
@@ -89,12 +91,18 @@ function koerTest() {
     faerdig();
     paastand("baegerglasset har 10 mL", Math.abs(V(b100) - 10) < 0.3, V(b100).toFixed(2));
     paastand("flasken har 240 mL", Math.abs(V(g.fl_cu) - 240) < 0.3, V(g.fl_cu).toFixed(1));
+    paastand("flasken bliver haengende over baegerglasset", !!g.fl_cu.svaev && g.fl_cu.svaev.maal === b100 && g.fl_cu.p.y < b100.p.y, g.fl_cu.p.y.toFixed(0));
+    paastand("klik paa et andet glas afvises, mens flasken haenger", !bord.ned({ x: g.baeger250.p.x, y: g.baeger250.p.y + 20 }) && !bord.holdt);
+    paastand("klik paa flasken haelder en portion til", bord.klik("fl_cu"));
+    faerdig();
+    paastand("baegerglasset har 20 mL (flaskens portion er 10 mL, under en femtedel af 100 mL)", Math.abs(V(b100) - 20) < 0.3, V(b100).toFixed(2));
+    vaek(g.fl_cu);
     paastand("flasken er hjemme igen", Math.abs(g.fl_cu.p.x - g.fl_cu.hjem.x) < 1 && Math.abs(g.fl_cu.p.y - g.fl_cu.hjem.y) < 1);
     paastand("baegerglasset er valgt", bord.valgtBeholder() === b100);
     paastand("Cu²⁺ er 100 mM i baegerglasset", Math.abs(St.konc(B.samlet(b100), "Cu2+") - 100) < 1, St.konc(B.samlet(b100), "Cu2+").toFixed(1));
     paastand("haeld baegerglasset i glas 1", bord.haeld(b100, glas1, 5));
     faerdig();
-    paastand("glas 1 har 5 mL, baegerglasset 5 mL", Math.abs(V(glas1) - 5) < 0.3 && Math.abs(V(b100) - 5) < 0.3, V(glas1).toFixed(2) + " / " + V(b100).toFixed(2));
+    paastand("glas 1 har 5 mL, baegerglasset 15 mL", Math.abs(V(glas1) - 5) < 0.3 && Math.abs(V(b100) - 15) < 0.3, V(glas1).toFixed(2) + " / " + V(b100).toFixed(2));
     paastand("zoomboblen viser partikler", bord.mikro.partikler.length > 0, bord.mikro.partikler.length);
     paastand("partiklerne har formler med ladning", bord.mikro.partikler.every(function (p) { return p.tekst.length > 0; }) && bord.mikro.partikler.some(function (p) { return p.tekst === "Cu²⁺"; }));
     NK.opdaterPanel();
@@ -127,18 +135,21 @@ function koerTest() {
     var V3 = V(b250);
     bord.op();
     faerdig();
-    paastand("slip efter haeldning giver ingen portion oveni, og flasken gaar hjem", Math.abs(V(b250) - V3) < 0.01 && Math.abs(g.fl_cu.p.x - g.fl_cu.hjem.x) < 1, V(b250).toFixed(1));
+    paastand("slip efter haeldning giver ingen portion oveni, og flasken bliver haengende", Math.abs(V(b250) - V3) < 0.01 && !!g.fl_cu.svaev, V(b250).toFixed(1));
     paastand("kobberioner i baegerglasset", n(b250, "Cu2+") > 500, n(b250, "Cu2+").toFixed(0));
+    vaek(g.fl_cu);
     bord.ned({ x: g.fl_ki.p.x, y: g.fl_ki.p.y + 30 });
     hold(g.fl_ki, { x: b250.p.x + 5, y: b250.p.y - 30 }, 0.15);
     bord.op(); faerdig();
     paastand("et hurtigt slip giver én portion (10 mL)", Math.abs(V(b250) - V3 - 10) < 0.3, (V(b250) - V3).toFixed(1));
     var uheldH = bord.antalUheld;
+    vaek(g.fl_ki);
     bord.ned({ x: g.fl_hcl.p.x, y: g.fl_hcl.p.y + 30 });
     hold(g.fl_hcl, { x: b250.p.x + 62, y: b250.p.y - 40 }, 2.2);
     paastand("holdes tuden ved siden af glasset, haeldes der paa bordet", bord.antalUheld === uheldH + 1 && bord.pytter.length > 0 && Math.abs(V(b250) - V3 - 10) < 0.3, "uheld " + bord.antalUheld + ", V " + V(b250).toFixed(1));
     bord.op(); faerdig();
     vent(function () { return !bord.laerer.scene; }, 30);
+    vaek(g.fl_hcl);
     bord.ned({ x: g.ag.p.x, y: g.ag.p.y + 30 });
     hold(g.ag, { x: b250.p.x, y: b250.p.y - 40 }, 2.5);
     paastand("draabeflasken vender og drypper, mens den holdes", Math.abs(Math.abs(g.ag.p.v) - Math.PI) < 0.3 && V(g.ag) < 59.9, V(g.ag).toFixed(2) + " mL tilbage");
@@ -288,8 +299,10 @@ function koerTest() {
     vent(function () { return bord.draaber.length === 0; }, 4);
     adv(1);
     paastand("to draaber er 0,1 mL", Math.abs(V(g.ag) - 59.9) < 0.02, V(g.ag).toFixed(2));
-    vent(function () { return !g.ag.svaev && !bord.koer.igang(); }, 8);
-    paastand("flasken gaar hjem igen", Math.abs(g.ag.p.x - g.ag.hjem.x) < 1, g.ag.p.x.toFixed(0) + " / " + g.ag.hjem.x.toFixed(0));
+    adv(5);
+    paastand("flasken bliver haengende, til den traekkes vaek", !!g.ag.svaev && !bord.koer.igang());
+    vaek(g.ag);
+    paastand("flasken gaar hjem, naar den traekkes vaek", Math.abs(g.ag.p.x - g.ag.hjem.x) < 1, g.ag.p.x.toFixed(0) + " / " + g.ag.hjem.x.toFixed(0));
 
     bord.sproejt(g.vand, g.glas2); faerdig();
     paastand("tag en spatelspids NaCl", bord.fyldSpatel(g.spatel, g.pulver_nacl));

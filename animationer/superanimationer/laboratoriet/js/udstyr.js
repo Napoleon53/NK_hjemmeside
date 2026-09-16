@@ -260,6 +260,15 @@
             anker: { x: 0, y: 0 },
             kan: { maaler: true, ph: true },
             laengde: 100, titel: "pH-meteret"
+        },
+        /* Lugen: et gennemraekningsskab mellem to rum. Det, der stilles paa
+           hylden, sendes til det andet rum med et klik (NK.Rum) */
+        luge: {
+            sprite: "luge", fil: "luge.svg", b: 170, h: 160,
+            anker: { x: 0, y: 0 },
+            kan: { luge: true, fast: true },
+            plade: { x0: 24, x1: 146, y: 128 }, skilt: { x: 40, y: 10, b: 90, h: 12 }, knap: { x: 159, y: 70 },
+            titel: "lugen"
         }
     };
 

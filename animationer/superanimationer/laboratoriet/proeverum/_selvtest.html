@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest - Prøverummet</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:800px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i animationen og kan slettes.
+
+   Aabner index.html i en iframe og koerer rummene igennem: at gaa
+   mellem rum, at tage noget med, lugen, stinkskabet, at rummene gaar
+   videre, mens man er vaek, og start forfra. Skal aabnes gennem en
+   lokal server.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn + (note !== undefined ? "   (" + note + ")" : ""), "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+
+window.addEventListener("load", function () { setTimeout(koer, 1800); });
+
+function koer() {
+    try { koerTest(); } catch (e) { fejl++; skriv("UNDTAGELSE: " + e.message + "\n" + e.stack, "fejl"); }
+    vis();
+}
+
+function koerTest() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument;
+    var NK = ramme.contentWindow.NK;
+
+    overskrift("1. Indlaesning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var rum = NK.rum, B = NK.Beholder, St = NK.Stof;
+    paastand("rummene er bygget", !!rum && rum.rum.length === 3, rum && rum.rum.length);
+    paastand("man starter paa proevebordet", rum.nu.navn === "bord");
+    paastand("introen aabner og lukker", !!NK.intro && (NK.intro.aabn(), d.getElementById("intro").classList.contains("vis")) && (NK.intro.luk(), !d.getElementById("intro").classList.contains("vis")));
+    var alle = Object.keys(NK.Sprites.FILER);
+    var klar = alle.filter(function (n) { return NK.Sprites.klar(n); });
+    paastand("sprites er indlaest, ogsaa lugen", klar.length === alle.length && NK.Sprites.klar("luge"), klar.length + " af " + alle.length);
+
+    function adv(sek) { for (var k = 0; k < Math.round(sek * 60); k++) rum.opdater(1 / 60); }
+    function vent(betingelse, maks) { var t = 0; while (!betingelse() && t < maks) { adv(0.25); t += 0.25; } return t; }
+    function faerdig() { vent(function () { return !rum.aktiv().koer.igang(); }, 8); }
+    function V(c) { return B.volumen(c); }
+    function n(c, s) { return B.samlet(c).n[s] || 0; }
+    function bord() { return rum.aktiv(); }
+    function knapAktiv() { var k = d.querySelector("#rumknapper .knap.aktiv"); return k ? k.dataset.rum : null; }
+
+    overskrift("2. At gaa mellem rum");
+    var S = NK.Scene;
+    paastand("pilene peger paa naborummene", rum.nu.venstre.navn === "forrum" && rum.nu.hoejre.navn === "stinkskab");
+    paastand("pilen til hoejre traeffes", rum.pilVed({ x: S.BREDDE - 40, y: 200 }) === "hoejre" && rum.pilVed({ x: 400, y: 200 }) === null);
+    paastand("gaa til hoejre", rum.gaa("hoejre"));
+    paastand("rummet skifter med det samme, og glider ind", rum.nu.navn === "stinkskab" && !!rum.skift && rum.aktiv().forskyd > 100, rum.aktiv().forskyd.toFixed(0));
+    paastand("panelets knap foelger med", knapAktiv() === "stinkskab", knapAktiv());
+    paastand("mens det glider, kan man ikke gaa igen", !rum.gaa("venstre"));
+    adv(0.8);
+    paastand("efter glidningen staar rummet stille", !rum.skift && rum.aktiv().forskyd === 0);
+    paastand("stinkskabet har ingen nabo til hoejre", !rum.gaa("hoejre") && rum.nu.hoejre === null);
+    paastand("piletasten venstre gaar tilbage", rum.tast({ key: "ArrowLeft" }) && rum.nu.navn === "bord");
+    adv(0.8);
+    paastand("spring direkte til forrummet med knappen", rum.gaaTil("forrum", -1) && rum.nu.navn === "forrum");
+    adv(0.8);
+    paastand("forrummet har sin egen opstilling", !!bord().g.vask && !!bord().g.kolbe && !bord().g.plade);
+    rum.gaaTil("bord", 1); adv(0.8);
+
+    overskrift("3. Det, man har i haanden, kommer med");
+    var b = bord(), g = b.g;
+    b.haeld(g.fl_cu, g.baeger100, 30); faerdig();
+    g.fl_cu.svaev = null; b.koer.start([NK.Koer.hjemTil(g.fl_cu, 0.3, 20)], "hjem"); faerdig();
+    b.startBaer(g.baeger100);
+    var baeger = g.baeger100;
+    paastand("baegerglasset er i haanden", b.baerer === baeger);
+    paastand("gaa til stinkskabet med det", rum.gaa("hoejre"));
+    var b2 = bord();
+    paastand("det er nu i stinkskabets haand", b2 !== b && b2.baerer === baeger && b2.g.baeger100 !== baeger && !!b2.g["baeger100#2"], Object.keys(b2.g).filter(function (k) { return k.indexOf("baeger100") === 0; }).join(","));
+    paastand("og vaek fra proevebordet", !b.g.baeger100 && b.liste.indexOf(baeger) < 0 && b.baerer === null);
+    paastand("indholdet er med", Math.abs(V(baeger) - 30) < 0.5 && n(baeger, "Cu2+") > 2000, V(baeger).toFixed(1));
+    adv(0.8);
+    var pt = { x: 1000, y: 470 };
+    baeger.p.x = pt.x; baeger.p.y = pt.y;
+    b2.stopBaer(pt); faerdig();
+    paastand("det kan saettes ned i det nye rum", b2.baerer === null && Math.abs(baeger.p.x - pt.x) < 100 && b2.liste.indexOf(baeger) >= 0, baeger.p.x.toFixed(0));
+    paastand("og vaelges", (b2.vaelg(baeger.navn), b2.valgtBeholder() === baeger));
+
+    overskrift("4. Stinkskabet");
+    var g2 = b2.g;
+    paastand("baegerglasset staar i stinkskabet", b2.iStinkskab(baeger));
+    paastand("lugen staar uden for", !b2.iStinkskab(g2.luge));
+    b2.haeldFast(g2.metal_cu, baeger); faerdig();
+    var gasFoer = b2.gasIalt || 0;
+    var haendt = [];
+    rum.vedHaendelse = function (type, data) { if (type === "gas") haendt.push(data); };
+    b2.haeld(g2.fl_hno3, baeger, 15); faerdig();
+    var set = 0, opad = 0, tid = 0;
+    while (tid < 6 && set < 20) { adv(0.5); tid += 0.5; b2.dampe.forEach(function (p) { if (p.liv < 0.8) { set++; if (p.vy < -60) opad++; } }); }
+    paastand("kobber og koncentreret salpetersyre giver NO₂", haendt.some(function (h) { return h.stof === "NO2(g)"; }), haendt.length + " gasbegivenheder");
+    paastand("gassen er maerket som i stinkskabet", haendt.length > 0 && haendt.every(function (h) { return h.iStinkskab; }));
+    paastand("dampene trækkes opad af udsugningen", set > 0 && opad > set * 0.7, opad + " af " + set);
+    rum.vedHaendelse = null;
+    b2.toemI(baeger, g2.dunk); faerdig();
+    rum.gaaTil("bord", -1); adv(0.8);
+
+    overskrift("5. Lugen");
+    b = bord(); g = b.g;
+    b.haeld(g.fl_ki, g.baeger250, 20); faerdig();
+    g.fl_ki.svaev = null; b.koer.start([NK.Koer.hjemTil(g.fl_ki, 0.3, 20)], "hjem"); faerdig();
+    var luge = g.luge;
+    paastand("lugen kan tage imod et baegerglas, ikke et reagensglas", b.kanModtage(g.baeger250, luge) && !b.kanModtage(g.glas1, luge));
+    paastand("et tomt tryk paa lugen goer ingenting", !b.klik("luge"));
+    b.startBaer(g.baeger250);
+    var lx = luge.p.x - luge.anker.x + 85;
+    g.baeger250.p.x = lx; g.baeger250.p.y = luge.p.y + 60;
+    b.stopBaer({ x: lx, y: luge.p.y + 60 }); faerdig();
+    paastand("baegerglasset staar i lugen", g.baeger250.paa === luge && b.paaLuge(luge).length === 1, b.paaLuge(luge).length);
+    b.maal(g.termometer, g.baeger250); faerdig();
+    paastand("termometeret sidder i det", g.termometer.i === g.baeger250);
+    var glas = g.baeger250, term = g.termometer;
+    paastand("tryk paa knappen sender det", b.klik("luge"));
+    var st = rum.find("stinkskab").bord;
+    paastand("baegerglasset er i stinkskabets luge", st.liste.indexOf(glas) >= 0 && glas.paa === st.g.luge && b.liste.indexOf(glas) < 0, glas.paa && glas.paa.navn);
+    paastand("termometeret fulgte med og sidder stadig i", st.liste.indexOf(term) >= 0 && term.i === glas);
+    paastand("indholdet er med", Math.abs(V(glas) - 20) < 0.5 && n(glas, "I-") > 1500, V(glas).toFixed(1));
+    paastand("lampen lyser i begge luger", luge.lys > 0.5 && st.g.luge.lys > 0.5);
+    rum.gaaTil("stinkskab", 1); adv(0.8);
+    paastand("i stinkskabet staar det i lugen med termometeret", st.g.luge && bord() === st && Math.abs(term.p.x - glas.p.x - term.rel.dx) < 1);
+    paastand("send det tilbage", st.klik("luge") && b.liste.indexOf(glas) >= 0 && glas.paa === b.g.luge);
+
+    overskrift("6. Rummene gaar videre, mens man er vaek");
+    rum.gaaTil("bord", -1); adv(0.8);
+    b = bord(); g = b.g;
+    b.paaPlade(glas, g.plade, undefined, true);
+    paastand("baegerglasset fra lugen kan saettes paa varmepladen", glas.paa === g.plade);
+    b.sproejt(g.vand, glas); faerdig();
+    g.vand.svaev = null; b.koer.start([NK.Koer.hjemTil(g.vand, 0.3, 20)], "hjem"); faerdig();
+    b.klik("plade");
+    paastand("varmepladen er taendt", g.plade.taendt);
+    rum.gaaTil("forrum", -1); adv(0.8);
+    var T0 = glas.indhold.T;
+    adv(60);
+    paastand("vandet bliver varmt, mens man er i forrummet", glas.indhold.T > T0 + 20, T0.toFixed(0) + " -> " + glas.indhold.T.toFixed(0));
+    paastand("men uden dampe i det rum, man ikke er i", b.dampe.length === 0);
+    rum.gaaTil("bord", 1); adv(0.8);
+    paastand("uheld taelles paa tvaers af rum", rum.antalUheld() >= 0);
+
+    overskrift("7. Start forfra");
+    NK.startForfra();
+    adv(0.2);
+    paastand("man er tilbage paa proevebordet", rum.nu.navn === "bord" && knapAktiv() === "bord");
+    b = bord(); g = b.g;
+    paastand("alt staar, som da det blev bygget", !!g.baeger250 && V(g.baeger250) < 0.01 && !g.plade.taendt && Math.abs(V(g.fl_cu) - 250) < 0.01 && g.termometer.i === null);
+    var st2 = rum.find("stinkskab").bord;
+    paastand("ogsaa i stinkskabet", !!st2.g.baeger250 && !st2.g["baeger250#2"] && V(st2.g.baeger250) < 0.01);
+    paastand("panelet kan opdateres", (NK.opdaterPanel(), true));
+}
+
+function vis() {
+    skriv("\n" + (fejl === 0 ? "ALT OK" : fejl + " FEJL"), fejl === 0 ? "ok" : "fejl");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+</script>
+</body>
+</html>

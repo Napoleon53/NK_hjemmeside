@@ -41,6 +41,12 @@ statiske sider i roden, downloads i `downloads/`.
   Klik viser, træk gør: et klik vælger kun til aflæsning og zoom, handlinger
   sker ved at trække. Zoomboblen står i panelet, ikke på scenen.
   Mønster: `laboratoriet/proevebord/`.
+- Det, der lige er brugt (flaske, dråbeflaske, sprøjteflaske, spatel), bliver
+  hængende over glasset, flasken i hældepositur med en gul ring ved siden af;
+  klik gentager, træk væk sætter det hjem. En portion er højst en femtedel af
+  glasset. Ingen hånd tegnes.
+- Flere rum (pile, luge, stinkskab) ligger i `laboratoriet/js/rum.js`, mønster
+  `laboratoriet/proeverum/`. Superanimationerne bruger ét rum.
 - Kemien er data, ikke kode: nye stoffer, reaktioner og redoxpar skrives i
   `laboratoriet/js/stoftabel.js` (pKa, Ksp, E°, ΔH, farve), aldrig som
   særtilfælde i et forsøg. Efter ændringer køres
