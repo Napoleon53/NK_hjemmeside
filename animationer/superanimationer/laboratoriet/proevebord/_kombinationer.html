@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Kombinationsprøve - Prøvebordet</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.5; white-space:pre-wrap; }
+    .h { color:#f2c53d; font-weight:700; } .stille { color:#7d8590; } .sker { color:#7ee0a8; } .varm { color:#f0918a; }
+    .prove { display:inline-block; width:12px; height:12px; border:1px solid #666; vertical-align:middle; margin-right:6px; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<script src="../js/kerne.js"></script>
+<script src="../js/stof.js"></script>
+<script src="../js/stoftabel.js"></script>
+<script src="js/stoffer.js"></script>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i animationen og kan slettes.
+
+   Blander alle par af bordets flasker og pulvere (3 mL + 3 mL, eller
+   en spatelspids i 6 mL) og skriver, hvad kemilogikken siger, der sker:
+   nye stoffer, bundfald, gas, pH og temperatur. Laes listen igennem som
+   kemiker: fejl af slagsen "for lidt" er acceptable, fejl af slagsen
+   "forkert" skal rettes i stoftabel.js.
+   ===================================================================== */
+var St = NK.Stof;
+var linjer = [];
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function tal(x, d) { return x.toFixed(d === undefined ? 1 : d).replace(".", ","); }
+
+var kilder = NK.OPSTILLING.filter(function (s) { return s.indhold; }).map(function (s) {
+    var o = St.lav(s.indhold);
+    return { navn: s.etiket ? (Array.isArray(s.etiket) ? s.etiket.join(" ") : s.etiket) : s.navn, pulver: o.V === 0, o: o };
+});
+kilder.push({ navn: "vand", vand: true, o: St.lav({ V: 250, T: 20 }) });
+
+function portion(k) {
+    if (k.pulver) { var p = St.ny(20); St.tilsaet(p, St.faste(k.o)[0].navn, 1500); return p; }
+    return St.del(St.kopi(k.o), 3);
+}
+
+function bland(a, b) {
+    var o = St.ny(20);
+    if (a.pulver && b.pulver) return null;
+    if (a.pulver || b.pulver) {
+        var p = a.pulver ? a : b, v = a.pulver ? b : a;
+        St.bland(o, portion(v)); St.bland(o, St.del(St.kopi(v.vand ? v.o : kilder[kilder.length - 1].o), 3));
+        St.bland(o, portion(p));
+        return o;
+    }
+    St.bland(o, portion(a)); St.bland(o, portion(b));
+    return o;
+}
+
+function koer(o) {
+    var maksT = o.T, gas = {}, sek = 0;
+    var start = St.kopi(o);
+    for (var i = 0; i < 1200; i++) {
+        St.skridt(o, 0.05);
+        maksT = Math.max(maksT, o.T);
+        var g = St.tapGas(o);
+        for (var n in g) gas[n] = (gas[n] || 0) + g[n];
+        o.T = 20 + (o.T - 20) * Math.exp(-0.05 / 40);
+    }
+    return { start: start, maksT: maksT, gas: gas };
+}
+
+function beskriv(a, b) {
+    var o = bland(a, b);
+    if (!o) return null;
+    var pH0 = St.pH(o), T0 = 20, Tmix = o.T;
+    var res = koer(o); res.maksT = Math.max(res.maksT, Tmix);
+    var nye = [], vaek = [];
+    Object.keys(o.n).forEach(function (s) {
+        if (o.n[s] > 0.5 && (res.start.n[s] || 0) < 0.5) nye.push(St.formel(s, true) + " " + tal(o.n[s], 0) + " µmol");
+    });
+    Object.keys(res.start.n).forEach(function (s) {
+        if (res.start.n[s] > 0.5 && (o.n[s] || 0) < res.start.n[s] * 0.1) vaek.push(St.formel(s, true));
+    });
+    var gasser = Object.keys(res.gas).filter(function (g) { return res.gas[g] > 0.5; }).map(function (g) { return St.formel(g) + " " + tal(res.gas[g], 0) + " µmol"; });
+    var f = St.farve(o, 1);
+    var farve = f ? "rgb(" + Math.round(f.r) + "," + Math.round(f.g) + "," + Math.round(f.b) + ")" : "transparent";
+    var pH1 = St.pH(o);
+    var sker = nye.length || gasser.length || Math.abs(res.maksT - T0) > 2;
+    var dele = [];
+    if (nye.length) dele.push("nyt: " + nye.join(", "));
+    if (vaek.length) dele.push("væk: " + vaek.join(", "));
+    if (gasser.length) dele.push("gas: " + gasser.join(", "));
+    if (pH0 !== null && pH1 !== null && Math.abs(pH1 - pH0) > 0.3) dele.push("pH " + tal(pH0) + " → " + tal(pH1));
+    else if (pH1 !== null) dele.push("pH " + tal(pH1));
+    if (Math.abs(res.maksT - T0) > 1) dele.push("T " + tal(T0, 0) + " → " + tal(res.maksT, 0) + " °C");
+    return { sker: sker, varm: res.maksT > 60, tekst: dele.join("; "), farve: farve };
+}
+
+var antal = 0, stille = 0;
+skriv("Kombinationsprøve: " + kilder.length + " kilder, 3 mL + 3 mL eller en spatelspids i 6 mL, 60 s\n", "h");
+for (var i = 0; i < kilder.length; i++) {
+    for (var j = i + 1; j < kilder.length; j++) {
+        var r = beskriv(kilder[i], kilder[j]);
+        if (!r) continue;
+        antal++;
+        var navn = kilder[i].navn + " + " + kilder[j].navn;
+        if (!r.sker) { stille++; skriv('<span class="prove" style="background:' + r.farve + '"></span>' + navn + ": ingenting (" + r.tekst + ")", "stille"); continue; }
+        skriv('<span class="prove" style="background:' + r.farve + '"></span>' + navn + ": " + r.tekst, r.varm ? "varm" : "sker");
+    }
+}
+skriv("\n" + antal + " kombinationer, " + (antal - stille) + " hvor der sker noget, " + stille + " hvor der ikke sker noget.", "h");
+document.getElementById("ud").innerHTML = linjer.join("\n");
+</script>
+</body>
+</html>

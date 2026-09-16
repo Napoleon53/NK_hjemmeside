@@ -31,7 +31,9 @@ js/lyd.js            lydene med Web Audio, ingen lydfiler
 js/sprites.js        indlæser SVG-sprites; mappen findes ud fra filens placering
 js/koer.js           koreografier: små bevægelser af genstande (flyt, vent, kald)
 js/stof.js           stoffer, opløsninger (µmol og mL), reaktioner (fuld, ligevægt,
-                     bundfald, opløsning) og farven som lysfiltre
+                     bundfald, opløsning), redoxpar, pH, gas, varme og farven som lysfiltre
+js/stoftabel.js      den fælles tabel: ioner, syrer, baser, indikatorer, gasser, pulvere,
+                     metaller, bundfald, reaktioner og standardpotentialer
 js/udstyr.js         kataloget over udstyr: sprite, anker, inderside, rumfang,
                      tud og egenskaber (holder, hælder, drypper, spatel, rører ...)
 js/beholder.js       det, en beholder kan: rumme, blande, hælde, lag, bundfald,
@@ -48,6 +50,25 @@ proevebord/          det frie bord: index.html, css/stil.css, js/stoffer.js
                      (stoffer, reaktioner, opstilling), js/laerer.js, js/tur.js,
                      js/app.js, _selvtest.html
 ```
+
+## Kemilogikken
+
+Kemien ligger i lag, så et nyt stof koster én linje data, ikke nye regler:
+
+| Lag | Hvor | Hvad |
+|-----|------|------|
+| 0 fysik | `beholder.js` | blanding, lag, fortynding, temperatur, kogning, overløb |
+| 1 egenskaber | `stof.js` + `stoftabel.js` | bundfald (opløselighedsprodukt), syre-base (Ka, autoprotolyse, pH, indikatorer), redox (standardpotentialer, reaktioner mellem par afledes), kompleksdannelse (K), reaktionsvarme ΔH, fortyndingsvarme |
+| 2 navngivne reaktioner | `stoftabel.js` | reaktioner med betingelser, fx kobber i koncentreret salpetersyre |
+| 3 hændelser | `bord.js` | bobler, farvede dampe, damp, "voldsom" (kogende sprøjt), som Kemichael reagerer på |
+
+Alle stoffer og reaktioner står i `js/stoftabel.js`, som alle forsøg deler.
+Et forsøg vælger kun, hvad der står på bordet (`NK.OPSTILLING`). Motoren
+opfinder ikke kemi, den ikke kender: en blanding uden regel gør ingenting.
+`proevebord/_kombinationer.html` blander alle par af bordets flasker og
+pulvere og skriver, hvad der sker. Læs den igennem som kemiker, hver gang
+et stof eller en regel ændres: "for lidt" er acceptabelt, "forkert" rettes
+i stoftabellen.
 
 ## Genstandsmodellen
 

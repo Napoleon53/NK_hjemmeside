@@ -71,7 +71,8 @@
         tabel.hidden = !raekker.length;
         var temp = NK.el("glas-temp");
         temp.hidden = B.volumen(c) < 0.05;
-        temp.textContent = "Temperatur: " + NK.Tegning.temperaturTekst(o.T) + (c.koger ? " (koger)" : "");
+        var ph = St.pH(o);
+        temp.textContent = "Temperatur: " + NK.Tegning.temperaturTekst(o.T) + (c.koger ? " (koger)" : "") + (ph === null ? "" : " · pH " + tal(ph, 1));
         sidsteSignatur = signatur();
     }
 
@@ -79,7 +80,8 @@
         var c = bord.valgtBeholder();
         if (!c) return "ingen|" + bord.antalUheld;
         var o = B.samlet(c);
-        var dele = [c.navn, Math.round(B.volumen(c) * 10), Math.round(o.T * 2), bord.antalUheld, c.koger ? 1 : 0];
+        var ph = St.pH(o);
+        var dele = [c.navn, Math.round(B.volumen(c) * 10), Math.round(o.T * 2), bord.antalUheld, c.koger ? 1 : 0, ph === null ? "" : Math.round(ph * 10)];
         Object.keys(o.n).sort().forEach(function (n) { dele.push(n + ":" + Math.round(o.n[n] * 10)); });
         return dele.join("|");
     }

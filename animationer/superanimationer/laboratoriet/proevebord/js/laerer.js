@@ -152,6 +152,26 @@
             this.laererKo("laererFlaskeAffald", data.fra);
             this.laererVentende();
         }
+        if (type === "voldsom") {
+            this.laererKo("laererVoldsom", data);
+            this.laererVentende();
+        }
+    };
+
+    /* Det kogte over. Replikken afhaenger af, hvad der var i glasset. */
+    P.laererVoldsom = function (c) {
+        this.uheldTal = this.uheldTal || {};
+        this.uheldTal.voldsom = (this.uheldTal.voldsom || 0) + 1;
+        var k = this.uheldTal.voldsom;
+        var St = NK.Stof, o = NK.Beholder.samlet(c);
+        var replikker;
+        if (c.sidsteGas === "NO2(g)") replikker = ["Brune dampe.", "Det er ikke en farve, man vil have i lungerne. Stinkskab."];
+        else if (St.konc(o, "H+") > 2000 && !St.faste(o).length) replikker = ["Syre i vand. Ikke vand i syre.", "Og lidt ad gangen."];
+        else replikker = ["Det kogte over.", "Mindre ad gangen. Metallet skal ikke have det hele på én gang."];
+        if (k === 2) replikker = ["Igen. Det står på plakaten, hvis den var stor nok."];
+        if (k >= 3) replikker = ["Jeg tæller ikke længere."];
+        bemaerkning(this, "voldsom", NK.klamp(c.p.x - 180, 60, NK.Scene.BREDDE - 260), { vrede: 0.7, humoer: -0.6, roed: 0.2, briller: 1 },
+            replikker, k === 1 ? K.glimtTrin("oejenbryn") : []);
     };
 
     /* En hel flaske i affaldsdunken: han fylder den op igen, én gang */

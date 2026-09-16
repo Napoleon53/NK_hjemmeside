@@ -19,7 +19,7 @@
     var B = {};
     NK.Beholder = B;
 
-    B.BLAND = { diffusion: 0.03, ryst: 3, roer: 4, lagMaks: 3 };
+    B.BLAND = { diffusion: 0.06, ryst: 3, roer: 4, bobler: 1.5, lagMaks: 3 };
     B.TEMP = { stue: 20, tauLuft: 40, tauVarme: 10, kog: 100 };
 
     B.er = function (gg) {
@@ -128,6 +128,19 @@
             if (x.V > 0) x.T = s.T + (x.T - s.T) * Math.exp(-dt / (s.tau || B.TEMP.tauLuft));
             Stof.skridt(x, dt, reaktioner);
         });
+        /* Gas fra laget samles i beholderens gas. Bobler roerer rundt. */
+        if (gg.lag && gg.lag.gas) {
+            var g = Stof.tapGas(gg.lag);
+            o.gas = o.gas || {};
+            for (var navn in g) {
+                if (!Object.prototype.hasOwnProperty.call(g, navn)) continue;
+                o.gas[navn] = (o.gas[navn] || 0) + g[navn];
+                if (g[navn] > 0.01) blandFart += B.BLAND.bobler;
+            }
+        }
+        if (o.gas) {
+            for (var gn in o.gas) if (Object.prototype.hasOwnProperty.call(o.gas, gn) && o.gas[gn] > 0.01) { blandFart += B.BLAND.bobler; break; }
+        }
         if (gg.lag) {
             var f = 1 - Math.exp(-blandFart * dt);
             if (gg.lagBund && Stof.fastIalt(gg.lag) > 0.5) f *= 0.3;

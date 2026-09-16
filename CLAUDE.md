@@ -41,6 +41,10 @@ statiske sider i roden, downloads i `downloads/`.
   Klik viser, træk gør: et klik vælger kun til aflæsning og zoom, handlinger
   sker ved at trække. Zoomboblen står i panelet, ikke på scenen.
   Mønster: `laboratoriet/proevebord/`.
+- Kemien er data, ikke kode: nye stoffer, reaktioner og redoxpar skrives i
+  `laboratoriet/js/stoftabel.js` (pKa, Ksp, E°, ΔH, farve), aldrig som
+  særtilfælde i et forsøg. Efter ændringer køres
+  `laboratoriet/proevebord/_kombinationer.html` og læses igennem.
 - Sidepanelet er 430 px bredt (`--panel-bredde` i `laboratoriet/css/grund.css`).
   Prøvebordet har 473 px, fordi zoomboblen står i panelet.
 - Samlingssiderne (`samling_*.html`) har fuld skærm: sidepanelerne skjules i

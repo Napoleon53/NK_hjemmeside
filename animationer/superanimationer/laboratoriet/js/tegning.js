@@ -50,17 +50,16 @@
         ctx.fill();
         NK.skaer(ctx, BREDDE / 2, 42, 190, "rgba(255, 248, 225, 0.1)");
 
-        /* Hylde til venstre */
-        var H = Sc.HYLDE;
-        if (H) {
+        /* Hylderne */
+        (Sc.HYLDER || (Sc.HYLDE ? [Sc.HYLDE] : [])).forEach(function (H) {
             ctx.fillStyle = "#6b4a2c";
             ctx.fillRect(H.x0, H.y, H.x1 - H.x0, 7);
             ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
             ctx.fillRect(H.x0, H.y, H.x1 - H.x0, 1.5);
             ctx.fillStyle = "#4a3320";
-            ctx.fillRect(H.x0 + 10, H.y + 7, 5, 14);
+            for (var hx = H.x0 + 10; hx < H.x1 - 12; hx += 180) ctx.fillRect(hx, H.y + 7, 5, 14);
             ctx.fillRect(H.x1 - 15, H.y + 7, 5, 14);
-        }
+        });
 
         if (v && v.plakat) T.tegnPlakat(ctx, v.plakat);
 
@@ -401,6 +400,26 @@
         return top;
     };
 
+    /* Bobler af gas paa vej op gennem vaesken, klippet til indersiden */
+    T.tegnBobler = function (ctx, gg, bobler) {
+        if (!bobler || !bobler.length || !gg.type.indre) return;
+        var verden = T.indreVerden(gg);
+        ctx.save();
+        NK.polySti(ctx, verden);
+        ctx.clip();
+        for (var i = 0; i < bobler.length; i++) {
+            var b = bobler[i];
+            ctx.beginPath();
+            ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(235, 245, 255, 0.35)";
+            ctx.fill();
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+            ctx.lineWidth = 0.9;
+            ctx.stroke();
+        }
+        ctx.restore();
+    };
+
     /* Skaar af et knust glas. s: { x, y, a, pts, alfa } */
     T.tegnSkaar = function (ctx, liste) {
         if (!liste || !liste.length) return;
@@ -605,8 +624,8 @@
         ctx.save();
         for (var i = 0; i < dampe.length; i++) {
             var d = dampe[i];
-            ctx.globalAlpha = NK.klamp(d.liv, 0, 1) * 0.16;
-            ctx.fillStyle = "#eef3f8";
+            ctx.globalAlpha = NK.klamp(d.liv, 0, 1) * (d.farve ? 0.32 : 0.16);
+            ctx.fillStyle = d.farve ? NK.css(d.farve, 1) : "#eef3f8";
             ctx.beginPath();
             ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
             ctx.fill();

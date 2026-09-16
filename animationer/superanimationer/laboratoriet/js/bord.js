@@ -64,7 +64,8 @@
         S.BREDDE = valg.bredde || 1120;
         S.HOEJDE = valg.hoejde || 600;
         S.BORD = valg.bord || 500;
-        S.HYLDE = valg.hylde === undefined ? { x0: 16, x1: 116, y: 268 } : valg.hylde;
+        S.HYLDER = valg.hylder || (valg.hylde === undefined ? [{ x0: 16, x1: 116, y: 268 }] : (valg.hylde ? [valg.hylde] : []));
+        S.HYLDE = S.HYLDER[0] || null;
         S.ANKER = S.ANKER || {};
         if (NK.Kemichael) Object.keys(NK.Kemichael.ANKER).forEach(function (n) { S.ANKER[n] = NK.Kemichael.ANKER[n]; });
         S.skala = function (b, h) {
@@ -506,6 +507,21 @@
         return true;
     };
 
+    /* En voldsom reaktion: det koger over og sproejter */
+    P.voldsom = function (c) {
+        var fo = B.farve(c) || Stof.VAND;
+        var farve = { r: fo.r, g: fo.g, b: fo.b, a: 0.8 };
+        var o = B.aabning(c);
+        sproejt(this, o.x, o.y, farve, 16);
+        for (var i = 0; i < 8; i++) this.dampe.push({ x: o.x + r(-10, 10), y: o.y - 4, vx: r(-14, 14), vy: r(-40, -20), rad: r(7, 12), liv: 1 });
+        this.ryk = 3;
+        if (NK.Lyd && NK.Lyd.plask) NK.Lyd.plask();
+        this.besked("Det bliver kogende varmt og sprøjter!", "advarsel");
+        this.haendt_voldsom = true;
+        this.haendelse("voldsom", c);
+        this.aendret("voldsom");
+    };
+
     P.opdaterSkaar = function (dt) {
         var S = NK.Scene;
         for (var i = 0; i < this.skaar.length; i++) {
@@ -624,6 +640,18 @@
         var S = NK.Scene, t = gg.type;
         if (pt && pt.y > S.BORD + 30) return this.tab(gg);
         var x = NK.klamp(pt ? pt.x : gg.p.x, 40, S.BREDDE - 40);
+        /* Paa en hylde, hvis den slippes lige over den */
+        var hylde = null;
+        (S.HYLDER || []).forEach(function (H) {
+            if (pt && pt.x > H.x0 - 10 && pt.x < H.x1 + 10 && pt.y > H.y - 150 && pt.y < H.y + 12) hylde = H;
+        });
+        if (hylde && t.sprite && t.navn !== "reagensglas") {
+            gg.p = staar(t, NK.klamp(x, hylde.x0 + t.b / 2, hylde.x1 - t.b / 2), hylde.y);
+            gg.hjem = kopi(gg.p);
+            this.tilFront(gg);
+            this.haendelse("satNed", gg);
+            return true;
+        }
         if (t.navn === "reagensglas") {
             var fod = this.fod(gg);
             for (var i = 0; i < this.liste.length; i++) {
@@ -1107,12 +1135,49 @@
 
         this.beholdere().forEach(function (c) {
             var s = mig.omgivelser(c);
+            /* Varmen fra haeldning og reaktioner er lagt til siden sidste billede */
+            var Tsidst = c.Tsidst === undefined ? c.indhold.T : c.Tsidst;
             B.skridt(c, dt, s, mig.reaktioner);
+            var o = B.aabning(c);
+            var flade = c.niveau === null || c.niveau === undefined ? o.y + 20 : c.niveau;
+            /* Bliver det pludselig meget varmt, koger og sproejter det */
+            c.varmeFart = NK.mod(c.varmeFart || 0, (c.indhold.T - Tsidst) / Math.max(dt, 1e-3), 3, dt);
             if (c.indhold.T > B.TEMP.kog) c.indhold.T = B.TEMP.kog;
-            if (c.koger) {
-                var o = B.aabning(c);
-                if (Math.random() < dt * 6) mig.dampe.push({ x: o.x + r(-8, 8), y: (c.niveau || o.y + 20) - 2, vx: r(-6, 6), vy: r(-26, -14), rad: r(5, 9), liv: 0.9 });
+            c.Tsidst = c.indhold.T;
+            if (c.varmeFart > 8 && c.indhold.T > 70 && mig.tid - (c.voldsomTid || -99) > 6 && B.volumen(c) > 0.1) {
+                c.voldsomTid = mig.tid;
+                mig.voldsom(c);
             }
+            if (c.koger) {
+                if (Math.random() < dt * 6) mig.dampe.push({ x: o.x + r(-8, 8), y: flade - 2, vx: r(-6, 6), vy: r(-26, -14), rad: r(5, 9), liv: 0.9 });
+            }
+            /* Gas bobler op gennem vaesken; farvet gas bliver til dampe */
+            var gas = Stof.tapGas(c.indhold);
+            c.bobler = c.bobler || [];
+            for (var navn in gas) {
+                if (!Object.prototype.hasOwnProperty.call(gas, navn) || gas[navn] < 0.01) continue;
+                var st = Stof.stof(navn);
+                var antal = Math.min(10, Math.ceil(gas[navn] / 15));
+                if (st.farve) {
+                    for (var k = 0; k < antal; k++) mig.dampe.push({ x: o.x + r(-10, 10), y: o.y - 2, vx: r(-10, 10), vy: r(-30, -16), rad: r(6, 11), liv: 1.1, farve: st.farve });
+                } else {
+                    var v = B.er(c) && c.type.indre ? T.indreVerden(c) : null;
+                    if (!v) continue;
+                    var x0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+                    v.forEach(function (p) { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y); });
+                    for (var m = 0; m < antal; m++) c.bobler.push({ x: NK.lerp(x0 + 4, x1 - 4, Math.random()), y: y1 - 4 - r(0, 10), r: r(1.4, 3), vy: -r(40, 80) });
+                }
+                mig.gasIalt = (mig.gasIalt || 0) + gas[navn];
+                c.sidsteGas = navn;
+                mig.haendelse("gas", { fra: c, stof: navn, umol: gas[navn] });
+            }
+            for (var i = c.bobler.length - 1; i >= 0; i--) {
+                var b = c.bobler[i];
+                b.y += b.vy * dt;
+                b.x += Math.sin(mig.tid * 9 + i) * 8 * dt;
+                if (b.y < flade + 1) c.bobler.splice(i, 1);
+            }
+            if (c.bobler.length > 40) c.bobler.splice(0, c.bobler.length - 40);
         });
 
         /* Termometre foelger det glas, de sidder i */
@@ -1196,8 +1261,11 @@
         var S = NK.Scene;
         if (!gg.type.sprite || gg.sted || gg.i) return false;
         var bund = gg.p.y - gg.anker.y + gg.type.h;
-        var underlag = gg.paa ? gg.paa.p.y - gg.paa.anker.y + gg.paa.type.plade.y : S.BORD;
-        return Math.abs(gg.p.v) < 0.05 && Math.abs(bund - underlag) < 3;
+        if (Math.abs(gg.p.v) >= 0.05) return false;
+        var underlag = [S.BORD];
+        if (gg.paa) underlag.push(gg.paa.p.y - gg.paa.anker.y + gg.paa.type.plade.y);
+        (S.HYLDER || []).forEach(function (H) { underlag.push(H.y); });
+        return underlag.some(function (u) { return Math.abs(bund - u) < 3; });
     };
 
     P.tegnGenstand = function (ctx, gg, tid) {
@@ -1208,7 +1276,10 @@
         }
         if (this.staarPaaBord(gg) && !k.fast) T.skygge(ctx, gg.p.x - gg.anker.x + t.b / 2, t.b * 0.45, 0.3, gg.p.y - gg.anker.y + t.h - 3);
         if (k.varmer) T.tegnVarmeplade(ctx, gg, tid);
-        else if (k.holder) gg.niveau = T.tegnBeholder(ctx, gg, tid, { boelge: this.baerer === gg ? this.ryst * 1.5 : (this.roerer === gg ? 0.8 : 0) });
+        else if (k.holder) {
+            gg.niveau = T.tegnBeholder(ctx, gg, tid, { boelge: this.baerer === gg ? this.ryst * 1.5 : (this.roerer === gg ? 0.8 : 0) });
+            if (gg.bobler && gg.bobler.length && !t.skjulIndhold) T.tegnBobler(ctx, gg, gg.bobler);
+        }
         else if (k.spatel) T.tegnSpatel(ctx, gg);
         else if (k.roerer) T.tegnStav(ctx, gg);
         else if (k.maaler) T.tegnTermometer(ctx, gg, !!gg.i || this.baerer === gg);
