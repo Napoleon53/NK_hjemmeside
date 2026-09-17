@@ -9,8 +9,8 @@
    foran et hvidt kort, varmt vandbad paa varmepladen, isbad, termometer
    og affaldsdunk.
 
-   Del 2, fortynding: kolben, frugtfarve, sproejteflaske med vand og to
-   baegerglas paa et hvidt papir.
+   Del 2, fortynding: kolben, frugtfarve, sproejteflaske med vand og fire
+   baegerglas paa et hvidt papir, to og to i par.
 
    Genstandene er SVG-filer i sprites/. Hver genstand har et ankerpunkt og
    en positur { x, y, v }: hvor ankeret staar, og hvor meget den haelder.
@@ -65,7 +65,11 @@
     S.GLAS_Y = S.BORD - 12 - 154 + 2;
     S.VARMEPLADE = { x: 812, y: 457, skala: 0.6 };
     S.DUNK = { x: 1026, y: S.BORD - 130, aabning: { x: 1071, y: S.BORD - 118 } };
-    S.PAPIR = { x: 380, b: 360 };
+    /* Det hvide papir i del 2 med de fire baegerglas: to par med et
+       mellemrum imellem, saa parrene kan ses som par */
+    S.PAPIR = { x: 356, b: 568 };
+    S.BAEGER_X = [432, 532, 748, 848];
+    S.PAR_MIDT = [(S.BAEGER_X[0] + S.BAEGER_X[1]) / 2, (S.BAEGER_X[2] + S.BAEGER_X[3]) / 2];
     S.BOBLE = { x: 300, y: 205, r: 185 };
     S.LUP_GLAS = { x: 15, y: 128 };
     S.LUP_BAEGER = { x: 36, y: 88 };
@@ -105,11 +109,12 @@
         kolbe2:       staar("kolbe", 80),
         flaske_farve: staar("flaske_farve", 170),
         vand:         staar("vand", 236),
-        baegerV:      staar("baeger", 480),
-        baegerH:      staar("baeger", 640),
         /* Begge */
         kaffekop:     staar("kaffekop", 60, S.HYLDE.y)
     };
+    S.BAEGER_X.forEach(function (x, i) {
+        S.HJEM["baeger" + (i + 1)] = staar("baeger", x);
+    });
     S.STATIV.huller.forEach(function (x, i) {
         S.HJEM["glas" + (i + 1)] = { x: x, y: S.GLAS_Y, v: 0 };
     });
@@ -131,7 +136,8 @@
             { x: 80, r: 0, t: "stamopløsning" },
             { x: 170, r: 1, t: "frugtfarve" },
             { x: 236, r: 0, t: "vand" },
-            { x: 560, r: 0, t: "hvidt papir" },
+            { x: S.PAR_MIDT[0], r: 0, t: "par 1: frugtfarve" },
+            { x: S.PAR_MIDT[1], r: 0, t: "par 2: ligevægtsblanding" },
             { x: 1071, r: 1, t: "surt uorganisk" }
         ]
     };

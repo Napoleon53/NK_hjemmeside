@@ -111,12 +111,12 @@
 
     var MAENGDE = {
         KOLBE_BAEGER: 30,    /* mL fra kolben i baegerglasset i del 1 */
-        KOLBE_BAEGER2: 40,   /* mL fra kolben i et baegerglas i del 2: naesten halvt op */
+        KOLBE_BAEGER2: 20,   /* mL fra kolben i et baegerglas i del 2: en femtedel af glasset */
         KOLBE_GLAS: 3,       /* mL fra kolben direkte i et reagensglas */
         BAEGER_GLAS: 3,      /* mL fra baegerglasset i et reagensglas: et par mL */
         KSCN_FLASKE: 2,      /* mL 0,1 M KSCN pr. haeldning */
         KSCN_MM: 100,        /* µmol pr. mL i flasken */
-        FARVE: 40,           /* mL frugtfarve pr. haeldning */
+        FARVE: 20,           /* mL frugtfarve pr. haeldning: en femtedel af glasset */
         VAND_BAEGER: 10,     /* mL vand pr. klik i et baegerglas */
         VAND_GLAS: 2,
         GLAS_MAKS: 17,
@@ -158,20 +158,27 @@
        Et glas taeller som varmt over varm og som koldt under kold. */
     var TEMP = { stue: 20, vandbad: 80, isbad: 0, tauBad: 3.5, tauIs: 4.5, tauLuft: 25, varm: 60, kold: 8 };
 
-    /* Lysvejen i cm gennem et reagensglas og et baegerglas fra siden.
-       Ovenfra er lysvejen vaeskesoejlens hoejde: V delt med tvaersnittet
-       (cm²) af et reagensglas eller et 100 mL baegerglas. */
-    var LYSVEJ = { glas: 1.4, baeger: 4, tvaersnit: 1.54, baegerTvaersnit: 19.6 };
+    /* Lysvejen i cm gennem et reagensglas og et baegerglas fra siden. Et
+       baegerglas er bredere end 2,2 cm, men lyset naar oejet fra hele den
+       krumme vaeg, saa den vej, farven ses igennem, er kortere end
+       diameteren. Ovenfra er lysvejen vaeskesoejlens hoejde: V delt med
+       tvaersnittet (cm²) af et reagensglas eller et 100 mL baegerglas. */
+    var LYSVEJ = { glas: 1.4, baeger: 2.2, tvaersnit: 1.54, baegerTvaersnit: 19.6 };
 
-    /* Absorbans pr. mM og cm i roed, groen og blaa. FeSCN2+ absorberer
-       blaagroent lys og ser roedt ud; Fe3+ er svagt gult, Fe2+ naesten
-       farveloest, og frugtfarven er blaa. */
-    var ABS = {
-        fescn:     { r: 0.45, g: 4.6, b: 6.2 },
-        fe:        { r: 0, g: 0.012, b: 0.07 },
-        fe2:       { r: 0.004, g: 0, b: 0.004 },
-        farvestof: { r: 2.4, g: 0.9, b: 0.08 }
+    /* Stoffernes farve i oploesning og farvestyrken k: absorbansen ved
+       spektrets top pr. mM og cm. Farven laves om til et absorptions-
+       spektrum i farvemodel.js, saa blandinger regnes paa lys og ikke paa
+       tre RGB-kanaler. FeSCN2+ er blodroedt, Fe3+ svagt gult, Fe2+
+       naesten farveloest, og frugtfarven er blaa. */
+    var STOFFARVE = {
+        fescn:     { farve: { r: 190, g: 35, b: 25 },   k: 6.2 },
+        fe:        { farve: { r: 236, g: 206, b: 118 }, k: 0.07 },
+        fe2:       { farve: { r: 226, g: 240, b: 228 }, k: 0.008 },
+        farvestof: { farve: { r: 45, g: 120, b: 215 },  k: 2.4 }
     };
+    Object.keys(STOFFARVE).forEach(function (n) {
+        STOFFARVE[n].sp = NK.Farvemodel.spektrum(STOFFARVE[n].farve);
+    });
 
     /* Sammenligning: fra siden forholdet mellem c(FeSCN2+) i to glas, ovenfra
        forholdet mellem den samlede absorbans */
@@ -453,22 +460,37 @@
     }
 
     /* ----- Farver ------------------------------------------------------------ */
-    function absorbans(o, lysvej) {
+    /* Oploesningen som lag af farvede stoffer, hvert med sin absorbans
+       gennem lysvejen (cm) */
+    function lag(o, lysvej) {
         if (!o || o.V <= 0) return null;
-        var cx = o.x / o.V, cfe = Math.max(0, o.fe - o.x) / o.V, cfe2 = o.fe2 / o.V, cfv = o.farvestof / o.V;
-        function kanal(k) {
-            return (ABS.fescn[k] * cx + ABS.fe[k] * cfe + ABS.fe2[k] * cfe2 + ABS.farvestof[k] * cfv) * lysvej;
-        }
-        return { r: kanal("r"), g: kanal("g"), b: kanal("b") };
+        var c = {
+            fescn: o.x / o.V,
+            fe: Math.max(0, o.fe - o.x) / o.V,
+            fe2: o.fe2 / o.V,
+            farvestof: o.farvestof / o.V
+        };
+        var ud = [];
+        Object.keys(STOFFARVE).forEach(function (n) {
+            if (c[n] > 1e-9) ud.push({ sp: STOFFARVE[n].sp, A: STOFFARVE[n].k * c[n] * lysvej });
+        });
+        return ud;
+    }
+
+    /* Absorbansen i roedt, groent og blaat lys. Bruges til graenser og
+       sammenligninger, ikke til at tegne farven. */
+    function absorbans(o, lysvej) {
+        var l = lag(o, lysvej);
+        return l ? NK.Farvemodel.kanaler(l) : null;
     }
 
     /* Oploesningens farve set gennem lysvejen (cm) mod hvidt lys */
     function farve(o, lysvej) {
-        var A = absorbans(o, lysvej);
-        if (!A) return null;
-        var tr = Math.pow(10, -A.r), tg = Math.pow(10, -A.g), tb = Math.pow(10, -A.b);
-        var moerke = 1 - (tr + tg + tb) / 3;
-        var farvet = { r: 252 * tr, g: 246 * tg, b: 240 * tb, a: NK.klamp(0.34 + 0.62 * moerke, 0, 0.94) };
+        var l = lag(o, lysvej);
+        if (!l) return null;
+        var c = NK.Farvemodel.lys(l);
+        var moerke = 1 - c.Y;
+        var farvet = { r: c.r * 0.99, g: c.g * 0.965, b: c.b * 0.94, a: NK.klamp(0.34 + 0.62 * moerke, 0, 0.94) };
         return NK.blandFarve(FARVE.vand, farvet, NK.klamp(moerke * 4, 0, 1));
     }
 
@@ -480,7 +502,8 @@
     function farveNavn(o) {
         var A = absorbans(o, LYSVEJ.glas);
         if (!A) return "";
-        if (o.farvestof > 0 && ABS.farvestof.r * o.farvestof / o.V * LYSVEJ.glas > A.g * 0.5) return A.r > 0.3 ? "blå" : "lyseblå";
+        var blaat = STOFFARVE.farvestof.k * o.farvestof / o.V * LYSVEJ.glas;
+        if (o.farvestof > 0 && blaat > A.g * 0.5) return A.r > 0.3 ? "blå" : "lyseblå";
         if (A.g < 0.05) return A.b > 0.05 ? "svagt gul" : "farveløs";
         if (A.g < 0.3) return "svagt orange";
         if (A.g < 0.8) return "orange";
@@ -568,6 +591,7 @@
         BLAND: BLAND,
         TEMP: TEMP,
         LYSVEJ: LYSVEJ,
+        STOFFARVE: STOFFARVE,
         VURDER: VURDER,
         FORDOBLING: FORDOBLING,
         RYST: RYST,
