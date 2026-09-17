@@ -76,12 +76,17 @@
   .vurdering-tekst{min-width:118px; text-align:right; font-size:.85rem; color:var(--muted);}
 
   .score-tal{font-size:3.4rem; font-weight:800; line-height:1; color:var(--orange);}
+  .score-tal.ingen{color:#4d6a8e;}
   .score-max{font-size:1.1rem; color:var(--muted); font-weight:600;}
+  .karakter-raekke{display:flex; align-items:baseline; gap:4px 12px; flex-wrap:wrap;}
+  .karakter-detalje{font-size:.88rem; color:var(--muted);}
   .stempel{display:inline-block; margin-top:8px; padding:5px 12px; border-radius:999px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; font-size:.78rem;}
   .stempel.guld{background:#f5c542; color:#3a2c00;}
   .stempel.soelv{background:#cdd7e0; color:#2a3540;}
   .stempel.bronze{background:#cd8542; color:#2d1a05;}
+  .stempel.ok{background:#2f5a3f; color:#d9f3e2;}
   .stempel.ingen{background:#3c5573; color:var(--muted);}
+  canvas#konfetti{position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:40;}
 
   .maaler{height:12px; border-radius:999px; background:#33496a; overflow:hidden; margin:8px 0 4px; display:block;}
   .maaler > span{display:block; height:100%; background:linear-gradient(90deg,var(--orange),var(--orange-lys)); width:0;}
@@ -129,7 +134,7 @@
 <div class="top">
   <div class="titel">
     <h1>Fælles normer</h1>
-    <p class="muted" style="margin:4px 0 0;">Vurder modulet sammen med klassen. Point samles op og låser belønninger op.</p>
+    <p class="muted" style="margin:4px 0 0;">Vurder modulet sammen med klassen. Vurderingen bliver til en karakter på 12-skalaen.</p>
   </div>
   <div class="felt">
     <label for="klasse">Klasse</label>
@@ -166,23 +171,35 @@
 
   <div style="display:flex; flex-direction:column; gap:16px;">
     <div class="gruppe">
-      <div class="gruppe-hoved">Score</div>
-      <div><span class="score-tal" id="scoreTal">0</span> <span class="score-max">/ 30</span></div>
+      <div class="gruppe-hoved">Dagens karakter</div>
+      <div class="karakter-raekke">
+        <span class="score-tal ingen" id="karakterTal">&ndash;</span>
+        <span class="karakter-detalje"><span id="scoreTal">0</span> / 30 stjerner &middot; <span id="procentTal">0</span> %</span>
+      </div>
       <div id="stempel" class="stempel ingen">Ikke vurderet</div>
       <p class="muted" id="trend" style="margin:8px 0 0;"></p>
     </div>
 
     <div class="gruppe">
       <div class="gruppe-hoved">Point og belønning</div>
-      <div><b id="pointTal">0</b> <span class="muted">point i alt</span></div>
-      <span class="maaler"><span id="maalerFyld"></span></span>
-      <p class="muted" id="naeste" style="margin:0 0 10px;"></p>
-      <ul class="belon-liste" id="belonninger"></ul>
-      <div class="belon-knapper">
-        <button id="belonTilfoej">Tilføj belønning</button>
-        <button id="belonStandard">Gendan standard</button>
+      <div id="belonFra">
+        <p class="muted" style="margin:0;">Belønninger er slået fra. Slås de til, lægges karaktererne sammen til point, som klassen kan låse belønninger op med.</p>
+        <div class="belon-knapper">
+          <button id="belonTil">Slå belønninger til</button>
+        </div>
       </div>
-      <p class="muted" style="margin:8px 0 0; font-size:.8rem;">Belønninger og pointkrav kan rettes. De gemmes sammen med klassen.</p>
+      <div id="belonPaa" hidden>
+        <div><b id="pointTal">0</b> <span class="muted">point i alt, altså summen af karaktererne</span></div>
+        <span class="maaler"><span id="maalerFyld"></span></span>
+        <p class="muted" id="naeste" style="margin:0 0 10px;"></p>
+        <ul class="belon-liste" id="belonninger"></ul>
+        <div class="belon-knapper">
+          <button id="belonTilfoej">Tilføj belønning</button>
+          <button id="belonStandard">Gendan standard</button>
+          <button id="belonFraKnap">Slå fra</button>
+        </div>
+        <p class="muted" style="margin:8px 0 0; font-size:.8rem;">Belønninger og pointkrav kan rettes. De gemmes sammen med klassen.</p>
+      </div>
     </div>
   </div>
 </div>
@@ -203,7 +220,7 @@
       <div id="normSnit"></div>
       <h2 style="margin-top:16px;">Gemte moduler</h2>
       <table>
-        <thead><tr><th>Dato</th><th>Note</th><th class="tal">Score</th><th class="tal">Point</th><th></th></tr></thead>
+        <thead><tr><th>Dato</th><th>Note</th><th class="tal">Stjerner</th><th class="tal">Karakter</th><th></th></tr></thead>
         <tbody id="histTabel"></tbody>
       </table>
     </div>
@@ -257,25 +274,37 @@
   ];
   var NIVEAU = ['Ikke vurderet','Gik galt','Kan gøres bedre','Nogenlunde','Godt','Forbilledligt'];
   var MAX = REGLER.length * 5;
+  var MIN = REGLER.length;            // alle normer vurderet lavest
+
+  // Karakteren følger, hvor stor en del af spændet fra MIN til MAX klassen når op på.
+  var KARAKTERER = [
+    { fra:.90, vaerdi:12, tekst:'12', stempel:'Guldmodul',    klasse:'guld'   },
+    { fra:.80, vaerdi:10, tekst:'10', stempel:'Sølvmodul',    klasse:'soelv'  },
+    { fra:.70, vaerdi:7,  tekst:'7',  stempel:'Bronzemodul',  klasse:'bronze' },
+    { fra:.60, vaerdi:4,  tekst:'4',  stempel:'Godkendt',     klasse:'ok'     },
+    { fra:.50, vaerdi:2,  tekst:'02', stempel:'Godkendt',     klasse:'ok'     },
+    { fra:.20, vaerdi:0,  tekst:'00', stempel:'Under normen', klasse:'ingen'  },
+    { fra:-1,  vaerdi:-3, tekst:'-3', stempel:'Under normen', klasse:'ingen'  }
+  ];
 
   var STANDARD_BELON = [
-    { krav:100,  tekst:'Musik i arbejdsfaser' },
-    { krav:250,  tekst:'Fem minutters ekstra pause' },
-    { krav:450,  tekst:'Frit pladsvalg i ét modul' },
-    { krav:700,  tekst:'Godbid til holdet' },
-    { krav:1000, tekst:'Holdet vælger aktiviteten i et modul' }
+    { krav:25,  tekst:'Musik i arbejdsfaser' },
+    { krav:75,  tekst:'Fem minutters ekstra pause' },
+    { krav:175, tekst:'Godbid til holdet' },
+    { krav:250, tekst:'Holdet vælger aktiviteten i et modul' }
   ];
   // Tidligere standardlister. En klasse, der stadig har en af dem uændret, får
   // den nye standard. Er listen rettet af læreren, bliver den stående.
   var GAMLE_STANDARDER = [
     '100:Musik i arbejdsfaser|250:Frit pladsvalg i ét modul|450:Fem minutters ekstra pause|700:Kage eller frugt til holdet|1000:Holdet vælger aktiviteten i et modul',
-    '100:Musik i arbejdsfaser|250:Demonstrationsforsøg sidst i modulet|450:Fem minutters ekstra pause|700:Godbid til holdet|1000:Kemishow med de store forsøg'
+    '100:Musik i arbejdsfaser|250:Demonstrationsforsøg sidst i modulet|450:Fem minutters ekstra pause|700:Godbid til holdet|1000:Kemishow med de store forsøg',
+    '100:Musik i arbejdsfaser|250:Fem minutters ekstra pause|450:Frit pladsvalg i ét modul|700:Godbid til holdet|1000:Holdet vælger aktiviteten i et modul'
   ];
   function belonNoegle(liste){
     return (liste || []).map(function(b){ return b.krav + ':' + b.tekst; }).join('|');
   }
 
-  var EKSTRA_INTERVAL = 300;
+  var EKSTRA_INTERVAL = 100;
   var STORE_KEY = 'normer.klasser';
   var lagerOk = (function(){ try{ localStorage.getItem(STORE_KEY); return true; }catch(e){ return false; } })();
   if(!lagerOk) document.getElementById('ingenLager').hidden = false;
@@ -296,6 +325,8 @@
             if(GAMLE_STANDARDER.indexOf(belonNoegle(k.belonninger)) !== -1){
               k.belonninger = standardBelon();
             }
+            // Klasser fra før karakterskalaen havde altid belønninger fremme.
+            if(k.belonAktiv === undefined) k.belonAktiv = true;
           });
           return d;
         }
@@ -313,12 +344,24 @@
     return STANDARD_BELON.map(function(b){ return { krav:b.krav, tekst:b.tekst }; });
   }
   function nyKlasseData(){
-    return { moduler:[], belonninger:standardBelon() };
+    return { moduler:[], belonninger:standardBelon(), belonAktiv:false };
   }
   function klasse(){ return aktiv ? data.klasser[aktiv] : null; }
   function samletPoint(){
     var k = klasse(); if(!k) return 0;
-    return k.moduler.reduce(function(s,m){ return s + m.point; }, 0);
+    return k.moduler.reduce(function(s,m){ return s + modulPoint(m); }, 0);
+  }
+  // Moduler gemt før karakterskalaen har et point-tal fra den gamle model.
+  // Point regnes derfor altid ud fra modulets score.
+  function modulPoint(m){ return karakterFor(m.score).vaerdi; }
+
+  function andelFor(sum){ return (sum - MIN) / (MAX - MIN); }
+  function karakterFor(sum){
+    var a = andelFor(sum);
+    for(var i = 0; i < KARAKTERER.length; i++){
+      if(a >= KARAKTERER[i].fra) return KARAKTERER[i];
+    }
+    return KARAKTERER[KARAKTERER.length - 1];
   }
 
   // ---------- Reglerne ----------
@@ -366,28 +409,21 @@
       kort[i].querySelector('[data-tekst]').textContent = NIVEAU[v];
     });
     var sum = scores.reduce(function(a,b){ return a+b; }, 0);
+    var mangler = scores.indexOf(0) !== -1;
+    var kar = karakterFor(sum);
+
     document.getElementById('scoreTal').textContent = sum;
+    document.getElementById('procentTal').textContent = mangler ? 0 : Math.round(andelFor(sum) * 100);
+    var kt = document.getElementById('karakterTal');
+    kt.textContent = mangler ? '–' : kar.tekst;
+    kt.className = 'score-tal' + (mangler ? ' ingen' : '');
+
     var st = document.getElementById('stempel');
-    var n = niveauFor(sum, scores);
-    st.className = 'stempel ' + n.klasse;
-    st.textContent = n.navn;
-    document.getElementById('gem').disabled = scores.indexOf(0) !== -1;
+    st.className = 'stempel ' + (mangler ? 'ingen' : kar.klasse);
+    st.textContent = mangler ? 'Ikke vurderet' : kar.stempel;
+
+    document.getElementById('gem').disabled = mangler;
     tegnTrend(sum);
-  }
-
-  function niveauFor(sum, s){
-    if(s.indexOf(0) !== -1) return { navn:'Ikke vurderet', klasse:'ingen' };
-    if(sum >= 28) return { navn:'Guldmodul', klasse:'guld' };
-    if(sum >= 24) return { navn:'Sølvmodul', klasse:'soelv' };
-    if(sum >= 20) return { navn:'Bronzemodul', klasse:'bronze' };
-    return { navn:'Under normen', klasse:'ingen' };
-  }
-
-  // Point = summen af stjerner, plus 5 i bonus hvis ingen norm ligger under 4.
-  function pointFor(sum, s){
-    var p = sum;
-    if(s.indexOf(0) === -1 && Math.min.apply(null, s) >= 4) p += 5;
-    return p;
   }
 
   function tegnTrend(sum){
@@ -402,7 +438,7 @@
     var d = sum - snit;
     var pil = d > 0.5 ? '▲ ' : (d < -0.5 ? '▼ ' : '▬ ');
     el.textContent = pil + 'Seneste ' + sidste.length + ' moduler: ' + snit.toFixed(1) + ' i snit. Forskel: ' +
-                     (d >= 0 ? '+' : '') + d.toFixed(1) + '. Point i dag: ' + pointFor(sum, scores) + '.';
+                     (d >= 0 ? '+' : '') + d.toFixed(1) + '. Karakter i dag: ' + karakterFor(sum).tekst + '.';
   }
 
   // ---------- Klasser ----------
@@ -440,10 +476,16 @@
   var belonEl = document.getElementById('belonninger');
   function tegnBelonninger(){
     var k = klasse();
+    var paa = !!(k && k.belonAktiv);
+    document.getElementById('belonFra').hidden = paa;
+    document.getElementById('belonPaa').hidden = !paa;
+    document.getElementById('belonTil').disabled = !k;
+    if(!paa) return;
+
     belonEl.innerHTML = '';
-    document.getElementById('pointTal').textContent = k ? samletPoint() : 0;
-    var liste = k ? k.belonninger : STANDARD_BELON;
-    var point = k ? samletPoint() : 0;
+    document.getElementById('pointTal').textContent = samletPoint();
+    var liste = k.belonninger;
+    var point = samletPoint();
     document.getElementById('belonTilfoej').disabled = !k;
     document.getElementById('belonStandard').disabled = !k;
     var naeste = null;
@@ -458,7 +500,7 @@
 
       var kravInp = document.createElement('input');
       kravInp.type = 'number'; kravInp.className = 'kravfelt';
-      kravInp.min = '1'; kravInp.step = '10'; kravInp.value = b.krav;
+      kravInp.min = '1'; kravInp.step = '5'; kravInp.value = b.krav;
       kravInp.disabled = !k;
       kravInp.setAttribute('aria-label', 'Point der kræves for: ' + b.tekst);
       kravInp.addEventListener('change', function(){
@@ -503,9 +545,8 @@
       liste.forEach(function(b){ if(b.krav < naeste.krav && b.krav > forrige) forrige = b.krav; });
       var andel = (point - forrige) / (naeste.krav - forrige);
       document.getElementById('maalerFyld').style.width = Math.max(0, Math.min(1, andel)) * 100 + '%';
-      document.getElementById('naeste').textContent = k
-        ? (naeste.krav - point) + ' point til: ' + naeste.tekst
-        : 'Opret en klasse for at samle point.';
+      document.getElementById('naeste').textContent =
+        Math.max(0, naeste.krav - point) + ' point til: ' + naeste.tekst;
     } else {
       // Stigen er kørt til ende. Herefter gentages topbelønningen som ekstrarunder.
       var top = liste[liste.length - 1];
@@ -539,7 +580,7 @@
   document.getElementById('belonTilfoej').addEventListener('click', function(){
     var k = klasse(); if(!k) return;
     var top = k.belonninger.length ? k.belonninger[k.belonninger.length - 1].krav : 0;
-    k.belonninger.push({ krav: top + 250, tekst:'Ny belønning' });
+    k.belonninger.push({ krav: top + 50, tekst:'Ny belønning' });
     skriv(); tegnBelonninger();
     var felter = belonEl.querySelectorAll('input[type=text]');
     if(felter.length){ var sidste = felter[felter.length - 1]; sidste.focus(); sidste.select(); }
@@ -549,6 +590,20 @@
     var k = klasse(); if(!k) return;
     if(!confirm('Erstat klassens belønninger med standardlisten?')) return;
     k.belonninger = standardBelon();
+    skriv(); tegnBelonninger();
+  });
+
+  // Belønninger er slået fra, indtil læreren selv tænder for dem.
+  document.getElementById('belonTil').addEventListener('click', function(){
+    var k = klasse(); if(!k) return;
+    if(!k.belonninger || !k.belonninger.length) k.belonninger = standardBelon();
+    k.belonAktiv = true;
+    skriv(); tegnBelonninger();
+  });
+
+  document.getElementById('belonFraKnap').addEventListener('click', function(){
+    var k = klasse(); if(!k) return;
+    k.belonAktiv = false;
     skriv(); tegnBelonninger();
   });
 
@@ -563,7 +618,8 @@
     }
     var k = klasse();
     var sum = scores.reduce(function(a,b){ return a+b; }, 0);
-    var point = pointFor(sum, scores);
+    var kar = karakterFor(sum);
+    var point = kar.vaerdi;
     var foer = samletPoint();
     k.moduler.push({
       dato: document.getElementById('dato').value || idag(),
@@ -574,17 +630,22 @@
     k.moduler.sort(function(a,b){ return a.dato < b.dato ? -1 : (a.dato > b.dato ? 1 : 0); });
     var gemt = skriv();
     var efter = samletPoint();
-    var laast = k.belonninger.filter(function(b){ return b.krav > foer && b.krav <= efter; })
-                             .map(function(b){ return b.tekst; });
-    if(ekstraRunder(efter, k.belonninger) > ekstraRunder(foer, k.belonninger)){
-      laast.push('ekstrarunde med ' + k.belonninger[k.belonninger.length - 1].tekst);
+    var laast = [];
+    if(k.belonAktiv){
+      laast = k.belonninger.filter(function(b){ return b.krav > foer && b.krav <= efter; })
+                           .map(function(b){ return b.tekst; });
+      if(ekstraRunder(efter, k.belonninger) > ekstraRunder(foer, k.belonninger)){
+        laast.push('ekstrarunde med ' + k.belonninger[k.belonninger.length - 1].tekst);
+      }
     }
     var besked = document.getElementById('gemBesked');
     besked.textContent = gemt ? 'Gemt.' : 'Talt med, men ikke gemt i browseren.';
     besked.className = gemt ? 'muted' : 'fejl';
-    var tekst = '+' + point + ' point til ' + aktiv;
+    var tekst = 'Karakteren ' + kar.tekst + ' til ' + aktiv;
+    if(k.belonAktiv) tekst += '\n' + (point >= 0 ? '+' : '') + point + ' point, i alt ' + efter;
     if(laast.length) tekst += '\nBelønning låst op: ' + laast.join(', ');
     fanfare(tekst);
+    if(kar.vaerdi >= 10 || laast.length) konfetti();
     scores = tomScore();
     document.getElementById('note').value = '';
     tegnAlt();
@@ -610,6 +671,62 @@
     el.classList.add('vis');
     clearTimeout(fanfareTimer);
     fanfareTimer = setTimeout(function(){ el.classList.remove('vis'); }, 2800);
+  }
+
+  // ---------- Konfetti ----------
+  var konfettiEl = null, konfettiBillede = null;
+  function konfetti(){
+    if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if(!konfettiEl){
+      konfettiEl = document.createElement('canvas');
+      konfettiEl.id = 'konfetti';
+      konfettiEl.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(konfettiEl);
+    }
+    var ctx = konfettiEl.getContext('2d');
+    var bredde = konfettiEl.width = window.innerWidth;
+    var hoejde = konfettiEl.height = window.innerHeight;
+    var farver = ['#ef8a00','#ffb03a','#f5c542','#eef3f8','#7fd6a0','#5aa9e6'];
+    var stykker = [];
+    for(var i = 0; i < 150; i++){
+      stykker.push({
+        x: Math.random() * bredde,
+        y: -10 - Math.random() * hoejde * 0.35,
+        br: 6 + Math.random() * 6,
+        hj: 9 + Math.random() * 9,
+        fart: 3 + Math.random() * 4.2,
+        drej: Math.random() * Math.PI,
+        drejFart: (Math.random() - 0.5) * 0.24,
+        sving: 0.5 + Math.random() * 1.5,
+        farve: farver[i % farver.length]
+      });
+    }
+    var start = null;
+    if(konfettiBillede) cancelAnimationFrame(konfettiBillede);
+    function tegn(nu){
+      if(start === null) start = nu;
+      var gaaet = nu - start;
+      ctx.clearRect(0, 0, bredde, hoejde);
+      stykker.forEach(function(p){
+        p.y += p.fart;
+        p.x += Math.sin(p.y / 38) * p.sving;
+        p.drej += p.drejFart;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.drej);
+        ctx.globalAlpha = gaaet > 2600 ? Math.max(0, 1 - (gaaet - 2600) / 900) : 1;
+        ctx.fillStyle = p.farve;
+        ctx.fillRect(-p.br / 2, -p.hj / 2, p.br, p.hj);
+        ctx.restore();
+      });
+      if(gaaet < 3500){
+        konfettiBillede = requestAnimationFrame(tegn);
+      } else {
+        ctx.clearRect(0, 0, bredde, hoejde);
+        konfettiBillede = null;
+      }
+    }
+    konfettiBillede = requestAnimationFrame(tegn);
   }
 
   // ---------- Historik ----------
@@ -650,7 +767,8 @@
     k.moduler.slice().reverse().forEach(function(m){
       var tr = document.createElement('tr');
       tr.innerHTML = '<td>' + datoTekst(m.dato) + '</td><td>' + undslip(m.note || '') + '</td>' +
-                     '<td class="tal">' + m.score + ' / ' + MAX + '</td><td class="tal">' + m.point + '</td>';
+                     '<td class="tal">' + m.score + ' / ' + MAX + '</td>' +
+                     '<td class="tal">' + karakterFor(m.score).tekst + '</td>';
       var td = document.createElement('td');
       var slet = document.createElement('button');
       slet.className = 'fare'; slet.textContent = 'Slet';
@@ -680,9 +798,12 @@
     moduler.forEach(function(m, i){
       var x = 26 + i * (b + mellem);
       var bh = m.score / MAX * h;
-      var farve = m.score >= 28 ? '#f5c542' : (m.score >= 24 ? '#cdd7e0' : (m.score >= 20 ? '#cd8542' : '#e0403a'));
-      s += '<rect x="' + x + '" y="' + (top + h - bh) + '" width="' + b + '" height="' + bh + '" rx="4" fill="' + farve + '"/>';
-      s += '<text x="' + (x + b/2) + '" y="' + (top + h - bh - 5) + '" fill="#eef3f8" font-size="12" font-weight="700" text-anchor="middle">' + m.score + '</text>';
+      var kar = karakterFor(m.score);
+      var farve = kar.vaerdi >= 12 ? '#f5c542' : (kar.vaerdi >= 10 ? '#cdd7e0'
+                : (kar.vaerdi >= 7 ? '#cd8542' : (kar.vaerdi >= 2 ? '#5aa9e6' : '#e0403a')));
+      s += '<rect x="' + x + '" y="' + (top + h - bh) + '" width="' + b + '" height="' + bh + '" rx="4" fill="' + farve + '">' +
+           '<title>' + m.score + ' af ' + MAX + ' stjerner</title></rect>';
+      s += '<text x="' + (x + b/2) + '" y="' + (top + h - bh - 5) + '" fill="#eef3f8" font-size="12" font-weight="700" text-anchor="middle">' + kar.tekst + '</text>';
       s += '<text x="' + (x + b/2) + '" y="' + (top + h + 17) + '" fill="#a9bace" font-size="11" text-anchor="middle">' + kortDato(m.dato) + '</text>';
     });
     s += '</svg>';
