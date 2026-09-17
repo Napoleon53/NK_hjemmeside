@@ -6,7 +6,7 @@
    ikke lige nu, springes stoppet over.
    ===================================================================== */
 NK.Rundvisning.tur([
-    { sel: "#scene", titel: "Laboratoriebordet", tekst: "Alt udstyr kan tages med musen og slippes der, hvor det skal bruges. Et klik bruger det på det valgte glas." },
+    { sel: "#scene", titel: "Laboratoriebordet", tekst: "Klik viser, træk gør: et klik vælger en genstand, så du kan se, hvad der er i den. Alt udstyr tages med musen og slippes der, hvor det skal bruges." },
     { sel: "#stationer", titel: "Del 1 og del 2", tekst: "Skift mellem de syv glas og fortyndingsforsøget." },
     { sel: "#forloeb-kort", titel: "Forløbet", tekst: "Trinene får flueben, efterhånden som du når dem. Hint hjælper med det trin, du er ved." },
     { sel: "#visning-knap", titel: "Billede og ovenfra", tekst: "I del 1 tager du et billede af glassene, og i del 2 ser du bægerglassene ovenfra. Her noterer du, hvad du ser." },

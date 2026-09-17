@@ -456,6 +456,44 @@
         ctx.restore();
     };
 
+    /* Den valgte genstand: en rolig ramme, saa den skiller sig ud fra
+       hintets pulserende markering */
+    S.tegnValgt = function (ctx, r) {
+        ctx.save();
+        ctx.strokeStyle = "rgba(90, 170, 245, 0.85)";
+        ctx.lineWidth = 2;
+        NK.rundtRekt(ctx, r.x - 5, r.y - 5, r.b + 10, r.h + 10, 8);
+        ctx.stroke();
+        ctx.restore();
+    };
+
+    /* Den gule ring ved siden af det, der svaever: et klik gentager
+       handlingen. ring: { x, y, r } */
+    S.tegnSvaevRing = function (ctx, ring, tid, hover) {
+        var puls = 1 + 0.06 * Math.sin(tid * 4);
+        ctx.save();
+        NK.skaer(ctx, ring.x, ring.y, ring.r * 2.2 * puls, "rgba(242, 197, 61, 0.35)");
+        ctx.fillStyle = hover ? "rgba(242, 197, 61, 0.35)" : "rgba(20, 20, 26, 0.55)";
+        ctx.beginPath();
+        ctx.arc(ring.x, ring.y, ring.r * puls, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#f2c53d";
+        ctx.lineWidth = 3.5;
+        ctx.stroke();
+        ctx.strokeStyle = "#f7f0c8";
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.beginPath();
+        ctx.moveTo(ring.x, ring.y - 6);
+        ctx.lineTo(ring.x, ring.y + 6);
+        ctx.moveTo(ring.x - 5, ring.y + 1);
+        ctx.lineTo(ring.x, ring.y + 6);
+        ctx.lineTo(ring.x + 5, ring.y + 1);
+        ctx.stroke();
+        ctx.restore();
+    };
+
     /* ================================================================
        VAESKER
        ================================================================ */

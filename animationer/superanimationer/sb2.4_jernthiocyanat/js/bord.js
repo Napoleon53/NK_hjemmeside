@@ -34,6 +34,12 @@
         var kop = g.kaffekop;
         if (!kop.skjult && !kop.iHaand && S.inden("kaffekop", kop.p, kop.anker, pt.x, pt.y, 6)) return "kaffekop";
 
+        /* Ringen og det, der svaever, ligger oeverst */
+        var ring = this.svaevRing();
+        if (ring && Math.abs(pt.x - ring.x) < ring.r + 6 && Math.abs(pt.y - ring.y) < ring.r + 6) return ring.navn;
+        var sv = this.svaevende();
+        if (sv && S.inden(sv.sprite, sv.p, sv.anker, pt.x, pt.y, 6)) return sv.navn;
+
         if (this.station === 1) {
             var glas = this.glasListe();
             for (i = glas.length - 1; i >= 0; i--) {
@@ -88,6 +94,9 @@
         if (!navn) return false;
         var laererOpt = this.laererOptaget && this.laererOptaget();
         if (!laererOpt && !this.optaget() && !this.rystKilde && !this.baerer && !this.visning && this.grebbar(navn)) {
+            /* Tages der fat i noget andet, gaar det svaevende hjem */
+            var sv = this.svaevende();
+            if (sv && sv.navn !== navn) this.svaevHjem(sv);
             var gg = this.g[navn];
             /* En genstand paa vej hjem kan tages midt i bevaegelsen */
             if (this.handling && this.handling.navn === "hjem" && this.handling.liste.some(function (tr) { return tr.flyt === gg; })) this.handling = null;
@@ -204,27 +213,41 @@
         gl.niveau = S.tegnGlas(ctx, this.beholderTegning(gl), tid);
     };
 
+    /* Rammen om en genstand: den bruges baade til hintets markering og til
+       det, der er valgt */
+    P.ramme = function (gg) {
+        if (gg.greb === "stav") return S.stavRekt(gg.p);
+        if (gg.greb === "termometer") return S.termRekt(gg.p);
+        return S.rekt(gg.sprite, gg.p, gg.anker, 0);
+    };
+
     P.tegnGenstand = function (ctx, gg, tid, hjemme) {
         var mark = this.markeret(gg.navn);
         if (gg.erGlas) { this.tegnEtGlas(ctx, gg, tid); return; }
         if (gg.erBeholder) { gg.niveau = S.tegnBaeger(ctx, this.beholderTegning(gg), tid, hjemme); return; }
+        var eget = true;
         switch (gg.greb) {
             case "kolbe":
                 S.tegnKolbe(ctx, { p: gg.p, V: gg.tom ? 0 : 200, farve: M.baegerFarve(M.stamOpl(10)), boelge: this.baerer === gg ? this.ryst * 3 : 0, fremhaev: mark }, tid, hjemme);
-                return;
+                break;
             case "stav":
                 S.tegnStav(ctx, gg.p, mark, tid);
-                return;
+                break;
             case "termometer":
                 S.tegnTermometer(ctx, gg.p, gg.T, !!this.maaler, mark, tid);
-                return;
+                break;
             case "spatel":
                 S.tegnSpatel(ctx, gg.p, gg.last, mark, tid);
-                return;
+                break;
+            default:
+                eget = false;
         }
-        if (hjemme) S.skygge(ctx, gg.hjem.x - gg.anker.x + NK.Sprites.FILER[gg.sprite].b / 2, 22, 0.3);
-        NK.Sprites.tegnPositur(ctx, gg.sprite, gg.p, gg.anker);
-        if (mark) S.tegnMarkering(ctx, S.rekt(gg.sprite, gg.p, gg.anker, 0), tid);
+        if (!eget) {
+            if (hjemme) S.skygge(ctx, gg.hjem.x - gg.anker.x + NK.Sprites.FILER[gg.sprite].b / 2, 22, 0.3);
+            NK.Sprites.tegnPositur(ctx, gg.sprite, gg.p, gg.anker);
+            if (mark) S.tegnMarkering(ctx, this.ramme(gg), tid);
+        }
+        if (!mark && this.valgt === gg.navn) S.tegnValgt(ctx, this.ramme(gg));
     };
 
     P.bobleTitel = function (c) {
@@ -333,13 +356,18 @@
         if (this.bobleAlfa > 0.01 && this.bobleBeholder && this.synlig(this.bobleBeholder)) {
             var bb = this.bobleBeholder;
             var off = bb.erGlas && (bb.sted === "vandbad" || bb.sted === "isbad") ? this.badOff[bb.sted] : { x: 0, y: 0 };
-            var lp = bb.erGlas ? NK.tilVerden(bb.p, bb.anker, S.LUP_GLAS.x, S.LUP_GLAS.y) : NK.tilVerden(bb.p, bb.anker, S.LUP_BAEGER.x, S.LUP_BAEGER.y);
+            var lup = bb.lup || (bb.erGlas ? S.LUP_GLAS : S.LUP_BAEGER);
+            var lp = NK.tilVerden(bb.p, bb.anker, lup.x, lup.y);
             S.tegnForbindelse(ctx, { x: lp.x + off.x, y: lp.y + off.y }, S.BOBLE, this.bobleAlfa);
             bb.mikro.tegn(ctx, S.BOBLE, this.bobleAlfa, this.bobleTitel(bb), tid);
         }
 
         for (i = 0; i < aktive.length; i++) this.tegnGenstand(ctx, aktive[i], tid, false);
         this.tegnSlipMaal(ctx, tid);
+
+        /* Den gule ring ved det, der svaever: et klik gentager handlingen */
+        var ring = this.svaevRing();
+        if (ring) S.tegnSvaevRing(ctx, ring, tid, this.hover === ring.navn);
 
         /* Handsken om det reagensglas, der holdes */
         var greb = this.rystGlas || (this.holdt && g[this.holdt.navn].erGlas ? g[this.holdt.navn] : null);

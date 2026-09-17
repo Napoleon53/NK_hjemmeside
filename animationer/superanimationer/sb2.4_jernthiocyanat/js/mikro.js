@@ -627,7 +627,7 @@
             .map(function (t) { return KORT[t] + " = " + LEGENDE[t]; });
         if (!linjer.length) return;
         var h = linjer.length * 17 + 10;
-        var y0 = b.r * 0.62;
+        var y0 = b.r * 0.72;
         ctx.save();
         ctx.beginPath();
         ctx.arc(0, 0, b.r - 3, 0, Math.PI * 2);

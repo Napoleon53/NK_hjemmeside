@@ -19,10 +19,11 @@ Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺. Knapperne øverst på scenen skifter mellem to 
 **Del 1: De syv glas.**
 
 * **Stamopløsningen står færdig** i en kolbe (20 mL 0,10 M Fe(NO₃)₃ og 20 mL
-  0,10 M KSCN i 800 mL vand). Kolben hælder 30 mL i bægerglasset, og et klik
-  på bægerglasset hælder 3 mL i hvert af glas 1 til 7. Trinnet er lige så
-  gjort, hvis bægerglasset eller kolben hældes i ét glas ad gangen
-  (`alleFyldte` og `tjekFordelt` i `js/forsoeg.js`).
+  0,10 M KSCN i 800 mL vand). Kolben hælder 30 mL i bægerglasset, og eleven
+  hælder selv 3 mL i hvert af glas 1 til 7, ét glas ad gangen. Trinnet er
+  gjort, når der står stamopløsning i alle syv, uanset om den kom fra
+  bægerglasset eller direkte fra kolben (`alleFyldte` og `tjekFordelt` i
+  `js/forsoeg.js`).
 * **Glas 1 til 3** får Fe(NO₃)₃ (s), ascorbinsyre (s) og KSCN (s). Spatlen tager
   en spatelspids fra pulverglasset. Det faste stof ligger som korn i bunden og
   opløses langsomt; det opløste lægger sig som et lag i bunden, til der røres
@@ -36,7 +37,9 @@ Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺. Knapperne øverst på scenen skifter mellem to 
   til 7 i række. Eleven klikker under hvert glas: mørkere, lysere eller som
   glas 7. Når billedet lukkes, og glas 1 til 6 er noteret, er trinnet gjort.
   Svaret gemmes sammen med glassets udseende i det øjeblik.
-* Resterne afleveres som surt uorganisk affald.
+* **Resterne** hældes i dunken med surt uorganisk affald, ét glas ad gangen.
+  Trinnet er gjort, når glassene og bægerglasset er tomme (`tjekAffald`), og
+  hvert glas huskes, som det så ud lige før det blev tømt (`slutBillede`).
 
 **Del 2: Fortynding.** To bægerglas på hvidt papir fyldes næsten halvt op med
 frugtfarve. Sprøjteflasken giver 10 mL ad gangen, til det ene glas har dobbelt
@@ -44,19 +47,29 @@ volumen, og glassene ses ovenfra. Frugtfarven ser ens ud, fordi antallet af
 farvestofmolekyler er det samme. Derefter tømmes glassene, og det samme gøres
 med ligevægtsblanding fra kolben, som bliver lysere ovenfra.
 
-**Alt udstyr kan gribes.** Kolberne, bægerglassene, reagensglassene,
-flaskerne, pulverglassene, spatlen, glasstaven, termometeret og badene kan
-tages med musen. Slippes udstyret over en beholder, bruges det på den, og en
-grøn ramme viser, hvad det bliver sluppet over. Et klik bruger udstyret på den
-valgte beholder. Rystes et glas voldsomt, skvulper det ud. Knappen **Ryst
-glasset** (tasten R) ryster det valgte reagensglas og spilder aldrig.
+**Klik viser, træk gør.** Et klik vælger en genstand og gør ellers ingenting:
+alt kan vælges, og det valgte får en rolig blå ramme. Handlingerne sker ved at
+tage fat i udstyret og slippe det over en beholder; en grøn ramme viser, hvad
+det bliver sluppet over. Kolberne, bægerglassene, reagensglassene, flaskerne,
+pulverglassene, spatlen, glasstaven, termometeret og badene kan alle tages med
+musen. Rystes et glas voldsomt, skvulper det ud. Knappen **Ryst glasset**
+(tasten R) ryster det valgte reagensglas og spilder aldrig.
 
-* **Zoomboblen følger den valgte beholder.** Fe³⁺ og SCN⁻ danner FeSCN²⁺ og går i
+* **Det, der lige er brugt, bliver hængende** over glasset (`svaev` i
+  `js/forsoeg.js`, listen `SVAEVER`): kolben og bægerglasset i hældepositur,
+  dråbeflasken, sprøjteflasken, KSCN-flasken og spatlen i luften over det, de
+  blev brugt på. En gul ring med en pil ved siden af gentager handlingen ved et
+  klik. Tages der fat i noget andet, går det hjem. Spatlen bliver også hængende
+  over pulverglasset, når den har taget en spatelspids; der gentager ringen
+  spatelspidsen.
+* **Zoomboblen følger det valgte.** Fe³⁺ og SCN⁻ danner FeSCN²⁺ og går i
   stykker igen, Ag⁺ finder SCN⁻ og danner AgSCN, og ascorbinsyre gør to Fe³⁺ til
-  Fe²⁺. K er forstærket i boblen, så der er komplekser at se. Hver partikel er
-  én kugle med formlen på, også de sammensatte ioner SCN⁻ og FeSCN²⁺, og
-  kuglerne er få og store nok til, at formlen kan læses. Navne uden formel
-  (frugtfarven) forkortes på kuglen og forklares under boblen.
+  Fe²⁺. K er forstærket i boblen, så der er komplekser at se. Vælges en flaske
+  eller kolben i stedet for et glas, viser boblen, hvad der står i den
+  (`bobleMaal`). Hver partikel er én kugle med formlen på, også de sammensatte
+  ioner SCN⁻ og FeSCN²⁺. Det er boblen, der er stor (`S.BOBLE`), ikke kuglerne,
+  så der er plads til mange. Lange navne står forkortet på kuglen (Asc, F) og
+  forklares i legenden nederst i boblen.
 * **Intro.** Første gang siden åbnes, siger en pop-up kort, hvad forsøget
   undersøger, og hvad eleven skal gøre. Knappen Om forsøget åbner den igen.
   Den huskes i `localStorage` under `nk-sb24-intro`.
@@ -147,7 +160,8 @@ med ladning bygges med `NK.ladningHaevet`, så ±1 skrives som + og −.
 **Trinene** står i `NK.TRIN` øverst i `js/forsoeg.js`, ét sæt for hver del, med
 tekst, hint og hvilken genstand hintet markerer. Hvornår et trin er gjort,
 afgøres i `trinGjort`. Hvad udstyret gør, når det slippes, står i `brug` og
-`slip`.
+`slip`, og `klik` vælger kun. Et trin skal kunne afgøres af bordets tilstand
+(`alleFyldte`, `tjekAffald`), ikke af den vej, eleven kom ad.
 
 **Koreografierne** (`koer` i `forsoeg.js`) er lister af trin: `flyt` en genstand
 til en positur, vent med `hver` og gør noget undervejs, eller `kald` en
@@ -157,7 +171,8 @@ efter den. Lærerens scener virker på samme måde; formatet står øverst i
 
 **`_selvtest.html`** åbner `index.html` i en iframe og kører forsøget igennem:
 sprites, afstemte skemaer, at hvert indgreb giver den rigtige farveændring, at
-fast stof kræver omrøring, hele del 1 med træk og klik, billedet, del 2 med
+fast stof kræver omrøring, at et klik kun vælger, at det brugte bliver
+hængende med sin ring, hele del 1 med træk, billedet, del 2 med
 fortyndingen, zoomboblen, tegneserien og resultatskemaerne, uheld og
 bemærkninger, kaffen, quizzen, og at der ikke er tankestreger eller 1+/1− i
 teksterne. Chrome skal have lov at åbne iframen: brug en lokal server eller

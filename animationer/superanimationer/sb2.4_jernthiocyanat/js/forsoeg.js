@@ -61,9 +61,9 @@
 
     var TRIN1 = [
         { id: "stam", tekst: "Hæld stamopløsning i bægerglasset", mark: "kolbe1",
-          hint: "Tag fat i kolben med stamopløsning, og slip den over bægerglasset. Du kan også klikke på kolben." },
+          hint: "Tag fat i kolben med stamopløsning, og slip den over bægerglasset." },
         { id: "fordel", tekst: "Hæld et par mL i glas 1 til 7", mark: "baegerA",
-          hint: "Klik på bægerglasset, så hælder det et par mL i de glas, der mangler. Du kan også tage fat i det og hælde i ét glas ad gangen." },
+          hint: "Tag fat i bægerglasset, og slip det over glas 1. Gør det samme med glas 2 til 7." },
         { id: "g1", tekst: "Glas 1: Fe(NO₃)₃ (s), og rør rundt", mark: "pulver_fe", glas: 1, stof: "fe",
           hint: "Tag fat i pulverglasset med Fe(NO₃)₃, og slip det over glas 1. Rør så rundt med glasstaven." },
         { id: "g2", tekst: "Glas 2: ascorbinsyre (s), og rør rundt", mark: "pulver_vitc", glas: 2, stof: "vitc",
@@ -73,7 +73,7 @@
         { id: "g8", tekst: "Glas 8: KSCN og et par dråber AgNO₃", mark: "flaske_scn", glas: 8,
           hint: "Forundersøgelsen: hæld KSCN 0,1 M i det tomme glas 8, og dryp AgNO₃ i. Hold øje med glasset." },
         { id: "g4", tekst: "Glas 4: et par dråber AgNO₃", mark: "ag", glas: 4,
-          hint: "Tag fat i dråbeflasken med AgNO₃, og slip den over glas 4. Hvert klik på flasken er én dråbe." },
+          hint: "Tag fat i dråbeflasken med AgNO₃, og slip den over glas 4. Flasken bliver hængende, og et klik på den gule pil giver en dråbe mere." },
         { id: "g5", tekst: "Glas 5: i det varme vandbad", mark: "vandbad", glas: 5,
           hint: "Tag fat i glas 5, og stil det i vandbadet." },
         { id: "g6", tekst: "Glas 6: i isbadet", mark: "isbad", glas: 6,
@@ -83,18 +83,18 @@
         { id: "billede", tekst: "Tag et billede af glas 1 til 7", mark: "kort",
           hint: "Klik på Tag billede eller på det hvide kort. Notér for hvert glas, om det er mørkere eller lysere end glas 7." },
         { id: "affald", tekst: "Hæld resterne i affaldsdunken", mark: "dunk",
-          hint: "Klik på dunken med surt uorganisk affald." }
+          hint: "Tag fat i hvert glas og i bægerglasset, og slip dem over affaldsdunken." }
     ];
 
     var TRIN2 = [
         { id: "farve", tekst: "Hæld frugtfarve i begge bægerglas", mark: "flaske_farve",
-          hint: "Tag fat i flasken med frugtfarve, og slip den over hvert bægerglas. Et klik fylder det valgte glas næsten halvt op." },
+          hint: "Tag fat i flasken med frugtfarve, og slip den over hvert bægerglas. Den gule pil ved flasken hælder mere i det samme glas." },
         { id: "farveVand", tekst: "Fordobl volumen i det ene glas med vand", mark: "vand",
           hint: "Tag fat i sprøjteflasken, og slip den over det ene glas. Hver gang giver 10 mL. Læs volumen på glasset." },
         { id: "farveSml", tekst: "Sammenlign glassene ovenfra", mark: "papir",
           hint: "Klik på Se ovenfra eller på det hvide papir, og notér, hvordan det fortyndede glas ser ud." },
         { id: "toem", tekst: "Tøm bægerglassene", mark: "dunk",
-          hint: "Tag fat i hvert bægerglas, og slip det over dunken. Du kan også klikke på dunken." },
+          hint: "Tag fat i hvert bægerglas, og slip det over dunken." },
         { id: "lv", tekst: "Hæld ligevægtsblanding i begge bægerglas", mark: "kolbe2",
           hint: "Tag fat i kolben med stamopløsning, og slip den over hvert bægerglas." },
         { id: "lvVand", tekst: "Fordobl volumen i det ene glas med vand", mark: "vand",
@@ -614,9 +614,11 @@
         if (navn === "kaffekop") return this.klikKop ? this.klikKop() : false;
         if (navn === "kort" || navn === "papir") return this.aabnVisning();
 
-        /* Det, der svaever over et glas, gentager sin handling ved et klik */
+        /* Det, der svaever over et glas, gentager sin handling ved et klik.
+           Klikkes der et andet sted, gaar det hjem. */
         var sv = this.svaevende();
         if (sv && navn === sv.navn) return this.gentagSvaev(sv);
+        if (sv) this.svaevHjem(sv);
 
         /* Klik viser, traek goer: et klik vaelger kun genstanden, saa den
            kan laeses og ses i zoomboblen. Handlinger sker ved at traekke. */
@@ -708,9 +710,30 @@
     /* ----- Haeldning fra kolben og flaskerne --------------------------------- */
     P.indholdFra = function (gg, mL) {
         if (gg.greb === "kolbe") return M.stamOpl(mL);
+        if (gg.greb === "draabe") return M.agOpl(mL);
         if (gg.stof === "kscn") return M.kscnOpl(mL);
         if (gg.stof === "farve") return M.farveOpl(mL);
         return M.vandOpl(mL);
+    };
+
+    /* Det, zoomboblen viser: den valgte beholder, eller indholdet i den
+       valgte flaske, saa eleven kan se, hvad der staar i den */
+    P.bobleMaal = function () {
+        var gg = this.valgtGenstand();
+        if (!gg) return null;
+        if (gg.erBeholder) return gg;
+        if (gg.greb !== "kolbe" && gg.greb !== "flaske" && gg.greb !== "draabe") return null;
+        if (gg.greb === "kolbe" && gg.tom) return null;
+        if (!gg.vis) {
+            var f = NK.Sprites.FILER[gg.sprite];
+            gg.vis = {
+                navn: gg.navn, titel: gg.titel, anker: gg.anker, erBeholder: true, erFlaske: true,
+                lup: { x: f.b / 2, y: f.h * 0.55 }, mikro: new NK.Mikro(), b: M.beholder(1)
+            };
+            M.haeldI(gg.vis.b, this.indholdFra(gg, 20));
+        }
+        gg.vis.p = gg.p;
+        return gg.vis;
     };
 
     P.straaleFarve = function (gg) {
@@ -1687,11 +1710,12 @@
 
         this.tjekAffald();
 
-        /* Zoomboblen viser den valgte beholder */
-        var v = this.valgtBeholder();
+        /* Zoomboblen viser det valgte: en beholder eller en flaske */
+        var v = this.bobleMaal();
         var hn = this.handling ? this.handling.navn : "";
         var vis = !!v && (M.volumen(v.b) > 0.05 || v.mikro.partikler.length > 0) && hn !== "affald" && hn !== "toem";
         if (vis) this.bobleBeholder = v;
+        if (v && v.erFlaske) v.mikro.opdater(dt, M.mikroMaal(v.b), { ryst: 0, farve: M.baegerFarve(M.samlet(v.b)) });
         this.bobleAlfa = NK.mod(this.bobleAlfa, vis ? 1 : 0, 5, dt);
 
         this.haandAlfa = NK.mod(this.haandAlfa, this.rystKilde || (this.holdt && this.g[this.holdt.navn].erGlas) ? 1 : 0, 10, dt);
