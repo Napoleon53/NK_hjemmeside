@@ -30,17 +30,17 @@
     var r = NK.r;
 
     var TYPER = ["fe", "scn", "fescn", "fe2", "vitc", "ag", "agscn", "farvestof", "vand"];
-    /* Kuglen skal have plads til formlen: en enkelt ion fylder 14, en lang
-       formel som FeSCN2+ op til 24 */
-    var RADIUS = { fe: 13, scn: 15, fescn: 23, fe2: 13, vitc: 19, ag: 11.5, agscn: 18, farvestof: 14, vand: 6.5 };
+    /* Kuglerne er smaa i forhold til boblen, saa der er plads til mange.
+       Selve boblen er stor (S.BOBLE), og det er den, der goer formlerne
+       laeselige. Lange navne forkortes og forklares i legenden. */
+    var RADIUS = { fe: 7, scn: 8, fescn: 12, fe2: 7, vitc: 10, ag: 6, agscn: 9, farvestof: 7.5, vand: 3.5 };
     var FART = { fe: 22, scn: 26, fescn: 16, fe2: 22, vitc: 18, ag: 28, agscn: 0, farvestof: 14, vand: 16 };
 
     /* Pladserne til AgSCN i bunden */
     var BUNDPLADS = [
-        { x: 0, y: 72 }, { x: -33, y: 68 }, { x: 33, y: 68 },
-        { x: -17, y: 44 }, { x: 17, y: 44 }, { x: -50, y: 40 }, { x: 50, y: 40 },
-        { x: 0, y: 18 }, { x: -34, y: 14 }, { x: 34, y: 14 },
-        { x: -17, y: -10 }, { x: 17, y: -10 }
+        { x: 0, y: 78 }, { x: -19, y: 78 }, { x: 19, y: 78 }, { x: -37, y: 74 }, { x: 37, y: 74 },
+        { x: 0, y: 60 }, { x: -19, y: 60 }, { x: 19, y: 60 }, { x: -38, y: 56 }, { x: 38, y: 56 },
+        { x: -9.5, y: 42 }, { x: 9.5, y: 42 }, { x: -28, y: 42 }, { x: 28, y: 42 }
     ];
 
     NK.Mikro = function () {
@@ -438,9 +438,9 @@
         fescn:     { lys: "#ff9c72", moerk: "#8d2410" },
         fe2:       { lys: "#dcf2c9", moerk: "#5f8a48", tekst: "#2c3a22" },
         scn:       { lys: "#cadcff", moerk: "#2f4e8c" },
-        vitc:      { lys: "#ffeeae", moerk: "#96760f", tekst: "#3a2f06" },
-        ag:        { lys: "#ffffff", moerk: "#7d8792", tekst: "#2b3238" },
-        agscn:     { lys: "#f4f6f8", moerk: "#98a1a9", tekst: "#2b3238" },
+        vitc:      { lys: "#ffdd84", moerk: "#8a6a0a" },
+        ag:        { lys: "#e8edf2", moerk: "#6b7580" },
+        agscn:     { lys: "#e6eaee", moerk: "#828b93" },
         farvestof: { lys: "#8fb6ff", moerk: "#1f4fa8" },
         o:         { lys: "#ff9a90", moerk: "#b8332a" },
         h:         { lys: "#ffffff", moerk: "#aab4bf" }
@@ -453,10 +453,12 @@
     };
     NK.Mikro.ETIKET = ETIKET;
 
-    /* Navne, der er for lange til kuglen, forkortes, og forklaringen staar
-       under boblen */
-    var KORT = { farvestof: "F" };
+    /* Navne, der er for lange til kuglen, forkortes, og legenden nederst i
+       boblen siger, hvad forkortelsen daekker */
+    var KORT = { vitc: "Asc", farvestof: "F" };
+    var LEGENDE = { vitc: "ascorbinsyre, " + M.formel("C6H8O6"), farvestof: "farvestof i frugtfarven" };
     NK.Mikro.KORT = KORT;
+    NK.Mikro.LEGENDE = LEGENDE;
 
     /* Den stoerste skrift, formlen kan staa med paa kuglen. Regnes én gang
        pr. slags og gemmes. */
@@ -491,7 +493,7 @@
         var u = UDSEENDE[p.type];
         var s = skriftMaal(ctx, p.type);
         NK.kugle(ctx, p.x, p.y, p.rad, u.lys, u.moerk);
-        etiket(ctx, s.tekst, p.x, p.y, u.tekst || "#ffffff", s.str);
+        etiket(ctx, s.tekst, p.x, p.y, "#ffffff", s.str);
     }
 
     /* Bundfaldet: samme kugle med en lys kant, saa det ses, at det er fast */
