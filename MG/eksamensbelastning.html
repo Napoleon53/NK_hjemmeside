@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eksamensbelastning 2026/2027</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="../assets/img/logo.svg" type="image/svg+xml">
+<style>
+  :root{
+    --bg:#f4f6f8;
+    --panel:#ffffff;
+    --border:#d8dee4;
+    --ink:#1f2933;
+    --muted:#5c6a76;
+    --accent:#2563eb;
+    --accent-dark:#1d4ed8;
+    --accent-svag:#eef4ff;
+    --warn:#b45309;
+    --warn-bg:#fef3c7;
+    --warn-kant:#f5d78e;
+    --fejl:#b91c1c;
+    --ok:#15803d;
+  }
+  *{box-sizing:border-box;}
+  [hidden]{display:none !important;}
+  body{
+    margin:0;
+    font-family:"Segoe UI", Calibri, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding:22px 24px 60px;
+  }
+  a{color:var(--accent-dark);}
+  h1{font-size:1.5rem; margin:0;}
+  .muted{color:var(--muted); font-size:.88rem;}
+
+  .top{display:flex; align-items:flex-end; gap:8px 20px; flex-wrap:wrap; margin-bottom:18px;}
+  .top .titel{flex:1 1 320px;}
+  .top .titel p{margin:4px 0 0; max-width:62ch;}
+  .tilbage{font-size:.85rem; text-decoration:none;}
+  .tilbage:hover{text-decoration:underline;}
+
+  button{
+    font-family:inherit; font-size:.95rem; font-weight:600;
+    padding:10px 18px; border-radius:8px; border:1px solid transparent; cursor:pointer;
+  }
+  .btn-primary{background:var(--accent); color:#fff;}
+  .btn-primary:hover{background:var(--accent-dark);}
+  .btn-secondary{background:#fff; color:var(--ink); border-color:var(--border);}
+  .btn-secondary:hover{background:#eef1f4;}
+  .btn-small{padding:6px 12px; font-size:.85rem;}
+  .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+
+  input[type=text], input[type=number]{
+    font-family:inherit; font-size:.95rem; font-weight:400;
+    padding:7px 9px; border:1px solid var(--border); border-radius:6px;
+    background:#fff; color:var(--ink);
+  }
+  input[type=number]{width:96px;}
+  input.advar{border-color:var(--warn); background:#fffbeb;}
+  input.fejl{border-color:var(--fejl); background:#fff5f5;}
+  label.felt{display:flex; flex-direction:column; gap:5px; font-size:.88rem; font-weight:600;}
+  label.felt .enhed{font-weight:400; color:var(--muted); font-size:.8rem;}
+  label.check{display:flex; align-items:center; gap:8px; font-weight:600; font-size:.92rem; cursor:pointer;}
+  label.check input{width:18px; height:18px; margin:0; accent-color:var(--accent); cursor:pointer;}
+
+  .layout{display:grid; grid-template-columns:minmax(0,1fr); gap:18px; align-items:start;}
+  @media (min-width:1080px){ .layout{grid-template-columns:minmax(0,1fr) 340px;} }
+
+  /* En tjans */
+  .tjans{
+    background:var(--panel); border:1px solid var(--border); border-radius:10px;
+    padding:12px 16px 14px; margin-bottom:14px;
+  }
+  .tjans.ufuldstaendig{border-style:dashed;}
+  .tjans-hoved{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px;}
+  .tjans-nr{
+    width:24px; height:24px; flex:none; border-radius:50%;
+    background:var(--accent); color:#fff; font-size:.78rem; font-weight:700;
+    display:inline-flex; align-items:center; justify-content:center;
+  }
+  .tjans-hoved input.hold{width:190px;}
+  .tjans-hoved .fjern{margin-left:auto;}
+  .sub-label{display:block; font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:6px;}
+
+  .chip-list{display:flex; flex-wrap:wrap; gap:6px;}
+  .chip{
+    padding:6px 12px; font-size:.85rem; border-radius:999px;
+    border:1px solid var(--border); background:#fff; color:var(--ink); font-weight:600;
+  }
+  .chip:hover{background:#eef1f4;}
+  .chip.valgt{background:var(--accent); border-color:var(--accent); color:#fff;}
+
+  .felter{display:flex; flex-wrap:wrap; gap:14px 20px; margin-top:14px; align-items:flex-start;}
+  .hjaelp{margin:6px 0 0; font-size:.82rem; color:var(--muted); max-width:60ch;}
+  .type-info{
+    margin:12px 0 0; font-size:.85rem; color:var(--muted);
+    background:var(--accent-svag); border-radius:6px; padding:8px 11px; max-width:60ch;
+  }
+
+  .gruppe-blok{margin-top:16px; border-top:1px solid #edf0f3; padding-top:12px;}
+  .gruppe-felter{display:flex; flex-wrap:wrap; gap:14px 20px; margin-top:12px; align-items:flex-start;}
+  .runde-svar{flex-basis:100%; margin:0; font-size:.83rem; color:var(--muted); max-width:60ch;}
+  .runde-svar b{color:var(--ink);}
+
+  .beskeder{display:flex; flex-direction:column; gap:6px;}
+  .beskeder:not(:empty){margin-top:12px;}
+  .besked{
+    font-size:.88rem; border-radius:6px; padding:8px 11px; margin:0;
+    border:1px solid var(--warn-kant); background:var(--warn-bg); color:#7c4a02;
+  }
+  .besked.stor{font-weight:600;}
+  .besked.fejl{border-color:#f3c0c0; background:#fdf1f1; color:var(--fejl);}
+  .besked ul{margin:6px 0 0; padding-left:18px; font-weight:400;}
+
+  .tjans-resultat{
+    margin-top:12px; padding-top:10px; border-top:1px solid #edf0f3;
+    display:flex; align-items:baseline; gap:4px 14px; flex-wrap:wrap;
+  }
+  .tjans-resultat .timer{font-size:1.15rem; font-weight:700; color:var(--accent-dark);}
+  .tjans-resultat .regnestykke{font-size:.85rem; color:var(--muted);}
+
+  /* Resultatpanel */
+  .sidepanel{position:sticky; top:18px; display:flex; flex-direction:column; gap:14px;}
+  .sum-kort{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px 16px 16px;}
+  .sum-tal{font-size:2.1rem; font-weight:700; color:var(--accent-dark); line-height:1.1;}
+  .sum-tal span{font-size:1rem; font-weight:600; color:var(--muted);}
+  .sum-liste{list-style:none; margin:12px 0 0; padding:0; font-size:.88rem;}
+  .sum-liste li{display:flex; justify-content:space-between; gap:12px; padding:5px 0; border-top:1px solid #edf0f3;}
+  .sum-liste li span:last-child{font-weight:600; white-space:nowrap;}
+  .sum-liste li.tom{color:var(--muted);}
+  .sum-liste li.tom span:last-child{font-weight:400;}
+  .sum-kort .row{margin-top:14px;}
+  .note{
+    background:#fff; border:1px solid var(--border); border-radius:10px;
+    padding:12px 14px; font-size:.85rem; color:var(--muted);
+  }
+  .note p{margin:0 0 8px;}
+  .note p:last-child{margin-bottom:0;}
+  .note strong{color:var(--ink);}
+  .kvittering{margin:10px 0 0; font-size:.85rem; color:var(--ok); font-weight:600;}
+
+  @media (max-width:520px){
+    body{padding:16px 14px 50px;}
+    .tjans-hoved input.hold{width:100%;}
+  }
+  @media print{
+    body{background:#fff; padding:0;}
+    .chip-list, .fjern, .sum-kort .row, #tilfoej, #ryd, .tilbage, .gruppe-blok label.check{display:none !important;}
+    .tjans, .sum-kort, .note{break-inside:avoid; border-color:#bbb;}
+    .sidepanel{position:static;}
+  }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="titel">
+    <h1>Eksamensbelastning</h1>
+    <p class="muted">Beregnet efter FAQ om fordeling af opgaver 2026/2027. Tallene bliver i din egen browser og sendes ingen steder hen.</p>
+  </div>
+  <a class="tilbage" href="index.html">Tilbage til v&aelig;rkt&oslash;jer</a>
+</div>
+
+<div class="layout">
+  <div>
+    <div id="tjanser"></div>
+    <div class="row">
+      <button id="tilfoej" class="btn-primary" type="button">Tilf&oslash;j tjans</button>
+      <button id="ryd" class="btn-secondary btn-small" type="button">Ryd alt</button>
+    </div>
+  </div>
+
+  <aside class="sidepanel">
+    <div class="sum-kort">
+      <span class="sub-label">Samlet eksamensbelastning</span>
+      <div class="sum-tal"><b id="sumTimer">0,0</b> <span>timer</span></div>
+      <ul class="sum-liste" id="sumListe"></ul>
+      <div id="sumBeskeder" class="beskeder"></div>
+      <div class="row">
+        <button id="kopier" class="btn-secondary btn-small" type="button">Kopier oversigt</button>
+        <button id="udskriv" class="btn-secondary btn-small" type="button">Udskriv</button>
+      </div>
+      <p class="kvittering" id="kvittering" hidden>Oversigten er kopieret.</p>
+    </div>
+
+    <div class="note">
+      <p><strong>Udg&aring;ende censur samme dag.</strong> Skal du censurere mere end &eacute;t hold p&aring; samme dag som udg&aring;ende censor, kan der sk&oslash;nnes en lavere samlet belastning i opgavefordelingen.</p>
+      <p>Sig gerne til NK, hvis beregningen ikke stemmer med opgavefordelingen for 2026/2027.</p>
+    </div>
+  </aside>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var TYPER = [
+    { id:'eksamen',   navn:'Eksamen, eksaminator', grund:8.5, faktor:2, tid:true,
+      info:'8,5 timer i grundtid. Eksaminationstiden tæller dobbelt.' },
+    { id:'udgcensur', navn:'Udgående censur', grund:10, faktor:1, tid:true,
+      info:'10 timer i grundtid plus eksaminationstiden.' },
+    { id:'aarspEks',  navn:'Årsprøve, eksaminator', grund:10, faktor:1, tid:true,
+      info:'10 timer i grundtid plus eksaminationstiden.' },
+    { id:'aarspCens', navn:'Årsprøve, censor', grund:3, faktor:1, tid:true,
+      info:'3 timer i grundtid plus eksaminationstiden.' },
+    { id:'dhosro',    navn:'DHO/SRO', perElev:28/60,
+      info:'28 minutter pr. elev. Her skal kun antal elever udfyldes.' },
+    { id:'srp',       navn:'SRP, censor eller eksaminator', perElev:3.5,
+      info:'3,5 time pr. elev. Her skal kun antal elever udfyldes.' },
+    { id:'andet',     navn:'Andet', manuel:true,
+      info:'Skriv timetallet selv, hvis opgaven ikke passer i de andre kategorier.' }
+  ];
+
+  var GRAENSE_TJANS = 50;   // timer for een tjans, hvor det som regel er en tastefejl
+  var NOEGLE = 'mg_eksamensbelastning_v1';
+
+  var tjanser = [];
+  var naesteId = 1;
+
+  /* --------------------------------------------------------------- hjaelpere */
+
+  function type(id){
+    for (var i = 0; i < TYPER.length; i++){ if (TYPER[i].id === id) return TYPER[i]; }
+    return null;
+  }
+  function tal(v){
+    if (v === '' || v === null || v === undefined) return null;
+    var n = Number(v);
+    return isFinite(n) ? n : null;
+  }
+  function timetekst(t){
+    return (Math.round(t * 10) / 10).toFixed(1).replace('.', ',');
+  }
+  function esc(s){
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function nyTjans(){
+    return { id:naesteId++, hold:'', type:'', elever:null, minutter:null,
+             gruppe:false, gruppestr:null, runder:null, gruppeminutter:null,
+             runderRettet:false, andetTekst:'', andetTimer:null };
+  }
+
+  /* ------------------------------------------------------------ beregningen */
+
+  // Samme regnestykke som regnearket Eksamensbelastningsberegner 2026.
+  function beregn(t){
+    var ty = type(t.type);
+    var svar = { timer:null, regnestykke:'', beskeder:[], felter:{} };
+    if (!ty) return svar;
+
+    if (ty.manuel){
+      if (t.andetTimer === null) return svar;
+      if (t.andetTimer < 0){
+        svar.felter.andetTimer = 'fejl';
+        svar.beskeder.push({ art:'fejl', tekst:'Timetallet kan ikke være negativt.' });
+        return svar;
+      }
+      svar.timer = t.andetTimer;
+      svar.regnestykke = 'indtastet direkte';
+      return svar;
+    }
+
+    var mangler = false;
+    var elever = t.elever;
+    if (elever === null || elever <= 0){
+      mangler = true;
+    } else if (elever % 1 !== 0){
+      mangler = true;
+      svar.felter.elever = 'fejl';
+      svar.beskeder.push({ art:'fejl', tekst:'Antal elever skal være et helt tal.' });
+    } else if (elever > 40){
+      svar.felter.elever = 'advar';
+      svar.beskeder.push({ art:'advar', tekst:'Er der virkelig ' + elever +
+        ' elever? Skriv kun de elever, du selv skal eksaminere eller censurere.' });
+    }
+
+    if (ty.perElev){
+      if (mangler) return svar;
+      svar.timer = ty.perElev * elever;
+      svar.regnestykke = elever + ' elever × ' + (ty.id === 'dhosro' ? '28 min' : '3,5 time');
+      return svar;
+    }
+
+    // Eksamen og aarsproever: grundtid + faktor gange eksaminationstiden.
+    var min = t.minutter;
+    if (min === null){
+      mangler = true;
+    } else if (min < 0){
+      svar.felter.minutter = 'fejl';
+      mangler = true;
+    } else if (min > 60){
+      svar.felter.minutter = 'advar';
+      svar.beskeder.push({ art:'advar', tekst:'Tiden skal være pr. elev, ikke for hele holdet. ' +
+        min + ' minutter til én elev er meget.' });
+    }
+
+    var runder = null, gmin = null;
+    if (t.gruppe){
+      runder = t.runder;
+      gmin = t.gruppeminutter;
+      if (runder === null || runder <= 0 || gmin === null || gmin <= 0){
+        mangler = true;
+        if (runder === null || runder <= 0) svar.felter.runder = 'fejl';
+        if (gmin === null || gmin <= 0) svar.felter.gruppeminutter = 'fejl';
+        svar.beskeder.push({ art:'fejl',
+          tekst:'Udfyld felterne om grupper, eller fjern fluebenet ved gruppeelementet.' });
+      } else {
+        if (elever && t.gruppestr){
+          var vent = Math.ceil(elever / t.gruppestr);
+          if (runder !== vent){
+            svar.felter.runder = 'advar';
+            svar.beskeder.push({ art:'advar', tekst:elever + ' elever i grupper à ' +
+              t.gruppestr + ' giver ' + vent + ' grupperunder, ikke ' + runder + '.' });
+          }
+        }
+        if (elever && runder > elever){
+          svar.felter.runder = 'advar';
+          svar.beskeder.push({ art:'advar', tekst:'Der kan ikke være flere grupperunder end elever. ' +
+            'Antallet af runder er, hvor mange gange en gruppe skal ind til prøven.' });
+        }
+        if (gmin > 120){
+          svar.felter.gruppeminutter = 'advar';
+          svar.beskeder.push({ art:'advar',
+            tekst:'Tiden skal være pr. grupperunde, ikke for alle runder tilsammen.' });
+        }
+      }
+    }
+
+    if (mangler) return svar;
+
+    var indi = elever * min / 60;
+    var grp  = t.gruppe ? runder * gmin / 60 : 0;
+    svar.timer = ty.grund + ty.faktor * (indi + grp);
+
+    var grundtekst = timetekst(ty.grund) + ' t grundtid';
+    if (t.gruppe){
+      var inder = timetekst(indi) + ' t individuelt + ' + timetekst(grp) + ' t i grupper';
+      svar.regnestykke = grundtekst + (ty.faktor === 2 ? ' + 2 × (' + inder + ')' : ' + ' + inder);
+    } else {
+      svar.regnestykke = grundtekst + (ty.faktor === 2 ? ' + 2 × ' : ' + ') +
+        timetekst(indi) + ' t eksamination';
+    }
+
+    if (svar.timer > GRAENSE_TJANS){
+      var raad = ['Er tiden pr. elev og ikke for hele holdet?'];
+      if (t.gruppe) raad.push('Er tiden pr. grupperunde og ikke for alle runder tilsammen?');
+      raad.push('Er antallet af elever kun dem, du selv skal ind til?');
+      svar.beskeder.push({ art:'advar', stor:true, punkter:raad,
+        tekst:'Over ' + GRAENSE_TJANS + ' timer for én tjans. Det er næsten altid en tastefejl.' });
+    }
+    return svar;
+  }
+
+  /* ---------------------------------------------------------------- tegning */
+
+  function feltHtml(navn, etiket, enhed, vaerdi, ekstra){
+    return '<label class="felt">' + esc(etiket) +
+      (enhed ? ' <span class="enhed">' + esc(enhed) + '</span>' : '') +
+      '<input type="number" data-felt="' + navn + '" value="' +
+      (vaerdi === null ? '' : vaerdi) + '"' + (ekstra || '') + '></label>';
+  }
+
+  function tjansHtml(t, nr){
+    var ty = type(t.type);
+    var h = '<section class="tjans" data-id="' + t.id + '">';
+
+    h += '<div class="tjans-hoved">' +
+           '<span class="tjans-nr">' + nr + '</span>' +
+           '<input type="text" class="hold" data-felt="hold" placeholder="Hold (valgfrit)" value="' +
+             esc(t.hold) + '">' +
+           (tjanser.length > 1 ? '<button type="button" class="btn-secondary btn-small fjern">Fjern</button>' : '') +
+         '</div>';
+
+    h += '<span class="sub-label">Opgavetype</span><div class="chip-list">';
+    for (var i = 0; i < TYPER.length; i++){
+      h += '<button type="button" class="chip' + (TYPER[i].id === t.type ? ' valgt' : '') +
+           '" data-type="' + TYPER[i].id + '">' + TYPER[i].navn + '</button>';
+    }
+    h += '</div>';
+
+    if (!ty){
+      h += '<p class="hjaelp">Vælg en opgavetype, så kommer felterne frem.</p>';
+    } else {
+
+    h += '<p class="type-info">' + ty.info + '</p>';
+
+    if (ty.manuel){
+      h += '<div class="felter">' +
+             '<label class="felt">Hvad dækker timerne?' +
+               '<input type="text" data-felt="andetTekst" style="width:240px;" value="' +
+                 esc(t.andetTekst) + '"></label>' +
+             feltHtml('andetTimer', 'Timer', '', t.andetTimer, ' min="0" max="200" step="0.5"') +
+           '</div>';
+    } else if (ty.perElev){
+      h += '<div class="felter">' +
+             feltHtml('elever', 'Antal elever', '', t.elever, ' min="1" max="100"') +
+           '</div>';
+    } else {
+      h += '<div class="felter">' +
+             feltHtml('elever', 'Antal elever', '', t.elever, ' min="1" max="100"') +
+             feltHtml('minutter', 'Tid pr. elev', 'minutter', t.minutter, ' min="0" max="200"') +
+           '</div>' +
+           '<p class="hjaelp">Tiden er den individuelle prøvedel for én elev, som den står i eksamensplanen.</p>';
+
+      h += '<div class="gruppe-blok">' +
+             '<label class="check"><input type="checkbox" data-felt="gruppe"' +
+               (t.gruppe ? ' checked' : '') + '> Prøven har også et gruppeelement</label>' +
+             '<p class="hjaelp">Sæt kun flueben, hvis en del af prøven foregår i grupper, ' +
+               'fx en fælles fremlæggelse før de individuelle spørgsmål. ' +
+               'Har din prøve intet gruppeelement, skal du ikke skrive noget om grupper.</p>' +
+             '<div class="gruppe-felter"' + (t.gruppe ? '' : ' hidden') + '>' +
+               feltHtml('gruppestr', 'Elever pr. gruppe', '', t.gruppestr, ' min="1" max="100"') +
+               feltHtml('runder', 'Antal grupperunder', '', t.runder, ' min="1" max="100"') +
+               feltHtml('gruppeminutter', 'Tid pr. grupperunde', 'minutter', t.gruppeminutter, ' min="1" max="500"') +
+               '<p class="runde-svar"></p>' +
+             '</div>' +
+           '</div>';
+    }
+
+    }
+
+    h += '<div class="beskeder"></div>';
+    if (ty){
+      h += '<div class="tjans-resultat"><span class="timer">&ndash;</span>' +
+           '<span class="regnestykke"></span></div>';
+    }
+    h += '</section>';
+    return h;
+  }
+
+  function tegnAlle(){
+    var ud = '';
+    for (var i = 0; i < tjanser.length; i++) ud += tjansHtml(tjanser[i], i + 1);
+    document.getElementById('tjanser').innerHTML = ud;
+    opdaterAlle();
+  }
+
+  function kortFor(t){
+    return document.querySelector('.tjans[data-id="' + t.id + '"]');
+  }
+
+  function beskedHtml(liste){
+    var h = '';
+    for (var i = 0; i < liste.length; i++){
+      var b = liste[i];
+      h += '<div class="besked' + (b.art === 'fejl' ? ' fejl' : '') + (b.stor ? ' stor' : '') + '">' + esc(b.tekst);
+      if (b.punkter){
+        h += '<ul>';
+        for (var j = 0; j < b.punkter.length; j++) h += '<li>' + esc(b.punkter[j]) + '</li>';
+        h += '</ul>';
+      }
+      h += '</div>';
+    }
+    return h;
+  }
+
+  function opdaterKort(t){
+    var kort = kortFor(t);
+    if (!kort) return null;
+    var svar = beregn(t);
+
+    kort.classList.toggle('ufuldstaendig', svar.timer === null);
+
+    var felter = kort.querySelectorAll('input[data-felt]');
+    for (var i = 0; i < felter.length; i++){
+      var m = svar.felter[felter[i].getAttribute('data-felt')];
+      felter[i].classList.toggle('advar', m === 'advar');
+      felter[i].classList.toggle('fejl', m === 'fejl');
+    }
+
+    var runde = kort.querySelector('.runde-svar');
+    if (runde){
+      if (t.elever && t.gruppestr){
+        runde.innerHTML = t.elever + ' elever i grupper à ' + t.gruppestr + ' giver <b>' +
+          Math.ceil(t.elever / t.gruppestr) + ' grupperunder</b>. Antallet er udfyldt for dig og kan rettes.';
+      } else {
+        runde.innerHTML = 'En grupperunde er én gruppe inde til prøven. Udfyld elever pr. gruppe, ' +
+          'så regnes antallet af runder ud.';
+      }
+    }
+
+    var boks = kort.querySelector('.beskeder');
+    if (boks) boks.innerHTML = beskedHtml(svar.beskeder);
+
+    var timer = kort.querySelector('.timer');
+    var regne = kort.querySelector('.regnestykke');
+    if (!timer || !regne) return svar;
+    if (svar.timer === null){
+      timer.innerHTML = '&ndash;';
+      regne.textContent = type(t.type) ? 'Udfyld felterne, så tæller tjansen med.' : '';
+    } else {
+      timer.textContent = timetekst(svar.timer) + ' timer';
+      regne.textContent = svar.regnestykke;
+    }
+    return svar;
+  }
+
+  function opdaterAlle(){
+    var sum = 0, ufuldstaendige = 0, censur = 0, liste = '';
+    for (var i = 0; i < tjanser.length; i++){
+      var t = tjanser[i];
+      var svar = opdaterKort(t);
+      if (!svar) continue;
+      var ty = type(t.type);
+      if (!ty) continue;                       // en tom tjans uden valgt opgavetype
+      if (t.type === 'udgcensur') censur++;
+      var navn = t.hold || (ty.manuel && t.andetTekst ? t.andetTekst : null) || ty.navn;
+      if (svar.timer === null){
+        ufuldstaendige++;
+        liste += '<li class="tom"><span>' + esc(navn) + '</span><span>&ndash;</span></li>';
+      } else {
+        sum += svar.timer;
+        liste += '<li><span>' + esc(navn) + '</span><span>' + timetekst(svar.timer) + ' t</span></li>';
+      }
+    }
+
+    document.getElementById('sumTimer').textContent = timetekst(sum);
+    document.getElementById('sumListe').innerHTML = liste ||
+      '<li class="tom"><span>Ingen tjanser endnu</span><span></span></li>';
+
+    var beskeder = [];
+    if (ufuldstaendige > 0){
+      beskeder.push({ art:'advar', tekst: ufuldstaendige === 1
+        ? 'Én tjans er ikke færdigudfyldt og tæller ikke med.'
+        : ufuldstaendige + ' tjanser er ikke færdigudfyldte og tæller ikke med.' });
+    }
+    if (censur > 1){
+      beskeder.push({ art:'advar', tekst:'Du har ' + censur + ' hold som udgående censor. ' +
+        'Ligger to af dem samme dag, kan der skønnes en lavere samlet belastning.' });
+    }
+    document.getElementById('sumBeskeder').innerHTML = beskedHtml(beskeder);
+    gem();
+  }
+
+  /* -------------------------------------------------------------- haendelser */
+
+  function find(el){
+    var kort = el.closest ? el.closest('.tjans') : null;
+    if (!kort) return null;
+    var id = Number(kort.getAttribute('data-id'));
+    for (var i = 0; i < tjanser.length; i++){ if (tjanser[i].id === id) return tjanser[i]; }
+    return null;
+  }
+
+  var liste = document.getElementById('tjanser');
+
+  liste.addEventListener('click', function(e){
+    var chip = e.target.closest('.chip');
+    if (chip){
+      var t = find(chip);
+      if (!t) return;
+      if (t.type !== chip.getAttribute('data-type')){
+        t.type = chip.getAttribute('data-type');
+        tegnAlle();
+        var kort = kortFor(t);
+        var foerste = kort && kort.querySelector('input[data-felt="elever"], input[data-felt="andetTekst"]');
+        if (foerste) foerste.focus();
+      }
+      return;
+    }
+    if (e.target.closest('.fjern')){
+      var t2 = find(e.target);
+      if (!t2) return;
+      for (var i = 0; i < tjanser.length; i++){
+        if (tjanser[i] === t2){ tjanser.splice(i, 1); break; }
+      }
+      if (!tjanser.length) tjanser.push(nyTjans());
+      tegnAlle();
+    }
+  });
+
+  liste.addEventListener('input', function(e){
+    var felt = e.target.getAttribute('data-felt');
+    if (!felt) return;
+    var t = find(e.target);
+    if (!t) return;
+
+    if (felt === 'hold' || felt === 'andetTekst'){
+      t[felt] = e.target.value;
+    } else if (felt === 'gruppe'){
+      t.gruppe = e.target.checked;
+      var blok = kortFor(t).querySelector('.gruppe-felter');
+      if (blok) blok.hidden = !t.gruppe;
+    } else {
+      t[felt] = tal(e.target.value);
+      if (felt === 'runder') t.runderRettet = true;
+      // Antal grupperunder udfyldes af sig selv, indtil det rettes i haanden.
+      if ((felt === 'elever' || felt === 'gruppestr') && t.gruppe && !t.runderRettet &&
+          t.elever && t.gruppestr){
+        t.runder = Math.ceil(t.elever / t.gruppestr);
+        var rf = kortFor(t).querySelector('input[data-felt="runder"]');
+        if (rf) rf.value = t.runder;
+      }
+    }
+    opdaterAlle();
+  });
+
+  document.getElementById('tilfoej').addEventListener('click', function(){
+    tjanser.push(nyTjans());
+    tegnAlle();
+    var kort = document.querySelectorAll('.tjans');
+    if (kort.length) kort[kort.length - 1].scrollIntoView({ block:'nearest' });
+  });
+
+  document.getElementById('ryd').addEventListener('click', function(){
+    if (!window.confirm('Ryd alle tjanser?')) return;
+    tjanser = [nyTjans()];
+    tegnAlle();
+  });
+
+  document.getElementById('udskriv').addEventListener('click', function(){ window.print(); });
+
+  document.getElementById('kopier').addEventListener('click', function(){
+    var linjer = ['Eksamensbelastning 2026/2027'], sum = 0;
+    for (var i = 0; i < tjanser.length; i++){
+      var t = tjanser[i], svar = beregn(t), ty = type(t.type);
+      if (!ty || svar.timer === null) continue;
+      sum += svar.timer;
+      var del = [];
+      if (t.hold) del.push(t.hold);
+      del.push(ty.navn);
+      if (ty.manuel && t.andetTekst) del.push(t.andetTekst);
+      if (t.elever) del.push(t.elever + ' elever');
+      if (ty.tid && t.minutter !== null) del.push(t.minutter + ' min pr. elev');
+      if (t.gruppe && t.runder && t.gruppeminutter){
+        del.push(t.runder + ' grupperunder à ' + t.gruppeminutter + ' min');
+      }
+      linjer.push('- ' + del.join(', ') + ': ' + timetekst(svar.timer) + ' timer');
+    }
+    linjer.push('I alt: ' + timetekst(sum) + ' timer');
+
+    var tekst = linjer.join('\n');
+    var kvit = document.getElementById('kvittering');
+    function vis(){
+      kvit.hidden = false;
+      window.setTimeout(function(){ kvit.hidden = true; }, 2500);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(tekst).then(vis, function(){
+        window.prompt('Kopier oversigten:', tekst);
+      });
+    } else {
+      window.prompt('Kopier oversigten:', tekst);
+    }
+  });
+
+  /* ------------------------------------------------------------------ lager */
+
+  function gem(){
+    try { window.localStorage.setItem(NOEGLE, JSON.stringify(tjanser)); } catch (e) {}
+  }
+  function hent(){
+    try {
+      var raa = window.localStorage.getItem(NOEGLE);
+      if (!raa) return null;
+      var d = JSON.parse(raa);
+      if (!d || !d.length) return null;
+      for (var i = 0; i < d.length; i++){
+        d[i].id = naesteId++;
+        if (!type(d[i].type)) d[i].type = '';
+      }
+      return d;
+    } catch (e) { return null; }
+  }
+
+  tjanser = hent() || [nyTjans()];
+  tegnAlle();
+})();
+</script>
+</body>
+</html>
