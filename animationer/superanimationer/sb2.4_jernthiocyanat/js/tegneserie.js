@@ -197,7 +197,7 @@
         if (!res.farve && !res.lv) return null;
         var tabel = document.createElement("table");
         tabel.className = "resultater skema";
-        raekke(tabel, ["Opløsning", "Set ovenfra efter fortynding", "⟵ / ⟶"], true);
+        raekke(tabel, ["Opløsning", "Volumen", "Set ovenfra efter fortynding", "⟵ / ⟶"], true);
         [["frugtfarve", res.farve, "ingen ligevægt"], ["ligevægtsblanding", res.lv, null]].forEach(function (rk) {
             var r = rk[1];
             if (!r) return;
@@ -209,7 +209,8 @@
                 fk.textContent = "Glasset var " + r.faktisk + ".";
                 svar.appendChild(fk);
             }
-            raekke(tabel, [rk[0], svar, rk[2] || (r.faktisk === "lysere" ? "⟵" : (r.faktisk === "mørkere" ? "⟶" : "ingen"))]);
+            raekke(tabel, [rk[0], Math.round(r.V[1]) + " mL ⟶ " + Math.round(r.V[0]) + " mL", svar,
+                rk[2] || (r.faktisk === "lysere" ? "⟵" : (r.faktisk === "mørkere" ? "⟶" : "ingen"))]);
         });
         return tabel;
     }
@@ -285,21 +286,33 @@
                 }
             });
 
-            /* 5. Del 2: fortynding set ovenfra */
-            function del2Rude(r, t) {
-                rude(container, ++nr, t, function (ctx) {
+            /* 5. Del 2: de fire glas ovenfra, to og to i par */
+            var r2 = f.del2.resultat;
+            if (r2.farve && r2.lv) {
+                var TEKST2 = "De fire glas ovenfra: frugtfarven var " + r2.farve.svar + ", og ligevægtsblandingen var " +
+                    r2.lv.svar + ". Frugtfarven har lige mange farvestofmolekyler i lysvejen, uanset volumen. " +
+                    "I ligevægtsblandingen halveres alle koncentrationer, så Y bliver dobbelt så stor som K, " +
+                    "og ligevægten forskydes mod venstre.";
+                rude(container, ++nr, TEKST2, function (ctx) {
                     ctx.fillStyle = "#f4f5f3";
                     NK.rundtRekt(ctx, 12, 18, 276, 166, 8);
                     ctx.fill();
-                    S.tegnOppefra(ctx, 95, 92, 44, { farve: r.farver[1] });
-                    S.tegnOppefra(ctx, 205, 92, 44, { farve: r.farver[0] });
-                    tekst(ctx, Math.round(r.V[1]) + " mL", 95, 160, { farve: "#2a2f36" });
-                    tekst(ctx, Math.round(r.V[0]) + " mL", 205, 160, { farve: "#2a2f36" });
+                    ctx.strokeStyle = "rgba(90, 100, 112, 0.35)";
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(150, 30);
+                    ctx.lineTo(150, 172);
+                    ctx.stroke();
+                    [["Frugtfarve", r2.farve, 48], ["Ligevægt", r2.lv, 190]].forEach(function (p) {
+                        var r = p[1], x0 = p[2];
+                        tekst(ctx, p[0], x0 + 31, 40, { farve: "#2a2f36", font: "700 11px 'Segoe UI', sans-serif" });
+                        S.tegnOppefra(ctx, x0, 104, 27, { farve: r.farver[1] });
+                        S.tegnOppefra(ctx, x0 + 62, 104, 27, { farve: r.farver[0] });
+                        tekst(ctx, Math.round(r.V[1]) + " mL", x0, 152, { farve: "#2a2f36", font: "600 11px 'Segoe UI', sans-serif" });
+                        tekst(ctx, Math.round(r.V[0]) + " mL", x0 + 62, 152, { farve: "#2a2f36", font: "600 11px 'Segoe UI', sans-serif" });
+                    });
                 });
             }
-            var r2 = f.del2.resultat;
-            if (r2.farve) del2Rude(r2.farve, "Frugtfarve: set ovenfra var det fortyndede glas " + r2.farve.svar + ". Antallet af farvestofmolekyler er det samme, så farven ovenfra er uændret.");
-            if (r2.lv) del2Rude(r2.lv, "Ligevægtsblanding: set ovenfra var det fortyndede glas " + r2.lv.svar + ". Fortynding gør Y større end K, så ligevægten forskydes mod venstre.");
 
             /* 6. Uheld */
             var UHELD = [];
@@ -307,7 +320,9 @@
                 if (f.haendt["spild_" + gl.navn]) UHELD.push("Uheld: glas " + gl.nr + " blev rystet så voldsomt, at indholdet sprøjtede ud. Kemichael tørrede op.");
                 if (f.haendt["overloeb_" + gl.navn]) UHELD.push("Uheld: glas " + gl.nr + " løb over. Kemichael tørrede op.");
             });
-            [["baegerA", "bægerglasset"], ["baegerV", "det venstre bægerglas"], ["baegerH", "det højre bægerglas"]].forEach(function (b) {
+            [["baegerA", "bægerglasset"]].concat(NK.BAEGERE.map(function (n, i) {
+                return [n, "bægerglas " + (i + 1)];
+            })).forEach(function (b) {
                 if (f.haendt["spild_" + b[0]]) UHELD.push("Uheld: " + b[1] + " blev rystet, så indholdet røg ud. Kemichael tørrede op.");
                 if (f.haendt["overloeb_" + b[0]]) UHELD.push("Uheld: " + b[1] + " løb over. Kemichael tørrede op.");
             });

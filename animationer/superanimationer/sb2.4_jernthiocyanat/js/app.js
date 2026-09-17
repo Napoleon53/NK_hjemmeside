@@ -78,11 +78,14 @@
         var beholdere = f.alleBeholdere().map(function (c) {
             return [Math.round(M.volumen(c.b) * 4), c.sted || "", !!c.b.lag, M.fastIalt(c.b) > 0, c.vurdering ? c.vurdering.svar : "", c.erGlas ? f.indgrebListe(c).join("+") : "", c.maaltT].join(",");
         }).join(";");
-        var d2 = f.del2.vurdering ? f.del2.vurdering.svar + f.del2.vurdering.idx : "";
+        var d2 = ["farve", "lv"].map(function (k) {
+            var v = f.del2.vurdering[k];
+            return v ? v.svar + v.idx : "";
+        }).join("/");
         return [
             f.station, t ? t.id : "", !!f.handling, f.rystKilde, f.kanRysteNu(), f.valgt, f.visning, beholdere, d2,
             NK.TRIN[1].concat(NK.TRIN[2]).map(function (x) { return f.trinGjort(x.id) ? 1 : 0; }).join(""),
-            !!f.gjort.affald, !!f.gjort.billede, !!f.gjort.lvSml
+            !!f.gjort.affald, !!f.gjort.billede, !!f.gjort.sml
         ].join("|");
     }
 

@@ -11,9 +11,12 @@
    stuetemperatur som reference. Glas 8 bruges til forundersoegelsen med
    KSCN og AgNO3. Temperaturen maales, og glassene fotograferes.
 
-   Del 2, fortynding. To baegerglas paa hvidt papir: foerst frugtfarve,
-   derefter ligevaegtsblanding. Det ene fortyndes til dobbelt volumen, og
-   glassene sammenlignes ovenfra.
+   Del 2, fortynding. Fire baegerglas paa hvidt papir, to og to i par:
+   det ene par faar frugtfarve, det andet ligevaegtsblanding. Begge glas
+   i et par faar lige meget, og det ene fortyndes til dobbelt volumen.
+   Alle fire ses ovenfra samtidig, saa forskellen mellem de to
+   oploesninger staar i ét billede. Et par kendes paa sit indhold, ikke
+   paa sin plads, saa det virker ogsaa, hvis eleven bytter om.
 
    Alt udstyr kan gribes med musen. Slippes det over en beholder, bruges
    det paa den: kolben og flaskerne haelder, baegerglasset haelder, draabe-
