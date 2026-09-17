@@ -24,6 +24,7 @@ namespace QuartoRenderMaster
         private ComboBox _cmbProfil;
         private Label _lblProjekt, _lblAntal, _lblProfil, _lblQuarto, _lblVink;
         private LinkLabel _lnkQuarto;
+        private Button _hjaelpProfil;
         private Panel _pnlDropbox;
         private CheckBox _chkKopi, _chkHtml, _chkWord, _chkPdf, _chkSamlet, _chkIndlejr;
         private RadioButton _rdoBog, _rdoFiler;
@@ -224,6 +225,14 @@ namespace QuartoRenderMaster
             _cmbProfil.Visible = false;
             _cmbProfil.SelectedIndexChanged += SkiftProfil;
             profil.Controls.Add(_cmbProfil);
+            _hjaelpProfil = Hjaelp("Udgave",
+                "Nogle bøger findes i flere udgaver. Ligger der en fil som _quarto-laerer.yml "
+                + "ved siden af _quarto.yml, er laerer en udgave.\r\n\r\n"
+                + "Udgaven lægger sine egne indstillinger oven i bogens: den kan have flere "
+                + "kapitler, en anden titel og sin egen outputmappe.\r\n\r\n"
+                + "Standard er bogen, som den står i _quarto.yml.");
+            _hjaelpProfil.Visible = false;
+            profil.Controls.Add(_hjaelpProfil);
             t.Controls.Add(profil, 2, 1);
 
             _lblQuarto = new Label();
@@ -698,6 +707,7 @@ namespace QuartoRenderMaster
             bool vis = profiler.Count > 0;
             _cmbProfil.Visible = vis;
             _lblProfil.Visible = vis;
+            _hjaelpProfil.Visible = vis;
 
             string husket = _indst.Hent(Indstillinger.SidsteProfil, "");
             int valg = 0;
