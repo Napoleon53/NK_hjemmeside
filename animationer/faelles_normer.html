@@ -183,7 +183,7 @@
     <div class="gruppe">
       <div class="gruppe-hoved">Point og belønning</div>
       <div id="belonFra">
-        <p class="muted" style="margin:0;">Belønninger er slået fra. Slås de til, lægges karaktererne sammen til point, som klassen kan låse belønninger op med.</p>
+        <p class="muted" style="margin:0;">Slå belønninger til, så lægges karaktererne sammen til point, som klassen kan låse belønninger op med.</p>
         <div class="belon-knapper">
           <button id="belonTil">Slå belønninger til</button>
         </div>
@@ -479,7 +479,8 @@
     var paa = !!(k && k.belonAktiv);
     document.getElementById('belonFra').hidden = paa;
     document.getElementById('belonPaa').hidden = !paa;
-    document.getElementById('belonTil').disabled = !k;
+    var til = document.getElementById('belonTil');
+    til.textContent = k ? 'Slå belønninger til' : 'Opret en klasse, og slå belønninger til';
     if(!paa) return;
 
     belonEl.innerHTML = '';
@@ -593,12 +594,20 @@
     skriv(); tegnBelonninger();
   });
 
-  // Belønninger er slået fra, indtil læreren selv tænder for dem.
+  // Belønninger er slået fra, indtil læreren selv tænder for dem. De hører til
+  // en klasse, så mangler den, oprettes den samtidig.
   document.getElementById('belonTil').addEventListener('click', function(){
-    var k = klasse(); if(!k) return;
+    var k = klasse();
+    if(!k){
+      var navn = (prompt('Belønninger hører til en klasse.\nNavn på klassen, fx 1.x Kemi C:') || '').trim();
+      if(!navn) return;
+      if(!data.klasser[navn]) data.klasser[navn] = nyKlasseData();
+      aktiv = navn;
+      k = klasse();
+    }
     if(!k.belonninger || !k.belonninger.length) k.belonninger = standardBelon();
     k.belonAktiv = true;
-    skriv(); tegnBelonninger();
+    skriv(); tegnAlt();
   });
 
   document.getElementById('belonFraKnap').addEventListener('click', function(){
