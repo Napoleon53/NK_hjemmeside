@@ -84,9 +84,8 @@ overskriver hinanden.
   sidefod, laves der en med et centreret sidetal, og har skabelonens sidefod
   allerede et sidetal, røres den ikke.
 
-  Figurer i SVG kommer ikke med i Word. Pandoc skal bruge `rsvg-convert` til at
-  lave dem om, og det program følger ikke med Quarto. Det gælder også, når
-  Quarto kaldes i hånden. Gem figuren som PNG, hvis den skal med i Word.
+  Figurer i SVG kommer fint med i Word: Pandoc lægger SVG-filen direkte i
+  docx'en, og Word tegner den selv, uden mellemregning til PNG.
 - **PDF.** Renderes med `--to typst`, altså Quartos indbyggede Typst-motor.
   Der er hverken LaTeX eller TinyTeX inde over. `--pdf-engine typst` er ikke
   brugt, fordi det kræver en separat typst-installation ved siden af Quarto.
