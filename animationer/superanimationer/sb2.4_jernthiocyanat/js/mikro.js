@@ -47,6 +47,7 @@
 
     NK.Mikro = function () {
         this.nulstil();
+        this.foerste = true;
     };
 
     var P = NK.Mikro.prototype;
@@ -57,7 +58,24 @@
         this.blink = [];
         this.spawnUr = 0;
         this.evUr = 0;
+        this.foerste = false;
+        this.fast = null;
         this.s = { ryst: 0, farve: null };
+    };
+
+    /* Foerste gang boblen fyldes, ligger partiklerne bare fordelt i den.
+       Der er ikke tilsat noget: det er en beholder, man kigger ned i, og
+       saa skal indholdet ikke falde ned oppefra. */
+    P.fyldOp = function (m) {
+        var mig = this;
+        TYPER.forEach(function (type) {
+            for (var i = mig.antal(type); i < (m[type] || 0); i++) {
+                var q = mig.plads(RADIUS[type]);
+                var p = mig.ny(type, q.x, q.y, r(-10, 10), r(-10, 10));
+                p.alfa = 1;
+                if (type === "agscn") { p.plads = mig.fraBund(); p.x = BUNDPLADS[p.plads].x; p.y = BUNDPLADS[p.plads].y; }
+            }
+        });
     };
 
     P.toem = function () {
@@ -350,8 +368,10 @@
     /* m: maalet fra M.mikroMaal. s = { ryst, farve } */
     P.opdater = function (dt, m, s) {
         this.s = s || {};
+        if (this.fast) return;
         var ryst = this.s.ryst || 0;
         var i, j, p, q;
+        if (this.foerste) { this.foerste = false; this.fyldOp(m); }
         this.afstem(dt, m);
 
         var liste = this.partikler;
@@ -462,19 +482,35 @@
     NK.Mikro.KORT = KORT;
     NK.Mikro.LEGENDE = LEGENDE;
 
-    /* Den stoerste skrift, formlen kan staa med paa kuglen. Regnes én gang
-       pr. slags og gemmes. */
+    /* Ionerne og molekylerne i et fast stof: én kugle med formlen paa, saa
+       NO₃⁻ er én kugle og ikke fire atomer, der sidder sammen */
+    var ION = {
+        "Fe3+":   { tekst: M.formel("Fe3+"), lys: "#ffd98a", moerk: "#a4610f" },
+        "NO3-":   { tekst: M.formel("NO3-"), lys: "#a6e3c2", moerk: "#2b6c4a" },
+        "K+":     { tekst: M.formel("K+"), lys: "#e3c6f6", moerk: "#67379a" },
+        "SCN-":   { tekst: M.formel("SCN-"), lys: "#cadcff", moerk: "#2f4e8c" },
+        "C6H8O6": { tekst: M.formel("C6H8O6"), lys: "#ffdd84", moerk: "#8a6a0a" }
+    };
+
+    /* Den stoerste skrift, formlen kan staa med paa en kugle. Regnes én
+       gang pr. tekst og radius og gemmes. */
     var SKRIFT = {};
-    function skriftMaal(ctx, type) {
-        if (SKRIFT[type]) return SKRIFT[type];
-        var tekst = KORT[type] || ETIKET[type], str = RADIUS[type] * 0.95;
-        for (var n = 0; n < 8 && str > 6; n++) {
+    function skriftTil(ctx, tekst, rad) {
+        var noegle = tekst + "|" + rad;
+        if (SKRIFT[noegle]) return SKRIFT[noegle];
+        var str = rad * 0.95;
+        for (var n = 0; n < 9 && str > 5; n++) {
             ctx.font = "800 " + str.toFixed(1) + "px 'Segoe UI', sans-serif";
-            if (ctx.measureText(tekst).width <= RADIUS[type] * 1.85) break;
+            if (ctx.measureText(tekst).width <= rad * 1.85) break;
             str *= 0.88;
         }
-        SKRIFT[type] = { tekst: tekst, str: str };
-        return SKRIFT[type];
+        SKRIFT[noegle] = str;
+        return str;
+    }
+
+    function skriftMaal(ctx, type) {
+        var tekst = KORT[type] || ETIKET[type];
+        return { tekst: tekst, str: skriftTil(ctx, tekst, RADIUS[type]) };
     }
 
     function etiket(ctx, tekst, x, y, farve, stoerrelse) {
@@ -517,6 +553,33 @@
         NK.kugle(ctx, 0, 0, 3.8, UDSEENDE.o.lys, UDSEENDE.o.moerk);
         ctx.restore();
     }
+
+    /* Fast stof i boblen: et udsnit af iongitteret med stoffets eget
+       formelforhold (samme moenster som iongitteret i sc1.1), eller
+       molekyler, der ligger taet op ad hinanden. */
+    P.visFast = function (f) {
+        this.nulstil();
+        this.fast = f || null;
+    };
+
+    P.tegnGitter = function (ctx) {
+        var f = this.fast;
+        var celle = [], x, y;
+        if (f.gitter) f.gitter.forEach(function (d) { for (var i = 0; i < d.antal; i++) celle.push(ION[d.ion]); });
+        var mol = f.molekyle ? ION[f.molekyle] : null;
+        var trin = mol ? 31 : 32;
+        var rad = mol ? 15.5 : 14;
+        var raekkeH = mol ? trin * 0.87 : trin;
+        var raekke = 0;
+        for (y = -R - trin; y < R + trin; y += raekkeH, raekke++) {
+            var soejle = 0;
+            for (x = -R - trin + (mol && raekke % 2 ? trin / 2 : 0); x < R + trin; x += trin, soejle++) {
+                var d2 = mol || celle[(raekke + soejle) % celle.length];
+                NK.kugle(ctx, x, y, rad, d2.lys, d2.moerk);
+                etiket(ctx, d2.tekst, x, y, "#ffffff", skriftTil(ctx, d2.tekst, rad));
+            }
+        }
+    };
 
     function tegnPartikel(ctx, p) {
         ctx.globalAlpha = NK.klamp(p.alfa, 0, 1) * (p.type === "vand" ? 0.45 : 1);
@@ -565,6 +628,7 @@
             ctx.fillRect(-R, -R, 2 * R, 2 * R);
         }
 
+        if (this.fast) this.tegnGitter(ctx);
         for (i = 0; i < this.partikler.length; i++) {
             p = this.partikler[i];
             if (p.type === "vand") tegnPartikel(ctx, p);
@@ -623,8 +687,9 @@
     /* Formlen staar paa kuglen. Legenden nederst i boblen siger kun, hvad
        de forkortede navne daekker over. */
     P.tegnLegende = function (ctx, b) {
-        var linjer = this.typer().filter(function (t) { return !!KORT[t]; })
-            .map(function (t) { return KORT[t] + " = " + LEGENDE[t]; });
+        var linjer = this.fast ? [this.fast.tekst]
+            : this.typer().filter(function (t) { return !!KORT[t]; })
+                .map(function (t) { return KORT[t] + " = " + LEGENDE[t]; });
         if (!linjer.length) return;
         var h = linjer.length * 17 + 10;
         var y0 = b.r * 0.72;

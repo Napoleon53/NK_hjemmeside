@@ -722,15 +722,17 @@
         var gg = this.valgtGenstand();
         if (!gg) return null;
         if (gg.erBeholder) return gg;
-        if (gg.greb !== "kolbe" && gg.greb !== "flaske" && gg.greb !== "draabe") return null;
+        if (gg.greb !== "kolbe" && gg.greb !== "flaske" && gg.greb !== "draabe" && gg.greb !== "pulver") return null;
         if (gg.greb === "kolbe" && gg.tom) return null;
         if (!gg.vis) {
             var f = NK.Sprites.FILER[gg.sprite];
+            var fast = gg.greb === "pulver" ? M.FAST_MIKRO[gg.stof] : null;
             gg.vis = {
-                navn: gg.navn, titel: gg.titel, anker: gg.anker, erBeholder: true, erFlaske: true,
+                navn: gg.navn, titel: fast ? fast.titel : gg.titel, anker: gg.anker, erBeholder: true, erFlaske: true,
                 lup: { x: f.b / 2, y: f.h * 0.55 }, mikro: new NK.Mikro(), b: M.beholder(1)
             };
-            M.haeldI(gg.vis.b, this.indholdFra(gg, 20));
+            if (fast) gg.vis.mikro.visFast(fast);
+            else M.haeldI(gg.vis.b, this.indholdFra(gg, 20));
         }
         gg.vis.p = gg.p;
         return gg.vis;
@@ -1713,7 +1715,7 @@
         /* Zoomboblen viser det valgte: en beholder eller en flaske */
         var v = this.bobleMaal();
         var hn = this.handling ? this.handling.navn : "";
-        var vis = !!v && (M.volumen(v.b) > 0.05 || v.mikro.partikler.length > 0) && hn !== "affald" && hn !== "toem";
+        var vis = !!v && (M.volumen(v.b) > 0.05 || v.mikro.partikler.length > 0 || !!v.mikro.fast) && hn !== "affald" && hn !== "toem";
         if (vis) this.bobleBeholder = v;
         if (v && v.erFlaske) v.mikro.opdater(dt, M.mikroMaal(v.b), { ryst: 0, farve: M.baegerFarve(M.samlet(v.b)) });
         this.bobleAlfa = NK.mod(this.bobleAlfa, vis ? 1 : 0, 5, dt);

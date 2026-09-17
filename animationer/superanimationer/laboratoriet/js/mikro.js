@@ -24,6 +24,7 @@
     NK.Mikro = function (R) {
         this.R = R || 120;
         this.nulstil();
+        this.foerste = true;
     };
 
     var P = NK.Mikro.prototype;
@@ -31,6 +32,7 @@
     P.nulstil = function () {
         this.partikler = [];
         this.spawnUr = 0;
+        this.foerste = false;
         this.s = { ryst: 0 };
     };
 
@@ -69,12 +71,29 @@
         return n;
     };
 
+    /* Foerste gang boblen fyldes, ligger partiklerne bare fordelt i den.
+       Der er ikke tilsat noget: det er en beholder, man kigger ned i, og
+       saa skal indholdet ikke falde ned oppefra. Fast stof ligger i
+       bunden. */
+    P.fyldOp = function (maal) {
+        var R = this.R, mig = this;
+        Object.keys(maal).forEach(function (navn) {
+            for (var i = mig.antal(navn); i < maal[navn]; i++) {
+                var rad = radius(navn), fast = Stof.STOFFER[navn] && Stof.STOFFER[navn].fase === "s";
+                var v = r(0, 6.28), d = Math.sqrt(Math.random()) * (R - rad - 6);
+                var p = mig.ny(navn, Math.cos(v) * d, fast ? r(R * 0.3, R * 0.6) : Math.sin(v) * d, 0, 0);
+                p.alfa = 1;
+            }
+        });
+    };
+
     /* maal: { stof: antal }. s: { ryst } */
     P.opdater = function (dt, maal, s) {
         var R = this.R, i, p;
         this.s = s || this.s;
         maal = maal || {};
         var ryst = this.s.ryst || 0;
+        if (this.foerste) { this.foerste = false; this.fyldOp(maal); }
 
         /* Afstem antallet mod maalet, én partikel ad gangen */
         this.spawnUr -= dt;

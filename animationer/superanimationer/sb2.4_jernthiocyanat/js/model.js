@@ -129,6 +129,18 @@
        hvor hurtigt det oploeses pr. sekund uden og med omroering */
     var FAST = { fe: 30, scn: 60, vitc: 10, oploes: 0.22, roer: 3.0 };
 
+    /* Det faste stof, som det ser ud i zoomboblen. Et salt er et iongitter
+       med stoffets eget formelforhold, ikke 1:1: Fe(NO3)3 har tre nitrat
+       pr. jern. Et molekylestof er molekyler, der ligger taet. */
+    var FAST_MIKRO = {
+        fe:   { titel: "Fe(NO₃)₃ (s)", gitter: [{ ion: "Fe3+", antal: 1 }, { ion: "NO3-", antal: 3 }],
+                tekst: "Iongitter: 3 NO₃⁻ pr. Fe³⁺" },
+        scn:  { titel: "KSCN (s)", gitter: [{ ion: "K+", antal: 1 }, { ion: "SCN-", antal: 1 }],
+                tekst: "Iongitter: 1 SCN⁻ pr. K⁺" },
+        vitc: { titel: "Ascorbinsyre (s)", molekyle: "C6H8O6",
+                tekst: "Molekyler, der ligger tæt" }
+    };
+
     /* Ascorbinsyrens reduktion af Fe3+ pr. sekund */
     var REDUKTION = { k: 1.2 };
 
@@ -549,6 +561,7 @@
         STAM: STAM,
         MAENGDE: MAENGDE,
         FAST: FAST,
+        FAST_MIKRO: FAST_MIKRO,
         REDUKTION: REDUKTION,
         FARVESTOF: FARVESTOF,
         LIGEVAEGT: LIGEVAEGT,

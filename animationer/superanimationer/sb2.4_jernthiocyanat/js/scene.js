@@ -456,13 +456,13 @@
         ctx.restore();
     };
 
-    /* Den valgte genstand: en rolig ramme, saa den skiller sig ud fra
-       hintets pulserende markering */
+    /* Den valgte genstand faar en tynd, rolig ramme som i proeverummet,
+       saa den skiller sig ud fra hintets pulserende markering */
     S.tegnValgt = function (ctx, r) {
         ctx.save();
-        ctx.strokeStyle = "rgba(90, 170, 245, 0.85)";
-        ctx.lineWidth = 2;
-        NK.rundtRekt(ctx, r.x - 5, r.y - 5, r.b + 10, r.h + 10, 8);
+        ctx.strokeStyle = "rgba(242, 197, 61, 0.75)";
+        ctx.lineWidth = 1.6;
+        NK.rundtRekt(ctx, r.x - 3, r.y - 3, r.b + 6, r.h + 6, 6);
         ctx.stroke();
         ctx.restore();
     };
@@ -685,6 +685,7 @@
             ctx.restore();
         }
 
+        if (g.valgt) S.tegnValgt(ctx, S.rekt("reagensglas", g.p, a, 0));
         if (g.fremhaev) S.tegnMarkering(ctx, S.rekt("reagensglas", g.p, a, 0), tid);
         return top;
     };
@@ -709,10 +710,7 @@
             ctx.lineTo(69, 4);
         });
         NK.Sprites.tegnPositur(ctx, "baeger", g.p, a);
-        if (g.valgt) {
-            var m = NK.tilVerden(g.p, a, 60, -8);
-            NK.kugle(ctx, m.x, m.y, 5.5, "#ffe38a", "#b88a12");
-        }
+        if (g.valgt) S.tegnValgt(ctx, S.rekt("baeger", g.p, a, 0));
         if (g.fremhaev) S.tegnMarkering(ctx, S.rekt("baeger", g.p, a, 0), tid);
         return top;
     };
