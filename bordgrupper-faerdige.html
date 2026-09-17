@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Færdige grupper</title>
+<style>
+  :root{
+    --bg:#f4f6f8;
+    --panel:#ffffff;
+    --border:#d8dee4;
+    --ink:#1f2933;
+    --muted:#5c6a76;
+    --accent:#2563eb;
+    --accent-dark:#1d4ed8;
+    --warn:#b45309;
+  }
+  *{box-sizing:border-box;}
+  [hidden]{display:none !important;}
+  body{
+    margin:0;
+    font-family:"Segoe UI", Calibri, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    padding:24px;
+  }
+  .top{display:flex; align-items:baseline; gap:10px 16px; flex-wrap:wrap; margin-bottom:16px;}
+  h1{font-size:1.5rem; margin:0;}
+  .muted{color:var(--muted); font-size:.85rem;}
+  .hint{margin:8px 0 0;}
+  a{color:var(--accent-dark);}
+
+  .gruppe{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 18px 18px;
+    margin-bottom:16px;
+  }
+  .gruppe-hoved{font-size:.78rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--accent-dark); margin:0 0 12px;}
+  .kolonner{display:grid; grid-template-columns:minmax(0,1fr); gap:16px;}
+  @media (min-width:1100px){
+    .kolonner{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);}
+  }
+  .kolonner > .gruppe{margin-bottom:0;}
+
+  label.field{display:block; font-weight:600; margin:0 0 6px;}
+  input[type=text]{
+    font-family:inherit;
+    font-size:.9rem;
+    padding:6px 8px;
+    border:1px solid var(--border);
+    border-radius:6px;
+    background:#fff;
+    color:var(--ink);
+    width:180px;
+  }
+  textarea{
+    width:100%;
+    min-height:190px;
+    font-family:inherit;
+    font-size:.95rem;
+    padding:10px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    resize:vertical;
+  }
+  .row{display:flex; gap:10px; align-items:center; margin-top:12px; flex-wrap:wrap;}
+  button{
+    font-family:inherit;
+    font-size:.95rem;
+    font-weight:600;
+    padding:10px 18px;
+    border-radius:8px;
+    border:1px solid transparent;
+    cursor:pointer;
+  }
+  .btn-primary{background:var(--accent); color:#fff;}
+  .btn-primary:hover{background:var(--accent-dark);}
+  .btn-secondary{background:#fff; color:var(--ink); border-color:var(--border);}
+  .btn-secondary:hover{background:#eef1f4;}
+  .btn-small{padding:6px 12px; font-size:.85rem;}
+  .error{color:#b91c1c; font-weight:600; font-size:.9rem;}
+  .warn{color:var(--warn); font-weight:600; font-size:.9rem;}
+  .gruppe > .error, .gruppe > .warn{margin-top:10px;}
+
+  .oversigt{display:flex; gap:6px 14px; flex-wrap:wrap; font-size:.9rem; margin-bottom:10px;}
+  .oversigt b{font-weight:700;}
+  /* Visningen er selve filen, vist i en ramme, så den ikke blandes med sidens egne typografier. */
+  #visning{width:100%; border:1px solid var(--border); border-radius:8px; background:#fff; min-height:200px;}
+  .retur{margin:0; font-size:.85rem;}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>Færdige grupper</h1>
+  <span class="muted">Grupper, du selv har lavet, vist og hentet i samme format som gruppegeneratoren.</span>
+</div>
+
+<div class="kolonner">
+  <section class="gruppe">
+    <p class="gruppe-hoved">Grupperne</p>
+    <label class="field" for="grupper">Én gruppe pr. linje, navnene adskilt af komma</label>
+    <textarea id="grupper" spellcheck="false">Amalie, Zain, Laura S, Sarah
+Caroline, Roubin, Anne Sofie
+Astrid, Kamilla, Jonathan, Karoline
+Henrik, Vigga, Laura H, Jolien
+Nicoleta, Mathilde, Magnus, Ditte
+Marie, Viggo, Mikas, Maja
+Gabi, Laurits, Jolien H, Emilie</textarea>
+    <p class="muted hint">Makkerparrene dannes i den rækkefølge, navnene står. En gruppe med ulige antal får en trio.
+      Skriver du <b>Gruppe A:</b> foran navnene, bruges det som gruppens navn.</p>
+    <div class="error" id="fejl" hidden></div>
+    <div class="warn" id="advarsel" hidden></div>
+  </section>
+
+  <section class="gruppe">
+    <p class="gruppe-hoved">Filen</p>
+    <label class="field" for="klasse">Klasse (valgfri)</label>
+    <input type="text" id="klasse" placeholder="fx 2y">
+    <div class="row">
+      <button class="btn-primary" id="wordBtn" type="button">Hent Word-fil</button>
+      <button class="btn-secondary" id="pdfBtn" type="button">Udskriv / gem som PDF</button>
+      <button class="btn-secondary btn-small" id="blandBtn" type="button">Bland makkerpar</button>
+    </div>
+    <p class="muted hint">Filen er én side: gruppekort med makkerpar, de sekskantede borde og rækkeopstillingen.</p>
+    <div class="error" id="eksportFejl" hidden></div>
+  </section>
+</div>
+
+<section class="gruppe">
+  <p class="gruppe-hoved">Sådan ser siden ud</p>
+  <div class="oversigt" id="oversigt"></div>
+  <iframe id="visning" title="Siden som den bliver i filen"></iframe>
+  <p class="retur"><a href="bordgrupper.html">Tilbage til gruppegeneratoren</a></p>
+</section>
+
+<script src="assets/bordgrupper-visning.js"></script>
+<script>
+(function(){
+  var BG = window.Bordgrupper;
+
+  function byId(id){ return document.getElementById(id); }
+
+  function visBesked(id, tekst){
+    var node = byId(id);
+    node.textContent = tekst || '';
+    node.hidden = !tekst;
+  }
+
+  // ---------- Linjerne ind: "Gruppe A: Anna, Bertram, ..." ----------
+  function laesLinjer(tekst){
+    return tekst.split('\n').map(function(linje){
+      var navnedel = linje, etiket = null;
+      var kolon = linje.indexOf(':');
+      if(kolon > -1){
+        etiket = linje.slice(0, kolon).trim();
+        navnedel = linje.slice(kolon + 1);
+      }
+      var navne = navnedel.split(/[,;\t]/)
+        .map(function(s){ return s.trim(); })
+        .filter(function(s){ return s.length > 0; })
+        .map(BG.capName);
+      return { etiket:etiket, navne:navne };
+    }).filter(function(g){ return g.navne.length > 0; });
+  }
+
+  // ---------- Grupperne om til par og trioer ----------
+  // Samme model som gruppegeneratoren: en gruppe består af makkerpar og højst én trio, og det
+  // er parrene og trioerne, der fordeles på borde og rækker. Ulige gruppestørrelse giver en trio.
+  function byggeGrupper(linjer, bland){
+    var pairsGroups = [], triplesGroups = [];
+    var bundles = linjer.map(function(linje, i){
+      var rest = bland ? BG.shuffle(linje.navne) : linje.navne.slice();
+      var b = { pairs:[], trio:null };
+      if(rest.length % 2 === 1 && rest.length >= 3){
+        b.trio = rest.splice(0, 3);
+        triplesGroups.push(b.trio);
+      }
+      while(rest.length > 0){
+        var par = rest.splice(0, 2);
+        b.pairs.push(par);
+        pairsGroups.push(par);
+      }
+      b.label = linje.etiket || ('Gruppe ' + (i + 1));
+      b.members = BG.bundleMembers(b);
+      return b;
+    });
+    var groups = {
+      n: bundles.reduce(function(sum, b){ return sum + b.members.length; }, 0),
+      pairsGroups: pairsGroups,
+      triplesGroups: triplesGroups,
+      bundles: bundles
+    };
+    groups.labels = BG.unitLabels(pairsGroups, triplesGroups, bundles);
+    return groups;
+  }
+
+  function byggeOpstilling(groups){
+    return {
+      hex: BG.packBalanced(groups, BG.MAX_HEX_TABLES, BG.HEX_CAPACITY),
+      row: BG.packBalanced(groups, BG.MAX_ROWS, BG.ROW_CAPACITY)
+    };
+  }
+
+  // ---------- Titel og filnavn ----------
+  function klasse(){ return byId('klasse').value.trim(); }
+
+  function overskrift(){
+    var navn = klasse();
+    return navn ? ('Bordgrupper til ' + navn) : 'Bordgrupper';
+  }
+
+  function filnavn(){
+    var navn = klasse().replace(/[\\\/:*?"<>|]/g, '').replace(/\s+/g, '_');
+    return (navn ? navn + '_' : '') + 'Bordgrupper';
+  }
+
+  // ---------- Siden ----------
+  var side = null;
+
+  function gentagneNavne(groups){
+    var set = {}, gengangere = [];
+    groups.bundles.forEach(function(b){
+      b.members.forEach(function(nm){
+        if(set[nm] && gengangere.indexOf(nm) === -1) gengangere.push(nm);
+        set[nm] = true;
+      });
+    });
+    return gengangere;
+  }
+
+  function opdater(bland){
+    var linjer = laesLinjer(byId('grupper').value);
+    visBesked('eksportFejl', null);
+    if(!linjer.length){
+      side = null;
+      byId('visning').removeAttribute('srcdoc');
+      byId('oversigt').textContent = '';
+      visBesked('fejl', 'Indsæt mindst én gruppe: navnene på en linje, adskilt af komma.');
+      visBesked('advarsel', null);
+      return;
+    }
+    visBesked('fejl', null);
+
+    var groups = byggeGrupper(linjer, bland);
+    var layouts = byggeOpstilling(groups);
+    side = BG.roundBodyHtml(groups, layouts, { title: overskrift() });
+
+    var advarsler = [];
+    var gengangere = gentagneNavne(groups);
+    if(gengangere.length) advarsler.push(BG.joinDa(gengangere) + ' står i mere end én gruppe.');
+    var enkelte = groups.bundles.filter(function(b){ return b.members.length === 1; }).length;
+    if(enkelte) advarsler.push(enkelte === 1 ? 'En gruppe har kun ét navn.' : enkelte + ' grupper har kun ét navn.');
+    var hexNote = BG.capacityNote(groups.n, layouts.hex, BG.HEX_CAPACITY, 'bord', 'borde');
+    if(hexNote) advarsler.push(hexNote);
+    visBesked('advarsel', advarsler.length ? advarsler.join(' ') : null);
+
+    var oversigt = byId('oversigt');
+    oversigt.innerHTML = '';
+    [groups.n + ' elever', BG.describeSizes(BG.bundleSizes(groups))].forEach(function(tekst){
+      var s = document.createElement('span');
+      s.textContent = tekst;
+      oversigt.appendChild(s);
+    });
+
+    var ramme = byId('visning');
+    ramme.srcdoc = BG.documentHtml([side], overskrift(), false);
+  }
+
+  // Rammen får højden fra sit eget indhold, så hele siden kan ses uden at rulle i den.
+  byId('visning').addEventListener('load', function(){
+    var doc = this.contentDocument;
+    if(doc && doc.body) this.style.height = (doc.body.scrollHeight + 24) + 'px';
+  });
+
+  var timer = null;
+  byId('grupper').addEventListener('input', function(){
+    clearTimeout(timer);
+    timer = setTimeout(function(){ opdater(false); }, 300);
+  });
+  byId('klasse').addEventListener('input', function(){
+    clearTimeout(timer);
+    timer = setTimeout(function(){ opdater(false); }, 300);
+  });
+  byId('blandBtn').addEventListener('click', function(){ opdater(true); });
+
+  byId('wordBtn').addEventListener('click', function(){
+    if(!side) return;
+    BG.downloadWord([side], filnavn());
+  });
+
+  byId('pdfBtn').addEventListener('click', function(){
+    if(!side) return;
+    var aabnet = BG.printPages([side], filnavn());
+    visBesked('eksportFejl', aabnet ? null : 'Pop-up blev blokeret. Tillad pop-ups for denne side for at udskrive.');
+  });
+
+  opdater(false);
+})();
+</script>
+
+</body>
+</html>
