@@ -115,19 +115,43 @@ tager at læse linjen (`K.taleTid`). Lange replikker brydes over to linjer.
 
 ## Dagsform
 
-Han har en tilstand for hver sidevisning: fredag, dagen efter et langt møde, en
-dårlig nat, ny kaffemaskine, en rettebunke eller tre vikartimer i fysik.
-Dagsformen lægger sine egne vendinger i puljerne (cirka hver tredje replik),
-flytter ansigtet en smule i alle scener og afgør, hvor mange prik han finder sig
-i, før han går (tre til fem). Listen står i `DAGSFORM` i `kemichael.js`.
-`K.dagsform()` siger, hvilken det er, og `K.dagsform("fredag")` vælger en bestemt,
-så selvtesten kan regne med den.
+Han har en tilstand for hver sidevisning. Dagsformen lægger sine egne vendinger i
+puljerne (cirka hver tredje replik), flytter ansigtet en smule i alle scener og
+afgør, hvor mange prik han finder sig i, før han går (tre til fem). Listen står i
+`DAGSFORM` i `kemichael.js`.
+
+Tilstandene retter sig efter maskinens rigtige ugedag og klokkeslæt: han taler kun
+om fredag om fredagen, og kun om kagen klokken to, hvis klokken ikke er over to.
+`naar(t)` i den enkelte tilstand siger, hvornår den overhovedet kan komme, og
+`vaegt` (normalt 1), hvor tung den er blandt dem, der passer på tidspunktet.
+
+| Tilstand | Kommer |
+|----------|--------|
+| `morgen` | hverdag før kl. 8 |
+| `soevn` | hverdag kl. 5 til 11 |
+| `maskine` | hverdag kl. 6 til 13 |
+| `rettebunke` | hverdag kl. 8 til 17 |
+| `vikar` | hverdag kl. 11 til 17 |
+| `moede` | hverdag kl. 13 til 17 |
+| `fredag` | fredag kl. 6 til 16, vægt 3 |
+| `weekend` | lørdag og søndag kl. 5 til 22, vægt 3 |
+| `aften` | alle dage kl. 17 til 22, vægt 2 |
+| `nat` | alle dage kl. 22 til 5, vægt 2 |
+
+`ekstra` må være en funktion af `t`, når vendingerne selv afhænger af klokken
+(kagen om fredagen, klokkeslættet om natten). `t` har `ugedag` (0 er søndag),
+`navn`, `klokken` (timer med decimaler), `ur` ("23.40"), `hverdag` og `skoletid`.
+
+`K.dagsform()` siger, hvilken tilstand det er, og `K.dagsform("fredag")` vælger en
+bestemt, så selvtesten kan regne med den. `K.tid()` er tidsbilledet, og
+`K.tidTvang(dato)` låser tiden fast og vælger tilstanden om; `K.tidTvang(null)`
+slipper den igen.
 
 ## Baggrundsliv
 
-Har eleven ikke rørt noget i 75 sekunder, sker der noget af sig selv: han går
+Har eleven ikke rørt noget i 95 sekunder, sker der noget af sig selv: han går
 tværs over scenen med en papkasse, eller han kigger ind fra kanten og spørger, om
-det står stille. Der går mindst to en halv minut mellem to indslag.
+det står stille. Der går mindst tre minutter mellem to indslag.
 
 * Tiden måles i rigtige sekunder, ikke i forsøgets tid, og tælles fra sidste klik
   eller tastetryk i vinduet. Derfor sker det aldrig i en selvtest, der kører timer

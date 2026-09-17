@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="da">
+<head><meta charset="UTF-8"><title>Skud</title>
+<style>html,body{margin:0;background:#14141a}iframe{border:0;width:1900px;height:1020px}</style>
+</head>
+<body>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+function koer() {
+    var w = document.getElementById("ramme").contentWindow, NK = w.NK, f = NK.forsoeg;
+    if (NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+    if (NK.intro) NK.intro.luk();
+    function adv(s) { for (var k = 0; k < Math.round(s * 60); k++) f.opdater(1 / 60); }
+    var m = new URLSearchParams(location.search).get("m") || "1";
+    f.klik("kolbe1"); adv(4);
+    f.klik("baegerA"); adv(16);
+    if (m === "1") { f.klik("glas1"); adv(1); f.klik("pulver_fe"); adv(4); f.klik("glasstav"); adv(8); f.klik("glas1"); adv(8); }
+    if (m === "4") { f.klik("glas4"); adv(1); f.klik("ag"); adv(3); f.klik("ag"); adv(3); f.klik("ag"); adv(10); f.klik("glas4"); adv(8); }
+    if (m === "2") { f.klik("glas2"); adv(1); f.klik("pulver_vitc"); adv(4); f.klik("glasstav"); adv(8); f.klik("glas2"); adv(8); }
+    if (m === "7") { f.klik("glas7"); adv(12); }
+    if (m === "f") {
+        document.getElementById("ramme").contentDocument.getElementById("station2").click();
+        f.klik("baegerV"); adv(1); f.klik("flaske_farve"); adv(5); f.klik("baegerV"); adv(10);
+    }
+    if (NK.opdaterPanel) NK.opdaterPanel();
+    document.title = "klar";
+}
+</script>
+</body></html>

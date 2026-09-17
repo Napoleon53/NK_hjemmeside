@@ -66,7 +66,7 @@
     S.VARMEPLADE = { x: 812, y: 457, skala: 0.6 };
     S.DUNK = { x: 1026, y: S.BORD - 130, aabning: { x: 1071, y: S.BORD - 118 } };
     S.PAPIR = { x: 380, b: 360 };
-    S.BOBLE = { x: 250, y: 178, r: 140 };
+    S.BOBLE = { x: 300, y: 205, r: 185 };
     S.LUP_GLAS = { x: 15, y: 128 };
     S.LUP_BAEGER = { x: 36, y: 88 };
     S.STAV_L = 170;

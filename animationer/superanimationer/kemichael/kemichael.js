@@ -56,10 +56,14 @@
      K.dagsform()              dagens tilstand (DAGSFORM); den laegger egne
                                vendinger i puljerne, flytter ansigtet lidt og
                                afgoer, hvor mange prik han finder sig i.
-                               K.dagsform(id) vaelger en bestemt
+                               Kun tilstande, der passer til ugedagen og
+                               klokken, kan komme. K.dagsform(id) vaelger
+                               en bestemt
+     K.tid()                   ugedag og klokkeslaet, som han regner med.
+                               K.tidTvang(dato) laaser tiden fast
 
    Baggrundsliv (laererBaggrundsliv, kaldes fra opdaterLaerer):
-     Har eleven ikke roert noget i 75 rigtige sekunder, gaar han forbi med en
+     Har eleven ikke roert noget i 95 rigtige sekunder, gaar han forbi med en
      kasse eller kigger ind fra kanten. Indslagene laaser ikke forsoeget og
      viger, saa snart eleven roerer noget. K.baggrundsliv(false) slaar dem fra.
 
@@ -213,32 +217,87 @@
         ]
     };
 
+    /* ----- Hvad klokken er -------------------------------------------------
+       Dagsformen og en raekke replikker retter sig efter den rigtige
+       ugedag og tid paa maskinen, saa han ikke taler om fredag om
+       tirsdagen eller om kagen klokken to om natten.
+       K.tid() siger, hvad han regner med. K.tidTvang(dato) laaser tiden
+       fast (selvtesten), K.tidTvang(null) slipper den igen. */
+    var UGEDAGE = ["søndag", "mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag"];
+
+    var tidTvunget = null;
+
+    function tid() {
+        var d = tidTvunget || new Date();
+        var ugedag = d.getDay();                              /* 0 soendag ... 6 loerdag */
+        var klokken = d.getHours() + d.getMinutes() / 60;     /* timer med decimaler */
+        return {
+            ugedag: ugedag,
+            navn: UGEDAGE[ugedag],
+            klokken: klokken,
+            ur: ("0" + Math.floor(klokken)).slice(-2) + "." + ("0" + Math.floor((klokken % 1) * 60)).slice(-2),
+            hverdag: ugedag >= 1 && ugedag <= 5,
+            skoletid: ugedag >= 1 && ugedag <= 5 && klokken >= 8 && klokken < 16
+        };
+    }
+
+    function tidTvang(dato) {
+        tidTvunget = dato || null;
+        dagen = vaelgDagsform();
+        brugte = {};
+    }
+
     /* ----- Dagsform ---------------------------------------------------------
        Han har en tilstand for hver sidevisning. Den laegger et par
        vendinger til puljerne, flytter ansigtet en smule og afgoer, hvor
-       mange prik han finder sig i. K.dagsform() siger, hvilken det er, og
-       K.dagsform(id) vaelger en bestemt (selvtesten). */
+       mange prik han finder sig i. naar(t) siger, hvornaar tilstanden
+       overhovedet kan komme, og vaegt, hvor tung den er blandt dem, der
+       passer paa tidspunktet. ekstra maa vaere en funktion af t, naar
+       vendingerne selv afhaenger af klokken. K.dagsform() siger, hvilken
+       det er, og K.dagsform(id) vaelger en bestemt (selvtesten). */
     var DAGSFORM = [
         {
-            id: "fredag", taalmod: 5, humoer: 0.25,
-            ekstra: {
-                prik: ["Det er fredag. Det redder dig.", "Der er kage klokken to. Det redder dig også."],
-                ros: ["Godt. Så kan jeg nå kagen."],
-                uheld: ["På en fredag. Selvfølgelig."],
-                stilstand: ["Det er fredag. Forsøget bliver ikke kortere af at vente."]
+            id: "fredag", taalmod: 5, humoer: 0.25, vaegt: 3,
+            naar: function (t) { return t.ugedag === 5 && t.klokken >= 6 && t.klokken < 16; },
+            ekstra: function (t) {
+                var foerKage = t.klokken < 14;
+                return {
+                    prik: ["Det er fredag. Det redder dig.",
+                        foerKage ? "Der er kage klokken to. Det redder dig også."
+                                 : "Kagen er spist. Nu er der kun forsøget."],
+                    ros: [foerKage ? "Godt. Så kan jeg nå kagen." : "Godt. Og jeg nåede kagen."],
+                    uheld: ["På en fredag. Selvfølgelig."],
+                    stilstand: ["Det er fredag. Forsøget bliver ikke kortere af at vente."]
+                };
             }
         },
         {
-            id: "moede", taalmod: 3, vrede: 0.15, humoer: -0.1,
+            id: "weekend", taalmod: 5, humoer: 0.1, vaegt: 3,
+            naar: function (t) { return !t.hverdag && t.klokken >= 5 && t.klokken < 22; },
+            ekstra: function (t) {
+                return {
+                    prik: ["Det er " + t.navn + ". Jeg er her, fordi du er her.",
+                        "Skolen er lukket. Jeg har en nøgle."],
+                    ros: ["Godt. Og det er ikke engang en skoledag."],
+                    uheld: ["Der er ingen pedel i weekenden. Vi to rydder op."],
+                    stilstand: ["Vi kunne begge to lave noget andet i dag."]
+                };
+            }
+        },
+        {
+            id: "morgen", taalmod: 4, vrede: 0.1, humoer: -0.05, vaegt: 2,
+            naar: function (t) { return t.hverdag && t.klokken >= 5 && t.klokken < 8; },
             ekstra: {
-                prik: ["Jeg har siddet i møde i fire timer.", "Jeg har brugt dagen på et skema. Det her er nemmere."],
-                ros: ["Det var dagens første, der gik som planlagt."],
-                uheld: ["Det skal jeg også skrive i et skema."],
-                stilstand: ["Jeg har siddet stille hele dagen. Nu er det din tur til at lade være."]
+                prik: ["Klokken er ikke otte. Det er kaffen, der taler.",
+                    "Første time er ikke begyndt. Det er du til gengæld."],
+                ros: ["Godt. Og dagen er knap nok begyndt."],
+                uheld: ["Allerede? Vi er ikke engang kommet i gang."],
+                stilstand: ["Jeg er heller ikke vågen endnu. Men jeg står op."]
             }
         },
         {
             id: "soevn", taalmod: 3, vrede: 0.2, humoer: -0.15,
+            naar: function (t) { return t.hverdag && t.klokken >= 5 && t.klokken < 11; },
             ekstra: {
                 prik: ["Jeg har sovet fire timer. Vælg dine ord.", "Ikke i dag."],
                 ros: ["Godt. Så kan jeg sætte mig ned."],
@@ -248,6 +307,7 @@
         },
         {
             id: "maskine", taalmod: 5, humoer: 0.3,
+            naar: function (t) { return t.hverdag && t.klokken >= 6 && t.klokken < 13; },
             ekstra: {
                 prik: ["Der er ny kaffemaskine. Jeg er et bedre menneske i dag.", "Spørg om noget fagligt, mens jeg er sådan her."],
                 ros: ["Flot. Og kaffen er varm. En god dag."],
@@ -257,6 +317,7 @@
         },
         {
             id: "rettebunke", taalmod: 4, vrede: 0.1,
+            naar: function (t) { return t.hverdag && t.klokken >= 8 && t.klokken < 17; },
             ekstra: {
                 prik: ["Jeg har 62 rapporter at rette. Du er nummer 63.", "Kort version: nej."],
                 ros: ["Skriv det i rapporten. Så bliver den nem at rette."],
@@ -266,16 +327,65 @@
         },
         {
             id: "vikar", taalmod: 4, vrede: 0.05,
+            naar: function (t) { return t.hverdag && t.klokken >= 11 && t.klokken < 17; },
             ekstra: {
                 prik: ["Jeg har haft tre vikartimer i fysik i dag.", "Jeg har forklaret Newton tre gange. Nu er det kemi."],
                 ros: ["Godt. Dagens første rigtige kemi."],
                 uheld: ["Det her var ikke i fysiktimen."],
                 stilstand: ["Jeg har ventet på et rigtigt kemiforsøg hele dagen."]
             }
+        },
+        {
+            id: "moede", taalmod: 3, vrede: 0.15, humoer: -0.1,
+            naar: function (t) { return t.hverdag && t.klokken >= 13 && t.klokken < 17; },
+            ekstra: {
+                prik: ["Jeg har siddet i møde i fire timer.", "Jeg har brugt dagen på et skema. Det her er nemmere."],
+                ros: ["Det var dagens første, der gik som planlagt."],
+                uheld: ["Det skal jeg også skrive i et skema."],
+                stilstand: ["Jeg har siddet stille hele dagen. Nu er det din tur til at lade være."]
+            }
+        },
+        {
+            id: "aften", taalmod: 3, vrede: 0.1, humoer: -0.05, vaegt: 2,
+            naar: function (t) { return t.klokken >= 17 && t.klokken < 22; },
+            ekstra: {
+                prik: ["Klokken er over fem. Jeg burde være gået hjem.", "Skemaet siger fri. Jeg står her."],
+                ros: ["Godt. Så kan jeg låse."],
+                uheld: ["Nu? På det her tidspunkt?"],
+                stilstand: ["Jeg venter gerne. Bare ikke hele aftenen."]
+            }
+        },
+        {
+            id: "nat", taalmod: 3, vrede: 0.15, humoer: -0.1, vaegt: 2,
+            naar: function (t) { return t.klokken >= 22 || t.klokken < 5; },
+            ekstra: function (t) {
+                return {
+                    prik: ["Klokken er " + t.ur + ". Det står ikke i noget skema.",
+                        "Vi to burde sove. Én af os ved det."],
+                    ros: ["Rigtigt. Selv nu."],
+                    uheld: ["Klokken " + t.ur + ". Det er en ny rekord."],
+                    stilstand: ["Det bliver ikke bedre af at være nat."]
+                };
+            }
         }
     ];
 
-    var dagen = DAGSFORM[Math.floor(Math.random() * DAGSFORM.length)];
+    /* Tilstandene, der passer paa tidspunktet. Vaegten afgoer, hvor tit
+       hver af dem kommer; passer ingen, staar hele listen aaben. */
+    function vaelgDagsform() {
+        var t = tid();
+        var kan = DAGSFORM.filter(function (d) { return !d.naar || d.naar(t); });
+        if (!kan.length) kan = DAGSFORM;
+        var sum = kan.reduce(function (s, d) { return s + (d.vaegt || 1); }, 0);
+        var trukket = Math.random() * sum;
+        for (var i = 0; i < kan.length; i++) {
+            trukket -= kan[i].vaegt || 1;
+            if (trukket <= 0) return kan[i];
+        }
+        return kan[kan.length - 1];
+    }
+
+    var dagen = vaelgDagsform();
 
     function dagsform(id) {
         if (id) {
@@ -288,6 +398,7 @@
     /* Dagsformens egne vendinger til en pulje. prik1 til prik4 deler pulje. */
     function dagensLinjer(kategori) {
         var e = dagen.ekstra || {};
+        if (typeof e === "function") e = e(tid()) || {};
         return (kategori.indexOf("prik") === 0 ? e.prik : e[kategori]) || [];
     }
 
@@ -449,8 +560,8 @@
        Maales i rigtige sekunder, ikke i forsoegets tid. Baggrundslivet
        haenger paa den, saa det aldrig sker midt i noget, eleven laver, og
        aldrig i selvtesten, der koerer timer igennem paa faa sekunder. */
-    var STILLE_FOERSTE = 75;   /* sekunder uden at eleven roerer noget */
-    var STILLE_IGEN = 150;     /* sekunder mellem to indslag */
+    var STILLE_FOERSTE = 95;   /* sekunder uden at eleven roerer noget */
+    var STILLE_IGEN = 195;     /* sekunder mellem to indslag */
 
     var roert = Date.now();
     var roertTal = 0;          /* taeller, saa et indslag kan se, om eleven har roert noget */
@@ -681,8 +792,12 @@
             griber: false,
             beholder: true,
             midte: function (h) {
+                var t = tid();
+                var linje = t.ugedag !== 5 ? "Ikke nu. På fredag er der kage."
+                    : t.klokken < 14 ? "Ikke nu. Der er kage klokken to."
+                    : "For sent. Kagen var klokken to.";
                 return h.udtryk({ vrede: 0.2, humoer: 0.5 }).concat(
-                    h.vent(0.5), h.sig("Ikke nu. På fredag er der kage."),
+                    h.vent(0.5), h.sig(linje),
                     h.sig(h.glimt("fredag") || "")
                 );
             }
@@ -1511,6 +1626,8 @@
         taleTid: taleTid,
         replik: replik,
         dagsform: dagsform,
+        tid: tid,
+        tidTvang: tidTvang,
         kaffeTvang: kaffeTvang,
         baggrundsliv: slaaBaggrundsliv,
         paa: paa,

@@ -12,8 +12,10 @@
      C6H8O6 finder to Fe3+ og goer dem til Fe2+          (reduk)
 
    Hver partikel er én kugle med formlen paa: en sammensat ion som SCN⁻
-   eller FeSCN²⁺ er én kugle, ikke flere atomer, der sidder sammen.
-   Derfor er kuglerne faa og store nok til, at formlen kan laeses.
+   eller FeSCN²⁺ er én kugle, ikke flere atomer, der sidder sammen. Det er
+   boblen, der er stor (S.BOBLE), ikke kuglerne, saa der er plads til
+   mange. Lange navne staar forkortet paa kuglen og forklares i legenden
+   nederst i boblen.
 
    Tilsaettes der ioner, falder de ned oppefra. Fortyndes der, toner
    partikler ud. Vandmolekylerne ligger svagt i baggrunden.
@@ -333,8 +335,8 @@
                 if (h.t > 0.35) {
                     var kk = h.k, c = Math.cos(kk.a), s = Math.sin(kk.a);
                     this.fjern(kk);
-                    var fe = this.ny("fe", kk.x - c * 15, kk.y - s * 15, -c * 55, -s * 55);
-                    var sc = this.ny("scn", kk.x + c * 17, kk.y + s * 17, c * 55, s * 55);
+                    var fe = this.ny("fe", kk.x - c * 9, kk.y - s * 9, -c * 45, -s * 45);
+                    var sc = this.ny("scn", kk.x + c * 10, kk.y + s * 10, c * 45, s * 45);
                     fe.alfa = 1;
                     sc.alfa = 1;
                     this.blink.push({ x: kk.x, y: kk.y, liv: 1, farve: "255, 230, 150" });
@@ -479,8 +481,8 @@
         ctx.font = "800 " + stoerrelse + "px 'Segoe UI', sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = "rgba(10, 12, 18, 0.45)";
+        ctx.lineWidth = Math.max(1.4, stoerrelse * 0.3);
+        ctx.strokeStyle = "rgba(10, 12, 18, 0.5)";
         ctx.lineJoin = "round";
         ctx.strokeText(tekst, x, y + 0.5);
         ctx.fillStyle = farve;
@@ -606,7 +608,7 @@
             ctx.stroke();
             NK.tekst(ctx, titel, 0, -b.r, { font: "700 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#dfe5ec" });
         }
-        this.tegnForklaring(ctx, 0, b.r + 12);
+        this.tegnLegende(ctx, b);
         ctx.restore();
     };
 
@@ -618,21 +620,22 @@
         return ud;
     };
 
-    /* Formlen staar paa kuglen, saa forklaringen under boblen siger kun,
-       hvad de forkortede navne betyder */
-    P.tegnForklaring = function (ctx, x, y) {
+    /* Formlen staar paa kuglen. Legenden nederst i boblen siger kun, hvad
+       de forkortede navne daekker over. */
+    P.tegnLegende = function (ctx, b) {
         var linjer = this.typer().filter(function (t) { return !!KORT[t]; })
-            .map(function (t) { return KORT[t] + " = " + ETIKET[t]; });
+            .map(function (t) { return KORT[t] + " = " + LEGENDE[t]; });
         if (!linjer.length) return;
+        var h = linjer.length * 17 + 10;
+        var y0 = b.r * 0.62;
         ctx.save();
-        ctx.font = "600 12px 'Segoe UI', sans-serif";
-        var bredde = 22;
-        linjer.forEach(function (t) { bredde = Math.max(bredde, ctx.measureText(t).width + 22); });
-        ctx.fillStyle = "rgba(20, 22, 28, 0.88)";
-        NK.rundtRekt(ctx, x - bredde / 2, y, bredde, linjer.length * 18 + 8, 9);
-        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(0, 0, b.r - 3, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.fillStyle = "rgba(10, 12, 18, 0.72)";
+        ctx.fillRect(-b.r, y0, 2 * b.r, h);
         linjer.forEach(function (t, i) {
-            NK.tekst(ctx, t, x, y + 13 + i * 18, { font: "600 12px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#cfd6de" });
+            NK.tekst(ctx, t, 0, y0 + 14 + i * 17, { font: "600 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#dfe5ec" });
         });
         ctx.restore();
     };

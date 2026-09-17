@@ -47,6 +47,9 @@
     var GLAS = ["glas1", "glas2", "glas3", "glas4", "glas5", "glas6", "glas7", "glas8"];
     NK.GLAS = GLAS;
 
+    /* Det udstyr, der bliver haengende over glasset, naar det er brugt */
+    var SVAEVER = ["spatel", "ag", "flaske_scn", "flaske_farve", "vand", "kolbe1", "kolbe2", "baegerA"];
+
     function kopi(p) { return { x: p.x, y: p.y, v: p.v }; }
 
     var STOF = {
@@ -202,7 +205,17 @@
         g.flaske_farve.stof = "farve";
         g.vand.stof = "vand";
         g.spatel.last = null;
-        g.ag.svaev = null;
+        /* Alt kan vaelges, saa alt har et navn */
+        var titler = {
+            kolbe1: "Kolben med stamopløsning", kolbe2: "Kolben med stamopløsning",
+            pulver_fe: "Pulverglasset med Fe(NO₃)₃", pulver_vitc: "Pulverglasset med ascorbinsyre",
+            pulver_scn: "Pulverglasset med KSCN", spatel: "Spatlen",
+            flaske_scn: "Flasken med KSCN 0,1 M", ag: "Dråbeflasken med AgNO₃ 0,1 M",
+            glasstav: "Glasstaven", termometer: "Termometeret", vandbad: "Vandbadet", isbad: "Isbadet",
+            flaske_farve: "Flasken med frugtfarve", vand: "Sprøjteflasken med vand"
+        };
+        Object.keys(titler).forEach(function (n) { g[n].titel = titler[n]; });
+        SVAEVER.forEach(function (n) { if (g[n]) g[n].svaev = null; });
         GLAS.forEach(function (n, i) { g[n] = nytGlas(n, i + 1); });
         g.kaffekop.skjult = this.koppenVaek;
 
@@ -271,7 +284,56 @@
 
     P.valgtBeholder = function () {
         var c = this.valgt ? this.g[this.valgt] : null;
-        return c && this.synlig(c) ? c : null;
+        return c && c.erBeholder && this.synlig(c) ? c : null;
+    };
+
+    /* Den valgte genstand, uanset om den rummer noget */
+    P.valgtGenstand = function () {
+        var gg = this.valgt ? this.g[this.valgt] : null;
+        return gg && this.synlig(gg) ? gg : null;
+    };
+
+    /* ----- Det, der svaever over et glas ---------------------------------- */
+    /* Det, der lige er brugt, bliver haengende over glasset med en gul ring
+       ved siden af. Et klik paa ringen eller paa genstanden gentager
+       handlingen, og traekkes den vaek, gaar den hjem. */
+    P.svaevende = function () {
+        for (var i = 0; i < SVAEVER.length; i++) {
+            var gg = this.g[SVAEVER[i]];
+            if (gg && gg.svaev && this.synlig(gg)) return gg;
+        }
+        return null;
+    };
+
+    P.svaevRing = function () {
+        var sv = this.svaevende();
+        if (!sv || this.optaget() || this.holdt || this.visning) return null;
+        var rekt = S.rekt(sv.sprite, sv.p, sv.anker, 0);
+        return { x: rekt.x + rekt.b + 18, y: rekt.y + rekt.h * 0.45, r: 14, navn: sv.navn };
+    };
+
+    /* Koreografitrin: gg lander svaevende over c og bliver der. pose(gg, c)
+       giver posituren; uden pose bliver gg i haeldepositur. */
+    P.svaevVed = function (gg, c, pose, slags) {
+        var mig = this;
+        return [
+            { flyt: gg, til: function () { return pose ? pose.call(mig, gg, c) : mig.poseOver(gg, c); }, tid: 0.45, loeft: 14 },
+            { kald: function () { gg.svaev = { c: c, slags: slags || "brug" }; this.aendret("svaev"); } }
+        ];
+    };
+
+    P.svaevHjem = function (gg) {
+        if (!gg || !gg.svaev) return;
+        gg.svaev = null;
+        this.koer([hjemTil(gg, 0.6, 40)], "hjem");
+    };
+
+    /* Et klik paa det svaevende eller paa ringen gentager handlingen */
+    P.gentagSvaev = function (sv) {
+        var maal = sv.svaev.c;
+        if (!maal || !this.synlig(maal)) { this.svaevHjem(sv); return false; }
+        if (sv.svaev.slags === "fyld") { this.fyldSpatel(maal.stof); return true; }
+        return this.brug(sv, maal);
     };
 
     P.vaelg = function (navn) {
@@ -549,40 +611,38 @@
         if (this.visning) return this.klikVisning(navn);
         if (this.laererOptaget && this.laererOptaget()) return false;
         if (this.optaget() || this.holdt || this.rystKilde) return false;
-        switch (navn) {
-            case "kaffekop": return this.klikKop ? this.klikKop() : false;
-            case "kort": case "papir": return this.aabnVisning();
-            case "dunk": return this.proevDunk();
-            case "vandbad": case "isbad": return this.proevBad(navn);
-            case "stativ": return this.proevStativ();
-        }
+        if (navn === "kaffekop") return this.klikKop ? this.klikKop() : false;
+        if (navn === "kort" || navn === "papir") return this.aabnVisning();
+
+        /* Det, der svaever over et glas, gentager sin handling ved et klik */
+        var sv = this.svaevende();
+        if (sv && navn === sv.navn) return this.gentagSvaev(sv);
+
+        /* Klik viser, traek goer: et klik vaelger kun genstanden, saa den
+           kan laeses og ses i zoomboblen. Handlinger sker ved at traekke. */
         var gg = this.g[navn];
-        if (!this.synlig(gg)) return false;
-        if (gg.erBeholder) return this.klikBeholder(gg);
-        if (gg.greb === "spatel") return this.klikSpatel();
-        if (gg.greb === "bad" || !gg.greb) return false;
-        return this.brug(gg, null);
+        if (!gg || !this.synlig(gg)) return this.klikSted(navn);
+        this.vaelg(navn);
+        this.besked(this.valgBesked(gg));
+        return true;
     };
 
-    P.klikBeholder = function (c) {
-        if (c === this.g.baegerA) {
-            var tomme = this.tommeGlas();
-            if (M.volumen(c.b) >= 1 && tomme.length) {
-                this.fordel(tomme);
-                return true;
-            }
-            this.vaelg(c.navn);
-            if (M.volumen(c.b) < 1 && tomme.length) {
-                this.besked("Bægerglasset er tomt. Hæld stamopløsning i fra kolben.");
-                this.markér("kolbe1");
-            } else {
-                this.besked("Bægerglasset er valgt.");
-            }
-            return true;
-        }
-        this.vaelg(c.navn);
-        this.besked(this.navn(c) + " er valgt.");
+    /* Stativet og dunken er steder paa bordet, ikke genstande */
+    P.klikSted = function (navn) {
+        if (navn === "dunk") this.besked("Affaldsdunken til surt uorganisk affald. Træk et glas herover for at tømme det.");
+        else if (navn === "stativ") this.besked("Stativet. Træk et glas herover for at sætte det tilbage.");
+        else return false;
+        this.markér(navn, 2);
         return true;
+    };
+
+    P.valgBesked = function (gg) {
+        var t = gg.titel || "Genstanden";
+        if (gg.erBeholder) return t + " er valgt.";
+        if (gg.greb === "bad") return t + " er valgt. Træk et reagensglas ned i det.";
+        if (gg.greb === "pulver") return t + " er valgt. Træk det hen over et glas, så tager spatlen en spatelspids.";
+        if (gg.greb === "spatel") return t + (gg.last ? " har " + STOF[gg.last].navn + " på. Træk den hen over et glas." : " er valgt. Træk den ned i et pulverglas.");
+        return t + " er valgt. Træk den hen over et glas for at bruge den.";
     };
 
     /* Er der stamoploesning i glas 1 til 7? Trinnet er gjort, uanset om der
@@ -602,28 +662,11 @@
         return true;
     };
 
-    P.tommeGlas = function () {
-        return this.glasListe().filter(function (gl) {
-            return gl.nr <= 7 && !gl.fyldt && gl.sted === "stativ" && M.volumen(gl.b) < M.MAENGDE.GLAS_MAKS - M.MAENGDE.BAEGER_GLAS;
-        });
-    };
-
-    /* Hvilken beholder et klik paa udstyret virker paa */
-    P.standardMaal = function (gg) {
-        var v = this.valgtBeholder();
-        if (gg.greb === "kolbe" || gg.stof === "farve") {
-            if (v) return v;
-            if (this.station === 1) return this.g.baegerA;
-            return M.volumen(this.g.baegerV.b) < 0.3 ? this.g.baegerV : this.g.baegerH;
-        }
-        return v;
-    };
-
-    /* Udstyret gg bruges paa beholderen maal (eller den valgte) */
-    P.brug = function (gg, maal) {
-        var c = maal || this.standardMaal(gg);
-        if (!c) {
-            this.besked(this.station === 1 ? "Klik på et glas for at vælge det, eller tag fat i udstyret og slip det over glasset." : "Klik på et bægerglas for at vælge det.");
+    /* Udstyret gg bruges paa beholderen c. Det sker, naar udstyret slippes
+       over den, eller naar der klikkes paa det, der svaever over den. */
+    P.brug = function (gg, c) {
+        if (!c || !c.erBeholder) {
+            this.besked("Slip udstyret over et glas for at bruge det.");
             this.markérGlas();
             return false;
         }
@@ -690,6 +733,7 @@
         var farve = this.straaleFarve(gg);
         var slags = gg.greb === "kolbe" ? "stam" : gg.stof;
         this.vaelg(c.navn);
+        gg.svaev = null;
         this.koer([
             { flyt: gg, til: function () { return mig.poseOver(gg, c); }, tid: 0.75, loeft: 40 },
             { kald: function () { if (NK.Lyd) NK.Lyd.haeld(tid); } },
@@ -706,9 +750,8 @@
             { kald: function () {
                 this.straale = null;
                 this.efterHaeldning(c, slags, mL, foer);
-            } },
-            hjemTil(gg, 0.8, 40)
-        ], "haeld");
+            } }
+        ].concat(this.svaevVed(gg, c)), "haeld");
     };
 
     P.efterHaeldning = function (c, slags, mL, foer) {
@@ -763,8 +806,15 @@
         if (c === bg) return false;
         if (M.volumen(bg.b) < 0.2) { this.besked(this.navn(bg) + " er tomt."); return false; }
         var mL = c.erGlas ? M.MAENGDE.BAEGER_GLAS : M.volumen(bg.b);
-        this.koer(this.haeldBaegerListe(bg, c, mL).concat([hjemTil(bg, 0.7, 30)]), "haeld");
+        bg.svaev = null;
+        this.vaelg(c.navn);
+        this.koer(this.haeldBaegerListe(bg, c, mL).concat(this.svaevVed(bg, c, this.haeldPositurFor)), "haeld");
         return true;
+    };
+
+    /* Baegerglasset svaever i haeldepositur over c */
+    P.haeldPositurFor = function (bg, c) {
+        return this.haeldPositur(c);
     };
 
     P.haeldBaegerListe = function (bg, c, mL) {
@@ -795,19 +845,6 @@
         ];
     };
 
-    P.fordel = function (tomme) {
-        var bg = this.g.baegerA, mig = this;
-        var liste = [];
-        this.vaelg("baegerA");
-        tomme.forEach(function (gl) { liste = liste.concat(mig.haeldBaegerListe(bg, gl, M.MAENGDE.BAEGER_GLAS)); });
-        liste.push(hjemTil(bg, 0.7, 30));
-        liste.push({ kald: function () {
-            this.tjekFordelt();
-            this.aendret("fordel");
-        } });
-        this.koer(liste, "fordel");
-    };
-
     /* ----- Draaber AgNO3 ----------------------------------------------------- */
     P.draabe = function (c) {
         var fl = this.g.ag, mig = this;
@@ -819,7 +856,7 @@
         }
         liste.push({ kald: function () {
             this.draaber.push({ x: fl.p.x, y: fl.p.y + 4, vx: 0, vy: 40, r: 3.4, liv: 1, farveloes: true, c: c });
-            fl.svaev = { c: c, ur: 2.4 };
+            fl.svaev = { c: c, slags: "brug" };
             this.aendret("draabe");
         } });
         this.koer(liste, "draabe");
@@ -892,16 +929,30 @@
 
     /* Et pulverglas bruges: spatlen tager en spatelspids og kommer den i c */
     P.spatelspids = function (pulver, c) {
-        var liste = [];
+        var sp = this.g.spatel, liste = [];
         this.vaelg(c.navn);
+        sp.svaev = null;
         if (Math.abs(pulver.p.x - pulver.hjem.x) + Math.abs(pulver.p.y - pulver.hjem.y) > 1.5) liste.push(hjemTil(pulver, 0.4, 20));
-        liste = liste.concat(this.fyldListe(pulver.stof), this.spatelHaeldListe(c), [hjemTil(this.g.spatel, 0.7, 40)]);
+        liste = liste.concat(this.fyldListe(pulver.stof), this.spatelHaeldListe(c), this.svaevVed(sp, c, this.spatelSvaev));
         this.koer(liste, "spatel");
     };
 
+    /* Spatlen bliver haengende over glasset eller over pulverglasset */
+    P.spatelSvaev = function (sp, c) {
+        var q = this.spatelOver(c);
+        return { x: q.x, y: q.y - 6, v: q.v };
+    };
+
+    P.spatelVedPulver = function (sp, pulver) {
+        var q = this.spatelVedGlas(pulver);
+        return { x: q.x, y: q.y - 34, v: 0 };
+    };
+
     P.fyldSpatel = function (stof) {
-        this.koer(this.fyldListe(stof).concat([hjemTil(this.g.spatel, 0.6, 30)]), "spatel");
-        this.besked("Der ligger " + STOF[stof].navn + " på spatlen.");
+        var sp = this.g.spatel, pulver = this.g["pulver_" + stof];
+        sp.svaev = null;
+        this.koer(this.fyldListe(stof).concat(this.svaevVed(sp, pulver, this.spatelVedPulver, "fyld")), "spatel");
+        this.besked("Der ligger " + STOF[stof].navn + " på spatlen. Træk den hen over et glas.");
     };
 
     P.toemSpatel = function (c) {
@@ -911,15 +962,9 @@
             return false;
         }
         this.vaelg(c.navn);
-        this.koer(this.spatelHaeldListe(c).concat([hjemTil(sp, 0.7, 40)]), "spatel");
+        sp.svaev = null;
+        this.koer(this.spatelHaeldListe(c).concat(this.svaevVed(sp, c, this.spatelSvaev)), "spatel");
         return true;
-    };
-
-    P.klikSpatel = function () {
-        var v = this.valgtBeholder();
-        if (this.g.spatel.last && v) return this.toemSpatel(v);
-        this.besked("Tag fat i spatlen, og før den ned i et pulverglas. Du kan også klikke på et pulverglas.");
-        return false;
     };
 
     /* ----- Omroering ----------------------------------------------------- */
@@ -971,27 +1016,6 @@
     };
 
     /* ----- Badene ----------------------------------------------------------- */
-    P.proevBad = function (bad) {
-        var i = this.glasI(bad);
-        var v = this.valgtBeholder();
-        var badNavn = bad === "vandbad" ? "vandbadet" : "isbadet";
-        if (v && v.erGlas && v.sted !== bad) {
-            if (i) { this.besked("Der er allerede et glas i " + badNavn + "."); return false; }
-            this.tilBad(v, bad);
-            return true;
-        }
-        if (i) { this.tilStativ(i); return true; }
-        this.besked("Klik på et reagensglas for at vælge det, eller tag fat i glasset og stil det i " + badNavn + ".");
-        this.markérGlas();
-        return false;
-    };
-
-    P.proevStativ = function () {
-        var v = this.valgtBeholder();
-        if (v && v.erGlas && (v.sted === "vandbad" || v.sted === "isbad")) { this.tilStativ(v); return true; }
-        this.besked("Klik på et glas for at vælge det.");
-        return false;
-    };
 
     P.tilBad = function (gl, bad) {
         gl.sted = "flytter";
@@ -1025,25 +1049,6 @@
     };
 
     /* ----- Affald ----------------------------------------------------------- */
-    P.proevDunk = function () {
-        var v = this.valgtBeholder(), mig = this;
-        if (this.station === 1) {
-            if (this.gjort.affald) { this.besked("Resterne er afleveret."); return false; }
-            if (this.gjort.billede) { this.aflever(); return true; }
-            if (v && M.volumen(v.b) + M.fastIalt(v.b) > 0.05) { this.toemI(v); return true; }
-            this.besked("Tag billede af glassene, før resterne afleveres.");
-            this.markér("kort", 3);
-            return false;
-        }
-        var fulde = [this.g.baegerV, this.g.baegerH].filter(function (c) { return M.volumen(c.b) > 0.05; });
-        if (!fulde.length) { this.besked("Bægerglassene er tomme."); return false; }
-        if (v && fulde.indexOf(v) >= 0) { this.toemI(v); return true; }
-        var liste = [];
-        fulde.forEach(function (c) { liste = liste.concat(mig.toemListe(c)); });
-        this.koer(liste, "toem");
-        return true;
-    };
-
     P.toemListe = function (c) {
         var d = S.DUNK.aabning, mig = this;
         var liste = [];
@@ -1078,34 +1083,38 @@
 
     P.toemI = function (c) {
         this.vaelg(c.navn);
-        if (c.erGlas && (c.sted === "vandbad" || c.sted === "isbad")) c.sted = "stativ";
+        if (c.erGlas) {
+            /* Resultatet gemmes, som glasset saa ud, lige foer det blev toemt */
+            c.slut = this.slutBillede(c);
+            if (c.sted === "vandbad" || c.sted === "isbad") c.sted = "stativ";
+        }
         this.koer(this.toemListe(c).concat([{ kald: function () {
             this.besked(this.navn(c) + " er tømt.");
         } }]), "toem");
     };
 
-    P.aflever = function () {
+    /* Glasset, som tegneserien skal huske det */
+    P.slutBillede = function (gl) {
+        return {
+            opl: M.samlet(gl.b), tegning: this.beholderTegning(gl), indgreb: this.indgrebTekst(gl), liste: this.indgrebListe(gl),
+            vurdering: gl.vurdering, maaltT: gl.maaltT, afkoelet: gl.afkoelet, uroert: this.uroert(gl)
+        };
+    };
+
+    /* Resterne er afleveret, naar glassene og baegerglasset er tomme.
+       Trinnet afgoeres af bordets tilstand, ikke af et klik paa dunken. */
+    P.tjekAffald = function () {
+        if (this.station !== 1 || this.gjort.affald || !this.gjort.fordelt || this.optaget()) return;
         var mig = this;
-        var liste = [];
-        this.lukVisning(false);
-        this.glasListe().forEach(function (gl) {
-            gl.slut = {
-                opl: M.samlet(gl.b), tegning: mig.beholderTegning(gl), indgreb: mig.indgrebTekst(gl), liste: mig.indgrebListe(gl),
-                vurdering: gl.vurdering, maaltT: gl.maaltT, afkoelet: gl.afkoelet, uroert: mig.uroert(gl)
-            };
-            if (M.volumen(gl.b) + M.fastIalt(gl.b) < 0.05) return;
-            liste = liste.concat(mig.toemListe(gl));
-        });
-        if (M.volumen(this.g.baegerA.b) > 0.05) liste = liste.concat(this.toemListe(this.g.baegerA));
-        liste.push({ kald: function () {
-            this.gjort.affald = true;
-            this.valgt = null;
-            this.valgtPr[1] = null;
-            this.besked("Resterne er afleveret. Del 1 er slut.", "god");
-            if (NK.Lyd) NK.Lyd.succes();
-            this.aendret("affald");
-        } });
-        this.koer(liste, "affald");
+        var tomt = this.glasListe().every(function (gl) { return M.volumen(gl.b) + M.fastIalt(gl.b) < 0.05; });
+        if (!tomt || M.volumen(this.g.baegerA.b) > 0.05) return;
+        this.glasListe().forEach(function (gl) { if (!gl.slut) gl.slut = mig.slutBillede(gl); });
+        this.gjort.affald = true;
+        this.valgt = null;
+        this.valgtPr[1] = null;
+        this.besked("Resterne er afleveret. Del 1 er slut.", "god");
+        if (NK.Lyd) NK.Lyd.succes();
+        this.aendret("affald");
     };
 
     /* Stamoploesningen haeldes i affaldet. Laereren henter mere. */
@@ -1666,17 +1675,17 @@
             this.aendret("toemt2");
         }
 
-        /* Draabeflasken svaever over beholderen lidt tid og gaar saa hjem */
-        var fl = g.ag;
-        if (fl.svaev) {
-            fl.svaev.ur -= dt;
-            var sc = fl.svaev.c;
-            if (sc.erGlas && ((this.holdt && this.holdt.navn === sc.navn) || this.rystGlas === sc || sc.sted === "flytter")) fl.svaev.ur = 0;
-            if (fl.svaev.ur <= 0 && !this.handling) {
-                fl.svaev = null;
-                this.koer([hjemTil(fl, 0.6, 40)], "hjem");
-            }
+        /* Det, der svaever over et glas, bliver haengende, til glasset
+           flyttes, eller til det selv traekkes vaek */
+        var sv = this.svaevende();
+        if (sv && !this.handling) {
+            var sc = sv.svaev.c;
+            var vaek = !this.synlig(sc) || this.baerer === sv ||
+                (sc.erGlas && ((this.holdt && this.holdt.navn === sc.navn) || this.rystGlas === sc || sc.sted === "flytter"));
+            if (vaek) this.svaevHjem(sv);
         }
+
+        this.tjekAffald();
 
         /* Zoomboblen viser den valgte beholder */
         var v = this.valgtBeholder();

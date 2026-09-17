@@ -180,8 +180,8 @@
        den skal kunne laeses. Derfor er tallene lavere end koncentrationen
        alene ville give. */
     var MIKRO = {
-        PR_MM: 3, FORSTAERK: 4, MAKS: 10, MAKS_AG: 7, MAKS_AGSCN: 9, MAKS_FE2: 10, MAKS_VITC: 4,
-        PR_MM_FARVE: 40, MAKS_FARVE: 10, VAND: 8
+        PR_MM: 5, FORSTAERK: 4, MAKS: 18, MAKS_AG: 12, MAKS_AGSCN: 14, MAKS_FE2: 16, MAKS_VITC: 6,
+        PR_MM_FARVE: 70, MAKS_FARVE: 16, VAND: 14
     };
 
     /* Bundfaldet synker (pr. sekund) og hvirvles op ved rystning */
