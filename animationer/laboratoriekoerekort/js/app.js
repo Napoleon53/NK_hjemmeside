@@ -73,7 +73,7 @@
     }
 
     function start() {
-        proeve = bland(PULJE).slice(0, antal).map(function (sp) {
+        proeve = PULJE.slice(0, antal).map(function (sp) {
             var svar = sp.blandSvar === false ? sp.svar.slice() : bland(sp.svar);
             return {
                 sp: sp,
