@@ -37,7 +37,8 @@ js/stoftabel.js      den fælles tabel: ioner, syrer, baser, indikatorer, gasser
                      chlorider, iodider, sulfater, carbonater, hydroxider, Ag₂O, AgSCN),
                      reaktioner og standardpotentialer
 js/udstyr.js         kataloget over udstyr: sprite, anker, inderside, rumfang,
-                     tud og egenskaber (holder, hælder, drypper, spatel, rører ...)
+                     tud og egenskaber (holder, hælder, drypper, spatel, rører ...).
+                     skaleret() giver en type i mindre målestok
 js/beholder.js       det, en beholder kan: rumme, blande, hælde, lag, bundfald,
                      temperatur, kogning, overløb
 js/tegning.js        baggrund, plakat, væske, bundfald, korn, etiketter, stav,
@@ -127,6 +128,36 @@ Måleudstyr: vægten (`vaegt`, med vejebåd til pulver), pH-meteret (`phmeter`,
 sættes i glasset som termometeret), brænderen med trefod (`braender`, en
 varmeplade med flamme) og podetråden (`podetraad`) til flammeprøver. Massen
 regnes af glassets egen masse, vandet og stofferne (M i stoftabellen).
+
+## Bordets størrelse og udstyr i mindre målestok
+
+Hvert bord vælger selv sine mål i `NK.BORD_VALG` (`bredde`, `hoejde`, `bord`,
+hylder, plakat, `bobleR`), og lærredet skalerer scenen, så den fylder vinduet.
+Et smalt bord er altså zoomet ind: prøvebordet og prøverummet er 1620 enheder
+brede, mens sb2.4 er 1120 og derfor står tættere på. Et nyt lille bord med
+store, tydelige flasker koster kun de tre tal plus sin egen opstilling.
+
+En genstand i opstillingen kan desuden få `skala` (0,25 til 1), så den samme
+type kan stå i mindre målestok på et lille bord:
+
+```js
+{ navn: "stativ", type: "stativ", p: { x: 330, y: 350, v: 0 }, skala: 0.5 },
+{ navn: "glas1", type: "reagensglas", stativ: "stativ", hul: 1, nr: 1 }
+```
+
+* Kun tegnemålene skaleres (`NK.Udstyr.skaleret`): sprite, anker, inderside,
+  tud, etiket, huller, plade og de øvrige felter i listerne øverst i
+  `udstyr.js`. Nye mål i en type skal skrives ind i de lister, ellers følger
+  de ikke med.
+* Rumfang (`maks`), lysvej, masse og temperatur er uændrede, så kemien er den
+  samme: et bægerglas i halv størrelse er stadig et 100 mL bægerglas, og
+  væsken står lige så højt i det. Derfor ganges `mlPrAreal` med skala².
+* Det, der står i eller på noget andet (glas i et stativ, bægerglas på en
+  varmeplade), arver dets skala, så huller og plader passer.
+* Skala over 1 tillades ikke: sprites er tegnet i deres naturlige størrelse og
+  bliver bløde, hvis de forstørres.
+* Prøvebordets selvtest har et afsnit, der holder øje med, at rumfang,
+  væskehøjde, arv og museramme følger med (afsnit 10).
 
 Frihed frem for afvisning: rystes et åbent glas voldsomt, skvulper det ud;
 løber et glas over, bliver der en pyt; sættes et reagensglas på bordet,

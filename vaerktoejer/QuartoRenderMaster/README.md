@@ -35,12 +35,26 @@ Findes den ikke, siger programmet det og viser et link til quarto.org.
 ## Sådan bruges det
 
 Vælg en projektmappe øverst. Programmet finder selv ud af, hvad mappen er.
+Hver gruppe har en ?-knap med en kort forklaring, både som gult tip og som
+en boks, når der klikkes.
+
+Programmet starter altid i Enkelte filer i mappetræet. Er der en bog i
+mappen, kan du skifte til Bogens kapitler øverst i listen.
 
 **Bog.** Indeholder mappen en `_quarto.yml` med et `book:`-felt, vises bogens
 dele og kapitler som et træ med afkrydsningsfelter. Titlerne læses fra
-kapitlernes egne filer. Er alle kapitler valgt, bygges hele bogen samlet. Er
-kun nogle valgt, renderes de enkeltvis ind i bogens egen outputmappe, som
-læses af `output-dir` i `_quarto.yml`.
+kapitlernes egne filer.
+
+Er hvert eneste kapitel valgt, bygges hele bogen som ét samlet værk i bogens
+egen outputmappe, som læses af `output-dir` i `_quarto.yml`.
+
+Er kun nogle kapitler valgt, bliver netop de kapitler til selvstændige
+dokumenter i den outputmappe, du har valgt. Det kræver en omvej: Quarto laver
+altid hele bogen som ét Word- eller PDF-dokument, også når man beder om en
+enkelt fil i den. Programmet kopierer derfor projektet til en midlertidig
+mappe, tager `book:`-afsnittet og projektets `render:`-liste ud af kopien og
+renderer filerne der. Originalen røres ikke. Det samme sker, hvis du vælger
+enkelte filer i mappetræet i en mappe, der er en bog.
 
 **Udgaver.** Ligger der `_quarto-<navn>.yml`-filer ved siden af, kan de vælges
 i feltet Udgave øverst til højre. Programmet lægger profilens indstillinger
@@ -64,6 +78,15 @@ overskriver hinanden.
   selve .html-filen, så den kan sendes videre alene.
 - **Word.** Er der sat en skabelon i Word-skabelon (reference-doc), bruges den
   til alle Word-renderinger.
+
+  Der er altid sidetal. Pandoc laver ingen sidefod af sig selv, så programmet
+  skriver et sidetalsfelt ind i den færdige .docx-fil bagefter: har filen ingen
+  sidefod, laves der en med et centreret sidetal, og har skabelonens sidefod
+  allerede et sidetal, røres den ikke.
+
+  Figurer i SVG kommer ikke med i Word. Pandoc skal bruge `rsvg-convert` til at
+  lave dem om, og det program følger ikke med Quarto. Det gælder også, når
+  Quarto kaldes i hånden. Gem figuren som PNG, hvis den skal med i Word.
 - **PDF.** Renderes med `--to typst`, altså Quartos indbyggede Typst-motor.
   Der er hverken LaTeX eller TinyTeX inde over. `--pdf-engine typst` er ikke
   brugt, fordi det kræver en separat typst-installation ved siden af Quarto.
@@ -113,5 +136,6 @@ mappe, udgave, outputmappe, Word-skabelon, formater og de øvrige afkrydsninger.
 | `Dokumenthoved.cs` | YAML-hoved, titler, sammenkædning, stiomskrivning |
 | `Renderplan.cs` | Laver listen af quarto-kald ud fra brugerens valg |
 | `Koerer.cs` | Kører quarto og skriver til loggen |
+| `Sidetal.cs` | Skriver sidetal i sidefoden på færdige Word-filer |
 | `Filhjaelp.cs` | Stier, mappekopiering, Dropbox |
 | `Indstillinger.cs` | Gemmer valgene mellem programkørsler |

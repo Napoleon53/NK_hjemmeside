@@ -575,10 +575,12 @@
     };
 
     T.tegnTermometer = function (ctx, gg, visTal) {
-        var L = gg.type.laengde, p = gg.p, Tc = gg.T === undefined ? 20 : gg.T;
+        var k = gg.skala || 1;
+        var L = gg.type.laengde / k, p = gg.p, Tc = gg.T === undefined ? 20 : gg.T;
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(p.v);
+        ctx.scale(k, k);
         ctx.fillStyle = "rgba(225, 238, 247, 0.6)";
         NK.rundtRekt(ctx, -4, 0, 8, L - 5, 4);
         ctx.fill();

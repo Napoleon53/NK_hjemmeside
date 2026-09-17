@@ -284,7 +284,7 @@
             hj = [[-pad, -pad], [t.b + pad, -pad], [t.b + pad, t.h + pad], [-pad, t.h + pad]];
         } else {
             var L = t.laengde || 100;
-            hj = [[-7 - pad, -pad], [7 + pad, -pad], [7 + pad, L + pad], [-7 - pad, L + pad]];
+            hj = [[-7 * (t.skala || 1) - pad, -pad], [7 * (t.skala || 1) + pad, -pad], [7 * (t.skala || 1) + pad, L + pad], [-7 * (t.skala || 1) - pad, L + pad]];
         }
         var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
         hj.forEach(function (h) {
@@ -302,7 +302,8 @@
         var l = NK.tilLokal(gg.p, gg.anker, pt.x, pt.y);
         if (t.sprite) return l.x > -pad && l.x < t.b + pad && l.y > -pad && l.y < t.h + pad;
         var L = t.laengde || 100;
-        return l.x > -7 - pad && l.x < 7 + pad && l.y > -pad && l.y < L + pad;
+        var halv = 7 * (t.skala || 1);
+        return l.x > -halv - pad && l.x < halv + pad && l.y > -pad && l.y < L + pad;
     };
 
     P.tilBord = function (ev) {
