@@ -265,6 +265,14 @@
         return o;
     }
 
+    /* AgNO3 0,1 M, som den staar i draabeflasken */
+    function agOpl(V) {
+        var o = nyOpl();
+        o.V = V;
+        o.ag = DRAABE.umol / DRAABE.mL * V;
+        return o;
+    }
+
     /* Ag+ faelder SCN-. Returnerer, hvor meget der blev faeldet (µmol). */
     function faeld(o) {
         var p = Math.min(o.ag, o.scn);
@@ -563,6 +571,7 @@
         farveOpl: farveOpl,
         vandOpl: vandOpl,
         kscnOpl: kscnOpl,
+        agOpl: agOpl,
         xLigevaegt: xLigevaegt,
         faeld: faeld,
         reducer: reducer,
