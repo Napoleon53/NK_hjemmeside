@@ -40,8 +40,18 @@ namespace QuartoRenderMaster
             HentIndstillinger();
             FindQuarto();
             string sidste = _indst.Hent(Indstillinger.SidsteMappe, "");
-            if (sidste.Length > 0 && Directory.Exists(sidste)) IndlaesMappe(sidste, false);
-            else OpdaterProjektinfo();
+            if (sidste.Length > 0 && Directory.Exists(sidste))
+            {
+                IndlaesMappe(sidste, false);
+            }
+            else
+            {
+                _opdaterer = true;
+                _rdoBog.Enabled = false;
+                _rdoFiler.Checked = true;
+                _opdaterer = false;
+                OpdaterProjektinfo();
+            }
         }
 
         // ---------------------------------------------------------------- UI

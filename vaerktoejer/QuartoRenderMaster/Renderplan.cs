@@ -181,6 +181,7 @@ namespace QuartoRenderMaster
                 string maalbase = Filhjaelp.SikkertFilnavn(Path.GetFileNameWithoutExtension(fil));
                 string inputnavn = Path.GetFileName(arbejdsfil);
                 string kildebase = Path.GetFileNameWithoutExtension(inputnavn);
+                string filud = Udmappe(plan, arbejdsrod, mappe, udmappe, log);
 
                 if (!Dokumenthoved.HarHoved(fil))
                 {
@@ -214,9 +215,10 @@ namespace QuartoRenderMaster
                     TilfoejFaelles(job, oe, f);
                     job.Argumenter.Add("--output-dir");
                     job.Argumenter.Add(udmappe);
+                    job.Argumenter.Add("--no-clean");
                     job.Kildebase = kildebase;
                     job.Maalbase = maalbase;
-                    job.Udmappe = udmappe;
+                    job.Udmappe = filud;
                     job.Endelse = f.Endelse;
                     plan.Job.Add(job);
                 }
@@ -268,6 +270,8 @@ namespace QuartoRenderMaster
             plan.Midlertidige.Add(tempsti);
             log(oe.Filer.Count + " filer samles til en fil med sideskift imellem.");
 
+            string filud = Udmappe(plan, arbejdsrod, arbejdsfaelles, udmappe, log);
+
             foreach (Renderformat f in formater)
             {
                 Renderjob job = new Renderjob();
@@ -278,12 +282,64 @@ namespace QuartoRenderMaster
                 TilfoejFaelles(job, oe, f);
                 job.Argumenter.Add("--output-dir");
                 job.Argumenter.Add(udmappe);
+                job.Argumenter.Add("--no-clean");
                 job.Kildebase = Path.GetFileNameWithoutExtension(tempnavn);
                 job.Maalbase = maalbase;
-                job.Udmappe = udmappe;
+                job.Udmappe = filud;
                 job.Endelse = f.Endelse;
                 plan.Job.Add(job);
             }
+        }
+
+        // Quarto lægger resultatet af en enkelt fil i outputmappen under den sti,
+        // filen har inde i sit projekt. Uden en _quarto.yml er der intet projekt,
+        // og saa naegter Typst at hente billeder uden for filens egen mappe.
+        // Derfor faar mappen en midlertidig _quarto.yml, mens der renderes.
+        private static string Udmappe(Renderplan plan, string arbejdsrod, string filmappe,
+                                      string udmappe, Action<string> log)
+        {
+            string rod = Projektrod(filmappe);
+            if (rod == null)
+            {
+                rod = arbejdsrod;
+                string sti = Path.Combine(arbejdsrod, "_quarto.yml");
+                if (!File.Exists(sti) && !plan.Midlertidige.Contains(sti))
+                {
+                    try
+                    {
+                        File.WriteAllText(sti,
+                            "# Midlertidig fil fra Quarto Render Master. Den slettes automatisk igen.\r\n"
+                            + "project:\r\n  type: default\r\n", UdenBom);
+                        plan.Midlertidige.Add(sti);
+                        log("Mappen er ikke et Quarto-projekt. Der bruges en midlertidig _quarto.yml under renderingen.");
+                    }
+                    catch (Exception)
+                    {
+                        return udmappe;
+                    }
+                }
+            }
+            string rel = Filhjaelp.RelativSti(rod, filmappe).Replace('/', '\\').Trim('\\');
+            if (rel.Length == 0 || rel.StartsWith("..")) return udmappe;
+            return Path.Combine(udmappe, rel);
+        }
+
+        private static string Projektrod(string mappe)
+        {
+            try
+            {
+                DirectoryInfo m = new DirectoryInfo(mappe);
+                while (m != null)
+                {
+                    if (File.Exists(Path.Combine(m.FullName, "_quarto.yml"))
+                        || File.Exists(Path.Combine(m.FullName, "_quarto.yaml"))) return m.FullName;
+                    m = m.Parent;
+                }
+            }
+            catch (Exception)
+            {
+            }
+            return null;
         }
 
         private static void TilfoejFaelles(Renderjob job, Renderoensker oe, Renderformat f)

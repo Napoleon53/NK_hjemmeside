@@ -97,6 +97,25 @@ namespace QuartoRenderMaster
             }
         }
 
+        // Sletter en midlertidig fil og det, Quarto har lagt ved siden af den
+        // undervejs (fx en .typ-fil eller en _files-mappe efter en fejl).
+        public static void SletMedRester(string sti)
+        {
+            SletStille(sti);
+            try
+            {
+                string basenavn = Path.GetFileNameWithoutExtension(sti);
+                if (!basenavn.StartsWith("~qrm-")) return;
+                string mappe = Path.GetDirectoryName(sti);
+                foreach (string f in Directory.GetFiles(mappe, basenavn + ".*")) SletStille(f);
+                string ekstra = Path.Combine(mappe, basenavn + "_files");
+                if (Directory.Exists(ekstra)) Directory.Delete(ekstra, true);
+            }
+            catch (Exception)
+            {
+            }
+        }
+
         public static void SletStille(string sti)
         {
             try

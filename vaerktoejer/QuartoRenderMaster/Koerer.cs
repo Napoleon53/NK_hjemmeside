@@ -82,7 +82,7 @@ namespace QuartoRenderMaster
             }
             finally
             {
-                foreach (string temp in plan.Midlertidige) Filhjaelp.SletStille(temp);
+                foreach (string temp in plan.Midlertidige) Filhjaelp.SletMedRester(temp);
             }
             return altGik && !_afbrudt;
         }
