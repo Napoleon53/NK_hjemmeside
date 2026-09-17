@@ -37,7 +37,6 @@ namespace QuartoRenderMaster
         public string Projektmappe;
         public string Profil = "";
         public bool Bogtilstand;
-        public bool HeleBogen;
         public string Bogudmappe = "";
         public List<string> Filer = new List<string>();
         public bool Html, Word, Pdf;
@@ -80,27 +79,122 @@ namespace QuartoRenderMaster
                 return plan;
             }
 
-            string arbejdsrod = oe.Projektmappe;
-            if (oe.Kopi)
+            // En bog bliver altid til ét samlet Word- eller PDF-dokument, ogsaa
+            // naar man beder om en enkelt fil i den. Skal der kun renderes nogle
+            // faa filer, bygges de derfor i en kopi af projektet, hvor
+            // bogopsaetningen er taget ud.
+            string kilderod = oe.Projektmappe;
+            string bogrod = oe.Bogtilstand ? null : Bogprojektrod(oe.Projektmappe);
+            if (bogrod != null) kilderod = bogrod;
+
+            string arbejdsrod = kilderod;
+            if (oe.Kopi || bogrod != null)
             {
-                string navn = Filhjaelp.SikkertFilnavn(Path.GetFileName(oe.Projektmappe.TrimEnd('\\', '/')));
+                string navn = Filhjaelp.SikkertFilnavn(Path.GetFileName(kilderod.TrimEnd('\\', '/')));
                 arbejdsrod = Path.Combine(Path.GetTempPath(), "QuartoRenderMaster", navn);
                 log("Kopierer projektet til " + arbejdsrod);
                 try
                 {
                     Filhjaelp.RydMappe(arbejdsrod);
-                    Filhjaelp.KopierMappe(oe.Projektmappe, arbejdsrod, true);
+                    Filhjaelp.KopierMappe(kilderod, arbejdsrod, true);
                 }
                 catch (Exception f)
                 {
                     plan.Fejl.Add("Kunne ikke kopiere projektet: " + f.Message);
                     return plan;
                 }
+                if (bogrod != null)
+                {
+                    FjernBogopsaetning(arbejdsrod);
+                    log("Filerne renderes hver for sig, ikke som en del af bogen.");
+                }
             }
 
             if (oe.Bogtilstand) ByggBog(plan, oe, formater, arbejdsrod, log);
-            else ByggFiler(plan, oe, formater, arbejdsrod, log);
+            else ByggFiler(plan, oe, formater, kilderod, arbejdsrod, log);
             return plan;
+        }
+
+        // Er mappen en del af et Quarto-projekt af typen book, gives roden af det.
+        private static string Bogprojektrod(string mappe)
+        {
+            string rod = Projektrod(mappe);
+            if (rod == null) return null;
+            string fil = Kvartoprojekt.Projektfil(rod);
+            if (fil == null) return null;
+            Ynode node = Yamllaeser.LaesFil(fil);
+            if (node == null) return null;
+            bool bog = string.Equals(node.Tekst("project", "type"), "book", StringComparison.OrdinalIgnoreCase)
+                       || node.Hent("book") != null;
+            return bog ? rod : null;
+        }
+
+        // Tager book-afsnittet ud af kopiens _quarto-filer, saa Quarto laver
+        // selvstaendige dokumenter i stedet for en bog. Resten af opsaetningen
+        // bliver staaende.
+        private static void FjernBogopsaetning(string mappe)
+        {
+            string[] filer;
+            try
+            {
+                filer = Directory.GetFiles(mappe, "_quarto*.y*ml");
+            }
+            catch (Exception)
+            {
+                return;
+            }
+            foreach (string fil in filer)
+            {
+                try
+                {
+                    string[] linjer = File.ReadAllLines(fil, Encoding.UTF8);
+                    StringBuilder sb = new StringBuilder();
+                    int spring = -1;        // indryk for den blok, der springes over
+                    bool iProjekt = false;
+                    foreach (string linje in linjer)
+                    {
+                        string trimmet = linje.TrimStart(' ');
+                        if (trimmet.Length == 0)
+                        {
+                            if (spring < 0) sb.AppendLine(linje);
+                            continue;
+                        }
+                        int indryk = linje.Length - trimmet.Length;
+                        if (spring >= 0 && indryk > spring) continue;
+                        spring = -1;
+
+                        if (indryk == 0) iProjekt = trimmet.StartsWith("project:");
+
+                        // Hele book-afsnittet ryger ud.
+                        if (indryk == 0 && (trimmet.StartsWith("book:") || trimmet.StartsWith("appendices:")))
+                        {
+                            spring = 0;
+                            continue;
+                        }
+                        // Projektets render-liste ryger ud, ellers hoerer de
+                        // midlertidige filer ikke med til projektet.
+                        if (iProjekt && indryk > 0 && trimmet.StartsWith("render:"))
+                        {
+                            spring = indryk;
+                            continue;
+                        }
+                        if (trimmet.StartsWith("type:"))
+                        {
+                            string vaerdi = trimmet.Substring(5).Trim().Trim('"', '\'');
+                            if (string.Equals(vaerdi, "book", StringComparison.OrdinalIgnoreCase))
+                            {
+                                sb.AppendLine(linje.Substring(0, indryk) + "type: default");
+                                continue;
+                            }
+                        }
+                        sb.AppendLine(linje);
+                    }
+                    File.WriteAllText(fil, sb.ToString(), UdenBom);
+                }
+                catch (Exception)
+                {
+                }
+            }
         }
 
         private static void ByggBog(Renderplan plan, Renderoensker oe, List<Renderformat> formater,
@@ -112,37 +206,24 @@ namespace QuartoRenderMaster
             if (oe.Kopi)
                 plan.Efterkopi.Add(new string[] { Path.Combine(arbejdsrod, udnavn), plan.Aabnmappe });
 
-            if (oe.HeleBogen) log("Hele bogen renderes. Resultatet lander i " + udnavn);
-            else log("Kun de valgte kapitler renderes. Resultatet lander i " + udnavn);
+            log("Hele bogen bygges samlet. Resultatet lander i " + udnavn);
 
             foreach (Renderformat f in formater)
             {
-                if (oe.HeleBogen)
-                {
-                    Renderjob job = new Renderjob();
-                    job.Tekst = "Hele bogen som " + f.Navn;
-                    job.Arbejdsmappe = arbejdsrod;
-                    job.Argumenter.Add("render");
-                    TilfoejFaelles(job, oe, f);
-                    plan.Job.Add(job);
-                    continue;
-                }
-                foreach (string fil in oe.Filer)
-                {
-                    string rel = Filhjaelp.RelativSti(oe.Projektmappe, fil).Replace('/', '\\');
-                    Renderjob job = new Renderjob();
-                    job.Tekst = rel + " som " + f.Navn;
-                    job.Arbejdsmappe = arbejdsrod;
-                    job.Argumenter.Add("render");
-                    job.Argumenter.Add(rel);
-                    TilfoejFaelles(job, oe, f);
-                    plan.Job.Add(job);
-                }
+                Renderjob job = new Renderjob();
+                job.Tekst = "Hele bogen som " + f.Navn;
+                job.Arbejdsmappe = arbejdsrod;
+                job.Argumenter.Add("render");
+                TilfoejFaelles(job, oe, f);
+                // Bogen faar sit navn af Quarto, saa der omdoebes ikke bagefter.
+                job.Udmappe = Path.Combine(arbejdsrod, udnavn);
+                job.Endelse = f.Endelse;
+                plan.Job.Add(job);
             }
         }
 
         private static void ByggFiler(Renderplan plan, Renderoensker oe, List<Renderformat> formater,
-                                      string arbejdsrod, Action<string> log)
+                                      string kilderod, string arbejdsrod, Action<string> log)
         {
             if (string.IsNullOrEmpty(oe.Outputmappe))
             {
@@ -170,13 +251,13 @@ namespace QuartoRenderMaster
 
             if (oe.Samlet && oe.Filer.Count > 1)
             {
-                ByggSamlet(plan, oe, formater, arbejdsrod, udmappe, log);
+                ByggSamlet(plan, oe, formater, kilderod, arbejdsrod, udmappe, log);
                 return;
             }
 
             foreach (string fil in oe.Filer)
             {
-                string arbejdsfil = IArbejde(oe, arbejdsrod, fil);
+                string arbejdsfil = IArbejde(kilderod, arbejdsrod, fil);
                 string mappe = Path.GetDirectoryName(arbejdsfil);
                 string maalbase = Filhjaelp.SikkertFilnavn(Path.GetFileNameWithoutExtension(fil));
                 string inputnavn = Path.GetFileName(arbejdsfil);
@@ -226,10 +307,10 @@ namespace QuartoRenderMaster
         }
 
         private static void ByggSamlet(Renderplan plan, Renderoensker oe, List<Renderformat> formater,
-                                       string arbejdsrod, string udmappe, Action<string> log)
+                                       string kilderod, string arbejdsrod, string udmappe, Action<string> log)
         {
-            string faelles = Filhjaelp.FaellesMappe(oe.Filer, oe.Projektmappe);
-            string arbejdsfaelles = IArbejde(oe, arbejdsrod, faelles);
+            string faelles = Filhjaelp.FaellesMappe(oe.Filer, kilderod);
+            string arbejdsfaelles = IArbejde(kilderod, arbejdsrod, faelles);
             string maalbase = Filhjaelp.SikkertFilnavn(
                 string.IsNullOrEmpty(oe.Samletnavn) ? "samlet" : oe.Samletnavn);
             string tempnavn = "~qrm-" + maalbase + ".qmd";
@@ -364,13 +445,13 @@ namespace QuartoRenderMaster
         }
 
         // Den samme fil inde i den midlertidige kopi af projektet.
-        private static string IArbejde(Renderoensker oe, string arbejdsrod, string sti)
+        private static string IArbejde(string kilderod, string arbejdsrod, string sti)
         {
             if (string.Equals(Path.GetFullPath(arbejdsrod).TrimEnd('\\'),
-                              Path.GetFullPath(oe.Projektmappe).TrimEnd('\\'),
+                              Path.GetFullPath(kilderod).TrimEnd('\\'),
                               StringComparison.OrdinalIgnoreCase)) return sti;
-            if (!Filhjaelp.ErUnder(oe.Projektmappe, sti)) return sti;
-            string rel = Filhjaelp.RelativSti(oe.Projektmappe, sti).Replace('/', '\\');
+            if (!Filhjaelp.ErUnder(kilderod, sti)) return sti;
+            string rel = Filhjaelp.RelativSti(kilderod, sti).Replace('/', '\\');
             if (rel.Length == 0) return arbejdsrod;
             return Path.Combine(arbejdsrod, rel);
         }

@@ -30,6 +30,7 @@ namespace QuartoRenderMaster
         private TreeView _trae;
         private ProgressBar _bjaelke;
         private TableLayoutPanel _rod;
+        private readonly ToolTip _tips = new ToolTip();
 
         private static readonly Color Daempet = Color.FromArgb(95, 95, 95);
         private static readonly Color Advarsel = Color.FromArgb(176, 0, 0);
@@ -76,6 +77,10 @@ namespace QuartoRenderMaster
             _rod.RowStyles.Add(new RowStyle(SizeType.Absolute, 46));
             Controls.Add(_rod);
 
+            _tips.AutoPopDelay = 30000;
+            _tips.InitialDelay = 400;
+            _tips.ReshowDelay = 100;
+
             _rod.Controls.Add(OpretTop(), 0, 0);
             _rod.Controls.Add(OpretDropbox(), 0, 1);
             _rod.Controls.Add(OpretMidte(), 0, 2);
@@ -116,6 +121,34 @@ namespace QuartoRenderMaster
             return b;
         }
 
+        // En lille ?-knap med en kort forklaring. Teksten vises baade som
+        // gult tip ved museknappen og i en boks, naar der klikkes.
+        private Button Hjaelp(string titel, string tekst)
+        {
+            Button b = new Button();
+            b.Text = "?";
+            b.Size = new Size(23, 23);
+            b.Margin = new Padding(8, 2, 2, 2);
+            b.Anchor = AnchorStyles.Left;
+            b.TabStop = false;
+            b.Click += delegate
+            {
+                MessageBox.Show(this, tekst, titel, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            };
+            _tips.SetToolTip(b, tekst);
+            return b;
+        }
+
+        private static FlowLayoutPanel Raekke()
+        {
+            FlowLayoutPanel f = new FlowLayoutPanel();
+            f.AutoSize = true;
+            f.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            f.Margin = new Padding(0);
+            f.WrapContents = false;
+            return f;
+        }
+
         private static CheckBox Kryds(string tekst)
         {
             CheckBox c = new CheckBox();
@@ -145,7 +178,15 @@ namespace QuartoRenderMaster
             t.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
             t.RowStyles.Add(new RowStyle(SizeType.Absolute, 24));
 
-            t.Controls.Add(Etikette("Projektmappe"), 0, 0);
+            FlowLayoutPanel mapperaekke = Raekke();
+            mapperaekke.Anchor = AnchorStyles.Left;
+            mapperaekke.Controls.Add(Etikette("Projektmappe"));
+            mapperaekke.Controls.Add(Hjaelp("Projektmappe",
+                "Peg på den mappe, dit materiale ligger i.\r\n\r\n"
+                + "Er det en Quarto-bog, er det mappen med _quarto.yml. Ellers er det "
+                + "den mappe, dine .qmd-filer ligger i.\r\n\r\n"
+                + "Undermapper kommer med, så du kan vælge filer fra fx kilder eller arbejdsark."));
+            t.Controls.Add(mapperaekke, 0, 0);
 
             _txtMappe = new TextBox();
             _txtMappe.ReadOnly = true;
@@ -227,8 +268,15 @@ namespace QuartoRenderMaster
             t.Controls.Add(l, 0, 0);
 
             _chkKopi = Kryds("Byg i en midlertidig kopi og kopiér resultatet tilbage bagefter");
-            _chkKopi.Anchor = AnchorStyles.Left;
-            t.Controls.Add(_chkKopi, 0, 1);
+            FlowLayoutPanel kopiraekke = Raekke();
+            kopiraekke.Anchor = AnchorStyles.Left;
+            kopiraekke.BackColor = Color.Transparent;
+            kopiraekke.Controls.Add(_chkKopi);
+            kopiraekke.Controls.Add(Hjaelp("Mappen ligger i Dropbox",
+                "Dropbox kan låse en fil midt i en rendering, så den fejler.\r\n\r\n"
+                + "Sæt kryds, så kopieres projektet først til din midlertidige mappe, bygges "
+                + "der, og resultatet kopieres tilbage, når det er færdigt."));
+            t.Controls.Add(kopiraekke, 0, 1);
 
             _pnlDropbox.Controls.Add(t);
             return _pnlDropbox;
@@ -287,6 +335,15 @@ namespace QuartoRenderMaster
             _rdoFiler.AutoSize = true;
             _rdoFiler.Margin = new Padding(4, 3, 4, 3);
             tilstand.Controls.Add(_rdoFiler);
+            tilstand.Controls.Add(Hjaelp("Hvad skal renderes",
+                "Bogens kapitler viser bogens indholdsfortegnelse, som den står i _quarto.yml.\r\n\r\n"
+                + "Er hvert eneste kapitel valgt, bygges hele bogen som ét samlet værk i bogens "
+                + "egen mappe.\r\n\r\n"
+                + "Er kun nogle kapitler valgt, bliver netop de kapitler til selvstændige "
+                + "dokumenter i outputmappen. Sæt kryds i Kombinér til én fil, hvis de skal samles "
+                + "i ét dokument.\r\n\r\n"
+                + "Enkelte filer i mappetræet viser alle filer i mappen, også dem der ikke er "
+                + "en del af bogen."));
             t.Controls.Add(tilstand, 0, 0);
 
             _trae = new TreeView();
@@ -377,6 +434,12 @@ namespace QuartoRenderMaster
             ff.Controls.Add(_chkHtml);
             ff.Controls.Add(_chkWord);
             ff.Controls.Add(_chkPdf);
+            ff.Controls.Add(Hjaelp("Format",
+                "HTML er en side til skærmen.\r\n\r\n"
+                + "Word (.docx) kan redigeres videre og bruges som grundlag for OneNote. "
+                + "Der sættes altid sidetal i sidefoden.\r\n\r\n"
+                + "PDF laves med Quartos indbyggede Typst-motor og er klar til print.\r\n\r\n"
+                + "Du kan vælge flere formater på én gang."));
             gf.Controls.Add(ff);
             t.Controls.Add(gf, 0, 0);
 
@@ -385,9 +448,10 @@ namespace QuartoRenderMaster
             gw.Text = "Word-skabelon (reference-doc)";
             gw.Dock = DockStyle.Fill;
             gw.Margin = new Padding(0, 0, 0, 6);
-            TableLayoutPanel tw = Gitter(2, 1);
-            tw.Padding = new Padding(8, 6, 8, 4);
+            TableLayoutPanel tw = Gitter(3, 1);
+            tw.Padding = new Padding(8, 6, 4, 4);
             tw.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            tw.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
             tw.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
             _txtWord = new TextBox();
             _txtWord.Anchor = AnchorStyles.Left | AnchorStyles.Right;
@@ -397,6 +461,13 @@ namespace QuartoRenderMaster
             _btnWord.Margin = new Padding(0, 2, 0, 2);
             _btnWord.Click += VaelgWordskabelon;
             tw.Controls.Add(_btnWord, 1, 0);
+            tw.Controls.Add(Hjaelp("Word-skabelon",
+                "En almindelig Word-fil, der bestemmer, hvordan resultatet ser ud: skrifttyper, "
+                + "overskrifter, margener, sidehoved og sidefod.\r\n\r\n"
+                + "Quarto kalder den en reference-doc. Teksten i filen bruges ikke, kun dens "
+                + "typografier.\r\n\r\n"
+                + "Er feltet tomt, bruger Quarto sin egen opsætning. Sidetal sættes i begge "
+                + "tilfælde."), 2, 0);
             gw.Controls.Add(tw);
             t.Controls.Add(gw, 0, 1);
 
@@ -405,9 +476,10 @@ namespace QuartoRenderMaster
             go.Text = "Outputmappe for enkelte filer";
             go.Dock = DockStyle.Fill;
             go.Margin = new Padding(0, 0, 0, 6);
-            TableLayoutPanel to = Gitter(2, 1);
-            to.Padding = new Padding(8, 6, 8, 4);
+            TableLayoutPanel to = Gitter(3, 1);
+            to.Padding = new Padding(8, 6, 4, 4);
             to.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+            to.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
             to.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
             _txtOutput = new TextBox();
             _txtOutput.Anchor = AnchorStyles.Left | AnchorStyles.Right;
@@ -417,6 +489,13 @@ namespace QuartoRenderMaster
             _btnOutput.Margin = new Padding(0, 2, 0, 2);
             _btnOutput.Click += VaelgOutputmappe;
             to.Controls.Add(_btnOutput, 1, 0);
+            to.Controls.Add(Hjaelp("Outputmappe",
+                "Mappen, hvor de færdige filer lægges, når du renderer enkelte filer eller "
+                + "enkelte kapitler.\r\n\r\n"
+                + "Filerne lægges i undermapper, der svarer til deres plads i projektet, så to "
+                + "filer med samme navn ikke overskriver hinanden.\r\n\r\n"
+                + "Bygger du hele bogen, styrer bogen selv sin outputmappe, og feltet her "
+                + "bruges ikke."), 2, 0);
             go.Controls.Add(to);
             t.Controls.Add(go, 0, 2);
 
@@ -432,7 +511,15 @@ namespace QuartoRenderMaster
             te.RowStyles.Add(new RowStyle(SizeType.AutoSize));
             _chkSamlet = Kryds("Kombinér til én fil med sideskift");
             _chkSamlet.CheckedChanged += delegate { OpdaterTilstand(); };
-            te.Controls.Add(_chkSamlet, 0, 0);
+            FlowLayoutPanel fs = Raekke();
+            fs.Controls.Add(_chkSamlet);
+            fs.Controls.Add(Hjaelp("Enkelte filer",
+                "Kombinér til én fil samler de valgte filer i ét dokument med sideskift mellem "
+                + "hver. Rækkefølgen er den, filerne står i på listen, og navnet er det, der står "
+                + "i Filnavn.\r\n\r\n"
+                + "HTML som én selvstændig fil lægger billeder og stilark ind i selve html-filen, "
+                + "så den kan sendes videre alene."));
+            te.Controls.Add(fs, 0, 0);
             FlowLayoutPanel fn = new FlowLayoutPanel();
             fn.AutoSize = true;
             fn.AutoSizeMode = AutoSizeMode.GrowAndShrink;
@@ -586,8 +673,7 @@ namespace QuartoRenderMaster
                 bool bogfundet = _projekt != null && _projekt.ErBog && _projekt.Poster.Count > 0;
                 _opdaterer = true;
                 _rdoBog.Enabled = bogfundet;
-                if (bogfundet) _rdoBog.Checked = true;
-                else _rdoFiler.Checked = true;
+                _rdoFiler.Checked = true;
                 _opdaterer = false;
 
                 if (_txtOutput.Text.Trim().Length == 0)
@@ -690,7 +776,6 @@ namespace QuartoRenderMaster
             if (bog)
             {
                 foreach (Bogpost post in _projekt.Poster) _trae.Nodes.Add(BogNode(post));
-                _lblVink.Text = "Alle kapitler valgt: hele bogen bygges samlet. Færre valgt: kun de valgte kapitler.";
             }
             else
             {
@@ -715,7 +800,6 @@ namespace QuartoRenderMaster
                     }
                     forael.Nodes.Add(node);
                 }
-                _lblVink.Text = "Filer uden YAML-hoved får en titel fra deres første overskrift.";
             }
 
             _trae.ExpandAll();
@@ -816,18 +900,42 @@ namespace QuartoRenderMaster
             }
         }
 
+        private bool Bogtilstand()
+        {
+            return _rdoBog.Checked && _projekt != null && _projekt.ErBog;
+        }
+
+        // Hele bogen bygges kun, naar hvert eneste kapitel er valgt. Ellers er
+        // det de valgte filer, der skal renderes, og ikke bogen.
+        private bool HeleBogenValgt()
+        {
+            if (!Bogtilstand()) return false;
+            int valgt = ValgteFiler().Count;
+            return valgt > 0 && valgt == AntalMulige();
+        }
+
         private void OpdaterTilstand()
         {
             int valgt = ValgteFiler().Count;
             int muligt = AntalMulige();
             _lblAntal.Text = valgt + " af " + muligt + " filer valgt";
 
-            bool bog = _rdoBog.Checked && _projekt != null && _projekt.ErBog;
-            _chkSamlet.Enabled = !bog;
-            _txtSamletnavn.Enabled = !bog && _chkSamlet.Checked;
-            _txtOutput.Enabled = !bog;
-            _btnOutput.Enabled = !bog;
-            _chkIndlejr.Enabled = !bog;
+            bool bog = Bogtilstand();
+            bool hele = bog && valgt > 0 && valgt == muligt;
+
+            _chkSamlet.Enabled = !hele;
+            _txtSamletnavn.Enabled = !hele && _chkSamlet.Checked;
+            _txtOutput.Enabled = !hele;
+            _btnOutput.Enabled = !hele;
+            _chkIndlejr.Enabled = !hele;
+
+            if (hele)
+                _lblVink.Text = "Alle kapitler valgt: hele bogen bygges samlet og lægges i "
+                                + _projekt.Outputmappe + ".";
+            else if (bog)
+                _lblVink.Text = "De valgte kapitler renderes hver for sig og lægges i outputmappen.";
+            else
+                _lblVink.Text = "Filer uden YAML-hoved får en titel fra deres første overskrift.";
         }
 
         // ------------------------------------------------------------- render
@@ -872,10 +980,12 @@ namespace QuartoRenderMaster
             Renderoensker oe = new Renderoensker();
             oe.Projektmappe = mappe;
             oe.Profil = ValgtProfil();
-            oe.Bogtilstand = _rdoBog.Checked && _projekt != null && _projekt.ErBog;
             oe.Bogudmappe = _projekt == null ? "" : _projekt.Outputmappe;
             oe.Filer = ValgteFiler();
-            oe.HeleBogen = oe.Bogtilstand && oe.Filer.Count > 0 && oe.Filer.Count == AntalMulige();
+            // Bogens egen byggemaade bruges kun, naar hele bogen er valgt. Vaelger
+            // brugeren enkelte kapitler, laver Quarto alligevel hele bogen som en
+            // samlet Word- eller PDF-fil, saa de kapitler renderes hver for sig.
+            oe.Bogtilstand = HeleBogenValgt();
             oe.Html = _chkHtml.Checked;
             oe.Word = _chkWord.Checked;
             oe.Pdf = _chkPdf.Checked;

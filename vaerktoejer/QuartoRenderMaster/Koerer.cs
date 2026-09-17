@@ -48,6 +48,7 @@ namespace QuartoRenderMaster
                     _log("");
                     _log("[" + nr + "/" + plan.Job.Count + "] " + job.Tekst);
                     _log("    quarto " + Kommandolinje(job.Argumenter));
+                    DateTime foer = DateTime.Now.AddSeconds(-5);
                     int kode = KoerEt(job);
                     if (_afbrudt) break;
                     if (kode != 0)
@@ -58,6 +59,7 @@ namespace QuartoRenderMaster
                     else
                     {
                         Flyt(job);
+                        if (job.Endelse == ".docx") Sidetal.TilfoejIMappe(job.Udmappe, foer, _log);
                     }
                 }
 

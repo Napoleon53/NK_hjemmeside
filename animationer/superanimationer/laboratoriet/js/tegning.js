@@ -441,7 +441,7 @@
             }
         }
         omrids(ctx, gg);
-        if (t.sprite) NK.Sprites.tegnPositur(ctx, t.sprite, gg.p, gg.anker, opt.alfa);
+        if (t.sprite) NK.Sprites.tegnPositur(ctx, t.sprite, gg.p, gg.anker, opt.alfa, gg.skala);
         if (t.pulverfelt) T.tegnPulver(ctx, gg);
         T.tegnEtiket(ctx, gg);
         if (gg.nr) {
@@ -521,7 +521,7 @@
 
     /* Spatlen med evt. en spatelspids paa */
     T.tegnSpatel = function (ctx, gg) {
-        NK.Sprites.tegnPositur(ctx, "spatel", gg.p, gg.anker);
+        NK.Sprites.tegnPositur(ctx, "spatel", gg.p, gg.anker, undefined, gg.skala);
         if (gg.last && gg.last.farve) {
             var m = NK.tilVerden(gg.p, gg.anker, gg.type.ske.x, gg.type.ske.y);
             ctx.save();
@@ -544,20 +544,20 @@
     };
 
     T.tegnStav = function (ctx, gg) {
-        var p = gg.p, e = T.stavEnde(gg);
+        var p = gg.p, e = T.stavEnde(gg), k = gg.skala || 1;
         ctx.save();
         ctx.lineCap = "round";
         ctx.strokeStyle = "rgba(70, 90, 105, 0.55)";
-        ctx.lineWidth = 5.6;
+        ctx.lineWidth = 5.6 * k;
         ctx.beginPath();
         ctx.moveTo(p.x, p.y);
         ctx.lineTo(e.x, e.y);
         ctx.stroke();
         ctx.strokeStyle = "rgba(225, 238, 247, 0.9)";
-        ctx.lineWidth = 3.6;
+        ctx.lineWidth = 3.6 * k;
         ctx.stroke();
         ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
-        ctx.lineWidth = 1;
+        ctx.lineWidth = k;
         ctx.beginPath();
         ctx.moveTo(NK.lerp(p.x, e.x, 0.08), NK.lerp(p.y, e.y, 0.08) - 1);
         ctx.lineTo(NK.lerp(p.x, e.x, 0.9), NK.lerp(p.y, e.y, 0.9) - 1);

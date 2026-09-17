@@ -294,9 +294,42 @@
        rystes ekstremt voldsomt */
     ["reagensglas", "baeger100", "baeger250", "kolbe", "maaleglas", "flaske", "glasstav", "termometer", "phmeter"].forEach(function (n) { TYPER[n].glas = true; });
 
+    /* ----- Udstyr i mindre maalestok ---------------------------------------
+       En genstand i opstillingen kan faa en skala, og saa bruger den en
+       skaleret udgave af sin type. Det er et rent tegnemaal: rumfanget
+       (maks), lysvejen, massen og temperaturen er de samme, saa kemien er
+       uaendret. Et bægerglas i halv stoerrelse er stadig et 100 mL
+       bægerglas, og vaesken staar lige saa hoejt i det. Derfor ganges
+       mlPrAreal med skala², saa den mindre inderside svarer til de samme mL.
+
+       Nye maal i en type skal skrives ind i listerne herunder, ellers
+       bliver de ikke skaleret med. */
+    var SKALA_TAL = ["b", "h", "hulY", "laengde"];
+    var SKALA_PUNKTER = ["anker", "tud", "ske", "flammePunkt", "valgtMaerke", "knap", "lampe"];
+    var SKALA_REKTER = ["etiket", "display", "skilt"];
+
+    function skaleret(t, k) {
+        if (!(k > 0) || k === 1) return t;
+        var ud = {}, n;
+        for (n in t) if (Object.prototype.hasOwnProperty.call(t, n)) ud[n] = t[n];
+        SKALA_TAL.forEach(function (f) { if (typeof t[f] === "number") ud[f] = t[f] * k; });
+        SKALA_PUNKTER.forEach(function (f) { if (t[f]) ud[f] = { x: t[f].x * k, y: t[f].y * k, v: t[f].v }; });
+        SKALA_REKTER.forEach(function (f) { if (t[f]) ud[f] = { x: t[f].x * k, y: t[f].y * k, b: t[f].b * k, h: t[f].h * k }; });
+        if (t.pulverfelt) ud.pulverfelt = { x0: t.pulverfelt.x0 * k, x1: t.pulverfelt.x1 * k, y: t.pulverfelt.y * k, top: t.pulverfelt.top * k };
+        if (t.plade) ud.plade = { x0: t.plade.x0 * k, x1: t.plade.x1 * k, y: t.plade.y * k };
+        if (t.huller) ud.huller = t.huller.map(function (x) { return x * k; });
+        if (t.indre) ud.indre = t.indre.map(function (q) { return { x: q.x * k, y: q.y * k }; });
+        if (typeof t.mlPrAreal === "number") ud.mlPrAreal = t.mlPrAreal * k * k;
+        if (t.omrids) ud.omrids = function (ctx) { ctx.save(); ctx.scale(k, k); t.omrids(ctx); ctx.restore(); };
+        ud.skala = k;
+        ud.grund = t;
+        return ud;
+    }
+
     NK.Udstyr = {
         TYPER: TYPER,
         HAAND_ANKER: { x: 40, y: 46 },
+        skaleret: skaleret,
 
         type: function (navn) {
             if (!TYPER[navn]) throw new Error("ukendt udstyr: " + navn);

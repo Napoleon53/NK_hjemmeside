@@ -84,7 +84,9 @@
             return false;
         },
 
-        /* Tegner spritet drejet om ankerpunktet, der staar i positur p. */
+        /* Tegner spritet drejet om ankerpunktet, der staar i positur p.
+           Med skala tegnes det mindre, og ankeret er da allerede maalt i
+           den mindre stoerrelse (som i en skaleret udstyrstype). */
         tegnPositur: function (ctx, navn, p, anker, alfa, skala) {
             var f = FILER[navn];
             if (!f) return;
@@ -93,8 +95,7 @@
             if (alfa !== undefined) ctx.globalAlpha *= NK.klamp(alfa, 0, 1);
             ctx.translate(p.x, p.y);
             ctx.rotate(p.v);
-            ctx.scale(k, k);
-            NK.Sprites.tegn(ctx, navn, -anker.x, -anker.y, f.b, f.h);
+            NK.Sprites.tegn(ctx, navn, -anker.x, -anker.y, f.b * k, f.h * k);
             ctx.restore();
         }
     };

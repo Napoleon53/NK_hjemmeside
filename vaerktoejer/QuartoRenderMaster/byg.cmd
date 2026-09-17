@@ -25,7 +25,7 @@ set CSC=%WINDIR%\Microsoft.NET\Framework64\v4.0.30319\csc.exe
 if not exist "%CSC%" set CSC=%WINDIR%\Microsoft.NET\Framework\v4.0.30319\csc.exe
 if not exist "%CSC%" goto ingencsc
 if not exist "%~dp0byg" mkdir "%~dp0byg"
-"%CSC%" /nologo /target:winexe /platform:anycpu /optimize+ /win32manifest:app.manifest /out:"byg\QuartoRenderMaster.exe" /reference:System.dll /reference:System.Core.dll /reference:System.Drawing.dll /reference:System.Windows.Forms.dll *.cs
+"%CSC%" /nologo /target:winexe /platform:anycpu /optimize+ /win32manifest:app.manifest /out:"byg\QuartoRenderMaster.exe" /reference:System.dll /reference:System.Core.dll /reference:System.Drawing.dll /reference:System.Windows.Forms.dll /reference:System.IO.Compression.dll /reference:System.IO.Compression.FileSystem.dll *.cs
 if errorlevel 1 goto fejl
 goto faerdig
 

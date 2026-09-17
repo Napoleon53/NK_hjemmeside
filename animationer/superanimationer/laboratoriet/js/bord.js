@@ -163,8 +163,16 @@
     P.tilfoej = function (spec) {
         var S = NK.Scene;
         var t = typeof spec.type === "string" ? U.type(spec.type) : spec.type;
+        /* Genstanden kan staa i mindre maalestok. Det, der staar i eller paa
+           noget andet, arver dets skala, saa glas passer i stativets huller
+           og bægerglasset staar rigtigt paa pladen. */
+        var k = spec.skala;
+        if (k === undefined && spec.stativ && this.g[spec.stativ]) k = this.g[spec.stativ].skala;
+        if (k === undefined && spec.paa && this.g[spec.paa]) k = this.g[spec.paa].skala;
+        k = NK.klamp(k === undefined ? 1 : k, 0.25, 1);
+        if (k !== 1) t = U.skaleret(t, k);
         var gg = {
-            navn: spec.navn, type: t, anker: t.anker, kan: udvid(t.kan, spec.kan),
+            navn: spec.navn, type: t, anker: t.anker, skala: k, kan: udvid(t.kan, spec.kan),
             titel: spec.titel || t.titel || spec.navn, etiket: spec.etiket || null, nr: spec.nr || 0,
             skjult: false, p: null, hjem: null, sted: null, paa: null, i: null, rel: null,
             T: this.stue, taendt: !!spec.taendt, last: null, indhold: null, lag: null, lagBund: false,
@@ -1711,7 +1719,7 @@
         else if (k.maaler) T.tegnTermometer(ctx, gg, !!gg.i || this.baerer === gg);
         else if (t.sprite) {
             if (k.fast) T.skygge(ctx, gg.p.x - gg.anker.x + t.b / 2, t.b * 0.45, 0.3, gg.p.y - gg.anker.y + t.h - 3);
-            NK.Sprites.tegnPositur(ctx, t.sprite, gg.p, gg.anker);
+            NK.Sprites.tegnPositur(ctx, t.sprite, gg.p, gg.anker, undefined, gg.skala);
             T.tegnEtiket(ctx, gg);
         }
         if (this.markeret(gg.navn)) T.tegnMarkering(ctx, this.rekt(gg, 0), tid);
