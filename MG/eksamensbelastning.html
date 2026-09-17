@@ -132,13 +132,6 @@
   .sum-liste li.tom{color:var(--muted);}
   .sum-liste li.tom span:last-child{font-weight:400;}
   .sum-kort .row{margin-top:14px;}
-  .note{
-    background:#fff; border:1px solid var(--border); border-radius:10px;
-    padding:12px 14px; font-size:.85rem; color:var(--muted);
-  }
-  .note p{margin:0 0 8px;}
-  .note p:last-child{margin-bottom:0;}
-  .note strong{color:var(--ink);}
   .kvittering{margin:10px 0 0; font-size:.85rem; color:var(--ok); font-weight:600;}
 
   @media (max-width:520px){
@@ -148,7 +141,7 @@
   @media print{
     body{background:#fff; padding:0;}
     .chip-list, .fjern, .sum-kort .row, #tilfoej, #ryd, .tilbage, .gruppe-blok label.check{display:none !important;}
-    .tjans, .sum-kort, .note{break-inside:avoid; border-color:#bbb;}
+    .tjans, .sum-kort{break-inside:avoid; border-color:#bbb;}
     .sidepanel{position:static;}
   }
 </style>
@@ -183,11 +176,6 @@
         <button id="udskriv" class="btn-secondary btn-small" type="button">Udskriv</button>
       </div>
       <p class="kvittering" id="kvittering" hidden>Oversigten er kopieret.</p>
-    </div>
-
-    <div class="note">
-      <p><strong>Udg&aring;ende censur samme dag.</strong> Skal du censurere mere end &eacute;t hold p&aring; samme dag som udg&aring;ende censor, kan der sk&oslash;nnes en lavere samlet belastning i opgavefordelingen.</p>
-      <p>Sig gerne til NK, hvis beregningen ikke stemmer med opgavefordelingen for 2026/2027.</p>
     </div>
   </aside>
 </div>
@@ -529,7 +517,8 @@
     }
     if (censur > 1){
       beskeder.push({ art:'advar', tekst:'Du har ' + censur + ' hold som udgående censor. ' +
-        'Ligger to af dem samme dag, kan der skønnes en lavere samlet belastning.' });
+        'Skal du censurere mere end ét af dem på samme dag, kan der skønnes en lavere ' +
+        'samlet eksamensbelastning i opgavefordelingen.' });
     }
     document.getElementById('sumBeskeder').innerHTML = beskedHtml(beskeder);
     gem();
