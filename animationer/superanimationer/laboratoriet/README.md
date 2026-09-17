@@ -26,12 +26,15 @@ modellen igennem.
 ```
 js/kerne.js          NK: hjælpefunktioner, kemisk notation, farver, positurer,
                      væskeniveau, lærred og tegnehjælpere
+js/farvemodel.js     farven af en farvet opløsning, regnet på lys: stoffets farve
+                     bliver et absorptionsspektrum, absorbanserne lægges sammen
+                     bånd for bånd, og det tilbageværende lys bliver til sRGB
 js/rundvisning.js    spotlight-rundvisningen bag hjælpeknappen
 js/lyd.js            lydene med Web Audio, ingen lydfiler
 js/sprites.js        indlæser SVG-sprites; mappen findes ud fra filens placering
 js/koer.js           koreografier: små bevægelser af genstande (flyt, vent, kald)
 js/stof.js           stoffer, opløsninger (µmol og mL), reaktioner (fuld, ligevægt,
-                     bundfald, opløsning), redoxpar, pH, gas, varme og farven som lysfiltre
+                     bundfald, opløsning), redoxpar, pH, gas, varme og farven (farvemodel.js)
 js/stoftabel.js      den fælles tabel: ioner, syrer, baser, indikatorer, gasser, pulvere,
                      metaller (Mg, Zn, Fe, Pb, Cu, Ag), bundfald (opløselighedstabellen:
                      chlorider, iodider, sulfater, carbonater, hydroxider, Ag₂O, AgSCN),
@@ -66,7 +69,7 @@ Kemien ligger i lag, så et nyt stof koster én linje data, ikke nye regler:
 
 | Lag | Hvor | Hvad |
 |-----|------|------|
-| 0 fysik | `beholder.js` | blanding, lag, fortynding, temperatur, kogning, overløb |
+| 0 fysik | `beholder.js` + `farvemodel.js` | blanding, lag, fortynding, temperatur, kogning, overløb, farven af en opløsning |
 | 1 egenskaber | `stof.js` + `stoftabel.js` | bundfald (opløselighedsprodukt), syre-base (Ka, autoprotolyse, pH, indikatorer), redox (standardpotentialer, reaktioner mellem par afledes), kompleksdannelse (K), reaktionsvarme ΔH, fortyndingsvarme |
 | 2 navngivne reaktioner | `stoftabel.js` | reaktioner med betingelser, fx kobber i koncentreret salpetersyre |
 | 3 hændelser | `bord.js` | bobler, farvede dampe, damp, "voldsom" (kogende sprøjt), som Kemichael reagerer på |
@@ -83,6 +86,20 @@ rigtige (fx Cu + KI, NaCl + KI, Zn + NaOH).
 Redox afledes af standardpotentialerne, når reduktionsmidlet er et fast
 stof (metal i saltopløsning eller syre). Redox mellem ioner (Fe³⁺ + I⁻,
 Cu²⁺ + I⁻) står som navngivne reaktioner, ligesom Fe³⁺ + CO₃²⁻.
+
+## Farven af en opløsning
+
+Farven regnes på lyset i `farvemodel.js`, ikke på de tre RGB-kanaler.
+Stoffets `farve` i stoftabellen læses som et absorptionsspektrum over 16
+bånd fra 400 til 700 nm: et rødt stof får næsten ingen absorbans i den
+røde ende. Absorbanserne lægges sammen bånd for bånd, og det lys, der
+slipper igennem, bliver til sRGB gennem D65 og CIE's farvematchnings-
+funktioner. Derfor bliver en koncentreret rød opløsning mørkerød og ikke
+sort, og blåt plus gult bliver grønt i stedet for gråt.
+
+`k` er absorbansen ved spektrets top pr. mM pr. vejlængde. Et stof, der
+ser for blegt eller for mørkt ud, rettes med `k`; en forkert kulør rettes
+med `farve`. Begge dele er data i `stoftabel.js`, ikke kode.
 
 ## Faremærkning og Kemichaels advarsler
 
@@ -230,9 +247,11 @@ spil.
    <link rel="stylesheet" href="../laboratoriet/css/grund.css">
    <link rel="stylesheet" href="css/stil.css">
    ```
-2. Kernen indlæses først af alle scripts, rundvisningen lige før `app.js`:
+2. Kernen og farvemodellen indlæses først af alle scripts, rundvisningen lige
+   før `app.js`:
    ```html
    <script src="../laboratoriet/js/kerne.js"></script>
+   <script src="../laboratoriet/js/farvemodel.js"></script>
    ...
    <script src="../laboratoriet/js/rundvisning.js"></script>
    <script src="js/tur.js"></script>
@@ -246,7 +265,7 @@ spil.
    ]);
    ```
 4. Genstandsmodellen indlæses i denne rækkefølge (se `proevebord/index.html`):
-   kerne, lyd, sprites, stof, udstyr, kemichael, koer, beholder, tegning,
+   kerne, farvemodel, lyd, sprites, stof, udstyr, kemichael, koer, beholder, tegning,
    mikro, bord, forsøgets stoffer og laerer, rundvisning, tur, app.
 
 ## Regler

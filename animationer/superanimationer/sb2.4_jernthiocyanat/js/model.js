@@ -145,7 +145,7 @@
     var REDUKTION = { k: 1.2 };
 
     /* Frugtfarvens koncentration i mM (et modeltal) */
-    var FARVESTOF = { mM: 0.12 };
+    var FARVESTOF = { mM: 0.45 };
 
     /* K ved 20 °C i M^-1, reaktionsentalpien i J/mol, og hvor hurtigt
        komplekset foelger ligevaegten (pr. sekund) */
@@ -200,7 +200,7 @@
        alene ville give. */
     var MIKRO = {
         PR_MM: 5, FORSTAERK: 4, MAKS: 18, MAKS_AG: 12, MAKS_AGSCN: 14, MAKS_FE2: 16, MAKS_VITC: 6,
-        PR_MM_FARVE: 70, MAKS_FARVE: 16, VAND: 14
+        PR_MM_FARVE: 20, MAKS_FARVE: 16, VAND: 14
     };
 
     /* Bundfaldet synker (pr. sekund) og hvirvles op ved rystning */

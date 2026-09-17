@@ -1324,7 +1324,7 @@
     P.ovenfraData = function () {
         var mig = this;
         var parListe = this.parListe();
-        var par = [], glas = [], mangler = 0, klar = 0;
+        var par = [], glas = [], mangler = 0;
         parListe.forEach(function (p) {
             var d = mig.parData(p);
             var vurd = d.type ? mig.del2.vurdering[d.type] : null;
@@ -1384,7 +1384,14 @@
     P.tjekOvenfra = function () {
         var v = this.del2.vurdering;
         if (this.gjort.sml || (!v.farve && !v.lv)) return;
-        if (!v.farve || !v.lv) {
+        /* Noteringen skal passe paa glassene, som de staar nu: eleven kan
+           have hældt mere i, efter at parret blev noteret */
+        var mig = this, gyldig = true;
+        [["farve", this.parMed("farve", 10)], ["lv", this.parMed("lv", 10)]].forEach(function (rk) {
+            var par = rk[1], vu = v[rk[0]];
+            if (!par || !vu || !mig.parFordoblet(par) || mig.parData(par).fortyndet !== vu.idx) gyldig = false;
+        });
+        if (!gyldig) {
             this.besked("Notér det fortyndede glas i begge par.");
             return;
         }

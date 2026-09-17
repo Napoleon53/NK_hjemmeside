@@ -138,11 +138,11 @@ function koerTest() {
     paastand("vandbadet giver et lysere glas", smlB(b5, ref) === "lysere");
     var b6 = tid(glas(), 12, { T: 0, tau: 4.5, bland: 0.05, roer: false, ryst: 0 });
     paastand("isbadet giver et moerkere glas", smlB(b6, ref) === "mørkere");
-    var fa = M.farveOpl(40), fb = M.farveOpl(40);
-    M.bland(fb, M.vandOpl(40));
+    var fa = M.farveOpl(20), fb = M.farveOpl(20);
+    M.bland(fb, M.vandOpl(20));
     paastand("fortyndet frugtfarve ser ens ud ovenfra", M.sammenlignOvenfra(fb, fa) === "som det andet glas");
-    var la = M.stamOpl(40), lb = M.stamOpl(40);
-    M.bland(lb, M.vandOpl(40));
+    var la = M.stamOpl(20), lb = M.stamOpl(20);
+    M.bland(lb, M.vandOpl(20));
     lb.x = M.xLigevaegt(lb);
     paastand("fortyndet ligevaegtsblanding er lysere ovenfra", M.sammenlignOvenfra(lb, la) === "lysere");
 
@@ -248,49 +248,52 @@ function koerTest() {
 
     overskrift("5. Del 2: fortynding");
     d.getElementById("station2").click();
-    paastand("knappen skifter til del 2", f.station === 2 && f.valgt === "baegerV" && d.getElementById("station2").classList.contains("aktiv"));
-    paastand("frugtfarve i det venstre baegerglas", traek("flaske_farve", "baegerV"));
+    paastand("knappen skifter til del 2", f.station === 2 && f.valgt === "baeger1" && d.getElementById("station2").classList.contains("aktiv"));
+    paastand("frugtfarve i baegerglas 1", traek("flaske_farve", "baeger1"));
     adv(3.5);
-    paastand("frugtfarve i det hoejre baegerglas", traek("flaske_farve", "baegerH"));
+    paastand("frugtfarve i baegerglas 2", traek("flaske_farve", "baeger2"));
     adv(3.5);
-    paastand("begge glas har 40 mL frugtfarve", Math.abs(V(f.g.baegerV) - 40) < 0.1 && Math.abs(V(f.g.baegerH) - 40) < 0.1 && f.trinGjort("farve"));
-    traek("vand", "baegerH"); adv(2.8);
-    for (i = 0; i < 3; i++) { f.klik("vand"); adv(2.8); }
-    paastand("det hoejre glas er fortyndet til 80 mL", Math.abs(V(f.g.baegerH) - 80) < 0.1 && f.trinGjort("farveVand"), komma(V(f.g.baegerH)));
+    paastand("begge glas i par 1 har 20 mL frugtfarve", Math.abs(V(f.g.baeger1) - 20) < 0.1 && Math.abs(V(f.g.baeger2) - 20) < 0.1 && f.trinGjort("farve"));
+    paastand("kolben traekkes til baegerglas 3", traek("kolbe2", "baeger3"));
+    adv(3.5);
+    paastand("kolben traekkes til baegerglas 4", traek("kolbe2", "baeger4"));
+    adv(3.5);
+    paastand("begge glas i par 2 har 20 mL ligevaegtsblanding", Math.abs(V(f.g.baeger3) - 20) < 0.1 && Math.abs(V(f.g.baeger4) - 20) < 0.1 && f.trinGjort("lv"));
+    traek("vand", "baeger2"); adv(2.8);
+    f.klik("vand"); adv(2.8);
+    paastand("baegerglas 2 er fortyndet til 40 mL", Math.abs(V(f.g.baeger2) - 40) < 0.1, komma(V(f.g.baeger2)));
+    paastand("trinnet er ikke gjort, foer begge par er fortyndet", !f.trinGjort("vand"));
+    traek("vand", "baeger4"); adv(2.8);
+    f.klik("vand"); adv(2.8);
+    paastand("baegerglas 4 er fortyndet til 40 mL, og trinnet er gjort", Math.abs(V(f.g.baeger4) - 40) < 0.1 && f.trinGjort("vand"), komma(V(f.g.baeger4)));
     paastand("papiret aabner visningen ovenfra", f.klik("papir") === true && f.visning === "ovenfra");
     var od = f.ovenfraData();
-    paastand("kun det fortyndede glas kan vurderes", !od.glas[0].kanVurderes && od.glas[1].kanVurderes);
+    paastand("visningen har fire glas i to par", od.glas.length === 4 && od.par.length === 2);
+    paastand("parrene kendes paa indholdet", od.par[0].titel === "Frugtfarve" && od.par[1].titel === "Ligevægtsblanding");
+    paastand("kun de fortyndede glas kan vurderes",
+        !od.glas[0].kanVurderes && od.glas[1].kanVurderes && !od.glas[2].kanVurderes && od.glas[3].kanVurderes);
     f.vurderOvenfra(1);
-    paastand("frugtfarven ser ens ud ovenfra", f.del2.vurdering.faktisk === "som det andet glas" && f.del2.vurdering.svar === "som det andet glas");
+    paastand("frugtfarven ser ens ud ovenfra", f.del2.vurdering.farve.faktisk === "som det andet glas" && f.del2.vurdering.farve.svar === "som det andet glas");
     f.lukVisning();
-    paastand("frugtfarven er sammenlignet", f.gjort.farveSml);
-    traek("baegerV", "dunk"); adv(3.5);
-    traek("baegerH", "dunk"); adv(3.5);
-    paastand("begge baegerglas er toemt", V(f.g.baegerV) < 0.01 && V(f.g.baegerH) < 0.01 && f.trinGjort("toem"));
-    paastand("kolben traekkes til det venstre baegerglas", traek("kolbe2", "baegerV"));
-    adv(3.5);
-    paastand("kolben traekkes til det hoejre baegerglas", traek("kolbe2", "baegerH"));
-    adv(3.5);
-    paastand("begge glas har 40 mL ligevaegtsblanding", f.trinGjort("lv"), komma(V(f.g.baegerV)) + " og " + komma(V(f.g.baegerH)));
-    traek("vand", "baegerV"); adv(2.8);
-    for (i = 0; i < 3; i++) { f.klik("vand"); adv(2.8); }
-    paastand("det venstre glas er fortyndet", f.trinGjort("lvVand"));
+    paastand("visningen beder om, at begge par noteres", !f.gjort.sml && f.trinGjort("sml") === false);
     f.klik("papir");
-    f.vurderOvenfra(0); f.vurderOvenfra(0);
-    paastand("ligevaegtsblandingen er lysere ovenfra", f.del2.vurdering.faktisk === "lysere" && f.del2.vurdering.svar === "lysere");
+    f.vurderOvenfra(3); f.vurderOvenfra(3);
+    paastand("ligevaegtsblandingen er lysere ovenfra", f.del2.vurdering.lv.faktisk === "lysere" && f.del2.vurdering.lv.svar === "lysere");
     f.klik("visLuk");
-    paastand("del 2 er faerdig, og tegneserien er laast op", f.gjort.lvSml && f.aktueltTrin() === null && !d.getElementById("serieknap").hidden);
+    paastand("del 2 er faerdig, og tegneserien er laast op", f.gjort.sml && f.aktueltTrin() === null && !d.getElementById("serieknap").hidden);
     NK.aabnSerie();
     var ruder = d.querySelectorAll("#serie-ruder .rude");
     var serieTekst = d.getElementById("serie-ruder").textContent;
-    paastand("tegneserien har mindst elleve ruder", ruder.length >= 11, ruder.length);
+    paastand("tegneserien har mindst ti ruder", ruder.length >= 10, ruder.length);
     paastand("tegneserien fortaeller om glassene og fortyndingen",
         serieTekst.indexOf("Glas 2 fik ascorbinsyre og blev lysere") >= 0 && serieTekst.indexOf("Forundersøgelsen i glas 8") >= 0 &&
-        serieTekst.indexOf("Frugtfarve: set ovenfra") >= 0 && serieTekst.indexOf("Ligevægtsblanding: set ovenfra var det fortyndede glas lysere") >= 0);
+        serieTekst.indexOf("De fire glas ovenfra: frugtfarven var som det andet glas, og ligevægtsblandingen var lysere") >= 0);
     var sidste = ruder[ruder.length - 1];
     var tabeller = sidste.querySelectorAll("table.resultater");
     paastand("sidste rude har resultatskemaerne for begge dele", tabeller.length === 2 && tabeller[0].querySelectorAll("tr").length === 8 && tabeller[1].querySelectorAll("tr").length === 3);
     var rk = tabeller.length ? tabeller[0].querySelectorAll("tr") : [];
+    paastand("skemaet for del 2 viser volumen", tabeller.length === 2 && tabeller[1].querySelectorAll("tr")[1].textContent.indexOf("20 mL ⟶ 40 mL") >= 0,
+        tabeller.length === 2 ? tabeller[1].querySelectorAll("tr")[1].textContent : "");
     paastand("skemaet: glas 2 lysere og ⟵, glas 5 vandbad med temperatur, glas 7 reference",
         rk.length === 8 && rk[2].textContent.indexOf("lysere") >= 0 && rk[2].textContent.indexOf("⟵") >= 0 &&
         rk[5].textContent.indexOf("vandbad") >= 0 && rk[5].textContent.indexOf("°C") > 0 && rk[7].textContent.indexOf("reference") >= 0,
@@ -326,14 +329,14 @@ function koerTest() {
     paastand("vandbadet kan tages og saettes tilbage", traek("vandbad", { x: 700, y: 300 }) && (adv(1), Math.abs(f.badOff.vandbad.x) < 0.5 && Math.abs(f.badOff.vandbad.y) < 0.5));
 
     d.getElementById("station2").click();
-    traek("flaske_farve", "baegerV"); adv(3.5);
-    traek("vand", "baegerV"); adv(2.8);
+    traek("flaske_farve", "baeger1"); adv(3.5);
+    traek("vand", "baeger1"); adv(2.8);
     for (i = 0; i < 8 && !f.pyt; i++) { f.klik("vand"); adv(2.8); }
-    paastand("for meget vand faar baegerglasset til at loebe over", f.haendt.overloeb_baegerV && V(f.g.baegerV) <= 100.01, komma(V(f.g.baegerV)) + " mL");
+    paastand("for meget vand faar baegerglasset til at loebe over", f.haendt.overloeb_baeger1 && V(f.g.baeger1) <= 100.01, komma(V(f.g.baeger1)) + " mL");
     vent(function () { return !f.laererOptaget(); }, 15);
-    traek("baegerV", "dunk"); adv(4);
-    traek("flaske_farve", "baegerV"); adv(3.5);
-    paastand("stamoploesning haeldes i frugtfarven", traek("kolbe2", "baegerV"));
+    traek("baeger1", "dunk"); adv(4);
+    traek("flaske_farve", "baeger1"); adv(3.5);
+    paastand("stamoploesning haeldes i frugtfarven", traek("kolbe2", "baeger1"));
     adv(3.5);
     t = vent(function () { return scene() === "kunst"; }, 6);
     paastand("laereren siger, at det ikke er et forsoeg", f.haendt.kunst && scene() === "kunst", t + " s");

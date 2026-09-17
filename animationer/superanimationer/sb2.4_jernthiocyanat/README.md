@@ -41,11 +41,19 @@ Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺. Knapperne øverst på scenen skifter mellem to 
   Trinnet er gjort, når glassene og bægerglasset er tomme (`tjekAffald`), og
   hvert glas huskes, som det så ud lige før det blev tømt (`slutBillede`).
 
-**Del 2: Fortynding.** To bægerglas på hvidt papir fyldes næsten halvt op med
-frugtfarve. Sprøjteflasken giver 10 mL ad gangen, til det ene glas har dobbelt
-volumen, og glassene ses ovenfra. Frugtfarven ser ens ud, fordi antallet af
-farvestofmolekyler er det samme. Derefter tømmes glassene, og det samme gøres
-med ligevægtsblanding fra kolben, som bliver lysere ovenfra.
+**Del 2: Fortynding.** Fire bægerglas står på hvidt papir, to og to i par. Par 1
+får frugtfarve, par 2 ligevægtsblanding fra kolben, 20 mL ad gangen i hvert glas.
+Sprøjteflasken giver 10 mL vand ad gangen, til det ene glas i hvert par har
+dobbelt volumen. Knappen **Se ovenfra** viser alle fire på én gang, parvis, så
+forskellen står i ét billede: frugtfarven ser ens ud, fordi lysvejen ovenfra
+bliver dobbelt så lang, når koncentrationen halveres, mens ligevægtsblandingen
+bliver lysere, fordi Y bliver dobbelt så stor som K. Eleven noterer det
+fortyndede glas i hvert par, og trinnet er gjort, når begge par er noteret.
+
+Et par kendes på sit indhold, ikke på sin plads (`parType` i `js/forsoeg.js`),
+så det virker også, hvis eleven bytter om på parrene. Et par kan vurderes, når
+begge glas har den samme opløsning, og det ene har omtrent dobbelt volumen
+(`parFordoblet`).
 
 **Klik viser, træk gør.** Et klik vælger en genstand og gør ellers ingenting:
 alt kan vælges, og det valgte får en rolig blå ramme. Handlingerne sker ved at
@@ -129,13 +137,14 @@ Alle ligger i `sprites/` som SVG og tegnes med `drawImage`. Ankrene står i
 Glasstaven, termometeret, det hvide kort og papiret, væsker, korn af fast
 stof, bundfald, vandet og isen i badene, damp, pytten, billedet, glassene set
 ovenfra og zoomboblen tegnes i koden. Navnene på bordets forkant står i
-`S.ETIKETTER`.
+`S.ETIKETTER`. De fire bægerglas i del 2 står ved `S.BAEGER_X`, og parrenes
+midte, som etiketterne på papiret følger, står i `S.PAR_MIDT`.
 
 ## Filer
 
 ```
 index.html          markup: scene, delene, panel, intro, teori, tegneserie, rundvisning
-../laboratoriet/    fælles for laboratorieforsøgene: kerne.js, rundvisning.js og grund.css
+../laboratoriet/    fælles for laboratorieforsøgene: kerne.js, farvemodel.js, rundvisning.js og grund.css
 css/stil.css        kun det særlige for forsøget: resultatskemaet og delknapperne. NB: decimaltal med PUNKTUM i CSS
 js/model.js         kemien og tallene: ligevægt, fast stof, reduktion, farver, fortynding
 js/lyd.js           lydene med Web Audio, ingen lydfiler
@@ -158,10 +167,18 @@ _selvtest.html      udviklerværktøj, indgår ikke i animationen
 20 °C og reaktionsentalpien (`LIGEVAEGT`), dråber (`DRAABE`), mængderne ved
 hver hældning (`MAENGDE`), spatelspidser og opløsning af fast stof (`FAST`),
 ascorbinsyrens fart (`REDUKTION`), frugtfarven (`FARVESTOF`), blanding
-(`BLAND`), temperaturerne (`TEMP`), lysvejen og farverne (`LYSVEJ`, `ABS`),
-grænserne for mørkere og lysere (`VURDER`), hvad der tæller som fordoblet
-(`FORDOBLING`), rystningen (`RYST`) og partikelmodellen (`MIKRO`). Alle formler
-med ladning bygges med `NK.ladningHaevet`, så ±1 skrives som + og −.
+(`BLAND`), temperaturerne (`TEMP`), lysvejen (`LYSVEJ`), stoffernes farve og
+farvestyrke (`STOFFARVE`), grænserne for mørkere og lysere (`VURDER`), hvad der
+tæller som fordoblet (`FORDOBLING`), rystningen (`RYST`) og partikelmodellen
+(`MIKRO`). Alle formler med ladning bygges med `NK.ladningHaevet`, så ±1 skrives
+som + og −.
+
+**Farverne** regnes i `../laboratoriet/js/farvemodel.js`, som er fælles for
+laboratorieforsøgene: stoffets farve læses som et absorptionsspektrum over 16
+bånd, absorbanserne lægges sammen bånd for bånd, og det lys, der slipper
+igennem, bliver til sRGB. Derfor bliver koncentreret ligevægtsblanding mørkerød
+i stedet for sort. Et stof, der ser for blegt eller for mørkt ud, rettes med sit
+`k` i `STOFFARVE`, en forkert kulør med `farve`.
 
 **Trinene** står i `NK.TRIN` øverst i `js/forsoeg.js`, ét sæt for hver del, med
 tekst, hint og hvilken genstand hintet markerer. Hvornår et trin er gjort,
@@ -178,8 +195,8 @@ efter den. Lærerens scener virker på samme måde; formatet står øverst i
 **`_selvtest.html`** åbner `index.html` i en iframe og kører forsøget igennem:
 sprites, afstemte skemaer, at hvert indgreb giver den rigtige farveændring, at
 fast stof kræver omrøring, at et klik kun vælger, at det brugte bliver
-hængende med sin ring, hele del 1 med træk, billedet, del 2 med
-fortyndingen, zoomboblen, tegneserien og resultatskemaerne, uheld og
+hængende med sin ring, hele del 1 med træk, billedet, del 2 med de fire glas og
+begge par, zoomboblen, tegneserien og resultatskemaerne, uheld og
 bemærkninger, kaffen, quizzen, og at der ikke er tankestreger eller 1+/1− i
 teksterne. Chrome skal have lov at åbne iframen: brug en lokal server eller
 `--allow-file-access-from-files`.

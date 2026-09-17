@@ -15,7 +15,8 @@
      q          ladning
      fase       "aq" (standard), "s" fast, "l" vaeske (oploesningsmiddel),
                 "g" gas
-     farve, k   farven og farvestyrken pr. mM pr. vejlaengde (0 = farveloes)
+     farve, k   farven i oploesning og farvestyrken: absorbansen ved
+                spektrets top pr. mM pr. vejlaengde (0 = farveloes)
      korn       fast stof, der tegnes som korn (pulver, metal)
      dHfort     fortyndingsvarme i kJ/mol (negativ = varmer), fx
                 koncentreret svovlsyre
@@ -422,11 +423,14 @@
         return { farve: st.farve, k: st.k };
     }
 
-    /* l: vejlaengde i forhold til et reagensglas (baegerglas ca. 2) */
+    /* Oploesningens farve. l: vejlaengde i forhold til et reagensglas
+       (baegerglas ca. 2). Farverne laegges sammen som lys i farvemodel.js,
+       ikke som absorbans pr. RGB-kanal: ellers gaar enhver blanding af to
+       farver mod sort. */
     function farve(o, l) {
         if (o.V <= 0.01) return null;
         l = l || 1;
-        var A = { r: 0, g: 0, b: 0 }, ialt = 0;
+        var lag = [], ialt = 0;
         var ph = pH(o);
         for (var s in o.n) {
             if (!Object.prototype.hasOwnProperty.call(o.n, s)) continue;
@@ -436,14 +440,14 @@
             if (!fa || fa.k <= 0) continue;
             var a = fa.k * (o.n[s] / o.V) * l;
             ialt += a;
-            A.r += a * (1 - fa.farve.r / 255);
-            A.g += a * (1 - fa.farve.g / 255);
-            A.b += a * (1 - fa.farve.b / 255);
+            lag.push({ sp: NK.Farvemodel.spektrum(fa.farve), A: a });
         }
+        if (!lag.length) return { r: VAND.r, g: VAND.g, b: VAND.b, a: VAND.a };
+        var c = NK.Farvemodel.lys(lag);
         return {
-            r: VAND.r * Math.exp(-A.r),
-            g: VAND.g * Math.exp(-A.g),
-            b: VAND.b * Math.exp(-A.b),
+            r: VAND.r * c.r / 255,
+            g: VAND.g * c.g / 255,
+            b: VAND.b * c.b / 255,
             a: 1 - (1 - VAND.a) * Math.exp(-ialt)
         };
     }
