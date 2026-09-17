@@ -102,15 +102,15 @@
   <section class="gruppe">
     <p class="gruppe-hoved">Grupperne</p>
     <label class="field" for="grupper">Én gruppe pr. linje, navnene adskilt af komma</label>
-    <textarea id="grupper" spellcheck="false">Amalie, Zain, Laura S, Sarah
-Caroline, Roubin, Anne Sofie
-Astrid, Kamilla, Jonathan, Karoline
-Henrik, Vigga, Laura H, Jolien
-Nicoleta, Mathilde, Magnus, Ditte
-Marie, Viggo, Mikas, Maja
-Gabi, Laurits, Jolien H, Emilie</textarea>
-    <p class="muted hint">Makkerparrene dannes i den rækkefølge, navnene står. En gruppe med ulige antal får en trio.
-      Skriver du <b>Gruppe A:</b> foran navnene, bruges det som gruppens navn.</p>
+    <textarea id="grupper" spellcheck="false">Navn A, Navn B, Navn C, Navn D
+Navn E, Navn F, Navn G
+Navn H, Navn I, Navn J, Navn K
+Navn L, Navn M, Navn N, Navn O
+Navn P, Navn Q, Navn R, Navn S
+Navn T, Navn U, Navn V, Navn W
+Navn X, Navn Y, Navn Z, Navn Æ</textarea>
+    <p class="muted hint">Makkerparrene dannes i den rækkefølge, navnene står. En gruppe med ulige antal får en trio.<br>
+      Skriver du <b>Gruppe A:</b> foran navnene, bruges det som gruppens navn. Nummerering som <b>1.</b> forrest springes over.</p>
     <div class="error" id="fejl" hidden></div>
     <div class="warn" id="advarsel" hidden></div>
   </section>
@@ -150,8 +150,14 @@ Gabi, Laurits, Jolien H, Emilie</textarea>
   }
 
   // ---------- Linjerne ind: "Gruppe A: Anna, Bertram, ..." ----------
+  // En nummereret eller punktopstillet liste ("1. Anna, ...", "- Anna, ...") er lige så
+  // almindelig som en ren navneliste, så nummeret foran det første navn fjernes.
+  function ryd(linje){
+    return linje.replace(/^[\s\-–—•*]+/, '').replace(/^\d+\s*[.):\]]\s*/, '');
+  }
+
   function laesLinjer(tekst){
-    return tekst.split('\n').map(function(linje){
+    return tekst.split('\n').map(ryd).map(function(linje){
       var navnedel = linje, etiket = null;
       var kolon = linje.indexOf(':');
       if(kolon > -1){
