@@ -94,8 +94,8 @@
           hint: "Tag fat i flasken med frugtfarve, og slip den over hvert af de to venstre bægerglas. Hver hældning giver 20 mL, og den gule pil hælder mere i det samme glas." },
         { id: "lv", tekst: "Hæld ligevægtsblanding i de to glas i par 2", mark: "kolbe2",
           hint: "Tag fat i kolben med stamopløsning, og slip den over hvert af de to højre bægerglas. Begge glas skal have lige meget." },
-        { id: "vand", tekst: "Fordobl volumen i ét glas i hvert par", mark: "vand",
-          hint: "Tag fat i sprøjteflasken, og slip den over det ene glas i hvert par. Hver gang giver 10 mL. Læs volumen på glasset." },
+        { id: "vand", tekst: "Fortynd ét glas i hvert par med vand", mark: "vand",
+          hint: "Tag fat i sprøjteflasken, og slip den over det ene glas i hvert par. Hver gang giver 10 mL. Sigt efter dobbelt volumen; mere vand gør bare forskellen tydeligere." },
         { id: "sml", tekst: "Sammenlign de fire glas ovenfra", mark: "papir",
           hint: "Klik på Se ovenfra eller på det hvide papir, og notér for hvert par, hvordan det fortyndede glas ser ud." }
     ];
@@ -455,11 +455,14 @@
         }) ? (t === "frugtfarve" ? "farve" : "lv") : null;
     };
 
-    /* Er det ene glas i parret fortyndet til dobbelt volumen? */
-    P.parFordoblet = function (par) {
+    /* Hvilket af parrets to glas er fortyndet? -1, hvis ingen af dem er.
+       Der er ingen oevre graense: haelder eleven mere vand i, er glasset
+       stadig fortyndet, og forskellen bliver bare tydeligere. */
+    P.fortyndetIPar = function (par) {
         var a = M.volumen(par[0].b), b = M.volumen(par[1].b);
         var lo = Math.min(a, b), hi = Math.max(a, b);
-        return lo >= 10 && hi / lo >= M.FORDOBLING.min && hi / lo <= M.FORDOBLING.maks;
+        if (lo < M.FORTYNDING.mindstemL || hi / lo < M.FORTYNDING.min) return -1;
+        return a > b ? 0 : 1;
     };
 
     /* Parret med den oploesning, eller null */
@@ -471,9 +474,9 @@
         return fundet;
     };
 
-    P.beggeParFordoblet = function () {
+    P.beggeParFortyndet = function () {
         var f = this.parMed("farve", 10), l = this.parMed("lv", 10);
-        return !!(f && l && this.parFordoblet(f) && this.parFordoblet(l));
+        return !!(f && l && this.fortyndetIPar(f) >= 0 && this.fortyndetIPar(l) >= 0);
     };
 
     P.tjekBlanding = function (c) {
@@ -510,7 +513,7 @@
                     g.glas6.maaltT !== null && g.glas6.maaltT <= 10 && g.glas7.maaltT !== null);
             case "farve": return !!(gj.sml || this.parMed("farve", 10));
             case "lv": return !!(gj.sml || this.parMed("lv", 10));
-            case "vand": return !!(gj.sml || this.beggeParFordoblet());
+            case "vand": return !!(gj.sml || this.beggeParFortyndet());
             default: return !!gj[id];
         }
     };
@@ -1315,10 +1318,11 @@
 
     P.parData = function (par) {
         var type = this.parType(par, 10);
-        var V = par.map(function (c) { return M.volumen(c.b); });
-        var lo = Math.min(V[0], V[1]), hi = Math.max(V[0], V[1]);
-        var fortyndet = type && lo >= 5 && hi / lo >= 1.3 ? (V[0] > V[1] ? 0 : 1) : -1;
-        return { type: type, V: V, fortyndet: fortyndet };
+        return {
+            type: type,
+            V: par.map(function (c) { return M.volumen(c.b); }),
+            fortyndet: type ? this.fortyndetIPar(par) : -1
+        };
     };
 
     P.ovenfraData = function () {
@@ -1330,7 +1334,7 @@
             var vurd = d.type ? mig.del2.vurdering[d.type] : null;
             var note;
             if (!d.type) { note = "Hæld den samme opløsning i begge glas."; mangler++; }
-            else if (d.fortyndet < 0) { note = "Fordobl volumen i det ene glas med vand."; mangler++; }
+            else if (d.fortyndet < 0) { note = "Fortynd det ene glas med vand."; mangler++; }
             else { note = Math.round(Math.min(d.V[0], d.V[1])) + " mL og " + Math.round(Math.max(d.V[0], d.V[1])) + " mL"; }
             par.push({ titel: d.type ? PAR_TITEL[d.type] : mig.parOverskrift(p), note: note });
             p.forEach(function (c, i) {
@@ -1346,7 +1350,7 @@
         });
         var noteret = this.del2.vurdering.farve && this.del2.vurdering.lv;
         return {
-            tekst: mangler ? "Hvert par skal have den samme opløsning i to glas, og det ene glas skal fortyndes." :
+            tekst: mangler ? "Hvert par skal have den samme opløsning i to glas, og det ene glas skal fortyndes med vand." :
                 "Hvert par fik lige meget i de to glas. Kun det ene glas i hvert par er fortyndet.",
             hjaelp: mangler ? "Gør begge par færdige, og se igen." :
                 (noteret ? "Luk visningen, når begge par er noteret." :
@@ -1390,7 +1394,7 @@
         var mig = this, gyldig = true;
         [["farve", this.parMed("farve", 10)], ["lv", this.parMed("lv", 10)]].forEach(function (rk) {
             var par = rk[1], vu = v[rk[0]];
-            if (!par || !vu || !mig.parFordoblet(par) || mig.parData(par).fortyndet !== vu.idx) gyldig = false;
+            if (!par || !vu || mig.fortyndetIPar(par) !== vu.idx) gyldig = false;
         });
         if (!gyldig) {
             this.besked("Notér det fortyndede glas i begge par.");

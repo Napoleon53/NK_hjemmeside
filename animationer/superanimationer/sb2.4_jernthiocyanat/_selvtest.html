@@ -245,6 +245,9 @@ function koerTest() {
     adv(6);
     paastand("del 1 er slut, og alt er toemt", f.gjort.affald && [1, 2, 3, 4, 5, 6, 7, 8].every(function (k) { return V(G(k)) < 0.01 && M.fastIalt(G(k).b) === 0 && G(k).sted === "stativ"; }) && V(f.g.baegerA) < 0.01 && !f.handling && f.aktueltTrin() === null);
     paastand("tegneserien er stadig laast, fordi del 2 mangler", d.getElementById("serieknap").hidden);
+    paastand("panelet siger, hvilken del der mangler",
+        d.getElementById("serie-tekst").textContent === "Del 1 er gjort. Del 2 mangler.",
+        d.getElementById("serie-tekst").textContent);
 
     overskrift("5. Del 2: fortynding");
     d.getElementById("station2").click();
@@ -260,12 +263,14 @@ function koerTest() {
     adv(3.5);
     paastand("begge glas i par 2 har 20 mL ligevaegtsblanding", Math.abs(V(f.g.baeger3) - 20) < 0.1 && Math.abs(V(f.g.baeger4) - 20) < 0.1 && f.trinGjort("lv"));
     traek("vand", "baeger2"); adv(2.8);
+    paastand("ét skud vand taeller allerede som fortyndet", Math.abs(V(f.g.baeger2) - 30) < 0.1 && f.fortyndetIPar(f.parListe()[0]) === 1, komma(V(f.g.baeger2)));
     f.klik("vand"); adv(2.8);
     paastand("baegerglas 2 er fortyndet til 40 mL", Math.abs(V(f.g.baeger2) - 40) < 0.1, komma(V(f.g.baeger2)));
     paastand("trinnet er ikke gjort, foer begge par er fortyndet", !f.trinGjort("vand"));
     traek("vand", "baeger4"); adv(2.8);
-    f.klik("vand"); adv(2.8);
-    paastand("baegerglas 4 er fortyndet til 40 mL, og trinnet er gjort", Math.abs(V(f.g.baeger4) - 40) < 0.1 && f.trinGjort("vand"), komma(V(f.g.baeger4)));
+    for (i = 0; i < 3; i++) { f.klik("vand"); adv(2.8); }
+    paastand("mere end dobbelt volumen taeller ogsaa, og trinnet er gjort",
+        Math.abs(V(f.g.baeger4) - 60) < 0.1 && f.trinGjort("vand"), komma(V(f.g.baeger4)));
     paastand("papiret aabner visningen ovenfra", f.klik("papir") === true && f.visning === "ovenfra");
     var od = f.ovenfraData();
     paastand("visningen har fire glas i to par", od.glas.length === 4 && od.par.length === 2);

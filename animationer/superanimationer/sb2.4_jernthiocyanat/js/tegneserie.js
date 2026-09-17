@@ -21,6 +21,11 @@
         NK.tekst(ctx, t, x, y, { font: (opt && opt.font) || "700 12px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: (opt && opt.farve) || "#dfe5ec" });
     }
 
+    /* Et tal med én decimal og komma, og uden decimalen, naar den er 0 */
+    function komma(x) {
+        return String(Math.round(x * 10) / 10).replace(".", ",");
+    }
+
     function rude(container, nr, tekstStr, tegn) {
         var div = document.createElement("div");
         div.className = "rude";
@@ -289,10 +294,13 @@
             /* 5. Del 2: de fire glas ovenfra, to og to i par */
             var r2 = f.del2.resultat;
             if (r2.farve && r2.lv) {
+                /* Fortyndingen behoever ikke at vaere praecis en fordobling:
+                   teksten bruger elevens egne volumener */
+                var gange = r2.lv.V[1] > 0 ? r2.lv.V[0] / r2.lv.V[1] : 2;
                 var TEKST2 = "De fire glas ovenfra: frugtfarven var " + r2.farve.svar + ", og ligevægtsblandingen var " +
                     r2.lv.svar + ". Frugtfarven har lige mange farvestofmolekyler i lysvejen, uanset volumen. " +
-                    "I ligevægtsblandingen halveres alle koncentrationer, så Y bliver dobbelt så stor som K, " +
-                    "og ligevægten forskydes mod venstre.";
+                    "I ligevægtsblandingen blev volumen " + komma(gange) + " gange så stort, så alle koncentrationer " +
+                    "faldt, Y blev større end K, og ligevægten forskød sig mod venstre.";
                 rude(container, ++nr, TEKST2, function (ctx) {
                     ctx.fillStyle = "#f4f5f3";
                     NK.rundtRekt(ctx, 12, 18, 276, 166, 8);

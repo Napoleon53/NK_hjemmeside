@@ -64,9 +64,12 @@
         vk.classList.toggle("banker", !!aktuelt && (aktuelt.id === "billede" || aktuelt.id === "sml") && !f.visning);
         NK.saetTekst("visning-tekst", f.visning ? "Luk visningen" : (f.station === 1 ? "Tag billede" : "Se ovenfra"));
 
+        /* Tegneserien bygges af begge dele, saa den siger, hvilken der mangler */
         var faerdig = f.alleFaerdige();
         NK.el("serieknap").hidden = !faerdig;
-        NK.saetTekst("serie-tekst", faerdig ? "Forsøget er slut." : "Låses op, når begge dele er gjort.");
+        NK.saetTekst("serie-tekst", faerdig ? "Forsøget er slut." :
+            (!f.gjort.affald && !f.gjort.sml ? "Låses op, når begge dele er gjort." :
+             !f.gjort.affald ? "Del 2 er gjort. Del 1 mangler." : "Del 1 er gjort. Del 2 mangler."));
         NK.el("serieknap").classList.toggle("banker", faerdig && !serieSet);
         quiz.saetLaast(!f.gjort.billede);
         sidsteSignatur = signatur();

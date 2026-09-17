@@ -43,17 +43,23 @@ Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺. Knapperne øverst på scenen skifter mellem to 
 
 **Del 2: Fortynding.** Fire bægerglas står på hvidt papir, to og to i par. Par 1
 får frugtfarve, par 2 ligevægtsblanding fra kolben, 20 mL ad gangen i hvert glas.
-Sprøjteflasken giver 10 mL vand ad gangen, til det ene glas i hvert par har
-dobbelt volumen. Knappen **Se ovenfra** viser alle fire på én gang, parvis, så
-forskellen står i ét billede: frugtfarven ser ens ud, fordi lysvejen ovenfra
-bliver dobbelt så lang, når koncentrationen halveres, mens ligevægtsblandingen
-bliver lysere, fordi Y bliver dobbelt så stor som K. Eleven noterer det
-fortyndede glas i hvert par, og trinnet er gjort, når begge par er noteret.
+Sprøjteflasken giver 10 mL vand ad gangen til det ene glas i hvert par. Knappen
+**Se ovenfra** viser alle fire på én gang, parvis, så forskellen står i ét
+billede: frugtfarven ser ens ud, fordi lysvejen ovenfra bliver længere i samme
+takt, som koncentrationen falder, mens ligevægtsblandingen bliver lysere, fordi
+Y bliver større end K. Eleven noterer det fortyndede glas i hvert par, og
+trinnet er gjort, når begge par er noteret.
 
 Et par kendes på sit indhold, ikke på sin plads (`parType` i `js/forsoeg.js`),
-så det virker også, hvis eleven bytter om på parrene. Et par kan vurderes, når
-begge glas har den samme opløsning, og det ene har omtrent dobbelt volumen
-(`parFordoblet`).
+så det virker også, hvis eleven bytter om på parrene. Et glas tæller som
+fortyndet, når det har mindst `FORTYNDING.min` gange så meget som det andet glas
+i parret (`fortyndetIPar`). Der er ingen øvre grænse: dobbelt volumen er målet,
+men hælder eleven mere vand i, er glasset stadig fortyndet, og forskellen bliver
+bare tydeligere. Det er den samme regel, der afgør både trinnet, hvilket glas
+der får knappen **Vurdér**, og hvad der tæller ved lukningen.
+
+**Tegneserien** låses op, når begge dele er gjort. Er kun den ene gjort, siger
+kortet i panelet, hvilken der mangler (`serie-tekst` i `js/app.js`).
 
 **Klik viser, træk gør.** Et klik vælger en genstand og gør ellers ingenting:
 alt kan vælges, og det valgte får en rolig blå ramme. Handlingerne sker ved at
@@ -169,7 +175,7 @@ hver hældning (`MAENGDE`), spatelspidser og opløsning af fast stof (`FAST`),
 ascorbinsyrens fart (`REDUKTION`), frugtfarven (`FARVESTOF`), blanding
 (`BLAND`), temperaturerne (`TEMP`), lysvejen (`LYSVEJ`), stoffernes farve og
 farvestyrke (`STOFFARVE`), grænserne for mørkere og lysere (`VURDER`), hvad der
-tæller som fordoblet (`FORDOBLING`), rystningen (`RYST`) og partikelmodellen
+tæller som fortyndet (`FORTYNDING`), rystningen (`RYST`) og partikelmodellen
 (`MIKRO`). Alle formler med ladning bygges med `NK.ladningHaevet`, så ±1 skrives
 som + og −.
 

@@ -184,8 +184,12 @@
        forholdet mellem den samlede absorbans */
     var VURDER = { moerkere: 1.25, lysere: 0.8, ovenfraMoerkere: 1.15, ovenfraLysere: 0.87 };
 
-    /* Fordobling i del 2: forholdet mellem de to volumener */
-    var FORDOBLING = { min: 1.8, maks: 2.25 };
+    /* Fortynding i del 2: et glas taeller som fortyndet, naar det har
+       mindst min gange saa meget som det andet glas i parret, og det
+       mindste glas har mindst mindstemL. Det ideelle er dobbelt volumen,
+       men enhver tydelig fortynding viser det samme: frugtfarven er
+       uaendret ovenfra, og ligevaegtsblandingen bliver lysere. */
+    var FORTYNDING = { min: 1.4, mindstemL: 10 };
 
     /* Rystning med musen: FULD er den fart (tegneenheder pr. sekund), der
        giver fuld rystning. Rystes der voldsommere end SPILD_FART i
@@ -593,7 +597,7 @@
         LYSVEJ: LYSVEJ,
         STOFFARVE: STOFFARVE,
         VURDER: VURDER,
-        FORDOBLING: FORDOBLING,
+        FORTYNDING: FORTYNDING,
         RYST: RYST,
         MIKRO: MIKRO,
         FARVE: FARVE,
