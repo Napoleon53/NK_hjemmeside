@@ -62,6 +62,12 @@ musen. Rystes et glas voldsomt, skvulper det ud. Knappen **Ryst glasset**
   klik. Tages der fat i noget andet, går det hjem. Spatlen bliver også hængende
   over pulverglasset, når den har taget en spatelspids; der gentager ringen
   spatelspidsen.
+* **Pulverglassene viser det faste stof** i boblen: Fe(NO₃)₃ og KSCN som
+  iongitter med deres eget formelforhold (tre NO₃⁻ pr. Fe³⁺), ascorbinsyre som
+  molekyler, der ligger tæt. Gitrene står som data i `FAST_MIKRO` i
+  `js/model.js`.
+* **Boblen fyldes på plads**, når man ser ned i et glas: partiklerne ligger
+  fordelt i den. Der falder kun noget ned oppefra, når der bliver tilsat noget.
 * **Zoomboblen følger det valgte.** Fe³⁺ og SCN⁻ danner FeSCN²⁺ og går i
   stykker igen, Ag⁺ finder SCN⁻ og danner AgSCN, og ascorbinsyre gør to Fe³⁺ til
   Fe²⁺. K er forstærket i boblen, så der er komplekser at se. Vælges en flaske

@@ -1570,14 +1570,36 @@
             if (!v.mikro) v.mikro = new NK.Mikro(this.bobleR);
             this.mikro = v.mikro;
         }
+        this.opdaterBoble(dt, v);
+        this.haandAlfa = 0;
+    };
+
+    /* Det faste stof, boblen skal vise gitteret for: kun naar der ikke er
+       vaeske i beholderen, saa et pulverglas viser saltets gitter, mens et
+       glas med vand i viser ionerne i oploesning */
+    P.fastGitter = function (v) {
+        if (!v || B.volumen(v) > 0.05 || B.fastIalt(v) < 0.01) return null;
+        var o = B.samlet(v), bedst = null, mest = 0;
+        for (var n in o.n) {
+            if (!Object.prototype.hasOwnProperty.call(o.n, n)) continue;
+            var s = Stof.STOFFER[n];
+            if (!s || s.fase !== "s" || o.n[n] <= mest) continue;
+            mest = o.n[n];
+            bedst = n;
+        }
+        return bedst ? Stof.gitter(bedst) : null;
+    };
+
+    P.opdaterBoble = function (dt, v) {
+        /* Er der kun fast stof i beholderen, viser boblen stoffets gitter */
+        var gitter = this.fastGitter(v);
+        if ((gitter && gitter.titel) !== (this.mikro.fast && this.mikro.fast.titel)) this.mikro.visFast(gitter);
         var vis = !!v && (B.volumen(v) > 0.05 || B.fastIalt(v) > 0.5 || this.mikro.partikler.length > 0) && this.koer.navn() !== "affald";
         if (vis) {
             this.bobleBeholder = v;
             this.mikro.opdater(dt, Stof.partikelTal(B.samlet(v), this.valg.partikler || 6), { ryst: this.omgivelser(v).ryst });
         } else this.mikro.opdater(dt, {}, { ryst: 0 });
         this.bobleAlfa = NK.mod(this.bobleAlfa, vis ? 1 : 0, 5, dt);
-
-        this.haandAlfa = 0;
     };
 
     /* Bordet, mens man er i et andet rum: pladerne, kemien og termometrene

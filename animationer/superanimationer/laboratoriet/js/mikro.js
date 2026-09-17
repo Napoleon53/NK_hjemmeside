@@ -33,6 +33,7 @@
         this.partikler = [];
         this.spawnUr = 0;
         this.foerste = false;
+        this.fast = null;
         this.s = { ryst: 0 };
     };
 
@@ -87,10 +88,18 @@
         });
     };
 
+    /* Fast stof: boblen viser stoffets gitter (Stof.gitter) i stedet for
+       partikler i en oploesning */
+    P.visFast = function (f) {
+        this.nulstil();
+        this.fast = f || null;
+    };
+
     /* maal: { stof: antal }. s: { ryst } */
     P.opdater = function (dt, maal, s) {
         var R = this.R, i, p;
         this.s = s || this.s;
+        if (this.fast) return;
         maal = maal || {};
         var ryst = this.s.ryst || 0;
         if (this.foerste) { this.foerste = false; this.fyldOp(maal); }
@@ -155,6 +164,57 @@
         }
     };
 
+    P.tegnKant = function (ctx, alfa) {
+        var R = this.R;
+        ctx.globalAlpha = alfa;
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.55)";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.arc(0, 0, R, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.arc(-R * 0.35, -R * 0.35, R * 0.55, Math.PI * 1.1, Math.PI * 1.55);
+        ctx.stroke();
+    };
+
+    /* Et udsnit af det faste stof: iongitteret med stoffets eget
+       formelforhold, eller ens byggesten, der ligger taet */
+    P.tegnGitter = function (ctx) {
+        var R = this.R, f = this.fast, x, y;
+        var celle = [];
+        if (f.dele) f.dele.forEach(function (d) { for (var i = 0; i < d.antal; i++) celle.push(d.navn); });
+        var mol = f.molekyle || null;
+        var trin = R * 0.27;
+        var rad = mol ? trin * 0.5 : trin * 0.44;
+        var raekkeH = mol ? trin * 0.87 : trin;
+        var raekke = 0;
+        for (y = -R - trin; y < R + trin; y += raekkeH, raekke++) {
+            var soejle = 0;
+            for (x = -R - trin + (mol && raekke % 2 ? trin / 2 : 0); x < R + trin; x += trin, soejle++) {
+                var navn = mol || celle[(raekke + soejle) % celle.length];
+                var fa = farveAf(navn);
+                NK.kugle(ctx, x, y, rad,
+                    NK.css({ r: Math.min(255, fa.r + 60), g: Math.min(255, fa.g + 60), b: Math.min(255, fa.b + 60) }),
+                    NK.css({ r: fa.r * 0.55, g: fa.g * 0.55, b: fa.b * 0.55 }));
+                var st = Stof.STOFFER[navn];
+                var tekst = st && st.kort ? st.kort : Stof.formel(navn);
+                var str = tekst.length > 5 ? rad * 0.5 : (tekst.length > 3 ? rad * 0.62 : rad * 0.78);
+                NK.tekst(ctx, tekst, x, y + 0.5, { font: "800 " + str.toFixed(1) + "px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#ffffff", kant: true, kantBredde: 3, kantFarve: "rgba(0,0,0,0.55)" });
+            }
+        }
+    };
+
+    /* Forklaringen staar inde i boblen, hvor der er bredde nok til den */
+    P.tegnGitterTekst = function (ctx, alfa) {
+        var R = this.R, ly0 = R * 0.6;
+        ctx.globalAlpha = alfa;
+        ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+        ctx.fillRect(-R, ly0, R * 2, 24);
+        NK.tekst(ctx, this.fast.tekst, 0, ly0 + 12, { font: "600 11px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#f2f4f7" });
+    };
+
     /* Boblen tegnes med centrum i (cx, cy). forbind: punktet, den hoerer til */
     P.tegn = function (ctx, cx, cy, alfa, tid, forbind, farve) {
         if (alfa < 0.02) return;
@@ -189,6 +249,16 @@
         ctx.fill();
         ctx.save();
         ctx.clip();
+
+        /* Fast stof: gitteret i stedet for partikler i vand */
+        if (this.fast) {
+            this.tegnGitter(ctx);
+            this.tegnGitterTekst(ctx, alfa);
+            ctx.restore();
+            this.tegnKant(ctx, alfa);
+            ctx.restore();
+            return;
+        }
 
         /* Vand i baggrunden */
         ctx.fillStyle = "rgba(255, 255, 255, 0.06)";
@@ -232,18 +302,7 @@
             });
         }
         ctx.restore();
-
-        ctx.globalAlpha = alfa;
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.55)";
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.arc(0, 0, R, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
-        ctx.lineWidth = 6;
-        ctx.beginPath();
-        ctx.arc(-R * 0.35, -R * 0.35, R * 0.55, Math.PI * 1.1, Math.PI * 1.55);
-        ctx.stroke();
+        this.tegnKant(ctx, alfa);
         ctx.restore();
     };
 }());

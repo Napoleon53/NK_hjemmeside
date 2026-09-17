@@ -484,6 +484,28 @@
         return ud;
     }
 
+    /* Det faste stofs indre, som zoomboblen viser det. Et salt er et
+       iongitter med sit eget formelforhold, og forholdet staar allerede i
+       stoffets oploesningsreaktion: NaCl(s) -> Na+ + Cl- giver 1:1, og
+       Pb(NO3)2(s) -> Pb2+ + 2 NO3- giver 1:2. Alt andet fast stof (metaller,
+       molekylestoffer) er ens byggesten, der ligger taet. Et nyt salt faar
+       altsaa sit gitter af sin egen reaktion, ikke af ny kode. */
+    function gitter(navn) {
+        var s = STOFFER[navn];
+        if (!s || s.fase !== "s") return null;
+        var rx = null;
+        REAKTIONER.forEach(function (r) {
+            if (r.slags === "oploes" && r.venstre.length === 1 && r.venstre[0][1] === navn && r.venstre[0][0] === 1) rx = r;
+        });
+        if (!rx) return { molekyle: navn, titel: formel(navn, true), tekst: "Ens byggesten, der ligger tæt" };
+        var dele = rx.hoejre.map(function (l) { return { navn: l[1], antal: l[0] }; });
+        return {
+            dele: dele, titel: formel(navn, true),
+            tekst: "Iongitter: " + dele.map(function (d) { return formel(d.navn); }).join(" og ") +
+                " i forholdet " + dele.map(function (d) { return d.antal; }).join(":")
+        };
+    }
+
     /* ----- Faremaerkning ------------------------------------------------------ */
     var MAERKER = ["brandfarlig", "oxiderende", "aetsende", "giftig", "sundhedsfare", "kronisk", "miljoe"];
 
@@ -542,7 +564,8 @@
         farve: farve,
         uklar: uklar,
         fastFarve: fastFarve,
-        partikelTal: partikelTal
+        partikelTal: partikelTal,
+        gitter: gitter
     };
 
     /* Vand kender alle forsoeg */

@@ -42,7 +42,9 @@ js/beholder.js       det, en beholder kan: rumme, blande, hælde, lag, bundfald,
                      temperatur, kogning, overløb
 js/tegning.js        baggrund, plakat, væske, bundfald, korn, etiketter, stav,
                      termometer, varmeplade, stråle, dråber, damp, pyt, markering
-js/mikro.js          zoomboblen: én kugle pr. partikel med formlen på
+js/mikro.js          zoomboblen: én kugle pr. partikel med formlen på. Boblen fyldes
+                     på plads, når man ser ned i en beholder, og fast stof vises
+                     som gitter (Stof.gitter)
 js/bord.js           bordet: genstande, greb og slip, møder afgjort af
                      egenskaber, stativ og varmeplade, uheld, tidens gang, tegning
 js/rum.js            rummene: flere borde på ét lærred, pile og piletaster,
@@ -226,6 +228,13 @@ spil.
 * Panelet er 430 px bredt (`--panel-bredde`).
 * Sammensatte ioner i zoomboblen er én kugle med formlen på (NO₃⁻), ikke flere
   kugler. Ladning ±1 skrives som + og −, aldrig 1+ og 1−.
+* Boblen fyldes på plads, første gang man ser ned i en beholder: partiklerne
+  ligger fordelt i den. Der falder kun noget ned oppefra, når der rent faktisk
+  bliver tilsat noget.
+* Er der kun fast stof i beholderen, viser boblen stoffets gitter: et salt som
+  iongitter med sit eget formelforhold, alt andet som ens byggesten, der ligger
+  tæt. Forholdet kommer fra stoffets egen opløsningsreaktion i `stoftabel.js`
+  (`Stof.gitter`), så et nyt salt får sit gitter uden ny kode.
 * sc1.3 og sc2.5 er ældre og har et andet sidelayout. De bruger `kerne.js` og
   `rundvisning.js`, men har stadig hele deres eget stilark.
 
