@@ -274,17 +274,15 @@
   ];
   var NIVEAU = ['Ikke vurderet','Gik galt','Kan gøres bedre','Nogenlunde','Godt','Forbilledligt'];
   var MAX = REGLER.length * 5;
-  var MIN = REGLER.length;            // alle normer vurderet lavest
-
-  // Karakteren følger, hvor stor en del af spændet fra MIN til MAX klassen når op på.
+  // Karakteren følger antallet af stjerner. Procenten er andelen af de 30 mulige.
   var KARAKTERER = [
-    { fra:.90, vaerdi:12, tekst:'12', stempel:'Guldmodul',    klasse:'guld'   },
-    { fra:.80, vaerdi:10, tekst:'10', stempel:'Sølvmodul',    klasse:'soelv'  },
-    { fra:.70, vaerdi:7,  tekst:'7',  stempel:'Bronzemodul',  klasse:'bronze' },
-    { fra:.60, vaerdi:4,  tekst:'4',  stempel:'Godkendt',     klasse:'ok'     },
-    { fra:.50, vaerdi:2,  tekst:'02', stempel:'Godkendt',     klasse:'ok'     },
-    { fra:.20, vaerdi:0,  tekst:'00', stempel:'Under normen', klasse:'ingen'  },
-    { fra:-1,  vaerdi:-3, tekst:'-3', stempel:'Under normen', klasse:'ingen'  }
+    { fra:28, vaerdi:12, tekst:'12', stempel:'Guldmodul',    klasse:'guld'   },
+    { fra:26, vaerdi:10, tekst:'10', stempel:'Sølvmodul',    klasse:'soelv'  },
+    { fra:24, vaerdi:7,  tekst:'7',  stempel:'Bronzemodul',  klasse:'bronze' },
+    { fra:20, vaerdi:4,  tekst:'4',  stempel:'Godkendt',     klasse:'ok'     },
+    { fra:15, vaerdi:2,  tekst:'02', stempel:'Godkendt',     klasse:'ok'     },
+    { fra:9,  vaerdi:0,  tekst:'00', stempel:'Under normen', klasse:'ingen'  },
+    { fra:0,  vaerdi:-3, tekst:'-3', stempel:'Under normen', klasse:'ingen'  }
   ];
 
   var STANDARD_BELON = [
@@ -355,11 +353,10 @@
   // Point regnes derfor altid ud fra modulets score.
   function modulPoint(m){ return karakterFor(m.score).vaerdi; }
 
-  function andelFor(sum){ return (sum - MIN) / (MAX - MIN); }
+  function andelFor(sum){ return sum / MAX; }
   function karakterFor(sum){
-    var a = andelFor(sum);
     for(var i = 0; i < KARAKTERER.length; i++){
-      if(a >= KARAKTERER[i].fra) return KARAKTERER[i];
+      if(sum >= KARAKTERER[i].fra) return KARAKTERER[i];
     }
     return KARAKTERER[KARAKTERER.length - 1];
   }
