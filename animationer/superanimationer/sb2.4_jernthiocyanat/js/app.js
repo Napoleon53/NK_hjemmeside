@@ -61,7 +61,7 @@
 
         var vk = NK.el("visning-knap");
         vk.classList.toggle("aktiv", !!f.visning);
-        vk.classList.toggle("banker", !!aktuelt && (aktuelt.id === "billede" || aktuelt.id === "farveSml" || aktuelt.id === "lvSml") && !f.visning);
+        vk.classList.toggle("banker", !!aktuelt && (aktuelt.id === "billede" || aktuelt.id === "sml") && !f.visning);
         NK.saetTekst("visning-tekst", f.visning ? "Luk visningen" : (f.station === 1 ? "Tag billede" : "Se ovenfra"));
 
         var faerdig = f.alleFaerdige();

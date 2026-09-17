@@ -1128,19 +1128,23 @@
         ctx.restore();
     };
 
-    /* ----- Baegerglassene ovenfra i del 2 --------------------------------------- */
-    S.OVENFRA = { x: 290, y: 80, b: 540, h: 440, cy: 250, r: 88 };
+    /* ----- De fire baegerglas ovenfra i del 2 ------------------------------------ */
+    /* Parrene staar side om side, saa frugtfarven og ligevaegtsblandingen
+       ses samtidig: det er forskellen mellem dem, forsoeget handler om. */
+    S.OVENFRA = { x: 120, y: 70, b: 880, h: 460, cy: 282, r: 74, titelY: 172 };
 
     S.ovenfraX = function (i) {
-        return S.OVENFRA.x + S.OVENFRA.b / 2 + (i === 0 ? -130 : 130);
+        var A = S.OVENFRA;
+        var parMidt = A.x + A.b * (i < 2 ? 0.25 : 0.75);
+        return parMidt + (i % 2 === 0 ? -92 : 92);
     };
 
     S.ovenfraPille = function (i) {
-        return { x: S.ovenfraX(i) - 92, y: S.OVENFRA.cy + 148, b: 184, h: 34 };
+        return { x: S.ovenfraX(i) - 78, y: S.OVENFRA.cy + 134, b: 156, h: 32 };
     };
 
     S.ovenfraHvad = function (pt) {
-        for (var i = 0; i < 2; i++) {
+        for (var i = 0; i < 4; i++) {
             if (S.iRekt(S.ovenfraPille(i), pt, 3)) return "ovenfra" + (i + 1);
         }
         var L = S.visLuk(S.OVENFRA);
@@ -1149,19 +1153,40 @@
         return "visUd";
     };
 
-    /* d: { tekst, glas: [ { navn, V, indhold, farve, bund, uklar, tom, kanVurderes, svar } ] } */
+    /* d: { tekst, hjaelp,
+            par:  [ { titel, note } ],
+            glas: [ { navn, V, indhold, farve, bund, uklar, tom, kanVurderes, svar } ] } */
     S.tegnOvenfra = function (ctx, d, alfa, tid) {
         if (alfa < 0.01 || !d) return;
-        var A = S.OVENFRA;
+        var A = S.OVENFRA, i;
         ctx.save();
         ctx.globalAlpha = alfa;
-        tegnArk(ctx, A, "Bægerglassene set ovenfra", d.tekst);
-        for (var i = 0; i < 2; i++) {
+        tegnArk(ctx, A, "De fire bægerglas set ovenfra", d.tekst);
+
+        /* Skillelinjen mellem de to par */
+        ctx.strokeStyle = "rgba(120, 132, 146, 0.4)";
+        ctx.lineWidth = 1.4;
+        ctx.setLineDash([6, 6]);
+        ctx.beginPath();
+        ctx.moveTo(A.x + A.b / 2, A.titelY - 24);
+        ctx.lineTo(A.x + A.b / 2, A.cy + 176);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        for (i = 0; i < 2; i++) {
+            var p = (d.par && d.par[i]) || { titel: "", note: "" };
+            var px = A.x + A.b * (i === 0 ? 0.25 : 0.75);
+            NK.tekst(ctx, p.titel || "", px, A.titelY, { font: "700 17px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#232830" });
+            NK.tekst(ctx, p.note || "", px, A.titelY + 21, { font: "600 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#6a737d" });
+        }
+
+        for (i = 0; i < 4; i++) {
             var gl = d.glas[i];
+            if (!gl) continue;
             var x = S.ovenfraX(i);
             S.tegnOppefra(ctx, x, A.cy, A.r, gl);
-            NK.tekst(ctx, gl.navn + (gl.tom ? "" : ", " + Math.round(gl.V) + " mL"), x, A.cy + 112, { font: "700 16px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#232830" });
-            NK.tekst(ctx, gl.indhold || "", x, A.cy + 133, { font: "600 14px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#56606b" });
+            NK.tekst(ctx, gl.tom ? "tomt" : Math.round(gl.V) + " mL", x, A.cy + 96, { font: "700 16px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#232830" });
+            NK.tekst(ctx, gl.maerke || "", x, A.cy + 116, { font: "600 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#56606b" });
             if (gl.kanVurderes) tegnPille(ctx, S.ovenfraPille(i), gl.svar || "Vurdér", gl.svar ? "svar" : "", alfa, tid);
         }
         NK.tekst(ctx, d.hjaelp || "", A.x + A.b / 2, A.y + A.h - 22, { font: "600 14px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#6a737d" });

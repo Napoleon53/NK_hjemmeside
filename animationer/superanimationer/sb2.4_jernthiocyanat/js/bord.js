@@ -65,7 +65,7 @@
             return null;
         }
 
-        var navne2 = ["vand", "flaske_farve", "kolbe2", "baegerV", "baegerH"];
+        var navne2 = ["vand", "flaske_farve", "kolbe2"].concat(NK.BAEGERE);
         for (i = 0; i < navne2.length; i++) {
             var g2 = g[navne2[i]];
             if (S.inden(g2.sprite, g2.p, g2.anker, pt.x, pt.y, 4)) return g2.navn;
@@ -310,7 +310,7 @@
         var g = this.g;
         S.tegnPapir(ctx, this.markeret("papir"), tid);
         S.tegnDunk(ctx, this.markeret("dunk"), tid);
-        ["kolbe2", "flaske_farve", "vand", "baegerV", "baegerH"].forEach(function (navn) {
+        ["kolbe2", "flaske_farve", "vand"].concat(NK.BAEGERE).forEach(function (navn) {
             var gg = g[navn];
             if (this.oppe(gg)) aktive.push(gg);
             else this.tegnGenstand(ctx, gg, tid, true);

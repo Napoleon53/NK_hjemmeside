@@ -87,22 +87,20 @@
     ];
 
     var TRIN2 = [
-        { id: "farve", tekst: "Hæld frugtfarve i begge bægerglas", mark: "flaske_farve",
-          hint: "Tag fat i flasken med frugtfarve, og slip den over hvert bægerglas. Den gule pil ved flasken hælder mere i det samme glas." },
-        { id: "farveVand", tekst: "Fordobl volumen i det ene glas med vand", mark: "vand",
-          hint: "Tag fat i sprøjteflasken, og slip den over det ene glas. Hver gang giver 10 mL. Læs volumen på glasset." },
-        { id: "farveSml", tekst: "Sammenlign glassene ovenfra", mark: "papir",
-          hint: "Klik på Se ovenfra eller på det hvide papir, og notér, hvordan det fortyndede glas ser ud." },
-        { id: "toem", tekst: "Tøm bægerglassene", mark: "dunk",
-          hint: "Tag fat i hvert bægerglas, og slip det over dunken." },
-        { id: "lv", tekst: "Hæld ligevægtsblanding i begge bægerglas", mark: "kolbe2",
-          hint: "Tag fat i kolben med stamopløsning, og slip den over hvert bægerglas." },
-        { id: "lvVand", tekst: "Fordobl volumen i det ene glas med vand", mark: "vand",
-          hint: "Tag fat i sprøjteflasken, og slip den over det ene glas. Hver gang giver 10 mL." },
-        { id: "lvSml", tekst: "Sammenlign glassene ovenfra", mark: "papir",
-          hint: "Klik på Se ovenfra, og notér, hvordan det fortyndede glas ser ud." }
+        { id: "farve", tekst: "Hæld frugtfarve i de to glas i par 1", mark: "flaske_farve",
+          hint: "Tag fat i flasken med frugtfarve, og slip den over hvert af de to venstre bægerglas. Hver hældning giver 20 mL, og den gule pil hælder mere i det samme glas." },
+        { id: "lv", tekst: "Hæld ligevægtsblanding i de to glas i par 2", mark: "kolbe2",
+          hint: "Tag fat i kolben med stamopløsning, og slip den over hvert af de to højre bægerglas. Begge glas skal have lige meget." },
+        { id: "vand", tekst: "Fordobl volumen i ét glas i hvert par", mark: "vand",
+          hint: "Tag fat i sprøjteflasken, og slip den over det ene glas i hvert par. Hver gang giver 10 mL. Læs volumen på glasset." },
+        { id: "sml", tekst: "Sammenlign de fire glas ovenfra", mark: "papir",
+          hint: "Klik på Se ovenfra eller på det hvide papir, og notér for hvert par, hvordan det fortyndede glas ser ud." }
     ];
     NK.TRIN = { 1: TRIN1, 2: TRIN2 };
+
+    /* De fire baegerglas i del 2, to og to i par */
+    var BAEGERE = ["baeger1", "baeger2", "baeger3", "baeger4"];
+    NK.BAEGERE = BAEGERE;
 
     var SVAR_FOTO = ["mørkere", "lysere", "som glas 7"];
     var SVAR_OVENFRA = ["som det andet glas", "lysere", "mørkere"];
@@ -194,10 +192,12 @@
             kolbe2:       genstand("kolbe2", "kolbe", 2, "kolbe"),
             flaske_farve: genstand("flaske_farve", "flaske_farve", 2, "flaske"),
             vand:         genstand("vand", "vand", 2, "flaske"),
-            baegerV:      beholderGenstand("baegerV", 2, "Venstre bægerglas"),
-            baegerH:      beholderGenstand("baegerH", 2, "Højre bægerglas"),
             kaffekop:     genstand("kaffekop", "kaffekop", 0, null)
         };
+        BAEGERE.forEach(function (n, i) {
+            g[n] = beholderGenstand(n, 2, "Bægerglas " + (i + 1));
+            g[n].par = i < 2 ? 0 : 1;
+        });
         g.pulver_fe.stof = "fe";
         g.pulver_vitc.stof = "vitc";
         g.pulver_scn.stof = "scn";
@@ -219,10 +219,10 @@
         GLAS.forEach(function (n, i) { g[n] = nytGlas(n, i + 1); });
         g.kaffekop.skjult = this.koppenVaek;
 
-        this.valgtPr = { 1: "baegerA", 2: "baegerV" };
+        this.valgtPr = { 1: "baegerA", 2: "baeger1" };
         this.valgt = "baegerA";
         this.resultat = null;
-        this.del2 = { foer: {}, vurdering: null, resultat: {} };
+        this.del2 = { vurdering: {}, resultat: {} };
 
         this.handling = null;
         this.holdt = null;
@@ -273,9 +273,20 @@
         return GLAS.map(function (n) { return g[n]; });
     };
 
+    P.baegerListe = function () {
+        var g = this.g;
+        return BAEGERE.map(function (n) { return g[n]; });
+    };
+
+    /* De to par: glas 1 og 2, og glas 3 og 4 */
+    P.parListe = function () {
+        var b = this.baegerListe();
+        return [[b[0], b[1]], [b[2], b[3]]];
+    };
+
     P.beholderListe = function (station) {
         var st = station || this.station, g = this.g;
-        return st === 1 ? [g.baegerA].concat(this.glasListe()) : [g.baegerV, g.baegerH];
+        return st === 1 ? [g.baegerA].concat(this.glasListe()) : this.baegerListe();
     };
 
     P.alleBeholdere = function () {
@@ -429,21 +440,37 @@
         return t;
     };
 
-    P.beggeMed = function (type, minV) {
+    /* Et par hoerer til den oploesning, begge glas har i sig. Det er
+       indholdet, der afgoer det, ikke pladsen paa papiret, saa det virker
+       ogsaa, hvis eleven bytter om paa parrene. */
+    P.parType = function (par, minV) {
         var mig = this;
-        return [this.g.baegerV, this.g.baegerH].every(function (c) {
-            return mig.indholdType(c) === type && M.volumen(c.b) >= minV;
-        });
+        var t = this.indholdType(par[0]);
+        if (t === "tom" || t === "vand" || t === "blanding") return null;
+        return par.every(function (c) {
+            return mig.indholdType(c) === t && M.volumen(c.b) >= (minV === undefined ? 10 : minV);
+        }) ? (t === "frugtfarve" ? "farve" : "lv") : null;
     };
 
-    P.fordoblet = function () {
-        var a = M.volumen(this.g.baegerV.b), b = M.volumen(this.g.baegerH.b);
+    /* Er det ene glas i parret fortyndet til dobbelt volumen? */
+    P.parFordoblet = function (par) {
+        var a = M.volumen(par[0].b), b = M.volumen(par[1].b);
         var lo = Math.min(a, b), hi = Math.max(a, b);
         return lo >= 10 && hi / lo >= M.FORDOBLING.min && hi / lo <= M.FORDOBLING.maks;
     };
 
-    P.del2Runde = function () {
-        return this.gjort.farveSml ? "lv" : "farve";
+    /* Parret med den oploesning, eller null */
+    P.parMed = function (type, minV) {
+        var mig = this, fundet = null;
+        this.parListe().forEach(function (par) {
+            if (!fundet && mig.parType(par, minV) === type) fundet = par;
+        });
+        return fundet;
+    };
+
+    P.beggeParFordoblet = function () {
+        var f = this.parMed("farve", 10), l = this.parMed("lv", 10);
+        return !!(f && l && this.parFordoblet(f) && this.parFordoblet(l));
     };
 
     P.tjekBlanding = function (c) {
@@ -478,11 +505,9 @@
             case "temp":
                 return !!gj.affald || (g.glas5.maaltT !== null && g.glas5.maaltT >= 50 &&
                     g.glas6.maaltT !== null && g.glas6.maaltT <= 10 && g.glas7.maaltT !== null);
-            case "farve": return !!(gj.farveSml || this.beggeMed("frugtfarve", 20));
-            case "farveVand": return !!(gj.farveSml || (this.beggeMed("frugtfarve", 10) && this.fordoblet()));
-            case "toem": return !!(gj.lvSml || gj.toemt2);
-            case "lv": return !!(gj.lvSml || (gj.toemt2 && this.beggeMed("ligevægtsblanding", 20)));
-            case "lvVand": return !!(gj.lvSml || (gj.toemt2 && this.beggeMed("ligevægtsblanding", 10) && this.fordoblet()));
+            case "farve": return !!(gj.sml || this.parMed("farve", 10));
+            case "lv": return !!(gj.sml || this.parMed("lv", 10));
+            case "vand": return !!(gj.sml || this.beggeParFordoblet());
             default: return !!gj[id];
         }
     };
@@ -494,7 +519,7 @@
     };
 
     P.alleFaerdige = function () {
-        return !!(this.gjort.affald && this.gjort.lvSml);
+        return !!(this.gjort.affald && this.gjort.sml);
     };
 
     P.travl = function () {
@@ -502,7 +527,7 @@
     };
 
     P.markérGlas = function () {
-        this.markér(this.station === 1 ? "stativ" : "baegerV", 3);
+        this.markér(this.station === 1 ? "stativ" : "baeger1", 3);
     };
 
     /* Hint til det aktuelle trin. Genstanden, det handler om, faar en
@@ -1174,13 +1199,12 @@
             }
             this.visning = "foto";
         } else {
-            if (M.volumen(this.g.baegerV.b) < 0.3 && M.volumen(this.g.baegerH.b) < 0.3) {
+            if (!this.baegerListe().some(function (c) { return M.volumen(c.b) > 0.3; })) {
                 this.besked("Hæld noget i bægerglassene først.");
                 this.markér("flaske_farve");
                 return false;
             }
             this.visning = "ovenfra";
-            this.gemFoer();
         }
         this.sidsteVisning = this.visning;
         this.visData = this.visningData();
@@ -1281,51 +1305,71 @@
         this.aendret("billede");
     };
 
-    /* Del 2: et billede af glassene, foer det ene er fortyndet */
-    P.gemFoer = function () {
-        var runde = this.del2Runde();
-        var type = runde === "farve" ? "frugtfarve" : "ligevægtsblanding";
-        var B = [this.g.baegerV, this.g.baegerH];
-        if (!this.beggeMed(type, 20)) return;
-        var V = B.map(function (c) { return M.volumen(c.b); });
-        if (Math.max(V[0], V[1]) / Math.min(V[0], V[1]) > 1.15) return;
-        this.del2.foer[runde] = { V: V, farver: B.map(function (c) { return M.baegerOppefraFarve(M.samlet(c.b)); }) };
+    /* Del 2: de fire baegerglas ovenfra, to og to i par. Et par, hvor
+       begge glas har den samme oploesning, kan sammenlignes, saa snart
+       det ene glas er fortyndet. */
+    var PAR_TITEL = { farve: "Frugtfarve", lv: "Ligevægtsblanding" };
+
+    P.parData = function (par) {
+        var type = this.parType(par, 10);
+        var V = par.map(function (c) { return M.volumen(c.b); });
+        var lo = Math.min(V[0], V[1]), hi = Math.max(V[0], V[1]);
+        var fortyndet = type && lo >= 5 && hi / lo >= 1.3 ? (V[0] > V[1] ? 0 : 1) : -1;
+        return { type: type, V: V, fortyndet: fortyndet };
     };
 
     P.ovenfraData = function () {
-        var mig = this, B = [this.g.baegerV, this.g.baegerH];
-        var V = B.map(function (c) { return M.volumen(c.b); });
-        var lo = Math.min(V[0], V[1]), hi = Math.max(V[0], V[1]);
-        var fortyndet = lo >= 5 && hi / lo >= 1.3 ? (V[0] > V[1] ? 0 : 1) : -1;
-        var runde = this.del2Runde();
-        var vurd = this.del2.vurdering && this.del2.vurdering.runde === runde ? this.del2.vurdering : null;
-        var tekst = lo < 0.3 ? "Hæld noget i begge bægerglas." :
-            (fortyndet < 0 ? "Glassene har omtrent samme volumen." : "Det " + (fortyndet === 0 ? "venstre" : "højre") + " glas er fortyndet.");
+        var mig = this;
+        var parListe = this.parListe();
+        var par = [], glas = [], mangler = 0, klar = 0;
+        parListe.forEach(function (p) {
+            var d = mig.parData(p);
+            var vurd = d.type ? mig.del2.vurdering[d.type] : null;
+            var note;
+            if (!d.type) { note = "Hæld den samme opløsning i begge glas."; mangler++; }
+            else if (d.fortyndet < 0) { note = "Fordobl volumen i det ene glas med vand."; mangler++; }
+            else { note = Math.round(Math.min(d.V[0], d.V[1])) + " mL og " + Math.round(Math.max(d.V[0], d.V[1])) + " mL"; klar++; }
+            par.push({ titel: d.type ? PAR_TITEL[d.type] : mig.parOverskrift(p), note: note });
+            p.forEach(function (c, i) {
+                var o = M.samlet(c.b), bf = mig.bundfald(c), V = M.volumen(c.b);
+                glas.push({
+                    V: V, tom: V < 0.3,
+                    maerke: V < 0.3 ? "" : (i === d.fortyndet ? "fortyndet" : mig.indholdTekst(c)),
+                    farve: M.baegerOppefraFarve(o), bund: bf.bund, uklar: bf.uklar,
+                    kanVurderes: i === d.fortyndet,
+                    svar: vurd && vurd.idx === i ? vurd.svar : null
+                });
+            });
+        });
+        var noteret = this.del2.vurdering.farve && this.del2.vurdering.lv;
         return {
-            tekst: tekst,
-            hjaelp: fortyndet >= 0 ? "Klik på knappen under det fortyndede glas for at notere, hvad du ser." : "Fordobl volumen i det ene glas med vand, og se igen.",
-            glas: B.map(function (c, i) {
-                var o = M.samlet(c.b), bf = mig.bundfald(c);
-                return {
-                    navn: i === 0 ? "Venstre glas" : "Højre glas", V: V[i], indhold: mig.indholdTekst(c),
-                    farve: M.baegerOppefraFarve(o), bund: bf.bund, uklar: bf.uklar, tom: V[i] < 0.3,
-                    kanVurderes: i === fortyndet, svar: vurd && vurd.idx === i ? vurd.svar : null
-                };
-            })
+            tekst: "Begge par fik lige meget i de to glas. Kun det ene glas i hvert par er fortyndet.",
+            hjaelp: mangler ? "Gør begge par færdige, og se igen." :
+                (noteret ? "Luk visningen, når begge par er noteret." :
+                 "Klik på knappen under det fortyndede glas i hvert par for at notere, hvad du ser."),
+            par: par, glas: glas
         };
     };
 
-    P.vurderOvenfra = function (i) {
-        var d = this.ovenfraData();
-        if (!d.glas[i] || !d.glas[i].kanVurderes) return false;
-        var B = [this.g.baegerV, this.g.baegerH];
-        var runde = this.del2Runde();
-        var gammel = this.del2.vurdering && this.del2.vurdering.runde === runde && this.del2.vurdering.idx === i ? this.del2.vurdering : null;
-        var nu = gammel ? SVAR_OVENFRA.indexOf(gammel.svar) : -1;
+    /* Overskriften over et par, der endnu ikke kan sammenlignes */
+    P.parOverskrift = function (par) {
+        var a = this.indholdTekst(par[0]), b = this.indholdTekst(par[1]);
+        if (a === "tomt" && b === "tomt") return "Tomme glas";
+        return a === b ? a.charAt(0).toUpperCase() + a.slice(1) : "Forskelligt indhold";
+    };
+
+    /* Et klik paa knappen under et glas skifter mellem de tre svar */
+    P.vurderOvenfra = function (n) {
+        var par = this.parListe()[n < 2 ? 0 : 1];
+        var i = n % 2;
+        var d = this.parData(par);
+        if (!d.type || i !== d.fortyndet) return false;
+        var gammel = this.del2.vurdering[d.type];
+        var nu = gammel && gammel.idx === i ? SVAR_OVENFRA.indexOf(gammel.svar) : -1;
         var svar = SVAR_OVENFRA[(nu + 1) % SVAR_OVENFRA.length];
-        var a = M.samlet(B[i].b), b = M.samlet(B[1 - i].b);
-        this.del2.vurdering = {
-            runde: runde, idx: i, svar: svar, faktisk: M.sammenlignOvenfra(a, b),
+        var a = M.samlet(par[i].b), b = M.samlet(par[1 - i].b);
+        this.del2.vurdering[d.type] = {
+            idx: i, svar: svar, faktisk: M.sammenlignOvenfra(a, b),
             V: [a.V, b.V], farver: [M.baegerOppefraFarve(a), M.baegerOppefraFarve(b)]
         };
         if (NK.Lyd) NK.Lyd.klik();
@@ -1335,20 +1379,18 @@
     };
 
     P.tjekOvenfra = function () {
-        var runde = this.del2Runde(), v = this.del2.vurdering;
-        if (!v || v.runde !== runde || this.gjort[runde + "Sml"]) return;
-        var type = runde === "farve" ? "frugtfarve" : "ligevægtsblanding";
-        if (!this.beggeMed(type, 10)) {
-            this.besked(runde === "farve" ? "Begge glas skal indeholde frugtfarve." : "Begge glas skal indeholde ligevægtsblanding.");
+        var v = this.del2.vurdering;
+        if (this.gjort.sml || (!v.farve && !v.lv)) return;
+        if (!v.farve || !v.lv) {
+            this.besked("Notér det fortyndede glas i begge par.");
             return;
         }
-        if (!this.fordoblet()) {
-            this.besked("Volumen er ikke fordoblet. Det fortyndede glas skal have dobbelt så meget som det andet.");
-            return;
-        }
-        this.gjort[runde + "Sml"] = true;
-        this.del2.resultat[runde] = { svar: v.svar, faktisk: v.faktisk, V: v.V, farver: v.farver, foer: this.del2.foer[runde] || null };
-        this.besked("Glassene er sammenlignet ovenfra.", "god");
+        this.gjort.sml = true;
+        this.del2.resultat = {
+            farve: { svar: v.farve.svar, faktisk: v.farve.faktisk, V: v.farve.V, farver: v.farve.farver },
+            lv: { svar: v.lv.svar, faktisk: v.lv.faktisk, V: v.lv.V, farver: v.lv.farver }
+        };
+        this.besked("De fire glas er sammenlignet ovenfra.", "god");
         if (NK.Lyd) NK.Lyd.succes();
         this.aendret("ovenfra");
     };
@@ -1694,11 +1736,6 @@
         var tm = g.termometer;
         if (this.maaler && M.volumen(this.maaler.b) > 0.1) tm.T = NK.mod(tm.T, this.maaler.b.sol.T, 1.6, dt);
         else tm.T = NK.mod(tm.T, M.TEMP.stue, 0.25, dt);
-
-        if (this.gjort.farveSml && !this.gjort.toemt2 && M.volumen(g.baegerV.b) < 0.3 && M.volumen(g.baegerH.b) < 0.3) {
-            this.gjort.toemt2 = true;
-            this.aendret("toemt2");
-        }
 
         /* Det, der svaever over et glas, bliver haengende, til glasset
            flyttes, eller til det selv traekkes vaek */
