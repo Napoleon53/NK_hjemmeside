@@ -20,7 +20,9 @@ Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺. Knapperne øverst på scenen skifter mellem to 
 
 * **Stamopløsningen står færdig** i en kolbe (20 mL 0,10 M Fe(NO₃)₃ og 20 mL
   0,10 M KSCN i 800 mL vand). Kolben hælder 30 mL i bægerglasset, og et klik
-  på bægerglasset hælder 3 mL i hvert af glas 1 til 7.
+  på bægerglasset hælder 3 mL i hvert af glas 1 til 7. Trinnet er lige så
+  gjort, hvis bægerglasset eller kolben hældes i ét glas ad gangen
+  (`alleFyldte` og `tjekFordelt` i `js/forsoeg.js`).
 * **Glas 1 til 3** får Fe(NO₃)₃ (s), ascorbinsyre (s) og KSCN (s). Spatlen tager
   en spatelspids fra pulverglasset. Det faste stof ligger som korn i bunden og
   opløses langsomt; det opløste lægger sig som et lag i bunden, til der røres
@@ -51,7 +53,10 @@ glasset** (tasten R) ryster det valgte reagensglas og spilder aldrig.
 
 * **Zoomboblen følger den valgte beholder.** Fe³⁺ og SCN⁻ danner FeSCN²⁺ og går i
   stykker igen, Ag⁺ finder SCN⁻ og danner AgSCN, og ascorbinsyre gør to Fe³⁺ til
-  Fe²⁺. K er forstærket i boblen, så der er komplekser at se.
+  Fe²⁺. K er forstærket i boblen, så der er komplekser at se. Hver partikel er
+  én kugle med formlen på, også de sammensatte ioner SCN⁻ og FeSCN²⁺, og
+  kuglerne er få og store nok til, at formlen kan læses. Navne uden formel
+  (frugtfarven) forkortes på kuglen og forklares under boblen.
 * **Intro.** Første gang siden åbnes, siger en pop-up kort, hvad forsøget
   undersøger, og hvad eleven skal gøre. Knappen Om forsøget åbner den igen.
   Den huskes i `localStorage` under `nk-sb24-intro`.
@@ -117,7 +122,7 @@ js/model.js         kemien og tallene: ligevægt, fast stof, reduktion, farver, 
 js/lyd.js           lydene med Web Audio, ingen lydfiler
 js/sprites.js       indlæser SVG'erne og tegner dem drejet om et anker
 js/scene.js         tegnebordet (1120 x 600): mål, lokalet, udstyr, billedet, ovenfra
-js/mikro.js         partikelmodellen i zoomboblen
+js/mikro.js         partikelmodellen i zoomboblen: én kugle med formlen pr. partikel
 js/forsoeg.js       trinene, tilstanden og handlingerne for begge dele
 js/bord.js          tegning af bordet og styring med musen
 js/laerer.js        Kemichaels scener i dette forsøg

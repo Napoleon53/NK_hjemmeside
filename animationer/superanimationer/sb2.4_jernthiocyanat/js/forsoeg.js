@@ -404,8 +404,8 @@
     P.trinGjort = function (id) {
         var gj = this.gjort, g = this.g;
         switch (id) {
-            case "stam": return !!(gj.affald || gj.fordelt || M.volumen(g.baegerA.b) >= 10);
-            case "fordel": return !!(gj.affald || gj.fordelt);
+            case "stam": return !!(gj.affald || gj.fordelt || this.alleFyldte() || M.volumen(g.baegerA.b) >= 10);
+            case "fordel": return !!(gj.affald || gj.fordelt || this.alleFyldte());
             case "g1": return !!gj.affald || (g.glas1.indgreb.fe > 0 && oploestOgBlandet(g.glas1));
             case "g2": return !!gj.affald || (g.glas2.indgreb.vitc > 0 && oploestOgBlandet(g.glas2));
             case "g3": return !!gj.affald || (g.glas3.indgreb.scn > 0 && oploestOgBlandet(g.glas3));
@@ -585,6 +585,23 @@
         return true;
     };
 
+    /* Er der stamoploesning i glas 1 til 7? Trinnet er gjort, uanset om der
+       blev fordelt med et klik paa baegerglasset, haeldt i ét glas ad gangen
+       eller haeldt direkte fra kolben. */
+    P.alleFyldte = function () {
+        return this.glasListe().every(function (gl) { return gl.nr > 7 || gl.fyldt; });
+    };
+
+    P.tjekFordelt = function () {
+        if (this.gjort.fordelt || !this.alleFyldte()) return false;
+        this.gjort.fordelt = true;
+        this.valgt = null;
+        this.valgtPr[1] = null;
+        this.besked("Der er stamopløsning i glas 1 til 7.", "god");
+        if (NK.Lyd) NK.Lyd.succes();
+        return true;
+    };
+
     P.tommeGlas = function () {
         return this.glasListe().filter(function (gl) {
             return gl.nr <= 7 && !gl.fyldt && gl.sted === "stativ" && M.volumen(gl.b) < M.MAENGDE.GLAS_MAKS - M.MAENGDE.BAEGER_GLAS;
@@ -697,7 +714,7 @@
     P.efterHaeldning = function (c, slags, mL, foer) {
         if (c.erGlas) {
             if (slags === "stam") {
-                if (!c.fyldt && M.volumen(c.b) > 1) { c.fyldt = true; c.vurdering = null; }
+                if (!c.fyldt && M.volumen(c.b) > 1) { c.fyldt = true; c.vurdering = null; this.tjekFordelt(); }
             } else if (slags === "kscn") {
                 c.indgreb.kscn += mL;
                 this.efterIndgreb(c, "kscn", foer);
@@ -771,7 +788,7 @@
             { kald: function () {
                 this.straale = null;
                 var o = M.samlet(c.b);
-                if (c.erGlas && !c.fyldt && o.fe + o.fe2 > 0 && M.volumen(c.b) > 1) { c.fyldt = true; c.vurdering = null; }
+                if (c.erGlas && !c.fyldt && o.fe + o.fe2 > 0 && M.volumen(c.b) > 1) { c.fyldt = true; c.vurdering = null; this.tjekFordelt(); }
                 this.tjekBlanding(c);
                 this.aendret("haeldt");
             } }
@@ -785,14 +802,7 @@
         tomme.forEach(function (gl) { liste = liste.concat(mig.haeldBaegerListe(bg, gl, M.MAENGDE.BAEGER_GLAS)); });
         liste.push(hjemTil(bg, 0.7, 30));
         liste.push({ kald: function () {
-            var alle = this.glasListe().filter(function (gl) { return gl.nr <= 7; }).every(function (gl) { return gl.fyldt; });
-            if (alle && !this.gjort.fordelt) {
-                this.gjort.fordelt = true;
-                this.valgt = null;
-                this.valgtPr[1] = null;
-                this.besked("Der er stamopløsning i glas 1 til 7.", "god");
-                if (NK.Lyd) NK.Lyd.succes();
-            }
+            this.tjekFordelt();
             this.aendret("fordel");
         } });
         this.koer(liste, "fordel");

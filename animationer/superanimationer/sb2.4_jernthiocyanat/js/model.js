@@ -176,9 +176,12 @@
 
     /* Partikelmodellen i zoomboblen: partikler pr. mM. K er forstaerket,
        saa der kan ses komplekser; det er et modelbillede, ikke et regnskab. */
+    /* Faa og store kugler: hver partikel er én kugle med formlen paa, og
+       den skal kunne laeses. Derfor er tallene lavere end koncentrationen
+       alene ville give. */
     var MIKRO = {
-        PR_MM: 4, FORSTAERK: 4, MAKS: 22, MAKS_AG: 10, MAKS_AGSCN: 12, MAKS_FE2: 14, MAKS_VITC: 6,
-        PR_MM_FARVE: 60, MAKS_FARVE: 16, VAND: 12
+        PR_MM: 3, FORSTAERK: 4, MAKS: 10, MAKS_AG: 7, MAKS_AGSCN: 9, MAKS_FE2: 10, MAKS_VITC: 4,
+        PR_MM_FARVE: 40, MAKS_FARVE: 10, VAND: 8
     };
 
     /* Bundfaldet synker (pr. sekund) og hvirvles op ved rystning */
@@ -513,14 +516,15 @@
         if (o.V < 0.01) return ud;
         var s = MIKRO.PR_MM;
         var cFe = o.fe / o.V, cS = o.scn / o.V;
-        var nFe = Math.min(MIKRO.MAKS, Math.round(cFe * s));
-        var nS = Math.min(MIKRO.MAKS, Math.round(cS * s));
         var xp = ligevaegtsKonc(K(o.T) / 1000 * MIKRO.FORSTAERK, cFe, cS);
-        var nX = Math.min(Math.round(xp * s), nFe, nS);
-        if (nX === 0 && nFe > 0 && nS > 0 && xp * s > 0.25) nX = 1;
-        ud.fe = nFe - nX;
-        ud.scn = nS - nX;
-        ud.fescn = nX;
+        /* De frie ioner rundes hver for sig. Rundes totalen foerst og
+           komplekset traekkes fra, forsvinder forskellen mellem glassene i
+           afrundingen, naar der er faa kugler. */
+        var nX = Math.round(xp * s);
+        if (nX === 0 && cFe > 0 && cS > 0 && xp * s > 0.25) nX = 1;
+        ud.fe = Math.min(MIKRO.MAKS, Math.round((cFe - xp) * s));
+        ud.scn = Math.min(MIKRO.MAKS, Math.round((cS - xp) * s));
+        ud.fescn = Math.min(MIKRO.MAKS, nX);
         ud.fe2 = Math.min(MIKRO.MAKS_FE2, Math.round(o.fe2 / o.V * s));
         ud.vitc = Math.min(MIKRO.MAKS_VITC, Math.round(o.vitc / o.V * s));
         ud.ag = Math.min(MIKRO.MAKS_AG, Math.round(o.ag / o.V * s));

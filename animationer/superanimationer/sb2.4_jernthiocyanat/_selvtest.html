@@ -159,6 +159,15 @@ function koerTest() {
     paastand("intet glas er valgt efter fordelingen", f.valgt === null);
     paastand("et klik paa draabeflasken kraever et valgt glas", f.klik("ag") === false);
 
+    /* Haeldes der i ét glas ad gangen i stedet for med et klik paa
+       baegerglasset, skal trinnene ogsaa blive gjort */
+    frisk();
+    f.klik("kolbe1"); adv(3.5);
+    for (i = 1; i <= 7; i++) { traek("baegerA", "glas" + i); adv(3.2); }
+    paastand("trinnet er ogsaa gjort, naar der haeldes i ét glas ad gangen",
+        [1, 2, 3, 4, 5, 6, 7].every(function (k) { return G(k).fyldt; }) && f.trinGjort("fordel") && f.trinGjort("stam"),
+        komma(V(G(7))) + " mL i glas 7");
+
     paastand("pulverglasset med Fe(NO3)3 traekkes til glas 1", traek("pulver_fe", "glas1"));
     adv(4);
     paastand("glas 1 har fast stof, og pulverglasset er hjemme", G(1).indgreb.fe === 1 && M.fastIalt(G(1).b) > 0 && Math.abs(f.g.pulver_fe.p.x - f.g.pulver_fe.hjem.x) < 1 && !f.handling, komma(M.fastIalt(G(1).b)) + " µmol");

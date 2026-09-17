@@ -11,6 +11,10 @@
      Ag+ finder SCN- og danner AgSCN, der synker         (faeld)
      C6H8O6 finder to Fe3+ og goer dem til Fe2+          (reduk)
 
+   Hver partikel er én kugle med formlen paa: en sammensat ion som SCN⁻
+   eller FeSCN²⁺ er én kugle, ikke flere atomer, der sidder sammen.
+   Derfor er kuglerne faa og store nok til, at formlen kan laeses.
+
    Tilsaettes der ioner, falder de ned oppefra. Fortyndes der, toner
    partikler ud. Vandmolekylerne ligger svagt i baggrunden.
 
@@ -26,14 +30,17 @@
     var r = NK.r;
 
     var TYPER = ["fe", "scn", "fescn", "fe2", "vitc", "ag", "agscn", "farvestof", "vand"];
-    var RADIUS = { fe: 11, scn: 11, fescn: 16, fe2: 10, vitc: 12, ag: 9.5, agscn: 11, farvestof: 12, vand: 6 };
+    /* Kuglen skal have plads til formlen: en enkelt ion fylder 14, en lang
+       formel som FeSCN2+ op til 24 */
+    var RADIUS = { fe: 13, scn: 15, fescn: 23, fe2: 13, vitc: 19, ag: 11.5, agscn: 18, farvestof: 14, vand: 6.5 };
     var FART = { fe: 22, scn: 26, fescn: 16, fe2: 22, vitc: 18, ag: 28, agscn: 0, farvestof: 14, vand: 16 };
 
     /* Pladserne til AgSCN i bunden */
     var BUNDPLADS = [
-        { x: 0, y: 84 }, { x: -22, y: 82 }, { x: 22, y: 82 }, { x: -43, y: 76 }, { x: 43, y: 76 },
-        { x: -11, y: 66 }, { x: 11, y: 66 }, { x: -32, y: 62 }, { x: 32, y: 62 }, { x: -60, y: 64 },
-        { x: 60, y: 64 }, { x: 0, y: 50 }
+        { x: 0, y: 72 }, { x: -33, y: 68 }, { x: 33, y: 68 },
+        { x: -17, y: 44 }, { x: 17, y: 44 }, { x: -50, y: 40 }, { x: 50, y: 40 },
+        { x: 0, y: 18 }, { x: -34, y: 14 }, { x: 34, y: 14 },
+        { x: -17, y: -10 }, { x: 17, y: -10 }
     ];
 
     NK.Mikro = function () {
@@ -326,8 +333,8 @@
                 if (h.t > 0.35) {
                     var kk = h.k, c = Math.cos(kk.a), s = Math.sin(kk.a);
                     this.fjern(kk);
-                    var fe = this.ny("fe", kk.x - c * 9, kk.y - s * 9, -c * 50, -s * 50);
-                    var sc = this.ny("scn", kk.x + c * 11, kk.y + s * 11, c * 50, s * 50);
+                    var fe = this.ny("fe", kk.x - c * 15, kk.y - s * 15, -c * 55, -s * 55);
+                    var sc = this.ny("scn", kk.x + c * 17, kk.y + s * 17, c * 55, s * 55);
                     fe.alfa = 1;
                     sc.alfa = 1;
                     this.blink.push({ x: kk.x, y: kk.y, liv: 1, farve: "255, 230, 150" });
@@ -427,17 +434,16 @@
        TEGNING
        ================================================================ */
     var UDSEENDE = {
-        fe:    { lys: "#ffd98a", moerk: "#a4610f" },
-        fescn: { lys: "#ffb08a", moerk: "#9b2d12" },
-        fe2:   { lys: "#e4f7d6", moerk: "#6f9a5a" },
-        ag:    { lys: "#ffffff", moerk: "#8a949e" },
-        agscn: { lys: "#ffffff", moerk: "#b3bac2" },
-        blaa:  { lys: "#8fb6ff", moerk: "#1f4fa8" },
-        s:     { lys: "#fff08a", moerk: "#a98a0c" },
-        c:     { lys: "#b4bcc6", moerk: "#4a525c" },
-        n:     { lys: "#9ec0ff", moerk: "#2a4ea8" },
-        o:     { lys: "#ff9a90", moerk: "#b8332a" },
-        h:     { lys: "#ffffff", moerk: "#aab4bf" }
+        fe:        { lys: "#ffd98a", moerk: "#a4610f" },
+        fescn:     { lys: "#ff9c72", moerk: "#8d2410" },
+        fe2:       { lys: "#dcf2c9", moerk: "#5f8a48", tekst: "#2c3a22" },
+        scn:       { lys: "#cadcff", moerk: "#2f4e8c" },
+        vitc:      { lys: "#ffeeae", moerk: "#96760f", tekst: "#3a2f06" },
+        ag:        { lys: "#ffffff", moerk: "#7d8792", tekst: "#2b3238" },
+        agscn:     { lys: "#f4f6f8", moerk: "#98a1a9", tekst: "#2b3238" },
+        farvestof: { lys: "#8fb6ff", moerk: "#1f4fa8" },
+        o:         { lys: "#ff9a90", moerk: "#b8332a" },
+        h:         { lys: "#ffffff", moerk: "#aab4bf" }
     };
 
     var ETIKET = {
@@ -447,79 +453,55 @@
     };
     NK.Mikro.ETIKET = ETIKET;
 
+    /* Navne, der er for lange til kuglen, forkortes, og forklaringen staar
+       under boblen */
+    var KORT = { farvestof: "F" };
+    NK.Mikro.KORT = KORT;
+
+    /* Den stoerste skrift, formlen kan staa med paa kuglen. Regnes én gang
+       pr. slags og gemmes. */
+    var SKRIFT = {};
+    function skriftMaal(ctx, type) {
+        if (SKRIFT[type]) return SKRIFT[type];
+        var tekst = KORT[type] || ETIKET[type], str = RADIUS[type] * 0.95;
+        for (var n = 0; n < 8 && str > 6; n++) {
+            ctx.font = "800 " + str.toFixed(1) + "px 'Segoe UI', sans-serif";
+            if (ctx.measureText(tekst).width <= RADIUS[type] * 1.85) break;
+            str *= 0.88;
+        }
+        SKRIFT[type] = { tekst: tekst, str: str };
+        return SKRIFT[type];
+    }
+
     function etiket(ctx, tekst, x, y, farve, stoerrelse) {
-        ctx.font = "700 " + stoerrelse + "px 'Segoe UI', sans-serif";
+        ctx.font = "800 " + stoerrelse + "px 'Segoe UI', sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.lineWidth = 3;
-        ctx.strokeStyle = "rgba(10, 12, 18, 0.55)";
+        ctx.strokeStyle = "rgba(10, 12, 18, 0.45)";
         ctx.lineJoin = "round";
         ctx.strokeText(tekst, x, y + 0.5);
         ctx.fillStyle = farve;
         ctx.fillText(tekst, x, y + 0.5);
     }
 
-    function tegnSCN(ctx, x, y, a) {
-        var c = Math.cos(a), s = Math.sin(a);
-        ctx.strokeStyle = "#3a4048";
-        ctx.lineWidth = 2.6;
-        ctx.lineCap = "round";
-        ctx.beginPath();
-        ctx.moveTo(x - c * 9, y - s * 9);
-        ctx.lineTo(x + c * 8, y + s * 8);
-        ctx.stroke();
-        NK.kugle(ctx, x + c * 8, y + s * 8, 4.6, UDSEENDE.n.lys, UDSEENDE.n.moerk);
-        NK.kugle(ctx, x, y, 4, UDSEENDE.c.lys, UDSEENDE.c.moerk);
-        NK.kugle(ctx, x - c * 9, y - s * 9, 5.8, UDSEENDE.s.lys, UDSEENDE.s.moerk);
+    /* Én kugle med formlen paa. Sammensatte ioner er ikke flere kugler,
+       der sidder sammen, men én med hele formlen. */
+    function tegnKugle(ctx, p) {
+        var u = UDSEENDE[p.type];
+        var s = skriftMaal(ctx, p.type);
+        NK.kugle(ctx, p.x, p.y, p.rad, u.lys, u.moerk);
+        etiket(ctx, s.tekst, p.x, p.y, u.tekst || "#ffffff", s.str);
     }
 
-    function tegnFeSCN(ctx, x, y, a, glød) {
-        var c = Math.cos(a), s = Math.sin(a);
-        if (glød) NK.skaer(ctx, x, y, 26, "rgba(235, 60, 35, 0.6)", 0.8);
-        ctx.strokeStyle = "#3a4048";
-        ctx.lineWidth = 2.6;
-        ctx.lineCap = "round";
+    /* Bundfaldet: samme kugle med en lys kant, saa det ses, at det er fast */
+    function tegnFast(ctx, p) {
+        tegnKugle(ctx, p);
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.55)";
+        ctx.lineWidth = 1.4;
         ctx.beginPath();
-        ctx.moveTo(x - c * 8, y - s * 8);
-        ctx.lineTo(x + c * 20, y + s * 20);
+        ctx.arc(p.x, p.y, p.rad, 0, Math.PI * 2);
         ctx.stroke();
-        NK.kugle(ctx, x + c * 4, y + s * 4, 4.4, UDSEENDE.n.lys, UDSEENDE.n.moerk);
-        NK.kugle(ctx, x + c * 11, y + s * 11, 3.8, UDSEENDE.c.lys, UDSEENDE.c.moerk);
-        NK.kugle(ctx, x + c * 19, y + s * 19, 5.4, UDSEENDE.s.lys, UDSEENDE.s.moerk);
-        NK.kugle(ctx, x - c * 9, y - s * 9, 10, UDSEENDE.fescn.lys, UDSEENDE.fescn.moerk);
-    }
-
-    /* Ascorbinsyre: en femring med to O-atomer */
-    function tegnVitc(ctx, x, y, a) {
-        var i, pkt = [];
-        for (i = 0; i < 5; i++) {
-            var v = a + i * Math.PI * 2 / 5;
-            pkt.push({ x: x + Math.cos(v) * 7, y: y + Math.sin(v) * 7 });
-        }
-        ctx.strokeStyle = "#3a4048";
-        ctx.lineWidth = 2.2;
-        ctx.beginPath();
-        pkt.forEach(function (p, k) { if (k === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y); });
-        ctx.closePath();
-        ctx.stroke();
-        pkt.forEach(function (p, k) {
-            if (k === 1 || k === 3) NK.kugle(ctx, p.x, p.y, 3.4, UDSEENDE.o.lys, UDSEENDE.o.moerk);
-            else NK.kugle(ctx, p.x, p.y, 2.8, UDSEENDE.c.lys, UDSEENDE.c.moerk);
-        });
-    }
-
-    function tegnFarvestof(ctx, x, y, a) {
-        var c = Math.cos(a), s = Math.sin(a);
-        ctx.strokeStyle = "#1c3566";
-        ctx.lineWidth = 2.4;
-        ctx.beginPath();
-        ctx.moveTo(x - c * 9, y - s * 9);
-        ctx.lineTo(x, y);
-        ctx.lineTo(x + c * 7 - s * 6, y + s * 7 + c * 6);
-        ctx.stroke();
-        NK.kugle(ctx, x - c * 9, y - s * 9, 5, UDSEENDE.blaa.lys, UDSEENDE.blaa.moerk);
-        NK.kugle(ctx, x, y, 6, UDSEENDE.blaa.lys, UDSEENDE.blaa.moerk);
-        NK.kugle(ctx, x + c * 7 - s * 6, y + s * 7 + c * 6, 4.6, UDSEENDE.blaa.lys, UDSEENDE.blaa.moerk);
     }
 
     function tegnVand(ctx, x, y, a) {
@@ -532,51 +514,14 @@
         ctx.restore();
     }
 
-    function tegnAgSCN(ctx, x, y, a) {
-        var c = Math.cos(a) * 0.3, s = Math.sin(a) * 0.3;
-        NK.kugle(ctx, x - 5 + s, y + c, 7.5, UDSEENDE.agscn.lys, UDSEENDE.agscn.moerk);
-        NK.kugle(ctx, x + 6 - s, y - 1 - c, 6.5, "#f4f6f8", "#9aa3ab");
-        NK.kugle(ctx, x + 1, y - 6, 4.5, "#ffffff", "#b9c0c7");
-    }
-
-    /* medEtiket: kun de foerste af hver slags faar formlen paa, saa boblen
-       ikke drukner i tekst. Forklaringen under boblen siger resten. */
-    function tegnPartikel(ctx, p, medEtiket) {
+    function tegnPartikel(ctx, p) {
         ctx.globalAlpha = NK.klamp(p.alfa, 0, 1) * (p.type === "vand" ? 0.45 : 1);
-        switch (p.type) {
-            case "vand":
-                tegnVand(ctx, p.x, p.y, p.a * 0.3);
-                break;
-            case "scn":
-                tegnSCN(ctx, p.x, p.y, p.a);
-                if (medEtiket) etiket(ctx, ETIKET.scn, p.x, p.y + 15, "#eef2f6", 11);
-                break;
-            case "fescn":
-                tegnFeSCN(ctx, p.x, p.y, p.a, true);
-                if (medEtiket) etiket(ctx, ETIKET.fescn, p.x, p.y + 20, "#ffd6c9", 11);
-                break;
-            case "fe":
-                NK.kugle(ctx, p.x, p.y, p.rad, UDSEENDE.fe.lys, UDSEENDE.fe.moerk);
-                if (medEtiket) etiket(ctx, ETIKET.fe, p.x, p.y, "#ffffff", 11);
-                break;
-            case "fe2":
-                NK.kugle(ctx, p.x, p.y, p.rad, UDSEENDE.fe2.lys, UDSEENDE.fe2.moerk);
-                if (medEtiket) etiket(ctx, ETIKET.fe2, p.x, p.y, "#ffffff", 10.5);
-                break;
-            case "vitc":
-                tegnVitc(ctx, p.x, p.y, p.a);
-                if (medEtiket) etiket(ctx, ETIKET.vitc, p.x, p.y + 15, "#fff1cf", 10);
-                break;
-            case "ag":
-                NK.kugle(ctx, p.x, p.y, p.rad, UDSEENDE.ag.lys, UDSEENDE.ag.moerk);
-                if (medEtiket) etiket(ctx, ETIKET.ag, p.x, p.y, "#ffffff", 10.5);
-                break;
-            case "agscn":
-                tegnAgSCN(ctx, p.x, p.y, p.a);
-                break;
-            case "farvestof":
-                tegnFarvestof(ctx, p.x, p.y, p.a);
-                break;
+        if (p.type === "vand") tegnVand(ctx, p.x, p.y, p.a * 0.3);
+        else if (p.type === "agscn") tegnFast(ctx, p);
+        else {
+            /* Komplekset er det roede, og det skal ses */
+            if (p.type === "fescn") NK.skaer(ctx, p.x, p.y, p.rad + 10, "rgba(235, 60, 35, 0.55)", 0.75);
+            tegnKugle(ctx, p);
         }
         ctx.globalAlpha = 1;
     }
@@ -618,14 +563,11 @@
 
         for (i = 0; i < this.partikler.length; i++) {
             p = this.partikler[i];
-            if (p.type === "vand") tegnPartikel(ctx, p, false);
+            if (p.type === "vand") tegnPartikel(ctx, p);
         }
-        var talt = {};
         for (i = 0; i < this.partikler.length; i++) {
             p = this.partikler[i];
-            if (p.type === "vand") continue;
-            talt[p.type] = (talt[p.type] || 0) + 1;
-            tegnPartikel(ctx, p, talt[p.type] <= 4);
+            if (p.type !== "vand") tegnPartikel(ctx, p);
         }
 
         for (i = 0; i < this.blink.length; i++) {
@@ -674,43 +616,21 @@
         return ud;
     };
 
+    /* Formlen staar paa kuglen, saa forklaringen under boblen siger kun,
+       hvad de forkortede navne betyder */
     P.tegnForklaring = function (ctx, x, y) {
-        var typer = this.typer();
-        if (!typer.length) return;
+        var linjer = this.typer().filter(function (t) { return !!KORT[t]; })
+            .map(function (t) { return KORT[t] + " = " + ETIKET[t]; });
+        if (!linjer.length) return;
         ctx.save();
         ctx.font = "600 12px 'Segoe UI', sans-serif";
-        var bredder = typer.map(function (t) { return ctx.measureText(ETIKET[t]).width + 36; });
-        var raekker = [[]], rb = [0];
-        typer.forEach(function (t, i) {
-            var n = raekker.length - 1;
-            if (rb[n] + bredder[i] > 260 && raekker[n].length) { raekker.push([]); rb.push(0); n++; }
-            raekker[n].push(i);
-            rb[n] += bredder[i];
-        });
-        var h = raekker.length * 22 + 6;
-        var maks = Math.max.apply(null, rb) + 12;
+        var bredde = 22;
+        linjer.forEach(function (t) { bredde = Math.max(bredde, ctx.measureText(t).width + 22); });
         ctx.fillStyle = "rgba(20, 22, 28, 0.88)";
-        NK.rundtRekt(ctx, x - maks / 2, y, maks, h, 10);
+        NK.rundtRekt(ctx, x - bredde / 2, y, bredde, linjer.length * 18 + 8, 9);
         ctx.fill();
-        raekker.forEach(function (rk, ri) {
-            var cx = x - rb[ri] / 2;
-            var cy = y + 14 + ri * 22;
-            rk.forEach(function (i) {
-                var t = typer[i];
-                var ix = cx + 13;
-                ctx.save();
-                ctx.translate(ix, cy);
-                if (t === "scn") { ctx.scale(0.75, 0.75); tegnSCN(ctx, 0, 0, 0); }
-                else if (t === "fescn") { ctx.scale(0.55, 0.55); tegnFeSCN(ctx, -4, 0, 0, false); }
-                else if (t === "vand") { tegnVand(ctx, 0, 0, 0); }
-                else if (t === "agscn") { ctx.scale(0.6, 0.6); tegnAgSCN(ctx, 0, 0, 0); }
-                else if (t === "vitc") { ctx.scale(0.8, 0.8); tegnVitc(ctx, 0, 0, 0); }
-                else if (t === "farvestof") { ctx.scale(0.7, 0.7); tegnFarvestof(ctx, 0, 0, 0); }
-                else { NK.kugle(ctx, 0, 0, 6.5, UDSEENDE[t].lys, UDSEENDE[t].moerk); }
-                ctx.restore();
-                NK.tekst(ctx, ETIKET[t], cx + 27, cy + 0.5, { font: "600 12px 'Segoe UI', sans-serif", linje: "middle", farve: "#cfd6de" });
-                cx += bredder[i];
-            });
+        linjer.forEach(function (t, i) {
+            NK.tekst(ctx, t, x, y + 13 + i * 18, { font: "600 12px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#cfd6de" });
         });
         ctx.restore();
     };
