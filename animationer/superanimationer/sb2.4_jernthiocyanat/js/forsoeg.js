@@ -1331,7 +1331,7 @@
             var note;
             if (!d.type) { note = "Hæld den samme opløsning i begge glas."; mangler++; }
             else if (d.fortyndet < 0) { note = "Fordobl volumen i det ene glas med vand."; mangler++; }
-            else { note = Math.round(Math.min(d.V[0], d.V[1])) + " mL og " + Math.round(Math.max(d.V[0], d.V[1])) + " mL"; klar++; }
+            else { note = Math.round(Math.min(d.V[0], d.V[1])) + " mL og " + Math.round(Math.max(d.V[0], d.V[1])) + " mL"; }
             par.push({ titel: d.type ? PAR_TITEL[d.type] : mig.parOverskrift(p), note: note });
             p.forEach(function (c, i) {
                 var o = M.samlet(c.b), bf = mig.bundfald(c), V = M.volumen(c.b);
@@ -1346,7 +1346,8 @@
         });
         var noteret = this.del2.vurdering.farve && this.del2.vurdering.lv;
         return {
-            tekst: "Begge par fik lige meget i de to glas. Kun det ene glas i hvert par er fortyndet.",
+            tekst: mangler ? "Hvert par skal have den samme opløsning i to glas, og det ene glas skal fortyndes." :
+                "Hvert par fik lige meget i de to glas. Kun det ene glas i hvert par er fortyndet.",
             hjaelp: mangler ? "Gør begge par færdige, og se igen." :
                 (noteret ? "Luk visningen, når begge par er noteret." :
                  "Klik på knappen under det fortyndede glas i hvert par for at notere, hvad du ser."),
@@ -1385,7 +1386,7 @@
         var v = this.del2.vurdering;
         if (this.gjort.sml || (!v.farve && !v.lv)) return;
         /* Noteringen skal passe paa glassene, som de staar nu: eleven kan
-           have hældt mere i, efter at parret blev noteret */
+           have haeldt mere i, efter at parret blev noteret */
         var mig = this, gyldig = true;
         [["farve", this.parMed("farve", 10)], ["lv", this.parMed("lv", 10)]].forEach(function (rk) {
             var par = rk[1], vu = v[rk[0]];
