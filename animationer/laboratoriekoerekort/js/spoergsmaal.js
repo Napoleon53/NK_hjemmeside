@@ -12,6 +12,7 @@ window.SPOERGSMAAL = [
         billede: "billeder/01_briller.svg",
         alt: "En titreringsopstilling med en burette fyldt med natriumhydroxid i et stativ og en konisk kolbe under. Ved siden af står flasken med natriumhydroxid 0,1 M. Sikkerhedsbrillerne ligger på bordet, og på væggen hænger et påbudsskilt for øjenværn.",
         spoergsmaal: "Du skal titrere med natriumhydroxid. Hvad gør du, før du går i gang?",
+        ekstra: true,
         svar: [
             { tekst: "Tager sikkerhedsbrillerne på.", rigtig: true },
             { tekst: "Skubber brillerne op i panden, så de er klar, hvis det går galt.", rigtig: false },
@@ -71,6 +72,7 @@ window.SPOERGSMAAL = [
         billede: "billeder/06_vask.svg",
         alt: "En stor flaske natriumhydroxid står på bordet ved siden af et stativ med en burette, der har en tragt i toppen. Der er spildt ved foden af stativet og på kladdehæftet. Til venstre er der en vask.",
         spoergsmaal: "Buretten skal fyldes fra den store flaske. Hvor gør du det?",
+        ekstra: true,
         svar: [
             { tekst: "Over vasken.", rigtig: true },
             { tekst: "Ved stativet på bordet. Der er alligevel spildt i forvejen.", rigtig: false },
@@ -118,6 +120,7 @@ window.SPOERGSMAAL = [
         billede: "billeder/10_hormoner.svg",
         alt: "En af drengene ved bordet overfor holder en konisk kolbe op og aflæser den koncentreret. Hjerter stiger op fra dit bord, hvor hæftet er fyldt med tegnede hjerter.",
         spoergsmaal: "Du er i brunst og får lyst til at kramme en af drengene. Hvordan vil du fortsætte?",
+        ekstra: true,
         svar: [
             { tekst: "Jeg forlader lokalet et øjeblik, så hormonerne kan få afløb i sikkerhed.", rigtig: true },
             { tekst: "Jeg krammer ham. Han har jo sikkerhedsbriller på.", rigtig: false },
@@ -154,6 +157,7 @@ window.SPOERGSMAAL = [
         billede: "billeder/13_glasudstyr.svg",
         alt: "Fire stykker glasudstyr på bordet, mærket A, B, C og D.",
         spoergsmaal: "Hvad hedder glasset mærket C?",
+        ekstra: true,
         svar: [
             { tekst: "Bægerglas", rigtig: false },
             { tekst: "Måleglas", rigtig: false },
@@ -204,6 +208,7 @@ window.SPOERGSMAAL = [
         billede: "billeder/15_traengsel.svg",
         alt: "Hele holdet trænger sig sammen ved vægtbordet for at se, mens én elev afvejer kobber(II)sulfat. Der er spildt blå krystaller omkring vægten, og en elev yderst med en vejebåd spørger: Må jeg komme til?",
         spoergsmaal: "Din gruppe skal afveje kobber(II)sulfat, og alle vil med op og se. Hvordan vil I fortsætte?",
+        ekstra: true,
         svar: [
             { tekst: "Gruppen sender én person op for at afveje.", rigtig: true },
             { tekst: "Resten af gruppen gør klar ved bordet imens.", rigtig: true },

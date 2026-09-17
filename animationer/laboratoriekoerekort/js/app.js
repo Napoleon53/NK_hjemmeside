@@ -1,22 +1,29 @@
 /* =====================================================================
    Laboratoriekoerekort - forside, proeve og resultat
 
-   Proeven tager ANTAL spoergsmaal fra puljen i spoergsmaal.js i
-   tilfaeldig raekkefoelge og blander svarene (medmindre blandSvar er
-   false). Eleven faar at vide, hvor mange svar der skal vaelges: ét svar
-   giver runde valgknapper, flere svar giver afkrydsning med en taeller.
-   Et spoergsmaal er rigtigt, naar praecis de rigtige svar er valgt.
+   Proeven tager grund-spoergsmaalene fra puljen i spoergsmaal.js (dem
+   uden ekstra: true) i samme raekkefoelge som filen, saa numrene er
+   faste. Svarene blandes stadig (medmindre blandSvar er false). Eleven
+   faar at vide, hvor mange svar der skal vaelges: ét svar giver runde
+   valgknapper, flere svar giver afkrydsning med en taeller. Et
+   spoergsmaal er rigtigt, naar praecis de rigtige svar er valgt.
    Hoejst ANDEL_FEJL af spoergsmaalene maa vaere forkerte.
+
+   Spoergsmaal markeret ekstra: true er inaktive fra start. Efter
+   afleveringen kan eleven valgfrit trykke "5 situationer mere", som
+   foejer dem til proeven og fortsaetter den.
    ===================================================================== */
 (function () {
     "use strict";
 
     var PULJE = window.SPOERGSMAAL || [];
-    var ANTAL = Infinity;      /* alle spoergsmaal; saet fx 10 for et tilfaeldigt udvalg */
+    var GRUND = PULJE.filter(function (sp) { return !sp.ekstra; });
+    var EKSTRA = PULJE.filter(function (sp) { return sp.ekstra; });
+    var ANTAL = Infinity;      /* alle grund-spoergsmaal; saet fx 10 for et tilfaeldigt udvalg */
     var ANDEL_FEJL = 0.2;
 
-    var antal = Math.min(ANTAL, PULJE.length);
-    var maksFejl = Math.floor(antal * ANDEL_FEJL);
+    var antal = Math.min(ANTAL, GRUND.length);
+    var ekstraTilfoejet = false;
 
     var proeve = [];   /* { sp, svar, krav (antal rigtige), valgt: [bool] } */
     var nr = 0;
@@ -72,8 +79,8 @@
         window.scrollTo({ top: 0, behavior: "instant" });   /* sitets style.css ruller ellers blødt */
     }
 
-    function start() {
-        proeve = PULJE.slice(0, antal).map(function (sp) {
+    function lavProever(liste) {
+        return liste.map(function (sp) {
             var svar = sp.blandSvar === false ? sp.svar.slice() : bland(sp.svar);
             return {
                 sp: sp,
@@ -82,7 +89,24 @@
                 valgt: svar.map(function () { return false; })
             };
         });
+    }
+
+    function start() {
+        ekstraTilfoejet = false;
+        proeve = lavProever(GRUND.slice(0, antal));
+        antal = proeve.length;
         nr = 0;
+        byggPrikker();
+        visSide("proeve");
+        visSpoergsmaal();
+    }
+
+    function flereSpoergsmaal() {
+        ekstraTilfoejet = true;
+        var foerste = proeve.length;
+        proeve = proeve.concat(lavProever(EKSTRA));
+        antal = proeve.length;
+        nr = foerste;
         byggPrikker();
         visSide("proeve");
         visSpoergsmaal();
@@ -212,6 +236,7 @@
         if (kanTale) window.speechSynthesis.cancel();
 
         var fejl = proeve.filter(function (p) { return !erRigtig(p); }).length;
+        var maksFejl = Math.floor(antal * ANDEL_FEJL);
         var bestaaet = fejl <= maksFejl;
 
         var titel = el("res-titel");
@@ -223,6 +248,7 @@
 
         udfyldKort(bestaaet);
         el("udskriv").hidden = !bestaaet;
+        el("flere-spoergsmaal").hidden = ekstraTilfoejet || EKSTRA.length === 0;
         byggGennemgang();
         visSide("resultat");
     }
@@ -271,7 +297,7 @@
 
     /* ----------------------------------------------------------- Start */
     el("regel-antal").textContent = antal;
-    el("regel-fejl").textContent = maksFejl;
+    el("regel-fejl").textContent = Math.floor(antal * ANDEL_FEJL);
     el("spoergsmaal").setAttribute("tabindex", "-1");
 
     if (kanTale) {
@@ -294,4 +320,5 @@
     });
     el("igen").addEventListener("click", start);
     el("udskriv").addEventListener("click", function () { window.print(); });
+    el("flere-spoergsmaal").addEventListener("click", flereSpoergsmaal);
 })();
