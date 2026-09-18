@@ -132,10 +132,9 @@
 
         /* ----- Rundvisningen --------------------------------------------- */
         "rundvisning": [
-            { sel: "#scene", titel: "Bordet", tekst: "Klik viser, træk gør. Tag fat i kolben, og slip den over et glas for at hælde." },
-            { sel: "#glas-kort", titel: "Det valgte glas", tekst: "Klik på et glas, og se rumfang, temperatur og partiklerne i zoomboblen. Indholdet i tal folder du ud under boblen." },
+            { sel: "#scene", titel: "Bordet", tekst: "Klik viser, træk gør. Tag fat i kolben, og slip den over et glas for at hælde. Bordpladen er dyb, så du kan stille ting foran stativet." },
+            { sel: "#glas-kort", titel: "Det valgte glas", tekst: "Klik på et glas, og se rumfang og temperatur her. Indholdet i tal folder du ud, og partiklerne ses i zoomboblen øverst til venstre over bordet." },
             { sel: "#teori-kort-ramme", titel: "Ligevægten", tekst: "Reaktionen, det hele handler om. Knappen åbner teorien bag hvert indgreb — det gør tasten T også." },
-            { sel: "#logbog-kort", titel: "Logbog", tekst: "Notér dine aflæsninger undervejs. Knappen skriver det valgte glas' tal ind." },
             { sel: "#uheld-kort", titel: "Uheld", tekst: "Det, der kan gå galt, går galt. Kemichael kommer og tørrer op." },
             { sel: "#forfraknap", titel: "Start forfra", tekst: "Rydder bordet og stiller alt tilbage." }
         ]

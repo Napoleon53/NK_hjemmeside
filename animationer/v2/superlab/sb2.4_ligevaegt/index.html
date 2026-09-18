@@ -38,7 +38,6 @@
         <div class="kort fremhaev" id="glas-kort">
             <h2><span id="glas-titel">Det valgte glas</span> <span class="taeller" id="glas-volumen"></span></h2>
             <p class="besked" id="glas-tom">Klik på et glas for at se, hvad der er i.</p>
-            <canvas class="boble" id="boble-laerred" aria-label="Zoom: partiklerne i det valgte glas" hidden></canvas>
             <p class="besked" id="glas-temp" hidden></p>
             <details class="fold" id="glas-indhold-fold" hidden>
                 <summary>Indhold</summary>
@@ -62,15 +61,6 @@
             <div class="knaprad">
                 <button class="knap" id="teori-aabn" type="button" title="Teorien bag forsøget (T)">Læs teorien</button>
             </div>
-        </div>
-
-        <div class="kort" id="logbog-kort">
-            <h2>Logbog</h2>
-            <div class="knaprad">
-                <button class="knap blaa" id="logbog-noter" type="button" title="Skriv det valgte glas' aflæsning i logbogen"><span>Notér aflæsning</span><span class="tegn">✎</span></button>
-                <button class="knap" id="logbog-ryd" type="button" title="Slet logbogen">Ryd</button>
-            </div>
-            <textarea class="logbog" id="logbog-tekst" rows="6" placeholder="Dine egne noter. Knappen skriver det valgte glas' rumfang, temperatur og indhold."></textarea>
         </div>
 
         <div class="kort" id="uheld-kort">

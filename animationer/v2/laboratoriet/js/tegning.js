@@ -63,16 +63,32 @@
 
         if (v && v.plakat) T.tegnPlakat(ctx, v.plakat);
 
-        /* Bordplade og forkant */
+        /* Bordplade og forkant. Med dybde (Sc.DYBDE) er pladen en flade fra
+           bagkanten (BORD) ned til forkanten (Sc.FORKANT), som man ser lidt
+           ovenfra; uden dybde er den en smal kant som foer. */
+        var FORKANT = Sc.FORKANT === undefined ? BORD : Sc.FORKANT;
+        if (FORKANT > BORD) {
+            var pl = ctx.createLinearGradient(0, BORD, 0, FORKANT);
+            pl.addColorStop(0, "#2f343e");
+            pl.addColorStop(1, "#3a3f4a");
+            ctx.fillStyle = pl;
+            ctx.fillRect(-2000, BORD, BREDDE + 4000, FORKANT - BORD);
+            /* Skygge, hvor vaeggen moeder pladen */
+            var sk = ctx.createLinearGradient(0, BORD, 0, BORD + 10);
+            sk.addColorStop(0, "rgba(0, 0, 0, 0.28)");
+            sk.addColorStop(1, "rgba(0, 0, 0, 0)");
+            ctx.fillStyle = sk;
+            ctx.fillRect(-2000, BORD, BREDDE + 4000, 10);
+        }
         ctx.fillStyle = "#3b404b";
-        ctx.fillRect(-2000, BORD, BREDDE + 4000, 9);
+        ctx.fillRect(-2000, FORKANT, BREDDE + 4000, 9);
         ctx.fillStyle = "rgba(255, 255, 255, 0.12)";
-        ctx.fillRect(-2000, BORD, BREDDE + 4000, 1.5);
-        var f = ctx.createLinearGradient(0, BORD + 9, 0, HOEJDE);
+        ctx.fillRect(-2000, FORKANT, BREDDE + 4000, 1.5);
+        var f = ctx.createLinearGradient(0, FORKANT + 9, 0, HOEJDE);
         f.addColorStop(0, "#23262e");
         f.addColorStop(1, "#16181d");
         ctx.fillStyle = f;
-        ctx.fillRect(-2000, BORD + 9, BREDDE + 4000, 2000);
+        ctx.fillRect(-2000, FORKANT + 9, BREDDE + 4000, 2000);
     };
 
     /* Plakaten med sikkerhedsreglerne. p: { x, y, regel: 0-3 (fremhaevet) } */

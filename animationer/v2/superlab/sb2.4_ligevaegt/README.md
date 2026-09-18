@@ -16,7 +16,7 @@ kører med tekst, hint og en liste i panelet, og billedet af glas 1 til 7
 lader eleven notere sine iagttagelser. Kemichael siger selv forløbets
 bemærkninger og et par tørre ord, når et trin er gjort. Del 2 om
 fortynding, quizzen og tegneserien mangler. `_selvtest.html` kører det hele
-igennem i femten afsnit.
+igennem i seksten afsnit.
 
 ## Filer
 
@@ -38,11 +38,20 @@ aflæsningen af det valgte glas, zoomboblen, beskeden på scenen,
 lydknappen, introen, teoriboksen, rundvisningen, tastaturet, logbogen og
 Start forfra — ligger nu i `../../laboratoriet/js/side.js`.
 
-**Panelet** holder kun det, man bruger undervejs. Indholdet af det valgte
-glas i tal er foldet sammen under zoomboblen (»Indhold«), og ligevægten
-står i sit eget kort hele tiden. Teorien bag hvert indgreb ligger i
-teoriboksen, som åbnes med knappen Teori, med »Læs teorien« under ligningen
-eller med tasten T.
+**Panelet** holder kun det, man bruger undervejs: det valgte glas' rumfang,
+temperatur og pH med indholdet i tal foldet sammen (»Indhold«), forløbet,
+ligevægten og uheldene. Der er ingen logbog i dette forsøg; journalen
+(billedet af de syv glas) er elevens notater. Teorien bag hvert indgreb
+ligger i teoriboksen, som åbnes med knappen Teori, med »Læs teorien« under
+ligningen eller med tasten T.
+
+**Scenen** står forneden i lærredet (`lodret: "bund"` i `NK.BORD_VALG`),
+så den tomme plads er over bordet. Dér står zoomboblen fast i øverste
+venstre hjørne (`boble: { hjoerne: true }`, radius 144), lige stor uanset
+zoom, med en stiplet streg ned til det glas, den kigger ind i, og glassets
+navn under sig. Bordpladen er 64 dyb (`bordDybde`), så man kan stille ting
+foran stativet; det forreste tegnes forrest. Spatlen, glasstaven og
+termometeret ligger forrest fra start.
 
 ## Kemien
 

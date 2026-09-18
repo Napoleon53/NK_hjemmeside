@@ -52,7 +52,7 @@
         pulver("pulver_fe",   410, "Fe(NO₃)₃", "pulverglasset med Fe(NO₃)₃", "Fe(NO3)3(s)"),
         pulver("pulver_asc",  454, "C-vitamin", "pulverglasset med ascorbinsyre", "Asc(s)"),
         pulver("pulver_kscn", 498, "KSCN", "pulverglasset med KSCN", "KSCN(s)"),
-        { navn: "spatel", type: "spatel", p: { x: 548, y: 495, v: 0 } },
+        { navn: "spatel", type: "spatel", p: { x: 548, y: 550, v: 0 } },
 
         /* Flasken og draabeflasken paa hylden bag bordet */
         { navn: "fl_kscn", type: "flaske", x: 320, y: HYLDE, etiket: ["KSCN", "0,1 M"],
@@ -71,9 +71,9 @@
         { navn: "glas7", type: "reagensglas", stativ: "stativ", hul: 6, nr: 7, titel: "glas 7" },
         { navn: "glas8", type: "reagensglas", stativ: "stativ", hul: 7, nr: 8, titel: "glas 8" },
 
-        /* Maaleudstyret */
-        { navn: "glasstav", type: "glasstav", x: 1010 },
-        { navn: "termometer", type: "termometer", x: 1060 },
+        /* Maaleudstyret ligger forrest paa bordpladen */
+        { navn: "glasstav", type: "glasstav", x: 1000, y: 546 },
+        { navn: "termometer", type: "termometer", x: 1070, y: 562 },
 
         /* Vandbadet staar paa varmepladen og varmes, naar eleven taender
            den. Isbadet holdes paa 2 grader (holdT: isen fyldes efter).
@@ -89,10 +89,14 @@
           indhold: opl(500, {}) }
     ];
 
+    /* Bordpladen er 64 dybt, saa der er plads til at stille ting foran
+       stativet. Tegnebordet staar forneden i laerredet (lodret: "bund"),
+       saa den tomme plads er over bordet, og dér staar zoomboblen fast i
+       hjoernet, lige stor uanset zoom. */
     NK.BORD_VALG = {
-        bredde: 1520, hoejde: 600, bord: 500,
+        bredde: 1520, hoejde: 650, bord: 500, bordDybde: 64, lodret: "bund",
         hylder: [{ x0: 16, x1: 230, y: 268 }, { x0: 280, x1: 470, y: HYLDE }],
         plakat: { x: 1330, y: 90 },
-        bobleR: 128, partikler: 6
+        boble: { hjoerne: true }, bobleR: 144, partikler: 6
     };
 }());

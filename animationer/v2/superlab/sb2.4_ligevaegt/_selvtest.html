@@ -71,20 +71,32 @@ function koerTest() {
     var klar = alle.filter(function (n) { return NK.Sprites.klar(n); });
     paastand("sprites er indlaest", klar.length === alle.length, klar.length + " af " + alle.length);
 
-    /* Panelets stil kommer fra grund.css: laerredet skal have plads til hele
-       zoomboblen, og aflaesningen og logbogen skal have deres stil. Da
-       stilen kun laa i proevebordets stilark, var boblen skaaret over her. */
+    /* Zoomboblen staar paa scenen, fast i laerredets oeverste venstre
+       hjoerne i pixel. Med tegnebordet forneden er den plads tom: ved fem
+       almindelige laerredsstoerrelser daekker boblen intet udstyr og ingen
+       hylde. Stoerrelserne regnes; laerredet aendres ikke. */
     var valgtFoer = bord.valgt;
-    bord.vaelg("glas1");
-    side.tegnBoble();
-    var bl = d.getElementById("boble-laerred").getBoundingClientRect();
-    paastand("zoomboblen har plads til hele boblen",
-        bl.width >= 2 * bord.bobleR && bl.height >= 2 * bord.bobleR,
-        Math.round(bl.width) + " x " + Math.round(bl.height) + " til radius " + bord.bobleR);
     var vin = ramme.contentWindow;
-    paastand("aflaesningen og logbogen har deres stil",
-        vin.getComputedStyle(d.getElementById("glas-indhold")).borderCollapse === "collapse" &&
-        vin.getComputedStyle(d.getElementById("logbog-tekst")).resize === "vertical");
+    var Sc = NK.Scene;
+    paastand("zoomboblen staar paa scenen og ikke i panelet",
+        !d.getElementById("boble-laerred") && !!bord.boble && !!bord.boble.hjoerne && bord.bobleR === 144);
+    var br = bord.bobleRekt(), daekker = [];
+    [[1490, 1027], [936, 715], [850, 667], [664, 715], [2130, 1027]].forEach(function (lr) {
+        var sk = Sc.skala(lr[0], lr[1]);
+        var x0 = (br.x - sk.dx) / sk.s, x1 = (br.x + br.b - sk.dx) / sk.s;
+        var y0 = (br.y - sk.dy) / sk.s, y1 = (br.y + br.h - sk.dy) / sk.s;
+        bord.liste.forEach(function (gg) {
+            if (!bord.synlig(gg)) return;
+            var rk = bord.rekt(gg, 0);
+            if (rk.x < x1 && rk.x + rk.b > x0 && rk.y < y1 && rk.y + rk.h > y0) daekker.push(lr[0] + "x" + lr[1] + " " + gg.navn);
+        });
+        (Sc.HYLDER || []).forEach(function (H) {
+            if (H.x0 < x1 && H.x1 > x0 && H.y < y1 && H.y + 7 > y0) daekker.push(lr[0] + "x" + lr[1] + " hylde");
+        });
+    });
+    paastand("zoomboblen daekker intet paa bordet ved fem skaermstoerrelser", daekker.length === 0, daekker.join(", ") || "fri");
+    paastand("aflaesningen har sin stil",
+        vin.getComputedStyle(d.getElementById("glas-indhold")).borderCollapse === "collapse");
 
     /* Indholdet i tal er foldet sammen som udgangspunkt, og folden er
        skjult, naar der ikke er noget at vise */
@@ -448,6 +460,43 @@ function koerTest() {
         if (huskUheld !== null) ramme.contentWindow.localStorage.setItem("nk-kemichael", huskUheld);
         else ramme.contentWindow.localStorage.removeItem("nk-kemichael");
     } catch (e) { /* ingen localStorage */ }
+    NK.startForfra();
+
+    overskrift("16. Bordets dybde");
+    /* Bordpladen er en flade: noget kan stilles foran stativet, og det
+       forreste tegnes og rammes foerst */
+    var bg = bord.g.baeger, stv = bord.g.stativ, sp = bord.g.spatel;
+    function stilMedFod(gg, x, fodY, musY) {
+        bord.frigoer(gg);
+        var f0 = bord.fod(gg);
+        gg.p.x += x - f0.x;
+        gg.p.y += fodY - f0.y;
+        return bord.saetNed(gg, { x: x, y: musY === undefined ? fodY : musY });
+    }
+    function bundAf(gg) { return gg.p.y - gg.anker.y + gg.type.h; }
+    paastand("bordpladen har dybde, og tegnebordet staar forneden",
+        Sc.DYBDE === 64 && Sc.FORKANT === 564 && Sc.LODRET === "bund");
+    paastand("vaerktoejet ligger forrest fra start",
+        ["spatel", "glasstav", "termometer"].every(function (n) {
+            return bord.dybdeAf(bord.g[n]) > Sc.BORD && bord.liste.indexOf(bord.g[n]) > bord.liste.indexOf(stv);
+        }));
+    stilMedFod(bg, 700, 540);
+    paastand("et baegerglas kan stilles foran stativet",
+        Math.abs(bundAf(bg) - 540) < 0.5 && bord.staarPaaBord(bg), tal(bundAf(bg), 0));
+    var iB = bord.liste.indexOf(bg);
+    paastand("og tegnes foran stativet og glassene i det",
+        iB > bord.liste.indexOf(stv) && [1, 2, 3, 4, 5, 6, 7, 8].every(function (i) { return bord.liste.indexOf(g(i)) < iB; }));
+    var rkB = bord.rekt(bg, 0);
+    paastand("det forreste rammes foerst med musen", bord.hvad({ x: rkB.x + rkB.b / 2, y: rkB.y + 12 }) === "baeger");
+    stilMedFod(bg, 700, 600, 560);
+    paastand("slippes det laengere fremme, staar det paa forkanten", Math.abs(bundAf(bg) - Sc.FORKANT) < 0.5, tal(bundAf(bg), 0));
+    stilMedFod(bg, 700, 470);
+    paastand("slippes det i luften over bordet, staar det ved bagkanten", Math.abs(bundAf(bg) - Sc.BORD) < 0.5, tal(bundAf(bg), 0));
+    stilMedFod(sp, 800, 560, Sc.FORKANT + 40);
+    adv(1);
+    paastand("slippes noget foran forkanten, falder det paa gulvet", sp.p.y > Sc.FORKANT + 40, tal(sp.p.y, 0));
+    try { bord.tegn(); paastand("bordet tegnes med dybde og boble uden fejl", true); }
+    catch (e) { paastand("bordet tegnes med dybde og boble uden fejl", false, e.message); }
     NK.startForfra();
 }
 

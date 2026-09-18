@@ -23,6 +23,21 @@
        paa det gentager handlingen; resten af bordet venter, til det
        traekkes vaek. En portion er hoejst en femtedel af glasset.
 
+   Bordets maal og udseende i valg (NK.BORD_VALG):
+     bredde, hoejde, bord   tegnebordet og bordpladens bagkant (y)
+     bordDybde              bordpladens dybde nedad paa tegningen. Med
+                            dybde kan noget stilles foran det, der staar
+                            ved bagkanten; det forreste tegnes forrest.
+                            0 (standard) er en smal kant som foer.
+     lodret                 "midt" (standard) eller "bund": hvor
+                            tegnebordet staar i et hoejere laerred. Med
+                            "bund" bliver den tomme plads over bordet.
+     boble                  zoomboblen paa scenen: { x, y } paa
+                            tegnebordet, eller { hjoerne: true } fast i
+                            laerredets oeverste venstre hjoerne i pixel,
+                            saa den har samme stoerrelse uanset zoom
+     bobleR                 zoomboblens radius
+
    Hooks, som siden saetter:
      vedBesked(tekst, slags)   korte beskeder til scenen
      vedAendring(grund)        noget i tilstanden aendrede sig
@@ -102,13 +117,17 @@
         S.BREDDE = valg.bredde || 1120;
         S.HOEJDE = valg.hoejde || 600;
         S.BORD = valg.bord || 500;
+        S.DYBDE = valg.bordDybde || 0;
+        S.FORKANT = S.BORD + S.DYBDE;
+        S.LODRET = valg.lodret || "midt";
         S.HYLDER = valg.hylder || (valg.hylde === undefined ? [{ x0: 16, x1: 116, y: 268 }] : (valg.hylde ? [valg.hylde] : []));
         S.HYLDE = S.HYLDER[0] || null;
         S.ANKER = S.ANKER || {};
         if (NK.Kemichael) Object.keys(NK.Kemichael.ANKER).forEach(function (n) { S.ANKER[n] = NK.Kemichael.ANKER[n]; });
         S.skala = function (b, h) {
             var s = Math.min(b / S.BREDDE, h / S.HOEJDE);
-            return { s: s, dx: (b - S.BREDDE * s) / 2, dy: (h - S.HOEJDE * s) / 2 };
+            var dy = S.LODRET === "bund" ? h - S.HOEJDE * s : (h - S.HOEJDE * s) / 2;
+            return { s: s, dx: (b - S.BREDDE * s) / 2, dy: dy };
         };
     };
 
@@ -249,6 +268,7 @@
         var mig = this;
         this.specs = specs.slice();
         specs.forEach(function (s) { mig.tilfoej(s); });
+        this.ordnDybde();
     };
 
     /* Start forfra: alt staar, som da bordet blev bygget */
@@ -261,6 +281,7 @@
         this.liste = [];
         if (NK.Sprites.FILER.kaffekop && NK.Scene.HYLDE) this.lavKaffekop();
         this.specs.forEach(function (s) { mig.tilfoej(s); });
+        this.ordnDybde();
         if (this.laererNyt) this.laererNyt();
         this.koppenVaek = false;
         this.aendret("nulstil");
@@ -379,7 +400,7 @@
         h.t = nu;
         var S = NK.Scene;
         gg.p.x = NK.klamp(pt.x - h.dx, 20, S.BREDDE - 20);
-        gg.p.y = NK.klamp(pt.y - h.dy, 40, S.BORD + 90);
+        gg.p.y = NK.klamp(pt.y - h.dy, 40, S.FORKANT + 90);
         this.slipMaal = this.maalVed(gg, pt);
         this.folgHaeldning(gg);
     };
@@ -654,13 +675,13 @@
         this.vold = 0;
         this.uro = 0;
         var paaGulv = slags === "gulv";
-        var gulv = paaGulv ? S.HOEJDE - 6 : S.BORD;
         var fod = this.fod(gg);
+        var gulv = paaGulv ? S.HOEJDE - 6 : this.bordLinje(fod.y);
         var x = NK.klamp(fod.x, 60, S.BREDDE - 60);
         if (gg.kan.holder && !B.tom(gg)) {
             var fo = B.farve(gg) || Stof.VAND;
             var farve = { r: fo.r, g: fo.g, b: fo.b, a: 0.85 };
-            sproejt(this, x, gulv - 10, farve, 20);
+            sproejt(this, x, gulv - 10, farve, 20, gulv);
             this.nyPyt(x, (t.maks || 0) > 100 ? 70 : 50, farve, gulv);
             B.toem(gg);
         }
@@ -843,7 +864,7 @@
         if (gg.kan.papir) {
             for (var k = 0; k < this.pytter.length; k++) {
                 var py = this.pytter[k];
-                if (py.vaad > 0.05 && Math.abs(pt.x - py.x) < py.rx + 30 && pt.y > NK.Scene.BORD - 60) return "pyt:" + k;
+                if (py.vaad > 0.05 && Math.abs(pt.x - py.x) < py.rx + 30 && pt.y > (py.y || NK.Scene.BORD) - 60) return "pyt:" + k;
             }
             return null;
         }
@@ -912,8 +933,9 @@
         /* Genstanden lander der, hvor den er, ikke der, hvor musen er: den
            kan vaere grebet i kanten */
         var fod = this.fod(gg);
-        if (pt && pt.y > S.BORD + 30) return this.tab(gg);
+        if (pt && pt.y > S.FORKANT + 30) return this.tab(gg);
         var x = NK.klamp(t.sprite ? fod.x : gg.p.x, 40, S.BREDDE - 40);
+        var linje = this.bordLinje(fod.y);
         /* Paa en hylde, hvis foden er lige over den */
         var hylde = null;
         (S.HYLDER || []).forEach(function (H) {
@@ -935,15 +957,43 @@
                 var hulFod = st.p.y - st.anker.y + st.type.hulY + t.h - t.anker.y;
                 if (hul >= 0 && Math.abs(this.hulX(st, hul) - fod.x) < 26 && Math.abs(fod.y - hulFod) < 70) return this.iStativ(gg, st, hul);
             }
-            this.vaelt(gg, x);
+            this.vaelt(gg, x, linje);
             return true;
         }
-        if (t.sprite) gg.p = staar(t, x, S.BORD);
-        else gg.p = { x: x, y: S.BORD - 3, v: -Math.PI / 2 };
+        if (t.sprite) gg.p = staar(t, x, linje);
+        else gg.p = { x: x, y: linje - 3, v: -Math.PI / 2 };
         gg.hjem = kopi(gg.p);
         this.tilFront(gg);
+        this.ordnDybde();
         this.haendelse("satNed", gg);
         return true;
+    };
+
+    /* Den linje paa bordpladen, noget stilles paa, naar foden er i y:
+       bagkanten, forkanten eller et sted imellem */
+    P.bordLinje = function (y) {
+        var S = NK.Scene;
+        return NK.klamp(y, S.BORD, S.FORKANT);
+    };
+
+    /* Hvor noget roerer bordet: underkanten af det, der staar frit */
+    P.dybdeAf = function (gg) {
+        var S = NK.Scene;
+        if (!S.DYBDE || gg.sted || gg.paa || gg.i || gg.skjult) return S.BORD;
+        var bund = gg.type.sprite ? gg.p.y - gg.anker.y + gg.type.h : gg.p.y + 3;
+        return bund > S.BORD + 1 && bund <= S.FORKANT + 1 ? bund : S.BORD;
+    };
+
+    /* Tegne- og traefraekkefoelgen i dybden: alt ved bagkanten beholder sin
+       indbyrdes orden (det sidst roerte oeverst), og det, der staar
+       laengere fremme, kommer efter, det forreste sidst. Uden dybde goer
+       den ingenting. */
+    P.ordnDybde = function () {
+        if (!NK.Scene.DYBDE) return;
+        var mig = this;
+        var noegle = this.liste.map(function (gg, i) { return { gg: gg, i: i, d: mig.dybdeAf(gg) }; });
+        noegle.sort(function (a, b) { return a.d - b.d || a.i - b.i; });
+        this.liste = noegle.map(function (n) { return n.gg; });
     };
 
     P.tilFront = function (gg) {
@@ -952,18 +1002,20 @@
     };
 
     /* Et reagensglas, der saettes paa bordet, vaelter */
-    P.vaelt = function (gg, x) {
+    P.vaelt = function (gg, x, linje) {
         var S = NK.Scene;
+        if (linje === undefined) linje = S.BORD;
         var mod = x > S.BREDDE / 2 ? -1 : 1;
-        gg.p = { x: x, y: S.BORD - 9, v: mod * Math.PI / 2 };
+        gg.p = { x: x, y: linje - 9, v: mod * Math.PI / 2 };
         gg.hjem = kopi(gg.p);
         this.tilFront(gg);
+        this.ordnDybde();
         if (!B.tom(gg)) {
             var fo = B.farve(gg) || Stof.VAND;
             var farve = { r: fo.r, g: fo.g, b: fo.b, a: 0.85 };
             var a = B.aabning(gg);
-            sproejt(this, a.x, a.y, farve, 14);
-            this.nyPyt(a.x, 40, farve);
+            sproejt(this, a.x, a.y, farve, 14, linje);
+            this.nyPyt(a.x, 40, farve, linje);
             gg.spildtMaerker = Stof.faremaerker(B.samlet(gg));
             B.toem(gg);
             this.uheld("vaeltet", gg, gg.titel + " væltede, og indholdet løb ud.");
@@ -1230,9 +1282,9 @@
         if (this.pytter.length > 6) this.pytter.shift();
     };
 
-    function sproejt(f, x, y, farve, n) {
+    function sproejt(f, x, y, farve, n, gulv) {
         for (var i = 0; i < n; i++) {
-            f.draaber.push({ x: x + r(-4, 4), y: y, vx: r(-240, 240), vy: -r(120, 360), rad: r(1.6, 3), liv: 1, farve: farve, fysik: true });
+            f.draaber.push({ x: x + r(-4, 4), y: y, vx: r(-240, 240), vy: -r(120, 360), rad: r(1.6, 3), liv: 1, farve: farve, fysik: true, gulv: gulv });
         }
     }
 
@@ -1552,7 +1604,7 @@
         if (!py) { this.saetNed(gg, gg.p); return false; }
         var S = NK.Scene;
         this.koer.start([
-            { flyt: gg, til: { x: py.x, y: S.BORD - 12, v: 0 }, tid: 0.4, loeft: 10 },
+            { flyt: gg, til: { x: py.x, y: (py.y || S.BORD) - 12, v: 0 }, tid: 0.4, loeft: 10 },
             { tid: 1.0, hver: function (t) {
                 gg.p.x = py.x + Math.sin(t * 18) * py.rx * 0.5;
                 py.vaad = Math.max(0, 1 - t * 1.1);
@@ -1779,7 +1831,7 @@
             dr.y += dr.vy * dt;
             dr.x += (dr.vx || 0) * dt;
             if (dr.fysik) {
-                if (dr.y > S.BORD - 1) this.draaber.splice(i, 1);
+                if (dr.y > (dr.gulv || S.BORD) - 1) this.draaber.splice(i, 1);
                 continue;
             }
             var c = dr.c;
@@ -1820,6 +1872,7 @@
         if (!gg.type.sprite || gg.sted || gg.i) return false;
         var bund = gg.p.y - gg.anker.y + gg.type.h;
         if (Math.abs(gg.p.v) >= 0.05) return false;
+        if (bund > S.BORD - 3 && bund < S.FORKANT + 3 && !gg.paa) return true;
         var underlag = [S.BORD];
         if (gg.paa) underlag.push(gg.paa.p.y - gg.paa.anker.y + gg.paa.type.plade.y);
         (S.HYLDER || []).forEach(function (H) { underlag.push(H.y); });
@@ -1892,7 +1945,7 @@
         if (this.slipMaal) {
             if (this.slipMaal.indexOf("pyt:") === 0) {
                 var py = this.pytter[+this.slipMaal.slice(4)];
-                if (py) T.tegnSlipMaal(ctx, { x: py.x - py.rx, y: S.BORD - 8, b: py.rx * 2, h: 14 }, tid);
+                if (py) T.tegnSlipMaal(ctx, { x: py.x - py.rx, y: (py.y || S.BORD) - 8, b: py.rx * 2, h: 14 }, tid);
             } else {
                 var m = this.g[this.slipMaal];
                 if (m) T.tegnSlipMaal(ctx, this.rekt(m, 0), tid);
@@ -1912,11 +1965,41 @@
         /* Zoomboblen paa scenen, hvis bordet er sat op med boble: { x, y };
            ellers tegner siden den selv med tegnBoble, fx i panelet */
         var vb = this.bobleBeholder;
-        if (this.boble && vb && this.bobleAlfa > 0.01) {
+        if (this.boble && !this.boble.hjoerne && vb && this.bobleAlfa > 0.01) {
             var fo = B.farve(vb) || Stof.VAND;
             (vb.mikro || this.mikro).tegn(ctx, this.boble.x, this.boble.y, this.bobleAlfa, tid, this.synlig(vb) ? B.aabning(vb) : null, { r: fo.r * 0.35, g: fo.g * 0.35, b: fo.b * 0.35 });
         }
         ctx.restore();
+        if (this.boble && this.boble.hjoerne && vb && this.bobleAlfa > 0.01) this.tegnBobleIHjoernet(ctx, sk, tid);
+    };
+
+    /* Zoomboblen fast i laerredets oeverste venstre hjoerne, i pixel, saa
+       den er lige stor uanset zoom. En stiplet streg viser, hvilket glas
+       den kigger ind i, og glassets navn staar under den. Med lodret:
+       "bund" er hjoernet den tomme plads over bordet. */
+    P.tegnBobleIHjoernet = function (ctx, sk, tid) {
+        var vb = this.bobleBeholder, R = this.bobleR;
+        var m = this.boble.margen === undefined ? 16 : this.boble.margen;
+        var cx = m + R, cy = m + R;
+        var fo = B.farve(vb) || Stof.VAND;
+        var forbind = null;
+        if (this.synlig(vb)) {
+            var o = B.aabning(vb);
+            forbind = { x: sk.dx + (o.x + this.forskyd) * sk.s, y: sk.dy + o.y * sk.s };
+        }
+        (vb.mikro || this.mikro).tegn(ctx, cx, cy, this.bobleAlfa, tid, forbind, { r: fo.r * 0.35, g: fo.g * 0.35, b: fo.b * 0.35 });
+        ctx.save();
+        ctx.globalAlpha = this.bobleAlfa;
+        NK.tekst(ctx, vb.titel.charAt(0).toUpperCase() + vb.titel.slice(1), cx, cy + R + 14,
+            { font: "700 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#f2c53d", kant: true, kantBredde: 3, kantFarve: "rgba(0,0,0,0.6)" });
+        ctx.restore();
+    };
+
+    /* Hvor zoomboblen i hjoernet staar, i laerredets pixel: { x, y, b, h } */
+    P.bobleRekt = function () {
+        if (!this.boble || !this.boble.hjoerne) return null;
+        var m = this.boble.margen === undefined ? 16 : this.boble.margen;
+        return { x: m, y: m, b: 2 * this.bobleR, h: 2 * this.bobleR + 26 };
     };
 
     /* Zoomboblen tegnet paa et andet laerred med centrum i (cx, cy) */
