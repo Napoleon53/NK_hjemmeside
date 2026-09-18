@@ -320,7 +320,7 @@
             document.getElementById('startside').style.display = 'none';
             iframe.style.display = 'block';
             iframe.src = filsti;
-            fuldSkaerm(filsti.indexOf('superanimationer/') >= 0);
+            fuldSkaerm(('/' + filsti).indexOf('/v2/') >= 0);
 
             var alleKnapper = document.querySelectorAll('.tab-btn');
             alleKnapper.forEach(btn => btn.classList.remove('active'));

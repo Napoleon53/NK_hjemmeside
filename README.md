@@ -43,7 +43,7 @@ C:\NK_hjemmeside\            <- selve git-repoet (github.com/Napoleon53/NK_hjemm
 │   ├── site.js              Kun mobilmenuen (siden virker uden JS)
 │   └── img\                 Logo og skærmbilleder
 ├── animationer\             De rigtige animationsfiler
-│   └── superanimationer\    Superanimationer og superlab-animationer
+│   └── v2\                  Anden generation: superanimationer og superlab
 ├── downloads\               De filer besøgende kan downloade
 └── files\
     ├── Billeder\            Billedfiler til siderne

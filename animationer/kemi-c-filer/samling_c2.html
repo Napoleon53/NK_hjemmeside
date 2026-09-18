@@ -303,9 +303,9 @@
             <button class="tab-btn" data-emne="c2.2" data-beskrivelse="Byg neutrale forbindelser af sammensatte ioner, så den samlede ladning går op." onclick="visAnimation(this, 'c2.2_salte_sammensatte_ioner.html')" title="Neutrale forbindelser"><span class="btn-num">2</span><span class="btn-text">Neutrale forbindelser</span></button>
             <button class="tab-btn" data-emne="c2.3" data-beskrivelse="Træn at navngive ionforbindelser og opskrive deres kemiske formel korrekt." onclick="visAnimation(this, 'c2.3_Ionforbindelser_navngivning.html')" title="Træn ionforbindelser"><span class="btn-num">3</span><span class="btn-text">Træn ionforbindelser</span></button>
             <button class="tab-btn" data-emne="c2.4" data-beskrivelse="Afstem fældningsreaktioner mellem ioner, hvor der dannes et bundfald." onclick="visAnimation(this, 'c2.4_afstem_faeldning.html')" title="Afstem fældning"><span class="btn-num">4</span><span class="btn-text">Afstem fældning</span></button>
-            <button class="tab-btn" data-emne="c2.5" data-beskrivelse="Dryp opløsninger på en folie, se bundfaldet og ionerne i luppen, og opskriv fældningsreaktionerne." onclick="visAnimation(this, '../superanimationer/superlab/sc2.5_faeldning/index.html')" title="Forsøg: Fældning"><span class="btn-num">5</span><span class="btn-text">Forsøg: Fældning</span></button>
-            <button class="tab-btn" data-emne="c2.6" data-beskrivelse="Animation der viser reaktionen mellem kobber og dibrom, både det du kan se og det der sker på partikelniveau." onclick="visAnimation(this, '../superanimationer/superlab/sc2.6_kobber_dibrom/index.html')" title="Forsøg: Cu+Br₂"><span class="btn-num">6</span><span class="btn-text">Forsøg: Cu+Br₂</span></button>
-            <button class="tab-btn" data-emne="c2.7" data-beskrivelse="Fæld PbI₂ af Pb(NO₃)₂ og KI, varm op til bundfaldet forsvinder, og mål opløselighedskurven." onclick="visAnimation(this, '../superanimationer/superlab/sc2.7_blyiodid/index.html')" title="Forsøg: PbI₂"><span class="btn-num">7</span><span class="btn-text">Forsøg: PbI₂</span></button>
+            <button class="tab-btn" data-emne="c2.5" data-beskrivelse="Dryp opløsninger på en folie, se bundfaldet og ionerne i luppen, og opskriv fældningsreaktionerne." onclick="visAnimation(this, '../v2/superlab/sc2.5_faeldning/index.html')" title="Forsøg: Fældning"><span class="btn-num">5</span><span class="btn-text">Forsøg: Fældning</span></button>
+            <button class="tab-btn" data-emne="c2.6" data-beskrivelse="Animation der viser reaktionen mellem kobber og dibrom, både det du kan se og det der sker på partikelniveau." onclick="visAnimation(this, '../v2/superlab/sc2.6_kobber_dibrom/index.html')" title="Forsøg: Cu+Br₂"><span class="btn-num">6</span><span class="btn-text">Forsøg: Cu+Br₂</span></button>
+            <button class="tab-btn" data-emne="c2.7" data-beskrivelse="Fæld PbI₂ af Pb(NO₃)₂ og KI, varm op til bundfaldet forsvinder, og mål opløselighedskurven." onclick="visAnimation(this, '../v2/superlab/sc2.7_blyiodid/index.html')" title="Forsøg: PbI₂"><span class="btn-num">7</span><span class="btn-text">Forsøg: PbI₂</span></button>
             <!--<button class="tab-btn" onclick="visAnimation(this, 'c2_spil_ionic_tetris.html')" title="Spil: Ionisk tetris"><span class="btn-num">8</span><span class="btn-text">Spil: Ionisk tetris</span></button>-->
 
         </div>
@@ -331,7 +331,7 @@
             document.getElementById('startside').style.display = 'none';
             iframe.style.display = 'block';
             iframe.src = filsti;
-            fuldSkaerm(filsti.indexOf('superanimationer/') >= 0);
+            fuldSkaerm(('/' + filsti).indexOf('/v2/') >= 0);
             ignorerBlurIndtil = Date.now() + 1200;
 
             var alleKnapper = document.querySelectorAll('.tab-btn');

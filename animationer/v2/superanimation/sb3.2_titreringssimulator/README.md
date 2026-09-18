@@ -154,7 +154,7 @@ Den er med vilje ikke linket ind endnu. Én linje i
 ```html
 <button class="tab-btn" data-emne="b3.2"
     data-beskrivelse="Byg din egen titrering: vælg syre, base, koncentrationer og indikator, åbn hanen og følg pH. Med ækvivalenspunkter, fordelingsdiagram og ukendte prøver."
-    onclick="visAnimation(this, '../superanimationer/superanimation/sb3.2_titreringssimulator/index.html')"
+    onclick="visAnimation(this, '../v2/superanimation/sb3.2_titreringssimulator/index.html')"
     title="Titreringssimulator"><span class="btn-num">2</span><span class="btn-text">Titreringssimulator</span></button>
 ```
 

@@ -80,7 +80,7 @@ Den er med vilje ikke linket ind endnu. Én linje i
 ```html
 <button class="tab-btn" data-emne="b2.0"
     data-beskrivelse="Fire modeller af dynamisk ligevægt: trafikken over Lillebælt, rensdyr og føde, torvets priser og til sidst N₂O₄ ⇌ 2 NO₂."
-    onclick="visAnimation(this, '../superanimationer/superanimation/sb2.0_ligevaegt_intro/index.html')"
+    onclick="visAnimation(this, '../v2/superanimation/sb2.0_ligevaegt_intro/index.html')"
     title="Dynamisk ligevægt: introduktion"><span class="btn-num">0</span><span class="btn-text">Dynamisk ligevægt</span></button>
 ```
 

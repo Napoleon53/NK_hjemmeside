@@ -226,7 +226,7 @@ Skal den nye afløse den, er det den ene linje, der skal skiftes ud — bemærk
 ```html
 <button class="tab-btn" data-emne="c2.2"
     data-beskrivelse="Byg salte af sammensatte ioner, så ladningerne går op, skriv formlen rigtigt, og se hvad der sker, når saltet opløses i vand."
-    onclick="visAnimation(this, '../superanimationer/superanimation/sc2.2_saltbygger/index.html')"
+    onclick="visAnimation(this, '../v2/superanimation/sc2.2_saltbygger/index.html')"
     title="Saltbyggeren"><span class="btn-num">2</span><span class="btn-text">Saltbyggeren</span></button>
 ```
 

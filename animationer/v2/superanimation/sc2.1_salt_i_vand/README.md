@@ -248,6 +248,6 @@ kapitlets egen mappe:
 ```html
 <button class="tab-btn" data-emne="c2.1"
     data-beskrivelse="Se vandet rive ionerne løs af en saltkrystal, og find ud af, hvor meget der overhovedet kan opløses, før resten bliver til bundfald."
-    onclick="visAnimation(this, '../superanimationer/superanimation/sc2.1_salt_i_vand/index.html')"
+    onclick="visAnimation(this, '../v2/superanimation/sc2.1_salt_i_vand/index.html')"
     title="Salt i vand"><span class="btn-num">1</span><span class="btn-text">Salt i vand</span></button>
 ```

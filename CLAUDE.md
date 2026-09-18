@@ -1,8 +1,9 @@
 # kemiformler.dk
 
-Kemi-undervisningssite: HTML/CSS/vanilla JS, ingen build-proces. Animationer i
-`animationer/superanimationer/*` (interaktive canvas-simulationer med opgaver),
-statiske sider i roden, downloads i `downloads/`.
+Kemi-undervisningssite: HTML/CSS/vanilla JS, ingen build-proces. Anden
+generations animationer ligger i `animationer/v2/` (interaktive
+canvas-simulationer med opgaver), statiske sider i roden, downloads i
+`downloads/`.
 
 ## Om brugeren
 
@@ -30,7 +31,7 @@ statiske sider i roden, downloads i `downloads/`.
 
 ## Superanimationer
 
-- Læs `animationer/superanimationer/README.md`, før der arbejdes i mappen. Den
+- Læs `animationer/v2/README.md`, før der arbejdes i mappen. Den
   skelner mellem superanimationer (et begreb i op til fire faner, Kemichael kan
   komme på besøg) og superlab-animationer (et forsøg på `laboratoriet/`,
   Kemichael er fast), og den har kravene til begge. Punkterne nedenfor om
@@ -104,7 +105,7 @@ statiske sider i roden, downloads i `downloads/`.
   ikke Na¹⁺). Gælder alle steder ladning vises: canvas-tegninger, løbende tekst,
   beregnede beskeder, tooltips og fejlbeskeder bygget af strengsammensætning.
   Mønster: `ladningHaevet`/`ladningstekst` i
-  `animationer/superanimationer/superanimation/sc2.2_saltbygger/js/kerne.js`.
+  `animationer/v2/superanimation/sc2.2_saltbygger/js/kerne.js`.
 
 ## Filstruktur
 

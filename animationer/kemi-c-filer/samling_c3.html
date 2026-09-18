@@ -299,10 +299,10 @@
                 </div>
             </div>
 
-            <button class="tab-btn" data-emne="c3.1" data-beskrivelse="Tegn elektronprikformler for molekyler, og se de bindende og ikke-bindende elektronpar." onclick="visAnimation(this, '../superanimationer/superanimation/sc3.1_elektronprikformler/index.html')" title="Elektronprikformler"><span class="btn-num">1</span><span class="btn-text">Elektronprikformler</span></button>
+            <button class="tab-btn" data-emne="c3.1" data-beskrivelse="Tegn elektronprikformler for molekyler, og se de bindende og ikke-bindende elektronpar." onclick="visAnimation(this, '../v2/superanimation/sc3.1_elektronprikformler/index.html')" title="Elektronprikformler"><span class="btn-num">1</span><span class="btn-text">Elektronprikformler</span></button>
             <button class="tab-btn" data-emne="c3.2" data-beskrivelse="Se molekylers rumlige (3D) opbygning, og hvordan atomerne er placeret i forhold til hinanden." onclick="visAnimation(this, 'c3.2_rumlig_opbygning.html')" title="Molekylers opbygning"><span class="btn-num">2</span><span class="btn-text">Molekylers opbygning</span></button>
             <button class="tab-btn" data-emne="c3.3" data-beskrivelse="Undersøg elektronegativitet, og hvordan forskelle mellem atomer giver polare bindinger." onclick="visAnimation(this, 'c3.3_elektronegativitet.html')" title="Elektronegativitet"><span class="btn-num">3</span><span class="btn-text">Elektronegativitet</span></button>
-            <button class="tab-btn" data-emne="c3.4" data-beskrivelse="Bland fem væsker to og to, og find ud af, hvorfor nogle blander sig, og andre lægger sig i lag. Anden fane: kogepunkt og destillation." onclick="visAnimation(this, '../superanimationer/superanimation/sc3.4_blandbarhed/index.html')" title="Faser/blandbarhed"><span class="btn-num">4</span><span class="btn-text">Faser/blandbarhed</span></button>
+            <button class="tab-btn" data-emne="c3.4" data-beskrivelse="Bland fem væsker to og to, og find ud af, hvorfor nogle blander sig, og andre lægger sig i lag. Anden fane: kogepunkt og destillation." onclick="visAnimation(this, '../v2/superanimation/sc3.4_blandbarhed/index.html')" title="Faser/blandbarhed"><span class="btn-num">4</span><span class="btn-text">Faser/blandbarhed</span></button>
             <button class="tab-btn" data-emne="c3.5" data-beskrivelse="Animation hvor du undersøger blandbarhed mellem forskellige stoffer og vurderer, om de er polære eller upolære." onclick="visAnimation(this, 'c3.5_eksperiment_blandbarhed.html')" title="Gæt polaritet"><span class="btn-num">5</span><span class="btn-text">Gæt polaritet</span></button>
 
         </div>
@@ -322,7 +322,7 @@
             document.getElementById('startside').style.display = 'none';
             iframe.style.display = 'block';
             iframe.src = filsti;
-            fuldSkaerm(filsti.indexOf('superanimationer/') >= 0);
+            fuldSkaerm(('/' + filsti).indexOf('/v2/') >= 0);
 
             var alleKnapper = document.querySelectorAll('.tab-btn');
             alleKnapper.forEach(btn => btn.classList.remove('active'));

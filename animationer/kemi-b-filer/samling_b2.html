@@ -302,7 +302,7 @@
             <button class="tab-btn" data-emne="b2.1" data-beskrivelse="Byg reaktionsbrøken for en ligevægt: produkter i tælleren, koefficienter som eksponenter, og faste stoffer og opløsningsmiddel udeladt." onclick="visAnimation(this, 'b2.1_ligevaegtsloven.html')" title="Ligevægtsloven"><span class="btn-num">1</span><span class="btn-text">Ligevægtsloven</span></button>
             <button class="tab-btn" data-emne="b2.2" data-beskrivelse="Seks rigtige demonstrationsforsøg med kobolt, kulsyre, krystalvand, chromat, NO₂ og ammoniak. Gæt først, hvad et indgreb gør ved ligevægten, og se det derefter ske ved siden af et urørt referenceglas." onclick="visAnimation(this, 'b2.2_indgreb_i_ligevaegte.html')" title="Indgreb i ligevægte"><span class="btn-num">2</span><span class="btn-text">Indgreb i ligevægte</span></button>
             <button class="tab-btn" data-emne="b2.3" data-beskrivelse="Regn ligevægtsopgaver på tre niveauer: K ud fra stofmængder, opstil og isolér x, og til sidst opgaver der kræver en andengradsligning." onclick="visAnimation(this, 'b2.3_ligevaegtsberegninger.html')" title="Ligevægtsberegninger"><span class="btn-num">3</span><span class="btn-text">Ligevægtsberegninger</span></button>
-            <button class="tab-btn" data-emne="b2.4" data-beskrivelse="Hæld stamopløsning i syv reagensglas, og forskyd ligevægten med Fe(NO₃)₃, ascorbinsyre, KSCN, AgNO₃, varme og kulde. Fortynd derefter frugtfarve og ligevægtsblanding, og se dem ovenfra." onclick="visAnimation(this, '../superanimationer/superlab/sb2.4_jernthiocyanat/index.html')" title="Forsøg: Jernthiocyanat"><span class="btn-num">4</span><span class="btn-text">Forsøg: Jernthiocyanat</span></button>
+            <button class="tab-btn" data-emne="b2.4" data-beskrivelse="Hæld stamopløsning i syv reagensglas, og forskyd ligevægten med Fe(NO₃)₃, ascorbinsyre, KSCN, AgNO₃, varme og kulde. Fortynd derefter frugtfarve og ligevægtsblanding, og se dem ovenfra." onclick="visAnimation(this, '../v2/superlab/sb2.4_jernthiocyanat/index.html')" title="Forsøg: Jernthiocyanat"><span class="btn-num">4</span><span class="btn-text">Forsøg: Jernthiocyanat</span></button>
             <button class="tab-btn" data-emne="b2.5" data-beskrivelse="Forskyd ligevægten Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺ ved at tilsætte ioner, fælde, fortynde eller ændre temperaturen, og følg reaktionsbrøken Y mod K på grafen." onclick="visAnimation(this, 'b2.5_ligevægt_simulation.html')" title="Ligevægtssimulation"><span class="btn-num">5</span><span class="btn-text">Ligevægtssimulation</span></button>
             <button class="tab-btn" data-emne="b2.6" data-beskrivelse="Pres en blanding af NO₂ og N₂O₄ sammen fra 4,0 L til 1,0 L, og følg, hvordan ligevægten forskydes mod færrest molekyler, indtil Y igen er lig med K. Vises som molekyler eller som dansere." onclick="visAnimation(this, 'b2.6_volumenændring.html')" title="Volumenændring"><span class="btn-num">6</span><span class="btn-text">Volumenændring</span></button>
 
@@ -323,7 +323,7 @@
             document.getElementById('startside').style.display = 'none';
             iframe.style.display = 'block';
             iframe.src = filsti;
-            fuldSkaerm(filsti.indexOf('superanimationer/') >= 0);
+            fuldSkaerm(('/' + filsti).indexOf('/v2/') >= 0);
 
             var alleKnapper = document.querySelectorAll('.tab-btn');
             alleKnapper.forEach(btn => btn.classList.remove('active'));

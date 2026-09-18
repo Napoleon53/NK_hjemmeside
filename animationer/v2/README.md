@@ -1,6 +1,6 @@
-# Superanimationer
+# Animationer, anden generation
 
-Mappen rummer to slags interaktive læringsmiljøer: **superanimationer** og
+Mappen `v2/` rummer to slags interaktive læringsmiljøer: **superanimationer** og
 **superlab-animationer**. Begge er selvbærende: eleven kan bruge dem alene,
 uden at emnet er gennemgået på tavlen først. Det er det, der gør dem super,
 ikke at de er store eller ligger i deres egen mappe.
