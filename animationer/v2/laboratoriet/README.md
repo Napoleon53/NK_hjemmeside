@@ -290,6 +290,19 @@ flaskens standardportion (`haeldMl`), dog højst en femtedel af glasset
 stopper strømmen, til flasken flyttes. Flaskerne er fyldt til 200 mL af 250,
 så der kan hældes i dem.
 
+**Slipmålet vælges efter nærhed.** Alt, der vil tage imod det bårne
+(`kanModtage`), er kandidater, og de scores efter afstanden fra det, man
+sigter med, til det, man sigter efter: tuden mod åbningen, når der hældes;
+foden mod det nærmeste ledige hul eller pladen, når noget stilles; ellers
+musen mod genstanden (`sigteScore`, `sigteKandidater`, `maalVed`). Den
+nærmeste vinder — før var det den øverst tegnede af dem, der overhovedet
+blev ramt, i praksis det man sidst havde rørt, og to reagensglas ved siden
+af hinanden fik derfor tit den forkerte stråle. Det valgte mål beholdes, til
+et andet er tydeligt bedre (`SIGTE.hysterese`), så den grønne ramme ikke
+flimrer. Træfzonerne står samlet i `SIGTE`; en flaskehals rammes inden for
+16 enheder i stedet for 6, som var et par skærmpixels. Prøvebordets selvtest
+afsnit 11 prøver det med to glas i naboglas-huller.
+
 Det, der lige er brugt, bliver hængende: flasken bliver i hældepositur
 over glasset, dråbeflasken, sprøjteflasken og spatlen bliver i luften over
 det, de blev brugt på (`svaev`, `svaevVed`). En gul ring med en pil ved
@@ -331,8 +344,8 @@ kabinettet tegnes bag udstyret og ruden foran, udsugningen trækker dampe op,
 og gas-hændelser får `iStinkskab`, så et forsøg kan skelne mellem farlige
 dampe inde og ude. Mønster: `proeverum/` (forrum, kemikaliedepot, prøvebord,
 stinkskab). Det, der svæver, har første prioritet for musen, og en flaske
-er kun mål for hældning, når tuden står lige over halsen; ellers sættes det
-bårne ned mellem flaskerne.
+er kun mål for hældning, når tuden står over halsen (inden for
+`SIGTE.hals`); ellers sættes det bårne ned mellem flaskerne.
 Superanimationerne bruger indtil videre ét rum; rummene er til det senere
 spil.
 

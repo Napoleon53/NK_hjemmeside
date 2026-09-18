@@ -759,8 +759,85 @@
         return NK.tilVerden(gg.p, gg.anker, 0, t.laengde || 100);
     };
 
-    /* Hvad under punktet vil tage imod den baarne genstand? Stativ og
-       varmeplade afgoeres af, hvor genstandens fod er, ikke musen. */
+    /* ----- Slipmaalet ---------------------------------------------------------
+       Hvad under det baarne vil tage imod det? Alle, der bestaar kanModtage,
+       er kandidater, og de scores efter, hvor taet det, man sigter med, staar
+       paa det, man sigter efter: tuden mod aabningen, naar der haeldes; foden
+       mod hullet eller pladen, naar noget stilles; ellers musen mod
+       genstanden. Den naermeste vinder. Foer var det den oeverst tegnede af
+       dem, der overhovedet blev ramt - i praksis den, man sidst havde roert.
+
+       Traefzonerne er som foer (SIGTE), paa nær flaskehalsen: en flaske
+       rammes nu inden for SIGTE.hals enheder af halsen i stedet for 6, som
+       var et par skaermpixels. Er man tydeligt ved siden af, saettes det
+       baarne stadig ned mellem flaskerne.
+
+       Hysterese: det maal, der allerede er valgt (slipMaal), beholdes,
+       medmindre et andet er tydeligt bedre, saa den groenne ramme ikke
+       flimrer mellem to glas, mens musen bevaeger sig lidt. */
+    var SIGTE = {
+        hals: 16, halsOp: 40, halsNed: 10,     /* tuden over en flaskehals */
+        glasSide: 14, glasOp: 90,              /* tuden over et glas */
+        stativ: 12, plade: 30,                 /* foden i stativet, paa pladen */
+        holder: 10, andet: 6,                  /* musen paa genstanden */
+        hysterese: 10
+    };
+
+    /* Afstanden fra det, man sigter med, til det, man sigter efter paa c -
+       eller null, hvis c slet ikke er inden for raekkevidde */
+    P.sigteScore = function (gg, c, pt, fod, tud) {
+        var m = c.kan;
+        var plads = m.stoette || m.varmer || m.vaegt || m.luge;
+        var rk = this.rekt(c, 0);
+        var midt = { x: rk.x + rk.b / 2, y: rk.y + rk.h / 2 };
+        /* Det, noget stilles i eller paa, afgoeres af foden */
+        if (plads) {
+            if (!this.inden(c, fod, m.stoette ? SIGTE.stativ : SIGTE.plade)) return null;
+            if (m.stoette) {
+                var hul = this.ledigtHul(c, fod.x);
+                return hul < 0 ? null : Math.abs(this.hulX(c, hul) - fod.x);
+            }
+            return Math.abs(fod.x - midt.x) + Math.abs(fod.y - rk.y) * 0.5;
+        }
+        /* Braenderen: foden paa trefodens plade, som ligger over spriten */
+        if (m.flamme && c.type.plade) {
+            var px = c.p.x - c.anker.x, py = c.p.y - c.anker.y + c.type.plade.y;
+            if (fod.x > px + c.type.plade.x0 - 24 && fod.x < px + c.type.plade.x1 + 24 && fod.y > py - 60 && fod.y < py + 70) {
+                return Math.abs(fod.x - (px + (c.type.plade.x0 + c.type.plade.x1) / 2));
+            }
+        }
+        /* Haeldning: tuden mod aabningen */
+        if (tud && m.holder) {
+            var ob = B.aabning(c);
+            var dx = Math.abs(tud.x - ob.x);
+            if (m.flaske || m.sproejter || m.pulver) {
+                if (dx < SIGTE.hals && tud.y > ob.y - SIGTE.halsOp && tud.y < ob.y + SIGTE.halsNed) return dx;
+            } else if (tud.x > rk.x - SIGTE.glasSide && tud.x < rk.x + rk.b + SIGTE.glasSide &&
+                       tud.y > rk.y - SIGTE.glasOp && tud.y < rk.y + rk.h * 0.6) {
+                return dx;
+            }
+        }
+        /* Ellers musen mod genstanden */
+        if (!this.inden(c, pt, m.holder ? SIGTE.holder : SIGTE.andet)) return null;
+        var maal = m.holder ? B.aabning(c) : midt;
+        return Math.abs(pt.x - maal.x) + Math.abs(pt.y - maal.y) * 0.7;
+    };
+
+    /* Alle, der vil tage imod gg, med deres score, naermeste foerst */
+    P.sigteKandidater = function (gg, pt) {
+        var ud = [];
+        var fod = this.fod(gg);
+        var tud = (gg.kan.haelder || gg.kan.drypper || gg.kan.sproejter) ? B.tudVerden(gg) : null;
+        for (var i = 0; i < this.liste.length; i++) {
+            var c = this.liste[i];
+            if (c === gg || !this.synlig(c) || !this.kanModtage(gg, c)) continue;
+            var s = this.sigteScore(gg, c, pt, fod, tud);
+            if (s !== null) ud.push({ navn: c.navn, score: s });
+        }
+        ud.sort(function (a, b) { return a.score - b.score; });
+        return ud;
+    };
+
     P.maalVed = function (gg, pt) {
         if (!pt || !gg) return null;
         if (gg.kan.papir) {
@@ -770,34 +847,16 @@
             }
             return null;
         }
-        var fod = this.fod(gg);
-        /* Det, der kan haelde, sigter med tuden: den skal staa over glasset */
-        var tud = (gg.kan.haelder || gg.kan.drypper || gg.kan.sproejter) ? B.tudVerden(gg) : null;
-        for (var i = this.liste.length - 1; i >= 0; i--) {
-            var c = this.liste[i];
-            if (c === gg || !this.synlig(c)) continue;
-            var plads = c.kan.stoette || c.kan.varmer || c.kan.vaegt || c.kan.luge;
-            var ramt = this.inden(c, plads ? fod : pt, c.kan.stoette ? 12 : (plads ? 30 : (c.kan.holder ? 10 : 6)));
-            /* Braenderen: foden skal staa paa trefodens plade, som ligger over spriten */
-            if (!ramt && c.kan.flamme && c.type.plade) {
-                var px = c.p.x - c.anker.x, py = c.p.y - c.anker.y + c.type.plade.y;
-                ramt = fod.x > px + c.type.plade.x0 - 24 && fod.x < px + c.type.plade.x1 + 24 && fod.y > py - 60 && fod.y < py + 70;
+        var kand = this.sigteKandidater(gg, pt);
+        if (!kand.length) return null;
+        var bedst = kand[0];
+        var forrige = this.slipMaal;
+        if (forrige && forrige !== bedst.navn) {
+            for (var i = 1; i < kand.length; i++) {
+                if (kand[i].navn === forrige && kand[i].score <= bedst.score + SIGTE.hysterese) return forrige;
             }
-            if (!ramt && tud && c.kan.holder && !plads) {
-                var rk = this.rekt(c, 0);
-                if (c.kan.flaske || c.kan.sproejter || c.kan.pulver) {
-                    /* En flaske har en smal hals: tuden skal staa lige over den, ellers
-                       saettes det, man baerer, ned mellem flaskerne */
-                    var ob = B.aabning(c);
-                    ramt = Math.abs(tud.x - ob.x) < 6 && tud.y > ob.y - 22 && tud.y < ob.y + 6;
-                } else {
-                    ramt = tud.x > rk.x - 14 && tud.x < rk.x + rk.b + 14 && tud.y > rk.y - 90 && tud.y < rk.y + rk.h * 0.6;
-                }
-            }
-            if (!ramt) continue;
-            if (this.kanModtage(gg, c)) return c.navn;
         }
-        return null;
+        return bedst.navn;
     };
 
     P.slip = function (gg, pt) {

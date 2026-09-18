@@ -445,6 +445,75 @@ function koerTest() {
     paastand("musen rammer det, der er tegnet", bord.hvad({ x: lr.x + lr.b / 2, y: lr.y + lr.h / 2 }) === "_lille_glas" && Math.abs(lr.h - U.type("reagensglas").h / 2) < 1.5, lr.h.toFixed(0));
     [lgl, lst, lb].forEach(function (x) { bord.tagUd(x); });
     paastand("de kan tages af bordet igen", !bord.g._lille_glas && !bord.g._lille_stativ && !bord.g._lille_baeger);
+
+    overskrift("11. Slipmaalet: naermeste, ikke oeverst tegnede");
+    /* Slipmaalet vaelges blandt alle, der vil tage imod, efter afstanden fra
+       det, man sigter med, til det, man sigter efter - ikke efter hvad der
+       er tegnet oeverst. To reagensglas i naboglas-huller er proeven. */
+    frisk();
+    var st = g.stativ, gl1 = g.glas1, gl2 = g.glas2;
+    bord.frigoer(gl2);
+    bord.iStativ(gl2, st, 1, true);
+    faerdig();
+    paastand("glas 1 og 2 staar i naboglas-huller", gl1.sted && gl1.sted.hul === 0 && gl2.sted && gl2.sted.hul === 1,
+        (gl1.sted && gl1.sted.hul) + " og " + (gl2.sted && gl2.sted.hul));
+    var fl = g.fl_cu;
+    /* Flasken holdes, saa tuden staar over hullerne; x forskydes fra glas 1's aabning */
+    var o1 = B.aabning(gl1), o2 = B.aabning(gl2), afst = o2.x - o1.x;
+    function tudVed(x) {
+        var p = B.haeldPositur(fl, gl1, 14);
+        var t = B.tudVerden({ p: p, anker: fl.anker, type: fl.type });
+        fl.p = { x: p.x + (x - t.x), y: p.y, v: p.v };
+        return { x: fl.p.x, y: fl.p.y - 10 };   /* musen: paa flasken, ikke over glasset */
+    }
+    bord.startBaer(fl);
+    var rigtige = 0, forkerte = [];
+    for (var r = 0; r < 10; r++) {
+        var modGlas1 = r % 2 === 0;
+        var x = modGlas1 ? o1.x + 16 : o2.x - 16;   /* inde i begge glas' zone, men naermest det ene */
+        var pt = tudVed(x);
+        bord.slipMaal = null;
+        var m = bord.maalVed(fl, pt);
+        if (m === (modGlas1 ? "glas1" : "glas2")) rigtige++; else forkerte.push(r + ":" + m);
+    }
+    paastand("ti gange i traek faar tuden det glas, den peger paa", rigtige === 10, rigtige + " af 10" + (forkerte.length ? " (forkerte: " + forkerte.join(", ") + ")" : ""));
+    var raekkefoelge = bord.liste.indexOf(gl1) < bord.liste.indexOf(gl2);
+    bord.tilFront(gl1);
+    bord.slipMaal = null;
+    paastand("det, man sidst roerte, vinder ikke laengere", bord.maalVed(fl, tudVed(o2.x - 16)) === "glas2", "glas 1 forrest, tuden naermest glas 2");
+    /* Hysterese: det valgte maal beholdes, naar forskellen er lille */
+    bord.slipMaal = "glas2";
+    var midt = o1.x + afst / 2;
+    paastand("naesten midt imellem beholdes det valgte", bord.maalVed(fl, tudVed(midt - 3)) === "glas2");
+    paastand("men et tydeligt bedre maal vinder", bord.maalVed(fl, tudVed(o1.x + 4)) === "glas1");
+    paastand("stille mus giver samme svar hver gang", (function () {
+        var pt2 = tudVed(o1.x + 5), foerste = bord.maalVed(fl, pt2);
+        for (var q = 0; q < 20; q++) if (bord.maalVed(fl, pt2) !== foerste) return false;
+        return true;
+    }()));
+    bord.stopBaer({ x: fl.hjem.x, y: fl.hjem.y });
+    faerdig();
+
+    /* Flaskehalsen: et baegerglas med vaeske haeldes tilbage i en flaske */
+    var bs = g.baegerStor;
+    bord.haeld(g.fl_ki, bs, 30);
+    faerdig();
+    bord.startBaer(bs);
+    var ok = B.aabning(g.fl_ki);
+    function bsTudVed(x) {
+        var p = B.haeldPositur(bs, g.fl_ki, 14);
+        var t = B.tudVerden({ p: p, anker: bs.anker, type: bs.type });
+        bs.p = { x: p.x + (x - t.x), y: p.y, v: p.v };
+        return { x: bs.p.x, y: bs.p.y };
+    }
+    bord.slipMaal = null;
+    paastand("flaskehalsen rammes uden at sigte pixelvis (12 enheder ved siden af)", bord.maalVed(bs, bsTudVed(ok.x + 12)) === "fl_ki");
+    bord.slipMaal = null;
+    var vedSiden = bord.maalVed(bs, bsTudVed(ok.x + 30));
+    paastand("tydeligt ved siden af saettes det ned mellem flaskerne", vedSiden !== "fl_ki" && vedSiden !== "fl_cu", String(vedSiden));
+    bord.stopBaer({ x: bs.hjem.x, y: bs.hjem.y });
+    faerdig();
+    frisk();
 }
 
 function vis() {
