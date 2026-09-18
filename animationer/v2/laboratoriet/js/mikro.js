@@ -13,6 +13,11 @@
    svagt i baggrunden.
 
    Det er et modelbillede af, hvad der sker, ikke et regnskab.
+
+   new NK.Mikro(R, k): R er boblens radius, k stoerrelsen af det, der er
+   inde i den (kugler, skrift, vandmolekyler, legende og gitter), hvor 1 er
+   standard. Et forsoeg kan altsaa goere boblen mindre og indholdet endnu
+   mindre (bobleR og bobleIndhold i NK.BORD_VALG).
    ===================================================================== */
 (function () {
     "use strict";
@@ -21,8 +26,9 @@
     var Stof = NK.Stof;
     var r = NK.r;
 
-    NK.Mikro = function (R) {
+    NK.Mikro = function (R, k) {
         this.R = R || 120;
+        this.k = k || 1;
         this.nulstil();
         this.foerste = true;
     };
@@ -39,13 +45,44 @@
 
     P.toem = function () { this.nulstil(); };
 
-    /* Faa, store kugler: en enkelt ion er 14 enheder, lange formler op til 22 */
-    function radius(navn) {
+    /* Faa, store kugler: en enkelt ion er 14 enheder, lange formler op til
+       22, ganget med k */
+    function radius(navn, k) {
         var s = Stof.STOFFER[navn];
-        if (!s) return 14;
-        if (s.fase === "s") return 16;
+        k = k || 1;
+        if (!s) return 14 * k;
+        if (s.fase === "s") return 16 * k;
         var l = (s.kort || s.formel).replace(/[₀-₉]/g, "").length;
-        return NK.klamp(11 + l * 1.9, 14, 22);
+        return NK.klamp(11 + l * 1.9, 14, 22) * k;
+    }
+
+    /* Formlen paa en kugle: fed skrift uden kant, inde i kuglen. Moerk
+       skrift paa lyse kugler og hvid paa moerke, som i sc6.8 - en sort kant
+       om smaa bogstaver goer dem grynede. basis er skriftens stoerrelse;
+       er formlen for bred, goeres skriften hoejst ned til mindst, og saa
+       stoerre kuglen i stedet (rad i svaret), saa en lang formel som SO4 2-
+       stadig kan laeses. */
+    function lysstyrke(f) { return 0.299 * f.r + 0.587 * f.g + 0.114 * f.b; }
+
+    function etiketStil(ctx, tekst, rad, farve, basis, mindst) {
+        var str = basis;
+        ctx.font = "700 " + str.toFixed(2) + "px 'Segoe UI', sans-serif";
+        var b = ctx.measureText(tekst).width, maks = rad * 1.8;
+        if (b > maks) {
+            str = Math.max(mindst, str * maks / b);
+            rad = Math.max(rad, b * str / basis / 1.8);
+        }
+        /* Farven midt paa kuglen: mellem den lyse top og den moerke kant */
+        var midt = { r: farve.r * 0.82 + 36, g: farve.g * 0.82 + 36, b: farve.b * 0.82 + 36 };
+        return { font: "700 " + str.toFixed(2) + "px 'Segoe UI', sans-serif", farve: lysstyrke(midt) > 150 ? "#14181e" : "#ffffff", rad: rad };
+    }
+
+    function tegnEtiket(ctx, tekst, x, y, stil) {
+        ctx.font = stil.font;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = stil.farve;
+        ctx.fillText(tekst, x, y + 0.5);
     }
 
     function farveAf(navn) {
@@ -59,7 +96,7 @@
     P.ny = function (navn, x, y, vx, vy) {
         var s = Stof.STOFFER[navn];
         var p = {
-            navn: navn, x: x, y: y, vx: vx || 0, vy: vy || 0, rad: radius(navn), alfa: 0,
+            navn: navn, x: x, y: y, vx: vx || 0, vy: vy || 0, rad: radius(navn, this.k), alfa: 0,
             fast: !!(s && s.fase === "s"), tekst: s && s.kort ? s.kort : Stof.formel(navn), farve: farveAf(navn), fase: r(0, 6.28), doer: false
         };
         this.partikler.push(p);
@@ -80,7 +117,7 @@
         var R = this.R, mig = this;
         Object.keys(maal).forEach(function (navn) {
             for (var i = mig.antal(navn); i < maal[navn]; i++) {
-                var rad = radius(navn), fast = Stof.STOFFER[navn] && Stof.STOFFER[navn].fase === "s";
+                var rad = radius(navn, mig.k), fast = Stof.STOFFER[navn] && Stof.STOFFER[navn].fase === "s";
                 var v = r(0, 6.28), d = Math.sqrt(Math.random()) * (R - rad - 6);
                 var p = mig.ny(navn, Math.cos(v) * d, fast ? r(R * 0.3, R * 0.6) : Math.sin(v) * d, 0, 0);
                 p.alfa = 1;
@@ -182,11 +219,11 @@
     /* Et udsnit af det faste stof: iongitteret med stoffets eget
        formelforhold, eller ens byggesten, der ligger taet */
     P.tegnGitter = function (ctx) {
-        var R = this.R, f = this.fast, x, y;
+        var R = this.R, k = this.k, f = this.fast, x, y;
         var celle = [];
         if (f.dele) f.dele.forEach(function (d) { for (var i = 0; i < d.antal; i++) celle.push(d.navn); });
         var mol = f.molekyle || null;
-        var trin = R * 0.27;
+        var trin = R * 0.27 * k;
         var rad = mol ? trin * 0.5 : trin * 0.44;
         var raekkeH = mol ? trin * 0.87 : trin;
         var raekke = 0;
@@ -200,25 +237,25 @@
                     NK.css({ r: fa.r * 0.55, g: fa.g * 0.55, b: fa.b * 0.55 }));
                 var st = Stof.STOFFER[navn];
                 var tekst = st && st.kort ? st.kort : Stof.formel(navn);
-                var str = tekst.length > 5 ? rad * 0.5 : (tekst.length > 3 ? rad * 0.62 : rad * 0.78);
-                NK.tekst(ctx, tekst, x, y + 0.5, { font: "800 " + str.toFixed(1) + "px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#ffffff", kant: true, kantBredde: 3, kantFarve: "rgba(0,0,0,0.55)" });
+                var basis = tekst.length > 5 ? rad * 0.5 : (tekst.length > 3 ? rad * 0.62 : rad * 0.78);
+                tegnEtiket(ctx, tekst, x, y, etiketStil(ctx, tekst, rad, fa, basis, rad * 0.4));
             }
         }
     };
 
     /* Forklaringen staar inde i boblen, hvor der er bredde nok til den */
     P.tegnGitterTekst = function (ctx, alfa) {
-        var R = this.R, ly0 = R * 0.6;
+        var R = this.R, k = this.k, ly0 = R * 0.6;
         ctx.globalAlpha = alfa;
         ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
-        ctx.fillRect(-R, ly0, R * 2, 24);
-        NK.tekst(ctx, this.fast.tekst, 0, ly0 + 12, { font: "600 11px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#f2f4f7" });
+        ctx.fillRect(-R, ly0, R * 2, 24 * k);
+        NK.tekst(ctx, this.fast.tekst, 0, ly0 + 12 * k, { font: "600 " + (11 * k).toFixed(1) + "px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#f2f4f7" });
     };
 
     /* Boblen tegnes med centrum i (cx, cy). forbind: punktet, den hoerer til */
     P.tegn = function (ctx, cx, cy, alfa, tid, forbind, farve) {
         if (alfa < 0.02) return;
-        var R = this.R, i;
+        var R = this.R, k = this.k, i;
         ctx.save();
         ctx.globalAlpha = alfa;
 
@@ -265,25 +302,29 @@
         for (i = 0; i < 14; i++) {
             var wx = Math.sin(i * 2.7 + tid * 0.3) * R * 0.8, wy = Math.cos(i * 1.9 + tid * 0.25) * R * 0.8;
             ctx.beginPath();
-            ctx.arc(wx, wy, 6, 0, Math.PI * 2);
+            ctx.arc(wx, wy, 6 * k, 0, Math.PI * 2);
             ctx.fill();
         }
 
         for (i = 0; i < this.partikler.length; i++) {
             var p = this.partikler[i];
             ctx.globalAlpha = alfa * p.alfa;
+            if (!p.etiket) {
+                var basis = (p.tekst.length > 5 ? 11 : (p.tekst.length > 3 ? 13 : 15)) * k;
+                p.etiket = etiketStil(ctx, p.tekst, p.rad, p.farve, basis, basis * 0.8);
+                p.rad = p.etiket.rad;
+            }
             var lys = { r: Math.min(255, p.farve.r + 60), g: Math.min(255, p.farve.g + 60), b: Math.min(255, p.farve.b + 60) };
             var moerk = { r: p.farve.r * 0.55, g: p.farve.g * 0.55, b: p.farve.b * 0.55 };
             NK.kugle(ctx, p.x, p.y, p.rad, NK.css(lys), NK.css(moerk));
-            if (p.fast) {
-                ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.rad, 0, Math.PI * 2);
-                ctx.stroke();
-            }
-            var str = p.tekst.length > 5 ? 11 : (p.tekst.length > 3 ? 13 : 15);
-            NK.tekst(ctx, p.tekst, p.x, p.y + 0.5, { font: "800 " + str + "px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#ffffff", kant: true, kantBredde: 3, kantFarve: "rgba(0,0,0,0.55)" });
+            /* En tynd kant giver kuglen et skarpt omrids mod baggrunden;
+               fast stof har en lys kant */
+            ctx.strokeStyle = p.fast ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.45)";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.rad - 0.5, 0, Math.PI * 2);
+            ctx.stroke();
+            tegnEtiket(ctx, p.tekst, p.x, p.y, p.etiket);
         }
 
         /* Legende for de forkortede navne, nederst i boblen */
@@ -294,11 +335,11 @@
         }
         if (legende.length) {
             ctx.globalAlpha = alfa;
-            var lh = 14, ly0 = R - 10 - legende.length * lh;
+            var lh = 14 * k, ly0 = R - 10 * k - legende.length * lh;
             ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
-            ctx.fillRect(-R, ly0 - 6, R * 2, R - ly0 + 6);
-            legende.forEach(function (tekst, k) {
-                NK.tekst(ctx, tekst, 0, ly0 + k * lh + lh / 2, { font: "600 11px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#f2f4f7" });
+            ctx.fillRect(-R, ly0 - 6 * k, R * 2, R - ly0 + 6 * k);
+            legende.forEach(function (tekst, j) {
+                NK.tekst(ctx, tekst, 0, ly0 + j * lh + lh / 2, { font: "600 " + (11 * k).toFixed(1) + "px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#f2f4f7" });
             });
         }
         ctx.restore();

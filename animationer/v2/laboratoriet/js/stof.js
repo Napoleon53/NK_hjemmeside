@@ -501,18 +501,29 @@
     }
 
     /* Antal partikler af hver slags til zoomboblen: maengderne skaleret,
-       saa den stoerste slags faar 'maks' partikler. Vandets egne ioner
-       (10⁻⁷ M) vises ikke. */
+       saa den stoerste slags faar 'maks' partikler. Et oploest stof under
+       PARTIKEL_MIN (10⁻⁵ M) vises ikke, fx vandets egne ioner (10⁻⁷ M) i
+       rent vand eller H⁺ i en neutral oploesning. Det er koncentrationen,
+       der taeller, ikke stofmaengden, saa et stort vandbad er lige saa tomt
+       som et lille glas vand: kun vandmolekylerne i baggrunden. Et stof,
+       der er under 2 % af det stoerste, vises heller ikke. En indikator er
+       der lidt af, men den farver alt: altid én kugle. */
+    var PARTIKEL_MIN = 0.01;   /* mM */
+
     function partikelTal(o, maks) {
-        var ud = {}, top = 0, s;
-        for (s in o.n) if (Object.prototype.hasOwnProperty.call(o.n, s) && o.n[s] > 1e-3) top = Math.max(top, o.n[s]);
-        if (top <= 0) return ud;
+        var ud = {}, top = 0, s, synlige = [];
         for (s in o.n) {
             if (!Object.prototype.hasOwnProperty.call(o.n, s) || o.n[s] <= 1e-3) continue;
-            /* En indikator er der lidt af, men den farver alt: altid én kugle */
-            if (o.n[s] < top * 0.02 && !(STOFFER[s] && STOFFER[s].indikator)) continue;
-            ud[s] = Math.max(1, Math.round(o.n[s] / top * (maks || 6)));
+            var st = STOFFER[s];
+            var oploest = o.V > 1e-9 && !(st && st.fase === "s");
+            if (oploest && o.n[s] / o.V < PARTIKEL_MIN && !(st && st.indikator)) continue;
+            synlige.push(s);
+            top = Math.max(top, o.n[s]);
         }
+        synlige.forEach(function (s) {
+            if (o.n[s] < top * 0.02 && !(STOFFER[s] && STOFFER[s].indikator)) return;
+            ud[s] = Math.max(1, Math.round(o.n[s] / top * (maks || 6)));
+        });
         return ud;
     }
 
@@ -599,6 +610,7 @@
         uklar: uklar,
         fastFarve: fastFarve,
         partikelTal: partikelTal,
+        PARTIKEL_MIN: PARTIKEL_MIN,
         gitter: gitter
     };
 

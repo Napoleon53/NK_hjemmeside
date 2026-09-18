@@ -55,7 +55,13 @@ js/tegning.js        baggrund, plakat, væske, bundfald, korn, etiketter, stav,
                      termometer, varmeplade, stråle, dråber, damp, pyt, markering
 js/mikro.js          zoomboblen: én kugle pr. partikel med formlen på. Boblen fyldes
                      på plads, når man ser ned i en beholder, og fast stof vises
-                     som gitter (Stof.gitter)
+                     som gitter (Stof.gitter). Hvor meget der er af hvert stof,
+                     giver Stof.partikelTal; et opløst stof under 10⁻⁵ M vises
+                     ikke (vandets egne ioner i rent vand). Kuglernes og
+                     skriftens størrelse er bobleIndhold i NK.BORD_VALG.
+                     Formlen står uden kant i kuglen, mørk på lyse kugler og
+                     hvid på mørke (som i sc6.8); en lang formel gør kuglen
+                     større i stedet for skriften mindre
 js/bord.js           bordet: genstande, greb og slip, møder afgjort af
                      egenskaber, stativ og varmeplade, uheld, tidens gang, tegning
 js/rum.js            rummene: flere borde på ét lærred, pile og piletaster,
@@ -317,6 +323,14 @@ flimrer. Træfzonerne står samlet i `SIGTE`; en flaskehals rammes inden for
 16 enheder i stedet for 6, som var et par skærmpixels. Prøvebordets selvtest
 afsnit 11 prøver det med to glas i naboglas-huller.
 
+Der hældes ovenfra: en tud, der er under glassets kant (`SIGTE.tudNed`),
+sigter ikke på glasset, og musen på et glas tæller kun ved åbningen
+(`SIGTE.musNed`). Så kan en flaske, man sænker, til bunden rører bordet,
+stilles foran et glas uden at hælde eller dryppe i det. Reagensglassets
+nederste 24 enheder rammes ikke med musen (`traefBund` i `udstyr.js`), for
+bunden står nede i stativet. sb2.4's selvtest afsnit 17 prøver det med
+dråbeflasken og KSCN-flasken foran stativet.
+
 Det, der lige er brugt, bliver hængende: flasken bliver i hældepositur
 over glasset, dråbeflasken, sprøjteflasken og spatlen bliver i luften over
 det, de blev brugt på (`svaev`, `svaevVed`). En gul ring med en pil ved
@@ -336,6 +350,10 @@ og zoom, og handlinger sker kun ved at trække. Undtagelser er kontakten på
 varmepladen og en dråbeflaske, der allerede hænger over et glas. Zoomboblen
 tegnes i panelet (`NK.Bord.prototype.tegnBoble`), eller på scenen i
 laboratoriets hjørne, når bordet er sat op med `boble: { x, y }` (sb2.4).
+Boblen på scenen har en lup på kanten: et klik på den viser den stor midt
+på scenen over en mørk flade, som luppen i sc6.8 (`aabnStorBoble`), og et
+klik hvor som helst eller Esc lukker den (`lukStorBoble`). Indholdet
+skaleres, så kugler og skrift er lige så skarpe, bare større.
 
 Et nyt forsøg på modellen laver sin egen `js/stoffer.js` med stoffer,
 reaktioner og opstilling (`NK.OPSTILLING`, `NK.BORD_VALG`) og en
