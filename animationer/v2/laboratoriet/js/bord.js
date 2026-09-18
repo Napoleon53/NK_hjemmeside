@@ -39,6 +39,8 @@
                             under sig og en stiplet streg ned til glasset.
                             Uden boble tegner siden den selv, fx i panelet.
      bobleR                 zoomboblens radius paa tegnebordet
+     bobleIndhold           stoerrelsen af det, der er inde i boblen
+                            (kugler og skrift), 1 er standard; se mikro.js
 
    Hooks, som siden saetter:
      vedBesked(tekst, slags)   korte beskeder til scenen
@@ -99,7 +101,8 @@
         /* Hver beholder faar sin egen zoombobbel, naar den vaelges foerste
            gang; this.mikro er den valgte beholders */
         this.bobleR = valg.bobleR || 120;
-        this.mikro = new NK.Mikro(this.bobleR);
+        this.bobleIndhold = valg.bobleIndhold || 1;
+        this.mikro = new NK.Mikro(this.bobleR, this.bobleIndhold);
         this.boble = valg.boble || null;
         this.vedBesked = null;
         this.vedAendring = null;
@@ -279,7 +282,7 @@
         var mig = this;
         this.koer.afbryd();
         this.nulstilTilstand();
-        this.mikro = new NK.Mikro(this.bobleR);
+        this.mikro = new NK.Mikro(this.bobleR, this.bobleIndhold);
         this.g = {};
         this.liste = [];
         if (NK.Sprites.FILER.kaffekop && NK.Scene.HYLDE) this.lavKaffekop();
@@ -324,7 +327,7 @@
         pad = pad || 0;
         var t = gg.type;
         var l = NK.tilLokal(gg.p, gg.anker, pt.x, pt.y);
-        if (t.sprite) return l.x > -pad && l.x < t.b + pad && l.y > -pad && l.y < t.h + pad;
+        if (t.sprite) return l.x > -pad && l.x < t.b + pad && l.y > -pad && l.y < (t.traefBund ? t.h - t.traefBund : t.h + pad);
         var L = t.laengde || 100;
         var halv = 7 * (t.skala || 1);
         return l.x > -halv - pad && l.x < halv + pad && l.y > -pad && l.y < L + pad;
@@ -876,6 +879,8 @@
     var SIGTE = {
         hals: 16, halsOp: 40, halsNed: 10,     /* tuden over en flaskehals */
         glasSide: 14, glasOp: 90,              /* tuden over et glas */
+        tudNed: 6,                             /* tuden hoejst saa langt under aabningen */
+        musNed: 50,                            /* musen paa et glas: kun ved aabningen */
         stativ: 12, plade: 30,                 /* foden i stativet, paa pladen */
         holder: 10, andet: 6,                  /* musen paa genstanden */
         hysterese: 10
@@ -904,20 +909,27 @@
                 return Math.abs(fod.x - (px + (c.type.plade.x0 + c.type.plade.x1) / 2));
             }
         }
-        /* Haeldning: tuden mod aabningen */
+        /* Haeldning: tuden mod aabningen. Der haeldes ovenfra: en tud under
+           glassets kant ville haelde ved siden af, saa det sigter ikke.
+           Draabeflasken sigter med bunden, som bliver spidsen, naar den
+           vender (draabeSigte); den maa gerne gaa lidt ned i glasset, for
+           den loeftes op over aabningen, mens den vender. */
+        var ob = B.aabning(c);
         if (tud && m.holder) {
-            var ob = B.aabning(c);
             var dx = Math.abs(tud.x - ob.x);
+            var bund = gg.kan.drypper ? rk.y + rk.h * 0.6 : ob.y + SIGTE.tudNed;
             if (m.flaske || m.sproejter || m.pulver) {
                 if (dx < SIGTE.hals && tud.y > ob.y - SIGTE.halsOp && tud.y < ob.y + SIGTE.halsNed) return dx;
             } else if (tud.x > rk.x - SIGTE.glasSide && tud.x < rk.x + rk.b + SIGTE.glasSide &&
-                       tud.y > rk.y - SIGTE.glasOp && tud.y < rk.y + rk.h * 0.6) {
+                       tud.y > rk.y - SIGTE.glasOp && tud.y < bund) {
                 return dx;
             }
         }
-        /* Ellers musen mod genstanden */
+        /* Ellers musen mod genstanden; paa et glas kun ved aabningen, saa
+           det, der stilles paa bordet foran et glas, ikke haelder i det */
         if (!this.inden(c, pt, m.holder ? SIGTE.holder : SIGTE.andet)) return null;
-        var maal = m.holder ? B.aabning(c) : midt;
+        if (m.holder && pt.y > ob.y + SIGTE.musNed) return null;
+        var maal = m.holder ? ob : midt;
         return Math.abs(pt.x - maal.x) + Math.abs(pt.y - maal.y) * 0.7;
     };
 
@@ -1843,7 +1855,7 @@
         /* Zoomboblen viser den valgte beholder */
         var v = this.valgtBeholder();
         if (v) {
-            if (!v.mikro) v.mikro = new NK.Mikro(this.bobleR);
+            if (!v.mikro) v.mikro = new NK.Mikro(this.bobleR, this.bobleIndhold);
             this.mikro = v.mikro;
         }
         this.opdaterBoble(dt, v);

@@ -53,8 +53,9 @@ dråbeflasken og sprøjteflasken øverst og kaffen, køkkenrullen og
 pulverglassene nederst; til højre det tomme bægerglas under plakaten. På
 bordet står kun det, man arbejder med: affaldet og kolben til venstre,
 stativet, varmepladen med vandbadet og isbadet. Zoomboblen står i
-laboratoriets øverste venstre hjørne (`boble: { x, y }`, radius 150) og
-skalerer med resten; den har en stiplet streg ned til det glas, den
+laboratoriets øverste venstre hjørne (`boble: { x, y }`, radius 135, og
+kuglerne og skriften i den er en fjerdedel mindre end standard,
+`bobleIndhold: 0.75`) og skalerer med resten; den har en stiplet streg ned til det glas, den
 kigger ind i, og glassets navn under sig. Opstillingen holder hjørnet frit,
 og selvtesten tjekker det. Scenen står forneden i lærredet (`lodret:
 "bund"`). Bordpladen er 64 dyb (`bordDybde`), så man kan stille ting foran

@@ -55,7 +55,10 @@ js/tegning.js        baggrund, plakat, væske, bundfald, korn, etiketter, stav,
                      termometer, varmeplade, stråle, dråber, damp, pyt, markering
 js/mikro.js          zoomboblen: én kugle pr. partikel med formlen på. Boblen fyldes
                      på plads, når man ser ned i en beholder, og fast stof vises
-                     som gitter (Stof.gitter)
+                     som gitter (Stof.gitter). Hvor meget der er af hvert stof,
+                     giver Stof.partikelTal; et opløst stof under 10⁻⁵ M vises
+                     ikke (vandets egne ioner i rent vand). Kuglernes og
+                     skriftens størrelse er bobleIndhold i NK.BORD_VALG
 js/bord.js           bordet: genstande, greb og slip, møder afgjort af
                      egenskaber, stativ og varmeplade, uheld, tidens gang, tegning
 js/rum.js            rummene: flere borde på ét lærred, pile og piletaster,
@@ -316,6 +319,14 @@ et andet er tydeligt bedre (`SIGTE.hysterese`), så den grønne ramme ikke
 flimrer. Træfzonerne står samlet i `SIGTE`; en flaskehals rammes inden for
 16 enheder i stedet for 6, som var et par skærmpixels. Prøvebordets selvtest
 afsnit 11 prøver det med to glas i naboglas-huller.
+
+Der hældes ovenfra: en tud, der er under glassets kant (`SIGTE.tudNed`),
+sigter ikke på glasset, og musen på et glas tæller kun ved åbningen
+(`SIGTE.musNed`). Så kan en flaske, man sænker, til bunden rører bordet,
+stilles foran et glas uden at hælde eller dryppe i det. Reagensglassets
+nederste 24 enheder rammes ikke med musen (`traefBund` i `udstyr.js`), for
+bunden står nede i stativet. sb2.4's selvtest afsnit 17 prøver det med
+dråbeflasken og KSCN-flasken foran stativet.
 
 Det, der lige er brugt, bliver hængende: flasken bliver i hældepositur
 over glasset, dråbeflasken, sprøjteflasken og spatlen bliver i luften over

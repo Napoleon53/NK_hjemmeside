@@ -45,6 +45,9 @@
                        saa glasset ogsaa ses mod en lys baggrund
      huller            x-positioner (i spritets koordinater) for glas i et
                        stativ, og hulY: hvor glassets aabning staar
+     traefBund         de nederste enheder af tegningen, som musen ikke
+                       rammer (reagensglasset: bunden staar nede i stativet,
+                       og det, der stilles foran det, skal ikke ramme det)
    ===================================================================== */
 (function () {
     "use strict";
@@ -73,7 +76,7 @@
     var TYPER = {
         reagensglas: {
             sprite: "reagensglas", fil: "reagensglas.svg", b: 30, h: 160,
-            anker: { x: 15, y: 2 },
+            anker: { x: 15, y: 2 }, traefBund: 24,
             kan: { holder: true, haelder: true },
             indre: GLAS_INDRE, maks: 30, haeldMl: 0,
             tud: { x: 4, y: 3, v: -2.0 },
@@ -342,7 +345,7 @@
 
        Nye maal i en type skal skrives ind i listerne herunder, ellers
        bliver de ikke skaleret med. */
-    var SKALA_TAL = ["b", "h", "hulY", "laengde"];
+    var SKALA_TAL = ["b", "h", "hulY", "laengde", "traefBund"];
     var SKALA_PUNKTER = ["anker", "tud", "ske", "flammePunkt", "valgtMaerke", "knap", "lampe"];
     var SKALA_REKTER = ["etiket", "display", "skilt"];
 

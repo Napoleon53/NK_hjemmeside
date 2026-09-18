@@ -80,7 +80,8 @@ function koerTest() {
     var vin = ramme.contentWindow;
     var Sc = NK.Scene;
     paastand("zoomboblen staar paa scenen og ikke i panelet",
-        !d.getElementById("boble-laerred") && !!bord.boble && bord.bobleR === 150);
+        !d.getElementById("boble-laerred") && !!bord.boble && bord.bobleR === 135);
+    paastand("og indholdet i den er en fjerdedel mindre", bord.bobleIndhold === 0.75 && bord.mikro.k === 0.75);
     var br = bord.bobleRekt(), daekker = [];
     function overlap(a, b) { return a.x < b.x + b.b && a.x + a.b > b.x && a.y < b.y + b.h && a.y + a.h > b.y; }
     bord.liste.forEach(function (gg) {
@@ -162,6 +163,10 @@ function koerTest() {
         tal((B.samlet(g(4)).n["AgSCN(s)"] || 0) / 1000, 3) + " mmol AgSCN");
 
     overskrift("4. Badene");
+    paastand("zoomboblen viser ingen H⁺ og OH⁻ i badenes rene vand",
+        Object.keys(St.partikelTal(B.samlet(bord.g.vandbad), 6)).length === 0 &&
+        Object.keys(St.partikelTal(B.samlet(bord.g.vand), 6)).length === 0,
+        JSON.stringify(St.partikelTal(B.samlet(bord.g.vandbad), 6)));
     paastand("der er plads til flere glas i et bad", bord.badPladser(bord.g.isbad).length >= 2,
         bord.badPladser(bord.g.isbad).length + " pladser");
     paastand("glas 5 kan saettes i vandbadet", bord.moede(g(5), bord.g.vandbad, { x: bord.g.vandbad.p.x - 24 }));
@@ -606,6 +611,48 @@ function koerTest() {
     paastand("og samme besked", beskeder.slice(nB).some(function (t) { return t.indexOf("dråbe mere") > 0; }));
     paastand("draabeflasken kan traekkes hjem igen", flytHjem("ag"));
     paastand("intet uheld undervejs", bord.antalUheld === uheld0, bord.antalUheld - uheld0 + " uheld");
+
+    /* Stillet paa bordet foran stativet: en flaske, der tages i toppen og
+       saenkes, til bunden roerer bordpladen, skal stilles ned - ikke
+       haelde eller dryppe i reagensglasset bag den, selv om musen er ud
+       for glasset. Reagensglassets traefzone stopper over bunden. */
+    function stilForan(navn, glas, bundY) {
+        NK.startForfra();
+        adv(0.2);
+        var fl = bord.g[navn], gl = g(glas), V0 = B.volumen(gl), fV0 = B.volumen(fl), u0 = bord.antalUheld;
+        mus.tag(navn, 0.5, 0.1);
+        mus.baer({ x: gl.p.x, y: bundY - fl.type.h + fl.anker.y }, 0.8);
+        var ud = { maal: bord.slipMaal };
+        mus.hold(2);
+        ud.ud = fV0 - B.volumen(fl);
+        mus.slip();
+        mus.hold(1.5);
+        ud.ind = B.volumen(gl) - V0;
+        ud.uheld = bord.antalUheld - u0;
+        ud.bund = bundAf(fl);
+        ud.svaev = !!fl.svaev;
+        ud.tekst = "maal " + ud.maal + ", " + tal(ud.ud) + " mL ud, bund " + tal(ud.bund, 0) + (ud.uheld ? ", uheld" : "");
+        return ud;
+    }
+    [540, 505].forEach(function (y) {
+        var r = stilForan("ag", 4, y);
+        paastand("draabeflasken taget i toppen og stillet med bunden i " + y + " foran glas 4 drypper ikke",
+            r.maal !== "glas4" && r.ud < 0.001 && r.ind < 0.001, r.tekst);
+        paastand("og den staar paa bordet bagefter", !r.svaev && Math.abs(r.bund - y) < 1.5, r.tekst);
+    });
+    [540, 505].forEach(function (y) {
+        var r = stilForan("fl_kscn", 3, y);
+        paastand("KSCN-flasken stillet med bunden i " + y + " foran glas 3 haelder ikke og spilder ikke",
+            r.maal !== "glas3" && r.ud < 0.01 && r.uheld === 0, r.tekst);
+        paastand("og den staar paa bordet bagefter", !r.svaev && Math.abs(r.bund - y) < 1.5, r.tekst);
+    });
+    NK.startForfra();
+    adv(0.2);
+    var rkT = bord.rekt(g(4), 0);
+    paastand("reagensglassets traefzone stopper lidt over bunden",
+        bord.hvad({ x: g(4).p.x, y: rkT.y + rkT.h - 12 }) !== "glas4" && bord.hvad({ x: g(4).p.x, y: rkT.y + rkT.h - 40 }) === "glas4",
+        "12 over bunden: " + bord.hvad({ x: g(4).p.x, y: rkT.y + rkT.h - 12 }));
+    paastand("og glasset kan stadig tages i den oeverste del", mus.tag("glas4", 0.5, 0.15) && (mus.slip(), true));
     bord.vedBesked = vedB;
     NK.startForfra();
 }

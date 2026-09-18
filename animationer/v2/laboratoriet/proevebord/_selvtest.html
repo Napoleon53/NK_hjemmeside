@@ -88,6 +88,17 @@ function koerTest() {
     paastand("0,1 M CuSO₄ er blaat", f && f.b > f.r + 60 && f.a > 0.7, f ? Math.round(f.r) + "," + Math.round(f.g) + "," + Math.round(f.b) + " a=" + f.a.toFixed(2) : "ingen");
     var d2 = St.del(o, 4);
     paastand("del tager 4 mL med 40 % af ionerne", Math.abs(d2.V - 4) < 1e-9 && Math.abs(d2.n["Cu2+"] - 400) < 1e-6 && Math.abs(o.n["Cu2+"] - 600) < 1e-6);
+    /* Zoomboblen viser ikke det, der er for lidt af: vandets egne ioner
+       (10⁻⁷ M) hverken i et lille glas eller i en stor flaske */
+    function kugler(V, mM) { return St.partikelTal(St.lav({ V: V, mM: mM }), 6); }
+    var tV3 = kugler(3, { "H+": 1e-4, "OH-": 1e-4 }), tV500 = kugler(500, { "H+": 1e-4, "OH-": 1e-4 });
+    paastand("rent vand viser ingen ioner i zoomboblen, heller ikke 500 mL",
+        Object.keys(tV3).length === 0 && Object.keys(tV500).length === 0, JSON.stringify(tV500));
+    var tHcl = kugler(3, { "H+": 100, "Cl-": 100 }), tNacl = kugler(3, { "Na+": 100, "Cl-": 100, "H+": 1e-4, "OH-": 1e-4 });
+    paastand("saltsyre viser H⁺ og Cl⁻", tHcl["H+"] === 6 && tHcl["Cl-"] === 6, JSON.stringify(tHcl));
+    paastand("en neutral saltoploesning viser kun saltets ioner", JSON.stringify(tNacl) === JSON.stringify({ "Na+": 6, "Cl-": 6 }), JSON.stringify(tNacl));
+    var tPhph = kugler(3, { "phph": 0.005, "Na+": 10, "OH-": 10 });
+    paastand("en indikator faar stadig én kugle, selv om der er meget lidt", tPhph.phph === 1, JSON.stringify(tPhph));
 
     overskrift("3. Haeldning");
     frisk();
