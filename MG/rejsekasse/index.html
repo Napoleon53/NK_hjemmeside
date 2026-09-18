@@ -351,7 +351,7 @@
         <input type="text" id="hvem" placeholder="fx hele holdet, Sofie" autocomplete="off" list="navneliste">
         <datalist id="navneliste"></datalist>
       </div>
-      <div class="felt">
+      <div class="felt" id="betalingFelt">
         <label>Betalt med</label>
         <div class="chips" id="betaling">
           <button type="button" data-b="kontant" aria-pressed="true">Kontant</button>
@@ -724,14 +724,38 @@ function tegnKopipind(){
 
 /* ------------------------------------------------------------------- Arket */
 
+/* Arkene lukkes ogsaa af telefonens tilbageknap: hvert ark laegger et trin i
+   historikken, og popstate lukker det oeverste. */
+var arkStak = [];
+var brugHistorik = true;
+
 function aabn(id){
   $(id).hidden = false;
   document.body.style.overflow = 'hidden';
+  arkStak.push(id);
+  if (brugHistorik) {
+    try { history.pushState({rejsekasse: arkStak.length}, ''); }
+    catch(e){ brugHistorik = false; }
+  }
 }
-function luk(id){
+
+function lukStille(id){
+  var i = arkStak.lastIndexOf(id);
+  if (i >= 0) arkStak.splice(i, 1);
+  if (id === 'mere' && mereFyldt) gemMere();
   $(id).hidden = true;
-  if (document.querySelectorAll('.ark:not([hidden])').length === 0) document.body.style.overflow = '';
+  if (!arkStak.length) document.body.style.overflow = '';
 }
+
+function luk(id){
+  if (brugHistorik && arkStak[arkStak.length - 1] === id) history.back();
+  else lukStille(id);
+}
+
+window.addEventListener('popstate', function(){
+  var top = arkStak[arkStak.length - 1];
+  if (top) lukStille(top);
+});
 
 function aabnArk(post){
   kladde = post ? JSON.parse(JSON.stringify(post)) : {
@@ -780,7 +804,10 @@ function tegnTypevalg(){
   Array.prototype.forEach.call($('typevalg').children, function(b){
     b.setAttribute('aria-pressed', b.dataset.type === kladde.type ? 'true' : 'false');
   });
-  $('typevalg').children[0].textContent = 'Lagt ud';
+  $('betalingFelt').hidden = (kladde.type === 'ind');
+  $('tekst').placeholder = (kladde.type === 'ind')
+    ? 'fx hævet i automat, fået tilbage'
+    : 'fx frokost, bus, entré';
 }
 
 function tegnKategorier(){
@@ -798,7 +825,7 @@ function tegnBetaling(){
 
 function tegnForslag(){
   var set = [], seet = {};
-  for (var i = data.poster.length - 1; i >= 0 && set.length < 5; i--) {
+  for (var i = data.poster.length - 1; i >= 0 && set.length < 4; i--) {
     var t = data.poster[i].tekst;
     if (t && !seet[t.toLowerCase()]) { seet[t.toLowerCase()] = 1; set.push(t); }
   }
@@ -915,7 +942,10 @@ function sletPost(){
 
 /* ------------------------------------------------------- Indstillingssiden */
 
+var mereFyldt = false;
+
 function fyldMere(){
+  mereFyldt = true;
   $('iTurnavn').value = data.turnavn;
   $('iStart').value = data.startbeloeb ? tal(data.startbeloeb) : '';
   $('iKode').value = data.valuta ? data.valuta.kode : '';
@@ -1025,24 +1055,28 @@ function somTekst(){
   return l.join('\n');
 }
 
+function csvTal(n){ return tal(n).replace(/\./g, ''); }   /* uden tusindtalsskilletegn */
+
 function somCsv(){
-  var r = [['Dato','Tid','Type','Tekst','Kategori','Hvem','Betaling','Beloeb i kr','Beloeb i valuta','Valuta']];
+  var r = [['Dato','Tid','Type','Tekst','Kategori','Hvem','Betaling','Beløb i kr','Beløb i valuta','Valuta']];
   data.poster.slice().sort(function(a, b){ return a.tid < b.tid ? -1 : 1; }).forEach(function(p){
     var d = new Date(p.tid);
     r.push([
       d.toLocaleDateString('da-DK'),
       d.toLocaleTimeString('da-DK', {hour:'2-digit', minute:'2-digit'}),
       p.type === 'ind' ? 'Ind i kassen' : 'Lagt ud',
-      p.tekst, p.kategori, p.hvem, p.betaling,
-      tal(p.kr),
-      p.org ? tal(p.org.beloeb) : '',
+      p.tekst, p.kategori, p.hvem,
+      p.type === 'ind' ? '' : p.betaling,
+      csvTal(p.kr),
+      p.org ? csvTal(p.org.beloeb) : '',
       p.org ? p.org.kode : ''
     ]);
   });
   r.push([]);
-  r.push(['Startbeloeb', '', '', '', '', '', '', tal(data.startbeloeb)]);
-  r.push(['Lagt ud i alt', '', '', '', '', '', '', tal(sumUdlagt())]);
-  r.push(['Rest i kassen', '', '', '', '', '', '', tal(rest())]);
+  r.push(['Startbeløb', '', '', '', '', '', '', csvTal(data.startbeloeb)]);
+  r.push(['Lagt i kassen siden', '', '', '', '', '', '', csvTal(sumInd())]);
+  r.push(['Lagt ud i alt', '', '', '', '', '', '', csvTal(sumUdlagt())]);
+  r.push(['Rest i kassen', '', '', '', '', '', '', csvTal(rest())]);
   return '﻿' + r.map(function(raekke){
     return raekke.map(function(c){
       c = String(c == null ? '' : c);
@@ -1174,7 +1208,6 @@ function bind(){
   document.addEventListener('click', function(e){
     var l = e.target.closest('[data-luk]');
     if (l) {
-      if (l.dataset.luk === 'mere') gemMere();
       luk(l.dataset.luk);
     }
   });
