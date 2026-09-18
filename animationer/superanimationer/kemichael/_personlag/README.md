@@ -61,14 +61,23 @@ Det, der bevidst *ikke* er lavet endnu: karantæne (en replik, der må komme
 igen efter et stykke tid), interpolation af verdens tal i teksten, og
 prioritet mellem forløbets replikker og hans andre scener ud over det, der
 allerede gjaldt (et uheld afbryder en bemærkning). Ingen af delene har en
-kunde endnu. Boblen selv (`02-taleboblen.md`) er urørt.
+kunde endnu.
+
+**18. september, senere — taleboblen som eget lag.**
+`laboratoriet/js/taleboble.js` (`NK.Taleboble`): boblen får munden og
+hovedets mål og finder selv sin plads — over, ellers til siden eller under —
+inden for scenen og uden om det glas, replikken peger på; halen ender ved
+issen; al stil står ét sted; og skriften holder mindst 14 px på skærmen, så
+boblen kan læses, når bordet er zoomet ud. Et uheld, der afbryder en
+forløbsreplik, lægger resten tilbage forrest i køen. Kø og prioritet *i
+laget* venter på taler nummer to. Se `02-taleboblen.md`.
 
 ## Når arbejdet skal i gang
 
 Rækkefølgen fra `claude/personer.md` holder stadig:
 
-1. **Nu, uafhængigt af zoom og stationer:** stemmelaget (påbegyndt, se
-   status) og taleboblen.
+1. **Nu, uafhængigt af zoom og stationer:** stemmelaget og taleboblen —
+   begge påbegyndt, se status.
 2. **Efter stationerne:** kroppen, planerne og gangvejene.
 3. **Først når person nummer to findes:** selve personrammen trækkes ud.
    Lav aldrig en ramme for noget, der kun er set én gang.

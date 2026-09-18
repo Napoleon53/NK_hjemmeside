@@ -19,8 +19,8 @@
 
    Aabner index.html i en iframe og koerer forsoeget igennem: kemien i de
    fire indgreb, badene, forloebets trin (ogsaa i forkert raekkefoelge),
-   flagene, udloeserne, gemningen, opstillingen mod stoftabellen og
-   Kemichaels replikker fra forloebet.
+   flagene, udloeserne, gemningen, opstillingen mod stoftabellen,
+   Kemichaels replikker fra forloebet og taleboblen som eget lag.
 
    Skal aabnes gennem en lokal server (eller Chrome med
    --allow-file-access-from-files), ellers kan iframen ikke laeses.
@@ -321,6 +321,89 @@ function koerTest() {
     NK.startForfra();
     adv(1);
     paastand("start forfra toemmer koeen og scenen", !L.scene && bord.laererVent.length === 0);
+
+    overskrift("14. Taleboblen: eget lag, der finder sin plads");
+    /* laboratoriet/js/taleboble.js. Placeringen er ren geometri og proeves
+       direkte; derefter at Kemichael tegner gennem laget. */
+    var Tb = NK.Taleboble;
+    paastand("taleboble.js er indlaest", !!Tb && typeof Tb.placer === "function" && typeof Tb.tegn === "function");
+    var ctx2 = d.getElementById("scene-laerred").getContext("2d");
+    var mKort = Tb.maal(ctx2, "Kort.", 1);
+    paastand("en kort replik er én linje", mKort.linjer.length === 1 && mKort.b > 0 && mKort.h > 0, tal(mKort.b, 0) + " x " + tal(mKort.h, 0));
+    var langTekst = "En replik, der er saa lang, at den maa brydes over flere linjer, for boblen maa ikke loebe ud over scenen, og saa lidt mere tekst for at naa fire.";
+    var mLang = Tb.maal(ctx2, langTekst, 1);
+    paastand("en lang replik brydes over flere linjer", mLang.linjer.length >= 3 && mLang.b <= Tb.STIL.maksBredde + 2 * Tb.STIL.polsterX + 1,
+        mLang.linjer.length + " linjer, " + tal(mLang.b, 0) + " bred");
+    var R = { x: 0, y: 0, b: NK.Scene.BREDDE, h: NK.Scene.HOEJDE };
+    var hoved = { op: 97, side: 55, ned: 33 };
+    function inden(p) { return p.x >= 0 && p.y >= 0 && p.x + p.b <= R.b && p.y + p.h <= R.h; }
+    function rammer(a, b) { return a.x < b.x + b.b && a.x + a.b > b.x && a.y < b.y + b.h && a.y + a.h > b.y; }
+    var p1 = Tb.placer(mLang, { x: 600, y: 380 }, R, { hoved: hoved });
+    paastand("med plads over hovedet staar boblen over", p1.side === "over" && p1.y + p1.h <= 380 - 97 && inden(p1), p1.side);
+    paastand("halen staar lige over munden og ender ved issen", Math.abs(p1.hale.x - 600) < 1 && Math.abs(p1.hale.y - (p1.y + p1.h)) < 1 &&
+        Math.abs(p1.spids.x - 600) < 1 && p1.spids.y > 380 - 97 - 1 && p1.spids.y < 380 - 97 + 4);
+    var p2 = Tb.placer(mLang, { x: 600, y: 40 }, R, { hoved: hoved });
+    paastand("uden plads over hovedet vendes den, og den daekker ikke hovedet", p2.side !== "over" && inden(p2) &&
+        !rammer(p2, { x: 600 - 55, y: 40 - 97, b: 110, h: 130 }), p2.side);
+    var p3 = Tb.placer(mLang, { x: R.b - 10, y: 380 }, R, { hoved: hoved });
+    paastand("ved hoejre kant bliver den inden for scenen", inden(p3), p3.side + " x=" + tal(p3.x, 0) + " b=" + tal(p3.b, 0));
+    var glas = { x: 560, y: 150, b: 80, h: 120 };
+    var p4 = Tb.placer(mLang, { x: 600, y: 380 }, R, { hoved: hoved, undgaa: glas });
+    paastand("boblen laegger sig ikke over det, replikken handler om", !rammer(p4, glas) && inden(p4), p4.side + " x=" + tal(p4.x, 0) + " y=" + tal(p4.y, 0));
+    var p4b = Tb.placer(mLang, { x: 600, y: 380 }, R, { hoved: hoved, undgaa: glas, side: "under" });
+    paastand("en foretrukken side foelges, naar den er fri", p4b.side === "under" && inden(p4b), p4b.side);
+
+    /* Kemichael tegner gennem laget: mens han taler om glas 3, ligger
+       boblen inden for scenen, holder mindste skrift og daekker ikke glasset */
+    NK.startForfra();
+    adv(1);
+    bord.laererReplik("Prøve af boblen, mens han taler om glas 3.", { peg: "glas3" }, { id: "boble" });
+    var tegnet = false, p5 = null;
+    for (var q3 = 0; q3 < 40 && !tegnet; q3++) {
+        adv(0.5);
+        bord.tegn();
+        if (L.taleUr > 0 && L.taleAlfa > 0.5 && Tb.sidst) { tegnet = true; p5 = Tb.sidst; }
+    }
+    paastand("figuren tegner sin boble gennem laget", tegnet && inden(p5), p5 && (p5.side + " f=" + tal(p5.f, 2)));
+    paastand("skriften holder mindst " + Tb.STIL.minSkaerm + " px paa skaermen", tegnet && p5.f >= 1);
+    paastand("han taler om glas 3, og boblen daekker det ikke", tegnet && L.undgaa === "glas3" && !rammer(p5, bord.rekt(bord.g.glas3, 8)));
+    adv(30);
+    paastand("efter replikken er der ikke laengere noget at undgaa", L.undgaa === null && !L.scene);
+
+    overskrift("15. En replik, der afbrydes af et uheld, kommer igen");
+    /* Uheldet tager over med det samme (hoejere prioritet), men de linjer,
+       der ikke blev sagt, venter forrest i koeen og siges bagefter.
+       Regnskabet over uheld huskes i browseren og saettes tilbage. */
+    var huskUheld = null;
+    try { huskUheld = ramme.contentWindow.localStorage.getItem("nk-kemichael"); } catch (e) { /* ingen localStorage */ }
+    var altidFoer = bord.laererAltid;
+    bord.laererAltid = true;
+    NK.startForfra();
+    adv(1);
+    bord.laererReplik(["Første linje.", "Anden linje.", "Tredje linje."], {}, { id: "afbrudt" });
+    var sagdeFoerste = false;
+    for (var q4 = 0; q4 < 20 && !sagdeFoerste; q4++) { adv(0.25); sagdeFoerste = L.taleUr > 0 && L.tale === "Første linje."; }
+    paastand("han er i gang med foerste linje", sagdeFoerste && L.scene && L.scene.navn === "replik");
+    bord.laererUheld("spild", bord.g.glas1);
+    paastand("uheldet tager over med det samme", L.scene && L.scene.navn === "spild", L.scene && L.scene.navn);
+    paastand("de linjer, der ikke blev sagt, venter forrest i koeen",
+        bord.laererVent.length === 1 && bord.laererVent[0].fn === "laererSigReplik" &&
+        bord.laererVent[0].arg.linjer.join("|") === "Anden linje.|Tredje linje.",
+        bord.laererVent.length ? bord.laererVent[0].arg.linjer.join(" / ") : "tom koe");
+    var sagdeAnden = false, sagdeTredje = false;
+    for (var q5 = 0; q5 < 120 && !sagdeTredje; q5++) {
+        adv(0.5);
+        if (L.taleUr > 0 && L.tale === "Anden linje.") sagdeAnden = true;
+        if (L.taleUr > 0 && L.tale === "Tredje linje.") sagdeTredje = true;
+    }
+    paastand("og bliver sagt, naar han har toerret op", sagdeAnden && sagdeTredje);
+    adv(20);
+    bord.laererAltid = altidFoer;
+    try {
+        if (huskUheld !== null) ramme.contentWindow.localStorage.setItem("nk-kemichael", huskUheld);
+        else ramme.contentWindow.localStorage.removeItem("nk-kemichael");
+    } catch (e) { /* ingen localStorage */ }
+    NK.startForfra();
 }
 
 function vis() {

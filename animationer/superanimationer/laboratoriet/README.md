@@ -63,12 +63,17 @@ js/forloeb.js        trin, udløsere og flag: betingelse → konsekvens, fyrer
                      én gang. Samme lag bærer en øvelses trin og en låst dør
 js/journal.js        elevens egne iagttagelser og målinger: posterne, svarene,
                      øjebliksbilledet og bedømmelsen mod sandheden
+js/taleboble.js      taleboblen som eget lag: får munden og hovedet, finder selv
+                     sin plads inden for scenen og uden om det, replikken handler
+                     om, og holder skriften læsbar uanset zoom
 css/grund.css        farver, toplinje, scene og panel, kort, forløb, quiz,
                      knapper, overlays, tegneserie og rundvisning
 sprites/             generisk glasudstyr uden etiketter (etiketten tegnes i koden)
 _geometri.html       udviklerværktøj: alt glasudstyr læst som omdrejnings-
                      legemer, så rumfang, lysvej og væskehøjde holdes op
                      mod hinanden og mod tegningen
+_taleboble.html      udviklerværktøj: flyt munden med musen, og se boblen
+                     vende, holde sig inden for kanten og undgå et rektangel
 proevebord/          det frie bord: index.html, css/stil.css, js/stoffer.js
                      (stoffer, reaktioner, opstilling), js/laerer.js, js/tur.js,
                      js/app.js, _selvtest.html
@@ -181,6 +186,34 @@ Kemichael taler ikke hele tiden (`laererOpdager`): uheld med farlige
 kemikalier (ætsende, giftig, brandfarlig, oxiderende, kronisk) og knust glas
 ser han altid; alt andet, også advarslerne, lader han passere i 60 % af
 tilfældene. `laererAltid = true` slår tilfældet fra i selvtestene.
+
+## Taleboblen
+
+Boblen er ikke en del af figuren; den er et lag for sig, `js/taleboble.js`
+(`NK.Taleboble`). Figuren siger kun *hvad* der siges og oplyser, hvor munden
+er, og hvor stort hovedet er (`hoved: { op, side, ned }`). Laget finder selv
+pladsen: over hovedet, når der er plads; ellers til højre, til venstre eller
+under. Det holder sig inden for scenen, lægger sig ikke over det, replikken
+handler om (`undgaa`, et rektangel — Kemichael giver det glas, han peger på,
+`L.undgaa`), og halen ender ved hovedets kant i stedet for at gå hen over
+ansigtet. Er den foretrukne plads ikke fri, vælges den, der går mindst på
+kompromis, og blandt lige gode den, hvor halen sidder mindst skævt.
+
+**Skriften holder en mindste størrelse på skærmen** (`STIL.minSkaerm`,
+14 px): er et bredt bord zoomet langt ud, vokser hele boblen med samme
+faktor, så den ser ens ud og stadig kan læses. Det er svaret på, om boblen
+skulle flyttes til DOM for læsbarhedens skyld — det skulle den ikke.
+
+Al stil står ét sted (`NK.Taleboble.STIL`): skrift, polster, radius, hale,
+farver. To personers bobler skal adskille sig ved en farve (`valg.stil`),
+aldrig ved et nyt layout. `_taleboble.html` viser laget arbejde, og sb2.4's
+selvtest afsnit 14 prøver placeringen som ren geometri.
+
+Der er ingen kø og ingen prioritet i laget endnu. Med én taler ligger det i
+figurens egne scener (`kemichael.js`, `proevebord/js/laerer.js`), hvor et
+uheld går forud for en bemærkning, og en forløbsreplik, der afbrydes, lægges
+tilbage forrest i køen og siges bagefter. Laget får køen, når der er en
+taler mere.
 
 ## Genstandsmodellen
 
@@ -329,8 +362,10 @@ spil.
    ]);
    ```
 4. Genstandsmodellen indlæses i denne rækkefølge (se `proevebord/index.html`):
-   kerne, farvemodel, lyd, sprites, stof, udstyr, kemichael, koer, beholder, tegning,
-   mikro, bord, forsøgets stoffer og laerer, rundvisning, tur, app.
+   kerne, taleboble, farvemodel, lyd, sprites, stof, udstyr, kemichael, koer,
+   beholder, tegning, mikro, bord, forsøgets stoffer og laerer, rundvisning,
+   tur, app. Uden `taleboble.js` tegner `kemichael.js` boblen selv, som de
+   ældre animationer gør.
 
 ## Regler
 

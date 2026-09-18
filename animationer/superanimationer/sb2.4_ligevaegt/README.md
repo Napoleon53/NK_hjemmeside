@@ -16,7 +16,7 @@ kører med tekst, hint og en liste i panelet, og billedet af glas 1 til 7
 lader eleven notere sine iagttagelser. Kemichael siger selv forløbets
 bemærkninger og et par tørre ord, når et trin er gjort. Del 2 om
 fortynding, quizzen og tegneserien mangler. `_selvtest.html` kører det hele
-igennem i tretten afsnit.
+igennem i femten afsnit.
 
 ## Filer
 

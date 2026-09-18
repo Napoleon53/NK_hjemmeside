@@ -49,6 +49,12 @@
    staar 10 % laengere end den tid, scenen beder om, og aldrig kortere
    end det tager at laese linjen (K.taleTid).
 
+   Taleboblen tegnes af laboratoriet/js/taleboble.js (NK.Taleboble), naar den er
+   indlaest: den faar munden (laererMund) og hovedets hoejde og finder
+   selv sin plads inden for scenen, uden om det, replikken handler om
+   (L.undgaa er navnet paa en genstand paa bordet). Er taleboble.js ikke
+   indlaest - de aeldre animationer - tegnes boblen som foer, her i filen.
+
    Replikker:
      K.replik(kategori)        en vending fra puljen REPLIKKER, som ikke er
                                brugt for nylig (ros, uheld, advarsel, prik1-4)
@@ -1117,6 +1123,7 @@
                 arm: HAENGER, armFra: HAENGER, armTil: HAENGER,
                 hovedV: 0, hovedDx: 0, hovedDy: 0,
                 baerer: null, kopV: 0, kopFra: 0, klik: 0, plakatRegel: 0, rost: false,
+                undgaa: null,
                 dampe: []
             };
             if (this.laererStartEkstra) this.laererStartEkstra();
@@ -1139,6 +1146,7 @@
                uden en scene. Ellers kan den naeste replik ikke komme */
             L.tale = "";
             L.taleUr = 0;
+            L.undgaa = null;
             L.hovedV = 0; L.hovedDx = 0; L.hovedDy = 0;
             L.lukket = 0;
             L.kopV = 0;
@@ -1604,9 +1612,23 @@
             }
             ctx.restore();
 
-            var top = krop.y - 118;
-            var bh = bobleHoejde(ctx, L.tale);
-            tegnTaleboble(ctx, krop.x + 150, top - 6 - bh, L.tale, L.taleAlfa, krop.x + 52, top + 50);
+            if (NK.Taleboble) {
+                /* Boblen er sit eget lag: den faar munden og hovedets hoejde
+                   og finder selv sin plads, uden om det, han taler om */
+                var mund = this.laererMund();
+                var isse = NK.tilVerden(hoved, S.ANKER.laererHoved, 55, 0);
+                var undgaa = null;
+                if (L.undgaa && this.g && this.g[L.undgaa] && this.rekt) undgaa = this.rekt(this.g[L.undgaa], 8);
+                /* Hovedspritet er 110 x 130 med munden 97 nede fra issen */
+                NK.Taleboble.tegn(ctx, L.tale, L.taleAlfa, mund, {
+                    hoved: { op: Math.max(20, mund.y - isse.y), side: 58, ned: 36 },
+                    undgaa: undgaa
+                });
+            } else {
+                var top = krop.y - 118;
+                var bh = bobleHoejde(ctx, L.tale);
+                tegnTaleboble(ctx, krop.x + 150, top - 6 - bh, L.tale, L.taleAlfa, krop.x + 52, top + 50);
+            }
         };
     }
 

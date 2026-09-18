@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Talebobleprøve - laboratoriet</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    .h { color:#f2c53d; font-weight:700; }
+    p { margin:4px 0 8px; line-height:1.5; max-width:1120px; }
+    .raekke { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:8px 0; }
+    button { font:inherit; background:#232734; color:#e9eef4; border:1px solid #3a4150; border-radius:6px; padding:4px 10px; cursor:pointer; }
+    button.aktiv { background:#f2c53d; color:#14141a; border-color:#f2c53d; }
+    label { color:#a9b2bd; }
+    canvas { display:block; background:#2a2f36; border:1px solid #3a4150; border-radius:6px; cursor:crosshair; }
+    #status { color:#7ee0a8; white-space:pre; margin-top:8px; }
+    .lav { color:#7d8590; }
+</style>
+</head>
+<body>
+<div class="h">Talebobleprøve: boblen som eget lag</div>
+<p>Flyt musen over scenen: munden følger den, og boblen finder selv sin plads. Den foretrækker at stå
+over hovedet, vender til siden eller under, når der ikke er plads, holder sig inden for scenen og
+lægger sig ikke over det gule rektangel (det, replikken handler om). Træk i rektanglet for at flytte det.
+Zoomen efterligner et bredt bord, der er skaleret ned til vinduet: skriften holder sin mindste størrelse
+på skærmen, og hele boblen vokser med.</p>
+<div class="raekke">
+    <label>Replik:</label>
+    <button data-tekst="Kort.">ét ord</button>
+    <button data-tekst="Glas 7 skulle stå urørt." class="aktiv">én sætning</button>
+    <button data-tekst="Et af glassene er noteret anderledes, end det ser ud. Kig en gang til. Jeg har tid. Det står i regnskabet, og regnskabet glemmer ikke noget.">fem linjer</button>
+    <label style="margin-left:16px">Zoom:</label>
+    <button data-zoom="1">1,0</button>
+    <button data-zoom="0.7" class="aktiv">0,7 (sb2.4)</button>
+    <button data-zoom="0.5">0,5</button>
+    <label style="margin-left:16px">Foretrukken side:</label>
+    <button data-side="over" class="aktiv">over</button>
+    <button data-side="hoejre">højre</button>
+    <button data-side="venstre">venstre</button>
+    <button data-side="under">under</button>
+</div>
+<canvas id="scene" width="1120" height="600"></canvas>
+<div id="status"></div>
+<p class="lav">Udviklerværktøj. Indgår ikke i animationerne og kan slettes. Laget ligger i js/taleboble.js.</p>
+<script src="js/kerne.js"></script>
+<script src="js/taleboble.js"></script>
+<script>
+/* Efterligner NK.Laerred + bordets skalering: scenen er BREDDE x HOEJDE
+   tegneenheder og tegnes zoomet ind i lærredet. */
+var BREDDE = 1120, HOEJDE = 600;
+NK.Scene = { BREDDE: BREDDE, HOEJDE: HOEJDE };
+var canvas = document.getElementById("scene");
+var ctx = canvas.getContext("2d");
+var tekst = "Glas 7 skulle stå urørt.";
+var zoom = 0.7;
+var side = "over";
+var mund = { x: 560, y: 380 };
+var undgaa = { x: 620, y: 150, b: 90, h: 130 };
+var traek = null;
+
+function tilpas() {
+    var dpr = window.devicePixelRatio || 1;
+    var b = Math.round(BREDDE * zoom), h = Math.round(HOEJDE * zoom);
+    canvas.style.width = b + "px"; canvas.style.height = h + "px";
+    canvas.width = Math.round(b * dpr); canvas.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function tilVerden(e) {
+    var r = canvas.getBoundingClientRect();
+    return { x: (e.clientX - r.left) / zoom, y: (e.clientY - r.top) / zoom };
+}
+
+function tegn() {
+    ctx.save();
+    ctx.setTransform(window.devicePixelRatio || 1, 0, 0, window.devicePixelRatio || 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.scale(zoom, zoom);
+    /* Scenens kant */
+    ctx.strokeStyle = "#3a4150"; ctx.lineWidth = 1;
+    ctx.strokeRect(0.5, 0.5, BREDDE - 1, HOEJDE - 1);
+    /* Bordet, som reference */
+    ctx.fillStyle = "#4a3b2a"; ctx.fillRect(0, 430, BREDDE, 170);
+    /* Det, replikken handler om */
+    ctx.fillStyle = "rgba(242,197,61,0.25)"; ctx.strokeStyle = "#f2c53d"; ctx.lineWidth = 2;
+    ctx.fillRect(undgaa.x, undgaa.y, undgaa.b, undgaa.h); ctx.strokeRect(undgaa.x, undgaa.y, undgaa.b, undgaa.h);
+    NK.tekst(ctx, "det, han taler om", undgaa.x + undgaa.b / 2, undgaa.y + undgaa.h + 14, { str: 12, farve: "#f2c53d", justering: "center" });
+    /* Et hoved: 130 enheder hoejt, munden 97 nede fra issen (som Kemichaels sprite) */
+    var isseY = mund.y - 97;
+    ctx.fillStyle = "#e8c9a8"; ctx.beginPath(); ctx.ellipse(mund.x, isseY + 65, 52, 65, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#2a2f36"; ctx.beginPath(); ctx.ellipse(mund.x, mund.y, 9, 4, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#dfe6ee"; ctx.fillRect(mund.x - 60, isseY + 128, 120, 400);
+    /* Boblen */
+    var p = NK.Taleboble.tegn(ctx, tekst, 1, mund, { hoved: { op: 97, side: 55, ned: 33 }, undgaa: undgaa, side: side });
+    ctx.restore();
+    var s = NK.Taleboble.sidst;
+    document.getElementById("status").textContent = !s ? "" :
+        "side: " + s.side + "   linjer: " + s.linjer + "   forstørrelse: " + s.f.toFixed(2) +
+        "   skrift på skærmen: " + (NK.Taleboble.STIL.skrift * s.f * zoom).toFixed(1) + " px" +
+        "   boble: x " + s.x.toFixed(0) + "  y " + s.y.toFixed(0) + "  " + s.b.toFixed(0) + " × " + s.h.toFixed(0) +
+        (s.pris > 0 ? "   (måtte gå på kompromis: " + s.pris.toFixed(0) + ")" : "   (fri)");
+}
+
+canvas.addEventListener("mousemove", function (e) {
+    var w = tilVerden(e);
+    if (traek) { undgaa.x = w.x - traek.dx; undgaa.y = w.y - traek.dy; }
+    else mund = w;
+    tegn();
+});
+canvas.addEventListener("mousedown", function (e) {
+    var w = tilVerden(e);
+    if (w.x >= undgaa.x && w.x <= undgaa.x + undgaa.b && w.y >= undgaa.y && w.y <= undgaa.y + undgaa.h) traek = { dx: w.x - undgaa.x, dy: w.y - undgaa.y };
+});
+window.addEventListener("mouseup", function () { traek = null; });
+
+Array.prototype.forEach.call(document.querySelectorAll("button"), function (k) {
+    k.addEventListener("click", function () {
+        var gruppe = k.dataset.tekst !== undefined ? "tekst" : (k.dataset.zoom !== undefined ? "zoom" : "side");
+        Array.prototype.forEach.call(document.querySelectorAll("button[data-" + gruppe + "]"), function (b) { b.classList.remove("aktiv"); });
+        k.classList.add("aktiv");
+        if (gruppe === "tekst") tekst = k.dataset.tekst;
+        if (gruppe === "zoom") { zoom = Number(k.dataset.zoom); tilpas(); }
+        if (gruppe === "side") side = k.dataset.side;
+        tegn();
+    });
+});
+tilpas();
+tegn();
+</script>
+</body>
+</html>

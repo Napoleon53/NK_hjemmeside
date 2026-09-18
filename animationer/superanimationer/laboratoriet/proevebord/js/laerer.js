@@ -26,7 +26,10 @@
                            eller et udtryk-objekt som i kemichael.js
                 Replikker venter paa hinanden i stedet for at falde sammen
                 til én, og han overhoerer dem aldrig: det er forloebet, der
-                har besluttet, at han skal tale.
+                har besluttet, at han skal tale. Mens han taler om en
+                genstand, holder boblen sig fri af den (L.undgaa), og et
+                uheld, der afbryder ham, laegger resten af replikken
+                forrest i koeen, saa den bliver sagt bagefter.
    ===================================================================== */
 (function () {
     "use strict";
@@ -155,16 +158,44 @@
                    : NK.klamp(NK.Scene.BREDDE * 0.35, 60, NK.Scene.BREDDE - 260);
         var ekstra = v.glimt && K.glimtTrin ? K.glimtTrin(v.glimt) : [];
         var trin = [{ udtryk: udtryk }, { gaa: x }];
-        if (gg) trin.push({ kald: function () { this.markér(v.peg, 4); } });
+        if (gg) trin.push({ kald: function () { this.markér(v.peg, 4); this.laerer.undgaa = v.peg; } });
         a.linjer.forEach(function (rp, i) {
             if (i > 0) trin.push({ tid: 0.2 });
-            trin.push(sig(rp));
+            var t = sig(rp);
+            t.replikLinje = i;          /* saa en afbrudt replik ved, hvor langt den kom */
+            trin.push(t);
         });
         trin = trin.concat(ekstra, [
+            { kald: function () { this.laerer.undgaa = null; this.laerer.replikNu = null; } },
             { udtryk: { skeptisk: 0, briller: 0 } },
             { gaa: UDE }
         ]);
+        this.laerer.replikNu = a;
         this.laererKoer("replik", trin, false);
+    };
+
+    /* Et uheld afbryder den scene, der koerer. Var det en replik fra
+       forloebet, skal resten af den ikke gaa tabt: de linjer, der ikke er
+       sagt, laegges forrest i koeen og siges, naar han er faerdig med at
+       toerre op. Reglen om ikke at afbryde boblen gaelder stadig - det er
+       scenen, der afbrydes, ikke den linje, der staar. */
+    P.laererAfbryd = function () {
+        var L = this.laerer;
+        if (!L) return;
+        var sc = L.scene, a = L.replikNu;
+        if (sc && sc.navn === "replik" && a && a.linjer) {
+            var sagt = 0;
+            for (var j = 0; j < sc.trin.length && j <= sc.i; j++) {
+                var tr = sc.trin[j];
+                if (tr.replikLinje !== undefined && (j < sc.i || tr.startet)) sagt = tr.replikLinje + 1;
+            }
+            var rest = a.linjer.slice(sagt);
+            this.laererVent = this.laererVent || [];
+            if (rest.length) this.laererVent.unshift({ fn: "laererSigReplik", arg: { linjer: rest, valg: a.valg }, noegle: "replik:afbrudt" });
+        }
+        L.replikNu = null;
+        L.undgaa = null;
+        L.scene = null;
     };
 
     /* ----- Uheld: han toerrer op ------------------------------------------ */
@@ -184,7 +215,7 @@
         var maerker = gg.spildtMaerker || (gg.indhold ? NK.Stof.faremaerker(NK.Beholder.samlet(gg)) : []);
         gg.spildtMaerker = null;
         if (!this.laererOpdager(alvorlig(maerker))) return;
-        L.scene = null;
+        this.laererAfbryd();
         this.uheldTal = this.uheldTal || {};
         this.uheldTal[slags] = (this.uheldTal[slags] || 0) + 1;
         var liste = REPLIK[slags] || REPLIK.spild;
@@ -216,7 +247,7 @@
 
     P.laererKnust = function (gg) {
         var L = this.laerer;
-        L.scene = null;
+        this.laererAfbryd();
         this.uheldTal = this.uheldTal || {};
         this.uheldTal.knust = (this.uheldTal.knust || 0) + 1;
         var replik = KNUST[Math.min(this.uheldTal.knust, KNUST.length) - 1];
