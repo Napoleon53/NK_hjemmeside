@@ -4,6 +4,13 @@ Kemi-undervisningssite: HTML/CSS/vanilla JS, ingen build-proces. Animationer i
 `animationer/superanimationer/*` (interaktive canvas-simulationer med opgaver),
 statiske sider i roden, downloads i `downloads/`.
 
+## Om brugeren
+
+- Brugeren vibecoder og programmerer aldrig selv. Tal direkte og uden kodejargon,
+  og gør arbejdet i stedet for at forklare, hvordan det gøres.
+- Er der et reelt valg, så giv valgmulighederne med din anbefaling først og en
+  kort begrundelse. Brugeren følger som regel anbefalingen.
+
 ## Sprog og tone
 
 - Dansk, forklarende men formelt og skarpt.
@@ -28,6 +35,10 @@ statiske sider i roden, downloads i `downloads/`.
   komme på besøg) og superlab-animationer (et forsøg på `laboratoriet/`,
   Kemichael er fast), og den har kravene til begge. Punkterne nedenfor om
   forsøg, laboratoriet og uheld gælder superlab-animationerne.
+- En ny superanimation eller superlab-animation ligger kun i sin egen mappe, til
+  brugeren siger til. Først da kommer den i samlingsfilerne (`samling_*.html`) og
+  `FEEDBACK_EMNER`, og først da flyttes en gammel animation, den afløser, til
+  `arkiv/`. Ret samtidig kolonnen "I menuen" i superanimationernes README.
 - Ingen løbende liste af iagttagelser i panelet. Forsøget opsummeres i stedet
   som en tegneserie i en pop-up bag en knap, der først låses op, når forsøget
   er slut (mønster: `sc6.8_substitution/js/tegneserie.js`).

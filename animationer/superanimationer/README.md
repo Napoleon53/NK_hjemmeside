@@ -8,19 +8,39 @@ ikke at de er store eller ligger i deres egen mappe.
 |  | Superanimation | Superlab-animation |
 |--|----------------|--------------------|
 | Handler om | ét begreb | ét forsøg |
-| Eleven | bygger, skruer, forudsiger og spiller | udfører forsøget selv, fra afvejning til affald |
+| Eleven | bygger, skruer, forudsiger og spiller | udfører forsøget selv, trin for trin |
 | Form | op til fire faner med hver sin vinkel på samme idé | én scene med en rigtig laboratorieopstilling |
 | Kode | selvstændig mappe | står på den fælles motor i `laboratoriet/` |
 | Kemichael | kan komme på besøg | fast bestanddel |
-| Eksempler | sb2.0, sb3.2, sc1.1, sc2.1, sc2.2, sc3.1, sc3.2 | sc1.3, sc2.5, sc2.6, sc2.7, sc6.8, sc6.9, sc8.6, sb2.4 |
 
 De to slags bygges hver for sig. Det eneste overlap er kemilæreren Kemichael.
 I en superanimation er han gæst og dukker op, når det giver mening (sc2.1). I
 en superlab-animation er han en del af forsøget.
 
-sc3.2 er ikke aktiv. sb2.4 findes i to udgaver: `sb2.4_jernthiocyanat` er den,
-menuen bruger, og `sb2.4_ligevaegt` er det samme forsøg bygget på den fælles
-motor, stadig under opbygning.
+## Oversigt
+
+"I menuen" betyder, at en samlingsfil (`samling_*.html`) linker til mappen. En
+ny animation kommer først i menuen, når brugeren siger til.
+
+| Mappe | Slags | I menuen | Note |
+|-------|-------|----------|------|
+| `sb2.0_ligevaegt_intro` | superanimation | nej | |
+| `sb2.4_jernthiocyanat` | superlab | ja | gammel kode, afløses af `sb2.4_ligevaegt` |
+| `sb2.4_ligevaegt` | superlab | nej | samme forsøg på den fælles motor, under opbygning |
+| `sb3.2_titreringssimulator` | superanimation | ja | |
+| `sc1.1_atombygger` | superanimation | ja | via genvejen `kemi-c-filer/c1.1_atommodel_ioner.html` |
+| `sc1.3_knaldgas` | superlab | ja | ældre sidelayout |
+| `sc2.1_salt_i_vand` | superanimation | nej | menuen viser stadig den gamle c2.1 |
+| `sc2.2_saltbygger` | superanimation | nej | menuen viser stadig den gamle c2.2 |
+| `sc2.5_faeldning` | superlab | ja | ældre sidelayout og ældre udgave af Kemichael |
+| `sc2.6_kobber_dibrom` | superlab | ja | |
+| `sc2.7_blyiodid` | superlab | ja | |
+| `sc3.1_elektronprikformler` | superanimation | ja | |
+| `sc3.2_rumlig_opbygning` | superanimation | nej | inaktiv: rettes ikke, før brugeren siger til |
+| `sc3.4_blandbarhed` | superanimation | ja | ny, sept. 2026 |
+| `sc6.8_substitution` | superlab | ja | |
+| `sc6.9_fedt_i_chips` | superlab | ja | |
+| `sc8.6_jern_i_staaluld` | superlab | ja | |
 
 ## Fælles krav
 
@@ -124,7 +144,7 @@ kan lave de fejl, man kan lave dér.
 ## Det, der ikke er en animation
 
 Mapperne, der begynder med `sb` eller `sc`, er superanimationer eller
-superlab-animationer (se tabellen). Resten er fælles kode og værktøj:
+superlab-animationer (se oversigten). Resten er fælles kode og værktøj:
 
 * `laboratoriet/` er motoren bag superlab-animationerne: stoffer, udstyr,
   bordet, forløbet og den fælles skal. Prøvebordet og prøverummet derinde er
@@ -135,9 +155,9 @@ superlab-animationer (se tabellen). Resten er fælles kode og værktøj:
 * Filer, der begynder med `_` (`_selvtest.html`, `_geometri.html`,
   `_lav_sprites.js`), er udviklerværktøj og indgår ikke i animationerne.
 
-På sigt kan animationerne blive lagt et lag længere nede, så de fælles mapper
-ikke forveksles med dem. Så skal stierne til `../laboratoriet/` og
-`../kemichael/` og linkene i samlingerne (`../superanimationer/...`) følge med.
+Animationerne skal deles i to undermapper, `superanimation/` og `superlab/`,
+så de fælles mapper ikke forveksles med dem. Planen står i `_oprydning.md` og
+udføres, når brugeren beder om det.
 
 ## Fælles opbygning
 
@@ -151,8 +171,11 @@ ikke forveksles med dem. Så skal stierne til `../laboratoriet/` og
 * **`_selvtest.html`** tjekker det, man ikke kan se på et skærmbillede: at
   modellen rammer tabelværdierne, at forløbet kan gennemføres, og at sproget
   overholder reglerne.
+* **Menuen:** en ny animation ligger kun i sin mappe, til brugeren siger til.
+  Først da kommer den i samlingsfilerne og `FEEDBACK_EMNER`, og kolonnen
+  "I menuen" i oversigten rettes.
 * **Afløser** den en gammel enkeltfil, flyttes den gamle til `arkiv/` med
-  `_oldversion` i navnet.
+  `_oldversion` i navnet, men først når den nye kommer i menuen.
 
 ## Tjekliste før menuen
 
@@ -167,6 +190,7 @@ ikke forveksles med dem. Så skal stierne til `../laboratoriet/` og
 - [ ] Sproget er kort og uden tankestreger, talesprog og 1+/1−.
 - [ ] Humoren rammer handlingen, aldrig eleven.
 - [ ] `_selvtest.html` er grøn, og siden virker fra harddisken.
+- [ ] Brugeren har sagt, at den skal i menuen.
 
 ## Til den, der koder
 
