@@ -506,7 +506,10 @@
        samtidig kommer et stort overskud af noget andet (FeSCN2+ bliver
        flere, naar Fe(NO3)3 tilsaettes, i stedet for at forsvinde). Uden
        ref faar den stoerste slags 'maks'. Hvert synligt stof faar mindst
-       én kugle og hoejst det dobbelte af maks. Et oploest stof under
+       én kugle og hoejst det dobbelte af maks, og der er hoejst LOFT
+       kugler i alt (20): er der flere, skaleres alle ned i samme forhold,
+       saa boblen ikke bliver en myretue ved hoeje koncentrationer, og
+       forholdet mellem stofferne stadig kan ses. Et oploest stof under
        PARTIKEL_MIN (10⁻⁵ M) vises ikke, fx vandets egne ioner (10⁻⁷ M) i
        rent vand eller H⁺ i en neutral oploesning. Det er koncentrationen,
        der taeller, ikke stofmaengden, saa et stort vandbad er lige saa tomt
@@ -514,6 +517,7 @@
        indikator er der lidt af, men den farver alt: altid én kugle. */
     var PARTIKEL_MIN = 0.01;   /* mM */
     var FAST_MIN = 0.5;        /* µmol: et fnug bundfald under det vises ikke */
+    var LOFT = 20;             /* hoejst saa mange kugler i boblen i alt */
 
     /* Er der nok af stoffet til at vise det (i boblen og i tabellen)? */
     function synlig(o, s) {
@@ -524,10 +528,12 @@
         return o.n[s] / o.V >= PARTIKEL_MIN || !!(st && st.indikator);
     }
 
-    /* skjul: stofnavne, der ikke skal vises (tilskuerioner) */
-    function partikelTal(o, maks, skjul, ref) {
-        var ud = {}, top = 0, s, synlige = [];
+    /* skjul: stofnavne, der ikke skal vises (tilskuerioner).
+       loft: hoejst saa mange kugler i alt (standard LOFT) */
+    function partikelTal(o, maks, skjul, ref, loft) {
+        var ud = {}, top = 0, s, synlige = [], ialt = 0;
         maks = maks || 6;
+        loft = loft || LOFT;
         for (s in o.n) {
             if (!synlig(o, s) || (skjul && skjul.indexOf(s) >= 0)) continue;
             synlige.push(s);
@@ -537,8 +543,32 @@
         synlige.forEach(function (s) {
             var andel = fast ? o.n[s] / o.V / ref : o.n[s] / top;
             ud[s] = NK.klamp(Math.round(andel * maks), 1, maks * 2);
+            ialt += ud[s];
         });
+        if (ialt > loft) skalerNed(ud, synlige, ialt, loft);
         return ud;
+    }
+
+    /* Ned til loftet i samme forhold: hver faar sin del rundet ned (mindst
+       én), og resten gives til dem med den stoerste brøkdel. Er der flere
+       slags end loftet, faar hver én. */
+    function skalerNed(ud, navne, ialt, loft) {
+        var f = loft / ialt, sum = 0, rest = [];
+        navne.forEach(function (s) {
+            var x = ud[s] * f;
+            ud[s] = Math.max(1, Math.floor(x));
+            sum += ud[s];
+            rest.push({ s: s, broek: x - ud[s] });
+        });
+        rest.sort(function (a, b) { return b.broek - a.broek || (a.s < b.s ? -1 : 1); });
+        for (var i = 0; sum < loft && i < rest.length; i++) { ud[rest[i].s]++; sum++; }
+        /* Mange smaa slags, der hver fik én, kan have skubbet summen over */
+        while (sum > loft) {
+            var stoerst = navne.reduce(function (a, b) { return ud[b] > ud[a] ? b : a; });
+            if (ud[stoerst] <= 1) break;
+            ud[stoerst]--;
+            sum--;
+        }
     }
 
     /* Tilskuerioner: de ioner, der ikke tager del i nogen af de reaktioner,
@@ -661,6 +691,7 @@
         synlig: synlig,
         tilskuerioner: tilskuerioner,
         PARTIKEL_MIN: PARTIKEL_MIN,
+        PARTIKEL_LOFT: LOFT,
         gitter: gitter
     };
 

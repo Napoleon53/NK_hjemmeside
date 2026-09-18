@@ -42,11 +42,14 @@ lydknappen, introen, teoriboksen, rundvisningen, tastaturet, logbogen og
 Start forfra — ligger nu i `../../laboratoriet/js/side.js`.
 
 **Panelet** holder kun det, man bruger undervejs: det valgte glas' rumfang,
-temperatur og pH med indholdet i tal foldet sammen (»Indhold«), forløbet,
-ligevægten og uheldene. Der er ingen logbog i dette forsøg; journalen
-(billedet af de syv glas) er elevens notater. Teorien bag hvert indgreb
-ligger i teoriboksen, som åbnes med knappen Teori, med »Læs teorien« under
-ligningen eller med tasten T.
+temperatur og pH med indholdet i tal foldet sammen (»Indhold«), forløbet og
+tælleren for uheld. Ligevægten står i toplinjen mellem titlen og knapperne.
+Teorien bag hvert indgreb ligger i teoriboksen, som åbnes med knappen Teori
+eller tasten T. Ved siden af Teori folder knappen Noter (tasten N) elevens
+noter ud i laboratoriets øverste højre hjørne; »Notér det valgte glas«
+skriver aflæsningen ind, og man skriver videre efter den. Noterne huskes i
+browseren. Journalen (billedet af de syv glas) er stadig det, forløbet
+bedømmer.
 
 **Laboratoriet** er 1040 bredt (før 1520), så alt er omkring 45 % større
 på skærmen. Reagenserne står på tre hylder: over stativet flasken,

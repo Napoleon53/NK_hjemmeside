@@ -109,13 +109,16 @@ function koerTest() {
     bord.vaelg(valgtFoer);
     side.opdaterPanel();
 
-    /* Teoriboksen: ligningen staar i panelet, resten bag knappen og T */
-    var teori = d.getElementById("teori");
-    paastand("ligningen staar i panelet, og teorien er ikke dér",
-        d.getElementById("teori-kort-ramme").querySelector(".ligning") !== null &&
-        d.getElementById("teori-kort-ramme").textContent.indexOf("exoterm") < 0);
-    d.getElementById("teori-aabn").click();
-    paastand("knappen aabner teoriboksen", teori.classList.contains("vis"));
+    /* Ligevaegten staar i toplinjen, teorien bag knappen Teori og T, og
+       uheldskortet har kun sin taeller */
+    var teori = d.getElementById("teori"), topL = d.getElementById("top-ligning");
+    paastand("ligningen staar i toplinjen", !!topL && topL.textContent.indexOf("⇌") > 0 &&
+        topL.parentNode.classList.contains("top") && topL.getBoundingClientRect().width > 100, topL && topL.textContent);
+    paastand("panelet har ikke laengere et ligevaegtskort", !d.getElementById("teori-kort-ramme") && !d.getElementById("teori-aabn"));
+    paastand("uheldskortet har kun taelleren", !d.getElementById("uheld-tekst") && !!d.getElementById("uheld-taeller") &&
+        d.getElementById("uheld-kort").textContent.replace(/\s+/g, " ").trim() === "Uheld " + bord.antalUheld);
+    d.getElementById("teoriknap").click();
+    paastand("knappen Teori aabner teoriboksen", teori.classList.contains("vis"));
     paastand("teorien er bygget af blokke",
         teori.querySelectorAll("#teori-indhold p").length >= 5 &&
         teori.querySelectorAll("#teori-indhold h3").length >= 4 &&
@@ -125,6 +128,36 @@ function koerTest() {
     d.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "T" }));
     paastand("og T aabner den", teori.classList.contains("vis"));
     NK.teori.luk();
+
+    /* Noterne foldes ud fra toplinjen ved siden af Teori */
+    var noter = d.getElementById("noter"), noterknap = d.getElementById("noterknap"), felt = d.getElementById("logbog-tekst");
+    var noterFoer = felt.value;
+    paastand("knappen Noter staar lige efter Teori", !!noterknap && d.getElementById("teoriknap").nextElementSibling === noterknap);
+    paastand("noterne er foldet ind som udgangspunkt", noter.hidden && noterknap.getAttribute("aria-expanded") === "false");
+    noterknap.click();
+    paastand("knappen folder dem ud, og markoeren staar i feltet", !noter.hidden && d.activeElement === felt &&
+        noterknap.getAttribute("aria-expanded") === "true" && noterknap.classList.contains("aktiv"));
+    var rN = noter.getBoundingClientRect(), rS = d.getElementById("scene").getBoundingClientRect();
+    paastand("de ligger i scenens oeverste hoejre hjoerne, ikke over panelet", rN.right <= rS.right + 0.5 && rN.top >= rS.top && rN.top - rS.top < 20,
+        Math.round(rN.left) + "-" + Math.round(rN.right) + " / scene " + Math.round(rS.right));
+    felt.value = "";
+    bord.vaelg("kolbe");
+    d.getElementById("logbog-noter").click();
+    var noteret = felt.value;
+    paastand("»Notér det valgte glas« skriver kolbens aflaesning som tabellen: uden tilskuere og spor",
+        noteret.indexOf("Kolben") >= 0 && noteret.indexOf("Fe³⁺") >= 0 && noteret.indexOf("K⁺") < 0 && noteret.indexOf("0,00") < 0, noteret);
+    paastand("og markoeren staar efter den, saa man kan skrive videre", d.activeElement === felt && felt.selectionStart === felt.value.length);
+    felt.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "t", bubbles: true }));
+    paastand("et t i feltet aabner ikke teorien", !teori.classList.contains("vis"));
+    felt.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    paastand("Esc i feltet folder noterne ind", noter.hidden && !noterknap.classList.contains("aktiv"));
+    d.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "n" }));
+    paastand("tasten N folder dem ud igen", !noter.hidden);
+    d.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "N" }));
+    paastand("og ind", noter.hidden);
+    felt.value = noterFoer;
+    side.logbogGem();
+    bord.vaelg(valgtFoer);
 
     function adv(sek) { for (var k = 0; k < Math.round(sek * 20); k++) bord.opdater(0.05); F.opdater(); }
     function lys(gg) { return V.lysstyrke(gg); }
@@ -171,10 +204,15 @@ function koerTest() {
     var k7 = kugler(g(7)), k1 = kugler(g(1)), k4 = kugler(g(4));
     paastand("forsoeget finder selv tilskuerionerne K+ og NO3-", bord.tilskuere.join(",") === "K+,NO3-", bord.tilskuere.join(", "));
     paastand("FeSCN2+ faar flere kugler i glas 1 (mere Fe3+) end i referencen", (k1["FeSCN2+"] || 0) > (k7["FeSCN2+"] || 0),
-        (k7["FeSCN2+"] || 0) + " -> " + (k1["FeSCN2+"] || 0));
+        (k7["FeSCN2+"] || 0) + " -> " + (k1["FeSCN2+"] || 0) + " " + JSON.stringify(k1));
     paastand("og faerre i glas 4 (AgNO3), men forsvinder ikke", (k4["FeSCN2+"] || 0) >= 1 && (k4["FeSCN2+"] || 0) <= (k7["FeSCN2+"] || 0),
         (k7["FeSCN2+"] || 0) + " -> " + (k4["FeSCN2+"] || 0));
     paastand("tilskuerionerne er ikke i boblen for referencen", !k7["K+"] && !k7["NO3-"], JSON.stringify(k7));
+    /* Loftet: hoejst 20 kugler i alt, ogsaa med tilskuerne vist */
+    function ialt(k) { return Object.keys(k).reduce(function (a, n) { return a + k[n]; }, 0); }
+    var alle1 = St.partikelTal(B.samlet(g(1)), 6, [], bord.valg.partikelRef);
+    paastand("boblen har hoejst 20 kugler i glas 1, ogsaa med tilskuerne", ialt(k1) <= 20 && ialt(alle1) <= 20 && ialt(alle1) >= ialt(k1),
+        ialt(k1) + " / " + ialt(alle1) + " " + JSON.stringify(alle1));
     var kAg = kugler(bord.g.ag), kSCN = kugler(bord.g.fl_kscn);
     paastand("men med kun to ioner vises de (AgNO3- og KSCN-flasken)", kAg["NO3-"] > 0 && kAg["Ag+"] > 0 && kSCN["K+"] > 0 && kSCN["SCN-"] > 0);
     bord.vaelg("glas7");
@@ -746,6 +784,37 @@ function koerTest() {
     paastand("og Esc lukker den", !bord.storBoble);
     mus.hold(0.6);
     paastand("bagefter kan kolben tages igen", mus.tag("kolbe") && (mus.slip(), true));
+
+    /* Spatlen med musen: en spatelspids Fe(NO3)3 fra pulverglasset paa
+       hylden til glas 1. En fuld spatel kan ikke tage mere; pilen ved den
+       tomme spatel henter selv en spatelspids mere og kommer tilbage. */
+    NK.startForfra();
+    adv(0.5);
+    var sp = bord.g.spatel, feJar = bord.g.pulver_fe;
+    function feI1() { var o = B.samlet(g(1)).n; return ["Fe(NO3)3(s)", "Fe3+", "FeSCN2+", "Fe(OH)3(s)"].reduce(function (a, k) { return a + (o[k] || 0); }, 0); }
+    function sidsteBesked() { return beskeder[beskeder.length - 1] || ""; }
+    var rkJar = bord.rekt(feJar, 0);
+    paastand("spatlen kan tages med musen", mus.tag("spatel"));
+    mus.til({ x: rkJar.x + rkJar.b / 2, y: rkJar.y + rkJar.h * 0.4 }, 0.8);
+    paastand("over pulverglasset med Fe(NO3)3 faar det den groenne ramme", bord.slipMaal === "pulver_fe", bord.slipMaal);
+    mus.slip();
+    mus.hold(2);
+    paastand("spatlen er fuld og haenger over pulverglasset uden pil", !!sp.last && !!sp.svaev && sp.svaev.maal === feJar && !bord.svaevRing());
+    mus.klik("spatel");
+    paastand("et klik paa den fulde spatel tager ikke mere, men siger, hvad man goer", sp.last.umol === 1500 && sidsteBesked().indexOf("Spatlen er fuld") === 0, sidsteBesked());
+    var rkG1 = bord.rekt(g(1), 0);
+    mus.tag("spatel");
+    mus.til({ x: g(1).p.x, y: rkG1.y + 10 }, 0.8);
+    paastand("over glas 1 faar glasset den groenne ramme", bord.slipMaal === "glas1", bord.slipMaal);
+    mus.slip();
+    mus.hold(2);
+    paastand("glas 1 fik spatelspidsen", Math.abs(feI1() - 1500) < 1, tal(feI1()));
+    var ringS = bord.svaevRing();
+    paastand("pilen ved den tomme spatel siger »En spatelspids mere«", !!ringS && ringS.tekst === "En spatelspids mere", ringS && ringS.tekst);
+    if (ringS) mus.klik({ x: ringS.x, y: ringS.y });
+    mus.hold(3);
+    paastand("et klik paa pilen: spatlen henter selv og giver glas 1 en spatelspids mere", Math.abs(feI1() - 3000) < 1 && !sp.last && !!sp.svaev && sp.svaev.maal === g(1), tal(feI1()));
+    paastand("spatlen kan traekkes hjem", flytHjem("spatel"));
     bord.vedBesked = vedB;
     NK.startForfra();
 }

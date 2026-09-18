@@ -6,12 +6,15 @@
    NB: decimaltal med PUNKTUM i CSS.
    ===================================================================== */
 
-/* Ligevaegtsligningen oeverst i teorikortet */
+/* Ligningerne i teoriboksen (ligevaegten selv staar i toplinjen) */
 .ligning {
     margin: 0 0 8px;
     font-size: 1.12rem;
     letter-spacing: 0.02em;
 }
+
+/* Uheldskortet har kun sin taeller */
+#uheld-kort h2 { margin-bottom: 0; }
 
 /* ----- Forloebet ------------------------------------------------------ */
 .forloeb-nu {

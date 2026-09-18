@@ -20,8 +20,11 @@
        bliver der en pyt. Saettes et reagensglas paa bordet, vaelter det.
      * Det, der lige er brugt (flaske, draabeflaske, sproejteflaske,
        spatel), bliver haengende over det, det blev brugt paa. Et klik
-       paa det gentager handlingen; resten af bordet venter, til det
-       traekkes vaek. En portion er hoejst en femtedel af glasset.
+       paa pilen ved siden af gentager handlingen; resten af bordet
+       venter, til det traekkes vaek. En portion er hoejst en femtedel af
+       glasset. En fuld spatel over pulverglasset har ingen pil (den kan
+       ikke tage mere); en tom spatel over et glas henter selv en
+       spatelspids mere i pulverglasset og kommer tilbage med den.
 
    Bordets maal og udseende i valg (NK.BORD_VALG):
      bredde, hoejde, bord   tegnebordet og bordpladens bagkant (y)
@@ -51,7 +54,8 @@
                             visTilskuere saettes (fluebenet i panelet)
      partikler, partikelRef boblens skala: et stof med koncentrationen
                             partikelRef (mM, standard 100) faar partikler
-                            kugler (standard 6); se Stof.partikelTal
+                            kugler (standard 6); se Stof.partikelTal.
+                            Hoejst Stof.PARTIKEL_LOFT (20) kugler i alt
 
    Hooks, som siden saetter:
      vedBesked(tekst, slags)   korte beskeder til scenen
@@ -1353,9 +1357,18 @@
        navnet "svaevring". */
     P.svaevRing = function () {
         var sv = this.svaevende();
-        if (!sv || this.koer.flytter(sv)) return null;
+        if (!sv || this.koer.flytter(sv) || !this.kanGentage(sv)) return null;
         var r = this.rekt(sv, 0);
         return { x: r.x + r.b + 22, y: r.y + r.h * 0.5, r: 15, navn: sv.navn, tekst: pilenGiver(sv).navn };
+    };
+
+    /* Kan det, der svaever, gentage? En fuld spatel over pulverglasset kan
+       ikke tage mere, og en tom spatel over et glas kan kun, hvis den har
+       et pulverglas at hente i. */
+    P.kanGentage = function (sv) {
+        if (!sv.kan.spatel) return true;
+        if (sv.svaev && sv.svaev.maal && sv.svaev.maal.kan.pulver) return false;
+        return !sv.last && !!this.pulverAtHente(sv);
     };
 
     /* Hvad pilen giver: navn ved pilen og »for ...« i beskeden */
@@ -1449,7 +1462,8 @@
         if (this.baerer) return false;
         if (navn === "svaevring") {
             var sv = this.svaevende();
-            if (!sv || this.koer.optaget()) return false;
+            if (!sv || this.koer.optaget() || !this.kanGentage(sv)) return false;
+            if (sv.kan.spatel) return this.hentOgGiv(sv, sv.svaev.maal);
             return this.moede(sv, sv.svaev.maal) || false;
         }
         var gg = this.g[navn];
@@ -1482,7 +1496,8 @@
            flasken siger, hvordan man faar mere, eller at den skal traekkes
            vaek */
         if (gg.svaev) {
-            this.besked("Klik på pilen " + pilenGiver(gg).besked + ", eller træk " + gg.titel + " væk.");
+            if (!this.kanGentage(gg)) this.besked(k.spatel && gg.last ? "Spatlen er fuld. Træk den hen over et glas." : "Træk " + gg.titel + " væk.");
+            else this.besked("Klik på pilen " + pilenGiver(gg).besked + ", eller træk " + gg.titel + " væk.");
             return false;
         }
         if (k.holder) {
@@ -1762,35 +1777,54 @@
         return true;
     };
 
-    /* Spatlen tager en spatelspids fra pulverglasset */
+    /* Spatlen tager en spatelspids fra pulverglasset. En fuld spatel kan
+       ikke tage mere: den skal gives til et glas foerst. */
     P.fyldSpatel = function (sp, jar) {
+        if (sp.last) { this.besked("Spatlen er fuld. Træk den hen over et glas."); return false; }
+        if (!Stof.faste(jar.indhold).length) { this.besked(jar.titel + " er tomt."); return false; }
+        this.koer.start(this.fyldTrin(sp, jar).concat(this.svaevVed(sp, jar, { dx: 10, dy: -18, v: 0.35 })), "spatel");
+        return true;
+    };
+
+    /* Trinene i at fylde spatlen: hen over pulverglasset, ned og op med en
+       spatelspids. Spatlen husker glasset (sp.fraPulver), saa pilen kan
+       hente mere derfra. */
+    P.fyldTrin = function (sp, jar) {
         var mig = this;
-        var liste = Stof.faste(jar.indhold);
-        if (!liste.length) { this.besked(jar.titel + " er tomt."); return false; }
-        var f = liste[0];
-        this.koer.start([
+        return [
             { flyt: sp, til: function () { return B.overAabning(sp, jar, 6, 6, 0.55); }, tid: 0.55, loeft: 30 },
             { tid: 0.25 },
             { kald: function () {
+                var f = Stof.faste(jar.indhold)[0];
+                if (!f) return;
                 var umol = Math.min(SPATELSPIDS, f.umol);
                 Stof.tilsaet(jar.indhold, f.navn, -umol);
                 sp.last = { navn: f.navn, umol: umol, farve: f.stof.farve || { r: 230, g: 230, b: 230 } };
+                sp.fraPulver = jar;
                 mig.haendelse("spatel", { fra: jar, stof: f.navn });
                 mig.aendret("spatel");
             } }
-        ].concat(this.svaevVed(sp, jar, { dx: 10, dy: -18, v: 0.35 })), "spatel");
-        return true;
+        ];
     };
 
     /* Spatelspidsen haeldes i glasset */
     P.toemSpatel = function (sp, c) {
-        var mig = this;
         if (!sp.last) return false;
         if (this.aaben(c)) this.vaelg(c.navn);
-        var last = sp.last;
-        this.koer.start([
+        this.koer.start(this.toemTrin(sp, c).concat(this.svaevVed(sp, c, { dx: 0, dy: -24, v: -0.5 })), "spatel");
+        return true;
+    };
+
+    /* Trinene i at give spatelspidsen: hen over glasset og drys den ned.
+       Lasten laeses, naar trinene koeres, saa de kan komme lige efter
+       fyldTrin. */
+    P.toemTrin = function (sp, c) {
+        var mig = this, last = null;
+        return [
             { flyt: sp, til: function () { return B.overAabning(sp, c, 0, -12, -0.5); }, tid: 0.55, loeft: 30 },
             { tid: 0.5, hver: function (t) {
+                last = last || sp.last;
+                if (!last) return;
                 if (Math.random() < 0.6) {
                     var m = NK.tilVerden(sp.p, sp.anker, sp.type.ske.x, sp.type.ske.y);
                     mig.draaber.push({ x: m.x + r(-3, 3), y: m.y, vx: r(-8, 8), vy: r(20, 60), rad: 1.5, liv: 1, farve: last.farve, korn: true, c: c });
@@ -1798,12 +1832,30 @@
                 if (t > 0.9) sp.last = null;
             } },
             { kald: function () {
+                if (!last) return;
                 B.tilsaetFast(c, last.navn, last.umol);
                 sp.last = null;
                 mig.haendelse("fast", { til: c, stof: last.navn, umol: last.umol });
                 mig.aendret("fast");
             } }
-        ].concat(this.svaevVed(sp, c, { dx: 0, dy: -24, v: -0.5 })), "spatel");
+        ];
+    };
+
+    /* Pilen ved en tom spatel over et glas: spatlen henter selv en
+       spatelspids i det pulverglas, den sidst tog fra, og kommer tilbage
+       og giver den til glasset. */
+    P.pulverAtHente = function (sp) {
+        var jar = sp.fraPulver;
+        if (!jar || this.liste.indexOf(jar) < 0 || !this.synlig(jar) || this.baerer === jar) return null;
+        return Stof.faste(jar.indhold).length ? jar : null;
+    };
+
+    P.hentOgGiv = function (sp, c) {
+        var jar = this.pulverAtHente(sp);
+        if (!jar || sp.last) return false;
+        if (!Stof.faste(jar.indhold).length) { this.besked(jar.titel.charAt(0).toUpperCase() + jar.titel.slice(1) + " er tomt."); return false; }
+        if (this.aaben(c)) this.vaelg(c.navn);
+        this.koer.start(this.fyldTrin(sp, jar).concat(this.toemTrin(sp, c), this.svaevVed(sp, c, { dx: 0, dy: -24, v: -0.5 })), "spatel");
         return true;
     };
 

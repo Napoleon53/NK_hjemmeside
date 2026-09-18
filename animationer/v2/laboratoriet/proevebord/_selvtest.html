@@ -103,7 +103,21 @@ function koerTest() {
        ogsaa naar noget andet er i stort overskud */
     var oRef = St.lav({ V: 6, mM: { "Fe3+": 250, "SCN-": 0.15, "FeSCN2+": 4.8 } });
     var tRef = St.partikelTal(oRef, 6, null, 3), tRel = St.partikelTal(oRef, 6);
-    paastand("med fast skala forsvinder FeSCN2+ ikke i et overskud af Fe3+", tRef["FeSCN2+"] >= 8 && tRef["SCN-"] === 1 && tRef["Fe3+"] === 12, JSON.stringify(tRef) + " (relativt: " + JSON.stringify(tRel) + ")");
+    paastand("med fast skala forsvinder FeSCN2+ ikke i et overskud af Fe3+", tRef["FeSCN2+"] >= 8 && tRef["SCN-"] === 1 && tRef["Fe3+"] >= 10, JSON.stringify(tRef) + " (relativt: " + JSON.stringify(tRel) + ")");
+    /* Loftet: hoejst 20 kugler i alt, i samme forhold som foer */
+    function sum(t) { return Object.keys(t).reduce(function (a, k) { return a + t[k]; }, 0); }
+    paastand("der er hoejst 20 kugler i boblen (Fe3+ 12 + SCN- 1 + FeSCN2+ 10 bliver 10 + 1 + 9)",
+        sum(tRef) === 20 && tRef["Fe3+"] === 10 && tRef["FeSCN2+"] === 9, JSON.stringify(tRef));
+    var tMange = kugler(3, { "Na+": 100, "Cl-": 100, "K+": 100, "NO3-": 100, "Cu2+": 50 });
+    paastand("fem slags ioner i 0,1 M deler 20 kugler i forholdet (4-5 hver og 2-3 af den halve)",
+        sum(tMange) === 20 && ["Na+", "Cl-", "K+", "NO3-"].every(function (k) { return tMange[k] >= 4 && tMange[k] <= 5; }) &&
+        tMange["Cu2+"] >= 2 && tMange["Cu2+"] <= 3, JSON.stringify(tMange));
+    var tFaa = kugler(3, { "Na+": 100, "Cl-": 100 });
+    paastand("under loftet er intet aendret", tFaa["Na+"] === 6 && tFaa["Cl-"] === 6, JSON.stringify(tFaa));
+    var oMange = { V: 3, n: {} }; for (var i = 0; i < 24; i++) oMange.n["x" + i] = 3;
+    var tMange2 = St.partikelTal(oMange, 6);
+    paastand("flere slags end loftet: hver faar én, og ingen forsvinder", Object.keys(tMange2).length === 24 &&
+        Object.keys(tMange2).every(function (k) { return tMange2[k] === 1; }) && St.PARTIKEL_LOFT === 20);
     paastand("tilskuerionerne findes ud fra reaktionerne: Pb(NO3)2 og KI giver K+ og NO3-",
         St.tilskuerioner(["Pb(NO3)2(s)", "KI(s)"]).join(",") === "K+,NO3-", St.tilskuerioner(["Pb(NO3)2(s)", "KI(s)"]).join(", "));
     paastand("men NO3- er ikke tilskuer, naar kobber oploeses i salpetersyre",
@@ -347,6 +361,25 @@ function koerTest() {
     paastand("saltet ligger som korn", n(g.glas2, "NaCl(s)") > 100, n(g.glas2, "NaCl(s)").toFixed(0));
     adv(6);
     paastand("saltet oploeses til Na⁺ og Cl⁻", n(g.glas2, "Na+") > 500, n(g.glas2, "Na+").toFixed(0));
+    /* Pilen ved en tom spatel over et glas: spatlen henter selv en
+       spatelspids i pulverglasset og kommer tilbage med den. En fuld spatel
+       over pulverglasset har ingen pil og kan ikke tage mere. */
+    bord.liste.forEach(function (x) { if (x !== g.spatel) vaek(x); });
+    function naclIGlas() { return n(g.glas2, "Na+") + n(g.glas2, "NaCl(s)"); }
+    function naclIPulver() { var f = St.faste(g.pulver_nacl.indhold)[0]; return f ? f.umol : 0; }
+    var naFoer = naclIGlas(), pFoer = naclIPulver(), ringSp = bord.svaevRing();
+    paastand("pilen ved den tomme spatel over glasset siger »En spatelspids mere«", !!ringSp && ringSp.tekst === "En spatelspids mere", ringSp && ringSp.tekst);
+    paastand("et klik paa pilen: spatlen henter selv en spatelspids og giver glasset den", bord.klik("svaevring"));
+    faerdig();
+    paastand("glas 2 fik én spatelspids mere, og pulverglasset mistede én", Math.abs(naclIGlas() - naFoer - 1500) < 1 && Math.abs(pFoer - naclIPulver() - 1500) < 1,
+        (naclIGlas() - naFoer).toFixed(0) + " / " + (pFoer - naclIPulver()).toFixed(0));
+    paastand("spatlen er tom og haenger over glas 2 igen", !g.spatel.last && !!g.spatel.svaev && g.spatel.svaev.maal === g.glas2);
+    bord.fyldSpatel(g.spatel, g.pulver_nacl); faerdig();
+    var pFuld = naclIPulver();
+    paastand("en fuld spatel over pulverglasset har ingen pil", !!g.spatel.last && g.spatel.svaev && g.spatel.svaev.maal === g.pulver_nacl && !bord.svaevRing());
+    paastand("og kan ikke tage en spatelspids mere", !bord.klik("svaevring") && !bord.fyldSpatel(g.spatel, g.pulver_nacl) && !bord.koer.igang() &&
+        Math.abs(naclIPulver() - pFuld) < 1e-6 && g.spatel.last.umol === 1500);
+    bord.toemSpatel(g.spatel, g.glas2); faerdig();
     paastand("roer rundt med glasstaven", bord.roer(g.glasstav, g.glas2));
     faerdig();
     paastand("staven er hjemme", Math.abs(g.glasstav.p.x - g.glasstav.hjem.x) < 1);

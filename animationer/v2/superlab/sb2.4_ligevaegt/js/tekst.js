@@ -20,7 +20,7 @@
     NK.TEKST = {
         /* ----- Toplinjen ----------------------------------------------- */
         "titel": "Indgreb i en kemisk ligevægt",
-        "undertitel": "Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺",
+        "top-ligning": "Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺",
 
         /* ----- Introen -------------------------------------------------- */
         "intro-titel": "Indgreb i en kemisk ligevægt",
@@ -72,9 +72,6 @@
             "AgNO₃ er ætsende og giver sorte pletter på huden. Brug handsker og briller. Resterne " +
             "afleveres som surt uorganisk affald."
         ],
-        "uheld-tekst":
-            "Rystes et glas for voldsomt, skvulper det ud. Et reagensglas kan ikke stå på bordet. " +
-            "Glas, der slippes foran bordkanten, falder på gulvet. Kemichael rydder op.",
 
         /* ----- Forløbets trin ---------------------------------------------
            Hvert trin har en tekst (hvad eleven skal), et kort navn til
@@ -135,7 +132,8 @@
         "rundvisning": [
             { sel: "#scene", titel: "Bordet", tekst: "Klik viser, træk gør. Tag fat i kolben, og slip den over et glas for at hælde. Bordpladen er dyb, så du kan stille ting foran stativet." },
             { sel: "#glas-kort", titel: "Det valgte glas", tekst: "Klik på et glas, og se rumfang og temperatur her. Indholdet i tal folder du ud, og partiklerne ses i zoomboblen i laboratoriets venstre hjørne. Klik på boblen for at se den stor." },
-            { sel: "#teori-kort-ramme", titel: "Ligevægten", tekst: "Reaktionen, det hele handler om. Knappen åbner teorien bag hvert indgreb — det gør tasten T også." },
+            { sel: "#top-ligning", titel: "Ligevægten", tekst: "Reaktionen, det hele handler om. Teorien bag hvert indgreb ligger under knappen Teori ved siden af — det gør tasten T også." },
+            { sel: "#noterknap", titel: "Noter", tekst: "Fold noterne ud og skriv dine iagttagelser. »Notér det valgte glas« skriver aflæsningen ind for dig. Tasten N folder dem ud og ind." },
             { sel: "#uheld-kort", titel: "Uheld", tekst: "Det, der kan gå galt, går galt. Kemichael kommer og tørrer op." },
             { sel: "#forfraknap", titel: "Start forfra", tekst: "Rydder bordet og stiller alt tilbage." }
         ]

@@ -61,7 +61,9 @@ js/mikro.js          zoomboblen: én kugle pr. partikel med formlen på. Boblen 
                      får flere kugler, også i et overskud af noget andet; et
                      opløst stof under 10⁻⁵ M vises ikke (vandets egne ioner
                      i rent vand), og tilskuerionerne kan skjules (se
-                     »Tilskuerioner« nedenfor). Kuglernes og
+                     »Tilskuerioner« nedenfor). Der er højst 20 kugler i
+                     alt (Stof.PARTIKEL_LOFT); er der flere, skaleres alle
+                     ned i samme forhold, og ingen slags forsvinder. Kuglernes og
                      skriftens størrelse er bobleIndhold i NK.BORD_VALG.
                      Formlen står uden kant i kuglen, mørk på lyse kugler og
                      hvid på mørke (som i sc6.8); en lang formel gør kuglen
@@ -371,7 +373,11 @@ siden af gentager handlingen, når man klikker på den (en portion til, en
 dråbe til, en spatelspids til), og med musen over den står der, hvad den
 gør. Et klik på selve flasken gentager ikke, men siger, at det er pilen,
 eller at flasken skal trækkes væk; efter den første dråbe siger beskeden
-det også. Resten
+det også. Spatlen er særlig: en fuld spatel over pulverglasset har ingen
+pil og kan ikke tage mere (den skal gives til et glas først), og pilen ved
+en tom spatel over et glas sender den selv hen til pulverglasset, den sidst
+tog fra, efter en spatelspids og tilbage til glasset med den (`hentOgGiv`,
+bygget af de samme trin som `fyldSpatel` og `toemSpatel`). Resten
 af bordet venter, til det trækkes væk; så går det hjem. Tages en vendt
 flaske eller et væltet glas, rettes det op om det punkt, man greb i, så det
 bliver under hånden. Der tegnes ingen hånd.
@@ -489,7 +495,13 @@ eller, med flere rum, `NK.Side.start({ navn: "spillet", plan: NK.RUM_PLAN })`.
 Panelet bygges af HTML, og `side.js` binder kun det, der faktisk findes på
 siden, så et forsøg tager de kort med, det vil have (`#glas-kort`,
 `#logbog-kort`, `#uheld-kort`, `#rumknapper`, `#intro`, `#forfraknap`,
-`#lydknap`, `#hjaelpknap`). Krogene `vedAendring`, `vedBesked`,
+`#lydknap`, `#hjaelpknap`). Reaktionsskemaet kan stå i toplinjen
+(`<header class="top med-ligning">` med en `<p class="top-ligning">`), og
+logbogen kan i stedet for et kort være noter, der foldes ud fra toplinjen:
+knappen `#noterknap` og tasten N viser og skjuler `#noter` (i scenens
+øverste højre hjørne), Esc lukker, og »Notér det valgte glas« skriver
+aflæsningen ind med samme regler som tabellen og lader markøren stå efter
+den (sb2.4 gør det). Krogene `vedAendring`, `vedBesked`,
 `vedHaendelse`, `vedSkift`, `tast`, `panel` og `efterStart` er til det,
 forsøget selv vil lave. `NK.Side.nu` er siden, så selvtesten kan pille ved
 den.

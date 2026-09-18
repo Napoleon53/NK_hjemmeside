@@ -39,6 +39,10 @@
                       valg.tilskuere); linjen vises kun, naar det valgte
                       glas har nogen
      #logbog-tekst #logbog-noter #logbog-ryd
+     #noterknap #noter #noter-luk
+                      noterne (logbogen) foldet ud fra toplinjen: knappen
+                      og tasten N viser og skjuler #noter, Esc og
+                      #noter-luk lukker
 
    Kroge, som forsoeget kan saette i valg:
      vedAendring(grund)     noget aendrede sig paa bordet
@@ -125,25 +129,13 @@
            den stoerste koncentration foerst og fast stof til sidst. Er der
            mere end tre slags ioner, staar tilskuerionerne for sig nederst
            og kun, naar fluebenet er sat; med én til tre hoerer de med. */
-        var tilskuere = b.tilskuereI ? b.tilskuereI(o) : [];
+        var ind = this.indhold(b, o), tilskuere = ind.tilskuere;
         if (linje) {
             linje.hidden = !tilskuere.length;
             if (NK.el("tilskuere-navne")) NK.saetTekst("tilskuere-navne", "(" + tilskuere.map(function (n) { return St.formel(n); }).join(", ") + ")");
             if (NK.el("tilskuere-vis")) NK.el("tilskuere-vis").checked = !!b.visTilskuere;
         }
-        function raekkerAf(navne) {
-            var opl = [], fast = [];
-            navne.forEach(function (navn) {
-                var s = St.stof(navn);
-                if (s.fase === "s") fast.push({ formel: St.formel(navn, true), tal: o.n[navn], vaerdi: tal(o.n[navn] / 1000, 2), enhed: "mmol", fast: true });
-                else if (s.fase === "aq") opl.push({ formel: St.formel(navn, true), tal: St.konc(o, navn), vaerdi: tal(St.konc(o, navn), o.V > 0 && St.konc(o, navn) < 1 ? 2 : 1), enhed: "mM" });
-            });
-            function stoerst(a, b2) { return b2.tal - a.tal; }
-            return opl.sort(stoerst).concat(fast.sort(stoerst));
-        }
-        var synlige = Object.keys(o.n).filter(function (navn) { return St.synlig(o, navn); });
-        var raekker = raekkerAf(synlige.filter(function (n) { return tilskuere.indexOf(n) < 0; }));
-        var ekstra = b.visTilskuere ? raekkerAf(tilskuere) : [];
+        var raekker = ind.raekker, ekstra = ind.ekstra;
 
         var tom = NK.el("glas-tom");
         if (tom) {
@@ -307,6 +299,30 @@
     };
 
     /* ----- Logbogen, hvis siden har en ------------------------------------- */
+    /* Indholdet, som tabellen og noterne viser det: kun det, der er nok af
+       til at ses (som boblen), den stoerste koncentration foerst og fast
+       stof til sidst; tilskuerionerne for sig (ekstra), naar fluebenet er
+       sat, og ellers slet ikke. */
+    P.indhold = function (b, o) {
+        var tilskuere = b.tilskuereI ? b.tilskuereI(o) : [];
+        function raekkerAf(navne) {
+            var opl = [], fast = [];
+            navne.forEach(function (navn) {
+                var s = St.stof(navn);
+                if (s.fase === "s") fast.push({ navn: navn, formel: St.formel(navn, true), tal: o.n[navn], vaerdi: tal(o.n[navn] / 1000, 2), enhed: "mmol", fast: true });
+                else if (s.fase === "aq") opl.push({ navn: navn, formel: St.formel(navn, true), tal: St.konc(o, navn), vaerdi: tal(St.konc(o, navn), o.V > 0 && St.konc(o, navn) < 1 ? 2 : 1), enhed: "mM" });
+            });
+            function stoerst(a, b2) { return b2.tal - a.tal; }
+            return opl.sort(stoerst).concat(fast.sort(stoerst));
+        }
+        var synlige = Object.keys(o.n).filter(function (navn) { return St.synlig(o, navn); });
+        return {
+            tilskuere: tilskuere,
+            raekker: raekkerAf(synlige.filter(function (n) { return tilskuere.indexOf(n) < 0; })),
+            ekstra: b.visTilskuere ? raekkerAf(tilskuere) : []
+        };
+    };
+
     P.aflaesning = function () {
         var b = this.bord();
         var c = b.valgtBeholder();
@@ -318,17 +334,32 @@
             var ph = St.pH(o);
             if (ph !== null) dele.push("pH " + tal(ph, 1));
         }
-        var stoffer = [];
-        Object.keys(o.n).sort().forEach(function (navn) {
-            var s = St.stof(navn);
-            if (o.n[navn] < 1e-3) return;
-            if (s.fase === "s") stoffer.push(St.formel(navn, true) + " " + tal(o.n[navn] / 1000, 2) + " mmol");
-            else if (s.fase === "aq") stoffer.push(St.formel(navn) + " " + tal(St.konc(o, navn), St.konc(o, navn) < 1 ? 2 : 1) + " mM");
+        /* Det samme som tabellen, i samme orden */
+        var ind = this.indhold(b, o);
+        var stoffer = ind.raekker.concat(ind.ekstra).map(function (rk) {
+            return (rk.fast ? rk.formel : St.formel(rk.navn)) + " " + rk.vaerdi + " " + rk.enhed;
         });
         if (stoffer.length) dele.push(stoffer.join(", "));
         var v = b.g && b.g.vaegt;
         if (v && b.masseePaa && b.masseePaa(v) > 0 && c.paa === v) dele.push("vægt " + b.vaegtTekst(v));
         return dele.join("; ");
+    };
+
+    /* Noterne foldes ud fra toplinjen og ind igen (vis: true/false, eller
+       intet for at skifte) */
+    P.skiftNoter = function (vis) {
+        var el = NK.el("noter"), kn = NK.el("noterknap");
+        if (!el) return false;
+        if (vis === undefined) vis = el.hidden;
+        el.hidden = !vis;
+        if (kn) {
+            kn.setAttribute("aria-expanded", vis ? "true" : "false");
+            kn.classList.toggle("aktiv", !!vis);
+        }
+        var felt = NK.el("logbog-tekst");
+        if (vis && felt) felt.focus();
+        else if (!vis && felt && document.activeElement === felt) felt.blur();
+        return true;
     };
 
     P.logbogGem = function () {
@@ -345,6 +376,12 @@
         el.value = (el.value ? el.value.replace(/\s+$/, "") + "\n" : "") + klokken + " " + linje;
         el.scrollTop = el.scrollHeight;
         this.logbogGem();
+        /* I de udfoldede noter skriver man videre efter aflaesningen, saa
+           markoeren staar dér, og tasterne gaar ikke til bordet */
+        if (NK.el("noter") && !NK.el("noter").hidden) {
+            el.focus();
+            el.selectionStart = el.selectionEnd = el.value.length;
+        }
         if (NK.Lyd && NK.Lyd.klik) NK.Lyd.klik();
     };
 
@@ -485,6 +522,7 @@
         if (e.ctrlKey || e.metaKey || e.altKey) return;
         if (e.key === "Escape") {
             var b = this.bord();
+            this.skiftNoter(false);
             if (b && b.lukStorBoble) b.lukStorBoble();
             this.lukOverlay();
             NK.Rundvisning.luk();
@@ -502,6 +540,7 @@
         }
         if (NK.Rundvisning.aktiv() || document.querySelector(".overlay.vis")) return;
         if (e.key === "m" || e.key === "M") { this.skiftLyd(); return; }
+        if ((e.key === "n" || e.key === "N") && NK.el("noter")) { this.skiftNoter(); e.preventDefault(); return; }
         if ((e.key === "i" || e.key === "I") && this.forloeb) { this.visHint(); return; }
         if (this.valg.tast && this.valg.tast.call(this, e)) { e.preventDefault(); return; }
         if (this.rum && this.rum.tast(e)) e.preventDefault();
@@ -634,6 +673,14 @@
             paa("logbog-ryd", "click", function () { NK.el("logbog-tekst").value = ""; mig.logbogGem(); });
             NK.logbog = { noter: function () { mig.logbogNoter(); }, aflaesning: function () { return mig.aflaesning(); } };
         }
+        paa("noterknap", "click", function () { mig.skiftNoter(); });
+        paa("noter-luk", "click", function () { mig.skiftNoter(false); });
+        /* Esc i skrivefeltet lukker ogsaa (tastaturet ser ikke tekstfelter) */
+        paa("noter", "keydown", function (e) {
+            if (e.key !== "Escape") return;
+            mig.skiftNoter(false);
+            if (NK.el("noterknap")) NK.el("noterknap").focus();
+        });
 
         document.addEventListener("keydown", function (e) { mig.tastNed(e); });
 

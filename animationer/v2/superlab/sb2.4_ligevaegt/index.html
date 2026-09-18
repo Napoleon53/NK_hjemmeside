@@ -9,13 +9,14 @@
 </head>
 <body>
 
-<header class="top">
-    <h1><span class="ikon">⚗</span> <span id="titel">Indgreb i en kemisk ligevægt</span>
-        <span class="undertitel" id="undertitel"></span></h1>
+<header class="top med-ligning">
+    <h1><span class="ikon">⚗</span> <span id="titel">Indgreb i en kemisk ligevægt</span></h1>
+    <p class="top-ligning" id="top-ligning" title="Ligevægten, det hele handler om. Teorien ligger under knappen Teori."></p>
 
     <div class="top-hoejre">
         <button class="knap topknap" id="forfraknap" type="button" title="Ryd bordet og start forfra">Start forfra</button>
         <button class="knap topknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+        <button class="knap topknap" id="noterknap" type="button" title="Skriv noter (N)" aria-expanded="false" aria-controls="noter">Noter</button>
         <button class="knap topknap" id="introknap" type="button" title="Om forsøget">Om forsøget</button>
         <button class="ikonknap" id="lydknap" type="button" title="Lyd til og fra (M)" aria-label="Lyd til og fra" aria-pressed="true">
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -32,6 +33,17 @@
     <div class="scene" id="scene">
         <canvas id="scene-laerred" aria-label="Laboratoriebord med kolbe, bægerglas, otte reagensglas i et stativ, pulverglas med Fe(NO₃)₃, ascorbinsyre og KSCN, flaske med KSCN, dråbeflaske med AgNO₃, vandbad på varmeplade, isbad, glasstav, termometer og affaldsdunk."></canvas>
         <div class="scenebesked" id="scenebesked" aria-live="polite"></div>
+        <section class="noter" id="noter" hidden aria-label="Noter">
+            <div class="noter-top">
+                <h2>Noter</h2>
+                <button class="ikonknap" id="noter-luk" type="button" title="Fold noterne ind (Esc)" aria-label="Fold noterne ind">×</button>
+            </div>
+            <textarea id="logbog-tekst" rows="5" placeholder="Dine egne noter. Knappen skriver det valgte glas' rumfang, temperatur, pH og indhold."></textarea>
+            <div class="knaprad">
+                <button class="knap blaa" id="logbog-noter" type="button" title="Skriv det valgte glas' aflæsning i noterne">Notér det valgte glas</button>
+                <button class="knap" id="logbog-ryd" type="button" title="Slet noterne">Ryd</button>
+            </div>
+        </section>
     </div>
 
     <aside class="panel">
@@ -56,17 +68,8 @@
             <ol class="forloeb-liste" id="forloeb-liste"></ol>
         </div>
 
-        <div class="kort" id="teori-kort-ramme">
-            <h2>Ligevægten</h2>
-            <p class="ligning">Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺</p>
-            <div class="knaprad">
-                <button class="knap" id="teori-aabn" type="button" title="Teorien bag forsøget (T)">Læs teorien</button>
-            </div>
-        </div>
-
         <div class="kort" id="uheld-kort">
             <h2><span>Uheld</span> <span class="taeller" id="uheld-taeller">0</span></h2>
-            <p class="besked" id="uheld-tekst"></p>
         </div>
     </aside>
 </main>
