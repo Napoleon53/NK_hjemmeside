@@ -458,6 +458,7 @@
         }
         omrids(ctx, gg);
         if (t.sprite) NK.Sprites.tegnPositur(ctx, t.sprite, gg.p, gg.anker, opt.alfa, gg.skala);
+        if (t.streger) T.tegnStreger(ctx, gg, opt.alfa);
         if (t.pulverfelt) T.tegnPulver(ctx, gg);
         T.tegnEtiket(ctx, gg);
         if (gg.nr) {
@@ -486,6 +487,41 @@
             ctx.restore();
         }
         return top;
+    };
+
+    /* Inddelingen paa glasset: stregerne og rumfanget, tegnet oven paa
+       glasset, hvor NK.Udstyr.streger siger. De staar ikke i spriten, saa
+       de kan ikke komme ud af trit med det, motoren regner. */
+    T.tegnStreger = function (ctx, gg, alfa) {
+        var t = gg.type, s = t.streger, k = t.skala || 1;
+        var liste = NK.Udstyr.streger(t);
+        ctx.save();
+        if (alfa !== undefined) ctx.globalAlpha *= NK.klamp(alfa, 0, 1);
+        ctx.translate(gg.p.x, gg.p.y);
+        ctx.rotate(gg.p.v);
+        ctx.translate(-gg.anker.x, -gg.anker.y);
+        ctx.strokeStyle = "rgba(238, 246, 252, 0.8)";
+        ctx.lineWidth = (s.bred || 1) * k;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        liste.forEach(function (st) { ctx.moveTo(st.x0, st.y); ctx.lineTo(st.x1, st.y); });
+        ctx.stroke();
+        ctx.fillStyle = "rgba(238, 246, 252, 0.8)";
+        ctx.font = "600 " + (s.str * k).toFixed(2) + "px 'Segoe UI', Arial, sans-serif";
+        ctx.textBaseline = "middle";
+        var hoejre = s.tekst === "hoejre";
+        ctx.textAlign = hoejre ? "left" : "right";
+        liste.forEach(function (st) {
+            if (st.tal) ctx.fillText(String(st.mL), hoejre ? st.x1 + 2.5 * k : st.x0 - 2 * k, st.y + 0.4 * k);
+        });
+        if (s.navn) {
+            ctx.fillStyle = "rgba(238, 246, 252, 0.62)";
+            ctx.font = "600 " + ((s.navn.str || s.str) * k).toFixed(2) + "px 'Segoe UI', Arial, sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "alphabetic";
+            ctx.fillText((s.nominel || t.maks) + " mL", s.navn.x * k, s.navn.y * k);
+        }
+        ctx.restore();
     };
 
     /* Bobler af gas paa vej op gennem vaesken, klippet til indersiden */

@@ -45,6 +45,22 @@
                        saa glasset ogsaa ses mod en lys baggrund
      huller            x-positioner (i spritets koordinater) for glas i et
                        stativ, og hulY: hvor glassets aabning staar
+     streger           inddelingen paa glasudstyr: { hver, smaa, til, lang,
+                       kort, luft | x, str, tekst: "venstre"|"hoejre",
+                       navn: { x, y, str } }. Stregerne og rumfanget
+                       (»600 mL«) staar ikke i spriten, men tegnes af
+                       tegning.js der, hvor vaesken naar op til ved det
+                       rumfang (NK.Udstyr.streger), saa de altid passer til
+                       det, motoren regner. hver: mL mellem stregerne med
+                       tal; smaa: mellem de korte; til: den oeverste streg
+                       (ellers den stoerste under 85 % af maks); lang, kort:
+                       stregernes laengde; luft: afstand til indersidens
+                       hoejre side, eller x: fast venstre ende; str:
+                       skriftens stoerrelse; navn: hvor rumfanget staar;
+                       nominel: rumfanget, der staar paa glasset, hvis det
+                       ikke er maks (maaleglasset: 100 mL, men der er luft
+                       over den oeverste streg, saa maks er til kanten).
+                       Alt i spritets enheder foer skalering
      traefBund         de nederste enheder af tegningen, som musen ikke
                        rammer (reagensglasset: bunden staar nede i stativet,
                        og det, der stilles foran det, skal ikke ramme det)
@@ -69,9 +85,12 @@
     var BAEGER_LILLE_INDRE = pts([[6, 6], [66, 6], [66, 100], [62, 104], [10, 104], [6, 100]]);
     var BAEGER_STOR_INDRE = pts([[8, 8], [104, 8], [104, 121], [99, 126], [13, 126], [8, 121]]);
     var KOLBE_INDRE = pts([[37.8, 4], [37.8, 41.6], [8.3, 113.3], [8.6, 119.5], [14.1, 123.5], [81.9, 123.5], [87.4, 119.5], [87.7, 113.3], [58.2, 41.6], [58.2, 4]]);
-    var MAALEGLAS_INDRE = pts([[8, 12], [36, 12], [36, 208], [33, 212], [11, 212], [8, 208]]);
+    var MAALEGLAS_INDRE = pts([[7, 8], [37, 8], [37, 197], [34, 200], [10, 200], [7, 197]]);
     var FLASKE_INDRE = pts([[5, 34], [37, 34], [37, 92], [32, 97], [10, 97], [5, 92]]);
     var PULVER_INDRE = pts([[4, 12], [34, 12], [34, 47], [31, 49], [7, 49], [4, 47]]);
+
+    /* Det store baegerglas og badet deler sprite og inddeling */
+    var STREGER_STOR = { hver: 100, smaa: 50, lang: 14, kort: 8, luft: 8, str: 6, navn: { x: 40, y: 118, str: 6 } };
 
     var TYPER = {
         reagensglas: {
@@ -91,6 +110,7 @@
         baegerLille: {
             sprite: "baegerLille", fil: "baegerglas_100.svg", b: 72, h: 110,
             anker: { x: 36, y: 4 },
+            streger: { hver: 50, smaa: 25, lang: 12, kort: 7, luft: 4, str: 6, navn: { x: 30, y: 99, str: 5.6 } },
             kan: { holder: true, haelder: true },
             indre: BAEGER_LILLE_INDRE, maks: 250, haeldMl: 20,
             tud: { x: 1, y: 3.5, v: -1.15 },
@@ -107,6 +127,7 @@
         baegerStor: {
             sprite: "baegerStor", fil: "baegerglas.svg", b: 112, h: 132,
             anker: { x: 56, y: 6 },
+            streger: STREGER_STOR,
             kan: { holder: true, haelder: true },
             indre: BAEGER_STOR_INDRE, maks: 600, haeldMl: 25,
             tud: { x: 3, y: 6, v: -1.1 },
@@ -129,6 +150,7 @@
         bad: {
             sprite: "baegerStor", fil: "baegerglas.svg", b: 112, h: 132,
             anker: { x: 56, y: 6 },
+            streger: STREGER_STOR,
             kan: { holder: true, haelder: false, bad: true, fast: true },
             indre: BAEGER_STOR_INDRE, maks: 600, haeldMl: 0,
             vejlaengde: 3, titel: "badet", valgtMaerke: { x: 96, y: -8 },
@@ -145,6 +167,7 @@
         kolbe: {
             sprite: "kolbe", fil: "kolbe.svg", b: 96, h: 128,
             anker: { x: 48, y: 2.5 },
+            streger: { hver: 50, lang: 7.7, x: 41, str: 5.1, tekst: "hoejre", bred: 0.9, navn: { x: 48, y: 119, str: 4.8 } },
             kan: { holder: true, haelder: true },
             indre: KOLBE_INDRE, maks: 200, haeldMl: 25,
             tud: { x: 40, y: 3, v: -1.95 },
@@ -163,17 +186,16 @@
         maaleglas: {
             sprite: "maaleglas", fil: "maaleglas.svg", b: 44, h: 220,
             anker: { x: 22, y: 4 },
+            streger: { hver: 20, smaa: 10, til: 100, nominel: 100, lang: 12, kort: 8, luft: 4, str: 4.6, bred: 0.8, navn: { x: 22, y: 196, str: 4.4 } },
             kan: { holder: true, haelder: true },
-            indre: MAALEGLAS_INDRE, maks: 100, haeldMl: 10,
-            tud: { x: 4, y: 5, v: -1.3 },
-            vejlaengde: 1.4, titel: "måleglasset",
+            indre: MAALEGLAS_INDRE, maks: 110, haeldMl: 10,
+            tud: { x: 2, y: 3.5, v: -1.3 },
+            vejlaengde: 1.3, titel: "måleglasset",
             omrids: function (ctx) {
-                ctx.moveTo(6, 6);
-                ctx.lineTo(6, 210);
-                ctx.quadraticCurveTo(6, 215, 11, 215);
-                ctx.lineTo(33, 215);
-                ctx.quadraticCurveTo(38, 215, 38, 210);
-                ctx.lineTo(38, 6);
+                ctx.moveTo(5, 6);
+                ctx.lineTo(5, 202);
+                ctx.moveTo(39, 202);
+                ctx.lineTo(39, 6);
             }
         },
         flaske: {
@@ -385,8 +407,8 @@
        rektangulaer skaal), saettes med rund: false og maales ikke. */
     var SKALA = 10.7;
 
-    /* Indersidens bredde ved hoejden y */
-    function bredde(poly, y) {
+    /* Indersidens venstre og hoejre side ved hoejden y, eller null */
+    function kanter(poly, y) {
         var xs = [], i, a, b;
         for (i = 0; i < poly.length; i++) {
             a = poly[i];
@@ -395,8 +417,14 @@
                 xs.push(a.x + (y - a.y) / (b.y - a.y) * (b.x - a.x));
             }
         }
-        if (xs.length < 2) return 0;
-        return Math.max.apply(null, xs) - Math.min.apply(null, xs);
+        if (xs.length < 2) return null;
+        return { x0: Math.min.apply(null, xs), x1: Math.max.apply(null, xs) };
+    }
+
+    /* Indersidens bredde ved hoejden y */
+    function bredde(poly, y) {
+        var k = kanter(poly, y);
+        return k ? k.x1 - k.x0 : 0;
     }
 
     var husketMaal = {};
@@ -449,6 +477,37 @@
         return 1 + (m.vej_cm / 1.6 - 1) * LYSVEJ_DAEMPNING;
     }
 
+    /* ----- Inddelingen -----------------------------------------------------
+       En streg for V mL staar i den hoejde, vaesken naar op til, naar der
+       er V mL i glasset. Den regnes paa samme maade, som tegning.js tegner
+       vaesken: arealet af indersiden under stregen er V * mlPrAreal
+       (NK.vaeskeNiveau). Saa passer stregerne altid til det, motoren
+       regner, ogsaa hvis maks eller tegningen aendres, og aflaeser eleven
+       100 mL, er der 100 mL. Giver [{ mL, y, x0, x1, tal }] i spritets
+       koordinater (typens skala er regnet med); tal: stregen har et tal. */
+    var husketStreger = {};
+
+    function streger(t) {
+        var s = t.streger;
+        if (!s || !t.indre || !t.mlPrAreal || !t.maks) return [];
+        var noegle = t.navn + "|" + (t.skala || 1);
+        if (husketStreger[noegle]) return husketStreger[noegle];
+        var k = t.skala || 1, ud = [];
+        var til = s.til || Math.floor(t.maks * 0.85 / s.hver) * s.hver;
+        var trin = s.smaa || s.hver;
+        for (var n = 1; n * trin <= til + 1e-9; n++) {
+            var V = n * trin;
+            var y = NK.vaeskeNiveau(t.indre, V * t.mlPrAreal);
+            var kant = kanter(t.indre, y) || { x0: 0, x1: t.b };
+            var tal = Math.abs(V / s.hver - Math.round(V / s.hver)) < 1e-6;
+            var L = (tal ? s.lang : (s.kort || s.lang)) * k;
+            var x0 = s.x !== undefined ? s.x * k : kant.x1 - s.luft * k - L;
+            ud.push({ mL: V, y: y, x0: x0, x1: x0 + L, tal: tal });
+        }
+        husketStreger[noegle] = ud;
+        return ud;
+    }
+
     /* ----- Maalene udledes af tegningen -------------------------------------
        mlPrAreal og vejlaengde stod foer som frie tal i hver type. De
        beskriver begge den samme tegnede form, saa de kan udledes af den, og
@@ -473,6 +532,8 @@
         HAAND_ANKER: { x: 40, y: 46 },
         SKALA: SKALA,
         maal: maal,
+        streger: streger,
+        kanter: kanter,
         lysvej: lysvej,
         skaleret: skaleret,
 

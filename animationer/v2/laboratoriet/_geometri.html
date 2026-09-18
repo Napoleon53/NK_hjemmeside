@@ -34,6 +34,8 @@
        glasset faktisk er
      * vaeskehoejde: mlPrAreal passer ikke til indersiden, saa vaesken
        staar forkert, naar glasset er fuldt
+     * inddelingen: en streg staar ikke der, hvor vaesken naar op ved dens
+       rumfang, eller tal og paaskrift rammer hinanden
 
    Laes den igennem, hver gang en sprite eller et maal aendres.
    ===================================================================== */
@@ -77,6 +79,65 @@ Object.keys(U.TYPER).forEach(function (navn) {
     if (rund && !t.vindue && Math.abs(fylde - 1) > 0.15) advarsler.push(navn + ": mlPrAreal giver væskehøjde " +
         tal(fylde * 100, 0) + " % af indersiden ved maks (bør være 100). Sæt mlPrAreal = " + tal(m.A / t.maks, 0));
 });
+
+/* Inddelingen. Stregerne regnes af NK.Udstyr.streger med samme
+   vaeskeniveau, som tegningen bruger. Her holdes de op mod indersiden
+   fra den anden side: arealet under hver streg skal vaere dens rumfang
+   gange mlPrAreal, og hverken tal eller paaskrift maa ramme hinanden. */
+skriv("\nInddelingen: stregerne holdt op mod indersiden", "h");
+skriv(pad("udstyr", 16) + padV("streger", 16) + padV("stk", 5) + padV("værst", 9) + padV("påskrift", 11) + padV("øverst", 9), "h");
+var maaler = document.createElement("canvas").getContext("2d");
+function tekstBredde(tekst, str) {
+    maaler.font = "600 " + str + "px 'Segoe UI', Arial, sans-serif";
+    return maaler.measureText(tekst).width;
+}
+function kasse(x0, y0, x1, y1) { return { x0: x0, y0: y0, x1: x1, y1: y1 }; }
+function rammer(a, b) { return a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1; }
+Object.keys(U.TYPER).forEach(function (navn) {
+    var t = U.TYPER[navn], s = t.streger;
+    if (!s) return;
+    var liste = U.streger(t);
+    var fejl = [];
+    if (liste.length < 3) fejl.push("kun " + liste.length + " streger");
+    var vaerst = 0, top = Math.min.apply(null, t.indre.map(function (p) { return p.y; }));
+    var kasser = [];
+    liste.forEach(function (st, i) {
+        var mL = NK.polyAreal(NK.klipUnder(t.indre, st.y)) / t.mlPrAreal;
+        vaerst = Math.max(vaerst, Math.abs(mL - st.mL) / st.mL);
+        if (i && st.y >= liste[i - 1].y) fejl.push(st.mL + " mL står ikke over " + liste[i - 1].mL + " mL");
+        var kant = U.kanter(t.indre, st.y);
+        if (!kant || st.x0 < kant.x0 - 0.5 || st.x1 > kant.x1 + 0.5) fejl.push("stregen for " + st.mL + " mL går ud over glasset");
+        kasser.push({ hvad: "stregen for " + st.mL + " mL", k: kasse(st.x0, st.y - 0.6, st.x1, st.y + 0.6) });
+        if (st.tal) {
+            var w = tekstBredde(String(st.mL), s.str);
+            var x = s.tekst === "hoejre" ? st.x1 + 2.5 : st.x0 - 2 - w;
+            kasser.push({ hvad: "tallet " + st.mL, k: kasse(x, st.y - s.str * 0.45, x + w, st.y + s.str * 0.45) });
+        }
+    });
+    var sidste = liste[liste.length - 1];
+    if (sidste && sidste.y < top + 1) fejl.push("den øverste streg står oppe i kanten");
+    if (sidste && sidste.mL > t.maks) fejl.push("den øverste streg er over maks");
+    var paaskrift = s.nominel || t.maks;
+    if (s.nominel && sidste && sidste.mL !== s.nominel) fejl.push("der står " + s.nominel + " mL, men den øverste streg er " + sidste.mL + " mL");
+    if (!s.navn) fejl.push("rumfanget står ikke på glasset");
+    else {
+        var ns = s.navn.str || s.str, nw = tekstBredde(paaskrift + " mL", ns);
+        var nk = kasse(s.navn.x - nw / 2, s.navn.y - ns * 0.75, s.navn.x + nw / 2, s.navn.y + ns * 0.2);
+        kasser.forEach(function (a) { if (rammer(a.k, nk)) fejl.push("påskriften rammer " + a.hvad); });
+        var nkant = U.kanter(t.indre, s.navn.y - ns * 0.3);
+        if (!nkant || nk.x0 < nkant.x0 || nk.x1 > nkant.x1) fejl.push("påskriften står uden for glasset");
+    }
+    for (var i = 0; i < kasser.length; i++) for (var j = i + 1; j < kasser.length; j++)
+        if (rammer(kasser[i].k, kasser[j].k)) fejl.push(kasser[i].hvad + " rammer " + kasser[j].hvad);
+    if (vaerst > 0.01) fejl.push("en streg står " + tal(vaerst * 100) + " % forkert");
+    var linje = pad(navn, 16) + padV(liste.length ? liste[0].mL + "–" + sidste.mL + " mL" : "—", 16) + padV(liste.length, 5) +
+        padV(tal(vaerst * 100, 2) + " %", 9) + padV(paaskrift + " mL", 11) +
+        padV(sidste ? tal((sidste.y - top), 0) + " enh" : "—", 9);
+    skriv(linje, fejl.length ? "fejl" : "ok");
+    fejl.forEach(function (f) { advarsler.push(navn + ": " + f); });
+});
+skriv("  værst: den største afvigelse mellem en stregs rumfang og arealet under den");
+skriv("  øverst: hvor langt under indersidens top den øverste streg står (tegneenheder)");
 
 skriv("\nkolonnerne", "h");
 skriv("  maks        rumfanget, typen siger, den har");

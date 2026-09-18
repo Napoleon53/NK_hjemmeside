@@ -87,8 +87,8 @@ css/grund.css        farver, toplinje, scene og panel, kort, forløb, quiz,
                      knapper, overlays, tegneserie og rundvisning
 sprites/             generisk glasudstyr uden etiketter (etiketten tegnes i koden)
 _geometri.html       udviklerværktøj: alt glasudstyr læst som omdrejnings-
-                     legemer, så rumfang, lysvej og væskehøjde holdes op
-                     mod hinanden og mod tegningen
+                     legemer, så rumfang, lysvej, væskehøjde og
+                     inddelingen holdes op mod hinanden og mod tegningen
 _taleboble.html      udviklerværktøj: flyt munden med musen, og se boblen
                      vende, holde sig inden for kanten og undgå et rektangel
 _vinduer.html        udviklerværktøj: et forsøg i to vinduesstørrelser side om side
@@ -189,6 +189,18 @@ igennem, hver gang en sprite eller et mål ændres.
 tegningerne er gode, fulgte tallene i stedet: de er nu 250 og 600 mL, og
 navnene siger ikke længere et rumfang, der kan blive forkert igen. Af samme
 grund rummer reagensglasset 30 mL og kolben 200 mL.
+
+**Inddelingen tegnes af koden.** Stregerne og rumfanget (»600 mL«) på
+bægerglas, kolbe og måleglas står ikke i spritene. `NK.Udstyr.streger(t)`
+lægger hver streg dér, hvor væsken står ved dens rumfang — med samme
+`NK.vaeskeNiveau` som tegningen — og `T.tegnStreger` tegner dem oven på
+glasset i glassets skala. Typens `streger` siger kun, hvor tæt de står
+(`hver`, `smaa`), hvor langt op (`til`) og hvor tallene og påskriften står.
+Påskriften er `maks`. Måleglasset er undtagelsen: det rummer 110 mL til
+kanten, men står som 100 mL (`nominel`) med luft over den øverste streg,
+som et rigtigt måleglas. `_geometri.html` holder stregerne op mod
+indersiden og ser efter, at tal og påskrift ikke rammer hinanden, og
+prøvebordets selvtest afsnit 9b prøver, at væsken står ved stregen.
 
 ## Faremærkning og Kemichaels advarsler
 
