@@ -19,7 +19,8 @@
 
    Aabner index.html i en iframe og koerer forsoeget igennem: kemien i de
    fire indgreb, badene, forloebets trin (ogsaa i forkert raekkefoelge),
-   flagene, udloeserne, gemningen og opstillingen mod stoftabellen.
+   flagene, udloeserne, gemningen, opstillingen mod stoftabellen og
+   Kemichaels replikker fra forloebet.
 
    Skal aabnes gennem en lokal server (eller Chrome med
    --allow-file-access-from-files), ellers kan iframen ikke laeses.
@@ -244,6 +245,82 @@ function koerTest() {
     paastand("kolben er fuld igen", B.volumen(bord.g.kolbe) > 190, tal(B.volumen(bord.g.kolbe), 0) + " mL");
     paastand("forloebet staar paa foerste trin", F.nuTrin() && F.nuTrin().id === "fyld");
     paastand("panelet kan opdateres", (NK.opdaterPanel(), true));
+
+    overskrift("13. Replikker: forloebet taler gennem Kemichael");
+    /* En konsekvens { sig } i forloebet gaar gennem side.sig til bordets
+       laererReplik: han kommer ind, siger linjerne og gaar igen, uden at
+       laase bordet. Uden laerer bliver det en besked. */
+    var L = bord.laerer;
+    paastand("bordet har en laerer med laererReplik", !!L && typeof bord.laererReplik === "function");
+    bord.laererNyt();
+    var tog = bord.laererReplik("Prøve.", {}, { id: "proeve" });
+    paastand("laererReplik tager imod", tog === true);
+    paastand("han fik en replik-scene med det samme", !!L.scene && L.scene.navn === "replik", L.scene && L.scene.navn);
+    paastand("scenen laaser ikke bordet", !bord.laererOptaget());
+    bord.laererReplik("Nummer to.", {}, { id: "to" });
+    bord.laererReplik("Nummer tre.", {}, { id: "tre" });
+    bord.laererReplik("Nummer to igen.", {}, { id: "to" });   /* samme kilde: kun én gang */
+    paastand("replikker venter paa hinanden og kollapser ikke", bord.laererVent.length === 2, bord.laererVent.length + " i koe");
+    adv(4);
+    paastand("han siger replikken, naar han er kommet ind", L.tale === "Prøve.", JSON.stringify(L.tale));
+    adv(40);
+    paastand("koeen er afviklet", bord.laererVent.length === 0 && !L.scene, bord.laererVent.length + " i koe");
+
+    /* Udloeseren om referencen: han stiller sig ved glas 7, markerer det,
+       siger linjerne fra tekst.js og slutter med glimtet om afslaget.
+       Glimtene huskes i browseren, saa hukommelsen tages ud imens og
+       saettes tilbage bagefter. */
+    var huskGlimt = null;
+    try { huskGlimt = ramme.contentWindow.localStorage.getItem("nk-kemichael"); } catch (e) { /* ingen localStorage */ }
+    NK.Kemichael.glimtNulstil();
+    var g7b = bord.g.glas7;
+    B.haeldI(g7b, B.udtag(bord.g.kolbe, 3), true);
+    adv(5);
+    B.haeldI(g7b, B.udtag(bord.g.ag, 0.3), true);
+    var fyrede = false;
+    for (var q = 0; q < 60 && !fyrede; q++) { adv(0.5); fyrede = !!F.fyret.roert_reference; }
+    paastand("udloeseren fyrede", fyrede);
+    /* Han skal foerst hen til glasset; foelg ham, til glimtet er sagt */
+    var saaFoerste = false, saaAnden = false, saaAfslag = false, markeret = false, stodVed = null;
+    var vedGlas = NK.klamp(g7b.p.x - 180, 60, NK.Scene.BREDDE - 260);
+    for (q = 0; q < 80 && !saaAfslag; q++) {
+        adv(0.5);
+        if (L.taleUr <= 0) continue;
+        if (L.tale === NK.TEKST["sig-reference"][0]) { saaFoerste = true; stodVed = L.maalX; markeret = markeret || bord.markeret("glas7"); }
+        if (L.tale === NK.TEKST["sig-reference"][1]) saaAnden = true;
+        if (L.tale.indexOf("afslag") >= 0) saaAfslag = true;
+    }
+    paastand("han kom ind og sagde foerste linje fra tekst.js", saaFoerste);
+    paastand("han stiller sig ved glas 7", stodVed !== null && Math.abs(stodVed - vedGlas) < 1, stodVed + " mod " + vedGlas);
+    paastand("glas 7 er markeret, mens han taler", markeret);
+    paastand("anden linje foelger", saaAnden);
+    paastand("glimtet om afslaget kommer til sidst", saaAfslag);
+    try {
+        if (huskGlimt !== null) ramme.contentWindow.localStorage.setItem("nk-kemichael", huskGlimt);
+        else ramme.contentWindow.localStorage.removeItem("nk-kemichael");
+    } catch (e) { /* ingen localStorage */ }
+    adv(30);
+
+    /* Uden laerer: side.sig falder tilbage til beskeden paa scenen */
+    var gemtL = bord.laerer;
+    bord.laerer = null;
+    side.sig(["Uden", "lærer."], { slags: "info" });
+    bord.laerer = gemtL;
+    paastand("uden laerer bliver replikken en besked",
+        d.getElementById("scenebesked").textContent === "Uden lærer.", JSON.stringify(d.getElementById("scenebesked").textContent));
+
+    /* Et trins eget sig: gaar samme vej */
+    NK.startForfra();
+    adv(1);
+    var trinSig = F.trin.filter(function (x) { return x.sig; }).map(function (x) { return x.id; });
+    paastand("to trin har en replik, naar de er gjort", trinSig.length === 2, trinSig.join(", "));
+    F.gjortNu("billede");
+    adv(0.1);
+    paastand("trinnets replik gaar til Kemichael", !!L.scene && L.scene.navn === "replik" &&
+        L.scene.trin.some(function (x) { return x.sig === NK.TEKST.trin.billede.sig; }), L.scene && L.scene.navn);
+    NK.startForfra();
+    adv(1);
+    paastand("start forfra toemmer koeen og scenen", !L.scene && bord.laererVent.length === 0);
 }
 
 function vis() {

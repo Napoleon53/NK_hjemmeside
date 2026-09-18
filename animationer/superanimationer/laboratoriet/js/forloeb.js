@@ -25,6 +25,20 @@
            ]
        });
 
+   ----- Konsekvenser (saa) --------------------------------------------
+   En funktion, eller en liste af:
+     { flag: "navn", vaerdi }    saetter (eller rydder) et flag
+     { trin: "id" }              goer et trin gjort
+     { besked: "tekst", slags }  en linje paa scenen (valg.besked)
+     { sig: "tekst" }            en replik: noget, der siges af den, der
+                                 er der til at sige det (valg.sig). Kan
+                                 vaere en liste af linjer og have peg,
+                                 glimt og udtryk med; det er taleren, der
+                                 laeser dem. Er der ingen til at tale,
+                                 bliver den en besked, saa intet gaar tabt
+     { kald: fn }                kald en funktion
+   Et trin kan desuden have sit eget sig, som siges, naar trinnet er gjort.
+
    ----- Regler --------------------------------------------------------
    * Et trin er gjort, naar dets vilkaar er sandt - uanset i hvilken
      raekkefoelge eleven kom frem til det. Et trin, der bliver sandt, foer
@@ -113,6 +127,12 @@
             if (s.flag) mig.saetFlag(s.flag, s.vaerdi);
             if (s.trin) mig.gjortNu(s.trin);
             if (s.besked && mig.valg.besked) mig.valg.besked(s.besked, s.slags);
+            /* En replik. Forloebet ved ikke, hvem der taler; det afgoer
+               valg.sig. Uden nogen til at tale bliver den en besked. */
+            if (s.sig) {
+                if (mig.valg.sig) mig.valg.sig(s.sig, s, kilde);
+                else if (mig.valg.besked) mig.valg.besked(Array.isArray(s.sig) ? s.sig.join(" ") : s.sig, s.slags);
+            }
             if (s.kald) s.kald(mig, kilde);
         });
     };

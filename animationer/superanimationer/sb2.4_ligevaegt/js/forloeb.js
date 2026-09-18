@@ -5,6 +5,11 @@
    ../laboratoriet/js/vilkaar.js. Her staar kun, hvornaar hvert trin er
    gjort. Teksterne staar i js/tekst.js.
 
+   Udloesernes bemaerkninger siges af Kemichael ({ sig } som konsekvens,
+   se ../laboratoriet/js/forloeb.js): den samme saetning som et trin -
+   betingelse, konsekvens, fyrer én gang - med en replik som konsekvens
+   i stedet for et flag.
+
    Reglen, hele forsoeget hviler paa: et trin afgoeres af, hvad der staar
    paa bordet - ikke af hvilken vej eleven kom. Derfor er indgrebene
    skrevet som "glasset ser anderledes ud end referencen", ikke som "der
@@ -35,7 +40,7 @@
 
     function trin(id, naar, peg, saa) {
         var t = T[id];
-        return { id: id, kort: t.kort, tekst: t.tekst, hint: t.hint, peg: peg, naar: naar, saa: saa };
+        return { id: id, kort: t.kort, tekst: t.tekst, hint: t.hint, sig: t.sig, peg: peg, naar: naar, saa: saa };
     }
 
     NK.FORLOEB = {
@@ -84,7 +89,8 @@
         udloesere: [
             /* Referencen fik et indgreb. Den skal fyre paa virkningen, ikke
                paa handlingen, saa den ogsaa fanger, at glasset blev varmet
-               eller kom i isbadet. */
+               eller kom i isbadet. Kemichael siger det selv, stiller sig
+               ved glas 7 - og det er her, glimtet om afslaget hoerer til. */
             {
                 id: "roert_reference",
                 naar: { alle: [
@@ -98,7 +104,7 @@
                         { beholder: "glas7", V: { over: 6 } }
                     ] }
                 ] },
-                saa: [{ besked: NK.TEKST["sig-reference"], slags: "advarsel" }]
+                saa: [{ sig: NK.TEKST["sig-reference"], peg: "glas7", glimt: "afslag", udtryk: "skeptisk", slags: "advarsel" }]
             },
 
             /* To slags indgreb i samme glas: saa kan man ikke sige, hvad der
@@ -112,7 +118,7 @@
                         { beholder: g, stof: "Fe2+", over: 0.3 }
                     ] };
                 }) },
-                saa: [{ besked: NK.TEKST["sig-to-indgreb"], slags: "advarsel" }]
+                saa: [{ sig: NK.TEKST["sig-to-indgreb"], udtryk: "skeptisk", slags: "advarsel" }]
             },
 
             /* Er billedet fyldt ud, men et glas noteret anderledes end det ser
@@ -124,7 +130,7 @@
                     { journal: "billede", faerdig: true },
                     { journal: "billede", forkerte: { over: 0 } }
                 ] },
-                saa: [{ besked: NK.TEKST["sig-kig-igen"], slags: "advarsel" }]
+                saa: [{ sig: NK.TEKST["sig-kig-igen"], udtryk: "toer", slags: "advarsel" }]
             }
         ],
 

@@ -417,6 +417,20 @@ Det er det samme lag, spillet skal bruge. Et trin i en øvelse og en låst dør
 i et escaperoom er den samme sætning — betingelse, konsekvens, fyrer én
 gang — og kun konsekvensen er forskellig. Mønster: `../sb2.4_ligevaegt/js/forloeb.js`.
 
+**En replik er også en konsekvens.** `{ sig: "…" }` i en udløsers `saa` (eller
+et trins eget `sig`, som siges, når trinnet er gjort) går gennem `side.sig`
+til bordets lærer: `laererReplik` i `proevebord/js/laerer.js` lader Kemichael
+komme ind, sige linjerne og gå igen, uden at bordet låses. `sig` kan være
+en liste af linjer (én boble ad gangen) og have `peg` (en genstand, han
+stiller sig ved og markerer), `glimt` (et glimt af hans baggrund til sidst)
+og `udtryk` (`toer`, `streng`, `mild`, `skeptisk`) med. Forløbet ved ikke,
+hvem der taler; er der ingen lærer på siden, bliver linjen en besked, så
+intet går tabt. Replikker venter på hinanden i køen i `laerer.js` og
+kollapser ikke, og han overhører dem aldrig — det er forløbet, der har
+besluttet, at han skal tale. Det er det første stykke af personlaget
+(`../kemichael/_personlag/`), og det er skrevet som data af samme grund som
+alt andet i forløbet: vilkår → replik.
+
 ## Journalen
 
 Et forsøg er ikke færdigt, fordi motoren ved, hvad der skete. Det er
@@ -467,9 +481,10 @@ vandbad giver 80 °C i stedet for pladens 250.
 ## Næste skridt
 
 * sb2.4 er lagt over på genstandsmodellen i `../sb2.4_ligevaegt/`. Bordet
-  står, kemien er prøvet igennem, badene virker, og forløbets otte trin
-  kører. Billedet af de syv glas, del 2 om fortynding, Kemichaels egne
-  scener, quizzen og tegneserien mangler. Derefter sc6.8 og sc8.6.
+  står, kemien er prøvet igennem, badene virker, forløbets ni trin kører,
+  billedet af de syv glas noteres, og Kemichael siger forløbets
+  bemærkninger. Del 2 om fortynding, quizzen og tegneserien mangler.
+  Derefter sc6.8 og sc8.6.
 * **Grafen.** Journalen kan notere en måling; den kan endnu ikke tegne den
   op. Titrerings- og kalibreringskurver dukker op i næsten enhver øvelse, så
   det er en fælles komponent, ikke noget hvert forsøg skal opfinde.

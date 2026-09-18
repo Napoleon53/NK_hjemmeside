@@ -13,6 +13,20 @@
    Bemaerkninger (bordet fortsaetter):
      affald     en hel flaske blev haeldt i affaldsdunken; han fylder
                 den op igen, én gang
+
+   Replikker fra forloebet (bordet fortsaetter):
+     replik     forloebet (forloeb.js) har { sig } som konsekvens, eller et
+                trin har sit eget sig, og side.js sender det herhen som
+                laererReplik(tekst, valg, kilde). Han kommer ind, siger
+                linjerne og gaar igen. valg kan have:
+                  peg      navnet paa en genstand: han stiller sig ved den
+                           og markerer den
+                  glimt    id paa et glimt af hans baggrund, sagt til sidst
+                  udtryk   "toer" (standard), "streng", "mild", "skeptisk"
+                           eller et udtryk-objekt som i kemichael.js
+                Replikker venter paa hinanden i stedet for at falde sammen
+                til én, og han overhoerer dem aldrig: det er forloebet, der
+                har besluttet, at han skal tale.
    ===================================================================== */
 (function () {
     "use strict";
@@ -74,11 +88,14 @@
         bemaerkning(this, "advarsel", x, { vrede: alvorlig ? 0.6 : 0.3, humoer: -0.4, roed: 0, skeptisk: alvorlig ? 0.6 : 0.3, briller: alvorlig ? 1 : 0 }, a.sig);
     };
 
-    /* Bemaerkninger, der ventede paa, at laereren blev ledig */
-    P.laererKo = function (fn, arg) {
+    /* Bemaerkninger, der ventede paa, at laereren blev ledig. Noeglen
+       afgoer, hvad der taeller som "den samme": som regel scenen (fn), men
+       to forskellige replikker fra forloebet skal begge med. */
+    P.laererKo = function (fn, arg, noegle) {
+        noegle = noegle || fn;
         this.laererVent = this.laererVent || [];
-        for (var i = 0; i < this.laererVent.length; i++) if (this.laererVent[i].fn === fn) return;
-        this.laererVent.push({ fn: fn, arg: arg });
+        for (var i = 0; i < this.laererVent.length; i++) if (this.laererVent[i].noegle === noegle) return;
+        this.laererVent.push({ fn: fn, arg: arg, noegle: noegle });
     };
 
     P.laererVentende = function () {
@@ -105,6 +122,50 @@
         ]);
         mig.laererKoer(navn, trin, false);
     }
+
+    /* ----- Replikker fra forloebet -------------------------------------------
+       Se hovedkommentaren. Ansigtet vaelges med et navn, saa forloebet ikke
+       skal kende tallene i kemichael.js. */
+    var UDTRYK = {
+        toer:     { vrede: 0.3, humoer: -0.3, roed: 0, skeptisk: 0.4, briller: 0 },
+        streng:   { vrede: 0.7, humoer: -0.6, roed: 0.2, skeptisk: 0.5, briller: 1 },
+        mild:     { vrede: 0.1, humoer: 0.3, roed: 0, skeptisk: 0, briller: 0 },
+        skeptisk: { vrede: 0.3, humoer: -0.4, roed: 0, skeptisk: 0.9, briller: 1 }
+    };
+
+    P.laererReplik = function (tekst, valg, kilde) {
+        if (!this.laerer) return false;
+        valg = valg || {};
+        var linjer = (Array.isArray(tekst) ? tekst : [tekst]).filter(function (t) { return !!t; });
+        if (!linjer.length) return false;
+        /* Samme kilde (fx en udloeser) staar kun i koeen én gang; to
+           forskellige kilder staar der begge */
+        var noegle = "replik:" + ((kilde && kilde.id) || linjer[0]);
+        this.laererKo("laererSigReplik", { linjer: linjer, valg: valg }, noegle);
+        this.laererVentende();
+        return true;
+    };
+
+    P.laererSigReplik = function (a) {
+        var v = a.valg || {};
+        var udtryk = typeof v.udtryk === "string" ? UDTRYK[v.udtryk] : v.udtryk;
+        udtryk = udtryk || UDTRYK.toer;
+        var gg = v.peg && this.g ? this.g[v.peg] : null;
+        var x = gg ? NK.klamp(gg.p.x - 180, 60, NK.Scene.BREDDE - 260)
+                   : NK.klamp(NK.Scene.BREDDE * 0.35, 60, NK.Scene.BREDDE - 260);
+        var ekstra = v.glimt && K.glimtTrin ? K.glimtTrin(v.glimt) : [];
+        var trin = [{ udtryk: udtryk }, { gaa: x }];
+        if (gg) trin.push({ kald: function () { this.markér(v.peg, 4); } });
+        a.linjer.forEach(function (rp, i) {
+            if (i > 0) trin.push({ tid: 0.2 });
+            trin.push(sig(rp));
+        });
+        trin = trin.concat(ekstra, [
+            { udtryk: { skeptisk: 0, briller: 0 } },
+            { gaa: UDE }
+        ]);
+        this.laererKoer("replik", trin, false);
+    };
 
     /* ----- Uheld: han toerrer op ------------------------------------------ */
     var REPLIK = {

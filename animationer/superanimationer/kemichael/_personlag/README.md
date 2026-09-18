@@ -42,11 +42,30 @@ den nye motor, er derfor forslag og ikke verificeret mod koden.
 den hænger på `NK.Forsoeg.prototype`, `NK.Scene` og `NK.Sprites`, ikke på
 genstandsmodellen. Den skal ikke flyttes som den er. Den skal høstes.
 
+## Status
+
+**18. september 2026 — stemmelaget, første stykke.** En replik er nu en
+konsekvens i forløbet: `{ sig }` i en udløsers `saa`, eller et trins eget
+`sig`, går gennem `side.sig` til `laererReplik` i
+`laboratoriet/proevebord/js/laerer.js`. Han kommer ind, siger linjerne én
+boble ad gangen og går igen; bordet låses ikke; replikker venter på hinanden
+i køen og kollapser ikke; `peg` stiller ham ved en genstand og markerer den;
+`glimt` slutter med et glimt af hans baggrund; `udtryk` vælger ansigtet ved
+navn. Uden lærer bliver linjen en besked. sb2.4's tre bemærkninger og to
+trin er de første kunder, og selvtestens afsnit 13 holder øje med det.
+
+Det, der bevidst *ikke* er lavet endnu: karantæne (en replik, der må komme
+igen efter et stykke tid), interpolation af verdens tal i teksten, og
+prioritet mellem forløbets replikker og hans andre scener ud over det, der
+allerede gjaldt (et uheld afbryder en bemærkning). Ingen af delene har en
+kunde endnu. Boblen selv (`02-taleboblen.md`) er urørt.
+
 ## Når arbejdet skal i gang
 
 Rækkefølgen fra `claude/personer.md` holder stadig:
 
-1. **Nu, uafhængigt af zoom og stationer:** stemmelaget og taleboblen.
+1. **Nu, uafhængigt af zoom og stationer:** stemmelaget (påbegyndt, se
+   status) og taleboblen.
 2. **Efter stationerne:** kroppen, planerne og gangvejene.
 3. **Først når person nummer to findes:** selve personrammen trækkes ud.
    Lav aldrig en ramme for noget, der kun er set én gang.

@@ -36,6 +36,8 @@
      vedAendring(grund)     noget aendrede sig paa bordet
      vedBesked(tekst, slags)
      vedHaendelse(type, data)
+   Forloebets replikker ({ sig } i en konsekvens, eller et trins sig) gaar
+   gennem side.sig: til bordets laerer, hvis der er en, ellers som besked.
      vedSkift(rum, forrige) man kom ind i et nyt rum
      tast(e)                returnér true, hvis tasten blev brugt
      efterStart(side)       kaldes, naar alt er bygget
@@ -191,6 +193,18 @@
         el.className = "scenebesked vis " + (slags || "");
         window.clearTimeout(this.beskedUr);
         this.beskedUr = window.setTimeout(function () { el.classList.remove("vis"); }, 2800);
+    };
+
+    /* ----- En replik paa scenen ----------------------------------------------
+       Forloebet siger noget: en konsekvens { sig } eller et trins eget sig.
+       Er der en laerer paa bordet, siger han det - kommer ind, siger
+       linjerne og gaar igen (laererReplik i forsoegets laerer.js). Er der
+       ingen, eller kan han ikke lige nu, bliver det en besked, saa ingen
+       linje gaar tabt. valg kan have peg, glimt, udtryk og slags med. */
+    P.sig = function (tekst, valg, kilde) {
+        var b = this.bord();
+        if (b && b.laererReplik && b.laererReplik(tekst, valg || {}, kilde)) return;
+        this.besked(Array.isArray(tekst) ? tekst.join(" ") : tekst, (valg && valg.slags) || "info");
     };
 
     /* ----- Overlays, intro og lyd ------------------------------------------ */
@@ -476,10 +490,11 @@
             f.navn = f.navn || this.navn;
             f.bord = function () { return mig.bord(); };
             f.besked = function (tekst, slags) { mig.besked(tekst, slags); };
+            f.sig = function (tekst, s, kilde) { mig.sig(tekst, s, kilde); };
             var forrigeTrin = f.vedTrin;
             f.vedTrin = function (t, F2) {
                 mig.opdaterForloeb();
-                if (t.sig) mig.besked(t.sig, "gjort");
+                if (t.sig) mig.sig(t.sig, { slags: "gjort" }, t);
                 if (forrigeTrin) forrigeTrin.call(mig, t, F2);
             };
             var forrigeFaerdig = f.vedFaerdig;
