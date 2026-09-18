@@ -71,6 +71,22 @@ function koerTest() {
     var klar = alle.filter(function (n) { return NK.Sprites.klar(n); });
     paastand("sprites er indlaest", klar.length === alle.length, klar.length + " af " + alle.length);
 
+    /* Panelets stil kommer fra grund.css: laerredet skal have plads til hele
+       zoomboblen, og aflaesningen og logbogen skal have deres stil. Da
+       stilen kun laa i proevebordets stilark, var boblen skaaret over her. */
+    var valgtFoer = bord.valgt;
+    bord.vaelg("glas1");
+    side.tegnBoble();
+    var bl = d.getElementById("boble-laerred").getBoundingClientRect();
+    paastand("zoomboblen har plads til hele boblen",
+        bl.width >= 2 * bord.bobleR && bl.height >= 2 * bord.bobleR,
+        Math.round(bl.width) + " x " + Math.round(bl.height) + " til radius " + bord.bobleR);
+    var vin = ramme.contentWindow;
+    paastand("aflaesningen og logbogen har deres stil",
+        vin.getComputedStyle(d.getElementById("glas-indhold")).borderCollapse === "collapse" &&
+        vin.getComputedStyle(d.getElementById("logbog-tekst")).resize === "vertical");
+    bord.vaelg(valgtFoer);
+
     function adv(sek) { for (var k = 0; k < Math.round(sek * 20); k++) bord.opdater(0.05); F.opdater(); }
     function lys(gg) { return V.lysstyrke(gg); }
     function konc(gg, navn) { return St.konc(B.samlet(gg), navn); }

@@ -1,50 +1,19 @@
 /* =====================================================================
    Proevebordet
    Det, der er saerligt for denne side. Grundstilen ligger i
-   ../../css/grund.css og indlaeses foer denne fil.
+   ../../css/grund.css og indlaeses foer denne fil; der staar ogsaa
+   zoomboblen, aflaesningen og logbogen, som alle sider paa side.js har.
+   Proeverummet indlaeser ogsaa denne fil.
    BEMAERK: decimaltal skrives med PUNKTUM i CSS (0.25rem), aldrig med
    dansk komma.
    ===================================================================== */
 
-/* Panelet er 10 % bredere end standarden, fordi zoomboblen staar i det */
+/* Panelet er 10 % bredere end standarden paa proevebordet og i proeverummet */
 :root { --panel-bredde: 473px; }
 
 @media (max-width: 1100px) {
     :root { --panel-bredde: 396px; }
 }
-
-/* Zoomboblen i panelet */
-.boble { display: block; width: 100%; height: 272px; margin: 2px 0 8px; border-radius: var(--radius-lil); background-color: #16161c; }
-.boble[hidden] { display: none; }
-
-/* Aflaesningen af det valgte glas */
-.indhold { width: 100%; border-collapse: collapse; font-size: 0.86rem; font-variant-numeric: tabular-nums; }
-.indhold th { text-align: left; font-weight: 600; color: var(--tekst-svag); padding: 3px 0; }
-.indhold td { text-align: right; font-weight: 700; color: var(--tekst); padding: 3px 0 3px 8px; white-space: nowrap; }
-.indhold td.enhed { text-align: left; font-weight: 400; color: var(--tekst-mat); padding-left: 4px; width: 34%; }
-.indhold tr + tr th, .indhold tr + tr td { border-top: 1px solid #3a3a47; }
-.indhold .fast th { color: var(--tekst-mat); }
-.indhold[hidden] { display: none; }
-#glas-temp { margin-top: 8px; }
-#glas-temp[hidden] { display: none; }
-
-/* Logbogen */
-.logbog {
-    display: block;
-    width: 100%;
-    margin-top: 10px;
-    padding: 8px 10px;
-    background-color: #16161c;
-    border: 1px solid #4a4a58;
-    border-radius: var(--radius-lil);
-    color: var(--tekst);
-    font-family: inherit;
-    font-size: 0.86rem;
-    line-height: 1.45;
-    resize: vertical;
-}
-.logbog:focus { outline: 2px solid var(--gul); outline-offset: 1px; }
-#logbog-kort .knaprad { margin-top: 0; }
 
 /* Ideerne er en simpel liste med en prik */
 .ideer { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; }
