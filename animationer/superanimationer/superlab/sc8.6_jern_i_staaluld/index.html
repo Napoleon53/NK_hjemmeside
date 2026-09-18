@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jern i ståluld</title>
+<link rel="stylesheet" href="../../laboratoriet/css/grund.css">
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚗</span> Jern i ståluld <span class="undertitel">Redoxtitrering med permanganat</span></h1>
+
+    <div class="top-hoejre">
+        <label class="skifter" title="Vis også de ioner i zoomboblen, der ikke reagerer">
+            <input type="checkbox" id="tilskuer-skift">
+            <span class="skifter-spor" aria-hidden="true"></span>
+            <span>Tilskuerioner</span>
+        </label>
+        <button class="knap topknap" id="nytknap" type="button" title="Start et nyt forsøg (N)">Nyt forsøg</button>
+        <button class="knap topknap" id="introknap" type="button" title="Hvad forsøget handler om">Om forsøget</button>
+        <button class="knap topknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+        <button class="ikonknap" id="lydknap" type="button" title="Lyd til og fra (M)" aria-label="Lyd til og fra" aria-pressed="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/>
+                <path class="boelger" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path class="kryds" d="M16.5 9.5l5 5M21.5 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </button>
+        <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+    </div>
+</header>
+
+<main class="forsoeg">
+    <div class="scene" id="scene">
+        <canvas id="scene-laerred" aria-label="Laboratoriebord med ståluld og vægt, et stinkskab med svovlsyre, saltsyre, kolbe og varmeplade, og en titreropstilling med buret og kaliumpermanganat"></canvas>
+        <div class="scenebesked" id="scenebesked" aria-live="polite"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort fremhaev" id="forloeb-kort">
+            <h2><span>Forløb</span> <span class="taeller" id="forloeb-taeller"></span></h2>
+            <ol class="trinliste" id="trin-liste"></ol>
+            <div class="hanefart" id="hanefart" hidden>
+                <span class="etiket">Hane</span>
+                <div class="segment" role="group" aria-label="Hanens fart">
+                    <button class="seg" id="fart-langsom" type="button" aria-pressed="true">Langsom</button>
+                    <button class="seg" id="fart-hurtig" type="button" aria-pressed="false" title="Hurtig hane (F)">Hurtig</button>
+                </div>
+            </div>
+            <div class="knaprad">
+                <button class="knap" id="aflaes-knap" type="button" title="Aflæs buretten (A)" hidden><span>Aflæs</span><span class="tegn">✎</span></button>
+                <button class="knap" id="draabe-knap" type="button" title="Én dråbe (D)" hidden><span>Dråbe</span><span class="tegn">💧</span></button>
+                <button class="knap" id="hint-knap" type="button" title="Hint til trinnet (I)"><span>Hint</span><span class="tegn">?</span></button>
+            </div>
+            <p class="hint" id="hint-tekst" hidden></p>
+        </div>
+
+        <div class="kort" id="maal-kort">
+            <h2><span>Beregning</span> <span class="taeller" id="maal-nr">Forsøg 1</span></h2>
+            <table class="maaleskema">
+                <tr id="raekke-staal"><th>m(ståluld)</th><td id="m-staal"></td></tr>
+                <tr id="raekke-konc"><th>c(KMnO₄)</th><td>0,0200 M</td></tr>
+                <tr id="raekke-start"><th>V(start)</th><td id="v-start"></td></tr>
+                <tr id="raekke-slut"><th>V(slut)</th><td id="v-slut"></td></tr>
+            </table>
+            <div class="beregn" id="beregn" hidden>
+                <label for="svar">Jernindhold</label>
+                <input id="svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false">
+                <span class="enhed">%</span>
+                <button class="knap blaa" id="tjek-knap" type="button">Tjek</button>
+            </div>
+            <button class="knap lille" id="hjaelp-beregn" type="button" hidden><span>Hjælp til beregningen</span><span class="tegn">?</span></button>
+            <p class="hint" id="beregn-hint" hidden></p>
+            <p class="besked god" id="beregn-svar" hidden></p>
+        </div>
+
+        <div class="kort" id="serie-kort">
+            <h2>Tegneserie</h2>
+            <p class="besked" id="serie-tekst">Låses op, når jernindholdet er beregnet.</p>
+            <button class="knap stor blaa" id="serieknap" type="button" title="Tegneserie (S)" hidden><span>Se forsøget som tegneserie</span><span class="tegn">→</span></button>
+        </div>
+
+        <div class="kort opgavekort" id="quiz-kort">
+            <h2><span>Quiz</span> <span class="taeller" id="quiz-taeller"></span></h2>
+            <p class="besked" id="quiz-tekst"></p>
+            <div class="valg" id="quiz-valg" hidden></div>
+            <p class="besked" id="quiz-forklaring" hidden></p>
+            <div class="quiz-score" id="quiz-score" hidden></div>
+            <button class="knap stor blaa" id="quiz-knap" type="button" hidden><span id="quiz-knap-tekst">Start quiz</span><span class="tegn">→</span></button>
+        </div>
+    </aside>
+</main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="intro">
+    <div class="overlay-boks intro-boks" role="dialog" aria-labelledby="intro-titel">
+        <h2 id="intro-titel">Jern i ståluld</h2>
+        <p class="intro-formaal">Forsøget bestemmer, hvor mange procent jern der er i ståluld, ved en titrering med kaliumpermanganat.</p>
+
+        <h3>Forsøget</h3>
+        <ol class="intro-trin">
+            <li>Afvej ca. 0,1 g ståluld, og opløs den i syre på varmepladen.</li>
+            <li>Fyld buretten med KMnO₄, og tap af, til menisken står på 0.</li>
+            <li>Titrer, til opløsningen er svagt og blivende lyserød, og aflæs buretten igen.</li>
+            <li>Beregn jernindholdet.</li>
+        </ol>
+
+        <h3>Uheld</h3>
+        <p>Alt kan prøves, også det forkerte. Kemichael rydder op og kommenterer, men forsøget kan altid fortsætte.</p>
+
+        <div class="knapper">
+            <button class="knap" id="intro-rundvisning" type="button">Rundvisning</button>
+            <button class="knap blaa" id="intro-start" type="button">Start forsøget</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Jern i ståluld</h2>
+        <h3>Opløsning</h3>
+        <p>Jernet i stålulden oxideres af syren. Der dannes jern(II)-ioner og dihydrogen, som ses som bobler.</p>
+        <div class="ligning lille">Fe(s) + 2 H⁺(aq) → Fe²⁺(aq) + H₂(g)</div>
+
+        <h3>Titrering</h3>
+        <p>Fe²⁺ titreres med kaliumpermanganat. Den lilla MnO₄⁻ reduceres til den næsten farveløse Mn²⁺. Når al Fe²⁺ er brugt, farver den næste dråbe opløsningen svagt og blivende lyserød.</p>
+        <div class="ligning lille">MnO₄⁻ + 5 Fe²⁺ + 8 H⁺ → Mn²⁺ + 5 Fe³⁺ + 4 H₂O</div>
+
+        <h3>Beregning</h3>
+        <div class="ligning lille">n(Fe²⁺) = 5 · c(KMnO₄) · V(KMnO₄)</div>
+        <div class="ligning lille">jernindhold = n(Fe²⁺) · M(Fe) / m(ståluld) · 100 %</div>
+        <p>V er forskellen mellem slutaflæsningen og startaflæsningen, regnet i liter. M(Fe) = 55,85 g/mol.</p>
+
+        <h3>Sikkerhed</h3>
+        <p>Svovlsyre irriterer hud og øjne. Kaliumpermanganat er oxiderende og giver brune pletter. Brug briller, og tør spild op med det samme.</p>
+
+        <div class="knapper">
+            <button class="knap blaa" id="teori-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Guidet hjaelp til beregningen: fem trin, der laases op ét ad gangen -->
+<div class="overlay" id="guide">
+    <div class="overlay-boks guide-boks">
+        <h2>Beregn jernindholdet</h2>
+        <ol class="guide">
+            <li id="g1">
+                <span class="nr">1</span>
+                <div>
+                    <p class="guide-titel">Forbrugt volumen</p>
+                    <p class="guide-formel">V = V(slut) − V(start)</p>
+                    <div class="guide-regning">
+                        <span id="g1-tal"></span>
+                        <input id="g1-svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Forbrugt volumen i mL">
+                        <span class="enhed">mL</span>
+                        <button class="knap blaa" id="g1-tjek" type="button">Tjek</button>
+                    </div>
+                    <p class="hint" id="g1-hint" hidden></p>
+                </div>
+            </li>
+            <li id="g2">
+                <span class="nr">2</span>
+                <div>
+                    <p class="guide-titel">Stofmængden af MnO₄⁻</p>
+                    <p class="guide-formel">n(MnO₄⁻) = c · V, med V i liter</p>
+                    <div class="guide-regning">
+                        <span id="g2-tal"></span>
+                        <input id="g2-svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Stofmængden af permanganat i mol">
+                        <span class="enhed">mol</span>
+                        <button class="knap blaa" id="g2-tjek" type="button">Tjek</button>
+                    </div>
+                    <p class="hint" id="g2-hint" hidden></p>
+                </div>
+            </li>
+            <li id="g3">
+                <span class="nr">3</span>
+                <div>
+                    <p class="guide-titel">Stofmængden af Fe²⁺</p>
+                    <p class="guide-formel">n(Fe²⁺) = 5 · n(MnO₄⁻)</p>
+                    <div class="guide-regning">
+                        <span id="g3-tal"></span>
+                        <input id="g3-svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Stofmængden af jern(II) i mol">
+                        <span class="enhed">mol</span>
+                        <button class="knap blaa" id="g3-tjek" type="button">Tjek</button>
+                    </div>
+                    <p class="hint" id="g3-hint" hidden></p>
+                </div>
+            </li>
+            <li id="g4">
+                <span class="nr">4</span>
+                <div>
+                    <p class="guide-titel">Massen af jern</p>
+                    <p class="guide-formel">m(Fe) = n(Fe²⁺) · M(Fe), M(Fe) = 55,85 g/mol</p>
+                    <div class="guide-regning">
+                        <span id="g4-tal"></span>
+                        <input id="g4-svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Massen af jern i gram">
+                        <span class="enhed">g</span>
+                        <button class="knap blaa" id="g4-tjek" type="button">Tjek</button>
+                    </div>
+                    <p class="hint" id="g4-hint" hidden></p>
+                </div>
+            </li>
+            <li id="g5">
+                <span class="nr">5</span>
+                <div>
+                    <p class="guide-titel">Jernindholdet i procent</p>
+                    <p class="guide-formel">jernindhold = m(Fe) / m(ståluld) · 100 %</p>
+                    <div class="guide-regning">
+                        <span id="g5-tal"></span>
+                        <input id="g5-svar" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" aria-label="Jernindholdet i procent">
+                        <span class="enhed">%</span>
+                        <button class="knap blaa" id="g5-tjek" type="button">Tjek</button>
+                    </div>
+                    <p class="hint" id="g5-hint" hidden></p>
+                </div>
+            </li>
+        </ol>
+        <p class="guide-note">Små tal kan skrives som 0,000356 eller 3,56·10^-4.</p>
+        <div class="knapper">
+            <button class="knap" id="guide-luk" type="button">Luk</button>
+            <button class="knap blaa" id="guide-brug" type="button" hidden>Skriv svaret i måleskemaet</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<div class="overlay" id="tegneserie">
+    <div class="overlay-boks bred">
+        <h2>Forsøget som tegneserie</h2>
+        <div class="serie" id="serie-ruder"></div>
+        <div class="knapper">
+            <button class="knap blaa" id="serie-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/6</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="../../laboratoriet/js/kerne.js"></script>
+<script src="js/model.js"></script>
+<script src="js/lyd.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../kemichael/kemichael.js"></script>
+<script src="js/scene.js"></script>
+<script src="js/mikro.js"></script>
+<script src="js/forsoeg.js"></script>
+<script src="js/bord.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/tegneserie.js"></script>
+<script src="js/quiz.js"></script>
+<script src="../../laboratoriet/js/rundvisning.js"></script>
+<script src="js/tur.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+/* =====================================================================
+   sc6.8 - Substitution i benzin
+   Det, der er saerligt for dette forsoeg. Grundstilen ligger i
+   ../../laboratoriet/css/grund.css og indlaeses foer denne fil.
+   BEMAERK: decimaltal skrives med PUNKTUM i CSS (0.25rem), aldrig med
+   dansk komma.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   RESULTATER: de to glas ved siden af hinanden, i tegneseriens sidste rude
+   --------------------------------------------------------------------- */
+.resultater { width: 100%; border-collapse: collapse; font-size: 0.82rem; table-layout: fixed; }
+.resultater th { text-align: left; font-weight: 600; color: var(--tekst-svag); padding: 4px 4px 4px 0; }
+.resultater tr:first-child th { text-align: center; color: var(--gul); font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase; padding-bottom: 5px; }
+.resultater tr:first-child th:first-child { width: 34%; }
+.resultater td {
+    text-align: center;
+    font-weight: 700;
+    color: var(--tekst);
+    padding: 4px 2px;
+    vertical-align: middle;
+    line-height: 1.3;
+}
+.resultater td:empty::after { content: "…"; color: var(--tekst-mat); font-weight: 400; }
+.resultater tr + tr th, .resultater tr + tr td { border-top: 1px solid #3a3a47; }
+.resultater .farve {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    margin: 0 5px -1px 0;
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    vertical-align: baseline;
+}
+.rude .resultater { font-size: 0.84rem; }

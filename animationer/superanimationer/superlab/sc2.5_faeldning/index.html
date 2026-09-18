@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fældning</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<!-- Én fane: det er ét forsoeg. Derfor ingen fanelinje i toppen. -->
+<header class="top">
+    <h1><span class="ikon">◍</span> Fældning <span class="undertitel">Dråbeforsøg på folie</span></h1>
+
+    <div class="top-hoejre">
+        <button class="knap topknap" id="introknap" type="button" title="Hvad forsøget handler om">Om forsøget</button>
+        <button class="knap topknap" id="teoriknap" type="button" title="Teori (T)">Teori</button>
+        <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+    </div>
+</header>
+
+<main class="forsoeg">
+    <div class="scenekolonne">
+        <div class="scene" id="scene">
+            <canvas id="scene-laerred" aria-label="Forsøgsopstilling: dråbeflasker i to stativer, en plastlomme med et skema og en lup"></canvas>
+            <div class="scenebesked" id="scenebesked" aria-live="polite"></div>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <!-- Forloebet i tre trin. Det aktive trin lyser; se trin() i forsoeg.js. -->
+        <ol class="trinlinje" aria-label="Forløb">
+            <li id="trin-1"><span class="nr">1</span>Dryp</li>
+            <li id="trin-2"><span class="nr">2</span>Brug luppen</li>
+            <li id="trin-3"><span class="nr">3</span>Opskriv</li>
+        </ol>
+
+        <div class="kort fremhaev" id="skema-kort">
+            <h2><span id="skema-titel">Skema</span> <span class="taeller" id="skema-taeller">0 af 12 felter</span></h2>
+            <!-- Vises, naar skemaet er udfoert og de ekstra flasker er laast op -->
+            <div class="sidevalg" id="sidevalg" hidden>
+                <button type="button" class="sideknap aktiv" data-side="skema" aria-pressed="true">Skema</button>
+                <button type="button" class="sideknap" data-side="frit" aria-pressed="false" title="Skift side (F)">Frit forsøg</button>
+            </div>
+            <table class="skema" id="skema-tabel"></table>
+            <div class="knaprad">
+                <button class="knap" id="knap-toer" type="button" title="Tør feltet i luppen af (Delete)"><span>Tør feltet af</span></button>
+                <button class="knap" id="knap-toer-alt" type="button" title="Tør hele folien af (R)"><span>Tør folien af</span></button>
+            </div>
+        </div>
+
+        <div class="kort opgavekort" id="opgave-kort">
+            <h2><span>Reaktionsskema</span> <span class="taeller" id="opg-taeller">0 af 9</span></h2>
+            <p class="besked" id="opg-tekst"></p>
+
+            <div id="opg-bygger" hidden>
+                <div class="ionvalg" id="opg-ioner" aria-label="Ionerne i dråben"></div>
+                <!-- Trin 1: de to ioner. Trin 2: pilen og formlen kommer frem. Se js/opgave.js. -->
+                <div class="skemalinje" id="opg-linje">
+                    <span class="plads tom" id="opg-kat">?</span><span class="tilst">(aq)</span>
+                    <span class="tegn-plus">+</span>
+                    <span class="plads tom" id="opg-an">?</span><span class="tilst">(aq)</span>
+                    <span class="produktdel" id="opg-produktdel" hidden>
+                        <span class="tegn-pil">→</span>
+                        <span class="formel"><span id="opg-f-kat"></span><button class="indeks" id="opg-i1" type="button" title="Antal. Klik for at ændre." aria-label="Antal af den positive ion">1</button><span class="parentes" id="opg-p1" hidden>(</span><span id="opg-f-an"></span><span class="parentes" id="opg-p2" hidden>)</span><button class="indeks" id="opg-i2" type="button" title="Antal. Klik for at ændre." aria-label="Antal af den negative ion">1</button></span><span class="tilst">(s)</span>
+                    </span>
+                </div>
+                <div class="skemalinje loest" id="opg-facit" hidden></div>
+                <div class="knaprad">
+                    <button class="knap blaa" id="opg-tjek" type="button"><span>Tjek</span><span class="tegn">✓</span></button>
+                    <button class="knap" id="opg-svar" type="button" hidden><span>Vis svaret</span></button>
+                </div>
+            </div>
+
+            <p class="besked" id="opg-besked" hidden></p>
+            <button class="knap stor blaa" id="opg-naeste" type="button" hidden><span>Næste felt med bundfald</span><span class="tegn">→</span></button>
+        </div>
+
+        <!-- Opgaven i det frie forsøg, se js/fritopgave.js -->
+        <div class="kort opgavekort" id="frit-kort" hidden>
+            <h2><span>Tungtopløselige salte</span></h2>
+            <p class="besked">Markér alle jern(III)salte og sulfider, der er tungtopløselige.</p>
+            <div id="frit-grupper"></div>
+            <div class="knaprad frit-knaprad">
+                <button class="knap blaa" id="frit-tjek" type="button"><span>Tjek svar</span><span class="tegn">✓</span></button>
+                <p class="besked" id="frit-besked" hidden></p>
+            </div>
+        </div>
+    </aside>
+</main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="intro">
+    <div class="overlay-boks intro-boks" role="dialog" aria-labelledby="intro-titel">
+        <h2 id="intro-titel">Fældning</h2>
+        <p class="intro-formaal">Forsøget undersøger, hvilke saltopløsninger der giver bundfald, når de blandes.</p>
+
+        <h3>Forsøget</h3>
+        <ol class="intro-trin">
+            <li>Dryp to opløsninger i hvert felt i skemaet.</li>
+            <li>Se på dråberne med luppen.</li>
+            <li>Opskriv reaktionsskemaet for hvert bundfald.</li>
+        </ol>
+
+        <h3>Uheld</h3>
+        <p>Forkerte handlinger kan give uheld. Kemichael rydder op.</p>
+
+        <div class="knapper">
+            <button class="knap" id="intro-rundvisning" type="button">Rundvisning</button>
+            <button class="knap blaa" id="intro-start" type="button">Start forsøget</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Fældning</h2>
+        <p>Blandes to opløsninger af salte, kan en positiv ion fra den ene og en negativ ion fra den anden danne et tungtopløseligt salt. Saltet kan ikke være opløst og ses som et bundfald.</p>
+        <div class="ligning">Pb²⁺(aq) + 2 I⁻(aq) → PbI₂(s)</div>
+
+        <h3>Tilskuerioner</h3>
+        <p>De øvrige ioner er opløst både før og efter blandingen. De skrives ikke med i reaktionsskemaet.</p>
+
+        <h3>Koefficienterne</h3>
+        <p>Bundfaldet har ingen samlet ladning. Koefficienterne vælges, så den positive og den negative ladning går op, med de mindste hele tal.</p>
+
+        <h3>Huskeregel</h3>
+        <p>Nitrater og alle salte med natrium, kalium og ammonium er letopløselige.</p>
+
+        <div class="knapper">
+            <button class="knap blaa" id="teori-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: spotlight paa ét element ad gangen - se js/rundvisning.js -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="../../laboratoriet/js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/scene.js"></script>
+<script src="js/mikro.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/forsoeg.js"></script>
+<script src="js/opgave.js"></script>
+<script src="js/fritopgave.js"></script>
+<script src="../../laboratoriet/js/rundvisning.js"></script>
+<script src="js/tur.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

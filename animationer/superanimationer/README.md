@@ -22,25 +22,25 @@ en superlab-animation er han en del af forsøget.
 "I menuen" betyder, at en samlingsfil (`samling_*.html`) linker til mappen. En
 ny animation kommer først i menuen, når brugeren siger til.
 
-| Mappe | Slags | I menuen | Note |
-|-------|-------|----------|------|
-| `sb2.0_ligevaegt_intro` | superanimation | nej | |
-| `sb2.4_jernthiocyanat` | superlab | ja | gammel kode, afløses af `sb2.4_ligevaegt` |
-| `sb2.4_ligevaegt` | superlab | nej | samme forsøg på den fælles motor, under opbygning |
-| `sb3.2_titreringssimulator` | superanimation | ja | |
-| `sc1.1_atombygger` | superanimation | ja | via genvejen `kemi-c-filer/c1.1_atommodel_ioner.html` |
-| `sc1.3_knaldgas` | superlab | ja | ældre sidelayout |
-| `sc2.1_salt_i_vand` | superanimation | nej | menuen viser stadig den gamle c2.1 |
-| `sc2.2_saltbygger` | superanimation | nej | menuen viser stadig den gamle c2.2 |
-| `sc2.5_faeldning` | superlab | ja | ældre sidelayout og ældre udgave af Kemichael |
-| `sc2.6_kobber_dibrom` | superlab | ja | |
-| `sc2.7_blyiodid` | superlab | ja | |
-| `sc3.1_elektronprikformler` | superanimation | ja | |
-| `sc3.2_rumlig_opbygning` | superanimation | nej | inaktiv: rettes ikke, før brugeren siger til |
-| `sc3.4_blandbarhed` | superanimation | ja | ny, sept. 2026 |
-| `sc6.8_substitution` | superlab | ja | |
-| `sc6.9_fedt_i_chips` | superlab | ja | |
-| `sc8.6_jern_i_staaluld` | superlab | ja | |
+| Mappe | I menuen | Note |
+|-------|----------|------|
+| `superanimation/sb2.0_ligevaegt_intro` | nej | |
+| `superanimation/sb3.2_titreringssimulator` | ja | |
+| `superanimation/sc1.1_atombygger` | ja | via genvejen `kemi-c-filer/c1.1_atommodel_ioner.html` |
+| `superanimation/sc2.1_salt_i_vand` | nej | menuen viser stadig den gamle c2.1 |
+| `superanimation/sc2.2_saltbygger` | nej | menuen viser stadig den gamle c2.2 |
+| `superanimation/sc3.1_elektronprikformler` | ja | |
+| `superanimation/sc3.2_rumlig_opbygning` | nej | inaktiv: rettes ikke, før brugeren siger til |
+| `superanimation/sc3.4_blandbarhed` | ja | ny, sept. 2026 |
+| `superlab/sb2.4_jernthiocyanat` | ja | gammel kode, afløses af `sb2.4_ligevaegt` |
+| `superlab/sb2.4_ligevaegt` | nej | samme forsøg på den fælles motor, under opbygning |
+| `superlab/sc1.3_knaldgas` | ja | ældre sidelayout |
+| `superlab/sc2.5_faeldning` | ja | ældre sidelayout og ældre udgave af Kemichael |
+| `superlab/sc2.6_kobber_dibrom` | ja | |
+| `superlab/sc2.7_blyiodid` | ja | |
+| `superlab/sc6.8_substitution` | ja | |
+| `superlab/sc6.9_fedt_i_chips` | ja | |
+| `superlab/sc8.6_jern_i_staaluld` | ja | |
 
 ## Fælles krav
 
@@ -110,11 +110,12 @@ opstilling.
 * Opgaver, et spil eller en ukendt prøve tjekker forståelsen, gerne i den
   sidste fane.
 * Mappen er selvstændig og henter kun filer inde fra sig selv. Kommer
-  Kemichael på besøg, hentes han fra `../kemichael/`.
+  Kemichael på besøg, hentes han fra `../../kemichael/`.
 * Hver fane er et objekt med `tilpas()`, `opdater(dt)`, `tegn()` og
   `nulstil()`, og kun den aktive fane kører. Kemien og tallene ligger for sig
   selv, adskilt fra tegningen.
-* Mønster: `sc1.1_atombygger` og `sb3.2_titreringssimulator`.
+* Mønster: `superanimation/sc1.1_atombygger` og
+  `superanimation/sb3.2_titreringssimulator`.
 
 ## Superlab-animation
 
@@ -137,30 +138,29 @@ kan lave de fejl, man kan lave dér.
   Resultatskemaet står i tegneseriens sidste rude.
 * Nye superlab-animationer bygges på genstandsmodellen i `laboratoriet/`.
   Kemien er data i `stoftabel.js`, ikke kode i forsøget. Mønster:
-  `sb2.4_ligevaegt/` og `laboratoriet/README.md`. Quiz, tegneserie og
-  Kemichaels scener findes indtil videre i `sc6.8_substitution` og
-  `sc8.6_jern_i_staaluld`.
+  `superlab/sb2.4_ligevaegt/` og `laboratoriet/README.md`. Quiz, tegneserie
+  og Kemichaels scener findes indtil videre i `superlab/sc6.8_substitution` og
+  `superlab/sc8.6_jern_i_staaluld`.
 
 ## Det, der ikke er en animation
 
-Mapperne, der begynder med `sb` eller `sc`, er superanimationer eller
-superlab-animationer (se oversigten). Resten er fælles kode og værktøj:
+Animationerne ligger i `superanimation/` og `superlab/` (se oversigten). De to
+andre mapper er fælles kode:
 
 * `laboratoriet/` er motoren bag superlab-animationerne: stoffer, udstyr,
   bordet, forløbet og den fælles skal. Prøvebordet og prøverummet derinde er
   legeplads og testbænk.
 * `kemichael/` er læreren, der går igen. Han er ikke en animation. Sig det ikke
   til ham.
-* `Claude outputs/` er skærmbilleder fra arbejdet.
-* Filer, der begynder med `_` (`_selvtest.html`, `_geometri.html`,
-  `_lav_sprites.js`), er udviklerværktøj og indgår ikke i animationerne.
 
-Animationerne skal deles i to undermapper, `superanimation/` og `superlab/`,
-så de fælles mapper ikke forveksles med dem. Planen står i `_oprydning.md` og
-udføres, når brugeren beder om det.
+Filer, der begynder med `_` (`_selvtest.html`, `_geometri.html`,
+`_lav_sprites.js`), er udviklerværktøj og indgår ikke i animationerne.
 
 ## Fælles opbygning
 
+* **Mappe:** en ny animation lægges i `superanimation/` eller `superlab/` efter
+  sin slags. Stier ud af mappen har derfor to niveauer: `../../kemichael/`,
+  `../../laboratoriet/`.
 * **Navn:** `s`, niveau, kapitel og nummer og et kort navn uden æ, ø og å, fx
   `sc2.7_blyiodid`. Nummeret er emnet i samlingen (`samling_c2.html`).
 * **Indgang:** `index.html`. Ingen `fetch` og ingen moduler, så den virker fra

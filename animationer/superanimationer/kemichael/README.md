@@ -7,7 +7,8 @@ ens alle steder. Hver animation har sine egne scener i sin `js/laerer.js`.
 Bruges i sc1.3 Knaldgas, sc2.1 Salt i vand, sc2.6 Kobber og dibrom, sc2.7
 Blyiodid, sc6.8 Substitution, sc6.9 Fedt i chips, sc8.6 Jern i ståluld, sb2.4
 Jernthiocyanat og prøvebordet i `laboratoriet/`.
-Animationerne henter filer herfra og skal derfor ligge ved siden af denne mappe.
+Animationerne ligger i `../superanimation/` og `../superlab/` og henter filer herfra
+med `../../kemichael/`.
 sc2.1 har intet fast tegnebord; dens `js/laerer.js` laver et `NK.Scene` med de mål,
 figuren bruger, og tegner ham skaleret efter lærredets højde. sc2.5 Fældning har en ældre udgave af ham, der kigger op i hjørnet;
 den er tegnet med samme ansigt og overskæg, men bruger ikke mappen.
@@ -219,7 +220,7 @@ tæller oprydningerne i det forsøg, der kører nu, `K.oprydningsTekst()` giver
 teksten, og `K.tegneserieFigur(ctx, valg)` tegner ham i ruden. Valgene er `x`,
 `gulv`, `skala` (0,46 passer til en rude på 214 px), `arm`, `udtryk` og
 `haand(ctx, hd)`, som tegner det, han holder, fx køkkenrullen. Mønster:
-`sc6.8_substitution/js/tegneserie.js`.
+`../superlab/sc6.8_substitution/js/tegneserie.js`.
 
 ## Filer
 
@@ -243,7 +244,7 @@ Ankrene står i `NK.Kemichael.ANKER`. Øjne, bryn, briller, mund, rødme, damp a
 1. Indlæs filen efter `sprites.js` og før `scene.js`:
    ```html
    <script src="js/sprites.js"></script>
-   <script src="../kemichael/kemichael.js"></script>
+   <script src="../../kemichael/kemichael.js"></script>
    <script src="js/scene.js"></script>
    ```
 2. `sprites.js` henter en post fra dens egen mappe, hvis den har en:

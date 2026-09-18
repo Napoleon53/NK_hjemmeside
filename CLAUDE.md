@@ -41,7 +41,7 @@ statiske sider i roden, downloads i `downloads/`.
   `arkiv/`. Ret samtidig kolonnen "I menuen" i superanimationernes README.
 - Ingen løbende liste af iagttagelser i panelet. Forsøget opsummeres i stedet
   som en tegneserie i en pop-up bag en knap, der først låses op, når forsøget
-  er slut (mønster: `sc6.8_substitution/js/tegneserie.js`).
+  er slut (mønster: `superlab/sc6.8_substitution/js/tegneserie.js`).
 - Resultatskemaet for forsøget står i tegneseriens sidste rude, ikke som et
   kort i panelet.
 - Zoomboblen med mikroniveauet må gerne være lidt større end i de første
@@ -78,7 +78,7 @@ statiske sider i roden, downloads i `downloads/`.
 - Superanimationer om laboratorieforsøg har en intro-popup, der kort siger, hvad
   forsøget undersøger, og hvad eleven skal gøre. Den åbner af sig selv første
   gang og igen med knappen Om forsøget (mønster: `#intro` i
-  `sc6.8_substitution/index.html`, `aabnIntro` i `js/app.js`).
+  `superlab/sc6.8_substitution/index.html`, `aabnIntro` i `js/app.js`).
 - Forkerte handlinger i et forsøg afvises ikke med en besked, når det kan
   undgås. De udføres og giver et uheld, og Kemichael kommer og rydder op
   (`kemichael/`). Kun det, der fysisk ikke kan lade sig gøre, afvises.
@@ -104,7 +104,7 @@ statiske sider i roden, downloads i `downloads/`.
   ikke Na¹⁺). Gælder alle steder ladning vises: canvas-tegninger, løbende tekst,
   beregnede beskeder, tooltips og fejlbeskeder bygget af strengsammensætning.
   Mønster: `ladningHaevet`/`ladningstekst` i
-  `animationer/superanimationer/sc2.2_saltbygger/js/kerne.js`.
+  `animationer/superanimationer/superanimation/sc2.2_saltbygger/js/kerne.js`.
 
 ## Filstruktur
 

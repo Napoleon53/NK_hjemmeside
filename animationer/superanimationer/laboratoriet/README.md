@@ -7,8 +7,8 @@ det, der er særligt for netop det forsøg.
 
 Bruges af sc1.3 Knaldgas, sc2.5 Fældning, sc2.6 Kobber og dibrom, sc2.7
 Blyiodid, sc6.8 Substitution, sc6.9 Fedt i chips, sc8.6 Jern i ståluld og
-sb2.4 Jernthiocyanat (kerne, rundvisning og grundstilark). Forsøgene henter
-filer herfra og skal derfor ligge ved siden af denne mappe, ligesom med
+sb2.4 Jernthiocyanat (kerne, rundvisning og grundstilark). Forsøgene ligger i
+`../superlab/` og henter filer herfra med `../../laboratoriet/`, ligesom med
 `kemichael/`.
 
 ## Prøvebordet
@@ -341,16 +341,16 @@ spil.
 1. Stilark: grundstilen først, forsøgets eget stilark bagefter. Forsøgets
    `css/stil.css` har kun det, der er særligt for forsøget.
    ```html
-   <link rel="stylesheet" href="../laboratoriet/css/grund.css">
+   <link rel="stylesheet" href="../../laboratoriet/css/grund.css">
    <link rel="stylesheet" href="css/stil.css">
    ```
 2. Kernen og farvemodellen indlæses først af alle scripts, rundvisningen lige
    før `app.js`:
    ```html
-   <script src="../laboratoriet/js/kerne.js"></script>
-   <script src="../laboratoriet/js/farvemodel.js"></script>
+   <script src="../../laboratoriet/js/kerne.js"></script>
+   <script src="../../laboratoriet/js/farvemodel.js"></script>
    ...
-   <script src="../laboratoriet/js/rundvisning.js"></script>
+   <script src="../../laboratoriet/js/rundvisning.js"></script>
    <script src="js/tur.js"></script>
    <script src="js/app.js"></script>
    ```
@@ -414,7 +414,7 @@ Al prosa i et forsøg ligger i dets `js/tekst.js` som `{ id: tekst }`, og
 `side.js` skriver den ind i elementerne ved start: en streng bliver til
 indholdet, en liste til punkter. Det går to veje: en øvelsesvejledning kan
 oversættes til den ene fil, og hele forsøgets sprog kan læses igennem ét
-sted uden at åbne kode. Mønster: `../sb2.4_ligevaegt/`.
+sted uden at åbne kode. Mønster: `../superlab/sb2.4_ligevaegt/`.
 
 Prøvebordet og prøverummet har endnu deres egne `app.js`; de flyttes over
 på `side.js`, når der ikke er andet i gang.
@@ -450,7 +450,7 @@ der holder gemningen lille nok til at virke, når der bliver mange rum.
 
 Det er det samme lag, spillet skal bruge. Et trin i en øvelse og en låst dør
 i et escaperoom er den samme sætning — betingelse, konsekvens, fyrer én
-gang — og kun konsekvensen er forskellig. Mønster: `../sb2.4_ligevaegt/js/forloeb.js`.
+gang — og kun konsekvensen er forskellig. Mønster: `../superlab/sb2.4_ligevaegt/js/forloeb.js`.
 
 **En replik er også en konsekvens.** `{ sig: "…" }` i en udløsers `saa` (eller
 et trins eget `sig`, som siges, når trinnet er gjort) går gennem `side.sig`
@@ -496,7 +496,7 @@ bordene. Et trin kan læse dem i samme sprog som alt andet:
 { journal: "billede", post: "glas1", rigtig: true }
 ```
 
-Mønster: `../sb2.4_ligevaegt/js/billede.js` og dets trin `billede`.
+Mønster: `../superlab/sb2.4_ligevaegt/js/billede.js` og dets trin `billede`.
 
 ## Bade
 
@@ -515,7 +515,7 @@ vandbad giver 80 °C i stedet for pladens 250.
 
 ## Næste skridt
 
-* sb2.4 er lagt over på genstandsmodellen i `../sb2.4_ligevaegt/`. Bordet
+* sb2.4 er lagt over på genstandsmodellen i `../superlab/sb2.4_ligevaegt/`. Bordet
   står, kemien er prøvet igennem, badene virker, forløbets ni trin kører,
   billedet af de syv glas noteres, og Kemichael siger forløbets
   bemærkninger. Del 2 om fortynding, quizzen og tegneserien mangler.
@@ -529,7 +529,7 @@ vandbad giver 80 °C i stedet for pladens 250.
   som koncentrationen falder. Dybden er der allerede som `niveau`, og
   geometrien i `udstyr.js` giver resten.
 * **Øvelsestjekket:** en generisk validering, ethvert nyt forsøg køres
-  igennem. Kimen står i `../sb2.4_ligevaegt/_selvtest.html` afsnit 10, som
+  igennem. Kimen står i `../superlab/sb2.4_ligevaegt/_selvtest.html` afsnit 10, som
   bruger `NK.Vilkaar.naevnte` til at opdage et trin, der peger på et glas
   eller et stof, der ikke findes.
 * Rammen for `quiz.js` og `tegneserie.js` samles, når to forsøg på

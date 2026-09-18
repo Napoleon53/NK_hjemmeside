@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salt i vand</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">💧</span> Salt<span class="lang"> i vand</span></h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-oploes" role="tab" aria-selected="true"><span class="nr">1</span>Opløsningen</button>
+        <button class="faneknap" data-fane="fane-maetning" role="tab" aria-selected="false"><span class="nr">2</span>Hvor meget kan der være?</button>
+    </div>
+
+    <button class="topknap" id="teoriknap" type="button" title="Teori (T)">📖 <span>Teori</span></button>
+    <button class="topknap" id="quizknap" type="button" title="Tjek dig selv (Q)">🧠 <span>Quiz</span></button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Hjælp og genveje (H)" aria-label="Hjælp">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: OPLOESNINGEN                                               -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-oploes" role="tabpanel" aria-label="Opløsningen">
+    <div class="scene medtekst">
+        <canvas id="oploes-laerred"></canvas>
+        <div class="scene-mrk" id="oploes-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort">
+            <h2>Vælg et salt</h2>
+            <div class="saltvalg" id="oploes-saltvalg"></div>
+            <div class="talraekke" style="margin-top:9px;">
+                <span id="oploes-navn">natriumchlorid</span>
+                <span class="maerke groen" id="oploes-type">letopløseligt</span>
+            </div>
+            <p class="note" id="oploes-hverdag"></p>
+        </div>
+
+        <div class="kort">
+            <h2>Forsøget</h2>
+            <div class="tilstandsvalg" id="oploes-temp" role="group" aria-label="Temperatur"></div>
+            <div class="tilstandsvalg" id="oploes-roer" role="group" aria-label="Omrøring" style="margin-top:6px;"></div>
+            <label class="tjek"><input type="checkbox" id="oploes-delta" checked> Vis δ+ og δ− på vandet</label>
+            <button class="knap nulstil" id="oploes-nulstil" type="button"><span>Ny krystal</span><span class="tegn">↺</span></button>
+        </div>
+
+        <!-- Én knap, der aendrer sig med, hvor langt man er:
+             Start opgave -> Giv hint -> Vis svaret -> Ny opgave (js/opgave.js) -->
+        <div class="kort opgavekort" id="oploes-opg-kort">
+            <h2>Opgaver <span class="taeller"><b id="oploes-opg-nr">0</b>/<span id="oploes-opg-antal">4</span></span></h2>
+            <p class="opgave-spm" id="oploes-opg-tekst"></p>
+            <div class="valg en-spalte" id="oploes-opg-valg" hidden></div>
+            <p class="besked" id="oploes-opg-hint"></p>
+            <p class="besked" id="oploes-opg-svar"></p>
+            <div class="knaprad"><button class="knap blaa" id="oploes-opg-knap" type="button">Start opgave</button></div>
+        </div>
+
+        <div class="kort maaling">
+            <h2>Det sker der</h2>
+            <div class="ligning" id="oploes-ligning"></div>
+            <div class="talraekke" style="margin-top:9px;"><span>Der kan opløses</span><span class="tal blaa" id="oploes-graense">-</span></div>
+            <p class="besked" id="oploes-besked" style="margin-top:9px;"></p>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: HVOR MEGET KAN DER VAERE?                                   -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-maetning" role="tabpanel" aria-label="Hvor meget kan der være?">
+    <div class="scene medtekst">
+        <canvas id="maet-laerred"></canvas>
+
+        <!-- Ligger over spatlen - positionen saettes af sim_maetning.js,
+             saa den foelger glasset. -->
+        <div class="glas-knapper" id="maet-glasknapper">
+            <button class="knap lille blaa" id="maet-lidt" type="button">+ 5 g</button>
+            <button class="knap lille blaa" id="maet-meget" type="button">+ 25 g</button>
+            <button class="knap lille nulstil" id="maet-toem" type="button" title="Tøm glasset" aria-label="Tøm glasset">↺</button>
+        </div>
+
+        <button class="graf-skala-knap" id="maet-skala-knap" type="button">Skaler til stoffet</button>
+
+        <div class="scene-mrk" id="maet-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort">
+            <h2>Vælg et salt</h2>
+            <div class="saltvalg" id="maet-saltvalg"></div>
+            <div class="talraekke" style="margin-top:9px;">
+                <span id="maet-navn">natriumchlorid</span>
+                <span class="maerke groen" id="maet-type">letopløseligt</span>
+            </div>
+            <p class="note" id="maet-hverdag"></p>
+        </div>
+
+        <div class="kort">
+            <h2>Temperatur</h2>
+            <div class="skyder">
+                <label for="maet-temp"><span>Vandets temperatur</span><b id="maet-temp-tal">20 °C</b></label>
+                <input type="range" id="maet-temp" min="0" max="100" step="1" value="20">
+                <div class="skala"><span>0 °C</span><span>50 °C</span><span>100 °C</span></div>
+            </div>
+            <p class="note">Du kan også trække i kurven.</p>
+        </div>
+
+        <div class="kort opgavekort" id="maet-opg-kort">
+            <h2>Opgaver <span class="taeller"><b id="maet-opg-nr">0</b>/<span id="maet-opg-antal">4</span></span></h2>
+            <p class="opgave-spm" id="maet-opg-tekst"></p>
+            <div class="valg en-spalte" id="maet-opg-valg" hidden></div>
+            <p class="besked" id="maet-opg-hint"></p>
+            <p class="besked" id="maet-opg-svar"></p>
+            <div class="knaprad"><button class="knap blaa" id="maet-opg-knap" type="button">Start opgave</button></div>
+        </div>
+
+        <div class="kort maaling">
+            <h2>I glasset <span class="maerke groen" id="maet-maerke">tomt glas</span></h2>
+            <div class="talraekke"><span>Hældt i</span><span class="tal" id="maet-tilsat">0 g</span></div>
+            <div class="talraekke"><span>Opløst</span><span class="tal groen" id="maet-oploest">0 g</span></div>
+            <div class="talraekke"><span>Bundfald</span><span class="tal roed" id="maet-bundfald">0 g</span></div>
+            <div class="talraekke sum"><span>Grænsen lige nu</span><span class="tal gul" id="maet-graense">-</span></div>
+            <p class="besked" id="maet-besked" style="margin-top:9px;"></p>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- TEORIBOKSEN - valgfri, aabnes med knappen eller T                   -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Teori: salt i vand</h2>
+        <p>Otte korte afsnit. Du behøver ikke læse dem for at bruge animationen.</p>
+        <div class="teoriliste" id="teori-liste"></div>
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="teori-luk" type="button" style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<div class="overlay" id="quiz">
+    <div class="overlay-boks" style="max-width:520px;">
+        <div id="quiz-indhold"></div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<div class="overlay" id="hjaelp">
+    <div class="overlay-boks">
+        <h2>Salt i vand</h2>
+        <p>To faner om det samme spørgsmål: <b>hvad sker der, når et salt kommer i vand?</b> Den første viser det gennem en lup, ion for ion. Den anden viser det, man kan måle: hvor meget der kan være i vandet.</p>
+
+        <h3>De to faner</h3>
+        <ul>
+            <li><b>Opløsningen.</b> Vandmolekylerne vender den rigtige ende ind mod ionerne i krystallens overflade og river dem løs. Skift temperatur, eller slå omrøring til: omrøringen knuser krystallen, så flere vandmolekyler kan tage fat på én gang. Knapperne på varmepladen kan også drejes direkte i billedet.</li>
+            <li><b>Hvor meget kan der være?</b> Spatlen hælder salt i glasset. Kurven er grænsen, og den gule linje er det, du har hældt i. "Skaler til stoffet" zoomer ind på det valgte salt.</li>
+        </ul>
+
+        <h3>Opgaver</h3>
+        <p>Hver fane har fire opgaver. Sidder du fast, giver knappen først et hint og derefter svaret.</p>
+
+        <h3>De seks salte</h3>
+        <p>Den grønne streg over knappen betyder <b>letopløseligt</b>, den orange <b>tungtopløseligt</b>. Det salt, du vælger, følger med over på den anden fane.</p>
+
+        <h3>Genveje</h3>
+        <p>
+            <kbd>1</kbd> <kbd>2</kbd> skift fane &nbsp;·&nbsp;
+            <kbd>T</kbd> teori &nbsp;·&nbsp;
+            <kbd>Q</kbd> tjek dig selv &nbsp;·&nbsp;
+            <kbd>R</kbd> start fanen forfra &nbsp;·&nbsp;
+            <kbd>H</kbd> denne hjælp &nbsp;·&nbsp;
+            <kbd>Esc</kbd> luk
+        </p>
+
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="hjaelp-luk" type="button" style="justify-content:center;">Luk og kom i gang</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../kemichael/kemichael.js"></script>
+<script src="js/valg.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/opgave.js"></script>
+<script src="js/sim_oploes.js"></script>
+<script src="js/sim_maetning.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/quiz.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
