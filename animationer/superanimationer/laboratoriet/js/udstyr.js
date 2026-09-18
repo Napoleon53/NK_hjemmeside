@@ -23,12 +23,22 @@
                          papir      toerrer pytter op
                          fast       kan ikke tages op (staar fast paa bordet)
      indre             indersiden som polygon i spritets koordinater
-     mlPrAreal         areal i tegneenheder pr. mL
-     maks              rumfang i mL, foer det loeber over
+     mlPrAreal         areal i tegneenheder pr. mL. UDLEDES af indersiden og
+                       maks, saa vaesken staar praecis til kanten, naar
+                       beholderen er fuld. Skrives kun i typen for vinduer.
+     maks              rumfang i mL, foer det loeber over. For aabent
+                       glasudstyr er det rumfanget af den tegnede form
+                       (se _geometri.html); for vinduer et rigtigt tal.
+     vindue            indersiden er kun et kig ind i beholderen, ikke hele
+                       dens rum (flasker og pulverglas med etiket). Saa
+                       udledes rumfanget ikke af tegningen.
+     rund              false for det, der ikke er et omdrejningslegeme
+                       (vejebaaden). Saa maales det ikke.
      tud               hvor vaesken forlader beholderen, naar den haelder,
                        og hvor meget den haelder (radianer)
      haeldMl           hvor meget en haeldning giver (0 = alt)
-     vejlaengde        lysvej i forhold til et reagensglas (til farven)
+     vejlaengde        lysvej i forhold til et reagensglas (til farven).
+                       UDLEDES af indersidens bredde og LYSVEJ_DAEMPNING
      etiket            feltet til etiketten paa flasker og pulverglas
      pulverfelt        feltet, hvor pulveret ligger i et pulverglas
      omrids            sti i spritets koordinater til et moerkt omrids,
@@ -53,8 +63,8 @@
         return pts(l);
     }());
 
-    var BAEGER100_INDRE = pts([[6, 6], [66, 6], [66, 100], [62, 104], [10, 104], [6, 100]]);
-    var BAEGER250_INDRE = pts([[8, 8], [104, 8], [104, 121], [99, 126], [13, 126], [8, 121]]);
+    var BAEGER_LILLE_INDRE = pts([[6, 6], [66, 6], [66, 100], [62, 104], [10, 104], [6, 100]]);
+    var BAEGER_STOR_INDRE = pts([[8, 8], [104, 8], [104, 121], [99, 126], [13, 126], [8, 121]]);
     var KOLBE_INDRE = pts([[37.8, 4], [37.8, 41.6], [8.3, 113.3], [8.6, 119.5], [14.1, 123.5], [81.9, 123.5], [87.4, 119.5], [87.7, 113.3], [58.2, 41.6], [58.2, 4]]);
     var MAALEGLAS_INDRE = pts([[8, 12], [36, 12], [36, 208], [33, 212], [11, 212], [8, 208]]);
     var FLASKE_INDRE = pts([[5, 34], [37, 34], [37, 92], [32, 97], [10, 97], [5, 92]]);
@@ -65,7 +75,7 @@
             sprite: "reagensglas", fil: "reagensglas.svg", b: 30, h: 160,
             anker: { x: 15, y: 2 },
             kan: { holder: true, haelder: true },
-            indre: GLAS_INDRE, mlPrAreal: 146, maks: 17, haeldMl: 0,
+            indre: GLAS_INDRE, maks: 30, haeldMl: 0,
             tud: { x: 4, y: 3, v: -2.0 },
             vejlaengde: 1, titel: "reagensglasset",
             omrids: function (ctx) {
@@ -75,11 +85,11 @@
                 ctx.lineTo(27, 3);
             }
         },
-        baeger100: {
-            sprite: "baeger100", fil: "baegerglas_100.svg", b: 72, h: 110,
+        baegerLille: {
+            sprite: "baegerLille", fil: "baegerglas_100.svg", b: 72, h: 110,
             anker: { x: 36, y: 4 },
             kan: { holder: true, haelder: true },
-            indre: BAEGER100_INDRE, mlPrAreal: 54, maks: 100, haeldMl: 20,
+            indre: BAEGER_LILLE_INDRE, maks: 250, haeldMl: 20,
             tud: { x: 1, y: 3.5, v: -1.15 },
             vejlaengde: 2, titel: "bægerglasset", valgtMaerke: { x: 60, y: -8 },
             omrids: function (ctx) {
@@ -91,13 +101,35 @@
                 ctx.lineTo(69, 4);
             }
         },
-        baeger250: {
-            sprite: "baeger250", fil: "baegerglas.svg", b: 112, h: 132,
+        baegerStor: {
+            sprite: "baegerStor", fil: "baegerglas.svg", b: 112, h: 132,
             anker: { x: 56, y: 6 },
             kan: { holder: true, haelder: true },
-            indre: BAEGER250_INDRE, mlPrAreal: 43, maks: 250, haeldMl: 25,
+            indre: BAEGER_STOR_INDRE, maks: 600, haeldMl: 25,
             tud: { x: 3, y: 6, v: -1.1 },
             vejlaengde: 3, titel: "det store bægerglas", valgtMaerke: { x: 96, y: -8 },
+            omrids: function (ctx) {
+                ctx.moveTo(4, 6);
+                ctx.lineTo(4, 122);
+                ctx.quadraticCurveTo(4, 130, 12, 130);
+                ctx.lineTo(100, 130);
+                ctx.quadraticCurveTo(108, 130, 108, 122);
+                ctx.lineTo(108, 6);
+            }
+        },
+        /* Et bad: et stort baegerglas, der staar fast, og som man saetter
+           reagensglas ned i. Glasset i badet tager badets temperatur.
+           Uden mere: det er bare et baegerglas med vand, saa et bad paa en
+           varmeplade bliver et rigtigt vandbad, naar pladen taendes. Med
+           holdT i opstillingen holdes badet paa en fast temperatur (is,
+           der fyldes efter, eller en termostat). */
+        bad: {
+            sprite: "baegerStor", fil: "baegerglas.svg", b: 112, h: 132,
+            anker: { x: 56, y: 6 },
+            kan: { holder: true, haelder: false, bad: true, fast: true },
+            indre: BAEGER_STOR_INDRE, maks: 600, haeldMl: 0,
+            vejlaengde: 3, titel: "badet", valgtMaerke: { x: 96, y: -8 },
+            plade: { x0: 14, x1: 98, y: 20 },
             omrids: function (ctx) {
                 ctx.moveTo(4, 6);
                 ctx.lineTo(4, 122);
@@ -111,7 +143,7 @@
             sprite: "kolbe", fil: "kolbe.svg", b: 96, h: 128,
             anker: { x: 48, y: 2.5 },
             kan: { holder: true, haelder: true },
-            indre: KOLBE_INDRE, mlPrAreal: NK.polyAreal(KOLBE_INDRE) / 270, maks: 250, haeldMl: 25,
+            indre: KOLBE_INDRE, maks: 200, haeldMl: 25,
             tud: { x: 40, y: 3, v: -1.95 },
             vejlaengde: 3, titel: "kolben",
             omrids: function (ctx) {
@@ -129,7 +161,7 @@
             sprite: "maaleglas", fil: "maaleglas.svg", b: 44, h: 220,
             anker: { x: 22, y: 4 },
             kan: { holder: true, haelder: true },
-            indre: MAALEGLAS_INDRE, mlPrAreal: NK.polyAreal(MAALEGLAS_INDRE) / 100, maks: 100, haeldMl: 10,
+            indre: MAALEGLAS_INDRE, maks: 100, haeldMl: 10,
             tud: { x: 4, y: 5, v: -1.3 },
             vejlaengde: 1.4, titel: "måleglasset",
             omrids: function (ctx) {
@@ -145,6 +177,7 @@
             sprite: "flaske", fil: "flaske.svg", b: 42, h: 100,
             anker: { x: 21, y: 3 },
             kan: { holder: true, haelder: true, flaske: true },
+            vindue: true,
             indre: FLASKE_INDRE, mlPrAreal: NK.polyAreal(FLASKE_INDRE) / 250, maks: 250, haeldMl: 10,
             tud: { x: 15, y: 3, v: -1.9 },
             vejlaengde: 1.5, titel: "flasken",
@@ -154,6 +187,7 @@
             sprite: "draabeflaske", fil: "draabeflaske.svg", b: 46, h: 110,
             anker: { x: 23, y: 0 },
             kan: { holder: true, drypper: true, flaske: true },
+            vindue: true,
             indre: pts([[6, 44], [40, 44], [40, 104], [36, 108], [10, 108], [6, 104]]), mlPrAreal: 30, maks: 60, haeldMl: 0,
             tud: { x: 23, y: 0, v: 0 },
             vejlaengde: 1, titel: "dråbeflasken",
@@ -163,6 +197,7 @@
             sprite: "sproejteflaske", fil: "sproejteflaske.svg", b: 46, h: 120,
             anker: { x: 44, y: 9 },
             kan: { holder: true, sproejter: true },
+            vindue: true,
             indre: pts([[4, 30], [42, 30], [42, 116], [38, 119], [8, 119], [4, 116]]), mlPrAreal: 6, maks: 500, haeldMl: 10,
             tud: { x: 44, y: 9, v: 0.55 },
             vejlaengde: 1, titel: "sprøjteflasken", skjulIndhold: true
@@ -171,6 +206,7 @@
             sprite: "pulverglas", fil: "pulverglas.svg", b: 38, h: 52,
             anker: { x: 19, y: 4 },
             kan: { holder: true, pulver: true },
+            vindue: true,
             indre: PULVER_INDRE, mlPrAreal: 20, maks: 30, haeldMl: 0,
             vejlaengde: 1, titel: "pulverglasset",
             etiket: { x: 5, y: 17.5, b: 28, h: 10.5 }, pulverfelt: { x0: 4, x1: 34, y: 49, top: 31 }, skjulIndhold: true
@@ -238,6 +274,8 @@
             sprite: "vejebaad", fil: "vejebaad.svg", b: 64, h: 14,
             anker: { x: 32, y: 2 },
             kan: { holder: true, haelder: true },
+            /* Vejebaaden er en rektangulaer skaal, ikke et omdrejningslegeme */
+            rund: false,
             indre: pts([[4, 3], [60, 3], [58, 12], [6, 12]]), mlPrAreal: 100, maks: 4, haeldMl: 0,
             tud: { x: 4, y: 3, v: -1.4 },
             vejlaengde: 0.3, titel: "vejebåden", masse: 1.5
@@ -273,7 +311,7 @@
     };
 
     /* Glassets egen masse i gram, til vaegten */
-    var MASSE = { reagensglas: 15, baeger100: 50, baeger250: 100, kolbe: 120, maaleglas: 80, flaske: 150, draabeflaske: 20, sproejteflaske: 30, pulverglas: 40, vejebaad: 1.5 };
+    var MASSE = { reagensglas: 15, baegerLille: 50, baegerStor: 100, bad: 100, kolbe: 120, maaleglas: 80, flaske: 150, draabeflaske: 20, sproejteflaske: 30, pulverglas: 40, vejebaad: 1.5 };
     Object.keys(MASSE).forEach(function (n) { TYPER[n].masse = MASSE[n]; });
 
     /* Sprites registreres, saa NK.Sprites.start() henter dem */
@@ -292,7 +330,7 @@
 
     /* Det, der er af glas, knuses, hvis det tabes paa gulvet eller
        rystes ekstremt voldsomt */
-    ["reagensglas", "baeger100", "baeger250", "kolbe", "maaleglas", "flaske", "glasstav", "termometer", "phmeter"].forEach(function (n) { TYPER[n].glas = true; });
+    ["reagensglas", "baegerLille", "baegerStor", "kolbe", "maaleglas", "flaske", "glasstav", "termometer", "phmeter"].forEach(function (n) { TYPER[n].glas = true; });
 
     /* ----- Udstyr i mindre maalestok ---------------------------------------
        En genstand i opstillingen kan faa en skala, og saa bruger den en
@@ -326,9 +364,113 @@
         return ud;
     }
 
+    /* ----- Glassets geometri ------------------------------------------------
+       Alt glasudstyr er omdrejningslegemer: en silhuet, drejet om sin egen
+       lodrette akse. Derfor er baade rumfanget og lysvejen givet af den
+       tegnede inderside og ét tal - hvor mange tegneenheder der gaar paa en
+       centimeter. De behoever ikke staa som frie tal, der kan komme til at
+       modsige hinanden og tegningen.
+
+         rumfang   V = integral pi (w/2)^2 dy / SKALA^3
+         lysvej    w / SKALA, altsaa indersidens bredde i cm
+
+       SKALA er sat, saa reagensglassets inderside bliver 1,6 cm bred, som
+       et rigtigt 16 mm reagensglas. Det er det udstyr, der er tegnet mest
+       trofast, og alt andet maales mod det.
+
+       Et udstyr, der ikke er et omdrejningslegeme (vejebaaden er en
+       rektangulaer skaal), saettes med rund: false og maales ikke. */
+    var SKALA = 10.7;
+
+    /* Indersidens bredde ved hoejden y */
+    function bredde(poly, y) {
+        var xs = [], i, a, b;
+        for (i = 0; i < poly.length; i++) {
+            a = poly[i];
+            b = poly[(i + 1) % poly.length];
+            if ((a.y <= y && b.y > y) || (b.y <= y && a.y > y)) {
+                xs.push(a.x + (y - a.y) / (b.y - a.y) * (b.x - a.x));
+            }
+        }
+        if (xs.length < 2) return 0;
+        return Math.max.apply(null, xs) - Math.min.apply(null, xs);
+    }
+
+    var husketMaal = {};
+
+    /* { V, A, wMid, wMax, h } i tegneenheder, plus V_mL og vejlaengde_cm */
+    function maal(t) {
+        if (!t.indre) return null;
+        if (husketMaal[t.navn]) return husketMaal[t.navn];
+        var ys = t.indre.map(function (p) { return p.y; });
+        var y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+        var n = 400, dy = (y1 - y0) / n, V = 0, A = 0, wSum = 0, wN = 0, wMax = 0, i, y, w;
+        for (i = 0; i < n; i++) {
+            y = y0 + dy * (i + 0.5);
+            w = bredde(t.indre, y);
+            V += Math.PI * w * w / 4 * dy;
+            A += w * dy;
+            if (w > 0.5) { wSum += w; wN++; if (w > wMax) wMax = w; }
+        }
+        var m = {
+            V: V, A: A, h: y1 - y0,
+            wMid: wN ? wSum / wN : 0, wMax: wMax,
+            V_mL: V / (SKALA * SKALA * SKALA),
+            vej_cm: (wN ? wSum / wN : 0) / SKALA
+        };
+        husketMaal[t.navn] = m;
+        return m;
+    }
+
+    /* Lysvejen, som geometrien giver den, i reagensglas-enheder.
+       Bruges ikke af tegningen endnu: den staar som tal i typerne, saa en
+       aendring af farvedybden er en beslutning og ikke en bivirkning. */
+    /* Dæmpningen af lysvejen. Den rene geometri giver et 600 mL bægerglas
+       en vej paa 5,6 reagensglas, og saa staar en almindelig skoleopløsning
+       naesten sort i det. Det er fysisk rigtigt - saadan ser den ogsaa ud i
+       virkeligheden - men en animation skal kunne aflaeses. Vejen trykkes
+       derfor sammen mod reagensglassets:
+
+           vej = 1 + (geometri - 1) * DAEMPNING
+
+       0,45 er valgt, fordi den rammer de haandsatte tal, bordene blev
+       bygget med (baegerglas 2,0 og 3,0), naesten praecist. Det er den
+       eneste knap paa farvedybden: skru paa den ene og faa hele
+       laboratoriet med, i stedet for syv frie tal, der kan komme til at
+       modsige hinanden. */
+    var LYSVEJ_DAEMPNING = 0.45;
+
+    function lysvej(t) {
+        var m = maal(t);
+        if (!m || t.rund === false) return t.vejlaengde || 1;
+        return 1 + (m.vej_cm / 1.6 - 1) * LYSVEJ_DAEMPNING;
+    }
+
+    /* ----- Maalene udledes af tegningen -------------------------------------
+       mlPrAreal og vejlaengde stod foer som frie tal i hver type. De
+       beskriver begge den samme tegnede form, saa de kan udledes af den, og
+       saa kan de ikke komme til at modsige hverken tegningen eller
+       hinanden. mlPrAreal saettes, saa vaesken staar praecis til kanten ved
+       maks, og vejlaengden af indersidens bredde.
+
+       En beholder med vindue: true er undtaget for rumfangets vedkommende:
+       flasker og pulverglas har en etiket over det meste af sig, saa den
+       tegnede inderside er et kig ind i beholderen og ikke hele dens rum.
+       Deres maks staar derfor stadig som et tal. */
+    Object.keys(TYPER).forEach(function (navn) {
+        var t = TYPER[navn];
+        if (!t.indre || !t.maks) return;
+        var m = maal(t);
+        if (!t.vindue && t.rund !== false) t.mlPrAreal = m.A / t.maks;
+        if (t.rund !== false) t.vejlaengde = lysvej(t);
+    });
+
     NK.Udstyr = {
         TYPER: TYPER,
         HAAND_ANKER: { x: 40, y: 46 },
+        SKALA: SKALA,
+        maal: maal,
+        lysvej: lysvej,
         skaleret: skaleret,
 
         type: function (navn) {

@@ -153,6 +153,30 @@
     /* Jern(III) og carbonat: hydroxid faelder, og carbonatet bliver til CO2 */
     St.reaktion({ id: "fe_co3", venstre: [[2, "Fe3+"], [3, "CO32-"], [3, "H2O"]], hoejre: [[2, "Fe(OH)3(s)"], [3, "CO2(g)"]], slags: "fuld", fart: 2, dH: -10 });
 
+    /* ----- Ascorbinsyre og de faste salte til ligevaegtsforsoeget ------------
+       Indgrebene i Fe3+ + SCN- = FeSCN2+ er: mere Fe3+ (fast Fe(NO3)3), mere
+       SCN- (fast KSCN), faerre Fe3+ (ascorbinsyre reducerer til Fe2+) og
+       faerre SCN- (AgNO3 faelder AgSCN, som allerede staar ovenfor).
+
+       Ascorbinsyre er i virkeligheden ogsaa en svag syre (pKa1 = 4,1). Den
+       ligevaegt er ikke med her, fordi forsoeget handler om jernthiocyanatet,
+       og en syre-base-ligevaegt oveni ville flytte pH uden at laere noget
+       bort. Skal den med senere, er det én linje som "hac" ovenfor. */
+    St.def("Asc",    { M: 176.1, formel: "C₆H₈O₆", kort: "Asc", q: 0, navn: "ascorbinsyre", atomer: { C: 6, H: 8, O: 6 } });
+    St.def("DHA",    { M: 174.1, formel: "C₆H₆O₆", kort: "DHA", q: 0, navn: "dehydroascorbinsyre", atomer: { C: 6, H: 6, O: 6 } });
+    St.def("Asc(s)", { M: 176.1, formel: "C₆H₈O₆", kort: "Asc", fase: "s", korn: true, farve: { r: 245, g: 245, b: 240 }, navn: "ascorbinsyre", atomer: { C: 6, H: 8, O: 6 } });
+    St.def("Fe(NO3)3(s)", { M: 241.9, formel: "Fe(NO₃)₃", fase: "s", korn: true, farve: { r: 210, g: 180, b: 130 }, navn: "jern(III)nitrat", atomer: { Fe: 1, N: 3, O: 9 } });
+    St.def("KSCN(s)",     { M: 97.2, formel: "KSCN", fase: "s", korn: true, farve: { r: 245, g: 245, b: 240 }, navn: "kaliumthiocyanat", atomer: { K: 1, S: 1, C: 1, N: 1 } });
+
+    St.reaktion({ id: "asc_s",  venstre: [[1, "Asc(s)"]],        hoejre: [[1, "Asc"]],                    slags: "oploes", fart: 0.3, dH: 10 });
+    St.reaktion({ id: "feno33", venstre: [[1, "Fe(NO3)3(s)"]],   hoejre: [[1, "Fe3+"], [3, "NO3-"]],      slags: "oploes", fart: 0.3, dH: -40 });
+    St.reaktion({ id: "kscn_s", venstre: [[1, "KSCN(s)"]],       hoejre: [[1, "K+"], [1, "SCN-"]],        slags: "oploes", fart: 0.4, dH: 24 });
+
+    /* Ascorbinsyre reducerer jern(III) til jern(II), saa komplekset falder fra
+       hinanden og farven bliver lysere. E0(DHA/Asc) = 0,06 V mod 0,77 V for
+       Fe3+/Fe2+, saa den gaar til hoejre. */
+    St.reaktion({ id: "asc_fe", venstre: [[2, "Fe3+"], [1, "Asc"]], hoejre: [[2, "Fe2+"], [1, "DHA"], [2, "H+"]], slags: "fuld", fart: 1.2, dH: -25 });
+
     /* ----- Faremaerkning (GHS, nogenlunde) og Kemichaels advarsel -----------
        over: koncentrationen i mM, hvor trinnet gaelder (0 for faste stoffer).
        sig: det, Kemichael siger, foerste gang flasken tages. */
@@ -177,6 +201,9 @@
     fare("Mg(s)", [{ over: 0, maerker: ["brandfarlig"], sig: ["Magnesium brænder med et lys, man ikke kigger på.", "Og det slukkes ikke med vand."] }]);
     fare("Zn(s)", [{ over: 0, maerker: ["brandfarlig", "miljoe"] }]);
     fare("Fe(s)", [{ over: 0, maerker: ["brandfarlig"] }]);
+    fare("Fe(NO3)3(s)", [{ over: 0, maerker: ["oxiderende", "sundhedsfare"], sig: ["Jern(III)nitrat. Nitrat er oxiderende.", "Ikke sammen med noget, der kan braende."] }]);
+    fare("KSCN(s)", [{ over: 0, maerker: ["sundhedsfare", "miljoe"], sig: ["Thiocyanat. Ikke sammen med syre.", "Så udvikler det blåsyre, og det er ikke en øvelse."] }]);
+    /* Ascorbinsyre er C-vitamin og faar ikke maerke */
 
     /* ----- Redoxpar (standardpotentialer i V) --------------------------------- */
     St.par({ ox: "Mg2+", red: "Mg(s)", e: 2, E0: -2.37 });
@@ -187,4 +214,9 @@
     St.par({ ox: "Cu2+", red: "Cu(s)", e: 2, E0: 0.34 });
     St.par({ ox: "Fe3+", red: "Fe2+",  e: 1, E0: 0.77 });
     St.par({ ox: "Ag+",  red: "Ag(s)", e: 1, E0: 0.80 });
+    /* DHA/Asc er ikke et redoxpar her. Halvreaktionen DHA + 2e⁻ + 2H⁺ -> Asc
+       kraever hydroner for at stemme i ladning, og de udledte reaktioner
+       mellem par regner ikke med H⁺. Ascorbinsyrens reduktion af jern(III)
+       staar derfor som den navngivne reaktion "asc_fe" ovenfor, ligesom de
+       oevrige redoxreaktioner mellem ioner. */
 }());

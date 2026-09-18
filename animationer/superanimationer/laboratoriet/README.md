@@ -53,9 +53,22 @@ js/bord.js           bordet: genstande, greb og slip, møder afgjort af
                      egenskaber, stativ og varmeplade, uheld, tidens gang, tegning
 js/rum.js            rummene: flere borde på ét lærred, pile og piletaster,
                      glidning, det man bærer kommer med, lugen, stinkskabet
+js/side.js           den fælles skal om en side: tegneløkken, aflæsningen af
+                     det valgte glas, zoomboblen, beskeden, lyd, intro,
+                     rundvisning, tastatur, logbog, forløbskortet og Start forfra
+js/vilkaar.js        en betingelse over bordets tilstand som data: stof,
+                     rumfang, temperatur, pH, hvor glasset står, og hvor lyst
+                     det er i forhold til et andet glas
+js/forloeb.js        trin, udløsere og flag: betingelse → konsekvens, fyrer
+                     én gang. Samme lag bærer en øvelses trin og en låst dør
+js/journal.js        elevens egne iagttagelser og målinger: posterne, svarene,
+                     øjebliksbilledet og bedømmelsen mod sandheden
 css/grund.css        farver, toplinje, scene og panel, kort, forløb, quiz,
                      knapper, overlays, tegneserie og rundvisning
 sprites/             generisk glasudstyr uden etiketter (etiketten tegnes i koden)
+_geometri.html       udviklerværktøj: alt glasudstyr læst som omdrejnings-
+                     legemer, så rumfang, lysvej og væskehøjde holdes op
+                     mod hinanden og mod tegningen
 proevebord/          det frie bord: index.html, css/stil.css, js/stoffer.js
                      (stoffer, reaktioner, opstilling), js/laerer.js, js/tur.js,
                      js/app.js, _selvtest.html
@@ -73,6 +86,15 @@ Kemien ligger i lag, så et nyt stof koster én linje data, ikke nye regler:
 | 1 egenskaber | `stof.js` + `stoftabel.js` | bundfald (opløselighedsprodukt), syre-base (Ka, autoprotolyse, pH, indikatorer), redox (standardpotentialer, reaktioner mellem par afledes), kompleksdannelse (K), reaktionsvarme ΔH, fortyndingsvarme |
 | 2 navngivne reaktioner | `stoftabel.js` | reaktioner med betingelser, fx kobber i koncentreret salpetersyre |
 | 3 hændelser | `bord.js` | bobler, farvede dampe, damp, "voldsom" (kogende sprøjt), som Kemichael reagerer på |
+
+Ligevægtskonstanterne følger temperaturen efter van 't Hoff:
+K(T) = K(20 °C)·exp(−ΔH/R·(1/T − 1/293,15)). En reaktion, der allerede har
+et ΔH i stoftabellen, får det gratis, så Le Châteliers princip er fysik i
+stedet for en regel pr. reaktion: en exoterm ligevægt flytter sig mod
+venstre, når det bliver varmere. Det gælder også opløselighedsprodukter og
+vandets autoprotolyse. Ved 20 °C er faktoren præcis 1, så intet ændrer sig
+i et forsøg ved stuetemperatur; eksponenten begrænses til ±6.
+`NK.Stof.vantHoff = false` slår det fra.
 
 Alle stoffer og reaktioner står i `js/stoftabel.js`, som alle forsøg deler.
 Et forsøg vælger kun, hvad der står på bordet (`NK.OPSTILLING`). Motoren
@@ -100,6 +122,48 @@ sort, og blåt plus gult bliver grønt i stedet for gråt.
 `k` er absorbansen ved spektrets top pr. mM pr. vejlængde. Et stof, der
 ser for blegt eller for mørkt ud, rettes med `k`; en forkert kulør rettes
 med `farve`. Begge dele er data i `stoftabel.js`, ikke kode.
+
+## Glassenes geometri
+
+Alt glasudstyr er et omdrejningslegeme: en silhuet drejet om sin egen
+lodrette akse. Derfor er både rumfanget og lysvejen givet af den tegnede
+inderside og ét tal — `NK.Udstyr.SKALA`, tegneenheder pr. cm. De står ikke
+længere som frie tal, der kan komme til at modsige hinanden og tegningen:
+
+```
+rumfang   V = ∫ π(w/2)² dy / SKALA³
+lysvej    w / SKALA, altså indersidens bredde i cm
+```
+
+`SKALA` er 10,7 og sat, så reagensglassets inderside bliver 1,6 cm bred som
+et rigtigt 16 mm glas. Det er det udstyr, der er tegnet mest trofast, og alt
+andet måles mod det. `mlPrAreal` udledes af indersiden og `maks`, så væsken
+står præcis til kanten, når beholderen er fuld, og `vejlaengde` udledes af
+bredden.
+
+**Lysvejen dæmpes.** Den rene geometri giver et 600 mL bægerglas en vej på
+5,6 reagensglas, og så står en almindelig skoleopløsning næsten sort i det.
+Det er fysisk rigtigt — sådan ser den også ud i virkeligheden — men en
+animation skal kunne aflæses. Vejen trykkes derfor sammen mod
+reagensglassets med `LYSVEJ_DAEMPNING = 0,45`, valgt fordi den rammer de
+håndsatte tal, bordene blev bygget med (bægerglas 2,0 og 3,0), næsten
+præcist. Det er den eneste knap på farvedybden: skru på den ene og få hele
+laboratoriet med.
+
+**To undtagelser.** `vindue: true` betyder, at den tegnede inderside kun er
+et kig ind i beholderen og ikke hele dens rum: flasker, dråbeflasker,
+sprøjteflasken og pulverglas har en etiket over det meste af sig, så deres
+`maks` står stadig som et rigtigt tal. `rund: false` er det, der ikke er et
+omdrejningslegeme (vejebåden er en rektangulær skål).
+
+`_geometri.html` regner det hele ud og holder det op mod typerne. Læs den
+igennem, hver gang en sprite eller et mål ændres.
+
+**Bægerglassene hedder nu `baegerLille` og `baegerStor`.** De hed
+`baeger100` og `baeger250`, men de var tegnet som 225 og 694 mL. Da
+tegningerne er gode, fulgte tallene i stedet: de er nu 250 og 600 mL, og
+navnene siger ikke længere et rumfang, der kan blive forkert igen. Af samme
+grund rummer reagensglasset 30 mL og kolben 200 mL.
 
 ## Faremærkning og Kemichaels advarsler
 
@@ -288,10 +352,139 @@ spil.
 * sc1.3 og sc2.5 er ældre og har et andet sidelayout. De bruger `kerne.js` og
   `rundvisning.js`, men har stadig hele deres eget stilark.
 
+## Den fælles skal
+
+Hvert forsøg havde før sin egen `app.js`, og to af dem var 92 % ens.
+`js/side.js` er den ramme, de var ens om. Et forsøg starter sin side med
+
+```js
+NK.Side.start({
+    navn: "sb24",                  /* nøgle til localStorage */
+    opstilling: NK.OPSTILLING,
+    valg: NK.BORD_VALG,
+    tekster: NK.TEKST
+});
+```
+
+eller, med flere rum, `NK.Side.start({ navn: "spillet", plan: NK.RUM_PLAN })`.
+Panelet bygges af HTML, og `side.js` binder kun det, der faktisk findes på
+siden, så et forsøg tager de kort med, det vil have (`#glas-kort`,
+`#logbog-kort`, `#uheld-kort`, `#rumknapper`, `#intro`, `#forfraknap`,
+`#lydknap`, `#hjaelpknap`). Krogene `vedAendring`, `vedBesked`,
+`vedHaendelse`, `vedSkift`, `tast`, `panel` og `efterStart` er til det,
+forsøget selv vil lave. `NK.Side.nu` er siden, så selvtesten kan pille ved
+den.
+
+Al prosa i et forsøg ligger i dets `js/tekst.js` som `{ id: tekst }`, og
+`side.js` skriver den ind i elementerne ved start: en streng bliver til
+indholdet, en liste til punkter. Det går to veje: en øvelsesvejledning kan
+oversættes til den ene fil, og hele forsøgets sprog kan læses igennem ét
+sted uden at åbne kode. Mønster: `../sb2.4_ligevaegt/`.
+
+Prøvebordet og prøverummet har endnu deres egne `app.js`; de flyttes over
+på `side.js`, når der ikke er andet i gang.
+
+## Forløbet som data
+
+Et trin er ikke en plads i en rækkefølge, men en betingelse over bordets
+tilstand. `js/vilkaar.js` er sproget, betingelsen skrives i, og
+`js/forloeb.js` er motoren, der prøver trinnene og udløserne, hver gang
+noget ændrer sig — og fire gange i sekundet af sig selv, så et glas, der
+står og bliver varmt i et bad, også tæller.
+
+```js
+{ id: "glas4", tekst: "Dryp AgNO₃ i glas 4.", hint: "...", peg: "ag",
+  naar: { alle: [ { beholder: "glas7", V: { over: 2.5 } },
+                  { beholder: "glas4", lysere: "glas7", mindst: 0.03 } ] } }
+```
+
+Tre regler bærer det. Et trin afgøres af, hvad der står på bordet, aldrig
+af hvilken vej eleven kom — derfor tæller et trin længere fremme også, hvis
+det bliver opfyldt først. Et trin, der én gang er gjort, bliver ved med at
+være gjort, så forløbet aldrig springer tilbage. Og en udløser fyrer én
+gang, husket på sit id.
+
+Et trins `peg` siger, hvad hintet skal pege på. Det kan være en genstand på
+bordet, som så markeres på scenen, eller et element i panelet, som blinker
+kort. Et trin behøver ikke pege på noget.
+
+Flagene er verdenstilstanden. De er med vilje det eneste, der gemmes:
+`F.tilstand()` giver trin, udløsere og flag, og `F.saetTilstand()` spiller
+dem tilbage. Bordene bygges op fra deres opstilling. Det er den beslutning,
+der holder gemningen lille nok til at virke, når der bliver mange rum.
+
+Det er det samme lag, spillet skal bruge. Et trin i en øvelse og en låst dør
+i et escaperoom er den samme sætning — betingelse, konsekvens, fyrer én
+gang — og kun konsekvensen er forskellig. Mønster: `../sb2.4_ligevaegt/js/forloeb.js`.
+
+## Journalen
+
+Et forsøg er ikke færdigt, fordi motoren ved, hvad der skete. Det er
+færdigt, når eleven har set det og skrevet det ned. `js/journal.js` er det
+sted, det skrives ned, og den er adskilt fra, hvordan der spørges: posterne,
+svarene og bedømmelsen ligger her, mens forsøget selv bestemmer, om det
+spørges med knapper under et billede, med et felt til et tal eller noget
+tredje.
+
+En post kan være et valg (»mørkere«, »ens«, »lysere«) eller et tal (en
+temperatur, en aflæsning fra en burette, med `tolerance`). Begge dele
+bedømmes mod sandheden, som **regnes ud af verden i det øjeblik, eleven
+svarer** — ikke af en facitliste skrevet i forvejen. Det er den samme regel
+som for trinnene: spørg bordet, ikke opskriften. Et forsøg uden `facit` er en
+ren notesbog, og det er også i orden.
+
+`billede(id, bord)` gemmes sammen med svaret. Eleven noterede glasset, som
+det så ud dengang, og det er det, resultatskemaet og tegneserien skal vise
+bagefter — ikke hvordan glasset ser ud nu, efter at det er hældt ud. Svaret
+og det, der blev svaret på, hører sammen.
+
+Journalerne gemmes med forløbet, fordi de er en del af historien og ikke af
+bordene. Et trin kan læse dem i samme sprog som alt andet:
+
+```js
+{ journal: "billede", faerdig: true }
+{ journal: "billede", rigtige: { over: 4 } }
+{ journal: "billede", post: "glas1", rigtig: true }
+```
+
+Mønster: `../sb2.4_ligevaegt/js/billede.js` og dets trin `billede`.
+
+## Bade
+
+Udstyret `bad` er et stort bægerglas, der står fast, og som man sætter
+reagensglas ned i. Glasset i badet tager badets temperatur med en kort tau,
+fordi vand mod glas leder meget bedre end luft. Pladsen afgøres af
+geometrien (`badPladser`), ikke af en liste over, hvad der må stå i hvad, så
+et forsøg kan stille et bad op uden ny kode.
+
+Uden mere er et bad bare et bægerglas med vand, så et bad på en tændt
+varmeplade bliver et vandbad af sig selv. Med `holdT` i opstillingen er
+badet termostateret: `{ navn: "isbad", type: "bad", holdT: 2 }` holder 2 °C,
+og et bad med `holdT` oven på en varmeplade følger termostaten, mens pladen
+er tændt, og køler til stuetemperatur, når den slukkes. Det er derfor et
+vandbad giver 80 °C i stedet for pladens 250.
+
 ## Næste skridt
 
-* sb2.4 lægges over på genstandsmodellen som første rigtige forsøg; derefter
-  sc6.8 og sc8.6.
-* Rammen for `quiz.js`, `tegneserie.js` og `app.js` samles.
+* sb2.4 er lagt over på genstandsmodellen i `../sb2.4_ligevaegt/`. Bordet
+  står, kemien er prøvet igennem, badene virker, og forløbets otte trin
+  kører. Billedet af de syv glas, del 2 om fortynding, Kemichaels egne
+  scener, quizzen og tegneserien mangler. Derefter sc6.8 og sc8.6.
+* **Grafen.** Journalen kan notere en måling; den kan endnu ikke tegne den
+  op. Titrerings- og kalibreringskurver dukker op i næsten enhver øvelse, så
+  det er en fælles komponent, ikke noget hvert forsøg skal opfinde.
+* **Lysvejen ovenfra.** Ses der ned i et glas, er vejen væskens dybde og
+  ikke glassets bredde. Det er hele pointen i sb2.4's del 2 om fortynding:
+  frugtfarven ser ens ud, fordi vejen ovenfra bliver længere i samme takt,
+  som koncentrationen falder. Dybden er der allerede som `niveau`, og
+  geometrien i `udstyr.js` giver resten.
+* **Øvelsestjekket:** en generisk validering, ethvert nyt forsøg køres
+  igennem. Kimen står i `../sb2.4_ligevaegt/_selvtest.html` afsnit 10, som
+  bruger `NK.Vilkaar.naevnte` til at opdage et trin, der peger på et glas
+  eller et stof, der ikke findes.
+* Rammen for `quiz.js` og `tegneserie.js` samles, når to forsøg på
+  genstandsmodellen har vist, hvad de er fælles om.
+* **Til spillet:** låste passager i `rum.js`, som spørger forløbets flag,
+  om man må gå videre. Vilkårs- og forløbslaget er der allerede.
 * Et rum, hvor forsøgene er stationer, man kan gå imellem. Prøverummet er
   motoren; prøvebordet er den første station.

@@ -390,7 +390,7 @@
        ved siden af glasset haeldes der paa bordet. Draabeflasken drypper og
        sproejteflasken sproejter paa samme maade. Et hurtigt slip giver
        stadig én standardportion (moede). */
-    var HAELD = { dvael: 0.3, vipTid: 0.5, fart: { reagensglas: 12, baeger100: 25, baeger250: 35, kolbe: 30, maaleglas: 15, flaske: 15, vejebaad: 900, sproejteflaske: 8 }, dryp: 0.45 };
+    var HAELD = { dvael: 0.3, vipTid: 0.5, fart: { reagensglas: 12, baegerLille: 25, baegerStor: 35, kolbe: 30, maaleglas: 15, flaske: 15, vejebaad: 900, sproejteflaske: 8 }, dryp: 0.45 };
 
     P.kanHaelde = function (gg) {
         var k = gg.kan;
@@ -731,6 +731,7 @@
         if (m.pulver && k.spatel && !gg.last) return true;
         if ((m.affald || m.vask) && k.holder && !B.tom(gg)) return true;
         if (m.stoette && gg.type.navn === "reagensglas") return this.ledigtHul(maal) >= 0;
+        if (m.bad && gg.type.navn === "reagensglas") return this.ledigPlads(maal) !== null;
         if (m.varmer && k.holder && !k.flaske && !k.drypper && !k.sproejter && !k.pulver && gg.type.navn !== "reagensglas") return true;
         if (m.vaegt && k.holder && gg.type.navn !== "reagensglas") return true;
         if (m.luge && !k.fast && gg.type.navn !== "reagensglas" && gg.type.sprite) return true;
@@ -823,6 +824,10 @@
         var k = gg.kan, m = c.kan;
         if (m.affald || m.vask) return this.toemI(gg, c);
         if (m.stoette && gg.type.navn === "reagensglas") return this.iStativ(gg, c, this.ledigtHul(c, pt ? pt.x : undefined));
+        /* Et reagensglas, der slippes over et bad, stilles ned i det. Det
+           skal staa foer m.holder, ellers ville glasset haelde sit indhold
+           i badet i stedet. */
+        if (m.bad && gg.type.navn === "reagensglas") return this.iBad(gg, c, pt ? pt.x : undefined);
         if (m.flamme && k.dypper) return this.flammeproeve(gg, c);
         if ((m.varmer || m.vaegt) && k.holder) return this.paaPlade(gg, c, pt ? pt.x : undefined);
         if (m.luge && !k.fast && gg.type.sprite) return this.paaPlade(gg, c, pt ? pt.x : undefined);
@@ -938,6 +943,58 @@
         else this.koer.start([{ flyt: gg, til: til, tid: 0.35, loeft: 10 }], "hjem");
         this.tilFront(gg);
         this.haendelse("plade", gg);
+        return true;
+    };
+
+    /* ----- Badet -------------------------------------------------------------
+       Et bad (udstyr "bad") er et stort baegerglas, der staar fast, og som
+       man saetter reagensglas ned i. Glasset i badet tager badets
+       temperatur, saa et bad paa en taendt varmeplade er et vandbad, og et
+       bad med holdT i opstillingen er et isbad. Der er plads til de glas,
+       der kan staa ved siden af hinanden paa badets plade.
+
+       Badet er det samme moenster som stativet og varmepladen: pladsen
+       afgoeres af geometrien, ikke af en liste over, hvad der maa staa i
+       hvad. Derfor kan ethvert forsoeg stille et bad op uden ny kode. */
+    P.badPladser = function (bad) {
+        var t = bad.type, b = 34 * (bad.skala || 1);
+        var n = Math.max(1, Math.floor((t.plade.x1 - t.plade.x0) / b));
+        var p0 = bad.p.x - bad.anker.x, ud = [];
+        for (var i = 0; i < n; i++) ud.push(p0 + t.plade.x0 + b * (i + 0.5));
+        return ud;
+    };
+
+    P.iBadet = function (bad) {
+        return this.liste.filter(function (x) { return x.paa === bad; });
+    };
+
+    /* Den ledige plads naermest x, eller null hvis badet er fuldt */
+    P.ledigPlads = function (bad, naerX) {
+        var pladser = this.badPladser(bad);
+        var optaget = this.iBadet(bad).map(function (x) { return x.p.x; });
+        var bedst = null, afst = Infinity;
+        pladser.forEach(function (x, i) {
+            if (optaget.some(function (o) { return Math.abs(o - x) < 8; })) return;
+            var d = naerX === undefined ? i : Math.abs(x - naerX);
+            if (d < afst) { afst = d; bedst = x; }
+        });
+        return bedst;
+    };
+
+    P.iBad = function (gg, bad, x, stille) {
+        if (!bad) return false;
+        var cx = this.ledigPlads(bad, x);
+        if (cx === null) { this.besked("Der er ikke plads til flere glas i " + bad.titel + "."); return false; }
+        this.frigoer(gg);
+        gg.paa = bad;
+        /* Glasset staar nede i vaesken: aabningen bliver over badets kant */
+        var til = { x: cx, y: bad.p.y - bad.anker.y + bad.type.plade.y - 62 * (gg.skala || 1), v: 0 };
+        gg.hjem = kopi(til);
+        if (stille) gg.p = kopi(til);
+        else this.koer.start([{ flyt: gg, til: til, tid: 0.35, loeft: 14 }], "hjem");
+        this.tilFront(gg);
+        this.haendelse("bad", gg);
+        this.aendret("bad");
         return true;
     };
 
@@ -1465,10 +1522,26 @@
         return x > sk.x0 && x < sk.x1;
     };
 
+    /* Badets maaltemperatur, hvis det er termostateret (holdT i
+       opstillingen). Staar badet paa en varmeplade, gaelder termostaten
+       kun, mens pladen er taendt; ellers koeler badet af til stuetemperatur.
+       Uden holdT foelger badet den almindelige fysik. */
+    P.badT = function (bad) {
+        if (!bad.kan.bad || !bad.spec || bad.spec.holdT === undefined) return null;
+        if (bad.paa && bad.paa.kan.varmer && !bad.paa.taendt) return this.stue;
+        return bad.spec.holdT;
+    };
+
     P.omgivelser = function (gg) {
         var s = { T: this.stue, tau: B.TEMP.tauLuft, ryst: 0, roer: false };
+        /* Badet selv: termostaten bestemmer, ikke pladens 250 grader */
+        var bt = gg.kan.bad ? this.badT(gg) : null;
+        if (bt !== null) { s.T = bt; s.tau = 12; return s; }
         if (gg.paa && gg.paa.kan.varmer && gg.paa.taendt) { s.T = gg.paa.T; s.tau = gg.paa.kan.flamme ? 6 : B.TEMP.tauVarme; }
         else if (gg.paa && gg.paa.kan.varmer) { s.T = Math.max(this.stue, gg.paa.T); s.tau = B.TEMP.tauVarme; }
+        /* Et glas nede i et bad tager badets temperatur. Vand mod glas
+           leder meget bedre end luft, saa tau er kort. */
+        else if (gg.paa && gg.paa.kan.bad && gg.paa.indhold && B.volumen(gg.paa) > 1) { s.T = B.samlet(gg.paa).T; s.tau = 8; }
         if (this.baerer === gg) s.ryst = this.ryst;
         if (this.roerer === gg) { s.roer = true; s.ryst = Math.max(s.ryst, 0.6); }
         return s;

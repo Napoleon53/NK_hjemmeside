@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest - Indgreb i en kemisk ligevægt</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:800px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i animationen og kan slettes.
+
+   Aabner index.html i en iframe og koerer forsoeget igennem: kemien i de
+   fire indgreb, badene, forloebets trin (ogsaa i forkert raekkefoelge),
+   flagene, udloeserne, gemningen og opstillingen mod stoftabellen.
+
+   Skal aabnes gennem en lokal server (eller Chrome med
+   --allow-file-access-from-files), ellers kan iframen ikke laeses.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn + (note !== undefined ? "   (" + note + ")" : ""), "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function tal(x, d) { return Number(x).toFixed(d === undefined ? 2 : d).replace(".", ","); }
+
+window.addEventListener("load", function () { setTimeout(koer, 1800); });
+
+function koer() {
+    try { koerTest(); } catch (e) { fejl++; skriv("UNDTAGELSE: " + e.message + "\n" + e.stack, "fejl"); }
+    vis();
+}
+
+function koerTest() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument;
+    var NK = ramme.contentWindow.NK;
+    if (NK && NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+
+    overskrift("1. Indlaesning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var bord = NK.bord, B = NK.Beholder, St = NK.Stof, V = NK.Vilkaar;
+    var side = NK.Side.nu, F = NK.Forloeb.nu;
+    paastand("bordet er bygget", !!bord);
+    paastand("skallen er den faelles side.js", !!side);
+    paastand("forloebet er bygget", !!F && F.trin.length === 9, F && F.trin.length + " trin");
+    paastand("de otte glas staar i stativet", [1,2,3,4,5,6,7,8].every(function (i) { return !!bord.g["glas" + i]; }));
+    paastand("badene staar paa bordet", !!bord.g.vandbad && !!bord.g.isbad &&
+        bord.g.vandbad.kan.bad && bord.g.isbad.kan.bad);
+    paastand("vandbadet staar paa varmepladen", bord.g.vandbad.paa === bord.g.plade);
+    paastand("teksterne er skrevet ind fra tekst.js",
+        d.getElementById("teori-kort").textContent.indexOf("exoterm") > 0);
+    paastand("panelet viser foerste trin",
+        d.getElementById("forloeb-tekst").textContent.indexOf("stamopløsning") > 0);
+    paastand("introen aabner og lukker", !!NK.intro &&
+        (NK.intro.aabn(), d.getElementById("intro").classList.contains("vis")) &&
+        (NK.intro.luk(), !d.getElementById("intro").classList.contains("vis")));
+    var alle = Object.keys(NK.Sprites.FILER);
+    var klar = alle.filter(function (n) { return NK.Sprites.klar(n); });
+    paastand("sprites er indlaest", klar.length === alle.length, klar.length + " af " + alle.length);
+
+    function adv(sek) { for (var k = 0; k < Math.round(sek * 20); k++) bord.opdater(0.05); F.opdater(); }
+    function lys(gg) { return V.lysstyrke(gg); }
+    function konc(gg, navn) { return St.konc(B.samlet(gg), navn); }
+    function g(n) { return bord.g["glas" + n]; }
+
+    overskrift("2. Stamoploesningen");
+    var kolbe = bord.g.kolbe;
+    for (var i = 1; i <= 8; i++) B.haeldI(g(i), B.udtag(kolbe, 6), true);
+    adv(25);
+    var ref = g(7), lys0 = lys(ref), fescn0 = konc(ref, "FeSCN2+");
+    paastand("komplekset danner sig af sig selv", fescn0 > 0.8 && fescn0 < 2.5, tal(fescn0) + " mM FeSCN2+");
+    paastand("farven er tydelig, men ikke sort", lys0 < 0.75 && lys0 > 0.12, "lys " + tal(lys0));
+    paastand("trin 1 er gjort, naar alle otte glas er fyldt", F.erGjort("fyld"));
+    paastand("naeste trin er glas 1", F.nuTrin() && F.nuTrin().id === "glas1", F.nuTrin() && F.nuTrin().id);
+
+    overskrift("3. De fire indgreb");
+    /* Med vilje i en anden raekkefoelge end listen: et trin afgoeres af
+       bordets tilstand, ikke af den vej eleven kom */
+    B.tilsaetFast(g(3), "KSCN(s)", 20);
+    adv(40);
+    paastand("et trin laengere fremme taeller ogsaa", F.erGjort("glas3"));
+    paastand("men glas 1 er stadig ikke gjort", !F.erGjort("glas1"));
+    paastand("glas 3 blev moerkere", lys(g(3)) < lys0 - 0.02, tal(lys0) + " -> " + tal(lys(g(3))));
+
+    B.tilsaetFast(g(1), "Fe(NO3)3(s)", 20);
+    B.tilsaetFast(g(2), "Asc(s)", 12);
+    B.haeldI(g(4), B.udtag(bord.g.ag, 0.12), true);
+    adv(50);
+    paastand("glas 1: mere Fe3+ giver moerkere", F.erGjort("glas1") && konc(g(1), "FeSCN2+") > fescn0,
+        tal(fescn0) + " -> " + tal(konc(g(1), "FeSCN2+")) + " mM");
+    paastand("glas 2: ascorbinsyre reducerer til Fe2+ og giver lysere",
+        F.erGjort("glas2") && konc(g(2), "Fe2+") > 0.5, tal(konc(g(2), "Fe2+")) + " mM Fe2+");
+    paastand("glas 4: AgNO3 faelder AgSCN og giver lysere",
+        F.erGjort("glas4") && B.samlet(g(4)).n["AgSCN(s)"] > 1,
+        tal((B.samlet(g(4)).n["AgSCN(s)"] || 0) / 1000, 3) + " mmol AgSCN");
+
+    overskrift("4. Badene");
+    paastand("der er plads til flere glas i et bad", bord.badPladser(bord.g.isbad).length >= 2,
+        bord.badPladser(bord.g.isbad).length + " pladser");
+    paastand("glas 5 kan saettes i vandbadet", bord.moede(g(5), bord.g.vandbad, { x: bord.g.vandbad.p.x - 24 }));
+    paastand("glas 6 kan saettes i isbadet", bord.moede(g(6), bord.g.isbad, { x: bord.g.isbad.p.x - 24 }));
+    paastand("varmetrinnet er ikke gjort, foer pladen er taendt", !F.erGjort("varme"));
+    paastand("isbadet holder sin temperatur uden varmeplade", B.samlet(bord.g.isbad).T < 5,
+        tal(B.samlet(bord.g.isbad).T, 1) + " grader");
+    bord.g.plade.taendt = true;
+    adv(200);
+    paastand("vandbadet gaar til sin termostat og koger ikke", B.samlet(bord.g.vandbad).T > 70 && B.samlet(bord.g.vandbad).T < 90,
+        tal(B.samlet(bord.g.vandbad).T, 1) + " grader");
+    paastand("glas 5 foelger vandbadet", B.samlet(g(5)).T > 55, tal(B.samlet(g(5)).T, 1) + " grader");
+    paastand("glas 6 foelger isbadet", B.samlet(g(6)).T < 8, tal(B.samlet(g(6)).T, 1) + " grader");
+    paastand("varme flytter den exoterme ligevaegt mod venstre", konc(g(5), "FeSCN2+") < fescn0 * 0.9,
+        tal(fescn0) + " -> " + tal(konc(g(5), "FeSCN2+")) + " mM");
+    paastand("kulde flytter den mod hoejre", konc(g(6), "FeSCN2+") > fescn0 * 1.1,
+        tal(fescn0) + " -> " + tal(konc(g(6), "FeSCN2+")) + " mM");
+    paastand("begge badtrin er gjort", F.erGjort("varme") && F.erGjort("kulde"));
+    paastand("flaget blev sat, da indgrebene var gjort", F.flag("indgreb_gjort"));
+    paastand("et glas kan tages op af badet igen", (bord.frigoer(g(6)), g(6).paa === null));
+
+    overskrift("5. Billedet og journalen");
+    var Jn = NK.Journal.find("billede");
+    paastand("journalen er registreret", !!Jn && Jn.kraevede.length === 6);
+    paastand("facit regnes af verden, ikke af en facitliste",
+        NK.BILLEDE.facit("glas1", bord) === "moerkere" && NK.BILLEDE.facit("glas2", bord) === "lysere" &&
+        NK.BILLEDE.facit("glas7", bord) === "ens",
+        "glas 1 " + NK.BILLEDE.facit("glas1", bord) + ", glas 2 " + NK.BILLEDE.facit("glas2", bord));
+    paastand("billedet kan tages", (NK.billede.aabn(bord), d.getElementById("billede").classList.contains("vis")));
+    paastand("trinnet er ikke gjort, foer der er noteret", !F.erGjort("billede"));
+
+    /* Fem rigtige og ét forkert */
+    ["glas1", "glas2", "glas3", "glas4", "glas5"].forEach(function (n) {
+        NK.billede.noter(n, NK.BILLEDE.facit(n, bord), bord);
+    });
+    NK.billede.noter("glas6", "lysere", bord);          /* glas 6 er i virkeligheden moerkere */
+    adv(1);
+    paastand("journalen er udfyldt", Jn.faerdig(), Jn.antal() + " af 6");
+    paastand("fem er rigtige og ét forkert", Jn.antalRigtige() === 5 && Jn.antalForkerte() === 1,
+        Jn.antalRigtige() + " rigtige, " + Jn.antalForkerte() + " forkerte");
+    paastand("trinnet er gjort, naar alle seks er noteret", F.erGjort("billede"));
+    paastand("det forkerte glas udloeser en bemaerkning", !!F.fyret.kig_igen);
+    paastand("et svar kan rettes",
+        (NK.billede.noter("glas6", "moerkere", bord), Jn.antalForkerte() === 0 && Jn.rigtig("glas6") === true));
+    paastand("oejebliksbilledet blev gemt med svaret", !!Jn.billede("glas1") && !!Jn.billede("glas1").farve,
+        JSON.stringify(Jn.billede("glas1").farve));
+    NK.billede.luk();
+    paastand("billedet kan lukkes", !d.getElementById("billede").classList.contains("vis"));
+
+    overskrift("6. Referencen");
+    paastand("glas 7 staar uroert", Math.abs(konc(ref, "FeSCN2+") - fescn0) < 0.05, tal(konc(ref, "FeSCN2+")) + " mM");
+    paastand("udloeseren om referencen har ikke fyret", !F.fyret.roert_reference);
+
+    overskrift("7. Oprydning");
+    paastand("oprydningen er ikke gjort endnu", !F.erGjort("ryd"));
+    /* Ét glas ad gangen: toemI er en koreografi, og der koerer kun én */
+    for (var j = 1; j <= 8; j++) { bord.toemI(g(j), bord.g.dunk); adv(4); }
+    adv(4);
+    paastand("alle glas er tomme", [1,2,3,4,5,6,7,8].every(function (n) { return B.tom(g(n)); }));
+    paastand("oprydningen taeller nu", F.erGjort("ryd"));
+    paastand("forloebet er faerdigt", F.faerdig);
+    paastand("taelleren staar paa 9 af 9", d.getElementById("forloeb-taeller").textContent === "9/9");
+
+    overskrift("8. Gemning: historien, ikke bordene");
+    var t = F.tilstand();
+    paastand("tilstanden rummer trin, udloesere, flag og journal",
+        Object.keys(t.gjort).length === 9 && !!t.flag.indgreb_gjort && !!t.journal.billede);
+    F.nulstil();
+    paastand("efter nulstil er intet gjort og journalen tom",
+        !F.erGjort("fyld") && !F.flag("indgreb_gjort") && Jn.antal() === 0);
+    paastand("tilstanden kan spilles tilbage, ogsaa journalen",
+        (F.saetTilstand(t), F.erGjort("ryd") && F.faerdig && Jn.antal() === 6));
+
+    overskrift("9. Udloesere");
+    NK.startForfra();
+    adv(2);
+    paastand("start forfra nulstiller forloeb og journal", !F.erGjort("fyld") && F.nummer() === 0 && Jn.antal() === 0);
+    var g7 = bord.g.glas7;
+    B.haeldI(g7, B.udtag(bord.g.kolbe, 3), true);
+    adv(10);
+    paastand("udloeseren har stadig ikke fyret", !F.fyret.roert_reference);
+    B.haeldI(g7, B.udtag(bord.g.ag, 0.3), true);
+    adv(30);
+    paastand("et indgreb i glas 7 udloeser bemaerkningen", !!F.fyret.roert_reference);
+    var g1 = bord.g.glas1;
+    B.haeldI(g1, B.udtag(bord.g.kolbe, 3), true);
+    B.haeldI(g1, B.udtag(bord.g.ag, 0.3), true);
+    B.tilsaetFast(g1, "Asc(s)", 20);
+    adv(60);
+    paastand("to slags indgreb i samme glas udloeser en bemaerkning", !!F.fyret.to_indgreb);
+
+    overskrift("10. Vilkaarssproget");
+    paastand("et tal betyder over", V.passer(5, 3) && !V.passer(2, 3));
+    paastand("over og under kan staa sammen", V.passer(50, { over: 20, under: 80 }) && !V.passer(90, { over: 20, under: 80 }));
+    paastand("ikke vender et vilkaar", V.opfyldt({ ikke: { beholder: "glas2", V: { over: 1 } } }, bord));
+    paastand("nogen er sandt, naar ét er sandt",
+        V.opfyldt({ nogen: [{ beholder: "glas1", V: { over: 1 } }, { beholder: "glas2", V: { over: 1 } }] }, bord));
+    paastand("et ukendt glas giver falsk, ikke en undtagelse",
+        V.opfyldt({ beholder: "findes_ikke", V: { over: 1 } }, bord) === false);
+
+    overskrift("11. Opstillingen mod kataloget");
+    var ukendte = [];
+    NK.OPSTILLING.forEach(function (spec) {
+        var kilder = [];
+        if (spec.indhold && spec.indhold.mM) kilder = kilder.concat(Object.keys(spec.indhold.mM));
+        if (spec.indhold && spec.indhold.umol) kilder = kilder.concat(Object.keys(spec.indhold.umol));
+        kilder.forEach(function (n) { if (!St.STOFFER[n]) ukendte.push(spec.navn + ": " + n); });
+    });
+    paastand("alle stoffer paa bordet findes i stoftabellen", ukendte.length === 0, ukendte.join(", ") || "ingen ukendte");
+    var udenType = NK.OPSTILLING.filter(function (s) { return !NK.Udstyr.TYPER[s.type]; });
+    paastand("alt udstyr i opstillingen findes i kataloget", udenType.length === 0,
+        udenType.map(function (s) { return s.type; }).join(", ") || "ingen ukendte");
+
+    /* Oevelsestjekket i sin spaede form: peger et trin paa et glas eller et
+       stof, der ikke findes, er forsoeget i stykker, og det skal opdages
+       her - ikke af en elev. */
+    var navne = {}, mangler = [], manglerStof = [];
+    NK.OPSTILLING.forEach(function (s) { navne[s.navn] = true; });
+    F.trin.concat(F.udloesere).forEach(function (x) {
+        NK.Vilkaar.naevnte(x.naar).forEach(function (n) { if (!navne[n]) mangler.push(x.id + ": " + n); });
+        NK.Vilkaar.naevnteStoffer(x.naar).forEach(function (n) { if (!St.STOFFER[n]) manglerStof.push(x.id + ": " + n); });
+        /* peg maa vaere en genstand paa bordet eller et element i panelet */
+        if (x.peg && !navne[x.peg] && !d.getElementById(x.peg)) mangler.push(x.id + " peger paa " + x.peg);
+    });
+    paastand("alle trin peger paa genstande, der findes", mangler.length === 0, mangler.join(", ") || "ingen mangler");
+    paastand("alle trin naevner stoffer, der findes", manglerStof.length === 0, manglerStof.join(", ") || "ingen mangler");
+    paastand("hvert trin har tekst og hint",
+        F.trin.every(function (x) { return x.tekst && x.hint && x.kort; }));
+
+    overskrift("12. Start forfra");
+    NK.startForfra();
+    var friske = [];
+    for (var m = 1; m <= 8; m++) friske.push(bord.g["glas" + m]);
+    paastand("glassene er tomme igen", friske.every(function (x) { return B.tom(x); }));
+    paastand("kolben er fuld igen", B.volumen(bord.g.kolbe) > 190, tal(B.volumen(bord.g.kolbe), 0) + " mL");
+    paastand("forloebet staar paa foerste trin", F.nuTrin() && F.nuTrin().id === "fyld");
+    paastand("panelet kan opdateres", (NK.opdaterPanel(), true));
+}
+
+function vis() {
+    skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK"), fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+</script>
+</body>
+</html>

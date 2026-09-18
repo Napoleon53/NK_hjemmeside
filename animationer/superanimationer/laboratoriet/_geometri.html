@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Geometriprøve - laboratoriet</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.55; white-space:pre-wrap; }
+    .h { color:#f2c53d; font-weight:700; } .ok { color:#7ee0a8; } .fejl { color:#f0918a; }
+    .lav { color:#7d8590; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<script src="js/kerne.js"></script>
+<script src="js/farvemodel.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/stof.js"></script>
+<script src="js/stoftabel.js"></script>
+<script src="js/udstyr.js"></script>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i animationerne og kan slettes.
+
+   Alt glasudstyr er et omdrejningslegeme: en silhuet drejet om sin egen
+   akse. Derfor er rumfanget og lysvejen givet af den tegnede inderside og
+   én skala (NK.Udstyr.SKALA, tegneenheder pr. cm). Denne side regner dem
+   ud og holder dem op mod de tal, der staar i typerne.
+
+   Tre ting kan vaere galt, og de ses hver sit sted:
+     * tegnet rumfang mod maks: glasset er tegnet for stort eller for
+       lille i forhold til det rumfang, det siger, det har
+     * vejlaengde mod geometri: farvedybden svarer ikke til, hvor bredt
+       glasset faktisk er
+     * vaeskehoejde: mlPrAreal passer ikke til indersiden, saa vaesken
+       staar forkert, naar glasset er fuldt
+
+   Laes den igennem, hver gang en sprite eller et maal aendres.
+   ===================================================================== */
+var U = NK.Udstyr;
+var linjer = [];
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function tal(x, d) { return Number(x).toFixed(d === undefined ? 1 : d).replace(".", ","); }
+function pad(s, n) { s = String(s); while (s.length < n) s += " "; return s; }
+function padV(s, n) { s = String(s); while (s.length < n) s = " " + s; return s; }
+
+skriv("Geometriprøve: alt glasudstyr læst som omdrejningslegemer", "h");
+skriv("Skala: " + tal(U.SKALA) + " tegneenheder pr. cm (sat efter reagensglassets 1,6 cm inderside)");
+skriv("Lysvejen dæmpes mod reagensglassets, så dybe glas kan aflæses. Se LYSVEJ_DAEMPNING i udstyr.js.");
+skriv("— betyder undtaget: et vindue (etiket over indersiden) eller ikke et omdrejningslegeme.\n");
+
+skriv(pad("udstyr", 16) + padV("maks", 7) + padV("tegnet", 8) + padV("afvig", 8) +
+      padV("bredde", 9) + padV("vejl.", 7) + padV("geometri", 10) + padV("væskehøjde", 12), "h");
+
+var advarsler = [];
+Object.keys(U.TYPER).forEach(function (navn) {
+    var t = U.TYPER[navn];
+    if (!t.indre || !t.maks) return;
+    var m = U.maal(t);
+    var rund = t.rund !== false && !t.vindue;
+    var afvig = m.V_mL / t.maks;
+    /* Hvor hoejt staar vaesken ved maks? Motoren regner areal = maks * mlPrAreal */
+    var fylde = m.A / (t.maks * t.mlPrAreal);
+    var vejGeo = U.lysvej(t);
+    var linje = pad(navn, 16) + padV(t.maks + " mL", 7) +
+        padV(rund ? tal(m.V_mL, 0) + " mL" : "—", 8) +
+        padV(rund ? tal(afvig, 2) + "x" : "—", 8) +
+        padV(tal(m.vej_cm) + " cm", 9) +
+        padV(tal(t.vejlaengde || 1), 7) +
+        padV(rund ? tal(vejGeo) : "—", 10) +
+        padV(tal(fylde * 100, 0) + " %", 12);
+    var slem = rund && (afvig > 1.25 || afvig < 0.8);
+    skriv(linje, slem ? "fejl" : (rund ? "ok" : "lav"));
+    if (slem) advarsler.push(navn + " er tegnet som " + tal(m.V_mL, 0) + " mL, men siger " + t.maks + " mL" +
+        " (ret spriten med faktor " + tal(Math.pow(1 / afvig, 1 / 3), 2) + ")");
+    /* Et vindue viser ikke hele beholderen, saa vaeskehoejden maales ikke */
+    if (rund && !t.vindue && Math.abs(fylde - 1) > 0.15) advarsler.push(navn + ": mlPrAreal giver væskehøjde " +
+        tal(fylde * 100, 0) + " % af indersiden ved maks (bør være 100). Sæt mlPrAreal = " + tal(m.A / t.maks, 0));
+});
+
+skriv("\nkolonnerne", "h");
+skriv("  maks        rumfanget, typen siger, den har");
+skriv("  tegnet      rumfanget af den tegnede inderside som omdrejningslegeme");
+skriv("  afvig       tegnet / maks. 1,00 er rigtigt");
+skriv("  bredde      indersidens gennemsnitlige bredde, altså lysvejen gennem siden");
+skriv("  vejl.       vejlaengde, som den står i typen");
+skriv("  geometri    vejlaengde, som bredden siger den burde være, efter dæmpning");
+skriv("  væskehøjde  hvor højt væsken står ved maks. 100 % er til kanten");
+
+if (advarsler.length) {
+    skriv("\nDet, der ikke passer", "h");
+    advarsler.forEach(function (a) { skriv("  " + a, "fejl"); });
+} else {
+    skriv("\nAlt passer.", "ok");
+}
+
+document.getElementById("ud").innerHTML = linjer.join("\n");
+</script>
+</body>
+</html>

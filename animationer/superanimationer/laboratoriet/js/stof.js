@@ -359,10 +359,38 @@
     /* Den xi, hvor reaktionsbroeken er K. t/n stiger med xi, saa der
        kan halveres. For et bundfald er K oploselighedsproduktet, dvs.
        ionproduktet n alene, saa betingelsen t/n = 1/K bruges. */
+    /* ----- Ligevaegtskonstanten ved en anden temperatur ---------------------
+       van 't Hoff: K(T) = K(T0) · exp(-ΔH/R · (1/T - 1/T0)).
+
+       Tabellens K'er gaelder ved 20 °C. En exoterm reaktion (ΔH < 0) faar
+       et mindre K, naar det bliver varmere, saa ligevaegten flytter mod
+       venstre; en endoterm det modsatte. Det er Le Chateliers princip som
+       fysik i stedet for som en regel, der skal skrives ind pr. reaktion:
+       en reaktion, der allerede har et ΔH i stoftabellen, faar
+       temperaturafhaengigheden gratis.
+
+       Det gaelder ogsaa oploselighedsprodukter og vandets autoprotolyse,
+       som begge vokser med temperaturen. Ved 20 °C er faktoren 1, saa
+       intet aendrer sig i et forsoeg ved stuetemperatur.
+
+       Eksponenten begraenses til ±6, saa en reaktion med et stort ΔH ikke
+       giver absurde tal lige under kogepunktet.
+
+       NK.Stof.vantHoff = false slaar det fra. */
+    var T0 = 293.15;            /* 20 °C i kelvin */
+    var R = 8.314;              /* J/(mol·K) */
+
+    function Kved(rx, T) {
+        if (NK.Stof.vantHoff === false || !rx.dH || typeof T !== "number") return rx.K;
+        var eks = -(rx.dH * 1000) / R * (1 / (T + 273.15) - 1 / T0);
+        return rx.K * Math.exp(NK.klamp(eks, -6, 6));
+    }
+
     function ligevaegtXi(o, rx, g) {
         var a = g.min, b = g.maks;
         if (b - a < 1e-15) return 0;
-        var K = rx.slags === "faeld" ? 1 / rx.K : rx.K;
+        var K0 = Kved(rx, o.T);
+        var K = rx.slags === "faeld" ? 1 / K0 : K0;
         for (var i = 0; i < 60; i++) {
             var m = (a + b) / 2;
             var q = broek(o, rx, m);
@@ -387,7 +415,7 @@
         if (rx.slags === "ligevaegt" || rx.slags === "faeld") {
             var q = broek(o, rx, 0);
             var harFast = rx.hoejre.some(function (led) { return stof(led[1]).fase === "s" && (o.n[led[1]] || 0) > 1e-9; });
-            if (rx.slags === "faeld" && q.n < rx.K && !harFast) return;
+            if (rx.slags === "faeld" && q.n < Kved(rx, o.T) && !harFast) return;
             maal = ligevaegtXi(o, rx, g);
             anvend(o, rx, Math.abs(maal) < 1e-3 ? maal : maal * f);
         }
@@ -546,6 +574,8 @@
         VAND: VAND,
         VARMEKAP: VARMEKAP,
         KW: KW,
+        vantHoff: true,
+        Kved: Kved,
         def: def,
         stof: stof,
         formel: formel,

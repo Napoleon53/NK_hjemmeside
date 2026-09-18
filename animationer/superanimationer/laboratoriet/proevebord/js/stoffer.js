@@ -16,7 +16,7 @@
 
     NK.OPSTILLING = [
         { navn: "dunk", type: "affaldsdunk", x: 66, etiket: ["AFFALD", "uorganisk"] },
-        { navn: "baeger250", type: "baeger250", x: 170 },
+        { navn: "baegerStor", type: "baegerStor", x: 170 },
         { navn: "vand", type: "sproejteflaske", x: 246, titel: "sprøjteflasken med vand", indhold: opl(500, {}) },
 
         /* Pulverglas og metaller */
@@ -58,7 +58,7 @@
         { navn: "vaegt", type: "vaegt", p: { x: 1160, y: 438, v: 0 } },
         { navn: "vejebaad", type: "vejebaad", paa: "vaegt", x: 1230 },
         { navn: "plade", type: "varmeplade", p: { x: 1420, y: 428, v: 0 } },
-        { navn: "baeger100", type: "baeger100", paa: "plade", x: 1510 },
+        { navn: "baegerLille", type: "baegerLille", paa: "plade", x: 1510 },
 
         { navn: "glasstav", type: "glasstav", x: 700 },
         { navn: "termometer", type: "termometer", x: 850 },

@@ -23,8 +23,8 @@
         { navn: "papir", type: "koekkenrulle", x: 100, y: 268 },
         { navn: "vand", type: "sproejteflaske", x: 246, titel: "sprøjteflasken med vand", indhold: opl(500, {}) },
         { navn: "vand2", type: "sproejteflaske", x: 300, titel: "den anden sprøjteflaske med vand", indhold: opl(500, {}) },
-        { navn: "baegerA", type: "baeger250", x: 420, titel: "det store bægerglas" },
-        { navn: "baegerB", type: "baeger100", x: 520, titel: "det lille bægerglas" },
+        { navn: "baegerA", type: "baegerStor", x: 420, titel: "det store bægerglas" },
+        { navn: "baegerB", type: "baegerLille", x: 520, titel: "det lille bægerglas" },
         { navn: "maaleglas", type: "maaleglas", x: 600 },
         { navn: "kolbe", type: "kolbe", x: 700 },
         { navn: "fl_nacl", type: "flaske", x: 300, y: HYLDE, etiket: ["NaCl", "0,1 M"], titel: "flasken med NaCl", indhold: opl(200, { "Na+": 100, "Cl-": 100 }) },
@@ -84,14 +84,14 @@
         pulver("p_cu", 670, "Cu", "glasset med kobber", "Cu(s)"),
         { navn: "spatel", type: "spatel", p: { x: 720, y: 495, v: 0 } },
         { navn: "vand", type: "sproejteflaske", x: 1100, titel: "sprøjteflasken med vand", indhold: opl(500, {}) },
-        { navn: "baegerA", type: "baeger100", x: 1200, titel: "det lille bægerglas" },
-        { navn: "baegerB", type: "baeger250", x: 1300, titel: "det store bægerglas" },
+        { navn: "baegerA", type: "baegerLille", x: 1200, titel: "det lille bægerglas" },
+        { navn: "baegerB", type: "baegerStor", x: 1300, titel: "det store bægerglas" },
         { navn: "dunk", type: "affaldsdunk", x: 1500, etiket: ["AFFALD", "uorganisk"] }
     ];
 
     var BORD = [
         { navn: "dunk", type: "affaldsdunk", x: 66, etiket: ["AFFALD", "uorganisk"] },
-        { navn: "baeger250", type: "baeger250", x: 170 },
+        { navn: "baegerStor", type: "baegerStor", x: 170 },
         { navn: "vand", type: "sproejteflaske", x: 246, titel: "sprøjteflasken med vand", indhold: opl(500, {}) },
         pulver("pulver_nacl", 300, "NaCl", "pulverglasset med NaCl", "NaCl(s)"),
         pulver("pulver_cu", 344, "CuSO₄", "pulverglasset med CuSO₄", "CuSO4(s)"),
@@ -124,13 +124,13 @@
         { navn: "vaegt", type: "vaegt", p: { x: 1220, y: 438, v: 0 } },
         { navn: "vejebaad", type: "vejebaad", paa: "vaegt", x: 1290 },
         { navn: "plade", type: "varmeplade", p: { x: 1420, y: 428, v: 0 } },
-        { navn: "baeger100", type: "baeger100", paa: "plade", x: 1510 }
+        { navn: "baegerLille", type: "baegerLille", paa: "plade", x: 1510 }
     ];
 
     var STINKSKAB = [
         { navn: "luge", type: "luge", x: 120, til: "bord", skilt: "TIL PRØVEBORDET" },
-        { navn: "baeger100", type: "baeger100", x: 400 },
-        { navn: "baeger250", type: "baeger250", x: 490 },
+        { navn: "baegerLille", type: "baegerLille", x: 400 },
+        { navn: "baegerStor", type: "baegerStor", x: 490 },
         pulver("metal_cu", 580, "Cu", "glasset med kobber", "Cu(s)"),
         pulver("metal_mg", 624, "Mg", "glasset med magnesium", "Mg(s)"),
         pulver("metal_zn", 668, "Zn", "glasset med zink", "Zn(s)"),

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Indgreb i en kemisk ligevægt</title>
+<link rel="stylesheet" href="../laboratoriet/css/grund.css">
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚗</span> <span id="titel">Indgreb i en kemisk ligevægt</span>
+        <span class="undertitel" id="undertitel"></span></h1>
+
+    <div class="top-hoejre">
+        <button class="knap topknap" id="forfraknap" type="button" title="Ryd bordet og start forfra">Start forfra</button>
+        <button class="knap topknap" id="introknap" type="button" title="Om forsøget">Om forsøget</button>
+        <button class="ikonknap" id="lydknap" type="button" title="Lyd til og fra (M)" aria-label="Lyd til og fra" aria-pressed="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/>
+                <path class="boelger" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <path class="kryds" d="M16.5 9.5l5 5M21.5 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+        </button>
+        <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning (H)" aria-label="Rundvisning">?</button>
+    </div>
+</header>
+
+<main class="forsoeg">
+    <div class="scene" id="scene">
+        <canvas id="scene-laerred" aria-label="Laboratoriebord med kolbe, bægerglas, otte reagensglas i et stativ, pulverglas med Fe(NO₃)₃, ascorbinsyre og KSCN, flaske med KSCN, dråbeflaske med AgNO₃, vandbad på varmeplade, isbad, glasstav, termometer og affaldsdunk."></canvas>
+        <div class="scenebesked" id="scenebesked" aria-live="polite"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort fremhaev" id="glas-kort">
+            <h2><span id="glas-titel">Det valgte glas</span> <span class="taeller" id="glas-volumen"></span></h2>
+            <p class="besked" id="glas-tom">Klik på et glas for at se, hvad der er i.</p>
+            <canvas class="boble" id="boble-laerred" aria-label="Zoom: partiklerne i det valgte glas" hidden></canvas>
+            <table class="indhold" id="glas-indhold" hidden></table>
+            <p class="besked" id="glas-temp" hidden></p>
+        </div>
+
+        <div class="kort fremhaev" id="forloeb-kort">
+            <h2><span>Forløb</span> <span class="taeller" id="forloeb-taeller">0/8</span></h2>
+            <p class="forloeb-nu" id="forloeb-tekst"></p>
+            <div class="knaprad">
+                <button class="knap blaa" id="hintknap" type="button" title="Hint til dette trin (I)">Hint</button>
+                <button class="knap" id="billedknap" type="button" title="Tag et billede af stativet (S)">Tag billede</button>
+            </div>
+            <ol class="forloeb-liste" id="forloeb-liste"></ol>
+        </div>
+
+        <div class="kort" id="teori-kort-ramme">
+            <h2>Ligevægten</h2>
+            <p class="ligning">Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺</p>
+            <p class="besked" id="teori-kort"></p>
+        </div>
+
+        <div class="kort" id="logbog-kort">
+            <h2>Logbog</h2>
+            <div class="knaprad">
+                <button class="knap blaa" id="logbog-noter" type="button" title="Skriv det valgte glas' aflæsning i logbogen"><span>Notér aflæsning</span><span class="tegn">✎</span></button>
+                <button class="knap" id="logbog-ryd" type="button" title="Slet logbogen">Ryd</button>
+            </div>
+            <textarea class="logbog" id="logbog-tekst" rows="6" placeholder="Dine egne noter. Knappen skriver det valgte glas' rumfang, temperatur og indhold."></textarea>
+        </div>
+
+        <div class="kort" id="uheld-kort">
+            <h2><span>Uheld</span> <span class="taeller" id="uheld-taeller">0</span></h2>
+            <p class="besked" id="uheld-tekst"></p>
+        </div>
+    </aside>
+</main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="intro">
+    <div class="overlay-boks intro-boks" role="dialog" aria-labelledby="intro-titel">
+        <h2 id="intro-titel">Indgreb i en kemisk ligevægt</h2>
+        <p class="intro-formaal" id="intro-formaal"></p>
+
+        <h3>Sådan gør du</h3>
+        <ol class="intro-trin" id="intro-trin"></ol>
+
+        <h3>Uheld</h3>
+        <p id="intro-uheld"></p>
+
+        <div class="knapper">
+            <button class="knap" id="intro-rundvisning" type="button">Rundvisning</button>
+            <button class="knap blaa" id="intro-start" type="button">Til bordet</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<div class="overlay" id="billede">
+    <div class="overlay-boks billede-boks" role="dialog" aria-labelledby="billede-titel">
+        <h2 id="billede-titel">Billedet</h2>
+        <p class="besked" id="billede-tekst"></p>
+        <div class="billede-ramme">
+            <canvas id="billede-laerred" aria-label="Glas 1 til 7 i række, som de så ud, da billedet blev taget"></canvas>
+            <div class="billede-svar" id="billede-svar"></div>
+        </div>
+        <div class="knapper">
+            <span class="taeller" id="billede-taeller"></span>
+            <button class="knap blaa" id="billede-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/6</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="../laboratoriet/js/kerne.js"></script>
+<script src="../laboratoriet/js/farvemodel.js"></script>
+<script src="../laboratoriet/js/lyd.js"></script>
+<script src="../laboratoriet/js/sprites.js"></script>
+<script src="../laboratoriet/js/stof.js"></script>
+<script src="../laboratoriet/js/stoftabel.js"></script>
+<script src="../laboratoriet/js/udstyr.js"></script>
+<script src="../kemichael/kemichael.js"></script>
+<script src="../laboratoriet/js/koer.js"></script>
+<script src="../laboratoriet/js/beholder.js"></script>
+<script src="../laboratoriet/js/tegning.js"></script>
+<script src="../laboratoriet/js/mikro.js"></script>
+<script src="../laboratoriet/js/bord.js"></script>
+<script src="../laboratoriet/js/vilkaar.js"></script>
+<script src="../laboratoriet/js/journal.js"></script>
+<script src="../laboratoriet/js/forloeb.js"></script>
+<script src="js/tekst.js"></script>
+<script src="js/opstilling.js"></script>
+<script src="js/billede.js"></script>
+<script src="js/forloeb.js"></script>
+<script src="../laboratoriet/proevebord/js/laerer.js"></script>
+<script src="../laboratoriet/js/rundvisning.js"></script>
+<script src="../laboratoriet/js/side.js"></script>
+<script src="js/tur.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
