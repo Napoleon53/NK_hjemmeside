@@ -38,9 +38,12 @@ Disse filer er skrevet uden adgang til det nye motorlag i `laboratoriet/`
 `sb2.4_ligevaegt/`. Alt, hvad der står om, hvordan personlaget kobles på
 den nye motor, er derfor forslag og ikke verificeret mod koden.
 
-`kemichael.js` er desuden skrevet til den **gamle** superanimationsmodel:
-den hænger på `NK.Forsoeg.prototype`, `NK.Scene` og `NK.Sprites`, ikke på
-genstandsmodellen. Den skal ikke flyttes som den er. Den skal høstes.
+`kemichael.js` blev først læst som skrevet til den gamle model. Det var for
+hurtigt: `K.paa(prototype)` er generisk, og filen kører allerede på den nye
+motor — prøvebordet og sb2.4 kobler den på `NK.Bord.prototype`, og
+`laboratoriet/proevebord/js/laerer.js` er hans scener på det nye bord. Det,
+der skal skilles ad, er stadig maskineri fra mand; men det er ét bord at
+arbejde på, ikke to.
 
 ## Status
 
