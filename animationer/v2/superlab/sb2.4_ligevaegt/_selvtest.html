@@ -81,7 +81,7 @@ function koerTest() {
     var Sc = NK.Scene;
     paastand("zoomboblen staar paa scenen og ikke i panelet",
         !d.getElementById("boble-laerred") && !!bord.boble && bord.bobleR === 135);
-    paastand("og indholdet i den er en fjerdedel mindre", bord.bobleIndhold === 0.75 && bord.mikro.k === 0.75);
+    paastand("og indholdet i den er en tiendedel mindre", bord.bobleIndhold === 0.9 && bord.mikro.k === 0.9);
     var br = bord.bobleRekt(), daekker = [];
     function overlap(a, b) { return a.x < b.x + b.b && a.x + a.b > b.x && a.y < b.y + b.h && a.y + a.h > b.y; }
     bord.liste.forEach(function (gg) {
@@ -653,6 +653,29 @@ function koerTest() {
         bord.hvad({ x: g(4).p.x, y: rkT.y + rkT.h - 12 }) !== "glas4" && bord.hvad({ x: g(4).p.x, y: rkT.y + rkT.h - 40 }) === "glas4",
         "12 over bunden: " + bord.hvad({ x: g(4).p.x, y: rkT.y + rkT.h - 12 }));
     paastand("og glasset kan stadig tages i den oeverste del", mus.tag("glas4", 0.5, 0.15) && (mus.slip(), true));
+
+    /* Den store zoomboble: et klik paa boblen viser den stor, et klik hvor
+       som helst lukker den uden at tage noget, og Esc lukker den ogsaa */
+    NK.startForfra();
+    adv(0.2);
+    B.haeldI(g(4), B.udtag(bord.g.kolbe, 6), true);
+    bord.vaelg("glas4");
+    mus.hold(1);
+    paastand("zoomboblen vises for glas 4, med en lup paa kanten", bord.bobleVises());
+    mus.klik(bord.boble);
+    mus.hold(0.6);
+    paastand("et klik paa boblen viser den stor midt paa scenen", bord.storBoble && bord.storAlfa > 0.9, tal(bord.storAlfa));
+    try { bord.tegn(); paastand("den store boble tegnes uden fejl", true); }
+    catch (e) { paastand("den store boble tegnes uden fejl", false, e.message); }
+    var tog = mus.tag("kolbe");
+    mus.slip();
+    paastand("et klik hvor som helst lukker den uden at tage noget", !tog && !bord.storBoble && !bord.baerer);
+    mus.klik(bord.boble);
+    mus.hold(0.3);
+    d.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "Escape" }));
+    paastand("og Esc lukker den", !bord.storBoble);
+    mus.hold(0.6);
+    paastand("bagefter kan kolben tages igen", mus.tag("kolbe") && (mus.slip(), true));
     bord.vedBesked = vedB;
     NK.startForfra();
 }

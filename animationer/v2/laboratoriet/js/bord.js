@@ -41,6 +41,9 @@
      bobleR                 zoomboblens radius paa tegnebordet
      bobleIndhold           stoerrelsen af det, der er inde i boblen
                             (kugler og skrift), 1 er standard; se mikro.js
+                            Et klik paa boblen paa scenen viser den stor
+                            midt paa scenen (aabnStorBoble); et klik hvor
+                            som helst eller Esc lukker den (lukStorBoble)
 
    Hooks, som siden saetter:
      vedBesked(tekst, slags)   korte beskeder til scenen
@@ -140,6 +143,8 @@
         this.tid = 0;
         this.holdt = null;
         this.baerer = null;
+        this.storBoble = false;
+        this.storAlfa = 0;
         this.hover = null;
         this.slipMaal = null;
         this.haeldning = null;
@@ -341,6 +346,8 @@
 
     /* Hvad ligger under punktet? Det oeverste foerst. */
     P.hvad = function (pt) {
+        /* Zoomboblen ligger over alt; er den stor, er den alt */
+        if (this.overBoble(pt)) return "boble";
         if (this.overLaerer) {
             var l = this.overLaerer(pt);
             if (l) return l;
@@ -370,6 +377,7 @@
         if (NK.Lyd) NK.Lyd.laasOp();
         var navn = this.hvad(pt);
         if (!navn) return false;
+        if (navn === "boble") { this.klik(navn); return false; }
         var sv = this.svaevende();
         if (sv && sv.navn !== navn && navn !== "laerer" && navn !== "kaffekop") {
             this.besked("Træk først " + sv.titel + " væk.");
@@ -1297,6 +1305,7 @@
        over et glas (klik igen giver en draabe mere). */
     P.klik = function (navn) {
         if (NK.Lyd) NK.Lyd.laasOp();
+        if (navn === "boble") return this.storBoble ? this.lukStorBoble() : this.aabnStorBoble();
         if (navn === "laerer") return this.klikLaerer ? this.klikLaerer() : false;
         if (navn === "kaffekop") return this.klikKop ? this.klikKop() : false;
         if (this.laererOptaget && this.laererOptaget()) return false;
@@ -1888,6 +1897,10 @@
             this.mikro.opdater(dt, Stof.partikelTal(B.samlet(v), this.valg.partikler || 6), { ryst: this.omgivelser(v).ryst });
         } else this.mikro.opdater(dt, {}, { ryst: 0 });
         this.bobleAlfa = NK.mod(this.bobleAlfa, vis ? 1 : 0, 5, dt);
+        /* Forsvinder boblen, lukker den store visning med den */
+        if (!vis && this.storBoble) this.lukStorBoble();
+        this.storAlfa = NK.mod(this.storAlfa, this.storBoble ? 1 : 0, 7, dt);
+        if (!this.storBoble && this.storAlfa < 0.003) this.storAlfa = 0;
     };
 
     /* Bordet, mens man er i et andet rum: pladerne, kemien og termometrene
@@ -2066,16 +2079,126 @@
 
     /* Zoomboblen paa scenen: en del af laboratoriet, der skalerer med det.
        En stiplet streg viser, hvilket glas den kigger ind i, og glassets
-       navn staar under den. */
+       navn staar under den. En lille lup paa kanten viser, at den kan
+       klikkes stor. Den store visning vokser ud af hjoernet (storAlfa) og
+       tegnes over alt andet paa en moerk flade; indholdet skaleres, saa
+       kugler og skrift bliver lige saa skarpe, bare stoerre. */
     P.tegnBobleIScenen = function (ctx, tid) {
         var vb = this.bobleBeholder, bo = this.boble, R = this.bobleR;
         var fo = B.farve(vb) || Stof.VAND;
-        (vb.mikro || this.mikro).tegn(ctx, bo.x, bo.y, this.bobleAlfa, tid, this.synlig(vb) ? B.aabning(vb) : null, { r: fo.r * 0.35, g: fo.g * 0.35, b: fo.b * 0.35 });
+        var mik = vb.mikro || this.mikro;
+        var farve = { r: fo.r * 0.35, g: fo.g * 0.35, b: fo.b * 0.35 };
+        var titel = vb.titel.charAt(0).toUpperCase() + vb.titel.slice(1);
+        var e = NK.blod(this.storAlfa);
+        if (e < 0.005) {
+            mik.tegn(ctx, bo.x, bo.y, this.bobleAlfa, tid, this.synlig(vb) ? B.aabning(vb) : null, farve);
+            ctx.save();
+            ctx.globalAlpha = this.bobleAlfa;
+            NK.tekst(ctx, titel, bo.x, bo.y + R + 14,
+                { font: "700 14px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#f2c53d", kant: true, kantBredde: 3, kantFarve: "rgba(0,0,0,0.6)" });
+            tegnLup(ctx, bo.x + R * 0.66, bo.y + R * 0.66, this.hover === "boble");
+            ctx.restore();
+            return;
+        }
+        var st = this.storBobleMaal();
+        var x = bo.x + (st.x - bo.x) * e, y = bo.y + (st.y - bo.y) * e, r = R + (st.r - R) * e;
         ctx.save();
-        ctx.globalAlpha = this.bobleAlfa;
-        NK.tekst(ctx, vb.titel.charAt(0).toUpperCase() + vb.titel.slice(1), bo.x, bo.y + R + 14,
-            { font: "700 14px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#f2c53d", kant: true, kantBredde: 3, kantFarve: "rgba(0,0,0,0.6)" });
+        ctx.globalAlpha = 0.62 * e;
+        ctx.fillStyle = "#07090d";
+        ctx.fillRect(-5000, -5000, 10000, 10000);
         ctx.restore();
+        ctx.save();
+        ctx.globalAlpha = this.bobleAlfa * e;
+        ctx.fillStyle = "#101318";
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(r / R, r / R);
+        mik.tegn(ctx, 0, 0, this.bobleAlfa, tid, null, farve);
+        ctx.restore();
+        ctx.save();
+        ctx.globalAlpha = this.bobleAlfa * e;
+        NK.tekst(ctx, titel, x, y + r + 22,
+            { font: "700 18px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#f2c53d", kant: true, kantBredde: 3, kantFarve: "rgba(0,0,0,0.6)" });
+        tegnLuk(ctx, x + r * 0.74, y - r * 0.74);
+        ctx.restore();
+    };
+
+    /* Luppen paa den lille boble og krydset paa den store */
+    function tegnLup(ctx, x, y, hover) {
+        ctx.fillStyle = hover ? "rgba(242, 197, 61, 0.95)" : "rgba(20, 24, 31, 0.85)";
+        ctx.strokeStyle = hover ? "#14181e" : "rgba(255, 255, 255, 0.85)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(x, y, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(x - 1.5, y - 1.5, 5, 0, Math.PI * 2);
+        ctx.moveTo(x + 2, y + 2);
+        ctx.lineTo(x + 6.5, y + 6.5);
+        ctx.stroke();
+    }
+
+    function tegnLuk(ctx, x, y) {
+        ctx.fillStyle = "rgba(20, 24, 31, 0.9)";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.85)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(x, y, 15, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.moveTo(x - 5, y - 5); ctx.lineTo(x + 5, y + 5);
+        ctx.moveTo(x + 5, y - 5); ctx.lineTo(x - 5, y + 5);
+        ctx.stroke();
+    }
+
+    /* ----- Den store zoomboble ---------------------------------------------
+       Som luppen i den gamle sc6.8: et klik paa boblen i hjoernet viser den
+       stor midt paa scenen, over alt andet, og imens kan intet andet
+       roeres. Et klik hvor som helst lukker den, og siden lukker den med
+       Esc. Den viser stadig det valgte glas og lever videre. */
+    /* Midt i den synlige del af laerredet (i scenens koordinater), med
+       plads under sig til navnet og beskeden */
+    P.storBobleMaal = function () {
+        var S = NK.Scene, x0 = 0, y0 = 0, b = S.BREDDE, h = S.HOEJDE;
+        if (this.laerred && this.laerred.b) {
+            var sk = S.skala(this.laerred.b, this.laerred.h);
+            x0 = -sk.dx / sk.s; y0 = -sk.dy / sk.s;
+            b = this.laerred.b / sk.s; h = this.laerred.h / sk.s;
+        }
+        return { x: x0 + b / 2, y: y0 + h * 0.45, r: Math.max(this.bobleR, Math.min(b * 0.36, h * 0.38)) };
+    };
+
+    P.bobleVises = function () {
+        return !!(this.boble && this.bobleBeholder && this.bobleAlfa > 0.5);
+    };
+
+    P.overBoble = function (pt) {
+        if (this.storBoble) return true;
+        if (!this.bobleVises() || !pt) return false;
+        return Math.hypot(pt.x - this.boble.x, pt.y - this.boble.y) < this.bobleR + 4;
+    };
+
+    P.aabnStorBoble = function () {
+        if (this.storBoble || !this.bobleVises() || this.baerer) return false;
+        this.storBoble = true;
+        this.besked("Klik hvor som helst, eller tryk Esc, for at lukke den store visning.");
+        this.aendret("boble");
+        return true;
+    };
+
+    P.lukStorBoble = function () {
+        if (!this.storBoble) return false;
+        this.storBoble = false;
+        this.aendret("boble");
+        return true;
     };
 
     /* Den plads, zoomboblen og dens navn optager paa tegnebordet:

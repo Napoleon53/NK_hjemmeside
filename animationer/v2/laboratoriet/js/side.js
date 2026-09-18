@@ -449,7 +449,13 @@
     P.tastNed = function (e) {
         if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
         if (e.ctrlKey || e.metaKey || e.altKey) return;
-        if (e.key === "Escape") { this.lukOverlay(); NK.Rundvisning.luk(); return; }
+        if (e.key === "Escape") {
+            var b = this.bord();
+            if (b && b.lukStorBoble) b.lukStorBoble();
+            this.lukOverlay();
+            NK.Rundvisning.luk();
+            return;
+        }
         if (e.key === "?" || e.key === "h" || e.key === "H") {
             if (NK.Rundvisning.aktiv()) NK.Rundvisning.luk();
             else { this.lukOverlay(); NK.Rundvisning.start(); }

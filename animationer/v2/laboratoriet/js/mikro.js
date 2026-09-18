@@ -56,6 +56,35 @@
         return NK.klamp(11 + l * 1.9, 14, 22) * k;
     }
 
+    /* Formlen paa en kugle: fed skrift uden kant, inde i kuglen. Moerk
+       skrift paa lyse kugler og hvid paa moerke, som i sc6.8 - en sort kant
+       om smaa bogstaver goer dem grynede. basis er skriftens stoerrelse;
+       er formlen for bred, goeres skriften hoejst ned til mindst, og saa
+       stoerre kuglen i stedet (rad i svaret), saa en lang formel som SO4 2-
+       stadig kan laeses. */
+    function lysstyrke(f) { return 0.299 * f.r + 0.587 * f.g + 0.114 * f.b; }
+
+    function etiketStil(ctx, tekst, rad, farve, basis, mindst) {
+        var str = basis;
+        ctx.font = "700 " + str.toFixed(2) + "px 'Segoe UI', sans-serif";
+        var b = ctx.measureText(tekst).width, maks = rad * 1.8;
+        if (b > maks) {
+            str = Math.max(mindst, str * maks / b);
+            rad = Math.max(rad, b * str / basis / 1.8);
+        }
+        /* Farven midt paa kuglen: mellem den lyse top og den moerke kant */
+        var midt = { r: farve.r * 0.82 + 36, g: farve.g * 0.82 + 36, b: farve.b * 0.82 + 36 };
+        return { font: "700 " + str.toFixed(2) + "px 'Segoe UI', sans-serif", farve: lysstyrke(midt) > 150 ? "#14181e" : "#ffffff", rad: rad };
+    }
+
+    function tegnEtiket(ctx, tekst, x, y, stil) {
+        ctx.font = stil.font;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = stil.farve;
+        ctx.fillText(tekst, x, y + 0.5);
+    }
+
     function farveAf(navn) {
         var s = Stof.STOFFER[navn];
         if (s && s.farve) return s.farve;
@@ -208,8 +237,8 @@
                     NK.css({ r: fa.r * 0.55, g: fa.g * 0.55, b: fa.b * 0.55 }));
                 var st = Stof.STOFFER[navn];
                 var tekst = st && st.kort ? st.kort : Stof.formel(navn);
-                var str = tekst.length > 5 ? rad * 0.5 : (tekst.length > 3 ? rad * 0.62 : rad * 0.78);
-                NK.tekst(ctx, tekst, x, y + 0.5, { font: "800 " + str.toFixed(1) + "px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#ffffff", kant: true, kantBredde: 3 * k, kantFarve: "rgba(0,0,0,0.55)" });
+                var basis = tekst.length > 5 ? rad * 0.5 : (tekst.length > 3 ? rad * 0.62 : rad * 0.78);
+                tegnEtiket(ctx, tekst, x, y, etiketStil(ctx, tekst, rad, fa, basis, rad * 0.4));
             }
         }
     };
@@ -280,18 +309,22 @@
         for (i = 0; i < this.partikler.length; i++) {
             var p = this.partikler[i];
             ctx.globalAlpha = alfa * p.alfa;
+            if (!p.etiket) {
+                var basis = (p.tekst.length > 5 ? 11 : (p.tekst.length > 3 ? 13 : 15)) * k;
+                p.etiket = etiketStil(ctx, p.tekst, p.rad, p.farve, basis, basis * 0.8);
+                p.rad = p.etiket.rad;
+            }
             var lys = { r: Math.min(255, p.farve.r + 60), g: Math.min(255, p.farve.g + 60), b: Math.min(255, p.farve.b + 60) };
             var moerk = { r: p.farve.r * 0.55, g: p.farve.g * 0.55, b: p.farve.b * 0.55 };
             NK.kugle(ctx, p.x, p.y, p.rad, NK.css(lys), NK.css(moerk));
-            if (p.fast) {
-                ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.rad, 0, Math.PI * 2);
-                ctx.stroke();
-            }
-            var str = (p.tekst.length > 5 ? 11 : (p.tekst.length > 3 ? 13 : 15)) * k;
-            NK.tekst(ctx, p.tekst, p.x, p.y + 0.5, { font: "800 " + str.toFixed(1) + "px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#ffffff", kant: true, kantBredde: 3 * k, kantFarve: "rgba(0,0,0,0.55)" });
+            /* En tynd kant giver kuglen et skarpt omrids mod baggrunden;
+               fast stof har en lys kant */
+            ctx.strokeStyle = p.fast ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.45)";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.rad - 0.5, 0, Math.PI * 2);
+            ctx.stroke();
+            tegnEtiket(ctx, p.tekst, p.x, p.y, p.etiket);
         }
 
         /* Legende for de forkortede navne, nederst i boblen */

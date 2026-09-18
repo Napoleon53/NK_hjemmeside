@@ -103,8 +103,9 @@
        stille ting foran stativet. Tegnebordet staar forneden i laerredet
        (lodret: "bund"), og zoomboblen staar i laboratoriets oeverste
        venstre hjoerne med radius 135. Kuglerne og skriften inde i den er
-       en fjerdedel mindre end standard (bobleIndhold), saa der er luft
-       mellem dem. Den foerste hylde er kaffens (lavKaffekop). */
+       en tiendedel mindre end standard (bobleIndhold), saa der er luft
+       mellem dem, og skriften stadig kan laeses ved 1366 x 768. Et klik
+       paa boblen viser den stor. Den foerste hylde er kaffens (lavKaffekop). */
     NK.BORD_VALG = {
         bredde: 1040, hoejde: 650, bord: 500, bordDybde: 64, lodret: "bund",
         hylder: [
@@ -113,6 +114,6 @@
             { x0: 715, x1: 1025, y: HYLDE_HOEJRE }
         ],
         plakat: { x: 880, y: 70 },
-        boble: BOBLE, bobleR: 135, bobleIndhold: 0.75, partikler: 6
+        boble: BOBLE, bobleR: 135, bobleIndhold: 0.9, partikler: 6
     };
 }());
