@@ -4,7 +4,7 @@
    Hele skallen (tegneloekke, panel, zoomboble, lyd, intro, rundvisning,
    tastatur, logbog, forloebskort, Start forfra) ligger i
    ../../laboratoriet/js/side.js. Her staar kun det, der er saerligt for
-   dette forsoeg: billedet af de syv glas.
+   dette forsoeg: billedet af de syv glas og kravet, der aabner quizzen.
    ===================================================================== */
 (function () {
     "use strict";
@@ -18,6 +18,11 @@
         tekster: NK.TEKST,
         tomTekst: NK.TEKST["glas-tom-start"],
         forloeb: NK.FORLOEB,
+
+        /* Quizzen (../../laboratoriet/js/quiz.js) laases op, naar eleven har
+           taget billedet og noteret alle syv glas. Spoergsmaalene staar i
+           js/tekst.js under "quiz". */
+        quiz: { krav: { journal: "billede", faerdig: true } },
 
         tast: function (e) {
             if (e.key === "s" || e.key === "S") { this.tagBillede(); return true; }

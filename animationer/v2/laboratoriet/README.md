@@ -82,6 +82,8 @@ js/forloeb.js        trin, udløsere og flag: betingelse → konsekvens, fyrer
                      én gang. Samme lag bærer en øvelses trin og en låst dør
 js/journal.js        elevens egne iagttagelser og målinger: posterne, svarene,
                      øjebliksbilledet og bedømmelsen mod sandheden
+js/quiz.js           quizzen som fælles ramme: spørgsmålene er data i forsøgets
+                     tekst.js, og et vilkår åbner den
 js/taleboble.js      taleboblen som eget lag: får munden og hovedet, finder selv
                      sin plads inden for scenen og uden om det, replikken handler
                      om, og holder skriften læsbar uanset zoom
@@ -260,6 +262,49 @@ standard scenens bund) — bag bordet ved bagkanten. Før fortsatte kitlen
 1500 enheder ned, og i et højt lærred blev det til meget lange ben.
 `kemichael.js` uden et gulv i scenen — de gamle animationer — tegner som før.
 Prøvebordets selvtest afsnit 13 og sb2.4's afsnit 18 prøver begge dele.
+
+## Quizzen
+
+`js/quiz.js` (`NK.Quiz`). Alle otte gamle forsøg havde deres egen quiz, og de
+var 70 % ens: ti spørgsmål med fire svar, blandet hver gang, ét forsøg pr.
+spørgsmål, og en begrundelse bagefter — **også når svaret er rigtigt**, for
+det er dér, der bliver lært noget. Maskineriet står nu ét sted.
+
+Forsøget leverer to ting. Spørgsmålene står i dets `js/tekst.js` under nøglen
+`quiz`, så al prosa stadig kan læses ét sted, og de er rene data:
+
+```js
+"quiz": {
+    laast: "Låses op, når der er taget billede af glas 1 til 7.",
+    klar:  "Billedet af glassene er taget.",
+    spoergsmaal: [
+        { sp: "…", valg: ["…", "…", "…", "…"], rigtig: 0, forklaring: "…" }
+    ]
+}
+```
+
+Et svar er enten en streng eller `{ tekst, farve }`; med farve vises en lille
+farveprøve foran teksten, og `farve: null` betyder farveløs og vises ternet
+(to af de gamle spørger om farver). `rigtig` er nummeret **før** blandingen.
+Rammen regner ikke med, at der altid er fire svar.
+
+Den anden ting er kravet, der åbner quizzen — et helt almindeligt vilkår
+(`vilkaar.js`) i sidens valg:
+
+```js
+NK.Side.start({ … quiz: { krav: { journal: "billede", faerdig: true } } })
+```
+
+Kravet prøves, hver gang panelet opdateres, så quizzen åbner af sig selv i
+samme øjeblik, eleven har gjort det, der skulle til — ikke fordi et eller
+andet sted i forsøget husker at kalde `laasOp()`. Et vilkår må også være en
+funktion, så den gamle sc1.3's »alle syv blandinger er prøvet« passer ind.
+Uden krav er quizzen åben fra begyndelsen.
+
+`side.js` bygger quizzen, hvis siden har kortet `#quiz-kort` og forsøget har
+spørgsmål; en side uden kortet mister ingenting. Stilen (`.valg`,
+`.valgknap`, `.farveprove`, `.quiz-score`) stod allerede i `css/grund.css`.
+sb2.4's selvtest afsnit 19 prøver både rammen og forsøgets egne spørgsmål.
 
 ## Taleboblen
 

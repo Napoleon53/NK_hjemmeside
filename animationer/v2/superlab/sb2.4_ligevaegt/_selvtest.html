@@ -997,6 +997,88 @@ function koerTest() {
     paastand("start forfra sender ham ud og saetter planet tilbage",
         L.x <= NK.Kemichael.UDE + 1 && L.plan === 1 && !L.scene, tal(L.x, 0) + ", plan " + L.plan);
 
+    overskrift("19. Quizzen: rammen og forsoegets egne spoergsmaal");
+    /* S9/S10: maskineriet staar i ../../laboratoriet/js/quiz.js, og
+       spoergsmaalene staar i forsoegets js/tekst.js under "quiz". Quizzen
+       laases op af et vilkaar (journalen faerdig), ikke af et kald. */
+    NK.startForfra();
+    adv(1);
+    var Qz = NK.quiz;
+    paastand("quiz.js er indlaest, og siden har bygget quizzen", !!NK.Quiz && !!Qz);
+    paastand("spoergsmaalene kommer fra forsoegets tekst.js",
+        !!Qz && Qz.spoergsmaal === NK.TEKST.quiz.spoergsmaal && Qz.antal() === 9, Qz && Qz.antal() + " spoergsmaal");
+    paastand("hvert spoergsmaal har fire svar og et rigtigt",
+        Qz.spoergsmaal.every(function (x) { return x.valg.length === 4 && x.rigtig >= 0 && x.rigtig < 4 && !!x.forklaring; }));
+    paastand("rammen har ingen af forsoegets ord i sig",
+        JSON.stringify(NK.Quiz.ORD).indexOf("FeSCN") < 0 && JSON.stringify(NK.Quiz.ORD).indexOf("glas") < 0);
+    paastand("den er laast fra begyndelsen med forsoegets egen tekst",
+        Qz.tilstand === "laast" && d.getElementById("quiz-tekst").textContent === NK.TEKST.quiz.laast,
+        Qz.tilstand);
+    paastand("og knappen er skjult, saa laangen ikke kan klikkes op",
+        d.getElementById("quiz-knap").hidden && (Qz.knap(), Qz.tilstand === "laast"));
+
+    /* Laasen er et vilkaar: journalen skal vaere faerdig */
+    var Jq = NK.Journal.find("billede");
+    var g = function (n) { return bord.g["glas" + n]; };
+    for (var qq = 1; qq <= 7; qq++) B.haeldI(g(qq), B.udtag(bord.g.kolbe, 3), true);
+    adv(2);
+    NK.BILLEDE.aabn(bord, function () {});
+    NK.BILLEDE.luk();
+    ["glas1", "glas2", "glas3", "glas4", "glas5"].forEach(function (id) { Jq.noter(id, "ens", bord); });
+    side.opdaterPanel();
+    paastand("den er stadig laast, naar ét glas mangler at blive noteret",
+        Qz.tilstand === "laast" && !Jq.faerdig(), Jq.antal() + " af 6 noteret");
+    Jq.noter("glas6", "ens", bord);
+    side.opdaterPanel();
+    paastand("og den aabner af sig selv, naar alle seks er noteret",
+        Qz.tilstand === "klar" && d.getElementById("quiz-tekst").textContent === NK.TEKST.quiz.klar, Qz.tilstand);
+    paastand("knappen banker, saa man kan se, at der er noget nyt",
+        d.getElementById("quiz-knap").className.indexOf("banker") >= 0);
+
+    /* Et spoergsmaal ad gangen, ét forsoeg, forklaring begge veje */
+    Qz.knap();
+    paastand("foerste spoergsmaal kommer med fire knapper", Qz.tilstand === "sp" &&
+        d.getElementById("quiz-valg").querySelectorAll(".valgknap").length === 4 &&
+        d.getElementById("quiz-taeller").textContent === "1/9",
+        d.getElementById("quiz-taeller").textContent);
+    paastand("og knappen videre er skjult, til der er svaret", d.getElementById("quiz-knap").hidden);
+    var forkert = (Qz.aktuel.rigtig + 1) % 4;
+    paastand("et forkert svar giver forklaringen, ikke bare et kryds", Qz.svar(forkert) === false &&
+        d.getElementById("quiz-forklaring").className.indexOf("skidt") >= 0 &&
+        d.getElementById("quiz-forklaring").textContent.indexOf("Forkert.") === 0 &&
+        d.getElementById("quiz-forklaring").textContent.length > 40);
+    paastand("det rigtige svar bliver vist alligevel",
+        d.getElementById("quiz-valg").querySelectorAll(".valgknap.rigtig").length === 1 &&
+        d.getElementById("quiz-valg").querySelectorAll(".valgknap.forkert").length === 1);
+    paastand("der er kun ét forsoeg pr. spoergsmaal", Qz.svar(Qz.aktuel.rigtig) === false && Qz.rigtige === 0);
+    Qz.knap();
+    paastand("naeste spoergsmaal kommer", Qz.tilstand === "sp" && Qz.nr === 1 &&
+        d.getElementById("quiz-taeller").textContent === "2/9");
+    paastand("et rigtigt svar faar ogsaa sin forklaring", Qz.svarRigtigt() === true &&
+        d.getElementById("quiz-forklaring").className.indexOf("god") >= 0 &&
+        d.getElementById("quiz-forklaring").textContent.indexOf("Rigtigt.") === 0);
+
+    /* Resten rigtigt, og resultatet */
+    for (var q12 = 0; q12 < 20 && Qz.tilstand === "sp"; q12++) { Qz.knap(); if (Qz.tilstand === "sp") Qz.svarRigtigt(); }
+    paastand("efter det sidste spoergsmaal kommer resultatet", Qz.tilstand === "slut" &&
+        d.getElementById("quiz-score").textContent === "8 / 9", d.getElementById("quiz-score").textContent);
+    paastand("og man kan tage den igen", (Qz.knap(), Qz.tilstand === "sp" && Qz.nr === 0 && Qz.rigtige === 0));
+
+    /* Svarene blandes, og rammen regner ikke med fire */
+    var sp0 = Qz.spoergsmaal[0], ordener = {};
+    for (var q13 = 0; q13 < 30; q13++) ordener[Qz.bland(sp0).valg.join("|")] = 1;
+    paastand("svarene blandes fra gang til gang", Object.keys(ordener).length > 1,
+        Object.keys(ordener).length + " forskellige raekkefoelger paa 30");
+    var tre = Qz.bland({ sp: "x", valg: ["a", "b", "c"], rigtig: 2, forklaring: "y" });
+    paastand("og rammen regner ikke med, at der altid er fire svar",
+        tre.valg.length === 3 && tre.valg[tre.rigtig] === "c");
+
+    NK.startForfra();
+    adv(1);
+    paastand("Start forfra laaser quizzen igen og nulstiller den",
+        Qz.tilstand === "laast" && Qz.nr === 0 && Qz.rigtige === 0 &&
+        d.getElementById("quiz-valg").innerHTML === "", Qz.tilstand);
+
 }
 
 function vis() {

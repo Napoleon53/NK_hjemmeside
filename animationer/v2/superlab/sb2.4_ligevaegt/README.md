@@ -15,11 +15,12 @@ Bordet står, kemien opfører sig rigtigt, badene virker, forløbets ni trin
 kører med tekst, hint og en liste i panelet, og billedet af glas 1 til 7
 lader eleven notere sine iagttagelser. Kemichael siger selv forløbets
 bemærkninger og et par tørre ord, når et trin er gjort. Del 2 om
-fortynding, quizzen og tegneserien mangler. `_selvtest.html` kører det hele
-igennem i atten afsnit (plus 3b om boblen og tabellen); afsnit 17 gør
-det med musen, som en elev (`laboratoriet/js/proeve.js`), og afsnit 18
+fortynding og tegneserien mangler; quizzen er der med ni af de ti
+spørgsmål (det tiende handler om fortynding og hører til del 2). `_selvtest.html` kører det hele
+igennem i nitten afsnit (plus 3b om boblen og tabellen); afsnit 17 gør
+det med musen, som en elev (`laboratoriet/js/proeve.js`), afsnit 18
 prøver, at Kemichael kommer ind bag bordet, standser hvor der er plads, og
-går ud igen.
+går ud igen, og afsnit 19 prøver quizzen.
 `laboratoriet/_vinduer.html` viser forsøget i to vinduesstørrelser ved
 siden af hinanden.
 
@@ -160,6 +161,20 @@ fri af både det glas, replikken handler om, og zoomboblens hjørne.
 Al tale står i `js/tekst.js` som korte linjer i hans tone: sarkasmen rammer
 handlingen, aldrig eleven, og han forklarer ikke teori. Er der ingen lærer
 på siden, vises linjerne som en besked, så intet går tabt.
+
+## Quizzen
+
+Rammen står i `../../laboratoriet/js/quiz.js`; her ligger kun spørgsmålene,
+i `js/tekst.js` under `quiz`, sammen med al anden prosa. Ni spørgsmål om
+del 1 — farven, de fire indgreb, forundersøgelsen i glas 8, varme og kulde
+og hvorfor der tilsættes fast stof. Det tiende, som den gamle udgave har,
+handler om fortynding set ovenfra og kommer med del 2 (S2).
+
+Quizzen låses op af et vilkår i `js/app.js`:
+`quiz: { krav: { journal: "billede", faerdig: true } }` — altså når billedet
+er taget og alle seks glas er noteret. Kravet prøves ved hver opdatering af
+panelet, så kortet åbner af sig selv i samme øjeblik, det sidste glas er
+noteret, og knappen banker.
 
 ## Badene
 

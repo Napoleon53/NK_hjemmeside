@@ -96,6 +96,8 @@
 
     /* ----- Aflaesningen af det valgte glas --------------------------------- */
     P.opdaterPanel = function () {
+        /* Quizzen aabner af sig selv, naar dens krav er opfyldt */
+        if (this.quiz) this.quiz.opdaterLaas();
         var b = this.bord();
         var c = b.valgtBeholder();
         var tabel = NK.el("glas-indhold");
@@ -293,6 +295,7 @@
             this.etBord.nulstil();
         }
         if (this.forloeb) this.forloeb.nulstil();
+        if (this.quiz) this.quiz.nulstil();
         if (this.visRum) this.visRum();
         this.opdaterForloeb();
         this.opdaterPanel();
@@ -628,6 +631,17 @@
                 if (forrigeFaerdig) forrigeFaerdig.call(mig, F2);
             };
             this.forloeb = NK.Forloeb.saet(f);
+        }
+
+        /* Quizzen, hvis siden har kortet og forsoeget har spoergsmaal
+           (laboratoriet/js/quiz.js). Spoergsmaalene staar i forsoegets
+           tekst.js under "quiz"; kravet for at laase op i sidens valg. */
+        if (NK.el("quiz-kort") && NK.Quiz) {
+            var qIndhold = (valg.tekster && valg.tekster.quiz) || valg.quizIndhold;
+            if (qIndhold && qIndhold.spoergsmaal && qIndhold.spoergsmaal.length) {
+                this.quiz = NK.Quiz.lav({ indhold: qIndhold, krav: valg.quiz && valg.quiz.krav }, this);
+                NK.quiz = this.quiz;
+            }
         }
 
         if (NK.el("boble-laerred")) this.bobleL = new NK.Laerred(NK.el("boble-laerred"));

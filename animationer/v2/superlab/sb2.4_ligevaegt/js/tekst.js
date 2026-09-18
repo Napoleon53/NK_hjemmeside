@@ -128,12 +128,112 @@
         "sig-to-indgreb": ["To indgreb i det samme glas.", "Så ved man ikke, hvad der virkede."],
         "sig-kig-igen": ["Et af glassene er noteret anderledes, end det ser ud.", "Kig en gang til. Jeg har tid."],
 
+        /* ----- Quizzen ---------------------------------------------------
+           Rammen staar i ../../laboratoriet/js/quiz.js; her staar kun
+           spoergsmaalene. Fire svar hver, blandet ved hvert forsoeg, saa
+           »rigtig« er nummeret her i listen og ikke paa skaermen.
+           Forklaringen vises ogsaa ved rigtigt svar - det er dér, der
+           bliver lært noget. Det tiende spoergsmaal, den gamle udgave har,
+           handler om fortynding set ovenfra og hoerer til del 2; det
+           kommer med S2. */
+        "quiz": {
+            laast: "Låses op, når der er taget billede af glas 1 til 7.",
+            klar: "Billedet af glassene er taget.",
+            spoergsmaal: [
+                {
+                    sp: "Hvilket stof giver stamopløsningen den rødbrune farve?",
+                    valg: ["FeSCN²⁺", "Fe³⁺", "SCN⁻", "NO₃⁻"],
+                    rigtig: 0,
+                    forklaring: "Komplekset FeSCN²⁺ er rødt. Fe³⁺ er svagt gult, og SCN⁻ og NO₃⁻ er farveløse. Jo mere FeSCN²⁺, jo mørkere farve."
+                },
+                {
+                    sp: "I glas 1 tilsættes fast Fe(NO₃)₃. Hvad sker der?",
+                    valg: [
+                        "Ligevægten forskydes mod højre, og farven bliver mørkere",
+                        "Ligevægten forskydes mod venstre, og farven bliver lysere",
+                        "Ligevægten ændrer sig ikke, men farven bliver gul",
+                        "K bliver større, og farven bliver mørkere"
+                    ],
+                    rigtig: 0,
+                    forklaring: "Mere Fe³⁺ gør Y mindre end K. Ligevægten forskydes mod højre, indtil Y igen er lig med K, og der dannes mere FeSCN²⁺. K er uændret."
+                },
+                {
+                    sp: "Hvorfor bliver glas 2 lysere, når der tilsættes ascorbinsyre?",
+                    valg: [
+                        "Ascorbinsyre reducerer Fe³⁺ til Fe²⁺, så ligevægten forskydes mod venstre",
+                        "Ascorbinsyre fortynder opløsningen",
+                        "Ascorbinsyre fælder SCN⁻ som et bundfald",
+                        "Ascorbinsyre gør opløsningen varmere"
+                    ],
+                    rigtig: 0,
+                    forklaring: "2 Fe³⁺ + C₆H₈O₆ → 2 Fe²⁺ + C₆H₆O₆ + 2 H⁺. Fe²⁺ indgår ikke i ligevægten. Når c(Fe³⁺) falder, forskydes ligevægten mod venstre, og FeSCN²⁺ bliver brugt op."
+                },
+                {
+                    sp: "I glas 3 er der tilsat KSCN, og en ny ligevægt har indstillet sig. Hvad er der sket med koncentrationen af frie Fe³⁺-ioner?",
+                    valg: ["Den er faldet", "Den er steget", "Den er uændret", "Den er blevet nul"],
+                    rigtig: 0,
+                    forklaring: "Mere SCN⁻ forskyder ligevægten mod højre. Noget af det frie Fe³⁺ bindes i FeSCN²⁺, så c(Fe³⁺) falder."
+                },
+                {
+                    sp: "Hvad viser forundersøgelsen med KSCN og AgNO₃ i glas 8?",
+                    valg: [
+                        "At Ag⁺ og SCN⁻ danner et hvidt bundfald",
+                        "At Ag⁺ og Fe³⁺ danner et bundfald",
+                        "At KSCN-opløsning er rød",
+                        "At AgNO₃ gør opløsningen varm"
+                    ],
+                    rigtig: 0,
+                    forklaring: "I glas 8 er der ingen jernioner. Det hvide bundfald må derfor være AgSCN: Ag⁺ + SCN⁻ → AgSCN(s). Så ved man, hvad Ag⁺ gør ved SCN⁻ i glas 4."
+                },
+                {
+                    sp: "Hvorfor bliver glas 4 lysere, når der dryppes AgNO₃ i?",
+                    valg: [
+                        "Ag⁺ fjerner SCN⁻, og ligevægten forskydes mod venstre",
+                        "Ag⁺ reagerer med Fe³⁺, så der dannes mere FeSCN²⁺",
+                        "Bundfaldet dækker for farven",
+                        "AgNO₃ fortynder opløsningen"
+                    ],
+                    rigtig: 0,
+                    forklaring: "Når SCN⁻ fældes, falder c(SCN⁻), og Y bliver større end K. Ligevægten forskydes mod venstre, og FeSCN²⁺ bliver brugt op."
+                },
+                {
+                    sp: "Glas 5 i det varme vandbad bliver lysere. Hvad viser det om reaktionen Fe³⁺ + SCN⁻ → FeSCN²⁺?",
+                    valg: [
+                        "Den er exoterm",
+                        "Den er endoterm",
+                        "Den går hurtigere, men ligevægten er den samme",
+                        "Den stopper ved høj temperatur"
+                    ],
+                    rigtig: 0,
+                    forklaring: "Ved opvarmning forskydes en ligevægt i den endoterme retning. Farven bliver lysere, så ligevægten forskydes mod venstre. Reaktionen mod højre er derfor exoterm."
+                },
+                {
+                    sp: "Hvad sker der med K, når glas 6 står i isbadet?",
+                    valg: ["K bliver større", "K bliver mindre", "K er uændret", "K bliver nul"],
+                    rigtig: 0,
+                    forklaring: "K afhænger kun af temperaturen. Reaktionen mod højre er exoterm, så K bliver større, når temperaturen falder. Y er nu mindre end K, og ligevægten forskydes mod højre."
+                },
+                {
+                    sp: "Hvorfor tilsættes Fe(NO₃)₃ og KSCN som fast stof i glas 1 og 3?",
+                    valg: [
+                        "En opløsning ville også fortynde glasset, så der ikke er variabelkontrol",
+                        "Fast stof reagerer hurtigere end opløste ioner",
+                        "Fast stof giver altid en mørkere farve",
+                        "En opløsning ville fælde jernet"
+                    ],
+                    rigtig: 0,
+                    forklaring: "Med fast stof ændres kun koncentrationen af det tilsatte stof. En opløsning ville samtidig fortynde, og fortynding er selv et indgreb, der forskyder ligevægten."
+                }
+            ]
+        },
+
         /* ----- Rundvisningen --------------------------------------------- */
         "rundvisning": [
             { sel: "#scene", titel: "Bordet", tekst: "Klik viser, træk gør. Tag fat i kolben, og slip den over et glas for at hælde. Bordpladen er dyb, så du kan stille ting foran stativet." },
             { sel: "#glas-kort", titel: "Det valgte glas", tekst: "Klik på et glas, og se rumfang og temperatur her. Indholdet i tal folder du ud, og partiklerne ses i zoomboblen i laboratoriets venstre hjørne. Klik på boblen for at se den stor." },
             { sel: "#top-ligning", titel: "Ligevægten", tekst: "Reaktionen, det hele handler om. Teorien bag hvert indgreb ligger under knappen Teori ved siden af — det gør tasten T også." },
             { sel: "#noterknap", titel: "Noter", tekst: "Fold noterne ud og skriv dine iagttagelser. »Notér det valgte glas« skriver aflæsningen ind for dig. Tasten N folder dem ud og ind." },
+            { sel: "#quiz-kort", titel: "Quizzen", tekst: "Ni spørgsmål om det, du lige har set. Den låses op, når billedet er taget, og svarene blandes hver gang. Begrundelsen kommer, også når du svarer rigtigt." },
             { sel: "#uheld-kort", titel: "Uheld", tekst: "Det, der kan gå galt, går galt. Kemichael kommer og tørrer op." },
             { sel: "#forfraknap", titel: "Start forfra", tekst: "Rydder bordet og stiller alt tilbage." }
         ]
