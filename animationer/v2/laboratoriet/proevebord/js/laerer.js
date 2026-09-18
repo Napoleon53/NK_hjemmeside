@@ -41,7 +41,12 @@
     var UDE = K.UDE;
     var HAENGER = K.HAENGER;
 
-    K.paa(P, { kaffeX: 170, fredet: ["spild"] });
+    /* Kaffen staar paa den foerste hylde (lavKaffekop i bord.js), saa han
+       gaar derhen, hvor hylden er, og ikke til et fast sted */
+    K.paa(P, {
+        kaffeX: function () { var H = NK.Scene.HYLDE; return H ? H.x0 + 154 : 170; },
+        fredet: ["spild"]
+    });
 
     P.laererNytEkstra = function () {
         this.laererVent = [];

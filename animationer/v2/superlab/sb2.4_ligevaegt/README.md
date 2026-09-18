@@ -45,13 +45,19 @@ ligevægten og uheldene. Der er ingen logbog i dette forsøg; journalen
 ligger i teoriboksen, som åbnes med knappen Teori, med »Læs teorien« under
 ligningen eller med tasten T.
 
-**Scenen** står forneden i lærredet (`lodret: "bund"` i `NK.BORD_VALG`),
-så den tomme plads er over bordet. Dér står zoomboblen fast i øverste
-venstre hjørne (`boble: { hjoerne: true }`, radius 144), lige stor uanset
-zoom, med en stiplet streg ned til det glas, den kigger ind i, og glassets
-navn under sig. Bordpladen er 64 dyb (`bordDybde`), så man kan stille ting
-foran stativet; det forreste tegnes forrest. Spatlen, glasstaven og
-termometeret ligger forrest fra start.
+**Laboratoriet** er 1040 bredt (før 1520), så alt er omkring 45 % større
+på skærmen. Reagenserne står på tre hylder: over stativet flasken,
+dråbeflasken og sprøjteflasken øverst og kaffen, køkkenrullen og
+pulverglassene nederst; til højre det tomme bægerglas under plakaten. På
+bordet står kun det, man arbejder med: affaldet og kolben til venstre,
+stativet, varmepladen med vandbadet og isbadet. Zoomboblen står i
+laboratoriets øverste venstre hjørne (`boble: { x, y }`, radius 150) og
+skalerer med resten; den har en stiplet streg ned til det glas, den
+kigger ind i, og glassets navn under sig. Opstillingen holder hjørnet frit,
+og selvtesten tjekker det. Scenen står forneden i lærredet (`lodret:
+"bund"`). Bordpladen er 64 dyb (`bordDybde`), så man kan stille ting foran
+stativet; det forreste tegnes forrest. Spatlen, glasstaven og termometeret
+ligger forrest fra start.
 
 ## Kemien
 

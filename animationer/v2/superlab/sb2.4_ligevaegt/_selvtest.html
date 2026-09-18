@@ -71,30 +71,25 @@ function koerTest() {
     var klar = alle.filter(function (n) { return NK.Sprites.klar(n); });
     paastand("sprites er indlaest", klar.length === alle.length, klar.length + " af " + alle.length);
 
-    /* Zoomboblen staar paa scenen, fast i laerredets oeverste venstre
-       hjoerne i pixel. Med tegnebordet forneden er den plads tom: ved fem
-       almindelige laerredsstoerrelser daekker boblen intet udstyr og ingen
-       hylde. Stoerrelserne regnes; laerredet aendres ikke. */
+    /* Zoomboblen staar i laboratoriets oeverste venstre hjoerne og skalerer
+       med det. Opstillingen holder hjoernet frit: intet udstyr, ingen hylde
+       og ikke plakaten maa ligge inden for boblen og dens navn. */
     var valgtFoer = bord.valgt;
     var vin = ramme.contentWindow;
     var Sc = NK.Scene;
     paastand("zoomboblen staar paa scenen og ikke i panelet",
-        !d.getElementById("boble-laerred") && !!bord.boble && !!bord.boble.hjoerne && bord.bobleR === 144);
+        !d.getElementById("boble-laerred") && !!bord.boble && bord.bobleR === 150);
     var br = bord.bobleRekt(), daekker = [];
-    [[1490, 1027], [936, 715], [850, 667], [664, 715], [2130, 1027]].forEach(function (lr) {
-        var sk = Sc.skala(lr[0], lr[1]);
-        var x0 = (br.x - sk.dx) / sk.s, x1 = (br.x + br.b - sk.dx) / sk.s;
-        var y0 = (br.y - sk.dy) / sk.s, y1 = (br.y + br.h - sk.dy) / sk.s;
-        bord.liste.forEach(function (gg) {
-            if (!bord.synlig(gg)) return;
-            var rk = bord.rekt(gg, 0);
-            if (rk.x < x1 && rk.x + rk.b > x0 && rk.y < y1 && rk.y + rk.h > y0) daekker.push(lr[0] + "x" + lr[1] + " " + gg.navn);
-        });
-        (Sc.HYLDER || []).forEach(function (H) {
-            if (H.x0 < x1 && H.x1 > x0 && H.y < y1 && H.y + 7 > y0) daekker.push(lr[0] + "x" + lr[1] + " hylde");
-        });
+    function overlap(a, b) { return a.x < b.x + b.b && a.x + a.b > b.x && a.y < b.y + b.h && a.y + a.h > b.y; }
+    bord.liste.forEach(function (gg) {
+        if (bord.synlig(gg) && overlap(bord.rekt(gg, 0), br)) daekker.push(gg.navn);
     });
-    paastand("zoomboblen daekker intet paa bordet ved fem skaermstoerrelser", daekker.length === 0, daekker.join(", ") || "fri");
+    (Sc.HYLDER || []).forEach(function (H, i) {
+        if (overlap({ x: H.x0, y: H.y, b: H.x1 - H.x0, h: 21 }, br)) daekker.push("hylde " + i);
+    });
+    if (bord.plakat && overlap({ x: bord.plakat.x, y: bord.plakat.y, b: 132, h: 128 }, br)) daekker.push("plakaten");
+    paastand("zoomboblens hjoerne er frit", daekker.length === 0, daekker.join(", ") || "frit");
+    paastand("laboratoriet er smallere, saa alt er stoerre", Sc.BREDDE === 1040);
     paastand("aflaesningen har sin stil",
         vin.getComputedStyle(d.getElementById("glas-indhold")).borderCollapse === "collapse");
 
@@ -480,7 +475,7 @@ function koerTest() {
         ["spatel", "glasstav", "termometer"].every(function (n) {
             return bord.dybdeAf(bord.g[n]) > Sc.BORD && bord.liste.indexOf(bord.g[n]) > bord.liste.indexOf(stv);
         }));
-    stilMedFod(bg, 700, 540);
+    stilMedFod(bg, 500, 540);
     paastand("et baegerglas kan stilles foran stativet",
         Math.abs(bundAf(bg) - 540) < 0.5 && bord.staarPaaBord(bg), tal(bundAf(bg), 0));
     var iB = bord.liste.indexOf(bg);
@@ -488,15 +483,31 @@ function koerTest() {
         iB > bord.liste.indexOf(stv) && [1, 2, 3, 4, 5, 6, 7, 8].every(function (i) { return bord.liste.indexOf(g(i)) < iB; }));
     var rkB = bord.rekt(bg, 0);
     paastand("det forreste rammes foerst med musen", bord.hvad({ x: rkB.x + rkB.b / 2, y: rkB.y + 12 }) === "baeger");
-    stilMedFod(bg, 700, 600, 560);
+    stilMedFod(bg, 500, 600, 560);
     paastand("slippes det laengere fremme, staar det paa forkanten", Math.abs(bundAf(bg) - Sc.FORKANT) < 0.5, tal(bundAf(bg), 0));
-    stilMedFod(bg, 700, 470);
+    stilMedFod(bg, 500, 470);
     paastand("slippes det i luften over bordet, staar det ved bagkanten", Math.abs(bundAf(bg) - Sc.BORD) < 0.5, tal(bundAf(bg), 0));
-    stilMedFod(sp, 800, 560, Sc.FORKANT + 40);
+    stilMedFod(sp, 600, 560, Sc.FORKANT + 40);
     adv(1);
     paastand("slippes noget foran forkanten, falder det paa gulvet", sp.p.y > Sc.FORKANT + 40, tal(sp.p.y, 0));
     try { bord.tegn(); paastand("bordet tegnes med dybde og boble uden fejl", true); }
     catch (e) { paastand("bordet tegnes med dybde og boble uden fejl", false, e.message); }
+
+    /* Kaffen staar paa den foerste hylde, og han gaar derhen, hvor hylden
+       er (kaffeX i laerer.js). Hans hukommelse saettes tilbage bagefter. */
+    var huskK = null;
+    try { huskK = vin.localStorage.getItem("nk-kemichael"); } catch (e) { /* ingen localStorage */ }
+    NK.startForfra();
+    var Lk = bord.laerer, maalKaffe = null;
+    bord.klikKop();
+    for (var qk = 0; qk < 60 && maalKaffe === null; qk++) { adv(0.05); if (Lk.maalX > 0) maalKaffe = Lk.maalX; }
+    paastand("han gaar hen til kaffen paa hylden",
+        maalKaffe !== null && Math.abs(maalKaffe - (Sc.HYLDE.x0 + 154)) < 1, maalKaffe === null ? "gik ikke" : tal(maalKaffe, 0));
+    adv(30);
+    try {
+        if (huskK !== null) vin.localStorage.setItem("nk-kemichael", huskK);
+        else vin.localStorage.removeItem("nk-kemichael");
+    } catch (e) { /* ingen localStorage */ }
     NK.startForfra();
 }
 

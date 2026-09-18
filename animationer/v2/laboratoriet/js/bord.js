@@ -31,12 +31,14 @@
                             0 (standard) er en smal kant som foer.
      lodret                 "midt" (standard) eller "bund": hvor
                             tegnebordet staar i et hoejere laerred. Med
-                            "bund" bliver den tomme plads over bordet.
-     boble                  zoomboblen paa scenen: { x, y } paa
-                            tegnebordet, eller { hjoerne: true } fast i
-                            laerredets oeverste venstre hjoerne i pixel,
-                            saa den har samme stoerrelse uanset zoom
-     bobleR                 zoomboblens radius
+                            "bund" bliver den tomme plads over bordet, og
+                            laereren slutter ved laerredets kant.
+     boble                  zoomboblen paa scenen: { x, y } er dens
+                            centrum paa tegnebordet. Den skalerer med
+                            resten af laboratoriet, viser glassets navn
+                            under sig og en stiplet streg ned til glasset.
+                            Uden boble tegner siden den selv, fx i panelet.
+     bobleR                 zoomboblens radius paa tegnebordet
 
    Hooks, som siden saetter:
      vedBesked(tekst, slags)   korte beskeder til scenen
@@ -1965,41 +1967,31 @@
         /* Zoomboblen paa scenen, hvis bordet er sat op med boble: { x, y };
            ellers tegner siden den selv med tegnBoble, fx i panelet */
         var vb = this.bobleBeholder;
-        if (this.boble && !this.boble.hjoerne && vb && this.bobleAlfa > 0.01) {
-            var fo = B.farve(vb) || Stof.VAND;
-            (vb.mikro || this.mikro).tegn(ctx, this.boble.x, this.boble.y, this.bobleAlfa, tid, this.synlig(vb) ? B.aabning(vb) : null, { r: fo.r * 0.35, g: fo.g * 0.35, b: fo.b * 0.35 });
-        }
+        if (this.boble && vb && this.bobleAlfa > 0.01) this.tegnBobleIScenen(ctx, tid);
         ctx.restore();
-        if (this.boble && this.boble.hjoerne && vb && this.bobleAlfa > 0.01) this.tegnBobleIHjoernet(ctx, sk, tid);
     };
 
-    /* Zoomboblen fast i laerredets oeverste venstre hjoerne, i pixel, saa
-       den er lige stor uanset zoom. En stiplet streg viser, hvilket glas
-       den kigger ind i, og glassets navn staar under den. Med lodret:
-       "bund" er hjoernet den tomme plads over bordet. */
-    P.tegnBobleIHjoernet = function (ctx, sk, tid) {
-        var vb = this.bobleBeholder, R = this.bobleR;
-        var m = this.boble.margen === undefined ? 16 : this.boble.margen;
-        var cx = m + R, cy = m + R;
+    /* Zoomboblen paa scenen: en del af laboratoriet, der skalerer med det.
+       En stiplet streg viser, hvilket glas den kigger ind i, og glassets
+       navn staar under den. */
+    P.tegnBobleIScenen = function (ctx, tid) {
+        var vb = this.bobleBeholder, bo = this.boble, R = this.bobleR;
         var fo = B.farve(vb) || Stof.VAND;
-        var forbind = null;
-        if (this.synlig(vb)) {
-            var o = B.aabning(vb);
-            forbind = { x: sk.dx + (o.x + this.forskyd) * sk.s, y: sk.dy + o.y * sk.s };
-        }
-        (vb.mikro || this.mikro).tegn(ctx, cx, cy, this.bobleAlfa, tid, forbind, { r: fo.r * 0.35, g: fo.g * 0.35, b: fo.b * 0.35 });
+        (vb.mikro || this.mikro).tegn(ctx, bo.x, bo.y, this.bobleAlfa, tid, this.synlig(vb) ? B.aabning(vb) : null, { r: fo.r * 0.35, g: fo.g * 0.35, b: fo.b * 0.35 });
         ctx.save();
         ctx.globalAlpha = this.bobleAlfa;
-        NK.tekst(ctx, vb.titel.charAt(0).toUpperCase() + vb.titel.slice(1), cx, cy + R + 14,
-            { font: "700 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#f2c53d", kant: true, kantBredde: 3, kantFarve: "rgba(0,0,0,0.6)" });
+        NK.tekst(ctx, vb.titel.charAt(0).toUpperCase() + vb.titel.slice(1), bo.x, bo.y + R + 14,
+            { font: "700 14px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#f2c53d", kant: true, kantBredde: 3, kantFarve: "rgba(0,0,0,0.6)" });
         ctx.restore();
     };
 
-    /* Hvor zoomboblen i hjoernet staar, i laerredets pixel: { x, y, b, h } */
+    /* Den plads, zoomboblen og dens navn optager paa tegnebordet:
+       { x, y, b, h }, eller null uden boble paa scenen. Opstillingen skal
+       holde den fri. */
     P.bobleRekt = function () {
-        if (!this.boble || !this.boble.hjoerne) return null;
-        var m = this.boble.margen === undefined ? 16 : this.boble.margen;
-        return { x: m, y: m, b: 2 * this.bobleR, h: 2 * this.bobleR + 26 };
+        if (!this.boble) return null;
+        var R = this.bobleR;
+        return { x: this.boble.x - R, y: this.boble.y - R, b: 2 * R, h: 2 * R + 26 };
     };
 
     /* Zoomboblen tegnet paa et andet laerred med centrum i (cx, cy) */
