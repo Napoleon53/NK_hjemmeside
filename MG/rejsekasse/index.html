@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rejsekasse</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="rejsekasse.webmanifest">
+<meta name="theme-color" content="#0f766e">
+<link rel="icon" href="../../assets/img/rejsekasse-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="../../assets/img/rejsekasse-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Rejsekasse">
+<style>
+  :root{
+    --bg:#f1f6f5;
+    --kort:#ffffff;
+    --tekst:#14201f;
+    --daempet:#556766;
+    --accent:#0f766e;
+    --accent-mork:#0b544e;
+    --accent-lys:#e3f2f0;
+    --kant:#dbe7e5;
+    --roed:#b3261e;
+    --roed-lys:#fbe9e7;
+    --gul:#f1c40f;
+    --radius:14px;
+    --font:"Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+    --top:env(safe-area-inset-top);
+    --bund:env(safe-area-inset-bottom);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0e1817;
+      --kort:#172524;
+      --tekst:#e9f2f1;
+      --daempet:#9cb3b1;
+      --accent:#2a9d8f;
+      --accent-mork:#1f7c71;
+      --accent-lys:#17302e;
+      --kant:#26403e;
+      --roed:#f2857c;
+      --roed-lys:#3a1f1d;
+    }
+  }
+
+  *,*::before,*::after{box-sizing:border-box;}
+  [hidden]{display:none !important;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:var(--font);
+    font-size:17px;
+    line-height:1.5;
+    color:var(--tekst);
+    background:var(--bg);
+    -webkit-text-size-adjust:100%;
+    -webkit-tap-highlight-color:transparent;
+    overscroll-behavior-y:none;
+  }
+  button,input,select,textarea{font:inherit; color:inherit;}
+  button{cursor:pointer;}
+  h1,h2,h3{margin:0; line-height:1.2; letter-spacing:-.01em;}
+  h1{font-size:1.15rem; font-weight:600;}
+  h2{font-size:1.05rem; font-weight:600;}
+
+  /* ------------------------------------------------------------- Toppen */
+
+  .top{
+    position:sticky; top:0; z-index:5;
+    background:var(--accent); color:#fff;
+    padding:calc(var(--top) + 10px) 16px 16px;
+    box-shadow:0 2px 10px rgba(0,0,0,.12);
+  }
+  .toplinje{display:flex; align-items:center; gap:10px; min-height:34px;}
+  .toplinje h1{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .ikonknap{
+    border:0; background:rgba(255,255,255,.16); color:#fff;
+    width:38px; height:38px; border-radius:11px; font-size:1.1rem;
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .ikonknap:active{background:rgba(255,255,255,.3);}
+
+  .hovedtal{margin-top:10px; display:flex; align-items:baseline; gap:8px;}
+  .hovedtal .sum{font-size:2.5rem; font-weight:700; letter-spacing:-.02em;}
+  .hovedtal .enhed{font-size:1.1rem; font-weight:600; opacity:.85;}
+  .hovedlabel{font-size:.85rem; opacity:.85; margin-top:-2px;}
+  .hovedtal.negativ .sum{color:#ffd9d5;}
+
+  .noegletal{
+    display:flex; gap:8px; margin-top:14px;
+  }
+  .noegletal div{min-width:0;
+    flex:1; background:rgba(255,255,255,.14); border-radius:10px; padding:8px 10px;
+  }
+  .noegletal b{display:block; font-size:.98rem; font-weight:600;}
+  .noegletal span{display:block; font-size:.78rem; opacity:.85; line-height:1.3;}
+
+  .kopipind{
+    display:flex; align-items:center; gap:8px; width:100%;
+    margin-top:12px; border:0; border-radius:10px; text-align:left;
+    background:var(--gul); color:#3a2f00; font-size:.85rem; font-weight:600;
+    padding:8px 12px;
+  }
+
+  /* -------------------------------------------------------------- Listen */
+
+  main{padding:14px 14px calc(96px + var(--bund));}
+
+  .dag{margin-bottom:16px;}
+  .dag-hoved{
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding:0 4px 6px; font-size:.8rem; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--daempet); font-weight:700;
+  }
+  .dag-hoved span:last-child{letter-spacing:0; text-transform:none; font-size:.85rem;}
+
+  .poster{background:var(--kort); border:1px solid var(--kant); border-radius:var(--radius); overflow:hidden;}
+  .post{
+    display:flex; align-items:center; gap:12px; width:100%;
+    border:0; border-top:1px solid var(--kant); background:none;
+    padding:12px 14px; text-align:left;
+  }
+  .post:first-child{border-top:0;}
+  .post:active{background:var(--accent-lys);}
+  .post .midt{flex:1; min-width:0;}
+  .post .navn{display:block; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .post .meta{display:block; font-size:.8rem; color:var(--daempet); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .post .bel{font-weight:700; white-space:nowrap; font-variant-numeric:tabular-nums;}
+  .post .bel small{display:block; font-weight:500; font-size:.78rem; color:var(--daempet); text-align:right;}
+  .post.ind .bel{color:var(--accent);}
+
+  .tom{
+    background:var(--kort); border:1px dashed var(--kant); border-radius:var(--radius);
+    padding:26px 20px; text-align:center; color:var(--daempet);
+  }
+  .tom b{display:block; color:var(--tekst); margin-bottom:4px;}
+
+  /* ------------------------------------------------------------ Bundlinje */
+
+  .bundlinje{
+    position:fixed; left:0; right:0; bottom:0; z-index:5;
+    padding:10px 14px calc(10px + var(--bund));
+    background:linear-gradient(to top, var(--bg) 62%, rgba(0,0,0,0));
+  }
+  .primaer{
+    width:100%; border:0; border-radius:13px; background:var(--accent); color:#fff;
+    font-size:1.05rem; font-weight:600; padding:15px 16px;
+    box-shadow:0 4px 14px rgba(15,118,110,.32);
+  }
+  .primaer:active{background:var(--accent-mork);}
+  .primaer[disabled]{opacity:.45; box-shadow:none;}
+  .sekundaer{
+    width:100%; border:1px solid var(--kant); border-radius:13px;
+    background:var(--kort); color:var(--tekst); font-weight:600; padding:13px 16px;
+  }
+  .sekundaer:active{background:var(--accent-lys);}
+  .fare{color:var(--roed); border-color:var(--roed);}
+  .fare:active{background:var(--roed-lys);}
+
+  /* ----------------------------------------------------------------- Ark */
+
+  .ark{
+    position:fixed; inset:0; z-index:20; background:var(--bg);
+    display:flex; flex-direction:column;
+    padding-top:var(--top);
+    animation:op .16s ease-out;
+  }
+  @keyframes op{from{transform:translateY(14px); opacity:.4;} to{transform:none; opacity:1;}}
+  @media (prefers-reduced-motion: reduce){ .ark{animation:none;} }
+
+  .ark-hoved{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 14px; border-bottom:1px solid var(--kant); background:var(--kort);
+  }
+  .ark-hoved h2{flex:1;}
+  .ark-hoved .luk{
+    border:0; background:none; color:var(--daempet); font-size:1.5rem;
+    width:38px; height:38px; border-radius:10px; flex:none;
+  }
+  .ark-krop{flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:14px;}
+  .ark-bund{padding:10px 14px calc(10px + var(--bund)); border-top:1px solid var(--kant); background:var(--kort);}
+
+  .valg{display:flex; gap:8px; margin-bottom:14px;}
+  .valg button{
+    flex:1; border:1px solid var(--kant); background:var(--kort); color:var(--daempet);
+    border-radius:11px; padding:10px; font-weight:600;
+  }
+  .valg button[aria-pressed=true]{background:var(--accent); border-color:var(--accent); color:#fff;}
+
+  .visning{
+    background:var(--kort); border:1px solid var(--kant); border-radius:var(--radius);
+    padding:14px 16px; display:flex; align-items:baseline; justify-content:flex-end; gap:8px;
+  }
+  .visning .tal{font-size:2.4rem; font-weight:700; font-variant-numeric:tabular-nums; letter-spacing:-.02em;}
+  .visning .tal.blank{color:var(--daempet);}
+  .visning .val{
+    border:1px solid var(--accent); background:var(--accent-lys); color:var(--accent);
+    border-radius:9px; padding:4px 10px; font-weight:700; font-size:.95rem;
+  }
+  .omregn{text-align:right; color:var(--daempet); font-size:.85rem; margin:6px 2px 0; min-height:1.3em;}
+
+  .felt{margin-top:14px;}
+  .felt > label{
+    display:block; font-size:.78rem; letter-spacing:.06em; text-transform:uppercase;
+    font-weight:700; color:var(--daempet); margin-bottom:5px;
+  }
+  input[type=text], input[type=number], input[type=date], textarea, select{
+    width:100%; background:var(--kort); border:1px solid var(--kant);
+    border-radius:11px; padding:12px 13px; font-size:1rem;
+  }
+  input:focus, textarea:focus, select:focus{outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent);}
+  textarea{min-height:120px; resize:vertical; font-size:.9rem; font-family:ui-monospace, Consolas, monospace;}
+  .hjaelp{font-size:.85rem; color:var(--daempet); margin:6px 2px 0;}
+
+  .chips{display:flex; flex-wrap:wrap; gap:7px;}
+  .chips button{
+    border:1px solid var(--kant); background:var(--kort); color:var(--daempet);
+    border-radius:999px; padding:8px 14px; font-size:.9rem; font-weight:600;
+  }
+  .chips button[aria-pressed=true]{background:var(--accent); border-color:var(--accent); color:#fff;}
+
+  .udvid{
+    width:100%; border:1px dashed var(--kant); background:none; color:var(--daempet);
+    border-radius:11px; padding:10px; font-weight:600; font-size:.9rem; margin-top:16px;
+  }
+
+  /* -------------------------------------------------------------- Tastatur */
+
+  .tastatur{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:14px;}
+  .tastatur button{
+    border:1px solid var(--kant); background:var(--kort); border-radius:12px;
+    padding:14px 0; font-size:1.45rem; font-weight:600; font-variant-numeric:tabular-nums;
+  }
+  .tastatur button:active{background:var(--accent-lys);}
+  .tastatur .slet{font-size:1.2rem;}
+
+  /* ------------------------------------------------------------- Mere-side */
+
+  .gruppe{
+    background:var(--kort); border:1px solid var(--kant); border-radius:var(--radius);
+    padding:14px; margin-bottom:14px;
+  }
+  .gruppe > h3{
+    font-size:.78rem; letter-spacing:.06em; text-transform:uppercase;
+    color:var(--daempet); margin:0 0 10px; font-weight:700;
+  }
+  .gruppe .sekundaer + .sekundaer{margin-top:8px;}
+  .to{display:flex; gap:8px;}
+  .to > *{flex:1; min-width:0;}
+
+  .raekke{
+    display:flex; justify-content:space-between; gap:12px;
+    padding:7px 0; border-top:1px solid var(--kant); font-size:.95rem;
+  }
+  .raekke:first-of-type{border-top:0;}
+  .raekke b{font-variant-numeric:tabular-nums; white-space:nowrap;}
+
+  .besked{
+    position:fixed; left:50%; transform:translateX(-50%); bottom:calc(86px + var(--bund));
+    z-index:40; background:var(--tekst); color:var(--bg);
+    padding:11px 18px; border-radius:999px; font-size:.92rem; font-weight:600;
+    box-shadow:0 6px 20px rgba(0,0,0,.25); max-width:88vw; text-align:center;
+  }
+
+  .installer{
+    background:var(--accent-lys); border:1px solid var(--accent);
+    border-radius:var(--radius); padding:12px 14px; margin-bottom:14px; font-size:.9rem;
+  }
+  .installer b{display:block; margin-bottom:3px;}
+  .installer button{
+    border:0; background:none; color:var(--accent); font-weight:700;
+    padding:6px 0 0; font-size:.9rem; text-decoration:underline;
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="toplinje">
+    <h1 id="turnavn">Rejsekasse</h1>
+    <button class="ikonknap" id="mereKnap" type="button" aria-label="Indstillinger og sikkerhedskopi">&#9776;</button>
+  </div>
+  <div class="hovedtal" id="hovedtalBoks">
+    <span class="sum" id="hovedtal">0,00</span><span class="enhed">kr</span>
+  </div>
+  <div class="hovedlabel" id="hovedlabel">Lagt ud i alt</div>
+  <div class="noegletal" id="noegletal"></div>
+  <button class="kopipind" id="kopipind" type="button" hidden>
+    <span>&#9888;</span><span id="kopipindTekst"></span>
+  </button>
+</header>
+
+<main id="liste"></main>
+
+<div class="bundlinje">
+  <button class="primaer" id="nyKnap" type="button">+ Nyt udl&aelig;g</button>
+</div>
+
+<!-- ------------------------------------------------------------- Indtastning -->
+<section class="ark" id="ark" hidden aria-label="Indtastning">
+  <div class="ark-hoved">
+    <h2 id="arkTitel">Nyt udl&aelig;g</h2>
+    <button class="luk" type="button" data-luk="ark" aria-label="Luk">&times;</button>
+  </div>
+  <div class="ark-krop">
+
+    <div class="valg" id="typevalg">
+      <button type="button" data-type="udlaeg" aria-pressed="true">Lagt ud</button>
+      <button type="button" data-type="ind" aria-pressed="false">Ind i kassen</button>
+    </div>
+
+    <div class="visning">
+      <span class="tal blank" id="tastTal">0</span>
+      <button class="val" type="button" id="valutaKnap">kr</button>
+    </div>
+    <div class="omregn" id="omregn"></div>
+
+    <div class="tastatur" id="tastatur">
+      <button type="button" data-t="1">1</button>
+      <button type="button" data-t="2">2</button>
+      <button type="button" data-t="3">3</button>
+      <button type="button" data-t="4">4</button>
+      <button type="button" data-t="5">5</button>
+      <button type="button" data-t="6">6</button>
+      <button type="button" data-t="7">7</button>
+      <button type="button" data-t="8">8</button>
+      <button type="button" data-t="9">9</button>
+      <button type="button" data-t=",">,</button>
+      <button type="button" data-t="0">0</button>
+      <button type="button" class="slet" data-t="slet" aria-label="Slet sidste ciffer">&#9003;</button>
+    </div>
+
+    <div class="felt">
+      <label for="tekst">Hvad</label>
+      <input type="text" id="tekst" placeholder="fx frokost, bus, entr&eacute;" autocomplete="off" enterkeyhint="done">
+      <div class="chips" id="forslag" style="margin-top:8px"></div>
+    </div>
+
+    <button class="udvid" type="button" id="udvidKnap">Flere felter</button>
+
+    <div id="ekstra" hidden>
+      <div class="felt">
+        <label>Kategori</label>
+        <div class="chips" id="kategorier"></div>
+      </div>
+      <div class="felt">
+        <label for="hvem">Hvem det gjaldt</label>
+        <input type="text" id="hvem" placeholder="fx hele holdet, Sofie" autocomplete="off" list="navneliste">
+        <datalist id="navneliste"></datalist>
+      </div>
+      <div class="felt">
+        <label>Betalt med</label>
+        <div class="chips" id="betaling">
+          <button type="button" data-b="kontant" aria-pressed="true">Kontant</button>
+          <button type="button" data-b="kort" aria-pressed="false">Kort</button>
+        </div>
+        <div class="hjaelp">Kort tr&aelig;kkes ikke fra kassen, men t&aelig;ller med i det, der er lagt ud.</div>
+      </div>
+      <div class="felt">
+        <label for="dato">Dato</label>
+        <input type="date" id="dato">
+      </div>
+    </div>
+
+    <button class="sekundaer fare" type="button" id="sletKnap" style="margin-top:16px" hidden>Slet denne postering</button>
+  </div>
+  <div class="ark-bund">
+    <button class="primaer" id="gemKnap" type="button" disabled>Gem</button>
+  </div>
+</section>
+
+<!-- ------------------------------------------------------------------- Mere -->
+<section class="ark" id="mere" hidden aria-label="Indstillinger">
+  <div class="ark-hoved">
+    <h2>Indstillinger</h2>
+    <button class="luk" type="button" data-luk="mere" aria-label="Luk">&times;</button>
+  </div>
+  <div class="ark-krop">
+
+    <div class="installer" id="installer" hidden>
+      <b>L&aelig;g appen p&aring; hjemmesk&aelig;rmen</b>
+      <span id="installerTekst"></span>
+      <button type="button" id="installerKnap" hidden>Installer nu</button>
+      <button type="button" id="installerSkjul">Skjul</button>
+    </div>
+
+    <div class="gruppe">
+      <h3>Turen</h3>
+      <div class="felt" style="margin-top:0">
+        <label for="iTurnavn">Navn p&aring; turen</label>
+        <input type="text" id="iTurnavn" placeholder="fx Berlin 3.b" autocomplete="off">
+      </div>
+      <div class="felt">
+        <label for="iStart">Startbel&oslash;b i kassen (kr)</label>
+        <input type="text" id="iStart" inputmode="decimal" placeholder="0,00">
+        <div class="hjaelp">Det forskud, du har med fra skolen. Kontanter, du h&aelig;ver undervejs, tastes i stedet som "Ind i kassen".</div>
+      </div>
+    </div>
+
+    <div class="gruppe">
+      <h3>Udenlandsk valuta</h3>
+      <div class="felt" style="margin-top:0">
+        <label for="iKode">Valuta (kort navn)</label>
+        <input type="text" id="iKode" placeholder="fx PLN, &pound;, z&#322;" autocomplete="off" maxlength="6">
+      </div>
+      <div class="felt">
+        <label>Kursen du selv har vekslet til</label>
+        <div class="to">
+          <input type="text" id="iEnheder" inputmode="decimal" placeholder="100">
+          <input type="text" id="iKroner" inputmode="decimal" placeholder="kr">
+        </div>
+        <div class="hjaelp" id="kursHjaelp">Skriv fx 100 og 165, hvis du fik 100 enheder for 165 kr.</div>
+      </div>
+      <div class="hjaelp">Lad feltet med valuta st&aring; tomt, hvis alt regnes i kroner. Allerede gemte poster beholder den kurs, de blev tastet med.</div>
+    </div>
+
+    <div class="gruppe">
+      <h3>Sikkerhedskopi</h3>
+      <div class="hjaelp" id="kopiStatus" style="margin:0 0 10px"></div>
+      <button class="sekundaer" type="button" id="delKnap">Send regnskabet til mig selv</button>
+      <button class="sekundaer" type="button" id="gemFilKnap">Gem sikkerhedskopi som fil</button>
+      <button class="sekundaer" type="button" id="hentFilKnap">L&aelig;s sikkerhedskopi ind</button>
+      <button class="sekundaer" type="button" id="csvKnap">Regneark til afregning (CSV)</button>
+      <input type="file" id="filvaelger" accept=".json,application/json" hidden>
+      <div class="hjaelp">Tag en kopi hver aften. Kopien er den eneste sikring, hvis telefonen bliver v&aelig;k.</div>
+    </div>
+
+    <div class="gruppe" id="oversigtBoks" hidden>
+      <h3>Oversigt</h3>
+      <div id="oversigt"></div>
+    </div>
+
+    <div class="gruppe">
+      <h3>Ny tur</h3>
+      <button class="sekundaer fare" type="button" id="nulstilKnap">Ryd regnskabet og start forfra</button>
+      <button class="sekundaer" type="button" id="fortrydKnap" hidden>Fortryd og hent det sidste regnskab</button>
+      <div class="hjaelp">Gem en kopi f&oslash;rst. Der kan kun fortrydes &eacute;n gang.</div>
+    </div>
+
+    <div class="gruppe">
+      <h3>Kategorier</h3>
+      <div class="felt" style="margin-top:0">
+        <label for="iKategorier">Vises under "Flere felter"</label>
+        <input type="text" id="iKategorier" placeholder="Mad, Transport, Entr&eacute;" autocomplete="off">
+        <div class="hjaelp">Adskilt med komma.</div>
+      </div>
+    </div>
+
+  </div>
+  <div class="ark-bund">
+    <button class="primaer" type="button" data-luk="mere">F&aelig;rdig</button>
+  </div>
+</section>
+
+<!-- --------------------------------------------------------------- Tekstark -->
+<section class="ark" id="tekstark" hidden aria-label="Regnskab som tekst">
+  <div class="ark-hoved">
+    <h2 id="tekstarkTitel">Regnskabet</h2>
+    <button class="luk" type="button" data-luk="tekstark" aria-label="Luk">&times;</button>
+  </div>
+  <div class="ark-krop">
+    <div class="hjaelp" id="tekstarkHjaelp" style="margin:0 0 10px"></div>
+    <textarea id="tekstarkFelt" spellcheck="false" style="min-height:46vh"></textarea>
+  </div>
+  <div class="ark-bund">
+    <button class="primaer" type="button" id="tekstarkKnap">Kopi&eacute;r</button>
+  </div>
+</section>
+
+<script>
+"use strict";
+
+/* ===========================================================================
+   Rejsekasse: et kontantregnskab for en studietur. Alt ligger i telefonen,
+   der er ingen server. Data gemmes i localStorage efter hver eneste aendring.
+   =========================================================================== */
+
+var NOEGLE = 'mg-rejsekasse-v1';
+var FORTRYD = 'mg-rejsekasse-fortryd';
+var STANDARDKATEGORIER = ['Mad', 'Transport', 'Entré', 'Overnatning', 'Andet'];
+
+var stand = {
+  version: 1,
+  turnavn: '',
+  startbeloeb: 0,
+  valuta: null,                 /* {kode, enheder, kroner} */
+  poster: [],                   /* nyeste sidst */
+  kategorier: STANDARDKATEGORIER.slice(),
+  visEkstra: false,
+  sidsteKopi: null
+};
+
+var data = null;
+var kladde = null;              /* posten der redigeres i arket */
+var tast = '';                  /* det taltastaturet har skrevet */
+var arkValuta = 'kr';           /* 'kr' eller 'ud' */
+var installPrompt = null;
+
+/* ----------------------------------------------------------------- Smaating */
+
+function $(id){ return document.getElementById(id); }
+
+function esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function rund(n){ return Math.round((Number(n) || 0) * 100) / 100; }
+
+function tal(n){
+  return (Number(n) || 0).toLocaleString('da-DK', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function kr(n){ return tal(n) + ' kr'; }
+
+function nulstilTal(s){ return String(s).replace(/\./g,'').replace(',', '.'); }
+
+function laesTal(s){
+  var n = parseFloat(nulstilTal(String(s || '').trim()));
+  return isFinite(n) ? n : 0;
+}
+
+function idag(){ return new Date(); }
+
+function datonoegle(d){
+  var x = (d instanceof Date) ? d : new Date(d);
+  return x.getFullYear() + '-' + ('0' + (x.getMonth()+1)).slice(-2) + '-' + ('0' + x.getDate()).slice(-2);
+}
+
+function dagnavn(noegle){
+  var nu = datonoegle(idag());
+  if (noegle === nu) return 'I dag';
+  var igaar = new Date(); igaar.setDate(igaar.getDate() - 1);
+  if (noegle === datonoegle(igaar)) return 'I går';
+  var d = new Date(noegle + 'T12:00:00');
+  return d.toLocaleDateString('da-DK', {weekday:'short', day:'numeric', month:'short'});
+}
+
+function nytId(){
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+var beskedTimer = null;
+function sig(tekst){
+  var gl = document.querySelector('.besked');
+  if (gl) gl.remove();
+  var d = document.createElement('div');
+  d.className = 'besked';
+  d.setAttribute('role', 'status');
+  d.textContent = tekst;
+  document.body.appendChild(d);
+  clearTimeout(beskedTimer);
+  beskedTimer = setTimeout(function(){ if (d.parentNode) d.remove(); }, 2600);
+}
+
+/* --------------------------------------------------------------- Lager */
+
+function laes(){
+  var raa = null;
+  try { raa = localStorage.getItem(NOEGLE); } catch(e){}
+  if (!raa) return JSON.parse(JSON.stringify(stand));
+  try {
+    var d = JSON.parse(raa);
+    return ordn(d);
+  } catch(e){
+    return JSON.parse(JSON.stringify(stand));
+  }
+}
+
+function ordn(d){
+  var ud = JSON.parse(JSON.stringify(stand));
+  if (!d || typeof d !== 'object') return ud;
+  if (typeof d.turnavn === 'string') ud.turnavn = d.turnavn;
+  ud.startbeloeb = rund(d.startbeloeb);
+  if (d.valuta && d.valuta.kode) {
+    ud.valuta = {
+      kode: String(d.valuta.kode).slice(0, 6),
+      enheder: Number(d.valuta.enheder) || 0,
+      kroner: Number(d.valuta.kroner) || 0
+    };
+    if (!(ud.valuta.enheder > 0) || !(ud.valuta.kroner > 0)) ud.valuta = null;
+  }
+  if (Array.isArray(d.kategorier) && d.kategorier.length) {
+    ud.kategorier = d.kategorier.map(function(k){ return String(k); });
+  }
+  ud.visEkstra = !!d.visEkstra;
+  ud.sidsteKopi = d.sidsteKopi || null;
+  ud.poster = (Array.isArray(d.poster) ? d.poster : []).map(function(p){
+    return {
+      id: p.id || nytId(),
+      tid: p.tid || new Date().toISOString(),
+      type: p.type === 'ind' ? 'ind' : 'udlaeg',
+      kr: rund(p.kr),
+      tekst: String(p.tekst || ''),
+      kategori: p.kategori ? String(p.kategori) : '',
+      hvem: p.hvem ? String(p.hvem) : '',
+      betaling: p.betaling === 'kort' ? 'kort' : 'kontant',
+      org: p.org && p.org.kode ? {
+        beloeb: Number(p.org.beloeb) || 0,
+        kode: String(p.org.kode),
+        enheder: Number(p.org.enheder) || 1,
+        kroner: Number(p.org.kroner) || 0
+      } : null
+    };
+  }).filter(function(p){ return p.kr > 0; });
+  return ud;
+}
+
+function gem(){
+  try {
+    localStorage.setItem(NOEGLE, JSON.stringify(data));
+  } catch(e){
+    sig('Telefonen kunne ikke gemme. Tag en sikkerhedskopi nu.');
+  }
+}
+
+/* --------------------------------------------------------------- Regnestykker */
+
+function sumUdlagt(){
+  return rund(data.poster.reduce(function(s, p){ return p.type === 'udlaeg' ? s + p.kr : s; }, 0));
+}
+function sumKort(){
+  return rund(data.poster.reduce(function(s, p){
+    return (p.type === 'udlaeg' && p.betaling === 'kort') ? s + p.kr : s;
+  }, 0));
+}
+function sumInd(){
+  return rund(data.poster.reduce(function(s, p){ return p.type === 'ind' ? s + p.kr : s; }, 0));
+}
+function rest(){
+  return rund(data.startbeloeb + sumInd() - (sumUdlagt() - sumKort()));
+}
+
+function tilKroner(beloeb){
+  if (!data.valuta) return beloeb;
+  return rund(beloeb * data.valuta.kroner / data.valuta.enheder);
+}
+
+/* ----------------------------------------------------------------- Tegning */
+
+function tegn(){
+  $('turnavn').textContent = data.turnavn || 'Rejsekasse';
+  document.title = data.turnavn ? ('Rejsekasse: ' + data.turnavn) : 'Rejsekasse';
+
+  var udlagt = sumUdlagt(), kort = sumKort(), r = rest();
+  var harKasse = data.startbeloeb > 0 || sumInd() > 0;
+
+  $('hovedtal').textContent = tal(harKasse ? r : udlagt);
+  $('hovedlabel').textContent = harKasse ? 'Tilbage af kassen' : 'Lagt ud i alt';
+  $('hovedtalBoks').classList.toggle('negativ', harKasse && r < 0);
+
+  var celler = [];
+  if (harKasse) celler.push(['<b>' + kr(udlagt) + '</b><span>lagt ud i alt</span>']);
+  celler.push(['<b>' + kr(data.startbeloeb) + '</b><span>i kassen fra start</span>']);
+  if (kort > 0) celler.push(['<b>' + kr(kort) + '</b><span>heraf med kort</span>']);
+  if (sumInd() > 0) celler.push(['<b>' + kr(sumInd()) + '</b><span>lagt i kassen siden</span>']);
+  $('noegletal').innerHTML = celler.slice(0, 3).map(function(c){ return '<div>' + c[0] + '</div>'; }).join('');
+
+  tegnListe();
+  tegnKopipind();
+}
+
+function tegnListe(){
+  var liste = $('liste');
+  if (!data.poster.length) {
+    liste.innerHTML = '<div class="tom"><b>Ingen posteringer endnu</b>' +
+      (data.startbeloeb > 0
+        ? 'Tryk p&aring; knappen nederst, hver gang du l&aelig;gger penge ud.'
+        : 'S&aelig;t f&oslash;rst startbel&oslash;bet under menuen &oslash;verst til h&oslash;jre.') +
+      '</div>';
+    return;
+  }
+
+  var dage = {}, orden = [];
+  data.poster.slice().sort(function(a, b){ return a.tid < b.tid ? 1 : -1; }).forEach(function(p){
+    var n = datonoegle(p.tid);
+    if (!dage[n]) { dage[n] = []; orden.push(n); }
+    dage[n].push(p);
+  });
+
+  liste.innerHTML = orden.map(function(n){
+    var poster = dage[n];
+    var dagsum = rund(poster.reduce(function(s, p){ return p.type === 'udlaeg' ? s + p.kr : s; }, 0));
+    var raekker = poster.map(function(p){
+      var meta = [];
+      if (p.kategori) meta.push(esc(p.kategori));
+      if (p.hvem) meta.push(esc(p.hvem));
+      if (p.betaling === 'kort') meta.push('kort');
+      if (p.type === 'ind') meta.push('ind i kassen');
+      meta.push(new Date(p.tid).toLocaleTimeString('da-DK', {hour:'2-digit', minute:'2-digit'}));
+      var org = p.org ? '<small>' + esc(tal(p.org.beloeb) + ' ' + p.org.kode) + '</small>' : '';
+      return '<button class="post ' + (p.type === 'ind' ? 'ind' : '') + '" type="button" data-id="' + esc(p.id) + '">' +
+        '<span class="midt">' +
+          '<span class="navn">' + esc(p.tekst || (p.type === 'ind' ? 'Ind i kassen' : 'Udlæg')) + '</span>' +
+          '<span class="meta">' + meta.join(' &middot; ') + '</span>' +
+        '</span>' +
+        '<span class="bel">' + (p.type === 'ind' ? '+' : '') + kr(p.kr) + org + '</span>' +
+      '</button>';
+    }).join('');
+    return '<section class="dag"><div class="dag-hoved"><span>' + esc(dagnavn(n)) + '</span>' +
+      '<span>' + kr(dagsum) + '</span></div>' +
+      '<div class="poster">' + raekker + '</div></section>';
+  }).join('');
+}
+
+function tegnKopipind(){
+  var pind = $('kopipind');
+  var nye = data.poster.filter(function(p){
+    return !data.sidsteKopi || p.tid > data.sidsteKopi;
+  }).length;
+  if (nye >= 5) {
+    $('kopipindTekst').textContent = nye + ' posteringer er ikke sikkerhedskopieret';
+    pind.hidden = false;
+  } else {
+    pind.hidden = true;
+  }
+  $('kopiStatus').textContent = data.sidsteKopi
+    ? 'Sidste kopi: ' + new Date(data.sidsteKopi).toLocaleString('da-DK', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'})
+    : 'Der er endnu ikke taget en sikkerhedskopi.';
+}
+
+/* ------------------------------------------------------------------- Arket */
+
+function aabn(id){
+  $(id).hidden = false;
+  document.body.style.overflow = 'hidden';
+}
+function luk(id){
+  $(id).hidden = true;
+  if (document.querySelectorAll('.ark:not([hidden])').length === 0) document.body.style.overflow = '';
+}
+
+function aabnArk(post){
+  kladde = post ? JSON.parse(JSON.stringify(post)) : {
+    id: null,
+    tid: new Date().toISOString(),
+    type: 'udlaeg',
+    kr: 0,
+    tekst: '',
+    kategori: '',
+    hvem: '',
+    betaling: 'kontant',
+    org: null
+  };
+
+  arkValuta = 'kr';
+  tast = '';
+  if (post) {
+    if (post.org && data.valuta && post.org.kode === data.valuta.kode) {
+      arkValuta = 'ud';
+      tast = tal(post.org.beloeb).replace(/\./g, '');
+    } else {
+      tast = tal(post.kr).replace(/\./g, '');
+    }
+  }
+
+  $('arkTitel').textContent = post ? 'Ret postering' : 'Nyt udlæg';
+  $('gemKnap').textContent = post ? 'Gem ændringen' : 'Gem';
+  $('sletKnap').hidden = !post;
+  $('tekst').value = kladde.tekst;
+  $('hvem').value = kladde.hvem;
+  $('dato').value = datonoegle(kladde.tid);
+  $('ekstra').hidden = !(data.visEkstra || kladde.kategori || kladde.hvem || kladde.betaling === 'kort');
+  $('udvidKnap').textContent = $('ekstra').hidden ? 'Flere felter' : 'Færre felter';
+
+  tegnTypevalg();
+  tegnKategorier();
+  tegnBetaling();
+  tegnForslag();
+  tegnNavneliste();
+  tegnValutaknap();
+  tegnTast();
+  aabn('ark');
+}
+
+function tegnTypevalg(){
+  Array.prototype.forEach.call($('typevalg').children, function(b){
+    b.setAttribute('aria-pressed', b.dataset.type === kladde.type ? 'true' : 'false');
+  });
+  $('typevalg').children[0].textContent = 'Lagt ud';
+}
+
+function tegnKategorier(){
+  $('kategorier').innerHTML = data.kategorier.map(function(k){
+    return '<button type="button" data-k="' + esc(k) + '" aria-pressed="' +
+      (kladde.kategori === k ? 'true' : 'false') + '">' + esc(k) + '</button>';
+  }).join('');
+}
+
+function tegnBetaling(){
+  Array.prototype.forEach.call($('betaling').children, function(b){
+    b.setAttribute('aria-pressed', b.dataset.b === kladde.betaling ? 'true' : 'false');
+  });
+}
+
+function tegnForslag(){
+  var set = [], seet = {};
+  for (var i = data.poster.length - 1; i >= 0 && set.length < 5; i--) {
+    var t = data.poster[i].tekst;
+    if (t && !seet[t.toLowerCase()]) { seet[t.toLowerCase()] = 1; set.push(t); }
+  }
+  $('forslag').innerHTML = set.map(function(t){
+    return '<button type="button" data-tekst="' + esc(t) + '">' + esc(t) + '</button>';
+  }).join('');
+}
+
+function tegnNavneliste(){
+  var seet = {}, ud = [];
+  data.poster.forEach(function(p){
+    if (p.hvem && !seet[p.hvem.toLowerCase()]) { seet[p.hvem.toLowerCase()] = 1; ud.push(p.hvem); }
+  });
+  $('navneliste').innerHTML = ud.map(function(n){ return '<option value="' + esc(n) + '">'; }).join('');
+}
+
+function tegnValutaknap(){
+  var k = $('valutaKnap');
+  if (!data.valuta) {
+    arkValuta = 'kr';
+    k.textContent = 'kr';
+    k.disabled = true;
+    k.style.opacity = '.55';
+  } else {
+    k.disabled = false;
+    k.style.opacity = '1';
+    k.textContent = arkValuta === 'kr' ? 'kr' : data.valuta.kode;
+  }
+}
+
+function tastVaerdi(){
+  return laesTal(tast);
+}
+
+function tegnTast(){
+  var vis = $('tastTal');
+  vis.textContent = tast === '' ? '0' : tast;
+  vis.classList.toggle('blank', tast === '');
+  var v = tastVaerdi();
+  $('gemKnap').disabled = !(v > 0);
+  if (data.valuta && arkValuta === 'ud') {
+    $('omregn').textContent = v > 0 ? '= ' + kr(tilKroner(v)) : '';
+  } else if (data.valuta && v > 0) {
+    var iVal = data.valuta.kroner > 0 ? v * data.valuta.enheder / data.valuta.kroner : 0;
+    $('omregn').textContent = '= ' + tal(iVal) + ' ' + data.valuta.kode;
+  } else {
+    $('omregn').textContent = '';
+  }
+}
+
+function tryk(t){
+  if (t === 'slet') {
+    tast = tast.slice(0, -1);
+  } else if (t === ',') {
+    if (tast === '') tast = '0,';
+    else if (tast.indexOf(',') === -1) tast += ',';
+  } else {
+    var dele = tast.split(',');
+    if (dele.length > 1 && dele[1].length >= 2) return;
+    if (dele[0].length >= 9 && dele.length === 1) return;
+    if (tast === '0') tast = t; else tast += t;
+  }
+  tegnTast();
+}
+
+function gemPost(){
+  var v = tastVaerdi();
+  if (!(v > 0)) return;
+
+  var p = kladde;
+  if (data.valuta && arkValuta === 'ud') {
+    p.kr = tilKroner(v);
+    p.org = {beloeb: v, kode: data.valuta.kode, enheder: data.valuta.enheder, kroner: data.valuta.kroner};
+  } else {
+    p.kr = rund(v);
+    p.org = null;
+  }
+  p.tekst = $('tekst').value.trim();
+  p.hvem = $('hvem').value.trim();
+
+  var valgtDato = $('dato').value;
+  if (valgtDato && valgtDato !== datonoegle(p.tid)) {
+    var gl = new Date(p.tid);
+    var ny = new Date(valgtDato + 'T12:00:00');
+    ny.setHours(gl.getHours(), gl.getMinutes(), gl.getSeconds(), 0);
+    p.tid = ny.toISOString();
+  }
+
+  if (p.id) {
+    for (var i = 0; i < data.poster.length; i++) {
+      if (data.poster[i].id === p.id) { data.poster[i] = p; break; }
+    }
+  } else {
+    p.id = nytId();
+    data.poster.push(p);
+  }
+
+  data.visEkstra = !$('ekstra').hidden;
+  gem();
+  tegn();
+  luk('ark');
+  sig(p.type === 'ind' ? 'Lagt i kassen: ' + kr(p.kr) : 'Lagt ud: ' + kr(p.kr));
+}
+
+function sletPost(){
+  if (!kladde.id) return;
+  if (!confirm('Slet posteringen på ' + kr(kladde.kr) + '?')) return;
+  data.poster = data.poster.filter(function(p){ return p.id !== kladde.id; });
+  gem();
+  tegn();
+  luk('ark');
+  sig('Posteringen er slettet');
+}
+
+/* ------------------------------------------------------- Indstillingssiden */
+
+function fyldMere(){
+  $('iTurnavn').value = data.turnavn;
+  $('iStart').value = data.startbeloeb ? tal(data.startbeloeb) : '';
+  $('iKode').value = data.valuta ? data.valuta.kode : '';
+  $('iEnheder').value = data.valuta ? String(data.valuta.enheder) : '';
+  $('iKroner').value = data.valuta ? tal(data.valuta.kroner) : '';
+  $('iKategorier').value = data.kategorier.join(', ');
+  $('fortrydKnap').hidden = !laesFortryd();
+  tegnKursHjaelp();
+  tegnOversigt();
+  tegnKopipind();
+}
+
+function tegnKursHjaelp(){
+  var kode = $('iKode').value.trim();
+  var e = laesTal($('iEnheder').value), k = laesTal($('iKroner').value);
+  if (kode && e > 0 && k > 0) {
+    $('kursHjaelp').textContent = tal(e) + ' ' + kode + ' = ' + kr(k) + '. En enhed koster ' + tal(k / e) + ' kr.';
+  } else {
+    $('kursHjaelp').textContent = 'Skriv fx 100 og 165, hvis du fik 100 enheder for 165 kr.';
+  }
+}
+
+function gemMere(){
+  data.turnavn = $('iTurnavn').value.trim();
+  data.startbeloeb = rund(laesTal($('iStart').value));
+
+  var kode = $('iKode').value.trim();
+  var e = laesTal($('iEnheder').value), k = laesTal($('iKroner').value);
+  data.valuta = (kode && e > 0 && k > 0) ? {kode: kode, enheder: e, kroner: k} : null;
+
+  var kat = $('iKategorier').value.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+  data.kategorier = kat.length ? kat : STANDARDKATEGORIER.slice();
+
+  gem();
+  tegn();
+}
+
+function tegnOversigt(){
+  var pr = {}, hvem = {}, harKat = false, harHvem = false;
+  data.poster.forEach(function(p){
+    if (p.type !== 'udlaeg') return;
+    var k = p.kategori || 'Uden kategori';
+    pr[k] = rund((pr[k] || 0) + p.kr);
+    if (p.kategori) harKat = true;
+    if (p.hvem) { hvem[p.hvem] = rund((hvem[p.hvem] || 0) + p.kr); harHvem = true; }
+  });
+  if (!harKat && !harHvem) { $('oversigtBoks').hidden = true; return; }
+
+  var ud = '';
+  if (harKat) {
+    ud += Object.keys(pr).sort(function(a, b){ return pr[b] - pr[a]; }).map(function(k){
+      return '<div class="raekke"><span>' + esc(k) + '</span><b>' + kr(pr[k]) + '</b></div>';
+    }).join('');
+  }
+  if (harHvem) {
+    ud += '<div class="raekke" style="border-top-width:2px"><span><b>Fordelt på personer</b></span><span></span></div>';
+    ud += Object.keys(hvem).sort(function(a, b){ return hvem[b] - hvem[a]; }).map(function(n){
+      return '<div class="raekke"><span>' + esc(n) + '</span><b>' + kr(hvem[n]) + '</b></div>';
+    }).join('');
+  }
+  $('oversigt').innerHTML = ud;
+  $('oversigtBoks').hidden = false;
+}
+
+/* ------------------------------------------------------------- Ud og ind af */
+
+function filnavn(endelse){
+  var navn = (data.turnavn || 'rejsekasse').toLowerCase()
+    .replace(/[æ]/g,'ae').replace(/[ø]/g,'oe').replace(/[å]/g,'aa')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'rejsekasse';
+  return 'rejsekasse-' + navn + '-' + datonoegle(idag()) + '.' + endelse;
+}
+
+function somTekst(){
+  var l = [];
+  l.push('REJSEKASSE' + (data.turnavn ? ': ' + data.turnavn.toUpperCase() : ''));
+  l.push('Opgjort ' + idag().toLocaleString('da-DK', {day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'}));
+  l.push('');
+  l.push('Startbeløb i kassen  ' + kr(data.startbeloeb));
+  if (sumInd() > 0) l.push('Lagt i kassen siden  ' + kr(sumInd()));
+  l.push('Lagt ud i alt        ' + kr(sumUdlagt()));
+  if (sumKort() > 0) l.push('  heraf betalt med kort ' + kr(sumKort()));
+  l.push('Rest i kassen        ' + kr(rest()));
+  if (data.valuta) l.push('Kurs: ' + tal(data.valuta.enheder) + ' ' + data.valuta.kode + ' = ' + kr(data.valuta.kroner));
+  l.push('');
+
+  var dage = {}, orden = [];
+  data.poster.slice().sort(function(a, b){ return a.tid < b.tid ? -1 : 1; }).forEach(function(p){
+    var n = datonoegle(p.tid);
+    if (!dage[n]) { dage[n] = []; orden.push(n); }
+    dage[n].push(p);
+  });
+  orden.forEach(function(n){
+    l.push(new Date(n + 'T12:00:00').toLocaleDateString('da-DK', {weekday:'long', day:'numeric', month:'long'}));
+    dage[n].forEach(function(p){
+      var d = [];
+      if (p.kategori) d.push(p.kategori);
+      if (p.hvem) d.push(p.hvem);
+      if (p.betaling === 'kort') d.push('kort');
+      if (p.org) d.push(tal(p.org.beloeb) + ' ' + p.org.kode);
+      var navn = p.tekst || (p.type === 'ind' ? 'Ind i kassen' : 'Udlæg');
+      if (d.length) navn += ' (' + d.join(', ') + ')';
+      l.push('  ' + (p.type === 'ind' ? '+ ' : '- ') + kr(p.kr) + '   ' + navn);
+    });
+    l.push('');
+  });
+  return l.join('\n');
+}
+
+function somCsv(){
+  var r = [['Dato','Tid','Type','Tekst','Kategori','Hvem','Betaling','Beloeb i kr','Beloeb i valuta','Valuta']];
+  data.poster.slice().sort(function(a, b){ return a.tid < b.tid ? -1 : 1; }).forEach(function(p){
+    var d = new Date(p.tid);
+    r.push([
+      d.toLocaleDateString('da-DK'),
+      d.toLocaleTimeString('da-DK', {hour:'2-digit', minute:'2-digit'}),
+      p.type === 'ind' ? 'Ind i kassen' : 'Lagt ud',
+      p.tekst, p.kategori, p.hvem, p.betaling,
+      tal(p.kr),
+      p.org ? tal(p.org.beloeb) : '',
+      p.org ? p.org.kode : ''
+    ]);
+  });
+  r.push([]);
+  r.push(['Startbeloeb', '', '', '', '', '', '', tal(data.startbeloeb)]);
+  r.push(['Lagt ud i alt', '', '', '', '', '', '', tal(sumUdlagt())]);
+  r.push(['Rest i kassen', '', '', '', '', '', '', tal(rest())]);
+  return '﻿' + r.map(function(raekke){
+    return raekke.map(function(c){
+      c = String(c == null ? '' : c);
+      return /[";\n]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c;
+    }).join(';');
+  }).join('\r\n');
+}
+
+function hentFil(indhold, navn, type){
+  try {
+    var blob = new Blob([indhold], {type: type});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = navn;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 4000);
+    return true;
+  } catch(e){
+    return false;
+  }
+}
+
+function markerKopi(){
+  data.sidsteKopi = new Date().toISOString();
+  gem();
+  tegnKopipind();
+}
+
+function visTekst(titel, hjaelp, indhold){
+  $('tekstarkTitel').textContent = titel;
+  $('tekstarkHjaelp').textContent = hjaelp;
+  $('tekstarkFelt').value = indhold;
+  aabn('tekstark');
+}
+
+function gemSomFil(){
+  var indhold = JSON.stringify(data, null, 1);
+  if (hentFil(indhold, filnavn('json'), 'application/json')) {
+    markerKopi();
+    sig('Filen er hentet. Læg den et sikkert sted.');
+  } else {
+    visTekst('Sikkerhedskopi', 'Kopiér teksten og gem den i en mail eller en note. Den kan læses ind igen.', indhold);
+  }
+}
+
+function delRegnskab(){
+  var t = somTekst();
+  if (navigator.share) {
+    navigator.share({title: 'Rejsekasse' + (data.turnavn ? ': ' + data.turnavn : ''), text: t})
+      .then(markerKopi)
+      .catch(function(){});
+  } else {
+    visTekst('Regnskabet', 'Kopiér teksten og send den til dig selv.', t);
+    markerKopi();
+  }
+}
+
+function laesInd(raa){
+  var nyt;
+  try { nyt = ordn(JSON.parse(raa)); }
+  catch(e){ sig('Filen kunne ikke læses'); return; }
+  if (!confirm('Erstat det nuværende regnskab med ' + nyt.poster.length + ' posteringer?')) return;
+  try { localStorage.setItem(FORTRYD, JSON.stringify(data)); } catch(e){}
+  data = nyt;
+  gem();
+  tegn();
+  fyldMere();
+  sig('Regnskabet er hentet ind');
+}
+
+function laesFortryd(){
+  try { return localStorage.getItem(FORTRYD); } catch(e){ return null; }
+}
+
+function nulstil(){
+  if (!confirm('Ryd hele regnskabet og start en ny tur? Tag en sikkerhedskopi først.')) return;
+  try { localStorage.setItem(FORTRYD, JSON.stringify(data)); } catch(e){}
+  var kat = data.kategorier.slice();
+  data = JSON.parse(JSON.stringify(stand));
+  data.kategorier = kat;
+  gem();
+  tegn();
+  fyldMere();
+  sig('Klar til en ny tur');
+}
+
+function fortryd(){
+  var raa = laesFortryd();
+  if (!raa) return;
+  data = ordn(JSON.parse(raa));
+  try { localStorage.removeItem(FORTRYD); } catch(e){}
+  gem();
+  tegn();
+  fyldMere();
+  sig('Det forrige regnskab er hentet tilbage');
+}
+
+/* --------------------------------------------------------------- Installation */
+
+function tegnInstaller(){
+  var staaendeApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  var skjult = false;
+  try { skjult = localStorage.getItem('mg-rejsekasse-skjul-installer') === '1'; } catch(e){}
+  if (staaendeApp || skjult) { $('installer').hidden = true; return; }
+
+  var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  $('installerTekst').textContent = iOS
+    ? 'Tryk på Del-knappen nederst i Safari og vælg "Føj til hjemmeskærm". Så får appen sit eget ikon, og telefonen rydder ikke data af sig selv.'
+    : 'Vælg "Installer app" eller "Føj til startskærm" i browserens menu. Så får appen sit eget ikon og virker uden net.';
+  $('installerKnap').hidden = !installPrompt;
+  $('installer').hidden = false;
+}
+
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  installPrompt = e;
+  tegnInstaller();
+});
+
+/* ------------------------------------------------------------------ Bindinger */
+
+function bind(){
+  $('nyKnap').addEventListener('click', function(){ aabnArk(null); });
+  $('mereKnap').addEventListener('click', function(){ fyldMere(); aabn('mere'); });
+  $('kopipind').addEventListener('click', function(){ fyldMere(); aabn('mere'); });
+
+  document.addEventListener('click', function(e){
+    var l = e.target.closest('[data-luk]');
+    if (l) {
+      if (l.dataset.luk === 'mere') gemMere();
+      luk(l.dataset.luk);
+    }
+  });
+
+  $('liste').addEventListener('click', function(e){
+    var b = e.target.closest('.post');
+    if (!b) return;
+    var p = data.poster.filter(function(x){ return x.id === b.dataset.id; })[0];
+    if (p) aabnArk(p);
+  });
+
+  $('tastatur').addEventListener('click', function(e){
+    var b = e.target.closest('button');
+    if (b) tryk(b.dataset.t);
+  });
+
+  $('valutaKnap').addEventListener('click', function(){
+    if (!data.valuta) return;
+    arkValuta = (arkValuta === 'kr') ? 'ud' : 'kr';
+    tegnValutaknap();
+    tegnTast();
+  });
+
+  $('typevalg').addEventListener('click', function(e){
+    var b = e.target.closest('button');
+    if (!b) return;
+    kladde.type = b.dataset.type;
+    tegnTypevalg();
+  });
+
+  $('kategorier').addEventListener('click', function(e){
+    var b = e.target.closest('button');
+    if (!b) return;
+    kladde.kategori = (kladde.kategori === b.dataset.k) ? '' : b.dataset.k;
+    tegnKategorier();
+  });
+
+  $('betaling').addEventListener('click', function(e){
+    var b = e.target.closest('button');
+    if (!b) return;
+    kladde.betaling = b.dataset.b;
+    tegnBetaling();
+  });
+
+  $('forslag').addEventListener('click', function(e){
+    var b = e.target.closest('button');
+    if (b) $('tekst').value = b.dataset.tekst;
+  });
+
+  $('udvidKnap').addEventListener('click', function(){
+    var e = $('ekstra');
+    e.hidden = !e.hidden;
+    $('udvidKnap').textContent = e.hidden ? 'Flere felter' : 'Færre felter';
+  });
+
+  $('gemKnap').addEventListener('click', gemPost);
+  $('sletKnap').addEventListener('click', sletPost);
+
+  $('tekst').addEventListener('keydown', function(e){
+    if (e.key === 'Enter') { e.preventDefault(); this.blur(); }
+  });
+
+  ['iKode','iEnheder','iKroner'].forEach(function(id){
+    $(id).addEventListener('input', tegnKursHjaelp);
+  });
+  ['iTurnavn','iStart','iKode','iEnheder','iKroner','iKategorier'].forEach(function(id){
+    $(id).addEventListener('change', function(){ gemMere(); tegnOversigt(); });
+  });
+
+  $('delKnap').addEventListener('click', function(){ gemMere(); delRegnskab(); });
+  $('gemFilKnap').addEventListener('click', function(){ gemMere(); gemSomFil(); });
+  $('csvKnap').addEventListener('click', function(){
+    gemMere();
+    if (!hentFil(somCsv(), filnavn('csv'), 'text/csv;charset=utf-8')) {
+      visTekst('Regneark', 'Kopiér teksten og gem den som en .csv-fil.', somCsv());
+    }
+  });
+  $('hentFilKnap').addEventListener('click', function(){ $('filvaelger').click(); });
+  $('filvaelger').addEventListener('change', function(){
+    var f = this.files && this.files[0];
+    if (!f) return;
+    var l = new FileReader();
+    l.onload = function(){ laesInd(String(l.result)); };
+    l.readAsText(f);
+    this.value = '';
+  });
+
+  $('nulstilKnap').addEventListener('click', nulstil);
+  $('fortrydKnap').addEventListener('click', fortryd);
+
+  $('tekstarkKnap').addEventListener('click', function(){
+    var felt = $('tekstarkFelt');
+    felt.focus();
+    felt.select();
+    felt.setSelectionRange(0, felt.value.length);
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch(e){}
+    if (!ok && navigator.clipboard) {
+      navigator.clipboard.writeText(felt.value).then(function(){ sig('Kopieret'); });
+    } else {
+      sig(ok ? 'Kopieret' : 'Marker teksten og kopiér den selv');
+    }
+  });
+
+  $('installerKnap').addEventListener('click', function(){
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    installPrompt = null;
+    $('installerKnap').hidden = true;
+  });
+  $('installerSkjul').addEventListener('click', function(){
+    try { localStorage.setItem('mg-rejsekasse-skjul-installer', '1'); } catch(e){}
+    $('installer').hidden = true;
+  });
+
+  window.addEventListener('beforeunload', gem);
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'hidden') gem();
+  });
+}
+
+/* ------------------------------------------------------------------- Opstart */
+
+data = laes();
+bind();
+tegn();
+tegnInstaller();
+
+if (!data.poster.length && !data.startbeloeb) {
+  fyldMere();
+  aabn('mere');
+  setTimeout(function(){ $('iTurnavn').focus(); }, 300);
+}
+
+if (location.protocol === 'https:' && 'serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('rejsekasse-sw.js').catch(function(){});
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "Rejsekasse",
+  "short_name": "Rejsekasse",
+  "description": "Regnskab over kontanter, der lægges ud på en studietur.",
+  "lang": "da",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f1f6f5",
+  "theme_color": "#0f766e",
+  "icons": [
+    { "src": "../../assets/img/rejsekasse-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "../../assets/img/rejsekasse-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "../../assets/img/rejsekasse-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
