@@ -208,13 +208,17 @@ tale og dreje armen kan han:
 
 ## Bag bordet
 
-Har forsøget givet ham en fast plads bag bordpladen (`bagBord` i bordets valg —
-sb2.4 gør det), er han en del af lokalet i stedet for en mand, der kommer og
-går. Bordpladen dækker hans underkrop, han tegnes mindre, fordi han er længere
-væk, og han går ikke hen til det, han taler om: han bliver stående og peger.
-Kun det, der kræver hans hænder — oprydningen efter et uheld — henter ham om
-for enden af bordet, og bagefter går han hjem til pladsen igen. `K.UDE` betyder
-da »hjem« og ikke »ud af scenen«. Det tekniske står i
+Har forsøget givet ham et plan bag bordpladen (`bagBord` i bordets valg —
+sb2.4 gør det), taler han bagfra. Han bor ikke der: han er ude det meste af
+tiden, som han altid har været, og kommer kun ind, når han har noget at sige.
+Så går han ind bag bordet, standser dér, hvor der lige er plads i det rum —
+ikke samme sted hver gang — peger på det, replikken handler om, og går ud
+igen. Bordpladen dækker hans underkrop, og han tegnes mindre, fordi han er
+længere væk.
+
+Reglen er **hænder foran, ord bagved**. Det, der kræver, at han rører noget —
+oprydningen efter et uheld, kaffen, flasken der fyldes op igen — og
+baggrundslivet foregår foran bordet, præcis som før. Det tekniske står i
 `../laboratoriet/README.md` under »Kemichael bag bordet«.
 
 ## Uheld

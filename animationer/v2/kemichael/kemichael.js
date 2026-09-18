@@ -1142,10 +1142,14 @@
         var fredet = (valg.fredet || []).concat("gaaUd");
 
         /* ----- De to planer: foran og bag bordet (S8) ---------------------
-           Scenen siger med NK.Scene.BAGBORD ({ x, y, skala }), at laereren
-           hoerer hjemme BAG bordet. Saa er hans plads fast, han tegnes med
-           planets skala, og bordets bagkant klipper ham. Uden BAGBORD er
-           L.plan altid 0, og alt er som foer. */
+           Scenen siger med NK.Scene.BAGBORD ({ y, skala }), at laereren skal
+           tale BAG bordet. Han bor der ikke: han er ude det meste af tiden
+           og kommer kun ind, naar han har noget at sige. Saa gaar han ind
+           bag bordet, standser dér, hvor der er plads i netop dette rum
+           (laererPlads), peger og gaar ud igen. Det, der kraever hans
+           haender - oprydning, kaffen, flasken i affaldet - og
+           baggrundslivet foregaar foran bordet som foer (foran: true).
+           Uden BAGBORD er L.plan altid 0, og alt er som foer. */
         function bagValg() { return NK.Scene && NK.Scene.BAGBORD; }
         function bagSkala(bv) { return bv && bv.skala ? bv.skala : 0.82; }
         function kald(x, mig) { return typeof x === "function" ? x.call(mig) : x; }
@@ -1182,15 +1186,14 @@
             return { kald: function () { this.laerer.plan = p; } };
         }
 
-        /* Hjem til pladsen bag bordet: armen ned, om for enden, hvis han
-           staar foran, og saa hen paa plads */
-        function hjemTrin(bv) {
+        /* Ud af scenen: armen ned, hovedet lige og ud ad den kant, han er
+           naermest. Naar han er ude, staar planet paa "bag bordet" igen, saa
+           naeste replik kommer ind den rigtige vej (se opdaterLaerer). */
+        function udTrin() {
             return [
                 { arm: HAENGER, tid: 0.3 },
                 { kald: function () { this.laerer.hovedMaal = 0; } },
-                { gaa: function () { var L = this.laerer; return L.plan < 0.5 ? endeMod(L, bv.x) : L.x; }, fart: 560 },
-                skiftPlan(1),
-                { gaa: bv.x }
+                { gaa: UDE }
             ];
         }
 
@@ -1209,9 +1212,10 @@
             return (m && typeof m === "object") ? m : { x: m };
         }
 
-        /* Bliv staaende og peg: hovedet drejer, og armen gaar op mod stedet */
+        /* Gaa ind bag bordet, stands hvor der er plads, og peg derhen */
         function pegTrin(tr) {
             return [
+                { gaa: function () { return this.laererPlads(modPunkt(tr.mod, this)); } },
                 { kald: function () { this.laerer.hovedMaal = this.kigVinkel(modPunkt(tr.mod, this).x); } },
                 { arm: function () { var m = modPunkt(tr.mod, this); return this.pegVinkel(m.x, m.y); }, tid: 0.45 }
             ];
@@ -1219,19 +1223,93 @@
 
         /* En scene, der er skrevet til en mand foran bordet, laest om til
            en mand bag det. Alt uden gaa gaar igennem uroert, og et gaa
-           uden mod og foran er stadig en gang - bag bordet, hvor hylderne
-           og kaffen staar. */
+           uden mod og foran er stadig en almindelig gang bag bordet. */
         function omskrivBag(trin, bv) {
             var ud = [];
             trin.forEach(function (tr) {
                 if (!tr || tr.gaa === undefined) { ud.push(tr); return; }
-                if (tr.gaa === UDE) { ud.push.apply(ud, hjemTrin(bv)); return; }
+                if (tr.gaa === UDE) { ud.push.apply(ud, udTrin()); return; }
                 if (tr.foran) { ud.push.apply(ud, foranTrin(tr)); return; }
                 if (tr.mod !== undefined) { ud.push.apply(ud, pegTrin(tr)); return; }
                 ud.push(tr);
             });
             return ud;
         }
+
+        /* ----- Hvor der er plads --------------------------------------------
+           Han standser ikke samme sted hver gang. Han gaar ind bag bordet og
+           stopper dér, hvor der er plads i netop dette rum - saa taet paa
+           det, han taler om, som han kan uden at stille sig bag noget, der
+           skal kunne ses. Prisen er af samme slags som taleboblens: den
+           haarde afgoer, den bloede skiller lige gode ad.
+
+           Haard pris (han maa ikke staa der):
+             * zoomboblen paa scenen - dér ville han vaere usynlig
+             * plakaten og hylderne, som han tegnes hen over
+             * det, der staar paa en hylde, som tegnes hen over ham
+             * det, han lige nu peger paa (maal.rekt)
+           Blod pris: hvor langt der er fra ham til det, han taler om.
+           Gennemsigtigt glas paa bordpladen er ikke et problem (din
+           beslutning 18/9 kl. 22.30), saa bade og bagerglas taeller ikke med.
+
+           Er der ingen plads, der er helt fri, vaelges den, der gaar mindst
+           paa kompromis - han skal et sted hen. */
+        function raek(a, b) {
+            return a && b && a.x < b.x + b.b && a.x + a.b > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+        }
+
+        function snitAreal(a, b) {
+            if (!raek(a, b)) return 0;
+            return (Math.min(a.x + a.b, b.x + b.b) - Math.max(a.x, b.x)) *
+                   (Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+        }
+
+        /* Det, han ikke maa staa bag. Samles én gang pr. valg, for bordet
+           kan have flyttet sig siden sidst. */
+        P.laererOptagetAf = function () {
+            var mig = this, ud = [];
+            if (this.bobleRekt) {
+                var br = this.bobleRekt();
+                if (br) ud.push(br);
+            }
+            if (this.plakat) ud.push({ x: this.plakat.x, y: this.plakat.y, b: 132, h: 128 });
+            var hylder = S.HYLDER || (S.HYLDE ? [S.HYLDE] : []);
+            hylder.forEach(function (H) { ud.push({ x: H.x0, y: H.y, b: H.x1 - H.x0, h: 21 }); });
+            /* Alt, der staar paa en hylde: det tegnes hen over ham */
+            (this.liste || []).forEach(function (gg) {
+                if (!mig.synlig(gg) || !gg.type) return;
+                var r = mig.rekt(gg, 0);
+                var paaHylde = hylder.some(function (H) {
+                    return Math.abs(r.y + r.h - H.y) < 6 && r.x + r.b > H.x0 - 4 && r.x < H.x1 + 4;
+                });
+                if (paaHylde) ud.push(r);
+            });
+            return ud;
+        };
+
+        /* maal: { x, y } - det, han taler om. Giver et x bag bordet. */
+        P.laererPlads = function (maal) {
+            var bv = bagValg();
+            if (!bv) return maal && maal.x !== undefined ? maal.x : this.laerer.x;
+            var k = bagSkala(bv);
+            var top = bv.y - 116 * k, h = Math.max(1, S.BORD - top);
+            var undgaa = this.laererOptagetAf();
+            /* Og ikke bag det, han lige nu peger paa (maal.rekt) */
+            if (maal && maal.rekt) undgaa = undgaa.concat([maal.rekt]);
+            var maalX = maal && maal.x !== undefined ? maal.x : S.BREDDE / 2;
+            var x0 = 105 * k, x1 = S.BREDDE - 112 * k;
+            var bedst = null;
+            for (var x = x0; x <= x1 + 0.01; x += 10) {
+                var r = { x: x - 105 * k, y: top, b: 217 * k, h: h };
+                var haard = 0;
+                for (var i = 0; i < undgaa.length; i++) haard += snitAreal(r, undgaa[i]);
+                var bloed = Math.abs(x - maalX);
+                if (!bedst || haard < bedst.haard - 1 || (haard <= bedst.haard + 1 && bloed < bedst.bloed)) {
+                    bedst = { x: x, haard: haard, bloed: bloed };
+                }
+            }
+            return bedst ? bedst.x : NK.klamp(maalX, x0, x1);
+        };
 
         /* Vinklen, armen skal have for at pege paa et sted paa bordet.
            Armen drejer om skulderen, og dens retning ved vinklen v er
@@ -1252,7 +1330,7 @@
         P.laererStart = function () {
             var bv = bagValg();
             this.laerer = {
-                x: bv ? bv.x : UDE, maalX: bv ? bv.x : UDE,
+                x: UDE, maalX: UDE,
                 y: bv ? bv.y : Y_FORAN, plan: bv ? 1 : 0, skala: bv ? bagSkala(bv) : 1,
                 loeb: false, fart: 0, gang: 0,
                 scene: null,
@@ -1290,15 +1368,8 @@
             L.hovedV = 0; L.hovedMaal = 0; L.hovedDx = 0; L.hovedDy = 0;
             L.lukket = 0;
             L.kopV = 0;
-            /* Bag bordet gaar han ikke ud; han staar paa sin plads igen */
-            var bvNy = bagValg();
-            if (bvNy) {
-                L.plan = 1;
-                L.x = bvNy.x;
-                L.maalX = bvNy.x;
-                L.arm = HAENGER;
-                L.armTil = HAENGER;
-            }
+            /* Naeste replik kommer ind bag bordet */
+            if (bagValg()) L.plan = 1;
             /* Nyt forsoeg: koppen staar paa hylden igen, saa paaskeaegget
                kan komme en gang til, og uheldene taelles forfra */
             uheldNu = 0;
@@ -1391,7 +1462,7 @@
                 udtryk: function (o) { return [{ udtryk: o }]; },
                 vent: function (tid) { return [{ tid: tid }]; },
                 suk: function (tid) { return [suk(tid)]; },
-                gaa: function (x, loeb) { return [{ gaa: x, loeb: !!loeb }]; },
+                gaa: function (x, loeb) { return [{ gaa: x, loeb: !!loeb, foran: true }]; },
                 grib: function () {
                     return [
                         { arm: -0.5, tid: 0.55 },
@@ -1570,19 +1641,14 @@
                 }
                 return;
             }
-            var bvB = bagValg();
-            if (L.scene) return;
-            /* Ude af scenen - eller hjemme paa pladsen bag bordet */
-            if (bvB ? (L.plan < 0.999 || Math.abs(L.x - bvB.x) > 1) : L.x > UDE + 1) return;
+            if (L.scene || L.x > UDE + 1) return;
             /* Ikke, mens fanen er skjult, eller en popup daekker scenen */
             if (window.document && document.visibilityState === "hidden") return;
             if (window.document && document.querySelector(".overlay.vis")) return;
             if (stille() < STILLE_FOERSTE || sidenBaggrund() < STILLE_IGEN) return;
             if (!this.laererRolig()) return;
-            /* Bag bordet gaar han ikke tvaers over med en kasse; han kigger
-               op fra sit og spoerger, om det staar stille */
-            if (bvB || Math.random() >= 0.5) this.laererStilstand();
-            else this.laererForbi();
+            if (Math.random() < 0.5) this.laererForbi();
+            else this.laererStilstand();
         };
 
         /* Markerer scenen som baggrundsliv, saa den viger for eleven */
@@ -1599,7 +1665,7 @@
                 { udtryk: { vrede: 0.3, humoer: -0.1, roed: 0, skeptisk: 0, briller: 0, laen: 0 } },
                 { arm: 1.95, tid: 0.01 },
                 { kald: function () { this.laerer.baerer = "kasse"; } },
-                { gaa: 210, fart: 250 }
+                { gaa: 210, fart: 250, foran: true }
             ].concat(sig, [
                 { gaa: function () { return S.BREDDE + 220; }, fart: 250 },
                 { kald: function () { this.laerer.baerer = null; this.laerer.x = UDE; this.laerer.maalX = UDE; this.laerer.arm = HAENGER; } }
@@ -1609,11 +1675,9 @@
 
         /* Han kigger ind fra kanten og spoerger, om det staar stille */
         P.laererStilstand = function () {
-            /* Bag bordet staar han allerede der; foran bordet kigger han ind
-               fra kanten */
             this.laererKoer("stilstand", [
                 { udtryk: { vrede: 0.3, humoer: -0.1, roed: 0, briller: 1, laen: 1 } },
-                bagValg() ? { tid: 0.3 } : { gaa: KANT },
+                { gaa: KANT, foran: true },
                 { tid: 0.4 },
                 { sig: replik("stilstand"), vis: 3.0, tid: 2.2 },
                 { udtryk: { briller: 0, laen: 0 } },
@@ -1688,15 +1752,12 @@
                 L.y = NK.lerp(Y_FORAN, bvOp.y, L.plan);
                 L.skala = NK.lerp(1, bagSkala(bvOp), L.plan);
             }
-            /* Han falder til ro, naar han er ude af billedet. Bag bordet
-               gaar han aldrig ud, saa dér tager det seks stille sekunder
-               paa pladsen, foer prikkene og det roede hoved er glemt. */
-            if (bvOp) {
-                var iRo = !L.scene && L.taleUr <= 0 && L.plan >= 0.999 && Math.abs(L.x - bvOp.x) < 1;
-                L.roUr = iRo ? (L.roUr || 0) + dt : 0;
-                if (L.roUr > 6) { L.klik = 0; L.roedMaal = 0; L.damp = 0; L.brillerMaal = 0; L.laenMaal = 0; }
-            } else if (L.x <= UDE + 1 && !L.scene) {
+            /* Ude af billedet falder han til ro - og naeste gang kommer han
+               ind bag bordet igen, uanset hvor han gik ud */
+            if (L.x <= UDE + 1 && !L.scene) {
                 L.klik = 0; L.roedMaal = 0; L.damp = 0; L.brillerMaal = 0; L.laenMaal = 0;
+                L.hovedMaal = 0;
+                if (bvOp) L.plan = 1;
             }
 
             /* Udtryk, tale og blink */

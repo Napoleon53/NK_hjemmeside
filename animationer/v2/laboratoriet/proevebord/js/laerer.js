@@ -20,8 +20,8 @@
                 laererReplik(tekst, valg, kilde). Han kommer ind, siger
                 linjerne og gaar igen. valg kan have:
                   peg      navnet paa en genstand: han stiller sig ved den
-                           og markerer den. Staar han bag bordet (S8),
-                           bliver han staaende og peger paa den i stedet
+                           og markerer den. Bag bordet (S8) standser han i
+                           stedet dér, hvor der er plads, og peger paa den
                   glimt    id paa et glimt af hans baggrund, sagt til sidst
                   udtryk   "toer" (standard), "streng", "mild", "skeptisk"
                            eller et udtryk-objekt som i kemichael.js
@@ -120,10 +120,11 @@
     }
 
     /* En kort bemaerkning: han kommer ind, siger replikkerne og gaar igen.
-       mod er det sted paa bordet, det handler om: staar han bag bordet,
-       bliver han staaende og peger derhen i stedet for at gaa. */
-    function bemaerkning(mig, navn, x, udtryk, replikker, ekstra, mod) {
-        var trin = [{ udtryk: udtryk }, { gaa: x, mod: mod }];
+       mod er det sted paa bordet, det handler om: bag bordet standser han,
+       hvor der er plads, og peger derhen i stedet for at gaa hen til det.
+       foran: scenen kraever hans haender, saa han skal foran bordet. */
+    function bemaerkning(mig, navn, x, udtryk, replikker, ekstra, mod, foran) {
+        var trin = [{ udtryk: udtryk }, { gaa: x, mod: mod, foran: foran }];
         replikker.forEach(function (rp, i) {
             if (i > 0) trin.push({ tid: 0.2 });
             trin.push(sig(rp));
@@ -162,7 +163,7 @@
        top, saa armen peger paa den og ikke ned bag den */
     function pegPunkt(mig, gg) {
         var rk = mig.rekt(gg, 0);
-        return { x: gg.p.x, y: rk.y + Math.min(24, rk.h * 0.3) };
+        return { x: gg.p.x, y: rk.y + Math.min(24, rk.h * 0.3), rekt: rk };
     }
 
     P.laererSigReplik = function (a) {
@@ -346,7 +347,8 @@
             sig("Der er mere i forberedelsen. Én gang.")
         ];
         bemaerkning(this, "affald", 150, { vrede: 1, humoer: -0.9, roed: 0.45, briller: 1 },
-            ["En hel flaske i affaldet.", foer ? "Det var den sidste." : "Den var til hele klassen."], ekstra);
+            ["En hel flaske i affaldet.", foer ? "Det var den sidste." : "Den var til hele klassen."],
+            ekstra, null, true);
     };
 
     /* ----- Tegning ------------------------------------------------------------- */

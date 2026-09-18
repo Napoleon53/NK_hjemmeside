@@ -410,17 +410,17 @@ function koerTest() {
     var fyrede = false;
     for (var q = 0; q < 60 && !fyrede; q++) { adv(0.5); fyrede = !!F.fyret.roert_reference; }
     paastand("udloeseren fyrede", fyrede);
-    /* Bag bordet gaar han ikke hen til glasset: han bliver staaende paa
-       sin plads og peger paa det (S8). Foelg ham, til glimtet er sagt. */
+    /* Bag bordet gaar han ikke hen til glasset: han standser, hvor der er
+       plads, og peger paa det (S8). Foelg ham, til glimtet er sagt. */
     var saaFoerste = false, saaAnden = false, saaAfslag = false, markeret = false;
-    var stodVed = null, pegVink = null, pegFacit = null;
-    var pladsen = NK.Scene.BAGBORD;
+    var stodVed = null, pegVink = null, pegFacit = null, planUnder = null;
     for (q = 0; q < 80 && !saaAfslag; q++) {
         adv(0.5);
         if (L.taleUr <= 0) continue;
         if (L.tale === NK.TEKST["sig-reference"][0]) {
             saaFoerste = true;
             stodVed = L.x;
+            planUnder = L.plan;
             pegVink = L.arm;
             var rk7 = bord.rekt(g7b, 0);
             pegFacit = bord.pegVinkel(g7b.p.x, rk7.y + Math.min(24, rk7.h * 0.3));
@@ -430,8 +430,10 @@ function koerTest() {
         if (L.tale.indexOf("afslag") >= 0) saaAfslag = true;
     }
     paastand("han kom ind og sagde foerste linje fra tekst.js", saaFoerste);
-    paastand("han bliver staaende paa sin plads bag bordet", stodVed !== null && L.plan === 1 &&
-        Math.abs(stodVed - pladsen.x) < 1, stodVed + " mod " + pladsen.x);
+    paastand("han staar bag bordet, mens han taler", planUnder === 1, "plan " + planUnder);
+    paastand("og han gaar ikke hen til glasset, men standser hvor der er plads",
+        stodVed !== null && Math.abs(stodVed - g7b.p.x) > 100,
+        stodVed === null ? "kom aldrig" : tal(stodVed, 0) + ", glasset staar i " + tal(g7b.p.x, 0));
     paastand("og peger paa glas 7 inden for 10 grader", pegVink !== null &&
         Math.abs(pegVink - pegFacit) < 10 * Math.PI / 180,
         pegVink === null ? "pegede ikke" : tal(pegVink * 180 / Math.PI, 1) + "° mod " + tal(pegFacit * 180 / Math.PI, 1) + "°");
@@ -513,6 +515,7 @@ function koerTest() {
     adv(30);
     paastand("efter replikken er der ikke laengere noget at undgaa", L.undgaa === null && !L.scene);
     paastand("og armen haenger ned igen", Math.abs(L.arm - NK.Kemichael.HAENGER) < 0.05, tal(L.arm, 2));
+    paastand("og han er gaaet ud af scenen igen", L.x <= NK.Kemichael.UDE + 1, tal(L.x, 0));
 
     /* F5: taleboblen er oeverste lag. Zoomboblen staar i venstre hjoerne,
        saa proeven er ham ovre i venstre side med en lang replik. */
@@ -861,54 +864,89 @@ function koerTest() {
     NK.startForfra();
 
     overskrift("18. Kemichael bag bordet");
-    /* S8: hans plads er bag bordet i hoejre side (plads B). Bordpladen
-       daekker hans underkrop, han daekker intet af det, man skal bruge, og
-       han kommer kun om for enden af bordet, naar der skal ryddes op. */
+    /* S8: han bor ikke bag bordet - han er ude det meste af tiden og kommer
+       kun ind, naar han har noget at sige. Saa staar han bag bordpladen, som
+       daekker hans underkrop, og han standser dér, hvor der er plads i netop
+       dette rum. Det, der kraever hans haender, foregaar foran bordet. */
+    NK.startForfra();
     adv(1);
     var BB = NK.Scene.BAGBORD;
-    paastand("opstillingen giver ham en plads bag bordet", !!BB && BB.x === 940 && BB.skala < 1,
-        BB ? "x=" + BB.x + " y=" + BB.y + " skala=" + tal(BB.skala, 2) : "ingen plads");
-    paastand("han staar der fra begyndelsen", bord.laererBagBord() && Math.abs(L.x - BB.x) < 1 && L.plan === 1,
-        tal(L.x, 0) + ", plan " + L.plan);
-    paastand("og tegnes mindre, fordi han er laengere vaek", Math.abs(bord.laererSkala() - BB.skala) < 0.001, tal(bord.laererSkala(), 2));
-    var lr = bord.laererRekt();
+    paastand("opstillingen giver ham et plan bag bordet og ingen fast plads",
+        !!BB && BB.x === undefined && BB.y === 358 && BB.skala < 1,
+        BB ? "y=" + BB.y + " skala=" + tal(BB.skala, 2) + (BB.x === undefined ? ", intet x" : ", x=" + BB.x) : "intet plan");
+    paastand("han er ude af scenen, naar han ikke har noget at sige",
+        L.x <= NK.Kemichael.UDE + 1 && !L.scene, tal(L.x, 0));
+
+    /* Pladsen regnes ud i oejeblikket: hvad han taler om, afgoer hvor han
+       standser, og han staar aldrig bag noget, der skal kunne ses */
+    function pegMaal(navn) {
+        var gg = bord.g[navn], rk = bord.rekt(gg, 0);
+        return { x: gg.p.x, y: rk.y + Math.min(24, rk.h * 0.3), rekt: rk };
+    }
+    function hansRekt(x) {
+        var k = BB.skala, top = BB.y - 116 * k;
+        return { x: x - 105 * k, y: top, b: 217 * k, h: NK.Scene.BORD - top };
+    }
+    var vedGlas7 = bord.laererPlads(pegMaal("glas7"));
+    var vedIsbad = bord.laererPlads(pegMaal("isbad"));
+    var vedVandbad = bord.laererPlads(pegMaal("vandbad"));
+    paastand("han standser forskellige steder alt efter hvad han taler om",
+        vedGlas7 !== vedIsbad && vedIsbad !== vedVandbad,
+        "glas 7: " + tal(vedGlas7, 0) + ", isbadet: " + tal(vedIsbad, 0) + ", vandbadet: " + tal(vedVandbad, 0));
+    paastand("og aldrig bag det, han selv peger paa",
+        !rammer(hansRekt(vedIsbad), bord.rekt(bord.g.isbad, 0)) &&
+        !rammer(hansRekt(vedVandbad), bord.rekt(bord.g.vandbad, 0)));
+    var optaget = bord.laererOptagetAf();
+    [["glas 7", vedGlas7], ["isbadet", vedIsbad], ["vandbadet", vedVandbad]].forEach(function (par) {
+        var r = hansRekt(par[1]), stoeder = [];
+        optaget.forEach(function (o, i) { if (rammer(r, o)) stoeder.push(i); });
+        paastand("pladsen ved " + par[0] + " er fri for zoomboblen, plakaten, hylderne og det, der staar paa dem",
+            stoeder.length === 0, stoeder.length ? stoeder.length + " sammenstoed" : "fri");
+    });
+    paastand("og han bliver inden for scenen", vedGlas7 - 105 * BB.skala > -1 &&
+        vedIsbad + 112 * BB.skala < NK.Scene.BREDDE + 1);
+
+    /* Han kommer ind, taler og gaar ud igen */
+    B.haeldI(bord.g.glas3, B.udtag(bord.g.kolbe, 3), true);
+    bord.laererReplik(["Glas 3 fik mere SCN⁻."], { peg: "glas3" }, { id: "s18" });
+    var saaHam = false, planMensHanTalte = null, stodI = null, lr = null;
+    for (var q9 = 0; q9 < 120 && !saaHam; q9++) {
+        adv(0.25);
+        if (L.taleUr > 0 && L.taleAlfa > 0.5) {
+            saaHam = true;
+            planMensHanTalte = L.plan;
+            stodI = L.x;
+            lr = bord.laererRekt();
+        }
+    }
+    paastand("en replik henter ham ind bag bordet", saaHam && planMensHanTalte === 1, "plan " + planMensHanTalte);
     paastand("bordpladen daekker ham forneden: han slutter ved bagkanten",
-        Math.abs((lr.y + lr.h) - NK.Scene.BORD) < 0.5, "slutter i " + tal(lr.y + lr.h, 0) + ", bagkanten er " + NK.Scene.BORD);
-    paastand("og hovedet naar op under den nederste hylde til hoejre",
-        lr.y > 230 && lr.y < 300, "issen i " + tal(lr.y, 0));
+        !!lr && Math.abs((lr.y + lr.h) - NK.Scene.BORD) < 0.5, lr ? "slutter i " + tal(lr.y + lr.h, 0) : "-");
+    paastand("og issen naar op under den nederste hylde uden at krydse den",
+        !!lr && lr.y > 251 && lr.y < 300, lr ? "issen i " + tal(lr.y, 0) : "-");
+    paastand("han tegnes mindre, fordi han er laengere vaek",
+        Math.abs(bord.laererSkala() - BB.skala) < 0.001, tal(bord.laererSkala(), 2));
 
-    /* Han maa ikke staa i vejen for noget, man skal bruge */
-    paastand("han daekker ikke plakaten", !rammer(lr, { x: 880, y: 70, b: 132, h: 128 }));
-    paastand("han daekker ikke zoomboblen", !rammer(lr, bord.bobleRekt()));
-    var paaHylde = [];
-    (NK.Scene.HYLDER || []).forEach(function (H, i) {
-        if (rammer(lr, { x: H.x0, y: H.y, b: H.x1 - H.x0, h: 21 })) paaHylde.push("hylde " + (i + 1));
-    });
-    bord.liste.forEach(function (gg) {
-        if (!bord.synlig(gg) || !gg.hjem) return;
-        if (bord.rekt(gg, 0).y + bord.rekt(gg, 0).h < NK.Scene.BORD - 40 && rammer(lr, bord.rekt(gg, 0))) paaHylde.push(gg.navn);
-    });
-    paastand("han daekker ikke hylderne eller det, der staar paa dem", paaHylde.length === 0, paaHylde.join(", ") || "intet");
-    var daekkerGlas = [];
-    [1, 2, 3, 4, 5, 6, 7, 8].forEach(function (n) {
-        if (rammer(lr, bord.rekt(bord.g["glas" + n], 0))) daekkerGlas.push("glas " + n);
-    });
-    paastand("og han daekker ingen af de otte reagensglas", daekkerGlas.length === 0, daekkerGlas.join(", ") || "intet");
-
-    /* Han ligger bag alt paa bordet: et klik paa isbadet foran ham rammer
-       isbadet, ikke ham */
+    /* Han ligger bag alt paa bordet */
     var rIs = bord.rekt(bord.g.isbad, 0);
-    paastand("et klik paa isbadet foran ham rammer isbadet", bord.hvad({ x: rIs.x + rIs.b / 2, y: rIs.y + 20 }) === "isbad",
+    paastand("et klik paa et glas foran ham rammer glasset", bord.hvad({ x: rIs.x + rIs.b / 2, y: rIs.y + 20 }) === "isbad",
         bord.hvad({ x: rIs.x + rIs.b / 2, y: rIs.y + 20 }));
     paastand("men et klik paa hans hoved rammer ham", bord.hvad({ x: L.x, y: L.y - 90 }) === "laerer",
         bord.hvad({ x: L.x, y: L.y - 90 }));
     paastand("under bordkanten rammer man ham ikke", bord.overLaerer({ x: L.x, y: NK.Scene.BORD + 30 }) === null);
+    adv(40);
+    paastand("naar han er faerdig, gaar han ud af scenen igen",
+        L.x <= NK.Kemichael.UDE + 1 && !L.scene, tal(L.x, 0));
 
-    /* Og med musen: glas 6 kan saettes i isbadet, selv om han staar bag det */
+    /* Med musen: glas 6 kan saettes i isbadet, ogsaa mens han staar der */
+    NK.startForfra();
+    adv(0.5);
     var is6 = bord.g.isbad, stv6 = bord.g.stativ, g6 = bord.g.glas6, hul6 = g6.sted && g6.sted.hul;
+    bord.laererReplik(["Isbadet holder to grader."], { peg: "isbad" }, { id: "s18b" });
+    for (var q10 = 0; q10 < 40 && L.taleUr <= 0; q10++) adv(0.25);
     paastand("glas 6 kan tages op af stativet med musen", mus.tag("glas6", 0.5, 0.3));
     mus.baer({ x: is6.p.x, y: is6.p.y - 60 }, 0.8);
-    paastand("isbadet faar den groenne ramme, selv om han staar bag det", bord.slipMaal === "isbad", bord.slipMaal);
+    paastand("isbadet faar den groenne ramme, selv om han staar bagved", bord.slipMaal === "isbad", bord.slipMaal);
     mus.slip();
     mus.hold(1);
     paastand("og sluppet der staar glas 6 i isbadet", g6.paa === is6 && !g6.sted, g6.paa ? g6.paa.navn : "ingen steder");
@@ -918,28 +956,47 @@ function koerTest() {
     mus.hold(1);
     paastand("og kan saettes tilbage i sit hul", !!g6.sted && g6.sted.hul === hul6, g6.sted ? "hul " + g6.sted.hul : "ikke i stativet");
 
-    /* Et uheld: han kommer om for enden af bordet, toerrer op og gaar hjem */
+    /* Det, der kraever hans haender, foregaar foran bordet */
+    NK.startForfra();
+    adv(1);
     var altidF = bord.laererAltid;
     bord.laererAltid = true;
     B.haeldI(bord.g.glas1, B.udtag(bord.g.kolbe, 3), true);
     bord.laererUheld("spild", bord.g.glas1);
     var saaForan = false, saaUdenfor = false, naaedePyt = false;
-    for (var q8 = 0; q8 < 200; q8++) {
+    for (var q8 = 0; q8 < 240; q8++) {
         adv(0.25);
         if (L.plan < 0.5) saaForan = true;
-        if (L.x < -100 || L.x > NK.Scene.BREDDE + 100) saaUdenfor = true;
+        if (saaForan && (L.x < -100 || L.x > NK.Scene.BREDDE + 100)) saaUdenfor = true;
         if (L.plan < 0.5 && Math.abs(L.x - NK.klamp(bord.g.glas1.p.x - 130, 60, NK.Scene.BREDDE - 260)) < 2) naaedePyt = true;
-        if (!L.scene && saaForan && L.plan === 1) break;
+        if (!L.scene && saaForan && L.x <= NK.Kemichael.UDE + 1) break;
     }
     paastand("ved et uheld kommer han foran bordet", saaForan);
     paastand("og gaar om for enden, uden for scenen", saaUdenfor);
     paastand("han naar hen til pytten og toerrer op", naaedePyt && bord.pytter.length === 0, bord.pytter.length + " pytter tilbage");
-    paastand("og staar hjemme bag bordet bagefter", L.plan === 1 && Math.abs(L.x - BB.x) < 1 && !L.scene,
-        tal(L.x, 0) + ", plan " + L.plan);
+    paastand("og gaar ud af scenen bagefter", L.x <= NK.Kemichael.UDE + 1 && !L.scene, tal(L.x, 0));
+    paastand("naeste gang kommer han ind bag bordet igen", L.plan === 1, "plan " + L.plan);
     bord.laererAltid = altidF;
+
+    /* Kaffen staar paa hylden, men han skal have haenderne i den */
     NK.startForfra();
     adv(1);
-    paastand("start forfra saetter ham tilbage paa pladsen", L.plan === 1 && Math.abs(L.x - BB.x) < 1, tal(L.x, 0));
+    paastand("kaffekoppen staar paa hylden", !!bord.g.kaffekop && !bord.g.kaffekop.skjult);
+    bord.klikKop();
+    var kaffeForan = false, tagetOp = false;
+    for (var q11 = 0; q11 < 240 && L.scene; q11++) {
+        adv(0.25);
+        if (L.plan < 0.5) kaffeForan = true;
+        if (bord.g.kaffekop.iHaand) tagetOp = true;
+    }
+    paastand("kaffen hentes foran bordet, som foer", kaffeForan);
+    paastand("og koppen kommer i hans haand", tagetOp);
+    adv(20);
+    NK.startForfra();
+    adv(1);
+    paastand("start forfra sender ham ud og saetter planet tilbage",
+        L.x <= NK.Kemichael.UDE + 1 && L.plan === 1 && !L.scene, tal(L.x, 0) + ", plan " + L.plan);
+
 }
 
 function vis() {

@@ -223,9 +223,11 @@ tilfældene. `laererAltid = true` slår tilfældet fra i selvtestene.
 
 ## Kemichael bag bordet: to planer
 
-Et bord kan give ham en fast plads bag bordpladen med `bagBord: { x, y,
-skala }` i `NK.BORD_VALG` (sb2.4 bruger den; prøvebordet og prøverummet gør
-ikke). Så er han en del af lokalet i stedet for en mand, der kommer og går:
+Et bord kan give ham et plan bag bordpladen med `bagBord: { y, skala }` i
+`NK.BORD_VALG` (sb2.4 bruger det; prøvebordet og prøverummet gør ikke). Han
+*bor* ikke der: han er ude af scenen det meste af tiden, præcis som før, og
+kommer kun ind, når han har noget at sige. Reglen er **hænder foran, ord
+bagved**.
 
 * **Han tegnes i sit eget plan.** `skala` er planets faktor — bag bordet er
   han længere væk og tegnes mindre — og `y` er halsens højde. Hele figuren,
@@ -235,15 +237,23 @@ ikke). Så er han en del af lokalet i stedet for en mand, der kommer og går:
   så pladen dækker hans underkrop. Derfor betyder hans størrelse mindre, og
   han kan ikke stille sig foran glassene. Et klik på ham gælder først, når
   intet på bordet ligger under musen (`laererBagBord` i `bord.hvad`).
-* **Han bliver stående og peger.** Et scenetrin `{ gaa: x, mod: m }` er
-  stadig en gang uden `bagBord`, men med den drejer han hovedet og fører
-  armen mod `m` (`pegVinkel`, `kigVinkel`) i stedet for at gå derhen.
-  `mod` er et x eller et punkt `{ x, y }`.
-* **Kun hænderne henter ham om for enden.** Et trin med `foran: true`
-  (oprydningen efter et uheld) sender ham om for den ende af bordet, der
-  giver den korteste vej, og tilbage igen bagefter. Vejen går uden for
-  scenen, så skiftet mellem planerne ikke ses. `K.UDE` betyder da »hjem til
-  pladsen«.
+* **Han standser, hvor der er plads.** Der står ingen fast koordinat i
+  opstillingen. Et scenetrin `{ gaa: x, mod: m }` er stadig en gang uden
+  `bagBord`; med den går han ind bag bordet, standser dér, hvor der er plads
+  i netop dette rum (`laererPlads`), drejer hovedet og fører armen mod `m`
+  (`pegVinkel`, `kigVinkel`). `mod` er et x eller et punkt `{ x, y, rekt }`.
+  Pladsen regnes i øjeblikket og prissættes som taleboblens: den **hårde**
+  pris afgør (zoomboblen, plakaten, hylderne, det der står på dem, og det han
+  selv peger på — `laererOptagetAf`), den **bløde** skiller lige gode ad
+  (afstanden til det, han taler om). Gennemsigtigt glas på bordpladen tæller
+  ikke med; det kan man se igennem. Er intet helt frit, vælges det, der går
+  mindst på kompromis — han skal et sted hen.
+* **Hænderne foregår foran bordet.** Et trin med `foran: true` — oprydningen
+  efter et uheld, kaffen, flasken der fyldes op igen, og baggrundslivet —
+  sender ham om for den ende af bordet, der giver den korteste vej. Vejen går
+  uden for scenen, så skiftet mellem planerne ikke ses. `K.UDE` sender ham ud
+  som altid, og når han er ude, står planet på »bag bordet« igen, så næste
+  replik kommer ind den rigtige vej.
 
 Figuren slutter forneden ved gulvet, `NK.Scene.GULV` (bordets valg `gulv`,
 standard scenens bund) — bag bordet ved bagkanten. Før fortsatte kitlen

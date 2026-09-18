@@ -42,13 +42,14 @@
        det, man arbejder med. */
     var BOBLE = { x: 172, y: 192 };        /* centrum; radius i BORD_VALG */
 
-    /* Kemichaels plads: bag bordet i hoejre side, under plakaten og bag
-       isbadet (plads B, valgt 18/9). Han daekker hverken hylderne eller
-       reagensglassene, og den hvide kittel staar ikke bag de glas, hvis
-       farver skal sammenlignes. y er halsens hoejde, saa issen lige naar
-       op under den nederste hylde til hoejre (230), og skala er hans plan:
-       bag bordet er han laengere vaek og tegnes mindre. */
-    var KEMICHAEL = { x: 940, y: 358, skala: 0.82 };
+    /* Kemichaels plan bag bordet. Han bor ikke her: han er ude det meste af
+       tiden og kommer kun ind, naar han har noget at sige. Hvor han saa
+       standser, regnes ud i oejeblikket (laererPlads i kemichael.js) - saa
+       taet paa det, han taler om, som der er plads til - og derfor staar der
+       intet x her. y er halsens hoejde, saa issen naar op under den nederste
+       hylde til hoejre (230) uden at krydse den, og skala er planets: bag
+       bordet er han laengere vaek og tegnes mindre. */
+    var KEMICHAEL = { y: 358, skala: 0.82 };
     var HYLDE_KAFFE = 268;                 /* kaffen, koekkenrullen og pulverglassene */
     var HYLDE_FLASKER = 170;               /* flasken, draabeflasken og sproejteflasken */
     var HYLDE_HOEJRE = 230;                /* det tomme baegerglas */
@@ -106,8 +107,8 @@
         { navn: "baeger", type: "baegerStor", x: 790, y: HYLDE_HOEJRE, titel: "bægerglasset" }
     ];
 
-    /* Kemichael staar bag bordet (bagBord) paa sin faste plads og kommer
-       kun om for enden, naar der skal ryddes op. Tegnebordet er 1040 bredt
+    /* Kemichael taler bag bordet (bagBord) og kommer om for enden, naar der
+       skal ryddes op eller hentes kaffe. Tegnebordet er 1040 bredt
        i stedet for 1520, saa alt er omkring 45 %
        stoerre paa skaermen. Bordpladen er 64 dyb, saa der er plads til at
        stille ting foran stativet. Tegnebordet staar forneden i laerredet

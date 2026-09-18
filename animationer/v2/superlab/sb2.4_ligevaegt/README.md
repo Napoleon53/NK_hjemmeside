@@ -18,7 +18,8 @@ bemærkninger og et par tørre ord, når et trin er gjort. Del 2 om
 fortynding, quizzen og tegneserien mangler. `_selvtest.html` kører det hele
 igennem i atten afsnit (plus 3b om boblen og tabellen); afsnit 17 gør
 det med musen, som en elev (`laboratoriet/js/proeve.js`), og afsnit 18
-prøver Kemichaels plads bag bordet.
+prøver, at Kemichael kommer ind bag bordet, standser hvor der er plads, og
+går ud igen.
 `laboratoriet/_vinduer.html` viser forsøget i to vinduesstørrelser ved
 siden af hinanden.
 
@@ -73,11 +74,12 @@ tjekker det. Scenen står forneden i lærredet (`lodret:
 stativet; det forreste tegnes forrest. Spatlen, glasstaven og termometeret
 ligger forrest fra start.
 
-Kemichael står bag bordet (`bagBord: { x: 940, y: 358, skala: 0.82 }`) i
-højre side, under plakaten og bag isbadet. Han dækker hverken hylderne,
-plakaten, zoomboblen eller nogen af de otte reagensglas, bordpladen dækker
-hans underkrop, og han tegnes mindre, fordi han er længere væk. Se
-»Kemichael i forsøget«.
+Kemichael taler bag bordet (`bagBord: { y: 358, skala: 0.82 }`). Der står
+intet x: han er ude af scenen, når han ikke har noget at sige, og når han
+kommer ind, standser han dér, hvor der er plads — mellem hylderne og
+vandbadet, når han taler om reagensglassene, og til venstre for isbadet, når
+han taler om det. Bordpladen dækker hans underkrop, og han tegnes mindre,
+fordi han er længere væk. Se »Kemichael i forsøget«.
 
 ## Kemien
 
@@ -144,12 +146,13 @@ slutter med glimtet `afslag` fra hans baggrund, som README'en i
 `sig`, som han siger, når trinnet er gjort: billedet og oprydningen. Det er
 med vilje kun to; han taler ikke hele tiden.
 
-**Hans plads er bag bordet** (`bagBord` i `js/opstilling.js`): han står der
-fra begyndelsen, tegnes i sit eget plan (`skala: 0.82`) og klippes ved
-bordets bagkant, så pladen dækker hans underkrop. Han går ikke hen til
-tingene, men peger på dem. Kun oprydningen efter et uheld henter ham om for
-enden af bordet; bagefter går han hjem igen. Motoren bag det står i
-`../../laboratoriet/README.md` under »Kemichael bag bordet«.
+**Han taler bag bordet** (`bagBord` i `js/opstilling.js`): han er ude det
+meste af tiden, kommer ind, når en replik kalder, standser hvor der er plads,
+peger på det, replikken handler om, og går ud igen. Han tegnes i sit eget
+plan (`skala: 0.82`) og klippes ved bordets bagkant, så pladen dækker hans
+underkrop. Det, der kræver hans hænder — oprydningen efter et uheld, kaffen
+og flasken, der fyldes op igen — foregår foran bordet som før. Motoren bag
+det står i `../../laboratoriet/README.md` under »Kemichael bag bordet«.
 
 Taleboblen tegnes som allersidste lag, også over zoomboblen, og holder sig
 fri af både det glas, replikken handler om, og zoomboblens hjørne.
