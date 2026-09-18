@@ -34,6 +34,10 @@
      #intro #intro-start #intro-rundvisning
      #teori #teori-indhold #teori-luk   teoriboksen; aabnes med
                       #teoriknap, #teori-aabn eller tasten T
+     #tilskuere-linje #tilskuere-vis #tilskuere-navne
+                      et flueben, der viser tilskuerionerne (bordets
+                      valg.tilskuere); linjen vises kun, naar det valgte
+                      glas har nogen
      #logbog-tekst #logbog-noter #logbog-ryd
 
    Kroge, som forsoeget kan saette i valg:
@@ -96,7 +100,9 @@
         if (NK.el("uheld-taeller")) NK.saetTekst("uheld-taeller", String(this.uheld()));
         if (boble) boble.hidden = !c;
 
+        var linje = NK.el("tilskuere-linje");
         if (!c) {
+            if (linje) linje.hidden = true;
             if (NK.el("glas-titel")) NK.saetTekst("glas-titel", "Det valgte glas");
             if (NK.el("glas-volumen")) NK.saetTekst("glas-volumen", "");
             if (NK.el("glas-tom")) {
@@ -115,24 +121,41 @@
         if (NK.el("glas-titel")) NK.saetTekst("glas-titel", stor(c.titel));
         if (NK.el("glas-volumen")) NK.saetTekst("glas-volumen", tal(B.volumen(c)) + " mL");
 
-        var raekker = [];
-        Object.keys(o.n).sort().forEach(function (navn) {
-            var s = St.stof(navn);
-            if (o.n[navn] < 1e-3) return;
-            if (s.fase === "s") raekker.push({ formel: St.formel(navn, true), vaerdi: tal(o.n[navn] / 1000, 2), enhed: "mmol", fast: true });
-            else if (s.fase === "aq") raekker.push({ formel: St.formel(navn, true), vaerdi: tal(St.konc(o, navn), o.V > 0 && St.konc(o, navn) < 1 ? 2 : 1), enhed: "mM" });
-        });
+        /* Tabellen viser det, der er nok af til at ses (som boblen), med
+           den stoerste koncentration foerst og fast stof til sidst. Er der
+           mere end tre slags ioner, staar tilskuerionerne for sig nederst
+           og kun, naar fluebenet er sat; med én til tre hoerer de med. */
+        var tilskuere = b.tilskuereI ? b.tilskuereI(o) : [];
+        if (linje) {
+            linje.hidden = !tilskuere.length;
+            if (NK.el("tilskuere-navne")) NK.saetTekst("tilskuere-navne", "(" + tilskuere.map(function (n) { return St.formel(n); }).join(", ") + ")");
+            if (NK.el("tilskuere-vis")) NK.el("tilskuere-vis").checked = !!b.visTilskuere;
+        }
+        function raekkerAf(navne) {
+            var opl = [], fast = [];
+            navne.forEach(function (navn) {
+                var s = St.stof(navn);
+                if (s.fase === "s") fast.push({ formel: St.formel(navn, true), tal: o.n[navn], vaerdi: tal(o.n[navn] / 1000, 2), enhed: "mmol", fast: true });
+                else if (s.fase === "aq") opl.push({ formel: St.formel(navn, true), tal: St.konc(o, navn), vaerdi: tal(St.konc(o, navn), o.V > 0 && St.konc(o, navn) < 1 ? 2 : 1), enhed: "mM" });
+            });
+            function stoerst(a, b2) { return b2.tal - a.tal; }
+            return opl.sort(stoerst).concat(fast.sort(stoerst));
+        }
+        var synlige = Object.keys(o.n).filter(function (navn) { return St.synlig(o, navn); });
+        var raekker = raekkerAf(synlige.filter(function (n) { return tilskuere.indexOf(n) < 0; }));
+        var ekstra = b.visTilskuere ? raekkerAf(tilskuere) : [];
 
         var tom = NK.el("glas-tom");
         if (tom) {
-            if (!raekker.length && B.volumen(c) > 0.05) { NK.saetTekst("glas-tom", "Kun vand."); tom.hidden = false; }
+            if (!raekker.length && tilskuere.length) { NK.saetTekst("glas-tom", "Kun tilskuerioner."); tom.hidden = false; }
+            else if (!raekker.length && B.volumen(c) > 0.05) { NK.saetTekst("glas-tom", "Kun vand."); tom.hidden = false; }
             else if (!raekker.length) { NK.saetTekst("glas-tom", "Tomt."); tom.hidden = false; }
             else tom.hidden = true;
         }
 
         if (tabel) {
             tabel.innerHTML = "";
-            raekker.forEach(function (rk) {
+            var raekke = function (rk) {
                 var tr = document.createElement("tr");
                 if (rk.fast) tr.className = "fast";
                 var th = document.createElement("th");
@@ -144,9 +167,20 @@
                 te.textContent = rk.enhed;
                 tr.appendChild(th); tr.appendChild(td); tr.appendChild(te);
                 tabel.appendChild(tr);
-            });
-            tabel.hidden = !raekker.length;
-            if (fold) fold.hidden = !raekker.length;
+            };
+            raekker.forEach(raekke);
+            if (ekstra.length) {
+                var tr = document.createElement("tr");
+                tr.className = "kategori";
+                var th = document.createElement("th");
+                th.colSpan = 3;
+                th.textContent = "Tilskuerioner";
+                tr.appendChild(th);
+                tabel.appendChild(tr);
+                ekstra.forEach(raekke);
+            }
+            tabel.hidden = !(raekker.length || ekstra.length);
+            if (fold) fold.hidden = tabel.hidden;
         }
 
         var temp = NK.el("glas-temp");
@@ -586,6 +620,11 @@
         paa("teoriknap", "click", function () { mig.aabnTeori(); });
         paa("teori-aabn", "click", function () { mig.aabnTeori(); });
         paa("teori-luk", "click", function () { mig.lukOverlay(); });
+        paa("tilskuere-vis", "change", function () {
+            var b = mig.bord();
+            b.visTilskuere = !!this.checked;
+            mig.opdaterPanel();
+        });
         paa("teori", "click", function (e) { if (e.target === this) mig.lukOverlay(); });
 
         if (NK.el("logbog-tekst")) {

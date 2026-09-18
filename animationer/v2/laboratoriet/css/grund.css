@@ -327,9 +327,15 @@ main.forsoeg {
 #glas-indhold td.enhed { text-align: left; font-weight: 400; color: var(--tekst-mat); padding-left: 4px; width: 34%; }
 #glas-indhold tr + tr th, #glas-indhold tr + tr td { border-top: 1px solid #3a3a47; }
 #glas-indhold .fast th { color: var(--tekst-mat); }
+#glas-indhold tr.kategori th { padding-top: 10px; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tekst-mat); }
 #glas-indhold[hidden] { display: none; }
 #glas-temp { margin-top: 8px; }
 #glas-temp[hidden] { display: none; }
+/* Fluebenet, der viser tilskuerionerne (side.js: #tilskuere-vis) */
+#tilskuere-linje { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: 0.86rem; color: var(--tekst-svag); cursor: pointer; user-select: none; }
+#tilskuere-linje[hidden] { display: none; }
+#tilskuere-linje input { width: 16px; height: 16px; margin: 0; accent-color: #f2c53d; cursor: pointer; }
+#tilskuere-navne { color: var(--tekst-mat); }
 
 #logbog-tekst {
     display: block;

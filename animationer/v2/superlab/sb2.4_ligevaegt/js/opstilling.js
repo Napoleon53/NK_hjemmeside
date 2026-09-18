@@ -105,7 +105,12 @@
        venstre hjoerne med radius 135. Kuglerne og skriften inde i den er
        en tiendedel mindre end standard (bobleIndhold), saa der er luft
        mellem dem, og skriften stadig kan laeses ved 1366 x 768. Et klik
-       paa boblen viser den stor. Den foerste hylde er kaffens (lavKaffekop). */
+       paa boblen viser den stor. Tilskuerionerne (K+ og NO3-) findes ud fra
+       opstillingen og reaktionerne og er skjult i boblen og i panelets
+       tabel, til eleven saetter flueben (tilskuere: true). Boblens skala er
+       fast: 3 mM giver 6 kugler (partikelRef), saa FeSCN2+ bliver flere,
+       naar der tilsaettes Fe3+ eller SCN-. Den foerste hylde er kaffens
+       (lavKaffekop). */
     NK.BORD_VALG = {
         bredde: 1040, hoejde: 650, bord: 500, bordDybde: 64, lodret: "bund",
         hylder: [
@@ -114,6 +119,6 @@
             { x0: 715, x1: 1025, y: HYLDE_HOEJRE }
         ],
         plakat: { x: 880, y: 70 },
-        boble: BOBLE, bobleR: 135, bobleIndhold: 0.9, partikler: 6
+        boble: BOBLE, bobleR: 135, bobleIndhold: 0.9, tilskuere: true, partikler: 6, partikelRef: 3
     };
 }());

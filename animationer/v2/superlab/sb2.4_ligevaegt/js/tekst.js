@@ -41,6 +41,7 @@
         /* ----- Panelet --------------------------------------------------- */
         "glas-tom-start":
             "Klik på et glas for at se rumfang, temperatur og indhold. Alt andet gør du ved at trække.",
+        "tilskuere-tekst": "Vis tilskuerioner",
         /* ----- Teoriboksen (knappen Teori, »Læs teorien« eller T) -------
            Blokke: en streng er et afsnit, { overskrift } en mellemrubrik,
            { ligning } en ligning i sin egen ramme. Fortyndingen fra den

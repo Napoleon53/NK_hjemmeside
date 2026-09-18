@@ -16,9 +16,10 @@ kører med tekst, hint og en liste i panelet, og billedet af glas 1 til 7
 lader eleven notere sine iagttagelser. Kemichael siger selv forløbets
 bemærkninger og et par tørre ord, når et trin er gjort. Del 2 om
 fortynding, quizzen og tegneserien mangler. `_selvtest.html` kører det hele
-igennem i sytten afsnit; det sidste gør det med musen, som en elev
-(`laboratoriet/js/proeve.js`). `laboratoriet/_vinduer.html` viser forsøget
-i to vinduesstørrelser ved siden af hinanden.
+igennem i sytten afsnit (plus 3b om boblen og tabellen); det sidste gør
+det med musen, som en elev (`laboratoriet/js/proeve.js`).
+`laboratoriet/_vinduer.html` viser forsøget i to vinduesstørrelser ved
+siden af hinanden.
 
 ## Filer
 
@@ -58,8 +59,12 @@ kuglerne og skriften i den er en tiendedel mindre end standard,
 `bobleIndhold: 0.9`) og skalerer med resten. Et klik på boblen viser den
 stor midt på scenen, som luppen i sc6.8; et klik eller Esc lukker den.
 Boblen har en stiplet streg ned til det glas, den kigger ind i, og glassets
-navn under sig. Opstillingen holder hjørnet frit, og selvtesten tjekker
-det. Scenen står forneden i lærredet (`lodret:
+navn under sig. Skalaen er fast (`partikelRef: 3`: 3 mM giver seks
+kugler), så FeSCN²⁺ bliver flere kugler, når der tilsættes Fe³⁺ eller SCN⁻,
+og K⁺ og NO₃⁻ er tilskuerioner, som forsøget selv finder (`tilskuere:
+true`): de skjules i boblen og står for sig i panelets tabel, når fluebenet
+»Vis tilskuerioner« er sat. Opstillingen holder hjørnet frit, og selvtesten
+tjekker det. Scenen står forneden i lærredet (`lodret:
 "bund"`). Bordpladen er 64 dyb (`bordDybde`), så man kan stille ting foran
 stativet; det forreste tegnes forrest. Spatlen, glasstaven og termometeret
 ligger forrest fra start.

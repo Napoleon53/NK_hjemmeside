@@ -99,6 +99,15 @@ function koerTest() {
     paastand("en neutral saltoploesning viser kun saltets ioner", JSON.stringify(tNacl) === JSON.stringify({ "Na+": 6, "Cl-": 6 }), JSON.stringify(tNacl));
     var tPhph = kugler(3, { "phph": 0.005, "Na+": 10, "OH-": 10 });
     paastand("en indikator faar stadig én kugle, selv om der er meget lidt", tPhph.phph === 1, JSON.stringify(tPhph));
+    /* Fast skala (ref i mM): et stof, der bliver mere af, faar flere kugler,
+       ogsaa naar noget andet er i stort overskud */
+    var oRef = St.lav({ V: 6, mM: { "Fe3+": 250, "SCN-": 0.15, "FeSCN2+": 4.8 } });
+    var tRef = St.partikelTal(oRef, 6, null, 3), tRel = St.partikelTal(oRef, 6);
+    paastand("med fast skala forsvinder FeSCN2+ ikke i et overskud af Fe3+", tRef["FeSCN2+"] >= 8 && tRef["SCN-"] === 1 && tRef["Fe3+"] === 12, JSON.stringify(tRef) + " (relativt: " + JSON.stringify(tRel) + ")");
+    paastand("tilskuerionerne findes ud fra reaktionerne: Pb(NO3)2 og KI giver K+ og NO3-",
+        St.tilskuerioner(["Pb(NO3)2(s)", "KI(s)"]).join(",") === "K+,NO3-", St.tilskuerioner(["Pb(NO3)2(s)", "KI(s)"]).join(", "));
+    paastand("men NO3- er ikke tilskuer, naar kobber oploeses i salpetersyre",
+        St.tilskuerioner(["Cu(s)", "HNO3", "NaCl(s)"]).join(",") === "Cl-,Na+", St.tilskuerioner(["Cu(s)", "HNO3", "NaCl(s)"]).join(", "));
 
     overskrift("3. Haeldning");
     frisk();
@@ -110,7 +119,9 @@ function koerTest() {
     paastand("flasken har 190 mL (den er fyldt til 200)", Math.abs(V(g.fl_cu) - 190) < 0.3, V(g.fl_cu).toFixed(1));
     paastand("flasken bliver haengende over baegerglasset", !!g.fl_cu.svaev && g.fl_cu.svaev.maal === b100 && g.fl_cu.p.y < b100.p.y, g.fl_cu.p.y.toFixed(0));
     paastand("klik paa et andet glas afvises, mens flasken haenger", !bord.ned({ x: g.baegerStor.p.x, y: g.baegerStor.p.y + 20 }) && !bord.holdt);
-    paastand("klik paa flasken haelder en portion til", bord.klik("fl_cu"));
+    var V10 = V(b100);
+    paastand("et klik paa selve flasken haelder ikke", !bord.klik("fl_cu") && Math.abs(V(b100) - V10) < 1e-9 && !bord.koer.igang());
+    paastand("klik paa pilen haelder en portion til", bord.klik("svaevring"));
     faerdig();
     paastand("baegerglasset har 20 mL (flaskens portion er 10 mL, under en femtedel af 100 mL)", Math.abs(V(b100) - 20) < 0.3, V(b100).toFixed(2));
     vaek(g.fl_cu);
@@ -163,7 +174,11 @@ function koerTest() {
     vaek(g.fl_ki);
     bord.ned({ x: g.fl_hcl.p.x, y: g.fl_hcl.p.y + 30 });
     hold(g.fl_hcl, { x: b250.p.x + 62, y: b250.p.y - 40 }, 2.2);
-    paastand("holdes tuden ved siden af glasset, haeldes der paa bordet", bord.antalUheld === uheldH + 1 && bord.pytter.length > 0 && Math.abs(V(b250) - V3 - 10) < 0.3, "uheld " + bord.antalUheld + ", V " + V(b250).toFixed(1));
+    /* Tuden er ude ved kanten af det groenne felt, uden for aabningen: den
+       foeres ind over glasset, og det hele ryger i det (F8) - foer loeb det
+       ud paa bordet */
+    paastand("holdes tuden ude ved glassets kant, foeres den ind og haelder i glasset, ikke paa bordet",
+        bord.antalUheld === uheldH && bord.pytter.length === 0 && V(b250) > V3 + 10 + 5, "uheld " + (bord.antalUheld - uheldH) + ", V " + V(b250).toFixed(1));
     bord.op(); faerdig();
     vent(function () { return !bord.laerer.scene; }, 30);
     vaek(g.fl_hcl);
@@ -172,8 +187,8 @@ function koerTest() {
     paastand("draabeflasken vender og drypper, mens den holdes", Math.abs(Math.abs(g.ag.p.v) - Math.PI) < 0.3 && V(g.ag) < 59.9, V(g.ag).toFixed(2) + " mL tilbage");
     bord.op(); faerdig();
     vent(function () { return bord.draaber.length === 0; }, 4); adv(1);
-    var agIalt = n(b250, "Ag+") + n(b250, "AgI(s)") + n(b250, "Ag2SO4(s)") + n(b250, "Ag(s)");
-    paastand("draaberne landede i glasset (soelv i alt; iodidet er allerede brugt af kobberionerne til CuI)", agIalt > 2, agIalt.toFixed(1) + " umol Ag, CuI " + n(b250, "CuI(s)").toFixed(0) + ", I2 " + n(b250, "I2").toFixed(0));
+    var agIalt = n(b250, "Ag+") + n(b250, "AgI(s)") + n(b250, "AgCl(s)") + n(b250, "Ag2SO4(s)") + n(b250, "Ag(s)");
+    paastand("draaberne landede i glasset (soelv i alt, ogsaa som AgCl fra saltsyren; iodidet er allerede brugt af kobberionerne til CuI)", agIalt > 2, agIalt.toFixed(1) + " umol Ag, CuI " + n(b250, "CuI(s)").toFixed(0) + ", I2 " + n(b250, "I2").toFixed(0));
 
     overskrift("4. Bundfald, ligevaegt og neutralisation");
     frisk();
@@ -312,7 +327,8 @@ function koerTest() {
     adv(1.5);
     paastand("draaben giver hvidt AgCl(s)", n(g.glas1, "AgCl(s)") > 2, n(g.glas1, "AgCl(s)").toFixed(1) + " µmol");
     paastand("flasken haenger over glasset", !!g.ag.svaev);
-    paastand("et klik paa flasken drypper igen", bord.klik("ag"));
+    paastand("et klik paa selve flasken drypper ikke", !bord.klik("ag") && Math.abs(V(g.ag) - 59.95) < 0.02);
+    paastand("et klik paa pilen drypper igen", bord.klik("svaevring"));
     vent(function () { return bord.draaber.length === 0; }, 4);
     adv(1);
     paastand("to draaber er 0,1 mL", Math.abs(V(g.ag) - 59.9) < 0.02, V(g.ag).toFixed(2));
@@ -533,14 +549,15 @@ function koerTest() {
     frisk();
     var mus = NKProeve.mus(bord, { tik: function (dt) { bord.opdater(dt); } });
     var uheldM = bord.antalUheld;
+    /* Sammenlignes med det gamle hjem: saetNed flytter hjem med */
     function hjemMedMusen(navn) {
-        var gg = g[navn];
-        mus.tag(navn);
-        mus.baer(gg.hjem, 0.8);
-        mus.hold(0.1);
+        var gg = g[navn], hjem0 = { x: gg.hjem.x, y: gg.hjem.y };
+        if (!mus.tag(navn)) { mus.slip(); return false; }
+        mus.baer(hjem0, 0.8);
+        mus.hold(0.5);
         mus.slip();
         mus.hold(0.8);
-        return !gg.svaev && Math.abs(gg.p.x - gg.hjem.x) < 1 && Math.abs(gg.p.y - gg.hjem.y) < 1;
+        return !gg.svaev && Math.abs(gg.p.x - hjem0.x) < 2 && Math.abs(gg.p.y - hjem0.y) < 2;
     }
     /* Flasken sluppet hurtigt over glas 1 giver en portion */
     var rkG1 = bord.rekt(g.glas1, 0);

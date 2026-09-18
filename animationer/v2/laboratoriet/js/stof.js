@@ -500,31 +500,79 @@
         return { r: r / sum, g: g / sum, b: b / sum, a: 1 };
     }
 
-    /* Antal partikler af hver slags til zoomboblen: maengderne skaleret,
-       saa den stoerste slags faar 'maks' partikler. Et oploest stof under
+    /* Antal partikler af hver slags til zoomboblen. Med ref (mM) er
+       skalaen fast: et stof med koncentrationen ref faar 'maks' partikler,
+       saa et stof, der bliver mere af, faar flere kugler, ogsaa naar der
+       samtidig kommer et stort overskud af noget andet (FeSCN2+ bliver
+       flere, naar Fe(NO3)3 tilsaettes, i stedet for at forsvinde). Uden
+       ref faar den stoerste slags 'maks'. Hvert synligt stof faar mindst
+       én kugle og hoejst det dobbelte af maks. Et oploest stof under
        PARTIKEL_MIN (10⁻⁵ M) vises ikke, fx vandets egne ioner (10⁻⁷ M) i
        rent vand eller H⁺ i en neutral oploesning. Det er koncentrationen,
        der taeller, ikke stofmaengden, saa et stort vandbad er lige saa tomt
-       som et lille glas vand: kun vandmolekylerne i baggrunden. Et stof,
-       der er under 2 % af det stoerste, vises heller ikke. En indikator er
-       der lidt af, men den farver alt: altid én kugle. */
+       som et lille glas vand: kun vandmolekylerne i baggrunden. En
+       indikator er der lidt af, men den farver alt: altid én kugle. */
     var PARTIKEL_MIN = 0.01;   /* mM */
+    var FAST_MIN = 0.5;        /* µmol: et fnug bundfald under det vises ikke */
 
-    function partikelTal(o, maks) {
+    /* Er der nok af stoffet til at vise det (i boblen og i tabellen)? */
+    function synlig(o, s) {
+        if (!Object.prototype.hasOwnProperty.call(o.n, s) || o.n[s] <= 1e-3) return false;
+        var st = STOFFER[s];
+        if (st && st.fase === "s") return o.n[s] >= FAST_MIN;
+        if (!(o.V > 1e-9)) return true;
+        return o.n[s] / o.V >= PARTIKEL_MIN || !!(st && st.indikator);
+    }
+
+    /* skjul: stofnavne, der ikke skal vises (tilskuerioner) */
+    function partikelTal(o, maks, skjul, ref) {
         var ud = {}, top = 0, s, synlige = [];
+        maks = maks || 6;
         for (s in o.n) {
-            if (!Object.prototype.hasOwnProperty.call(o.n, s) || o.n[s] <= 1e-3) continue;
-            var st = STOFFER[s];
-            var oploest = o.V > 1e-9 && !(st && st.fase === "s");
-            if (oploest && o.n[s] / o.V < PARTIKEL_MIN && !(st && st.indikator)) continue;
+            if (!synlig(o, s) || (skjul && skjul.indexOf(s) >= 0)) continue;
             synlige.push(s);
             top = Math.max(top, o.n[s]);
         }
+        var fast = ref && o.V > 1e-9;
         synlige.forEach(function (s) {
-            if (o.n[s] < top * 0.02 && !(STOFFER[s] && STOFFER[s].indikator)) return;
-            ud[s] = Math.max(1, Math.round(o.n[s] / top * (maks || 6)));
+            var andel = fast ? o.n[s] / o.V / ref : o.n[s] / top;
+            ud[s] = NK.klamp(Math.round(andel * maks), 1, maks * 2);
         });
         return ud;
+    }
+
+    /* Tilskuerioner: de ioner, der ikke tager del i nogen af de reaktioner,
+       der kan ske med det, et forsoeg har at arbejde med. start: stofnavne
+       i opstillingen (flaskerne, pulverglassene, glassene). Reaktionerne,
+       der kan ske, findes paa papiret: en reaktion kan ske, naar alt paa
+       dens venstre side er der (en ligevaegt og et bundfald ogsaa, naar
+       alt paa hoejre side er der), og saa er dens produkter der ogsaa, saa
+       de kan tage del i den naeste. Oploesningen af et fast stof goer ikke
+       dets ioner aktive. De ioner, der kun kommer og staar, er tilskuere:
+       i sb2.4 K+ og NO3-. Vand er der altid. Betingelser (fx koncentreret
+       syre) regnes som opfyldt: saa hellere vise en ion for meget. */
+    function tilskuerioner(start) {
+        var har = { "H2O": true }, aktiv = {}, brugt = [], nyt = true;
+        start.forEach(function (s) { har[s] = true; });
+        function alle(side) { return side.every(function (l) { return har[l[1]]; }); }
+        while (nyt) {
+            nyt = false;
+            REAKTIONER.forEach(function (rx, i) {
+                if (brugt[i]) return;
+                var begge = rx.slags === "ligevaegt" || rx.slags === "faeld";
+                if (!alle(rx.venstre) && !(begge && alle(rx.hoejre))) return;
+                brugt[i] = true;
+                nyt = true;
+                rx.venstre.concat(rx.hoejre).forEach(function (l) {
+                    har[l[1]] = true;
+                    if (rx.slags !== "oploes") aktiv[l[1]] = true;
+                });
+            });
+        }
+        return Object.keys(har).filter(function (s) {
+            var st = STOFFER[s];
+            return st && st.q && !aktiv[s];
+        }).sort();
     }
 
     /* Det faste stofs indre, som zoomboblen viser det. Et salt er et
@@ -610,6 +658,8 @@
         uklar: uklar,
         fastFarve: fastFarve,
         partikelTal: partikelTal,
+        synlig: synlig,
+        tilskuerioner: tilskuerioner,
         PARTIKEL_MIN: PARTIKEL_MIN,
         gitter: gitter
     };

@@ -44,6 +44,14 @@
                             Et klik paa boblen paa scenen viser den stor
                             midt paa scenen (aabnStorBoble); et klik hvor
                             som helst eller Esc lukker den (lukStorBoble)
+     tilskuere              true: find tilskuerionerne ud fra opstillingen
+                            (Stof.tilskuerioner), eller en liste. Er der
+                            mere end tre slags ioner i et glas, skjules de
+                            i boblen og staar for sig i panelets tabel, til
+                            visTilskuere saettes (fluebenet i panelet)
+     partikler, partikelRef boblens skala: et stof med koncentrationen
+                            partikelRef (mM, standard 100) faar partikler
+                            kugler (standard 6); se Stof.partikelTal
 
    Hooks, som siden saetter:
      vedBesked(tekst, slags)   korte beskeder til scenen
@@ -105,6 +113,8 @@
            gang; this.mikro er den valgte beholders */
         this.bobleR = valg.bobleR || 120;
         this.bobleIndhold = valg.bobleIndhold || 1;
+        this.tilskuere = [];
+        this.visTilskuere = !!valg.visTilskuere;
         this.mikro = new NK.Mikro(this.bobleR, this.bobleIndhold);
         this.boble = valg.boble || null;
         this.vedBesked = null;
@@ -158,6 +168,7 @@
         this.knusTid = 0;
         this.musFart = 0;
         this.baerAnker = null;   /* ankeret paa det baarne, som det staar oprejst */
+        this.tudHjaelp = { x: 0, y: 0 };   /* se foerTud */
         this.musVx = 0;
         this.vold = 0;
         this.uro = 0;
@@ -280,6 +291,40 @@
         this.specs = specs.slice();
         specs.forEach(function (s) { mig.tilfoej(s); });
         this.ordnDybde();
+        this.findTilskuere();
+    };
+
+    /* Tilskuerionerne i forsoeget: se valg.tilskuere i hovedkommentaren */
+    P.findTilskuere = function () {
+        var v = this.valg.tilskuere;
+        if (!v) { this.tilskuere = []; return; }
+        if (Array.isArray(v)) { this.tilskuere = v.slice(); return; }
+        var arter = {};
+        this.liste.forEach(function (gg) {
+            if (!B.er(gg)) return;
+            var o = B.samlet(gg);
+            Object.keys(o.n).forEach(function (n) { if (o.n[n] > 0) arter[n] = true; });
+        });
+        this.tilskuere = Stof.tilskuerioner(Object.keys(arter));
+    };
+
+    /* Tilskuerionerne i oploesningen o, der staar for sig: kun naar der er
+       mere end tre slags ioner i den. Med én til tre ioner hoerer de med
+       (en flaske AgNO3 har baade Ag+ og NO3-). */
+    P.tilskuereI = function (o) {
+        if (!o || !this.tilskuere.length) return [];
+        var ioner = Object.keys(o.n).filter(function (n) {
+            var s = Stof.STOFFER[n];
+            return s && s.q && s.fase !== "s" && Stof.synlig(o, n);
+        });
+        if (ioner.length <= 3) return [];
+        var t = this.tilskuere;
+        return ioner.filter(function (n) { return t.indexOf(n) >= 0; });
+    };
+
+    /* Det, der ikke vises i boblen og tabellen lige nu */
+    P.skjulteI = function (o) {
+        return this.visTilskuere ? [] : this.tilskuereI(o);
     };
 
     /* Start forfra: alt staar, som da bordet blev bygget */
@@ -353,7 +398,7 @@
             if (l) return l;
         }
         var ring = this.svaevRing();
-        if (ring && Math.hypot(pt.x - ring.x, pt.y - ring.y) < ring.r + 6) return ring.navn;
+        if (ring && Math.hypot(pt.x - ring.x, pt.y - ring.y) < ring.r + 6) return "svaevring";
         /* Det, der svaever (flasken, man er i gang med), har foerste prioritet */
         var sv = this.svaevende();
         if (sv && this.synlig(sv) && this.inden(sv, pt, 8)) return sv.navn;
@@ -377,7 +422,7 @@
         if (NK.Lyd) NK.Lyd.laasOp();
         var navn = this.hvad(pt);
         if (!navn) return false;
-        if (navn === "boble") { this.klik(navn); return false; }
+        if (navn === "boble" || navn === "svaevring") { this.klik(navn); return false; }
         var sv = this.svaevende();
         if (sv && sv.navn !== navn && navn !== "laerer" && navn !== "kaffekop") {
             this.besked("Træk først " + sv.titel + " væk.");
@@ -422,6 +467,7 @@
         this.slipMaal = this.maalVed(gg, pt);
         this.folgHaeldning(gg);
         if (gg.kan.drypper) this.vendDrypper(gg);
+        else this.foerTud(gg);
     };
 
     /* ----- Haeldning med haanden -------------------------------------------
@@ -433,7 +479,12 @@
 
        Draabeflasken er lille og vender hurtigere (vipDryp), og den drypper
        foerst, naar den staar paa hovedet (drypVip). Den vender om sin midte
-       og ikke om spidsen: se vendDrypper. */
+       og ikke om spidsen: se vendDrypper.
+
+       Den groenne ramme holder, hvad den lover: mens flasken vipper, foeres
+       tuden ind over glassets aabning (foerTud), og der haeldes kun, naar
+       straalen rammer. Man kan altsaa ikke komme til at haelde ved siden af
+       et glas, der har den groenne ramme. */
     var HAELD = { dvael: 0.3, vipTid: 0.5, vipDryp: 0.3, drypVip: 0.85, fart: { reagensglas: 12, baegerLille: 25, baegerStor: 35, kolbe: 30, maaleglas: 15, flaske: 15, vejebaad: 900, sproejteflaske: 8 }, dryp: 0.45 };
 
     P.kanHaelde = function (gg) {
@@ -481,6 +532,13 @@
         var x0 = Infinity, x1 = -Infinity;
         if (v) v.forEach(function (p) { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); });
         var o = B.aabning(c);
+        /* Hvor tuden skal foeres hen: ind over aabningen, lidt inden for
+           kanten; en flaskehals rammes i midten */
+        if (!k.drypper) {
+            var ax0 = v && !c.kan.flaske ? x0 + 5 : o.x, ax1 = v && !c.kan.flaske ? x1 - 5 : o.x;
+            if (ax0 > ax1) ax0 = ax1 = (ax0 + ax1) / 2;
+            h.aabning = { x0: ax0, x1: ax1, y: o.y };
+        }
         /* Draabeflasken glider ind over aabningen, mens den vender */
         if (k.drypper) {
             var sigte = this.draabeSigte(gg);
@@ -509,6 +567,8 @@
             }
             return;
         }
+        /* Der haeldes foerst, naar tuden er foert ind over aabningen */
+        if (!rammer) { if (this.straale && this.straale.haand) this.straale = null; return; }
         this.haeldBegyndt(h, c);
         var fart = (HAELD.fart[t.navn] || 15) * (h.vip - 0.5) * 2;
         if (t.navn === "vejebaad") {
@@ -581,6 +641,7 @@
         var mig = this;
         this.baerer = gg;
         this.baerAnker = null;
+        this.tudHjaelp = { x: 0, y: 0 };
         this.spildTid = 0;
         gg.svaev = null;
         this.frigoer(gg);
@@ -664,6 +725,46 @@
         return { x: P0.x + 2 * d.x, y: P0.y + 2 * d.y };
     };
 
+    /* En hjaelpende haand: mens en flaske (et glas, sproejteflasken,
+       vejebaaden) vipper over et maal, foeres tuden ind over aabningen
+       (haeldning.aabning) og op over kanten. Den fulde hjaelp er naaet,
+       naar der begynder at blive haeldt (vip 0,5). Forskydningen
+       (tudHjaelp) glider, saa flasken ikke springer, naar maalet skifter
+       eller haeldningen holder op. Uden dt (fra flyt) bruges den, som den
+       er. */
+    P.foerTud = function (gg, dt) {
+        var P0 = this.baerAnker;
+        if (!P0) return;
+        var h = this.haeldning, hj = this.tudHjaelp, mx = 0, my = 0;
+        if (h && h.maal && h.aabning && this.kanHaelde(gg)) {
+            var t = gg.type.tud || gg.anker, a = gg.anker;
+            var co = Math.cos(gg.p.v), si = Math.sin(gg.p.v), dx = t.x - a.x, dy = t.y - a.y;
+            var nx = P0.x + dx * co - dy * si, ny = P0.y + dx * si + dy * co;
+            var A = h.aabning, w = NK.blod(NK.klamp(h.vip * 2, 0, 1));
+            mx = (NK.klamp(nx, A.x0, A.x1) - nx) * w;
+            my = (Math.min(ny, A.y - 8) - ny) * w;
+        }
+        if (dt) {
+            hj.x = NK.mod(hj.x, mx, 14, dt);
+            hj.y = NK.mod(hj.y, my, 14, dt);
+        }
+        gg.p.x = P0.x + hj.x;
+        gg.p.y = P0.y + hj.y;
+    };
+
+    /* Staar haanden stille, vaelges det naermeste maal uden hysterese.
+       Hysteresen er der kun, for at rammen ikke skal flimre, mens man
+       bevaeger sig; naar man er standset, er det glasset, man er naermest,
+       man mener. Foer det vipper. */
+    P.faldTilRo = function (gg) {
+        if (!this.holdt || this.musFart > 100) return;
+        if (this.haeldning && this.haeldning.vip > 0.05) return;
+        var foer = this.slipMaal;
+        this.slipMaal = null;
+        this.slipMaal = this.maalVed(gg, this.holdt.sidst);
+        if (this.slipMaal !== foer) this.folgHaeldning(gg);
+    };
+
     /* Rystning og spild, mens noget baeres */
     P.opdaterRyst = function (dt) {
         var bb = this.baerer;
@@ -689,6 +790,8 @@
             }
             bb.p.v = NK.mod(bb.p.v, hv + NK.klamp(-this.musVx * 0.0004, -0.4, 0.4) * (1 - vip), 12, dt) + (Math.random() - 0.5) * 0.14 * this.uro;
             if (bb.kan.drypper) this.vendDrypper(bb);
+            else this.foerTud(bb, dt);
+            this.faldTilRo(bb);
             if (harVaeske && this.spildTid > 0.08 && Math.random() < dt * 14) {
                 var fo = B.farve(bb) || Stof.VAND;
                 var a = B.aabning(bb);
@@ -945,15 +1048,36 @@
     P.sigteKandidater = function (gg, pt) {
         var ud = [];
         var fod = this.fod(gg);
+        /* Staar foden lige paa en hylde, er det den, man stiller noget
+           paa: saa haeldes der ikke i glassene under hylden */
+        var hylde = this.hyldeVed(this.fodOprejst(gg));
         var tud = gg.kan.drypper && gg.type.sprite ? this.draabeSigte(gg)
             : (gg.kan.haelder || gg.kan.drypper || gg.kan.sproejter) ? B.tudVerden(gg) : null;
         for (var i = 0; i < this.liste.length; i++) {
             var c = this.liste[i];
             if (c === gg || !this.synlig(c) || !this.kanModtage(gg, c)) continue;
+            if (hylde && c.kan.holder && this.rekt(c, 0).y > hylde.y - 1) continue;
             var s = this.sigteScore(gg, c, pt, fod, tud);
             if (s !== null) ud.push({ navn: c.navn, score: s });
         }
         ud.sort(function (a, b) { return a.score - b.score; });
+        return ud;
+    };
+
+    /* Foden paa det baarne, som det ville staa oprejst i haanden */
+    P.fodOprejst = function (gg) {
+        var t = gg.type, P0 = this.baerAnker;
+        if (!P0 || !t.sprite) return this.fod(gg);
+        return { x: P0.x + t.b / 2 - gg.anker.x, y: P0.y + t.h - gg.anker.y };
+    };
+
+    /* Hylden, foden er ved at blive stillet paa: lige over hyldens
+       overflade (hoejst 20 enheder) og inden for dens bredde */
+    P.hyldeVed = function (fod) {
+        var ud = null;
+        (NK.Scene.HYLDER || []).forEach(function (H) {
+            if (fod.x > H.x0 - 10 && fod.x < H.x1 + 10 && fod.y > H.y - 20 && fod.y < H.y + 4) ud = H;
+        });
         return ud;
     };
 
@@ -1223,14 +1347,27 @@
         return null;
     };
 
-    /* Den gule ring ved siden af det, der svaever: et klik paa den
-       gentager handlingen */
+    /* Den gule ring med pilen ved siden af det, der svaever: et klik paa
+       den gentager handlingen, og den siger hvilken, naar musen er over
+       den. Et klik paa selve flasken goer det ikke (klik). hvad giver
+       navnet "svaevring". */
     P.svaevRing = function () {
         var sv = this.svaevende();
         if (!sv || this.koer.flytter(sv)) return null;
         var r = this.rekt(sv, 0);
-        return { x: r.x + r.b + 22, y: r.y + r.h * 0.5, r: 15, navn: sv.navn };
+        return { x: r.x + r.b + 22, y: r.y + r.h * 0.5, r: 15, navn: sv.navn, tekst: pilenGiver(sv).navn };
     };
+
+    /* Hvad pilen giver: navn ved pilen og »for ...« i beskeden */
+    function pilenGiver(gg) {
+        var k = gg.kan;
+        if (k.drypper) return { navn: "En dråbe mere", besked: "for en dråbe mere" };
+        if (k.sproejter) return { navn: "En sjat mere", besked: "for en sjat mere" };
+        if (k.spatel) return { navn: "En spatelspids mere", besked: "for en spatelspids mere" };
+        if (k.roerer) return { navn: "Rør igen", besked: "for at røre igen" };
+        if (k.dypper) return { navn: "Dyp igen", besked: "for at dyppe igen" };
+        return { navn: "Hæld mere", besked: "for at hælde mere" };
+    }
 
     /* Koreografitrin: gg lander svaevende over c og bliver der, til det
        traekkes vaek. pose: { dx, dy, v } i forhold til aabningen; uden pose
@@ -1310,6 +1447,11 @@
         if (navn === "kaffekop") return this.klikKop ? this.klikKop() : false;
         if (this.laererOptaget && this.laererOptaget()) return false;
         if (this.baerer) return false;
+        if (navn === "svaevring") {
+            var sv = this.svaevende();
+            if (!sv || this.koer.optaget()) return false;
+            return this.moede(sv, sv.svaev.maal) || false;
+        }
         var gg = this.g[navn];
         if (!gg || !this.synlig(gg)) return false;
         var k = gg.kan;
@@ -1336,7 +1478,13 @@
             this.aendret("tara");
             return true;
         }
-        if (gg.svaev && !this.koer.optaget()) return this.moede(gg, gg.svaev.maal) || false;
+        /* Det, der svaever, gentager kun med pilen; et klik paa selve
+           flasken siger, hvordan man faar mere, eller at den skal traekkes
+           vaek */
+        if (gg.svaev) {
+            this.besked("Klik på pilen " + pilenGiver(gg).besked + ", eller træk " + gg.titel + " væk.");
+            return false;
+        }
         if (k.holder) {
             this.vaelg(navn);
             this.besked(gg.titel.charAt(0).toUpperCase() + gg.titel.slice(1) + " er valgt. Tag fat i udstyret for at bruge det.");
@@ -1556,7 +1704,7 @@
     };
 
     function flereDraaber(gg) {
-        return "Klik på " + gg.titel + " for en dråbe mere, eller træk den væk.";
+        return "Klik på pilen ved " + gg.titel + " for en dråbe mere, eller træk den væk.";
     }
 
     /* Én draabe fra draabeflasken. Flasken bliver haengende, saa der kan
@@ -1894,7 +2042,8 @@
         var vis = !!v && (B.volumen(v) > 0.05 || B.fastIalt(v) > 0.5 || this.mikro.partikler.length > 0) && this.koer.navn() !== "affald";
         if (vis) {
             this.bobleBeholder = v;
-            this.mikro.opdater(dt, Stof.partikelTal(B.samlet(v), this.valg.partikler || 6), { ryst: this.omgivelser(v).ryst });
+            var ov = B.samlet(v);
+            this.mikro.opdater(dt, Stof.partikelTal(ov, this.valg.partikler || 6, this.skjulteI(ov), this.valg.partikelRef || 100), { ryst: this.omgivelser(v).ryst });
         } else this.mikro.opdater(dt, {}, { ryst: 0 });
         this.bobleAlfa = NK.mod(this.bobleAlfa, vis ? 1 : 0, 5, dt);
         /* Forsvinder boblen, lukker den store visning med den */
@@ -2066,7 +2215,7 @@
         T.tegnDampe(ctx, this.dampe);
         if (this.stinkskab) T.tegnStinkskabFor(ctx, this.stinkskab);
         var ring = this.svaevRing();
-        if (ring) T.tegnSvaevRing(ctx, ring, tid, this.hover === ring.navn);
+        if (ring) T.tegnSvaevRing(ctx, ring, tid, this.hover === "svaevring");
 
         if (this.tegnLaerer) this.tegnLaerer(ctx, tid);
 

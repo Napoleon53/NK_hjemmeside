@@ -56,8 +56,12 @@ js/tegning.js        baggrund, plakat, væske, bundfald, korn, etiketter, stav,
 js/mikro.js          zoomboblen: én kugle pr. partikel med formlen på. Boblen fyldes
                      på plads, når man ser ned i en beholder, og fast stof vises
                      som gitter (Stof.gitter). Hvor meget der er af hvert stof,
-                     giver Stof.partikelTal; et opløst stof under 10⁻⁵ M vises
-                     ikke (vandets egne ioner i rent vand). Kuglernes og
+                     giver Stof.partikelTal med en fast skala (partikelRef mM
+                     giver partikler kugler), så et stof, der bliver mere af,
+                     får flere kugler, også i et overskud af noget andet; et
+                     opløst stof under 10⁻⁵ M vises ikke (vandets egne ioner
+                     i rent vand), og tilskuerionerne kan skjules (se
+                     »Tilskuerioner« nedenfor). Kuglernes og
                      skriftens størrelse er bobleIndhold i NK.BORD_VALG.
                      Formlen står uden kant i kuglen, mørk på lyse kugler og
                      hvid på mørke (som i sc6.8); en lang formel gør kuglen
@@ -298,9 +302,14 @@ Kemichael kommer og tørrer op eller fejer og henter et nyt
 
 Hældning med hånden: holdes en flaske stille over et glas, vipper den efter
 0,3 s og hælder, så længe den holdes der (`opdaterHaeldning`; farten pr. type
-i `HAELD.fart`). Strålen lander, hvor tuden er, så ved siden af glasset hældes
-der på bordet. Dråbeflasken drypper, sprøjteflasken sprøjter og vejebåden
-drysser på samme måde. Dråbeflasken sigtes med bunden: den vender om sin
+i `HAELD.fart`). Den grønne ramme holder, hvad den lover: mens flasken
+vipper, føres tuden ind over glassets åbning og op over kanten (`foerTud`,
+en hjælpende hånd), og der hældes kun, når strålen rammer. Man kan altså
+ikke komme til at hælde ved siden af et glas med grøn ramme (før løb det ud
+på bordet og gav et uheld). Står hånden stille, vælges det nærmeste glas
+uden hysterese (`faldTilRo`), og stilles en flaske på en hylde, sigter den
+ikke på glassene under hylden (`hyldeVed`). Dråbeflasken drypper,
+sprøjteflasken sprøjter og vejebåden drysser på samme måde. Dråbeflasken sigtes med bunden: den vender om sin
 midte og ikke om spidsen, så spidsen ender dér, hvor bunden var, og mens den
 vender, glider den ind over åbningen; den drypper først, når spidsen peger
 lige ned (`vendDrypper`, `draabeSigte`, `HAELD.vipDryp`). Når der hældes med
@@ -331,11 +340,26 @@ nederste 24 enheder rammes ikke med musen (`traefBund` i `udstyr.js`), for
 bunden står nede i stativet. sb2.4's selvtest afsnit 17 prøver det med
 dråbeflasken og KSCN-flasken foran stativet.
 
+**Tilskuerioner.** Med `tilskuere: true` i `NK.BORD_VALG` finder bordet
+selv forsøgets tilskuerioner (`Stof.tilskuerioner`): reaktionerne køres på
+papiret ud fra det, opstillingen har, og de ioner, der kun kommer fra et
+salt, der opløses, og ikke tager del i nogen reaktion, er tilskuere (i sb2.4
+K⁺ og NO₃⁻; NO₃⁻ er ikke tilskuer, hvis der er kobber og syre). En liste
+kan også gives direkte. Har et glas mere end tre slags ioner, skjules
+tilskuerionerne i zoomboblen og står for sig nederst i panelets tabel, når
+fluebenet »Vis tilskuerioner« er sat; med én til tre ioner hører de altid
+med (en flaske AgNO₃ har både Ag⁺ og NO₃⁻). Tabellen står med den største
+koncentration først og fast stof til sidst, og det, der er for lidt af til
+at ses, står der ikke.
+
 Det, der lige er brugt, bliver hængende: flasken bliver i hældepositur
 over glasset, dråbeflasken, sprøjteflasken og spatlen bliver i luften over
-det, de blev brugt på (`svaev`, `svaevVed`). En gul ring med en pil ved
-siden af viser, at et klik gentager handlingen (en portion til, en dråbe
-til, en spatelspids til); efter den første dråbe siger beskeden det. Resten
+det, de blev brugt på (`svaev`, `svaevVed`). En gul ring med en pil ned ved
+siden af gentager handlingen, når man klikker på den (en portion til, en
+dråbe til, en spatelspids til), og med musen over den står der, hvad den
+gør. Et klik på selve flasken gentager ikke, men siger, at det er pilen,
+eller at flasken skal trækkes væk; efter den første dråbe siger beskeden
+det også. Resten
 af bordet venter, til det trækkes væk; så går det hjem. Tages en vendt
 flaske eller et væltet glas, rettes det op om det punkt, man greb i, så det
 bliver under hånden. Der tegnes ingen hånd.

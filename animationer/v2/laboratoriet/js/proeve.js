@@ -126,6 +126,12 @@
             baer: function (pt, sek) {
                 var h = bord.holdt;
                 if (!h) throw new Error("proeve.js: der holdes ikke noget");
+                /* Foerst et lille ryk, saa baeringen er begyndt: en vendt
+                   flaske rettes op, naar man tager den, og saa sidder den
+                   anderledes i haanden (holdt.dx, dy) */
+                if (!h.flyttet) api.til({ x: her.x, y: her.y - 10 }, 0.05);
+                h = bord.holdt;
+                if (!h) throw new Error("proeve.js: der holdes ikke noget");
                 return api.til({ x: pt.x + h.dx, y: pt.y + h.dy }, sek);
             },
             slip: function () { return api.op(); },

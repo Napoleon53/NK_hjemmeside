@@ -162,6 +162,39 @@ function koerTest() {
         F.erGjort("glas4") && B.samlet(g(4)).n["AgSCN(s)"] > 1,
         tal((B.samlet(g(4)).n["AgSCN(s)"] || 0) / 1000, 3) + " mmol AgSCN");
 
+    overskrift("3b. Boblen og tabellen: fast skala og tilskuerioner");
+    /* Boblens skala er fast (partikelRef), saa FeSCN2+ faar flere kugler i
+       glas 1 end i referencen, selv om Fe3+ er i stort overskud. K+ og NO3-
+       er tilskuere: de skjules, naar der er mere end tre slags ioner, og
+       staar for sig nederst i tabellen, naar fluebenet er sat. */
+    function kugler(gl) { var o = B.samlet(gl); return St.partikelTal(o, 6, bord.skjulteI(o), bord.valg.partikelRef); }
+    var k7 = kugler(g(7)), k1 = kugler(g(1)), k4 = kugler(g(4));
+    paastand("forsoeget finder selv tilskuerionerne K+ og NO3-", bord.tilskuere.join(",") === "K+,NO3-", bord.tilskuere.join(", "));
+    paastand("FeSCN2+ faar flere kugler i glas 1 (mere Fe3+) end i referencen", (k1["FeSCN2+"] || 0) > (k7["FeSCN2+"] || 0),
+        (k7["FeSCN2+"] || 0) + " -> " + (k1["FeSCN2+"] || 0));
+    paastand("og faerre i glas 4 (AgNO3), men forsvinder ikke", (k4["FeSCN2+"] || 0) >= 1 && (k4["FeSCN2+"] || 0) <= (k7["FeSCN2+"] || 0),
+        (k7["FeSCN2+"] || 0) + " -> " + (k4["FeSCN2+"] || 0));
+    paastand("tilskuerionerne er ikke i boblen for referencen", !k7["K+"] && !k7["NO3-"], JSON.stringify(k7));
+    var kAg = kugler(bord.g.ag), kSCN = kugler(bord.g.fl_kscn);
+    paastand("men med kun to ioner vises de (AgNO3- og KSCN-flasken)", kAg["NO3-"] > 0 && kAg["Ag+"] > 0 && kSCN["K+"] > 0 && kSCN["SCN-"] > 0);
+    bord.vaelg("glas7");
+    side.opdaterPanel();
+    function tabelNavne() { return [].map.call(d.querySelectorAll("#glas-indhold tr"), function (tr) { return tr.className === "kategori" ? "|" : tr.querySelector("th").textContent; }); }
+    function tabelTal() { return [].map.call(d.querySelectorAll("#glas-indhold tr:not(.kategori):not(.fast) td:not(.enhed)"), function (td) { return parseFloat(td.textContent.replace(",", ".")); }); }
+    var tn = tabelNavne(), tt = tabelTal();
+    paastand("tabellen har ingen tilskuerioner, og fluebenet staar der", tn.join(" ").indexOf("K⁺") < 0 && tn.join(" ").indexOf("NO₃⁻") < 0 && !d.getElementById("tilskuere-linje").hidden, tn.join(" "));
+    paastand("tabellen er sorteret med den stoerste koncentration foerst", tt.every(function (v, i) { return i === 0 || v <= tt[i - 1]; }), tt.join(" "));
+    d.getElementById("tilskuere-vis").click();
+    var tn2 = tabelNavne();
+    paastand("med fluebenet staar tilskuerionerne for sig nederst", tn2.indexOf("|") > 0 && tn2.slice(tn2.indexOf("|") + 1).join(" ") === "NO₃⁻(aq) K⁺(aq)" && bord.visTilskuere, tn2.join(" "));
+    paastand("og boblen viser dem", kugler(g(7))["NO3-"] > 0);
+    d.getElementById("tilskuere-vis").click();
+    paastand("fluebenet kan slaas fra igen", !bord.visTilskuere && tabelNavne().indexOf("|") < 0);
+    bord.vaelg("ag");
+    side.opdaterPanel();
+    paastand("i AgNO3-flasken staar begge ioner i tabellen, og fluebenet er skjult", tabelNavne().slice().sort().join(" ") === "Ag⁺(aq) NO₃⁻(aq)" && d.getElementById("tilskuere-linje").hidden, tabelNavne().join(" "));
+    bord.vaelg(null);
+
     overskrift("4. Badene");
     paastand("zoomboblen viser ingen H⁺ og OH⁻ i badenes rene vand",
         Object.keys(St.partikelTal(B.samlet(bord.g.vandbad), 6)).length === 0 &&
@@ -531,14 +564,17 @@ function koerTest() {
     var seet = mus.bordetSer({ x: 400, y: 300 });
     paastand("musen rammer det punkt paa scenen, der sigtes paa", Math.abs(seet.x - 400) < 0.01 && Math.abs(seet.y - 300) < 0.01, tal(seet.x) + ", " + tal(seet.y));
     function ankerMedFod(gg, x, y) { var t = gg.type; return { x: x - t.b / 2 + gg.anker.x, y: y - t.h + gg.anker.y }; }
+    /* Traek genstanden hjem med musen; true, hvis den staar dér, hvor den
+       stod foer (saetNed flytter hjem med, saa det sammenlignes med det
+       gamle hjem) */
     function flytHjem(navn) {
-        var gg = bord.g[navn];
-        mus.tag(navn);
-        mus.baer(gg.hjem, 0.8);
-        mus.hold(0.1);
+        var gg = bord.g[navn], hjem0 = { x: gg.hjem.x, y: gg.hjem.y };
+        if (!mus.tag(navn)) { mus.slip(); return false; }
+        mus.baer(hjem0, 0.8);
+        mus.hold(0.5);
         mus.slip();
         mus.hold(0.8);
-        return !gg.svaev && Math.abs(gg.p.x - gg.hjem.x) < 1 && Math.abs(gg.p.y - gg.hjem.y) < 1;
+        return !gg.svaev && Math.abs(gg.p.x - hjem0.x) < 2 && Math.abs(gg.p.y - hjem0.y) < 2;
     }
 
     /* Kolben: et hurtigt slip over glas 1 giver en portion */
@@ -586,9 +622,17 @@ function koerTest() {
     paastand("sluppet bliver den haengende over glasset", !!ag.svaev && ag.svaev.maal === g4);
     paastand("og beskeden siger, hvordan man faar flere",
         beskeder.length > 0 && beskeder[beskeder.length - 1].indexOf("dråbe mere") > 0, beskeder[beskeder.length - 1]);
+    var nB0 = beskeder.length;
     mus.klik("ag");
     mus.hold(1);
-    paastand("et klik paa den giver en draabe mere", Math.abs(B.volumen(g4) - dV4 - 0.05) < 0.001, tal(B.volumen(g4) - dV4, 3) + " mL");
+    paastand("et klik paa selve flasken drypper ikke, men siger, hvad pilen goer",
+        Math.abs(B.volumen(g4) - dV4) < 0.001 && beskeder.slice(nB0).some(function (t) { return t.indexOf("pilen") >= 0; }), beskeder[beskeder.length - 1]);
+    var ringA = bord.svaevRing();
+    mus.stil({ x: ringA.x, y: ringA.y });
+    paastand("musen over pilen: pilen lyser op og siger, hvad den goer", bord.hover === "svaevring" && ringA.tekst === "En dråbe mere", ringA.tekst);
+    mus.klik({ x: ringA.x, y: ringA.y });
+    mus.hold(1);
+    paastand("et klik paa pilen giver en draabe mere", Math.abs(B.volumen(g4) - dV4 - 0.05) < 0.001, tal(B.volumen(g4) - dV4, 3) + " mL");
     var r0 = bord.rekt(ag, 0);
     mus.tag("ag");
     mus.til({ x: mus.her().x + 10, y: mus.her().y - 10 }, 0.1);
@@ -653,6 +697,32 @@ function koerTest() {
         bord.hvad({ x: g(4).p.x, y: rkT.y + rkT.h - 12 }) !== "glas4" && bord.hvad({ x: g(4).p.x, y: rkT.y + rkT.h - 40 }) === "glas4",
         "12 over bunden: " + bord.hvad({ x: g(4).p.x, y: rkT.y + rkT.h - 12 }));
     paastand("og glasset kan stadig tages i den oeverste del", mus.tag("glas4", 0.5, 0.15) && (mus.slip(), true));
+
+    /* Haeldning med haanden, der ikke rammer praecist: tuden holdes 18
+       enheder ved siden af glas 3's midte - i det groenne felt, men uden
+       for aabningen. Saa foeres tuden ind over aabningen, mens flasken
+       vipper, og det hele ryger i glasset: intet paa bordet (F8) */
+    [-1, 1].forEach(function (side) {
+        NK.startForfra();
+        adv(0.2);
+        var fk = bord.g.fl_kscn, g3 = g(3), rk3 = bord.rekt(g3, 0);
+        var V0 = B.volumen(g3), u0 = bord.antalUheld;
+        mus.tag("fl_kscn", 0.5, 0.2);
+        var tt = fk.type.tud, aa = fk.anker;
+        var tx = g3.p.x + side * 18, ty = rk3.y - 30;
+        mus.baer({ x: tx - (tt.x - aa.x), y: ty - (tt.y - aa.y) }, 0.8);
+        mus.hold(0.6);
+        var maalK = bord.slipMaal;
+        mus.hold(1.4);
+        var ind = B.volumen(g3) - V0, uh = bord.antalUheld - u0, py = bord.pytter.length;
+        paastand("KSCN-flasken med tuden 18 til " + (side < 0 ? "venstre" : "hoejre") + " for glas 3 haelder i glasset og ikke paa bordet",
+            maalK === "glas3" && ind > 2 && uh === 0 && py === 0,
+            "maal " + maalK + ", " + tal(ind, 1) + " mL i glasset, " + uh + " uheld, " + py + " pytter");
+        mus.slip();
+        mus.hold(1);
+        var hj = flytHjem("fl_kscn"), fk2 = bord.g.fl_kscn;
+        paastand("og flasken kan traekkes hjem igen", hj, "p " + tal(fk2.p.x, 0) + "," + tal(fk2.p.y, 0) + " v " + tal(fk2.p.v) + " hjem " + tal(fk2.hjem.x, 0) + "," + tal(fk2.hjem.y, 0) + " svaev " + !!fk2.svaev + " maal " + bord.slipMaal);
+    });
 
     /* Den store zoomboble: et klik paa boblen viser den stor, et klik hvor
        som helst lukker den uden at tage noget, og Esc lukker den ogsaa */

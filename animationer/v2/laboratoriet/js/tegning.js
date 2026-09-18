@@ -872,7 +872,8 @@
         NK.Sprites.tegnPositur(ctx, "haand", p, NK.Udstyr.HAAND_ANKER, alfa);
     };
 
-    /* Den gule ring ved siden af det, der svaever. ring: { x, y, r } */
+    /* Den gule ring med pilen ved siden af det, der svaever. ring: { x, y,
+       r, tekst } */
     T.tegnSvaevRing = function (ctx, ring, tid, hover) {
         var puls = 1 + 0.06 * Math.sin(tid * 4);
         ctx.save();
@@ -891,6 +892,24 @@
         ctx.moveTo(ring.x, ring.y - 6); ctx.lineTo(ring.x, ring.y + 6);
         ctx.moveTo(ring.x - 5, ring.y + 1); ctx.lineTo(ring.x, ring.y + 6); ctx.lineTo(ring.x + 5, ring.y + 1);
         ctx.stroke();
+        /* Med musen over pilen: hvad den goer (ring.tekst), til hoejre for
+           den, eller til venstre, hvis der ikke er plads */
+        if (hover && ring.tekst) {
+            ctx.font = "700 13px 'Segoe UI', sans-serif";
+            var b = ctx.measureText(ring.tekst).width + 16, h = 24;
+            var x = ring.x + ring.r + 10;
+            if (x + b > NK.Scene.BREDDE - 4) x = ring.x - ring.r - 10 - b;
+            ctx.fillStyle = "rgba(20, 22, 28, 0.92)";
+            ctx.strokeStyle = "rgba(242, 197, 61, 0.9)";
+            ctx.lineWidth = 1.5;
+            NK.rundtRekt(ctx, x, ring.y - h / 2, b, h, 7);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = "#f7f0c8";
+            ctx.textAlign = "left";
+            ctx.textBaseline = "middle";
+            ctx.fillText(ring.tekst, x + 8, ring.y + 0.5);
+        }
         ctx.restore();
     };
 
