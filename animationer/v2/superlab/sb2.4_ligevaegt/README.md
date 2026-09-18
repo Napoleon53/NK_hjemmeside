@@ -21,10 +21,10 @@ igennem i femten afsnit.
 ## Filer
 
 ```
-index.html          stilladset: scene, panel, intro, rundvisning. Ingen prosa.
+index.html          stilladset: scene, panel, intro, teoriboks, rundvisning. Ingen prosa.
 css/stil.css        ligevægtsligningen og forløbslisten
-js/tekst.js         AL prosa: titel, intro, trinnenes tekster og hints,
-                    bemærkningerne, panelets kort, rundvisningens stop
+js/tekst.js         AL prosa: titel, intro, teorien, trinnenes tekster og
+                    hints, bemærkningerne, panelets kort, rundvisningens stop
 js/opstilling.js    bordet: hvad der står på det, og bordets mål
 js/forloeb.js       trinnenes betingelser og de tre udløsere
 js/billede.js       billedet af de syv glas: optagelsen og knapperne under dem
@@ -35,8 +35,14 @@ _selvtest.html      udviklerværktøj, indgår ikke i animationen
 
 Alt det, der før stod i hvert forsøgs egen `app.js` — tegneløkken,
 aflæsningen af det valgte glas, zoomboblen, beskeden på scenen,
-lydknappen, introen, rundvisningen, tastaturet, logbogen og Start forfra
-— ligger nu i `../../laboratoriet/js/side.js`.
+lydknappen, introen, teoriboksen, rundvisningen, tastaturet, logbogen og
+Start forfra — ligger nu i `../../laboratoriet/js/side.js`.
+
+**Panelet** holder kun det, man bruger undervejs. Indholdet af det valgte
+glas i tal er foldet sammen under zoomboblen (»Indhold«), og ligevægten
+står i sit eget kort hele tiden. Teorien bag hvert indgreb ligger i
+teoriboksen, som åbnes med knappen Teori, med »Læs teorien« under ligningen
+eller med tasten T.
 
 ## Kemien
 

@@ -348,6 +348,36 @@ main.forsoeg {
 #logbog-tekst:focus { outline: 2px solid var(--gul); outline-offset: 1px; }
 #logbog-kort .knaprad { margin-top: 0; }
 
+/* Et felt, der kan foldes ud: <details class="fold"><summary>...</summary>.
+   Lukket som udgangspunkt, saa panelet ikke drukner i tal; eleven aabner
+   det, naar tallene skal bruges. */
+details.fold { margin-top: 8px; }
+details.fold[hidden] { display: none; }
+details.fold > summary {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 0;
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--tekst-svag);
+}
+details.fold > summary::-webkit-details-marker { display: none; }
+details.fold > summary::before {
+    content: "\25B8";
+    color: var(--gul);
+    transition: transform 0.15s ease;
+}
+details.fold[open] > summary::before { transform: rotate(90deg); }
+details.fold[open] > summary { margin-bottom: 4px; }
+details.fold > summary:hover { color: var(--tekst); }
+details.fold > summary:focus-visible { outline: 2px solid var(--gul); outline-offset: 2px; border-radius: 4px; }
+
 /* ----- Quiz ---------------------------------------------------------- */
 .valg { display: grid; gap: 6px; margin: 10px 0; }
 .valg[hidden] { display: none; }
@@ -488,6 +518,10 @@ main.forsoeg {
 .intro-trin li { margin-bottom: 2px; }
 .intro-trin li::marker { color: var(--gul); font-weight: 700; }
 .intro-boks .knapper { gap: 8px; }
+
+/* Teoriboksen: forsoegets teori som blokke fra tekst.js (side.js) */
+.teori-boks { max-width: 620px; }
+.teori-boks .tekstblokke > :first-child { margin-top: 4px; }
 
 .ligning {
     background-color: #111117;

@@ -61,7 +61,7 @@ function koerTest() {
         bord.g.vandbad.kan.bad && bord.g.isbad.kan.bad);
     paastand("vandbadet staar paa varmepladen", bord.g.vandbad.paa === bord.g.plade);
     paastand("teksterne er skrevet ind fra tekst.js",
-        d.getElementById("teori-kort").textContent.indexOf("exoterm") > 0);
+        d.getElementById("teori-indhold").textContent.indexOf("exoterm") > 0);
     paastand("panelet viser foerste trin",
         d.getElementById("forloeb-tekst").textContent.indexOf("stamopløsning") > 0);
     paastand("introen aabner og lukker", !!NK.intro &&
@@ -85,7 +85,36 @@ function koerTest() {
     paastand("aflaesningen og logbogen har deres stil",
         vin.getComputedStyle(d.getElementById("glas-indhold")).borderCollapse === "collapse" &&
         vin.getComputedStyle(d.getElementById("logbog-tekst")).resize === "vertical");
+
+    /* Indholdet i tal er foldet sammen som udgangspunkt, og folden er
+       skjult, naar der ikke er noget at vise */
+    var fold = d.getElementById("glas-indhold-fold");
+    bord.vaelg("kolbe");
+    side.opdaterPanel();
+    paastand("indholdet er foldet sammen som udgangspunkt",
+        !!fold && !fold.hidden && !fold.open && d.getElementById("glas-indhold").rows.length > 0);
+    bord.vaelg("glas1");
+    side.opdaterPanel();
+    paastand("folden er skjult for et tomt glas", !!fold && fold.hidden);
     bord.vaelg(valgtFoer);
+    side.opdaterPanel();
+
+    /* Teoriboksen: ligningen staar i panelet, resten bag knappen og T */
+    var teori = d.getElementById("teori");
+    paastand("ligningen staar i panelet, og teorien er ikke dér",
+        d.getElementById("teori-kort-ramme").querySelector(".ligning") !== null &&
+        d.getElementById("teori-kort-ramme").textContent.indexOf("exoterm") < 0);
+    d.getElementById("teori-aabn").click();
+    paastand("knappen aabner teoriboksen", teori.classList.contains("vis"));
+    paastand("teorien er bygget af blokke",
+        teori.querySelectorAll("#teori-indhold p").length >= 5 &&
+        teori.querySelectorAll("#teori-indhold h3").length >= 4 &&
+        teori.querySelectorAll("#teori-indhold .ligning").length >= 4);
+    d.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "t" }));
+    paastand("T lukker den igen", !teori.classList.contains("vis"));
+    d.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "T" }));
+    paastand("og T aabner den", teori.classList.contains("vis"));
+    NK.teori.luk();
 
     function adv(sek) { for (var k = 0; k < Math.round(sek * 20); k++) bord.opdater(0.05); F.opdater(); }
     function lys(gg) { return V.lysstyrke(gg); }

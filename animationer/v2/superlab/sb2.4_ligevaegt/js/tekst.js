@@ -8,7 +8,9 @@
    igennem paa fem minutter uden at aabne kode.
 
    Noeglerne er id'er i index.html. side.js skriver dem ind ved start:
-   en streng bliver til indholdet, en liste bliver til punkter.
+   en streng bliver til indholdet, en liste bliver til punkter, og en
+   liste til et element med klassen tekstblokke (teoriboksen) bliver til
+   afsnit, mellemrubrikker og ligninger.
    ===================================================================== */
 (function () {
     "use strict";
@@ -39,10 +41,36 @@
         /* ----- Panelet --------------------------------------------------- */
         "glas-tom-start":
             "Klik på et glas for at se rumfang, temperatur og indhold. Alt andet gør du ved at trække.",
-        "teori-kort":
-            "Reaktionen er exoterm (ΔH = −20 kJ/mol), så varme flytter ligevægten mod venstre og " +
-            "kulde mod højre. Tilsættes Fe³⁺ eller SCN⁻, flytter den mod højre; fjernes en af dem, " +
-            "mod venstre. Ascorbinsyre reducerer Fe³⁺ til Fe²⁺, og AgNO₃ fælder SCN⁻ som AgSCN.",
+        /* ----- Teoriboksen (knappen Teori, »Læs teorien« eller T) -------
+           Blokke: en streng er et afsnit, { overskrift } en mellemrubrik,
+           { ligning } en ligning i sin egen ramme. Fortyndingen fra den
+           gamle udgave kommer med, når del 2 er bygget. */
+        "teori-titel": "Indgreb i en kemisk ligevægt",
+        "teori-indhold": [
+            "Jern(III)ioner reagerer med thiocyanat og danner et rødt kompleks. Reaktionen er reversibel:",
+            { ligning: "Fe³⁺(aq) + SCN⁻(aq) ⇌ FeSCN²⁺(aq)" },
+            "Farven viser, hvor meget FeSCN²⁺ der er. Bliver farven mørkere, er ligevægten forskudt " +
+            "mod højre. Bliver den lysere, er den forskudt mod venstre.",
+            { overskrift: "Ligevægtsloven" },
+            { ligning: "K = [FeSCN²⁺] / ([Fe³⁺] · [SCN⁻])", lille: true },
+            "Efter et indgreb er reaktionsbrøken Y forskellig fra K. Ligevægten forskydes, til Y " +
+            "igen er lig med K.",
+            { overskrift: "Glas 1 til 4" },
+            "Fe(NO₃)₃ og KSCN øger koncentrationen af Fe³⁺ og SCN⁻, så ligevægten forskydes mod " +
+            "højre. Ascorbinsyre reducerer Fe³⁺ til Fe²⁺, som ikke indgår i ligevægten:",
+            { ligning: "2 Fe³⁺ + C₆H₈O₆ → 2 Fe²⁺ + C₆H₆O₆ + 2 H⁺", lille: true },
+            "Ag⁺ fælder SCN⁻ som et hvidt bundfald. I begge tilfælde forskydes ligevægten mod venstre:",
+            { ligning: "Ag⁺(aq) + SCN⁻(aq) → AgSCN(s)", lille: true },
+            { overskrift: "Glas 5 og 6" },
+            "Reaktionen mod højre er exoterm (ΔH = −20 kJ/mol). Opvarmning gør K mindre og forskyder " +
+            "ligevægten mod venstre. Afkøling gør K større og forskyder den mod højre.",
+            { overskrift: "Fast stof og variabelkontrol" },
+            "Fe(NO₃)₃ og KSCN tilsættes som fast stof. En opløsning ville også fortynde glasset, og så " +
+            "var der to indgreb på én gang.",
+            { overskrift: "Sikkerhed og affald" },
+            "AgNO₃ er ætsende og giver sorte pletter på huden. Brug handsker og briller. Resterne " +
+            "afleveres som surt uorganisk affald."
+        ],
         "uheld-tekst":
             "Rystes et glas for voldsomt, skvulper det ud. Et reagensglas kan ikke stå på bordet. " +
             "Glas, der slippes foran bordkanten, falder på gulvet. Kemichael rydder op.",
@@ -105,8 +133,8 @@
         /* ----- Rundvisningen --------------------------------------------- */
         "rundvisning": [
             { sel: "#scene", titel: "Bordet", tekst: "Klik viser, træk gør. Tag fat i kolben, og slip den over et glas for at hælde." },
-            { sel: "#glas-kort", titel: "Det valgte glas", tekst: "Klik på et glas, og se rumfang, temperatur, indhold og partiklerne i zoomboblen." },
-            { sel: "#teori-kort", titel: "Teorien", tekst: "Den korte forklaring på, hvad hvert indgreb gør ved ligevægten." },
+            { sel: "#glas-kort", titel: "Det valgte glas", tekst: "Klik på et glas, og se rumfang, temperatur og partiklerne i zoomboblen. Indholdet i tal folder du ud under boblen." },
+            { sel: "#teori-kort-ramme", titel: "Ligevægten", tekst: "Reaktionen, det hele handler om. Knappen åbner teorien bag hvert indgreb — det gør tasten T også." },
             { sel: "#logbog-kort", titel: "Logbog", tekst: "Notér dine aflæsninger undervejs. Knappen skriver det valgte glas' tal ind." },
             { sel: "#uheld-kort", titel: "Uheld", tekst: "Det, der kan gå galt, går galt. Kemichael kommer og tørrer op." },
             { sel: "#forfraknap", titel: "Start forfra", tekst: "Rydder bordet og stiller alt tilbage." }

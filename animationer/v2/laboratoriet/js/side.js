@@ -26,10 +26,14 @@
      #scenebesked     linjen, der kommer og gaar
      #boble-laerred   zoomboblen i panelet
      #glas-titel #glas-volumen #glas-tom #glas-indhold #glas-temp
+                      (ligger #glas-indhold i en <details class="fold">,
+                      skjules folden sammen med tabellen)
      #uheld-taeller   antal uheld
      #rumknapper      knapper til rummene          (kun med plan)
      #forfraknap #lydknap #hjaelpknap #introknap
      #intro #intro-start #intro-rundvisning
+     #teori #teori-indhold #teori-luk   teoriboksen; aabnes med
+                      #teoriknap, #teori-aabn eller tasten T
      #logbog-tekst #logbog-noter #logbog-ryd
 
    Kroge, som forsoeget kan saette i valg:
@@ -87,6 +91,7 @@
         var b = this.bord();
         var c = b.valgtBeholder();
         var tabel = NK.el("glas-indhold");
+        var fold = tabel && tabel.closest ? tabel.closest("details") : null;
         var boble = NK.el("boble-laerred");
         if (NK.el("uheld-taeller")) NK.saetTekst("uheld-taeller", String(this.uheld()));
         if (boble) boble.hidden = !c;
@@ -99,6 +104,7 @@
                 if (this.valg.tomTekst) NK.saetTekst("glas-tom", this.valg.tomTekst);
             }
             if (tabel) tabel.hidden = true;
+            if (fold) fold.hidden = true;
             if (NK.el("glas-temp")) NK.el("glas-temp").hidden = true;
             if (this.valg.panel) this.valg.panel(this);
             this.sidsteSignatur = this.signatur();
@@ -140,6 +146,7 @@
                 tabel.appendChild(tr);
             });
             tabel.hidden = !raekker.length;
+            if (fold) fold.hidden = !raekker.length;
         }
 
         var temp = NK.el("glas-temp");
@@ -219,6 +226,16 @@
         this.lukOverlay();
         NK.el("intro").classList.add("vis");
         if (NK.el("intro-start")) NK.el("intro-start").focus({ preventScroll: true });
+    };
+
+    /* Teoriboksen: forsoegets teori i et overlay, saa panelet kun har det,
+       man bruger undervejs. Teksten staar i tekst.js som blokke. */
+    P.aabnTeori = function () {
+        if (!NK.el("teori")) return;
+        NK.Rundvisning.luk();
+        this.lukOverlay();
+        NK.el("teori").classList.add("vis");
+        if (NK.el("teori-luk")) NK.el("teori-luk").focus({ preventScroll: true });
     };
 
     P.introFoersteGang = function () {
@@ -356,7 +373,9 @@
             var el = NK.el(id);
             if (!el) return;
             var t = tekster[id];
-            if (Array.isArray(t)) {
+            if (Array.isArray(t) && el.classList.contains("tekstblokke")) {
+                fyldBlokke(el, t);
+            } else if (Array.isArray(t)) {
                 if (t.length && typeof t[0] !== "string") return;   /* fx rundvisningens stop */
                 el.innerHTML = "";
                 t.forEach(function (linje) {
@@ -371,6 +390,28 @@
             }
         });
     };
+
+    /* Et element med klassen tekstblokke faar en liste af blokke: en streng
+       er et afsnit, { overskrift } en mellemrubrik og { ligning, lille } en
+       ligning i sin egen ramme. Saadan skrives teorien i tekst.js. */
+    function fyldBlokke(el, blokke) {
+        el.innerHTML = "";
+        blokke.forEach(function (b) {
+            var ny;
+            if (typeof b === "string") {
+                ny = document.createElement("p");
+                ny.innerHTML = b;
+            } else if (b.overskrift) {
+                ny = document.createElement("h3");
+                ny.innerHTML = b.overskrift;
+            } else if (b.ligning) {
+                ny = document.createElement("div");
+                ny.className = "ligning" + (b.lille ? " lille" : "");
+                ny.innerHTML = b.ligning;
+            }
+            if (ny) el.appendChild(ny);
+        });
+    }
 
     /* ----- Rumknapper, naar siden har flere rum ----------------------------- */
     P.bygRumknapper = function () {
@@ -412,6 +453,11 @@
         if (e.key === "?" || e.key === "h" || e.key === "H") {
             if (NK.Rundvisning.aktiv()) NK.Rundvisning.luk();
             else { this.lukOverlay(); NK.Rundvisning.start(); }
+            return;
+        }
+        if ((e.key === "t" || e.key === "T") && NK.el("teori")) {
+            if (NK.el("teori").classList.contains("vis")) this.lukOverlay();
+            else if (!NK.Rundvisning.aktiv() && !document.querySelector(".overlay.vis")) this.aabnTeori();
             return;
         }
         if (NK.Rundvisning.aktiv() || document.querySelector(".overlay.vis")) return;
@@ -514,6 +560,7 @@
         NK.opdaterPanel = function () { mig.opdaterPanel(); };
         NK.startForfra = function () { mig.startForfra(); };
         NK.intro = { aabn: function () { mig.aabnIntro(); }, luk: function () { mig.lukOverlay(); } };
+        NK.teori = { aabn: function () { mig.aabnTeori(); }, luk: function () { mig.lukOverlay(); } };
 
         this.bygRumknapper();
 
@@ -530,6 +577,10 @@
         paa("intro-start", "click", function () { mig.lukOverlay(); });
         paa("intro-rundvisning", "click", function () { mig.lukOverlay(); NK.Rundvisning.start(); });
         paa("intro", "click", function (e) { if (e.target === this) mig.lukOverlay(); });
+        paa("teoriknap", "click", function () { mig.aabnTeori(); });
+        paa("teori-aabn", "click", function () { mig.aabnTeori(); });
+        paa("teori-luk", "click", function () { mig.lukOverlay(); });
+        paa("teori", "click", function (e) { if (e.target === this) mig.lukOverlay(); });
 
         if (NK.el("logbog-tekst")) {
             NK.el("logbog-tekst").value = gemt("nk-" + this.navn + "-logbog") || "";
