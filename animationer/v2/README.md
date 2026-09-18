@@ -31,7 +31,7 @@ ny animation kommer først i menuen, når brugeren siger til.
 | `superanimation/sc2.2_saltbygger` | nej | menuen viser stadig den gamle c2.2 |
 | `superanimation/sc3.1_elektronprikformler` | ja | |
 | `superanimation/sc3.2_rumlig_opbygning` | nej | inaktiv: rettes ikke, før brugeren siger til |
-| `superanimation/sc3.4_blandbarhed` | ja | ny, sept. 2026 |
+| `superanimation/sc3.4_blandbarhed_inaktiv` | nej | ny, sept. 2026; menuen viser stadig den gamle c3.4 |
 | `superlab/sb2.4_jernthiocyanat` | ja | gammel kode, afløses af `sb2.4_ligevaegt` |
 | `superlab/sb2.4_ligevaegt` | nej | samme forsøg på den fælles motor, under opbygning |
 | `superlab/sc1.3_knaldgas` | ja | ældre sidelayout |

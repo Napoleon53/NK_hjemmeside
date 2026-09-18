@@ -7,9 +7,8 @@ ligger den i sin egen mappe med adskilt CSS, JavaScript og tegnekode.
 læreren hentes fra. Den bruger hverken `fetch` eller moduler og virker derfor
 også, når den åbnes direkte fra harddisken.
 
-Den afløser `animationer/kemi-c-filer/c3.4_molekyler_blandbarhed.html`, som nu
-ligger i `animationer/kemi-c-filer/arkiv/c3.4_molekyler_blandbarhed_oldversion.html`.
-`samling_c3.html` og `samling_NV.html` peger på mappen her.
+Den afløser `animationer/kemi-c-filer/c3.4_molekyler_blandbarhed.html`, men er
+ikke i menuen endnu. Mappen hedder `_inaktiv`, indtil brugeren siger til.
 
 ## Hvad viser den
 
@@ -159,3 +158,12 @@ glasset kan fyldes, hældes og tømmes, at væskeniveauet følger rumfanget, at
 hvert stof koger ved sit eget kogepunkt, at destillatet bliver rigt på ethanol,
 at alle ti opgaver kan løses, og at ingen tekst bruger tankestreger eller står
 under 12 px. Chrome kræver `--allow-file-access-from-files`.
+
+## Hvis den skal ind i menuen
+
+`animationer/kemi-c-filer/samling_c3.html` og `animationer/samling_NV.html` har
+hver en knap med `data-emne="c3.4"`, som peger på den gamle animation
+`c3.4_molekyler_blandbarhed.html`. Skal den nye afløse den: skift den linje til
+at pege på `index.html` her, flyt den gamle fil til
+`animationer/kemi-c-filer/arkiv/c3.4_molekyler_blandbarhed_oldversion.html`, og
+omdøb denne mappe fra `sc3.4_blandbarhed_inaktiv` til `sc3.4_blandbarhed`.
