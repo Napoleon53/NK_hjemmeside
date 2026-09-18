@@ -202,7 +202,20 @@ tale og dreje armen kan han:
 * `L.kopV`: koppen i hånden vippes, fx på hovedet ved -2,4
 * armen: 0 peger lige op, og `K.HAENGER` (2,9) hænger ned. Over 2 tegnes armen
   bag kroppen. Når han tørrer op på bordet til højre for sig, bruges 1,8 med en
-  lille svingning (±0,14)
+  lille svingning (±0,14). `pegVinkel(x, y)` regner den vinkel, armen skal have
+  for at pege på et sted på bordet, og `kigVinkel(x)` drejer hovedet lidt
+  samme vej
+
+## Bag bordet
+
+Har forsøget givet ham en fast plads bag bordpladen (`bagBord` i bordets valg —
+sb2.4 gør det), er han en del af lokalet i stedet for en mand, der kommer og
+går. Bordpladen dækker hans underkrop, han tegnes mindre, fordi han er længere
+væk, og han går ikke hen til det, han taler om: han bliver stående og peger.
+Kun det, der kræver hans hænder — oprydningen efter et uheld — henter ham om
+for enden af bordet, og bagefter går han hjem til pladsen igen. `K.UDE` betyder
+da »hjem« og ikke »ud af scenen«. Det tekniske står i
+`../laboratoriet/README.md` under »Kemichael bag bordet«.
 
 ## Uheld
 

@@ -16,8 +16,9 @@ kører med tekst, hint og en liste i panelet, og billedet af glas 1 til 7
 lader eleven notere sine iagttagelser. Kemichael siger selv forløbets
 bemærkninger og et par tørre ord, når et trin er gjort. Del 2 om
 fortynding, quizzen og tegneserien mangler. `_selvtest.html` kører det hele
-igennem i sytten afsnit (plus 3b om boblen og tabellen); det sidste gør
-det med musen, som en elev (`laboratoriet/js/proeve.js`).
+igennem i atten afsnit (plus 3b om boblen og tabellen); afsnit 17 gør
+det med musen, som en elev (`laboratoriet/js/proeve.js`), og afsnit 18
+prøver Kemichaels plads bag bordet.
 `laboratoriet/_vinduer.html` viser forsøget i to vinduesstørrelser ved
 siden af hinanden.
 
@@ -71,6 +72,12 @@ tjekker det. Scenen står forneden i lærredet (`lodret:
 "bund"`). Bordpladen er 64 dyb (`bordDybde`), så man kan stille ting foran
 stativet; det forreste tegnes forrest. Spatlen, glasstaven og termometeret
 ligger forrest fra start.
+
+Kemichael står bag bordet (`bagBord: { x: 940, y: 358, skala: 0.82 }`) i
+højre side, under plakaten og bag isbadet. Han dækker hverken hylderne,
+plakaten, zoomboblen eller nogen af de otte reagensglas, bordpladen dækker
+hans underkrop, og han tegnes mindre, fordi han er længere væk. Se
+»Kemichael i forsøget«.
 
 ## Kemien
 
@@ -128,13 +135,24 @@ læser det — ellers ville et tomt bord ved starten tælle som ryddet op.
 De tre bemærkninger siges af Kemichael selv. En udløser har `{ sig }` som
 konsekvens i stedet for `{ besked }` (motoren: `../../laboratoriet/js/forloeb.js`),
 og `side.js` sender det til `laererReplik` i
-`../../laboratoriet/proevebord/js/laerer.js`: han kommer ind, siger linjerne én
-boble ad gangen og går igen, uden at bordet låses. Bemærkningen om
-referencen peger på glas 7 — han stiller sig ved det og markerer det — og
+`../../laboratoriet/proevebord/js/laerer.js`: han siger linjerne én
+boble ad gangen, uden at bordet låses. Bemærkningen om
+referencen peger på glas 7 — han bliver stående på sin plads, drejer hovedet,
+fører armen mod glasset og markerer det — og
 slutter med glimtet `afslag` fra hans baggrund, som README'en i
 `../../kemichael/` havde sat af til netop det. To trin har desuden deres eget
 `sig`, som han siger, når trinnet er gjort: billedet og oprydningen. Det er
 med vilje kun to; han taler ikke hele tiden.
+
+**Hans plads er bag bordet** (`bagBord` i `js/opstilling.js`): han står der
+fra begyndelsen, tegnes i sit eget plan (`skala: 0.82`) og klippes ved
+bordets bagkant, så pladen dækker hans underkrop. Han går ikke hen til
+tingene, men peger på dem. Kun oprydningen efter et uheld henter ham om for
+enden af bordet; bagefter går han hjem igen. Motoren bag det står i
+`../../laboratoriet/README.md` under »Kemichael bag bordet«.
+
+Taleboblen tegnes som allersidste lag, også over zoomboblen, og holder sig
+fri af både det glas, replikken handler om, og zoomboblens hjørne.
 
 Al tale står i `js/tekst.js` som korte linjer i hans tone: sarkasmen rammer
 handlingen, aldrig eleven, og han forklarer ikke teori. Er der ingen lærer

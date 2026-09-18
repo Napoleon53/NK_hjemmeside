@@ -27,12 +27,35 @@
    uden ansigt; oejne, bryn, briller, mund og roedme tegnes her, saa
    udtrykket kan skifte. Armen er et eget sprite, der drejer om skulderen.
 
+   To planer (S8). Har scenen et NK.Scene.BAGBORD ({ x, y, skala }, sat af
+   bordets valg bagBord), staar han BAG bordet paa en fast plads i stedet
+   for at komme og gaa foran det:
+     * L.plan er 1 bag bordet og 0 foran det. Bag bordet tegnes han med
+       planets skala og klippes ved bordets bagkant (NK.Scene.BORD), saa
+       bordpladen daekker hans underkrop. Han er da ikke laengere hoejere
+       end bordet er dybt, og han kan ikke stille sig foran glassene.
+     * Han bliver staaende og PEGER paa det, en replik handler om, i
+       stedet for at gaa hen til det (trinnets mod).
+     * Kun det, der kraever hans haender - oprydning efter et uheld -
+       henter ham om for enden af bordet (trinnets foran). Vejen gaar uden
+       for scenen, saa skiftet mellem planerne ikke ses.
+     * K.UDE betyder da "hjem til pladsen" i stedet for "ud af scenen".
+   Uden BAGBORD er alt som foer. Forneden slutter figuren ved gulvet
+   (NK.Scene.GULV, bordets valg gulv, standard scenens bund) i stedet for
+   at fortsaette ned under laerredet (F3); har scenen intet gulv - de
+   gamle animationer - fortsaetter kitlen som foer.
+
    Laereren optraeder i smaa scener (laererKoer): en liste af trin, der
    koeres efter hinanden.
      { gaa: x, loeb }       gaa (eller loeb) hen til x; x kan vaere en funktion.
                             K.UDE er uden for scenen, K.KANT lige inde ved kanten
+     { gaa: x, mod: m }     som gaa, men bag bordet bliver han staaende og
+                            peger paa m (et sted paa bordet) i stedet
+     { gaa: x, foran: 1 }   han skal staa FORAN bordet ved x (oprydning);
+                            bag bordet gaar han foerst om for enden
      { sig: tekst, vis }    taleboble i vis sekunder
-     { arm: vinkel, tid }   drej armen om skulderen
+     { arm: vinkel, tid }   drej armen om skulderen; vinkel kan vaere en
+                            funktion, fx this.pegVinkel(x)
      { udtryk: { ... } }    ansigtet glider derhen:
                               vrede, humoer, roed
                               skeptisk  hoejre bryn op og skaev mund
@@ -52,8 +75,13 @@
    Taleboblen tegnes af laboratoriet/js/taleboble.js (NK.Taleboble), naar den er
    indlaest: den faar munden (laererMund) og hovedets hoejde og finder
    selv sin plads inden for scenen, uden om det, replikken handler om
-   (L.undgaa er navnet paa en genstand paa bordet). Er taleboble.js ikke
-   indlaest - de aeldre animationer - tegnes boblen som foer, her i filen.
+   (L.undgaa er navnet paa en genstand paa bordet) OG uden om zoomboblen
+   paa scenen (bord.bobleRekt, F5). Er taleboble.js ikke indlaest - de
+   aeldre animationer - tegnes boblen som foer, her i filen.
+   Boblen er sit eget lag og tegnes til sidst: bordet kalder tegnLaerer
+   med { udenBoble: true } og derefter tegnLaererBoble efter zoomboblen,
+   saa replikken aldrig kan havne under noget. Kalder en aeldre animation
+   bare tegnLaerer(ctx, tid), tegnes boblen med det samme som foer.
 
    Replikker:
      K.replik(kategori)        en vending fra puljen REPLIKKER, som ikke er
@@ -115,6 +143,7 @@
     var UDE = -300;
     var KANT = 10;
     var HAENGER = 2.9;
+    var Y_FORAN = 392;        /* halsens y, naar han staar foran bordet */
 
     /* Sprites hentes fra sprites/ ved siden af denne fil */
     var script = document.currentScript;
@@ -1112,16 +1141,127 @@
         var kaffeX = valg.kaffeX === undefined ? 170 : valg.kaffeX;
         var fredet = (valg.fredet || []).concat("gaaUd");
 
+        /* ----- De to planer: foran og bag bordet (S8) ---------------------
+           Scenen siger med NK.Scene.BAGBORD ({ x, y, skala }), at laereren
+           hoerer hjemme BAG bordet. Saa er hans plads fast, han tegnes med
+           planets skala, og bordets bagkant klipper ham. Uden BAGBORD er
+           L.plan altid 0, og alt er som foer. */
+        function bagValg() { return NK.Scene && NK.Scene.BAGBORD; }
+        function bagSkala(bv) { return bv && bv.skala ? bv.skala : 0.82; }
+        function kald(x, mig) { return typeof x === "function" ? x.call(mig) : x; }
+
+        /* Ankeret maalt i figurens egen skala (som i en skaleret udstyrstype) */
+        function ank(navn, k) {
+            var a = S.ANKER[navn];
+            return k === 1 ? a : { x: a.x * k, y: a.y * k };
+        }
+
+        /* Sandt, mens han staar bag bordet */
+        P.laererBagBord = function () {
+            var L = this.laerer;
+            return !!(bagValg() && L && L.plan >= 0.5);
+        };
+
+        P.laererSkala = function () {
+            var L = this.laerer;
+            return L && L.skala ? L.skala : 1;
+        };
+
+        /* Enden af bordet, uden for scenen: vejen mellem de to planer gaar
+           der, saa skiftet ikke ses. Der vaelges den ende, der giver den
+           korteste vej hele vejen frem til maalet - ikke bare den
+           naermeste - saa han ikke gaar hele bordet igennem to gange. */
+        function endeMod(L, maal) {
+            var v = -140, h = S.BREDDE + 140;
+            var dv = Math.abs(L.x - v) + Math.abs(v - maal);
+            var dh = Math.abs(L.x - h) + Math.abs(h - maal);
+            return dv <= dh ? v : h;
+        }
+
+        function skiftPlan(p) {
+            return { kald: function () { this.laerer.plan = p; } };
+        }
+
+        /* Hjem til pladsen bag bordet: armen ned, om for enden, hvis han
+           staar foran, og saa hen paa plads */
+        function hjemTrin(bv) {
+            return [
+                { arm: HAENGER, tid: 0.3 },
+                { kald: function () { this.laerer.hovedMaal = 0; } },
+                { gaa: function () { var L = this.laerer; return L.plan < 0.5 ? endeMod(L, bv.x) : L.x; }, fart: 560 },
+                skiftPlan(1),
+                { gaa: bv.x }
+            ];
+        }
+
+        /* Om for enden og hen foran bordet (oprydning) */
+        function foranTrin(tr) {
+            return [
+                { gaa: function () { var L = this.laerer; return L.plan > 0.5 ? endeMod(L, kald(tr.gaa, this)) : L.x; }, fart: 560 },
+                skiftPlan(0),
+                tr
+            ];
+        }
+
+        /* mod er enten et x eller et punkt { x, y } paa bordet */
+        function modPunkt(m, mig) {
+            m = kald(m, mig);
+            return (m && typeof m === "object") ? m : { x: m };
+        }
+
+        /* Bliv staaende og peg: hovedet drejer, og armen gaar op mod stedet */
+        function pegTrin(tr) {
+            return [
+                { kald: function () { this.laerer.hovedMaal = this.kigVinkel(modPunkt(tr.mod, this).x); } },
+                { arm: function () { var m = modPunkt(tr.mod, this); return this.pegVinkel(m.x, m.y); }, tid: 0.45 }
+            ];
+        }
+
+        /* En scene, der er skrevet til en mand foran bordet, laest om til
+           en mand bag det. Alt uden gaa gaar igennem uroert, og et gaa
+           uden mod og foran er stadig en gang - bag bordet, hvor hylderne
+           og kaffen staar. */
+        function omskrivBag(trin, bv) {
+            var ud = [];
+            trin.forEach(function (tr) {
+                if (!tr || tr.gaa === undefined) { ud.push(tr); return; }
+                if (tr.gaa === UDE) { ud.push.apply(ud, hjemTrin(bv)); return; }
+                if (tr.foran) { ud.push.apply(ud, foranTrin(tr)); return; }
+                if (tr.mod !== undefined) { ud.push.apply(ud, pegTrin(tr)); return; }
+                ud.push(tr);
+            });
+            return ud;
+        }
+
+        /* Vinklen, armen skal have for at pege paa et sted paa bordet.
+           Armen drejer om skulderen, og dens retning ved vinklen v er
+           (sin v, -cos v); derfor atan2(dx, -dy). */
+        P.pegVinkel = function (x, y) {
+            var sk = this.laererSkulder();
+            /* Uden en hoejde sigtes der lidt over bordpladen, saa armen
+               bliver naesten vandret og ikke forsvinder ned bag et glas */
+            var dy = (y === undefined ? S.BORD - 120 : y) - sk.y;
+            return Math.atan2(x - sk.x, -dy);
+        };
+
+        /* Hovedet drejer en smule den vej, han ser */
+        P.kigVinkel = function (x) {
+            return NK.klamp((x - this.laerer.x) / 900, -0.26, 0.26);
+        };
+
         P.laererStart = function () {
+            var bv = bagValg();
             this.laerer = {
-                x: UDE, maalX: UDE, y: 392, loeb: false, fart: 0, gang: 0,
+                x: bv ? bv.x : UDE, maalX: bv ? bv.x : UDE,
+                y: bv ? bv.y : Y_FORAN, plan: bv ? 1 : 0, skala: bv ? bagSkala(bv) : 1,
+                loeb: false, fart: 0, gang: 0,
                 scene: null,
                 tale: "", taleUr: 0, taleAlfa: 0, taleLaengde: 0,
                 vrede: 0.5, humoer: -0.5, roed: 0, skeptisk: 0, briller: 0, laen: 0,
                 vredeMaal: 0.5, humoerMaal: -0.5, roedMaal: 0, skeptiskMaal: 0, brillerMaal: 0, laenMaal: 0,
                 aaben: 0, blinkUr: 2, blink: 0, lukket: 0, nik: 0, damp: 0,
                 arm: HAENGER, armFra: HAENGER, armTil: HAENGER,
-                hovedV: 0, hovedDx: 0, hovedDy: 0,
+                hovedV: 0, hovedMaal: 0, hovedDx: 0, hovedDy: 0,
                 baerer: null, kopV: 0, kopFra: 0, klik: 0, plakatRegel: 0, rost: false,
                 undgaa: null,
                 dampe: []
@@ -1147,9 +1287,18 @@
             L.tale = "";
             L.taleUr = 0;
             L.undgaa = null;
-            L.hovedV = 0; L.hovedDx = 0; L.hovedDy = 0;
+            L.hovedV = 0; L.hovedMaal = 0; L.hovedDx = 0; L.hovedDy = 0;
             L.lukket = 0;
             L.kopV = 0;
+            /* Bag bordet gaar han ikke ud; han staar paa sin plads igen */
+            var bvNy = bagValg();
+            if (bvNy) {
+                L.plan = 1;
+                L.x = bvNy.x;
+                L.maalX = bvNy.x;
+                L.arm = HAENGER;
+                L.armTil = HAENGER;
+            }
             /* Nyt forsoeg: koppen staar paa hylden igen, saa paaskeaegget
                kan komme en gang til, og uheldene taelles forfra */
             uheldNu = 0;
@@ -1174,6 +1323,8 @@
            endnu, begynder scenen med at vente, til han er talt faerdig. */
         P.laererKoer = function (navn, trin, blokerer) {
             var L = this.laerer;
+            var bv = bagValg();
+            if (bv) trin = omskrivBag(trin, bv);
             var rest = L && L.taleUr > 0 ? Math.min(L.taleUr, 3) : 0;
             L.scene = {
                 navn: navn,
@@ -1192,32 +1343,36 @@
         /* ----- Skulder og haand -------------------------------------------- */
         P.laererKrop = function () {
             var L = this.laerer;
+            var k = L.skala || 1;
             var gaar = L.x !== L.maalX;
-            var bob = gaar ? Math.abs(Math.sin(L.gang)) * -5 : 0;
-            return { x: L.x, y: L.y + bob, v: (gaar ? Math.sin(L.gang) * 0.03 : 0) + L.laen * 0.04 };
+            var bob = gaar ? Math.abs(Math.sin(L.gang)) * -5 * k : 0;
+            return { x: L.x, y: L.y + bob, v: (gaar ? Math.sin(L.gang) * 0.03 : 0) + L.laen * 0.04, k: k };
         };
 
         P.laererSkulder = function () {
-            return NK.tilVerden(this.laererKrop(), S.ANKER.laererKrop, 176, 58);
+            var krop = this.laererKrop(), k = krop.k;
+            return NK.tilVerden(krop, ank("laererKrop", k), 176 * k, 58 * k);
         };
 
         P.laererHaand = function () {
-            var sk = this.laererSkulder();
-            return NK.tilVerden({ x: sk.x, y: sk.y, v: this.laerer.arm }, S.ANKER.laererArm, 28, 36);
+            var sk = this.laererSkulder(), k = this.laererSkala();
+            return NK.tilVerden({ x: sk.x, y: sk.y, v: this.laerer.arm }, ank("laererArm", k), 28 * k, 36 * k);
         };
 
         /* Hovedet og munden, saa fx kaffe kan sprutte det rigtige sted fra */
         P.laererHovedPositur = function () {
-            var L = this.laerer, krop = this.laererKrop();
+            var L = this.laerer, krop = this.laererKrop(), k = krop.k;
             return {
-                x: krop.x + L.hovedDx + L.laen * 10,
-                y: krop.y + 14 + L.nik + L.hovedDy,
-                v: krop.v + L.hovedV + L.laen * 0.18
+                x: krop.x + (L.hovedDx + L.laen * 10) * k,
+                y: krop.y + (14 + L.nik + L.hovedDy) * k,
+                v: krop.v + L.hovedV + L.laen * 0.18,
+                k: k
             };
         };
 
         P.laererMund = function () {
-            return NK.tilVerden(this.laererHovedPositur(), S.ANKER.laererHoved, 55, 97);
+            var hd = this.laererHovedPositur(), k = hd.k;
+            return NK.tilVerden(hd, ank("laererHoved", k), 55 * k, 97 * k);
         };
 
         /* ----- Kaffen ------------------------------------------------------
@@ -1324,10 +1479,24 @@
         };
 
         /* ----- Klik paa laereren ------------------------------------------ */
+        /* Den plads, figuren fylder paa tegnebordet: { x, y, b, h }.
+           Forneden slutter den ved gulvet - bag bordet ved bordets
+           bagkant, fordi pladen daekker resten. */
+        P.laererRekt = function () {
+            var L = this.laerer;
+            if (!L) return null;
+            var k = L.skala || 1;
+            var top = L.y - 116 * k;
+            var bund = this.laererBagBord() ? S.BORD
+                : (S.GULV === undefined ? S.HOEJDE + 40 : S.GULV);
+            return { x: L.x - 105 * k, y: top, b: 217 * k, h: Math.max(0, bund - top) };
+        };
+
         P.overLaerer = function (pt) {
             var L = this.laerer;
             if (!L || L.x < -100) return null;
-            if (pt.x > L.x - 105 && pt.x < L.x + 112 && pt.y > L.y - 116 && pt.y < S.HOEJDE + 40) return "laerer";
+            var r = this.laererRekt();
+            if (pt.x > r.x && pt.x < r.x + r.b && pt.y > r.y && pt.y < r.y + r.h) return "laerer";
             return null;
         };
 
@@ -1392,22 +1561,28 @@
             /* En scene, der er i gang, viger, saa snart eleven roerer noget */
             if (L.scene && L.scene.baggrund) {
                 if (roerteSidst() > L.scene.startet) {
+                    var bvV = bagValg();
                     L.scene = null;
-                    L.maalX = UDE;
+                    L.maalX = bvV ? bvV.x : UDE;
                     L.baerer = null;
                     L.armTil = HAENGER;
                     L.arm = HAENGER;
                 }
                 return;
             }
-            if (L.scene || L.x > UDE + 1) return;
+            var bvB = bagValg();
+            if (L.scene) return;
+            /* Ude af scenen - eller hjemme paa pladsen bag bordet */
+            if (bvB ? (L.plan < 0.999 || Math.abs(L.x - bvB.x) > 1) : L.x > UDE + 1) return;
             /* Ikke, mens fanen er skjult, eller en popup daekker scenen */
             if (window.document && document.visibilityState === "hidden") return;
             if (window.document && document.querySelector(".overlay.vis")) return;
             if (stille() < STILLE_FOERSTE || sidenBaggrund() < STILLE_IGEN) return;
             if (!this.laererRolig()) return;
-            if (Math.random() < 0.5) this.laererForbi();
-            else this.laererStilstand();
+            /* Bag bordet gaar han ikke tvaers over med en kasse; han kigger
+               op fra sit og spoerger, om det staar stille */
+            if (bvB || Math.random() >= 0.5) this.laererStilstand();
+            else this.laererForbi();
         };
 
         /* Markerer scenen som baggrundsliv, saa den viger for eleven */
@@ -1434,9 +1609,11 @@
 
         /* Han kigger ind fra kanten og spoerger, om det staar stille */
         P.laererStilstand = function () {
+            /* Bag bordet staar han allerede der; foran bordet kigger han ind
+               fra kanten */
             this.laererKoer("stilstand", [
                 { udtryk: { vrede: 0.3, humoer: -0.1, roed: 0, briller: 1, laen: 1 } },
-                { gaa: KANT },
+                bagValg() ? { tid: 0.3 } : { gaa: KANT },
                 { tid: 0.4 },
                 { sig: replik("stilstand"), vis: 3.0, tid: 2.2 },
                 { udtryk: { briller: 0, laen: 0 } },
@@ -1481,7 +1658,7 @@
                     tr.startet = true;
                     if (tr.gaa !== undefined) { L.maalX = typeof tr.gaa === "function" ? tr.gaa.call(this) : tr.gaa; L.loeb = !!tr.loeb; L.fart = tr.fart || 0; }
                     if (tr.sig) this.laererSig(tr.sig, tr.vis);
-                    if (tr.arm !== undefined) { L.armFra = L.arm; L.armTil = tr.arm; }
+                    if (tr.arm !== undefined) { L.armFra = L.arm; L.armTil = kald(tr.arm, this); }
                 }
                 sc.t += rest;
                 rest = 0;
@@ -1505,7 +1682,22 @@
                 L.x += Math.sign(d) * Math.min(Math.abs(d), fart * dt);
                 L.gang += dt * (L.loeb ? 16 : 10);
             }
-            if (L.x <= UDE + 1 && !L.scene) { L.klik = 0; L.roedMaal = 0; L.damp = 0; L.brillerMaal = 0; L.laenMaal = 0; }
+            /* Planet afgoer, hvor hoejt han staar, og hvor stor han tegnes */
+            var bvOp = bagValg();
+            if (bvOp) {
+                L.y = NK.lerp(Y_FORAN, bvOp.y, L.plan);
+                L.skala = NK.lerp(1, bagSkala(bvOp), L.plan);
+            }
+            /* Han falder til ro, naar han er ude af billedet. Bag bordet
+               gaar han aldrig ud, saa dér tager det seks stille sekunder
+               paa pladsen, foer prikkene og det roede hoved er glemt. */
+            if (bvOp) {
+                var iRo = !L.scene && L.taleUr <= 0 && L.plan >= 0.999 && Math.abs(L.x - bvOp.x) < 1;
+                L.roUr = iRo ? (L.roUr || 0) + dt : 0;
+                if (L.roUr > 6) { L.klik = 0; L.roedMaal = 0; L.damp = 0; L.brillerMaal = 0; L.laenMaal = 0; }
+            } else if (L.x <= UDE + 1 && !L.scene) {
+                L.klik = 0; L.roedMaal = 0; L.damp = 0; L.brillerMaal = 0; L.laenMaal = 0;
+            }
 
             /* Udtryk, tale og blink */
             L.vrede = NK.mod(L.vrede, L.vredeMaal, 5, dt);
@@ -1514,6 +1706,7 @@
             L.skeptisk = NK.mod(L.skeptisk, L.skeptiskMaal, 5, dt);
             L.briller = NK.mod(L.briller, L.brillerMaal, 6, dt);
             L.laen = NK.mod(L.laen, L.laenMaal, 6, dt);
+            L.hovedV = NK.mod(L.hovedV, L.hovedMaal || 0, 5, dt);
             L.taleUr -= dt;
             L.taleAlfa = NK.mod(L.taleAlfa, L.taleUr > 0 ? 1 : 0, 12, dt);
             var taler = L.taleUr > 0 && this.tid - (L.taleStart || 0) < L.taleLaengde;
@@ -1528,7 +1721,7 @@
                 if (Math.random() < dt * 12) {
                     var hk = this.laererKrop();
                     var side = Math.random() < 0.5 ? -1 : 1;
-                    L.dampe.push({ x: hk.x + side * 44, y: hk.y - 56, vx: side * r(20, 50), vy: -r(40, 80), r: r(4, 7), liv: 1 });
+                    L.dampe.push({ x: hk.x + side * 44 * hk.k, y: hk.y - 56 * hk.k, vx: side * r(20, 50), vy: -r(40, 80), r: r(4, 7) * hk.k, liv: 1 });
                 }
             }
             /* Damp stiger og vokser; draaber (tyngde) falder og skrumper */
@@ -1549,9 +1742,9 @@
         P.tegnAnsigt = function (ctx, L) { tegnAnsigt(ctx, L); };
         P.tegnBaaret = function (ctx, L) {
             if (!L.baerer) return;
-            var hd = this.laererHaand();
+            var hd = this.laererHaand(), k = L.skala || 1;
             if (L.baerer === "kaffekop") {
-                NK.Sprites.tegnPositur(ctx, "kaffekop", { x: hd.x + 8, y: hd.y + 26, v: L.kopV || 0 }, S.ANKER.kaffekop);
+                NK.Sprites.tegnPositur(ctx, "kaffekop", { x: hd.x + 8 * k, y: hd.y + 26 * k, v: L.kopV || 0 }, ank("kaffekop", k), undefined, k);
             } else if (L.baerer === "kasse") {
                 tegnKasse(ctx, hd.x + 2, hd.y + 14);
             } else if (this.tegnBaaretEkstra) {
@@ -1559,49 +1752,62 @@
             }
         };
 
-        P.tegnLaerer = function (ctx, tid) {
-            var L = this.laerer;
-            if (!L) return;
-            var i;
-            if (this.tegnLaererFoer) this.tegnLaererFoer(ctx, tid, L);
+        /* Kroppen. Forneden slutter han ved gulvet: bag bordet er det
+           bordets bagkant (pladen daekker underkroppen), ellers scenens
+           gulv (S.GULV). Har scenen intet gulv - de gamle animationer -
+           fortsaetter kitlen ned som foer. */
+        P.tegnLaererKrop = function (ctx, tid, bag) {
+            var L = this.laerer, i;
             if (L.x < UDE + 40 && !L.scene) return;
+            var k = L.skala || 1;
+            var aKrop = ank("laererKrop", k), aArm = ank("laererArm", k), aHoved = ank("laererHoved", k);
             var krop = this.laererKrop();
             var sk = this.laererSkulder();
             var armBag = Math.abs(L.arm) > 2;
             var armPositur = { x: sk.x, y: sk.y, v: L.arm };
+            var gulv = bag ? S.BORD : S.GULV;
 
-            if (armBag) NK.Sprites.tegnPositur(ctx, "laererArm", armPositur, S.ANKER.laererArm);
+            ctx.save();
+            if (gulv !== undefined) {
+                ctx.beginPath();
+                ctx.rect(-4000, -4000, 12000, gulv + 4000);
+                ctx.clip();
+            }
 
-            /* Kitlen fortsaetter ned under spritet, saa den ikke slutter
-               midt paa en bred skaerm */
-            var kv = NK.tilVerden(krop, S.ANKER.laererKrop, 15, 246);
-            var kh = NK.tilVerden(krop, S.ANKER.laererKrop, 205, 246);
-            var kg = ctx.createLinearGradient(kv.x, 0, kh.x, 0);
-            kg.addColorStop(0, "#c9d2da");
-            kg.addColorStop(0.3, "#f7f9fb");
-            kg.addColorStop(0.7, "#eef2f5");
-            kg.addColorStop(1, "#bcc6cf");
-            ctx.fillStyle = kg;
-            ctx.fillRect(kv.x, kv.y, kh.x - kv.x, 1500);
-            ctx.fillStyle = "#9aa6b1";
-            ctx.fillRect(krop.x - 1, kv.y, 2, 1500);
-            NK.Sprites.tegnPositur(ctx, "laererKrop", krop, S.ANKER.laererKrop);
+            if (armBag) NK.Sprites.tegnPositur(ctx, "laererArm", armPositur, aArm, undefined, k);
+
+            /* Kitlen fortsaetter ned under spritet, til gulvet */
+            var kv = NK.tilVerden(krop, aKrop, 15 * k, 246 * k);
+            var kh = NK.tilVerden(krop, aKrop, 205 * k, 246 * k);
+            var ned = gulv === undefined ? 1500 : Math.max(0, gulv + 2 - kv.y);
+            if (ned > 0) {
+                var kg = ctx.createLinearGradient(kv.x, 0, kh.x, 0);
+                kg.addColorStop(0, "#c9d2da");
+                kg.addColorStop(0.3, "#f7f9fb");
+                kg.addColorStop(0.7, "#eef2f5");
+                kg.addColorStop(1, "#bcc6cf");
+                ctx.fillStyle = kg;
+                ctx.fillRect(kv.x, kv.y, kh.x - kv.x, ned);
+                ctx.fillStyle = "#9aa6b1";
+                ctx.fillRect(krop.x - 1 * k, kv.y, 2 * k, ned);
+            }
+            NK.Sprites.tegnPositur(ctx, "laererKrop", krop, aKrop, undefined, k);
 
             var ryst = L.taleUr > 0 ? Math.sin(tid * 9) * 0.05 * L.vrede * (L.humoer < 0 ? 1 : 0) : 0;
             var hoved = this.laererHovedPositur();
             hoved.v += ryst;
-            NK.Sprites.tegnPositur(ctx, "laererHoved", hoved, S.ANKER.laererHoved);
+            NK.Sprites.tegnPositur(ctx, "laererHoved", hoved, aHoved, undefined, k);
             ctx.save();
             ctx.translate(hoved.x, hoved.y);
             ctx.rotate(hoved.v);
+            if (k !== 1) ctx.scale(k, k);
             ctx.translate(-S.ANKER.laererHoved.x, -S.ANKER.laererHoved.y);
             this.tegnAnsigt(ctx, L);
             ctx.restore();
 
-            if (!armBag) NK.Sprites.tegnPositur(ctx, "laererArm", armPositur, S.ANKER.laererArm);
+            if (!armBag) NK.Sprites.tegnPositur(ctx, "laererArm", armPositur, aArm, undefined, k);
             this.tegnBaaret(ctx, L);
 
-            ctx.save();
             for (i = 0; i < L.dampe.length; i++) {
                 var d = L.dampe[i];
                 ctx.globalAlpha = NK.klamp(d.liv, 0, 1) * (d.farve ? 1 : 0.7);
@@ -1611,24 +1817,53 @@
                 ctx.fill();
             }
             ctx.restore();
+        };
 
+        /* Taleboblen som eget lag. Den holder sig fri af det, replikken
+           handler om (L.undgaa), OG af zoomboblen paa scenen (F5). */
+        P.tegnLaererBoble = function (ctx, tid) {
+            var L = this.laerer;
+            if (!L || !L.tale || !(L.taleAlfa > 0.01)) return;
+            if (L.x < UDE + 40 && !L.scene) return;
+            var k = L.skala || 1;
             if (NK.Taleboble) {
-                /* Boblen er sit eget lag: den faar munden og hovedets hoejde
-                   og finder selv sin plads, uden om det, han taler om */
+                var hoved = this.laererHovedPositur();
                 var mund = this.laererMund();
-                var isse = NK.tilVerden(hoved, S.ANKER.laererHoved, 55, 0);
-                var undgaa = null;
-                if (L.undgaa && this.g && this.g[L.undgaa] && this.rekt) undgaa = this.rekt(this.g[L.undgaa], 8);
+                var isse = NK.tilVerden(hoved, ank("laererHoved", k), 55 * k, 0);
+                var undgaa = [];
+                if (L.undgaa && this.g && this.g[L.undgaa] && this.rekt) undgaa.push(this.rekt(this.g[L.undgaa], 8));
+                if (this.bobleRekt) {
+                    var br = this.bobleRekt();
+                    if (br) undgaa.push(br);
+                }
                 /* Hovedspritet er 110 x 130 med munden 97 nede fra issen */
                 NK.Taleboble.tegn(ctx, L.tale, L.taleAlfa, mund, {
-                    hoved: { op: Math.max(20, mund.y - isse.y), side: 58, ned: 36 },
-                    undgaa: undgaa
+                    hoved: { op: Math.max(20, mund.y - isse.y), side: 58 * k, ned: 36 * k },
+                    undgaa: undgaa.length ? undgaa : null
                 });
             } else {
-                var top = krop.y - 118;
+                var krop = this.laererKrop();
+                var top = krop.y - 118 * k;
                 var bh = bobleHoejde(ctx, L.tale);
-                tegnTaleboble(ctx, krop.x + 150, top - 6 - bh, L.tale, L.taleAlfa, krop.x + 52, top + 50);
+                tegnTaleboble(ctx, krop.x + 150 * k, top - 6 - bh, L.tale, L.taleAlfa, krop.x + 52 * k, top + 50 * k);
             }
+        };
+
+        /* Laget bag alt paa bordet: kun naar han staar der */
+        P.tegnLaererBag = function (ctx, tid) {
+            if (!this.laererBagBord()) return;
+            this.tegnLaererKrop(ctx, tid, true);
+        };
+
+        /* Laget foran bordet. Bordet kalder med { udenBoble: true } og
+           tegner selv boblen til sidst; en aeldre animation kalder uden
+           valg og faar boblen med som foer. */
+        P.tegnLaerer = function (ctx, tid, valg) {
+            var L = this.laerer;
+            if (!L) return;
+            if (this.tegnLaererFoer) this.tegnLaererFoer(ctx, tid, L);
+            if (!this.laererBagBord()) this.tegnLaererKrop(ctx, tid, false);
+            if (!valg || !valg.udenBoble) this.tegnLaererBoble(ctx, tid);
         };
     }
 

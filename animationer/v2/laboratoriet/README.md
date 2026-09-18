@@ -221,6 +221,36 @@ kemikalier (ætsende, giftig, brandfarlig, oxiderende, kronisk) og knust glas
 ser han altid; alt andet, også advarslerne, lader han passere i 60 % af
 tilfældene. `laererAltid = true` slår tilfældet fra i selvtestene.
 
+## Kemichael bag bordet: to planer
+
+Et bord kan give ham en fast plads bag bordpladen med `bagBord: { x, y,
+skala }` i `NK.BORD_VALG` (sb2.4 bruger den; prøvebordet og prøverummet gør
+ikke). Så er han en del af lokalet i stedet for en mand, der kommer og går:
+
+* **Han tegnes i sit eget plan.** `skala` er planets faktor — bag bordet er
+  han længere væk og tegnes mindre — og `y` er halsens højde. Hele figuren,
+  også armen, hovedet, ansigtet og det, han bærer, følger faktoren.
+* **Bordpladen klipper ham.** Han tegnes mellem væggen og alt på bordet
+  (`tegnLaererBag` fra `bord.tegn`) og klippes ved bagkanten (`NK.Scene.BORD`),
+  så pladen dækker hans underkrop. Derfor betyder hans størrelse mindre, og
+  han kan ikke stille sig foran glassene. Et klik på ham gælder først, når
+  intet på bordet ligger under musen (`laererBagBord` i `bord.hvad`).
+* **Han bliver stående og peger.** Et scenetrin `{ gaa: x, mod: m }` er
+  stadig en gang uden `bagBord`, men med den drejer han hovedet og fører
+  armen mod `m` (`pegVinkel`, `kigVinkel`) i stedet for at gå derhen.
+  `mod` er et x eller et punkt `{ x, y }`.
+* **Kun hænderne henter ham om for enden.** Et trin med `foran: true`
+  (oprydningen efter et uheld) sender ham om for den ende af bordet, der
+  giver den korteste vej, og tilbage igen bagefter. Vejen går uden for
+  scenen, så skiftet mellem planerne ikke ses. `K.UDE` betyder da »hjem til
+  pladsen«.
+
+Figuren slutter forneden ved gulvet, `NK.Scene.GULV` (bordets valg `gulv`,
+standard scenens bund) — bag bordet ved bagkanten. Før fortsatte kitlen
+1500 enheder ned, og i et højt lærred blev det til meget lange ben.
+`kemichael.js` uden et gulv i scenen — de gamle animationer — tegner som før.
+Prøvebordets selvtest afsnit 13 og sb2.4's afsnit 18 prøver begge dele.
+
 ## Taleboblen
 
 Boblen er ikke en del af figuren; den er et lag for sig, `js/taleboble.js`
@@ -228,15 +258,20 @@ Boblen er ikke en del af figuren; den er et lag for sig, `js/taleboble.js`
 er, og hvor stort hovedet er (`hoved: { op, side, ned }`). Laget finder selv
 pladsen: over hovedet, når der er plads; ellers til højre, til venstre eller
 under. Det holder sig inden for scenen, lægger sig ikke over det, replikken
-handler om (`undgaa`, et rektangel — Kemichael giver det glas, han peger på,
-`L.undgaa`), og halen ender ved hovedets kant i stedet for at gå hen over
-ansigtet. Er den foretrukne plads ikke fri, vælges den, der går mindst på
+handler om (`undgaa`, et rektangel eller en liste — Kemichael giver det glas,
+han peger på (`L.undgaa`), og zoomboblen på scenen (`bord.bobleRekt`)), og
+halen ender ved hovedets kant i stedet for at gå hen over ansigtet. Er den foretrukne plads ikke fri, vælges den, der går mindst på
 kompromis, og blandt lige gode den, hvor halen sidder mindst skævt.
 
 **Skriften holder en mindste størrelse på skærmen** (`STIL.minSkaerm`,
 14 px): er et bredt bord zoomet langt ud, vokser hele boblen med samme
 faktor, så den ser ens ud og stadig kan læses. Det er svaret på, om boblen
 skulle flyttes til DOM for læsbarhedens skyld — det skulle den ikke.
+
+**Boblen er øverste lag.** Bordet kalder `tegnLaerer(ctx, tid,
+{ udenBoble: true })` og derefter `tegnLaererBoble` til allersidst — efter
+zoomboblen — så en replik aldrig kan havne under noget. En ældre animation
+kalder `tegnLaerer(ctx, tid)` uden valg og får boblen med som før.
 
 Al stil står ét sted (`NK.Taleboble.STIL`): skrift, polster, radius, hale,
 farver. To personers bobler skal adskille sig ved en farve (`valg.stil`),
@@ -280,7 +315,8 @@ regnes af glassets egen masse, vandet og stofferne (M i stoftabellen).
 ## Bordets størrelse og udstyr i mindre målestok
 
 Hvert bord vælger selv sine mål i `NK.BORD_VALG` (`bredde`, `hoejde`, `bord`,
-hylder, plakat, `bobleR`), og lærredet skalerer scenen, så den fylder vinduet.
+`bordDybde`, `lodret`, `gulv`, hylder, plakat, `bagBord`, `bobleR`), og
+lærredet skalerer scenen, så den fylder vinduet.
 Et smalt bord er altså zoomet ind: prøvebordet og prøverummet er 1620 enheder
 brede, mens sb2.4 er 1120 og derfor står tættere på. Et nyt lille bord med
 store, tydelige flasker koster kun de tre tal plus sin egen opstilling.

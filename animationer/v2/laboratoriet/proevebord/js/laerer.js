@@ -20,7 +20,8 @@
                 laererReplik(tekst, valg, kilde). Han kommer ind, siger
                 linjerne og gaar igen. valg kan have:
                   peg      navnet paa en genstand: han stiller sig ved den
-                           og markerer den
+                           og markerer den. Staar han bag bordet (S8),
+                           bliver han staaende og peger paa den i stedet
                   glimt    id paa et glimt af hans baggrund, sagt til sidst
                   udtryk   "toer" (standard), "streng", "mild", "skeptisk"
                            eller et udtryk-objekt som i kemichael.js
@@ -92,8 +93,9 @@
 
     P.laererAdvarsel = function (a) {
         var alvorlig = a.maerker.indexOf("aetsende") >= 0 || a.maerker.indexOf("giftig") >= 0 || a.maerker.indexOf("brandfarlig") >= 0;
+        var ved = pegPunkt(this, a.gg);
         var x = NK.klamp((a.gg.hjem ? a.gg.hjem.x : a.gg.p.x) - 200, 60, NK.Scene.BREDDE - 260);
-        bemaerkning(this, "advarsel", x, { vrede: alvorlig ? 0.6 : 0.3, humoer: -0.4, roed: 0, skeptisk: alvorlig ? 0.6 : 0.3, briller: alvorlig ? 1 : 0 }, a.sig);
+        bemaerkning(this, "advarsel", x, { vrede: alvorlig ? 0.6 : 0.3, humoer: -0.4, roed: 0, skeptisk: alvorlig ? 0.6 : 0.3, briller: alvorlig ? 1 : 0 }, a.sig, null, ved);
     };
 
     /* Bemaerkninger, der ventede paa, at laereren blev ledig. Noeglen
@@ -117,9 +119,11 @@
         return { sig: tekst, vis: 1.4 + tekst.length * 0.05, tid: 1.5 + tekst.length * 0.05 };
     }
 
-    /* En kort bemaerkning: han kommer ind, siger replikkerne og gaar igen */
-    function bemaerkning(mig, navn, x, udtryk, replikker, ekstra) {
-        var trin = [{ udtryk: udtryk }, { gaa: x }];
+    /* En kort bemaerkning: han kommer ind, siger replikkerne og gaar igen.
+       mod er det sted paa bordet, det handler om: staar han bag bordet,
+       bliver han staaende og peger derhen i stedet for at gaa. */
+    function bemaerkning(mig, navn, x, udtryk, replikker, ekstra, mod) {
+        var trin = [{ udtryk: udtryk }, { gaa: x, mod: mod }];
         replikker.forEach(function (rp, i) {
             if (i > 0) trin.push({ tid: 0.2 });
             trin.push(sig(rp));
@@ -154,6 +158,13 @@
         return true;
     };
 
+    /* Det sted, en replik peger paa: genstandens midte, lidt under dens
+       top, saa armen peger paa den og ikke ned bag den */
+    function pegPunkt(mig, gg) {
+        var rk = mig.rekt(gg, 0);
+        return { x: gg.p.x, y: rk.y + Math.min(24, rk.h * 0.3) };
+    }
+
     P.laererSigReplik = function (a) {
         var v = a.valg || {};
         var udtryk = typeof v.udtryk === "string" ? UDTRYK[v.udtryk] : v.udtryk;
@@ -162,7 +173,7 @@
         var x = gg ? NK.klamp(gg.p.x - 180, 60, NK.Scene.BREDDE - 260)
                    : NK.klamp(NK.Scene.BREDDE * 0.35, 60, NK.Scene.BREDDE - 260);
         var ekstra = v.glimt && K.glimtTrin ? K.glimtTrin(v.glimt) : [];
-        var trin = [{ udtryk: udtryk }, { gaa: x }];
+        var trin = [{ udtryk: udtryk }, { gaa: x, mod: gg ? pegPunkt(this, gg) : undefined }];
         if (gg) trin.push({ kald: function () { this.markér(v.peg, 4); this.laerer.undgaa = v.peg; } });
         a.linjer.forEach(function (rp, i) {
             if (i > 0) trin.push({ tid: 0.2 });
@@ -229,7 +240,7 @@
         this.laererKoer("spild", [
             { tid: 0.5 },
             { udtryk: { vrede: 0.9, humoer: -0.8, roed: 0.3, skeptisk: slags === "overloeb" ? 0.8 : 0, briller: slags === "vaeltet" ? 1 : 0 } },
-            { gaa: function () { return NK.klamp((pyt ? pyt.x : gg.p.x) - 130, 60, NK.Scene.BREDDE - 260); } },
+            { gaa: function () { return NK.klamp((pyt ? pyt.x : gg.p.x) - 130, 60, NK.Scene.BREDDE - 260); }, foran: true },
             K.suk(),
             { sig: replik, vis: 2.4, tid: 0.3 },
             { udtryk: { skeptisk: 0, briller: 0 } },
@@ -263,7 +274,7 @@
         this.laererKoer("spild", [
             { tid: 0.5 },
             { udtryk: { vrede: 0.9, humoer: -0.9, roed: 0.3, briller: 1 } },
-            { gaa: x },
+            { gaa: x, foran: true },
             K.suk(1.2),
             { sig: replik, vis: 2.4, tid: 0.3 },
             { udtryk: { briller: 0 } },
@@ -314,7 +325,7 @@
         if (k === 2) replikker = ["Igen. Det står på plakaten, hvis den var stor nok."];
         if (k >= 3) replikker = ["Jeg tæller ikke længere."];
         bemaerkning(this, "voldsom", NK.klamp(c.p.x - 180, 60, NK.Scene.BREDDE - 260), { vrede: 0.7, humoer: -0.6, roed: 0.2, briller: 1 },
-            replikker, k === 1 ? K.glimtTrin("oejenbryn") : []);
+            replikker, k === 1 ? K.glimtTrin("oejenbryn") : [], pegPunkt(this, c));
     };
 
     /* En hel flaske i affaldsdunken: han fylder den op igen, én gang */

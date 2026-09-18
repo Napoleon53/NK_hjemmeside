@@ -36,6 +36,17 @@
                             tegnebordet staar i et hoejere laerred. Med
                             "bund" bliver den tomme plads over bordet, og
                             laereren slutter ved laerredets kant.
+     gulv                   y'et, hvor en person slutter forneden
+                            (standard: scenens bund). Kitlen fortsaetter
+                            ikke laengere ned end dertil, saa han slutter
+                            ved gulvet og ikke ved laerredets kant.
+     bagBord                { x, y, skala }: laererens faste plads BAG
+                            bordet. Med den staar han der i hvile, tegnes
+                            i sit eget plan (skala) og klippes ved bordets
+                            bagkant, saa pladen daekker hans underkrop. Han
+                            kommer kun om for enden af bordet, naar en
+                            scene beder om det (foran: true - oprydning).
+                            Uden bagBord staar han foran bordet som foer.
      boble                  zoomboblen paa scenen: { x, y } er dens
                             centrum paa tegnebordet. Den skalerer med
                             resten af laboratoriet, viser glassets navn
@@ -65,6 +76,11 @@
    Hooks fra laereren (../kemichael/kemichael.js og forsoegets laerer.js)
    er frivillige: laererStart, laererNyt, opdaterLaerer, tegnLaerer,
    overLaerer, klikLaerer, klikKop, laererOptaget, laererUheld(slags, gg).
+   Med bagBord bruges tre lag i stedet for ét: tegnLaererBag (bag alt paa
+   bordet), tegnLaerer (foran bordet) og tegnLaererBoble (taleboblen, der
+   altid er oeverste lag, ogsaa over zoomboblen). laererBagBord() siger,
+   om han staar bag bordet lige nu, saa et klik paa ham foerst gaelder,
+   naar intet paa bordet ligger under musen.
    ===================================================================== */
 (function () {
     "use strict";
@@ -142,6 +158,9 @@
         S.DYBDE = valg.bordDybde || 0;
         S.FORKANT = S.BORD + S.DYBDE;
         S.LODRET = valg.lodret || "midt";
+        /* Gulvet, en person slutter ved, og hans plads bag bordet (S8) */
+        S.GULV = valg.gulv === undefined ? S.HOEJDE : valg.gulv;
+        S.BAGBORD = valg.bagBord || null;
         S.HYLDER = valg.hylder || (valg.hylde === undefined ? [{ x0: 16, x1: 116, y: 268 }] : (valg.hylde ? [valg.hylde] : []));
         S.HYLDE = S.HYLDER[0] || null;
         S.ANKER = S.ANKER || {};
@@ -397,7 +416,10 @@
     P.hvad = function (pt) {
         /* Zoomboblen ligger over alt; er den stor, er den alt */
         if (this.overBoble(pt)) return "boble";
-        if (this.overLaerer) {
+        /* Staar laereren bag bordet, ligger han bag alt paa det, og et klik
+           paa ham gaelder foerst, naar intet andet er under musen */
+        var bagBordet = !!(this.laererBagBord && this.laererBagBord());
+        if (this.overLaerer && !bagBordet) {
             var l = this.overLaerer(pt);
             if (l) return l;
         }
@@ -410,6 +432,10 @@
             var gg = this.liste[i];
             if (!this.synlig(gg)) continue;
             if (this.inden(gg, pt, gg.kan.fast ? 2 : 5)) return gg.navn;
+        }
+        if (this.overLaerer && bagBordet) {
+            var lb = this.overLaerer(pt);
+            if (lb) return lb;
         }
         return null;
     };
@@ -2241,6 +2267,10 @@
         T.tegnBaggrund(ctx, { plakat: this.plakat ? { x: this.plakat.x, y: this.plakat.y, regel: lv.plakatRegel || 0 } : null });
         if (this.stinkskab) T.tegnStinkskabBag(ctx, this.stinkskab, tid);
 
+        /* Staar laereren bag bordet, tegnes han her: efter vaeggen og
+           hylderne, foer alt paa bordet, og klippet ved bordets bagkant */
+        if (this.tegnLaererBag) this.tegnLaererBag(ctx, tid);
+
         this.pytter.forEach(function (py) { T.tegnPyt(ctx, py); });
         T.tegnSkaar(ctx, this.skaar);
 
@@ -2269,12 +2299,15 @@
         var ring = this.svaevRing();
         if (ring) T.tegnSvaevRing(ctx, ring, tid, this.hover === "svaevring");
 
-        if (this.tegnLaerer) this.tegnLaerer(ctx, tid);
+        if (this.tegnLaerer) this.tegnLaerer(ctx, tid, { udenBoble: true });
 
         /* Zoomboblen paa scenen, hvis bordet er sat op med boble: { x, y };
            ellers tegner siden den selv med tegnBoble, fx i panelet */
         var vb = this.bobleBeholder;
         if (this.boble && vb && this.bobleAlfa > 0.01) this.tegnBobleIScenen(ctx, tid);
+        /* Taleboblen er oeverste lag: den skal kunne laeses, ogsaa naar
+           den ellers ville havne under zoomboblen (F5) */
+        if (this.tegnLaererBoble) this.tegnLaererBoble(ctx, tid);
         ctx.restore();
     };
 

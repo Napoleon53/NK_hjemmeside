@@ -654,6 +654,32 @@ function koerTest() {
     paastand("glas 4 kan flyttes til naeste hul i stativet", g.glas4.sted && g.glas4.sted.hul === hul4 + 1, g.glas4.sted ? "hul " + g.glas4.sted.hul : "ikke i stativet");
     paastand("intet uheld undervejs", bord.antalUheld === uheldM, bord.antalUheld - uheldM + " uheld");
     frisk();
+
+    overskrift("13. Kemichael slutter ved gulvet");
+    /* F3: kitlen fortsatte 1500 enheder ned under figuren, saa han fik
+       meget lange ben i et hoejt laerred. Nu klippes han ved scenens gulv
+       (NK.Scene.GULV). Proeven tegner ham paa et frit laerred, hvor gulvet
+       ligger 150 px nede, og ser efter, at der ikke er tegnet noget under
+       det. */
+    var Sg = NK.Scene;
+    var gulv = Sg.GULV === undefined ? Sg.HOEJDE : Sg.GULV;
+    paastand("scenen har et gulv", Sg.GULV === Sg.HOEJDE, "gulv " + Sg.GULV + ", scene " + Sg.HOEJDE + " hoej");
+    var Lg = bord.laerer;
+    Lg.x = 500; Lg.maalX = 500;
+    var lrd = d.createElement("canvas");
+    lrd.width = 420; lrd.height = 320;
+    var cg = lrd.getContext("2d");
+    cg.translate(210 - Lg.x, 150 - gulv);
+    bord.tegnLaerer(cg, 0, { udenBoble: true });
+    var dat = cg.getImageData(0, 152, 420, 168).data, tegnet = 0;
+    for (var ig = 3; ig < dat.length; ig += 4) if (dat[ig] > 10) tegnet++;
+    paastand("intet af figuren er tegnet under gulvet", tegnet === 0, tegnet + " pixel under gulvet");
+    var over = cg.getImageData(0, 60, 420, 80).data, kittel = 0;
+    for (var jg = 3; jg < over.length; jg += 4) if (over[jg] > 10) kittel++;
+    paastand("men han er der: kitlen naar ned til gulvet", kittel > 2000, kittel + " pixel lige over gulvet");
+    paastand("og man rammer ham ikke under gulvet med musen",
+        bord.overLaerer({ x: Lg.x, y: gulv + 30 }) === null && bord.overLaerer({ x: Lg.x, y: gulv - 30 }) === "laerer");
+    frisk();
 }
 
 function vis() {

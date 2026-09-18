@@ -41,6 +41,14 @@
        det. Reagenserne staar paa hylderne over stativet, saa bordet kun har
        det, man arbejder med. */
     var BOBLE = { x: 172, y: 192 };        /* centrum; radius i BORD_VALG */
+
+    /* Kemichaels plads: bag bordet i hoejre side, under plakaten og bag
+       isbadet (plads B, valgt 18/9). Han daekker hverken hylderne eller
+       reagensglassene, og den hvide kittel staar ikke bag de glas, hvis
+       farver skal sammenlignes. y er halsens hoejde, saa issen lige naar
+       op under den nederste hylde til hoejre (230), og skala er hans plan:
+       bag bordet er han laengere vaek og tegnes mindre. */
+    var KEMICHAEL = { x: 940, y: 358, skala: 0.82 };
     var HYLDE_KAFFE = 268;                 /* kaffen, koekkenrullen og pulverglassene */
     var HYLDE_FLASKER = 170;               /* flasken, draabeflasken og sproejteflasken */
     var HYLDE_HOEJRE = 230;                /* det tomme baegerglas */
@@ -98,7 +106,9 @@
         { navn: "baeger", type: "baegerStor", x: 790, y: HYLDE_HOEJRE, titel: "bægerglasset" }
     ];
 
-    /* Tegnebordet er 1040 bredt i stedet for 1520, saa alt er omkring 45 %
+    /* Kemichael staar bag bordet (bagBord) paa sin faste plads og kommer
+       kun om for enden, naar der skal ryddes op. Tegnebordet er 1040 bredt
+       i stedet for 1520, saa alt er omkring 45 %
        stoerre paa skaermen. Bordpladen er 64 dyb, saa der er plads til at
        stille ting foran stativet. Tegnebordet staar forneden i laerredet
        (lodret: "bund"), og zoomboblen staar i laboratoriets oeverste
@@ -119,6 +129,7 @@
             { x0: 715, x1: 1025, y: HYLDE_HOEJRE }
         ],
         plakat: { x: 880, y: 70 },
+        bagBord: KEMICHAEL,
         boble: BOBLE, bobleR: 135, bobleIndhold: 0.9, tilskuere: true, partikler: 6, partikelRef: 3
     };
 }());
