@@ -51,7 +51,10 @@
            Hvert trin har en tekst (hvad eleven skal), et kort navn til
            listen og et hint. Betingelsen for, hvornår trinnet er gjort,
            står i js/forloeb.js — teksten og betingelsen holdes adskilt,
-           så sproget kan læses og rettes uden at røre logikken. */
+           så sproget kan læses og rettes uden at røre logikken.
+           Et trin kan have et sig: det, Kemichael siger, når trinnet er
+           gjort. Kort og tørt, og ikke ved hvert trin — han taler ikke
+           hele tiden. */
         "trin": {
             "fyld":  { kort: "Fyld de otte glas",
                        tekst: "Hæld stamopløsning fra kolben i glas 1 til 8 — omkring 3 mL i hvert.",
@@ -76,10 +79,12 @@
                        hint: "Isbadet står til højre. Slip glas 6 ned i det." },
             "billede": { kort: "Tag billedet",
                        tekst: "Tag et billede af stativet, og notér under hvert glas, om det blev mørkere, lysere eller ser ud som glas 7.",
-                       hint: "Knappen Tag billede står her i panelet. Glassene på billedet bliver stående, som de ser ud nu." },
+                       hint: "Knappen Tag billede står her i panelet. Glassene på billedet bliver stående, som de ser ud nu.",
+                       sig: "Noteret. Så tæller det." },
             "ryd":   { kort: "Ryd op",
                        tekst: "Hæld glassene ud i dunken med surt uorganisk affald, ét ad gangen.",
-                       hint: "Tag et glas, og slip det over affaldsdunken." }
+                       hint: "Tag et glas, og slip det over affaldsdunken.",
+                       sig: "Ryddet op. Så er der ligevægt på bordet også." }
         },
         "forloeb-slut": "Alle ni trin er gjort. Bordet er ryddet, og billedet er noteret.",
 
@@ -87,10 +92,15 @@
         "billede-titel": "Billedet",
         "billede-tekst": "Glassene, som de så ud, da du trykkede. Notér under hvert glas, hvordan det ser ud i forhold til glas 7, som ikke fik noget indgreb.",
 
-        /* ----- Bemærkninger undervejs --------------------------------- */
-        "sig-reference": "Glas 7 skulle stå urørt. Nu er der ingen reference at sammenligne med.",
-        "sig-to-indgreb": "Der er lavet to forskellige indgreb i samme glas. Så kan man ikke sige, hvad der virkede.",
-        "sig-kig-igen": "Et af glassene er noteret anderledes, end det ser ud. Kig på billedet en gang til.",
+        /* ----- Kemichaels bemærkninger undervejs -------------------------
+           Udløserne i js/forloeb.js. Han siger dem selv, én linje ad gangen
+           (en liste er flere bobler efter hinanden), så hver linje er kort.
+           Sarkasmen rammer handlingen, aldrig eleven, og han forklarer
+           ikke teori. Er der ingen lærer på siden, vises linjerne som en
+           besked i stedet. */
+        "sig-reference": ["Glas 7 skulle stå urørt.", "Nu er der ikke noget at sammenligne med."],
+        "sig-to-indgreb": ["To indgreb i det samme glas.", "Så ved man ikke, hvad der virkede."],
+        "sig-kig-igen": ["Et af glassene er noteret anderledes, end det ser ud.", "Kig en gang til. Jeg har tid."],
 
         /* ----- Rundvisningen --------------------------------------------- */
         "rundvisning": [

@@ -3,6 +3,23 @@
 Boblen er det sted, hvor flere personer først kommer i karambolage, og den
 er samtidig det, eleven kigger mest på. Derfor har den sit eget dokument.
 
+## Status 18. september 2026
+
+Bygget som `laboratoriet/js/taleboble.js` (`NK.Taleboble`) — ikke `boble.js`,
+fordi »boble« i motoren allerede er zoomboblen i panelet. Punkt 3, 4 og 5
+nedenfor er gjort: ankring i `laererMund()` med hovedets mål, vending til
+højre/venstre/under når der ikke er plads over, inden for scenen, uden om
+det glas replikken peger på (`L.undgaa`), halen ender ved issen, og al stil
+står i `STIL`. Dertil én ting, der ikke stod på listen: skriften holder en
+mindste størrelse på skærmen (14 px), så hele boblen vokser, når bordet er
+zoomet ud — det afgør DOM-spørgsmålet nedenfor til fordel for canvas.
+Punkt 1 og 2 (kanal og kø i laget) venter på taler nummer to; det, der
+havde en kunde nu — at et uheld ikke må sluge en forløbsreplik — er løst i
+`laerer.js` (`laererAfbryd`: resten af replikken lægges forrest i køen).
+De gamle animationer indlæser ikke laget og tegner boblen som før.
+`_taleboble.html` viser laget arbejde; sb2.4's selvtest afsnit 14 og 15
+holder øje med det.
+
 ## Som den er i dag
 
 Tegnet i canvas i `kemichael.js` (`tegnTaleboble`, `bobleLinjer`,

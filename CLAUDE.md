@@ -23,6 +23,11 @@ statiske sider i roden, downloads i `downloads/`.
 
 ## Superanimationer
 
+- Læs `animationer/superanimationer/README.md`, før der arbejdes i mappen. Den
+  skelner mellem superanimationer (et begreb i op til fire faner, Kemichael kan
+  komme på besøg) og superlab-animationer (et forsøg på `laboratoriet/`,
+  Kemichael er fast), og den har kravene til begge. Punkterne nedenfor om
+  forsøg, laboratoriet og uheld gælder superlab-animationerne.
 - Ingen løbende liste af iagttagelser i panelet. Forsøget opsummeres i stedet
   som en tegneserie i en pop-up bag en knap, der først låses op, når forsøget
   er slut (mønster: `sc6.8_substitution/js/tegneserie.js`).

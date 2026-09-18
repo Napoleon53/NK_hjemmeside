@@ -111,7 +111,13 @@ med `K.replik("ryst", RYST_SVAR)`.
 ny scene begynder med at vente, til han er talt færdig. Trinet
 `{ taleFaerdig: true }` venter på det samme, så han ikke går fra sin egen replik.
 Boblen står 10 % længere end den tid, scenen beder om, og aldrig kortere end det
-tager at læse linjen (`K.taleTid`). Lange replikker brydes over to linjer.
+tager at læse linjen (`K.taleTid`). Lange replikker brydes over flere linjer.
+
+**Boblen tegnes af `../laboratoriet/js/taleboble.js`**, når den er indlæst: den
+får munden (`laererMund`) og hovedets mål og finder selv sin plads inden for
+scenen, uden om det glas han peger på (`L.undgaa`), med halen ved issen i
+stedet for hen over ansigtet, og med skriften i læsbar størrelse uanset zoom.
+I animationer, der ikke indlæser laget, tegnes boblen som før her i filen.
 
 ## Dagsform
 

@@ -89,12 +89,14 @@ på en hylde, som man kan klikke på, og som svarer forskelligt hver gang.*
 Beskrevet sådan kan den næste lærer have en trillebør, en nøgleknippe eller
 en frokostmadkasse uden ny kode. Beskrevet som "kaffe" kan hun ikke.
 
-**Filen er skrevet til den gamle model.** Den hænger på
-`NK.Forsoeg.prototype`, `NK.Scene` og `NK.Sprites` og ved intet om
-genstandsmodellen, `vilkaar.js` eller `forloeb.js`. Maskineriet er godt nok
-til at høste; koblingen er det ikke. Forventningen skal være, at
-`kemichael.js` bliver stående urørt som en af de otte gamle, mens dens
-mekanismer skrives om mod den nye motor — ikke at filen flyttes.
+**Filen kører allerede på den nye motor — rettelse til første læsning.**
+Hovedkommentaren taler om `NK.Forsoeg.prototype`, men `K.paa(prototype)` er
+generisk, og prøvebordet og sb2.4 kobler ham på `NK.Bord.prototype`.
+`laboratoriet/proevebord/js/laerer.js` er hans scener på det nye bord
+(uheld, advarsler, bemærkninger og nu forløbets replikker). Det betyder, at
+opdelingen kan laves på det bord, der bruges, uden en mellemstation. Det,
+filen ikke ved noget om, er `vilkaar.js` og `forloeb.js` — og det er
+rigtigt: forløbet må kigge ned på ham, aldrig omvendt.
 
 ## Hvad der bliver tilbage
 

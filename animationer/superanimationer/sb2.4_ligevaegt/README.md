@@ -13,9 +13,10 @@ af de to mapper.
 
 Bordet står, kemien opfører sig rigtigt, badene virker, forløbets ni trin
 kører med tekst, hint og en liste i panelet, og billedet af glas 1 til 7
-lader eleven notere sine iagttagelser. Del 2 om fortynding, Kemichaels egne
-scener, quizzen og tegneserien mangler. `_selvtest.html` kører det hele
-igennem i tolv afsnit.
+lader eleven notere sine iagttagelser. Kemichael siger selv forløbets
+bemærkninger og et par tørre ord, når et trin er gjort. Del 2 om
+fortynding, quizzen og tegneserien mangler. `_selvtest.html` kører det hele
+igennem i femten afsnit.
 
 ## Filer
 
@@ -88,6 +89,23 @@ fyrer én gang.
 Flaget `indgreb_gjort` sættes, når glas 6 er koldt, og oprydningstrinnet
 læser det — ellers ville et tomt bord ved starten tælle som ryddet op.
 
+## Kemichael i forsøget
+
+De tre bemærkninger siges af Kemichael selv. En udløser har `{ sig }` som
+konsekvens i stedet for `{ besked }` (motoren: `../laboratoriet/js/forloeb.js`),
+og `side.js` sender det til `laererReplik` i
+`../laboratoriet/proevebord/js/laerer.js`: han kommer ind, siger linjerne én
+boble ad gangen og går igen, uden at bordet låses. Bemærkningen om
+referencen peger på glas 7 — han stiller sig ved det og markerer det — og
+slutter med glimtet `afslag` fra hans baggrund, som README'en i
+`../kemichael/` havde sat af til netop det. To trin har desuden deres eget
+`sig`, som han siger, når trinnet er gjort: billedet og oprydningen. Det er
+med vilje kun to; han taler ikke hele tiden.
+
+Al tale står i `js/tekst.js` som korte linjer i hans tone: sarkasmen rammer
+handlingen, aldrig eleven, og han forklarer ikke teori. Er der ingen lærer
+på siden, vises linjerne som en besked, så intet går tabt.
+
 ## Badene
 
 Vandbadet og isbadet er udstyret `bad` fra motoren. Vandbadet står på
@@ -120,7 +138,8 @@ iagttagelsen, der er arbejdet.
 ## Det, der mangler
 
 * **Del 2 om fortynding** med de fire bægerglas på hvidt papir.
-* **Kemichaels egne scener** i forsøget. Han rydder allerede op efter
+* **Flere af Kemichaels scener**, når del 2 kommer til: bemærkningerne og
+  trinnenes replikker er på plads (se ovenfor), og han rydder op efter
   uheld gennem `../laboratoriet/proevebord/js/laerer.js`.
 * **Quiz og tegneserie**, som løftes fra den gamle udgave, når rammen for
   dem er trukket ud.
