@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>To vinduer - udviklerside</title>
+<style>
+    html, body { margin:0; height:100%; background:#14141a; color:#e9eef4; font-family:system-ui, sans-serif; font-size:13px; }
+    header { display:flex; flex-wrap:wrap; gap:10px; align-items:center; padding:8px 12px; background:#1d1f27; border-bottom:1px solid #2c2f3a; }
+    header b { color:#f2c53d; }
+    select, button { font:inherit; background:#2a2d38; color:#e9eef4; border:1px solid #3a3e4c; border-radius:4px; padding:3px 8px; }
+    button { cursor:pointer; }
+    main { display:flex; gap:12px; padding:12px; align-items:flex-start; }
+    .rude { flex:1 1 0; min-width:0; }
+    .rude .navn { margin:0 0 6px; color:#aab3c2; }
+    .ramme { position:relative; overflow:hidden; background:#000; border:1px solid #2c2f3a; }
+    .ramme iframe { position:absolute; left:0; top:0; border:0; transform-origin:0 0; background:#fff; }
+</style>
+</head>
+<body>
+<header>
+    <b>To vinduer</b>
+    <label>Forsøg
+        <select id="side">
+            <option value="../superlab/sb2.4_ligevaegt/index.html">sb2.4 Ligevægt (motoren)</option>
+            <option value="proevebord/index.html">Prøvebordet</option>
+            <option value="proeverum/index.html">Prøverummet</option>
+            <option value="../superlab/sb2.4_jernthiocyanat/index.html">sb2.4 Jernthiocyanat (den gamle)</option>
+        </select>
+    </label>
+    <label>Venstre <select id="a"></select></label>
+    <label>Højre <select id="b"></select></label>
+    <button id="igen" type="button">Genindlæs begge</button>
+    <span id="note"></span>
+</header>
+<main>
+    <div class="rude"><p class="navn" id="navn-a"></p><div class="ramme" id="ramme-a"><iframe id="vindue-a" title="venstre vindue"></iframe></div></div>
+    <div class="rude"><p class="navn" id="navn-b"></p><div class="ramme" id="ramme-b"><iframe id="vindue-b" title="hoejre vindue"></iframe></div></div>
+</main>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i forsoegene og kan slettes.
+
+   Viser et forsoeg i to vinduesstoerrelser ved siden af hinanden, til
+   oejet: det, en selvtest ikke kan se (om noget er skaaret over, om
+   skriften er for lille, om panelet fylder for meget). Hver rude er et
+   rigtigt vindue i den valgte stoerrelse, skaleret ned, saa begge kan
+   ses; man kan bruge dem med musen som normalt.
+
+   Adressen husker valget: _vinduer.html?side=proevebord/index.html&a=1366x768&b=1920x1080
+   Skal aabnes gennem en lokal server, ligesom selvtesterne.
+   ===================================================================== */
+(function () {
+    "use strict";
+    var STOERRELSER = ["1024x768", "1280x720", "1366x768", "1440x900", "1536x864", "1920x1080", "2560x1440", "820x1180"];
+    var q = new URLSearchParams(location.search);
+    var valg = {
+        side: q.get("side") || "../superlab/sb2.4_ligevaegt/index.html",
+        a: q.get("a") || "1366x768",
+        b: q.get("b") || "1920x1080"
+    };
+    var $ = function (id) { return document.getElementById(id); };
+
+    ["a", "b"].forEach(function (k) {
+        var sel = $(k);
+        STOERRELSER.forEach(function (s) {
+            var o = document.createElement("option");
+            o.value = s;
+            o.textContent = s.replace("x", " × ");
+            sel.appendChild(o);
+        });
+        if (STOERRELSER.indexOf(valg[k]) < 0) {
+            var o = document.createElement("option");
+            o.value = valg[k];
+            o.textContent = valg[k].replace("x", " × ");
+            sel.appendChild(o);
+        }
+        sel.value = valg[k];
+    });
+    var sideSel = $("side");
+    if (![].some.call(sideSel.options, function (o) { return o.value === valg.side; })) {
+        var o = document.createElement("option");
+        o.value = valg.side;
+        o.textContent = valg.side;
+        sideSel.appendChild(o);
+    }
+    sideSel.value = valg.side;
+
+    function maal(s) {
+        var m = /^(\d+)x(\d+)$/.exec(s);
+        return m ? { b: +m[1], h: +m[2] } : { b: 1366, h: 768 };
+    }
+
+    /* Hver rude skaleres, saa vinduet fylder rudens bredde */
+    function tilpas() {
+        ["a", "b"].forEach(function (k) {
+            var m = maal(valg[k]);
+            var ramme = $("ramme-" + k), fr = $("vindue-" + k);
+            var bred = ramme.parentNode.clientWidth - 2;
+            var s = Math.min(1, bred / m.b);
+            fr.style.width = m.b + "px";
+            fr.style.height = m.h + "px";
+            fr.style.transform = "scale(" + s + ")";
+            ramme.style.width = Math.round(m.b * s) + "px";
+            ramme.style.height = Math.round(m.h * s) + "px";
+            $("navn-" + k).textContent = m.b + " × " + m.h + " px, vist i " + Math.round(s * 100) + " %";
+        });
+    }
+
+    function indlaes() {
+        ["a", "b"].forEach(function (k) { $("vindue-" + k).src = valg.side; });
+        tilpas();
+        var q2 = new URLSearchParams({ side: valg.side, a: valg.a, b: valg.b });
+        history.replaceState(null, "", "?" + q2.toString());
+        $("note").textContent = location.protocol === "file:" ? "Åbn siden gennem en lokal server." : "";
+    }
+
+    sideSel.addEventListener("change", function () { valg.side = sideSel.value; indlaes(); });
+    $("a").addEventListener("change", function () { valg.a = $("a").value; indlaes(); });
+    $("b").addEventListener("change", function () { valg.b = $("b").value; indlaes(); });
+    $("igen").addEventListener("click", indlaes);
+    window.addEventListener("resize", tilpas);
+    indlaes();
+}());
+</script>
+</body>
+</html>

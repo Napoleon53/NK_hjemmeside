@@ -21,6 +21,13 @@ andet. Det er både en legeplads og testbænken for den fælles kode, og det er
 kimen til et rum med flere stationer. `proevebord/_selvtest.html` kører hele
 modellen igennem.
 
+Selvtesterne prøver også med musen: `js/proeve.js` sender rigtige
+pointer-hændelser til lærredet i scenens koordinater (det omvendte af
+`tilBord`), så en prøve kan tage fat, bære, holde stille, slippe og klikke
+som en elev, og tiden styres af prøven, så bordet ser musens fart.
+Prøvebordets afsnit 12 og sb2.4's afsnit 17 gør det. `_vinduer.html` viser et
+forsøg i to vinduesstørrelser ved siden af hinanden, til øjet.
+
 ## Filer
 
 ```
@@ -74,6 +81,9 @@ _geometri.html       udviklerværktøj: alt glasudstyr læst som omdrejnings-
                      mod hinanden og mod tegningen
 _taleboble.html      udviklerværktøj: flyt munden med musen, og se boblen
                      vende, holde sig inden for kanten og undgå et rektangel
+_vinduer.html        udviklerværktøj: et forsøg i to vinduesstørrelser side om side
+js/proeve.js         udviklerværktøj: musen til selvtesterne (pointer-hændelser
+                     i scenens koordinater, prøvens eget ur)
 proevebord/          det frie bord: index.html, css/stil.css, js/stoffer.js
                      (stoffer, reaktioner, opstilling), js/laerer.js, js/tur.js,
                      js/app.js, _selvtest.html
@@ -284,11 +294,15 @@ Hældning med hånden: holdes en flaske stille over et glas, vipper den efter
 0,3 s og hælder, så længe den holdes der (`opdaterHaeldning`; farten pr. type
 i `HAELD.fart`). Strålen lander, hvor tuden er, så ved siden af glasset hældes
 der på bordet. Dråbeflasken drypper, sprøjteflasken sprøjter og vejebåden
-drysser på samme måde. Et hurtigt slip over glasset giver én portion:
-flaskens standardportion (`haeldMl`), dog højst en femtedel af glasset
-(`portion`). Målet sigtes med tuden, ikke med musen. Løber glasset over,
-stopper strømmen, til flasken flyttes. Flaskerne er fyldt til 200 mL af 250,
-så der kan hældes i dem.
+drysser på samme måde. Dråbeflasken sigtes med bunden: den vender om sin
+midte og ikke om spidsen, så spidsen ender dér, hvor bunden var, og mens den
+vender, glider den ind over åbningen; den drypper først, når spidsen peger
+lige ned (`vendDrypper`, `draabeSigte`, `HAELD.vipDryp`). Når der hældes med
+hånden, vælges glasset, så zoomboblen viser, hvad der sker i det. Et
+hurtigt slip over glasset giver én portion: flaskens standardportion
+(`haeldMl`), dog højst en femtedel af glasset (`portion`). Målet sigtes med
+tuden, ikke med musen. Løber glasset over, stopper strømmen, til flasken
+flyttes. Flaskerne er fyldt til 200 mL af 250, så der kan hældes i dem.
 
 **Slipmålet vælges efter nærhed.** Alt, der vil tage imod det bårne
 (`kanModtage`), er kandidater, og de scores efter afstanden fra det, man
@@ -307,8 +321,10 @@ Det, der lige er brugt, bliver hængende: flasken bliver i hældepositur
 over glasset, dråbeflasken, sprøjteflasken og spatlen bliver i luften over
 det, de blev brugt på (`svaev`, `svaevVed`). En gul ring med en pil ved
 siden af viser, at et klik gentager handlingen (en portion til, en dråbe
-til, en spatelspids til). Resten af bordet venter, til det trækkes væk; så
-går det hjem. Der tegnes ingen hånd.
+til, en spatelspids til); efter den første dråbe siger beskeden det. Resten
+af bordet venter, til det trækkes væk; så går det hjem. Tages en vendt
+flaske eller et væltet glas, rettes det op om det punkt, man greb i, så det
+bliver under hånden. Der tegnes ingen hånd.
 
 Fortyndingsvarmen (`dHfort`, `cRef` i stoftabellen) er en tilstandsfunktion
 af koncentrationen, så syre i syre giver ingen varme, og syre hældt i små
@@ -318,7 +334,8 @@ og vand koger stadig; det er rigtigt.
 Klik viser, træk gør: et klik vælger det, der rummer noget, til aflæsning
 og zoom, og handlinger sker kun ved at trække. Undtagelser er kontakten på
 varmepladen og en dråbeflaske, der allerede hænger over et glas. Zoomboblen
-tegnes i panelet (`NK.Bord.prototype.tegnBoble`), så den ikke dækker bordet.
+tegnes i panelet (`NK.Bord.prototype.tegnBoble`), eller på scenen i
+laboratoriets hjørne, når bordet er sat op med `boble: { x, y }` (sb2.4).
 
 Et nyt forsøg på modellen laver sin egen `js/stoffer.js` med stoffer,
 reaktioner og opstilling (`NK.OPSTILLING`, `NK.BORD_VALG`) og en

@@ -13,6 +13,7 @@
 <body>
 <pre id="ud">Kører …</pre>
 <iframe id="ramme" src="index.html"></iframe>
+<script src="../../laboratoriet/js/proeve.js"></script>
 <script>
 /* =====================================================================
    Udviklervaerktoej. Indgaar ikke i animationen og kan slettes.
@@ -20,7 +21,8 @@
    Aabner index.html i en iframe og koerer forsoeget igennem: kemien i de
    fire indgreb, badene, forloebets trin (ogsaa i forkert raekkefoelge),
    flagene, udloeserne, gemningen, opstillingen mod stoftabellen,
-   Kemichaels replikker fra forloebet og taleboblen som eget lag.
+   Kemichaels replikker fra forloebet og taleboblen som eget lag. Til
+   sidst goeres det samme med musen, som en elev (proeve.js).
 
    Skal aabnes gennem en lokal server (eller Chrome med
    --allow-file-access-from-files), ellers kan iframen ikke laeses.
@@ -508,6 +510,103 @@ function koerTest() {
         if (huskK !== null) vin.localStorage.setItem("nk-kemichael", huskK);
         else vin.localStorage.removeItem("nk-kemichael");
     } catch (e) { /* ingen localStorage */ }
+    NK.startForfra();
+
+    overskrift("17. Med musen: som en elev");
+    /* Rigtige pointer-haendelser gennem laerredet (laboratoriet/js/proeve.js):
+       tag fat, baer, hold stille, slip, klik. Proeven styrer tiden, saa
+       bordet ser musens fart. Det, der svaever efter en haeldning, traekkes
+       vaek med musen igen, ligesom eleven skal. */
+    NK.startForfra();
+    adv(0.5);
+    var mus = NKProeve.mus(bord);
+    var beskeder = [], vedB = bord.vedBesked;
+    bord.vedBesked = function (t, s) { beskeder.push(t); if (vedB) vedB.call(bord, t, s); };
+    var uheld0 = bord.antalUheld;
+    var seet = mus.bordetSer({ x: 400, y: 300 });
+    paastand("musen rammer det punkt paa scenen, der sigtes paa", Math.abs(seet.x - 400) < 0.01 && Math.abs(seet.y - 300) < 0.01, tal(seet.x) + ", " + tal(seet.y));
+    function ankerMedFod(gg, x, y) { var t = gg.type; return { x: x - t.b / 2 + gg.anker.x, y: y - t.h + gg.anker.y }; }
+    function flytHjem(navn) {
+        var gg = bord.g[navn];
+        mus.tag(navn);
+        mus.baer(gg.hjem, 0.8);
+        mus.hold(0.1);
+        mus.slip();
+        mus.hold(0.8);
+        return !gg.svaev && Math.abs(gg.p.x - gg.hjem.x) < 1 && Math.abs(gg.p.y - gg.hjem.y) < 1;
+    }
+
+    /* Kolben: et hurtigt slip over glas 1 giver en portion */
+    var kb = bord.g.kolbe, rk1 = bord.rekt(g(1), 0);
+    paastand("kolben kan tages med musen", mus.tag("kolbe"));
+    mus.til({ x: g(1).p.x, y: rk1.y + 30 }, 0.7);
+    paastand("over glas 1 faar glasset den groenne ramme", bord.slipMaal === "glas1", bord.slipMaal);
+    mus.slip();
+    mus.hold(2);
+    paastand("et hurtigt slip haelder en portion i glas 1", B.volumen(g(1)) > 4, tal(B.volumen(g(1)), 1) + " mL");
+    paastand("og kolben bliver haengende over glasset", !!kb.svaev && kb.svaev.maal === g(1));
+    paastand("kolben kan traekkes hjem igen", flytHjem("kolbe"));
+
+    /* Glas 8 op af stativet, ned i vandbadet og tilbage */
+    var stv8 = bord.g.stativ, vb8 = bord.g.vandbad, g8 = g(8), hul8 = g8.sted && g8.sted.hul;
+    paastand("glas 8 kan tages op af stativet", mus.tag("glas8", 0.5, 0.3));
+    mus.baer({ x: vb8.p.x, y: vb8.p.y - 60 }, 0.8);
+    paastand("over vandbadet faar badet den groenne ramme", bord.slipMaal === "vandbad", bord.slipMaal);
+    mus.slip();
+    mus.hold(1);
+    paastand("sluppet over vandbadet staar glas 8 i badet", g8.paa === vb8 && !g8.sted);
+    mus.tag("glas8", 0.5, 0.3);
+    mus.baer({ x: bord.hulX(stv8, hul8), y: stv8.p.y - 90 }, 0.8);
+    paastand("over sit hul i stativet faar stativet den groenne ramme", bord.slipMaal === "stativ", bord.slipMaal);
+    mus.slip();
+    mus.hold(1);
+    paastand("og sluppet der staar det i stativet igen", !!g8.sted && g8.sted.stativ === stv8 && g8.sted.hul === hul8, g8.sted ? "hul " + g8.sted.hul : "ikke i stativet");
+
+    /* Draabeflasken holdt med bunden lige over glas 4 (F2) */
+    var ag = bord.g.ag, g4 = g(4), rk4 = bord.rekt(g4, 0);
+    var agV0 = B.volumen(ag), g4V0 = B.volumen(g4);
+    paastand("draabeflasken kan tages med musen", mus.tag("ag"));
+    mus.baer({ x: g4.p.x, y: rk4.y - 5 - ag.type.h + ag.anker.y }, 0.7);
+    paastand("holdt med bunden lige over glas 4 faar glasset den groenne ramme", bord.slipMaal === "glas4", bord.slipMaal);
+    mus.hold(1);
+    paastand("inden for et sekund vender den og drypper", B.volumen(ag) < agV0 - 0.01 && Math.cos(ag.p.v) < -0.98,
+        tal(agV0 - B.volumen(ag)) + " mL ud, vinkel " + tal(ag.p.v));
+    mus.hold(0.8);
+    paastand("og draaberne lander i glas 4, ikke paa bordet", B.volumen(g4) > g4V0 + 0.04 && bord.pytter.length === 0 && bord.antalUheld === uheld0,
+        tal(B.volumen(g4) - g4V0) + " mL i glasset, " + bord.pytter.length + " pytter");
+    paastand("og glas 4 er valgt, saa zoomboblen viser, hvad der sker i det", bord.valgt === "glas4", bord.valgt);
+    mus.slip();
+    mus.hold(0.8);
+    var dV4 = B.volumen(g4);
+    paastand("sluppet bliver den haengende over glasset", !!ag.svaev && ag.svaev.maal === g4);
+    paastand("og beskeden siger, hvordan man faar flere",
+        beskeder.length > 0 && beskeder[beskeder.length - 1].indexOf("dråbe mere") > 0, beskeder[beskeder.length - 1]);
+    mus.klik("ag");
+    mus.hold(1);
+    paastand("et klik paa den giver en draabe mere", Math.abs(B.volumen(g4) - dV4 - 0.05) < 0.001, tal(B.volumen(g4) - dV4, 3) + " mL");
+    var r0 = bord.rekt(ag, 0);
+    mus.tag("ag");
+    mus.til({ x: mus.her().x + 10, y: mus.her().y - 10 }, 0.1);
+    var r1 = bord.rekt(ag, 0);
+    paastand("taget igen rettes den op under haanden uden at springe",
+        Math.abs(r1.y - r0.y + 10) < 3 && Math.cos(ag.p.v) > 0.98, "fra y " + tal(r0.y, 0) + " til " + tal(r1.y, 0));
+    mus.baer(ag.hjem, 0.8);
+    mus.hold(0.1);
+    mus.slip();
+    mus.hold(0.8);
+    paastand("og den kan stilles paa hylden igen", !ag.svaev && Math.abs(bundAf(ag) - 170) < 1, "bund " + tal(bundAf(ag), 0));
+
+    /* Et hurtigt slip over glas 4 giver én draabe og beskeden */
+    var g4V1 = B.volumen(g4), nB = beskeder.length;
+    mus.tag("ag");
+    mus.baer({ x: g4.p.x, y: rk4.y - 5 - ag.type.h + ag.anker.y }, 0.7);
+    mus.slip();
+    mus.hold(1.5);
+    paastand("et hurtigt slip over glas 4 giver én draabe", Math.abs(B.volumen(g4) - g4V1 - 0.05) < 0.001, tal(B.volumen(g4) - g4V1, 3) + " mL");
+    paastand("og samme besked", beskeder.slice(nB).some(function (t) { return t.indexOf("dråbe mere") > 0; }));
+    paastand("draabeflasken kan traekkes hjem igen", flytHjem("ag"));
+    paastand("intet uheld undervejs", bord.antalUheld === uheld0, bord.antalUheld - uheld0 + " uheld");
+    bord.vedBesked = vedB;
     NK.startForfra();
 }
 

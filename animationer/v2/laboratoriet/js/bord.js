@@ -149,6 +149,7 @@
         this.skaar = [];
         this.knusTid = 0;
         this.musFart = 0;
+        this.baerAnker = null;   /* ankeret paa det baarne, som det staar oprejst */
         this.musVx = 0;
         this.vold = 0;
         this.uro = 0;
@@ -392,7 +393,10 @@
             h.flyttet = true;
             h.sidst = pt;
             h.t = nu;
-            this.startBaer(gg);
+            this.startBaer(gg, h.start);
+            /* Blev den rettet op, sidder den nu anderledes i haanden */
+            h.dx = h.start.x - gg.p.x;
+            h.dy = h.start.y - gg.p.y;
         }
         var dts = Math.max(4, nu - h.t) / 1000;
         var dx = pt.x - h.sidst.x, dy = pt.y - h.sidst.y;
@@ -401,10 +405,12 @@
         h.sidst = pt;
         h.t = nu;
         var S = NK.Scene;
-        gg.p.x = NK.klamp(pt.x - h.dx, 20, S.BREDDE - 20);
-        gg.p.y = NK.klamp(pt.y - h.dy, 40, S.FORKANT + 90);
+        this.baerAnker = { x: NK.klamp(pt.x - h.dx, 20, S.BREDDE - 20), y: NK.klamp(pt.y - h.dy, 40, S.FORKANT + 90) };
+        gg.p.x = this.baerAnker.x;
+        gg.p.y = this.baerAnker.y;
         this.slipMaal = this.maalVed(gg, pt);
         this.folgHaeldning(gg);
+        if (gg.kan.drypper) this.vendDrypper(gg);
     };
 
     /* ----- Haeldning med haanden -------------------------------------------
@@ -412,8 +418,12 @@
        haelder, saa laenge den holdes der. Straalen lander, hvor tuden er:
        ved siden af glasset haeldes der paa bordet. Draabeflasken drypper og
        sproejteflasken sproejter paa samme maade. Et hurtigt slip giver
-       stadig én standardportion (moede). */
-    var HAELD = { dvael: 0.3, vipTid: 0.5, fart: { reagensglas: 12, baegerLille: 25, baegerStor: 35, kolbe: 30, maaleglas: 15, flaske: 15, vejebaad: 900, sproejteflaske: 8 }, dryp: 0.45 };
+       stadig én standardportion (moede).
+
+       Draabeflasken er lille og vender hurtigere (vipDryp), og den drypper
+       foerst, naar den staar paa hovedet (drypVip). Den vender om sin midte
+       og ikke om spidsen: se vendDrypper. */
+    var HAELD = { dvael: 0.3, vipTid: 0.5, vipDryp: 0.3, drypVip: 0.85, fart: { reagensglas: 12, baegerLille: 25, baegerStor: 35, kolbe: 30, maaleglas: 15, flaske: 15, vejebaad: 900, sproejteflaske: 8 }, dryp: 0.45 };
 
     P.kanHaelde = function (gg) {
         var k = gg.kan;
@@ -431,6 +441,15 @@
         }
     };
 
+    /* Der haeldes nu med haanden i c: glasset vaelges, saa panelet og
+       zoomboblen viser det, der sker i det (som ved et slip) */
+    P.haeldBegyndt = function (h, c) {
+        h.harHaeldt = true;
+        if (h.valgt === c) return;
+        h.valgt = c;
+        if (this.aaben(c)) this.vaelg(c.navn);
+    };
+
     P.opdaterHaeldning = function (dt) {
         var h = this.haeldning, gg = this.baerer;
         if (!h) return;
@@ -443,30 +462,43 @@
         h.dvael = stille ? h.dvael + dt : Math.max(0, h.dvael - dt * 2);
         /* Loeb glasset over, stopper man med at haelde, til flasken flyttes */
         var maalVip = h.dvael > HAELD.dvael && !h.stoppet ? 1 : 0;
-        h.vip = NK.mod(h.vip, maalVip, maalVip ? 1 / HAELD.vipTid * 1.6 : 8, dt);
-        if (h.vip < 0.5) { if (this.straale && this.straale.haand) this.straale = null; return; }
+        var vipTid = gg.kan.drypper ? HAELD.vipDryp : HAELD.vipTid;
+        h.vip = NK.mod(h.vip, maalVip, maalVip ? 1 / vipTid * 1.6 : 8, dt);
         var c = h.maal, k = gg.kan, t = gg.type;
-        var tud = B.tudVerden(gg);
-        /* Rammer straalen glasset? */
+        /* Aabningen i glasset: det indre mellem x0 og x1 */
         var v = c.type.indre ? T.indreVerden(c) : null;
         var x0 = Infinity, x1 = -Infinity;
         if (v) v.forEach(function (p) { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); });
         var o = B.aabning(c);
+        /* Draabeflasken glider ind over aabningen, mens den vender */
+        if (k.drypper) {
+            var sigte = this.draabeSigte(gg);
+            h.draabeMaal = {
+                x: v ? NK.klamp(sigte.x, Math.min(o.x, x0 + 6), Math.max(o.x, x1 - 6)) : o.x,
+                y: Math.min(sigte.y, o.y - 14)
+            };
+        }
+        if (h.vip < 0.5) { if (this.straale && this.straale.haand) this.straale = null; return; }
+        var tud = B.tudVerden(gg);
+        /* Rammer straalen glasset? */
         var rammer = v ? tud.x > x0 - 4 && tud.x < x1 + 4 && tud.y < o.y + 6 : Math.abs(tud.x - o.x) < 20;
         var flade = rammer ? (c.niveau === null || c.niveau === undefined ? o.y + 40 : c.niveau) : NK.Scene.BORD;
-        h.harHaeldt = true;
         if (k.drypper) {
+            /* Foerst naar spidsen peger lige ned (under 10 grader skaevt) */
+            if (h.vip < HAELD.drypVip || Math.cos(gg.p.v) > -0.985) return;
+            this.haeldBegyndt(h, c);
             h.drypUr -= dt;
             if (h.drypUr <= 0) {
                 h.drypUr = HAELD.dryp;
-                var d = Stof.del(gg.indhold, 0.05);
+                var d = Stof.del(gg.indhold, DRAABE);
                 var fo = Stof.farve(d, 3) || Stof.VAND;
                 this.draaber.push({ x: tud.x, y: tud.y + 2, vx: 0, vy: 30, rad: 3.2, liv: 1, farve: { r: fo.r, g: fo.g, b: fo.b, a: fo.a }, c: rammer ? c : null, opl: rammer ? d : null, fysik: !rammer });
                 if (NK.Lyd && NK.Lyd.plip) NK.Lyd.plip();
-                if (!rammer) this.smaaSpild(h, tud.x, 0.05, fo);
+                if (!rammer) this.smaaSpild(h, tud.x, DRAABE, fo);
             }
             return;
         }
+        this.haeldBegyndt(h, c);
         var fart = (HAELD.fart[t.navn] || 15) * (h.vip - 0.5) * 2;
         if (t.navn === "vejebaad") {
             var liste = Stof.faste(gg.indhold);
@@ -534,14 +566,23 @@
     };
 
     /* ----- At baere ------------------------------------------------------------ */
-    P.startBaer = function (gg) {
+    P.startBaer = function (gg, greb) {
         var mig = this;
         this.baerer = gg;
+        this.baerAnker = null;
         this.spildTid = 0;
         gg.svaev = null;
         this.frigoer(gg);
-        /* Et vaeltet glas rettes op, naar man tager det */
-        if (gg.type.sprite) gg.p.v = 0;
+        /* Et vaeltet glas eller en vendt draabeflaske rettes op, naar man
+           tager det: om punktet, der blev grebet i (ellers om midten), saa
+           det bliver under haanden og ikke springer */
+        if (gg.type.sprite && gg.p.v) {
+            var l = greb ? NK.tilLokal(gg.p, gg.anker, greb.x, greb.y) : { x: gg.type.b / 2, y: gg.type.h / 2 };
+            var w = NK.tilVerden(gg.p, gg.anker, l.x, l.y);
+            gg.p.v = 0;
+            gg.p.x = w.x - (l.x - gg.anker.x);
+            gg.p.y = w.y - (l.y - gg.anker.y);
+        }
         /* Et termometer, der sidder i glasset, tages med op; en anden
            genstand, der sidder i det, falder hjem */
         this.liste.forEach(function (x) {
@@ -572,11 +613,44 @@
         this.spildTid = 0;
         this.knusTid = 0;
         if (gg) this.slip(gg, pt);
+        this.baerAnker = null;
         this.aendret("baer");
     };
 
     P.aaben = function (gg) {
         return !!(gg.kan.holder && !gg.kan.flaske && !gg.kan.sproejter && !gg.kan.pulver && !gg.kan.drypper);
+    };
+
+    /* Draabeflasken holdes i haanden og vender om sin midte, ikke om
+       spidsen (ankeret): holdes den med bunden over et glas, ender spidsen
+       dér, hvor bunden var. Mens den vender, glider den ind over aabningen
+       (haeldning.draabeMaal), saa draaberne rammer. baerAnker er ankerets
+       plads, som flasken ville staa oprejst i haanden; flyt saetter den. */
+    function midtAf(gg) {
+        return { x: gg.type.b / 2 - gg.anker.x, y: gg.type.h / 2 - gg.anker.y };
+    }
+
+    P.vendDrypper = function (gg) {
+        var P0 = this.baerAnker;
+        if (!P0 || !gg.type.sprite) return;
+        var d = midtAf(gg), h = this.haeldning;
+        var C = { x: P0.x + d.x, y: P0.y + d.y };
+        var T = h && h.draabeMaal;
+        if (T) {
+            var w = NK.blod(h.vip);
+            C.x += (T.x - d.x - C.x) * w;
+            C.y += (T.y - d.y - C.y) * w;
+        }
+        var co = Math.cos(gg.p.v), si = Math.sin(gg.p.v);
+        gg.p.x = C.x - (d.x * co - d.y * si);
+        gg.p.y = C.y - (d.x * si + d.y * co);
+    };
+
+    /* Der, hvor spidsen kommer til at vaere, naar flasken er vendt: det er
+       dér, der sigtes fra (bunden af den oprejste flaske) */
+    P.draabeSigte = function (gg) {
+        var d = midtAf(gg), P0 = this.baerAnker || gg.p;
+        return { x: P0.x + 2 * d.x, y: P0.y + 2 * d.y };
     };
 
     /* Rystning og spild, mens noget baeres */
@@ -603,6 +677,7 @@
                 hv = hv + (tv - hv) * NK.blod(vip);
             }
             bb.p.v = NK.mod(bb.p.v, hv + NK.klamp(-this.musVx * 0.0004, -0.4, 0.4) * (1 - vip), 12, dt) + (Math.random() - 0.5) * 0.14 * this.uro;
+            if (bb.kan.drypper) this.vendDrypper(bb);
             if (harVaeske && this.spildTid > 0.08 && Math.random() < dt * 14) {
                 var fo = B.farve(bb) || Stof.VAND;
                 var a = B.aabning(bb);
@@ -850,7 +925,8 @@
     P.sigteKandidater = function (gg, pt) {
         var ud = [];
         var fod = this.fod(gg);
-        var tud = (gg.kan.haelder || gg.kan.drypper || gg.kan.sproejter) ? B.tudVerden(gg) : null;
+        var tud = gg.kan.drypper && gg.type.sprite ? this.draabeSigte(gg)
+            : (gg.kan.haelder || gg.kan.drypper || gg.kan.sproejter) ? B.tudVerden(gg) : null;
         for (var i = 0; i < this.liste.length; i++) {
             var c = this.liste[i];
             if (c === gg || !this.synlig(c) || !this.kanModtage(gg, c)) continue;
@@ -894,6 +970,7 @@
         if (c && h && h.harHaeldt && c.kan.holder && (gg.kan.haelder || gg.kan.drypper || gg.kan.sproejter)) {
             gg.svaev = null;
             this.koer.start(this.svaevVed(gg, c, gg.kan.drypper ? { dx: 0, dy: -26, v: Math.PI } : null), "svaev");
+            if (gg.kan.drypper) this.besked(flereDraaber(gg));
             this.aendret("haeldt");
             return;
         }
@@ -1457,8 +1534,12 @@
         return true;
     };
 
-    /* Én draabe fra draabeflasken. Flasken bliver haengende lidt, saa der
-       kan dryppes igen med et klik. */
+    function flereDraaber(gg) {
+        return "Klik på " + gg.titel + " for en dråbe mere, eller træk den væk.";
+    }
+
+    /* Én draabe fra draabeflasken. Flasken bliver haengende, saa der kan
+       dryppes igen med et klik; det siger beskeden efter den foerste. */
     P.draabe = function (gg, c) {
         var mig = this;
         if (B.volumen(gg) < 0.05) { this.besked(gg.titel + " er tom."); return false; }
@@ -1475,7 +1556,7 @@
         this.koer.start([
             { flyt: gg, til: function () { return B.overAabning(gg, c, 0, -26, Math.PI); }, tid: 0.6, loeft: 30 },
             { tid: 0.15 },
-            { kald: dryp }
+            { kald: function () { dryp(); mig.besked(flereDraaber(gg)); } }
         ], "dryp");
         return true;
     };
