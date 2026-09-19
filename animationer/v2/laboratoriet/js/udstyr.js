@@ -227,13 +227,16 @@
             vejlaengde: 1, titel: "dråbeflasken",
             etiket: { x: 5, y: 60, b: 36, h: 32 }, skjulIndhold: true
         },
+        /* Tegnet 25 % stoerre end spriten (F29): alle maal herunder er
+           ganget med 1,25, og mlPrAreal med 1,25², saa 500 mL fylder den
+           samme del af flasken */
         sproejteflaske: {
-            sprite: "sproejteflaske", fil: "sproejteflaske.svg", b: 46, h: 120,
-            anker: { x: 44, y: 9 },
+            sprite: "sproejteflaske", fil: "sproejteflaske.svg", b: 57.5, h: 150,
+            anker: { x: 55, y: 11.25 },
             kan: { holder: true, sproejter: true },
             vindue: true,
-            indre: pts([[4, 30], [42, 30], [42, 116], [38, 119], [8, 119], [4, 116]]), mlPrAreal: 6, maks: 500, haeldMl: 10,
-            tud: { x: 44, y: 9, v: 0.55 },
+            indre: pts([[5, 37.5], [52.5, 37.5], [52.5, 145], [47.5, 148.75], [10, 148.75], [5, 145]]), mlPrAreal: 9.375, maks: 500, haeldMl: 10,
+            tud: { x: 55, y: 11.25, v: 0.55 },
             vejlaengde: 1, titel: "sprøjteflasken", skjulIndhold: true
         },
         pulverglas: {

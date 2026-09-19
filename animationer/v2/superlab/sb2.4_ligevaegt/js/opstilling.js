@@ -105,16 +105,43 @@
        stativets bund (bundY), saa vaesken staar frit mellem stativets to
        braedder. */
     var GLAS_SKALA = Math.cbrt(2 / 3);
+    /* Skiltene (F31): glas 7 er referencen R, glas 8 er forundersoegelsen
+       4a, og glas 4 er 4b. Navnene i koden (glas1-glas8) er de samme, saa
+       forloebet, journalen og selvtesten ikke skal skrives om. */
+    var SKILT = { 4: "4b", 7: "R", 8: "4a" };
     function glas(nr) {
-        return { navn: "glas" + nr, type: "reagensglas", stativ: "stativ", hul: nr - 1, nr: nr,
-                 titel: "glas " + nr, del: 1, skala: GLAS_SKALA, rumfangFoelger: true };
+        var s = SKILT[nr] || String(nr);
+        return { navn: "glas" + nr, type: "reagensglas", stativ: "stativ", hul: nr - 1, nr: s,
+                 titel: "glas " + s, del: 1, skala: GLAS_SKALA, rumfangFoelger: true };
     }
 
-    /* De fire baegerglas i del 2, to og to i par med luft imellem */
-    var PAR1 = [380, 470], PAR2 = [660, 750];
+    /* Stativet til sb2.4 (F31): som udstyrets stativ, men 4a's hul sidder
+       for sig med lidt luft - et hint om, at det glas ikke skal have
+       stamoploesning - og uden tal paa bunden, for glassene har selv deres
+       skilte. Spriten ligger i forsoegets egen sprites/. */
+    (function () {
+        var s = NK.Udstyr.type("stativ"), ny = {}, n;
+        for (n in s) if (Object.prototype.hasOwnProperty.call(s, n)) ny[n] = s[n];
+        ny.sprite = "stativ4a";
+        ny.fil = "stativ_4a.svg";
+        ny.mappe = "sprites/";
+        ny.b = 392;
+        ny.huller = [34, 76, 118, 160, 202, 244, 286, 358];
+        NK.Udstyr.tilfoej("stativ4a", ny);
+    }());
+
+    /* De fire baegerglas i del 2, to og to i par med luft imellem. De
+       staar paa hvert sit hvide underlag paa bordpladen, og det staar
+       forrest paa papiret, hvad parret skal have (F32): det skal vaere
+       helt tydeligt, at par 1 er frugtfarve og par 2 stamoploesning. */
+    var PAR1 = [380, 470], PAR2 = [660, 750], PAR_BUND = 532;
     function baeger(nr, x) {
-        return { navn: "baeger" + nr, type: "baegerLille", x: x, del: 2,
+        return { navn: "baeger" + nr, type: "baegerLille", x: x, y: PAR_BUND, del: 2,
                  titel: "bægerglas " + nr };
+    }
+    function underlag(par, tekst) {
+        return { x0: par[0] - 56, x1: par[1] + 56, y0: 503, y1: 562, tekst: tekst,
+                 vis: function () { return !NK.DELE || NK.DELE.nu() === 2; } };
     }
 
     NK.OPSTILLING = [
@@ -145,7 +172,7 @@
           indhold: opl(500, {}) },
 
         /* De otte reagensglas i stativet */
-        { navn: "stativ", type: "stativ", p: { x: 330, y: 400, v: 0 }, del: 1 },
+        { navn: "stativ", type: "stativ4a", p: { x: 310, y: 400, v: 0 }, del: 1 },
         glas(1), glas(2), glas(3), glas(4), glas(5), glas(6), glas(7), glas(8),
 
         /* Spatlen, glasstaven og termometeret ligger forrest paa bordpladen */
@@ -212,6 +239,7 @@
         plakat: { x: 880, y: 70 },
         bagBord: KEMICHAEL,
         boble: BOBLE, bobleR: 135, bobleIndhold: 0.9, partikler: 6, partikelRef: 3,
-        tilskuere: { centrale: ["Fe3+", "SCN-", "FeSCN2+", "Ag+", "Fe2+"] }
+        tilskuere: { centrale: ["Fe3+", "SCN-", "FeSCN2+", "Ag+", "Fe2+"] },
+        underlag: [underlag(PAR1, "Par 1 · frugtfarve"), underlag(PAR2, "Par 2 · stamopløsning")]
     };
 }());

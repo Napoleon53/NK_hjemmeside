@@ -125,7 +125,9 @@
         if (!p || !p.billede || !p.billede.opl || p.billede.opl.V < 0.5) return null;
         var opl = p.billede.opl;
         var kode = indgreb(opl, ref7);
-        var t = (TEK.glas || "").replace("{nr}", String(nr));
+        /* Skiltet, glasset har paa bordet (4b, R ...), ikke dets plads */
+        var mk = (bord.g[navn] && bord.g[navn].nr) || nr, mkR = bord.g.glas7.nr || "7";
+        var t = (TEK.glas || "").replace("{nr}", String(mk));
         var g = TEK.indgreb && TEK.indgreb[kode];
         t += g ? " " + g.hvad : " " + (TEK.ukendt || "");
         if (kode === "varme" || kode === "kulde") t += " (" + grader(opl.T) + ")";
@@ -143,10 +145,10 @@
             /* Etiketterne staar i rudens bund og ikke ved glasset: saa
                daekker de aldrig det, der skal ses */
             oven: function (ctx, pt) {
-                TS.etiket(ctx, "glas 7", pt(VENSTRE.x, 0).x, TS.H - 13, { farve: "#7ee0a8" });
-                TS.etiket(ctx, "glas " + nr, pt(HOEJRE.x, 0).x, TS.H - 13);
+                TS.etiket(ctx, "glas " + mkR, pt(VENSTRE.x, 0).x, TS.H - 13, { farve: "#7ee0a8" });
+                TS.etiket(ctx, "glas " + mk, pt(HOEJRE.x, 0).x, TS.H - 13);
             },
-            alt: "Glas 7 og glas " + nr + " ved siden af hinanden"
+            alt: "Glas " + mkR + " og glas " + mk + " ved siden af hinanden"
         };
     }
 
@@ -163,9 +165,9 @@
             udsnit: TS.omkring(ting, 60),
             ting: ting,
             oven: function (ctx, pt) {
-                TS.etiket(ctx, "glas 8", pt(midt.x, 0).x, TS.H - 13);
+                TS.etiket(ctx, "glas " + (bord.g.glas8.nr || "8"), pt(midt.x, 0).x, TS.H - 13);
             },
-            alt: "Glas 8 med hvidt bundfald af AgSCN"
+            alt: "Glas " + (bord.g.glas8.nr || "8") + " med hvidt bundfald af AgSCN"
         };
     }
 
@@ -203,7 +205,7 @@
                         { font: "700 13px 'Segoe UI', sans-serif", farve: ref ? "#7ee0a8" : "#c8ced6" });
                 });
             },
-            alt: "Glas 1 til 7 i række, som de så ud på billedet"
+            alt: "Glas 1–6 og R i række, som de så ud på billedet"
         };
     }
 
@@ -357,7 +359,7 @@
                 facitTekst: p.facit && p.svar !== p.facit ? (K.facit || "").replace("{ord}", TEK.ord[p.facit] || p.facit) : null
             });
             raekker.push([
-                String(nr),
+                String((bord.g[navn] && bord.g[navn].nr) || nr),
                 tom ? (K.tomt || "") : (g ? g.kort : (navn === "glas7" ? (K.uroert || "") : (TEK.ukendt || ""))),
                 tom ? "" : grader(opl.T),
                 svar,

@@ -527,6 +527,15 @@ knuses (`type.glas`); rystes et glas ekstremt voldsomt, knuses det i hånden.
 Kemichael kommer og tørrer op eller fejer og henter et nyt
 (`proevebord/js/laerer.js`, `NK.Bord.prototype.genopstil`).
 
+**Tilføjet 19. september (F28–F36):** `stilSvaevendeNed` og
+`ledigtSted` stiller det, der svæver, ned på et ledigt sted på bordet,
+når noget andet trækkes; `NK.Udstyr.mindre` og `rumfangFoelger` på en post
+giver en rigtig mindre udgave af et glas (rumfang og lysvej følger
+tegningen); `Stof.OPLOES_K0` er et konstant bidrag til opløsningen af
+fast stof; `underlag` i `BORD_VALG` er hvidt papir med en påskrift på
+bordpladen; og `side.js` laver feltet »Fyld op til« ved sprøjteflasken
+(`bord.fyldOpTil`). Sprøjteflasken er tegnet 25 % større.
+
 **Der hældes kun, når eleven beder om det (F36):** et slip over glasset
 giver én portion, og pilen ved flasken giver mere. At bære en flaske hen
 over et glas eller holde den stille over det hælder ikke — før talte en

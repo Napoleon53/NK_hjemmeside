@@ -27,13 +27,13 @@
         "intro-formaal":
             "Jernthiocyanat-komplekset FeSCN²⁺ er blodrødt, mens jern(III) er svagt gult og " +
             "thiocyanat farveløst. Farven fortæller altså direkte, hvor ligevægten ligger. " +
-            "Du laver et indgreb i hvert glas og sammenligner med glas 7, der ikke bliver rørt.",
+            "Du laver et indgreb i hvert glas og sammenligner med glas R, referencen, der ikke bliver rørt.",
         "intro-trin": [
-            "Fyld stamopløsning fra kolben i glas 1 til 8. Glas 7 er referencen.",
+            "Fyld stamopløsning fra kolben i glas 1, 2, 3, 4b, 5, 6 og R. Glas R er referencen. Glas 4a, der står for sig, skal ikke have stamopløsning.",
             "Glas 1 til 3 får en spatelspids fast stof: Fe(NO₃)₃, ascorbinsyre og KSCN.",
-            "Glas 4 får et par dråber AgNO₃, som fjerner SCN⁻ som hvidt bundfald.",
+            "Glas 4a er forundersøgelsen: KSCN og AgNO₃ uden jern giver et hvidt bundfald. Glas 4b får et par dråber AgNO₃, som fjerner SCN⁻ som hvidt bundfald.",
             "Glas 5 i vandbadet, glas 6 i isbadet. Mål temperaturen med termometeret.",
-            "Sammenlign hvert glas med glas 7, og notér om det blev mørkere eller lysere.",
+            "Sammenlign hvert glas med glas R, og notér om det blev mørkere eller lysere.",
             "Del 2: fire bægerglas i to par. Par 1 får en portion frugtfarve og vand op til, par 2 ligevægtsblanding — lige meget i begge glas i parret.",
             "Fortynd det ene glas i hvert par med vand, og se alle fire ovenfra. Der er forskellen."
         ],
@@ -41,6 +41,7 @@
             "Forkerte handlinger afvises ikke. Det, der kan gå galt, går galt, og Kemichael rydder op.",
 
         /* ----- De to dele ----------------------------------------------- */
+        "sig-4a": ["Glas 4a skal ikke have stamopløsning.", "Det er forundersøgelsen: KSCN og sølvnitrat alene. Hæld det i affaldet, og begynd forfra med det glas."],
         "forfra-del2": "Begge dele er ryddet. Vi begynder forfra i del 1.",
         "del1-gjort": "Del 1 er gjort. Gå videre til del 2 med pilen øverst til højre, når du er klar.",
         "del1knap": "Del 1: Glassene",
@@ -100,8 +101,8 @@
            gjort. Kort og tørt, og ikke ved hvert trin — han taler ikke
            hele tiden. */
         "trin": {
-            "fyld":  { kort: "Fyld de otte glas",
-                       tekst: "Hæld stamopløsning fra kolben i glas 1 til 8 — 4 mL i hvert.",
+            "fyld":  { kort: "Fyld de syv glas",
+                       tekst: "Hæld stamopløsning fra kolben i glas 1, 2, 3, 4b, 5, 6 og R — 4 mL i hvert. Glas 4a skal ikke have noget.",
                        hint: "Tag fat i kolben, og slip den over et glas. Den bliver hængende, så et klik hælder igen." },
             "glas1": { kort: "Glas 1: mere Fe³⁺",
                        tekst: "Giv glas 1 en spatelspids Fe(NO₃)₃, og rør rundt. Hvad sker der med farven?",
@@ -112,9 +113,9 @@
             "glas3": { kort: "Glas 3: mere SCN⁻",
                        tekst: "Giv glas 3 en spatelspids KSCN, og rør rundt.",
                        hint: "Pulverglasset med KSCN står ved siden af de to andre." },
-            "glas4": { kort: "Glas 4: AgNO₃",
-                       tekst: "Dryp AgNO₃ i glas 4. Sølv fælder thiocyanat som hvidt AgSCN.",
-                       hint: "Dråbeflasken med AgNO₃ står på hylden. Slip den over glas 4, så drypper den én dråbe, og pilen giver en dråbe mere — et par dråber er nok." },
+            "glas4": { kort: "Glas 4b: AgNO₃",
+                       tekst: "Lav først forundersøgelsen i glas 4a: lidt KSCN og en dråbe AgNO₃. Dryp så AgNO₃ i glas 4b. Sølv fælder thiocyanat som hvidt AgSCN.",
+                       hint: "Dråbeflasken med AgNO₃ står på hylden. Slip den over glas 4b, så drypper den én dråbe, og pilen giver en dråbe mere — et par dråber er nok." },
             "varme": { kort: "Glas 5: varme",
                        tekst: "Sæt glas 5 i vandbadet, og tænd varmepladen. Mål temperaturen med termometeret.",
                        hint: "Slip glas 5 over vandbadet, og klik på varmepladens kontakt." },
@@ -122,7 +123,7 @@
                        tekst: "Sæt glas 6 i isbadet, og lad det stå, til det er koldt.",
                        hint: "Isbadet står til højre. Slip glas 6 ned i det." },
             "billede": { kort: "Tag billedet",
-                       tekst: "Tag et billede af stativet, og notér under hvert glas, om det blev mørkere, lysere eller ser ud som glas 7.",
+                       tekst: "Tag et billede af stativet, og notér under hvert glas, om det blev mørkere, lysere eller ser ud som glas R.",
                        hint: "Knappen Tag billede står her i panelet. Glassene på billedet bliver stående, som de ser ud nu.",
                        sig: "Noteret. Så tæller det." },
             "ryd":   { kort: "Ryd op",
@@ -149,7 +150,7 @@
 
         /* ----- Billedet ------------------------------------------------- */
         "billede-titel": "Billedet",
-        "billede-tekst": "Glassene, som de så ud, da du trykkede. Notér under hvert glas, hvordan det ser ud i forhold til glas 7, som ikke fik noget indgreb.",
+        "billede-tekst": "Glassene, som de så ud, da du trykkede. Notér under hvert glas, hvordan det ser ud i forhold til glas R, som ikke fik noget indgreb.",
 
         /* ----- De fire glas ovenfra (del 2) ------------------------------ */
         "ovenfra-titel": "De fire glas set ovenfra",
@@ -167,7 +168,7 @@
            Sarkasmen rammer handlingen, aldrig eleven, og han forklarer
            ikke teori. Er der ingen lærer på siden, vises linjerne som en
            besked i stedet. */
-        "sig-reference": ["Glas 7 skulle stå urørt.", "Nu er der ikke noget at sammenligne med."],
+        "sig-reference": ["Glas R skulle stå urørt.", "Nu er der ikke noget at sammenligne med."],
         "sig-to-indgreb": ["To indgreb i det samme glas.", "Så ved man ikke, hvad der virkede."],
         "sig-kig-igen": ["Et af glassene er noteret anderledes, end det ser ud.", "Kig en gang til. Jeg har tid."],
         "sig-kunst": ["Frugtfarve og ligevægt i samme glas.", "Kunstnerisk. Men ikke et forsøg."],
@@ -180,7 +181,7 @@
            Forklaringen vises ogsaa ved rigtigt svar - det er dér, der
            bliver lært noget. */
         "quiz": {
-            laast: "Låses op, når der er taget billede af glas 1 til 7.",
+            laast: "Låses op, når der er taget billede af glas 1–6 og R.",
             klar: "Billedet af glassene er taget.",
             spoergsmaal: [
                 {
@@ -218,7 +219,7 @@
                     forklaring: "Mere SCN⁻ forskyder ligevægten mod højre. Noget af det frie Fe³⁺ bindes i FeSCN²⁺, så c(Fe³⁺) falder."
                 },
                 {
-                    sp: "Hvad viser forundersøgelsen med KSCN og AgNO₃ i glas 8?",
+                    sp: "Hvad viser forundersøgelsen med KSCN og AgNO₃ i glas 4a?",
                     valg: [
                         "At Ag⁺ og SCN⁻ danner et hvidt bundfald",
                         "At Ag⁺ og Fe³⁺ danner et bundfald",
@@ -226,10 +227,10 @@
                         "At AgNO₃ gør opløsningen varm"
                     ],
                     rigtig: 0,
-                    forklaring: "I glas 8 er der ingen jernioner. Det hvide bundfald må derfor være AgSCN: Ag⁺ + SCN⁻ → AgSCN(s). Så ved man, hvad Ag⁺ gør ved SCN⁻ i glas 4."
+                    forklaring: "I glas 4a er der ingen jernioner. Det hvide bundfald må derfor være AgSCN: Ag⁺ + SCN⁻ → AgSCN(s). Så ved man, hvad Ag⁺ gør ved SCN⁻ i glas 4b."
                 },
                 {
-                    sp: "Hvorfor bliver glas 4 lysere, når der dryppes AgNO₃ i?",
+                    sp: "Hvorfor bliver glas 4b lysere, når der dryppes AgNO₃ i?",
                     valg: [
                         "Ag⁺ fjerner SCN⁻, og ligevægten forskydes mod venstre",
                         "Ag⁺ reagerer med Fe³⁺, så der dannes mere FeSCN²⁺",
@@ -294,8 +295,8 @@
             stam: "Stamopløsningen af Fe(NO₃)₃ og KSCN er brændt orange. Farven skyldes komplekset FeSCN²⁺. Kolben er dagens portion; bægerglasset på hylden er forrådet.",
 
             glas: "Glas {nr}",
-            blev: "Det blev {ord} end glas 7.",
-            ukendt: "blev ikke ændret i forhold til glas 7",
+            blev: "Det blev {ord} end glas R.",
+            ukendt: "blev ikke ændret i forhold til glas R",
             reference: "referencen",
             refKort: "ref.",
 
@@ -308,9 +309,9 @@
 
             /* Indgrebet laeses af, hvad der ER i glasset (js/serie.js) */
             indgreb: {
-                fe:    { hvad: "har mere jern i sig end glas 7", kort: "mere Fe³⁺",
+                fe:    { hvad: "har mere jern i sig end glas R", kort: "mere Fe³⁺",
                          hvorfor: "Mere Fe³⁺ forskyder ligevægten mod højre, så der dannes mere FeSCN²⁺." },
-                scn:   { hvad: "har mere thiocyanat i sig end glas 7", kort: "mere SCN⁻",
+                scn:   { hvad: "har mere thiocyanat i sig end glas R", kort: "mere SCN⁻",
                          hvorfor: "Mere SCN⁻ forskyder ligevægten mod højre, så der dannes mere FeSCN²⁺." },
                 vitc:  { hvad: "indeholder Fe²⁺", kort: "ascorbinsyre",
                          hvorfor: "Ascorbinsyre reducerer Fe³⁺ til Fe²⁺. Så falder c(Fe³⁺), og ligevægten forskydes mod venstre." },
@@ -324,9 +325,9 @@
                          hvorfor: "Fortynding sænker alle koncentrationer. Y bliver større end K, og ligevægten forskydes mod venstre." }
             },
 
-            glas8: "Forundersøgelsen i glas 8: KSCN og AgNO₃ giver et hvidt bundfald. Ag⁺(aq) + SCN⁻(aq) ⟶ AgSCN(s). Derfor virker sølv som indgreb i glas 4.",
+            glas8: "Forundersøgelsen i glas 4a: KSCN og AgNO₃ giver et hvidt bundfald. Ag⁺(aq) + SCN⁻(aq) ⟶ AgSCN(s). Derfor virker sølv som indgreb i glas 4b.",
 
-            billede: "Billedet af glas 1 til 7. Glas 7 ved stuetemperatur er referencen, og du noterede {n} af {i alt} glas.",
+            billede: "Billedet af glas 1–6 og R. Glas R ved stuetemperatur er referencen, og du noterede {n} af {i alt} glas.",
 
             ovenfra: "De fire glas ovenfra: frugtfarven var {farve}, og ligevægtsblandingen var {lv}. Frugtfarven har lige mange farvestofmolekyler i lysvejen, uanset rumfang. I ligevægtsblandingen blev rumfanget {gange} gange så stort, alle koncentrationer faldt, Y blev større end K, og ligevægten forskød sig mod venstre.",
 

@@ -608,6 +608,7 @@
         v.opdater(dt);
         v.tegn();
         this.tegnBoble();
+        this.opdaterFyldOp();
 
         /* Forloebet proeves ogsaa af sig selv, ikke kun naar eleven roerer
            noget: et glas, der staar og bliver varmt i et bad, aendrer
@@ -619,6 +620,60 @@
         }
 
         if (this.signatur() !== this.sidsteSignatur) this.opdaterPanel();
+    };
+
+    /* ----- »Fyld op til« (F29) ------------------------------------------------
+       Haenger sproejteflasken over et glas, staar der et lille felt ved
+       pilen: skriv et rumfang, og glasset fyldes op til det i én
+       sproejtning (bord.fyldOpTil). Feltet laves her, saa alle forsoeg faar
+       det uden egen markup. */
+    P.bygFyldOp = function () {
+        var lr = NK.el("scene-laerred"), scene = lr && lr.parentNode, mig = this;
+        if (!scene || this.fyldOp) return;
+        var f = document.createElement("form");
+        f.className = "fyldop";
+        f.id = "fyldop";
+        f.hidden = true;
+        f.setAttribute("aria-label", "Fyld op til");
+        f.innerHTML = '<label>Fyld op til <input id="fyldop-ml" type="text" inputmode="decimal" size="4" autocomplete="off"> mL</label>' +
+            '<button class="knap" type="submit">Fyld</button>';
+        scene.appendChild(f);
+        f.addEventListener("submit", function (e) {
+            e.preventDefault();
+            var b = mig.bord(), sv = b && b.svaevende(), inp = NK.el("fyldop-ml");
+            var v = parseFloat(String(inp.value).replace(",", "."));
+            if (!sv || !sv.svaev || !(v > 0)) { inp.focus(); return; }
+            b.fyldOpTil(sv, sv.svaev.maal, v);
+            inp.value = "";
+            inp.blur();
+        });
+        this.fyldOp = f;
+    };
+
+    P.opdaterFyldOp = function () {
+        var f = this.fyldOp;
+        if (!f) return;
+        var b = this.bord(), sv = b && b.svaevende(), ring = sv && b.svaevRing();
+        var vis = !!(ring && sv.kan.sproejter && sv.svaev && sv.svaev.maal && sv.svaev.maal.kan.holder && !b.koer.optaget());
+        if (!vis) {
+            if (!f.hidden) {
+                f.hidden = true;
+                if (document.activeElement && f.contains(document.activeElement)) document.activeElement.blur();
+            }
+            return;
+        }
+        var sk = NK.Scene.skala(b.laerred.b, b.laerred.h);
+        var cr = b.canvas.getBoundingClientRect(), pr = f.parentNode.getBoundingClientRect();
+        var x = Math.round(Math.min(cr.left - pr.left + sk.dx + (ring.x + ring.r + 10) * sk.s, pr.width - 200));
+        var y = Math.round(cr.top - pr.top + sk.dy + ring.y * sk.s - 16);
+        if (f.dataset.sted !== x + "," + y) {
+            f.style.left = x + "px";
+            f.style.top = y + "px";
+            f.dataset.sted = x + "," + y;
+        }
+        f.hidden = false;
+        var inp = NK.el("fyldop-ml");
+        if (inp && document.activeElement !== inp) inp.placeholder = String(Math.round(NK.Beholder.volumen(sv.svaev.maal)));
     };
 
     /* ----- Opstart ------------------------------------------------------------ */
@@ -640,6 +695,7 @@
             this.etBord.byg(valg.opstilling || NK.OPSTILLING);
             this.etBord.bindMus();
         }
+        this.bygFyldOp();
 
         var v = this.verden();
         v.vedAendring = function (grund) {

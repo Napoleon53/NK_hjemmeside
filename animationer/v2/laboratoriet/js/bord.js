@@ -41,6 +41,11 @@
                             (standard: scenens bund). Kitlen fortsaetter
                             ikke laengere ned end dertil, saa han slutter
                             ved gulvet og ikke ved laerredets kant.
+     underlag               [{ x0, x1, y0, y1, tekst, vis }]: hvidt papir
+                            paa bordpladen med en paaskrift forrest, fx
+                            under et par baegerglas (F32). Tegnes foer alt
+                            paa bordet og kan hverken rammes eller flyttes.
+                            vis() afgoer, om det ses (fx kun i del 2).
      bagBord                { x, y, skala }: laererens faste plads BAG
                             bordet. Med den staar han der i hvile, tegnes
                             i sit eget plan (skala) og klippes ved bordets
@@ -123,6 +128,7 @@
         this.forskyd = 0;
         this.stinkskab = valg.stinkskab || null;
         this.plakat = valg.plakat || null;
+        this.underlag = valg.underlag || [];
         this.reaktioner = valg.reaktioner || null;
         this.stue = valg.stue || B.TEMP.stue;
         this.specs = [];
@@ -1465,6 +1471,22 @@
         return p ? Math.min(p, kap) : kap;
     };
 
+    /* F29: fyld glasset c op til maalMl med sproejteflasken gg i én
+       sproejtning - aldrig over glassets rumfang og aldrig mere, end
+       flasken har. Returnerer de mL, der gives (0, hvis glasset allerede
+       staar der). */
+    P.fyldOpTil = function (gg, c, maalMl) {
+        if (!gg || !c || !gg.kan.sproejter || !c.kan.holder || this.koer.optaget()) return 0;
+        /* Lige under kanten: fylder man til randen, loeber det over */
+        var mangler = Math.min(maalMl, c.type.maks - 0.1) - B.volumen(c);
+        if (!(mangler > 0.05)) {
+            this.besked(c.titel + " har allerede " + Math.round(B.volumen(c)) + " mL.");
+            return 0;
+        }
+        var mL = Math.min(mangler, B.volumen(gg));
+        return this.sproejt(gg, c, mL) ? mL : 0;
+    };
+
     /* Det, der svaever over noget lige nu (noget skjult svaever ikke) */
     P.svaevende = function () {
         for (var i = 0; i < this.liste.length; i++) if (this.liste[i].svaev && this.synlig(this.liste[i])) return this.liste[i];
@@ -1929,15 +1951,18 @@
     };
 
     /* En sjat vand fra sproejteflasken */
-    P.sproejt = function (gg, c) {
+    /* maengde: mL i én sproejtning (standard SPROEJT); en stor maengde
+       tager lidt laengere tid (F29, »fyld op til«) */
+    P.sproejt = function (gg, c, maengde) {
         var mig = this;
         if (B.volumen(gg) < 0.05) { this.besked(gg.titel + " er tom."); return false; }
-        var mL = Math.min(SPROEJT, B.volumen(gg)), givet = 0, loebOver = false;
+        var mL = Math.min(maengde > 0 ? maengde : SPROEJT, B.volumen(gg)), givet = 0, loebOver = false;
+        var tid = NK.klamp(mL / 12, 0.8, 3);
         if (this.aaben(c)) this.vaelg(c.navn);
         this.koer.start([
             { flyt: gg, til: function () { return B.overAabning(gg, c, -12, -34, 0.55); }, tid: 0.6, loeft: 30 },
-            { kald: function () { if (NK.Lyd && NK.Lyd.haeld) NK.Lyd.haeld(0.8); } },
-            { tid: 0.8, hver: function (t) {
+            { kald: function () { if (NK.Lyd && NK.Lyd.haeld) NK.Lyd.haeld(tid); } },
+            { tid: tid, hver: function (t) {
                 var nu = mL * t;
                 if (!loebOver && nu > givet) {
                     B.haeldI(c, Stof.del(gg.indhold, nu - givet), true);
@@ -2421,6 +2446,7 @@
            hylderne, foer alt paa bordet, og klippet ved bordets bagkant */
         if (this.tegnLaererBag) this.tegnLaererBag(ctx, tid);
 
+        this.underlag.forEach(function (u) { if (!u.vis || u.vis()) T.tegnUnderlag(ctx, u); });
         this.pytter.forEach(function (py) { T.tegnPyt(ctx, py); });
         T.tegnSkaar(ctx, this.skaar);
 

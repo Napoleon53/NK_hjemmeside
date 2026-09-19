@@ -1846,6 +1846,65 @@ function koerTest() {
     mus.slip();
     mus.hold(1);
 
+    /* F32: i del 2 staar hvert par paa et hvidt underlag med sin maerkat */
+    NK.startForfra();
+    adv(0.5);
+    var ul = bord.underlag || [];
+    paastand("del 2 har et hvidt underlag med maerkat for hvert par (F32)",
+        ul.length === 2 && /frugtfarve/.test(ul[0].tekst) && /stamopløsning/.test(ul[1].tekst), ul.map(function (u) { return u.tekst; }).join(" / "));
+    paastand("underlagene ses ikke i del 1", NK.DELE.nu() === 1 && !ul[0].vis() && !ul[1].vis());
+    side.skiftDel(2);
+    adv(0.5);
+    var paaPapir = [1, 2, 3, 4].every(function (n) {
+        var bb = bord.g["baeger" + n], u = ul[n <= 2 ? 0 : 1], f = bord.fod(bb);
+        return f.x > u.x0 && f.x < u.x1 && f.y > u.y0 && f.y < u.y1;
+    });
+    paastand("i del 2 ses de, og hvert baegerglas staar paa sit pars underlag", ul[0].vis() && ul[1].vis() && paaPapir);
+
+    /* F29: sproejteflasken er stoerre, og over et glas kan man skrive,
+       hvor meget der skal fyldes op til */
+    paastand("sproejteflasken er tegnet 25 % stoerre", Math.abs(bord.g.vand.type.h - 150) < 1e-9 && bord.g.vand.type.maks === 500,
+        bord.g.vand.type.h + " hoej");
+    var fo = d.getElementById("fyldop"), rbF = bord.rekt(bord.g.baeger2, 0);
+    paastand("feltet »fyld op til« findes og er skjult, naar intet svaever", !!fo && fo.hidden);
+    mus.tag("vand");
+    mus.til({ x: bord.g.baeger2.p.x, y: rbF.y - 6 }, 0.7);
+    mus.slip();
+    mus.hold(1.5);
+    faerdig();
+    var vF = B.volumen(bord.g.baeger2);
+    side.ramme(performance.now());
+    paastand("en sjat giver 10 mL, og saa staar feltet ved pilen", Math.abs(vF - 10) < 0.05 && !fo.hidden, tal(vF, 1) + " mL");
+    d.getElementById("fyldop-ml").value = "44";
+    fo.requestSubmit();
+    faerdig();
+    paastand("skrives 44, fyldes glasset op til 44 mL i én sproejtning", Math.abs(B.volumen(bord.g.baeger2) - 44) < 0.05,
+        tal(B.volumen(bord.g.baeger2), 1) + " mL");
+    d.getElementById("fyldop-ml").value = "900";
+    fo.requestSubmit();
+    faerdig();
+    paastand("og aldrig over glassets rumfang", Math.abs(B.volumen(bord.g.baeger2) - bord.g.baeger2.type.maks) < 0.2 && bord.pytter.length === 0 && bord.antalUheld === 0,
+        tal(B.volumen(bord.g.baeger2), 1) + " mL af " + bord.g.baeger2.type.maks);
+
+    /* F31: glassene hedder R, 4a og 4b, og 4a staar for sig */
+    NK.startForfra();
+    adv(0.5);
+    paastand("glas 7 hedder R, glas 8 4a og glas 4 4b (F31)",
+        g(7).nr === "R" && g(8).nr === "4a" && g(4).nr === "4b" && g(4).titel === "glas 4b", [g(4).nr, g(7).nr, g(8).nr].join(" "));
+    var afst = [1, 2, 3, 4, 5, 6, 7].map(function (n) { return g(n + 1).p.x - g(n).p.x; });
+    paastand("4a staar for sig med lidt mere luft end de andre", afst.slice(0, 6).every(function (a) { return Math.abs(a - 42) < 0.01; }) && afst[6] > 60,
+        afst.map(function (a) { return tal(a, 0); }).join(" "));
+    paastand("trin 1 kraever ikke stamoploesning i 4a",
+        (function () { [1, 2, 3, 4, 5, 6, 7].forEach(function (n) { B.haeldI(g(n), B.udtag(bord.g.kolbe, PORTION), true); }); adv(1); return F.erGjort("fyld"); }()));
+    B.haeldI(g(8), B.udtag(bord.g.kolbe, PORTION), true);
+    adv(1);
+    paastand("stamoploesning i 4a faar Kemichael til at sige det og foreslaa affaldet",
+        !!F.fyret.stam_i_4a && NK.TEKST["sig-4a"].join(" ").indexOf("affald") > 0, F.fyret.stam_i_4a ? "fyret" : "ikke fyret");
+    NK.startForfra();
+    adv(1);
+    NK.startForfra();
+    adv(0.5);
+
     NK.startForfra();
     adv(1);
 }

@@ -24,6 +24,9 @@
     var T = NK.TEKST.trin;
 
     var GLAS = ["glas1", "glas2", "glas3", "glas4", "glas5", "glas6", "glas7", "glas8"];
+    /* Glassene med stamoploesning: alle paa naer 4a (glas8), som er
+       forundersoegelsen med KSCN og AgNO3 alene (F31) */
+    var STAM_GLAS = ["glas1", "glas2", "glas3", "glas4", "glas5", "glas6", "glas7"];
 
     /* Del 2 spoerger js/ovenfra.js, som ejer parrene og reglen for, hvad
        der taeller som fortyndet. Et vilkaar maa vaere en funktion af
@@ -59,7 +62,7 @@
 
     NK.FORLOEB = {
         trin: [
-            trin("fyld", 1, { alleAf: GLAS, V: { over: 2.5 } }, "kolbe"),
+            trin("fyld", 1, { alleAf: STAM_GLAS, V: { over: 2.5 } }, "kolbe"),
 
             trin("glas1", 1, anderledes("glas1", "moerkere"), "pulver_fe"),
             trin("glas2", 1, anderledes("glas2", "lysere"), "pulver_asc"),
@@ -125,6 +128,17 @@
                     ] }
                 ] },
                 saa: [{ sig: NK.TEKST["sig-reference"], peg: "glas7", glimt: "afslag", udtryk: "skeptisk", slags: "advarsel" }]
+            },
+
+            /* Stamoploesning i 4a (F31): det glas er forundersoegelsen, og
+               han foreslaar affaldet */
+            {
+                id: "stam_i_4a",
+                naar: { nogen: [
+                    { beholder: "glas8", stof: "Fe3+", over: 0.1 },
+                    { beholder: "glas8", stof: "FeSCN2+", over: 0.05 }
+                ] },
+                saa: [{ sig: NK.TEKST["sig-4a"], peg: "glas8", udtryk: "skeptisk", slags: "advarsel" }]
             },
 
             /* To slags indgreb i samme glas: saa kan man ikke sige, hvad der

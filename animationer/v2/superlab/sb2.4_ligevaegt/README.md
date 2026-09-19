@@ -100,6 +100,14 @@ fordi han er længere væk. Se »Kemichael i forsøget«.
 
 ## Reagensglassene
 
+**Rettet samme dag (F33, F31):** glassene rummer 20 mL og er tegnet 87 %
+(`rumfangFoelger`), så en portion er 4 mL af sig selv, og `modtager`
+bruges ikke længere. Glas 7 hedder **R** (referencen), glas 8 **4a**
+(forundersøgelsen, som ikke skal have stamopløsning) og glas 4 **4b**; 4a
+står for sig i stativets sidste hul (forsøgets egen `sprites/stativ_4a.svg`
+uden tal), og hælder man stamopløsning i det, siger Kemichael det.
+Afsnittet herunder beskriver S31, som det først blev lavet.
+
 De otte reagensglas er tegnet en tredjedel mindre end udstyrets
 reagensglas (`skala: 2/3` på hver post i `js/opstilling.js`), men står i
 stativets huller, som de altid har, så der er luft mellem dem, og de ligner
@@ -127,9 +135,12 @@ køkkenrullen og sprøjteflasken — har intet `del` og står hele tiden.
 
 Der skiftes med knapperne øverst til højre på scenen eller med tasterne
 <kbd>1</kbd> og <kbd>2</kbd>, og aldrig midt i en handling: så ville det,
-hånden bærer, forsvinde under den. Når del 1 er ryddet op, skifter bordet
-selv til del 2 (flaget `del1_gjort`), så eleven ikke skal gætte, at der er
-en knap; tilbage til del 1 kan man altid.
+hånden bærer, forsvinde under den. Bordet skifter aldrig selv (F28): når
+del 1 er ryddet op (flaget `del1_gjort`), dukker en grøn pil »Videre til
+del 2 →« op ved fanerne, så eleven ikke skal gætte, at der er en knap.
+Det, der svæver, stilles ned før et skift; tilbage til del 1 kan man
+altid. I del 2 står hvert par bægerglas på et hvidt underlag, hvor der
+står, hvad parret skal have (F32).
 
 Panelet viser det trin, eleven kan gå i gang med *her* — listen viser
 stadig alle tretten, så hele forsøget kan ses på én gang. Det er `kun` på
@@ -253,7 +264,7 @@ glas, og den femte, hvis de to glas i et par ikke fik lige meget stof — den
 fyrer på tallene og ikke på handlingen. Alle fem fyrer én gang.
 Flaget `indgreb_gjort` sættes, når glas 6 er koldt, og oprydningstrinnet
 læser det — ellers ville et tomt bord ved starten tælle som ryddet op.
-Flaget `del1_gjort` sættes af oprydningen og henter del 2 frem.
+Flaget `del1_gjort` sættes af oprydningen og viser pilen til del 2.
 
 Del 2's tre første trin spørger `js/ovenfra.js` gennem vilkårssprogets
 nødudgang (`proev`): parrene og fortyndingsreglen hører til forsøget og

@@ -93,7 +93,7 @@
     /* ----- Knapperne under glassene ------------------------------------- */
     var VALG = [
         { id: "moerkere", tekst: "Mørkere" },
-        { id: "ens", tekst: "Som glas 7" },
+        { id: "ens", tekst: "Som glas R" },
         { id: "lysere", tekst: "Lysere" }
     ];
 

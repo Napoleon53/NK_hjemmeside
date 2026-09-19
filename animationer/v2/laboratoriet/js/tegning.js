@@ -526,7 +526,8 @@
             ctx.arc(m2.x, m2.y, 9, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
-            NK.tekst(ctx, String(gg.nr), m2.x, m2.y + 0.5, { font: "800 12px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: gg.valgt ? "#2a1d04" : "#dfe5ec" });
+            /* Et skilt paa to tegn (4a, 4b) faar lidt mindre skrift */
+            NK.tekst(ctx, String(gg.nr), m2.x, m2.y + 0.5, { font: "800 " + (String(gg.nr).length > 1 ? 10 : 12) + "px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: gg.valgt ? "#2a1d04" : "#dfe5ec" });
             ctx.restore();
         }
         /* Det valgte glas har en tynd gul ramme */
@@ -934,6 +935,28 @@
     };
 
     /* Pytten paa bordet efter et uheld */
+    /* Et hvidt underlag paa bordpladen med en paaskrift forrest (F32):
+       { x0, x1, y0, y1, tekst } i tegnebordets enheder */
+    T.tegnUnderlag = function (ctx, u) {
+        var b = u.x1 - u.x0, h = u.y1 - u.y0;
+        ctx.save();
+        ctx.fillStyle = "rgba(0, 0, 0, 0.22)";
+        ctx.fillRect(u.x0 + 3, u.y0 + 3, b, h);
+        ctx.fillStyle = "#f3f0e8";
+        ctx.fillRect(u.x0, u.y0, b, h);
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.14)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(u.x0 + 0.5, u.y0 + 0.5, b - 1, h - 1);
+        if (u.tekst) {
+            ctx.fillStyle = "#2a2a2a";
+            ctx.font = "600 " + (u.str || 14) + "px 'Segoe UI', Arial, sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "alphabetic";
+            ctx.fillText(u.tekst, u.x0 + b / 2, u.y1 - 6);
+        }
+        ctx.restore();
+    };
+
     T.tegnPyt = function (ctx, pyt) {
         if (!pyt || pyt.vaad < 0.01) return;
         var BORD = pyt.y === undefined ? S().BORD : pyt.y;
