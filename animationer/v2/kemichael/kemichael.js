@@ -596,8 +596,8 @@
        Maales i rigtige sekunder, ikke i forsoegets tid. Baggrundslivet
        haenger paa den, saa det aldrig sker midt i noget, eleven laver, og
        aldrig i selvtesten, der koerer timer igennem paa faa sekunder. */
-    var STILLE_FOERSTE = 95;   /* sekunder uden at eleven roerer noget */
-    var STILLE_IGEN = 195;     /* sekunder mellem to indslag */
+    var STILLE_FOERSTE = 150;  /* sekunder uden at eleven roerer noget */
+    var STILLE_IGEN = 420;     /* sekunder mellem to indslag */
 
     var roert = Date.now();
     var roertTal = 0;          /* taeller, saa et indslag kan se, om eleven har roert noget */
@@ -642,10 +642,13 @@
 
     /* Papkassen, han baerer forbi. Tegnes i koden, saa den ikke kraever
        en sprite: (x, y) er midt paa kassens overkant. */
-    function tegnKasse(ctx, x, y) {
+    function tegnKasse(ctx, x, y, k) {
         var b = 66, h = 46;
+        k = k || 1;
         ctx.save();
-        ctx.translate(x - b / 2, y);
+        ctx.translate(x, y);
+        ctx.scale(k, k);
+        ctx.translate(-b / 2, 0);
         var g = ctx.createLinearGradient(0, 0, b, 0);
         g.addColorStop(0, "#a9773f");
         g.addColorStop(0.5, "#c89355");
@@ -1670,7 +1673,9 @@
             if (window.document && document.querySelector(".overlay.vis")) return;
             if (stille() < STILLE_FOERSTE || sidenBaggrund() < STILLE_IGEN) return;
             if (!this.laererRolig()) return;
-            if (Math.random() < 0.5) this.laererForbi();
+            /* Turen med kassen er den mest paafaldende af de to, saa den
+               kommer sjaeldnest */
+            if (Math.random() < 0.25) this.laererForbi();
             else this.laererStilstand();
         };
 
@@ -1681,14 +1686,16 @@
             baggrundNu();
         }
 
-        /* Han gaar tvaers over med en kasse og siger som regel ingenting */
+        /* Han gaar tvaers over med en kasse og siger som regel ingenting.
+           BAG bordet, hvor der er gulv nok - foran ville kassen og armen
+           komme hen over glassene, og det er elevens plads. */
         P.laererForbi = function () {
             var sig = Math.random() < 0.4 ? [{ sig: replik("forbi"), vis: 2.4, tid: 0.3 }] : [];
             this.laererKoer("forbi", [
                 { udtryk: { vrede: 0.3, humoer: -0.1, roed: 0, skeptisk: 0, briller: 0, laen: 0 } },
                 { arm: 1.95, tid: 0.01 },
                 { kald: function () { this.laerer.baerer = "kasse"; } },
-                { gaa: 210, fart: 250, foran: true }
+                { gaa: 210, fart: 250 }
             ].concat(sig, [
                 { gaa: function () { return S.BREDDE + 220; }, fart: 250 },
                 { kald: function () { this.laerer.baerer = null; this.laerer.x = UDE; this.laerer.maalX = UDE; this.laerer.arm = HAENGER; } }
@@ -1850,7 +1857,7 @@
             if (L.baerer === "kaffekop") {
                 NK.Sprites.tegnPositur(ctx, "kaffekop", { x: hd.x + 8 * k, y: hd.y + 26 * k, v: L.kopV || 0 }, ank("kaffekop", k), undefined, k);
             } else if (L.baerer === "kasse") {
-                tegnKasse(ctx, hd.x + 2, hd.y + 14);
+                tegnKasse(ctx, hd.x + 2 * k, hd.y + 14 * k, k);
             } else if (this.tegnBaaretEkstra) {
                 this.tegnBaaretEkstra(ctx, L, hd);
             }

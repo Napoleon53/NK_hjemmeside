@@ -315,7 +315,17 @@
             var opl = [], fast = [];
             navne.forEach(function (navn) {
                 var s = St.stof(navn);
-                if (s.fase === "s") fast.push({ navn: navn, formel: St.formel(navn, true), tal: o.n[navn], vaerdi: tal(o.n[navn] / 1000, 2), enhed: "mmol", fast: true });
+                /* Fast stof taeller i stofmaengde og ikke i koncentration:
+                   et tungtoploeseligt salt har ingen koncentration, der
+                   siger noget - det ligger der. Et fnug staar i µmol, saa
+                   der aldrig kommer til at staa "0,00 mmol" om noget, der
+                   er der. */
+                if (s.fase === "s") {
+                    var n = o.n[navn];
+                    fast.push({ navn: navn, formel: St.formel(navn, true), tal: n, fast: true,
+                                vaerdi: n < 10 ? tal(n, 1) : tal(n / 1000, 2),
+                                enhed: n < 10 ? "µmol" : "mmol" });
+                }
                 else if (s.fase === "aq") opl.push({ navn: navn, formel: St.formel(navn, true), tal: St.konc(o, navn), vaerdi: tal(St.konc(o, navn), o.V > 0 && St.konc(o, navn) < 1 ? 2 : 1), enhed: "mM" });
             });
             function stoerst(a, b2) { return b2.tal - a.tal; }

@@ -177,9 +177,17 @@
        venstre hjoerne med radius 135. Kuglerne og skriften inde i den er
        en tiendedel mindre end standard (bobleIndhold), saa der er luft
        mellem dem, og skriften stadig kan laeses ved 1366 x 768. Et klik
-       paa boblen viser den stor. Tilskuerionerne (K+ og NO3-) findes ud fra
-       opstillingen og reaktionerne og er skjult i boblen og i panelets
-       tabel, til eleven saetter flueben (tilskuere: true). Boblens skala er
+       paa boblen viser den stor.
+
+       Tilskuerionerne siges her ved at sige, hvad der IKKE er tilskuer:
+       forsoeget handler om Fe3+, SCN-, FeSCN2+ og de to indgreb, der
+       fjerner dem (Ag+ faelder, Fe2+ er det reducerede jern). Alt andet
+       ionisk - K+, NO3-, H+, OH- - er tilskuer og skjules i boblen og i
+       panelets tabel, til eleven saetter flueben. Motoren kan selv finde
+       de ioner, der ikke tager del i nogen reaktion, men H+ GOER det her
+       (redoxen afgiver to pr. ascorbinsyre) uden at betyde noget for det,
+       der skal laeres. Det ved forsoeget, og motoren kan ikke gaette
+       det: i en titrering ville H+ vaere hovedpersonen. Boblens skala er
        fast: 3 mM giver 6 kugler (partikelRef), saa FeSCN2+ bliver flere,
        naar der tilsaettes Fe3+ eller SCN-. Tallet er lavt med vilje: gaar
        det hoejere, rammer et glas med en stamoploesning loftet paa 20
@@ -196,6 +204,7 @@
         ],
         plakat: { x: 880, y: 70 },
         bagBord: KEMICHAEL,
-        boble: BOBLE, bobleR: 135, bobleIndhold: 0.9, tilskuere: true, partikler: 6, partikelRef: 3
+        boble: BOBLE, bobleR: 135, bobleIndhold: 0.9, partikler: 6, partikelRef: 3,
+        tilskuere: { centrale: ["Fe3+", "SCN-", "FeSCN2+", "Ag+", "Fe2+"] }
     };
 }());

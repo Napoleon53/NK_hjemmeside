@@ -134,6 +134,7 @@
         this.bobleR = valg.bobleR || 120;
         this.bobleIndhold = valg.bobleIndhold || 1;
         this.tilskuere = [];
+        this.centrale = null;
         this.visTilskuere = !!valg.visTilskuere;
         this.mikro = new NK.Mikro(this.bobleR, this.bobleIndhold);
         this.boble = valg.boble || null;
@@ -317,9 +318,23 @@
         this.findTilskuere();
     };
 
-    /* Tilskuerionerne i forsoeget: se valg.tilskuere i hovedkommentaren */
+    /* Tilskuerionerne i forsoeget: se valg.tilskuere i hovedkommentaren.
+       Tre former:
+         true              motoren finder dem selv (Stof.tilskuerioner)
+         [ "K+", "NO3-" ]  forsoeget siger dem
+         { centrale: [] }  forsoeget siger, hvad der er HOVEDPERSONER, og
+                           alt andet ionisk er tilskuer
+         { ogsaa: [] }     som true, plus disse
+
+       Den tredje er den, der holder i laengden. Motoren kan regne ud,
+       hvilke ioner der ikke tager del i nogen reaktion, men ikke hvilke
+       der ikke betyder noget I DETTE FORSOEG: H+ er tilskuer i en
+       ligevaegt mellem to ioner og hovedperson i en titrering, hvor den
+       er i stort overskud og alligevel er det hele. Det ved forsoeget,
+       og motoren kan ikke gaette det. */
     P.findTilskuere = function () {
         var v = this.valg.tilskuere;
+        this.centrale = null;
         if (!v) { this.tilskuere = []; return; }
         if (Array.isArray(v)) { this.tilskuere = v.slice(); return; }
         var arter = {};
@@ -328,21 +343,39 @@
             var o = B.samlet(gg);
             Object.keys(o.n).forEach(function (n) { if (o.n[n] > 0) arter[n] = true; });
         });
-        this.tilskuere = Stof.tilskuerioner(Object.keys(arter));
+        var navne = Object.keys(arter);
+        if (v.centrale) {
+            /* centrale gaelder ogsaa det, der endnu ikke findes: H+ kommer
+               foerst, naar redoxen loeber, og skal vaere tilskuer med det
+               samme. Derfor spoerges der levende i tilskuereI, og listen
+               her er kun dem, der staar paa bordet fra start. */
+            this.centrale = v.centrale.slice();
+            var c = this.centrale;
+            this.tilskuere = navne.filter(function (n) {
+                var s = Stof.STOFFER[n];
+                return s && s.q && s.fase === "aq" && c.indexOf(n) < 0;
+            });
+            return;
+        }
+        this.tilskuere = Stof.tilskuerioner(navne);
+        if (v.ogsaa) {
+            var t = this.tilskuere;
+            v.ogsaa.forEach(function (n) { if (t.indexOf(n) < 0) t.push(n); });
+        }
     };
 
     /* Tilskuerionerne i oploesningen o, der staar for sig: kun naar der er
        mere end tre slags ioner i den. Med én til tre ioner hoerer de med
        (en flaske AgNO3 har baade Ag+ og NO3-). */
     P.tilskuereI = function (o) {
-        if (!o || !this.tilskuere.length) return [];
+        if (!o || (!this.tilskuere.length && !this.centrale)) return [];
         var ioner = Object.keys(o.n).filter(function (n) {
             var s = Stof.STOFFER[n];
             return s && s.q && s.fase !== "s" && Stof.synlig(o, n);
         });
         if (ioner.length <= 3) return [];
-        var t = this.tilskuere;
-        return ioner.filter(function (n) { return t.indexOf(n) >= 0; });
+        var c = this.centrale, t = this.tilskuere;
+        return ioner.filter(function (n) { return c ? c.indexOf(n) < 0 : t.indexOf(n) >= 0; });
     };
 
     /* Det, der ikke vises i boblen og tabellen lige nu */

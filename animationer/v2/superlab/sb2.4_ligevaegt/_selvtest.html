@@ -202,7 +202,20 @@ function koerTest() {
        staar for sig nederst i tabellen, naar fluebenet er sat. */
     function kugler(gl) { var o = B.samlet(gl); return St.partikelTal(o, bord.valg.partikler, bord.skjulteI(o), bord.valg.partikelRef); }
     var k7 = kugler(g(7)), k1 = kugler(g(1)), k4 = kugler(g(4));
-    paastand("forsoeget finder selv tilskuerionerne K+ og NO3-", bord.tilskuere.join(",") === "K+,NO3-", bord.tilskuere.join(", "));
+    paastand("tilskuerionerne fra start er K+ og NO3-", bord.tilskuere.join(",") === "K+,NO3-", bord.tilskuere.join(", "));
+    /* Forsoeget siger, hvad der er CENTRALT, og alt andet ionisk er
+       tilskuer. Det er den vej, der holder: H+ opstaar foerst, naar
+       redoxen loeber, og er tilskuer HER - men ville vaere hovedperson i
+       en titrering. Motoren kan ikke gaette det; forsoeget ved det. */
+    paastand("og forsoeget siger, hvad der er centralt, ikke hvad der er tilskuer",
+        !!bord.centrale && bord.centrale.indexOf("FeSCN2+") >= 0 && bord.centrale.indexOf("H+") < 0,
+        (bord.centrale || []).join(", "));
+    (function () {
+        var o = St.lav({ V: 6, mM: { "Fe3+": 2, "SCN-": 2, "FeSCN2+": 1, "K+": 3, "NO3-": 9, "H+": 5, "Fe2+": 4 } });
+        var sk = bord.tilskuereI(o);
+        paastand("saa H+ er tilskuer, ogsaa selv om den ikke stod paa bordet fra start",
+            sk.indexOf("H+") >= 0 && sk.indexOf("Fe2+") < 0 && sk.indexOf("FeSCN2+") < 0, sk.join(", "));
+    }());
     paastand("FeSCN2+ faar flere kugler i glas 1 (mere Fe3+) end i referencen", (k1["FeSCN2+"] || 0) > (k7["FeSCN2+"] || 0),
         (k7["FeSCN2+"] || 0) + " -> " + (k1["FeSCN2+"] || 0) + " " + JSON.stringify(k1));
     paastand("og faerre i glas 4 (AgNO3), men forsvinder ikke", (k4["FeSCN2+"] || 0) >= 1 && (k4["FeSCN2+"] || 0) <= (k7["FeSCN2+"] || 0),
