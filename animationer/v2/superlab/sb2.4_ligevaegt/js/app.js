@@ -40,8 +40,12 @@
         vedAendring: function (grund) {
             if (grund === "nulstil") {
                 this.venterPaaDel2 = false;
-                NK.DELE.nulstil(this.bord());
+                var foer = NK.DELE.nulstil(this.bord());
                 if (this.visDel) this.visDel();
+                /* Kom man fra del 2, er begge dele ryddet, og man staar i
+                   del 1 igen. Det skal siges, ellers ser det ud som om
+                   noget gik galt. */
+                if (foer === 2) this.bord().besked(NK.TEKST["forfra-del2"]);
                 return;
             }
             if (this.venterPaaDel2 && NK.DELE.kanSkifte(this.bord())) {

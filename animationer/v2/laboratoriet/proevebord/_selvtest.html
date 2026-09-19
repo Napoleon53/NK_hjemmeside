@@ -590,6 +590,46 @@ function koerTest() {
         paastand("proeveglassene er taget af bordet igen", !bord.g._ov_a && !bord.g._ov_b);
     }());
 
+    overskrift("9d. Glas rammes, hvor der er glas (F12)");
+    /* Et omdrejningslegeme uden etiket over sig rammes efter sin
+       silhuet og ikke efter sit rektangel. For et reagensglas og et
+       baegerglas er det naesten den samme kasse, men kolben er smal
+       foroven, og dens oeverste hjoerner er luft. */
+    (function () {
+        var U = NK.Udstyr;
+        function laeg(navn, x) { return bord.tilfoej({ navn: navn, type: navn, x: x }); }
+        var kb = bord.tilfoej({ navn: "_traef_kolbe", type: "kolbe", x: 1180 });
+        var rk = bord.rekt(kb, 0);
+        function traf(dx, dy) { return bord.hvad({ x: rk.x + dx, y: rk.y + dy }); }
+        paastand("kolbens oeverste hjoerner er luft", traf(5, 6) === null && traf(rk.b - 5, 6) === null,
+            "[" + traf(5, 6) + ", " + traf(rk.b - 5, 6) + "]");
+        paastand("men halsen og bunden er glas",
+            traf(rk.b / 2, 10) === "_traef_kolbe" && traf(6, rk.h - 6) === "_traef_kolbe");
+        paastand("og midten af kolben er glas", traf(rk.b / 2, rk.h * 0.7) === "_traef_kolbe");
+        paastand("skraaningen rammes, hvor glasset er, og ikke ved siden af",
+            traf(14, rk.h * 0.78) === "_traef_kolbe" && traf(14, rk.h * 0.45) === null,
+            "[" + traf(14, rk.h * 0.78) + ", " + traf(14, rk.h * 0.45) + "]");
+        bord.tagUd(kb);
+
+        /* Et baegerglas og et reagensglas rammes som foer */
+        var bg = bord.tilfoej({ navn: "_traef_baeger", type: "baegerLille", x: 1180 });
+        var rb = bord.rekt(bg, 0);
+        paastand("et baegerglas rammes stadig i hele sin kasse",
+            bord.hvad({ x: rb.x + 4, y: rb.y + 4 }) === "_traef_baeger" &&
+            bord.hvad({ x: rb.x + rb.b - 4, y: rb.y + rb.h - 6 }) === "_traef_baeger");
+        bord.tagUd(bg);
+        var rg1 = bord.rekt(g.glas1, 0);
+        paastand("et reagensglas rammes foroven, men ikke nede i stativet",
+            bord.hvad({ x: rg1.x + rg1.b / 2, y: rg1.y + 20 }) === "glas1" &&
+            bord.hvad({ x: rg1.x + rg1.b / 2, y: rg1.y + rg1.h - 6 }) !== "glas1");
+        /* En flaske har etiket over det meste af sig: dens inderside er kun
+           et kig ind i den, saa den rammes som et rektangel */
+        var rf = bord.rekt(g.fl_hcl, 0);
+        paastand("en flaske rammes som foer, i hele sin kasse",
+            bord.hvad({ x: rf.x + 3, y: rf.y + 3 }) === "fl_hcl");
+        paastand("proevegenstandene er taget af bordet igen", !bord.g._traef_kolbe && !bord.g._traef_baeger);
+    }());
+
     overskrift("10. Udstyr i mindre maalestok");
     /* Et lille bord kan have udstyr i halv stoerrelse. Kun tegnemaalene
        skaleres: rumfang, lysvej og kemi skal vaere uaendret. */

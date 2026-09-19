@@ -144,6 +144,7 @@
     var KANT = 10;
     var HAENGER = 2.9;
     var Y_FORAN = 392;        /* halsens y, naar han staar foran bordet */
+    var SCENE_MAKS = 45;      /* sekunder, foer en scene afbrydes som haengt */
 
     /* Sprites hentes fra sprites/ ved siden af denne fil */
     var script = document.currentScript;
@@ -1351,6 +1352,7 @@
         P.laererNyt = function () {
             var L = this.laerer;
             if (!L) return;
+            L.sceneUr = 0;
             if (L.scene) {
                 L.scene = null;
                 L.maalX = UDE;
@@ -1381,6 +1383,26 @@
             if (this.laererNytEkstra) this.laererNytEkstra();
         };
 
+        /* Kan han ikke tegnes, saettes han tilbage til udgangspunktet og
+           slipper bordet fri. Bedre en laerer, der lige var ude, end et
+           forsoeg, der ikke kan bruges. */
+        P.laererRed = function () {
+            var L = this.laerer, bv = bagValg();
+            if (!L) return;
+            L.scene = null;
+            L.sceneUr = 0;
+            L.x = UDE; L.maalX = UDE;
+            L.plan = bv ? 1 : 0;
+            L.y = bv ? bv.y : Y_FORAN;
+            L.skala = bv ? bagSkala(bv) : 1;
+            L.arm = HAENGER; L.armFra = HAENGER; L.armTil = HAENGER;
+            L.hovedV = 0; L.hovedMaal = 0; L.hovedDx = 0; L.hovedDy = 0;
+            L.tale = ""; L.taleUr = 0; L.undgaa = null;
+            L.dampe = [];
+            if (window.console) window.console.warn("kemichael: figuren kunne ikke tegnes og er stillet tilbage");
+            this.aendret("laerer");
+        };
+
         P.laererOptaget = function () {
             var L = this.laerer;
             return !!(L && L.scene && L.scene.blokerer);
@@ -1403,6 +1425,7 @@
                 i: 0, t: 0,
                 blokerer: blokerer !== false
             };
+            L.sceneUr = 0;
             this.aendret("laerer");
         };
 
@@ -1693,7 +1716,27 @@
             if (!L) return;
             var i;
 
-            /* Scenen */
+            /* Scenen. En scene, der spaerrer bordet, faar en klokke paa:
+               gaar noget i staa - et gaa-trin, der aldrig naar sit maal,
+               fordi det, han skulle hen til, er vaek - slipper han bordet
+               fri og gaar ud af sig selv. Eleven maa aldrig kunne sidde
+               fast bag en laerer, der ikke kan tale faerdig. */
+            if (L.scene) {
+                L.sceneUr = (L.sceneUr || 0) + dt;
+                if (L.sceneUr > SCENE_MAKS) {
+                    L.scene = null;
+                    L.sceneUr = 0;
+                    L.maalX = UDE;
+                    L.arm = HAENGER;
+                    L.tale = "";
+                    L.taleUr = 0;
+                    if (bagValg()) L.plan = 1;
+                    if (window.console) window.console.warn("kemichael: en scene blev haengende og er afbrudt");
+                    this.aendret("laerer");
+                }
+            } else {
+                L.sceneUr = 0;
+            }
             var sc = L.scene, vagt = 0, rest = dt;
             while (sc && L.scene === sc && vagt++ < 30) {
                 var tr = sc.trin[sc.i];
@@ -1820,6 +1863,14 @@
         P.tegnLaererKrop = function (ctx, tid, bag) {
             var L = this.laerer, i;
             if (L.x < UDE + 40 && !L.scene) return;
+            /* Et tal, der ikke er et tal, skal ikke naa laerredet: en
+               gradient eller en bue med NaN i kaster, og en ramme, der
+               kaster, koster resten af tegningen. Sker det, stilles han
+               tilbage til udgangspunktet i stedet. */
+            if (!isFinite(L.x) || !isFinite(L.y) || !isFinite(L.arm) || !(L.skala > 0)) {
+                this.laererRed();
+                return;
+            }
             var k = L.skala || 1;
             var aKrop = ank("laererKrop", k), aArm = ank("laererArm", k), aHoved = ank("laererHoved", k);
             var krop = this.laererKrop();

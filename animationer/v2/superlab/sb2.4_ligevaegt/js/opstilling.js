@@ -27,11 +27,14 @@
    begge dele - affaldet, kolben, koekkenrullen og sproejteflasken - har
    intet `del` og staar hele tiden.
 
-   Stamoploesningen: 20 mL 0,10 M Fe(NO₃)₃ og 20 mL 0,10 M KSCN fortyndet
-   til 400 mL, altsaa 5 mM af hver. Ved ligevaegt giver det ca. 1,5 mM
-   FeSCN²⁺, som er tydeligt roedt i et reagensglas uden at vaere sort.
-   Motoren regner selv ligevaegten frem; her staar kun det, der blev
-   blandet.
+   Stamoploesningen: 32 mL 0,10 M Fe(NO₃)₃ og 32 mL 0,10 M KSCN fortyndet
+   til 400 mL, altsaa 8 mM af hver. Ved ligevaegt giver det ca. 3,2 mM
+   FeSCN²⁺, som staar kraftigt roedt i et reagensglas uden at gaa mod
+   sort, og som ogsaa kan ses, naar der kigges ned i et baegerglas, hvor
+   lysvejen er kortere. Der er 4,8 mM frit Fe³⁺ tilbage, og det er dét,
+   der traeder frem som gult, naar blandingen fortyndes og komplekset
+   bruges op. Motoren regner selv ligevaegten frem; her staar kun det,
+   der blev blandet.
    ===================================================================== */
 (function () {
     "use strict";
@@ -65,7 +68,7 @@
     var HYLDE_HOEJRE = 230;                /* det tomme baegerglas */
 
     /* Stamoploesningen: Fe³⁺ og SCN⁻ 5 mM, plus modionerne */
-    var STAM = { "Fe3+": 5, "SCN-": 5, "K+": 5, "NO3-": 15 };
+    var STAM = { "Fe3+": 8, "SCN-": 8, "K+": 8, "NO3-": 24 };
 
     /* Frugtfarve: et blaat farvestof, der ikke indgaar i nogen reaktion.
        3,5 mM er valgt, saa to portioner i et baegerglas staar tydeligt
@@ -83,7 +86,10 @@
     NK.OPSTILLING = [
         /* Venstre ende af bordet, under zoomboblen: affaldet og kolben */
         { navn: "dunk", type: "affaldsdunk", x: 70, etiket: ["AFFALD", "surt uorg."] },
-        { navn: "kolbe", type: "kolbe", x: 200, titel: "kolben med stamopløsning", indhold: opl(200, STAM) },
+        /* 150 mL i en kolbe paa 200: den skal ikke staa til kanten, og
+           inddelingens oeverste streg er netop 150. Det raekker til del 1
+           (8 glas a 6 mL) og til del 2 (to portioner a 40 mL). */
+        { navn: "kolbe", type: "kolbe", x: 200, titel: "kolben med stamopløsning", indhold: opl(150, STAM) },
 
         /* Hylden over stativet: koekkenrullen (kaffen stilles selv ved
            venstre ende) og pulverglassene til glas 1, 2 og 3 */

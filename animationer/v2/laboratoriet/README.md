@@ -216,6 +216,15 @@ omdrejningslegeme (vejebåden er en rektangulær skål).
 `_geometri.html` regner det hele ud og holder det op mod typerne. Læs den
 igennem, hver gang en sprite eller et mål ændres.
 
+**Glas rammes, hvor der er glas.** Musen og slipmålet spørger `bord.inden`,
+og for et omdrejningslegeme uden etiket over sig er svaret indersidens
+silhuet plus glassets væg — ikke spritets rektangel. For et reagensglas og
+et bægerglas er det næsten den samme kasse, men kolben er smal foroven, og
+så snyder dens øverste hjørner ikke længere den, der sigter på den. En
+flaske eller et pulverglas har etiket over det meste af sig, så deres
+inderside kun er et kig ind i beholderen (`vindue: true`); de rammes som
+før.
+
 **Bægerglassene hedder nu `baegerLille` og `baegerStor`.** De hed
 `baeger100` og `baeger250`, men de var tegnet som 225 og 694 mL. Da
 tegningerne er gode, fulgte tallene i stedet: de er nu 250 og 600 mL, og
@@ -633,6 +642,32 @@ sted uden at åbne kode. Mønster: `../superlab/sb2.4_ligevaegt/`.
 
 Prøvebordet og prøverummet har endnu deres egne `app.js`; de flyttes over
 på `side.js`, når der ikke er andet i gang.
+
+## Når noget går galt i en tegneramme
+
+Den værste fejl i en animation er ikke en forkert farve, men en side, der
+holder op med at svare. Tre spærrer holder den i live.
+
+**Tegneløkken kan ikke dø.** `side.js` bestiller den næste ramme *først* og
+tegner bagefter i en `try`. Før gjorde den det modsatte, og så kostede én
+undtagelse et vilkårligt sted ikke én ramme, men resten af timen: DOM'en
+svarede stadig, så knapperne kunne klikkes og gjorde, hvad de skulle — men
+intet blev tegnet igen, og hele forsøget så låst ud, også Start forfra.
+Fejlen skrives i konsollen den første gang, så den stadig kan findes.
+
+**Hver ramme begynder fra en kendt transform.** En tegnefunktion, der kaster
+midt i en `save()`, efterlader gemmestakken i ubalance, og så tegner den
+næste ramme oven i den forrige. `NK.Laerred.friskTransform()` i starten af
+`bord.tegn` gør, at en dårlig ramme ikke kan smitte af på den næste.
+
+**Ingen scene kan blive hængende.** En af lærerens scener kan spærre bordet,
+mens den kører. Går den i stå — et gå-trin, der aldrig når sit mål, fordi
+det, han skulle hen til, er væk — slipper han bordet fri efter
+`SCENE_MAKS` sekunder og går ud af sig selv. Og kan figuren ikke tegnes med
+gyldige tal, stilles han tilbage til udgangspunktet i stedet for at kaste:
+en gradient eller en bue med NaN i kaster, og det er netop en ramme, der
+kaster. Eleven må aldrig kunne sidde fast bag en lærer, der ikke kan tale
+færdig.
 
 ## Forløbet som data
 

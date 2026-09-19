@@ -549,8 +549,31 @@
         if (this.rum && this.rum.tast(e)) e.preventDefault();
     };
 
-    /* ----- Tegneloekken ------------------------------------------------------ */
+    /* ----- Tegneloekken ------------------------------------------------------
+       Naeste ramme bestilles FOERST. Ellers ville én undtagelse et
+       vilkaarligt sted i en ramme staa tilbage som en doed side: DOM'en
+       svarer stadig, saa knapperne kan klikkes og gør, hvad de skal, men
+       intet bliver tegnet igen, og saa ser hele forsoeget laast ud - ogsaa
+       Start forfra. En daarlig ramme skal koste én ramme, ikke resten af
+       timen. Fejlen skrives i konsollen den foerste gang, saa den stadig
+       kan findes. */
     P.loekke = function (ts) {
+        var mig = this;
+        window.requestAnimationFrame(function (t) { mig.loekke(t); });
+        try {
+            this.ramme(ts);
+        } catch (fejl) {
+            if (!this.rammeFejl) {
+                this.rammeFejl = fejl;
+                if (window.console) window.console.error("laboratoriet: fejl i en tegneramme", fejl);
+            }
+            /* Tegn videre fra en kendt transform, saa den naeste ramme ikke
+               arver en ubalanceret gemmestak */
+            try { this.verden().laerred.nulstil(); } catch (ignore) { /* saa var den vaek */ }
+        }
+    };
+
+    P.ramme = function (ts) {
         var dt = (ts - this.sidsteTid) / 1000;
         this.sidsteTid = ts;
         if (!isFinite(dt) || dt < 0) dt = 0;
@@ -572,8 +595,6 @@
         }
 
         if (this.signatur() !== this.sidsteSignatur) this.opdaterPanel();
-        var mig = this;
-        window.requestAnimationFrame(function (t) { mig.loekke(t); });
     };
 
     /* ----- Opstart ------------------------------------------------------------ */

@@ -223,6 +223,50 @@ window.NK = NK;
         this._dpr = 0;
     };
 
+    /* Begynd en ramme fra bunden. En tegnefunktion, der kaster midt i en
+       save(), efterlader gemmestakken i ubalance, og saa tegner den
+       naeste ramme oven i den forrige transform - alt glider og vokser,
+       mens musen stadig regner rigtigt, saa billedet og det, man kan
+       ramme, ikke laengere er det samme. Én linje her, og en daarlig
+       ramme kan ikke smitte af paa den naeste. */
+    NK.Laerred.prototype.friskTransform = function () {
+        var dpr = this._dpr || window.devicePixelRatio || 1;
+        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    /* Ligger punktet inde i polygonen? (stráleskydning) */
+    NK.iPoly = function (pts, x, y) {
+        var inde = false, n = pts.length, i, j;
+        for (i = 0, j = n - 1; i < n; j = i++) {
+            var a = pts[i], b = pts[j];
+            if ((a.y > y) !== (b.y > y) &&
+                x < (b.x - a.x) * (y - a.y) / (b.y - a.y) + a.x) inde = !inde;
+        }
+        return inde;
+    };
+
+    /* Korteste afstand fra punktet til polygonens kant */
+    NK.afstandTilPoly = function (pts, x, y) {
+        var bedst = Infinity, n = pts.length, i, j;
+        for (i = 0, j = n - 1; i < n; j = i++) {
+            var a = pts[i], b = pts[j];
+            var dx = b.x - a.x, dy = b.y - a.y;
+            var l2 = dx * dx + dy * dy;
+            var t = l2 > 0 ? ((x - a.x) * dx + (y - a.y) * dy) / l2 : 0;
+            t = t < 0 ? 0 : (t > 1 ? 1 : t);
+            var px = a.x + t * dx - x, py = a.y + t * dy - y;
+            var d = Math.sqrt(px * px + py * py);
+            if (d < bedst) bedst = d;
+        }
+        return bedst;
+    };
+
+    /* Inde i polygonen - eller hoejst m uden for den */
+    NK.iNaerPoly = function (pts, x, y, m) {
+        if (NK.iPoly(pts, x, y)) return true;
+        return m > 0 && NK.afstandTilPoly(pts, x, y) <= m;
+    };
+
     /* ----- Tegnehjaelpere -------------------------------------------- */
     NK.rundtRekt = function (ctx, x, y, b, h, r) {
         var m = Math.max(0, Math.min(r, b / 2, h / 2));

@@ -169,7 +169,7 @@
             anker: { x: 48, y: 2.5 },
             streger: { hver: 50, lang: 7.7, x: 41, str: 5.1, tekst: "hoejre", bred: 0.9, navn: { x: 48, y: 119, str: 4.8 } },
             kan: { holder: true, haelder: true },
-            indre: KOLBE_INDRE, maks: 200, haeldMl: 25,
+            indre: KOLBE_INDRE, maks: 200, haeldMl: 40,
             tud: { x: 40, y: 3, v: -1.95 },
             vejlaengde: 3, titel: "kolben",
             omrids: function (ctx) {

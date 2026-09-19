@@ -396,10 +396,26 @@
     };
 
     /* Ligger punktet paa genstanden? */
+    /* Glassets vaeg i tegneenheder: saa meget ligger ydersiden uden for
+       den tegnede inderside */
+    var VAEG = 4;
+
     P.inden = function (gg, pt, pad) {
         pad = pad || 0;
         var t = gg.type;
         var l = NK.tilLokal(gg.p, gg.anker, pt.x, pt.y);
+        /* Et omdrejningslegeme uden etiket over sig rammes dér, hvor der
+           ER glas: indersiden er tegningens egen silhuet, og ydersiden er
+           den plus vaeggen. For et reagensglas og et baegerglas er det
+           naesten den samme kasse som foer, men kolben er en kolbe - og
+           saa snyder hjoernerne ikke laengere den, der sigter paa den.
+           En flaske eller et pulverglas har etiket over det meste af sig,
+           saa deres inderside er kun et kig ind i beholderen; de rammes
+           som foer. */
+        if (t.indre && !t.vindue && t.rund !== false) {
+            if (t.traefBund && l.y > t.h - t.traefBund) return false;
+            return NK.iNaerPoly(t.indre, l.x, l.y, VAEG * (t.skala || 1) + pad);
+        }
         if (t.sprite) return l.x > -pad && l.x < t.b + pad && l.y > -pad && l.y < (t.traefBund ? t.h - t.traefBund : t.h + pad);
         var L = t.laengde || 100;
         var halv = 7 * (t.skala || 1);
@@ -2249,6 +2265,7 @@
     P.tegn = function (udenRyd) {
         var L = this.laerred, ctx = L.ctx, S = NK.Scene, mig = this;
         var tid = this.tid;
+        L.friskTransform();
         if (!udenRyd) ctx.clearRect(0, 0, L.b, L.h);
         var sk = S.skala(L.b, L.h);
         ctx.save();

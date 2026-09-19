@@ -172,10 +172,15 @@ navngiven reaktion, ligesom Fe³⁺ + I⁻.
 
 ## Stamopløsningen
 
-20 mL 0,10 M Fe(NO₃)₃ og 20 mL 0,10 M KSCN fortyndet til 400 mL, altså
-5 mM af hver. Ved ligevægt giver det 1,6 mM FeSCN²⁺, som er tydeligt rødt
-i et reagensglas uden at gå mod sort. Motoren regner selv ligevægten frem;
-opstillingen siger kun, hvad der blev blandet.
+32 mL 0,10 M Fe(NO₃)₃ og 32 mL 0,10 M KSCN fortyndet til 400 mL, altså
+8 mM af hver. Ved ligevægt giver det 3,2 mM FeSCN²⁺, som står kraftigt rødt
+i et reagensglas uden at gå mod sort — og som stadig kan ses, når der kigges
+ned i et bægerglas, hvor lysvejen er kortere. Der er 4,8 mM frit Fe³⁺
+tilbage; det er dét, der træder frem som gult, når blandingen fortyndes og
+komplekset bruges op, og det er kun synligt, fordi udgangspunktet er kraftigt
+nok. Kolben rummer 150 mL af de 200, den kan — nok til begge dele, uden at
+stå til kanten. Motoren regner selv ligevægten frem; opstillingen siger kun,
+hvad der blev blandet.
 
 Vil man have farven stærkere eller svagere, ændres koncentrationen i
 `STAM` i `js/opstilling.js`. Bliver den for mørk, er det `k` for FeSCN²⁺ i

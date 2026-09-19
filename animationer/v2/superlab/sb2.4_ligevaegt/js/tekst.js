@@ -41,6 +41,7 @@
             "Forkerte handlinger afvises ikke. Det, der kan gå galt, går galt, og Kemichael rydder op.",
 
         /* ----- De to dele ----------------------------------------------- */
+        "forfra-del2": "Begge dele er ryddet. Vi begynder forfra i del 1.",
         "del1knap": "Del 1: Glassene",
         "del2knap": "Del 2: Fortynding",
 
@@ -133,8 +134,8 @@
                        tekst: "Hæld frugtfarve i begge glas i par 1 — to portioner i hvert, og lige meget i begge.",
                        hint: "Flasken med frugtfarve står på hylden. Slip den over hvert af de to venstre bægerglas. Hver hældning giver 20 mL, og den gule pil hælder en portion mere i det samme glas. Der skal mindst 30 mL i hvert, ellers er laget for tyndt til at se ned i." },
             "lv":    { kort: "Par 2: ligevægtsblanding",
-                       tekst: "Hæld ligevægtsblanding fra kolben i begge glas i par 2 — to portioner i hvert, og lige meget i begge.",
-                       hint: "Kolben står til venstre. Hver hældning giver 25 mL, og den gule pil hælder en portion mere. Får de to glas ikke lige meget, måler du noget andet end fortyndingen." },
+                       tekst: "Hæld ligevægtsblanding fra kolben i begge glas i par 2 — lige meget i begge.",
+                       hint: "Kolben står til venstre. En hældning i et bægerglas giver 40 mL, og det er nok. Får de to glas ikke lige meget, måler du noget andet end fortyndingen." },
             "vand":  { kort: "Fortynd ét glas i hvert par",
                        tekst: "Fortynd ét glas i hvert par med vand. Sigt efter dobbelt rumfang.",
                        hint: "Sprøjteflasken står på hylden. Hver sjat er 10 mL, og den gule pil giver en mere. Mere vand gør bare forskellen tydeligere." },

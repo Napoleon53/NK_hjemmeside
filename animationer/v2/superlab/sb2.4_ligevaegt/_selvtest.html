@@ -169,7 +169,7 @@ function koerTest() {
     for (var i = 1; i <= 8; i++) B.haeldI(g(i), B.udtag(kolbe, 6), true);
     adv(25);
     var ref = g(7), lys0 = lys(ref), fescn0 = konc(ref, "FeSCN2+");
-    paastand("komplekset danner sig af sig selv", fescn0 > 0.8 && fescn0 < 2.5, tal(fescn0) + " mM FeSCN2+");
+    paastand("komplekset danner sig af sig selv", fescn0 > 2 && fescn0 < 4.5, tal(fescn0) + " mM FeSCN2+");
     paastand("farven er tydelig, men ikke sort", lys0 < 0.75 && lys0 > 0.12, "lys " + tal(lys0));
     paastand("trin 1 er gjort, naar alle otte glas er fyldt", F.erGjort("fyld"));
     paastand("naeste trin er glas 1", F.nuTrin() && F.nuTrin().id === "glas1", F.nuTrin() && F.nuTrin().id);
@@ -378,7 +378,7 @@ function koerTest() {
     var friske = [];
     for (var m = 1; m <= 8; m++) friske.push(bord.g["glas" + m]);
     paastand("glassene er tomme igen", friske.every(function (x) { return B.tom(x); }));
-    paastand("kolben er fuld igen", B.volumen(bord.g.kolbe) > 190, tal(B.volumen(bord.g.kolbe), 0) + " mL");
+    paastand("kolben er fyldt op igen", B.volumen(bord.g.kolbe) > 140, tal(B.volumen(bord.g.kolbe), 0) + " mL");
     paastand("forloebet staar paa foerste trin", F.nuTrin() && F.nuTrin().id === "fyld");
     paastand("panelet kan opdateres", (NK.opdaterPanel(), true));
 
@@ -1287,12 +1287,74 @@ function koerTest() {
 
     NK.startForfra();
     adv(1);
-    paastand("Start forfra stiller bordet tilbage i del 1 med tomme baegerglas",
+    paastand("Start forfra rydder BEGGE dele og stiller bordet i del 1",
         NK.DELE.nu() === 1 && baeg(1).skjult && B.tom(baeg(1)) &&
-        Jf.antal() === 0 && !bord.g.stativ.skjult);
-    paastand("og knapperne viser del 1 igen",
+        Jf.antal() === 0 && !bord.g.stativ.skjult && B.tom(bord.g.glas1));
+    paastand("og det bliver sagt, saa det ikke ser ud som en fejl",
+        d.getElementById("scenebesked").textContent === NK.TEKST["forfra-del2"],
+        JSON.stringify(d.getElementById("scenebesked").textContent));
+    paastand("knapperne viser del 1 igen",
         d.getElementById("del1knap").getAttribute("aria-pressed") === "true" &&
         d.getElementById("del2knap").getAttribute("aria-pressed") === "false");
+
+    overskrift("21. Siden kan ikke laase eleven ude (F15)");
+    /* Den vaerste fejl er ikke en forkert farve, men en side, der holder
+       op med at svare. Tre spaerrer er sat: tegneloekken doer ikke af en
+       daarlig ramme, en scene, der spaerrer bordet, kan ikke blive
+       haengende, og en figur med tal, der ikke er tal, stilles tilbage i
+       stedet for at kaste. */
+    NK.startForfra();
+    adv(1);
+
+    /* (1) Én undtagelse i en ramme maa koste den ramme og ikke resten.
+       Foer rettelsen blev requestAnimationFrame kun bestilt til sidst i
+       loekken, saa én fejl et vilkaarligt sted stoppede alt: knapperne
+       virkede stadig, men intet blev tegnet igen. */
+    var raf = 0, gammelRaf = vin.requestAnimationFrame;
+    vin.requestAnimationFrame = function () { raf++; return 0; };
+    var gammelTegn = bord.tegn, kastede = false;
+    bord.tegn = function () { throw new Error("proeve: en daarlig ramme"); };
+    try { side.loekke(vin.performance.now()); } catch (e) { kastede = true; }
+    paastand("en daarlig ramme kaster ikke ud af tegneloekken", !kastede);
+    paastand("og naeste ramme er bestilt alligevel", raf === 1, raf + " bestilt");
+    bord.tegn = gammelTegn;
+    try { side.loekke(vin.performance.now() + 16); } catch (e) { kastede = true; }
+    paastand("loekken tegner videre bagefter", !kastede && raf === 2, raf + " bestilt");
+    paastand("og fejlen er husket, saa den kan findes i konsollen", !!side.rammeFejl);
+    side.rammeFejl = null;
+    vin.requestAnimationFrame = gammelRaf;
+    vin.requestAnimationFrame(function (t) { side.loekke(t); });
+
+    /* (2) En scene, der spaerrer bordet, slipper det, hvis den gaar i staa */
+    NK.startForfra();
+    adv(1);
+    L.scene = { navn: "haenger", trin: [{ gaa: 99999 }], i: 0, t: 0, blokerer: true };
+    L.sceneUr = 0;
+    adv(3);
+    paastand("mens en spaerrende scene koerer, tager bordet ikke imod",
+        bord.laererOptaget() && bord.klik("kolbe") === false);
+    adv(50);
+    paastand("men en scene, der gaar i staa, slipper bordet fri igen",
+        !L.scene && !bord.laererOptaget() && bord.klik("kolbe") !== false);
+    paastand("og han er sendt ud og staar klar bag bordet igen",
+        L.maalX === NK.Kemichael.UDE && L.plan === 1, "maalX " + tal(L.maalX, 0) + ", plan " + L.plan);
+
+    /* (3) Tal, der ikke er tal, naar ikke laerredet */
+    NK.startForfra();
+    adv(1);
+    side.sig("Noget.");
+    adv(1);
+    L.x = NaN;
+    var kastedeTegn = false;
+    try { bord.tegn(); } catch (e) { kastedeTegn = true; }
+    paastand("en figur uden gyldige tal kaster ikke, naar der tegnes", !kastedeTegn);
+    paastand("han er stillet tilbage til udgangspunktet i stedet",
+        isFinite(L.x) && L.x === NK.Kemichael.UDE && !L.scene && L.skala > 0,
+        "x " + L.x + ", skala " + L.skala);
+    paastand("og bordet er frit bagefter", !bord.laererOptaget() && bord.klik("kolbe") !== false);
+
+    NK.startForfra();
+    adv(1);
 }
 
 function vis() {

@@ -68,7 +68,10 @@
         kanSkifte: kanSkifte,
         saet: saet,
         anvend: anvend,
-        /* Start forfra begynder altid i del 1 */
-        nulstil: function (bord) { nu = 1; anvend(bord); }
+        /* Start forfra begynder HELE forsoeget forfra - forloebet og
+           journalen er ét og kan ikke halveres - og saa begynder man i
+           del 1. At det ogsaa rydder den anden del, skal siges, for
+           ellers er det en overraskelse. */
+        nulstil: function (bord) { var foer = nu; nu = 1; anvend(bord); return foer; }
     };
 }());
