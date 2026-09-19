@@ -1391,6 +1391,164 @@ function koerTest() {
 
     NK.startForfra();
     adv(1);
+    overskrift("22. Tegneserien: rammen og forsoegets egne ruder (S29, S10)");
+    /* Rammen staar i ../../laboratoriet/js/tegneserie.js og maa ikke vide
+       noget om jernthiocyanat. Ruderne staar i js/serie.js og bygges af
+       elevens egne journalposter - ikke af bordet, som det ser ud nu. */
+    var TS = NK.Tegneserie, SR = NK.SERIE, serie = side.serie;
+    paastand("rammen findes og er bundet til siden", !!TS && !!serie);
+    paastand("og forsoeget har sin egen liste over ruder", !!SR && typeof SR.ruder === "function");
+
+    /* Rammen maa ikke indeholde ét eneste af forsoegets ord */
+    var rammeKilde = "";
+    for (var iS = 0; iS < d.scripts.length; iS++) {
+        if (d.scripts[iS].src.indexOf("js/tegneserie.js") > 0) rammeKilde = d.scripts[iS].src;
+    }
+    var rammeTekst = "";
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", rammeKilde, false);
+    xhr.send(null);
+    rammeTekst = xhr.responseText;
+    paastand("rammen er hentet og kan laeses", rammeTekst.length > 1000, rammeTekst.length + " tegn");
+    var forbudte = ["FeSCN", "thiocyanat", "ligevaegtsblanding", "frugtfarve", "ascorbin", "glas7", "sb2.4"];
+    var fundne = forbudte.filter(function (o) { return rammeTekst.indexOf(o) >= 0; });
+    paastand("og den naevner ingen af forsoegets ord", fundne.length === 0, fundne.join(", ") || "ingen");
+
+    /* ----- Laasen ---------------------------------------------------- */
+    NK.startForfra();
+    adv(1);
+    side.opdaterPanel();
+    paastand("tegneserien er laast fra begyndelsen", serie.laast() &&
+        d.getElementById("serieknap").disabled);
+    paastand("og knappen siger med forsoegets egne ord hvorfor",
+        d.getElementById("serie-laast").textContent === NK.TEKST.serie.laast,
+        JSON.stringify(d.getElementById("serie-laast").textContent));
+    paastand("den kan ikke aabnes, selv om man proever", serie.aabn() === false &&
+        !d.getElementById("serie").classList.contains("vis"));
+
+    /* ----- Del 1: de otte glas og de fire indgreb --------------------- */
+    function haeld(fra, til, mL) { St.bland(til.indhold, St.del(fra.indhold, mL)); }
+    for (var iG = 1; iG <= 8; iG++) haeld(bord.g.kolbe, bord.g["glas" + iG], 6);
+    St.tilsaet(bord.g.glas1.indhold, "Fe(NO3)3(s)", 60);
+    St.tilsaet(bord.g.glas2.indhold, "Asc(s)", 40);
+    St.tilsaet(bord.g.glas3.indhold, "KSCN(s)", 60);
+    haeld(bord.g.ag, bord.g.glas4, 0.3);
+    bord.g.glas5.indhold.T = 80;
+    bord.g.glas6.indhold.T = 2;
+    haeld(bord.g.fl_kscn, bord.g.glas8, 1);
+    haeld(bord.g.ag, bord.g.glas8, 1);
+    adv(6);
+    /* Ét uheld, saa der ogsaa er en roed rude at proeve */
+    bord.uheld("spild", bord.g.glas3, "");
+    /* Glas 2 noteres med vilje forkert */
+    ["glas1", "glas2", "glas3", "glas4", "glas5", "glas6"].forEach(function (n) {
+        NK.BILLEDE.noter(n, n === "glas2" ? "ens" : NK.BILLEDE.facit(n, bord), bord);
+    });
+    side.opdaterPanel();
+    paastand("med kun del 1 noteret er tegneserien stadig laast",
+        NK.BILLEDE.journal.faerdig() && serie.laast());
+
+    /* ----- Del 2: parrene og fortyndingen ---------------------------- */
+    NK.DELE.saet(bord, 2, true);
+    haeld(bord.g.fl_farve, baeg(1), 4); haeld(bord.g.vand, baeg(1), 40);
+    haeld(bord.g.fl_farve, baeg(2), 4); haeld(bord.g.vand, baeg(2), 40);
+    haeld(bord.g.baeger, baeg(3), 44);
+    haeld(bord.g.baeger, baeg(4), 44);
+    adv(6);
+    haeld(bord.g.vand, baeg(2), 44);
+    haeld(bord.g.vand, baeg(4), 44);
+    adv(8);
+    NK.OVENFRA.noter("farve", NK.OVENFRA.facit("farve", bord), bord);
+    NK.OVENFRA.noter("lv", NK.OVENFRA.facit("lv", bord), bord);
+    side.opdaterPanel();
+    paastand("med begge dele noteret aabner laasen af sig selv",
+        !serie.laast() && !d.getElementById("serieknap").disabled);
+
+    /* ----- Ruderne ---------------------------------------------------- */
+    paastand("tegneserien aabner", serie.aabn() === true &&
+        d.getElementById("serie").classList.contains("vis"));
+    var ruder = d.getElementById("serie-ruder").querySelectorAll(".rude");
+    paastand("og den har en rude for hvert glas, billedet, del 2, uheldet og skemaet",
+        ruder.length >= 12, ruder.length + " ruder");
+    paastand("hver rude har et nummer og en tekst",
+        [].every.call(ruder, function (r) {
+            return r.querySelector(".nr") && r.textContent.length > 12;
+        }));
+    paastand("uheldet fik sin egen roede rude",
+        d.getElementById("serie-ruder").querySelectorAll(".rude.fejl").length === 1);
+    paastand("skemaet fylder hele raekken og har begge dele",
+        d.getElementById("serie-ruder").querySelectorAll(".rude.bred table.resultater").length === 2);
+
+    /* Indgrebet laeses af, hvad der ER i glasset - ikke af, hvad eleven gjorde */
+    var r7 = NK.BILLEDE.journal.post("glas7");
+    var ref7 = r7 && r7.billede ? r7.billede.opl : St.opskrift(B.samlet(bord.g.glas7));
+    var koder = [1, 2, 3, 4, 5, 6].map(function (n) {
+        var pb = NK.BILLEDE.journal.post("glas" + n);
+        return SR.indgreb(pb.billede.opl, ref7);
+    });
+    paastand("indgrebet i hvert glas laeses af oejebliksbilledet",
+        koder.join(",") === "fe,vitc,scn,ag,varme,kulde", koder.join(", "));
+
+    /* Et forkert svar bliver ikke rettet, men facit staar i skemaet */
+    var skema = d.getElementById("serie-ruder").querySelector(".rude.bred table.resultater");
+    paastand("det glas, der blev noteret forkert, faar facit med i skemaet",
+        skema.textContent.indexOf("Glasset var") >= 0 &&
+        skema.querySelectorAll(".facit").length === 1);
+    paastand("og de andre seks staar uden facit",
+        skema.querySelectorAll("tr").length === 8, skema.querySelectorAll("tr").length + " raekker");
+
+    /* ----- Oejebliksbilledet ------------------------------------------
+       Den vigtigste paastand i afsnittet: ruderne skal vise glassene, som
+       de saa ud, da eleven noterede dem - ogsaa efter at bordet er ryddet.
+       Derfor tegnes der af journalens opskrifter og ikke af bordet. */
+    function rudeData(n) {
+        var c = ruder[n].querySelector("canvas");
+        return c ? c.toDataURL() : "";
+    }
+    var foerRyd = rudeData(1);
+    side.skiftDel(1);
+    adv(0.5);
+    for (var iT = 1; iT <= 8; iT++) B.udtag(bord.g["glas" + iT], 99);
+    adv(2);
+    serie.luk();
+    serie.aabn();
+    ruder = d.getElementById("serie-ruder").querySelectorAll(".rude");
+    paastand("glassene er tomme paa bordet nu", B.tom(bord.g.glas1));
+    paastand("men ruden viser stadig glasset, som det saa ud", rudeData(1) === foerRyd);
+
+    /* ----- Deterministisk tilfaeldighed ------------------------------- */
+    serie.luk();
+    serie.aabn();
+    ruder = d.getElementById("serie-ruder").querySelectorAll(".rude");
+    paastand("og den samme rude ser ens ud, hver gang serien aabnes",
+        rudeData(1) === foerRyd && rudeData(5) !== "");
+    var froeProeve = (function () {
+        var a = [], b = [];
+        TS.medFroe(7, function () { for (var i = 0; i < 5; i++) a.push(vin.Math.random()); });
+        TS.medFroe(7, function () { for (var j = 0; j < 5; j++) b.push(vin.Math.random()); });
+        return a.join(",") === b.join(",") && a[0] !== a[1];
+    }());
+    paastand("froeet giver de samme tal hver gang og ikke det samme tal hver gang", froeProeve);
+    paastand("og Math.random er givet tilbage bagefter",
+        typeof Math.random() === "number" && Math.random() !== Math.random());
+
+    /* ----- Tasten, knappen og laasen igen ----------------------------- */
+    serie.luk();
+    paastand("Luk lukker serien", !serie.aaben());
+    d.getElementById("serieknap").click();
+    paastand("knappen i panelet aabner den", serie.aaben());
+    side.lukOverlay();
+    paastand("Esc lukker ethvert overlay, ogsaa denne", !serie.aaben());
+
+    NK.startForfra();
+    adv(1);
+    side.opdaterPanel();
+    paastand("Start forfra laaser serien og rydder ruderne",
+        serie.laast() && d.getElementById("serie-ruder").children.length === 0 &&
+        !serie.aaben());
+
+    NK.startForfra();
+    adv(1);
 }
 
 function vis() {

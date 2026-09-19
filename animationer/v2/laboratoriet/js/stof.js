@@ -282,6 +282,20 @@
         return o;
     }
 
+    /* Det omvendte af lav(): en opskrift i ren data, som kan gemmes og
+       laves om til den samme oploesning igen. Journalens oejebliksbillede
+       bruger den, saa tegneserien kan tegne glasset, som det saa ud,
+       dengang eleven noterede det - og ikke som det ser ud nu, efter at
+       det er haeldt ud. µmol og ikke mM, saa et tomt glas med et fnug
+       bundfald i ogsaa kan gemmes. */
+    function opskrift(o) {
+        var ud = { V: o.V, T: o.T, umol: {} };
+        for (var s in o.n) {
+            if (Object.prototype.hasOwnProperty.call(o.n, s) && Math.abs(o.n[s]) > 1e-12) ud.umol[s] = o.n[s];
+        }
+        return ud;
+    }
+
     function faste(o) {
         var ud = [];
         for (var s in o.n) {
@@ -705,6 +719,7 @@
         ny: ny,
         kopi: kopi,
         lav: lav,
+        opskrift: opskrift,
         tilsaet: tilsaet,
         konc: konc,
         del: del,

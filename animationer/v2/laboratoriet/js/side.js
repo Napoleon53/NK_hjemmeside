@@ -96,8 +96,10 @@
 
     /* ----- Aflaesningen af det valgte glas --------------------------------- */
     P.opdaterPanel = function () {
-        /* Quizzen aabner af sig selv, naar dens krav er opfyldt */
+        /* Quizzen og tegneserien aabner af sig selv, naar deres krav er
+           opfyldt */
         if (this.quiz) this.quiz.opdaterLaas();
+        if (this.serie) this.serie.opdaterLaas();
         var b = this.bord();
         var c = b.valgtBeholder();
         var tabel = NK.el("glas-indhold");
@@ -296,6 +298,7 @@
         }
         if (this.forloeb) this.forloeb.nulstil();
         if (this.quiz) this.quiz.nulstil();
+        if (this.serie) this.serie.nulstil();
         if (this.visRum) this.visRum();
         this.opdaterForloeb();
         this.opdaterPanel();
@@ -457,6 +460,12 @@
                     li.innerHTML = linje;
                     el.appendChild(li);
                 });
+            } else if (t && typeof t === "object") {
+                /* Et opslag under en noegle er data og ikke tekst - quizzens
+                   spoergsmaal, tegneseriens ord. Det maa aldrig havne i et
+                   element, bare fordi der tilfaeldigvis findes et med samme
+                   id (saa stod der "[object Object]" i overlayet). */
+                return;
             } else if (el.tagName === "TITLE") {
                 document.title = t;
             } else {
@@ -539,6 +548,11 @@
         if ((e.key === "t" || e.key === "T") && NK.el("teori")) {
             if (NK.el("teori").classList.contains("vis")) this.lukOverlay();
             else if (!NK.Rundvisning.aktiv() && !document.querySelector(".overlay.vis")) this.aabnTeori();
+            return;
+        }
+        if ((e.key === "g" || e.key === "G") && this.serie) {
+            if (this.serie.aaben()) this.lukOverlay();
+            else if (!NK.Rundvisning.aktiv() && !document.querySelector(".overlay.vis")) this.serie.aabn();
             return;
         }
         if (NK.Rundvisning.aktiv() || document.querySelector(".overlay.vis")) return;
@@ -663,6 +677,18 @@
                 this.quiz = NK.Quiz.lav({ indhold: qIndhold, krav: valg.quiz && valg.quiz.krav }, this);
                 NK.quiz = this.quiz;
             }
+        }
+
+        /* Tegneserien, hvis siden har ruderne og forsoeget en liste
+           (laboratoriet/js/tegneserie.js). Ruderne bygges af forsoeget ved
+           hver aabning; kravet for at laase op staar i sidens valg. */
+        if (NK.el("serie-ruder") && NK.Tegneserie && valg.ruder) {
+            this.serie = NK.Tegneserie.lav({
+                indhold: (valg.tekster && valg.tekster.serie) || valg.serieIndhold,
+                krav: valg.serie && valg.serie.krav,
+                ruder: valg.ruder
+            }, this);
+            NK.serie = this.serie;
         }
 
         if (NK.el("boble-laerred")) this.bobleL = new NK.Laerred(NK.el("boble-laerred"));

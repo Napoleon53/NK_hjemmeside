@@ -40,9 +40,22 @@
         id: "billede",
         kraevede: GLAS,
         facit: facit,
+        /* Oejebliksbilledet: farven til skemaet, og hele opskriften paa
+           det, der stod i glasset, saa tegneserien kan tegne glasset, som
+           det saa ud - ogsaa efter at det er haeldt ud (tegneserie.js). */
         billede: function (id, bord) {
-            var f = NK.Beholder.farve(bord.g[id]);
-            return { farve: f ? { r: Math.round(f.r), g: Math.round(f.g), b: Math.round(f.b) } : null };
+            var gg = bord.g[id];
+            var f = NK.Beholder.farve(gg);
+            return {
+                farve: f ? { r: Math.round(f.r), g: Math.round(f.g), b: Math.round(f.b) } : null,
+                opl: Stof.opskrift(NK.Beholder.samlet(gg)),
+                /* Referencen hoerer med. Svaret er ikke "moerk", men
+                   "moerkere END GLAS 7", saa det, der blev sammenlignet
+                   med, skal gemmes sammen med svaret - ellers kan
+                   tegneserien ikke tegne de to ved siden af hinanden
+                   bagefter. */
+                ref: Stof.opskrift(NK.Beholder.samlet(bord.g.glas7))
+            };
         }
     });
 

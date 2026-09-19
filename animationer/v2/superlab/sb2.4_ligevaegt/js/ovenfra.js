@@ -145,9 +145,13 @@
             function post(gg) {
                 var f = B.farve(gg, "ovenfra");
                 return {
+                    navn: gg.navn,
                     V: B.volumen(gg),
                     vej: NK.Udstyr.vejOvenfra(gg.type, B.volumen(gg)),
-                    farve: f ? { r: Math.round(f.r), g: Math.round(f.g), b: Math.round(f.b), a: f.a } : null
+                    farve: f ? { r: Math.round(f.r), g: Math.round(f.g), b: Math.round(f.b), a: f.a } : null,
+                    /* Hele opskriften, saa tegneserien kan tegne de to glas
+                       ovenfra, som de saa ud (tegneserie.js) */
+                    opl: NK.Stof.opskrift(B.samlet(gg))
                 };
             }
             return { fortyndet: i < 0 ? null : post(p[i]), reference: i < 0 ? null : post(p[1 - i]) };
@@ -161,12 +165,19 @@
        papiret er hvidt, saa en tynd vaeske bliver lys af sig selv. */
     function tegnOppefra(ctx, x, y, r, gg) {
         var tom = !gg || B.volumen(gg) < 0.3;
+        tegnSkive(ctx, x, y, r, tom ? null : B.samlet(gg), tom ? 0 : B.lysvej(gg, "ovenfra"));
+    }
+
+    /* Den samme skive ud fra en oploesning og en lysvej i stedet for et
+       glas paa bordet. Tegneserien tegner sine ruder af journalens
+       oejebliksbilleder, og et oejebliksbillede er tal og ikke et glas. */
+    function tegnSkive(ctx, x, y, r, o, vej) {
         /* Det, oejet moeder, er hvidt papir set GENNEM vaesken: lyset gaar
            ned, rammer papiret og kommer op igen. Derfor tegnes vaesken som
            et filter (Stof.gennem) og ikke som et halvgennemsigtigt lag
            maling oven paa papiret - ellers bliver en fortyndet oploesning
            mat og graalig i stedet for lysere i sin egen kuloer. */
-        var f = tom ? null : NK.Stof.gennem(B.samlet(gg), B.lysvej(gg, "ovenfra"));
+        var f = !o || o.V < 0.3 ? null : NK.Stof.gennem(o, vej);
         ctx.save();
         ctx.fillStyle = "rgba(20, 26, 34, 0.16)";
         ctx.beginPath();
@@ -194,7 +205,7 @@
         } else {
             ctx.fillStyle = NK.css(f, 1);
             ctx.fill();
-            var u = gg ? NK.Stof.uklar(B.samlet(gg)) : 0;
+            var u = o ? NK.Stof.uklar(o) : 0;
             if (u > 0.01) {
                 ctx.fillStyle = "rgba(246, 247, 244, " + (NK.klamp(u, 0, 1) * 0.6).toFixed(3) + ")";
                 ctx.fill();
@@ -370,6 +381,7 @@
         aabn: aabn,
         luk: luk,
         tegn: tegn,
+        tegnSkive: tegnSkive,
         facit: facit,
         indholdType: indholdType,
         maengde: maengde,

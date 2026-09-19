@@ -5,7 +5,7 @@
    tastatur, logbog, forloebskort, Start forfra) ligger i
    ../../laboratoriet/js/side.js. Her staar kun det, der er saerligt for
    dette forsoeg: de to dele, billedet af de syv glas, de fire glas
-   ovenfra og kravet, der aabner quizzen.
+   ovenfra og de to krav, der aabner quizzen og tegneserien.
    ===================================================================== */
 (function () {
     "use strict";
@@ -24,6 +24,17 @@
            taget billedet og noteret alle syv glas. Spoergsmaalene staar i
            js/tekst.js under "quiz". */
         quiz: { krav: { journal: "billede", faerdig: true } },
+
+        /* Tegneserien (../../laboratoriet/js/tegneserie.js) laases op, naar
+           BEGGE dele er gjort: billedet af de syv glas og sammenligningen
+           ovenfra. Ruderne bygges af js/serie.js ud fra de to journalers
+           oejebliksbilleder, og teksterne staar i js/tekst.js under
+           "serie". */
+        serie: { krav: { alle: [
+            { journal: "billede", faerdig: true },
+            { journal: "fortynding", faerdig: true }
+        ] } },
+        ruder: function (bord) { return NK.SERIE.ruder(bord); },
 
         tast: function (e) {
             if (e.key === "s" || e.key === "S") { this.visning(); return true; }
@@ -65,6 +76,7 @@
                 s.lukOverlay();
                 NK.BILLEDE.luk();
                 NK.OVENFRA.luk();
+                if (s.serie) s.serie.luk();
                 if (NK.DELE.saet(s.bord(), n, stille)) s.visDel();
             };
             s.visDel = function () {
@@ -118,6 +130,10 @@
             NK.el("ovenfra-luk").addEventListener("click", function () { NK.OVENFRA.luk(); });
             NK.el("ovenfra").addEventListener("click", function (e) {
                 if (e.target === this) NK.OVENFRA.luk();
+            });
+
+            NK.el("serie").addEventListener("click", function (e) {
+                if (e.target === this && s.serie) s.serie.luk();
             });
 
             NK.billede = NK.BILLEDE;

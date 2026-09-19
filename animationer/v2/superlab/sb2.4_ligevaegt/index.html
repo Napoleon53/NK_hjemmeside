@@ -82,6 +82,12 @@
             <button class="knap stor blaa" id="quiz-knap" type="button" hidden><span id="quiz-knap-tekst">Start quiz</span><span class="tegn">→</span></button>
         </div>
 
+        <div class="kort" id="serie-kort">
+            <h2><span>Tegneserie</span></h2>
+            <p class="besked" id="serie-laast"></p>
+            <button class="knap stor" id="serieknap" type="button">Se tegneserien<span class="tegn">→</span></button>
+        </div>
+
         <div class="kort" id="uheld-kort">
             <h2><span>Uheld</span> <span class="taeller" id="uheld-taeller">0</span></h2>
         </div>
@@ -168,6 +174,17 @@
     </div>
 </div>
 
+<div class="overlay" id="serie">
+    <div class="overlay-boks bred" role="dialog" aria-labelledby="serie-titel">
+        <h2 id="serie-titel">Tegneserien</h2>
+        <p class="besked" id="serie-tekst"></p>
+        <div class="serie" id="serie-ruder"></div>
+        <div class="knaprad">
+            <button class="knap blaa" id="serie-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
 <script src="../../laboratoriet/js/kerne.js"></script>
 <script src="../../laboratoriet/js/taleboble.js"></script>
 <script src="../../laboratoriet/js/farvemodel.js"></script>
@@ -186,10 +203,12 @@
 <script src="../../laboratoriet/js/journal.js"></script>
 <script src="../../laboratoriet/js/forloeb.js"></script>
 <script src="../../laboratoriet/js/quiz.js"></script>
+<script src="../../laboratoriet/js/tegneserie.js"></script>
 <script src="js/tekst.js"></script>
 <script src="js/opstilling.js"></script>
 <script src="js/billede.js"></script>
 <script src="js/ovenfra.js"></script>
+<script src="js/serie.js"></script>
 <script src="js/dele.js"></script>
 <script src="js/forloeb.js"></script>
 <script src="../../laboratoriet/proevebord/js/laerer.js"></script>

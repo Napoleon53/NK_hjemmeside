@@ -280,6 +280,79 @@
             ]
         },
 
+        /* ----- Tegneserien -----------------------------------------------
+           Rammen staar i ../../laboratoriet/js/tegneserie.js, og hvilke
+           ruder sb2.4 har, staar i js/serie.js. Her staar kun ordene.
+           {nr}, {ord}, {gange} og de andre tuborgklammer byttes ud med
+           elevens egne tal og svar. */
+        "serie": {
+            titel: "Tegneserien",
+            laast: "Tegneserien låses op, når begge dele er gjort.",
+            klar: "Sådan gik forsøget. Ruderne er tegnet af det, du selv noterede.",
+
+            stam: "Stamopløsningen af Fe(NO₃)₃ og KSCN er brændt orange. Farven skyldes komplekset FeSCN²⁺. Kolben er dagens portion; bægerglasset på hylden er forrådet.",
+
+            glas: "Glas {nr}",
+            blev: "Det blev {ord} end glas 7.",
+            ukendt: "blev ikke ændret i forhold til glas 7",
+            reference: "referencen",
+            refKort: "ref.",
+
+            ord: {
+                "moerkere": "mørkere",
+                "lysere": "lysere",
+                "ens": "ikke synligt anderledes"
+            },
+            kort: { "moerkere": "mørk", "lysere": "lys", "ens": "som 7" },
+
+            /* Indgrebet laeses af, hvad der ER i glasset (js/serie.js) */
+            indgreb: {
+                fe:    { hvad: "har mere jern i sig end glas 7", kort: "mere Fe³⁺",
+                         hvorfor: "Mere Fe³⁺ forskyder ligevægten mod højre, så der dannes mere FeSCN²⁺." },
+                scn:   { hvad: "har mere thiocyanat i sig end glas 7", kort: "mere SCN⁻",
+                         hvorfor: "Mere SCN⁻ forskyder ligevægten mod højre, så der dannes mere FeSCN²⁺." },
+                vitc:  { hvad: "indeholder Fe²⁺", kort: "ascorbinsyre",
+                         hvorfor: "Ascorbinsyre reducerer Fe³⁺ til Fe²⁺. Så falder c(Fe³⁺), og ligevægten forskydes mod venstre." },
+                ag:    { hvad: "indeholder et hvidt bundfald af AgSCN", kort: "AgNO₃",
+                         hvorfor: "Ag⁺ fælder SCN⁻ som AgSCN(s). Så falder c(SCN⁻), og ligevægten forskydes mod venstre." },
+                varme: { hvad: "stod i det varme vandbad", kort: "varme",
+                         hvorfor: "Dannelsen af FeSCN²⁺ er exoterm, så opvarmning forskyder ligevægten mod venstre." },
+                kulde: { hvad: "stod i isbadet", kort: "kulde",
+                         hvorfor: "Dannelsen af FeSCN²⁺ er exoterm, så afkøling forskyder ligevægten mod højre." },
+                vand:  { hvad: "er fortyndet", kort: "vand",
+                         hvorfor: "Fortynding sænker alle koncentrationer. Y bliver større end K, og ligevægten forskydes mod venstre." }
+            },
+
+            glas8: "Forundersøgelsen i glas 8: KSCN og AgNO₃ giver et hvidt bundfald. Ag⁺(aq) + SCN⁻(aq) ⟶ AgSCN(s). Derfor virker sølv som indgreb i glas 4.",
+
+            billede: "Billedet af glas 1 til 7. Glas 7 ved stuetemperatur er referencen, og du noterede {n} af {i alt} glas.",
+
+            ovenfra: "De fire glas ovenfra: frugtfarven var {farve}, og ligevægtsblandingen var {lv}. Frugtfarven har lige mange farvestofmolekyler i lysvejen, uanset rumfang. I ligevægtsblandingen blev rumfanget {gange} gange så stort, alle koncentrationer faldt, Y blev større end K, og ligevægten forskød sig mod venstre.",
+
+            par: { farve: "Frugtfarve", lv: "Ligevægt" },
+
+            uheld: {
+                spild:    "Uheld: {glas} blev rystet så voldsomt, at en tiendedel af indholdet røg ud på bordet. Kemichael tørrede op.",
+                overloeb: "Uheld: {glas} løb over. Kemichael tørrede op.",
+                knust:    "Uheld: {glas} gik i stykker. Kemichael fejede skårene op.",
+                vaeltet:  "Uheld: {glas} væltede. Kemichael tørrede op."
+            },
+
+            skema: {
+                titel: "Resultatskemaet: sådan endte forsøget.",
+                del1: "Del 1: de syv glas",
+                del2: "Del 2: fortynding set ovenfra",
+                hoved1: ["Glas", "Det, der er i glasset", "Temperatur", "Farveændring", "⟵ / ⟶"],
+                hoved2: ["Opløsning", "Rumfang", "Set ovenfra efter fortynding", "⟵ / ⟶"],
+                tomt: "tomt",
+                uroert: "urørt",
+                ikkeNoteret: "ikke noteret",
+                facit: "Glasset var {ord}.",
+                ingen: "ingen ligevægt",
+                retning: { "moerkere": "⟶", "lysere": "⟵", "ens": "ingen" }
+            }
+        },
+
         /* ----- Rundvisningen --------------------------------------------- */
         "rundvisning": [
             { sel: "#scene", titel: "Bordet", tekst: "Klik viser, træk gør. Tag fat i kolben, og slip den over et glas for at hælde. Bordpladen er dyb, så du kan stille ting foran stativet." },
@@ -288,6 +361,7 @@
             { sel: "#noterknap", titel: "Noter", tekst: "Fold noterne ud og skriv dine iagttagelser. »Notér det valgte glas« skriver aflæsningen ind for dig. Tasten N folder dem ud og ind." },
             { sel: "#delknapper", titel: "De to dele", tekst: "Del 1 er de syv glas med hvert sit indgreb. Del 2 er fortyndingen med fire bægerglas. Skift med knapperne eller tasterne 1 og 2 — bordet har kun det fremme, du arbejder med." },
             { sel: "#quiz-kort", titel: "Quizzen", tekst: "Ti spørgsmål om det, du lige har set. Den låses op, når billedet er taget, og svarene blandes hver gang. Begrundelsen kommer, også når du svarer rigtigt." },
+            { sel: "#serie-kort", titel: "Tegneserien", tekst: "Hele forsøget i ruder, når begge dele er gjort. Ruderne er tegnet af det, du selv noterede — også efter at glassene er hældt ud. Tasten G åbner og lukker den." },
             { sel: "#uheld-kort", titel: "Uheld", tekst: "Det, der kan gå galt, går galt. Kemichael kommer og tørrer op." },
             { sel: "#forfraknap", titel: "Start forfra", tekst: "Rydder bordet og stiller alt tilbage." }
         ]

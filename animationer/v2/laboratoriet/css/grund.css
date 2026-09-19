@@ -601,8 +601,39 @@ details.fold > summary:focus-visible { outline: 2px solid var(--gul); outline-of
 .rude p { margin: 7px 0 0 0; font-size: 0.86rem; line-height: 1.45; color: var(--tekst-svag); }
 .rude .nr { color: var(--gul); font-weight: 700; margin-right: 6px; }
 .rude > p:first-child { margin: 2px 0 8px 0; }
+
+/* En rude, der viser en fejl eller et uheld, er roed. En bred rude
+   fylder hele raekken - det er der, resultatskemaet staar. */
+.rude.fejl { border-color: var(--roed); background-color: #1e1416; }
+.rude.fejl .nr { color: var(--roed); }
+.rude.bred { grid-column: 1 / -1; }
+
+/* Resultatskemaet. En celle maa rumme en farveproeve og et facit. */
+.resultater { width: 100%; border-collapse: collapse; font-size: 0.84rem; table-layout: auto; }
+.resultater th { text-align: left; font-weight: 600; color: var(--tekst-svag); padding: 5px 12px 5px 0; }
+.resultater tr:first-child th {
+    color: var(--gul);
+    font-size: 0.74rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding-bottom: 5px;
+}
+.resultater td { text-align: left; font-weight: 600; color: var(--tekst); padding: 5px 12px 5px 0; vertical-align: top; line-height: 1.35; }
+.resultater tr + tr th, .resultater tr + tr td { border-top: 1px solid #3a3a47; }
+.resultater .facit { display: block; font-weight: 400; font-size: 0.8rem; color: #f0918a; }
+.resultater .farveprove {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    margin: 0 5px -1px 0;
+    border-radius: 3px;
+    vertical-align: baseline;
+}
+.rude .mellemrubrik { margin: 14px 0 6px 0; font-weight: 700; color: var(--tekst); font-size: 0.92rem; }
+
 #serieknap { margin-top: 10px; }
 #serieknap[hidden] { display: none; }
+#serieknap.laast { opacity: 0.55; }
 
 /* ---------------------------------------------------------------------
    RUNDVISNINGEN

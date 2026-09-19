@@ -84,6 +84,9 @@ js/journal.js        elevens egne iagttagelser og målinger: posterne, svarene,
                      øjebliksbilledet og bedømmelsen mod sandheden
 js/quiz.js           quizzen som fælles ramme: spørgsmålene er data i forsøgets
                      tekst.js, og et vilkår åbner den
+js/tegneserie.js     tegneserien som fælles ramme: hver rude er et udsnit af
+                     tegnebordet, tegnet ud fra et gemt øjebliksbillede, plus
+                     et lag ovenpå og en sidste rude med resultatskemaet
 js/taleboble.js      taleboblen som eget lag: får munden og hovedet, finder selv
                      sin plads inden for scenen og uden om det, replikken handler
                      om, og holder skriften læsbar uanset zoom
@@ -367,6 +370,55 @@ Uden krav er quizzen åben fra begyndelsen.
 spørgsmål; en side uden kortet mister ingenting. Stilen (`.valg`,
 `.valgknap`, `.farveprove`, `.quiz-score`) stod allerede i `css/grund.css`.
 sb2.4's selvtest afsnit 19 prøver både rammen og forsøgets egne spørgsmål.
+
+## Tegneserien
+
+`js/tegneserie.js` (`NK.Tegneserie`). Alle tre gamle tegneserier (sc2.7,
+sc6.8, sc8.6) var det samme mønster skrevet tre gange: **hver rude er et
+udsnit af tegnebordet, tegnet med scenens egne tegnefunktioner ud fra en gemt
+tilstand** — ikke en ny tegning — plus et lag ovenpå med pil, lup og
+etiketter, og en sidste rude med resultatskemaet.
+
+Reglen er journalens: ruden viser glasset, som det så ud, da eleven noterede
+det, og ikke som det ser ud nu. Derfor tager rammen et **øjebliksbillede** —
+`NK.Tegneserie.kopi(gg, p)`, en løsreven kopi, der kan tegnes for sig selv —
+og journalen gemmer opskriften på indholdet (`Stof.opskrift`, det omvendte af
+`Stof.lav`) sammen med hvert svar. Hælder eleven glasset ud bagefter, står
+tegneserien stadig med det, han så.
+
+En rude er data:
+
+```js
+{ tekst:   "…",
+  udsnit:  { x: 300, y: 300, b: 420 },   /* i tegnebordets enheder */
+  ting:    [ kopi1, kopi2 ],             /* gemt tilstand */
+  tegn:    function (ctx) { … },         /* mere, i tegnebordsenheder */
+  oven:    function (ctx, pt, maal) { … },/* laget ovenpå, i rudens pixels */
+  froe:    3, fejl: true, ren: true, bred: true, dom: function (div) { … } }
+```
+
+`udsnit` er et vindue ind i tegnebordet; højden følger rudens forhold af sig
+selv, så et udsnit aldrig kan blive forvrænget, og `NK.Tegneserie.omkring`
+regner et udsnit ud, der lige rummer de ting, der er med. `pt(x, y)` i `oven`
+omregner fra tegnebordets enheder til rudens pixels, så en pil kan pege fra
+noget i scenen ud til en etiket ved siden af. En **bred** rude fylder hele
+rækken og får et lærred, der er tre gange så bredt — det er der,
+resultatskemaet og en række på syv glas står.
+
+**Tilfældigheden er deterministisk.** Scenen bruger `Math.random` nogle
+steder (dråber, skår, kugler i boblen). En tegneserie, der så forskellig ud
+hver gang, den blev åbnet, ville være en anden slags dokument, så rammen
+låner `Math.random`, mens en rude tegnes, og giver den et frø pr. rude.
+
+Låsen er quizzens: `serie: { krav: … }` i sidens valg er et almindeligt
+vilkår, og teksterne står i forsøgets `tekst.js` under nøglen `serie`.
+Forsøget leverer `ruder: function (bord) { … }`, som kaldes ved hver åbning.
+`side.js` bygger serien, hvis siden har `#serie-ruder`; en side uden den
+mister ingenting. Tasten **G** åbner og lukker. Stilen (`.serie`, `.rude`,
+`.rude.fejl`, `.rude.bred`, `.resultater`) står i `css/grund.css`.
+sb2.4's selvtest afsnit 22 prøver både rammen og forsøgets egne ruder — også
+at rammen ikke nævner ét eneste af forsøgets ord, og at en rude ser ens ud,
+efter at bordet er ryddet.
 
 ## Taleboblen
 
@@ -809,8 +861,8 @@ vandbad giver 80 °C i stedet for pladens 250.
   igennem. Kimen står i `../superlab/sb2.4_ligevaegt/_selvtest.html` afsnit 10, som
   bruger `NK.Vilkaar.naevnte` til at opdage et trin, der peger på et glas
   eller et stof, der ikke findes.
-* Rammen for `quiz.js` og `tegneserie.js` samles, når to forsøg på
-  genstandsmodellen har vist, hvad de er fælles om.
+* Rammerne i `quiz.js` og `tegneserie.js` er skrevet til otte forsøg, men
+  kun prøvet af ét. Ved første konvertering viser det sig, hvad de mangler.
 * **Til spillet:** låste passager i `rum.js`, som spørger forløbets flag,
   om man må gå videre. Vilkårs- og forløbslaget er der allerede.
 * Et rum, hvor forsøgene er stationer, man kan gå imellem. Prøverummet er

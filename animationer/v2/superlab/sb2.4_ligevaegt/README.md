@@ -37,6 +37,8 @@ js/forloeb.js       trinnenes betingelser og de fem udløsere
 js/billede.js       del 1: billedet af de syv glas, optagelsen og knapperne under dem
 js/ovenfra.js       del 2: parrene, fortyndingsreglen og de fire glas set ovenfra
 js/dele.js          del 1 og del 2 på det samme bord
+js/serie.js         tegneseriens ruder, bygget af de to journalers
+                    øjebliksbilleder
 js/app.js           starter den fælles skal og kobler delene og de to visninger på
 js/tur.js           rundvisningen henter sine stop i tekst.js
 _selvtest.html      udviklerværktøj, indgår ikke i animationen
@@ -275,6 +277,34 @@ er taget og alle seks glas er noteret. Kravet prøves ved hver opdatering af
 panelet, så kortet åbner af sig selv i samme øjeblik, det sidste glas er
 noteret, og knappen banker.
 
+## Tegneserien
+
+Rammen står i `../../laboratoriet/js/tegneserie.js`; her ligger kun, hvilke
+ruder sb2.4 har (`js/serie.js`) og ordene i dem (`js/tekst.js` under
+`serie`). Tretten ruder: stamopløsningen, ét glas ad gangen ved siden af glas
+7, forundersøgelsen i glas 8, billedet af alle syv, de fire glas ovenfra, en
+rød rude for hvert uheld, Kemichael hvis han ryddede op, og resultatskemaet
+for begge dele som sidste, brede rude.
+
+**Ruderne tegnes af elevens journal og ikke af bordet.** Hver post i
+journalen `billede` gemmer opskriften på det, der stod i glasset — og på
+glas 7, det blev holdt op mod — og hver post i `fortynding` gemmer de to
+glas' opskrifter og deres lysveje ovenfra. Hælder eleven glassene ud
+bagefter, står tegneserien stadig med det, han så. Det var dét,
+øjebliksbilledet blev lavet til.
+
+**Og hvad glasset FIK, står ingen steder.** Motoren spørger altid, hvad der
+*er*, aldrig hvordan man kom dertil, og tegneserien gør det samme: indgrebet
+læses ud af øjebliksbilledet. Er der Fe²⁺, har glasset fået ascorbinsyre; er
+der AgSCN(s), har det fået sølv; er der mere jern i alt end i glas 7, har det
+fået Fe(NO₃)₃; står temperaturen over 30 °C, stod det i vandbadet. Tog eleven
+en anden vej, end trinnet foreslog, står der stadig det rigtige i ruden.
+
+Serien låses op af et vilkår i `js/app.js` — begge journaler færdige — og
+åbnes med kortet i panelet eller tasten <kbd>G</kbd>. Et glas, der blev
+noteret anderledes, end det så ud, bliver ikke rettet; skemaet skriver facit
+under svaret, så eleven kan se forskellen selv.
+
 ## Badene
 
 Vandbadet og isbadet er udstyret `bad` fra motoren. Vandbadet står på
@@ -306,9 +336,8 @@ iagttagelsen, der er arbejdet.
 
 ## Det, der mangler
 
-* **Tegneserien**: ruder bygget af elevens egne journalposter fra begge
-  dele, med resultatskemaet som sidste rude. Rammen skal trækkes ud som
-  `quiz.js` blev det.
+* **Mikroniveauet** viser i dag kun mængderne og ikke selve reaktionerne
+  (bind og split ved ligevægt). Det er S5 i `claude/TODO.md`.
 
 ## Mængderne, der kan skrues på
 
