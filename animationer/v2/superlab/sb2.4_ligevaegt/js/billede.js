@@ -62,10 +62,13 @@
     var laerred = null;
     var optagelse = null;        /* kopierne af glassene, som de saa ud */
 
-    /* En kopi af glasset, der kan tegnes for sig selv */
+    /* En kopi af glasset, der kan tegnes for sig selv. Billedet viser
+       glasset i fuld stoerrelse, ogsaa naar det staar mindre paa bordet
+       (S31: skala er et tegnemaal, og i billedet skal farven kunne ses) */
     function kopi(gg, x, y) {
+        var t = gg.type.grund || gg.type;
         return {
-            navn: gg.navn, type: gg.type, anker: gg.anker, skala: gg.skala,
+            navn: gg.navn, type: t, anker: t.anker, skala: 1,
             kan: gg.kan, titel: gg.titel, etiket: gg.etiket, nr: gg.nr,
             indhold: Stof.kopi(gg.indhold), lag: gg.lag ? Stof.kopi(gg.lag) : null,
             lagBund: gg.lagBund, bund: 1, korn: [], niveau: null,

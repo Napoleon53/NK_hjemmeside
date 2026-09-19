@@ -96,6 +96,20 @@
        ogsaa frugtfarve i et koekken: et par draaber i en skaal. */
     var FRUGTFARVE = { "farve": 35 };
 
+    /* De otte reagensglas er tegnet en tredjedel mindre end udstyrets
+       reagensglas, men staar i stativets huller, som de er: saa er der luft
+       mellem dem, og de ligner rigtige reagensglas ved siden af et stativ.
+       skala er et rent tegnemaal - glasset rummer stadig 30 mL, og farven
+       og kemien er de samme - saa det er modtager, der goer, at et tryk
+       giver 4 mL og ikke en femtedel af glasset (6 mL). Et kortere glas
+       synker ned i hullet, til det staar paa stativets bund (bundY), saa
+       vaesken staar frit i aabningen mellem stativets to braedder. */
+    var GLAS_SKALA = 2 / 3, GLAS_PORTION = 4;
+    function glas(nr) {
+        return { navn: "glas" + nr, type: "reagensglas", stativ: "stativ", hul: nr - 1, nr: nr,
+                 titel: "glas " + nr, del: 1, skala: GLAS_SKALA, modtager: GLAS_PORTION };
+    }
+
     /* De fire baegerglas i del 2, to og to i par med luft imellem */
     var PAR1 = [380, 470], PAR2 = [660, 750];
     function baeger(nr, x) {
@@ -108,7 +122,7 @@
         { navn: "dunk", type: "affaldsdunk", x: 70, etiket: ["AFFALD", "surt uorg."] },
         /* 150 mL i en kolbe paa 200: den skal ikke staa til kanten, og
            inddelingens oeverste streg er netop 150. Det raekker til del 1
-           (8 glas a 6 mL) og til del 2 (to portioner a 40 mL). */
+           (8 glas a 4 mL) og til del 2 (to portioner a 40 mL). */
         { navn: "kolbe", type: "kolbe", x: 200, titel: "kolben med stamopløsning", indhold: opl(150, STAM) },
 
         /* Hylden over stativet: koekkenrullen (kaffen stilles selv ved
@@ -132,14 +146,7 @@
 
         /* De otte reagensglas i stativet */
         { navn: "stativ", type: "stativ", p: { x: 330, y: 400, v: 0 }, del: 1 },
-        { navn: "glas1", type: "reagensglas", stativ: "stativ", hul: 0, nr: 1, titel: "glas 1", del: 1 },
-        { navn: "glas2", type: "reagensglas", stativ: "stativ", hul: 1, nr: 2, titel: "glas 2", del: 1 },
-        { navn: "glas3", type: "reagensglas", stativ: "stativ", hul: 2, nr: 3, titel: "glas 3", del: 1 },
-        { navn: "glas4", type: "reagensglas", stativ: "stativ", hul: 3, nr: 4, titel: "glas 4", del: 1 },
-        { navn: "glas5", type: "reagensglas", stativ: "stativ", hul: 4, nr: 5, titel: "glas 5", del: 1 },
-        { navn: "glas6", type: "reagensglas", stativ: "stativ", hul: 5, nr: 6, titel: "glas 6", del: 1 },
-        { navn: "glas7", type: "reagensglas", stativ: "stativ", hul: 6, nr: 7, titel: "glas 7", del: 1 },
-        { navn: "glas8", type: "reagensglas", stativ: "stativ", hul: 7, nr: 8, titel: "glas 8", del: 1 },
+        glas(1), glas(2), glas(3), glas(4), glas(5), glas(6), glas(7), glas(8),
 
         /* Spatlen, glasstaven og termometeret ligger forrest paa bordpladen */
         { navn: "spatel", type: "spatel", p: { x: 290, y: 550, v: 0 }, del: 1 },

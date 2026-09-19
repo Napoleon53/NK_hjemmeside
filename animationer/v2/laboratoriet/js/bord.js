@@ -22,7 +22,8 @@
        spatel), bliver haengende over det, det blev brugt paa. Et klik
        paa pilen ved siden af gentager handlingen; resten af bordet
        venter, til det traekkes vaek. En portion er hoejst en femtedel af
-       glasset. En fuld spatel over pulverglasset har ingen pil (den kan
+       glasset, eller det, glasset selv siger (modtager i opstillingen).
+       En fuld spatel over pulverglasset har ingen pil (den kan
        ikke tage mere); en tom spatel over et glas henter selv en
        spatelspids mere i pulverglasset og kommer tilbage med den.
 
@@ -1078,7 +1079,7 @@
 
     /* Afstanden fra det, man sigter med, til det, man sigter efter paa c -
        eller null, hvis c slet ikke er inden for raekkevidde */
-    P.sigteScore = function (gg, c, pt, fod, tud) {
+    P.sigteScore = function (gg, c, pt, fod, tud, stiller) {
         var m = c.kan;
         var plads = m.stoette || m.varmer || m.vaegt || m.luge;
         var rk = this.rekt(c, 0);
@@ -1116,7 +1117,9 @@
             }
         }
         /* Ellers musen mod genstanden; paa et glas kun ved aabningen, saa
-           det, der stilles paa bordet foran et glas, ikke haelder i det */
+           det, der stilles paa bordet foran et glas, ikke haelder i det -
+           og slet ikke, naar det baarne har foden paa bordpladen (stiller) */
+        if (m.holder && stiller) return null;
         if (!this.inden(c, pt, m.holder ? SIGTE.holder : SIGTE.andet)) return null;
         if (m.holder && pt.y > ob.y + SIGTE.musNed) return null;
         var maal = m.holder ? ob : midt;
@@ -1132,11 +1135,19 @@
         var hylde = this.hyldeVed(this.fodOprejst(gg));
         var tud = gg.kan.drypper && gg.type.sprite ? this.draabeSigte(gg)
             : (gg.kan.haelder || gg.kan.drypper || gg.kan.sproejter) ? B.tudVerden(gg) : null;
+        /* Staar foden paa bordpladen (et bord med dybde), er det den, man
+           stiller det baarne paa: saa haelder musen alene ikke i et glas,
+           den er ud for. Tuden sigter stadig, saa en flaske kan haelde i et
+           glas, der er kortere end den selv (S31: reagensglassene i sb2.4
+           er lavere end flaskerne, saa musen, der holder en flaske i
+           toppen, er ved glassets aabning, naar flasken staar foran det). */
+        var S = NK.Scene, fo = this.fodOprejst(gg);
+        var stiller = !!tud && !!S.DYBDE && fo.y >= S.BORD && fo.y <= S.FORKANT + 4;
         for (var i = 0; i < this.liste.length; i++) {
             var c = this.liste[i];
             if (c === gg || !this.synlig(c) || !this.kanModtage(gg, c)) continue;
             if (hylde && c.kan.holder && this.rekt(c, 0).y > hylde.y - 1) continue;
-            var s = this.sigteScore(gg, c, pt, fod, tud);
+            var s = this.sigteScore(gg, c, pt, fod, tud, stiller);
             if (s !== null) ud.push({ navn: c.navn, score: s });
         }
         ud.sort(function (a, b) { return a.score - b.score; });
@@ -1328,12 +1339,28 @@
     };
 
     /* ----- Pladser: stativ og varmeplade ------------------------------------- */
+
+    /* Et glas, der er for kort til at naa bunden af det, det staar i
+       (stativets eller badets bundY), synker ned, til indersidens bund
+       staar dér. y er ankerets hoejde, som stedet ellers ville give; et
+       glas i fuld stoerrelse naar bunden og beholder det. */
+    function synkTil(gg, sted, y) {
+        var t = gg.type;
+        if (typeof sted.type.bundY !== "number" || !t.indre) return y;
+        var ib = -Infinity;
+        t.indre.forEach(function (q) { ib = Math.max(ib, q.y); });
+        return Math.max(y, sted.p.y - sted.anker.y + sted.type.bundY - (ib - gg.anker.y));
+    }
     P.iStativ = function (gg, st, hul, stille) {
         if (!st || hul < 0 || hul === undefined || st.glas[hul]) return false;
         this.frigoer(gg);
         st.glas[hul] = gg;
         gg.sted = { stativ: st, hul: hul };
         var til = { x: this.hulX(st, hul), y: st.p.y - st.anker.y + st.type.hulY, v: 0 };
+        /* Et glas, der er for kort til at naa stativets bund fra hullet,
+           synker ned, til indersidens bund staar paa bunden (bundY). Et
+           glas i fuld stoerrelse naar bunden og staar, som det altid har. */
+        til.y = synkTil(gg, st, til.y);
         gg.hjem = kopi(til);
         if (stille) gg.p = kopi(til);
         else this.koer.start([{ flyt: gg, til: til, tid: 0.35, loeft: 0 }], "hjem");
@@ -1400,8 +1427,11 @@
         if (cx === null) { this.besked("Der er ikke plads til flere glas i " + bad.titel + "."); return false; }
         this.frigoer(gg);
         gg.paa = bad;
-        /* Glasset staar nede i vaesken: aabningen bliver over badets kant */
+        /* Glasset staar nede i vaesken: aabningen bliver over badets kant.
+           Et kortere glas synker ned, til bunden staar, hvor et fuldt glas'
+           bund staar (bundY), ellers kommer indholdet ikke ned i vandet */
         var til = { x: cx, y: bad.p.y - bad.anker.y + bad.type.plade.y - 62 * (gg.skala || 1), v: 0 };
+        til.y = synkTil(gg, bad, til.y);
         gg.hjem = kopi(til);
         if (stille) gg.p = kopi(til);
         else this.koer.start([{ flyt: gg, til: til, tid: 0.35, loeft: 14 }], "hjem");
@@ -1412,10 +1442,16 @@
     };
 
     /* En portion: flaskens standardportion, dog hoejst en femtedel af det
-       glas, der haeldes i. 0 = alt (fx fra et reagensglas i et baegerglas). */
+       glas, der haeldes i. 0 = alt (fx fra et reagensglas i et baegerglas).
+       Et glas kan selv sige, hvor meget det tager i én haeldning:
+       modtager paa dets post i opstillingen (mL). Det bruges, naar
+       femtedelen ikke passer til forsoeget - i sb2.4 er reagensglassene
+       tegnet mindre, men rummer stadig 30 mL (skala er et rent tegnemaal),
+       og der skal 4 mL i pr. tryk, ikke 6. */
     P.portion = function (gg, c) {
         var p = gg.type.haeldMl || 0;
-        var kap = c && c.type.maks ? c.type.maks / 5 : 0;
+        var m = c && c.spec && c.spec.modtager;
+        var kap = m > 0 ? m : (c && c.type.maks ? c.type.maks / 5 : 0);
         if (!kap) return p;
         return p ? Math.min(p, kap) : kap;
     };

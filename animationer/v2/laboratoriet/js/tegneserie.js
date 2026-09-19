@@ -356,11 +356,13 @@
         var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
         (ting || []).forEach(function (g) {
             if (!g || !g.type) return;
-            var vx = g.p.x - g.anker.x * (g.skala || 1), vy = g.p.y - g.anker.y * (g.skala || 1);
+            /* type og anker er allerede i genstandens skala
+               (NK.Udstyr.skaleret), saa der ganges ikke med den igen */
+            var vx = g.p.x - g.anker.x, vy = g.p.y - g.anker.y;
             x0 = Math.min(x0, vx);
             y0 = Math.min(y0, vy);
-            x1 = Math.max(x1, vx + g.type.b * (g.skala || 1));
-            y1 = Math.max(y1, vy + g.type.h * (g.skala || 1));
+            x1 = Math.max(x1, vx + g.type.b);
+            y1 = Math.max(y1, vy + g.type.h);
         });
         if (!isFinite(x0)) return { x: 0, y: 0, b: NK.Scene.BREDDE };
         x0 -= m; y0 -= m; x1 += m; y1 += m;

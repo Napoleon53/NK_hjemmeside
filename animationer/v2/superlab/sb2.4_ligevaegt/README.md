@@ -16,12 +16,14 @@ forløbets tretten trin kører med tekst, hint og en liste i panelet,
 billedet af glas 1 til 7 lader eleven notere sine iagttagelser i del 1, og
 de fire bægerglas set ovenfra gør det samme for fortyndingen i del 2.
 Kemichael siger selv forløbets bemærkninger og et par tørre ord, når et
-trin er gjort. Quizzen har alle ti spørgsmål. Tegneserien mangler.
-`_selvtest.html` kører det hele igennem i tyve afsnit (plus 3b om boblen og
-tabellen); afsnit 17 gør det med musen, som en elev
+trin er gjort. Quizzen har alle ti spørgsmål, og tegneserien har sine
+ruder. `_selvtest.html` kører det hele igennem i fireogtyve afsnit (plus
+3b om boblen og tabellen); afsnit 17 gør det med musen, som en elev
 (`laboratoriet/js/proeve.js`), afsnit 18 prøver, at Kemichael kommer ind
 bag bordet, standser hvor der er plads, og går ud igen, afsnit 19 prøver
-quizzen, og afsnit 20 hele del 2 — med tal og ikke med øjnene.
+quizzen, afsnit 20 hele del 2 — med tal og ikke med øjnene — afsnit 22
+tegneserien, afsnit 23 reaktionerne i zoomboblen og afsnit 24
+reagensglassene.
 `laboratoriet/_vinduer.html` viser forsøget i to vinduesstørrelser ved
 siden af hinanden.
 
@@ -95,6 +97,20 @@ kommer ind, standser han dér, hvor der er plads — mellem hylderne og
 vandbadet, når han taler om reagensglassene, og til venstre for isbadet, når
 han taler om det. Bordpladen dækker hans underkrop, og han tegnes mindre,
 fordi han er længere væk. Se »Kemichael i forsøget«.
+
+## Reagensglassene
+
+De otte reagensglas er tegnet en tredjedel mindre end udstyrets
+reagensglas (`skala: 2/3` på hver post i `js/opstilling.js`), men står i
+stativets huller, som de altid har, så der er luft mellem dem, og de ligner
+rigtige reagensglas ved siden af et stativ. `skala` er et rent tegnemål:
+glasset rummer stadig 30 mL, og farven og kemien er de samme. Derfor siger
+hver post `modtager: 4`: ét tryk — et hurtigt slip fra kolben, pilen, en
+flaske — giver 4 mL og ikke en femtedel af glasset (6 mL). Et kortere glas
+synker ned i hullet, til det står på stativets bund, og i badet ned til
+samme dybde som et fuldt glas, så væsken står frit mellem stativets to
+brædder og nede i vandet. Selvtestens afsnit 24 prøver det, også med
+musen: ingen to klikfelter overlapper.
 
 ## De to dele
 

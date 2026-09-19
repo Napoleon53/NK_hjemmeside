@@ -44,7 +44,12 @@
      omrids            sti i spritets koordinater til et moerkt omrids,
                        saa glasset ogsaa ses mod en lys baggrund
      huller            x-positioner (i spritets koordinater) for glas i et
-                       stativ, og hulY: hvor glassets aabning staar
+                       stativ, og hulY: hvor glassets aabning staar.
+                       bundY: stativets (eller badets) bund. Et glas, der
+                       er for kort til at naa den fra hullet eller kanten
+                       (et reagensglas tegnet i mindre maalestok), synker
+                       ned, til indersidens bund staar dér, som et rigtigt
+                       glas i et rigtigt stativ
      streger           inddelingen paa glasudstyr: { hver, smaa, til, lang,
                        kort, luft | x, str, tekst: "venstre"|"hoejre",
                        navn: { x, y, str } }. Stregerne og rumfanget
@@ -155,6 +160,10 @@
             indre: BAEGER_STOR_INDRE, maks: 600, haeldMl: 0,
             vejlaengde: 3, titel: "badet", valgtMaerke: { x: 96, y: -8 },
             plade: { x0: 14, x1: 98, y: 20 },
+            /* Her staar et reagensglas' bund i badet (et glas i fuld
+               stoerrelse naar den fra kanten; et kortere synker ned til
+               den, saa indholdet kommer ned i vandet) */
+            bundY: 108,
             omrids: function (ctx) {
                 ctx.moveTo(4, 6);
                 ctx.lineTo(4, 122);
@@ -258,7 +267,7 @@
             sprite: "stativ", fil: "stativ8.svg", b: 362, h: 100,
             anker: { x: 0, y: 0 },
             kan: { stoette: true, fast: true },
-            huller: [34, 76, 118, 160, 202, 244, 286, 328], hulY: -54,
+            huller: [34, 76, 118, 160, 202, 244, 286, 328], hulY: -54, bundY: 88,
             titel: "stativet"
         },
         varmeplade: {
@@ -367,7 +376,7 @@
 
        Nye maal i en type skal skrives ind i listerne herunder, ellers
        bliver de ikke skaleret med. */
-    var SKALA_TAL = ["b", "h", "hulY", "laengde", "traefBund"];
+    var SKALA_TAL = ["b", "h", "hulY", "bundY", "laengde", "traefBund"];
     var SKALA_PUNKTER = ["anker", "tud", "ske", "flammePunkt", "valgtMaerke", "knap", "lampe"];
     var SKALA_REKTER = ["etiket", "display", "skilt"];
 

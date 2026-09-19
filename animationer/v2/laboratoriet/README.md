@@ -509,6 +509,12 @@ type kan stå i mindre målestok på et lille bord:
   væsken står lige så højt i det. Derfor ganges `mlPrAreal` med skala².
 * Det, der står i eller på noget andet (glas i et stativ, bægerglas på en
   varmeplade), arver dets skala, så huller og plader passer.
+* Et glas kan også have sin egen, mindre skala i et stativ i fuld størrelse
+  (sb2.4's reagensglas er 2/3). Så er det for kort til at nå bunden fra
+  hullet og synker ned, til indersidens bund står på stativets `bundY`; i
+  et bad synker det til badets `bundY`, hvor et fuldt glas' bund står, så
+  indholdet kommer ned i vandet (`synkTil` i `bord.js`). Et glas i fuld
+  størrelse når bunden og står, som det altid har.
 * Skala over 1 tillades ikke: sprites er tegnet i deres naturlige størrelse og
   bliver bløde, hvis de forstørres.
 * Prøvebordets selvtest har et afsnit, der holder øje med, at rumfang,
@@ -536,7 +542,10 @@ vender, glider den ind over åbningen; den drypper først, når spidsen peger
 lige ned (`vendDrypper`, `draabeSigte`, `HAELD.vipDryp`). Når der hældes med
 hånden, vælges glasset, så zoomboblen viser, hvad der sker i det. Et
 hurtigt slip over glasset giver én portion: flaskens standardportion
-(`haeldMl`), dog højst en femtedel af glasset (`portion`). Målet sigtes med
+(`haeldMl`), dog højst en femtedel af glasset (`portion`) — eller det,
+glasset selv siger: `modtager` i mL på dets post i opstillingen (sb2.4's
+reagensglas tager 4 mL pr. tryk, fordi de er tegnet mindre, men stadig
+rummer 30 mL). Målet sigtes med
 tuden, ikke med musen. Løber glasset over, stopper strømmen, til flasken
 flyttes. Flaskerne er fyldt til 200 mL af 250, så der kan hældes i dem.
 
@@ -556,7 +565,11 @@ afsnit 11 prøver det med to glas i naboglas-huller.
 Der hældes ovenfra: en tud, der er under glassets kant (`SIGTE.tudNed`),
 sigter ikke på glasset, og musen på et glas tæller kun ved åbningen
 (`SIGTE.musNed`). Så kan en flaske, man sænker, til bunden rører bordet,
-stilles foran et glas uden at hælde eller dryppe i det. Reagensglassets
+stilles foran et glas uden at hælde eller dryppe i det. Står det bårnes
+fod på bordpladen (et bord med dybde), hælder musen slet ikke i et glas;
+kun tuden sigter (`stiller` i `sigteKandidater`). Ellers ville en flaske,
+der stilles foran et af sb2.4's lave reagensglas, hælde i det, fordi musen,
+der holder flasken i toppen, er ved glassets åbning. Reagensglassets
 nederste 24 enheder rammes ikke med musen (`traefBund` i `udstyr.js`), for
 bunden står nede i stativet. sb2.4's selvtest afsnit 17 prøver det med
 dråbeflasken og KSCN-flasken foran stativet.

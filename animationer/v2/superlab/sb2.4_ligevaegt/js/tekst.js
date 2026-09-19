@@ -100,7 +100,7 @@
            hele tiden. */
         "trin": {
             "fyld":  { kort: "Fyld de otte glas",
-                       tekst: "Hæld stamopløsning fra kolben i glas 1 til 8 — omkring 3 mL i hvert.",
+                       tekst: "Hæld stamopløsning fra kolben i glas 1 til 8 — 4 mL i hvert.",
                        hint: "Tag fat i kolben, og slip den over et glas. Den bliver hængende, så et klik hælder igen." },
             "glas1": { kort: "Glas 1: mere Fe³⁺",
                        tekst: "Giv glas 1 en spatelspids Fe(NO₃)₃, og rør rundt. Hvad sker der med farven?",

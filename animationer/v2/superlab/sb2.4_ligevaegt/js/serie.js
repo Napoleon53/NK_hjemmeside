@@ -271,7 +271,8 @@
                i stativet, men stativet er ikke med i udsnittet, og et glas,
                der svaever, laeses som en fejl i tegningen. */
             var bund = NK.Scene.BORD + 6;
-            var ting = [TS.kopi(gg, { x: gg.p.x, y: bund - gg.type.h * (gg.skala || 1) + gg.anker.y * (gg.skala || 1) })];
+            /* type og anker er allerede i glassets skala (S31) */
+            var ting = [TS.kopi(gg, { x: gg.p.x, y: bund - gg.type.h + gg.anker.y })];
             var f = B.farve(gg) || NK.Stof.VAND;
             ud.push({
                 tekst: t.replace("{glas}", gg.titel || navn),
