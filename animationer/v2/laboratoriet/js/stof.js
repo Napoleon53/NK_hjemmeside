@@ -423,7 +423,15 @@
         if (rx.slags === "fuld" || rx.slags === "oploes") {
             maal = g.maks;
             if (maal <= 1e-9) return;
-            anvend(o, rx, maal < 1e-3 ? maal : maal * f);
+            /* Fast stof, der oploeses, har to bidrag (F34): et relativt,
+               der afhaenger af, hvor meget der er tilbage (fart), og et
+               konstant, der er ens for alle salte (OPLOES_K0 µmol/s). Uden
+               det konstante gik den sidste rest mod nul uden at blive
+               faerdig. Det er ikke kinetik, men en behagelig fart: en
+               spatelspids paa 60 µmol er vaek paa omkring 6 s i stedet for
+               over et halvt minut. Mere end der er, oploeses aldrig. */
+            var k0 = rx.slags === "oploes" ? (NK.Stof.OPLOES_K0 || 0) * dt : 0;
+            anvend(o, rx, maal < 1e-3 ? maal : Math.min(maal, maal * f + k0));
             return;
         }
         if (rx.slags === "ligevaegt" || rx.slags === "faeld") {
@@ -738,6 +746,8 @@
         tilskuerioner: tilskuerioner,
         PARTIKEL_MIN: PARTIKEL_MIN,
         PARTIKEL_LOFT: LOFT,
+        /* Det konstante bidrag til oploesningen af fast stof, µmol/s (F34) */
+        OPLOES_K0: 3,
         gitter: gitter
     };
 

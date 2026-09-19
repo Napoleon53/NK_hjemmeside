@@ -236,7 +236,10 @@
         if (k === undefined && spec.stativ && this.g[spec.stativ]) k = this.g[spec.stativ].skala;
         if (k === undefined && spec.paa && this.g[spec.paa]) k = this.g[spec.paa].skala;
         k = NK.klamp(k === undefined ? 1 : k, 0.25, 1);
-        if (k !== 1) t = U.skaleret(t, k);
+        /* rumfangFoelger: en rigtig mindre udgave, hvor rumfang og lysvej
+           foelger tegningen (NK.Udstyr.mindre); ellers er skala et rent
+           tegnemaal */
+        if (k !== 1) t = spec.rumfangFoelger ? U.mindre(t, k) : U.skaleret(t, k);
         var gg = {
             navn: spec.navn, type: t, anker: t.anker, skala: k, kan: udvid(t.kan, spec.kan),
             titel: spec.titel || t.titel || spec.navn, etiket: spec.etiket || null, nr: spec.nr || 0,
@@ -503,11 +506,6 @@
         var navn = this.hvad(pt);
         if (!navn) return false;
         if (navn === "boble" || navn === "svaevring") { this.klik(navn); return false; }
-        var sv = this.svaevende();
-        if (sv && sv.navn !== navn && navn !== "laerer" && navn !== "kaffekop") {
-            this.besked("Træk først " + sv.titel + " væk.");
-            return false;
-        }
         var laererOpt = this.laererOptaget && this.laererOptaget();
         if (!laererOpt && !this.koer.optaget() && !this.baerer && this.grebbar(navn)) {
             var gg = this.g[navn];
@@ -529,6 +527,11 @@
             h.flyttet = true;
             h.sidst = pt;
             h.t = nu;
+            /* F35: tager man fat i noget andet, stilles det, der svaever,
+               ned paa det naermeste ledige sted paa bordet - det maa aldrig
+               spaerre for det naeste */
+            var sv0 = this.svaevende();
+            if (sv0 && sv0 !== gg) this.stilSvaevendeNed();
             this.startBaer(gg, h.start);
             /* Blev den rettet op, sidder den nu anderledes i haanden */
             h.dx = h.start.x - gg.p.x;
@@ -565,7 +568,13 @@
        tuden ind over glassets aabning (foerTud), og der haeldes kun, naar
        straalen rammer. Man kan altsaa ikke komme til at haelde ved siden af
        et glas, der har den groenne ramme. */
-    var HAELD = { dvael: 0.3, vipTid: 0.5, vipDryp: 0.3, drypVip: 0.85, fart: { reagensglas: 12, baegerLille: 25, baegerStor: 35, kolbe: 30, maaleglas: 15, flaske: 15, vejebaad: 900, sproejteflaske: 8 }, dryp: 0.45 };
+    /* medHaanden: F36 slog haeldning med haanden fra. At bære en flaske
+       langsomt hen over et glas talte som at holde den stille, og saa
+       haeldte den - ogsaa i det forkerte glas. Nu haeldes der kun, naar
+       eleven beder om det: et slip over glasset giver én portion, og pilen
+       giver mere. Resten af maskineriet herunder staar, som det stod, og
+       kan slaas til igen med medHaanden: true. */
+    var HAELD = { medHaanden: false, dvael: 0.3, vipTid: 0.5, vipDryp: 0.3, drypVip: 0.85, fart: { reagensglas: 12, baegerLille: 25, baegerStor: 35, kolbe: 30, maaleglas: 15, flaske: 15, vejebaad: 900, sproejteflaske: 8 }, dryp: 0.45 };
 
     P.kanHaelde = function (gg) {
         var k = gg.kan;
@@ -603,7 +612,7 @@
         var stille = this.musFart < 160;
         h.dvael = stille ? h.dvael + dt : Math.max(0, h.dvael - dt * 2);
         /* Loeb glasset over, stopper man med at haelde, til flasken flyttes */
-        var maalVip = h.dvael > HAELD.dvael && !h.stoppet ? 1 : 0;
+        var maalVip = HAELD.medHaanden && h.dvael > HAELD.dvael && !h.stoppet ? 1 : 0;
         var vipTid = gg.kan.drypper ? HAELD.vipDryp : HAELD.vipTid;
         h.vip = NK.mod(h.vip, maalVip, maalVip ? 1 / vipTid * 1.6 : 8, dt);
         var c = h.maal, k = gg.kan, t = gg.type;
@@ -1456,10 +1465,57 @@
         return p ? Math.min(p, kap) : kap;
     };
 
-    /* Det, der svaever over noget lige nu */
+    /* Det, der svaever over noget lige nu (noget skjult svaever ikke) */
     P.svaevende = function () {
-        for (var i = 0; i < this.liste.length; i++) if (this.liste[i].svaev) return this.liste[i];
+        for (var i = 0; i < this.liste.length; i++) if (this.liste[i].svaev && this.synlig(this.liste[i])) return this.liste[i];
         return null;
+    };
+
+    /* F35: det, der svaever over noget, stilles ned paa det naermeste
+       ledige sted paa bordpladen: naar man tager fat i noget andet, og naar
+       bordet skifter del. straks: uden en bue (bordet skifter). Er der
+       ikke plads nogen steder, gaar det hjem. */
+    var LUFT = 12;                         /* afstand til andet udstyr */
+    P.stilSvaevendeNed = function (straks) {
+        var sv = null;
+        for (var i = 0; i < this.liste.length; i++) if (this.liste[i].svaev) sv = this.liste[i];
+        if (!sv) return null;
+        sv.svaev = null;
+        this.koer.slipFri(sv);
+        var til = this.ledigtSted(sv, sv.p.x) || sv.hjem;
+        sv.hjem = kopi(til);
+        if (straks) sv.p = kopi(til);
+        else this.koer.start([{ flyt: sv, til: til, tid: 0.4, loeft: 8 }], "hjem");
+        this.tilFront(sv);
+        this.ordnDybde();
+        this.haendelse("satNed", sv);
+        this.aendret("svaev");
+        return sv;
+    };
+
+    /* Det naermeste sted paa bordpladen, set fra x, hvor gg kan staa uden
+       at dens omrids kommer inden for LUFT af andet synligt udstyr. Paa et
+       bord med dybde stilles den et stykke fremme paa pladen. null, hvis
+       der ikke er plads. */
+    P.ledigtSted = function (gg, x0) {
+        var S = NK.Scene, t = gg.type, mig = this;
+        var linje = S.DYBDE ? S.BORD + Math.round(S.DYBDE * 0.6) : S.BORD;
+        var gammel = gg.p, fundet = null;
+        for (var k = 0; k <= 400 && !fundet; k++) {
+            var x = x0 + (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 4;
+            if (x < 40 || x > S.BREDDE - 40) continue;
+            gg.p = t.sprite ? staar(t, x, linje) : { x: x, y: linje - 3, v: -Math.PI / 2 };
+            var r = this.rekt(gg, LUFT);
+            if (r.x < 4 || r.x + r.b > S.BREDDE - 4) continue;
+            var fri = this.liste.every(function (o) {
+                if (o === gg || !mig.synlig(o)) return true;
+                var q = mig.rekt(o, 0);
+                return r.x + r.b <= q.x || q.x + q.b <= r.x || r.y + r.h <= q.y || q.y + q.h <= r.y;
+            });
+            if (fri) fundet = kopi(gg.p);
+        }
+        gg.p = gammel;
+        return fundet;
     };
 
     /* Den gule ring med pilen ved siden af det, der svaever: et klik paa
@@ -2170,7 +2226,7 @@
             if (gg.svaev) {
                 gg.svaev.ur -= dt;
                 var m = gg.svaev.maal;
-                if (mig.baerer === m || mig.baerer === gg || !mig.synlig(m) || mig.liste.indexOf(m) < 0) gg.svaev.ur = 0;
+                if (mig.baerer === m || mig.baerer === gg || !mig.synlig(m) || !mig.synlig(gg) || mig.liste.indexOf(m) < 0) gg.svaev.ur = 0;
                 if (gg.svaev.ur <= 0 && !mig.koer.igang()) {
                     gg.svaev = null;
                     mig.koer.start([NK.Koer.hjemTil(gg, 0.6, 40)], "hjem");

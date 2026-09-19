@@ -122,7 +122,8 @@
     /* En kort bemaerkning: han kommer ind, siger replikkerne og gaar igen.
        mod er det sted paa bordet, det handler om: bag bordet standser han,
        hvor der er plads, og peger derhen i stedet for at gaa hen til det.
-       foran: scenen kraever hans haender, saa han skal foran bordet. */
+       foran: kun oprydningen efter et uheld bringer ham om foran bordet
+       (F30); alt andet, ogsaa det, der kraever hans haender, sker bagfra. */
     function bemaerkning(mig, navn, x, udtryk, replikker, ekstra, mod, foran) {
         var trin = [{ udtryk: udtryk }, { gaa: x, mod: mod, foran: foran }];
         replikker.forEach(function (rp, i) {
@@ -348,7 +349,7 @@
         ];
         bemaerkning(this, "affald", 150, { vrede: 1, humoer: -0.9, roed: 0.45, briller: 1 },
             ["En hel flaske i affaldet.", foer ? "Det var den sidste." : "Den var til hele klassen."],
-            ekstra, null, true);
+            ekstra, fl, false);
     };
 
     /* ----- Tegning ------------------------------------------------------------- */

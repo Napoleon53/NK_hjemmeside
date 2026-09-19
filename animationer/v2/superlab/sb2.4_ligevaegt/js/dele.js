@@ -41,9 +41,10 @@
     }
 
     /* Der skiftes ikke midt i en handling: saa ville det, haanden baerer,
-       forsvinde under den. */
+       forsvinde under den. En genstand paa vej hjem er ikke en handling
+       (koer.optaget), og det, der svaever, stilles ned foer skiftet (F28). */
     function kanSkifte(bord) {
-        return !!bord && !bord.baerer && !bord.holdt && !bord.koer.igang();
+        return !!bord && !bord.baerer && !bord.holdt && !bord.koer.optaget();
     }
 
     /* Returnerer true, hvis der blev skiftet. stille: ingen lyd og ingen
@@ -56,6 +57,7 @@
             if (!stille) bord.besked("Vent, til det, der er i gang, er færdigt.");
             return false;
         }
+        if (bord.stilSvaevendeNed) bord.stilSvaevendeNed(true);
         nu = n;
         anvend(bord);
         if (!stille && NK.Lyd && NK.Lyd.papir) NK.Lyd.papir();

@@ -491,6 +491,25 @@
         return 1 + (m.vej_cm / REF_CM - 1) * LYSVEJ_DAEMPNING;
     }
 
+    /* ----- Udstyr i en anden stoerrelse ------------------------------------
+       skaleret er et tegnemaal: rumfang og lysvej staar fast. I en rigtig
+       mindre udgave af et glas foelger de tegningen, som de goer for
+       typerne selv (samme SKALA): et reagensglas, der rummer to
+       tredjedele, er (2/3)^(1/3) = 87 % saa stort i hver retning, og lyset
+       gaar gennem en smallere vaeske. Bruges af en opstilling med
+       rumfangFoelger: true ved siden af skala (F33, sb2.4's reagensglas). */
+    function mindre(t, k) {
+        var ud = skaleret(t, k);
+        if (ud === t) return t;
+        if (t.maks && t.indre && !t.vindue && t.rund !== false && t.mlPrAreal) {
+            ud.maks = t.maks * k * k * k;
+            ud.mlPrAreal = t.mlPrAreal / k;       /* areal k², rumfang k³ */
+        }
+        if (t.indre && t.rund !== false) ud.vejlaengde = 1 + (k * maal(t).vej_cm / REF_CM - 1) * LYSVEJ_DAEMPNING;
+        ud.rumfangFoelger = true;
+        return ud;
+    }
+
     /* ----- Lysvejen ovenfra -------------------------------------------------
        Ses der NED i et glas, gaar lyset gennem vaeskens dybde og ikke
        gennem glassets bredde. Det er ikke en detalje. Fortyndes et glas
@@ -513,8 +532,9 @@
        ovenfra, og saa var proeven ingenting vaerd. Vejen ovenfra er et
        forhold mellem to laengder, og det forhold skal staa. */
     function vejOvenfra(t, V) {
-        /* Maalene er de samme i mindre maalestok (se skaleret) */
-        var g = t.grund || t;
+        /* Maalene er de samme i mindre maalestok (se skaleret) - medmindre
+           rumfanget foelger tegningen (mindre), saa er det dens egne */
+        var g = t.rumfangFoelger ? t : (t.grund || t);
         if (!g.indre || !g.mlPrAreal || !(V > 0)) return 0;
         var bund = -Infinity;
         for (var i = 0; i < g.indre.length; i++) bund = Math.max(bund, g.indre[i].y);
@@ -583,6 +603,7 @@
         lysvej: lysvej,
         vejOvenfra: vejOvenfra,
         skaleret: skaleret,
+        mindre: mindre,
 
         type: function (navn) {
             if (!TYPER[navn]) throw new Error("ukendt udstyr: " + navn);

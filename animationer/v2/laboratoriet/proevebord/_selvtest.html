@@ -132,7 +132,10 @@ function koerTest() {
     paastand("baegerglasset har 10 mL", Math.abs(V(b100) - 10) < 0.3, V(b100).toFixed(2));
     paastand("flasken har 190 mL (den er fyldt til 200)", Math.abs(V(g.fl_cu) - 190) < 0.3, V(g.fl_cu).toFixed(1));
     paastand("flasken bliver haengende over baegerglasset", !!g.fl_cu.svaev && g.fl_cu.svaev.maal === b100 && g.fl_cu.p.y < b100.p.y, g.fl_cu.p.y.toFixed(0));
-    paastand("klik paa et andet glas afvises, mens flasken haenger", !bord.ned({ x: g.baegerStor.p.x, y: g.baegerStor.p.y + 20 }) && !bord.holdt);
+    /* Et klik paa et andet glas vaelger det, og flasken bliver haengende;
+       foerst naar noget andet TRAEKKES, stilles den ned (F35) */
+    bord.ned({ x: g.baegerStor.p.x, y: g.baegerStor.p.y + 20 }); bord.op();
+    paastand("klik paa et andet glas vaelger det, og flasken bliver haengende (F35)", bord.valgt === "baegerStor" && !!g.fl_cu.svaev && !bord.holdt, bord.valgt);
     var V10 = V(b100);
     paastand("et klik paa selve flasken haelder ikke", !bord.klik("fl_cu") && Math.abs(V(b100) - V10) < 1e-9 && !bord.koer.igang());
     paastand("klik paa pilen haelder en portion til", bord.klik("svaevring"));
@@ -154,7 +157,7 @@ function koerTest() {
     paastand("panelet viser flaskens indhold", (NK.opdaterPanel(), d.getElementById("glas-titel").textContent.indexOf("Pb(NO₃)₂") >= 0), d.getElementById("glas-titel").textContent);
     paastand("et klik paa spatlen goer ingenting", !bord.klik("spatel") && !bord.koer.igang() && !g.spatel.last);
 
-    overskrift("3b. Haeldning med haanden");
+    overskrift("3b. Der haeldes kun, naar eleven beder om det (F36)");
     frisk();
     /* Holder flasken stille over baegerglasset: musen staar i pt, tiden gaar */
     function hold(gg, pt, sek) {
@@ -168,16 +171,13 @@ function koerTest() {
     hold(g.fl_cu, over, 0.2);
     paastand("flasken er taget og holdes over baegerglasset", bord.baerer === g.fl_cu && bord.slipMaal === "baegerStor", bord.slipMaal);
     paastand("intet er haeldt endnu", V(b250) < 0.01);
-    hold(g.fl_cu, over, 2.0);
-    var V2 = V(b250);
-    paastand("efter 2 s har den vippet og haeldt", V2 > 5 && V2 < 40 && g.fl_cu.p.v < -0.8, V2.toFixed(1) + " mL, v " + g.fl_cu.p.v.toFixed(2));
-    paastand("straalen tegnes", !!bord.straale && bord.straale.haand);
-    hold(g.fl_cu, over, 1.0);
-    paastand("den haelder videre, saa laenge den holdes", V(b250) > V2 + 5, V(b250).toFixed(1));
-    var V3 = V(b250);
+    hold(g.fl_cu, over, 3.0);
+    paastand("holdt stille over glasset i 3 s haelder den ikke og vipper ikke", V(b250) < 0.01 && g.fl_cu.p.v > -0.2 && !bord.straale,
+        V(b250).toFixed(1) + " mL, v " + g.fl_cu.p.v.toFixed(2));
     bord.op();
     faerdig();
-    paastand("slip efter haeldning giver ingen portion oveni, og flasken bliver haengende", Math.abs(V(b250) - V3) < 0.01 && !!g.fl_cu.svaev, V(b250).toFixed(1));
+    var V3 = V(b250);
+    paastand("et slip giver én portion (10 mL), og flasken bliver haengende", Math.abs(V3 - 10) < 0.3 && !!g.fl_cu.svaev, V3.toFixed(1));
     paastand("kobberioner i baegerglasset", n(b250, "Cu2+") > 500, n(b250, "Cu2+").toFixed(0));
     vaek(g.fl_cu);
     bord.ned({ x: g.fl_ki.p.x, y: g.fl_ki.p.y + 30 });
@@ -188,21 +188,37 @@ function koerTest() {
     vaek(g.fl_ki);
     bord.ned({ x: g.fl_hcl.p.x, y: g.fl_hcl.p.y + 30 });
     hold(g.fl_hcl, { x: b250.p.x + 62, y: b250.p.y - 40 }, 2.2);
-    /* Tuden er ude ved kanten af det groenne felt, uden for aabningen: den
-       foeres ind over glasset, og det hele ryger i det (F8) - foer loeb det
-       ud paa bordet */
-    paastand("holdes tuden ude ved glassets kant, foeres den ind og haelder i glasset, ikke paa bordet",
-        bord.antalUheld === uheldH && bord.pytter.length === 0 && V(b250) > V3 + 10 + 5, "uheld " + (bord.antalUheld - uheldH) + ", V " + V(b250).toFixed(1));
+    var VH = V(b250);
     bord.op(); faerdig();
+    /* Tuden er ude ved kanten af det groenne felt, uden for aabningen:
+       holdt der haelder den ikke, og et slip haelder i glasset (F8, F36) */
+    paastand("holdes tuden ude ved glassets kant, haelder den ikke, og et slip haelder i glasset, ikke paa bordet",
+        Math.abs(VH - V3 - 10) < 0.3 && bord.antalUheld === uheldH && bord.pytter.length === 0 && Math.abs(V(b250) - V3 - 20) < 0.3,
+        "uheld " + (bord.antalUheld - uheldH) + ", V " + V(b250).toFixed(1));
     vent(function () { return !bord.laerer.scene; }, 30);
     vaek(g.fl_hcl);
     bord.ned({ x: g.ag.p.x, y: g.ag.p.y + 30 });
     hold(g.ag, { x: b250.p.x, y: b250.p.y - 40 }, 2.5);
-    paastand("draabeflasken vender og drypper, mens den holdes", Math.abs(Math.abs(g.ag.p.v) - Math.PI) < 0.3 && V(g.ag) < 59.9, V(g.ag).toFixed(2) + " mL tilbage");
+    paastand("draabeflasken drypper ikke, mens den holdes", Math.abs(V(g.ag) - 60) < 1e-6, V(g.ag).toFixed(2) + " mL tilbage");
     bord.op(); faerdig();
+    paastand("et slip giver én draabe", Math.abs(V(g.ag) - 59.95) < 0.001, V(g.ag).toFixed(2) + " mL tilbage");
     vent(function () { return bord.draaber.length === 0; }, 4); adv(1);
     var agIalt = n(b250, "Ag+") + n(b250, "AgI(s)") + n(b250, "AgCl(s)") + n(b250, "Ag2SO4(s)") + n(b250, "Ag(s)");
     paastand("draaberne landede i glasset (soelv i alt, ogsaa som AgCl fra saltsyren; iodidet er allerede brugt af kobberionerne til CuI)", agIalt > 2, agIalt.toFixed(1) + " umol Ag, CuI " + n(b250, "CuI(s)").toFixed(0) + ", I2 " + n(b250, "I2").toFixed(0));
+
+    overskrift("3c. Fast stof oploeses paa endelig tid (F34)");
+    /* To bidrag: et relativt (fart · n) og et konstant (OPLOES_K0 µmol/s),
+       saa den sidste rest ikke gaar mod nul uden at blive faerdig */
+    (function () {
+        var o = St.lav({ V: 6, T: 20, umol: { "NaCl(s)": 60 } }), t = 0;
+        while ((o.n["NaCl(s)"] || 0) > 1e-9 && t < 60) { St.skridt(o, 0.05); t += 0.05; }
+        paastand("en spatelspids NaCl (60 µmol) er helt oploest efter under 10 s", (o.n["NaCl(s)"] || 0) <= 1e-9 && t < 10, t.toFixed(1) + " s");
+        paastand("og der er ikke oploest mere, end der var", Math.abs(o.n["Na+"] - 60) < 1e-6, o.n["Na+"].toFixed(3) + " µmol Na⁺");
+        var o2 = St.lav({ V: 6, T: 20, umol: { "NaCl(s)": 60 } });
+        St.skridt(o2, 0.05);
+        var ud = 60 - o2.n["NaCl(s)"], rel = 60 * (1 - Math.exp(-0.35 * 0.05));
+        paastand("i det foerste skridt er begge bidrag med", Math.abs(ud - rel - St.OPLOES_K0 * 0.05) < 1e-6, ud.toFixed(4) + " µmol");
+    }());
 
     overskrift("4. Bundfald, ligevaegt og neutralisation");
     frisk();
@@ -820,10 +836,12 @@ function koerTest() {
         mus.baer({ x: gl.p.x, y: rk.y - 5 - fl.type.h + fl.anker.y }, 0.7);
         var maal = bord.slipMaal;
         mus.hold(1.8);
-        paastand(par[0] + " holdt over " + par[1] + " drypper i glasset", maal === par[1] && V(gl) > V0 + 0.04,
-            maal + ", " + (V(gl) - V0).toFixed(2) + " mL");
+        var holdtV = V(gl) - V0;
         mus.slip();
-        mus.hold(0.8);
+        mus.hold(2);
+        paastand(par[0] + " holdt over " + par[1] + " drypper ikke, og et slip giver én draabe i glasset",
+            maal === par[1] && holdtV < 1e-9 && Math.abs(V(gl) - V0 - 0.05) < 0.001,
+            maal + ", " + (V(gl) - V0).toFixed(3) + " mL");
         paastand("og kan traekkes hjem igen", hjemMedMusen(par[0]));
     });
     /* Glas 4 flyttes et hul til hoejre i stativet */

@@ -1150,9 +1150,10 @@
            tale BAG bordet. Han bor der ikke: han er ude det meste af tiden
            og kommer kun ind, naar han har noget at sige. Saa gaar han ind
            bag bordet, standser dér, hvor der er plads i netop dette rum
-           (laererPlads), peger og gaar ud igen. Det, der kraever hans
-           haender - oprydning, kaffen, flasken i affaldet - og
-           baggrundslivet foregaar foran bordet som foer (foran: true).
+           (laererPlads), peger og gaar ud igen. Kun oprydningen efter et
+           uheld foregaar foran bordet (foran: true); kaffen, flasken i
+           affaldet, kigget ind fra kanten og baggrundslivet sker bag
+           bordet (F30).
            Uden BAGBORD er L.plan altid 0, og alt er som foer. */
         function bagValg() { return NK.Scene && NK.Scene.BAGBORD; }
         function bagSkala(bv) { return bv && bv.skala ? bv.skala : 0.82; }
@@ -1488,7 +1489,9 @@
                 udtryk: function (o) { return [{ udtryk: o }]; },
                 vent: function (tid) { return [{ tid: tid }]; },
                 suk: function (tid) { return [suk(tid)]; },
-                gaa: function (x, loeb) { return [{ gaa: x, loeb: !!loeb, foran: true }]; },
+                /* Kaffen hentes bag bordet (F30): han kommer kun om foran
+                   for at rydde op efter et uheld */
+                gaa: function (x, loeb) { return [{ gaa: x, loeb: !!loeb }]; },
                 grib: function () {
                     return [
                         { arm: -0.5, tid: 0.55 },
@@ -1707,7 +1710,7 @@
         P.laererStilstand = function () {
             this.laererKoer("stilstand", [
                 { udtryk: { vrede: 0.3, humoer: -0.1, roed: 0, briller: 1, laen: 1 } },
-                { gaa: KANT, foran: true },
+                { gaa: KANT },
                 { tid: 0.4 },
                 { sig: replik("stilstand"), vis: 3.0, tid: 2.2 },
                 { udtryk: { briller: 0, laen: 0 } },

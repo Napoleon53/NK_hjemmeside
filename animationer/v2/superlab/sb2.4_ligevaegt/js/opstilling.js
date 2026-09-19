@@ -96,18 +96,18 @@
        ogsaa frugtfarve i et koekken: et par draaber i en skaal. */
     var FRUGTFARVE = { "farve": 35 };
 
-    /* De otte reagensglas er tegnet en tredjedel mindre end udstyrets
-       reagensglas, men staar i stativets huller, som de er: saa er der luft
-       mellem dem, og de ligner rigtige reagensglas ved siden af et stativ.
-       skala er et rent tegnemaal - glasset rummer stadig 30 mL, og farven
-       og kemien er de samme - saa det er modtager, der goer, at et tryk
-       giver 4 mL og ikke en femtedel af glasset (6 mL). Et kortere glas
-       synker ned i hullet, til det staar paa stativets bund (bundY), saa
-       vaesken staar frit i aabningen mellem stativets to braedder. */
-    var GLAS_SKALA = 2 / 3, GLAS_PORTION = 4;
+    /* De otte reagensglas rummer en tredjedel mindre end udstyrets
+       reagensglas: 20 mL i stedet for 30 (F33). Rumfanget foelger
+       tegningen (rumfangFoelger), saa de er (2/3)^(1/3) = 87 % saa store i
+       hver retning, og en portion - en femtedel af glasset - er 4 mL af sig
+       selv. De staar i stativets huller, som de er, saa der er luft mellem
+       dem. Et kortere glas synker ned i hullet, til det staar paa
+       stativets bund (bundY), saa vaesken staar frit mellem stativets to
+       braedder. */
+    var GLAS_SKALA = Math.cbrt(2 / 3);
     function glas(nr) {
         return { navn: "glas" + nr, type: "reagensglas", stativ: "stativ", hul: nr - 1, nr: nr,
-                 titel: "glas " + nr, del: 1, skala: GLAS_SKALA, modtager: GLAS_PORTION };
+                 titel: "glas " + nr, del: 1, skala: GLAS_SKALA, rumfangFoelger: true };
     }
 
     /* De fire baegerglas i del 2, to og to i par med luft imellem */

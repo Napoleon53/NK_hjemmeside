@@ -527,7 +527,13 @@ knuses (`type.glas`); rystes et glas ekstremt voldsomt, knuses det i hånden.
 Kemichael kommer og tørrer op eller fejer og henter et nyt
 (`proevebord/js/laerer.js`, `NK.Bord.prototype.genopstil`).
 
-Hældning med hånden: holdes en flaske stille over et glas, vipper den efter
+**Der hældes kun, når eleven beder om det (F36):** et slip over glasset
+giver én portion, og pilen ved flasken giver mere. At bære en flaske hen
+over et glas eller holde den stille over det hælder ikke — før talte en
+langsom bevægelse som at holde stille, og så hældte den i det glas, den
+blev båret forbi. Maskineriet til hældning med hånden står der stadig og
+kan slås til med `HAELD.medHaanden` i `bord.js`. Sådan virkede det: holdes
+en flaske stille over et glas, vipper den efter
 0,3 s og hælder, så længe den holdes der (`opdaterHaeldning`; farten pr. type
 i `HAELD.fart`). Den grønne ramme holder, hvad den lover: mens flasken
 vipper, føres tuden ind over glassets åbning og op over kanten (`foerTud`,

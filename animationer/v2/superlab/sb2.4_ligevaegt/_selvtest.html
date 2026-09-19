@@ -319,9 +319,15 @@ function koerTest() {
     paastand("del 1 er gjort, og del 2 staar tilbage", !F.faerdig &&
         d.getElementById("forloeb-taeller").textContent === "9/13",
         d.getElementById("forloeb-taeller").textContent);
-    /* Naar der er ryddet op, kommer de fire baegerglas frem af sig selv */
+    /* Naar der er ryddet op, skifter bordet IKKE af sig selv (F28): pilen
+       til del 2 dukker op, og eleven skifter selv */
     adv(2);
-    paastand("bordet skifter selv til del 2, naar der er ryddet op", NK.DELE.nu() === 2, NK.DELE.nu());
+    var pil7 = d.getElementById("del2pil");
+    paastand("bordet bliver i del 1, naar der er ryddet op (F28)", NK.DELE.nu() === 1, NK.DELE.nu());
+    paastand("og pilen til del 2 dukker op", !!pil7 && !pil7.hidden);
+    pil7.click();
+    adv(0.5);
+    paastand("pilen skifter til del 2 og forsvinder", NK.DELE.nu() === 2 && pil7.hidden, NK.DELE.nu());
     paastand("og saa er del 1's udstyr vaek fra bordet",
         bord.g.stativ.skjult && bord.g.isbad.skjult && !bord.g.baeger1.skjult && !bord.g.kolbe.skjult);
 
@@ -710,21 +716,20 @@ function koerTest() {
     mus.hold(1);
     paastand("og sluppet der staar det i stativet igen", !!g8.sted && g8.sted.stativ === stv8 && g8.sted.hul === hul8, g8.sted ? "hul " + g8.sted.hul : "ikke i stativet");
 
-    /* Draabeflasken holdt med bunden lige over glas 4 (F2) */
+    /* Draabeflasken holdt med bunden lige over glas 4: den drypper ikke,
+       mens den holdes (F36), men et slip giver én draabe (F2) */
     var ag = bord.g.ag, g4 = g(4), rk4 = bord.rekt(g4, 0);
     var agV0 = B.volumen(ag), g4V0 = B.volumen(g4);
     paastand("draabeflasken kan tages med musen", mus.tag("ag"));
     mus.baer({ x: g4.p.x, y: rk4.y - 5 - ag.type.h + ag.anker.y }, 0.7);
     paastand("holdt med bunden lige over glas 4 faar glasset den groenne ramme", bord.slipMaal === "glas4", bord.slipMaal);
-    mus.hold(1);
-    paastand("inden for et sekund vender den og drypper", B.volumen(ag) < agV0 - 0.01 && Math.cos(ag.p.v) < -0.98,
+    mus.hold(1.8);
+    paastand("holdt stille over glas 4 drypper den ikke (F36)", Math.abs(B.volumen(ag) - agV0) < 1e-9 && Math.cos(ag.p.v) > 0.98,
         tal(agV0 - B.volumen(ag)) + " mL ud, vinkel " + tal(ag.p.v));
-    mus.hold(0.8);
-    paastand("og draaberne lander i glas 4, ikke paa bordet", B.volumen(g4) > g4V0 + 0.04 && bord.pytter.length === 0 && bord.antalUheld === uheld0,
-        tal(B.volumen(g4) - g4V0) + " mL i glasset, " + bord.pytter.length + " pytter");
-    paastand("og glas 4 er valgt, saa zoomboblen viser, hvad der sker i det", bord.valgt === "glas4", bord.valgt);
     mus.slip();
-    mus.hold(0.8);
+    mus.hold(2);
+    paastand("et slip giver én draabe i glas 4 og intet paa bordet", Math.abs(B.volumen(g4) - g4V0 - 0.05) < 0.001 && bord.pytter.length === 0 && bord.antalUheld === uheld0,
+        tal(B.volumen(g4) - g4V0, 3) + " mL i glasset, " + bord.pytter.length + " pytter");
     var dV4 = B.volumen(g4);
     paastand("sluppet bliver den haengende over glasset", !!ag.svaev && ag.svaev.maal === g4);
     paastand("og beskeden siger, hvordan man faar flere",
@@ -805,10 +810,9 @@ function koerTest() {
         "12 over bunden: " + bord.hvad({ x: g(4).p.x, y: rkT.y + rkT.h - 12 }));
     paastand("og glasset kan stadig tages i den oeverste del", mus.tag("glas4", 0.5, 0.15) && (mus.slip(), true));
 
-    /* Haeldning med haanden, der ikke rammer praecist: tuden holdes 18
-       enheder ved siden af glas 3's midte - i det groenne felt, men uden
-       for aabningen. Saa foeres tuden ind over aabningen, mens flasken
-       vipper, og det hele ryger i glasset: intet paa bordet (F8) */
+    /* Tuden holdes 18 enheder ved siden af glas 3's midte - i det groenne
+       felt, men uden for aabningen. Holdt der haelder den ikke (F36); et
+       slip haelder én portion, og det hele ryger i glasset (F8) */
     [-1, 1].forEach(function (side) {
         NK.startForfra();
         adv(0.2);
@@ -821,12 +825,14 @@ function koerTest() {
         mus.hold(0.6);
         var maalK = bord.slipMaal;
         mus.hold(1.4);
-        var ind = B.volumen(g3) - V0, uh = bord.antalUheld - u0, py = bord.pytter.length;
-        paastand("KSCN-flasken med tuden 18 til " + (side < 0 ? "venstre" : "hoejre") + " for glas 3 haelder i glasset og ikke paa bordet",
-            maalK === "glas3" && ind > 2 && uh === 0 && py === 0,
-            "maal " + maalK + ", " + tal(ind, 1) + " mL i glasset, " + uh + " uheld, " + py + " pytter");
+        var holdt = B.volumen(g3) - V0;
         mus.slip();
         mus.hold(1);
+        faerdig();
+        var ind = B.volumen(g3) - V0, uh = bord.antalUheld - u0, py = bord.pytter.length;
+        paastand("KSCN-flasken med tuden 18 til " + (side < 0 ? "venstre" : "hoejre") + " for glas 3 haelder ikke, mens den holdes, og et slip giver én portion i glasset",
+            maalK === "glas3" && holdt < 1e-9 && Math.abs(ind - PORTION) < 0.05 && uh === 0 && py === 0,
+            "maal " + maalK + ", " + tal(ind, 1) + " mL i glasset, " + uh + " uheld, " + py + " pytter");
         var hj = flytHjem("fl_kscn"), fk2 = bord.g.fl_kscn;
         paastand("og flasken kan traekkes hjem igen", hj, "p " + tal(fk2.p.x, 0) + "," + tal(fk2.p.y, 0) + " v " + tal(fk2.p.v) + " hjem " + tal(fk2.hjem.x, 0) + "," + tal(fk2.hjem.y, 0) + " svaev " + !!fk2.svaev + " maal " + bord.slipMaal);
     });
@@ -1009,7 +1015,7 @@ function koerTest() {
     /* Kaffen er et paaskeaeg med flere udgaver, og én af dem (»stirrer«)
        roerer slet ikke koppen (griber: false i KAFFE i kemichael.js).
        Derfor proeves der flere gange: det, der skal holde, er at han
-       kommer foran bordet hver gang, og at koppen KAN komme i haanden. */
+       bliver bag bordet hver gang (F30), og at koppen KAN komme i haanden. */
     var kaffeForan = false, tagetOp = false, forsoegt = 0;
     while (forsoegt < 8 && !tagetOp) {
         forsoegt++;
@@ -1021,7 +1027,7 @@ function koerTest() {
         }
         if (!tagetOp) { NK.startForfra(); adv(1); }
     }
-    paastand("kaffen hentes foran bordet, som foer", kaffeForan);
+    paastand("kaffen hentes bag bordet, ikke foran (F30)", !kaffeForan);
     paastand("og koppen kan komme i hans haand", tagetOp, forsoegt + " kopper");
     adv(20);
     NK.startForfra();
@@ -1302,18 +1308,19 @@ function koerTest() {
     paastand("flasken med frugtfarve kan tages med musen", mus2.tag("fl_farve"));
     mus2.til({ x: baeg(1).p.x, y: rb1.y - 6 }, 0.7);
     mus2.hold(3.0);
+    paastand("holdt over baegerglasset haelder den ikke (F36)", B.volumen(baeg(1)) < 1e-9);
     mus2.slip();
     mus2.hold(1.2);
     faerdig();
-    paastand("og den haelder i det baegerglas, den holdes over",
-        B.volumen(baeg(1)) > 12 && bord.pytter.length === 0,
+    paastand("og et slip haelder én portion (4 mL) i det",
+        Math.abs(B.volumen(baeg(1)) - 4) < 0.05 && bord.pytter.length === 0,
         tal(B.volumen(baeg(1)), 0) + " mL, " + bord.pytter.length + " pytter");
     paastand("den bliver haengende med sin gule ring, saa et klik haelder mere",
         bord.svaevende() === bord.g.fl_farve);
     bord.klik("svaevring");
     faerdig();
-    paastand("og saa er der nok i glasset til, at det kan ses ned i",
-        B.volumen(baeg(1)) >= O.MINDST, tal(B.volumen(baeg(1)), 0) + " mL");
+    paastand("og pilen haelder en portion mere",
+        Math.abs(B.volumen(baeg(1)) - 8) < 0.05, tal(B.volumen(baeg(1)), 0) + " mL");
     mus2.tag("fl_farve");
     mus2.baer({ x: bord.g.fl_farve.hjem.x, y: bord.g.fl_farve.hjem.y }, 0.8);
     mus2.slip();
@@ -1674,19 +1681,25 @@ function koerTest() {
     NK.startForfra();
     adv(1);
 
-    overskrift("24. Reagensglassene en tredjedel mindre (S31)");
-    /* Glassene er tegnet i 2/3, men staar i stativets huller, som de
-       stod. skala er et rent tegnemaal: glasset rummer stadig 30 mL, og
-       et tryk giver 4 mL, fordi opstillingen siger modtager: 4. */
+    overskrift("24. Reagensglassene rummer en tredjedel mindre (S31, F33)");
+    /* Glassene rummer 20 mL i stedet for 30. Rumfanget foelger tegningen,
+       saa de er (2/3)^(1/3) = 87 % saa store, og et tryk - en femtedel af
+       glasset - giver 4 mL af sig selv. De staar i stativets huller, som
+       de stod. */
     NK.startForfra();
     adv(0.5);
     var st24 = bord.g.stativ, fuld = NK.Udstyr.type("reagensglas"), G24 = [1, 2, 3, 4, 5, 6, 7, 8].map(g);
     var top24 = st24.p.y - st24.anker.y;
-    paastand("de otte glas er tegnet en tredjedel mindre",
-        G24.every(function (x) { return Math.abs(x.skala - 2 / 3) < 1e-9 && Math.abs(x.type.h - fuld.h * 2 / 3) < 1e-6; }),
+    var k24 = Math.cbrt(2 / 3);
+    paastand("de otte glas rummer 20 mL, en tredjedel mindre end 30",
+        G24.every(function (x) { return Math.abs(x.type.maks - 20) < 1e-9; }), tal(g(1).type.maks, 2) + " mL");
+    paastand("og er tegnet 87 % saa store, saa rumfanget foelger tegningen",
+        G24.every(function (x) { return Math.abs(x.skala - k24) < 1e-9 && Math.abs(x.type.h - fuld.h * k24) < 1e-6; }),
         tal(g(1).type.h, 1) + " mod " + fuld.h);
-    paastand("og rummer stadig det samme: skala er et tegnemaal", G24.every(function (x) { return x.type.maks === fuld.maks; }),
-        g(1).type.maks + " mL");
+    paastand("en portion er en femtedel af glasset, uden modtager", Math.abs(bord.portion(bord.g.kolbe, g(1)) - 4) < 1e-9 && !g(1).spec.modtager);
+    var vmaal = NK.Udstyr.maal(fuld);
+    paastand("tegningens rumfang passer: 30 mL gange k³ er 20 mL", Math.abs(vmaal.V_mL * k24 * k24 * k24 - g(1).type.maks) < 0.02 * 20,
+        tal(vmaal.V_mL * k24 * k24 * k24, 1) + " mL");
     paastand("stativet er uaendret, og glassene staar i de samme huller med samme afstand",
         (st24.skala || 1) === 1 && G24.every(function (x, i) {
             return x.sted && x.sted.stativ === st24 && x.sted.hul === i && Math.abs(x.p.x - bord.hulX(st24, i)) < 0.01;
@@ -1710,9 +1723,11 @@ function koerTest() {
     B.haeldI(g(5), B.udtag(bord.g.kolbe, PORTION), true);
     bord.iBad(g(5), vb24, undefined, true);
     function flade(x) { return NK.vaeskeNiveau(x.type.indre, B.volumen(x) * x.type.mlPrAreal) + x.p.y - x.anker.y; }
-    paastand("i vandbadet staar glassets indhold under vandets overflade",
-        g(5).paa === vb24 && flade(g(5)) > flade(vb24),
-        "glassets overflade " + tal(flade(g(5)), 1) + ", vandets " + tal(flade(vb24), 1));
+    var yb5 = indreBund(g(5)), ys5 = flade(g(5)), yv5 = flade(vb24);
+    var nede5 = (yb5 - Math.max(ys5, yv5)) / (yb5 - ys5);
+    paastand("i vandbadet staar mindst halvdelen af glassets indhold under vandet",
+        g(5).paa === vb24 && nede5 >= 0.5,
+        tal(nede5 * 100, 0) + " % nede, glassets overflade " + tal(ys5, 1) + ", vandets " + tal(yv5, 1));
     paastand("og aabningen er oppe ved badets kant, saa glasset kan tages med musen",
         B.aabning(g(5)).y < vb24.p.y - vb24.anker.y + 20 && mus.tag("glas5") && (mus.slip(), mus.hold(0.8), g(5).paa === vb24),
         "aabningen " + tal(B.aabning(g(5)).y, 1) + ", badets kant " + tal(vb24.p.y - vb24.anker.y + 6, 1));
@@ -1767,6 +1782,69 @@ function koerTest() {
     paastand("kolben kan traekkes vaek og staar paa bordet igen, uden uheld",
         !kb24.svaev && !bord.holdt && Math.abs(kb24.p.x - kb24.hjem.x) < 6 && bord.antalUheld === u24,
         "x " + tal(kb24.p.x, 1) + " mod hjem " + tal(kb24.hjem.x, 1));
+
+    overskrift("25. Intet bliver haengende i luften (F28, F35)");
+    /* Kolben hurtigt sluppet over et glas bliver haengende over det. Det
+       maa aldrig spaerre for det naeste: tager man fat i noget andet, eller
+       skifter man del, stilles den ned paa et ledigt sted paa bordet. */
+    function kolbeOver(n) {
+        var rk = bord.rekt(g(n), 0);
+        mus.tag("kolbe");
+        mus.til({ x: g(n).p.x, y: rk.y + 20 }, 0.7);
+        mus.slip();
+        mus.hold(2);
+        return bord.g.kolbe;
+    }
+    function ovenI(gg) {
+        var r = bord.rekt(gg, 0);
+        return bord.liste.filter(function (o) {
+            if (o === gg || !bord.synlig(o) || o === bord.holdt) return false;
+            if (bord.holdt && o === bord.g[bord.holdt.navn]) return false;
+            var q = bord.rekt(o, 0);
+            return !(r.x + r.b <= q.x || q.x + q.b <= r.x || r.y + r.h <= q.y || q.y + q.h <= r.y);
+        }).map(function (o) { return o.navn; });
+    }
+    function paaBordet(gg) { var f = bord.fod(gg).y; return f >= NK.Scene.BORD - 0.5 && f <= NK.Scene.FORKANT + 0.5; }
+    NK.startForfra();
+    adv(0.5);
+    var kb25 = kolbeOver(1);
+    paastand("kolben haenger over glas 1 efter et slip", !!kb25.svaev, kb25.svaev && kb25.svaev.maal.navn);
+    var tog25 = mus.tag("spatel");
+    mus.til({ x: bord.g.spatel.p.x + 40, y: bord.g.spatel.p.y - 80 }, 0.4);
+    mus.hold(0.8);
+    paastand("at tage fat i spatlen virker og stiller kolben ned (F35)",
+        tog25 && !kb25.svaev && !!bord.holdt && bord.holdt.navn === "spatel");
+    paastand("kolben staar paa bordet og ikke oven i andet udstyr",
+        paaBordet(kb25) && ovenI(kb25).length === 0, "fod " + tal(bord.fod(kb25).y, 0) + (ovenI(kb25).length ? ", oven i " + ovenI(kb25).join(", ") : ""));
+    mus.slip();
+    mus.hold(1);
+
+    NK.startForfra();
+    adv(0.5);
+    kb25 = kolbeOver(2);
+    paastand("kolben haenger over glas 2", !!kb25.svaev);
+    d.getElementById("del2knap").click();
+    adv(0.5);
+    paastand("der kan skiftes til del 2, mens den haenger (F28)", NK.DELE.nu() === 2, NK.DELE.nu());
+    paastand("og saa staar kolben paa bordet i del 2 og ikke i luften",
+        !kb25.svaev && paaBordet(kb25) && ovenI(kb25).length === 0, "fod " + tal(bord.fod(kb25).y, 0));
+    paastand("og den kan tages igen", mus.tag("kolbe") && (mus.slip(), mus.hold(1), true));
+
+    /* F36: en fuld kolbe baaret langsomt hen over alle otte glas haelder
+       ikke - der haeldes kun, naar eleven slipper */
+    NK.startForfra();
+    adv(0.5);
+    var rkF = bord.rekt(g(1), 0), kbF = bord.g.kolbe, VkF = B.volumen(kbF);
+    mus.tag("kolbe");
+    mus.til({ x: g(1).p.x, y: rkF.y + 15 }, 0.8);
+    mus.til({ x: g(8).p.x, y: rkF.y + 15 }, 6);
+    mus.hold(1.5);
+    var fyldt = [1, 2, 3, 4, 5, 6, 7, 8].filter(function (n) { return B.volumen(g(n)) > 0; });
+    paastand("kolben baaret langsomt hen over de otte glas haelder ikke (F36)",
+        fyldt.length === 0 && Math.abs(B.volumen(kbF) - VkF) < 1e-9, fyldt.length ? "haeldt i " + fyldt.join(", ") : "intet haeldt");
+    mus.baer(kbF.hjem, 0.8);
+    mus.slip();
+    mus.hold(1);
 
     NK.startForfra();
     adv(1);

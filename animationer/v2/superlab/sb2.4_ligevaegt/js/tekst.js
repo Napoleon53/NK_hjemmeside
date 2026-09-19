@@ -42,6 +42,7 @@
 
         /* ----- De to dele ----------------------------------------------- */
         "forfra-del2": "Begge dele er ryddet. Vi begynder forfra i del 1.",
+        "del1-gjort": "Del 1 er gjort. Gå videre til del 2 med pilen øverst til højre, når du er klar.",
         "del1knap": "Del 1: Glassene",
         "del2knap": "Del 2: Fortynding",
 
@@ -113,7 +114,7 @@
                        hint: "Pulverglasset med KSCN står ved siden af de to andre." },
             "glas4": { kort: "Glas 4: AgNO₃",
                        tekst: "Dryp AgNO₃ i glas 4. Sølv fælder thiocyanat som hvidt AgSCN.",
-                       hint: "Dråbeflasken med AgNO₃ står på hylden. Hold den over glas 4, så vender den og drypper — et par dråber er nok." },
+                       hint: "Dråbeflasken med AgNO₃ står på hylden. Slip den over glas 4, så drypper den én dråbe, og pilen giver en dråbe mere — et par dråber er nok." },
             "varme": { kort: "Glas 5: varme",
                        tekst: "Sæt glas 5 i vandbadet, og tænd varmepladen. Mål temperaturen med termometeret.",
                        hint: "Slip glas 5 over vandbadet, og klik på varmepladens kontakt." },

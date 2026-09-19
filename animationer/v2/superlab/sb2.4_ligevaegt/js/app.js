@@ -43,14 +43,11 @@
             return false;
         },
 
-        /* To ting hoerer til her. Bordet bygges op fra opstillingen igen
-           ved Start forfra, og saa staar begge deles udstyr fremme.
-           Og det skift til del 2, forloebet beder om, naar der er ryddet
-           op, venter, til haanden er tom - ellers ville det, der er i
-           gang, forsvinde under sig selv. */
+        /* Bordet bygges op fra opstillingen igen ved Start forfra, og saa
+           staar begge deles udstyr fremme. Der skiftes aldrig del af sig
+           selv (F28): eleven skifter med fanerne eller pilen. */
         vedAendring: function (grund) {
             if (grund === "nulstil") {
-                this.venterPaaDel2 = false;
                 var foer = NK.DELE.nulstil(this.bord());
                 if (this.visDel) this.visDel();
                 /* Kom man fra del 2, er begge dele ryddet, og man staar i
@@ -58,10 +55,6 @@
                    noget gik galt. */
                 if (foer === 2) this.bord().besked(NK.TEKST["forfra-del2"]);
                 return;
-            }
-            if (this.venterPaaDel2 && NK.DELE.kanSkifte(this.bord())) {
-                this.venterPaaDel2 = false;
-                if (this.skiftDel) this.skiftDel(2, true);
             }
         },
 
@@ -87,6 +80,9 @@
                 });
                 NK.el("billedknap").hidden = n !== 1;
                 NK.el("ovenfraknap").hidden = n !== 2;
+                /* Pilen til del 2 dukker op, naar del 1 er gjort (F28) */
+                var pil = NK.el("del2pil");
+                if (pil) pil.hidden = !(n === 1 && s.forloeb.flag("del1_gjort"));
                 s.opdaterForloeb();
             };
             /* Panelet viser det trin, eleven kan gaa i gang med HER. Listen
@@ -95,6 +91,7 @@
             [1, 2].forEach(function (i) {
                 NK.el("del" + i + "knap").addEventListener("click", function () { s.skiftDel(i); });
             });
+            if (NK.el("del2pil")) NK.el("del2pil").addEventListener("click", function () { s.skiftDel(2); });
             NK.DELE.anvend(s.bord());
             s.visDel();
 
@@ -139,12 +136,14 @@
             NK.billede = NK.BILLEDE;
             NK.ovenfra = NK.OVENFRA;
 
-            /* Del 1 er forbi, naar der er ryddet op. Saa kommer de fire
-               baegerglas frem af sig selv - eleven skal ikke gaette, at der
-               er en knap. Skiftet venter, til haanden er tom (vedAendring).
+            /* Del 1 er forbi, naar der er ryddet op. Saa dukker pilen til
+               del 2 op, og der kommer en besked - men bordet skifter ikke
+               af sig selv (F28): man skal aldrig flyttes midt i noget.
                Tilbage til del 1 kan man altid. */
             s.forloeb.vedFlag = function (navn, sat) {
-                if (navn === "del1_gjort" && sat && NK.DELE.nu() === 1) s.venterPaaDel2 = true;
+                if (navn !== "del1_gjort") return;
+                s.visDel();
+                if (sat && NK.DELE.nu() === 1) s.bord().besked(NK.TEKST["del1-gjort"]);
             };
         }
     });
