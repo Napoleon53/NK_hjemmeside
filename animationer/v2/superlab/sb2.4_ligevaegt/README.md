@@ -296,7 +296,24 @@ gang (`genopfyld: true` på kolben i `js/opstilling.js`, S16). Motoren bag
 det står i `../../laboratoriet/README.md` under »Kemichael bag bordet«.
 
 Taleboblen tegnes som allersidste lag, også over zoomboblen, og holder sig
-fri af både det glas, replikken handler om, og zoomboblens hjørne.
+fri af både det glas, replikken handler om, og zoomboblens hjørne. Et klik
+på boblen springer videre til hans næste linje (S14); et træk, der
+begynder på boblen, tager det, der står under den.
+
+**Det, han siger, står også i panelet** (S13): kortet »Sagt i
+laboratoriet« viser den seneste linje med hans navn og alle under »Alle«.
+Forløbets replikker kommer altid med, og sb2.4 har også valgt hans uheld
+og advarsler (`historik` i `js/app.js`); kaffen og kigget ind kommer
+aldrig med. Start forfra rydder kortet.
+
+**Bemærkningerne kan komme igen** (S3): stamopløsning i 4a, to indgreb i
+samme glas, frugtfarve i ligevægtsblandingen, et skævt par og et forkert
+noteret glas har `igen` (30 s, billedet 20 s) i `js/forloeb.js`. De
+kommer igen, når eleven laver fejlen på ny, men ikke før karantænen, og
+aldrig bare fordi glasset står der. Referencen siger han kun én gang.
+Sætter eleven termometeret i det varme glas 5, læser han tallet op, som
+det står, når han siger det (»Termometeret siger 71 °C.«,
+`{{termometer.T}}` i `js/tekst.js`).
 
 Al tale står i `js/tekst.js` som korte linjer i hans tone: sarkasmen rammer
 handlingen, aldrig eleven, og han forklarer ikke teori. Er der ingen lærer

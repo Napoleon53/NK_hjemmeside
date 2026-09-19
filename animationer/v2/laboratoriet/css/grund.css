@@ -457,6 +457,16 @@ details.fold[open] > summary { margin-bottom: 4px; }
 details.fold > summary:hover { color: var(--tekst); }
 details.fold > summary:focus-visible { outline: 2px solid var(--gul); outline-offset: 2px; border-radius: 4px; }
 
+/* ----- Det, der er sagt (S13) ------------------------------------------ */
+.kort[hidden] { display: none; }
+.replik-sidst { margin: 0; font-size: 0.9rem; line-height: 1.5; color: var(--tekst); }
+.replik-sidst b, .replik-liste b { color: var(--gul); font-weight: 700; }
+.replik-liste {
+    margin: 0; padding: 0 0 0 1.4em; max-height: 220px; overflow-y: auto;
+    font-size: 0.84rem; line-height: 1.45; color: var(--tekst-svag);
+}
+.replik-liste li { margin: 0 0 4px; }
+
 /* ----- Quiz ---------------------------------------------------------- */
 .valg { display: grid; gap: 6px; margin: 10px 0; }
 .valg[hidden] { display: none; }

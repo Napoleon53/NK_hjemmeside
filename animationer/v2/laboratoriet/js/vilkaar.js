@@ -217,7 +217,39 @@
         return ud;
     }
 
+    /* ----- Tal i replikker (S3) ---------------------------------------
+       En replik kan laese verdens tal i det oejeblik, den siges, saa en
+       vittighed aldrig bliver faktuelt forkert, fordi eleven gik en anden
+       vej: {{glas5.T}} bliver til »80 °C«. Formerne:
+         {{navn.T}}      temperaturen i hele grader            »80 °C«
+                         (et termometer: det, det viser)
+         {{navn.V}}      rumfanget                             »4,0 mL«
+         {{navn.pH}}     pH med én decimal                     »5,1«
+         {{navn.STOF}}   et stof: mM for oploest, mmol for fast »1,06 mM«
+       navn er genstandens navn paa bordet. Kan tallet ikke findes (ingen
+       genstand, tomt glas), staar pladsholderen tilbage som den er, saa
+       fejlen kan ses og ikke gaettes. */
+    function komma(x, dec) { return x.toFixed(dec).replace(".", ","); }
+
+    function udfyld(tekst, bord) {
+        if (typeof tekst !== "string" || tekst.indexOf("{{") < 0 || !bord || !bord.g) return tekst;
+        return tekst.replace(/\{\{\s*([A-Za-z0-9_]+)\.([^}\s]+)\s*\}\}/g, function (hele, navn, hvad) {
+            var gg = bord.g[navn];
+            if (gg && gg.kan && gg.kan.maaler && hvad === "T" && typeof gg.T === "number") return Math.round(gg.T) + " °C";
+            if (!gg || !gg.indhold) return hele;
+            var o = B.samlet(gg);
+            if (hvad === "T") return Math.round(o.T) + " °C";
+            if (hvad === "V") return komma(B.volumen(gg), 1) + " mL";
+            if (hvad === "pH") { var ph = St.pH(o); return ph === null ? hele : komma(ph, 1); }
+            var s = St.STOFFER[hvad];
+            if (!s) return hele;
+            var m = maengde(gg, hvad);
+            return s.fase === "s" ? komma(m, 2) + " mmol" : komma(m, m < 1 ? 2 : 1) + " mM";
+        });
+    }
+
     NK.Vilkaar = {
+        udfyld: udfyld,
         opfyldt: opfyldt,
         lysstyrke: lysstyrke,
         lyshed: lyshed,

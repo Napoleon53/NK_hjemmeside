@@ -47,7 +47,13 @@
    * Et trin, der én gang er gjort, bliver ved med at vaere gjort, ogsaa
      hvis eleven haelder glasset ud bagefter. Ellers ville forloebet
      springe tilbage, og det foeles som en fejl.
-   * En udloeser fyrer én gang. Den huskes paa sit id.
+   * En udloeser fyrer én gang. Den huskes paa sit id. Med igen: sekunder
+     (S3) kan den fyre igen: naar dens vilkaar har vaeret falsk og bliver
+     sandt igen, tidligst igen sekunder efter sidst (karantaene, maalt i
+     bordets tid). Bliver det sandt igen inden for karantaenen, sluges det.
+     Den nager altsaa ikke, mens tilstanden bare staar der.
+   * En replik kan laese verdens tal, naar den siges: {{glas5.T}} (se
+     NK.Vilkaar.udfyld).
    * Flag er verdenstilstanden. De er med vilje det eneste, der gemmes:
      et gemt spil gemmer historien, ikke bordene.
    ===================================================================== */
@@ -64,6 +70,8 @@
         this.udloesere = (this.valg.udloesere || []).slice();
         this.gjort = {};
         this.fyret = {};
+        this.fyretTid = {};     /* bordets tid, sidst en udloeser fyrede */
+        this.hviler = {};       /* igen-udloesere, der ikke har vaeret falske siden */
         this.flagene = {};
         this.faerdig = false;
         this.vedTrin = this.valg.vedTrin || null;
@@ -170,11 +178,22 @@
             if (mig.vedTrin) mig.vedTrin(t, mig);
         });
 
-        /* Udloesere: fyrer én gang */
+        /* Udloesere: fyrer én gang - eller igen efter karantaenen (igen) */
+        var nu = bord.tid || 0;
         this.udloesere.forEach(function (u) {
-            if (mig.fyret[u.id]) return;
-            if (!V.opfyldt(u.naar, bord, mig)) return;
+            var sand = V.opfyldt(u.naar, bord, mig);
+            if (mig.fyret[u.id]) {
+                if (!u.igen) return;
+                if (!sand) { mig.hviler[u.id] = false; return; }
+                if (mig.hviler[u.id] !== false) return;
+                /* Sker det igen inden for karantaenen, sluges det: en
+                   bemaerkning, der kommer et halvt minut efter handlingen,
+                   ville virke tilfaeldig */
+                if (nu - (mig.fyretTid[u.id] || 0) < u.igen) { mig.hviler[u.id] = true; return; }
+            } else if (!sand) return;
             mig.fyret[u.id] = true;
+            mig.fyretTid[u.id] = nu;
+            mig.hviler[u.id] = true;
             mig.udfoer(u.saa, u);
         });
 
@@ -204,6 +223,8 @@
         if (!t || t.udgave !== 1) return false;
         this.gjort = t.gjort || {};
         this.fyret = t.fyret || {};
+        this.fyretTid = {};
+        this.hviler = {};
         this.flagene = t.flag || {};
         if (NK.Journal) NK.Journal.saetTilstand(t.journal);
         this.faerdig = !!(this.trin.length && this.alleGjort());
@@ -225,6 +246,8 @@
     P.nulstil = function () {
         this.gjort = {};
         this.fyret = {};
+        this.fyretTid = {};
+        this.hviler = {};
         this.flagene = {};
         this.faerdig = false;
         if (NK.Journal) NK.Journal.nulstilAlle();

@@ -537,16 +537,21 @@
     P.ned = function (pt) {
         if (NK.Lyd) NK.Lyd.laasOp();
         var navn = this.hvad(pt);
+        /* S14: taleboblen er oeverste lag. Et klik paa den springer videre;
+           men et traek, der begynder paa den, tager det, der staar under
+           den, saa en boble aldrig spaerrer for et glas. */
+        var paaTaleboble = !!(this.overLaererBoble && this.overLaererBoble(pt));
+        if (!navn && paaTaleboble) { this.klik("taleboble"); return false; }
         if (!navn) { if (this.klar) { this.klar = null; this.genvejMaal = null; } return false; }
-        if (navn === "boble" || navn === "svaevring") { this.klik(navn); return false; }
+        if (navn === "boble" || navn === "svaevring") { this.klik(paaTaleboble ? "taleboble" : navn); return false; }
         var laererOpt = this.laererOptaget && this.laererOptaget();
         if (!laererOpt && !this.koer.optaget() && !this.baerer && this.grebbar(navn)) {
             var gg = this.g[navn];
             this.koer.slipFri(gg);
-            this.holdt = { navn: navn, start: pt, dx: pt.x - gg.p.x, dy: pt.y - gg.p.y, flyttet: false, sidst: pt, t: Date.now() };
+            this.holdt = { navn: navn, start: pt, dx: pt.x - gg.p.x, dy: pt.y - gg.p.y, flyttet: false, sidst: pt, t: Date.now(), taleboble: paaTaleboble };
             return true;
         }
-        this.klik(navn);
+        this.klik(paaTaleboble ? "taleboble" : navn);
         return false;
     };
 
@@ -740,7 +745,7 @@
         var h = this.holdt;
         if (!h) return;
         this.holdt = null;
-        if (!h.flyttet) { this.klik(h.navn); return; }
+        if (!h.flyttet) { this.klik(h.taleboble ? "taleboble" : h.navn); return; }
         this.stopBaer(h.sidst);
     };
 
@@ -757,7 +762,8 @@
             mig.flyt(mig.tilBord(ev), ev.timeStamp || Date.now());
             var hv = mig.hover;
             var greb = hv && mig.grebbar(hv);
-            c.style.cursor = mig.holdt ? "grabbing" : (greb ? "grab" : (hv ? "pointer" : "default"));
+            var tb = !greb && !mig.holdt && mig.overLaererBoble && mig.overLaererBoble(mig.tilBord(ev));
+            c.style.cursor = mig.holdt ? "grabbing" : (greb ? "grab" : (hv || tb ? "pointer" : "default"));
         });
         c.addEventListener("pointerup", function () { mig.op(); });
         c.addEventListener("pointercancel", function () { mig.op(); });
@@ -1713,6 +1719,7 @@
        over et glas (klik igen giver en draabe mere). */
     P.klik = function (navn) {
         if (NK.Lyd) NK.Lyd.laasOp();
+        if (navn === "taleboble") return this.springReplik ? this.springReplik() : false;
         if (navn === "boble") return this.storBoble ? this.lukStorBoble() : this.aabnStorBoble();
         if (navn === "laerer") return this.klikLaerer ? this.klikLaerer() : false;
         if (navn === "kaffekop") return this.klikKop ? this.klikKop() : false;

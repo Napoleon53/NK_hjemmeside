@@ -39,6 +39,11 @@
                       valg.tilskuere); linjen vises kun, naar det valgte
                       glas har nogen. Navnene er knapper, der loefter en
                       ion op (F27)
+     #replik-kort #replik-antal #replik-sidst #replik-fold #replik-liste
+                      det, der er sagt i taleboblen, et varigt sted
+                      (S13): forloebets replikker altid, Kemichaels egne
+                      scener (uheld, advarsler) hvis valg.historik naevner
+                      dem, smaasnak aldrig
      #rystknap        »Ryst glasset«: holdes nede (eller tasten R) og
                       ryster det valgte glas uden at spilde (S16); vises
                       kun, naar det valgte glas kan rystes
@@ -248,7 +253,68 @@
     P.sig = function (tekst, valg, kilde) {
         var b = this.bord();
         if (b && b.laererReplik && b.laererReplik(tekst, valg || {}, kilde)) return;
-        this.besked(Array.isArray(tekst) ? tekst.join(" ") : tekst, (valg && valg.slags) || "info");
+        var linje = Array.isArray(tekst) ? tekst.join(" ") : tekst;
+        if (NK.Vilkaar && NK.Vilkaar.udfyld) linje = NK.Vilkaar.udfyld(linje, b);
+        this.noterReplik(linje, "");
+        this.besked(linje, (valg && valg.slags) || "info");
+    };
+
+    /* ----- Replikkerne: et varigt sted (S13) --------------------------------
+       Det, der siges i taleboblen, forsvinder igen, og intet, der betyder
+       noget, maa kun findes dér. Har siden kortet #replik-kort, lander det,
+       der bliver sagt, ogsaa i en liste, eleven kan laese igen: den seneste
+       linje staar fremme, alle under »Alle«. Forloebets replikker kommer
+       altid med; Kemichaels egne scener (uheld, advarsler) kun dem, forsoeget
+       naevner i valg.historik; smaasnakken aldrig. Linjen noteres, naar den
+       SIGES (kemichael.js kalder NK.vedReplik), saa listen staar i den
+       raekkefoelge, eleven hoerte den. Start forfra rydder den. */
+    P.bygReplikker = function () {
+        var mig = this;
+        if (!NK.el("replik-kort")) return;
+        this.replikker = [];
+        var med = ["replik"].concat(this.valg.historik || []);
+        NK.vedReplik = function (tekst, om) {
+            if (med.indexOf(om && om.scene) < 0) return;
+            mig.noterReplik(tekst, om.hvem);
+        };
+        this.visReplikker();
+    };
+
+    P.noterReplik = function (tekst, hvem) {
+        if (!this.replikker || !tekst) return;
+        this.replikker.push({ tekst: tekst, hvem: hvem || "" });
+        if (this.replikker.length > 80) this.replikker.shift();
+        this.visReplikker();
+    };
+
+    P.visReplikker = function () {
+        var kort = NK.el("replik-kort");
+        if (!kort || !this.replikker) return;
+        var r = this.replikker;
+        kort.hidden = !r.length;
+        if (NK.el("replik-antal")) NK.saetTekst("replik-antal", r.length ? String(r.length) : "");
+        function linje(el, x) {
+            el.textContent = "";
+            if (x.hvem) {
+                var b = document.createElement("b");
+                b.textContent = x.hvem + ": ";
+                el.appendChild(b);
+            }
+            el.appendChild(document.createTextNode(x.tekst));
+        }
+        var sidst = NK.el("replik-sidst");
+        if (sidst) { if (r.length) linje(sidst, r[r.length - 1]); else sidst.textContent = ""; }
+        var fold = NK.el("replik-fold"), liste = NK.el("replik-liste");
+        if (fold) fold.hidden = r.length < 2;
+        if (liste) {
+            liste.textContent = "";
+            r.forEach(function (x) {
+                var li = document.createElement("li");
+                linje(li, x);
+                liste.appendChild(li);
+            });
+            liste.scrollTop = liste.scrollHeight;
+        }
     };
 
     /* ----- Overlays, intro og lyd ------------------------------------------ */
@@ -306,6 +372,7 @@
         if (this.forloeb) this.forloeb.nulstil();
         if (this.quiz) this.quiz.nulstil();
         if (this.serie) this.serie.nulstil();
+        if (this.replikker) { this.replikker = []; this.visReplikker(); }
         if (this.visRum) this.visRum();
         this.opdaterForloeb();
         this.opdaterPanel();
@@ -737,6 +804,7 @@
             this.etBord.bindMus();
         }
         this.bygFyldOp();
+        this.bygReplikker();
 
         var v = this.verden();
         v.vedAendring = function (grund) {

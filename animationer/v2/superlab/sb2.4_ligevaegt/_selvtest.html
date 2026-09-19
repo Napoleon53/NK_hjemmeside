@@ -2137,6 +2137,110 @@ function koerTest() {
 
     NK.startForfra();
     adv(1);
+
+    overskrift("29. Det, der er sagt, et varigt sted (S13)");
+    NK.startForfra();
+    adv(1);
+    var rkort = d.getElementById("replik-kort"), rsidst = d.getElementById("replik-sidst");
+    paastand("kortet »Sagt i laboratoriet« er skjult, foer der er sagt noget", !!rkort && rkort.hidden && side.replikker.length === 0);
+    [1, 8].forEach(function (n) { B.haeldI(g(n), B.udtag(bord.g.kolbe, PORTION), true); });
+    for (var r29 = 0; r29 < 60 && !side.replikker.length; r29++) adv(0.5);
+    var sig4a = NK.TEKST["sig-4a"];
+    paastand("stamopløsning i 4a: Kemichaels replik står i kortet med hans navn",
+        !rkort.hidden && rsidst.textContent.indexOf("Kemichael: ") === 0 && side.replikker[0].tekst === sig4a[0],
+        rsidst.textContent);
+    for (r29 = 0; r29 < 60 && side.replikker.length < sig4a.length; r29++) adv(0.5);
+    paastand("alle hans linjer kommer med, i den rækkefølge han sagde dem",
+        side.replikker.length >= sig4a.length && sig4a.every(function (t, i) { return side.replikker[i].tekst === t; }),
+        side.replikker.map(function (x) { return x.tekst; }).join(" | "));
+    var n29 = side.replikker.length;
+    NK.vedReplik("Det er min kaffe.", { hvem: "Kemichael", scene: "kaffe" });
+    paastand("småsnakken kommer ikke med", side.replikker.length === n29);
+    var altid29 = bord.laererAltid;
+    bord.laererAltid = true;
+    bord.spild(g(1), "rystet");
+    for (r29 = 0; r29 < 80 && side.replikker.length === n29; r29++) adv(0.5);
+    paastand("et uheld kommer med, fordi sb2.4 har valgt det (historik)", side.replikker.length > n29,
+        side.replikker.slice(n29).map(function (x) { return x.tekst; }).join(" | "));
+    bord.laererAltid = altid29;
+    var rfold = d.getElementById("replik-fold"), rliste = d.getElementById("replik-liste");
+    paastand("under »Alle« står alle linjerne", !rfold.hidden && rliste.children.length === side.replikker.length,
+        rliste.children.length + " af " + side.replikker.length);
+    NK.startForfra();
+    adv(0.5);
+    paastand("Start forfra rydder kortet", rkort.hidden && side.replikker.length === 0);
+
+    NK.startForfra();
+    adv(1);
+
+    overskrift("30. Klik på taleboblen for at springe videre (S14)");
+    NK.startForfra();
+    adv(1);
+    var L30 = bord.laerer, s4a = NK.TEKST["sig-4a"];
+    [1, 8].forEach(function (n) { B.haeldI(g(n), B.udtag(bord.g.kolbe, PORTION), true); });
+    for (var r30 = 0; r30 < 80 && !(L30.tale === s4a[0] && L30.taleAlfa > 0.5); r30++) adv(0.25);
+    paastand("han siger den første linje", L30.tale === s4a[0] && L30.taleUr > 0, L30.tale);
+    var tb = NK.Taleboble.sidst, midt = { x: tb.x + tb.b / 2, y: tb.y + tb.h / 2 };
+    paastand("musen er over boblen", bord.overLaererBoble(midt));
+    var valgt30 = bord.valgt, klik30 = L30.klik;
+    mus.klik(midt);
+    mus.hold(0.1);
+    paastand("et klik på boblen: næste linje kommer straks", L30.tale === s4a[1] && L30.taleUr > 0, L30.tale);
+    paastand("og klikket rammer ikke noget på bordet og tæller ikke som en prik", bord.valgt === valgt30 && L30.klik === klik30);
+    for (r30 = 0; r30 < 20 && !(L30.taleAlfa > 0.5); r30++) adv(0.1);
+    tb = NK.Taleboble.sidst;
+    mus.klik({ x: tb.x + tb.b / 2, y: tb.y + tb.h / 2 });
+    mus.hold(0.1);
+    paastand("et klik på den sidste linje lukker boblen", !(L30.taleUr > 0));
+    paastand("begge linjer står i kortet, én gang hver", side.replikker.filter(function (x) { return s4a.indexOf(x.tekst) >= 0; }).length === 2);
+    for (r30 = 0; r30 < 80 && L30.scene; r30++) adv(0.25);
+    paastand("uden boble rammer musen ikke en gammel boble", !bord.overLaererBoble(midt));
+
+    NK.startForfra();
+    adv(1);
+
+    overskrift("31. Karantæne og tal i replikker (S3)");
+    NK.startForfra();
+    adv(0.5);
+    [1, 5].forEach(function (n) { B.haeldI(g(n), B.udtag(bord.g.kolbe, PORTION), true); });
+    adv(2);
+    g(5).indhold.T = 80;
+    var U = NK.Vilkaar.udfyld;
+    paastand("{{glas5.T}} bliver til glassets temperatur", U("{{glas5.T}}", bord) === "80 °C", U("{{glas5.T}}", bord));
+    paastand("{{glas1.V}} og {{glas1.FeSCN2+}} bliver til rumfang og koncentration",
+        U("{{glas1.V}}", bord) === "4,0 mL" && /^0,\d\d mM$/.test(U("{{glas1.FeSCN2+}}", bord)), U("{{glas1.V}} / {{glas1.FeSCN2+}}", bord));
+    paastand("en pladsholder, der ikke kan udfyldes, står tilbage, så fejlen kan ses",
+        U("{{ukendt.T}} og {{glas1.Xyz}}", bord) === "{{ukendt.T}} og {{glas1.Xyz}}");
+    /* Termometeret i glas 5: han læser tallet op, som det står, når han siger det */
+    bord.maal(bord.g.termometer, g(5));
+    faerdig();
+    var n31 = side.replikker.length;
+    for (var r31 = 0; r31 < 80 && !side.replikker.some(function (x) { return x.tekst.indexOf("Termometeret siger") === 0; }); r31++) { g(5).indhold.T = 80; adv(0.5); }
+    var tl = side.replikker.filter(function (x) { return x.tekst.indexOf("Termometeret siger") === 0; })[0];
+    paastand("termometeret i det varme glas 5: han siger tallet, ikke pladsholderen",
+        !!tl && /^Termometeret siger \d+ °C\.$/.test(tl.tekst) && L30.tale.indexOf("{{") < 0, tl ? tl.tekst : "ingen replik");
+    for (r31 = 0; r31 < 80 && L30.scene; r31++) adv(0.25);
+
+    /* igen: stamoploesning i 4a fyrer igen - men ikke foer karantaenen */
+    var fyr = 0, udf = F.udfoer;
+    F.udfoer = function (saa, kilde) { if (kilde && kilde.id === "stam_i_4a") fyr++; return udf.apply(this, arguments); };
+    function fyld4a() { B.haeldI(g(8), B.udtag(bord.g.kolbe, PORTION), true); adv(0.5); }
+    function toem4a() { B.udtagAlt(g(8)); adv(0.5); }
+    fyld4a();
+    paastand("stamopløsning i 4a fyrer én gang", fyr === 1, fyr + " gange");
+    adv(5);
+    paastand("og ikke igen, mens den bare står der", fyr === 1, fyr + " gange");
+    toem4a(); fyld4a();
+    paastand("tømt og fyldt igen inden for karantænen (30 s): ingen ny bemærkning", fyr === 1, fyr + " gange");
+    adv(30);
+    paastand("efter karantænen fyrer den ikke af sig selv, mens den står der", fyr === 1, fyr + " gange");
+    toem4a(); fyld4a();
+    paastand("men tømt og fyldt igen efter karantænen: bemærkningen kommer igen", fyr === 2, fyr + " gange");
+    F.udfoer = udf;
+    paastand("referencen har ingen igen: den fyrer kun én gang", !NK.FORLOEB.udloesere.filter(function (u) { return u.id === "roert_reference"; })[0].igen);
+
+    NK.startForfra();
+    adv(1);
 }
 
 function vis() {

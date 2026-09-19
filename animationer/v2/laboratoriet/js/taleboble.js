@@ -34,6 +34,10 @@
                                           { side, x, y, b, h, hale }
      NK.Taleboble.sidst                       den seneste placering, til
                                           selvtest og _taleboble.html
+     NK.Taleboble.rammer(pt)                  ligger pt i den seneste boble?
+                                          (S14: et klik paa boblen springer
+                                          videre; figuren spoerger, om
+                                          boblen staar lige nu)
 
    Der er ingen koe og ingen prioritet her endnu. Med én taler ligger det
    i figurens egne scener (kemichael.js, laerer.js); laget faar det, naar
@@ -287,6 +291,11 @@
         return p;
     }
 
+    function rammer(pt) {
+        var r = NK.Taleboble.sidst;
+        return !!(r && pt && pt.x >= r.x && pt.x <= r.x + r.b && pt.y >= r.y && pt.y <= r.y + r.h);
+    }
+
     NK.Taleboble = {
         STIL: STIL,
         SIDER: SIDER,
@@ -294,6 +303,7 @@
         placer: placer,
         forstoerrelse: forstoerrelse,
         tegn: tegn,
+        rammer: rammer,
         sidst: null
     };
 }());

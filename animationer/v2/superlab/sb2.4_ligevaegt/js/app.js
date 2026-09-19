@@ -20,6 +20,11 @@
         tomTekst: NK.TEKST["glas-tom-start"],
         forloeb: NK.FORLOEB,
 
+        /* Kortet »Sagt i laboratoriet« (S13): forloebets replikker kommer
+           altid med; her ogsaa Kemichaels uheld og advarsler. Smaasnakken
+           (kaffen, kigget ind) kommer aldrig. */
+        historik: ["spild", "advarsel", "voldsom", "affald"],
+
         /* Quizzen (../../laboratoriet/js/quiz.js) laases op, naar eleven har
            taget billedet og noteret alle syv glas. Spoergsmaalene staar i
            js/tekst.js under "quiz". */

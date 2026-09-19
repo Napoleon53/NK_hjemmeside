@@ -541,6 +541,23 @@ glas, hvor det står, uden at spilde (knappen `#rystknap` og tasten R i
 `side.js`, hvis siden har knappen); og en kolbe med `genopfyld: true`
 fylder Kemichael igen, når den er hældt i affaldet (S16).
 
+**Tilføjet 19. september om aftenen (S13, S14, S3).** *Det, der er sagt,
+et varigt sted:* har siden kortet `#replik-kort`, noteres hver linje, der
+siges i taleboblen (`NK.vedReplik`, kaldt af `laererSig` i
+`kemichael.js`), i en liste: forløbets replikker altid, de scener,
+forsøget nævner i `historik` (fx `"spild"`, `"advarsel"`), og aldrig
+småsnakken eller svarene på en prik. Uden kort sker der ingenting.
+*Klik på boblen:* `NK.Taleboble.rammer(pt)` og `overLaererBoble`; et klik
+på boblen kalder `springReplik`, som afslutter linjen og det sig-trin,
+scenen står i, så næste linje kommer straks. Et træk, der begynder på
+boblen, tager det, der står under den. *Karantæne:* en udløser med
+`igen: sekunder` fyrer igen, når vilkåret har været falsk og bliver sandt
+igen, tidligst efter karantænen (bordets tid); sker det inden for
+karantænen, sluges det. *Tal i replikker:* `NK.Vilkaar.udfyld(tekst,
+bord)` gør `{{glas5.T}}`, `{{glas1.V}}`, `{{glas1.pH}}` og
+`{{glas1.FeSCN2+}}` til tal, når linjen siges; et termometer giver det,
+det viser. En pladsholder, der ikke kan udfyldes, står tilbage.
+
 **Der hældes kun, når eleven beder om det (F36):** et slip over glasset
 giver én portion, og pilen ved flasken giver mere. At bære en flaske hen
 over et glas eller holde den stille over det hælder ikke — før talte en

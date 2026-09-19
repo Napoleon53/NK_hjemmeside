@@ -109,7 +109,24 @@
             trin("sml", 2, { journal: "fortynding", faerdig: true }, "ovenfraknap")
         ],
 
+        /* igen (S3): en udloeser med igen: sekunder kan fyre igen, naar
+           dens vilkaar har vaeret falsk og bliver sandt igen - tidligst
+           igen sekunder efter sidst. Saa kommer bemaerkningen igen, naar
+           eleven laver den samme fejl med et andet glas, men han nager
+           ikke, mens glasset bare staar der. Referencen fyrer kun én gang:
+           den er roert, til der begyndes forfra. */
         udloesere: [
+            /* Termometeret aflaest i glas 5 (S3): han laeser tallet op, som
+               det staar, naar han siger det ({{termometer.T}}) */
+            {
+                id: "termometer_varm",
+                naar: { proev: function (bord) {
+                    var tm = bord.g.termometer;
+                    return !!tm && tm.i === bord.g.glas5 && tm.T > 55;
+                } },
+                saa: [{ sig: NK.TEKST["sig-termometer"], peg: "glas5", udtryk: "toer", slags: "info" }]
+            },
+
             /* Referencen fik et indgreb. Den skal fyre paa virkningen, ikke
                paa handlingen, saa den ogsaa fanger, at glasset blev varmet
                eller kom i isbadet. Kemichael siger det selv, stiller sig
@@ -134,6 +151,7 @@
                han foreslaar affaldet */
             {
                 id: "stam_i_4a",
+                igen: 30,
                 naar: { nogen: [
                     { beholder: "glas8", stof: "Fe3+", over: 0.1 },
                     { beholder: "glas8", stof: "FeSCN2+", over: 0.05 }
@@ -145,6 +163,7 @@
                virkede. Proeven er sat paa glas 1 til 4, ét ad gangen. */
             {
                 id: "to_indgreb",
+                igen: 30,
                 naar: { nogen: ["glas1", "glas2", "glas3", "glas4"].map(function (g) {
                     return { alle: [
                         { beholder: g, V: { over: 2.5 } },
@@ -160,6 +179,7 @@
                ikke kan lade vaere med at kommentere. */
             {
                 id: "kunst",
+                igen: 30,
                 naar: { nogen: NK.OVENFRA.BAEGERE.map(function (navn) {
                     return { proev: function (bord) {
                         return !!bord.g[navn] && NK.OVENFRA.indholdType(bord.g[navn]) === "blanding";
@@ -174,6 +194,7 @@
                uanset hvordan glassene blev fyldt. */
             {
                 id: "skaevt_op",
+                igen: 30,
                 naar: { nogen: ["farve", "lv"].map(function (type) {
                     return { proev: function (bord) {
                         var n = NK.OVENFRA.parMed(type, bord);
@@ -191,6 +212,7 @@
                kigge igen, og han kan selv trykke om. */
             {
                 id: "kig_igen",
+                igen: 20,
                 naar: { alle: [
                     { journal: "billede", faerdig: true },
                     { journal: "billede", forkerte: { over: 0 } }

@@ -1600,6 +1600,33 @@
             return null;
         };
 
+        /* S14: et klik paa taleboblen (ikke paa ham) springer videre. Linjen
+           er sagt faerdig, det sig-trin, scenen staar i, afsluttes, og en
+           kort pause mellem to linjer springes over, saa naeste linje kommer
+           straks. Boblen er oeverste lag, saa bordets hvad spoerger den
+           foer alt andet. Uden taleboble.js (de gamle animationer) er der
+           ingen boble at ramme. */
+        P.overLaererBoble = function (pt) {
+            var L = this.laerer;
+            if (!L || !L.tale || !(L.taleUr > 0) || !(L.taleAlfa > 0.3) || !NK.Taleboble || !NK.Taleboble.rammer) return false;
+            return NK.Taleboble.rammer(pt);
+        };
+
+        P.springReplik = function () {
+            var L = this.laerer;
+            if (!L || !(L.taleUr > 0)) return false;
+            L.taleUr = 0;
+            var sc = L.scene;
+            if (sc) {
+                var tr = sc.trin[sc.i];
+                if (tr && tr.sig && tr.startet) { sc.i++; sc.t = 0; }
+                var nx = sc.trin[sc.i];
+                if (nx && !nx.startet && Object.keys(nx).every(function (n) { return n === "tid"; })) { sc.i++; sc.t = 0; }
+            }
+            this.aendret("laerer");
+            return true;
+        };
+
         /* Fire prikker giver fire svar, det femte sender ham ud. Prikker
            midt i en replik gaar han ikke op i: han taler faerdig. */
         P.klikLaerer = function () {
@@ -1613,7 +1640,7 @@
             if (L.klik <= (dagen.taalmod || 4)) {
                 var navn = L.klik === 1 ? glimt("navn") : null;
                 var svar = navn || replik("prik" + Math.min(L.klik, 4));
-                this.laererSig(svar, taleTid(svar));
+                this.laererSig(svar, taleTid(svar), true);
                 L.roedMaal = Math.min(1, 0.22 * L.klik);
                 return true;
             }
@@ -1634,8 +1661,14 @@
 
         /* Taleboblen staar 10 % laengere end den tid, scenen beder om, og
            aldrig kortere end det tager at laese linjen. */
-        P.laererSig = function (tekst, vis) {
+        P.laererSig = function (tekst, vis, udenHistorik) {
             var L = this.laerer;
+            /* S3: tallene i en replik laeses, naar den siges */
+            if (NK.Vilkaar && NK.Vilkaar.udfyld) tekst = NK.Vilkaar.udfyld(tekst, this);
+            /* S13: det, han siger, kan ogsaa lande et varigt sted. Siden
+               bestemmer selv, hvilke scener der kommer med (side.js).
+               Svarene paa en prik er aldrig med. */
+            if (NK.vedReplik && !udenHistorik) NK.vedReplik(tekst, { hvem: "Kemichael", scene: L.scene ? L.scene.navn : "" });
             L.tale = tekst;
             L.taleUr = Math.max((vis || 2), taleTid(tekst)) * TALE_EKSTRA;
             L.taleLaengde = Math.min(2.2, 0.12 + tekst.length * 0.045);

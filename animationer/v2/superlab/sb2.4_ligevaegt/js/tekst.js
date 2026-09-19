@@ -172,6 +172,7 @@
         "sig-to-indgreb": ["To indgreb i det samme glas.", "Så ved man ikke, hvad der virkede."],
         "sig-kig-igen": ["Et af glassene er noteret anderledes, end det ser ud.", "Kig en gang til. Jeg har tid."],
         "sig-kunst": ["Frugtfarve og ligevægt i samme glas.", "Kunstnerisk. Men ikke et forsøg."],
+        "sig-termometer": ["Termometeret siger {{termometer.T}}.", "Så er glas 5 varmt nok. Se på farven."],
         "sig-skaevt-op": ["De to glas i parret har ikke lige meget stof i sig.", "Så er det ikke fortyndingen, du måler."],
 
         /* ----- Quizzen ---------------------------------------------------
