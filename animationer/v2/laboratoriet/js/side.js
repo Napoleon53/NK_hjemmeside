@@ -134,9 +134,10 @@
            mere end tre slags ioner, staar tilskuerionerne for sig nederst
            og kun, naar fluebenet er sat; med én til tre hoerer de med. */
         var ind = this.indhold(b, o), tilskuere = ind.tilskuere;
+        var ogsaaLoeftede = b.tilskuereI ? b.tilskuereI(o, true) : tilskuere;
         if (linje) {
-            linje.hidden = !tilskuere.length;
-            if (NK.el("tilskuere-navne")) NK.saetTekst("tilskuere-navne", "(" + tilskuere.map(function (n) { return St.formel(n); }).join(", ") + ")");
+            linje.hidden = !ogsaaLoeftede.length;
+            if (NK.el("tilskuere-navne")) this.tilskuerNavne(ogsaaLoeftede, b.loeftede || []);
             if (NK.el("tilskuere-vis")) NK.el("tilskuere-vis").checked = !!b.visTilskuere;
         }
         var raekker = ind.raekker, ekstra = ind.ekstra;
@@ -302,6 +303,32 @@
         if (this.visRum) this.visRum();
         this.opdaterForloeb();
         this.opdaterPanel();
+    };
+
+    /* Tilskuerionerne i linjen under tabellen er knapper: et klik loefter
+       en ion op i tabellen og boblen, et klik mere saetter den ned (F27).
+       Knapper inde i en label saetter ikke fluebenet. Linjen bygges kun
+       om, naar den har aendret sig, saa et klik ikke rammer en knap, der
+       lige er skiftet ud. */
+    P.tilskuerNavne = function (navne, loeftede) {
+        var el = NK.el("tilskuere-navne");
+        var noegle = navne.join(",") + "|" + loeftede.join(",");
+        if (el.dataset.noegle === noegle) return;
+        el.dataset.noegle = noegle;
+        el.textContent = "";
+        el.appendChild(document.createTextNode("("));
+        navne.forEach(function (n, i) {
+            if (i) el.appendChild(document.createTextNode(", "));
+            var op = loeftede.indexOf(n) >= 0;
+            var k = document.createElement("button");
+            k.type = "button";
+            k.className = "tilskuer-ion" + (op ? " loeftet" : "");
+            k.dataset.ion = n;
+            k.textContent = (op ? "↑ " : "") + St.formel(n);
+            k.title = op ? "Sæt " + St.formel(n) + " ned blandt tilskuerne igen" : "Løft " + St.formel(n) + " op i tabellen og boblen";
+            el.appendChild(k);
+        });
+        el.appendChild(document.createTextNode(")"));
     };
 
     /* ----- Logbogen, hvis siden har en ------------------------------------- */
@@ -789,6 +816,14 @@
         paa("tilskuere-vis", "change", function () {
             var b = mig.bord();
             b.visTilskuere = !!this.checked;
+            mig.opdaterPanel();
+        });
+        paa("tilskuere-navne", "click", function (e) {
+            var k = e.target && e.target.closest ? e.target.closest("button[data-ion]") : null;
+            if (!k) return;
+            e.preventDefault();
+            var b = mig.bord();
+            if (b.loeft) b.loeft(k.dataset.ion);
             mig.opdaterPanel();
         });
         paa("teori", "click", function (e) { if (e.target === this) mig.lukOverlay(); });

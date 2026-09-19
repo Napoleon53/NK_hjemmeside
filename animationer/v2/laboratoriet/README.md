@@ -534,7 +534,9 @@ giver en rigtig mindre udgave af et glas (rumfang og lysvej følger
 tegningen); `Stof.OPLOES_K0` er et konstant bidrag til opløsningen af
 fast stof; `underlag` i `BORD_VALG` er hvidt papir med en påskrift på
 bordpladen; og `side.js` laver feltet »Fyld op til« ved sprøjteflasken
-(`bord.fyldOpTil`). Sprøjteflasken er tegnet 25 % større.
+(`bord.fyldOpTil`). Sprøjteflasken er tegnet 25 % større. Et
+pulverglas kan have sin egen `spatelspids` (µmol) på posten; ellers er en
+spatelspids 1,5 mmol som før.
 
 **Der hældes kun, når eleven beder om det (F36):** et slip over glasset
 giver én portion, og pilen ved flasken giver mere. At bære en flaske hen
@@ -597,7 +599,10 @@ K⁺ og NO₃⁻; NO₃⁻ er ikke tilskuer, hvis der er kobber og syre). En lis
 kan også gives direkte. Har et glas mere end tre slags ioner, skjules
 tilskuerionerne i zoomboblen og står for sig nederst i panelets tabel, når
 fluebenet »Vis tilskuerioner« er sat; med én til tre ioner hører de altid
-med (en flaske AgNO₃ har både Ag⁺ og NO₃⁻). Tabellen står med den største
+med (en flaske AgNO₃ har både Ag⁺ og NO₃⁻). Eleven kan løfte en enkelt
+tilskuerion op ved at klikke på den i linjen under tabellen og sætte den
+ned igen med et klik mere (`bord.loeft`, `bord.loeftede`; gælder hele
+forsøget, og Start forfra sætter alle ned). Tabellen står med den største
 koncentration først og fast stof til sidst, og det, der er for lidt af til
 at ses, står der ikke.
 

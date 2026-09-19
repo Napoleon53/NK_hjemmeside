@@ -41,6 +41,17 @@
    paa farvedybden, mens koncentrationen er knappen paa, hvor meget
    ligevaegten kan flytte sig. Motoren regner selv ligevaegten frem; her
    staar kun det, der blev blandet.
+
+   Spatelspidserne (S12): hvert pulverglas har sin egen, fordi glassene
+   kun har 12 µmol Fe³⁺ og 12 µmol SCN⁻ at arbejde med. Motorens 1,5 mmol
+   ville goere glas 1 sort (375 mM Fe³⁺) og glas 2 farveloest. Med 8 µmol
+   Fe(NO₃)₃ bliver glas 1 tydeligt moerkere, men stadig roedorange; 3 µmol
+   ascorbinsyre reducerer halvdelen af jernet, saa glas 2 bliver lysere og
+   ikke farveloest (og al ascorbinsyren bruges, saa pH ender omkring 2,8 af
+   de to H⁺, redoxen afgiver - F25, S11); 30 µmol KSCN giver glas 3 mere
+   end dobbelt saa meget kompleks. Draabeflasken er 0,1 M: én draabe
+   lysner lidt, to tydeligt, og tre fjerner al SCN⁻, saa kun Fe³⁺'s gule
+   farve er tilbage.
    ===================================================================== */
 (function () {
     "use strict";
@@ -60,11 +71,11 @@
         ny.titel = "flasken med frugtfarve";
         NK.Udstyr.tilfoej("flaskeFarve", ny);
     }());
-    function pulver(navn, x, y, etiket, titel, stof) {
+    function pulver(navn, x, y, etiket, titel, stof, spids) {
         var u = {};
         u[stof] = 30000;
         return { navn: navn, type: "pulverglas", x: x, y: y, etiket: etiket, titel: titel, del: 1,
-                 indhold: { V: 0, T: 20, umol: u }, pulverMaks: 30000 };
+                 indhold: { V: 0, T: 20, umol: u }, pulverMaks: 30000, spatelspids: spids };
     }
 
     /* Laboratoriet er 1040 bredt. Det oeverste venstre hjoerne er zoomboblens
@@ -155,9 +166,9 @@
         /* Hylden over stativet: koekkenrullen (kaffen stilles selv ved
            venstre ende) og pulverglassene til glas 1, 2 og 3 */
         { navn: "papir", type: "koekkenrulle", x: 460, y: HYLDE_KAFFE },
-        pulver("pulver_fe",   540, HYLDE_KAFFE, "Fe(NO₃)₃", "pulverglasset med Fe(NO₃)₃", "Fe(NO3)3(s)"),
-        pulver("pulver_asc",  590, HYLDE_KAFFE, "C-vitamin", "pulverglasset med ascorbinsyre", "Asc(s)"),
-        pulver("pulver_kscn", 640, HYLDE_KAFFE, "KSCN", "pulverglasset med KSCN", "KSCN(s)"),
+        pulver("pulver_fe",   540, HYLDE_KAFFE, "Fe(NO₃)₃", "pulverglasset med Fe(NO₃)₃", "Fe(NO3)3(s)", 8),
+        pulver("pulver_asc",  590, HYLDE_KAFFE, "C-vitamin", "pulverglasset med ascorbinsyre", "Asc(s)", 3),
+        pulver("pulver_kscn", 640, HYLDE_KAFFE, "KSCN", "pulverglasset med KSCN", "KSCN(s)", 30),
 
         /* Den oeverste hylde: flasken, draabeflasken og sproejteflasken.
            I del 2 staar frugtfarven paa KSCN-flaskens plads - de to er

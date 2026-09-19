@@ -377,7 +377,24 @@ iagttagelsen, der er arbejdet.
 
 ## Mængderne, der kan skrues på
 
-En spatelspids er 25 µmol i selvtesten, og det er nok til at fjerne al
-Fe³⁺ i glas 2 og gøre det helt farveløst. Et par dråber AgNO₃ (0,5 mL)
-fjerner al SCN⁻ i glas 4. Begge dele er kemisk rigtige, men »lysere« er
-pædagogisk bedre end »farveløs«. Det er tal i forløbet, ikke i motoren.
+Afgjort 19. september (S12, F25, F26, S11): hvert pulverglas har sin egen
+spatelspids (`spatelspids` på posten i `js/opstilling.js`), fordi glassene
+kun har 12 µmol Fe³⁺ og 12 µmol SCN⁻ at arbejde med. Motorens 1,5 mmol
+gjorde glas 1 sort og glas 2 farveløst.
+
+| pulverglas | spatelspids | glasset bagefter |
+|---|---|---|
+| Fe(NO₃)₃ (glas 1) | 8 µmol | tydeligt mørkere, stadig rødorange |
+| ascorbinsyre (glas 2) | 3 µmol | lysere, ikke farveløst; pH ca. 2,8 |
+| KSCN (glas 3) | 30 µmol | mere end dobbelt så meget FeSCN²⁺ |
+
+pH 2,8 i glas 2 er rigtig kemi: redoxen afgiver to H⁺ pr. ascorbinsyre.
+Al ascorbinsyren bruges, så dens egen pKa (4,1) ville ikke ændre noget,
+og den står stadig ikke i stoftabellen. Dråbeflasken med AgNO₃ er 0,1 M
+(5 µmol pr. dråbe): én dråbe lysner lidt, to tydeligt, og tre fjerner al
+SCN⁻, så kun Fe³⁺'s gule farve er tilbage.
+
+**Tilskuerionerne kan løftes op (F27).** I linjen under tabellen er K⁺ og
+NO₃⁻ knapper: et klik løfter ionen op i tabellen og boblen for hele
+forsøget (den står så som »↑ NO₃⁻«), et klik mere sætter den ned, og
+Start forfra sætter alle ned. Fluebenet viser dem alle på én gang.

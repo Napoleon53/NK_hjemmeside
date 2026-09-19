@@ -876,19 +876,19 @@ function koerTest() {
     mus.hold(2);
     paastand("spatlen er fuld og haenger over pulverglasset uden pil", !!sp.last && !!sp.svaev && sp.svaev.maal === feJar && !bord.svaevRing());
     mus.klik("spatel");
-    paastand("et klik paa den fulde spatel tager ikke mere, men siger, hvad man goer", sp.last.umol === 1500 && sidsteBesked().indexOf("Spatlen er fuld") === 0, sidsteBesked());
+    paastand("et klik paa den fulde spatel tager ikke mere, men siger, hvad man goer", sp.last.umol === 8 && sidsteBesked().indexOf("Spatlen er fuld") === 0, sidsteBesked());
     var rkG1 = bord.rekt(g(1), 0);
     mus.tag("spatel");
     mus.til({ x: g(1).p.x, y: rkG1.y + 10 }, 0.8);
     paastand("over glas 1 faar glasset den groenne ramme", bord.slipMaal === "glas1", bord.slipMaal);
     mus.slip();
     mus.hold(2);
-    paastand("glas 1 fik spatelspidsen", Math.abs(feI1() - 1500) < 1, tal(feI1()));
+    paastand("glas 1 fik spatelspidsen", Math.abs(feI1() - 8) < 0.01, tal(feI1()));
     var ringS = bord.svaevRing();
     paastand("pilen ved den tomme spatel siger »En spatelspids mere«", !!ringS && ringS.tekst === "En spatelspids mere", ringS && ringS.tekst);
     if (ringS) mus.klik({ x: ringS.x, y: ringS.y });
     mus.hold(3);
-    paastand("et klik paa pilen: spatlen henter selv og giver glas 1 en spatelspids mere", Math.abs(feI1() - 3000) < 1 && !sp.last && !!sp.svaev && sp.svaev.maal === g(1), tal(feI1()));
+    paastand("et klik paa pilen: spatlen henter selv og giver glas 1 en spatelspids mere", Math.abs(feI1() - 16) < 0.01 && !sp.last && !!sp.svaev && sp.svaev.maal === g(1), tal(feI1()));
     paastand("spatlen kan traekkes hjem", flytHjem("spatel"));
     bord.vedBesked = vedB;
     NK.startForfra();
@@ -1904,6 +1904,56 @@ function koerTest() {
     adv(1);
     NK.startForfra();
     adv(0.5);
+
+    NK.startForfra();
+    adv(1);
+
+    overskrift("26. Spatelspidserne og tilskuerionerne (S12, F25, F27)");
+    /* S12: hvert pulverglas har sin egen spatelspids. Spatlen bruges, som
+       eleven bruger den: fyldt i pulverglasset og toemt i glasset. */
+    [1, 2, 3, 7].forEach(function (n) { B.haeldI(g(n), B.udtag(bord.g.kolbe, PORTION), true); });
+    adv(25);
+    var spids = {};
+    [["pulver_fe", 1], ["pulver_asc", 2], ["pulver_kscn", 3]].forEach(function (par) {
+        var sp = bord.g.spatel;
+        bord.fyldSpatel(sp, bord.g[par[0]]);
+        faerdig();
+        spids[par[0]] = sp.last ? sp.last.umol : 0;
+        bord.toemSpatel(sp, g(par[1]));
+        faerdig();
+    });
+    paastand("en spatelspids er 8 µmol Fe(NO3)3, 3 µmol ascorbinsyre og 30 µmol KSCN",
+        spids.pulver_fe === 8 && spids.pulver_asc === 3 && spids.pulver_kscn === 30, JSON.stringify(spids));
+    adv(40);
+    var l7 = lys(g(7)), l1 = lys(g(1)), l2 = lys(g(2)), l3 = lys(g(3));
+    paastand("glas 1 er tydeligt moerkere end R, men ikke sort", l1 < l7 - 0.05 && l1 > 0.12, tal(l7) + " -> " + tal(l1));
+    paastand("glas 2 er lysere end R, men ikke farveloest", l2 > l7 + 0.05 && konc(g(2), "FeSCN2+") > 0.2,
+        tal(l7) + " -> " + tal(l2) + ", " + tal(konc(g(2), "FeSCN2+")) + " mM FeSCN2+");
+    paastand("glas 3 har mere end dobbelt saa meget kompleks som R", konc(g(3), "FeSCN2+") > 2 * konc(g(7), "FeSCN2+") && l3 < l7 - 0.02,
+        tal(konc(g(7), "FeSCN2+")) + " -> " + tal(konc(g(3), "FeSCN2+")) + " mM");
+    var ph2 = St.pH(B.samlet(g(2)));
+    paastand("pH i glas 2 er omkring 2,8: redoxen afgiver to H+ pr. ascorbinsyre (F25)", ph2 > 2.5 && ph2 < 3.2, tal(ph2, 2));
+    paastand("trinene for glas 1, 2 og 3 er gjort", F.erGjort("glas1") && F.erGjort("glas2") && F.erGjort("glas3"));
+
+    /* F27: en tilskuerion kan loeftes op i tabellen og boblen */
+    bord.vaelg("glas7");
+    side.opdaterPanel();
+    var tsNavne = d.getElementById("tilskuere-navne"), tsVis = d.getElementById("tilskuere-vis"), visFoer = tsVis.checked;
+    function ionKnap(n) { return tsNavne.querySelector('button[data-ion="' + n + '"]'); }
+    function iTabel(n) { return side.indhold(bord, B.samlet(g(7))).raekker.some(function (r) { return r.navn === n; }); }
+    paastand("tilskuerionerne staar som knapper under tabellen og ikke i den (F27)",
+        !!ionKnap("K+") && !!ionKnap("NO3-") && !iTabel("NO3-") && !iTabel("K+"));
+    ionKnap("NO3-").click();
+    paastand("et klik paa NO3- loefter den op i tabellen og boblen, uden at saette fluebenet",
+        iTabel("NO3-") && !iTabel("K+") && (kugler(g(7))["NO3-"] || 0) > 0 && tsVis.checked === visFoer && ionKnap("NO3-").classList.contains("loeftet"),
+        JSON.stringify(kugler(g(7))));
+    paastand("og det gaelder i alle glas", bord.tilskuereI(B.samlet(g(1))).indexOf("NO3-") < 0 && bord.tilskuereI(B.samlet(g(1))).indexOf("K+") >= 0);
+    ionKnap("NO3-").click();
+    paastand("et klik mere saetter den ned igen", !iTabel("NO3-") && !ionKnap("NO3-").classList.contains("loeftet"));
+    ionKnap("K+").click();
+    NK.startForfra();
+    adv(0.5);
+    paastand("Start forfra saetter alle ned", bord.loeftede.length === 0);
 
     NK.startForfra();
     adv(1);

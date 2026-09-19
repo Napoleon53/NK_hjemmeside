@@ -68,7 +68,9 @@
                             (Stof.tilskuerioner), eller en liste. Er der
                             mere end tre slags ioner i et glas, skjules de
                             i boblen og staar for sig i panelets tabel, til
-                            visTilskuere saettes (fluebenet i panelet)
+                            visTilskuere saettes (fluebenet i panelet). Et
+                            klik paa en af dem i panelet loefter den op for
+                            hele forsoeget (loeft, loeftede)
      partikler, partikelRef boblens skala: et stof med koncentrationen
                             partikelRef (mM, standard 100) faar partikler
                             kugler (standard 6); se Stof.partikelTal.
@@ -105,7 +107,7 @@
     /* Rystning: ved SPILD_FART i SPILD_TID sekunder skvulper det ud; ved
        KNUS_FART i KNUS_TID sekunder knuses et glas i haanden */
     var RYST = { FULD: 900, SPILD_FART: 650, SPILD_TID: 0.35, KNUS_FART: 1300, KNUS_TID: 0.4 };
-    var SPATELSPIDS = 1500;   /* µmol fast stof paa en spatelspids */
+    var SPATELSPIDS = 1500;   /* µmol fast stof paa en spatelspids, naar pulverglasset ikke siger andet */
     var DRAABE = 0.05;        /* mL */
     var SPROEJT = 10;         /* mL fra sproejteflasken */
 
@@ -143,6 +145,7 @@
         this.tilskuere = [];
         this.centrale = null;
         this.visTilskuere = !!valg.visTilskuere;
+        this.loeftede = [];
         this.mikro = new NK.Mikro(this.bobleR, this.bobleIndhold);
         this.boble = valg.boble || null;
         this.vedBesked = null;
@@ -231,7 +234,8 @@
     };
 
     /* spec: { navn, type, x, y, etiket, titel, nr, indhold: { V, T, mM, umol },
-              stativ: navn, hul: i, paa: navn (varmeplade), p, taendt, kan, pulverMaks } */
+              stativ: navn, hul: i, paa: navn (varmeplade), p, taendt, kan, pulverMaks,
+              spatelspids: µmol pr. spatelspids fra dette pulverglas (ellers SPATELSPIDS) } */
     P.tilfoej = function (spec) {
         var S = NK.Scene;
         var t = typeof spec.type === "string" ? U.type(spec.type) : spec.type;
@@ -376,8 +380,25 @@
 
     /* Tilskuerionerne i oploesningen o, der staar for sig: kun naar der er
        mere end tre slags ioner i den. Med én til tre ioner hoerer de med
-       (en flaske AgNO3 har baade Ag+ og NO3-). */
-    P.tilskuereI = function (o) {
+       (en flaske AgNO3 har baade Ag+ og NO3-). En ion, eleven har loeftet
+       op (loeft), er ikke tilskuer i hele forsoeget, foer den saettes ned
+       igen; med `ogsaaLoeftede` kommer den med alligevel, saa panelet kan
+       vise den i tilskuerlinjen, hvor den saettes ned (F27). */
+    P.tilskuereI = function (o, ogsaaLoeftede) {
+        var alle = this.tilskuereUden(o), l = this.loeftede;
+        return ogsaaLoeftede ? alle : alle.filter(function (n) { return l.indexOf(n) < 0; });
+    };
+
+    /* Loeft en tilskuerion op i tabellen og boblen, eller saet den ned
+       igen. Gaelder hele forsoeget; Start forfra saetter alle ned. */
+    P.loeft = function (navn) {
+        var i = this.loeftede.indexOf(navn);
+        if (i < 0) this.loeftede.push(navn); else this.loeftede.splice(i, 1);
+        this.aendret("tilskuere");
+        return i < 0;
+    };
+
+    P.tilskuereUden = function (o) {
         if (!o || (!this.tilskuere.length && !this.centrale)) return [];
         var ioner = Object.keys(o.n).filter(function (n) {
             var s = Stof.STOFFER[n];
@@ -398,6 +419,7 @@
         var mig = this;
         this.koer.afbryd();
         this.nulstilTilstand();
+        this.loeftede = [];
         this.mikro = new NK.Mikro(this.bobleR, this.bobleIndhold);
         this.g = {};
         this.liste = [];
@@ -1997,7 +2019,7 @@
             { kald: function () {
                 var f = Stof.faste(jar.indhold)[0];
                 if (!f) return;
-                var umol = Math.min(SPATELSPIDS, f.umol);
+                var umol = Math.min(jar.spec.spatelspids || SPATELSPIDS, f.umol);
                 Stof.tilsaet(jar.indhold, f.navn, -umol);
                 sp.last = { navn: f.navn, umol: umol, farve: f.stof.farve || { r: 230, g: 230, b: 230 } };
                 sp.fraPulver = jar;
