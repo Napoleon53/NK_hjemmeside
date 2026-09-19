@@ -179,6 +179,27 @@ håndsatte tal, bordene blev bygget med (bægerglas 2,0 og 3,0), næsten
 præcist. Det er den eneste knap på farvedybden: skru på den ene og få hele
 laboratoriet med.
 
+**Lysvejen ovenfra er en anden.** Ses der NED i et glas, går lyset gennem
+væskens dybde og ikke gennem glassets bredde, og dybden afhænger af, hvor
+meget der er i. `NK.Udstyr.vejOvenfra(type, V)` måler den på tegningen på
+samme måde som stregerne: overfladen ved V mL er `NK.vaeskeNiveau` af
+indersiden, bunden er indersidens laveste punkt, og dybden deles med
+reagensglassets `REF_CM` = 1,6 cm, så tallet betyder det samme som
+`vejlaengde`. `NK.Beholder.farve(gg, "ovenfra")` ser gennem den;
+`B.lysvej(gg, retning)` giver vejen alene.
+
+Her dæmpes der **ikke**. Dæmpningen trykker vejen mod 1, og det ville brække
+det, vejen ovenfra er til for: fordobles rumfanget, halveres
+koncentrationen, men dybden fordobles, så et farvestof, der bare bliver
+fortyndet, står præcis lige så kraftigt ovenfra. Bliver blandingen alligevel
+lysere, er der blevet færre farvede molekyler — og så har ligevægten flyttet
+sig. En dæmpning ville ændre farven ved en ren fortynding, og så var prøven
+ingenting værd. Fordi vejen måles på den tegnede inderside, følger den
+formen af sig selv: i et glas med lodrette sider fordobles den med
+rumfanget, i et glas med rundet bund en anelse mindre, og i kolben mere,
+fordi den er bredest forneden. Tabellen »Lysvejen ovenfra« i
+`_geometri.html` viser det for alt udstyr.
+
 **To undtagelser.** `vindue: true` betyder, at den tegnede inderside kun er
 et kig ind i beholderen og ikke hele dens rum: flasker, dråbeflasker,
 sprøjteflasken og pulverglas har en etiket over det meste af sig, så deres
@@ -710,11 +731,6 @@ vandbad giver 80 °C i stedet for pladens 250.
 * **Grafen.** Journalen kan notere en måling; den kan endnu ikke tegne den
   op. Titrerings- og kalibreringskurver dukker op i næsten enhver øvelse, så
   det er en fælles komponent, ikke noget hvert forsøg skal opfinde.
-* **Lysvejen ovenfra.** Ses der ned i et glas, er vejen væskens dybde og
-  ikke glassets bredde. Det er hele pointen i sb2.4's del 2 om fortynding:
-  frugtfarven ser ens ud, fordi vejen ovenfra bliver længere i samme takt,
-  som koncentrationen falder. Dybden er der allerede som `niveau`, og
-  geometrien i `udstyr.js` giver resten.
 * **Øvelsestjekket:** en generisk validering, ethvert nyt forsøg køres
   igennem. Kimen står i `../superlab/sb2.4_ligevaegt/_selvtest.html` afsnit 10, som
   bruger `NK.Vilkaar.naevnte` til at opdage et trin, der peger på et glas

@@ -111,10 +111,21 @@
         return ud;
     };
 
-    /* Farven af vaesken, set gennem denne beholder */
-    B.farve = function (gg) {
+    /* Lysvejen gennem beholderen, i reagensglas-enheder (vejlaengde 1).
+       Fra siden er den glassets egen, og den staar fast. Ovenfra er den
+       vaeskens dybde, og den vokser altsaa med rumfanget: derfor ser en
+       ren fortynding ens ud ovenfra og lysere fra siden.
+       Se NK.Udstyr.vejOvenfra. */
+    B.lysvej = function (gg, retning) {
+        if (retning === "ovenfra") return NK.Udstyr.vejOvenfra(gg.type, B.volumen(gg));
+        return gg.type.vejlaengde || 1;
+    };
+
+    /* Farven af vaesken, set gennem denne beholder.
+       retning: "ovenfra" for kigget ned i glasset, ellers gennem siden. */
+    B.farve = function (gg, retning) {
         if (!gg.indhold || B.volumen(gg) < 0.02) return null;
-        return Stof.farve(B.samlet(gg), gg.type.vejlaengde || 1) || Stof.VAND;
+        return Stof.farve(B.samlet(gg), B.lysvej(gg, retning)) || Stof.VAND;
     };
 
     /* Tidens gang i beholderen.

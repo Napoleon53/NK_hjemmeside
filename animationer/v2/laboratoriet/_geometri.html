@@ -48,7 +48,7 @@ function padV(s, n) { s = String(s); while (s.length < n) s = " " + s; return s;
 
 skriv("Geometriprøve: alt glasudstyr læst som omdrejningslegemer", "h");
 skriv("Skala: " + tal(U.SKALA) + " tegneenheder pr. cm (sat efter reagensglassets 1,6 cm inderside)");
-skriv("Lysvejen dæmpes mod reagensglassets, så dybe glas kan aflæses. Se LYSVEJ_DAEMPNING i udstyr.js.");
+skriv("Lysvejen fra siden dæmpes mod reagensglassets, så dybe glas kan aflæses. Se LYSVEJ_DAEMPNING i udstyr.js.");
 skriv("— betyder undtaget: et vindue (etiket over indersiden) eller ikke et omdrejningslegeme.\n");
 
 skriv(pad("udstyr", 16) + padV("maks", 7) + padV("tegnet", 8) + padV("afvig", 8) +
@@ -139,6 +139,31 @@ Object.keys(U.TYPER).forEach(function (navn) {
 skriv("  værst: den største afvigelse mellem en stregs rumfang og arealet under den");
 skriv("  øverst: hvor langt under indersidens top den øverste streg står (tegneenheder)");
 
+/* Lysvejen ovenfra. Ses der ned i et glas, er vejen vaeskens dybde og
+   ikke glassets bredde, saa den afhaenger af, hvor meget der er i.
+   Dybden maales paa tegningen med samme vaeskeniveau som stregerne.
+   Sidste kolonne er proeven: i et glas med lodrette sider fordobles
+   vejen, naar rumfanget fordobles, og saa staar en ren fortynding ens
+   ovenfra. Er glasset bredest forneden (kolben), vokser vejen
+   hurtigere; er det rundet af i bunden, en anelse langsommere. */
+skriv("\nLysvejen ovenfra: væskens dybde, ikke glassets bredde", "h");
+skriv(pad("udstyr", 16) + padV("fra siden", 11) + padV("¼ fyldt", 10) + padV("½ fyldt", 10) +
+      padV("fuldt", 10) + padV("fordobling", 12), "h");
+Object.keys(U.TYPER).forEach(function (navn) {
+    var t = U.TYPER[navn];
+    if (!t.indre || !t.maks) return;
+    var kvart = U.vejOvenfra(t, t.maks / 4), halv = U.vejOvenfra(t, t.maks / 2);
+    var linje = pad(navn, 16) + padV(tal(t.vejlaengde || 1, 2), 11) +
+        padV(tal(kvart, 2), 10) + padV(tal(halv, 2), 10) +
+        padV(tal(U.vejOvenfra(t, t.maks), 2), 10) +
+        padV(kvart > 0 ? tal(halv / kvart, 2) + "x" : "—", 12);
+    skriv(linje, t.vindue ? "lav" : "ok");
+    if (kvart > 0 && (halv / kvart < 1.8 || halv / kvart > 2.6)) advarsler.push(navn +
+        ": en fordobling af rumfanget ganger vejen ovenfra med " + tal(halv / kvart, 2) +
+        " (2,00 i et glas med lodrette sider)");
+});
+skriv("  tallene er lysveje i reagensglas-enheder: 1,00 er vejen gennem et reagensglas fra siden");
+
 skriv("\nkolonnerne", "h");
 skriv("  maks        rumfanget, typen siger, den har");
 skriv("  tegnet      rumfanget af den tegnede inderside som omdrejningslegeme");
@@ -147,6 +172,7 @@ skriv("  bredde      indersidens gennemsnitlige bredde, altså lysvejen gennem s
 skriv("  vejl.       vejlaengde, som den står i typen");
 skriv("  geometri    vejlaengde, som bredden siger den burde være, efter dæmpning");
 skriv("  væskehøjde  hvor højt væsken står ved maks. 100 % er til kanten");
+skriv("  fordobling  hvor meget vejen ovenfra ganges med, når rumfanget fordobles. 2,00x er lodrette sider");
 
 if (advarsler.length) {
     skriv("\nDet, der ikke passer", "h");

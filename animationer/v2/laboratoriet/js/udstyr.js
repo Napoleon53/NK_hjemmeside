@@ -471,10 +471,46 @@
        modsige hinanden. */
     var LYSVEJ_DAEMPNING = 0.45;
 
+    /* Reagensglassets inderside i cm. Den er baade det, SKALA er sat
+       efter, og den enhed, lysvejen maales i: vejlaengde 1 betyder vejen
+       gennem et reagensglas. */
+    var REF_CM = 1.6;
+
     function lysvej(t) {
         var m = maal(t);
         if (!m || t.rund === false) return t.vejlaengde || 1;
-        return 1 + (m.vej_cm / 1.6 - 1) * LYSVEJ_DAEMPNING;
+        return 1 + (m.vej_cm / REF_CM - 1) * LYSVEJ_DAEMPNING;
+    }
+
+    /* ----- Lysvejen ovenfra -------------------------------------------------
+       Ses der NED i et glas, gaar lyset gennem vaeskens dybde og ikke
+       gennem glassets bredde. Det er ikke en detalje. Fortyndes et glas
+       til det dobbelte rumfang, halveres koncentrationen, men dybden
+       fordobles, og de to ophaever hinanden: et farvestof, der bare bliver
+       fortyndet, staar praecis lige saa kraftigt ovenfra. Bliver
+       blandingen alligevel lysere, er der blevet faerre farvede
+       molekyler - og saa har ligevaegten flyttet sig. Det er hele pointen
+       i en fortyndingsproeve, og den kan kun ses ovenfra.
+
+       Dybden maales paa tegningen paa samme maade som inddelingen:
+       overfladen ved V mL er NK.vaeskeNiveau af indersiden, og bunden er
+       indersidens laveste punkt. Saa kan vejen ovenfra ikke komme til at
+       modsige hverken stregerne eller den vaeske, tegning.js tegner, og
+       den passer af sig selv til enhver form - ogsaa kolben, der er
+       bredest forneden.
+
+       Her daempes der IKKE. Daempningen fra siden trykker vejen mod 1, og
+       den ville braekke det hele: en ren fortynding ville aendre farven
+       ovenfra, og saa var proeven ingenting vaerd. Vejen ovenfra er et
+       forhold mellem to laengder, og det forhold skal staa. */
+    function vejOvenfra(t, V) {
+        /* Maalene er de samme i mindre maalestok (se skaleret) */
+        var g = t.grund || t;
+        if (!g.indre || !g.mlPrAreal || !(V > 0)) return 0;
+        var bund = -Infinity;
+        for (var i = 0; i < g.indre.length; i++) bund = Math.max(bund, g.indre[i].y);
+        var top = NK.vaeskeNiveau(g.indre, V * g.mlPrAreal);
+        return Math.max(0, bund - top) / SKALA / REF_CM;
     }
 
     /* ----- Inddelingen -----------------------------------------------------
@@ -531,10 +567,12 @@
         TYPER: TYPER,
         HAAND_ANKER: { x: 40, y: 46 },
         SKALA: SKALA,
+        REF_CM: REF_CM,
         maal: maal,
         streger: streger,
         kanter: kanter,
         lysvej: lysvej,
+        vejOvenfra: vejOvenfra,
         skaleret: skaleret,
 
         type: function (navn) {

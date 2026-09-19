@@ -511,6 +511,82 @@ function koerTest() {
         });
     }());
 
+    overskrift("9c. Lysvejen ovenfra (S1)");
+    /* Ses der ned i et glas, er lysvejen vaeskens dybde og ikke glassets
+       bredde. Proeven er en fortynding: samme stofmaengde, dobbelt
+       rumfang. Et farvestof, der bare bliver fortyndet, skal staa ens
+       ovenfra (halv koncentration gange dobbelt dybde) og lysere fra
+       siden. En ligevaegtsblanding skal blive lysere ogsaa ovenfra,
+       fordi der bliver faerre farvede molekyler.
+       Maalt i tal, ikke med oejnene: farven laegges paa hvidt papir, og
+       lysheden regnes ud - det er praecis det, del 2 viser paa papiret. */
+    (function () {
+        var U = NK.Udstyr, t = U.type("baegerLille");
+        /* Farven som den staar paa det hvide papir, og hvor lys den er */
+        function lyshed(f) {
+            if (!f) return 255;
+            var a = f.a;
+            return 0.2126 * (255 * (1 - a) + f.r * a) +
+                   0.7152 * (255 * (1 - a) + f.g * a) +
+                   0.0722 * (255 * (1 - a) + f.b * a);
+        }
+        function opret(navn, x) { return bord.tilfoej({ navn: navn, type: "baegerLille", x: x }); }
+        function fyld(gg, o) { B.toem(gg); B.haeldI(gg, o, true); }
+        var a = opret("_ov_a", 1180), b2 = opret("_ov_b", 1260);
+
+        /* Geometrien: vejen ovenfra er dybden, saa den vokser med rumfanget */
+        var l40 = U.vejOvenfra(t, 40), l80 = U.vejOvenfra(t, 80);
+        paastand("vejen ovenfra fordobles, naar rumfanget fordobles",
+            Math.abs(l80 / l40 - 2) < 0.05,
+            l40.toFixed(3) + " -> " + l80.toFixed(3) + " reagensglas (" + (l80 / l40).toFixed(3) + "x)");
+        paastand("de sidste par procent mangler, fordi bunden er rundet af", l80 / l40 < 2);
+        paastand("et tomt glas har ingen vej ovenfra", U.vejOvenfra(t, 0) === 0);
+        paastand("vejen ovenfra er den samme i mindre maalestok",
+            Math.abs(U.vejOvenfra(U.skaleret(t, 0.5), 40) - l40) < 1e-9);
+        var K = U.type("kolbe");
+        paastand("kolben er bredest forneden, saa dens vej ovenfra vokser hurtigere end rumfanget",
+            U.vejOvenfra(K, 100) / U.vejOvenfra(K, 50) > 2.1,
+            (U.vejOvenfra(K, 100) / U.vejOvenfra(K, 50)).toFixed(2) + "x ved 50 -> 100 mL");
+        paastand("lysvejen fra siden er uaendret: glassets egen",
+            B.lysvej(a) === t.vejlaengde && B.lysvej(a, "side") === t.vejlaengde, t.vejlaengde.toFixed(3));
+
+        /* Frugtfarve: 40 umol i begge glas, det ene fortyndet til det dobbelte */
+        fyld(a, St.lav({ V: 40, umol: { farve: 40 } }));
+        fyld(b2, St.lav({ V: 80, umol: { farve: 40 } }));
+        paastand("frugtfarve: samme stofmaengde, halv koncentration i det fortyndede",
+            Math.abs(n(a, "farve") - n(b2, "farve")) < 1e-9 &&
+            Math.abs(St.konc(a.indhold, "farve") / St.konc(b2.indhold, "farve") - 2) < 0.01,
+            St.konc(a.indhold, "farve").toFixed(2) + " mM mod " + St.konc(b2.indhold, "farve").toFixed(2) + " mM");
+        var fa = lyshed(B.farve(a, "ovenfra")), fb = lyshed(B.farve(b2, "ovenfra"));
+        paastand("ovenfra ser de to glas ens ud", Math.abs(fa - fb) < 0.5,
+            "lyshed " + fa.toFixed(2) + " mod " + fb.toFixed(2));
+        var sa = lyshed(B.farve(a)), sb = lyshed(B.farve(b2));
+        paastand("fra siden er det fortyndede glas tydeligt lysere", sb - sa > 15,
+            "lyshed " + sa.toFixed(2) + " mod " + sb.toFixed(2));
+
+        /* Ligevaegt: Fe3+ + SCN- = FeSCN2+, samme stofmaengder, dobbelt rumfang */
+        fyld(a, St.lav({ V: 40, mM: { "Fe3+": 5, "NO3-": 15, "K+": 5, "SCN-": 5 } }));
+        fyld(b2, St.lav({ V: 80, mM: { "Fe3+": 2.5, "NO3-": 7.5, "K+": 2.5, "SCN-": 2.5 } }));
+        adv(60);
+        paastand("ligevaegten har indstillet sig i begge glas", n(a, "FeSCN2+") > 10 && n(b2, "FeSCN2+") > 10,
+            n(a, "FeSCN2+").toFixed(1) + " umol mod " + n(b2, "FeSCN2+").toFixed(1) + " umol");
+        paastand("fortyndingen har flyttet ligevaegten: faerre FeSCN2+ i alt",
+            n(b2, "FeSCN2+") < n(a, "FeSCN2+") * 0.85,
+            (n(b2, "FeSCN2+") / n(a, "FeSCN2+") * 100).toFixed(0) + " % af stofmaengden tilbage");
+        var ga = lyshed(B.farve(a, "ovenfra")), gb = lyshed(B.farve(b2, "ovenfra"));
+        paastand("og derfor er det fortyndede glas ogsaa lysere OVENFRA", gb - ga > 8,
+            "lyshed " + ga.toFixed(2) + " mod " + gb.toFixed(2));
+        var la = lyshed(B.farve(a)), lb = lyshed(B.farve(b2));
+        paastand("men forskellen er mindre ovenfra end fra siden: den laengere vej tager noget af den",
+            gb - ga < (lb - la) * 0.5,
+            (gb - ga).toFixed(1) + " mod " + (lb - la).toFixed(1) + " i lyshed");
+        paastand("det er forskellen paa de to: frugtfarven staar ens, ligevaegten bliver lysere",
+            Math.abs(fa - fb) < 0.5 && gb - ga > 8);
+
+        [a, b2].forEach(function (x) { bord.tagUd(x); });
+        paastand("proeveglassene er taget af bordet igen", !bord.g._ov_a && !bord.g._ov_b);
+    }());
+
     overskrift("10. Udstyr i mindre maalestok");
     /* Et lille bord kan have udstyr i halv stoerrelse. Kun tegnemaalene
        skaleres: rumfang, lysvej og kemi skal vaere uaendret. */
