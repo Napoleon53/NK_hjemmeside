@@ -67,7 +67,9 @@ js/mikro.js          zoomboblen: én kugle pr. partikel med formlen på. Boblen 
                      skriftens størrelse er bobleIndhold i NK.BORD_VALG.
                      Formlen står uden kant i kuglen, mørk på lyse kugler og
                      hvid på mørke (som i sc6.8); en lang formel gør kuglen
-                     større i stedet for skriften mindre
+                     større i stedet for skriften mindre. Når et tal ændrer
+                     sig, fordi der sker en reaktion, SKER reaktionen også i
+                     boblen — se »Reaktionerne i boblen« nedenfor
 js/bord.js           bordet: genstande, greb og slip, møder afgjort af
                      egenskaber, stativ og varmeplade, uheld, tidens gang, tegning
 js/rum.js            rummene: flere borde på ét lærred, pile og piletaster,
@@ -682,6 +684,65 @@ spil.
 * sc1.3 og sc2.5 er ældre og har et andet sidelayout. De bruger `kerne.js` og
   `rundvisning.js`, men har stadig hele deres eget stilark.
 
+## Reaktionerne i boblen
+
+Boblen afstemmer sig mod `Stof.partikelTal`, men den afstemmer ikke i
+stilhed. **Når et tal ændrer sig, fordi der sker en reaktion, så sker
+reaktionen også i boblen**: to partikler finder hinanden og bliver til én,
+én går i stykker til to, et bundfald dannes og synker. Det er dét, eleven
+skal se — ikke at kuglerne bare bliver flere eller færre.
+
+**Der står ikke ét stofnavn i `mikro.js`** (ud over vandet i baggrunden), og
+sb2.4's selvtest afsnit 23 holder den på det. Hvilke hændelser der kan ses,
+læses af `Stof.REAKTIONER`, hvor hver reaktion allerede er data. Formen
+følger af tallene og faserne:
+
+| | |
+|---|---|
+| færre partikler ud end ind | **bind** |
+| flere partikler ud end ind | **split** |
+| et fast stof blandt produkterne | **fæld** — kuglen synker |
+| et fast stof blandt udgangsstofferne | **opløs** |
+| flere slags stof på begge sider | **omdan** — en redox er hverken en sammenlægning eller en deling |
+
+Derfor virker det også for en reaktion, der fanger seks partikler på én
+gang (permanganat og fem jern(II), som den gamle sc8.6 havde), uden at der
+skal skrives noget nyt: alle udgangsstofferne mødes i midten, forbundet af
+en stiplet streg, og produkterne springer ud med et glimt.
+
+**Dynamisk ligevægt.** Står alle tal i mål, sker der stadig noget: en
+ligevægt får med jævne mellemrum et skub den ene vej. Så er der ét kompleks
+for meget, og afstemningen retter det ved at lade et andet gå i stykker.
+Bind og split kommer altså lige ofte af sig selv — det er ikke en regel, der
+er skrevet ind, men følgen af to ting: at boblen altid retter mod tallene,
+og at den retter med en reaktion, når der findes en. Målt over et minut i
+sb2.4's reference: 34 bind og 34 split. Efter et indgreb dominerer den ene
+retning, til tallene passer igen (mere Fe³⁺: 9 bind mod 5 split).
+
+**Valget mellem at reagere og at lade partikler komme og gå.** Er et stof
+for få eller for mange, ser boblen først efter en reaktion, der kan lukke
+hullet, og vælger den vej, der samlet bringer flest tal tættere på målet
+(`gevinst`). Er den bedste vej spærret af et manglende udgangsstof, tager
+boblen det skridt, der skaffer det — et kompleks går i stykker, så ionen
+bliver fri, og så kan fældningen ses. Og imens må hverken det, der skal
+bruges, eller det, der er skaffet, tone ud.
+
+To ting holder den fra at gå i stå. Den venter kun på noget, der faktisk er
+på vej (det står i målet, eller en anden reaktion kan danne det), og hvert
+stof har en tålmodighed: går der mere end et par sekunder, uden at
+reaktionen kan lade sig gøre, falder partiklen ned oppefra som før. Et
+bundfald falder dog aldrig ned — det toner frem i bunden, hvor det i
+forvejen ligger.
+
+**K forstærkes ikke.** Den gamle sb2.4 hævede K i boblen, så der var
+komplekser at se. Det gør den nye ikke: boblen viser de tal, panelets tabel
+viser. Prisen er, at en lille forskydning kan forsvinde i afrundingen — ved
+6 kugler pr. 3 mM går FeSCN²⁺ fra én kugle til én kugle, når glasset varmes,
+selv om stofmængden falder til det halve. Hæves opløsningen, rammer et glas
+med stamopløsning til gengæld loftet på 20 kugler, og så kan et indgreb
+ikke længere ses som FLERE komplekser. Det er en grænse ved at tegne tyve
+kugler i stedet for 10²⁰, ikke en fejl.
+
 ## Den fælles skal
 
 Hvert forsøg havde før sin egen `app.js`, og to af dem var 92 % ens.
@@ -863,6 +924,11 @@ vandbad giver 80 °C i stedet for pladens 250.
   eller et stof, der ikke findes.
 * Rammerne i `quiz.js` og `tegneserie.js` er skrevet til otte forsøg, men
   kun prøvet af ét. Ved første konvertering viser det sig, hvad de mangler.
+* **Mikroniveauet** kan vise bind, split, fæld, opløs og omdan. Fire former
+  mere venter på deres første kunde: ligander, der sætter sig én ad gangen
+  (sc2.6), bundfald pakket i hele formelenheder i et gitter med faste
+  pladser (sc2.5, sc2.7), et faseskift ned gennem en grænseflade (sc6.8) og
+  molekyler tegnet af atomer i stedet for kugler med formlen på (M10).
 * **Til spillet:** låste passager i `rum.js`, som spørger forløbets flag,
   om man må gå videre. Vilkårs- og forløbslaget er der allerede.
 * Et rum, hvor forsøgene er stationer, man kan gå imellem. Prøverummet er

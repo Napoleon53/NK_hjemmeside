@@ -200,7 +200,7 @@ function koerTest() {
        glas 1 end i referencen, selv om Fe3+ er i stort overskud. K+ og NO3-
        er tilskuere: de skjules, naar der er mere end tre slags ioner, og
        staar for sig nederst i tabellen, naar fluebenet er sat. */
-    function kugler(gl) { var o = B.samlet(gl); return St.partikelTal(o, 6, bord.skjulteI(o), bord.valg.partikelRef); }
+    function kugler(gl) { var o = B.samlet(gl); return St.partikelTal(o, bord.valg.partikler, bord.skjulteI(o), bord.valg.partikelRef); }
     var k7 = kugler(g(7)), k1 = kugler(g(1)), k4 = kugler(g(4));
     paastand("forsoeget finder selv tilskuerionerne K+ og NO3-", bord.tilskuere.join(",") === "K+,NO3-", bord.tilskuere.join(", "));
     paastand("FeSCN2+ faar flere kugler i glas 1 (mere Fe3+) end i referencen", (k1["FeSCN2+"] || 0) > (k7["FeSCN2+"] || 0),
@@ -210,7 +210,7 @@ function koerTest() {
     paastand("tilskuerionerne er ikke i boblen for referencen", !k7["K+"] && !k7["NO3-"], JSON.stringify(k7));
     /* Loftet: hoejst 20 kugler i alt, ogsaa med tilskuerne vist */
     function ialt(k) { return Object.keys(k).reduce(function (a, n) { return a + k[n]; }, 0); }
-    var alle1 = St.partikelTal(B.samlet(g(1)), 6, [], bord.valg.partikelRef);
+    var alle1 = St.partikelTal(B.samlet(g(1)), bord.valg.partikler, [], bord.valg.partikelRef);
     paastand("boblen har hoejst 20 kugler i glas 1, ogsaa med tilskuerne", ialt(k1) <= 20 && ialt(alle1) <= 20 && ialt(alle1) >= ialt(k1),
         ialt(k1) + " / " + ialt(alle1) + " " + JSON.stringify(alle1));
     var kAg = kugler(bord.g.ag), kSCN = kugler(bord.g.fl_kscn);
@@ -1546,6 +1546,105 @@ function koerTest() {
     paastand("Start forfra laaser serien og rydder ruderne",
         serie.laast() && d.getElementById("serie-ruder").children.length === 0 &&
         !serie.aaben());
+    overskrift("23. Mikroniveauet viser reaktionerne (S5)");
+    /* Boblen afstemmer ikke i stilhed. Naar et tal aendrer sig, fordi der
+       sker en reaktion, sker reaktionen ogsaa i boblen. Hvilke haendelser
+       der kan ses, udledes af REAKTIONER i stoftabellen - der staar ikke ét
+       stofnavn i motorens mikro.js. */
+    var mikroKilde = "";
+    (function () {
+        var url = "";
+        for (var iM = 0; iM < d.scripts.length; iM++) if (d.scripts[iM].src.indexOf("js/mikro.js") > 0) url = d.scripts[iM].src;
+        var x = new XMLHttpRequest();
+        x.open("GET", url, false);
+        x.send(null);
+        mikroKilde = x.responseText;
+    }());
+    paastand("motorens mikro.js er hentet og kan laeses", mikroKilde.length > 2000, mikroKilde.length + " tegn");
+    var forbudtM = ["Fe3+", "SCN-", "FeSCN", "Ag+", "AgSCN", "Asc", "Cu2+", "Pb2+", "I-", "NO3-", "OH-"];
+    var fundneM = forbudtM.filter(function (o) { return mikroKilde.indexOf('"' + o + '"') >= 0; });
+    paastand("og den naevner ikke ét stofnavn (ud over vandet i baggrunden)",
+        fundneM.length === 0 && mikroKilde.indexOf("H2O") < 0, fundneM.join(", ") || "ingen");
+
+    /* Tilfaeldigheden bindes, saa tallene herunder er de samme hver gang */
+    var gammelRandom = vin.Math.random, froe = 20260919;
+    function bindTilfaeldigheden() {
+        froe = 20260919;
+        vin.Math.random = function () {
+            froe = (froe * 1664525 + 1013904223) % 4294967296;
+            return froe / 4294967296;
+        };
+    }
+    function slipTilfaeldigheden() { vin.Math.random = gammelRandom; }
+
+    function boble(navn) { bord.vaelg(navn); adv(2); return bord.mikro; }
+    function nulTael(m) { m.taeller = { bind: 0, split: 0, faeld: 0, oploes: 0, omdan: 0 }; }
+
+    /* De reaktioner, boblen kan vise, kommer fra stoftabellen */
+    bindTilfaeldigheden();
+    NK.startForfra();
+    adv(1);
+    [1, 2, 3, 4, 5, 6, 7, 8].forEach(function (n) { bord.haeld(bord.g.kolbe, g(n), 6); faerdig(); });
+    adv(4);
+    var m7 = boble("glas7");
+    var spil = m7.spil.map(function (x) { return x.rx.id + (x.retning > 0 ? ">" : "<"); });
+    paastand("ligevaegten er i spil begge veje, udledt af stoftabellen",
+        spil.indexOf("fescn>") >= 0 && spil.indexOf("fescn<") >= 0, spil.slice(0, 6).join(" "));
+    paastand("og en faeldning kun den ene vej", spil.indexOf("agscn>") >= 0 && spil.indexOf("agscn<") < 0);
+
+    /* ----- Dynamisk ligevaegt: bind og split lige ofte ----------------- */
+    nulTael(m7);
+    var foer7 = JSON.stringify(m7.taeller);
+    adv(60);
+    var t7 = m7.taeller, ialt7 = t7.bind + t7.split;
+    paastand("i referencen sker der stadig noget, naar tallene staar stille",
+        ialt7 > 20, t7.bind + " bind og " + t7.split + " split paa et minut");
+    paastand("og bind og split kommer lige ofte (dynamisk ligevaegt)",
+        Math.abs(t7.bind - t7.split) <= 0.2 * Math.max(t7.bind, t7.split),
+        "forskel " + Math.abs(t7.bind - t7.split) + " af " + Math.max(t7.bind, t7.split));
+    var c7 = {};
+    m7.partikler.forEach(function (p) { c7[p.navn] = (c7[p.navn] || 0) + 1; });
+    var maal7 = St.partikelTal(B.samlet(g(7)), bord.valg.partikler, bord.skjulteI(B.samlet(g(7))), bord.valg.partikelRef);
+    paastand("og tallene staar, hvor de skal, bagefter",
+        Object.keys(maal7).every(function (n) { return c7[n] === maal7[n]; }),
+        JSON.stringify(c7) + " mod " + JSON.stringify(maal7));
+
+    /* ----- Et indgreb: den ene retning overvejer ---------------------- */
+    var m1 = boble("glas1");
+    nulTael(m1);
+    St.tilsaet(g(1).indhold, "Fe(NO3)3(s)", 60);
+    adv(8);
+    paastand("mere Fe³⁺ faar bind til at overveje, til tallene passer igen",
+        m1.taeller.bind > m1.taeller.split, m1.taeller.bind + " bind mod " + m1.taeller.split + " split");
+    paastand("og saltet bliver oploest i boblen, ikke bare talt op",
+        m1.taeller.oploes > 0, m1.taeller.oploes + " oploesninger");
+
+    /* ----- Faeldningen: bundfaldet dannes og synker ------------------- */
+    var m4 = boble("glas4");
+    nulTael(m4);
+    bord.haeld(bord.g.ag, g(4), 0.3);
+    faerdig();
+    adv(8);
+    paastand("soelv faelder AgSCN i boblen, det falder ikke ned oppefra",
+        m4.taeller.faeld > 0, m4.taeller.faeld + " faeldninger");
+    var fasteM = m4.partikler.filter(function (p) { return p.fast; });
+    paastand("og bundfaldet ligger i bunden af boblen",
+        fasteM.length > 0 && fasteM.every(function (p) { return p.y > 0; }),
+        fasteM.length + " kugler, laveste y " + tal(Math.min.apply(null, fasteM.map(function (p) { return p.y; })), 0));
+
+    /* ----- Redoxen: flere partikler fanget paa én gang ---------------- */
+    var m2 = boble("glas2");
+    nulTael(m2);
+    St.tilsaet(g(2).indhold, "Asc(s)", 40);
+    adv(12);
+    paastand("ascorbinsyren omdanner jern i boblen (to Fe³⁺ paa én gang)",
+        m2.taeller.omdan > 0, JSON.stringify(m2.taeller));
+    paastand("og den faste ascorbinsyre gaar i oploesning undervejs",
+        m2.taeller.oploes > 0, m2.taeller.oploes + " oploesninger");
+    slipTilfaeldigheden();
+
+    NK.startForfra();
+    adv(1);
 
     NK.startForfra();
     adv(1);

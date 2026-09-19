@@ -181,7 +181,11 @@
        opstillingen og reaktionerne og er skjult i boblen og i panelets
        tabel, til eleven saetter flueben (tilskuere: true). Boblens skala er
        fast: 3 mM giver 6 kugler (partikelRef), saa FeSCN2+ bliver flere,
-       naar der tilsaettes Fe3+ eller SCN-. Den foerste hylde er kaffens
+       naar der tilsaettes Fe3+ eller SCN-. Tallet er lavt med vilje: gaar
+       det hoejere, rammer et glas med en stamoploesning loftet paa 20
+       kugler (Stof.PARTIKEL_LOFT), og saa kan et indgreb ikke laengere
+       ses som FLERE komplekser, kun som en anden fordeling.
+       Den foerste hylde er kaffens
        (lavKaffekop). */
     NK.BORD_VALG = {
         bredde: 1040, hoejde: 650, bord: 500, bordDybde: 64, lodret: "bund",

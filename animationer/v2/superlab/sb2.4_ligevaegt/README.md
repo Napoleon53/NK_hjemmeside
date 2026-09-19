@@ -75,7 +75,16 @@ kugler), så FeSCN²⁺ bliver flere kugler, når der tilsættes Fe³⁺ eller S
 og K⁺ og NO₃⁻ er tilskuerioner, som forsøget selv finder (`tilskuere:
 true`): de skjules i boblen og står for sig i panelets tabel, når fluebenet
 »Vis tilskuerioner« er sat. Opstillingen holder hjørnet frit, og selvtesten
-tjekker det. Scenen står forneden i lærredet (`lodret:
+tjekker det.
+
+**Og boblen viser reaktionerne, ikke kun mængderne.** Fe³⁺ og SCN⁻ finder
+hinanden og bliver til FeSCN²⁺, komplekset går i stykker igen, Ag⁺ og SCN⁻
+fælder et AgSCN, der synker til bunds, og ascorbinsyren fanger to Fe³⁺ på én
+gang. Intet af det står i dette forsøg: hændelserne udledes af reaktionerne
+i den fælles stoftabel (se »Reaktionerne i boblen« i motorens README). Står
+glasset i ligevægt, sker der stadig noget — bind og split kommer lige ofte,
+34 af hver på et minut i referencen. Efter et indgreb overvejer den ene
+retning, til tallene passer igen. Scenen står forneden i lærredet (`lodret:
 "bund"`). Bordpladen er 64 dyb (`bordDybde`), så man kan stille ting foran
 stativet; det forreste tegnes forrest. Spatlen, glasstaven og termometeret
 ligger forrest fra start.
