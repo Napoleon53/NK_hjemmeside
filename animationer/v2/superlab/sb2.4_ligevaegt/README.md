@@ -100,15 +100,16 @@ fordi han er længere væk. Se »Kemichael i forsøget«.
 
 ## Reagensglassene
 
-**Rettet samme dag (F33, F31):** glassene rummer 20 mL og er tegnet 87 %
-(`rumfangFoelger`), så en portion er 4 mL af sig selv, og `modtager`
-bruges ikke længere. Glas 7 hedder **R** (referencen), glas 8 **4a**
-(forundersøgelsen, som ikke skal have stamopløsning) og glas 4 **4b**; 4a
-står for sig i stativets sidste hul (forsøgets egen `sprites/stativ_4a.svg`
-uden tal), og hælder man stamopløsning i det, siger Kemichael det.
-Afsnittet herunder beskriver S31, som det først blev lavet.
+**Rettet samme dag (F33, F31, F48):** glassene rummer 20 mL og er tegnet
+87 % (`rumfangFoelger`), så en portion er 4 mL af sig selv, og `modtager`
+bruges ikke længere. Der er syv glas: 1 til 6 og **R** (referencen, glas
+7). Forundersøgelsen i glas 8 og KSCN-flasken er fjernet igen (F48);
+nysgerrige kan selv lave den med det faste salt. Stativet er forsøgets
+eget med syv huller og uden tal (`sprites/stativ_7.svg`); den gamle
+`sprites/stativ_4a.svg` bruges ikke længere. Afsnittet herunder beskriver
+S31, som det først blev lavet.
 
-De otte reagensglas er tegnet en tredjedel mindre end udstyrets
+De syv reagensglas er tegnet en tredjedel mindre end udstyrets
 reagensglas (`skala: 2/3` på hver post i `js/opstilling.js`), men står i
 stativets huller, som de altid har, så der er luft mellem dem, og de ligner
 rigtige reagensglas ved siden af et stativ. `skala` er et rent tegnemål:
@@ -123,7 +124,7 @@ musen: ingen to klikfelter overlapper.
 ## De to dele
 
 Forsøget har to dele, og de bruger hver sit udstyr: del 1 stativet med de
-otte reagensglas, badene og pulverglassene, del 2 de fire bægerglas og
+syv reagensglas, badene og pulverglassene, del 2 de fire bægerglas og
 frugtfarven. Der er ikke plads til begge dele på ét bord på 1040, og der
 skal heller ikke være det — et rigtigt bord har det fremme, man arbejder
 med. Derfor står **delen på genstanden**: hver post i `js/opstilling.js`
@@ -306,9 +307,9 @@ Forløbets replikker kommer altid med, og sb2.4 har også valgt hans uheld
 og advarsler (`historik` i `js/app.js`); kaffen og kigget ind kommer
 aldrig med. Start forfra rydder kortet.
 
-**Bemærkningerne kan komme igen** (S3): stamopløsning i 4a, to indgreb i
-samme glas, frugtfarve i ligevægtsblandingen, et skævt par og et forkert
-noteret glas har `igen` (30 s, billedet 20 s) i `js/forloeb.js`. De
+**Bemærkningerne kan komme igen** (S3): to indgreb i samme glas,
+frugtfarve i ligevægtsblandingen og et skævt par har `igen` (30 s) i
+`js/forloeb.js`. Et forkert noteret glas siger han kun én gang (F40). De
 kommer igen, når eleven laver fejlen på ny, men ikke før karantænen, og
 aldrig bare fordi glasset står der. Referencen siger han kun én gang.
 Sætter eleven termometeret i det varme glas 5, læser han tallet op, som
@@ -323,8 +324,9 @@ på siden, vises linjerne som en besked, så intet går tabt.
 
 Rammen står i `../../laboratoriet/js/quiz.js`; her ligger kun spørgsmålene,
 i `js/tekst.js` under `quiz`, sammen med al anden prosa. Ti spørgsmål:
-farven, de fire indgreb, forundersøgelsen i glas 8, varme og kulde, hvorfor
-der tilsættes fast stof, og til sidst fortyndingen set ovenfra.
+farven, de fire indgreb, varme og kulde, hvorfor der tilsættes fast stof,
+og til sidst fortyndingen set ovenfra, både for frugtfarven og for
+ligevægtsblandingen (spørgsmålet om forundersøgelsen er skiftet ud, F48).
 
 Quizzen låses op af et vilkår i `js/app.js`:
 `quiz: { krav: { journal: "billede", faerdig: true } }` — altså når billedet
@@ -336,10 +338,13 @@ noteret, og knappen banker.
 
 Rammen står i `../../laboratoriet/js/tegneserie.js`; her ligger kun, hvilke
 ruder sb2.4 har (`js/serie.js`) og ordene i dem (`js/tekst.js` under
-`serie`). Tretten ruder: stamopløsningen, ét glas ad gangen ved siden af glas
-7, forundersøgelsen i glas 8, billedet af alle syv, de fire glas ovenfra, en
-rød rude for hvert uheld, Kemichael hvis han ryddede op, og resultatskemaet
-for begge dele som sidste, brede rude.
+`serie`). Elleve ruder og en for hvert uheld: stamopløsningen, ét glas ad
+gangen ved siden af glas R, billedet af alle syv, de fire glas ovenfra, en
+rød rude for hvert uheld og resultatskemaet for begge dele som sidste,
+brede rude. **Uheldsruden siger, hvem der ryddede op** (F41): kun hvis
+Kemichael så uheldet og greb ind, står der, at han tørrede op, og så står
+han i ruden med køkkenrullen (eller kosten); tørrede eleven selv op, står
+der det (`bord.opryddet`).
 
 **Ruderne tegnes af elevens journal og ikke af bordet.** Hver post i
 journalen `billede` gemmer opskriften på det, der stod i glasset — og på
@@ -356,9 +361,12 @@ fået Fe(NO₃)₃; står temperaturen over 30 °C, stod det i vandbadet. Tog el
 en anden vej, end trinnet foreslog, står der stadig det rigtige i ruden.
 
 Serien låses op af et vilkår i `js/app.js` — begge journaler færdige — og
-åbnes med kortet i panelet eller tasten <kbd>G</kbd>. Et glas, der blev
-noteret anderledes, end det så ud, bliver ikke rettet; skemaet skriver facit
-under svaret, så eleven kan se forskellen selv.
+åbnes med kortet i panelet eller tasten <kbd>G</kbd>. **Opsummeringen
+retter ikke elevens iagttagelser** (F40): ruderne gentager det, eleven
+noterede, og forklarer teorien, og skemaet har kolonnerne »Du noterede« og
+»Teorien forventer« (fx »lysere ⟵«, for glas 6 »lidt mørkere ⟶«). Glas 6 i
+isbadet må noteres både »mørkere« og »som glas R«: forskellen er lille, og
+begge er rigtige iagttagelser (`godkendt` på billedets journal).
 
 ## Badene
 
@@ -420,10 +428,22 @@ Start forfra sætter alle ned. Fluebenet viser dem alle på én gang.
 
 **Klik som genvej (M16).** Alt i del 1 og del 2 kan gøres med klik:
 klik på kolben og så på glasset, så hælder den én portion; spatlen og så
-pulverglasset, så glasset; dråbeflasken og så 4b; glas 5 og så vandbadet;
+pulverglasset, så glasset; dråbeflasken og så glas 4; glas 5 og så vandbadet;
 et glas og så affaldet. Træk virker som før. Et klik på et glas og så på
 et andet hælder ikke — så vælges bare det andet. Selvtestens afsnit 28
 gør hele del 1 med klik alene.
+
+**Gennemgangen 19. september om aftenen (F37–F48).** Pilen til del 2 er
+en stor, blinkende pil på væggen ved plakaten (`pil` i `BORD_VALG`,
+`bord.visPil`). Isbadet har is (`is: true`). Forrest på bordet står en
+bøtte med rene spatler (`spatler`, del 1) og en kurv til snavset udstyr
+(`kurv`, begge dele). »Fyld op til« giver forslag, der passer til
+fortyndingen (`fyldOpForslag` i `js/app.js`): det, makkeren i parret har,
+det, det andet par har, og det dobbelte. Teksterne har tilstandsform ved
+stofferne, siger ikke længere »rør rundt«, og del 2 siger »lige meget
+frugtfarve« i stedet for »lige meget vand«; i visningen ovenfra vælger
+eleven, om det fortyndede glas er mørkere, lige så mørkt eller lysere end
+det ufortyndede.
 
 **Ryst glasset (S16).** Når et glas er valgt, står knappen »Ryst glasset«
 i panelet. Holdes den nede (eller tasten <kbd>R</kbd>), rystes glasset,

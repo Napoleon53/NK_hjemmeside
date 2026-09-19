@@ -25,6 +25,28 @@
            (kaffen, kigget ind) kommer aldrig. */
         historik: ["spild", "advarsel", "voldsom", "affald"],
 
+        /* »Fyld op til« (F39): de forslag, fortyndingen bruger. Til et af
+           de fire baegerglas: det, makkeren i parret har (saa de to faar
+           lige meget), det, det andet par har (saa par 1 kan fyldes op til
+           par 2), og det dobbelte (fortyndingen). Andre steder motorens
+           egne forslag. */
+        fyldOpForslag: function (bord, c) {
+            var O = NK.OVENFRA, B = NK.Beholder, i = O.BAEGERE.indexOf(c.navn);
+            if (i < 0) return null;
+            var V = B.volumen(c), maks = c.type.maks, ud = [];
+            function til(mL, tekst) {
+                mL = Math.round(mL);
+                if (mL > V + 0.5 && mL <= maks - 0.1 && !ud.some(function (x) { return x.mL === mL; })) ud.push({ mL: mL, tekst: tekst });
+            }
+            var makker = bord.g[O.BAEGERE[i ^ 1]];
+            if (makker) til(B.volumen(makker), "som " + makker.titel);
+            var andet = i < 2 ? [2, 3] : [0, 1];
+            var ander = Math.max.apply(null, andet.map(function (j) { return bord.g[O.BAEGERE[j]] ? B.volumen(bord.g[O.BAEGERE[j]]) : 0; }));
+            if (ander > 0.5) til(ander, "som par " + (i < 2 ? 2 : 1));
+            if (V > 0.5) til(2 * V, "dobbelt");
+            return ud;
+        },
+
         /* Quizzen (../../laboratoriet/js/quiz.js) laases op, naar eleven har
            taget billedet og noteret alle syv glas. Spoergsmaalene staar i
            js/tekst.js under "quiz". */
@@ -85,9 +107,9 @@
                 });
                 NK.el("billedknap").hidden = n !== 1;
                 NK.el("ovenfraknap").hidden = n !== 2;
-                /* Pilen til del 2 dukker op, naar del 1 er gjort (F28) */
-                var pil = NK.el("del2pil");
-                if (pil) pil.hidden = !(n === 1 && s.forloeb.flag("del1_gjort"));
+                /* Pilen til del 2 dukker op paa vaeggen og blinker, naar
+                   del 1 er gjort (F28, F43) */
+                s.bord().visPil(n === 1 && s.forloeb.flag("del1_gjort"));
                 s.opdaterForloeb();
             };
             /* Panelet viser det trin, eleven kan gaa i gang med HER. Listen
@@ -96,7 +118,7 @@
             [1, 2].forEach(function (i) {
                 NK.el("del" + i + "knap").addEventListener("click", function () { s.skiftDel(i); });
             });
-            if (NK.el("del2pil")) NK.el("del2pil").addEventListener("click", function () { s.skiftDel(2); });
+            s.bord().vedPil = function () { s.skiftDel(2); };
             NK.DELE.anvend(s.bord());
             s.visDel();
 

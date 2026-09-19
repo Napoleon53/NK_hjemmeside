@@ -36,10 +36,22 @@
         return "ens";
     }
 
+    /* F40: afkoelingen i isbadet flytter ligevaegten, men kun lidt. Glasset
+       ER lidt moerkere, og teoretisk skal det ogsaa vaere det, saa baade
+       »moerkere« og »som glas R« er rigtige iagttagelser af glas 6, naar
+       det har staaet koldt. Ingen retter eleven for at se det ene eller
+       det andet. */
+    function godkendt(id, bord, f) {
+        var gg = bord.g[id];
+        if (id === "glas6" && gg && (f === "moerkere" || f === "ens") && NK.Beholder.samlet(gg).T < 12) return ["moerkere", "ens"];
+        return [f];
+    }
+
     var journal = NK.Journal.lav({
         id: "billede",
         kraevede: GLAS,
         facit: facit,
+        godkendt: godkendt,
         /* Oejebliksbilledet: farven til skemaet, og hele opskriften paa
            det, der stod i glasset, saa tegneserien kan tegne glasset, som
            det saa ud - ogsaa efter at det er haeldt ud (tegneserie.js). */

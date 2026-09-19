@@ -29,21 +29,20 @@
             "thiocyanat farveløst. Farven fortæller altså direkte, hvor ligevægten ligger. " +
             "Du laver et indgreb i hvert glas og sammenligner med glas R, referencen, der ikke bliver rørt.",
         "intro-trin": [
-            "Fyld stamopløsning fra kolben i glas 1, 2, 3, 4b, 5, 6 og R. Glas R er referencen. Glas 4a, der står for sig, skal ikke have stamopløsning.",
-            "Glas 1 til 3 får en spatelspids fast stof: Fe(NO₃)₃, ascorbinsyre og KSCN.",
-            "Glas 4a er forundersøgelsen: KSCN og AgNO₃ uden jern giver et hvidt bundfald. Glas 4b får et par dråber AgNO₃, som fjerner SCN⁻ som hvidt bundfald.",
+            "Fyld 4 mL stamopløsning (aq) fra kolben i hvert af glas 1 til 6 og R. Glas R er referencen.",
+            "Glas 1 til 3 får en spatelspids fast stof: Fe(NO₃)₃(s), ascorbinsyre C₆H₈O₆(s) og KSCN(s).",
+            "Glas 4 får et par dråber AgNO₃(aq), som fjerner SCN⁻(aq) som hvidt AgSCN(s).",
             "Glas 5 i vandbadet, glas 6 i isbadet. Mål temperaturen med termometeret.",
             "Sammenlign hvert glas med glas R, og notér om det blev mørkere eller lysere.",
-            "Del 2: fire bægerglas i to par. Par 1 får en portion frugtfarve og vand op til, par 2 ligevægtsblanding — lige meget i begge glas i parret.",
-            "Fortynd det ene glas i hvert par med vand, og se alle fire ovenfra. Der er forskellen."
+            "Del 2: fire bægerglas i to par. Begge glas i par 1 får lige meget frugtfarve (aq), og begge glas i par 2 lige meget ligevægtsblanding (aq).",
+            "Fortynd det ene glas i hvert par med vand, H₂O(l), så de to glas i parret får forskelligt rumfang. Se så alle fire ovenfra, og sammenlign i hvert par det fortyndede glas med det ufortyndede."
         ],
         "intro-uheld":
             "Forkerte handlinger afvises ikke. Det, der kan gå galt, går galt, og Kemichael rydder op.",
 
         /* ----- De to dele ----------------------------------------------- */
-        "sig-4a": ["Glas 4a skal ikke have stamopløsning.", "Det er forundersøgelsen: KSCN og sølvnitrat alene. Hæld det i affaldet, og begynd forfra med det glas."],
         "forfra-del2": "Begge dele er ryddet. Vi begynder forfra i del 1.",
-        "del1-gjort": "Del 1 er gjort. Gå videre til del 2 med pilen øverst til højre, når du er klar.",
+        "del1-gjort": "Del 1 er gjort. Gå videre til del 2 med den grønne pil ved plakaten, når du er klar.",
         "del1knap": "Del 1: Glassene",
         "del2knap": "Del 2: Fortynding",
 
@@ -65,7 +64,7 @@
             "Efter et indgreb er reaktionsbrøken Y forskellig fra K. Ligevægten forskydes, til Y " +
             "igen er lig med K.",
             { overskrift: "Glas 1 til 4" },
-            "Fe(NO₃)₃ og KSCN øger koncentrationen af Fe³⁺ og SCN⁻, så ligevægten forskydes mod " +
+            "Fe(NO₃)₃(s) og KSCN(s) øger koncentrationen af Fe³⁺ og SCN⁻, så ligevægten forskydes mod " +
             "højre. Ascorbinsyre reducerer Fe³⁺ til Fe²⁺, som ikke indgår i ligevægten:",
             { ligning: "2 Fe³⁺ + C₆H₈O₆ → 2 Fe²⁺ + C₆H₆O₆ + 2 H⁺", lille: true },
             "Ag⁺ fælder SCN⁻ som et hvidt bundfald. I begge tilfælde forskydes ligevægten mod venstre:",
@@ -81,8 +80,8 @@
             "dobbelt så højt. Set ovenfra er lysvejen derfor dobbelt så lang, lyset møder lige mange " +
             "farvestofmolekyler, og farven er uændret. Set fra siden er vejen den samme som før, og " +
             "glasset ser lysere ud — men det siger kun, at koncentrationen faldt.",
-            "Ligevægtsblandingen opfører sig anderledes, selv om der er brugt lige meget stamopløsning. " +
-            "Alle koncentrationer halveres, og Y bliver dobbelt så stor som K:",
+            "I ligevægtsblandingen er der også lige meget stamopløsning i de to glas, men her bliver det " +
+            "fortyndede glas lysere, også set ovenfra. Alle koncentrationer halveres, og Y bliver dobbelt så stor som K:",
             { ligning: "Y = ½[FeSCN²⁺] / (½[Fe³⁺] · ½[SCN⁻]) = 2K", lille: true },
             "Ligevægten forskydes mod venstre, der dannes mindre FeSCN²⁺, og farven ovenfra bliver " +
             "lysere. Forskellen mellem de to par er beviset for, at fortynding i sig selv er et " +
@@ -102,20 +101,20 @@
            hele tiden. */
         "trin": {
             "fyld":  { kort: "Fyld de syv glas",
-                       tekst: "Hæld stamopløsning fra kolben i glas 1, 2, 3, 4b, 5, 6 og R — 4 mL i hvert. Glas 4a skal ikke have noget.",
+                       tekst: "Hæld stamopløsning (aq) fra kolben i glas 1 til 6 og R — 4 mL i hvert.",
                        hint: "Tag fat i kolben, og slip den over et glas. Den bliver hængende, så et klik hælder igen." },
             "glas1": { kort: "Glas 1: mere Fe³⁺",
-                       tekst: "Giv glas 1 en spatelspids Fe(NO₃)₃, og rør rundt. Hvad sker der med farven?",
-                       hint: "Slip spatlen over pulverglasset med Fe(NO₃)₃, og derefter over glas 1. Rør med glasstaven." },
+                       tekst: "Giv glas 1 en spatelspids Fe(NO₃)₃(s). Hvad sker der med farven?",
+                       hint: "Slip spatlen over pulverglasset med Fe(NO₃)₃(s), og derefter over glas 1." },
             "glas2": { kort: "Glas 2: C-vitamin",
-                       tekst: "Giv glas 2 en spatelspids ascorbinsyre. Den reducerer Fe³⁺ til Fe²⁺.",
+                       tekst: "Giv glas 2 en spatelspids ascorbinsyre, C₆H₈O₆(s). Den reducerer Fe³⁺(aq) til Fe²⁺(aq).",
                        hint: "Ascorbinsyre er C-vitamin. Spatelspidsen tages i pulverglasset og slippes over glas 2." },
             "glas3": { kort: "Glas 3: mere SCN⁻",
-                       tekst: "Giv glas 3 en spatelspids KSCN, og rør rundt.",
-                       hint: "Pulverglasset med KSCN står ved siden af de to andre." },
-            "glas4": { kort: "Glas 4b: AgNO₃",
-                       tekst: "Lav først forundersøgelsen i glas 4a: lidt KSCN og en dråbe AgNO₃. Dryp så AgNO₃ i glas 4b. Sølv fælder thiocyanat som hvidt AgSCN.",
-                       hint: "Dråbeflasken med AgNO₃ står på hylden. Slip den over glas 4b, så drypper den én dråbe, og pilen giver en dråbe mere — et par dråber er nok." },
+                       tekst: "Giv glas 3 en spatelspids KSCN(s).",
+                       hint: "Pulverglasset med KSCN(s) står ved siden af de to andre." },
+            "glas4": { kort: "Glas 4: AgNO₃",
+                       tekst: "Dryp et par dråber AgNO₃(aq) i glas 4. Sølv fælder thiocyanat som hvidt AgSCN(s).",
+                       hint: "Dråbeflasken med AgNO₃(aq) står på hylden. Slip den over glas 4, så drypper den én dråbe, og pilen giver en dråbe mere. Et par dråber er nok." },
             "varme": { kort: "Glas 5: varme",
                        tekst: "Sæt glas 5 i vandbadet, og tænd varmepladen. Mål temperaturen med termometeret.",
                        hint: "Slip glas 5 over vandbadet, og klik på varmepladens kontakt." },
@@ -133,16 +132,16 @@
 
             /* ----- Del 2: fortyndingen ------------------------------- */
             "farve": { kort: "Par 1: frugtfarve",
-                       tekst: "Giv begge glas i par 1 en portion frugtfarve, og fyld op med vand — lige meget i begge.",
-                       hint: "Flasken er en stamflaske: én hældning er 4 mL, og det er nok. Fyld op med sprøjteflasken, til der er lige så meget som i par 2 — hver sjat er 10 mL, og den gule pil giver en mere. Der skal mindst 30 mL i hvert glas, ellers er laget for tyndt til at se ned i." },
+                       tekst: "Giv begge glas i par 1 lige meget frugtfarve (aq): én portion i hvert. Hæld så vand, H₂O(l), i, til der er mindst 30 mL i hvert glas.",
+                       hint: "Flasken er en stamflaske: én hældning er 4 mL, og det er nok. Vandet kommer fra sprøjteflasken: skriv et tal i »Fyld op til«, eller giv en sjat ad gangen. Der skal mindst 30 mL i hvert glas, ellers er laget for tyndt til at se ned i." },
             "lv":    { kort: "Par 2: ligevægtsblanding",
-                       tekst: "Hæld ligevægtsblanding i begge glas i par 2 — lige meget i begge.",
+                       tekst: "Hæld lige meget ligevægtsblanding (stamopløsning, aq) i begge glas i par 2.",
                        hint: "Tag kolben til venstre eller bægerglasset med stamopløsning fra hylden. Kolben giver 40 mL pr. hældning, bægerglasset 25. Får de to glas ikke lige meget, måler du noget andet end fortyndingen." },
             "vand":  { kort: "Fortynd ét glas i hvert par",
-                       tekst: "Fortynd ét glas i hvert par med vand. Sigt efter dobbelt rumfang.",
-                       hint: "Sprøjteflasken står på hylden. Hver sjat er 10 mL, og den gule pil giver en mere. Mere vand gør bare forskellen tydeligere." },
+                       tekst: "Fortynd ét glas i hvert par med vand, H₂O(l), så de to glas i parret får forskelligt rumfang. Sigt efter dobbelt rumfang.",
+                       hint: "Sprøjteflasken står på hylden. Skriv fx det dobbelte i »Fyld op til«, eller giv en sjat ad gangen. Mere vand gør bare forskellen tydeligere." },
             "sml":   { kort: "Se de fire glas ovenfra",
-                       tekst: "Se de fire glas ovenfra, og notér for hvert par, hvordan det fortyndede glas ser ud.",
+                       tekst: "Se de fire glas ovenfra, og notér for hvert par, om det fortyndede glas er mørkere, lige så mørkt eller lysere end det ufortyndede.",
                        hint: "Knappen Se ovenfra står her i panelet. Ovenfra er lysvejen væskens dybde — det er derfor, fortyndingen kan aflæses dér og ikke fra siden.",
                        sig: "Der har du det. To glas, to svar." }
         },
@@ -156,8 +155,9 @@
         "ovenfra-titel": "De fire glas set ovenfra",
         "ovenfra-tekst":
             "Ovenfra går lyset gennem væskens dybde og ikke gennem glassets bredde. Fortyndes et glas " +
-            "til det dobbelte, halveres koncentrationen, men dybden fordobles. Notér for hvert par, " +
-            "hvordan det fortyndede glas ser ud i forhold til det andet.",
+            "til det dobbelte, halveres koncentrationen, men dybden fordobles. Sammenlign i hvert par " +
+            "det fortyndede glas med det ufortyndede ved siden af: er det fortyndede mørkere, lige så mørkt eller lysere?",
+        "ovenfra-valg": { moerkere: "Fortyndet er mørkere", ens: "Lige så mørkt", lysere: "Fortyndet er lysere" },
         "ovenfra-mangler": "Hæld den samme opløsning i begge glas i parret.",
         "ovenfra-ufortyndet": "Fortynd det ene glas i parret med vand.",
         "ovenfra-ikke-klar": "Parret er ikke klar: begge glas skal have den samme opløsning, og det ene skal være fortyndet.",
@@ -220,18 +220,18 @@
                     forklaring: "Mere SCN⁻ forskyder ligevægten mod højre. Noget af det frie Fe³⁺ bindes i FeSCN²⁺, så c(Fe³⁺) falder."
                 },
                 {
-                    sp: "Hvad viser forundersøgelsen med KSCN og AgNO₃ i glas 4a?",
+                    sp: "Frugtfarve fortyndes til dobbelt rumfang og ses ovenfra. Hvordan ser det fortyndede glas ud i forhold til det ufortyndede?",
                     valg: [
-                        "At Ag⁺ og SCN⁻ danner et hvidt bundfald",
-                        "At Ag⁺ og Fe³⁺ danner et bundfald",
-                        "At KSCN-opløsning er rød",
-                        "At AgNO₃ gør opløsningen varm"
+                        "Lige så mørkt, fordi lyset møder lige mange farvestofmolekyler",
+                        "Lysere, fordi koncentrationen er halveret",
+                        "Mørkere, fordi der er mere væske",
+                        "Lysere, fordi farvestoffet reagerer med vandet"
                     ],
                     rigtig: 0,
-                    forklaring: "I glas 4a er der ingen jernioner. Det hvide bundfald må derfor være AgSCN: Ag⁺ + SCN⁻ → AgSCN(s). Så ved man, hvad Ag⁺ gør ved SCN⁻ i glas 4b."
+                    forklaring: "Koncentrationen halveres, men væsken står dobbelt så højt. Lysvejen ovenfra bliver dobbelt så lang, så lyset møder lige mange farvestofmolekyler. Frugtfarven er ikke en ligevægt, så intet forskydes."
                 },
                 {
-                    sp: "Hvorfor bliver glas 4b lysere, når der dryppes AgNO₃ i?",
+                    sp: "Hvorfor bliver glas 4 lysere, når der dryppes AgNO₃ i?",
                     valg: [
                         "Ag⁺ fjerner SCN⁻, og ligevægten forskydes mod venstre",
                         "Ag⁺ reagerer med Fe³⁺, så der dannes mere FeSCN²⁺",
@@ -259,7 +259,7 @@
                     forklaring: "K afhænger kun af temperaturen. Reaktionen mod højre er exoterm, så K bliver større, når temperaturen falder. Y er nu mindre end K, og ligevægten forskydes mod højre."
                 },
                 {
-                    sp: "Hvorfor tilsættes Fe(NO₃)₃ og KSCN som fast stof i glas 1 og 3?",
+                    sp: "Hvorfor tilsættes Fe(NO₃)₃ og KSCN som fast stof, (s), i glas 1 og 3?",
                     valg: [
                         "En opløsning ville også fortynde glasset, så der ikke er variabelkontrol",
                         "Fast stof reagerer hurtigere end opløste ioner",
@@ -296,7 +296,13 @@
             stam: "Stamopløsningen af Fe(NO₃)₃ og KSCN er brændt orange. Farven skyldes komplekset FeSCN²⁺. Kolben er dagens portion; bægerglasset på hylden er forrådet.",
 
             glas: "Glas {nr}",
-            blev: "Det blev {ord} end glas R.",
+            /* F40: tegneserien gentager elevens egen iagttagelse og siger,
+               hvad teorien forventer. Den retter ikke iagttagelsen. */
+            noteret: {
+                "moerkere": "Du noterede, at det blev mørkere end glas R.",
+                "lysere": "Du noterede, at det blev lysere end glas R.",
+                "ens": "Du noterede, at det ikke blev synligt anderledes end glas R."
+            },
             ukendt: "blev ikke ændret i forhold til glas R",
             reference: "referencen",
             refKort: "ref.",
@@ -310,23 +316,21 @@
 
             /* Indgrebet laeses af, hvad der ER i glasset (js/serie.js) */
             indgreb: {
-                fe:    { hvad: "har mere jern i sig end glas R", kort: "mere Fe³⁺",
+                fe:    { hvad: "har mere jern i sig end glas R", kort: "mere Fe³⁺", forventet: "moerkere",
                          hvorfor: "Mere Fe³⁺ forskyder ligevægten mod højre, så der dannes mere FeSCN²⁺." },
-                scn:   { hvad: "har mere thiocyanat i sig end glas R", kort: "mere SCN⁻",
+                scn:   { hvad: "har mere thiocyanat i sig end glas R", kort: "mere SCN⁻", forventet: "moerkere",
                          hvorfor: "Mere SCN⁻ forskyder ligevægten mod højre, så der dannes mere FeSCN²⁺." },
-                vitc:  { hvad: "indeholder Fe²⁺", kort: "ascorbinsyre",
+                vitc:  { hvad: "indeholder Fe²⁺", kort: "ascorbinsyre", forventet: "lysere",
                          hvorfor: "Ascorbinsyre reducerer Fe³⁺ til Fe²⁺. Så falder c(Fe³⁺), og ligevægten forskydes mod venstre." },
-                ag:    { hvad: "indeholder et hvidt bundfald af AgSCN", kort: "AgNO₃",
+                ag:    { hvad: "indeholder et hvidt bundfald af AgSCN", kort: "AgNO₃", forventet: "lysere",
                          hvorfor: "Ag⁺ fælder SCN⁻ som AgSCN(s). Så falder c(SCN⁻), og ligevægten forskydes mod venstre." },
-                varme: { hvad: "stod i det varme vandbad", kort: "varme",
+                varme: { hvad: "stod i det varme vandbad", kort: "varme", forventet: "lysere",
                          hvorfor: "Dannelsen af FeSCN²⁺ er exoterm, så opvarmning forskyder ligevægten mod venstre." },
-                kulde: { hvad: "stod i isbadet", kort: "kulde",
-                         hvorfor: "Dannelsen af FeSCN²⁺ er exoterm, så afkøling forskyder ligevægten mod højre." },
-                vand:  { hvad: "er fortyndet", kort: "vand",
+                kulde: { hvad: "stod i isbadet", kort: "kulde", forventet: "lidtMoerkere",
+                         hvorfor: "Dannelsen af FeSCN²⁺ er exoterm, så afkøling forskyder ligevægten lidt mod højre. Glasset kan blive en smule mørkere, men forskellen er lille." },
+                vand:  { hvad: "er fortyndet", kort: "vand", forventet: "lysere",
                          hvorfor: "Fortynding sænker alle koncentrationer. Y bliver større end K, og ligevægten forskydes mod venstre." }
             },
-
-            glas8: "Forundersøgelsen i glas 4a: KSCN og AgNO₃ giver et hvidt bundfald. Ag⁺(aq) + SCN⁻(aq) ⟶ AgSCN(s). Derfor virker sølv som indgreb i glas 4b.",
 
             billede: "Billedet af glas 1–6 og R. Glas R ved stuetemperatur er referencen, og du noterede {n} af {i alt} glas.",
 
@@ -335,24 +339,37 @@
             par: { farve: "Frugtfarve", lv: "Ligevægt" },
 
             uheld: {
-                spild:    "Uheld: {glas} blev rystet så voldsomt, at en tiendedel af indholdet røg ud på bordet. Kemichael tørrede op.",
-                overloeb: "Uheld: {glas} løb over. Kemichael tørrede op.",
-                knust:    "Uheld: {glas} gik i stykker. Kemichael fejede skårene op.",
-                vaeltet:  "Uheld: {glas} væltede. Kemichael tørrede op."
+                spild:    "Uheld: {glas} blev rystet så voldsomt, at en tiendedel af indholdet røg ud på bordet.",
+                rystet:   "Uheld: {glas} blev rystet så voldsomt, at en tiendedel af indholdet røg ud på bordet.",
+                overloeb: "Uheld: {glas} løb over.",
+                knust:    "Uheld: {glas} gik i stykker.",
+                vaeltet:  "Uheld: {glas} væltede."
+            },
+            /* F41: kun hvis han faktisk greb ind, var det ham */
+            oprydning: {
+                laerer: "Kemichael så det og tørrede op.",
+                laererKnust: "Kemichael så det og fejede skårene op.",
+                elev: "Du tørrede selv op.",
+                ingen: "Ingen tørrede op."
             },
 
             skema: {
                 titel: "Resultatskemaet: sådan endte forsøget.",
                 del1: "Del 1: de syv glas",
                 del2: "Del 2: fortynding set ovenfra",
-                hoved1: ["Glas", "Det, der er i glasset", "Temperatur", "Farveændring", "⟵ / ⟶"],
-                hoved2: ["Opløsning", "Rumfang", "Set ovenfra efter fortynding", "⟵ / ⟶"],
+                hoved1: ["Glas", "Det, der er i glasset", "Temperatur", "Du noterede", "Teorien forventer"],
+                hoved2: ["Opløsning", "Rumfang", "Du noterede (fortyndet mod ufortyndet)", "Teorien forventer"],
                 tomt: "tomt",
                 uroert: "urørt",
                 ikkeNoteret: "ikke noteret",
-                facit: "Glasset var {ord}.",
                 ingen: "ingen ligevægt",
-                retning: { "moerkere": "⟶", "lysere": "⟵", "ens": "ingen" }
+                /* Det, teorien forventer, med ligevaegtens retning */
+                forventet: {
+                    "moerkere": "mørkere ⟶",
+                    "lidtMoerkere": "lidt mørkere ⟶",
+                    "lysere": "lysere ⟵",
+                    "ens": "lige så mørkt"
+                }
             }
         },
 

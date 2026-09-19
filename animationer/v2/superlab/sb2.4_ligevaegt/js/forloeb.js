@@ -23,10 +23,10 @@
     var NK = window.NK;
     var T = NK.TEKST.trin;
 
-    var GLAS = ["glas1", "glas2", "glas3", "glas4", "glas5", "glas6", "glas7", "glas8"];
-    /* Glassene med stamoploesning: alle paa naer 4a (glas8), som er
-       forundersoegelsen med KSCN og AgNO3 alene (F31) */
-    var STAM_GLAS = ["glas1", "glas2", "glas3", "glas4", "glas5", "glas6", "glas7"];
+    var GLAS = ["glas1", "glas2", "glas3", "glas4", "glas5", "glas6", "glas7"];
+    /* Glassene med stamoploesning: alle syv (forundersoegelsen i glas 8
+       er fjernet igen, F48) */
+    var STAM_GLAS = GLAS;
 
     /* Del 2 spoerger js/ovenfra.js, som ejer parrene og reglen for, hvad
        der taeller som fortyndet. Et vilkaar maa vaere en funktion af
@@ -147,18 +147,6 @@
                 saa: [{ sig: NK.TEKST["sig-reference"], peg: "glas7", glimt: "afslag", udtryk: "skeptisk", slags: "advarsel" }]
             },
 
-            /* Stamoploesning i 4a (F31): det glas er forundersoegelsen, og
-               han foreslaar affaldet */
-            {
-                id: "stam_i_4a",
-                igen: 30,
-                naar: { nogen: [
-                    { beholder: "glas8", stof: "Fe3+", over: 0.1 },
-                    { beholder: "glas8", stof: "FeSCN2+", over: 0.05 }
-                ] },
-                saa: [{ sig: NK.TEKST["sig-4a"], peg: "glas8", udtryk: "skeptisk", slags: "advarsel" }]
-            },
-
             /* To slags indgreb i samme glas: saa kan man ikke sige, hvad der
                virkede. Proeven er sat paa glas 1 til 4, ét ad gangen. */
             {
@@ -212,7 +200,6 @@
                kigge igen, og han kan selv trykke om. */
             {
                 id: "kig_igen",
-                igen: 20,
                 naar: { alle: [
                     { journal: "billede", faerdig: true },
                     { journal: "billede", forkerte: { over: 0 } }

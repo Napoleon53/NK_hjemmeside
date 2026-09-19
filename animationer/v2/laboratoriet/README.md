@@ -558,6 +558,28 @@ bord)` gør `{{glas5.T}}`, `{{glas1.V}}`, `{{glas1.pH}}` og
 `{{glas1.FeSCN2+}}` til tal, når linjen siges; et termometer giver det,
 det viser. En pladsholder, der ikke kan udfyldes, står tilbage.
 
+**Tilføjet 19. september sent (F37–F46).** *Pilen:* `valg.pil = { x, y,
+b, h, tekst }` er en stor pil på væggen; `bord.visPil(true)` viser den
+blinkende, og et klik kalder `bord.vedPil` (samme pil kan føre til næste
+rum). *Kurven og bøtten:* udstyret `kurv` (`kan.kurv`) tager imod tomt,
+snavset udstyr — det forsvinder, og et rent eksemplar bygges af
+opstillingens post uden indhold (`iKurv`, `nytRent`); et glas med noget i
+afvises med en besked. `spatelboette` (`kan.spatler`) giver en ny spatel:
+et træk tager den, et klik lægger den frem og gør den klar (`nySpatel`);
+de ekstra spatler har `ekstra: true` og forsvinder bare i kurven. *Fyld
+op:* feltet vises, når en flaske, kolben eller et glas svæver over
+glasudstyr med `fyldOp` på typen (bægerglas, måleglas, konisk kolbe), og
+`fyldOpTil` hælder med kolben eller sprøjter med sprøjteflasken. Under
+feltet står op til tre forslag (`valg.fyldOpForslag` i siden, ellers
+»dobbelt« og runde tal). *Termometeret* glider roligt (`opdaterMaaler`),
+og tallet (`visT`) skifter højst fire gange i sekundet. *Glasstaven* er 190
+lang og går ned til lige over bunden. *Isbad:* `is: true` på en post
+tegner isterninger (`T.tegnIs`). *Journalen:* `godkendt(id, bord, facit)`
+kan godkende flere svar. *Uheld:* `bord.opryddet` siger, om læreren
+(`laerer.js`) eller eleven (`toerOp`) ryddede op. *Noterne:* skraldespand
+og kryds øverst til højre, »Luk« nederst; skraldespanden sletter først ved
+andet klik.
+
 **Der hældes kun, når eleven beder om det (F36):** et slip over glasset
 giver én portion, og pilen ved flasken giver mere. At bære en flaske hen
 over et glas eller holde den stille over det hælder ikke — før talte en

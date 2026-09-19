@@ -94,11 +94,9 @@
 
         ud.push(rudeStam(bord));
         GLAS.forEach(function (navn, i) { ud.push(rudeGlas(bord, navn, i + 1, ref7)); });
-        ud.push(rudeGlas8(bord));
         ud.push(rudeBillede(bord));
         ud.push(rudeOvenfra(bord));
         uheldsruder(bord).forEach(function (r) { ud.push(r); });
-        ud.push(rudeOprydning(bord));
         ud.push(rudeSkema(bord, ref7));
         return ud;
     }
@@ -132,7 +130,9 @@
         t += g ? " " + g.hvad : " " + (TEK.ukendt || "");
         if (kode === "varme" || kode === "kulde") t += " (" + grader(opl.T) + ")";
         t += ". ";
-        if (p.facit) t += (TEK.blev || "").replace("{ord}", TEK.ord[p.facit] || p.facit) + " ";
+        /* F40: elevens egen iagttagelse og teoriens forklaring - ruden
+           retter ikke det, eleven saa */
+        if (p.svar && TEK.noteret && TEK.noteret[p.svar]) t += TEK.noteret[p.svar] + " ";
         if (g) t += g.hvorfor;
         /* Hver post har sin egen reference gemt: glas 7, som det saa ud,
            da netop DETTE glas blev noteret */
@@ -149,25 +149,6 @@
                 TS.etiket(ctx, "glas " + mk, pt(HOEJRE.x, 0).x, TS.H - 13);
             },
             alt: "Glas " + mkR + " og glas " + mk + " ved siden af hinanden"
-        };
-    }
-
-    /* 8. Forundersoegelsen i glas 8, hvis den blev lavet */
-    function rudeGlas8(bord) {
-        var p = post("glas8") || { billede: { opl: Stof.opskrift(B.samlet(bord.g.glas8)) } };
-        var opl = p.billede && p.billede.opl;
-        if (!opl || mM(opl, "AgSCN(s)") < 0.02) return null;
-        var midt = { x: 520, y: 420, v: 0 };
-        var ting = [glasSom(bord, "glas8", midt, opl)];
-        return {
-            tekst: TEK.glas8,
-            froe: 8,
-            udsnit: TS.omkring(ting, 60),
-            ting: ting,
-            oven: function (ctx, pt) {
-                TS.etiket(ctx, "glas " + (bord.g.glas8.nr || "8"), pt(midt.x, 0).x, TS.H - 13);
-            },
-            alt: "Glas " + (bord.g.glas8.nr || "8") + " med hvidt bundfald af AgSCN"
         };
     }
 
@@ -276,8 +257,25 @@
             /* type og anker er allerede i glassets skala (S31) */
             var ting = [TS.kopi(gg, { x: gg.p.x, y: bund - gg.type.h + gg.anker.y })];
             var f = B.farve(gg) || NK.Stof.VAND;
+            /* F41: hvem ryddede op? Kun hvis Kemichael greb ind, siger ruden
+               det - og saa staar han i den med koekkenrullen eller kosten */
+            var hvem = bord.opryddet && bord.opryddet[n];
+            var laerer = hvem === "laerer" && NK.Kemichael && NK.Kemichael.tegneserieFigur;
+            var O = TEK.oprydning || {};
+            var efter = hvem === "laerer" ? (slags === "knust" ? O.laererKnust : O.laerer) : (hvem === "elev" ? O.elev : O.ingen);
             ud.push({
-                tekst: t.replace("{glas}", gg.titel || navn),
+                tekst: t.replace("{glas}", gg.titel || navn) + (efter ? " " + efter : ""),
+                oven: laerer ? function (ctx) {
+                    NK.Kemichael.tegneserieFigur(ctx, {
+                        x: TS.B * 0.78, gulv: TS.H - 18, skala: 0.42, arm: 2.05,
+                        udtryk: { vrede: 0.9, humoer: -0.8, roed: 0.2, lukket: 1 },
+                        haand: function (c, hd) {
+                            var hvad = slags === "knust" ? "kost" : "koekkenrulle";
+                            NK.Sprites.tegnPositur(c, hvad, { x: hd.x + 6, y: hd.y + 8, v: 0.2 },
+                                (NK.Udstyr.type(hvad) && NK.Udstyr.type(hvad).anker) || { x: 0, y: 0 });
+                        }
+                    });
+                } : undefined,
                 fejl: true,
                 froe: 20 + ud.length,
                 udsnit: TS.omkring(ting, 70),
@@ -291,28 +289,6 @@
             });
         });
         return ud;
-    }
-
-    /* 12. Ryddede han op undervejs, faar han sin egen rude */
-    function rudeOprydning() {
-        var K = NK.Kemichael;
-        if (!K || !K.uheldIForsoeget || !K.uheldIForsoeget()) return null;
-        return {
-            tekst: K.oprydningsTekst(),
-            froe: 30,
-            ren: true,
-            oven: function (ctx) {
-                K.tegneserieFigur(ctx, {
-                    x: TS.B / 2, gulv: TS.H - 18, skala: 0.46, arm: 2.05,
-                    udtryk: { vrede: 0.9, humoer: -0.8, roed: 0.2, lukket: 1 },
-                    haand: function (c, hd) {
-                        NK.Sprites.tegnPositur(c, "koekkenrulle", { x: hd.x + 6, y: hd.y + 8, v: 0.2 },
-                            NK.Udstyr.type("koekkenrulle").anker || { x: 0, y: 0 });
-                    }
-                });
-            },
-            alt: "Kemichael med køkkenrullen"
-        };
     }
 
     /* 13. Resultatskemaet: begge dele i den sidste, brede rude */
@@ -354,16 +330,14 @@
             else if (!p) svar = tom ? "" : (K.ikkeNoteret || "");
             else svar = TS.svarCelle({
                 farve: p.billede && p.billede.farve,
-                svar: TEK.ord[p.svar] || p.svar,
-                facit: TEK.ord[p.facit] || p.facit,
-                facitTekst: p.facit && p.svar !== p.facit ? (K.facit || "").replace("{ord}", TEK.ord[p.facit] || p.facit) : null
+                svar: TEK.ord[p.svar] || p.svar
             });
             raekker.push([
                 String((bord.g[navn] && bord.g[navn].nr) || nr),
                 tom ? (K.tomt || "") : (g ? g.kort : (navn === "glas7" ? (K.uroert || "") : (TEK.ukendt || ""))),
                 tom ? "" : grader(opl.T),
                 svar,
-                navn === "glas7" || !p || !p.facit ? "" : (K.retning ? K.retning[p.facit] : "")
+                navn === "glas7" || !g || !g.forventet || !K.forventet ? "" : K.forventet[g.forventet]
             ]);
         });
         return raekker;
@@ -380,11 +354,9 @@
                 Math.round(r.V) + " mL ⟶ " + Math.round(f.V) + " mL",
                 TS.svarCelle({
                     farve: f.farve,
-                    svar: TEK.ord[p.svar] || p.svar,
-                    facit: TEK.ord[p.facit] || p.facit,
-                    facitTekst: p.facit && p.svar !== p.facit ? (K.facit || "").replace("{ord}", TEK.ord[p.facit] || p.facit) : null
+                    svar: TEK.ord[p.svar] || p.svar
                 }),
-                type === "farve" ? (K.ingen || "") : (K.retning ? K.retning[p.facit] : "")
+                !K.forventet ? "" : (type === "farve" ? K.forventet.ens + " (" + (K.ingen || "") + ")" : K.forventet.lysere)
             ]);
         });
         return raekker;

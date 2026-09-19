@@ -2,7 +2,7 @@
    dele.js - del 1 og del 2 paa det samme bord
 
    Forsoeget har to dele, og de bruger hver sit udstyr: del 1 stativet
-   med de otte reagensglas, badene og pulverglassene, del 2 de fire
+   med de syv reagensglas, badene og pulverglassene, del 2 de fire
    baegerglas og frugtfarven. Der er ikke plads til begge dele paa ét
    bord paa 1040, og der skal heller ikke vaere det: et rigtigt bord har
    det fremme, man arbejder med.

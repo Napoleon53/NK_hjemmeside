@@ -48,10 +48,11 @@
                       ryster det valgte glas uden at spilde (S16); vises
                       kun, naar det valgte glas kan rystes
      #logbog-tekst #logbog-noter #logbog-ryd
-     #noterknap #noter #noter-luk
+     #noterknap #noter #noter-luk #noter-lukknap
                       noterne (logbogen) foldet ud fra toplinjen: knappen
-                      og tasten N viser og skjuler #noter, Esc og
-                      #noter-luk lukker
+                      og tasten N viser og skjuler #noter, Esc, krydset
+                      #noter-luk og knappen #noter-lukknap lukker. Ryd
+                      (skraldespanden) sletter foerst ved andet klik (F37)
 
    Kroge, som forsoeget kan saette i valg:
      vedAendring(grund)     noget aendrede sig paa bordet
@@ -730,11 +731,25 @@
         if (this.signatur() !== this.sidsteSignatur) this.opdaterPanel();
     };
 
-    /* ----- »Fyld op til« (F29) ------------------------------------------------
-       Haenger sproejteflasken over et glas, staar der et lille felt ved
-       pilen: skriv et rumfang, og glasset fyldes op til det i én
-       sproejtning (bord.fyldOpTil). Feltet laves her, saa alle forsoeg faar
-       det uden egen markup. */
+    /* ----- »Fyld op til« (F29, F39, F42) --------------------------------------
+       Haenger sproejteflasken - eller en anden flaske, kolben eller et glas
+       - over glasudstyr, man maaler rumfang i (bord.kanFyldeOp), staar der
+       et lille felt ved pilen: skriv et rumfang, og glasset fyldes op til
+       det i én haeldning (bord.fyldOpTil). Under feltet staar op til tre
+       forslag som knapper. Forsoeget kan give sine egne, der passer til
+       netop det (valg.fyldOpForslag(bord, glas, kilde) -> [{ mL, tekst }]);
+       ellers er det »dobbelt« og runde tal paa glassets skala. Feltet
+       laves her, saa alle forsoeg faar det uden egen markup. */
+    function standardForslag(b, c) {
+        var V = NK.Beholder.volumen(c), maks = c.type.maks, ud = [];
+        if (V > 0.5 && 2 * V <= maks - 0.1) ud.push({ mL: Math.round(2 * V), tekst: "dobbelt" });
+        [0.25, 0.5, 0.75].forEach(function (f) {
+            var mL = Math.round(maks * f / 10) * 10;
+            if (mL > V + 0.5 && ud.length < 3 && !ud.some(function (x) { return x.mL === mL; })) ud.push({ mL: mL, tekst: "" });
+        });
+        return ud;
+    }
+
     P.bygFyldOp = function () {
         var lr = NK.el("scene-laerred"), scene = lr && lr.parentNode, mig = this;
         if (!scene || this.fyldOp) return;
@@ -744,8 +759,16 @@
         f.hidden = true;
         f.setAttribute("aria-label", "Fyld op til");
         f.innerHTML = '<label>Fyld op til <input id="fyldop-ml" type="text" inputmode="decimal" size="4" autocomplete="off"> mL</label>' +
-            '<button class="knap" type="submit">Fyld</button>';
+            '<button class="knap" type="submit">Fyld</button>' +
+            '<div class="fyldop-forslag" id="fyldop-forslag"></div>';
         scene.appendChild(f);
+        f.querySelector(".fyldop-forslag").addEventListener("click", function (e) {
+            var k = e.target && e.target.closest ? e.target.closest("button[data-ml]") : null;
+            if (!k) return;
+            e.preventDefault();
+            var b = mig.bord(), sv = b && b.svaevende();
+            if (sv && sv.svaev) b.fyldOpTil(sv, sv.svaev.maal, parseFloat(k.dataset.ml));
+        });
         f.addEventListener("submit", function (e) {
             e.preventDefault();
             var b = mig.bord(), sv = b && b.svaevende(), inp = NK.el("fyldop-ml");
@@ -762,7 +785,7 @@
         var f = this.fyldOp;
         if (!f) return;
         var b = this.bord(), sv = b && b.svaevende(), ring = sv && b.svaevRing();
-        var vis = !!(ring && sv.kan.sproejter && sv.svaev && sv.svaev.maal && sv.svaev.maal.kan.holder && !b.koer.optaget());
+        var vis = !!(ring && sv.svaev && sv.svaev.maal && b.kanFyldeOp && b.kanFyldeOp(sv, sv.svaev.maal) && !b.koer.optaget());
         if (!vis) {
             if (!f.hidden) {
                 f.hidden = true;
@@ -780,8 +803,25 @@
             f.dataset.sted = x + "," + y;
         }
         f.hidden = false;
-        var inp = NK.el("fyldop-ml");
-        if (inp && document.activeElement !== inp) inp.placeholder = String(Math.round(NK.Beholder.volumen(sv.svaev.maal)));
+        var inp = NK.el("fyldop-ml"), c = sv.svaev.maal;
+        if (inp && document.activeElement !== inp) inp.placeholder = String(Math.round(NK.Beholder.volumen(c)));
+        var fo = this.valg.fyldOpForslag ? this.valg.fyldOpForslag.call(this, b, c, sv) : null;
+        if (!fo) fo = standardForslag(b, c);
+        fo = (fo || []).slice(0, 3);
+        var boks = NK.el("fyldop-forslag"), noegle = fo.map(function (x) { return x.mL + ":" + x.tekst; }).join("|");
+        if (boks && boks.dataset.noegle !== noegle) {
+            boks.dataset.noegle = noegle;
+            boks.textContent = "";
+            boks.hidden = !fo.length;
+            fo.forEach(function (x) {
+                var k = document.createElement("button");
+                k.type = "button";
+                k.className = "knap forslag";
+                k.dataset.ml = String(x.mL);
+                k.textContent = x.mL + " mL" + (x.tekst ? " · " + x.tekst : "");
+                boks.appendChild(k);
+            });
+        }
     };
 
     /* ----- Opstart ------------------------------------------------------------ */
@@ -932,11 +972,30 @@
             NK.el("logbog-tekst").value = gemt("nk-" + this.navn + "-logbog") || "";
             paa("logbog-tekst", "input", function () { mig.logbogGem(); });
             paa("logbog-noter", "click", function () { mig.logbogNoter(); });
-            paa("logbog-ryd", "click", function () { NK.el("logbog-tekst").value = ""; mig.logbogGem(); });
+            /* Skraldespanden sidder lige ved krydset (F37), saa den sletter
+               foerst ved andet klik inden for tre sekunder */
+            paa("logbog-ryd", "click", function () {
+                var k = this, felt = NK.el("logbog-tekst");
+                if (!felt.value) return;
+                if (!k.classList.contains("bekraeft")) {
+                    k.classList.add("bekraeft");
+                    k.title = "Klik igen for at slette noterne";
+                    mig.besked("Klik på skraldespanden igen for at slette noterne.", "advarsel");
+                    window.clearTimeout(mig.rydUr);
+                    mig.rydUr = window.setTimeout(function () { k.classList.remove("bekraeft"); k.title = "Slet noterne"; }, 3000);
+                    return;
+                }
+                window.clearTimeout(mig.rydUr);
+                k.classList.remove("bekraeft");
+                k.title = "Slet noterne";
+                felt.value = "";
+                mig.logbogGem();
+            });
             NK.logbog = { noter: function () { mig.logbogNoter(); }, aflaesning: function () { return mig.aflaesning(); } };
         }
         paa("noterknap", "click", function () { mig.skiftNoter(); });
         paa("noter-luk", "click", function () { mig.skiftNoter(false); });
+        paa("noter-lukknap", "click", function () { mig.skiftNoter(false); });
         /* Esc i skrivefeltet lukker ogsaa (tastaturet ser ikke tekstfelter) */
         paa("noter", "keydown", function (e) {
             if (e.key !== "Escape") return;

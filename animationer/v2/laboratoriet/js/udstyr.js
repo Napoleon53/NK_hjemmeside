@@ -21,6 +21,8 @@
                          affald     tager imod alt, der haeldes i
                          vask       tager imod alt, der haeldes i
                          papir      toerrer pytter op
+                         kurv       tager imod tomt, snavset udstyr (F44)
+                         spatler    en boette, man tager nye spatler fra
                          fast       kan ikke tages op (staar fast paa bordet)
      kilde             en beholder, man haelder FRA (kolben, maaleglasset,
                        vejebaaden - flasker er det altid). Klik som genvej
@@ -28,6 +30,10 @@
                        glas, man kigger i, flyttes kun med klik
      intetkoen         navnet er intetkoen (glasset, termometeret): saa
                        siger beskeder »det« og ikke »den«
+     fyldOp            glasudstyr, man maaler rumfang i (baegerglas,
+                       maaleglas, konisk kolbe): haenger en flaske over
+                       det, kan man skrive, hvor meget der skal fyldes op
+                       til (F42). Ikke reagensglas og petriskaale
      indre             indersiden som polygon i spritets koordinater
      mlPrAreal         areal i tegneenheder pr. mL. UDLEDES af indersiden og
                        maks, saa vaesken staar praecis til kanten, naar
@@ -122,7 +128,7 @@
             sprite: "baegerLille", fil: "baegerglas_100.svg", b: 72, h: 110,
             anker: { x: 36, y: 4 },
             streger: { hver: 50, smaa: 25, lang: 12, kort: 7, luft: 4, str: 6, navn: { x: 30, y: 99, str: 5.6 } },
-            kan: { holder: true, haelder: true }, intetkoen: true,
+            kan: { holder: true, haelder: true }, intetkoen: true, fyldOp: true,
             indre: BAEGER_LILLE_INDRE, maks: 250, haeldMl: 20,
             tud: { x: 1, y: 3.5, v: -1.15 },
             vejlaengde: 2, titel: "bægerglasset", valgtMaerke: { x: 60, y: -8 },
@@ -139,7 +145,7 @@
             sprite: "baegerStor", fil: "baegerglas.svg", b: 112, h: 132,
             anker: { x: 56, y: 6 },
             streger: STREGER_STOR,
-            kan: { holder: true, haelder: true }, intetkoen: true,
+            kan: { holder: true, haelder: true }, intetkoen: true, fyldOp: true,
             indre: BAEGER_STOR_INDRE, maks: 600, haeldMl: 25,
             tud: { x: 3, y: 6, v: -1.1 },
             vejlaengde: 3, titel: "det store bægerglas", valgtMaerke: { x: 96, y: -8 },
@@ -183,7 +189,7 @@
             sprite: "kolbe", fil: "kolbe.svg", b: 96, h: 128,
             anker: { x: 48, y: 2.5 },
             streger: { hver: 50, lang: 7.7, x: 41, str: 5.1, tekst: "hoejre", bred: 0.9, navn: { x: 48, y: 119, str: 4.8 } },
-            kan: { holder: true, haelder: true }, kilde: true,
+            kan: { holder: true, haelder: true }, kilde: true, fyldOp: true,
             indre: KOLBE_INDRE, maks: 200, haeldMl: 40,
             tud: { x: 40, y: 3, v: -1.95 },
             vejlaengde: 3, titel: "kolben",
@@ -202,7 +208,7 @@
             sprite: "maaleglas", fil: "maaleglas.svg", b: 44, h: 220,
             anker: { x: 22, y: 4 },
             streger: { hver: 20, smaa: 10, til: 100, nominel: 100, lang: 12, kort: 8, luft: 4, str: 4.6, bred: 0.8, navn: { x: 22, y: 196, str: 4.4 } },
-            kan: { holder: true, haelder: true }, kilde: true, intetkoen: true,
+            kan: { holder: true, haelder: true }, kilde: true, intetkoen: true, fyldOp: true,
             indre: MAALEGLAS_INDRE, maks: 110, haeldMl: 10,
             tud: { x: 2, y: 3.5, v: -1.3 },
             vejlaengde: 1.3, titel: "måleglasset",
@@ -261,10 +267,11 @@
             titel: "spatlen", ske: { x: 12, y: 3.5 }
         },
         glasstav: {
-            sprite: null, b: 8, h: 130,
+            /* F46: lang nok til at naa bunden af et reagensglas (160) */
+            sprite: null, b: 8, h: 190,
             anker: { x: 0, y: 0 },
             kan: { roerer: true },
-            laengde: 130, titel: "glasstaven"
+            laengde: 190, titel: "glasstaven"
         },
         termometer: {
             sprite: null, b: 14, h: 120,
@@ -292,6 +299,22 @@
             kan: { affald: true, fast: true },
             etiket: { x: 12, y: 46, b: 66, h: 40 },
             titel: "affaldsdunken"
+        },
+        /* F44: kurven til snavset udstyr (et tomt glas, en spatel, en
+           glasstav eller et termometer i kurven forsvinder, og et rent staar
+           paa dets plads) og boetten med rene spatler */
+        kurv: {
+            sprite: "kurv", fil: "kurv.svg", b: 110, h: 50,
+            anker: { x: 55, y: 6 },
+            kan: { kurv: true, fast: true },
+            etiket: { x: 32, y: 15, b: 46, h: 24 },
+            titel: "kurven til snavset udstyr"
+        },
+        spatelboette: {
+            sprite: "spatelboette", fil: "spatelboette.svg", b: 40, h: 74,
+            anker: { x: 20, y: 30 },
+            kan: { spatler: true, fast: true },
+            titel: "bøtten med spatler"
         },
         vask: {
             sprite: "vask", fil: "vask.svg", b: 110, h: 160,

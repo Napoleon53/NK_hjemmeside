@@ -70,6 +70,9 @@
             id: id,
             svar: svar,
             facit: facit,
+            /* F40: de svar, der godkendes. Er en virkning lille, kan baade
+               retningen og »ens« vaere rigtige iagttagelser (valg.godkendt) */
+            godkendt: v.godkendt && bord ? v.godkendt(id, bord, facit) : null,
             billede: v.billede && bord ? v.billede(id, bord) : null,
             tid: Date.now()
         };
@@ -96,6 +99,7 @@
             if (tol === undefined) tol = 0;
             return Math.abs(Number(p.svar) - p.facit) <= tol;
         }
+        if (Array.isArray(p.godkendt) && p.godkendt.length) return p.godkendt.indexOf(p.svar) >= 0;
         return p.svar === p.facit;
     };
 

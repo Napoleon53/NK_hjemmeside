@@ -124,6 +124,36 @@
         ctx.restore();
     };
 
+    /* F43: den store pil paa vaeggen til naeste del eller rum. Den
+       blinker - to groenne toner og en glorie, der aander - saa det er
+       tydeligt, at man skal videre. p: { x, y, b, h, tekst } */
+    T.tegnPil = function (ctx, p, tid, over) {
+        var puls = 0.5 + 0.5 * Math.sin(tid * 5);
+        var x = p.x, y = p.y, b = p.b, h = p.h, spids = h * 0.6;
+        var ky = y + h * 0.2, kh = h * 0.6;
+        ctx.save();
+        ctx.shadowColor = "rgba(82, 214, 145, " + (0.35 + 0.55 * puls) + ")";
+        ctx.shadowBlur = 8 + 16 * puls;
+        ctx.fillStyle = over ? "#4cc584" : (puls > 0.5 ? "#3fae72" : "#2b8a57");
+        ctx.beginPath();
+        ctx.moveTo(x, ky);
+        ctx.lineTo(x + b - spids, ky);
+        ctx.lineTo(x + b - spids, y);
+        ctx.lineTo(x + b, y + h / 2);
+        ctx.lineTo(x + b - spids, y + h);
+        ctx.lineTo(x + b - spids, ky + kh);
+        ctx.lineTo(x, ky + kh);
+        ctx.closePath();
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "rgba(236, 255, 244, " + (0.7 + 0.3 * puls) + ")";
+        ctx.stroke();
+        NK.tekst(ctx, p.tekst || "Videre", x + (b - spids) / 2 + 6, y + h / 2 + 0.5,
+            { font: "800 15px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#ffffff" });
+        ctx.restore();
+    };
+
     T.skygge = function (ctx, x, rx, alfa, y) {
         ctx.save();
         ctx.fillStyle = "rgba(0, 0, 0, " + (alfa === undefined ? 0.35 : alfa) + ")";
@@ -356,6 +386,39 @@
     /* Indersiden paa tegnebordet */
     T.indreVerden = function (gg) {
         return gg.type.indre.map(function (q) { return NK.tilVerden(gg.p, gg.anker, q.x, q.y); });
+    };
+
+    /* Isterninger i vandoverfladen (F40: isbadet manglede is). top er
+       vaeskens overflade, som tegnBeholder giver den. Placeringen er fast,
+       saa terningerne ikke hopper fra ramme til ramme. */
+    T.tegnIs = function (ctx, gg, top) {
+        if (top === null || top === undefined || !gg.type.indre) return;
+        var v = T.indreVerden(gg), x0 = Infinity, x1 = -Infinity;
+        v.forEach(function (p) { if (p.y <= top + 20) { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); } });
+        if (!(x1 > x0 + 30)) return;
+        var n = 5, b = (x1 - x0 - 14) / n, k = gg.skala || 1;
+        ctx.save();
+        for (var i = 0; i < n; i++) {
+            var s = (12 + (i * 7) % 5) * k;
+            var x = x0 + 7 + b * (i + 0.5) + ((i * 13) % 7 - 3);
+            var y = top + 1 + (i % 2) * 3;
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(((i * 37) % 11 - 5) * 0.06);
+            ctx.fillStyle = "rgba(236, 248, 255, 0.8)";
+            ctx.strokeStyle = "rgba(150, 200, 230, 0.95)";
+            ctx.lineWidth = 1;
+            NK.rundtRekt(ctx, -s / 2, -s / 2, s, s, 3);
+            ctx.fill();
+            ctx.stroke();
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.95)";
+            ctx.beginPath();
+            ctx.moveTo(-s / 2 + 3, -s / 2 + 3);
+            ctx.lineTo(s / 2 - 4, -s / 2 + 3);
+            ctx.stroke();
+            ctx.restore();
+        }
+        ctx.restore();
     };
 
     /* Etiketten paa en flaske eller et pulverglas: 1-2 linjer tekst i
@@ -711,10 +774,11 @@
         ctx.restore();
         if (visTal) {
             var w = NK.tilVerden(p, { x: 0, y: 0 }, 0, -18);
-            var tekst = T.temperaturTekst(Tc);
+            var tekst = T.temperaturTekst(gg.visT === undefined ? Tc : gg.visT);
             ctx.save();
             ctx.font = "700 14px 'Segoe UI', sans-serif";
-            var b = ctx.measureText(tekst).width + 16;
+            /* Fast bredde, saa skiltet ikke hopper, naar tallet skifter (F45) */
+            var b = ctx.measureText("100,5 °C").width + 16;
             ctx.fillStyle = "rgba(20, 22, 28, 0.92)";
             NK.rundtRekt(ctx, w.x - b / 2, w.y - 12, b, 24, 12);
             ctx.fill();

@@ -130,6 +130,12 @@
         this.forskyd = 0;
         this.stinkskab = valg.stinkskab || null;
         this.plakat = valg.plakat || null;
+        /* F43: en stor pil paa vaeggen til naeste del eller rum. Den staar
+           der, naar forsoeget beder om det (visPil), blinker og foerer
+           videre med et klik (vedPil). valg.pil: { x, y, b, h, tekst } */
+        this.pil = valg.pil || null;
+        this.pilAktiv = false;
+        this.vedPil = null;
         this.underlag = valg.underlag || [];
         this.reaktioner = valg.reaktioner || null;
         this.stue = valg.stue || B.TEMP.stue;
@@ -185,6 +191,7 @@
 
     P.nulstilTilstand = function () {
         this.tid = 0;
+        this.spatelNr = 1;
         this.holdt = null;
         this.baerer = null;
         this.storBoble = false;
@@ -220,6 +227,10 @@
         this.bobleBeholder = null;
         this.antalUheld = 0;
         this.haendt = {};
+        /* F41: hvem der ryddede op efter hvert uheld (samme noegle som
+           haendt): "laerer", naar laereren greb ind, "elev", naar eleven
+           selv toerrede op med koekkenrullen */
+        this.opryddet = {};
         this.roerer = null;
     };
 
@@ -505,6 +516,8 @@
         /* Staar laereren bag bordet, ligger han bag alt paa det, og et klik
            paa ham gaelder foerst, naar intet andet er under musen */
         var bagBordet = !!(this.laererBagBord && this.laererBagBord());
+        var pl = this.pilAktiv && this.pil;
+        if (pl && pt.x >= pl.x && pt.x <= pl.x + pl.b && pt.y >= pl.y && pt.y <= pl.y + pl.h) return "naestepil";
         if (this.overLaerer && !bagBordet) {
             var l = this.overLaerer(pt);
             if (l) return l;
@@ -543,8 +556,18 @@
         var paaTaleboble = !!(this.overLaererBoble && this.overLaererBoble(pt));
         if (!navn && paaTaleboble) { this.klik("taleboble"); return false; }
         if (!navn) { if (this.klar) { this.klar = null; this.genvejMaal = null; } return false; }
-        if (navn === "boble" || navn === "svaevring") { this.klik(paaTaleboble ? "taleboble" : navn); return false; }
+        if (navn === "boble" || navn === "svaevring" || navn === "naestepil") { this.klik(paaTaleboble ? "taleboble" : navn); return false; }
         var laererOpt = this.laererOptaget && this.laererOptaget();
+        /* F44: i boetten tages en ny, ren spatel. Traekkes der, er den i
+           haanden; et klik laegger den frem og goer den klar (op) */
+        var bo = this.g[navn];
+        if (bo && bo.kan.spatler && !paaTaleboble && !laererOpt && !this.koer.optaget() && !this.baerer) {
+            var ny = this.nySpatel(bo);
+            if (ny) {
+                this.holdt = { navn: ny.navn, start: pt, dx: pt.x - ny.p.x, dy: pt.y - ny.p.y, flyttet: false, sidst: pt, t: Date.now(), fraBoette: true };
+                return true;
+            }
+        }
         if (!laererOpt && !this.koer.optaget() && !this.baerer && this.grebbar(navn)) {
             var gg = this.g[navn];
             this.koer.slipFri(gg);
@@ -745,6 +768,19 @@
         var h = this.holdt;
         if (!h) return;
         this.holdt = null;
+        if (!h.flyttet && h.fraBoette) {
+            /* Et klik paa boetten: den nye spatel laegges frem og er klar */
+            var ns = this.g[h.navn];
+            if (ns) {
+                var sted = this.ledigtSted(ns, ns.p.x) || ns.p;
+                ns.p = kopi(sted); ns.hjem = kopi(sted);
+                this.ordnDybde();
+                this.goerKlar(ns);
+                this.besked("En ren spatel. Klik på et pulverglas, eller træk den derhen.");
+                this.aendret("spatel");
+            }
+            return;
+        }
         if (!h.flyttet) { this.klik(h.taleboble ? "taleboble" : h.navn); return; }
         this.stopBaer(h.sidst);
     };
@@ -1077,6 +1113,7 @@
         }
         if (m.pulver && k.spatel && !gg.last) return true;
         if ((m.affald || m.vask) && k.holder && !B.tom(gg)) return true;
+        if (m.kurv && !k.fast && !k.pulver && !k.flaske && !k.drypper && !k.sproejter && (k.holder || k.spatel || k.roerer || k.maaler)) return true;
         if (m.stoette && gg.type.navn === "reagensglas") return this.ledigtHul(maal) >= 0;
         if (m.bad && gg.type.navn === "reagensglas") return this.ledigPlads(maal) !== null;
         if (m.varmer && k.holder && !k.flaske && !k.drypper && !k.sproejter && !k.pulver && gg.type.navn !== "reagensglas") return true;
@@ -1271,6 +1308,7 @@
     P.moede = function (gg, c, pt) {
         var k = gg.kan, m = c.kan;
         if (m.affald || m.vask) return this.toemI(gg, c);
+        if (m.kurv) return this.iKurv(gg, c);
         if (m.stoette && gg.type.navn === "reagensglas") return this.iStativ(gg, c, this.ledigtHul(c, pt ? pt.x : undefined));
         /* Et reagensglas, der slippes over et bad, stilles ned i det. Det
            skal staa foer m.holder, ellers ville glasset haelde sit indhold
@@ -1515,8 +1553,17 @@
        sproejtning - aldrig over glassets rumfang og aldrig mere, end
        flasken har. Returnerer de mL, der gives (0, hvis glasset allerede
        staar der). */
+    /* F42: kan gg fylde c op til et rumfang? Kilden haelder vaeske
+       (sproejteflasken, en flaske, kolben, et glas), og maalet er
+       glasudstyr, man maaler rumfang i (fyldOp paa typen) */
+    P.kanFyldeOp = function (gg, c) {
+        if (!gg || !c || gg === c || !c.kan.holder || !c.type.fyldOp) return false;
+        if (B.volumen(gg) < 0.05) return false;
+        return !!(gg.kan.sproejter || (gg.kan.haelder && gg.type.navn !== "vejebaad"));
+    };
+
     P.fyldOpTil = function (gg, c, maalMl) {
-        if (!gg || !c || !gg.kan.sproejter || !c.kan.holder || this.koer.optaget()) return 0;
+        if (!this.kanFyldeOp(gg, c) || this.koer.optaget()) return 0;
         /* Lige under kanten: fylder man til randen, loeber det over */
         var mangler = Math.min(maalMl, c.type.maks - 0.1) - B.volumen(c);
         if (!(mangler > 0.05)) {
@@ -1524,7 +1571,8 @@
             return 0;
         }
         var mL = Math.min(mangler, B.volumen(gg));
-        return this.sproejt(gg, c, mL) ? mL : 0;
+        if (gg.kan.sproejter) return this.sproejt(gg, c, mL) ? mL : 0;
+        return this.haeld(gg, c, mL) ? mL : 0;
     };
 
     /* Det, der svaever over noget lige nu (noget skjult svaever ikke) */
@@ -1670,6 +1718,14 @@
        spilder aldrig - det goer kun musen, naar den ryster voldsomt.
        Flasker paa hylden, bade og fast udstyr rystes ikke. sek: hvor
        laenge (ellers til rystValgt(false)). */
+    /* F43: vis eller skjul pilen til naeste del (tekst kan skiftes) */
+    P.visPil = function (til, tekst) {
+        if (!this.pil) return false;
+        if (tekst) this.pil.tekst = tekst;
+        if (this.pilAktiv !== !!til) { this.pilAktiv = !!til; this.aendret("pil"); }
+        return true;
+    };
+
     P.kanRystes = function (c) {
         return !!(c && c.kan.holder && !c.kan.bad && !c.kan.flaske && !c.kan.fast && this.synlig(c) && c !== this.baerer);
     };
@@ -1720,6 +1776,7 @@
     P.klik = function (navn) {
         if (NK.Lyd) NK.Lyd.laasOp();
         if (navn === "taleboble") return this.springReplik ? this.springReplik() : false;
+        if (navn === "naestepil") { if (this.pilAktiv && this.vedPil) { this.vedPil(); return true; } return false; }
         if (navn === "boble") return this.storBoble ? this.lukStorBoble() : this.aabnStorBoble();
         if (navn === "laerer") return this.klikLaerer ? this.klikLaerer() : false;
         if (navn === "kaffekop") return this.klikKop ? this.klikKop() : false;
@@ -1863,6 +1920,55 @@
         if (!ok) this.koer.start([NK.Koer.hjemTil(kl, 0.6, 30)], "hjem");
         this.aendret("genvej");
         return !!ok;
+    };
+
+    /* ----- Kurven og boetten (F44) --------------------------------------
+       Kurven til snavset udstyr: et tomt glas, en spatel, en glasstav eller
+       et termometer, der laegges i den, forsvinder, og et nyt, rent
+       eksemplar staar paa dets plads - bygget af opstillingens post, men
+       uden indhold. Et glas med noget i skal i affaldet foerst. En spatel
+       fra boetten har ingen plads i opstillingen og forsvinder bare. */
+    P.iKurv = function (gg, kurv) {
+        var mig = this;
+        if (B.er(gg) && (B.volumen(gg) > 0.05 || B.fastIalt(gg) > 0.5)) {
+            this.besked("Hæld " + gg.titel + " i affaldet først. Kurven er til tomt, snavset udstyr.", "advarsel");
+            return false;
+        }
+        var o = { x: kurv.p.x - kurv.anker.x + kurv.type.b / 2, y: kurv.p.y - kurv.anker.y + 4 };
+        var ned = gg.type.sprite ? gg.type.h - gg.anker.y : 0;
+        this.koer.start([
+            { flyt: gg, til: { x: o.x, y: o.y - 20 - ned, v: gg.type.sprite ? 0.25 : -1.3 }, tid: 0.45, loeft: 30 },
+            { flyt: gg, til: { x: o.x, y: o.y + 8 - ned, v: gg.type.sprite ? 0.25 : -1.3 }, tid: 0.2, loeft: 0 },
+            { kald: function () { mig.nytRent(gg); } }
+        ], "kurv");
+        return true;
+    };
+
+    P.nytRent = function (gg) {
+        var spec = gg.spec;
+        this.tagUd(gg);
+        if (NK.Lyd && NK.Lyd.klik) NK.Lyd.klik();
+        this.haendelse("kurv", gg);
+        if (!spec || spec.ekstra) { this.aendret("kurv"); return null; }
+        var ny = {}, n;
+        for (n in spec) if (Object.prototype.hasOwnProperty.call(spec, n) && n !== "indhold") ny[n] = spec[n];
+        var rent = this.tilfoej(ny);
+        this.ordnDybde();
+        this.besked(stor(rent.titel) + " er skiftet ud med et rent.");
+        this.aendret("kurv");
+        return rent;
+    };
+
+    /* Boetten med spatler: en ny, ren spatel staar op af boetten */
+    P.nySpatel = function (bo) {
+        this.spatelNr = (this.spatelNr || 1) + 1;
+        var top = { x: bo.p.x - bo.anker.x + bo.type.b / 2, y: bo.p.y - bo.anker.y };
+        var sp = this.tilfoej({ navn: "spatel_" + this.spatelNr, type: "spatel", titel: "spatlen", ekstra: true,
+                                 del: bo.spec && bo.spec.del, p: { x: top.x - 2, y: top.y + 24, v: -Math.PI / 2 + 0.12 } });
+        sp.hjem = kopi(sp.p);
+        this.tilFront(sp);
+        this.aendret("spatel");
+        return sp;
     };
 
     P.foersteMed = function (egenskab) {
@@ -2227,7 +2333,8 @@
         if (B.volumen(c) < 0.1) { this.besked(c.titel + " er tomt."); return false; }
         if (this.aaben(c)) this.vaelg(c.navn);
         var o = B.aabning(c);
-        var dyb = Math.min(gg.type.laengde - 30, c.type.h * 0.7);
+        /* Staven gaar ned til lige over bunden (F46) */
+        var dyb = Math.min(gg.type.laengde - 30, c.type.h - 12);
         this.koer.start([
             { flyt: gg, til: function () { return { x: o.x, y: o.y - (gg.type.laengde - dyb), v: 0.12 }; }, tid: 0.5, loeft: 30 },
             { kald: function () { mig.roerer = c; } },
@@ -2278,6 +2385,10 @@
             { kald: function () {
                 if (NK.Lyd && NK.Lyd.papir) NK.Lyd.papir();
                 mig.pytter.splice(mig.pytter.indexOf(py), 1);
+                /* F41: det, ingen andre har ryddet op, har eleven */
+                Object.keys(mig.haendt).forEach(function (n) {
+                    if (n.indexOf("_") > 0 && !mig.opryddet[n]) mig.opryddet[n] = "elev";
+                });
                 mig.haendelse("toerret", gg);
             } },
             NK.Koer.hjemTil(gg, 0.6, 20)
@@ -2405,12 +2516,8 @@
                 if (c) {
                     gg.p.x = c.p.x + gg.rel.dx; gg.p.y = c.p.y + gg.rel.dy; gg.p.v = gg.rel.v + c.p.v;
                     gg.hjem = kopi(gg.p);
-                    gg.T = NK.mod(gg.T, B.volumen(c) > 0.1 ? c.indhold.T : mig.stue, 1.6, dt);
-                    if (gg.kan.ph) gg.pH = B.volumen(c) > 0.1 ? Stof.pH(B.samlet(c)) : null;
-                } else if (mig.baerer !== gg) {
-                    gg.T = NK.mod(gg.T, mig.stue, 0.25, dt);
-                    if (gg.kan.ph) gg.pH = null;
                 }
+                mig.opdaterMaaler(gg, dt);
             }
             if (gg.svaev) {
                 gg.svaev.ur -= dt;
@@ -2468,6 +2575,21 @@
         if (!this.storBoble && this.storAlfa < 0.003) this.storAlfa = 0;
     };
 
+    /* Et termometer (eller pH-meter) i et glas. F45: det glider roligt mod
+       glassets temperatur (tau ca. 1,4 s), og det tal, der vises (visT),
+       skifter hoejst fire gange i sekundet og kun, naar det har flyttet
+       sig en halv grad. Foer rykkede tallet ti gange i sekundet, og
+       skiltet skiftede bredde med det. Baares det, staar det stille. */
+    P.opdaterMaaler = function (gg, dt) {
+        var c = gg.i;
+        if (c) gg.T = NK.mod(gg.T, B.volumen(c) > 0.1 ? c.indhold.T : this.stue, 0.7, dt);
+        else if (this.baerer !== gg) gg.T = NK.mod(gg.T, this.stue, 0.25, dt);
+        if (gg.kan.ph) gg.pH = c && B.volumen(c) > 0.1 ? Stof.pH(B.samlet(c)) : null;
+        gg.visUr = (gg.visUr || 0) - dt;
+        if (gg.visT === undefined) gg.visT = Math.round(gg.T * 2) / 2;
+        if (gg.visUr <= 0 && Math.abs(gg.T - gg.visT) >= 0.5) { gg.visT = Math.round(gg.T * 2) / 2; gg.visUr = 0.25; }
+    };
+
     /* Bordet, mens man er i et andet rum: pladerne, kemien og termometrene
        gaar videre, men uden dampe, bobler, uheld og laerer. */
     P.opdaterStille = function (dt) {
@@ -2487,10 +2609,7 @@
             c.bobler = [];
         });
         this.liste.forEach(function (gg) {
-            if (!gg.kan.maaler) return;
-            var c = gg.i;
-            gg.T = NK.mod(gg.T, c && B.volumen(c) > 0.1 ? c.indhold.T : mig.stue, c ? 1.6 : 0.25, dt);
-            if (gg.kan.ph) gg.pH = c && B.volumen(c) > 0.1 ? Stof.pH(B.samlet(c)) : null;
+            if (gg.kan.maaler) mig.opdaterMaaler(gg, dt);
         });
         this.dampe = [];
         this.pytter.forEach(function (py) { py.rx = NK.mod(py.rx, py.rxMaal, 3, dt); });
@@ -2583,6 +2702,8 @@
         else if (k.ph) T.tegnPHmeter(ctx, gg, !!gg.i || this.baerer === gg);
         else if (k.holder) {
             gg.niveau = T.tegnBeholder(ctx, gg, tid, { boelge: this.baerer === gg ? this.ryst * 1.5 : (this.roerer === gg ? 0.8 : (this.rystes === gg ? 1.2 : 0)) });
+            /* Et isbad har is i vandet (is: true paa posten, F40) */
+            if (gg.spec && gg.spec.is && T.tegnIs) T.tegnIs(ctx, gg, gg.niveau);
             if (gg.bobler && gg.bobler.length && !t.skjulIndhold) T.tegnBobler(ctx, gg, gg.bobler);
         }
         else if (k.spatel) T.tegnSpatel(ctx, gg);
@@ -2616,6 +2737,7 @@
 
         var lv = this.laererVisning ? this.laererVisning() : {};
         T.tegnBaggrund(ctx, { plakat: this.plakat ? { x: this.plakat.x, y: this.plakat.y, regel: lv.plakatRegel || 0 } : null });
+        if (this.pil && this.pilAktiv && T.tegnPil) T.tegnPil(ctx, this.pil, tid, this.hover === "naestepil");
         if (this.stinkskab) T.tegnStinkskabBag(ctx, this.stinkskab, tid);
 
         /* Staar laereren bag bordet, tegnes han her: efter vaeggen og

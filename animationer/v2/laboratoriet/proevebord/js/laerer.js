@@ -233,6 +233,8 @@
         var maerker = gg.spildtMaerker || (gg.indhold ? NK.Stof.faremaerker(NK.Beholder.samlet(gg)) : []);
         gg.spildtMaerker = null;
         if (!this.laererOpdager(alvorlig(maerker))) return;
+        /* F41: han greb ind, saa tegneserien maa sige, at han toerrede op */
+        if (this.opryddet) this.opryddet[slags + "_" + gg.navn] = "laerer";
         this.laererAfbryd();
         this.uheldTal = this.uheldTal || {};
         this.uheldTal[slags] = (this.uheldTal[slags] || 0) + 1;
@@ -265,6 +267,7 @@
 
     P.laererKnust = function (gg) {
         var L = this.laerer;
+        if (this.opryddet) this.opryddet["knust_" + gg.navn] = "laerer";
         this.laererAfbryd();
         this.uheldTal = this.uheldTal || {};
         this.uheldTal.knust = (this.uheldTal.knust || 0) + 1;

@@ -31,22 +31,24 @@
 
 <main class="forsoeg">
     <div class="scene" id="scene">
-        <canvas id="scene-laerred" aria-label="Laboratoriebord med kolbe, bægerglas, otte reagensglas i et stativ, pulverglas med Fe(NO₃)₃, ascorbinsyre og KSCN, flaske med KSCN, dråbeflaske med AgNO₃, vandbad på varmeplade, isbad, glasstav, termometer og affaldsdunk."></canvas>
+        <canvas id="scene-laerred" aria-label="Laboratoriebord med kolbe, bægerglas, syv reagensglas i et stativ, pulverglas med Fe(NO₃)₃, ascorbinsyre og KSCN, dråbeflaske med AgNO₃, vandbad på varmeplade, isbad, glasstav, termometer og affaldsdunk."></canvas>
         <div class="scenebesked" id="scenebesked" aria-live="polite"></div>
         <div class="delknapper" id="delknapper" role="group" aria-label="Forsøgets to dele">
-            <button class="knap delpil" id="del2pil" type="button" title="Videre til del 2 (tast 2)" hidden>Videre til del 2 →</button>
             <button class="knap delknap" id="del1knap" type="button" title="Del 1: de syv glas (tast 1)" aria-pressed="true">Del 1</button>
             <button class="knap delknap" id="del2knap" type="button" title="Del 2: fortynding (tast 2)" aria-pressed="false">Del 2</button>
         </div>
         <section class="noter" id="noter" hidden aria-label="Noter">
             <div class="noter-top">
                 <h2>Noter</h2>
-                <button class="ikonknap" id="noter-luk" type="button" title="Fold noterne ind (Esc)" aria-label="Fold noterne ind">×</button>
+                <div class="noter-ikoner">
+                    <button class="ikonknap" id="logbog-ryd" type="button" title="Slet noterne" aria-label="Slet noterne"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>
+                    <button class="ikonknap" id="noter-luk" type="button" title="Luk noterne (Esc)" aria-label="Luk noterne">×</button>
+                </div>
             </div>
             <textarea id="logbog-tekst" rows="5" placeholder="Dine egne noter. Knappen skriver det valgte glas' rumfang, temperatur, pH og indhold."></textarea>
             <div class="knaprad">
                 <button class="knap blaa" id="logbog-noter" type="button" title="Skriv det valgte glas' aflæsning i noterne">Notér det valgte glas</button>
-                <button class="knap" id="logbog-ryd" type="button" title="Slet noterne">Ryd</button>
+                <button class="knap" id="noter-lukknap" type="button" title="Luk noterne (Esc)">Luk</button>
             </div>
         </section>
     </div>

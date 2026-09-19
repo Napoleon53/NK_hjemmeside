@@ -161,6 +161,8 @@ body {
 .noter-top { display: flex; align-items: center; justify-content: space-between; }
 .noter-top h2 { margin: 0; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gul); }
 .noter-top .ikonknap { width: 28px; height: 26px; font-size: 1.1rem; }
+.noter-ikoner { display: flex; gap: 4px; margin-right: -4px; }
+.ikonknap.bekraeft { color: var(--roed); border-color: var(--roed); background-color: rgba(224, 84, 70, 0.14); }
 .noter #logbog-tekst { margin-top: 8px; }
 .noter .knaprad { margin-top: 8px; }
 
@@ -174,11 +176,14 @@ main.forsoeg {
     grid-template-columns: minmax(0, 1fr) var(--panel-bredde);
 }
 
-/* »Fyld op til« ved sproejteflasken (F29) - side.js laver og flytter det */
+/* »Fyld op til« ved en flaske over glasudstyr (F29, F39, F42) - side.js
+   laver og flytter det; forslagene staar paa en linje under feltet */
 .fyldop {
     position: absolute;
     z-index: 4;
     display: flex;
+    flex-wrap: wrap;
+    max-width: 240px;
     align-items: center;
     gap: 6px;
     padding: 5px 8px;
@@ -199,6 +204,9 @@ main.forsoeg {
     border-radius: 4px;
 }
 .fyldop .knap { padding: 3px 9px; font-size: 0.8rem; }
+.fyldop-forslag { display: flex; flex-wrap: wrap; gap: 4px; width: 100%; }
+.fyldop-forslag[hidden] { display: none; }
+.fyldop .knap.forslag { padding: 2px 7px; font-size: 0.74rem; background: rgba(79, 147, 218, 0.18); border-color: #4f93da; }
 
 .scene {
     position: relative;

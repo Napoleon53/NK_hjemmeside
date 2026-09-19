@@ -277,11 +277,17 @@
     }
 
     /* ----- Knapperne under hvert par ------------------------------------- */
+    /* Knapperne siger, hvad der sammenlignes (F47): det fortyndede glas
+       med det ufortyndede i samme par. Ordene staar i js/tekst.js. */
     var VALG = [
         { id: "moerkere", tekst: "Mørkere" },
         { id: "ens", tekst: "Som det andet glas" },
         { id: "lysere", tekst: "Lysere" }
     ];
+    function valgTekst(v) {
+        var t = NK.TEKST && NK.TEKST["ovenfra-valg"];
+        return (t && t[v.id]) || v.tekst;
+    }
 
     var TITEL = { farve: "Par med frugtfarve", lv: "Par med ligevægtsblanding" };
 
@@ -316,7 +322,7 @@
                 var k = document.createElement("button");
                 k.type = "button";
                 k.className = "knap ovenfra-knap";
-                k.textContent = v.tekst;
+                k.textContent = valgTekst(v);
                 k.dataset.par = type;
                 k.dataset.valg = v.id;
                 k.addEventListener("click", function () {

@@ -15,7 +15,6 @@
        glas 5   vandbad         varme           -> lysere  (exoterm)
        glas 6   isbad           kulde           -> moerkere
        glas 7   reference       intet indgreb
-       glas 8   forundersoegelse: KSCN 0,1 M + AgNO₃ giver hvidt bundfald
 
    Del 2 er fortyndingen: fire baegerglas, to og to i par. Par 1 faar
    frugtfarve, par 2 ligevaegtsblanding fra den samme kolbe. Det ene glas
@@ -107,7 +106,7 @@
        ogsaa frugtfarve i et koekken: et par draaber i en skaal. */
     var FRUGTFARVE = { "farve": 35 };
 
-    /* De otte reagensglas rummer en tredjedel mindre end udstyrets
+    /* De syv reagensglas rummer en tredjedel mindre end udstyrets
        reagensglas: 20 mL i stedet for 30 (F33). Rumfanget foelger
        tegningen (rumfangFoelger), saa de er (2/3)^(1/3) = 87 % saa store i
        hver retning, og en portion - en femtedel af glasset - er 4 mL af sig
@@ -116,29 +115,28 @@
        stativets bund (bundY), saa vaesken staar frit mellem stativets to
        braedder. */
     var GLAS_SKALA = Math.cbrt(2 / 3);
-    /* Skiltene (F31): glas 7 er referencen R, glas 8 er forundersoegelsen
-       4a, og glas 4 er 4b. Navnene i koden (glas1-glas8) er de samme, saa
-       forloebet, journalen og selvtesten ikke skal skrives om. */
-    var SKILT = { 4: "4b", 7: "R", 8: "4a" };
+    /* Skiltene: glas 7 er referencen R (F31). Forundersoegelsen i glas 8
+       er fjernet igen (F48), og glas 4 hedder 4 igen. */
+    var SKILT = { 7: "R" };
     function glas(nr) {
         var s = SKILT[nr] || String(nr);
         return { navn: "glas" + nr, type: "reagensglas", stativ: "stativ", hul: nr - 1, nr: s,
                  titel: "glas " + s, del: 1, skala: GLAS_SKALA, rumfangFoelger: true };
     }
 
-    /* Stativet til sb2.4 (F31): som udstyrets stativ, men 4a's hul sidder
-       for sig med lidt luft - et hint om, at det glas ikke skal have
-       stamoploesning - og uden tal paa bunden, for glassene har selv deres
-       skilte. Spriten ligger i forsoegets egen sprites/. */
+    /* Stativet til sb2.4: som udstyrets stativ, men med syv huller og uden
+       tal paa bunden, for glassene har selv deres skilte (1-6 og R). Spriten
+       ligger i forsoegets egen sprites/. (F31 havde et ottende hul for sig
+       til forundersoegelsen; det gik ud med den i F48.) */
     (function () {
         var s = NK.Udstyr.type("stativ"), ny = {}, n;
         for (n in s) if (Object.prototype.hasOwnProperty.call(s, n)) ny[n] = s[n];
-        ny.sprite = "stativ4a";
-        ny.fil = "stativ_4a.svg";
+        ny.sprite = "stativ7";
+        ny.fil = "stativ_7.svg";
         ny.mappe = "sprites/";
-        ny.b = 392;
-        ny.huller = [34, 76, 118, 160, 202, 244, 286, 358];
-        NK.Udstyr.tilfoej("stativ4a", ny);
+        ny.b = 320;
+        ny.huller = [34, 76, 118, 160, 202, 244, 286];
+        NK.Udstyr.tilfoej("stativ7", ny);
     }());
 
     /* De fire baegerglas i del 2, to og to i par med luft imellem. De
@@ -160,7 +158,7 @@
         { navn: "dunk", type: "affaldsdunk", x: 70, etiket: ["AFFALD", "surt uorg."] },
         /* 150 mL i en kolbe paa 200: den skal ikke staa til kanten, og
            inddelingens oeverste streg er netop 150. Det raekker til del 1
-           (8 glas a 4 mL) og til del 2 (to portioner a 40 mL). */
+           (7 glas a 4 mL) og til del 2 (to portioner a 40 mL). */
         { navn: "kolbe", type: "kolbe", x: 200, titel: "kolben med stamopløsning", indhold: opl(150, STAM),
           /* Hældes den i affaldet, fylder Kemichael den igen (S16) */
           genopfyld: true },
@@ -172,11 +170,9 @@
         pulver("pulver_asc",  590, HYLDE_KAFFE, "C-vitamin", "pulverglasset med ascorbinsyre", "Asc(s)", 3),
         pulver("pulver_kscn", 640, HYLDE_KAFFE, "KSCN", "pulverglasset med KSCN", "KSCN(s)", 30),
 
-        /* Den oeverste hylde: flasken, draabeflasken og sproejteflasken.
-           I del 2 staar frugtfarven paa KSCN-flaskens plads - de to er
-           aldrig fremme samtidig. */
-        { navn: "fl_kscn", type: "flaske", x: 400, y: HYLDE_FLASKER, etiket: ["KSCN", "0,1 M"], del: 1,
-          titel: "flasken med KSCN", indhold: opl(200, { "K+": 100, "SCN-": 100 }) },
+        /* Den oeverste hylde: draabeflasken og sproejteflasken, og i del 2
+           frugtfarven. (KSCN-flasken til forundersoegelsen er fjernet, F48:
+           nysgerrige kan selv lave den med det faste salt.) */
         { navn: "fl_farve", type: "flaskeFarve", x: 400, y: HYLDE_FLASKER, etiket: ["frugt-", "farve"], del: 2,
           titel: "flasken med frugtfarve", indhold: opl(100, FRUGTFARVE) },
         { navn: "ag", type: "draabeflaske", x: 470, y: HYLDE_FLASKER, etiket: ["AgNO₃", "0,1 M"], del: 1,
@@ -184,12 +180,16 @@
         { navn: "vand", type: "sproejteflaske", x: 560, y: HYLDE_FLASKER, titel: "sprøjteflasken med vand",
           indhold: opl(500, {}) },
 
-        /* De otte reagensglas i stativet */
-        { navn: "stativ", type: "stativ4a", p: { x: 310, y: 400, v: 0 }, del: 1 },
-        glas(1), glas(2), glas(3), glas(4), glas(5), glas(6), glas(7), glas(8),
+        /* De syv reagensglas i stativet */
+        { navn: "stativ", type: "stativ7", p: { x: 346, y: 400, v: 0 }, del: 1 },
+        glas(1), glas(2), glas(3), glas(4), glas(5), glas(6), glas(7),
 
         /* Spatlen, glasstaven og termometeret ligger forrest paa bordpladen */
         { navn: "spatel", type: "spatel", p: { x: 290, y: 550, v: 0 }, del: 1 },
+        /* F44: boetten med rene spatler ved spatlen, og kurven til snavset
+           udstyr forrest til venstre (i begge dele) */
+        { navn: "spatler", type: "spatelboette", x: 404, y: 560, del: 1 },
+        { navn: "kurv", type: "kurv", x: 140, y: 564, etiket: ["SNAVSET", "udstyr"] },
         { navn: "glasstav", type: "glasstav", x: 820, y: 546, del: 1 },
         { navn: "termometer", type: "termometer", x: 900, y: 562, del: 1 },
 
@@ -200,7 +200,7 @@
         { navn: "plade", type: "varmeplade", p: { x: 715, y: 428, v: 0 }, del: 1 },
         { navn: "vandbad", type: "bad", paa: "plade", x: 791, titel: "vandbadet", holdT: 80, del: 1,
           indhold: opl(180, {}) },
-        { navn: "isbad", type: "bad", x: 965, titel: "isbadet", holdT: 2, del: 1,
+        { navn: "isbad", type: "bad", x: 965, titel: "isbadet", holdT: 2, del: 1, is: true,
           indhold: { V: 180, T: 2, mM: {} } },
 
         /* Hylden til hoejre: det store baegerglas med dagens
@@ -250,6 +250,9 @@
             { x0: 715, x1: 1025, y: HYLDE_HOEJRE }
         ],
         plakat: { x: 880, y: 70 },
+        /* F43: pilen til del 2 paa vaeggen ved plakaten, over baegerglasset
+           paa hylden til hoejre */
+        pil: { x: 688, y: 26, b: 186, h: 62, tekst: "Videre til del 2" },
         bagBord: KEMICHAEL,
         boble: BOBLE, bobleR: 135, bobleIndhold: 0.9, partikler: 6, partikelRef: 3,
         tilskuere: { centrale: ["Fe3+", "SCN-", "FeSCN2+", "Ag+", "Fe2+"] },
