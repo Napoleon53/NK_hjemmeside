@@ -304,7 +304,7 @@ begynder på boblen, tager det, der står under den.
 **Det, han siger, står også i panelet** (S13): kortet »Sagt i
 laboratoriet« viser den seneste linje med hans navn og alle under »Alle«.
 Forløbets replikker kommer altid med, og sb2.4 har også valgt hans uheld
-og advarsler (`historik` i `js/app.js`); kaffen og kigget ind kommer
+og det, han siger om vasken (`historik` i `js/app.js`); kaffen og kigget ind kommer
 aldrig med. Start forfra rydder kortet.
 
 **Bemærkningerne kan komme igen** (S3): to indgreb i samme glas,
@@ -450,3 +450,19 @@ i panelet. Holdes den nede (eller tasten <kbd>R</kbd>), rystes glasset,
 hvor det står, så det, der ligger i bunden, blandes op, og det spilder
 aldrig — det gør kun musen, når den ryster voldsomt. Enter på knappen
 ryster et sekund. Flasker på hylden og badene rystes ikke.
+
+**Gennemgangen 19. september om natten (F49–F53).** *Forløbslisten* er
+foldet i to dele (`forloebDele` i `js/app.js`): i del 1 står de seks glas,
+billedet og »Ryd op« trin for trin og del 2 som én linje, »Del 2:
+fortynding (0/5)«; når eleven kommer til del 2, foldes den ud, og del 1
+bliver én linje. *C-vitamin:* bøtten hedder C-vitamin, og udførelsen siger
+»C-vitamin (ascorbinsyre, C₆H₈O₆(s))«. *Kemichael* advarer kun om et
+farligt stof, når det faktisk er spildt (se motorens README). *Bordet
+forrest* fra venstre: kurven til snavset udstyr, bøtten med spatler lige
+ved siden af, en håndvask med en hane med demineraliseret vand og så den
+koniske kolbe, flyttet længere ind (x 296). Affaldsdunken står til venstre
+for vasken. Et glas, der slippes under hanen, fyldes med vand (4 mL i et
+reagensglas, 25 mL i et bægerglas, pilen giver mere, og bægerglasset får
+»Fyld op til«); et glas, der slippes over kummen, hældes ud i vasken, og er
+der sølv i (AgNO₃ fra glas 4), siger Kemichael noget om tungmetaller og
+kloakken. Selvtestens afsnit 33 prøver det hele.

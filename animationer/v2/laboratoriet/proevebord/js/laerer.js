@@ -75,28 +75,17 @@
         return Math.random() < 0.4;
     };
 
-    /* ----- Farlige kemikalier: en advarsel, foerste gang flasken tages ------
-       Kun de alvorlige, og kun hvis han ser det */
-    P.laererBaer = function (gg) {
-        if (!gg.indhold || !this.laerer) return;
-        var St = NK.Stof;
-        var farer = St.farer(gg.indhold).filter(function (f) { return f.trin.sig && alvorlig(f.trin.maerker); });
-        if (!farer.length) return;
-        this.advaret = this.advaret || {};
-        var f = farer[0];
-        if (this.advaret[f.stof]) return;
-        if (!this.laererOpdager(false)) return;
-        this.advaret[f.stof] = true;
-        this.laererKo("laererAdvarsel", { gg: gg, sig: f.trin.sig, maerker: f.trin.maerker || [] });
-        this.laererVentende();
-    };
-
-    P.laererAdvarsel = function (a) {
-        var alvorlig = a.maerker.indexOf("aetsende") >= 0 || a.maerker.indexOf("giftig") >= 0 || a.maerker.indexOf("brandfarlig") >= 0;
-        var ved = pegPunkt(this, a.gg);
-        var x = NK.klamp((a.gg.hjem ? a.gg.hjem.x : a.gg.p.x) - 200, 60, NK.Scene.BREDDE - 260);
-        bemaerkning(this, "advarsel", x, { vrede: alvorlig ? 0.6 : 0.3, humoer: -0.4, roed: 0, skeptisk: alvorlig ? 0.6 : 0.3, briller: alvorlig ? 1 : 0 }, a.sig, null, ved);
-    };
+    /* ----- Farlige kemikalier: han advarer, naar de spildes (F51) ----------
+       Foer advarede han, foerste gang en farlig flaske blev taget. Nu siger
+       han kun noget, naar noget farligt faktisk er kommet ud paa bordet:
+       stoffets egne advarselslinjer (fare i stoftabellen) kommer, naar han
+       har toerret op (laererUheld). Det, der ikke er spildt, er ikke farligt
+       for nogen. */
+    function farligeLinjer(farer) {
+        var f = (farer || []).filter(function (x) { return x.trin.sig && alvorlig(x.trin.maerker); })[0];
+        if (!f) return [];
+        return (Array.isArray(f.trin.sig) ? f.trin.sig : [f.trin.sig]).map(function (t) { return sig(t); });
+    }
 
     /* Bemaerkninger, der ventede paa, at laereren blev ledig. Noeglen
        afgoer, hvad der taeller som "den samme": som regel scenen (fn), men
@@ -231,7 +220,9 @@
         if (slags === "knust") return this.laererKnust(gg);
         /* Det, der loeb ud: farligt indhold ser han altid */
         var maerker = gg.spildtMaerker || (gg.indhold ? NK.Stof.faremaerker(NK.Beholder.samlet(gg)) : []);
+        var advarsel = farligeLinjer(gg.spildtFarer);
         gg.spildtMaerker = null;
+        gg.spildtFarer = null;
         if (!this.laererOpdager(alvorlig(maerker))) return;
         /* F41: han greb ind, saa tegneserien maa sige, at han toerrede op */
         if (this.opryddet) this.opryddet[slags + "_" + gg.navn] = "laerer";
@@ -257,7 +248,7 @@
             } },
             { kald: function () { this.laerer.baerer = null; if (NK.Lyd && NK.Lyd.brum) NK.Lyd.brum(); } },
             { arm: HAENGER, tid: 0.4 }
-        ].concat(K.uheld(), [
+        ].concat(advarsel.length ? [{ udtryk: { skeptisk: 0.6, briller: 1 } }].concat(advarsel) : [], K.uheld(), [
             { gaa: UDE }
         ]));
     };
@@ -268,6 +259,8 @@
     P.laererKnust = function (gg) {
         var L = this.laerer;
         if (this.opryddet) this.opryddet["knust_" + gg.navn] = "laerer";
+        var advarsel = farligeLinjer(gg.spildtFarer);
+        gg.spildtFarer = null;
         this.laererAfbryd();
         this.uheldTal = this.uheldTal || {};
         this.uheldTal.knust = (this.uheldTal.knust || 0) + 1;
@@ -297,12 +290,13 @@
                 if (t >= 0.99) { this.skaar = []; this.pytter = []; }
             } },
             { kald: function () { this.laerer.baerer = null; } },
-            { arm: HAENGER, tid: 0.4 },
+            { arm: HAENGER, tid: 0.4 }
+        ].concat(advarsel, [
             sig("Jeg henter et nyt.")
         ].concat(K.glimtTrin("kunst"), K.uheld(), [
             { gaa: UDE },
             { kald: function () { this.genopstil(gg); if (NK.Lyd && NK.Lyd.dunk) NK.Lyd.dunk(); } }
-        ]));
+        ])));
     };
 
     /* ----- Bemaerkninger --------------------------------------------------- */
@@ -313,6 +307,14 @@
         if (type === "affald" && data.fra && (data.fra.kan.flaske || genopfyld) && data.indhold && data.indhold.V > 20 && (genopfyld || this.laererOpdager(farligt(data.indhold)))) {
             this.laererKo("laererFlaskeAffald", data.fra);
             this.laererVentende();
+        }
+        /* F53: tungmetaller i vasken - det ser han altid */
+        if (type === "vask" && data && data.indhold) {
+            var metal = tungmetal(data.indhold);
+            if (metal) {
+                this.laererKo("laererVask", { fra: data.fra, til: data.til, metal: metal });
+                this.laererVentende();
+            }
         }
         if (type === "voldsom" && this.laererOpdager(farligt(data && data.indhold ? NK.Beholder.samlet(data) : null))) {
             this.laererKo("laererVoldsom", data);
@@ -334,6 +336,36 @@
         if (k >= 3) replikker = ["Jeg tæller ikke længere."];
         bemaerkning(this, "voldsom", NK.klamp(c.p.x - 180, 60, NK.Scene.BREDDE - 260), { vrede: 0.7, humoer: -0.6, roed: 0.2, briller: 1 },
             replikker, k === 1 ? K.glimtTrin("oejenbryn") : [], pegPunkt(this, c));
+    };
+
+    /* ----- Tungmetaller i vasken (F53) -------------------------------------
+       Det, der ryger i kloakken, laeses af opskriften paa det, der blev
+       haeldt ud: et stof, hvis atomer rummer et tungmetal, i en maengde,
+       der kan ses (over et fnug). Jern er ikke med - det er et
+       tungmetal paa papiret, men ikke det, man holder ude af afloebet. */
+    var TUNG = { Ag: "sølv", Pb: "bly", Hg: "kviksølv", Cd: "cadmium", Cu: "kobber", Ni: "nikkel",
+                 Cr: "krom", Co: "kobolt", Zn: "zink", Ba: "barium", Sn: "tin", Mn: "mangan" };
+    function tungmetal(o) {
+        var St = NK.Stof, ud = null, mest = 0;
+        Object.keys(o.n || {}).forEach(function (navn) {
+            var s = St.stof(navn), n = o.n[navn] || 0;
+            if (!s || !s.atomer || n < 0.05) return;
+            Object.keys(s.atomer).forEach(function (el) {
+                if (TUNG[el] && n > mest) { mest = n; ud = TUNG[el]; }
+            });
+        });
+        return ud;
+    }
+
+    P.laererVask = function (a) {
+        this.uheldTal = this.uheldTal || {};
+        this.uheldTal.vask = (this.uheldTal.vask || 0) + 1;
+        var k = this.uheldTal.vask;
+        var M = a.metal.charAt(0).toUpperCase() + a.metal.slice(1);
+        var replikker = k === 1 ? [M + " i vasken.", "Tungmetaller skal i affaldsdunken, ikke i kloakken."]
+            : (k === 2 ? ["Igen. " + M + " i vasken.", "Dunken står lige ved siden af."] : ["Rensningsanlægget takker."]);
+        bemaerkning(this, "vask", NK.klamp(a.til.p.x - 120, 60, NK.Scene.BREDDE - 260), { vrede: 0.8, humoer: -0.7, roed: 0.2, skeptisk: 0.6, briller: 1 },
+            replikker, k === 1 ? K.glimtTrin("oejenbryn") : [], pegPunkt(this, a.til), false);
     };
 
     /* En hel flaske i affaldsdunken: han fylder den op igen, én gang.

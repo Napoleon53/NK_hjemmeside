@@ -156,10 +156,14 @@
     NK.OPSTILLING = [
         /* Venstre ende af bordet, under zoomboblen: affaldet og kolben */
         { navn: "dunk", type: "affaldsdunk", x: 70, etiket: ["AFFALD", "surt uorg."] },
+        /* F53: haandvasken med demineraliseret vand staar lige ved
+           affaldsdunken: kummen i bordpladen og hanen over den */
+        { navn: "vask", type: "kumme", x: 190, y: 543, titel: "vasken" },
+        { navn: "hane", type: "vandhane", x: 202, y: 524, titel: "hanen med demineraliseret vand" },
         /* 150 mL i en kolbe paa 200: den skal ikke staa til kanten, og
            inddelingens oeverste streg er netop 150. Det raekker til del 1
            (7 glas a 4 mL) og til del 2 (to portioner a 40 mL). */
-        { navn: "kolbe", type: "kolbe", x: 200, titel: "kolben med stamopløsning", indhold: opl(150, STAM),
+        { navn: "kolbe", type: "kolbe", x: 296, titel: "kolben med stamopløsning", indhold: opl(150, STAM),
           /* Hældes den i affaldet, fylder Kemichael den igen (S16) */
           genopfyld: true },
 
@@ -186,10 +190,10 @@
 
         /* Spatlen, glasstaven og termometeret ligger forrest paa bordpladen */
         { navn: "spatel", type: "spatel", p: { x: 290, y: 550, v: 0 }, del: 1 },
-        /* F44: boetten med rene spatler ved spatlen, og kurven til snavset
-           udstyr forrest til venstre (i begge dele) */
-        { navn: "spatler", type: "spatelboette", x: 404, y: 560, del: 1 },
-        { navn: "kurv", type: "kurv", x: 140, y: 564, etiket: ["SNAVSET", "udstyr"] },
+        /* F44/F52: kurven til snavset udstyr forrest til venstre (i begge
+           dele) og boetten med rene spatler lige ved siden af den */
+        { navn: "kurv", type: "kurv", x: 58, y: 564, etiket: ["SNAVSET", "udstyr"] },
+        { navn: "spatler", type: "spatelboette", x: 124, y: 562, del: 1 },
         { navn: "glasstav", type: "glasstav", x: 820, y: 546, del: 1 },
         { navn: "termometer", type: "termometer", x: 900, y: 562, del: 1 },
 

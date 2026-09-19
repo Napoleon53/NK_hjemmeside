@@ -1045,6 +1045,7 @@
             var farve = { r: fo.r, g: fo.g, b: fo.b, a: 0.85 };
             sproejt(this, x, gulv - 10, farve, 20, gulv);
             this.nyPyt(x, (t.maks || 0) > 100 ? 70 : 50, farve, gulv);
+            gg.spildtFarer = Stof.farer(B.samlet(gg));
             B.toem(gg);
         }
         var n = t.sprite ? Math.round(6 + (t.b * t.h) / 900) : 6;
@@ -1113,6 +1114,7 @@
         }
         if (m.pulver && k.spatel && !gg.last) return true;
         if ((m.affald || m.vask) && k.holder && !B.tom(gg)) return true;
+        if (m.hane && k.holder && !k.pulver && !k.flaske && !k.drypper && !k.sproejter && B.volumen(gg) < gg.type.maks - 0.5) return true;
         if (m.kurv && !k.fast && !k.pulver && !k.flaske && !k.drypper && !k.sproejter && (k.holder || k.spatel || k.roerer || k.maaler)) return true;
         if (m.stoette && gg.type.navn === "reagensglas") return this.ledigtHul(maal) >= 0;
         if (m.bad && gg.type.navn === "reagensglas") return this.ledigPlads(maal) !== null;
@@ -1184,6 +1186,17 @@
                 return hul < 0 ? null : Math.abs(this.hulX(c, hul) - fod.x);
             }
             return Math.abs(fod.x - midt.x) + Math.abs(fod.y - rk.y) * 0.5;
+        }
+        /* F53: hanen - glassets aabning lige under tuden; kummen - musen i
+           soejlen over kummen. Staar glasset under tuden, vinder hanen. */
+        if (m.hane) {
+            var ht = B.tudVerden(c), ga = B.aabning(gg);
+            if (Math.abs(ga.x - ht.x) < 26 && ga.y > ht.y - 16 && ga.y < ht.y + 110) return Math.abs(ga.x - ht.x);
+            return null;
+        }
+        if (m.vask && c.type.kumme) {
+            if (pt.x > rk.x - 6 && pt.x < rk.x + rk.b + 6 && pt.y > rk.y - 190 && pt.y < rk.y + rk.h + 12) return Math.abs(pt.x - midt.x) + 30;
+            return null;
         }
         /* Braenderen: foden paa trefodens plade, som ligger over spriten */
         if (m.flamme && c.type.plade) {
@@ -1309,6 +1322,7 @@
         var k = gg.kan, m = c.kan;
         if (m.affald || m.vask) return this.toemI(gg, c);
         if (m.kurv) return this.iKurv(gg, c);
+        if (m.hane && k.holder) return this.fyldFraHane(gg, c);
         if (m.stoette && gg.type.navn === "reagensglas") return this.iStativ(gg, c, this.ledigtHul(c, pt ? pt.x : undefined));
         /* Et reagensglas, der slippes over et bad, stilles ned i det. Det
            skal staa foer m.holder, ellers ville glasset haelde sit indhold
@@ -1423,6 +1437,7 @@
             sproejt(this, a.x, a.y, farve, 14, linje);
             this.nyPyt(a.x, 40, farve, linje);
             gg.spildtMaerker = Stof.faremaerker(B.samlet(gg));
+            gg.spildtFarer = Stof.farer(B.samlet(gg));
             B.toem(gg);
             this.uheld("vaeltet", gg, gg.titel + " væltede, og indholdet løb ud.");
             return;
@@ -1557,6 +1572,8 @@
        (sproejteflasken, en flaske, kolben, et glas), og maalet er
        glasudstyr, man maaler rumfang i (fyldOp paa typen) */
     P.kanFyldeOp = function (gg, c) {
+        /* Et glas under hanen fyldes af hanen (F53) */
+        if (gg && c && c.kan.hane) return !!(gg.kan.holder && gg.type.fyldOp);
         if (!gg || !c || gg === c || !c.kan.holder || !c.type.fyldOp) return false;
         if (B.volumen(gg) < 0.05) return false;
         return !!(gg.kan.sproejter || (gg.kan.haelder && gg.type.navn !== "vejebaad"));
@@ -1564,6 +1581,11 @@
 
     P.fyldOpTil = function (gg, c, maalMl) {
         if (!this.kanFyldeOp(gg, c) || this.koer.optaget()) return 0;
+        if (c.kan.hane) {
+            var mangl = Math.min(maalMl, gg.type.maks - 0.1) - B.volumen(gg);
+            if (!(mangl > 0.05)) { this.besked(stor(gg.titel) + " har allerede " + Math.round(B.volumen(gg)) + " mL."); return 0; }
+            return this.fyldFraHane(gg, c, mangl) ? mangl : 0;
+        }
         /* Lige under kanten: fylder man til randen, loeber det over */
         var mangler = Math.min(maalMl, c.type.maks - 0.1) - B.volumen(c);
         if (!(mangler > 0.05)) {
@@ -1592,6 +1614,15 @@
         if (!sv) return null;
         sv.svaev = null;
         this.koer.slipFri(sv);
+        /* Et reagensglas (fx under hanen, F53) kan ikke staa paa bordet:
+           det gaar tilbage i stativet, helst i sit eget hul */
+        if (sv.type.navn === "reagensglas") {
+            var st = sv.spec && sv.spec.stativ ? this.g[sv.spec.stativ] : this.foersteMed("stoette");
+            if (st) {
+                var hul = sv.spec && sv.spec.hul !== undefined && !st.glas[sv.spec.hul] ? sv.spec.hul : this.ledigtHul(st, sv.p.x);
+                if (hul >= 0 && this.iStativ(sv, st, hul, !!straks)) { this.aendret("svaev"); return sv; }
+            }
+        }
         var til = this.ledigtSted(sv, sv.p.x) || sv.hjem;
         sv.hjem = kopi(til);
         if (straks) sv.p = kopi(til);
@@ -1651,6 +1682,7 @@
     /* Hvad pilen giver: navn ved pilen og »for ...« i beskeden */
     function pilenGiver(gg) {
         var k = gg.kan;
+        if (gg.svaev && gg.svaev.maal && gg.svaev.maal.kan.hane) return { navn: "Mere vand", besked: "for mere vand" };
         if (k.drypper) return { navn: "En dråbe mere", besked: "for en dråbe mere" };
         if (k.sproejter) return { navn: "En sjat mere", besked: "for en sjat mere" };
         if (k.spatel) return { navn: "En spatelspids mere", besked: "for en spatelspids mere" };
@@ -1847,6 +1879,7 @@
         else if (k.stoette) this.besked("Slip et reagensglas over stativet.");
         else if (k.luge) this.besked("Stil noget i lugen, og klik på knappen for at sende det.");
         else if (k.affald || k.vask) this.besked("Slip et glas over " + gg.titel + " for at tømme det.");
+        else if (k.hane) this.besked("Hold et glas under hanen, og slip det, så fyldes det med demineraliseret vand.");
         return false;
     };
 
@@ -1922,6 +1955,47 @@
         return !!ok;
     };
 
+    /* ----- Haandvasken (F53) ---------------------------------------------
+       Et glas, der slippes under hanen, stilles med bunden i kummen og
+       aabningen under tuden og faar demineraliseret vand: én portion
+       (hanens haeldMl, hoejst en femtedel af glasset), eller op til et
+       rumfang fra »Fyld op til« (mL). Glasset bliver staaende under hanen,
+       saa pilen giver mere, og feltet kan fylde op. */
+    P.fyldFraHane = function (gg, hane, mL) {
+        var mig = this;
+        var plads = gg.type.maks - 0.1 - B.volumen(gg);
+        if (mL === undefined) mL = this.portion(hane, gg);
+        mL = Math.min(mL, plads);
+        if (!(mL > 0.05)) { this.besked(stor(gg.titel) + " er fuldt."); return false; }
+        var tud = B.tudVerden(hane);
+        var kumme = null;
+        this.liste.forEach(function (x) { if (x.kan.vask && x.type.kumme && Math.abs(x.p.x - tud.x) < 80) kumme = x; });
+        var bundY = kumme ? kumme.p.y + 2 : NK.Scene.BORD + 20;
+        var til = { x: tud.x, y: Math.max(tud.y + 10, bundY - (gg.type.h - gg.anker.y)), v: 0 };
+        var tid = NK.klamp(mL / 20, 0.6, 2.5), givet = 0;
+        if (this.aaben(gg)) this.vaelg(gg.navn);
+        this.koer.start([
+            { flyt: gg, til: til, tid: 0.6, loeft: 30 },
+            { kald: function () { if (NK.Lyd && NK.Lyd.haeld) NK.Lyd.haeld(tid); } },
+            { tid: tid, hver: function (t) {
+                var nu = mL * t;
+                if (nu > givet) {
+                    B.haeldI(gg, Stof.lav({ V: nu - givet, T: 20, mM: {} }), true);
+                    givet = nu;
+                }
+                mig.straale = { fra: B.tudVerden(hane), til: { x: tud.x, y: gg.niveau === null || gg.niveau === undefined ? til.y + 40 : gg.niveau }, farve: Stof.VAND, bredde: 2.2 };
+            } },
+            { kald: function () {
+                mig.straale = null;
+                gg.svaev = { maal: hane, ur: Infinity };
+                mig.tilFront(gg);
+                mig.haendelse("hane", { til: gg, mL: givet });
+                mig.aendret("hane");
+            } }
+        ], "hane");
+        return true;
+    };
+
     /* ----- Kurven og boetten (F44) --------------------------------------
        Kurven til snavset udstyr: et tomt glas, en spatel, en glasstav eller
        et termometer, der laegges i den, forsvinder, og et nyt, rent
@@ -1989,6 +2063,8 @@
             this.draaber.push({ x: o.x + r(-8, 8), y: o.y + 2, vx: r(-120, 120), vy: -r(40, 160), rad: r(1.4, 2.6), liv: 1, farve: farve, fysik: true });
         }
         this.nyPyt(o.x, c.type.maks < 30 ? 44 : 70, farve);
+        c.spildtMaerker = Stof.faremaerker(ud);
+        c.spildtFarer = Stof.farer(ud);
         this.uheld("overloeb", c, c.titel + " løber over.");
         return true;
     };
@@ -2032,6 +2108,7 @@
         sproejt(this, a.x, a.y, farve, Math.max(8, Math.round(26 * (0.4 + del * 6))));
         this.nyPyt(gg.p.x, (gg.type.maks < 30 ? 56 : 66) * NK.klamp(0.5 + del * 5, 0.5, 1), farve);
         gg.spildtMaerker = Stof.faremaerker(tabt);
+        gg.spildtFarer = Stof.farer(tabt);
         this.koer.start([NK.Koer.hjemTil(gg, 0.6, 20)], "hjem");
         this.uheld(slags || "spild", gg, "Det skvulpede ud. En tiendedel røg på bordet.");
     };

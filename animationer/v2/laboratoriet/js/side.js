@@ -521,8 +521,23 @@
         var liste = NK.el("forloeb-liste");
         if (liste) {
             liste.innerHTML = "";
+            /* F49: et forsoeg i flere dele kan folde de dele, eleven ikke
+               staar i, sammen til én linje (valg.forloebDele: { titler:
+               { 1: "...", 2: "..." }, nu: function () -> delens nummer }).
+               Uden det staar alle trin i listen som foer. */
+            var fd = this.valg.forloebDele, nuDel = fd && fd.nu ? fd.nu() : null, vist = {};
             f.trin.forEach(function (x) {
                 var li = document.createElement("li");
+                if (fd && x.del && x.del !== nuDel) {
+                    if (vist[x.del]) return;
+                    vist[x.del] = true;
+                    var dens = f.trin.filter(function (y) { return y.del === x.del; });
+                    var gjorte = dens.filter(function (y) { return f.erGjort(y.id); }).length;
+                    li.textContent = (fd.titler && fd.titler[x.del] || ("Del " + x.del)) + " (" + gjorte + "/" + dens.length + ")";
+                    li.className = "gruppe" + (gjorte === dens.length ? " gjort" : "");
+                    liste.appendChild(li);
+                    return;
+                }
                 li.textContent = x.kort || x.tekst;
                 li.className = f.erGjort(x.id) ? "gjort" : (x === t ? "nu" : "");
                 liste.appendChild(li);
@@ -803,7 +818,8 @@
             f.dataset.sted = x + "," + y;
         }
         f.hidden = false;
-        var inp = NK.el("fyldop-ml"), c = sv.svaev.maal;
+        /* Under hanen er det glasset selv, der fyldes (F53) */
+        var inp = NK.el("fyldop-ml"), c = sv.svaev.maal.kan.hane ? sv : sv.svaev.maal;
         if (inp && document.activeElement !== inp) inp.placeholder = String(Math.round(NK.Beholder.volumen(c)));
         var fo = this.valg.fyldOpForslag ? this.valg.fyldOpForslag.call(this, b, c, sv) : null;
         if (!fo) fo = standardForslag(b, c);

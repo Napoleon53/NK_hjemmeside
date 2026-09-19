@@ -22,6 +22,8 @@
                          vask       tager imod alt, der haeldes i
                          papir      toerrer pytter op
                          kurv       tager imod tomt, snavset udstyr (F44)
+                         hane       giver demineraliseret vand til et
+                                    glas, der holdes under den (F53)
                          spatler    en boette, man tager nye spatler fra
                          fast       kan ikke tages op (staar fast paa bordet)
      kilde             en beholder, man haelder FRA (kolben, maaleglasset,
@@ -315,6 +317,22 @@
             anker: { x: 20, y: 30 },
             kan: { spatler: true, fast: true },
             titel: "bøtten med spatler"
+        },
+        /* F53: haandvasken som to maal - kummen i bordpladen, hvor man
+           tømmer et glas (kan.vask), og hanen med demineraliseret vand,
+           hvor man fylder det (kan.hane). Hanens tud er (14, 44). */
+        kumme: {
+            sprite: "kumme", fil: "kumme.svg", b: 110, h: 26,
+            anker: { x: 55, y: 13 },
+            kan: { vask: true, fast: true }, kumme: true,
+            titel: "vasken"
+        },
+        vandhane: {
+            sprite: "vandhane", fil: "vandhane.svg", b: 70, h: 170,
+            anker: { x: 35, y: 170 },
+            kan: { hane: true, fast: true },
+            tud: { x: 14, y: 44 }, haeldMl: 25,
+            titel: "hanen med demineraliseret vand"
         },
         vask: {
             sprite: "vask", fil: "vask.svg", b: 110, h: 160,

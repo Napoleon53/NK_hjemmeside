@@ -904,6 +904,23 @@ function koerTest() {
     paastand("varmepladen er ikke et maal: klikket taender den bare", g.plade.taendt && !bord.klar);
     bord.klik("plade");
     frisk();
+
+    overskrift("15. Kemichael advarer, naar noget farligt spildes, ikke naar det tages (F51)");
+    function scenerFor(sek) { var set = {}; for (var k = 0; k < sek * 4; k++) { adv(0.25); if (bord.laerer.scene) set[bord.laerer.scene.navn] = true; } return set; }
+    var fl15 = g.fl_hno3;
+    bord.startBaer(fl15);
+    bord.stopBaer({ x: fl15.hjem.x, y: fl15.hjem.y });
+    var s15 = scenerFor(4);
+    paastand("at tage flasken med koncentreret salpetersyre giver ingen advarsel", !s15.advarsel && !(bord.laererVent || []).length, JSON.stringify(s15));
+    B.haeldI(g.glas1, St.lav({ V: 5, T: 20, mM: { "HNO3": 14000 } }), true);
+    var sagt15 = [], lsig = bord.laererSig;
+    bord.laererSig = function (tekst) { sagt15.push(tekst); return lsig.apply(this, arguments); };
+    bord.spild(g.glas1, "rystet");
+    scenerFor(20);
+    bord.laererSig = lsig;
+    paastand("men spildes den, siger han stoffets advarsel, naar han har toerret op",
+        sagt15.some(function (t) { return t.indexOf("salpetersyre") >= 0; }), sagt15.join(" | "));
+    frisk();
 }
 
 function vis() {

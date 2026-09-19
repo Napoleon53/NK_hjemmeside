@@ -23,7 +23,14 @@
         /* Kortet »Sagt i laboratoriet« (S13): forloebets replikker kommer
            altid med; her ogsaa Kemichaels uheld og advarsler. Smaasnakken
            (kaffen, kigget ind) kommer aldrig. */
-        historik: ["spild", "advarsel", "voldsom", "affald"],
+        historik: ["spild", "voldsom", "affald", "vask"],
+
+        /* F49: listen viser trinnene i den del, eleven staar i; den anden
+           del staar som én linje og foldes ud, naar man kommer dertil */
+        forloebDele: {
+            titler: { 1: "Del 1: glassene", 2: "Del 2: fortynding" },
+            nu: function () { return NK.DELE.nu(); }
+        },
 
         /* »Fyld op til« (F39): de forslag, fortyndingen bruger. Til et af
            de fire baegerglas: det, makkeren i parret har (saa de to faar
@@ -113,7 +120,7 @@
                 s.opdaterForloeb();
             };
             /* Panelet viser det trin, eleven kan gaa i gang med HER. Listen
-               viser stadig alle tretten, saa hele forsoeget kan ses. */
+               viser den dels trin, og den anden del som én linje (F49). */
             s.forloeb.kun = function (t) { return !t.del || t.del === NK.DELE.nu(); };
             [1, 2].forEach(function (i) {
                 NK.el("del" + i + "knap").addEventListener("click", function () { s.skiftDel(i); });

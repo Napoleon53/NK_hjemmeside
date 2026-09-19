@@ -2424,6 +2424,97 @@ function koerTest() {
 
     NK.startForfra();
     adv(1);
+
+    overskrift("33. Forløbslisten, C-vitamin, spatelbøtten og håndvasken (F49-F53)");
+    NK.startForfra();
+    adv(0.5);
+    /* F49: listen viser den del, eleven står i, og den anden som én linje */
+    side.opdaterForloeb();
+    var li33 = [].map.call(d.querySelectorAll("#forloeb-liste li"), function (l) { return l.textContent; });
+    paastand("i del 1 står del 1's trin og del 2 som én linje (F49)",
+        li33.length === 10 && li33[8] === NK.TEKST.trin.ryd.kort && li33[9].indexOf("Del 2: fortynding") === 0, li33.join(" | "));
+    NK.DELE.saet(bord, 2, true);
+    side.visDel();
+    li33 = [].map.call(d.querySelectorAll("#forloeb-liste li"), function (l) { return l.textContent; });
+    paastand("i del 2 står del 1 som én linje og del 2's fire trin", li33.length === 5 && li33[0].indexOf("Del 1: glassene") === 0, li33.join(" | "));
+    NK.DELE.saet(bord, 1, true);
+    side.visDel();
+    /* F50 og F52 */
+    paastand("udførelsen siger C-vitamin med ascorbinsyre i parentes (F50)",
+        NK.TEKST.trin.glas2.tekst.indexOf("C-vitamin (ascorbinsyre") >= 0 && NK.TEKST["intro-trin"][1].indexOf("C-vitamin (ascorbinsyre") >= 0);
+    paastand("spatelbøtten står lige ved kurven (F52)", Math.abs(bord.g.spatler.p.x - bord.g.kurv.p.x) < 90, tal(bord.g.spatler.p.x, 0) + " og " + tal(bord.g.kurv.p.x, 0));
+    /* F53: håndvasken */
+    var hane = bord.g.hane, kumme = bord.g.vask;
+    paastand("vasken står lige ved affaldsdunken, og kolben er rykket ind (F53)",
+        !!hane && !!kumme && kumme.p.x - bord.g.dunk.p.x < 150 && bord.g.kolbe.p.x > kumme.p.x + 80);
+    var V33 = B.volumen(g(2));
+    bord.moede(g(2), hane, null);
+    faerdig();
+    paastand("et reagensglas under hanen får 4 mL demineraliseret vand og bliver stående",
+        Math.abs(B.volumen(g(2)) - V33 - 4) < 0.05 && !!g(2).svaev && g(2).svaev.maal === hane, tal(B.volumen(g(2)), 1) + " mL");
+    var ring33 = bord.svaevRing();
+    paastand("pilen siger »Mere vand«", !!ring33 && ring33.tekst === "Mere vand", ring33 && ring33.tekst);
+    side.opdaterFyldOp();
+    paastand("men »Fyld op til« står ikke ved et reagensglas", d.getElementById("fyldop").hidden);
+    bord.klik("svaevring");
+    faerdig();
+    paastand("pilen giver 4 mL mere", Math.abs(B.volumen(g(2)) - V33 - 8) < 0.05, tal(B.volumen(g(2)), 1) + " mL");
+    bord.stilSvaevendeNed(true);
+    adv(0.5);
+    paastand("stilles det ned igen, går reagensglasset tilbage i sit hul", !!g(2).sted && g(2).sted.hul === 1);
+    NK.DELE.saet(bord, 2, true);
+    adv(0.5);
+    var b33 = bord.g.baeger1;
+    paastand("hanen og vasken står også i del 2", bord.synlig(hane) && bord.synlig(kumme));
+    bord.moede(b33, hane, null);
+    faerdig();
+    side.opdaterFyldOp();
+    paastand("et bægerglas under hanen får 25 mL, og »Fyld op til« står ved det", Math.abs(B.volumen(b33) - 25) < 0.05 && !d.getElementById("fyldop").hidden,
+        tal(B.volumen(b33), 1) + " mL");
+    bord.fyldOpTil(b33, hane, 60);
+    faerdig();
+    paastand("»Fyld op til« 60 fylder det op fra hanen", Math.abs(B.volumen(b33) - 60) < 0.1 && !St.konc(B.samlet(b33), "Fe3+"), tal(B.volumen(b33), 1) + " mL");
+    bord.stilSvaevendeNed(true);
+    NK.DELE.saet(bord, 1, true);
+    adv(0.5);
+    /* Kummen: tømmer; tungmetal giver en bemærkning, vand ikke */
+    var sagt33 = [], lsig33 = bord.laererSig, altid33 = bord.laererAltid;
+    bord.laererAltid = true;
+    bord.laererSig = function (tekst) { sagt33.push(tekst); return lsig33.apply(this, arguments); };
+    bord.moede(g(2), kumme, null);
+    faerdig();
+    for (var r33 = 0; r33 < 20; r33++) adv(0.5);
+    paastand("et glas med kun stamopløsning og vand i vasken: tømt, og ingen bemærkning", B.tom(g(2)) && !sagt33.some(function (t) { return t.indexOf("vasken") >= 0; }), sagt33.join(" | "));
+    B.haeldI(g(4), B.udtag(bord.g.kolbe, PORTION), true);
+    B.haeldI(g(4), B.udtag(bord.g.ag, 0.1), true);
+    adv(2);
+    bord.moede(g(4), kumme, null);
+    faerdig();
+    for (r33 = 0; r33 < 40 && !sagt33.some(function (t) { return t.indexOf("Sølv i vasken") === 0; }); r33++) adv(0.5);
+    paastand("sølv i vasken: »Sølv i vasken. Tungmetaller skal i affaldsdunken …«",
+        sagt33.some(function (t) { return t.indexOf("Sølv i vasken") === 0; }), sagt33.join(" | "));
+    bord.laererSig = lsig33;
+    bord.laererAltid = altid33;
+    for (r33 = 0; r33 < 80 && bord.laerer.scene; r33++) adv(0.25);
+    paastand("det står også i kortet »Sagt i laboratoriet«", side.replikker.some(function (x) { return x.tekst.indexOf("Sølv i vasken") === 0; }));
+    /* Med musen: glasset under tuden giver hanen, over kummen vasken */
+    NK.startForfra();
+    adv(0.5);
+    B.haeldI(g(3), B.udtag(bord.g.kolbe, PORTION), true);
+    var tud33 = B.tudVerden(hane);
+    mus.tag("glas3", 0.5, 0.3);
+    var gg33 = g(3), gr = { x: mus.her().x - gg33.p.x, y: mus.her().y - gg33.p.y };
+    mus.til({ x: tud33.x + gr.x, y: tud33.y + 30 + gr.y }, 0.8);
+    var m1 = bord.slipMaal;
+    var rk33 = bord.rekt(kumme, 0);
+    mus.til({ x: rk33.x + rk33.b - 12, y: rk33.y - 80 }, 0.6);
+    var m2 = bord.slipMaal;
+    mus.slip();
+    faerdig();
+    paastand("med musen: under tuden er målet hanen, ude over kummen vasken", m1 === "hane" && m2 === "vask" && B.tom(g(3)), m1 + ", " + m2);
+
+    NK.startForfra();
+    adv(1);
 }
 
 function vis() {

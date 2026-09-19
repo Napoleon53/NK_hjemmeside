@@ -60,6 +60,19 @@
     content: "▸";
 }
 
+/* F49: den del, eleven ikke staar i, som én linje */
+.forloeb-liste li.gruppe {
+    opacity: 0.55;
+    font-weight: 700;
+    margin-top: 4px;
+}
+.forloeb-liste li.gruppe::before {
+    content: "▸";
+}
+.forloeb-liste li.gruppe.gjort::before {
+    content: "✓";
+}
+
 #forloeb-kort.faerdig .forloeb-nu {
     font-weight: 600;
 }

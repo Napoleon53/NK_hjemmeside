@@ -282,8 +282,12 @@ miljoe, forenklede GHS-tegn) og det, Kemichael siger første gang flasken
 tages (`sig`). Et stof med et langt navn får et kort navn på kuglen i
 zoomboblen (`kort`, fx PP for phenolphthalein), og boblen viser en legende. `NK.Stof.faremaerker(o)` giver mærkerne for en opløsning, så
 etiketten følger indholdet: en fortyndet syre mister sit ætsende-mærke, og
-affaldsdunken viser, hvad der er i den. Kemichael advarer gennem
-`laererBaer` (`proevebord/js/laerer.js`), én gang pr. stof.
+affaldsdunken viser, hvad der er i den. Kemichael advarer kun, når et
+farligt stof faktisk er spildt på bordet, gulvet eller knust glas (F51):
+bordet sætter `bord.spildtFarer` (det spildte stofs farer) ved vælt, spild,
+overløb og knust glas, og `laererUheld`/`laererKnust` i
+`proevebord/js/laerer.js` lægger `farligeLinjer(farer)` efter oprydningen.
+At tage eller bære en flaske giver ingen advarsel længere.
 
 Kemichael taler ikke hele tiden (`laererOpdager`): uheld med farlige
 kemikalier (ætsende, giftig, brandfarlig, oxiderende, kronisk) og knust glas
@@ -545,7 +549,7 @@ fylder Kemichael igen, når den er hældt i affaldet (S16).
 et varigt sted:* har siden kortet `#replik-kort`, noteres hver linje, der
 siges i taleboblen (`NK.vedReplik`, kaldt af `laererSig` i
 `kemichael.js`), i en liste: forløbets replikker altid, de scener,
-forsøget nævner i `historik` (fx `"spild"`, `"advarsel"`), og aldrig
+forsøget nævner i `historik` (fx `"spild"`, `"vask"`), og aldrig
 småsnakken eller svarene på en prik. Uden kort sker der ingenting.
 *Klik på boblen:* `NK.Taleboble.rammer(pt)` og `overLaererBoble`; et klik
 på boblen kalder `springReplik`, som afslutter linjen og det sig-trin,
@@ -579,6 +583,23 @@ kan godkende flere svar. *Uheld:* `bord.opryddet` siger, om læreren
 (`laerer.js`) eller eleven (`toerOp`) ryddede op. *Noterne:* skraldespand
 og kryds øverst til højre, »Luk« nederst; skraldespanden sletter først ved
 andet klik.
+
+**Tilføjet 19. september, nat (F49–F53).** *Håndvasken:* udstyret
+`kumme` (`kan.vask`) og `vandhane` (`kan.hane`, `tud`, `haeldMl`) står fast
+på bordet. Slippes et glas under hanens tud, stilles det i vasken og fyldes
+med demineraliseret vand (`bord.fyldFraHane(glas, hane, mL)`, 25 mL eller
+glassets `haeldMl`); pilen ved glasset giver »Mere vand«, og et bægerglas
+får feltet »Fyld op til«. Glasset svæver ved hanen (`svaev.maal` = hanen),
+og når noget andet trækkes, kommer et reagensglas tilbage i stativet
+(helst sit eget hul). Slippes et glas over kummen, hældes det ud i vasken
+(hændelsen `"vask"`); Kemichael har noget at sige, hvis der var tungmetaller
+i (`laererVask`, `tungmetal(o)` i `laerer.js`: Ag, Pb, Hg, Cd, Cu, Ni, Cr,
+Co, Zn, Ba, Sn, Mn). *Kemichael og farlige stoffer:* se »Faremærkning og
+Kemichaels advarsler« — kun ved spild. *Forløbslisten i dele:*
+`valg.forloebDele = { titler: { 1: "Del 1: …", 2: "Del 2: …" }, nu:
+function () { … } }` foldes, så kun den del, eleven er i, står trin for
+trin; de andre dele står som én linje med antal gjort (klassen `gruppe`).
+Uden `forloebDele` står listen som før.
 
 **Der hældes kun, når eleven beder om det (F36):** et slip over glasset
 giver én portion, og pilen ved flasken giver mere. At bære en flaske hen
