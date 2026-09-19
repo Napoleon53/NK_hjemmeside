@@ -169,7 +169,7 @@ function koerTest() {
     for (var i = 1; i <= 8; i++) B.haeldI(g(i), B.udtag(kolbe, 6), true);
     adv(25);
     var ref = g(7), lys0 = lys(ref), fescn0 = konc(ref, "FeSCN2+");
-    paastand("komplekset danner sig af sig selv", fescn0 > 2 && fescn0 < 4.5, tal(fescn0) + " mM FeSCN2+");
+    paastand("komplekset danner sig af sig selv", fescn0 > 0.4 && fescn0 < 1.5, tal(fescn0) + " mM FeSCN2+");
     paastand("farven er tydelig, men ikke sort", lys0 < 0.75 && lys0 > 0.12, "lys " + tal(lys0));
     paastand("trin 1 er gjort, naar alle otte glas er fyldt", F.erGjort("fyld"));
     paastand("naeste trin er glas 1", F.nuTrin() && F.nuTrin().id === "glas1", F.nuTrin() && F.nuTrin().id);
@@ -1209,14 +1209,17 @@ function koerTest() {
             else h = (r - gr) / d + 4;
             h *= 60;
         }
-        return { h: h, m: d / (mx || 1), l: (mx + mn) / 2 };
+        return { h: h, m: d / (mx || 1), l: (mx + mn) / 2, gr: f.g / Math.max(f.r, 1) };
     }
     var kA = kulor(baeg(3)), kB = kulor(baeg(4));
-    paastand("ligevaegtsblandingen beholder sin kuloer, naar den fortyndes",
-        Math.abs(kA.h - kB.h) < 8, tal(kA.h, 0) + "° mod " + tal(kB.h, 0) + "°");
-    paastand("og den bliver lysere uden at gaa mod graat",
-        kB.l > kA.l + 0.03 && kB.m > kA.m * 0.6,
-        "lyshed " + tal(kA.l, 2) + " -> " + tal(kB.l, 2) + ", maetning " + tal(kA.m, 2) + " -> " + tal(kB.m, 2));
+    paastand("fortyndingen trækker kuloeren mod gult, ikke mod graat",
+        kB.h > kA.h + 2 && kB.m > kA.m * 0.7,
+        "kuloer " + tal(kA.h, 0) + "° -> " + tal(kB.h, 0) + "°, maetning " + tal(kA.m, 2) + " -> " + tal(kB.m, 2));
+    /* Det gule ER det groenne lys, der slipper mere igennem, naar det
+       roede kompleks bruges op. Rent tal, ikke et skoen. */
+    paastand("fordi mere groent lys slipper igennem, naar komplekset bruges op",
+        kB.gr > kA.gr * 1.15,
+        "groent/roedt " + tal(kA.gr, 2) + " -> " + tal(kB.gr, 2));
     paastand("rent vand er ikke farvet, men heller ikke usynligt",
         (function () { var v = NK.Stof.gennem(NK.Stof.lav({ V: 40, mM: {} }), 1); return v.b > v.r && v.r > 180; }()));
 

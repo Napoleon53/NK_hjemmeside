@@ -492,7 +492,7 @@
        ellers ville den tage kuloeren fra enhver fortyndet oploesning og
        goere den mat - en fortyndet ligevaegtsblanding skal gaa mod
        orange og gult, ikke mod graat. */
-    function vandTone(ialt) { return Math.exp(-ialt * 5); }
+    function vandTone(ialt) { return Math.exp(-ialt * 25); }
 
     /* Oploesningens farve, som den tegnes: kuloeren og hvor meget den
        daekker. l: vejlaengde i forhold til et reagensglas (baegerglas ca. 2). */

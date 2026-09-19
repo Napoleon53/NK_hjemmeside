@@ -27,14 +27,20 @@
    begge dele - affaldet, kolben, koekkenrullen og sproejteflasken - har
    intet `del` og staar hele tiden.
 
-   Stamoploesningen: 32 mL 0,10 M Fe(NO₃)₃ og 32 mL 0,10 M KSCN fortyndet
-   til 400 mL, altsaa 8 mM af hver. Ved ligevaegt giver det ca. 3,2 mM
-   FeSCN²⁺, som staar kraftigt roedt i et reagensglas uden at gaa mod
-   sort, og som ogsaa kan ses, naar der kigges ned i et baegerglas, hvor
-   lysvejen er kortere. Der er 4,8 mM frit Fe³⁺ tilbage, og det er dét,
-   der traeder frem som gult, naar blandingen fortyndes og komplekset
-   bruges op. Motoren regner selv ligevaegten frem; her staar kun det,
-   der blev blandet.
+   Stamoploesningen: 12 mL 0,10 M Fe(NO₃)₃ og 12 mL 0,10 M KSCN fortyndet
+   til 400 mL, altsaa 3 mM af hver. Ved ligevaegt giver det 0,73 mM
+   FeSCN²⁺ og 2,28 mM frit Fe³⁺.
+
+   Hvorfor ikke mere? Fordi en KRAFTIG stamoploesning gaar doed i
+   fortyndingsproeven. Jo mere koncentreret blandingen er, jo stoerre en
+   del er allerede bundet i komplekset, og jo mindre rykker en fortynding:
+   ved 8 mM er der 71 % af komplekset tilbage efter en fortynding til det
+   dobbelte, ved 3 mM kun 63 % - og des mere frit Fe³⁺ er der til at
+   traede frem som gult. Farven er i stedet gjort kraftig med
+   ekstinktionskoefficienten k for FeSCN²⁺ i stoftabellen: dét er knappen
+   paa farvedybden, mens koncentrationen er knappen paa, hvor meget
+   ligevaegten kan flytte sig. Motoren regner selv ligevaegten frem; her
+   staar kun det, der blev blandet.
    ===================================================================== */
 (function () {
     "use strict";
@@ -79,8 +85,8 @@
     var HYLDE_FLASKER = 170;               /* flasken, draabeflasken og sproejteflasken */
     var HYLDE_HOEJRE = 230;                /* det tomme baegerglas */
 
-    /* Stamoploesningen: Fe³⁺ og SCN⁻ 5 mM, plus modionerne */
-    var STAM = { "Fe3+": 8, "SCN-": 8, "K+": 8, "NO3-": 24 };
+    /* Stamoploesningen: Fe³⁺ og SCN⁻ 3 mM, plus modionerne */
+    var STAM = { "Fe3+": 3, "SCN-": 3, "K+": 3, "NO3-": 9 };
 
     /* Frugtfarve: et blaat farvestof, der ikke indgaar i nogen reaktion.
        Flasken er en stamflaske paa 100 mL og 35 mM - ti gange saa

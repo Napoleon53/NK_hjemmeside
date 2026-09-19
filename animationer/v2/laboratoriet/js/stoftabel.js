@@ -31,9 +31,15 @@
     St.def("Zn2+",    { M: 65.4, formel: "Zn", q: 2, navn: "zinkioner", atomer: { Zn: 1 } });
     St.def("Fe2+",    { M: 55.8, formel: "Fe", q: 2, navn: "jern(II)ioner", atomer: { Fe: 1 }, farve: { r: 150, g: 200, b: 160 }, k: 0.004 });
     St.def("Cu2+",    { M: 63.5, flamme: { r: 60, g: 220, b: 130 }, formel: "Cu", q: 2, navn: "kobberioner", atomer: { Cu: 1 }, farve: { r: 70, g: 150, b: 225 }, k: 0.012 });
-    St.def("Fe3+",    { M: 55.8, formel: "Fe", q: 3, navn: "jern(III)ioner", atomer: { Fe: 1 }, farve: { r: 215, g: 170, b: 80 }, k: 0.02 });
+    /* Fe³⁺ er svagt gult. Tallet er sat hoejere, end kemien siger: i
+       virkeligheden absorberer FeSCN²⁺ omkring femogtyve gange kraftigere
+       end Fe³⁺, og saa ville den gule tone aldrig kunne ses ved siden af
+       den roede. Her er forholdet under tre, saa gult traeder frem, naar
+       komplekset bruges op - ved fortynding, og i glas 4, hvor soelvet
+       tager thiocyanatet. Et modelbillede, ikke et regnskab. */
+    St.def("Fe3+",    { M: 55.8, formel: "Fe", q: 3, navn: "jern(III)ioner", atomer: { Fe: 1 }, farve: { r: 215, g: 170, b: 80 }, k: 0.5 });
     St.def("SCN-",    { M: 58.1, formel: "SCN", q: -1, navn: "thiocyanationer", atomer: { S: 1, C: 1, N: 1 } });
-    St.def("FeSCN2+", { M: 113.9, formel: "FeSCN", q: 2, navn: "jernthiocyanat-komplekset", atomer: { Fe: 1, S: 1, C: 1, N: 1 }, farve: { r: 185, g: 25, b: 20 }, k: 0.35 });
+    St.def("FeSCN2+", { M: 113.9, formel: "FeSCN", q: 2, navn: "jernthiocyanat-komplekset", atomer: { Fe: 1, S: 1, C: 1, N: 1 }, farve: { r: 185, g: 25, b: 20 }, k: 1.2 });
     St.def("MnO4-",   { M: 118.9, formel: "MnO₄", q: -1, navn: "permanganationer", atomer: { Mn: 1, O: 4 }, farve: { r: 130, g: 20, b: 150 }, k: 0.6 });
     St.def("HAc",     { M: 60.1, formel: "CH₃COOH", q: 0, navn: "ethansyre", atomer: { C: 2, H: 4, O: 2 } });
     St.def("Ac-",     { M: 59.1, formel: "CH₃COO", q: -1, navn: "acetationer", atomer: { C: 2, H: 3, O: 2 } });

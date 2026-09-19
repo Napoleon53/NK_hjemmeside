@@ -179,21 +179,34 @@ navngiven reaktion, ligesom Fe³⁺ + I⁻.
 
 ## Stamopløsningen
 
-32 mL 0,10 M Fe(NO₃)₃ og 32 mL 0,10 M KSCN fortyndet til 400 mL, altså
-8 mM af hver. Ved ligevægt giver det 3,2 mM FeSCN²⁺, som står kraftigt rødt
-i et reagensglas uden at gå mod sort — og som stadig kan ses, når der kigges
-ned i et bægerglas, hvor lysvejen er kortere. Der er 4,8 mM frit Fe³⁺
-tilbage; det er dét, der træder frem som gult, når blandingen fortyndes og
-komplekset bruges op, og det er kun synligt, fordi udgangspunktet er kraftigt
-nok. Kolben rummer 150 mL af de 200, den kan — nok til del 1, uden at stå til
+12 mL 0,10 M Fe(NO₃)₃ og 12 mL 0,10 M KSCN fortyndet til 400 mL, altså
+3 mM af hver. Ved ligevægt giver det 0,73 mM FeSCN²⁺ og 2,28 mM frit
+Fe³⁺ tilbage — altså en fjerdedel omsat, tre fjerdedele til rest.
+
+Den fordeling er hele pointen, og den er tynd med vilje. Ligevægten
+Fe³⁺ + SCN⁻ ⇌ FeSCN²⁺ er af anden orden mod første: fortynder man, er der
+to partikler at finde hinanden for hver én, der falder fra hinanden, så
+ligevægten flytter sig mod venstre. Hvor meget den flytter sig, afhænger af,
+hvor langt fra mætning man står. Med en kraftig stamopløsning er næsten alt
+SCN⁻ allerede bundet, og der er ikke noget at flytte: ved 8 mM overlever
+71 % af komplekset en fordobling af rumfanget, og eleven ser ingenting. Ved
+3 mM overlever kun 63 %, og de 37 %, der falder fra hinanden, lægger sig
+oveni det frie Fe³⁺, som er gult. Derfor går brændt orange mod rav, når der
+fortyndes — ikke fordi farven bliver bleg, men fordi kuløren skifter.
+En kraftigere stamopløsning ville være kønnere og pjatteklogere.
+
+Kolben rummer 150 mL af de 200, den kan — nok til del 1, uden at stå til
 kanten — og **det store bægerglas på hylden står med 500 mL** af de 600,
 det kan: dagens forråd, som del 2 hældes af. Kolben er den håndterlige
-portion, bægerglasset batchen. Motoren regner selv ligevægten frem; opstillingen siger kun,
-hvad der blev blandet.
+portion, bægerglasset batchen. Motoren regner selv ligevægten frem;
+opstillingen siger kun, hvad der blev blandet.
 
-Vil man have farven stærkere eller svagere, ændres koncentrationen i
-`STAM` i `js/opstilling.js`. Bliver den for mørk, er det `k` for FeSCN²⁺ i
-stoftabellen, der skal ned.
+De to knapper er adskilte med vilje. **Hvor langt ligevægten kan flytte
+sig** står i `STAM` i `js/opstilling.js` — det er koncentrationen, og den
+afgør, om fortyndingsforsøget overhovedet kan ses. **Hvor dyb farven er**
+står i `k` for FeSCN²⁺ i stoftabellen — ekstinktionskoefficienten, som kun
+skalerer mørket, ikke kulørskiftet. Bliver billedet for mørkt, er det `k`,
+der skal ned, ikke `STAM`; bliver fortyndingen usynlig, er det omvendt.
 
 ## Forløbet
 
