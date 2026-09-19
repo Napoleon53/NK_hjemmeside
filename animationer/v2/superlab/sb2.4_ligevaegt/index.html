@@ -33,6 +33,10 @@
     <div class="scene" id="scene">
         <canvas id="scene-laerred" aria-label="Laboratoriebord med kolbe, bægerglas, otte reagensglas i et stativ, pulverglas med Fe(NO₃)₃, ascorbinsyre og KSCN, flaske med KSCN, dråbeflaske med AgNO₃, vandbad på varmeplade, isbad, glasstav, termometer og affaldsdunk."></canvas>
         <div class="scenebesked" id="scenebesked" aria-live="polite"></div>
+        <div class="delknapper" id="delknapper" role="group" aria-label="Forsøgets to dele">
+            <button class="knap delknap" id="del1knap" type="button" title="Del 1: de syv glas (tast 1)" aria-pressed="true">Del 1</button>
+            <button class="knap delknap" id="del2knap" type="button" title="Del 2: fortynding (tast 2)" aria-pressed="false">Del 2</button>
+        </div>
         <section class="noter" id="noter" hidden aria-label="Noter">
             <div class="noter-top">
                 <h2>Noter</h2>
@@ -64,6 +68,7 @@
             <div class="knaprad">
                 <button class="knap blaa" id="hintknap" type="button" title="Hint til dette trin (I)">Hint</button>
                 <button class="knap" id="billedknap" type="button" title="Tag et billede af stativet (S)">Tag billede</button>
+                <button class="knap" id="ovenfraknap" type="button" title="Se de fire bægerglas ovenfra (S)" hidden>Se ovenfra</button>
             </div>
             <ol class="forloeb-liste" id="forloeb-liste"></ol>
         </div>
@@ -130,6 +135,22 @@
 </div>
 
 <!-- ================================================================= -->
+<div class="overlay" id="ovenfra">
+    <div class="overlay-boks ovenfra-boks" role="dialog" aria-labelledby="ovenfra-titel">
+        <h2 id="ovenfra-titel">De fire glas set ovenfra</h2>
+        <p class="besked" id="ovenfra-tekst"></p>
+        <div class="ovenfra-ramme">
+            <canvas id="ovenfra-laerred" aria-label="De fire bægerglas set lige ned i, to og to i par, på hvidt papir"></canvas>
+        </div>
+        <div class="ovenfra-svar" id="ovenfra-svar"></div>
+        <div class="knapper">
+            <span class="taeller" id="ovenfra-taeller"></span>
+            <button class="knap blaa" id="ovenfra-luk" type="button">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
 <div class="rundvisning" id="rundvisning" hidden>
     <div class="rundvisning-baggrund" id="rv-baggrund"></div>
     <div class="rundvisning-spot" id="rv-spot"></div>
@@ -168,6 +189,8 @@
 <script src="js/tekst.js"></script>
 <script src="js/opstilling.js"></script>
 <script src="js/billede.js"></script>
+<script src="js/ovenfra.js"></script>
+<script src="js/dele.js"></script>
 <script src="js/forloeb.js"></script>
 <script src="../../laboratoriet/proevebord/js/laerer.js"></script>
 <script src="../../laboratoriet/js/rundvisning.js"></script>

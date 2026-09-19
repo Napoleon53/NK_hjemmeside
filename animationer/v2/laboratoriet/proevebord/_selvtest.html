@@ -522,8 +522,11 @@ function koerTest() {
        lysheden regnes ud - det er praecis det, del 2 viser paa papiret. */
     (function () {
         var U = NK.Udstyr, t = U.type("baegerLille");
-        /* Farven som den staar paa det hvide papir, og hvor lys den er */
-        function lyshed(f) {
+        /* Farven som den staar paa det hvide papir, og hvor lys den er.
+           Det er det samme maal som motorens NK.Vilkaar.lyshed, men
+           proevebordet indlaeser ikke vilkaar.js, saa den regnes her. */
+        function lyshed(gg, retning) {
+            var f = B.farve(gg, retning);
             if (!f) return 255;
             var a = f.a;
             return 0.2126 * (255 * (1 - a) + f.r * a) +
@@ -557,10 +560,10 @@ function koerTest() {
             Math.abs(n(a, "farve") - n(b2, "farve")) < 1e-9 &&
             Math.abs(St.konc(a.indhold, "farve") / St.konc(b2.indhold, "farve") - 2) < 0.01,
             St.konc(a.indhold, "farve").toFixed(2) + " mM mod " + St.konc(b2.indhold, "farve").toFixed(2) + " mM");
-        var fa = lyshed(B.farve(a, "ovenfra")), fb = lyshed(B.farve(b2, "ovenfra"));
+        var fa = lyshed(a, "ovenfra"), fb = lyshed(b2, "ovenfra");
         paastand("ovenfra ser de to glas ens ud", Math.abs(fa - fb) < 0.5,
             "lyshed " + fa.toFixed(2) + " mod " + fb.toFixed(2));
-        var sa = lyshed(B.farve(a)), sb = lyshed(B.farve(b2));
+        var sa = lyshed(a), sb = lyshed(b2);
         paastand("fra siden er det fortyndede glas tydeligt lysere", sb - sa > 15,
             "lyshed " + sa.toFixed(2) + " mod " + sb.toFixed(2));
 
@@ -573,10 +576,10 @@ function koerTest() {
         paastand("fortyndingen har flyttet ligevaegten: faerre FeSCN2+ i alt",
             n(b2, "FeSCN2+") < n(a, "FeSCN2+") * 0.85,
             (n(b2, "FeSCN2+") / n(a, "FeSCN2+") * 100).toFixed(0) + " % af stofmaengden tilbage");
-        var ga = lyshed(B.farve(a, "ovenfra")), gb = lyshed(B.farve(b2, "ovenfra"));
+        var ga = lyshed(a, "ovenfra"), gb = lyshed(b2, "ovenfra");
         paastand("og derfor er det fortyndede glas ogsaa lysere OVENFRA", gb - ga > 8,
             "lyshed " + ga.toFixed(2) + " mod " + gb.toFixed(2));
-        var la = lyshed(B.farve(a)), lb = lyshed(B.farve(b2));
+        var la = lyshed(a), lb = lyshed(b2);
         paastand("men forskellen er mindre ovenfra end fra siden: den laengere vej tager noget af den",
             gb - ga < (lb - la) * 0.5,
             (gb - ga).toFixed(1) + " mod " + (lb - la).toFixed(1) + " i lyshed");

@@ -179,6 +179,13 @@ håndsatte tal, bordene blev bygget med (bægerglas 2,0 og 3,0), næsten
 præcist. Det er den eneste knap på farvedybden: skru på den ene og få hele
 laboratoriet med.
 
+Til en sammenligning med øjnene findes to mål i `js/vilkaar.js`:
+`lysstyrke(gg)` er farven selv, og `lyshed(gg, retning)` er den, som den
+ser ud lagt på **hvidt papir** — altså med gennemsigtigheden regnet med.
+Forskellen betyder noget, når lysvejen er kort: en tynd væske er næsten
+gennemsigtig, og så er det papiret, man ser. Derfor hviler en
+sammenligning ovenfra på `lyshed`.
+
 **Lysvejen ovenfra er en anden.** Ses der NED i et glas, går lyset gennem
 væskens dybde og ikke gennem glassets bredde, og dybden afhænger af, hvor
 meget der er i. `NK.Udstyr.vejOvenfra(type, V)` måler den på tegningen på
@@ -650,6 +657,13 @@ gang, husket på sit id.
 Et trins `peg` siger, hvad hintet skal pege på. Det kan være en genstand på
 bordet, som så markeres på scenen, eller et element i panelet, som blinker
 kort. Et trin behøver ikke pege på noget.
+
+**Et forsøg i flere dele** kan lade panelet følge den del, eleven står i:
+sætter siden en `kun(trin)` på forløbet, springer `nuTrin()` de trin over,
+der hører til en anden del. Det ændrer intet ved, hvornår et trin er gjort,
+intet ved listen, og intet ved, hvornår forløbet er færdigt — kun hvilket
+af de ugjorte trin der står øverst i panelet. Første kunde er sb2.4's to
+dele (`../superlab/sb2.4_ligevaegt/js/app.js`).
 
 Flagene er verdenstilstanden. De er med vilje det eneste, der gemmes:
 `F.tilstand()` giver trin, udløsere og flag, og `F.saetTilstand()` spiller

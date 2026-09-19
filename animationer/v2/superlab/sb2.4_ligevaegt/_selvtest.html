@@ -57,7 +57,7 @@ function koerTest() {
     var side = NK.Side.nu, F = NK.Forloeb.nu;
     paastand("bordet er bygget", !!bord);
     paastand("skallen er den faelles side.js", !!side);
-    paastand("forloebet er bygget", !!F && F.trin.length === 9, F && F.trin.length + " trin");
+    paastand("forloebet er bygget", !!F && F.trin.length === 13, F && F.trin.length + " trin");
     paastand("de otte glas staar i stativet", [1,2,3,4,5,6,7,8].every(function (i) { return !!bord.g["glas" + i]; }));
     paastand("badene staar paa bordet", !!bord.g.vandbad && !!bord.g.isbad &&
         bord.g.vandbad.kan.bad && bord.g.isbad.kan.bad);
@@ -298,8 +298,14 @@ function koerTest() {
     adv(4);
     paastand("alle glas er tomme", [1,2,3,4,5,6,7,8].every(function (n) { return B.tom(g(n)); }));
     paastand("oprydningen taeller nu", F.erGjort("ryd"));
-    paastand("forloebet er faerdigt", F.faerdig);
-    paastand("taelleren staar paa 9 af 9", d.getElementById("forloeb-taeller").textContent === "9/9");
+    paastand("del 1 er gjort, og del 2 staar tilbage", !F.faerdig &&
+        d.getElementById("forloeb-taeller").textContent === "9/13",
+        d.getElementById("forloeb-taeller").textContent);
+    /* Naar der er ryddet op, kommer de fire baegerglas frem af sig selv */
+    adv(2);
+    paastand("bordet skifter selv til del 2, naar der er ryddet op", NK.DELE.nu() === 2, NK.DELE.nu());
+    paastand("og saa er del 1's udstyr vaek fra bordet",
+        bord.g.stativ.skjult && bord.g.isbad.skjult && !bord.g.baeger1.skjult && !bord.g.kolbe.skjult);
 
     overskrift("8. Gemning: historien, ikke bordene");
     var t = F.tilstand();
@@ -309,7 +315,7 @@ function koerTest() {
     paastand("efter nulstil er intet gjort og journalen tom",
         !F.erGjort("fyld") && !F.flag("indgreb_gjort") && Jn.antal() === 0);
     paastand("tilstanden kan spilles tilbage, ogsaa journalen",
-        (F.saetTilstand(t), F.erGjort("ryd") && F.faerdig && Jn.antal() === 6));
+        (F.saetTilstand(t), F.erGjort("ryd") && F.erGjort("billede") && Jn.antal() === 6));
 
     overskrift("9. Udloesere");
     NK.startForfra();
@@ -458,7 +464,7 @@ function koerTest() {
     NK.startForfra();
     adv(1);
     var trinSig = F.trin.filter(function (x) { return x.sig; }).map(function (x) { return x.id; });
-    paastand("to trin har en replik, naar de er gjort", trinSig.length === 2, trinSig.join(", "));
+    paastand("tre trin har en replik, naar de er gjort", trinSig.length === 3, trinSig.join(", "));
     F.gjortNu("billede");
     adv(0.1);
     paastand("trinnets replik gaar til Kemichael", !!L.scene && L.scene.navn === "replik" &&
@@ -982,15 +988,23 @@ function koerTest() {
     NK.startForfra();
     adv(1);
     paastand("kaffekoppen staar paa hylden", !!bord.g.kaffekop && !bord.g.kaffekop.skjult);
-    bord.klikKop();
-    var kaffeForan = false, tagetOp = false;
-    for (var q11 = 0; q11 < 240 && L.scene; q11++) {
-        adv(0.25);
-        if (L.plan < 0.5) kaffeForan = true;
-        if (bord.g.kaffekop.iHaand) tagetOp = true;
+    /* Kaffen er et paaskeaeg med flere udgaver, og én af dem (»stirrer«)
+       roerer slet ikke koppen (griber: false i KAFFE i kemichael.js).
+       Derfor proeves der flere gange: det, der skal holde, er at han
+       kommer foran bordet hver gang, og at koppen KAN komme i haanden. */
+    var kaffeForan = false, tagetOp = false, forsoegt = 0;
+    while (forsoegt < 8 && !tagetOp) {
+        forsoegt++;
+        bord.klikKop();
+        for (var q11 = 0; q11 < 240 && L.scene; q11++) {
+            adv(0.25);
+            if (L.plan < 0.5) kaffeForan = true;
+            if (bord.g.kaffekop.iHaand) tagetOp = true;
+        }
+        if (!tagetOp) { NK.startForfra(); adv(1); }
     }
     paastand("kaffen hentes foran bordet, som foer", kaffeForan);
-    paastand("og koppen kommer i hans haand", tagetOp);
+    paastand("og koppen kan komme i hans haand", tagetOp, forsoegt + " kopper");
     adv(20);
     NK.startForfra();
     adv(1);
@@ -1006,7 +1020,7 @@ function koerTest() {
     var Qz = NK.quiz;
     paastand("quiz.js er indlaest, og siden har bygget quizzen", !!NK.Quiz && !!Qz);
     paastand("spoergsmaalene kommer fra forsoegets tekst.js",
-        !!Qz && Qz.spoergsmaal === NK.TEKST.quiz.spoergsmaal && Qz.antal() === 9, Qz && Qz.antal() + " spoergsmaal");
+        !!Qz && Qz.spoergsmaal === NK.TEKST.quiz.spoergsmaal && Qz.antal() === 10, Qz && Qz.antal() + " spoergsmaal");
     paastand("hvert spoergsmaal har fire svar og et rigtigt",
         Qz.spoergsmaal.every(function (x) { return x.valg.length === 4 && x.rigtig >= 0 && x.rigtig < 4 && !!x.forklaring; }));
     paastand("rammen har ingen af forsoegets ord i sig",
@@ -1039,7 +1053,7 @@ function koerTest() {
     Qz.knap();
     paastand("foerste spoergsmaal kommer med fire knapper", Qz.tilstand === "sp" &&
         d.getElementById("quiz-valg").querySelectorAll(".valgknap").length === 4 &&
-        d.getElementById("quiz-taeller").textContent === "1/9",
+        d.getElementById("quiz-taeller").textContent === "1/10",
         d.getElementById("quiz-taeller").textContent);
     paastand("og knappen videre er skjult, til der er svaret", d.getElementById("quiz-knap").hidden);
     var forkert = (Qz.aktuel.rigtig + 1) % 4;
@@ -1053,7 +1067,7 @@ function koerTest() {
     paastand("der er kun ét forsoeg pr. spoergsmaal", Qz.svar(Qz.aktuel.rigtig) === false && Qz.rigtige === 0);
     Qz.knap();
     paastand("naeste spoergsmaal kommer", Qz.tilstand === "sp" && Qz.nr === 1 &&
-        d.getElementById("quiz-taeller").textContent === "2/9");
+        d.getElementById("quiz-taeller").textContent === "2/10");
     paastand("et rigtigt svar faar ogsaa sin forklaring", Qz.svarRigtigt() === true &&
         d.getElementById("quiz-forklaring").className.indexOf("god") >= 0 &&
         d.getElementById("quiz-forklaring").textContent.indexOf("Rigtigt.") === 0);
@@ -1061,7 +1075,7 @@ function koerTest() {
     /* Resten rigtigt, og resultatet */
     for (var q12 = 0; q12 < 20 && Qz.tilstand === "sp"; q12++) { Qz.knap(); if (Qz.tilstand === "sp") Qz.svarRigtigt(); }
     paastand("efter det sidste spoergsmaal kommer resultatet", Qz.tilstand === "slut" &&
-        d.getElementById("quiz-score").textContent === "8 / 9", d.getElementById("quiz-score").textContent);
+        d.getElementById("quiz-score").textContent === "9 / 10", d.getElementById("quiz-score").textContent);
     paastand("og man kan tage den igen", (Qz.knap(), Qz.tilstand === "sp" && Qz.nr === 0 && Qz.rigtige === 0));
 
     /* Svarene blandes, og rammen regner ikke med fire */
@@ -1079,6 +1093,206 @@ function koerTest() {
         Qz.tilstand === "laast" && Qz.nr === 0 && Qz.rigtige === 0 &&
         d.getElementById("quiz-valg").innerHTML === "", Qz.tilstand);
 
+    overskrift("20. Del 2: fortyndingen (S2)");
+    /* Proeven, hele del 2 hviler paa: to par glas med samme stofmaengde,
+       det ene glas i hvert par fortyndet. Ovenfra skal frugtfarven staa
+       ENS og ligevaegtsblandingen blive LYSERE. Maalt i tal paa hvidt
+       papir (NK.Vilkaar.lyshed), ikke med oejnene. */
+    NK.startForfra();
+    adv(1);
+    var O = NK.OVENFRA, Jf = NK.Journal.find("fortynding");
+    function baeg(n) { return bord.g["baeger" + n]; }
+    /* Vent, til den koreografi, der blev sat i gang, er faerdig */
+    function faerdig() { for (var k = 0; k < 200 && bord.koer.igang(); k++) adv(0.25); adv(0.5); }
+    function lysO(n) { return NK.Vilkaar.lyshed(baeg(n), "ovenfra") * 255; }
+
+    paastand("de fire baegerglas staar paa bordet, to og to i par",
+        [1,2,3,4].every(function (i) { return !!baeg(i); }) &&
+        O.par(bord, 0)[0] === baeg(1) && O.par(bord, 1)[1] === baeg(4));
+    paastand("de er skjult i del 1 sammen med frugtfarven",
+        NK.DELE.nu() === 1 && baeg(1).skjult && bord.g.fl_farve.skjult);
+    paastand("og stativet, badene og pulverglassene staar fremme",
+        !bord.g.stativ.skjult && !bord.g.isbad.skjult && !bord.g.glas1.skjult);
+    paastand("det, begge dele bruger, har ingen del og staar altid",
+        !bord.g.kolbe.spec.del && !bord.g.vand.spec.del && !bord.g.dunk.spec.del);
+
+    side.skiftDel(2);
+    adv(0.5);
+    paastand("del 2 skifter bordet om", NK.DELE.nu() === 2 &&
+        !baeg(1).skjult && !bord.g.fl_farve.skjult && bord.g.stativ.skjult && bord.g.glas1.skjult);
+    paastand("knappen Se ovenfra kommer frem i stedet for Tag billede",
+        !d.getElementById("ovenfraknap").hidden && d.getElementById("billedknap").hidden);
+    var rSkjult = bord.rekt(bord.g.glas1, 0);
+    paastand("et skjult glas kan ikke rammes med musen",
+        bord.hvad({ x: rSkjult.x + rSkjult.b / 2, y: rSkjult.y + rSkjult.h / 2 }) !== "glas1");
+
+    /* Par 1: frugtfarve, lige meget i begge. To portioner i hvert glas:
+       en sjat paa bunden har for kort en lysvej til at kunne ses ned i. */
+    bord.haeld(bord.g.fl_farve, baeg(1), 20);
+    faerdig();
+    paastand("ét glas med én portion er ikke et par endnu",
+        O.parMed("farve", bord) < 0 && !F.erGjort("farve"));
+    bord.haeld(bord.g.fl_farve, baeg(1), 20);
+    faerdig();
+    bord.haeld(bord.g.fl_farve, baeg(2), 40);
+    faerdig();
+    paastand("frugtfarve i begge glas i par 1 gjorde trinnet faerdigt",
+        F.erGjort("farve") && O.parMed("farve", bord) === 0,
+        Math.round(B.volumen(baeg(1))) + " mL og " + Math.round(B.volumen(baeg(2))) + " mL");
+    paastand("men parret kan ikke noteres endnu: intet glas er fortyndet",
+        O.fortyndet(O.par(bord, 0)) < 0 && !O.klar("farve", bord));
+
+    /* Par 2: ligevaegtsblanding fra den samme kolbe */
+    bord.haeld(bord.g.kolbe, baeg(3), 50);
+    faerdig();
+    bord.haeld(bord.g.kolbe, baeg(4), 50);
+    faerdig();
+    adv(6);
+    paastand("ligevaegtsblanding i begge glas i par 2 gjorde trinnet faerdigt",
+        F.erGjort("lv") && O.parMed("lv", bord) === 1);
+    paastand("parret kendes paa sit indhold og ikke paa sin plads",
+        O.indholdType(baeg(1)) === "farve" && O.indholdType(baeg(3)) === "lv");
+
+    /* Fortyndingen: ét glas i hvert par til omkring det dobbelte */
+    function lysSide(n) { return NK.Vilkaar.lyshed(baeg(n)) * 255; }
+    var foerFarve = lysSide(2), foerLv = lysSide(4);
+    for (var sp2 = 0; sp2 < 4; sp2++) { bord.sproejt(bord.g.vand, baeg(2)); faerdig(); }
+    for (var sp4 = 0; sp4 < 5; sp4++) { bord.sproejt(bord.g.vand, baeg(4)); faerdig(); }
+    adv(8);
+    paastand("fortyndingen gjorde trinnet faerdigt", F.erGjort("vand") && O.beggeKlar(bord),
+        [1,2,3,4].map(function (i) { return Math.round(B.volumen(baeg(i))); }).join(" / ") + " mL");
+    paastand("motoren ved, hvilket glas i hvert par der er fortyndet",
+        O.fortyndet(O.par(bord, 0)) === 1 && O.fortyndet(O.par(bord, 1)) === 1);
+    paastand("de to glas i et par fik lige meget stof",
+        Math.abs(O.maengde(baeg(1), "farve") - O.maengde(baeg(2), "farve")) < 0.01);
+
+    /* Selve proeven, i tal */
+    paastand("lysvejen ovenfra fulgte med rumfanget",
+        NK.Udstyr.vejOvenfra(baeg(2).type, B.volumen(baeg(2))) >
+        NK.Udstyr.vejOvenfra(baeg(1).type, B.volumen(baeg(1))) * 1.7,
+        tal(NK.Udstyr.vejOvenfra(baeg(1).type, B.volumen(baeg(1))), 3) + " -> " +
+        tal(NK.Udstyr.vejOvenfra(baeg(2).type, B.volumen(baeg(2))), 3));
+    paastand("FRUGTFARVEN staar ens ovenfra efter fortyndingen",
+        Math.abs(lysO(2) - lysO(1)) < O.GRAENSE * 255,
+        "lyshed " + tal(lysO(1)) + " mod " + tal(lysO(2)));
+    paastand("LIGEVAEGTSBLANDINGEN er tydeligt lysere ovenfra",
+        lysO(4) - lysO(3) > O.GRAENSE * 255,
+        "lyshed " + tal(lysO(3)) + " mod " + tal(lysO(4)));
+    paastand("fordi der blev faerre FeSCN²⁺, ikke bare tyndere",
+        B.samlet(baeg(4)).n["FeSCN2+"] < B.samlet(baeg(3)).n["FeSCN2+"] * 0.85,
+        Math.round(B.samlet(baeg(4)).n["FeSCN2+"] / B.samlet(baeg(3)).n["FeSCN2+"] * 100) + " % af stofmaengden tilbage");
+    paastand("fra SIDEN ligner de to fortyndinger hinanden: begge blev tydeligt lysere",
+        lysSide(2) - foerFarve > 20 && lysSide(4) - foerLv > 20,
+        "frugtfarve +" + tal(lysSide(2) - foerFarve, 0) + ", ligevaegt +" + tal(lysSide(4) - foerLv, 0) +
+        " i lyshed - derfor skal der ses ovenfra");
+
+    /* Facit regnes af verden, og journalen bedoemmer svaret */
+    paastand("facit for de to par er ens og lysere",
+        O.facit("farve", bord) === "ens" && O.facit("lv", bord) === "lysere");
+    NK.OVENFRA.noter("farve", "lysere", bord);
+    paastand("et forkert svar bliver ikke rettet, men det taeller som forkert",
+        Jf.svar("farve") === "lysere" && Jf.rigtig("farve") === false);
+    NK.OVENFRA.noter("farve", "ens", bord);
+    NK.OVENFRA.noter("lv", "lysere", bord);
+    side.opdaterPanel();
+    F.opdater();
+    paastand("begge par noteret rigtigt gjorde det sidste trin faerdigt",
+        Jf.faerdig() && Jf.antalRigtige() === 2 && F.erGjort("sml"),
+        "journalen: " + Jf.antalRigtige() + " af 2 rigtige, taelleren " +
+        d.getElementById("forloeb-taeller").textContent);
+    paastand("og svaret gemte, hvordan glassene saa ud i det oejeblik",
+        !!Jf.post("lv").billede.fortyndet.farve && Jf.post("lv").billede.fortyndet.V > Jf.post("lv").billede.reference.V);
+
+    /* Visningen: fire glas paa hvidt papir, og knapperne under hvert par */
+    NK.OVENFRA.aabn(bord, function () {});
+    paastand("visningen aabner med de fire glas og to par knapper",
+        d.getElementById("ovenfra").classList.contains("vis") &&
+        d.getElementById("ovenfra-svar").querySelectorAll(".ovenfra-par").length === 2 &&
+        d.getElementById("ovenfra-svar").querySelectorAll("button").length === 6);
+    paastand("det valgte svar staar markeret under hvert par",
+        d.getElementById("ovenfra-svar").querySelectorAll("button.aktiv").length === 2);
+    paastand("og taelleren siger, hvor mange par der er noteret",
+        d.getElementById("ovenfra-taeller").textContent === "2 af 2 noteret",
+        d.getElementById("ovenfra-taeller").textContent);
+    NK.OVENFRA.luk();
+    paastand("den lukker igen", !d.getElementById("ovenfra").classList.contains("vis"));
+
+    /* Fortyndingen har ingen oevre graense, og et blandet glas er ikke et par */
+    bord.sproejt(bord.g.vand, baeg(2));
+    faerdig();
+    adv(2);
+    paastand("mere vand goer bare forskellen tydeligere - parret staar stadig",
+        O.fortyndet(O.par(bord, 0)) === 1 && O.klar("farve", bord),
+        Math.round(B.volumen(baeg(2))) + " mL");
+    B.haeldI(baeg(3), B.udtag(bord.g.fl_farve, 10), true);
+    adv(2);
+    paastand("frugtfarve i ligevaegtsblandingen er ikke et par laengere",
+        O.indholdType(baeg(3)) === "blanding" && O.parMed("lv", bord) < 0);
+    adv(1);
+    paastand("og det siger Kemichael noget om",
+        !!F.fyret.kunst && !!L.scene,
+        (F.fyret.kunst ? "udloeseren kunst er fyret" : "ikke fyret") + ", scene: " + (L.scene && L.scene.navn));
+
+    /* ----- Med musen, som en elev ------------------------------------ */
+    /* Samme vej som i afsnit 17: rigtige pointer-haendelser gennem
+       laerredet. Det, der skal virke i del 2, er at haelde i et
+       baegerglas, at sproejte vand i det, og at knappen i panelet aabner
+       visningen. */
+    NK.startForfra();
+    adv(0.5);
+    side.skiftDel(2);
+    adv(0.5);
+    var mus2 = NKProeve.mus(bord);
+    var uheld2 = bord.antalUheld;
+    var rb1 = bord.rekt(baeg(1), 0);
+    paastand("flasken med frugtfarve kan tages med musen", mus2.tag("fl_farve"));
+    mus2.til({ x: baeg(1).p.x, y: rb1.y - 6 }, 0.7);
+    mus2.hold(3.0);
+    mus2.slip();
+    mus2.hold(1.2);
+    faerdig();
+    paastand("og den haelder i det baegerglas, den holdes over",
+        B.volumen(baeg(1)) > 12 && bord.pytter.length === 0,
+        tal(B.volumen(baeg(1)), 0) + " mL, " + bord.pytter.length + " pytter");
+    paastand("den bliver haengende med sin gule ring, saa et klik haelder mere",
+        bord.svaevende() === bord.g.fl_farve);
+    bord.klik("svaevring");
+    faerdig();
+    paastand("og saa er der nok i glasset til, at det kan ses ned i",
+        B.volumen(baeg(1)) >= O.MINDST, tal(B.volumen(baeg(1)), 0) + " mL");
+    mus2.tag("fl_farve");
+    mus2.baer({ x: bord.g.fl_farve.hjem.x, y: bord.g.fl_farve.hjem.y }, 0.8);
+    mus2.slip();
+    mus2.hold(0.6);
+    faerdig();
+    paastand("flasken kan saettes tilbage paa hylden", bord.g.fl_farve.p.y < 300 &&
+        Math.abs(bord.g.fl_farve.p.x - bord.g.fl_farve.hjem.x) < 30, tal(bord.g.fl_farve.p.y, 0));
+    var rb2 = bord.rekt(baeg(2), 0);
+    paastand("sproejteflasken kan tages og sproejte i det andet glas",
+        mus2.tag("vand") && (mus2.til({ x: baeg(2).p.x, y: rb2.y - 6 }, 0.7), mus2.hold(3.0),
+        mus2.slip(), mus2.hold(1.0), faerdig(), B.volumen(baeg(2)) > 8),
+        tal(B.volumen(baeg(2)), 0) + " mL");
+    mus2.tag("vand");
+    mus2.baer({ x: bord.g.vand.hjem.x, y: bord.g.vand.hjem.y }, 0.8);
+    mus2.slip();
+    mus2.hold(0.6);
+    faerdig();
+    paastand("intet gik galt undervejs", bord.antalUheld === uheld2 && bord.pytter.length === 0,
+        bord.antalUheld - uheld2 + " uheld, " + bord.pytter.length + " pytter");
+    d.getElementById("ovenfraknap").click();
+    paastand("knappen Se ovenfra i panelet aabner visningen",
+        d.getElementById("ovenfra").classList.contains("vis"));
+    d.getElementById("ovenfra-luk").click();
+    paastand("og knappen Luk lukker den", !d.getElementById("ovenfra").classList.contains("vis"));
+
+    NK.startForfra();
+    adv(1);
+    paastand("Start forfra stiller bordet tilbage i del 1 med tomme baegerglas",
+        NK.DELE.nu() === 1 && baeg(1).skjult && B.tom(baeg(1)) &&
+        Jf.antal() === 0 && !bord.g.stativ.skjult);
+    paastand("og knapperne viser del 1 igen",
+        d.getElementById("del1knap").getAttribute("aria-pressed") === "true" &&
+        d.getElementById("del2knap").getAttribute("aria-pressed") === "false");
 }
 
 function vis() {

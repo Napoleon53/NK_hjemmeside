@@ -37,7 +37,10 @@
     St.def("MnO4-",   { M: 118.9, formel: "MnO₄", q: -1, navn: "permanganationer", atomer: { Mn: 1, O: 4 }, farve: { r: 130, g: 20, b: 150 }, k: 0.6 });
     St.def("HAc",     { M: 60.1, formel: "CH₃COOH", q: 0, navn: "ethansyre", atomer: { C: 2, H: 4, O: 2 } });
     St.def("Ac-",     { M: 59.1, formel: "CH₃COO", q: -1, navn: "acetationer", atomer: { C: 2, H: 3, O: 2 } });
-    St.def("farve",   { formel: "farvestof", q: 0, navn: "frugtfarve", farve: { r: 225, g: 40, b: 60 }, k: 0.2 });
+    /* Frugtfarven er blaa, saa den ikke kan forveksles med den roede
+       ligevaegtsblanding: i en fortyndingsproeve staar de to ved siden af
+       hinanden, og det er forskellen paa dem, der skal ses. */
+    St.def("farve",   { formel: "farvestof", q: 0, navn: "frugtfarve", farve: { r: 45, g: 120, b: 215 }, k: 0.2 });
 
     /* Koncentrerede syrer: molekylet holder, til det er fortyndet, og
        fortyndingen varmer */

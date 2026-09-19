@@ -17,6 +17,16 @@
        glas 7   reference       intet indgreb
        glas 8   forundersoegelse: KSCN 0,1 M + AgNO₃ giver hvidt bundfald
 
+   Del 2 er fortyndingen: fire baegerglas, to og to i par. Par 1 faar
+   frugtfarve, par 2 ligevaegtsblanding fra den samme kolbe. Det ene glas
+   i hvert par fortyndes med vand, og de fire ses ovenfra (js/ovenfra.js).
+
+   De to dele deler ét bord. Hver genstand har et `del`, og js/dele.js
+   skjuler den anden dels ting (motorens `skjult`, som tegningen,
+   traefningen og slipmaalet allerede spoerger om). Det, der bruges i
+   begge dele - affaldet, kolben, koekkenrullen og sproejteflasken - har
+   intet `del` og staar hele tiden.
+
    Stamoploesningen: 20 mL 0,10 M Fe(NO₃)₃ og 20 mL 0,10 M KSCN fortyndet
    til 400 mL, altsaa 5 mM af hver. Ved ligevaegt giver det ca. 1,5 mM
    FeSCN²⁺, som er tydeligt roedt i et reagensglas uden at vaere sort.
@@ -32,7 +42,7 @@
     function pulver(navn, x, y, etiket, titel, stof) {
         var u = {};
         u[stof] = 30000;
-        return { navn: navn, type: "pulverglas", x: x, y: y, etiket: etiket, titel: titel,
+        return { navn: navn, type: "pulverglas", x: x, y: y, etiket: etiket, titel: titel, del: 1,
                  indhold: { V: 0, T: 20, umol: u }, pulverMaks: 30000 };
     }
 
@@ -57,6 +67,19 @@
     /* Stamoploesningen: Fe³⁺ og SCN⁻ 5 mM, plus modionerne */
     var STAM = { "Fe3+": 5, "SCN-": 5, "K+": 5, "NO3-": 15 };
 
+    /* Frugtfarve: et blaat farvestof, der ikke indgaar i nogen reaktion.
+       3,5 mM er valgt, saa to portioner i et baegerglas staar tydeligt
+       blaat SET OVENFRA - dér er lysvejen kun vaeskens dybde, knap én
+       reagensglaslaengde, saa der skal mere til end fra siden. */
+    var FRUGTFARVE = { "farve": 3.5 };
+
+    /* De fire baegerglas i del 2, to og to i par med luft imellem */
+    var PAR1 = [380, 470], PAR2 = [660, 750];
+    function baeger(nr, x) {
+        return { navn: "baeger" + nr, type: "baegerLille", x: x, del: 2,
+                 titel: "bægerglas " + nr };
+    }
+
     NK.OPSTILLING = [
         /* Venstre ende af bordet, under zoomboblen: affaldet og kolben */
         { navn: "dunk", type: "affaldsdunk", x: 70, etiket: ["AFFALD", "surt uorg."] },
@@ -69,42 +92,50 @@
         pulver("pulver_asc",  590, HYLDE_KAFFE, "C-vitamin", "pulverglasset med ascorbinsyre", "Asc(s)"),
         pulver("pulver_kscn", 640, HYLDE_KAFFE, "KSCN", "pulverglasset med KSCN", "KSCN(s)"),
 
-        /* Den oeverste hylde: flasken, draabeflasken og sproejteflasken */
-        { navn: "fl_kscn", type: "flaske", x: 400, y: HYLDE_FLASKER, etiket: ["KSCN", "0,1 M"],
+        /* Den oeverste hylde: flasken, draabeflasken og sproejteflasken.
+           I del 2 staar frugtfarven paa KSCN-flaskens plads - de to er
+           aldrig fremme samtidig. */
+        { navn: "fl_kscn", type: "flaske", x: 400, y: HYLDE_FLASKER, etiket: ["KSCN", "0,1 M"], del: 1,
           titel: "flasken med KSCN", indhold: opl(200, { "K+": 100, "SCN-": 100 }) },
-        { navn: "ag", type: "draabeflaske", x: 470, y: HYLDE_FLASKER, etiket: ["AgNO₃", "0,1 M"],
+        { navn: "fl_farve", type: "flaske", x: 400, y: HYLDE_FLASKER, etiket: ["frugt-", "farve"], del: 2,
+          titel: "flasken med frugtfarve", indhold: opl(300, FRUGTFARVE) },
+        { navn: "ag", type: "draabeflaske", x: 470, y: HYLDE_FLASKER, etiket: ["AgNO₃", "0,1 M"], del: 1,
           titel: "dråbeflasken med AgNO₃", indhold: opl(60, { "Ag+": 100, "NO3-": 100 }) },
         { navn: "vand", type: "sproejteflaske", x: 560, y: HYLDE_FLASKER, titel: "sprøjteflasken med vand",
           indhold: opl(500, {}) },
 
         /* De otte reagensglas i stativet */
-        { navn: "stativ", type: "stativ", p: { x: 330, y: 400, v: 0 } },
-        { navn: "glas1", type: "reagensglas", stativ: "stativ", hul: 0, nr: 1, titel: "glas 1" },
-        { navn: "glas2", type: "reagensglas", stativ: "stativ", hul: 1, nr: 2, titel: "glas 2" },
-        { navn: "glas3", type: "reagensglas", stativ: "stativ", hul: 2, nr: 3, titel: "glas 3" },
-        { navn: "glas4", type: "reagensglas", stativ: "stativ", hul: 3, nr: 4, titel: "glas 4" },
-        { navn: "glas5", type: "reagensglas", stativ: "stativ", hul: 4, nr: 5, titel: "glas 5" },
-        { navn: "glas6", type: "reagensglas", stativ: "stativ", hul: 5, nr: 6, titel: "glas 6" },
-        { navn: "glas7", type: "reagensglas", stativ: "stativ", hul: 6, nr: 7, titel: "glas 7" },
-        { navn: "glas8", type: "reagensglas", stativ: "stativ", hul: 7, nr: 8, titel: "glas 8" },
+        { navn: "stativ", type: "stativ", p: { x: 330, y: 400, v: 0 }, del: 1 },
+        { navn: "glas1", type: "reagensglas", stativ: "stativ", hul: 0, nr: 1, titel: "glas 1", del: 1 },
+        { navn: "glas2", type: "reagensglas", stativ: "stativ", hul: 1, nr: 2, titel: "glas 2", del: 1 },
+        { navn: "glas3", type: "reagensglas", stativ: "stativ", hul: 2, nr: 3, titel: "glas 3", del: 1 },
+        { navn: "glas4", type: "reagensglas", stativ: "stativ", hul: 3, nr: 4, titel: "glas 4", del: 1 },
+        { navn: "glas5", type: "reagensglas", stativ: "stativ", hul: 4, nr: 5, titel: "glas 5", del: 1 },
+        { navn: "glas6", type: "reagensglas", stativ: "stativ", hul: 5, nr: 6, titel: "glas 6", del: 1 },
+        { navn: "glas7", type: "reagensglas", stativ: "stativ", hul: 6, nr: 7, titel: "glas 7", del: 1 },
+        { navn: "glas8", type: "reagensglas", stativ: "stativ", hul: 7, nr: 8, titel: "glas 8", del: 1 },
 
         /* Spatlen, glasstaven og termometeret ligger forrest paa bordpladen */
-        { navn: "spatel", type: "spatel", p: { x: 290, y: 550, v: 0 } },
-        { navn: "glasstav", type: "glasstav", x: 820, y: 546 },
-        { navn: "termometer", type: "termometer", x: 900, y: 562 },
+        { navn: "spatel", type: "spatel", p: { x: 290, y: 550, v: 0 }, del: 1 },
+        { navn: "glasstav", type: "glasstav", x: 820, y: 546, del: 1 },
+        { navn: "termometer", type: "termometer", x: 900, y: 562, del: 1 },
 
         /* Vandbadet staar paa varmepladen og varmes, naar eleven taender
            den. Isbadet holdes paa 2 grader (holdT: isen fyldes efter).
            Begge er udstyret "bad": et stort baegerglas, man saetter
            reagensglas ned i, og glasset tager badets temperatur. */
-        { navn: "plade", type: "varmeplade", p: { x: 715, y: 428, v: 0 } },
-        { navn: "vandbad", type: "bad", paa: "plade", x: 791, titel: "vandbadet", holdT: 80,
+        { navn: "plade", type: "varmeplade", p: { x: 715, y: 428, v: 0 }, del: 1 },
+        { navn: "vandbad", type: "bad", paa: "plade", x: 791, titel: "vandbadet", holdT: 80, del: 1,
           indhold: opl(180, {}) },
-        { navn: "isbad", type: "bad", x: 965, titel: "isbadet", holdT: 2,
+        { navn: "isbad", type: "bad", x: 965, titel: "isbadet", holdT: 2, del: 1,
           indhold: { V: 180, T: 2, mM: {} } },
 
         /* Hylden til hoejre: det tomme baegerglas */
-        { navn: "baeger", type: "baegerStor", x: 790, y: HYLDE_HOEJRE, titel: "bægerglasset" }
+        { navn: "baeger", type: "baegerStor", x: 790, y: HYLDE_HOEJRE, titel: "bægerglasset", del: 1 },
+
+        /* Del 2: de fire baegerglas paa bordet, to og to i par */
+        baeger(1, PAR1[0]), baeger(2, PAR1[1]),
+        baeger(3, PAR2[0]), baeger(4, PAR2[1])
     ];
 
     /* Kemichael taler bag bordet (bagBord) og kommer om for enden, naar der

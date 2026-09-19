@@ -11,16 +11,17 @@ fra `../../laboratoriet/` og `../../kemichael/`, og skal derfor ligge i
 
 ## Hvad der er lavet indtil videre
 
-Bordet står, kemien opfører sig rigtigt, badene virker, forløbets ni trin
-kører med tekst, hint og en liste i panelet, og billedet af glas 1 til 7
-lader eleven notere sine iagttagelser. Kemichael siger selv forløbets
-bemærkninger og et par tørre ord, når et trin er gjort. Del 2 om
-fortynding og tegneserien mangler; quizzen er der med ni af de ti
-spørgsmål (det tiende handler om fortynding og hører til del 2). `_selvtest.html` kører det hele
-igennem i nitten afsnit (plus 3b om boblen og tabellen); afsnit 17 gør
-det med musen, som en elev (`laboratoriet/js/proeve.js`), afsnit 18
-prøver, at Kemichael kommer ind bag bordet, standser hvor der er plads, og
-går ud igen, og afsnit 19 prøver quizzen.
+Begge dele kører. Bordet står, kemien opfører sig rigtigt, badene virker,
+forløbets tretten trin kører med tekst, hint og en liste i panelet,
+billedet af glas 1 til 7 lader eleven notere sine iagttagelser i del 1, og
+de fire bægerglas set ovenfra gør det samme for fortyndingen i del 2.
+Kemichael siger selv forløbets bemærkninger og et par tørre ord, når et
+trin er gjort. Quizzen har alle ti spørgsmål. Tegneserien mangler.
+`_selvtest.html` kører det hele igennem i tyve afsnit (plus 3b om boblen og
+tabellen); afsnit 17 gør det med musen, som en elev
+(`laboratoriet/js/proeve.js`), afsnit 18 prøver, at Kemichael kommer ind
+bag bordet, standser hvor der er plads, og går ud igen, afsnit 19 prøver
+quizzen, og afsnit 20 hele del 2 — med tal og ikke med øjnene.
 `laboratoriet/_vinduer.html` viser forsøget i to vinduesstørrelser ved
 siden af hinanden.
 
@@ -31,10 +32,12 @@ index.html          stilladset: scene, panel, intro, teoriboks, rundvisning. Ing
 css/stil.css        ligevægtsligningen og forløbslisten
 js/tekst.js         AL prosa: titel, intro, teorien, trinnenes tekster og
                     hints, bemærkningerne, panelets kort, rundvisningens stop
-js/opstilling.js    bordet: hvad der står på det, og bordets mål
-js/forloeb.js       trinnenes betingelser og de tre udløsere
-js/billede.js       billedet af de syv glas: optagelsen og knapperne under dem
-js/app.js           starter den fælles skal og kobler billedet på
+js/opstilling.js    bordet: hvad der står på det, hvilken del det hører til, og bordets mål
+js/forloeb.js       trinnenes betingelser og de fem udløsere
+js/billede.js       del 1: billedet af de syv glas, optagelsen og knapperne under dem
+js/ovenfra.js       del 2: parrene, fortyndingsreglen og de fire glas set ovenfra
+js/dele.js          del 1 og del 2 på det samme bord
+js/app.js           starter den fælles skal og kobler delene og de to visninger på
 js/tur.js           rundvisningen henter sine stop i tekst.js
 _selvtest.html      udviklerværktøj, indgår ikke i animationen
 ```
@@ -82,6 +85,68 @@ vandbadet, når han taler om reagensglassene, og til venstre for isbadet, når
 han taler om det. Bordpladen dækker hans underkrop, og han tegnes mindre,
 fordi han er længere væk. Se »Kemichael i forsøget«.
 
+## De to dele
+
+Forsøget har to dele, og de bruger hver sit udstyr: del 1 stativet med de
+otte reagensglas, badene og pulverglassene, del 2 de fire bægerglas og
+frugtfarven. Der er ikke plads til begge dele på ét bord på 1040, og der
+skal heller ikke være det — et rigtigt bord har det fremme, man arbejder
+med. Derfor står **delen på genstanden**: hver post i `js/opstilling.js`
+kan have et `del` (1 eller 2), og `js/dele.js` sætter motorens `skjult` på
+den anden dels ting. Så er de væk for tegningen, for musen, for slipmålet
+og for zoomboblen på én gang — ingen ny mekanik, det er den samme `skjult`,
+et knust glas bruger. Det, begge dele bruger — affaldet, kolben,
+køkkenrullen og sprøjteflasken — har intet `del` og står hele tiden.
+
+Der skiftes med knapperne øverst til højre på scenen eller med tasterne
+<kbd>1</kbd> og <kbd>2</kbd>, og aldrig midt i en handling: så ville det,
+hånden bærer, forsvinde under den. Når del 1 er ryddet op, skifter bordet
+selv til del 2 (flaget `del1_gjort`), så eleven ikke skal gætte, at der er
+en knap; tilbage til del 1 kan man altid.
+
+Panelet viser det trin, eleven kan gå i gang med *her* — listen viser
+stadig alle tretten, så hele forsøget kan ses på én gang. Det er `kun` på
+motorens forløb (`../../laboratoriet/js/forloeb.js`): et filter over,
+hvilket af de ugjorte trin der står øverst. Det ændrer intet ved, hvornår
+et trin er gjort, og intet ved, hvornår forløbet er færdigt.
+
+## Del 2: fortyndingen
+
+Fire bægerglas, to og to i par. Par 1 får frugtfarve fra flasken på
+hylden, par 2 ligevægtsblanding fra den samme kolbe som del 1 — to
+portioner i hvert glas, og lige meget i begge. Derefter fortyndes det ene
+glas i hvert par med vand fra sprøjteflasken, helst til dobbelt rumfang.
+
+**Set fra siden** bliver begge fortyndede glas lysere, og det siger
+ingenting: vejen gennem glasset er den samme, og koncentrationen er
+halveret. **Set ovenfra** er vejen væskens dybde, og den er fordoblet. De
+to ophæver hinanden, og så måler man antallet af farvede molekyler i
+stedet for koncentrationen:
+
+| | fra siden | ovenfra |
+|---|---|---|
+| frugtfarve | lysere | **ens** — lige mange farvestofmolekyler |
+| ligevægtsblanding | lysere | **lysere** — færre FeSCN²⁺ |
+
+Forskellen mellem de to par er beviset for, at fortynding i sig selv er et
+indgreb i ligevægten. Lysvejen ovenfra står i motoren
+(`NK.Udstyr.vejOvenfra`, `NK.Beholder.farve(gg, "ovenfra")`); `js/ovenfra.js`
+har parrene og præsentationen.
+
+Et par kendes på sit **indhold** og ikke på sin plads, så det virker også,
+hvis eleven bytter om på parrene. Et glas tæller som fortyndet, når det har
+mindst 1,4 gange så meget som det andet — uden øvre grænse: dobbelt rumfang
+er målet, men mere vand gør bare forskellen tydeligere. Og der skal mindst
+30 mL i hvert glas: ses der ned i en sjat på bunden, er lysvejen kun et par
+millimeter, og så er selv en kraftig opløsning næsten farveløs.
+
+Facit regnes af verden i svarøjeblikket som alle andre steder: de to glas
+lægges på hvidt papir, og lysheden sammenlignes (`NK.Vilkaar.lyshed`). Har
+eleven fyldt glassene anderledes end tiltænkt, er det HANS glas, svaret
+måles mod. Under hvert par står, hvor meget der er i de to glas, og om de
+fik lige meget stof — det er variabelkontrollen, og Kemichael siger til,
+hvis de ikke gjorde.
+
 ## Kemien
 
 Alt står i den fælles `../../laboratoriet/js/stoftabel.js`. Ligevægten
@@ -118,20 +183,28 @@ stoftabellen, der skal ned.
 
 ## Forløbet
 
-De ni trin står i `js/forloeb.js` som betingelser over bordets tilstand,
+De tretten trin står i `js/forloeb.js` som betingelser over bordets tilstand,
 og deres tekster i `js/tekst.js`. Indgrebene er med vilje skrevet som
 »glasset ser anderledes ud end glas 7«, ikke som »der blev taget en
 spatelspids«: farven er det, der skal læres, så farven er det, der prøves.
 Derfor kan eleven nå et trin ad flere veje, og et trin længere fremme
 tæller også, hvis det bliver opfyldt først.
 
-Tre udløsere holder øje undervejs. Får glas 7 et indgreb, siger forløbet, at
+Fem udløsere holder øje undervejs. Får glas 7 et indgreb, siger forløbet, at
 der ikke længere er nogen reference; får ét glas to forskellige indgreb,
 siger det, at man så ikke kan vide, hvad der virkede; og er et glas noteret
-anderledes, end det ser ud, beder den tredje eleven kigge igen. Alle tre
-fyrer én gang.
+anderledes, end det ser ud, beder den tredje eleven kigge igen. I del 2
+siger den fjerde til, hvis frugtfarve og ligevægtsblanding ender i samme
+glas, og den femte, hvis de to glas i et par ikke fik lige meget stof — den
+fyrer på tallene og ikke på handlingen. Alle fem fyrer én gang.
 Flaget `indgreb_gjort` sættes, når glas 6 er koldt, og oprydningstrinnet
 læser det — ellers ville et tomt bord ved starten tælle som ryddet op.
+Flaget `del1_gjort` sættes af oprydningen og henter del 2 frem.
+
+Del 2's tre første trin spørger `js/ovenfra.js` gennem vilkårssprogets
+nødudgang (`proev`): parrene og fortyndingsreglen hører til forsøget og
+ikke til motoren. Reglen er stadig en tilstand — parrene læses af bordet,
+ikke af, hvad eleven gjorde.
 
 ## Kemichael i forsøget
 
@@ -165,10 +238,9 @@ på siden, vises linjerne som en besked, så intet går tabt.
 ## Quizzen
 
 Rammen står i `../../laboratoriet/js/quiz.js`; her ligger kun spørgsmålene,
-i `js/tekst.js` under `quiz`, sammen med al anden prosa. Ni spørgsmål om
-del 1 — farven, de fire indgreb, forundersøgelsen i glas 8, varme og kulde
-og hvorfor der tilsættes fast stof. Det tiende, som den gamle udgave har,
-handler om fortynding set ovenfra og kommer med del 2 (S2).
+i `js/tekst.js` under `quiz`, sammen med al anden prosa. Ti spørgsmål:
+farven, de fire indgreb, forundersøgelsen i glas 8, varme og kulde, hvorfor
+der tilsættes fast stof, og til sidst fortyndingen set ovenfra.
 
 Quizzen låses op af et vilkår i `js/app.js`:
 `quiz: { krav: { journal: "billede", faerdig: true } }` — altså når billedet
@@ -207,12 +279,9 @@ iagttagelsen, der er arbejdet.
 
 ## Det, der mangler
 
-* **Del 2 om fortynding** med de fire bægerglas på hvidt papir.
-* **Flere af Kemichaels scener**, når del 2 kommer til: bemærkningerne og
-  trinnenes replikker er på plads (se ovenfor), og han rydder op efter
-  uheld gennem `../../laboratoriet/proevebord/js/laerer.js`.
-* **Quiz og tegneserie**, som løftes fra den gamle udgave, når rammen for
-  dem er trukket ud.
+* **Tegneserien**: ruder bygget af elevens egne journalposter fra begge
+  dele, med resultatskemaet som sidste rude. Rammen skal trækkes ud som
+  `quiz.js` blev det.
 
 ## Mængderne, der kan skrues på
 

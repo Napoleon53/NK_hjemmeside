@@ -33,10 +33,16 @@
             "Glas 1 til 3 får en spatelspids fast stof: Fe(NO₃)₃, ascorbinsyre og KSCN.",
             "Glas 4 får et par dråber AgNO₃, som fjerner SCN⁻ som hvidt bundfald.",
             "Glas 5 i vandbadet, glas 6 i isbadet. Mål temperaturen med termometeret.",
-            "Sammenlign hvert glas med glas 7, og notér om det blev mørkere eller lysere."
+            "Sammenlign hvert glas med glas 7, og notér om det blev mørkere eller lysere.",
+            "Del 2: fire bægerglas i to par. Par 1 får frugtfarve, par 2 ligevægtsblanding — lige meget i begge glas i parret.",
+            "Fortynd det ene glas i hvert par med vand, og se alle fire ovenfra. Der er forskellen."
         ],
         "intro-uheld":
             "Forkerte handlinger afvises ikke. Det, der kan gå galt, går galt, og Kemichael rydder op.",
+
+        /* ----- De to dele ----------------------------------------------- */
+        "del1knap": "Del 1: Glassene",
+        "del2knap": "Del 2: Fortynding",
 
         /* ----- Panelet --------------------------------------------------- */
         "glas-tom-start":
@@ -44,8 +50,7 @@
         "tilskuere-tekst": "Vis tilskuerioner",
         /* ----- Teoriboksen (knappen Teori, »Læs teorien« eller T) -------
            Blokke: en streng er et afsnit, { overskrift } en mellemrubrik,
-           { ligning } en ligning i sin egen ramme. Fortyndingen fra den
-           gamle udgave kommer med, når del 2 er bygget. */
+           { ligning } en ligning i sin egen ramme. */
         "teori-titel": "Indgreb i en kemisk ligevægt",
         "teori-indhold": [
             "Jern(III)ioner reagerer med thiocyanat og danner et rødt kompleks. Reaktionen er reversibel:",
@@ -68,6 +73,17 @@
             { overskrift: "Fast stof og variabelkontrol" },
             "Fe(NO₃)₃ og KSCN tilsættes som fast stof. En opløsning ville også fortynde glasset, og så " +
             "var der to indgreb på én gang.",
+            { overskrift: "Fortynding" },
+            "Fortyndes en frugtfarve til dobbelt rumfang, halveres koncentrationen, men væsken står " +
+            "dobbelt så højt. Set ovenfra er lysvejen derfor dobbelt så lang, lyset møder lige mange " +
+            "farvestofmolekyler, og farven er uændret. Set fra siden er vejen den samme som før, og " +
+            "glasset ser lysere ud — men det siger kun, at koncentrationen faldt.",
+            "Ligevægtsblandingen opfører sig anderledes, selv om der er brugt lige meget stamopløsning. " +
+            "Alle koncentrationer halveres, og Y bliver dobbelt så stor som K:",
+            { ligning: "Y = ½[FeSCN²⁺] / (½[Fe³⁺] · ½[SCN⁻]) = 2K", lille: true },
+            "Ligevægten forskydes mod venstre, der dannes mindre FeSCN²⁺, og farven ovenfra bliver " +
+            "lysere. Forskellen mellem de to par er beviset for, at fortynding i sig selv er et " +
+            "indgreb i ligevægten.",
             { overskrift: "Sikkerhed og affald" },
             "AgNO₃ er ætsende og giver sorte pletter på huden. Brug handsker og briller. Resterne " +
             "afleveres som surt uorganisk affald."
@@ -110,13 +126,38 @@
             "ryd":   { kort: "Ryd op",
                        tekst: "Hæld glassene ud i dunken med surt uorganisk affald, ét ad gangen.",
                        hint: "Tag et glas, og slip det over affaldsdunken.",
-                       sig: "Ryddet op. Så er der ligevægt på bordet også." }
+                       sig: "Ryddet op. Så tager vi del 2." },
+
+            /* ----- Del 2: fortyndingen ------------------------------- */
+            "farve": { kort: "Par 1: frugtfarve",
+                       tekst: "Hæld frugtfarve i begge glas i par 1 — to portioner i hvert, og lige meget i begge.",
+                       hint: "Flasken med frugtfarve står på hylden. Slip den over hvert af de to venstre bægerglas. Hver hældning giver 20 mL, og den gule pil hælder en portion mere i det samme glas. Der skal mindst 30 mL i hvert, ellers er laget for tyndt til at se ned i." },
+            "lv":    { kort: "Par 2: ligevægtsblanding",
+                       tekst: "Hæld ligevægtsblanding fra kolben i begge glas i par 2 — to portioner i hvert, og lige meget i begge.",
+                       hint: "Kolben står til venstre. Hver hældning giver 25 mL, og den gule pil hælder en portion mere. Får de to glas ikke lige meget, måler du noget andet end fortyndingen." },
+            "vand":  { kort: "Fortynd ét glas i hvert par",
+                       tekst: "Fortynd ét glas i hvert par med vand. Sigt efter dobbelt rumfang.",
+                       hint: "Sprøjteflasken står på hylden. Hver sjat er 10 mL, og den gule pil giver en mere. Mere vand gør bare forskellen tydeligere." },
+            "sml":   { kort: "Se de fire glas ovenfra",
+                       tekst: "Se de fire glas ovenfra, og notér for hvert par, hvordan det fortyndede glas ser ud.",
+                       hint: "Knappen Se ovenfra står her i panelet. Ovenfra er lysvejen væskens dybde — det er derfor, fortyndingen kan aflæses dér og ikke fra siden.",
+                       sig: "Der har du det. To glas, to svar." }
         },
-        "forloeb-slut": "Alle ni trin er gjort. Bordet er ryddet, og billedet er noteret.",
+        "forloeb-slut": "Alle tretten trin er gjort. Begge dele er i hus.",
 
         /* ----- Billedet ------------------------------------------------- */
         "billede-titel": "Billedet",
         "billede-tekst": "Glassene, som de så ud, da du trykkede. Notér under hvert glas, hvordan det ser ud i forhold til glas 7, som ikke fik noget indgreb.",
+
+        /* ----- De fire glas ovenfra (del 2) ------------------------------ */
+        "ovenfra-titel": "De fire glas set ovenfra",
+        "ovenfra-tekst":
+            "Ovenfra går lyset gennem væskens dybde og ikke gennem glassets bredde. Fortyndes et glas " +
+            "til det dobbelte, halveres koncentrationen, men dybden fordobles. Notér for hvert par, " +
+            "hvordan det fortyndede glas ser ud i forhold til det andet.",
+        "ovenfra-mangler": "Hæld den samme opløsning i begge glas i parret.",
+        "ovenfra-ufortyndet": "Fortynd det ene glas i parret med vand.",
+        "ovenfra-ikke-klar": "Parret er ikke klar: begge glas skal have den samme opløsning, og det ene skal være fortyndet.",
 
         /* ----- Kemichaels bemærkninger undervejs -------------------------
            Udløserne i js/forloeb.js. Han siger dem selv, én linje ad gangen
@@ -127,15 +168,15 @@
         "sig-reference": ["Glas 7 skulle stå urørt.", "Nu er der ikke noget at sammenligne med."],
         "sig-to-indgreb": ["To indgreb i det samme glas.", "Så ved man ikke, hvad der virkede."],
         "sig-kig-igen": ["Et af glassene er noteret anderledes, end det ser ud.", "Kig en gang til. Jeg har tid."],
+        "sig-kunst": ["Frugtfarve og ligevægt i samme glas.", "Kunstnerisk. Men ikke et forsøg."],
+        "sig-skaevt-op": ["De to glas i parret har ikke lige meget stof i sig.", "Så er det ikke fortyndingen, du måler."],
 
         /* ----- Quizzen ---------------------------------------------------
            Rammen staar i ../../laboratoriet/js/quiz.js; her staar kun
            spoergsmaalene. Fire svar hver, blandet ved hvert forsoeg, saa
            »rigtig« er nummeret her i listen og ikke paa skaermen.
            Forklaringen vises ogsaa ved rigtigt svar - det er dér, der
-           bliver lært noget. Det tiende spoergsmaal, den gamle udgave har,
-           handler om fortynding set ovenfra og hoerer til del 2; det
-           kommer med S2. */
+           bliver lært noget. */
         "quiz": {
             laast: "Låses op, når der er taget billede af glas 1 til 7.",
             klar: "Billedet af glassene er taget.",
@@ -223,6 +264,17 @@
                     ],
                     rigtig: 0,
                     forklaring: "Med fast stof ændres kun koncentrationen af det tilsatte stof. En opløsning ville samtidig fortynde, og fortynding er selv et indgreb, der forskyder ligevægten."
+                },
+                {
+                    sp: "Ligevægtsblandingen fortyndes til dobbelt rumfang og ses ovenfra. Hvad sker der?",
+                    valg: [
+                        "Den bliver lysere, fordi Y bliver større end K, og ligevægten forskydes mod venstre",
+                        "Den ser ens ud, fordi antallet af farvede partikler er det samme",
+                        "Den bliver mørkere, fordi Y bliver mindre end K",
+                        "Den bliver lysere, fordi vandet ødelægger FeSCN²⁺"
+                    ],
+                    rigtig: 0,
+                    forklaring: "Når alle koncentrationer halveres, fordobles Y. Y er større end K, så ligevægten forskydes mod venstre, og der bliver færre FeSCN²⁺. Frugtfarve ser derimod ens ud ovenfra, fordi antallet af farvestofmolekyler er det samme — og det er hele pointen i del 2."
                 }
             ]
         },
@@ -233,7 +285,8 @@
             { sel: "#glas-kort", titel: "Det valgte glas", tekst: "Klik på et glas, og se rumfang og temperatur her. Indholdet i tal folder du ud, og partiklerne ses i zoomboblen i laboratoriets venstre hjørne. Klik på boblen for at se den stor." },
             { sel: "#top-ligning", titel: "Ligevægten", tekst: "Reaktionen, det hele handler om. Teorien bag hvert indgreb ligger under knappen Teori ved siden af — det gør tasten T også." },
             { sel: "#noterknap", titel: "Noter", tekst: "Fold noterne ud og skriv dine iagttagelser. »Notér det valgte glas« skriver aflæsningen ind for dig. Tasten N folder dem ud og ind." },
-            { sel: "#quiz-kort", titel: "Quizzen", tekst: "Ni spørgsmål om det, du lige har set. Den låses op, når billedet er taget, og svarene blandes hver gang. Begrundelsen kommer, også når du svarer rigtigt." },
+            { sel: "#delknapper", titel: "De to dele", tekst: "Del 1 er de syv glas med hvert sit indgreb. Del 2 er fortyndingen med fire bægerglas. Skift med knapperne eller tasterne 1 og 2 — bordet har kun det fremme, du arbejder med." },
+            { sel: "#quiz-kort", titel: "Quizzen", tekst: "Ti spørgsmål om det, du lige har set. Den låses op, når billedet er taget, og svarene blandes hver gang. Begrundelsen kommer, også når du svarer rigtigt." },
             { sel: "#uheld-kort", titel: "Uheld", tekst: "Det, der kan gå galt, går galt. Kemichael kommer og tørrer op." },
             { sel: "#forfraknap", titel: "Start forfra", tekst: "Rydder bordet og stiller alt tilbage." }
         ]

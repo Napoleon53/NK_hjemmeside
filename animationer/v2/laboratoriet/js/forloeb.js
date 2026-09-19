@@ -69,6 +69,7 @@
         this.vedTrin = this.valg.vedTrin || null;
         this.vedFaerdig = this.valg.vedFaerdig || null;
         this.vedFlag = this.valg.vedFlag || null;
+        this.kun = this.valg.kun || null;
     };
 
     var P = F.prototype;
@@ -92,9 +93,16 @@
     /* ----- Trin -------------------------------------------------------- */
     P.erGjort = function (id) { return !!this.gjort[id]; };
 
+    /* Det foerste trin, der ikke er gjort. Har siden sat en `kun(trin)`,
+       springes de trin over, der ikke hoerer til det, eleven staar i lige
+       nu - et forsoeg i flere dele lader panelet foelge delen. Det aendrer
+       intet ved, hvornaar et trin er gjort, og intet ved listen; kun
+       hvilket af de ugjorte der staar oeverst. */
     P.nuTrin = function () {
         for (var i = 0; i < this.trin.length; i++) {
-            if (!this.gjort[this.trin[i].id]) return this.trin[i];
+            if (this.gjort[this.trin[i].id]) continue;
+            if (this.kun && !this.kun(this.trin[i])) continue;
+            return this.trin[i];
         }
         return null;
     };
@@ -103,6 +111,14 @@
         var n = 0;
         for (var i = 0; i < this.trin.length; i++) if (this.gjort[this.trin[i].id]) n++;
         return n;
+    };
+
+    /* Er hvert eneste trin gjort? Her spoerges UDEN `kun`: filteret
+       afgoer kun, hvilket trin panelet viser eleven lige nu, aldrig
+       hvornaar forloebet er forbi. */
+    P.alleGjort = function () {
+        for (var i = 0; i < this.trin.length; i++) if (!this.gjort[this.trin[i].id]) return false;
+        return true;
     };
 
     /* Markerer et trin gjort uden at proeve vilkaaret (til selvtest og
@@ -162,7 +178,7 @@
             mig.udfoer(u.saa, u);
         });
 
-        if (!this.faerdig && this.trin.length && !this.nuTrin()) {
+        if (!this.faerdig && this.trin.length && this.alleGjort()) {
             this.faerdig = true;
             if (this.vedFaerdig) this.vedFaerdig(this);
         }
@@ -190,7 +206,7 @@
         this.fyret = t.fyret || {};
         this.flagene = t.flag || {};
         if (NK.Journal) NK.Journal.saetTilstand(t.journal);
-        this.faerdig = !!(this.trin.length && !this.nuTrin());
+        this.faerdig = !!(this.trin.length && this.alleGjort());
         return true;
     };
 

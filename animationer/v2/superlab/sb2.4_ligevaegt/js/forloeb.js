@@ -25,6 +25,16 @@
 
     var GLAS = ["glas1", "glas2", "glas3", "glas4", "glas5", "glas6", "glas7", "glas8"];
 
+    /* Del 2 spoerger js/ovenfra.js, som ejer parrene og reglen for, hvad
+       der taeller som fortyndet. Et vilkaar maa vaere en funktion af
+       bordet, og det er den noednoedudgang, sproget har til netop det her:
+       et forsoeg, der har sin egen forestilling om, hvornaar noget er
+       gjort. Reglen er stadig en tilstand - parrene laeses af bordet, ikke
+       af hvad eleven gjorde. */
+    function parKlar(type) {
+        return { proev: function (bord) { return NK.OVENFRA.parMed(type, bord) >= 0; } };
+    }
+
     /* Referencen skal staa der, foer en sammenligning betyder noget:
        et tomt glas er "lysere" end alt andet. */
     var REFERENCE_FYLDT = { beholder: "glas7", V: { over: 2.5 } };
@@ -38,31 +48,35 @@
         return { alle: [REFERENCE_FYLDT, proev] };
     }
 
-    function trin(id, naar, peg, saa) {
+    /* del: hvilken af forsoegets to dele trinnet hoerer til. Panelet
+       foelger den del, eleven staar i (se js/app.js og `kun` i motorens
+       forloeb.js); listen viser stadig alle tretten trin. */
+    function trin(id, del, naar, peg, saa) {
         var t = T[id];
-        return { id: id, kort: t.kort, tekst: t.tekst, hint: t.hint, sig: t.sig, peg: peg, naar: naar, saa: saa };
+        return { id: id, del: del, kort: t.kort, tekst: t.tekst, hint: t.hint, sig: t.sig,
+                 peg: peg, naar: naar, saa: saa };
     }
 
     NK.FORLOEB = {
         trin: [
-            trin("fyld", { alleAf: GLAS, V: { over: 2.5 } }, "kolbe"),
+            trin("fyld", 1, { alleAf: GLAS, V: { over: 2.5 } }, "kolbe"),
 
-            trin("glas1", anderledes("glas1", "moerkere"), "pulver_fe"),
-            trin("glas2", anderledes("glas2", "lysere"), "pulver_asc"),
-            trin("glas3", anderledes("glas3", "moerkere"), "pulver_kscn"),
-            trin("glas4", anderledes("glas4", "lysere"), "ag"),
+            trin("glas1", 1, anderledes("glas1", "moerkere"), "pulver_fe"),
+            trin("glas2", 1, anderledes("glas2", "lysere"), "pulver_asc"),
+            trin("glas3", 1, anderledes("glas3", "moerkere"), "pulver_kscn"),
+            trin("glas4", 1, anderledes("glas4", "lysere"), "ag"),
 
             /* Badene: baade at glasset staar rigtigt, og at det naaede at
                blive varmt eller koldt. Temperaturen er det, der flytter
                ligevaegten, saa temperaturen er det, der proeves. */
-            trin("varme", { alle: [
+            trin("varme", 1, { alle: [
                 REFERENCE_FYLDT,
                 { beholder: "glas5", staarI: "vandbad" },
                 { beholder: "glas5", T: { over: 50 } },
                 { beholder: "glas5", lysere: "glas7", mindst: 0.03 }
             ] }, "vandbad"),
 
-            trin("kulde", { alle: [
+            trin("kulde", 1, { alle: [
                 REFERENCE_FYLDT,
                 { beholder: "glas6", staarI: "isbad" },
                 { beholder: "glas6", T: { under: 10 } },
@@ -73,17 +87,23 @@
                taeller foerst, naar eleven har set det og noteret det. Trinnet
                spoerger journalen i stedet for bordet - og journalen er ogsaa
                en tilstand, saa reglen er den samme. */
-            trin("billede", { journal: "billede", faerdig: true }, "billedknap"),
+            trin("billede", 1, { journal: "billede", faerdig: true }, "billedknap"),
 
             /* Oprydningen taeller foerst, naar indgrebene er lavet - ellers
                ville et tomt bord ved starten vaere "ryddet op". Flaget er
                verdenstilstanden, og det er det samme flag, en laast doer i
                spillet ville laese. */
-            trin("ryd", { alle: [
+            trin("ryd", 1, { alle: [
                 { flag: "indgreb_gjort" },
                 { journal: "billede", faerdig: true },
                 { alleAf: GLAS, tom: true }
-            ] }, "dunk")
+            ] }, "dunk", [{ flag: "del1_gjort" }]),
+
+            /* ----- Del 2: fortyndingen ---------------------------------- */
+            trin("farve", 2, parKlar("farve"), "fl_farve"),
+            trin("lv", 2, parKlar("lv"), "kolbe"),
+            trin("vand", 2, { proev: function (bord) { return NK.OVENFRA.beggeKlar(bord); } }, "vand"),
+            trin("sml", 2, { journal: "fortynding", faerdig: true }, "ovenfraknap")
         ],
 
         udloesere: [
@@ -119,6 +139,37 @@
                     ] };
                 }) },
                 saa: [{ sig: NK.TEKST["sig-to-indgreb"], udtryk: "skeptisk", slags: "advarsel" }]
+            },
+
+            /* Frugtfarve og ligevaegtsblanding i det samme glas. Saa er der
+               ikke to par at sammenligne laengere, og det er den slags, han
+               ikke kan lade vaere med at kommentere. */
+            {
+                id: "kunst",
+                naar: { nogen: NK.OVENFRA.BAEGERE.map(function (navn) {
+                    return { proev: function (bord) {
+                        return !!bord.g[navn] && NK.OVENFRA.indholdType(bord.g[navn]) === "blanding";
+                    } };
+                }) },
+                saa: [{ sig: NK.TEKST["sig-kunst"], udtryk: "skeptisk", slags: "advarsel" }]
+            },
+
+            /* De to glas i et par skal have lige meget stof i sig, ellers
+               maaler proeven noget andet end fortyndingen. Den fyrer paa
+               tallene, ikke paa handlingen: har eleven skaevt op, siges det,
+               uanset hvordan glassene blev fyldt. */
+            {
+                id: "skaevt_op",
+                naar: { nogen: ["farve", "lv"].map(function (type) {
+                    return { proev: function (bord) {
+                        var n = NK.OVENFRA.parMed(type, bord);
+                        if (n < 0) return false;
+                        var par = NK.OVENFRA.par(bord, n);
+                        var a = NK.OVENFRA.maengde(par[0], type), b = NK.OVENFRA.maengde(par[1], type);
+                        return a > 0 && b > 0 && Math.abs(a - b) / Math.max(a, b) > 0.15;
+                    } };
+                }) },
+                saa: [{ sig: NK.TEKST["sig-skaevt-op"], udtryk: "skeptisk", slags: "advarsel" }]
             },
 
             /* Er billedet fyldt ud, men et glas noteret anderledes end det ser

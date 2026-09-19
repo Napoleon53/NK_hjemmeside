@@ -74,6 +74,22 @@
         return (0.2126 * f.r + 0.7152 * f.g + 0.0722 * f.b) / 255;
     }
 
+    /* Hvor lys vaesken ser ud, naar farven ligger paa hvidt papir (0-1).
+       lysstyrke ser paa selve farven; lyshed ser paa det, oejet moeder.
+       Forskellen betyder noget, naar lysvejen er kort: en tynd vaeske er
+       naesten gennemsigtig, og saa er det papiret, man ser. Det er derfor
+       den maaling, en sammenligning OVENFRA hviler paa - dér er vejen
+       vaeskens dybde og kan vaere ganske kort (se NK.Udstyr.vejOvenfra).
+       retning: "ovenfra" for kigget ned i glasset, ellers gennem siden. */
+    function lyshed(gg, retning) {
+        var f = B.farve(gg, retning);
+        if (!f) return 1;
+        var a = f.a === undefined ? 1 : f.a;
+        return (0.2126 * (255 * (1 - a) + f.r * a) +
+                0.7152 * (255 * (1 - a) + f.g * a) +
+                0.0722 * (255 * (1 - a) + f.b * a)) / 255;
+    }
+
     /* Et tal maales mod { over, under } - eller mod et bart tal, som
        betyder "over". */
     function passer(vaerdi, krav) {
@@ -207,6 +223,7 @@
     NK.Vilkaar = {
         opfyldt: opfyldt,
         lysstyrke: lysstyrke,
+        lyshed: lyshed,
         maengde: maengde,
         passer: passer,
         naevnte: naevnte,
