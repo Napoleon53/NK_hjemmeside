@@ -34,7 +34,7 @@
             "Glas 4 får et par dråber AgNO₃, som fjerner SCN⁻ som hvidt bundfald.",
             "Glas 5 i vandbadet, glas 6 i isbadet. Mål temperaturen med termometeret.",
             "Sammenlign hvert glas med glas 7, og notér om det blev mørkere eller lysere.",
-            "Del 2: fire bægerglas i to par. Par 1 får frugtfarve, par 2 ligevægtsblanding — lige meget i begge glas i parret.",
+            "Del 2: fire bægerglas i to par. Par 1 får en portion frugtfarve og vand op til, par 2 ligevægtsblanding — lige meget i begge glas i parret.",
             "Fortynd det ene glas i hvert par med vand, og se alle fire ovenfra. Der er forskellen."
         ],
         "intro-uheld":
@@ -131,11 +131,11 @@
 
             /* ----- Del 2: fortyndingen ------------------------------- */
             "farve": { kort: "Par 1: frugtfarve",
-                       tekst: "Hæld frugtfarve i begge glas i par 1 — to portioner i hvert, og lige meget i begge.",
-                       hint: "Flasken med frugtfarve står på hylden. Slip den over hvert af de to venstre bægerglas. Hver hældning giver 20 mL, og den gule pil hælder en portion mere i det samme glas. Der skal mindst 30 mL i hvert, ellers er laget for tyndt til at se ned i." },
+                       tekst: "Giv begge glas i par 1 en portion frugtfarve, og fyld op med vand — lige meget i begge.",
+                       hint: "Flasken er en stamflaske: én hældning er 4 mL, og det er nok. Fyld op med sprøjteflasken, til der er lige så meget som i par 2 — hver sjat er 10 mL, og den gule pil giver en mere. Der skal mindst 30 mL i hvert glas, ellers er laget for tyndt til at se ned i." },
             "lv":    { kort: "Par 2: ligevægtsblanding",
-                       tekst: "Hæld ligevægtsblanding fra kolben i begge glas i par 2 — lige meget i begge.",
-                       hint: "Kolben står til venstre. En hældning i et bægerglas giver 40 mL, og det er nok. Får de to glas ikke lige meget, måler du noget andet end fortyndingen." },
+                       tekst: "Hæld ligevægtsblanding i begge glas i par 2 — lige meget i begge.",
+                       hint: "Tag kolben til venstre eller bægerglasset med stamopløsning fra hylden. Kolben giver 40 mL pr. hældning, bægerglasset 25. Får de to glas ikke lige meget, måler du noget andet end fortyndingen." },
             "vand":  { kort: "Fortynd ét glas i hvert par",
                        tekst: "Fortynd ét glas i hvert par med vand. Sigt efter dobbelt rumfang.",
                        hint: "Sprøjteflasken står på hylden. Hver sjat er 10 mL, og den gule pil giver en mere. Mere vand gør bare forskellen tydeligere." },

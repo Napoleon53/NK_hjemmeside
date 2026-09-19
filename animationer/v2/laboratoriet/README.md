@@ -216,6 +216,29 @@ omdrejningslegeme (vejebåden er en rektangulær skål).
 `_geometri.html` regner det hele ud og holder det op mod typerne. Læs den
 igennem, hver gang en sprite eller et mål ændres.
 
+**Væsken er et filter, ikke maling.** Det, man ser gennem et glas, er
+baggrunden ganget med det lys, der slipper igennem. `Stof.gennem(o, l)`
+giver netop det lys mod hvidt — farven på hvidt papir — og `Stof.farve`
+giver kulør og dækning til at tegne med. Vandets egen svage blå tone
+(`VAND`) viger, jo mere farve der er i glasset; ellers ville den trække
+kuløren ud af enhver fortyndet opløsning og gøre den mat og grålig. En
+fortynding skal gøre væsken **lysere i sin egen kulør**, ikke gråere. Det
+er også `Stof.gennem`, `NK.Vilkaar.lyshed` måler, når to glas skal
+sammenlignes på hvidt papir.
+
+**Farven er dybest, hvor glasset er bredest.** Lysvejen følger indersidens
+bredde, højde for højde: en konisk kolbe er godt dobbelt så bred forneden
+som i gennemsnit, så lyset går dobbelt så langt gennem bunden, og bunden
+står dobbelt så mørk. `T.vejVedY(gg, verden)` giver vejen i en højde og
+`null`, hvis glasset er lige i siderne — så koster det ingenting for et
+bægerglas. Det er den samme Lambert-Beer, der giver et bægerglas set
+ovenfra sin dybde, bare vandret.
+
+**Et uheld koster en tiendedel, ikke det hele.** Rystes et åbent glas for
+voldsomt, skvulper `SKVULP` = 10 % af indholdet ud som en pyt på bordet.
+Nok til et uheld og til at Kemichael kommer og tørrer op, men ikke nok til
+at forsøget er tabt. Rystes der videre, sker det igen.
+
 **Glas rammes, hvor der er glas.** Musen og slipmålet spørger `bord.inden`,
 og for et omdrejningslegeme uden etiket over sig er svaret indersidens
 silhuet plus glassets væg — ikke spritets rektangel. For et reagensglas og
@@ -223,7 +246,9 @@ et bægerglas er det næsten den samme kasse, men kolben er smal foroven, og
 så snyder dens øverste hjørner ikke længere den, der sigter på den. En
 flaske eller et pulverglas har etiket over det meste af sig, så deres
 inderside kun er et kig ind i beholderen (`vindue: true`); de rammes som
-før.
+før. Den stiplede ramme — den grønne, når noget kan slippes, og den gule,
+når et hint peger — følger den samme silhuet (`T.markeringsForm`), så det,
+man ser, er det, man kan ramme.
 
 **Bægerglassene hedder nu `baegerLille` og `baegerStor`.** De hed
 `baeger100` og `baeger250`, men de var tegnet som 225 og 694 mL. Da

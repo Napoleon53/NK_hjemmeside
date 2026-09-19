@@ -112,10 +112,17 @@ et trin er gjort, og intet ved, hvornår forløbet er færdigt.
 
 ## Del 2: fortyndingen
 
-Fire bægerglas, to og to i par. Par 1 får frugtfarve fra flasken på
-hylden, par 2 ligevægtsblanding fra den samme kolbe som del 1 — to
-portioner i hvert glas, og lige meget i begge. Derefter fortyndes det ene
-glas i hvert par med vand fra sprøjteflasken, helst til dobbelt rumfang.
+Fire bægerglas, to og to i par. Par 1 får en portion frugtfarve og vand op
+til; par 2 ligevægtsblanding — lige meget i begge glas i parret. Derefter
+fortyndes det ene glas i hvert par med vand fra sprøjteflasken, helst til
+dobbelt rumfang.
+
+Frugtfarven står som en **stamflaske**: 100 mL på 35 mM, ti gange så
+kraftig som den farve, der skal stå i glassene. Den doseres derfor og
+hældes ikke op — én hældning er 4 mL (`FARVE_PORTION`), og resten af
+rumfanget er vand. Sådan bruger man også frugtfarve i et køkken. Fire mL i
+et glas, der fyldes til 44 mL, giver 3,2 mM, og det er dét, der står blåt
+ovenfra.
 
 **Set fra siden** bliver begge fortyndede glas lysere, og det siger
 ingenting: vejen gennem glasset er den samme, og koncentrationen er
@@ -178,8 +185,10 @@ i et reagensglas uden at gå mod sort — og som stadig kan ses, når der kigges
 ned i et bægerglas, hvor lysvejen er kortere. Der er 4,8 mM frit Fe³⁺
 tilbage; det er dét, der træder frem som gult, når blandingen fortyndes og
 komplekset bruges op, og det er kun synligt, fordi udgangspunktet er kraftigt
-nok. Kolben rummer 150 mL af de 200, den kan — nok til begge dele, uden at
-stå til kanten. Motoren regner selv ligevægten frem; opstillingen siger kun,
+nok. Kolben rummer 150 mL af de 200, den kan — nok til del 1, uden at stå til
+kanten — og **det store bægerglas på hylden står med 500 mL** af de 600,
+det kan: dagens forråd, som del 2 hældes af. Kolben er den håndterlige
+portion, bægerglasset batchen. Motoren regner selv ligevægten frem; opstillingen siger kun,
 hvad der blev blandet.
 
 Vil man have farven stærkere eller svagere, ændres koncentrationen i

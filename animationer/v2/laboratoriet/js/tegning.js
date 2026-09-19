@@ -134,16 +134,30 @@
     };
 
     /* Stiplet, pulserende ramme om det, eleven kan bruge nu. */
-    T.tegnMarkering = function (ctx, r, tid, farve) {
+    /* Den stiplede ramme. Har genstanden en tegnet silhuet, foelger
+       rammen den i stedet for at vaere en kasse om den: en konisk kolbe
+       skal ikke se ud, som om man kan ramme dens oeverste hjoerner, for
+       det kan man ikke (bord.inden spoerger den samme silhuet). */
+    T.tegnMarkering = function (ctx, r, tid, farve, gg) {
+        var form = gg ? T.markeringsForm(gg) : null;
         ctx.save();
         ctx.globalAlpha = 0.5 + 0.35 * Math.sin(tid * 4);
         ctx.strokeStyle = farve || "#f2c53d";
         ctx.lineWidth = 2.2;
         ctx.setLineDash([7, 6]);
         ctx.lineDashOffset = -tid * 12;
-        NK.rundtRekt(ctx, r.x - 6, r.y - 6, r.b + 12, r.h + 12, 9);
+        if (form) NK.polySti(ctx, form);
+        else NK.rundtRekt(ctx, r.x - 6, r.y - 6, r.b + 12, r.h + 12, 9);
         ctx.stroke();
         ctx.restore();
+    };
+
+    /* Silhuetten at tegne rammen efter, eller null. Samme regel som
+       bord.inden: et omdrejningslegeme uden etiket over indersiden. */
+    T.markeringsForm = function (gg) {
+        var t = gg && gg.type;
+        if (!t || !t.indre || t.vindue || t.rund === false) return null;
+        return NK.udvidPoly(T.indreVerden(gg), 11 * (gg.skala || 1));
     };
 
     /* ----- Vaesker ---------------------------------------------------------- */
@@ -154,8 +168,35 @@
         }
     }
 
+    /* Lysvejen gennem vaesken i hoejden y, i reagensglas-enheder: den
+       foelger indersidens bredde dér. En konisk kolbe er godt dobbelt saa
+       bred forneden som i gennemsnit, saa lyset gaar dobbelt saa langt
+       gennem bunden, og bunden staar dobbelt saa moerk. Det er den samme
+       Lambert-Beer, der giver et baegerglas set ovenfra sin dybde
+       (NK.Udstyr.vejOvenfra) - her bare vandret og hoejde for hoejde.
+       Giver null, hvis glasset er lige i siderne og farven altsaa er den
+       samme hele vejen ned. */
+    T.vejVedY = function (gg, verden) {
+        var U = NK.Udstyr, t = gg.type, g = t.grund || t;
+        var m = U.maal(g);
+        if (!m || !(m.wMid > 0) || !verden) return null;
+        var wMid = m.wMid * (gg.skala || 1);
+        var vej = t.vejlaengde || 1;
+        function ved(y) {
+            var kant = U.kanter(verden, y);
+            return kant ? vej * (kant.x1 - kant.x0) / wMid : vej;
+        }
+        /* Er glasset lige i siderne, er der intet at tegne forskelligt */
+        var y0 = Infinity, y1 = -Infinity;
+        verden.forEach(function (p) { y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); });
+        var a = ved(y0 + (y1 - y0) * 0.15), b = ved(y1 - (y1 - y0) * 0.15);
+        return Math.abs(a - b) > 0.1 * Math.max(a, b, 0.01) ? ved : null;
+    };
+
     /* Ét vaeskelag i beholderen fra overfladen 'niveau' ned til 'bund'
-       (eller polygonens bund). verden: indersiden paa tegnebordet. */
+       (eller polygonens bund). verden: indersiden paa tegnebordet.
+       opt.farveVedY(y): farven i hoejden y, naar glasset ikke er lige i
+       siderne. Saa bygges overgangen af flere stop i stedet for ét. */
     T.tegnLag = function (ctx, verden, niveau, bund, farve, opt) {
         opt = opt || {};
         if (!farve) return;
@@ -171,8 +212,17 @@
         ctx.lineTo(x0 - 4, slut);
         ctx.closePath();
         var g = ctx.createLinearGradient(0, niveau, 0, slut);
-        g.addColorStop(0, NK.css(farve, 0.9));
-        g.addColorStop(1, NK.css(farve, 1.1));
+        if (opt.farveVedY && slut - niveau > 6) {
+            /* Fem stop raekker: farven aendrer sig jaevnt med bredden */
+            for (var n = 0; n <= 4; n++) {
+                var f = n / 4;
+                var fv = opt.farveVedY(niveau + (slut - niveau) * f) || farve;
+                g.addColorStop(f, NK.css(fv, 0.9 + 0.2 * f));
+            }
+        } else {
+            g.addColorStop(0, NK.css(farve, 0.9));
+            g.addColorStop(1, NK.css(farve, 1.1));
+        }
         ctx.fillStyle = g;
         ctx.fill();
         if (opt.uklar > 0.01 && opt.uklarFarve) {
@@ -194,7 +244,7 @@
         opt = opt || {};
         if (arealTot <= 2 || !solFarve) return null;
         var top = NK.vaeskeNiveau(verden, arealTot);
-        T.tegnLag(ctx, verden, top, null, solFarve, { boelge: opt.boelge, tid: opt.tid, uklar: opt.uklar, uklarFarve: opt.uklarFarve, kant: 0.35 });
+        T.tegnLag(ctx, verden, top, null, solFarve, { boelge: opt.boelge, tid: opt.tid, uklar: opt.uklar, uklarFarve: opt.uklarFarve, kant: 0.35, farveVedY: opt.farveVedY });
         if (lagFarve && arealTot - arealSol > 6) {
             var x0 = Infinity, x1 = -Infinity, yBund = -Infinity;
             verden.forEach(function (p) { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); yBund = Math.max(yBund, p.y); });
@@ -439,8 +489,13 @@
             if (V > 0.02) {
                 var solFarve = Stof.farve(o, t.vejlaengde) || Stof.VAND;
                 var lagFarve = gg.lag && gg.lag.V > 0.05 ? Stof.farve(gg.lag, t.vejlaengde) : null;
+                /* Er glasset ikke lige i siderne, regnes farven hoejde
+                   for hoejde: lyset gaar laengere gennem den brede bund
+                   end gennem den smalle hals */
+                var vedY = T.vejVedY(gg, verden);
                 top = T.tegnVaeske(ctx, verden, V * t.mlPrAreal, o.V * t.mlPrAreal, solFarve, lagFarve, {
-                    boelge: opt.boelge, tid: tid, uklar: Stof.uklar(o) * (1 - (gg.bund || 0)), uklarFarve: Stof.fastFarve(o), lagBund: gg.lagBund
+                    boelge: opt.boelge, tid: tid, uklar: Stof.uklar(o) * (1 - (gg.bund || 0)), uklarFarve: Stof.fastFarve(o), lagBund: gg.lagBund,
+                    farveVedY: vedY ? function (y) { return Stof.farve(o, vedY(y)); } : null
                 });
                 var faste = Stof.faste(o).concat(gg.lag ? Stof.faste(gg.lag) : []);
                 var korn = faste.filter(function (f) { return f.stof.korn; });
@@ -898,8 +953,8 @@
     };
 
     /* Den groenne ramme om det, en baaret genstand vil blive brugt paa */
-    T.tegnSlipMaal = function (ctx, r, tid) {
-        T.tegnMarkering(ctx, r, tid, "#7ee0a8");
+    T.tegnSlipMaal = function (ctx, r, tid, gg) {
+        T.tegnMarkering(ctx, r, tid, "#7ee0a8", gg);
     };
 
     /* Haanden, der holder om et glas, mens det rystes */

@@ -434,10 +434,17 @@ function koerTest() {
     var uheld2 = bord.antalUheld;
     bord.haeld(g.fl_cu, g.glas1, 3);
     faerdig();
+    var foerSpild = V(g.glas1);
     bord.startBaer(g.glas1);
     bord.musFart = 5000; bord.vold = 5000;
     adv(0.6);
-    paastand("voldsom rystning spilder", bord.antalUheld === uheld2 + 1 && V(g.glas1) < 0.01, "uheld " + bord.antalUheld + ", V " + V(g.glas1).toFixed(2));
+    /* Det skvulper ud - men kun en tiendedel. Et uheld skal koste noget
+       og ikke vaelte forsoeget: rystes der videre, sker det igen. */
+    paastand("voldsom rystning spilder", bord.antalUheld === uheld2 + 1,
+        "uheld " + bord.antalUheld);
+    paastand("men kun en tiendedel ryger paa bordet",
+        V(g.glas1) > foerSpild * 0.85 && V(g.glas1) < foerSpild * 0.95 && bord.pytter.length > 0,
+        foerSpild.toFixed(2) + " -> " + V(g.glas1).toFixed(2) + " mL");
     paastand("glasset er sluppet", !bord.baerer && !bord.holdt);
     vent(function () { return !bord.laerer.scene; }, 30);
 
@@ -628,6 +635,61 @@ function koerTest() {
         paastand("en flaske rammes som foer, i hele sin kasse",
             bord.hvad({ x: rf.x + 3, y: rf.y + 3 }) === "fl_hcl");
         paastand("proevegenstandene er taget af bordet igen", !bord.g._traef_kolbe && !bord.g._traef_baeger);
+
+        /* Og rammen, man ser, skal vise det samme: den foelger silhuetten
+           for et omdrejningslegeme og er ellers en kasse. */
+        var k2 = bord.tilfoej({ navn: "_form_kolbe", type: "kolbe", x: 1180 });
+        var form = NK.Tegning.markeringsForm(k2);
+        paastand("markeringen om kolben er en form og ikke en kasse", !!form && form.length === k2.type.indre.length);
+        paastand("og den ligger uden om glasset hele vejen rundt",
+            form.every(function (q) { return !NK.iPoly(NK.Tegning.indreVerden(k2), q.x, q.y); }));
+        var rk2 = bord.rekt(k2, 0);
+        var halsY = rk2.y + 14;
+        var formHals = form.filter(function (q) { return Math.abs(q.y - halsY) < 40; });
+        paastand("ved halsen snoerer den ind om halsen og fylder ikke hele kassen",
+            formHals.length > 0 && Math.max.apply(null, formHals.map(function (q) { return q.x; })) < rk2.x + rk2.b - 6,
+            "hoejst x " + Math.max.apply(null, formHals.map(function (q) { return q.x; })).toFixed(0) + " mod kassens " + (rk2.x + rk2.b).toFixed(0));
+        bord.tagUd(k2);
+        var b2 = bord.tilfoej({ navn: "_form_flaske", type: "flaske", x: 1180 });
+        paastand("en flaske med etiket faar ingen form, kun sin kasse", NK.Tegning.markeringsForm(b2) === null);
+        bord.tagUd(b2);
+    }());
+
+    overskrift("9e. Farven er dybest, hvor glasset er bredest");
+    /* Lysvejen gennem vaesken foelger indersidens bredde. En konisk kolbe
+       er bredest forneden, saa lyset gaar laengst gennem bunden, og bunden
+       staar moerkest. Et baegerglas er lige i siderne og har derfor samme
+       farve hele vejen ned. */
+    (function () {
+        var Tg = NK.Tegning, St2 = NK.Stof;
+        function tl(x, d) { return Number(x).toFixed(d === undefined ? 2 : d).replace(".", ","); }
+        function lys(f) { return (0.2126 * f.r + 0.7152 * f.g + 0.0722 * f.b) / 255; }
+        var kb = bord.tilfoej({ navn: "_dyb_kolbe", type: "kolbe", x: 1180 });
+        B.haeldI(kb, St2.lav({ V: 150, mM: { "Cu2+": 20 } }), true);
+        adv(0.5);
+        var verden = Tg.indreVerden(kb);
+        var ved = Tg.vejVedY(kb, verden);
+        paastand("kolben har ikke samme lysvej hele vejen ned", !!ved);
+        var y0 = Math.min.apply(null, verden.map(function (q) { return q.y; }));
+        var y1 = Math.max.apply(null, verden.map(function (q) { return q.y; }));
+        var vHals = ved(y0 + (y1 - y0) * 0.2), vBund = ved(y1 - (y1 - y0) * 0.1);
+        paastand("vejen gennem bunden er over dobbelt saa lang som gennem halsen",
+            vBund > vHals * 2, tl(vHals, 2) + " mod " + tl(vBund, 2) + " reagensglas");
+        var o = B.samlet(kb);
+        var lysHals = lys(St2.gennem(o, vHals)), lysBund = lys(St2.gennem(o, vBund));
+        paastand("og farven er derfor tydeligt moerkere forneden", lysBund < lysHals - 0.08,
+            "lyshed " + tl(lysHals, 2) + " foroven mod " + tl(lysBund, 2) + " forneden");
+        paastand("gennemsnittet er stadig glassets egen vejlaengde",
+            Math.abs(ved((y0 + y1) / 2) - kb.type.vejlaengde) < kb.type.vejlaengde * 0.6);
+        bord.tagUd(kb);
+
+        var bg2 = bord.tilfoej({ navn: "_dyb_baeger", type: "baegerLille", x: 1180 });
+        B.haeldI(bg2, St2.lav({ V: 150, mM: { "Cu2+": 20 } }), true);
+        adv(0.5);
+        paastand("et baegerglas er lige i siderne, saa farven er den samme hele vejen ned",
+            Tg.vejVedY(bg2, Tg.indreVerden(bg2)) === null);
+        bord.tagUd(bg2);
+        paastand("proevegenstandene er taget af bordet igen", !bord.g._dyb_kolbe && !bord.g._dyb_baeger);
     }());
 
     overskrift("10. Udstyr i mindre maalestok");

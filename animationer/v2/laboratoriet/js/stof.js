@@ -451,14 +451,12 @@
         return { farve: st.farve, k: st.k };
     }
 
-    /* Oploesningens farve. l: vejlaengde i forhold til et reagensglas
-       (baegerglas ca. 2). Farverne laegges sammen som lys i farvemodel.js,
-       ikke som absorbans pr. RGB-kanal: ellers gaar enhver blanding af to
-       farver mod sort. */
-    function farve(o, l) {
-        if (o.V <= 0.01) return null;
-        l = l || 1;
-        var lag = [], ialt = 0;
+    /* Oploesningens lag: hvert farvet stof med sin absorbans gennem
+       lysvejen l (i reagensglas-enheder). Farverne laegges sammen som lys
+       i farvemodel.js, ikke som absorbans pr. RGB-kanal: ellers gaar
+       enhver blanding af to farver mod sort. */
+    function lag(o, l) {
+        var ud = [], ialt = 0;
         var ph = pH(o);
         for (var s in o.n) {
             if (!Object.prototype.hasOwnProperty.call(o.n, s)) continue;
@@ -466,17 +464,49 @@
             if (!st || st.fase !== "aq") continue;
             var fa = farveAf(st, o, ph);
             if (!fa || fa.k <= 0) continue;
-            var a = fa.k * (o.n[s] / o.V) * l;
+            var a = fa.k * (o.n[s] / o.V) * (l || 1);
             ialt += a;
-            lag.push({ sp: NK.Farvemodel.spektrum(fa.farve), A: a });
+            ud.push({ sp: NK.Farvemodel.spektrum(fa.farve), A: a });
         }
-        if (!lag.length) return { r: VAND.r, g: VAND.g, b: VAND.b, a: VAND.a };
-        var c = NK.Farvemodel.lys(lag);
+        return { lag: ud, ialt: ialt };
+    }
+
+    /* Det lys, der slipper IGENNEM vaesken, mod hvidt (0-255). Det er
+       farven paa hvidt papir: en vaeske er et filter, ikke et lag maling,
+       og en fortyndet oploesning skal blive lysere UDEN at miste sin
+       kuloer. Bruges, hvor der ses gennem vaesken mod noget lyst - fx ned
+       i et glas, der staar paa hvidt papir. */
+    function gennem(o, l) {
+        if (!o || o.V <= 0.01) return { r: 255, g: 255, b: 255 };
+        var d = lag(o, l);
+        if (!d.lag.length) return { r: VAND.r, g: VAND.g, b: VAND.b };
+        var c = NK.Farvemodel.lys(d.lag);
+        var t = vandTone(d.ialt);
+        return { r: NK.lerp(255, VAND.r, t) * c.r / 255,
+                 g: NK.lerp(255, VAND.g, t) * c.g / 255,
+                 b: NK.lerp(255, VAND.b, t) * c.b / 255 };
+    }
+
+    /* Hvor meget vandets egen svage blaa tone slaar igennem. Den er der,
+       naar glasset er naesten rent vand, og viger, jo mere farve der er i:
+       ellers ville den tage kuloeren fra enhver fortyndet oploesning og
+       goere den mat - en fortyndet ligevaegtsblanding skal gaa mod
+       orange og gult, ikke mod graat. */
+    function vandTone(ialt) { return Math.exp(-ialt * 5); }
+
+    /* Oploesningens farve, som den tegnes: kuloeren og hvor meget den
+       daekker. l: vejlaengde i forhold til et reagensglas (baegerglas ca. 2). */
+    function farve(o, l) {
+        if (o.V <= 0.01) return null;
+        var d = lag(o, l);
+        if (!d.lag.length) return { r: VAND.r, g: VAND.g, b: VAND.b, a: VAND.a };
+        var c = NK.Farvemodel.lys(d.lag);
+        var t = vandTone(d.ialt);
         return {
-            r: VAND.r * c.r / 255,
-            g: VAND.g * c.g / 255,
-            b: VAND.b * c.b / 255,
-            a: 1 - (1 - VAND.a) * Math.exp(-ialt)
+            r: NK.lerp(255, VAND.r, t) * c.r / 255,
+            g: NK.lerp(255, VAND.g, t) * c.g / 255,
+            b: NK.lerp(255, VAND.b, t) * c.b / 255,
+            a: 1 - (1 - VAND.a) * Math.exp(-d.ialt)
         };
     }
 
@@ -685,6 +715,7 @@
         tapGas: tapGas,
         skridt: skridt,
         farve: farve,
+        gennem: gennem,
         uklar: uklar,
         fastFarve: fastFarve,
         partikelTal: partikelTal,

@@ -42,6 +42,18 @@
     var NK = window.NK;
 
     function opl(V, mM) { return { V: V, T: 20, mM: mM }; }
+
+    /* Frugtfarveflasken er en stamflaske: den doseres i smaa portioner og
+       haeldes ikke op. Derfor faar forsoeget sin egen udgave af flasken
+       med en lille portion; alt andet er flaskens egne maal. */
+    var FARVE_PORTION = 4;      /* mL pr. haeldning */
+    (function () {
+        var f = NK.Udstyr.type("flaske"), ny = {}, n;
+        for (n in f) if (Object.prototype.hasOwnProperty.call(f, n)) ny[n] = f[n];
+        ny.haeldMl = FARVE_PORTION;
+        ny.titel = "flasken med frugtfarve";
+        NK.Udstyr.tilfoej("flaskeFarve", ny);
+    }());
     function pulver(navn, x, y, etiket, titel, stof) {
         var u = {};
         u[stof] = 30000;
@@ -71,10 +83,12 @@
     var STAM = { "Fe3+": 8, "SCN-": 8, "K+": 8, "NO3-": 24 };
 
     /* Frugtfarve: et blaat farvestof, der ikke indgaar i nogen reaktion.
-       3,5 mM er valgt, saa to portioner i et baegerglas staar tydeligt
-       blaat SET OVENFRA - dér er lysvejen kun vaeskens dybde, knap én
-       reagensglaslaengde, saa der skal mere til end fra siden. */
-    var FRUGTFARVE = { "farve": 3.5 };
+       Flasken er en stamflaske paa 100 mL og 35 mM - ti gange saa
+       kraftig som den farve, der skal staa i glassene, saa den doseres og
+       ikke haeldes op. En portion er derfor lille (FARVE_PORTION), og
+       resten af rumfanget er vand fra sproejteflasken. Saadan bruger man
+       ogsaa frugtfarve i et koekken: et par draaber i en skaal. */
+    var FRUGTFARVE = { "farve": 35 };
 
     /* De fire baegerglas i del 2, to og to i par med luft imellem */
     var PAR1 = [380, 470], PAR2 = [660, 750];
@@ -103,8 +117,8 @@
            aldrig fremme samtidig. */
         { navn: "fl_kscn", type: "flaske", x: 400, y: HYLDE_FLASKER, etiket: ["KSCN", "0,1 M"], del: 1,
           titel: "flasken med KSCN", indhold: opl(200, { "K+": 100, "SCN-": 100 }) },
-        { navn: "fl_farve", type: "flaske", x: 400, y: HYLDE_FLASKER, etiket: ["frugt-", "farve"], del: 2,
-          titel: "flasken med frugtfarve", indhold: opl(300, FRUGTFARVE) },
+        { navn: "fl_farve", type: "flaskeFarve", x: 400, y: HYLDE_FLASKER, etiket: ["frugt-", "farve"], del: 2,
+          titel: "flasken med frugtfarve", indhold: opl(100, FRUGTFARVE) },
         { navn: "ag", type: "draabeflaske", x: 470, y: HYLDE_FLASKER, etiket: ["AgNO₃", "0,1 M"], del: 1,
           titel: "dråbeflasken med AgNO₃", indhold: opl(60, { "Ag+": 100, "NO3-": 100 }) },
         { navn: "vand", type: "sproejteflaske", x: 560, y: HYLDE_FLASKER, titel: "sprøjteflasken med vand",
@@ -136,8 +150,12 @@
         { navn: "isbad", type: "bad", x: 965, titel: "isbadet", holdT: 2, del: 1,
           indhold: { V: 180, T: 2, mM: {} } },
 
-        /* Hylden til hoejre: det tomme baegerglas */
-        { navn: "baeger", type: "baegerStor", x: 790, y: HYLDE_HOEJRE, titel: "bægerglasset", del: 1 },
+        /* Hylden til hoejre: det store baegerglas med dagens
+           stamoploesning. 500 mL af de 600, det kan rumme - nok til begge
+           dele, saa kolben er den haandterlige portion og baegerglasset
+           forraadet. Det staar fremme i begge dele. */
+        { navn: "baeger", type: "baegerStor", x: 790, y: HYLDE_HOEJRE,
+          titel: "bægerglasset med stamopløsning", indhold: opl(500, STAM) },
 
         /* Del 2: de fire baegerglas paa bordet, to og to i par */
         baeger(1, PAR1[0]), baeger(2, PAR1[1]),

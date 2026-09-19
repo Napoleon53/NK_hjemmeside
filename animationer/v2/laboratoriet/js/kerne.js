@@ -261,6 +261,39 @@ window.NK = NK;
         return bedst;
     };
 
+    /* Polygonen skubbet m ud ad alle kanter. Hvert punkt flyttes langs
+       gennemsnittet af sine to kanters normaler (en almindelig
+       geringsforskydning), og meget skarpe hjoerner faar et loft, saa de
+       ikke skyder ud i det uendelige. Bruges til at tegne en ramme, der
+       foelger formen i stedet for et rektangel om den. */
+    NK.udvidPoly = function (pts, m) {
+        var n = pts.length, i, sum = 0;
+        if (n < 3) return pts.slice();
+        for (i = 0; i < n; i++) {
+            var a0 = pts[i], b0 = pts[(i + 1) % n];
+            sum += (b0.x - a0.x) * (b0.y + a0.y);
+        }
+        /* Skolisseformlen med y nedad: en negativ sum er med uret.
+           Normalen skal pege UD, og de to slags polygoner i kataloget er
+           tegnet hver sin vej (baegerglasset med uret fra oeverste venstre,
+           kolben mod uret ned ad venstre side). */
+        var vend = sum > 0 ? -1 : 1;
+        function normal(a, b) {
+            var dx = b.x - a.x, dy = b.y - a.y;
+            var l = Math.sqrt(dx * dx + dy * dy) || 1;
+            return { x: (dy / l) * vend, y: (-dx / l) * vend };
+        }
+        var ud = [];
+        for (i = 0; i < n; i++) {
+            var f = pts[(i - 1 + n) % n], p = pts[i], e = pts[(i + 1) % n];
+            var v1 = normal(f, p), v2 = normal(p, e);
+            var d = 1 + (v1.x * v2.x + v1.y * v2.y);
+            if (d < 0.4) d = 0.4;
+            ud.push({ x: p.x + (v1.x + v2.x) / d * m, y: p.y + (v1.y + v2.y) / d * m });
+        }
+        return ud;
+    };
+
     /* Inde i polygonen - eller hoejst m uden for den */
     NK.iNaerPoly = function (pts, x, y, m) {
         if (NK.iPoly(pts, x, y)) return true;

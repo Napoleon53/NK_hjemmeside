@@ -161,7 +161,12 @@
        papiret er hvidt, saa en tynd vaeske bliver lys af sig selv. */
     function tegnOppefra(ctx, x, y, r, gg) {
         var tom = !gg || B.volumen(gg) < 0.3;
-        var f = tom ? null : B.farve(gg, "ovenfra");
+        /* Det, oejet moeder, er hvidt papir set GENNEM vaesken: lyset gaar
+           ned, rammer papiret og kommer op igen. Derfor tegnes vaesken som
+           et filter (Stof.gennem) og ikke som et halvgennemsigtigt lag
+           maling oven paa papiret - ellers bliver en fortyndet oploesning
+           mat og graalig i stedet for lysere i sin egen kuloer. */
+        var f = tom ? null : NK.Stof.gennem(B.samlet(gg), B.lysvej(gg, "ovenfra"));
         ctx.save();
         ctx.fillStyle = "rgba(20, 26, 34, 0.16)";
         ctx.beginPath();
@@ -187,7 +192,7 @@
             ctx.stroke();
             ctx.setLineDash([]);
         } else {
-            ctx.fillStyle = NK.css(f, f.a === undefined ? 1 : f.a);
+            ctx.fillStyle = NK.css(f, 1);
             ctx.fill();
             var u = gg ? NK.Stof.uklar(B.samlet(gg)) : 0;
             if (u > 0.01) {

@@ -1126,16 +1126,21 @@ function koerTest() {
     paastand("et skjult glas kan ikke rammes med musen",
         bord.hvad({ x: rSkjult.x + rSkjult.b / 2, y: rSkjult.y + rSkjult.h / 2 }) !== "glas1");
 
-    /* Par 1: frugtfarve, lige meget i begge. To portioner i hvert glas:
-       en sjat paa bunden har for kort en lysvej til at kunne ses ned i. */
-    bord.haeld(bord.g.fl_farve, baeg(1), 20);
+    /* Par 1: en portion frugtfarve fra stamflasken og vand op til. En
+       sjat paa bunden har for kort en lysvej til at kunne ses ned i, saa
+       der skal mindst 30 mL i hvert glas. */
+    function farveOgVand(gg, sjatter) {
+        bord.haeld(bord.g.fl_farve, gg, bord.portion(bord.g.fl_farve, gg));
+        faerdig();
+        for (var v = 0; v < sjatter; v++) { bord.sproejt(bord.g.vand, gg); faerdig(); }
+    }
+    bord.haeld(bord.g.fl_farve, baeg(1), bord.portion(bord.g.fl_farve, baeg(1)));
     faerdig();
-    paastand("ét glas med én portion er ikke et par endnu",
-        O.parMed("farve", bord) < 0 && !F.erGjort("farve"));
-    bord.haeld(bord.g.fl_farve, baeg(1), 20);
-    faerdig();
-    bord.haeld(bord.g.fl_farve, baeg(2), 40);
-    faerdig();
+    paastand("en portion frugtfarve alene er ikke et par endnu",
+        O.parMed("farve", bord) < 0 && !F.erGjort("farve"),
+        tal(B.volumen(baeg(1)), 0) + " mL");
+    for (var v1 = 0; v1 < 4; v1++) { bord.sproejt(bord.g.vand, baeg(1)); faerdig(); }
+    farveOgVand(baeg(2), 4);
     paastand("frugtfarve i begge glas i par 1 gjorde trinnet faerdigt",
         F.erGjort("farve") && O.parMed("farve", bord) === 0,
         Math.round(B.volumen(baeg(1))) + " mL og " + Math.round(B.volumen(baeg(2))) + " mL");
@@ -1143,9 +1148,10 @@ function koerTest() {
         O.fortyndet(O.par(bord, 0)) < 0 && !O.klar("farve", bord));
 
     /* Par 2: ligevaegtsblanding fra den samme kolbe */
-    bord.haeld(bord.g.kolbe, baeg(3), 50);
+    /* Par 2: ligevaegtsblanding fra baegerglasset med stamoploesning */
+    bord.haeld(bord.g.baeger, baeg(3), 44);
     faerdig();
-    bord.haeld(bord.g.kolbe, baeg(4), 50);
+    bord.haeld(bord.g.baeger, baeg(4), 44);
     faerdig();
     adv(6);
     paastand("ligevaegtsblanding i begge glas i par 2 gjorde trinnet faerdigt",
@@ -1157,7 +1163,7 @@ function koerTest() {
     function lysSide(n) { return NK.Vilkaar.lyshed(baeg(n)) * 255; }
     var foerFarve = lysSide(2), foerLv = lysSide(4);
     for (var sp2 = 0; sp2 < 4; sp2++) { bord.sproejt(bord.g.vand, baeg(2)); faerdig(); }
-    for (var sp4 = 0; sp4 < 5; sp4++) { bord.sproejt(bord.g.vand, baeg(4)); faerdig(); }
+    for (var sp4 = 0; sp4 < 4; sp4++) { bord.sproejt(bord.g.vand, baeg(4)); faerdig(); }
     adv(8);
     paastand("fortyndingen gjorde trinnet faerdigt", F.erGjort("vand") && O.beggeKlar(bord),
         [1,2,3,4].map(function (i) { return Math.round(B.volumen(baeg(i))); }).join(" / ") + " mL");
@@ -1187,6 +1193,33 @@ function koerTest() {
         " i lyshed - derfor skal der ses ovenfra");
 
     /* Facit regnes af verden, og journalen bedoemmer svaret */
+    /* Fortyndingen skal goere vaesken LYSERE, ikke MAT. Vaesken er et
+       filter: det, man ser paa hvidt papir, er papiret ganget med det lys,
+       der slipper igennem (Stof.gennem). Blev den blandet som et
+       halvgennemsigtigt lag maling oven paa papiret, ville vandets egen
+       blaa tone traekke kuloeren ud af enhver fortyndet oploesning. */
+    function kulor(gg) {
+        var f = NK.Stof.gennem(B.samlet(gg), B.lysvej(gg, "ovenfra"));
+        var r = f.r / 255, gr = f.g / 255, b = f.b / 255;
+        var mx = Math.max(r, gr, b), mn = Math.min(r, gr, b), d = mx - mn;
+        var h = 0;
+        if (d > 0) {
+            if (mx === r) h = ((gr - b) / d + (gr < b ? 6 : 0));
+            else if (mx === gr) h = (b - r) / d + 2;
+            else h = (r - gr) / d + 4;
+            h *= 60;
+        }
+        return { h: h, m: d / (mx || 1), l: (mx + mn) / 2 };
+    }
+    var kA = kulor(baeg(3)), kB = kulor(baeg(4));
+    paastand("ligevaegtsblandingen beholder sin kuloer, naar den fortyndes",
+        Math.abs(kA.h - kB.h) < 8, tal(kA.h, 0) + "° mod " + tal(kB.h, 0) + "°");
+    paastand("og den bliver lysere uden at gaa mod graat",
+        kB.l > kA.l + 0.03 && kB.m > kA.m * 0.6,
+        "lyshed " + tal(kA.l, 2) + " -> " + tal(kB.l, 2) + ", maetning " + tal(kA.m, 2) + " -> " + tal(kB.m, 2));
+    paastand("rent vand er ikke farvet, men heller ikke usynligt",
+        (function () { var v = NK.Stof.gennem(NK.Stof.lav({ V: 40, mM: {} }), 1); return v.b > v.r && v.r > 180; }()));
+
     paastand("facit for de to par er ens og lysere",
         O.facit("farve", bord) === "ens" && O.facit("lv", bord) === "lysere");
     NK.OVENFRA.noter("farve", "lysere", bord);

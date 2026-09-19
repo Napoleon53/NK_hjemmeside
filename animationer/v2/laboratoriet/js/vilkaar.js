@@ -82,12 +82,9 @@
        vaeskens dybde og kan vaere ganske kort (se NK.Udstyr.vejOvenfra).
        retning: "ovenfra" for kigget ned i glasset, ellers gennem siden. */
     function lyshed(gg, retning) {
-        var f = B.farve(gg, retning);
-        if (!f) return 1;
-        var a = f.a === undefined ? 1 : f.a;
-        return (0.2126 * (255 * (1 - a) + f.r * a) +
-                0.7152 * (255 * (1 - a) + f.g * a) +
-                0.0722 * (255 * (1 - a) + f.b * a)) / 255;
+        if (!gg || !gg.indhold) return 1;
+        var f = St.gennem(B.samlet(gg), B.lysvej(gg, retning));
+        return (0.2126 * f.r + 0.7152 * f.g + 0.0722 * f.b) / 255;
     }
 
     /* Et tal maales mod { over, under } - eller mod et bart tal, som

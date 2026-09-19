@@ -1593,6 +1593,12 @@
         }
     }
 
+    /* Hvor meget der skvulper ud af et aabent glas, der rystes for
+       voldsomt. En tiendedel: nok til et uheld og en pyt paa bordet, men
+       ikke nok til at forsoeget er tabt. Rystes der videre, sker det
+       igen. */
+    var SKVULP = 0.1;
+
     /* Et aabent glas blev rystet saa voldsomt, at indholdet sproejtede ud */
     P.spild = function (gg, slags) {
         this.holdt = null;
@@ -1605,12 +1611,14 @@
         var fo = B.farve(gg) || Stof.VAND;
         var farve = { r: fo.r, g: fo.g, b: fo.b, a: 0.85 };
         var a = B.aabning(gg);
-        sproejt(this, a.x, a.y, farve, 26);
-        this.nyPyt(gg.p.x, gg.type.maks < 30 ? 56 : 66, farve);
-        gg.spildtMaerker = Stof.faremaerker(B.samlet(gg));
-        B.toem(gg);
+        var V = B.volumen(gg);
+        var tabt = B.udtag(gg, V * SKVULP);
+        var del = V > 0 ? tabt.V / V : 0;
+        sproejt(this, a.x, a.y, farve, Math.max(8, Math.round(26 * (0.4 + del * 6))));
+        this.nyPyt(gg.p.x, (gg.type.maks < 30 ? 56 : 66) * NK.klamp(0.5 + del * 5, 0.5, 1), farve);
+        gg.spildtMaerker = Stof.faremaerker(tabt);
         this.koer.start([NK.Koer.hjemTil(gg, 0.6, 20)], "hjem");
-        this.uheld(slags || "spild", gg, "Det skvulpede ud. Indholdet er tabt.");
+        this.uheld(slags || "spild", gg, "Det skvulpede ud. En tiendedel røg på bordet.");
     };
 
     /* Massen af det, der staar paa vaegten (glas og indhold) */
@@ -2259,7 +2267,7 @@
             NK.Sprites.tegnPositur(ctx, t.sprite, gg.p, gg.anker, undefined, gg.skala);
             T.tegnEtiket(ctx, gg);
         }
-        if (this.markeret(gg.navn)) T.tegnMarkering(ctx, this.rekt(gg, 0), tid);
+        if (this.markeret(gg.navn)) T.tegnMarkering(ctx, this.rekt(gg, 0), tid, undefined, gg);
     };
 
     P.tegn = function (udenRyd) {
@@ -2304,7 +2312,7 @@
                 if (py) T.tegnSlipMaal(ctx, { x: py.x - py.rx, y: (py.y || S.BORD) - 8, b: py.rx * 2, h: 14 }, tid);
             } else {
                 var m = this.g[this.slipMaal];
-                if (m) T.tegnSlipMaal(ctx, this.rekt(m, 0), tid);
+                if (m) T.tegnSlipMaal(ctx, this.rekt(m, 0), tid, m);
             }
         }
 
