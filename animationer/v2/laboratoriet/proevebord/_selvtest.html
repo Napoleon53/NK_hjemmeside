@@ -879,6 +879,31 @@ function koerTest() {
     paastand("og man rammer ham ikke under gulvet med musen",
         bord.overLaerer({ x: Lg.x, y: gulv + 30 }) === null && bord.overLaerer({ x: Lg.x, y: gulv - 30 }) === "laerer");
     frisk();
+
+    overskrift("14. Klik som genvej (M16)");
+    function faerdig14() { for (var k = 0; k < 200 && bord.koer.igang(); k++) adv(0.25); adv(0.5); }
+    bord.klik("fl_ki");
+    paastand("et klik paa en flaske goer den klar", bord.klar === "fl_ki" && bord.valgtBeholder() === g.fl_ki);
+    bord.klik("glas1");
+    faerdig14();
+    paastand("og et klik paa glas 1 haelder én portion i det", Math.abs(V(g.glas1) - bord.portion(g.fl_ki, g.glas1)) < 0.05, V(g.glas1).toFixed(2) + " mL");
+    var v14 = V(g.glas1);
+    bord.klik("glas1"); bord.klik("glas2");
+    faerdig14();
+    paastand("et glas og saa et andet: der haeldes ikke", Math.abs(V(g.glas1) - v14) < 1e-9 && V(g.glas2) < 1e-9 && bord.valgtBeholder() === g.glas2);
+    bord.klik("spatel"); bord.klik("pulver_nacl");
+    faerdig14();
+    paastand("spatlen og saa et pulverglas: en spatelspids", !!g.spatel.last);
+    bord.klik("spatel"); bord.klik("baegerStor");
+    faerdig14();
+    paastand("spatlen og saa baegerglasset: den lander dér", !g.spatel.last && B.fastIalt(g.baegerStor) + (B.samlet(g.baegerStor).n["Na+"] || 0) > 1);
+    bord.klik("glas1"); bord.klik("dunk");
+    faerdig14();
+    paastand("glas 1 og saa affaldet: det toemmes", V(g.glas1) < 0.01);
+    bord.klik("fl_ki"); bord.klik("plade");
+    paastand("varmepladen er ikke et maal: klikket taender den bare", g.plade.taendt && !bord.klar);
+    bord.klik("plade");
+    frisk();
 }
 
 function vis() {

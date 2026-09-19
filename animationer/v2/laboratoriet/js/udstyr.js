@@ -22,6 +22,12 @@
                          vask       tager imod alt, der haeldes i
                          papir      toerrer pytter op
                          fast       kan ikke tages op (staar fast paa bordet)
+     kilde             en beholder, man haelder FRA (kolben, maaleglasset,
+                       vejebaaden - flasker er det altid). Klik som genvej
+                       (M16) haelder kun fra en kilde i et andet glas; et
+                       glas, man kigger i, flyttes kun med klik
+     intetkoen         navnet er intetkoen (glasset, termometeret): saa
+                       siger beskeder »det« og ikke »den«
      indre             indersiden som polygon i spritets koordinater
      mlPrAreal         areal i tegneenheder pr. mL. UDLEDES af indersiden og
                        maks, saa vaesken staar praecis til kanten, naar
@@ -101,7 +107,7 @@
         reagensglas: {
             sprite: "reagensglas", fil: "reagensglas.svg", b: 30, h: 160,
             anker: { x: 15, y: 2 }, traefBund: 24,
-            kan: { holder: true, haelder: true },
+            kan: { holder: true, haelder: true }, intetkoen: true,
             indre: GLAS_INDRE, maks: 30, haeldMl: 0,
             tud: { x: 4, y: 3, v: -2.0 },
             vejlaengde: 1, titel: "reagensglasset",
@@ -116,7 +122,7 @@
             sprite: "baegerLille", fil: "baegerglas_100.svg", b: 72, h: 110,
             anker: { x: 36, y: 4 },
             streger: { hver: 50, smaa: 25, lang: 12, kort: 7, luft: 4, str: 6, navn: { x: 30, y: 99, str: 5.6 } },
-            kan: { holder: true, haelder: true },
+            kan: { holder: true, haelder: true }, intetkoen: true,
             indre: BAEGER_LILLE_INDRE, maks: 250, haeldMl: 20,
             tud: { x: 1, y: 3.5, v: -1.15 },
             vejlaengde: 2, titel: "bægerglasset", valgtMaerke: { x: 60, y: -8 },
@@ -133,7 +139,7 @@
             sprite: "baegerStor", fil: "baegerglas.svg", b: 112, h: 132,
             anker: { x: 56, y: 6 },
             streger: STREGER_STOR,
-            kan: { holder: true, haelder: true },
+            kan: { holder: true, haelder: true }, intetkoen: true,
             indre: BAEGER_STOR_INDRE, maks: 600, haeldMl: 25,
             tud: { x: 3, y: 6, v: -1.1 },
             vejlaengde: 3, titel: "det store bægerglas", valgtMaerke: { x: 96, y: -8 },
@@ -177,7 +183,7 @@
             sprite: "kolbe", fil: "kolbe.svg", b: 96, h: 128,
             anker: { x: 48, y: 2.5 },
             streger: { hver: 50, lang: 7.7, x: 41, str: 5.1, tekst: "hoejre", bred: 0.9, navn: { x: 48, y: 119, str: 4.8 } },
-            kan: { holder: true, haelder: true },
+            kan: { holder: true, haelder: true }, kilde: true,
             indre: KOLBE_INDRE, maks: 200, haeldMl: 40,
             tud: { x: 40, y: 3, v: -1.95 },
             vejlaengde: 3, titel: "kolben",
@@ -196,7 +202,7 @@
             sprite: "maaleglas", fil: "maaleglas.svg", b: 44, h: 220,
             anker: { x: 22, y: 4 },
             streger: { hver: 20, smaa: 10, til: 100, nominel: 100, lang: 12, kort: 8, luft: 4, str: 4.6, bred: 0.8, navn: { x: 22, y: 196, str: 4.4 } },
-            kan: { holder: true, haelder: true },
+            kan: { holder: true, haelder: true }, kilde: true, intetkoen: true,
             indre: MAALEGLAS_INDRE, maks: 110, haeldMl: 10,
             tud: { x: 2, y: 3.5, v: -1.3 },
             vejlaengde: 1.3, titel: "måleglasset",
@@ -242,7 +248,7 @@
         pulverglas: {
             sprite: "pulverglas", fil: "pulverglas.svg", b: 38, h: 52,
             anker: { x: 19, y: 4 },
-            kan: { holder: true, pulver: true },
+            kan: { holder: true, pulver: true }, intetkoen: true,
             vindue: true,
             indre: PULVER_INDRE, mlPrAreal: 20, maks: 30, haeldMl: 0,
             vejlaengde: 1, titel: "pulverglasset",
@@ -263,7 +269,7 @@
         termometer: {
             sprite: null, b: 14, h: 120,
             anker: { x: 0, y: 0 },
-            kan: { maaler: true },
+            kan: { maaler: true }, intetkoen: true,
             laengde: 120, titel: "termometeret"
         },
         stativ: {
@@ -310,7 +316,7 @@
         vejebaad: {
             sprite: "vejebaad", fil: "vejebaad.svg", b: 64, h: 14,
             anker: { x: 32, y: 2 },
-            kan: { holder: true, haelder: true },
+            kan: { holder: true, haelder: true }, kilde: true,
             /* Vejebaaden er en rektangulaer skaal, ikke et omdrejningslegeme */
             rund: false,
             indre: pts([[4, 3], [60, 3], [58, 12], [6, 12]]), mlPrAreal: 100, maks: 4, haeldMl: 0,
@@ -333,7 +339,7 @@
         phmeter: {
             sprite: null, b: 16, h: 100,
             anker: { x: 0, y: 0 },
-            kan: { maaler: true, ph: true },
+            kan: { maaler: true, ph: true }, intetkoen: true,
             laengde: 100, titel: "pH-meteret"
         },
         /* Lugen: et gennemraekningsskab mellem to rum. Det, der stilles paa

@@ -2047,6 +2047,96 @@ function koerTest() {
 
     NK.startForfra();
     adv(1);
+
+    overskrift("28. Klik som genvej: hele del 1 med klik alene (M16)");
+    /* Klik paa det, der skal bruges, og saa paa maalet: det samme som et
+       traek og slip. Rigtige pointer-haendelser gennem laerredet. */
+    NK.startForfra();
+    adv(0.5);
+    var b28 = [], vb28 = bord.vedBesked;
+    bord.vedBesked = function (t, s) { b28.push(t); if (vb28) vb28.call(bord, t, s); };
+    function sidst28() { return b28[b28.length - 1] || ""; }
+    /* Reagensglassene klikkes forneden, saa en kolbe, der svaever over
+       naboglasset, ikke kommer i vejen; alt andet midt paa */
+    function nede(navn) { var gg = bord.g[navn], r = bord.rekt(gg, 0); return { x: r.x + r.b / 2, y: r.y + r.h * (gg.type.navn === "reagensglas" ? 0.8 : 0.5) }; }
+    function klikKlik(a, b) { mus.klik(nede(a)); mus.hold(0.1); mus.klik(nede(b)); faerdig(); }
+    var uh28 = bord.antalUheld;
+
+    mus.klik(nede("kolbe"));
+    paastand("et klik paa kolben vaelger den og goer den klar", bord.valgtBeholder() === bord.g.kolbe && bord.klar === "kolbe" && sidst28().indexOf("Klik der, hvor den skal hen") > 0, sidst28());
+    mus.til(nede("glas3"), 0.3);
+    paastand("musen over et glas giver det den groenne ramme", bord.genvejMaal === "glas3", bord.genvejMaal);
+    mus.klik(nede("glas1"));
+    faerdig();
+    paastand("og et klik paa glas 1 haelder én portion i det", Math.abs(B.volumen(g(1)) - PORTION) < 0.05 && !bord.klar, tal(B.volumen(g(1)), 1) + " mL");
+    [2, 3, 4, 5, 6, 7].forEach(function (n) { klikKlik("kolbe", "glas" + n); });
+    paastand("klik, klik seks gange mere: alle syv glas har 4 mL, og trinnet er gjort",
+        [1, 2, 3, 4, 5, 6, 7].every(function (n) { return Math.abs(B.volumen(g(n)) - PORTION) < 0.05; }) && F.erGjort("fyld"),
+        [1, 2, 3, 4, 5, 6, 7].map(function (n) { return tal(B.volumen(g(n)), 1); }).join(" "));
+
+    /* Et glas, man kigger i, haeldes ikke i et andet med klik */
+    var v1 = B.volumen(g(1)), v2 = B.volumen(g(2));
+    mus.klik(nede("glas1"));
+    mus.hold(0.1);
+    mus.klik(nede("glas2"));
+    faerdig();
+    paastand("glas 1 og saa glas 2: der haeldes ikke, glas 2 bliver bare valgt",
+        Math.abs(B.volumen(g(1)) - v1) < 1e-9 && Math.abs(B.volumen(g(2)) - v2) < 1e-9 && bord.valgtBeholder() === g(2));
+    bord.klar = null;
+
+    /* Spatlen: pulverglasset, saa glasset */
+    klikKlik("spatel", "pulver_fe");
+    paastand("spatlen og saa pulverglasset: den tager en spatelspids", !!bord.g.spatel.last && bord.g.spatel.last.umol === 8);
+    mus.klik(nede("spatel"));
+    paastand("et klik paa den fulde spatel goer den klar", bord.klar === "spatel" && sidst28().indexOf("Spatlen er fuld") === 0, sidst28());
+    mus.klik(nede("glas1"));
+    faerdig();
+    klikKlik("spatel", "pulver_asc"); klikKlik("spatel", "glas2");
+    klikKlik("spatel", "pulver_kscn"); klikKlik("spatel", "glas3");
+    adv(20);
+    paastand("glas 1, 2 og 3 har faaet hver sin spatelspids, og trinnene er gjort",
+        F.erGjort("glas1") && F.erGjort("glas2") && F.erGjort("glas3") && !bord.g.spatel.last);
+
+    /* Draabeflasken over 4b, to gange */
+    klikKlik("ag", "glas4"); klikKlik("ag", "glas4");
+    adv(20);
+    paastand("draabeflasken og saa glas 4b, to gange: to draaber og trinnet er gjort",
+        Math.abs((B.samlet(g(4)).n["AgSCN(s)"] || 0) + (B.samlet(g(4)).n["Ag+"] || 0) - 10) < 0.3 && F.erGjort("glas4"),
+        tal((B.samlet(g(4)).n["AgSCN(s)"] || 0) + (B.samlet(g(4)).n["Ag+"] || 0), 1) + " µmol sølv i glasset");
+
+    /* Glassene i badene, termometeret i glas 5 */
+    klikKlik("glas5", "vandbad");
+    klikKlik("glas6", "isbad");
+    paastand("glas 5 og saa vandbadet, glas 6 og saa isbadet: de staar i badene",
+        g(5).paa === bord.g.vandbad && g(6).paa === bord.g.isbad && !g(5).sted && !g(6).sted);
+    klikKlik("termometer", "glas5");
+    paastand("termometeret og saa glas 5: det sidder i glasset", bord.g.termometer.i === g(5));
+
+    /* Fortryd og det, der ikke er maal */
+    mus.klik(nede("kolbe"));
+    mus.klik(nede("kolbe"));
+    paastand("et klik paa kolben igen fortryder", !bord.klar && sidst28() === "Fortrudt.", sidst28());
+    mus.klik(nede("kolbe"));
+    mus.klik({ x: 1000, y: 120 });
+    paastand("et klik ved siden af fortryder", !bord.klar);
+    mus.klik(nede("kolbe"));
+    d.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    paastand("Esc fortryder", !bord.klar);
+    var taendt0 = bord.g.plade.taendt, kolbeP = { x: bord.g.kolbe.p.x, y: bord.g.kolbe.p.y };
+    mus.klik(nede("kolbe"));
+    mus.klik(nede("plade"));
+    faerdig();
+    paastand("med kolben klar taender et klik paa varmepladen den bare",
+        bord.g.plade.taendt !== taendt0 && Math.abs(bord.g.kolbe.p.x - kolbeP.x) < 1 && !bord.klar);
+
+    /* Oprydningen: glas og saa affaldet */
+    klikKlik("glas1", "dunk");
+    paastand("glas 1 og saa affaldet: det tømmes", B.volumen(g(1)) < 0.01);
+    paastand("og ingen uheld undervejs", bord.antalUheld === uh28, bord.antalUheld - uh28 + " uheld");
+    bord.vedBesked = vb28;
+
+    NK.startForfra();
+    adv(1);
 }
 
 function vis() {

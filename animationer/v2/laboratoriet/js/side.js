@@ -578,6 +578,7 @@
         if (e.key === "Escape") {
             var b = this.bord();
             this.skiftNoter(false);
+            if (b) { b.klar = null; b.genvejMaal = null; }
             if (b && b.lukStorBoble) b.lukStorBoble();
             this.lukOverlay();
             NK.Rundvisning.luk();

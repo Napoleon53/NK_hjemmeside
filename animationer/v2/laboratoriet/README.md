@@ -631,8 +631,19 @@ portioner giver det samme som på én gang. Lige dele koncentreret svovlsyre
 og vand koger stadig; det er rigtigt.
 
 Klik viser, træk gør: et klik vælger det, der rummer noget, til aflæsning
-og zoom, og handlinger sker kun ved at trække. Undtagelser er kontakten på
-varmepladen og en dråbeflaske, der allerede hænger over et glas. Zoomboblen
+og zoom. Undtagelser er kontakten på varmepladen, vægten og lugen.
+**Klik som genvej (M16, beslutningen i M11):** det første klik gør også
+genstanden klar (`bord.klar`), hvis der er noget, den kan bruges på, og et
+klik på et mål, der kan tage imod (`genvejTil`), udfører det samme som et
+træk og slip over målet (`genvej` → `moede`). Til stativet og et bad
+flyver genstanden først derop. Et glas, man kigger i, hældes ikke i et
+andet glas med klik — det gør kun en kilde (flasker, kolben, måleglasset,
+vejebåden; `kilde` på typen eller posten) og værktøj — men det kan flyttes
+i stativet, i et bad og i affaldet med klik. Varmepladen, vægten og lugen
+er ikke mål. Mens noget er klar, pulserer det (et glas har sin gule
+ramme), og målet under musen får den grønne ramme (`genvejMaal`). Et klik
+på det samme igen, ved siden af, et træk eller Esc fortryder. `intetkoen`
+på typen styrer, om beskeden siger »den« eller »det«. Zoomboblen
 tegnes i panelet (`NK.Bord.prototype.tegnBoble`), eller på scenen i
 laboratoriets hjørne, når bordet er sat op med `boble: { x, y }` (sb2.4).
 Boblen på scenen har en lup på kanten: et klik på den viser den stor midt

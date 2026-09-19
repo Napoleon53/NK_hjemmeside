@@ -191,6 +191,8 @@
         this.storAlfa = 0;
         this.hover = null;
         this.slipMaal = null;
+        this.klar = null;         /* det, et klik har gjort klar til genvejen (M16) */
+        this.genvejMaal = null;   /* det maal, musen er over, mens noget er klar */
         this.haeldning = null;
         this.valgt = null;
         this.mark = null;
@@ -535,7 +537,7 @@
     P.ned = function (pt) {
         if (NK.Lyd) NK.Lyd.laasOp();
         var navn = this.hvad(pt);
-        if (!navn) return false;
+        if (!navn) { if (this.klar) { this.klar = null; this.genvejMaal = null; } return false; }
         if (navn === "boble" || navn === "svaevring") { this.klik(navn); return false; }
         var laererOpt = this.laererOptaget && this.laererOptaget();
         if (!laererOpt && !this.koer.optaget() && !this.baerer && this.grebbar(navn)) {
@@ -550,7 +552,11 @@
 
     P.flyt = function (pt, nu) {
         var h = this.holdt;
-        if (!h) { this.hover = this.hvad(pt); return; }
+        if (!h) {
+            this.hover = this.hvad(pt);
+            this.genvejMaal = this.klar && this.hover && this.genvejTil(this.g[this.klar], this.g[this.hover]) ? this.hover : null;
+            return;
+        }
         var gg = this.g[h.navn];
         if (nu === undefined) nu = Date.now();
         if (!h.flyttet) {
@@ -559,6 +565,8 @@
             h.sidst = pt;
             h.t = nu;
             this.rystes = null;
+            this.klar = null;
+            this.genvejMaal = null;
             /* F35: tager man fat i noget andet, stilles det, der svaever,
                ned paa det naermeste ledige sted paa bordet - det maa aldrig
                spaerre for det naeste */
@@ -1665,7 +1673,7 @@
         var c = this.valgtBeholder();
         if (this.rystes && this.rystes === c) { if (sek) this.rystSlut = this.rystUr + sek; return true; }
         if (!c) { this.besked("Klik på et glas for at vælge det."); return false; }
-        if (!this.kanRystes(c)) { this.besked(c.titel.charAt(0).toUpperCase() + c.titel.slice(1) + " skal ikke rystes."); return false; }
+        if (!this.kanRystes(c)) { this.besked(stor(c.titel) + " skal ikke rystes."); return false; }
         if (this.holdt || this.koer.optaget()) return false;
         this.rystes = c;
         this.rystUr = 0;
@@ -1711,6 +1719,7 @@
         if (this.laererOptaget && this.laererOptaget()) return false;
         if (this.baerer) return false;
         if (navn === "svaevring") {
+            this.klar = null;
             var sv = this.svaevende();
             if (!sv || this.koer.optaget() || !this.kanGentage(sv)) return false;
             if (sv.kan.spatel) return this.hentOgGiv(sv, sv.svaev.maal);
@@ -1719,6 +1728,14 @@
         var gg = this.g[navn];
         if (!gg || !this.synlig(gg)) return false;
         var k = gg.kan;
+        /* M16: det, der er gjort klar, bruges paa det, der klikkes paa */
+        if (this.klar) {
+            var kl = this.g[this.klar];
+            this.klar = null;
+            this.genvejMaal = null;
+            if (kl === gg) { this.besked("Fortrudt."); return false; }
+            if (kl && !this.koer.optaget() && this.genvejTil(kl, gg)) return this.genvej(kl, gg);
+        }
         if (k.varmer) {
             if (this.koer.optaget()) return false;
             gg.taendt = !gg.taendt;
@@ -1745,23 +1762,100 @@
         /* Det, der svaever, gentager kun med pilen; et klik paa selve
            flasken siger, hvordan man faar mere, eller at den skal traekkes
            vaek */
+        var pron = gg.type.intetkoen ? "det" : "den";
         if (gg.svaev) {
-            if (!this.kanGentage(gg)) this.besked(k.spatel && gg.last ? "Spatlen er fuld. Træk den hen over et glas." : "Træk " + gg.titel + " væk.");
-            else this.besked("Klik på pilen " + pilenGiver(gg).besked + ", eller træk " + gg.titel + " væk.");
+            var klarSv = this.goerKlar(gg);
+            if (!this.kanGentage(gg)) this.besked(k.spatel && gg.last ? "Spatlen er fuld. Klik på et glas, eller træk den derhen." : "Træk " + gg.titel + " væk" + (klarSv ? ", eller klik der, hvor " + pron + " skal hen." : "."));
+            else this.besked("Klik på pilen " + pilenGiver(gg).besked + (klarSv ? ", på et andet glas" : "") + ", eller træk " + gg.titel + " væk.");
             return false;
         }
         if (k.holder) {
             this.vaelg(navn);
-            this.besked(gg.titel.charAt(0).toUpperCase() + gg.titel.slice(1) + " er valgt. Tag fat i udstyret for at bruge det.");
+            var klarH = !k.pulver && this.goerKlar(gg);
+            this.besked(stor(gg.titel) + " er valgt. " + (klarH ? "Klik der, hvor " + pron + " skal hen, eller træk " + pron + "." : "Tag fat i udstyret for at bruge det."));
             return true;
         }
-        if (k.spatel) this.besked(gg.last ? "Slip spatlen over et glas." : "Slip spatlen over et pulverglas for at tage en spatelspids.");
+        var klarV = this.goerKlar(gg);
+        if (k.spatel) this.besked(gg.last ? "Klik på det glas, spatelspidsen skal i, eller træk spatlen derhen." : "Klik på et pulverglas for at tage en spatelspids, eller træk spatlen derhen.");
+        else if ((k.roerer || k.maaler) && klarV) this.besked("Klik på det glas, " + gg.titel + " skal i, eller træk " + pron + " derhen.");
         else if (k.roerer || k.maaler) this.besked("Slip " + gg.titel + " over et glas.");
         else if (k.papir) this.besked("Slip køkkenrullen over en pyt.");
         else if (k.stoette) this.besked("Slip et reagensglas over stativet.");
         else if (k.luge) this.besked("Stil noget i lugen, og klik på knappen for at sende det.");
         else if (k.affald || k.vask) this.besked("Slip et glas over " + gg.titel + " for at tømme det.");
         return false;
+    };
+
+    /* ----- Klik som genvej (M16) -------------------------------------------
+       Klik viser, traek goer - og et klik paa det, der skal bruges, og saa
+       paa maalet goer det samme som et traek og slip over maalet (M11).
+       Foerste klik vaelger som foer og goer genstanden klar (this.klar);
+       andet klik paa et maal, der kan tage imod, udfoerer handlingen
+       gennem moede, og et klik paa noget, der ikke kan, vaelger bare det i
+       stedet. Et klik paa det klare igen, et traek, et klik ved siden af
+       eller Esc fortryder. Mens noget er klar, faar det maal, musen er
+       over, den groenne ramme (genvejMaal).
+       Et glas, man kigger i, haeldes ikke i et andet glas med klik - det
+       goer kun en kilde (flasker, kolben, maaleglasset, vejebaaden,
+       udstyrets `kilde`) og vaerktoej. Et glas kan flyttes med klik: i
+       stativet, i et bad og i affaldet. Varmepladen, vaegten og lugen er
+       ikke maal: et klik paa dem goer det, det altid har gjort. */
+    function kilde(gg) {
+        var k = gg.kan;
+        return !k.holder || !!k.flaske || !!k.drypper || !!k.sproejter || !!gg.type.kilde || !!(gg.spec && gg.spec.kilde);
+    }
+
+    function stor(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
+
+    P.genvejTil = function (kl, c) {
+        if (!kl || !c || kl === c || !this.synlig(kl) || !this.synlig(c)) return false;
+        var m = c.kan;
+        if (m.varmer || m.vaegt || m.luge || m.flamme && !kl.kan.dypper) return false;
+        if (kl.sted && kl.sted.stativ === c) return false;
+        if (kl.paa === c) return false;
+        if (!this.kanModtage(kl, c)) return false;
+        if (m.holder && !m.pulver && !kilde(kl) && !(m.bad && kl.type.navn === "reagensglas")) return false;
+        return true;
+    };
+
+    /* Goer gg klar, hvis der er noget, den kan bruges paa med et klik */
+    P.goerKlar = function (gg) {
+        var mig = this;
+        this.klar = null;
+        if (!this.grebbar(gg.navn) || (this.laererOptaget && this.laererOptaget())) return false;
+        var noget = this.liste.some(function (c) { return mig.genvejTil(gg, c); });
+        if (noget) this.klar = gg.navn;
+        return noget;
+    };
+
+    /* Udfoer genvejen: kl bruges paa c, som om den var trukket derhen og
+       sluppet. Til stativet og et bad flyver den foerst derop, saa den ikke
+       glider gennem det, der staar imellem; alt andet flyver moede selv. */
+    P.genvej = function (kl, c) {
+        var mig = this, m = c.kan;
+        var sv = this.svaevende();
+        if (sv && sv !== kl) this.stilSvaevendeNed();
+        this.genvejMaal = null;
+        if (!(m.stoette || m.bad)) return this.genvejSlip(kl, c, null);
+        var r = this.rekt(c, 0), t = kl.type, x;
+        if (m.stoette) { var hul = this.ledigtHul(c); x = hul >= 0 ? this.hulX(c, hul) : r.x + r.b / 2; }
+        else { var px = this.ledigPlads(c); x = px === null ? r.x + r.b / 2 : px; }
+        var til = { x: x - t.b / 2 + kl.anker.x, y: r.y - 16 - (t.h - kl.anker.y), v: 0 };
+        this.koer.start([
+            { flyt: kl, til: til, tid: 0.6, loeft: 30 },
+            { kald: function () { mig.genvejSlip(kl, c, { x: x, y: r.y }); } }
+        ], "genvej");
+        return true;
+    };
+
+    P.genvejSlip = function (kl, c, pt) {
+        this.startBaer(kl);
+        this.baerer = null;
+        this.baerAnker = null;
+        var ok = this.synlig(c) && this.kanModtage(kl, c) && this.moede(kl, c, pt);
+        if (!ok) this.koer.start([NK.Koer.hjemTil(kl, 0.6, 30)], "hjem");
+        this.aendret("genvej");
+        return !!ok;
     };
 
     P.foersteMed = function (egenskab) {
@@ -2531,6 +2625,12 @@
             if (gg === mig.baerer || (gg.i && gg.i === mig.baerer)) { sidst.push(gg); return; }
             mig.tegnGenstand(ctx, gg, tid);
         });
+
+        /* M16: det, der er klar, pulserer (et glas har allerede sin gule
+           ramme), og maalet under musen faar den groenne */
+        var kl = this.klar ? this.g[this.klar] : null;
+        if (kl && this.synlig(kl) && !kl.kan.holder && !this.markeret(kl.navn)) T.tegnMarkering(ctx, this.rekt(kl, 0), tid, undefined, kl);
+        if (kl && this.genvejMaal && this.g[this.genvejMaal]) T.tegnSlipMaal(ctx, this.rekt(this.g[this.genvejMaal], 0), tid, this.g[this.genvejMaal]);
 
         if (this.slipMaal) {
             if (this.slipMaal.indexOf("pyt:") === 0) {

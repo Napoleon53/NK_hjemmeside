@@ -401,6 +401,13 @@ NO₃⁻ knapper: et klik løfter ionen op i tabellen og boblen for hele
 forsøget (den står så som »↑ NO₃⁻«), et klik mere sætter den ned, og
 Start forfra sætter alle ned. Fluebenet viser dem alle på én gang.
 
+**Klik som genvej (M16).** Alt i del 1 og del 2 kan gøres med klik:
+klik på kolben og så på glasset, så hælder den én portion; spatlen og så
+pulverglasset, så glasset; dråbeflasken og så 4b; glas 5 og så vandbadet;
+et glas og så affaldet. Træk virker som før. Et klik på et glas og så på
+et andet hælder ikke — så vælges bare det andet. Selvtestens afsnit 28
+gør hele del 1 med klik alene.
+
 **Ryst glasset (S16).** Når et glas er valgt, står knappen »Ryst glasset«
 i panelet. Holdes den nede (eller tasten <kbd>R</kbd>), rystes glasset,
 hvor det står, så det, der ligger i bunden, blandes op, og det spilder
