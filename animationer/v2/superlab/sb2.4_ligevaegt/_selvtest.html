@@ -1957,6 +1957,96 @@ function koerTest() {
 
     NK.startForfra();
     adv(1);
+
+    overskrift("27. Paritet med den gamle sb2.4 (S16)");
+    /* Ryst glasset: knappen og tasten R ryster det valgte glas, hvor det
+       staar. Det blander det, der ligger i bunden, og spilder aldrig. */
+    NK.startForfra();
+    adv(0.5);
+    [1, 3].forEach(function (n) { B.haeldI(g(n), B.udtag(bord.g.kolbe, PORTION), true); });
+    adv(2);
+    B.tilsaetFast(g(1), "Fe(NO3)3(s)", 8);
+    B.tilsaetFast(g(3), "Fe(NO3)3(s)", 8);
+    var rk = d.getElementById("rystknap");
+    var b27 = [], vb27 = bord.vedBesked;
+    bord.vedBesked = function (t, s) { b27.push(t); if (vb27) vb27.call(bord, t, s); };
+    bord.vaelg(null);
+    side.opdaterPanel();
+    paastand("knappen »Ryst glasset« er skjult, naar intet glas er valgt", !!rk && rk.hidden);
+    d.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "r", bubbles: true }));
+    paastand("R uden et valgt glas siger, hvad man goer", !bord.rystes && (b27[b27.length - 1] || "").indexOf("Klik på et glas") === 0, b27.join(" | "));
+    d.dispatchEvent(new vin.KeyboardEvent("keyup", { key: "r", bubbles: true }));
+    bord.vaelg("glas1");
+    side.opdaterPanel();
+    paastand("med glas 1 valgt vises knappen", !rk.hidden);
+    var p1 = { x: g(1).p.x, y: g(1).p.y }, V1 = B.volumen(g(1)), uh0 = bord.antalUheld, py0 = bord.pytter.length;
+    d.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "R", bubbles: true }));
+    paastand("hold R: glas 1 rystes", bord.rystes === g(1));
+    adv(1.5);
+    d.dispatchEvent(new vin.KeyboardEvent("keyup", { key: "R", bubbles: true }));
+    adv(0.2);
+    paastand("slip R: det holder op", !bord.rystes);
+    var lag1 = g(1).lag ? g(1).lag.V : 0, lag3 = g(3).lag ? g(3).lag.V : 0;
+    paastand("det rystede glas blandes meget hurtigere op end det urystede", lag3 > 1 && lag1 < 0.5 * lag3,
+        "laget i bunden: glas 1 " + tal(lag1) + " mL, glas 3 " + tal(lag3) + " mL");
+    paastand("og intet er spildt: samme rumfang, ingen pytter, intet uheld, glasset staar, hvor det stod",
+        Math.abs(B.volumen(g(1)) - V1) < 1e-6 && bord.pytter.length === py0 && bord.antalUheld === uh0 &&
+        Math.abs(g(1).p.x - p1.x) < 1e-6 && Math.abs(g(1).p.y - p1.y) < 1e-6);
+    rk.dispatchEvent(new vin.PointerEvent("pointerdown", { bubbles: true, pointerId: 1 }));
+    paastand("knappen ryster ogsaa, saa laenge den holdes", bord.rystes === g(1));
+    rk.dispatchEvent(new vin.PointerEvent("pointerup", { bubbles: true, pointerId: 1 }));
+    paastand("og holder op, naar den slippes", !bord.rystes);
+    rk.dispatchEvent(new vin.MouseEvent("click", { bubbles: true, detail: 0 }));
+    adv(0.5);
+    var tastRyst = bord.rystes === g(1);
+    adv(1);
+    paastand("Enter paa knappen ryster et sekund", tastRyst && !bord.rystes);
+    bord.vaelg("kolbe");
+    paastand("flasker paa hylden rystes ikke", !bord.kanRystes(bord.g.fl_kscn) && !bord.kanRystes(bord.g.vandbad) && bord.kanRystes(bord.g.kolbe));
+
+    /* Kolben i affaldet: Kemichael fylder den igen */
+    bord.vaelg(null);
+    var kolbeV = B.volumen(bord.g.kolbe);
+    bord.toemI(bord.g.kolbe, bord.g.dunk);
+    faerdig();
+    var kolbeTom = B.volumen(bord.g.kolbe);
+    for (var kk = 0; kk < 40 && B.volumen(bord.g.kolbe) < 100; kk++) adv(1);
+    paastand("kolben i affaldet: Kemichael fylder den igen (150 mL)", kolbeTom < 0.5 && Math.abs(B.volumen(bord.g.kolbe) - 150) < 0.5,
+        tal(kolbeV, 0) + " -> " + tal(kolbeTom, 0) + " -> " + tal(B.volumen(bord.g.kolbe), 0) + " mL");
+    bord.vedBesked = vb27;
+
+    /* Termometeret med musen */
+    NK.startForfra();
+    adv(0.5);
+    for (var gi = 1; gi <= 7; gi++) B.haeldI(g(gi), B.udtag(bord.g.kolbe, PORTION), true);
+    adv(2);
+    g(5).indhold.T = 60;
+    var tm = bord.g.termometer, rk5 = bord.rekt(g(5), 0);
+    paastand("termometeret kan tages med musen", mus.tag("termometer"));
+    mus.til({ x: g(5).p.x, y: rk5.y + 10 }, 0.8);
+    mus.slip();
+    mus.hold(4);
+    paastand("sluppet over glas 5 sidder det i glasset og viser dets temperatur", tm.i === g(5) && Math.abs(tm.T - B.samlet(g(5)).T) < 2,
+        (tm.i ? tm.i.navn : "intet") + ", " + tal(tm.T, 1) + " mod " + tal(B.samlet(g(5)).T, 1) + " grader");
+
+    /* Billedet med musen, og temperaturen i resultatskemaet */
+    var T5 = B.samlet(g(5)).T;
+    d.getElementById("billedknap").click();
+    paastand("knappen »Tag billede« aabner billedet", d.getElementById("billede").classList.contains("vis"));
+    ["glas1", "glas2", "glas3", "glas4", "glas5", "glas6"].forEach(function (n) {
+        var k = d.querySelector('.billede-valg[data-glas="' + n + '"][data-valg="' + NK.BILLEDE.facit(n, bord) + '"]');
+        if (k) k.click();
+    });
+    adv(1);
+    var Jb = NK.Journal.find("billede");
+    paastand("seks klik noterer alle seks glas rigtigt", Jb.faerdig() && Jb.antalRigtige() === 6, Jb.antalRigtige() + " rigtige");
+    paastand("temperaturen, glas 5 havde, gemmes til resultatskemaet", !!Jb.billede("glas5") && Math.abs(Jb.billede("glas5").opl.T - T5) < 1,
+        Jb.billede("glas5") ? tal(Jb.billede("glas5").opl.T, 1) + " grader" : "intet billede");
+    d.getElementById("billede-luk").click();
+    paastand("og »Luk« lukker det", !d.getElementById("billede").classList.contains("vis"));
+
+    NK.startForfra();
+    adv(1);
 }
 
 function vis() {

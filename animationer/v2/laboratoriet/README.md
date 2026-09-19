@@ -536,7 +536,10 @@ fast stof; `underlag` i `BORD_VALG` er hvidt papir med en påskrift på
 bordpladen; og `side.js` laver feltet »Fyld op til« ved sprøjteflasken
 (`bord.fyldOpTil`). Sprøjteflasken er tegnet 25 % større. Et
 pulverglas kan have sin egen `spatelspids` (µmol) på posten; ellers er en
-spatelspids 1,5 mmol som før.
+spatelspids 1,5 mmol som før. `bord.rystValgt(til, sek)` ryster det valgte
+glas, hvor det står, uden at spilde (knappen `#rystknap` og tasten R i
+`side.js`, hvis siden har knappen); og en kolbe med `genopfyld: true`
+fylder Kemichael igen, når den er hældt i affaldet (S16).
 
 **Der hældes kun, når eleven beder om det (F36):** et slip over glasset
 giver én portion, og pilen ved flasken giver mere. At bære en flaske hen

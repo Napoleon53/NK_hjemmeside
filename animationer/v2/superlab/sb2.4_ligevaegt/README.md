@@ -289,8 +289,10 @@ med vilje kun to; han taler ikke hele tiden.
 meste af tiden, kommer ind, når en replik kalder, standser hvor der er plads,
 peger på det, replikken handler om, og går ud igen. Han tegnes i sit eget
 plan (`skala: 0.82`) og klippes ved bordets bagkant, så pladen dækker hans
-underkrop. Det, der kræver hans hænder — oprydningen efter et uheld, kaffen
-og flasken, der fyldes op igen — foregår foran bordet som før. Motoren bag
+underkrop. Kun oprydningen efter et uheld foregår foran bordet (F30);
+kaffen og en flaske eller kolbe, der fyldes op igen, klarer han bagfra.
+Hældes kolben med stamopløsning i affaldet, fylder han den altid igen, én
+gang (`genopfyld: true` på kolben i `js/opstilling.js`, S16). Motoren bag
 det står i `../../laboratoriet/README.md` under »Kemichael bag bordet«.
 
 Taleboblen tegnes som allersidste lag, også over zoomboblen, og holder sig
@@ -398,3 +400,9 @@ SCN⁻, så kun Fe³⁺'s gule farve er tilbage.
 NO₃⁻ knapper: et klik løfter ionen op i tabellen og boblen for hele
 forsøget (den står så som »↑ NO₃⁻«), et klik mere sætter den ned, og
 Start forfra sætter alle ned. Fluebenet viser dem alle på én gang.
+
+**Ryst glasset (S16).** Når et glas er valgt, står knappen »Ryst glasset«
+i panelet. Holdes den nede (eller tasten <kbd>R</kbd>), rystes glasset,
+hvor det står, så det, der ligger i bunden, blandes op, og det spilder
+aldrig — det gør kun musen, når den ryster voldsomt. Enter på knappen
+ryster et sekund. Flasker på hylden og badene rystes ikke.

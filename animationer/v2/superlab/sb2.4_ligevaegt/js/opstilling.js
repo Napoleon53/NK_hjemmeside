@@ -161,7 +161,9 @@
         /* 150 mL i en kolbe paa 200: den skal ikke staa til kanten, og
            inddelingens oeverste streg er netop 150. Det raekker til del 1
            (8 glas a 4 mL) og til del 2 (to portioner a 40 mL). */
-        { navn: "kolbe", type: "kolbe", x: 200, titel: "kolben med stamopløsning", indhold: opl(150, STAM) },
+        { navn: "kolbe", type: "kolbe", x: 200, titel: "kolben med stamopløsning", indhold: opl(150, STAM),
+          /* Hældes den i affaldet, fylder Kemichael den igen (S16) */
+          genopfyld: true },
 
         /* Hylden over stativet: koekkenrullen (kaffen stilles selv ved
            venstre ende) og pulverglassene til glas 1, 2 og 3 */

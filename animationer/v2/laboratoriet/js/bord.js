@@ -209,6 +209,9 @@
         this.spildTid = 0;
         this.ryst = 0;
         this.skvulpUr = 0;
+        this.rystes = null;       /* glasset, knappen eller tasten R ryster (rystValgt) */
+        this.rystUr = 0;
+        this.rystSlut = null;
         this.ryk = 0;
         this.haandAlfa = 0;
         this.bobleAlfa = 0;
@@ -555,6 +558,7 @@
             h.flyttet = true;
             h.sidst = pt;
             h.t = nu;
+            this.rystes = null;
             /* F35: tager man fat i noget andet, stilles det, der svaever,
                ned paa det naermeste ledige sted paa bordet - det maa aldrig
                spaerre for det naeste */
@@ -1647,6 +1651,41 @@
         return c && this.synlig(c) && B.er(c) ? c : null;
     };
 
+    /* Ryst glasset (knappen og tasten R, S16): det valgte glas rystes,
+       hvor det staar, saa det, der ligger i bunden, blandes op. Det
+       spilder aldrig - det goer kun musen, naar den ryster voldsomt.
+       Flasker paa hylden, bade og fast udstyr rystes ikke. sek: hvor
+       laenge (ellers til rystValgt(false)). */
+    P.kanRystes = function (c) {
+        return !!(c && c.kan.holder && !c.kan.bad && !c.kan.flaske && !c.kan.fast && this.synlig(c) && c !== this.baerer);
+    };
+
+    P.rystValgt = function (til, sek) {
+        if (!til) { this.rystes = null; return false; }
+        var c = this.valgtBeholder();
+        if (this.rystes && this.rystes === c) { if (sek) this.rystSlut = this.rystUr + sek; return true; }
+        if (!c) { this.besked("Klik på et glas for at vælge det."); return false; }
+        if (!this.kanRystes(c)) { this.besked(c.titel.charAt(0).toUpperCase() + c.titel.slice(1) + " skal ikke rystes."); return false; }
+        if (this.holdt || this.koer.optaget()) return false;
+        this.rystes = c;
+        this.rystUr = 0;
+        this.rystSlut = sek ? sek : null;
+        this.aendret("ryst");
+        return true;
+    };
+
+    P.opdaterRystKnap = function (dt) {
+        var c = this.rystes;
+        if (!c) return;
+        this.rystUr += dt;
+        if ((this.rystSlut !== null && this.rystUr >= this.rystSlut) || !this.kanRystes(c) || this.holdt) { this.rystes = null; return; }
+        this.skvulpUr -= dt;
+        if (B.volumen(c) > 0.1 && this.skvulpUr <= 0 && NK.Lyd && NK.Lyd.skvulp) {
+            NK.Lyd.skvulp(0.5);
+            this.skvulpUr = 0.4;
+        }
+    };
+
     P.markér = function (navn, sek) {
         this.mark = { navn: navn, ur: sek || 3 };
     };
@@ -2180,6 +2219,7 @@
            leder meget bedre end luft, saa tau er kort. */
         else if (gg.paa && gg.paa.kan.bad && gg.paa.indhold && B.volumen(gg.paa) > 1) { s.T = B.samlet(gg.paa).T; s.tau = 8; }
         if (this.baerer === gg) s.ryst = this.ryst;
+        if (this.rystes === gg) s.ryst = Math.max(s.ryst, 0.8);
         if (this.roerer === gg) { s.roer = true; s.ryst = Math.max(s.ryst, 0.6); }
         return s;
     };
@@ -2191,6 +2231,7 @@
 
         this.koer.opdater(dt);
         this.opdaterRyst(dt);
+        this.opdaterRystKnap(dt);
         this.opdaterHaeldning(dt);
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
 
@@ -2414,7 +2455,19 @@
         return this.liste.filter(function (x) { return x.paa === luge; });
     };
 
+    /* Et glas, der rystes med knappen, loeftes lidt og vugger om sit anker */
     P.tegnGenstand = function (ctx, gg, tid) {
+        if (this.rystes !== gg) { this.tegnGenstandHer(ctx, gg, tid); return; }
+        var w = this.rystUr * 17;
+        ctx.save();
+        ctx.translate(gg.p.x + Math.sin(w) * 4, gg.p.y - 10 + Math.abs(Math.cos(w)) * 3);
+        ctx.rotate(Math.cos(w) * 0.12);
+        ctx.translate(-gg.p.x, -gg.p.y);
+        this.tegnGenstandHer(ctx, gg, tid);
+        ctx.restore();
+    };
+
+    P.tegnGenstandHer = function (ctx, gg, tid) {
         var t = gg.type, k = gg.kan;
         if (gg.navn === "kaffekop") {
             if (!gg.skjult && !gg.iHaand) NK.Sprites.tegnPositur(ctx, "kaffekop", gg.p, gg.anker);
@@ -2428,7 +2481,7 @@
         else if (k.dypper) T.tegnPodetraad(ctx, gg);
         else if (k.ph) T.tegnPHmeter(ctx, gg, !!gg.i || this.baerer === gg);
         else if (k.holder) {
-            gg.niveau = T.tegnBeholder(ctx, gg, tid, { boelge: this.baerer === gg ? this.ryst * 1.5 : (this.roerer === gg ? 0.8 : 0) });
+            gg.niveau = T.tegnBeholder(ctx, gg, tid, { boelge: this.baerer === gg ? this.ryst * 1.5 : (this.roerer === gg ? 0.8 : (this.rystes === gg ? 1.2 : 0)) });
             if (gg.bobler && gg.bobler.length && !t.skjulIndhold) T.tegnBobler(ctx, gg, gg.bobler);
         }
         else if (k.spatel) T.tegnSpatel(ctx, gg);

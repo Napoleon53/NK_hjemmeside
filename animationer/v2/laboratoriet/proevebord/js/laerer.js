@@ -304,7 +304,10 @@
 
     /* ----- Bemaerkninger --------------------------------------------------- */
     P.laererHaendelse = function (type, data) {
-        if (type === "affald" && data.fra && data.fra.kan.flaske && data.indhold && data.indhold.V > 20 && this.laererOpdager(farligt(data.indhold))) {
+        /* En hel flaske i affaldet opdager han maaske; en kolbe, opstillingen
+           har sagt skal fyldes igen (genopfyld), opdager han altid (S16) */
+        var genopfyld = type === "affald" && data.fra && data.fra.spec && data.fra.spec.genopfyld;
+        if (type === "affald" && data.fra && (data.fra.kan.flaske || genopfyld) && data.indhold && data.indhold.V > 20 && (genopfyld || this.laererOpdager(farligt(data.indhold)))) {
             this.laererKo("laererFlaskeAffald", data.fra);
             this.laererVentende();
         }
@@ -330,9 +333,10 @@
             replikker, k === 1 ? K.glimtTrin("oejenbryn") : [], pegPunkt(this, c));
     };
 
-    /* En hel flaske i affaldsdunken: han fylder den op igen, én gang */
+    /* En hel flaske i affaldsdunken: han fylder den op igen, én gang.
+       Det samme for en kolbe med genopfyld i opstillingen (S16). */
     P.laererFlaskeAffald = function (fl) {
-        var mig = this;
+        var mig = this, ord = fl.kan.flaske ? "flaske" : "kolbe";
         this.flaskerFyldt = this.flaskerFyldt || {};
         var foer = this.flaskerFyldt[fl.navn];
         this.flaskerFyldt[fl.navn] = true;
@@ -348,7 +352,7 @@
             sig("Der er mere i forberedelsen. Én gang.")
         ];
         bemaerkning(this, "affald", 150, { vrede: 1, humoer: -0.9, roed: 0.45, briller: 1 },
-            ["En hel flaske i affaldet.", foer ? "Det var den sidste." : "Den var til hele klassen."],
+            ["En hel " + ord + " i affaldet.", foer ? "Det var den sidste." : "Den var til hele klassen."],
             ekstra, fl, false);
     };
 

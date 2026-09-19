@@ -37,7 +37,11 @@
      #tilskuere-linje #tilskuere-vis #tilskuere-navne
                       et flueben, der viser tilskuerionerne (bordets
                       valg.tilskuere); linjen vises kun, naar det valgte
-                      glas har nogen
+                      glas har nogen. Navnene er knapper, der loefter en
+                      ion op (F27)
+     #rystknap        »Ryst glasset«: holdes nede (eller tasten R) og
+                      ryster det valgte glas uden at spilde (S16); vises
+                      kun, naar det valgte glas kan rystes
      #logbog-tekst #logbog-noter #logbog-ryd
      #noterknap #noter #noter-luk
                       noterne (logbogen) foldet ud fra toplinjen: knappen
@@ -111,6 +115,7 @@
         var linje = NK.el("tilskuere-linje");
         if (!c) {
             if (linje) linje.hidden = true;
+            if (NK.el("rystknap")) NK.el("rystknap").hidden = true;
             if (NK.el("glas-titel")) NK.saetTekst("glas-titel", "Det valgte glas");
             if (NK.el("glas-volumen")) NK.saetTekst("glas-volumen", "");
             if (NK.el("glas-tom")) {
@@ -126,6 +131,7 @@
         }
 
         var o = B.samlet(c);
+        if (NK.el("rystknap")) NK.el("rystknap").hidden = !(b.kanRystes && b.kanRystes(c));
         if (NK.el("glas-titel")) NK.saetTekst("glas-titel", stor(c.titel));
         if (NK.el("glas-volumen")) NK.saetTekst("glas-volumen", tal(B.volumen(c)) + " mL");
 
@@ -596,6 +602,13 @@
         if (e.key === "m" || e.key === "M") { this.skiftLyd(); return; }
         if ((e.key === "n" || e.key === "N") && NK.el("noter")) { this.skiftNoter(); e.preventDefault(); return; }
         if ((e.key === "i" || e.key === "I") && this.forloeb) { this.visHint(); return; }
+        /* Hold R: ryst det valgte glas (S16). Slippes paa keyup. */
+        if ((e.key === "r" || e.key === "R") && NK.el("rystknap")) {
+            var br = this.bord();
+            if (!e.repeat && br && br.rystValgt) br.rystValgt(true);
+            e.preventDefault();
+            return;
+        }
         if (this.valg.tast && this.valg.tast.call(this, e)) { e.preventDefault(); return; }
         if (this.rum && this.rum.tast(e)) e.preventDefault();
     };
@@ -818,6 +831,24 @@
             b.visTilskuere = !!this.checked;
             mig.opdaterPanel();
         });
+        /* Ryst glasset: hold knappen eller tasten R nede. Et klik fra
+           tastaturet (Enter/mellemrum paa knappen) ryster et sekund. */
+        (function () {
+            var rk = NK.el("rystknap");
+            if (!rk) return;
+            function stop() { var b = mig.bord(); if (b && b.rystValgt) b.rystValgt(false); }
+            rk.addEventListener("pointerdown", function (e) {
+                var b = mig.bord();
+                if (b && b.rystValgt && b.rystValgt(true)) { try { rk.setPointerCapture(e.pointerId); } catch (fejl) { /* intet */ } }
+            });
+            ["pointerup", "pointercancel", "lostpointercapture"].forEach(function (t) { rk.addEventListener(t, stop); });
+            rk.addEventListener("click", function (e) {
+                var b = mig.bord();
+                if (e.detail === 0 && b && b.rystValgt) b.rystValgt(true, 1);
+            });
+            document.addEventListener("keyup", function (e) { if (e.key === "r" || e.key === "R") stop(); });
+            window.addEventListener("blur", stop);
+        }());
         paa("tilskuere-navne", "click", function (e) {
             var k = e.target && e.target.closest ? e.target.closest("button[data-ion]") : null;
             if (!k) return;
