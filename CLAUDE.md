@@ -5,6 +5,26 @@ generations animationer ligger i `animationer/v2/` (interaktive
 canvas-simulationer med opgaver), statiske sider i roden, downloads i
 `downloads/`.
 
+## Frosset: animationer/v2/ bortset fra superanimation/
+
+`animationer/v2/laboratoriet/`, `kemichael/`, `superlab/` og `superlab_ny/`
+er frosne 20. september 2026 og må ikke rettes her. Laboratoriesporet
+udvikles i `C:\NK_Undervisning\virtuelt_laboratorium\`, som har sin egen
+kopi af de fire mapper. Bliver der alligevel rettet i dem, tager
+`autocommit.ps1` filerne ud af commit'en igen og skriver det i
+`autocommit.log`.
+
+Mapperne bliver stående her, fordi de otte gamle laboratorieforsøg i
+`superlab/` og `superanimation/sc2.1_salt_i_vand` indlæser filer fra
+`laboratoriet/` og `kemichael/`. Fjernes de, går animationerne i sort på
+kemiformler.dk.
+
+`animationer/v2/superanimation/` er ikke frosset og rettes som hidtil.
+
+Skal en fejl i en af de otte gamle animationer rettes, rettes den her, ét
+sted, og bakkes ikke til NK_Undervisning. De to kopier skal ikke holdes i
+sync; denne er færdig.
+
 ## Om brugeren
 
 - Brugeren vibecoder og programmerer aldrig selv. Tal direkte og uden kodejargon,
@@ -31,6 +51,9 @@ canvas-simulationer med opgaver), statiske sider i roden, downloads i
 
 ## Superanimationer
 
+- Punkterne om superlab-animationer, `laboratoriet/` og `kemichael/`
+  gælder i NK_Undervisning, ikke her: de mapper er frosne (se ovenfor).
+  Punkterne om superanimationer gælder som hidtil.
 - Læs `animationer/v2/README.md`, før der arbejdes i mappen. Den
   skelner mellem superanimationer (et begreb i op til fire faner, Kemichael kan
   komme på besøg) og superlab-animationer (et forsøg på `laboratoriet/`,
