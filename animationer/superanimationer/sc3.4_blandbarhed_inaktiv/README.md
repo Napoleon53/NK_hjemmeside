@@ -1,5 +1,15 @@
 # sc3.4: Blandbarhed og faser
 
+> **Kasseret som afløser for c3.4, 20. september 2026.** Den kom for langt væk
+> fra den gamle animation: fane 1 overtog forsøget fra nabofilen
+> `c3.5_eksperiment_blandbarhed.html` og lånte superlabbens flasker, stativ og
+> uheld, fane 2 handler om et andet emne, og flaskerne er tegnet i kode uden
+> sprites. Mappen bliver liggende som reservedele. Det, der er værd at tage med
+> videre, er destillationsfanen, zoomboblen og blandingsskemaet som data.
+> En ny sc3.4 bygges tæt på den gamle `c3.4_molekyler_blandbarhed.html`: scenen
+> i næsten hele billedet, tre stoffer, ryst, temperatur og quiz.
+> Se "Bestillingen, før der skrives kode" i `../README.md`.
+
 En superanimation: i modsætning til de gamle animationer, som er én HTML-fil,
 ligger den i sin egen mappe med adskilt CSS, JavaScript og tegnekode.
 

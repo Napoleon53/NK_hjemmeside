@@ -62,6 +62,44 @@ gælder `sb2.0_ligevaegt_intro` og `sb3.2_titreringssimulator`.
 Afløser den en gammel enkeltfil, flyttes den gamle til `arkiv/` med `_oldversion`
 i navnet. Det sker først, når den nye kommer i menuen.
 
+## Bestillingen, før der skrives kode
+
+Erfaringen fra `sc3.4_blandbarhed_inaktiv`: en løs bestilling bliver til en for
+stor animation. Den kom til at dække nabofilens forsøg, lånte superlabbens
+flasker og uheld, og fik en fane om destillation, som er et andet emne. Skriv
+derfor fem ting ned, før arbejdet går i gang.
+
+1. **Pointen i én sætning.** For 3.4: "polariteten afgør, om der bliver ét lag
+   eller to, og tætheden afgør kun rækkefølgen." Det, der ikke tjener sætningen,
+   kommer ikke med.
+2. **Hvad den afløser, og hvad der skal med.** Nævn de elementer fra den gamle,
+   der virker, og det, den gamle gjorde godt rent visuelt.
+3. **Naboerne, der ejer resten.** Fx: `c3.3` ejer elektronegativitet, og `c3.5`
+   ejer forsøget med reagensglas. De røres ikke, og deres indhold kopieres ikke
+   herind.
+4. **Loftet, skrevet som tal.** Antal stoffer, antal faner og antal objekter på
+   skærmen. En fane er en ny vinkel på den samme sætning, aldrig et nyt emne.
+   Fire faner er et loft, ikke et mål: har begrebet to vinkler, er der to faner.
+5. **Layoutet.** Er scenen stjernen i næsten hele billedet, som i den gamle 3.4,
+   eller er det scene plus panel? Det afgøres før, ikke undervejs.
+
+### Stop-listen
+
+Er et af disse træk på vej ind, er det ved at blive en superlab-animation:
+flasker man hælder med musen, et stativ med reagensglas, et affaldsglas, uheld
+og oprydning, eller et forløb trin for trin. Stop, og spørg brugeren.
+
+### Ved uklarhed
+
+Er svaret på et spørgsmål uklart, så spørg igen med to konkrete muligheder, og
+vælg den mindste af dem. Et uklart svar må aldrig blive til den store løsning.
+
+### Udstyr tegnes som sprites først
+
+Glasudstyr og flasker lægges som SVG i `sprites/` og vises for brugeren alene,
+før de sættes i bevægelse. Mønster: `sc2.1_salt_i_vand`. Tegnes de i kode midt
+inde i en simulation, opdages det sjuskede først til sidst.
+
 ## Oversigt
 
 "I menuen" betyder, at en samlingsfil (`samling_*.html`) linker til mappen. En ny
