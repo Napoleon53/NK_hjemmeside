@@ -1,6 +1,14 @@
 # Animationer, anden generation
 
-Mappen `v2/` rummer to slags interaktive læringsmiljøer: **superanimationer** og
+> **Flyttet 20. september 2026.** Superanimationerne ligger ikke længere i
+> `v2/`, men i `../superanimationer/` — samme sted som før 18. september, så
+> de gamle adresser på kemiformler.dk virker igen. Resten af `v2/`
+> (`laboratoriet/`, `kemichael/`, `superlab/`, `superlab_ny/`) er **frosset**
+> og udvikles i `C:\NK_Undervisning\virtuelt_laboratorium\`; se `CLAUDE.md`
+> i roden. Denne fil beskriver stadig begge slags animationer, fordi kravene
+> til dem er de samme.
+
+Dette dokument dækker to slags interaktive læringsmiljøer: **superanimationer** og
 **superlab-animationer**. Begge er selvbærende: eleven kan bruge dem alene,
 uden at emnet er gennemgået på tavlen først. Det er det, der gør dem super,
 ikke at de er store eller ligger i deres egen mappe.
@@ -28,14 +36,14 @@ viser de gamle udgaver.
 
 | Mappe | I menuen | Note |
 |-------|----------|------|
-| `superanimation/sb2.0_ligevaegt_intro` | nej | |
-| `superanimation/sb3.2_titreringssimulator` | ja | |
-| `superanimation/sc1.1_atombygger` | ja | via genvejen `kemi-c-filer/c1.1_atommodel_ioner.html` |
-| `superanimation/sc2.1_salt_i_vand` | nej | menuen viser stadig den gamle c2.1 |
-| `superanimation/sc2.2_saltbygger` | nej | menuen viser stadig den gamle c2.2 |
-| `superanimation/sc3.1_elektronprikformler` | ja | |
-| `superanimation/sc3.2_rumlig_opbygning` | nej | inaktiv: rettes ikke, før brugeren siger til |
-| `superanimation/sc3.4_blandbarhed_inaktiv` | nej | ny, sept. 2026; menuen viser stadig den gamle c3.4 |
+| `../superanimationer/sb2.0_ligevaegt_intro` | nej | |
+| `../superanimationer/sb3.2_titreringssimulator` | ja | |
+| `../superanimationer/sc1.1_atombygger` | ja | via genvejen `kemi-c-filer/c1.1_atommodel_ioner.html` |
+| `../superanimationer/sc2.1_salt_i_vand` | nej | menuen viser stadig den gamle c2.1 |
+| `../superanimationer/sc2.2_saltbygger` | nej | menuen viser stadig den gamle c2.2 |
+| `../superanimationer/sc3.1_elektronprikformler` | ja | |
+| `../superanimationer/sc3.2_rumlig_opbygning` | nej | inaktiv: rettes ikke, før brugeren siger til |
+| `../superanimationer/sc3.4_blandbarhed_inaktiv` | nej | ny, sept. 2026; menuen viser stadig den gamle c3.4 |
 | `superlab/sb2.4_jernthiocyanat` | ja | gammel kode; Kemi B viser den |
 | `superlab/sc1.3_knaldgas` | ja | ældre sidelayout |
 | `superlab/sc2.5_faeldning` | ja | ældre sidelayout og ældre udgave af Kemichael |
@@ -119,8 +127,8 @@ opstilling.
 * Hver fane er et objekt med `tilpas()`, `opdater(dt)`, `tegn()` og
   `nulstil()`, og kun den aktive fane kører. Kemien og tallene ligger for sig
   selv, adskilt fra tegningen.
-* Mønster: `superanimation/sc1.1_atombygger` og
-  `superanimation/sb3.2_titreringssimulator`.
+* Mønster: `../superanimationer/sc1.1_atombygger` og
+  `../superanimationer/sb3.2_titreringssimulator`.
 
 ## Superlab-animation
 
@@ -151,7 +159,7 @@ kan lave de fejl, man kan lave dér.
 
 ## Det, der ikke er en animation
 
-Animationerne ligger i `superanimation/`, `superlab/` og `superlab_ny/` (se
+Animationerne ligger i `../superanimationer/`, `superlab/` og `superlab_ny/` (se
 oversigten). De to andre mapper er fælles kode:
 
 * `laboratoriet/` er motoren bag superlab-animationerne: stoffer, udstyr,
@@ -165,7 +173,7 @@ Filer, der begynder med `_` (`_selvtest.html`, `_geometri.html`,
 
 ## Fælles opbygning
 
-* **Mappe:** en ny animation lægges i `superanimation/` eller `superlab/` efter
+* **Mappe:** en ny animation lægges i `../superanimationer/` eller `superlab/` efter
   sin slags, og en superlab-animation på den nye motor i `superlab_ny/`. Stier
   ud af mappen har derfor to niveauer: `../../kemichael/`,
   `../../laboratoriet/`.

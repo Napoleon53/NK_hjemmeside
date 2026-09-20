@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc2.1 Salt i vand</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1200px; height:800px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: formler og ladninger, opløselighedstallene,
+   regnskabet på fane 2, at krystallen går i opløsning og kan knuses, at
+   vandskallen er de molekyler, der bar ionen ud, og at opgaverne kan
+   løses.
+
+   Chrome kigger kun ind i en iframe på file://, hvis den startes med
+   --allow-file-access-from-files. Ellers: brug en lokal server eller
+   Firefox.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function note(t) { skriv("        " + t, "note"); }
+function overskrift(t) { skriv("\n" + t, "h"); }
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+function koer() {
+    try { koerTest(); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    vis();
+}
+
+function koerTest() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument;
+    var W = ramme.contentWindow;
+    var NK = W.NK;
+    /* Baggrundslivet (han går forbi, når der er stille) skal ikke
+       blande sig i testens scener */
+    if (NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+    var i;
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var D = NK.Data;
+    paastand("data.js er kørt", !!(D && D.SALTE && D.SALTE.length === 6));
+    paastand("begge faner er bygget", !!(NK.sims && NK.sims["fane-oploes"] && NK.sims["fane-maetning"]));
+    if (!NK.sims) return;
+    var sprites = ["baegerglas", "varmeplade", "termometer", "spatel", "pulverglas", "lup"];
+    var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
+    paastand("alle " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
+    paastand("Kemichael er indlæst og koblet på begge faner",
+        !!(NK.Kemichael && NK.sims["fane-oploes"].laerer && NK.sims["fane-maetning"].laerer));
+    paastand("hans sprites er indlæst", ["laererKrop", "laererHoved", "laererArm"].every(function (n) { return NK.Sprites.klar(n); }));
+
+    overskrift("2. Panelerne er fyldt ud ved opstart");
+    var skalHaveTekst = ["oploes-navn", "oploes-hverdag", "oploes-ligning", "oploes-graense", "oploes-besked",
+        "oploes-status", "maet-navn", "maet-graense", "maet-besked", "maet-status", "maet-temp-tal",
+        "oploes-opg-knap", "maet-opg-knap"];
+    var tomme = skalHaveTekst.filter(function (id) {
+        var e = d.getElementById(id);
+        return !e || !e.textContent.replace(/\s/g, "");
+    });
+    paastand(skalHaveTekst.length + " udlæsninger fyldt ud", tomme.length === 0, "tomme: " + tomme.join(", "));
+    paastand("saltknapper i begge paneler",
+        d.querySelectorAll("#oploes-saltvalg .saltknap").length === 6 &&
+        d.querySelectorAll("#maet-saltvalg .saltknap").length === 6);
+    paastand("teoriboksen er bygget", d.querySelectorAll("#teori-liste .teorikort").length === D.TEORI.length);
+    paastand("opgaveknapperne starter på \"Start opgave\"",
+        d.getElementById("oploes-opg-knap").textContent === "Start opgave" &&
+        d.getElementById("maet-opg-knap").textContent === "Start opgave");
+
+    overskrift("3. Faneskift: præcis én aktiv ad gangen");
+    ["fane-maetning", "fane-oploes", "fane-maetning"].forEach(function (id) {
+        var knap = d.querySelector('.faneknap[data-fane="' + id + '"]');
+        knap.click();
+        var afsnit = d.querySelectorAll(".fane.aktiv");
+        var knapper = d.querySelectorAll(".faneknap.aktiv");
+        paastand(id + ": 1 afsnit + 1 knap",
+            afsnit.length === 1 && knapper.length === 1 && afsnit[0].id === id && knapper[0] === knap);
+    });
+
+    overskrift("4. Formlerne passer med ionerne, og ladningerne går op");
+    function bygFormel(salt) {
+        function del(ion, antal) {
+            if (antal === 1) return ion.formel;
+            return (ion.sammensat ? "(" + ion.formel + ")" : ion.formel) + NK.saenket(antal);
+        }
+        return del(D.ion(salt.kat), salt.p) + del(D.ion(salt.an), salt.n);
+    }
+    D.SALTE.forEach(function (salt) {
+        var sum = D.ion(salt.kat).q * salt.p + D.ion(salt.an).q * salt.n;
+        paastand(salt.id + ": " + salt.formel + ", neutral", salt.formel === bygFormel(salt) && sum === 0,
+            "beregnet " + bygFormel(salt) + ", ladning " + sum);
+    });
+
+    overskrift("5. Opløselighedstallene");
+    var naer = function (a, b, tol) { return Math.abs(a - b) < (tol || 0.0000001); };
+    paastand("seks positive værdier pr. salt", D.SALTE.every(function (s) {
+        return s.kurve.length === D.TEMPER.length && s.kurve.every(function (v) { return v > 0; });
+    }));
+    paastand("tabelpunkterne rammes præcist", D.TEMPER.every(function (t, j) {
+        return D.SALTE.every(function (s) { return naer(D.oploeselighed(s, t), s.kurve[j]); });
+    }));
+    var monotonOk = true, monotonNote = "";
+    D.SALTE.forEach(function (s) {
+        var stiger = s.kurve[5] > s.kurve[0], forrige = D.oploeselighed(s, 0);
+        for (var t = 0.5; t <= 100; t += 0.5) {
+            var v = D.oploeselighed(s, t);
+            if (stiger ? v < forrige - 1e-9 : v > forrige + 1e-9) { monotonOk = false; monotonNote = s.id + " ved " + t + " °C"; }
+            forrige = v;
+        }
+    });
+    paastand("kurverne vender aldrig (glat, men monoton)", monotonOk, monotonNote);
+    var nacl = D.salt("NaCl");
+    paastand("uden for tabellen klippes til enderne",
+        naer(D.oploeselighed(nacl, -40), nacl.kurve[0]) && naer(D.oploeselighed(nacl, 250), nacl.kurve[5]));
+    var kno3 = D.salt("KNO3");
+    var t60 = D.temperaturFor(kno3, 60);
+    paastand("temperaturFor rammer 60 g KNO₃", naer(D.oploeselighed(kno3, t60), 60, 0.001), t60.toFixed(2) + " °C");
+
+    overskrift("6. Let og tungt");
+    D.SALTE.forEach(function (salt) {
+        paastand(salt.formel + " er " + D.typeNavn(salt),
+            D.erTung(salt) === (["CaCO3", "AgCl"].indexOf(salt.id) >= 0));
+    });
+    paastand("AgCl slipper flere ioner i varmt vand",
+        D.frieIoner(D.salt("AgCl"), 70) > D.frieIoner(D.salt("AgCl"), 5));
+
+    overskrift("7. Ligningen");
+    var caCl2 = D.salt("CaCl2"), cuso4 = D.salt("CuSO4");
+    paastand("CaCl₂ giver Ca²⁺(aq) + 2 Cl⁻(aq)", D.hoejreSide(caCl2) === "Ca²⁺(aq) + 2 Cl⁻(aq)", D.hoejreSide(caCl2));
+    paastand("CuSO₄ giver Cu²⁺(aq) + SO₄²⁻(aq)", D.hoejreSide(cuso4) === "Cu²⁺(aq) + SO₄²⁻(aq)", D.hoejreSide(cuso4));
+    D.SALTE.forEach(function (salt) {
+        var f = D.forkerteHoejresider(salt);
+        paastand(salt.formel + ": mindst 3 forskellige forkerte ligninger",
+            f.length >= 3 && f.indexOf(D.hoejreSide(salt)) < 0 && f.every(function (s) { return !/[¹]/.test(s); }),
+            f.join("  |  "));
+    });
+
+    d.querySelector('.faneknap[data-fane="fane-oploes"]').click();
+    var s1 = NK.sims["fane-oploes"];
+    var ligningEl = d.getElementById("oploes-ligning");
+    ["CaCl2", "CuSO4"].forEach(function (id) {
+        NK.Valg.saet(id);
+        s1.opdater(0.016);
+        paastand("ligningen holder sig på én linje (" + id + ")", ligningEl.scrollWidth <= ligningEl.clientWidth + 1);
+    });
+
+    overskrift("8. Fane 1: krystallen går i opløsning");
+    NK.Valg.saet("NaCl");
+    s1.saetOmroering(false);
+    s1.saetTemp({ id: "lunken", temp: 20, fart: 1 });
+    s1.nulstil();
+    s1.tilpas();
+    var iAlt = s1.ioner.length;
+    paastand("krystallen har lige mange af hver (NaCl)", tael(s1, 1) === tael(s1, -1));
+    paastand("otte vandmolekyler i arbejde fra start", s1.vand.length === 8, String(s1.vand.length));
+    note("cellestørrelse " + s1.celle.toFixed(1) + " px, lupen " + Math.round(s1.zoom.b) + " x " + Math.round(s1.zoom.h));
+    koerTid(s1, 60, 0.05);
+    paastand("NaCl: ioner er revet løs efter tre sekunder", s1.frie > 0, "frie: " + s1.frie);
+    koerTid(s1, 3000, 0.05);
+    paastand("NaCl: hele krystallen forsvinder", s1.tilbage() === 0, "tilbage: " + s1.tilbage());
+    var frieNu = s1.ioner.filter(function (o) { return o.tilstand === "fri"; });
+    paastand("frie ioner beholder deres størrelse",
+        frieNu.every(function (o) { return naer(s1.ionRadius(o), s1.celle * 0.4 * o.ion.r); }));
+    paastand("højst " + NK.SimOploes.MAKS_SYNLIGE + " frie ioner i lupen ad gangen",
+        s1.synligeFrie() <= NK.SimOploes.MAKS_SYNLIGE + 1, String(s1.synligeFrie()));
+
+    NK.Valg.saet("CaCl2");
+    s1.tilpas();
+    paastand("CaCl₂: dobbelt så mange Cl⁻ som Ca²⁺", tael(s1, -1) === 2 * tael(s1, 1));
+
+    ["AgCl", "CaCO3"].forEach(function (id) {
+        NK.Valg.saet(id);
+        s1.tilpas();
+        koerTid(s1, 600, 0.05);
+        var maks = D.frieIoner(D.salt(id), 20);
+        paastand(id + ": præcis " + maks + " ioner slipper ud", s1.frie === maks, "frie: " + s1.frie);
+    });
+
+    overskrift("9. Vandet vender rigtigt, og δ-mærkerne står på ret køl");
+    function skalAfstande(ion) {
+        var c = d.createElement("canvas");
+        c.width = 400; c.height = 400;
+        var k = c.getContext("2d");
+        k.fillStyle = "#000"; k.fillRect(0, 0, 400, 400);
+        var r = 60;
+        NK.Tegn.vandskal(k, 200, 200, r, 0, 4, ion.q > 0);
+        NK.Tegn.ion(k, 200, 200, ion, r);
+        var px = k.getImageData(0, 0, 400, 400).data;
+        var sumO = 0, nO = 0, sumH = 0, nH = 0;
+        for (var a = 0; a < 360; a += 2) {
+            var fO = 0, fH = 0;
+            for (var afst = r * 1.02; afst < r * 2.6; afst += 0.5) {
+                var x = Math.round(200 + Math.cos(a * Math.PI / 180) * afst);
+                var y = Math.round(200 + Math.sin(a * Math.PI / 180) * afst);
+                var p = (y * 400 + x) * 4, R = px[p], G = px[p + 1], B = px[p + 2];
+                if (!fO && R > 60 && R > G * 1.6 && R > B * 1.6) fO = afst;
+                if (!fH && R > 80 && Math.abs(R - G) < 25 && Math.abs(G - B) < 25) fH = afst;
+                if (fO && fH) break;
+            }
+            if (fO) { sumO += fO; nO++; }
+            if (fH) { sumH += fH; nH++; }
+        }
+        return { o: nO ? sumO / nO / r : 99, h: nH ? sumH / nH / r : 99 };
+    }
+    var skalPlus = skalAfstande({ formel: "Na", q: 1, r: 0.70 });
+    var skalMinus = skalAfstande({ formel: "Cl", q: -1, r: 1.00 });
+    paastand("positiv ion: oxygen ligger inderst", skalPlus.o < skalPlus.h,
+        "oxygen " + skalPlus.o.toFixed(2) + "r mod hydrogen " + skalPlus.h.toFixed(2) + "r");
+    paastand("negativ ion: hydrogen ligger inderst", skalMinus.h < skalMinus.o,
+        "hydrogen " + skalMinus.h.toFixed(2) + "r mod oxygen " + skalMinus.o.toFixed(2) + "r");
+
+    /* δ− skrives i midten af oxygen. Drejes molekylet en halv omgang, må
+       teksten ikke vende på hovedet: den tegnede tekst skal være den samme,
+       blot flyttet. Sammenlignes som "blæk" i et lille felt om oxygen. */
+    function deltaBlaek(vinkel) {
+        var c = d.createElement("canvas");
+        c.width = 200; c.height = 200;
+        var k = c.getContext("2d");
+        var skala = 3;
+        NK.Tegn.vand(k, 100, 100, vinkel, skala, { delta: true });
+        var px = k.getImageData(84, 88, 32, 24).data, rk = [];
+        for (var y = 0; y < 24; y++) {
+            var sum = 0;
+            for (var x = 0; x < 32; x++) { var p = (y * 32 + x) * 4; if (px[p] > 235 && px[p + 1] > 235) sum++; }
+            rk.push(sum);
+        }
+        return rk;
+    }
+    var op = deltaBlaek(0), ned = deltaBlaek(Math.PI);
+    var ens = op.every(function (v, j) { return Math.abs(v - ned[j]) <= 2; });
+    paastand("δ− ser ens ud, uanset hvilken vej molekylet vender", ens, op.join(",") + " / " + ned.join(","));
+
+    overskrift("10. Vandskallen er de molekyler, der bar ionen ud");
+    NK.Valg.saet("NaCl");
+    s1.nulstil(); s1.tilpas();
+    /* lavSkal kaldes, i samme oejeblik ionen rives loes. Vinklerne foer og
+       efter skal vaere de samme. */
+    var fundne = [], orgLavSkal = s1.lavSkal;
+    s1.lavSkal = function (o) {
+        var foer = o.baerere.map(function (v) { return norm(Math.atan2(v.y - o.y, v.x - o.x)); });
+        orgLavSkal.call(this, o);
+        fundne.push({ foer: foer, efter: o.skal.map(function (s) { return norm(s.vinkel); }), tilbage: o.baerere.length });
+    };
+    for (var trin = 0; trin < 12000 && fundne.length < 6; trin++) s1.opdater(0.05);
+    delete s1.lavSkal;
+    var skalOk = fundne.length >= 5, skalNote = "";
+    fundne.forEach(function (f) {
+        var a = f.foer.slice().sort(numerisk), b = f.efter.slice().sort(numerisk);
+        if (a.length !== 4 || b.length !== 4 || f.tilbage !== 0) { skalOk = false; skalNote = "antal " + a.length + "/" + b.length; return; }
+        var afv = a.map(function (v, j) { var x = Math.abs(v - b[j]); return Math.min(x, Math.PI * 2 - x); });
+        if (Math.max.apply(null, afv) > 0.01) { skalOk = false; skalNote = "vinkler " + afv.map(function (v) { return v.toFixed(3); }).join(" "); }
+    });
+    paastand("skallen dannes præcis dér, hvor bærerne sad (" + fundne.length + " ioner)", skalOk, skalNote);
+
+    var prove = s1.vand[0], xer = [], yer = [];
+    for (var sp = 0; sp < 250; sp++) {
+        prove.x = s1.frit.x0; prove.y = s1.frit.y0;
+        s1.sendVaek(prove);
+        xer.push(prove.x); yer.push(prove.y);
+    }
+    paastand("nye arbejdsmolekyler toner op over hele lupen",
+        (Math.max.apply(null, xer) - Math.min.apply(null, xer)) > (s1.frit.x1 - s1.frit.x0) * 0.8 &&
+        (Math.max.apply(null, yer) - Math.min.apply(null, yer)) > (s1.frit.y1 - s1.frit.y0) * 0.8);
+
+    overskrift("11. Omrøring knuser krystallen");
+    function tidTil(temp, roer) {
+        NK.Valg.saet("NaCl");
+        s1.saetTemp(temp);
+        s1.saetOmroering(roer);
+        s1.nulstil(); s1.tilpas();
+        for (var n = 0; n < 8000 && s1.slutTid === null; n++) s1.opdater(0.05);
+        return s1.slutTid === null ? Infinity : s1.slutTid;
+    }
+    var KOLD = { id: "kold", temp: 5, fart: 0.55 }, LUNK = { id: "lunken", temp: 20, fart: 1 }, VARM = { id: "varm", temp: 70, fart: 1.95 };
+    var tider = {};
+    [["koldt", KOLD], ["lunkent", LUNK], ["varmt", VARM]].forEach(function (t) {
+        tider[t[0]] = [0, 1, 2].map(function () { return tidTil(t[1], false); });
+        tider[t[0] + "+rør"] = [0, 1, 2].map(function () { return tidTil(t[1], true); });
+    });
+    var snit = function (l) { return l.reduce(function (a, b) { return a + b; }, 0) / l.length; };
+    Object.keys(tider).forEach(function (n) {
+        note("NaCl " + n + ": " + tider[n].map(function (v) { return v.toFixed(0); }).join(", ") + " s");
+    });
+    paastand("omrøring gør det hurtigere (lunkent)", snit(tider["lunkent+rør"]) < snit(tider.lunkent) * 0.8);
+    paastand("varme gør det hurtigere", snit(tider.varmt) < snit(tider.lunkent) * 0.8);
+    var G = NK.SimOploes.GRAENSE_SEK;
+    var MAXT = NK.SimOploes.temperatur("max");
+    tider.max = [0, 1, 2].map(function () { return tidTil(MAXT, false); });
+    note("NaCl max uden omrøring: " + tider.max.map(function (v) { return v.toFixed(0); }).join(", ") + " s");
+    paastand("opgaven \"under " + G + " s\" kan klares med varmt vand og omrøring",
+        Math.max.apply(null, tider["varmt+rør"]) <= G * 0.85, tider["varmt+rør"].join(", "));
+    paastand("og kræver både varme og omrøring, også på max",
+        Math.min.apply(null, tider.varmt) > G * 1.15 && Math.min.apply(null, tider["lunkent+rør"]) > G * 1.15 &&
+        Math.min.apply(null, tider.max) > G * 1.1,
+        "varmt " + Math.min.apply(null, tider.varmt).toFixed(1) + ", lunkent+rør " +
+        Math.min.apply(null, tider["lunkent+rør"]).toFixed(1) + ", max " + Math.min.apply(null, tider.max).toFixed(1));
+    s1.saetTemp(LUNK);
+
+    NK.Valg.saet("NaCl");
+    s1.saetTemp(LUNK); s1.saetOmroering(true);
+    s1.nulstil(); s1.tilpas();
+    koerTid(s1, 200, 0.05);
+    paastand("efter 10 s omrøring er krystallen i flere stykker", s1.antalStykker() >= 4, String(s1.antalStykker()));
+    paastand("og flere vandmolekyler arbejder", s1.vand.length > 8, String(s1.vand.length));
+    koerTid(s1, 200, 0.05);
+    var svaever = s1.ioner.filter(function (o) {
+        if (o.tilstand !== "fast") return false;
+        var st = s1.stykker[o.stykke];
+        var nederst = Math.max.apply(null, s1.ioner.filter(function (p) {
+            return p.tilstand === "fast" && p.stykke === o.stykke;
+        }).map(function (p) { return p.r; }));
+        return o.r === nederst && Math.abs(o.hvileY + st.mdy + s1.celle / 2 - s1.gulv) > 1;
+    });
+    paastand("ingen stykker svæver over bunden", svaever.length === 0, svaever.length + " ioner");
+
+    NK.Valg.saet("AgCl");
+    s1.saetOmroering(true);
+    s1.nulstil(); s1.tilpas();
+    koerTid(s1, 600, 0.05);
+    paastand("AgCl med omrøring: stadig kun " + D.frieIoner(D.salt("AgCl"), 20) + " ioner",
+        s1.frie === D.frieIoner(D.salt("AgCl"), 20), "frie: " + s1.frie);
+    s1.saetOmroering(false);
+
+    overskrift("11b. Vandmolekylerne ligger ikke oven i hinanden");
+    /* Tæller par af vandmolekyler (i vandskaller og ledige), hvis midter
+       ligger tættere end 20 skalaenheder. Molekyler i samme skal tæller ikke. */
+    function overlap(sim) {
+        var vs = sim.vandSkala, punkter = [];
+        sim.ioner.forEach(function (o, n) {
+            if (!o.skal || (o.tilstand !== "fri" && o.tilstand !== "paavej")) return;
+            o.skal.forEach(function (s) {
+                var p = NK.Tegn.skalVand(null, o.x, o.y, sim.ionRadius(o), s.vinkel + o.skalfase, vs, o.ion.q > 0, {});
+                punkter.push({ x: p.x, y: p.y, ejer: "ion" + n });
+            });
+        });
+        sim.vand.forEach(function (v, n) {
+            if (v.tilstand === "hjemme" && v.fade > 0.5) punkter.push({ x: v.x, y: v.y, ejer: "vand" + n });
+        });
+        var par = 0;
+        for (var a = 0; a < punkter.length; a++) {
+            for (var b = a + 1; b < punkter.length; b++) {
+                if (punkter[a].ejer === punkter[b].ejer) continue;
+                if (Math.hypot(punkter[a].x - punkter[b].x, punkter[a].y - punkter[b].y) < 20 * vs) par++;
+            }
+        }
+        return par;
+    }
+    [["lunkent", LUNK, false], ["varmt med omrøring", VARM, true]].forEach(function (k) {
+        NK.Valg.saet("CaCl2");
+        s1.saetTemp(k[1]); s1.saetOmroering(k[2]);
+        s1.nulstil(); s1.tilpas();
+        var sum = 0, n = 0, maks = 0;
+        for (var t = 0; t < 1200; t++) {
+            s1.opdater(0.05);
+            if (t > 100 && t % 10 === 0) { var p = overlap(s1); sum += p; n++; maks = Math.max(maks, p); }
+        }
+        var snitP = sum / n;
+        note("CaCl₂ " + k[0] + ": " + snitP.toFixed(2) + " overlappende par i gennemsnit, højst " + maks);
+        paastand("CaCl₂ " + k[0] + ": næsten ingen overlappende vandmolekyler", snitP <= 0.5, snitP.toFixed(2));
+    });
+    s1.saetTemp(LUNK); s1.saetOmroering(false);
+
+    overskrift("11c. Knapperne på varmepladen");
+    NK.Valg.saet("NaCl");
+    s1.nulstil(); s1.tilpas();
+    var laerred1 = d.getElementById("oploes-laerred");
+    function klikKnap(navn) {
+        var r = laerred1.getBoundingClientRect(), m = s1.makro;
+        var k = NK.Tegn.pladeKnap(m.pladeX, m.pladeY, m.pladeB, navn);
+        laerred1.dispatchEvent(new W.PointerEvent("pointerdown", { clientX: r.left + k.x, clientY: r.top + k.y, bubbles: true, pointerId: 2 }));
+    }
+    paastand("panelet har tre temperaturer (max findes kun på pladen)",
+        d.querySelectorAll("#oploes-temp .tilstandsknap").length === 3);
+    var rk = [];
+    klikKnap("varme"); rk.push(s1.tempValg.id);
+    klikKnap("varme"); rk.push(s1.tempValg.id);
+    klikKnap("varme"); rk.push(s1.tempValg.id);
+    paastand("varmeknappen drejer varm → max → slukket", rk.join(" ") === "varm max lunken", rk.join(" "));
+    klikKnap("roer");
+    var roerTil = s1.omroering;
+    klikKnap("roer");
+    paastand("omrøringsknappen tænder og slukker", roerTil === true && s1.omroering === false);
+    paastand("panelets knapper følger med",
+        d.querySelector("#oploes-roer .tilstandsknap.aktiv").textContent.indexOf("Står") >= 0 &&
+        d.querySelector("#oploes-temp .tilstandsknap.aktiv").textContent.indexOf("Lunkent") >= 0);
+
+    overskrift("11d. Overkogning og Kemichael");
+    var MAX = NK.SimOploes.temperatur("max");
+    var KOG = NK.SimOploes.KOGE_OVER_SEK, EFTER = NK.SimOploes.LAERER_EFTER_SEK;
+    NK.Valg.saet("NaCl");
+    s1.nulstil(); s1.tilpas();
+    s1.saetTemp(MAX);
+    koerTid(s1, Math.round((KOG - 1) / 0.05), 0.05);
+    paastand("ingen overkogning før " + KOG + " s", s1.overkogStart === null);
+    koerTid(s1, 40, 0.05);
+    paastand("efter " + KOG + " s på max koger det over", s1.overkogStart !== null);
+    paastand("Kemichael er her ikke endnu", !(s1.laerer.scene && s1.laerer.scene.navn === "kogerOver"));
+    koerTid(s1, Math.round(EFTER / 0.05) + 2, 0.05);
+    paastand("Kemichael kommer " + EFTER + " s efter", !!(s1.laerer.scene && s1.laerer.scene.navn === "kogerOver"));
+    koerTid(s1, 100, 0.05);
+    paastand("han lader varmen være", s1.tempValg.id === "max");
+    paastand("der er kogt vand over", s1.vandTab > 1 && s1.spild > 0.1, s1.vandTab.toFixed(1) + " mL");
+    s1.nulstil();
+    paastand("Ny krystal rydder op", s1.overkog === 0 && s1.vandTab === 0 && s1.overkogStart === null && !s1.laerer.scene);
+    s1.saetTemp(MAX); koerTid(s1, 200, 0.05); s1.saetTemp(LUNK); koerTid(s1, 2, 0.05);
+    paastand("skrues der ned før tid, starter kogningen forfra", s1.kogeTid === 0 && s1.overkogStart === null);
+    s1.nulstil();
+
+    overskrift("12. Opgaverne på fane 1");
+    var op1 = s1.opgaver;
+    paastand("fire opgavetyper", op1.typer.length === 4);
+
+    var fejlOpg = op1.typer[0](s1);
+    fejlOpg.start(s1);
+    var fejlIon = null, fejlNr = -1, godIon = null, godNr = -1;
+    s1.ioner.forEach(function (o) {
+        if (!o.skal || o.tilstand !== "fri") return;
+        o.skal.forEach(function (s, j) {
+            if (s.forkert) { fejlIon = o; fejlNr = j; }
+            else if (!godIon) { godIon = o; godNr = j; }
+        });
+    });
+    paastand("find fejlen: præcis ét molekyle vender forkert", !!fejlIon);
+    paastand("billedet står stille", s1.pause === true);
+    paastand("de ledige vandmolekyler er tonet ud",
+        s1.vand.every(function (v) { return v.tilstand !== "hjemme" || v.fade < 0.05; }));
+    paastand("ingen hold arbejder ved krystallen",
+        s1.vand.every(function (v) { return v.tilstand === "hjemme"; }));
+    function midtAf(o, j) {
+        var s = o.skal[j];
+        return NK.Tegn.skalVand(null, o.x, o.y, s1.ionRadius(o), s.vinkel + o.skalfase, s1.vandSkala, o.ion.q > 0, { forkert: s.forkert });
+    }
+    if (fejlIon && godIon) {
+        var pg = midtAf(godIon, godNr);
+        paastand("klik på et rigtigt vendt molekyle giver en besked", typeof fejlOpg.klik(s1, pg.x, pg.y) === "string");
+        var pf = midtAf(fejlIon, fejlNr);
+        paastand("klik på det forkerte løser opgaven", fejlOpg.klik(s1, pf.x, pf.y) === true);
+    }
+    s1.nulstil();
+
+    for (i = 0; i < 12; i++) {
+        var lig = op1.typer[1](s1);
+        lig.start(s1);
+        var ligOk = lig.valg.length === 4 && lig.rigtig >= 0 && lig.valg[lig.rigtig] === D.hoejreSide(NK.Valg.salt()) &&
+            lig.valg.filter(function (v, j) { return lig.valg.indexOf(v) === j; }).length === 4;
+        if (!ligOk) break;
+    }
+    paastand("ligningsopgaven: 4 forskellige svar med det rigtige iblandt", ligOk, lig.valg.join(" | "));
+
+    var hurtig = op1.typer[2](s1);
+    hurtig.start(s1);
+    koerTid(s1, 20, 0.05);
+    paastand("hurtigst: ikke løst undervejs", hurtig.tjek(s1) === false);
+    hurtig.visSvar(s1);
+    for (i = 0; i < 4000 && s1.slutTid === null; i++) s1.opdater(0.05);
+    paastand("hurtigst: svaret (varmt + omrøring) løser opgaven", hurtig.tjek(s1) === true, "tid " + s1.slutTid);
+
+    var tung = op1.typer[3](s1);
+    tung.start(s1);
+    paastand("omrøringsopgaven vælger AgCl", NK.Valg.saltId === "AgCl");
+    paastand("AgCl-svaret har den nye formulering", tung.svar.indexOf("hurtigere bliver mættet") >= 0);
+    paastand("hurtigst-opgaven viser det store ur", hurtig.stortUr === true);
+    s1.saetOmroering(false);
+
+    NK.Valg.saet("NaCl");
+    op1.ny();
+    var knap1 = d.getElementById("oploes-opg-knap");
+    var trapper = [knap1.textContent];
+    op1.knap(); trapper.push(knap1.textContent);
+    op1.knap(); trapper.push(knap1.textContent);
+    paastand("knappen går Giv hint → Vis svaret → Ny opgave",
+        trapper.join("|") === "Giv hint|Vis svaret|Ny opgave", trapper.join(" | "));
+    paastand("hint og svar står i kortet",
+        !!d.getElementById("oploes-opg-hint").textContent && !!d.getElementById("oploes-opg-svar").textContent);
+    s1.nulstil();
+
+    overskrift("13. Fane 2: opløst + bundfald går op");
+    var s2 = NK.sims["fane-maetning"];
+    d.querySelector('.faneknap[data-fane="fane-maetning"]').click();
+    NK.Valg.saet("NaCl");
+    s2.nulstil(); s2.saetTemp(20);
+    s2.haeldI(25);
+    paastand("25 g NaCl: alt opløses", naer(s2.oploest(), 25) && s2.bundfald() === 0);
+    s2.haeldI(25);
+    paastand("50 g NaCl ved 20 °C: 36,0 g opløst og 14,0 g bundfald",
+        naer(s2.oploest(), 36.0) && naer(s2.bundfald(), 14.0), s2.oploest() + " / " + s2.bundfald());
+    s2.saetTemp(100);
+    paastand("kogende vand hjælper kun lidt på NaCl", s2.bundfald() > 10);
+
+    NK.Valg.saet("KNO3");
+    s2.nulstil(); s2.saetTemp(20); s2.haeldI(100);
+    paastand("100 g KNO₃ ved 20 °C giver bundfald", s2.bundfald() > 60);
+    s2.saetTemp(100);
+    paastand("100 g KNO₃ ved 100 °C er helt opløst", s2.bundfald() === 0);
+
+    var alleOk = true;
+    D.SALTE.forEach(function (salt) {
+        NK.Valg.saet(salt.id);
+        s2.nulstil();
+        [0, 37, 100].forEach(function (t) {
+            s2.saetTemp(t);
+            s2.haeldI(20);
+            if (!naer(s2.oploest() + s2.bundfald(), s2.tilsat)) alleOk = false;
+        });
+    });
+    paastand("opløst + bundfald = hældt i, for alle salte og temperaturer", alleOk);
+
+    overskrift("14. Grafen");
+    s2.autoSkala = false;
+    s2.nulstil();
+    var klemt = D.SALTE.filter(function (salt) {
+        NK.Valg.saet(salt.id);
+        return s2.ymax() < D.stoersteOploeselighed(salt);
+    }).map(function (s) { return s.id; });
+    paastand("fælles skala: ingen kurve går over grafens top", klemt.length === 0, klemt.join(", "));
+    NK.Valg.saet("NaCl");
+    s2.haeldI(25); s2.haeldI(250);
+    paastand("aksen vokser med, når der hældes meget i", s2.ymax() >= s2.tilsat, s2.ymax() + " / " + s2.tilsat);
+    s2.nulstil();
+    s2.autoSkala = true;
+    var zoomOk = D.SALTE.every(function (salt) {
+        NK.Valg.saet(salt.id);
+        var m = D.stoersteOploeselighed(salt);
+        return s2.ymax() >= m && s2.ymax() <= m * 2.6;
+    });
+    paastand("skaleret til stoffet: kurven fylder grafen", zoomOk);
+    s2.autoSkala = false;
+
+    var skyder = d.getElementById("maet-temp");
+    skyder.value = "80";
+    skyder.dispatchEvent(new W.Event("input"));
+    paastand("skyderen sætter temperaturen", s2.temp === 80);
+
+    var laerred = d.getElementById("maet-laerred");
+    var rekt = laerred.getBoundingClientRect();
+    function klikVedTemperatur(t) {
+        laerred.dispatchEvent(new W.PointerEvent("pointerdown", {
+            clientX: rekt.left + s2.graf.x + (t / 100) * s2.graf.b,
+            clientY: rekt.top + s2.graf.y + s2.graf.h / 2, bubbles: true, pointerId: 1
+        }));
+        laerred.dispatchEvent(new W.PointerEvent("pointerup", { bubbles: true, pointerId: 1 }));
+    }
+    klikVedTemperatur(60);
+    paastand("klik i grafen ved 60 °C", Math.abs(s2.temp - 60) < 1.5, String(s2.temp));
+    s2.saetTemp(20);
+
+    var glasKnapper = d.getElementById("maet-glasknapper");
+    paastand("knapraden er placeret over spatlen", glasKnapper.style.left !== "" && glasKnapper.style.top !== "");
+
+    overskrift("15. Opgaverne på fane 2");
+    var op2 = s2.opgaver;
+    function tal(tekst) { return parseFloat(tekst.replace(/\./g, "").replace(",", ".")); }
+    function valgOk(o) {
+        return o.valg.length >= 3 && o.rigtig >= 0 && o.rigtig < o.valg.length &&
+            o.valg.filter(function (v, j) { return o.valg.indexOf(v) === j; }).length === o.valg.length;
+    }
+    var navne2 = ["aflæs grafen", "bundfald", "find temperaturen", "afkøling"];
+    var ok2 = [true, true, true, true], note2 = ["", "", "", ""];
+    for (var runde = 0; runde < 15; runde++) {
+        var a = op2.typer[0](s2); a.start(s2);
+        if (!valgOk(a)) { ok2[0] = false; note2[0] = a.valg.join(" | "); }
+        a.visSvar(s2);
+        if (Math.abs(s2.graense() - tal(a.valg[a.rigtig])) > 0.51) { ok2[0] = false; note2[0] = a.tekst + " -> " + a.valg[a.rigtig]; }
+
+        var b = op2.typer[1](s2); b.start(s2);
+        if (!valgOk(b)) { ok2[1] = false; note2[1] = b.valg.join(" | "); }
+        b.visSvar(s2);
+        if (Math.abs(s2.bundfald() - tal(b.valg[b.rigtig])) > 0.06) { ok2[1] = false; note2[1] = b.tekst + " -> " + b.valg[b.rigtig]; }
+
+        var c = op2.typer[2](s2); c.start(s2);
+        if (!(s2.bundfald() > 0) || c.tjek(s2) !== false) { ok2[2] = false; note2[2] = "start: " + c.tekst; }
+        s2.saetTemp(100);
+        if (typeof c.tjek(s2) !== "string") { ok2[2] = false; note2[2] = "for varmt: " + c.tekst; }
+        c.visSvar(s2);
+        if (c.tjek(s2) !== true) { ok2[2] = false; note2[2] = "svar: " + c.tekst + " ved " + s2.temp; }
+
+        var e = op2.typer[3](s2); e.start(s2);
+        if (!valgOk(e) || s2.bundfald() > 0) { ok2[3] = false; note2[3] = "start: " + e.tekst; }
+        e.visSvar(s2);
+        if (Math.abs(s2.bundfald() - tal(e.valg[e.rigtig])) > 0.06) { ok2[3] = false; note2[3] = e.tekst + " -> " + e.valg[e.rigtig]; }
+    }
+    navne2.forEach(function (n, j) { paastand(n + ": 15 tilfældige opgaver passer med modellen", ok2[j], note2[j]); });
+    s2.nulstil();
+
+    overskrift("15b. En runde med opgaver og resultatet");
+    var brugt = [], orgTyper = op2.typer;
+    op2.typer = orgTyper.map(function (fn, nr) { return function (sim) { brugt.push(nr); return fn(sim); }; });
+    op2.nyRunde();
+    var knap2 = d.getElementById("maet-opg-knap");
+    var trinListe = [];
+    for (i = 0; i < 4; i++) { op2.ny(); op2.visSvar(); trinListe.push(knap2.textContent); }
+    paastand("hver opgave kommer én gang i runden", brugt.slice().sort().join("") === "0123", brugt.join(" "));
+    paastand("efter den sidste står der Se resultatet",
+        trinListe.join("|") === "Ny opgave|Ny opgave|Ny opgave|Se resultatet", trinListe.join(" | "));
+    paastand("tælleren viser 4/4", d.getElementById("maet-opg-nr").textContent === "4");
+    op2.knap();
+    var sejrTekst = d.getElementById("maet-opg-tekst").textContent;
+    paastand("resultatet vises", op2.faerdig && sejrTekst.indexOf("Alle fire") === 0, sejrTekst);
+    paastand("der henvises til den anden fane", d.getElementById("maet-opg-svar").textContent.indexOf("Opløsningen") >= 0);
+    paastand("kortet får sejrsrammen", d.getElementById("maet-opg-kort").classList.contains("sejr"));
+    paastand("knappen hedder Start forfra", knap2.textContent === "Start forfra");
+    paastand("Kemichael kommer med ros", !!(s2.laerer.scene && s2.laerer.scene.navn === "ros"));
+    op2.knap();
+    paastand("en ny runde starter forfra", !op2.faerdig && op2.gennemfoert === 0 && brugt.length === 5);
+    op2.typer = orgTyper;
+    s2.nulstil();
+
+    overskrift("16. Quizzen");
+    var quizOk = true, quizNote = "";
+    D.QUIZ.forEach(function (sp, nr) {
+        if (sp.svar.length !== 4 || !(sp.rigtig >= 0 && sp.rigtig < 4) || !sp.hvorfor) { quizOk = false; quizNote = "nr " + (nr + 1); }
+        if (sp.svar.filter(function (s, j) { return sp.svar.indexOf(s) === j; }).length !== 4) { quizOk = false; quizNote = "nr " + (nr + 1) + " har to ens svar"; }
+    });
+    paastand(D.QUIZ.length + " spørgsmål med 4 forskellige svar og en forklaring", quizOk, quizNote);
+    var laengst = D.QUIZ.filter(function (sp) {
+        var l = sp.svar[sp.rigtig].length;
+        return sp.svar.every(function (s, j) { return j === sp.rigtig || s.length < l; });
+    }).length;
+    paastand("det rigtige svar er sjældent det længste", laengst <= D.QUIZ.length / 3, laengst + " af " + D.QUIZ.length);
+    NK.Quiz.aabn();
+    var valg = d.querySelectorAll("#quiz-indhold .valgknap");
+    valg[NK.Quiz.naevaerende.rigtig].click();
+    paastand("quizzen åbner, og et rigtigt svar tælles med", NK.Quiz.rigtige === 1 && valg.length === 4);
+    NK.Quiz.luk();
+
+    overskrift("17. Teksterne");
+    var alTekst = JSON.stringify(D.TEORI) + JSON.stringify(D.QUIZ) + JSON.stringify(D.SALTE) + d.body.innerText;
+    var fundet = ["kinetisk", "hydratiser", "entalpi", "gitterenergi"].filter(function (o) {
+        return alTekst.toLowerCase().indexOf(o) >= 0;
+    });
+    paastand("ingen fagord over C-niveau", fundet.length === 0, "fundet: " + fundet.join(", "));
+    var streg = alTekst.match(/.{0,25}[—–].{0,25}/);
+    paastand("ingen tankestreger i den synlige tekst", !streg, streg ? streg[0] : "");
+    paastand("ingen 1+ eller 1− i ladninger", !/[A-Za-z₀-₉]¹[⁺⁻]/.test(alTekst));
+
+    NK.Valg.saet("NaCl");
+    d.querySelector('.faneknap[data-fane="fane-oploes"]').click();
+    s1.nulstil();
+}
+
+function numerisk(a, b) { return a - b; }
+
+function norm(v) {
+    v = v % (Math.PI * 2);
+    return v < 0 ? v + Math.PI * 2 : v;
+}
+
+function tael(sim, fortegn) {
+    var n = 0;
+    for (var i = 0; i < sim.ioner.length; i++) {
+        if ((sim.ioner[i].ion.q > 0 ? 1 : -1) === fortegn) n++;
+    }
+    return n;
+}
+
+/* Lader tiden gaa uden at vente paa den: kalder simulationens egen
+   opdatering direkte, saa testen ikke afhaenger af billedraten. */
+function koerTid(sim, skridt, dt) {
+    for (var i = 0; i < skridt; i++) sim.opdater(dt);
+}
+
+function vis() {
+    skriv("\n" + (fejl === 0 ? "ALT OK" : fejl + " FEJL"), fejl === 0 ? "ok" : "fejl");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+    document.title = (fejl === 0 ? "ALT OK" : fejl + " FEJL") + ": selvtest sc2.1";
+}
+</script>
+</body>
+</html>

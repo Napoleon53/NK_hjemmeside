@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blandbarhed og faser</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">⚗️</span> Blandbarhed<span class="lang"> og faser</span></h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-bland" role="tab" aria-selected="true"><span class="nr">1</span>Ét lag eller to?</button>
+        <button class="faneknap" data-fane="fane-faser" role="tab" aria-selected="false"><span class="nr">2</span>Faser og kogepunkt</button>
+    </div>
+
+    <button class="topknap" id="introknap" type="button" title="Om forsøget (O)">⚗️ <span>Om forsøget</span></button>
+    <button class="topknap" id="teoriknap" type="button" title="Teori (T)">📖 <span>Teori</span></button>
+    <button class="topknap" id="quizknap" type="button" title="Tjek dig selv (Q)">🧠 <span>Quiz</span></button>
+    <button class="ikonknap" id="lydknap" type="button" title="Lyd til og fra (L)" aria-label="Lyd">🔊</button>
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Hjælp og genveje (H)" aria-label="Hjælp">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: ET LAG ELLER TO?                                          -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-bland" role="tabpanel" aria-label="Ét lag eller to?">
+    <div class="scene medtekst">
+        <canvas id="bland-laerred"></canvas>
+        <div class="scene-mrk" id="bland-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling">
+            <h2>Reagensglas <span class="taeller"><b id="bland-glasnr">1</b></span></h2>
+            <div id="bland-maerke"></div>
+            <div id="bland-indhold" style="margin-top:8px;"></div>
+            <p class="besked" id="bland-resultat" style="margin-top:9px;"></p>
+            <div class="knaprad">
+                <button class="knap blaa" id="bland-ryst" type="button">Ryst glasset</button>
+                <button class="knap" id="bland-toem" type="button">Tøm</button>
+            </div>
+            <label class="tjek"><input type="checkbox" id="bland-delta" checked> Marker den polære ende</label>
+        </div>
+
+        <!-- Én knap, der aendrer sig med, hvor langt man er:
+             Start opgave -> Giv hint -> Vis svaret -> Ny opgave (js/opgave.js) -->
+        <div class="kort opgavekort" id="bland-opg-kort">
+            <h2>Opgaver <span class="taeller"><b id="bland-opg-nr">0</b>/<span id="bland-opg-antal">5</span></span></h2>
+            <p class="opgave-spm" id="bland-opg-tekst"></p>
+            <div class="valg en-spalte" id="bland-opg-valg" hidden></div>
+            <p class="besked" id="bland-opg-hint"></p>
+            <p class="besked" id="bland-opg-svar"></p>
+            <div class="knaprad"><button class="knap blaa" id="bland-opg-knap" type="button">Start opgave</button></div>
+        </div>
+
+        <div class="kort">
+            <h2>Dit skema <span class="taeller">1 = ét lag, 2 = to lag</span></h2>
+            <div id="bland-skema"></div>
+            <p class="note">Felterne fyldes ud, efterhånden som du prøver parrene. Klik på et felt for forklaringen.</p>
+        </div>
+
+        <div class="kort">
+            <h2>Væskerne</h2>
+            <div id="bland-fakta"></div>
+            <p class="note">Farverne er kun til at kende væskerne fra hinanden. I virkeligheden er de alle klare.</p>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: FASER OG KOGEPUNKT                                        -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-faser" role="tabpanel" aria-label="Faser og kogepunkt">
+    <div class="scene medtekst">
+        <canvas id="faser-laerred"></canvas>
+        <div class="scene-mrk" id="faser-status"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort">
+            <h2>I kolben</h2>
+            <div class="vaeskevalg" id="faser-valg"></div>
+        </div>
+
+        <div class="kort">
+            <h2>Varmepladen <span class="taeller">trin <b id="faser-trin-tal">0</b> af 10</span></h2>
+            <div class="skyder">
+                <label for="faser-trin"><span>Pladen er indstillet på</span><b id="faser-plade-tal">slukket</b></label>
+                <input type="range" id="faser-trin" min="0" max="10" step="1" value="0">
+                <div class="skala"><span>slukket</span><span>160 °C</span><span>300 °C</span></div>
+            </div>
+            <div class="talraekke sum" style="margin-top:9px;"><span>Termometeret i kolben</span><span class="tal gul" id="faser-temp-tal">20 °C</span></div>
+            <p class="note">Knappen på pladen kan også drejes direkte i billedet.</p>
+            <label class="tjek"><input type="checkbox" id="faser-delta"> Marker den polære ende</label>
+            <button class="knap nulstil" id="faser-forfra" type="button"><span>Fyld kolben op igen</span><span class="tegn">↺</span></button>
+        </div>
+
+        <div class="kort opgavekort" id="faser-opg-kort">
+            <h2>Opgaver <span class="taeller"><b id="faser-opg-nr">0</b>/<span id="faser-opg-antal">5</span></span></h2>
+            <p class="opgave-spm" id="faser-opg-tekst"></p>
+            <div class="valg en-spalte" id="faser-opg-valg" hidden></div>
+            <p class="besked" id="faser-opg-hint"></p>
+            <p class="besked" id="faser-opg-svar"></p>
+            <div class="knaprad"><button class="knap blaa" id="faser-opg-knap" type="button">Start opgave</button></div>
+        </div>
+
+        <div class="kort maaling">
+            <h2>Målinger <span class="maerke groen" id="faser-tilstand">flydende</span></h2>
+            <div class="talraekke"><span>Tilbage i kolben</span><span class="tal" id="faser-kolbe">90 mL</span></div>
+            <div class="talraekke"><span>I modtageglasset</span><span class="tal groen" id="faser-modtag">0 mL</span></div>
+            <div class="talraekke"><span>Destillatet</span><span class="tal gul" id="faser-renhed">-</span></div>
+        </div>
+
+        <div class="kort">
+            <h2>Stoffets tal</h2>
+            <div id="faser-fakta"></div>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- INTRO - aabner af sig selv foerste gang, og igen med Om forsoeget  -->
+<!-- ================================================================= -->
+<div class="overlay" id="intro">
+    <div class="overlay-boks" style="max-width:520px;">
+        <h2>Om forsøget</h2>
+        <p>Nogle væsker blander sig med hinanden. Andre lægger sig i to lag. Forsøget undersøger, hvad der afgør det, og hvor meget varme der skal til for at koge et stof.</p>
+
+        <h3>Sådan gør du</h3>
+        <ul>
+            <li><b>Ét lag eller to?</b> Hæld to af de fem væsker sammen i et reagensglas. Ryst glasset, og lad det stå. Udfyld skemaet i panelet ved at prøve parrene af.</li>
+            <li><b>Faser og kogepunkt.</b> Vælg et stof, skru op på varmepladen, og hold øje med termometeret, mens det koger.</li>
+        </ul>
+
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="intro-luk" type="button" style="justify-content:center;">Kom i gang</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- TEORIBOKSEN - valgfri, aabnes med knappen eller T                  -->
+<!-- ================================================================= -->
+<div class="overlay" id="teori">
+    <div class="overlay-boks">
+        <h2>Teori: blandbarhed og faser</h2>
+        <p>Syv korte afsnit. Du behøver ikke læse dem for at bruge animationen.</p>
+        <div class="teoriliste" id="teori-liste"></div>
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="teori-luk" type="button" style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<div class="overlay" id="quiz">
+    <div class="overlay-boks" style="max-width:520px;">
+        <div id="quiz-indhold"></div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<div class="overlay" id="hjaelp">
+    <div class="overlay-boks">
+        <h2>Blandbarhed og faser</h2>
+        <p>To faner om det samme spørgsmål: <b>hvad holder molekylerne sammen?</b> Den første viser, hvem der kan blandes med hvem. Den anden viser, hvad der skal til for at rive dem fra hinanden.</p>
+
+        <h3>Fane 1: ét lag eller to?</h3>
+        <ul>
+            <li>Træk en flaske hen over et reagensglas, og slip den. Der hældes en portion i. Flasken bliver hængende over glasset, og den gule ring betyder, at et klik giver en portion mere.</li>
+            <li>Et klik på en flaske hælder i det glas, du har valgt. Klik på et glas for at vælge det.</li>
+            <li>Grib et glas, og ryst det frem og tilbage. Knappen <b>Ryst glasset</b> gør det samme.</li>
+            <li>Træk et glas hen over et andet for at hælde indholdet over, eller hen over affaldsglasset for at tømme det.</li>
+            <li>Zoomboblen til højre er det valgte glas set inde fra.</li>
+        </ul>
+
+        <h3>Fane 2: faser og kogepunkt</h3>
+        <ul>
+            <li>Vælg et stof, og skru op på varmepladen. Knappen på pladen kan drejes direkte i billedet.</li>
+            <li>Termometeret sidder i kolbens hals. Hold øje med det, når stoffet begynder at koge.</li>
+            <li>Dampen går ud i sidearmen, køles til dråber og drypper ned i modtageglasset. Vælg blandingen af vand og ethanol for at se, hvad destillation kan bruges til.</li>
+        </ul>
+
+        <h3>Opgaver</h3>
+        <p>Hver fane har fem opgaver. Sidder du fast, giver knappen først et hint og derefter svaret.</p>
+
+        <h3>Genveje</h3>
+        <p>
+            <kbd>1</kbd> <kbd>2</kbd> skift fane &nbsp;·&nbsp;
+            <kbd>O</kbd> om forsøget &nbsp;·&nbsp;
+            <kbd>T</kbd> teori &nbsp;·&nbsp;
+            <kbd>Q</kbd> tjek dig selv &nbsp;·&nbsp;
+            <kbd>R</kbd> start fanen forfra &nbsp;·&nbsp;
+            <kbd>L</kbd> lyd &nbsp;·&nbsp;
+            <kbd>H</kbd> denne hjælp &nbsp;·&nbsp;
+            <kbd>Esc</kbd> luk
+        </p>
+
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="hjaelp-luk" type="button" style="justify-content:center;">Luk og kom i gang</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/lyd.js"></script>
+<script src="js/sprites.js"></script>
+<script src="js/molekyle.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/tegning_faser.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="js/opgave.js"></script>
+<script src="js/sim_bland.js"></script>
+<script src="js/sim_faser.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/quiz.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

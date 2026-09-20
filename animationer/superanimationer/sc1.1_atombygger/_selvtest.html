@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest — sc1.1 Atomets opbygning</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1200px; height:800px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden aabner index.html i en iframe og kontrollerer det, man ikke kan
+   se paa et skaermbillede: at faneskiftet rammer én fane ad gangen, at
+   panelerne rent faktisk er fyldt ud, og at kemien i data.js stemmer -
+   isotopblandingerne skal ramme de atommasser, der staar i det
+   periodiske system, og saltformlerne skal have ladningsbalance.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+
+window.addEventListener("load", function () { setTimeout(koer, 1400); });
+
+function koer() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument;
+    var NK = ramme.contentWindow.NK;
+    var i, k, z;
+
+    overskrift("1. Indlaesning");
+    paastand("NK findes", !!NK);
+    if (!NK) { vis(); return; }
+    paastand("alle fire simulationer er bygget", !!(NK.sims &&
+        NK.sims["fane-byg"] && NK.sims["fane-isotop"]
+        && NK.sims["fane-salt"] && NK.sims["fane-spil"]));
+
+    overskrift("2. Panelerne er fyldt ud ved opstart");
+    var skalHaveTekst = ["byg-nuklid-sym", "byg-nuklid-a", "byg-nuklid-z", "byg-kerne",
+        "byg-opgave", "iso-regnestykke",
+        "salt-formel", "salt-navn", "salt-knap-tekst"];
+    var tomme = [];
+    for (i = 0; i < skalHaveTekst.length; i++) {
+        var e = d.getElementById(skalHaveTekst[i]);
+        if (!e || !e.textContent.replace(/\s/g, "")) tomme.push(skalHaveTekst[i]);
+    }
+    paastand(skalHaveTekst.length + " udlaesninger fyldt ud", tomme.length === 0, "tomme: " + tomme.join(", "));
+
+    overskrift("3. Faneskift — praecis én aktiv ad gangen");
+    var faner = ["fane-byg", "fane-isotop", "fane-salt", "fane-spil", "fane-byg"];
+    for (var f = 0; f < faner.length; f++) {
+        var knap = d.querySelector('.faneknap[data-fane="' + faner[f] + '"]');
+        knap.click();
+        var afsnit = d.querySelectorAll(".fane.aktiv");
+        var knapper = d.querySelectorAll(".faneknap.aktiv");
+        paastand(faner[f] + ": 1 afsnit + 1 knap",
+            afsnit.length === 1 && knapper.length === 1 &&
+            afsnit[0].id === faner[f] && knapper[0] === knap,
+            afsnit.length + " afsnit / " + knapper.length + " knapper");
+    }
+
+    overskrift("4. Atommasser regnet ud af isotopblandingerne");
+    var D = NK.Data;
+    for (z = 1; z <= D.MAKS_Z; z++) {
+        var g = D.grundstof(z);
+        var beregnet = D.gennemsnitsmasse(g.isotoper);
+        var sum = 0;
+        for (k = 0; k < g.isotoper.length; k++) sum += g.isotoper[k].andel;
+        var afvig = Math.abs(beregnet - g.masse);
+        paastand(g.symbol + ": andele " + sum.toFixed(3) + " %, beregnet " + beregnet.toFixed(4)
+            + " u mod tabellens " + g.masse + " u",
+            Math.abs(sum - 100) < 0.02 && afvig < 0.01, "afvigelse " + afvig.toFixed(4));
+    }
+
+    overskrift("5. Skalfordelinger");
+    var ventet = { 1: "1", 2: "2", 6: "2, 4", 10: "2, 8", 11: "2, 8, 1", 17: "2, 8, 7",
+                   18: "2, 8, 8", 19: "2, 8, 8, 1", 20: "2, 8, 8, 2" };
+    for (z = 1; z <= D.MAKS_Z; z++) {
+        var fordeling = D.skalfordeling(z);
+        var ialt = 0;
+        for (k = 0; k < fordeling.length; k++) ialt += fordeling[k];
+        var tekst = fordeling.join(", ");
+        paastand("Z=" + z + " -> (" + tekst + ")",
+            ialt === z && (!ventet[z] || ventet[z] === tekst), "ventede " + ventet[z]);
+    }
+
+    overskrift("6. Saltformler og ladningsbalance");
+    var proever = [["Na", "Cl", "NaCl"], ["Mg", "Cl", "MgCl₂"], ["Al", "O", "Al₂O₃"],
+                   ["Ca", "O", "CaO"], ["Li", "N", "Li₃N"], ["Mg", "N", "Mg₃N₂"], ["K", "S", "K₂S"]];
+    for (i = 0; i < proever.length; i++) {
+        var m = D.findSymbol(proever[i][0]), ik = D.findSymbol(proever[i][1]);
+        var formel = D.saltformel(m, ik);
+        var forhold = D.formelforhold(m.ion, ik.ion);
+        var balance = forhold.antalPositive * m.ion + forhold.antalNegative * ik.ion;
+        paastand(proever[i][0] + " + " + proever[i][1] + " -> " + formel + " (" + D.saltnavn(m, ik) + ")",
+            formel === proever[i][2] && balance === 0,
+            "ventede " + proever[i][2] + ", ladning i alt " + balance);
+    }
+
+    overskrift("7. Kerner, byggefanen kan bygge");
+    var kp = [[6, 6, "naturlig"], [6, 8, "radioaktiv"], [1, 2, "radioaktiv"],
+              [17, 18, "naturlig"], [8, 3, "findes-ikke"], [20, 28, "naturlig"], [19, 21, "radioaktiv"]];
+    for (i = 0; i < kp.length; i++) {
+        var art = D.kerne(kp[i][0], kp[i][1]).art;
+        paastand("p=" + kp[i][0] + " n=" + kp[i][1] + " -> " + art, art === kp[i][2], "ventede " + kp[i][2]);
+    }
+
+    overskrift("8. Byggefanen reagerer paa knapperne");
+    var byg = NK.sims["fane-byg"];
+    d.querySelector('.faneknap[data-fane="fane-byg"]').click();
+    byg.p = 6; byg.n = 6; byg.e = 6;
+    byg.atom.saet(6, 6, 6);
+    byg.opdaterPanel("");
+    paastand("6 protoner giver symbolet C (kulstof)", d.getElementById("byg-nuklid-sym").textContent === "C");
+    byg.aendr("p", 1);
+    paastand("én proton mere giver symbolet N (nitrogen)", d.getElementById("byg-nuklid-sym").textContent === "N");
+    paastand("og elektronerne foelger ikke med, saa ladningen bliver +",
+        d.getElementById("byg-nuklid-q").textContent.indexOf("+") === 0,
+        d.getElementById("byg-nuklid-q").textContent);
+    d.getElementById("byg-neutral").click();
+    paastand("\"Goer det neutralt\" nulstiller ladningen",
+        d.getElementById("byg-nuklid-q").textContent === "",
+        d.getElementById("byg-nuklid-q").textContent);
+    byg.aendr("e", -1);
+    paastand("én elektron faerre giver ladning +",
+        d.getElementById("byg-nuklid-q").textContent.indexOf("+") === 0,
+        d.getElementById("byg-nuklid-q").textContent);
+    paastand("og maerkatet faar klassen for positiv ion",
+        d.getElementById("byg-nuklid-q").className.indexOf("plus") !== -1,
+        d.getElementById("byg-nuklid-q").className);
+
+    overskrift("9. Spilbanerne laver gyldige spoergsmaal");
+    var baner = NK.SPIL_BANER;
+    for (var b = 0; b < baner.length; b++) {
+        var problemer = [];
+        for (var runde = 0; runde < 300; runde++) {
+            for (var s = 0; s < baner[b].slags.length; s++) {
+                var sp = baner[b].slags[s]();
+                var fejltekst = "";
+                if (!sp.tekst) fejltekst = "ingen tekst";
+                else if (!sp.forklaring) fejltekst = "ingen forklaring";
+                else if (!sp.valg || sp.valg.length !== 4) fejltekst = "har " + (sp.valg ? sp.valg.length : 0) + " svar";
+                else if (sp.rigtig < 0 || sp.rigtig >= sp.valg.length) fejltekst = "det rigtige svar mangler";
+                else {
+                    for (var q = 0; q < sp.valg.length; q++) {
+                        for (var w = q + 1; w < sp.valg.length; w++) {
+                            if (sp.valg[q] === sp.valg[w]) fejltekst = "to ens svar (" + sp.valg[q] + ")";
+                        }
+                        if (sp.valg[q] === "" || sp.valg[q] === undefined) fejltekst = "tomt svar";
+                    }
+                }
+                if (fejltekst && problemer.length < 4) problemer.push(sp.tekst + ": " + fejltekst);
+            }
+        }
+        paastand("bane " + (b + 1) + " (" + baner[b].navn + "): 300 runder uden fejl",
+            problemer.length === 0, problemer.join(" | "));
+    }
+
+    overskrift("10. Fem spørgsmål i en runde er altid indbyrdes forskellige");
+    var spil = NK.sims["fane-spil"];
+    for (var bn = 0; bn < baner.length; bn++) {
+        var gentagelser = 0, eksempel = "";
+        for (var kort = 0; kort < 200; kort++) {
+            spil.aktiv = bn;
+            var status = { nr: 0, rigtige: 0, opgave: null, valgt: -1, faerdig: false, perfekt: false,
+                sidsteSlags: null, brugte: [] };
+            spil.baner[bn] = status;
+            var set = {};
+            for (var qn = 0; qn < 5; qn++) {
+                spil.nytSpoergsmaal();
+                var noeg = status.brugte[status.brugte.length - 1];
+                if (set[noeg]) { gentagelser++; eksempel = status.opgave.tekst; }
+                set[noeg] = true;
+            }
+        }
+        paastand("bane " + (bn + 1) + " (" + baner[bn].navn + "): 200 runder, ingen gentagne spørgsmål",
+            gentagelser === 0, gentagelser + " gentagelser, fx: " + eksempel);
+    }
+    spil.nulstil();
+
+    vis();
+}
+
+function vis() {
+    skriv("\n" + (fejl === 0 ? "ALT OK" : fejl + " FEJL"), fejl === 0 ? "ok" : "fejl");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+</script>
+</body>
+</html>

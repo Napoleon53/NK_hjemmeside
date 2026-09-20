@@ -328,7 +328,8 @@
             document.getElementById('startside').style.display = 'none';
             iframe.style.display = 'block';
             iframe.src = filsti;
-            fuldSkaerm(('/' + filsti).indexOf('/v2/') >= 0);
+            // Ingen automatisk fuld skaerm: menuen bliver staaende, indtil man selv
+            // trykker paa knappen i panelets hoved.
             ignorerBlurIndtil = Date.now() + 1200;
 
             var alleKnapper = document.querySelectorAll('.tab-btn');

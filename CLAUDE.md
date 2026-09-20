@@ -1,25 +1,29 @@
 # kemiformler.dk
 
-Kemi-undervisningssite: HTML/CSS/vanilla JS, ingen build-proces. Anden
-generations animationer ligger i `animationer/v2/` (interaktive
-canvas-simulationer med opgaver), statiske sider i roden, downloads i
-`downloads/`.
+Kemi-undervisningssite: HTML/CSS/vanilla JS, ingen build-proces.
+Superanimationerne (interaktive canvas-simulationer med opgaver) ligger i
+`animationer/superanimationer/`, de gamle laboratorieforsøg og motoren bag
+dem i `animationer/v2/`, statiske sider i roden, downloads i `downloads/`.
 
 ## Frosset: animationer/v2/ bortset fra superanimation/
 
-`animationer/v2/laboratoriet/`, `kemichael/`, `superlab/` og `superlab_ny/`
-er frosne 20. september 2026 og må ikke rettes her. Laboratoriesporet
+Hele `animationer/v2/` er frosset 20. september 2026 og må ikke rettes her:
+`laboratoriet/`, `kemichael/`, `superlab/` og `superlab_ny/`. Laboratoriesporet
 udvikles i `C:\NK_Undervisning\virtuelt_laboratorium\`, som har sin egen
 kopi af de fire mapper. Bliver der alligevel rettet i dem, tager
 `autocommit.ps1` filerne ud af commit'en igen og skriver det i
 `autocommit.log`.
 
 Mapperne bliver stående her, fordi de otte gamle laboratorieforsøg i
-`superlab/` og `superanimation/sc2.1_salt_i_vand` indlæser filer fra
-`laboratoriet/` og `kemichael/`. Fjernes de, går animationerne i sort på
-kemiformler.dk.
+`superlab/` og to superanimationer (`sc2.1_salt_i_vand` og
+`sc3.4_blandbarhed_inaktiv`, som henter `../../v2/kemichael/kemichael.js`)
+indlæser filer fra `laboratoriet/` og `kemichael/`. Fjernes de, går
+animationerne i sort på kemiformler.dk.
 
-`animationer/v2/superanimation/` er ikke frosset og rettes som hidtil.
+**Superanimationerne er flyttet ud af `v2/`** og ligger igen i
+`animationer/superanimationer/` (20. september). De er ikke frosne og rettes
+som hidtil. Den gamle `animationer/v2/superanimation/` skal slettes af
+brugeren; intet peger på den.
 
 Skal en fejl i en af de otte gamle animationer rettes, rettes den her, ét
 sted, og bakkes ikke til NK_Undervisning. De to kopier skal ikke holdes i
@@ -53,8 +57,9 @@ sync; denne er færdig.
 
 - Punkterne om superlab-animationer, `laboratoriet/` og `kemichael/`
   gælder i NK_Undervisning, ikke her: de mapper er frosne (se ovenfor).
-  Punkterne om superanimationer gælder som hidtil.
-- Læs `animationer/v2/README.md`, før der arbejdes i mappen. Den
+  Punkterne om superanimationer gælder som hidtil og arbejdes i
+  `animationer/superanimationer/`.
+- Læs `animationer/v2/README.md`, før der arbejdes i en af mapperne. Den Den
   skelner mellem superanimationer (et begreb i op til fire faner, Kemichael kan
   komme på besøg) og superlab-animationer (et forsøg på `laboratoriet/`,
   Kemichael er fast), og den har kravene til begge. Punkterne nedenfor om
@@ -94,11 +99,12 @@ sync; denne er færdig.
   og Kemichaels advarsel om et stof er også data der (`fare`).
 - Sidepanelet er 430 px bredt (`--panel-bredde` i `laboratoriet/css/grund.css`).
   Prøvebordet har 473 px, fordi zoomboblen står i panelet.
-- Samlingssiderne (`samling_*.html`) har fuld skærm: sidepanelerne skjules i
-  begge lag, og knappen ☰ nederst til venstre gendanner dem. Superanimationer
-  starter i fuld skærm; for alle andre animationer vælges den med ⛶ i
-  panelets hoved (`fuldSkaerm` i de indre sider, beskederne `fuldSkaerm` og
-  `gendanPanel` til de ydre).
+- Samlingssiderne (`samling_*.html`) kan give fuld skærm: sidepanelerne
+  skjules i begge lag, og knappen ☰ nederst til venstre gendanner dem. **Ingen
+  animation starter i fuld skærm af sig selv** (rettet 20. september efter
+  kollegers tilbagemelding: det var forvirrende, at menuen forsvandt). Fuld
+  skærm vælges med ⛶ i panelets hoved (`fuldSkaerm` i de indre sider,
+  beskederne `fuldSkaerm` og `gendanPanel` til de ydre).
 - Superanimationer om laboratorieforsøg har en intro-popup, der kort siger, hvad
   forsøget undersøger, og hvad eleven skal gøre. Den åbner af sig selv første
   gang og igen med knappen Om forsøget (mønster: `#intro` i

@@ -1,0 +1,198 @@
+# sc1.1 — Atomets opbygning
+
+En superanimation: i modsætning til de øvrige animationer, som er én enkelt
+HTML-fil, ligger denne i sin egen mappe med adskilt CSS og JavaScript.
+
+Åbn **`index.html`**. Mappen er selvstændig — den henter kun filer inde fra sig
+selv, så den kan flyttes hvorhen som helst uden at der knækker noget.
+
+Den afløser `animationer/kemi-c-filer/c1.1_atommodel_ioner.html`. Det, der var
+værd at tage med derfra, er taget med: skyderen gennem de første 20 grundstoffer,
+gæt-ladningen-øvelsen og elektronoverførslen til et salt. Resten er bygget om.
+
+Den gamle animation ligger nu i `animationer/kemi-c-filer/arkiv/c1.1_atommodel_ioner_oldversion.html`.
+Den oprindelige sti, `c1.1_atommodel_ioner.html`, er en genvej (meta-refresh +
+JS-redirect) til denne superanimations `index.html`, så de eksisterende knapper
+i `samling_c1.html` og `samling_NV.html` ikke behøvede at blive ændret.
+
+## Hvad viser den
+
+Fire faner om det samme spørgsmål: *hvad er et atom lavet af, og hvad sker der,
+når man ændrer på delene?*
+
+| # | Fane | Hvad man gør | Pointe |
+|---|------|--------------|--------|
+| 1 | Atommodellen | lægger protoner, neutroner og elektroner i én ad gangen | **protoner** = grundstoffet, **neutroner** = isotopen, **elektroner** = ladningen |
+| 2 | Isotoper | skruer på, hvor meget der er af hver isotop | atommassen i det periodiske system er et **vejet gennemsnit** — derfor 35,45 for chlor |
+| 3 | Salte | kombinerer et metal og et ikke-metal frit | formlen følger af, at **elektronregnskabet skal gå op**: Mg²⁺ + 2 Cl⁻ → MgCl₂ |
+| 4 | Spil | tager en bane på fem spørgsmål | det hele én gang til, men som spørgsmål — og med begrundelsen med, også når man rammer rigtigt |
+
+Der er ikke længere en selvstændig "Skaller og ioner"-fane: dens gæt-ladningen-
+øvelse mindede for meget om spørgsmålene i fane 4's "Ioner"-bane til at
+retfærdiggøre begge dele. Grafikken og pointen lever videre dér i stedet — se
+"Spilfanen viser hele iondannelsen" nedenfor.
+
+Hverken værktøjet eller fane 1 hedder "Byg et atom": PhET har en sim med det
+navn, og selv om koden her er skrevet fra bunden, er der ingen grund til at
+lægge sig så tæt op ad den.
+
+Fane 1 har det periodiske system i lommeformat nederst i panelet. Det viser,
+hvor det byggede atom hører hjemme, og man kan trykke sig direkte til et
+grundstof. Fane 4 kan slå den samme tabel op i stort format midt i et
+spørgsmål — dér med atomnummeret i felterne.
+
+### Det nye i forhold til den gamle animation
+
+* **Fane 1 findes ikke i den gamle.** Det er den, isotopbegrebet kommer ud af:
+  man kan bygge to kerner af samme grundstof, som ikke vejer det samme, og
+  animationen siger hver gang, hvad der lige skete og hvorfor det betyder noget.
+  Den har også en opgavegenerator med fem slags opgaver — fra "byg ¹⁴C" til
+  "byg en ion med ladningen 2+, som har samme elektronstruktur som neon".
+* **Neutronerne er kommet med.** Den gamle animation havde kun protoner og
+  elektroner, så massetal og isotoper kunne slet ikke vises.
+* **Kernen tegnes som partikler**, ikke som én lilla kugle. Man kan tælle
+  protonerne, og kernen vokser synligt, når man lægger mere i.
+* **Reaktivitetsmåleren er fjernet.** Den gamle gav en procentskala, eleven
+  ikke kunne efterprøve. Ædelgasstruktur nævnes i stedet i beskeden, der
+  kommer, når man lægger en elektron i eller fjerner én.
+* **Saltfanen tvinger ikke længere metal og ikke-metal til at passe én til én.**
+  Vælger man magnesium og chlor, regner modellen selv ud, at der skal to
+  chloratomer til — og skriver forklaringen ud.
+* **Bor og silicium danner ikke ioner** i modellen. Den gamle lod Bor afgive tre
+  elektroner og blive B³⁺, hvilket ikke er rigtigt.
+
+### Spilfanen viser hele iondannelsen
+
+Den gamle "Skaller og ioner"-fane (gæt ionens ladning, se den bagefter) er
+lagt ned, fordi bane 4's "Hvilken ladning får X?"-spørgsmål allerede spurgte
+om det samme. I stedet er den fanes grafik flyttet med ind i spilfanen:
+
+* Svarer man rigtigt på et ladningsspørgsmål, dannes ionen for øjnene af én -
+  elektronerne flyver ud eller ind, og maerkatet får ladningen på. Se
+  `afsloerIon()` i `js/sim_spil.js`.
+* Den lille "partikelstat"-boks (protoner, elektroner, ladning) fra den gamle
+  fane findes stadig, nu som `#spil-stat` i `index.html` - og den lille
+  skaltal-oversigt over elektroner pr. skal ("2/2, 8/8, …") er altid fremme,
+  når der overhovedet er et atom at vise. Kun de(t) tal, spørgsmålet selv
+  handler om, vises som "?" i boksen i stedet for facit - se `skjulStat` på
+  hver opgave i `sim_spil.js` (en liste af `"p"`, `"e"`, `"q"`). Maerkatet
+  (symbol + ladning) vises kun, når `maerkatSymbol` er sat, og aldrig med
+  ladning haevet paa, hvis `"q"` er skjult.
+
+Direkte link til en bestemt fane: `index.html#isotop`, `#salt`, `#spil`
+(`#byg` eller ingenting giver fane 1).
+
+Genveje: <kbd>1</kbd>–<kbd>4</kbd> faner · <kbd>p</kbd> <kbd>n</kbd> <kbd>e</kbd>
+læg en partikel i · <kbd>P</kbd> <kbd>N</kbd> <kbd>E</kbd> tag en ud ·
+<kbd>R</kbd> nulstil fanen · <kbd>H</kbd> rundvisning på den aktive fane.
+
+## Filer
+
+```
+index.html          markup for alle fire faner + rundvisningens skal
+css/stil.css        alt udseende. NB: decimaltal med PUNKTUM i CSS
+js/kerne.js         NK-navnerum, dansk talformat, hævet/sænket skrift,
+                    DPR-skarpt canvas, tegnehjælpere
+js/data.js          grundstofferne 1–20: isotoper med rigtige kernemasser og
+                    andele, ionladninger, saltformler og -navne, plads i det
+                    periodiske system
+js/atom.js          ÉT atom: tre tal (p, n, e), partikler der flyver ind og ud,
+                    kernepakning og hele tegningen. Bruges af alle faner
+js/pertabel.js      det periodiske system i lommeformat, 18 søjler
+js/sim_byg.js       fane 1     js/sim_isotop.js  fane 2
+js/sim_salt.js      fane 3     js/sim_spil.js    fane 4
+js/rundvisning.js   spotlight-rundvisningen bag hjælpeknappen (se nedenfor)
+js/app.js           faneskift, tastatur, tegneløkke
+_selvtest.html      udviklerværktøj, indgår ikke i animationen (se nedenfor)
+```
+
+Hver simulation er et objekt med `tilpas()`, `opdater(dt)`, `tegn()` og
+`nulstil()`. `app.js` kalder kun den aktive fane, så de tre andre koster
+ingenting.
+
+## At rette i den
+
+**Grundstofdata** står samlet i `js/data.js`. Isotopmasserne er de rigtige
+kernemasser i u — ikke massetallene — for ellers rammer det vejede gennemsnit
+ikke den atommasse, der står i det periodiske system. Ændrer man en andel,
+skal `_selvtest.html` stadig være grøn.
+
+Listen stopper ved calcium (Z = 20), fordi skalmodellen `[2, 8, 8, 2]` ikke
+holder længere. Kalium og calcium er i forvejen et særtilfælde i
+`D.skalfordeling`: deres sidste elektroner lægges i skal 4, selvom skal 3 kun
+er halvt fyldt — det er netop derfor, de opfører sig som metaller med 1 og 2
+yderelektroner.
+
+**Kernen** pakkes i `NK.Atom.prototype.pakKerne` ved at løse afstandene
+positionsvis i stedet for med fjederkræfter: partiklerne trækkes mod midten og
+skubbes fra hinanden, hvis de overlapper. Den metode kan ikke eksplodere,
+uanset hvor mange partikler man propper i.
+
+**Størrelsesforholdet er med vilje fast.** `MODEL_YDRE` i `js/atom.js` er den
+radius, et atom med fire fyldte skaller ville have, og alt skaleres i forhold
+til den. Derfor fylder hydrogen mindre i billedet end calcium — i stedet for at
+hvert atom blæses op til at fylde hele scenen. Vil man have store atomer, skal
+man hæve loftet i `plads`-beregningen i `sim_byg.js` og `sim_spil.js`, ikke
+`MODEL_YDRE`.
+
+**Opgaverne** på fane 1 er fem skabeloner øverst i `OPGAVETYPER` i
+`js/sim_byg.js`. Hver skabelon returnerer `{tekst, p, n, e, svar}`, og resten
+klarer sig selv — opgaven tjekkes efter hver eneste ændring, så eleven får
+svaret i samme øjeblik, atomet er rigtigt.
+
+**Spørgsmålene** på fane 4 er `sp_`-funktionerne i `js/sim_spil.js`, samlet i
+tre baner i `BANER`. Hver funktion returnerer `{tekst, valg, rigtig,
+forklaring, noegle}` plus det, der skal tegnes (`atom`, `nuklid` eller
+`stortekst`), og bygger både spørgsmål, svarmuligheder og begrundelse ud af
+`data.js` — så et spørgsmål aldrig kan komme til at sige noget andet end
+resten af animationen. Distraktorerne er med vilje de fejl, eleven faktisk
+laver: protontallet i stedet for neutrontallet, fortegnsfejl på ladningen.
+Bane 3 ("Ioner") ruller ikke ind i salte — det kommer eleven først til på
+fane 3 (Salte) — men gætter til gengæld elektrontallet ud fra selve
+ionskrivemåden (fx N³⁻), uden et billede at tælle prikker på. Et opgave-objekt
+med `atom` kan desuden have `skjulStat` (en liste af `"p"`, `"e"`, `"q"` -
+de tal i partikelstat-boksen, der skal vises som "?", fordi de er selve
+svaret) og `maerkatSymbol` (vises kun, når identiteten ikke er hemmelig).
+`ionAfsloering` er kun sat på ladningsspørgsmålet: svarer man rigtigt, dannes
+ionen for øjnene af én, se afsnittet "Spilfanen viser hele iondannelsen"
+ovenfor.
+
+`noegle` bruges til at sikre, at de fem spørgsmål i én runde altid handler om
+fem forskellige grundstoffer: `nytSpoergsmaal()` i `sim_spil.js` trækker en ny
+opgave, indtil dens `(slags, noegle)`-par ikke allerede er brugt i denne
+runde. Uden det kunne man sagtens få "hvilken ladning får kalium" to gange i
+samme runde, bare pakket i to forskellige spørgsmålstyper.
+
+Fordi spørgsmålene trækkes tilfældigt, tjekker `_selvtest.html` 300 runder af
+hver bane for, at der altid er fire *forskellige* svarmuligheder med præcis ét
+rigtigt iblandt, og yderligere 200 runder for, at ingen af de fem spørgsmål i
+én runde gentager samme (type, grundstof)-par. Det er ikke noget, man kan se
+på ét skærmbillede.
+
+**`_selvtest.html`** åbner `index.html` i en iframe og kontrollerer det, man
+ikke kan se på et skærmbillede: at faneskiftet rammer én fane ad gangen, at
+panelerne er fyldt ud, at alle 20 isotopblandinger rammer tabellens atommasse,
+at skalfordelingerne er rigtige, og at saltformlerne har ladningsbalance. Brug
+den efter ændringer i `data.js`. Filen bruges ikke af animationen og kan
+slettes.
+
+**Rundvisningen** (hjælpeknappen, `?`) viser ikke længere én lang tekstvæg om
+alle faner. Den peger i stedet på ét element ad gangen på den fane, man
+rent faktisk står på — kun fane 1's rundvisning slutter af med at pege på de
+tre andre faner, uden at gå i dybden med dem. Trinene står i `TURE` i
+`js/rundvisning.js`, ét array pr. fane-id, som en liste af `{sel, titel,
+tekst}`. `sel` er en CSS-selector (kommasepareret for at fremhæve flere
+elementer på én gang, se saltfanens to grundstofvælgere) — findes elementet
+ikke lige nu, springes trinnet automatisk over. Rundvisningen blokerer klik
+og tastaturgenveje på resten af siden, mens den er åben, og lukker sig selv,
+hvis man skifter fane.
+
+## Den er nu i menuen
+
+`samling_c1.html` og `samling_NV.html` peger stadig på den gamle sti
+(`c1.1_atommodel_ioner.html`), men den sti er nu selv genvejen til denne
+superanimation — se ovenfor. Ingen af knapperne er derfor ændret.
+
+Feedback-boksen i `animationer/samling_alt.html` har allerede pladsen: i
+`FEEDBACK_EMNER` står `C1: Atomer` med `{ nr: 1, navn: 'Atommodel' }` — det navn
+passer allerede.

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc3.4 Blandbarhed og faser</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1400px; height:860px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: blandingsskemaet, lagene og deres rækkefølge,
+   at en emulsion skiller sig ad igen, at hvert stof koger ved sit eget
+   kogepunkt og står stille dér, at destillatet bliver rigt på det stof
+   med det laveste kogepunkt, og at alle ti opgaver kan løses.
+
+   Chrome kigger kun ind i en iframe på file://, hvis den startes med
+   --allow-file-access-from-files. Ellers: brug en lokal server eller
+   Firefox.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function note(t) { skriv("        " + t, "note"); }
+function overskrift(t) { skriv("\n" + t, "h"); }
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+function koer() {
+    try { koerTest(); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    vis();
+}
+
+/* Kør simulationen frem i sekunder uden at vente på skærmen. */
+function frem(sim, sek) {
+    var n = Math.round(sek * 60);
+    for (var i = 0; i < n; i++) sim.opdater(1 / 60);
+}
+
+function koerTest() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument;
+    var W = ramme.contentWindow;
+    var NK = W.NK;
+    if (NK && NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+    var i, j;
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var D = NK.Data, T = NK.Tegn, M = NK.Mol;
+    paastand("data.js er kørt: fem væsker", !!(D && D.VAESKER && D.VAESKER.length === 5));
+    paastand("begge faner er bygget", !!(NK.sims && NK.sims["fane-bland"] && NK.sims["fane-faser"]));
+    if (!NK.sims) return;
+    var B = NK.sims["fane-bland"], F = NK.sims["fane-faser"];
+    paastand("Kemichael er indlæst og koblet på begge faner",
+        !!(NK.Kemichael && B.laerer && F.laerer));
+    paastand("hans sprites er indlæst",
+        ["laererKrop", "laererHoved", "laererArm"].every(function (n) { return NK.Sprites.klar(n); }));
+
+    overskrift("2. Panelerne er fyldt ud ved opstart");
+    var skalHaveTekst = ["bland-glasnr", "bland-resultat", "bland-status", "bland-opg-knap",
+                         "faser-temp-tal", "faser-plade-tal", "faser-kolbe", "faser-modtag",
+                         "faser-tilstand", "faser-opg-knap"];
+    var tomme = skalHaveTekst.filter(function (id) {
+        var e = d.getElementById(id);
+        return !e || !e.textContent.replace(/\s/g, "");
+    });
+    paastand(skalHaveTekst.length + " udlæsninger fyldt ud", tomme.length === 0, "tomme: " + tomme.join(", "));
+    paastand("skemaet har 5 x 5 felter", d.querySelectorAll("#bland-skema td").length === 25);
+    paastand("væsketabellen har fem rækker", d.querySelectorAll("#bland-fakta tr").length === 6);
+    paastand("seks valg i kolben", d.querySelectorAll("#faser-valg .vaeskeknap").length === 6);
+    paastand("teoriboksen er bygget", d.querySelectorAll("#teori-liste .teorikort").length === D.TEORI.length);
+    paastand("opgaveknapperne starter på \"Start opgave\"",
+        d.getElementById("bland-opg-knap").textContent === "Start opgave" &&
+        d.getElementById("faser-opg-knap").textContent === "Start opgave");
+
+    overskrift("3. Blandingsskemaet er fuldstændigt og symmetrisk");
+    var par = 0, huller = [];
+    for (i = 0; i < D.VAESKER.length; i++) {
+        for (j = i + 1; j < D.VAESKER.length; j++) {
+            var a = D.VAESKER[i].id, b = D.VAESKER[j].id;
+            var p1 = D.par(a, b), p2 = D.par(b, a);
+            par++;
+            if (p1 !== p2 || !p1.hvorfor) huller.push(a + "+" + b);
+        }
+    }
+    paastand("alle " + par + " par har en forklaring og er symmetriske", huller.length === 0, huller.join(", "));
+    paastand("et stof med sig selv er altid ét lag",
+        D.VAESKER.every(function (v) { return D.par(v.id, v.id).blandbar; }));
+    note("blandbare par: " + (function () {
+        var n = 0;
+        for (i = 0; i < D.VAESKER.length; i++) {
+            for (j = i + 1; j < D.VAESKER.length; j++) {
+                if (D.par(D.VAESKER[i].id, D.VAESKER[j].id).blandbar) n++;
+            }
+        }
+        return n + " af " + par;
+    }()));
+
+    overskrift("4. Lagene i glasset");
+    function proev(a, b) {
+        var g = B.glas[0];
+        g.toem();
+        g.tilsaet(a, 4.8);
+        g.tilsaet(b, 4.8);
+        B.valgt = 0;
+        B.opdaterPanel();
+        return g.lag();
+    }
+    var lagfejl = [];
+    for (i = 0; i < D.VAESKER.length; i++) {
+        for (j = i + 1; j < D.VAESKER.length; j++) {
+            var va = D.VAESKER[i], vb = D.VAESKER[j];
+            var p = D.par(va.id, vb.id);
+            var lag = proev(va.id, vb.id);
+            var venter = p.blandbar ? 1 : 2;
+            if (lag.length !== venter) { lagfejl.push(va.id + "+" + vb.id + ": " + lag.length + " lag"); continue; }
+            if (!p.blandbar) {
+                /* Listen går nedefra og op, så det sidste lag er det øverste. */
+                var oeverst = lag[lag.length - 1].ids[0];
+                if (oeverst !== D.oeverst(va.id, vb.id).id) {
+                    lagfejl.push(va.id + "+" + vb.id + ": " + oeverst + " lå øverst");
+                }
+            }
+        }
+    }
+    paastand("alle par giver det rigtige antal lag, og det letteste ligger øverst",
+        lagfejl.length === 0, lagfejl.join(" | "));
+
+    proev("ethanol", "olie");
+    paastand("ethanol ligger over olie (0,79 mod 0,92 g/mL)",
+        B.glas[0].lag()[1].ids[0] === "ethanol");
+
+    overskrift("5. Rystning og adskillelse");
+    proev("vand", "olie");
+    B.rystValgte();
+    paastand("rystning giver en emulsion", B.glas[0].uklar > 0.9);
+    paastand("emulsionen er ét mælket lag på skærmen", B.glas[0].lag().length === 2);
+    frem(B, 8);
+    paastand("den skiller sig ad igen af sig selv", B.glas[0].uklar < 0.02);
+    paastand("og lagene er de samme som før", B.glas[0].lag().length === 2);
+
+    proev("vand", "ethanol");
+    B.rystValgte();
+    paastand("en blandbar blanding bliver ikke uklar af at blive rystet", B.glas[0].uklar < 0.02);
+
+    overskrift("6. Glasset kan fyldes, hældes og tømmes");
+    B.glas.forEach(function (g) { g.toem(); });
+    B.valgt = 0;
+    for (i = 0; i < 20; i++) B.haeldFlaske(0, 0);
+    paastand("glasset løber ikke over " + NK.tal(B.glas[0].mL(), 1) + " mL",
+        Math.abs(B.glas[0].mL() - T.RG.maks) < 0.01);
+    paastand("en portion er højst en femtedel af glasset", 2.4 <= T.RG.maks / 5 + 1e-9);
+    B.haeldGlas(0, 1);
+    paastand("indholdet kan hældes over i et andet glas",
+        B.glas[1].mL() > 11.9 && B.glas[0].mL() < 0.1);
+    B.toemIAffald(1);
+    paastand("og tømmes i affaldsglasset", B.glas[1].mL() < 0.001);
+
+    overskrift("7. Væskeniveauet i reagensglasset");
+    paastand("tomt glas: niveau 0", T.rgNiveau(0) === 0);
+    paastand("fuldt glas står til kanten",
+        Math.abs(T.rgNiveau(T.RG.maks) - (T.RG.h - T.RG.vaeg)) < 0.6,
+        NK.tal(T.rgNiveau(T.RG.maks), 1) + " mod " + (T.RG.h - T.RG.vaeg));
+    var voksende = true;
+    for (i = 1; i <= T.RG.maks; i++) {
+        if (T.rgNiveau(i) <= T.rgNiveau(i - 1)) voksende = false;
+    }
+    paastand("niveauet vokser med rumfanget", voksende);
+
+    overskrift("8. Kogepunkterne på fane 2");
+    var kogefejl = [];
+    D.VAESKER.forEach(function (v) {
+        if (v.kp > 300) return;                 /* madolie koger over pladens maksimum */
+        for (i = 0; i < 6; i++) { if (VALGID(F, v.id)) break; }
+        F.saetTrin(10);
+        frem(F, 120);
+        if (Math.abs(F.temp - v.kp) > 1.5 && F.mLIKolben() > 0.5) {
+            kogefejl.push(v.id + ": " + NK.tal(F.temp, 0) + " °C, ikke " + v.kp);
+        }
+        if (F.mLIGlasset() < 1) kogefejl.push(v.id + ": intet destillat");
+    });
+    paastand("hvert stof koger ved sit eget kogepunkt og destillerer over",
+        kogefejl.length === 0, kogefejl.join(" | "));
+
+    VALGID(F, "olie");
+    F.saetTrin(10);
+    frem(F, 90);
+    paastand("madolie koger ikke ved pladens maksimum (kp 320 °C)",
+        !F.koger && F.temp < 320, NK.tal(F.temp, 0) + " °C");
+
+    overskrift("9. Destillation af vand og ethanol");
+    VALGNR(F, 5);
+    paastand("blandingen er halvt vand og halvt ethanol",
+        Math.abs(F.kolbe.vand - F.kolbe.ethanol) < 0.01);
+    F.saetTrin(7);
+    frem(F, 20);
+    paastand("den koger ved ethanols kogepunkt, ikke vandets",
+        Math.abs(F.temp - 78) < 1.5, NK.tal(F.temp, 0) + " °C");
+    var samlet = F.mLIGlasset();
+    var andel = samlet > 0 ? (F.modtag.ethanol || 0) / samlet : 0;
+    paastand("de første " + NK.tal(samlet, 0) + " mL er over 60 % ethanol",
+        andel > 0.6, NK.tal(andel * 100, 0) + " %");
+    paastand("og der er også lidt vand med", (F.modtag.vand || 0) > 0.01);
+    frem(F, 200);
+    paastand("koges kolben tør, er alt kommet med over",
+        F.mLIKolben() < 0.5 && Math.abs(F.mLIGlasset() - 90) < 1,
+        NK.tal(F.mLIGlasset(), 1) + " mL");
+
+    overskrift("10. Alle opgaverne kan løses");
+    [[B, "bland"], [F, "faser"]].forEach(function (post) {
+        var sim = post[0], navn = post[1];
+        var O = sim.opgaver;
+        var antal = O.typer.length;
+        var uloeste = [];
+        for (var n = 0; n < antal; n++) {
+            O.nyRunde();
+            O.koe = [n];
+            O.ny();
+            var o = O.opgave;
+            if (!o.tekst) { uloeste.push(navn + " " + n + ": ingen tekst"); continue; }
+            if (!o.svar) { uloeste.push(navn + " " + n + ": intet svar"); continue; }
+            if (o.valg && (o.rigtig < 0 || o.rigtig >= o.valg.length)) {
+                uloeste.push(navn + " " + n + ": rigtig peger uden for valgene");
+                continue;
+            }
+            if (o.visSvar) o.visSvar(sim);
+            if (o.tjek) {
+                /* Nogle opgaver tager tid: destillationen skal naa at
+                   samle 15 mL, og en emulsion skal naa at skille sig ad. */
+                frem(sim, 40);
+                if (o.tjek(sim) !== true) uloeste.push(navn + " " + n + ": tjek blev ikke sand efter visSvar");
+            }
+            O.visSvar();
+            if (!O.opgave.afsluttet) uloeste.push(navn + " " + n + ": blev ikke afsluttet");
+        }
+        paastand(navn + ": alle " + antal + " opgaver", uloeste.length === 0, uloeste.join(" | "));
+        O.nyRunde();
+    });
+
+    overskrift("11. Quizzen");
+    var q = D.QUIZ;
+    var qfejl = q.filter(function (s) {
+        return !s.q || !s.hvorfor || s.svar.length < 3 || s.rigtig < 0 || s.rigtig >= s.svar.length;
+    });
+    paastand("alle " + q.length + " spørgsmål er hele", qfejl.length === 0);
+
+    overskrift("12. Sproget og skriftstørrelsen");
+    var tekst = d.body.innerText || "";
+    var streger = tekst.match(/[–—]/g);
+    paastand("ingen tankestreger i teksten", !streger, streger ? streger.length + " fundet" : "");
+    var smaa = [];
+    var alle = d.querySelectorAll("body *");
+    for (i = 0; i < alle.length; i++) {
+        var e = alle[i];
+        if (!e.textContent.replace(/\s/g, "")) continue;
+        if (e.children.length) continue;
+        var px = parseFloat(W.getComputedStyle(e).fontSize);
+        if (px && px < 11.9 && smaa.indexOf(e.className) < 0) smaa.push(e.className || e.tagName);
+    }
+    paastand("ingen tekst under 12 px", smaa.length === 0, smaa.join(", "));
+
+    overskrift("13. Molekylerne");
+    var molfejl = [];
+    D.VAESKER.forEach(function (v) {
+        var f = M.form(v);
+        if (!f.knuder.length) molfejl.push(v.id + ": ingen atomer");
+        if (!(f.yder > 0)) molfejl.push(v.id + ": ingen udstrækning");
+        var polaer = f.harPolaer;
+        if (v.polaer > 0.2 && !polaer) molfejl.push(v.id + ": mangler en polær gruppe");
+        if (v.id === "heptan" && polaer) molfejl.push("heptan har en polær gruppe");
+    });
+    paastand("alle fem molekyler er bygget rigtigt", molfejl.length === 0, molfejl.join(" | "));
+    paastand("heptan fylder mere end vand", M.form(D.vaeske("heptan")).yder > M.form(D.vaeske("vand")).yder);
+    paastand("madolie fylder mest af alle",
+        D.VAESKER.every(function (v) {
+            return v.id === "olie" || M.form(D.vaeske("olie")).yder >= M.form(v).yder;
+        }));
+
+    overskrift("14. Farveblandingen giver en gyldig farve");
+    var f1 = T.blandFarve("#3d9ee0", "#b06ad6", 0.5);
+    paastand("blandFarve giver hex", /^#[0-9a-f]{6}$/.test(f1), f1);
+    paastand("den kan blandes igen", /^#[0-9a-f]{6}$/.test(T.blandFarve(f1, "#e0b53a", 0.3)));
+
+    /* Ryd op efter testen, så en åben side ikke står i en mærkelig tilstand. */
+    B.glas.forEach(function (g) { g.toem(); });
+    B.opdaterPanel();
+    F.saetTrin(0);
+    F.fyld();
+}
+
+/* Vælg en ren væske på fane 2 ud fra dens id. */
+function VALGID(F, id) {
+    var W = document.getElementById("ramme").contentWindow;
+    var knapper = document.getElementById("ramme").contentDocument.querySelectorAll("#faser-valg .vaeskeknap");
+    var navn = W.NK.Data.vaeske(id).navn;
+    for (var i = 0; i < knapper.length; i++) {
+        if (knapper[i].querySelector(".vnavn").textContent === navn) {
+            F.valgNr = i;
+            F.fyld();
+            return true;
+        }
+    }
+    return false;
+}
+
+function VALGNR(F, nr) { F.valgNr = nr; F.fyld(); }
+
+function vis() {
+    skriv("\n" + (fejl ? fejl + " fejl" : "Alt i orden."), fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+</script>
+</body>
+</html>

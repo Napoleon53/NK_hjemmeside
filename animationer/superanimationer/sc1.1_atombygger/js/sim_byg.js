@@ -1,0 +1,586 @@
+/* =====================================================================
+   sim_byg.js - fane 1: Byg et atom
+
+   Her er der ingen skyder, der vaelger et grundstof for eleven. Man
+   laegger partiklerne i én ad gangen, og hver gang faar man at vide,
+   hvad der SKETE - for det er hele pointen:
+
+     protoner   bestemmer, HVILKET grundstof det er
+     neutroner  bestemmer, HVILKEN isotop det er
+     elektroner bestemmer, HVILKEN ladning det har
+
+   Det er derfor isotopbegrebet kan opdages her: man kan bygge to
+   kerner af samme grundstof, som ikke vejer det samme.
+   ===================================================================== */
+(function () {
+    "use strict";
+
+    var NK = window.NK;
+    var D = NK.Data;
+
+    var MAKS_P = D.MAKS_Z;      /* skalmodellen holder til og med calcium */
+    var MAKS_N = 28;            /* nok til calcium-48 */
+    var MAKS_E = D.MAKS_Z;
+
+    NK.SimByg = function () {
+        this.l = new NK.Laerred(NK.el("byg-laerred"));
+        this.atom = new NK.Atom();
+        this.p = 1; this.n = 0; this.e = 1;
+        this.opgave = null;
+        this.rigtige = 0;       /* selv-loeste opgaver i denne runde - se tjekOpgave() */
+        this.beskedTid = 0;
+        this.atom.saetStraks(this.p, this.n, this.e);
+
+        this.koblKnapper();
+        this.opdaterPanel("start");
+        this.visOpgaveStart();
+    };
+
+    /* ----- Knapper -------------------------------------------------------- */
+    NK.SimByg.prototype.koblKnapper = function () {
+        var mig = this;
+
+        function bind(id, slags, retning) {
+            NK.el(id).addEventListener("click", function () { mig.aendr(slags, retning); });
+        }
+        bind("byg-p-plus", "p", 1);
+        bind("byg-p-minus", "p", -1);
+        bind("byg-n-plus", "n", 1);
+        bind("byg-n-minus", "n", -1);
+        bind("byg-e-plus", "e", 1);
+        bind("byg-e-minus", "e", -1);
+
+        NK.el("byg-neutral").addEventListener("click", function () {
+            if (mig.e === mig.p) return;
+            var forskel = mig.p - mig.e;
+            mig.e = mig.p;
+            mig.anvend(forskel > 0
+                ? "Du fyldte " + NK.talform(forskel, "elektron", "elektroner") + " på. Nu er der lige mange protoner og elektroner — atomet er neutralt."
+                : "Du fjernede " + NK.talform(-forskel, "elektron", "elektroner") + ". Nu er der lige mange protoner og elektroner — atomet er neutralt.");
+        });
+
+        NK.el("byg-almindelig").addEventListener("click", function () {
+            var i = D.hyppigsteIsotop(mig.p);
+            if (!i) return;
+            var nyN = i.a - mig.p;
+            if (nyN === mig.n) return;
+            mig.n = nyN;
+            var g = D.grundstof(mig.p);
+            mig.anvend("Nu har kernen " + nyN + " neutroner. " + g.navn + "-" + i.a
+                + " er den isotop, der er mest af i naturen (" + NK.tal(i.andel, 2) + " %).");
+        });
+
+        NK.el("byg-nulstil").addEventListener("click", function () { mig.ryd(); });
+
+        NK.el("byg-opgave-knap").addEventListener("click", function () { mig.opgaveKnap(); });
+
+        /* Det periodiske system i panelet viser, hvor det byggede atom
+           hoerer hjemme. Man kan ogsaa springe direkte til et grundstof
+           ved at trykke paa det. */
+        this.pertabel = new NK.PeriodiskSystem(NK.el("byg-pertabel"), {
+            vedKlik: function (z) { mig.vaelgGrundstof(z); }
+        });
+    };
+
+    /* Tom scene: ingen partikler tilbage at bygge videre paa. Bruges
+       baade af Genstart og af "Ny opgave", saa man starter forfra. */
+    NK.SimByg.prototype.ryd = function () {
+        this.p = 0; this.n = 0; this.e = 0;
+        this.atom.saet(0, 0, 0);
+        this.opdaterPanel("tom");
+    };
+
+    /* Spring direkte til et grundstof: den almindelige kerne og lige
+       mange protoner og elektroner. */
+    NK.SimByg.prototype.vaelgGrundstof = function (z) {
+        var g = D.grundstof(z);
+        var iso = D.hyppigsteIsotop(z);
+        if (!g || (this.p === z && this.n === iso.a - z && this.e === z)) return;
+        this.p = z;
+        this.n = iso.a - z;
+        this.e = z;
+        this.anvend("Du sprang til " + g.navn.toLowerCase() + ": " + NK.talform(z, "proton", "protoner")
+            + " i kernen, og lige så mange elektroner, så atomet er neutralt.");
+    };
+
+    /* ----- Aendring af ét tal ---------------------------------------------- */
+    NK.SimByg.prototype.aendr = function (slags, retning) {
+        var foerP = this.p;
+        var besked = "";
+
+        if (slags === "p") {
+            var nyP = NK.klamp(this.p + retning, 0, MAKS_P);
+            if (nyP === this.p) {
+                besked = retning > 0
+                    ? "Her stopper vi ved calcium (20 protoner) — længere rækker den simple skalmodel ikke."
+                    : "Der er ingen protoner tilbage at fjerne.";
+                this.visBesked(besked, "advarsel");
+                return;
+            }
+            this.p = nyP;
+            besked = this.protonBesked(foerP, nyP);
+        } else if (slags === "n") {
+            var nyN = NK.klamp(this.n + retning, 0, MAKS_N);
+            if (nyN === this.n) { this.visBesked("Flere neutroner giver ikke mening her.", "advarsel"); return; }
+            this.n = nyN;
+            besked = this.neutronBesked();
+        } else {
+            var nyE = NK.klamp(this.e + retning, 0, MAKS_E);
+            if (nyE === this.e) {
+                this.visBesked(retning > 0
+                    ? "Der er ikke plads til flere elektroner i de fire skaller."
+                    : "Der er ingen elektroner tilbage at fjerne.", "advarsel");
+                return;
+            }
+            this.e = nyE;
+            besked = this.elektronBesked(retning);
+        }
+        this.anvend(besked, slags);
+    };
+
+    NK.SimByg.prototype.anvend = function (besked, slags) {
+        this.atom.saet(this.p, this.n, this.e);
+        this.opdaterPanel(slags);
+        this.visBesked(besked, "");
+        this.tjekOpgave();
+    };
+
+    /* ----- Beskederne: hvad skete der, og hvorfor betyder det noget? ------- */
+    NK.SimByg.prototype.protonBesked = function (foer, nu) {
+        var gammel = D.grundstof(foer);
+        var ny = D.grundstof(nu);
+        if (!ny) return "Nu er der ingen protoner tilbage. Uden protoner er der heller ikke noget grundstof.";
+        if (!gammel) return "Første proton er på plads. Ét eneste proton i kernen betyder hydrogen — det simpleste grundstof, der findes.";
+        return "Du ændrede protontallet fra " + foer + " til " + nu
+            + ", og så er det ikke " + gammel.navn.toLowerCase() + " længere, men "
+            + ny.navn.toLowerCase() + ". Protontallet ER grundstoffet.";
+    };
+
+    NK.SimByg.prototype.neutronBesked = function () {
+        var g = D.grundstof(this.p);
+        var a = this.p + this.n;
+        if (!g) return "Neutroner alene er ikke et grundstof — der skal protoner til.";
+        var k = D.kerne(this.p, this.n);
+        var start = "Stadig " + g.navn.toLowerCase() + ": neutroner ændrer ikke grundstoffet, kun massen. ";
+        if (k.art === "naturlig") {
+            return start + "Du har bygget " + g.navn.toLowerCase() + "-" + a
+                + ", som udgør " + NK.tal(k.isotop.andel, k.isotop.andel < 1 ? 4 : 2) + " % af naturens " + g.navn.toLowerCase() + ".";
+        }
+        if (k.art === "radioaktiv") {
+            return start + "Du har bygget " + (k.isotop.navn || (g.navn.toLowerCase() + "-" + a)) + " — " + k.isotop.note + ".";
+        }
+        return start + g.symbol + "-" + a + " findes ikke i naturen: med "
+            + this.n + " neutroner mod " + this.p + " protoner hænger kernen ikke sammen.";
+    };
+
+    NK.SimByg.prototype.elektronBesked = function (retning) {
+        var g = D.grundstof(this.p);
+        var q = this.p - this.e;
+        var lagde = retning > 0 ? "lagde en elektron til" : "tog en elektron væk";
+        if (!g) return "Du " + lagde + ". Uden protoner i kernen er der dog ikke noget at holde fast i.";
+        if (q === 0) {
+            return "Du " + lagde + ", og nu er der lige mange protoner og elektroner. "
+                + g.navn + " er et neutralt ATOM — ladningen er 0.";
+        }
+        var aedel = D.aedelgasStruktur(this.e);
+        var hale = aedel
+            ? " Elektronerne sidder nu præcis som i " + aedel.navn.toLowerCase() + " — det er den stabile opbygning, ioner stræber efter."
+            : "";
+        return "Du " + lagde + ". Nu er der " + this.p + " protoner mod " + this.e
+            + " elektroner, så ladningen er " + NK.ladningstekst(q) + ". Det er ikke et atom længere, men en ION." + hale;
+    };
+
+    NK.SimByg.prototype.visBesked = function (tekst, klasse) {
+        if (!tekst) return;
+        NK.saetTekst("byg-hint", tekst);
+        NK.saetKlasse("byg-hint", "scene-mrk" + (klasse ? " " + klasse : ""));
+        this.beskedTid = 0;
+    };
+
+    /* ----- Panelet --------------------------------------------------------- */
+    NK.SimByg.prototype.opdaterPanel = function (slags) {
+        var g = D.grundstof(this.p);
+        var a = this.p + this.n;
+        var q = this.p - this.e;
+
+        NK.saetTekst("byg-p-antal", String(this.p));
+        NK.saetTekst("byg-n-antal", String(this.n));
+        NK.saetTekst("byg-e-antal", String(this.e));
+
+        /* Kemikerens skrivemaade: massetal over, protontal under, ladning bagefter. */
+        NK.saetTekst("byg-nuklid-sym", g ? g.symbol : "?");
+        NK.saetTekst("byg-nuklid-a", this.p ? String(a) : "");
+        NK.saetTekst("byg-nuklid-z", this.p ? String(this.p) : "");
+        NK.saetTekst("byg-nuklid-q", q === 0 ? "" : NK.ladningstekst(q));
+        NK.saetKlasse("byg-nuklid-q", q > 0 ? "q plus" : (q < 0 ? "q minus" : "q"));
+
+        if (this.pertabel) this.pertabel.marker(g ? this.p : 0);
+
+        /* Kernen: findes den overhovedet? Teksten staar under selve
+           atommodellen i scenen - se tegn(). */
+        var k = D.kerne(this.p, this.n);
+        var kerneTekst, kerneKlasse;
+        if (!g) { kerneTekst = "Læg en proton i for at komme i gang."; kerneKlasse = ""; }
+        else if (k.art === "naturlig") {
+            kerneTekst = g.symbol + "-" + a + " findes i naturen (" + NK.tal(k.isotop.andel, k.isotop.andel < 1 ? 4 : 2) + " % af alt " + g.navn.toLowerCase() + ").";
+            kerneKlasse = "god";
+        } else if (k.art === "radioaktiv") {
+            kerneTekst = "☢ " + g.symbol + "-" + a + " findes, men er radioaktiv — " + k.isotop.note + ".";
+            kerneKlasse = "gul";
+        } else {
+            kerneTekst = "Der findes ingen kerne med " + this.p + " protoner og " + this.n + " neutroner. Den ville falde fra hinanden.";
+            kerneKlasse = "skidt";
+        }
+        NK.saetTekst("byg-kerne", kerneTekst);
+        NK.saetKlasse("byg-kerne", "kernekort" + (kerneKlasse ? " " + kerneKlasse : ""));
+
+        /* Radioaktiv kerne: et blinkende maerke ved atomsymbolet, saa det
+           kan ses uden at laese teksten i panelet. */
+        NK.saetKlasse("byg-rad-ikon", "rad-ikon" + (g && k.art === "radioaktiv" ? " vis" : ""));
+
+        NK.el("byg-p-minus").disabled = this.p <= 0;
+        NK.el("byg-n-minus").disabled = this.n <= 0;
+        NK.el("byg-e-minus").disabled = this.e <= 0;
+        NK.el("byg-p-plus").disabled = this.p >= MAKS_P;
+        NK.el("byg-n-plus").disabled = this.n >= MAKS_N;
+        NK.el("byg-e-plus").disabled = this.e >= MAKS_E;
+        NK.el("byg-neutral").disabled = (this.p === this.e) || !g;
+        NK.el("byg-almindelig").disabled = !g || (D.hyppigsteIsotop(this.p).a - this.p === this.n);
+    };
+
+    /* ----- Opgaver ---------------------------------------------------------- */
+    function tilfaeldig(liste) { return liste[Math.floor(Math.random() * liste.length)]; }
+
+    function medFlereIsotoper() {
+        var ud = [];
+        for (var i = 0; i < D.GRUNDSTOFFER.length; i++) {
+            if (D.GRUNDSTOFFER[i].isotoper.length > 1) ud.push(D.GRUNDSTOFFER[i]);
+        }
+        return ud;
+    }
+
+    function ionDannere() {
+        var ud = [];
+        for (var i = 0; i < D.GRUNDSTOFFER.length; i++) {
+            var g = D.GRUNDSTOFFER[i];
+            if (g.ion !== null && g.ion !== 0 && g.z > 1) ud.push(g);
+        }
+        return ud;
+    }
+
+    var OPGAVETYPER = [
+        /* 1. Et helt almindeligt neutralt atom af en bestemt isotop. */
+        function () {
+            var g = tilfaeldig(D.GRUNDSTOFFER);
+            var i = tilfaeldig(g.isotoper);
+            return {
+                tekst: "Byg et neutralt atom af " + g.navn.toLowerCase() + " (" + g.symbol + ") med massetal " + i.a + ".",
+                p: g.z, n: i.a - g.z, e: g.z,
+                svar: "Massetal = protoner + neutroner, så " + i.a + " − " + g.z + " = "
+                    + NK.talform(i.a - g.z, "neutron", "neutroner") + ". Neutralt betyder lige mange elektroner som protoner."
+            };
+        },
+        /* 2. En ion af et grundstof, der danner ioner. */
+        function () {
+            var g = tilfaeldig(ionDannere());
+            var i = D.hyppigsteIsotop(g.z);
+            var aedel = D.aedelgasStruktur(g.z - g.ion);
+            return {
+                tekst: "Byg ionen " + g.symbol + NK.ladningHaevet(g.ion) + " med den kerne, der er mest af i naturen.",
+                p: g.z, n: i.a - g.z, e: g.z - g.ion,
+                svar: "Ladningen " + NK.ladningstekst(g.ion) + " betyder " + NK.talform(Math.abs(g.ion), "elektron", "elektroner")
+                    + " " + (g.ion > 0 ? "færre" : "flere") + " end protoner."
+                    + (aedel ? " Elektronerne ligger nu som i " + aedel.navn.toLowerCase() + "." : "")
+            };
+        },
+        /* 3. En isotop, der IKKE er den almindelige - kernen skal aendres. */
+        function () {
+            var g = tilfaeldig(medFlereIsotoper());
+            var almindelig = D.hyppigsteIsotop(g.z);
+            var andre = [];
+            for (var i = 0; i < g.isotoper.length; i++) {
+                if (g.isotoper[i].a !== almindelig.a) andre.push(g.isotoper[i]);
+            }
+            var valgt = tilfaeldig(andre);
+            return {
+                tekst: "Naturens " + g.navn.toLowerCase() + " er for det meste " + g.symbol + "-" + almindelig.a
+                    + ". Byg det neutrale atom af den sjældnere isotop " + g.symbol + "-" + valgt.a + ".",
+                p: g.z, n: valgt.a - g.z, e: g.z,
+                svar: "Stadig " + NK.talform(g.z, "proton", "protoner") + ", for de bestemmer grundstoffet. Kun neutrontallet skifter fra "
+                    + (almindelig.a - g.z) + " til " + (valgt.a - g.z) + "."
+            };
+        },
+        /* 4. Den anden vej rundt: partiklerne er givet, navnet er opgaven. */
+        function () {
+            var g = tilfaeldig(D.GRUNDSTOFFER);
+            var i = tilfaeldig(g.isotoper);
+            var q = g.ion === null ? 0 : g.ion;
+            var e = NK.klamp(g.z - q, 0, MAKS_E);
+            return {
+                tekst: "Byg partiklen med " + NK.talform(g.z, "proton", "protoner") + ", " + NK.talform(i.a - g.z, "neutron", "neutroner")
+                    + " og " + NK.talform(e, "elektron", "elektroner") + ". Hvad er det, du har bygget?",
+                p: g.z, n: i.a - g.z, e: e,
+                svar: "Det er " + g.symbol + NK.ladningHaevet(g.z - e) + " med massetal " + i.a + ". Altså "
+                    + g.navn.toLowerCase() + "-" + i.a + (g.z - e === 0 ? " som neutralt atom." : " som ion.")
+            };
+        },
+        /* 5. Bagvendt: elektronstrukturen er givet, kernen skal findes. */
+        function () {
+            var kandidater = [];
+            var liste = ionDannere();
+            for (var i = 0; i < liste.length; i++) {
+                if (D.aedelgasStruktur(liste[i].z - liste[i].ion)) kandidater.push(liste[i]);
+            }
+            var g = tilfaeldig(kandidater);
+            var aedel = D.aedelgasStruktur(g.z - g.ion);
+            var iso = D.hyppigsteIsotop(g.z);
+            return {
+                tekst: "Byg en ion med ladningen " + NK.ladningstekst(g.ion) + ", som har præcis samme elektronstruktur som "
+                    + aedel.navn.toLowerCase() + " (" + D.skalfordeling(aedel.z).join(", ") + "). Brug den almindelige kerne.",
+                p: g.z, n: iso.a - g.z, e: g.z - g.ion,
+                svar: "Der skal " + NK.talform(g.z - g.ion, "elektron", "elektroner") + " til for at ligne "
+                    + aedel.navn.toLowerCase() + ". Ladningen " + NK.ladningstekst(g.ion) + " svarer så til "
+                    + NK.talform(g.z, "proton", "protoner") + ": " + g.navn.toLowerCase() + "."
+            };
+        }
+    ];
+
+    /* Der er kun ÉN knap i opgavekortet, og den viser det naeste skridt:
+
+         start   -> Start opgave    traekker en opgave
+         hint    -> Giv hint        viser opgavens atomsymbol
+         svar    -> Vis svaret      bygger den og forklarer hvorfor
+         ny      -> Ny opgave       rydder scenen og traekker en ny
+         faerdig -> Start forfra    runden er vundet - nulstil og begynd igen
+
+       Loeser man selv opgaven undervejs, springer knappen direkte til
+       "Ny opgave". Trappen er den samme vej hele vejen igennem: man
+       faar aldrig mere hjaelp, end man selv har bedt om. */
+    var KNAPTRIN = {
+        start:   { tekst: "Start opgave", klasse: "knap blaa" },
+        hint:    { tekst: "Giv hint",     klasse: "knap" },
+        svar:    { tekst: "Vis svaret",   klasse: "knap" },
+        ny:      { tekst: "Ny opgave",    klasse: "knap blaa banker" },
+        faerdig: { tekst: "Start forfra", klasse: "knap groen banker" }
+    };
+
+    /* Maalet for runden: opgaver taeller kun med, naar de er loest selv -
+       hverken forkerte forsoeg eller et afsloeret svar rykker taelleren,
+       men et hint undervejs er stadig en selv-loest opgave. */
+    var MAAL_RIGTIGE = 6;
+
+    NK.SimByg.prototype.saetOpgaveTrin = function (trin) {
+        this.opgaveTrin = trin;
+        NK.saetTekst("byg-opgave-knap", KNAPTRIN[trin].tekst);
+        NK.saetKlasse("byg-opgave-knap", KNAPTRIN[trin].klasse);
+    };
+
+    NK.SimByg.prototype.opgaveKnap = function () {
+        if (this.opgaveTrin === "hint") { this.visHint(); return; }
+        if (this.opgaveTrin === "svar") { this.visSvar(); return; }
+        if (this.opgaveTrin === "faerdig") { this.startForfra(); return; }
+        if (this.opgaveTrin === "ny") this.ryd();
+        this.nyOpgave();
+    };
+
+    /* Runden er vundet: nulstil taelleren, ryd atomet, og vend tilbage
+       til udgangspunktet, saa naeste runde begynder paa samme maade som
+       den foerste. */
+    NK.SimByg.prototype.startForfra = function () {
+        this.rigtige = 0;
+        this.ryd();
+        this.visOpgaveStart();
+    };
+
+    /* Udgangspunktet: ingen opgave er i gang endnu - eleven skal selv
+       bede om én, saa opgaven ikke bare dukker op uopfordret. */
+    NK.SimByg.prototype.visOpgaveStart = function () {
+        this.opgave = null;
+        NK.saetTekst("byg-opgave", "Løs " + MAAL_RIGTIGE + " opgaver rigtigt for at gennemføre runden. Tryk på “Start opgave” for at komme i gang.");
+        NK.saetKlasse("byg-opgave", "besked");
+        NK.el("byg-opgave-taeller").style.display = "";
+        NK.saetTekst("byg-opgave-taeller", this.rigtige + "/" + MAAL_RIGTIGE);
+        NK.el("byg-opgave-nuklid").hidden = true;
+        this.saetOpgaveTrin("start");
+    };
+
+    /* Hintet: opgavens atomsymbol med massetal, atomnummer og ladning,
+       skrevet ganske som maerkatet over atomet selv (byg-nuklid). Saa
+       er der noget konkret at bygge efter, uden at tallene for
+       protoner, neutroner og elektroner er givet. */
+    NK.SimByg.prototype.visHint = function () {
+        if (!this.opgave) return;
+        this.visOpgaveNuklid(this.opgave);
+        this.saetOpgaveTrin("svar");
+    };
+
+    NK.SimByg.prototype.visOpgaveNuklid = function (o) {
+        var g = D.grundstof(o.p);
+        var a = o.p + o.n;
+        var q = o.p - o.e;
+        NK.saetTekst("byg-opgave-nuklid-sym", g ? g.symbol : "?");
+        NK.saetTekst("byg-opgave-nuklid-a", String(a));
+        NK.saetTekst("byg-opgave-nuklid-z", String(o.p));
+        NK.saetTekst("byg-opgave-nuklid-q", q === 0 ? "" : NK.ladningstekst(q));
+        NK.saetKlasse("byg-opgave-nuklid-q", "q" + (q > 0 ? " plus" : (q < 0 ? " minus" : "")));
+        NK.el("byg-opgave-nuklid").hidden = false;
+    };
+
+    /* Taelleren viser "X/6" - hvor mange opgaver, der er loest selv i
+       denne runde. Den staar fast, mens en ny opgave er i gang, og
+       rykker foerst, naar tjekOpgave() godkender et selv-bygget svar. */
+    NK.SimByg.prototype.nyOpgave = function () {
+        var forsoeg = 0;
+        do {
+            this.opgave = tilfaeldig(OPGAVETYPER)();
+            forsoeg++;
+        } while (forsoeg < 8 && this.opgave.p === this.p && this.opgave.n === this.n && this.opgave.e === this.e);
+        this.opgave.loest = false;
+        NK.saetTekst("byg-opgave", this.opgave.tekst);
+        NK.saetKlasse("byg-opgave", "besked");
+        NK.el("byg-opgave-taeller").style.display = "";
+        NK.saetTekst("byg-opgave-taeller", this.rigtige + "/" + MAAL_RIGTIGE);
+        NK.el("byg-opgave-nuklid").hidden = true;
+        this.saetOpgaveTrin("hint");
+        this.tjekOpgave();
+    };
+
+    NK.SimByg.prototype.visSvar = function () {
+        if (!this.opgave) return;
+        this.p = this.opgave.p; this.n = this.opgave.n; this.e = this.opgave.e;
+        this.atom.saet(this.p, this.n, this.e);
+        this.opdaterPanel("");
+        NK.saetTekst("byg-opgave", this.opgave.tekst + "  →  " + this.opgave.svar);
+        NK.saetKlasse("byg-opgave", "besked gul");
+        this.opgave.loest = true;
+        this.visOpgaveNuklid(this.opgave);
+        this.saetOpgaveTrin("ny");
+    };
+
+    NK.SimByg.prototype.tjekOpgave = function () {
+        var o = this.opgave;
+        if (!o || o.loest) return;
+        if (o.p !== this.p || o.n !== this.n || o.e !== this.e) return;
+        o.loest = true;
+        this.rigtige++;
+        NK.saetTekst("byg-opgave-taeller", this.rigtige + "/" + MAAL_RIGTIGE);
+        this.visOpgaveNuklid(o);
+
+        if (this.rigtige >= MAAL_RIGTIGE) {
+            NK.saetTekst("byg-opgave", "Rigtigt! " + o.svar + " Du har nu løst " + MAAL_RIGTIGE + " opgaver rigtigt selv — runden er gennemført.");
+            NK.saetKlasse("byg-opgave", "besked god");
+            this.saetOpgaveTrin("faerdig");
+        } else {
+            NK.saetTekst("byg-opgave", "Rigtigt! " + o.svar);
+            NK.saetKlasse("byg-opgave", "besked god");
+            this.saetOpgaveTrin("ny");
+        }
+    };
+
+    /* ----- Tegning ---------------------------------------------------------- */
+    NK.SimByg.prototype.tilpas = function () { this.l.tilpas(); };
+
+    /* Hvor atomet skal staa: midt i scenen, som nu er atommodellens
+       alene - det periodiske system staar i panelet til hoejre.
+
+       Pladsen findes ved at LOESE uligheden for den stoerste radius, der
+       stadig levner plads til nuklidmaerkat foroven og kernetekst
+       forneden - ikke ved at proeve sig frem i et hak-for-hak loekke.
+       Enten findes loesningen, eller ogsaa er der bevisligt ikke plads.
+
+       Bemaerk, at pladsen er den samme for alle grundstoffer. Hvor stort
+       atomet SELV tegnes inden for den plads, afhaenger af, hvor mange
+       skaller der er i brug - se tilpasSkaller i atom.js. */
+    var YDRE_ANDEL = 0.93;      /* yderste skals radius i forhold til plads, fire skaller */
+    var NUKLID_H = 78, LUFT = 10;
+    var KERNE_H = 74;           /* svarer til loftet i tegn(): 74 px over scenens bund */
+    var MIN_PLADS = 55;         /* absolut bund paa en meget lille scene */
+    var SIDE_LUFT = 12;         /* luft mellem atomet og scenens sidekant */
+
+    NK.SimByg.prototype.placering = function () {
+        var l = this.l;
+        var noegle = l.b + "x" + l.h;
+        if (this.stedNoegle === noegle) return this.sted;
+        this.stedNoegle = noegle;
+
+        var normalPlads = NK.klamp(Math.min(l.b * 0.33, l.h * 0.45), 70, 380);
+        var R = Math.min(normalPlads * YDRE_ANDEL,
+            (l.h - LUFT - NUKLID_H - KERNE_H - 30) / 2,
+            l.b / 2 - SIDE_LUFT);
+        R = Math.max(R, MIN_PLADS * YDRE_ANDEL);
+
+        var cyMin = LUFT + NUKLID_H + 14 + R;
+        var cyMax = l.h - R - 16 - KERNE_H;
+        var cy = NK.klamp(l.h * 0.54, cyMin, Math.max(cyMin, cyMax));
+
+        this.sted = { plads: R / YDRE_ANDEL, cy: cy, cx: l.b / 2 };
+        return this.sted;
+    };
+
+    NK.SimByg.prototype.opdater = function (dt) {
+        this.atom.opdater(dt);
+        this.beskedTid += dt;
+    };
+
+    NK.SimByg.prototype.nulstil = function () {
+        this.p = 1; this.n = 0; this.e = 1;
+        this.atom.saet(1, 0, 1);
+        this.opdaterPanel("start");
+        this.visBesked("Tilbage til det simpleste atom: ét proton og én elektron — hydrogen.", "");
+    };
+
+    NK.SimByg.prototype.tegn = function () {
+        var l = this.l, c = l.ctx;
+        l.ryd("#14141a");
+
+        var sted = this.placering();
+        var cx = sted.cx;
+        var cy = sted.cy;
+        var plads = sted.plads;
+        var nuklidBoks = NK.el("byg-nuklid");
+        var kerneBoks = NK.el("byg-kerne");
+
+        if (this.p === 0 && this.n === 0 && this.e === 0) {
+            nuklidBoks.style.display = "none";
+            kerneBoks.style.display = "none";
+            c.save();
+            c.setLineDash([7, 7]);
+            c.strokeStyle = "rgba(160, 190, 220, 0.25)";
+            c.lineWidth = 1.5;
+            c.beginPath();
+            c.arc(cx, cy, plads * 0.45, 0, Math.PI * 2);
+            c.stroke();
+            c.restore();
+            NK.tekst(c, "Tomt rum", cx, cy - 8, {
+                font: "600 15px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#7e8590"
+            });
+            NK.tekst(c, "Læg den første proton i", cx, cy + 14, {
+                font: "400 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#5f656e"
+            });
+            return;
+        }
+
+        this.atom.tegn(c, cx, cy, plads, {
+            fremhaevValens: true,
+            ladning: this.p - this.e,
+            tilpasSkaller: true
+        });
+        NK.tegnSkaltal(c, this.atom);
+
+        /* Nuklidmaerkatet (massetal, atomnummer, symbol, ladning) svaever
+           lige over atomet i stedet for at ligge fast i et hjoerne - saa
+           det altid peger paa netop det atom, der er tegnet. */
+        var geo = this.atom.sidsteGeo;
+        var yderste = this.atom.fordeling.length - 1;
+        var ydreR = geo.geo.rSkal[Math.max(0, yderste)] * geo.s;
+        nuklidBoks.style.display = "";
+        nuklidBoks.style.left = cx + "px";
+        nuklidBoks.style.top = (cy - ydreR - 14) + "px";
+
+        /* Og svaret om kernen lige under atomet - dog aldrig saa langt
+           nede, at det falder ud af scenen paa en lav skaerm. */
+        kerneBoks.style.display = "";
+        kerneBoks.style.left = cx + "px";
+        kerneBoks.style.top = Math.min(cy + ydreR + 16, l.h - 74) + "px";
+    };
+}());

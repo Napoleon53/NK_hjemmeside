@@ -1,0 +1,758 @@
+/* =====================================================================
+   sc3.2 - Molekylers rumlige opbygning
+   Stilark. Samme udtryk som de andre superanimationer (sc2.1, sc6.8).
+   BEMAERK: decimaltal skrives med PUNKTUM i CSS (0.25rem), aldrig med
+   dansk komma.
+   ===================================================================== */
+
+:root {
+    --bund:        #1b1b21;
+    --scene-bund:  #14141a;
+    --panel:       #2b2b36;
+    --panel-2:     #333340;
+    --panel-3:     #3d3d4b;
+    --linje:       #464655;
+    --tekst:       #f2f3f5;
+    --tekst-svag:  #c8ced6;
+    --tekst-mat:   #9aa1ab;
+
+    --blaa:        #3d9ee0;
+    --blaa-mork:   #2a76ac;
+    --orange:      #e6892a;
+    --groen:       #3fae72;
+    --groen-mork:  #2b7d51;
+    --roed:        #e05446;
+    --roed-mork:   #a33529;
+    --gul:         #f2c53d;
+    --lilla:       #9b6bd6;
+
+    --radius:      10px;
+    --radius-lil:  6px;
+    --skygge:      0 4px 14px rgba(0, 0, 0, 0.35);
+    --panel-bredde: 430px;
+}
+
+* { box-sizing: border-box; }
+
+[hidden] { display: none !important; }
+
+html, body { margin: 0; padding: 0; height: 100%; }
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bund);
+    color: var(--tekst);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------------
+   TOPLINJE
+   --------------------------------------------------------------------- */
+.top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 16px;
+    background-color: #15151b;
+    border-bottom: 1px solid #33333f;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.4);
+    z-index: 20;
+    flex-shrink: 0;
+}
+
+/* I en samling i fuld skaerm staar knappen, der gendanner panelet, i hjoernet */
+.samling-fuld .top { padding-left: 56px; }
+
+.top h1 { margin: 0; font-size: 1.05rem; font-weight: 600; letter-spacing: 0.02em; white-space: nowrap; }
+
+.faneknapper { display: flex; gap: 6px; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.faneknapper::-webkit-scrollbar { display: none; }
+
+.faneknap {
+    background-color: var(--panel-2);
+    color: var(--tekst-svag);
+    border: 1px solid transparent;
+    padding: 8px 14px;
+    border-radius: var(--radius-lil);
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.faneknap .nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    background-color: var(--panel-3);
+    font-size: 0.76rem;
+    flex-shrink: 0;
+}
+
+.faneknap:hover { background-color: var(--panel-3); color: var(--tekst); }
+.faneknap.aktiv { background-color: var(--blaa); color: #ffffff; }
+.faneknap.aktiv .nr { background-color: rgba(255, 255, 255, 0.25); color: #ffffff; }
+
+.topknap {
+    background-color: var(--panel-2);
+    color: var(--tekst-svag);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 7px 14px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.topknap:hover { background-color: var(--panel-3); color: var(--tekst); border-color: #5e5e70; }
+
+.ikonknap {
+    background-color: var(--roed-mork);
+    border: 1px solid var(--roed);
+    color: #e3e6ea;
+    border-radius: var(--radius-lil);
+    width: 34px;
+    height: 32px;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.ikonknap:hover { background-color: var(--roed); color: #ffffff; }
+
+/* ---------------------------------------------------------------------
+   HOVEDLAYOUT
+   --------------------------------------------------------------------- */
+main { flex: 1; position: relative; min-height: 0; }
+
+.fane {
+    position: absolute;
+    inset: 0;
+    display: none;
+    grid-template-columns: minmax(0, 1fr) var(--panel-bredde);
+}
+
+.fane.aktiv { display: grid; }
+
+.scene { position: relative; min-width: 0; min-height: 0; background-color: var(--scene-bund); overflow: hidden; }
+.scene > canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+
+/* Korte beskeder nederst paa scenen */
+.scenebesked {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translate(-50%, 8px);
+    max-width: calc(100% - 40px);
+    padding: 8px 18px;
+    border-radius: var(--radius);
+    background-color: rgba(20, 20, 26, 0.92);
+    border: 1px solid rgba(242, 197, 61, 0.4);
+    box-shadow: var(--skygge);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #f0d77a;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 6;
+}
+
+.scenebesked.vis { opacity: 1; transform: translate(-50%, 0); }
+
+/* Vinkelmaaleren oeverst til hoejre paa scenen */
+.vinkelknap {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px 6px 8px;
+    background-color: rgba(20, 20, 26, 0.82);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    color: var(--tekst-svag);
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 5;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.vinkelknap img { width: 38px; height: 23px; display: block; }
+.vinkelknap:hover { background-color: rgba(51, 51, 64, 0.92); color: var(--tekst); }
+.vinkelknap.aktiv { background-color: rgba(242, 197, 61, 0.18); border-color: var(--gul); color: var(--gul); }
+
+/* Prikformlen oeverst til venstre paa scenen */
+.prikpanel {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    width: 238px;
+    padding: 7px 8px 6px;
+    background-color: rgba(34, 34, 43, 0.9);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius);
+    box-shadow: var(--skygge);
+    pointer-events: none;
+    z-index: 5;
+}
+
+.prik-titel { font-size: 0.76rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tekst-mat); text-align: center; }
+.prikpanel canvas { display: block; width: 220px; height: 150px; }
+
+/* ---------------------------------------------------------------------
+   HOEJRE SPALTE
+   --------------------------------------------------------------------- */
+.panel {
+    background-color: var(--panel);
+    border-left: 1px solid #1f1f27;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    min-width: 0;
+    scrollbar-width: thin;
+    scrollbar-color: #4d4d5c var(--panel);
+}
+
+.kort { background-color: rgba(0, 0, 0, 0.22); border: 1px solid #3a3a47; border-radius: var(--radius); padding: 11px; }
+
+.kort > h2 {
+    margin: 0 0 8px 0;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--gul);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.kort > h2 .taeller { font-size: 0.78rem; letter-spacing: 0.02em; text-transform: none; color: var(--tekst-mat); font-weight: 600; white-space: nowrap; }
+.kort > h2 .taeller b { color: var(--tekst); }
+
+.kort.maaling { border-left: 3px solid var(--groen); }
+.kort.opgavekort { border-left: 3px solid var(--lilla); }
+
+.besked { margin: 0; font-size: 0.88rem; line-height: 1.5; color: var(--tekst-svag); }
+.besked:empty { display: none; }
+.besked.god   { color: #7ee0a8; }
+.besked.skidt { color: #f0918a; }
+.besked.gul   { color: #f0d77a; }
+
+/* ----- Byggesaettet (fane 1) ------------------------------------------- */
+.brikker { display: grid; gap: 5px; }
+
+.brik {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) 32px 28px 32px;
+    align-items: center;
+    gap: 6px;
+    background-color: rgba(255, 255, 255, 0.045);
+    border-radius: var(--radius-lil);
+    padding: 4px 6px 4px 8px;
+}
+
+.brik-navn { font-size: 0.9rem; color: var(--tekst); }
+.brik-navn small { font-size: 0.8rem; color: var(--tekst-mat); margin-left: 3px; }
+.brik-tal { text-align: center; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+
+.brik-ikon { width: 28px; height: 20px; }
+.brik-ikon.enkelt { background: linear-gradient(#aab2bd, #aab2bd) 50% 50% / 24px 3px no-repeat; }
+.brik-ikon.dobbelt {
+    background: linear-gradient(#aab2bd, #aab2bd) 50% 30% / 24px 3px no-repeat,
+                linear-gradient(#aab2bd, #aab2bd) 50% 70% / 24px 3px no-repeat;
+}
+.brik-ikon.tripel {
+    background: linear-gradient(#aab2bd, #aab2bd) 50% 10% / 24px 3px no-repeat,
+                linear-gradient(#aab2bd, #aab2bd) 50% 50% / 24px 3px no-repeat,
+                linear-gradient(#aab2bd, #aab2bd) 50% 90% / 24px 3px no-repeat;
+}
+.brik-ikon.fri {
+    background: radial-gradient(circle, #f2c53d 3.5px, transparent 4px) 25% 50% / 12px 12px no-repeat,
+                radial-gradient(circle, #f2c53d 3.5px, transparent 4px) 75% 50% / 12px 12px no-repeat;
+}
+
+.talknap {
+    background-color: var(--panel-2);
+    color: var(--tekst);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    height: 30px;
+    font-family: inherit;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.14s ease, transform 0.08s ease;
+}
+
+.talknap:hover:not(:disabled) { background-color: var(--panel-3); }
+.talknap:active:not(:disabled) { transform: scale(0.92); }
+.talknap:disabled { opacity: 0.28; cursor: not-allowed; }
+.talknap.plus { background-color: var(--blaa-mork); border-color: var(--blaa); }
+.talknap.plus:hover:not(:disabled) { background-color: var(--blaa); }
+
+/* ----- Valg, afkrydsning og molekylemenu -------------------------------- */
+.tilstandsvalg {
+    display: flex;
+    gap: 4px;
+    margin-top: 9px;
+    background-color: rgba(0, 0, 0, 0.22);
+    border: 1px solid #3a3a47;
+    border-radius: var(--radius);
+    padding: 4px;
+}
+
+.kort > h2 + .tilstandsvalg { margin-top: 0; }
+
+.tilstandsknap {
+    flex: 1;
+    background: transparent;
+    color: var(--tekst-svag);
+    border: none;
+    border-radius: var(--radius-lil);
+    padding: 8px 6px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.tilstandsknap:hover { color: var(--tekst); background-color: var(--panel-2); }
+.tilstandsknap.aktiv { background-color: var(--blaa); color: #ffffff; }
+
+.tjekraekke { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; margin-top: 9px; }
+.kort > h2 + .tjekraekke { margin-top: 0; }
+
+.tjek { display: flex; align-items: center; gap: 7px; font-size: 0.88rem; color: var(--tekst-svag); cursor: pointer; }
+.tjek input { accent-color: var(--blaa); width: 15px; height: 15px; cursor: pointer; margin: 0; }
+.tjek:has(input:disabled) { opacity: 0.45; cursor: not-allowed; }
+
+.molvalg { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
+
+.molknap {
+    background-color: var(--panel-2);
+    border: 1px solid #45454f;
+    border-radius: var(--radius-lil);
+    padding: 7px 4px;
+    font-family: inherit;
+    color: var(--tekst);
+    cursor: pointer;
+    min-width: 0;
+    transition: background-color 0.16s ease, border-color 0.16s ease;
+}
+
+.molknap .mformel { font-size: 1rem; font-weight: 600; white-space: nowrap; }
+.molknap:hover:not(:disabled) { background-color: var(--panel-3); border-color: #5e5e70; }
+.molknap.valgt { background-color: rgba(61, 158, 224, 0.24); border-color: var(--blaa); box-shadow: 0 0 0 1px var(--blaa); }
+.molknap:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ----- Formlen og talraekkerne ------------------------------------------ */
+.formelvis {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    background-color: #0e1a14;
+    border: 1px solid #21402f;
+    border-radius: var(--radius-lil);
+    padding: 7px 12px;
+    margin-bottom: 6px;
+}
+
+.fformel { font-size: 1.7rem; font-weight: 600; line-height: 1.15; }
+.fformel.ukendt { color: var(--tekst-mat); }
+.fnavn { font-size: 0.9rem; color: #7ee0a8; }
+
+@keyframes formelglimt {
+    0%   { box-shadow: 0 0 0 0 rgba(63, 174, 114, 0.55); }
+    70%  { box-shadow: 0 0 0 12px rgba(63, 174, 114, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(63, 174, 114, 0); }
+}
+
+.formelvis.ny { animation: formelglimt 0.9s ease-out 1; }
+
+.talraekke {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.045);
+    border-radius: var(--radius-lil);
+    padding: 6px 10px;
+    font-size: 0.88rem;
+    color: var(--tekst-svag);
+}
+
+.talraekke + .talraekke { margin-top: 5px; }
+.talraekke.sum { background-color: rgba(255, 255, 255, 0.09); font-weight: 600; margin-top: 6px; align-items: center; }
+.talraekke .tal { font-weight: 700; color: var(--tekst); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tal.gul { color: var(--gul); }
+
+.bindingsraekke {
+    display: grid;
+    grid-template-columns: 62px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    background-color: rgba(255, 255, 255, 0.045);
+    border-radius: var(--radius-lil);
+    padding: 5px 10px;
+    font-size: 0.88rem;
+}
+
+.bindingsraekke + .bindingsraekke { margin-top: 5px; }
+.bnavn { font-weight: 700; color: var(--tekst); }
+.bregning { color: var(--tekst-svag); font-variant-numeric: tabular-nums; }
+.bregning b { color: var(--tekst); }
+
+.maerke {
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.maerke.groen  { background-color: rgba(63, 174, 114, 0.22); color: #7ee0a8; border: 1px solid rgba(63, 174, 114, 0.5); }
+.maerke.orange { background-color: rgba(230, 137, 42, 0.2); color: #f2b06a; border: 1px solid rgba(230, 137, 42, 0.5); }
+.maerke.graa   { background-color: rgba(255, 255, 255, 0.06); color: var(--tekst-mat); border: 1px solid #4a4a58; }
+
+/* ----- Opgaverne --------------------------------------------------------- */
+.opgave-spm { margin: 0; font-size: 0.92rem; line-height: 1.45; color: var(--tekst); }
+.opgave-spm:empty { display: none; }
+
+.valg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 9px 0 0; }
+.valg.en-spalte { grid-template-columns: minmax(0, 1fr); }
+
+.valgknap {
+    background-color: var(--panel-2);
+    color: var(--tekst);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 8px 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.25;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.14s ease, border-color 0.14s ease;
+}
+
+.valg.en-spalte .valgknap { text-align: left; padding: 9px 11px; font-size: 0.9rem; }
+.valgknap:hover:not(:disabled) { background-color: var(--panel-3); border-color: #5e5e70; }
+.valgknap:disabled { cursor: default; opacity: 0.45; }
+.valgknap.rigtig { background-color: var(--groen-mork); border-color: var(--groen); color: #ffffff; opacity: 1; }
+.valgknap.forkert { background-color: var(--roed-mork); border-color: var(--roed); color: #ffffff; opacity: 0.75; }
+
+.opgavekort .besked { margin-top: 8px; }
+
+/* ---------------------------------------------------------------------
+   KNAPPER
+   --------------------------------------------------------------------- */
+.knap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: var(--panel-2);
+    color: var(--tekst);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    padding: 8px 11px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+}
+
+.knap:hover:not(:disabled) { background-color: var(--panel-3); border-color: #5e5e70; }
+.knap:active:not(:disabled) { transform: scale(0.985); }
+.knap:disabled { opacity: 0.4; cursor: not-allowed; }
+.knap .tegn { font-size: 1rem; }
+
+.knap.blaa { background-color: var(--blaa-mork); border-color: var(--blaa); }
+.knap.blaa:hover:not(:disabled) { background-color: var(--blaa); }
+
+.knap.nulstil { background-color: transparent; border-color: #5b3b39; color: #e08b81; }
+.knap.nulstil:hover:not(:disabled) { background-color: rgba(224, 84, 70, 0.16); border-color: var(--roed); }
+.knap.lille { padding: 5px 11px; font-size: 0.86rem; }
+.tjekraekke .knap.lille { margin-left: auto; }
+
+.knaprad { display: flex; gap: 6px; margin-top: 10px; }
+.knaprad .knap { flex: 1; }
+
+.knapper { display: flex; justify-content: flex-end; margin-top: 18px; }
+.knapper .knap { min-width: 110px; }
+
+@keyframes bank {
+    0%   { box-shadow: 0 0 0 0 rgba(61, 158, 224, 0.6); }
+    70%  { box-shadow: 0 0 0 11px rgba(61, 158, 224, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(61, 158, 224, 0); }
+}
+
+.knap.banker { animation: bank 1.7s ease-out infinite; }
+
+/* ---------------------------------------------------------------------
+   TEORIBOKSEN
+   --------------------------------------------------------------------- */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(8, 8, 12, 0.78);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 50;
+}
+
+.overlay.vis { display: flex; }
+
+.overlay-boks {
+    background-color: var(--panel);
+    border: 1px solid var(--linje);
+    border-radius: 14px;
+    box-shadow: var(--skygge);
+    max-width: 620px;
+    width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    padding: 22px 26px;
+}
+
+.overlay-boks h2 { margin: 0 0 12px 0; font-size: 1.15rem; color: var(--blaa); }
+
+.teoriliste { display: flex; flex-direction: column; gap: 10px; }
+
+.teorikort {
+    background-color: rgba(0, 0, 0, 0.26);
+    border: 1px solid #3a3a47;
+    border-left: 3px solid var(--blaa);
+    border-radius: var(--radius-lil);
+    padding: 10px 13px;
+}
+
+.teorikort h4 { margin: 0 0 4px 0; font-size: 0.95rem; font-weight: 600; color: var(--tekst); }
+.teorikort p { margin: 0; font-size: 0.9rem; line-height: 1.55; color: #c2c9d2; }
+.teorikort p + p { margin-top: 5px; }
+.teorikort b { color: var(--gul); font-weight: 600; }
+
+/* ---------------------------------------------------------------------
+   RUNDVISNINGEN (samme som sc6.8)
+   --------------------------------------------------------------------- */
+.rundvisning { position: fixed; inset: 0; z-index: 200; }
+.rundvisning-baggrund { position: fixed; inset: 0; background: transparent; cursor: pointer; }
+
+.rundvisning-spot {
+    position: fixed;
+    border-radius: 10px;
+    box-shadow: 0 0 0 9999px rgba(8, 8, 13, 0.74);
+    outline: 2px solid var(--gul);
+    outline-offset: 3px;
+    pointer-events: none;
+    transition: top 0.22s ease, left 0.22s ease, width 0.22s ease, height 0.22s ease;
+}
+
+.rundvisning-boks {
+    position: fixed;
+    width: 300px;
+    max-width: calc(100vw - 28px);
+    background-color: var(--panel);
+    border: 1px solid var(--linje);
+    border-radius: var(--radius);
+    box-shadow: var(--skygge);
+    padding: 14px 16px;
+}
+
+.rundvisning-hoved { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.rundvisning-tal { font-size: 0.76rem; font-weight: 700; letter-spacing: 0.07em; color: var(--tekst-mat); }
+.rundvisning-luk { background: transparent; border: none; color: var(--tekst-svag); font-size: 0.95rem; cursor: pointer; padding: 2px 4px; }
+.rundvisning-boks h3 { margin: 0 0 6px 0; font-size: 1rem; color: var(--gul); }
+.rundvisning-boks p { margin: 0; font-size: 0.9rem; line-height: 1.5; color: var(--tekst-svag); }
+.rundvisning-knapper { display: flex; justify-content: space-between; gap: 8px; margin-top: 14px; }
+.rundvisning-knapper .knap { flex: 1; }
+
+/* ---------------------------------------------------------------------
+   FANE 1: ATOMER OG BINDINGER
+   --------------------------------------------------------------------- */
+.atompalette { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+
+.atomknap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 58px;
+    padding: 0;
+    background-color: var(--panel-2);
+    border: 1px solid #45454f;
+    border-radius: var(--radius-lil);
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+}
+
+.atomknap img { width: 46px; height: 46px; display: block; }
+.atomknap span { position: absolute; font-size: 1.1rem; font-weight: 700; color: #ffffff; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8); }
+.atomknap:hover:not(:disabled) { background-color: var(--panel-3); border-color: var(--blaa); }
+.atomknap:active:not(:disabled) { transform: scale(0.96); }
+.atomknap:disabled { opacity: 0.32; cursor: not-allowed; }
+
+.knapgruppe { display: flex; gap: 6px; margin-left: auto; }
+.tjekraekke .knapgruppe .knap.lille { margin-left: 0; }
+
+.note { margin: 0; font-size: 0.86rem; line-height: 1.45; color: var(--tekst-mat); }
+
+.bindingsvalg-raekke {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.045);
+    border-radius: var(--radius-lil);
+    padding: 4px 6px 4px 10px;
+}
+
+.bindingsvalg-raekke + .bindingsvalg-raekke { margin-top: 5px; }
+.bindingsvalg-raekke .bnavn { font-size: 1rem; }
+.bindingsvalg { display: flex; gap: 4px; }
+
+.bindingsvalg button {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 30px;
+    padding: 0;
+    background-color: var(--panel-2);
+    border: 1px solid #4a4a58;
+    border-radius: var(--radius-lil);
+    cursor: pointer;
+}
+
+.bindingsvalg button:hover:not(:disabled) { background-color: var(--panel-3); }
+.bindingsvalg button.aktiv { background-color: var(--blaa-mork); border-color: var(--blaa); }
+.bindingsvalg button:disabled { opacity: 0.28; cursor: not-allowed; }
+
+/* ---------------------------------------------------------------------
+   FANE 4: FORLOEB, HINT OG TEGNESERIE (som sc6.8)
+   --------------------------------------------------------------------- */
+.kort.fremhaev { border-left: 3px solid var(--blaa); }
+
+.trinliste { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+
+.trinliste li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px 4px 5px;
+    border-radius: var(--radius-lil);
+    font-size: 0.9rem;
+    line-height: 1.3;
+    color: var(--tekst-mat);
+}
+
+.trinliste .nr {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    background-color: var(--panel-3);
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--tekst-svag);
+}
+
+.trinliste li.gjort { color: var(--tekst-svag); }
+.trinliste li.gjort .nr { background-color: var(--groen-mork); color: #ffffff; }
+.trinliste li.aktiv { background-color: rgba(42, 118, 172, 0.3); color: #ffffff; font-weight: 600; }
+.trinliste li.aktiv .nr { background-color: var(--blaa); color: #ffffff; }
+
+.hint {
+    margin: 9px 0 0 0;
+    padding: 8px 10px;
+    border-radius: var(--radius-lil);
+    background-color: rgba(242, 197, 61, 0.1);
+    border: 1px solid rgba(242, 197, 61, 0.35);
+    color: #f0d77a;
+    font-size: 0.88rem;
+    line-height: 1.45;
+}
+
+.knap.stor { width: 100%; padding: 10px 13px; margin-top: 10px; }
+
+.overlay-boks.bred { max-width: 1000px; }
+.serie { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.rude { background-color: #16161c; border: 1px solid #3f3f4d; border-radius: var(--radius-lil); padding: 8px; }
+.rude canvas { display: block; width: 100%; border-radius: 5px; }
+.rude p { margin: 7px 0 0 0; font-size: 0.88rem; line-height: 1.45; color: var(--tekst-svag); }
+.rude > p:first-child { margin: 2px 0 8px 0; }
+.rude .nr { color: var(--gul); font-weight: 700; margin-right: 6px; }
+
+.resultater { width: 100%; border-collapse: collapse; font-size: 0.86rem; table-layout: fixed; }
+.resultater th { text-align: left; font-weight: 600; color: var(--tekst-svag); padding: 6px 4px 6px 0; }
+.resultater tr:first-child th { text-align: center; color: var(--gul); font-size: 0.76rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.resultater tr:first-child th:first-child { width: 26%; }
+.resultater td { text-align: center; font-weight: 700; color: var(--tekst); padding: 6px 2px; line-height: 1.3; }
+.resultater td.ikke { color: var(--tekst-mat); font-weight: 400; }
+.resultater tr + tr th, .resultater tr + tr td { border-top: 1px solid #3a3a47; }
+
+/* ---------------------------------------------------------------------
+   TILGAENGELIGHED OG SMALLE SKAERME
+   --------------------------------------------------------------------- */
+button:focus-visible, input:focus-visible { outline: 2px solid var(--gul); outline-offset: 2px; }
+
+@media (max-width: 1320px) {
+    :root { --panel-bredde: 380px; }
+    .top h1 .lang { display: none; }
+}
+
+@media (max-width: 1100px) {
+    .top { gap: 10px; padding: 8px 12px; }
+    .faneknap { padding: 7px 10px; font-size: 0.82rem; gap: 6px; }
+    .prikpanel { width: 190px; }
+    .prikpanel canvas { width: 172px; height: 118px; }
+}
+
+@media (max-width: 860px) {
+    body { overflow: auto; }
+    .top { flex-wrap: wrap; }
+    .faneknapper { order: 3; width: 100%; flex: none; }
+    .fane { position: static; grid-template-columns: minmax(0, 1fr); }
+    .scene { height: 65vh; min-height: 420px; }
+    .panel { border-left: none; border-top: 1px solid #1f1f27; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
