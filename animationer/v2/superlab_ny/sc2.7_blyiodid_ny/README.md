@@ -65,6 +65,24 @@ js/tur.js           rundvisningen
 _selvtest.html      udviklerværktøj (gennem en lokal server)
 ```
 
+## Bord og zoom (M19)
+
+Bordet er 1040 × 650. Zoom er lærredets bredde delt med bordets: på en skærm
+i 1366 × 768 er lærredet 936 × 715, så forsøget står i **0,90**; 1920 × 1080
+giver 1,43, og 1280 × 720 giver 0,82.
+
+sc2.7 bruger lidt udstyr. Bageste række (dunk, vægt med vejebåd, varmeplade
+med bægerglas, måleglas) fylder 454, forreste række (kurv, spatelbøtte,
+spatel, termometer) 366, og hylden 224. Zoomboblen fylder 270 i hjørnet, og
+Kemichael bag bordet 178.
+
+**Vurdering: bordet kan komme ned på ca. 760 × 620**, hvis rækkerne rykkes
+sammen. Det giver zoom **1,23** ved 1366 × 768 — godt en tredjedel større end
+nu — og er nok det højeste, forsøget kan nå, så længe Kemichael skal kunne stå
+bag bordet. Det koster nye koordinater i hele `js/opstilling.js` og et
+gennemsyn af rundvisningen, så det er ikke gjort. Vurderingen står også i
+`js/opstilling.js` ved `NK.BORD_VALG`.
+
 ## Kemien
 
 Alt står i den fælles stoftabel (`laboratoriet/js/stoftabel.js`):

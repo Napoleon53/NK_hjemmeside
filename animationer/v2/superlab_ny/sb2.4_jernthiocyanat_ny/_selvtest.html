@@ -934,6 +934,18 @@ function koerTest() {
     bord.vedBesked = vedB;
     NK.startForfra();
 
+    /* M18: forsoegets eget katalog af replikker. Puljerne staar i
+       js/tekst.js under "kemichael", og side.js giver dem videre. */
+    var kat18 = NK.Kemichael.katalogNu();
+    paastand("sb2.4 har sit eget katalog af replikker (M18)", kat18 === NK.TEKST.kemichael &&
+        !!kat18.stilstand && Object.keys(kat18).length >= 8, Object.keys(kat18).join(", "));
+    paastand("og det handler om dette forsoeg", JSON.stringify(kat18).indexOf("ligevægt") > 0 ||
+        JSON.stringify(kat18).indexOf("glas R") > 0);
+    var egne18 = 0;
+    for (var q18 = 0; q18 < 60; q18++) if (kat18.stilstand.indexOf(NK.Kemichael.replik("stilstand")) >= 0) egne18++;
+    paastand("han trækker baade fra sine egne og fra forsoegets puljer", egne18 > 8 && egne18 < 52,
+        egne18 + " egne af 60");
+
     overskrift("18. Kemichael bag bordet");
     /* S8: han bor ikke bag bordet - han er ude det meste af tiden og kommer
        kun ind, naar han har noget at sige. Saa staar han bag bordpladen, som

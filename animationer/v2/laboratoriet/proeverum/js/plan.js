@@ -16,6 +16,14 @@
         return { navn: navn, type: "pulverglas", x: x, etiket: etiket, titel: titel, indhold: { V: 0, T: 20, umol: u }, pulverMaks: 30000 };
     }
     var HYLDE = 322;
+    /* Bord og zoom (M19): hvert rum er 1620 bredt, det samme som
+       proevebordet, saa zoom bliver 0,55 paa en skaerm i 1366 x 768. Rummene
+       arver proevebordets opstilling, og derfor staar der mere fremme, end
+       hvert rum selv bruger. Vurdering: har hvert rum kun sit eget udstyr,
+       kan bredden komme ned paa ca. 1200 og zoom op paa 0,74. Det er ikke
+       gjort, fordi rummene er en testbaenk for rum.js og ikke en
+       elevanimation. Vurderingen for de andre animationer staar i
+       ../README.md. */
     var BREDDE = 1620;
 
     var FORRUM = [

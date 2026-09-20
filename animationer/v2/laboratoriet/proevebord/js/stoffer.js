@@ -67,6 +67,13 @@
         { navn: "papir", type: "koekkenrulle", x: 176, y: 268 }
     ];
 
+    /* Bord og zoom (M19): 1620 x 600 er det bredeste bord i mappen, og det
+       skal det vaere - proevebordet har ALT udstyret fremme paa én gang (23
+       genstande paa bordpladen, 16 paa hylderne). Zoom bliver derfor 0,55
+       paa en skaerm i 1366 x 768 (laerredet er 893 px bredt). Det er en
+       testbaenk og ikke en elevanimation, saa det er i orden; skal noget
+       ses stort, er det prøverummet eller et forsoeg, der skal bruges.
+       Vurderingen for de andre animationer staar i ../README.md. */
     NK.BORD_VALG = {
         bredde: 1620, hoejde: 600, bord: 500,
         hylder: [{ x0: 16, x1: 220, y: 268 }, { x0: 250, x1: 960, y: HYLDE }],

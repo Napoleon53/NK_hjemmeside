@@ -108,6 +108,30 @@ med `K.replik("ryst", RYST_SVAR)`.
 | `forbi`, `stilstand` | baggrundslivet, se nedenfor |
 | `ros`, `uheld`, `advarsel` | fælles vendinger, som et forsøg kan bruge, hvis det ikke har sine egne |
 
+### Forsøgets eget katalog (M18)
+
+Han skal lyde som sig selv — men som sig selv **i det her forsøg**. Hver animation
+kan derfor lægge sine egne vendinger oven i puljerne. De står i forsøgets
+`js/tekst.js` under nøglen `kemichael` med de samme kategorier som `REPLIKKER`
+(og uheldenes: `spild`, `rystet`, `vaeltet`, `overloeb`, `knust`), og
+`laboratoriet/js/side.js` giver dem videre med `K.katalog(puljer)`. Det koster
+ingen kode i forsøget — kun tekst.
+
+```js
+"kemichael": {
+    stilstand: ["Køler det af? Krystallerne kommer, når de kommer."],
+    advarsel:  ["Pb(NO₃)₂ er giftigt. Det står på etiketten og på plakaten."]
+}
+```
+
+Når han skal sige noget i en kategori, tager han forsøgets egen vending knap
+halvdelen af gangene (`0,45`), dagsformen cirka hver tredje af resten, og ellers
+den fælles pulje. `K.katalogReplik(kategori)` henter én direkte fra katalogets
+pulje og giver `""`, hvis forsøget ikke har nogen — det er den, uheldene bruger
+fra anden gang, et uheld af samme slags sker. Mønster:
+`../superlab_ny/sc2.7_blyiodid_ny/js/tekst.js` og
+`../superlab_ny/sb2.4_jernthiocyanat_ny/js/tekst.js`.
+
 **Han bliver ikke afbrudt.** Et klik på ham preller af, mens taleboblen står, og en
 ny scene begynder med at vente, til han er talt færdig. Trinet
 `{ taleFaerdig: true }` venter på det samme, så han ikke går fra sin egen replik.
@@ -116,8 +140,12 @@ tager at læse linjen (`K.taleTid`). Lange replikker brydes over flere linjer.
 
 **Boblen tegnes af `../laboratoriet/js/taleboble.js`**, når den er indlæst: den
 får munden (`laererMund`) og hovedets mål og finder selv sin plads inden for
-scenen, uden om det glas han peger på (`L.undgaa`), med halen ved issen i
-stedet for hen over ansigtet, og med skriften i læsbar størrelse uanset zoom.
+scenen, uden om det glas han peger på (`L.undgaa`), uden om hylderne og det,
+der står på dem (F78 — ellers kunne boblen dække et pulverglas, så kemikaliet
+hverken kunne ses eller klikkes), med halen ved issen i stedet for hen over
+ansigtet, og med skriften i læsbar størrelse uanset zoom. **Boblen spærrer
+aldrig for arbejdet:** står der en genstand under den, gælder klikket
+genstanden; rammer klikket kun boblen, springer det replikken videre (S14).
 I animationer, der ikke indlæser laget, tegnes boblen som før her i filen.
 
 ## Dagsform

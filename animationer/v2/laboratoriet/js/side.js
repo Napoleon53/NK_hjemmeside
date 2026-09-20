@@ -72,6 +72,9 @@
      vedHaendelse(type, data)
    Forloebets replikker ({ sig } i en konsekvens, eller et trins sig) gaar
    gennem side.sig: til bordets laerer, hvis der er en, ellers som besked.
+   Har forsoegets tekst.js en noegle "kemichael", er det forsoegets eget
+   katalog af replikker (M18): side.js giver det videre til
+   NK.Kemichael.katalog, saa hans smaasnak ogsaa handler om dette forsoeg.
      vedSkift(rum, forrige) man kom ind i et nyt rum
      tast(e)                returnér true, hvis tasten blev brugt
      efterStart(side)       kaldes, naar alt er bygget
@@ -988,6 +991,13 @@
 
         NK.Sprites.start();
         this.fyldTekster(valg.tekster);
+
+        /* M18: forsoegets eget katalog af replikker. Staar der en noegle
+           "kemichael" i forsoegets tekst.js, laegger Kemichael den oven i
+           sine faelles puljer, saa han taler om DET HER forsoeg. */
+        if (NK.Kemichael && NK.Kemichael.katalog) {
+            NK.Kemichael.katalog(valg.tekster && valg.tekster.kemichael);
+        }
 
         if (valg.plan) {
             this.rum = new NK.Rum(NK.el("scene-laerred"), valg.plan);

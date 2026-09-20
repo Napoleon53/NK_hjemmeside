@@ -25,8 +25,9 @@
    hvad der maa haeldes i), varmepladen med magnetomroereren, de tre
    maalinger med facit fra verden og grafen i maalingskortet, Start
    forfra, oevelsestjekket (M2), det samme med musen, som en elev
-   (proeve.js), grafen (graf.js, M9) med kendte tal, og til sidst quizzen
-   og tegneserien.
+   (proeve.js), grafen (graf.js, M9) med kendte tal, quizzen og
+   tegneserien, og til sidst Kemichaels eget katalog (M18) og reglen om,
+   at man kan arbejde videre, mens han taler (F78).
 
    Skal aabnes gennem en lokal server (eller Chrome med
    --allow-file-access-from-files), ellers kan iframen ikke laeses.
@@ -692,6 +693,71 @@ function koerTest() {
         Qz.tilstand === "laast" && Qz.nr === 0 && serie.laast() &&
         d.getElementById("serie-ruder").children.length === 0 && !Object.keys(SR.OEJEBLIKKE).length,
         Qz.tilstand + ", " + Object.keys(SR.OEJEBLIKKE).length + " oejeblikke");
+
+    overskrift("12. Kemichael: eget katalog og fri bane (M18, F78)");
+    NK.startForfra();
+    adv(1);
+    bord = NK.bord;
+    var Km = NK.Kemichael;
+    var kat = Km.katalogNu();
+    paastand("forsoegets eget katalog er lagt ind fra tekst.js (M18)",
+        kat === NK.TEKST.kemichael && !!kat.stilstand && Object.keys(kat).length >= 8,
+        Object.keys(kat).join(", "));
+    paastand("og det handler om dette forsoeg", JSON.stringify(kat).indexOf("bly") > 0 ||
+        JSON.stringify(kat).indexOf("Bly") > 0);
+    /* Han trækker baade fra sine egne faelles puljer og fra forsoegets */
+    var egne = 0, faelles = 0, mine = kat.stilstand;
+    for (var q20 = 0; q20 < 80; q20++) {
+        var linje = Km.replik("stilstand");
+        if (mine.indexOf(linje) >= 0) egne++; else faelles++;
+    }
+    paastand("han blander forsoegets vendinger ind i de faelles", egne > 10 && faelles > 10,
+        egne + " egne og " + faelles + " faelles af 80");
+    paastand("katalogReplik giver en vending fra forsoeget og intet, hvor det ikke har nogen",
+        mine.indexOf(Km.katalogReplik("stilstand")) >= 0 && Km.katalogReplik("findes-ikke") === "");
+    paastand("de faelles puljer er stadig hans egne og naevner ikke forsoeget",
+        JSON.stringify(Km.REPLIKKER).indexOf("bly") < 0 && JSON.stringify(Km.REPLIKKER).indexOf("PbI") < 0 &&
+        Km.REPLIKKER.stilstand.length >= 5);
+
+    /* F78: man skal kunne arbejde videre, mens han taler */
+    bord.laererReplik(["Det er ikke en knap. Det er et pulverglas.", "Og det skal på vægten."], { peg: "baeger", udtryk: "toer" });
+    var n20 = 0;
+    while (!bord.laererTaler() && n20++ < 400) adv(0.25);
+    paastand("han siger noget", bord.laererTaler());
+    paastand("og en replik spaerrer ikke bordet", !(bord.laererOptaget && bord.laererOptaget()));
+    /* Boblen faar foerst en plads, naar der tegnes. Selvtesten koerer uden
+       tegneloekke, saa her tegnes ét billede, og saa proeves reglen paa den
+       placering, laget selv har lavet. */
+    bord.tegn();
+    var boble = vin.NK.Taleboble.sidst;
+    paastand("taleboblen har fundet en plads", !!boble, boble ? Math.round(boble.x) + ", " + Math.round(boble.y) : "ingen");
+    function snit(a, b2) {
+        if (!a || !b2) return 0;
+        return Math.max(0, Math.min(a.x + a.b, b2.x + b2.b) - Math.max(a.x, b2.x)) *
+               Math.max(0, Math.min(a.y + a.h, b2.y + b2.h) - Math.max(a.y, b2.y));
+    }
+    var overPb = snit(boble, bord.rekt(bord.g.pb, 0)), overKi = snit(boble, bord.rekt(bord.g.ki, 0));
+    paastand("og den daekker ikke pulverglassene paa hylden (F78)", overPb === 0 && overKi === 0,
+        Math.round(overPb) + " og " + Math.round(overKi) + " px²");
+    /* Selv naar den staar hen over et glas, gaelder klikket glasset */
+    var glas = bord.g.pb;
+    glas.p = { x: boble.x + boble.b / 2, y: boble.y + boble.h / 2 + glas.anker.y, v: 0 };
+    bord.ordnDybde();
+    var midt = { x: boble.x + boble.b / 2, y: boble.y + boble.h / 2 };
+    paastand("punktet ligger baade paa boblen og paa glasset",
+        !!bord.overLaererBoble(midt) && bord.hvad(midt) === "pb", bord.hvad(midt));
+    bord.ned(midt);
+    bord.op();
+    paastand("et klik dér tager glasset og afbryder ham ikke (F78)", bord.klar === "pb" && bord.laererTaler(),
+        String(bord.klar));
+    /* Et klik paa boblen uden noget under springer stadig replikken (S14) */
+    var hjoerne = { x: boble.x + 6, y: boble.y + 4 };
+    paastand("et klik paa boblen uden en genstand under springer replikken (S14)",
+        !bord.g[bord.hvad(hjoerne)] && (bord.ned(hjoerne), bord.op(), !bord.laererTaler()),
+        bord.hvad(hjoerne));
+    NK.startForfra();
+    adv(1);
+
 
 }
 

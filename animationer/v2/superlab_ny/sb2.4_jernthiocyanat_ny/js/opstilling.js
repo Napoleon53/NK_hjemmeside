@@ -251,6 +251,27 @@
        F58/F59: plakaten er mindre og haenger lavere, saa uret er over den,
        og kaffekoppen staar under den paa hylden til hoejre (motoren
        stiller dem selv ved plakaten, kaffeSted og urSted i bord.js). */
+    /* ----- Bord og zoom (M19) ---------------------------------------------
+       Zoom er laerredets bredde delt med bordets: paa en skaerm i 1366 x 768
+       er laerredet 936 x 715, saa dette bord (1040 x 650) staar i 0,90.
+       1920 x 1080 giver 1,43, og 1280 x 720 giver 0,82.
+
+       sb2.4 er den af forsoegene, der bruger mest udstyr. I den bageste
+       raekke staar dunken (90), stativet med de syv reagensglas (320),
+       varmepladen (180), isbadet (112), hanen og vasken (180) og kolben
+       (96) - 978 i alt, foer der er luft imellem. Forrest ligger
+       glasstaven (190), spatlen (96), spatelboetten (40), termometeret
+       (120) og kurven (110). Paa hylden staar tre pulverglas,
+       soelvflasken, maaleglasset, det store bægerglas og koekkenrullen,
+       593. Dertil zoomboblen (270) og Kemichael bag bordet (178).
+
+       Vurdering: bordet kan IKKE blive meget mindre end de 1040 x 650, det
+       har - den bageste raekke fylder naesten det hele, og del 2 skal
+       desuden have plads til fire bægerglas paa hvidt underlag. Zoom 0,90
+       ved 1366 x 768 er derfor taet paa det hoejest mulige for dette
+       forsoeg. Skal det vaere stoerre, skal forsoeget deles i to borde
+       (fx del 1 og del 2 hver for sig), og det er foerst relevant med
+       telefonudgaven (P13). */
     NK.BORD_VALG = {
         bredde: 1040, hoejde: 650, bord: 500, bordDybde: 64, lodret: "bund",
         hylder: [

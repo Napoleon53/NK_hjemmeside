@@ -87,6 +87,11 @@
    bare tegnLaerer(ctx, tid), tegnes boblen med det samme som foer.
 
    Replikker:
+     K.katalog(puljer)         forsoegets eget katalog af replikker (M18):
+                               de samme kategorier som REPLIKKER, lagt oven
+                               i puljerne. Saettes af side.js fra forsoegets
+                               tekst.js ("kemichael")
+     K.katalogReplik(kategori) en vending fra forsoegets eget katalog, ellers ""
      K.replik(kategori)        en vending fra puljen REPLIKKER, som ikke er
                                brugt for nylig (ros, uheld, advarsel, prik1-4)
      K.replik(navn, liste)     det samme med forsoegets egen liste
@@ -187,7 +192,9 @@
             "Jeg står lige midt i noget.",
             "Det er ikke en knap.",
             "Jeg er her. Det kan du godt se.",
-            "Var der noget fagligt?"
+            "Var der noget fagligt?",
+            "Jeg hører dig. Jeg reagerer bare langsomt.",
+            "Ja. Stadig lærer."
         ],
         prik2: [
             "Jeg har travlt.",
@@ -195,7 +202,9 @@
             "Forsøget står stadig derovre.",
             "Ja. Stadig mig.",
             "Prøv at prikke til opgaven i stedet.",
-            "Jeg har 28 elever. Du er lige nu alle 28."
+            "Jeg har 28 elever. Du er lige nu alle 28.",
+            "To gange. Det er én mere, end der skulle til.",
+            "Jeg er ikke en dørklokke."
         ],
         prik3: [
             "Lad være med det.",
@@ -203,7 +212,9 @@
             "Det her fører ingen steder hen.",
             "Jeg tæller også det her.",
             "Der er en grænse. Den er tæt på.",
-            "Hænderne til dig selv. Også i et forsøg."
+            "Hænderne til dig selv. Også i et forsøg.",
+            "Tre gange er en tendens.",
+            "Jeg skriver det ikke ned. Jeg husker det."
         ],
         prik4: [
             "Nej.",
@@ -211,40 +222,53 @@
             "Færdig.",
             "Jeg har set det før. Det blev ikke sjovere.",
             "Godt. Så gør vi det på den anden måde.",
-            "Det står i regnskabet."
+            "Det står i regnskabet.",
+            "Fjerde gang. Jeg går om lidt.",
+            "Det her er ikke et forsøg. Det er en udholdenhedsprøve."
         ],
         gaaUd: [
             "Nu går jeg.",
             "Så går jeg. Det er også en reaktion.",
             "Jeg er i forberedelsen.",
-            "Farvel. Forsøget står der stadig."
+            "Farvel. Forsøget står der stadig.",
+            "Jeg går ud. Kemien bliver.",
+            "Jeg er ved kaffen. Den svarer heller ikke."
         ],
-        /* Faelles puljer, som forsoegene kan bruge med K.replik(kategori) */
+        /* Faelles puljer, som forsoegene kan bruge med K.replik(kategori),
+           og som forsoegets eget katalog laegger sig oven i (M18) */
         ros: [
             "Fint arbejde.",
             "Det var rigtigt. Det sker.",
             "Godt. Skriv det ned, før du glemmer det.",
             "Sådan. Næsten som i bogen.",
-            "Det holder. Også i morgen."
+            "Det holder. Også i morgen.",
+            "Præcis. Og du gjorde det selv.",
+            "Ja. Det er sådan, det skal se ud."
         ],
         uheld: [
             "Det var ikke meningen. Det er de færreste uheld.",
             "Jeg henter køkkenrullen. Igen.",
             "Sådan lærer man det også. Bare langsommere.",
             "Det står i regnskabet.",
-            "Vi kalder det en observation."
+            "Vi kalder det en observation.",
+            "Det er derfor, der er bordplade og ikke gulvtæppe.",
+            "Vi har alle hældt ved siden af. Nogle af os i 1994."
         ],
         advarsel: [
             "Læs etiketten, før du hælder.",
             "Lidt ad gangen. Altid lidt ad gangen.",
             "Det står på plakaten. Den hænger der stadig.",
-            "Briller på. De er ikke pynt."
+            "Briller på. De er ikke pynt.",
+            "Langsomt. Kemi er ikke en konkurrence.",
+            "Er du i tvivl, så spørg. Jeg står lige her."
         ],
         /* Han kommer forbi uden aerinde */
         forbi: [
             "Jeg skal bare forbi.",
             "Der er kemi i kassen. Bliv siddende.",
-            "Jeg går bare igennem."
+            "Jeg går bare igennem.",
+            "Jeg er her ikke. Jeg bærer bare noget.",
+            "Kig ikke på kassen."
         ],
         /* Der er ikke sket noget i forsoeget i lang tid */
         stilstand: [
@@ -252,7 +276,9 @@
             "Forsøget gør det ikke selv.",
             "Det bider ikke.",
             "Er du gået i stå, eller tænker du?",
-            "Der er ikke sket noget herovre i et stykke tid."
+            "Der er ikke sket noget herovre i et stykke tid.",
+            "Jeg venter. Det gør kemien også.",
+            "Skal jeg hente en stol?"
         ]
     };
 
@@ -444,15 +470,41 @@
     /* Replikker, der er brugt i denne sidevisning, pr. kategori */
     var brugte = {};
 
+    /* ----- Forsoegets eget katalog (M18) ----------------------------------
+       Han skal lyde som sig selv - men som sig selv I DET HER forsoeg.
+       Hver animation kan derfor lægge sine egne vendinger oven i puljerne:
+       de staar i forsoegets js/tekst.js under noeglen "kemichael" med de
+       samme kategorier som REPLIKKER (og uheldenes: spild, rystet,
+       vaeltet, overloeb, knust), og side.js giver dem videre hertil.
+       Ingen ny kode i forsoeget - kun tekst. */
+    var katalog = {};
+
+    function saetKatalog(puljer) {
+        katalog = puljer || {};
+        brugte = {};
+    }
+
+    /* En vending fra forsoegets eget katalog, eller "", hvis det ikke har
+       nogen i kategorien */
+    function katalogReplik(kategori) {
+        var liste = katalog[kategori];
+        return liste && liste.length ? replik(kategori + ":egen", liste) : "";
+    }
+
     function replik(kategori, liste) {
         var noegle = kategori;
         if (!liste) {
             liste = REPLIKKER[kategori];
-            /* Dagsformen fylder cirka hver tredje replik. De fire prik-trin
-               deler dagsformens pulje, saa den samme vending ikke kommer
-               to klik i traek. */
+            /* Forsoegets egne vendinger fylder knap halvdelen, naar det har
+               nogen i kategorien (M18). Dagsformen fylder cirka hver tredje
+               af resten. De fire prik-trin deler dagsformens pulje, saa den
+               samme vending ikke kommer to klik i traek. */
+            var egen = katalog[kategori] || [];
             var dag = dagensLinjer(kategori);
-            if (dag.length && Math.random() < 0.35) {
+            if (egen.length && Math.random() < 0.45) {
+                liste = egen;
+                noegle = kategori + ":egen";
+            } else if (dag.length && Math.random() < 0.35) {
                 liste = dag;
                 noegle = (kategori.indexOf("prik") === 0 ? "prik" : kategori) + ":dagen";
             }
@@ -1984,7 +2036,8 @@
         };
 
         /* Taleboblen som eget lag. Den holder sig fri af det, replikken
-           handler om (L.undgaa), OG af zoomboblen paa scenen (F5). */
+           handler om (L.undgaa), af zoomboblen paa scenen (F5) og af
+           hylderne med det, der staar paa dem (F78). */
         P.tegnLaererBoble = function (ctx, tid) {
             var L = this.laerer;
             if (!L || !L.tale || !(L.taleAlfa > 0.01)) return;
@@ -1996,7 +2049,12 @@
                 var isse = NK.tilVerden(hoved, ank("laererHoved", k), 55 * k, 0);
                 var undgaa = [];
                 if (L.undgaa && this.g && this.g[L.undgaa] && this.rekt) undgaa.push(this.rekt(this.g[L.undgaa], 8));
-                if (this.bobleRekt) {
+                /* F78: boblen daekker heller ikke hylderne og det, der staar
+                   paa dem - saa laenge den stod hen over et pulverglas,
+                   kunne kemikaliet hverken ses eller klikkes. Det er den
+                   samme liste, han selv holder sig fri af. */
+                if (this.laererOptagetAf) undgaa = undgaa.concat(this.laererOptagetAf());
+                else if (this.bobleRekt) {
                     var br = this.bobleRekt();
                     if (br) undgaa.push(br);
                 }
@@ -2046,6 +2104,9 @@
         tegneserieFigur: tegneserieFigur,
         taleTid: taleTid,
         replik: replik,
+        katalog: saetKatalog,
+        katalogReplik: katalogReplik,
+        katalogNu: function () { return katalog; },
         dagsform: dagsform,
         tid: tid,
         tidTvang: tidTvang,

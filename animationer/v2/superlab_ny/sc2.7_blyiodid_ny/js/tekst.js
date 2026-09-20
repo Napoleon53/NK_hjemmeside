@@ -252,6 +252,78 @@
             ]
         },
 
+        /* ----- Kemichaels eget katalog i sc2.7 (M18) ----------------------
+           Hans faelles puljer staar i ../../kemichael/kemichael.js. Her
+           staar de vendinger, der kun giver mening i DETTE forsoeg: bly,
+           vægten, varmepladen og de krystaller, man venter paa. side.js
+           giver dem videre til NK.Kemichael.katalog, og han blander dem
+           ind i de faelles, saa han lyder som sig selv - her.
+           Kategorier: prik1-4 (klik paa ham), gaaUd, ros, uheld, advarsel,
+           forbi, stilstand og uheldenes egne (spild, rystet, vaeltet,
+           overloeb, knust). */
+        "kemichael": {
+            prik1: [
+                "Ja? Krystallerne kommer ikke hurtigere af det.",
+                "Jeg står og venter på et bundfald. Det gør du også.",
+                "Vægten viser tre decimaler. Jeg viser én."
+            ],
+            prik2: [
+                "Du kan prikke, eller du kan veje 0,050 g af. Det ene rykker forsøget.",
+                "Termometeret er mere interessant end mig.",
+                "Jeg er ikke en varmeplade. Jeg bliver ikke varmere af det."
+            ],
+            prik3: [
+                "Bly, handsker, og hold så op med at prikke.",
+                "Tre gange. Det er flere end dine målinger.",
+                "Se på glasset i stedet. Der sker faktisk noget."
+            ],
+            prik4: [
+                "Nej. Og resterne skal stadig i dunken.",
+                "Færdig. Bly er tungt nok i forvejen.",
+                "Så er det nok. Gå hen til vægten."
+            ],
+            gaaUd: [
+                "Jeg går. Husk, at resterne er tungmetalaffald.",
+                "Farvel. Bundfaldet venter ikke på mig.",
+                "Jeg er ved forberedelsen. Der er også bly derinde."
+            ],
+            ros: [
+                "Tre punkter på en opløselighedskurve. Dem har du lavet selv.",
+                "Den temperatur er dit eget tal. Det er sådan, en tabel bliver til.",
+                "Fint. Og du kan se, hvorfor bundfaldet kom igen."
+            ],
+            uheld: [
+                "Bly på bordet. Derfor køkkenrulle, og derfor handsker.",
+                "Tør op, og vask hænder. I den rækkefølge.",
+                "Det er ikke vand. Det er bly i vand."
+            ],
+            advarsel: [
+                "Pb(NO₃)₂ er giftigt. Det står på etiketten og på plakaten.",
+                "Vej af på vejebåden. Ikke i glasset.",
+                "Samme masse af hvert stof. Ikke samme stofmængde."
+            ],
+            forbi: [
+                "Jeg henter mere kaliumiodid. Det bruger vi hurtigere end blyet.",
+                "Der er bly i kassen. Bliv siddende."
+            ],
+            stilstand: [
+                "Køler det af? Krystallerne kommer, når de kommer.",
+                "Bundfaldet forsvinder ikke af sig selv. Der skal varme til.",
+                "Sidder termometeret i glasset?",
+                "Har du husket omrøreren? Den gør arbejdet."
+            ],
+            spild: [
+                "Bly på bordet. Det er ikke en pyt. Det er affald.",
+                "Hold glasset ned, mens du hælder. Så bliver det i glasset."
+            ],
+            vaeltet: [
+                "Glasset står bedst, når det står."
+            ],
+            knust: [
+                "Glas og bly. To ting, der ikke skal ligge på gulvet."
+            ]
+        },
+
         /* ----- Kemichaels replikker (udløserne i js/forloeb.js) ------------ */
         "sig-for-meget": [
             "Det koger, og der er stadig bundfald.",

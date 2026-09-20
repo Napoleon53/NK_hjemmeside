@@ -175,6 +175,77 @@
         "sig-termometer": ["Termometeret siger {{termometer.T}}.", "Så er glas 5 varmt nok. Se på farven."],
         "sig-skaevt-op": ["De to glas i parret har ikke lige meget stof i sig.", "Så er det ikke fortyndingen, du måler."],
 
+        /* ----- Kemichaels eget katalog i sb2.4 (M18) ----------------------
+           Hans faelles puljer staar i ../../kemichael/kemichael.js. Her
+           staar de vendinger, der kun giver mening i DETTE forsoeg:
+           ligevaegten, farven, glas R og de syv glas. side.js giver dem
+           videre til NK.Kemichael.katalog, og han blander dem ind i de
+           faelles. Kategorier: prik1-4, gaaUd, ros, uheld, advarsel,
+           forbi, stilstand og uheldenes egne (spild, rystet, vaeltet,
+           overloeb, knust). */
+        "kemichael": {
+            prik1: [
+                "Ja? Ligevægten flytter sig ikke af det.",
+                "Jeg er ikke et indgreb.",
+                "Glassene står derovre. Jeg står her."
+            ],
+            prik2: [
+                "Du kan også forskyde en ligevægt. Det er mere interessant.",
+                "Prik til glas 7 i stedet. Nej, forresten, lad være.",
+                "Farven bliver ikke rødere af det."
+            ],
+            prik3: [
+                "Tre gange. Det er flere indgreb, end glasset har fået.",
+                "Der sker mere i glas 5, og der sker ikke meget.",
+                "Hold øjnene på farven, ikke på mig."
+            ],
+            prik4: [
+                "Nej. Gå hen til glassene.",
+                "Færdig. Sammenlign med glas R i stedet.",
+                "Så er det nok. Ligevægten venter."
+            ],
+            gaaUd: [
+                "Jeg går. Glas R står der stadig som reference.",
+                "Farvel. Farverne bliver, hvor de er.",
+                "Jeg er i forberedelsen. Der står også noget rødt derinde."
+            ],
+            ros: [
+                "Du kan se forskellen. Det er hele øvelsen.",
+                "Rigtigt — og du kan forklare hvorfor. Det er det svære.",
+                "Godt. Le Chatelier ville have nikket."
+            ],
+            uheld: [
+                "Rødt på bordet. Det er ikke farligt, det ser bare voldsomt ud.",
+                "Thiocyanat på kitlen. Igen.",
+                "Det plamager. Det gør det altid."
+            ],
+            advarsel: [
+                "Hold glassene op mod det hvide. Ellers kan du ikke se forskellen.",
+                "Sammenlign altid med glas R. Ellers er det bare farver.",
+                "Lige meget i hvert glas. Ellers måler du rumfang og ikke ligevægt."
+            ],
+            forbi: [
+                "Jeg henter mere frugtfarve. Det er til en anden klasse.",
+                "Der er glas i kassen. Bliv siddende."
+            ],
+            stilstand: [
+                "Har du set på glas R?",
+                "Hvilket glas er mørkest? Det er spørgsmålet.",
+                "Ligevægten venter ikke. Den er der allerede.",
+                "Er der noget, der skal varmes eller køles?"
+            ],
+            spild: [
+                "Rødt på bordet fortæller ingenting. Det skal være i glasset.",
+                "En tiendedel ud af glasset er en tiendedel færre ioner at se på."
+            ],
+            vaeltet: [
+                "Reagensglas står i stativet. Det er derfor, det står der."
+            ],
+            knust: [
+                "Et glas mindre. Farven var ellers fin."
+            ]
+        },
+
         /* ----- Quizzen ---------------------------------------------------
            Rammen staar i ../../laboratoriet/js/quiz.js; her staar kun
            spoergsmaalene. Fire svar hver, blandet ved hvert forsoeg, saa

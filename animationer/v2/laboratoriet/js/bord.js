@@ -676,7 +676,11 @@
             this.holdt = { navn: navn, start: pt, dx: pt.x - gg.p.x, dy: pt.y - gg.p.y, flyttet: false, sidst: pt, t: Date.now(), taleboble: paaTaleboble };
             return true;
         }
-        this.klik(paaTaleboble ? "taleboble" : navn, pt);
+        /* F78: staar der en genstand under boblen, gaelder klikket
+           genstanden - eleven skal kunne arbejde videre, mens han taler.
+           Rammer klikket kun boblen (eller ham bag den), springer det
+           replikken videre (S14). */
+        this.klik(paaTaleboble && !this.g[navn] ? "taleboble" : navn, pt);
         return false;
     };
 
@@ -883,7 +887,10 @@
             }
             return;
         }
-        if (!h.flyttet) { this.klik(h.taleboble ? "taleboble" : h.navn); return; }
+        /* F78: et klik paa noget, der kan gribes, gaelder genstanden - ogsaa
+           naar taleboblen staar hen over den. Boblen tager kun de klik, der
+           ikke rammer noget. */
+        if (!h.flyttet) { this.klik(h.navn); return; }
         this.stopBaer(h.sidst);
     };
 

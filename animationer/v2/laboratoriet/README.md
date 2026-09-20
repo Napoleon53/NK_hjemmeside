@@ -503,11 +503,68 @@ Hvert bord vælger selv sine mål i `NK.BORD_VALG` (`bredde`, `hoejde`, `bord`,
 `bordDybde`, `lodret`, `gulv`, hylder, plakat, `bagBord`, `bobleR`), og
 lærredet skalerer scenen, så den fylder vinduet.
 Et smalt bord er altså zoomet ind: prøvebordet og prøverummet er 1620 enheder
-brede, mens sb2.4 er 1120 og derfor står tættere på. Et nyt lille bord med
-store, tydelige flasker koster kun de tre tal plus sin egen opstilling.
+brede, mens sb2.4 og sc2.7 er 1040 og derfor står tættere på. Et nyt lille
+bord med store, tydelige flasker koster kun de tre tal plus sin egen
+opstilling.
 
-En genstand i opstillingen kan desuden få `skala` (0,25 til 1), så den samme
-type kan stå i mindre målestok på et lille bord:
+### Zoomniveauet pr. animation (M19)
+
+**Zoom = lærredets bredde ÷ bordets bredde**, med lærredets højde ÷ bordets
+højde som loft. Lærredet fylder vinduet minus panelet: 936 × 715 ved
+1366 × 768, 1490 × 1027 ved 1920 × 1080 og 850 × 667 ved 1280 × 720. Et bord
+på 1040 × 650 står altså i 0,90 på en normal skærm, og et på 1620 i 0,55.
+
+Hvor højt et forsøg kan komme op, afgøres af, hvor meget udstyr der skal
+kunne stå fremme på én gang — ikke af, hvor stort bordet er tegnet. Målt på
+den bageste række (det, der skal kunne nås), den forreste (værktøjet),
+hylden, zoomboblen (270) og Kemichaels plads bag bordet (178):
+
+| Animation | Bord | Zoom nu (1366) | Mindste fornuftige bord | Mulig zoom |
+|---|---|---|---|---|
+| **sc2.7** blyiodid | 1040 × 650 | 0,90 | ca. 760 × 620 | **1,23** |
+| **sb2.4** jernthiocyanat | 1040 × 650 | 0,90 | ca. 1040 × 650 (uændret) | 0,90 |
+| Prøvebordet | 1620 × 600 | 0,55 | uændret (alt udstyr på én gang) | 0,55 |
+| Prøverummet | 1620 × 600 pr. rum | 0,55 | ca. 1200, hvis hvert rum kun har sit eget | 0,74 |
+
+Vurderingen for hvert forsøg på motoren står **sammen med animationen**: i
+dens `js/opstilling.js` ved `NK.BORD_VALG` og i dens README under »Bord og
+zoom«.
+
+De syv gamle forsøg er endnu ikke konverteret og har intet bord i motorens
+forstand. Skønnet nedenfor er lavet ud fra det udstyr, hvert forsøg skal have
+fremme (`claude/konverteringer.md`), så det er kendt, inden opstillingen
+tegnes. Når et forsøg konverteres, skrives dets egen vurdering ind sammen med
+animationen som ovenfor.
+
+| Gammelt forsøg | Udstyr, der skal stå fremme | Skønnet bord | Mulig zoom |
+|---|---|---|---|
+| **sc6.8** substitution | to reagensglas i stativ, lampe, alufolie, prop, bromvand, hexan, pH-papir, AgNO₃ | ca. 800 × 620 | **1,17** |
+| **sc2.5** fældning | 3×4-skema set ovenfra, syv dråbeflasker, lup | ca. 820 × 640 | **1,14** |
+| **sc2.6** kobber og dibrom | konisk kolbe med prop, to glas, tre dråbeflasker, kobberspåner, udsugning | ca. 950 × 650 | 0,99 |
+| **sc8.6** jern i ståluld | buret i stativ (høj), kolbe, varmeplade, vægt, to syreflasker, KMnO₄ | ca. 1000 × 780 | 0,92 (højden binder) |
+| **sc1.3** knaldgas | pneumatisk kar, måleglas, to trykflasker med slange, plads til molekyler, der flyver ud | ca. 1100 × 700 | 0,85 |
+| **sc6.9** fedt i chips | morter, tragt med filter, petriskål, vægt, varmeplade, brænder, heptan, chips | ca. 1200 × 680 | 0,78 |
+
+sc8.6 er den eneste, hvor **højden** sætter grænsen: en buret i et stativ er
+høj, og lærredet er 715 px højt ved 1366 × 768. De to mindste (sc6.8 og
+sc2.5) kan komme højere op end noget, der kører i dag.
+
+Tre ting, der sætter grænsen i praksis:
+
+* **Den bageste række.** Alt, der skal kunne nås samtidig, skal stå ved
+  siden af hinanden. sb2.4's bageste række fylder 978 af bordets 1040; sc2.7's
+  fylder 454.
+* **Zoomboblen** fylder 270 i øverste venstre hjørne, uanset hvor lille
+  bordet er. På et bord under ca. 700 dækker den for meget, og så skal den
+  enten være mindre (`bobleR`) eller åbnes med et klik i stedet.
+* **Kemichael bag bordet** skal have 178 fri bagvæg at stå på. Et forsøg
+  uden ham kan komme tættere på.
+
+Superanimationerne i `../superanimation/` er ikke laboratorieforsøg, kører
+ikke på motoren og har intet bord; de er ikke med i vurderingen.
+
+En genstand i opstillingen kan desuden få `skala` (0,25 til 2), så den samme
+type kan stå i mindre eller større målestok:
 
 ```js
 { navn: "stativ", type: "stativ", p: { x: 330, y: 350, v: 0 }, skala: 0.5 },
@@ -529,8 +586,9 @@ type kan stå i mindre målestok på et lille bord:
   et bad synker det til badets `bundY`, hvor et fuldt glas' bund står, så
   indholdet kommer ned i vandet (`synkTil` i `bord.js`). Et glas i fuld
   størrelse når bunden og står, som det altid har.
-* Skala over 1 tillades ikke: sprites er tegnet i deres naturlige størrelse og
-  bliver bløde, hvis de forstørres.
+* Skala går fra 0,25 til 2. Over 1 bliver en sprite blød, medmindre den er
+  tegnet til det: pulverglassene i sc2.7 og sb2.4 står i 1,45, og deres sprite
+  blev tegnet om, så etiketten kan læses (F73).
 * Prøvebordets selvtest har et afsnit, der holder øje med, at rumfang,
   væskehøjde, arv og museramme følger med (afsnit 10).
 

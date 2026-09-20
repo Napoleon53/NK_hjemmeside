@@ -254,7 +254,11 @@
         this.uheldTal = this.uheldTal || {};
         this.uheldTal[slags] = (this.uheldTal[slags] || 0) + 1;
         var liste = REPLIK[slags] || REPLIK.spild;
-        var replik = liste[Math.min(this.uheldTal[slags], liste.length) - 1];
+        /* M18: foerste gang siger han det faelles. Sker det igen, tager han
+           forsoegets egen vending, hvis animationen har en (tekst.js
+           "kemichael") */
+        var egen = this.uheldTal[slags] > 1 && K.katalogReplik ? K.katalogReplik(slags) : "";
+        var replik = egen || liste[Math.min(this.uheldTal[slags], liste.length) - 1];
         var pyt = this.pytter[this.pytter.length - 1];
         this.laererKoer("spild", [
             { tid: 0.5 },
@@ -288,7 +292,8 @@
         this.laererAfbryd();
         this.uheldTal = this.uheldTal || {};
         this.uheldTal.knust = (this.uheldTal.knust || 0) + 1;
-        var replik = KNUST[Math.min(this.uheldTal.knust, KNUST.length) - 1];
+        var egenKnust = this.uheldTal.knust > 1 && K.katalogReplik ? K.katalogReplik("knust") : "";
+        var replik = egenKnust || KNUST[Math.min(this.uheldTal.knust, KNUST.length) - 1];
         var sx = 0;
         this.skaar.forEach(function (s) { sx += s.x; });
         sx = this.skaar.length ? sx / this.skaar.length : gg.p.x;

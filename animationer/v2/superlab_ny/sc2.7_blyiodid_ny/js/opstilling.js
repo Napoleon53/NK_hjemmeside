@@ -99,6 +99,26 @@
        i et glas med 0,1 g Pb(NO3)2 giver to, og krystallen i bunden er
        Stof.gitter. Tilskuerionerne er K+ og NO3- (alt andet end de
        centrale). */
+    /* ----- Bord og zoom (M19) ---------------------------------------------
+       Zoom er laerredets bredde delt med bordets: paa en skaerm i 1366 x 768
+       er laerredet 936 x 715, saa dette bord (1040 x 650) staar i 0,90.
+       1920 x 1080 giver 1,43, og 1280 x 720 giver 0,82. Hoejden saetter
+       loftet paa samme maade (715 / 650 = 1,10), saa bredden bestemmer her.
+
+       sc2.7 bruger lidt udstyr: paa bordet staar dunken (90), vaegten med
+       vejebaaden (140), varmepladen med bægerglasset (180) og maaleglasset
+       (44) i den bageste raekke - 454 i alt - og kurven (110), spatelboetten
+       (40), spatlen (96) og termometeret (120) forrest, 366 i alt. Paa
+       hylden staar to pulverglas og koekkenrullen, 224. Zoomboblen fylder
+       270 i hjoernet, og Kemichael bag bordet 178.
+
+       Vurdering: bordet kan komme ned paa ca. 760 x 620, hvis raekkerne
+       rykkes sammen (boblen bliver i hjoernet, hylden flyttes ind over
+       bordet). Det giver zoom 1,23 ved 1366 x 768 - godt en tredjedel
+       stoerre end nu - og det er nok det hoejeste, forsoeget kan komme op
+       paa, saa laenge Kemichael skal kunne staa bag bordet. Det koster nye
+       koordinater i hele opstillingen og et gennemsyn af rundvisningen,
+       saa det er ikke gjort endnu. */
     NK.BORD_VALG = {
         bredde: 1040, hoejde: 650, bord: 500, bordDybde: 64, lodret: "bund",
         hylder: [

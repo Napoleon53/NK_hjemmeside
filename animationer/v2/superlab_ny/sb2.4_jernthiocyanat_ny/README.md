@@ -104,6 +104,23 @@ vandbadet, når han taler om reagensglassene, og til venstre for isbadet, når
 han taler om det. Bordpladen dækker hans underkrop, og han tegnes mindre,
 fordi han er længere væk. Se »Kemichael i forsøget«.
 
+## Bord og zoom (M19)
+
+Bordet er 1040 × 650. Zoom er lærredets bredde delt med bordets: på en skærm
+i 1366 × 768 er lærredet 936 × 715, så forsøget står i **0,90**; 1920 × 1080
+giver 1,43, og 1280 × 720 giver 0,82.
+
+sb2.4 er det forsøg, der bruger mest udstyr. Bageste række (dunk, stativ med
+syv reagensglas, varmeplade, isbad, hane og vask, kolbe) fylder 978, før der
+er luft imellem; forreste række (glasstav, spatel, spatelbøtte, termometer,
+kurv) 556; hylden 593. Dertil zoomboblen (270) og Kemichael (178).
+
+**Vurdering: bordet kan ikke blive meget mindre end 1040 × 650.** Zoom 0,90
+ved 1366 × 768 er derfor tæt på det højest mulige for dette forsøg. Skal det
+være større, skal forsøget deles i to borde — del 1 og del 2 hver for sig —
+og det er først relevant med telefonudgaven (P13). Vurderingen står også i
+`js/opstilling.js` ved `NK.BORD_VALG`.
+
 ## Reagensglassene
 
 **Rettet samme dag (F33, F31, F48):** glassene rummer 20 mL og er tegnet
