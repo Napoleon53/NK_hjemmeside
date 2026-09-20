@@ -67,7 +67,9 @@ body {
 }
 
 /* I en samling i fuld skaerm staar knappen, der gendanner panelet, i hjoernet */
-.samling-fuld .top { padding-left: 56px; }
+/* Plads til samlingsfilens knap i hjoernet; en samling med en stoerre knap
+   (»Det virtuelle laboratorium«) saetter --samling-knap */
+.samling-fuld .top { padding-left: var(--samling-knap, 56px); }
 
 .top h1 {
     margin: 0;

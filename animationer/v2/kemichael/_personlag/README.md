@@ -35,7 +35,7 @@ bedre udgangssituation.
 
 Disse filer er skrevet uden adgang til det nye motorlag i `laboratoriet/`
 (`side.js`, `vilkaar.js`, `forloeb.js`, `rum.js`) og uden adgang til
-`../../superlab/sb2.4_ligevaegt/`. Alt, hvad der står om, hvordan personlaget kobles på
+`../../superlab_ny/sb2.4_jernthiocyanat_ny/`. Alt, hvad der står om, hvordan personlaget kobles på
 den nye motor, er derfor forslag og ikke verificeret mod koden.
 
 `kemichael.js` blev først læst som skrevet til den gamle model. Det var for

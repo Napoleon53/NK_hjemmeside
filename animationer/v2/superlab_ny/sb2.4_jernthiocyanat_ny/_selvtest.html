@@ -1,0 +1,2713 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest - Indgreb i en kemisk ligevægt</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:800px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script src="../../laboratoriet/js/proeve.js"></script>
+<script src="../../laboratoriet/js/tjek.js"></script>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i animationen og kan slettes.
+
+   Aabner index.html i en iframe og koerer forsoeget igennem: kemien i de
+   fire indgreb, badene, forloebets trin (ogsaa i forkert raekkefoelge),
+   flagene, udloeserne, gemningen, opstillingen mod stoftabellen,
+   oevelsestjekket (M2), Kemichaels replikker fra forloebet og
+   taleboblen som eget lag. Til sidst goeres det samme med musen, som en
+   elev (proeve.js).
+
+   Skal aabnes gennem en lokal server (eller Chrome med
+   --allow-file-access-from-files), ellers kan iframen ikke laeses.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn + (note !== undefined ? "   (" + note + ")" : ""), "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function tal(x, d) { return Number(x).toFixed(d === undefined ? 2 : d).replace(".", ","); }
+
+window.addEventListener("load", function () { setTimeout(koer, 1800); });
+
+function koer() {
+    try { koerTest(); } catch (e) { fejl++; skriv("UNDTAGELSE: " + e.message + "\n" + e.stack, "fejl"); }
+    vis();
+}
+
+function koerTest() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument;
+    var NK = ramme.contentWindow.NK;
+    if (NK && NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+
+    overskrift("1. Indlaesning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var bord = NK.bord, B = NK.Beholder, St = NK.Stof, V = NK.Vilkaar;
+    var side = NK.Side.nu, F = NK.Forloeb.nu;
+    paastand("bordet er bygget", !!bord);
+    paastand("skallen er den faelles side.js", !!side);
+    paastand("forloebet er bygget", !!F && F.trin.length === 13, F && F.trin.length + " trin");
+    paastand("de syv glas staar i stativet, og der er intet glas 8 (F48)", [1,2,3,4,5,6,7].every(function (i) { return !!bord.g["glas" + i]; }) && !bord.g.glas8);
+    paastand("badene staar paa bordet", !!bord.g.vandbad && !!bord.g.isbad &&
+        bord.g.vandbad.kan.bad && bord.g.isbad.kan.bad);
+    paastand("vandbadet staar paa varmepladen", bord.g.vandbad.paa === bord.g.plade);
+    paastand("teksterne er skrevet ind fra tekst.js",
+        d.getElementById("teori-indhold").textContent.indexOf("exoterm") > 0);
+    paastand("panelet viser foerste trin",
+        d.getElementById("forloeb-tekst").textContent.indexOf("stamopløsning") > 0);
+    paastand("introen aabner og lukker", !!NK.intro &&
+        (NK.intro.aabn(), d.getElementById("intro").classList.contains("vis")) &&
+        (NK.intro.luk(), !d.getElementById("intro").classList.contains("vis")));
+    var alle = Object.keys(NK.Sprites.FILER);
+    var klar = alle.filter(function (n) { return NK.Sprites.klar(n); });
+    paastand("sprites er indlaest", klar.length === alle.length, klar.length + " af " + alle.length);
+
+    /* Zoomboblen staar i laboratoriets oeverste venstre hjoerne og skalerer
+       med det. Opstillingen holder hjoernet frit: intet udstyr, ingen hylde
+       og ikke plakaten maa ligge inden for boblen og dens navn. */
+    var valgtFoer = bord.valgt;
+    var vin = ramme.contentWindow;
+    var Sc = NK.Scene;
+    paastand("zoomboblen staar paa scenen og ikke i panelet",
+        !d.getElementById("boble-laerred") && !!bord.boble && bord.bobleR === 135);
+    paastand("og indholdet i den er en tiendedel mindre", bord.bobleIndhold === 0.9 && bord.mikro.k === 0.9);
+    var br = bord.bobleRekt(), daekker = [];
+    function overlap(a, b) { return a.x < b.x + b.b && a.x + a.b > b.x && a.y < b.y + b.h && a.y + a.h > b.y; }
+    bord.liste.forEach(function (gg) {
+        if (bord.synlig(gg) && overlap(bord.rekt(gg, 0), br)) daekker.push(gg.navn);
+    });
+    (Sc.HYLDER || []).forEach(function (H, i) {
+        if (overlap({ x: H.x0, y: H.y, b: H.x1 - H.x0, h: 21 }, br)) daekker.push("hylde " + i);
+    });
+    if (bord.plakat && overlap(bord.plakatRekt(), br)) daekker.push("plakaten");
+    paastand("zoomboblens hjoerne er frit", daekker.length === 0, daekker.join(", ") || "frit");
+    paastand("laboratoriet er smallere, saa alt er stoerre", Sc.BREDDE === 1040);
+    paastand("aflaesningen har sin stil",
+        vin.getComputedStyle(d.getElementById("glas-indhold")).borderCollapse === "collapse");
+
+    /* Indholdet i tal er foldet sammen som udgangspunkt, og folden er
+       skjult, naar der ikke er noget at vise */
+    var fold = d.getElementById("glas-indhold-fold");
+    bord.vaelg("kolbe");
+    side.opdaterPanel();
+    paastand("indholdet er foldet sammen som udgangspunkt",
+        !!fold && !fold.hidden && !fold.open && d.getElementById("glas-indhold").rows.length > 0);
+    bord.vaelg("glas1");
+    side.opdaterPanel();
+    paastand("folden er skjult for et tomt glas", !!fold && fold.hidden);
+    bord.vaelg(valgtFoer);
+    side.opdaterPanel();
+
+    /* Ligevaegten staar i toplinjen, teorien bag knappen Teori og T, og
+       uheldskortet har kun sin taeller */
+    var teori = d.getElementById("teori"), topL = d.getElementById("top-ligning");
+    paastand("ligningen staar i toplinjen", !!topL && topL.textContent.indexOf("⇌") > 0 &&
+        topL.parentNode.classList.contains("top") && topL.getBoundingClientRect().width > 100, topL && topL.textContent);
+    paastand("panelet har ikke laengere et ligevaegtskort", !d.getElementById("teori-kort-ramme") && !d.getElementById("teori-aabn"));
+    paastand("uheldskortet har kun taelleren", !d.getElementById("uheld-tekst") && !!d.getElementById("uheld-taeller") &&
+        d.getElementById("uheld-kort").textContent.replace(/\s+/g, " ").trim() === "Uheld " + bord.antalUheld);
+    d.getElementById("teoriknap").click();
+    paastand("knappen Teori aabner teoriboksen", teori.classList.contains("vis"));
+    paastand("teorien er bygget af blokke",
+        teori.querySelectorAll("#teori-indhold p").length >= 5 &&
+        teori.querySelectorAll("#teori-indhold h3").length >= 4 &&
+        teori.querySelectorAll("#teori-indhold .ligning").length >= 4);
+    d.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "t" }));
+    paastand("T lukker den igen", !teori.classList.contains("vis"));
+    d.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "T" }));
+    paastand("og T aabner den", teori.classList.contains("vis"));
+    NK.teori.luk();
+
+    /* Noterne foldes ud fra toplinjen ved siden af Teori */
+    var noter = d.getElementById("noter"), noterknap = d.getElementById("noterknap"), felt = d.getElementById("logbog-tekst");
+    var noterFoer = felt.value;
+    paastand("knappen Noter staar lige efter Teori", !!noterknap && d.getElementById("teoriknap").nextElementSibling === noterknap);
+    paastand("noterne er foldet ind som udgangspunkt", noter.hidden && noterknap.getAttribute("aria-expanded") === "false");
+    noterknap.click();
+    /* F56: noterne aabner paa fanen »Uheld og replikker« */
+    paastand("knappen folder dem ud paa fanen »Uheld og replikker« (F56)", !noter.hidden &&
+        !d.getElementById("noter-sket").hidden && d.getElementById("noter-egne").hidden &&
+        d.activeElement === d.getElementById("fane-sket") &&
+        noterknap.getAttribute("aria-expanded") === "true" && noterknap.classList.contains("aktiv"));
+    paastand("skraldespanden ses kun i »Mine noter«", d.getElementById("logbog-ryd").hidden);
+    d.getElementById("fane-egne").click();
+    paastand("»Mine noter« viser feltet, og markoeren staar i det", d.getElementById("noter-sket").hidden &&
+        !d.getElementById("noter-egne").hidden && d.activeElement === felt && !d.getElementById("logbog-ryd").hidden);
+    d.getElementById("fane-sket").click();
+    var rN = noter.getBoundingClientRect(), rS = d.getElementById("scene").getBoundingClientRect();
+    paastand("de ligger i scenens oeverste hoejre hjoerne, ikke over panelet", rN.right <= rS.right + 0.5 && rN.top >= rS.top && rN.top - rS.top < 20,
+        Math.round(rN.left) + "-" + Math.round(rN.right) + " / scene " + Math.round(rS.right));
+    felt.value = "";
+    bord.vaelg("kolbe");
+    d.getElementById("logbog-noter").click();
+    var noteret = felt.value;
+    paastand("»Notér det valgte glas« skriver kolbens aflaesning som tabellen: uden tilskuere og spor",
+        noteret.indexOf("Kolben") >= 0 && noteret.indexOf("Fe³⁺") >= 0 && noteret.indexOf("K⁺") < 0 && noteret.indexOf("0,00") < 0, noteret);
+    paastand("og markoeren staar efter den, saa man kan skrive videre", d.activeElement === felt && felt.selectionStart === felt.value.length);
+    felt.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "t", bubbles: true }));
+    paastand("et t i feltet aabner ikke teorien", !teori.classList.contains("vis"));
+    felt.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    paastand("Esc i feltet folder noterne ind", noter.hidden && !noterknap.classList.contains("aktiv"));
+    d.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "n" }));
+    paastand("tasten N folder dem ud igen", !noter.hidden);
+    d.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "N" }));
+    paastand("og ind", noter.hidden);
+    felt.value = noterFoer;
+    side.logbogGem();
+    bord.vaelg(valgtFoer);
+
+    function adv(sek) { for (var k = 0; k < Math.round(sek * 20); k++) bord.opdater(0.05); F.opdater(); }
+    function lys(gg) { return V.lysstyrke(gg); }
+    function konc(gg, navn) { return St.konc(B.samlet(gg), navn); }
+    function g(n) { return bord.g["glas" + n]; }
+
+    overskrift("2. Stamoploesningen");
+    var kolbe = bord.g.kolbe;
+    /* Det, et tryk giver i et reagensglas (S31: modtager i opstillingen) */
+    var PORTION = bord.portion(kolbe, g(1));
+    paastand("et tryk fra kolben giver 4 mL i et reagensglas", Math.abs(PORTION - 4) < 1e-9, tal(PORTION, 1) + " mL");
+    for (var i = 1; i <= 7; i++) B.haeldI(g(i), B.udtag(kolbe, PORTION), true);
+    adv(25);
+    var ref = g(7), lys0 = lys(ref), fescn0 = konc(ref, "FeSCN2+");
+    paastand("komplekset danner sig af sig selv", fescn0 > 0.4 && fescn0 < 1.5, tal(fescn0) + " mM FeSCN2+");
+    paastand("farven er tydelig, men ikke sort", lys0 < 0.75 && lys0 > 0.12, "lys " + tal(lys0));
+    paastand("trin 1 er gjort, naar alle syv glas er fyldt", F.erGjort("fyld"));
+    paastand("naeste trin er glas 1", F.nuTrin() && F.nuTrin().id === "glas1", F.nuTrin() && F.nuTrin().id);
+
+    overskrift("3. De fire indgreb");
+    /* Med vilje i en anden raekkefoelge end listen: et trin afgoeres af
+       bordets tilstand, ikke af den vej eleven kom */
+    B.tilsaetFast(g(3), "KSCN(s)", 20);
+    adv(40);
+    paastand("et trin laengere fremme taeller ogsaa", F.erGjort("glas3"));
+    paastand("men glas 1 er stadig ikke gjort", !F.erGjort("glas1"));
+    paastand("glas 3 blev moerkere", lys(g(3)) < lys0 - 0.02, tal(lys0) + " -> " + tal(lys(g(3))));
+
+    B.tilsaetFast(g(1), "Fe(NO3)3(s)", 20);
+    B.tilsaetFast(g(2), "Asc(s)", 12);
+    /* AgNO3 til to tredjedele af glassets SCN-: 0,02 mL 0,1 M pr. mL
+       stamoploesning (3 mM), saa glasset bliver lysere, men ikke farveloest */
+    B.haeldI(g(4), B.udtag(bord.g.ag, 0.02 * PORTION), true);
+    adv(50);
+    paastand("glas 1: mere Fe3+ giver moerkere", F.erGjort("glas1") && konc(g(1), "FeSCN2+") > fescn0,
+        tal(fescn0) + " -> " + tal(konc(g(1), "FeSCN2+")) + " mM");
+    paastand("glas 2: ascorbinsyre reducerer til Fe2+ og giver lysere",
+        F.erGjort("glas2") && konc(g(2), "Fe2+") > 0.5, tal(konc(g(2), "Fe2+")) + " mM Fe2+");
+    paastand("glas 4: AgNO3 faelder AgSCN og giver lysere",
+        F.erGjort("glas4") && B.samlet(g(4)).n["AgSCN(s)"] > 1,
+        tal((B.samlet(g(4)).n["AgSCN(s)"] || 0) / 1000, 3) + " mmol AgSCN");
+
+    overskrift("3b. Boblen og tabellen: fast skala og tilskuerioner");
+    /* Boblens skala er fast (partikelRef), saa FeSCN2+ faar flere kugler i
+       glas 1 end i referencen, selv om Fe3+ er i stort overskud. K+ og NO3-
+       er tilskuere: de skjules, naar der er mere end tre slags ioner, og
+       staar for sig nederst i tabellen, naar fluebenet er sat. */
+    function kugler(gl) { var o = B.samlet(gl); return St.partikelTal(o, bord.valg.partikler, bord.skjulteI(o), bord.valg.partikelRef); }
+    var k7 = kugler(g(7)), k1 = kugler(g(1)), k4 = kugler(g(4));
+    paastand("tilskuerionerne fra start er K+ og NO3-", bord.tilskuere.join(",") === "K+,NO3-", bord.tilskuere.join(", "));
+    /* Forsoeget siger, hvad der er CENTRALT, og alt andet ionisk er
+       tilskuer. Det er den vej, der holder: H+ opstaar foerst, naar
+       redoxen loeber, og er tilskuer HER - men ville vaere hovedperson i
+       en titrering. Motoren kan ikke gaette det; forsoeget ved det. */
+    paastand("og forsoeget siger, hvad der er centralt, ikke hvad der er tilskuer",
+        !!bord.centrale && bord.centrale.indexOf("FeSCN2+") >= 0 && bord.centrale.indexOf("H+") < 0,
+        (bord.centrale || []).join(", "));
+    (function () {
+        var o = St.lav({ V: 6, mM: { "Fe3+": 2, "SCN-": 2, "FeSCN2+": 1, "K+": 3, "NO3-": 9, "H+": 5, "Fe2+": 4 } });
+        var sk = bord.tilskuereI(o);
+        paastand("saa H+ er tilskuer, ogsaa selv om den ikke stod paa bordet fra start",
+            sk.indexOf("H+") >= 0 && sk.indexOf("Fe2+") < 0 && sk.indexOf("FeSCN2+") < 0, sk.join(", "));
+    }());
+    paastand("FeSCN2+ faar flere kugler i glas 1 (mere Fe3+) end i referencen", (k1["FeSCN2+"] || 0) > (k7["FeSCN2+"] || 0),
+        (k7["FeSCN2+"] || 0) + " -> " + (k1["FeSCN2+"] || 0) + " " + JSON.stringify(k1));
+    paastand("og faerre i glas 4 (AgNO3), men forsvinder ikke", (k4["FeSCN2+"] || 0) >= 1 && (k4["FeSCN2+"] || 0) <= (k7["FeSCN2+"] || 0),
+        (k7["FeSCN2+"] || 0) + " -> " + (k4["FeSCN2+"] || 0));
+    paastand("tilskuerionerne er ikke i boblen for referencen", !k7["K+"] && !k7["NO3-"], JSON.stringify(k7));
+    /* Loftet: hoejst 20 kugler i alt, ogsaa med tilskuerne vist */
+    function ialt(k) { return Object.keys(k).reduce(function (a, n) { return a + k[n]; }, 0); }
+    var alle1 = St.partikelTal(B.samlet(g(1)), bord.valg.partikler, [], bord.valg.partikelRef);
+    paastand("boblen har hoejst 20 kugler i glas 1, ogsaa med tilskuerne", ialt(k1) <= 20 && ialt(alle1) <= 20 && ialt(alle1) >= ialt(k1),
+        ialt(k1) + " / " + ialt(alle1) + " " + JSON.stringify(alle1));
+    var kAg = kugler(bord.g.ag);
+    paastand("men med kun to ioner vises de (AgNO3-flasken)", kAg["NO3-"] > 0 && kAg["Ag+"] > 0);
+    bord.vaelg("glas7");
+    side.opdaterPanel();
+    function tabelNavne() { return [].map.call(d.querySelectorAll("#glas-indhold tr"), function (tr) { return tr.className === "kategori" ? "|" : tr.querySelector("th").textContent; }); }
+    function tabelTal() { return [].map.call(d.querySelectorAll("#glas-indhold tr:not(.kategori):not(.fast) td:not(.enhed)"), function (td) { return parseFloat(td.textContent.replace(",", ".")); }); }
+    var tn = tabelNavne(), tt = tabelTal();
+    paastand("tabellen har ingen tilskuerioner, og fluebenet staar der", tn.join(" ").indexOf("K⁺") < 0 && tn.join(" ").indexOf("NO₃⁻") < 0 && !d.getElementById("tilskuere-linje").hidden, tn.join(" "));
+    paastand("tabellen er sorteret med den stoerste koncentration foerst", tt.every(function (v, i) { return i === 0 || v <= tt[i - 1]; }), tt.join(" "));
+    d.getElementById("tilskuere-vis").click();
+    var tn2 = tabelNavne();
+    paastand("med fluebenet staar tilskuerionerne for sig nederst", tn2.indexOf("|") > 0 && tn2.slice(tn2.indexOf("|") + 1).join(" ") === "NO₃⁻(aq) K⁺(aq)" && bord.visTilskuere, tn2.join(" "));
+    paastand("og boblen viser dem", kugler(g(7))["NO3-"] > 0);
+    d.getElementById("tilskuere-vis").click();
+    paastand("fluebenet kan slaas fra igen", !bord.visTilskuere && tabelNavne().indexOf("|") < 0);
+    bord.vaelg("ag");
+    side.opdaterPanel();
+    paastand("i AgNO3-flasken staar begge ioner i tabellen, og fluebenet er skjult", tabelNavne().slice().sort().join(" ") === "Ag⁺(aq) NO₃⁻(aq)" && d.getElementById("tilskuere-linje").hidden, tabelNavne().join(" "));
+    bord.vaelg(null);
+
+    overskrift("4. Badene");
+    paastand("zoomboblen viser ingen H⁺ og OH⁻ i badenes rene vand",
+        Object.keys(St.partikelTal(B.samlet(bord.g.vandbad), 6)).length === 0 &&
+        Object.keys(St.partikelTal(B.samlet(bord.g.vand), 6)).length === 0,
+        JSON.stringify(St.partikelTal(B.samlet(bord.g.vandbad), 6)));
+    paastand("der er plads til flere glas i et bad", bord.badPladser(bord.g.isbad).length >= 2,
+        bord.badPladser(bord.g.isbad).length + " pladser");
+    paastand("glas 5 kan saettes i vandbadet", bord.moede(g(5), bord.g.vandbad, { x: bord.g.vandbad.p.x - 24 }));
+    paastand("glas 6 kan saettes i isbadet", bord.moede(g(6), bord.g.isbad, { x: bord.g.isbad.p.x - 24 }));
+    paastand("varmetrinnet er ikke gjort, foer pladen er taendt", !F.erGjort("varme"));
+    paastand("isbadet holder sin temperatur uden varmeplade", B.samlet(bord.g.isbad).T < 5,
+        tal(B.samlet(bord.g.isbad).T, 1) + " grader");
+    bord.g.plade.taendt = true;
+    adv(200);
+    paastand("vandbadet gaar til sin termostat og koger ikke", B.samlet(bord.g.vandbad).T > 70 && B.samlet(bord.g.vandbad).T < 90,
+        tal(B.samlet(bord.g.vandbad).T, 1) + " grader");
+    paastand("glas 5 foelger vandbadet", B.samlet(g(5)).T > 55, tal(B.samlet(g(5)).T, 1) + " grader");
+    paastand("glas 6 foelger isbadet", B.samlet(g(6)).T < 8, tal(B.samlet(g(6)).T, 1) + " grader");
+    paastand("varme flytter den exoterme ligevaegt mod venstre", konc(g(5), "FeSCN2+") < fescn0 * 0.9,
+        tal(fescn0) + " -> " + tal(konc(g(5), "FeSCN2+")) + " mM");
+    paastand("kulde flytter den mod hoejre", konc(g(6), "FeSCN2+") > fescn0 * 1.1,
+        tal(fescn0) + " -> " + tal(konc(g(6), "FeSCN2+")) + " mM");
+    paastand("begge badtrin er gjort", F.erGjort("varme") && F.erGjort("kulde"));
+    paastand("flaget blev sat, da indgrebene var gjort", F.flag("indgreb_gjort"));
+    paastand("et glas kan tages op af badet igen", (bord.frigoer(g(6)), g(6).paa === null));
+
+    overskrift("5. Billedet og journalen");
+    var Jn = NK.Journal.find("billede");
+    paastand("journalen er registreret", !!Jn && Jn.kraevede.length === 6);
+    paastand("facit regnes af verden, ikke af en facitliste",
+        NK.BILLEDE.facit("glas1", bord) === "moerkere" && NK.BILLEDE.facit("glas2", bord) === "lysere" &&
+        NK.BILLEDE.facit("glas7", bord) === "ens",
+        "glas 1 " + NK.BILLEDE.facit("glas1", bord) + ", glas 2 " + NK.BILLEDE.facit("glas2", bord));
+    paastand("billedet kan tages", (NK.billede.aabn(bord), d.getElementById("billede").classList.contains("vis")));
+    paastand("trinnet er ikke gjort, foer der er noteret", !F.erGjort("billede"));
+
+    /* Fem rigtige og ét forkert */
+    ["glas1", "glas2", "glas3", "glas4", "glas5"].forEach(function (n) {
+        NK.billede.noter(n, NK.BILLEDE.facit(n, bord), bord);
+    });
+    NK.billede.noter("glas6", "lysere", bord);          /* glas 6 er i virkeligheden moerkere */
+    adv(1);
+    paastand("journalen er udfyldt", Jn.faerdig(), Jn.antal() + " af 6");
+    paastand("fem er rigtige og ét forkert", Jn.antalRigtige() === 5 && Jn.antalForkerte() === 1,
+        Jn.antalRigtige() + " rigtige, " + Jn.antalForkerte() + " forkerte");
+    paastand("trinnet er gjort, naar alle seks er noteret", F.erGjort("billede"));
+    paastand("det forkerte glas udloeser en bemaerkning", !!F.fyret.kig_igen);
+    paastand("et svar kan rettes",
+        (NK.billede.noter("glas6", "moerkere", bord), Jn.antalForkerte() === 0 && Jn.rigtig("glas6") === true));
+    paastand("oejebliksbilledet blev gemt med svaret", !!Jn.billede("glas1") && !!Jn.billede("glas1").farve,
+        JSON.stringify(Jn.billede("glas1").farve));
+    NK.billede.luk();
+    paastand("billedet kan lukkes", !d.getElementById("billede").classList.contains("vis"));
+
+    overskrift("6. Referencen");
+    paastand("glas 7 staar uroert", Math.abs(konc(ref, "FeSCN2+") - fescn0) < 0.05, tal(konc(ref, "FeSCN2+")) + " mM");
+    paastand("udloeseren om referencen har ikke fyret", !F.fyret.roert_reference);
+
+    overskrift("7. Oprydning");
+    paastand("oprydningen er ikke gjort endnu", !F.erGjort("ryd"));
+    /* Ét glas ad gangen: toemI er en koreografi, og der koerer kun én */
+    for (var j = 1; j <= 7; j++) { bord.toemI(g(j), bord.g.dunk); adv(4); }
+    adv(4);
+    paastand("alle glas er tomme", [1,2,3,4,5,6,7].every(function (n) { return B.tom(g(n)); }));
+    paastand("oprydningen taeller nu", F.erGjort("ryd"));
+    paastand("del 1 er gjort, og del 2 staar tilbage", !F.faerdig &&
+        d.getElementById("forloeb-taeller").textContent === "9/13",
+        d.getElementById("forloeb-taeller").textContent);
+    /* Naar der er ryddet op, skifter bordet IKKE af sig selv (F28): pilen
+       til del 2 dukker op, og eleven skifter selv */
+    adv(2);
+    paastand("bordet bliver i del 1, naar der er ryddet op (F28)", NK.DELE.nu() === 1, NK.DELE.nu());
+    var pl7 = bord.pil, pm7 = pl7 ? { x: pl7.x + pl7.b / 2, y: pl7.y + pl7.h / 2 } : null;
+    paastand("og den store pil paa vaeggen dukker op og rammes af musen (F43)",
+        !!pl7 && bord.pilAktiv && bord.hvad(pm7) === "naestepil", pm7 ? bord.hvad(pm7) : "ingen pil");
+    bord.klik("naestepil");
+    adv(0.5);
+    paastand("pilen skifter til del 2 og forsvinder", NK.DELE.nu() === 2 && !bord.pilAktiv && bord.hvad(pm7) !== "naestepil", NK.DELE.nu());
+    paastand("og saa er del 1's udstyr vaek fra bordet",
+        bord.g.stativ.skjult && bord.g.isbad.skjult && !bord.g.baeger1.skjult && !bord.g.kolbe.skjult);
+
+    overskrift("8. Gemning: historien, ikke bordene");
+    var t = F.tilstand();
+    paastand("tilstanden rummer trin, udloesere, flag og journal",
+        Object.keys(t.gjort).length === 9 && !!t.flag.indgreb_gjort && !!t.journal.billede);
+    F.nulstil();
+    paastand("efter nulstil er intet gjort og journalen tom",
+        !F.erGjort("fyld") && !F.flag("indgreb_gjort") && Jn.antal() === 0);
+    paastand("tilstanden kan spilles tilbage, ogsaa journalen",
+        (F.saetTilstand(t), F.erGjort("ryd") && F.erGjort("billede") && Jn.antal() === 6));
+
+    overskrift("9. Udloesere");
+    NK.startForfra();
+    adv(2);
+    paastand("start forfra nulstiller forloeb og journal", !F.erGjort("fyld") && F.nummer() === 0 && Jn.antal() === 0);
+    var g7 = bord.g.glas7;
+    B.haeldI(g7, B.udtag(bord.g.kolbe, 3), true);
+    adv(10);
+    paastand("udloeseren har stadig ikke fyret", !F.fyret.roert_reference);
+    B.haeldI(g7, B.udtag(bord.g.ag, 0.3), true);
+    adv(30);
+    paastand("et indgreb i glas 7 udloeser bemaerkningen", !!F.fyret.roert_reference);
+    var g1 = bord.g.glas1;
+    B.haeldI(g1, B.udtag(bord.g.kolbe, 3), true);
+    B.haeldI(g1, B.udtag(bord.g.ag, 0.3), true);
+    B.tilsaetFast(g1, "Asc(s)", 20);
+    adv(60);
+    paastand("to slags indgreb i samme glas udloeser en bemaerkning", !!F.fyret.to_indgreb);
+
+    overskrift("10. Vilkaarssproget");
+    paastand("et tal betyder over", V.passer(5, 3) && !V.passer(2, 3));
+    paastand("over og under kan staa sammen", V.passer(50, { over: 20, under: 80 }) && !V.passer(90, { over: 20, under: 80 }));
+    paastand("ikke vender et vilkaar", V.opfyldt({ ikke: { beholder: "glas2", V: { over: 1 } } }, bord));
+    paastand("nogen er sandt, naar ét er sandt",
+        V.opfyldt({ nogen: [{ beholder: "glas1", V: { over: 1 } }, { beholder: "glas2", V: { over: 1 } }] }, bord));
+    paastand("et ukendt glas giver falsk, ikke en undtagelse",
+        V.opfyldt({ beholder: "findes_ikke", V: { over: 1 } }, bord) === false);
+
+    overskrift("11. Opstillingen mod kataloget");
+    var ukendte = [];
+    NK.OPSTILLING.forEach(function (spec) {
+        var kilder = [];
+        if (spec.indhold && spec.indhold.mM) kilder = kilder.concat(Object.keys(spec.indhold.mM));
+        if (spec.indhold && spec.indhold.umol) kilder = kilder.concat(Object.keys(spec.indhold.umol));
+        kilder.forEach(function (n) { if (!St.STOFFER[n]) ukendte.push(spec.navn + ": " + n); });
+    });
+    paastand("alle stoffer paa bordet findes i stoftabellen", ukendte.length === 0, ukendte.join(", ") || "ingen ukendte");
+    var udenType = NK.OPSTILLING.filter(function (s) { return !NK.Udstyr.TYPER[s.type]; });
+    paastand("alt udstyr i opstillingen findes i kataloget", udenType.length === 0,
+        udenType.map(function (s) { return s.type; }).join(", ") || "ingen ukendte");
+
+    /* Oevelsestjekket i sin spaede form: peger et trin paa et glas eller et
+       stof, der ikke findes, er forsoeget i stykker, og det skal opdages
+       her - ikke af en elev. */
+    var navne = {}, mangler = [], manglerStof = [];
+    NK.OPSTILLING.forEach(function (s) { navne[s.navn] = true; });
+    F.trin.concat(F.udloesere).forEach(function (x) {
+        NK.Vilkaar.naevnte(x.naar).forEach(function (n) { if (!navne[n]) mangler.push(x.id + ": " + n); });
+        NK.Vilkaar.naevnteStoffer(x.naar).forEach(function (n) { if (!St.STOFFER[n]) manglerStof.push(x.id + ": " + n); });
+        /* peg maa vaere en genstand paa bordet eller et element i panelet */
+        if (x.peg && !navne[x.peg] && !d.getElementById(x.peg)) mangler.push(x.id + " peger paa " + x.peg);
+    });
+    paastand("alle trin peger paa genstande, der findes", mangler.length === 0, mangler.join(", ") || "ingen mangler");
+    paastand("alle trin naevner stoffer, der findes", manglerStof.length === 0, manglerStof.join(", ") || "ingen mangler");
+    paastand("hvert trin har tekst og hint",
+        F.trin.every(function (x) { return x.tekst && x.hint && x.kort; }));
+
+    /* M2: oevelsestjekket er det, kimen ovenfor voksede op til - den
+       generiske validering, som ethvert forsoeg koeres igennem
+       (../../laboratoriet/js/tjek.js og _oevelsestjek.html). Den koeres paa
+       et frisk bord, saa »intet trin er gjort, foer eleven har gjort
+       noget« kan proeves, og den skal fange de fejl, der saettes ind med
+       vilje. NB (det, der ikke kan afgoeres paa papiret) er ikke en fejl. */
+    NK.startForfra();
+    var tjek = NKTjek.koer(ramme.contentWindow);
+    paastand("øvelsestjekket finder ingen fejl i forsøget (M2)", tjek.fejl === 0,
+        tjek.fejl ? tjek.fund().join(" | ") : tjek.afsnit.length + " afsnit, " + tjek.advarsler + " NB");
+    var selvTjek = NKTjek.selvproeve(ramme.contentWindow);
+    var ikkeFanget = selvTjek.filter(function (p) { return !p.fanget; }).map(function (p) { return p.navn; });
+    paastand("og det fanger hver af de fejl, der sættes ind med vilje", selvTjek.length >= 10 && !ikkeFanget.length,
+        ikkeFanget.join(", ") || selvTjek.length + " fanget");
+    /* F65 skrev [Fe³⁺] i stedet for c(Fe³⁺), men rettelsen naaede ikke
+       disken (F66); tjekket ovenfor holder nu alle tekster paa reglen */
+    paastand("tegneseriens linje om C-vitaminen siger »falder [Fe³⁺]« (F65, F66)",
+        NK.TEKST.serie.indgreb.vitc.hvorfor.indexOf("falder [Fe³⁺]") >= 0, NK.TEKST.serie.indgreb.vitc.hvorfor);
+
+    overskrift("12. Start forfra");
+    NK.startForfra();
+    var friske = [];
+    for (var m = 1; m <= 7; m++) friske.push(bord.g["glas" + m]);
+    paastand("glassene er tomme igen", friske.every(function (x) { return B.tom(x); }));
+    paastand("kolben er fyldt op igen", B.volumen(bord.g.kolbe) > 140, tal(B.volumen(bord.g.kolbe), 0) + " mL");
+    paastand("forloebet staar paa foerste trin", F.nuTrin() && F.nuTrin().id === "fyld");
+    paastand("panelet kan opdateres", (NK.opdaterPanel(), true));
+
+    overskrift("13. Replikker: forloebet taler gennem Kemichael");
+    /* En konsekvens { sig } i forloebet gaar gennem side.sig til bordets
+       laererReplik: han kommer ind, siger linjerne og gaar igen, uden at
+       laase bordet. Uden laerer bliver det en besked. */
+    var L = bord.laerer;
+    paastand("bordet har en laerer med laererReplik", !!L && typeof bord.laererReplik === "function");
+    bord.laererNyt();
+    var tog = bord.laererReplik("Prøve.", {}, { id: "proeve" });
+    paastand("laererReplik tager imod", tog === true);
+    paastand("han fik en replik-scene med det samme", !!L.scene && L.scene.navn === "replik", L.scene && L.scene.navn);
+    paastand("scenen laaser ikke bordet", !bord.laererOptaget());
+    bord.laererReplik("Nummer to.", {}, { id: "to" });
+    bord.laererReplik("Nummer tre.", {}, { id: "tre" });
+    bord.laererReplik("Nummer to igen.", {}, { id: "to" });   /* samme kilde: kun én gang */
+    paastand("replikker venter paa hinanden og kollapser ikke", bord.laererVent.length === 2, bord.laererVent.length + " i koe");
+    adv(4);
+    paastand("han siger replikken, naar han er kommet ind", L.tale === "Prøve.", JSON.stringify(L.tale));
+    adv(40);
+    paastand("koeen er afviklet", bord.laererVent.length === 0 && !L.scene, bord.laererVent.length + " i koe");
+
+    /* Udloeseren om referencen: han stiller sig ved glas 7, markerer det,
+       siger linjerne fra tekst.js og slutter med glimtet om afslaget.
+       Glimtene huskes i browseren, saa hukommelsen tages ud imens og
+       saettes tilbage bagefter. */
+    var huskGlimt = null;
+    try { huskGlimt = ramme.contentWindow.localStorage.getItem("nk-kemichael"); } catch (e) { /* ingen localStorage */ }
+    NK.Kemichael.glimtNulstil();
+    var g7b = bord.g.glas7;
+    B.haeldI(g7b, B.udtag(bord.g.kolbe, 3), true);
+    adv(5);
+    B.haeldI(g7b, B.udtag(bord.g.ag, 0.3), true);
+    var fyrede = false;
+    for (var q = 0; q < 60 && !fyrede; q++) { adv(0.5); fyrede = !!F.fyret.roert_reference; }
+    paastand("udloeseren fyrede", fyrede);
+    /* Bag bordet gaar han ikke hen til glasset: han standser, hvor der er
+       plads, og peger paa det (S8). Foelg ham, til glimtet er sagt. */
+    var saaFoerste = false, saaAnden = false, saaAfslag = false, markeret = false;
+    var stodVed = null, pegVink = null, pegFacit = null, planUnder = null;
+    for (q = 0; q < 80 && !saaAfslag; q++) {
+        adv(0.5);
+        if (L.taleUr <= 0) continue;
+        if (L.tale === NK.TEKST["sig-reference"][0]) {
+            saaFoerste = true;
+            stodVed = L.x;
+            planUnder = L.plan;
+            pegVink = L.arm;
+            var rk7 = bord.rekt(g7b, 0);
+            pegFacit = bord.pegVinkel(g7b.p.x, rk7.y + Math.min(24, rk7.h * 0.3));
+            markeret = markeret || bord.markeret("glas7");
+        }
+        if (L.tale === NK.TEKST["sig-reference"][1]) saaAnden = true;
+        if (L.tale.indexOf("afslag") >= 0) saaAfslag = true;
+    }
+    paastand("han kom ind og sagde foerste linje fra tekst.js", saaFoerste);
+    paastand("han staar bag bordet, mens han taler", planUnder === 1, "plan " + planUnder);
+    paastand("og han gaar ikke hen til glasset, men standser hvor der er plads",
+        stodVed !== null && Math.abs(stodVed - g7b.p.x) > 100,
+        stodVed === null ? "kom aldrig" : tal(stodVed, 0) + ", glasset staar i " + tal(g7b.p.x, 0));
+    paastand("og peger paa glas 7 inden for 10 grader", pegVink !== null &&
+        Math.abs(pegVink - pegFacit) < 10 * Math.PI / 180,
+        pegVink === null ? "pegede ikke" : tal(pegVink * 180 / Math.PI, 1) + "° mod " + tal(pegFacit * 180 / Math.PI, 1) + "°");
+    paastand("glas 7 er markeret, mens han taler", markeret);
+    paastand("anden linje foelger", saaAnden);
+    paastand("glimtet om afslaget kommer til sidst", saaAfslag);
+    try {
+        if (huskGlimt !== null) ramme.contentWindow.localStorage.setItem("nk-kemichael", huskGlimt);
+        else ramme.contentWindow.localStorage.removeItem("nk-kemichael");
+    } catch (e) { /* ingen localStorage */ }
+    adv(30);
+
+    /* Uden laerer: side.sig falder tilbage til beskeden paa scenen */
+    var gemtL = bord.laerer;
+    bord.laerer = null;
+    side.sig(["Uden", "lærer."], { slags: "info" });
+    bord.laerer = gemtL;
+    paastand("uden laerer bliver replikken en besked",
+        d.getElementById("scenebesked").textContent === "Uden lærer.", JSON.stringify(d.getElementById("scenebesked").textContent));
+
+    /* Et trins eget sig: gaar samme vej */
+    NK.startForfra();
+    adv(1);
+    var trinSig = F.trin.filter(function (x) { return x.sig; }).map(function (x) { return x.id; });
+    paastand("tre trin har en replik, naar de er gjort", trinSig.length === 3, trinSig.join(", "));
+    F.gjortNu("billede");
+    adv(0.1);
+    paastand("trinnets replik gaar til Kemichael", !!L.scene && L.scene.navn === "replik" &&
+        L.scene.trin.some(function (x) { return x.sig === NK.TEKST.trin.billede.sig; }), L.scene && L.scene.navn);
+    NK.startForfra();
+    adv(1);
+    paastand("start forfra toemmer koeen og scenen", !L.scene && bord.laererVent.length === 0);
+
+    overskrift("14. Taleboblen: eget lag, der finder sin plads");
+    /* laboratoriet/js/taleboble.js. Placeringen er ren geometri og proeves
+       direkte; derefter at Kemichael tegner gennem laget. */
+    var Tb = NK.Taleboble;
+    paastand("taleboble.js er indlaest", !!Tb && typeof Tb.placer === "function" && typeof Tb.tegn === "function");
+    var ctx2 = d.getElementById("scene-laerred").getContext("2d");
+    var mKort = Tb.maal(ctx2, "Kort.", 1);
+    paastand("en kort replik er én linje", mKort.linjer.length === 1 && mKort.b > 0 && mKort.h > 0, tal(mKort.b, 0) + " x " + tal(mKort.h, 0));
+    var langTekst = "En replik, der er saa lang, at den maa brydes over flere linjer, for boblen maa ikke loebe ud over scenen, og saa lidt mere tekst for at naa fire.";
+    var mLang = Tb.maal(ctx2, langTekst, 1);
+    paastand("en lang replik brydes over flere linjer", mLang.linjer.length >= 3 && mLang.b <= Tb.STIL.maksBredde + 2 * Tb.STIL.polsterX + 1,
+        mLang.linjer.length + " linjer, " + tal(mLang.b, 0) + " bred");
+    var R = { x: 0, y: 0, b: NK.Scene.BREDDE, h: NK.Scene.HOEJDE };
+    var hoved = { op: 97, side: 55, ned: 33 };
+    function inden(p) { return p.x >= 0 && p.y >= 0 && p.x + p.b <= R.b && p.y + p.h <= R.h; }
+    function rammer(a, b) { return a.x < b.x + b.b && a.x + a.b > b.x && a.y < b.y + b.h && a.y + a.h > b.y; }
+    var p1 = Tb.placer(mLang, { x: 600, y: 380 }, R, { hoved: hoved });
+    paastand("med plads over hovedet staar boblen over", p1.side === "over" && p1.y + p1.h <= 380 - 97 && inden(p1), p1.side);
+    paastand("halen staar lige over munden og ender ved issen", Math.abs(p1.hale.x - 600) < 1 && Math.abs(p1.hale.y - (p1.y + p1.h)) < 1 &&
+        Math.abs(p1.spids.x - 600) < 1 && p1.spids.y > 380 - 97 - 1 && p1.spids.y < 380 - 97 + 4);
+    var p2 = Tb.placer(mLang, { x: 600, y: 40 }, R, { hoved: hoved });
+    paastand("uden plads over hovedet vendes den, og den daekker ikke hovedet", p2.side !== "over" && inden(p2) &&
+        !rammer(p2, { x: 600 - 55, y: 40 - 97, b: 110, h: 130 }), p2.side);
+    var p3 = Tb.placer(mLang, { x: R.b - 10, y: 380 }, R, { hoved: hoved });
+    paastand("ved hoejre kant bliver den inden for scenen", inden(p3), p3.side + " x=" + tal(p3.x, 0) + " b=" + tal(p3.b, 0));
+    var glas = { x: 560, y: 150, b: 80, h: 120 };
+    var p4 = Tb.placer(mLang, { x: 600, y: 380 }, R, { hoved: hoved, undgaa: glas });
+    paastand("boblen laegger sig ikke over det, replikken handler om", !rammer(p4, glas) && inden(p4), p4.side + " x=" + tal(p4.x, 0) + " y=" + tal(p4.y, 0));
+    var p4b = Tb.placer(mLang, { x: 600, y: 380 }, R, { hoved: hoved, undgaa: glas, side: "under" });
+    paastand("en foretrukken side foelges, naar den er fri", p4b.side === "under" && inden(p4b), p4b.side);
+
+    /* Kemichael tegner gennem laget: mens han taler om glas 3, ligger
+       boblen inden for scenen, holder mindste skrift og daekker ikke glasset */
+    NK.startForfra();
+    adv(1);
+    bord.laererReplik("Prøve af boblen, mens han taler om glas 3.", { peg: "glas3" }, { id: "boble" });
+    var tegnet = false, p5 = null;
+    for (var q3 = 0; q3 < 40 && !tegnet; q3++) {
+        adv(0.5);
+        bord.tegn();
+        if (L.taleUr > 0 && L.taleAlfa > 0.5 && Tb.sidst) { tegnet = true; p5 = Tb.sidst; }
+    }
+    paastand("figuren tegner sin boble gennem laget", tegnet && inden(p5), p5 && (p5.side + " f=" + tal(p5.f, 2)));
+    paastand("skriften holder mindst " + Tb.STIL.minSkaerm + " px paa skaermen", tegnet && p5.f >= 1);
+    paastand("han taler om glas 3, og boblen daekker det ikke", tegnet && L.undgaa === "glas3" && !rammer(p5, bord.rekt(bord.g.glas3, 8)));
+    adv(30);
+    paastand("efter replikken er der ikke laengere noget at undgaa", L.undgaa === null && !L.scene);
+    paastand("og armen haenger ned igen", Math.abs(L.arm - NK.Kemichael.HAENGER) < 0.05, tal(L.arm, 2));
+    paastand("og han er gaaet ud af scenen igen", L.x <= NK.Kemichael.UDE + 1, tal(L.x, 0));
+
+    /* F5: taleboblen er oeverste lag. Zoomboblen staar i venstre hjoerne,
+       saa proeven er ham ovre i venstre side med en lang replik. */
+    NK.startForfra();
+    adv(1);
+    B.haeldI(bord.g.glas5, B.udtag(bord.g.kolbe, 3), true);
+    bord.vaelg("glas5");
+    adv(1);
+    L.x = 200; L.maalX = 200;
+    bord.laererSig("Sølvnitrat giver sorte pletter på huden. Det går af igen efter en uge.", 8);
+    adv(0.6);
+    var raekke = [];
+    var gemtZoom = bord.tegnBobleIScenen, gemtTale = bord.tegnLaererBoble;
+    bord.tegnBobleIScenen = function () { raekke.push("zoom"); return gemtZoom.apply(this, arguments); };
+    bord.tegnLaererBoble = function () { raekke.push("tale"); return gemtTale.apply(this, arguments); };
+    Tb.sidst = null;
+    bord.tegn();
+    delete bord.tegnBobleIScenen;
+    delete bord.tegnLaererBoble;
+    var bRekt = bord.bobleRekt();
+    paastand("taleboblen tegnes efter zoomboblen",
+        raekke.indexOf("zoom") >= 0 && raekke.indexOf("tale") > raekke.indexOf("zoom"), raekke.join(" > "));
+    paastand("og den laegger sig ikke under zoomboblen, naar der er plads andetsteds",
+        !!Tb.sidst && !rammer(Tb.sidst, bRekt) && inden(Tb.sidst),
+        Tb.sidst ? Tb.sidst.side + " x=" + tal(Tb.sidst.x, 0) + " y=" + tal(Tb.sidst.y, 0) : "ingen boble");
+    L.tale = ""; L.taleUr = 0;
+    NK.startForfra();
+    adv(1);
+
+    overskrift("15. En replik, der afbrydes af et uheld, kommer igen");
+    /* Uheldet tager over med det samme (hoejere prioritet), men de linjer,
+       der ikke blev sagt, venter forrest i koeen og siges bagefter.
+       Regnskabet over uheld huskes i browseren og saettes tilbage. */
+    var huskUheld = null;
+    try { huskUheld = ramme.contentWindow.localStorage.getItem("nk-kemichael"); } catch (e) { /* ingen localStorage */ }
+    var altidFoer = bord.laererAltid;
+    bord.laererAltid = true;
+    NK.startForfra();
+    adv(1);
+    bord.laererReplik(["Første linje.", "Anden linje.", "Tredje linje."], {}, { id: "afbrudt" });
+    var sagdeFoerste = false;
+    for (var q4 = 0; q4 < 20 && !sagdeFoerste; q4++) { adv(0.25); sagdeFoerste = L.taleUr > 0 && L.tale === "Første linje."; }
+    paastand("han er i gang med foerste linje", sagdeFoerste && L.scene && L.scene.navn === "replik");
+    bord.laererUheld("spild", bord.g.glas1);
+    paastand("uheldet tager over med det samme", L.scene && L.scene.navn === "spild", L.scene && L.scene.navn);
+    paastand("de linjer, der ikke blev sagt, venter forrest i koeen",
+        bord.laererVent.length === 1 && bord.laererVent[0].fn === "laererSigReplik" &&
+        bord.laererVent[0].arg.linjer.join("|") === "Anden linje.|Tredje linje.",
+        bord.laererVent.length ? bord.laererVent[0].arg.linjer.join(" / ") : "tom koe");
+    var sagdeAnden = false, sagdeTredje = false;
+    for (var q5 = 0; q5 < 120 && !sagdeTredje; q5++) {
+        adv(0.5);
+        if (L.taleUr > 0 && L.tale === "Anden linje.") sagdeAnden = true;
+        if (L.taleUr > 0 && L.tale === "Tredje linje.") sagdeTredje = true;
+    }
+    paastand("og bliver sagt, naar han har toerret op", sagdeAnden && sagdeTredje);
+    adv(20);
+    bord.laererAltid = altidFoer;
+    try {
+        if (huskUheld !== null) ramme.contentWindow.localStorage.setItem("nk-kemichael", huskUheld);
+        else ramme.contentWindow.localStorage.removeItem("nk-kemichael");
+    } catch (e) { /* ingen localStorage */ }
+    NK.startForfra();
+
+    overskrift("16. Bordets dybde");
+    /* Bordpladen er en flade: noget kan stilles foran stativet, og det
+       forreste tegnes og rammes foerst */
+    var bg = bord.g.baeger, stv = bord.g.stativ, sp = bord.g.spatel;
+    function stilMedFod(gg, x, fodY, musY) {
+        bord.frigoer(gg);
+        var f0 = bord.fod(gg);
+        gg.p.x += x - f0.x;
+        gg.p.y += fodY - f0.y;
+        return bord.saetNed(gg, { x: x, y: musY === undefined ? fodY : musY });
+    }
+    function bundAf(gg) { return gg.p.y - gg.anker.y + gg.type.h; }
+    paastand("bordpladen har dybde, og tegnebordet staar forneden",
+        Sc.DYBDE === 64 && Sc.FORKANT === 564 && Sc.LODRET === "bund");
+    paastand("vaerktoejet ligger forrest fra start",
+        ["spatel", "glasstav", "termometer"].every(function (n) {
+            return bord.dybdeAf(bord.g[n]) > Sc.BORD && bord.liste.indexOf(bord.g[n]) > bord.liste.indexOf(stv);
+        }));
+    stilMedFod(bg, 500, 540);
+    paastand("et baegerglas kan stilles foran stativet",
+        Math.abs(bundAf(bg) - 540) < 0.5 && bord.staarPaaBord(bg), tal(bundAf(bg), 0));
+    var iB = bord.liste.indexOf(bg);
+    paastand("og tegnes foran stativet og glassene i det",
+        iB > bord.liste.indexOf(stv) && [1, 2, 3, 4, 5, 6, 7].every(function (i) { return bord.liste.indexOf(g(i)) < iB; }));
+    var rkB = bord.rekt(bg, 0);
+    paastand("det forreste rammes foerst med musen", bord.hvad({ x: rkB.x + rkB.b / 2, y: rkB.y + 12 }) === "baeger");
+    stilMedFod(bg, 500, 600, 560);
+    paastand("slippes det laengere fremme, staar det paa forkanten", Math.abs(bundAf(bg) - Sc.FORKANT) < 0.5, tal(bundAf(bg), 0));
+    stilMedFod(bg, 500, 470);
+    paastand("slippes det i luften over bordet, staar det ved bagkanten", Math.abs(bundAf(bg) - Sc.BORD) < 0.5, tal(bundAf(bg), 0));
+    stilMedFod(sp, 600, 560, Sc.FORKANT + 40);
+    adv(1);
+    paastand("slippes noget foran forkanten, falder det paa gulvet", sp.p.y > Sc.FORKANT + 40, tal(sp.p.y, 0));
+    try { bord.tegn(); paastand("bordet tegnes med dybde og boble uden fejl", true); }
+    catch (e) { paastand("bordet tegnes med dybde og boble uden fejl", false, e.message); }
+
+    /* Kaffen staar paa den foerste hylde, og han gaar derhen, hvor hylden
+       er (kaffeX i laerer.js). Hans hukommelse saettes tilbage bagefter. */
+    var huskK = null;
+    try { huskK = vin.localStorage.getItem("nk-kemichael"); } catch (e) { /* ingen localStorage */ }
+    NK.startForfra();
+    var Lk = bord.laerer, maalKaffe = null;
+    bord.klikKop();
+    for (var qk = 0; qk < 60 && maalKaffe === null; qk++) { adv(0.05); if (Lk.maalX > 0) maalKaffe = Lk.maalX; }
+    /* F58: koppen staar ved plakaten, helt til hoejre, saa han stiller
+       sig til venstre for den og raekker armen mod den */
+    var kopR = bord.rekt(bord.g.kaffekop, 0), kopX = kopR.x + kopR.b / 2;
+    paastand("han gaar hen til kaffen ved plakaten (til venstre for koppen)",
+        maalKaffe !== null && Math.abs(maalKaffe - (kopX - 100 * bord.laererSkala())) < 1, maalKaffe === null ? "gik ikke" : tal(maalKaffe, 0) + " / kop " + tal(kopX, 0));
+    adv(30);
+    try {
+        if (huskK !== null) vin.localStorage.setItem("nk-kemichael", huskK);
+        else vin.localStorage.removeItem("nk-kemichael");
+    } catch (e) { /* ingen localStorage */ }
+    NK.startForfra();
+
+    overskrift("17. Med musen: som en elev");
+    /* Rigtige pointer-haendelser gennem laerredet (laboratoriet/js/proeve.js):
+       tag fat, baer, hold stille, slip, klik. Proeven styrer tiden, saa
+       bordet ser musens fart. Det, der svaever efter en haeldning, traekkes
+       vaek med musen igen, ligesom eleven skal. */
+    NK.startForfra();
+    adv(0.5);
+    var mus = NKProeve.mus(bord);
+    var beskeder = [], vedB = bord.vedBesked;
+    bord.vedBesked = function (t, s) { beskeder.push(t); if (vedB) vedB.call(bord, t, s); };
+    var uheld0 = bord.antalUheld;
+    var seet = mus.bordetSer({ x: 400, y: 300 });
+    paastand("musen rammer det punkt paa scenen, der sigtes paa", Math.abs(seet.x - 400) < 0.01 && Math.abs(seet.y - 300) < 0.01, tal(seet.x) + ", " + tal(seet.y));
+    function ankerMedFod(gg, x, y) { var t = gg.type; return { x: x - t.b / 2 + gg.anker.x, y: y - t.h + gg.anker.y }; }
+    /* Traek genstanden hjem med musen; true, hvis den staar dér, hvor den
+       stod foer (saetNed flytter hjem med, saa det sammenlignes med det
+       gamle hjem) */
+    function flytHjem(navn) {
+        var gg = bord.g[navn], hjem0 = { x: gg.hjem.x, y: gg.hjem.y };
+        if (!mus.tag(navn)) { mus.slip(); return false; }
+        mus.baer(hjem0, 0.8);
+        mus.hold(0.5);
+        mus.slip();
+        mus.hold(0.8);
+        return !gg.svaev && Math.abs(gg.p.x - hjem0.x) < 2 && Math.abs(gg.p.y - hjem0.y) < 2;
+    }
+
+    /* Kolben: et hurtigt slip over glas 1 giver en portion */
+    var kb = bord.g.kolbe, rk1 = bord.rekt(g(1), 0);
+    paastand("kolben kan tages med musen", mus.tag("kolbe"));
+    mus.til({ x: g(1).p.x, y: rk1.y + 30 }, 0.7);
+    paastand("over glas 1 faar glasset den groenne ramme", bord.slipMaal === "glas1", bord.slipMaal);
+    mus.slip();
+    mus.hold(2);
+    paastand("et hurtigt slip haelder én portion (4 mL) i glas 1", Math.abs(B.volumen(g(1)) - PORTION) < 0.05, tal(B.volumen(g(1)), 1) + " mL");
+    paastand("og kolben bliver haengende over glasset", !!kb.svaev && kb.svaev.maal === g(1));
+    paastand("kolben kan traekkes hjem igen", flytHjem("kolbe"));
+
+    /* Glas 7 op af stativet, ned i vandbadet og tilbage */
+    var stv8 = bord.g.stativ, vb8 = bord.g.vandbad, g8 = g(7), hul8 = g8.sted && g8.sted.hul;
+    paastand("glas 7 kan tages op af stativet", mus.tag("glas7", 0.5, 0.3));
+    mus.baer({ x: vb8.p.x, y: vb8.p.y - 60 }, 0.8);
+    paastand("over vandbadet faar badet den groenne ramme", bord.slipMaal === "vandbad", bord.slipMaal);
+    mus.slip();
+    mus.hold(1);
+    paastand("sluppet over vandbadet staar glas 7 i badet", g8.paa === vb8 && !g8.sted);
+    mus.tag("glas7", 0.5, 0.3);
+    mus.baer({ x: bord.hulX(stv8, hul8), y: stv8.p.y - 90 }, 0.8);
+    paastand("over sit hul i stativet faar stativet den groenne ramme", bord.slipMaal === "stativ", bord.slipMaal);
+    mus.slip();
+    mus.hold(1);
+    paastand("og sluppet der staar det i stativet igen", !!g8.sted && g8.sted.stativ === stv8 && g8.sted.hul === hul8, g8.sted ? "hul " + g8.sted.hul : "ikke i stativet");
+
+    /* Draabeflasken holdt med bunden lige over glas 4: den drypper ikke,
+       mens den holdes (F36), men et slip giver én draabe (F2) */
+    var ag = bord.g.ag, g4 = g(4), rk4 = bord.rekt(g4, 0);
+    var agV0 = B.volumen(ag), g4V0 = B.volumen(g4);
+    paastand("draabeflasken kan tages med musen", mus.tag("ag"));
+    mus.baer({ x: g4.p.x, y: rk4.y - 5 - ag.type.h + ag.anker.y }, 0.7);
+    paastand("holdt med bunden lige over glas 4 faar glasset den groenne ramme", bord.slipMaal === "glas4", bord.slipMaal);
+    mus.hold(1.8);
+    paastand("holdt stille over glas 4 drypper den ikke (F36)", Math.abs(B.volumen(ag) - agV0) < 1e-9 && Math.cos(ag.p.v) > 0.98,
+        tal(agV0 - B.volumen(ag)) + " mL ud, vinkel " + tal(ag.p.v));
+    mus.slip();
+    mus.hold(2);
+    paastand("et slip giver én draabe i glas 4 og intet paa bordet", Math.abs(B.volumen(g4) - g4V0 - 0.05) < 0.001 && bord.pytter.length === 0 && bord.antalUheld === uheld0,
+        tal(B.volumen(g4) - g4V0, 3) + " mL i glasset, " + bord.pytter.length + " pytter");
+    var dV4 = B.volumen(g4);
+    paastand("sluppet bliver den haengende over glasset", !!ag.svaev && ag.svaev.maal === g4);
+    paastand("og beskeden siger, hvordan man faar flere",
+        beskeder.length > 0 && beskeder[beskeder.length - 1].indexOf("dråbe mere") > 0, beskeder[beskeder.length - 1]);
+    var nB0 = beskeder.length;
+    mus.klik("ag");
+    mus.hold(1);
+    paastand("et klik paa selve flasken drypper ikke, men siger, hvad pilen goer",
+        Math.abs(B.volumen(g4) - dV4) < 0.001 && beskeder.slice(nB0).some(function (t) { return t.indexOf("pilen") >= 0; }), beskeder[beskeder.length - 1]);
+    var ringA = bord.svaevRing();
+    mus.stil({ x: ringA.x, y: ringA.y });
+    paastand("musen over pilen: pilen lyser op og siger, hvad den goer", bord.hover === "svaevring" && ringA.tekst === "En dråbe mere", ringA.tekst);
+    mus.klik({ x: ringA.x, y: ringA.y });
+    mus.hold(1);
+    paastand("et klik paa pilen giver en draabe mere", Math.abs(B.volumen(g4) - dV4 - 0.05) < 0.001, tal(B.volumen(g4) - dV4, 3) + " mL");
+    var r0 = bord.rekt(ag, 0);
+    mus.tag("ag");
+    mus.til({ x: mus.her().x + 10, y: mus.her().y - 10 }, 0.1);
+    var r1 = bord.rekt(ag, 0);
+    paastand("taget igen rettes den op under haanden uden at springe",
+        Math.abs(r1.y - r0.y + 10) < 3 && Math.cos(ag.p.v) > 0.98, "fra y " + tal(r0.y, 0) + " til " + tal(r1.y, 0));
+    mus.baer(ag.hjem, 0.8);
+    mus.hold(0.1);
+    mus.slip();
+    mus.hold(0.8);
+    paastand("og den kan stilles paa hylden igen", !ag.svaev && Math.abs(bundAf(ag) - 170) < 1, "bund " + tal(bundAf(ag), 0));
+
+    /* Et hurtigt slip over glas 4 giver én draabe og beskeden */
+    var g4V1 = B.volumen(g4), nB = beskeder.length;
+    mus.tag("ag");
+    mus.baer({ x: g4.p.x, y: rk4.y - 5 - ag.type.h + ag.anker.y }, 0.7);
+    mus.slip();
+    mus.hold(1.5);
+    paastand("et hurtigt slip over glas 4 giver én draabe", Math.abs(B.volumen(g4) - g4V1 - 0.05) < 0.001, tal(B.volumen(g4) - g4V1, 3) + " mL");
+    paastand("og samme besked", beskeder.slice(nB).some(function (t) { return t.indexOf("dråbe mere") > 0; }));
+    paastand("draabeflasken kan traekkes hjem igen", flytHjem("ag"));
+    paastand("intet uheld undervejs", bord.antalUheld === uheld0, bord.antalUheld - uheld0 + " uheld");
+
+    /* Stillet paa bordet foran stativet: en flaske, der tages i toppen og
+       saenkes, til bunden roerer bordpladen, skal stilles ned - ikke
+       haelde eller dryppe i reagensglasset bag den, selv om musen er ud
+       for glasset. Reagensglassets traefzone stopper over bunden. */
+    function stilForan(navn, glas, bundY) {
+        NK.startForfra();
+        adv(0.2);
+        var fl = bord.g[navn], gl = g(glas), V0 = B.volumen(gl), fV0 = B.volumen(fl), u0 = bord.antalUheld;
+        mus.tag(navn, 0.5, 0.1);
+        mus.baer({ x: gl.p.x, y: bundY - fl.type.h + fl.anker.y }, 0.8);
+        var ud = { maal: bord.slipMaal };
+        mus.hold(2);
+        ud.ud = fV0 - B.volumen(fl);
+        mus.slip();
+        mus.hold(1.5);
+        ud.ind = B.volumen(gl) - V0;
+        ud.uheld = bord.antalUheld - u0;
+        ud.bund = bundAf(fl);
+        ud.svaev = !!fl.svaev;
+        ud.tekst = "maal " + ud.maal + ", " + tal(ud.ud) + " mL ud, bund " + tal(ud.bund, 0) + (ud.uheld ? ", uheld" : "");
+        return ud;
+    }
+    [540, 505].forEach(function (y) {
+        var r = stilForan("ag", 4, y);
+        paastand("draabeflasken taget i toppen og stillet med bunden i " + y + " foran glas 4 drypper ikke",
+            r.maal !== "glas4" && r.ud < 0.001 && r.ind < 0.001, r.tekst);
+        paastand("og den staar paa bordet bagefter", !r.svaev && Math.abs(r.bund - y) < 1.5, r.tekst);
+    });
+    /* F48: sb2.4 har ikke laengere en almindelig flaske i del 1 (KSCN-
+       flasken gik ud med forundersoegelsen). Proeverne af en flaske foran
+       stativet laaner derfor en midlertidig flaske som den gamle; den
+       staar i opstillingen, til proeverne er faerdige. */
+    var FL_TEST = { navn: "fl_kscn", type: "flaske", x: 400, y: 170, etiket: ["KSCN", "0,1 M"], del: 1,
+                    titel: "flasken med KSCN", indhold: { V: 200, T: 20, mM: { "K+": 100, "SCN-": 100 } } };
+    bord.specs.push(FL_TEST);
+    [540, 505].forEach(function (y) {
+        var r = stilForan("fl_kscn", 3, y);
+        paastand("KSCN-flasken stillet med bunden i " + y + " foran glas 3 haelder ikke og spilder ikke",
+            r.maal !== "glas3" && r.ud < 0.01 && r.uheld === 0, r.tekst);
+        paastand("og den staar paa bordet bagefter", !r.svaev && Math.abs(r.bund - y) < 1.5, r.tekst);
+    });
+    NK.startForfra();
+    adv(0.2);
+    var rkT = bord.rekt(g(4), 0);
+    paastand("reagensglassets traefzone stopper lidt over bunden",
+        bord.hvad({ x: g(4).p.x, y: rkT.y + rkT.h - 12 }) !== "glas4" && bord.hvad({ x: g(4).p.x, y: rkT.y + rkT.h - 40 }) === "glas4",
+        "12 over bunden: " + bord.hvad({ x: g(4).p.x, y: rkT.y + rkT.h - 12 }));
+    paastand("og glasset kan stadig tages i den oeverste del", mus.tag("glas4", 0.5, 0.15) && (mus.slip(), true));
+
+    /* Tuden holdes 18 enheder ved siden af glas 3's midte - i det groenne
+       felt, men uden for aabningen. Holdt der haelder den ikke (F36); et
+       slip haelder én portion, og det hele ryger i glasset (F8) */
+    [-1, 1].forEach(function (side) {
+        NK.startForfra();
+        adv(0.2);
+        var fk = bord.g.fl_kscn, g3 = g(3), rk3 = bord.rekt(g3, 0);
+        var V0 = B.volumen(g3), u0 = bord.antalUheld;
+        mus.tag("fl_kscn", 0.5, 0.2);
+        var tt = fk.type.tud, aa = fk.anker;
+        var tx = g3.p.x + side * 18, ty = rk3.y - 30;
+        mus.baer({ x: tx - (tt.x - aa.x), y: ty - (tt.y - aa.y) }, 0.8);
+        mus.hold(0.6);
+        var maalK = bord.slipMaal;
+        mus.hold(1.4);
+        var holdt = B.volumen(g3) - V0;
+        mus.slip();
+        mus.hold(1);
+        faerdig();
+        var ind = B.volumen(g3) - V0, uh = bord.antalUheld - u0, py = bord.pytter.length;
+        paastand("KSCN-flasken med tuden 18 til " + (side < 0 ? "venstre" : "hoejre") + " for glas 3 haelder ikke, mens den holdes, og et slip giver én portion i glasset",
+            maalK === "glas3" && holdt < 1e-9 && Math.abs(ind - PORTION) < 0.05 && uh === 0 && py === 0,
+            "maal " + maalK + ", " + tal(ind, 1) + " mL i glasset, " + uh + " uheld, " + py + " pytter");
+        var hj = flytHjem("fl_kscn"), fk2 = bord.g.fl_kscn;
+        paastand("og flasken kan traekkes hjem igen", hj, "p " + tal(fk2.p.x, 0) + "," + tal(fk2.p.y, 0) + " v " + tal(fk2.p.v) + " hjem " + tal(fk2.hjem.x, 0) + "," + tal(fk2.hjem.y, 0) + " svaev " + !!fk2.svaev + " maal " + bord.slipMaal);
+    });
+    bord.specs.splice(bord.specs.indexOf(FL_TEST), 1);
+
+    /* Den store zoomboble: et klik paa boblen viser den stor, et klik hvor
+       som helst lukker den uden at tage noget, og Esc lukker den ogsaa */
+    NK.startForfra();
+    adv(0.2);
+    B.haeldI(g(4), B.udtag(bord.g.kolbe, PORTION), true);
+    bord.vaelg("glas4");
+    mus.hold(1);
+    paastand("zoomboblen vises for glas 4, med en lup paa kanten", bord.bobleVises());
+    mus.klik(bord.boble);
+    mus.hold(0.6);
+    paastand("et klik paa boblen viser den stor midt paa scenen", bord.storBoble && bord.storAlfa > 0.9, tal(bord.storAlfa));
+    try { bord.tegn(); paastand("den store boble tegnes uden fejl", true); }
+    catch (e) { paastand("den store boble tegnes uden fejl", false, e.message); }
+    var tog = mus.tag("kolbe");
+    mus.slip();
+    paastand("et klik hvor som helst lukker den uden at tage noget", !tog && !bord.storBoble && !bord.baerer);
+    mus.klik(bord.boble);
+    mus.hold(0.3);
+    d.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "Escape" }));
+    paastand("og Esc lukker den", !bord.storBoble);
+    mus.hold(0.6);
+    paastand("bagefter kan kolben tages igen", mus.tag("kolbe") && (mus.slip(), true));
+
+    /* Spatlen med musen: en spatelspids Fe(NO3)3 fra pulverglasset paa
+       hylden til glas 1. En fuld spatel kan ikke tage mere; pilen ved den
+       tomme spatel henter selv en spatelspids mere og kommer tilbage. */
+    NK.startForfra();
+    adv(0.5);
+    var sp = bord.g.spatel, feJar = bord.g.pulver_fe;
+    function feI1() { var o = B.samlet(g(1)).n; return ["Fe(NO3)3(s)", "Fe3+", "FeSCN2+", "Fe(OH)3(s)"].reduce(function (a, k) { return a + (o[k] || 0); }, 0); }
+    function sidsteBesked() { return beskeder[beskeder.length - 1] || ""; }
+    var rkJar = bord.rekt(feJar, 0);
+    paastand("spatlen kan tages med musen", mus.tag("spatel"));
+    mus.til({ x: rkJar.x + rkJar.b / 2, y: rkJar.y + rkJar.h * 0.4 }, 0.8);
+    paastand("over pulverglasset med Fe(NO3)3 faar det den groenne ramme", bord.slipMaal === "pulver_fe", bord.slipMaal);
+    mus.slip();
+    mus.hold(2);
+    paastand("spatlen er fuld og haenger over pulverglasset uden pil", !!sp.last && !!sp.svaev && sp.svaev.maal === feJar && !bord.svaevRing());
+    mus.klik("spatel");
+    paastand("et klik paa den fulde spatel tager ikke mere, men siger, hvad man goer", sp.last.umol === 8 && sidsteBesked().indexOf("Spatlen er fuld") === 0, sidsteBesked());
+    var rkG1 = bord.rekt(g(1), 0);
+    mus.tag("spatel");
+    mus.til({ x: g(1).p.x, y: rkG1.y + 10 }, 0.8);
+    paastand("over glas 1 faar glasset den groenne ramme", bord.slipMaal === "glas1", bord.slipMaal);
+    mus.slip();
+    mus.hold(2);
+    paastand("glas 1 fik spatelspidsen", Math.abs(feI1() - 8) < 0.01, tal(feI1()));
+    var ringS = bord.svaevRing();
+    paastand("pilen ved den tomme spatel siger »En spatelspids mere«", !!ringS && ringS.tekst === "En spatelspids mere", ringS && ringS.tekst);
+    if (ringS) mus.klik({ x: ringS.x, y: ringS.y });
+    mus.hold(3);
+    paastand("et klik paa pilen: spatlen henter selv og giver glas 1 en spatelspids mere", Math.abs(feI1() - 16) < 0.01 && !sp.last && !!sp.svaev && sp.svaev.maal === g(1), tal(feI1()));
+    paastand("spatlen kan traekkes hjem", flytHjem("spatel"));
+    bord.vedBesked = vedB;
+    NK.startForfra();
+
+    overskrift("18. Kemichael bag bordet");
+    /* S8: han bor ikke bag bordet - han er ude det meste af tiden og kommer
+       kun ind, naar han har noget at sige. Saa staar han bag bordpladen, som
+       daekker hans underkrop, og han standser dér, hvor der er plads i netop
+       dette rum. Det, der kraever hans haender, foregaar foran bordet. */
+    NK.startForfra();
+    adv(1);
+    var BB = NK.Scene.BAGBORD;
+    paastand("opstillingen giver ham et plan bag bordet og ingen fast plads",
+        !!BB && BB.x === undefined && BB.y === 358 && BB.skala < 1,
+        BB ? "y=" + BB.y + " skala=" + tal(BB.skala, 2) + (BB.x === undefined ? ", intet x" : ", x=" + BB.x) : "intet plan");
+    paastand("han er ude af scenen, naar han ikke har noget at sige",
+        L.x <= NK.Kemichael.UDE + 1 && !L.scene, tal(L.x, 0));
+
+    /* Pladsen regnes ud i oejeblikket: hvad han taler om, afgoer hvor han
+       standser, og han staar aldrig bag noget, der skal kunne ses */
+    function pegMaal(navn) {
+        var gg = bord.g[navn], rk = bord.rekt(gg, 0);
+        return { x: gg.p.x, y: rk.y + Math.min(24, rk.h * 0.3), rekt: rk };
+    }
+    function hansRekt(x) {
+        var k = BB.skala, top = BB.y - 116 * k;
+        return { x: x - 105 * k, y: top, b: 217 * k, h: NK.Scene.BORD - top };
+    }
+    var vedGlas7 = bord.laererPlads(pegMaal("glas7"));
+    var vedIsbad = bord.laererPlads(pegMaal("isbad"));
+    var vedVandbad = bord.laererPlads(pegMaal("vandbad"));
+    paastand("han standser forskellige steder alt efter hvad han taler om",
+        vedGlas7 !== vedIsbad && vedIsbad !== vedVandbad,
+        "glas 7: " + tal(vedGlas7, 0) + ", isbadet: " + tal(vedIsbad, 0) + ", vandbadet: " + tal(vedVandbad, 0));
+    paastand("og aldrig bag det, han selv peger paa",
+        !rammer(hansRekt(vedIsbad), bord.rekt(bord.g.isbad, 0)) &&
+        !rammer(hansRekt(vedVandbad), bord.rekt(bord.g.vandbad, 0)));
+    var optaget = bord.laererOptagetAf();
+    [["glas 7", vedGlas7], ["isbadet", vedIsbad], ["vandbadet", vedVandbad]].forEach(function (par) {
+        var r = hansRekt(par[1]), stoeder = [];
+        optaget.forEach(function (o, i) { if (rammer(r, o)) stoeder.push(i); });
+        paastand("pladsen ved " + par[0] + " er fri for zoomboblen, plakaten, hylderne og det, der staar paa dem",
+            stoeder.length === 0, stoeder.length ? stoeder.length + " sammenstoed" : "fri");
+    });
+    paastand("og han bliver inden for scenen", vedGlas7 - 105 * BB.skala > -1 &&
+        vedIsbad + 112 * BB.skala < NK.Scene.BREDDE + 1);
+
+    /* Han kommer ind, taler og gaar ud igen */
+    B.haeldI(bord.g.glas3, B.udtag(bord.g.kolbe, 3), true);
+    bord.laererReplik(["Glas 3 fik mere SCN⁻."], { peg: "glas3" }, { id: "s18" });
+    var saaHam = false, planMensHanTalte = null, stodI = null, lr = null;
+    for (var q9 = 0; q9 < 120 && !saaHam; q9++) {
+        adv(0.25);
+        if (L.taleUr > 0 && L.taleAlfa > 0.5) {
+            saaHam = true;
+            planMensHanTalte = L.plan;
+            stodI = L.x;
+            lr = bord.laererRekt();
+        }
+    }
+    paastand("en replik henter ham ind bag bordet", saaHam && planMensHanTalte === 1, "plan " + planMensHanTalte);
+    paastand("bordpladen daekker ham forneden: han slutter ved bagkanten",
+        !!lr && Math.abs((lr.y + lr.h) - NK.Scene.BORD) < 0.5, lr ? "slutter i " + tal(lr.y + lr.h, 0) : "-");
+    paastand("og issen naar op under den nederste hylde uden at krydse den",
+        !!lr && lr.y > 251 && lr.y < 300, lr ? "issen i " + tal(lr.y, 0) : "-");
+    paastand("han tegnes mindre, fordi han er laengere vaek",
+        Math.abs(bord.laererSkala() - BB.skala) < 0.001, tal(bord.laererSkala(), 2));
+
+    /* Han ligger bag alt paa bordet */
+    var rIs = bord.rekt(bord.g.isbad, 0);
+    paastand("et klik paa et glas foran ham rammer glasset", bord.hvad({ x: rIs.x + rIs.b / 2, y: rIs.y + 20 }) === "isbad",
+        bord.hvad({ x: rIs.x + rIs.b / 2, y: rIs.y + 20 }));
+    paastand("men et klik paa hans hoved rammer ham", bord.hvad({ x: L.x, y: L.y - 90 }) === "laerer",
+        bord.hvad({ x: L.x, y: L.y - 90 }));
+    paastand("under bordkanten rammer man ham ikke", bord.overLaerer({ x: L.x, y: NK.Scene.BORD + 30 }) === null);
+    adv(40);
+    paastand("naar han er faerdig, gaar han ud af scenen igen",
+        L.x <= NK.Kemichael.UDE + 1 && !L.scene, tal(L.x, 0));
+
+    /* Med musen: glas 6 kan saettes i isbadet, ogsaa mens han staar der */
+    NK.startForfra();
+    adv(0.5);
+    var is6 = bord.g.isbad, stv6 = bord.g.stativ, g6 = bord.g.glas6, hul6 = g6.sted && g6.sted.hul;
+    bord.laererReplik(["Isbadet holder to grader."], { peg: "isbad" }, { id: "s18b" });
+    for (var q10 = 0; q10 < 40 && L.taleUr <= 0; q10++) adv(0.25);
+    paastand("glas 6 kan tages op af stativet med musen", mus.tag("glas6", 0.5, 0.3));
+    mus.baer({ x: is6.p.x, y: is6.p.y - 60 }, 0.8);
+    paastand("isbadet faar den groenne ramme, selv om han staar bagved", bord.slipMaal === "isbad", bord.slipMaal);
+    mus.slip();
+    mus.hold(1);
+    paastand("og sluppet der staar glas 6 i isbadet", g6.paa === is6 && !g6.sted, g6.paa ? g6.paa.navn : "ingen steder");
+    mus.tag("glas6", 0.5, 0.3);
+    mus.baer({ x: bord.hulX(stv6, hul6), y: stv6.p.y - 90 }, 0.8);
+    mus.slip();
+    mus.hold(1);
+    paastand("og kan saettes tilbage i sit hul", !!g6.sted && g6.sted.hul === hul6, g6.sted ? "hul " + g6.sted.hul : "ikke i stativet");
+
+    /* Det, der kraever hans haender, foregaar foran bordet */
+    NK.startForfra();
+    adv(1);
+    var altidF = bord.laererAltid;
+    bord.laererAltid = true;
+    B.haeldI(bord.g.glas1, B.udtag(bord.g.kolbe, 3), true);
+    bord.laererUheld("spild", bord.g.glas1);
+    var saaForan = false, saaUdenfor = false, naaedePyt = false;
+    for (var q8 = 0; q8 < 240; q8++) {
+        adv(0.25);
+        if (L.plan < 0.5) saaForan = true;
+        if (saaForan && (L.x < -100 || L.x > NK.Scene.BREDDE + 100)) saaUdenfor = true;
+        if (L.plan < 0.5 && Math.abs(L.x - NK.klamp(bord.g.glas1.p.x - 130, 60, NK.Scene.BREDDE - 260)) < 2) naaedePyt = true;
+        if (!L.scene && saaForan && L.x <= NK.Kemichael.UDE + 1) break;
+    }
+    paastand("ved et uheld kommer han foran bordet", saaForan);
+    paastand("og gaar om for enden, uden for scenen", saaUdenfor);
+    paastand("han naar hen til pytten og toerrer op", naaedePyt && bord.pytter.length === 0, bord.pytter.length + " pytter tilbage");
+    paastand("og gaar ud af scenen bagefter", L.x <= NK.Kemichael.UDE + 1 && !L.scene, tal(L.x, 0));
+    paastand("naeste gang kommer han ind bag bordet igen", L.plan === 1, "plan " + L.plan);
+    bord.laererAltid = altidF;
+
+    /* Kaffen staar paa hylden, men han skal have haenderne i den */
+    NK.startForfra();
+    adv(1);
+    paastand("kaffekoppen staar paa hylden", !!bord.g.kaffekop && !bord.g.kaffekop.skjult);
+    /* Kaffen er et paaskeaeg med flere udgaver, og én af dem (»stirrer«)
+       roerer slet ikke koppen (griber: false i KAFFE i kemichael.js).
+       Derfor proeves der flere gange: det, der skal holde, er at han
+       bliver bag bordet hver gang (F30), og at koppen KAN komme i haanden. */
+    var kaffeForan = false, tagetOp = false, forsoegt = 0;
+    while (forsoegt < 8 && !tagetOp) {
+        forsoegt++;
+        bord.klikKop();
+        for (var q11 = 0; q11 < 240 && L.scene; q11++) {
+            adv(0.25);
+            if (L.plan < 0.5) kaffeForan = true;
+            if (bord.g.kaffekop.iHaand) tagetOp = true;
+        }
+        if (!tagetOp) { NK.startForfra(); adv(1); }
+    }
+    paastand("kaffen hentes bag bordet, ikke foran (F30)", !kaffeForan);
+    paastand("og koppen kan komme i hans haand", tagetOp, forsoegt + " kopper");
+    adv(20);
+    NK.startForfra();
+    adv(1);
+    paastand("start forfra sender ham ud og saetter planet tilbage",
+        L.x <= NK.Kemichael.UDE + 1 && L.plan === 1 && !L.scene, tal(L.x, 0) + ", plan " + L.plan);
+
+    overskrift("19. Quizzen: rammen og forsoegets egne spoergsmaal");
+    /* S9/S10: maskineriet staar i ../../laboratoriet/js/quiz.js, og
+       spoergsmaalene staar i forsoegets js/tekst.js under "quiz". Quizzen
+       laases op af et vilkaar (journalen faerdig), ikke af et kald. */
+    NK.startForfra();
+    adv(1);
+    var Qz = NK.quiz;
+    paastand("quiz.js er indlaest, og siden har bygget quizzen", !!NK.Quiz && !!Qz);
+    paastand("spoergsmaalene kommer fra forsoegets tekst.js",
+        !!Qz && Qz.spoergsmaal === NK.TEKST.quiz.spoergsmaal && Qz.antal() === 10, Qz && Qz.antal() + " spoergsmaal");
+    paastand("hvert spoergsmaal har fire svar og et rigtigt",
+        Qz.spoergsmaal.every(function (x) { return x.valg.length === 4 && x.rigtig >= 0 && x.rigtig < 4 && !!x.forklaring; }));
+    paastand("rammen har ingen af forsoegets ord i sig",
+        JSON.stringify(NK.Quiz.ORD).indexOf("FeSCN") < 0 && JSON.stringify(NK.Quiz.ORD).indexOf("glas") < 0);
+    paastand("den er laast fra begyndelsen med forsoegets egen tekst",
+        Qz.tilstand === "laast" && d.getElementById("quiz-tekst").textContent === NK.TEKST.quiz.laast,
+        Qz.tilstand);
+    paastand("og knappen er skjult, saa laangen ikke kan klikkes op",
+        d.getElementById("quiz-knap").hidden && (Qz.knap(), Qz.tilstand === "laast"));
+
+    /* Laasen er et vilkaar: journalen skal vaere faerdig */
+    var Jq = NK.Journal.find("billede");
+    var g = function (n) { return bord.g["glas" + n]; };
+    for (var qq = 1; qq <= 7; qq++) B.haeldI(g(qq), B.udtag(bord.g.kolbe, 3), true);
+    adv(2);
+    NK.BILLEDE.aabn(bord, function () {});
+    NK.BILLEDE.luk();
+    ["glas1", "glas2", "glas3", "glas4", "glas5"].forEach(function (id) { Jq.noter(id, "ens", bord); });
+    side.opdaterPanel();
+    paastand("den er stadig laast, naar ét glas mangler at blive noteret",
+        Qz.tilstand === "laast" && !Jq.faerdig(), Jq.antal() + " af 6 noteret");
+    Jq.noter("glas6", "ens", bord);
+    side.opdaterPanel();
+    paastand("og den aabner af sig selv, naar alle seks er noteret",
+        Qz.tilstand === "klar" && d.getElementById("quiz-tekst").textContent === NK.TEKST.quiz.klar, Qz.tilstand);
+    paastand("knappen banker, saa man kan se, at der er noget nyt",
+        d.getElementById("quiz-knap").className.indexOf("banker") >= 0);
+
+    /* Et spoergsmaal ad gangen, ét forsoeg, forklaring begge veje */
+    Qz.knap();
+    paastand("foerste spoergsmaal kommer med fire knapper", Qz.tilstand === "sp" &&
+        d.getElementById("quiz-valg").querySelectorAll(".valgknap").length === 4 &&
+        d.getElementById("quiz-taeller").textContent === "1/10",
+        d.getElementById("quiz-taeller").textContent);
+    paastand("og knappen videre er skjult, til der er svaret", d.getElementById("quiz-knap").hidden);
+    var forkert = (Qz.aktuel.rigtig + 1) % 4;
+    paastand("et forkert svar giver forklaringen, ikke bare et kryds", Qz.svar(forkert) === false &&
+        d.getElementById("quiz-forklaring").className.indexOf("skidt") >= 0 &&
+        d.getElementById("quiz-forklaring").textContent.indexOf("Forkert.") === 0 &&
+        d.getElementById("quiz-forklaring").textContent.length > 40);
+    paastand("det rigtige svar bliver vist alligevel",
+        d.getElementById("quiz-valg").querySelectorAll(".valgknap.rigtig").length === 1 &&
+        d.getElementById("quiz-valg").querySelectorAll(".valgknap.forkert").length === 1);
+    paastand("der er kun ét forsoeg pr. spoergsmaal", Qz.svar(Qz.aktuel.rigtig) === false && Qz.rigtige === 0);
+    Qz.knap();
+    paastand("naeste spoergsmaal kommer", Qz.tilstand === "sp" && Qz.nr === 1 &&
+        d.getElementById("quiz-taeller").textContent === "2/10");
+    paastand("et rigtigt svar faar ogsaa sin forklaring", Qz.svarRigtigt() === true &&
+        d.getElementById("quiz-forklaring").className.indexOf("god") >= 0 &&
+        d.getElementById("quiz-forklaring").textContent.indexOf("Rigtigt.") === 0);
+
+    /* Resten rigtigt, og resultatet */
+    for (var q12 = 0; q12 < 20 && Qz.tilstand === "sp"; q12++) { Qz.knap(); if (Qz.tilstand === "sp") Qz.svarRigtigt(); }
+    paastand("efter det sidste spoergsmaal kommer resultatet", Qz.tilstand === "slut" &&
+        d.getElementById("quiz-score").textContent === "9 / 10", d.getElementById("quiz-score").textContent);
+    paastand("og man kan tage den igen", (Qz.knap(), Qz.tilstand === "sp" && Qz.nr === 0 && Qz.rigtige === 0));
+
+    /* Svarene blandes, og rammen regner ikke med fire */
+    var sp0 = Qz.spoergsmaal[0], ordener = {};
+    for (var q13 = 0; q13 < 30; q13++) ordener[Qz.bland(sp0).valg.join("|")] = 1;
+    paastand("svarene blandes fra gang til gang", Object.keys(ordener).length > 1,
+        Object.keys(ordener).length + " forskellige raekkefoelger paa 30");
+    var tre = Qz.bland({ sp: "x", valg: ["a", "b", "c"], rigtig: 2, forklaring: "y" });
+    paastand("og rammen regner ikke med, at der altid er fire svar",
+        tre.valg.length === 3 && tre.valg[tre.rigtig] === "c");
+
+    NK.startForfra();
+    adv(1);
+    paastand("Start forfra laaser quizzen igen og nulstiller den",
+        Qz.tilstand === "laast" && Qz.nr === 0 && Qz.rigtige === 0 &&
+        d.getElementById("quiz-valg").innerHTML === "", Qz.tilstand);
+
+    overskrift("20. Del 2: fortyndingen (S2)");
+    /* Proeven, hele del 2 hviler paa: to par glas med samme stofmaengde,
+       det ene glas i hvert par fortyndet. Ovenfra skal frugtfarven staa
+       ENS og ligevaegtsblandingen blive LYSERE. Maalt i tal paa hvidt
+       papir (NK.Vilkaar.lyshed), ikke med oejnene. */
+    NK.startForfra();
+    adv(1);
+    var O = NK.OVENFRA, Jf = NK.Journal.find("fortynding");
+    function baeg(n) { return bord.g["baeger" + n]; }
+    /* Vent, til den koreografi, der blev sat i gang, er faerdig */
+    function faerdig() { for (var k = 0; k < 200 && bord.koer.igang(); k++) adv(0.25); adv(0.5); }
+    function lysO(n) { return NK.Vilkaar.lyshed(baeg(n), "ovenfra") * 255; }
+
+    paastand("de fire baegerglas staar paa bordet, to og to i par",
+        [1,2,3,4].every(function (i) { return !!baeg(i); }) &&
+        O.par(bord, 0)[0] === baeg(1) && O.par(bord, 1)[1] === baeg(4));
+    paastand("de er skjult i del 1 sammen med frugtfarven",
+        NK.DELE.nu() === 1 && baeg(1).skjult && bord.g.fl_farve.skjult);
+    paastand("og stativet, badene og pulverglassene staar fremme",
+        !bord.g.stativ.skjult && !bord.g.isbad.skjult && !bord.g.glas1.skjult);
+    paastand("det, begge dele bruger, har ingen del og staar altid",
+        !bord.g.kolbe.spec.del && !bord.g.vand.spec.del && !bord.g.dunk.spec.del);
+
+    side.skiftDel(2);
+    adv(0.5);
+    paastand("del 2 skifter bordet om", NK.DELE.nu() === 2 &&
+        !baeg(1).skjult && !bord.g.fl_farve.skjult && bord.g.stativ.skjult && bord.g.glas1.skjult);
+    paastand("knappen Se ovenfra kommer frem i stedet for Tag billede",
+        !d.getElementById("ovenfraknap").hidden && d.getElementById("billedknap").hidden);
+    var rSkjult = bord.rekt(bord.g.glas1, 0);
+    paastand("et skjult glas kan ikke rammes med musen",
+        bord.hvad({ x: rSkjult.x + rSkjult.b / 2, y: rSkjult.y + rSkjult.h / 2 }) !== "glas1");
+
+    /* Par 1: en portion frugtfarve fra stamflasken og vand op til. En
+       sjat paa bunden har for kort en lysvej til at kunne ses ned i, saa
+       der skal mindst 30 mL i hvert glas. */
+    function farveOgVand(gg, sjatter) {
+        bord.haeld(bord.g.fl_farve, gg, bord.portion(bord.g.fl_farve, gg));
+        faerdig();
+        for (var v = 0; v < sjatter; v++) { bord.sproejt(bord.g.vand, gg); faerdig(); }
+    }
+    bord.haeld(bord.g.fl_farve, baeg(1), bord.portion(bord.g.fl_farve, baeg(1)));
+    faerdig();
+    paastand("en portion frugtfarve alene er ikke et par endnu",
+        O.parMed("farve", bord) < 0 && !F.erGjort("farve"),
+        tal(B.volumen(baeg(1)), 0) + " mL");
+    for (var v1 = 0; v1 < 4; v1++) { bord.sproejt(bord.g.vand, baeg(1)); faerdig(); }
+    farveOgVand(baeg(2), 4);
+    paastand("frugtfarve i begge glas i par 1 gjorde trinnet faerdigt",
+        F.erGjort("farve") && O.parMed("farve", bord) === 0,
+        Math.round(B.volumen(baeg(1))) + " mL og " + Math.round(B.volumen(baeg(2))) + " mL");
+    paastand("men parret kan ikke noteres endnu: intet glas er fortyndet",
+        O.fortyndet(O.par(bord, 0)) < 0 && !O.klar("farve", bord));
+
+    /* Par 2: ligevaegtsblanding fra den samme kolbe */
+    /* Par 2: ligevaegtsblanding fra baegerglasset med stamoploesning */
+    bord.haeld(bord.g.baeger, baeg(3), 44);
+    faerdig();
+    bord.haeld(bord.g.baeger, baeg(4), 44);
+    faerdig();
+    adv(6);
+    paastand("ligevaegtsblanding i begge glas i par 2 gjorde trinnet faerdigt",
+        F.erGjort("lv") && O.parMed("lv", bord) === 1);
+    paastand("parret kendes paa sit indhold og ikke paa sin plads",
+        O.indholdType(baeg(1)) === "farve" && O.indholdType(baeg(3)) === "lv");
+
+    /* Fortyndingen: ét glas i hvert par til omkring det dobbelte */
+    function lysSide(n) { return NK.Vilkaar.lyshed(baeg(n)) * 255; }
+    var foerFarve = lysSide(2), foerLv = lysSide(4);
+    for (var sp2 = 0; sp2 < 4; sp2++) { bord.sproejt(bord.g.vand, baeg(2)); faerdig(); }
+    for (var sp4 = 0; sp4 < 4; sp4++) { bord.sproejt(bord.g.vand, baeg(4)); faerdig(); }
+    adv(8);
+    paastand("fortyndingen gjorde trinnet faerdigt", F.erGjort("vand") && O.beggeKlar(bord),
+        [1,2,3,4].map(function (i) { return Math.round(B.volumen(baeg(i))); }).join(" / ") + " mL");
+    paastand("motoren ved, hvilket glas i hvert par der er fortyndet",
+        O.fortyndet(O.par(bord, 0)) === 1 && O.fortyndet(O.par(bord, 1)) === 1);
+    paastand("de to glas i et par fik lige meget stof",
+        Math.abs(O.maengde(baeg(1), "farve") - O.maengde(baeg(2), "farve")) < 0.01);
+
+    /* Selve proeven, i tal */
+    paastand("lysvejen ovenfra fulgte med rumfanget",
+        NK.Udstyr.vejOvenfra(baeg(2).type, B.volumen(baeg(2))) >
+        NK.Udstyr.vejOvenfra(baeg(1).type, B.volumen(baeg(1))) * 1.7,
+        tal(NK.Udstyr.vejOvenfra(baeg(1).type, B.volumen(baeg(1))), 3) + " -> " +
+        tal(NK.Udstyr.vejOvenfra(baeg(2).type, B.volumen(baeg(2))), 3));
+    paastand("FRUGTFARVEN staar ens ovenfra efter fortyndingen",
+        Math.abs(lysO(2) - lysO(1)) < O.GRAENSE * 255,
+        "lyshed " + tal(lysO(1)) + " mod " + tal(lysO(2)));
+    paastand("LIGEVAEGTSBLANDINGEN er tydeligt lysere ovenfra",
+        lysO(4) - lysO(3) > O.GRAENSE * 255,
+        "lyshed " + tal(lysO(3)) + " mod " + tal(lysO(4)));
+    paastand("fordi der blev faerre FeSCN²⁺, ikke bare tyndere",
+        B.samlet(baeg(4)).n["FeSCN2+"] < B.samlet(baeg(3)).n["FeSCN2+"] * 0.85,
+        Math.round(B.samlet(baeg(4)).n["FeSCN2+"] / B.samlet(baeg(3)).n["FeSCN2+"] * 100) + " % af stofmaengden tilbage");
+    paastand("fra SIDEN ligner de to fortyndinger hinanden: begge blev tydeligt lysere",
+        lysSide(2) - foerFarve > 20 && lysSide(4) - foerLv > 20,
+        "frugtfarve +" + tal(lysSide(2) - foerFarve, 0) + ", ligevaegt +" + tal(lysSide(4) - foerLv, 0) +
+        " i lyshed - derfor skal der ses ovenfra");
+
+    /* Facit regnes af verden, og journalen bedoemmer svaret */
+    /* Fortyndingen skal goere vaesken LYSERE, ikke MAT. Vaesken er et
+       filter: det, man ser paa hvidt papir, er papiret ganget med det lys,
+       der slipper igennem (Stof.gennem). Blev den blandet som et
+       halvgennemsigtigt lag maling oven paa papiret, ville vandets egen
+       blaa tone traekke kuloeren ud af enhver fortyndet oploesning. */
+    function kulor(gg) {
+        var f = NK.Stof.gennem(B.samlet(gg), B.lysvej(gg, "ovenfra"));
+        var r = f.r / 255, gr = f.g / 255, b = f.b / 255;
+        var mx = Math.max(r, gr, b), mn = Math.min(r, gr, b), d = mx - mn;
+        var h = 0;
+        if (d > 0) {
+            if (mx === r) h = ((gr - b) / d + (gr < b ? 6 : 0));
+            else if (mx === gr) h = (b - r) / d + 2;
+            else h = (r - gr) / d + 4;
+            h *= 60;
+        }
+        return { h: h, m: d / (mx || 1), l: (mx + mn) / 2, gr: f.g / Math.max(f.r, 1) };
+    }
+    var kA = kulor(baeg(3)), kB = kulor(baeg(4));
+    paastand("fortyndingen trækker kuloeren mod gult, ikke mod graat",
+        kB.h > kA.h + 2 && kB.m > kA.m * 0.7,
+        "kuloer " + tal(kA.h, 0) + "° -> " + tal(kB.h, 0) + "°, maetning " + tal(kA.m, 2) + " -> " + tal(kB.m, 2));
+    /* Det gule ER det groenne lys, der slipper mere igennem, naar det
+       roede kompleks bruges op. Rent tal, ikke et skoen. */
+    paastand("fordi mere groent lys slipper igennem, naar komplekset bruges op",
+        kB.gr > kA.gr * 1.15,
+        "groent/roedt " + tal(kA.gr, 2) + " -> " + tal(kB.gr, 2));
+    paastand("rent vand er ikke farvet, men heller ikke usynligt",
+        (function () { var v = NK.Stof.gennem(NK.Stof.lav({ V: 40, mM: {} }), 1); return v.b > v.r && v.r > 180; }()));
+
+    paastand("facit for de to par er ens og lysere",
+        O.facit("farve", bord) === "ens" && O.facit("lv", bord) === "lysere");
+    NK.OVENFRA.noter("farve", "lysere", bord);
+    paastand("et forkert svar bliver ikke rettet, men det taeller som forkert",
+        Jf.svar("farve") === "lysere" && Jf.rigtig("farve") === false);
+    NK.OVENFRA.noter("farve", "ens", bord);
+    NK.OVENFRA.noter("lv", "lysere", bord);
+    side.opdaterPanel();
+    F.opdater();
+    paastand("begge par noteret rigtigt gjorde det sidste trin faerdigt",
+        Jf.faerdig() && Jf.antalRigtige() === 2 && F.erGjort("sml"),
+        "journalen: " + Jf.antalRigtige() + " af 2 rigtige, taelleren " +
+        d.getElementById("forloeb-taeller").textContent);
+    paastand("og svaret gemte, hvordan glassene saa ud i det oejeblik",
+        !!Jf.post("lv").billede.fortyndet.farve && Jf.post("lv").billede.fortyndet.V > Jf.post("lv").billede.reference.V);
+
+    /* Visningen: fire glas paa hvidt papir, og knapperne under hvert par */
+    NK.OVENFRA.aabn(bord, function () {});
+    paastand("visningen aabner med de fire glas og to par knapper",
+        d.getElementById("ovenfra").classList.contains("vis") &&
+        d.getElementById("ovenfra-svar").querySelectorAll(".ovenfra-par").length === 2 &&
+        d.getElementById("ovenfra-svar").querySelectorAll("button").length === 6);
+    paastand("det valgte svar staar markeret under hvert par",
+        d.getElementById("ovenfra-svar").querySelectorAll("button.aktiv").length === 2);
+    paastand("og taelleren siger, hvor mange par der er noteret",
+        d.getElementById("ovenfra-taeller").textContent === "2 af 2 noteret",
+        d.getElementById("ovenfra-taeller").textContent);
+    NK.OVENFRA.luk();
+    paastand("den lukker igen", !d.getElementById("ovenfra").classList.contains("vis"));
+
+    /* Fortyndingen har ingen oevre graense, og et blandet glas er ikke et par */
+    bord.sproejt(bord.g.vand, baeg(2));
+    faerdig();
+    adv(2);
+    paastand("mere vand goer bare forskellen tydeligere - parret staar stadig",
+        O.fortyndet(O.par(bord, 0)) === 1 && O.klar("farve", bord),
+        Math.round(B.volumen(baeg(2))) + " mL");
+    B.haeldI(baeg(3), B.udtag(bord.g.fl_farve, 10), true);
+    adv(2);
+    paastand("frugtfarve i ligevaegtsblandingen er ikke et par laengere",
+        O.indholdType(baeg(3)) === "blanding" && O.parMed("lv", bord) < 0);
+    adv(1);
+    paastand("og det siger Kemichael noget om",
+        !!F.fyret.kunst && !!L.scene,
+        (F.fyret.kunst ? "udloeseren kunst er fyret" : "ikke fyret") + ", scene: " + (L.scene && L.scene.navn));
+
+    /* ----- Med musen, som en elev ------------------------------------ */
+    /* Samme vej som i afsnit 17: rigtige pointer-haendelser gennem
+       laerredet. Det, der skal virke i del 2, er at haelde i et
+       baegerglas, at sproejte vand i det, og at knappen i panelet aabner
+       visningen. */
+    NK.startForfra();
+    adv(0.5);
+    side.skiftDel(2);
+    adv(0.5);
+    var mus2 = NKProeve.mus(bord);
+    var uheld2 = bord.antalUheld;
+    var rb1 = bord.rekt(baeg(1), 0);
+    paastand("flasken med frugtfarve kan tages med musen", mus2.tag("fl_farve"));
+    mus2.til({ x: baeg(1).p.x, y: rb1.y - 6 }, 0.7);
+    mus2.hold(3.0);
+    paastand("holdt over baegerglasset haelder den ikke (F36)", B.volumen(baeg(1)) < 1e-9);
+    mus2.slip();
+    mus2.hold(1.2);
+    faerdig();
+    paastand("og et slip haelder én portion (5 mL, F60) i det",
+        Math.abs(B.volumen(baeg(1)) - 5) < 0.05 && bord.pytter.length === 0,
+        tal(B.volumen(baeg(1)), 0) + " mL, " + bord.pytter.length + " pytter");
+    paastand("den bliver haengende med sin gule ring, saa et klik haelder mere",
+        bord.svaevende() === bord.g.fl_farve);
+    bord.klik("svaevring");
+    faerdig();
+    paastand("og pilen haelder en portion mere (5 mL, F62)",
+        Math.abs(B.volumen(baeg(1)) - 10) < 0.05, tal(B.volumen(baeg(1)), 0) + " mL");
+    mus2.tag("fl_farve");
+    mus2.baer({ x: bord.g.fl_farve.hjem.x, y: bord.g.fl_farve.hjem.y }, 0.8);
+    mus2.slip();
+    mus2.hold(0.6);
+    faerdig();
+    paastand("flasken kan saettes tilbage paa hylden", bord.g.fl_farve.p.y < 300 &&
+        Math.abs(bord.g.fl_farve.p.x - bord.g.fl_farve.hjem.x) < 30, tal(bord.g.fl_farve.p.y, 0));
+    var rb2 = bord.rekt(baeg(2), 0);
+    paastand("sproejteflasken kan tages og sproejte i det andet glas",
+        mus2.tag("vand") && (mus2.til({ x: baeg(2).p.x, y: rb2.y - 6 }, 0.7), mus2.hold(3.0),
+        mus2.slip(), mus2.hold(1.0), faerdig(), B.volumen(baeg(2)) > 8),
+        tal(B.volumen(baeg(2)), 0) + " mL");
+    mus2.tag("vand");
+    mus2.baer({ x: bord.g.vand.hjem.x, y: bord.g.vand.hjem.y }, 0.8);
+    mus2.slip();
+    mus2.hold(0.6);
+    faerdig();
+    paastand("intet gik galt undervejs", bord.antalUheld === uheld2 && bord.pytter.length === 0,
+        bord.antalUheld - uheld2 + " uheld, " + bord.pytter.length + " pytter");
+    d.getElementById("ovenfraknap").click();
+    paastand("knappen Se ovenfra i panelet aabner visningen",
+        d.getElementById("ovenfra").classList.contains("vis"));
+    d.getElementById("ovenfra-luk").click();
+    paastand("og knappen Luk lukker den", !d.getElementById("ovenfra").classList.contains("vis"));
+
+    NK.startForfra();
+    adv(1);
+    paastand("Start forfra rydder BEGGE dele og stiller bordet i del 1",
+        NK.DELE.nu() === 1 && baeg(1).skjult && B.tom(baeg(1)) &&
+        Jf.antal() === 0 && !bord.g.stativ.skjult && B.tom(bord.g.glas1));
+    paastand("og det bliver sagt, saa det ikke ser ud som en fejl",
+        d.getElementById("scenebesked").textContent === NK.TEKST["forfra-del2"],
+        JSON.stringify(d.getElementById("scenebesked").textContent));
+    paastand("knapperne viser del 1 igen",
+        d.getElementById("del1knap").getAttribute("aria-pressed") === "true" &&
+        d.getElementById("del2knap").getAttribute("aria-pressed") === "false");
+
+    overskrift("21. Siden kan ikke laase eleven ude (F15)");
+    /* Den vaerste fejl er ikke en forkert farve, men en side, der holder
+       op med at svare. Tre spaerrer er sat: tegneloekken doer ikke af en
+       daarlig ramme, en scene, der spaerrer bordet, kan ikke blive
+       haengende, og en figur med tal, der ikke er tal, stilles tilbage i
+       stedet for at kaste. */
+    NK.startForfra();
+    adv(1);
+
+    /* (1) Én undtagelse i en ramme maa koste den ramme og ikke resten.
+       Foer rettelsen blev requestAnimationFrame kun bestilt til sidst i
+       loekken, saa én fejl et vilkaarligt sted stoppede alt: knapperne
+       virkede stadig, men intet blev tegnet igen. */
+    var raf = 0, gammelRaf = vin.requestAnimationFrame;
+    vin.requestAnimationFrame = function () { raf++; return 0; };
+    var gammelTegn = bord.tegn, kastede = false;
+    bord.tegn = function () { throw new Error("proeve: en daarlig ramme"); };
+    try { side.loekke(vin.performance.now()); } catch (e) { kastede = true; }
+    paastand("en daarlig ramme kaster ikke ud af tegneloekken", !kastede);
+    paastand("og naeste ramme er bestilt alligevel", raf === 1, raf + " bestilt");
+    bord.tegn = gammelTegn;
+    try { side.loekke(vin.performance.now() + 16); } catch (e) { kastede = true; }
+    paastand("loekken tegner videre bagefter", !kastede && raf === 2, raf + " bestilt");
+    paastand("og fejlen er husket, saa den kan findes i konsollen", !!side.rammeFejl);
+    side.rammeFejl = null;
+    vin.requestAnimationFrame = gammelRaf;
+    vin.requestAnimationFrame(function (t) { side.loekke(t); });
+
+    /* (2) En scene, der spaerrer bordet, slipper det, hvis den gaar i staa */
+    NK.startForfra();
+    adv(1);
+    L.scene = { navn: "haenger", trin: [{ gaa: 99999 }], i: 0, t: 0, blokerer: true };
+    L.sceneUr = 0;
+    adv(3);
+    paastand("mens en spaerrende scene koerer, tager bordet ikke imod",
+        bord.laererOptaget() && bord.klik("kolbe") === false);
+    adv(50);
+    paastand("men en scene, der gaar i staa, slipper bordet fri igen",
+        !L.scene && !bord.laererOptaget() && bord.klik("kolbe") !== false);
+    paastand("og han er sendt ud og staar klar bag bordet igen",
+        L.maalX === NK.Kemichael.UDE && L.plan === 1, "maalX " + tal(L.maalX, 0) + ", plan " + L.plan);
+
+    /* (3) Tal, der ikke er tal, naar ikke laerredet */
+    NK.startForfra();
+    adv(1);
+    side.sig("Noget.");
+    adv(1);
+    L.x = NaN;
+    var kastedeTegn = false;
+    try { bord.tegn(); } catch (e) { kastedeTegn = true; }
+    paastand("en figur uden gyldige tal kaster ikke, naar der tegnes", !kastedeTegn);
+    paastand("han er stillet tilbage til udgangspunktet i stedet",
+        isFinite(L.x) && L.x === NK.Kemichael.UDE && !L.scene && L.skala > 0,
+        "x " + L.x + ", skala " + L.skala);
+    paastand("og bordet er frit bagefter", !bord.laererOptaget() && bord.klik("kolbe") !== false);
+
+    NK.startForfra();
+    adv(1);
+    overskrift("22. Tegneserien: rammen og forsoegets egne ruder (S29, S10)");
+    /* Rammen staar i ../../laboratoriet/js/tegneserie.js og maa ikke vide
+       noget om jernthiocyanat. Ruderne staar i js/serie.js og bygges af
+       elevens egne journalposter - ikke af bordet, som det ser ud nu. */
+    var TS = NK.Tegneserie, SR = NK.SERIE, serie = side.serie;
+    paastand("rammen findes og er bundet til siden", !!TS && !!serie);
+    paastand("og forsoeget har sin egen liste over ruder", !!SR && typeof SR.ruder === "function");
+
+    /* Rammen maa ikke indeholde ét eneste af forsoegets ord */
+    var rammeKilde = "";
+    for (var iS = 0; iS < d.scripts.length; iS++) {
+        if (d.scripts[iS].src.indexOf("js/tegneserie.js") > 0) rammeKilde = d.scripts[iS].src;
+    }
+    var rammeTekst = "";
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", rammeKilde, false);
+    xhr.send(null);
+    rammeTekst = xhr.responseText;
+    paastand("rammen er hentet og kan laeses", rammeTekst.length > 1000, rammeTekst.length + " tegn");
+    var forbudte = ["FeSCN", "thiocyanat", "ligevaegtsblanding", "frugtfarve", "ascorbin", "glas7", "sb2.4"];
+    var fundne = forbudte.filter(function (o) { return rammeTekst.indexOf(o) >= 0; });
+    paastand("og den naevner ingen af forsoegets ord", fundne.length === 0, fundne.join(", ") || "ingen");
+
+    /* ----- Laasen ---------------------------------------------------- */
+    NK.startForfra();
+    adv(1);
+    side.opdaterPanel();
+    paastand("tegneserien er laast fra begyndelsen", serie.laast() &&
+        d.getElementById("serieknap").disabled);
+    paastand("og knappen siger med forsoegets egne ord hvorfor",
+        d.getElementById("serie-laast").textContent === NK.TEKST.serie.laast,
+        JSON.stringify(d.getElementById("serie-laast").textContent));
+    paastand("den kan ikke aabnes, selv om man proever", serie.aabn() === false &&
+        !d.getElementById("serie").classList.contains("vis"));
+
+    /* ----- Del 1: de syv glas og de fire indgreb ---------------------- */
+    function haeld(fra, til, mL) { St.bland(til.indhold, St.del(fra.indhold, mL)); }
+    for (var iG = 1; iG <= 7; iG++) haeld(bord.g.kolbe, bord.g["glas" + iG], PORTION);
+    St.tilsaet(bord.g.glas1.indhold, "Fe(NO3)3(s)", 60);
+    St.tilsaet(bord.g.glas2.indhold, "Asc(s)", 40);
+    St.tilsaet(bord.g.glas3.indhold, "KSCN(s)", 60);
+    haeld(bord.g.ag, bord.g.glas4, 0.3);
+    bord.g.glas5.indhold.T = 80;
+    bord.g.glas6.indhold.T = 2;
+    adv(6);
+    /* Ét uheld, saa der ogsaa er en roed rude at proeve */
+    bord.uheld("spild", bord.g.glas3, "");
+    /* Glas 2 noteres med vilje forkert */
+    ["glas1", "glas2", "glas3", "glas4", "glas5", "glas6"].forEach(function (n) {
+        NK.BILLEDE.noter(n, n === "glas2" ? "ens" : NK.BILLEDE.facit(n, bord), bord);
+    });
+    side.opdaterPanel();
+    paastand("med kun del 1 noteret er tegneserien stadig laast",
+        NK.BILLEDE.journal.faerdig() && serie.laast());
+
+    /* ----- Del 2: parrene og fortyndingen ---------------------------- */
+    NK.DELE.saet(bord, 2, true);
+    haeld(bord.g.fl_farve, baeg(1), 4); haeld(bord.g.vand, baeg(1), 40);
+    haeld(bord.g.fl_farve, baeg(2), 4); haeld(bord.g.vand, baeg(2), 40);
+    haeld(bord.g.baeger, baeg(3), 44);
+    haeld(bord.g.baeger, baeg(4), 44);
+    adv(6);
+    haeld(bord.g.vand, baeg(2), 44);
+    haeld(bord.g.vand, baeg(4), 44);
+    adv(8);
+    NK.OVENFRA.noter("farve", NK.OVENFRA.facit("farve", bord), bord);
+    NK.OVENFRA.noter("lv", NK.OVENFRA.facit("lv", bord), bord);
+    side.opdaterPanel();
+    paastand("med begge dele noteret aabner laasen af sig selv",
+        !serie.laast() && !d.getElementById("serieknap").disabled);
+
+    /* ----- Ruderne ---------------------------------------------------- */
+    paastand("tegneserien aabner", serie.aabn() === true &&
+        d.getElementById("serie").classList.contains("vis"));
+    var ruder = d.getElementById("serie-ruder").querySelectorAll(".rude");
+    paastand("og den har en rude for hvert glas, billedet, del 2, uheldet og skemaet",
+        ruder.length >= 11, ruder.length + " ruder");
+    paastand("hver rude har et nummer og en tekst",
+        [].every.call(ruder, function (r) {
+            return r.querySelector(".nr") && r.textContent.length > 12;
+        }));
+    paastand("uheldet fik sin egen roede rude",
+        d.getElementById("serie-ruder").querySelectorAll(".rude.fejl").length === 1);
+    paastand("skemaet fylder hele raekken og har begge dele",
+        d.getElementById("serie-ruder").querySelectorAll(".rude.bred table.resultater").length === 2);
+
+    /* Indgrebet laeses af, hvad der ER i glasset - ikke af, hvad eleven gjorde */
+    var r7 = NK.BILLEDE.journal.post("glas7");
+    var ref7 = r7 && r7.billede ? r7.billede.opl : St.opskrift(B.samlet(bord.g.glas7));
+    var koder = [1, 2, 3, 4, 5, 6].map(function (n) {
+        var pb = NK.BILLEDE.journal.post("glas" + n);
+        return SR.indgreb(pb.billede.opl, ref7);
+    });
+    paastand("indgrebet i hvert glas laeses af oejebliksbilledet",
+        koder.join(",") === "fe,vitc,scn,ag,varme,kulde", koder.join(", "));
+
+    /* F40: skemaet retter ikke elevens iagttagelser. Det viser, hvad
+       eleven noterede, og hvad teorien forventer */
+    var skema = d.getElementById("serie-ruder").querySelector(".rude.bred table.resultater");
+    paastand("skemaet retter ikke elevens iagttagelser (F40)",
+        skema.querySelectorAll(".facit").length === 0 && skema.textContent.indexOf("Glasset var") < 0);
+    paastand("men siger, hvad teorien forventer: glas 2 blev noteret »ikke synligt anderledes«, teorien forventer lysere",
+        (function () {
+            var r2 = skema.querySelectorAll("tr")[2];
+            return !!r2 && r2.textContent.indexOf("ikke synligt anderledes") >= 0 && r2.textContent.indexOf("lysere ⟵") >= 0;
+        }()), skema.querySelectorAll("tr")[2] ? skema.querySelectorAll("tr")[2].textContent : "");
+    paastand("og der er en raekke for hvert af de syv glas",
+        skema.querySelectorAll("tr").length === 8, skema.querySelectorAll("tr").length + " raekker");
+
+    /* ----- Oejebliksbilledet ------------------------------------------
+       Den vigtigste paastand i afsnittet: ruderne skal vise glassene, som
+       de saa ud, da eleven noterede dem - ogsaa efter at bordet er ryddet.
+       Derfor tegnes der af journalens opskrifter og ikke af bordet. */
+    function rudeData(n) {
+        var c = ruder[n].querySelector("canvas");
+        return c ? c.toDataURL() : "";
+    }
+    var foerRyd = rudeData(1);
+    side.skiftDel(1);
+    adv(0.5);
+    for (var iT = 1; iT <= 7; iT++) B.udtag(bord.g["glas" + iT], 99);
+    adv(2);
+    serie.luk();
+    serie.aabn();
+    ruder = d.getElementById("serie-ruder").querySelectorAll(".rude");
+    paastand("glassene er tomme paa bordet nu", B.tom(bord.g.glas1));
+    paastand("men ruden viser stadig glasset, som det saa ud", rudeData(1) === foerRyd);
+
+    /* ----- Deterministisk tilfaeldighed ------------------------------- */
+    serie.luk();
+    serie.aabn();
+    ruder = d.getElementById("serie-ruder").querySelectorAll(".rude");
+    paastand("og den samme rude ser ens ud, hver gang serien aabnes",
+        rudeData(1) === foerRyd && rudeData(5) !== "");
+    var froeProeve = (function () {
+        var a = [], b = [];
+        TS.medFroe(7, function () { for (var i = 0; i < 5; i++) a.push(vin.Math.random()); });
+        TS.medFroe(7, function () { for (var j = 0; j < 5; j++) b.push(vin.Math.random()); });
+        return a.join(",") === b.join(",") && a[0] !== a[1];
+    }());
+    paastand("froeet giver de samme tal hver gang og ikke det samme tal hver gang", froeProeve);
+    paastand("og Math.random er givet tilbage bagefter",
+        typeof Math.random() === "number" && Math.random() !== Math.random());
+
+    /* ----- Tasten, knappen og laasen igen ----------------------------- */
+    serie.luk();
+    paastand("Luk lukker serien", !serie.aaben());
+    d.getElementById("serieknap").click();
+    paastand("knappen i panelet aabner den", serie.aaben());
+    side.lukOverlay();
+    paastand("Esc lukker ethvert overlay, ogsaa denne", !serie.aaben());
+
+    NK.startForfra();
+    adv(1);
+    side.opdaterPanel();
+    paastand("Start forfra laaser serien og rydder ruderne",
+        serie.laast() && d.getElementById("serie-ruder").children.length === 0 &&
+        !serie.aaben());
+    overskrift("23. Mikroniveauet viser reaktionerne (S5)");
+    /* Boblen afstemmer ikke i stilhed. Naar et tal aendrer sig, fordi der
+       sker en reaktion, sker reaktionen ogsaa i boblen. Hvilke haendelser
+       der kan ses, udledes af REAKTIONER i stoftabellen - der staar ikke ét
+       stofnavn i motorens mikro.js. */
+    var mikroKilde = "";
+    (function () {
+        var url = "";
+        for (var iM = 0; iM < d.scripts.length; iM++) if (d.scripts[iM].src.indexOf("js/mikro.js") > 0) url = d.scripts[iM].src;
+        var x = new XMLHttpRequest();
+        x.open("GET", url, false);
+        x.send(null);
+        mikroKilde = x.responseText;
+    }());
+    paastand("motorens mikro.js er hentet og kan laeses", mikroKilde.length > 2000, mikroKilde.length + " tegn");
+    var forbudtM = ["Fe3+", "SCN-", "FeSCN", "Ag+", "AgSCN", "Asc", "Cu2+", "Pb2+", "I-", "NO3-", "OH-"];
+    var fundneM = forbudtM.filter(function (o) { return mikroKilde.indexOf('"' + o + '"') >= 0; });
+    paastand("og den naevner ikke ét stofnavn (ud over vandet i baggrunden)",
+        fundneM.length === 0 && mikroKilde.indexOf("H2O") < 0, fundneM.join(", ") || "ingen");
+
+    /* Tilfaeldigheden bindes, saa tallene herunder er de samme hver gang */
+    var gammelRandom = vin.Math.random, froe = 20260919;
+    function bindTilfaeldigheden() {
+        froe = 20260919;
+        vin.Math.random = function () {
+            froe = (froe * 1664525 + 1013904223) % 4294967296;
+            return froe / 4294967296;
+        };
+    }
+    function slipTilfaeldigheden() { vin.Math.random = gammelRandom; }
+
+    function boble(navn) { bord.vaelg(navn); adv(2); return bord.mikro; }
+    function nulTael(m) { m.taeller = { bind: 0, split: 0, faeld: 0, oploes: 0, omdan: 0 }; }
+
+    /* De reaktioner, boblen kan vise, kommer fra stoftabellen */
+    bindTilfaeldigheden();
+    NK.startForfra();
+    adv(1);
+    [1, 2, 3, 4, 5, 6, 7].forEach(function (n) { bord.haeld(bord.g.kolbe, g(n), PORTION); faerdig(); });
+    adv(4);
+    var m7 = boble("glas7");
+    var spil = m7.spil.map(function (x) { return x.rx.id + (x.retning > 0 ? ">" : "<"); });
+    paastand("ligevaegten er i spil begge veje, udledt af stoftabellen",
+        spil.indexOf("fescn>") >= 0 && spil.indexOf("fescn<") >= 0, spil.slice(0, 6).join(" "));
+    paastand("og en faeldning kun den ene vej", spil.indexOf("agscn>") >= 0 && spil.indexOf("agscn<") < 0);
+
+    /* ----- Dynamisk ligevaegt: bind og split lige ofte ----------------- */
+    nulTael(m7);
+    var foer7 = JSON.stringify(m7.taeller);
+    adv(60);
+    var t7 = m7.taeller, ialt7 = t7.bind + t7.split;
+    paastand("i referencen sker der stadig noget, naar tallene staar stille",
+        ialt7 > 20, t7.bind + " bind og " + t7.split + " split paa et minut");
+    paastand("og bind og split kommer lige ofte (dynamisk ligevaegt)",
+        Math.abs(t7.bind - t7.split) <= 0.2 * Math.max(t7.bind, t7.split),
+        "forskel " + Math.abs(t7.bind - t7.split) + " af " + Math.max(t7.bind, t7.split));
+    /* Boblen aander hele tiden: lige efter et skub staar der ét kompleks
+       for meget, til afstemningen retter det. Derfor ventes der hoejst tre
+       sekunder paa, at tallene er tilbage - ellers afhang paastanden af,
+       om minuttet sluttede midt i et aandedrag (det gjorde det omkring
+       hver femte gang efter S31, fordi haeldningerne tog en anden tid) */
+    var maal7 = St.partikelTal(B.samlet(g(7)), bord.valg.partikler, bord.skjulteI(B.samlet(g(7))), bord.valg.partikelRef);
+    var c7 = {}, vent7 = 0;
+    for (;;) {
+        c7 = {};
+        m7.partikler.forEach(function (p) { c7[p.navn] = (c7[p.navn] || 0) + 1; });
+        if (Object.keys(maal7).every(function (n) { return c7[n] === maal7[n]; }) || vent7 >= 3) break;
+        adv(0.1); vent7 += 0.1;
+    }
+    paastand("og tallene staar, hvor de skal, bagefter",
+        Object.keys(maal7).every(function (n) { return c7[n] === maal7[n]; }),
+        JSON.stringify(c7) + " mod " + JSON.stringify(maal7) + ", efter " + tal(vent7, 1) + " s");
+
+    /* ----- Et indgreb: den ene retning overvejer ---------------------- */
+    var m1 = boble("glas1");
+    nulTael(m1);
+    St.tilsaet(g(1).indhold, "Fe(NO3)3(s)", 60);
+    adv(8);
+    paastand("mere Fe³⁺ faar bind til at overveje, til tallene passer igen",
+        m1.taeller.bind > m1.taeller.split, m1.taeller.bind + " bind mod " + m1.taeller.split + " split");
+    paastand("og saltet bliver oploest i boblen, ikke bare talt op",
+        m1.taeller.oploes > 0, m1.taeller.oploes + " oploesninger");
+
+    /* ----- Faeldningen: bundfaldet dannes og synker ------------------- */
+    var m4 = boble("glas4");
+    nulTael(m4);
+    bord.haeld(bord.g.ag, g(4), 0.3);
+    faerdig();
+    adv(8);
+    paastand("soelv faelder AgSCN i boblen, det falder ikke ned oppefra",
+        m4.taeller.faeld > 0, m4.taeller.faeld + " faeldninger");
+    var fasteM = m4.partikler.filter(function (p) { return p.fast; });
+    paastand("og bundfaldet ligger i bunden af boblen",
+        fasteM.length > 0 && fasteM.every(function (p) { return p.y > 0; }),
+        fasteM.length + " kugler, laveste y " + tal(Math.min.apply(null, fasteM.map(function (p) { return p.y; })), 0));
+
+    /* ----- Redoxen: flere partikler fanget paa én gang ---------------- */
+    var m2 = boble("glas2");
+    nulTael(m2);
+    St.tilsaet(g(2).indhold, "Asc(s)", 40);
+    adv(12);
+    paastand("ascorbinsyren omdanner jern i boblen (to Fe³⁺ paa én gang)",
+        m2.taeller.omdan > 0, JSON.stringify(m2.taeller));
+    paastand("og den faste ascorbinsyre gaar i oploesning undervejs",
+        m2.taeller.oploes > 0, m2.taeller.oploes + " oploesninger");
+    slipTilfaeldigheden();
+
+    NK.startForfra();
+    adv(1);
+
+    overskrift("24. Reagensglassene rummer en tredjedel mindre (S31, F33)");
+    /* Glassene rummer 20 mL i stedet for 30. Rumfanget foelger tegningen,
+       saa de er (2/3)^(1/3) = 87 % saa store, og et tryk - en femtedel af
+       glasset - giver 4 mL af sig selv. De staar i stativets huller, som
+       de stod. */
+    NK.startForfra();
+    adv(0.5);
+    var st24 = bord.g.stativ, fuld = NK.Udstyr.type("reagensglas"), G24 = [1, 2, 3, 4, 5, 6, 7].map(g);
+    var top24 = st24.p.y - st24.anker.y;
+    var k24 = Math.cbrt(2 / 3);
+    paastand("de syv glas rummer 20 mL, en tredjedel mindre end 30",
+        G24.every(function (x) { return Math.abs(x.type.maks - 20) < 1e-9; }), tal(g(1).type.maks, 2) + " mL");
+    paastand("og er tegnet 87 % saa store, saa rumfanget foelger tegningen",
+        G24.every(function (x) { return Math.abs(x.skala - k24) < 1e-9 && Math.abs(x.type.h - fuld.h * k24) < 1e-6; }),
+        tal(g(1).type.h, 1) + " mod " + fuld.h);
+    paastand("en portion er en femtedel af glasset, uden modtager", Math.abs(bord.portion(bord.g.kolbe, g(1)) - 4) < 1e-9 && !g(1).spec.modtager);
+    var vmaal = NK.Udstyr.maal(fuld);
+    paastand("tegningens rumfang passer: 30 mL gange k³ er 20 mL", Math.abs(vmaal.V_mL * k24 * k24 * k24 - g(1).type.maks) < 0.02 * 20,
+        tal(vmaal.V_mL * k24 * k24 * k24, 1) + " mL");
+    paastand("stativet er uaendret, og glassene staar i de samme huller med samme afstand",
+        (st24.skala || 1) === 1 && G24.every(function (x, i) {
+            return x.sted && x.sted.stativ === st24 && x.sted.hul === i && Math.abs(x.p.x - bord.hulX(st24, i)) < 0.01;
+        }) && Math.abs(g(2).p.x - g(1).p.x - 42) < 0.01, "afstand " + tal(g(2).p.x - g(1).p.x, 1));
+    function indreBund(x) {
+        var ib = -Infinity; x.type.indre.forEach(function (q) { ib = Math.max(ib, q.y); });
+        return x.p.y + ib - x.anker.y;
+    }
+    paastand("et kortere glas staar paa stativets bund og haenger ikke i luften",
+        G24.every(function (x) { return Math.abs(indreBund(x) - (top24 + st24.type.bundY)) < 0.01; }),
+        "indersidens bund " + tal(indreBund(g(1)), 1) + ", stativets bund " + tal(top24 + st24.type.bundY, 1));
+    B.haeldI(g(1), B.udtag(bord.g.kolbe, PORTION), true);
+    var niv = NK.vaeskeNiveau(g(1).type.indre, B.volumen(g(1)) * g(1).type.mlPrAreal) + g(1).p.y - g(1).anker.y;
+    /* stativ8.svg: topbraettet gaar fra 20 til 34, bunden fra 88 */
+    paastand("4 mL staar frit mellem stativets to braedder, saa farven kan ses",
+        Math.abs(B.volumen(g(1)) - 4) < 0.01 && niv > top24 + 34 && indreBund(g(1)) <= top24 + 88 + 0.01,
+        tal(B.volumen(g(1)), 1) + " mL, overfladen i " + tal(niv, 1) + ", topbraettet slutter i " + tal(top24 + 34, 0));
+    /* I badet synker et kortere glas ogsaa ned (badets bundY), ellers
+       kom indholdet ikke ned i vandet */
+    var vb24 = bord.g.vandbad;
+    B.haeldI(g(5), B.udtag(bord.g.kolbe, PORTION), true);
+    bord.iBad(g(5), vb24, undefined, true);
+    function flade(x) { return NK.vaeskeNiveau(x.type.indre, B.volumen(x) * x.type.mlPrAreal) + x.p.y - x.anker.y; }
+    var yb5 = indreBund(g(5)), ys5 = flade(g(5)), yv5 = flade(vb24);
+    var nede5 = (yb5 - Math.max(ys5, yv5)) / (yb5 - ys5);
+    paastand("i vandbadet staar mindst halvdelen af glassets indhold under vandet",
+        g(5).paa === vb24 && nede5 >= 0.5,
+        tal(nede5 * 100, 0) + " % nede, glassets overflade " + tal(ys5, 1) + ", vandets " + tal(yv5, 1));
+    paastand("og aabningen er oppe ved badets kant, saa glasset kan tages med musen",
+        B.aabning(g(5)).y < vb24.p.y - vb24.anker.y + 20 && mus.tag("glas5") && (mus.slip(), mus.hold(0.8), g(5).paa === vb24),
+        "aabningen " + tal(B.aabning(g(5)).y, 1) + ", badets kant " + tal(vb24.p.y - vb24.anker.y + 6, 1));
+    NK.startForfra();
+    adv(0.5);
+    /* Et glas i fuld stoerrelse staar, som det altid har: det naar bunden fra hullet */
+    paastand("et glas i fuld stoerrelse haenger i hullet som foer",
+        top24 + st24.type.hulY - fuld.anker.y + 152 >= top24 + st24.type.bundY, "hulY " + st24.type.hulY);
+
+    /* Klikfelterne: to naboglas deler ikke et eneste punkt, og musen
+       vaelger det glas, den klikker paa */
+    var fael = 0, proever = 0;
+    for (var n24 = 1; n24 < 7; n24++) {
+        var a24 = g(n24), b24 = g(n24 + 1), ra = bord.rekt(a24, 0);
+        for (var x24 = a24.p.x; x24 <= b24.p.x; x24 += 0.5) {
+            for (var y24 = ra.y - 6; y24 <= ra.y + ra.h + 6; y24 += 2) {
+                proever++;
+                if (bord.inden(a24, { x: x24, y: y24 }, 5) && bord.inden(b24, { x: x24, y: y24 }, 5)) fael++;
+            }
+        }
+    }
+    paastand("ingen to klikfelter overlapper", fael === 0, fael + " faelles punkter af " + proever);
+    var klikket = [];
+    G24.forEach(function (x) { mus.klik(x.navn); mus.hold(0.2); klikket.push(bord.valgt); });
+    paastand("musen vaelger det glas, der klikkes paa, for alle syv",
+        klikket.every(function (v, i) { return v === "glas" + (i + 1); }), klikket.join(" "));
+    var mellem = { x: (g(4).p.x + g(5).p.x) / 2, y: B.aabning(g(4)).y + 20 };
+    paastand("og midt imellem to glas rammer den ingen af dem",
+        ["glas4", "glas5"].indexOf(bord.hvad(mus.bordetSer(mellem))) < 0, bord.hvad(mus.bordetSer(mellem)));
+
+    /* Kolben hurtigt sluppet over glas 7 giver 4 mL, og pilen 4 mL mere */
+    NK.startForfra();
+    adv(0.5);
+    var u24 = bord.antalUheld, rk8 = bord.rekt(g(7), 0);
+    mus.tag("kolbe");
+    mus.til({ x: g(7).p.x, y: rk8.y + 20 }, 0.7);
+    mus.slip();
+    mus.hold(2);
+    var v8 = B.volumen(g(7));
+    paastand("kolben sluppet over glas 7 giver 4 mL", Math.abs(v8 - 4) < 0.05, tal(v8, 2) + " mL");
+    paastand("uden uheld", bord.antalUheld === u24, bord.antalUheld - u24 + " uheld");
+    /* Kolben traekkes vaek fra glas 8 og stilles paa bordet. (flytHjem
+       rammer ikke hjemmet paa 2 enheder her: en kolbe, der tages skraat
+       over glas 8, lander 3,7 enheder fra hjemmet - ogsaa med de gamle
+       glas, saa det er proeve.js' udligning af opretningen og ikke S31) */
+    var kb24 = bord.g.kolbe;
+    mus.tag("kolbe");
+    mus.baer({ x: kb24.hjem.x, y: kb24.hjem.y }, 0.8);
+    mus.hold(0.5);
+    mus.slip();
+    mus.hold(0.8);
+    paastand("kolben kan traekkes vaek og staar paa bordet igen, uden uheld",
+        !kb24.svaev && !bord.holdt && Math.abs(kb24.p.x - kb24.hjem.x) < 6 && bord.antalUheld === u24,
+        "x " + tal(kb24.p.x, 1) + " mod hjem " + tal(kb24.hjem.x, 1));
+
+    overskrift("25. Intet bliver haengende i luften (F28, F35)");
+    /* Kolben hurtigt sluppet over et glas bliver haengende over det. Det
+       maa aldrig spaerre for det naeste: tager man fat i noget andet, eller
+       skifter man del, stilles den ned paa et ledigt sted paa bordet. */
+    function kolbeOver(n) {
+        var rk = bord.rekt(g(n), 0);
+        mus.tag("kolbe");
+        mus.til({ x: g(n).p.x, y: rk.y + 20 }, 0.7);
+        mus.slip();
+        mus.hold(2);
+        return bord.g.kolbe;
+    }
+    function ovenI(gg) {
+        var r = bord.rekt(gg, 0);
+        return bord.liste.filter(function (o) {
+            if (o === gg || !bord.synlig(o) || o === bord.holdt) return false;
+            if (bord.holdt && o === bord.g[bord.holdt.navn]) return false;
+            var q = bord.rekt(o, 0);
+            return !(r.x + r.b <= q.x || q.x + q.b <= r.x || r.y + r.h <= q.y || q.y + q.h <= r.y);
+        }).map(function (o) { return o.navn; });
+    }
+    function paaBordet(gg) { var f = bord.fod(gg).y; return f >= NK.Scene.BORD - 0.5 && f <= NK.Scene.FORKANT + 0.5; }
+    NK.startForfra();
+    adv(0.5);
+    var kb25 = kolbeOver(1);
+    paastand("kolben haenger over glas 1 efter et slip", !!kb25.svaev, kb25.svaev && kb25.svaev.maal.navn);
+    var tog25 = mus.tag("spatel");
+    mus.til({ x: bord.g.spatel.p.x + 40, y: bord.g.spatel.p.y - 80 }, 0.4);
+    mus.hold(0.8);
+    paastand("at tage fat i spatlen virker og stiller kolben ned (F35)",
+        tog25 && !kb25.svaev && !!bord.holdt && bord.holdt.navn === "spatel");
+    paastand("kolben staar paa bordet og ikke oven i andet udstyr",
+        paaBordet(kb25) && ovenI(kb25).length === 0, "fod " + tal(bord.fod(kb25).y, 0) + (ovenI(kb25).length ? ", oven i " + ovenI(kb25).join(", ") : ""));
+    mus.slip();
+    mus.hold(1);
+
+    NK.startForfra();
+    adv(0.5);
+    kb25 = kolbeOver(2);
+    paastand("kolben haenger over glas 2", !!kb25.svaev);
+    d.getElementById("del2knap").click();
+    adv(0.5);
+    paastand("der kan skiftes til del 2, mens den haenger (F28)", NK.DELE.nu() === 2, NK.DELE.nu());
+    paastand("og saa staar kolben paa bordet i del 2 og ikke i luften",
+        !kb25.svaev && paaBordet(kb25) && ovenI(kb25).length === 0, "fod " + tal(bord.fod(kb25).y, 0));
+    paastand("og den kan tages igen", mus.tag("kolbe") && (mus.slip(), mus.hold(1), true));
+
+    /* F36: en fuld kolbe baaret langsomt hen over alle syv glas haelder
+       ikke - der haeldes kun, naar eleven slipper */
+    NK.startForfra();
+    adv(0.5);
+    var rkF = bord.rekt(g(1), 0), kbF = bord.g.kolbe, VkF = B.volumen(kbF);
+    mus.tag("kolbe");
+    mus.til({ x: g(1).p.x, y: rkF.y + 15 }, 0.8);
+    mus.til({ x: g(7).p.x, y: rkF.y + 15 }, 6);
+    mus.hold(1.5);
+    var fyldt = [1, 2, 3, 4, 5, 6, 7].filter(function (n) { return B.volumen(g(n)) > 0; });
+    paastand("kolben baaret langsomt hen over de syv glas haelder ikke (F36)",
+        fyldt.length === 0 && Math.abs(B.volumen(kbF) - VkF) < 1e-9, fyldt.length ? "haeldt i " + fyldt.join(", ") : "intet haeldt");
+    mus.baer(kbF.hjem, 0.8);
+    mus.slip();
+    mus.hold(1);
+
+    /* F32: i del 2 staar hvert par paa et hvidt underlag med sin maerkat */
+    NK.startForfra();
+    adv(0.5);
+    var ul = bord.underlag || [];
+    paastand("del 2 har et hvidt underlag med maerkat for hvert par (F32)",
+        ul.length === 2 && /frugtfarve/.test(ul[0].tekst) && /stamopløsning/.test(ul[1].tekst), ul.map(function (u) { return u.tekst; }).join(" / "));
+    paastand("underlagene ses ikke i del 1", NK.DELE.nu() === 1 && !ul[0].vis() && !ul[1].vis());
+    side.skiftDel(2);
+    adv(0.5);
+    var paaPapir = [1, 2, 3, 4].every(function (n) {
+        var bb = bord.g["baeger" + n], u = ul[n <= 2 ? 0 : 1], f = bord.fod(bb);
+        return f.x > u.x0 && f.x < u.x1 && f.y > u.y0 && f.y < u.y1;
+    });
+    paastand("i del 2 ses de, og hvert baegerglas staar paa sit pars underlag", ul[0].vis() && ul[1].vis() && paaPapir);
+
+    /* F29: sproejteflasken er stoerre, og over et glas kan man skrive,
+       hvor meget der skal fyldes op til */
+    paastand("sproejteflasken er tegnet 25 % stoerre", Math.abs(bord.g.vand.type.h - 150) < 1e-9 && bord.g.vand.type.maks === 500,
+        bord.g.vand.type.h + " hoej");
+    var fo = d.getElementById("fyldop"), rbF = bord.rekt(bord.g.baeger2, 0);
+    paastand("feltet »fyld op til« findes og er skjult, naar intet svaever", !!fo && fo.hidden);
+    mus.tag("vand");
+    mus.til({ x: bord.g.baeger2.p.x, y: rbF.y - 6 }, 0.7);
+    mus.slip();
+    mus.hold(1.5);
+    faerdig();
+    var vF = B.volumen(bord.g.baeger2);
+    side.ramme(performance.now());
+    paastand("en sjat giver 10 mL, og saa staar feltet ved pilen", Math.abs(vF - 10) < 0.05 && !fo.hidden, tal(vF, 1) + " mL");
+    d.getElementById("fyldop-ml").value = "44";
+    fo.requestSubmit();
+    faerdig();
+    paastand("skrives 44, fyldes glasset op til 44 mL i én sproejtning", Math.abs(B.volumen(bord.g.baeger2) - 44) < 0.05,
+        tal(B.volumen(bord.g.baeger2), 1) + " mL");
+    d.getElementById("fyldop-ml").value = "900";
+    fo.requestSubmit();
+    faerdig();
+    paastand("og aldrig over glassets rumfang", Math.abs(B.volumen(bord.g.baeger2) - bord.g.baeger2.type.maks) < 0.2 && bord.pytter.length === 0 && bord.antalUheld === 0,
+        tal(B.volumen(bord.g.baeger2), 1) + " mL af " + bord.g.baeger2.type.maks);
+
+    /* F31 og F48: glas 7 hedder R, glas 4 hedder 4 igen, og der er ingen
+       forundersoegelse og ingen KSCN-flaske */
+    NK.startForfra();
+    adv(0.5);
+    paastand("glas 7 hedder R, og glas 4 hedder 4 (F48)",
+        g(7).nr === "R" && g(4).nr === "4" && g(4).titel === "glas 4", [g(4).nr, g(7).nr].join(" "));
+    var afst = [1, 2, 3, 4, 5, 6].map(function (n) { return g(n + 1).p.x - g(n).p.x; });
+    paastand("de syv glas staar med samme afstand", afst.every(function (a) { return Math.abs(a - 42) < 0.01; }),
+        afst.map(function (a) { return tal(a, 0); }).join(" "));
+    paastand("der er ingen KSCN-flaske og ingen udloeser om 4a", !bord.g.fl_kscn && NK.FORLOEB.udloesere.every(function (u) { return u.id !== "stam_i_4a"; }));
+    var alleTekster = JSON.stringify(NK.TEKST);
+    paastand("ingen tekst naevner 4a, 4b eller forundersoegelsen",
+        !/\b4a\b|\b4b\b|forundersøgelse/i.test(alleTekster), (alleTekster.match(/.{30}(\b4a\b|\b4b\b|forundersøgelse).{30}/i) || [""])[0]);
+    NK.startForfra();
+    adv(1);
+    NK.startForfra();
+    adv(0.5);
+
+    NK.startForfra();
+    adv(1);
+
+    overskrift("26. Spatelspidserne og tilskuerionerne (S12, F25, F27)");
+    /* S12: hvert pulverglas har sin egen spatelspids. Spatlen bruges, som
+       eleven bruger den: fyldt i pulverglasset og toemt i glasset. */
+    [1, 2, 3, 7].forEach(function (n) { B.haeldI(g(n), B.udtag(bord.g.kolbe, PORTION), true); });
+    adv(25);
+    var spids = {};
+    [["pulver_fe", 1], ["pulver_asc", 2], ["pulver_kscn", 3]].forEach(function (par) {
+        var sp = bord.g.spatel;
+        bord.fyldSpatel(sp, bord.g[par[0]]);
+        faerdig();
+        spids[par[0]] = sp.last ? sp.last.umol : 0;
+        bord.toemSpatel(sp, g(par[1]));
+        faerdig();
+    });
+    paastand("en spatelspids er 8 µmol Fe(NO3)3, 3 µmol ascorbinsyre og 30 µmol KSCN",
+        spids.pulver_fe === 8 && spids.pulver_asc === 3 && spids.pulver_kscn === 30, JSON.stringify(spids));
+    adv(40);
+    var l7 = lys(g(7)), l1 = lys(g(1)), l2 = lys(g(2)), l3 = lys(g(3));
+    paastand("glas 1 er tydeligt moerkere end R, men ikke sort", l1 < l7 - 0.05 && l1 > 0.12, tal(l7) + " -> " + tal(l1));
+    paastand("glas 2 er lysere end R, men ikke farveloest", l2 > l7 + 0.05 && konc(g(2), "FeSCN2+") > 0.2,
+        tal(l7) + " -> " + tal(l2) + ", " + tal(konc(g(2), "FeSCN2+")) + " mM FeSCN2+");
+    paastand("glas 3 har mere end dobbelt saa meget kompleks som R", konc(g(3), "FeSCN2+") > 2 * konc(g(7), "FeSCN2+") && l3 < l7 - 0.02,
+        tal(konc(g(7), "FeSCN2+")) + " -> " + tal(konc(g(3), "FeSCN2+")) + " mM");
+    var ph2 = St.pH(B.samlet(g(2)));
+    paastand("pH i glas 2 er omkring 2,8: redoxen afgiver to H+ pr. ascorbinsyre (F25)", ph2 > 2.5 && ph2 < 3.2, tal(ph2, 2));
+    paastand("trinene for glas 1, 2 og 3 er gjort", F.erGjort("glas1") && F.erGjort("glas2") && F.erGjort("glas3"));
+
+    /* F27: en tilskuerion kan loeftes op i tabellen og boblen */
+    bord.vaelg("glas7");
+    side.opdaterPanel();
+    var tsNavne = d.getElementById("tilskuere-navne"), tsVis = d.getElementById("tilskuere-vis"), visFoer = tsVis.checked;
+    function ionKnap(n) { return tsNavne.querySelector('button[data-ion="' + n + '"]'); }
+    function iTabel(n) { return side.indhold(bord, B.samlet(g(7))).raekker.some(function (r) { return r.navn === n; }); }
+    paastand("tilskuerionerne staar som knapper under tabellen og ikke i den (F27)",
+        !!ionKnap("K+") && !!ionKnap("NO3-") && !iTabel("NO3-") && !iTabel("K+"));
+    ionKnap("NO3-").click();
+    paastand("et klik paa NO3- loefter den op i tabellen og boblen, uden at saette fluebenet",
+        iTabel("NO3-") && !iTabel("K+") && (kugler(g(7))["NO3-"] || 0) > 0 && tsVis.checked === visFoer && ionKnap("NO3-").classList.contains("loeftet"),
+        JSON.stringify(kugler(g(7))));
+    paastand("og det gaelder i alle glas", bord.tilskuereI(B.samlet(g(1))).indexOf("NO3-") < 0 && bord.tilskuereI(B.samlet(g(1))).indexOf("K+") >= 0);
+    ionKnap("NO3-").click();
+    paastand("et klik mere saetter den ned igen", !iTabel("NO3-") && !ionKnap("NO3-").classList.contains("loeftet"));
+    ionKnap("K+").click();
+    NK.startForfra();
+    adv(0.5);
+    paastand("Start forfra saetter alle ned", bord.loeftede.length === 0);
+
+    NK.startForfra();
+    adv(1);
+
+    overskrift("27. Paritet med den gamle sb2.4 (S16)");
+    /* Ryst glasset: knappen og tasten R ryster det valgte glas, hvor det
+       staar. Det blander det, der ligger i bunden, og spilder aldrig. */
+    NK.startForfra();
+    adv(0.5);
+    [1, 3].forEach(function (n) { B.haeldI(g(n), B.udtag(bord.g.kolbe, PORTION), true); });
+    adv(2);
+    B.tilsaetFast(g(1), "Fe(NO3)3(s)", 8);
+    B.tilsaetFast(g(3), "Fe(NO3)3(s)", 8);
+    var rk = d.getElementById("rystknap");
+    var b27 = [], vb27 = bord.vedBesked;
+    bord.vedBesked = function (t, s) { b27.push(t); if (vb27) vb27.call(bord, t, s); };
+    bord.vaelg(null);
+    side.opdaterPanel();
+    paastand("knappen »Ryst glasset« er skjult, naar intet glas er valgt", !!rk && rk.hidden);
+    d.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "r", bubbles: true }));
+    paastand("R uden et valgt glas siger, hvad man goer", !bord.rystes && (b27[b27.length - 1] || "").indexOf("Klik på et glas") === 0, b27.join(" | "));
+    d.dispatchEvent(new vin.KeyboardEvent("keyup", { key: "r", bubbles: true }));
+    bord.vaelg("glas1");
+    side.opdaterPanel();
+    paastand("med glas 1 valgt vises knappen", !rk.hidden);
+    var p1 = { x: g(1).p.x, y: g(1).p.y }, V1 = B.volumen(g(1)), uh0 = bord.antalUheld, py0 = bord.pytter.length;
+    d.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "R", bubbles: true }));
+    paastand("hold R: glas 1 rystes", bord.rystes === g(1));
+    adv(1.5);
+    d.dispatchEvent(new vin.KeyboardEvent("keyup", { key: "R", bubbles: true }));
+    adv(0.2);
+    paastand("slip R: det holder op", !bord.rystes);
+    var lag1 = g(1).lag ? g(1).lag.V : 0, lag3 = g(3).lag ? g(3).lag.V : 0;
+    paastand("det rystede glas blandes meget hurtigere op end det urystede", lag3 > 1 && lag1 < 0.5 * lag3,
+        "laget i bunden: glas 1 " + tal(lag1) + " mL, glas 3 " + tal(lag3) + " mL");
+    paastand("og intet er spildt: samme rumfang, ingen pytter, intet uheld, glasset staar, hvor det stod",
+        Math.abs(B.volumen(g(1)) - V1) < 1e-6 && bord.pytter.length === py0 && bord.antalUheld === uh0 &&
+        Math.abs(g(1).p.x - p1.x) < 1e-6 && Math.abs(g(1).p.y - p1.y) < 1e-6);
+    rk.dispatchEvent(new vin.PointerEvent("pointerdown", { bubbles: true, pointerId: 1 }));
+    paastand("knappen ryster ogsaa, saa laenge den holdes", bord.rystes === g(1));
+    rk.dispatchEvent(new vin.PointerEvent("pointerup", { bubbles: true, pointerId: 1 }));
+    paastand("og holder op, naar den slippes", !bord.rystes);
+    rk.dispatchEvent(new vin.MouseEvent("click", { bubbles: true, detail: 0 }));
+    adv(0.5);
+    var tastRyst = bord.rystes === g(1);
+    adv(1);
+    paastand("Enter paa knappen ryster et sekund", tastRyst && !bord.rystes);
+    bord.vaelg("kolbe");
+    paastand("flasker paa hylden rystes ikke", !bord.kanRystes(bord.g.ag) && !bord.kanRystes(bord.g.vandbad) && bord.kanRystes(bord.g.kolbe));
+
+    /* Kolben i affaldet: Kemichael fylder den igen */
+    bord.vaelg(null);
+    var kolbeV = B.volumen(bord.g.kolbe);
+    bord.toemI(bord.g.kolbe, bord.g.dunk);
+    faerdig();
+    var kolbeTom = B.volumen(bord.g.kolbe);
+    for (var kk = 0; kk < 40 && B.volumen(bord.g.kolbe) < 100; kk++) adv(1);
+    paastand("kolben i affaldet: Kemichael fylder den igen (150 mL)", kolbeTom < 0.5 && Math.abs(B.volumen(bord.g.kolbe) - 150) < 0.5,
+        tal(kolbeV, 0) + " -> " + tal(kolbeTom, 0) + " -> " + tal(B.volumen(bord.g.kolbe), 0) + " mL");
+    bord.vedBesked = vb27;
+
+    /* Termometeret med musen */
+    NK.startForfra();
+    adv(0.5);
+    for (var gi = 1; gi <= 7; gi++) B.haeldI(g(gi), B.udtag(bord.g.kolbe, PORTION), true);
+    adv(2);
+    g(5).indhold.T = 60;
+    var tm = bord.g.termometer, rk5 = bord.rekt(g(5), 0);
+    paastand("termometeret kan tages med musen", mus.tag("termometer"));
+    mus.til({ x: g(5).p.x, y: rk5.y + 10 }, 0.8);
+    mus.slip();
+    mus.hold(7);
+    paastand("sluppet over glas 5 sidder det i glasset og viser dets temperatur", tm.i === g(5) && Math.abs(tm.T - B.samlet(g(5)).T) < 2,
+        (tm.i ? tm.i.navn : "intet") + ", " + tal(tm.T, 1) + " mod " + tal(B.samlet(g(5)).T, 1) + " grader");
+
+    /* Billedet med musen, og temperaturen i resultatskemaet */
+    var T5 = B.samlet(g(5)).T;
+    d.getElementById("billedknap").click();
+    paastand("knappen »Tag billede« aabner billedet", d.getElementById("billede").classList.contains("vis"));
+    ["glas1", "glas2", "glas3", "glas4", "glas5", "glas6"].forEach(function (n) {
+        var k = d.querySelector('.billede-valg[data-glas="' + n + '"][data-valg="' + NK.BILLEDE.facit(n, bord) + '"]');
+        if (k) k.click();
+    });
+    adv(1);
+    var Jb = NK.Journal.find("billede");
+    paastand("seks klik noterer alle seks glas rigtigt", Jb.faerdig() && Jb.antalRigtige() === 6, Jb.antalRigtige() + " rigtige");
+    paastand("temperaturen, glas 5 havde, gemmes til resultatskemaet", !!Jb.billede("glas5") && Math.abs(Jb.billede("glas5").opl.T - T5) < 1,
+        Jb.billede("glas5") ? tal(Jb.billede("glas5").opl.T, 1) + " grader" : "intet billede");
+    d.getElementById("billede-luk").click();
+    paastand("og »Luk« lukker det", !d.getElementById("billede").classList.contains("vis"));
+
+    NK.startForfra();
+    adv(1);
+
+    overskrift("28. Klik som genvej: hele del 1 med klik alene (M16)");
+    /* Klik paa det, der skal bruges, og saa paa maalet: det samme som et
+       traek og slip. Rigtige pointer-haendelser gennem laerredet. */
+    NK.startForfra();
+    adv(0.5);
+    var b28 = [], vb28 = bord.vedBesked;
+    bord.vedBesked = function (t, s) { b28.push(t); if (vb28) vb28.call(bord, t, s); };
+    function sidst28() { return b28[b28.length - 1] || ""; }
+    /* Reagensglassene klikkes forneden, saa en kolbe, der svaever over
+       naboglasset, ikke kommer i vejen; alt andet midt paa */
+    function nede(navn) { var gg = bord.g[navn], r = bord.rekt(gg, 0); return { x: r.x + r.b / 2, y: r.y + r.h * (gg.type.navn === "reagensglas" ? 0.8 : 0.5) }; }
+    function klikKlik(a, b) { mus.klik(nede(a)); mus.hold(0.1); mus.klik(nede(b)); faerdig(); }
+    var uh28 = bord.antalUheld;
+
+    mus.klik(nede("kolbe"));
+    paastand("et klik paa kolben vaelger den og goer den klar", bord.valgtBeholder() === bord.g.kolbe && bord.klar === "kolbe" && sidst28().indexOf("Klik der, hvor den skal hen") > 0, sidst28());
+    mus.til(nede("glas3"), 0.3);
+    paastand("musen over et glas giver det den groenne ramme", bord.genvejMaal === "glas3", bord.genvejMaal);
+    mus.klik(nede("glas1"));
+    faerdig();
+    paastand("og et klik paa glas 1 haelder én portion i det", Math.abs(B.volumen(g(1)) - PORTION) < 0.05 && !bord.klar, tal(B.volumen(g(1)), 1) + " mL");
+    [2, 3, 4, 5, 6, 7].forEach(function (n) { klikKlik("kolbe", "glas" + n); });
+    paastand("klik, klik seks gange mere: alle syv glas har 4 mL, og trinnet er gjort",
+        [1, 2, 3, 4, 5, 6, 7].every(function (n) { return Math.abs(B.volumen(g(n)) - PORTION) < 0.05; }) && F.erGjort("fyld"),
+        [1, 2, 3, 4, 5, 6, 7].map(function (n) { return tal(B.volumen(g(n)), 1); }).join(" "));
+
+    /* Et glas, man kigger i, haeldes ikke i et andet med klik */
+    var v1 = B.volumen(g(1)), v2 = B.volumen(g(2));
+    mus.klik(nede("glas1"));
+    mus.hold(0.1);
+    mus.klik(nede("glas2"));
+    faerdig();
+    paastand("glas 1 og saa glas 2: der haeldes ikke, glas 2 bliver bare valgt",
+        Math.abs(B.volumen(g(1)) - v1) < 1e-9 && Math.abs(B.volumen(g(2)) - v2) < 1e-9 && bord.valgtBeholder() === g(2));
+    bord.klar = null;
+
+    /* Spatlen: pulverglasset, saa glasset */
+    klikKlik("spatel", "pulver_fe");
+    paastand("spatlen og saa pulverglasset: den tager en spatelspids", !!bord.g.spatel.last && bord.g.spatel.last.umol === 8);
+    mus.klik(nede("spatel"));
+    paastand("et klik paa den fulde spatel goer den klar", bord.klar === "spatel" && sidst28().indexOf("Spatlen er fuld") === 0, sidst28());
+    mus.klik(nede("glas1"));
+    faerdig();
+    klikKlik("spatel", "pulver_asc"); klikKlik("spatel", "glas2");
+    klikKlik("spatel", "pulver_kscn"); klikKlik("spatel", "glas3");
+    adv(20);
+    paastand("glas 1, 2 og 3 har faaet hver sin spatelspids, og trinnene er gjort",
+        F.erGjort("glas1") && F.erGjort("glas2") && F.erGjort("glas3") && !bord.g.spatel.last);
+
+    /* Draabeflasken over glas 4, to gange */
+    klikKlik("ag", "glas4"); klikKlik("ag", "glas4");
+    adv(20);
+    paastand("draabeflasken og saa glas 4, to gange: to draaber og trinnet er gjort",
+        Math.abs((B.samlet(g(4)).n["AgSCN(s)"] || 0) + (B.samlet(g(4)).n["Ag+"] || 0) - 10) < 0.3 && F.erGjort("glas4"),
+        tal((B.samlet(g(4)).n["AgSCN(s)"] || 0) + (B.samlet(g(4)).n["Ag+"] || 0), 1) + " µmol sølv i glasset");
+
+    /* Glassene i badene, termometeret i glas 5 */
+    klikKlik("glas5", "vandbad");
+    klikKlik("glas6", "isbad");
+    paastand("glas 5 og saa vandbadet, glas 6 og saa isbadet: de staar i badene",
+        g(5).paa === bord.g.vandbad && g(6).paa === bord.g.isbad && !g(5).sted && !g(6).sted);
+    klikKlik("termometer", "glas5");
+    paastand("termometeret og saa glas 5: det sidder i glasset", bord.g.termometer.i === g(5));
+
+    /* Fortryd og det, der ikke er maal */
+    mus.klik(nede("kolbe"));
+    mus.klik(nede("kolbe"));
+    paastand("et klik paa kolben igen fortryder", !bord.klar && sidst28() === "Fortrudt.", sidst28());
+    mus.klik(nede("kolbe"));
+    mus.klik({ x: 1000, y: 120 });
+    paastand("et klik ved siden af fortryder", !bord.klar);
+    mus.klik(nede("kolbe"));
+    d.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    paastand("Esc fortryder", !bord.klar);
+    var taendt0 = bord.g.plade.taendt, kolbeP = { x: bord.g.kolbe.p.x, y: bord.g.kolbe.p.y };
+    mus.klik(nede("kolbe"));
+    mus.klik(nede("plade"));
+    faerdig();
+    paastand("med kolben klar taender et klik paa varmepladen den bare",
+        bord.g.plade.taendt !== taendt0 && Math.abs(bord.g.kolbe.p.x - kolbeP.x) < 1 && !bord.klar);
+
+    /* Oprydningen: glas og saa affaldet */
+    klikKlik("glas1", "dunk");
+    paastand("glas 1 og saa affaldet: det tømmes", B.volumen(g(1)) < 0.01);
+    paastand("og ingen uheld undervejs", bord.antalUheld === uh28, bord.antalUheld - uh28 + " uheld");
+    bord.vedBesked = vb28;
+
+    NK.startForfra();
+    adv(1);
+
+    overskrift("29. Det, der er sagt, et varigt sted (S13, F56)");
+    NK.startForfra();
+    adv(1);
+    /* F56: listen staar i fanen »Uheld og replikker« under noterne, ikke
+       i et kort i panelet */
+    var rliste = d.getElementById("replik-liste"), ringen = d.getElementById("replik-ingen");
+    paastand("kortet i panelet er væk, og listen står i noternes fane (F56)",
+        !d.getElementById("replik-kort") && !!rliste && d.getElementById("noter-sket").contains(rliste));
+    paastand("før der er sagt noget, står der, at der ikke er sagt noget", !ringen.hidden && rliste.children.length === 0 && side.replikker.length === 0);
+    function sidsteLinje() { return rliste.lastElementChild ? rliste.lastElementChild.textContent : ""; }
+    /* To indgreb i glas 1 (soelv og ascorbinsyre): en bemaerkning paa to
+       linjer. Proeverne i 29-31 bruger den; F48 fjernede 4a, som de brugte
+       foer. */
+    function toIndgreb() {
+        B.udtagAlt(g(1));
+        B.haeldI(g(1), B.udtag(bord.g.kolbe, PORTION), true);
+        B.tilsaetFast(g(1), "Asc(s)", 3);
+        B.haeldI(g(1), B.udtag(bord.g.ag, 0.05), true);
+        adv(3);
+    }
+    toIndgreb();
+    for (var r29 = 0; r29 < 60 && !side.replikker.length; r29++) adv(0.5);
+    var sig4a = NK.TEKST["sig-to-indgreb"];
+    paastand("to indgreb i glas 1: Kemichaels replik står i listen med hans navn",
+        ringen.hidden && rliste.firstElementChild && rliste.firstElementChild.textContent.indexOf("Kemichael: ") === 0 && side.replikker[0].tekst === sig4a[0],
+        sidsteLinje());
+    for (r29 = 0; r29 < 60 && side.replikker.length < sig4a.length; r29++) adv(0.5);
+    paastand("alle hans linjer kommer med, i den rækkefølge han sagde dem",
+        side.replikker.length >= sig4a.length && sig4a.every(function (t, i) { return side.replikker[i].tekst === t; }),
+        side.replikker.map(function (x) { return x.tekst; }).join(" | "));
+    var n29 = side.replikker.length;
+    NK.vedReplik("Det er min kaffe.", { hvem: "Kemichael", scene: "kaffe" });
+    paastand("småsnakken kommer ikke med", side.replikker.length === n29);
+    var altid29 = bord.laererAltid;
+    bord.laererAltid = true;
+    bord.spild(g(1), "rystet");
+    for (r29 = 0; r29 < 80 && side.replikker.length === n29; r29++) adv(0.5);
+    paastand("et uheld kommer med, fordi sb2.4 har valgt det (historik)", side.replikker.length > n29,
+        side.replikker.slice(n29).map(function (x) { return x.tekst; }).join(" | "));
+    bord.laererAltid = altid29;
+    paastand("i listen står alle linjerne", rliste.children.length === side.replikker.length,
+        rliste.children.length + " af " + side.replikker.length);
+    NK.startForfra();
+    adv(0.5);
+    paastand("Start forfra rydder listen", !ringen.hidden && rliste.children.length === 0 && side.replikker.length === 0);
+
+    NK.startForfra();
+    adv(1);
+
+    overskrift("30. Klik på taleboblen for at springe videre (S14)");
+    NK.startForfra();
+    adv(1);
+    var L30 = bord.laerer, s4a = NK.TEKST["sig-to-indgreb"];
+    toIndgreb();
+    for (var r30 = 0; r30 < 80 && !(L30.tale === s4a[0] && L30.taleAlfa > 0.5); r30++) adv(0.25);
+    paastand("han siger den første linje", L30.tale === s4a[0] && L30.taleUr > 0, L30.tale);
+    var tb = NK.Taleboble.sidst, midt = { x: tb.x + tb.b / 2, y: tb.y + tb.h / 2 };
+    paastand("musen er over boblen", bord.overLaererBoble(midt));
+    var valgt30 = bord.valgt, klik30 = L30.klik;
+    mus.klik(midt);
+    mus.hold(0.1);
+    paastand("et klik på boblen: næste linje kommer straks", L30.tale === s4a[1] && L30.taleUr > 0, L30.tale);
+    paastand("og klikket rammer ikke noget på bordet og tæller ikke som en prik", bord.valgt === valgt30 && L30.klik === klik30);
+    for (r30 = 0; r30 < 20 && !(L30.taleAlfa > 0.5); r30++) adv(0.1);
+    tb = NK.Taleboble.sidst;
+    mus.klik({ x: tb.x + tb.b / 2, y: tb.y + tb.h / 2 });
+    mus.hold(0.1);
+    paastand("et klik på den sidste linje lukker boblen", !(L30.taleUr > 0));
+    paastand("begge linjer står i kortet, én gang hver", side.replikker.filter(function (x) { return s4a.indexOf(x.tekst) >= 0; }).length === 2);
+    for (r30 = 0; r30 < 80 && L30.scene; r30++) adv(0.25);
+    paastand("uden boble rammer musen ikke en gammel boble", !bord.overLaererBoble(midt));
+
+    NK.startForfra();
+    adv(1);
+
+    overskrift("31. Karantæne og tal i replikker (S3)");
+    NK.startForfra();
+    adv(0.5);
+    [1, 5].forEach(function (n) { B.haeldI(g(n), B.udtag(bord.g.kolbe, PORTION), true); });
+    adv(2);
+    g(5).indhold.T = 80;
+    var U = NK.Vilkaar.udfyld;
+    paastand("{{glas5.T}} bliver til glassets temperatur", U("{{glas5.T}}", bord) === "80 °C", U("{{glas5.T}}", bord));
+    paastand("{{glas1.V}} og {{glas1.FeSCN2+}} bliver til rumfang og koncentration",
+        U("{{glas1.V}}", bord) === "4,0 mL" && /^0,\d\d mM$/.test(U("{{glas1.FeSCN2+}}", bord)), U("{{glas1.V}} / {{glas1.FeSCN2+}}", bord));
+    paastand("en pladsholder, der ikke kan udfyldes, står tilbage, så fejlen kan ses",
+        U("{{ukendt.T}} og {{glas1.Xyz}}", bord) === "{{ukendt.T}} og {{glas1.Xyz}}");
+    /* Termometeret i glas 5: han læser tallet op, som det står, når han siger det */
+    bord.maal(bord.g.termometer, g(5));
+    faerdig();
+    var n31 = side.replikker.length;
+    for (var r31 = 0; r31 < 80 && !side.replikker.some(function (x) { return x.tekst.indexOf("Termometeret siger") === 0; }); r31++) { g(5).indhold.T = 80; adv(0.5); }
+    var tl = side.replikker.filter(function (x) { return x.tekst.indexOf("Termometeret siger") === 0; })[0];
+    paastand("termometeret i det varme glas 5: han siger tallet, ikke pladsholderen",
+        !!tl && /^Termometeret siger \d+ °C\.$/.test(tl.tekst) && L30.tale.indexOf("{{") < 0, tl ? tl.tekst : "ingen replik");
+    for (r31 = 0; r31 < 80 && L30.scene; r31++) adv(0.25);
+
+    /* igen: to indgreb i samme glas fyrer igen - men ikke foer karantaenen */
+    var fyr = 0, udf = F.udfoer;
+    F.udfoer = function (saa, kilde) { if (kilde && kilde.id === "to_indgreb") fyr++; return udf.apply(this, arguments); };
+    function fyld4a() { toIndgreb(); }
+    function toem4a() { B.udtagAlt(g(1)); adv(0.5); }
+    fyld4a();
+    paastand("to indgreb i glas 1 fyrer én gang", fyr === 1, fyr + " gange");
+    adv(5);
+    paastand("og ikke igen, mens den bare står der", fyr === 1, fyr + " gange");
+    toem4a(); fyld4a();
+    paastand("tømt og fyldt igen inden for karantænen (30 s): ingen ny bemærkning", fyr === 1, fyr + " gange");
+    adv(30);
+    paastand("efter karantænen fyrer den ikke af sig selv, mens den står der", fyr === 1, fyr + " gange");
+    toem4a(); fyld4a();
+    paastand("men tømt og fyldt igen efter karantænen: bemærkningen kommer igen", fyr === 2, fyr + " gange");
+    F.udfoer = udf;
+    paastand("referencen har ingen igen: den fyrer kun én gang", !NK.FORLOEB.udloesere.filter(function (u) { return u.id === "roert_reference"; })[0].igen);
+
+    NK.startForfra();
+    adv(1);
+
+    overskrift("32. Gennemgangen 19. september om aftenen (F37-F46)");
+    NK.startForfra();
+    adv(0.5);
+    /* F37: noterne */
+    side.skiftNoter(true);
+    var nNoter = d.getElementById("noter"), nFelt = d.getElementById("logbog-tekst"), nRyd = d.getElementById("logbog-ryd");
+    var nGammel = nFelt.value;
+    d.getElementById("noter-lukknap").click();
+    paastand("den store knap nederst til højre lukker noterne (F37)", nNoter.hidden);
+    side.skiftNoter(true);
+    paastand("skraldespanden og krydset sidder øverst til højre", !!nNoter.querySelector(".noter-top #logbog-ryd") && !!nNoter.querySelector(".noter-top #noter-luk") &&
+        !!nRyd.querySelector("svg"));
+    nFelt.value = "prøve";
+    nRyd.click();
+    paastand("første klik på skraldespanden sletter ikke, men spørger", nFelt.value === "prøve" && nRyd.classList.contains("bekraeft"));
+    nRyd.click();
+    paastand("andet klik sletter noterne", nFelt.value === "" && !nRyd.classList.contains("bekraeft"));
+    nFelt.value = nGammel; side.logbogGem();
+    d.getElementById("noter-luk").click();
+    paastand("og krydset lukker", nNoter.hidden);
+
+    /* F38: tilstandsform ved stofferne i udførelsen */
+    var udf = [].concat(NK.TEKST["intro-trin"]);
+    Object.keys(NK.TEKST.trin).forEach(function (k) { udf.push(NK.TEKST.trin[k].tekst, NK.TEKST.trin[k].hint); });
+    var uden = udf.filter(function (t) { return /(Fe\(NO₃\)₃|KSCN|AgNO₃|AgSCN)(?!\((s|l|aq|g)\))/.test(t); });
+    paastand("stofferne i udførelsen har tilstandsform (F38)", uden.length === 0, uden.join(" | "));
+    paastand("og der står ikke »lige meget vand« nogen steder (F47)", JSON.stringify(NK.TEKST).indexOf("lige meget vand") < 0);
+    paastand("trinnene siger ikke »rør rundt« (F46)", udf.every(function (t) { return !/rør rundt|Rør med/.test(t); }));
+
+    /* F46: glasstaven når bunden af et reagensglas */
+    B.haeldI(g(1), B.udtag(bord.g.kolbe, PORTION), true);
+    var stav = bord.g.glasstav;
+    bord.roer(stav, g(1));
+    for (var s32 = 0; s32 < 20 && !bord.roerer; s32++) adv(0.1);
+    var spids = stav.p.y + stav.type.laengde * Math.cos(stav.p.v), bundG1 = g(1).p.y - g(1).anker.y + g(1).type.h;
+    paastand("glasstaven når ned til lige over bunden af reagensglasset (F46)", bundG1 - spids < 20 && spids < bundG1,
+        "spids " + tal(spids, 0) + ", bund " + tal(bundG1, 0));
+    faerdig();
+
+    /* F45: termometeret glider roligt */
+    g(1).indhold.T = 70;
+    bord.maal(bord.g.termometer, g(1));
+    faerdig();
+    var visninger = [], tm32 = bord.g.termometer, skift = 0, sidste = tm32.visT;
+    for (s32 = 0; s32 < 60; s32++) {
+        bord.opdater(1 / 30);
+        if (tm32.visT !== sidste) { skift++; visninger.push(tm32.visT); sidste = tm32.visT; }
+    }
+    var stiger = visninger.every(function (v, i) { return i === 0 || v >= visninger[i - 1]; });
+    paastand("termometerets tal stiger roligt og skifter højst fire gange i sekundet (F45)", stiger && skift <= 9 && skift >= 3,
+        skift + " skift på 2 s: " + visninger.join(" "));
+
+    /* F40: glasset i isbadet: både »mørkere« og »som glas R« er rigtige */
+    NK.startForfra();
+    adv(0.5);
+    for (var i32 = 1; i32 <= 7; i32++) B.haeldI(g(i32), B.udtag(bord.g.kolbe, PORTION), true);
+    bord.moede(g(6), bord.g.isbad, { x: bord.g.isbad.p.x });
+    adv(60);
+    var J32 = NK.BILLEDE.journal;
+    NK.billede.noter("glas6", "moerkere", bord);
+    var r1 = J32.rigtig("glas6");
+    NK.billede.noter("glas6", "ens", bord);
+    var r2 = J32.rigtig("glas6");
+    NK.billede.noter("glas6", "lysere", bord);
+    var r3 = J32.rigtig("glas6");
+    paastand("glas 6 i isbadet: »mørkere« og »som glas R« godkendes, »lysere« ikke (F40)", r1 === true && r2 === true && r3 === false,
+        [r1, r2, r3].join(" ") + " (målt: " + NK.BILLEDE.facit("glas6", bord) + ")");
+    paastand("isbadet har is", !!bord.g.isbad.spec.is);
+
+    /* F41: hvem tørrede op? */
+    NK.startForfra();
+    adv(0.5);
+    var altid32 = bord.laererAltid, opd32 = bord.laererOpdager;
+    bord.laererOpdager = function () { return false; };
+    bord.laererAltid = false;
+    B.haeldI(g(2), B.udtag(bord.g.kolbe, PORTION), true);
+    bord.vaelt(g(2), g(2).p.x + 60, NK.Scene.BORD + 20);
+    bord.uheld("vaeltet", g(2), "");
+    adv(1);
+    paastand("et uheld, han ikke ser, rydder han ikke op (F41)", !bord.opryddet["vaeltet_glas2"] && bord.pytter.length > 0);
+    bord.toerOp(bord.g.papir, bord.pytter.length - 1);
+    faerdig();
+    paastand("tørrer eleven selv op, står det i regnskabet", bord.opryddet["vaeltet_glas2"] === "elev");
+    bord.laererOpdager = opd32;
+    bord.laererAltid = true;
+    B.haeldI(g(3), B.udtag(bord.g.kolbe, PORTION), true);
+    bord.spild(g(3), "rystet");
+    adv(1);
+    paastand("et uheld, han ser, rydder han op", bord.opryddet["rystet_glas3"] === "laerer" || bord.opryddet["spild_glas3"] === "laerer",
+        JSON.stringify(bord.opryddet));
+    bord.laererAltid = altid32;
+    var ur32 = NK.SERIE.ruder(bord).filter(function (r) { return r && r.fejl; });
+    var tekst32 = ur32.map(function (r) { return r.tekst; }).join(" | ");
+    paastand("tegneserien siger det rigtige om begge: »Du tørrede selv op« og »Kemichael så det«",
+        tekst32.indexOf("Du tørrede selv op") >= 0 && tekst32.indexOf("Kemichael så det") >= 0, tekst32);
+    paastand("og kun ruden, hvor han greb ind, tegner ham", ur32.filter(function (r) { return !!r.oven; }).length === 1);
+    for (s32 = 0; s32 < 80 && bord.laerer.scene; s32++) adv(0.25);
+
+    /* F44: bøtten med spatler og kurven */
+    NK.startForfra();
+    adv(0.5);
+    var boette = bord.g.spatler, kurv = bord.g.kurv;
+    paastand("bøtten med spatler og kurven står på bordet (F44)", !!boette && !!kurv);
+    var rkFe32 = bord.rekt(bord.g.pulver_fe, 0);
+    mus.tag("spatler");
+    mus.til({ x: rkFe32.x + rkFe32.b / 2, y: rkFe32.y + rkFe32.h * 0.4 }, 0.8);
+    var iHaand = bord.baerer;
+    mus.slip();
+    faerdig();
+    paastand("et træk i bøtten tager en ny, ren spatel", !!iHaand && iHaand.navn === "spatel_2" && !!iHaand.last && iHaand.last.umol === 8,
+        iHaand ? iHaand.navn : "intet i hånden");
+    mus.klik("spatler");
+    mus.hold(0.3);
+    paastand("et klik lægger en ny spatel frem og gør den klar", !!bord.g.spatel_3 && bord.klar === "spatel_3");
+    bord.klar = null;
+    B.haeldI(g(1), B.udtag(bord.g.kolbe, PORTION), true);
+    var g1gl = g(1);
+    bord.moede(g1gl, kurv, null);
+    faerdig();
+    paastand("et glas med noget i kommer ikke i kurven", g(1) === g1gl && B.volumen(g(1)) > 3 && g(1).sted);
+    bord.toemI(g(1), bord.g.dunk);
+    faerdig();
+    bord.moede(g(1), kurv, null);
+    faerdig();
+    paastand("et tomt glas i kurven: et nyt, rent glas 1 står i stativets hul", !!g(1) && g(1) !== g1gl && B.tom(g(1)) && !!g(1).sted && g(1).sted.hul === 0);
+    bord.moede(bord.g.spatel_2, kurv, null);
+    faerdig();
+    paastand("en ekstra spatel i kurven forsvinder bare", !bord.g.spatel_2);
+    var sp0 = bord.g.spatel;
+    bord.moede(sp0, kurv, null);
+    faerdig();
+    paastand("den første spatel i kurven: en ny ligger på dens plads", !!bord.g.spatel && bord.g.spatel !== sp0 && !bord.g.spatel.last);
+
+    /* F42 og F61-F63: »Fyld op til [ ] mL [Fyld]« ved glasudstyr man måler
+       i, med en værdi i feltet, der giver mening, og uden forslagsknapper */
+    NK.startForfra();
+    adv(0.5);
+    var fo32 = d.getElementById("fyldop");
+    bord.haeld(bord.g.kolbe, g(1), PORTION);
+    faerdig();
+    side.opdaterFyldOp();
+    paastand("kolben over et reagensglas: intet felt (F42)", !!bord.g.kolbe.svaev && fo32.hidden);
+    NK.DELE.saet(bord, 2, true);
+    adv(0.5);
+    bord.sproejt(bord.g.vand, bord.g.baeger1, 40);
+    faerdig();
+    bord.stilSvaevendeNed(true);
+    bord.haeld(bord.g.kolbe, bord.g.baeger2, 10);
+    faerdig();
+    side.opdaterFyldOp();
+    var inp32 = d.getElementById("fyldop-ml"), p32 = bord.pilMl(bord.g.kolbe);
+    paastand("kolben over et bægerglas: feltet står der, uden forslagsknapper (F42, F63)",
+        !fo32.hidden && !d.getElementById("fyldop-forslag") && fo32.querySelectorAll("button").length === 1 && fo32.textContent.indexOf("dobbelt") < 0,
+        fo32.textContent);
+    paastand("i feltet står det, der er i glasset, plus det, pilen giver (10 + " + p32 + " mL, F61)",
+        inp32.value === String(Math.round(10 + p32)), inp32.value);
+    fo32.requestSubmit();
+    faerdig();
+    paastand("»Fyld« fylder op til det", Math.abs(B.volumen(bord.g.baeger2) - (10 + p32)) < 0.1, tal(B.volumen(bord.g.baeger2), 1) + " mL");
+    side.opdaterFyldOp();
+    paastand("og så står det næste forslag i feltet", inp32.value === String(Math.round(10 + 2 * p32)), inp32.value);
+    NK.DELE.saet(bord, 1, true);
+
+    NK.startForfra();
+    adv(1);
+
+    overskrift("33. Forløbslisten, C-vitamin, spatelbøtten og håndvasken (F49-F53)");
+    NK.startForfra();
+    adv(0.5);
+    /* F49: listen viser den del, eleven står i, og den anden som én linje */
+    side.opdaterForloeb();
+    var li33 = [].map.call(d.querySelectorAll("#forloeb-liste li"), function (l) { return l.textContent; });
+    paastand("i del 1 står del 1's trin og del 2 som én linje (F49)",
+        li33.length === 10 && li33[8] === NK.TEKST.trin.ryd.kort && li33[9].indexOf("Del 2: fortynding") === 0, li33.join(" | "));
+    NK.DELE.saet(bord, 2, true);
+    side.visDel();
+    li33 = [].map.call(d.querySelectorAll("#forloeb-liste li"), function (l) { return l.textContent; });
+    paastand("i del 2 står del 1 som én linje og del 2's fire trin", li33.length === 5 && li33[0].indexOf("Del 1: glassene") === 0, li33.join(" | "));
+    NK.DELE.saet(bord, 1, true);
+    side.visDel();
+    /* F50 og F52 */
+    paastand("udførelsen siger C-vitamin med ascorbinsyre i parentes (F50)",
+        NK.TEKST.trin.glas2.tekst.indexOf("C-vitamin (ascorbinsyre") >= 0 && NK.TEKST["intro-trin"][1].indexOf("C-vitamin (ascorbinsyre") >= 0);
+    paastand("spatelbøtten står lige ved kurven (F52)", Math.abs(bord.g.spatler.p.x - bord.g.kurv.p.x) < 90, tal(bord.g.spatler.p.x, 0) + " og " + tal(bord.g.kurv.p.x, 0));
+    /* F53: håndvasken */
+    var hane = bord.g.hane, kumme = bord.g.vask;
+    paastand("vasken står lige ved affaldsdunken, og kolben er rykket ind (F53)",
+        !!hane && !!kumme && kumme.p.x - bord.g.dunk.p.x < 150 && bord.g.kolbe.p.x > kumme.p.x + 80);
+    var V33 = B.volumen(g(2));
+    bord.moede(g(2), hane, null);
+    faerdig();
+    paastand("et reagensglas under hanen får 4 mL demineraliseret vand og bliver stående",
+        Math.abs(B.volumen(g(2)) - V33 - 4) < 0.05 && !!g(2).svaev && g(2).svaev.maal === hane, tal(B.volumen(g(2)), 1) + " mL");
+    var ring33 = bord.svaevRing();
+    paastand("pilen siger, hvor meget vand den giver (»4 mL vand mere«, F62)", !!ring33 && ring33.tekst === "4 mL vand mere", ring33 && ring33.tekst);
+    side.opdaterFyldOp();
+    paastand("men »Fyld op til« står ikke ved et reagensglas", d.getElementById("fyldop").hidden);
+    bord.klik("svaevring");
+    faerdig();
+    paastand("pilen giver 4 mL mere", Math.abs(B.volumen(g(2)) - V33 - 8) < 0.05, tal(B.volumen(g(2)), 1) + " mL");
+    bord.stilSvaevendeNed(true);
+    adv(0.5);
+    paastand("stilles det ned igen, går reagensglasset tilbage i sit hul", !!g(2).sted && g(2).sted.hul === 1);
+    NK.DELE.saet(bord, 2, true);
+    adv(0.5);
+    var b33 = bord.g.baeger1;
+    paastand("hanen og vasken står også i del 2", bord.synlig(hane) && bord.synlig(kumme));
+    bord.moede(b33, hane, null);
+    faerdig();
+    side.opdaterFyldOp();
+    paastand("et bægerglas under hanen får 25 mL, og »Fyld op til« står ved det", Math.abs(B.volumen(b33) - 25) < 0.05 && !d.getElementById("fyldop").hidden,
+        tal(B.volumen(b33), 1) + " mL");
+    bord.fyldOpTil(b33, hane, 60);
+    faerdig();
+    paastand("»Fyld op til« 60 fylder det op fra hanen", Math.abs(B.volumen(b33) - 60) < 0.1 && !St.konc(B.samlet(b33), "Fe3+"), tal(B.volumen(b33), 1) + " mL");
+    bord.stilSvaevendeNed(true);
+    NK.DELE.saet(bord, 1, true);
+    adv(0.5);
+    /* Kummen: tømmer; tungmetal giver en bemærkning, vand ikke */
+    var sagt33 = [], lsig33 = bord.laererSig, altid33 = bord.laererAltid;
+    bord.laererAltid = true;
+    bord.laererSig = function (tekst) { sagt33.push(tekst); return lsig33.apply(this, arguments); };
+    bord.moede(g(2), kumme, null);
+    faerdig();
+    for (var r33 = 0; r33 < 20; r33++) adv(0.5);
+    paastand("et glas med kun stamopløsning og vand i vasken: tømt, og ingen bemærkning", B.tom(g(2)) && !sagt33.some(function (t) { return t.indexOf("vasken") >= 0; }), sagt33.join(" | "));
+    B.haeldI(g(4), B.udtag(bord.g.kolbe, PORTION), true);
+    B.haeldI(g(4), B.udtag(bord.g.ag, 0.1), true);
+    adv(2);
+    bord.moede(g(4), kumme, null);
+    faerdig();
+    for (r33 = 0; r33 < 40 && !sagt33.some(function (t) { return t.indexOf("Sølv i vasken") === 0; }); r33++) adv(0.5);
+    paastand("sølv i vasken: »Sølv i vasken. Tungmetaller skal i affaldsdunken …«",
+        sagt33.some(function (t) { return t.indexOf("Sølv i vasken") === 0; }), sagt33.join(" | "));
+    bord.laererSig = lsig33;
+    bord.laererAltid = altid33;
+    for (r33 = 0; r33 < 80 && bord.laerer.scene; r33++) adv(0.25);
+    paastand("det står også i kortet »Sagt i laboratoriet«", side.replikker.some(function (x) { return x.tekst.indexOf("Sølv i vasken") === 0; }));
+    /* Med musen: glasset under tuden giver hanen, over kummen vasken */
+    NK.startForfra();
+    adv(0.5);
+    B.haeldI(g(3), B.udtag(bord.g.kolbe, PORTION), true);
+    var tud33 = B.tudVerden(hane);
+    mus.tag("glas3", 0.5, 0.3);
+    var gg33 = g(3), gr = { x: mus.her().x - gg33.p.x, y: mus.her().y - gg33.p.y };
+    mus.til({ x: tud33.x + gr.x, y: tud33.y + 30 + gr.y }, 0.8);
+    var m1 = bord.slipMaal;
+    var rk33 = bord.rekt(kumme, 0);
+    mus.til({ x: rk33.x + rk33.b - 12, y: rk33.y - 80 }, 0.6);
+    var m2 = bord.slipMaal;
+    mus.slip();
+    faerdig();
+    paastand("med musen: under tuden er målet hanen, ude over kummen vasken", m1 === "hane" && m2 === "vask" && B.tom(g(3)), m1 + ", " + m2);
+
+    NK.startForfra();
+    adv(1);
+
+    overskrift("34. Spatlen, noterne, uret, kaffen, plakaten og »Fyld op til« (F54-F64)");
+    NK.startForfra();
+    adv(0.5);
+    /* F59: plakaten er mindre, skriften 1 px stoerre, punkterne korte */
+    var pr34 = bord.plakatRekt();
+    paastand("plakaten fylder mindre end før (132 × 128), og punkterne er korte (F59)",
+        pr34.b * pr34.h < 132 * 128 * 0.85 && NK.Tegning.PLAKAT_REGLER[1] === "Ingen mad i laboratoriet" && NK.Tegning.PLAKAT_REGLER[2] === "Ingen åben ild",
+        Math.round(pr34.b) + " × " + Math.round(pr34.h));
+    /* F58: uret og koppen ved plakaten */
+    var ur34 = bord.ur, kop34 = bord.rekt(bord.g.kaffekop, 0);
+    paastand("uret hænger over plakaten, og koppen står under den på hylden til højre (F58)",
+        !!ur34 && Math.abs(ur34.x - (pr34.x + pr34.b / 2)) < 1 && ur34.y + ur34.r < pr34.y &&
+        kop34.y > pr34.y + pr34.h && kop34.x > pr34.x - 6 && kop34.x + kop34.b < pr34.x + pr34.b + 6 && Math.abs(kop34.y + kop34.h - 230) < 3,
+        "ur " + (ur34 ? Math.round(ur34.x) + "," + Math.round(ur34.y) : "intet") + ", kop " + Math.round(kop34.x) + "," + Math.round(kop34.y));
+    paastand("musen over uret rammer det", bord.hvad({ x: ur34.x, y: ur34.y }) === "ur");
+    /* F57: et klik paa uret - fem minutter, og temperaturen falder til ro */
+    B.haeldI(g(5), B.udtag(bord.g.kolbe, PORTION), true);
+    B.haeldI(g(6), B.udtag(bord.g.kolbe, PORTION), true);
+    bord.iBad(g(5), bord.g.vandbad);
+    bord.iBad(g(6), bord.g.isbad);
+    faerdig();
+    bord.moede(bord.g.termometer, g(5));
+    faerdig();
+    bord.g.plade.taendt = true;
+    adv(1);
+    var T5 = g(5).indhold.T, T6 = g(6).indhold.T, min34 = bord.urMinutter();
+    paastand("før: glas 5 er ikke varmt, glas 6 ikke koldt endnu", T5 < 40 && T6 > 8, tal(T5, 1) + " og " + tal(T6, 1) + " °C");
+    bord.hover = "ur";
+    try { bord.tegn(); paastand("uret og dets skilt tegnes uden fejl", true); } catch (e) { paastand("uret og dets skilt tegnes uden fejl", false, e.message); }
+    bord.hover = null;
+    paastand("et klik på uret springer frem", bord.klik("ur") && !!bord.spring);
+    adv(2);
+    paastand("viserne er gået fem minutter frem (F57)", !bord.spring && Math.abs(bord.urMinutter() - min34 - 5 - 2 / 60) < 0.02,
+        tal(bord.urMinutter() - min34, 2) + " min");
+    paastand("glassene står ved badenes temperatur: 80 og 2 °C", Math.abs(g(5).indhold.T - 80) < 1 && Math.abs(g(6).indhold.T - 2) < 1,
+        tal(g(5).indhold.T, 1) + " og " + tal(g(6).indhold.T, 1) + " °C");
+    paastand("og termometeret viser det", Math.abs(bord.g.termometer.visT - 80) < 1, tal(bord.g.termometer.visT, 1) + " °C");
+    paastand("over uret står »+5 min«", bord.tilsat.some(function (t) { return t.tekst === "+5 min"; }));
+
+    /* F64: den groenne tekst - draabe og hane i del 1 */
+    NK.startForfra();
+    adv(0.5);
+    B.haeldI(g(4), B.udtag(bord.g.kolbe, PORTION), true);
+    bord.moede(bord.g.ag, g(4));
+    faerdig();
+    paastand("en dråbe: »1 dråbe tilsat« over glasset (F64)", bord.tilsat.some(function (t) { return t.c === g(4) && t.tekst === "1 dråbe tilsat"; }),
+        bord.tilsat.map(function (t) { return t.tekst; }).join(" | "));
+    bord.stilSvaevendeNed(true);
+    bord.moede(g(2), hane, null);
+    faerdig();
+    paastand("hanen: »4 mL tilsat«", bord.tilsat.some(function (t) { return t.c === g(2) && t.tekst === "4 mL tilsat"; }),
+        bord.tilsat.map(function (t) { return t.tekst; }).join(" | "));
+    bord.stilSvaevendeNed(true);
+
+    /* F56: uheldene staar under noterne, én linje hver */
+    var uh34 = d.getElementById("uheld-liste");
+    side.opdaterPanel();
+    paastand("ingen uheld: listen er tom, og tælleren siger 0", uh34.children.length === 0 && !d.getElementById("uheld-ingen").hidden &&
+        d.getElementById("noter-uheld").textContent === "Uheld: 0");
+    bord.laererAltid = true;
+    bord.spild(g(2), "rystet");
+    side.opdaterPanel();
+    paastand("et uheld: »Uheld 1: …« og »Uheld: 1« i hjørnet (F56)",
+        uh34.children.length === 1 && uh34.children[0].textContent.indexOf("Uheld 1: Glas 2") === 0 && d.getElementById("noter-uheld").textContent === "Uheld: 1",
+        uh34.children.length ? uh34.children[0].textContent : "ingen");
+    for (var r34 = 0; r34 < 80 && bord.laerer.scene; r34++) adv(0.25);
+    bord.laererAltid = false;
+
+    /* F54: et pulverglas hen til et glas - en ren spatel fra boetten */
+    NK.startForfra();
+    adv(0.5);
+    function fe34(n) { var o = B.samlet(g(n)); return (o.n["Fe(NO3)3(s)"] || 0) + (o.n["Fe3+"] || 0) + (o.n["FeSCN2+"] || 0) + (o.n["Fe2+"] || 0); }
+    B.haeldI(g(1), B.udtag(bord.g.kolbe, PORTION), true);
+    var fe0 = fe34(1), n34 = bord.liste.length, jar34 = bord.g.pulver_fe, hjem34 = { x: jar34.hjem.x, y: jar34.hjem.y };
+    klikKlik("pulver_fe", "glas1");
+    var sp34 = jar34.svaev && jar34.svaev.spatel;
+    paastand("pulverglasset og så glas 1: en spatelspids (8 µmol) i glasset (F54)", Math.abs(fe34(1) - fe0 - 8) < 0.01, tal(fe34(1) - fe0, 2) + " µmol");
+    paastand("spatlen kom fra bøtten og var ren", !!sp34 && sp34.spec && sp34.spec.ekstra && bord.liste.length === n34 + 1 &&
+        sp34.snavs.length === 1 && sp34.snavs[0].stof === "Fe(NO3)3(s)" && !(jar34.forurenet && jar34.forurenet.length));
+    paastand("pulverglasset svæver ved glasset med »En spatelspids mere«", jar34.svaev.maal === g(1) && !!bord.svaevRing() && bord.svaevRing().tekst === "En spatelspids mere");
+    paastand("og den grønne tekst siger »1 spatelspids tilsat« (F64)", bord.tilsat.some(function (t) { return t.c === g(1) && t.tekst === "1 spatelspids tilsat"; }));
+    bord.klik("svaevring");
+    faerdig();
+    paastand("pilen: en spatelspids mere med den samme spatel", Math.abs(fe34(1) - fe0 - 16) < 0.01 && jar34.svaev && jar34.svaev.spatel === sp34 && bord.liste.length === n34 + 1,
+        tal(fe34(1) - fe0, 2) + " µmol");
+    bord.stilSvaevendeNed();
+    faerdig();
+    paastand("tages der fat i noget andet: pulverglasset hjem, spatlen i kurven", !jar34.svaev && Math.abs(jar34.p.x - hjem34.x) < 1 && Math.abs(jar34.p.y - hjem34.y) < 1 &&
+        bord.liste.indexOf(sp34) < 0 && bord.liste.length === n34);
+    /* Med musen */
+    B.haeldI(g(2), B.udtag(bord.g.kolbe, PORTION), true);
+    var o34 = B.aabning(g(2));
+    mus.tag("pulver_asc");
+    mus.til({ x: o34.x, y: o34.y - 8 }, 0.8);
+    var m34 = bord.slipMaal;
+    mus.slip();
+    faerdig();
+    paastand("pulverglasset trukket hen over glas 2: målet er glasset, og C-vitaminen kommer i", m34 === "glas2" &&
+        (B.samlet(g(2)).n["Asc(s)"] || 0) + (B.samlet(g(2)).n.Asc || 0) + (B.samlet(g(2)).n["Fe2+"] || 0) > 0.5, m34);
+    bord.stilSvaevendeNed(true);
+
+    /* F55: en brugt spatel i et andet stof */
+    var sp55 = bord.g.spatel, sagt34 = [], lsig34 = bord.laererSig;
+    bord.laererSig = function (tekst) { sagt34.push(tekst); return lsig34.apply(this, arguments); };
+    bord.fyldSpatel(sp55, bord.g.pulver_fe);
+    faerdig();
+    bord.toemSpatel(sp55, g(3));
+    faerdig();
+    bord.stilSvaevendeNed(true);
+    paastand("samme stof igen er ikke en forurening", !bord.g.pulver_fe.forurenet || !bord.g.pulver_fe.forurenet.length);
+    bord.fyldSpatel(sp55, bord.g.pulver_kscn);
+    faerdig();
+    var kscn34 = bord.g.pulver_kscn;
+    paastand("den brugte spatel i KSCN: bøtten er forurenet med Fe(NO₃)₃ (F55)", kscn34.forurenet && kscn34.forurenet.length === 1 && kscn34.forurenet[0].stof === "Fe(NO3)3(s)");
+    bord.stilSvaevendeNed(true);
+    bord.vaelg("pulver_kscn");
+    side.opdaterPanel();
+    var fu34 = d.getElementById("glas-forurenet");
+    paastand("klikker man på bøtten, står det i beskrivelsen", !fu34.hidden && fu34.textContent.indexOf("Forurenet med jern(III)nitrat") === 0, fu34.textContent);
+    for (r34 = 0; r34 < 60 && !sagt34.some(function (t) { return t.indexOf("Stop!") === 0; }); r34++) adv(0.5);
+    paastand("og Kemichael skælder ud", sagt34.some(function (t) { return t.indexOf("Stop! Den spatel har været i jern(III)nitrat") === 0; }), sagt34.join(" | "));
+    bord.laererSig = lsig34;
+    for (r34 = 0; r34 < 80 && bord.laerer.scene; r34++) adv(0.25);
+    NK.startForfra();
+    adv(0.5);
+    paastand("Start forfra: bøtterne er rene igen", !bord.g.pulver_kscn.forurenet);
+
+    /* F60-F64 i del 2: frugtfarven, pilen, feltet og den groenne tekst */
+    NK.DELE.saet(bord, 2, true);
+    adv(0.5);
+    bord.moede(bord.g.fl_farve, baeg(1));
+    faerdig();
+    paastand("frugtfarven giver 5 mL (F60), og det står over glasset (F64)", Math.abs(B.volumen(baeg(1)) - 5) < 0.05 &&
+        bord.tilsat.some(function (t) { return t.c === baeg(1) && t.tekst === "5 mL tilsat"; }), tal(B.volumen(baeg(1)), 1) + " mL");
+    paastand("pilen siger »5 mL mere« (F62)", !!bord.svaevRing() && bord.svaevRing().tekst === "5 mL mere", bord.svaevRing() && bord.svaevRing().tekst);
+    side.opdaterFyldOp();
+    paastand("»Fyld op til« foreslår 10 mL, når der er 5 (F61)", d.getElementById("fyldop-ml").value === "10", d.getElementById("fyldop-ml").value);
+    bord.stilSvaevendeNed(true);
+    bord.sproejt(bord.g.vand, baeg(1), 20);
+    faerdig();
+    paastand("sprøjteflasken: »20 mL tilsat«", bord.tilsat.some(function (t) { return t.c === baeg(1) && t.tekst === "20 mL tilsat"; }),
+        bord.tilsat.map(function (t) { return t.tekst; }).join(" | "));
+    NK.DELE.saet(bord, 1, true);
+
+    NK.startForfra();
+    adv(1);
+}
+
+function vis() {
+    skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK"), fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+</script>
+</body>
+</html>

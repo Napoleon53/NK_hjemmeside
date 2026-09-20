@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest - Opløselighed af blyiodid</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:800px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script src="../../laboratoriet/js/proeve.js"></script>
+<script src="../../laboratoriet/js/tjek.js"></script>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i animationen og kan slettes.
+
+   Aabner index.html i en iframe og koerer forsoeget igennem: PbI2's
+   oploselighed og maetningstemperaturerne i stoftabellen, afvejningen
+   (spatelspidser, at tage af, vaegtens tre decimaler og reglen for,
+   hvad der maa haeldes i), varmepladen med magnetomroereren, de tre
+   maalinger med facit fra verden, Start forfra, oevelsestjekket (M2) og
+   til sidst det samme med musen, som en elev (proeve.js).
+
+   Skal aabnes gennem en lokal server (eller Chrome med
+   --allow-file-access-from-files), ellers kan iframen ikke laeses.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) skriv("  ok    " + navn + (note !== undefined ? "   (" + note + ")" : ""), "ok");
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function overskrift(t) { skriv("\n" + t, "h"); }
+function tal(x, d) { return Number(x).toFixed(d === undefined ? 2 : d).replace(".", ","); }
+
+window.addEventListener("load", function () { setTimeout(koer, 1800); });
+
+function koer() {
+    try { koerTest(); } catch (e) { fejl++; skriv("UNDTAGELSE: " + e.message + "\n" + e.stack, "fejl"); }
+    vis();
+}
+
+function koerTest() {
+    var ramme = document.getElementById("ramme");
+    var d = ramme.contentDocument, vin = ramme.contentWindow;
+    var NK = vin.NK;
+    if (NK && NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+
+    overskrift("1. Indlaesning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var bord = NK.bord, B = NK.Beholder, St = NK.Stof, V = NK.Vilkaar, M = NK.MAALING;
+    var side = NK.Side.nu, F = NK.Forloeb.nu;
+    NK.intro.luk();
+    paastand("bordet er bygget", !!bord);
+    paastand("skallen er den faelles side.js", !!side && side.navn === "sc27");
+    paastand("forloebet har syv trin og tre udloesere", !!F && F.trin.length === 7 && F.udloesere.length === 3,
+        F && F.trin.length + " trin, " + F.udloesere.length + " udloesere");
+    var navne = ["dunk", "vaegt", "baad", "plade", "baeger", "maaleglas", "pb", "ki", "papir", "kurv", "spatler", "spatel", "termometer"];
+    var mangler = navne.filter(function (n) { return !bord.g[n]; });
+    paastand("udstyret staar paa bordet", !mangler.length, mangler.join(", ") || navne.length + " genstande");
+    paastand("vejebaaden staar paa vaegten, bægerglasset paa varmepladen",
+        bord.g.baad.paa === bord.g.vaegt && bord.g.baeger.paa === bord.g.plade);
+    paastand("maaleglasset har 100 mL vand", Math.abs(B.volumen(bord.g.maaleglas) - 100) < 0.01);
+    paastand("teksterne er skrevet ind fra tekst.js",
+        d.getElementById("teori-indhold").textContent.indexOf("Opløseligheden") >= 0 &&
+        d.getElementById("forloeb-tekst").textContent.indexOf("100 mL vand") >= 0);
+    paastand("knappen Notér temperatur og kortet Målinger findes",
+        !!d.getElementById("maaleknap") && !!d.getElementById("maaling-kort") &&
+        d.getElementById("maaling-tom").textContent.indexOf("Ingen målinger") === 0);
+    var alle = Object.keys(NK.Sprites.FILER);
+    var klar = alle.filter(function (n) { return NK.Sprites.klar(n); });
+    paastand("sprites er indlaest", klar.length === alle.length, klar.length + " af " + alle.length);
+    paastand("vaegten viser tre decimaler og er tareret med vejebaaden", bord.vaegtTekst(bord.g.vaegt) === "0,000 g",
+        bord.vaegtTekst(bord.g.vaegt));
+    paastand("vejebaaden og pulverglassene kan ikke rystes, bægerglasset kan (F76)", !bord.kanRystes(bord.g.baad) &&
+        !bord.kanRystes(bord.g.pb) && bord.kanRystes(bord.g.baeger));
+
+    /* F73-F75: bøtterne er større, etiketten har kun formlen, og
+       faremaerkerne staar paa etiketten og stort i panelet */
+    var pb = bord.g.pb;
+    paastand("pulverglassene er 1,45 gange motorens, og etiketten har kun formlen (F73)", pb.skala === 1.45 &&
+        pb.etiket === "Pb(NO₃)₂" && Math.abs(pb.type.b - 38 * 1.45) < 1e-9 && !!pb.type.maerkeFelt, pb.type.b.toFixed(1) + " bred");
+    var tegnet = [], ctxSpy = { save: function () {}, restore: function () {}, translate: function () {}, rotate: function () {}, scale: function () {},
+        beginPath: function () {}, moveTo: function () {}, lineTo: function () {}, closePath: function () {}, fill: function () {}, stroke: function () {},
+        quadraticCurveTo: function () {}, arc: function () {}, ellipse: function () {}, fillRect: function () {}, measureText: function (t) { return { width: t.length * 5 }; },
+        fillText: function (t) { tegnet.push(t); }, strokeText: function () {} };
+    NK.Tegning.tegnEtiket(ctxSpy, pb);
+    paastand("formlen staar på etiketten med stor skrift", tegnet.indexOf("Pb(NO₃)₂") >= 0);
+    var buer = 0;
+    ctxSpy.arc = function () { buer++; };
+    bord.mikro.tegnKant(ctxSpy, 1);
+    paastand("zoomboblens kant er én cirkel uden glansbue (F72)", buer === 1, buer + " buer");
+    bord.vaelg("pb");
+    side.opdaterPanel();
+    var fare = d.getElementById("glas-fare"), figurer = fare ? fare.querySelectorAll("figure") : [];
+    paastand("det valgte pulverglas viser sine faremærker stort med navn (F74)", !!fare && !fare.hidden && figurer.length === 3 &&
+        fare.textContent.indexOf("Brandnærende") >= 0 && fare.querySelector("canvas").getBoundingClientRect().width >= 36,
+        fare ? fare.textContent : "intet felt");
+    var formel = d.querySelector("#glas-titel .formel");
+    paastand("formlen i overskriften står ikke med store bogstaver (F75)", !!formel && formel.textContent === "Pb(NO₃)₂" &&
+        vin.getComputedStyle(formel).textTransform === "none", d.getElementById("glas-titel").textContent);
+    bord.vaelg("ki");
+    side.opdaterPanel();
+    paastand("KI har ingen faremærker, og feltet er skjult", fare.hidden);
+    bord.vaelg(null);
+    side.opdaterPanel();
+
+    function adv(sek) { for (var k = 0; k < Math.round(sek * 20); k++) bord.opdater(0.05); F.opdater(); }
+    var beskeder = [], vedB = bord.vedBesked;
+    bord.vedBesked = function (t, s) { beskeder.push(t); if (vedB) vedB.call(bord, t, s); };
+    function sidste() { return beskeder.length ? beskeder[beskeder.length - 1] : ""; }
+
+    overskrift("2. Kemien: PbI2's oploselighed");
+    var rx = St.REAKTIONER.filter(function (r) { return r.id === "pbi2"; })[0];
+    paastand("faeldningen staar i stoftabellen med ΔH og ΔCp", !!rx && rx.slags === "faeld" && rx.dH > 0 && rx.dCp > 0,
+        rx && "K " + rx.K + ", ΔH " + rx.dH + " kJ/mol, ΔCp " + rx.dCp + " J/(mol·K)");
+    /* Oploeseligheden i g pr. 100 mL: Ksp = 4s³ (mM), m = s · 461 · 0,1 mg */
+    function opl(T) { return Math.pow(St.Kved(rx, T) / 4, 1 / 3) * 461 * 1e-4; }
+    [[0, 0.044, 0.003], [20, 0.069, 0.003], [100, 0.41, 0.02]].forEach(function (p) {
+        paastand("oploeseligheden ved " + p[0] + " °C er " + tal(p[1], 3) + " g pr. 100 mL", Math.abs(opl(p[0]) - p[1]) <= p[2],
+            tal(opl(p[0]), 4) + " g");
+    });
+    var stiger = true;
+    for (var tt = 0; tt < 100; tt += 5) if (!(St.Kved(rx, tt + 5) > St.Kved(rx, tt))) stiger = false;
+    paastand("K stiger hele vejen fra 0 til 100 °C", stiger);
+    function glas(gPb, gKI, T) {
+        return { V: 100, T: T === undefined ? 20 : T, n: { "Pb2+": gPb / 331.2 * 1e6, "NO3-": 2 * gPb / 331.2 * 1e6,
+            "K+": gKI / 166 * 1e6, "I-": gKI / 166 * 1e6 } };
+    }
+    [[0.100, 51.5], [0.150, 69.7], [0.200, 82.6]].forEach(function (p) {
+        var t = St.maetningsT(glas(p[0], p[0]), rx);
+        paastand("de foerste krystaller ved " + tal(p[0], 3) + " g af hvert salt: ca. " + tal(p[1], 0) + " °C (som den gamle)",
+            t !== null && Math.abs(t - p[1]) < 1.5, t === null ? "null" : tal(t, 1) + " °C");
+    });
+    var o1 = glas(0.1, 0.1);
+    paastand("ved maetningstemperaturen er ionproduktet K", Math.abs(St.ionprodukt(o1, rx) / St.Kved(rx, St.maetningsT(o1, rx)) - 1) < 1e-6);
+    paastand("bundet PbI2 taeller med i maetningen", (function () {
+        var o2 = glas(0.1, 0.1); o2.n["Pb2+"] -= 100; o2.n["I-"] -= 200; o2.n["PbI2(s)"] = 100;
+        return Math.abs(St.maetningsT(o2, rx) - St.maetningsT(o1, rx)) < 1e-6;
+    }()));
+    /* Bundfaldet oploeses hurtigere under omroering (fartOploes) */
+    function oploesTid(s) {
+        var o = { V: 100, T: 70, n: { "PbI2(s)": 300, "K+": 600, "NO3-": 600 } };
+        for (var i = 0; i < 2000; i++) {
+            St.skridt(o, 0.05, [rx], s);
+            if ((o.n["PbI2(s)"] || 0) < 1) return i * 0.05;
+        }
+        return Infinity;
+    }
+    var med = oploesTid({ roer: true }), uden = oploesTid({});
+    paastand("bundfaldet oploeses hurtigere under omroering", med * 2 < uden, tal(med, 1) + " s med, " + tal(uden, 1) + " s uden");
+    var o3 = glas(0.1, 0.1, 20);
+    for (var i3 = 0; i3 < 200; i3++) St.skridt(o3, 0.05, [rx], {});
+    var fast3 = (o3.n["PbI2(s)"] || 0) * 461e-6;
+    paastand("ved 20 °C falder 0,146 − 0,069 g PbI2 ud", Math.abs(fast3 - (0.1 / 331.2 * 461 - 0.0688)) < 0.004, tal(fast3, 4) + " g");
+    paastand("PbI2 farver vaesken tydeligt gul, naar det hvirvler rundt (daekke)", St.uklar(o3) > 0.3 &&
+        St.fastFarve({ V: 100, n: { "PbI2(s)": 10, "KI(s)": 500 } }, true).b < 60, tal(St.uklar(o3)));
+
+    overskrift("3. Afvejningen");
+    NK.startForfra();
+    adv(0.5);
+    var baad = bord.g.baad, pb = bord.g.pb, ki = bord.g.ki;
+    function gram() { var f = St.faste(baad.indhold)[0]; return f ? f.umol * f.stof.M * 1e-6 : 0; }
+    function vist() { return parseFloat(bord.vaegtTekst(bord.g.vaegt).replace(",", ".")); }
+    function renSpatel() {
+        return bord.liste.filter(function (x) { return x.type.navn === "spatel" && !x.autoFor && !x.last && !x.svaev; })[0];
+    }
+    function afvej(jar, lo, hi) {
+        var n = 0;
+        while (vist() < lo && n++ < 20) { bord.moede(bord.g[jar], baad); adv(3.5); }
+        n = 0;
+        while (vist() > hi && n++ < 30) { var sp = renSpatel(); bord.moede(sp, baad); adv(2.5); bord.moede(sp, bord.g.kurv); adv(2); }
+        return vist();
+    }
+    function tilDunk() { bord.moede(baad, bord.g.dunk); adv(4); }
+    paastand("spatlen er den gamle sc2.7's", NK.SPATEL.spids[0] === 0.038 && NK.SPATEL.spids[1] === 0.062 &&
+        NK.SPATEL.af[0] === 0.004 && NK.SPATEL.af[1] === 0.016 &&
+        pb.spec.spatelGram === NK.SPATEL.spids && ki.spec.spatelGram === NK.SPATEL.spids && baad.spec.spatelGram === NK.SPATEL.af);
+    var spidser = [], foer = 0;
+    for (var s1 = 0; s1 < 6; s1++) { bord.moede(pb, baad); adv(3.5); spidser.push(gram() - foer); foer = gram(); }
+    paastand("en spatelspids er 0,038-0,062 g", spidser.every(function (x) { return x > 0.038 - 1e-6 && x < 0.062 + 1e-6; }),
+        spidser.map(function (x) { return tal(x, 3); }).join(" "));
+    paastand("og forskellig hver gang", spidser.some(function (x) { return Math.abs(x - spidser[0]) > 0.001; }));
+    paastand("vaegten viser massen med tre decimaler", bord.vaegtTekst(bord.g.vaegt) === tal(Math.round(gram() * 1000) / 1000, 3) + " g",
+        bord.vaegtTekst(bord.g.vaegt) + " for " + tal(gram(), 5) + " g");
+    paastand("vejebaaden er noget, en tom spatel kan tage af", bord.kanTageAf(baad) && !bord.kanTageAf(bord.g.baeger));
+    var af = [];
+    for (var s2 = 0; s2 < 4; s2++) {
+        var sp2 = renSpatel(), g0 = gram();
+        bord.moede(sp2, baad); adv(2.5);
+        af.push(g0 - gram());
+        bord.moede(sp2, bord.g.kurv); adv(2);
+    }
+    paastand("en tom spatel tager 0,004-0,016 g af", af.every(function (x) { return x > 0.004 - 1e-6 && x < 0.016 + 1e-6; }),
+        af.map(function (x) { return tal(x, 3); }).join(" "));
+    paastand("og kommer i kurven, hvor den skiftes ud med en ren (F68)",
+        beskeder.indexOf("Spatlen er skiftet ud med en ren.") >= 0 && !!renSpatel());
+    tilDunk();
+    paastand("vejebaaden kan toemmes i dunken og staar paa vaegten igen", gram() === 0 && baad.paa === bord.g.vaegt &&
+        bord.vaegtTekst(bord.g.vaegt) === "0,000 g", bord.vaegtTekst(bord.g.vaegt));
+
+    /* Reglen: hvad der maa haeldes i bægerglasset */
+    var baeger = bord.g.baeger;
+    bord.moede(bord.g.maaleglas, baeger); adv(6);
+    paastand("maaleglasset giver hele sine 100 mL i ét tryk", Math.abs(B.volumen(baeger) - 100) < 0.05, tal(B.volumen(baeger), 1) + " mL");
+    function iGlasset(navn) { return V.tilsatGram(B.samlet(baeger), navn); }
+    afvej("ki", 0.095, 0.105);
+    beskeder.length = 0;
+    bord.moede(baad, baeger); adv(4);
+    paastand("KI foer Pb(NO3)2 afvises", iGlasset("KI(s)") === 0 && sidste() === NK.TEKST.maaling["foerst-pb"], sidste());
+    paastand("og vejebaaden gaar hjem til vaegten og vejes igen", baad.paa === bord.g.vaegt && vist() > 0.09 && !baad.svaev,
+        bord.vaegtTekst(bord.g.vaegt));
+    tilDunk();
+    bord.moede(pb, baad); adv(3.5);
+    var enSpids = vist();
+    bord.moede(baad, baeger); adv(4);
+    paastand("én spatelspids Pb(NO3)2 er for lidt første gang", iGlasset("Pb(NO3)2(s)") === 0 &&
+        sidste().indexOf("mellem 0,090 og 0,110 g") > 0 && sidste().indexOf(tal(enSpids, 3)) > 0, sidste());
+    var mPb = afvej("pb", 0.093, 0.107);
+    beskeder.length = 0;
+    bord.moede(baad, baeger); adv(4);
+    paastand("0,090-0,110 g Pb(NO3)2 kommer i", Math.abs(iGlasset("Pb(NO3)2(s)") - mPb) < 0.0006 && M.ventKI && M.sidstePb === mPb,
+        tal(mPb, 3) + " g");
+    paastand("trinnet Pb(NO3)2 er gjort", F.erGjort("vand") && F.erGjort("pb") && !F.erGjort("ki"));
+    afvej("pb", 0.040, 0.060);
+    bord.moede(baad, baeger); adv(4);
+    paastand("mere Pb(NO3)2, foer KI er kommet i, afvises", sidste() === NK.TEKST.maaling["foerst-ki"], sidste());
+    tilDunk();
+    afvej("ki", 0.030, mPb - 0.012);
+    bord.moede(baad, baeger); adv(4);
+    paastand("KI mere end 0,010 g fra Pb(NO3)2 afvises", iGlasset("KI(s)") === 0 && sidste().indexOf("samme masse") > 0, sidste());
+    afvej("ki", mPb - 0.006, mPb + 0.006);
+    var mKI = vist();
+    bord.moede(baad, baeger); adv(4);
+    paastand("samme masse KI kommer i", Math.abs(iGlasset("KI(s)") - mKI) < 0.0006 && !M.ventKI, tal(mKI, 3) + " g mod " + tal(mPb, 3) + " g");
+    paastand("trinnet KI er gjort", F.erGjort("ki"));
+    bord.moede(pb, baad); adv(3.5);
+    bord.moede(ki, baad); adv(3.5);
+    bord.moede(baad, baeger); adv(4);
+    paastand("to stoffer paa vejebaaden afvises", sidste() === NK.TEKST.maaling.blandet, sidste());
+    tilDunk();
+    afvej("pb", 0.095, 0.105);
+    bord.moede(baad, baeger); adv(4);
+    paastand("anden gang er 0,100 g for meget (0,040-0,060 g)", sidste().indexOf("mellem 0,040 og 0,060 g") > 0, sidste());
+    tilDunk();
+    paastand("afvisningerne har ikke flyttet noget i glasset", Math.abs(iGlasset("Pb(NO3)2(s)") - mPb) < 0.0006 &&
+        Math.abs(iGlasset("KI(s)") - mKI) < 0.0006);
+    var tm = bord.g.termometer;
+    side.noterTemperatur();
+    paastand("uden termometer i glasset kan der ikke noteres", M.journal.antal() === 0 && sidste() === NK.TEKST.maaling.termometer, sidste());
+    bord.moede(tm, baeger); adv(3);
+    paastand("termometeret sidder i bægerglasset", tm.i === baeger);
+    side.noterTemperatur();
+    paastand("med bundfald fra start: »varm op, til bundfaldet er væk«", M.journal.antal() === 0 && sidste() === NK.TEKST.maaling["ikke-klar"], sidste());
+
+    overskrift("4. Varmepladen med magnetomroerer");
+    var plade = bord.g.plade, rp = bord.rekt(plade, 0);
+    var venstre = { x: rp.x + rp.b * 0.25, y: rp.y + rp.h * 0.6 }, hoejre = { x: rp.x + rp.b * 0.75, y: rp.y + rp.h * 0.6 };
+    paastand("pladen har effekt, traeghed og omroerer", plade.spec.effekt === 1100 && plade.spec.traeghed === 2.2 && !!plade.kan.omroerer);
+    bord.klik("plade", hoejre);
+    paastand("et klik paa hoejre halvdel taender omroeringen", !!plade.omroerer && !plade.taendt && sidste() === "Omrøringen er tændt.", sidste());
+    paastand("og glasset paa pladen roeres", bord.omgivelser(baeger).roer === true);
+    bord.klik("plade", venstre);
+    paastand("et klik paa venstre halvdel taender varmen", !!plade.taendt && !!plade.omroerer);
+    adv(10);
+    var T0 = B.samlet(baeger).T;
+    adv(2);
+    var T1 = B.samlet(baeger).T, midt = (T0 + T1) / 2;
+    var brutto = (T1 - T0) / 2 + (midt - 20) / B.TEMP.tauLuft;
+    paastand("1100 W varmer 100 mL med ca. 2,6 °C/s (som den gamle)", Math.abs(brutto - 2.63) < 0.35,
+        tal((T1 - T0) / 2) + " °C/s netto ved " + tal(midt, 0) + " °C, " + tal(brutto) + " °C/s brutto");
+    var n0 = 0;
+    while (!M.klar(baeger) && n0++ < 200) adv(0.5);
+    var Tklar = B.samlet(baeger).T, facit1 = M.maetning(baeger);
+    paastand("glasset bliver klart lidt over maetningstemperaturen", M.klar(baeger) && Tklar > facit1 && Tklar < facit1 + 8,
+        "klart ved " + tal(Tklar, 1) + " °C, maetning " + tal(facit1, 1) + " °C");
+    paastand("trinnet »varm op« er gjort", F.erGjort("klar"));
+    adv(1);
+    paastand("i det klare glas er der ingen krystaller at se", !(baeger.flager || []).length);
+    side.noterTemperatur();
+    paastand("klart og varmt: »der er ingen krystaller endnu«", M.journal.antal() === 0 && sidste() === NK.TEKST.maaling["ingen-krystaller"], sidste());
+    bord.klik("plade", venstre);
+    bord.klik("plade", hoejre);
+    paastand("begge knapper slukker igen", !plade.taendt && !plade.omroerer && bord.omgivelser(baeger).roer === false);
+    var Tsluk = B.samlet(baeger).T;
+    adv(6);
+    paastand("pladen er traeg: glasset stiger lidt endnu og koeler saa af", B.samlet(baeger).T < Tsluk + 6 && plade.T < 120,
+        tal(Tsluk, 1) + " → " + tal(B.samlet(baeger).T, 1) + " °C, pladen " + tal(plade.T, 0) + " °C");
+
+    overskrift("5. Maalingerne");
+    var n1 = 0;
+    while (!M.krystaller(baeger) && n1++ < 400) adv(0.25);
+    var Tk = B.samlet(baeger).T, facit = M.maetning(baeger);
+    paastand("krystallerne kommer ved maetningstemperaturen", Math.abs(Tk - facit) < 1.5, tal(Tk, 1) + " °C mod " + tal(facit, 1) + " °C");
+    var flager = (baeger.flager || []).filter(function (f) { return !f.doed; });
+    paastand("og ses straks som glinsende flager, der daler (den gyldne regn)", flager.length >= 5 && flager.every(function (f) { return f.v > 0 && f.v <= 1; }),
+        flager.length + " flager");
+    side.opdaterPanel();
+    paastand("knappen lyser, naar der kan noteres", d.getElementById("maaleknap").classList.contains("klar"));
+    d.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "k" }));
+    var p1 = M.journal.post("1");
+    paastand("tasten K noterer termometerets temperatur", !!p1 && Math.abs(p1.svar - tm.visT) < 0.11,
+        p1 && tal(p1.svar, 1) + " °C, facit " + tal(p1.facit, 1) + " °C");
+    paastand("og maalingen er rigtig (hoejst 6 °C fra)", M.journal.rigtig("1") === true);
+    paastand("oejebliksbilledet har masserne", !!p1 && Math.abs(p1.billede.pb - mPb) < 0.0006 && Math.abs(p1.billede.ki - mKI) < 0.0006 &&
+        Math.abs(p1.billede.pbi2 - Math.min(mPb / 331.2, mKI / 332) * 461) < 0.001);
+    paastand("trinnet »første måling« er gjort", F.erGjort("maal1"));
+    side.noterTemperatur();
+    paastand("samme maaling kan ikke noteres to gange", M.journal.antal() === 1 && sidste() === NK.TEKST.maaling.allerede, sidste());
+    side.opdaterPanel();
+    paastand("kortet viser maalingen", d.getElementById("maaling-tabel").rows.length === 2 &&
+        d.getElementById("maaling-taeller").textContent === "1/3" && d.getElementById("maaling-tom").hidden);
+    /* Maaling 2 og 3: 0,050 g mere af hvert, varm, sluk, noter */
+    function tilsaet() {
+        var m = afvej("pb", 0.044, 0.056); bord.moede(baad, baeger); adv(4);
+        var k = afvej("ki", m - 0.006, m + 0.006); bord.moede(baad, baeger); adv(4);
+    }
+    function maal() {
+        bord.klik("plade", venstre); bord.klik("plade", hoejre);
+        var n = 0; while (!M.klar(baeger) && n++ < 300) adv(0.5);
+        adv(2);
+        bord.klik("plade", venstre); bord.klik("plade", hoejre);
+        side.noterTemperatur();
+        var ikkeKlar = sidste();
+        n = 0; while (!M.krystaller(baeger) && n++ < 600) adv(0.25);
+        side.noterTemperatur();
+        return ikkeKlar;
+    }
+    tilsaet();
+    side.noterTemperatur();
+    paastand("efter en ny tilsaetning skal glasset vaere klart foerst", M.journal.antal() === 1 && sidste() === NK.TEKST.maaling["ikke-klar"], sidste());
+    maal();
+    tilsaet();
+    maal();
+    var J = M.journal;
+    paastand("tre maalinger, alle rigtige", J.antal() === 3 && J.antalRigtige() === 3,
+        J.svarede().map(function (id) { return tal(J.post(id).svar, 1) + " (" + tal(J.post(id).facit, 1) + ")"; }).join(", ") + " °C");
+    paastand("temperaturerne stiger med massen", J.post("1").svar < J.post("2").svar && J.post("2").svar < J.post("3").svar);
+    paastand("trinnet »tre målinger« er gjort", F.erGjort("maal3") && !F.erGjort("affald"));
+    /* Replikken noteres, naar han siger den: han skal lige ind foerst */
+    function sagt(linje) { return (side.replikker || []).some(function (r) { return r.tekst === linje; }); }
+    for (var n9 = 0; n9 < 40 && !sagt(NK.TEKST["sig-tre-rigtige"][0]); n9++) adv(0.5);
+    paastand("Kemichael siger, at de tre ligger paa kurven", sagt(NK.TEKST["sig-tre-rigtige"][0]));
+    side.opdaterPanel();
+    var rk = d.getElementById("maaling-tabel").rows;
+    paastand("kortet har tre raekker, og temperaturen er groen", rk.length === 4 && rk[3].cells[4].className === "rigtig",
+        rk.length > 1 ? rk[rk.length - 1].textContent : "");
+    bord.moede(baeger, bord.g.dunk); adv(5);
+    paastand("resterne i dunken: alle trin er gjort", B.tom(baeger) && F.alleGjort());
+
+    /* For meget stof: det koger, og bundfaldet er der stadig */
+    NK.startForfra(); adv(0.5);
+    baeger = bord.g.baeger;
+    bord.moede(bord.g.maaleglas, baeger); adv(6);
+    B.tilsaetFast(baeger, "PbI2(s)", 3000);
+    bord.klik("plade", venstre);
+    var n2 = 0;
+    while (!baeger.koger && n2++ < 200) adv(0.5);
+    for (var n8 = 0; n8 < 40 && !sagt(NK.TEKST["sig-for-meget"][0]); n8++) adv(0.5);
+    paastand("koger det med bundfald, siger Kemichael det", sagt(NK.TEKST["sig-for-meget"][0]), baeger.koger ? "koger" : "koger ikke");
+    bord.klik("plade", venstre);
+
+    overskrift("6. Start forfra");
+    NK.startForfra(); adv(0.5);
+    paastand("maalingernes hukommelse er ryddet", M.klarFor === null && !Object.keys(M.noteret).length && M.sidstePb === null && !M.ventKI);
+    paastand("journalen er tom, og kortet siger det", M.journal.antal() === 0 && d.getElementById("maaling-tabel").hidden &&
+        !d.getElementById("maaling-tom").hidden && d.getElementById("maaling-taeller").textContent === "0/3");
+    paastand("vaegten er tareret igen", bord.vaegtTekst(bord.g.vaegt) === "0,000 g" && bord.g.baad.paa === bord.g.vaegt);
+    paastand("bægerglasset er tomt, pladen slukket, og forloebet staar paa foerste trin",
+        B.tom(bord.g.baeger) && !bord.g.plade.taendt && !bord.g.plade.omroerer && F.nuTrin().id === "vand");
+
+    overskrift("7. Oevelsestjekket (M2)");
+    var tjek = NKTjek.koer(vin);
+    paastand("øvelsestjekket finder ingen fejl i forsøget", tjek.fejl === 0,
+        tjek.fejl ? tjek.fund().join(" | ") : tjek.afsnit.length + " afsnit, " + tjek.advarsler + " NB");
+    var selvTjek = NKTjek.selvproeve(vin);
+    var ikkeFanget = selvTjek.filter(function (p) { return !p.fanget; }).map(function (p) { return p.navn; });
+    paastand("og det fanger hver af de fejl, der sættes ind med vilje", selvTjek.length >= 10 && !ikkeFanget.length,
+        ikkeFanget.join(", ") || selvTjek.length + " fanget");
+
+    overskrift("8. Med musen");
+    NK.startForfra(); adv(0.5);
+    var mus = NKProeve.mus(bord);
+    bord = NK.bord; baad = bord.g.baad; baeger = bord.g.baeger;
+    var rb = bord.rekt(baeger, 0);
+    paastand("maaleglasset kan tages med musen", mus.tag("maaleglas"));
+    mus.baer({ x: baeger.p.x + 30, y: rb.y - 40 }, 0.8);
+    paastand("over bægerglasset faar det den groenne ramme", bord.slipMaal === "baeger", bord.slipMaal);
+    mus.slip();
+    mus.hold(4);
+    paastand("sluppet dér giver det 100 mL", Math.abs(B.volumen(baeger) - 100) < 0.05, tal(B.volumen(baeger), 1) + " mL");
+    mus.klik(hoejre);
+    mus.hold(0.3);
+    paastand("et klik med musen paa OMRØRING taender omroeringen", !!bord.g.plade.omroerer && !bord.g.plade.taendt);
+    mus.klik(venstre);
+    mus.hold(0.3);
+    paastand("og et paa VARME taender varmen", !!bord.g.plade.taendt);
+    mus.klik(venstre); mus.klik(hoejre); mus.hold(0.3);
+    paastand("og de slukker igen", !bord.g.plade.taendt && !bord.g.plade.omroerer);
+    var rbd = bord.rekt(baad, 0);
+    paastand("glasset med Pb(NO3)2 kan tages med musen", mus.tag("pb"));
+    /* Bunden af glasset en halv centimeter over vejebaaden */
+    var pbM = bord.g.pb;
+    mus.baer({ x: baad.p.x, y: rbd.y - 6 - (pbM.type.h - pbM.anker.y) }, 0.8);
+    paastand("holdt over vejebaaden faar den den groenne ramme, ikke vaegten", bord.slipMaal === "baad", bord.slipMaal);
+    mus.slip();
+    mus.hold(4);
+    paastand("og saa kommer der en spatelspids paa", vist() >= 0.038 && vist() <= 0.062, bord.vaegtTekst(bord.g.vaegt));
+    beskeder.length = 0;
+    paastand("vejebaaden kan tages med musen", mus.tag("baad"));
+    mus.baer({ x: baeger.p.x + 20, y: rb.y - 30 }, 0.8);
+    mus.slip();
+    mus.hold(4);
+    paastand("én spatelspids i vandet afvises, og det staar paa scenen", V.tilsatGram(B.samlet(baeger), "Pb(NO3)2(s)") === 0 &&
+        sidste().indexOf("Afvej ca. 0,100 g") === 0 && d.getElementById("scenebesked").textContent.indexOf("Afvej ca. 0,100 g") === 0, sidste());
+    paastand("og vejebaaden er hjemme paa vaegten igen", baad.paa === bord.g.vaegt && vist() > 0.03, bord.vaegtTekst(bord.g.vaegt));
+
+    bord.vedBesked = vedB;
+    NK.startForfra();
+    adv(1);
+}
+
+function vis() {
+    skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK"), fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+</script>
+</body>
+</html>

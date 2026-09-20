@@ -9,7 +9,10 @@ Bruges af sc1.3 Knaldgas, sc2.5 Fældning, sc2.6 Kobber og dibrom, sc2.7
 Blyiodid, sc6.8 Substitution, sc6.9 Fedt i chips, sc8.6 Jern i ståluld og
 sb2.4 Jernthiocyanat (kerne, rundvisning og grundstilark). Forsøgene ligger i
 `../superlab/` og henter filer herfra med `../../laboratoriet/`, ligesom med
-`kemichael/`.
+`kemichael/`. Forsøgene, der står helt på motoren, ligger for sig i
+`../superlab_ny/` med endelsen `_ny` (`sb2.4_jernthiocyanat_ny`,
+`sc2.7_blyiodid_ny`) og samles i »Det virtuelle laboratorium«
+(`../../samling_virtuelt_laboratorium.html`).
 
 ## Prøvebordet
 
@@ -927,7 +930,7 @@ Al prosa i et forsøg ligger i dets `js/tekst.js` som `{ id: tekst }`, og
 `side.js` skriver den ind i elementerne ved start: en streng bliver til
 indholdet, en liste til punkter. Det går to veje: en øvelsesvejledning kan
 oversættes til den ene fil, og hele forsøgets sprog kan læses igennem ét
-sted uden at åbne kode. Mønster: `../superlab/sb2.4_ligevaegt/`.
+sted uden at åbne kode. Mønster: `../superlab_ny/sb2.4_jernthiocyanat_ny/`.
 
 Prøvebordet og prøverummet har endnu deres egne `app.js`; de flyttes over
 på `side.js`, når der ikke er andet i gang.
@@ -987,7 +990,7 @@ sætter siden en `kun(trin)` på forløbet, springer `nuTrin()` de trin over,
 der hører til en anden del. Det ændrer intet ved, hvornår et trin er gjort,
 intet ved listen, og intet ved, hvornår forløbet er færdigt — kun hvilket
 af de ugjorte trin der står øverst i panelet. Første kunde er sb2.4's to
-dele (`../superlab/sb2.4_ligevaegt/js/app.js`).
+dele (`../superlab_ny/sb2.4_jernthiocyanat_ny/js/app.js`).
 
 Flagene er verdenstilstanden. De er med vilje det eneste, der gemmes:
 `F.tilstand()` giver trin, udløsere og flag, og `F.saetTilstand()` spiller
@@ -996,7 +999,7 @@ der holder gemningen lille nok til at virke, når der bliver mange rum.
 
 Det er det samme lag, spillet skal bruge. Et trin i en øvelse og en låst dør
 i et escaperoom er den samme sætning — betingelse, konsekvens, fyrer én
-gang — og kun konsekvensen er forskellig. Mønster: `../superlab/sb2.4_ligevaegt/js/forloeb.js`.
+gang — og kun konsekvensen er forskellig. Mønster: `../superlab_ny/sb2.4_jernthiocyanat_ny/js/forloeb.js`.
 
 **En replik er også en konsekvens.** `{ sig: "…" }` i en udløsers `saa` (eller
 et trins eget `sig`, som siges, når trinnet er gjort) går gennem `side.sig`
@@ -1042,7 +1045,7 @@ bordene. Et trin kan læse dem i samme sprog som alt andet:
 { journal: "billede", post: "glas1", rigtig: true }
 ```
 
-Mønster: `../superlab/sb2.4_ligevaegt/js/billede.js` og dets trin `billede`.
+Mønster: `../superlab_ny/sb2.4_jernthiocyanat_ny/js/billede.js` og dets trin `billede`.
 
 ## Bade
 
@@ -1061,7 +1064,7 @@ vandbad giver 80 °C i stedet for pladens 250.
 
 ## Afvejning, varmeplade og forsøgets regel (K3)
 
-Det, sc2.7 (`../superlab/sc2.7_oploeselighed/`) skulle bruge, og som
+Det, sc2.7 (`../superlab_ny/sc2.7_blyiodid_ny/`) skulle bruge, og som
 ethvert forsøg nu kan skrive i opstillingen:
 
 * **Vægten** `{ type: "vaegt", decimaler: 3, tareret: true }` viser tre
@@ -1143,7 +1146,7 @@ et flag, som hverken data eller koden sætter, en FEJL igen.
 
 **Sådan køres det.** `_oevelsestjek.html` (gennem en lokal server) kører
 alle forsøg på motoren, ét fra listen eller et hvilket som helst andet:
-`_oevelsestjek.html?side=../superlab/sc2.7_blyiodid/index.html`. Med
+`_oevelsestjek.html?side=../superlab_ny/sc2.7_blyiodid_ny/index.html`. Med
 »prøv tjekket selv« (`&selv=1`) sættes ti slags fejl ind i en kopi af
 forsøgets data én ad gangen - et stof, der ikke findes; et trin, der peger
 på et glas, der ikke er på bordet; udstyr, der ikke findes; mere, end
@@ -1164,9 +1167,9 @@ selvtest med afsnittet ovenfor.
 
 ## Næste skridt
 
-* sb2.4 er lagt over på genstandsmodellen i `../superlab/sb2.4_ligevaegt/`
+* sb2.4 er lagt over på genstandsmodellen i `../superlab_ny/sb2.4_jernthiocyanat_ny/`
   med begge dele, quizzen og tegneserien.
-* sc2.7 er lagt over i `../superlab/sc2.7_oploeselighed/` (K3): kernen med
+* sc2.7 er lagt over i `../superlab_ny/sc2.7_blyiodid_ny/` (K3): kernen med
   afvejningen, varmepladen og de tre målinger kører. Grafen (M9), quizzen
   og tegneserien mangler. Derefter sc6.8 og sc8.6.
 * **Grafen.** Journalen kan notere en måling; den kan endnu ikke tegne den

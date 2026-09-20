@@ -20,7 +20,11 @@ en superlab-animation er han en del af forsøget.
 ## Oversigt
 
 "I menuen" betyder, at en samlingsfil (`samling_*.html`) linker til mappen. En
-ny animation kommer først i menuen, når brugeren siger til.
+ny animation kommer først i menuen, når brugeren siger til. Superlab-animationerne
+på den nye motor ligger i `superlab_ny/` og har deres egen samlingsfil, »Det
+virtuelle laboratorium« (`samling_virtuelt_laboratorium.html` ved siden af
+`samling_alt.html`); de står ikke i samlingsfilerne for Kemi C og Kemi B, som
+viser de gamle udgaver.
 
 | Mappe | I menuen | Note |
 |-------|----------|------|
@@ -32,15 +36,16 @@ ny animation kommer først i menuen, når brugeren siger til.
 | `superanimation/sc3.1_elektronprikformler` | ja | |
 | `superanimation/sc3.2_rumlig_opbygning` | nej | inaktiv: rettes ikke, før brugeren siger til |
 | `superanimation/sc3.4_blandbarhed_inaktiv` | nej | ny, sept. 2026; menuen viser stadig den gamle c3.4 |
-| `superlab/sb2.4_jernthiocyanat` | ja | gammel kode, afløses af `sb2.4_ligevaegt` |
-| `superlab/sb2.4_ligevaegt` | nej | samme forsøg på den fælles motor, under opbygning |
+| `superlab/sb2.4_jernthiocyanat` | ja | gammel kode; Kemi B viser den |
 | `superlab/sc1.3_knaldgas` | ja | ældre sidelayout |
 | `superlab/sc2.5_faeldning` | ja | ældre sidelayout og ældre udgave af Kemichael |
 | `superlab/sc2.6_kobber_dibrom` | ja | |
-| `superlab/sc2.7_blyiodid` | ja | |
+| `superlab/sc2.7_blyiodid` | ja | gammel kode; Kemi C viser den |
 | `superlab/sc6.8_substitution` | ja | |
 | `superlab/sc6.9_fedt_i_chips` | ja | |
 | `superlab/sc8.6_jern_i_staaluld` | ja | |
+| `superlab_ny/sb2.4_jernthiocyanat_ny` | ja | på den fælles motor; i »Det virtuelle laboratorium« |
+| `superlab_ny/sc2.7_blyiodid_ny` | ja | på den fælles motor (kernen, K3); i »Det virtuelle laboratorium« |
 
 ## Fælles krav
 
@@ -137,15 +142,17 @@ kan lave de fejl, man kan lave dér.
 * Når forsøget er slut, låses quizzen og tegneserien over forsøget op.
   Resultatskemaet står i tegneseriens sidste rude.
 * Nye superlab-animationer bygges på genstandsmodellen i `laboratoriet/`.
-  Kemien er data i `stoftabel.js`, ikke kode i forsøget. Mønster:
-  `superlab/sb2.4_ligevaegt/` og `laboratoriet/README.md`. Quiz, tegneserie
+  Kemien er data i `stoftabel.js`, ikke kode i forsøget. De ligger i
+  `superlab_ny/` og hedder som den gamle udgave med `_ny` til sidst
+  (`sc2.7_blyiodid` → `sc2.7_blyiodid_ny`). Mønster:
+  `superlab_ny/sb2.4_jernthiocyanat_ny/` og `laboratoriet/README.md`. Quiz, tegneserie
   og Kemichaels scener findes indtil videre i `superlab/sc6.8_substitution` og
   `superlab/sc8.6_jern_i_staaluld`.
 
 ## Det, der ikke er en animation
 
-Animationerne ligger i `superanimation/` og `superlab/` (se oversigten). De to
-andre mapper er fælles kode:
+Animationerne ligger i `superanimation/`, `superlab/` og `superlab_ny/` (se
+oversigten). De to andre mapper er fælles kode:
 
 * `laboratoriet/` er motoren bag superlab-animationerne: stoffer, udstyr,
   bordet, forløbet og den fælles skal. Prøvebordet og prøverummet derinde er
@@ -159,10 +166,12 @@ Filer, der begynder med `_` (`_selvtest.html`, `_geometri.html`,
 ## Fælles opbygning
 
 * **Mappe:** en ny animation lægges i `superanimation/` eller `superlab/` efter
-  sin slags. Stier ud af mappen har derfor to niveauer: `../../kemichael/`,
+  sin slags, og en superlab-animation på den nye motor i `superlab_ny/`. Stier
+  ud af mappen har derfor to niveauer: `../../kemichael/`,
   `../../laboratoriet/`.
 * **Navn:** `s`, niveau, kapitel og nummer og et kort navn uden æ, ø og å, fx
-  `sc2.7_blyiodid`. Nummeret er emnet i samlingen (`samling_c2.html`).
+  `sc2.7_blyiodid`. Nummeret er emnet i samlingen (`samling_c2.html`). På den
+  nye motor får navnet `_ny` til sidst: `sc2.7_blyiodid_ny`.
 * **Indgang:** `index.html`. Ingen `fetch` og ingen moduler, så den virker fra
   harddisken.
 * **Filer:** `css/stil.css`, `js/` delt efter ansvar og `sprites/` med SVG.

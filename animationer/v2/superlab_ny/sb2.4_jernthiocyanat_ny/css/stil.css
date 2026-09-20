@@ -1,0 +1,239 @@
+/* =====================================================================
+   stil.css - kun det, der er saerligt for sb2.4
+
+   Grundstilen (farver, toplinje, scene, panel, kort, knapper, overlays,
+   rundvisning) staar i ../../../laboratoriet/css/grund.css.
+   NB: decimaltal med PUNKTUM i CSS.
+   ===================================================================== */
+
+/* Ligningerne i teoriboksen (ligevaegten selv staar i toplinjen) */
+.ligning {
+    margin: 0 0 8px;
+    font-size: 1.12rem;
+    letter-spacing: 0.02em;
+}
+
+/* Uheldskortet har kun sin taeller */
+#uheld-kort h2 { margin-bottom: 0; }
+
+/* ----- Forloebet ------------------------------------------------------ */
+.forloeb-nu {
+    margin: 0 0 10px;
+    line-height: 1.5;
+}
+
+.forloeb-liste {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+    font-size: 0.86rem;
+    line-height: 1.5;
+}
+
+.forloeb-liste li {
+    position: relative;
+    padding: 2px 0 2px 22px;
+    opacity: 0.35;
+}
+
+.forloeb-liste li::before {
+    content: "○";
+    position: absolute;
+    left: 2px;
+}
+
+.forloeb-liste li.gjort {
+    opacity: 0.62;
+}
+
+.forloeb-liste li.gjort::before {
+    content: "✓";
+    font-weight: 700;
+}
+
+.forloeb-liste li.nu {
+    opacity: 1;
+    font-weight: 600;
+}
+
+.forloeb-liste li.nu::before {
+    content: "▸";
+}
+
+/* F49: den del, eleven ikke staar i, som én linje */
+.forloeb-liste li.gruppe {
+    opacity: 0.55;
+    font-weight: 700;
+    margin-top: 4px;
+}
+.forloeb-liste li.gruppe::before {
+    content: "▸";
+}
+.forloeb-liste li.gruppe.gjort::before {
+    content: "✓";
+}
+
+#forloeb-kort.faerdig .forloeb-nu {
+    font-weight: 600;
+}
+
+/* ----- Billedet af glas 1 til 7 --------------------------------------- */
+.billede-boks {
+    max-width: 760px;
+}
+
+.billede-ramme {
+    margin: 14px 0 4px;
+    padding: 10px 8px 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.055);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+#billede-laerred {
+    display: block;
+    width: 100%;
+    height: 215px;
+}
+
+.billede-svar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.billede-soejle {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    align-items: stretch;
+    text-align: center;
+}
+
+.knap.billede-valg {
+    padding: 4px 2px;
+    font-size: 0.74rem;
+    line-height: 1.15;
+    min-width: 0;
+}
+
+.knap.billede-valg.aktiv {
+    background: #2f6fb3;
+    border-color: #4f93da;
+    color: #fff;
+}
+
+.billede-ref {
+    display: block;
+    padding-top: 8px;
+    font-size: 0.74rem;
+    opacity: 0.55;
+}
+
+#billede-taeller {
+    margin-right: auto;
+    align-self: center;
+    opacity: 0.7;
+}
+
+/* ----- De to dele ------------------------------------------------------
+   Knapperne ligger paa scenen i oeverste hoejre hjoerne, hvor der er tom
+   vaeg over hylden til hoejre, saa de ikke tager plads fra bordet. */
+.delknapper {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    display: flex;
+    gap: 6px;
+    z-index: 3;
+}
+
+.knap.delknap {
+    padding: 5px 11px;
+    font-size: 0.8rem;
+    background: rgba(12, 16, 24, 0.66);
+    backdrop-filter: blur(3px);
+}
+
+.knap.delknap[aria-pressed="true"] {
+    background: #2f6fb3;
+    border-color: #4f93da;
+    color: #fff;
+    font-weight: 600;
+}
+
+/* ----- De fire glas ovenfra (del 2) ------------------------------------ */
+.ovenfra-boks {
+    max-width: 720px;
+}
+
+.ovenfra-ramme {
+    margin: 14px 0 10px;
+    padding: 8px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.055);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+#ovenfra-laerred {
+    display: block;
+    width: 100%;
+    height: 210px;
+}
+
+.ovenfra-svar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.ovenfra-par {
+    padding: 9px 10px 10px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ovenfra-par h3 {
+    margin: 0 0 2px;
+    font-size: 0.88rem;
+}
+
+.ovenfra-note {
+    margin: 0 0 8px;
+    font-size: 0.76rem;
+    line-height: 1.35;
+    opacity: 0.7;
+    min-height: 2.1em;
+}
+
+.ovenfra-valg {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.knap.ovenfra-knap {
+    padding: 5px 8px;
+    font-size: 0.78rem;
+    text-align: center;
+}
+
+.knap.ovenfra-knap.aktiv {
+    background: #2f6fb3;
+    border-color: #4f93da;
+    color: #fff;
+}
+
+/* Et par, der ikke kan sammenlignes endnu: knapperne staar, men daempet,
+   saa man kan se, hvad der bliver spurgt om */
+.ovenfra-par.laast .ovenfra-valg {
+    opacity: 0.4;
+}
+
+#ovenfra-taeller {
+    margin-right: auto;
+    align-self: center;
+    opacity: 0.7;
+}

@@ -22,13 +22,13 @@
     <label>Forsøg
         <select id="side">
             <option value="alle">Alle forsøg på motoren</option>
-            <option value="../superlab/sb2.4_ligevaegt/index.html">sb2.4 Ligevægt</option>
-            <option value="../superlab/sc2.7_oploeselighed/index.html">sc2.7 Opløselighed af blyiodid</option>
+            <option value="../superlab_ny/sb2.4_jernthiocyanat_ny/index.html">sb2.4 Jernthiocyanat (ny)</option>
+            <option value="../superlab_ny/sc2.7_blyiodid_ny/index.html">sc2.7 Blyiodid (ny)</option>
             <option value="proevebord/index.html">Prøvebordet</option>
             <option value="proeverum/index.html">Prøverummet</option>
         </select>
     </label>
-    <label>eller en sti <input type="text" id="sti" placeholder="../superlab/sc2.7_…/index.html"></label>
+    <label>eller en sti <input type="text" id="sti" placeholder="../superlab_ny/sc2.7_…_ny/index.html"></label>
     <label><input type="checkbox" id="selv"> prøv tjekket selv (sæt fejl ind)</label>
     <button id="igen" type="button">Kør</button>
     <span id="note" class="info"></span>
@@ -51,13 +51,13 @@
    peger paa et glas, der ikke er paa bordet; ...), og hver skal fanges.
 
    Adressen husker valget: _oevelsestjek.html?side=alle&selv=1
-   Et forsoeg, der ikke staar i listen: ?side=../superlab/xx/index.html
+   Et forsoeg, der ikke staar i listen: ?side=../superlab_ny/xx_ny/index.html
    Skal aabnes gennem en lokal server, ligesom selvtesterne.
    ===================================================================== */
 (function () {
     "use strict";
 
-    var ALLE = ["../superlab/sb2.4_ligevaegt/index.html", "../superlab/sc2.7_oploeselighed/index.html",
+    var ALLE = ["../superlab_ny/sb2.4_jernthiocyanat_ny/index.html", "../superlab_ny/sc2.7_blyiodid_ny/index.html",
                 "proevebord/index.html", "proeverum/index.html"];
     var VENT = 8000;            /* ms: saa laenge ventes der paa sprites */
 
