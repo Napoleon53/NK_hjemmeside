@@ -5,7 +5,8 @@ $log = "C:\NK_hjemmeside\autocommit.log"
 # motoren) er frosset i dette repo og udvikles i
 # C:\NK_Undervisning\virtuelt_laboratorium\. Filer derfra tages ud af
 # commit'en igen, saa resten af hjemmesiden committes som foer.
-# animationer/v2/superanimation/ er IKKE frosset og commiteres normalt.
+# Superanimationerne ligger siden 20-09-2026 i animationer/superanimationer/
+# uden for v2/ og er ikke frosne; hele v2/ er det.
 $FROSNE = @(
     "animationer/v2/laboratoriet",
     "animationer/v2/kemichael",

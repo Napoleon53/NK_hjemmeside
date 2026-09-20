@@ -1,2 +1,6 @@
 /.quarto/
 **/*.quarto_ipynb
+
+# Loggen fra autocommit.ps1. Uden denne linje committer og pusher
+# skriptet sin egen log hvert kvarter, ogsaa naar intet andet er aendret.
+/autocommit.log
