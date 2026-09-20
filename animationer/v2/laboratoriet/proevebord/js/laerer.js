@@ -42,10 +42,34 @@
     var UDE = K.UDE;
     var HAENGER = K.HAENGER;
 
-    /* Kaffen staar paa den foerste hylde (lavKaffekop i bord.js), saa han
-       gaar derhen, hvor hylden er, og ikke til et fast sted */
+    /* Kaffen staar ved sikkerhedsplakaten (F58, kaffeSted i bord.js) -
+       eller paa den foerste hylde, hvis rummet ingen plakat har - saa han
+       gaar derhen, hvor koppen er, og ikke til et fast sted. Han stiller
+       sig til hoejre for koppen, som han altid har gjort, hvis der er
+       plads til ham dér; ellers til venstre for den, og saa raekker han
+       armen mod den (kaffeArm) i stedet for op mod venstre. */
+    function kopMidte(b) {
+        var kop = b.g && b.g.kaffekop;
+        if (!kop || !kop.type) return null;
+        var r = b.rekt(kop, 0);
+        return { x: r.x + r.b / 2, y: r.y + r.h * 0.4 };
+    }
+    function kopTilHoejre(b, m) {
+        var k = b.laererSkala ? b.laererSkala() : 1;
+        return m.x + 110 > NK.Scene.BREDDE - 112 * k;
+    }
     K.paa(P, {
-        kaffeX: function () { var H = NK.Scene.HYLDE; return H ? H.x0 + 154 : 170; },
+        kaffeX: function () {
+            var m = kopMidte(this), H = NK.Scene.HYLDE;
+            if (!m) return H ? H.x0 + 154 : 170;
+            var k = this.laererSkala ? this.laererSkala() : 1;
+            return kopTilHoejre(this, m) ? m.x - 100 * k : m.x + 110;
+        },
+        kaffeArm: function () {
+            var m = kopMidte(this);
+            if (!m || !kopTilHoejre(this, m)) return -0.5;
+            return NK.klamp(this.pegVinkel(m.x, m.y), -1.1, 1.1);
+        },
         fredet: ["spild"]
     });
 
@@ -316,6 +340,11 @@
                 this.laererVentende();
             }
         }
+        /* F55: en brugt spatel i et andet stof - det ser han altid */
+        if (type === "forurenet" && data && data.jar) {
+            this.laererKo("laererForurenet", data);
+            this.laererVentende();
+        }
         if (type === "voldsom" && this.laererOpdager(farligt(data && data.indhold ? NK.Beholder.samlet(data) : null))) {
             this.laererKo("laererVoldsom", data);
             this.laererVentende();
@@ -366,6 +395,21 @@
             : (k === 2 ? ["Igen. " + M + " i vasken.", "Dunken står lige ved siden af."] : ["Rensningsanlægget takker."]);
         bemaerkning(this, "vask", NK.klamp(a.til.p.x - 120, 60, NK.Scene.BREDDE - 260), { vrede: 0.8, humoer: -0.7, roed: 0.2, skeptisk: 0.6, briller: 1 },
             replikker, k === 1 ? K.glimtTrin("oejenbryn") : [], pegPunkt(this, a.til), false);
+    };
+
+    /* ----- En brugt spatel i et andet stof (F55) -----------------------------
+       Han skaelder ud: det, der var paa spatlen, er nu i bøtten, og det
+       kan ikke goeres om. Bøtten husker det selv (bord.tjekForurening). */
+    P.laererForurenet = function (a) {
+        this.uheldTal = this.uheldTal || {};
+        this.uheldTal.forurenet = (this.uheldTal.forurenet || 0) + 1;
+        var k = this.uheldTal.forurenet;
+        var s = a.med && a.med[0] ? NK.Stof.STOFFER[a.med[0].stof] : null;
+        var fra = s ? (s.dansk || NK.Stof.formel(a.med[0].stof)) : "et andet stof";
+        var replikker = k === 1 ? ["Stop! Den spatel har været i " + fra + ".", "Nu er " + a.jar.titel + " forurenet. Én ren spatel pr. stof."]
+            : (k === 2 ? ["Igen en brugt spatel.", "Bøtten med rene spatler står lige der."] : ["Snart er der ikke en ren bøtte tilbage i laboratoriet."]);
+        bemaerkning(this, "forurenet", NK.klamp(a.jar.p.x - 120, 60, NK.Scene.BREDDE - 260), { vrede: 0.95, humoer: -0.85, roed: 0.4, skeptisk: 0.3, briller: 1 },
+            replikker, k === 1 ? K.glimtTrin("oejenbryn") : [], pegPunkt(this, a.jar), false);
     };
 
     /* En hel flaske i affaldsdunken: han fylder den op igen, én gang.

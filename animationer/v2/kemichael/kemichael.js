@@ -20,7 +20,10 @@
      NK.Kemichael.paa(NK.Forsoeg.prototype, { kaffeX: 170, fredet: ["brand"] });
 
    Valg:
-     kaffeX   hvor laereren stiller sig, naar kaffen hentes
+     kaffeX   hvor laereren stiller sig, naar kaffen hentes (tal eller
+              funktion)
+     kaffeArm armens vinkel, naar han tager koppen og stiller den
+              tilbage (funktion; ellers -0.5: op mod venstre)
      fredet   scener, som et klik paa laereren ikke afbryder
 
    Figuren kommer ind fra venstre, foran bordet. Hovedet er et sprite
@@ -1143,6 +1146,9 @@
         var S = NK.Scene;
         var r = NK.r;
         var kaffeX = valg.kaffeX === undefined ? 170 : valg.kaffeX;
+        /* F58: koppen kan staa til hoejre for ham (ved plakaten), saa
+           armen, der tager den, kan komme fra forsoeget */
+        var kaffeArm = valg.kaffeArm || function () { return -0.5; };
         var fredet = (valg.fredet || []).concat("gaaUd");
 
         /* ----- De to planer: foran og bag bordet (S8) ---------------------
@@ -1277,7 +1283,10 @@
                 var br = this.bobleRekt();
                 if (br) ud.push(br);
             }
-            if (this.plakat) ud.push({ x: this.plakat.x, y: this.plakat.y, b: 132, h: 128 });
+            /* Plakaten (F59: maalene fra bord.plakatRekt) og uret (F57) */
+            var pr = this.plakatRekt ? this.plakatRekt() : (this.plakat ? { x: this.plakat.x, y: this.plakat.y, b: 132, h: 128 } : null);
+            if (pr) ud.push(pr);
+            if (this.ur) ud.push({ x: this.ur.x - this.ur.r, y: this.ur.y - this.ur.r, b: 2 * this.ur.r, h: 2 * this.ur.r });
             var hylder = S.HYLDER || (S.HYLDE ? [S.HYLDE] : []);
             hylder.forEach(function (H) { ud.push({ x: H.x0, y: H.y, b: H.x1 - H.x0, h: 21 }); });
             /* Alt, der staar paa en hylde: det tegnes hen over ham */
@@ -1494,7 +1503,7 @@
                 gaa: function (x, loeb) { return [{ gaa: x, loeb: !!loeb }]; },
                 grib: function () {
                     return [
-                        { arm: -0.5, tid: 0.55 },
+                        { arm: kaffeArm, tid: 0.55 },
                         { kald: function () { kop.iHaand = true; this.laerer.baerer = "kaffekop"; } }
                     ];
                 },
@@ -1543,7 +1552,7 @@
                 ]);
             } else if (griber) {
                 trin = trin.concat([
-                    { arm: -0.5, tid: 0.35 },
+                    { arm: kaffeArm, tid: 0.35 },
                     { kald: function () {
                         kop.iHaand = false;
                         this.laerer.baerer = null;

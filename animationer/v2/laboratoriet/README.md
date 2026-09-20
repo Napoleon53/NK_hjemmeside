@@ -546,7 +546,7 @@ glas, hvor det står, uden at spilde (knappen `#rystknap` og tasten R i
 fylder Kemichael igen, når den er hældt i affaldet (S16).
 
 **Tilføjet 19. september om aftenen (S13, S14, S3).** *Det, der er sagt,
-et varigt sted:* har siden kortet `#replik-kort`, noteres hver linje, der
+et varigt sted:* har siden kortet `#replik-kort` (eller, fra F56, listen `#replik-liste` under noterne), noteres hver linje, der
 siges i taleboblen (`NK.vedReplik`, kaldt af `laererSig` i
 `kemichael.js`), i en liste: forløbets replikker altid, de scener,
 forsøget nævner i `historik` (fx `"spild"`, `"vask"`), og aldrig
@@ -573,9 +573,8 @@ et træk tager den, et klik lægger den frem og gør den klar (`nySpatel`);
 de ekstra spatler har `ekstra: true` og forsvinder bare i kurven. *Fyld
 op:* feltet vises, når en flaske, kolben eller et glas svæver over
 glasudstyr med `fyldOp` på typen (bægerglas, måleglas, konisk kolbe), og
-`fyldOpTil` hælder med kolben eller sprøjter med sprøjteflasken. Under
-feltet står op til tre forslag (`valg.fyldOpForslag` i siden, ellers
-»dobbelt« og runde tal). *Termometeret* glider roligt (`opdaterMaaler`),
+`fyldOpTil` hælder med kolben eller sprøjter med sprøjteflasken. (Under
+feltet stod op til tre forslag; de er fjernet igen i F63, se nedenfor.) *Termometeret* glider roligt (`opdaterMaaler`),
 og tallet (`visT`) skifter højst fire gange i sekundet. *Glasstaven* er 190
 lang og går ned til lige over bunden. *Isbad:* `is: true` på en post
 tegner isterninger (`T.tegnIs`). *Journalen:* `godkendt(id, bord, facit)`
@@ -600,6 +599,46 @@ Kemichaels advarsler« — kun ved spild. *Forløbslisten i dele:*
 function () { … } }` foldes, så kun den del, eleven er i, står trin for
 trin; de andre dele står som én linje med antal gjort (klassen `gruppe`).
 Uden `forloebDele` står listen som før.
+
+**Tilføjet 20. september (F54–F64).** *Pulverglasset over et glas (F54):*
+et pulverglas er et slipmål over et glas, når der står en spatelbøtte på
+bordet (`kanFaaSpatel`). `autoSpatel` henter en ny, ren spatel i bøtten
+(`nySpatel`), lader den tage en spatelspids og give den (`fyldTrin`,
+`toemTrin`), og pulverglasset svæver ved glasset (`pulverVed`,
+`svaev.spatel`) med pilen »En spatelspids mere«. Genvejen virker også
+(pulverglasset er en `kilde`). Når det, der svæver, stilles ned
+(`stilSvaevendeNed`), eller eleven tager pulverglasset, går det hjem, og
+spatlen ryger i kurven (`slipAutoSpatel`). *Den brugte spatel (F55):* en
+spatel husker de stoffer, den har været i (`sp.snavs`); stikkes den i et
+pulverglas med et andet stof, får glasset `forurenet` (`tjekForurening`),
+hændelsen `"forurenet"` går til Kemichael (`laererForurenet` i
+`laerer.js`), og `bord.forureningTekst(c)` er linjen til
+indholdsbeskrivelsen (`#glas-forurenet`). Kemien ændres ikke. *Noterne i
+faner (F56):* `bord.uheldListe` har én kort linje pr. uheld; `side.js`
+viser den i `#uheld-liste` med tælleren `#noter-uheld`, og replikkerne i
+`#replik-liste` — begge i fanen `#noter-sket`, som `skiftNoter` altid åbner
+med; `#noter-egne` har skrivefeltet (`vaelgFane`). *Uret (F57):*
+`bord.ur`, tegnet af `T.tegnUr`, viser det rigtige klokkeslæt plus bordets
+tid (`urMinutter`); et klik (`"ur"` i `hvad`) kalder `springTid(300)`, der
+lader fysikken alene (`fysik`) køre fem minutter på 1,3 sekund i skridt på
+højst et sekund (`opdaterSpring`) og til sidst sender hændelsen
+`"ventet"`. *Uret og kaffen ved plakaten (F58):* `urSted` og `kaffeSted`
+regner dem ud af plakaten (eller `valg.ur`, `valg.kaffe`, `ur: false`):
+uret over plakaten, hvis der er plads under loftet, ellers til venstre;
+koppen på hylden lige under plakaten eller på en lille kaffehylde
+(`kaffe: true` i `NK.Scene.HYLDER`), under den del af plakaten, der vender
+ind mod rummet. Kemichael stiller sig til venstre for koppen, når den står
+for langt til højre, og rækker armen mod den (`kaffeX` og `kaffeArm` i
+`laerer.js`, `kaffeArm` er nyt i `kemichael.js`). *Plakaten (F59):*
+`T.plakatMaal()` regner bredden og højden ud af skriften (9,5 px, korte
+punkter i `T.PLAKAT_REGLER`); `bord.plakatRekt()` er rektanglet, som
+Kemichael undgår. *Fyld op (F61–F63):* feltet har værdien
+`side.fyldOpForslag` = det, der er i glasset, plus `bord.pilMl(sv)` (det,
+pilen giver); forslagsknapperne er væk. *Pilen (F62):* `pilenGiver` siger
+mængden (»5 mL mere«, »4 mL vand mere«). *Den grønne tekst (F64):*
+`visTilsat` i `haendelse` lægger »5 mL tilsat«, »1 dråbe tilsat« (flere
+dråber tælles sammen), »1 spatelspids tilsat« eller »0,12 g tilsat« i
+`bord.tilsat`, og `tegnTilsat` tegner dem over glasset.
 
 **Der hældes kun, når eleven beder om det (F36):** et slip over glasset
 giver én portion, og pilen ved flasken giver mere. At bære en flaske hen

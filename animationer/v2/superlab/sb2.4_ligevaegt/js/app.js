@@ -23,35 +23,13 @@
         /* Kortet »Sagt i laboratoriet« (S13): forloebets replikker kommer
            altid med; her ogsaa Kemichaels uheld og advarsler. Smaasnakken
            (kaffen, kigget ind) kommer aldrig. */
-        historik: ["spild", "voldsom", "affald", "vask"],
+        historik: ["spild", "voldsom", "affald", "vask", "forurenet"],
 
         /* F49: listen viser trinnene i den del, eleven staar i; den anden
            del staar som én linje og foldes ud, naar man kommer dertil */
         forloebDele: {
             titler: { 1: "Del 1: glassene", 2: "Del 2: fortynding" },
             nu: function () { return NK.DELE.nu(); }
-        },
-
-        /* »Fyld op til« (F39): de forslag, fortyndingen bruger. Til et af
-           de fire baegerglas: det, makkeren i parret har (saa de to faar
-           lige meget), det, det andet par har (saa par 1 kan fyldes op til
-           par 2), og det dobbelte (fortyndingen). Andre steder motorens
-           egne forslag. */
-        fyldOpForslag: function (bord, c) {
-            var O = NK.OVENFRA, B = NK.Beholder, i = O.BAEGERE.indexOf(c.navn);
-            if (i < 0) return null;
-            var V = B.volumen(c), maks = c.type.maks, ud = [];
-            function til(mL, tekst) {
-                mL = Math.round(mL);
-                if (mL > V + 0.5 && mL <= maks - 0.1 && !ud.some(function (x) { return x.mL === mL; })) ud.push({ mL: mL, tekst: tekst });
-            }
-            var makker = bord.g[O.BAEGERE[i ^ 1]];
-            if (makker) til(B.volumen(makker), "som " + makker.titel);
-            var andet = i < 2 ? [2, 3] : [0, 1];
-            var ander = Math.max.apply(null, andet.map(function (j) { return bord.g[O.BAEGERE[j]] ? B.volumen(bord.g[O.BAEGERE[j]]) : 0; }));
-            if (ander > 0.5) til(ander, "som par " + (i < 2 ? 2 : 1));
-            if (V > 0.5) til(2 * V, "dobbelt");
-            return ud;
         },
 
         /* Quizzen (../../laboratoriet/js/quiz.js) laases op, naar eleven har

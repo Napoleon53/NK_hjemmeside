@@ -62,7 +62,7 @@
     /* Frugtfarveflasken er en stamflaske: den doseres i smaa portioner og
        haeldes ikke op. Derfor faar forsoeget sin egen udgave af flasken
        med en lille portion; alt andet er flaskens egne maal. */
-    var FARVE_PORTION = 4;      /* mL pr. haeldning */
+    var FARVE_PORTION = 5;      /* mL pr. haeldning (F60) */
     (function () {
         var f = NK.Udstyr.type("flaske"), ny = {}, n;
         for (n in f) if (Object.prototype.hasOwnProperty.call(f, n)) ny[n] = f[n];
@@ -91,7 +91,7 @@
        hylde til hoejre (230) uden at krydse den, og skala er planets: bag
        bordet er han laengere vaek og tegnes mindre. */
     var KEMICHAEL = { y: 358, skala: 0.82 };
-    var HYLDE_KAFFE = 268;                 /* kaffen, koekkenrullen og pulverglassene */
+    var HYLDE_KAFFE = 268;                 /* koekkenrullen og pulverglassene */
     var HYLDE_FLASKER = 170;               /* flasken, draabeflasken og sproejteflasken */
     var HYLDE_HOEJRE = 230;                /* det tomme baegerglas */
 
@@ -167,8 +167,8 @@
           /* Hældes den i affaldet, fylder Kemichael den igen (S16) */
           genopfyld: true },
 
-        /* Hylden over stativet: koekkenrullen (kaffen stilles selv ved
-           venstre ende) og pulverglassene til glas 1, 2 og 3 */
+        /* Hylden over stativet: koekkenrullen og pulverglassene til glas
+           1, 2 og 3. Kaffen staar ved plakaten (F58). */
         { navn: "papir", type: "koekkenrulle", x: 460, y: HYLDE_KAFFE },
         pulver("pulver_fe",   540, HYLDE_KAFFE, "Fe(NO₃)₃", "pulverglasset med Fe(NO₃)₃", "Fe(NO3)3(s)", 8),
         pulver("pulver_asc",  590, HYLDE_KAFFE, "C-vitamin", "pulverglasset med ascorbinsyre", "Asc(s)", 3),
@@ -244,8 +244,9 @@
        det hoejere, rammer et glas med en stamoploesning loftet paa 20
        kugler (Stof.PARTIKEL_LOFT), og saa kan et indgreb ikke laengere
        ses som FLERE komplekser, kun som en anden fordeling.
-       Den foerste hylde er kaffens
-       (lavKaffekop). */
+       F58/F59: plakaten er mindre og haenger lavere, saa uret er over den,
+       og kaffekoppen staar under den paa hylden til hoejre (motoren
+       stiller dem selv ved plakaten, kaffeSted og urSted i bord.js). */
     NK.BORD_VALG = {
         bredde: 1040, hoejde: 650, bord: 500, bordDybde: 64, lodret: "bund",
         hylder: [
@@ -253,7 +254,7 @@
             { x0: 340, x1: 690, y: HYLDE_FLASKER },
             { x0: 715, x1: 1025, y: HYLDE_HOEJRE }
         ],
-        plakat: { x: 880, y: 70 },
+        plakat: { x: 880, y: 104 },
         /* F43: pilen til del 2 paa vaeggen ved plakaten, over baegerglasset
            paa hylden til hoejre */
         pil: { x: 688, y: 26, b: 186, h: 62, tekst: "Videre til del 2" },

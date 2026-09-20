@@ -32,6 +32,7 @@
             NK.el("glas-tom").hidden = false;
             tabel.hidden = true;
             NK.el("glas-temp").hidden = true;
+            if (NK.el("glas-forurenet")) NK.el("glas-forurenet").hidden = true;
             sidsteSignatur = signatur();
             return;
         }
@@ -73,6 +74,9 @@
         temp.hidden = B.volumen(c) < 0.05;
         var ph = St.pH(o);
         temp.textContent = "Temperatur: " + NK.Tegning.temperaturTekst(o.T) + (c.koger ? " (koger)" : "") + (ph === null ? "" : " · pH " + tal(ph, 1));
+        /* F55: et forurenet pulverglas siger det */
+        var fu = NK.el("glas-forurenet"), fuTekst = bord.forureningTekst(c);
+        if (fu) { fu.hidden = !fuTekst; fu.textContent = fuTekst || ""; }
         sidsteSignatur = signatur();
     }
 
@@ -81,7 +85,7 @@
         if (!c) return "ingen|" + bord.antalUheld;
         var o = B.samlet(c);
         var ph = St.pH(o);
-        var dele = [c.navn, Math.round(B.volumen(c) * 10), Math.round(o.T * 2), bord.antalUheld, c.koger ? 1 : 0, ph === null ? "" : Math.round(ph * 10)];
+        var dele = [c.navn, Math.round(B.volumen(c) * 10), Math.round(o.T * 2), bord.antalUheld, c.koger ? 1 : 0, ph === null ? "" : Math.round(ph * 10), c.forurenet ? c.forurenet.length : 0];
         Object.keys(o.n).sort().forEach(function (n) { dele.push(n + ":" + Math.round(o.n[n] * 10)); });
         return dele.join("|");
     }

@@ -921,6 +921,59 @@ function koerTest() {
     paastand("men spildes den, siger han stoffets advarsel, naar han har toerret op",
         sagt15.some(function (t) { return t.indexOf("salpetersyre") >= 0; }), sagt15.join(" | "));
     frisk();
+
+    overskrift("16. Uret, kaffen og plakaten, den groenne tekst og den brugte spatel (F55-F59, F64)");
+    frisk();
+    function tal(x, d) { return x.toFixed(d).replace(".", ","); }
+    var pr16 = bord.plakatRekt(), ur16 = bord.ur, kop16 = bord.rekt(g.kaffekop, 0), Sc16 = NK.Scene;
+    paastand("plakaten er mindre end foer (F59)", pr16.b * pr16.h < 132 * 128 * 0.85, Math.round(pr16.b) + " x " + Math.round(pr16.h));
+    paastand("uret haenger over plakaten, midt for (F58)", !!ur16 && Math.abs(ur16.x - (pr16.x + pr16.b / 2)) < 1 && ur16.y + ur16.r < pr16.y && ur16.y - ur16.r > 30);
+    var kh16 = Sc16.HYLDER.filter(function (h) { return h.kaffe; })[0];
+    paastand("der er ingen hylde under plakaten, saa koppen faar sin egen lille hylde under den",
+        !!kh16 && kh16.y > pr16.y + pr16.h && kh16.x0 >= pr16.x - 8 && kh16.x1 <= pr16.x + pr16.b && Math.abs(kop16.y + kop16.h - kh16.y) < 2 && kop16.x >= kh16.x0 - 2 && kop16.x + kop16.b <= kh16.x1 + 2,
+        kh16 ? Math.round(kh16.x0) + "-" + Math.round(kh16.x1) + " y " + kh16.y : "ingen");
+    NK.Kemichael.kaffeTvang("kold");   /* en post, hvor han tager koppen */
+    bord.klikKop();
+    NK.Kemichael.kaffeTvang(null);
+    var maal16 = null;
+    for (var q16 = 0; q16 < 80 && maal16 === null; q16++) { adv(0.05); if (bord.laerer.maalX > 0) maal16 = bord.laerer.maalX; }
+    var kopX16 = kop16.x + kop16.b / 2;
+    paastand("han gaar hen til koppen og staar til venstre for den, inden for scenen",
+        maal16 !== null && maal16 < kopX16 && kopX16 - maal16 < 130 && maal16 + 112 < Sc16.BREDDE, maal16 === null ? "gik ikke" : Math.round(maal16) + " / kop " + Math.round(kopX16));
+    for (q16 = 0; q16 < 200 && !g.kaffekop.iHaand; q16++) adv(0.1);
+    paastand("og tager den med armen mod hoejre", g.kaffekop.iHaand && bord.laerer.arm > 0, tal(bord.laerer.arm, 2));
+    for (q16 = 0; q16 < 400 && bord.laerer.scene; q16++) adv(0.1);
+    frisk();
+    /* F57: uret springer fem minutter; varmepladen varmer baegerglasset */
+    B.haeldI(g.baegerLille, St.lav({ V: 50, T: 20, mM: {} }), true);
+    g.plade.taendt = true;
+    adv(0.5);
+    var T16 = B.samlet(g.baegerLille).T;
+    paastand("et klik paa uret springer fem minutter frem (F57)", bord.klik("ur"));
+    adv(2);
+    var T16b = B.samlet(g.baegerLille).T;
+    paastand("og vandet paa varmepladen er blevet varmt imens", T16 < 25 && T16b > 60, tal(T16, 1) + " -> " + tal(T16b, 1) + " grader");
+    frisk();
+    /* F64: den groenne tekst ved en haeldning */
+    bord.moede(g.fl_cu, g.glas1);
+    faerdig();
+    var t16 = bord.tilsat.filter(function (t) { return t.c === g.glas1; });
+    paastand("en haeldning: »… mL tilsat« over glasset (F64)", t16.length === 1 && / mL tilsat$/.test(t16[0].tekst), t16.map(function (t) { return t.tekst; }).join(" | "));
+    try { bord.tegn(); paastand("den tegnes uden fejl", true); } catch (e) { paastand("den tegnes uden fejl", false, e.message); }
+    frisk();
+    /* F55: prøvebordet har ingen spatelbøtte, men spatlen kan stadig
+       forurene: CuSO4 og saa NaCl med den samme spatel */
+    var pulv = Object.keys(g).filter(function (n) { return g[n].kan && g[n].kan.pulver; });
+    var sp16 = g.spatel, j1 = g[pulv[0]], j2 = g[pulv[1]];
+    paastand("et pulverglas er intet slipmaal over et glas uden en spatelboette (F54)", !bord.kanModtage(j1, g.glas1));
+    bord.fyldSpatel(sp16, j1); faerdig();
+    bord.toemSpatel(sp16, g.glas1); faerdig();
+    bord.stilSvaevendeNed(true);
+    bord.fyldSpatel(sp16, j2); faerdig();
+    paastand("en brugt spatel i et andet pulverglas: det er forurenet (F55)", j2.forurenet && j2.forurenet.length === 1 && !!bord.forureningTekst(j2),
+        bord.forureningTekst(j2));
+    bord.stilSvaevendeNed(true);
+    frisk();
 }
 
 function vis() {

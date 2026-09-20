@@ -103,6 +103,7 @@ body {
 }
 
 .ikonknap:hover { background-color: var(--panel-3); color: var(--tekst); }
+.ikonknap[hidden] { display: none; }
 
 #lydknap .kryds { display: none; }
 #lydknap.fra .boelger { display: none; }
@@ -166,6 +167,55 @@ body {
 .noter #logbog-tekst { margin-top: 8px; }
 .noter .knaprad { margin-top: 8px; }
 
+/* F56: noterne har to faner - »Uheld og replikker« (den, noterne aabner
+   med) og »Mine noter« - og uheldstaelleren i hjoernet */
+.faner { display: flex; gap: 2px; }
+.fane {
+    padding: 4px 9px 5px;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--tekst-mat);
+    background: transparent;
+    border: 1px solid transparent;
+    border-bottom: 2px solid transparent;
+    border-radius: 5px 5px 0 0;
+    cursor: pointer;
+}
+.fane:hover { color: var(--tekst); }
+.fane[aria-selected="true"] { color: var(--gul); border-bottom-color: var(--gul); background-color: var(--panel-3); }
+.fane:focus-visible { outline: 2px solid var(--gul); outline-offset: 1px; }
+.uheld-maerke {
+    margin-left: auto;
+    margin-right: 6px;
+    padding: 2px 8px;
+    font-size: 0.76rem;
+    font-weight: 800;
+    color: var(--tekst-svag);
+    background-color: var(--panel-3);
+    border-radius: 999px;
+    white-space: nowrap;
+}
+.uheld-maerke.nogen { color: #fff; background-color: var(--roed-mork); }
+.noter-fane[hidden] { display: none; }
+.noter-fane h3 {
+    margin: 10px 0 4px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--tekst-mat);
+}
+.noter-fane .besked { margin: 0; font-size: 0.84rem; color: var(--tekst-mat); }
+.noter-fane .besked[hidden] { display: none; }
+.uheld-liste {
+    margin: 0; padding: 0; list-style: none; max-height: 120px; overflow-y: auto;
+    font-size: 0.84rem; line-height: 1.45; color: var(--tekst-svag);
+}
+.uheld-liste li { margin: 0 0 3px; }
+.uheld-liste b { color: #f08a7e; font-weight: 700; }
+.noter-fane .replik-liste { max-height: 200px; }
+
 /* ---------------------------------------------------------------------
    HOVEDLAYOUT: scenen til venstre, panelet til hoejre
    --------------------------------------------------------------------- */
@@ -176,8 +226,8 @@ main.forsoeg {
     grid-template-columns: minmax(0, 1fr) var(--panel-bredde);
 }
 
-/* »Fyld op til« ved en flaske over glasudstyr (F29, F39, F42) - side.js
-   laver og flytter det; forslagene staar paa en linje under feltet */
+/* »Fyld op til [ ] mL [Fyld]« ved en flaske over glasudstyr (F29, F42,
+   F61) - side.js laver og flytter det og saetter vaerdien i feltet */
 .fyldop {
     position: absolute;
     z-index: 4;
@@ -204,9 +254,6 @@ main.forsoeg {
     border-radius: 4px;
 }
 .fyldop .knap { padding: 3px 9px; font-size: 0.8rem; }
-.fyldop-forslag { display: flex; flex-wrap: wrap; gap: 4px; width: 100%; }
-.fyldop-forslag[hidden] { display: none; }
-.fyldop .knap.forslag { padding: 2px 7px; font-size: 0.74rem; background: rgba(79, 147, 218, 0.18); border-color: #4f93da; }
 
 .scene {
     position: relative;
@@ -299,6 +346,9 @@ main.forsoeg {
 .besked { margin: 0; font-size: 0.9rem; line-height: 1.5; color: var(--tekst-svag); }
 .besked.god   { color: #7ee0a8; }
 .besked.skidt { color: #f0918a; }
+/* F55: et forurenet pulverglas */
+.besked.forurenet { margin-top: 6px; font-weight: 700; color: #f0918a; }
+.besked.forurenet[hidden] { display: none; }
 
 /* ----- Forloebet ------------------------------------------------------ */
 .trinliste { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }

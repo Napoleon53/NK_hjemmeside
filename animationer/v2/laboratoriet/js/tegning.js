@@ -91,36 +91,125 @@
         ctx.fillRect(-2000, FORKANT + 9, BREDDE + 4000, 2000);
     };
 
-    /* Plakaten med sikkerhedsreglerne. p: { x, y, regel: 0-3 (fremhaevet) } */
+    /* Plakaten med sikkerhedsreglerne. p: { x, y, regel: 0-3 (fremhaevet) }.
+       F59: den fylder mindre end foer, men skriften er 1 px stoerre, og
+       punkterne er korte. Maalene regnes ud af skriften (T.plakatMaal):
+       bredden efter den laengste regel (inden for PL.min-PL.maks), og kan
+       en regel alligevel ikke staa paa én linje, brydes den, og plakaten
+       bliver hoejere. Kemichael og bordet spoerger plakatMaal om stoerrelsen
+       (bord.plakatRekt), saa ingen har 132 x 128 skrevet ind. */
+    T.PLAKAT_REGLER = ["Brug briller og kittel", "Ingen mad i laboratoriet", "Ingen åben ild"];
+    var PL = { min: 112, maks: 156, hoved: 21, top: 13, linje: 12, mellem: 4, bund: 8, venstre: 23, hoejre: 7,
+               font: "600 9.5px 'Segoe UI', sans-serif" };
+    var plakatMaal = null;
+    T.plakatMaal = function () {
+        if (plakatMaal) return plakatMaal;
+        var c = document.createElement("canvas").getContext("2d");
+        c.font = PL.font;
+        var bredest = 0;
+        T.PLAKAT_REGLER.forEach(function (r) { bredest = Math.max(bredest, c.measureText(r).width); });
+        var b = Math.round(NK.klamp(bredest + PL.venstre + PL.hoejre, PL.min, PL.maks));
+        var plads = b - PL.venstre - PL.hoejre, n = 0;
+        var linjer = T.PLAKAT_REGLER.map(function (r) {
+            var ud = [], linje = "";
+            r.split(" ").forEach(function (o) {
+                var proev = linje ? linje + " " + o : o;
+                if (linje && c.measureText(proev).width > plads) { ud.push(linje); linje = o; } else linje = proev;
+            });
+            ud.push(linje);
+            n += ud.length;
+            return ud;
+        });
+        var h = PL.hoved + PL.top + (n - 1) * PL.linje + (linjer.length - 1) * PL.mellem + PL.bund;
+        plakatMaal = { b: b, h: Math.round(h), linjer: linjer };
+        return plakatMaal;
+    };
+
     T.tegnPlakat = function (ctx, p) {
-        var b = 132, h = 128;
+        var m = T.plakatMaal(), b = m.b, h = m.h;
         ctx.save();
+        ctx.fillStyle = "rgba(0, 0, 0, 0.22)";
+        ctx.fillRect(p.x + 3, p.y + 3, b, h);
         ctx.fillStyle = "#e8ecef";
         ctx.fillRect(p.x, p.y, b, h);
         ctx.fillStyle = "#2b7d51";
-        ctx.fillRect(p.x, p.y, b, 22);
-        NK.tekst(ctx, "SIKKERHED", p.x + b / 2, p.y + 15, { font: "800 11px 'Segoe UI', sans-serif", justering: "center", farve: "#ffffff" });
-        var regler = ["Brug briller og kittel", "Der spises og drikkes ikke i laboratoriet", "Ingen åben ild nær brandfarlige stoffer"];
-        var y = p.y + 38;
-        regler.forEach(function (r, i) {
-            var frem = p.regel === i + 1;
-            ctx.fillStyle = frem ? "#a33529" : "#2f343b";
+        ctx.fillRect(p.x, p.y, b, PL.hoved);
+        NK.tekst(ctx, "SIKKERHED", p.x + b / 2, p.y + 15, { font: "800 12px 'Segoe UI', sans-serif", justering: "center", farve: "#ffffff" });
+        var y = p.y + PL.hoved + PL.top;
+        m.linjer.forEach(function (ls, i) {
+            var frem = p.regel === i + 1, farve = frem ? "#a33529" : "#2f343b";
+            ctx.fillStyle = farve;
             ctx.beginPath();
-            ctx.arc(p.x + 12, y - 4, 6, 0, Math.PI * 2);
+            ctx.arc(p.x + 12, y - 3.5, 6.5, 0, Math.PI * 2);
             ctx.fill();
-            NK.tekst(ctx, String(i + 1), p.x + 12, y - 0.5, { font: "800 8px 'Segoe UI', sans-serif", justering: "center", farve: "#ffffff" });
-            var ord = r.split(" "), linje = "", ly = y;
-            ctx.font = "600 8.5px 'Segoe UI', sans-serif";
-            ord.forEach(function (o) {
-                var proev = linje ? linje + " " + o : o;
-                if (ctx.measureText(proev).width > b - 30) {
-                    NK.tekst(ctx, linje, p.x + 24, ly, { font: "600 8.5px 'Segoe UI', sans-serif", farve: frem ? "#a33529" : "#2f343b" });
-                    linje = o; ly += 11;
-                } else linje = proev;
+            NK.tekst(ctx, String(i + 1), p.x + 12, y, { font: "800 9px 'Segoe UI', sans-serif", justering: "center", farve: "#ffffff" });
+            ls.forEach(function (l, k) {
+                NK.tekst(ctx, l, p.x + PL.venstre, y + k * PL.linje, { font: PL.font, farve: farve });
             });
-            NK.tekst(ctx, linje, p.x + 24, ly, { font: "600 8.5px 'Segoe UI', sans-serif", farve: frem ? "#a33529" : "#2f343b" });
-            y = ly + 20;
+            y += ls.length * PL.linje + PL.mellem;
         });
+        ctx.restore();
+    };
+
+    /* F57: vaeguret. u: { x, y, r }, minutter siden midnat. Med musen over
+       staar der, hvad et klik goer. */
+    T.tegnUr = function (ctx, u, minutter, over) {
+        var i;
+        ctx.save();
+        ctx.fillStyle = "rgba(0, 0, 0, 0.25)";
+        ctx.beginPath();
+        ctx.arc(u.x + 2.5, u.y + 3, u.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#eef1f3";
+        ctx.beginPath();
+        ctx.arc(u.x, u.y, u.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = over ? "#f2c53d" : "#1c2026";
+        ctx.stroke();
+        ctx.strokeStyle = "#39404a";
+        for (i = 0; i < 12; i++) {
+            var va = i * Math.PI / 6, lang = i % 3 === 0 ? 7 : 5;
+            ctx.lineWidth = i % 3 === 0 ? 1.8 : 1.2;
+            ctx.beginPath();
+            ctx.moveTo(u.x + Math.cos(va) * (u.r - 3), u.y + Math.sin(va) * (u.r - 3));
+            ctx.lineTo(u.x + Math.cos(va) * (u.r - lang), u.y + Math.sin(va) * (u.r - lang));
+            ctx.stroke();
+        }
+        var min = minutter % 60, tim = (minutter / 60) % 12;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = "#1c2026";
+        ctx.lineWidth = 2.6;
+        ctx.beginPath();
+        ctx.moveTo(u.x, u.y);
+        ctx.lineTo(u.x + Math.sin(tim / 12 * Math.PI * 2) * u.r * 0.48, u.y - Math.cos(tim / 12 * Math.PI * 2) * u.r * 0.48);
+        ctx.stroke();
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(u.x, u.y);
+        ctx.lineTo(u.x + Math.sin(min / 60 * Math.PI * 2) * u.r * 0.74, u.y - Math.cos(min / 60 * Math.PI * 2) * u.r * 0.74);
+        ctx.stroke();
+        ctx.fillStyle = "#c0392b";
+        ctx.beginPath();
+        ctx.arc(u.x, u.y, 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    };
+
+    /* Skiltet under uret, naar musen er over det. Tegnes oeverst, saa
+       intet paa bordet daekker det. */
+    T.tegnUrSkilt = function (ctx, u, tekst) {
+        ctx.save();
+        ctx.font = "700 13px 'Segoe UI', sans-serif";
+        var b = ctx.measureText(tekst).width + 16, h = 24;
+        var x = NK.klamp(u.x - b / 2, 4, S().BREDDE - b - 4), y = u.y + u.r + 8;
+        ctx.fillStyle = "rgba(20, 22, 28, 0.92)";
+        ctx.strokeStyle = "rgba(242, 197, 61, 0.9)";
+        ctx.lineWidth = 1.5;
+        NK.rundtRekt(ctx, x, y, b, h, 7);
+        ctx.fill();
+        ctx.stroke();
+        NK.tekst(ctx, tekst, x + b / 2, y + h / 2 + 0.5, { font: "700 13px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#f7f0c8" });
         ctx.restore();
     };
 

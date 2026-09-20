@@ -158,9 +158,9 @@ dobbelt rumfang.
 
 Frugtfarven står som en **stamflaske**: 100 mL på 35 mM, ti gange så
 kraftig som den farve, der skal stå i glassene. Den doseres derfor og
-hældes ikke op — én hældning er 4 mL (`FARVE_PORTION`), og resten af
-rumfanget er vand. Sådan bruger man også frugtfarve i et køkken. Fire mL i
-et glas, der fyldes til 44 mL, giver 3,2 mM, og det er dét, der står blåt
+hældes ikke op — én hældning er 5 mL (`FARVE_PORTION`, F60), og resten
+af rumfanget er vand. Sådan bruger man også frugtfarve i et køkken. Fem mL
+i et glas, der fyldes til 44 mL, giver 4,0 mM, og det er dét, der står blåt
 ovenfra.
 
 **Set fra siden** bliver begge fortyndede glas lysere, og det siger
@@ -301,11 +301,13 @@ fri af både det glas, replikken handler om, og zoomboblens hjørne. Et klik
 på boblen springer videre til hans næste linje (S14); et træk, der
 begynder på boblen, tager det, der står under den.
 
-**Det, han siger, står også i panelet** (S13): kortet »Sagt i
-laboratoriet« viser den seneste linje med hans navn og alle under »Alle«.
-Forløbets replikker kommer altid med, og sb2.4 har også valgt hans uheld
-og det, han siger om vasken (`historik` i `js/app.js`); kaffen og kigget ind kommer
-aldrig med. Start forfra rydder kortet.
+**Det, han siger, står også under Noter** (S13, F56): fanen »Uheld og
+replikker«, som Noter åbner med, har uheldene (én linje hver, »Uheld 1:
+…«, og tælleren i hjørnet) og alt, han har sagt, med hans navn. Forløbets
+replikker kommer altid med, og sb2.4 har også valgt hans uheld, det, han
+siger om vasken, og skældud for en brugt spatel (`historik` i
+`js/app.js`); kaffen og kigget ind kommer aldrig med. Start forfra rydder
+listen. Kortet »Sagt i laboratoriet« i panelet er væk (F56).
 
 **Bemærkningerne kan komme igen** (S3): to indgreb i samme glas,
 frugtfarve i ligevægtsblandingen og et skævt par har `igen` (30 s) i
@@ -437,9 +439,9 @@ gør hele del 1 med klik alene.
 en stor, blinkende pil på væggen ved plakaten (`pil` i `BORD_VALG`,
 `bord.visPil`). Isbadet har is (`is: true`). Forrest på bordet står en
 bøtte med rene spatler (`spatler`, del 1) og en kurv til snavset udstyr
-(`kurv`, begge dele). »Fyld op til« giver forslag, der passer til
-fortyndingen (`fyldOpForslag` i `js/app.js`): det, makkeren i parret har,
-det, det andet par har, og det dobbelte. Teksterne har tilstandsform ved
+(`kurv`, begge dele). »Fyld op til« gav forslag, der passede til
+fortyndingen (`fyldOpForslag`) — de er fjernet igen i F63, for det, du
+mente, var værdien i feltet (F61). Teksterne har tilstandsform ved
 stofferne, siger ikke længere »rør rundt«, og del 2 siger »lige meget
 frugtfarve« i stedet for »lige meget vand«; i visningen ovenfra vælger
 eleven, om det fortyndede glas er mørkere, lige så mørkt eller lysere end
@@ -454,7 +456,7 @@ ryster et sekund. Flasker på hylden og badene rystes ikke.
 **Gennemgangen 19. september om natten (F49–F53).** *Forløbslisten* er
 foldet i to dele (`forloebDele` i `js/app.js`): i del 1 står de seks glas,
 billedet og »Ryd op« trin for trin og del 2 som én linje, »Del 2:
-fortynding (0/5)«; når eleven kommer til del 2, foldes den ud, og del 1
+fortynding (0/4)«; når eleven kommer til del 2, foldes den ud, og del 1
 bliver én linje. *C-vitamin:* bøtten hedder C-vitamin, og udførelsen siger
 »C-vitamin (ascorbinsyre, C₆H₈O₆(s))«. *Kemichael* advarer kun om et
 farligt stof, når det faktisk er spildt (se motorens README). *Bordet
@@ -466,3 +468,22 @@ reagensglas, 25 mL i et bægerglas, pilen giver mere, og bægerglasset får
 »Fyld op til«); et glas, der slippes over kummen, hældes ud i vasken, og er
 der sølv i (AgNO₃ fra glas 4), siger Kemichael noget om tungmetaller og
 kloakken. Selvtestens afsnit 33 prøver det hele.
+
+**Gennemgangen 20. september (F54–F64).** *Spatlen:* trækkes et
+pulverglas hen til et glas (eller klikkes det og så glasset), kommer en
+ren spatel fra bøtten selv flyvende, tager en spatelspids og giver den til
+glasset. Pulverglasset bliver ved glasset med pilen »En spatelspids mere«;
+tager man fat i noget andet, går det hjem på hylden, og spatlen ryger i
+kurven. Stikker eleven selv en brugt spatel i et andet pulverglas, skælder
+Kemichael ud, og bøtten er forurenet: det står i beskrivelsen, når man
+klikker på den (»Forurenet med jern(III)nitrat (Fe(NO₃)₃) fra en brugt
+spatel.«). Kemien i bøtten ændres ikke. *Noter:* se ovenfor. *Uret* hænger
+over sikkerhedsplakaten; et klik på det springer fem minutter frem, så
+glas 5 og 6 når badenes temperatur (80 og 2 °C). *Kaffekoppen* står under
+plakaten på hylden til højre. *Plakaten* er mindre og hænger lavere
+(`plakat: { x: 880, y: 104 }`), skriften er 1 px større, og punkterne er
+korte. *Fyld op:* frugtfarven gives 5 mL ad gangen, pilen siger »5 mL
+mere«, feltet »Fyld op til [ ] mL [Fyld]« har på forhånd det, der er i
+glasset, plus én portion, og der er ingen forslagsknapper. *Den grønne
+tekst:* »5 mL tilsat«, »1 dråbe tilsat«, »1 spatelspids tilsat« over
+glasset ved hver tilsætning. Selvtestens afsnit 34 prøver det hele.

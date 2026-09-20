@@ -133,7 +133,7 @@
             /* ----- Del 2: fortyndingen ------------------------------- */
             "farve": { kort: "Par 1: frugtfarve",
                        tekst: "Giv begge glas i par 1 lige meget frugtfarve (aq): én portion i hvert. Hæld så vand, H₂O(l), i, til der er mindst 30 mL i hvert glas.",
-                       hint: "Flasken er en stamflaske: én hældning er 4 mL, og det er nok. Vandet kommer fra sprøjteflasken: skriv et tal i »Fyld op til«, eller giv en sjat ad gangen. Der skal mindst 30 mL i hvert glas, ellers er laget for tyndt til at se ned i." },
+                       hint: "Flasken er en stamflaske: én hældning er 5 mL, og det er nok. Vandet kommer fra sprøjteflasken: skriv et tal i »Fyld op til«, eller giv en sjat ad gangen. Der skal mindst 30 mL i hvert glas, ellers er laget for tyndt til at se ned i." },
             "lv":    { kort: "Par 2: ligevægtsblanding",
                        tekst: "Hæld lige meget ligevægtsblanding (stamopløsning, aq) i begge glas i par 2.",
                        hint: "Tag kolben til venstre eller bægerglasset med stamopløsning fra hylden. Kolben giver 40 mL pr. hældning, bægerglasset 25. Får de to glas ikke lige meget, måler du noget andet end fortyndingen." },

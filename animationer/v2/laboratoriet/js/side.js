@@ -39,11 +39,16 @@
                       valg.tilskuere); linjen vises kun, naar det valgte
                       glas har nogen. Navnene er knapper, der loefter en
                       ion op (F27)
-     #replik-kort #replik-antal #replik-sidst #replik-fold #replik-liste
+     #replik-liste #replik-ingen (og evt. #replik-kort #replik-antal
+                      #replik-sidst #replik-fold)
                       det, der er sagt i taleboblen, et varigt sted
                       (S13): forloebets replikker altid, Kemichaels egne
-                      scener (uheld, advarsler) hvis valg.historik naevner
-                      dem, smaasnak aldrig
+                      scener (uheld, vasken) hvis valg.historik naevner
+                      dem, smaasnak aldrig. F56: listen kan staa i en
+                      fane under noterne i stedet for i et kort
+     #uheld-liste #uheld-ingen #noter-uheld
+                      uheldene, én linje hver (»Uheld 1: Glas 3 væltede«,
+                      bord.uheldListe), og taelleren i noternes hjoerne
      #rystknap        »Ryst glasset«: holdes nede (eller tasten R) og
                       ryster det valgte glas uden at spilde (S16); vises
                       kun, naar det valgte glas kan rystes
@@ -53,6 +58,10 @@
                       og tasten N viser og skjuler #noter, Esc, krydset
                       #noter-luk og knappen #noter-lukknap lukker. Ryd
                       (skraldespanden) sletter foerst ved andet klik (F37)
+     #noter-faner #fane-sket #fane-egne #noter-sket #noter-egne
+                      noternes to faner (F56): »Uheld og replikker« er
+                      den, noterne aabner med; »Mine noter« har
+                      skrivefeltet. Skraldespanden ses kun i »Mine noter«
 
    Kroge, som forsoeget kan saette i valg:
      vedAendring(grund)     noget aendrede sig paa bordet
@@ -103,6 +112,13 @@
     P.bord = function () { return this.rum ? this.rum.aktiv() : this.etBord; };
     P.verden = function () { return this.rum || this.etBord; };
     P.uheld = function () { return this.rum ? this.rum.antalUheld() : this.etBord.antalUheld; };
+    /* F56: alle uheld, i den raekkefoelge de skete (i et rum-spil fra alle rum) */
+    P.uheldListe = function () {
+        if (!this.rum) return this.etBord.uheldListe || [];
+        var ud = [];
+        this.rum.rum.forEach(function (r) { ud = ud.concat(r.bord.uheldListe || []); });
+        return ud;
+    };
 
     /* ----- Aflaesningen af det valgte glas --------------------------------- */
     P.opdaterPanel = function () {
@@ -116,6 +132,7 @@
         var fold = tabel && tabel.closest ? tabel.closest("details") : null;
         var boble = NK.el("boble-laerred");
         if (NK.el("uheld-taeller")) NK.saetTekst("uheld-taeller", String(this.uheld()));
+        this.visUheld();
         if (boble) boble.hidden = !c;
 
         var linje = NK.el("tilskuere-linje");
@@ -131,6 +148,7 @@
             if (tabel) tabel.hidden = true;
             if (fold) fold.hidden = true;
             if (NK.el("glas-temp")) NK.el("glas-temp").hidden = true;
+            if (NK.el("glas-forurenet")) NK.el("glas-forurenet").hidden = true;
             if (this.valg.panel) this.valg.panel(this);
             this.sidsteSignatur = this.signatur();
             return;
@@ -199,6 +217,9 @@
             temp.textContent = "Temperatur: " + NK.Tegning.temperaturTekst(o.T) +
                 (c.koger ? " (koger)" : "") + (ph === null ? "" : " · pH " + tal(ph, 1));
         }
+        /* F55: et forurenet pulverglas siger det, og med hvad */
+        var fu = NK.el("glas-forurenet"), fuTekst = b.forureningTekst ? b.forureningTekst(c) : null;
+        if (fu) { fu.hidden = !fuTekst; fu.textContent = fuTekst || ""; }
 
         if (this.valg.panel) this.valg.panel(this);
         this.sidsteSignatur = this.signatur();
@@ -214,7 +235,7 @@
         var o = B.samlet(c);
         var ph = St.pH(o);
         var dele = [forrum, c.navn, Math.round(B.volumen(c) * 10), Math.round(o.T * 2),
-            this.uheld(), c.koger ? 1 : 0, ph === null ? "" : Math.round(ph * 10)];
+            this.uheld(), c.koger ? 1 : 0, ph === null ? "" : Math.round(ph * 10), c.forurenet ? c.forurenet.length : 0];
         Object.keys(o.n).sort().forEach(function (n) { dele.push(n + ":" + Math.round(o.n[n] * 10)); });
         if (this.valg.signatur) dele.push(this.valg.signatur(this));
         return dele.join("|");
@@ -271,7 +292,7 @@
        raekkefoelge, eleven hoerte den. Start forfra rydder den. */
     P.bygReplikker = function () {
         var mig = this;
-        if (!NK.el("replik-kort")) return;
+        if (!NK.el("replik-kort") && !NK.el("replik-liste")) return;
         this.replikker = [];
         var med = ["replik"].concat(this.valg.historik || []);
         NK.vedReplik = function (tekst, om) {
@@ -290,9 +311,10 @@
 
     P.visReplikker = function () {
         var kort = NK.el("replik-kort");
-        if (!kort || !this.replikker) return;
+        if (!this.replikker) return;
         var r = this.replikker;
-        kort.hidden = !r.length;
+        if (kort) kort.hidden = !r.length;
+        if (NK.el("replik-ingen")) NK.el("replik-ingen").hidden = r.length > 0;
         if (NK.el("replik-antal")) NK.saetTekst("replik-antal", r.length ? String(r.length) : "");
         function linje(el, x) {
             el.textContent = "";
@@ -316,6 +338,32 @@
             });
             liste.scrollTop = liste.scrollHeight;
         }
+    };
+
+    /* ----- Uheldene under noterne (F56) ------------------------------------
+       Én linje pr. uheld (»Uheld 1: Glas 3 væltede, og indholdet løb
+       ud«) og taelleren i noternes hjoerne. Listen bygges kun om, naar der
+       er kommet et uheld til eller forsvundet nogen (Start forfra). */
+    P.visUheld = function () {
+        var liste = NK.el("uheld-liste"), maerke = NK.el("noter-uheld");
+        if (!liste && !maerke) return;
+        var u = this.uheldListe();
+        if (maerke) {
+            NK.saetTekst("noter-uheld", "Uheld: " + u.length);
+            maerke.classList.toggle("nogen", u.length > 0);
+        }
+        if (!liste || liste.dataset.antal === String(u.length)) return;
+        liste.dataset.antal = String(u.length);
+        liste.textContent = "";
+        u.forEach(function (x, i) {
+            var li = document.createElement("li"), b = document.createElement("b");
+            b.textContent = "Uheld " + (i + 1) + ": ";
+            li.appendChild(b);
+            li.appendChild(document.createTextNode(x.kort));
+            liste.appendChild(li);
+        });
+        liste.scrollTop = liste.scrollHeight;
+        if (NK.el("uheld-ingen")) NK.el("uheld-ingen").hidden = u.length > 0;
     };
 
     /* ----- Overlays, intro og lyd ------------------------------------------ */
@@ -459,6 +507,8 @@
         if (stoffer.length) dele.push(stoffer.join(", "));
         var v = b.g && b.g.vaegt;
         if (v && b.masseePaa && b.masseePaa(v) > 0 && c.paa === v) dele.push("vægt " + b.vaegtTekst(v));
+        var fu = b.forureningTekst ? b.forureningTekst(c) : null;
+        if (fu) dele.push(fu.replace(/^Forurenet/, "forurenet").replace(/\.$/, ""));
         return dele.join("; ");
     };
 
@@ -468,15 +518,34 @@
         var el = NK.el("noter"), kn = NK.el("noterknap");
         if (!el) return false;
         if (vis === undefined) vis = el.hidden;
+        var aabnes = vis && el.hidden;
         el.hidden = !vis;
         if (kn) {
             kn.setAttribute("aria-expanded", vis ? "true" : "false");
             kn.classList.toggle("aktiv", !!vis);
         }
         var felt = NK.el("logbog-tekst");
-        if (vis && felt) felt.focus();
-        else if (!vis && felt && document.activeElement === felt) felt.blur();
+        /* F56: med faner aabner noterne altid paa »Uheld og replikker« */
+        if (aabnes && NK.el("noter-faner")) {
+            this.vaelgFane("sket");
+            if (NK.el("fane-sket")) NK.el("fane-sket").focus();
+        } else if (vis && felt && !NK.el("noter-faner")) felt.focus();
+        if (!vis && felt && document.activeElement === felt) felt.blur();
+        if (!vis && document.activeElement && el.contains(document.activeElement)) document.activeElement.blur();
         return true;
+    };
+
+    /* F56: fanen "sket" (uheld og replikker) eller "egne" (mine noter) */
+    P.vaelgFane = function (navn) {
+        ["sket", "egne"].forEach(function (n) {
+            var k = NK.el("fane-" + n), p = NK.el("noter-" + n);
+            if (k) k.setAttribute("aria-selected", n === navn ? "true" : "false");
+            if (k) k.tabIndex = n === navn ? 0 : -1;
+            if (p) p.hidden = n !== navn;
+        });
+        if (NK.el("logbog-ryd")) NK.el("logbog-ryd").hidden = navn !== "egne";
+        if (navn === "sket") { this.visUheld(); this.visReplikker(); }
+        this.fane = navn;
     };
 
     P.logbogGem = function () {
@@ -488,6 +557,7 @@
         var linje = this.aflaesning();
         if (!linje) { this.besked("Klik på et glas først.", "advarsel"); return; }
         var el = NK.el("logbog-tekst");
+        if (NK.el("noter-faner")) this.vaelgFane("egne");
         var nu = new Date();
         var klokken = (nu.getHours() < 10 ? "0" : "") + nu.getHours() + ":" + (nu.getMinutes() < 10 ? "0" : "") + nu.getMinutes();
         el.value = (el.value ? el.value.replace(/\s+$/, "") + "\n" : "") + klokken + " " + linje;
@@ -746,24 +816,26 @@
         if (this.signatur() !== this.sidsteSignatur) this.opdaterPanel();
     };
 
-    /* ----- »Fyld op til« (F29, F39, F42) --------------------------------------
+    /* ----- »Fyld op til« (F29, F42, F61-F63) ----------------------------------
        Haenger sproejteflasken - eller en anden flaske, kolben eller et glas
        - over glasudstyr, man maaler rumfang i (bord.kanFyldeOp), staar der
-       et lille felt ved pilen: skriv et rumfang, og glasset fyldes op til
-       det i én haeldning (bord.fyldOpTil). Under feltet staar op til tre
-       forslag som knapper. Forsoeget kan give sine egne, der passer til
-       netop det (valg.fyldOpForslag(bord, glas, kilde) -> [{ mL, tekst }]);
-       ellers er det »dobbelt« og runde tal paa glassets skala. Feltet
-       laves her, saa alle forsoeg faar det uden egen markup. */
-    function standardForslag(b, c) {
-        var V = NK.Beholder.volumen(c), maks = c.type.maks, ud = [];
-        if (V > 0.5 && 2 * V <= maks - 0.1) ud.push({ mL: Math.round(2 * V), tekst: "dobbelt" });
-        [0.25, 0.5, 0.75].forEach(function (f) {
-            var mL = Math.round(maks * f / 10) * 10;
-            if (mL > V + 0.5 && ud.length < 3 && !ud.some(function (x) { return x.mL === mL; })) ud.push({ mL: mL, tekst: "" });
-        });
-        return ud;
-    }
+       et lille felt ved pilen: »Fyld op til [ ] mL [Fyld]«, og glasset
+       fyldes op til det i én haeldning (bord.fyldOpTil). Feltet har paa
+       forhaand en vaerdi, der giver mening: det, der staar i glasset, plus
+       det, pilen giver (bord.pilMl) - er der 5 mL, og giver pilen 5, staar
+       der 10 (F61). Vaerdien skifter, naar glasset eller rumfanget gør, men
+       ikke mens eleven skriver i feltet. Forslagsknapperne (F39, »dobbelt«)
+       er fjernet igen (F63). Feltet laves her, saa alle forsoeg faar det
+       uden egen markup. */
+    P.fyldOpForslag = function (b, sv) {
+        var c = sv.svaev.maal.kan.hane ? sv : sv.svaev.maal;
+        var V = B.volumen(c), p = b.pilMl ? b.pilMl(sv) : null;
+        if (!(p > 0)) p = 5;
+        var loft = (c.type.nominel || c.type.maks) - 0.1;
+        var mL = Math.round(V + p);
+        if (mL > loft) mL = Math.floor(loft);
+        return mL > V + 0.05 ? mL : null;
+    };
 
     P.bygFyldOp = function () {
         var lr = NK.el("scene-laerred"), scene = lr && lr.parentNode, mig = this;
@@ -774,23 +846,15 @@
         f.hidden = true;
         f.setAttribute("aria-label", "Fyld op til");
         f.innerHTML = '<label>Fyld op til <input id="fyldop-ml" type="text" inputmode="decimal" size="4" autocomplete="off"> mL</label>' +
-            '<button class="knap" type="submit">Fyld</button>' +
-            '<div class="fyldop-forslag" id="fyldop-forslag"></div>';
+            '<button class="knap" type="submit">Fyld</button>';
         scene.appendChild(f);
-        f.querySelector(".fyldop-forslag").addEventListener("click", function (e) {
-            var k = e.target && e.target.closest ? e.target.closest("button[data-ml]") : null;
-            if (!k) return;
-            e.preventDefault();
-            var b = mig.bord(), sv = b && b.svaevende();
-            if (sv && sv.svaev) b.fyldOpTil(sv, sv.svaev.maal, parseFloat(k.dataset.ml));
-        });
         f.addEventListener("submit", function (e) {
             e.preventDefault();
             var b = mig.bord(), sv = b && b.svaevende(), inp = NK.el("fyldop-ml");
             var v = parseFloat(String(inp.value).replace(",", "."));
             if (!sv || !sv.svaev || !(v > 0)) { inp.focus(); return; }
             b.fyldOpTil(sv, sv.svaev.maal, v);
-            inp.value = "";
+            inp.dataset.noegle = "";
             inp.blur();
         });
         this.fyldOp = f;
@@ -818,26 +882,16 @@
             f.dataset.sted = x + "," + y;
         }
         f.hidden = false;
-        /* Under hanen er det glasset selv, der fyldes (F53) */
+        /* Vaerdien i feltet (F61). Under hanen er det glasset selv, der
+           fyldes (F53). */
         var inp = NK.el("fyldop-ml"), c = sv.svaev.maal.kan.hane ? sv : sv.svaev.maal;
-        if (inp && document.activeElement !== inp) inp.placeholder = String(Math.round(NK.Beholder.volumen(c)));
-        var fo = this.valg.fyldOpForslag ? this.valg.fyldOpForslag.call(this, b, c, sv) : null;
-        if (!fo) fo = standardForslag(b, c);
-        fo = (fo || []).slice(0, 3);
-        var boks = NK.el("fyldop-forslag"), noegle = fo.map(function (x) { return x.mL + ":" + x.tekst; }).join("|");
-        if (boks && boks.dataset.noegle !== noegle) {
-            boks.dataset.noegle = noegle;
-            boks.textContent = "";
-            boks.hidden = !fo.length;
-            fo.forEach(function (x) {
-                var k = document.createElement("button");
-                k.type = "button";
-                k.className = "knap forslag";
-                k.dataset.ml = String(x.mL);
-                k.textContent = x.mL + " mL" + (x.tekst ? " · " + x.tekst : "");
-                boks.appendChild(k);
-            });
-        }
+        if (!inp || document.activeElement === inp) return;
+        var noegle = sv.navn + ">" + c.navn + ":" + B.volumen(c).toFixed(2);
+        if (inp.dataset.noegle === noegle) return;
+        inp.dataset.noegle = noegle;
+        var mL = this.fyldOpForslag(b, sv);
+        inp.value = mL === null ? "" : String(mL);
+        inp.placeholder = String(Math.round(B.volumen(c)));
     };
 
     /* ----- Opstart ------------------------------------------------------------ */
@@ -1010,6 +1064,22 @@
             NK.logbog = { noter: function () { mig.logbogNoter(); }, aflaesning: function () { return mig.aflaesning(); } };
         }
         paa("noterknap", "click", function () { mig.skiftNoter(); });
+        if (NK.el("noter-faner")) {
+            this.vaelgFane("sket");
+            paa("fane-sket", "click", function () { mig.vaelgFane("sket"); });
+            paa("fane-egne", "click", function () {
+                mig.vaelgFane("egne");
+                if (NK.el("logbog-tekst")) NK.el("logbog-tekst").focus();
+            });
+            /* Pilene skifter fane, som i enhver faneliste */
+            paa("noter-faner", "keydown", function (e) {
+                if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+                var til = mig.fane === "sket" ? "egne" : "sket";
+                mig.vaelgFane(til);
+                NK.el("fane-" + til).focus();
+                e.preventDefault();
+            });
+        }
         paa("noter-luk", "click", function () { mig.skiftNoter(false); });
         paa("noter-lukknap", "click", function () { mig.skiftNoter(false); });
         /* Esc i skrivefeltet lukker ogsaa (tastaturet ser ikke tekstfelter) */

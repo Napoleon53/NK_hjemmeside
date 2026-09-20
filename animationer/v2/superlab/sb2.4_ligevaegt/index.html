@@ -39,13 +39,27 @@
         </div>
         <section class="noter" id="noter" hidden aria-label="Noter">
             <div class="noter-top">
-                <h2>Noter</h2>
+                <div class="faner" id="noter-faner" role="tablist" aria-label="Noter">
+                    <button class="fane" id="fane-sket" type="button" role="tab" aria-selected="true" aria-controls="noter-sket">Uheld og replikker</button>
+                    <button class="fane" id="fane-egne" type="button" role="tab" aria-selected="false" aria-controls="noter-egne">Mine noter</button>
+                </div>
+                <span class="uheld-maerke" id="noter-uheld" title="Antal uheld">Uheld: 0</span>
                 <div class="noter-ikoner">
-                    <button class="ikonknap" id="logbog-ryd" type="button" title="Slet noterne" aria-label="Slet noterne"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>
+                    <button class="ikonknap" id="logbog-ryd" type="button" title="Slet noterne" aria-label="Slet noterne" hidden><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>
                     <button class="ikonknap" id="noter-luk" type="button" title="Luk noterne (Esc)" aria-label="Luk noterne">×</button>
                 </div>
             </div>
-            <textarea id="logbog-tekst" rows="5" placeholder="Dine egne noter. Knappen skriver det valgte glas' rumfang, temperatur, pH og indhold."></textarea>
+            <div class="noter-fane" id="noter-sket" role="tabpanel" aria-labelledby="fane-sket">
+                <h3>Uheld</h3>
+                <ul class="uheld-liste" id="uheld-liste"></ul>
+                <p class="besked" id="uheld-ingen">Ingen uheld endnu.</p>
+                <h3>Sagt i laboratoriet</h3>
+                <ol class="replik-liste" id="replik-liste"></ol>
+                <p class="besked" id="replik-ingen">Der er ikke sagt noget endnu.</p>
+            </div>
+            <div class="noter-fane" id="noter-egne" role="tabpanel" aria-labelledby="fane-egne" hidden>
+                <textarea id="logbog-tekst" rows="5" placeholder="Dine egne noter. Knappen skriver det valgte glas' rumfang, temperatur, pH og indhold."></textarea>
+            </div>
             <div class="knaprad">
                 <button class="knap blaa" id="logbog-noter" type="button" title="Skriv det valgte glas' aflæsning i noterne">Notér det valgte glas</button>
                 <button class="knap" id="noter-lukknap" type="button" title="Luk noterne (Esc)">Luk</button>
@@ -58,6 +72,7 @@
             <h2><span id="glas-titel">Det valgte glas</span> <span class="taeller" id="glas-volumen"></span></h2>
             <p class="besked" id="glas-tom">Klik på et glas for at se, hvad der er i.</p>
             <p class="besked" id="glas-temp" hidden></p>
+            <p class="besked forurenet" id="glas-forurenet" hidden></p>
             <button class="knap rystknap" id="rystknap" type="button" title="Hold knappen eller tasten R nede" hidden>Ryst glasset</button>
             <label id="tilskuere-linje" hidden><input type="checkbox" id="tilskuere-vis"> <span id="tilskuere-tekst"></span> <span id="tilskuere-navne"></span></label>
             <details class="fold" id="glas-indhold-fold" hidden>
@@ -75,15 +90,6 @@
                 <button class="knap" id="ovenfraknap" type="button" title="Se de fire bægerglas ovenfra (S)" hidden>Se ovenfra</button>
             </div>
             <ol class="forloeb-liste" id="forloeb-liste"></ol>
-        </div>
-
-        <div class="kort" id="replik-kort" hidden>
-            <h2><span>Sagt i laboratoriet</span> <span class="taeller" id="replik-antal"></span></h2>
-            <p class="replik-sidst" id="replik-sidst"></p>
-            <details class="fold" id="replik-fold" hidden>
-                <summary>Alle</summary>
-                <ol class="replik-liste" id="replik-liste"></ol>
-            </details>
         </div>
 
         <div class="kort opgavekort" id="quiz-kort">
