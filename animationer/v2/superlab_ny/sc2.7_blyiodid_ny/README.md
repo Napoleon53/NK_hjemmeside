@@ -20,13 +20,20 @@ som i den gamle, afvejningen er som den gamle, varmepladen har
 magnetomrører, og forløbets syv trin kører fra vandet til affaldet med
 tre målinger, der bedømmes af verden. Kemichael siger det, når det koger
 med bundfald, og når de tre målinger ligger på kurven.
-`_selvtest.html` kører det hele igennem i otte afsnit; afsnit 7 er
-øvelsestjekket (M2), og afsnit 8 gør det med musen.
 
-Det mangler: grafen over opløseligheden (M9), quizzen og tegneserien,
-PbI₂-krystallerne i zoomboblen og »den gyldne regn«, Kemichaels egne
-scener (det varme glas) og den gamle udgaves knap. Se `claude/TODO.md`,
-K3.
+Grafen (M9) står i kortet Målinger under tabellen: hver måling er et
+nummereret punkt med den noterede temperatur og den masse PbI₂, der kan
+dannes, pr. 100 mL. Kurven med tabelværdierne (4s³ = K(T)) kommer først, når
+alle tre er noteret, så den ikke siger, hvornår krystallerne skal komme.
+Et punkt, der er mere end 6 °C ved siden af, står i orange.
+
+`_selvtest.html` kører det hele igennem i ni afsnit; afsnit 7 er
+øvelsestjekket (M2), afsnit 8 gør det med musen, og afsnit 9 prøver
+grafen med kendte tal.
+
+Det mangler: quizzen og tegneserien, PbI₂-krystallerne i zoomboblen,
+Kemichaels egne scener (det varme glas) og den gamle udgaves knap. Se
+`claude/TODO.md`, K3.
 
 ## Filer
 
@@ -34,11 +41,13 @@ K3.
 index.html          stilladset: scene, panel (glasset, forløbet, målingerne,
                     uheld), intro, teoriboks, rundvisning. Ingen prosa.
 css/stil.css        ligningen, forløbslisten og målingernes tabel
+                    (grafens boks står i laboratoriet/css/grund.css)
 js/tekst.js         AL prosa: titel, intro, teorien, trinnenes tekster og
                     hints, beskederne om afvejning og måling, replikkerne,
                     rundvisningens stop
 js/opstilling.js    bordet: hvad der står på det, spatlen og bordets mål
-js/maaling.js       målingerne (journalen »maaling«) og afvejningens regel
+js/maaling.js       målingerne (journalen »maaling«), grafen og
+                    afvejningens regel
 js/forloeb.js       trinnenes betingelser og de tre udløsere
 js/app.js           siden: reglen, knappen Notér temperatur, tasten K
 js/tur.js           rundvisningen

@@ -179,6 +179,7 @@
             if (NK.el("glas-forurenet")) NK.el("glas-forurenet").hidden = true;
             this.visFare(null);
             if (this.valg.panel) this.valg.panel(this);
+            this.visGraf();
             this.sidsteSignatur = this.signatur();
             return;
         }
@@ -252,7 +253,28 @@
         this.visFare(B.volumen(c) > 0.05 || St.fastIalt(o) > 0.5 ? St.faremaerker(o) : null);
 
         if (this.valg.panel) this.valg.panel(this);
+        this.visGraf();
         this.sidsteSignatur = this.signatur();
+    };
+
+    /* M9: grafen i panelet. valg.graf(side) giver en definition til
+       NK.Graf.tegn eller null (saa skjules #graf-boks). Panelet opdateres,
+       hver gang noget paa bordet aendrer sig, men grafen tegnes kun om,
+       naar definitionen eller laerredets stoerrelse skifter. Svaret (grafens
+       maal fra NK.Graf.tegn) gemmes i side.graf til selvtesten. */
+    P.visGraf = function (tving) {
+        var laerred = NK.el("graf-laerred");
+        if (!laerred || !this.valg.graf || !NK.Graf) return null;
+        var boks = NK.el("graf-boks") || laerred;
+        var def = this.valg.graf(this);
+        boks.hidden = !def;
+        if (!def) { laerred.dataset.noegle = ""; this.graf = null; return null; }
+        var noegle = JSON.stringify(def, function (k, v) { return typeof v === "function" ? "f" : v; }) +
+            "|" + laerred.clientWidth + "x" + laerred.clientHeight + "|" + (window.devicePixelRatio || 1);
+        if (!tving && this.graf && laerred.dataset.noegle === noegle) return this.graf;
+        laerred.dataset.noegle = noegle;
+        this.graf = NK.Graf.tegn(laerred, def);
+        return this.graf;
     };
 
     /* F74: faremaerkerne paa det valgte glas i stor stoerrelse med navn.
@@ -1049,6 +1071,8 @@
         NK.bord = this.etBord || null;
         NK.rum = this.rum || null;
         NK.opdaterPanel = function () { mig.opdaterPanel(); };
+        /* M9: grafen foelger panelets bredde */
+        window.addEventListener("resize", function () { mig.visGraf(); });
         NK.startForfra = function () { mig.startForfra(); };
         NK.intro = { aabn: function () { mig.aabnIntro(); }, luk: function () { mig.lukOverlay(); } };
         NK.teori = { aabn: function () { mig.aabnTeori(); }, luk: function () { mig.lukOverlay(); } };

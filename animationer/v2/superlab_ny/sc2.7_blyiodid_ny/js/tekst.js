@@ -133,6 +133,17 @@
             "ki-vindue": "KI skal have samme masse som Pb(NO₃)₂: {m} g, højst 0,010 g fra. Vægten viser {g} g."
         },
 
+        /* ----- Grafen i målingskortet (js/maaling.js, M9) ----------------- */
+        graf: {
+            x: "Temperatur",
+            y: "Opløselighed",
+            yEnhed: "g PbI₂ pr. 100 mL",
+            punkter: "Dine målinger",
+            kurve: "Tabelværdier",
+            note: "Hvert punkt er en måling: temperaturen, og hvor meget PbI₂ der er i 100 mL. Kurven med tabelværdierne kommer, når du har tre målinger.",
+            noteFaerdig: "Den stiplede kurve er tabelværdierne. Jo tættere dine punkter ligger på den, jo bedre passer dine målinger."
+        },
+
         /* ----- Kemichaels replikker (udløserne i js/forloeb.js) ------------ */
         "sig-for-meget": [
             "Det koger, og der er stadig bundfald.",
@@ -150,7 +161,7 @@
             { sel: "#top-ligning", titel: "Fældningen", tekst: "Reaktionen, det hele handler om. Teorien ligger under knappen Teori, eller tasten T." },
             { sel: "#forloeb-kort", titel: "Forløbet", tekst: "Trinnene får flueben, når bordet ser rigtigt ud. Hint viser, hvad du skal gøre, og markerer det, det handler om." },
             { sel: "#maaleknap", titel: "Notér temperatur", tekst: "Tryk her (eller K), så snart de første krystaller kommer, når opløsningen køler af. Termometeret skal sidde i bægerglasset." },
-            { sel: "#maaling-kort", titel: "Målingerne", tekst: "Hver måling står her med masserne, den masse PbI₂ der kan dannes, og temperaturen." },
+            { sel: "#maaling-kort", titel: "Målingerne", tekst: "Hver måling står her med masserne, den masse PbI₂ der kan dannes, og temperaturen. Grafen viser målingerne, og når du har tre, kommer kurven med tabelværdierne." },
             { sel: "#noterknap", titel: "Noter", tekst: "Uheld og det, Kemichael har sagt, står her. Dine egne noter står under Mine noter." }
         ]
     };

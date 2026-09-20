@@ -41,6 +41,15 @@
    skal vise bagefter - ikke hvordan glasset ser ud nu, efter at det er
    haeldt ud. Svaret og det, der blev svaret paa, hoerer sammen.
 
+   ----- Grafen (M9) ---------------------------------------------------
+   punkter(fn) giver posterne som punkter til NK.Graf (graf.js), i den
+   raekkefoelge, de er kraevet (ellers som de blev noteret). fn(post,
+   journal) giver { x, y } eller null; uden fn er x postens nummer og y
+   svaret. Hvert punkt har ogsaa id, tekst (nummeret) og forkert, saa et
+   forkert svar kan staa i en anden farve:
+
+       J.punkter(function (p) { return { x: p.svar, y: p.billede.opl }; });
+
    ----- Gemning -------------------------------------------------------
    Journalerne gemmes med forloebet (forloeb.js), fordi de er en del af
    historien og ikke af bordene.
@@ -134,6 +143,27 @@
     P.forkerte = function () {
         var mig = this;
         return this.kraevede.filter(function (id) { return mig.rigtig(id) === false; });
+    };
+
+    /* ----- Grafen (M9) --------------------------------------------------- */
+    P.punkter = function (fn) {
+        var mig = this;
+        var raekke = this.svarede().sort(function (a, b) {
+            var ia = mig.kraevede.indexOf(a), ib = mig.kraevede.indexOf(b);
+            if (ia < 0) ia = Infinity;
+            if (ib < 0) ib = Infinity;
+            return ia !== ib ? ia - ib : mig.poster[a].tid - mig.poster[b].tid;
+        });
+        var ud = [];
+        raekke.forEach(function (id, i) {
+            var p = mig.poster[id];
+            var xy = fn ? fn(p, mig) : { x: i + 1, y: Number(p.svar) };
+            if (!xy || !isFinite(xy.x) || !isFinite(xy.y)) return;
+            var nr = mig.kraevede.indexOf(id);
+            ud.push({ x: +xy.x, y: +xy.y, id: id, tekst: xy.tekst !== undefined ? xy.tekst : String(nr >= 0 ? nr + 1 : i + 1),
+                      forkert: mig.rigtig(id) === false });
+        });
+        return ud;
     };
 
     /* ----- Gemning ------------------------------------------------------- */

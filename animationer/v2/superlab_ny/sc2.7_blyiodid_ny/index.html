@@ -92,6 +92,10 @@
             <h2><span>Målinger</span> <span class="taeller" id="maaling-taeller">0/3</span></h2>
             <p class="besked" id="maaling-tom"></p>
             <table class="maalinger" id="maaling-tabel" hidden></table>
+            <div class="graf-boks" id="graf-boks" hidden>
+                <canvas id="graf-laerred" role="img" aria-label="Graf over målingerne: opløselighed mod temperatur"></canvas>
+                <p class="graf-note" id="graf-note"></p>
+            </div>
         </div>
 
         <div class="kort" id="uheld-kort">
@@ -165,6 +169,7 @@
 <script src="../../laboratoriet/js/bord.js"></script>
 <script src="../../laboratoriet/js/vilkaar.js"></script>
 <script src="../../laboratoriet/js/journal.js"></script>
+<script src="../../laboratoriet/js/graf.js"></script>
 <script src="../../laboratoriet/js/forloeb.js"></script>
 <script src="js/tekst.js"></script>
 <script src="js/opstilling.js"></script>

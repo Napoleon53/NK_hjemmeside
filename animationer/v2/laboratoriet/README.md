@@ -87,6 +87,8 @@ js/forloeb.js        trin, udløsere og flag: betingelse → konsekvens, fyrer
                      én gang. Samme lag bærer en øvelses trin og en låst dør
 js/journal.js        elevens egne iagttagelser og målinger: posterne, svarene,
                      øjebliksbilledet og bedømmelsen mod sandheden
+js/graf.js           grafen (M9): journalens målinger som punkter, kurver
+                     eller søjler, med akser, der skalerer efter data
 js/quiz.js           quizzen som fælles ramme: spørgsmålene er data i forsøgets
                      tekst.js, og et vilkår åbner den
 js/tegneserie.js     tegneserien som fælles ramme: hver rude er et udsnit af
@@ -1047,6 +1049,40 @@ bordene. Et trin kan læse dem i samme sprog som alt andet:
 
 Mønster: `../superlab_ny/sb2.4_jernthiocyanat_ny/js/billede.js` og dets trin `billede`.
 
+### Grafen
+
+`js/graf.js` tegner journalens målinger op (M9). Et forsøg sætter
+`valg.graf` i `NK.Side.start`, og panelet tegner grafen i `#graf-laerred`
+(inde i `#graf-boks`), hver gang definitionen skifter. Giver `graf` `null`,
+skjules boksen.
+
+```js
+graf: function () {
+    var pkt = J.punkter(function (p) { return { x: p.svar, y: p.billede.opl }; });
+    if (!pkt.length) return null;
+    return {
+        x: { navn: "Temperatur", enhed: "°C", min: 0, max: 100, trin: 20 },
+        y: { navn: "Opløselighed", enhed: "g pr. 100 mL", min: 0 },
+        serier: [
+            { type: "kurve", f: tabel, navn: "Tabelværdier", stiplet: true },
+            { type: "punkter", punkter: pkt, navn: "Dine målinger" }
+        ]
+    };
+}
+```
+
+Grafen kan tre slags serier: en kurve (en funktion eller punkter), nummererede
+punkter (et forkert svar står i orange) og søjler med kategorier på x-aksen.
+Det, der ikke står om akserne, regnes af data og rundes ud til et rundt trin
+(1, 2 eller 5 gange en tierpotens) med lidt luft over det højeste. Tal står
+med dansk komma. `journal.punkter(fn)` giver posterne i den rækkefølge, de er
+krævet, med nummer og `forkert`. `NK.Graf.tegnPaa(ctx, B, H, def)` tegner
+grafen på et andet lærred, fx en tegneseries rude.
+
+Mønster: `../superlab_ny/sc2.7_blyiodid_ny/js/maaling.js` (`M.graf`); kurven
+med tabelværdierne kommer først, når alle tre målinger er noteret, så den
+ikke siger, hvornår krystallerne skal komme.
+
 ## Bade
 
 Udstyret `bad` er et stort bægerglas, der står fast, og som man sætter
@@ -1170,11 +1206,11 @@ selvtest med afsnittet ovenfor.
 * sb2.4 er lagt over på genstandsmodellen i `../superlab_ny/sb2.4_jernthiocyanat_ny/`
   med begge dele, quizzen og tegneserien.
 * sc2.7 er lagt over i `../superlab_ny/sc2.7_blyiodid_ny/` (K3): kernen med
-  afvejningen, varmepladen og de tre målinger kører. Grafen (M9), quizzen
+  afvejningen, varmepladen, de tre målinger og grafen (M9) kører. Quizzen
   og tegneserien mangler. Derefter sc6.8 og sc8.6.
-* **Grafen.** Journalen kan notere en måling; den kan endnu ikke tegne den
-  op. Titrerings- og kalibreringskurver dukker op i næsten enhver øvelse, så
-  det er en fælles komponent, ikke noget hvert forsøg skal opfinde.
+* **Grafen** (`js/graf.js`) er prøvet af sc2.7's kurve med punkter. Søjlerne
+  venter på sc1.3, og en titreringskurve, der tegnes, mens der titreres, på
+  den første titrering.
 * Rammerne i `quiz.js` og `tegneserie.js` er skrevet til otte forsøg, men
   kun prøvet af ét. Ved første konvertering viser det sig, hvad de mangler.
 * **Mikroniveauet** kan vise bind, split, fæld, opløs og omdan. Fire former

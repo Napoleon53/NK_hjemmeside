@@ -23,8 +23,9 @@
    oploselighed og maetningstemperaturerne i stoftabellen, afvejningen
    (spatelspidser, at tage af, vaegtens tre decimaler og reglen for,
    hvad der maa haeldes i), varmepladen med magnetomroereren, de tre
-   maalinger med facit fra verden, Start forfra, oevelsestjekket (M2) og
-   til sidst det samme med musen, som en elev (proeve.js).
+   maalinger med facit fra verden og grafen i maalingskortet, Start
+   forfra, oevelsestjekket (M2), det samme med musen, som en elev
+   (proeve.js), og til sidst grafen (graf.js, M9) med kendte tal.
 
    Skal aabnes gennem en lokal server (eller Chrome med
    --allow-file-access-from-files), ellers kan iframen ikke laeses.
@@ -111,11 +112,25 @@ function koerTest() {
     paastand("KI har ingen faremærker, og feltet er skjult", fare.hidden);
     bord.vaelg(null);
     side.opdaterPanel();
+    paastand("graf.js er indlaest, og grafen er skjult, foer der er maalt (M9)", !!NK.Graf && d.getElementById("graf-boks").hidden);
 
     function adv(sek) { for (var k = 0; k < Math.round(sek * 20); k++) bord.opdater(0.05); F.opdater(); }
     var beskeder = [], vedB = bord.vedBesked;
     bord.vedBesked = function (t, s) { beskeder.push(t); if (vedB) vedB.call(bord, t, s); };
     function sidste() { return beskeder.length ? beskeder[beskeder.length - 1] : ""; }
+    /* M9: farven i et punkt paa et laerred (CSS-pixel) og hvor mange
+       pixel i laerredet, der har kurvens blaa */
+    function farveI(c, x, y) {
+        var k = c.width / (c.clientWidth || c.width);
+        var px = c.getContext("2d").getImageData(Math.round(x * k), Math.round(y * k), 1, 1).data;
+        return [px[0], px[1], px[2]];
+    }
+    function erGul(f) { return f[0] > 200 && f[1] > 160 && f[1] < 225 && f[2] < 120; }
+    function blaaPixel(c) {
+        var dd = c.getContext("2d").getImageData(0, 0, c.width, c.height).data, n = 0;
+        for (var i = 0; i < dd.length; i += 4) if (dd[i + 2] > 170 && dd[i] < 130 && dd[i + 1] > 110 && dd[i + 1] < 200) n++;
+        return n;
+    }
 
     overskrift("2. Kemien: PbI2's oploselighed");
     var rx = St.REAKTIONER.filter(function (r) { return r.id === "pbi2"; })[0];
@@ -304,6 +319,7 @@ function koerTest() {
         flager.length + " flager");
     side.opdaterPanel();
     paastand("knappen lyser, naar der kan noteres", d.getElementById("maaleknap").classList.contains("klar"));
+    paastand("grafen er skjult, saa laenge der ikke er noteret noget", d.getElementById("graf-boks").hidden);
     d.dispatchEvent(new vin.KeyboardEvent("keydown", { key: "k" }));
     var p1 = M.journal.post("1");
     paastand("tasten K noterer termometerets temperatur", !!p1 && Math.abs(p1.svar - tm.visT) < 0.11,
@@ -317,6 +333,19 @@ function koerTest() {
     side.opdaterPanel();
     paastand("kortet viser maalingen", d.getElementById("maaling-tabel").rows.length === 2 &&
         d.getElementById("maaling-taeller").textContent === "1/3" && d.getElementById("maaling-tom").hidden);
+    var gl = d.getElementById("graf-laerred"), g1 = side.graf;
+    var y1 = p1 ? p1.billede.pbi2 * 100 / p1.billede.V : 0;
+    paastand("grafen kommer frem med maaling 1 som punkt: temperaturen og g PbI2 pr. 100 mL (M9)", !d.getElementById("graf-boks").hidden &&
+        !!g1 && g1.punkter.length === 1 && g1.punkter[0].tekst === "1" && Math.abs(g1.punkter[0].x - p1.svar) < 1e-9 &&
+        Math.abs(g1.punkter[0].y - y1) < 1e-9 && Math.abs(p1.billede.V - 100) < 1,
+        g1 && g1.punkter.length ? tal(g1.punkter[0].x, 1) + " °C, " + tal(g1.punkter[0].y, 3) + " g pr. 100 mL" : "ingen graf");
+    paastand("punktet er tegnet dér, hvor akserne siger (gult)", !!g1 && g1.punkter.length === 1 &&
+        Math.abs(g1.punkter[0].px - g1.tilX(p1.svar)) < 0.01 && Math.abs(g1.punkter[0].py - g1.tilY(y1)) < 0.01 &&
+        erGul(farveI(gl, g1.punkter[0].px + 5, g1.punkter[0].py)), g1 ? farveI(gl, g1.punkter[0].px + 5, g1.punkter[0].py).join(",") : "");
+    paastand("akserne: 0-100 °C, og y skalerer efter maalingen", !!g1 && g1.x.min === 0 && g1.x.max === 100 && g1.y.min === 0 &&
+        g1.y.max >= y1 && g1.y.max < y1 * 2.5, g1 ? "y 0-" + tal(g1.y.max, 2) : "");
+    paastand("kurven med tabelvaerdierne er der ikke endnu, og noten siger, hvornaar den kommer", blaaPixel(gl) === 0 &&
+        d.getElementById("graf-note").textContent === NK.TEKST.graf.note, blaaPixel(gl) + " blaa pixel");
     /* Maaling 2 og 3: 0,050 g mere af hvert, varm, sluk, noter */
     function tilsaet() {
         var m = afvej("pb", 0.044, 0.056); bord.moede(baad, baeger); adv(4);
@@ -352,6 +381,32 @@ function koerTest() {
     var rk = d.getElementById("maaling-tabel").rows;
     paastand("kortet har tre raekker, og temperaturen er groen", rk.length === 4 && rk[3].cells[4].className === "rigtig",
         rk.length > 1 ? rk[rk.length - 1].textContent : "");
+    var g3 = side.graf;
+    /* Hvor langt punktet ligger fra kurven ved facit-temperaturen, og hvor
+       langt det skal: tabelkurven er rent PbI2 (Pb:I = 1:2), men
+       afvejningen maa ramme 0,010 g ved siden af, saa blandingen kan have
+       lidt for meget af det ene. Punktet regnes af det, der er mindst af
+       (s), og kurven af ionproduktet: 4s'³ = [Pb][I]², saa s'/s - 1 er
+       hele forskellen */
+    var ligger = g3 ? g3.punkter.map(function (q, i) {
+        var p = J.post(String(i + 1)), b = p.billede;
+        var pb = b.pb / 331.2, ki = b.ki / 166.0;
+        var skal = Math.pow(pb * ki * ki / 4, 1 / 3) / Math.min(pb, ki / 2) - 1;
+        return { er: M.oploeselighed(p.facit) / q.y - 1, skal: skal };
+    }) : [];
+    paastand("grafen har de tre maalinger i raekkefoelge, alle gule (rigtige)", !!g3 && g3.punkter.length === 3 &&
+        g3.punkter.map(function (q) { return q.tekst; }).join() === "1,2,3" &&
+        g3.punkter.every(function (q) { return erGul(farveI(gl, q.px + 5, q.py)); }) &&
+        g3.punkter[0].y < g3.punkter[1].y && g3.punkter[1].y < g3.punkter[2].y,
+        g3 ? g3.punkter.map(function (q) { return tal(q.x, 1) + " °C/" + tal(q.y, 3) + " g"; }).join(", ") : "");
+    paastand("og nu er kurven med tabelvaerdierne tegnet, og y-aksen har plads til den", blaaPixel(gl) > 150 &&
+        g3.y.max >= M.oploeselighed(100) && d.getElementById("graf-note").textContent === NK.TEKST.graf.noteFaerdig,
+        blaaPixel(gl) + " blaa pixel, y 0-" + tal(g3.y.max, 2));
+    paastand("hver maaling ligger paa kurven ved sin facit-temperatur, paa lidt over- eller underskud naer (4s³ = K)", ligger.length === 3 &&
+        ligger.every(function (r) { return Math.abs(r.er - r.skal) < 0.003 && Math.abs(r.er) < 0.06; }),
+        ligger.map(function (r) { return tal(r.er * 100, 1) + " % (skal " + tal(r.skal * 100, 1) + " %)"; }).join(", "));
+    paastand("tabelkurven: 0,069 g ved 20 °C og 0,41 g ved 100 °C (README)", Math.abs(M.oploeselighed(20) - 0.069) < 0.002 &&
+        Math.abs(M.oploeselighed(100) - 0.41) < 0.01, tal(M.oploeselighed(20), 3) + " og " + tal(M.oploeselighed(100), 3) + " g pr. 100 mL");
     bord.moede(baeger, bord.g.dunk); adv(5);
     paastand("resterne i dunken: alle trin er gjort", B.tom(baeger) && F.alleGjort());
 
@@ -372,6 +427,7 @@ function koerTest() {
     paastand("maalingernes hukommelse er ryddet", M.klarFor === null && !Object.keys(M.noteret).length && M.sidstePb === null && !M.ventKI);
     paastand("journalen er tom, og kortet siger det", M.journal.antal() === 0 && d.getElementById("maaling-tabel").hidden &&
         !d.getElementById("maaling-tom").hidden && d.getElementById("maaling-taeller").textContent === "0/3");
+    paastand("og grafen er skjult igen", d.getElementById("graf-boks").hidden && side.graf === null);
     paastand("vaegten er tareret igen", bord.vaegtTekst(bord.g.vaegt) === "0,000 g" && bord.g.baad.paa === bord.g.vaegt);
     paastand("bægerglasset er tomt, pladen slukket, og forloebet staar paa foerste trin",
         B.tom(bord.g.baeger) && !bord.g.plade.taendt && !bord.g.plade.omroerer && F.nuTrin().id === "vand");
@@ -425,6 +481,50 @@ function koerTest() {
     bord.vedBesked = vedB;
     NK.startForfra();
     adv(1);
+
+    overskrift("9. Grafen med kendte tal (graf.js, M9)");
+    var G = NK.Graf;
+    var c = d.createElement("canvas");
+    c.setAttribute("width", "360");
+    c.setAttribute("height", "200");
+    var kendt = G.tegn(c, {
+        x: { navn: "x", min: 0, max: 100, trin: 20 }, y: { navn: "y", min: 0, max: 0.5, trin: 0.1 },
+        serier: [{ type: "punkter", navn: "Kendte", punkter: [{ x: 0, y: 0, tekst: "1" }, { x: 50, y: 0.2, tekst: "2" }, { x: 100, y: 0.4, tekst: "3" }] }]
+    });
+    var o = kendt.felt, kp = kendt.punkter;
+    paastand("tre kendte punkter (0; 0), (50; 0,2) og (100; 0,4) staar dér, hvor akserne siger", kp.length === 3 &&
+        Math.abs(kp[0].px - o.x0) < 0.01 && Math.abs(kp[0].py - o.y1) < 0.01 &&
+        Math.abs(kp[1].px - (o.x0 + o.x1) / 2) < 0.01 && Math.abs(kp[1].py - (o.y1 - 0.4 * (o.y1 - o.y0))) < 0.01 &&
+        Math.abs(kp[2].px - o.x1) < 0.01 && Math.abs(kp[2].py - (o.y1 - 0.8 * (o.y1 - o.y0))) < 0.01,
+        kp.map(function (q) { return "(" + tal(q.px, 0) + "; " + tal(q.py, 0) + ")"; }).join(" "));
+    paastand("og de er tegnet (gule)", kp.every(function (q) { return erGul(farveI(c, q.px + 5, q.py)); }),
+        kp.map(function (q) { return farveI(c, q.px + 5, q.py).join(","); }).join(" | "));
+    var aks = G.akse({ min: 0 }, [0.146, 0.224, 0.297], 4);
+    var rund = [1, 2, 2.5, 5].some(function (r) { var k = aks.trin / r; return Math.abs(Math.log(k) / Math.LN10 - Math.round(Math.log(k) / Math.LN10)) < 1e-9; });
+    paastand("en akse uden max skalerer efter data med et rundt trin og luft over det hoejeste", aks.min === 0 && aks.max > 0.297 &&
+        aks.max < 0.297 + 2 * aks.trin && rund && aks.antal >= 3 && aks.antal <= 8,
+        aks.streger().map(function (v) { return G.komma(v, aks.dec); }).join(" "));
+    var neg = G.akse({}, [-3.2, 7.9], 5);
+    paastand("ogsaa under nul, og tallene har dansk komma og rigtigt minus", neg.min <= -3.2 && neg.max >= 7.9 &&
+        G.komma(neg.min, neg.dec).charAt(0) === "\u2212" && G.komma(2.5, 1) === "2,5" && G.komma(0.10, 2, true) === "0,1",
+        neg.streger().map(function (v) { return G.komma(v, neg.dec); }).join(" "));
+    var kg = G.tegn(c, { x: { min: 0, max: 100 }, y: { min: 0 }, serier: [{ type: "kurve", f: function (x) { return x / 250; }, navn: "Ret linje" }] });
+    paastand("en kurve af en funktion tegnes, og y-aksen tager dens hoejeste vaerdi med", blaaPixel(c) > 150 && kg.y.max >= 0.4,
+        blaaPixel(c) + " blaa pixel, y 0-" + tal(kg.y.max, 2));
+    var sg = G.tegn(c, { y: { navn: "Knald" }, serier: [{ type: "soejler", navn: "Styrke", punkter: [{ x: "1:2", y: 3 }, { x: "1:1", y: 5 }, { x: "2:1", y: 2 }] }] });
+    paastand("soejler: kategorierne staar i den raekkefoelge, de kom, og den hoejeste soejle er hoejest", sg.kategorier.join() === "1:2,1:1,2:1" &&
+        sg.punkter[0].px < sg.punkter[1].px && sg.punkter[1].px < sg.punkter[2].px && sg.punkter[1].py < sg.punkter[0].py &&
+        sg.punkter[0].py < sg.punkter[2].py && sg.y.min === 0 && sg.y.max >= 5 && sg.x === null, sg.kategorier.join(" "));
+    /* Journalens punkter: i den kraevede raekkefoelge, med nummer og forkert */
+    var tj = NK.Journal.lav({ id: "graf-selvtest", kraevede: ["a", "b", "c"], tolerance: 1, facit: function () { return 10; } });
+    tj.noter("c", 12, bord); tj.noter("a", 10, bord); tj.noter("b", 30, bord);
+    var jp = tj.punkter();
+    paastand("journal.punkter: i kraevet raekkefoelge, x = nummeret, y = svaret, og de forkerte er markeret", jp.length === 3 &&
+        jp.map(function (q) { return q.id + q.tekst + ":" + q.x + "/" + q.y + (q.forkert ? "!" : ""); }).join() === "a1:1/10,b2:2/30!,c3:3/12!",
+        jp.map(function (q) { return q.id + q.tekst + ":" + q.x + "/" + q.y + (q.forkert ? "!" : ""); }).join());
+    var jp2 = tj.punkter(function (p) { return p.id === "b" ? null : { x: p.svar, y: p.svar * 2 }; });
+    paastand("og med en funktion: den bestemmer x og y, og null springer posten over", jp2.length === 2 && jp2[1].x === 12 && jp2[1].y === 24 && jp2[1].tekst === "3");
+    delete NK.Journal.alle["graf-selvtest"];
 }
 
 function vis() {

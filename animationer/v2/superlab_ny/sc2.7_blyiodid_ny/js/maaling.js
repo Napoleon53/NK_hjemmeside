@@ -18,6 +18,13 @@
    I i det oejeblik. Er indholdet det samme nu, er der ikke tilsat noget
    siden.
 
+   Grafen (M9, laboratoriet/js/graf.js): hver maaling er et punkt med den
+   noterede temperatur ud ad x-aksen og oploeseligheden op ad y-aksen - den
+   masse PbI2, der kan dannes af det, der er i glasset, pr. 100 mL. Kurven
+   med tabelvaerdierne (oploeseligheden af rent PbI2 efter K(T): 4s³ = K)
+   kommer foerst, naar alle tre maalinger er noteret, saa den ikke siger
+   eleven, hvornaar krystallerne skal komme.
+
    Afvejningens regel (bord.regel, se js/app.js): vejebaaden haeldes kun i
    bægerglasset, naar massen passer - foerste gang 0,090-0,110 g
    Pb(NO3)2, derefter 0,040-0,060 g, og KI samme masse som den Pb(NO3)2,
@@ -74,6 +81,21 @@
         return gg ? St.maetningsT(B.samlet(gg), rx()) : null;
     }
 
+    /* Tabelvaerdien: g PbI2, der kan vaere oploest i 100 mL vand ved T °C.
+       [Pb2+] = s og [I-] = 2s, saa 4s³ = K(T) (i mM), og s mM er
+       s · 461 mg pr. liter */
+    function oploeselighed(T) {
+        var K = St.Kved(rx(), T);
+        return Math.pow(K / 4, 1 / 3) * 461.0 * 1e-4;
+    }
+
+    /* En maalings punkt: noteret temperatur og g PbI2 pr. 100 mL */
+    function punkt(post) {
+        var b = post.billede || {};
+        if (!(b.V > 1)) return null;
+        return { x: Number(post.svar), y: b.pbi2 * 100 / b.V };
+    }
+
     var M = {
         TOLERANCE: TOLERANCE,
         AFVEJ: AFVEJ,
@@ -83,6 +105,7 @@
         ventKI: false,           /* Pb er kommet i, KI mangler */
 
         maetning: maetning,
+        oploeselighed: oploeselighed,
         klar: klar,
         krystaller: krystaller,
 
@@ -161,6 +184,21 @@
             return null;
         },
 
+        /* Grafen i maalingskortet (side.visGraf): null uden maalinger */
+        graf: function () {
+            var pkt = M.journal.punkter(punkt);
+            if (!pkt.length) return null;
+            var G = NK.TEKST.graf;
+            var serier = [];
+            if (M.journal.faerdig()) serier.push({ type: "kurve", f: oploeselighed, navn: G.kurve, stiplet: true });
+            serier.push({ type: "punkter", punkter: pkt, navn: G.punkter });
+            return {
+                x: { navn: G.x, enhed: "°C", min: 0, max: 100, trin: 20 },
+                y: { navn: G.y, enhed: G.yEnhed, min: 0 },
+                serier: serier
+            };
+        },
+
         /* Panelets kort med maalingerne */
         visKort: function () {
             var tabel = NK.el("maaling-tabel"), tom = NK.el("maaling-tom");
@@ -169,6 +207,8 @@
             NK.saetTekst("maaling-taeller", poster.length + "/3");
             if (tom) { tom.hidden = poster.length > 0; NK.saetTekst("maaling-tom", T("tom")); }
             tabel.hidden = !poster.length;
+            var note = NK.el("graf-note");
+            if (note) note.textContent = M.journal.faerdig() ? NK.TEKST.graf.noteFaerdig : NK.TEKST.graf.note;
             tabel.innerHTML = "";
             if (!poster.length) return;
             var hoved = document.createElement("tr");
@@ -191,7 +231,8 @@
 
     /* Journalen: posterne hedder 1, 2 og 3. Facit er maetningstemperaturen
        lige nu; oejebliksbilledet er masserne, den masse PbI2, der kan
-       dannes, og opskriften paa glasset (til grafen og tegneserien) */
+       dannes, rumfanget (mL) og opskriften paa glasset (til grafen og
+       tegneserien) */
     M.journal = NK.Journal.lav({
         id: "maaling",
         kraevede: ["1", "2", "3"],
@@ -206,6 +247,7 @@
             return {
                 pb: pb, ki: ki,
                 pbi2: Math.min(i.pb, i.ki / 2) * 461.0 * 1e-6,
+                V: B.volumen(gg),
                 T: B.samlet(gg).T,
                 opl: St.opskrift(B.samlet(gg))
             };

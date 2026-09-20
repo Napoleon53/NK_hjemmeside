@@ -5,7 +5,7 @@
    tastatur, logbog, forloebskort, Start forfra) ligger i
    ../../laboratoriet/js/side.js. Her staar kun det, der er saerligt for
    sc2.7: afvejningens regel, knappen »Notér temperatur« og kortet med
-   maalingerne (js/maaling.js).
+   maalingerne og grafen (js/maaling.js).
    ===================================================================== */
 (function () {
     "use strict";
@@ -43,6 +43,10 @@
         signatur: function (s) {
             return (M.kan(s.bord()).ok ? "k" : "-") + M.journal.antal();
         },
+
+        /* Grafen i maalingskortet (M9): punkterne og, naar alle tre er
+           maalt, kurven med tabelvaerdierne */
+        graf: function () { return M.graf(); },
 
         /* Panelet: maalingerne og om knappen kan bruges lige nu */
         panel: function (s) {
