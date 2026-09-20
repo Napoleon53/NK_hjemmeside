@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Titreringssimulator</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="draabe">💧</span> Titrering<span class="lang">ssimulator</span></h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-lab" role="tab" aria-selected="true"><span class="nr">1</span>Laboratoriet</button>
+        <button class="faneknap" data-fane="fane-kurve" role="tab" aria-selected="false"><span class="nr">2</span>Kurven</button>
+        <button class="faneknap" data-fane="fane-fordeling" role="tab" aria-selected="false"><span class="nr">3</span>Fordelingen</button>
+        <button class="faneknap gaade" data-fane="fane-ukendt" role="tab" aria-selected="false"><span class="nr">4</span>Ukendt prøve</button>
+    </div>
+
+    <div class="tidsboks">
+        <span class="mrk">Fart</span>
+        <button class="tidsknap" data-fart="0.5">0,5×</button>
+        <button class="tidsknap aktiv" data-fart="1">1×</button>
+        <button class="tidsknap" data-fart="3">3×</button>
+        <button class="tidsknap" data-fart="10">10×</button>
+    </div>
+
+    <button class="ikonknap" id="hjaelpknap" title="Hjælp og genveje" aria-label="Hjælp">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FÆLLES OPSTILLING                                                  -->
+<!-- ================================================================= -->
+<aside class="ops" id="opsaetning" aria-label="Opstilling">
+
+    <div class="kort">
+        <h2>Færdigt forsøg</h2>
+        <select id="forsoeg-vaelger" class="vaelger">
+            <option value="">— vælg et forsøg —</option>
+        </select>
+        <p class="note" id="forsoeg-note">Vælg et forsøg for at komme hurtigt i gang, eller byg din egen opstilling nedenfor.</p>
+    </div>
+
+    <div class="kort">
+        <h2>I bægerglasset</h2>
+        <div class="felt">
+            <label for="proeve-v0">Rumfang</label>
+            <input type="text" id="proeve-v0" inputmode="decimal" data-dec="1">
+            <span class="enhed">mL</span>
+        </div>
+
+        <div class="stofrad">
+            <select id="proeve-stof-0" class="vaelger"></select>
+            <div class="felt">
+                <label for="proeve-c-0">Koncentration</label>
+                <input type="text" id="proeve-c-0" inputmode="decimal">
+                <span class="enhed">M</span>
+            </div>
+        </div>
+
+        <div class="stofrad" id="proeve-rad-1">
+            <select id="proeve-stof-1" class="vaelger"></select>
+            <div class="felt">
+                <label for="proeve-c-1">Koncentration</label>
+                <input type="text" id="proeve-c-1" inputmode="decimal">
+                <span class="enhed">M</span>
+            </div>
+        </div>
+
+        <button class="knap blaa tilfoej-knap" id="proeve-tilfoej" type="button">
+            <span id="proeve-tilfoej-tekst">Tilføj opløsning</span><span class="tegn" id="proeve-tilfoej-tegn">+</span>
+        </button>
+    </div>
+
+    <div class="kort">
+        <h2>I buretten</h2>
+        <select id="titrator-stof" class="vaelger"></select>
+        <div class="felt">
+            <label for="titrator-c">Koncentration</label>
+            <input type="text" id="titrator-c" inputmode="decimal">
+            <span class="enhed">M</span>
+        </div>
+        <div class="felt">
+            <label for="vmaks-felt">Buretten rummer</label>
+            <input type="text" id="vmaks-felt" inputmode="decimal" data-dec="1">
+            <span class="enhed">mL</span>
+        </div>
+        <label class="tjek"><input type="checkbox" id="vmaks-auto" checked><span>Vælg rumfang automatisk</span></label>
+    </div>
+
+    <div class="kort">
+        <h2>Indikator</h2>
+        <select id="indikator-vaelger" class="vaelger"></select>
+        <p class="note" id="indikator-omslag"></p>
+    </div>
+
+    <div class="kort egen" id="egen-syre-boks">
+        <h2>Din egen syre</h2>
+        <p class="note">Skriv de pKs-værdier, syren skal have. Tomme felter springes over.</p>
+        <div class="pksrad">
+            <input type="text" id="egen-syre-pks-0" inputmode="decimal" placeholder="pKs1">
+            <input type="text" id="egen-syre-pks-1" inputmode="decimal" placeholder="pKs2">
+            <input type="text" id="egen-syre-pks-2" inputmode="decimal" placeholder="pKs3">
+        </div>
+    </div>
+
+    <div class="kort egen" id="egen-base-boks">
+        <h2>Din egen base</h2>
+        <p class="note">pKs hører til den korresponderende syre. En base med pKs 9,25 svarer til ammoniak.</p>
+        <div class="pksrad">
+            <input type="text" id="egen-base-pks-0" inputmode="decimal" placeholder="pKs1">
+            <input type="text" id="egen-base-pks-1" inputmode="decimal" placeholder="pKs2">
+            <input type="text" id="egen-base-pks-2" inputmode="decimal" placeholder="pKs3">
+        </div>
+    </div>
+
+    <div class="advarsel" id="ops-advarsel"></div>
+</aside>
+
+<div class="faneomraade">
+
+<!-- Flyder oven paa scenen paa alle faner undtagen den ukendte proeve.
+     Skifter ikon alt efter om venstre panel er vist eller skjult. -->
+<button class="scene-udvid" id="opsknap" title="Skjul venstre panel" aria-label="Skjul venstre panel" aria-pressed="false">
+    <svg class="ikon-udvid" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg class="ikon-fold" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+
+<!-- ================================================================= -->
+<!-- FANE 1: LABORATORIET                                               -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-lab" role="tabpanel" aria-label="Laboratoriet">
+    <div class="scene labscene">
+        <div class="apparat"><canvas id="lab-laerred"></canvas></div>
+        <div class="livegraf">
+            <div class="grafhoved">
+                <h2>Din kurve</h2>
+                <span class="hoverlaes" id="lab-hover"></span>
+                <label class="tjek lille"><input type="checkbox" id="lab-vis-facit"><span>Vis den beregnede kurve</span></label>
+            </div>
+            <div class="grafboks"><canvas id="lab-graf"></canvas></div>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling">
+            <div class="phvis">
+                <span class="phmrk">pH</span>
+                <span class="phtal" id="lab-ph">7,00</span>
+                <span class="farveprik" id="lab-farveprik"></span>
+            </div>
+            <div class="talraekke"><span>Tilsat titrator</span><span class="tal gul" id="lab-v">0,00 mL</span></div>
+            <div class="talraekke"><span>Rumfang i alt</span><span class="tal" id="lab-rumfang">20,0 mL</span></div>
+            <div class="talraekke"><span>Tilsat stofmængde</span><span class="tal blaa" id="lab-n">0 mmol</span></div>
+        </div>
+
+        <div class="kort">
+            <h2>Hanen</h2>
+            <button class="knap stor groen" id="lab-hane"><span id="lab-hane-tekst">Åbn hanen</span><span class="tegn">▶</span></button>
+            <div class="skyder">
+                <label><span>Gennemstrømning</span><b id="lab-flow-vis">0,60 mL/s</b></label>
+                <input type="range" id="lab-flow" min="0.05" max="3" step="0.05" value="0.6">
+            </div>
+            <div class="knaprad">
+                <button class="knap" id="lab-draabe" title="0,05 mL">1 dråbe</button>
+                <button class="knap" id="lab-plus01">+ 0,1 mL</button>
+                <button class="knap" id="lab-plus1">+ 1 mL</button>
+            </div>
+            <div class="knaprad">
+                <button class="knap" id="lab-minus1">− 1 mL</button>
+                <button class="knap blaa" id="lab-aekv"><span>Kør til ækvivalens</span></button>
+            </div>
+            <button class="knap nulstil" id="lab-nulstil"><span>Tøm og start forfra</span><span class="tegn">↺</span></button>
+        </div>
+
+        <div class="kort">
+            <h2>Undervejs</h2>
+            <p class="besked" id="lab-status">Åbn hanen, og hold øje med pH-metret.</p>
+            <div class="talraekke"><span>Næste ækvivalenspunkt</span><span class="tal gul" id="lab-naeste">–</span></div>
+            <div class="talraekke"><span>Omsat</span><span class="tal groen" id="lab-omsat">0 %</span></div>
+        </div>
+
+        <div class="kort">
+            <h2>Indikatoren</h2>
+            <div class="indikatorbjaelke"><canvas id="lab-ind-laerred"></canvas></div>
+            <p class="note" id="lab-ind-note">Vælg en indikator i venstre spalte.</p>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: KURVEN                                                     -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-kurve" role="tabpanel" aria-label="Kurven">
+    <div class="scene medtekst">
+        <canvas id="kur-laerred"></canvas>
+        <div class="scene-mrk" id="kur-mrk">Den beregnede kurve for opstillingen til venstre. Kør musen hen over den for at aflæse.</div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort fremhaev">
+            <h2>Aflæsning</h2>
+            <div class="talraekke"><span>Volumen</span><span class="tal gul" id="kur-v">–</span></div>
+            <div class="talraekke"><span>pH</span><span class="tal" id="kur-ph">–</span></div>
+            <p class="note">Kurven er regnet ud af ladningsbalancen — ikke af en tilnærmet formel. Derfor holder den også for meget fortyndede opløsninger.</p>
+        </div>
+
+        <div class="kort">
+            <h2>Vis på kurven</h2>
+            <label class="tjek"><input type="checkbox" id="kur-vis-aekv" checked><span>Ækvivalenspunkter</span></label>
+            <label class="tjek"><input type="checkbox" id="kur-vis-halv" checked><span>Halvtitrerpunkter (pKs)</span></label>
+            <label class="tjek"><input type="checkbox" id="kur-vis-afledt"><span>Den afledte, dpH/dV</span></label>
+            <label class="tjek"><input type="checkbox" id="kur-vis-ind" checked><span>Indikatorens omslag</span></label>
+            <label class="tjek"><input type="checkbox" id="kur-vis-maalt" checked><span>Dine egne målinger</span></label>
+        </div>
+
+        <div class="kort">
+            <h2>Ækvivalenspunkter</h2>
+            <div id="kur-tabel"></div>
+        </div>
+
+        <div class="kort">
+            <h2>Sammenlign</h2>
+            <p class="note">Gem kurven, skift opstilling, og se de to oven i hinanden.</p>
+            <div class="knaprad">
+                <button class="knap blaa" id="kur-gem">Gem denne kurve</button>
+                <button class="knap nulstil" id="kur-ryd">Ryd</button>
+            </div>
+            <div id="kur-liste" class="gemtliste"></div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 3: FORDELINGEN                                                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-fordeling" role="tabpanel" aria-label="Fordelingen">
+    <div class="scene medtekst">
+        <canvas id="for-laerred"></canvas>
+        <div class="scene-mrk">Hvor meget af stoffet findes på hver form ved en given pH? Kurverne krydser hinanden præcis ved pKs.</div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort fremhaev">
+            <h2>Stof</h2>
+            <select id="for-stof" class="vaelger"></select>
+            <div class="ligning" id="for-ligning">HA ⇌ A⁻ + H⁺</div>
+        </div>
+
+        <div class="kort">
+            <h2>Ved pH <span id="for-ph-vis">7,00</span></h2>
+            <div class="skyder">
+                <label><span>Vælg pH</span><b id="for-ph-b">7,00</b></label>
+                <input type="range" id="for-ph" min="0" max="14" step="0.01" value="7">
+            </div>
+            <label class="tjek"><input type="checkbox" id="for-foelg" checked><span>Følg titreringen i laboratoriet</span></label>
+            <div id="for-tabel"></div>
+        </div>
+
+        <div class="kort">
+            <h2>pKs-værdier</h2>
+            <div id="for-pks"></div>
+        </div>
+
+        <div class="kort">
+            <h2>Visning</h2>
+            <label class="tjek"><input type="checkbox" id="for-stablet"><span>Stablet (alle former lagt sammen til 100 %)</span></label>
+            <p class="note">Ved pH = pKs er der lige meget af syren og dens korresponderende base. Det er derfor, man aflæser pKs midt i bufferområdet.</p>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 4: UKENDT PRØVE                                               -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-ukendt" role="tabpanel" aria-label="Ukendt prøve">
+    <div class="scene labscene">
+        <div class="apparat"><canvas id="ukendt-laerred"></canvas></div>
+        <div class="livegraf">
+            <div class="grafhoved">
+                <h2>Din måling</h2>
+                <span class="hoverlaes" id="ukendt-hover"></span>
+            </div>
+            <div class="grafboks"><canvas id="ukendt-graf"></canvas></div>
+        </div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort fremhaev">
+            <h2>Opgaven</h2>
+            <p class="besked" id="ukendt-opgave">Tryk på knappen for at få udleveret en ukendt prøve.</p>
+            <button class="knap lilla" id="ukendt-ny"><span>Ny ukendt prøve</span><span class="tegn">🧪</span></button>
+        </div>
+
+        <div class="kort maaling">
+            <div class="phvis">
+                <span class="phmrk">pH</span>
+                <span class="phtal" id="ukendt-ph">7,00</span>
+                <span class="farveprik" id="ukendt-farveprik"></span>
+            </div>
+            <div class="talraekke"><span>Tilsat titrator</span><span class="tal gul" id="ukendt-v">0,00 mL</span></div>
+            <div class="talraekke"><span>I buretten</span><span class="tal blaa" id="ukendt-titrator">–</span></div>
+        </div>
+
+        <div class="kort">
+            <h2>Hanen</h2>
+            <button class="knap stor groen" id="ukendt-hane"><span id="ukendt-hane-tekst">Åbn hanen</span><span class="tegn">▶</span></button>
+            <div class="knaprad">
+                <button class="knap" id="ukendt-draabe">1 dråbe</button>
+                <button class="knap" id="ukendt-plus01">+ 0,1 mL</button>
+                <button class="knap" id="ukendt-plus1">+ 1 mL</button>
+            </div>
+            <button class="knap nulstil" id="ukendt-nulstil"><span>Tøm og start forfra</span><span class="tegn">↺</span></button>
+        </div>
+
+        <div class="kort">
+            <h2>Dit svar</h2>
+            <div class="felt">
+                <label for="ukendt-svar-v">Ækvivalensvolumen</label>
+                <input type="text" id="ukendt-svar-v" inputmode="decimal">
+                <span class="enhed">mL</span>
+            </div>
+            <div class="felt">
+                <label for="ukendt-svar-c">Koncentration</label>
+                <input type="text" id="ukendt-svar-c" inputmode="decimal">
+                <span class="enhed">M</span>
+            </div>
+            <div class="felt" id="ukendt-pks-felt">
+                <label for="ukendt-svar-pks">pKs</label>
+                <input type="text" id="ukendt-svar-pks" inputmode="decimal">
+                <span class="enhed"></span>
+            </div>
+            <div class="knaprad">
+                <button class="knap groen" id="ukendt-tjek">Tjek svar</button>
+                <button class="knap" id="ukendt-facit">Vis facit</button>
+            </div>
+            <div class="besked" id="ukendt-feedback"></div>
+        </div>
+    </aside>
+</section>
+
+</div><!-- /faneomraade -->
+</main>
+
+<!-- ================================================================= -->
+<div class="overlay" id="hjaelp">
+    <div class="overlay-boks">
+        <h2>Titreringssimulator</h2>
+        <p>Byg din egen titrering: vælg hvad der står i bægerglasset, hvad der er i buretten, og hvilken indikator du vil bruge. Alt regnes ud fra <b>ladningsbalancen</b> med rigtige pKs-værdier — ikke fra en tilnærmet formel.</p>
+
+        <h3>De fire faner</h3>
+        <ul>
+            <li><b>Laboratoriet</b> — åbn hanen og se pH ændre sig, mens din egen kurve tegnes nedenunder. Læg mærke til det lokale farveglimt, hvor dråben rammer.</li>
+            <li><b>Kurven</b> — den beregnede kurve med ækvivalenspunkter, halvtitrerpunkter og den afledte. Gem kurver og læg dem oven i hinanden.</li>
+            <li><b>Fordelingen</b> — hvor meget af stoffet findes på hvilken form ved hver pH. Kurverne krydser ved pKs.</li>
+            <li><b>Ukendt prøve</b> — du får en prøve uden mærkat. Titrér den, og bestem koncentrationen selv.</li>
+        </ul>
+
+        <h3>Prøv det her</h3>
+        <ul>
+            <li>Titrér 0,1 M eddikesyre med 0,1 M NaOH. Aflæs pH ved det halve ækvivalensvolumen — det er pKs.</li>
+            <li>Skift til 0,001 M. Springet skrumper: vælg nu en indikator, der stadig rammer rigtigt.</li>
+            <li>Tag phosphorsyre. Hvorfor kommer der kun to spring, når der er tre pKs-værdier?</li>
+            <li>Titrér eddikesyre med ammoniak i stedet for NaOH. Hvad sker der med springet — og hvorfor bruger man altid en stærk titrator?</li>
+            <li>Sæt soda i glasset og saltsyre i buretten. Find de to spring, og forklar hvad der sker mellem dem.</li>
+        </ul>
+
+        <h3>Genveje</h3>
+        <p>
+            <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> skift fane &nbsp;·&nbsp;
+            <kbd>mellemrum</kbd> åbn og luk hanen &nbsp;·&nbsp;
+            <kbd>D</kbd> én dråbe &nbsp;·&nbsp;
+            <kbd>R</kbd> tøm glasset &nbsp;·&nbsp;
+            <kbd>H</kbd> denne hjælp &nbsp;·&nbsp;
+            <kbd>Esc</kbd> luk
+        </p>
+
+        <div class="knapper" style="margin-top:18px;">
+            <button class="knap blaa" id="hjaelp-luk" style="justify-content:center;">Luk og kom i gang</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kemi.js"></script>
+<script src="js/kerne.js"></script>
+<script src="js/graf.js"></script>
+<script src="js/indikatorbar.js"></script>
+<script src="js/apparat.js"></script>
+<script src="js/bord.js"></script>
+<script src="js/opsaetning.js"></script>
+<script src="js/sim_lab.js"></script>
+<script src="js/sim_kurve.js"></script>
+<script src="js/sim_fordeling.js"></script>
+<script src="js/sim_ukendt.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
