@@ -211,13 +211,13 @@
                         "Ascorbinsyre gør opløsningen varmere"
                     ],
                     rigtig: 0,
-                    forklaring: "2 Fe³⁺ + C₆H₈O₆ → 2 Fe²⁺ + C₆H₆O₆ + 2 H⁺. Fe²⁺ indgår ikke i ligevægten. Når c(Fe³⁺) falder, forskydes ligevægten mod venstre, og FeSCN²⁺ bliver brugt op."
+                    forklaring: "2 Fe³⁺ + C₆H₈O₆ → 2 Fe²⁺ + C₆H₆O₆ + 2 H⁺. Fe²⁺ indgår ikke i ligevægten. Når [Fe³⁺] falder, forskydes ligevægten mod venstre, og FeSCN²⁺ bliver brugt op."
                 },
                 {
                     sp: "I glas 3 er der tilsat KSCN, og en ny ligevægt har indstillet sig. Hvad er der sket med koncentrationen af frie Fe³⁺-ioner?",
                     valg: ["Den er faldet", "Den er steget", "Den er uændret", "Den er blevet nul"],
                     rigtig: 0,
-                    forklaring: "Mere SCN⁻ forskyder ligevægten mod højre. Noget af det frie Fe³⁺ bindes i FeSCN²⁺, så c(Fe³⁺) falder."
+                    forklaring: "Mere SCN⁻ forskyder ligevægten mod højre. Noget af det frie Fe³⁺ bindes i FeSCN²⁺, så [Fe³⁺] falder."
                 },
                 {
                     sp: "Frugtfarve fortyndes til dobbelt rumfang og ses ovenfra. Hvordan ser det fortyndede glas ud i forhold til det ufortyndede?",
@@ -239,7 +239,7 @@
                         "AgNO₃ fortynder opløsningen"
                     ],
                     rigtig: 0,
-                    forklaring: "Når SCN⁻ fældes, falder c(SCN⁻), og Y bliver større end K. Ligevægten forskydes mod venstre, og FeSCN²⁺ bliver brugt op."
+                    forklaring: "Når SCN⁻ fældes, falder [SCN⁻], og Y bliver større end K. Ligevægten forskydes mod venstre, og FeSCN²⁺ bliver brugt op."
                 },
                 {
                     sp: "Glas 5 i det varme vandbad bliver lysere. Hvad viser det om reaktionen Fe³⁺ + SCN⁻ → FeSCN²⁺?",
@@ -321,9 +321,9 @@
                 scn:   { hvad: "har mere thiocyanat i sig end glas R", kort: "mere SCN⁻", forventet: "moerkere",
                          hvorfor: "Mere SCN⁻ forskyder ligevægten mod højre, så der dannes mere FeSCN²⁺." },
                 vitc:  { hvad: "indeholder Fe²⁺", kort: "C-vitamin", forventet: "lysere",
-                         hvorfor: "Ascorbinsyre reducerer Fe³⁺ til Fe²⁺. Så falder c(Fe³⁺), og ligevægten forskydes mod venstre." },
+                         hvorfor: "Ascorbinsyre reducerer Fe³⁺ til Fe²⁺. Så falder [Fe³⁺], og ligevægten forskydes mod venstre." },
                 ag:    { hvad: "indeholder et hvidt bundfald af AgSCN", kort: "AgNO₃", forventet: "lysere",
-                         hvorfor: "Ag⁺ fælder SCN⁻ som AgSCN(s). Så falder c(SCN⁻), og ligevægten forskydes mod venstre." },
+                         hvorfor: "Ag⁺ fælder SCN⁻ som AgSCN(s). Så falder [SCN⁻], og ligevægten forskydes mod venstre." },
                 varme: { hvad: "stod i det varme vandbad", kort: "varme", forventet: "lysere",
                          hvorfor: "Dannelsen af FeSCN²⁺ er exoterm, så opvarmning forskyder ligevægten mod venstre." },
                 kulde: { hvad: "stod i isbadet", kort: "kulde", forventet: "lidtMoerkere",

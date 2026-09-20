@@ -18,7 +18,8 @@ de fire bægerglas set ovenfra gør det samme for fortyndingen i del 2.
 Kemichael siger selv forløbets bemærkninger og et par tørre ord, når et
 trin er gjort. Quizzen har alle ti spørgsmål, og tegneserien har sine
 ruder. `_selvtest.html` kører det hele igennem i fireogtyve afsnit (plus
-3b om boblen og tabellen); afsnit 17 gør det med musen, som en elev
+3b om boblen og tabellen); afsnit 11 kører øvelsestjekket
+(`laboratoriet/js/tjek.js`, M2), afsnit 17 gør det med musen, som en elev
 (`laboratoriet/js/proeve.js`), afsnit 18 prøver, at Kemichael kommer ind
 bag bordet, standser hvor der er plads, og går ud igen, afsnit 19 prøver
 quizzen, afsnit 20 hele del 2 — med tal og ikke med øjnene — afsnit 22

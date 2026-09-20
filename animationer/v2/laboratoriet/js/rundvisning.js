@@ -123,6 +123,8 @@
 
     NK.Rundvisning = {
         tur: function (liste) { TUR = liste; },
+        /* Stoppene, saa oevelsestjekket (tjek.js) kan se, at de findes (M2) */
+        stop: function () { return TUR; },
         start: start,
         luk: luk,
         aktiv: function () { return erAktiv; }

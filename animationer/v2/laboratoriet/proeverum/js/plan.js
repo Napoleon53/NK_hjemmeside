@@ -32,7 +32,9 @@
         { navn: "fl_hcl", type: "flaske", x: 396, y: HYLDE, etiket: ["HCl", "0,1 M"], titel: "flasken med HCl", indhold: opl(200, { "H+": 100, "Cl-": 100 }) },
         { navn: "phph", type: "draabeflaske", x: 452, y: HYLDE, etiket: ["phenol-", "phthalein"], titel: "dråbeflasken med phenolphthalein", indhold: opl(60, { "phph": 30 }) },
         { navn: "btb", type: "draabeflaske", x: 504, y: HYLDE, etiket: ["bromthymol-", "blåt"], titel: "dråbeflasken med bromthymolblåt", indhold: opl(60, { "btb": 20 }) },
-        { navn: "stativ", type: "stativ", p: { x: 820, y: 400, v: 0 } },
+        /* F67: stativet er 362 bredt og stod ind over vaegten; det staar nu
+           mellem kolben og vaegten (oevelsestjekket, M2) */
+        { navn: "stativ", type: "stativ", p: { x: 756, y: 400, v: 0 } },
         { navn: "glas1", type: "reagensglas", stativ: "stativ", hul: 0, nr: 1, titel: "glas 1" },
         { navn: "glas2", type: "reagensglas", stativ: "stativ", hul: 2, nr: 2, titel: "glas 2" },
         { navn: "glas3", type: "reagensglas", stativ: "stativ", hul: 4, nr: 3, titel: "glas 3" },
@@ -140,12 +142,15 @@
         { navn: "fl_hcl_k", type: "flaske", x: 516, y: HYLDE, etiket: ["HCl", "konc. 12 M"], titel: "flasken med koncentreret saltsyre", indhold: opl(200, { "H+": 12000, "Cl-": 12000 }) },
         { navn: "fl_naoh_k", type: "flaske", x: 564, y: HYLDE, etiket: ["NaOH", "2 M"], titel: "flasken med 2 M NaOH", indhold: opl(200, { "Na+": 2000, "OH-": 2000 }) },
         { navn: "fl_cu", type: "flaske", x: 612, y: HYLDE, etiket: ["CuSO₄", "0,1 M"], titel: "flasken med CuSO₄", indhold: opl(200, { "Cu2+": 100, "SO42-": 100 }) },
-        { navn: "vand", type: "sproejteflaske", x: 830, titel: "sprøjteflasken med vand", indhold: opl(500, {}) },
-        { navn: "stativ", type: "stativ", p: { x: 880, y: 400, v: 0 } },
+        /* F67: braenderen og dens trefod stod inde i stativet. Sproejte-
+           flasken, stativet og braenderen er rykket, saa de staar hver for
+           sig inden for stinkskabet (oevelsestjekket, M2) */
+        { navn: "vand", type: "sproejteflaske", x: 760, titel: "sprøjteflasken med vand", indhold: opl(500, {}) },
+        { navn: "stativ", type: "stativ", p: { x: 800, y: 400, v: 0 } },
         { navn: "glas1", type: "reagensglas", stativ: "stativ", hul: 0, nr: 1, titel: "glas 1" },
         { navn: "glas2", type: "reagensglas", stativ: "stativ", hul: 2, nr: 2, titel: "glas 2" },
         { navn: "glas3", type: "reagensglas", stativ: "stativ", hul: 4, nr: 3, titel: "glas 3" },
-        { navn: "braender", type: "braender", p: { x: 1150, y: 425, v: 0 } },
+        { navn: "braender", type: "braender", p: { x: 1180, y: 425, v: 0 } },
         { navn: "podetraad", type: "podetraad", x: 1080 },
         { navn: "termometer", type: "termometer", x: 990 },
         { navn: "dunk", type: "affaldsdunk", x: 1420, etiket: ["AFFALD", "syre"] },

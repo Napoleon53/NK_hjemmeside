@@ -101,8 +101,13 @@ _geometri.html       udviklerværktøj: alt glasudstyr læst som omdrejnings-
 _taleboble.html      udviklerværktøj: flyt munden med musen, og se boblen
                      vende, holde sig inden for kanten og undgå et rektangel
 _vinduer.html        udviklerværktøj: et forsøg i to vinduesstørrelser side om side
+_oevelsestjek.html   udviklerværktøj: øvelsestjekket - et forsøg eller dem alle holdt op
+                     mod stoftabellen, kataloget, sprites, forløbet, pladsen på
+                     bordet og teksterne (se »Øvelsestjekket« nedenfor)
 js/proeve.js         udviklerværktøj: musen til selvtesterne (pointer-hændelser
                      i scenens koordinater, prøvens eget ur)
+js/tjek.js           udviklerværktøj: selve øvelsestjekket (NKTjek.koer og
+                     NKTjek.selvproeve), til _oevelsestjek.html og selvtesterne
 proevebord/          det frie bord: index.html, css/stil.css, js/stoffer.js
                      (stoffer, reaktioner, opstilling), js/laerer.js, js/tur.js,
                      js/app.js, _selvtest.html
@@ -1054,6 +1059,65 @@ og et bad med `holdT` oven på en varmeplade følger termostaten, mens pladen
 er tændt, og køler til stuetemperatur, når den slukkes. Det er derfor et
 vandbad giver 80 °C i stedet for pladens 250.
 
+## Øvelsestjekket
+
+`js/tjek.js` er en generisk validering, som ethvert forsøg på motoren køres
+igennem, før det regnes for færdigt (M2). Den spørger ikke, om forsøget er
+godt, men om det overhovedet kan hænge sammen, og den læser forsøget som
+data: opstillingen (eller rummene), bordets valg, forløbet og teksterne. Kun
+det, der ikke kan ses i data, spørges levende på siden.
+
+| Afsnit | Hvad der tjekkes |
+|--------|------------------|
+| 1 Forsøget | siden har NK og er startet, uden undtagelser under indlæsningen |
+| 2 Stoftabellen | alle reaktioner og redoxpar nævner stoffer, der findes, og reaktionerne er afstemte |
+| 3 Stofferne | alt i flasker og glas findes i stoftabellen; indholdet er skrevet med V, T, mM og umol (en stavefejl som `mm:` ignoreres ellers i stilhed); intet er fyldt over kanten; pulverglas har fast stof; tilskuerionerne findes |
+| 4 Udstyret | hver type findes i kataloget; navnene er entydige; stativer og plader står før det, der står i og på dem; hullet findes og er ikke optaget to gange; lugerne fører til rum, der findes |
+| 5 Sprites | udstyret har sine sprites, og hver fil kunne indlæses |
+| 6 Forløbet | id'er, tekst, kort og hint; hvert trin og hver udløser nævner genstande og stoffer, der findes; peg, konsekvenser og replikker (også `{{glas5.T}}`) peger på noget, der findes; hvert trin kan nås (se nedenfor); et trin i en del bruger kun den dels udstyr; quizzen og tegneserien kan låses op; hvert vilkår kan prøves på bordet, og intet trin er gjort, før eleven har gjort noget |
+| 7 Pladsen | alt står inden for laboratoriet og på bordpladen, en hylde eller i noget andet; intet hænger ud over sin hylde; intet står oven i noget andet; zoomboblens hjørne, plakaten og pilen er fri |
+| 8 Teksterne | en aktuel koncentration skrives [Fe³⁺] og ikke c(Fe³⁺) (F65); ingen tekst siger undefined eller NaN; rundvisningens stop findes på siden; hvert quizspørgsmål har svar, ét rigtigt svar og en begrundelse |
+
+**Kan et trin nås?** Det afgøres på papiret og siger kun nej, når det
+aldrig kan ske: et glas, der skal have mere, end det rummer; et stof, der
+hverken står på bordet eller kan dannes af det, der gør (samme regnestykke
+som `Stof.tilskuerioner`); en temperatur, intet på bordet varmer eller køler
+til; et glas, der skal tømmes, men står fast; et flag, som intet trin eller
+nogen udløser sætter; en journal eller en post, der ikke findes. En
+betingelse skrevet som funktion (`proev`) kan ikke afgøres og tælles bare.
+
+**To ting oven i hinanden** er to ting med foden på samme linje (samme
+dybde på bordpladen), hvis fodspor går ind over hinanden. Fodsporet er de
+uigennemsigtige pixels i spritets nederste 4 enheder, så et glas' kasse
+må gerne røre naboens, og det, der står en smule bagved, må gerne dække.
+
+**FEJL og NB.** Et forsøg består, når der ingen FEJL er. NB er det, der kan
+være i orden: en udløser, der ikke kan nås, en udløser, der fyrer fra
+start, og et flag, som ingen data sætter, når forløbet har konsekvenser
+skrevet som kode. Sætter forsøgets egen kode et flag, siger forløbet det
+med `flagFraKode: ["navn"]`, så er det ikke en fejl.
+
+**Sådan køres det.** `_oevelsestjek.html` (gennem en lokal server) kører
+alle forsøg på motoren, ét fra listen eller et hvilket som helst andet:
+`_oevelsestjek.html?side=../superlab/sc2.7_blyiodid/index.html`. Med
+»prøv tjekket selv« (`&selv=1`) sættes ti slags fejl ind i en kopi af
+forsøgets data én ad gangen - et stof, der ikke findes; et trin, der peger
+på et glas, der ikke er på bordet; udstyr, der ikke findes; mere, end
+glasset rummer; et flag, ingen sætter; et stof, der ikke kan dannes; et
+peg og et tal i en replik, der peger på ingenting; to ting oven i
+hinanden; c(Fe³⁺) i en tekst - og hver skal fanges. Et forsøgs egen
+selvtest kører det med to linjer (sb2.4's afsnit 11):
+
+```js
+NK.startForfra();                          // på et frisk bord
+var tjek = NKTjek.koer(ramme.contentWindow);
+paastand("øvelsestjekket finder ingen fejl", tjek.fejl === 0, tjek.fund().join(" | "));
+```
+
+Tjekket, der skal til, når et forsøg konverteres: `_oevelsestjek.html` på
+ALT OK med forsøget selv og med »prøv tjekket selv«, og forsøgets
+selvtest med afsnittet ovenfor.
+
 ## Næste skridt
 
 * sb2.4 er lagt over på genstandsmodellen i `../superlab/sb2.4_ligevaegt/`. Bordet
@@ -1064,10 +1128,6 @@ vandbad giver 80 °C i stedet for pladens 250.
 * **Grafen.** Journalen kan notere en måling; den kan endnu ikke tegne den
   op. Titrerings- og kalibreringskurver dukker op i næsten enhver øvelse, så
   det er en fælles komponent, ikke noget hvert forsøg skal opfinde.
-* **Øvelsestjekket:** en generisk validering, ethvert nyt forsøg køres
-  igennem. Kimen står i `../superlab/sb2.4_ligevaegt/_selvtest.html` afsnit 10, som
-  bruger `NK.Vilkaar.naevnte` til at opdage et trin, der peger på et glas
-  eller et stof, der ikke findes.
 * Rammerne i `quiz.js` og `tegneserie.js` er skrevet til otte forsøg, men
   kun prøvet af ét. Ved første konvertering viser det sig, hvad de mangler.
 * **Mikroniveauet** kan vise bind, split, fæld, opløs og omdan. Fire former

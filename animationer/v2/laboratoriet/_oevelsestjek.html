@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Øvelsestjekket - udviklerside</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; }
+    header { display:flex; flex-wrap:wrap; gap:10px; align-items:center; padding:8px 14px; background:#1d1f27; border-bottom:1px solid #2c2f3a; font-family:system-ui, sans-serif; }
+    header b { color:#f2c53d; }
+    select, button, input[type=text] { font:inherit; background:#2a2d38; color:#e9eef4; border:1px solid #3a3e4c; border-radius:4px; padding:3px 8px; }
+    input[type=text] { width:22em; }
+    button { cursor:pointer; }
+    pre { margin:0; padding:14px; line-height:1.45; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .nb { color:#f5c27a; } .info { color:#9aa4b4; }
+    .h { color:#f2c53d; font-weight:700; } .forsoeg { color:#8fc8ff; font-weight:700; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:800px; opacity:0.001; pointer-events:none; border:0; }
+</style>
+</head>
+<body>
+<header>
+    <b>Øvelsestjekket</b>
+    <label>Forsøg
+        <select id="side">
+            <option value="alle">Alle forsøg på motoren</option>
+            <option value="../superlab/sb2.4_ligevaegt/index.html">sb2.4 Ligevægt</option>
+            <option value="proevebord/index.html">Prøvebordet</option>
+            <option value="proeverum/index.html">Prøverummet</option>
+        </select>
+    </label>
+    <label>eller en sti <input type="text" id="sti" placeholder="../superlab/sc2.7_…/index.html"></label>
+    <label><input type="checkbox" id="selv"> prøv tjekket selv (sæt fejl ind)</label>
+    <button id="igen" type="button">Kør</button>
+    <span id="note" class="info"></span>
+</header>
+<pre id="ud">Kører …</pre>
+<script src="js/tjek.js"></script>
+<script>
+/* =====================================================================
+   Udviklervaerktoej. Indgaar ikke i forsoegene og kan slettes.
+
+   Koerer oevelsestjekket (js/tjek.js) mod et forsoeg paa motoren eller
+   mod dem alle: aabner forsoegets index.html i en iframe, venter til
+   sprites er indlaest, og spoerger saa, om forsoeget haenger sammen -
+   stoffer, udstyr, sprites, trin, betingelser, pladsen paa bordet og
+   teksterne. Et forsoeg bestaar, naar der ingen fejl er. NB er en
+   advarsel: noget, der ikke kan afgoeres paa papiret.
+
+   Med »proev tjekket selv« saettes ti slags fejl ind i en kopi af
+   forsoegets data én ad gangen (et stof, der ikke findes; et trin, der
+   peger paa et glas, der ikke er paa bordet; ...), og hver skal fanges.
+
+   Adressen husker valget: _oevelsestjek.html?side=alle&selv=1
+   Et forsoeg, der ikke staar i listen: ?side=../superlab/xx/index.html
+   Skal aabnes gennem en lokal server, ligesom selvtesterne.
+   ===================================================================== */
+(function () {
+    "use strict";
+
+    var ALLE = ["../superlab/sb2.4_ligevaegt/index.html", "proevebord/index.html", "proeverum/index.html"];
+    var VENT = 8000;            /* ms: saa laenge ventes der paa sprites */
+
+    var q = new URLSearchParams(location.search);
+    var valg = { side: q.get("side") || "alle", selv: q.get("selv") === "1" };
+    var $ = function (id) { return document.getElementById(id); };
+
+    var linjer = [], fejl = 0, advarsler = 0;
+    function esc(t) { return String(t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+    function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + esc(t) + "</span>" : esc(t)); }
+    function vis() { $("ud").innerHTML = linjer.join("\n"); }
+
+    function skrivResultat(r) {
+        r.afsnit.forEach(function (a) {
+            skriv("\n" + a.titel, "h");
+            a.poster.forEach(function (p) {
+                var note = p.note !== undefined && p.note !== "" ? "   (" + p.note + ")" : "";
+                if (p.slags === "ok") skriv("  ok    " + p.tekst + note, "ok");
+                else if (p.slags === "fejl") skriv("  FEJL  " + p.tekst + note, "fejl");
+                else if (p.slags === "advarsel") skriv("  NB    " + p.tekst + note, "nb");
+                else skriv("  ·     " + p.tekst + note, "info");
+            });
+        });
+        fejl += r.fejl;
+        advarsler += r.advarsler;
+    }
+
+    /* Aabner siden i en ny iframe. Undtagelser under indlaesningen
+       fanges: saa snart iframen har faaet sit nye dokument (adressen er
+       ikke laengere about:blank), faar dens vindue en lytter. Det sker, mens
+       siden henter sine scripts, altsaa foer forsoegets egen kode koerer.
+       Naar lytteren alligevel kommer for sent, siger afsnit 1 stadig, at
+       siden ikke startede, og de andre afsnit hvorfor. */
+    function aabn(side, faerdig) {
+        var gl = $("ramme");
+        if (gl) gl.parentNode.removeChild(gl);
+        var fr = document.createElement("iframe");
+        fr.id = "ramme";
+        document.body.appendChild(fr);
+        var undtagelser = [], hooket = false, loebet = false;
+        function lyt(e) {
+            undtagelser.push((e.message || "fejl") + (e.filename ? " (" + e.filename.split("/").slice(-2).join("/") + ":" + e.lineno + ")" : ""));
+        }
+        (function hag() {
+            if (hooket || loebet) return;
+            try {
+                var w = fr.contentWindow;
+                if (w && w.document && w.document.URL !== "about:blank") {
+                    w.addEventListener("error", lyt);
+                    hooket = true;
+                    return;
+                }
+            } catch (e) { /* endnu intet dokument */ }
+            setTimeout(hag, 1);
+        }());
+        fr.addEventListener("load", function () {
+            loebet = true;
+            if (!hooket) undtagelser = null;
+            var vin = fr.contentWindow, t0 = Date.now();
+            (function vent() {
+                var NK = vin.NK;
+                var klar = !NK || !NK.Sprites || NK.Sprites.alleKlar();
+                if (!klar && Date.now() - t0 < VENT) { setTimeout(vent, 100); return; }
+                setTimeout(function () { faerdig(vin, undtagelser); }, 300);
+            }());
+        });
+        fr.src = side;
+    }
+
+    function tjekEt(side, naeste) {
+        aabn(side, function (vin, undtagelser) {
+            skriv("\n══ " + side + " ══", "forsoeg");
+            try {
+                if (vin.NK && vin.NK.Kemichael && vin.NK.Kemichael.baggrundsliv) vin.NK.Kemichael.baggrundsliv(false);
+                var r = NKTjek.koer(vin, { undtagelser: undtagelser });
+                skrivResultat(r);
+                if (valg.selv) {
+                    skriv("\n9. Tjekket prøver sig selv: en fejl sat ind ad gangen skal fanges", "h");
+                    NKTjek.selvproeve(vin).forEach(function (p) {
+                        if (p.fanget) skriv("  ok    " + p.navn + "   (" + p.note + ")", "ok");
+                        else { fejl++; skriv("  FEJL  " + p.navn + " blev ikke fanget   (" + p.note + ")", "fejl"); }
+                    });
+                }
+            } catch (e) {
+                fejl++;
+                skriv("UNDTAGELSE: " + e.message + "\n" + e.stack, "fejl");
+            }
+            vis();
+            naeste();
+        });
+    }
+
+    function koer() {
+        linjer = []; fejl = 0; advarsler = 0;
+        $("ud").textContent = "Kører …";
+        var sider = valg.side === "alle" ? ALLE.slice() : [valg.side];
+        (function naeste() {
+            if (!sider.length) {
+                skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK") + (advarsler ? " (" + advarsler + " NB)" : ""), fejl ? "fejl" : "ok");
+                vis();
+                return;
+            }
+            tjekEt(sider.shift(), naeste);
+        }());
+        var q2 = new URLSearchParams({ side: valg.side });
+        if (valg.selv) q2.set("selv", "1");
+        history.replaceState(null, "", "?" + q2.toString());
+        $("note").textContent = location.protocol === "file:" ? "Åbn siden gennem en lokal server." : "";
+    }
+
+    var sel = $("side");
+    if (![].some.call(sel.options, function (o) { return o.value === valg.side; })) $("sti").value = valg.side;
+    else sel.value = valg.side;
+    $("selv").checked = valg.selv;
+    sel.addEventListener("change", function () { valg.side = sel.value; $("sti").value = ""; koer(); });
+    $("sti").addEventListener("change", function () { if (this.value.trim()) { valg.side = this.value.trim(); koer(); } });
+    $("selv").addEventListener("change", function () { valg.selv = this.checked; koer(); });
+    $("igen").addEventListener("click", koer);
+    window.addEventListener("load", koer);
+}());
+</script>
+</body>
+</html>

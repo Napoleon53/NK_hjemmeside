@@ -14,6 +14,7 @@
 <pre id="ud">Kører …</pre>
 <iframe id="ramme" src="index.html"></iframe>
 <script src="../../laboratoriet/js/proeve.js"></script>
+<script src="../../laboratoriet/js/tjek.js"></script>
 <script>
 /* =====================================================================
    Udviklervaerktoej. Indgaar ikke i animationen og kan slettes.
@@ -21,8 +22,9 @@
    Aabner index.html i en iframe og koerer forsoeget igennem: kemien i de
    fire indgreb, badene, forloebets trin (ogsaa i forkert raekkefoelge),
    flagene, udloeserne, gemningen, opstillingen mod stoftabellen,
-   Kemichaels replikker fra forloebet og taleboblen som eget lag. Til
-   sidst goeres det samme med musen, som en elev (proeve.js).
+   oevelsestjekket (M2), Kemichaels replikker fra forloebet og
+   taleboblen som eget lag. Til sidst goeres det samme med musen, som en
+   elev (proeve.js).
 
    Skal aabnes gennem en lokal server (eller Chrome med
    --allow-file-access-from-files), ellers kan iframen ikke laeses.
@@ -405,6 +407,25 @@ function koerTest() {
     paastand("alle trin naevner stoffer, der findes", manglerStof.length === 0, manglerStof.join(", ") || "ingen mangler");
     paastand("hvert trin har tekst og hint",
         F.trin.every(function (x) { return x.tekst && x.hint && x.kort; }));
+
+    /* M2: oevelsestjekket er det, kimen ovenfor voksede op til - den
+       generiske validering, som ethvert forsoeg koeres igennem
+       (../../laboratoriet/js/tjek.js og _oevelsestjek.html). Den koeres paa
+       et frisk bord, saa »intet trin er gjort, foer eleven har gjort
+       noget« kan proeves, og den skal fange de fejl, der saettes ind med
+       vilje. NB (det, der ikke kan afgoeres paa papiret) er ikke en fejl. */
+    NK.startForfra();
+    var tjek = NKTjek.koer(ramme.contentWindow);
+    paastand("øvelsestjekket finder ingen fejl i forsøget (M2)", tjek.fejl === 0,
+        tjek.fejl ? tjek.fund().join(" | ") : tjek.afsnit.length + " afsnit, " + tjek.advarsler + " NB");
+    var selvTjek = NKTjek.selvproeve(ramme.contentWindow);
+    var ikkeFanget = selvTjek.filter(function (p) { return !p.fanget; }).map(function (p) { return p.navn; });
+    paastand("og det fanger hver af de fejl, der sættes ind med vilje", selvTjek.length >= 10 && !ikkeFanget.length,
+        ikkeFanget.join(", ") || selvTjek.length + " fanget");
+    /* F65 skrev [Fe³⁺] i stedet for c(Fe³⁺), men rettelsen naaede ikke
+       disken (F66); tjekket ovenfor holder nu alle tekster paa reglen */
+    paastand("tegneseriens linje om C-vitaminen siger »falder [Fe³⁺]« (F65, F66)",
+        NK.TEKST.serie.indgreb.vitc.hvorfor.indexOf("falder [Fe³⁺]") >= 0, NK.TEKST.serie.indgreb.vitc.hvorfor);
 
     overskrift("12. Start forfra");
     NK.startForfra();
