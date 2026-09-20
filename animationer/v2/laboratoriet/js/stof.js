@@ -18,6 +18,10 @@
      farve, k   farven i oploesning og farvestyrken: absorbansen ved
                 spektrets top pr. mM pr. vejlaengde (0 = farveloes)
      korn       fast stof, der tegnes som korn (pulver, metal)
+     daekke     hvor staerkt et bundfald farver vaesken, naar det
+                hvirvler rundt, pr. µmol (standard 1). PbI2 er 6 (K3)
+     glimmer    bundfaldet ses ogsaa som glinsende flager, der daler ned
+                gennem vaesken (PbI2, »den gyldne regn«, K3)
      dHfort     fortyndingsvarme i kJ/mol (negativ = varmer), fx
                 koncentreret svovlsyre
      indikator  { pKa, syre: farve|null, base: farve|null }: farven
@@ -34,6 +38,17 @@
      dH         reaktionsvarme i kJ/mol (negativ = varmer op)
      betingelse fn(o) -> bool, fx koncentreret syre: konc(o, "HNO3") > 5000
      min        { stof: mM }: samme som betingelse, men som tabel
+     dCp        varmekapaciteten af reaktionen i J/(mol·K): saa foelger ΔH
+                selv temperaturen, ΔH(T) = ΔH + ΔCp·(T - 20 °C). Til en
+                reaktion, hvis K ikke kan beskrives med ét ΔH fra 0 til
+                100 °C (PbI2's oploselighed, K3)
+     fartOploes { uden, med }: et bundfald, der oploeses igen, goer det
+                med denne fart (1/s) uden og med omroering (magnetomroerer,
+                glasstav, rystning). Uden den gaelder fart begge veje
+   For et bundfald ("faeld") gaelder K og ΔH OPLOESNINGEN, som i en tabel:
+   K er oploselighedsproduktet, og ΔH er oploesningsvarmen (positiv, naar
+   saltet bliver mere oploeseligt i varmen). Faeldningen afgiver derfor
+   -ΔH.
 
    Redox skrives ikke som reaktioner, men som par med standardpotentiale:
      NK.Stof.par({ ox: "Cu2+", red: "Cu(s)", e: 2, E0: 0.34 });
@@ -68,6 +83,8 @@
             dansk: e.navn || e.formel || navn,
             M: e.M || 0,
             korn: !!e.korn,
+            daekke: e.daekke || 1,
+            glimmer: !!e.glimmer,
             atomer: e.atomer || null,
             dHfort: e.dHfort || 0,
             /* cRef: koncentrationen (mM), som dHfort regnes fra (flaskens) */
@@ -352,7 +369,10 @@
         if (Math.abs(xi) < 1e-12) return;
         rx.venstre.forEach(function (led) { tilsaet(o, led[1], -led[0] * xi); });
         rx.hoejre.forEach(function (led) { tilsaet(o, led[1], led[0] * xi); });
-        if (rx.dH && o.V > 0.05) o.T += -rx.dH * xi * 1e-3 / (o.V * VARMEKAP);
+        /* For et bundfald er ΔH oploesningens, og reaktionen er skrevet
+           som faeldningen: den afgiver varmen -ΔH */
+        var dH = rx.slags === "faeld" ? -rx.dH : rx.dH;
+        if (dH && o.V > 0.05) o.T += -dH * xi * 1e-3 / (o.V * VARMEKAP);
     }
 
     /* Reaktionsbroeken i mM, naar reaktionen er gaaet xi µmol laengere. */
@@ -390,14 +410,59 @@
        Eksponenten begraenses til ±6, saa en reaktion med et stort ΔH ikke
        giver absurde tal lige under kogepunktet.
 
-       NK.Stof.vantHoff = false slaar det fra. */
+       NK.Stof.vantHoff = false slaar det fra.
+
+       Med dCp (J/(mol·K)) foelger ΔH selv temperaturen,
+       ΔH(T) = ΔH + ΔCp·(T - T0), og saa er
+         ln K(T) = ln K(T0) - ΔH/R·(1/T - 1/T0) + ΔCp/R·(ln(T/T0) + T0/T - 1).
+       PbI2's oploselighed (0,044 / 0,069 / 0,41 g pr. 100 mL ved 0 / 20 /
+       100 °C) kan ikke beskrives med ét ΔH - det ville give 0,28 g ved
+       100 °C - men med ΔH = 47,6 kJ/mol og ΔCp = 356 J/(mol·K) rammer den
+       tabellen inden for en halv procent hele vejen (K3). */
     var T0 = 293.15;            /* 20 °C i kelvin */
     var R = 8.314;              /* J/(mol·K) */
 
     function Kved(rx, T) {
-        if (NK.Stof.vantHoff === false || !rx.dH || typeof T !== "number") return rx.K;
-        var eks = -(rx.dH * 1000) / R * (1 / (T + 273.15) - 1 / T0);
+        if (NK.Stof.vantHoff === false || (!rx.dH && !rx.dCp) || typeof T !== "number") return rx.K;
+        var Tk = T + 273.15;
+        var eks = -((rx.dH || 0) * 1000) / R * (1 / Tk - 1 / T0);
+        if (rx.dCp) eks += rx.dCp / R * (Math.log(Tk / T0) + T0 / Tk - 1);
         return rx.K * Math.exp(NK.klamp(eks, -6, 6));
+    }
+
+    /* Ionproduktet af en faeldning, som hvis alt var oploest: hver ion
+       regnes med det, der er bundet i bundfaldet (i mM). Er det over
+       K(T), er oploesningen overmaettet ved T (K3) */
+    function ionprodukt(o, rx) {
+        if (!(o.V > 1e-9)) return 0;
+        var Q = 1;
+        rx.venstre.forEach(function (led) {
+            var n = o.n[led[1]] || 0;
+            rx.hoejre.forEach(function (h) { n += led[0] * (o.n[h[1]] || 0) * h[0]; });
+            Q *= Math.pow(Math.max(0, n / o.V), led[0]);
+        });
+        return Q;
+    }
+
+    /* Den temperatur (°C), hvor et bundfald netop er i ligevaegt med alt
+       det, der er i oploesningen, hvis det hele var oploest: ionproduktet
+       af den samlede maengde af hvert ion er K(T). Det er den temperatur,
+       de foerste krystaller kommer ved, naar en klar oploesning koeles af
+       (K3). Stofferne til venstre regnes med det, der er bundet i
+       bundfaldet. null, hvis ionproduktet er under K ved lav eller over K
+       ved hoej (saa er der ingen saadan temperatur i omraadet). */
+    function maetningsT(o, rx, lav, hoej) {
+        if (!rx || rx.slags !== "faeld" || !(o.V > 1e-9)) return null;
+        lav = lav === undefined ? 0 : lav;
+        hoej = hoej === undefined ? 100 : hoej;
+        var Q = ionprodukt(o, rx);
+        if (Q <= Kved(rx, lav) || Q >= Kved(rx, hoej)) return null;
+        var a = lav, b = hoej;
+        for (var i = 0; i < 50; i++) {
+            var m = (a + b) / 2;
+            if (Kved(rx, m) < Q) a = m; else b = m;
+        }
+        return (a + b) / 2;
     }
 
     function ligevaegtXi(o, rx, g) {
@@ -414,7 +479,7 @@
         return (a + b) / 2;
     }
 
-    function skridtReaktion(o, rx, dt) {
+    function skridtReaktion(o, rx, dt, s) {
         if (o.V <= 1e-9) return;
         if (rx.betingelse && !rx.betingelse(o)) return;
         var g = graenser(o, rx);
@@ -439,20 +504,28 @@
             var harFast = rx.hoejre.some(function (led) { return stof(led[1]).fase === "s" && (o.n[led[1]] || 0) > 1e-9; });
             if (rx.slags === "faeld" && q.n < Kved(rx, o.T) && !harFast) return;
             maal = ligevaegtXi(o, rx, g);
+            /* Et bundfald, der oploeses igen (maal < 0), goer det med sin
+               egen fart, hurtigst naar der roeres (fartOploes) */
+            if (rx.slags === "faeld" && maal < 0 && rx.fartOploes) {
+                var roert = !!(s && (s.roer || (s.ryst || 0) > 0.15));
+                f = 1 - Math.exp(-(roert ? rx.fartOploes.med : rx.fartOploes.uden) * dt);
+            }
             anvend(o, rx, Math.abs(maal) < 1e-3 ? maal : maal * f);
         }
     }
 
     /* Tidens gang i oploesningen: alle reaktioner (eller listen), og gas
        forlader vaesken */
-    function skridt(o, dt, liste) {
-        (liste || REAKTIONER).forEach(function (rx) { skridtReaktion(o, rx, dt); });
+    /* s: { roer, ryst } fra beholderen - om der roeres (fartOploes) */
+    function skridt(o, dt, liste, s) {
+        (liste || REAKTIONER).forEach(function (rx) { skridtReaktion(o, rx, dt, s); });
         o.gas = o.gas || {};
-        for (var s in o.n) {
-            if (!Object.prototype.hasOwnProperty.call(o.n, s)) continue;
-            if (STOFFER[s].fase === "g") {
-                o.gas[s] = (o.gas[s] || 0) + o.n[s];
-                delete o.n[s];
+        /* navn og ikke s: s er omgivelserne (K3) */
+        for (var navn in o.n) {
+            if (!Object.prototype.hasOwnProperty.call(o.n, navn)) continue;
+            if (STOFFER[navn].fase === "g") {
+                o.gas[navn] = (o.gas[navn] || 0) + o.n[navn];
+                delete o.n[navn];
             }
         }
     }
@@ -532,22 +605,27 @@
         };
     }
 
-    /* Uklarhed 0-1 fra fast stof, der svaever i vaesken */
+    /* Uklarhed 0-1 fra fast stof, der svaever i vaesken. Et stof med
+       daekke (K3) farver vaesken staerkere pr. µmol: PbI2 er intenst gult,
+       saa 0,06 g i 100 mL ses tydeligt, naar det hvirvler rundt */
     function uklar(o) {
         if (o.V <= 0.01) return 0;
         var m = 0;
-        faste(o).forEach(function (f) { if (!f.stof.korn) m += f.umol; });
+        faste(o).forEach(function (f) { if (!f.stof.korn) m += f.umol * (f.stof.daekke || 1); });
         return 1 - Math.exp(-m / o.V * 0.08);
     }
 
-    /* Farven af det faste stof, vejet efter maengde */
-    function fastFarve(o) {
-        var liste = faste(o);
+    /* Farven af det faste stof, vejet efter maengde. udenKorn: kun det, der
+       svaever (uklarhedens farve) - ellers ville de hvide saltkorn, der
+       endnu ikke er oploest, blege det gule bundfald (K3) */
+    function fastFarve(o, udenKorn) {
+        var liste = faste(o).filter(function (f) { return !udenKorn || !f.stof.korn; });
         if (!liste.length) return null;
         var sum = 0, r = 0, g = 0, b = 0;
         liste.forEach(function (f) {
             var fa = f.stof.farve || { r: 230, g: 230, b: 230 };
-            sum += f.umol; r += fa.r * f.umol; g += fa.g * f.umol; b += fa.b * f.umol;
+            var w = f.umol * (udenKorn ? (f.stof.daekke || 1) : 1);
+            sum += w; r += fa.r * w; g += fa.g * w; b += fa.b * w;
         });
         return { r: r / sum, g: g / sum, b: b / sum, a: 1 };
     }
@@ -717,6 +795,8 @@
         KW: KW,
         vantHoff: true,
         Kved: Kved,
+        ionprodukt: ionprodukt,
+        maetningsT: maetningsT,
         def: def,
         stof: stof,
         formel: formel,

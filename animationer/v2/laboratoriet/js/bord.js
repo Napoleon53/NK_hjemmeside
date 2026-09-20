@@ -76,6 +76,28 @@
                             visTilskuere saettes (fluebenet i panelet). Et
                             klik paa en af dem i panelet loefter den op for
                             hele forsoeget (loeft, loeftede)
+   Nye poster i opstillingen (K3, sc2.7):
+     varmeplade { effekt: W, traeghed: s, kan: { omroerer: true } }
+                            en plade med effekt varmer glasset med en fast
+                            effekt (B.skridt) i stedet for at give det sin
+                            temperatur; traeghed er pladens tidskonstant,
+                            saa den er varm lidt tid efter, at der er
+                            slukket. Med omroerer er hoejre knap en
+                            magnetomroerer: et klik paa den (eller omroer)
+                            taender og slukker, og glasset paa pladen
+                            roeres (s.roer), saa bundfald hvirvler rundt og
+                            oploeses hurtigere (fartOploes i stof.js)
+     vaegt { decimaler: 3, tareret: true }
+                            tre decimaler, og vaegten er tareret med det,
+                            der staar paa den fra start (vejebaaden)
+     pulverglas, vejebaad { spatelGram: [min, maks] }
+                            en spatelspids er et tilfaeldigt antal gram
+                            mellem min og maks. Paa en vejebaad betyder det,
+                            at en tom spatel kan tage lidt af igen
+   Forsoegets regel for fremgangsmaaden: bord.regel(gg, c) kan give en
+   tekst, og saa sker moedet ikke - genstanden gaar hjem, og teksten
+   staar paa scenen (sc2.7: vejebaaden haeldes kun i, naar afvejningen
+   passer). Uden regel afvises intet, der kan lade sig goere.
      partikler, partikelRef boblens skala: et stof med koncentrationen
                             partikelRef (mM, standard 100) faar partikler
                             kugler (standard 6); se Stof.partikelTal.
@@ -412,7 +434,15 @@
         this.specs = specs.slice();
         specs.forEach(function (s) { mig.tilfoej(s); });
         this.ordnDybde();
+        this.tarer();
         this.findTilskuere();
+    };
+
+    /* En vaegt med tareret: true er tareret med det, der staar paa den fra
+       start (K3) */
+    P.tarer = function () {
+        var mig = this;
+        this.liste.forEach(function (gg) { if (gg.kan.vaegt && gg.spec && gg.spec.tareret) gg.tara = mig.masseePaa(gg); });
     };
 
     /* Tilskuerionerne i forsoeget: se valg.tilskuere i hovedkommentaren.
@@ -509,6 +539,7 @@
         if (NK.Sprites.FILER.kaffekop && (NK.Scene.HYLDE || NK.Scene.KAFFE)) this.lavKaffekop();
         this.specs.forEach(function (s) { mig.tilfoej(s); });
         this.ordnDybde();
+        this.tarer();
         if (this.laererNyt) this.laererNyt();
         this.koppenVaek = false;
         this.aendret("nulstil");
@@ -643,7 +674,7 @@
             this.holdt = { navn: navn, start: pt, dx: pt.x - gg.p.x, dy: pt.y - gg.p.y, flyttet: false, sidst: pt, t: Date.now(), taleboble: paaTaleboble };
             return true;
         }
-        this.klik(paaTaleboble ? "taleboble" : navn);
+        this.klik(paaTaleboble ? "taleboble" : navn, pt);
         return false;
     };
 
@@ -1192,6 +1223,9 @@
             if (k.roerer || k.maaler) return B.volumen(maal) > 0.1 || k.maaler;
         }
         if (m.pulver && k.spatel && !gg.last) return true;
+        /* K3: en tom spatel tager lidt af igen fra en toer beholder med fast
+           stof, der har spatelGram (vejebaaden paa vaegten) */
+        if (k.spatel && !gg.last && this.kanTageAf(maal)) return true;
         /* F54: et pulverglas over et glas - en ren spatel goer arbejdet */
         if (k.pulver && m.holder && !m.pulver && !m.affald && !m.vask && Stof.faste(gg.indhold).length && this.kanFaaSpatel(gg)) return true;
         if ((m.affald || m.vask) && k.holder && !B.tom(gg)) return true;
@@ -1200,11 +1234,20 @@
         if (m.stoette && gg.type.navn === "reagensglas") return this.ledigtHul(maal) >= 0;
         if (m.bad && gg.type.navn === "reagensglas") return this.ledigPlads(maal) !== null;
         if (m.varmer && k.holder && !k.flaske && !k.drypper && !k.sproejter && !k.pulver && gg.type.navn !== "reagensglas") return true;
-        if (m.vaegt && k.holder && gg.type.navn !== "reagensglas") return true;
+        /* Et pulverglas stilles ikke paa en vaegt, der har en vejebaad (eller
+           et glas) paa sig: saa er det den, det holdes over for at give en
+           spatelspids (K3). Alt andet kan staa ved siden af paa vaegten. */
+        if (m.vaegt && k.holder && gg.type.navn !== "reagensglas" &&
+            !(k.pulver && this.liste.some(function (x) { return x !== gg && x.paa === maal && x.kan.holder; }))) return true;
         if (m.luge && !k.fast && gg.type.navn !== "reagensglas" && gg.type.sprite) return true;
         if (m.holder && k.dypper && B.volumen(maal) > 0.05) return true;
         if (m.flamme && k.dypper && gg.last) return true;
         return false;
+    };
+
+    P.kanTageAf = function (c) {
+        return !!(c && c.kan.holder && !c.kan.pulver && c.spec && c.spec.spatelGram &&
+            B.volumen(c) < 0.05 && Stof.faste(c.indhold).length);
     };
 
     P.ledigtHul = function (st, naerX) {
@@ -1301,6 +1344,13 @@
                        tud.y > rk.y - SIGTE.glasOp && tud.y < bund) {
                 return dx;
             }
+        }
+        /* Et pulverglas over et glas (F54) sigter med foden, som en tud
+           ovenfra: holdes det over vejebaaden, er det den, der faar en
+           spatelspids, ogsaa naar musen er et stykke over den lave baad (K3) */
+        if (gg.kan.pulver && m.holder && !m.pulver && fod.y < ob.y + SIGTE.tudNed && fod.y > rk.y - SIGTE.glasOp &&
+            fod.x > rk.x - SIGTE.glasSide && fod.x < rk.x + rk.b + SIGTE.glasSide) {
+            return Math.abs(fod.x - ob.x);
         }
         /* Ellers musen mod genstanden; paa et glas kun ved aabningen, saa
            det, der stilles paa bordet foran et glas, ikke haelder i det -
@@ -1401,6 +1451,18 @@
     /* Genstanden gg bruges paa c. Returnerer true, hvis der skete noget. */
     P.moede = function (gg, c, pt) {
         var k = gg.kan, m = c.kan;
+        /* Forsoegets regel for fremgangsmaaden (bord.regel): siger den
+           nej, gaar genstanden hjem, og grunden staar paa scenen */
+        if (this.regel) {
+            var nej = this.regel(gg, c);
+            if (nej) {
+                this.besked(nej, "advarsel");
+                this.koer.start([NK.Koer.hjemTil(gg, 0.6, 30)], "hjem");
+                this.haendelse("regel", { gg: gg, til: c, tekst: nej });
+                this.aendret("regel");
+                return true;
+            }
+        }
         if (m.affald || m.vask) return this.toemI(gg, c);
         if (m.kurv) return this.iKurv(gg, c);
         if (m.hane && k.holder) return this.fyldFraHane(gg, c);
@@ -1413,6 +1475,7 @@
         if ((m.varmer || m.vaegt) && k.holder) return this.paaPlade(gg, c, pt ? pt.x : undefined);
         if (m.luge && !k.fast && gg.type.sprite) return this.paaPlade(gg, c, pt ? pt.x : undefined);
         if (m.pulver && k.spatel) return this.fyldSpatel(gg, c);
+        if (k.spatel && !gg.last && this.kanTageAf(c)) return this.fyldSpatel(gg, c);
         if (k.pulver && m.holder && !m.pulver) return this.autoSpatel(gg, c);
         if (m.holder) {
             if (k.dypper) return this.dyp(gg, c);
@@ -1569,6 +1632,7 @@
         gg.paa = plade;
         var til = staar(gg.type, cx, top);
         gg.hjem = kopi(til);
+        gg.hjemPaa = { plade: plade, p: kopi(til) };
         if (stille) gg.p = kopi(til);
         else this.koer.start([{ flyt: gg, til: til, tid: 0.35, loeft: 10 }], "hjem");
         this.tilFront(gg);
@@ -1623,6 +1687,7 @@
         var til = { x: cx, y: bad.p.y - bad.anker.y + bad.type.plade.y - 62 * (gg.skala || 1), v: 0 };
         til.y = synkTil(gg, bad, til.y);
         gg.hjem = kopi(til);
+        gg.hjemPaa = { plade: bad, p: kopi(til) };
         if (stille) gg.p = kopi(til);
         else this.koer.start([{ flyt: gg, til: til, tid: 0.35, loeft: 14 }], "hjem");
         this.tilFront(gg);
@@ -1639,7 +1704,9 @@
        tegnet mindre, men rummer stadig 30 mL (skala er et rent tegnemaal),
        og der skal 4 mL i pr. tryk, ikke 6. */
     P.portion = function (gg, c) {
-        var p = gg.type.haeldMl || 0;
+        /* K3: kilden kan selv sige, hvor meget den giver (haeldMl paa
+           posten): maaleglasset i sc2.7 haeldes ud i én haeldning */
+        var p = gg.spec && gg.spec.haeldMl !== undefined ? gg.spec.haeldMl : (gg.type.haeldMl || 0);
         var m = c && c.spec && c.spec.modtager;
         var kap = m > 0 ? m : (c && c.type.maks ? c.type.maks / 5 : 0);
         if (!kap) return p;
@@ -1886,7 +1953,9 @@
     };
 
     P.kanRystes = function (c) {
-        return !!(c && c.kan.holder && !c.kan.bad && !c.kan.flaske && !c.kan.fast && this.synlig(c) && c !== this.baerer);
+        /* Vejebaaden rystes ikke: den er ikke et glas (K3) */
+        return !!(c && c.kan.holder && !c.kan.bad && !c.kan.flaske && !c.kan.fast && c.type.navn !== "vejebaad" &&
+            this.synlig(c) && c !== this.baerer);
     };
 
     P.rystValgt = function (til, sek) {
@@ -1932,7 +2001,37 @@
        aflaesning og zoom; handlinger sker kun ved at traekke. Undtagelser:
        kontakten paa varmepladen, og en draabeflaske, der allerede haenger
        over et glas (klik igen giver en draabe mere). */
-    P.klik = function (navn) {
+    /* K3: magnetomroereren paa en varmeplade taendes og slukkes. til:
+       true/false, eller udeladt for at skifte */
+    P.omroer = function (gg, til) {
+        if (!gg || !gg.kan.omroerer) return false;
+        gg.omroerer = til === undefined ? !gg.omroerer : !!til;
+        if (NK.Lyd && NK.Lyd.kontakt) NK.Lyd.kontakt();
+        this.besked(gg.omroerer ? "Omrøringen er tændt." : "Omrøringen er slukket.");
+        this.haendelse("omroering", gg);
+        this.aendret("omroering");
+        return true;
+    };
+
+    /* Pladens temperatur: mod dens egen, naar den er taendt, ellers mod
+       stuen. Med traeghed (s) er det én tidskonstant begge veje (K3). */
+    P.pladeT = function (gg, dt) {
+        var maalT = gg.taendt ? gg.type.temperatur : this.stue;
+        var tau = gg.spec && gg.spec.traeghed;
+        gg.T = NK.mod(gg.T, maalT, tau ? 1 / tau : (gg.taendt ? 0.12 : 0.06), dt);
+    };
+
+    /* En genstand, der er kommet hjem (NK.Koer.hjemTil), staar igen paa
+       det, den stod paa, da hjemmet blev sat (vaegten, pladen, badet) */
+    P.hjemme = function (gg) {
+        var hp = gg.hjemPaa;
+        if (!hp || gg.paa || this.baerer === gg || this.liste.indexOf(hp.plade) < 0) return;
+        if (Math.abs(gg.hjem.x - hp.p.x) > 0.5 || Math.abs(gg.hjem.y - hp.p.y) > 0.5) return;
+        gg.paa = hp.plade;
+        this.aendret("hjemme");
+    };
+
+    P.klik = function (navn, pt) {
         if (NK.Lyd) NK.Lyd.laasOp();
         if (navn === "taleboble") return this.springReplik ? this.springReplik() : false;
         if (navn === "naestepil") { if (this.pilAktiv && this.vedPil) { this.vedPil(); return true; } return false; }
@@ -1962,6 +2061,9 @@
         }
         if (k.varmer) {
             if (this.koer.optaget()) return false;
+            /* K3: paa en plade med magnetomroerer er hoejre halvdel knappen
+               til omroeringen */
+            if (k.omroerer && pt && NK.tilLokal(gg.p, gg.anker, pt.x, pt.y).x > gg.type.b / 2) return this.omroer(gg);
             gg.taendt = !gg.taendt;
             if (NK.Lyd && NK.Lyd.kontakt) NK.Lyd.kontakt();
             var T = gg.titel.charAt(0).toUpperCase() + gg.titel.slice(1);
@@ -2157,7 +2259,8 @@
         for (n in spec) if (Object.prototype.hasOwnProperty.call(spec, n) && n !== "indhold") ny[n] = spec[n];
         var rent = this.tilfoej(ny);
         this.ordnDybde();
-        this.besked(stor(rent.titel) + " er skiftet ud med et rent.");
+        /* F68: spatlen er skiftet ud med en ren, glasset med et rent */
+        this.besked(stor(rent.titel) + " er skiftet ud med " + (rent.type.intetkoen ? "et rent." : "en ren."));
         this.aendret("kurv");
         return rent;
     };
@@ -2251,7 +2354,9 @@
 
     P.vaegtTekst = function (vaegt) {
         var m = this.masseePaa(vaegt) - (vaegt.tara || 0);
-        return (m < 0 ? "−" : "") + Math.abs(m).toFixed(2).replace(".", ",") + " g";
+        var d = (vaegt.spec && vaegt.spec.decimaler) || 2;
+        if (Math.abs(m) < 0.5 * Math.pow(10, -d)) m = 0;
+        return (m < 0 ? "−" : "") + Math.abs(m).toFixed(d).replace(".", ",") + " g";
     };
 
     /* Fast stof haeldes fra en toer beholder (vejebaaden) i c */
@@ -2477,7 +2582,11 @@
                 var f = Stof.faste(jar.indhold)[0];
                 if (!f) return;
                 mig.tjekForurening(sp, jar, f.navn);
-                var umol = Math.min(jar.spec.spatelspids || SPATELSPIDS, f.umol);
+                /* K3: spatelGram giver en spatelspids paa et tilfaeldigt
+                   antal gram mellem min og maks */
+                var sg = jar.spec && jar.spec.spatelGram;
+                var umol = sg && f.stof.M ? r(sg[0], sg[1]) / f.stof.M * 1e6 : ((jar.spec && jar.spec.spatelspids) || SPATELSPIDS);
+                umol = Math.min(umol, f.umol);
                 Stof.tilsaet(jar.indhold, f.navn, -umol);
                 sp.last = { navn: f.navn, umol: umol, farve: f.stof.farve || { r: 230, g: 230, b: 230 } };
                 sp.fraPulver = jar;
@@ -2786,7 +2895,7 @@
     P.fysik = function (h) {
         var mig = this;
         this.liste.forEach(function (gg) {
-            if (gg.kan.varmer) gg.T = NK.mod(gg.T, gg.taendt ? gg.type.temperatur : mig.stue, gg.taendt ? 0.12 : 0.06, h);
+            if (gg.kan.varmer) mig.pladeT(gg, h);
         });
         this.beholdere().forEach(function (c) {
             B.skridt(c, h, mig.omgivelser(c), mig.reaktioner);
@@ -2823,7 +2932,13 @@
         /* Badet selv: termostaten bestemmer, ikke pladens 250 grader */
         var bt = gg.kan.bad ? this.badT(gg) : null;
         if (bt !== null) { s.T = bt; s.tau = 12; return s; }
-        if (gg.paa && gg.paa.kan.varmer && gg.paa.taendt) { s.T = gg.paa.T; s.tau = gg.paa.kan.flamme ? 6 : B.TEMP.tauVarme; }
+        var pl = gg.paa;
+        /* K3: en plade med effekt varmer med sin effekt (W), saa laenge den
+           er varm, og glasset afgiver varme til luften imens */
+        if (pl && pl.kan.varmer && pl.spec && pl.spec.effekt) {
+            s.effekt = pl.spec.effekt * NK.klamp((pl.T - this.stue) / Math.max(1, pl.type.temperatur - this.stue), 0, 1);
+        }
+        else if (gg.paa && gg.paa.kan.varmer && gg.paa.taendt) { s.T = gg.paa.T; s.tau = gg.paa.kan.flamme ? 6 : B.TEMP.tauVarme; }
         else if (gg.paa && gg.paa.kan.varmer) { s.T = Math.max(this.stue, gg.paa.T); s.tau = B.TEMP.tauVarme; }
         /* Et glas nede i et bad tager badets temperatur. Vand mod glas
            leder meget bedre end luft, saa tau er kort. */
@@ -2831,6 +2946,8 @@
         if (this.baerer === gg) s.ryst = this.ryst;
         if (this.rystes === gg) s.ryst = Math.max(s.ryst, 0.8);
         if (this.roerer === gg) { s.roer = true; s.ryst = Math.max(s.ryst, 0.6); }
+        /* K3: magnetomroereren roerer det, der staar paa pladen */
+        if (pl && pl.kan.omroerer && pl.omroerer) s.roer = true;
         return s;
     };
 
@@ -2850,10 +2967,7 @@
         this.ryk = this.ryk > 0.2 ? this.ryk * (1 - dt * 7) : 0;
 
         this.liste.forEach(function (gg) {
-            if (gg.kan.varmer) {
-                var maalT = gg.taendt ? gg.type.temperatur : mig.stue;
-                gg.T = NK.mod(gg.T, maalT, gg.taendt ? 0.12 : 0.06, dt);
-            }
+            if (gg.kan.varmer) mig.pladeT(gg, dt);
             if (gg.kan.flamme && gg.flammeUr > 0) {
                 gg.flammeUr -= dt;
                 if (gg.flammeUr <= 0) gg.flammeStyrke = 0;
@@ -2997,7 +3111,7 @@
         if (dt > 0.1) dt = 0.1;
         this.tid += dt;
         this.liste.forEach(function (gg) {
-            if (gg.kan.varmer) gg.T = NK.mod(gg.T, gg.taendt ? gg.type.temperatur : mig.stue, gg.taendt ? 0.12 : 0.06, dt);
+            if (gg.kan.varmer) mig.pladeT(gg, dt);
             if (gg.kan.flamme && gg.flammeUr > 0) { gg.flammeUr -= dt; if (gg.flammeUr <= 0) gg.flammeStyrke = 0; }
         });
         this.beholdere().forEach(function (c) {
@@ -3149,7 +3263,12 @@
         else if (k.dypper) T.tegnPodetraad(ctx, gg);
         else if (k.ph) T.tegnPHmeter(ctx, gg, !!gg.i || this.baerer === gg);
         else if (k.holder) {
-            gg.niveau = T.tegnBeholder(ctx, gg, tid, { boelge: this.baerer === gg ? this.ryst * 1.5 : (this.roerer === gg ? 0.8 : (this.rystes === gg ? 1.2 : 0)) });
+            /* K3: et glas paa en magnetomroerer har magneten i bunden, og
+               vaesken hvirvler, naar den roerer */
+            var pl = gg.paa && gg.paa.kan && gg.paa.kan.omroerer ? gg.paa : null;
+            var magnet = pl && B.volumen(gg) > 0.5 ? { roterer: !!pl.omroerer } : null;
+            var boelge = this.baerer === gg ? this.ryst * 1.5 : (this.roerer === gg ? 0.8 : (this.rystes === gg ? 1.2 : (magnet && magnet.roterer ? 0.5 : 0)));
+            gg.niveau = T.tegnBeholder(ctx, gg, tid, { boelge: boelge, magnet: magnet });
             /* Et isbad har is i vandet (is: true paa posten, F40) */
             if (gg.spec && gg.spec.is && T.tegnIs) T.tegnIs(ctx, gg, gg.niveau);
             if (gg.bobler && gg.bobler.length && !t.skjulIndhold) T.tegnBobler(ctx, gg, gg.bobler);

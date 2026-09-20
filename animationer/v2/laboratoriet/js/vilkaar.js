@@ -41,6 +41,15 @@
      V: { over: 2.5 }           rumfang i mL
      T: { over: 50 }            temperatur i grader
      pH: { under: 3 }           pH
+     tilsat: "KI(s)", gram: { over: 0.09, under: 0.11 }
+                                saa meget af saltet er kommet i glasset,
+                                uanset hvad det er blevet til: regnet af
+                                grundstofferne (KI er K og I, hvad enten
+                                de staar som KI(s), K+, I- eller PbI2(s)).
+                                Det grundstof, der er mindst af i forhold
+                                til saltets formel, afgoer det (H og O
+                                taeller ikke, vandet har dem). umol i
+                                stedet for gram gaar ogsaa (K3)
      tom: true                  ingenting i den
      koger: true                den koger
      staarI: "vandbad"          den staar i eller paa den navngivne genstand
@@ -108,6 +117,30 @@
         return St.konc(o, navn);
     }
 
+    /* Hvor meget af saltet navn (µmol) indholdet svarer til, regnet af
+       grundstofferne i alle stoffer i det (vilkaaret tilsat) */
+    function tilsatUmol(o, navn) {
+        var s = St.STOFFER[navn];
+        if (!s || !s.atomer) return 0;
+        var tot = {}, x, a;
+        for (x in o.n) {
+            if (!Object.prototype.hasOwnProperty.call(o.n, x)) continue;
+            var st = St.STOFFER[x];
+            if (!st || !st.atomer) continue;
+            for (a in st.atomer) if (Object.prototype.hasOwnProperty.call(st.atomer, a)) tot[a] = (tot[a] || 0) + o.n[x] * st.atomer[a];
+        }
+        var kun = Object.keys(s.atomer).filter(function (e) { return e !== "H" && e !== "O"; });
+        if (!kun.length) kun = Object.keys(s.atomer);
+        var min = Infinity;
+        kun.forEach(function (e) { min = Math.min(min, (tot[e] || 0) / s.atomer[e]); });
+        return isFinite(min) ? min : 0;
+    }
+
+    function tilsatGram(o, navn) {
+        var s = St.STOFFER[navn];
+        return s && s.M ? tilsatUmol(o, navn) * s.M * 1e-6 : 0;
+    }
+
     /* Proeverne, der gaelder én beholder */
     function proevBeholder(v, gg, bord) {
         if (!gg) return false;
@@ -118,6 +151,12 @@
                 ? { over: v.over, under: v.under, mindst: v.mindst, hoejst: v.hoejst }
                 : { over: 0 };
             if (!passer(maengde(gg, v.stof), krav)) return false;
+        }
+        if (v.tilsat !== undefined) {
+            var ost = B.samlet(gg);
+            if (v.gram !== undefined && !passer(tilsatGram(ost, v.tilsat), v.gram)) return false;
+            if (v.umol !== undefined && !passer(tilsatUmol(ost, v.tilsat), v.umol)) return false;
+            if (v.gram === undefined && v.umol === undefined && !(tilsatUmol(ost, v.tilsat) > 0)) return false;
         }
         if (v.V !== undefined && !passer(B.volumen(gg), v.V)) return false;
         if (v.T !== undefined && !passer(B.samlet(gg).T, v.T)) return false;
@@ -214,6 +253,7 @@
         ["alle", "nogen"].forEach(function (n) { if (v[n]) naevnteStoffer(v[n], ud); });
         if (v.ikke) naevnteStoffer(v.ikke, ud);
         if (v.stof) ud.push(v.stof);
+        if (v.tilsat) ud.push(v.tilsat);
         return ud;
     }
 
@@ -256,6 +296,8 @@
         maengde: maengde,
         passer: passer,
         naevnte: naevnte,
-        naevnteStoffer: naevnteStoffer
+        naevnteStoffer: naevnteStoffer,
+        tilsatUmol: tilsatUmol,
+        tilsatGram: tilsatGram
     };
 }());

@@ -9,6 +9,9 @@
      bund      hvor meget bundfaldet har lagt sig (0-1); rystning
                hvirvler det op igen
      niveau    vaeskens overflade paa tegnebordet, sat af tegningen
+     flager    glinsende krystaller af et fast stof med glimmer (PbI2,
+               »den gyldne regn«, K3): { u, v } er broekdele af glassets
+               bredde og vaeskens hoejde, saa tegningen kan saette dem ind
    Alt fast stof ligger i oploesningens n som stoffer med fase "s".
    ===================================================================== */
 (function () {
@@ -21,6 +24,54 @@
 
     B.BLAND = { diffusion: 0.06, ryst: 3, roer: 4, bobler: 1.5, lagMaks: 3 };
     B.TEMP = { stue: 20, tauLuft: 40, tauVarme: 10, kog: 100 };
+
+    /* Glinsende krystaller (K3, som den gamle sc2.7): et fast stof med
+       glimmer ses som flager, der daler ned gennem vaesken og glimter, saa
+       de foerste krystaller kan ses, laenge foer der er et bundfald. 5
+       flager fra den foerste krystal, én mere pr. 2,5 mg, hoejst 80. Under
+       omroering hvirvler de rundt; i ro daler de til bunds. Kun til
+       tegningen: kemien staar i indholdet. */
+    B.opdaterFlager = function (gg, dt, urolig) {
+        var o = gg.indhold, m = 0, n = 0, farve = null;
+        if (o && o.V > 0.5) {
+            Stof.faste(o).forEach(function (f) {
+                if (!f.stof.glimmer) return;
+                n += f.umol;
+                m += f.umol * (f.stof.M || 0) * 1e-6;
+                farve = farve || f.stof.farve;
+            });
+        }
+        /* Under 0,5 µmol er der intet fast stof (som fastIalt) */
+        var antal = n >= 0.5 ? Math.min(80, 5 + Math.round(m * 400)) : 0;
+        if (!antal && !(gg.flager && gg.flager.length)) return;
+        var fl = gg.flager = gg.flager || [], r = NK.r, i, f, levende = 0;
+        if (farve) gg.flageFarve = farve;
+        for (i = 0; i < fl.length; i++) if (!fl[i].doed) levende++;
+        for (; levende < antal; levende++) {
+            fl.push({ u: r(0.1, 0.9), v: r(0.12, 0.9), a: r(0, 6.28), s: r(0.016, 0.032), alfa: 0,
+                      fart: r(1.5, 4.5), fase: r(0, 6.28), vv: r(0.1, 0.22), ru: r(0.08, 0.38), th: r(0, 6.28), vmaal: r(0.05, 0.9) });
+        }
+        for (i = fl.length - 1; i >= 0 && levende > antal; i--) if (!fl[i].doed) { fl[i].doed = true; levende--; }
+        var bund = 0.02 + 0.04 * (gg.bund || 0);
+        for (i = fl.length - 1; i >= 0; i--) {
+            f = fl[i];
+            if (f.doed) {
+                f.alfa -= dt * 2.5;
+                if (f.alfa <= 0.02) { fl.splice(i, 1); continue; }
+            } else f.alfa = Math.min(1, f.alfa + dt * 2);
+            if (urolig) {
+                f.th += dt * 4;
+                f.u = NK.mod(f.u, 0.5 + f.ru * Math.sin(f.th), 6, dt);
+                if (Math.random() < dt * 0.5) f.vmaal = r(0.05, 0.9);
+                f.v = NK.mod(f.v, f.vmaal, 1.5, dt);
+                f.a += dt * 3;
+            } else if (f.v > bund) {
+                f.v = Math.max(bund, f.v - f.vv * dt);
+                f.u = NK.klamp(f.u + Math.sin(f.fase + f.v * 9) * 0.03 * dt, 0.06, 0.94);
+                f.a += dt * 0.8;
+            }
+        }
+    };
 
     B.er = function (gg) {
         return !!(gg && gg.kan && gg.kan.holder && gg.indhold);
@@ -129,7 +180,12 @@
     };
 
     /* Tidens gang i beholderen.
-       s = { T: omgivelsernes temperatur, tau, ryst (0-1), roer (bool) } */
+       s = { T: omgivelsernes temperatur, tau, ryst (0-1), roer (bool),
+             effekt: W fra en varmeplade med effekt (K3) }
+       Med effekt varmes vaesken af pladens effekt i stedet for at naerme
+       sig pladens temperatur: dT/dt = P/(V·c), saa 100 mL paa en plade med
+       1100 W stiger 2,6 °C i sekundet, og et lille glas stiger hurtigere.
+       Imens afgiver den varme til luften som ellers (tau). */
     B.skridt = function (gg, dt, s, reaktioner) {
         var o = gg.indhold;
         if (!o) return;
@@ -137,7 +193,8 @@
         [o, gg.lag].forEach(function (x) {
             if (!x) return;
             if (x.V > 0) x.T = s.T + (x.T - s.T) * Math.exp(-dt / (s.tau || B.TEMP.tauLuft));
-            Stof.skridt(x, dt, reaktioner);
+            if (s.effekt && x === o && x.V > 0.05) x.T += s.effekt * dt / (x.V * Stof.VARMEKAP);
+            Stof.skridt(x, dt, reaktioner, s);
         });
         /* Gas fra laget samles i beholderens gas. Bobler roerer rundt. */
         if (gg.lag && gg.lag.gas) {
@@ -165,6 +222,7 @@
         /* Bundfaldet laegger sig, naar der er ro */
         var urolig = (s.ryst || 0) > 0.15 || s.roer;
         gg.bund = urolig ? Math.max(0, (gg.bund || 0) - dt * 2) : Math.min(1, (gg.bund || 0) + dt * 0.25);
+        B.opdaterFlager(gg, dt, urolig);
         /* Kogning: damp og fordampning */
         gg.koger = o.V > 0.1 && o.T >= B.TEMP.kog - 0.5;
         if (gg.koger) {

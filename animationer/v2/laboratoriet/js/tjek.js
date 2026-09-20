@@ -36,6 +36,8 @@
    som en funktion (proev) kan ikke afgoeres paa papiret, og et flag kan
    vaere sat af forsoegets egen kode. Et forloeb kan sige, hvilke flag dets
    kode saetter, med flagFraKode: ["navn", ...]; saa er de ikke en fejl.
+   Har forloebet sagt det (ogsaa flagFraKode: [], ingen), er alle andre
+   flag, som ingen data saetter, en fejl igen, selv om der er kode (K3).
 
    Indgaar ikke i forsoegene; kun _oevelsestjek.html og selvtesterne
    laeser den.
@@ -313,6 +315,7 @@
         ["alle", "nogen"].forEach(function (n) { if (v[n]) naevnteStoffer(NK, v[n], ud); });
         if (v.ikke) naevnteStoffer(NK, v.ikke, ud);
         if (v.stof) ud.push(v.stof);
+        if (v.tilsat) ud.push(v.tilsat);
         return ud;
     }
 
@@ -391,7 +394,7 @@
         var t = brugtType(NK, spec, b);
         if (!t) return [navn + " er af en type, der ikke findes"];
         var holder = kan(NK, spec, "holder");
-        var proeverIndhold = ["stof", "V", "T", "pH", "tom", "koger", "lysere", "moerkere"].some(function (n) { return v[n] !== undefined; });
+        var proeverIndhold = ["stof", "tilsat", "V", "T", "pH", "tom", "koger", "lysere", "moerkere"].some(function (n) { return v[n] !== undefined; });
         if (proeverIndhold && !holder) return [navn + " kan ikke rumme noget"];
 
         if (v.V !== undefined) {
@@ -402,6 +405,14 @@
             var kraev = v.over !== undefined || v.mindst !== undefined || (v.under === undefined && v.hoejst === undefined);
             if (!har(St.STOFFER, v.stof)) ud.push(v.stof + " findes ikke i stoftabellen");
             else if (kraev && !ctx.lukning[v.stof]) ud.push(v.stof + " kan ikke dannes af det, der står på bordet");
+        }
+        /* tilsat: saltet skal staa et sted paa bordene, ellers kan det
+           ikke komme i glasset */
+        if (v.tilsat !== undefined) {
+            if (!har(St.STOFFER, v.tilsat)) ud.push(v.tilsat + " findes ikke i stoftabellen");
+            else if (!ctx.f.borde.some(function (b2) { return b2.opstilling.some(function (s2) { return stofferI(s2).indexOf(v.tilsat) >= 0; }); })) {
+                ud.push(v.tilsat + " står ikke på bordet og kan ikke komme i " + navn);
+            }
         }
         if (v.T !== undefined) {
             var tt = temperaturer(NK, ctx.f);
@@ -654,6 +665,9 @@
         R.tjek("tallene i replikkerne peger på noget, der findes ({{navn.T}})", tal2);
 
         /* Kan trinnene naas? */
+        /* Har forloebet sagt, hvilke flag koden saetter, er det hele
+           sandheden: saa kan koden ikke goere et ukendt flag til et maaske */
+        if (F.flagFraKode !== undefined) kode = false;
         var ctx = { NK: NK, f: f, navne: navne, lukning: lukning(NK, f), flag: flag, kode: kode,
                     fraKode: {}, uafgjort: 0, maaske: [] };
         liste(F.flagFraKode).forEach(function (n) { ctx.fraKode[n] = true; });

@@ -110,6 +110,7 @@
                 var gg = tr.flyt;
                 if (!tr.fra) tr.fra = kopi(gg.p);
                 var til = typeof tr.til === "function" ? tr.til.call(ejer) : tr.til;
+                tr.sidstTil = til;
                 var e = NK.blod(t);
                 gg.p.x = NK.lerp(tr.fra.x, til.x, e);
                 gg.p.y = NK.lerp(tr.fra.y, til.y, e) - Math.sin(Math.PI * e) * (tr.loeft === undefined ? 40 : tr.loeft);
@@ -117,6 +118,9 @@
             }
             if (tr.hver) tr.hver.call(ejer, t, h.t);
             if (t < 1) return;
+            /* Er genstanden kommet hjem, faar ejeren besked, saa den kan staa
+               paa det, den stod paa, igen (bord.hjemme: vaegten, pladen) */
+            if (tr.hjem && tr.flyt && ejer.hjemme) ejer.hjemme(tr.flyt);
             h.i++;
             h.t = 0;
         }
@@ -124,6 +128,6 @@
 
     /* Trinnet, der sender en genstand hjem */
     NK.Koer.hjemTil = function (gg, tid, loeft) {
-        return { flyt: gg, til: function () { return gg.hjem; }, tid: tid || 0.8, loeft: loeft === undefined ? 40 : loeft };
+        return { flyt: gg, til: function () { return gg.hjem; }, tid: tid || 0.8, loeft: loeft === undefined ? 40 : loeft, hjem: true };
     };
 }());

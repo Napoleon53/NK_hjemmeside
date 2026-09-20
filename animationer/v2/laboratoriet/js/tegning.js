@@ -429,6 +429,63 @@
         });
     }
 
+    /* Glinsende krystaller, der daler ned gennem vaesken (K3, »den gyldne
+       regn« i sc2.7): sekskanter med et skaer om, og en gang imellem et
+       glimt. top er vaeskens overflade paa tegnebordet; flagerne staar i
+       broekdele af glassets bredde og vaeskens hoejde (beholder.js) */
+    function sekskant(ctx, s) {
+        ctx.beginPath();
+        for (var i = 0; i < 6; i++) {
+            var v = i * Math.PI / 3;
+            if (i === 0) ctx.moveTo(Math.cos(v) * s, Math.sin(v) * s * 0.7);
+            else ctx.lineTo(Math.cos(v) * s, Math.sin(v) * s * 0.7);
+        }
+        ctx.closePath();
+    }
+
+    function tegnFlager(ctx, gg, verden, top, tid) {
+        var t = gg.type, x0 = Infinity, x1 = -Infinity, yb = -Infinity;
+        t.indre.forEach(function (q) { x0 = Math.min(x0, q.x); x1 = Math.max(x1, q.x); yb = Math.max(yb, q.y); });
+        var yt = top - gg.p.y + gg.anker.y, b = x1 - x0, hoej = yb - yt - 2;
+        if (hoej < 2) return;
+        var fa = gg.flageFarve || { r: 255, g: 210, b: 46 };
+        var lys = { r: Math.min(255, fa.r + 10), g: Math.min(255, fa.g + 14), b: Math.min(255, fa.b + 6) };
+        iBeholder(ctx, gg.p, gg.anker, NK.klipUnder(verden, top - 0.5), function () {
+            gg.flager.forEach(function (f) {
+                var s = Math.max(0.8, f.s * b), alfa = NK.klamp(f.alfa, 0, 1);
+                ctx.save();
+                ctx.translate(x0 + f.u * b, yb - 1 - f.v * hoej);
+                ctx.rotate(f.a);
+                ctx.globalAlpha = alfa * 0.35;
+                ctx.fillStyle = NK.css(fa, 1);
+                ctx.beginPath();
+                ctx.arc(0, 0, s * 1.9, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = alfa;
+                sekskant(ctx, s);
+                ctx.fillStyle = NK.css(lys, 1);
+                ctx.fill();
+                ctx.strokeStyle = "rgba(170, 110, 0, 0.6)";
+                ctx.lineWidth = 0.4;
+                ctx.stroke();
+                var glimt = Math.pow(Math.max(0, Math.sin(tid * f.fart + f.fase)), 12);
+                if (glimt > 0.05) {
+                    ctx.globalAlpha = alfa * glimt;
+                    ctx.fillStyle = "#fffbe6";
+                    sekskant(ctx, s * 0.8);
+                    ctx.fill();
+                    ctx.strokeStyle = "#ffffff";
+                    ctx.lineWidth = 0.5;
+                    ctx.beginPath();
+                    ctx.moveTo(-s * 2.2, 0); ctx.lineTo(s * 2.2, 0);
+                    ctx.moveTo(0, -s * 1.6); ctx.lineTo(0, s * 1.6);
+                    ctx.stroke();
+                }
+                ctx.restore();
+            });
+        });
+    }
+
     /* Korn af fast stof, der endnu ikke er oploest */
     function tegnKorn(ctx, gg, verden, liste) {
         var t = gg.type, x0 = Infinity, x1 = -Infinity, y = -Infinity;
@@ -630,6 +687,26 @@
 
     /* En beholder: vaeske, bundfald, korn, omrids, sprite, etiket og
        valgmaerke. Returnerer vaeskens overflade paa tegnebordet. */
+    /* K3: magneten i bunden af et glas paa en magnetomroerer - en hvid
+       kapsel, der drejer rundt, naar omroeringen er taendt */
+    function tegnMagnet(ctx, gg, verden, tid, roterer) {
+        var bund = -Infinity, xs = [];
+        verden.forEach(function (q) { bund = Math.max(bund, q.y); });
+        verden.forEach(function (q) { if (q.y > bund - 1.5) xs.push(q.x); });
+        if (!xs.length) return;
+        var cx = xs.reduce(function (a, b) { return a + b; }, 0) / xs.length;
+        var k = gg.skala || 1, L = 22 * k, h = 5 * k;
+        var b = roterer ? Math.max(h, L * Math.abs(Math.cos(tid * 9))) : L;
+        ctx.save();
+        ctx.fillStyle = "rgba(250, 250, 252, 0.95)";
+        ctx.strokeStyle = "rgba(90, 100, 115, 0.8)";
+        ctx.lineWidth = 0.8;
+        NK.rundtRekt(ctx, cx - b / 2, bund - h - 1, b, h, h / 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+    }
+
     T.tegnBeholder = function (ctx, gg, tid, opt) {
         opt = opt || {};
         var t = gg.type;
@@ -646,7 +723,7 @@
                    end gennem den smalle hals */
                 var vedY = T.vejVedY(gg, verden);
                 top = T.tegnVaeske(ctx, verden, V * t.mlPrAreal, o.V * t.mlPrAreal, solFarve, lagFarve, {
-                    boelge: opt.boelge, tid: tid, uklar: Stof.uklar(o) * (1 - (gg.bund || 0)), uklarFarve: Stof.fastFarve(o), lagBund: gg.lagBund,
+                    boelge: opt.boelge, tid: tid, uklar: Stof.uklar(o) * (1 - (gg.bund || 0)), uklarFarve: Stof.fastFarve(o, true), lagBund: gg.lagBund,
                     farveVedY: vedY ? function (y) { return Stof.farve(o, vedY(y)); } : null
                 });
                 var faste = Stof.faste(o).concat(gg.lag ? Stof.faste(gg.lag) : []);
@@ -661,8 +738,10 @@
                     tegnBundfald(ctx, gg, verden, { r: fr / sum, g: fg / sum, b: fb / sum, a: 1 }, NK.klamp(m / (t.maks * 40), 0.15, 1.4) * (t.maks < 30 ? 14 : 6) * NK.klamp(gg.bund, 0, 1));
                 }
                 if (korn.length) tegnKorn(ctx, gg, verden, korn);
+                if (gg.flager && gg.flager.length && top !== null && Math.abs(gg.p.v) < 0.35) tegnFlager(ctx, gg, verden, top, tid);
             }
         }
+        if (verden && opt.magnet) tegnMagnet(ctx, gg, verden, tid, opt.magnet.roterer);
         omrids(ctx, gg);
         if (t.sprite) NK.Sprites.tegnPositur(ctx, t.sprite, gg.p, gg.anker, opt.alfa, gg.skala);
         if (t.streger) T.tegnStreger(ctx, gg, opt.alfa);
@@ -893,8 +972,18 @@
         ctx.moveTo(kx, ky);
         var v = gg.taendt ? -Math.PI / 2 + 1.5 : -Math.PI / 2 - 1.5;
         ctx.lineTo(kx + Math.cos(v) * 6, ky + Math.sin(v) * 6);
+        /* K3: magnetomroereren har sin egen knap til hoejre */
+        if (gg.kan.omroerer) {
+            var ox = x + 128, v2 = gg.omroerer ? -Math.PI / 2 + 1.5 : -Math.PI / 2 - 1.5;
+            ctx.moveTo(ox, ky);
+            ctx.lineTo(ox + Math.cos(v2) * 6, ky + Math.sin(v2) * 6);
+        }
         ctx.stroke();
         ctx.restore();
+        if (gg.kan.omroerer && gg.omroerer) {
+            NK.skaer(ctx, x + 158, y + 38, 9, "rgba(90, 170, 255, 0.9)", 0.6 + 0.2 * Math.sin(tid * 3));
+            NK.kugle(ctx, x + 158, y + 38, 2.2, "#bfe0ff", "#2f7fd0");
+        }
         if (gg.taendt) {
             var lx = x + 82, ly = y + 38;
             NK.skaer(ctx, lx, ly, 9, "rgba(255, 90, 60, 0.9)", 0.6 + 0.2 * Math.sin(tid * 3));
@@ -916,6 +1005,10 @@
         T.skygge(ctx, x + t.b / 2, t.b / 2, 0.3, y + t.h - 3);
         NK.Sprites.tegn(ctx, t.sprite, x, y);
         NK.tekst(ctx, tekst, x + D.x + D.b - 6, y + D.y + D.h / 2 + 1, { font: "700 13px Consolas, 'Courier New', monospace", justering: "right", linje: "middle", farve: "#7df0a8" });
+        /* Oploesningen under TARA foelger vaegtens decimaler (K3: sc2.7's
+           vaegt viser tre) */
+        var dec = (gg.spec && gg.spec.decimaler) || 2;
+        NK.tekst(ctx, "d = 0," + new Array(dec).join("0") + "1 g", x + 115, y + 57, { font: "600 5px 'Segoe UI', Arial, sans-serif", justering: "center", linje: "middle", farve: "#5b646f" });
         if (stabil) NK.tekst(ctx, "○", x + D.x + 5, y + D.y + 6, { font: "600 6px 'Segoe UI', sans-serif", linje: "middle", farve: "#4fbf7f" });
     };
 

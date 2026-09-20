@@ -72,7 +72,7 @@
     St.def("Zn(s)",       { M: 65.4, formel: "Zn", fase: "s", korn: true, farve: { r: 160, g: 170, b: 185 }, navn: "zink", atomer: { Zn: 1 } });
     St.def("Cu(s)",       { M: 63.5, formel: "Cu", fase: "s", korn: true, farve: { r: 184, g: 115, b: 51 }, navn: "kobber", atomer: { Cu: 1 } });
     St.def("Ag(s)",       { M: 107.9, formel: "Ag", fase: "s", korn: true, farve: { r: 200, g: 200, b: 205 }, navn: "sølv", atomer: { Ag: 1 } });
-    St.def("PbI2(s)",     { M: 461, formel: "PbI₂", fase: "s", farve: { r: 245, g: 210, b: 40 }, navn: "blyiodid", atomer: { Pb: 1, I: 2 } });
+    St.def("PbI2(s)",     { M: 461, formel: "PbI₂", fase: "s", farve: { r: 245, g: 210, b: 40 }, daekke: 6, glimmer: true, navn: "blyiodid", atomer: { Pb: 1, I: 2 } });
     St.def("AgCl(s)",     { M: 143.3, formel: "AgCl", fase: "s", farve: { r: 238, g: 238, b: 235 }, navn: "sølvchlorid", atomer: { Ag: 1, Cl: 1 } });
     St.def("AgI(s)",      { M: 234.8, formel: "AgI", fase: "s", farve: { r: 240, g: 230, b: 150 }, navn: "sølviodid", atomer: { Ag: 1, I: 1 } });
     St.def("PbCl2(s)",    { M: 278.1, formel: "PbCl₂", fase: "s", farve: { r: 240, g: 240, b: 240 }, navn: "blychlorid", atomer: { Pb: 1, Cl: 2 } });
@@ -89,7 +89,15 @@
     St.reaktion({ id: "na2co3", venstre: [[1, "Na2CO3(s)"]],   hoejre: [[2, "Na+"], [1, "CO32-"]],     slags: "oploes", fart: 0.3, dH: -25 });
 
     /* ----- Bundfald (oploselighedsprodukter i mM) --------------------------- */
-    St.reaktion({ id: "pbi2",  venstre: [[1, "Pb2+"], [2, "I-"]],  hoejre: [[1, "PbI2(s)"]],    slags: "faeld", K: 7, fart: 3 });
+    /* PbI2 (K3, sc2.7): oploeseligheden stiger kraftigt med temperaturen -
+       0,044 / 0,069 / 0,41 g pr. 100 mL ved 0 / 20 / 100 °C. K er
+       oploselighedsproduktet ved 20 °C (4s³ med s = 1,50 mM), ΔH er
+       oploesningsvarmen ved 20 °C, og dCp laeser ΔH med op til 77 kJ/mol ved
+       100 °C; saa rammer K(T) tabellen inden for en halv procent fra 0 til
+       100 °C. Et bundfald, der har lagt sig, oploeses langsomt uden
+       omroering og hurtigt med (fartOploes, som den gamle sc2.7: 0,5 og 2,4). */
+    St.reaktion({ id: "pbi2",  venstre: [[1, "Pb2+"], [2, "I-"]],  hoejre: [[1, "PbI2(s)"]],    slags: "faeld", K: 13.26, fart: 3,
+        dH: 47.6, dCp: 356, fartOploes: { uden: 0.5, med: 2.4 } });
     St.reaktion({ id: "agcl",  venstre: [[1, "Ag+"], [1, "Cl-"]],  hoejre: [[1, "AgCl(s)"]],    slags: "faeld", K: 1.8e-4, fart: 4 });
     St.reaktion({ id: "agi",   venstre: [[1, "Ag+"], [1, "I-"]],   hoejre: [[1, "AgI(s)"]],     slags: "faeld", K: 8.5e-11, fart: 4 });
     St.reaktion({ id: "pbcl2", venstre: [[1, "Pb2+"], [2, "Cl-"]], hoejre: [[1, "PbCl2(s)"]],   slags: "faeld", K: 17000, fart: 2 });

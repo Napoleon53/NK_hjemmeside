@@ -1059,6 +1059,39 @@ og et bad med `holdT` oven på en varmeplade følger termostaten, mens pladen
 er tændt, og køler til stuetemperatur, når den slukkes. Det er derfor et
 vandbad giver 80 °C i stedet for pladens 250.
 
+## Afvejning, varmeplade og forsøgets regel (K3)
+
+Det, sc2.7 (`../superlab/sc2.7_oploeselighed/`) skulle bruge, og som
+ethvert forsøg nu kan skrive i opstillingen:
+
+* **Vægten** `{ type: "vaegt", decimaler: 3, tareret: true }` viser tre
+  decimaler (og »d = 0,001 g« under TARA) og er tareret med det, der står på
+  den fra start. Et pulverglas stilles ikke på en vægt med en vejebåd på: så
+  er det vejebåden, det holdes over.
+* **Spatelspidser i gram.** `spatelGram: [0.038, 0.062]` på et pulverglas
+  giver en spatelspids på et tilfældigt antal gram. På en vejebåd betyder
+  det, at en tom spatel kan tage `[min, maks]` gram af igen. Et pulverglas
+  sigter med foden, så det kan holdes et stykke over den lave vejebåd.
+* **Varmeplade med effekt.** `effekt: 1100` (W) varmer væsken med
+  dT/dt = P/(V·4,18), så 100 mL stiger 2,6 °C i sekundet og et lille glas
+  hurtigere; `traeghed: 2.2` (s) er, hvor længe pladen er om at blive varm
+  og kold. `kan: { omroerer: true }` giver en knap mere: et klik på pladens
+  højre halvdel tænder omrøringen, som rører det, der står på pladen
+  (bundfald hvirvler, og `fartOploes` gælder).
+* **Opløselighed med ΔCp.** En reaktion kan have `dCp` ud over `dH`, og en
+  fældning kan have `fartOploes: { uden, med }`. `NK.Stof.maetningsT(o, rx)`
+  er den temperatur, hvor bundfaldet netop er opløst (de første krystaller),
+  og `NK.Stof.ionprodukt(o, rx)` ionproduktet, som om alt var opløst. Et
+  bundfald med `daekke` farver væsken stærkere, når det hvirvler.
+* **Vilkåret tilsat.** `{ beholder: "baeger", tilsat: "KI(s)", gram: { over:
+  0.09 } }` er sandt, når så meget af saltet er kommet i, uanset hvad det er
+  blevet til (regnet af grundstofferne).
+* **Forsøgets regel.** `bord.regel = function (gg, c) { ... }` kan sige nej
+  til en handling med en grund (en streng). Så går genstanden hjem, grunden
+  står på scenen, og der kommer en hændelse `regel`. Uden regel afvises
+  intet, der kan lade sig gøre. En genstand, der går hjem, står igen på det,
+  den stod på (vejebåden på vægten).
+
 ## Øvelsestjekket
 
 `js/tjek.js` er en generisk validering, som ethvert forsøg på motoren køres
@@ -1095,7 +1128,9 @@ må gerne røre naboens, og det, der står en smule bagved, må gerne dække.
 være i orden: en udløser, der ikke kan nås, en udløser, der fyrer fra
 start, og et flag, som ingen data sætter, når forløbet har konsekvenser
 skrevet som kode. Sætter forsøgets egen kode et flag, siger forløbet det
-med `flagFraKode: ["navn"]`, så er det ikke en fejl.
+med `flagFraKode: ["navn"]`, så er det ikke en fejl. Har forløbet sagt
+det (også `flagFraKode: []`, når koden ingen flag sætter, som i sc2.7), er
+et flag, som hverken data eller koden sætter, en FEJL igen.
 
 **Sådan køres det.** `_oevelsestjek.html` (gennem en lokal server) kører
 alle forsøg på motoren, ét fra listen eller et hvilket som helst andet:
@@ -1120,11 +1155,11 @@ selvtest med afsnittet ovenfor.
 
 ## Næste skridt
 
-* sb2.4 er lagt over på genstandsmodellen i `../superlab/sb2.4_ligevaegt/`. Bordet
-  står, kemien er prøvet igennem, badene virker, forløbets ni trin kører,
-  billedet af de syv glas noteres, og Kemichael siger forløbets
-  bemærkninger. Del 2 om fortynding, quizzen og tegneserien mangler.
-  Derefter sc6.8 og sc8.6.
+* sb2.4 er lagt over på genstandsmodellen i `../superlab/sb2.4_ligevaegt/`
+  med begge dele, quizzen og tegneserien.
+* sc2.7 er lagt over i `../superlab/sc2.7_oploeselighed/` (K3): kernen med
+  afvejningen, varmepladen og de tre målinger kører. Grafen (M9), quizzen
+  og tegneserien mangler. Derefter sc6.8 og sc8.6.
 * **Grafen.** Journalen kan notere en måling; den kan endnu ikke tegne den
   op. Titrerings- og kalibreringskurver dukker op i næsten enhver øvelse, så
   det er en fælles komponent, ikke noget hvert forsøg skal opfinde.
