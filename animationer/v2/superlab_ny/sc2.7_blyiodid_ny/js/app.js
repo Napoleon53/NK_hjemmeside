@@ -4,8 +4,9 @@
    Hele skallen (tegneloekke, panel, zoomboble, lyd, intro, rundvisning,
    tastatur, logbog, forloebskort, Start forfra) ligger i
    ../../laboratoriet/js/side.js. Her staar kun det, der er saerligt for
-   sc2.7: afvejningens regel, knappen »Notér temperatur« og kortet med
-   maalingerne og grafen (js/maaling.js).
+   sc2.7: afvejningens regel, knappen »Notér temperatur«, kortet med
+   maalingerne og grafen (js/maaling.js) og de to krav, der aabner quizzen
+   og tegneserien (js/serie.js).
    ===================================================================== */
 (function () {
     "use strict";
@@ -34,7 +35,7 @@
         /* Start forfra: maalingernes hukommelse (sidst klart, afvejningen)
            ryddes med bordet. Journalen ryddes af forloebet. */
         vedAendring: function (grund) {
-            if (grund === "nulstil") M.nulstil();
+            if (grund === "nulstil") { M.nulstil(); NK.SERIE.nulstil(); }
         },
 
         /* Panelet tegnes om, naar knappen skifter mellem klar og ikke
@@ -43,6 +44,21 @@
         signatur: function (s) {
             return (M.kan(s.bord()).ok ? "k" : "-") + M.journal.antal();
         },
+
+        /* Quizzen (../../laboratoriet/js/quiz.js) laases op, naar de tre
+           maalinger er noteret, som i den gamle sc2.7. Spoergsmaalene staar
+           i js/tekst.js under "quiz". */
+        quiz: { krav: { journal: "maaling", faerdig: true } },
+
+        /* Tegneserien (../../laboratoriet/js/tegneserie.js) laases op, naar
+           forsoeget er slut: tre maalinger, og resterne afleveret (det
+           samme vilkaar som trinnet affald). Ruderne bygges af js/serie.js
+           ud fra journalen og de oejeblikke, forloebet har set. */
+        serie: { krav: { alle: [
+            { journal: "maaling", faerdig: true },
+            { beholder: "baeger", tom: true }
+        ] } },
+        ruder: function (bord) { return NK.SERIE.ruder(bord); },
 
         /* Grafen i maalingskortet (M9): punkterne og, naar alle tre er
            maalt, kurven med tabelvaerdierne */
@@ -70,6 +86,12 @@
                 s.opdaterPanel();
             };
             NK.el("maaleknap").addEventListener("click", function () { s.noterTemperatur(); });
+
+            /* Et klik ved siden af tegneserien lukker den, som de andre
+               overlays */
+            NK.el("serie").addEventListener("click", function (e) {
+                if (e.target === this && s.serie) s.serie.luk();
+            });
             s.opdaterPanel();
         }
     });

@@ -1206,13 +1206,16 @@ selvtest med afsnittet ovenfor.
 * sb2.4 er lagt over på genstandsmodellen i `../superlab_ny/sb2.4_jernthiocyanat_ny/`
   med begge dele, quizzen og tegneserien.
 * sc2.7 er lagt over i `../superlab_ny/sc2.7_blyiodid_ny/` (K3): kernen med
-  afvejningen, varmepladen, de tre målinger og grafen (M9) kører. Quizzen
-  og tegneserien mangler. Derefter sc6.8 og sc8.6.
+  afvejningen, varmepladen, de tre målinger, grafen (M9), quizzen og
+  tegneserien kører. Tilbage er PbI₂ som krystal i zoomboblen, Kemichaels
+  egne scener og paritetslisten. Derefter sc6.8 og sc8.6.
 * **Grafen** (`js/graf.js`) er prøvet af sc2.7's kurve med punkter. Søjlerne
   venter på sc1.3, og en titreringskurve, der tegnes, mens der titreres, på
   den første titrering.
-* Rammerne i `quiz.js` og `tegneserie.js` er skrevet til otte forsøg, men
-  kun prøvet af ét. Ved første konvertering viser det sig, hvad de mangler.
+* Rammerne i `quiz.js` og `tegneserie.js` har nu to kunder (sb2.4 og
+  sc2.7) og holdt til den anden uden ændringer. Det eneste, sc2.7 måtte
+  tilføje, var sine egne øjeblikke: udløsere, der gemmer glassets opskrift,
+  når noget sker, fordi journalen kun rummer det, eleven noterer.
 * **Mikroniveauet** kan vise bind, split, fæld, opløs og omdan. Fire former
   mere venter på deres første kunde: ligander, der sætter sig én ad gangen
   (sc2.6), bundfald pakket i hele formelenheder i et gitter med faste

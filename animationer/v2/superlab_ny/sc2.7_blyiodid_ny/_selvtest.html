@@ -25,7 +25,8 @@
    hvad der maa haeldes i), varmepladen med magnetomroereren, de tre
    maalinger med facit fra verden og grafen i maalingskortet, Start
    forfra, oevelsestjekket (M2), det samme med musen, som en elev
-   (proeve.js), og til sidst grafen (graf.js, M9) med kendte tal.
+   (proeve.js), grafen (graf.js, M9) med kendte tal, og til sidst quizzen
+   og tegneserien.
 
    Skal aabnes gennem en lokal server (eller Chrome med
    --allow-file-access-from-files), ellers kan iframen ikke laeses.
@@ -61,7 +62,9 @@ function koerTest() {
     NK.intro.luk();
     paastand("bordet er bygget", !!bord);
     paastand("skallen er den faelles side.js", !!side && side.navn === "sc27");
-    paastand("forloebet har syv trin og tre udloesere", !!F && F.trin.length === 7 && F.udloesere.length === 3,
+    /* Fem udloesere: husk_klar, de to, der gemmer et oejeblik til
+       tegneserien, for_meget og tre_rigtige */
+    paastand("forloebet har syv trin og fem udloesere", !!F && F.trin.length === 7 && F.udloesere.length === 5,
         F && F.trin.length + " trin, " + F.udloesere.length + " udloesere");
     var navne = ["dunk", "vaegt", "baad", "plade", "baeger", "maaleglas", "pb", "ki", "papir", "kurv", "spatler", "spatel", "termometer"];
     var mangler = navne.filter(function (n) { return !bord.g[n]; });
@@ -525,6 +528,171 @@ function koerTest() {
     var jp2 = tj.punkter(function (p) { return p.id === "b" ? null : { x: p.svar, y: p.svar * 2 }; });
     paastand("og med en funktion: den bestemmer x og y, og null springer posten over", jp2.length === 2 && jp2[1].x === 12 && jp2[1].y === 24 && jp2[1].tekst === "3");
     delete NK.Journal.alle["graf-selvtest"];
+
+    overskrift("10. Quizzen: rammen og sc2.7's egne spoergsmaal (S9)");
+    /* Maskineriet staar i ../../laboratoriet/js/quiz.js, og spoergsmaalene
+       staar i js/tekst.js under "quiz". Laasen er et vilkaar (journalen
+       faerdig), ikke et kald. */
+    NK.startForfra();
+    adv(1);
+    bord = NK.bord;
+    var Qz = NK.quiz;
+    paastand("quiz.js er indlaest, og siden har bygget quizzen", !!NK.Quiz && !!Qz);
+    paastand("spoergsmaalene kommer fra forsoegets tekst.js og handler om PbI2",
+        !!Qz && Qz.spoergsmaal === NK.TEKST.quiz.spoergsmaal && Qz.antal() === 10 &&
+        JSON.stringify(Qz.spoergsmaal).indexOf("PbI₂") > 0, Qz && Qz.antal() + " spoergsmaal");
+    paastand("hvert spoergsmaal har fire svar, et rigtigt og en forklaring",
+        Qz.spoergsmaal.every(function (x) { return x.valg.length === 4 && x.rigtig >= 0 && x.rigtig < 4 && !!x.forklaring; }));
+    paastand("den er laast fra begyndelsen med forsoegets egen tekst, og knappen er skjult",
+        Qz.tilstand === "laast" && d.getElementById("quiz-tekst").textContent === NK.TEKST.quiz.laast &&
+        d.getElementById("quiz-knap").hidden, Qz.tilstand);
+
+    /* Hele forsoeget en gang til, hurtigt: vand, tre gange stof, varme,
+       afkoeling og en maaling hver gang */
+    function forsoegIgen() {
+        NK.startForfra();
+        adv(0.5);
+        bord = NK.bord;
+        var gg = bord.g.baeger, pl = bord.g.plade, n;
+        bord.moede(bord.g.maaleglas, gg);
+        adv(6);
+        bord.moede(bord.g.termometer, gg);
+        adv(3);
+        for (var i = 0; i < 3; i++) {
+            B.tilsaetFast(gg, "Pb(NO3)2(s)", i ? 151 : 302);
+            B.tilsaetFast(gg, "KI(s)", i ? 301 : 602);
+            adv(3);
+            pl.taendt = true;
+            pl.omroerer = true;
+            n = 0;
+            while (!M.klar(gg) && n++ < 600) { adv(0.5); M.kan(bord); }
+            adv(2);
+            M.kan(bord);
+            pl.taendt = false;
+            n = 0;
+            while (!M.krystaller(gg) && n++ < 1200) adv(0.25);
+            side.noterTemperatur();
+        }
+        side.opdaterPanel();
+        return gg;
+    }
+    baeger = forsoegIgen();
+    paastand("tre maalinger er noteret igen", M.journal.antal() === 3,
+        M.journal.svarede().map(function (id) { return tal(M.journal.post(id).svar, 1); }).join(", ") + " °C");
+    paastand("og quizzen aabner af sig selv, naar journalen er faerdig",
+        Qz.tilstand === "klar" && d.getElementById("quiz-tekst").textContent === NK.TEKST.quiz.klar, Qz.tilstand);
+    Qz.knap();
+    paastand("foerste spoergsmaal kommer med fire knapper", Qz.tilstand === "sp" &&
+        d.getElementById("quiz-valg").querySelectorAll(".valgknap").length === 4 &&
+        d.getElementById("quiz-taeller").textContent === "1/10",
+        d.getElementById("quiz-taeller").textContent);
+    var forkert = (Qz.aktuel.rigtig + 1) % 4;
+    paastand("et forkert svar giver forklaringen, ikke bare et kryds", Qz.svar(forkert) === false &&
+        d.getElementById("quiz-forklaring").className.indexOf("skidt") >= 0 &&
+        d.getElementById("quiz-forklaring").textContent.indexOf("Forkert.") === 0 &&
+        d.getElementById("quiz-forklaring").textContent.length > 40);
+    for (var q1 = 0; q1 < 20 && Qz.tilstand === "sp"; q1++) { Qz.knap(); if (Qz.tilstand === "sp") Qz.svarRigtigt(); }
+    paastand("resten rigtigt giver 9 af 10 til sidst", Qz.tilstand === "slut" &&
+        d.getElementById("quiz-score").textContent === "9 / 10", d.getElementById("quiz-score").textContent);
+
+    overskrift("11. Tegneserien: sc2.7's ruder af elevens egne tal (S29, M9)");
+    /* Rammen staar i ../../laboratoriet/js/tegneserie.js, ruderne i
+       js/serie.js. Ruderne tegnes af journalen og af de oejeblikke,
+       forloebets udloesere har gemt - ikke af bordet, som det ser ud nu. */
+    var TS = NK.Tegneserie, SR = NK.SERIE, serie = side.serie;
+    paastand("rammen findes, og forsoeget har sin egen liste over ruder",
+        !!TS && !!serie && !!SR && typeof SR.ruder === "function");
+    paastand("forloebet har gemt de tre oejeblikke: vandet, bundfaldet og det klare glas",
+        !!SR.OEJEBLIKKE.vand && !!SR.OEJEBLIKKE.bundfald && !!SR.OEJEBLIKKE.klar,
+        Object.keys(SR.OEJEBLIKKE).join(", "));
+    paastand("bundfaldets oejeblik har et bundfald i sig (over 0,05 mmol PbI2)",
+        (SR.OEJEBLIKKE.bundfald.opl.umol["PbI2(s)"] || 0) > 50,
+        Math.round(SR.OEJEBLIKKE.bundfald.opl.umol["PbI2(s)"] || 0) + " µmol");
+    paastand("og det klare glas var varmt og uden fast stof",
+        SR.OEJEBLIKKE.klar.T > 40 && !(SR.OEJEBLIKKE.klar.opl.umol["PbI2(s)"] > 0.5),
+        tal(SR.OEJEBLIKKE.klar.T, 1) + " °C");
+    paastand("med tre maalinger, men uden oprydning, er tegneserien stadig laast",
+        serie.laast() && d.getElementById("serieknap").disabled && serie.aabn() === false);
+    paastand("og knappen siger med forsoegets egne ord hvorfor",
+        d.getElementById("serie-laast").textContent === NK.TEKST.serie.laast);
+
+    bord.moede(baeger, bord.g.dunk);
+    adv(6);
+    F.opdater();
+    side.opdaterPanel();
+    paastand("naar resterne er afleveret, aabner laasen af sig selv",
+        !serie.laast() && !d.getElementById("serieknap").disabled && B.tom(baeger));
+    paastand("tegneserien aabner", serie.aabn() === true && d.getElementById("serie").classList.contains("vis"));
+    var ruder = d.getElementById("serie-ruder").querySelectorAll(".rude");
+    paastand("den har en rude for hvert skridt, grafen og skemaet", ruder.length === 8, ruder.length + " ruder");
+    paastand("hver rude har et nummer og en tekst", [].every.call(ruder, function (r) {
+        return r.querySelector(".nr") && r.textContent.length > 12;
+    }));
+    paastand("grafen staar i sin egen brede rude (M9)",
+        ruder[6].className.indexOf("bred") >= 0 && !!ruder[6].querySelector("canvas") &&
+        ruder[6].textContent.indexOf("tabelværdierne") > 0);
+    var skema = d.getElementById("serie-ruder").querySelector(".rude.bred table.resultater");
+    paastand("skemaet har en raekke pr. maaling med masserne, elevens tal og verdens",
+        !!skema && skema.querySelectorAll("tr").length === 4 &&
+        skema.querySelectorAll("tr")[1].textContent.indexOf("0,100 g") >= 0 &&
+        skema.querySelectorAll("tr")[1].textContent.indexOf(tal(M.journal.post("1").svar, 1) + " °C") >= 0,
+        skema ? skema.querySelectorAll("tr")[1].textContent : "intet skema");
+    paastand("og konklusionen siger, at punkterne ligger paa kurven",
+        d.getElementById("serie-ruder").textContent.indexOf(NK.TEKST.serie.skema.konklusion) > 0);
+
+    /* Den vigtigste paastand: ruden viser glasset, som det saa ud, og ikke
+       som det ser ud nu. Glasset er tomt paa bordet - bundfaldsruden har
+       stadig sit bundfald. */
+    function rudeData(n) {
+        var c = d.getElementById("serie-ruder").querySelectorAll(".rude")[n].querySelector("canvas");
+        return c ? c.toDataURL() : "";
+    }
+    var foer = rudeData(2);
+    B.haeldI(baeger, St.lav({ V: 60, T: 20, mM: {} }), true);
+    adv(2);
+    serie.luk();
+    serie.aabn();
+    paastand("glasset er fyldt med rent vand nu, men bundfaldsruden viser stadig bundfaldet",
+        B.volumen(baeger) > 50 && rudeData(2) === foer && foer.length > 1000);
+    serie.luk();
+    serie.aabn();
+    paastand("og den samme rude ser ens ud, hver gang serien aabnes", rudeData(2) === foer);
+
+    /* Kogte det med bundfald i, faar det sin egen roede rude */
+    B.tilsaetFast(baeger, "PbI2(s)", 3000);
+    bord.g.plade.taendt = true;
+    var n11 = 0;
+    while (!baeger.koger && n11++ < 300) adv(0.5);
+    adv(2);
+    bord.g.plade.taendt = false;
+    paastand("kogte det med bundfald i, er det gemt som et oejeblik", !!SR.OEJEBLIKKE.koger,
+        Object.keys(SR.OEJEBLIKKE).join(", "));
+    bord.uheld("spild", baeger, "");
+    bord.moede(baeger, bord.g.dunk);
+    adv(6);
+    side.opdaterPanel();
+    serie.luk();
+    serie.aabn();
+    ruder = d.getElementById("serie-ruder").querySelectorAll(".rude");
+    paastand("og saa er der to roede ruder: det, der kogte, og uheldet",
+        d.getElementById("serie-ruder").querySelectorAll(".rude.fejl").length === 2,
+        d.getElementById("serie-ruder").querySelectorAll(".rude.fejl").length + " roede ruder");
+
+    serie.luk();
+    paastand("Luk lukker serien", !serie.aaben());
+    d.getElementById("serieknap").click();
+    paastand("knappen i panelet aabner den", serie.aaben());
+    side.lukOverlay();
+    paastand("Esc lukker ethvert overlay, ogsaa denne", !serie.aaben());
+
+    NK.startForfra();
+    adv(1);
+    side.opdaterPanel();
+    paastand("Start forfra laaser quizzen og tegneserien og rydder begge",
+        Qz.tilstand === "laast" && Qz.nr === 0 && serie.laast() &&
+        d.getElementById("serie-ruder").children.length === 0 && !Object.keys(SR.OEJEBLIKKE).length,
+        Qz.tilstand + ", " + Object.keys(SR.OEJEBLIKKE).length + " oejeblikke");
+
 }
 
 function vis() {

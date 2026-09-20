@@ -27,13 +27,22 @@ dannes, pr. 100 mL. Kurven med tabelværdierne (4s³ = K(T)) kommer først, når
 alle tre er noteret, så den ikke siger, hvornår krystallerne skal komme.
 Et punkt, der er mere end 6 °C ved siden af, står i orange.
 
-`_selvtest.html` kører det hele igennem i ni afsnit; afsnit 7 er
-øvelsestjekket (M2), afsnit 8 gør det med musen, og afsnit 9 prøver
-grafen med kendte tal.
+Quizzen (S9) er den gamle sc2.7's ti spørgsmål. Den låses op, når de tre
+målinger er noteret, svarene blandes hver gang, og begrundelsen kommer
+også, når svaret er rigtigt.
 
-Det mangler: quizzen og tegneserien, PbI₂-krystallerne i zoomboblen,
-Kemichaels egne scener (det varme glas) og den gamle udgaves knap. Se
-`claude/TODO.md`, K3.
+Tegneserien (S29) låses op, når resterne er afleveret. Ruderne er tegnet
+af elevens egne tal: journalens øjebliksbilleder og de øjeblikke,
+forløbets udløsere gemmer undervejs (vandet, det første bundfald, det
+klare glas, og hvis det kogte med bundfald i). Til sidst kommer grafen i
+en bred rude og resultatskemaet. Uheld får hver sin røde rude.
+
+`_selvtest.html` kører det hele igennem i elleve afsnit; afsnit 7 er
+øvelsestjekket (M2), afsnit 8 gør det med musen, afsnit 9 prøver grafen
+med kendte tal, og afsnit 10 og 11 quizzen og tegneserien.
+
+Det mangler: PbI₂-krystallerne i zoomboblen, Kemichaels egne scener (det
+varme glas) og paritetslisten mod den gamle. Se `claude/TODO.md`, K3.
 
 ## Filer
 
@@ -44,11 +53,13 @@ css/stil.css        ligningen, forløbslisten og målingernes tabel
                     (grafens boks står i laboratoriet/css/grund.css)
 js/tekst.js         AL prosa: titel, intro, teorien, trinnenes tekster og
                     hints, beskederne om afvejning og måling, replikkerne,
+                    quizzens spørgsmål, tegneseriens ord og
                     rundvisningens stop
 js/opstilling.js    bordet: hvad der står på det, spatlen og bordets mål
 js/maaling.js       målingerne (journalen »maaling«), grafen og
                     afvejningens regel
-js/forloeb.js       trinnenes betingelser og de tre udløsere
+js/serie.js         tegneseriens ruder og de øjeblikke, forløbet gemmer
+js/forloeb.js       trinnenes betingelser og de fem udløsere
 js/app.js           siden: reglen, knappen Notér temperatur, tasten K
 js/tur.js           rundvisningen
 _selvtest.html      udviklerværktøj (gennem en lokal server)

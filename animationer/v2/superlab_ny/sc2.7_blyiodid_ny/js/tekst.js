@@ -144,6 +144,114 @@
             noteFaerdig: "Den stiplede kurve er tabelværdierne. Jo tættere dine punkter ligger på den, jo bedre passer dine målinger."
         },
 
+        /* ----- Quizzen ---------------------------------------------------
+           Rammen staar i ../../laboratoriet/js/quiz.js; her staar kun
+           spoergsmaalene. Fire svar hver, blandet ved hvert forsoeg, saa
+           »rigtig« er nummeret her i listen og ikke paa skaermen.
+           Forklaringen vises ogsaa ved rigtigt svar - det er dér, der
+           bliver lært noget. Spoergsmaalene er den gamle sc2.7's. */
+        "quiz": {
+            laast: "Låses op, når der er tre målinger.",
+            klar: "Tre målinger er noteret.",
+            spoergsmaal: [
+                {
+                    sp: "Hvilket stof er det gule bundfald?",
+                    valg: ["PbI₂", "KNO₃", "Pb(NO₃)₂", "KI"],
+                    rigtig: 0,
+                    forklaring: "Pb²⁺ og I⁻ danner det tungtopløselige salt PbI₂. KNO₃ er letopløseligt og bliver i opløsningen."
+                },
+                {
+                    sp: "Hvilket reaktionsskema beskriver fældningen?",
+                    valg: [
+                        "Pb²⁺(aq) + 2 I⁻(aq) → PbI₂(s)",
+                        "Pb²⁺(aq) + I⁻(aq) → PbI(s)",
+                        "Pb⁺(aq) + I⁻(aq) → PbI(s)",
+                        "K⁺(aq) + NO₃⁻(aq) → KNO₃(s)"
+                    ],
+                    rigtig: 0,
+                    forklaring: "Pb²⁺ har to positive ladninger, og I⁻ har én negativ. Der skal to I⁻ til hver Pb²⁺, før PbI₂ er neutral."
+                },
+                {
+                    sp: "Hvilke ioner er tilskuerioner?",
+                    valg: ["K⁺ og NO₃⁻", "Pb²⁺ og I⁻", "K⁺ og I⁻", "Pb²⁺ og NO₃⁻"],
+                    rigtig: 0,
+                    forklaring: "K⁺ og NO₃⁻ er i opløsningen både før og efter fældningen. De deltager ikke i reaktionen."
+                },
+                {
+                    sp: "Hvorfor forsvinder bundfaldet, når vandet varmes op?",
+                    valg: [
+                        "Opløseligheden af PbI₂ stiger med temperaturen",
+                        "PbI₂ fordamper",
+                        "PbI₂ reagerer med vandet og bliver til et nyt stof",
+                        "Omrøringen knuser krystallerne, så de ikke kan ses"
+                    ],
+                    rigtig: 0,
+                    forklaring: "I varmt vand kan der opløses mere PbI₂. Ved en bestemt temperatur er der plads til det hele, og ionerne er frie i opløsningen igen."
+                },
+                {
+                    sp: "Hvad er de glinsende krystaller, der kommer ved afkøling?",
+                    valg: [
+                        "PbI₂, der krystalliserer, fordi opløseligheden falder",
+                        "Is, der dannes i det kolde vand",
+                        "KNO₃, der fældes ud",
+                        "Urenheder fra bægerglasset"
+                    ],
+                    rigtig: 0,
+                    forklaring: "Når temperaturen falder, kan der ikke længere være så meget PbI₂ opløst. Ionerne samles igen til krystaller af PbI₂."
+                },
+                {
+                    sp: "Hvorfor afvejes samme masse Pb(NO₃)₂ og KI?",
+                    valg: [
+                        "M(Pb(NO₃)₂) er næsten det dobbelte af M(KI), så der bliver dobbelt så mange mol KI",
+                        "Fordi massen er bevaret i en kemisk reaktion",
+                        "Fordi de to stoffer har samme molare masse",
+                        "Fordi der så dannes mest KNO₃"
+                    ],
+                    rigtig: 0,
+                    forklaring: "Reaktionen kræver 2 mol KI pr. mol Pb(NO₃)₂. M(Pb(NO₃)₂) = 331,2 g/mol og M(KI) = 166,0 g/mol, så samme masse giver netop dobbelt så mange mol KI."
+                },
+                {
+                    sp: "Der bruges 0,100 g Pb(NO₃)₂ og 0,100 g KI. Hvor meget PbI₂ kan der højst dannes? M(PbI₂) = 461,0 g/mol.",
+                    valg: ["0,139 g", "0,100 g", "0,200 g", "0,278 g"],
+                    rigtig: 0,
+                    forklaring: "n(Pb(NO₃)₂) = 0,100 g / 331,2 g/mol = 0,302 mmol. Der dannes 0,302 mmol PbI₂, og 0,302 mmol · 461,0 g/mol = 0,139 g."
+                },
+                {
+                    sp: "Der er 0,139 g PbI₂ i 100 mL vand. Ved afkøling kommer de første krystaller ved 52 °C. Hvad fortæller det?",
+                    valg: [
+                        "Opløseligheden af PbI₂ ved 52 °C er ca. 0,139 g pr. 100 mL",
+                        "PbI₂ smelter ved 52 °C",
+                        "Ved 52 °C kan der ikke opløses PbI₂",
+                        "Opløseligheden er 0,139 g pr. 100 mL ved alle temperaturer"
+                    ],
+                    rigtig: 0,
+                    forklaring: "Når de første krystaller kommer, er opløsningen netop mættet med 0,139 g PbI₂. Det er ét punkt på opløselighedskurven."
+                },
+                {
+                    sp: "Opløseligheden af PbI₂ er 0,069 g pr. 100 mL ved 20 °C. Er PbI₂ tungtopløseligt?",
+                    valg: [
+                        "Ja, det er under 1 g pr. 100 mL",
+                        "Nej, fordi det kan opløses i varmt vand",
+                        "Nej, fordi der opløses lidt",
+                        "Ja, fordi det er gult"
+                    ],
+                    rigtig: 0,
+                    forklaring: "Grænsen er 1 g pr. 100 mL. PbI₂ ligger langt under, selv om opløseligheden stiger meget, når vandet varmes op."
+                },
+                {
+                    sp: "Hvor skal resterne fra forsøget hen?",
+                    valg: [
+                        "I beholderen til tungmetalaffald",
+                        "I vasken med rigeligt vand",
+                        "I beholderen til organisk affald",
+                        "I skraldespanden"
+                    ],
+                    rigtig: 0,
+                    forklaring: "Resterne indeholder bly, som er giftigt og skadeligt for miljøet. Det afleveres som tungmetalaffald."
+                }
+            ]
+        },
+
         /* ----- Kemichaels replikker (udløserne i js/forloeb.js) ------------ */
         "sig-for-meget": [
             "Det koger, og der er stadig bundfald.",
@@ -154,6 +262,51 @@
             "Det er sådan, en tabel over opløselighed bliver til."
         ],
 
+        /* ----- Tegneserien -----------------------------------------------
+           Rammen staar i ../../laboratoriet/js/tegneserie.js, og hvilke
+           ruder sc2.7 har, staar i js/serie.js. Her staar kun ordene.
+           Tuborgklammerne byttes ud med elevens egne tal. */
+        "serie": {
+            titel: "Tegneserien",
+            laast: "Tegneserien låses op, når de tre målinger er noteret og resterne afleveret.",
+            klar: "Sådan gik forsøget. Ruderne er tegnet af dine egne tal.",
+
+            ruder: {
+                vand: "100 mL vand i bægerglasset på varmepladen. Vandet er klart og farveløst.",
+                afvejning: "Der blev afvejet {pb} g Pb(NO₃)₂ og {ki} g KI. Samme masse giver dobbelt så mange mol KI som Pb(NO₃)₂ — og fældningen skal netop have to I⁻ til hver Pb²⁺.",
+                bundfald: "Da KI kom i, dannedes der straks et gult bundfald: Pb²⁺(aq) + 2 I⁻(aq) → PbI₂(s). K⁺ og NO₃⁻ blev i opløsningen som tilskuerioner.",
+                varm: "Ved opvarmning under omrøring forsvandt bundfaldet. Ved {T} blev opløsningen klar: så meget PbI₂ kan der være opløst i 100 mL vand så varmt.",
+                regn: "Måling {nr}: ved afkøling kom de første glinsende, gule krystaller ved {T}. Glasset indeholdt {m} g PbI₂, og det er opløseligheden ved netop den temperatur.",
+                koger: "Vandet kogte, men bundfaldet forsvandt ikke. Der var mere stof, end 100 mL vand kan opløse ved 100 °C.",
+                affald: "Resterne blev afleveret i dunken til tungmetalaffald. De indeholder bly og må ikke i vasken.",
+                graf: "Dine tre målinger tegnet op mod tabelværdierne. Opløseligheden af PbI₂ stiger kraftigt med temperaturen — derfor forsvinder bundfaldet ved opvarmning og kommer igen ved afkøling."
+            },
+
+            uheld: {
+                spild:    "Uheld: {glas} skvulpede ud på bordet.",
+                rystet:   "Uheld: {glas} blev rystet så voldsomt, at en tiendedel af indholdet røg ud på bordet.",
+                overloeb: "Uheld: {glas} løb over.",
+                knust:    "Uheld: {glas} gik i stykker.",
+                vaeltet:  "Uheld: {glas} væltede."
+            },
+            /* F41: kun hvis han faktisk greb ind, var det ham */
+            oprydning: {
+                laerer: "Kemichael så det og tørrede op.",
+                laererKnust: "Kemichael så det og fejede skårene op.",
+                elev: "Du tørrede selv op.",
+                ingen: "Ingen tørrede op."
+            },
+
+            /* F40: skemaet gentager det, eleven noterede, og siger, hvad
+               verden sagde. Det retter ikke målingen. */
+            skema: {
+                titel: "Resultatskemaet: masserne er i alt i 100 mL vand, og temperaturen er den, der blev noteret, da de første krystaller kom.",
+                hoved: ["Måling", "Pb(NO₃)₂", "KI", "PbI₂", "Du noterede", "Mættet ved"],
+                konklusion: "De tre punkter ligger på opløselighedskurven for PbI₂.",
+                konklusionAfvig: "Nogle punkter ligger langt fra kurven. Temperaturen skal noteres, lige når de første krystaller kommer."
+            }
+        },
+
         /* ----- Rundvisningen (js/tur.js) --------------------------------- */
         "rundvisning": [
             { sel: "#scene", titel: "Bordet", tekst: "Træk det, der skal bruges, hen over det, det skal bruges på, og slip. Eller klik på det og så på målet. Vægten viser tre decimaler, og varmepladen har en knap til varmen og en til omrøringen." },
@@ -162,7 +315,9 @@
             { sel: "#forloeb-kort", titel: "Forløbet", tekst: "Trinnene får flueben, når bordet ser rigtigt ud. Hint viser, hvad du skal gøre, og markerer det, det handler om." },
             { sel: "#maaleknap", titel: "Notér temperatur", tekst: "Tryk her (eller K), så snart de første krystaller kommer, når opløsningen køler af. Termometeret skal sidde i bægerglasset." },
             { sel: "#maaling-kort", titel: "Målingerne", tekst: "Hver måling står her med masserne, den masse PbI₂ der kan dannes, og temperaturen. Grafen viser målingerne, og når du har tre, kommer kurven med tabelværdierne." },
-            { sel: "#noterknap", titel: "Noter", tekst: "Uheld og det, Kemichael har sagt, står her. Dine egne noter står under Mine noter." }
+            { sel: "#noterknap", titel: "Noter", tekst: "Uheld og det, Kemichael har sagt, står her. Dine egne noter står under Mine noter." },
+            { sel: "#quiz-kort", titel: "Quizzen", tekst: "Ti spørgsmål om det, du lige har set. Den låses op, når du har tre målinger, og svarene blandes hver gang. Begrundelsen kommer, også når du svarer rigtigt." },
+            { sel: "#serie-kort", titel: "Tegneserien", tekst: "Hele forsøget i ruder, når resterne er afleveret. Ruderne er tegnet af dine egne målinger — også efter at glasset er tømt. Tasten G åbner og lukker den." }
         ]
     };
 }());

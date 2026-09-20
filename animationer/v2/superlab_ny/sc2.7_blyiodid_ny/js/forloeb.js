@@ -14,6 +14,11 @@
 
    Maalingerne proeves i journalen, som i sb2.4's billede: det taeller
    foerst, naar eleven har noteret det.
+
+   Nogle udloesere gemmer et oejebliksbillede til tegneserien
+   (js/serie.js): vandet, det foerste bundfald, det klare glas og det, der
+   kogte. De gemmer verden, som den er i det oejeblik, de fyrer - ikke en
+   historie skrevet i forvejen.
    ===================================================================== */
 (function () {
     "use strict";
@@ -22,6 +27,11 @@
     var T = NK.TEKST.trin;
 
     var GLAS = "baeger";
+
+    /* Tegneseriens oejebliksbilleder (js/serie.js). mest: ruden skal vise
+       saa meget af det faste stof som muligt, og oejeblikket erstattes,
+       saa laenge bundfaldet vokser. */
+    function se(navn, mest) { return { kald: function () { NK.SERIE.se(navn, NK.Side.nu.bord(), mest); } }; }
 
     /* Den foerste afvejning: 0,090-0,110 g. Vilkaaret er lidt under, saa
        det, der er inden for reglens vindue, altid taeller. */
@@ -63,8 +73,16 @@
                 id: "husk_klar",
                 igen: 0.1,
                 naar: KLAR,
-                saa: [{ kald: function () { NK.MAALING.husk(NK.Side.nu.bord()); } }]
+                saa: [{ kald: function () { NK.MAALING.husk(NK.Side.nu.bord()); } }, se("klar")]
             },
+
+            /* Vandet i glasset og det foerste bundfald: to oejeblikke, som
+               tegneserien viser. De fyrer én gang hver. */
+            { id: "se_vand", naar: { beholder: GLAS, V: { over: 95 } }, saa: [se("vand")] },
+            /* 0,05 mmol: saa er bundfaldet faldet til ro og ses som gult
+               i glasset, og ikke bare som de foerste korn */
+            { id: "se_bundfald", igen: 0.4, naar: { beholder: GLAS, stof: "PbI2(s)", over: 0.05 },
+              saa: [se("bundfald", "PbI2(s)")] },
 
             /* Det koger, og bundfaldet er der stadig: mere stof, end vandet
                kan opløse. Maalingen kan ikke laves. */
@@ -75,7 +93,7 @@
                     { beholder: GLAS, koger: true },
                     { beholder: GLAS, stof: "PbI2(s)", over: 0.001 }
                 ] },
-                saa: [{ sig: NK.TEKST["sig-for-meget"], peg: GLAS, udtryk: "skeptisk", slags: "advarsel" }]
+                saa: [{ sig: NK.TEKST["sig-for-meget"], peg: GLAS, udtryk: "skeptisk", slags: "advarsel" }, se("koger")]
             },
 
             /* Tre rigtige maalinger */
