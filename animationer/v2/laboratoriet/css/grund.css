@@ -349,6 +349,14 @@ main.forsoeg {
 /* F55: et forurenet pulverglas */
 .besked.forurenet { margin-top: 6px; font-weight: 700; color: #f0918a; }
 .besked.forurenet[hidden] { display: none; }
+/* F75: en formel i en overskrift skrives ikke med store bogstaver */
+.formel { text-transform: none; }
+/* F74: faremaerkerne paa det valgte glas, store og med navn */
+.fare-raekke { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 8px 0 2px; }
+.fare-raekke[hidden] { display: none; }
+.fare-raekke .fare { margin: 0; display: flex; flex-direction: column; align-items: center; min-width: 60px; }
+.fare-raekke canvas { display: block; }
+.fare-raekke figcaption { margin-top: 3px; font-size: 0.72rem; line-height: 1.2; text-align: center; color: var(--tekst-svag); }
 
 /* ----- Forloebet ------------------------------------------------------ */
 .trinliste { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }

@@ -759,6 +759,11 @@
 
     /* ----- Faremaerkning ------------------------------------------------------ */
     var MAERKER = ["brandfarlig", "oxiderende", "aetsende", "giftig", "sundhedsfare", "kronisk", "miljoe"];
+    /* Piktogrammernes danske navne, som de staar under dem i panelet (F74) */
+    var MAERKE_NAVN = {
+        brandfarlig: "Brandfarlig", oxiderende: "Brandnærende", aetsende: "Ætsende", giftig: "Akut giftig",
+        sundhedsfare: "Sundhedsskadelig", kronisk: "Alvorlig sundhedsfare", miljoe: "Miljøfare"
+    };
 
     /* Faretrinnet for hvert stof i oploesningen, som er naaet */
     function farer(o) {
@@ -785,6 +790,7 @@
 
     NK.Stof = {
         MAERKER: MAERKER,
+        MAERKE_NAVN: MAERKE_NAVN,
         farer: farer,
         faremaerker: faremaerker,
         STOFFER: STOFFER,

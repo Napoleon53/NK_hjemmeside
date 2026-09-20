@@ -37,10 +37,14 @@
 
     function opl(V, mM) { return { V: V, T: 20, mM: mM }; }
 
+    /* Pulverglassene er halvanden gang saa store som motorens (F73), saa
+       formlen og faremaerkerne kan laeses. Paa etiketten staar kun formlen;
+       navnet staar i panelet, naar glasset er valgt. */
+    var PULVER_SKALA = 1.45;
     function pulver(navn, x, y, etiket, titel, stof) {
         var u = {};
         u[stof] = 30000;
-        return { navn: navn, type: "pulverglas", x: x, y: y, etiket: etiket, titel: titel,
+        return { navn: navn, type: "pulverglas", x: x, y: y, skala: PULVER_SKALA, etiket: etiket, titel: titel,
                  indhold: { V: 0, T: 20, umol: u }, pulverMaks: 30000,
                  spatelGram: SPATEL.spids };
     }
@@ -77,9 +81,9 @@
 
         /* Hylden: de to pulverglas og koekkenrullen. Kaffen staar ved
            plakaten (motoren stiller den selv) */
-        pulver("pb", 660, HYLDE, ["Pb(NO₃)₂", "blynitrat"], "glasset med Pb(NO₃)₂", "Pb(NO3)2(s)"),
-        pulver("ki", 712, HYLDE, ["KI", "kaliumiodid"], "glasset med KI", "KI(s)"),
-        { navn: "papir", type: "koekkenrulle", x: 790, y: HYLDE },
+        pulver("pb", 662, HYLDE, "Pb(NO₃)₂", "glasset med blynitrat, Pb(NO₃)₂", "Pb(NO3)2(s)"),
+        pulver("ki", 728, HYLDE, "KI", "glasset med kaliumiodid, KI", "KI(s)"),
+        { navn: "papir", type: "koekkenrulle", x: 808, y: HYLDE },
 
         /* Forrest paa bordpladen: kurven til snavset udstyr og boetten med
            rene spatler til venstre (F44, F52), spatlen og termometeret */

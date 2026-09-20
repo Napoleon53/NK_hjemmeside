@@ -65,6 +65,10 @@ forskellig hver gang (`spatelGram` på pulverglassene), og en tom spatel
 tager 0,004–0,016 g af igen fra vejebåden (`spatelGram` på den). Vægten
 viser tre decimaler og er tareret med vejebåden fra start.
 
+Pulverglassene står i 1,45 gange motorens størrelse, og på etiketten står
+kun formlen og faremærkerne; navnet står i panelet, når glasset er valgt,
+sammen med faremærkerne i stor størrelse (F73, F74).
+
 Et pulverglas, der holdes over vejebåden, giver en spatelspids (motorens
 F54). For meget tages af ved at trække en tom spatel hen over vejebåden;
 spatlen lægges så i kurven, og en ren kommer frem.

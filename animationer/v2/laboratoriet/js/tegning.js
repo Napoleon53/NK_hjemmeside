@@ -570,29 +570,42 @@
     /* Etiketten paa en flaske eller et pulverglas: 1-2 linjer tekst i
        spritets etiketfelt. gg.etiket: streng eller [linje1, linje2] */
     T.tegnEtiket = function (ctx, gg) {
-        var e = gg.type.etiket;
+        var t = gg.type, e = t.etiket;
         if (!e || !gg.etiket) return;
         var linjer = Array.isArray(gg.etiket) ? gg.etiket : [gg.etiket];
+        /* F73: loftet over skriften foelger genstandens skala, saa et
+           stoerre glas ogsaa faar stoerre skrift */
+        var k = t.skala || 1;
         ctx.save();
         ctx.translate(gg.p.x, gg.p.y);
         ctx.rotate(gg.p.v);
         ctx.translate(-gg.anker.x, -gg.anker.y);
         var cx = e.x + e.b / 2;
-        var str = linjer.length > 1 ? Math.min(9, e.h * 0.42) : Math.min(10, e.h * 0.5);
+        var str = linjer.length > 1 ? Math.min(9 * k, e.h * 0.42) : Math.min(10 * k, e.h * (t.etiketFyld || 0.5));
         var y0 = e.y + e.h / 2 + (linjer.length > 1 ? -str * 0.35 : str * 0.36);
         linjer.forEach(function (l, i) {
-            NK.tekst(ctx, l, cx, y0 + i * (str + 1.5), { str: i === 0 ? str : str * 0.8, vaegt: i === 0 ? 700 : 600, justering: "center", farve: i === 0 ? "#1f2328" : "#4a4f57", maks: e.b - 3 });
+            NK.tekst(ctx, l, cx, y0 + i * (str + 1.5), { str: i === 0 ? str : str * 0.8, vaegt: i === 0 ? 700 : 600, justering: "center", farve: i === 0 ? "#1f2328" : "#4a4f57", maks: t.maerkeFelt ? e.b - 2 * k : e.b - 3 });
         });
-        /* Faremaerkerne i en raekke under etiketten */
+        /* Faremaerkerne: i typens maerkeFelt paa etiketten, ellers i en
+           raekke under den */
         var maerker = gg.indhold ? Stof.faremaerker(gg.indhold) : [];
         if (maerker.length) {
-            var s = Math.min(4.2, (e.b - 2) / (maerker.length * 2.4));
-            var b = maerker.length * s * 2.4;
-            var mx = cx - b / 2 + s * 1.2, my = e.y + e.h + s + 1.5;
-            ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
-            NK.rundtRekt(ctx, cx - b / 2 - 1.5, my - s - 1.5, b + 3, s * 2 + 3, 1.5);
-            ctx.fill();
-            maerker.forEach(function (m, i) { T.tegnPiktogram(ctx, m, mx + i * s * 2.4, my, s); });
+            var mf = t.maerkeFelt, s, b, mx, my;
+            if (mf) {
+                s = Math.min(mf.h / 2, (mf.b - k) / (maerker.length * 2.3));
+                b = maerker.length * s * 2.3;
+                mx = mf.x + mf.b / 2 - b / 2 + s * 1.15;
+                my = mf.y + mf.h / 2;
+                maerker.forEach(function (m, i) { T.tegnPiktogram(ctx, m, mx + i * s * 2.3, my, s); });
+            } else {
+                s = Math.min(4.2 * k, (e.b - 2) / (maerker.length * 2.4));
+                b = maerker.length * s * 2.4;
+                mx = cx - b / 2 + s * 1.2; my = e.y + e.h + s + 1.5;
+                ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+                NK.rundtRekt(ctx, cx - b / 2 - 1.5, my - s - 1.5, b + 3, s * 2 + 3, 1.5);
+                ctx.fill();
+                maerker.forEach(function (m, i) { T.tegnPiktogram(ctx, m, mx + i * s * 2.4, my, s); });
+            }
         }
         ctx.restore();
     };

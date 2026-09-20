@@ -344,13 +344,15 @@
     P.tilfoej = function (spec) {
         var S = NK.Scene;
         var t = typeof spec.type === "string" ? U.type(spec.type) : spec.type;
-        /* Genstanden kan staa i mindre maalestok. Det, der staar i eller paa
-           noget andet, arver dets skala, saa glas passer i stativets huller
-           og bægerglasset staar rigtigt paa pladen. */
+        /* Genstanden kan staa i en anden maalestok: mindre (reagensglassene
+           i sb2.4) eller stoerre (pulverglassene i sb2.4 og sc2.7, F73, saa
+           etiketten kan laeses). Det, der staar i eller paa noget andet,
+           arver dets skala, saa glas passer i stativets huller og
+           bægerglasset staar rigtigt paa pladen. */
         var k = spec.skala;
         if (k === undefined && spec.stativ && this.g[spec.stativ]) k = this.g[spec.stativ].skala;
         if (k === undefined && spec.paa && this.g[spec.paa]) k = this.g[spec.paa].skala;
-        k = NK.klamp(k === undefined ? 1 : k, 0.25, 1);
+        k = NK.klamp(k === undefined ? 1 : k, 0.25, 2);
         /* rumfangFoelger: en rigtig mindre udgave, hvor rumfang og lysvej
            foelger tegningen (NK.Udstyr.mindre); ellers er skala et rent
            tegnemaal */
@@ -1953,8 +1955,9 @@
     };
 
     P.kanRystes = function (c) {
-        /* Vejebaaden rystes ikke: den er ikke et glas (K3) */
-        return !!(c && c.kan.holder && !c.kan.bad && !c.kan.flaske && !c.kan.fast && c.type.navn !== "vejebaad" &&
+        /* Vejebaaden og pulverglassene rystes ikke: de er ikke et glas med
+           noget, der skal blandes (K3, F76) */
+        return !!(c && c.kan.holder && !c.kan.bad && !c.kan.flaske && !c.kan.fast && !c.kan.pulver && c.type.navn !== "vejebaad" &&
             this.synlig(c) && c !== this.baerer);
     };
 

@@ -79,7 +79,38 @@ function koerTest() {
     paastand("sprites er indlaest", klar.length === alle.length, klar.length + " af " + alle.length);
     paastand("vaegten viser tre decimaler og er tareret med vejebaaden", bord.vaegtTekst(bord.g.vaegt) === "0,000 g",
         bord.vaegtTekst(bord.g.vaegt));
-    paastand("vejebaaden kan ikke rystes, bægerglasset kan", !bord.kanRystes(bord.g.baad) && bord.kanRystes(bord.g.baeger));
+    paastand("vejebaaden og pulverglassene kan ikke rystes, bægerglasset kan (F76)", !bord.kanRystes(bord.g.baad) &&
+        !bord.kanRystes(bord.g.pb) && bord.kanRystes(bord.g.baeger));
+
+    /* F73-F75: bøtterne er større, etiketten har kun formlen, og
+       faremaerkerne staar paa etiketten og stort i panelet */
+    var pb = bord.g.pb;
+    paastand("pulverglassene er 1,45 gange motorens, og etiketten har kun formlen (F73)", pb.skala === 1.45 &&
+        pb.etiket === "Pb(NO₃)₂" && Math.abs(pb.type.b - 38 * 1.45) < 1e-9 && !!pb.type.maerkeFelt, pb.type.b.toFixed(1) + " bred");
+    var tegnet = [], ctxSpy = { save: function () {}, restore: function () {}, translate: function () {}, rotate: function () {}, scale: function () {},
+        beginPath: function () {}, moveTo: function () {}, lineTo: function () {}, closePath: function () {}, fill: function () {}, stroke: function () {},
+        quadraticCurveTo: function () {}, arc: function () {}, ellipse: function () {}, fillRect: function () {}, measureText: function (t) { return { width: t.length * 5 }; },
+        fillText: function (t) { tegnet.push(t); }, strokeText: function () {} };
+    NK.Tegning.tegnEtiket(ctxSpy, pb);
+    paastand("formlen staar på etiketten med stor skrift", tegnet.indexOf("Pb(NO₃)₂") >= 0);
+    var buer = 0;
+    ctxSpy.arc = function () { buer++; };
+    bord.mikro.tegnKant(ctxSpy, 1);
+    paastand("zoomboblens kant er én cirkel uden glansbue (F72)", buer === 1, buer + " buer");
+    bord.vaelg("pb");
+    side.opdaterPanel();
+    var fare = d.getElementById("glas-fare"), figurer = fare ? fare.querySelectorAll("figure") : [];
+    paastand("det valgte pulverglas viser sine faremærker stort med navn (F74)", !!fare && !fare.hidden && figurer.length === 3 &&
+        fare.textContent.indexOf("Brandnærende") >= 0 && fare.querySelector("canvas").getBoundingClientRect().width >= 36,
+        fare ? fare.textContent : "intet felt");
+    var formel = d.querySelector("#glas-titel .formel");
+    paastand("formlen i overskriften står ikke med store bogstaver (F75)", !!formel && formel.textContent === "Pb(NO₃)₂" &&
+        vin.getComputedStyle(formel).textTransform === "none", d.getElementById("glas-titel").textContent);
+    bord.vaelg("ki");
+    side.opdaterPanel();
+    paastand("KI har ingen faremærker, og feltet er skjult", fare.hidden);
+    bord.vaelg(null);
+    side.opdaterPanel();
 
     function adv(sek) { for (var k = 0; k < Math.round(sek * 20); k++) bord.opdater(0.05); F.opdater(); }
     var beskeder = [], vedB = bord.vedBesked;
@@ -375,7 +406,9 @@ function koerTest() {
     paastand("og de slukker igen", !bord.g.plade.taendt && !bord.g.plade.omroerer);
     var rbd = bord.rekt(baad, 0);
     paastand("glasset med Pb(NO3)2 kan tages med musen", mus.tag("pb"));
-    mus.baer({ x: baad.p.x, y: rbd.y - 60 }, 0.8);
+    /* Bunden af glasset en halv centimeter over vejebaaden */
+    var pbM = bord.g.pb;
+    mus.baer({ x: baad.p.x, y: rbd.y - 6 - (pbM.type.h - pbM.anker.y) }, 0.8);
     paastand("holdt over vejebaaden faar den den groenne ramme, ikke vaegten", bord.slipMaal === "baad", bord.slipMaal);
     mus.slip();
     mus.hold(4);

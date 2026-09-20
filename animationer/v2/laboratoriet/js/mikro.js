@@ -743,11 +743,8 @@
         ctx.beginPath();
         ctx.arc(0, 0, R, 0, Math.PI * 2);
         ctx.stroke();
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
-        ctx.lineWidth = 6;
-        ctx.beginPath();
-        ctx.arc(-R * 0.35, -R * 0.35, R * 0.55, Math.PI * 1.1, Math.PI * 1.55);
-        ctx.stroke();
+        /* F72: glansbuen i det oeverste venstre hjoerne er fjernet; den saa
+           ud som en streg, der ikke hoerte til noget */
     };
 
     /* Et udsnit af det faste stof: iongitteret med stoffets eget
@@ -777,13 +774,21 @@
         }
     };
 
-    /* Forklaringen staar inde i boblen, hvor der er bredde nok til den */
+    /* Forklaringen staar inde i boblen, hvor der er bredde nok til den.
+       F77: i to linjer (»Iongitter: …« og »i forholdet …«) og lidt hoejere
+       oppe, saa den hverken gaar ud over boblens kant eller ind under
+       luppen i hjoernet (bord.js, R · 0,66) */
     P.tegnGitterTekst = function (ctx, alfa) {
-        var R = this.R, k = this.k, ly0 = R * 0.6;
+        var R = this.R, k = this.k, ly0 = R * 0.38;
+        var tekst = this.fast.tekst, i = tekst.indexOf(" i forholdet ");
+        var linjer = i > 0 ? [tekst.slice(0, i), tekst.slice(i + 1)] : [tekst];
+        var lh = 15 * k, h = lh * linjer.length + 8 * k;
         ctx.globalAlpha = alfa;
-        ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
-        ctx.fillRect(-R, ly0, R * 2, 24 * k);
-        NK.tekst(ctx, this.fast.tekst, 0, ly0 + 12 * k, { font: "600 " + (11 * k).toFixed(1) + "px 'Segoe UI', sans-serif", justering: "center", linje: "middle", farve: "#f2f4f7" });
+        ctx.fillStyle = "rgba(0, 0, 0, 0.74)";
+        ctx.fillRect(-R, ly0, R * 2, h);
+        linjer.forEach(function (l, n) {
+            NK.tekst(ctx, l, 0, ly0 + 4 * k + lh * (n + 0.5), { str: 11 * k, vaegt: 600, maks: R * 1.05, justering: "center", linje: "middle", farve: "#f2f4f7" });
+        });
     };
 
     /* Boblen tegnes med centrum i (cx, cy). forbind: punktet, den hoerer til */

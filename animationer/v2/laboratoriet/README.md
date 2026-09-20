@@ -1086,6 +1086,15 @@ ethvert forsøg nu kan skrive i opstillingen:
 * **Vilkåret tilsat.** `{ beholder: "baeger", tilsat: "KI(s)", gram: { over:
   0.09 } }` er sandt, når så meget af saltet er kommet i, uanset hvad det er
   blevet til (regnet af grundstofferne).
+* **Større genstande og læsbare pulverglas (F73–F75).** En post kan have
+  `skala` op til 2 (før højst 1), så pulverglassene i sb2.4 og sc2.7 står i
+  1,45 gange motorens størrelse. Pulverglassets etiket er større: formlen
+  står stort (`etiketFyld`), og faremærkerne står inde på etiketten
+  (`maerkeFelt`); skriften og mærkerne følger genstandens skala. Vælges et
+  glas, viser panelet dets faremærker i stor størrelse med navn
+  (`#glas-fare`, navnene i `NK.Stof.MAERKE_NAVN`), og en formel i
+  glassets overskrift står ikke med store bogstaver (klassen `formel`).
+  Pulverglas og vejebåde kan ikke rystes.
 * **Forsøgets regel.** `bord.regel = function (gg, c) { ... }` kan sige nej
   til en handling med en grund (en streng). Så går genstanden hjem, grunden
   står på scenen, og der kommer en hændelse `regel`. Uden regel afvises

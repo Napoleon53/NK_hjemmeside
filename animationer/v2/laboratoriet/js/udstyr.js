@@ -54,6 +54,11 @@
      vejlaengde        lysvej i forhold til et reagensglas (til farven).
                        UDLEDES af indersidens bredde og LYSVEJ_DAEMPNING
      etiket            feltet til etiketten paa flasker og pulverglas
+     etiketFyld        hvor stor en del af etiketfeltets hoejde én linje
+                       tekst maa fylde (standard 0,5; pulverglassets
+                       formel 0,9, F73)
+     maerkeFelt        feltet, faremaerkerne staar i paa etiketten.
+                       Uden staar de i en raekke under etiketten
      pulverfelt        feltet, hvor pulveret ligger i et pulverglas
      omrids            sti i spritets koordinater til et moerkt omrids,
                        saa glasset ogsaa ses mod en lys baggrund
@@ -260,7 +265,10 @@
             vindue: true,
             indre: PULVER_INDRE, mlPrAreal: 20, maks: 30, haeldMl: 0,
             vejlaengde: 1, titel: "pulverglasset",
-            etiket: { x: 5, y: 17.5, b: 28, h: 10.5 }, pulverfelt: { x0: 4, x1: 34, y: 49, top: 31 }, skjulIndhold: true
+            /* F73: etiketten fylder mere, formlen staar stort (etiketFyld), og
+               faremaerkerne staar inde paa etiketten (maerkeFelt) */
+            etiket: { x: 4.5, y: 17.6, b: 29, h: 8.6 }, etiketFyld: 0.9, maerkeFelt: { x: 5, y: 26.4, b: 28, h: 7.2 },
+            pulverfelt: { x0: 4, x1: 34, y: 49, top: 36 }, skjulIndhold: true
         },
         spatel: {
             sprite: "spatel", fil: "spatel.svg", b: 96, h: 12,
@@ -428,7 +436,7 @@
        bliver de ikke skaleret med. */
     var SKALA_TAL = ["b", "h", "hulY", "bundY", "laengde", "traefBund"];
     var SKALA_PUNKTER = ["anker", "tud", "ske", "flammePunkt", "valgtMaerke", "knap", "lampe"];
-    var SKALA_REKTER = ["etiket", "display", "skilt"];
+    var SKALA_REKTER = ["etiket", "maerkeFelt", "display", "skilt"];
 
     function skaleret(t, k) {
         if (!(k > 0) || k === 1) return t;

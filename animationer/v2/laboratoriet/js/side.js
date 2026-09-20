@@ -28,6 +28,9 @@
      #glas-titel #glas-volumen #glas-tom #glas-indhold #glas-temp
                       (ligger #glas-indhold i en <details class="fold">,
                       skjules folden sammen med tabellen)
+     #glas-fare       faremaerkerne paa det valgte glas i stor stoerrelse
+                      med navn (F74), saa de kan laeses, selv om de er
+                      smaa paa etiketten
      #uheld-taeller   antal uheld
      #rumknapper      knapper til rummene          (kun med plan)
      #forfraknap #lydknap #hjaelpknap #introknap
@@ -89,6 +92,31 @@
 
     function stor(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
 
+    /* F75: kortenes overskrifter staar med store bogstaver (grund.css), men
+       en formel maa ikke: Pb(NO₃)₂ er ikke PB(NO₃)₂, og pH er ikke PH. Et
+       ord, der ligner en formel - to store bogstaver, et stort inde i ordet,
+       et saenket tal, en ladning eller en parentes - faar sin egen span med
+       klassen formel, som ikke skrives med store bogstaver. */
+    function erFormel(ord) {
+        return /[A-Z].*[A-Z]|[a-z][A-Z]|[\u2080-\u2089\u2070-\u2079\u207A\u207B]|\(/.test(ord);
+    }
+    function saetTitel(id, tekst) {
+        var el = NK.el(id);
+        if (!el || el.dataset.tekst === tekst) return;
+        el.dataset.tekst = tekst;
+        el.textContent = "";
+        tekst.split(/(\s+)/).forEach(function (ord) {
+            var ren = ord.replace(/[,.;:]+$/, "");
+            if (ren && erFormel(ren)) {
+                var sp = document.createElement("span");
+                sp.className = "formel";
+                sp.textContent = ren;
+                el.appendChild(sp);
+                if (ren !== ord) el.appendChild(document.createTextNode(ord.slice(ren.length)));
+            } else if (ord) el.appendChild(document.createTextNode(ord));
+        });
+    }
+
     /* localStorage fejler paa file:// og i privat browsing */
     function gemt(noegle, vaerdi) {
         try {
@@ -139,7 +167,7 @@
         if (!c) {
             if (linje) linje.hidden = true;
             if (NK.el("rystknap")) NK.el("rystknap").hidden = true;
-            if (NK.el("glas-titel")) NK.saetTekst("glas-titel", "Det valgte glas");
+            saetTitel("glas-titel", "Det valgte glas");
             if (NK.el("glas-volumen")) NK.saetTekst("glas-volumen", "");
             if (NK.el("glas-tom")) {
                 NK.el("glas-tom").hidden = false;
@@ -149,6 +177,7 @@
             if (fold) fold.hidden = true;
             if (NK.el("glas-temp")) NK.el("glas-temp").hidden = true;
             if (NK.el("glas-forurenet")) NK.el("glas-forurenet").hidden = true;
+            this.visFare(null);
             if (this.valg.panel) this.valg.panel(this);
             this.sidsteSignatur = this.signatur();
             return;
@@ -156,7 +185,7 @@
 
         var o = B.samlet(c);
         if (NK.el("rystknap")) NK.el("rystknap").hidden = !(b.kanRystes && b.kanRystes(c));
-        if (NK.el("glas-titel")) NK.saetTekst("glas-titel", stor(c.titel));
+        saetTitel("glas-titel", stor(c.titel));
         if (NK.el("glas-volumen")) NK.saetTekst("glas-volumen", tal(B.volumen(c)) + " mL");
 
         /* Tabellen viser det, der er nok af til at ses (som boblen), med
@@ -220,9 +249,46 @@
         /* F55: et forurenet pulverglas siger det, og med hvad */
         var fu = NK.el("glas-forurenet"), fuTekst = b.forureningTekst ? b.forureningTekst(c) : null;
         if (fu) { fu.hidden = !fuTekst; fu.textContent = fuTekst || ""; }
+        this.visFare(B.volumen(c) > 0.05 || St.fastIalt(o) > 0.5 ? St.faremaerker(o) : null);
 
         if (this.valg.panel) this.valg.panel(this);
         this.sidsteSignatur = this.signatur();
+    };
+
+    /* F74: faremaerkerne paa det valgte glas i stor stoerrelse med navn.
+       Piktogrammerne tegnes af den samme T.tegnPiktogram som paa etiketten,
+       paa et lille laerred i skaermens oploesning, saa de er skarpe. Raekken
+       bygges kun om, naar maerkerne skifter. */
+    P.visFare = function (maerker) {
+        var el = NK.el("glas-fare");
+        if (!el) return;
+        maerker = maerker || [];
+        var noegle = maerker.join(",");
+        el.hidden = !maerker.length;
+        if (el.dataset.noegle === noegle) return;
+        el.dataset.noegle = noegle;
+        el.textContent = "";
+        var PX = 38, dpr = window.devicePixelRatio || 1;
+        maerker.forEach(function (m) {
+            var fig = document.createElement("figure");
+            fig.className = "fare";
+            var c = document.createElement("canvas");
+            c.width = Math.round(PX * dpr);
+            c.height = Math.round(PX * dpr);
+            c.style.width = PX + "px";
+            c.style.height = PX + "px";
+            var ctx = c.getContext("2d");
+            ctx.scale(dpr, dpr);
+            NK.Tegning.tegnPiktogram(ctx, m, PX / 2, PX / 2, PX / 2 - 1.5);
+            var navn = (St.MAERKE_NAVN && St.MAERKE_NAVN[m]) || m;
+            c.setAttribute("role", "img");
+            c.setAttribute("aria-label", navn);
+            var cap = document.createElement("figcaption");
+            cap.textContent = navn;
+            fig.appendChild(c);
+            fig.appendChild(cap);
+            el.appendChild(fig);
+        });
     };
 
     /* Et kort aftryk af tilstanden, saa panelet kun tegnes om, naar noget

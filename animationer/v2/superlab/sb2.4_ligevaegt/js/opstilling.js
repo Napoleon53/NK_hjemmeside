@@ -70,10 +70,14 @@
         ny.titel = "flasken med frugtfarve";
         NK.Udstyr.tilfoej("flaskeFarve", ny);
     }());
+    /* Pulverglassene er 1,45 gange motorens (F73), saa etiketten og
+       faremaerkerne kan laeses. De er 75 hoeje og naar lige op under den
+       oeverste hyldes beslag (191). */
+    var PULVER_SKALA = 1.45;
     function pulver(navn, x, y, etiket, titel, stof, spids) {
         var u = {};
         u[stof] = 30000;
-        return { navn: navn, type: "pulverglas", x: x, y: y, etiket: etiket, titel: titel, del: 1,
+        return { navn: navn, type: "pulverglas", x: x, y: y, skala: PULVER_SKALA, etiket: etiket, titel: titel, del: 1,
                  indhold: { V: 0, T: 20, umol: u }, pulverMaks: 30000, spatelspids: spids };
     }
 
@@ -169,10 +173,10 @@
 
         /* Hylden over stativet: koekkenrullen og pulverglassene til glas
            1, 2 og 3. Kaffen staar ved plakaten (F58). */
-        { navn: "papir", type: "koekkenrulle", x: 460, y: HYLDE_KAFFE },
-        pulver("pulver_fe",   540, HYLDE_KAFFE, "Fe(NO₃)₃", "pulverglasset med Fe(NO₃)₃", "Fe(NO3)3(s)", 8),
-        pulver("pulver_asc",  590, HYLDE_KAFFE, "C-vitamin", "pulverglasset med ascorbinsyre", "Asc(s)", 3),
-        pulver("pulver_kscn", 640, HYLDE_KAFFE, "KSCN", "pulverglasset med KSCN", "KSCN(s)", 30),
+        { navn: "papir", type: "koekkenrulle", x: 420, y: HYLDE_KAFFE },
+        pulver("pulver_fe",   494, HYLDE_KAFFE, "Fe(NO₃)₃", "pulverglasset med Fe(NO₃)₃", "Fe(NO3)3(s)", 8),
+        pulver("pulver_asc",  557, HYLDE_KAFFE, "C-vitamin", "pulverglasset med ascorbinsyre", "Asc(s)", 3),
+        pulver("pulver_kscn", 620, HYLDE_KAFFE, "KSCN", "pulverglasset med KSCN", "KSCN(s)", 30),
 
         /* Den oeverste hylde: draabeflasken og sproejteflasken, og i del 2
            frugtfarven. (KSCN-flasken til forundersoegelsen er fjernet, F48:

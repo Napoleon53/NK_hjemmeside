@@ -195,7 +195,7 @@
             var mor = bord.opstilling.filter(function (s) { return s.navn === fra; })[0];
             if (mor) k = mor.skala;
         }
-        k = Math.max(0.25, Math.min(1, k === undefined ? 1 : k));
+        k = Math.max(0.25, Math.min(2, k === undefined ? 1 : k));
         if (k === 1) return t;
         return spec.rumfangFoelger ? NK.Udstyr.mindre(t, k) : NK.Udstyr.skaleret(t, k);
     }
