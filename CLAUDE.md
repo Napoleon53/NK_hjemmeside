@@ -10,9 +10,10 @@ dem i `animationer/v2/`, statiske sider i roden, downloads i `downloads/`.
 Hele `animationer/v2/` er frosset 20. september 2026 og må ikke rettes her:
 `laboratoriet/`, `kemichael/`, `superlab/` og `superlab_ny/`. Laboratoriesporet
 udvikles i `C:\NK_Undervisning\virtuelt_laboratorium\`, som har sin egen
-kopi af de fire mapper. Bliver der alligevel rettet i dem, tager
-`autocommit.ps1` filerne ud af commit'en igen og skriver det i
-`autocommit.log`.
+kopi af de fire mapper. Siden 21. september er den automatiske commit
+(`autocommit.ps1`) slået fra, og dermed også spærren, der tog rettede filer
+i dem ud af commit'en igen. Synkroniser committer alt, så mapperne skal
+holdes urørte.
 
 Mapperne bliver stående her, fordi de otte gamle laboratorieforsøg i
 `superlab/` og to superanimationer (`sc2.1_salt_i_vand` og
@@ -55,6 +56,12 @@ sync; denne er færdig.
 
 ## Superanimationer
 
+- Er brugerens svar på et spørgsmål uklart eller tvetydigt, så spørg igen med
+  to konkrete muligheder, og vælg den mindste af dem. Vælg aldrig den store
+  løsning på et uklart svar.
+- Skal en superanimation bygges eller rettes, så læs
+  `animationer/superanimationer/README.md` først. Afsnittet "Bestillingen, før
+  der skrives kode" er bindende.
 - Punkterne om superlab-animationer, `laboratoriet/` og `kemichael/`
   gælder i NK_Undervisning, ikke her: de mapper er frosne (se ovenfor).
   Punkterne om superanimationer gælder som hidtil og arbejdes i
