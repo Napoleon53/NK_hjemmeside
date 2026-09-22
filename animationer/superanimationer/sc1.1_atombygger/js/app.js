@@ -27,6 +27,7 @@
             var valgt = knapper[i].getAttribute("data-fane") === id;
             knapper[i].classList.toggle("aktiv", valgt);
             knapper[i].setAttribute("aria-selected", valgt ? "true" : "false");
+            if (valgt) knapper[i].classList.remove("blink-kraftigt");
         }
         aktivFane = id;
         if (sims[id]) sims[id].tilpas();

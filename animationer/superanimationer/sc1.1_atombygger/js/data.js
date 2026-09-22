@@ -16,8 +16,13 @@
     var D = {};
     NK.Data = D;
 
-    /* Hvor mange elektroner der er plads til i hver skal. */
-    D.SKALPLADSER = [2, 8, 8, 2];
+    /* Hvor mange elektroner der er plads til i hver skal.
+       Fjerde skal bruges kun af kalium og calcium (se skalfordeling
+       nedenfor), og de fylder den aldrig helt op - de 1-2 elektroner,
+       de har der, er netop deres yderelektroner. Pladsen sat til 8,
+       ligesom skal 3, saa "1/8" og "2/8" ikke fejlagtigt vises som
+       fyldt (groent) i skaltallene. */
+    D.SKALPLADSER = [2, 8, 8, 8];
 
     /* type styrer farve og sprogbrug:
        metal - ikkemetal - halvmetal - aedelgas

@@ -124,6 +124,17 @@ body {
 .faneknap.aktiv { background-color: var(--blaa); border-color: var(--blaa); color: #ffffff; }
 .faneknap.aktiv .nr { background-color: rgba(255, 255, 255, 0.25); color: #ffffff; }
 
+/* Fane 4 blinker kraftigt, naar man har loest hele opgaveturen paa fane 1 -
+   langt mere paagaaende end knap.banker, for den skal kunne ses i
+   periferisynet, mens man staar og bygger paa en helt anden fane. Stopper
+   selv, naar man rent faktisk aabner fanen (se visFane() i app.js). */
+@keyframes fane-blink {
+    0%, 100%  { transform: scale(1); border-color: #4a4a58; box-shadow: none; }
+    50% { transform: scale(1.1); border-color: var(--gul);
+          box-shadow: 0 0 0 5px rgba(242, 197, 61, 0.5), 0 0 18px 5px rgba(242, 197, 61, 0.6); }
+}
+.faneknap.blink-kraftigt { animation: fane-blink 0.7s ease-in-out infinite; }
+
 .ikonknap {
     background: transparent;
     border: 1px solid #4a4a58;

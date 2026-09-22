@@ -286,7 +286,8 @@
             var i = D.hyppigsteIsotop(g.z);
             var aedel = D.aedelgasStruktur(g.z - g.ion);
             return {
-                tekst: "Byg ionen " + g.symbol + NK.ladningHaevet(g.ion) + " med den kerne, der er mest af i naturen.",
+                tekst: "Byg ionen " + g.symbol + NK.ladningHaevet(g.ion) + " med "
+                    + NK.talform(i.a - g.z, "neutron", "neutroner") + " i kernen.",
                 p: g.z, n: i.a - g.z, e: g.z - g.ion,
                 svar: "Ladningen " + NK.ladningstekst(g.ion) + " betyder " + NK.talform(Math.abs(g.ion), "elektron", "elektroner")
                     + " " + (g.ion > 0 ? "færre" : "flere") + " end protoner."
@@ -335,8 +336,9 @@
             var aedel = D.aedelgasStruktur(g.z - g.ion);
             var iso = D.hyppigsteIsotop(g.z);
             return {
-                tekst: "Byg en ion med ladningen " + NK.ladningstekst(g.ion) + ", som har præcis samme elektronstruktur som "
-                    + aedel.navn.toLowerCase() + " (" + D.skalfordeling(aedel.z).join(", ") + "). Brug den almindelige kerne.",
+                tekst: "Byg en ion med ladningen " + NK.ladningstekst(g.ion) + " og " + NK.talform(iso.a - g.z, "neutron", "neutroner")
+                    + " i kernen, som har præcis samme elektronstruktur som "
+                    + aedel.navn.toLowerCase() + " (" + D.skalfordeling(aedel.z).join(", ") + ").",
                 p: g.z, n: iso.a - g.z, e: g.z - g.ion,
                 svar: "Der skal " + NK.talform(g.z - g.ion, "elektron", "elektroner") + " til for at ligne "
                     + aedel.navn.toLowerCase() + ". Ladningen " + NK.ladningstekst(g.ion) + " svarer så til "
@@ -470,6 +472,11 @@
             NK.saetTekst("byg-opgave", "Rigtigt! " + o.svar + " Du har nu løst " + MAAL_RIGTIGE + " opgaver rigtigt selv — runden er gennemført.");
             NK.saetKlasse("byg-opgave", "besked god");
             this.saetOpgaveTrin("faerdig");
+            /* Hele opgaveturen er klaret - peg kraftigt paa fane 4, saa
+               spillet ikke bliver overset. Blinket stopper selv, naar
+               fanen rent faktisk aabnes (visFane() i app.js). */
+            var faneSpil = NK.el("faneknap-spil");
+            if (faneSpil) faneSpil.classList.add("blink-kraftigt");
         } else {
             NK.saetTekst("byg-opgave", "Rigtigt! " + o.svar);
             NK.saetKlasse("byg-opgave", "besked god");
