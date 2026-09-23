@@ -231,6 +231,39 @@ main { flex: 1; position: relative; min-height: 0; }
 /* Usynlige felter oven paa laerredet, som rundvisningen peger paa */
 .anker { position: absolute; pointer-events: none; }
 
+/* Knappen, der sender Kemichael ud under praesentationen */
+.spring-over {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: rgba(14, 14, 20, 0.88);
+    color: var(--tekst);
+    border: 1px solid #5e5e70;
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.spring-over:hover { background-color: var(--panel-3); border-color: var(--gul); }
+.spring-over span { color: var(--tekst-svag); }
+
+/* Feltet, Kemichael peger paa, mens han siger, hvor svarene skrives */
+@keyframes peg {
+    0%   { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0.7); }
+    70%  { box-shadow: 0 0 0 10px rgba(242, 197, 61, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(242, 197, 61, 0); }
+}
+
+.felt.peg { border-color: var(--gul); animation: peg 1.2s ease-out infinite; }
+
 /* ---------------------------------------------------------------------
    HOEJRE SPALTE
    --------------------------------------------------------------------- */

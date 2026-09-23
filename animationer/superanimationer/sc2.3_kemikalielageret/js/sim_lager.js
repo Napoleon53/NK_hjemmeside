@@ -36,12 +36,16 @@
         navn: "fx calciumchlorid"
     };
 
-    var DISPLAY_TOM = {
-        ion: "ionen med ladning?",
-        ionnavn: "ionens navn?",
-        formel: "formlen?",
-        navn: "stoffets navn?"
-    };
+    /* Displayet, naar feltet er tomt: uden markoer i feltet peger det over
+       paa panelet; med markoer siger det, hvad der skal skrives */
+    var DISPLAY_PEG = "Skriv i feltet til højre →";
+    function displayOpgave(f) {
+        var i = f.raekke.ion;
+        if (f.slags === "ion") return "Skriv ionen for " + (i.q > 0 ? i.stamme : (f.raekke.del || NK.formel(i.formel)));
+        if (f.slags === "ionnavn") return "Skriv navnet på " + i.tekst;
+        if (f.slags === "formel") return "Skriv hele formlen";
+        return "Skriv hele navnet";
+    }
 
     function SimLager() {
         this.L = new NK.Laerred(NK.el("lager-laerred"));
@@ -151,14 +155,15 @@
 
         var rx = Math.max(10, W * 0.02);
         var rb = W * 0.68 - rx;
-        var ry = Math.max(8, H * 0.03);
-        var rh = H * 0.5 - ry;
+        /* Reolen har en top, og der er luft mellem den og glassene */
+        var ry = Math.max(18, H * 0.045);
+        var rh = H * 0.52 - ry;
         lay.reol = { x: rx, y: ry, b: rb, h: rh };
         lay.tyk = NK.klamp(H * 0.018, 8, 14);
-        var rum = rh / 3;
-        lay.hylder = [0, 1, 2].map(function (i) { return ry + rum * (i + 1) - lay.tyk; });
+        var rum = (rh - lay.tyk) / 3;
+        lay.hylder = [0, 1, 2].map(function (i) { return ry + lay.tyk + rum * (i + 1) - lay.tyk; });
         lay.slot = (rb - 24) / 10;
-        lay.lilleH = Math.max(30, Math.min(lay.slot * 0.84 / 0.77, rum - lay.tyk - 30));
+        lay.lilleH = Math.max(30, Math.min(lay.slot * 0.84 / 0.77, rum - lay.tyk - 38));
         lay.pladser = this.stoffer.map(function (st) {
             return { x: rx + 12 + lay.slot * (st.pladsPaaHylde + 0.5), y: lay.hylder[st.hylde], h: lay.lilleH };
         });
@@ -231,6 +236,7 @@
             nulstil: NK.el("lager-nulstil")
         };
         this.el.knap.addEventListener("click", function () { mig.knap(); });
+        NK.el("lager-spring").addEventListener("click", function () { mig.springIntro(); mig.fokus(); });
 
         /* Fremskridtet: én linje pr. hylde. Et klik henter det naeste
            uloeste glas fra den hylde. */
@@ -468,6 +474,7 @@
 
     P.tast = function () {
         this.taster.push({ i: Math.floor(Math.random() * 30), a: 1 });
+        this.springIntro();
     };
 
     P.tjek = function () {
@@ -560,6 +567,35 @@
         this.opg = null;
         this.retur = null;
         this.vaelg(0, true);
+    };
+
+    /* ----- Kemichaels praesentation ------------------------------------------
+       Foerste gang fanen aabnes i en browser (og igen med K). Knappen Spring
+       over, et klik paa scenen, et tastetryk i feltet og Esc sender ham ud. */
+    P.startIntro = function (tving) {
+        if (!this.laererIntro) return;
+        if (!tving && NK.hent("nk-sc2.3-intro", false)) return;
+        NK.gem("nk-sc2.3-intro", true);
+        this.introVent = tving ? 0.1 : 0.9;
+    };
+
+    P.springIntro = function () {
+        this.introVent = 0;
+        return !!(this.laererIntroVaek && this.laererIntroVaek());
+    };
+
+    P.opdaterIntro = function (dt) {
+        if (this.introVent > 0) {
+            this.introVent -= dt;
+            if (this.introVent <= 0 && this.laererIntro) this.laererIntro();
+        }
+        var iIntro = !!(this.laererIIntro && this.laererIIntro());
+        if (iIntro !== this.visesSpring) {
+            this.visesSpring = iIntro;
+            NK.el("lager-spring").hidden = !iIntro;
+        }
+        var f = this.aktivtFelt();
+        if (f && f.feltEl) f.feltEl.classList.toggle("peg", iIntro && this.introTrin === 2);
     };
 
     /* Enter uden for et felt: videre til naeste glas, naar det er loest */
@@ -701,6 +737,7 @@
             }
         }
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
+        this.opdaterIntro(dt);
     };
 
     P.tegn = function () {
@@ -790,7 +827,7 @@
                 t: gs.loest ? (gs.stjerne ? "Løst uden hjælp ★" : "Løst") : "Mangler " + (gst.retning === "formel" ? "formlen" : "navnet"),
                 px: 12, vaegt: "400", farve: gs.loest ? "#7ee0a8" : "#a9b0ba"
             });
-            Tg.boble(ctx, gp.x, gp.y - gp.h - 4, linjer, lay.W);
+            Tg.boble(ctx, gp.x, gp.y - gp.h - 4, linjer, lay.W, gp.y + lay.tyk);
         }
 
         if (this.laererTegnOver) this.laererTegnOver(ctx);
@@ -805,7 +842,7 @@
         if (f) {
             var raa = f.input ? f.input.value : "";
             v.tekst = Tj.pynt(raa, f.slags, f.raekke.ion);
-            v.tom = DISPLAY_TOM[f.slags];
+            v.tom = this.fokuseret ? displayOpgave(f) : DISPLAY_PEG;
             v.markoer = this.fokuseret && Math.floor(this.tid * 2) % 2 === 0;
         } else {
             v.tekst = o.st.retning === "formel" ? o.st.formelTekst : o.st.navn;
@@ -913,6 +950,8 @@
         if (!kop.skjult && !kop.iHaand && Math.abs(pt.x - lay.kop.x) < 30 && pt.y < lay.kop.y + 4 && pt.y > lay.kop.y - 60) {
             return { slags: "kop" };
         }
+        var m = lay.maskine, mh = m.b * 150 / 240;
+        if (this.aktivtFelt() && pt.x >= m.x && pt.x <= m.x + m.b && pt.y >= m.y && pt.y <= m.y + mh) return { slags: "maskine" };
         var pl = lay.plakater;
         for (var navn in pl) {
             if (!Object.prototype.hasOwnProperty.call(pl, navn)) continue;
@@ -937,10 +976,12 @@
         c.addEventListener("pointerleave", function () { mig.over = null; c.style.cursor = "default"; });
         c.addEventListener("click", function (e) {
             var pt = mig.L.punkt(e);
+            if (mig.springIntro()) return;
             if (mig.laererKlik && mig.laererKlik(pt.x, pt.y)) return;
             var u = mig.hvadErUnder(pt);
             if (!u) return;
             if (u.slags === "kop" && mig.klikKop) { mig.klikKop(); return; }
+            if (u.slags === "maskine") { mig.fokus(); return; }
             if (u.slags === "plakat") { NK.Opslag.aabn(u.i, mig.fremhaevning(u.i)); return; }
             if (u.slags === "glas") mig.vaelg(u.i);
         });

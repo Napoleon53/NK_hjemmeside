@@ -37,6 +37,7 @@
         if (sims[id]) {
             sims[id].tilpas();
             if (sims[id].fokus) sims[id].fokus();
+            if (sims[id].startIntro) sims[id].startIntro(false);   /* kun første gang i browseren */
         }
     }
 
@@ -71,10 +72,16 @@
 
     /* ----- Tastatur ------------------------------------------------------ */
     function tastatur(e) {
-        if (e.key === "Escape") { lukAlle(); if (NK.Rundvisning) NK.Rundvisning.luk(); return; }
+        var sim = sims[aktivFane];
+        if (e.key === "Escape") {
+            lukAlle();
+            if (NK.Rundvisning) NK.Rundvisning.luk();
+            if (sim && sim.springIntro) sim.springIntro();
+            return;
+        }
         if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
         if (e.ctrlKey || e.metaKey || e.altKey) return;
-        var sim = sims[aktivFane];
+        if (e.key === "k" || e.key === "K") { if (sim && sim.startIntro) sim.startIntro(true); return; }
 
         if (e.key === "1" || e.key === "2") { visFane(faner[parseInt(e.key, 10) - 1]); return; }
         if (e.key === "?" || e.key === "h" || e.key === "H") {

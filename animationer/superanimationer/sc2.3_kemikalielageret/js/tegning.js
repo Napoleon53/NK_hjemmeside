@@ -490,6 +490,13 @@
         ctx.fillStyle = "#5c3f27";
         ctx.fillRect(x, y, stolpe, h);
         ctx.fillRect(x + b - stolpe, y, stolpe, h);
+        /* Toppen af reolen */
+        ctx.fillStyle = "#6b4a2e";
+        ctx.fillRect(x - 3, y, b + 6, tyk);
+        ctx.fillStyle = "#8a6240";
+        ctx.fillRect(x - 3, y, b + 6, 3);
+        ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+        ctx.fillRect(x + stolpe, y + tyk, b - 2 * stolpe, 6);
         hylder.forEach(function (py) {
             ctx.fillStyle = "#8a6240";
             ctx.fillRect(x, py, b, tyk * 0.35);
@@ -685,9 +692,10 @@
         ctx.restore();
     };
 
-    /* En taleboble-agtig forklaring over punktet (x, y).
+    /* En taleboble-agtig forklaring over punktet (x, y). Er der ikke plads
+       over det, kommer den under yUnder i stedet, med pilen opad.
        linjer: [{ t, px, vaegt, farve }] */
-    T.boble = function (ctx, x, y, linjer, W) {
+    T.boble = function (ctx, x, y, linjer, W, yUnder) {
         ctx.save();
         var pad = 9, b = 0, h = 0;
         linjer.forEach(function (l) {
@@ -697,7 +705,8 @@
         });
         b += pad * 2;
         h += pad * 2 - 4;
-        var bx = NK.klamp(x - b / 2, 4, W - b - 4), by = y - h - 10;
+        var under = y - h - 10 < 4 && yUnder !== undefined;
+        var bx = NK.klamp(x - b / 2, 4, W - b - 4), by = under ? yUnder + 10 : y - h - 10;
         ctx.fillStyle = "rgba(14, 14, 20, 0.94)";
         ctx.strokeStyle = "#4a4a58";
         ctx.lineWidth = 1;
@@ -705,9 +714,15 @@
         ctx.fill();
         ctx.stroke();
         ctx.beginPath();
-        ctx.moveTo(x - 6, by + h);
-        ctx.lineTo(x, by + h + 7);
-        ctx.lineTo(x + 6, by + h);
+        if (under) {
+            ctx.moveTo(x - 6, by);
+            ctx.lineTo(x, by - 7);
+            ctx.lineTo(x + 6, by);
+        } else {
+            ctx.moveTo(x - 6, by + h);
+            ctx.lineTo(x, by + h + 7);
+            ctx.lineTo(x + 6, by + h);
+        }
         ctx.closePath();
         ctx.fill();
         var ly = by + pad;

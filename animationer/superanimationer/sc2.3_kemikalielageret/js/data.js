@@ -417,6 +417,19 @@
     };
 
     /* ----- Kemichaels replikker ---------------------------------------- */
+
+    /* Praesentationen, foerste gang fanen aabnes. Kort, og et klik eller
+       et tastetryk sender ham ud (js/laerer.js). */
+    D.INTRO = [
+        "Lageret. Halvdelen af etiketterne er faldet af.",
+        "Skriv svarene i felterne til højre.",
+        "Maskinen printer resten. Min kaffe venter."
+    ];
+    D.INTRO_BAAND = [
+        "Ny levering. Etiketterne mangler igen.",
+        "Skriv på maskinen, før glassene når kassen."
+    ];
+
     D.HYLDE_ROS = [
         "Ti glas med etiket. Den hylde har ikke set sådan ud siden 2009.",
         "Romertal og det hele. Jeg er rørt.",

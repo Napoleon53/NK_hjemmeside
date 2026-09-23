@@ -45,7 +45,7 @@ window.addEventListener("load", function () { setTimeout(koer, 1500); });
 
 function koer() {
     var W = document.getElementById("ramme").contentWindow;
-    var noegler = ["nk-sc2.3-lager", "nk-sc2.3-baand", "nk-sc2.3-svaer"], gemt = {};
+    var noegler = ["nk-sc2.3-lager", "nk-sc2.3-baand", "nk-sc2.3-svaer", "nk-sc2.3-intro", "nk-sc2.3-intro2"], gemt = {};
     try { noegler.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); }); } catch (e) { /* ingen hukommelse */ }
     try { koerTest(W); }
     catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
@@ -258,7 +258,7 @@ function koerTest(W) {
     overskrift("7. Sproget");
     var tekster = [].concat(
         D.STOFFER.map(function (s) { return s.fakta; }),
-        alleHints, alleBeskeder,
+        alleHints, alleBeskeder, D.INTRO, D.INTRO_BAAND,
         D.HYLDE_ROS, D.HYLDE_ROS_STJERNER, [D.LAGER_FAERDIGT],
         Object.keys(D.SLUT_REPLIK).map(function (k) { return D.SLUT_REPLIK[k]; }),
         [d.body.innerText]
@@ -267,11 +267,47 @@ function koerTest(W) {
     paastand("ingen tankestreger", tankestreg.length === 0, tankestreg.slice(0, 2).join(" | "));
     var ettal = tekster.filter(function (t) { return /(^|[^\d(])1[+−-](?![\d])/.test(t) || /¹[⁺⁻]/.test(t); });
     paastand("ingen ladning skrevet som 1+ eller 1−", ettal.length === 0, ettal.slice(0, 2).join(" | "));
-    var lange = [].concat(D.HYLDE_ROS, D.HYLDE_ROS_STJERNER, [D.LAGER_FAERDIGT],
+    var lange = [].concat(D.HYLDE_ROS, D.HYLDE_ROS_STJERNER, [D.LAGER_FAERDIGT], D.INTRO, D.INTRO_BAAND,
         Object.keys(D.SLUT_REPLIK).map(function (k) { return D.SLUT_REPLIK[k]; })).filter(function (t) { return t.length > 72; });
     paastand("Kemichaels replikker er korte", lange.length === 0, lange.join(" | "));
 
-    overskrift("8. Lageret kan gennemføres");
+    overskrift("8. Kemichaels præsentation og etiketmaskinens display");
+    function kør(sim, sek) { for (var n = 0; n < Math.round(sek * 60); n++) sim.opdater(1 / 60); }
+    L.springIntro();
+    kør(L, 3);
+    L.startIntro(true);
+    kør(L, 0.3);
+    paastand("K starter præsentationen, og Spring over vises", L.laererIIntro() && !d.getElementById("lager-spring").hidden);
+    kør(L, 6);
+    paastand("han peger på feltet, mens han siger, at svarene skrives dér",
+        L.introTrin === 2 && L.aktivtFelt().feltEl.classList.contains("peg"), "trin " + L.introTrin);
+    L.springIntro();
+    kør(L, 0.1);
+    paastand("Spring over sender ham ud med det samme", !L.laererIIntro() && !(L.laerer.taleUr > 0) &&
+        d.getElementById("lager-spring").hidden && !L.aktivtFelt().feltEl.classList.contains("peg"),
+        "intro " + L.laererIIntro() + ", taleUr " + L.laerer.taleUr + ", skjult " + d.getElementById("lager-spring").hidden +
+        ", peg " + L.aktivtFelt().feltEl.classList.contains("peg") + ", scene " + (L.laerer.scene && L.laerer.scene.navn));
+    kør(L, 4);
+    L.startIntro(true);
+    kør(L, 0.3);
+    var feltInput = L.aktivtFelt().input;
+    feltInput.value = "N";
+    feltInput.dispatchEvent(new W.Event("input"));
+    paastand("et tastetryk i feltet sender ham også ud", !L.laererIIntro());
+    feltInput.value = "";
+    kør(L, 4);
+    L.fokuseret = false;
+    paastand("displayet peger på feltet til højre, når markøren ikke står i det", /til højre/.test(L.displayIndhold().tom));
+    L.fokuseret = true;
+    paastand("displayet siger, hvad der skal skrives, når markøren står i feltet", L.displayIndhold().tom === "Skriv ionen for natrium",
+        L.displayIndhold().tom);
+    L.fokuseret = false;
+    paastand("præsentationen kommer kun af sig selv første gang", (function () {
+        L.startIntro(false);
+        return !(L.introVent > 0);
+    }()));
+
+    overskrift("9. Lageret kan gennemføres");
     function svar(v) { var f = L.aktivtFelt(); f.input.value = v; L.tjek(); }
     function rigtigtSvar(f) {
         var s = L.opg.st;
@@ -332,7 +368,7 @@ function koerTest(W) {
     L.knap();
     paastand("Øv glasset igen giver en tom opgave", !L.opg.gennemsyn && L.opg.k === 0 && L.aktivtFelt().status === "aktiv");
 
-    overskrift("9. Samlebåndet");
+    overskrift("10. Samlebåndet");
     d.querySelector('.faneknap[data-fane="fane-baand"]').click();
     B.tilpas();
     B.start();
@@ -365,7 +401,7 @@ function koerTest(W) {
     B.nulstil();
     d.querySelector('.faneknap[data-fane="fane-lager"]').click();
 
-    overskrift("10. Layoutet på små og store skærme");
+    overskrift("11. Layoutet på små og store skærme");
     [[520, 380], [700, 560], [980, 760], [1500, 900]].forEach(function (m) {
         L.L.b = m[0]; L.L.h = m[1];
         L.layout();

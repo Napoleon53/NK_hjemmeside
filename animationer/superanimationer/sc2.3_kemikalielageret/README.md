@@ -62,14 +62,26 @@ HCO₃⁻ kommer på plakaten, og samlebåndet trækker fra det samme sæt. Kont
 fremskridtet huskes for alle 36 stoffer, så intet går tabt ved at slå den til
 og fra.
 
-**Kemichael** kommer på besøg, når en hylde er færdig, og når spillet er slut.
-Kaffekoppen på arbejdsbordet er det fælles påskeæg.
+**Kemichael** præsenterer fanen første gang, den åbnes i en browser: på lageret
+tre korte replikker (han peger over på panelet, mens han siger, at svarene
+skrives dér, og feltet lyser op), ved samlebåndet to. Scenen låser ikke. Knappen
+Spring over, et klik på scenen, et tastetryk og Esc sender ham ud med det samme,
+og <kbd>K</kbd> viser præsentationen igen. Replikkerne står i `D.INTRO` og
+`D.INTRO_BAAND` i `js/data.js`. Ellers kommer han på besøg, når en hylde er
+færdig, og når spillet er slut. Kaffekoppen på arbejdsbordet er det fælles
+påskeæg.
+
+**Etiketmaskinen** viser det, der skrives, som det kommer til at se ud. Står
+markøren ikke i et felt, siger displayet "Skriv i feltet til højre →"; står den
+i et felt, siger det, hvad der skal skrives ("Skriv ionen for natrium"). Et klik
+på maskinen sætter markøren i feltet.
 
 Direkte link: `index.html#baand` giver samlebåndet.
 
 Genveje: <kbd>1</kbd> <kbd>2</kbd> faner · <kbd>P</kbd> periodisk system ·
 <kbd>I</kbd> sammensatte ioner · <kbd>R</kbd> start glasset eller spillet forfra ·
-<kbd>H</kbd> rundvisning · <kbd>Enter</kbd> næste glas · <kbd>Esc</kbd> luk.
+<kbd>H</kbd> rundvisning · <kbd>K</kbd> Kemichaels præsentation · <kbd>Enter</kbd> næste glas ·
+<kbd>Esc</kbd> luk eller send Kemichael ud.
 
 ### Det nye i forhold til den gamle animation
 

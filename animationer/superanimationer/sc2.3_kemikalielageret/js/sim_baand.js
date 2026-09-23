@@ -186,6 +186,7 @@
     };
 
     P.start = function () {
+        this.springIntro();
         this.nulstilSpil();
         this.tilstand = "koerer";
         this.visBanner();
@@ -349,6 +350,7 @@
             }
         }
         if (this.opdaterLaerer) this.opdaterLaerer(dt);
+        this.opdaterIntro(dt);
     };
 
     P.tegn = function () {
@@ -485,10 +487,37 @@
         else if (this.tilstand === "pause") v.tom = "Pause. Enter: fortsæt";
         else if (forreste) {
             v.tekst = Tj.pynt(raa, forreste.retning === "formel" ? "formel" : "navn");
-            v.tom = forreste.retning === "formel" ? "formlen?" : "navnet?";
+            v.tom = forreste.retning === "formel" ? "Skriv formlen, og tryk Enter" : "Skriv navnet, og tryk Enter";
         }
         v.markoer = this.fokuseret && Math.floor(this.tid * 2) % 2 === 0;
         return v;
+    };
+
+    /* ----- Kemichaels praesentation ------------------------------------------
+       Foerste gang fanen aabnes, foer spillet er startet (og igen med K).
+       Start, et klik, et tastetryk og Esc sender ham ud. */
+    P.startIntro = function (tving) {
+        if (!this.laererIntro || this.tilstand !== "klar") return;
+        if (!tving && NK.hent("nk-sc2.3-intro2", false)) return;
+        NK.gem("nk-sc2.3-intro2", true);
+        this.introVent = tving ? 0.1 : 0.7;
+    };
+
+    P.springIntro = function () {
+        this.introVent = 0;
+        return !!(this.laererIntroVaek && this.laererIntroVaek());
+    };
+
+    P.opdaterIntro = function (dt) {
+        if (this.introVent > 0) {
+            this.introVent -= dt;
+            if (this.introVent <= 0 && this.laererIntro && this.tilstand === "klar") this.laererIntro();
+        }
+        var iIntro = !!(this.laererIIntro && this.laererIIntro());
+        if (iIntro !== this.visesSpring) {
+            this.visesSpring = iIntro;
+            NK.el("baand-spring").hidden = !iIntro;
+        }
     };
 
     /* ----- Indtastning og mus -------------------------------------------------- */
@@ -505,7 +534,9 @@
         });
         this.input.addEventListener("input", function () {
             mig.taster.push({ i: Math.floor(Math.random() * 30), a: 1 });
+            mig.springIntro();
         });
+        NK.el("baand-spring").addEventListener("click", function () { mig.springIntro(); mig.fokus(); });
         this.input.addEventListener("focus", function () { mig.fokuseret = true; });
         this.input.addEventListener("blur", function () { mig.fokuseret = false; });
         NK.el("baand-knap").addEventListener("click", function () { mig.knap(); });
@@ -519,6 +550,7 @@
         });
         c.addEventListener("click", function (e) {
             var pt = mig.L.punkt(e);
+            if (mig.springIntro()) { mig.fokus(); return; }
             if (mig.laererKlik && mig.laererKlik(pt.x, pt.y)) return;
             mig.fokus();
         });

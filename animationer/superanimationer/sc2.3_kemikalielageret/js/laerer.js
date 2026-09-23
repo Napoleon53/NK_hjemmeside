@@ -72,6 +72,52 @@
 
     function replikTid(tekst) { return K.taleTid(tekst) + 0.4; }
 
+    /* ----- Praesentationen ------------------------------------------------
+       Han gaar ind, siger sine linjer og gaar igen. Scenen laaser ikke:
+       man kan skrive og klikke hele tiden, og det foerste klik eller
+       tastetryk sender ham ud med det samme (laererIntroVaek). Fanen
+       saetter this.introTrin, saa den kan pege med det, han taler om. */
+    function introTrin(sim, linjer, standX, peg) {
+        var trin = [
+            { udtryk: { vrede: 0, humoer: 0.35, roed: 0, skeptisk: 0.3, briller: 0 } },
+            { gaa: standX },
+            { tid: 0.2 }
+        ];
+        linjer.forEach(function (l, i) {
+            trin.push({ kald: function () { sim.introTrin = i + 1; } });
+            if (peg && i === peg.linje) trin.push({ arm: peg.vinkel, tid: 0.45 });
+            trin.push({ sig: l, vis: replikTid(l), tid: replikTid(l) });
+            if (peg && i === peg.linje) trin.push({ arm: HAENGER, tid: 0.35 });
+        });
+        return trin.concat([
+            { taleFaerdig: true },
+            { udtryk: { skeptisk: 0, humoer: 0 } },
+            { kald: function () { sim.introTrin = 0; } },
+            { gaa: UDE }
+        ]);
+    }
+
+    function introVaek(P) {
+        P.laererIntroVaek = function () {
+            var L = this.laerer;
+            if (!L || !L.scene || L.scene.navn !== "intro") return false;
+            L.tale = "";
+            L.taleUr = 0;
+            L.taleAlfa = 0;
+            this.introTrin = 0;
+            this.laererKoer("introUd", [
+                { arm: HAENGER, tid: 0.15 },
+                { udtryk: { skeptisk: 0, humoer: 0 } },
+                { gaa: UDE, loeb: true }
+            ], false);
+            return true;
+        };
+        P.laererIIntro = function () {
+            var L = this.laerer;
+            return !!(L && L.scene && L.scene.navn === "intro");
+        };
+    }
+
     /* ----- Fane 1: lageret ----------------------------------------------- */
     var PL = NK.SimLager.prototype;
     kobl(PL, {
@@ -90,6 +136,20 @@
     PL.laererPladsPx = function () {
         return this.lay ? this.lay.W * 0.82 : 700;
     };
+
+    /* Praesentationen paa lageret: han staar midt paa bordet og peger over
+       paa panelet, mens han siger, at svarene skrives dér */
+    PL.laererIntro = function () {
+        if (!this.laerer) return;
+        var mig = this;
+        this.laererKoer("intro", introTrin(this, D.INTRO,
+            function () { return mig.lay ? mig.lay.W * 0.47 / mig.laererLaerredSkala() : 450; },
+            { linje: 1, vinkel: function () {
+                var s = mig.laererLaerredSkala();
+                return mig.pegVinkel(mig.L.b / s + 60, mig.L.h * 0.25 / s);
+            } }), false);
+    };
+    introVaek(PL);
 
     /* En hel hylde har faaet etiketter: han loefter fingeren og roser toert.
        Han peger ikke paa reolen, for den staar til venstre for ham, og
@@ -120,6 +180,23 @@
     PB.laererPladsPx = function () {
         return this.lay ? this.lay.W * 0.62 : 600;
     };
+
+    /* Praesentationen ved samlebaandet: han staar til venstre for
+       etiketmaskinen og peger ned paa den */
+    PB.laererIntro = function () {
+        if (!this.laerer) return;
+        var mig = this;
+        this.laererKoer("intro", introTrin(this, D.INTRO_BAAND,
+            function () {
+                var lay = mig.lay, s = mig.laererLaerredSkala();
+                return lay ? Math.max(120, lay.maskine.x - 90) / s : 200;
+            },
+            { linje: 1, vinkel: function () {
+                var lay = mig.lay, s = mig.laererLaerredSkala();
+                return lay ? mig.pegVinkel((lay.maskine.x + lay.maskine.b * 0.4) / s, (lay.maskine.y + 20) / s) : 2;
+            } }), false);
+    };
+    introVaek(PB);
 
     PB.laererSlut = function (art) {
         var L = this.laerer;
