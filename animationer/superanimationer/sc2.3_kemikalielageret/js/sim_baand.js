@@ -104,6 +104,17 @@
         lay.kasse = { x: W - kb - Math.max(8, W * 0.012), y: lay.baandY + 30 - 34 * kk, b: kb };
         lay.kasseBund = lay.kasse.y + 130 * kk;
 
+        /* Plakaterne haenger i en soejle til hoejre over kassen, og hylden
+           foroven slutter foer dem */
+        var pb = Math.min(W * 0.17, 200), px = W - pb - Math.max(10, W * 0.015);
+        lay.hyldeX1 = px - 16;
+        var ptH = NK.klamp(pb * 0.62, 70, 130);
+        var ionH = NK.klamp(lay.kasse.y - 26 - (14 + ptH + 16), 70, 190);
+        lay.plakater = {
+            pt: { x: px, y: 14, b: pb, h: ptH },
+            ioner: { x: px + pb * 0.06, y: 14 + ptH + 16, b: pb * 0.88, h: ionH }
+        };
+
         var mb = NK.klamp(W * 0.36, 250, 380);
         var mh = mb * 150 / 240;
         lay.maskine = { x: Math.max(12, W * 0.4 - mb / 2), y: lay.bordY - mh * 0.95, b: mb };
@@ -132,7 +143,8 @@
 
         this.saetAnker("baand-anker-baand", 0, lay.baandY - lay.glasH - 30, lay.x1, lay.glasH + 60);
         this.saetAnker("baand-anker-kasse", lay.kasse.x - 6, lay.kasse.y - 6, kb + 12, lay.kasseBund - lay.kasse.y + 12);
-        this.saetAnker("baand-anker-hylde", 8, lay.hyldeY - lay.lilleH - 8, W - 16, lay.lilleH + 24);
+        this.saetAnker("baand-anker-hylde", 8, lay.hyldeY - lay.lilleH - 8, lay.hyldeX1 - 8, lay.lilleH + 24);
+        this.saetAnker("baand-anker-plakater", px - 6, 8, pb + 12, lay.plakater.ioner.y + lay.plakater.ioner.h - 2);
     };
 
     P.saetAnker = function (id, x, y, b, h) {
@@ -359,21 +371,31 @@
         var mig = this;
         Tg.rum(ctx, lay.W, lay.H, lay.bordY + 4);
 
+        /* Plakaterne, de samme som paa lageret */
+        ["pt", "ioner"].forEach(function (slags) {
+            var p = lay.plakater[slags];
+            Tg.plakat(ctx, p.x, p.y, p.b, p.h, slags, {
+                vinkel: slags === "pt" ? -0.012 : 0.018,
+                lys: mig.over && mig.over.slags === "plakat" && mig.over.i === slags ? 1 : 0
+            });
+        });
+
         /* Hylden foroven med de glas, der har faaet etiket */
+        var hb = lay.hyldeX1 - 8;
         ctx.fillStyle = "#8a6240";
-        ctx.fillRect(8, lay.hyldeY, lay.W - 16, 5);
+        ctx.fillRect(8, lay.hyldeY, hb, 5);
         ctx.fillStyle = "#6b4a2e";
-        ctx.fillRect(8, lay.hyldeY + 5, lay.W - 16, 8);
+        ctx.fillRect(8, lay.hyldeY + 5, hb, 8);
         ctx.fillStyle = "rgba(0, 0, 0, 0.28)";
-        ctx.fillRect(8, lay.hyldeY + 13, lay.W - 16, 4);
+        ctx.fillRect(8, lay.hyldeY + 13, hb, 4);
         var lb = Tg.glasBredde(lay.lilleH) * 1.08;
-        var plads = Math.max(1, Math.floor((lay.W - 40) / lb));
+        var plads = Math.max(1, Math.floor((hb - 24) / lb));
         var vis = this.paaHylden.slice(-plads);
         vis.forEach(function (st, i) {
             Tg.glas(ctx, 24 + lb * (i + 0.5), lay.hyldeY, lay.lilleH, st, { etiket: "ny", bredEtiket: true, tekst: true });
         });
         if (!this.paaHylden.length) {
-            NK.tekst(ctx, "Glas med ny etiket kommer op på hylden her.", lay.W / 2, lay.hyldeY - lay.lilleH / 2,
+            NK.tekst(ctx, "Glas med ny etiket kommer op på hylden her.", 8 + hb / 2, lay.hyldeY - lay.lilleH / 2,
                 { justering: "center", linje: "middle", farve: "rgba(169, 176, 186, 0.55)", font: "italic 600 13px 'Segoe UI', sans-serif" });
         }
 
@@ -495,7 +517,8 @@
 
     /* ----- Kemichaels praesentation ------------------------------------------
        Foerste gang fanen aabnes, foer spillet er startet (og igen med K).
-       Start, et klik, et tastetryk og Esc sender ham ud. */
+       Knappen Spring praesentationen over, to klik paa ham, Esc og Start
+       sender ham ud; andre klik og tastetryk goer ikke. */
     P.startIntro = function (tving) {
         if (!this.laererIntro || this.tilstand !== "klar") return;
         if (!tving && NK.hent("nk-sc2.3-intro2", false)) return;
@@ -534,7 +557,6 @@
         });
         this.input.addEventListener("input", function () {
             mig.taster.push({ i: Math.floor(Math.random() * 30), a: 1 });
-            mig.springIntro();
         });
         NK.el("baand-spring").addEventListener("click", function () { mig.springIntro(); mig.fokus(); });
         this.input.addEventListener("focus", function () { mig.fokuseret = true; });
@@ -542,16 +564,32 @@
         NK.el("baand-knap").addEventListener("click", function () { mig.knap(); });
     };
 
+    /* Det, musen er over: laereren eller en af plakaterne */
+    P.hvadErUnder = function (pt) {
+        if (!this.lay) return null;
+        if (this.laererUnder && this.laererUnder(pt.x, pt.y)) return { slags: "laerer" };
+        var pl = this.lay.plakater;
+        for (var navn in pl) {
+            if (!Object.prototype.hasOwnProperty.call(pl, navn)) continue;
+            var p = pl[navn];
+            if (pt.x >= p.x && pt.x <= p.x + p.b && pt.y >= p.y && pt.y <= p.y + p.h) return { slags: "plakat", i: navn };
+        }
+        return null;
+    };
+
     P.koblMus = function () {
         var mig = this, c = this.L.canvas;
         c.addEventListener("pointermove", function (e) {
-            var pt = mig.L.punkt(e);
-            c.style.cursor = mig.laererUnder && mig.laererUnder(pt.x, pt.y) ? "pointer" : "default";
+            mig.over = mig.hvadErUnder(mig.L.punkt(e));
+            c.style.cursor = mig.over ? "pointer" : "default";
         });
+        c.addEventListener("pointerleave", function () { mig.over = null; c.style.cursor = "default"; });
         c.addEventListener("click", function (e) {
             var pt = mig.L.punkt(e);
-            if (mig.springIntro()) { mig.fokus(); return; }
+            if (mig.laererIntroKlik && mig.laererIntroKlik(pt.x, pt.y)) return;
             if (mig.laererKlik && mig.laererKlik(pt.x, pt.y)) return;
+            var u = mig.hvadErUnder(pt);
+            if (u && u.slags === "plakat") { NK.Opslag.aabn(u.i, null); return; }
             mig.fokus();
         });
     };

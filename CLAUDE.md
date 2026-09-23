@@ -62,6 +62,12 @@ sync; denne er færdig.
 - Skal en superanimation bygges eller rettes, så læs
   `animationer/superanimationer/README.md` først. Afsnittet "Bestillingen, før
   der skrives kode" er bindende.
+- Kemichael præsenterer hver fane (hvert rum) i en superanimation første gang,
+  den åbnes: to eller tre korte replikker, der ikke låser fanen. Han går kun, når
+  eleven vil det: den store knap "Spring præsentationen over", to klik direkte
+  på ham eller Esc, aldrig ved et tilfældigt klik eller tastetryk. Reglen står i
+  superanimationernes README under "Kemichael præsenterer hvert rum"; mønster
+  `sc2.3_kemikalielageret`.
 - Punkterne om superlab-animationer, `laboratoriet/` og `kemichael/`
   gælder i NK_Undervisning, ikke her: de mapper er frosne (se ovenfor).
   Punkterne om superanimationer gælder som hidtil og arbejdes i

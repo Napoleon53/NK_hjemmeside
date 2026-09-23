@@ -64,12 +64,20 @@ og fra.
 
 **Kemichael** præsenterer fanen første gang, den åbnes i en browser: på lageret
 tre korte replikker (han peger over på panelet, mens han siger, at svarene
-skrives dér, og feltet lyser op), ved samlebåndet to. Scenen låser ikke. Knappen
-Spring over, et klik på scenen, et tastetryk og Esc sender ham ud med det samme,
-og <kbd>K</kbd> viser præsentationen igen. Replikkerne står i `D.INTRO` og
+skrives dér, og feltet lyser op), ved samlebåndet to. Scenen låser ikke: man kan
+klikke og skrive, mens han taler. Han går kun ved den store knap "Spring
+præsentationen over", to klik direkte på ham (det første får knappen til at
+blinke) eller Esc, og på samlebåndet også ved Start. <kbd>K</kbd> viser
+præsentationen igen. Det er reglen for alle superanimationer (se
+`../README.md`, "Kemichael præsenterer hvert rum"). Replikkerne står i `D.INTRO` og
 `D.INTRO_BAAND` i `js/data.js`. Ellers kommer han på besøg, når en hylde er
 færdig, og når spillet er slut. Kaffekoppen på arbejdsbordet er det fælles
 påskeæg.
+
+**Plakaterne** med det periodiske system og de sammensatte ioner hænger på
+væggen i begge faner og åbnes i stort format med et klik (eller <kbd>P</kbd> og
+<kbd>I</kbd>). Panelerne har ingen knapper til opslag. På samlebåndet kører
+båndet videre, mens man slår op.
 
 **Etiketmaskinen** viser det, der skrives, som det kommer til at se ud. Står
 markøren ikke i et felt, siger displayet "Skriv i feltet til højre →"; står den

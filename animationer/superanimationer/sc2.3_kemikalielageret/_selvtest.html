@@ -283,18 +283,31 @@ function koerTest(W) {
         L.introTrin === 2 && L.aktivtFelt().feltEl.classList.contains("peg"), "trin " + L.introTrin);
     L.springIntro();
     kør(L, 0.1);
-    paastand("Spring over sender ham ud med det samme", !L.laererIIntro() && !(L.laerer.taleUr > 0) &&
+    paastand("Spring præsentationen over sender ham ud med det samme", !L.laererIIntro() && !(L.laerer.taleUr > 0) &&
         d.getElementById("lager-spring").hidden && !L.aktivtFelt().feltEl.classList.contains("peg"),
         "intro " + L.laererIIntro() + ", taleUr " + L.laerer.taleUr + ", skjult " + d.getElementById("lager-spring").hidden +
         ", peg " + L.aktivtFelt().feltEl.classList.contains("peg") + ", scene " + (L.laerer.scene && L.laerer.scene.navn));
     kør(L, 4);
     L.startIntro(true);
-    kør(L, 0.3);
+    kør(L, 3.5);
     var feltInput = L.aktivtFelt().input;
     feltInput.value = "N";
     feltInput.dispatchEvent(new W.Event("input"));
-    paastand("et tastetryk i feltet sender ham også ud", !L.laererIIntro());
+    paastand("et tastetryk i feltet sender ham ikke ud", L.laererIIntro());
     feltInput.value = "";
+    function klikPaa(sim, px, py) {
+        var r = sim.L.canvas.getBoundingClientRect();
+        sim.L.canvas.dispatchEvent(new W.MouseEvent("click", { clientX: r.left + px, clientY: r.top + py, bubbles: true }));
+    }
+    klikPaa(L, L.lay.reol.x + 2, L.lay.bordY - 4);
+    paastand("et klik på scenen ved siden af ham sender ham ikke ud", L.laererIIntro());
+    var ls = L.laererLaerredSkala(), lr = L.laererRekt();
+    var mx = (lr.x + lr.b / 2) * ls, my = (lr.y + 140) * ls;
+    klikPaa(L, mx, my);
+    paastand("første klik på ham: han bliver, og knappen blinker", L.laererIIntro() &&
+        d.getElementById("lager-spring").classList.contains("puf"), "rammer ham: " + L.laererUnder(mx, my));
+    klikPaa(L, mx, my);
+    paastand("andet klik på ham sender ham ud", !L.laererIIntro());
     kør(L, 4);
     L.fokuseret = false;
     paastand("displayet peger på feltet til højre, når markøren ikke står i det", /til højre/.test(L.displayIndhold().tom));
@@ -306,6 +319,16 @@ function koerTest(W) {
         L.startIntro(false);
         return !(L.introVent > 0);
     }()));
+    paastand("panelerne har ikke længere knapper til opslag; plakaterne i scenen bruges",
+        d.querySelectorAll("[data-opslag]").length === 0);
+    [[700, 560], [1000, 760]].forEach(function (m) {
+        B.L.b = m[0]; B.L.h = m[1];
+        B.layout();
+        var pl = B.lay.plakater;
+        paastand(m[0] + " x " + m[1] + ": samlebåndet har også de to plakater, inden for scenen og over kassen",
+            pl.pt.x + pl.pt.b <= B.lay.W && pl.ioner.y + pl.ioner.h < B.lay.kasse.y && B.lay.hyldeX1 < pl.pt.x);
+    });
+    B.L.b = 0;
 
     overskrift("9. Lageret kan gennemføres");
     function svar(v) { var f = L.aktivtFelt(); f.input.value = v; L.tjek(); }

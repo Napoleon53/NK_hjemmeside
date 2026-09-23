@@ -16,7 +16,7 @@ fil er superanimationernes egen udgave: alt, der gælder her, står her.
 | Eleven | bygger, skruer, forudsiger og spiller | udfører forsøget selv, trin for trin |
 | Form | op til fire faner med hver sin vinkel på samme idé | én scene med en rigtig opstilling, normalt uden faner |
 | Kode | selvstændig mappe med egen kerne | står på den fælles motor i `../v2/laboratoriet/` |
-| Kemichael | kan komme på besøg | fast bestanddel |
+| Kemichael | præsenterer hver fane og kan komme på besøg | fast bestanddel |
 
 Begge er selvbærende: eleven kan bruge dem alene, uden at emnet er gennemgået på
 tavlen først. Det er det, der gør dem super, ikke at de er store eller ligger i
@@ -176,6 +176,28 @@ den må aldrig stå i vejen for pointen.
   tegningen.
 * Mønster at læse først: `sc1.1_atombygger` og `sb3.2_titreringssimulator`.
 
+## Kemichael præsenterer hvert rum
+
+Hver fane (hvert rum) har en kort præsentation ved Kemichael. Første gang fanen
+åbnes i en browser, går han ind, siger, hvor man er, og hvad man skal, og går
+igen. Mønster: `sc2.3_kemikalielageret` (`laererIntro` og `introVaek` i
+`js/laerer.js`, `startIntro` og `opdaterIntro` i fanerne).
+
+* To eller tre replikker på højst ca. 60 tegn: hvor man er, hvad man gør, og
+  gerne en tør bemærkning til sidst. Han forklarer ikke teori.
+* Han peger på det, han taler om, og det lyser op, fx feltet, man skriver i.
+* Præsentationen låser ikke fanen. Man kan klikke og skrive, mens han taler,
+  uden at han forsvinder.
+* Han går kun, når eleven vil det: den store knap "Spring præsentationen over"
+  midt foroven i scenen, to klik direkte på ham eller Esc. Det første klik på ham
+  får knappen til at blinke. Et klik andre steder og tastetryk sender ham ikke ud.
+* Den kommer af sig selv én gang pr. fane pr. browser (huskes i `localStorage`),
+  og <kbd>K</kbd> viser den igen, fx når læreren vil vise den for klassen.
+* Replikkerne står som data (`D.INTRO` i `js/data.js`), ikke inde i scenen.
+
+Reglen kom til med `sc2.3` i september 2026. De ældre superanimationer har den
+ikke endnu og får den, næste gang de bygges om.
+
 ## Fælles opbygning
 
 * **Mappe:** en ny superanimation lægges her i `superanimationer/`. Stier ud af
@@ -209,6 +231,7 @@ den må aldrig stå i vejen for pointen.
 - [ ] Quizzens forkerte svar er de fejl, elever faktisk laver.
 - [ ] Sproget er kort og uden tankestreger, talesprog og 1+/1−.
 - [ ] Humoren rammer handlingen, aldrig eleven.
+- [ ] Kemichael præsenterer hver fane første gang og går kun, når eleven vil det.
 - [ ] `_selvtest.html` er grøn, og siden virker fra harddisken.
 - [ ] Brugeren har sagt, at den skal i menuen.
 

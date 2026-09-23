@@ -474,7 +474,6 @@
 
     P.tast = function () {
         this.taster.push({ i: Math.floor(Math.random() * 30), a: 1 });
-        this.springIntro();
     };
 
     P.tjek = function () {
@@ -571,7 +570,8 @@
 
     /* ----- Kemichaels praesentation ------------------------------------------
        Foerste gang fanen aabnes i en browser (og igen med K). Knappen Spring
-       over, et klik paa scenen, et tastetryk i feltet og Esc sender ham ud. */
+       praesentationen over, to klik paa ham og Esc sender ham ud. Man kan
+       skrive og klikke paa scenen, mens han taler, uden at han gaar. */
     P.startIntro = function (tving) {
         if (!this.laererIntro) return;
         if (!tving && NK.hent("nk-sc2.3-intro", false)) return;
@@ -976,7 +976,7 @@
         c.addEventListener("pointerleave", function () { mig.over = null; c.style.cursor = "default"; });
         c.addEventListener("click", function (e) {
             var pt = mig.L.punkt(e);
-            if (mig.springIntro()) return;
+            if (mig.laererIntroKlik && mig.laererIntroKlik(pt.x, pt.y)) return;
             if (mig.laererKlik && mig.laererKlik(pt.x, pt.y)) return;
             var u = mig.hvadErUnder(pt);
             if (!u) return;

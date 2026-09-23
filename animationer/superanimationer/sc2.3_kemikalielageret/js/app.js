@@ -113,12 +113,6 @@
         }
         for (var i = 0; i < knapper.length; i++) bindFane(knapper[i]);
 
-        var opslagKnapper = document.querySelectorAll("[data-opslag]");
-        function bindOpslag(knap) {
-            knap.addEventListener("click", function () { opslag(knap.getAttribute("data-opslag")); });
-        }
-        for (i = 0; i < opslagKnapper.length; i++) bindOpslag(opslagKnapper[i]);
-
         var lukKnapper = document.querySelectorAll("[data-luk]");
         for (i = 0; i < lukKnapper.length; i++) lukKnapper[i].addEventListener("click", lukAlle);
         var overlays = document.querySelectorAll(".overlay");

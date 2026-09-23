@@ -29,6 +29,7 @@
             { sel: "#baand-anker-baand", titel: "Samlebåndet", tekst: "Glassene kører mod kassen. Pilen viser det forreste glas." },
             { sel: "#baand-lcd", titel: "Etiketmaskinen", tekst: "Skriv den halvdel af etiketten, der mangler på det forreste glas, og tryk Enter." },
             { sel: "#baand-anker-kasse", titel: "Kassen", tekst: "Et glas, der når kassen, koster et liv. Efter tre er spillet slut." },
+            { sel: "#baand-anker-plakater", titel: "Plakaterne", tekst: "De samme som på lageret. Klik for at slå op, men båndet kører imens." },
             { sel: "#baand-knap", titel: "Start", tekst: "Hvert femte rigtige svar giver et nyt niveau. Til sidst går det hurtigere." }
         ]
     };

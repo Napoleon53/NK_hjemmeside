@@ -74,11 +74,13 @@
 
     /* ----- Praesentationen ------------------------------------------------
        Han gaar ind, siger sine linjer og gaar igen. Scenen laaser ikke:
-       man kan skrive og klikke hele tiden, og det foerste klik eller
-       tastetryk sender ham ud med det samme (laererIntroVaek). Fanen
-       saetter this.introTrin, saa den kan pege med det, han taler om. */
+       man kan skrive og klikke hele tiden, uden at han forsvinder. Han gaar
+       kun, naar eleven vil det: knappen Spring praesentationen over, to klik
+       direkte paa ham eller Esc (laererIntroVaek). Fanen saetter
+       this.introTrin, saa den kan pege med det, han taler om. */
     function introTrin(sim, linjer, standX, peg) {
         var trin = [
+            { kald: function () { sim.introKlikTal = 0; } },
             { udtryk: { vrede: 0, humoer: 0.35, roed: 0, skeptisk: 0.3, briller: 0 } },
             { gaa: standX },
             { tid: 0.2 }
@@ -97,7 +99,24 @@
         ]);
     }
 
-    function introVaek(P) {
+    /* knapId: knappen Spring praesentationen over paa fanen */
+    function introVaek(P, knapId) {
+        /* Et klik under praesentationen: rammer det ham, taeller det. Andet
+           klik paa ham sender ham ud, det foerste faar knappen til at blinke.
+           Klik andre steder gaar videre til fanen som ellers. */
+        P.laererIntroKlik = function (px, py) {
+            if (!this.laererIIntro() || !this.laererUnder(px, py)) return false;
+            this.introKlikTal = (this.introKlikTal || 0) + 1;
+            if (this.introKlikTal >= 2) {
+                this.laererIntroVaek();
+            } else {
+                var k = NK.el(knapId);
+                k.classList.remove("puf");
+                void k.offsetWidth;
+                k.classList.add("puf");
+            }
+            return true;
+        };
         P.laererIntroVaek = function () {
             var L = this.laerer;
             if (!L || !L.scene || L.scene.navn !== "intro") return false;
@@ -149,7 +168,7 @@
                 return mig.pegVinkel(mig.L.b / s + 60, mig.L.h * 0.25 / s);
             } }), false);
     };
-    introVaek(PL);
+    introVaek(PL, "lager-spring");
 
     /* En hel hylde har faaet etiketter: han loefter fingeren og roser toert.
        Han peger ikke paa reolen, for den staar til venstre for ham, og
@@ -196,7 +215,7 @@
                 return lay ? mig.pegVinkel((lay.maskine.x + lay.maskine.b * 0.4) / s, (lay.maskine.y + 20) / s) : 2;
             } }), false);
     };
-    introVaek(PB);
+    introVaek(PB, "baand-spring");
 
     PB.laererSlut = function (art) {
         var L = this.laerer;

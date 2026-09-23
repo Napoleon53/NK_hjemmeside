@@ -576,6 +576,18 @@
             var linjer = D.plakatIoner(NK.indstil.svaer).map(function (id) { return D.ion(id); });
             var lh = ih / linjer.length;
             var px = NK.klamp(lh * 0.7, 7, 13);
+            /* Formel og navn skal kunne staa paa samme linje med luft imellem */
+            function bredest(s) {
+                var m = 0;
+                linjer.forEach(function (ion) {
+                    ctx.font = font("700", s);
+                    var b1 = ctx.measureText(ion.tekst).width;
+                    ctx.font = font("600", s);
+                    m = Math.max(m, b1 + ctx.measureText(ion.navn).width + 10);
+                });
+                return m;
+            }
+            while (px >= 10 && bredest(px) > ib - 4) px -= 0.5;
             linjer.forEach(function (ion, i) {
                 var ly = iy + lh * (i + 0.5);
                 if (px >= 10) {
