@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="170" height="130" viewBox="0 0 170 130">
+  <!-- Aaben papkasse. Kanten, glassene falder ned over, er y 34 mellem x 12 og 158.
+       Animationen klipper et faldende glas ved kanten og skriver maerkatets tekst
+       med midte i (85, 80). -->
+  <polygon points="12,34 20,22 150,22 158,34" fill="#5e3f1c"/>
+  <polygon points="10,34 0,14 58,20 66,34" fill="#c99b5f" stroke="#8a5f31" stroke-width="1.4" stroke-linejoin="round"/>
+  <polygon points="160,34 170,14 112,20 104,34" fill="#bf9056" stroke="#8a5f31" stroke-width="1.4" stroke-linejoin="round"/>
+  <rect x="10" y="34" width="150" height="92" rx="2" fill="#b8864f" stroke="#8a5f31" stroke-width="1.6"/>
+  <rect x="10" y="34" width="150" height="7" fill="#000000" fill-opacity="0.12"/>
+  <path d="M22 50 v66 M148 50 v66" stroke="#9c6f3d" stroke-width="1" stroke-opacity="0.6"/>
+  <rect x="38" y="62" width="94" height="36" rx="2" fill="#efe9dc" stroke="#cfc3a8" stroke-width="1" transform="rotate(-2 85 80)"/>
+</svg>

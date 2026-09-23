@@ -112,6 +112,7 @@ animation kommer først i menuen, når brugeren siger til.
 | `sc1.1_atombygger` | ja | via genvejen `kemi-c-filer/c1.1_atommodel_ioner.html` |
 | `sc2.1_salt_i_vand` | nej | menuen viser stadig den gamle c2.1 |
 | `sc2.2_saltbygger` | nej | menuen viser stadig den gamle c2.2 |
+| `sc2.3_kemikalielageret` | ja | `samling_c2.html`; den gamle c2.3 ligger i `arkiv/` |
 | `sc3.1_elektronprikformler` | ja | `samling_c3.html` og `samling_NV.html` |
 | `sc3.2_rumlig_opbygning` | nej | inaktiv: rettes ikke, før brugeren siger til |
 | `sc3.4_blandbarhed_inaktiv` | nej | ny, sept. 2026; menuen viser stadig den gamle c3.4 |

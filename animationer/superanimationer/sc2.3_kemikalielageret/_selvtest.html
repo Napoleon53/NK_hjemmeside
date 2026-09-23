@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Selvtest: sc2.3 Kemikalielageret</title>
+<style>
+    body { background:#14141a; color:#e9eef4; font-family:Consolas,monospace; font-size:13px; margin:0; padding:14px; }
+    pre { margin:0; line-height:1.4; white-space:pre-wrap; }
+    .ok { color:#7ee0a8; } .fejl { color:#f0918a; } .h { color:#f2c53d; font-weight:700; } .note { color:#9fb3c8; }
+    iframe { position:fixed; right:0; bottom:0; width:1300px; height:820px; opacity:0.001; pointer-events:none; }
+</style>
+</head>
+<body>
+<pre id="ud">Kører …</pre>
+<iframe id="ramme" src="index.html"></iframe>
+<script>
+/* =====================================================================
+   Udviklerværktøj. Indgår ikke i animationen og kan slettes.
+
+   Siden åbner index.html i en iframe og kontrollerer det, man ikke kan
+   se på et skærmbillede: at formlerne går op og er de mindste, at navne
+   og formler passer med ionerne, at svartjekket kender de rigtige svar
+   og giver den rigtige besked ved de typiske fejl, at sproget overholder
+   reglerne, og at begge faner kan gennemføres.
+
+   Chrome kigger kun ind i en iframe på file://, hvis den startes med
+   --allow-file-access-from-files. Ellers: brug en lokal server eller
+   Firefox. Testen gemmer elevens fremskridt og lægger det tilbage bagefter.
+   ===================================================================== */
+var linjer = [];
+var fejl = 0;
+function skriv(t, k) { linjer.push(k ? '<span class="' + k + '">' + t + "</span>" : t); }
+function paastand(navn, sand, note) {
+    if (sand) { skriv("  ok    " + navn, "ok"); }
+    else { fejl++; skriv("  FEJL  " + navn + (note !== undefined ? "   (" + note + ")" : ""), "fejl"); }
+}
+function note(t) { skriv("        " + t, "note"); }
+function overskrift(t) { skriv("\n" + t, "h"); }
+function vis() {
+    skriv("\n" + (fejl ? fejl + " FEJL" : "ALT OK"), fejl ? "fejl" : "ok");
+    document.getElementById("ud").innerHTML = linjer.join("\n");
+}
+
+window.addEventListener("load", function () { setTimeout(koer, 1500); });
+
+function koer() {
+    var W = document.getElementById("ramme").contentWindow;
+    var noegler = ["nk-sc2.3-lager", "nk-sc2.3-baand", "nk-sc2.3-svaer"], gemt = {};
+    try { noegler.forEach(function (n) { gemt[n] = W.localStorage.getItem(n); }); } catch (e) { /* ingen hukommelse */ }
+    try { koerTest(W); }
+    catch (e) { fejl++; skriv("\nUNDTAGELSE: " + e.message + "\n" + (e.stack || ""), "fejl"); }
+    try {
+        noegler.forEach(function (n) {
+            if (gemt[n] === null || gemt[n] === undefined) W.localStorage.removeItem(n); else W.localStorage.setItem(n, gemt[n]);
+        });
+    } catch (e) { /* ingen hukommelse */ }
+    vis();
+}
+
+function koerTest(W) {
+    var d = W.document;
+    var NK = W.NK;
+    if (NK && NK.Kemichael) NK.Kemichael.baggrundsliv(false);
+
+    overskrift("1. Indlæsning");
+    paastand("NK findes", !!NK);
+    if (!NK) return;
+    var D = NK.Data, T = NK.Tjek;
+    paastand("data.js og tjek.js er kørt", !!(D && D.STOFFER && T && T.formel));
+    paastand("begge faner er bygget", !!(NK.sims && NK.sims["fane-lager"] && NK.sims["fane-baand"]));
+    var sprites = ["pulverglas", "etiketmaskine", "kasse", "kaffekop", "laererKrop", "laererHoved", "laererArm"];
+    var mangler = sprites.filter(function (n) { return !NK.Sprites.klar(n); });
+    paastand("alle " + sprites.length + " sprites er indlæst", mangler.length === 0, "mangler: " + mangler.join(", "));
+    paastand("Kemichael er koblet på begge faner", !!(NK.sims["fane-lager"].laerer && NK.sims["fane-baand"].laerer));
+    var L = NK.sims["fane-lager"], B = NK.sims["fane-baand"];
+    var svaerKnap = d.getElementById("svaer-knap");
+    if (NK.indstil.svaer) svaerKnap.click();
+    paastand("testen starter uden sværere ioner", !NK.indstil.svaer && !svaerKnap.checked);
+
+    overskrift("2. De 30 stoffer og de 6 sværere");
+    var grund = D.aktive(false), svaere = D.STOFFER.filter(function (s) { return s.svaer; });
+    paastand("36 stoffer: 30 i grundsættet og 6 sværere", D.STOFFER.length === 36 && grund.length === 30 && svaere.length === 6);
+    [false, true].forEach(function (sv) {
+        var saet = D.aktive(sv);
+        paastand((sv ? "med" : "uden") + " sværere ioner: 10 glas på hver hylde, ét på hver plads", saet.length === 30 &&
+            [0, 1, 2].every(function (h) {
+                var paaHylde = saet.filter(function (s) { return s.hylde === h; }).map(function (s) { return s.pladsPaaHylde; }).sort(function (a, b) { return a - b; });
+                return paaHylde.join() === "0,1,2,3,4,5,6,7,8,9";
+            }));
+    });
+    var tilladt = D.GRUNDSTOFFER.slice(0, 20).map(function (g) { return g.s; }).concat(["Br", "I", "Ba", "Fe", "Cu", "Ag", "Zn"]);
+    var seks = ["NH4", "OH", "NO3", "SO4", "CO3", "PO4"];
+    var udenfor = [];
+    grund.forEach(function (s) {
+        [s.katIon, s.anIon].forEach(function (i) {
+            if (i.sammensat ? seks.indexOf(i.id) < 0 : tilladt.indexOf(i.formel) < 0) udenfor.push(s.formel + ": " + i.tekst);
+        });
+    });
+    paastand("grundsættet bruger kun grundstof 1-20, Br, I, Ba, Fe, Cu, Ag, Zn og de seks sammensatte ioner", udenfor.length === 0, udenfor.join(", "));
+    paastand("hvert sværere stof har Sr, Sn, Pb, Hg eller HCO₃⁻", svaere.every(function (s) {
+        return ["Sr", "Sn", "Pb", "Hg"].indexOf(s.katIon.formel) >= 0 || s.anIon.id === "HCO3";
+    }));
+    paastand("plakaten har HCO₃⁻ kun med sværere ioner", D.plakatIoner(false).indexOf("HCO3") < 0 && D.plakatIoner(true).indexOf("HCO3") >= 0 &&
+        D.plakatIoner(false).length === 6);
+    var ider = {};
+    D.STOFFER.forEach(function (s) { ider[s.id] = (ider[s.id] || 0) + 1; });
+    paastand("ingen stoffer er der to gange", Object.keys(ider).every(function (k) { return ider[k] === 1; }));
+    D.STOFFER.forEach(function (s) {
+        var k = s.katIon, a = s.anIon;
+        var sum = s.p * k.q + s.n * a.q;
+        var at = T.atomer(s.formel);
+        var forventet = {};
+        function laeg(ion, antal) {
+            var dele = T.atomer(ion.formel);
+            for (var e in dele) forventet[e] = (forventet[e] || 0) + dele[e] * antal;
+        }
+        laeg(k, s.p);
+        laeg(a, s.n);
+        var sammeAtomer = at && Object.keys(forventet).every(function (e) { return at[e] === forventet[e]; }) &&
+            Object.keys(at).length === Object.keys(forventet).length;
+        var parentes = /\(/.test(s.formel) === !!((k.sammensat && s.p > 1) || (a.sammensat && s.n > 1));
+        var navnOk = s.navn === k.stamme + (k.variabel ? "(" + D.ROM[k.q] + ")" : "") + a.navn;
+        paastand(s.formel + " " + s.navn + ": neutral, mindste forhold, atomer, parentes, navn",
+            sum === 0 && NK.gcd(s.p, s.n) === 1 && sammeAtomer && parentes && navnOk,
+            "ladning " + sum + ", forhold " + s.p + ":" + s.n);
+    });
+    paastand("alle har farve, form og en kort fakta-linje", D.STOFFER.every(function (s) {
+        return /^#[0-9a-f]{6}$/i.test(s.farve) && ["pulver", "krystal", "piller"].indexOf(s.form) >= 0 &&
+            s.fakta && s.fakta.length <= 70 && /\.$/.test(s.fakta);
+    }));
+    paastand("hylde 1 er navn til formel, hylde 2 formel til navn", D.STOFFER.every(function (s) {
+        return s.hylde !== 0 ? (s.hylde !== 1 || s.retning === "navn") : s.retning === "formel";
+    }));
+    paastand("hylde 2 kræver, at metallets ladning regnes ud", D.STOFFER.filter(function (s) { return s.hylde === 1; })
+        .every(function (s) { return s.katIon.beregnes; }));
+
+    overskrift("3. Ionerne og skrivemåden");
+    var ioner = Object.keys(D.IONER).map(function (id) { return D.IONER[id]; });
+    paastand("ingen ion skrives med ¹⁺ eller ¹⁻", ioner.every(function (i) { return !/¹/.test(i.tekst); }));
+    paastand("Na⁺, O²⁻, SO₄²⁻, NH₄⁺, PO₄³⁻", D.ion("Na").tekst === "Na⁺" && D.ion("O").tekst === "O²⁻" &&
+        D.ion("SO4").tekst === "SO₄²⁻" && D.ion("NH4").tekst === "NH₄⁺" && D.ion("PO4").tekst === "PO₄³⁻");
+    paastand("hovedgruppernes ladning passer med gruppen", ioner.filter(function (i) { return !i.sammensat && !i.beregnes; })
+        .every(function (i) { return i.q > 0 ? i.q === i.gruppe : i.q === i.gruppe - 8; }));
+    paastand("romertal i navnet på jern, kobber, bly, tin og kviksølv",
+        D.ion("Fe3").navn === "jern(III)ion" && D.ion("Cu1").navn === "kobber(I)ion" && D.ion("Pb4").navn === "bly(IV)ion" &&
+        D.ion("Sn2").navn === "tin(II)ion" && D.ion("Hg2").navn === "kviksølv(II)ion");
+    paastand("sølv og zink uden romertal", D.ion("Ag").navn === "sølvion" && D.ion("Zn").navn === "zinkion");
+    paastand("Sn og Pb står i hovedgruppe 4, men er markeret med flere ladninger",
+        D.hovedgruppe("Sn") === 4 && D.hovedgruppe("Pb") === 4 && D.FLERE_LADNINGER.indexOf("Sn") >= 0 && D.FLERE_LADNINGER.indexOf("Pb") >= 0);
+    paastand("overgangsmetallerne har intet hovedgruppenummer", D.hovedgruppe("Fe") === null && D.hovedgruppe("Zn") === null);
+    paastand("displayet: SO42- bliver SO₄²⁻", T.pynt("SO42-", "ion", D.ion("SO4")) === "SO₄²⁻");
+    paastand("displayet: NH4+ bliver NH₄⁺", T.pynt("NH4+", "ion", D.ion("NH4")) === "NH₄⁺");
+    paastand("displayet: Al2(SO4)3 bliver Al₂(SO₄)₃", T.pynt("Al2(SO4)3", "formel") === "Al₂(SO₄)₃");
+
+    overskrift("4. De rigtige svar bliver godkendt");
+    var ikkeGodkendt = [];
+    D.STOFFER.forEach(function (s) {
+        [s.katIon, s.anIon].forEach(function (i) {
+            var ascii = i.formel + (Math.abs(i.q) > 1 ? Math.abs(i.q) : "") + (i.q > 0 ? "+" : "-");
+            if (!T.ion(ascii, i, s, s.retning).ok) ikkeGodkendt.push(ascii);
+            if (!T.ion(i.tekst, i, s, s.retning).ok) ikkeGodkendt.push(i.tekst);
+            if (!T.ion(" " + ascii.replace(/(\d*)([+-])$/, " $1$2") + " ", i, s, s.retning).ok) ikkeGodkendt.push("mellemrum " + ascii);
+            i.navne.forEach(function (n) {
+                if (!T.ionNavn(n, i).ok) ikkeGodkendt.push(n);
+                if (!T.ionNavn(n.toUpperCase(), i).ok) ikkeGodkendt.push(n.toUpperCase());
+            });
+        });
+        if (!T.formel(s.formel, s).ok) ikkeGodkendt.push(s.formel);
+        if (!T.formel(s.formelTekst, s).ok) ikkeGodkendt.push(s.formelTekst);
+        s.navne.forEach(function (n) { if (!T.navn(n, s).ok) ikkeGodkendt.push(n); });
+        if (!T.navn(" " + s.navn.charAt(0).toUpperCase() + s.navn.slice(1) + " ", s).ok) ikkeGodkendt.push("stort " + s.navn);
+    });
+    paastand("alle ioner, ionnavne, formler og navne i ASCII, med hævet skrift og med mellemrum", ikkeGodkendt.length === 0,
+        ikkeGodkendt.slice(0, 6).join(", "));
+    var noteNa = T.ion("Na1+", D.ion("Na"), D.stof("Na2O"), "formel");
+    paastand("Na1+ godkendes med en bemærkning om skrivemåden", noteNa.ok && /bare som \+/.test(noteNa.note));
+    var fos = T.navn("calciumfosfid", D.stof("Ca3P2"));
+    paastand("fosfid godkendes, men staves phosphid", fos.ok && /phosphid/.test(fos.note));
+    var soelv = T.navn("sølv(I)bromid", D.stof("AgBr"));
+    paastand("sølv(I)bromid godkendes med en bemærkning", soelv.ok && /kun én ion/.test(soelv.note));
+
+    overskrift("5. De typiske fejl giver den rigtige besked");
+    var alleBeskeder = [];
+    function fejlTjek(navn, res, moenster) {
+        if (res && res.besked) alleBeskeder.push(res.besked);
+        paastand(navn, res && !res.ok && moenster.test(res.besked || ""), res ? (res.ok ? "godkendt" : res.besked) : "intet svar");
+    }
+    var Na2O = D.stof("Na2O"), Al2O3 = D.stof("Al2O3"), Fe2O3 = D.stof("Fe2O3"), AlS = D.stof("Al2(SO4)3");
+    fejlTjek("Na uden ladning", T.ion("Na", D.ion("Na"), Na2O, "formel"), /Husk ladningen/);
+    fejlTjek("Mg2 uden fortegn", T.ion("Mg2", D.ion("Mg"), D.stof("MgCl2"), "formel"), /fortegnet/);
+    fejlTjek("Na2+: forkert antal", T.ion("Na2+", D.ion("Na"), Na2O, "formel"), /hovedgruppe/);
+    fejlTjek("O6-: hovedgruppens tal i stedet for det, der mangler", T.ion("O6-", D.ion("O"), Na2O, "formel"), /Ikke så mange/);
+    fejlTjek("O2+: forkert fortegn", T.ion("O2+", D.ion("O"), Na2O, "formel"), /negative ioner/);
+    fejlTjek("Al-3: forkert fortegn på metal", T.ion("Al3-", D.ion("Al"), Al2O3, "formel"), /positive ioner/);
+    fejlTjek("Al+3: tallet efter fortegnet", T.ion("Al+3", D.ion("Al"), Al2O3, "formel"), /før fortegnet/);
+    fejlTjek("na+: små bogstaver", T.ion("na+", D.ion("Na"), Na2O, "formel"), /Store og små/);
+    fejlTjek("natrium: navnet i stedet for formlen", T.ion("natrium", D.ion("Na"), Na2O, "formel"), /ikke navnet/);
+    fejlTjek("N+ for natrium: forkert symbol", T.ion("N+", D.ion("Na"), Na2O, "formel"), /N er nitrogen/);
+    fejlTjek("Fe2+ i Fe2O3: regn efter", T.ion("Fe2+", D.ion("Fe3"), Fe2O3, "navn"), /er neutral/);
+    fejlTjek("SO3 2-: forkert sammensat ion", T.ion("SO32-", D.ion("SO4"), AlS, "formel"), /plakaten/);
+    fejlTjek("O--: ladning med to minusser", T.ion("O--", D.ion("O"), Na2O, "formel"), /med tal/);
+
+    fejlTjek("NaO: ladningen går ikke op", T.formel("NaO", Na2O), /går ikke lige op: 1 Na⁺ giver \+1, og 1 O²⁻ giver −2/);
+    fejlTjek("Al3O2: tallene byttet om", T.formel("Al3O2", Al2O3), /byttet om/);
+    fejlTjek("Be2O2: kan forkortes", T.formel("Be2O2", D.stof("BeO")), /forkortes/);
+    fejlTjek("Al2SO43: parentes mangler", T.formel("Al2SO43", AlS), /parentes: \(SO₄\)₃/);
+    fejlTjek("NH42SO4: parentes mangler om ammonium", T.formel("NH42SO4", D.stof("(NH4)2SO4")), /\(NH₄\)₂/);
+    fejlTjek("Ba(SO4): unødvendig parentes", T.formel("Ba(SO4)", D.stof("BaSO4")), /Parentesen bruges kun/);
+    fejlTjek("Na2O1: ettal", T.formel("Na2O1", Na2O), /Tallet 1/);
+    fejlTjek("ONa2: negativ ion først", T.formel("ONa2", Na2O), /positive ion skrives først/);
+    fejlTjek("Al2S3O12: atomerne talt ud", T.formel("Al2S3O12", AlS), /Atomerne passer/);
+    fejlTjek("AL2O3: store bogstaver", T.formel("AL2O3", Al2O3), /Store og små/);
+    fejlTjek("Na+2O2-: ladninger i formlen", T.formel("Na2+O2-", Na2O), /uden ladninger/);
+    fejlTjek("H2O: påskeæg", T.formel("H2O", Na2O), /vand/);
+
+    fejlTjek("jernoxid: romertal mangler", T.navn("jernoxid", Fe2O3), /jern\(\?\)oxid/);
+    fejlTjek("jern(II)oxid for Fe2O3: forkert ladning", T.navn("jern(II)oxid", Fe2O3), /Tjek ladningen/);
+    fejlTjek("dijerntrioxid: talord", T.navn("dijerntrioxid", Fe2O3), /talord/);
+    fejlTjek("natriumionhydrogencarbonat: -ion i navnet", T.navn("natriumionhydrogencarbonat", D.stof("NaHCO3")), /-ion ikke/);
+    fejlTjek("oxidjern(III): negativ ion først", T.navn("oxidjern(III)", Fe2O3), /positive ion kommer først/);
+    fejlTjek("natriumoxygen: grundstoffets navn", T.navn("natriumoxygen", Na2O), /endelsen -id/);
+    fejlTjek("bly(II)nitrit: nitrit og nitrat", T.navn("bly(II)nitrit", D.stof("Pb(NO3)2")), /Nitrit er NO₂⁻/);
+    fejlTjek("kaliumsulfid for K2CO3", T.navn("kaliumsulfid", D.stof("K2CO3")), /negative ion/);
+    fejlTjek("ammoniakchlorid", T.navn("ammoniakchlorid", D.stof("NH4Cl")), /Ammoniak er NH₃/);
+    fejlTjek("natrium(I)oxid: romertal på natrium", T.navn("natrium(I)oxid", Na2O), /kun én ion/);
+    fejlTjek("rust: hverdagsnavn", T.navn("rust", Fe2O3), /cyklen/);
+    fejlTjek("natron: hverdagsnavn", T.navn("natron", D.stof("NaHCO3")), /køkkenet/);
+
+    fejlTjek("oxidion: negativ ion med -ion", T.ionNavn("oxidion", D.ion("O")), /får ikke endelsen -ion/);
+    fejlTjek("oxygen: grundstoffets navn", T.ionNavn("oxygen", D.ion("O")), /endelsen -id/);
+    fejlTjek("natrium: -ion mangler", T.ionNavn("natrium", D.ion("Na")), /endelsen -ion/);
+    fejlTjek("jernion: romertal mangler", T.ionNavn("jernion", D.ion("Fe3")), /jern\(\?\)ion/);
+    fejlTjek("jern(II)ion for Fe3+", T.ionNavn("jern(II)ion", D.ion("Fe3")), /romertal/);
+    fejlTjek("sulfid for SO4 2-", T.ionNavn("sulfid", D.ion("SO4")), /Sulfid er S²⁻/);
+    fejlTjek("carbonat for HCO3-", T.ionNavn("carbonat", D.ion("HCO3")), /også et H/);
+    fejlTjek("tomt felt tæller ikke", { besked: T.formel("", Na2O).tom ? "tom" : "" }, /tom/);
+
+    overskrift("6. Hjælpen findes til hvert felt");
+    var mangelHjaelp = [];
+    var alleHints = [];
+    D.STOFFER.forEach(function (s) {
+        D.trin(s).forEach(function (r) {
+            r.felter.forEach(function (f) {
+                var h = D.hjaelp(s, r, f);
+                if (!h || !h.hint || !h.svar) mangelHjaelp.push(s.id + " " + f.slags);
+                else { alleHints.push(h.hint); alleHints.push(h.svar.replace(/<[^>]+>/g, "")); }
+            });
+        });
+    });
+    paastand("hint og svar til alle " + alleHints.length / 2 + " felter", mangelHjaelp.length === 0, mangelHjaelp.slice(0, 5).join(", "));
+    paastand("formel til navn: den negative ion kommer først, når metallets ladning skal regnes ud",
+        D.STOFFER.filter(function (s) { return s.retning === "navn"; }).every(function (s) {
+            return D.trin(s)[0].ion === (s.katIon.beregnes ? s.anIon : s.katIon);
+        }));
+    var hFe = D.hjaelp(Fe2O3, D.trin(Fe2O3)[1], { slags: "ion" });
+    paastand("svaret for Fe³⁺ regner med 3 O²⁻ og 2 Fe", /3 O²⁻ giver −6\. Så skal 2 Fe give \+6, altså \+3 hver/.test(hFe.svar), hFe.svar);
+
+    overskrift("7. Sproget");
+    var tekster = [].concat(
+        D.STOFFER.map(function (s) { return s.fakta; }),
+        alleHints, alleBeskeder,
+        D.HYLDE_ROS, D.HYLDE_ROS_STJERNER, [D.LAGER_FAERDIGT],
+        Object.keys(D.SLUT_REPLIK).map(function (k) { return D.SLUT_REPLIK[k]; }),
+        [d.body.innerText]
+    );
+    var tankestreg = tekster.filter(function (t) { return /[–—]/.test(t); });
+    paastand("ingen tankestreger", tankestreg.length === 0, tankestreg.slice(0, 2).join(" | "));
+    var ettal = tekster.filter(function (t) { return /(^|[^\d(])1[+−-](?![\d])/.test(t) || /¹[⁺⁻]/.test(t); });
+    paastand("ingen ladning skrevet som 1+ eller 1−", ettal.length === 0, ettal.slice(0, 2).join(" | "));
+    var lange = [].concat(D.HYLDE_ROS, D.HYLDE_ROS_STJERNER, [D.LAGER_FAERDIGT],
+        Object.keys(D.SLUT_REPLIK).map(function (k) { return D.SLUT_REPLIK[k]; })).filter(function (t) { return t.length > 72; });
+    paastand("Kemichaels replikker er korte", lange.length === 0, lange.join(" | "));
+
+    overskrift("8. Lageret kan gennemføres");
+    function svar(v) { var f = L.aktivtFelt(); f.input.value = v; L.tjek(); }
+    function rigtigtSvar(f) {
+        var s = L.opg.st;
+        if (f.slags === "ion") { var i = f.raekke.ion; return i.formel + (Math.abs(i.q) > 1 ? Math.abs(i.q) : "") + (i.q > 0 ? "+" : "-"); }
+        if (f.slags === "ionnavn") return f.raekke.ion.navn;
+        if (f.slags === "formel") return s.formel;
+        return s.navn;
+    }
+    L.nulstilAlt();
+    paastand("efter nulstilling er intet løst", L.antalLoest() === 0);
+    paastand("glas 1 står på bordet med første felt aktivt", L.valgt === 0 && L.aktivtFelt() && L.aktivtFelt().status === "aktiv");
+    svar("NaO");
+    paastand("et forkert svar giver en besked og flytter ikke videre", L.opg.k === 0 && /skidt/.test(L.el.besked.className));
+    paastand("knappen starter på Giv hint", L.el.knap.textContent === "Giv hint");
+    L.knap();
+    paastand("første tryk giver et hint, og knappen bliver til Vis svaret", /Hint/.test(L.el.besked.innerHTML) && L.el.knap.textContent === "Vis svaret");
+    paastand("hintet får plakaten med det periodiske system til at lyse og peger på Na", L.fremhaevning("pt") === "Na");
+    L.knap();
+    paastand("andet tryk viser svaret og går videre", L.opg.felter[0].status === "svar" && L.opg.k === 1 && L.opg.brugtSvar);
+    paastand("knappen er Giv hint igen i det næste felt", L.el.knap.textContent === "Giv hint");
+    svar("O2-");
+    paastand("kuglerne for Na⁺ og O²⁻ ligger ved glasset", L.kugler.length === 2);
+    svar("Na2O");
+    paastand("glasset er løst, men uden stjerne, fordi svaret blev vist", L.status[0].loest && !L.status[0].stjerne);
+    paastand("regnskabet lægger 2 Na⁺ og 1 O²⁻", L.kugler.length === 3 && L.regn && L.regn.fase === "viser");
+    for (var t = 0; t < 400; t++) L.opdater(1 / 60);
+    paastand("kuglerne ender i glasset, og etiketten bliver printet", L.regn.fase === "faerdig");
+    paastand("knappen er Næste glas", /Næste glas/.test(L.el.knap.textContent));
+    paastand("fakta-linjen står under scenen", /vinduesglas/.test(d.getElementById("lager-status").textContent));
+
+    var i, loeste = 1;
+    for (i = 1; i < 30; i++) {
+        L.vaelg(i, true);
+        var vagt = 0;
+        while (!L.opg.faerdig && vagt++ < 10) svar(rigtigtSvar(L.aktivtFelt()));
+        if (L.status[i].loest) loeste++;
+    }
+    paastand("alle 30 glas kan løses", loeste === 30 && L.antalLoest() === 30);
+    paastand("29 stjerner (det første fik svaret vist)", L.antalStjerner() === 29, L.antalStjerner());
+    paastand("Kemichael venter med at rose den sidste hylde og hele lageret", !!(L.ventRos && L.ventRos.hylde === 2 && L.ventRos.alt));
+    var gemt = JSON.parse(W.localStorage.getItem("nk-sc2.3-lager") || "{}");
+    paastand("fremskridtet er gemt i browseren", Object.keys(gemt).length === 30);
+    svaerKnap.click();
+    paastand("sværere ioner: seks glas er byttet ud og står uløste", NK.indstil.svaer && L.antalLoest() === 24 &&
+        L.stoffer[17].id === "PbO2" && L.stoffer[23].id === "NaHCO3");
+    paastand("sværere ioner huskes i browseren", W.localStorage.getItem("nk-sc2.3-svaer") === "true");
+    paastand("samlebåndet trækker også sværere stoffer", (function () {
+        B.nivNr = 1; B.pose = [];
+        for (var n = 0; n < 10; n++) { if (B.traek().st.svaer) return true; }
+        return false;
+    }()));
+    B.nivNr = 0; B.pose = [];
+    svaerKnap.click();
+    paastand("slået fra igen: de 30 løste glas er tilbage", !NK.indstil.svaer && L.antalLoest() === 30 && L.stoffer[17].id === "CuO");
+    L.vaelg(12, true);
+    paastand("et løst glas viser facit og Øv glasset igen", L.opg.gennemsyn && L.opg.felter.every(function (f) { return f.status === "ok"; }) &&
+        L.el.knap.textContent === "Øv glasset igen");
+    L.knap();
+    paastand("Øv glasset igen giver en tom opgave", !L.opg.gennemsyn && L.opg.k === 0 && L.aktivtFelt().status === "aktiv");
+
+    overskrift("9. Samlebåndet");
+    d.querySelector('.faneknap[data-fane="fane-baand"]').click();
+    B.tilpas();
+    B.start();
+    paastand("spillet starter med tre liv på niveau 1", B.tilstand === "koerer" && B.liv === 3 && B.nivNr === 0);
+    for (t = 0; t < 60; t++) B.opdater(1 / 60);
+    var g = B.forreste();
+    paastand("et glas kører ind", !!g && g.status === "paa");
+    B.input.value = "noget helt forkert";
+    B.tjek();
+    paastand("et forkert svar koster stimen, ikke et liv", B.liv === 3 && B.stime === 0 && /skidt/.test(d.getElementById("baand-besked").className));
+    var point = 0;
+    for (i = 0; i < 5; i++) {
+        var vagt2 = 0;
+        while (!B.forreste() && vagt2++ < 600) B.opdater(1 / 60);
+        g = B.forreste();
+        B.input.value = g.retning === "formel" ? g.st.formel : g.st.navn;
+        B.tjek();
+        point = B.point;
+    }
+    paastand("fem rigtige giver point og niveau 2", point > 0 && B.nivNr === 1, "point " + point + ", niveau " + (B.nivNr + 1));
+    paastand("niveau 2 er formel til navn", B.traek().retning === "navn");
+    var vagt3 = 0;
+    while (B.tilstand === "koerer" && vagt3++ < 60 * 400) B.opdater(1 / 60);
+    paastand("tre glas i kassen, og spillet er slut", B.tilstand === "slut" && B.liv === 0 && B.iKassen.length === 3);
+    paastand("glassene i kassen står med facit i panelet", d.querySelectorAll("#baand-kasseliste li").length === 3);
+    paastand("rekorden er gemt", B.rekord === point && JSON.parse(W.localStorage.getItem("nk-sc2.3-baand")).rekord === point);
+    var nivF = [0, 1, 2, 3, 6, 12].map(function (n) { B.nivNr = n; return B.traek(); });
+    paastand("hylde 3 bruger stoffets egen retning, og fra niveau 4 blandes retningerne",
+        nivF[2].retning === nivF[2].st.retning && ["formel", "navn"].indexOf(nivF[4].retning) >= 0);
+    B.nulstil();
+    d.querySelector('.faneknap[data-fane="fane-lager"]').click();
+
+    overskrift("10. Layoutet på små og store skærme");
+    [[520, 380], [700, 560], [980, 760], [1500, 900]].forEach(function (m) {
+        L.L.b = m[0]; L.L.h = m[1];
+        L.layout();
+        var lay = L.lay;
+        var reolBund = lay.reol.y + lay.reol.h;
+        var glasB = NK.Tegn.glasBredde(lay.lilleH);
+        var o = lay.ionOmr;
+        paastand(m[0] + " x " + m[1] + ": glassene på hylden rører ikke hinanden", glasB < lay.slot);
+        paastand(m[0] + " x " + m[1] + ": det store glas står under reolen", lay.bordY - lay.storH >= reolBund + 20);
+        paastand(m[0] + " x " + m[1] + ": plads til kuglerne mellem glas og maskine", o.x1 - o.x0 >= 120, Math.round(o.x1 - o.x0));
+        paastand(m[0] + " x " + m[1] + ": etiketmaskinen er inden for scenen", lay.maskine.x + lay.maskine.b <= m[0]);
+    });
+    L.L.b = 0;
+    L.tilpas();
+}
+</script>
+</body>
+</html>

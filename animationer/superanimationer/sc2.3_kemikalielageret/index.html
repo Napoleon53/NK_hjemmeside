@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kemikalielageret</title>
+<link rel="stylesheet" href="css/stil.css">
+</head>
+<body>
+
+<header class="top">
+    <h1><span class="ikon">🏷</span> Kemikalielageret</h1>
+
+    <div class="faneknapper" role="tablist" aria-label="Vælg fane">
+        <button class="faneknap aktiv" data-fane="fane-lager" role="tab" aria-selected="true"><span class="nr">1</span>Lageret</button>
+        <button class="faneknap" data-fane="fane-baand" role="tab" aria-selected="false"><span class="nr">2</span>Samlebåndet</button>
+    </div>
+
+    <!-- Tilvalg: seks glas faar sværere ioner (Sr, Sn, Pb, Hg, HCO3-).
+         Gaelder begge faner og huskes i browseren (js/app.js). -->
+    <label class="kontakt" id="svaer-kontakt">
+        <input type="checkbox" id="svaer-knap">
+        <span class="kontakt-spor" aria-hidden="true"><span class="kontakt-knop"></span></span>
+        <span class="kontakt-tekst">Sværere ioner</span>
+    </label>
+
+    <button class="ikonknap" id="hjaelpknap" type="button" title="Rundvisning på denne fane (H)" aria-label="Rundvisning">?</button>
+</header>
+
+<main>
+
+<!-- ================================================================= -->
+<!-- FANE 1: LAGERET                                                    -->
+<!-- Raekkerne i opgavekortet bygges af sim_lager.js                    -->
+<!-- ================================================================= -->
+<section class="fane aktiv" id="fane-lager" role="tabpanel" aria-label="Lageret">
+    <div class="scene medtekst">
+        <canvas id="lager-laerred"></canvas>
+        <div class="anker" id="lager-anker-reol"></div>
+        <div class="anker" id="lager-anker-bord"></div>
+        <div class="anker" id="lager-anker-plakater"></div>
+        <div class="scene-mrk" id="lager-status"></div>
+    </div>
+
+    <aside class="panel">
+        <!-- Én knap, der aendrer sig: Giv hint -> Vis svaret -> Naeste glas -->
+        <div class="kort opgavekort" id="lager-kort">
+            <h2><span id="lager-hylde"></span><span class="taeller">glas <b id="lager-nr">1</b>/10</span></h2>
+            <div class="opgave-prompt" id="lager-prompt"></div>
+            <p class="opgave-spm" id="lager-spm"></p>
+            <div class="raekker" id="lager-raekker"></div>
+            <p class="besked" id="lager-besked" aria-live="polite"></p>
+            <div class="knaprad"><button class="knap" id="lager-knap" type="button">Giv hint</button></div>
+        </div>
+
+        <div class="kort" id="lager-fremskridt">
+            <h2>Hylderne <span class="taeller">løst <b id="lager-loest">0</b>/30</span></h2>
+            <div class="hyldeliste" id="lager-hylder"></div>
+            <button class="knap nulstil" id="lager-nulstil" type="button"><span>Sæt alle glas tilbage</span><span class="tegn">↺</span></button>
+        </div>
+
+        <div class="kort">
+            <h2>Slå op</h2>
+            <div class="knaprad taet">
+                <button class="knap" type="button" data-opslag="pt">Periodisk system</button>
+                <button class="knap" type="button" data-opslag="ioner">Sammensatte ioner</button>
+            </div>
+        </div>
+    </aside>
+</section>
+
+<!-- ================================================================= -->
+<!-- FANE 2: SAMLEBAANDET                                               -->
+<!-- Feltet ligger usynligt oven paa etiketmaskinens display; teksten   -->
+<!-- tegnes af sim_baand.js med saenkede og haevede tal.                -->
+<!-- ================================================================= -->
+<section class="fane" id="fane-baand" role="tabpanel" aria-label="Samlebåndet">
+    <div class="scene">
+        <canvas id="baand-laerred"></canvas>
+        <div class="lcd-felt" id="baand-lcd">
+            <input type="text" id="baand-input" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
+                   aria-label="Skriv den halvdel af etiketten, der mangler">
+        </div>
+        <div class="baand-besked tom" id="baand-besked" aria-live="polite"></div>
+        <div class="anker" id="baand-anker-baand"></div>
+        <div class="anker" id="baand-anker-kasse"></div>
+        <div class="anker" id="baand-anker-hylde"></div>
+    </div>
+
+    <aside class="panel">
+        <div class="kort maaling">
+            <h2>Point <span class="taeller">rekord <b id="baand-rekord">0</b></span></h2>
+            <div class="storttal" id="baand-point">0</div>
+            <div class="talraekke"><span>Niveau</span><span class="tal" id="baand-niveau">1</span></div>
+            <div class="talraekke"><span>Stime</span><span class="tal gul" id="baand-stime">×1</span></div>
+            <div class="talraekke"><span>Liv</span><span class="tal roed" id="baand-liv">♥♥♥</span></div>
+            <button class="knap stor blaa banker" id="baand-knap" type="button" style="margin-top:10px;"><span>Start samlebåndet</span><span class="tegn">▶</span></button>
+        </div>
+
+        <div class="kort">
+            <h2>Sådan</h2>
+            <p class="note" style="margin-top:0;">Skriv den halvdel af etiketten, der mangler på det forreste glas, og tryk Enter. Et glas, der når kassen, koster et liv.</p>
+        </div>
+
+        <div class="kort" id="baand-kasse-kort" hidden>
+            <h2>I kassen</h2>
+            <ul class="kasseliste" id="baand-kasseliste"></ul>
+        </div>
+
+        <div class="kort">
+            <h2>Slå op</h2>
+            <div class="knaprad taet">
+                <button class="knap" type="button" data-opslag="pt">Periodisk system</button>
+                <button class="knap" type="button" data-opslag="ioner">Sammensatte ioner</button>
+            </div>
+            <p class="note">Båndet kører imens.</p>
+        </div>
+    </aside>
+</section>
+
+</main>
+
+<!-- ================================================================= -->
+<!-- PLAKATERNE I STORT FORMAT (js/opslag.js)                           -->
+<!-- ================================================================= -->
+<div class="overlay" id="opslag-pt">
+    <div class="overlay-boks bred">
+        <h2>Det periodiske system</h2>
+        <div class="pt-gitter" id="pt-gitter"></div>
+        <p class="pt-info" id="pt-info"></p>
+        <div class="pnoegle">
+            <span class="m">metal</span>
+            <span class="i">ikke-metal</span>
+            <span class="h">halvmetal</span>
+            <span class="a">ædelgas</span>
+            <span class="flere">flere mulige ladninger</span>
+        </div>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<div class="overlay" id="opslag-ioner">
+    <div class="overlay-boks smal">
+        <h2>Sammensatte ioner</h2>
+        <div class="ion-tabel" id="ion-tabel"></div>
+        <div class="knapper" style="margin-top:14px;">
+            <button class="knap blaa" type="button" data-luk style="justify-content:center;">Luk</button>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================= -->
+<!-- Rundvisningen: ét element ad gangen paa den aktive fane            -->
+<!-- ================================================================= -->
+<div class="rundvisning" id="rundvisning" hidden>
+    <div class="rundvisning-baggrund" id="rv-baggrund"></div>
+    <div class="rundvisning-spot" id="rv-spot"></div>
+    <div class="rundvisning-boks" id="rv-boks">
+        <div class="rundvisning-hoved">
+            <span class="rundvisning-tal" id="rv-tal">1/5</span>
+            <button class="rundvisning-luk" id="rv-luk" type="button" aria-label="Afslut rundvisning">✕</button>
+        </div>
+        <h3 id="rv-titel"></h3>
+        <p id="rv-tekst"></p>
+        <div class="rundvisning-knapper">
+            <button class="knap" id="rv-forrige" type="button">← Forrige</button>
+            <button class="knap blaa" id="rv-naeste" type="button">Næste →</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/kerne.js"></script>
+<script src="js/data.js"></script>
+<script src="js/tjek.js"></script>
+<script src="js/sprites.js"></script>
+<script src="../../v2/kemichael/kemichael.js"></script>
+<script src="js/tegning.js"></script>
+<script src="js/opslag.js"></script>
+<script src="js/sim_lager.js"></script>
+<script src="js/sim_baand.js"></script>
+<script src="js/laerer.js"></script>
+<script src="js/rundvisning.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
